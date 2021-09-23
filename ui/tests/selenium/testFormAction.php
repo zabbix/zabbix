@@ -157,257 +157,257 @@ class testFormAction extends CLegacyWebTest {
 		return [
 			[
 				[
-					'eventsource' => 'Triggers',
+					'eventsource' => EVENT_SOURCE_TRIGGERS,
 					'recovery_msg' => true,
 					'acknowledge_msg' => true
 				]
 			],
 			[
 				[
-					'eventsource' => 'Triggers',
+					'eventsource' => EVENT_SOURCE_TRIGGERS,
 					'new_operation_operationtype' => 'Send message'
 				]
 			],
 			[
 				[
-					'eventsource' => 'Triggers',
+					'eventsource' => EVENT_SOURCE_TRIGGERS,
 					'new_operation_operationtype' => 'Send message',
 					'new_operation_opmessage_custom_msg' => 'unchecked'
 				]
 			],
 			[
 				[
-					'eventsource' => 'Triggers',
+					'eventsource' => EVENT_SOURCE_TRIGGERS,
 					'new_operation_operationtype' => 'Send message',
 					'add_opcondition' => true
 				]
 			],
 			[
 				[
-					'eventsource' => 'Triggers',
+					'eventsource' => EVENT_SOURCE_TRIGGERS,
 					'check_operationtype' => true,
 					'new_operation_operationtype' => 'Reboot',
 					'add_opcondition' => true
 				]
 			],
 			[
-				['eventsource' => 'Triggers', 'evaltype' => 'And']
+				['eventsource' => EVENT_SOURCE_TRIGGERS, 'evaltype' => 'And']
 			],
 			[
-				['eventsource' => 'Triggers', 'evaltype' => 'Or']
+				['eventsource' => EVENT_SOURCE_TRIGGERS, 'evaltype' => 'Or']
 			],
 			[
-				['eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Tag name']
+				['eventsource' => EVENT_SOURCE_TRIGGERS, 'new_condition_conditiontype' => 'Tag name']
 			],
 			[
-				['eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Tag value']
+				['eventsource' => EVENT_SOURCE_TRIGGERS, 'new_condition_conditiontype' => 'Tag value']
 			],
 			[
-				['eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Host group']
+				['eventsource' => EVENT_SOURCE_TRIGGERS, 'new_condition_conditiontype' => 'Host group']
 			],
 			[
-				['eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Template']
+				['eventsource' => EVENT_SOURCE_TRIGGERS, 'new_condition_conditiontype' => 'Template']
 			],
 			[
-				['eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Host']
+				['eventsource' => EVENT_SOURCE_TRIGGERS, 'new_condition_conditiontype' => 'Host']
 			],
 			[
-				['eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Trigger']
+				['eventsource' => EVENT_SOURCE_TRIGGERS, 'new_condition_conditiontype' => 'Trigger']
 			],
 			[
-				['eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Trigger name']
+				['eventsource' => EVENT_SOURCE_TRIGGERS, 'new_condition_conditiontype' => 'Trigger name']
 			],
 			[
-				['eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Trigger severity']
+				['eventsource' => EVENT_SOURCE_TRIGGERS, 'new_condition_conditiontype' => 'Trigger severity']
 			],
 			[
-				['eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Time period']
+				['eventsource' => EVENT_SOURCE_TRIGGERS, 'new_condition_conditiontype' => 'Time period']
 			],
 			[
-				['eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Problem is suppressed']
+				['eventsource' => EVENT_SOURCE_TRIGGERS, 'new_condition_conditiontype' => 'Problem is suppressed']
 			],
 			[
 				[
-					'eventsource' => 'Services',
+					'eventsource' => EVENT_SOURCE_SERVICE,
 					'recovery_msg' => true,
 					'acknowledge_msg' => true
 				]
 			],
 			[
 				[
-					'eventsource' => 'Services',
+					'eventsource' => EVENT_SOURCE_SERVICE,
 					'new_operation_operationtype' => 'Send message'
 				]
 			],
 			[
 				[
-					'eventsource' => 'Services',
+					'eventsource' => EVENT_SOURCE_SERVICE,
 					'new_operation_operationtype' => 'Send message',
 					'new_operation_opmessage_custom_msg' => 'unchecked'
 				]
 			],
 			[
 				[
-					'eventsource' => 'Services',
+					'eventsource' => EVENT_SOURCE_SERVICE,
 					'check_operationtype' => true,
 					'new_operation_operationtype' => 'Reboot'
 				]
 			],
 			[
-				['eventsource' => 'Services', 'new_condition_conditiontype' => 'Service']
+				['eventsource' => EVENT_SOURCE_SERVICE, 'new_condition_conditiontype' => 'Service']
 			],
 			[
-				['eventsource' => 'Services', 'new_condition_conditiontype' => 'Service name']
+				['eventsource' => EVENT_SOURCE_SERVICE, 'new_condition_conditiontype' => 'Service name']
 			],
 			[
-				['eventsource' => 'Services', 'new_condition_conditiontype' => 'Service tag name']
+				['eventsource' => EVENT_SOURCE_SERVICE, 'new_condition_conditiontype' => 'Service tag name']
 			],
 			[
-				['eventsource' => 'Services', 'new_condition_conditiontype' => 'Service tag value']
+				['eventsource' => EVENT_SOURCE_SERVICE, 'new_condition_conditiontype' => 'Service tag value']
 			],
 			[
-				['eventsource' => 'Discovery']
+				['eventsource' => EVENT_SOURCE_DISCOVERY]
 			],
 			[
-				['eventsource' => 'Discovery', 'new_condition_conditiontype' => 'Host IP']
+				['eventsource' => EVENT_SOURCE_DISCOVERY, 'new_condition_conditiontype' => 'Host IP']
 			],
 			[
-				['eventsource' => 'Discovery', 'new_condition_conditiontype' => 'Service type']
+				['eventsource' => EVENT_SOURCE_DISCOVERY, 'new_condition_conditiontype' => 'Service type']
 			],
 			[
-				['eventsource' => 'Discovery', 'new_condition_conditiontype' => 'Service port']
+				['eventsource' => EVENT_SOURCE_DISCOVERY, 'new_condition_conditiontype' => 'Service port']
 			],
 			[
-				['eventsource' => 'Discovery', 'new_condition_conditiontype' => 'Discovery rule']
+				['eventsource' => EVENT_SOURCE_DISCOVERY, 'new_condition_conditiontype' => 'Discovery rule']
 			],
 			[
-				['eventsource' => 'Discovery', 'new_condition_conditiontype' => 'Discovery check']
+				['eventsource' => EVENT_SOURCE_DISCOVERY, 'new_condition_conditiontype' => 'Discovery check']
 			],
 			[
-				['eventsource' => 'Discovery', 'new_condition_conditiontype' => 'Discovery object']
+				['eventsource' => EVENT_SOURCE_DISCOVERY, 'new_condition_conditiontype' => 'Discovery object']
 			],
 			[
-				['eventsource' => 'Discovery', 'new_condition_conditiontype' => 'Discovery status']
+				['eventsource' => EVENT_SOURCE_DISCOVERY, 'new_condition_conditiontype' => 'Discovery status']
 			],
 			[
-				['eventsource' => 'Discovery', 'new_condition_conditiontype' => 'Uptime/Downtime']
+				['eventsource' => EVENT_SOURCE_DISCOVERY, 'new_condition_conditiontype' => 'Uptime/Downtime']
 			],
 			[
-				['eventsource' => 'Discovery', 'new_condition_conditiontype' => 'Received value']
+				['eventsource' => EVENT_SOURCE_DISCOVERY, 'new_condition_conditiontype' => 'Received value']
 			],
 			[
-				['eventsource' => 'Discovery', 'new_condition_conditiontype' => 'Proxy']
+				['eventsource' => EVENT_SOURCE_DISCOVERY, 'new_condition_conditiontype' => 'Proxy']
 			],
 			[
 				[
-					'eventsource' => 'Discovery',
+					'eventsource' => EVENT_SOURCE_DISCOVERY,
 					'new_operation_operationtype' => 'Send message'
 				]
 			],
 			[
 				[
-					'eventsource' => 'Discovery',
+					'eventsource' => EVENT_SOURCE_DISCOVERY,
 					'new_operation_operationtype' => 'Send message',
 					'new_operation_opmessage_custom_msg' => 'unchecked'
 				]
 			],
 			[
 				[
-					'eventsource' => 'Discovery',
+					'eventsource' => EVENT_SOURCE_DISCOVERY,
 					'new_operation_operationtype' => 'Reboot'
 				]
 			],
 			[
-				['eventsource' => 'Discovery', 'check_operationtype' => true, 'new_operation_operationtype' => 'Add host']
+				['eventsource' => EVENT_SOURCE_DISCOVERY, 'check_operationtype' => true, 'new_operation_operationtype' => 'Add host']
 			],
 			[
-				['eventsource' => 'Discovery', 'new_operation_operationtype' => 'Remove host']
+				['eventsource' => EVENT_SOURCE_DISCOVERY, 'new_operation_operationtype' => 'Remove host']
 			],
 			[
-				['eventsource' => 'Discovery', 'new_operation_operationtype' => 'Add to host group']
+				['eventsource' => EVENT_SOURCE_DISCOVERY, 'new_operation_operationtype' => 'Add to host group']
 			],
 			[
-				['eventsource' => 'Discovery', 'new_operation_operationtype' => 'Remove from host group']
+				['eventsource' => EVENT_SOURCE_DISCOVERY, 'new_operation_operationtype' => 'Remove from host group']
 			],
 			[
-				['eventsource' => 'Discovery', 'new_operation_operationtype' => 'Link to template']
+				['eventsource' => EVENT_SOURCE_DISCOVERY, 'new_operation_operationtype' => 'Link to template']
 			],
 			[
-				['eventsource' => 'Discovery', 'new_operation_operationtype' => 'Unlink from template']
+				['eventsource' => EVENT_SOURCE_DISCOVERY, 'new_operation_operationtype' => 'Unlink from template']
 			],
 			[
-				['eventsource' => 'Discovery', 'new_operation_operationtype' => 'Enable host']
+				['eventsource' => EVENT_SOURCE_DISCOVERY, 'new_operation_operationtype' => 'Enable host']
 			],
 			[
-				['eventsource' => 'Discovery', 'new_operation_operationtype' => 'Disable host']
+				['eventsource' => EVENT_SOURCE_DISCOVERY, 'new_operation_operationtype' => 'Disable host']
 			],
 			[
-				['eventsource' => 'Autoregistration']
+				['eventsource' => EVENT_SOURCE_AUTOREGISTRATION]
 			],
 			[
-				['eventsource' => 'Autoregistration', 'new_condition_conditiontype' => 'Host name']
+				['eventsource' => EVENT_SOURCE_AUTOREGISTRATION, 'new_condition_conditiontype' => 'Host name']
 			],
 			[
-				['eventsource' => 'Autoregistration', 'new_condition_conditiontype' => 'Proxy']
+				['eventsource' => EVENT_SOURCE_AUTOREGISTRATION, 'new_condition_conditiontype' => 'Proxy']
 			],
 			[
-				['eventsource' => 'Autoregistration', 'new_condition_conditiontype' => 'Host metadata']
+				['eventsource' => EVENT_SOURCE_AUTOREGISTRATION, 'new_condition_conditiontype' => 'Host metadata']
 			],
 			[
 				[
-					'eventsource' => 'Autoregistration',
+					'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
 					'new_operation_operationtype' => 'Send message'
 				]
 			],
 			[
 				[
-					'eventsource' => 'Autoregistration',
+					'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
 					'new_operation_operationtype' => 'Send message',
 					'new_operation_opmessage_custom_msg' => 'unchecked'
 				]
 			],
 			[
-				['eventsource' => 'Autoregistration', 'check_operationtype' => true, 'new_operation_operationtype' => 'Add host']
+				['eventsource' => EVENT_SOURCE_AUTOREGISTRATION, 'check_operationtype' => true, 'new_operation_operationtype' => 'Add host']
 			],
 			[
-				['eventsource' => 'Autoregistration', 'new_operation_operationtype' => 'Add to host group']
+				['eventsource' => EVENT_SOURCE_AUTOREGISTRATION, 'new_operation_operationtype' => 'Add to host group']
 			],
 			[
-				['eventsource' => 'Autoregistration', 'new_operation_operationtype' => 'Link to template']
+				['eventsource' => EVENT_SOURCE_AUTOREGISTRATION, 'new_operation_operationtype' => 'Link to template']
 			],
 			[
-				['eventsource' => 'Autoregistration', 'new_operation_operationtype' => 'Disable host']
+				['eventsource' => EVENT_SOURCE_AUTOREGISTRATION, 'new_operation_operationtype' => 'Disable host']
 			],
 			[
-				['eventsource' => 'Internal']
+				['eventsource' => EVENT_SOURCE_INTERNAL]
 			],
 			[
-				['eventsource' => 'Internal', 'recovery_msg' => true]
+				['eventsource' => EVENT_SOURCE_INTERNAL, 'recovery_msg' => true]
 			],
 			[
-				['eventsource' => 'Internal', 'new_condition_conditiontype' => 'Tag name']
+				['eventsource' => EVENT_SOURCE_INTERNAL, 'new_condition_conditiontype' => 'Tag name']
 			],
 			[
-				['eventsource' => 'Internal', 'new_condition_conditiontype' => 'Tag value']
+				['eventsource' => EVENT_SOURCE_INTERNAL, 'new_condition_conditiontype' => 'Tag value']
 			],
 			[
-				['eventsource' => 'Internal', 'new_condition_conditiontype' => 'Event type']
+				['eventsource' => EVENT_SOURCE_INTERNAL, 'new_condition_conditiontype' => 'Event type']
 			],
 			[
-				['eventsource' => 'Internal', 'new_condition_conditiontype' => 'Host group']
+				['eventsource' => EVENT_SOURCE_INTERNAL, 'new_condition_conditiontype' => 'Host group']
 			],
 			[
-				['eventsource' => 'Internal', 'new_condition_conditiontype' => 'Template']
+				['eventsource' => EVENT_SOURCE_INTERNAL, 'new_condition_conditiontype' => 'Template']
 			],
 			[
-				['eventsource' => 'Internal', 'new_condition_conditiontype' => 'Host']
+				['eventsource' => EVENT_SOURCE_INTERNAL, 'new_condition_conditiontype' => 'Host']
 			],
 			[
-				['eventsource' => 'Internal', 'new_operation_operationtype' => 'Send message']
+				['eventsource' => EVENT_SOURCE_INTERNAL, 'new_operation_operationtype' => 'Send message']
 			],
 			[
 				[
-					'eventsource' => 'Internal',
+					'eventsource' => EVENT_SOURCE_INTERNAL,
 					'check_operationtype' => true,
 					'new_operation_operationtype' => 'Send message',
 					'new_operation_opmessage_custom_msg' => 'unchecked'
@@ -421,27 +421,8 @@ class testFormAction extends CLegacyWebTest {
 	 */
 	public function testFormAction_CheckLayout($data) {
 		$eventsource = $data['eventsource'];
-		switch ($eventsource) {
-			case 'Triggers':
-				$this->zbxTestLogin('actionconf.php?eventsource='.EVENT_SOURCE_TRIGGERS.'&form=Create+action');
-				break;
-			case 'Services':
-				$this->zbxTestLogin('actionconf.php?eventsource='.EVENT_SOURCE_SERVICE.'&form=Create+action');
-				break;
-			case 'Discovery':
-				$this->zbxTestLogin('actionconf.php?eventsource='.EVENT_SOURCE_DISCOVERY.'&form=Create+action');
-				break;
-			case 'Autoregistration':
-				$this->zbxTestLogin('actionconf.php?eventsource='.EVENT_SOURCE_AUTOREGISTRATION.'&form=Create+action');
-				break;
-			case 'Internal';
-				$this->zbxTestLogin('actionconf.php?eventsource='.EVENT_SOURCE_INTERNAL.'&form=Create+action');
-				break;
-			default:
-				$this->zbxTestLogin('actionconf.php?eventsource='.EVENT_SOURCE_TRIGGERS.'&form=Create+action');
-				break;
-		}
 
+		$this->zbxTestLogin('actionconf.php?eventsource='.$eventsource.'&form=Create+action');
 		$this->zbxTestCheckTitle('Configuration of actions');
 		$this->zbxTestTextPresent(['Action', 'Operations']);
 
@@ -474,7 +455,7 @@ class testFormAction extends CLegacyWebTest {
 			$evaltype = $data['evaltype'];
 		}
 
-		if ($eventsource == 'Triggers' && array_key_exists('evaltype', $data)) {
+		if ($eventsource == EVENT_SOURCE_TRIGGERS && array_key_exists('evaltype', $data)) {
 			$this->zbxTestTextPresent('Type of calculation');
 			$this->zbxTestAssertElementPresentId('evaltype');
 			$this->zbxTestDropdownHasOptions('evaltype', [
@@ -504,7 +485,7 @@ class testFormAction extends CLegacyWebTest {
 				'Label', 'Name', 'Action'
 		]);
 
-		if ($eventsource == 'Triggers' && array_key_exists('evaltype', $data)) {
+		if ($eventsource == EVENT_SOURCE_TRIGGERS && array_key_exists('evaltype', $data)) {
 			$this->zbxTestAssertElementText('//tr[@id="conditions_0"]/td[2]', 'Trigger name contains TEST1');
 			$this->zbxTestAssertElementText('//tr[@id="conditions_1"]/td[2]', 'Trigger name contains TEST2');
 			$this->zbxTestAssertElementPresentXpath('//button[@name="remove" and @onclick="javascript: removeCondition(0);"]');
@@ -529,7 +510,7 @@ class testFormAction extends CLegacyWebTest {
 		$new_condition_conditiontype = $this->zbxTestGetSelectedLabel('condition_type');
 
 		switch ($eventsource) {
-			case 'Triggers':
+			case EVENT_SOURCE_TRIGGERS:
 				$this->zbxTestDropdownHasOptions('condition_type', [
 						'Tag name',
 						'Tag value',
@@ -543,7 +524,7 @@ class testFormAction extends CLegacyWebTest {
 						'Problem is suppressed'
 				]);
 				break;
-			case 'Services':
+			case EVENT_SOURCE_SERVICE:
 				$this->zbxTestDropdownHasOptions('condition_type', [
 						'Service',
 						'Service name',
@@ -551,7 +532,7 @@ class testFormAction extends CLegacyWebTest {
 						'Service tag value'
 				]);
 				break;
-			case 'Discovery':
+			case EVENT_SOURCE_DISCOVERY:
 				$this->zbxTestDropdownHasOptions('condition_type', [
 						'Host IP',
 						'Service type',
@@ -565,14 +546,14 @@ class testFormAction extends CLegacyWebTest {
 						'Proxy'
 				]);
 				break;
-			case 'Autoregistration':
+			case EVENT_SOURCE_AUTOREGISTRATION:
 				$this->zbxTestDropdownHasOptions('condition_type', [
 						'Host name',
 						'Proxy',
 						'Host metadata'
 				]);
 				break;
-			case 'Internal':
+			case EVENT_SOURCE_INTERNAL:
 				$this->zbxTestDropdownHasOptions('condition_type', [
 						'Tag name',
 						'Tag value',
@@ -865,8 +846,8 @@ class testFormAction extends CLegacyWebTest {
 		$operations_field = $form->getField('Operations')->asTable();
 
 		switch ($eventsource) {
-			case 'Triggers':
-			case 'Services':
+			case EVENT_SOURCE_TRIGGERS:
+			case EVENT_SOURCE_SERVICE:
 				$this->assertEquals('1h', $form->getField('Default operation step duration')->getValue());
 				$this->zbxTestAssertVisibleId('esc_period');
 				$this->zbxTestAssertAttribute('//input[@id=\'esc_period\']', 'maxlength', 255);
@@ -874,7 +855,7 @@ class testFormAction extends CLegacyWebTest {
 
 				$this->assertEquals($operations_field->getHeadersText(), ['Steps', 'Details', 'Start in', 'Duration', 'Action']);
 
-				if ($eventsource === 'Triggers') {
+				if ($eventsource === EVENT_SOURCE_TRIGGERS) {
 					$this->assertTrue($form->getField('Pause operations for suppressed problems')->getValue());
 				}
 				else {
@@ -886,14 +867,14 @@ class testFormAction extends CLegacyWebTest {
 				$update_field = $form->getField('Update operations')->asTable();
 				$this->assertEquals($update_field->getHeadersText(), ['Details', 'Action']);
 				break;
-			case 'Discovery':
-			case 'Autoregistration':
+			case EVENT_SOURCE_DISCOVERY:
+			case EVENT_SOURCE_AUTOREGISTRATION:
 				$this->zbxTestTextNotPresent(['Default operation step duration', 'Pause operations for suppressed problems',
 					'Recovery operations', 'Update operations']);
 				$this->zbxTestAssertElementNotPresentId('esc_period');
 				$this->zbxTestAssertElementNotPresentId('pause_suppressed');
 				break;
-			case 'Internal':
+			case EVENT_SOURCE_INTERNAL:
 				$this->assertEquals('1h', $form->getField('Default operation step duration')->getValue());
 				$this->zbxTestAssertVisibleId('esc_period');
 				$this->zbxTestAssertAttribute('//input[@id=\'esc_period\']', 'maxlength', 255);
@@ -911,18 +892,14 @@ class testFormAction extends CLegacyWebTest {
 			$new_operation_operationtype = $data['new_operation_operationtype'];
 			$operations_field->query('button:Add')->one()->click();
 			COverlayDialogElement::find()->one()->waitUntilReady();
-			switch ($eventsource) {
-				case 'Triggers':
-				case 'Services':
-				case 'Discovery':
-				case 'Autoregistration':
-					$this->zbxTestWaitUntilElementPresent(webDriverBy::id('operationtype'));
-					$this->zbxTestDropdownSelectWait('operation-type-select', $new_operation_operationtype);
-					COverlayDialogElement::find()->one()->waitUntilReady();
-					break;
-				case 'Internal':
-					$this->zbxTestTextPresent('Send message');
-					break;
+
+			if ($eventsource === EVENT_SOURCE_INTERNAL) {
+				$this->zbxTestTextPresent('Send message');
+			}
+			else {
+				$this->zbxTestWaitUntilElementPresent(webDriverBy::id('operationtype'));
+				$this->zbxTestDropdownSelectWait('operation-type-select', $new_operation_operationtype);
+				COverlayDialogElement::find()->one()->waitUntilReady();
 			}
 		}
 		else {
@@ -942,7 +919,7 @@ class testFormAction extends CLegacyWebTest {
 		}
 
 		if (isset($data['add_opcondition'])) {
-			$this->query('xpath://tr[@id="operation-condition-list-footer"]//button[text()="Add"]')->one()->forceClick();
+			$this->query('xpath://tr[@id="operation-condition-list-footer"]//button[text()="Add"]')->one()->click(true);
 			$this->page->query('xpath://div[contains(@class, "overlay-dialogue modal")][2]')
 					->asOverlayDialog()->waitUntilReady();
 			$add_opcondition = $data['add_opcondition'];
@@ -951,11 +928,12 @@ class testFormAction extends CLegacyWebTest {
 			$add_opcondition = null;
 		}
 
-		if ($eventsource === 'Service') {
+		if ($eventsource === EVENT_SOURCE_SERVICE) {
 			$this->assertFalse($this->query('id:operation-condition-list')->one(false)->isValid());
 		}
 
-		if ($new_operation_operationtype != null && in_array($eventsource, ['Triggers', 'Services', 'Internal'])) 	{
+		if ($new_operation_operationtype != null
+				&& in_array($eventsource, [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_SERVICE, EVENT_SOURCE_INTERNAL])) {
 			switch ($new_operation_operationtype) {
 				case 'Send message':
 				case 'Reboot':
@@ -985,7 +963,7 @@ class testFormAction extends CLegacyWebTest {
 				$this->zbxTestAssertElementNotPresentId('operation_esc_period');
 			}
 
-		if (isset($data['new_operation_operationtype']) && $eventsource != 'Internal') {
+		if (isset($data['new_operation_operationtype']) && $eventsource != EVENT_SOURCE_INTERNAL) {
 			$this->zbxTestTextPresent('Operations');
 			$this->zbxTestAssertVisibleXpath('//z-select[@id=\'operation-type-select\']');
 		}
@@ -993,20 +971,20 @@ class testFormAction extends CLegacyWebTest {
 			$this->zbxTestAssertElementNotPresentXpath('//z-select[@id=\'operation-type-select\']');
 		}
 
-		if (isset($data['check_operationtype']) && $eventsource === 'Internal') {
+		if (isset($data['check_operationtype']) && $eventsource === EVENT_SOURCE_INTERNAL) {
 			$this->assertFalse($this->query('id:operation-type-select')->one(false)->isValid());
 			$this->assertTrue($this->query('xpath://label[text()="Operation"]/../../div[text()="Send message"]')->one()->isValid());
 		}
 		elseif (isset($data['check_operationtype'])) {
 			$options = $this->query('id:operation-type-select')->asZDropdown()->one();
 			switch ($eventsource) {
-				case 'Triggers':
-				case 'Services':
+				case EVENT_SOURCE_TRIGGERS:
+				case EVENT_SOURCE_SERVICE:
 					$this->assertEquals($options->getOptions()->asText(), ['Send message', 'Reboot', 'Selenium script']);
 					break;
 
-				case 'Discovery':
-				case 'Autoregistration':
+				case EVENT_SOURCE_DISCOVERY:
+				case EVENT_SOURCE_AUTOREGISTRATION:
 					$this->assertEquals($options->getOptions()->asText(), [
 							'Send message',
 							'Add host',
@@ -1026,7 +1004,7 @@ class testFormAction extends CLegacyWebTest {
 			$this->assertEquals($new_operation_operationtype, $options->getValue());
 		}
 
-		if ($new_operation_operationtype === 'Reboot' && $eventsource !== 'Services') {
+		if ($new_operation_operationtype === 'Reboot' && $eventsource !== EVENT_SOURCE_SERVICE) {
 			$this->zbxTestTextPresent(['Target list', 'Current host', 'Host', 'Host group']);
 			$this->query('id:operation-command-chst')->one()->isSelected(false);
 			$this->zbxTestAssertVisibleId('operation_opcommand_hst__hostid');
@@ -1095,10 +1073,8 @@ class testFormAction extends CLegacyWebTest {
 				break;
 		}
 
-		if ($eventsource == 'Triggers' && $new_operation_operationtype != null) {
-			$this->zbxTestTextPresent([
-				'Conditions', 'Label', 'Name', 'Action'
-			]);
+		if ($eventsource == EVENT_SOURCE_TRIGGERS && $new_operation_operationtype != null) {
+			$this->zbxTestTextPresent(['Conditions', 'Label', 'Name', 'Action']);
 
 			if ($add_opcondition == null) {
 				$this->zbxTestAssertVisibleXpath('//div[@id="operationTab"]//button[text()="Add"]');
@@ -1177,7 +1153,7 @@ class testFormAction extends CLegacyWebTest {
 		COverlayDialogElement::find()->one()->waitUntilReady();
 		$operation_details = $this->query('name:popup.operation')->asForm()->one();
 		// Check available operation types depending on event source and the selected operation type.
-		$message_types = ($eventsource === 'Internal')
+		$message_types = ($eventsource === EVENT_SOURCE_INTERNAL)
 			? ['Send message', 'Notify all involved']
 			: ['Send message', 'Notify all involved', 'Reboot', 'Selenium script'];
 		$this->assertEquals($message_types, $operation_details->query('id:operation-type-select')
@@ -1217,36 +1193,15 @@ class testFormAction extends CLegacyWebTest {
 		$eventsource = $data['eventsource'];
 
 		if ($name == 'Auto discovery. Linux servers.') {
-			$sqlActions = "SELECT actionid,name,eventsource,evaltype,status FROM actions ORDER BY actionid";
+			$sqlActions = 'SELECT actionid, name, eventsource, evaltype, status FROM actions ORDER BY actionid';
 		}
 		else {
-			$sqlActions = "SELECT * FROM actions ORDER BY actionid";
+			$sqlActions = 'SELECT * FROM actions ORDER BY actionid';
 		}
 		$oldHashActions = CDBHelper::getHash($sqlActions);
 
 		$this->zbxTestLogin('actionconf.php');
-		switch ($eventsource) {
-			case EVENT_SOURCE_TRIGGERS:
-				$this->query('id:page-title-general')->asPopupButton()->one()->select('Trigger actions');
-				break;
-
-			case EVENT_SOURCE_SERVICE:
-				$this->query('id:page-title-general')->asPopupButton()->one()->select('Service actions');
-				break;
-
-			case EVENT_SOURCE_DISCOVERY:
-				$this->query('id:page-title-general')->asPopupButton()->one()->select('Discovery actions');
-				break;
-
-			case EVENT_SOURCE_AUTOREGISTRATION:
-				$this->query('id:page-title-general')->asPopupButton()->one()->select('Autoregistration actions');
-				break;
-
-			case EVENT_SOURCE_INTERNAL;
-				$this->query('id:page-title-general')->asPopupButton()->one()->select('Internal actions');
-				break;
-		}
-
+		$this->query('id:page-title-general')->asPopupButton()->one()->select($this->event_sources[$eventsource]);
 		$this->zbxTestClickLinkTextWait($name);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of actions');
@@ -1578,7 +1533,7 @@ class testFormAction extends CLegacyWebTest {
 		}
 
 		$action_form->submit();
-		$sql = "SELECT actionid FROM actions WHERE name='".$data['name']."'";
+		$sql = 'SELECT actionid FROM actions WHERE name='.zbx_dbstr($data['name']);
 
 		if ($data['expected'] === ACTION_GOOD) {
 			$this->page->waitUntilReady();
@@ -1609,7 +1564,8 @@ class testFormAction extends CLegacyWebTest {
 				$operations_table = $this->query('id:op-table')->waitUntilVisible()->asTable()->one();
 
 				$saved_operations = [];
-				for ($i = 0; $i < count($expected_operations); $i++) {
+				$row_count = count($expected_operations);
+				for ($i = 0; $i < $row_count; $i++) {
 					$saved_operations[] = $operations_table->getRow($i)->getColumn('Details')->getText();
 				}
 				$this->assertEquals($expected_operations, $saved_operations);
@@ -1745,7 +1701,7 @@ class testFormAction extends CLegacyWebTest {
 		$this->zbxTestDoubleClickBeforeMessage('add', 'filter_name');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action added');
 
-		$sql = "SELECT actionid FROM actions WHERE name='action test'";
+		$sql = 'SELECT actionid FROM actions WHERE name="action test"';
 		$this->assertEquals(1, CDBHelper::getCount($sql), 'Action has not been created in the DB.');
 	}
 
