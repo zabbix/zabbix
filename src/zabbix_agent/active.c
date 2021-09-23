@@ -1301,7 +1301,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	zbx_free(session_token);
 
 #ifdef _WINDOWS
-	zbx_addr_free(activechk_args.addrs);
+	zbx_addr_free(&activechk_args.addrs);
 	free_active_metrics();
 
 	ZBX_DO_EXIT();
