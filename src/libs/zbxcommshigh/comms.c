@@ -25,8 +25,6 @@
 #include "zbxalgo.h"
 #include "cfg.h"
 
-#define		ZBX_TCP_CONNECT_FAILOVER_TIMEOUT	30
-
 extern char		*CONFIG_SOURCE_IP;
 extern unsigned int	configured_tls_connect_mode;
 
@@ -78,7 +76,7 @@ int	connect_to_server(zbx_socket_t *sock, zbx_vector_ptr_t *addrs, int timeout, 
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In connect_to_server() [%s]:%d [timeout:%d, connection timeout:%d]",
 			((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port, timeout,
-			ZBX_TCP_CONNECT_FAILOVER_TIMEOUT);
+			CONFIG_TIMEOUT);
 
 	switch (configured_tls_connect_mode)
 	{
@@ -102,7 +100,7 @@ int	connect_to_server(zbx_socket_t *sock, zbx_vector_ptr_t *addrs, int timeout, 
 	}
 
 	if (FAIL == (res = zbx_tcp_connect_failover(sock, CONFIG_SOURCE_IP, addrs, timeout,
-			ZBX_TCP_CONNECT_FAILOVER_TIMEOUT, configured_tls_connect_mode, tls_arg1, tls_arg2)))
+			CONFIG_TIMEOUT, configured_tls_connect_mode, tls_arg1, tls_arg2)))
 	{
 		if (0 != retry_interval)
 		{
@@ -112,8 +110,8 @@ int	connect_to_server(zbx_socket_t *sock, zbx_vector_ptr_t *addrs, int timeout, 
 			lastlogtime = (int)time(NULL);
 
 			while (ZBX_IS_RUNNING() && FAIL == (res = zbx_tcp_connect_failover(sock, CONFIG_SOURCE_IP,
-					addrs, timeout, ZBX_TCP_CONNECT_FAILOVER_TIMEOUT, configured_tls_connect_mode,
-					tls_arg1, tls_arg2)))
+					addrs, timeout, CONFIG_TIMEOUT, configured_tls_connect_mode, tls_arg1,
+					tls_arg2)))
 			{
 				now = (int)time(NULL);
 
