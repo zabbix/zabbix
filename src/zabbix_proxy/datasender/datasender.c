@@ -30,7 +30,6 @@
 #include "dbcache.h"
 
 #include "datasender.h"
-#include "../servercomms.h"
 #include "zbxcrypto.h"
 #include "zbxcompress.h"
 

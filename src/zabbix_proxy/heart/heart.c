@@ -24,7 +24,6 @@
 #include "zbxself.h"
 
 #include "heart.h"
-#include "../servercomms.h"
 #include "zbxcrypto.h"
 #include "zbxcompress.h"
 
