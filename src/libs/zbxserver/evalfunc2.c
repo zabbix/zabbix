@@ -2749,19 +2749,19 @@ static int	evaluate_RATE(zbx_variant_t *value, DC_ITEM *item, const char *parame
 
 	if (1 < values.values_num)
 	{
-		history_value_t	rate, delta, last = {0};
+		history_value_t	last = {0};
 		int		i;
-		double		gap_start, gap_end, sampled_interval, average_duration_between_samples,
+		double		delta, gap_start, gap_end, sampled_interval, average_duration_between_samples,
 				threshold, interval, range, range_start, range_end;
 
 		/* Reset detection */
 
-		HVT_SET(delta, HVT(LAST(values).value) - HVT(FIRST(values).value));
+		delta = HVT(LAST(values).value) - HVT(FIRST(values).value);
 
 		for (i = values.values_num - 1; i >= 0; i--)
 		{
 			if (HVT(values.values[i].value) < HVT(last))
-				HVT_SET(delta, HVT(delta) + HVT(values.values[i].value));
+				delta = delta + HVT(values.values[i].value);
 
 			HVT_SET(last, HVT(values.values[i].value));
 		}
@@ -2784,9 +2784,9 @@ static int	evaluate_RATE(zbx_variant_t *value, DC_ITEM *item, const char *parame
 		sampled_interval = TS2DBL(LAST(values).timestamp) - TS2DBL(FIRST(values).timestamp);
 		average_duration_between_samples = sampled_interval / (values.values_num - 1);
 
-		if (HVT(delta) > 0 && HVT(FIRST(values).value) >= 0)
+		if (delta > 0 && HVT(FIRST(values).value) >= 0)
 		{
-			double	zero = sampled_interval * (HVT(FIRST(values).value) / HVT(delta));
+			double	zero = sampled_interval * (HVT(FIRST(values).value) / delta);
 
 			if (zero < gap_start)
 				gap_start = zero;
@@ -2805,8 +2805,7 @@ static int	evaluate_RATE(zbx_variant_t *value, DC_ITEM *item, const char *parame
 		else
 			interval += average_duration_between_samples / 2;
 
-		rate.dbl = (double)(HVT(delta) * (interval / sampled_interval)) / range;
-		zbx_history_value2variant(&rate, ITEM_VALUE_TYPE_FLOAT, value);
+		zbx_variant_set_dbl(value, (delta * (interval / sampled_interval)) / range);
 
 		ret = SUCCEED;
 	}
