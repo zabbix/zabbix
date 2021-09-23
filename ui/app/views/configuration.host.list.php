@@ -522,6 +522,7 @@ $form->addItem([
 				->setAttribute('confirm', _('Delete selected hosts?'))
 				->onClick('view.massDeleteHosts(this);')
 				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('no-chkbxrange')
 				->removeAttribute('id')
 		]
 	], 'hosts')
