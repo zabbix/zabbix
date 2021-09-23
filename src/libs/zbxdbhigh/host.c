@@ -2475,7 +2475,7 @@ static void	DBhost_prototypes_templates_make(zbx_vector_ptr_t *host_prototypes,
 						zbx_vector_uint64_append(del_hosttemplateids, hosttemplateid);
 
 						zbx_audit_host_prototype_create_entry(AUDIT_ACTION_UPDATE,
-								host_prototype->hostid, host_prototype->name);
+								host_prototype->hostid, host_prototype->host);
 
 						zbx_audit_host_prototype_update_json_delete_parent_template(
 								host_prototype->hostid, hosttemplateid);
@@ -2994,7 +2994,7 @@ static void	DBhost_prototypes_macros_make(zbx_vector_ptr_t *host_prototypes, zbx
 						zbx_vector_uint64_append(del_macroids, hostmacroid);
 
 						zbx_audit_host_prototype_create_entry(AUDIT_ACTION_UPDATE,
-								host_prototype->hostid, host_prototype->name);
+								host_prototype->hostid, host_prototype->host);
 
 						zbx_audit_host_prototype_update_json_delete_hostmacro(
 								host_prototype->hostid, hostmacroid);
@@ -3156,7 +3156,7 @@ static void	DBhost_prototypes_tags_make(zbx_vector_ptr_t *host_prototypes, zbx_v
 				zbx_vector_uint64_append(del_tagids, tagid);
 
 				zbx_audit_host_prototype_create_entry(AUDIT_ACTION_UPDATE, host_prototype->hostid,
-						host_prototype->name);
+						host_prototype->host);
 				zbx_audit_host_prototype_update_json_delete_tag(host_prototype->hostid, tagid);
 			}
 
@@ -3373,7 +3373,7 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 							zbx_vector_uint64_append(del_interfaceids, interfaceid);
 
 							zbx_audit_host_prototype_create_entry(AUDIT_ACTION_UPDATE,
-									host_prototype->hostid, host_prototype->name);
+									host_prototype->hostid, host_prototype->host);
 
 							zbx_audit_host_prototype_update_json_delete_interface(
 									host_prototype->hostid, interfaceid);
@@ -3395,7 +3395,7 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 							zbx_vector_uint64_append(del_interfaceids, interfaceid);
 
 							zbx_audit_host_prototype_create_entry(AUDIT_ACTION_UPDATE,
-									host_prototype->hostid, host_prototype->name);
+									host_prototype->hostid, host_prototype->host);
 
 							zbx_audit_host_prototype_update_json_delete_interface(
 									host_prototype->hostid, interfaceid);
@@ -3602,7 +3602,7 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 		else
 		{
 			zbx_audit_host_prototype_create_entry(AUDIT_ACTION_UPDATE, host_prototype->hostid,
-					host_prototype->name);
+					host_prototype->host);
 		}
 
 		new_hosts_templates += host_prototype->lnk_templateids.values_num;
@@ -3793,7 +3793,7 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 					(int)host_prototype->discover, (int)host_prototype->custom_interfaces);
 
 			zbx_audit_host_prototype_create_entry(AUDIT_ACTION_ADD, host_prototype->hostid,
-					host_prototype->name);
+					host_prototype->host);
 
 			zbx_db_insert_add_values(&db_insert_hdiscovery, host_prototype->hostid, host_prototype->itemid);
 

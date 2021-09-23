@@ -1102,7 +1102,7 @@ static void	lld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_
 				ZBX_STR2UINT64(hostgroupid, row[2]);
 				zbx_vector_uint64_append(del_hostgroupids, hostgroupid);
 				zbx_audit_host_create_entry(AUDIT_ACTION_UPDATE, hostid,
-						(NULL == host->name_orig) ? host->name : host->name_orig);
+						(NULL == host->host_orig) ? host->host : host->host_orig);
 				zbx_audit_hostgroup_update_json_delete_group(hostid, hostgroupid, groupid);
 			}
 			else
@@ -2734,7 +2734,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 		else
 		{
 			zbx_audit_host_create_entry(AUDIT_ACTION_UPDATE, host->hostid,
-					(NULL == host->name_orig) ? host->name : host->name_orig);
+					(NULL == host->host_orig) ? host->host : host->host_orig);
 
 			if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE))
 				upd_hosts++;
@@ -2781,7 +2781,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 			{
 				zbx_vector_uint64_append(&del_interfaceids, interface->interfaceid);
 				zbx_audit_host_create_entry(AUDIT_ACTION_UPDATE,
-						host->hostid, (NULL == host->name_orig) ? host->name : host->name_orig);
+						host->hostid, (NULL == host->host_orig) ? host->host : host->host_orig);
 				zbx_audit_host_update_json_delete_interface(
 						host->hostid, interface->interfaceid);
 			}
@@ -2790,7 +2790,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 			{
 				zbx_vector_uint64_append(&del_snmp_ids, interface->interfaceid);
 				zbx_audit_host_create_entry(AUDIT_ACTION_UPDATE,
-						host->hostid, (NULL == host->name_orig) ? host->name : host->name_orig);
+						host->hostid, (NULL == host->host_orig) ? host->host : host->host_orig);
 				zbx_audit_host_update_json_delete_interface(
 						host->hostid, interface->interfaceid);
 			}
@@ -2824,7 +2824,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 				zbx_vector_uint64_append(&del_hostmacroids, hostmacro->hostmacroid);
 
 				zbx_audit_host_create_entry(AUDIT_ACTION_UPDATE,
-						host->hostid, (NULL == host->name_orig) ? host->name : host->name_orig);
+						host->hostid, (NULL == host->host_orig) ? host->host : host->host_orig);
 				zbx_audit_host_update_json_delete_hostmacro(
 						host->hostid, hostmacro->hostmacroid);
 			}
@@ -2845,7 +2845,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 				zbx_vector_uint64_append(&del_tagids, host->tags.values[j]->tagid);
 
 				zbx_audit_host_prototype_create_entry(AUDIT_ACTION_UPDATE, host->hostid,
-						host->name);
+						host->host);
 				zbx_audit_host_update_json_delete_tag(host->hostid, host->tags.values[j]->tagid);
 			}
 		}
@@ -2950,7 +2950,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 					(int)host->status, (int)ZBX_FLAG_DISCOVERY_CREATED, (int)tls_connect,
 					(int)tls_accept, tls_issuer, tls_subject, tls_psk_identity, tls_psk,
 					(int)host->custom_interfaces);
-			zbx_audit_host_create_entry(AUDIT_ACTION_ADD, host->hostid, host->name);
+			zbx_audit_host_create_entry(AUDIT_ACTION_ADD, host->hostid, host->host);
 
 			zbx_db_insert_add_values(&db_insert_hdiscovery, host->hostid, parent_hostid, host_proto);
 
