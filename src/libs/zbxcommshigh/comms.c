@@ -69,14 +69,14 @@ static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_
 }
 
 int	connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_ptr_t *addrs, int timeout,
-		unsigned int tls_connect, int retry_interval)
+		int connect_timeout, unsigned int tls_connect, int retry_interval)
 {
 	int	res, lastlogtime, now;
 	char	*tls_arg1, *tls_arg2;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In connect_to_server() [%s]:%d [timeout:%d, connection timeout:%d]",
 			((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port, timeout,
-			CONFIG_TIMEOUT);
+			connect_timeout);
 
 	switch (tls_connect)
 	{
@@ -99,8 +99,8 @@ int	connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_ptr_
 			return FAIL;
 	}
 
-	if (FAIL == (res = zbx_tcp_connect_failover(sock, source_ip, addrs, timeout, CONFIG_TIMEOUT,
-			tls_connect, tls_arg1, tls_arg2)))
+	if (FAIL == (res = zbx_tcp_connect_failover(sock, source_ip, addrs, timeout, connect_timeout, tls_connect,
+			tls_arg1, tls_arg2)))
 	{
 		if (0 != retry_interval)
 		{
@@ -110,9 +110,8 @@ int	connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_ptr_
 
 			lastlogtime = (int)time(NULL);
 
-			while (ZBX_IS_RUNNING() && FAIL == (res = zbx_tcp_connect_failover(sock, source_ip,
-					addrs, timeout, CONFIG_TIMEOUT, tls_connect, tls_arg1,
-					tls_arg2)))
+			while (ZBX_IS_RUNNING() && FAIL == (res = zbx_tcp_connect_failover(sock, source_ip, addrs,
+					timeout, connect_timeout, tls_connect, tls_arg1, tls_arg2)))
 			{
 				now = (int)time(NULL);
 

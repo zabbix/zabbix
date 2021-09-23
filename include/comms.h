@@ -200,7 +200,7 @@ int	zbx_send_response_ext(zbx_socket_t *sock, int result, const char *info, cons
 
 int	zbx_recv_response(zbx_socket_t *sock, int timeout, char **error);
 int	connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_ptr_t *addrs, int timeout,
-		unsigned int tls_connect, int retry_interval);
+		int connect_timeout, unsigned int tls_connect, int retry_interval);
 void	disconnect_server(zbx_socket_t *sock);
 
 int	get_data_from_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved, char **error);
