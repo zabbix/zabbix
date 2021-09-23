@@ -587,17 +587,22 @@ class CMediatype extends CApiService {
 					]]
 				];
 
-				if ($method === 'create' || $type != $db_mediatype['type']) {
-					$api_input_rules['fields']['script']['flags'] |= API_REQUIRED;
-				}
-
 				$mediatype += array_intersect_key($db_mediatype, array_flip(['show_event_menu']));
 
 				if ($mediatype['show_event_menu'] == ZBX_EVENT_MENU_SHOW) {
 					$api_input_rules['fields'] += [
-						'event_menu_url' =>		['type' => API_URL, 'flags' => API_REQUIRED | API_ALLOW_EVENT_TAGS_MACRO | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'event_menu_url')],
-						'event_menu_name' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'event_menu_name')]
+						'event_menu_url' =>		['type' => API_URL, 'flags' => API_ALLOW_EVENT_TAGS_MACRO | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'event_menu_url')],
+						'event_menu_name' =>	['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'event_menu_name')]
 					];
+				}
+
+				if ($method === 'create' || $type != $db_mediatype['type']) {
+					$api_input_rules['fields']['script']['flags'] |= API_REQUIRED;
+
+					if ($mediatype['show_event_menu'] == ZBX_EVENT_MENU_SHOW) {
+						$api_input_rules['fields']['event_menu_url']['flags'] |= API_REQUIRED;
+						$api_input_rules['fields']['event_menu_name']['flags'] |= API_REQUIRED;
+					}
 				}
 				break;
 		}
