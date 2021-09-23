@@ -132,6 +132,84 @@ int	connect_to_server(zbx_socket_t *sock, zbx_vector_ptr_t *addrs, int timeout, 
 	return res;
 }
 
+void	disconnect_server(zbx_socket_t *sock)
+{
+	zbx_tcp_close(sock);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_data_from_server                                             *
+ *                                                                            *
+ * Purpose: get configuration and other data from server                      *
+ *                                                                            *
+ * Return value: SUCCEED - processed successfully                             *
+ *               FAIL - an error occurred                                     *
+ *                                                                            *
+ ******************************************************************************/
+int	get_data_from_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved, char **error)
+{
+	int		ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (SUCCEED != zbx_tcp_send_ext(sock, *buffer, buffer_size, reserved, ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS, 0))
+	{
+		*error = zbx_strdup(*error, zbx_socket_strerror());
+		goto exit;
+	}
+
+	zbx_free(*buffer);
+
+	if (SUCCEED != zbx_tcp_recv_large(sock))
+	{
+		*error = zbx_strdup(*error, zbx_socket_strerror());
+		goto exit;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "Received [%s] from server", sock->buffer);
+
+	ret = SUCCEED;
+exit:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: put_data_to_server                                               *
+ *                                                                            *
+ * Purpose: send data to server                                               *
+ *                                                                            *
+ * Return value: SUCCEED - processed successfully                             *
+ *               FAIL - an error occurred                                     *
+ *                                                                            *
+ ******************************************************************************/
+int	put_data_to_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved, char **error)
+{
+	int	ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() datalen:" ZBX_FS_SIZE_T, __func__, (zbx_fs_size_t)buffer_size);
+
+	if (SUCCEED != zbx_tcp_send_ext(sock, *buffer, buffer_size, reserved, ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS, 0))
+	{
+		*error = zbx_strdup(*error, zbx_socket_strerror());
+		goto out;
+	}
+
+	zbx_free(*buffer);
+
+	if (SUCCEED != zbx_recv_response(sock, 0, error))
+		goto out;
+
+	ret = SUCCEED;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_send_response                                                *

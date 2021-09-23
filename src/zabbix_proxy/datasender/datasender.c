@@ -101,6 +101,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state)
 	char			*error = NULL, *buffer = NULL;
 	zbx_vector_ptr_t	tasks;
 	extern zbx_vector_ptr_t	zbx_addrs;
+	extern char		*CONFIG_HOSTNAME;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 

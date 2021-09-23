@@ -62,6 +62,7 @@ static void	process_configuration_sync(size_t *data_size)
 	size_t			buffer_size, reserved;
 	struct zbx_json		j;
 	extern zbx_vector_ptr_t	zbx_addrs;
+	extern char		*CONFIG_HOSTNAME;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 

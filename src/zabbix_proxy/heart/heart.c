@@ -45,6 +45,7 @@ static int	send_heartbeat(void)
 	char			*error = NULL, *buffer = NULL;
 	size_t			buffer_size, reserved;
 	extern zbx_vector_ptr_t	zbx_addrs;
+	extern char		*CONFIG_HOSTNAME;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In send_heartbeat()");
 

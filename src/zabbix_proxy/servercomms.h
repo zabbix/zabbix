@@ -20,16 +20,8 @@
 #ifndef ZABBIX_SERVERCOMMS_H
 #define ZABBIX_SERVERCOMMS_H
 
-extern char	*CONFIG_SOURCE_IP;
-extern char	*CONFIG_SERVER;
-extern int	CONFIG_SERVER_PORT;
-extern char	*CONFIG_HOSTNAME;
 
 #include "comms.h"
 
-void	disconnect_server(zbx_socket_t *sock);
-
-int	get_data_from_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved, char **error);
-int	put_data_to_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved, char **error);
 
 #endif
