@@ -3384,6 +3384,60 @@ class CApiInputValidatorTest extends TestCase {
 				'Invalid parameter "/1/ip": an IP address is expected.'
 			],
 			[
+				['type' => API_IP_RANGES],
+				'',
+				'/1/ip_range',
+				''
+			],
+			[
+				['type' => API_IP_RANGES],
+				[],
+				'/1/ip_range',
+				'Invalid parameter "/1/ip_range": a character string is expected.'
+			],
+			[
+				['type' => API_IP_RANGES],
+				true,
+				'/1/ip_range',
+				'Invalid parameter "/1/ip_range": a character string is expected.'
+			],
+			[
+				['type' => API_IP_RANGES],
+				null,
+				'/1/ip_range',
+				'Invalid parameter "/1/ip_range": a character string is expected.'
+			],
+			[
+				['type' => API_IP_RANGES],
+				'0.0.0;0',
+				'/1/ip_range',
+				'Invalid parameter "/1/ip_range": invalid address range "0.0.0;0".'
+			],
+			[
+				['type' => API_IP_RANGES],
+				'1.1.1.1',
+				'/1/ip_range',
+				'1.1.1.1'
+			],
+			[
+				['type' => API_IP_RANGES, 'length' => 11],
+				'192.168.3.5',
+				'/1/ip_range',
+				'192.168.3.5'
+			],
+			[
+				['type' => API_IP_RANGES, 'length' => 10],
+				'192.168.3.5',
+				'/1/ip_range',
+				'Invalid parameter "/1/ip_range": value is too long.'
+			],
+			[
+				['type' => API_IP_RANGES],
+				'192.168.3.5,192.168.6.240',
+				'/1/ip_range',
+				'192.168.3.5,192.168.6.240'
+			],
+			[
 				['type' => API_DNS],
 				'',
 				'/1/dns',
@@ -3423,7 +3477,7 @@ class CApiInputValidatorTest extends TestCase {
 			[
 				['type' => API_DNS, 'flags' => API_ALLOW_USER_MACRO],
 				'{$MACRO: "context"}',
-				'/1/ip',
+				'/1/dns',
 				'{$MACRO: "context"}'
 			],
 			[
@@ -3562,7 +3616,7 @@ class CApiInputValidatorTest extends TestCase {
 			[
 				['type' => API_PORT, 'flags' => API_ALLOW_USER_MACRO],
 				'{$MACRO: "context"}',
-				'/1/ip',
+				'/1/port',
 				'{$MACRO: "context"}'
 			],
 			[
