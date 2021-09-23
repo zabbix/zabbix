@@ -272,17 +272,13 @@ class CScript extends CApiService {
 		 * Then validate each script separately. Depending on script type, each script may have different set of allowed
 		 * fields. Then in case the type is SSH and authtype is set, validate parameters again.
 		 */
-		$i = 0;
-
-		foreach ($scripts as $script) {
-			$path = '/'.++$i;
-
+		foreach ($scripts as $index => $script) {
 			$type_rules = $this->getTypeValidationRules($script['type'], 'create', $type_fields);
 			$this->getScopeValidationRules($script['scope'], $scope_fields);
 
 			$type_rules['fields'] += $common_fields + $scope_fields;
 
-			if (!CApiInputValidator::validate($type_rules, $script, $path, $error)) {
+			if (!CApiInputValidator::validate($type_rules, $script, '/'.($index + 1), $error)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 
@@ -290,7 +286,7 @@ class CScript extends CApiService {
 				$ssh_rules = $this->getAuthTypeValidationRules($script['authtype'], 'create');
 				$ssh_rules['fields'] += $common_fields + $type_fields + $scope_fields;
 
-				if (!CApiInputValidator::validate($ssh_rules, $script, $path, $error)) {
+				if (!CApiInputValidator::validate($ssh_rules, $script, '/'.($index + 1), $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
 			}
@@ -520,9 +516,7 @@ class CScript extends CApiService {
 		$scripts = zbx_toHash($scripts, 'scriptid');
 		$scripts = $this->extendFromObjects($scripts, $db_scripts, ['name', 'type', 'command', 'scope']);
 
-		$i = 0;
-		foreach ($scripts as &$script) {
-			$path = '/'.++$i;
+		foreach ($scripts as $index => &$script) {
 			$db_script = $db_scripts[$script['scriptid']];
 			$method = 'update';
 
@@ -544,7 +538,7 @@ class CScript extends CApiService {
 
 			$type_rules['fields'] += $common_fields + $scope_fields;
 
-			if (!CApiInputValidator::validate($type_rules, $script, $path, $error)) {
+			if (!CApiInputValidator::validate($type_rules, $script, '/'.($index + 1), $error)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 
@@ -560,7 +554,7 @@ class CScript extends CApiService {
 				$ssh_rules = $this->getAuthTypeValidationRules($script['authtype'], $method);
 				$ssh_rules['fields'] += $common_fields + $type_fields + $scope_fields;
 
-				if (!CApiInputValidator::validate($ssh_rules, $script, $path, $error)) {
+				if (!CApiInputValidator::validate($ssh_rules, $script, '/'.($index + 1), $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
 			}
@@ -1329,12 +1323,14 @@ class CScript extends CApiService {
 			return;
 		}
 
-		$duplicate = DBfetch(DBselect('SELECT s.name FROM scripts s WHERE '.dbConditionString('s.name', $names), 1));
+		$duplicates = DB::select('scripts', [
+			'output' => ['name'],
+			'filter' => ['name' => $names],
+			'limit' => 1
+		]);
 
-		if ($duplicate) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Script "%1$s" already exists.', $duplicate['name'])
-			);
+		if ($duplicates) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script "%1$s" already exists.', $duplicates[0]['name']));
 		}
 	}
 
@@ -1457,12 +1453,9 @@ class CScript extends CApiService {
 		];
 		$db_parameters = DBselect(DB::makeSql('script_param', $options));
 
-		while ($db_param = DBfetch($db_parameters)) {
-			$db_scripts[$db_param['scriptid']]['parameters'][$db_param['script_paramid']] = [
-				'script_paramid' => $db_param['script_paramid'],
-				'name' => $db_param['name'],
-				'value' => $db_param['value']
-			];
+		while ($db_parameter = DBfetch($db_parameters)) {
+			$db_scripts[$db_parameter['scriptid']]['parameters'][$db_parameter['script_paramid']] =
+				array_diff_key($db_parameter, array_flip(['scriptid']));
 		}
 	}
 }
