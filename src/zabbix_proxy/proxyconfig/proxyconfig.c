@@ -62,6 +62,8 @@ static void	process_configuration_sync(size_t *data_size)
 	struct zbx_json		j;
 	extern zbx_vector_ptr_t	zbx_addrs;
 	extern char		*CONFIG_HOSTNAME;
+	extern char		*CONFIG_SOURCE_IP;
+	extern unsigned int	configured_tls_connect_mode;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -82,8 +84,11 @@ static void	process_configuration_sync(size_t *data_size)
 	reserved = j.buffer_size;
 	zbx_json_free(&j);
 
-	if (FAIL == connect_to_server(&sock, &zbx_addrs, 600, CONFIG_PROXYCONFIG_RETRY))	/* retry till have a connection */
+	if (FAIL == connect_to_server(&sock,CONFIG_SOURCE_IP, &zbx_addrs, 600, configured_tls_connect_mode,
+			CONFIG_PROXYCONFIG_RETRY))	/* retry till have a connection */
+	{
 		goto out;
+	}
 
 	if (SUCCEED != get_data_from_server(&sock, &buffer, buffer_size, reserved, &error))
 	{

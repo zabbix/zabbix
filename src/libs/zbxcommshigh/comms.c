@@ -27,9 +27,6 @@
 #include "zbxalgo.h"
 #include "cfg.h"
 
-extern char		*CONFIG_SOURCE_IP;
-extern unsigned int	configured_tls_connect_mode;
-
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 extern char	*CONFIG_TLS_SERVER_CERT_ISSUER;
 extern char	*CONFIG_TLS_SERVER_CERT_SUBJECT;
@@ -71,7 +68,8 @@ static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_
 	return ret;
 }
 
-int	connect_to_server(zbx_socket_t *sock, zbx_vector_ptr_t *addrs, int timeout, int retry_interval)
+int	connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_ptr_t *addrs, int timeout,
+		unsigned int tls_connect, int retry_interval)
 {
 	int	res, lastlogtime, now;
 	char	*tls_arg1, *tls_arg2;
@@ -80,7 +78,7 @@ int	connect_to_server(zbx_socket_t *sock, zbx_vector_ptr_t *addrs, int timeout, 
 			((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port, timeout,
 			CONFIG_TIMEOUT);
 
-	switch (configured_tls_connect_mode)
+	switch (tls_connect)
 	{
 		case ZBX_TCP_SEC_UNENCRYPTED:
 			tls_arg1 = NULL;
@@ -101,8 +99,8 @@ int	connect_to_server(zbx_socket_t *sock, zbx_vector_ptr_t *addrs, int timeout, 
 			return FAIL;
 	}
 
-	if (FAIL == (res = zbx_tcp_connect_failover(sock, CONFIG_SOURCE_IP, addrs, timeout,
-			CONFIG_TIMEOUT, configured_tls_connect_mode, tls_arg1, tls_arg2)))
+	if (FAIL == (res = zbx_tcp_connect_failover(sock, source_ip, addrs, timeout, CONFIG_TIMEOUT,
+			tls_connect, tls_arg1, tls_arg2)))
 	{
 		if (0 != retry_interval)
 		{
@@ -112,8 +110,8 @@ int	connect_to_server(zbx_socket_t *sock, zbx_vector_ptr_t *addrs, int timeout, 
 
 			lastlogtime = (int)time(NULL);
 
-			while (ZBX_IS_RUNNING() && FAIL == (res = zbx_tcp_connect_failover(sock, CONFIG_SOURCE_IP,
-					addrs, timeout, CONFIG_TIMEOUT, configured_tls_connect_mode, tls_arg1,
+			while (ZBX_IS_RUNNING() && FAIL == (res = zbx_tcp_connect_failover(sock, source_ip,
+					addrs, timeout, CONFIG_TIMEOUT, tls_connect, tls_arg1,
 					tls_arg2)))
 			{
 				now = (int)time(NULL);

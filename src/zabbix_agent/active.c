@@ -606,7 +606,8 @@ static int	refresh_active_checks(zbx_vector_ptr_t *addrs)
 	if (ZBX_DEFAULT_AGENT_PORT != CONFIG_LISTEN_PORT)
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_PORT, CONFIG_LISTEN_PORT);
 
-	if (SUCCEED == (ret = connect_to_server(&s, addrs, CONFIG_TIMEOUT, 0)))
+	if (SUCCEED == (ret = connect_to_server(&s, CONFIG_SOURCE_IP, addrs, CONFIG_TIMEOUT,
+			configured_tls_connect_mode, 0)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "sending [%s]", json.buffer);
 
@@ -781,7 +782,8 @@ static int	send_buffer(zbx_vector_ptr_t *addrs)
 
 	zbx_json_close(&json);
 
-	if (SUCCEED == (ret = connect_to_server(&s, addrs, MIN(buffer.count * CONFIG_TIMEOUT, 60), 0)))
+	if (SUCCEED == (ret = connect_to_server(&s, CONFIG_SOURCE_IP, addrs, MIN(buffer.count * CONFIG_TIMEOUT, 60),
+			configured_tls_connect_mode, 0)))
 	{
 		zbx_timespec(&ts);
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_CLOCK, ts.sec);
