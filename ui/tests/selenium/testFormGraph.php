@@ -197,14 +197,16 @@ class testFormGraph extends CLegacyWebTest {
 		if (isset($data['template'])) {
 			$this->zbxTestLogin('templates.php');
 			$this->query('button:Reset')->one()->click();
-			$this->filterEntriesAndOpenGraph($data['template']);
+			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+			$this->filterEntriesAndOpenGraph($data['template'], $form);
 			$hostid = 30000;
 		}
 
 		if (isset($data['host'])) {
 			$this->zbxTestLogin(self::HOST_LIST_PAGE);
 			$this->query('button:Reset')->one()->click();
-			$this->filterEntriesAndOpenGraph($data['host']);
+			$form = $this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one();
+			$this->filterEntriesAndOpenGraph($data['host'], $form);
 			if (isset($data['templatedHost'])) {
 				$hostid = 30001;
 			}
@@ -1011,8 +1013,7 @@ class testFormGraph extends CLegacyWebTest {
 	 *
 	 * @param string    name of a host or template
 	 */
-	private function filterEntriesAndOpenGraph($name) {
-		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+	private function filterEntriesAndOpenGraph($name, $form) {
 		$form->fill(['Name' => $name]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
