@@ -19,7 +19,7 @@ This template was tested on:
 
 You must set {$VELOCLOUD.TOKEN} and {$VELOCLOUD.URL} macros. 
 
-You have to create API token in Orcestrator and use it in {$VELOCLOUD.TOKEN} macros. Read detailed instructions how to create token in VMWare documentation [documentation](https://docs.vmware.com/en/VMware-SD-WAN/4.0/vmware-sd-wan-operator-guide/GUID-C150D536-A75F-47C1-8AFF-17C417F40C1D.html)
+You have to create API token in Orchestrator and use it in {$VELOCLOUD.TOKEN} macros. Read detailed instructions how to create token in VMWare documentation [documentation](https://docs.vmware.com/en/VMware-SD-WAN/4.0/vmware-sd-wan-operator-guide/GUID-C150D536-A75F-47C1-8AFF-17C417F40C1D.html)
 
 Set Orchestrator URl for {$VELOCLOUD.URL}. e.g. example.com (where you replace example.com with the actual url VMWare SD-WAN Orchestrator is running on)
 
@@ -68,10 +68,15 @@ There are no template links in this template.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
+|Velocloud |Velocloud: Clear metrics for aggregated data |<p>Clear metrics for aggregated data without errors.</p> |DEPENDENT |velocloud.get.clear_metrics<p>**Preprocessing**:</p><p>- CHECK_JSON_ERROR |
+|Velocloud |Velocloud: Clear metrics for logs data |<p>Clear metrics for logs data without errors.</p> |DEPENDENT |velocloud.get_logs.clear_metrics<p>**Preprocessing**:</p><p>- CHECK_JSON_ERROR |
+|Velocloud |Velocloud: Clear metrics for apps data |<p>Clear metrics for apps data without errors.</p> |DEPENDENT |velocloud.get_apps.clear_metrics<p>**Preprocessing**:</p><p>- CHECK_JSON_ERROR |
 |Velocloud |Velocloud: Orchestrator API version |<p>Version of VMware SD-WAN Orchestrator API.</p> |DEPENDENT |velocloud.orchestrator.api_version<p>**Preprocessing**:</p><p>- JSONPATH: `$.version.apiVersion`</p> |
 |Velocloud |Velocloud: Orchestrator build |<p>Build of VMware SD-WAN Orchestrator API.</p> |DEPENDENT |velocloud.orchestrator.build<p>**Preprocessing**:</p><p>- JSONPATH: `$.version.build`</p> |
 |Velocloud |Velocloud: Orchestrator version |<p>Version of VMware SD-WAN Orchestrator API.</p> |DEPENDENT |velocloud.orchestrator.version<p>**Preprocessing**:</p><p>- JSONPATH: `$.version.version`</p> |
-|Velocloud |Velocloud: Script item errors |<p>Errors of script item.</p> |DEPENDENT |velocloud.get.error<p>**Preprocessing**:</p><p>- JSONPATH: `$.error`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Velocloud |Velocloud: Aggregate script item errors |<p>Errors of aggregate script item.</p> |DEPENDENT |velocloud.get.error<p>**Preprocessing**:</p><p>- JSONPATH: `$.error`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Velocloud |Velocloud: Logs script item errors |<p>Errors of logs script item.</p> |DEPENDENT |velocloud.get_logs.error<p>**Preprocessing**:</p><p>- JSONPATH: `$.error`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Velocloud |Velocloud: Apps script item errors |<p>Errors of apps script item.</p> |DEPENDENT |velocloud.get_apps.error<p>**Preprocessing**:</p><p>- JSONPATH: `$.error`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Velocloud |Velocloud: System properties |<p>System properties of VMware SD-WAN.</p> |HTTP_AGENT |velocloud.system.properties<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
 |Velocloud |Edge {#NAME}: Activation state |<p>Edge activation state.</p> |DEPENDENT |velocloud.edge.activation[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.edges[?(@.id=='{#ID}')].activationState.first()`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 |Velocloud |Edge {#NAME}: Description |<p>Edge description.</p> |DEPENDENT |velocloud.edge.description[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.edges[?(@.id=='{#ID}')].description.first()`</p> |
@@ -133,7 +138,7 @@ There are no template links in this template.
 |Velocloud |Path {#SOURCE} => {#DESTINATION}({#NAME}): Total packets |<p>Total packets of SDWAN peer path.</p> |DEPENDENT |velocloud.sdwanpath.total_packets[{#NAME}/{#SOURCE}/{#DESTINATION}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.edgeSDWanPath[?(@.source.linkName=='{#NAME}' && @.source.deviceName=='{#SOURCE}' && @.destination.deviceName=='{#DESTINATION}')].metrics.totalPackets.first()`</p> |
 |Velocloud |Path {#SOURCE} => {#DESTINATION}({#NAME}): Packet Loss Rx |<p>Received packet loss of SDWAN peer path.</p> |DEPENDENT |velocloud.sdwanpath.packet_loss_rx[{#NAME}/{#SOURCE}/{#DESTINATION}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.edgeSDWanPath[?(@.source.linkName=='{#NAME}' && @.source.deviceName=='{#SOURCE}' && @.destination.deviceName=='{#DESTINATION}')].metrics.packetLossRx.first()`</p> |
 |Velocloud |Path {#SOURCE} => {#DESTINATION}({#NAME}): Packet Loss Tx |<p>Transmitted packet loss of SDWAN peer path.</p> |DEPENDENT |velocloud.sdwanpath.packet_loss_tx[{#NAME}/{#SOURCE}/{#DESTINATION}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.edgeSDWanPath[?(@.source.linkName=='{#NAME}' && @.source.deviceName=='{#SOURCE}' && @.destination.deviceName=='{#DESTINATION}')].metrics.packetLossTx.first()`</p> |
-|Zabbix_raw_items |Velocloud: Get aggregate data |<p>The JSON with result of Velocloud API requests.</p> |SCRIPT |velocloud.get<p>**Expression**:</p>`The text is too long. Please see the template.` |
+|Zabbix_raw_items |Velocloud: Get aggregated data |<p>The JSON with result of Velocloud API requests.</p> |SCRIPT |velocloud.get<p>**Expression**:</p>`The text is too long. Please see the template.` |
 |Zabbix_raw_items |Velocloud: Get logs data |<p>The JSON with result of Velocloud API request for logs and events.</p> |SCRIPT |velocloud.get_logs<p>**Expression**:</p>`The text is too long. Please see the template.` |
 |Zabbix_raw_items |Velocloud: Get apps data |<p>The JSON with result of Velocloud API request for apps data.</p> |SCRIPT |velocloud.get_apps<p>**Expression**:</p>`The text is too long. Please see the template.` |
 
@@ -142,7 +147,9 @@ There are no template links in this template.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |Velocloud: Failed to fetch aggregate data (or no data for 30m) |<p>Zabbix has not received data for items for the last 30 minutes.</p> |`nodata(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.api_version,30m)=1` |AVERAGE |<p>Manual close: YES</p> |
-|Velocloud: There are errors in script item requests |<p>There are errors in script item requests.</p> |`length(last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.get.error))>0` |WARNING | |
+|Velocloud: There are errors in aggregate script item |<p>There are errors in aggregate script item.</p> |`length(last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.get.error))>0` |WARNING | |
+|Velocloud: There are errors in logs script item |<p>There are errors in logs script item.</p> |`length(last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.get_logs.error))>0` |WARNING | |
+|Velocloud: There are errors in apps script item |<p>There are errors in apps script item.</p> |`length(last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.get_apps.error))>0` |WARNING | |
 |Velocloud: System properties have changed |<p>System properties have changed.</p> |`change(/VMWare SD-WAN VeloCloud by HTTP/velocloud.system.properties)=1` |INFO |<p>Manual close: YES</p> |
 |Edge {#NAME}: HA state is in "FAILED" state |<p>High availability state is "FAILED".</p> |`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.ha_state[{#ID}])=3` |WARNING | |
 |Edge {#NAME}: Edge is in "OFFLINE" state |<p>Edge state is "OFFLINE".</p> |`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.state[{#ID}])=0` |AVERAGE | |
