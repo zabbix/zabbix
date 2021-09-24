@@ -1042,6 +1042,13 @@ class CApiInputValidator {
 
 			if ($field_rule['type'] === API_MULTIPLE) {
 				foreach ($field_rule['rules'] as $multiple_rule) {
+					if (!array_key_exists($multiple_rule['if']['field'], $data)) {
+						$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+							_s('the parameter "%1$s" is missing', $multiple_rule['if']['field'])
+						);
+						return false;
+					}
+
 					if (self::isInRange($data[$multiple_rule['if']['field']], $multiple_rule['if']['in'])) {
 						$field_rule = $multiple_rule;
 						break;

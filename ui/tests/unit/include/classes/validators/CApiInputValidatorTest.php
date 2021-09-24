@@ -1946,6 +1946,20 @@ class CApiInputValidatorTest extends TestCase {
 			],
 			[
 				['type' => API_OBJECTS, 'fields' => [
+					'type' =>	['type' => API_INT32, 'in' => '1:9'],
+					'value' =>	['type' => API_MULTIPLE, 'rules' => [
+						['if' => ['field' => 'type', 'in' => '1:2'], 'type' => API_INT32, 'in' => '1,2'],
+						['if' => ['field' => 'type', 'in' => '3'], 'type' => API_INT32, 'in' => '4:6'],
+					]]
+				]],
+				[
+					['value' => '1'],
+				],
+				'/',
+				'Invalid parameter "/1": the parameter "type" is missing.'
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => [
 					'host' =>	['type' => API_H_NAME, 'flags' => API_REQUIRED],
 					'name' =>	['type' => API_STRING_UTF8, 'default_source' => 'host']
 				]],
