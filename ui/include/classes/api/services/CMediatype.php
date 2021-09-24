@@ -447,20 +447,6 @@ class CMediatype extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 
-			if ($type == MEDIA_TYPE_EXEC) {
-				if (array_key_exists('exec_params', $mediatype) && $mediatype['exec_params'] !== '') {
-					$pos = strrpos($mediatype['exec_params'], "\n");
-
-					if ($pos === false || strlen($mediatype['exec_params']) != $pos + 1) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Script parameters "%1$s" are missing the last new line feed for media type "%2$s".',
-							$mediatype['exec_params'],
-							$mediatype['name']
-						));
-					}
-				}
-			}
-
 			if ($method === 'update') {
 				switch ($type) {
 					case MEDIA_TYPE_EMAIL:
@@ -555,7 +541,7 @@ class CMediatype extends CApiService {
 			case MEDIA_TYPE_EXEC:
 				$api_input_rules['fields'] = [
 					'exec_path' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'exec_path')],
-					'exec_params' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type', 'exec_params')]
+					'exec_params' =>	['type' => API_EXEC_PARAMS, 'length' => DB::getFieldLength('media_type', 'exec_params')]
 				];
 
 				if ($method === 'create' || $type != $db_mediatype['type']) {

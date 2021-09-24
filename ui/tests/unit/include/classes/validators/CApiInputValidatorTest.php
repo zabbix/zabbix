@@ -4326,6 +4326,66 @@ class CApiInputValidatorTest extends TestCase {
 				null,
 				'/',
 				'Invalid parameter "/": a character string is expected.'
+			],
+			[
+				['type' => API_EXEC_PARAMS],
+				null,
+				'/1/exec_params',
+				'Invalid parameter "/1/exec_params": a character string is expected.'
+			],
+			[
+				['type' => API_EXEC_PARAMS],
+				true,
+				'/1/exec_params',
+				'Invalid parameter "/1/exec_params": a character string is expected.'
+			],
+			[
+				['type' => API_EXEC_PARAMS],
+				1,
+				'/1/exec_params',
+				'Invalid parameter "/1/exec_params": a character string is expected.'
+			],
+			[
+				['type' => API_EXEC_PARAMS],
+				[],
+				'/1/exec_params',
+				'Invalid parameter "/1/exec_params": a character string is expected.'
+			],
+			[
+				['type' => API_EXEC_PARAMS],
+				'',
+				'/1/exec_params',
+				''
+			],
+			[
+				['type' => API_EXEC_PARAMS, 'flags' => API_NOT_EMPTY],
+				'',
+				'/1/exec_params',
+				'Invalid parameter "/1/exec_params": cannot be empty.'
+			],
+			[
+				['type' => API_EXEC_PARAMS, 'length' => 2],
+				'abc',
+				'/1/exec_params',
+				'Invalid parameter "/1/exec_params": value is too long.'
+			],
+			[
+				['type' => API_EXEC_PARAMS],
+				'abc',
+				'/1/exec_params',
+				'Invalid parameter "/1/exec_params": the last new line feed is missing.'
+			],
+			[
+				['type' => API_EXEC_PARAMS],
+				'ab'."\n".'c',
+				'/1/exec_params',
+				'Invalid parameter "/1/exec_params": the last new line feed is missing.'
+			],
+			[
+				['type' => API_EXEC_PARAMS],
+				'abc'."\n",
+				'/1/exec_params',
+				'abc'."\n"
 			]
 		];
 	}
