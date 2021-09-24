@@ -521,7 +521,7 @@ static void	remove_duplicate_backet(zbx_vector_histogram_t *h)
 		zbx_vector_histogram_remove_noorder(h, h->values_num - 1);
 }
 
-static void	ensure_monotonic(zbx_vector_histogram_t *h)
+static void	ensure_histogram_monotonic(zbx_vector_histogram_t *h)
 {
 	double	max = h->values[0].count;
 	int	i;
@@ -600,7 +600,7 @@ int	zbx_eval_calc_histogram_quantile(const double q, const zbx_vector_dbl_t *val
 		goto err;
 	}
 
-	ensure_monotonic(&histogram);
+	ensure_histogram_monotonic(&histogram);
 	total = LAST(histogram).count;
 
 	if (FP_ZERO == fpclassify(total))
