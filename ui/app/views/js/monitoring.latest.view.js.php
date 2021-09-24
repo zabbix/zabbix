@@ -213,11 +213,14 @@
 
 			const overlay = PopUp('popup.host.edit', host_data, 'host_edit', document.activeElement);
 
+			this.unscheduleRefresh();
+
 			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess);
 			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess);
 			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostDelete);
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
+				this.scheduleRefresh();
 			}, {once: true});
 		},
 
