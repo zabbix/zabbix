@@ -49,7 +49,7 @@ static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_
 		{
 			if (0 != i)
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "Connected to the alternative server [%s]:%d",
+				zabbix_log(LOG_LEVEL_DEBUG, "Connected to the alternative server [%s]:%d",
 						((zbx_addr_t *)addrs->values[0])->ip,
 						((zbx_addr_t *)addrs->values[0])->port);
 			}
@@ -57,7 +57,7 @@ static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_
 			break;
 		}
 
-		zabbix_log(LOG_LEVEL_WARNING, "Unable to connect to the server [%s]:%d [%s]",
+		zabbix_log(LOG_LEVEL_DEBUG, "Unable to connect to the server [%s]:%d [%s]",
 				((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port,
 				zbx_socket_strerror());
 
