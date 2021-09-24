@@ -229,7 +229,7 @@ var chkbxRange = {
 	 *
 	 * @param {string} object
 	 *
-	 * @param {bool} checked
+	 * @param {boolean} checked
 	 */
 	checkObjectAll: function(object, checked) {
 		// main checkbox exists and is clickable, but other checkboxes may not exist and object may be empty

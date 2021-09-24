@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $options = [
@@ -117,14 +118,25 @@ if ($data['action'] === 'problem.view') {
 		$data['filter_options'] = $filter->options;
 		$widget->addItem($filter);
 	}
+	else {
+		$data['filter_options'] = null;
+	}
 
 	$this->includeJsFile('monitoring.problem.view.js.php', $data);
 	$widget
 		->addItem($screen->get())
 		->show();
 
-	// Activate blinking.
-	(new CScriptTag('jqBlink.blink();'))->show();
+	(new CScriptTag('
+		view.init('.json_encode([
+			'filter_options' => $data['filter_options'],
+			'refresh_url' => $data['refresh_url'],
+			'refresh_interval' => $data['refresh_interval'],
+			'filter_defaults' => $data['filter_defaults']
+		]).');
+	'))
+		->setOnDocumentReady()
+		->show();
 }
 else {
 	echo $screen->get();

@@ -23,75 +23,141 @@
  * @var CView $this
  */
 
-if (array_key_exists('filter_options', $data)) { ?>
-	<script type="text/javascript">
-	$(function() {
-		var options = <?= json_encode($data['filter_options']) ?>,
-			filter = new CTabFilter($('#monitoring_problem_filter')[0], options),
-			refresh_interval = <?= $data['refresh_interval'] ?>,
-			refresh_url = '<?= $data['refresh_url'] ?>',
-			refresh_timer,
-			filter_item,
-			filter_counter_fetch,
-			active_filter = filter._active_item,
-			global_timerange = {
-				from: options.timeselector.from,
-				to: options.timeselector.to
+?>
+<script>
+	const view = {
+		refresh_url: null,
+		refresh_interval: null,
+		filter_defaults: null,
+		filter: null,
+		global_timerange: null,
+		active_filter: null,
+		refresh_timer: null,
+		filter_counter_fetch: null,
+
+		init({filter_options, refresh_url, refresh_interval, filter_defaults}) {
+			this.refresh_url = refresh_url;
+			this.refresh_interval = refresh_interval;
+			this.filter_defaults = filter_defaults;
+
+			if (filter_options !== null) {
+				this.initFilter({filter_options});
+			}
+
+			this.initAcknowledge();
+
+			$(document).on({
+				mouseenter: function() {
+					if ($(this)[0].scrollWidth > $(this)[0].offsetWidth) {
+						$(this).attr({title: $(this).text()});
+					}
+				},
+				mouseleave: function() {
+					if ($(this).is('[title]')) {
+						$(this).removeAttr('title');
+					}
+				}
+			}, 'table.<?= ZBX_STYLE_COMPACT_VIEW ?> a.<?= ZBX_STYLE_LINK_ACTION ?>');
+
+			// Activate blinking.
+			jqBlink.blink();
+		},
+
+		initFilter({filter_options}) {
+			this.filter = new CTabFilter($('#monitoring_problem_filter')[0], filter_options);
+			this.active_filter = this.filter._active_item;
+			this.global_timerange = {
+				from: filter_options.timeselector.from,
+				to: filter_options.timeselector.to
 			};
 
-		/**
-		 * Update on filter changes.
-		 */
-		filter.on(TABFILTER_EVENT_URLSET, () => {
-			let url = new Curl();
+			/**
+			 * Update on filter changes.
+			 */
+			this.filter.on(TABFILTER_EVENT_URLSET, () => {
+				const url = new Curl();
+				url.setArgument('action', 'problem.view.csv');
+				$('#export_csv').attr('data-url', url.getUrl());
 
-			url.setArgument('action', 'problem.view.csv');
-			$('#export_csv').attr('data-url', url.getUrl());
-			refreshResults();
-			refreshCounters();
+				this.refreshResults();
+				this.refreshCounters();
 
-			if (active_filter !== filter._active_item) {
-				active_filter = filter._active_item;
-				chkbxRange.checkObjectAll(chkbxRange.pageGoName, false);
-				chkbxRange.clearSelectedOnFilterChange();
-			}
-		});
+				if (this.active_filter !== this.filter._active_item) {
+					this.active_filter = this.filter._active_item;
+					chkbxRange.checkObjectAll(chkbxRange.pageGoName, false);
+					chkbxRange.clearSelectedOnFilterChange();
+				}
+			});
 
-		/**
-		 * Update filter item counter when filter settings updated.
-		 */
-		filter.on(TABFILTER_EVENT_UPDATE, (ev) => {
-			if (!filter._active_item.hasCounter() || ev.detail.filter_property !== 'properties') {
-				return;
-			}
+			/**
+			 * Update filter item counter when filter settings updated.
+			 */
+			this.filter.on(TABFILTER_EVENT_UPDATE, (e) => {
+				if (!this.filter._active_item.hasCounter() || e.detail.filter_property !== 'properties') {
+					return;
+				}
 
-			if (filter_counter_fetch) {
-				filter_counter_fetch.abort();
-			}
+				if (this.filter_counter_fetch) {
+					this.filter_counter_fetch.abort();
+				}
 
-			filter_counter_fetch = new AbortController();
-			filter_item = filter._active_item;
+				this.filter_counter_fetch = new AbortController();
+				const filter_item = this.filter._active_item;
 
-			fetch(refresh_url, {
-				method: 'POST',
-				signal: filter_counter_fetch.signal,
-				body: new URLSearchParams({filter_counters: 1, counter_index: filter_item._index})
-			})
-				.then(response => response.json())
-				.then(response => {
-					filter_item.updateCounter(response.filter_counters.pop());
-				});
-		});
+				fetch(this.refresh_url, {
+					method: 'POST',
+					signal: this.filter_counter_fetch.signal,
+					body: new URLSearchParams({filter_counters: 1, counter_index: filter_item._index})
+				})
+					.then(response => response.json())
+					.then(response => {
+						filter_item.updateCounter(response.filter_counters.pop());
+					});
+			});
+
+			this.refreshCounters();
+
+			// Keep timeselector changes in global_timerange.
+			$.subscribe('timeselector.rangeupdate', (e, data) => {
+				if (data.idx === '<?= CControllerProblem::FILTER_IDX ?>') {
+					this.global_timerange.from = data.from;
+					this.global_timerange.to = data.to;
+				}
+			});
+		},
+
+		initAcknowledge() {
+			$.subscribe('acknowledge.create', function(event, response) {
+				// Clear all selected checkboxes in Monitoring->Problems.
+				if (chkbxRange.prefix === 'problem') {
+					chkbxRange.checkObjectAll(chkbxRange.pageGoName, false);
+					chkbxRange.clearSelectedOnFilterChange();
+				}
+
+				window.flickerfreeScreen.refresh('problem');
+
+				clearMessages();
+				addMessage(makeMessageBox('good', [], response.message, true, false));
+			});
+
+			$(document).on('submit', '#problem_form', function(e) {
+				e.preventDefault();
+
+				const eventids = $('[id^="eventids_"]:checked', $(this)).map(function() {
+					return $(this).val();
+				}).get();
+
+				acknowledgePopUp({eventids}, this);
+			});
+		},
 
 		/**
 		 * Refresh results table via window.flickerfreeScreen.refresh call.
 		 */
-		function refreshResults() {
-			let url = new Curl(),
-				screen = window.flickerfreeScreen.screens['problem'],
-				data = $.extend(<?= json_encode($data['filter_defaults']) ?>,
-					global_timerange, url.getArgumentsObject()
-				);
+		refreshResults() {
+			const url = new Curl();
+			const screen = window.flickerfreeScreen.screens['problem'];
+			const data = $.extend(this.filter_defaults, this.global_timerange, url.getArgumentsObject());
 
 			data.inventory = data.inventory
 				? data.inventory.filter(inventory => 'value' in inventory && inventory.value !== '')
@@ -113,8 +179,8 @@ if (array_key_exists('filter_options', $data)) { ?>
 				screen.timeline.to = data.to;
 			}
 			else {
-				screen.timeline.from = global_timerange.from;
-				screen.timeline.to = global_timerange.to;
+				screen.timeline.from = this.global_timerange.from;
+				screen.timeline.to = this.global_timerange.to;
 			}
 
 			screen.data.filter = data;
@@ -122,8 +188,8 @@ if (array_key_exists('filter_options', $data)) { ?>
 			screen.data.sortorder = data.sortorder;
 
 			// Close all opened hint boxes otherwise flicker free screen will not refresh it content.
-			for (var i = overlays_stack.length - 1; i >= 0; i--) {
-				let hintbox = overlays_stack.getById(overlays_stack.stack[i]);
+			for (let i = overlays_stack.length - 1; i >= 0; i--) {
+				const hintbox = overlays_stack.getById(overlays_stack.stack[i]);
 
 				if (hintbox.type === 'hintbox') {
 					hintBox.hideHint(hintbox.element, true);
@@ -132,23 +198,23 @@ if (array_key_exists('filter_options', $data)) { ?>
 			}
 
 			window.flickerfreeScreen.refresh(screen.id);
-		}
+		},
 
-		function refreshCounters() {
-			clearTimeout(refresh_timer);
+		refreshCounters() {
+			clearTimeout(this.refresh_timer);
 
-			fetch(refresh_url, {
+			fetch(this.refresh_url, {
 				method: 'POST',
 				body: new URLSearchParams({filter_counters: 1})
 			})
 				.then(response => response.json())
 				.then(response => {
 					if (response.filter_counters) {
-						filter.updateCounters(response.filter_counters);
+						this.filter.updateCounters(response.filter_counters);
 					}
 
-					if (refresh_interval > 0) {
-						refresh_timer = setTimeout(refreshCounters, refresh_interval);
+					if (this.refresh_interval > 0) {
+						this.refresh_timer = setTimeout(() => this.refreshCounters(), this.refresh_interval);
 					}
 				})
 				.catch(() => {
@@ -156,60 +222,67 @@ if (array_key_exists('filter_options', $data)) { ?>
 					 * On error restart refresh timer.
 					 * If refresh interval is set to 0 (no refresh) schedule initialization request after 5 sec.
 					 */
-					refresh_timer = setTimeout(refreshCounters, refresh_interval > 0 ? refresh_interval : 5000);
+					this.refresh_timer = setTimeout(() => this.refreshCounters(),
+						this.refresh_interval > 0 ? this.refresh_interval : 5000
+					);
 				});
-		}
+		},
 
-		refreshCounters();
+		editHost(hostid) {
+			this.openHostPopup({hostid});
+		},
 
-		// Keep timeselector changes in global_timerange.
-		$.subscribe('timeselector.rangeupdate', (e, data) => {
-			if (data.idx === '<?= CControllerProblem::FILTER_IDX ?>') {
-				global_timerange.from = data.from;
-				global_timerange.to = data.to;
-			}
-		});
-	});
-	</script>
-<?php
-}
-?>
-<script type="text/javascript">
-	jQuery(function($) {
-		$(document).on({
-			mouseenter: function() {
-				if ($(this)[0].scrollWidth > $(this)[0].offsetWidth) {
-					$(this).attr({title: $(this).text()});
-				}
-			},
-			mouseleave: function() {
-				if ($(this).is('[title]')) {
-					$(this).removeAttr('title');
-				}
-			}
-		}, 'table.<?= ZBX_STYLE_COMPACT_VIEW ?> a.<?= ZBX_STYLE_LINK_ACTION ?>');
-
-		$.subscribe('acknowledge.create', function(event, response) {
-			// Clear all selected checkboxes in Monitoring->Problems.
-			if (chkbxRange.prefix === 'problem') {
-				chkbxRange.checkObjectAll(chkbxRange.pageGoName, false);
-				chkbxRange.clearSelectedOnFilterChange();
-			}
-
-			window.flickerfreeScreen.refresh('problem');
-
+		openHostPopup(host_data) {
 			clearMessages();
-			addMessage(makeMessageBox('good', [], response.message, true, false));
-		});
+			const original_url = location.href;
 
-		$(document).on('submit', '#problem_form', function(e) {
-			e.preventDefault();
+			const overlay = PopUp('popup.host.edit', host_data, 'host_edit', document.activeElement);
 
-			var eventids = $('[id^="eventids_"]:checked', $(this)).map(function() {
-					return $(this).val();
-				}).get();
+			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess);
+			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess);
+			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostDelete);
+			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+				history.replaceState({}, '', original_url);
+			}, {once: true});
+		},
 
-			acknowledgePopUp({eventids: eventids}, this);
-		});
-	});
+		events: {
+			hostSuccess(e) {
+				const data = e.detail;
+
+				if ('success' in data) {
+					const title = data.success.title;
+					let messages = [];
+
+					if ('messages' in data.success) {
+						messages = data.success.messages;
+					}
+
+					addMessage(makeMessageBox('good', messages, title));
+				}
+
+				view.refreshResults();
+				view.refreshCounters();
+			},
+
+			hostDelete(e) {
+				const data = e.detail;
+
+				if ('success' in data) {
+					const title = data.success.title;
+					let messages = [];
+
+					if ('messages' in data.success) {
+						messages = data.success.messages;
+					}
+
+					addMessage(makeMessageBox('good', messages, title));
+				}
+
+				uncheckTableRows('problem');
+				view.refreshResults();
+				view.refreshCounters();
+			}
+		}
+	};
 </script>

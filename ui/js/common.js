@@ -429,7 +429,7 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 /**
  * Open "Update problem" dialog and manage URL change.
  *
- * @param {array}  options
+ * @param {Object}  options
  * @param {array}  options['eventids']  Eventids to update.
  * @param {object} trigger_elmnt        (optional) UI element which was clicked to open overlay dialogue.
  *
