@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-09-20T14:49:58Z'
+  date: '2021-09-24T10:45:50Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -301,7 +301,7 @@ zabbix_export:
           key: influxdb.task_executor_complete.failed.rate
           delay: '0'
           history: 7d
-          description: 'Total number of failed runs across all tasks.'
+          description: 'Total number of failure runs across all tasks.'
           preprocessing:
             -
               type: JSONPATH
@@ -331,9 +331,9 @@ zabbix_export:
             -
               uuid: f0d2137905bc477f979d035c06111844
               expression: 'min(/InfluxDB by HTTP/influxdb.task_executor_complete.failed.rate,5m)>{$INFLUXDB.TASK.RUN.FAIL.MAX.WARN}'
-              name: 'InfluxDB: Too many tasks failures (over {$INFLUXDB.TASK.RUN.FAIL.MAX.WARN} for 5m)'
+              name: 'InfluxDB: Too many tasks failure runs (over {$INFLUXDB.TASK.RUN.FAIL.MAX.WARN} for 5m)'
               priority: WARNING
-              description: '"Too many tasks failed runs across all tasks."'
+              description: '"Number of failure runs completed across all tasks is too hight."'
         -
           uuid: a0183b6d934c4612b358c027c75eda6e
           name: 'InfluxDB: Task runs successful, rate'
@@ -657,7 +657,7 @@ zabbix_export:
                 macro: '{#ORG_NAME}'
                 value: '{$INFLUXDB.ORG_NAME.MATCHES}'
                 formulaid: B
-          description: 'Discovery pf organizations merics.'
+          description: 'Discovery of organizations merics.'
           item_prototypes:
             -
               uuid: c84ae278bd7c4387873bc8bbf6d8ba8f
@@ -779,7 +779,7 @@ zabbix_export:
                   expression: 'min(/InfluxDB by HTTP/influxdb.org.query_request.failed.rate["{#ORG_NAME}"],5m)>{$INFLUXDB.REQ.FAIL.MAX.WARN}'
                   name: 'InfluxDB: [{#ORG_NAME}]: Too many requests failures (over {$INFLUXDB.REQ.FAIL.MAX.WARN} for 5m)'
                   priority: WARNING
-                  description: '"Too many query requests failed."'
+                  description: 'Too many query requests failed.'
             -
               uuid: da53d3185ba744c38fc264993c72b1b9
               name: 'InfluxDB: [{#ORG_NAME}] Query requests, success'

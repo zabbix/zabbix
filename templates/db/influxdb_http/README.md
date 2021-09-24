@@ -51,7 +51,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Organizations discovery |<p>Discovery pf organizations merics.</p> |HTTP_AGENT |influxdb.orgs.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Filter**:</p>AND <p>- A: {#ORG_NAME} NOT_MATCHES_REGEX `{$INFLUXDB.ORG_NAME.NOT_MATCHES}`</p><p>- B: {#ORG_NAME} MATCHES_REGEX `{$INFLUXDB.ORG_NAME.MATCHES}`</p> |
+|Organizations discovery |<p>Discovery of organizations merics.</p> |HTTP_AGENT |influxdb.orgs.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Filter**:</p>AND <p>- A: {#ORG_NAME} NOT_MATCHES_REGEX `{$INFLUXDB.ORG_NAME.NOT_MATCHES}`</p><p>- B: {#ORG_NAME} MATCHES_REGEX `{$INFLUXDB.ORG_NAME.MATCHES}`</p> |
 
 ## Items collected
 
@@ -72,7 +72,7 @@ There are no template links in this template.
 |InfluxDB |InfluxDB: Uptime |<p>InfluxDB process uptime in seconds.</p> |DEPENDENT |influxdb.uptime<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="influxdb_uptime_seconds")].value.first()`</p> |
 |InfluxDB |InfluxDB: Workers currently running |<p>Total number of workers currently running tasks.</p> |DEPENDENT |influxdb.task_executor_runs_active.total<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="task_executor_total_runs_active")].value.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |InfluxDB |InfluxDB: Workers busy, pct |<p>Percent of total available workers that are currently busy.</p> |DEPENDENT |influxdb.task_executor_workers_busy.pct<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="task_executor_workers_busy")].value.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|InfluxDB |InfluxDB: Task runs failed, rate |<p>Total number of failed runs across all tasks.</p> |DEPENDENT |influxdb.task_executor_complete.failed.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="task_executor_total_runs_complete" && @.labels.status == "failed")].value.sum()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND |
+|InfluxDB |InfluxDB: Task runs failed, rate |<p>Total number of failure runs across all tasks.</p> |DEPENDENT |influxdb.task_executor_complete.failed.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="task_executor_total_runs_complete" && @.labels.status == "failed")].value.sum()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND |
 |InfluxDB |InfluxDB: Task runs successful, rate |<p>Total number of runs successful completed across all tasks.</p> |DEPENDENT |influxdb.task_executor_complete.successful.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="task_executor_total_runs_complete" && @.labels.status == "success")].value.sum()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND |
 |InfluxDB |InfluxDB: [{#ORG_NAME}] Query requests bytes, success |<p>Count of bytes received with status 200 per second.</p> |DEPENDENT |influxdb.org.query_request_bytes.success.rate["{#ORG_NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="http_query_request_bytes" && @.labels.status == "200" && @.labels.endpoint == "/api/v2/query" && @.labels.org_id == "{#ORG_ID}") ].value.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND |
 |InfluxDB |InfluxDB: [{#ORG_NAME}] Query requests bytes, failed |<p>Count of bytes received with status not 200 per second.</p> |DEPENDENT |influxdb.org.query_request_bytes.failed.rate["{#ORG_NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name=="http_query_request_bytes" && @.labels.status != "200" && @.labels.endpoint == "/api/v2/query" && @.labels.org_id == "{#ORG_ID}") ].value.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND |
@@ -89,8 +89,8 @@ There are no template links in this template.
 |InfluxDB: Health check was failed |<p>The InfluxDB instance is not available or unhealthy.</p> |`last(/InfluxDB by HTTP/influx.healthcheck)=0` |HIGH | |
 |InfluxDB: Version has changed (new version: {ITEM.VALUE}) |<p>InfluxDB version has changed. Ack to close.</p> |`last(/InfluxDB by HTTP/influxdb.version,#1)<>last(/InfluxDB by HTTP/influxdb.version,#2) and length(last(/InfluxDB by HTTP/influxdb.version))>0` |INFO |<p>Manual close: YES</p> |
 |InfluxDB: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`last(/InfluxDB by HTTP/influxdb.uptime)<10m` |INFO |<p>Manual close: YES</p> |
-|InfluxDB: Too many tasks failures (over {$INFLUXDB.TASK.RUN.FAIL.MAX.WARN} for 5m) |<p>"Too many tasks failed runs across all tasks."</p> |`min(/InfluxDB by HTTP/influxdb.task_executor_complete.failed.rate,5m)>{$INFLUXDB.TASK.RUN.FAIL.MAX.WARN}` |WARNING | |
-|InfluxDB: [{#ORG_NAME}]: Too many requests failures (over {$INFLUXDB.REQ.FAIL.MAX.WARN} for 5m) |<p>"Too many query requests failed."</p> |`min(/InfluxDB by HTTP/influxdb.org.query_request.failed.rate["{#ORG_NAME}"],5m)>{$INFLUXDB.REQ.FAIL.MAX.WARN}` |WARNING | |
+|InfluxDB: Too many tasks failure runs (over {$INFLUXDB.TASK.RUN.FAIL.MAX.WARN} for 5m) |<p>"Number of failure runs completed across all tasks is too hight."</p> |`min(/InfluxDB by HTTP/influxdb.task_executor_complete.failed.rate,5m)>{$INFLUXDB.TASK.RUN.FAIL.MAX.WARN}` |WARNING | |
+|InfluxDB: [{#ORG_NAME}]: Too many requests failures (over {$INFLUXDB.REQ.FAIL.MAX.WARN} for 5m) |<p>Too many query requests failed.</p> |`min(/InfluxDB by HTTP/influxdb.org.query_request.failed.rate["{#ORG_NAME}"],5m)>{$INFLUXDB.REQ.FAIL.MAX.WARN}` |WARNING | |
 
 ## Feedback
 
