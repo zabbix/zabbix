@@ -3904,6 +3904,8 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, " where hostid=" ZBX_FS_UI64 ";\n",
 					host_prototype->hostid);
 
+			DBexecute_overflowed_sql(&sql1, &sql1_alloc, &sql1_offset);
+
 			if (0 != (host_prototype->flags & ZBX_FLAG_HPLINK_UPDATE_INVENTORY_MODE))
 			{
 				/* new host inventory value which is 'disabled' is handled later */
