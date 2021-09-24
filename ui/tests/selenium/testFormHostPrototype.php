@@ -998,7 +998,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 
-		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+		$form = $this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one();
 		$form->fill(['Name' => $host]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $host)
