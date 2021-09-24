@@ -90,6 +90,11 @@
 		},
 
 		delete(hostid, button) {
+			const confirm_text = button.getAttribute('confirm');
+			if (!confirm(confirm_text)) {
+				return;
+			}
+
 			this.setLoading(button);
 
 			const curl = new Curl('zabbix.php');
