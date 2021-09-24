@@ -228,24 +228,25 @@ class testFormHost extends CWebTest {
 
 		// Click the "expand" icon (in the 0th column) for the SNMP interface (1th row).
 		$interfaces_form->getRow(1)->getColumn(0)->query('tag:button')->one()->click();
-		$snmp_form = $interfaces_form->getRow(1)->query('xpath:.//ul[@class="table-forms"]')->one()->parents()
-				->asForm(['normalized' => true])->one();
+		$snmp_form = $interfaces_form->getRow(1)->query('xpath:.//div[@class="form-grid"]')->one()->parents()
+				->asFluidForm(['normalized' => true])->one();
 		$data = [
-			'SNMPv1' => ['SNMP version', 'SNMP community', 'Use bulk requests'],
-			'SNMPv2' => ['SNMP version', 'SNMP community', 'Use bulk requests'],
-			'SNMPv3' => ['SNMP version', 'Context name', 'Security name', 'Security level', 'Use bulk requests'],
+			'SNMPv1' => ['SNMP version', 'SNMP community'],
+			'SNMPv2' => ['SNMP version', 'SNMP community'],
+			'SNMPv3' => ['SNMP version', 'Context name', 'Security name', 'Security level'],
 			'authNoPriv' => ['SNMP version', 'Context name', 'Security name', 'Security level',
-				'Authentication protocol', 'Authentication passphrase', 'Use bulk requests'
+				'Authentication protocol', 'Authentication passphrase'
 			]
 		];
 
 		// The SNMP interface has specific fields depending on the SNMP version and protocol.
 		foreach ($data as $field => $labels) {
 			$select = ($field === 'authNoPriv') ? 'Security level' : 'SNMP version';
-			$form = $this->query('id:host-form')->asForm()->one()->waitUntilVisible();
-			$form->fill([$select => $field]);
+			$snmp_form->fill([$select => $field]);
 			$this->assertEquals($labels, array_values($snmp_form->getLabels()
 					->filter(new CElementFilter(CElementFilter::VISIBLE))->asText()));
+			$this->assertFalse($snmp_form->query('xpath:.//label[text()="Use bulk requests"]')->one()
+					->asCheckbox()->isChecked());
 		}
 	}
 
@@ -255,7 +256,7 @@ class testFormHost extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'error' => ['Field "groups" is mandatory.', 'Incorrect value for field "Host name": cannot be empty.']
+					'error' => ['Incorrect value for field "host": cannot be empty.', 'Field "groups" is mandatory.']
 				]
 			],
 			[
@@ -264,7 +265,7 @@ class testFormHost extends CWebTest {
 					'host_fields' => [
 						'Groups' => 'Zabbix servers'
 					],
-					'error' => 'Incorrect value for field "Host name": cannot be empty.'
+					'error' => 'Incorrect value for field "host": cannot be empty.'
 				]
 			],
 			[
@@ -733,11 +734,9 @@ class testFormHost extends CWebTest {
 			$interface_old_hash = CDBHelper::getHash($this->interface_snmp_sql);
 		}
 
-		$this->page->login()->open((new CUrl('zabbix.php'))
-			->setArgument('action', 'host.create')
-			->getUrl()
-		);
-		$form = $this->query('id:host-form')->asForm()->one()->waitUntilVisible();
+		$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
+		$this->query('button:Create host')->one()->waitUntilClickable()->click();
+		$form = COverlayDialogElement::find()->asFluidForm()->one()->waitUntilVisible();
 		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
 
 		// Set name for field "Default".
@@ -783,8 +782,9 @@ class testFormHost extends CWebTest {
 				$this->assertEquals($old_hash, CDBHelper::getHash($this->hosts_sql));
 				$this->assertEquals($interface_old_hash, CDBHelper::getHash($this->interface_snmp_sql));
 
-				$error_title = CTestArrayHelper::get($data, 'error_title', 'Page received incorrect data');
+				$error_title = CTestArrayHelper::get($data, 'error_title', 'Cannot add host');
 				$this->assertMessage(TEST_BAD, $error_title, $data['error']);
+				COverlayDialogElement::find()->one()->close();
 				break;
 		}
 	}
@@ -817,7 +817,7 @@ class testFormHost extends CWebTest {
 							'index' => 0
 						]
 					],
-					'error' => ['Field "groups" is mandatory.', 'Incorrect value for field "Host name": cannot be empty.'
+					'error' => ['Field "groups" is mandatory.', 'Incorrect value for field "host": cannot be empty.'
 					]
 				]
 			],
@@ -828,7 +828,7 @@ class testFormHost extends CWebTest {
 						'Host name' => '',
 						'Groups' => ''
 					],
-					'error' => ['Field "groups" is mandatory.', 'Incorrect value for field "Host name": cannot be empty.']
+					'error' => ['Field "groups" is mandatory.', 'Incorrect value for field "host": cannot be empty.']
 				]
 			],
 			[
@@ -837,7 +837,7 @@ class testFormHost extends CWebTest {
 					'host_fields' => [
 						'Host name' => ''
 					],
-					'error' => 'Incorrect value for field "Host name": cannot be empty.'
+					'error' => 'Incorrect value for field "host": cannot be empty.'
 				]
 			],
 			[
@@ -1349,12 +1349,12 @@ class testFormHost extends CWebTest {
 			]
 		];
 
-		$this->page->login()->open((new CUrl('zabbix.php'))
-			->setArgument('action', 'host.edit')
-			->setArgument('hostid', self::$hostids['testFormHost_Update'])
-			->getUrl()
-		);
-		$form = $this->query('id:host-form')->asForm()->one()->waitUntilVisible();
+		$hostname = 'testFormHost_Update Visible name';
+		$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
+		$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $hostname)->getColumn('Name');
+		$column->query('link', $hostname)->asPopupButton()->one()->select('Configuration');
+		$form = COverlayDialogElement::find()->asFluidForm()->one()->waitUntilVisible();
+
 		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
 
 		// Set name for field "Default".
@@ -1459,8 +1459,9 @@ class testFormHost extends CWebTest {
 				$this->assertEquals($host_old_hash, CDBHelper::getHash($this->hosts_sql));
 				$this->assertEquals($interface_old_hash, CDBHelper::getHash($this->interface_snmp_sql));
 
-				$error_title = CTestArrayHelper::get($data, 'error_title', 'Page received incorrect data');
+				$error_title = CTestArrayHelper::get($data, 'error_title', 'Cannot update host');
 				$this->assertMessage(TEST_BAD, $error_title, $data['error']);
+				COverlayDialogElement::find()->one()->close();
 				break;
 		}
 	}
@@ -1597,7 +1598,7 @@ class testFormHost extends CWebTest {
 			->getUrl()
 		);
 
-		$form = $this->query('id:host-form')->asForm()->one()->waitUntilVisible();
+		$form = COverlayDialogElement::find()->asFluidForm()->one()->waitUntilVisible();
 		$form->setFilter(new CElementFilter(CElementFilter::VISIBLE));
 		// Get values from form.
 		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
@@ -1673,22 +1674,17 @@ class testFormHost extends CWebTest {
 		];
 
 		if ($data['action'] === 'Add') {
-			$this->page->login()->open((new CUrl('zabbix.php'))
-				->setArgument('action', 'host.create')
-				->getUrl()
-			);
+			$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
+			$this->query('button:Create host')->one()->waitUntilClickable()->click();
 		}
 		else {
-			$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($name));
-			$this->page->login()->open((new CUrl('zabbix.php'))
-				->setArgument('action', 'host.edit')
-				->setArgument('hostid', $hostid)
-				->getUrl()
-			);
+			$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
+			$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)->getColumn('Name');
+			$column->query('link', $name)->asPopupButton()->one()->select('Configuration');
 		}
 
 		// Change the host data to make sure that the changes are not saved to the database after cancellation.
-		$form = $this->query('id:host-form')->asForm()->one()->waitUntilVisible();
+		$form = $this->query('id:host-form')->asFluidForm()->one()->waitUntilVisible();
 		$form->fill(['Host name' => $new_name]);
 		$interfaces_form = $form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => ['1' => 'default']]);
 		$interfaces_form->fill($interface);
@@ -1753,6 +1749,7 @@ class testFormHost extends CWebTest {
 			$ids = array_column($interfaceids, 'interfaceid');
 		}
 
+		// This way to open host form should remain in this test as is.
 		$this->page->login()->open((new CUrl('zabbix.php'))
 			->setArgument('action', 'host.edit')
 			->setArgument('hostid', $hostid)
