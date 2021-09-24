@@ -286,9 +286,8 @@ static void	lld_graphs_get(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *graphs
 static void	lld_gitems_get(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *gitems_proto,
 		zbx_vector_ptr_t *graphs)
 {
-	int			i, index;
+	int			i;
 	zbx_lld_graph_t		*graph;
-	zbx_uint64_t		graphid;
 	zbx_vector_uint64_t	graphids;
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -324,6 +323,8 @@ static void	lld_gitems_get(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *gitems
 
 	while (NULL != (row = DBfetch(result)))
 	{
+		int			index;
+		zbx_uint64_t		graphid;
 		zbx_lld_gitem_t		*gitem = (zbx_lld_gitem_t *)zbx_malloc(NULL, sizeof(zbx_lld_gitem_t));
 
 		ZBX_STR2UINT64(gitem->gitemid, row[0]);
@@ -397,8 +398,6 @@ static void	lld_items_get(const zbx_vector_ptr_t *gitems_proto, zbx_uint64_t ymi
 {
 	DB_RESULT		result;
 	DB_ROW			row;
-	const zbx_lld_gitem_t	*gitem;
-	zbx_lld_item_t		*item;
 	zbx_vector_uint64_t	itemids;
 	int			i;
 
@@ -408,7 +407,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *gitems_proto, zbx_uint64_t ymi
 
 	for (i = 0; i < gitems_proto->values_num; i++)
 	{
-		gitem = (zbx_lld_gitem_t *)gitems_proto->values[i];
+		const zbx_lld_gitem_t	*gitem = (const zbx_lld_gitem_t *)gitems_proto->values[i];
 
 		zbx_vector_uint64_append(&itemids, gitem->itemid);
 	}
@@ -440,7 +439,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *gitems_proto, zbx_uint64_t ymi
 
 		while (NULL != (row = DBfetch(result)))
 		{
-			item = (zbx_lld_item_t *)zbx_malloc(NULL, sizeof(zbx_lld_item_t));
+			zbx_lld_item_t	*item = (zbx_lld_item_t *)zbx_malloc(NULL, sizeof(zbx_lld_item_t));
 
 			ZBX_STR2UINT64(item->itemid, row[0]);
 			ZBX_STR2UCHAR(item->flags, row[1]);
