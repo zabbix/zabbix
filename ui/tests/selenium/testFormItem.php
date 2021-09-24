@@ -965,10 +965,14 @@ class testFormItem extends CLegacyWebTest {
 
 		$sqlItems = "SELECT * FROM items ORDER BY itemid";
 		$oldHashItems = CDBHelper::getHash($sqlItems);
-
+		// Open hosts page.
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
-		$this->zbxTestClickLinkTextWait($this->host);
-		$this->zbxTestClickXpathWait('//div[@class="header-navigation"]//a[text()="Items"]');
+		// Find filter form and filter necessary host.
+		$this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one()->fill(['Name' => $this->host]);
+		$this->query('button:Apply')->one()->waitUntilClickable()->click();
+		// Find Items link in host row and click it.
+		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $this->host)
+				->getColumn('Items')->query('link:Items')->one()->click();
 		$this->zbxTestClickLinkTextWait($name);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of items');
@@ -1873,9 +1877,7 @@ class testFormItem extends CLegacyWebTest {
 	 */
 	public function testFormItem_SimpleCreate($data) {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
-		$this->zbxTestClickLinkTextWait($this->host);
-		$this->zbxTestClickXpathWait('//div[@class="header-navigation"]//a[text()="Items"]');
-
+		$this->filterEntriesAndOpenItems();
 		$this->zbxTestCheckTitle('Configuration of items');
 		$this->zbxTestCheckHeader('Items');
 
@@ -2116,9 +2118,7 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestClickWait('update');
 
 		$this->zbxTestOpen(self::HOST_LIST_PAGE);
-		$this->zbxTestClickLinkTextWait($this->host);
-		$this->zbxTestClickXpathWait('//div[@class="header-navigation"]//a[text()="Items"]');
-		$this->zbxTestClickLinkTextWait($this->item);
+		$this->filterEntriesAndOpenItems();
 
 		$this->zbxTestAssertElementNotPresentId('history_mode_hint');
 		$this->zbxTestAssertElementNotPresentId('trends_mode_hint');
@@ -2135,8 +2135,7 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestClickWait('update');
 
 		$this->zbxTestOpen(self::HOST_LIST_PAGE);
-		$this->zbxTestClickLinkTextWait($this->host);
-		$this->zbxTestClickXpathWait('//div[@class="header-navigation"]//a[text()="Items"]');
+		$this->filterEntriesAndOpenItems();
 		$this->zbxTestClickLinkTextWait($this->item);
 
 		$this->zbxTestClickWait('history_mode_hint');
@@ -2156,11 +2155,21 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestClickWait('update');
 
 		$this->zbxTestOpen(self::HOST_LIST_PAGE);
-		$this->zbxTestClickLinkTextWait($this->host);
-		$this->zbxTestClickXpathWait('//div[@class="header-navigation"]//a[text()="Items"]');
-		$this->zbxTestClickLinkTextWait($this->item);
-
+		$this->filterEntriesAndOpenItems();
 		$this->zbxTestAssertElementNotPresentId('history_mode_hint');
 		$this->zbxTestAssertElementNotPresentId('trends_mode_hint');
+	}
+
+	/**
+	 * Function for filtering necessary hosts or templates and opening their Items.
+	 *
+	 * @param string    name of a host or template
+	 */
+	private function filterEntriesAndOpenItems() {
+		$form = $this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one();
+		$form->fill(['Name' => $this->host]);
+		$this->query('button:Apply')->one()->waitUntilClickable()->click();
+		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $this->host)
+				->getColumn('Items')->query('link:Items')->one()->click();
 	}
 }
