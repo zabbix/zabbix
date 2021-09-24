@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-09-22T18:29:21Z'
+  date: '2021-09-24T14:40:25Z'
   media_types:
     -
       name: Github
@@ -12,6 +12,9 @@ zabbix_export:
         1:
           name: alert_subject
           value: '{ALERT.SUBJECT}'
+        14:
+          name: event_id
+          value: '{EVENT.ID}'
         2:
           name: event_recovery_value
           value: '{EVENT.RECOVERY.VALUE}'
@@ -42,6 +45,12 @@ zabbix_export:
         10:
           name: github_user_agent
           value: Zabbix/6.0
+        12:
+          name: trigger_id
+          value: '{TRIGGER.ID}'
+        13:
+          name: zabbix_url
+          value: '{$ZABBIX.URL}'
       script: |
         var Github = {
             params: {},
@@ -55,6 +64,31 @@ zabbix_export:
         
             setProxy: function (HTTPProxy) {
                 Github.HTTPProxy = HTTPProxy;
+            },
+        
+            urlCheckFormat: function (url) {
+        
+                if (typeof url === 'string' && !url.endsWith('/')) {
+                    url += '/';
+                }
+        
+                if (url.indexOf('http://') == -1 && url.indexOf('https://') == -1) {
+                    url = 'https://' + url;
+                }
+        
+                return url;
+            },
+        
+            createProblemURL: function (zabbix_url, triggerid, eventid, event_source) {
+                var problem_url = '';
+                if (event_source === '0') {
+                    problem_url = zabbix_url + 'tr_events.php?triggerid=' + triggerid + '&eventid=' + eventid;
+                }
+                else {
+                    problem_url = zabbix_url;
+                }
+        
+                return problem_url;
             },
         
             request: function (method, url, data) {
@@ -136,6 +170,7 @@ zabbix_export:
                 required_params = [
                     'alert_subject', 'alert_message', 'event_source', 'event_value',
                     'event_update_status', 'event_recovery_value', 'event_severity',
+                    'event_id', 'trigger_id', 'zabbix_url',
                     'github_token', 'github_url', 'github_user_agent'
                 ],
                 method = 'post',
@@ -170,10 +205,14 @@ zabbix_export:
                 throw 'Recovery operations are supported only for trigger-based actions.';
             }
         
-            //check for backslash in the end of url
-            if (typeof github.url === 'string' && !github.url.endsWith('/')) {
-                github.url += '/';
+            if (typeof params.zabbix_url !== 'string' || params.zabbix_url.trim() === '' || params.zabbix_url === '{$ZABBIX.URL}') {
+                throw 'Field "zabbix_url" cannot be empty.';
             }
+        
+            //check for backslash in the end of url and schema
+        
+            github.url = Github.urlCheckFormat(github.url);
+            params.zabbix_url = Github.urlCheckFormat(params.zabbix_url);
         
             // Default url for creating issue
             url = github.url + 'repos/' + github.repo + '/issues';
@@ -196,6 +235,9 @@ zabbix_export:
                 url = github.url + 'repos/' + github.repo + '/issues/' + github.issue_number;
                 comment_data = Object.assign({}, data);
                 delete data.body;
+            } else {
+                problem_url = Github.createProblemURL(params.zabbix_url, params.trigger_id, params.event_id, params.event_source);
+                data.body += '\nEvent details in Zabbix: [' + problem_url + '](' + problem_url + ')';
             }
         
             Github.setParams(github);

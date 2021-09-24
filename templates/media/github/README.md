@@ -24,6 +24,8 @@ For more information about the Zabbix Webhook configuration, please see the [doc
 
 3\. Create user and add Github media type to it. In field "Send to" use your full repo name (\<owner\>/\<project name\>) e.g. johndoe/example-project
 
+4\. Set up a global macro {$ZABBIX.URL} with URL of current zabbix. Please notice if http/https schema are not presented in url https will be used by default.
+
 For more information, please see [Zabbix](https://www.zabbix.com/documentation/6.0/manual/config/notifications) and [Github](https://docs.github.com/en/rest) documentation.
 
 ## Supported Versions
