@@ -275,6 +275,186 @@ static int	triggers_flags_compare_func(const void *d1, const void *d2)
 	return 0;
 }
 
+typedef struct
+{
+	zbx_uint64_t		trigger_down_id;
+	zbx_vector_uint64_pair_t	v;
+}
+zbx_trigger_dep_entry_t;
+
+static unsigned	zbx_trigger_dep_entries_hash_func(const void *data)
+{
+	const zbx_trigger_dep_entry_t	*trigger_dep_entry = (const zbx_trigger_dep_entry_t *)data;
+
+	return ZBX_DEFAULT_UINT64_HASH_ALGO(&((trigger_dep_entry)->trigger_down_id),
+			sizeof((trigger_dep_entry)->trigger_down_id), ZBX_DEFAULT_HASH_SEED);
+}
+
+static int	zbx_trigger_dep_entries_compare_func(const void *d1, const void *d2)
+{
+	const zbx_trigger_dep_entry_t	*trigger_dep_entry_1 = (const zbx_trigger_dep_entry_t *)d1;
+	const zbx_trigger_dep_entry_t	*trigger_dep_entry_2 = (const zbx_trigger_dep_entry_t *)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL((trigger_dep_entry_1)->trigger_down_id, (trigger_dep_entry_2)->trigger_down_id);
+
+	return 0;
+}
+
+static int	doIt(const zbx_vector_uint64_t *trids, zbx_vector_uint64_pair_t *links,
+		zbx_vector_uint64_pair_t *links2)
+{
+	/* links up and down - list on host, that we want to be present on the target */
+
+	/* get list of links up and down - currently on the target host */
+	char		*sql = NULL;
+	size_t		sql_alloc = 256, sql_offset = 0;
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_hashset_t	h;
+	int		i, res = SUCCEED;
+
+#define	TRIGGER_FUNCS_HASHSET_DEF_SIZE	100
+	zbx_hashset_create(&h, TRIGGER_FUNCS_HASHSET_DEF_SIZE, zbx_trigger_dep_entries_hash_func,
+			zbx_trigger_dep_entries_compare_func);
+#undef TRIGGER_FUNCS_HASHSET_DEF_SIZE
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select triggerid_down, triggerid_up from trigger_depends");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "trigger_down", trids->values, trids->values_num);
+
+	if (NULL == (result = DBselect("%s", sql)))
+	{
+		res = FAIL;
+		goto clean;
+	}
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	x, y;
+		zbx_trigger_dep_entry_t *found, temp_t;
+
+		ZBX_STR2UINT64(x, row[0]);
+		ZBX_STR2UINT64(y, row[1]);
+		temp_t.trigger_down_id = x;
+
+		if (NULL != (found = (zbx_trigger_dep_entry_t *)zbx_hashset_search(&h, &temp_t)))
+		{
+			zbx_uint64_pair_t       s;
+
+			s.first = y;
+			s.second = 0;
+			zbx_vector_uint64_pair_append(&(found->v), s);
+		}
+		else
+		{
+			zbx_trigger_dep_entry_t local_temp_t;
+			zbx_uint64_pair_t       s;
+
+			s.first = y;
+			s.second = 0;
+			zbx_vector_uint64_pair_create(&(local_temp_t.v));
+			zbx_vector_uint64_pair_append(&(local_temp_t.v), s);
+			local_temp_t.trigger_down_id = x;
+			zbx_hashset_insert(&h, &local_temp_t, sizeof(local_temp_t));
+		}
+	}
+
+
+	for (i = 0; i < links->values_num; i++)
+	{
+		zbx_trigger_dep_entry_t	*found, temp_t;
+
+		temp_t.trigger_down_id = links->values[i].first;
+
+		if (NULL != (found = (zbx_trigger_dep_entry_t *) zbx_hashset_search(&h, &temp_t)))
+		{
+			int	ii;
+			int	found_trigger_up = 0;
+
+			for (ii = 0; ii < found->v.values_num; ii++)
+			{
+				/* trigger_up are equal */
+				if (links->values[i].second == found->v.values[ii].first)
+				{
+					found_trigger_up = 1;
+					/* mark it as preserve */
+					found->v.values[ii].second = 1;
+					break;
+				}
+			}
+
+			if (0 == found_trigger_up)
+			{
+				zbx_uint64_pair_t	x;
+
+				x.first = links->values[i].first;
+				x.second = links->values[i].second;
+				zbx_vector_uint64_pair_append(links2, x);		
+			}
+		}
+		else
+		{
+			zbx_uint64_pair_t	x;
+
+			x.first = links->values[i].first;
+			x.second = links->values[i].second;
+			zbx_vector_uint64_pair_append(links2, x);
+		}
+	}
+clean:
+	zbx_hashset_destroy(&h);
+
+	return res;
+}
+
+static int	doIt2(zbx_vector_uint64_pair_t *links, zbx_hashset_t *triggers_flags)
+{
+	int	res = SUCCEED;
+
+	if (0 < links->values_num)
+	{
+		int		i;
+		zbx_uint64_t	triggerdepid;
+		zbx_db_insert_t	db_insert;
+
+		triggerdepid = DBget_maxid_num("trigger_depends", links->values_num);
+
+		zbx_db_insert_prepare(&db_insert, "trigger_depends", "triggerdepid", "triggerid_down", "triggerid_up",
+				NULL);
+
+		for (i = 0; i < links->values_num; i++)
+		{
+			resolve_dependencies_triggers_flags_t	*found, temp_t;
+
+			zbx_db_insert_add_values(&db_insert, triggerdepid, links->values[i].first,
+					links->values[i].second);
+
+			zabbix_log(LOG_LEVEL_INFORMATION, "INSERTING NEW DB ENTRY: %lu, %lu", links->values[i].first,
+				   links->values[i].second);
+
+			temp_t.triggerid = links->values[i].first;
+
+			if (NULL != (found = (resolve_dependencies_triggers_flags_t *)zbx_hashset_search(
+					triggers_flags, &temp_t)))
+			{
+				zbx_audit_trigger_update_json_add_dependency(found->flags, triggerdepid,
+						links->values[i].first, links->values[i].second);
+			}
+			else
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				res = FAIL;
+				goto out;
+			}
+
+			triggerdepid++;
+		}
+
+		zbx_db_insert_execute(&db_insert);
+		zbx_db_insert_clean(&db_insert);
+	}
+out:
+	return res;
+}
+
 /*********************************************************************************
  *                                                                               *
  * Function: DBresolve_template_trigger_dependencies                             *
@@ -292,7 +472,7 @@ static int	triggers_flags_compare_func(const void *d1, const void *d2)
  * Return value: upon successful completion return SUCCEED, or FAIL on DB error  *
  *                                                                               *
  *********************************************************************************/
-static int	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const zbx_uint64_t *trids, int trids_num,
+static int	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const zbx_vector_uint64_t *trids,
 		zbx_vector_uint64_pair_t *links, zbx_hashset_t *triggers_flags)
 {
 	DB_RESULT			result;
@@ -311,11 +491,13 @@ static int	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const zb
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 
 	sql_offset = 0;
+
+	/* get triggerids on which the 'parent template trigger of the new trigger' depends on */
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct td.triggerid_down,td.triggerid_up"
 			" from triggers t,trigger_depends td"
 			" where t.templateid in (td.triggerid_up,td.triggerid_down) and");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.triggerid", trids, trids_num);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.triggerid", trids->values, trids->values_num);
 
 	if (NULL == (result = DBselect("%s", sql)))
 	{
@@ -323,6 +505,8 @@ static int	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const zb
 		goto clean;
 	}
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "1111111");
+	
 	while (NULL != (row = DBfetch(result)))
 	{
 		zbx_uint64_pair_t	dep_list_id;
@@ -332,6 +516,8 @@ static int	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const zb
 		zbx_vector_uint64_pair_append(&dep_list_ids, dep_list_id);
 		zbx_vector_uint64_append(&all_templ_ids, dep_list_id.first);
 		zbx_vector_uint64_append(&all_templ_ids, dep_list_id.second);
+
+		zabbix_log(LOG_LEVEL_INFORMATION, "first: %s, second: %s", row[0], row[1]);
 	}
 
 	if (0 == dep_list_ids.values_num)	/* not all trigger templates have a dependency trigger */
@@ -343,6 +529,9 @@ static int	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const zb
 	zbx_vector_uint64_uniq(&all_templ_ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	sql_offset = 0;
+
+	/* find triggers which have a parent template trigger that we have dependency on */
+	/* those are the dependency triggers that we are interested on our host */
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select t.triggerid,t.templateid,t.flags"
 			" from triggers t,functions f,items i"
@@ -360,6 +549,8 @@ static int	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const zb
 		goto clean;
 	}
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "222222");
+	
 	while (NULL != (row = DBfetch(result)))
 	{
 		zbx_uint64_pair_t			map_id;
@@ -367,6 +558,8 @@ static int	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const zb
 
 		ZBX_STR2UINT64(temp_t.triggerid, row[0]);
 
+		zabbix_log(LOG_LEVEL_INFORMATION, "first: %s, second: %s, third: %s", row[0], row[1], row[2]);
+		
 		if (NULL == (found = (resolve_dependencies_triggers_flags_t *)zbx_hashset_search(triggers_flags,
 				&temp_t)))
 		{
@@ -382,6 +575,9 @@ static int	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const zb
 		zbx_vector_uint64_pair_append(&map_ids, map_id);
 	}
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "3333333");
+
+	
 	for (i = 0; i < dep_list_ids.values_num; i++)
 	{
 		int		j;
@@ -410,6 +606,8 @@ static int	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const zb
 				triggerid_up = hst_triggerid;
 		}
 
+		zabbix_log(LOG_LEVEL_INFORMATION, "BADGER MAP INSERT, TRIGGERID_DOWN: %lu, triggerid_up: %lu", triggerid_down, triggerid_up);
+		
 		if (0 != triggerid_down)
 		{
 			zbx_uint64_pair_t	link = {triggerid_down, triggerid_up};
@@ -432,7 +630,7 @@ clean:
 
 /********************************************************************************
  *                                                                              *
- * Function: DBadd_template_dependencies_for_new_triggers                       *
+ * Function: DBadd_or_update_template_dependencies_for_triggers                 *
  *                                                                              *
  * Purpose: update trigger dependencies for specified host                      *
  *                                                                              *
@@ -445,8 +643,8 @@ clean:
  * Comments: !!! Don't forget to sync the code with PHP !!!                     *
  *                                                                              *
  ********************************************************************************/
-static int	DBadd_template_dependencies_for_new_triggers(zbx_uint64_t hostid, const zbx_uint64_t *trids,
-		int trids_num)
+static int	DBadd_or_update_template_dependencies_for_triggers(zbx_uint64_t hostid, const zbx_vector_uint64_t *trids,
+		int is_update)
 {
 	int				res = SUCCEED;
 	zbx_vector_uint64_pair_t	links;
@@ -454,7 +652,7 @@ static int	DBadd_template_dependencies_for_new_triggers(zbx_uint64_t hostid, con
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (0 == trids_num)
+	if (0 == trids->values_num)
 		goto out;
 
 	zbx_vector_uint64_pair_create(&links);
@@ -462,47 +660,27 @@ static int	DBadd_template_dependencies_for_new_triggers(zbx_uint64_t hostid, con
 	zbx_hashset_create(&triggers_flags, TRIGGER_FUNCS_HASHSET_DEF_SIZE, triggers_flags_hash_func,
 			triggers_flags_compare_func);
 #undef TRIGGER_FUNCS_HASHSET_DEF_SIZE
-	if (FAIL == (res = DBresolve_template_trigger_dependencies(hostid, trids, trids_num, &links, &triggers_flags)))
+	if (FAIL == (res = DBresolve_template_trigger_dependencies(hostid, trids, &links, &triggers_flags)))
 		goto clean;
 
-	if (0 < links.values_num)
+	if (0 == is_update)
 	{
-		int		i;
-		zbx_uint64_t	triggerdepid;
-		zbx_db_insert_t	db_insert;
+		if (FAIL == (res = doIt2(&links, &triggers_flags)))
+			goto clean;
+	}
+	else if (1 == is_update)
+	{
+	  	zbx_vector_uint64_pair_t	links2;
 
-		triggerdepid = DBget_maxid_num("trigger_depends", links.values_num);
+		zbx_vector_uint64_pair_create(&links2);
 
-		zbx_db_insert_prepare(&db_insert, "trigger_depends", "triggerdepid", "triggerid_down", "triggerid_up",
-				NULL);
+		if (FAIL == (res = doIt(trids, &links, &links2)))
+			goto clean;
 
-		for (i = 0; i < links.values_num; i++)
-		{
-			resolve_dependencies_triggers_flags_t	*found, temp_t;
+		if (FAIL == (res = doIt2(&links2, &triggers_flags)))
+			goto clean;
 
-			zbx_db_insert_add_values(&db_insert, triggerdepid, links.values[i].first,
-					links.values[i].second);
-
-			temp_t.triggerid = links.values[i].first;
-
-			if (NULL != (found = (resolve_dependencies_triggers_flags_t *)zbx_hashset_search(
-					&triggers_flags, &temp_t)))
-			{
-				zbx_audit_trigger_update_json_add_dependency(found->flags, triggerdepid,
-						links.values[i].first, links.values[i].second);
-			}
-			else
-			{
-				THIS_SHOULD_NEVER_HAPPEN;
-				res = FAIL;
-				goto clean;
-			}
-
-			triggerdepid++;
-		}
-
-		zbx_db_insert_execute(&db_insert);
-		zbx_db_insert_clean(&db_insert);
+		zbx_vector_uint64_pair_destroy(&links2);
 	}
 clean:
 	zbx_vector_uint64_pair_destroy(&links);
@@ -594,7 +772,7 @@ static int	DBcopy_template_trigger_tags(const zbx_vector_uint64_t *new_triggerid
 		sql_offset = 0;
 		DBfree_result(result);
 
-		/* remove tags from host triggers that were linking to template triggers */
+		/* remove tags from host triggers that were linked to template triggers */
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from trigger_tag where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid", cur_triggerids->values,
 				cur_triggerids->values_num);
@@ -1640,10 +1818,19 @@ int	DBcopy_template_triggers(zbx_uint64_t hostid, const zbx_vector_uint64_t *tem
 
 	if (SUCCEED == res)
 	{
-		res = DBadd_template_dependencies_for_new_triggers(hostid, new_triggerids.values,
-				new_triggerids.values_num);
+		res = DBadd_or_update_template_dependencies_for_triggers(hostid, &new_triggerids, 0);
 	}
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "HELLO WORLD");
+	
+	if (SUCCEED == res)
+	{
+		res = DBadd_or_update_template_dependencies_for_triggers(hostid, &temp_host_triggerids, 1);
+	}
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "HELLO WORLD END");
+
+	
 	if (SUCCEED == res)
 		res = DBcopy_template_trigger_tags(&new_triggerids, &cur_triggerids);
 
