@@ -513,8 +513,7 @@ class CScript extends CApiService {
 		}
 
 		// Populate common and mandatory fields.
-		$scripts = zbx_toHash($scripts, 'scriptid');
-		$scripts = $this->extendFromObjects($scripts, $db_scripts, ['name', 'type', 'command', 'scope']);
+		$scripts = $this->extendObjectsByKey($scripts, $db_scripts, 'scriptid', ['name', 'type', 'command', 'scope']);
 
 		foreach ($scripts as $index => &$script) {
 			$db_script = $db_scripts[$script['scriptid']];
@@ -549,7 +548,7 @@ class CScript extends CApiService {
 					$method = 'create';
 				}
 
-				$script = $this->extendFromObjects([$script], [$db_script], ['authtype'])[0];
+				$script += ['authtype' => $db_script['authtype']];
 
 				$ssh_rules = $this->getAuthTypeValidationRules($script['authtype'], $method);
 				$ssh_rules['fields'] += $common_fields + $type_fields + $scope_fields;
@@ -557,6 +556,16 @@ class CScript extends CApiService {
 				if (!CApiInputValidator::validate($ssh_rules, $script, '/'.($index + 1), $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
+			}
+		}
+		unset($script);
+
+		// Cleanup field data.
+		foreach ($scripts as &$script) {
+			$db_script = $db_scripts[$script['scriptid']];
+
+			if ($script['type'] != $db_script['type'] && $db_script['type'] == ZBX_SCRIPT_TYPE_WEBHOOK) {
+				$script['parameters'] = [];
 			}
 		}
 		unset($script);
@@ -1344,63 +1353,41 @@ class CScript extends CApiService {
 	 * @param array|null $db_scripts
 	 */
 	private static function updateParams(array &$scripts, string $method, array $db_scripts = null): void {
-		$script_paramids = [];
 		$ins_params = [];
 		$upd_params = [];
 		$del_paramids = [];
 
 		foreach ($scripts as &$script) {
-			$params = [];
-			$param_name_by_index = [];
-			$db_script = ($method === 'update') ? $db_scripts[$script['scriptid']] : [];
-
-			if ($method === 'update') {
-				$db_type = $db_script['type'];
-				$type = array_key_exists('type', $script) ? $script['type'] : $db_type;
-			}
-			else {
-				$type = $script['type'];
-			}
-
-			if ($type != ZBX_SCRIPT_TYPE_WEBHOOK && ($method === 'update' && $db_type != ZBX_SCRIPT_TYPE_WEBHOOK)) {
+			if (!array_key_exists('parameters', $script)) {
 				continue;
 			}
 
-			if ($type == ZBX_SCRIPT_TYPE_WEBHOOK && array_key_exists('parameters', $script)) {
-				foreach ($script['parameters'] as $index => $param) {
-					$params[$param['name']] = $param['value'];
-					$param_name_by_index[$param['name']] = $index;
-				}
-			}
+			$db_params = ($method === 'update')
+				? array_column($db_scripts[$script['scriptid']]['parameters'], null, 'name')
+				: [];
 
-			if (array_key_exists('parameters', $db_script)) {
-				foreach ($db_script['parameters'] as $db_param) {
-					if (array_key_exists($db_param['name'], $params)) {
-						$script['parameters'][$param_name_by_index[$db_param['name']]]['script_paramid']
-							= $db_param['script_paramid'];
+			foreach ($script['parameters'] as &$param) {
+				if (array_key_exists($param['name'], $db_params)) {
+					$db_param = $db_params[$param['name']];
+					$param['script_paramid'] = $db_param['script_paramid'];
+					unset($db_params[$param['name']]);
 
-						if ($params[$db_param['name']] != $db_param['value']) {
-							$upd_params[] = [
-								'values' => ['value' => $params[$db_param['name']]],
-								'where' => ['script_paramid' => $db_param['script_paramid']]
-							];
-						}
+					$upd_param = DB::getUpdatedValues('script_param', $param, $db_param);
 
-						unset($params[$db_param['name']]);
-					}
-					else {
-						$del_paramids[] = $db_param['script_paramid'];
+					if ($upd_param) {
+						$upd_params[] = [
+							'values' => $upd_param,
+							'where' => ['script_paramid' => $db_param['script_paramid']]
+						];
 					}
 				}
+				else {
+					$ins_params[] = ['scriptid' => $script['scriptid']] + $param;
+				}
 			}
+			unset($param);
 
-			foreach ($params as $param_name => $param_value) {
-				$ins_params[] = [
-					'name' => $param_name,
-					'value' => $param_value,
-					'scriptid' => $script['scriptid']
-				];
-			}
+			$del_paramids = array_merge($del_paramids, array_column($db_params, 'script_paramid'));
 		}
 		unset($script);
 
@@ -1417,14 +1404,16 @@ class CScript extends CApiService {
 		}
 
 		foreach ($scripts as &$script) {
-			if (array_key_exists('parameters', $script)) {
-				foreach ($script['parameters'] as &$param) {
-					if (!array_key_exists('script_paramid', $param)) {
-						$param['script_paramid'] = array_shift($script_paramids);
-					}
-				}
-				unset($param);
+			if (!array_key_exists('parameters', $script)) {
+				continue;
 			}
+
+			foreach ($script['parameters'] as &$param) {
+				if (!array_key_exists('script_paramid', $param)) {
+					$param['script_paramid'] = array_shift($script_paramids);
+				}
+			}
+			unset($param);
 		}
 		unset($script);
 	}
