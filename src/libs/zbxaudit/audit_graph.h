@@ -53,10 +53,10 @@ PREPARE_AUDIT_GRAPH_UPDATE(percent_left, double)
 PREPARE_AUDIT_GRAPH_UPDATE(percent_right, double)
 PREPARE_AUDIT_GRAPH_UPDATE(ymin_type, int)
 PREPARE_AUDIT_GRAPH_UPDATE(ymax_type, int)
-PREPARE_AUDIT_GRAPH_UPDATE(ymin_itemid, uint64_t)
-PREPARE_AUDIT_GRAPH_UPDATE(ymax_itemid, uint64_t)
+PREPARE_AUDIT_GRAPH_UPDATE(ymin_itemid, zbx_uint64_t)
+PREPARE_AUDIT_GRAPH_UPDATE(ymax_itemid, zbx_uint64_t)
 PREPARE_AUDIT_GRAPH_UPDATE(discover, int)
-PREPARE_AUDIT_GRAPH_UPDATE(templateid, uint64_t)
+PREPARE_AUDIT_GRAPH_UPDATE(templateid, zbx_uint64_t)
 #undef PREPARE_AUDIT_GRAPH_UPDATE
 
 void	zbx_audit_graph_update_json_update_gitem_create_entry(zbx_uint64_t graphid, int flags, zbx_uint64_t gitemid);
@@ -64,7 +64,7 @@ void	zbx_audit_graph_update_json_update_gitem_create_entry(zbx_uint64_t graphid,
 #define PREPARE_AUDIT_GRAPH_UPDATE(resource, type1)								\
 void	zbx_audit_graph_update_json_update_gitem_update_##resource(zbx_uint64_t graphid, int flags,		\
 		zbx_uint64_t gitemid, type1 resource##_old, type1 resource##_new);
-PREPARE_AUDIT_GRAPH_UPDATE(itemid, uint64_t)
+PREPARE_AUDIT_GRAPH_UPDATE(itemid, zbx_uint64_t)
 PREPARE_AUDIT_GRAPH_UPDATE(drawtype, int)
 PREPARE_AUDIT_GRAPH_UPDATE(sortorder, int)
 PREPARE_AUDIT_GRAPH_UPDATE(color, const char*)
