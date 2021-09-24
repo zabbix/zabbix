@@ -30,10 +30,19 @@
 function submitAcknowledge(overlay) {
 	var $form = overlay.$dialogue.find('form'),
 		url = new Curl('zabbix.php', false),
-		form_data;
+		form_data = {},
+		posted_elements;
 
-	$form.trimValues(['#message']);
-	form_data = jQuery('#message, input:visible, input[type=hidden]', $form).serialize();
+	$form.trimValues(['[name=message]']);
+
+	posted_elements = jQuery('[name=message], input:visible, input[type=hidden]', $form)
+		.filter(':not([name^=eventids])')
+		.serializeArray();
+	posted_elements.map((entry) => {
+		form_data[entry.name] = entry.value;
+	});
+	form_data.eventids = chkbxRange.selectedIds;
+
 	url.setArgument('action', 'popup.acknowledge.create');
 
 	overlay.xhr = sendAjaxData(url.getUrl(), {
