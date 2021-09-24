@@ -40,10 +40,7 @@
 			this.refresh_interval = refresh_interval;
 			this.filter_defaults = filter_defaults;
 
-			if (filter_options !== null) {
-				this.initFilter({filter_options});
-			}
-
+			this.initFilter(filter_options);
 			this.initAcknowledge();
 
 			$(document).on({
@@ -63,7 +60,11 @@
 			jqBlink.blink();
 		},
 
-		initFilter({filter_options}) {
+		initFilter(filter_options) {
+			if (!filter_options) {
+				return;
+			}
+
 			this.filter = new CTabFilter($('#monitoring_problem_filter')[0], filter_options);
 			this.active_filter = this.filter._active_item;
 			this.global_timerange = {

@@ -51,13 +51,15 @@
 		},
 
 		initTabFilter(filter_options) {
-			if (filter_options) {
-				this.refresh_counters = this.createCountersRefresh(1);
-				this.filter = new CTabFilter($('#monitoring_hosts_filter')[0], filter_options);
-				this.filter.on(TABFILTER_EVENT_URLSET, () => {
-					this.reloadPartialAndTabCounters();
-				});
+			if (!filter_options) {
+				return;
 			}
+
+			this.refresh_counters = this.createCountersRefresh(1);
+			this.filter = new CTabFilter($('#monitoring_hosts_filter')[0], filter_options);
+			this.filter.on(TABFILTER_EVENT_URLSET, () => {
+				this.reloadPartialAndTabCounters();
+			});
 		},
 
 		createCountersRefresh(timeout) {
@@ -94,18 +96,21 @@
 			this.unscheduleRefresh();
 			this.refresh();
 
-			const filter_item = this.filter._active_item;
+			// Filter is not present in Kiosk mode.
+			if (this.filter) {
+				const filter_item = this.filter._active_item;
 
-			if (this.filter._active_item.hasCounter()) {
-				$.post('zabbix.php', {
-					action: 'host.view.refresh',
-					filter_counters: 1,
-					counter_index: filter_item._index
-				}).done((json) => {
-					if (json.filter_counters) {
-						filter_item.updateCounter(json.filter_counters.pop());
-					}
-				});
+				if (this.filter._active_item.hasCounter()) {
+					$.post('zabbix.php', {
+						action: 'host.view.refresh',
+						filter_counters: 1,
+						counter_index: filter_item._index
+					}).done((json) => {
+						if (json.filter_counters) {
+							filter_item.updateCounter(json.filter_counters.pop());
+						}
+					});
+				}
 			}
 		},
 
