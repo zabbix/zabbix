@@ -30,15 +30,25 @@ window.host_edit_popup = {
 	form: null,
 
 	init({popup_url, form_name}) {
-		this.enableNavigationWarning();
-
 		this.overlay = overlays_stack.getById('host_edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 
+		this.addEventListeners();
+
 		history.replaceState({}, '', popup_url);
 
 		host_edit.init({form_name});
+	},
+
+	addEventListeners() {
+		this.enableNavigationWarning();
+		this.overlay.$dialogue[0].addEventListener('overlay.close', this.events.overlayClose, {once: true});
+	},
+
+	removeEventListeners() {
+		this.disableNavigationWarning();
+		this.overlay.$dialogue[0].removeEventListener('overlay.close', this.events.overlayClose);
 	},
 
 	submit() {
@@ -60,7 +70,6 @@ window.host_edit_popup = {
 				}
 
 				overlayDialogueDestroy(this.overlay.dialogueid);
-				this.disableNavigationWarning();
 
 				if ('hostid' in fields) {
 					this.dialogue.dispatchEvent(new CustomEvent('dialogue.update', {
@@ -88,7 +97,7 @@ window.host_edit_popup = {
 		delete options.sid;
 		options.clone = 1;
 
-		this.disableNavigationWarning();
+		this.removeEventListeners();
 		PopUp('popup.host.edit', options, 'host_edit');
 	},
 
@@ -97,7 +106,7 @@ window.host_edit_popup = {
 		delete options.sid;
 		options.full_clone = 1;
 
-		this.disableNavigationWarning();
+		this.removeEventListeners();
 		PopUp('popup.host.edit', options, 'host_edit');
 	},
 
@@ -120,7 +129,6 @@ window.host_edit_popup = {
 				}
 
 				overlayDialogueDestroy(this.overlay.dialogueid);
-				this.disableNavigationWarning();
 
 				this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {
 					detail: {
@@ -132,11 +140,6 @@ window.host_edit_popup = {
 			.finally(() => {
 				this.overlay.unsetLoading();
 			});
-	},
-
-	closePopup() {
-		this.disableNavigationWarning();
-		this.dialogue.dispatchEvent(new CustomEvent('dialogue.close'));
 	},
 
 	removePopupMessages() {
@@ -178,6 +181,10 @@ window.host_edit_popup = {
 			// Display confirmation message.
 			e.preventDefault();
 			e.returnValue = '';
+		},
+
+		overlayClose() {
+			host_edit_popup.disableNavigationWarning();
 		}
 	}
 };

@@ -102,8 +102,7 @@ $output = [
 			'popup_url' => $popup_url->getUrl(),
 			'form_name' => $data['form_name']
 		]).');',
-	'buttons' => $buttons,
-	'cancel_action' => 'host_edit_popup.closePopup();'
+	'buttons' => $buttons
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

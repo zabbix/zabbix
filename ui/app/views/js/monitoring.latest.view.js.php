@@ -215,9 +215,9 @@
 
 			this.unscheduleRefresh();
 
-			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess);
-			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess);
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostDelete);
+			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostDelete, {once: true});
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
 				this.scheduleRefresh();

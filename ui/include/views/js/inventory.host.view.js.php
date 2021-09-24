@@ -31,9 +31,9 @@
 
 			const overlay = PopUp('popup.host.edit', {hostid}, 'host_edit', document.activeElement);
 
-			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostCreate);
-			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostUpdate);
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostDelete);
+			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostCreate, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostUpdate, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostDelete, {once: true});
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
