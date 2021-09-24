@@ -640,7 +640,7 @@ int	zbx_eval_calc_histogram_quantile(const double q, const zbx_vector_dbl_t *val
 		rank -= histogram.values[i - 1].count;
 	}
 
-	res = start + (end - start) *  (rank / count);
+	res = start + (end - start) * (rank / count);
 
 end:
 	if (SUCCEED != zbx_is_normal_double(res))
