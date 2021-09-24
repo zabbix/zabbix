@@ -231,8 +231,8 @@ void	zbx_audit_DBselect_delete_for_trigger(const char *sql, zbx_vector_uint64_t 
 	zbx_vector_uint64_sort(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
 
-void	zbx_audit_trigger_update_json_add_dependency(int flags, zbx_uint64_t triggerdepid,
-		zbx_uint64_t triggerid, zbx_uint64_t triggerid_up)
+void	zbx_audit_trigger_update_json_add_dependency(int flags, zbx_uint64_t triggerdepid, zbx_uint64_t triggerid,
+		zbx_uint64_t triggerid_up)
 {
 	char	audit_key[AUDIT_DETAILS_KEY_LEN], audit_key_triggerid_up[AUDIT_DETAILS_KEY_LEN];
 	int	resource_type;
@@ -257,6 +257,28 @@ void	zbx_audit_trigger_update_json_add_dependency(int flags, zbx_uint64_t trigge
 
 	zbx_audit_update_json_append_no_value(triggerid, AUDIT_DETAILS_ACTION_ADD, audit_key);
 	zbx_audit_update_json_append_uint64(triggerid, AUDIT_DETAILS_ACTION_ADD, audit_key_triggerid_up, triggerid_up);
+}
+
+void	zbx_audit_trigger_update_json_remove_dependency(int flags, zbx_uint64_t triggerdepid, zbx_uint64_t triggerid)
+{
+	char	audit_key[AUDIT_DETAILS_KEY_LEN];
+	int	resource_type;
+
+	RETURN_IF_AUDIT_OFF();
+
+	resource_type = trigger_flag_to_resource_type(flags);
+
+	if (AUDIT_RESOURCE_TRIGGER == resource_type)
+	{
+		zbx_snprintf(audit_key, sizeof(audit_key), "trigger.dependencies[" ZBX_FS_UI64 "]", triggerdepid);
+	}
+	else
+	{
+		zbx_snprintf(audit_key, sizeof(audit_key), "triggerprototype.dependencies[" ZBX_FS_UI64 "]",
+				triggerdepid);
+	}
+
+	zbx_audit_update_json_append_no_value(triggerid, AUDIT_DETAILS_ACTION_DELETE, audit_key);
 }
 
 void	zbx_audit_trigger_update_json_add_tags_and_values(zbx_uint64_t triggerid, int flags, zbx_uint64_t triggertagid,

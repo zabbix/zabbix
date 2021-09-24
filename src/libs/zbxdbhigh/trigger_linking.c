@@ -277,9 +277,11 @@ static int	triggers_flags_compare_func(const void *d1, const void *d2)
 
 typedef struct
 {
-	zbx_uint64_t	trigger_up_id;
 	zbx_uint64_t	trigger_dep_id;
+	zbx_uint64_t	trigger_down_id;
+	zbx_uint64_t	trigger_up_id;
 	int		status;
+	int		flags;
 }
 zbx_trigger_dep_vec_entry_t;
 
@@ -311,6 +313,28 @@ static int	zbx_trigger_dep_entries_compare_func(const void *d1, const void *d2)
 	return 0;
 }
 
+static void	zbx_trigger_dep_vec_entry_clean(zbx_trigger_dep_vec_entry_t *trigger_dep_entry)
+{
+	zbx_free(trigger_dep_entry);
+}
+
+static void	zbx_triggers_dep_entries_clean(zbx_hashset_t *h)
+{
+	zbx_hashset_iter_t	iter;
+	zbx_trigger_dep_entry_t	*trigger_dep_entry;
+
+	zbx_hashset_iter_reset(h, &iter);
+
+	while (NULL != (trigger_dep_entry = (zbx_trigger_dep_entry_t *)zbx_hashset_iter_next(&iter)))
+	{
+		zbx_vector_trigger_up_entries_clear_ext(&((trigger_dep_entry)->v), zbx_trigger_dep_vec_entry_clean);
+		zbx_vector_trigger_up_entries_destroy(&((trigger_dep_entry)->v));
+	}
+
+	zbx_hashset_destroy(h);
+}
+
+
 static int	doIt(const zbx_vector_uint64_t *trids, zbx_vector_uint64_pair_t *links,
 		zbx_vector_uint64_pair_t *links2, zbx_vector_uint64_t *trigger_dep_ids_del)
 {
@@ -330,9 +354,12 @@ static int	doIt(const zbx_vector_uint64_t *trids, zbx_vector_uint64_pair_t *link
 	zbx_hashset_create(&h, TRIGGER_FUNCS_HASHSET_DEF_SIZE, zbx_trigger_dep_entries_hash_func,
 			zbx_trigger_dep_entries_compare_func);
 #undef TRIGGER_FUNCS_HASHSET_DEF_SIZE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select triggerdepid, triggerid_down, triggerid_up "
-			"from trigger_depends");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "trigger_down", trids->values, trids->values_num);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select td.triggerdepid,td.triggerid_down,td.triggerid_up,t.flags"
+			" from trigger_depends td,triggers t "
+			" where t.triggerid=td.triggerid_down"
+			" and");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "td.triggerid_down", trids->values, trids->values_num);
 
 	if (NULL == (result = DBselect("%s", sql)))
 	{
@@ -342,31 +369,38 @@ static int	doIt(const zbx_vector_uint64_t *trids, zbx_vector_uint64_pair_t *link
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_uint64_t	a, x, y;
-		zbx_trigger_dep_entry_t *found, temp_t;
+		int				f;
+		zbx_uint64_t			a, x, y;
+		zbx_trigger_dep_entry_t		*found, temp_t;
+		zbx_trigger_dep_vec_entry_t	*s;
 
 		ZBX_STR2UINT64(a, row[0]);
 		ZBX_STR2UINT64(x, row[1]);
 		ZBX_STR2UINT64(y, row[2]);
+		f = atoi(row[3]);
+
 		temp_t.trigger_down_id = x;
 
 		if (NULL != (found = (zbx_trigger_dep_entry_t *)zbx_hashset_search(&h, &temp_t)))
 		{
-			zbx_trigger_dep_vec_entry_t	*s;
 			s = (zbx_trigger_dep_vec_entry_t *)zbx_malloc(NULL, sizeof(zbx_trigger_dep_vec_entry_t));
-			s->trigger_up_id = y;
 			s->trigger_dep_id = a;
+			s->trigger_down_id = x;
+			s->trigger_up_id = y;
 			s->status = 0;
+			s->flags = f;
 			zbx_vector_trigger_up_entries_append(&(found->v), s);
 		}
 		else
 		{
 			zbx_trigger_dep_entry_t local_temp_t;
-			zbx_trigger_dep_vec_entry_t	*s;
+
 			s = (zbx_trigger_dep_vec_entry_t *)zbx_malloc(NULL, sizeof(zbx_trigger_dep_vec_entry_t));
-			s->trigger_up_id = y;
 			s->trigger_dep_id = a;
+			s->trigger_down_id = x;
+			s->trigger_up_id = y;
 			s->status = 0;
+			s->flags = f;
 			zbx_vector_trigger_up_entries_create(&(local_temp_t.v));
 			zbx_vector_trigger_up_entries_append(&(local_temp_t.v), s);
 
@@ -423,22 +457,25 @@ static int	doIt(const zbx_vector_uint64_t *trids, zbx_vector_uint64_pair_t *link
 		zbx_trigger_dep_entry_t	*found;
 
 		zbx_hashset_iter_reset(&h, &iter1);
+
 		while (NULL != (found = (zbx_trigger_dep_entry_t *)zbx_hashset_iter_next(&iter1)))
 		{
-
 			for (i = 0; i < found->v.values_num; i++)
 			{
 				if (0 == found->v.values[i]->status)
 				{
 					zbx_vector_uint64_append(trigger_dep_ids_del,
 							found->v.values[i]->trigger_dep_id);
+					zbx_audit_trigger_update_json_remove_dependency(found->v.values[i]->flags,
+							found->v.values[i]->trigger_dep_id,
+							found->v.values[i]->trigger_down_id);
 				}
 			}
 		}
 	}
-
 clean:
-	zbx_hashset_destroy(&h);
+	zbx_triggers_dep_entries_clean(&h);
+	zbx_free(sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(res));
 
@@ -736,15 +773,21 @@ static int	DBadd_or_update_template_dependencies_for_triggers(zbx_uint64_t hosti
 			char	*sql = NULL;
 			size_t	sql_alloc = 0, sql_offset = 0;
 
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from trigger_depends where");
-			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerdepid",
-					trigger_dep_ids_del.values, trigger_dep_ids_del.values_num);
-
-			if (ZBX_DB_OK > DBexecute("%s", sql))
+			if (0 < trigger_dep_ids_del.values_num)
 			{
-				res = FAIL;
-				goto clean;
+				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from trigger_depends where");
+				DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerdepid",
+						trigger_dep_ids_del.values, trigger_dep_ids_del.values_num);
+
+				if (ZBX_DB_OK > DBexecute("%s", sql))
+				{
+					res = FAIL;
+					zbx_free(sql);
+					goto clean;
+				}
 			}
+
+			zbx_free(sql);
 		}
 
 		zabbix_log(LOG_LEVEL_INFORMATION, "doIT() input links2");
