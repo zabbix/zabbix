@@ -2694,6 +2694,7 @@ static int	evaluate_RATE(zbx_variant_t *value, DC_ITEM *item, const char *parame
 		char **error)
 {
 #	define HVT(v) (ITEM_VALUE_TYPE_FLOAT == item->value_type ? v.dbl : v.ui64)
+#	define HVD(v) (ITEM_VALUE_TYPE_FLOAT == item->value_type ? v.dbl : (double)v.ui64)
 #	define HVT_SET(v,r) (ITEM_VALUE_TYPE_FLOAT == item->value_type ? (v.dbl = r) : (v.ui64 = r))
 #	define TS2DBL(t) (t.sec + t.ns / 1e9)
 #	define LAST(v) (v.values[0])
@@ -2756,12 +2757,12 @@ static int	evaluate_RATE(zbx_variant_t *value, DC_ITEM *item, const char *parame
 
 		/* Reset detection */
 
-		delta = HVT(LAST(values).value) - HVT(FIRST(values).value);
+		delta = HVD(LAST(values).value) - HVD(FIRST(values).value);
 
 		for (i = values.values_num - 1; i >= 0; i--)
 		{
 			if (HVT(values.values[i].value) < HVT(last))
-				delta = delta + HVT(values.values[i].value);
+				delta = delta + HVD(values.values[i].value);
 
 			HVT_SET(last, HVT(values.values[i].value));
 		}
@@ -2786,7 +2787,7 @@ static int	evaluate_RATE(zbx_variant_t *value, DC_ITEM *item, const char *parame
 
 		if (delta > 0 && HVT(FIRST(values).value) >= 0)
 		{
-			double	zero = sampled_interval * (HVT(FIRST(values).value) / delta);
+			double	zero = sampled_interval * (HVD(FIRST(values).value) / delta);
 
 			if (zero < gap_start)
 				gap_start = zero;
