@@ -2693,7 +2693,6 @@ out:
 static int	evaluate_RATE(zbx_variant_t *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
 		char **error)
 {
-#	define HVT(v) (ITEM_VALUE_TYPE_FLOAT == item->value_type ? v.dbl : v.ui64)
 #	define HVD(v) (ITEM_VALUE_TYPE_FLOAT == item->value_type ? v.dbl : (double)v.ui64)
 #	define TS2DBL(t) (t.sec + t.ns / 1e9)
 #	define LAST(v) (v.values[0])
@@ -2760,7 +2759,7 @@ static int	evaluate_RATE(zbx_variant_t *value, DC_ITEM *item, const char *parame
 
 		for (i = values.values_num - 1; i >= 0; i--)
 		{
-			if (HVT(values.values[i].value) < HVT(last))
+			if (HVD(values.values[i].value) < HVD(last))
 				delta = delta + HVD(values.values[i].value);
 
 			last = values.values[i].value;
@@ -2784,7 +2783,7 @@ static int	evaluate_RATE(zbx_variant_t *value, DC_ITEM *item, const char *parame
 		sampled_interval = TS2DBL(LAST(values).timestamp) - TS2DBL(FIRST(values).timestamp);
 		average_duration_between_samples = sampled_interval / (values.values_num - 1);
 
-		if (delta > 0 && HVT(FIRST(values).value) >= 0)
+		if (delta > 0 && HVD(FIRST(values).value) >= 0)
 		{
 			double	zero = sampled_interval * (HVD(FIRST(values).value) / delta);
 
