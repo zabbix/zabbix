@@ -785,9 +785,10 @@ static int	perform_data_sending(ZBX_THREAD_SENDVAL_ARGS *sendval_args, int old_s
  *                FAIL - destination has been already added                   *
  *                                                                            *
  ******************************************************************************/
-static int	sender_add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vector_str_t *hostnames)
+static int	sender_add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vector_str_t *hostnames, void *data)
 {
 	ZBX_UNUSED(hostnames);
+	ZBX_UNUSED(data);
 
 	destinations_count++;
 #if defined(_WINDOWS)
@@ -896,7 +897,7 @@ static void	zbx_load_config(const char *config_file)
 		if (NULL != cfg_active_hosts && '\0' != *cfg_active_hosts)
 		{
 			zbx_set_data_destination_hosts(cfg_active_hosts, "ServerActive",
-					sender_add_serveractive_host_cb, NULL);
+					sender_add_serveractive_host_cb, NULL, NULL);
 		}
 	}
 	zbx_free(cfg_active_hosts);
@@ -1085,12 +1086,12 @@ static void	parse_commandline(int argc, char **argv)
 			zbx_vector_ptr_create(&addrs);
 
 			zbx_vector_ptr_append(&addrs, &addr);
-			sender_add_serveractive_host_cb(&addrs, NULL);
+			sender_add_serveractive_host_cb(&addrs, NULL, NULL);
 
 			zbx_vector_ptr_destroy(&addrs);
 		}
 		else
-			zbx_set_data_destination_hosts(ZABBIX_SERVER, "-z", sender_add_serveractive_host_cb, NULL);
+			zbx_set_data_destination_hosts(ZABBIX_SERVER, "-z", sender_add_serveractive_host_cb, NULL, NULL);
 	}
 
 	/* every option may be specified only once */

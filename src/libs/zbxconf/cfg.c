@@ -636,7 +636,7 @@ static int	addr_compare_func(const void *d1, const void *d2)
  *                                                                            *
  ******************************************************************************/
 void	zbx_set_data_destination_hosts(char *str, const char *name, add_serveractive_host_f cb,
-		zbx_vector_str_t *hostnames)
+		zbx_vector_str_t *hostnames, void *data)
 {
 	char			*r, *r_node;
 	zbx_vector_ptr_t	addrs, cluster_addrs;
@@ -690,7 +690,7 @@ void	zbx_set_data_destination_hosts(char *str, const char *name, add_serveractiv
 		}
 		while (NULL != r_node);
 
-		cb(&cluster_addrs, hostnames);
+		cb(&cluster_addrs, hostnames, data);
 
 		cluster_addrs.values_num = 0;
 

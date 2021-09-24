@@ -733,10 +733,11 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	CONFIG_EVENTLOG_MAX_LINES_PER_SECOND = CONFIG_MAX_LINES_PER_SECOND;
 }
 
-static int	add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vector_str_t *hostnames)
+static int	add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vector_str_t *hostnames, void *data)
 {
 	int	i, forks, new_forks;
 
+	ZBX_UNUSED(data);
 	/* add at least one fork */
 	new_forks = 0 < hostnames->values_num ? hostnames->values_num : 1;
 
@@ -975,7 +976,9 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 	parse_hostnames(CONFIG_HOSTNAMES, &hostnames);
 
 	if (NULL != active_hosts && '\0' != *active_hosts)
-		zbx_set_data_destination_hosts(active_hosts, "ServerActive", add_serveractive_host_cb, &hostnames);
+	{
+		zbx_set_data_destination_hosts(active_hosts, "ServerActive", add_serveractive_host_cb, &hostnames, NULL);
+	}
 
 	zbx_free(active_hosts);
 

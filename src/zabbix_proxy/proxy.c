@@ -666,9 +666,10 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		exit(EXIT_FAILURE);
 }
 
-static int	proxy_add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vector_str_t *hostnames)
+static int	proxy_add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vector_str_t *hostnames, void *data)
 {
 	ZBX_UNUSED(hostnames);
+	ZBX_UNUSED(data);
 
 	zbx_addr_copy(&zbx_addrs, addrs);
 
@@ -905,7 +906,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 	zbx_vector_ptr_create(&zbx_addrs);
 
 	if (ZBX_PROXYMODE_PASSIVE != CONFIG_PROXYMODE)
-		zbx_set_data_destination_hosts(CONFIG_SERVER, "Server", proxy_add_serveractive_host_cb, NULL);
+		zbx_set_data_destination_hosts(CONFIG_SERVER, "Server", proxy_add_serveractive_host_cb, NULL, NULL);
 
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 	zbx_db_validate_config();
