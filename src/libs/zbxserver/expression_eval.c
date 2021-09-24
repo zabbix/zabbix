@@ -1521,7 +1521,7 @@ static int	expression_eval_bucket_rate(zbx_expression_eval_t *eval, zbx_expressi
 
 		zbx_free(backet);
 
-		for (s = dcitem->key_orig; SUCCEED == is_key_char(*s); s++)
+		for (s = dcitem->key_orig; SUCCEED == is_key_char((unsigned char)*s); s++)
 			;
 
 		if (dcitem->key_orig == s || NULL == (backet = get_param_dyn(s, pos, NULL)))	/* the key is empty */
@@ -1547,7 +1547,8 @@ static int	expression_eval_bucket_rate(zbx_expression_eval_t *eval, zbx_expressi
 		results = NULL;
 		ret = SUCCEED;
 	}
-	else if (SUCCEED == (ret = zbx_eval_calc_histogram_quantile(percentage / 100, results, log_fn, &result, error)))
+	else if (ZBX_ITEM_FUNC_BPERCENTL == item_func && SUCCEED == (
+			ret = zbx_eval_calc_histogram_quantile(percentage / 100, results, log_fn, &result, error)))
 	{
 		zbx_variant_set_dbl(value, result);
 	}
