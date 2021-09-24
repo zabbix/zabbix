@@ -587,6 +587,7 @@ FIELD		|hk_events_service|t_varchar(32)|'1d'	|NOT NULL	|ZBX_NODATA
 FIELD		|passwd_min_length	|t_integer	|'8'	|NOT NULL	|ZBX_NODATA
 FIELD		|passwd_check_rules	|t_integer	|'8'	|NOT NULL	|ZBX_NODATA
 FIELD		|auditlog_enabled	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
+FIELD		|ha_failover_delay	|t_varchar(32)	|'1m'	|NOT NULL	|ZBX_NODATA
 INDEX		|1		|alert_usrgrpid
 INDEX		|2		|discovery_groupid
 
@@ -1888,7 +1889,17 @@ FIELD		|limit_status	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|new_status	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|serviceid
 
+TABLE|ha_node|ha_nodeid|ZBX_DATA
+FIELD		|ha_nodeid	|t_id		|	|NOT NULL	|0
+FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|address	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|port		|t_integer	|'10051'|NOT NULL	|0
+FIELD		|lastaccess	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
+INDEX		|1		|status
+INDEX		|2		|lastaccess
+
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|5050069	|5050069
+ROW		|5050073	|5050073

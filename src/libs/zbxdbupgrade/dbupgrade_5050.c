@@ -60,6 +60,7 @@ static int	DBpatch_5050003(void)
 {
 	return DBcreate_index("service_problem_tag", "service_problem_tag_1", "serviceid", 0);
 }
+
 static int	DBpatch_5050004(void)
 {
 	const ZBX_TABLE	table =
@@ -789,6 +790,42 @@ static int	DBpatch_5050069(void)
 	return DBdrop_not_null("auditlog", &field);
 }
 
+static int	DBpatch_5050070(void)
+{
+	const ZBX_FIELD	field = {"ha_failover_delay", "1m", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_5050071(void)
+{
+	const ZBX_TABLE	table =
+			{"ha_node", "ha_nodeid", 0,
+				{
+					{"ha_nodeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"address", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"port", "10051", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"lastaccess", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5050072(void)
+{
+	return DBcreate_index("ha_node", "ha_node_1", "status", 0);
+}
+
+static int	DBpatch_5050073(void)
+{
+	return DBcreate_index("ha_node", "ha_node_2", "lastaccess", 0);
+}
+
 #endif
 
 DBPATCH_START(5050)
@@ -859,5 +896,9 @@ DBPATCH_ADD(5050066, 0, 1)
 DBPATCH_ADD(5050067, 0, 1)
 DBPATCH_ADD(5050068, 0, 1)
 DBPATCH_ADD(5050069, 0, 1)
+DBPATCH_ADD(5050070, 0, 1)
+DBPATCH_ADD(5050071, 0, 1)
+DBPATCH_ADD(5050072, 0, 1)
+DBPATCH_ADD(5050073, 0, 1)
 
 DBPATCH_END()
