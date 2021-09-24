@@ -38,6 +38,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 			$this->zbxTestTextPresent($fieldName['title']);
 			$this->zbxTestAssertElementPresentId('host_inventory_'.$fieldId.'');
 		}
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	public function testFormHostLinkTemplates_TemplateLink() {
@@ -50,7 +51,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$dialog->fill(['Link new templates' => 'Linux by Zabbix agent']);
 
 		$this->zbxTestTextPresent('Linux by Zabbix agent');
-		$this->zbxTestClick('host-update');
+		$dialog->submit();
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
 		$this->zbxTestTextPresent($this->host_for_template);
@@ -86,7 +87,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 				->query('button:Unlink')->one()->click();
 		$this->assertFalse($dialog->query('link', $template)->exists());
 
-		$this->zbxTestClickWait('host-update');
+		$dialog->submit();
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
 
@@ -112,7 +113,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$form->fill(['Link new templates' => 'Linux by Zabbix agent']);
 
 		$this->zbxTestTextPresent('Linux by Zabbix agent');
-		$this->zbxTestClickWait('host-update');
+		$form->submit();
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
 		$this->zbxTestTextPresent($this->host_for_template);
@@ -148,7 +149,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 				->query('button:Unlink and clear')->one()->click();
 		$this->assertFalse($dialog->query('link', $template)->exists());
 
-		$this->zbxTestClickWait('host-update');
+		$dialog->submit();
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
 
