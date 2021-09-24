@@ -1,8 +1,8 @@
 CC = cl.exe /nologo
 LINKER = link.exe /NOLOGO
 
-CFLAGS = /I ..\..\..\..\bin\win32\dev /c
-LFLAGS = /LIBPATH:..\..\..\..\bin\win32\dev /DEFAULTLIB:zabbix_sender.lib
+CFLAGS = /I ..\..\..\..\bin\win64\dev /c
+LFLAGS = /LIBPATH:..\..\..\..\bin\win64\dev /DEFAULTLIB:zabbix_sender.lib
 
 PROGNAME = sender.exe
 OBJS = sender.obj

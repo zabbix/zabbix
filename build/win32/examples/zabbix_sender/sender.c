@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 		}
 
 		/* send one value to the argv[1] IP address and the default trapper port 10051 */
-		if (-1 == zabbix_sender_send_values(argv[1], 10051, NULL, &value, 1, &result))
+		if (-1 == zabbix_sender_send_values(argv[1], 0, NULL, &value, 1, &result))
 		{
 			printf("sending failed: %s\n", result);
 		}

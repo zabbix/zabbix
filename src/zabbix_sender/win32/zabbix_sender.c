@@ -20,6 +20,7 @@
 #include "common.h"
 #include "zbxjson.h"
 #include "comms.h"
+#include "cfg.h"
 
 #include "zabbix_sender.h"
 
@@ -33,12 +34,22 @@ unsigned char	program_type	= ZBX_PROGRAM_TYPE_SENDER;
 
 int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
+static int	sender_add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vector_str_t *hostnames, void *data)
+{
+	ZBX_UNUSED(hostnames);
+
+	zbx_addr_copy((zbx_vector_ptr_t *)data, addrs);
+
+	return SUCCEED;
+}
+
 int	zabbix_sender_send_values(const char *address, unsigned short port, const char *source,
 		const zabbix_sender_value_t *values, int count, char **result)
 {
-	zbx_socket_t	sock;
-	int		ret, i;
-	struct zbx_json	json;
+	zbx_socket_t		sock;
+	int			ret, i;
+	struct zbx_json		json;
+	zbx_vector_ptr_t	zbx_addrs;
 
 	if (1 > count)
 	{
@@ -62,8 +73,12 @@ int	zabbix_sender_send_values(const char *address, unsigned short port, const ch
 	}
 	zbx_json_close(&json);
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&sock, source, address, port, GET_SENDER_TIMEOUT, ZBX_TCP_COMMON_TIMEOUT,
-			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL)))
+	zbx_vector_ptr_create(&zbx_addrs);
+
+	zbx_set_data_destination_hosts(address, "<server>", sender_add_serveractive_host_cb, NULL, &zbx_addrs);
+
+	if (SUCCEED == (ret = connect_to_server(&sock, source, &zbx_addrs, GET_SENDER_TIMEOUT, 30, ZBX_TCP_SEC_UNENCRYPTED,
+			0)))
 	{
 		if (SUCCEED == (ret = zbx_tcp_send(&sock, json.buffer)))
 		{
@@ -81,6 +96,8 @@ int	zabbix_sender_send_values(const char *address, unsigned short port, const ch
 		*result = zbx_strdup(NULL, zbx_socket_strerror());
 
 	zbx_json_free(&json);
+	zbx_vector_ptr_clear_ext(&zbx_addrs, zbx_addr_free);
+	zbx_vector_ptr_destroy(&zbx_addrs);
 
 	return ret;
 }
