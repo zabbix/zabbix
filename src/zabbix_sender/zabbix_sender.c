@@ -896,8 +896,14 @@ static void	zbx_load_config(const char *config_file)
 	{
 		if (NULL != cfg_active_hosts && '\0' != *cfg_active_hosts)
 		{
-			zbx_set_data_destination_hosts(cfg_active_hosts, "ServerActive",
-					sender_add_serveractive_host_cb, NULL, NULL);
+			char	*error;
+
+			if (FAIL == zbx_set_data_destination_hosts(cfg_active_hosts, "ServerActive",
+					sender_add_serveractive_host_cb, NULL, NULL, &error))
+			{
+				zbx_error("%s", error);
+				exit(EXIT_FAILURE);
+			}
 		}
 	}
 	zbx_free(cfg_active_hosts);
@@ -1091,7 +1097,16 @@ static void	parse_commandline(int argc, char **argv)
 			zbx_vector_ptr_destroy(&addrs);
 		}
 		else
-			zbx_set_data_destination_hosts(ZABBIX_SERVER, "-z", sender_add_serveractive_host_cb, NULL, NULL);
+		{
+			char	*error;
+
+			if (FAIL == zbx_set_data_destination_hosts(ZABBIX_SERVER, "-z", sender_add_serveractive_host_cb,
+					NULL, NULL, &error))
+			{
+				zbx_error("%s", error);
+				exit(EXIT_FAILURE);
+			}
+		}
 	}
 
 	/* every option may be specified only once */

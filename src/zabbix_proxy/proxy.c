@@ -906,7 +906,17 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 	zbx_vector_ptr_create(&zbx_addrs);
 
 	if (ZBX_PROXYMODE_PASSIVE != CONFIG_PROXYMODE)
-		zbx_set_data_destination_hosts(CONFIG_SERVER, "Server", proxy_add_serveractive_host_cb, NULL, NULL);
+	{
+		char	*error;
+
+		if (FAIL == zbx_set_data_destination_hosts(CONFIG_SERVER, "Server", proxy_add_serveractive_host_cb,
+				NULL, NULL, &error))
+		{
+			zbx_error("%s", error);
+			exit(EXIT_FAILURE);
+		}
+	}
+
 
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 	zbx_db_validate_config();

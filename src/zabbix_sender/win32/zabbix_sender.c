@@ -59,6 +59,17 @@ int	zabbix_sender_send_values(const char *address, unsigned short port, const ch
 		return FAIL;
 	}
 
+	zbx_vector_ptr_create(&zbx_addrs);
+
+	if (FAIL == zbx_set_data_destination_hosts(address, "<server>", sender_add_serveractive_host_cb, NULL,
+			&zbx_addrs, result))
+	{
+		zbx_vector_ptr_clear_ext(&zbx_addrs, zbx_addr_free);
+		zbx_vector_ptr_destroy(&zbx_addrs);
+
+		return FAIL;
+	}
+
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_SENDER_DATA, ZBX_JSON_TYPE_STRING);
 	zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
@@ -73,12 +84,10 @@ int	zabbix_sender_send_values(const char *address, unsigned short port, const ch
 	}
 	zbx_json_close(&json);
 
-	zbx_vector_ptr_create(&zbx_addrs);
-
 	zbx_set_data_destination_hosts(address, "<server>", sender_add_serveractive_host_cb, NULL, &zbx_addrs);
 
 	if (SUCCEED == (ret = connect_to_server(&sock, source, &zbx_addrs, GET_SENDER_TIMEOUT, 30,
-			ZBX_TCP_SEC_UNENCRYPTED, 0)))
+		ZBX_TCP_SEC_UNENCRYPTED, 0)))
 	{
 		if (SUCCEED == (ret = zbx_tcp_send(&sock, json.buffer)))
 		{

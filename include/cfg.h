@@ -78,7 +78,7 @@ int	check_cfg_feature_int(const char *parameter, int value, const char *feature)
 int	check_cfg_feature_str(const char *parameter, const char *value, const char *feature);
 
 typedef int	(*add_serveractive_host_f)(const zbx_vector_ptr_t *addrs, zbx_vector_str_t *hostnames, void *data);
-void	zbx_set_data_destination_hosts(char *str, const char *name, add_serveractive_host_f cb,
-		zbx_vector_str_t *hostnames, void *data);
+int	zbx_set_data_destination_hosts(char *str, const char *name, add_serveractive_host_f cb,
+		zbx_vector_str_t *hostnames, void *data, char **error);
 
 #endif

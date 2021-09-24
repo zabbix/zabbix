@@ -635,11 +635,12 @@ static int	addr_compare_func(const void *d1, const void *d2)
  *          using a callback function                                         *
  *                                                                            *
  ******************************************************************************/
-void	zbx_set_data_destination_hosts(char *str, const char *name, add_serveractive_host_f cb,
-		zbx_vector_str_t *hostnames, void *data)
+int	zbx_set_data_destination_hosts(char *str, const char *name, add_serveractive_host_f cb,
+		zbx_vector_str_t *hostnames, void *data, char **error)
 {
 	char			*r, *r_node;
 	zbx_vector_ptr_t	addrs, cluster_addrs;
+	int			ret = SUCCEED;
 
 	zbx_vector_ptr_create(&addrs);
 	zbx_vector_ptr_create(&cluster_addrs);
@@ -659,24 +660,24 @@ void	zbx_set_data_destination_hosts(char *str, const char *name, add_serveractiv
 			addr = zbx_malloc(NULL, sizeof(zbx_addr_t));
 			addr->ip = NULL;
 
-			if (SUCCEED != parse_serveractive_element(str, &addr->ip, &addr->port, (unsigned short)ZBX_DEFAULT_SERVER_PORT))
+			if (SUCCEED != parse_serveractive_element(str, &addr->ip, &addr->port,
+					(unsigned short)ZBX_DEFAULT_SERVER_PORT))
 			{
-				zbx_error("error parsing the \"%s\" parameter: address \"%s\" is invalid", name, str);
-				exit(EXIT_FAILURE);
+				*error = zbx_dsprintf(NULL, "error parsing the \"%s\" parameter: address \"%s\" is "
+						"invalid", name, str);
+				ret = FAIL;
 			}
-
-			if (FAIL == is_supported_ip(addr->ip) && FAIL == zbx_validate_hostname(addr->ip))
+			else if (FAIL == is_supported_ip(addr->ip) && FAIL == zbx_validate_hostname(addr->ip))
 			{
-				zbx_error("error parsing the \"%s\" parameter: address \"%s\" is invalid",
-						name, str);
-				exit(EXIT_FAILURE);
+				*error = zbx_dsprintf(NULL, "error parsing the \"%s\" parameter: address \"%s\""
+						" is invalid", name, str);
+				ret = FAIL;
 			}
-
-			if (SUCCEED == zbx_vector_ptr_search(&addrs, addr, addr_compare_func))
+			else if (SUCCEED == zbx_vector_ptr_search(&addrs, addr, addr_compare_func))
 			{
-				zbx_error("error parsing the \"%s\" parameter: address \"%s\" specified more than"
-						" once", name, str);
-				exit(EXIT_FAILURE);
+				*error = zbx_dsprintf(NULL, "error parsing the \"%s\" parameter: address \"%s\""
+						" specified more than once", name, str);
+				ret = FAIL;
 			}
 
 			if (NULL != r_node)
@@ -687,6 +688,9 @@ void	zbx_set_data_destination_hosts(char *str, const char *name, add_serveractiv
 
 			zbx_vector_ptr_append(&cluster_addrs, addr);
 			zbx_vector_ptr_append(&addrs, addr);
+
+			if (FAIL == ret)
+				goto fail;
 		}
 		while (NULL != r_node);
 
@@ -701,8 +705,10 @@ void	zbx_set_data_destination_hosts(char *str, const char *name, add_serveractiv
 		}
 	}
 	while (NULL != r);
-
+fail:
 	zbx_vector_ptr_destroy(&cluster_addrs);
 	zbx_vector_ptr_clear_ext(&addrs, (zbx_clean_func_t)zbx_addr_free);
 	zbx_vector_ptr_destroy(&addrs);
+
+	return ret;
 }

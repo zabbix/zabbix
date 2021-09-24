@@ -977,7 +977,14 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 
 	if (NULL != active_hosts && '\0' != *active_hosts)
 	{
-		zbx_set_data_destination_hosts(active_hosts, "ServerActive", add_serveractive_host_cb, &hostnames, NULL);
+		char	*error;
+
+		if (FAIL == zbx_set_data_destination_hosts(active_hosts, "ServerActive", add_serveractive_host_cb, &hostnames, NULL,
+				&error))
+		{
+			zbx_error("%s", error);
+			exit(EXIT_FAILURE);
+		}
 	}
 
 	zbx_free(active_hosts);
