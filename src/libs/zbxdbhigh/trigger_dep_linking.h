@@ -25,7 +25,7 @@
 #include "zbxalgo.h"
 #include "../../libs/zbxalgo/vectorimpl.h"
 
-int	DBadd_or_update_template_dependencies_for_triggers(zbx_uint64_t hostid,
+int	DBsync_template_dependencies_for_triggers(zbx_uint64_t hostid,
 		const zbx_vector_uint64_t *trids, int is_update);
 
 #endif

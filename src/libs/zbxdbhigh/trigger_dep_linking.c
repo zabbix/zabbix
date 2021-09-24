@@ -269,21 +269,26 @@ clean:
 	return res;
 }
 
-static int	doIt(const zbx_vector_uint64_t *trids, zbx_vector_uint64_pair_t *links,
-		zbx_vector_uint64_pair_t *links2, zbx_vector_uint64_t *trigger_dep_ids_del)
+/* esclude trigger dependencies from the update list (links - links2) that are already present on the target host */
+/* prepare the list of the trigger dependencies that need to be deleted on the target host, since they are not    */
+/* present on the template trigger */
+static int	prepare_the_neccessary_trigger_dependencies_updates_and_deletes(const zbx_vector_uint64_t *trids,
+		zbx_vector_uint64_pair_t *links, zbx_vector_uint64_pair_t *links2,
+		zbx_vector_uint64_t *trigger_dep_ids_del)
 {
 	/* links up and down - list on host, that we want to be present on the target */
+	/* get list of links (up and down) - currently on the target host */
 
-	/* get list of links up and down - currently on the target host */
-	char		*sql = NULL;
-	size_t		sql_alloc = 256, sql_offset = 0;
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_hashset_t	h;
-	int		i, res = SUCCEED;
+	char			*sql = NULL;
+	size_t			sql_alloc = 256, sql_offset = 0;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_hashset_t		h;
+	int			i, res = SUCCEED;
+	zbx_hashset_iter_t	iter1;
+	zbx_trigger_dep_entry_t	*found;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
 #define	TRIGGER_FUNCS_HASHSET_DEF_SIZE	100
 	zbx_hashset_create(&h, TRIGGER_FUNCS_HASHSET_DEF_SIZE, zbx_trigger_dep_entries_hash_func,
 			zbx_trigger_dep_entries_compare_func);
@@ -303,26 +308,26 @@ static int	doIt(const zbx_vector_uint64_t *trids, zbx_vector_uint64_pair_t *link
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		int				f;
-		zbx_uint64_t			a, x, y;
-		zbx_trigger_dep_entry_t		*found, temp_t;
+		int				flags;
+		zbx_uint64_t			trigger_dep_id, trigger_id_down, trigger_id_up;
+		zbx_trigger_dep_entry_t		temp_t;
 		zbx_trigger_dep_vec_entry_t	*s;
 
-		ZBX_STR2UINT64(a, row[0]);
-		ZBX_STR2UINT64(x, row[1]);
-		ZBX_STR2UINT64(y, row[2]);
-		f = atoi(row[3]);
+		ZBX_STR2UINT64(trigger_dep_id, row[0]);
+		ZBX_STR2UINT64(trigger_id_down, row[1]);
+		ZBX_STR2UINT64(trigger_id_up, row[2]);
+		flags = atoi(row[3]);
 
-		temp_t.trigger_down_id = x;
+		temp_t.trigger_down_id = trigger_id_down;
 
 		if (NULL != (found = (zbx_trigger_dep_entry_t *)zbx_hashset_search(&h, &temp_t)))
 		{
 			s = (zbx_trigger_dep_vec_entry_t *)zbx_malloc(NULL, sizeof(zbx_trigger_dep_vec_entry_t));
-			s->trigger_dep_id = a;
-			s->trigger_down_id = x;
-			s->trigger_up_id = y;
+			s->trigger_dep_id = trigger_dep_id;
+			s->trigger_down_id = trigger_id_down;
+			s->trigger_up_id = trigger_id_up;
 			s->status = 0;
-			s->flags = f;
+			s->flags = flags;
 			zbx_vector_trigger_up_entries_append(&(found->v), s);
 		}
 		else
@@ -330,15 +335,14 @@ static int	doIt(const zbx_vector_uint64_t *trids, zbx_vector_uint64_pair_t *link
 			zbx_trigger_dep_entry_t local_temp_t;
 
 			s = (zbx_trigger_dep_vec_entry_t *)zbx_malloc(NULL, sizeof(zbx_trigger_dep_vec_entry_t));
-			s->trigger_dep_id = a;
-			s->trigger_down_id = x;
-			s->trigger_up_id = y;
+			s->trigger_dep_id = trigger_dep_id;
+			s->trigger_down_id = trigger_id_down;
+			s->trigger_up_id = trigger_id_up;
 			s->status = 0;
-			s->flags = f;
+			s->flags = flags;
 			zbx_vector_trigger_up_entries_create(&(local_temp_t.v));
 			zbx_vector_trigger_up_entries_append(&(local_temp_t.v), s);
-
-			local_temp_t.trigger_down_id = x;
+			local_temp_t.trigger_down_id = trigger_id_down;
 			zbx_hashset_insert(&h, &local_temp_t, sizeof(local_temp_t));
 		}
 	}
@@ -347,7 +351,7 @@ static int	doIt(const zbx_vector_uint64_t *trids, zbx_vector_uint64_pair_t *link
 
 	for (i = 0; i < links->values_num; i++)
 	{
-		zbx_trigger_dep_entry_t	*found, temp_t;
+		zbx_trigger_dep_entry_t	temp_t;
 
 		temp_t.trigger_down_id = links->values[i].first;
 
@@ -387,24 +391,19 @@ static int	doIt(const zbx_vector_uint64_t *trids, zbx_vector_uint64_pair_t *link
 		}
 	}
 
+	zbx_hashset_iter_reset(&h, &iter1);
+
+	while (NULL != (found = (zbx_trigger_dep_entry_t *)zbx_hashset_iter_next(&iter1)))
 	{
-		zbx_hashset_iter_t	iter1;
-		zbx_trigger_dep_entry_t	*found;
-
-		zbx_hashset_iter_reset(&h, &iter1);
-
-		while (NULL != (found = (zbx_trigger_dep_entry_t *)zbx_hashset_iter_next(&iter1)))
+		for (i = 0; i < found->v.values_num; i++)
 		{
-			for (i = 0; i < found->v.values_num; i++)
+			if (0 == found->v.values[i]->status)
 			{
-				if (0 == found->v.values[i]->status)
-				{
-					zbx_vector_uint64_append(trigger_dep_ids_del,
-							found->v.values[i]->trigger_dep_id);
-					zbx_audit_trigger_update_json_remove_dependency(found->v.values[i]->flags,
-							found->v.values[i]->trigger_dep_id,
-							found->v.values[i]->trigger_down_id);
-				}
+				zbx_vector_uint64_append(trigger_dep_ids_del,
+						found->v.values[i]->trigger_dep_id);
+				zbx_audit_trigger_update_json_remove_dependency(found->v.values[i]->flags,
+						found->v.values[i]->trigger_dep_id,
+						found->v.values[i]->trigger_down_id);
 			}
 		}
 	}
@@ -417,7 +416,7 @@ clean:
 	return res;
 }
 
-static int	doIt2(zbx_vector_uint64_pair_t *links, zbx_hashset_t *triggers_flags)
+static int	DBadd_trigger_dependencies(zbx_vector_uint64_pair_t *links, zbx_hashset_t *triggers_flags)
 {
 	int	res = SUCCEED;
 
@@ -468,9 +467,9 @@ out:
 	return res;
 }
 
-static int	doIt3(zbx_vector_uint64_pair_t	*links, const zbx_vector_uint64_t *trids, zbx_hashset_t *triggers_flags)
+static int	DBadd_and_remove_trigger_dependencies(zbx_vector_uint64_pair_t	*links, const zbx_vector_uint64_t *trids, zbx_hashset_t *triggers_flags)
 {
-	int				i, res = SUCCEED;
+	int				res = SUCCEED;
 	char				*sql = NULL;
 	size_t				sql_alloc = 0, sql_offset = 0;
 	zbx_vector_uint64_pair_t	links2;
@@ -481,8 +480,11 @@ static int	doIt3(zbx_vector_uint64_pair_t	*links, const zbx_vector_uint64_t *tri
 	zbx_vector_uint64_create(&trigger_dep_ids_del);
 	zbx_vector_uint64_pair_create(&links2);
 
-	if (FAIL == (res = doIt(trids, links, &links2, &trigger_dep_ids_del)))
+	if (FAIL == (res = prepare_the_neccessary_trigger_dependencies_updates_and_deletes(trids, links, &links2,
+			&trigger_dep_ids_del)))
+	{
 		goto clean;
+	}
 
 	if (0 < trigger_dep_ids_del.values_num)
 	{
@@ -497,12 +499,12 @@ static int	doIt3(zbx_vector_uint64_pair_t	*links, const zbx_vector_uint64_t *tri
 		}
 	}
 
-	res = doIt2(&links2, triggers_flags);
+	res = DBadd_trigger_dependencies(&links2, triggers_flags);
 clean:
 	zbx_free(sql);
 	zbx_vector_uint64_destroy(&trigger_dep_ids_del);
 	zbx_vector_uint64_pair_destroy(&links2);
-out:
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(res));
 
 	return res;
@@ -510,7 +512,7 @@ out:
 
 /********************************************************************************
  *                                                                              *
- * Function: DBadd_or_update_template_dependencies_for_triggers                 *
+ * Function: DBsync_template_dependencies_for_triggers                          *
  *                                                                              *
  * Purpose: update trigger dependencies for specified host                      *
  *                                                                              *
@@ -523,7 +525,7 @@ out:
  * Comments: !!! Don't forget to sync the code with PHP !!!                     *
  *                                                                              *
  ********************************************************************************/
-int	DBadd_or_update_template_dependencies_for_triggers(zbx_uint64_t hostid, const zbx_vector_uint64_t *trids,
+int	DBsync_template_dependencies_for_triggers(zbx_uint64_t hostid, const zbx_vector_uint64_t *trids,
 		int is_update)
 {
 	int				res = SUCCEED;
@@ -545,12 +547,12 @@ int	DBadd_or_update_template_dependencies_for_triggers(zbx_uint64_t hostid, cons
 
 	if (0 == is_update)
 	{
-		if (FAIL == (res = doIt2(&links, &triggers_flags)))
+		if (FAIL == (res = DBadd_trigger_dependencies(&links, &triggers_flags)))
 			goto clean;
 	}
 	else if (1 == is_update)
 	{
-		res = doIt3(&links, trids, &triggers_flags);
+		res = DBadd_and_remove_trigger_dependencies(&links, trids, &triggers_flags);
 	}
 clean:
 	zbx_vector_uint64_pair_destroy(&links);
