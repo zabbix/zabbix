@@ -516,6 +516,7 @@ $form->addItem([
 			'content' => (new CButton('', _('Mass update')))
 				->onClick("return openMassupdatePopup(this, 'popup.massupdate.host');")
 				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('no-chkbxrange')
 		],
 		'host.massdelete' => [
 			'content' => (new CSimpleButton(_('Delete')))

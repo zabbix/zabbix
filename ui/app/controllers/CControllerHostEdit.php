@@ -215,8 +215,17 @@ class CControllerHostEdit extends CController {
 			CArrayHelper::sort($data['host']['tags'], ['tag', 'value']);
 		}
 
+		if (!$data['host']['macros'] && $data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
+			$data['host']['macros'][] = [
+				'type' => ZBX_MACRO_TYPE_TEXT,
+				'macro' => '',
+				'value' => '',
+				'description' => ''
+			];
+		}
+
 		// Reset Secret text macros and set warning for cloned host.
-		if ($data['host']['hostid'] === null && $data['host']['macros']) {
+		if ($data['host']['hostid'] === null) {
 			foreach ($data['host']['macros'] as &$macro) {
 				if ($macro['type'] == ZBX_MACRO_TYPE_SECRET) {
 					$macro = [
