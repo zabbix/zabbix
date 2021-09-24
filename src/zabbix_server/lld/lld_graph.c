@@ -1002,7 +1002,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 	zbx_vector_uint64_t	del_gitemids;
 
 	zbx_uint64_t		graphid = 0, gitemid = 0;
-	char			*sql = NULL, *name_esc, *color_esc;
+	char			*sql = NULL;
 	size_t			sql_alloc = 8 * ZBX_KIBIBYTE, sql_offset = 0;
 	zbx_db_insert_t		db_insert, db_insert_gdiscovery, db_insert_gitems;
 
@@ -1013,7 +1013,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 
 	for (i = 0; i < graphs->values_num; i++)
 	{
-		zbx_lld_graph_t	*graph = (zbx_lld_graph_t *)graphs->values[i];
+		const zbx_lld_graph_t	*graph = (const zbx_lld_graph_t *)graphs->values[i];
 
 		if (0 == (graph->flags & ZBX_FLAG_LLD_GRAPH_DISCOVERED))
 			continue;
@@ -1026,7 +1026,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 		if (0 != graph->graphid)
 		{
 			zbx_audit_graph_create_entry(AUDIT_ACTION_UPDATE, graph->graphid, (NULL == graph->name_orig) ?
-					graph->name : graph->name_orig, (int)ZBX_FLAG_DISCOVERY_CREATED);
+					graph->name : graph->name_orig, ZBX_FLAG_DISCOVERY_CREATED);
 		}
 
 		for (j = 0; j < graph->gitems.values_num; j++)
@@ -1038,8 +1038,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 				zbx_vector_uint64_append(&del_gitemids, gitem->gitemid);
 
 				zbx_audit_graph_update_json_delete_gitems(graph->graphid,
-						(int)ZBX_FLAG_DISCOVERY_CREATED, gitem->gitemid);
-
+						ZBX_FLAG_DISCOVERY_CREATED, gitem->gitemid);
 				continue;
 			}
 
@@ -1112,11 +1111,12 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 					(int)ymax_type, graph->ymax_itemid, (int)ZBX_FLAG_DISCOVERY_CREATED);
 
 			zbx_audit_graph_create_entry(AUDIT_ACTION_ADD, graphid, graph->name,
-					(int)ZBX_FLAG_DISCOVERY_CREATED);
+					ZBX_FLAG_DISCOVERY_CREATED);
+
 			zbx_audit_graph_update_json_add_data(graphid, graph->name, width, height, yaxismin, yaxismax, 0,
 					(int)show_work_period, (int)show_triggers, (int)graphtype, (int)show_legend,
 					(int)show_3d, percent_left, percent_right, (int)ymin_type, (int)ymax_type,
-					graph->ymin_itemid, graph->ymax_itemid,	(int)ZBX_FLAG_DISCOVERY_CREATED, 0);
+					graph->ymin_itemid, graph->ymax_itemid,	ZBX_FLAG_DISCOVERY_CREATED, 0);
 
 			zbx_db_insert_add_values(&db_insert_gdiscovery, graphid, parent_graphid);
 
@@ -1130,7 +1130,8 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 
 			if (0 != (graph->flags & ZBX_FLAG_LLD_GRAPH_UPDATE_NAME))
 			{
-				name_esc = DBdyn_escape_string(graph->name);
+				char	*name_esc = DBdyn_escape_string(graph->name);
+
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "name='%s'", name_esc);
 				zbx_free(name_esc);
 				d = ",";
@@ -1328,8 +1329,8 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 
 	for (i = 0; i < upd_gitems.values_num; i++)
 	{
-		const char	*d = "";
-		zbx_lld_gitem_t	*gitem = (zbx_lld_gitem_t *)upd_gitems.values[i];
+		const char		*d = "";
+		const zbx_lld_gitem_t	*gitem = (const zbx_lld_gitem_t *)upd_gitems.values[i];
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update graphs_items set ");
 
@@ -1365,7 +1366,8 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 
 		if (0 != (gitem->flags & ZBX_FLAG_LLD_GITEM_UPDATE_COLOR))
 		{
-			color_esc = DBdyn_escape_string(gitem->color);
+			char	*color_esc = DBdyn_escape_string(gitem->color);
+
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%scolor='%s'", d, color_esc);
 			zbx_free(color_esc);
 			d = ",";
