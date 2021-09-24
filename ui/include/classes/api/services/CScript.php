@@ -310,83 +310,12 @@ class CScript extends CApiService {
 		$upd_scripts = [];
 
 		foreach ($scripts as $script) {
-			$scriptid = $script['scriptid'];
-			$db_script = $db_scripts[$scriptid];
-			$db_type = $db_script['type'];
-			$db_authtype = $db_script['authtype'];
-			$db_scope = $db_script['scope'];
-			$type = array_key_exists('type', $script) ? $script['type'] : $db_type;
-			$authtype = array_key_exists('authtype', $script) ? $script['authtype'] : $db_authtype;
-			$scope = array_key_exists('scope', $script) ? $script['scope'] : $db_scope;
-
-			$upd_script = [];
-
-			$upd_script = DB::getUpdatedValues('scripts', $script, $db_script);
-
-			// No mattter what the old type was, clear and reset all unnecessary fields from any other types.
-			if ($type != $db_type) {
-				switch ($type) {
-					case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
-						$upd_script['port'] = '';
-						$upd_script['authtype'] = DB::getDefault('scripts', 'authtype');
-						$upd_script['username'] = '';
-						$upd_script['password'] = '';
-						$upd_script['publickey'] = '';
-						$upd_script['privatekey'] = '';
-						break;
-
-					case ZBX_SCRIPT_TYPE_IPMI:
-						$upd_script['port'] = '';
-						$upd_script['authtype'] = DB::getDefault('scripts', 'authtype');
-						$upd_script['username'] = '';
-						$upd_script['password'] = '';
-						$upd_script['publickey'] = '';
-						$upd_script['privatekey'] = '';
-						$upd_script['execute_on'] = DB::getDefault('scripts', 'execute_on');
-						break;
-
-					case ZBX_SCRIPT_TYPE_SSH:
-						$upd_script['execute_on'] = DB::getDefault('scripts', 'execute_on');
-						break;
-
-					case ZBX_SCRIPT_TYPE_TELNET:
-						$upd_script['authtype'] = DB::getDefault('scripts', 'authtype');
-						$upd_script['publickey'] = '';
-						$upd_script['privatekey'] = '';
-						$upd_script['execute_on'] = DB::getDefault('scripts', 'execute_on');
-						break;
-
-					case ZBX_SCRIPT_TYPE_WEBHOOK:
-						$upd_script['port'] = '';
-						$upd_script['authtype'] = DB::getDefault('scripts', 'authtype');
-						$upd_script['username'] = '';
-						$upd_script['password'] = '';
-						$upd_script['publickey'] = '';
-						$upd_script['privatekey'] = '';
-						$upd_script['execute_on'] = DB::getDefault('scripts', 'execute_on');
-						break;
-				}
-			}
-			elseif ($type == ZBX_SCRIPT_TYPE_SSH && $authtype != $db_authtype && $authtype == ITEM_AUTHTYPE_PASSWORD) {
-				$upd_script['publickey'] = '';
-				$upd_script['privatekey'] = '';
-			}
-
-			if ($scope != $db_scope && $scope == ZBX_SCRIPT_SCOPE_ACTION) {
-				$upd_script['menu_path'] = '';
-				$upd_script['usrgrpid'] = 0;
-				$upd_script['host_access'] = DB::getDefault('scripts', 'host_access');;
-				$upd_script['confirmation'] = '';
-			}
-
-			if ($type != $db_type && $db_type == ZBX_SCRIPT_TYPE_WEBHOOK) {
-				$upd_script['timeout'] = DB::getDefault('scripts', 'timeout');
-			}
+			$upd_script = DB::getUpdatedValues('scripts', $script, $db_scripts[$script['scriptid']]);
 
 			if ($upd_script) {
 				$upd_scripts[] = [
 					'values' => $upd_script,
-					'where' => ['scriptid' => $scriptid]
+					'where' => ['scriptid' => $script['scriptid']]
 				];
 			}
 		}
@@ -560,13 +489,66 @@ class CScript extends CApiService {
 		}
 		unset($script);
 
-		// Cleanup field data.
+		// Clear and reset all unnecessary fields.
 		foreach ($scripts as &$script) {
 			$db_script = $db_scripts[$script['scriptid']];
 
-			if ($script['type'] != $db_script['type'] && $db_script['type'] == ZBX_SCRIPT_TYPE_WEBHOOK) {
-				$script['parameters'] = [];
+			if ($script['type'] != $db_script['type']) {
+				switch ($script['type']) {
+					case ZBX_SCRIPT_TYPE_IPMI:
+						$script['execute_on'] = DB::getDefault('scripts', 'execute_on');
+						// break; is not missing here
+
+					case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
+						$script['port'] = '';
+						$script['authtype'] = DB::getDefault('scripts', 'authtype');
+						$script['username'] = '';
+						$script['password'] = '';
+						$script['publickey'] = '';
+						$script['privatekey'] = '';
+						$script['parameters'] = [];
+						$script['timeout'] = DB::getDefault('scripts', 'timeout');
+						break;
+
+					case ZBX_SCRIPT_TYPE_SSH:
+						$script['execute_on'] = DB::getDefault('scripts', 'execute_on');
+						$script['parameters'] = [];
+						$script['timeout'] = DB::getDefault('scripts', 'timeout');
+						break;
+
+					case ZBX_SCRIPT_TYPE_TELNET:
+						$script['authtype'] = DB::getDefault('scripts', 'authtype');
+						$script['publickey'] = '';
+						$script['privatekey'] = '';
+						$script['execute_on'] = DB::getDefault('scripts', 'execute_on');
+						$script['parameters'] = [];
+						$script['timeout'] = DB::getDefault('scripts', 'timeout');
+						break;
+
+					case ZBX_SCRIPT_TYPE_WEBHOOK:
+						$script['port'] = '';
+						$script['authtype'] = DB::getDefault('scripts', 'authtype');
+						$script['username'] = '';
+						$script['password'] = '';
+						$script['publickey'] = '';
+						$script['privatekey'] = '';
+						$script['execute_on'] = DB::getDefault('scripts', 'execute_on');
+						break;
+				}
 			}
+			elseif ($script['type'] == ZBX_SCRIPT_TYPE_SSH && $script['authtype'] != $db_script['authtype']
+					&& $script['authtype'] == ITEM_AUTHTYPE_PASSWORD) {
+				$script['publickey'] = '';
+				$script['privatekey'] = '';
+			}
+
+			if ($script['scope'] != $db_script['scope'] && $script['scope'] == ZBX_SCRIPT_SCOPE_ACTION) {
+				$script['menu_path'] = '';
+				$script['usrgrpid'] = 0;
+				$script['host_access'] = DB::getDefault('scripts', 'host_access');;
+				$script['confirmation'] = '';
+			}
+
 		}
 		unset($script);
 
