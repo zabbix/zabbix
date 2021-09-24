@@ -2695,7 +2695,6 @@ static int	evaluate_RATE(zbx_variant_t *value, DC_ITEM *item, const char *parame
 {
 #	define HVT(v) (ITEM_VALUE_TYPE_FLOAT == item->value_type ? v.dbl : v.ui64)
 #	define HVD(v) (ITEM_VALUE_TYPE_FLOAT == item->value_type ? v.dbl : (double)v.ui64)
-#	define HVT_SET(v,r) (ITEM_VALUE_TYPE_FLOAT == item->value_type ? (v.dbl = r) : (v.ui64 = r))
 #	define TS2DBL(t) (t.sec + t.ns / 1e9)
 #	define LAST(v) (v.values[0])
 #	define FIRST(v) (v.values[v.values_num - 1])
@@ -2764,7 +2763,7 @@ static int	evaluate_RATE(zbx_variant_t *value, DC_ITEM *item, const char *parame
 			if (HVT(values.values[i].value) < HVT(last))
 				delta = delta + HVD(values.values[i].value);
 
-			HVT_SET(last, HVT(values.values[i].value));
+			last = values.values[i].value;
 		}
 
 		/* Extrapolation */
