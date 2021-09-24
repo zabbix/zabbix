@@ -2475,7 +2475,7 @@ static void	DBhost_prototypes_templates_make(zbx_vector_ptr_t *host_prototypes,
 						zbx_vector_uint64_append(del_hosttemplateids, hosttemplateid);
 
 						zbx_audit_host_prototype_create_entry(AUDIT_ACTION_UPDATE,
-								host_prototype->hostid, host_prototype->name);
+								host_prototype->hostid, host_prototype->host);
 
 						zbx_audit_host_prototype_update_json_delete_parent_template(
 								host_prototype->hostid, hosttemplateid);
@@ -2994,7 +2994,7 @@ static void	DBhost_prototypes_macros_make(zbx_vector_ptr_t *host_prototypes, zbx
 						zbx_vector_uint64_append(del_macroids, hostmacroid);
 
 						zbx_audit_host_prototype_create_entry(AUDIT_ACTION_UPDATE,
-								host_prototype->hostid, host_prototype->name);
+								host_prototype->hostid, host_prototype->host);
 
 						zbx_audit_host_prototype_update_json_delete_hostmacro(
 								host_prototype->hostid, hostmacroid);
@@ -3156,7 +3156,7 @@ static void	DBhost_prototypes_tags_make(zbx_vector_ptr_t *host_prototypes, zbx_v
 				zbx_vector_uint64_append(del_tagids, tagid);
 
 				zbx_audit_host_prototype_create_entry(AUDIT_ACTION_UPDATE, host_prototype->hostid,
-						host_prototype->name);
+						host_prototype->host);
 				zbx_audit_host_prototype_update_json_delete_tag(host_prototype->hostid, tagid);
 			}
 
@@ -3373,7 +3373,7 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 							zbx_vector_uint64_append(del_interfaceids, interfaceid);
 
 							zbx_audit_host_prototype_create_entry(AUDIT_ACTION_UPDATE,
-									host_prototype->hostid, host_prototype->name);
+									host_prototype->hostid, host_prototype->host);
 
 							zbx_audit_host_prototype_update_json_delete_interface(
 									host_prototype->hostid, interfaceid);
@@ -3395,7 +3395,7 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 							zbx_vector_uint64_append(del_interfaceids, interfaceid);
 
 							zbx_audit_host_prototype_create_entry(AUDIT_ACTION_UPDATE,
-									host_prototype->hostid, host_prototype->name);
+									host_prototype->hostid, host_prototype->host);
 
 							zbx_audit_host_prototype_update_json_delete_interface(
 									host_prototype->hostid, interfaceid);
@@ -3544,6 +3544,8 @@ static void	DBhost_prototypes_interface_snmp_prepare_sql(zbx_uint64_t hostid, co
 	}
 
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where interfaceid=" ZBX_FS_UI64 ";\n", interfaceid);
+
+	DBexecute_overflowed_sql(sql, sql_alloc, sql_offset);
 }
 
 /******************************************************************************
@@ -3561,16 +3563,16 @@ static void	DBhost_prototypes_interface_snmp_prepare_sql(zbx_uint64_t hostid, co
  *             db_insert_htemplates - [IN/OUT] templates insert structure     *
  *                                                                            *
  ******************************************************************************/
-static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector_uint64_t *del_hosttemplateids,
-		zbx_vector_uint64_t *del_hostmacroids, zbx_vector_uint64_t *del_tagids,
-		zbx_vector_uint64_t *del_interfaceids ,zbx_vector_uint64_t *del_snmpids,
-		zbx_db_insert_t *db_insert_htemplates)
+static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
+		const zbx_vector_uint64_t *del_hosttemplateids, const zbx_vector_uint64_t *del_hostmacroids,
+		const zbx_vector_uint64_t *del_tagids, const zbx_vector_uint64_t *del_interfaceids,
+		const zbx_vector_uint64_t *del_snmpids, zbx_db_insert_t *db_insert_htemplates)
 {
 	char				*sql1 = NULL, *sql2 = NULL, *name_esc, *value_esc;
 	size_t				sql1_alloc = ZBX_KIBIBYTE, sql1_offset = 0,
 					sql2_alloc = ZBX_KIBIBYTE, sql2_offset = 0;
-	zbx_group_prototype_t		*group_prototype;
-	zbx_macros_prototype_t		*hostmacro;
+	const zbx_group_prototype_t	*group_prototype;
+	const zbx_macros_prototype_t	*hostmacro;
 	zbx_db_tag_t			*tag;
 	zbx_interfaces_prototype_t	*interface;
 	zbx_uint64_t			hostid = 0, hosttemplateid = 0, group_prototypeid = 0, new_hostmacroid = 0,
@@ -3589,7 +3591,7 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 
 	for (i = 0; i < host_prototypes->values_num; i++)
 	{
-		zbx_host_prototype_t	*host_prototype;
+		const zbx_host_prototype_t	*host_prototype;
 
 		host_prototype = (zbx_host_prototype_t *)host_prototypes->values[i];
 
@@ -3600,7 +3602,7 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 		else
 		{
 			zbx_audit_host_prototype_create_entry(AUDIT_ACTION_UPDATE, host_prototype->hostid,
-					host_prototype->name);
+					host_prototype->host);
 		}
 
 		new_hosts_templates += host_prototype->lnk_templateids.values_num;
@@ -3791,7 +3793,7 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 					(int)host_prototype->discover, (int)host_prototype->custom_interfaces);
 
 			zbx_audit_host_prototype_create_entry(AUDIT_ACTION_ADD, host_prototype->hostid,
-					host_prototype->name);
+					host_prototype->host);
 
 			zbx_db_insert_add_values(&db_insert_hdiscovery, host_prototype->hostid, host_prototype->itemid);
 
@@ -3840,9 +3842,9 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 
 			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, " where hostid=" ZBX_FS_UI64 ";\n",
 					host_prototype->hostid);
-		}
 
-		DBexecute_overflowed_sql(&sql1, &sql1_alloc, &sql1_offset);
+			DBexecute_overflowed_sql(&sql1, &sql1_alloc, &sql1_offset);
+		}
 
 		for (j = 0; j < host_prototype->lnk_templateids.values_num; j++)
 		{
@@ -3878,6 +3880,8 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 						" set templateid=" ZBX_FS_UI64
 						" where group_prototypeid=" ZBX_FS_UI64 ";\n",
 						group_prototype->templateid, group_prototype->group_prototypeid);
+
+				DBexecute_overflowed_sql(&sql1, &sql1_alloc, &sql1_offset);
 
 				zbx_audit_host_prototype_update_json_update_group_details(host_prototype->hostid,
 						group_prototype->group_prototypeid, group_prototype->name,
@@ -3954,6 +3958,7 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 
 				zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
 						" where hostmacroid=" ZBX_FS_UI64 ";\n", hostmacro->hostmacroid);
+				DBexecute_overflowed_sql(&sql1, &sql1_alloc, &sql1_offset);
 			}
 		}
 
@@ -4060,6 +4065,8 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 
 				zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
 						" where interfaceid=" ZBX_FS_UI64 ";\n", interface->interfaceid);
+
+				DBexecute_overflowed_sql(&sql1, &sql1_alloc, &sql1_offset);
 			}
 
 			if (INTERFACE_TYPE_SNMP == interface->type)
@@ -4100,8 +4107,6 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 				}
 			}
 		}
-
-		DBexecute_overflowed_sql(&sql1, &sql1_alloc, &sql1_offset);
 	}
 
 	if (0 != upd_tags.values_num)
