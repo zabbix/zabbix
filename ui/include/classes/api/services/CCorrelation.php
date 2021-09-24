@@ -125,386 +125,385 @@ class CCorrelation extends CApiService {
 	/**
 	 * Add correlations.
 	 *
-	 * @param array  $correlations											An array of correlations.
-	 * @param string $correlations[]['name']								Correlation name.
-	 * @param string $correlations[]['description']							Correlation description (optional).
-	 * @param int    $correlations[]['status']								Correlation status (optional).
-	 *																		Possible values are:
-	 *																			0 - ZBX_CORRELATION_ENABLED;
-	 *																			1 - ZBX_CORRELATION_DISABLED.
-	 * @param array	 $correlations[]['filter']								Correlation filter that contains evaluation
-	 *																		method, formula and conditions.
-	 * @param int    $correlations[]['filter']['evaltype']					Correlation condition evaluation method.
-	 *																		Possible values are:
-	 *																			0 - CONDITION_EVAL_TYPE_AND_OR;
-	 *																			1 - CONDITION_EVAL_TYPE_AND;
-	 *																			2 - CONDITION_EVAL_TYPE_OR;
-	 *																			3 - CONDITION_EVAL_TYPE_EXPRESSION.
-	 * @param string $correlations[]['filter']['formula']					User-defined expression to be used for
-	 *																		evaluating conditions of filters with a
-	 *																		custom expression. Optional, but required
-	 *																		when evaluation method is:
-	 *																			3 - CONDITION_EVAL_TYPE_EXPRESSION.
-	 * @param array  $correlations[]['filter']['conditions']					An array of correlation conditions.
-	 * @param int    $correlations[]['filter']['conditions'][]['type']		Condition type.
-	 *																		Possible values are:
-	 *																			0 - ZBX_CORR_CONDITION_OLD_EVENT_TAG;
-	 *																			1 - ZBX_CORR_CONDITION_NEW_EVENT_TAG;
-	 *																			2 - ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP;
-	 *																			3 - ZBX_CORR_CONDITION_EVENT_TAG_PAIR;
-	 *																			4 - ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE;
-	 *																			5 - ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE.
-	 * @param string $correlations[]['filter']['conditions'][]['formulaid']	Condition formula ID. Optional, but required
-	 *																		when evaluation method is:
-	 *																			3 - CONDITION_EVAL_TYPE_EXPRESSION.
-	 * @param string $correlations[]['filter']['conditions'][]['tag']		Correlation condition tag.
-	 * @param int	 $correlations[]['filter']['conditions'][]['operator']	Correlation condition operator. Optional,
-	 *																		but required when "type" is one of the following:
-	 *																			2 - ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP;
-	 *																			4 - ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE;
-	 *																			5 - ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE.
-	 *																		Possible values depend on type:
-	 *																		for type ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP:
-	 *																			0 - CONDITION_OPERATOR_EQUAL
-	 *																			1 - CONDITION_OPERATOR_NOT_EQUAL
-	 *																		for types ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE
-	 *																		or ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
-	 *																			0 - CONDITION_OPERATOR_EQUAL;
-	 *																			1 - CONDITION_OPERATOR_NOT_EQUAL;
-	 *																			2 - CONDITION_OPERATOR_LIKE;
-	 *																			3 - CONDITION_OPERATOR_NOT_LIKE.
-	 * @param string $correlations[]['filter']['conditions'][]['groupid']	Correlation host group ID. Optional, but
-	 *																		required when "type" is:
-	 *																			2 - ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP.
-	 * @param string $correlations[]['filter']['conditions'][]['newtag']	Correlation condition new (current) tag.
-	 * @param string $correlations[]['filter']['conditions'][]['oldtag']	Correlation condition old (target/matching)
-	 *																		tag.
-	 * @param string $correlations[]['filter']['conditions'][]['value']		Correlation condition tag value (optional).
-	 * @param array	 $correlations[]['operations']							An array of correlation operations.
-	 * @param int	 $correlations[]['operations'][]['type']				Correlation operation type.
-	 *																		Possible values are:
-	 *																			0 - ZBX_CORR_OPERATION_CLOSE_OLD;
-	 *																			1 - ZBX_CORR_OPERATION_CLOSE_NEW.
+	 * @param array $correlations  An array of correlations.
 	 *
 	 * @return array
 	 */
 	public function create($correlations) {
-		$correlations = zbx_toArray($correlations);
+		self::validateCreate($correlations);
 
-		$this->validateCreate($correlations);
+		$correlation_tables = [];
 
-		foreach ($correlations as &$correlation) {
+		foreach ($correlations as $correlation) {
 			$correlation['evaltype'] = $correlation['filter']['evaltype'];
-			unset($correlation['formula']);
+			$correlation_tables[] = $correlation;
 		}
-		unset($correlation);
 
 		// Insert correlations into DB, get back array with new correlation IDs.
-		$correlations = DB::save('correlation', $correlations);
-		$correlations = zbx_toHash($correlations, 'correlationid');
+		$correlationids = DB::insert('correlation',$correlation_tables);
 
-		$conditions_to_create = [];
-		$operations_to_create = [];
+		foreach ($correlations as $index => &$correlation) {
+			$correlation['correlationid'] = $correlationids[$index];
+		}
+		unset($correlation);
+
+		self::updateConditionsAndOperations($correlations, __FUNCTION__);
+
+		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_CORRELATION, $correlations);
+
+		return ['correlationids' => $correlationids];
+	}
+
+	private static function updateConditionsAndOperations(array &$correlations, string $method,
+			array $db_correlations = null): void {
+		$ins_conditions = [];
+		$ins_operations = [];
+		$del_corr_conditionids = [];
+		$del_corr_operationids = [];
 
 		// Collect conditions and operations to be created and set appropriate correlation ID.
-		foreach ($correlations as $correlationid => &$correlation) {
-			foreach ($correlation['filter']['conditions'] as $condition) {
-				$condition['correlationid'] = $correlationid;
-				$conditions_to_create[] = $condition;
+		foreach ($correlations as &$correlation) {
+			$db_correlation = ($method === 'update')
+				? $db_correlations[$correlation['correlationid']]
+				: [];
+
+			if (array_key_exists('filter', $correlation) && array_key_exists('conditions', $correlation['filter'])) {
+				$db_conditions = ($method === 'update')
+					? $db_correlation['filter']['conditions']
+					: [];
+
+				foreach ($correlation['filter']['conditions'] as &$condition) {
+					$db_condition = CCorrelationHelper::getDbConditionByCondition($db_conditions, $condition);
+					if ($db_condition) {
+						$condition['corr_conditionid'] = $db_condition['corr_conditionid'];
+
+						unset($db_conditions[$db_condition['corr_conditionid']]);
+					}
+					else {
+						$ins_conditions[] = [
+							'correlationid' => $correlation['correlationid'],
+							'type' => $condition['type']
+						];
+					}
+				}
+				unset($condition);
+
+				$del_corr_conditionids = array_merge($del_corr_conditionids, array_keys($db_conditions));
 			}
 
-			foreach ($correlation['operations'] as $operation) {
-				$operation['correlationid'] = $correlationid;
-				$operations_to_create[] = $operation;
+			if (!array_key_exists('operations', $correlation)) {
+				continue;
+			}
+
+			$db_operations = ($method === 'update')
+				? array_column($db_correlation['operations'], null, 'type')
+				: [];
+
+			foreach ($correlation['operations'] as &$operation) {
+				if (array_key_exists($operation['type'], $db_operations)) {
+					$operation['corr_operationid'] = $db_operations[$operation['type']]['corr_operationid'];
+					unset($db_operations[$operation['type']]);
+				}
+				else {
+					$ins_operations[] = ['correlationid' => $correlation['correlationid']] + $operation;
+				}
+			}
+			unset($operation);
+
+			$del_corr_operationids = array_merge($del_corr_operationids,
+				array_column($db_operations, 'corr_operationid')
+			);
+		}
+		unset($correlation);
+
+		if ($ins_conditions) {
+			$conditionids = DB::insert('corr_condition', $ins_conditions);
+		}
+
+		if ($ins_operations) {
+			$operationids = DB::insert('corr_operation', $ins_operations);
+		}
+
+		if ($del_corr_operationids) {
+			DB::delete('corr_operation', ['corr_operationid' => $del_corr_operationids]);
+		}
+
+		if ($del_corr_conditionids) {
+			DB::delete('corr_condition', ['corr_conditionid' => $del_corr_conditionids]);
+			DB::delete('corr_condition_tag', ['corr_conditionid' => $del_corr_conditionids]);
+			DB::delete('corr_condition_group', ['corr_conditionid' => $del_corr_conditionids]);
+			DB::delete('corr_condition_tagpair', ['corr_conditionid' => $del_corr_conditionids]);
+			DB::delete('corr_condition_tagvalue', ['corr_conditionid' => $del_corr_conditionids]);
+		}
+
+		$ins_condition_tags = [];
+		$ins_condition_hostgroups = [];
+		$ins_condition_tag_pairs = [];
+		$ins_condition_tag_values = [];
+
+		$upd_condition_tags = [];
+		$upd_condition_hostgroups = [];
+		$upd_condition_tag_pairs = [];
+		$upd_condition_tag_values = [];
+
+		foreach ($correlations as &$correlation) {
+			if (array_key_exists('filter', $correlation) && array_key_exists('conditions', $correlation['filter'])) {
+				foreach ($correlation['filter']['conditions'] as &$condition) {
+					if (array_key_exists('corr_conditionid', $condition)) {
+						switch ($condition['type']) {
+							case ZBX_CORR_CONDITION_OLD_EVENT_TAG:
+							case ZBX_CORR_CONDITION_NEW_EVENT_TAG:
+								$upd_condition_tags[] = [
+									'values' => $condition,
+									'where' => ['corr_conditionid' => $condition['corr_conditionid']]
+								];
+								break;
+
+							case ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP:
+								$upd_condition_hostgroups[] = [
+									'values' => $condition,
+									'where' => ['corr_conditionid' => $condition['corr_conditionid']]
+								];
+								break;
+
+							case ZBX_CORR_CONDITION_EVENT_TAG_PAIR:
+								$upd_condition_tag_pairs[] = [
+									'values' => $condition,
+									'where' => ['corr_conditionid' => $condition['corr_conditionid']]
+								];
+								break;
+
+							case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
+							case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
+								$upd_condition_tag_values[] = [
+									'values' => $condition,
+									'where' => ['corr_conditionid' => $condition['corr_conditionid']]
+								];
+								break;
+						}
+					}
+					else {
+						$condition['corr_conditionid'] = array_shift($conditionids);
+
+						switch ($condition['type']) {
+							case ZBX_CORR_CONDITION_OLD_EVENT_TAG:
+							case ZBX_CORR_CONDITION_NEW_EVENT_TAG:
+								$ins_condition_tags[] = $condition;
+								break;
+
+							case ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP:
+								$ins_condition_hostgroups[] = $condition;
+								break;
+
+							case ZBX_CORR_CONDITION_EVENT_TAG_PAIR:
+								$ins_condition_tag_pairs[] = $condition;
+								break;
+
+							case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
+							case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
+								$ins_condition_tag_values[] = $condition;
+								break;
+						}
+					}
+				}
+				unset($condition);
+
+				if (array_key_exists('evaltype', $correlation['filter'])
+						&& $correlation['filter']['evaltype']
+							!= $db_correlations[$correlation['correlationid']]['filter']['evaltype']) {
+					if ($correlation['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+						self::updateFormula($correlation['correlationid'], $correlation['filter']['formula'],
+							$correlation['filter']['conditions']
+						);
+					}
+				}
+			}
+
+			if (array_key_exists('operations', $correlation)) {
+				foreach ($correlation['operations'] as &$operation) {
+					if (!array_key_exists('corr_operationid', $operation)) {
+						$operation['corr_operationid'] = array_shift($operationids);
+					}
+				}
+				unset($operation);
 			}
 		}
 		unset($correlation);
 
-		$conditions = $this->addConditions($conditions_to_create);
-
-		// Group back created correlation conditions by correlation ID to be used for updating correlation formula.
-		$conditions_for_correlations = [];
-		foreach ($conditions as $condition) {
-			$conditions_for_correlations[$condition['correlationid']][$condition['corr_conditionid']] = $condition;
+		if ($ins_condition_tags) {
+			DB::insert('corr_condition_tag', $ins_condition_tags, false);
 		}
 
-		// Update "formula" field if evaluation method is a custom expression.
-		foreach ($correlations as $correlationid => $correlation) {
-			if ($correlation['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-				$this->updateFormula($correlationid, $correlation['filter']['formula'],
-					$conditions_for_correlations[$correlationid]
-				);
-			}
+		if ($ins_condition_hostgroups) {
+			DB::insert('corr_condition_group', $ins_condition_hostgroups, false);
 		}
 
-		DB::save('corr_operation', $operations_to_create);
+		if ($ins_condition_tag_pairs) {
+			DB::insert('corr_condition_tagpair', $ins_condition_tag_pairs, false);
+		}
 
-		return ['correlationids' => array_keys($correlations)];
+		if ($ins_condition_tag_values) {
+			DB::insert('corr_condition_tagvalue', $ins_condition_tag_values, false);
+		}
+
+		if ($upd_condition_tags) {
+			DB::update('corr_condition_tag', $upd_condition_tags);
+		}
+
+		if ($upd_condition_hostgroups) {
+			DB::update('corr_condition_group', $upd_condition_hostgroups);
+		}
+
+		if ($upd_condition_tag_pairs) {
+			DB::update('corr_condition_tagpair', $upd_condition_tag_pairs);
+		}
+
+		if ($upd_condition_tag_values) {
+			DB::update('corr_condition_tagvalue', $upd_condition_tag_values);
+		}
 	}
 
 	/**
 	 * Update correlations.
 	 *
-	 * @param array  $correlations											An array of correlations.
-	 * @param string $correlations[]['name']								Correlation name (optional).
-	 * @param string $correlations[]['description']							Correlation description (optional).
-	 * @param int	 $correlations[]['status']								Correlation status (optional).
-	 *																		Possible values are:
-	 *																			0 - ZBX_CORRELATION_ENABLED;
-	 *																			1 - ZBX_CORRELATION_DISABLED.
-	 * @param array	 $correlations[]['filter']								Correlation filter that contains evaluation
-	 *																		method, formula and conditions.
-	 * @param int	 $correlations[]['filter']['evaltype']					Correlation condition evaluation
-	 *																		method (optional).
-	 *																		Possible values are:
-	 *																			0 - CONDITION_EVAL_TYPE_AND_OR;
-	 *																			1 - CONDITION_EVAL_TYPE_AND;
-	 *																			2 - CONDITION_EVAL_TYPE_OR;
-	 *																			3 - CONDITION_EVAL_TYPE_EXPRESSION.
-	 * @param string $correlations[]['filter']['formula']					User-defined expression to be used for
-	 *																		evaluating conditions of filters with a
-	 *																		custom expression. Optional, but required
-	 *																		when evaluation method is changed to
-	 *																		CONDITION_EVAL_TYPE_EXPRESSION (or remains the same)
-	 *																		and new conditions are set.
-	 * @param array  $correlations[]['filter']['conditions']				An array of correlation conditions (optional).
-	 * @param int	 $correlations[]['filter']['conditions'][]['type']		Condition type. Optional, but required when
-	 *																		new conditions are set.
-	 *																		Possible values are:
-	 *																			0 - ZBX_CORR_CONDITION_OLD_EVENT_TAG;
-	 *																			1 - ZBX_CORR_CONDITION_NEW_EVENT_TAG;
-	 *																			2 - ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP;
-	 *																			3 - ZBX_CORR_CONDITION_EVENT_TAG_PAIR;
-	 *																			4 - ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE;
-	 *																			5 - ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE.
-	 * @param string $correlations[]['filter']['conditions'][]['formulaid']	Condition formula ID. Optional, but required
-	 *																		when evaluation method is changed to
-	 *																		CONDITION_EVAL_TYPE_EXPRESSION (or remains the same)
-	 *																		and new conditions are set.
-	 * @param string $correlations[]['filter']['conditions'][]['tag']		Correlation condition tag.
-	 * @param int	 $correlations[]['filter']['conditions'][]['operator']	Correlation condition operator. Optional,
-	 *																		but required when "type" is changed to one
-	 *																		of the following:
-	 *																			2 - ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP;
-	 *																			4 - ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE;
-	 *																			5 - ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE.
-	 *																		Possible values depend on type:
-	 *																		for type ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP:
-	 *																			0 - CONDITION_OPERATOR_EQUAL
-	 *																			1 - CONDITION_OPERATOR_NOT_EQUAL
-	 *																		for types ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE
-	 *																		or ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
-	 *																			0 - CONDITION_OPERATOR_EQUAL;
-	 *																			1 - CONDITION_OPERATOR_NOT_EQUAL;
-	 *																			2 - CONDITION_OPERATOR_LIKE;
-	 *																			3 - CONDITION_OPERATOR_NOT_LIKE.
-	 * @param string $correlations[]['filter']['conditions'][]['groupid']	Correlation host group ID. Optional, but
-	 *																		required when "type" is changed to:
-	 *																			2 - ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP.
-	 * @param string $correlations[]['filter']['conditions'][]['newtag']	Correlation condition new (current) tag.
-	 * @param string $correlations[]['filter']['conditions'][]['oldtag']	Correlation condition old (target/matching)
-	 *																		tag.
-	 * @param string $correlations[]['filter']['conditions'][]['value']		Correlation condition tag value (optional).
-	 * @param array  $correlations[]['operations']							An array of correlation operations (optional).
-	 * @param int	 $correlations[]['operations'][]['type']				Correlation operation type (optional).
-	 *																		Possible values are:
-	 *																			0 - ZBX_CORR_OPERATION_CLOSE_OLD;
-	 *																			1 - ZBX_CORR_OPERATION_CLOSE_NEW.
+	 * @param array $correlations  An array of correlations.
 	 *
 	 * @return array
 	 */
 	public function update($correlations) {
-		$correlations = zbx_toArray($correlations);
-		$db_correlations = [];
+		self::validateUpdate($correlations, $db_correlations);
 
-		$this->validateUpdate($correlations, $db_correlations);
-
-		$correlations_to_update = [];
-		$conditions_to_create = [];
-		$conditions_to_delete = [];
-		$operations_to_create = [];
-		$operations_to_delete = [];
+		$upd_correlations = [];
 
 		foreach ($correlations as $correlation) {
 			$correlationid = $correlation['correlationid'];
 
-			unset($correlation['evaltype'], $correlation['formula'], $correlation['correlationid']);
-
-			$db_correlation = $db_correlations[$correlationid];
-
-			// Remove fields that have not been changed for correlations.
-			if (array_key_exists('name', $correlation) && $correlation['name'] === $db_correlation['name']) {
-				unset($correlation['name']);
+			$correlation_update_object = [];
+			$db_correlation_update_object = [];
+			if (array_key_exists('name', $correlation)) {
+				$correlation_update_object['name'] = $correlation['name'];
+				$db_correlation_update_object['name'] = $db_correlations[$correlationid]['name'];
+			}
+			if (array_key_exists('description', $correlation)) {
+				$correlation_update_object['description'] = $correlation['description'];
+				$db_correlation_update_object['description'] = $db_correlations[$correlationid]['description'];
+			}
+			if (array_key_exists('status', $correlation)) {
+				$correlation_update_object['status'] = $correlation['status'];
+				$db_correlation_update_object['status'] = $db_correlations[$correlationid]['status'];
+			}
+			if (array_key_exists('filter', $correlation) && array_key_exists('evaltype', $correlation['filter'])) {
+				$correlation_update_object['evaltype'] = $correlation['filter']['evaltype'];
+				$db_correlation_update_object['evaltype'] = $db_correlations[$correlationid]['filter']['evaltype'];
+			}
+			if (array_key_exists('filter', $correlation) && array_key_exists('formula', $correlation['filter'])) {
+				$correlation_update_object['formula'] = $correlation['filter']['formula'];
+				$db_correlation_update_object['formula'] = $db_correlations[$correlationid]['filter']['formula'];
 			}
 
-			if (array_key_exists('description', $correlation)
-					&& $correlation['description'] === $db_correlation['description']) {
-				unset($correlation['description']);
-			}
+			$upd_correlation = DB::getUpdatedValues('correlation', $correlation_update_object,
+				$db_correlation_update_object
+			);
 
-			if (array_key_exists('status', $correlation) && $correlation['status'] == $db_correlation['status']) {
-				unset($correlation['status']);
-			}
-
-			$evaltype_changed = false;
-
-			// If the filter is set, something might have changed.
-			if (array_key_exists('filter', $correlation)) {
-				// Delete old correlation conditions and create new conditions.
-				if (array_key_exists('conditions', $correlation['filter'])) {
-					$conditions_to_delete[$correlationid] = true;
-
-					foreach ($correlation['filter']['conditions'] as $condition) {
-						$condition['correlationid'] = $correlationid;
-						$conditions_to_create[] = $condition;
-					}
-				}
-
-				// Check if evaltype has changed.
-				if (array_key_exists('evaltype', $correlation['filter'])) {
-					if ($correlation['filter']['evaltype'] != $db_correlation['filter']['evaltype']) {
-						// Clear formula field evaluation method if evaltype has changed.
-						$correlation['evaltype'] = $correlation['filter']['evaltype'];
-
-						if ($correlation['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
-							$correlation['formula'] = '';
-						}
-					}
-				}
-			}
-
-			// Delete old correlation operations and create new operations.
-			if (array_key_exists('operations', $correlation)) {
-				$operations_to_delete[$correlationid] = true;
-
-				foreach ($correlation['operations'] as $operation) {
-					$operation['correlationid'] = $correlationid;
-					$operations_to_create[] = $operation;
-				}
-			}
-
-			// Add values only if something is set for update.
-			if (array_key_exists('name', $correlation)
-					|| array_key_exists('description', $correlation)
-					|| array_key_exists('status', $correlation)
-					|| array_key_exists('evaltype', $correlation)) {
-				$correlations_to_update[] = [
-					'values' => $correlation,
+			if ($upd_correlation) {
+				$upd_correlations[] = [
+					'values' => $upd_correlation,
 					'where' => ['correlationid' => $correlationid]
 				];
 			}
 		}
 
-		// Update correlations.
-		if ($correlations_to_update) {
-			DB::update('correlation', $correlations_to_update);
+		if ($upd_correlations) {
+			DB::update('correlation', $upd_correlations);
 		}
 
-		// Update conditions. Delete the old ones and create new ones.
-		if ($conditions_to_delete) {
-			DB::delete('corr_condition', ['correlationid' => array_keys($conditions_to_delete)]);
-		}
+		self::updateConditionsAndOperations($correlations, __FUNCTION__, $db_correlations);
 
-		if ($conditions_to_create) {
-			$conditions = $this->addConditions($conditions_to_create);
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_CORRELATION, $correlations, $db_correlations);
 
-			// Group back created correlation conditions by correlation ID to be used for updating correlation formula.
-			$conditions_for_correlations = [];
-			foreach ($conditions as $condition) {
-				$conditions_for_correlations[$condition['correlationid']][$condition['corr_conditionid']] = $condition;
-			}
-
-			// Update "formula" field if evaluation method is a custom expression.
-			foreach ($correlations as $correlation) {
-				if (array_key_exists('filter', $correlation)) {
-					$db_correlation = $db_correlations[$correlation['correlationid']];
-
-					// Check if evaluation method has changed.
-					if (array_key_exists('evaltype', $correlation['filter'])) {
-						if ($correlation['filter']['evaltype'] != $db_correlation['filter']['evaltype']) {
-							// The new evaluation method will be saved to DB.
-							$correlation['evaltype'] = $correlation['filter']['evaltype'];
-
-							if ($correlation['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-								// When evaluation method has changed, update the custom formula.
-								$this->updateFormula($correlation['correlationid'], $correlation['filter']['formula'],
-									$conditions_for_correlations[$correlation['correlationid']]
-								);
-							}
-						}
-						else {
-							/*
-							 * The evaluation method has not been changed, but it has been set and it's a custom
-							 * expression. The formula needs to be updated in this case.
-							 */
-							if ($correlation['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-								$this->updateFormula($correlation['correlationid'], $correlation['filter']['formula'],
-									$conditions_for_correlations[$correlation['correlationid']]
-								);
-							}
-						}
-					}
-					elseif ($db_correlation['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-						/*
-						 * The evaluation method has not been changed and was not set. It's read from DB, but it's still
-						 * a custom expression and there are new conditions, so the formula needs to be updated.
-						 */
-						$this->updateFormula($correlation['correlationid'], $correlation['filter']['formula'],
-							$conditions_for_correlations[$correlation['correlationid']]
-						);
-					}
-				}
-			}
-		}
-
-		// Update operations. Delete the old ones and create new ones.
-		if ($operations_to_delete) {
-			DB::delete('corr_operation', ['correlationid' => array_keys($operations_to_delete)]);
-		}
-
-		if ($operations_to_create) {
-			DB::save('corr_operation', $operations_to_create);
-		}
-
-		return ['correlationids' => zbx_objectValues($correlations, 'correlationid')];
+		return ['correlationids' => array_column($correlations, 'correlationid')];
 	}
 
 	/**
 	 * Delete correlations.
 	 *
-	 * @param array $correlationids					An array of correlation IDs.
+	 * @param array $correlationids  An array of correlation IDs.
 	 *
 	 * @return array
 	 */
 	public function delete(array $correlationids) {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-		}
+		self::validateDelete($correlationids, $db_correlations);
 
+		DB::delete('correlation', ['correlationid' => $correlationids]);
+
+		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_CORRELATION, $db_correlations);
+
+		return ['correlationids' => $correlationids];
+	}
+
+	/**
+	 * Validates the input parameters for the delete() method.
+	 *
+	 * @param array      $correlationids
+	 * @param array|null $db_correlations
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	private static function validateDelete(array $correlationids, array &$db_correlations = null): void {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+
 		if (!CApiInputValidator::validate($api_input_rules, $correlationids, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$db_correlations = $this->get([
+		$db_correlations = DB::select('correlation', [
 			'output' => ['correlationid', 'name'],
 			'correlationids' => $correlationids,
 			'preservekeys' => true
 		]);
 
-		foreach ($correlationids as $correlationid) {
-			if (!array_key_exists($correlationid, $db_correlations)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
+		if (count($db_correlations) != count($correlationids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+	}
+
+	/**
+	 * Check for unique event correlation names.
+	 *
+	 * @static
+	 *
+	 * @param array      $correlations
+	 * @param array|null $db_correlations
+	 *
+	 * @throws APIException if event correlation  names are not unique.
+	 */
+	protected static function checkDuplicates(array $correlations, array $db_correlations = null): void {
+		$names = [];
+
+		foreach ($correlations as $correlation) {
+			if (!array_key_exists('name', $correlation)) {
+				continue;
+			}
+
+			if ($db_correlations === null
+					|| $correlation['name'] !== $db_correlations[$correlation['correlationid']]['name']) {
+				$names[] = $correlation['name'];
 			}
 		}
 
-		DB::delete('correlation', ['correlationid' => $correlationids]);
+		if (!$names) {
+			return;
+		}
 
-		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_CORRELATION, $db_correlations);
+		$duplicates = DB::select('correlation', [
+			'output' => ['name'],
+			'filter' => ['name' => $names],
+			'limit' => 1
+		]);
 
-		return ['correlationids' => $correlationids];
+		if ($duplicates) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Correlation "%1$s" already exists.', $duplicates[0]['name']));
+		}
 	}
 
 	/**
@@ -514,427 +513,165 @@ class CCorrelation extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateCreate(array $correlations) {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only super admins can create correlations.'));
+	private static function validateCreate(array &$correlations): void {
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
+			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('correlation', 'name')],
+			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('correlation', 'description')],
+			'status' =>			['type' => API_INT32, 'in' => ZBX_CORRELATION_ENABLED.','.ZBX_CORRELATION_DISABLED],
+			'filter' =>			['type' => API_OBJECT, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
+				'evaltype' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION])],
+				'formula' =>		['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'evaltype', 'in' => CONDITION_EVAL_TYPE_EXPRESSION], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('correlation', 'formula')],
+										['if' => ['field' => 'evaltype', 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR])], 'type' => API_STRING_UTF8, 'in' => '']
+				]],
+				'conditions' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['formulaid']], 'fields' => [
+					'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP, ZBX_CORR_CONDITION_EVENT_TAG_PAIR, ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE])],
+					'formulaid' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('correlation', 'formula')],
+					'operator' =>		['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
+											['if' => ['field' => 'type', 'in' => ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP], 'type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL])],
+											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE])], 'type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE])],
+											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_EVENT_TAG_PAIR])], 'type' => API_INT32, 'in' => CONDITION_OPERATOR_EQUAL]
+					]],
+					'tag' =>			['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('corr_condition_tag', 'tag')],
+											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP, ZBX_CORR_CONDITION_EVENT_TAG_PAIR])], 'type' => API_STRING_UTF8, 'in' => '']
+					]],
+					'groupid' =>		['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'type', 'in' => ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP], 'type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_EVENT_TAG_PAIR, ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE])], 'type' => API_STRING_UTF8, 'in' => '']
+					]],
+					'oldtag' =>			['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'type', 'in' => ZBX_CORR_CONDITION_EVENT_TAG_PAIR], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('corr_condition_tagpair', 'oldtag')],
+											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP, ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE])], 'type' => API_STRING_UTF8, 'in' => '']
+					]],
+					'newtag' =>			['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'type', 'in' => ZBX_CORR_CONDITION_EVENT_TAG_PAIR], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('corr_condition_tagpair', 'newtag')],
+											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP, ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE])], 'type' => API_STRING_UTF8, 'in' => '']
+					]],
+					'value' =>			['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('corr_condition_tagvalue', 'value')],
+											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP, ZBX_CORR_CONDITION_EVENT_TAG_PAIR])], 'type' => API_STRING_UTF8, 'in' => '']
+					]]
+				]]
+			]],
+			'operations' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['type']], 'fields' => [
+				'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => ZBX_CORR_OPERATION_CLOSE_OLD.','.ZBX_CORR_OPERATION_CLOSE_NEW],
+			]]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $correlations, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if (!$correlations) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
-		}
+		self::checkDuplicates($correlations);
+		self::validateFormula($correlations, __FUNCTION__);
+		self::checkHostGroups($correlations);
+	}
 
-		$required_fields = ['name', 'filter', 'operations'];
-
-		// Validate required fields and check if "name" is not empty.
-		foreach ($correlations as $correlation) {
-			if (!is_array($correlation)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-			}
-
-			// Check required parameters.
-			$missing_keys = array_diff($required_fields, array_keys($correlation));
-
-			if ($missing_keys) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Correlation is missing parameters: %1$s', implode(', ', $missing_keys))
-				);
-			}
-
-			// Validate "name" field.
-			if (is_array($correlation['name'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-			}
-			elseif ($correlation['name'] === '' || $correlation['name'] === null || $correlation['name'] === false) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Correlation name cannot be empty.'));
-			}
-		}
-
-		// Check for duplicate names.
-		$duplicate = CArrayHelper::findDuplicate($correlations, 'name');
-		if ($duplicate) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Duplicate "%1$s" value "%2$s" for correlation.', 'name', $duplicate['name'])
-			);
-		}
-
-		// Check if correlation already exists.
-		$db_correlations = API::getApiService()->select('correlation', [
-			'output' => ['name'],
-			'filter' => ['name' => zbx_objectValues($correlations, 'name')],
-			'limit' => 1
-		]);
-
-		if ($db_correlations) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Correlation "%1$s" already exists.', $correlations[0]['name'])
-			);
-		}
-
-		// Set all necessary validators and parser before cycling each correlation.
-		$status_validator = new CLimitedSetValidator([
-			'values' => [ZBX_CORRELATION_ENABLED, ZBX_CORRELATION_DISABLED]
-		]);
-
-		$filter_evaltype_validator = new CLimitedSetValidator([
-			'values' => [CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_AND_OR,
-				CONDITION_EVAL_TYPE_EXPRESSION
-			]
-		]);
-
-		$filter_condition_type_validator = new CLimitedSetValidator([
-			'values' => [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG,
-				ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP,	ZBX_CORR_CONDITION_EVENT_TAG_PAIR,
-				ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE,	ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE
-			]
-		]);
-
-		$filter_condition_hg_operator_validator = new CLimitedSetValidator([
-			'values' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL]
-		]);
-
-		$filter_condition_tagval_operator_validator = new CLimitedSetValidator([
-			'values' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
-				CONDITION_OPERATOR_NOT_LIKE
-			]
-		]);
-
-		$filter_operations_validator = new CLimitedSetValidator([
-			'values' => [ZBX_CORR_OPERATION_CLOSE_OLD, ZBX_CORR_OPERATION_CLOSE_NEW]
-		]);
-
-		$parser = new CConditionFormula();
-
+	/**
+	 * Check host group permissions.
+	 *
+	 * @static
+	 *
+	 * @param array $correlations
+	 */
+	private static function checkHostGroups(array $correlations): void {
 		$groupids = [];
 
 		foreach ($correlations as $correlation) {
-			// Validate "status" field (optional).
-			if (array_key_exists('status', $correlation) && !$status_validator->validate($correlation['status'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Incorrect value "%1$s" in field "%2$s" for correlation "%3$s".',
-					$correlation['status'],
-					'status',
-					$correlation['name']
-				));
+			if (!array_key_exists('filter', $correlation) || !array_key_exists('conditions', $correlation['filter'])) {
+				continue;
 			}
 
-			// Validate "filter" field.
-			if (!is_array($correlation['filter'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-			}
-
-			// Validate "evaltype" field.
-			if (!array_key_exists('evaltype', $correlation['filter'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect type of calculation for correlation "%1$s".', $correlation['name'])
-				);
-			}
-			elseif (!$filter_evaltype_validator->validate($correlation['filter']['evaltype'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Incorrect value "%1$s" in field "%2$s" for correlation "%3$s".',
-					$correlation['filter']['evaltype'],
-					'evaltype',
-					$correlation['name']
-				));
-			}
-
-			// Check if conditions exist and that array is not empty.
-			if (!array_key_exists('conditions', $correlation['filter'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('No "%1$s" given for correlation "%2$s".', 'conditions', $correlation['name'])
-				);
-			}
-
-			// Validate condition operators and other parameters depending on type.
-			$groupids = $this->validateConditions($correlation, $filter_condition_type_validator,
-				$filter_condition_hg_operator_validator, $filter_condition_tagval_operator_validator
-			);
-
-			// Validate custom expressions and formula.
-			if ($correlation['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-				// Check formula.
-				if (!array_key_exists('formula', $correlation['filter'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('No "%1$s" given for correlation "%2$s".', 'formula', $correlation['name'])
-					);
+			foreach ($correlation['filter']['conditions'] as $condition) {
+				if ($condition['type'] == ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP) {
+					$groupids[] = $condition['groupid'];
 				}
-
-				$this->validateFormula($correlation, $parser);
-
-				// Check condition formula IDs.
-				$this->validateConditionFormulaIDs($correlation, $parser);
 			}
-
-			// Validate operations.
-			$this->validateOperations($correlation, $filter_operations_validator);
 		}
 
-		// Validate collected group IDs if at least one of correlation conditions was "New event host group".
-		if ($groupids) {
-			$groups_count = API::HostGroup()->get([
-				'countOutput' => true,
-				'groupids' => array_keys($groupids)
-			]);
+		if (!$groupids) {
+			return;
+		}
 
-			if ($groups_count != count($groupids)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
+		$groups_count = API::HostGroup()->get([
+			'countOutput' => true,
+			'groupids' => $groupids
+		]);
+
+		if ($groups_count != count($groupids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 	}
 
 	/**
-	 * Validates the input parameters for the update() method.
-	 *
-	 * @param array $correlations
-	 * @param array $db_correlations
+	 * @param array      $correlations
+	 * @param array|null $db_correlations
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateUpdate(array $correlations, array &$db_correlations) {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only super admins can update correlations.'));
+	private static function validateUpdate(array &$correlations, array &$db_correlations = null): void {
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['correlationid'], ['name']], 'fields' => [
+			'correlationid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
+			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('correlation', 'name')],
+			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('correlation', 'description')],
+			'status' =>			['type' => API_INT32, 'in' => ZBX_CORRELATION_ENABLED.','.ZBX_CORRELATION_DISABLED],
+			'filter' =>			['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
+				'evaltype' =>		['type' => API_INT32, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION])],
+				'formula' =>		['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'evaltype', 'in' => CONDITION_EVAL_TYPE_EXPRESSION], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('correlation', 'formula')],
+										['if' => ['field' => 'evaltype', 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR])], 'type' => API_STRING_UTF8, 'in' => '']
+				]],
+				'conditions' =>		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['formulaid']], 'fields' => [
+					'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP, ZBX_CORR_CONDITION_EVENT_TAG_PAIR, ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE])],
+					'formulaid' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('correlation', 'formula')],
+					'operator' =>		['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
+											['if' => ['field' => 'type', 'in' => ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP], 'type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL])],
+											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE])], 'type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE])],
+											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_EVENT_TAG_PAIR])], 'type' => API_INT32, 'in' => CONDITION_OPERATOR_EQUAL]
+					]],
+					'tag' =>			['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('corr_condition_tag', 'tag')],
+											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP, ZBX_CORR_CONDITION_EVENT_TAG_PAIR])], 'type' => API_STRING_UTF8, 'in' => '']
+					]],
+					'groupid' =>		['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'type', 'in' => ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP], 'type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_EVENT_TAG_PAIR, ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE])], 'type' => API_STRING_UTF8, 'in' => '']
+					]],
+					'oldtag' =>			['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'type', 'in' => ZBX_CORR_CONDITION_EVENT_TAG_PAIR], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('corr_condition_tagpair', 'oldtag')],
+											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP, ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE])], 'type' => API_STRING_UTF8, 'in' => '']
+					]],
+					'newtag' =>			['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'type', 'in' => ZBX_CORR_CONDITION_EVENT_TAG_PAIR], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('corr_condition_tagpair', 'newtag')],
+											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP, ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE])], 'type' => API_STRING_UTF8, 'in' => '']
+					]],
+					'value' =>			['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('corr_condition_tagvalue', 'value')],
+											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP, ZBX_CORR_CONDITION_EVENT_TAG_PAIR])], 'type' => API_STRING_UTF8, 'in' => '']
+					]]
+				]]
+			]],
+			'operations' =>		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['type']], 'fields' => [
+				'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => ZBX_CORR_OPERATION_CLOSE_OLD.','.ZBX_CORR_OPERATION_CLOSE_NEW],
+			]]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $correlations, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if (!$correlations) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
-		}
-
-		// Validate given IDs.
-		$this->checkObjectIds($correlations, 'correlationid',
-			_('No "%1$s" given for correlation.'),
-			_('Empty correlation ID.'),
-			_('Incorrect correlation ID.')
-		);
-
-		$db_correlations = $this->get([
+		$db_correlations = DB::select('correlation', [
 			'output' => ['correlationid', 'name', 'description', 'status'],
-			'selectFilter' => ['formula', 'eval_formula', 'evaltype', 'conditions'],
-			'selectOperations' => ['type'],
-			'correlationids' => zbx_objectValues($correlations, 'correlationid'),
+			'correlationids' => array_column($correlations, 'correlationid'),
 			'preservekeys' => true
 		]);
 
-		$check_names = [];
+		self::checkDuplicates($correlations, $db_correlations);
 
-		foreach ($correlations as $correlation) {
-			// Check if this correlation exists.
-			if (!array_key_exists($correlation['correlationid'], $db_correlations)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-
-			// Validate "name" field (optional).
-			if (array_key_exists('name', $correlation)) {
-				if (is_array($correlation['name'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-				}
-				elseif ($correlation['name'] === '' || $correlation['name'] === null || $correlation['name'] === false) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Correlation name cannot be empty.'));
-				}
-
-				if ($db_correlations[$correlation['correlationid']]['name'] !== $correlation['name']) {
-					$check_names[] = $correlation;
-				}
-			}
-		}
-
-		// Check only if names have changed.
-		if ($check_names) {
-			// Check for duplicate names.
-			$duplicate = CArrayHelper::findDuplicate($check_names, 'name');
-			if ($duplicate) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Duplicate "%1$s" value "%2$s" for correlation.', 'name', $duplicate['name'])
-				);
-			}
-
-			// Check if correlation already exists.
-			$db_correlation_names = API::getApiService()->select('correlation', [
-				'output' => ['correlationid', 'name'],
-				'filter' => ['name' => zbx_objectValues($check_names, 'name')]
-			]);
-			$db_correlation_names = zbx_toHash($db_correlation_names, 'name');
-
-			foreach ($check_names as $correlation) {
-				if (array_key_exists($correlation['name'], $db_correlation_names)
-						&& bccomp($db_correlation_names[$correlation['name']]['correlationid'],
-							$correlation['correlationid']) != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Correlation "%1$s" already exists.', $correlation['name'])
-					);
-				}
-			}
-		}
-
-		// Set all necessary validators and parser before cycling each correlation.
-		$status_validator = new CLimitedSetValidator([
-			'values' => [ZBX_CORRELATION_ENABLED, ZBX_CORRELATION_DISABLED]
-		]);
-
-		$filter_evaltype_validator = new CLimitedSetValidator([
-			'values' => [CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_AND_OR,
-				CONDITION_EVAL_TYPE_EXPRESSION
-			]
-		]);
-
-		$filter_condition_type_validator = new CLimitedSetValidator([
-			'values' => [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG,
-				ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP,	ZBX_CORR_CONDITION_EVENT_TAG_PAIR,
-				ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE,	ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE
-			]
-		]);
-
-		$filter_condition_hg_operator_validator = new CLimitedSetValidator([
-			'values' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL]
-		]);
-
-		$filter_condition_tagval_operator_validator = new CLimitedSetValidator([
-			'values' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
-				CONDITION_OPERATOR_NOT_LIKE
-			]
-		]);
-
-		$filter_operations_validator = new CLimitedSetValidator([
-			'values' => [ZBX_CORR_OPERATION_CLOSE_OLD, ZBX_CORR_OPERATION_CLOSE_NEW]
-		]);
-
-		$parser = new CConditionFormula();
-
-		$groupids = [];
-
-		// Populate "name" field, if not set.
-		$correlations = $this->extendFromObjects(zbx_toHash($correlations, 'correlationid'), $db_correlations,
-			['name']
-		);
-
-		foreach ($correlations as $correlation) {
-			$db_correlation = $db_correlations[$correlation['correlationid']];
-
-			// Validate "status" field (optional).
-			if (array_key_exists('status', $correlation) && !$status_validator->validate($correlation['status'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Incorrect value "%1$s" in field "%2$s" for correlation "%3$s".',
-					$correlation['status'],
-					'status',
-					$correlation['name']
-				));
-			}
-
-			// Validate "filter" field. If filter is set, then something else must exist.
-			if (array_key_exists('filter', $correlation)) {
-				if (!is_array($correlation['filter']) || !$correlation['filter']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-				}
-
-				$evaltype_changed = false;
-
-				// Validate "evaltype" field.
-				if (array_key_exists('evaltype', $correlation['filter'])) {
-					// Check if evaltype has changed.
-					if ($correlation['filter']['evaltype'] != $db_correlation['filter']['evaltype']) {
-						if (!$filter_evaltype_validator->validate($correlation['filter']['evaltype'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-								'Incorrect value "%1$s" in field "%2$s" for correlation "%3$s".',
-								$correlation['filter']['evaltype'],
-								'evaltype',
-								$correlation['name']
-							));
-						}
-
-						$evaltype_changed = true;
-					}
-				}
-				else {
-					// Populate "evaltype" field if not set, so we can later check for custom expressions.
-					$correlation['filter']['evaltype'] = $db_correlation['filter']['evaltype'];
-				}
-
-				if ($evaltype_changed) {
-					if ($correlation['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-						if (!array_key_exists('formula', $correlation['filter'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('No "%1$s" given for correlation "%2$s".', 'formula', $correlation['name'])
-							);
-						}
-
-						$this->validateFormula($correlation, $parser);
-
-						if (!array_key_exists('conditions', $correlation['filter'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('No "%1$s" given for correlation "%2$s".', 'conditions', $correlation['name'])
-							);
-						}
-
-						$groupids = $this->validateConditions($correlation, $filter_condition_type_validator,
-							$filter_condition_hg_operator_validator, $filter_condition_tagval_operator_validator
-						);
-
-						$this->validateConditionFormulaIDs($correlation, $parser);
-					}
-					else {
-						if (!array_key_exists('conditions', $correlation['filter'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('No "%1$s" given for correlation "%2$s".', 'conditions', $correlation['name'])
-							);
-						}
-
-						$groupids = $this->validateConditions($correlation, $filter_condition_type_validator,
-							$filter_condition_hg_operator_validator, $filter_condition_tagval_operator_validator
-						);
-					}
-				}
-				else {
-					if ($correlation['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-						if (array_key_exists('formula', $correlation['filter'])) {
-							$this->validateFormula($correlation, $parser);
-
-							if (!array_key_exists('conditions', $correlation['filter'])) {
-								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_s('No "%1$s" given for correlation "%2$s".', 'conditions', $correlation['name'])
-								);
-							}
-
-							$groupids = $this->validateConditions($correlation, $filter_condition_type_validator,
-								$filter_condition_hg_operator_validator, $filter_condition_tagval_operator_validator
-							);
-
-							$this->validateConditionFormulaIDs($correlation, $parser);
-						}
-						elseif (array_key_exists('conditions', $correlation['filter'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('No "%1$s" given for correlation "%2$s".', 'formula', $correlation['name'])
-							);
-						}
-					}
-					elseif (array_key_exists('conditions', $correlation['filter'])) {
-						$groupids = $this->validateConditions($correlation, $filter_condition_type_validator,
-							$filter_condition_hg_operator_validator, $filter_condition_tagval_operator_validator
-						);
-					}
-				}
-			}
-
-			// Validate operations (optional).
-			if (array_key_exists('operations', $correlation)) {
-				$this->validateOperations($correlation, $filter_operations_validator);
-			}
-		}
-
-		// Validate collected group IDs if at least one of correlation conditions was "New event host group".
-		if ($groupids) {
-			$groups_count = API::HostGroup()->get([
-				'countOutput' => true,
-				'groupids' => array_keys($groupids)
-			]);
-
-			if ($groups_count != count($groupids)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-		}
+		self::addAffectedObjects($correlations, $db_correlations);
+		self::validateFormula($correlations, __FUNCTION__, $db_correlations);
+		self::checkHostGroups($correlations);
 	}
 
 	/**
@@ -944,7 +681,7 @@ class CCorrelation extends CApiService {
 	 * @param string 	$formula_with_letters		Formula with letters.
 	 * @param array 	$conditions
 	 */
-	protected function updateFormula($correlationid, $formula_with_letters, array $conditions) {
+	protected static function updateFormula($correlationid, $formula_with_letters, array $conditions) {
 		$formulaid_to_conditionid = [];
 
 		foreach ($conditions as $condition) {
@@ -1207,72 +944,101 @@ class CCorrelation extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateFormula(array $correlation, CConditionFormula $parser) {
-		if (is_array($correlation['filter']['formula'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-		}
+	// protected function validateFormula(array $correlation, CConditionFormula $parser) {
+	// 	if (is_array($correlation['filter']['formula'])) {
+	// 		self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+	// 	}
 
-		if (!$parser->parse($correlation['filter']['formula'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Incorrect custom expression "%2$s" for correlation "%1$s": %3$s.',
-					$correlation['name'], $correlation['filter']['formula'], $parser->error
-				)
-			);
-		}
-	}
+	// 	if (!$parser->parse($correlation['filter']['formula'])) {
+	// 		self::exception(ZBX_API_ERROR_PARAMETERS,
+	// 			_s('Incorrect custom expression "%2$s" for correlation "%1$s": %3$s.',
+	// 				$correlation['name'], $correlation['filter']['formula'], $parser->error
+	// 			)
+	// 		);
+	// 	}
+	// }
 
 	/**
 	 * Validate correlation condition formula IDs. Check the "formulaid" field and that formula matches the conditions.
 	 *
-	 * @param array				$correlation										One correlation containing array of
-	 *																				conditions and name.
-	 * @param string			$correlation['name']								Correlation name for error messages.
-	 * @param array				$correlation['filter']								Correlation filter array containing
-	 *																				the conditions.
-	 * @param array				$correlation['filter']['conditions']				An array of correlation conditions.
-	 * @param string			$correlation['filter']['conditions'][]['formulaid']	Condition formula ID.
-	 * @param CConditionFormula $parser												Condition formula parser.
+	 * @static
+	 *
+	 * @param array $correlations
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateConditionFormulaIDs(array $correlation, CConditionFormula $parser) {
-		foreach ($correlation['filter']['conditions'] as $condition) {
-			if (!array_key_exists('formulaid', $condition)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('No "%1$s" given for correlation "%2$s".', 'formulaid', $correlation['name'])
-				);
-			}
-			elseif (is_array($condition['formulaid'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-			}
-			elseif (!preg_match('/[A-Z]+/', $condition['formulaid'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect filter condition formula ID given for correlation "%1$s".', $correlation['name'])
-				);
-			}
-		}
+	protected static function validateFormula(array $correlations, string $method, array $db_correlations = null): void {
+		$parser = new CConditionFormula();
 
-		$conditions = zbx_toHash($correlation['filter']['conditions'], 'formulaid');
-		$constants = array_unique(zbx_objectValues($parser->constants, 'value'));
-
-		foreach ($constants as $constant) {
-			if (!array_key_exists($constant, $conditions)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Condition "%2$s" used in formula "%3$s" for correlation "%1$s" is not defined.',
-					$correlation['name'], $constant, $correlation['filter']['formula']
-				));
+		foreach ($correlations as $i => $correlation) {
+			if (!array_key_exists('filter', $correlation)) {
+				continue;
 			}
 
-			unset($conditions[$constant]);
-		}
+			$filter_evaltype = ($method === 'validateUpdate')
+				? (
+					array_key_exists('evaltype', $correlation['filter'])
+						? $correlation['filter']['evaltype']
+						: $db_correlations['filter']['evaltype']
+				)
+				: $correlation['filter']['evaltype'];
 
-		// Check that the "conditions" array has no unused conditions.
-		if ($conditions) {
-			$condition = reset($conditions);
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-				'Condition "%2$s" is not used in formula "%3$s" for correlation "%1$s".', $correlation['name'],
-				$condition['formulaid'], $correlation['filter']['formula']
-			));
+			if ($filter_evaltype != CONDITION_EVAL_TYPE_EXPRESSION) {
+				if (!array_key_exists('conditions', $correlation['filter'])) {
+					continue;
+				}
+
+				foreach ($correlation['filter']['conditions'] as $j => $condition) {
+					if (array_key_exists('formulaid', $condition) && $condition['formulaid'] != '') {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Invalid parameter "%1$s": %2$s.',
+								'/'.($i + 1).'/filter/conditions/'.($j + 1).'/formulaid',
+								_('value must be empty')
+							)
+						);
+					}
+				}
+			}
+			else {
+				if (!$parser->parse($correlation['filter']['formula'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1).'/filter/formula', $parser->error)
+					);
+				}
+
+				if (!array_key_exists('conditions', $correlation['filter'])) {
+					continue;
+				}
+
+				$conditions = array_column($correlation['filter']['conditions'], 'formulaid', 'formulaid');
+				$constants = array_column($parser->constants, 'value', 'value');
+
+				if (count($conditions) != count($constants)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1).'/filter/formula', _('incorrect value')) // FIXME: rephrase message
+					);
+				}
+
+				foreach ($correlation['filter']['conditions'] as $j => $condition) {
+					if (!preg_match('/^[A-Z]+$/', $condition['formulaid'])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Invalid parameter "%1$s": %2$s.',
+								'/'.($i + 1).'/filter/conditions/'.($j + 1).'/formulaid',
+								_('incorrect value')
+							)
+						);
+					}
+
+					if (!array_key_exists($condition['formulaid'], $constants)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Invalid parameter "%1$s": %2$s.',
+								'/'.($i + 1).'/filter/conditions/'.($j + 1).'/formulaid',
+								_s('not defined in %1$s', '/'.($i + 1).'/filter/formula')
+							)
+						);
+					}
+				}
+			}
 		}
 	}
 
@@ -1340,14 +1106,16 @@ class CCorrelation extends CApiService {
 	 * @return array
 	 */
 	protected function addConditions(array $conditions) {
-		$conditions = DB::save('corr_condition', $conditions);
+		$conditionids = DB::insert('corr_condition', $conditions);
 
 		$corr_condition_tags_to_create = [];
 		$corr_condition_hostgroups_to_create = [];
 		$corr_condition_tag_pairs_to_create = [];
 		$corr_condition_tag_values_to_create = [];
 
-		foreach ($conditions as $condition) {
+		foreach ($conditions as $index => &$condition) {
+			$condition = ['corr_conditionid' => $conditionids[$index]] + $condition;
+
 			switch ($condition['type']) {
 				case ZBX_CORR_CONDITION_OLD_EVENT_TAG:
 				case ZBX_CORR_CONDITION_NEW_EVENT_TAG:
@@ -1368,6 +1136,7 @@ class CCorrelation extends CApiService {
 					break;
 			}
 		}
+		unset($condition);
 
 		if ($corr_condition_tags_to_create) {
 			DB::insert('corr_condition_tag', $corr_condition_tags_to_create, false);
@@ -1568,5 +1337,119 @@ class CCorrelation extends CApiService {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * @static
+	 *
+	 * @param array $correlations
+	 * @param array $db_correlations
+	 */
+	private static function addAffectedObjects(array $correlations, array &$db_correlations): void {
+		$correlationids = [/* 'filter' => [], */ 'conditions' => [], 'operations' => []];
+
+		foreach ($correlations as $correlation) {
+			if (array_key_exists('filter', $correlation) && array_key_exists('conditions', $correlation['filter'])) {
+				$correlationids['conditions'] = $correlation['correlationid'];
+				$db_correlations[$correlation['correlationid']]['filter']['conditions'] = [];
+			}
+
+			if (array_key_exists('operations', $correlation)) {
+				$correlationids['operations'] = $correlation['correlationid'];
+				$db_correlations[$correlation['correlationid']]['operations'] = [];
+			}
+		}
+
+		$options = [
+			'output' => ['correlationid', 'evaltype', 'formula'],
+			'filter' => ['correlationid' => array_column($correlations, 'correlationid')]
+		];
+		$db_filters = DBselect(DB::makeSql('correlation', $options));
+
+		while ($db_filter = DBfetch($db_filters)) {
+			$db_correlations[$db_filter['correlationid']]['filter'] =
+				array_diff_key($db_filter, array_flip(['correlationid']));
+		}
+
+		if ($correlationids['conditions']) {
+			$conditions = [];
+			$sql = 'SELECT c.correlationid,c.corr_conditionid,c.type,ct.tag AS ct_tag,'.
+					'cg.operator AS cg_operator,cg.groupid,ctp.oldtag,ctp.newtag,ctv.tag AS ctv_tag,'.
+					'ctv.operator AS ctv_operator,ctv.value'.
+				' FROM corr_condition c'.
+				' LEFT JOIN corr_condition_tag ct ON ct.corr_conditionid = c.corr_conditionid'.
+				' LEFT JOIN corr_condition_group cg ON cg.corr_conditionid = c.corr_conditionid'.
+				' LEFT JOIN corr_condition_tagpair ctp ON ctp.corr_conditionid = c.corr_conditionid'.
+				' LEFT JOIN corr_condition_tagvalue ctv ON ctv.corr_conditionid = c.corr_conditionid'.
+				' WHERE '.dbConditionId('c.correlationid', [$correlationids['conditions']]);
+			$db_conditions = DBselect($sql);
+
+			while ($db_condition = DBfetch($db_conditions)) {
+				$condition = [
+					'corr_conditionid' => $db_condition['corr_conditionid'],
+					'type' => $db_condition['type'],
+					'formulaid' => ''
+				];
+
+				switch ($db_condition['type']) {
+					case ZBX_CORR_CONDITION_OLD_EVENT_TAG:
+					case ZBX_CORR_CONDITION_NEW_EVENT_TAG:
+						$condition['tag'] = $db_condition['ct_tag'];
+						$condition['operator'] = CONDITION_OPERATOR_EQUAL;
+						break;
+
+					case ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP:
+						$condition['groupid'] = $db_condition['groupid'];
+						$condition['operator'] = $db_condition['cg_operator'];
+						break;
+
+					case ZBX_CORR_CONDITION_EVENT_TAG_PAIR:
+						$condition['oldtag'] = $db_condition['oldtag'];
+						$condition['newtag'] = $db_condition['newtag'];
+						$condition['operator'] = CONDITION_OPERATOR_EQUAL;
+						break;
+
+					case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
+					case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
+						$condition['tag'] = $db_condition['ctv_tag'];
+						$condition['value'] = $db_condition['value'];
+						$condition['operator'] = $db_condition['ctv_operator'];
+						break;
+				}
+
+				$conditions[$db_condition['correlationid']][$db_condition['corr_conditionid']] = $condition;
+			}
+
+			foreach ($conditions as $correlationid => $db_conditions) {
+				if ($db_correlations[$correlationid]['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+					$formula = $db_correlations[$correlationid]['filter']['formula'];
+
+					$formulaids = CConditionHelper::getFormulaIds($formula);
+
+					foreach ($db_conditions as &$db_condition) {
+						$db_condition['formulaid'] = $formulaids[$db_condition['corr_conditionid']];
+					}
+					unset($db_condition);
+
+					$db_correlations[$correlationid]['filter']['formula']
+						= CConditionHelper::replaceNumericIds($formula, $formulaids);
+				}
+
+				$db_correlations[$correlationid]['filter']['conditions'] = $db_conditions;
+			}
+		}
+
+		if ($correlationids['operations']) {
+			$options = [
+				'output' => ['corr_operationid', 'correlationid', 'type'],
+				'filter' => ['correlationid' => $correlationids['operations']]
+			];
+			$db_operations = DBselect(DB::makeSql('corr_operation', $options));
+
+			while ($db_operation = DBfetch($db_operations)) {
+				$db_correlations[$db_operation['correlationid']]['operations'][$db_operation['corr_operationid']] =
+				array_diff_key($db_operation, array_flip(['correlationid']));
+			}
+		}
 	}
 }

@@ -19,8 +19,6 @@
 **/
 
 
-require_once __DIR__.'/../../include/correlation.inc.php';
-
 class CControllerCorrelationEdit extends CController {
 
 	private $correlation = [];
@@ -84,8 +82,8 @@ class CControllerCorrelationEdit extends CController {
 	protected function doAction() {
 		$data = $this->correlation + DB::getDefaults('correlation') + [
 			'new_condition' => $this->getInput('new_condition', []),
-			'allowedOperations' => corrOperationTypes(),
-			'allowedConditions' => corrConditionTypes(),
+			'allowedOperations' => CCorrelationHelper::getOperationTypes(),
+			'allowedConditions' => CCorrelationHelper::getConditionTypes(),
 			'correlationid' => $this->getInput('correlationid', 0),
 			'op_close_new' => false,
 			'op_close_old' => false,

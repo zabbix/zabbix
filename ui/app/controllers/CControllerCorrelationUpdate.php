@@ -73,7 +73,8 @@ class CControllerCorrelationUpdate extends CController {
 	protected function doAction() {
 		$data = [
 			'conditions' => [],
-			'status' => ZBX_CORRELATION_DISABLED
+			'status' => ZBX_CORRELATION_DISABLED,
+			'formula' => ''
 		];
 
 		$this->getInputs($data, ['correlationid', 'name', 'description', 'evaltype', 'status', 'formula',
@@ -99,6 +100,14 @@ class CControllerCorrelationUpdate extends CController {
 			$correlation['filter']['evaltype'] = CONDITION_EVAL_TYPE_AND_OR;
 		}
 
+		if ($correlation['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+			$correlation['filter']['formula'] = '';
+			foreach ($correlation['filter']['conditions'] as &$condition) {
+				unset($condition['formulaid']);
+			}
+			unset($condition);
+		}
+
 		if (array_key_exists('op_close_old', $data)) {
 			$correlation['operations'][] = ['type' => ZBX_CORR_OPERATION_CLOSE_OLD];
 		}
@@ -106,6 +115,7 @@ class CControllerCorrelationUpdate extends CController {
 		if (array_key_exists('op_close_new', $data)) {
 			$correlation['operations'][] = ['type' => ZBX_CORR_OPERATION_CLOSE_NEW];
 		}
+
 
 		$result = API::Correlation()->update($correlation);
 

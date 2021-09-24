@@ -93,14 +93,14 @@ if ($data['correlations']) {
 				$condition['operator'] = CONDITION_OPERATOR_EQUAL;
 			}
 
-			$conditions[] = getCorrConditionDescription($condition, $data['group_names']);
+			$conditions[] = CCorrelationHelper::getConditionDescription($condition, $data['group_names']);
 			$conditions[] = BR();
 		}
 
 		CArrayHelper::sort($correlation['operations'], ['type']);
 
 		foreach ($correlation['operations'] as $operation) {
-			$operations[] = getCorrOperationDescription($operation);
+			$operations[] = CCorrelationHelper::getOperationLabel($operation);
 			$operations[] = BR();
 		}
 

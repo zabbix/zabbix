@@ -105,6 +105,7 @@ class CAudit {
 		self::RESOURCE_AUTHENTICATION => 'config',
 		self::RESOURCE_AUTH_TOKEN => 'token',
 		self::RESOURCE_AUTOREGISTRATION => 'config',
+		self::RESOURCE_CORRELATION => 'correlation',
 		self::RESOURCE_HOUSEKEEPING => 'config',
 		self::RESOURCE_MODULE => 'module',
 		self::RESOURCE_PROXY => 'hosts',
@@ -135,6 +136,7 @@ class CAudit {
 		self::RESOURCE_AUTHENTICATION => null,
 		self::RESOURCE_AUTH_TOKEN => 'name',
 		self::RESOURCE_AUTOREGISTRATION => null,
+		self::RESOURCE_CORRELATION => 'name',
 		self::RESOURCE_HOUSEKEEPING => null,
 		self::RESOURCE_MODULE => 'id',
 		self::RESOURCE_PROXY => 'host',
@@ -155,6 +157,7 @@ class CAudit {
 		self::RESOURCE_AUTHENTICATION => 'authentication',
 		self::RESOURCE_AUTH_TOKEN => 'token',
 		self::RESOURCE_AUTOREGISTRATION => 'autoregistration',
+		self::RESOURCE_CORRELATION => 'correlation',
 		self::RESOURCE_HOUSEKEEPING => 'housekeeping',
 		self::RESOURCE_MODULE => 'module',
 		self::RESOURCE_PROXY => 'proxy',
@@ -189,6 +192,9 @@ class CAudit {
 	 * @var array
 	 */
 	private const NESTED_OBJECTS_TABLE_NAMES = [
+		'correlation.filter' => 'correlation',
+		'correlation.filter.conditions' => 'corr_condition',
+		'correlation.operations' => 'corr_operation',
 		'proxy.hosts' => 'hosts',
 		'proxy.interface' => 'interface',
 		'regexp.expressions' => 'expressions',
@@ -208,6 +214,8 @@ class CAudit {
 	 * @var array
 	 */
 	private const NESTED_OBJECTS_IDS = [
+		'correlation.filter.conditions' => 'corr_conditionid',
+		'correlation.operations' => 'corr_operationid',
 		'proxy.hosts' => 'hostid',
 		'regexp.expressions' => 'expressionid',
 		'report.users' => 'reportuserid',
