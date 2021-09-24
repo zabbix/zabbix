@@ -77,8 +77,8 @@ int	zabbix_sender_send_values(const char *address, unsigned short port, const ch
 
 	zbx_set_data_destination_hosts(address, "<server>", sender_add_serveractive_host_cb, NULL, &zbx_addrs);
 
-	if (SUCCEED == (ret = connect_to_server(&sock, source, &zbx_addrs, GET_SENDER_TIMEOUT, 30, ZBX_TCP_SEC_UNENCRYPTED,
-			0)))
+	if (SUCCEED == (ret = connect_to_server(&sock, source, &zbx_addrs, GET_SENDER_TIMEOUT, 30,
+			ZBX_TCP_SEC_UNENCRYPTED, 0)))
 	{
 		if (SUCCEED == (ret = zbx_tcp_send(&sock, json.buffer)))
 		{
