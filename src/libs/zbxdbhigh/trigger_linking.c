@@ -387,7 +387,7 @@ static int	doIt(const zbx_vector_uint64_t *trids, zbx_vector_uint64_pair_t *link
 
 				x.first = links->values[i].first;
 				x.second = links->values[i].second;
-				zbx_vector_uint64_pair_append(links2, x);		
+				zbx_vector_uint64_pair_append(links2, x);
 			}
 		}
 		else
@@ -428,7 +428,7 @@ static int	doIt2(zbx_vector_uint64_pair_t *links, zbx_hashset_t *triggers_flags)
 					links->values[i].second);
 
 			zabbix_log(LOG_LEVEL_INFORMATION, "INSERTING NEW DB ENTRY: %lu, %lu", links->values[i].first,
-				   links->values[i].second);
+					links->values[i].second);
 
 			temp_t.triggerid = links->values[i].first;
 
@@ -506,7 +506,7 @@ static int	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const zb
 	}
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "1111111");
-	
+
 	while (NULL != (row = DBfetch(result)))
 	{
 		zbx_uint64_pair_t	dep_list_id;
@@ -550,7 +550,7 @@ static int	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const zb
 	}
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "222222");
-	
+
 	while (NULL != (row = DBfetch(result)))
 	{
 		zbx_uint64_pair_t			map_id;
@@ -559,7 +559,7 @@ static int	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const zb
 		ZBX_STR2UINT64(temp_t.triggerid, row[0]);
 
 		zabbix_log(LOG_LEVEL_INFORMATION, "first: %s, second: %s, third: %s", row[0], row[1], row[2]);
-		
+
 		if (NULL == (found = (resolve_dependencies_triggers_flags_t *)zbx_hashset_search(triggers_flags,
 				&temp_t)))
 		{
@@ -577,7 +577,6 @@ static int	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const zb
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "3333333");
 
-	
 	for (i = 0; i < dep_list_ids.values_num; i++)
 	{
 		int		j;
@@ -606,8 +605,9 @@ static int	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const zb
 				triggerid_up = hst_triggerid;
 		}
 
-		zabbix_log(LOG_LEVEL_INFORMATION, "BADGER MAP INSERT, TRIGGERID_DOWN: %lu, triggerid_up: %lu", triggerid_down, triggerid_up);
-		
+		zabbix_log(LOG_LEVEL_INFORMATION, "BADGER MAP INSERT, TRIGGERID_DOWN: %lu, triggerid_up: %lu",
+				triggerid_down, triggerid_up);
+
 		if (0 != triggerid_down)
 		{
 			zbx_uint64_pair_t	link = {triggerid_down, triggerid_up};
@@ -643,8 +643,8 @@ clean:
  * Comments: !!! Don't forget to sync the code with PHP !!!                     *
  *                                                                              *
  ********************************************************************************/
-static int	DBadd_or_update_template_dependencies_for_triggers(zbx_uint64_t hostid, const zbx_vector_uint64_t *trids,
-		int is_update)
+static int	DBadd_or_update_template_dependencies_for_triggers(zbx_uint64_t hostid,
+		const zbx_vector_uint64_t *trids, int is_update)
 {
 	int				res = SUCCEED;
 	zbx_vector_uint64_pair_t	links;
@@ -670,7 +670,7 @@ static int	DBadd_or_update_template_dependencies_for_triggers(zbx_uint64_t hosti
 	}
 	else if (1 == is_update)
 	{
-	  	zbx_vector_uint64_pair_t	links2;
+		zbx_vector_uint64_pair_t	links2;
 
 		zbx_vector_uint64_pair_create(&links2);
 
@@ -1822,7 +1822,7 @@ int	DBcopy_template_triggers(zbx_uint64_t hostid, const zbx_vector_uint64_t *tem
 	}
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "HELLO WORLD");
-	
+
 	if (SUCCEED == res)
 	{
 		res = DBadd_or_update_template_dependencies_for_triggers(hostid, &temp_host_triggerids, 1);
@@ -1830,7 +1830,6 @@ int	DBcopy_template_triggers(zbx_uint64_t hostid, const zbx_vector_uint64_t *tem
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "HELLO WORLD END");
 
-	
 	if (SUCCEED == res)
 		res = DBcopy_template_trigger_tags(&new_triggerids, &cur_triggerids);
 
