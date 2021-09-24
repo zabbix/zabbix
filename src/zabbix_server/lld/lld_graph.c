@@ -507,7 +507,7 @@ static zbx_lld_graph_t	*lld_graph_get(zbx_vector_ptr_t *graphs, const zbx_vector
 
 	for (i = 0; i < item_links->values_num; i++)
 	{
-		const zbx_lld_item_link_t	*item_link = (zbx_lld_item_link_t *)item_links->values[i];
+		const zbx_lld_item_link_t	*item_link = (const zbx_lld_item_link_t *)item_links->values[i];
 
 		if (NULL != (graph = lld_graph_by_item(graphs, item_link->itemid)))
 			return graph;
@@ -559,15 +559,14 @@ static int	lld_gitems_make(const zbx_vector_ptr_t *gitems_proto, zbx_vector_ptr_
 		const zbx_vector_ptr_t *items, const zbx_vector_ptr_t *item_links, uint64_t grpahid)
 {
 	int			i, ret = FAIL;
-	const zbx_lld_gitem_t	*gitem_proto;
 	zbx_lld_gitem_t		*gitem;
-	zbx_uint64_t		itemid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	for (i = 0; i < gitems_proto->values_num; i++)
 	{
-		gitem_proto = (zbx_lld_gitem_t *)gitems_proto->values[i];
+		zbx_uint64_t		itemid;
+		const zbx_lld_gitem_t	*gitem_proto = (const zbx_lld_gitem_t *)gitems_proto->values[i];
 
 		if (SUCCEED != lld_item_get(gitem_proto->itemid, items, item_links, &itemid))
 			goto out;
@@ -624,8 +623,8 @@ static int	lld_gitems_make(const zbx_vector_ptr_t *gitems_proto, zbx_vector_ptr_
 
 			if (0 != strcmp(gitem->color, gitem_proto->color))
 			{
-				gitem->color_orig = zbx_strdup(NULL, gitem->color);
-				gitem->color = zbx_strdup(gitem->color, gitem_proto->color);
+				gitem->color_orig = gitem->color;
+				gitem->color = zbx_strdup(NULL, gitem_proto->color);
 				gitem->flags |= ZBX_FLAG_LLD_GITEM_UPDATE_COLOR;
 			}
 
