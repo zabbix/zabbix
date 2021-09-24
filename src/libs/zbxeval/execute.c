@@ -2326,7 +2326,7 @@ static int	eval_execute_function_histogram_quantile(const zbx_eval_context_t *ct
 	if (UNKNOWN != (ret = eval_validate_function_args(ctx, token, output, error)))
 		goto out;
 
-	i = output->values_num - token->opt + 1;
+	i = output->values_num - (int)token->opt + 1;
 
 	if (2 == token->opt)
 	{
@@ -2359,7 +2359,7 @@ static int	eval_execute_function_histogram_quantile(const zbx_eval_context_t *ct
 		}
 	}
 
-	i = output->values_num - token->opt;
+	i = output->values_num - (int)token->opt;
 
 	if (ZBX_VARIANT_DBL != output->values[i].type &&
 			SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_DBL, &output->values[i], error))
@@ -2375,7 +2375,7 @@ static int	eval_execute_function_histogram_quantile(const zbx_eval_context_t *ct
 		goto out;
 	}
 
-	i = output->values_num - token->opt + 1;
+	i = output->values_num - (int)token->opt + 1;
 
 	if (2 == token->opt)
 	{

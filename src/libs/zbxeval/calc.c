@@ -503,7 +503,7 @@ static void	remove_duplicate_backet(zbx_vector_histogram_t *h)
 	{
 		b = h->values[i];
 
-		if (b.upper == last.upper)
+		if (SUCCEED == zbx_double_compare(b.upper, last.upper))
 		{
 			last.count += b.count;
 		}
@@ -552,8 +552,8 @@ static void	ensure_monotonic(zbx_vector_histogram_t *h)
  *               FAIL - failed to evaluate function (see 'error')             *
  *                                                                            *
  ******************************************************************************/
-int	zbx_eval_calc_histogram_quantile(double q, zbx_vector_dbl_t *values, const char *err_fn, double *result,
-		char **error)
+int	zbx_eval_calc_histogram_quantile(const double q, const zbx_vector_dbl_t *values, const char *err_fn,
+		double *result, char **error)
 {
 #	define LAST(v)		v.values[v.values_num - 1]
 
