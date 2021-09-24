@@ -103,7 +103,7 @@ class testFormAdministrationDMProxies extends CLegacyWebTest {
 				'proxy123.zabbix.com',
 				11051,
 				0,
-				['Cannot add proxy', 'Invalid IP address "wrong ip".']
+				['Cannot add proxy', 'Invalid parameter "/1/interface/ip": an IP address is expected.']
 			],
 			[
 				PROXY_BAD,
@@ -113,7 +113,7 @@ class testFormAdministrationDMProxies extends CLegacyWebTest {
 				'proxy123.zabbix.com',
 				11051,
 				0,
-				['Cannot add proxy', 'Incorrect characters used for proxy name']
+				['Cannot add proxy', 'Invalid parameter "/1/host": invalid host name.']
 			],
 			[
 				PROXY_BAD,
@@ -123,7 +123,7 @@ class testFormAdministrationDMProxies extends CLegacyWebTest {
 				'proxy123.zabbix.com',
 				11051,
 				0,
-				['Cannot add proxy', 'Incorrect characters used for proxy name "Прокси".']
+				['Cannot add proxy', 'Invalid parameter "/1/host": invalid host name.']
 			],
 			[
 				PROXY_BAD,
@@ -133,7 +133,7 @@ class testFormAdministrationDMProxies extends CLegacyWebTest {
 				'proxy123.zabbix.com',
 				0,
 				'port',
-				['Cannot add proxy', 'Incorrect interface port "port" provided.']
+				['Cannot add proxy', 'Invalid parameter "/1/interface/port": an integer is expected.']
 			],
 			[PROXY_BAD,
 				'Active proxy 1',
@@ -151,7 +151,7 @@ class testFormAdministrationDMProxies extends CLegacyWebTest {
 				'proxy123.zabbix.com',
 				0,
 				'$PROXY_PORT',
-				['Cannot add proxy', 'Incorrect interface port "$PROXY_PORT" provided.']
+				['Cannot add proxy', 'Invalid parameter "/1/interface/port": an integer is expected.']
 			],
 			[PROXY_BAD,
 				'New passive proxy with wrong IP macro',
@@ -160,7 +160,7 @@ class testFormAdministrationDMProxies extends CLegacyWebTest {
 				'proxy123.zabbix.com',
 				0,
 				11051,
-				['Cannot add proxy', 'Invalid IP address "$PROXY_IP".']
+				['Cannot add proxy', 'Invalid parameter "/1/interface/ip": an IP address is expected.']
 			]
 		];
 	}
