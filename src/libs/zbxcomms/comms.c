@@ -634,7 +634,7 @@ out:
 }
 #else
 static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
-		int timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2)
+		int timeout, int connect_timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2)
 {
 	ZBX_SOCKADDR	servaddr_in;
 	struct addrinfo	hints, *ai;
@@ -722,7 +722,8 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 		}
 	}
 
-	if (SUCCEED != zbx_socket_connect(s, (struct sockaddr *)&servaddr_in, sizeof(servaddr_in), timeout, &error))
+	if (SUCCEED != zbx_socket_connect(s, (struct sockaddr *)&servaddr_in, sizeof(servaddr_in), timeout,
+			connect_timeout, &error))
 	{
 		func_socket_close(s);
 		zbx_set_socket_strerror("cannot connect to [[%s]:%hu]: %s", ip, port, error);
