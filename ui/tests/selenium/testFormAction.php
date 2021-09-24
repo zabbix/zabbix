@@ -1701,7 +1701,7 @@ class testFormAction extends CLegacyWebTest {
 		$this->zbxTestDoubleClickBeforeMessage('add', 'filter_name');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action added');
 
-		$sql = 'SELECT actionid FROM actions WHERE name="action test"';
+		$sql = "SELECT actionid FROM actions WHERE name='action test'";
 		$this->assertEquals(1, CDBHelper::getCount($sql), 'Action has not been created in the DB.');
 	}
 
