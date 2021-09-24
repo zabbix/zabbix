@@ -175,6 +175,9 @@ class CApiInputValidator {
 			case API_IP:
 				return self::validateIp($rule, $data, $path, $error);
 
+			case API_IP_RANGES:
+				return self::validateIpRanges($rule, $data, $path, $error);
+
 			case API_DNS:
 				return self::validateDns($rule, $data, $path, $error);
 
@@ -259,6 +262,7 @@ class CApiInputValidator {
 			case API_VARIABLE_NAME:
 			case API_URL:
 			case API_IP:
+			case API_IP_RANGES:
 			case API_DNS:
 			case API_PORT:
 			case API_TRIGGER_EXPRESSION:
@@ -439,11 +443,41 @@ class CApiInputValidator {
 	}
 
 	/**
+	 * Returns unescaped array of "in" rules.
+	 *
+	 * @static
+	 *
+	 * @param string $in  A comma-delimited character string. For example, 'xml,json' or '\,,.,/'.
+	 *
+	 * @return array  An array of "in" rules. For example, ['xml', 'json'] or [',', '.', '/'].
+	 */
+	private static function unescapeInRule(string $in): array {
+		$result = [];
+		$pos = 0;
+
+		do {
+			preg_match('/^([^,\\\\]|\\\\[,\\\\])*/', substr($in, $pos), $matches);
+			$result[] = strtr($matches[0], ['\\,' => ',', '\\\\' => '\\']);
+			$pos += strlen($matches[0]);
+
+			if (!isset($in[$pos])) {
+				break;
+			}
+
+			$pos++;
+		}
+		while (true);
+
+		return $result;
+	}
+
+	/**
 	 * String validator.
 	 *
 	 * @param array  $rule
 	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_NULL
-	 * @param string $rule['in']      (optional) a comma-delimited character string, for example: 'xml,json'
+	 * @param string $rule['in']      (optional) A comma-delimited character string, for example: 'xml,json'.
+	 *                                           Comma and backslash char can be escaped.
 	 * @param int    $rule['length']  (optional)
 	 * @param mixed  $data
 	 * @param string $path
@@ -462,11 +496,27 @@ class CApiInputValidator {
 			return false;
 		}
 
-		if (array_key_exists('in', $rule) && !in_array($data, explode(',', $rule['in']), true)) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
-				_s('value must be one of %1$s', str_replace(',', ', ', $rule['in']))
-			);
-			return false;
+		if (array_key_exists('in', $rule)) {
+			$in = self::unescapeInRule($rule['in']);
+
+			if (!in_array($data, $in, true)) {
+				if (($i = array_search('', $in)) !== false) {
+					unset($in[$i]);
+				}
+
+				if ($i === false) {
+					$error = _s('value must be one of %1$s', implode(', ', $in));
+				}
+				elseif ($in) {
+					$error = _s('value must be empty or one of %1$s', implode(', ', $in));
+				}
+				else {
+					$error = _s('value must be empty');
+				}
+
+				$error = _s('Invalid parameter "%1$s": %2$s.', $path, $error);
+				return false;
+			}
 		}
 
 		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
@@ -981,7 +1031,8 @@ class CApiInputValidator {
 	 * @param array  $rul
 	 * @param int    $rule['flags']                                   (optional) API_ALLOW_NULL
 	 * @param array  $rule['fields']
-	 * @param int    $rule['fields'][<field_name>]['flags']           (optional) API_REQUIRED, API_DEPRECATED
+	 * @param int    $rule['fields'][<field_name>]['flags']           (optional) API_REQUIRED, API_DEPRECATED,
+	 *                                                                           API_ALLOW_UNEXPECTED
 	 * @param mixed  $rule['fields'][<field_name>]['default']         (optional)
 	 * @param string $rule['fields'][<field_name>]['default_source']  (optional)
 	 * @param mixed  $data
@@ -1003,10 +1054,14 @@ class CApiInputValidator {
 		}
 
 		// unexpected parameter validation
-		foreach ($data as $field_name => $value) {
-			if (!array_key_exists($field_name, $rule['fields'])) {
-				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _s('unexpected parameter "%1$s"', $field_name));
-				return false;
+		if (!($flags & API_ALLOW_UNEXPECTED)) {
+			foreach ($data as $field_name => $value) {
+				if (!array_key_exists($field_name, $rule['fields'])) {
+					$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+						_s('unexpected parameter "%1$s"', $field_name)
+					);
+					return false;
+				}
 			}
 		}
 
@@ -1218,7 +1273,8 @@ class CApiInputValidator {
 	 * Array of objects validator.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_NULL, API_NORMALIZE, API_PRESERVE_KEYS
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_NULL, API_NORMALIZE, API_PRESERVE_KEYS,
+	 *                                           API_ALLOW_UNEXPECTED
 	 * @param array  $rule['fields']
 	 * @param int    $rule['length']  (optional)
 	 * @param mixed  $data
@@ -1263,7 +1319,8 @@ class CApiInputValidator {
 
 		foreach ($data as $index => &$value) {
 			$subpath = ($path === '/' ? $path : $path.'/').($index + 1);
-			if (!self::validateObject(['fields' => $rule['fields']], $value, $subpath, $error)) {
+			if (!self::validateObject(['flags' => ($flags & API_ALLOW_UNEXPECTED), 'fields' => $rule['fields']], $value,
+					$subpath, $error)) {
 				return false;
 			}
 		}
@@ -2004,6 +2061,43 @@ class CApiInputValidator {
 
 		if ($ip_parser->parse($data) != CParser::PARSE_SUCCESS) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an IP address is expected'));
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Validate IP ranges. Multiple IPs separated by comma character.
+	 * Example:
+	 *   127.0.0.1,192.168.3.2
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['length']  (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateIpRanges($rule, &$data, $path, &$error) {
+		if (self::checkStringUtf8(0, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if ($data === '') {
+			return true;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		$ip_range_parser = new CIPRangeParser(['v6' => ZBX_HAVE_IPV6, 'ranges' => false]);
+
+		if (!$ip_range_parser->parse($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $ip_range_parser->getError());
 			return false;
 		}
 

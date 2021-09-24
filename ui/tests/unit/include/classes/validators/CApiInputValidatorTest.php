@@ -275,6 +275,18 @@ class CApiInputValidatorTest extends TestCase {
 				'Invalid parameter "/1/name": value must be one of xml, json.'
 			],
 			[
+				['type' => API_STRING_UTF8, 'in' => '\\,,.'],
+				',',
+				'/1/name',
+				','
+			],
+			[
+				['type' => API_STRING_UTF8, 'in' => ''],
+				'abc',
+				'/output',
+				'Invalid parameter "/output": value must be empty.'
+			],
+			[
 				['type' => API_STRINGS_UTF8],
 				['hostid', 'name'],
 				'/output',
@@ -370,6 +382,18 @@ class CApiInputValidatorTest extends TestCase {
 				['hostid', 'name', 'name'],
 				'/output',
 				'Invalid parameter "/output/3": value (name) already exists.'
+			],
+			[
+				['type' => API_STRINGS_UTF8, 'in' => '\\,,.,/,'],
+				[',', '.', '/', ''],
+				'/output',
+				[',', '.', '/', '']
+			],
+			[
+				['type' => API_STRINGS_UTF8, 'in' => '\\,,.,/,'],
+				['abc', '.', '/', ''],
+				'/output',
+				'Invalid parameter "/output/1": value must be empty or one of ,, ., /.'
 			],
 			[
 				['type' => API_INT32],
@@ -1231,6 +1255,20 @@ class CApiInputValidatorTest extends TestCase {
 				'Invalid parameter "/": unexpected parameter "name".'
 			],
 			[
+				['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+					'host' => ['type' => API_STRING_UTF8]
+				]],
+				[
+					'host' => 'Zabbix server',
+					'name' => 'Zabbix server'
+				],
+				'/',
+				[
+					'host' => 'Zabbix server',
+					'name' => 'Zabbix server'
+				]
+			],
+			[
 				['type' => API_OBJECT, 'fields' => [
 					'host' => ['type' => API_STRING_UTF8],
 					'name' => ['type' => API_STRING_UTF8]
@@ -1423,6 +1461,12 @@ class CApiInputValidatorTest extends TestCase {
 				[['host' => 'Zabbix server']],
 				'/',
 				'Invalid parameter "/1": unexpected parameter "host".'
+			],
+			[
+				['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => []],
+				[['host' => 'Zabbix server']],
+				'/',
+				[['host' => 'Zabbix server']]
 			],
 			[
 				['type' => API_OBJECTS, 'fields' => [
@@ -3340,6 +3384,60 @@ class CApiInputValidatorTest extends TestCase {
 				'Invalid parameter "/1/ip": an IP address is expected.'
 			],
 			[
+				['type' => API_IP_RANGES],
+				'',
+				'/1/ip_range',
+				''
+			],
+			[
+				['type' => API_IP_RANGES],
+				[],
+				'/1/ip_range',
+				'Invalid parameter "/1/ip_range": a character string is expected.'
+			],
+			[
+				['type' => API_IP_RANGES],
+				true,
+				'/1/ip_range',
+				'Invalid parameter "/1/ip_range": a character string is expected.'
+			],
+			[
+				['type' => API_IP_RANGES],
+				null,
+				'/1/ip_range',
+				'Invalid parameter "/1/ip_range": a character string is expected.'
+			],
+			[
+				['type' => API_IP_RANGES],
+				'0.0.0;0',
+				'/1/ip_range',
+				'Invalid parameter "/1/ip_range": invalid address range "0.0.0;0".'
+			],
+			[
+				['type' => API_IP_RANGES],
+				'1.1.1.1',
+				'/1/ip_range',
+				'1.1.1.1'
+			],
+			[
+				['type' => API_IP_RANGES, 'length' => 11],
+				'192.168.3.5',
+				'/1/ip_range',
+				'192.168.3.5'
+			],
+			[
+				['type' => API_IP_RANGES, 'length' => 10],
+				'192.168.3.5',
+				'/1/ip_range',
+				'Invalid parameter "/1/ip_range": value is too long.'
+			],
+			[
+				['type' => API_IP_RANGES],
+				'192.168.3.5,192.168.6.240',
+				'/1/ip_range',
+				'192.168.3.5,192.168.6.240'
+			],
+			[
 				['type' => API_DNS],
 				'',
 				'/1/dns',
@@ -3379,7 +3477,7 @@ class CApiInputValidatorTest extends TestCase {
 			[
 				['type' => API_DNS, 'flags' => API_ALLOW_USER_MACRO],
 				'{$MACRO: "context"}',
-				'/1/ip',
+				'/1/dns',
 				'{$MACRO: "context"}'
 			],
 			[
@@ -3518,7 +3616,7 @@ class CApiInputValidatorTest extends TestCase {
 			[
 				['type' => API_PORT, 'flags' => API_ALLOW_USER_MACRO],
 				'{$MACRO: "context"}',
-				'/1/ip',
+				'/1/port',
 				'{$MACRO: "context"}'
 			],
 			[

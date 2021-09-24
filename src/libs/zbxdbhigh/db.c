@@ -27,15 +27,15 @@
 #include "zbxalgo.h"
 #include "cfg.h"
 
-#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
-#define ZBX_SUPPORTED_DB_CHARACTER_SET	"utf8"
-#endif
-#if defined(HAVE_ORACLE)
-#define ZBX_ORACLE_UTF8_CHARSET "AL32UTF8"
-#define ZBX_ORACLE_CESU8_CHARSET "UTF8"
-#endif
-#if defined(HAVE_MYSQL)
-#define ZBX_SUPPORTED_DB_COLLATION	"utf8_bin"
+#if defined(HAVE_POSTGRESQL)
+#	define ZBX_SUPPORTED_DB_CHARACTER_SET	"utf8"
+#elif defined(HAVE_ORACLE)
+#	define ZBX_ORACLE_UTF8_CHARSET "AL32UTF8"
+#	define ZBX_ORACLE_CESU8_CHARSET "UTF8"
+#elif defined(HAVE_MYSQL)
+#	define ZBX_DB_STRLIST_DELIM		','
+#	define ZBX_SUPPORTED_DB_CHARACTER_SET	"utf8,utf8mb3"
+#	define ZBX_SUPPORTED_DB_COLLATION	"utf8_bin,utf8mb3_bin"
 #endif
 
 typedef struct
@@ -749,7 +749,12 @@ static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tablename:'%s'", __func__, tablename);
 
-	table = DBget_table(tablename);
+	if (NULL == (table = DBget_table(tablename)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Error getting table: %s", tablename);
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
 
 	while (FAIL == found)
 	{
@@ -858,20 +863,16 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
 
 /******************************************************************************
  *                                                                            *
- * Function: DBextract_version                                                *
+ * Function: DBextract_version_info                                           *
  *                                                                            *
  * Purpose: connects to DB and tries to detect DB version                     *
  *                                                                            *
  ******************************************************************************/
-zbx_uint32_t	DBextract_version(struct zbx_json *json)
+void	DBextract_version_info(struct zbx_db_version_info_t *version_info)
 {
-	zbx_uint32_t	ret;
-
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
-	ret = zbx_dbms_version_extract(json);
+	zbx_dbms_version_info_extract(version_info);
 	DBclose();
-
-	return ret;
 }
 
 /******************************************************************************
@@ -887,12 +888,8 @@ void	DBflush_version_requirements(const char *version)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
-
 	if (ZBX_DB_OK > DBexecute("update config set dbversion_status='%s'", version))
 		zabbix_log(LOG_LEVEL_CRIT, "Failed to set dbversion_status");
-
-	DBclose();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -1771,7 +1768,7 @@ static int	compare_autoreg_host_by_hostid(const void *d1, const void *d2)
 void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_hostid)
 {
 	zbx_autoreg_host_t	*autoreg_host;
-	zbx_uint64_t		autoreg_hostid;
+	zbx_uint64_t		autoreg_hostid = 0;
 	zbx_db_insert_t		db_insert;
 	int			i, create = 0, update = 0;
 	char			*sql = NULL, *ip_esc, *dns_esc, *host_metadata_esc;
@@ -2386,7 +2383,7 @@ int	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vect
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 static void	zbx_warn_char_set(const char *db_name, const char *char_set)
 {
-	zabbix_log(LOG_LEVEL_WARNING, "Zabbix supports only \"" ZBX_SUPPORTED_DB_CHARACTER_SET "\" character set."
+	zabbix_log(LOG_LEVEL_WARNING, "Zabbix supports only \"" ZBX_SUPPORTED_DB_CHARACTER_SET "\" character set(s)."
 			" Database \"%s\" has default character set \"%s\"", db_name, char_set);
 }
 #endif
@@ -2398,10 +2395,29 @@ static void	zbx_warn_no_charset_info(const char *db_name)
 }
 #endif
 
+#if defined(HAVE_MYSQL)
+static char	*db_strlist_quote(const char *strlist, char delimiter)
+{
+	const char	*delim;
+	char		*str = NULL;
+	size_t		str_alloc = 0, str_offset = 0;
+
+	while (NULL != (delim = strchr(strlist, delimiter)))
+	{
+		zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "'%.*s',", (int)(delim - strlist), strlist);
+		strlist = delim + 1;
+	}
+
+	zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "'%s'", strlist);
+
+	return str;
+}
+#endif
+
 void	DBcheck_character_set(void)
 {
 #if defined(HAVE_MYSQL)
-	char		*database_name_esc;
+	char		*database_name_esc, *charset_list, *collation_list;
 	DB_RESULT	result;
 	DB_ROW		row;
 
@@ -2422,12 +2438,12 @@ void	DBcheck_character_set(void)
 		char	*char_set = row[0];
 		char	*collation = row[1];
 
-		if (0 != strcasecmp(char_set, ZBX_SUPPORTED_DB_CHARACTER_SET))
+		if (SUCCEED != str_in_list(ZBX_SUPPORTED_DB_CHARACTER_SET, char_set, ZBX_DB_STRLIST_DELIM))
 			zbx_warn_char_set(CONFIG_DBNAME, char_set);
 
-		if (0 != zbx_strncasecmp(collation, ZBX_SUPPORTED_DB_COLLATION, sizeof(ZBX_SUPPORTED_DB_COLLATION)))
+		if (SUCCEED != str_in_list(ZBX_SUPPORTED_DB_COLLATION, collation, ZBX_DB_STRLIST_DELIM))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Zabbix supports only \"%s\" collation."
+			zabbix_log(LOG_LEVEL_WARNING, "Zabbix supports only \"%s\" collation(s)."
 					" Database \"%s\" has default collation \"%s\"", ZBX_SUPPORTED_DB_COLLATION,
 					CONFIG_DBNAME, collation);
 		}
@@ -2435,13 +2451,19 @@ void	DBcheck_character_set(void)
 
 	DBfree_result(result);
 
+	charset_list = db_strlist_quote(ZBX_SUPPORTED_DB_CHARACTER_SET, ZBX_DB_STRLIST_DELIM);
+	collation_list = db_strlist_quote(ZBX_SUPPORTED_DB_COLLATION, ZBX_DB_STRLIST_DELIM);
+
 	result = DBselect(
 			"select count(*)"
 			" from information_schema.`COLUMNS`"
 			" where table_schema='%s'"
 				" and data_type in ('text','varchar','longtext')"
-				" and (character_set_name<>'%s' or collation_name<>'%s')",
-			database_name_esc, ZBX_SUPPORTED_DB_CHARACTER_SET, ZBX_SUPPORTED_DB_COLLATION);
+				" and (character_set_name not in (%s) or collation_name not in (%s))",
+			database_name_esc, charset_list, collation_list);
+
+	zbx_free(collation_list);
+	zbx_free(charset_list);
 
 	if (NULL == result || NULL == (row = DBfetch(result)))
 	{
@@ -2451,8 +2473,9 @@ void	DBcheck_character_set(void)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "character set name or collation name that is not supported by Zabbix"
 				" found in %s column(s) of database \"%s\"", row[0], CONFIG_DBNAME);
-		zabbix_log(LOG_LEVEL_WARNING, "only character set \"%s\" and collation \"%s\" should be used in "
-				"database", ZBX_SUPPORTED_DB_CHARACTER_SET, ZBX_SUPPORTED_DB_COLLATION);
+		zabbix_log(LOG_LEVEL_WARNING, "only character set(s) \"%s\" and corresponding collation(s) \"%s\""
+				" should be used in database", ZBX_SUPPORTED_DB_CHARACTER_SET,
+				ZBX_SUPPORTED_DB_COLLATION);
 	}
 
 	DBfree_result(result);

@@ -165,7 +165,7 @@ foreach ($data['users'] as $user) {
 			$users_groups[] = ', ';
 		}
 
-		$group = $data['allowed_ui_user_grpups']
+		$group = $data['allowed_ui_user_groups']
 			? (new CLink($user_group['name'], (new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.edit')
 				->setArgument('usrgrpid', $user_group['usrgrpid'])
@@ -200,7 +200,7 @@ foreach ($data['users'] as $user) {
 		->setArgument('userid', $userid)
 	);
 
-	if (!CRoleHelper::checkAccess(CRoleHelper::API_ACCESS, $user['roleid'])) {
+	if (!CRoleHelper::checkAccess('api.access', $user['roleid'])) {
 		$api_access = (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_RED);
 	}
 	else {
@@ -209,7 +209,7 @@ foreach ($data['users'] as $user) {
 
 		if ($api_methods) {
 			$hint_api_methods = [];
-			$status_class = CRoleHelper::checkAccess(CRoleHelper::API_MODE, $user['roleid'])
+			$status_class = CRoleHelper::checkAccess('api.mode', $user['roleid'])
 				? ZBX_STYLE_STATUS_GREEN
 				: ZBX_STYLE_STATUS_GREY;
 

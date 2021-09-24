@@ -43,12 +43,9 @@ class CAutoregistration extends CApiService {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'output' =>	['type' => API_OUTPUT, 'in' => 'tls_accept', 'default' => API_OUTPUT_EXTEND]
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			return [];
 		}
 
 		if ($options['output'] === API_OUTPUT_EXTEND) {
@@ -63,16 +60,20 @@ class CAutoregistration extends CApiService {
 		while ($row = DBfetch($result)) {
 			$db_autoreg[] = $row;
 		}
+
 		if ($this->outputIsRequested('autoreg_tls_accept', $options['output'])) {
 			$db_autoreg = CArrayHelper::renameObjectsKeys($db_autoreg, ['autoreg_tls_accept' => 'tls_accept']);
 		}
+
 		$db_autoreg = $this->unsetExtraFields($db_autoreg, ['configid'], []);
 
 		return $db_autoreg[0];
 	}
 
 	/**
-	 * @param array  $autoreg
+	 * @param array $autoreg
+	 *
+	 * @throws APIException if the input is invalid.
 	 *
 	 * @return bool
 	 */
@@ -107,7 +108,7 @@ class CAutoregistration extends CApiService {
 			]);
 		}
 
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_AUTOREGISTRATION,
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_AUTOREGISTRATION,
 			[['configid' => $db_autoreg['configid']] + $autoreg], [$db_autoreg['configid'] => $db_autoreg]
 		);
 
@@ -115,24 +116,20 @@ class CAutoregistration extends CApiService {
 	}
 
 	/**
-	 * @param array  $autoreg
-	 * @param array  $db_autoreg
+	 * @param array      $autoreg
+	 * @param array|null $db_autoreg
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateUpdate(array &$autoreg, array &$db_autoreg = null) {
+	protected function validateUpdate(array &$autoreg, array &$db_autoreg = null): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
 			'tls_accept' =>			['type' => API_INT32, 'in' => HOST_ENCRYPTION_NONE.':'.(HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK)],
 			'tls_psk_identity' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config_autoreg_tls', 'tls_psk_identity')],
 			'tls_psk' =>			['type' => API_PSK, 'length' => DB::getFieldLength('config_autoreg_tls', 'tls_psk')]
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $autoreg, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
-		// Check permissions.
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		$db_autoreg = DBfetch(DBselect(

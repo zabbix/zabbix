@@ -1,0 +1,102 @@
+<?php declare(strict_types = 1);
+/*
+** Zabbix
+** Copyright (C) 2001-2021 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
+
+class CControllerServiceStatusRuleValidate extends CController {
+
+	protected function checkInput(): bool {
+		$fields = [
+			'row_index' =>		'required|int32',
+			'type' =>			'required|in '.implode(',', array_keys(CServiceHelper::getStatusRuleTypeOptions())),
+			'limit_value' =>	'required|int32|ge 1',
+			'limit_status' =>	'required|in '.implode(',', array_keys(CServiceHelper::getStatusNames())),
+			'new_status' =>		'required|in '.implode(',', array_keys(CServiceHelper::getProblemStatusNames()))
+		];
+
+		$ret = $this->validateInput($fields);
+
+		if ($ret) {
+			switch ($this->getInput('type')) {
+				case ZBX_SERVICE_STATUS_RULE_TYPE_N_GE:
+				case ZBX_SERVICE_STATUS_RULE_TYPE_N_L:
+					$limit_value_label = 'N';
+					$limit_value_max = 1000000;
+					break;
+
+				case ZBX_SERVICE_STATUS_RULE_TYPE_W_GE:
+				case ZBX_SERVICE_STATUS_RULE_TYPE_W_L:
+					$limit_value_label = 'W';
+					$limit_value_max = 1000000;
+					break;
+
+				case ZBX_SERVICE_STATUS_RULE_TYPE_NP_GE:
+				case ZBX_SERVICE_STATUS_RULE_TYPE_NP_L:
+				case ZBX_SERVICE_STATUS_RULE_TYPE_WP_GE:
+				case ZBX_SERVICE_STATUS_RULE_TYPE_WP_L:
+					$limit_value_label = 'N';
+					$limit_value_max = 100;
+					break;
+			}
+
+			$validator = new CNewValidator([
+				$limit_value_label => $this->getInput('limit_value')
+			], [
+				$limit_value_label => 'le '.$limit_value_max
+			]);
+
+			foreach ($validator->getAllErrors() as $error) {
+				info($error);
+			}
+
+			$ret = !$validator->isErrorFatal() && !$validator->isError();
+		}
+
+		if (!$ret) {
+			$this->setResponse(
+				(new CControllerResponseData([
+					'main_block' => json_encode(['errors' => getMessages()->toString()])
+				]))->disableView()
+			);
+		}
+
+		return $ret;
+	}
+
+	protected function checkPermissions(): bool {
+		return $this->checkAccess(CRoleHelper::UI_MONITORING_SERVICES);
+	}
+
+	protected function doAction(): void {
+		$data = [
+			'row_index' => $this->getInput('row_index'),
+			'form' => [
+				'type' => $this->getInput('type'),
+				'limit_value' => $this->getInput('limit_value'),
+				'limit_status' => $this->getInput('limit_status'),
+				'new_status' => $this->getInput('new_status')
+			],
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
+			]
+		];
+
+		$this->setResponse(new CControllerResponseData($data));
+	}
+}

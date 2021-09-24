@@ -109,10 +109,10 @@ $triggersFormList
 
 if ($discovered_trigger) {
 	$triggersFormList->addVar('priority', (int) $data['priority']);
-	$severity = new CSeverity(['name' => 'priority_names', 'value' => (int) $data['priority']], false);
+	$severity = new CSeverity('priority_names', (int) $data['priority'], false);
 }
 else {
-	$severity = new CSeverity(['name' => 'priority', 'value' => (int) $data['priority']]);
+	$severity = new CSeverity('priority', (int) $data['priority']);
 }
 
 $triggersFormList->addRow(_('Severity'), $severity);

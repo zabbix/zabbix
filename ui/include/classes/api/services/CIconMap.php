@@ -170,7 +170,7 @@ class CIconMap extends CApiService {
 
 		$this->updateMappings($iconmaps, __FUNCTION__);
 
-		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_ICON_MAP, $iconmaps);
+		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_ICON_MAP, $iconmaps);
 
 		return ['iconmapids' => $iconmapids];
 	}
@@ -241,7 +241,7 @@ class CIconMap extends CApiService {
 
 		$this->updateMappings($iconmaps, __FUNCTION__);
 
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ICON_MAP, $iconmaps, $db_iconmaps);
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_ICON_MAP, $iconmaps, $db_iconmaps);
 
 		return ['iconmapids' => zbx_objectValues($iconmaps, 'iconmapid')];
 	}
@@ -498,7 +498,7 @@ class CIconMap extends CApiService {
 		DB::delete('icon_mapping', ['iconmapid' => $iconmapids]);
 		DB::delete('icon_map', ['iconmapid' => $iconmapids]);
 
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ICON_MAP, $db_iconmaps);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_ICON_MAP, $db_iconmaps);
 
 		return ['iconmapids' => $iconmapids];
 	}

@@ -47,6 +47,10 @@
 		);
 
 		@each $offset, $value in $offsets {
+			// Dynamically generated classes:
+			//  .offset-1
+			//  .offset-2
+			//  .offset-3
 			&.offset-#{$offset} {
 				grid-column-start: $value !important;
 			}
@@ -94,6 +98,7 @@
 	}
 
 	.table-forms-separator {
+		display: inline-flex;
 		line-height: 1.4;
 
 		td {

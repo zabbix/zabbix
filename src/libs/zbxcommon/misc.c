@@ -2378,7 +2378,7 @@ int	calculate_item_nextcheck_unreachable(int simple_interval, const zbx_custom_i
  *                                                                            *
  * Purpose: calculate nextcheck timestamp for passive proxy                   *
  *                                                                            *
- * Parameters: hostid - [IN] host identificator from database                 *
+ * Parameters: hostid - [IN] host identifier from database                    *
  *             delay  - [IN] default delay value, can be overridden           *
  *             now    - [IN] current timestamp                                *
  *                                                                            *
@@ -3975,4 +3975,11 @@ int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekday
 	while (-1 != nextcheck && nextcheck <= now);
 
 	return nextcheck;
+}
+
+void	zbx_free_tag(zbx_tag_t *tag)
+{
+	zbx_free(tag->tag);
+	zbx_free(tag->value);
+	zbx_free(tag);
 }

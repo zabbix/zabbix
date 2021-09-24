@@ -20,7 +20,7 @@
 
 
 /**
- * Class containing methods for operations with user roles.
+ * User roles API implementation.
  */
 class CRole extends CApiService {
 
@@ -31,66 +31,36 @@ class CRole extends CApiService {
 		'delete' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
 	];
 
-	/**
-	 * @var string
-	 */
 	protected $tableName = 'role';
-
-	/**
-	 * @var string
-	 */
 	protected $tableAlias = 'r';
-
-	/**
-	 * @var array
-	 */
 	protected $sortColumns = ['roleid', 'name'];
 
 	/**
-	 * List of rules output parameters.
-	 *
-	 * @var array
+	 * Rule types.
 	 */
-	protected $rules_params = [CRoleHelper::SECTION_UI, CRoleHelper::UI_DEFAULT_ACCESS, CRoleHelper::SECTION_MODULES,
-		CRoleHelper::MODULES_DEFAULT_ACCESS, CRoleHelper::API_ACCESS, CRoleHelper::API_MODE, CRoleHelper::SECTION_API,
-		CRoleHelper::SECTION_ACTIONS, CRoleHelper::ACTIONS_DEFAULT_ACCESS
-	];
+	private const RULE_TYPE_INT32 = 0;
+	private const RULE_TYPE_STR = 1;
+	private const RULE_TYPE_MODULE = 2;
+	private const RULE_TYPE_SERVICE = 3;
 
 	/**
-	 * List of user output parameters.
-	 *
-	 * @var array
+	 * Rule type correspondence to the database field names.
 	 */
-	protected $user_params = ['userid', 'username', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang',
-		'refresh', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone', 'roleid'
-	];
-
-	/**
-	 * Rule value types.
-	 */
-	private const RULE_VALUE_TYPE_INT32 = 0;
-	private const RULE_VALUE_TYPE_STR = 1;
-	private const RULE_VALUE_TYPE_MODULE = 2;
-
-	/**
-	 * Set of rule value types and database field names that store their values.
-	 */
-	public const RULE_VALUE_TYPES = [
-		self::RULE_VALUE_TYPE_INT32 => 'value_int',
-		self::RULE_VALUE_TYPE_STR => 'value_str',
-		self::RULE_VALUE_TYPE_MODULE => 'value_moduleid'
+	public const RULE_TYPE_FIELDS = [
+		self::RULE_TYPE_INT32 => 'value_int',
+		self::RULE_TYPE_STR => 'value_str',
+		self::RULE_TYPE_MODULE => 'value_moduleid',
+		self::RULE_TYPE_SERVICE => 'value_serviceid'
 	];
 
 	/**
 	 * @param array $options
 	 *
-	 * @throws APIException
-	 *
 	 * @return array|int
+	 *
+	 * @throws APIException
 	 */
-	public function get(array $options) {
-		$result = [];
-
+	public function get(array $options = []) {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
 			'roleids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
@@ -110,8 +80,8 @@ class CRole extends CApiService {
 			// output
 			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', ['roleid', 'name', 'type', 'readonly']), 'default' => API_OUTPUT_EXTEND],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
-			'selectRules' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $this->rules_params), 'default' => null],
-			'selectUsers' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $this->user_params), 'default' => null],
+			'selectRules' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['ui', 'ui.default_access', 'services.read.mode', 'services.read.list', 'services.read.tag', 'services.write.mode', 'services.write.list', 'services.write.tag', 'modules', 'modules.default_access', 'api.access', 'api.mode', 'api', 'actions', 'actions.default_access']), 'default' => null],
+			'selectUsers' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['userid', 'username', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone', 'roleid']), 'default' => null],
 			// sort and limit
 			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
 			'sortorder' =>				['type' => API_SORTORDER, 'default' => []],
@@ -120,79 +90,46 @@ class CRole extends CApiService {
 			'editable' =>				['type' => API_BOOLEAN, 'default' => false],
 			'preservekeys' =>			['type' => API_BOOLEAN, 'default' => false]
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$sql_parts = [
-			'select'	=> ['role' => 'r.roleid'],
-			'from'		=> ['role' => 'role r'],
-			'where'		=> [],
-			'order'		=> [],
-			'limit'		=> null
-		];
-
-		// permission check + editable
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			if ($options['editable']) {
-				return $options['countOutput'] ? 0 : [];
-			}
-
-			$sql_parts['from']['users'] = 'users u';
-			$sql_parts['where']['u'] = 'r.roleid=u.roleid';
-			$sql_parts['where'][] = 'u.userid='.self::$userData['userid'];
+		if ($options['editable'] && self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			return $options['countOutput'] ? '0' : [];
 		}
 
-		$output = $options['output'];
+		$db_roles = [];
 
-		if ($options['selectRules'] !== null && is_array($options['output']) && !in_array('type', $options['output'])) {
-			$options['output'][] = 'type';
-		}
+		$sql = $this->createSelectQuery('role', $options);
+		$resource = DBselect($sql, $options['limit']);
 
-		// roleids
-		if ($options['roleids'] !== null) {
-			$sql_parts['where'][] = dbConditionInt('r.roleid', $options['roleids']);
-		}
-
-		// filter
-		if ($options['filter'] !== null) {
-			$this->dbFilter('role r', $options, $sql_parts);
-		}
-
-		// search
-		if ($options['search'] !== null) {
-			zbx_db_search('role r', $options, $sql_parts);
-		}
-
-		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
-		$sql_parts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
-
-		$res = DBselect(self::createSelectQueryFromParts($sql_parts), $options['limit']);
-
-		while ($db_role = DBfetch($res)) {
+		while ($row = DBfetch($resource)) {
 			if ($options['countOutput']) {
-				return $db_role['rowscount'];
+				return $row['rowscount'];
 			}
 
-			$result[$db_role['roleid']] = $db_role;
+			$db_roles[$row['roleid']] = $row;
 		}
 
-		if ($result) {
-			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, ['roleid', 'type'], $output);
+		if ($db_roles) {
+			$db_roles = $this->addRelatedObjects($options, $db_roles);
+			$db_roles = $this->unsetExtraFields($db_roles, ['roleid', 'type'], $options['output']);
 
 			if (!$options['preservekeys']) {
-				$result = array_values($result);
+				$db_roles = array_values($db_roles);
 			}
 		}
 
-		return $result;
+		return $db_roles;
 	}
 
 	/**
 	 * @param array $roles
 	 *
 	 * @return array
+	 *
+	 * @throws APIException
 	 */
 	public function create(array $roles): array {
 		$this->validateCreate($roles);
@@ -205,14 +142,16 @@ class CRole extends CApiService {
 		}
 
 		$roleids = DB::insert('role', $ins_roles);
+		$roles = array_combine($roleids, $roles);
 
-		foreach ($roles as $index => $role) {
-			$roles[$index]['roleid'] = $roleids[$index];
+		$this->updateRules($roles);
+
+		foreach ($roles as $roleid => &$role) {
+			$role['roleid'] = $roleid;
 		}
+		unset($role);
 
-		$this->updateRules($roles, __FUNCTION__);
-
-		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_USER_ROLE, $roles);
+		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_USER_ROLE, $roles);
 
 		return ['roleids' => $roleids];
 	}
@@ -220,78 +159,55 @@ class CRole extends CApiService {
 	/**
 	 * @param array $roles
 	 *
-	 * @throws APIException if no permissions or the input is invalid.
+	 * @throws APIException
 	 */
-	protected function validateCreate(array &$roles) {
+	private function validateCreate(array &$roles): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('role', 'name')],
 			'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])],
 			'rules' =>			['type' => API_OBJECT, 'default' => [], 'fields' => [
 				'ui' =>						['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
 					'name' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'value_str')],
-					'status' =>					['type' => API_INT32, 'in' => '0,1', 'default' => '1']
+					'status' =>					['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED, 'default' => ZBX_ROLE_RULE_ENABLED]
 				]],
-				'ui.default_access' =>		['type' => API_INT32, 'in' => CRoleHelper::DEFAULT_ACCESS_DISABLED.','.CRoleHelper::DEFAULT_ACCESS_ENABLED, 'default' => CRoleHelper::DEFAULT_ACCESS_ENABLED],
+				'ui.default_access' =>		['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED],
+				'services.read.mode' =>		['type' => API_INT32, 'in' => ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM.','.ZBX_ROLE_RULE_SERVICES_ACCESS_ALL],
+				'services.read.list' =>		['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
+					'serviceid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
+				]],
+				'services.read.tag' =>		['type' => API_OBJECT, 'fields' => [
+					'tag' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'value_str')],
+					'value' =>					['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('role_rule', 'value_str'), 'default' => '']
+				]],
+				'services.write.mode' =>	['type' => API_INT32, 'in' => ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM.','.ZBX_ROLE_RULE_SERVICES_ACCESS_ALL],
+				'services.write.list' =>	['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
+					'serviceid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
+				]],
+				'services.write.tag' =>		['type' => API_OBJECT, 'fields' => [
+					'tag' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'value_str')],
+					'value' =>					['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('role_rule', 'value_str'), 'default' => '']
+				]],
 				'modules' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
 					'moduleid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
-					'status' =>					['type' => API_INT32, 'in' => '0,1', 'default' => '1']
+					'status' =>					['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED, 'default' => ZBX_ROLE_RULE_ENABLED]
 				]],
-				'modules.default_access' =>	['type' => API_INT32, 'in' => CRoleHelper::DEFAULT_ACCESS_DISABLED.','.CRoleHelper::DEFAULT_ACCESS_ENABLED, 'default' => CRoleHelper::DEFAULT_ACCESS_ENABLED],
-				'api.access' =>				['type' => API_INT32, 'in' => CRoleHelper::API_ACCESS_DISABLED.','.CRoleHelper::API_ACCESS_ENABLED],
-				'api.mode' =>				['type' => API_INT32, 'in' => CRoleHelper::API_MODE_DENY.','.CRoleHelper::API_MODE_ALLOW],
+				'modules.default_access' =>	['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED],
 				'api' =>					['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'uniq' => true],
+				'api.access' =>				['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED],
+				'api.mode' =>				['type' => API_INT32, 'in' => ZBX_ROLE_RULE_API_MODE_DENY.','.ZBX_ROLE_RULE_API_MODE_ALLOW],
 				'actions' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
 					'name' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'value_str')],
-					'status' =>					['type' => API_INT32, 'in' => '0,1', 'default' => '1']
+					'status' =>					['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED, 'default' => ZBX_ROLE_RULE_ENABLED]
 				]],
-				'actions.default_access' =>	['type' => API_INT32, 'in' => CRoleHelper::DEFAULT_ACCESS_DISABLED.','.CRoleHelper::DEFAULT_ACCESS_ENABLED, 'default' => CRoleHelper::DEFAULT_ACCESS_ENABLED]
+				'actions.default_access' =>	['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED, 'default' => ZBX_ROLE_RULE_ENABLED]
 			]]
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $roles, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$this->checkDuplicates(array_keys(array_flip(array_column($roles, 'name'))));
-
-		$db_modules = DBfetchArray(DBselect(
-			'SELECT moduleid'.
-			' FROM module'.
-			' WHERE status='.MODULE_STATUS_ENABLED
-		), 'moduleid');
-		$default_modules = [];
-
-		foreach ($db_modules as $db_module) {
-			$default_modules[] = ['moduleid' => $db_module['moduleid'], 'status' => 1];
-		}
-
-		foreach ($roles as &$role) {
-			$role += ['rules' => []];
-			$role['rules'] += [
-				CRoleHelper::UI_DEFAULT_ACCESS => CRoleHelper::DEFAULT_ACCESS_ENABLED,
-				CRoleHelper::API_ACCESS => CRoleHelper::API_ACCESS_ENABLED,
-				CRoleHelper::API_MODE => CRoleHelper::API_MODE_DENY,
-				CRoleHelper::MODULES_DEFAULT_ACCESS => CRoleHelper::DEFAULT_ACCESS_ENABLED,
-				CRoleHelper::ACTIONS_DEFAULT_ACCESS => CRoleHelper::DEFAULT_ACCESS_ENABLED,
-				CRoleHelper::SECTION_MODULES => $default_modules
-			];
-
-			if (!array_key_exists(CRoleHelper::SECTION_UI, $role['rules'])) {
-				$skip = strlen(CRoleHelper::SECTION_UI.'.');
-
-				foreach (CRoleHelper::getAllUiElements($role['type']) as $ui_element) {
-					$role['rules'][CRoleHelper::SECTION_UI][] = ['name' => substr($ui_element, $skip), 'status' => 1];
-				}
-			}
-
-			if (!array_key_exists(CRoleHelper::SECTION_ACTIONS, $role['rules'])) {
-				$skip = strlen(CRoleHelper::SECTION_ACTIONS.'.');
-
-				foreach (CRoleHelper::getAllActions($role['type']) as $action) {
-					$role['rules'][CRoleHelper::SECTION_ACTIONS][] = ['name' => substr($action, $skip), 'status' => 1];
-				}
-			}
-		}
-
+		$this->checkDuplicates($roles);
 		$this->checkRules($roles);
 	}
 
@@ -299,6 +215,8 @@ class CRole extends CApiService {
 	 * @param array $roles
 	 *
 	 * @return array
+	 *
+	 * @throws APIException
 	 */
 	public function update(array $roles): array {
 		$this->validateUpdate($roles, $db_roles);
@@ -306,16 +224,7 @@ class CRole extends CApiService {
 		$upd_roles = [];
 
 		foreach ($roles as $role) {
-			$db_role = $db_roles[$role['roleid']];
-
-			$upd_role = [];
-
-			if (array_key_exists('name', $role) && $role['name'] !== $db_role['name']) {
-				$upd_role['name'] = $role['name'];
-			}
-			if (array_key_exists('type', $role) && $role['type'] !== $db_role['type']) {
-				$upd_role['type'] = $role['type'];
-			}
+			$upd_role = DB::getUpdatedValues('role', $role, $db_roles[$role['roleid']]);
 
 			if ($upd_role) {
 				$upd_roles[] = [
@@ -329,24 +238,22 @@ class CRole extends CApiService {
 			DB::update('role', $upd_roles);
 		}
 
-		$this->updateRules($roles, __FUNCTION__);
+		$roles = array_column($roles, null, 'roleid');
 
-		foreach ($db_roles as $db_roleid => $db_role) {
-			unset($db_roles[$db_roleid]['rules']);
-		}
+		$this->updateRules($roles, $db_roles);
 
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_USER_ROLE, $roles, $db_roles);
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER_ROLE, $roles, $db_roles);
 
 		return ['roleids' => array_column($roles, 'roleid')];
 	}
 
 	/**
-	 * @param array $roles
-	 * @param array $db_roles
+	 * @param array      $roles
+	 * @param array|null $db_roles
 	 *
-	 * @throws APIException if input is invalid.
+	 * @throws APIException
 	 */
-	private function validateUpdate(array &$roles, ?array &$db_roles) {
+	private function validateUpdate(array &$roles, ?array &$db_roles): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'roleid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('role', 'name')],
@@ -354,24 +261,41 @@ class CRole extends CApiService {
 			'rules' =>			['type' => API_OBJECT, 'fields' => [
 				'ui' =>						['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
 					'name' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'value_str')],
-					'status' =>					['type' => API_INT32, 'in' => '0,1', 'default' => '1']
+					'status' =>					['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED, 'default' => ZBX_ROLE_RULE_ENABLED]
 				]],
-				'ui.default_access' =>		['type' => API_INT32, 'in' => CRoleHelper::DEFAULT_ACCESS_DISABLED.','.CRoleHelper::DEFAULT_ACCESS_ENABLED],
+				'ui.default_access' =>		['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED],
+				'services.read.mode' =>		['type' => API_INT32, 'in' => ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM.','.ZBX_ROLE_RULE_SERVICES_ACCESS_ALL],
+				'services.read.list' =>		['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
+					'serviceid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
+				]],
+				'services.read.tag' =>		['type' => API_OBJECT, 'fields' => [
+					'tag' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'value_str')],
+					'value' =>					['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('role_rule', 'value_str'), 'default' => '']
+				]],
+				'services.write.mode' =>	['type' => API_INT32, 'in' => ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM.','.ZBX_ROLE_RULE_SERVICES_ACCESS_ALL],
+				'services.write.list' =>	['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
+					'serviceid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
+				]],
+				'services.write.tag' =>		['type' => API_OBJECT, 'fields' => [
+					'tag' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'value_str')],
+					'value' =>					['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('role_rule', 'value_str'), 'default' => '']
+				]],
 				'modules' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
 					'moduleid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
-					'status' =>					['type' => API_INT32, 'in' => '0,1', 'default' => '1']
+					'status' =>					['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED, 'default' => ZBX_ROLE_RULE_ENABLED]
 				]],
-				'modules.default_access' =>	['type' => API_INT32, 'in' => CRoleHelper::DEFAULT_ACCESS_DISABLED.','.CRoleHelper::DEFAULT_ACCESS_ENABLED],
-				'api.access' =>				['type' => API_INT32, 'in' => CRoleHelper::API_ACCESS_DISABLED.','.CRoleHelper::API_ACCESS_ENABLED],
-				'api.mode' =>				['type' => API_INT32, 'in' => CRoleHelper::API_MODE_DENY.','.CRoleHelper::API_MODE_ALLOW],
+				'modules.default_access' =>	['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED],
 				'api' =>					['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'uniq' => true],
+				'api.access' =>				['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED],
+				'api.mode' =>				['type' => API_INT32, 'in' => ZBX_ROLE_RULE_API_MODE_DENY.','.ZBX_ROLE_RULE_API_MODE_ALLOW],
 				'actions' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
 					'name' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'value_str')],
-					'status' =>					['type' => API_INT32, 'in' => '0,1', 'default' => '1']
+					'status' =>					['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED, 'default' => ZBX_ROLE_RULE_ENABLED]
 				]],
-				'actions.default_access' =>	['type' => API_INT32, 'in' => CRoleHelper::DEFAULT_ACCESS_DISABLED.','.CRoleHelper::DEFAULT_ACCESS_ENABLED]
+				'actions.default_access' =>	['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED]
 			]]
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $roles, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
@@ -379,415 +303,33 @@ class CRole extends CApiService {
 		$db_roles = $this->get([
 			'output' => ['roleid', 'name', 'type', 'readonly'],
 			'roleids' => array_column($roles, 'roleid'),
-			'selectRules' => [CRoleHelper::UI_DEFAULT_ACCESS],
+			'selectRules' => ['ui', 'ui.default_access', 'services.read.mode', 'services.read.list',
+				'services.read.tag', 'services.write.mode', 'services.write.list', 'services.write.tag', 'modules',
+				'modules.default_access', 'api.access', 'api.mode', 'api', 'actions', 'actions.default_access'
+			],
 			'preservekeys' => true
 		]);
-		$roles = $this->extendObjectsByKey($roles, $db_roles, 'roleid', ['name', 'type']);
 
-		if (array_diff(array_column($roles, 'roleid'), array_column($db_roles, 'roleid'))) {
+		if (count($db_roles) != count($roles)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$readonly = array_search(1, array_column($db_roles, 'readonly', 'name'));
-
-		if ($readonly !== false) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Cannot update readonly user role "%1$s".', $readonly));
-		}
-
-		$role_type = array_column($roles, 'type', 'roleid');
-
-		if (array_key_exists(self::$userData['roleid'], $role_type)
-				&& $role_type[self::$userData['roleid']] != self::$userData['type']) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('User cannot change the user type of own role.'));
-		}
-
-		$names = array_diff(array_column($roles, 'name'), array_column($db_roles, 'name'));
-
-		if ($names) {
-			$this->checkDuplicates($names);
-		}
-
+		$this->checkDuplicates($roles, $db_roles);
 		$this->checkRules($roles, $db_roles);
-	}
-
-	/**
-	 * Check for duplicated user roles.
-	 *
-	 * @param array $names
-	 *
-	 * @throws APIException if user role already exists.
-	 */
-	private function checkDuplicates(array $names): void {
-		$db_roles = DB::select('role', [
-			'output' => ['name'],
-			'filter' => ['name' => $names],
-			'limit' => 1
-		]);
-
-		if ($db_roles) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('User role with name "%1$s" already exists.', $db_roles[0]['name'])
-			);
-		}
-	}
-
-	/**
-	 * Check user role rules.
-	 *
-	 * @param array $roles
-	 * @param array $db_roles
-	 *
-	 * @throws APIException if input is invalid.
-	 */
-	private function checkRules(array $roles, array $db_roles = []): void {
-		$moduleids = [];
-
-		foreach ($roles as $role) {
-			if (!array_key_exists('rules', $role)) {
-				continue;
-			}
-
-			if (array_key_exists(CRoleHelper::UI_DEFAULT_ACCESS, $role['rules'])
-					|| array_key_exists(CRoleHelper::SECTION_UI, $role['rules'])) {
-				$ui_rules = [];
-				$default_access = CRoleHelper::DEFAULT_ACCESS_ENABLED;
-
-				if (array_key_exists(CRoleHelper::UI_DEFAULT_ACCESS, $role['rules'])) {
-					$default_access = $role['rules'][CRoleHelper::UI_DEFAULT_ACCESS];
-				}
-				elseif (array_key_exists('roleid', $role)) {
-					$default_access = $db_roles[$role['roleid']]['rules'][CRoleHelper::UI_DEFAULT_ACCESS];
-				}
-
-				$skip = strlen(CRoleHelper::SECTION_UI.'.');
-
-				foreach (CRoleHelper::getAllUiElements((int) $role['type']) as $rule) {
-					$index = substr($rule, $skip);
-					$ui_rules[$index] = $default_access;
-				}
-
-				if (array_key_exists('rules', $role) && array_key_exists(CRoleHelper::SECTION_UI, $role['rules'])) {
-					foreach ($role['rules'][CRoleHelper::SECTION_UI] as $ui_rule) {
-						if (!array_key_exists($ui_rule['name'], $ui_rules)) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('UI element "%1$s" is not available.', $ui_rule['name'])
-							);
-						}
-
-						$ui_rules[$ui_rule['name']] = $ui_rule['status'];
-					}
-				}
-
-				if (!in_array(1, $ui_rules)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one UI element must be checked.'));
-				}
-			}
-
-			if (array_key_exists(CRoleHelper::SECTION_MODULES, $role['rules'])) {
-				foreach ($role['rules'][CRoleHelper::SECTION_MODULES] as $module) {
-					$moduleids[$module['moduleid']] = true;
-				}
-			}
-
-			if (array_key_exists(CRoleHelper::SECTION_API, $role['rules'])) {
-				foreach ($role['rules'][CRoleHelper::SECTION_API] as $api_method) {
-					$this->validateApiMethod($api_method);
-				}
-			}
-
-			if (array_key_exists(CRoleHelper::SECTION_ACTIONS, $role['rules'])) {
-				foreach ($role['rules'][CRoleHelper::SECTION_ACTIONS] as $action) {
-					if (!in_array(sprintf('%s.%s', CRoleHelper::SECTION_ACTIONS, $action['name']),
-							CRoleHelper::getAllActions((int) $role['type']))) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Action "%1$s" is not available.', $action['name'])
-						);
-					}
-				}
-			}
-		}
-
-		if ($moduleids) {
-			$moduleids = array_keys($moduleids);
-
-			$db_modules = DBfetchArrayAssoc(DBselect(
-				'SELECT moduleid'.
-				' FROM module'.
-				' WHERE '.dbConditionInt('moduleid', $moduleids).
-					' AND status='.MODULE_STATUS_ENABLED
-			), 'moduleid');
-
-			foreach ($moduleids as $moduleid) {
-				if (!array_key_exists($moduleid, $db_modules)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Module with ID "%1$s" is not available.', $moduleid)
-					);
-				}
-			}
-		}
-	}
-
-	/**
-	 * Checks if the given API method is valid.
-	 *
-	 * @param string $api_method
-	 *
-	 * @throws APIException if the input is invalid.
-	 */
-	private function validateApiMethod(string $api_method): void {
-		if ($api_method === CRoleHelper::API_WILDCARD || $api_method === CRoleHelper::API_WILDCARD_ALIAS) {
-			return;
-		}
-
-		if (!preg_match('/([a-z]+|\*)\.([a-z]+|\*)/', $api_method)
-				|| (!in_array($api_method, CRoleHelper::getApiMethodMasks(USER_TYPE_SUPER_ADMIN))
-					&& !in_array($api_method, CRoleHelper::getApiMethods(USER_TYPE_SUPER_ADMIN)))) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid API method "%1$s".', $api_method));
-		}
-	}
-
-	/**
-	 * Update table "role_rule". Additionally check UI section for update operation.
-	 *
-	 * @param array  $roles                    Array of roles.
-	 * @param int    $roles[<role>]['roleid']  Role id.
-	 * @param int    $roles[<role>]['type']    Role type.
-	 * @param array  $roles[<role>]['rules']   Array or role rules to be updated.
-	 * @param string $method
-	 */
-	private function updateRules(array $roles, string $method): void {
-		$insert = [];
-		$update = [];
-		$delete = [];
-		$roles = array_column($roles, null, 'roleid');
-		$db_roles_rules = [];
-		$is_update = ($method === 'update');
-
-		if ($is_update) {
-			$db_rows = DB::select('role_rule', [
-				'output' => ['role_ruleid', 'roleid', 'type', 'name', 'value_int', 'value_str', 'value_moduleid'],
-				'filter' => ['roleid' => array_keys($roles)]
-			]);
-
-			// Move rules in database to $delete if it is not accessible anymore by role type.
-			foreach ($db_rows as $db_row) {
-				$role_type = (int) $roles[$db_row['roleid']]['type'];
-				$rule_name = $db_row['name'];
-				$section = CRoleHelper::getRuleSection($rule_name);
-
-				if ($section === CRoleHelper::SECTION_API && $rule_name !== CRoleHelper::API_ACCESS
-						&& $rule_name !== CRoleHelper::API_MODE) {
-					$rule_name = (strpos($db_row['value_str'], CRoleHelper::API_WILDCARD) === false)
-						? CRoleHelper::API_METHOD.$db_row['value_str']
-						: $rule_name;
-				}
-
-				if (CRoleHelper::checkRuleAllowedByType($rule_name, $role_type)) {
-					$db_roles_rules[$db_row['roleid']][$db_row['role_ruleid']] = $db_row;
-				}
-				else {
-					$delete[] = $db_row['role_ruleid'];
-				}
-			}
-		}
-
-		$roles_rules = [];
-		$processed_sections = [];
-
-		foreach ($roles as $role) {
-			if (!array_key_exists('rules', $role) && $is_update) {
-				continue;
-			}
-
-			$default = [
-				CRoleHelper::UI_DEFAULT_ACCESS => CRoleHelper::DEFAULT_ACCESS_ENABLED,
-				CRoleHelper::API_ACCESS => CRoleHelper::API_ACCESS_ENABLED,
-				CRoleHelper::API_MODE => CRoleHelper::API_MODE_DENY,
-				CRoleHelper::MODULES_DEFAULT_ACCESS => CRoleHelper::DEFAULT_ACCESS_ENABLED,
-				CRoleHelper::ACTIONS_DEFAULT_ACCESS => CRoleHelper::DEFAULT_ACCESS_ENABLED
-			];
-
-			if ($is_update) {
-				$db_role_rules = array_column($db_roles_rules[$role['roleid']], 'value_int', 'name');
-				$default = array_intersect_key($db_role_rules, $default) + $default;
-			}
-
-			$rules = $role['rules'] + $default + [
-				CRoleHelper::SECTION_UI => [],
-				CRoleHelper::SECTION_API => [],
-				CRoleHelper::SECTION_MODULES => [],
-				CRoleHelper::SECTION_ACTIONS => []
-			];
-			$roleid = $role['roleid'];
-
-			// UI rules.
-			$default_access = $rules[CRoleHelper::UI_DEFAULT_ACCESS];
-			$processed_sections[$roleid][CRoleHelper::SECTION_UI] = (bool) array_intersect_key($role['rules'], [
-				CRoleHelper::UI_DEFAULT_ACCESS => '',
-				CRoleHelper::SECTION_UI => ''
-			]);
-			$roles_rules[$roleid][] = [
-				'type' => self::RULE_VALUE_TYPE_INT32,
-				'name' => CRoleHelper::UI_DEFAULT_ACCESS,
-				'value_int' => $default_access
-			];
-
-			foreach ($rules[CRoleHelper::SECTION_UI] as $rule) {
-				if ($rule['status'] != $default_access) {
-					$roles_rules[$roleid][] = [
-						'type' => self::RULE_VALUE_TYPE_INT32,
-						'name' => sprintf('%s.%s', CRoleHelper::SECTION_UI, $rule['name']),
-						'value_int' => $rule['status']
-					];
-				}
-			}
-
-			// API rules.
-			$api_access = $rules[CRoleHelper::API_ACCESS];
-			$processed_sections[$roleid][CRoleHelper::SECTION_API] = (bool) array_intersect_key($role['rules'], [
-				CRoleHelper::API_ACCESS => '',
-				CRoleHelper::SECTION_API => ''
-			]);
-			$roles_rules[$roleid][] = [
-				'type' => self::RULE_VALUE_TYPE_INT32,
-				'name' => CRoleHelper::API_ACCESS,
-				'value_int' => $api_access
-			];
-
-			if ($api_access) {
-				$status = $rules[CRoleHelper::API_MODE];
-
-				$index = 0;
-				foreach ($rules[CRoleHelper::SECTION_API] as $method) {
-					$roles_rules[$roleid][] = [
-						'type' => self::RULE_VALUE_TYPE_STR,
-						'name' => CRoleHelper::API_METHOD.$index,
-						'value_str' => $method
-					];
-					$index++;
-				}
-
-				if ($index) {
-					$roles_rules[$roleid][] = [
-						'type' => self::RULE_VALUE_TYPE_INT32,
-						'name' => CRoleHelper::API_MODE,
-						'value_int' => $status
-					];
-				}
-			}
-
-			// Module rules.
-			$default_access = $rules[CRoleHelper::MODULES_DEFAULT_ACCESS];
-			$processed_sections[$roleid][CRoleHelper::SECTION_MODULES] = (bool) array_intersect_key($role['rules'], [
-				CRoleHelper::MODULES_DEFAULT_ACCESS => '',
-				CRoleHelper::SECTION_MODULES => ''
-			]);
-			$roles_rules[$roleid][] = [
-				'type' => self::RULE_VALUE_TYPE_INT32,
-				'name' => CRoleHelper::MODULES_DEFAULT_ACCESS,
-				'value_int' => $default_access
-			];
-
-			$index = 0;
-			foreach ($rules[CRoleHelper::SECTION_MODULES] as $module) {
-				if ($module['status'] != $default_access) {
-					$roles_rules[$roleid][] = [
-						'type' => self::RULE_VALUE_TYPE_MODULE,
-						'name' => CRoleHelper::MODULES_MODULE.$index,
-						'value_moduleid' => $module['moduleid']
-					];
-					$index++;
-				}
-			}
-
-			// Action rules.
-			$default_access = $rules[CRoleHelper::ACTIONS_DEFAULT_ACCESS];
-			$processed_sections[$roleid][CRoleHelper::SECTION_ACTIONS] = (bool) array_intersect_key($role['rules'], [
-				CRoleHelper::ACTIONS_DEFAULT_ACCESS => '',
-				CRoleHelper::SECTION_ACTIONS => ''
-			]);
-			$roles_rules[$roleid][] = [
-				'name' => CRoleHelper::ACTIONS_DEFAULT_ACCESS,
-				'value_int' => $default_access
-			];
-
-			foreach ($rules[CRoleHelper::SECTION_ACTIONS] as $rule) {
-				if ($rule['status'] != $default_access) {
-					$roles_rules[$roleid][] = [
-						'name' => sprintf('%s.%s', CRoleHelper::SECTION_ACTIONS, $rule['name']),
-						'value_int' => $rule['status']
-					];
-				}
-			}
-		}
-
-		// Fill rules to be inserted, updated or deleted.
-		foreach ($roles_rules as $roleid => $rules) {
-			if (!array_key_exists($roleid, $db_roles_rules)) {
-				foreach ($rules as $rule) {
-					$insert[] = $rule + ['roleid' => $roleid];
-				}
-
-				continue;
-			}
-
-			$db_role_rules = array_column($db_roles_rules[$roleid], null, 'name');
-
-			foreach ($rules as $rule) {
-				if (!array_key_exists($rule['name'], $db_role_rules)) {
-					$insert[] = $rule + ['roleid' => $roleid];
-
-					continue;
-				}
-
-				$role_ruleid = $db_role_rules[$rule['name']]['role_ruleid'];
-				$type_index = self::RULE_VALUE_TYPES[$db_role_rules[$rule['name']]['type']];
-
-				if (strval($db_role_rules[$rule['name']][$type_index]) != strval($rule[$type_index])) {
-					$update[] = [
-						'values' => $rule,
-						'where' => ['role_ruleid' => $role_ruleid]
-					];
-				}
-
-				unset($db_roles_rules[$roleid][$role_ruleid]);
-			}
-		}
-
-		foreach ($db_roles_rules as $roleid => $db_role_rules) {
-			if (!array_key_exists($roleid, $processed_sections)) {
-				continue;
-			}
-
-			foreach ($db_role_rules as $db_rule) {
-				$section = substr($db_rule['name'], 0, strpos($db_rule['name'], '.'));
-
-				if ($processed_sections[$roleid][$section]) {
-					$delete[] = $db_rule['role_ruleid'];
-				}
-			}
-		}
-
-		if ($insert) {
-			DB::insert('role_rule', $insert);
-		}
-
-		if ($update) {
-			DB::update('role_rule', $update);
-		}
-
-		if ($delete) {
-			DB::delete('role_rule', ['role_ruleid' => $delete]);
-		}
+		$this->checkReadonly($db_roles);
+		$this->checkOwnRoleType($roles);
 	}
 
 	/**
 	 * @param array $roleids
 	 *
 	 * @return array
+	 *
+	 * @throws APIException
 	 */
 	public function delete(array $roleids): array {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+
 		if (!CApiInputValidator::validate($api_input_rules, $roleids, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
@@ -799,15 +341,11 @@ class CRole extends CApiService {
 			'preservekeys' => true
 		]);
 
-		foreach ($roleids as $roleid) {
-			if (!array_key_exists($roleid, $db_roles)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
+		if (count($db_roles) != count($roleids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
 
-			$db_role = $db_roles[$roleid];
-
+		foreach ($db_roles as $db_role) {
 			if ($db_role['readonly'] == 1) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
 					_s('Cannot delete readonly user role "%1$s".', $db_role['name'])
@@ -816,159 +354,1169 @@ class CRole extends CApiService {
 
 			if ($db_role['users']) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_s('The role "%1$s" is assigned to at least one user and cannot be deleted.', $db_role['name'])
+					_s('Cannot delete assigned user role "%1$s".', $db_role['name'])
 				);
 			}
 		}
 
 		DB::delete('role', ['roleid' => $roleids]);
 
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER_ROLE, $db_roles);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_USER_ROLE, $db_roles);
 
 		return ['roleids' => $roleids];
 	}
 
-	protected function addRelatedObjects(array $options, array $result): array {
-		$roleids = array_keys($result);
+	/**
+	 * @param array      $roles
+	 * @param array|null $db_roles
+	 *
+	 * @throws APIException
+	 */
+	private function checkDuplicates(array $roles, array $db_roles = null): void {
+		$names = [];
 
-		// adding role rules
-		if ($options['selectRules'] !== null && $options['selectRules'] !== API_OUTPUT_COUNT) {
-			$options['selectRules'] = ($options['selectRules'] === API_OUTPUT_EXTEND)
-				? $this->rules_params
-				: array_intersect($this->rules_params, $options['selectRules']);
-
-			$enabled_modules = in_array('modules', $options['selectRules'])
-				? DBfetchArray(DBselect('SELECT moduleid FROM module WHERE status='.MODULE_STATUS_ENABLED))
-				: [];
-
-			$db_rules = DBselect(
-				'SELECT roleid,type,name,value_int,value_str,value_moduleid'.
-				' FROM role_rule'.
-				' WHERE '.dbConditionInt('roleid', $roleids)
-			);
-
-			$rules = [];
-			while ($db_rule = DBfetch($db_rules)) {
-				if (!array_key_exists($db_rule['roleid'], $rules)) {
-					$rules[$db_rule['roleid']] = [
-						CRoleHelper::SECTION_UI => [],
-						CRoleHelper::UI_DEFAULT_ACCESS => (string) CRoleHelper::DEFAULT_ACCESS_ENABLED,
-						CRoleHelper::SECTION_MODULES => [],
-						CRoleHelper::MODULES_DEFAULT_ACCESS => (string) CRoleHelper::DEFAULT_ACCESS_ENABLED,
-						CRoleHelper::API_ACCESS => (string) CRoleHelper::API_ACCESS_ENABLED,
-						CRoleHelper::API_MODE => (string) CRoleHelper::API_MODE_DENY,
-						CRoleHelper::SECTION_API => [],
-						CRoleHelper::SECTION_ACTIONS => [],
-						CRoleHelper::ACTIONS_DEFAULT_ACCESS => (string) CRoleHelper::DEFAULT_ACCESS_ENABLED
-					];
-				}
-
-				$value = $db_rule[self::RULE_VALUE_TYPES[$db_rule['type']]];
-
-				if (in_array($db_rule['name'], [CRoleHelper::UI_DEFAULT_ACCESS, CRoleHelper::MODULES_DEFAULT_ACCESS,
-						CRoleHelper::API_ACCESS, CRoleHelper::API_MODE, CRoleHelper::ACTIONS_DEFAULT_ACCESS])) {
-					$rules[$db_rule['roleid']][$db_rule['name']] = $value;
-				}
-				else {
-					[$key, $name] = explode('.', $db_rule['name'], 2);
-					$rules[$db_rule['roleid']][$key][$name] = $value;
-				}
-			}
-
-			foreach ($result as $roleid => $role) {
-				$role_rules = [];
-
-				foreach ($options['selectRules'] as $param) {
-					$role_rules[$param] = [];
-
-					switch ($param) {
-						case CRoleHelper::SECTION_UI:
-							foreach (CRoleHelper::getAllUiElements((int) $role['type']) as $ui_element) {
-								$ui_element = explode('.', $ui_element, 2)[1];
-								$role_rules[$param][] = [
-									'name' => $ui_element,
-									'status' => array_key_exists($ui_element, $rules[$roleid][$param])
-										? $rules[$roleid][$param][$ui_element]
-										: $rules[$roleid][CRoleHelper::UI_DEFAULT_ACCESS]
-								];
-							}
-							break;
-
-						case CRoleHelper::UI_DEFAULT_ACCESS:
-						case CRoleHelper::MODULES_DEFAULT_ACCESS:
-						case CRoleHelper::API_ACCESS:
-						case CRoleHelper::API_MODE:
-						case CRoleHelper::ACTIONS_DEFAULT_ACCESS:
-							$role_rules[$param] = $rules[$roleid][$param];
-							break;
-
-						case CRoleHelper::SECTION_MODULES:
-							$modules = array_flip($rules[$roleid][$param]);
-							foreach ($enabled_modules as $module) {
-								$role_rules[$param][] = [
-									'moduleid' => $module['moduleid'],
-									'status' => array_key_exists($module['moduleid'], $modules)
-										? (string) (int) !$rules[$roleid][CRoleHelper::MODULES_DEFAULT_ACCESS]
-										: $rules[$roleid][CRoleHelper::MODULES_DEFAULT_ACCESS]
-								];
-							}
-							break;
-
-						case CRoleHelper::SECTION_API:
-							$role_rules[$param] = array_values($rules[$roleid][$param]);
-							break;
-
-						case CRoleHelper::SECTION_ACTIONS:
-							foreach (CRoleHelper::getAllActions((int) $role['type']) as $action) {
-								$action = explode('.', $action, 2)[1];
-								$role_rules[$param][] = [
-									'name' => $action,
-									'status' => array_key_exists($action, $rules[$roleid][$param])
-										? $rules[$roleid][$param][$action]
-										: $rules[$roleid][CRoleHelper::ACTIONS_DEFAULT_ACCESS]
-								];
-							}
-					}
-				}
-
-				$result[$roleid]['rules'] = $role_rules;
+		foreach ($roles as $role) {
+			if ($db_roles === null
+					|| (array_key_exists('name', $role) && $role['name'] !== $db_roles[$role['roleid']]['name'])) {
+				$names[] = $role['name'];
 			}
 		}
 
-		// adding users
-		if ($options['selectUsers'] !== null && $options['selectRules'] !== API_OUTPUT_COUNT) {
-			if ($options['selectUsers'] === API_OUTPUT_EXTEND) {
-				$options['selectUsers'] = $this->user_params;
+		if (!$names) {
+			return;
+		}
+
+		$duplicate = DB::select('role', [
+			'output' => ['name'],
+			'filter' => ['name' => $names],
+			'limit' => 1
+		]);
+
+		if ($duplicate) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('User role "%1$s" already exists.', $duplicate[0]['name']));
+		}
+	}
+
+	/**
+	 * Check user role rules.
+	 *
+	 * @param array      $roles
+	 * @param array|null $db_roles
+	 *
+	 * @throws APIException if input is invalid.
+	 */
+	private function checkRules(array $roles, array $db_roles = null): void {
+		foreach ($roles as $role) {
+			if (!array_key_exists('rules', $role)) {
+				continue;
 			}
 
-			if (in_array('roleid', $options['selectUsers'])) {
-				$roleid_requested = true;
-			}
-			else {
-				$roleid_requested = false;
-				$options['selectUsers'][] = 'roleid';
-			}
+			$name = $db_roles !== null ? $db_roles[$role['roleid']]['name'] : $role['name'];
+			$type = array_key_exists('type', $role) ? $role['type'] : $db_roles[$role['roleid']]['type'];
 
-			$db_users = DBselect(
-				'SELECT '.implode(',', $options['selectUsers']).
-				' FROM users'.
-				' WHERE '.dbConditionInt('roleid', $roleids)
-			);
+			$db_rules = $db_roles !== null ? $db_roles[$role['roleid']]['rules'] : null;
 
-			foreach ($result as $roleid => $role) {
-				$result[$roleid]['users'] = [];
-			}
+			$this->checkUiRules($name, (int) $type, $role['rules'], $db_rules);
+			$this->checkServicesRules($name, (int) $type, $role['rules'], $db_rules);
+			$this->checkModulesRules($name, $role['rules']);
+			$this->checkApiRules($name, $role['rules']);
+			$this->checkActionsRules($name, (int) $type, $role['rules']);
+		}
+	}
 
-			while ($db_user = DBfetch($db_users)) {
-				$roleid = $db_user['roleid'];
-				if (!$roleid_requested) {
-					unset($db_user['roleid']);
+	/**
+	 * @param string     $name
+	 * @param int        $type
+	 * @param array      $rules
+	 * @param array|null $db_rules
+
+	 * @throws APIException
+	 */
+	private function checkUiRules(string $name, int $type, array $rules, array $db_rules = null): void {
+		if (!array_key_exists('ui.default_access', $rules) && !array_key_exists('ui', $rules)) {
+			return;
+		}
+
+		if (array_key_exists('ui.default_access', $rules)) {
+			$default_access = $rules['ui.default_access'];
+		}
+		elseif ($db_rules !== null) {
+			$default_access = $db_rules['ui.default_access'];
+		}
+		else {
+			$default_access = ZBX_ROLE_RULE_ENABLED;
+		}
+
+		$ui_rules = [];
+
+		foreach (CRoleHelper::getUiElementsByUserType($type) as $ui_element) {
+			$ui_rule_name = substr($ui_element, strlen('ui.'));
+			$ui_rules[$ui_rule_name] = $default_access == ZBX_ROLE_RULE_ENABLED;
+		}
+
+		if (array_key_exists('ui', $rules)) {
+			foreach ($rules['ui'] as $ui_rule) {
+				if (!array_key_exists($ui_rule['name'], $ui_rules)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('UI element "%2$s" is not available for user role "%1$s".', $name, $ui_rule['name'])
+					);
 				}
 
-				$result[$roleid]['users'][] = $db_user;
+				$ui_rules[$ui_rule['name']] = $ui_rule['status'] == ZBX_ROLE_RULE_ENABLED;
+			}
+		}
+
+		if (!in_array(true, $ui_rules)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('At least one UI element must be enabled for user role "%1$s".', $name)
+			);
+		}
+	}
+
+	/**
+	 * @param string     $name
+	 * @param int        $type
+	 * @param array      $rules
+	 * @param array|null $db_rules
+	 *
+	 * @throws APIException
+	 */
+	private function checkServicesRules(string $name, int $type, array $rules, array $db_rules = null): void {
+		$this->checkServicesReadRules($name, $rules, $db_rules);
+		$this->checkServicesWriteRules($name, $type, $rules, $db_rules);
+
+		$list = [];
+
+		if (array_key_exists('services.read.list', $rules)) {
+			$list = array_merge($list, $rules['services.read.list']);
+		}
+		elseif ($db_rules !== null) {
+			$list = array_merge($list, $db_rules['services.read.list']);
+		}
+
+		if (array_key_exists('services.write.list', $rules)) {
+			$list = array_merge($list, $rules['services.write.list']);
+		}
+		elseif ($db_rules !== null) {
+			$list = array_merge($list, $db_rules['services.write.list']);
+		}
+
+		if (!$list) {
+			return;
+		}
+
+		$serviceids = array_unique(array_column($list, 'serviceid'));
+
+		$db_services = DB::select('services', [
+			'output' => ['serviceid'],
+			'serviceids' => $serviceids,
+			'preservekeys' => true
+		]);
+
+		$unavailable_serviceids = array_diff($serviceids, array_keys($db_services));
+
+		if ($unavailable_serviceids) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Service with ID "%2$s" is not available for user role "%1$s".', $name, $unavailable_serviceids[0])
+			);
+		}
+	}
+
+	/**
+	 * @param string     $name
+	 * @param array      $rules
+	 * @param array|null $db_rules
+
+	 * @throws APIException
+	 */
+	private function checkServicesReadRules(string $name, array $rules, array $db_rules = null): void {
+		if (!array_key_exists('services.read.mode', $rules)
+				&& !array_key_exists('services.read.list', $rules)
+				&& !array_key_exists('services.read.tag', $rules)) {
+			return;
+		}
+
+		if (array_key_exists('services.read.mode', $rules)) {
+			$mode = $rules['services.read.mode'];
+		}
+		elseif ($db_rules !== null) {
+			$mode = $db_rules['services.read.mode'];
+		}
+		else {
+			$mode = ZBX_ROLE_RULE_SERVICES_ACCESS_ALL;
+		}
+
+		if ($mode == ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM) {
+			if (array_key_exists('services.read.tag', $rules)) {
+				if ($rules['services.read.tag']['tag'] === '' && $rules['services.read.tag']['value'] !== '') {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Cannot have non-empty tag value while having empty tag in rule "%2$s" for user role "%1$s".',
+						$name, 'services.read.tag'
+					));
+				}
+			}
+
+			return;
+		}
+
+		if (array_key_exists('services.read.list', $rules)) {
+			$has_list = (bool) $rules['services.read.list'];
+		}
+		elseif ($db_rules !== null) {
+			$has_list = (bool) $db_rules['services.read.list'];
+		}
+		else {
+			$has_list = false;
+		}
+
+		if ($has_list) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+				'Cannot have non-default "%2$s" rule while having "%3$s" set to %4$d for user role "%1$s".',
+				$name, 'services.read.list', 'services.read.mode', ZBX_ROLE_RULE_SERVICES_ACCESS_ALL
+			));
+		}
+
+		if (array_key_exists('services.read.tag', $rules)) {
+			$has_tag = $rules['services.read.tag']['tag'] !== '';
+		}
+		elseif ($db_rules !== null) {
+			$has_tag = $db_rules['services.read.tag']['tag'] !== '';
+		}
+		else {
+			$has_tag = false;
+		}
+
+		if ($has_tag) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+				'Cannot have non-default "%2$s" rule while having "%3$s" set to %4$d for user role "%1$s".',
+				$name, 'services.read.tag', 'services.read.mode', ZBX_ROLE_RULE_SERVICES_ACCESS_ALL
+			));
+		}
+	}
+
+	/**
+	 * @param string     $name
+	 * @param int        $type
+	 * @param array      $rules
+	 * @param array|null $db_rules
+
+	 * @throws APIException
+	 */
+	private function checkServicesWriteRules(string $name, int $type, array $rules, array $db_rules = null): void {
+		if (!array_key_exists('services.write.mode', $rules)
+				&& !array_key_exists('services.write.list', $rules)
+				&& !array_key_exists('services.write.tag', $rules)) {
+			return;
+		}
+
+		if (array_key_exists('services.write.mode', $rules)) {
+			$mode = $rules['services.write.mode'];
+		}
+		elseif ($db_rules !== null) {
+			$mode = $db_rules['services.write.mode'];
+		}
+		else {
+			$mode = ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM;
+		}
+
+		if ($mode == ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM) {
+			if (array_key_exists('services.write.tag', $rules)) {
+				if ($rules['services.write.tag']['tag'] === '' && $rules['services.write.tag']['value'] !== '') {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Cannot have non-empty tag value while having empty tag in rule "%2$s" for user role "%1$s".',
+						$name, 'services.write.tag'
+					));
+				}
+			}
+
+			return;
+		}
+
+		if (array_key_exists('services.write.list', $rules)) {
+			$has_list = (bool) $rules['services.write.list'];
+		}
+		elseif ($db_rules !== null) {
+			$has_list = (bool) $db_rules['services.write.list'];
+		}
+		else {
+			$has_list = false;
+		}
+
+		if ($has_list) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+				'Cannot have non-default "%2$s" rule while having "%3$s" set to %4$d for user role "%1$s".',
+				$name, 'services.write.list', 'services.write.mode', ZBX_ROLE_RULE_SERVICES_ACCESS_ALL
+			));
+		}
+
+		if (array_key_exists('services.write.tag', $rules)) {
+			$has_tag = $rules['services.write.tag']['tag'] !== '';
+		}
+		elseif ($db_rules !== null) {
+			$has_tag = $db_rules['services.write.tag']['tag'] !== '';
+		}
+		else {
+			$has_tag = false;
+		}
+
+		if ($has_tag) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+				'Cannot have non-default "%2$s" rule while having "%3$s" set to %4$d for user role "%1$s".',
+				$name, 'services.write.tag', 'services.write.mode', ZBX_ROLE_RULE_SERVICES_ACCESS_ALL
+			));
+		}
+	}
+
+	/**
+	 * @param string     $name
+	 * @param array      $rules
+	 *
+	 * @throws APIException
+	 */
+	private function checkModulesRules(string $name, array $rules): void {
+		if (!array_key_exists('modules', $rules)) {
+			return;
+		}
+
+		$moduleids = [];
+
+		foreach ($rules['modules'] as $module) {
+			$moduleids[$module['moduleid']] = true;
+		}
+
+		if (!$moduleids) {
+			return;
+		}
+
+		$unavailable_moduleids = array_diff(array_keys($moduleids), self::getEnabledModuleIds());
+
+		if ($unavailable_moduleids) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Module with ID "%2$s" is not available for user role "%1$s".', $name, $unavailable_moduleids[0])
+			);
+		}
+	}
+
+	/**
+	 * @param string $name
+	 * @param array  $rules
+	 *
+	 * @throws APIException
+	 */
+	private function checkApiRules(string $name, array $rules): void {
+		if (!array_key_exists('api', $rules)) {
+			return;
+		}
+
+		foreach ($rules['api'] as $rule) {
+			if ($rule === ZBX_ROLE_RULE_API_WILDCARD || $rule === ZBX_ROLE_RULE_API_WILDCARD_ALIAS) {
+				continue;
+			}
+
+			if (!in_array($rule, CRoleHelper::getApiMethodMasks(USER_TYPE_SUPER_ADMIN), true)
+					&& !in_array($rule, CRoleHelper::getApiMethods(USER_TYPE_SUPER_ADMIN), true)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Invalid API method "%2$s" for user role "%1$s".', $name, $rule)
+				);
+			}
+		}
+	}
+
+	/**
+	 * @param string $name
+	 * @param int    $type
+	 * @param array  $rules
+	 *
+	 * @throws APIException
+	 */
+	private function checkActionsRules(string $name, int $type, array $rules): void {
+		if (!array_key_exists('actions', $rules)) {
+			return;
+		}
+
+		$all_actions = CRoleHelper::getActionsByUserType($type);
+
+		foreach ($rules['actions'] as $rule) {
+			if (!in_array('actions.'.$rule['name'], $all_actions)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Action "%2$s" is not available for user role "%1$s".', $name, $rule['name'])
+				);
+			}
+		}
+	}
+
+	/**
+	 * @param array $db_roles
+	 *
+	 * @throws APIException
+	 */
+	private function checkReadonly(array $db_roles): void {
+		foreach ($db_roles as $db_role) {
+			if ($db_role['readonly'] == 1) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Cannot update readonly user role "%1$s".',
+					$db_role['name']
+				));
+			}
+		}
+	}
+
+	/**
+	 * @param array $roles
+	 *
+	 * @throws APIException
+	 */
+	private function checkOwnRoleType(array $roles): void {
+		$role_types = array_column($roles, 'type', 'roleid');
+
+		if (array_key_exists(self::$userData['roleid'], $role_types)
+				&& $role_types[self::$userData['roleid']] != self::$userData['type']) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Cannot change the user type of own role.'));
+		}
+	}
+
+	/**
+	 * @param array      $roles
+	 * @param array|null $db_roles
+	 *
+	 * @throws APIException
+	 */
+	private function updateRules(array $roles, array $db_roles = null): void {
+		$default_rules = [
+			'ui' => [],
+			'ui.default_access' => ZBX_ROLE_RULE_ENABLED,
+			'services.read.mode' => ZBX_ROLE_RULE_SERVICES_ACCESS_ALL,
+			'services.read.list' => [],
+			'services.read.tag' => ['tag' => '', 'value' => ''],
+			'services.write.mode' => ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM,
+			'services.write.list' => [],
+			'services.write.tag' => ['tag' => '', 'value' => ''],
+			'modules' => [],
+			'modules.default_access' => ZBX_ROLE_RULE_ENABLED,
+			'api' => [],
+			'api.access' => ZBX_ROLE_RULE_ENABLED,
+			'api.mode' => ZBX_ROLE_RULE_API_MODE_DENY,
+			'actions' => [],
+			'actions.default_access' => ZBX_ROLE_RULE_ENABLED
+		];
+
+		$rules = [];
+
+		foreach ($roles as $roleid => $role) {
+			if (!array_key_exists('rules', $role)) {
+				continue;
+			}
+
+			$type = array_key_exists('type', $role) ? $role['type'] : $db_roles[$role['roleid']]['type'];
+
+			$old_rules = $db_roles !== null ? $db_roles[$roleid]['rules'] : $default_rules;
+			$new_rules = $role['rules'] + $old_rules;
+
+			$rules[$roleid] = array_merge(
+				$this->compileUiRules((int) $type, $old_rules, $new_rules),
+				$this->compileServicesReadRules($new_rules),
+				$this->compileServicesWriteRules($new_rules),
+				$this->compileModulesRules($old_rules, $new_rules),
+				$this->compileApiRules($new_rules),
+				$this->compileActionsRules((int) $type, $old_rules, $new_rules)
+			);
+		}
+
+		$del_rules = [];
+		$ins_rules = [];
+
+		if ($db_roles !== null) {
+			$db_rules = DB::select('role_rule', [
+				'output' => ['role_ruleid', 'roleid', 'type', 'name', 'value_int', 'value_str', 'value_moduleid',
+					'value_serviceid'
+				],
+				'filter' => ['roleid' => array_keys($rules)]
+			]);
+
+			foreach ($db_rules as $db_rule) {
+				$value = $db_rule[self::RULE_TYPE_FIELDS[$db_rule['type']]];
+
+				$del_rules[$db_rule['roleid']][$db_rule['name']][$db_rule['type']][$value] = $db_rule['role_ruleid'];
+			}
+		}
+
+		foreach ($rules as $roleid => $role_rules) {
+			foreach ($role_rules as $rule) {
+				if (array_key_exists($roleid, $del_rules)
+						&& array_key_exists($rule['name'], $del_rules[$roleid])
+						&& array_key_exists($rule['type'], $del_rules[$roleid][$rule['name']])
+						&& array_key_exists($rule['value'], $del_rules[$roleid][$rule['name']][$rule['type']])) {
+					unset($del_rules[$roleid][$rule['name']][$rule['type']][$rule['value']]);
+				}
+				else {
+					$ins_rules[$rule['type']][] = [
+						'roleid' => $roleid,
+						'type' => $rule['type'],
+						'name' => $rule['name'],
+						self::RULE_TYPE_FIELDS[$rule['type']] => $rule['value']
+					];
+				}
+			}
+		}
+
+		if ($del_rules) {
+			$del_role_ruleids = [];
+
+			foreach ($del_rules as $del_rules) {
+				foreach ($del_rules as $del_rules) {
+					foreach ($del_rules as $del_rules) {
+						foreach ($del_rules as $role_ruleid) {
+							$del_role_ruleids[$role_ruleid] = true;
+						}
+					}
+				}
+			}
+
+			DB::delete('role_rule', ['role_ruleid' => array_keys($del_role_ruleids)]);
+		}
+
+		if ($ins_rules) {
+			foreach ($ins_rules as $ins_rules) {
+				DB::insertBatch('role_rule', $ins_rules);
+			}
+		}
+	}
+
+	/**
+	 * @param int   $type
+	 * @param array $old_rules
+	 * @param array $new_rules
+	 *
+	 * @return array
+	 */
+	private function compileUiRules(int $type, array $old_rules, array $new_rules): array {
+		$old_ui_rules = array_column($old_rules['ui'], null, 'name');
+		$new_ui_rules = array_column($new_rules['ui'], null, 'name');
+
+		$compiled_rules = [];
+
+		foreach (CRoleHelper::getUiElementsByUserType($type) as $ui_rule_name) {
+			$ui_element = substr($ui_rule_name, strlen('ui.'));
+
+			if (array_key_exists($ui_element, $new_ui_rules)) {
+				$ui_rule_status = $new_ui_rules[$ui_element]['status'];
+			}
+			elseif (array_key_exists($ui_element, $old_ui_rules)) {
+				$ui_rule_status = $old_ui_rules[$ui_element]['status'];
+			}
+			else {
+				$ui_rule_status = $old_rules['ui.default_access'];
+			}
+
+			if ($ui_rule_status != $new_rules['ui.default_access']) {
+				$compiled_rules[] = [
+					'name' => $ui_rule_name,
+					'type' => self::RULE_TYPE_INT32,
+					'value' => $ui_rule_status
+				];
+			}
+
+		}
+
+		$compiled_rules[] = [
+			'name' => 'ui.default_access',
+			'type' => self::RULE_TYPE_INT32,
+			'value' => $new_rules['ui.default_access']
+		];
+
+		return $compiled_rules;
+	}
+
+	/**
+	 * @param array $new_rules
+	 *
+	 * @return array
+	 */
+	private function compileServicesReadRules(array $new_rules): array {
+		$compiled_rules[] = [
+			'name' => 'services.read',
+			'type' => self::RULE_TYPE_INT32,
+			'value' => $new_rules['services.read.mode']
+		];
+
+		if ($new_rules['services.read.mode'] == ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM) {
+			foreach ($new_rules['services.read.list'] as $index => $service) {
+				$compiled_rules[] = [
+					'name' => 'services.read.id.'.$index,
+					'type' => self::RULE_TYPE_SERVICE,
+					'value' => $service['serviceid']
+				];
+			}
+
+			if ($new_rules['services.read.tag']['tag'] !== '') {
+				$compiled_rules[] = [
+					'name' => 'services.read.tag.name',
+					'type' => self::RULE_TYPE_STR,
+					'value' => $new_rules['services.read.tag']['tag']
+				];
+
+				if ($new_rules['services.read.tag']['value'] !== '') {
+					$compiled_rules[] = [
+						'name' => 'services.read.tag.value',
+						'type' => self::RULE_TYPE_STR,
+						'value' => $new_rules['services.read.tag']['value']
+					];
+				}
+			}
+		}
+
+		return $compiled_rules;
+	}
+
+	/**
+	 * @param array $new_rules
+	 *
+	 * @return array
+	 */
+	private function compileServicesWriteRules(array $new_rules): array {
+		$compiled_rules[] = [
+			'name' => 'services.write',
+			'type' => self::RULE_TYPE_INT32,
+			'value' => $new_rules['services.write.mode']
+		];
+
+		if ($new_rules['services.write.mode'] == ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM) {
+			foreach ($new_rules['services.write.list'] as $index => $service) {
+				$compiled_rules[] = [
+					'name' => 'services.write.id.'.$index,
+					'type' => self::RULE_TYPE_SERVICE,
+					'value' => $service['serviceid']
+				];
+			}
+
+			if ($new_rules['services.write.tag']['tag'] !== '') {
+				$compiled_rules[] = [
+					'name' => 'services.write.tag.name',
+					'type' => self::RULE_TYPE_STR,
+					'value' => $new_rules['services.write.tag']['tag']
+				];
+
+				if ($new_rules['services.write.tag']['value'] !== '') {
+					$compiled_rules[] = [
+						'name' => 'services.write.tag.value',
+						'type' => self::RULE_TYPE_STR,
+						'value' => $new_rules['services.write.tag']['value']
+					];
+				}
+			}
+		}
+
+		return $compiled_rules;
+	}
+
+	/**
+	 * @param array $old_rules
+	 * @param array $new_rules
+	 *
+	 * @return array
+	 *
+	 * @throws APIException
+	 */
+	private function compileModulesRules(array $old_rules, array $new_rules): array {
+		$old_modules_rules = array_column($old_rules['modules'], null, 'moduleid');
+		$new_modules_rules = array_column($new_rules['modules'], null, 'moduleid');
+
+		$compiled_rules = [];
+
+		$index = 0;
+
+		foreach (self::getEnabledModuleIds() as $moduleid) {
+			if (array_key_exists($moduleid, $new_modules_rules)) {
+				$module_status = $new_modules_rules[$moduleid]['status'];
+			}
+			elseif (array_key_exists($moduleid, $old_modules_rules)) {
+				$module_status = $old_modules_rules[$moduleid]['status'];
+			}
+			else {
+				$module_status = $old_rules['modules.default_access'];
+			}
+
+			if ($module_status != $new_rules['modules.default_access']) {
+				$compiled_rules[] = [
+					'name' => 'modules.module.'.$index,
+					'type' => self::RULE_TYPE_MODULE,
+					'value' => $moduleid
+				];
+
+				$index++;
+			}
+		}
+
+		$compiled_rules[] = [
+			'name' => 'modules.default_access',
+			'type' => self::RULE_TYPE_INT32,
+			'value' => $new_rules['modules.default_access']
+		];
+
+		return $compiled_rules;
+	}
+
+	/**
+	 * @param array $new_rules
+	 *
+	 * @return array
+	 */
+	private function compileApiRules(array $new_rules): array {
+		$compiled_rules = [];
+
+		$compiled_rules[] = [
+			'name' => 'api.access',
+			'type' => self::RULE_TYPE_INT32,
+			'value' => $new_rules['api.access']
+		];
+
+		if ($new_rules['api.access'] == ZBX_ROLE_RULE_ENABLED) {
+			$compiled_rules[] = [
+				'name' => 'api.mode',
+				'type' => self::RULE_TYPE_INT32,
+				'value' => $new_rules['api.mode']
+			];
+
+			foreach ($new_rules['api'] as $index => $api_method) {
+				$compiled_rules[] = [
+					'name' => 'api.method.'.$index,
+					'type' => self::RULE_TYPE_STR,
+					'value' => $api_method
+				];
+			}
+		}
+
+		return $compiled_rules;
+	}
+
+	/**
+	 * @param int   $type
+	 * @param array $old_rules
+	 * @param array $new_rules
+	 *
+	 * @return array
+	 */
+	private function compileActionsRules(int $type, array $old_rules, array $new_rules): array {
+		$old_actions_rules = array_column($old_rules['actions'], null, 'name');
+		$new_actions_rules = array_column($new_rules['actions'], null, 'name');
+
+		$compiled_rules = [];
+
+		foreach (CRoleHelper::getActionsByUserType($type) as $action_rule_name) {
+			$action_element = substr($action_rule_name, strlen('actions.'));
+
+			if (array_key_exists($action_element, $new_actions_rules)) {
+				$action_rule_status = $new_actions_rules[$action_element]['status'];
+			}
+			elseif (array_key_exists($action_element, $old_actions_rules)) {
+				$action_rule_status = $old_actions_rules[$action_element]['status'];
+			}
+			else {
+				$action_rule_status = $old_rules['actions.default_access'];
+			}
+
+			if ($action_rule_status != $new_rules['actions.default_access']) {
+				$compiled_rules[] = [
+					'name' => $action_rule_name,
+					'type' => self::RULE_TYPE_INT32,
+					'value' => $action_rule_status
+				];
+			}
+
+		}
+
+		$compiled_rules[] = [
+			'name' => 'actions.default_access',
+			'type' => self::RULE_TYPE_INT32,
+			'value' => $new_rules['actions.default_access']
+		];
+
+		return $compiled_rules;
+	}
+
+	/**
+	 * @param string $table_name
+	 * @param string $table_alias
+	 * @param array  $options
+	 * @param array  $sql_parts
+	 *
+	 * @return array
+	 */
+	protected function applyQueryFilterOptions($table_name, $table_alias, array $options, array $sql_parts): array {
+		$sqlParts = parent::applyQueryFilterOptions($table_name, $table_alias, $options, $sql_parts);
+
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			$sql_parts['from']['users'] = 'users u';
+			$sql_parts['where']['u'] = 'r.roleid=u.roleid';
+			$sql_parts['where'][] = 'u.userid='.self::$userData['userid'];
+		}
+
+		return $sqlParts;
+	}
+
+	/**
+	 * @param string $table_name
+	 * @param string $table_alias
+	 * @param array  $options
+	 * @param array  $sql_parts
+	 *
+	 * @return array
+	 */
+	protected function applyQueryOutputOptions($table_name, $table_alias, array $options, array $sql_parts): array {
+		$sql_parts = parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
+
+		if (!$options['countOutput'] && $options['selectRules'] !== null) {
+			$sql_parts = $this->addQuerySelect('r.type', $sql_parts);
+		}
+
+		return $sql_parts;
+	}
+
+	/**
+	 * @param array $options
+	 * @param array $result
+	 *
+	 * @return array
+	 *
+	 * @throws APIException
+	 */
+	protected function addRelatedObjects(array $options, array $result): array {
+		$result = parent::addRelatedObjects($options, $result);
+
+		$roleids = array_keys($result);
+
+		if ($options['selectRules'] !== null) {
+			if ($options['selectRules'] === API_OUTPUT_EXTEND) {
+				$output = ['ui', 'ui.default_access', 'services.read.mode', 'services.read.list', 'services.read.tag',
+					'services.write.mode', 'services.write.list', 'services.write.tag', 'modules',
+					'modules.default_access', 'api', 'api.access', 'api.mode', 'actions', 'actions.default_access'
+				];
+			}
+			else {
+				$output = $options['selectRules'];
+			}
+
+			$rules = DB::select('role_rule', [
+				'output' => ['role_ruleid', 'roleid', 'type', 'name', 'value_int', 'value_str', 'value_moduleid',
+					'value_serviceid'
+				],
+				'filter' => ['roleid' => $roleids]
+			]);
+
+			$roles_rules = array_fill_keys($roleids, []);
+
+			foreach ($rules as $rule) {
+				$roles_rules[$rule['roleid']][$rule['name']] = $rule[self::RULE_TYPE_FIELDS[$rule['type']]];
+			}
+
+			foreach ($result as $roleid => &$role) {
+				$role['rules'] = array_merge(
+					$this->getRelatedUiRules($roles_rules[$roleid], $output, (int) $role['type']),
+					$this->getRelatedServicesReadRules($roles_rules[$roleid], $output),
+					$this->getRelatedServicesWriteRules($roles_rules[$roleid], $output),
+					$this->getRelatedModulesRules($roles_rules[$roleid], $output),
+					$this->getRelatedApiRules($roles_rules[$roleid], $output),
+					$this->getRelatedActionsRules($roles_rules[$roleid], $output, (int) $role['type'])
+				);
+			}
+			unset($role);
+		}
+
+		if ($options['selectUsers'] !== null) {
+			if ($options['selectUsers'] === API_OUTPUT_COUNT) {
+				$output = ['userid', 'roleid'];
+			}
+			elseif ($options['selectUsers'] === API_OUTPUT_EXTEND) {
+				$output = ['userid', 'username', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
+					'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone', 'roleid'
+				];
+			}
+			else {
+				$output = array_unique(array_merge(['userid', 'roleid'], $options['selectUsers']));
+			}
+
+			$users = DB::select('users', [
+				'output' => $output,
+				'filter' => ['roleid' => $roleids],
+				'preservekeys' => true
+			]);
+			$relation_map = $this->createRelationMap($users, 'roleid', 'userid');
+			$users = $this->unsetExtraFields($users, ['userid', 'roleid'], $options['selectUsers']);
+			$result = $relation_map->mapMany($result, $users, 'users');
+
+			if ($options['selectUsers'] === API_OUTPUT_COUNT) {
+				foreach ($result as &$row) {
+					$row['users'] = (string) count($row['users']);
+				}
+				unset($row);
 			}
 		}
 
 		return $result;
+	}
+
+	/**
+	 * @param array $rules
+	 * @param array $output
+	 * @param int   $type
+	 *
+	 * @return array
+	 */
+	private function getRelatedUiRules(array $rules, array $output, int $type): array {
+		$ui_default_access = array_key_exists('ui.default_access', $rules)
+			? $rules['ui.default_access']
+			: (string) ZBX_ROLE_RULE_ENABLED;
+
+		$result = [];
+
+		if (in_array('ui', $output, true)) {
+			$ui = array_fill_keys(CRoleHelper::getUiElementsByUserType($type), $ui_default_access);
+			$ui = array_intersect_key($rules, $ui) + $ui;
+
+			$result['ui'] = [];
+
+			foreach ($ui as $ui_element => $status) {
+				$result['ui'][] = [
+					'name' => substr($ui_element, strlen('ui.')),
+					'status' => $status
+				];
+			}
+		}
+
+		if (in_array('ui.default_access', $output, true)) {
+			$result['ui.default_access'] = $ui_default_access;
+		}
+
+		return $result;
+	}
+
+	/**
+	 * @param array $rules
+	 * @param array $output
+	 *
+	 * @return array
+	 */
+	private function getRelatedServicesReadRules(array $rules, array $output): array {
+		$result = [];
+
+		$services_read_mode = array_key_exists('services.read', $rules)
+			? $rules['services.read']
+			: (string) ZBX_ROLE_RULE_SERVICES_ACCESS_ALL;
+
+		if (in_array('services.read.mode', $output, true)) {
+			$result['services.read.mode'] = $services_read_mode;
+		}
+
+		if (in_array('services.read.list', $output, true)) {
+			$result['services.read.list'] = [];
+
+			if ($services_read_mode == ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM) {
+				$enum = 'services.read.id.';
+
+				foreach ($rules as $rule_name => $rule_value) {
+					if (strpos($rule_name, $enum) === 0) {
+						$result['services.read.list'][] = ['serviceid' => $rule_value];
+					}
+				}
+			}
+		}
+
+		if (in_array('services.read.tag', $output, true)) {
+			$result['services.read.tag'] = ['tag' => '', 'value' => ''];
+
+			if ($services_read_mode == ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM) {
+				if (array_key_exists('services.read.tag.name', $rules)) {
+					$result['services.read.tag']['tag'] = $rules['services.read.tag.name'];
+				}
+
+				if (array_key_exists('services.read.tag.value', $rules)
+						&& $result['services.read.tag']['tag'] !== '') {
+					$result['services.read.tag']['value'] = $rules['services.read.tag.value'];
+				}
+			}
+		}
+
+		return $result;
+	}
+
+	/**
+	 * @param array $rules
+	 * @param array $output
+	 *
+	 * @return array
+	 */
+	private function getRelatedServicesWriteRules(array $rules, array $output): array {
+		$result = [];
+
+		$services_write_mode = array_key_exists('services.write', $rules)
+			? $rules['services.write']
+			: (string) ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM;
+
+		if (in_array('services.write.mode', $output, true)) {
+			$result['services.write.mode'] = $services_write_mode;
+		}
+
+		if (in_array('services.write.list', $output, true)) {
+			$result['services.write.list'] = [];
+
+			if ($services_write_mode == ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM) {
+				$enum = 'services.write.id.';
+
+				foreach ($rules as $rule_name => $rule_value) {
+					if (strpos($rule_name, $enum) === 0) {
+						$result['services.write.list'][] = ['serviceid' => $rule_value];
+					}
+				}
+			}
+		}
+
+		if (in_array('services.write.tag', $output, true)) {
+			$result['services.write.tag'] = ['tag' => '', 'value' => ''];
+
+			if ($services_write_mode == ZBX_ROLE_RULE_SERVICES_ACCESS_CUSTOM) {
+				if (array_key_exists('services.write.tag.name', $rules)) {
+					$result['services.write.tag']['tag'] = $rules['services.write.tag.name'];
+				}
+
+				if (array_key_exists('services.write.tag.value', $rules)
+						&& $result['services.write.tag']['tag'] !== '') {
+					$result['services.write.tag']['value'] = $rules['services.write.tag.value'];
+				}
+			}
+		}
+
+		return $result;
+	}
+
+	/**
+	 * @param array $rules
+	 * @param array $output
+	 *
+	 * @return array
+	 *
+	 * @throws APIException
+	 */
+	private function getRelatedModulesRules(array $rules, array $output): array {
+		$modules_default_access = array_key_exists('modules.default_access', $rules)
+			? $rules['modules.default_access']
+			: (string) ZBX_ROLE_RULE_ENABLED;
+
+		$result = [];
+
+		if (in_array('modules', $output, true)) {
+			$modules = [];
+
+			foreach (self::getEnabledModuleIds() as $moduleid) {
+				$modules[$moduleid] = [
+					'moduleid' => $moduleid,
+					'status' => $modules_default_access
+				];
+			}
+
+			$enum = 'modules.module.';
+
+			foreach ($rules as $rule_name => $rule_value) {
+				if (array_key_exists($rule_value, $modules) && strpos($rule_name, $enum) === 0) {
+					$modules[$rule_value]['status'] = $modules_default_access == ZBX_ROLE_RULE_ENABLED
+						? (string) ZBX_ROLE_RULE_DISABLED
+						: (string) ZBX_ROLE_RULE_ENABLED;
+				}
+			}
+
+			$result['modules'] = array_values($modules);
+		}
+
+		if (in_array('modules.default_access', $output, true)) {
+			$result['modules.default_access'] = $modules_default_access;
+		}
+
+		return $result;
+	}
+
+	/**
+	 * @param array $rules
+	 * @param array $output
+	 *
+	 * @return array
+	 */
+	private function getRelatedApiRules(array $rules, array $output): array {
+		$result = [];
+
+		if (in_array('api.access', $output, true)) {
+			$result['api.access'] = array_key_exists('api.access', $rules)
+				? $rules['api.access']
+				: (string) ZBX_ROLE_RULE_ENABLED;
+		}
+
+		if (in_array('api.mode', $output, true)) {
+			$result['api.mode'] = array_key_exists('api.mode', $rules)
+				? $rules['api.mode']
+				: (string) ZBX_ROLE_RULE_API_MODE_DENY;
+		}
+
+		if (in_array('api', $output, true)) {
+			$result['api'] = [];
+
+			$enum = 'api.method.';
+
+			foreach ($rules as $rule_name => $rule_value) {
+				if (strpos($rule_name, $enum) === 0) {
+					$result['api'][] = $rule_value;
+				}
+			}
+		}
+
+		return $result;
+	}
+
+	/**
+	 * @param array $rules
+	 * @param array $output
+	 * @param int   $type
+	 *
+	 * @return array
+	 */
+	private function getRelatedActionsRules(array $rules, array $output, int $type): array {
+		$actions_default_access = array_key_exists('actions.default_access', $rules)
+			? $rules['actions.default_access']
+			: (string) ZBX_ROLE_RULE_ENABLED;
+
+		$result = [];
+
+		if (in_array('actions', $output, true)) {
+			$actions = array_fill_keys(CRoleHelper::getActionsByUserType($type), $actions_default_access);
+			$actions = array_intersect_key($rules, $actions) + $actions;
+
+			$result['actions'] = [];
+
+			foreach ($actions as $action => $status) {
+				$result['actions'][] = [
+					'name' => substr($action, strlen('actions.')),
+					'status' => $status
+				];
+			}
+		}
+
+		if (in_array('actions.default_access', $output, true)) {
+			$result['actions.default_access'] = $actions_default_access;
+		}
+
+		return $result;
+	}
+
+	/**
+	 * @return array
+	 *
+	 * @throws APIException
+	 */
+	private static function getEnabledModuleIds(): array {
+		$modules = API::Module()->get([
+			'output' => [],
+			'filter' => [
+				'status' => MODULE_STATUS_ENABLED
+			],
+			'preservekeys' => true
+		], false);
+
+		return array_keys($modules);
 	}
 }

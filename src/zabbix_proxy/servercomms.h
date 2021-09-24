@@ -30,7 +30,7 @@ extern char	*CONFIG_HOSTNAME;
 int	connect_to_server(zbx_socket_t *sock, int timeout, int retry_interval);
 void	disconnect_server(zbx_socket_t *sock);
 
-int	get_data_from_server(zbx_socket_t *sock, const char *request, char **error);
-int	put_data_to_server(zbx_socket_t *sock, struct zbx_json *j, char **error);
+int	get_data_from_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved, char **error);
+int	put_data_to_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved, char **error);
 
 #endif

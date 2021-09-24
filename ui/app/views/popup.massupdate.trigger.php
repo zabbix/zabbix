@@ -53,10 +53,7 @@ $trigger_form_list = (new CFormList('trigger-form-list'))
 			->setLabel(_('Severity'))
 			->setAttribute('autofocus', 'autofocus'),
 		(new CDiv(
-			new CSeverity([
-				'name' => 'priority',
-				'value' => 0
-			])
+			new CSeverity('priority', 0)
 		))->setId('priority-div')
 	)
 	->addRow(

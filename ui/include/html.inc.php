@@ -987,7 +987,7 @@ function makeSuppressedProblemIcon(array $icon_data) {
 function makeActionIcon(array $icon_data): CTag {
 
 	if (array_key_exists('button', $icon_data) && $icon_data['button']) {
-		$icon = (new CButton())->addClass($icon_data['icon']);
+		$icon = (new CButton(null))->addClass($icon_data['icon']);
 	}
 	else {
 		$icon = (new CSpan())->addClass($icon_data['icon']);

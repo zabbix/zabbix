@@ -29,9 +29,10 @@
 #include "zbxalgo.h"
 #include "avail_protocol.h"
 
-extern unsigned char	process_type, program_type;
-extern int		server_num, process_num;
-static sigset_t		orig_mask;
+extern ZBX_THREAD_LOCAL unsigned char	process_type;
+extern unsigned char			program_type;
+extern ZBX_THREAD_LOCAL int		server_num, process_num;
+static sigset_t				orig_mask;
 
 #define ZBX_AVAILABILITY_MANAGER_DELAY			1
 #define ZBX_AVAILABILITY_MANAGER_FLUSH_DELAY_SEC	5

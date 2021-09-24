@@ -29,14 +29,7 @@ class CSettings extends CApiService {
 		'update' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
 	];
 
-	/**
-	 * @var string
-	 */
 	protected $tableName = 'config';
-
-	/**
-	 * @var string
-	 */
 	protected $tableAlias = 'c';
 
 	/**
@@ -56,8 +49,6 @@ class CSettings extends CApiService {
 	];
 
 	/**
-	 * Get settings parameters.
-	 *
 	 * @param array $options
 	 *
 	 * @throws APIException if the input is invalid.
@@ -68,6 +59,7 @@ class CSettings extends CApiService {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'output' =>	['type' => API_OUTPUT, 'in' => implode(',', $this->output_fields), 'default' => API_OUTPUT_EXTEND]
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
@@ -88,17 +80,16 @@ class CSettings extends CApiService {
 	}
 
 	/**
-	 * Get global settings parameters.
-	 *
 	 * @param array $options
+	 * @param bool  $api_call  Flag indicating whether this method called via an API call or from a local PHP file.
 	 *
 	 * @throws APIException if the input is invalid.
 	 *
 	 * @return array
 	 */
-	public function getGlobal(array $options, $api_call = true): array {
+	public function getGlobal(array $options, bool $api_call = true): array {
 		if ($api_call) {
-			return self::exception(ZBX_API_ERROR_PARAMETERS,
+			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Incorrect method "%1$s.%2$s".', 'settings', 'getglobal')
 			);
 		}
@@ -111,6 +102,7 @@ class CSettings extends CApiService {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'output' =>	['type' => API_OUTPUT, 'in' => implode(',', $output_fields), 'default' => API_OUTPUT_EXTEND]
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
@@ -131,44 +123,16 @@ class CSettings extends CApiService {
 	}
 
 	/**
-	 * Update settings parameters.
-	 *
 	 * @param array $settings
+	 *
+	 * @throws APIException if the input is invalid.
 	 *
 	 * @return array
 	 */
 	public function update(array $settings): array {
 		$db_settings = $this->validateUpdate($settings);
 
-		$upd_config = [];
-
-		// strings
-		$field_names = ['default_theme', 'work_period', 'history_period', 'period_default', 'max_period',
-			'severity_color_0', 'severity_color_1', 'severity_color_2', 'severity_color_3', 'severity_color_4',
-			'severity_color_5', 'severity_name_0', 'severity_name_1', 'severity_name_2', 'severity_name_3',
-			'severity_name_4', 'severity_name_5', 'ok_period', 'blink_period', 'problem_unack_color',
-			'problem_ack_color', 'ok_unack_color', 'ok_ack_color', 'default_lang',
-			'default_timezone', 'login_block', 'uri_valid_schemes', 'x_frame_options', 'iframe_sandboxing_exceptions',
-			'connect_timeout', 'socket_timeout', 'media_type_test_timeout', 'script_timeout', 'item_test_timeout',
-			'url', 'report_test_timeout'
-		];
-		foreach ($field_names as $field_name) {
-			if (array_key_exists($field_name, $settings) && $settings[$field_name] !== $db_settings[$field_name]) {
-				$upd_config[$field_name] = $settings[$field_name];
-			}
-		}
-
-		// integers
-		$field_names = ['search_limit', 'max_in_table', 'server_check_interval', 'show_technical_errors',
-			'custom_color', 'problem_unack_style', 'problem_ack_style', 'ok_unack_style', 'ok_ack_style',
-			'discovery_groupid', 'default_inventory_mode', 'alert_usrgrpid', 'snmptrap_logging', 'login_attempts',
-			'validate_uri_schemes', 'iframe_sandboxing_enabled', 'max_overview_table_size', 'auditlog_enabled'
-		];
-		foreach ($field_names as $field_name) {
-			if (array_key_exists($field_name, $settings) && $settings[$field_name] != $db_settings[$field_name]) {
-				$upd_config[$field_name] = $settings[$field_name];
-			}
-		}
+		$upd_config = DB::getUpdatedValues('config', $settings, $db_settings);
 
 		if ($upd_config) {
 			DB::update('config', [
@@ -177,13 +141,13 @@ class CSettings extends CApiService {
 			]);
 
 			if (array_key_exists('discovery_groupid', $upd_config)
-					&& bccomp($upd_config['discovery_groupid'], $db_settings['discovery_groupid']) !== 0) {
+					&& bccomp($upd_config['discovery_groupid'], $db_settings['discovery_groupid']) != 0) {
 				$this->setHostGroupInternal($db_settings['discovery_groupid'], ZBX_NOT_INTERNAL_GROUP);
 				$this->setHostGroupInternal($upd_config['discovery_groupid'], ZBX_INTERNAL_GROUP);
 			}
 		}
 
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SETTINGS,
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_SETTINGS,
 			[['configid' => $db_settings['configid']] + $settings], [$db_settings['configid'] => $db_settings]
 		);
 
@@ -191,9 +155,7 @@ class CSettings extends CApiService {
 	}
 
 	/**
-	 * Validate updated settings parameters.
-	 *
-	 * @param array  $settings
+	 * @param array $settings
 	 *
 	 * @throws APIException if the input is invalid.
 	 *
@@ -256,13 +218,9 @@ class CSettings extends CApiService {
 			'report_test_timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:300'],
 			'auditlog_enabled' =>				['type' => API_INT32, 'in' => '0,1']
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $settings, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
-		// Check permissions.
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		if (array_key_exists('discovery_groupid', $settings)) {
@@ -272,6 +230,7 @@ class CSettings extends CApiService {
 				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 				'editable' => true
 			]);
+
 			if (!$db_hstgrp_exists) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Host group with ID "%1$s" is not available.', $settings['discovery_groupid'])
@@ -284,6 +243,7 @@ class CSettings extends CApiService {
 				'countOutput' => true,
 				'usrgrpids' => $settings['alert_usrgrpid']
 			]);
+
 			if (!$db_usrgrp_exists) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('User group with ID "%1$s" is not available.', $settings['alert_usrgrpid'])
@@ -305,6 +265,7 @@ class CSettings extends CApiService {
 			if ($period_default > $max_period) {
 				$field = 'period_default';
 				$message = _('time filter default period exceeds the max period');
+
 				if (!$period_default_updated) {
 					$field = 'max_period';
 					$message = _('max period is less than time filter default period');
@@ -328,7 +289,7 @@ class CSettings extends CApiService {
 	 * @param string $groupid   Host group ID
 	 * @param int    $internal  Value of internal option
 	 */
-	private function setHostGroupInternal($groupid, $internal): void {
+	private function setHostGroupInternal(string $groupid, int $internal): void {
 		DB::update('hstgrp', [
 			'values' => ['internal' =>  $internal],
 			'where' => ['groupid' => $groupid]

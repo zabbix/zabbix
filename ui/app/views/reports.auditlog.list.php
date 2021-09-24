@@ -70,6 +70,9 @@ $filter_form = (new CFormList())
 	)
 	->addRow(new CLabel(_('Action'), $select_filter_action->getFocusableElementId()),
 		$select_filter_action
+	)
+	->addRow(_('Recordset ID'), (new CTextBox('filter_recordsetid', $data['recordsetid']))
+		->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	);
 
 $widget = (new CWidget())
@@ -88,28 +91,47 @@ $table = (new CTableInfo())
 		_('User'),
 		_('IP'),
 		_('Resource'),
-		_('Action'),
 		_('ID'),
-		_('Description'),
+		_('Action'),
+		_('Recordset ID'),
 		_('Details')
 	]);
 
 foreach ($data['auditlogs'] as $auditlog) {
 	$table->addRow([
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $auditlog['clock']),
-		array_key_exists($auditlog['userid'], $data['usernames'])
-			? new CTag('em', true, $data['usernames'][$auditlog['userid']])
+		in_array($auditlog['userid'], $data['non_existent_userids'])
+			? new CTag('em', true, $auditlog['username'])
 			: $data['users'][$auditlog['userid']],
 		$auditlog['ip'],
 		array_key_exists($auditlog['resourcetype'], $data['resources'])
 			? $data['resources'][$auditlog['resourcetype']]
 			: _('Unknown resource'),
+		new CLink($auditlog['resourceid'],
+			(new CUrl('zabbix.php'))
+				->setArgument('action', $data['action'])
+				->setArgument('filter_resourceid', $auditlog['resourceid'])
+				->setArgument('filter_resourcetype', $auditlog['resourcetype'])
+				->setArgument('filter_set', 1)
+		),
 		array_key_exists($auditlog['action'], $data['actions'])
 			? $data['actions'][$auditlog['action']]
 			: _('Unknown action'),
-		$auditlog['resourceid'],
-		$auditlog['resourcename'],
-		zbx_nl2br($auditlog['details'])
+		new CLink($auditlog['recordsetid'],
+			(new CUrl('zabbix.php'))
+				->setArgument('action', $data['action'])
+				->setArgument('filter_recordsetid', $auditlog['recordsetid'])
+				->setArgument('filter_set', 1)
+		),
+		(new CDiv([
+			new CDiv(zbx_nl2br($auditlog['short_details'])),
+			($auditlog['details_button'] == 1)
+				? (new CDiv (
+					(new CLinkAction(_('Details')))->onClick('openAuditDetails('.json_encode($auditlog['details']).')')
+				))->addClass('audit-show-details-btn-wrapper')
+				: ''
+		]))->addClass('audit-details-wrapper')
+
 	]);
 }
 

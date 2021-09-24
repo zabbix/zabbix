@@ -25,7 +25,7 @@
 
 $form = (new CForm())
 	->setId('service-list')
-	->setName('service-list')
+	->setName('service_list')
 	->addVar('back_url', $data['back_url']);
 
 $header = [
@@ -59,7 +59,7 @@ $table = (new CTableInfo())
 	]));
 
 foreach ($data['services'] as $serviceid => $service) {
-	$row = [new CCheckBox('serviceids['.$serviceid.']', $serviceid)];
+	$row = [(new CCheckBox('serviceids['.$serviceid.']', $serviceid))->setEnabled(!$service['readonly'])];
 
 	if ($data['is_filtered']) {
 		$parents = [];
@@ -71,7 +71,7 @@ foreach ($data['services'] as $serviceid => $service) {
 
 			$parents[] = (new CLink($parent['name'],
 				(new CUrl('zabbix.php'))
-					->setArgument('action', 'service.list')
+					->setArgument('action', 'service.list.edit')
 					->setArgument('serviceid', $parent['serviceid'])
 			))->setAttribute('data-serviceid', $parent['serviceid']);
 		}
@@ -108,9 +108,8 @@ foreach ($data['services'] as $serviceid => $service) {
 				CViewHelper::showNum($service['children'])
 			]
 			: $service['name'],
-		in_array($service['status'], [TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_NOT_CLASSIFIED])
-			? (new CCol(_('OK')))->addClass(ZBX_STYLE_GREEN)
-			: (new CCol(getSeverityName($service['status'])))->addClass(getSeverityStyle($service['status'])),
+		(new CCol(CSeverityHelper::getName((int) $service['status'])))
+			->addClass(CSeverityHelper::getStyle((int) $service['status'])),
 		$root_cause,
 		($service['showsla'] == SERVICE_SHOW_SLA_ON) ? sprintf('%.4f', $service['goodsla']) : '',
 		$data['tags'][$serviceid],
@@ -119,17 +118,20 @@ foreach ($data['services'] as $serviceid => $service) {
 				->addClass(ZBX_STYLE_BTN_ADD)
 				->addClass('js-add-child-service')
 				->setAttribute('data-serviceid', $serviceid)
-				->setTitle(_('Add child service')),
+				->setTitle(_('Add child service'))
+				->setEnabled(!$service['readonly']),
 			(new CButton(null))
 				->addClass(ZBX_STYLE_BTN_EDIT)
 				->addClass('js-edit-service')
 				->setAttribute('data-serviceid', $serviceid)
-				->setTitle(_('Edit')),
+				->setTitle(_('Edit'))
+				->setEnabled(!$service['readonly']),
 			(new CButton(null))
 				->addClass(ZBX_STYLE_BTN_REMOVE)
 				->addClass('js-remove-service')
 				->setAttribute('data-serviceid', $serviceid)
 				->setTitle(_('Delete'))
+				->setEnabled(!$service['readonly'])
 		]))->addClass(ZBX_STYLE_LIST_TABLE_ACTIONS)
 	])));
 }

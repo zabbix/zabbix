@@ -69,7 +69,7 @@ class CControllerUsergroupUpdate extends CController {
 
 	protected function doAction() {
 		$user_group = [
-			'userids' => $this->getInput('userids', []),
+			'users' => zbx_toObject($this->getInput('userids', []), 'userid'),
 			'tag_filters' => $this->getInput('tag_filters', []),
 			'rights' => []
 		];
