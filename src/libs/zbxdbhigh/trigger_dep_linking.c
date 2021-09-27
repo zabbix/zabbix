@@ -273,16 +273,30 @@ clean:
 	return res;
 }
 
-/* Take a list of pending trigger dependencies (links) and exlucde entries that are already present on the target */
-/* host to generate a new list (links2). Also, prepare the list of the trigger dependencies (trigger_dep_ids_del) */
-/* that need to be deleted on the target host, since they are not present on the template trigger                 */
+
+/**********************************************************************************************************
+ *                                                                                                        *
+ * Function: prepare_the_neccessary_trigger_dependencies_updates_and_deletes                              *
+ *                                                                                                        *
+ * Purpose: takes a list of pending trigger dependencies (links) and excludes  entries that are           *
+ *          already present on the target host to generate a new list (links2). Also, prepare the list    *
+ *          of the trigger dependencies (trigger_dep_ids_del) that need to be deleted on the target       *
+ *          host, since they are not present on the template trigger.                                     *
+ *                                                                                                        *
+ * Parameters: trids               - [IN] array of trigger identifiers from database                      *
+ *             trids_num           - [IN] trigger count in trids array                                    *
+ *             links               - [OUT] pairs of trigger dependencies, list of links_up and links_down *
+ *                                         links that we want to be present on the target host            *
+ *             links2              - [OUT] processed links with entries that are already present exluded  *
+ *             trigger_dep_ids_del - [OUT] - list of triggers dependencies that need to be deleted        *
+ *                                                                                                        *
+ * Return value: upon successful completion return SUCCEED, or FAIL on DB error                           *
+ *                                                                                                        *
+ *********************************************************************************************************/
 static int	prepare_the_neccessary_trigger_dependencies_updates_and_deletes(const zbx_vector_uint64_t *trids,
 		zbx_vector_uint64_pair_t *links, zbx_vector_uint64_pair_t *links2,
 		zbx_vector_uint64_t *trigger_dep_ids_del)
 {
-	/* links up and down - list on host, that we want to be present on the target */
-	/* get list of links (up and down) - currently on the target host */
-
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset = 0;
 	DB_RESULT		result;
