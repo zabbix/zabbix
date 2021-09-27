@@ -122,12 +122,13 @@
 				self = this;
 
 			const ajax_url = new Curl('jsrpc.php');
-			const post_data = {};
+			const post_data = {
+				type: 9, // PAGE_TYPE_TEXT
+				method: 'screen.get',
 
-			ajax_url.setArgument('type', 9); // PAGE_TYPE_TEXT
-			ajax_url.setArgument('method', 'screen.get');
-			// TODO: remove, do not use timestamp passing to server and back to ensure newest content will be shown.
-			ajax_url.setArgument('timestamp', screen.timestampActual);
+				// TODO: remove, do not use timestamp passing to server and back to ensure newest content will be shown.
+				timestamp: screen.timestampActual
+			};
 
 			$.each(type_params[params_index], function (i, name) {
 				if (!empty(screen[name])) {
@@ -141,8 +142,8 @@
 			// timeline params
 			// SCREEN_RESOURCE_HTTPTEST_DETAILS, SCREEN_RESOURCE_DISCOVERY, SCREEN_RESOURCE_HTTPTEST
 			if ($.inArray(screen.resourcetype, [21, 22, 23]) === -1) {
-				ajax_url.setArgument('from', screen.timeline.from);
-				ajax_url.setArgument('to', screen.timeline.to);
+				post_data.from = screen.timeline.from;
+				post_data.to = screen.timeline.to;
 			}
 
 			switch (parseInt(screen.resourcetype, 10)) {
