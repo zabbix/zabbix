@@ -818,6 +818,8 @@ class CScript extends CApiService {
 	}
 
 	/**
+	 * @static
+	 *
 	 * @param array      $scriptids
 	 * @param array|null $db_scripts
 	 *
@@ -1404,6 +1406,8 @@ class CScript extends CApiService {
 
 	/**
 	 * Add the existing parameters to $db_scripts whether these are affected by the update.
+	 *
+	 * @static
 	 *
 	 * @param array $scripts
 	 * @param array $db_scripts
