@@ -390,7 +390,7 @@ class CHostGroup extends CApiService {
 	}
 
 	/**
-	 * Prepares rights to inherit from parent host groups.
+	 * Prepare rights to inherit from parent host groups.
 	 *
 	 * @static
 	 *
@@ -465,7 +465,7 @@ class CHostGroup extends CApiService {
 	}
 
 	/**
-	 * Prepares tag filters to inherit from parent host groups.
+	 * Prepare tag filters to inherit from parent host groups.
 	 *
 	 * @static
 	 *
@@ -541,7 +541,7 @@ class CHostGroup extends CApiService {
 	}
 
 	/**
-	 * Inherits rights and tag filters of parent host groups.
+	 * Inherit rights and tag filters of parent host groups.
 	 *
 	 * @param array $groups
 	 */
@@ -622,8 +622,6 @@ class CHostGroup extends CApiService {
 	/**
 	 * @param array $groupids
 	 * @param bool 	$nopermissions
-	 *
-	 * @throws APIException if the input is invalid.
 	 *
 	 * @return array
 	 */
@@ -733,9 +731,9 @@ class CHostGroup extends CApiService {
 	 *
 	 * @param array  $names
 	 *
-	 * @throws APIException  if host group already exists.
+	 * @throws APIException if host group already exists.
 	 */
-	private static function checkDuplicates(array $names) {
+	private static function checkDuplicates(array $names): void {
 		$db_groups = DB::select('hstgrp', [
 			'output' => ['name'],
 			'filter' => ['name' => $names],
@@ -756,7 +754,7 @@ class CHostGroup extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected static function validateCreate(array &$groups) {
+	private static function validateCreate(array &$groups): void {
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can create host groups.'));
 		}
@@ -782,7 +780,7 @@ class CHostGroup extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	protected static function checkAndAddUuid(array &$groups_to_create): void {
+	private static function checkAndAddUuid(array &$groups_to_create): void {
 		foreach ($groups_to_create as &$group) {
 			if (!array_key_exists('uuid', $group)) {
 				$group['uuid'] = generateUuidV4();
@@ -858,7 +856,8 @@ class CHostGroup extends CApiService {
 			'output' => ['hostid', 'host', 'status'],
 			'groupids' => $groupids,
 			'templated_hosts' => true,
-			'nopermissions' => true
+			'nopermissions' => true,
+			'preservekeys' => true
 		]);
 
 		self::checkHostsToUnlink($db_hosts, $groupids);
@@ -946,17 +945,17 @@ class CHostGroup extends CApiService {
 	}
 
 	/**
-	 * Add all given hosts and templates to all given host groups.
+	 * Add given hosts and templates to given host groups.
 	 *
 	 * @param array $data
 	 *
-	 * @return array Array of group IDs that hosts and templates have been added to.
+	 * @return array
 	 */
 	public function massAdd(array $data): array {
 		$this->validateMassAdd($data, $db_groups);
 
 		$groups = self::getGroupsByData($data, $db_groups);
-		$ins_hosts_groups = self::getInsHostsGroups($groups);
+		$ins_hosts_groups = self::getInsHostsGroups($groups, __FUNCTION__);
 
 		if ($ins_hosts_groups) {
 			$ids = DB::insertBatch('hosts_groups', $ins_hosts_groups);
@@ -969,46 +968,18 @@ class CHostGroup extends CApiService {
 	}
 
 	/**
-	 * Remove all given hosts and templates from all given host groups.
+	 * Replace existing hosts (non-discovered only) and templates of given host groups with given hosts and templates.
 	 *
 	 * @param array $data
 	 *
-	 * @return array Array of group IDs that hosts and templates have been removed from.
-	 */
-	public function massRemove(array $data): array {
-		$this->validateMassRemove($data, $db_groups, $all_hostids);
-
-		$groups = self::getGroupsByData($data, $db_groups);
-
-		DB::delete('hosts_groups', [
-			'hostid' => $all_hostids,
-			'groupid' => $data['groupids']
-		]);
-
-		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_HOST_GROUP, $groups, $db_groups);
-
-		return ['groupids' => $data['groupids']];
-	}
-
-	/**
-	 * Update host groups with new hosts and templates.
-	 *
-	 * @param array $data
-	 *
-	 * @return array Array of group IDs that hosts and templates have been added to and removed from.
+	 * @return array
 	 */
 	public function massUpdate(array $data) {
 		$this->validateMassUpdate($data, $db_groups);
 
 		$groups = self::getGroupsByData($data, $db_groups);
-		$ins_hosts_groups = self::getInsHostsGroups($groups, $hostgroupids);
-
-		$del_hostgroupids = [];
-
-		foreach ($db_groups as $db_group) {
-			$del_hostgroupids += array_diff_key($db_group['hosts'], $hostgroupids);
-			$del_hostgroupids += array_diff_key($db_group['templates'], $hostgroupids);
-		}
+		$ins_hosts_groups = self::getInsHostsGroups($groups, __FUNCTION__, $ex_hostgroupids);
+		$del_hostgroupids = self::getDelHostgroupids($db_groups, $ex_hostgroupids);
 
 		if ($ins_hosts_groups) {
 			$ids = DB::insertBatch('hosts_groups', $ins_hosts_groups);
@@ -1016,14 +987,34 @@ class CHostGroup extends CApiService {
 		}
 
 		if ($del_hostgroupids) {
-			$del_hostgroupids = array_keys($del_hostgroupids);
-
 			DB::delete('hosts_groups', ['hostgroupid' => $del_hostgroupids]);
 		}
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_HOST_GROUP, $groups, $db_groups);
 
 		return ['groupids' => array_column($data['groups'], 'groupid')];
+	}
+
+	/**
+	 * Remove given hosts and templates from given host groups.
+	 *
+	 * @param array $data
+	 *
+	 * @return array
+	 */
+	public function massRemove(array $data): array {
+		$this->validateMassRemove($data, $db_groups);
+
+		$groups = self::getGroupsByData([], $db_groups);
+		$del_hostgroupids = self::getDelHostgroupids($db_groups);
+
+		if ($del_hostgroupids) {
+			DB::delete('hosts_groups', ['hostgroupid' => $del_hostgroupids]);
+		}
+
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_HOST_GROUP, $groups, $db_groups);
+
+		return ['groupids' => $data['groupids']];
 	}
 
 	/**
@@ -1066,12 +1057,6 @@ class CHostGroup extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		foreach ($db_groups as &$db_group) {
-			$db_group['hosts'] = [];
-			$db_group['templates'] = [];
-		}
-		unset($db_group);
-
 		$hostids = array_key_exists('hosts', $data) ? array_column($data['hosts'], 'hostid') : [];
 		$templateids = array_key_exists('templates', $data) ? array_column($data['templates'], 'templateid') : [];
 		$all_hostids = array_unique(array_merge($hostids, $templateids));
@@ -1090,7 +1075,7 @@ class CHostGroup extends CApiService {
 		self::checkHostsIds($hostids, $templateids, $db_hosts);
 		self::checkHostsNotDiscovered($db_hosts);
 
-		self::loadHostsGroups($db_groups, $groupids, $all_hostids);
+		self::addHostsAndTemplates($db_groups, $all_hostids);
 	}
 
 	/**
@@ -1099,15 +1084,15 @@ class CHostGroup extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateMassUpdate(array &$data, ?array &$db_groups) {
+	private function validateMassUpdate(array &$data, ?array &$db_groups): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
 			'groups' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
 				'groupid' =>		['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY]
 			]],
-			'hosts' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['hostid']], 'fields' => [
+			'hosts' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NORMALIZE, 'uniq' => [['hostid']], 'fields' => [
 				'hostid'=>			['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY]
 			]],
-			'templates' =>		['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
+			'templates' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
 				'templateid'=>		['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY]
 			]]
 		]];
@@ -1123,7 +1108,7 @@ class CHostGroup extends CApiService {
 		$groupids = array_column($data['groups'], 'groupid');
 
 		$db_groups = $this->get([
-			'output' => ['groupid'],
+			'output' => ['groupid', 'name'],
 			'groupids' => $groupids,
 			'editable' => true,
 			'preservekeys' => true
@@ -1133,12 +1118,6 @@ class CHostGroup extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		foreach ($db_groups as &$db_group) {
-			$db_group['hosts'] = [];
-			$db_group['templates'] = [];
-		}
-		unset($db_group);
-
 		$hostids = array_column($data['hosts'], 'hostid');
 		$templateids = array_column($data['templates'], 'templateid');
 		$all_hostids = array_unique(array_merge($hostids, $templateids));
@@ -1147,8 +1126,7 @@ class CHostGroup extends CApiService {
 			'output' => ['hostid', 'host', 'flags', 'status'],
 			'hostids' => $all_hostids,
 			'templated_hosts' => true,
-			'editable' => true,
-			'preservekeys' => true
+			'editable' => true
 		]);
 
 		if (count($db_hosts) != count($all_hostids)) {
@@ -1158,16 +1136,17 @@ class CHostGroup extends CApiService {
 		self::checkHostsIds($hostids, $templateids, $db_hosts);
 		self::checkHostsNotDiscovered($db_hosts);
 
-		self::loadHostsGroups($db_groups, $groupids, $all_hostids, $del_hostids);
+		self::addHostsAndTemplates($db_groups, [], $ex_hostids);
+
+		$del_hostids = array_diff($ex_hostids, $all_hostids);
 
 		if ($del_hostids) {
-			$del_hostids = array_keys($del_hostids);
-
 			$del_db_hosts = API::Host()->get([
-				'output' => ['hostid', 'host'],
+				'output' => ['hostid', 'host', 'status'],
 				'hostids' => $del_hostids,
 				'templated_hosts' => true,
-				'editable' => true
+				'editable' => true,
+				'preservekeys' => true
 			]);
 
 			if (count($del_db_hosts) != count($del_hostids)) {
@@ -1183,11 +1162,10 @@ class CHostGroup extends CApiService {
 	/**
 	 * @param array      $data
 	 * @param array|null $db_groups
-	 * @param array|null $all_hostids
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateMassRemove(array &$data, ?array &$db_groups, ?array &$all_hostids): void {
+	private function validateMassRemove(array &$data, ?array &$db_groups): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
 			'groupids' =>		['type' => API_IDS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => true],
 			'hostids' =>		['type' => API_IDS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => true],
@@ -1213,12 +1191,6 @@ class CHostGroup extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		foreach ($db_groups as &$db_group) {
-			$db_group['hosts'] = [];
-			$db_group['templates'] = [];
-		}
-		unset($db_group);
-
 		$hostids = array_key_exists('hostids', $data) ? $data['hostids'] : [];
 		$templateids = array_key_exists('templateids', $data) ? $data['templateids'] : [];
 		$all_hostids = array_unique(array_merge($hostids, $templateids));
@@ -1227,7 +1199,8 @@ class CHostGroup extends CApiService {
 			'output' => ['hostid', 'host', 'flags', 'status'],
 			'hostids' => $all_hostids,
 			'templated_hosts' => true,
-			'editable' => true
+			'editable' => true,
+			'preservekeys' => true
 		]);
 
 		if (count($db_hosts) != count($all_hostids)) {
@@ -1238,17 +1211,19 @@ class CHostGroup extends CApiService {
 		self::checkHostsNotDiscovered($db_hosts);
 		self::checkHostsToUnlink($db_hosts, $data['groupids']);
 
-		self::loadHostsGroups($db_groups, $data['groupids'], $all_hostids);
+		self::addHostsAndTemplates($db_groups, $all_hostids);
 	}
 
 	/**
-	 * Checks whether the passed host IDs are not containing the template IDs and vice versa.
+	 * Check whether the passed host IDs are not containing the template IDs and vice versa.
 	 *
 	 * @static
 	 *
-	 * @param array $hostids
-	 * @param array $templateids
-	 * @param array $db_hosts
+	 * @param array  $hostids
+	 * @param array  $templateids
+	 * @param array  $db_hosts
+	 * @param string $db_hosts[][hostid]
+	 * @param int    $db_hosts[][status]
 	 *
 	 * @throws APIException
 	 */
@@ -1266,11 +1241,13 @@ class CHostGroup extends CApiService {
 	}
 
 	/**
-	 * Checks whether no one of passed hosts are discovered host.
+	 * Check whether no one of passed hosts are discovered host.
 	 *
 	 * @static
 	 *
-	 * @param array $db_hosts
+	 * @param array  $db_hosts
+	 * @param string $db_hosts[][host]
+	 * @param int    $db_hosts[][flags]
 	 *
 	 * @throws APIException
 	 */
@@ -1285,19 +1262,67 @@ class CHostGroup extends CApiService {
 	}
 
 	/**
-	 * Loads hosts groups.
+	 * Check whether the given groups are able to unlink from given hosts and templates.
+	 *
+	 * @static
+	 *
+	 * @param array  $db_hosts
+	 * @param string $db_hosts[<hostid>]['host']
+	 * @param int    $db_hosts[<hostid>]['status']
+	 * @param array  $groupids
+	 *
+	 * @throws APIException
 	 */
-	private static function loadHostsGroups(array &$db_groups, array $groupids, array $hostids,
-			?array &$del_hostids = []): void {
-		$is_update = $del_hostids === null;
-		$del_hostids = [];
+	private static function checkHostsToUnlink(array $db_hosts, array $groupids): void {
+		$hostids = array_keys($db_hosts);
+
+		$hostids_unable_to_unlink = array_diff($hostids, getUnlinkableHostIds($groupids, $hostids));
+
+		if ($hostids_unable_to_unlink) {
+			$hostid = reset($hostids_unable_to_unlink);
+			$type = ($db_hosts[$hostid]['status'] == HOST_STATUS_TEMPLATE) ? 'template' : 'host';
+
+			if ($type === 'host') {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Host "%1$s" cannot be without host group.', $db_hosts[$hostid]['host'])
+				);
+			}
+			else {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Template "%1$s" cannot be without host group.', $db_hosts[$hostid]['host'])
+				);
+			}
+		}
+	}
+
+	/**
+	 * Adds to the passed host groups the existing hosts and templates from the set of passed host and template IDs.
+	 * If host IDs passed as empty array, all existing hosts and templates will be added to the passed host groups
+	 * and the array of existing hosts and templates IDs will be collected.
+	 *
+	 * @static
+	 *
+	 * @param array      $db_groups
+	 * @param array      $hostids
+	 * @param array|null $ex_hostids
+	 */
+	private static function addHostsAndTemplates(array &$db_groups, array $hostids, array &$ex_hostids = null): void {
+		if ($hostids === []) {
+			$ex_hostids = [];
+		}
+
+		foreach ($db_groups as &$db_group) {
+			$db_group['hosts'] = [];
+			$db_group['templates'] = [];
+		}
+		unset($db_group);
 
 		$sql = 'SELECT hg.hostgroupid,hg.hostid,hg.groupid,h.status'.
 			' FROM hosts_groups hg,hosts h'.
 			' WHERE hg.hostid=h.hostid'.
-				' AND '.dbConditionInt('hg.groupid', $groupids);
+				' AND '.dbConditionInt('hg.groupid', array_keys($db_groups));
 
-		if ($is_update) {
+		if ($hostids === []) {
 			$sql .= ' AND h.flags='.ZBX_FLAG_DISCOVERY_NORMAL;
 		}
 		else {
@@ -1307,10 +1332,6 @@ class CHostGroup extends CApiService {
 		$db_hosts_groups = DBselect($sql);
 
 		while ($link = DBfetch($db_hosts_groups)) {
-			if ($is_update && !in_array($link['hostid'], $hostids)) {
-				$del_hostids[$link['hostid']] = true;
-			}
-
 			if ($link['status'] != HOST_STATUS_TEMPLATE) {
 				$db_groups[$link['groupid']]['hosts'][$link['hostgroupid']] =
 					array_diff_key($link, array_flip(['groupid', 'status']));
@@ -1321,11 +1342,19 @@ class CHostGroup extends CApiService {
 					'templateid' => $link['hostid']
 				];
 			}
+
+			if ($hostids === []) {
+				$ex_hostids[$link['hostid']] = true;
+			}
+		}
+
+		if ($hostids === []) {
+			$ex_hostids = array_keys($ex_hostids);
 		}
 	}
 
 	/**
-	 * Forms and returns array of groups to provide to audit log.
+	 * Form host groups input array based on requested data and database data.
 	 *
 	 * @static
 	 *
@@ -1344,7 +1373,7 @@ class CHostGroup extends CApiService {
 				$db_hosts = array_column($db_group['hosts'], null, 'hostid');
 
 				foreach ($data['hosts'] as $host) {
-					if (in_array($host['hostid'], $db_hosts)) {
+					if (array_key_exists($host['hostid'], $db_hosts)) {
 						$group['hosts'][] = $db_hosts[$host['hostid']];
 					}
 					else {
@@ -1357,7 +1386,7 @@ class CHostGroup extends CApiService {
 				$db_templates = array_column($db_group['templates'], null, 'templateid');
 
 				foreach ($data['templates'] as $template) {
-					if (in_array($template['templateid'], $db_templates)) {
+					if (array_key_exists($template['templateid'], $db_templates)) {
 						$group['templates'][] = $db_templates[$template['templateid']];
 					}
 					else {
@@ -1373,31 +1402,45 @@ class CHostGroup extends CApiService {
 	}
 
 	/**
-	 * Forms and returns array of rows to insert to hosts_groups table.
+	 * Retrieve rows of hosts/templates and groups relations to insert.
+	 *
+	 * @static
+	 *
+	 * @param array      $groups
+	 * @param string     $method
+	 * @param array|null $ex_hostgroupids
+	 *
+	 * @return array
 	 */
-	private static function getInsHostsGroups(array $groups, array &$hostgroupids = []): array {
+	private static function getInsHostsGroups(array $groups, string $method, ?array &$ex_hostgroupids = null): array {
+		$ins_hosts_groups = [];
+
+		if ($method === 'massUpdate') {
+			$ex_hostgroupids = [];
+		}
+
 		foreach ($groups as $group) {
 			foreach ($group['hosts'] as $host) {
-				if (array_key_exists('hostgroupid', $host)) {
-					$hostgroupids[$host['hostgroupid']] = true;
-				}
-				else {
+				if (!array_key_exists('hostgroupid', $host)) {
 					$ins_hosts_groups[] = [
 						'hostid' => $host['hostid'],
 						'groupid' => $group['groupid']
 					];
 				}
+				elseif ($method === 'massUpdate') {
+					$ex_hostgroupids[$host['hostgroupid']] = true;
+				}
 			}
 
 			foreach ($group['templates'] as $template) {
-				if (array_key_exists('hostgroupid', $template)) {
-					$hostgroupids[$template['hostgroupid']] = true;
-				}
-				else {
+				if (!array_key_exists('hostgroupid', $template)) {
 					$ins_hosts_groups[] = [
 						'hostid' => $template['templateid'],
 						'groupid' => $group['groupid']
 					];
+				}
+				elseif ($method === 'massUpdate') {
+					$ex_hostgroupids[$template['hostgroupid']] = true;
 				}
 			}
 		}
@@ -1406,7 +1449,7 @@ class CHostGroup extends CApiService {
 	}
 
 	/**
-	 * Adds IDs.
+	 * Add IDs of inserted host groups relations to the passed host groups array.
 	 */
 	private static function addIds(array &$groups, array $ids): void {
 		foreach ($groups as &$group) {
@@ -1425,6 +1468,28 @@ class CHostGroup extends CApiService {
 			unset($template);
 		}
 		unset($group);
+	}
+
+	/**
+	 * Retrieve IDs of host groups relations to delete.
+	 *
+	 * @static
+	 *
+	 * @param array $db_groups
+	 * @param array $hostgroupids
+	 *
+	 */
+	private static function getDelHostgroupids(array $db_groups, array $hostgroupids = []): array {
+		$del_hostgroupids = [];
+
+		foreach ($db_groups as $db_group) {
+			$del_hostgroupids += array_diff_key($db_group['hosts'], $hostgroupids);
+			$del_hostgroupids += array_diff_key($db_group['templates'], $hostgroupids);
+		}
+
+		$del_hostgroupids = array_keys($del_hostgroupids);
+
+		return $del_hostgroupids;
 	}
 
 	protected function addRelatedObjects(array $options, array $result) {
@@ -1539,41 +1604,6 @@ class CHostGroup extends CApiService {
 		}
 
 		return $result;
-	}
-
-	/**
-	 * Checks whether the given groups are able to unlink from given hosts and templates.
-	 *
-	 * @static
-	 *
-	 * @param array   $hosts
-	 * @param string  $hosts[]['hostid']
-	 * @param string  $hosts[]['host']
-	 * @param integer $hosts[]['status']
-	 * @param array   $groupids
-	 *
-	 * @throws APIException
-	 */
-	private static function checkHostsToUnlink(array $db_hosts, array $groupids): void {
-		$hostids = array_column($db_hosts, 'hostid');
-
-		$hostids_unable_to_unlink = array_diff($hostids, getUnlinkableHostIds($groupids, $hostids));
-
-		if ($hostids_unable_to_unlink) {
-			$hostid = reset($hostids_unable_to_unlink);
-			$type = ($db_hosts[$hostid]['status'] == HOST_STATUS_TEMPLATE) ? 'template' : 'host';
-
-			if ($type === 'host') {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Host "%1$s" cannot be without host group.', $db_hosts[$hostid]['host'])
-				);
-			}
-			else {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Template "%1$s" cannot be without host group.', $db_hosts[$hostid]['host'])
-				);
-			}
-		}
 	}
 
 	/**

@@ -158,6 +158,7 @@ class CAudit {
 	 */
 	private const NESTED_OBJECTS_TABLE_NAMES = [
 		'hostgroup.hosts' => 'hosts_groups',
+		'hostgroup.templates' => 'hosts_groups',
 		'user.medias' => 'media',
 		'user.usrgrps' => 'users_groups',
 		'regexp.expressions' => 'expressions',
@@ -174,6 +175,7 @@ class CAudit {
 	 */
 	private const NESTED_OBJECTS_IDS = [
 		'hostgroup.hosts' => 'hostgroupid',
+		'hostgroup.templates' => 'hostgroupid',
 		'user.medias' => 'mediaid',
 		'user.usrgrps' => 'id',
 		'regexp.expressions' => 'expressionid',
