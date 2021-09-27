@@ -205,11 +205,9 @@ abstract class CControllerServiceListGeneral extends CController {
 		}
 
 		$options = [
-			'output' => [],
-			'selectParents' => ($filter['serviceid'] == self::WITHOUT_PARENTS_SERVICEID && !$is_filtered)
-				? null
-				: ['serviceid'],
-			'parentids' => !$is_filtered ? $filter['serviceid'] : null,
+			'output' => ['name'],
+			'parentids' => $filter['serviceid'],
+			'deep_parentids' => $is_filtered,
 			'childids' => $filter['without_children'] ? 0 : null,
 			'without_problem_tags' => $filter['without_problem_tags'],
 			'search' => ($filter['name'] === '')
@@ -233,8 +231,7 @@ abstract class CControllerServiceListGeneral extends CController {
 
 			if (!$filter['without_problem_tags']
 					&& ($filter['tag_source'] == ZBX_SERVICE_FILTER_TAGS_ANY
-						|| $filter['tag_source'] == ZBX_SERVICE_FILTER_TAGS_PROBLEM
-					)) {
+						|| $filter['tag_source'] == ZBX_SERVICE_FILTER_TAGS_PROBLEM)) {
 				$db_services += API::Service()->get($options + ['problem_tags' => $filter['tags']]);
 			}
 		}
@@ -242,52 +239,7 @@ abstract class CControllerServiceListGeneral extends CController {
 			$db_services += API::Service()->get($options);
 		}
 
-		if (!$db_services || !$is_filtered || $filter['serviceid'] == self::WITHOUT_PARENTS_SERVICEID) {
-			return array_keys($db_services);
-		}
-
-		$filtered_serviceids = [];
-
-		do {
-			$parentids = [];
-
-			foreach ($db_services as $db_serviceid => $db_service) {
-				$service_parentids = array_column($db_service['parents'], 'serviceid', 'serviceid');
-
-				if (array_key_exists($filter['serviceid'], $service_parentids)) {
-					$filtered_serviceids[$db_serviceid] = true;
-					unset($db_services[$db_serviceid]);
-				}
-				else {
-					$parentids += $service_parentids;
-				}
-			}
-
-			$db_parent_services = API::Service()->get([
-				'output' => [],
-				'selectParents' => ['serviceid'],
-				'serviceids' => $parentids,
-				'preservekeys' => true
-			]);
-
-			if (!$db_parent_services) {
-				break;
-			}
-
-			foreach ($db_services as &$db_service) {
-				$service_parentids = array_column($db_service['parents'], 'serviceid', 'serviceid');
-
-				$parentids = [];
-				foreach ($service_parentids as $service_parentid) {
-					$parentids += array_column($db_parent_services[$service_parentid]['parents'], null, 'serviceid');
-				}
-
-				$db_service['parents'] = $parentids;
-			}
-			unset($db_service);
-		} while (true);
-
-		return array_keys($filtered_serviceids);
+		return array_keys($db_services);
 	}
 
 	/**
