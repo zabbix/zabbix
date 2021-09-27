@@ -1011,7 +1011,8 @@ class testFormGraph extends CLegacyWebTest {
 	/**
 	 * Function for filtering necessary hosts or templates and opening their Graphs.
 	 *
-	 * @param string    name of a host or template
+	 * @param string         $name    name of a host
+	 * @param CFormELement   $form    filter form element
 	 */
 	private function filterEntriesAndOpenGraph($name, $form) {
 		$form->fill(['Name' => $name]);

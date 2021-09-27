@@ -2281,7 +2281,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 	/**
 	 * Function for filtering necessary hosts and opening its Discovery rules.
 	 *
-	 * @param string    name of a host or template
+	 * @param string    $name    name of a host
 	 */
 	private function filterEntriesAndOpenDiscovery($name) {
 		$form = $this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one();

@@ -2162,8 +2162,6 @@ class testFormItem extends CLegacyWebTest {
 
 	/**
 	 * Function for filtering necessary hosts or templates and opening their Items.
-	 *
-	 * @param string    name of a host or template
 	 */
 	private function filterEntriesAndOpenItems() {
 		$form = $this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one();

@@ -1235,7 +1235,7 @@ class testFormGraphPrototype extends CLegacyWebTest {
 	/**
 	 * Function for filtering necessary hosts or templates and opening their Discovery rules.
 	 *
-	 * @param string    name of a host or template
+	 * @param string    $name    name of a host
 	 */
 	private function filterEntriesAndOpenDiscovery($form, $name) {
 		$form->fill(['Name' => $name]);
