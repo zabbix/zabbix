@@ -37,7 +37,7 @@ class testPageApiTokensAdministrationGeneral extends testPageApiTokens {
 	public static function prepareTokenData() {
 		self::$timestamp = time() + 172800;
 
-		$responce = CDataHelper::call('token.create', [
+		$response = CDataHelper::call('token.create', [
 			[
 				'name' => 'Admin: future token for admin',
 				'userid' => 1,
@@ -99,7 +99,7 @@ class testPageApiTokensAdministrationGeneral extends testPageApiTokens {
 
 		// Update token "Last accessed" timestamp to be different for each token.
 		$i = 1;
-		foreach ($responce['tokenids'] as $tokenid) {
+		foreach ($response['tokenids'] as $tokenid) {
 			DBexecute('UPDATE token SET lastaccess='.(1609452001+$i).' WHERE tokenid='.$tokenid);
 			$i++;
 		}
