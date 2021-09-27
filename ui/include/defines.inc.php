@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'5.4.5rc1');
+define('ZABBIX_VERSION',		'5.4.5rc2');
 define('ZABBIX_API_VERSION',	'5.4.5');
 define('ZABBIX_EXPORT_VERSION',	'5.4');
 
