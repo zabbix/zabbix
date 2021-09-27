@@ -172,9 +172,9 @@ class CService extends CApiService {
 		$db_services = [];
 
 		$sql = $this->createSelectQuery('services', $options);
-		$resource = DBselect($sql, $options['limit']);
+		$resource = DBselect($sql);
 
-		while ($row = DBfetch($resource)) {
+		while (($options['limit'] === null || count($db_services) < $options['limit']) && $row = DBfetch($resource)) {
 			if ($options['countOutput']) {
 				return $row['rowscount'];
 			}
