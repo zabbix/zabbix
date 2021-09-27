@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-20 10:47+0300\n"
+"POT-Creation-Date: 2021-09-24 19:55+0300\n"
 "PO-Revision-Date: 2016-05-11 02:08+0300\n"
 "Last-Translator: 岂几 <tom3000@126.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -3040,7 +3040,7 @@ msgstr "无法更新网络拓扑图"
 msgid "Cannot update proxy"
 msgstr "无法更新agent代理程序"
 
-#: include/classes/api/services/CProxy.php:629
+#: include/classes/api/services/CProxy.php:636
 #, c-format
 msgid "Cannot update proxy for discovered host \"%1$s\"."
 msgstr "对于被自动发现的主机 \"%1$s\"无法更新其代理节点"
@@ -7197,8 +7197,8 @@ msgstr "数据图模板已删除"
 msgid "Graph prototype updated"
 msgstr "数据图模板已更新"
 
-#: include/classes/api/services/CDashboardGeneral.php:485
-#: include/classes/api/services/CDashboardGeneral.php:495
+#: include/classes/api/services/CDashboardGeneral.php:525
+#: include/classes/api/services/CDashboardGeneral.php:535
 #, c-format
 msgid "Graph prototype with ID \"%1$s\" is not available."
 msgstr "ID为 \"%1$s\" 的聚合图形不可用。"
@@ -7232,8 +7232,8 @@ msgstr "图形类别"
 msgid "Graph updated"
 msgstr "图形已更新"
 
-#: include/classes/api/services/CDashboardGeneral.php:457
-#: include/classes/api/services/CDashboardGeneral.php:464
+#: include/classes/api/services/CDashboardGeneral.php:497
+#: include/classes/api/services/CDashboardGeneral.php:504
 #, c-format
 msgid "Graph with ID \"%1$s\" is not available."
 msgstr "ID为 \"%1$s\" 的图表不可用。"
@@ -7718,7 +7718,7 @@ msgstr "主机群组组件"
 msgid "Host group label type"
 msgstr "主机群组标签类型"
 
-#: include/classes/api/services/CDashboardGeneral.php:515
+#: include/classes/api/services/CDashboardGeneral.php:555
 #: include/classes/api/services/CScript.php:937
 #: include/classes/api/services/CSettings.php:236
 #: include/classes/api/services/CUserGroup.php:455
@@ -7891,7 +7891,7 @@ msgstr "主机更新失败."
 msgid "Host updated"
 msgstr "主机已更新"
 
-#: include/classes/api/services/CDashboardGeneral.php:532
+#: include/classes/api/services/CDashboardGeneral.php:572
 #, c-format
 msgid "Host with ID \"%1$s\" is not available."
 msgstr "ID为 \"%1$s\" 的主机不可用"
@@ -9738,17 +9738,17 @@ msgstr "无效的方法参数."
 #: include/classes/api/services/CItemGeneral.php:2607
 #: include/classes/api/services/CItemGeneral.php:2617
 #: include/classes/api/services/CItemGeneral.php:2646
-#: include/classes/api/services/CProxy.php:651
-#: include/classes/api/services/CProxy.php:676
-#: include/classes/api/services/CProxy.php:682
-#: include/classes/api/services/CProxy.php:693
-#: include/classes/api/services/CProxy.php:699
-#: include/classes/api/services/CProxy.php:737
-#: include/classes/api/services/CProxy.php:754
-#: include/classes/api/services/CProxy.php:767
-#: include/classes/api/services/CProxy.php:773
-#: include/classes/api/services/CProxy.php:782
-#: include/classes/api/services/CProxy.php:794
+#: include/classes/api/services/CProxy.php:658
+#: include/classes/api/services/CProxy.php:683
+#: include/classes/api/services/CProxy.php:689
+#: include/classes/api/services/CProxy.php:700
+#: include/classes/api/services/CProxy.php:706
+#: include/classes/api/services/CProxy.php:744
+#: include/classes/api/services/CProxy.php:761
+#: include/classes/api/services/CProxy.php:774
+#: include/classes/api/services/CProxy.php:780
+#: include/classes/api/services/CProxy.php:789
+#: include/classes/api/services/CProxy.php:801
 #: include/classes/api/services/CReport.php:194
 #: include/classes/api/services/CReport.php:200
 #: include/classes/api/services/CReport.php:206
@@ -10128,8 +10128,8 @@ msgid "Item prototype updated"
 msgid_plural "Item prototypes updated"
 msgstr[0] "项目模板已更新"
 
-#: include/classes/api/services/CDashboardGeneral.php:429
-#: include/classes/api/services/CDashboardGeneral.php:437
+#: include/classes/api/services/CDashboardGeneral.php:469
+#: include/classes/api/services/CDashboardGeneral.php:477
 #, c-format
 msgid "Item prototype with ID \"%1$s\" is not available."
 msgstr "ID为 \"%1$s\" 的项目原型不可用。"
@@ -10187,8 +10187,8 @@ msgstr "监控项不会刷新。指定的更新间隔要求至少具有一个灵
 msgid "Item will not be refreshed. Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used."
 msgstr "监控项不会被刷新。更新间隔应该在 1s 到 1d 之间。还要指定调度/灵活间隔方式。"
 
-#: include/classes/api/services/CDashboardGeneral.php:402
-#: include/classes/api/services/CDashboardGeneral.php:409
+#: include/classes/api/services/CDashboardGeneral.php:442
+#: include/classes/api/services/CDashboardGeneral.php:449
 #, c-format
 msgid "Item with ID \"%1$s\" is not available."
 msgstr "ID为 \"%1$s\" 的项目不可用。"
@@ -10938,12 +10938,12 @@ msgid "Macro"
 msgstr "宏"
 
 #: include/classes/api/services/CHostBase.php:577
-#: include/classes/api/services/CUserMacro.php:668
+#: include/classes/api/services/CUserMacro.php:655
 #, c-format
 msgid "Macro \"%1$s\" already exists on \"%2$s\"."
 msgstr "宏\"%1$s\"已存在于\"%2$s\"."
 
-#: include/classes/api/services/CUserMacro.php:420
+#: include/classes/api/services/CUserMacro.php:411
 #, c-format
 msgid "Macro \"%1$s\" already exists."
 msgstr "宏\"%1$s\"已存在."
@@ -11159,7 +11159,7 @@ msgstr "拓扑图形状"
 msgid "Map update failed."
 msgstr "拓扑图更新失败."
 
-#: include/classes/api/services/CDashboardGeneral.php:549
+#: include/classes/api/services/CDashboardGeneral.php:589
 #, c-format
 msgid "Map with ID \"%1$s\" is not available."
 msgstr "ID为 \"%1$s\" 的地图不可用。"
@@ -12389,8 +12389,8 @@ msgstr ""
 #: include/classes/api/services/CCorrelation.php:724
 #: include/classes/api/services/CCorrelation.php:934
 #: include/classes/api/services/CDashboardGeneral.php:77
-#: include/classes/api/services/CDashboardGeneral.php:233
-#: include/classes/api/services/CDashboardGeneral.php:248
+#: include/classes/api/services/CDashboardGeneral.php:274
+#: include/classes/api/services/CDashboardGeneral.php:289
 #: include/classes/api/services/CDashboard.php:343
 #: include/classes/api/services/CDiscoveryRule.php:578
 #: include/classes/api/services/CDiscoveryRule.php:619
@@ -12470,8 +12470,8 @@ msgstr ""
 #: include/classes/api/services/CModule.php:214
 #: include/classes/api/services/CModule.php:246
 #: include/classes/api/services/CProxy.php:388
-#: include/classes/api/services/CProxy.php:623
-#: include/classes/api/services/CProxy.php:850
+#: include/classes/api/services/CProxy.php:630
+#: include/classes/api/services/CProxy.php:857
 #: include/classes/api/services/CRegexp.php:339
 #: include/classes/api/services/CRegexp.php:369
 #: include/classes/api/services/CReport.php:549
@@ -12505,11 +12505,11 @@ msgstr ""
 #: include/classes/api/services/CTriggerPrototype.php:711
 #: include/classes/api/services/CUserGroup.php:326
 #: include/classes/api/services/CUserGroup.php:893
-#: include/classes/api/services/CUserMacro.php:353
-#: include/classes/api/services/CUserMacro.php:463
-#: include/classes/api/services/CUserMacro.php:550
-#: include/classes/api/services/CUserMacro.php:742
-#: include/classes/api/services/CUserMacro.php:804
+#: include/classes/api/services/CUserMacro.php:345
+#: include/classes/api/services/CUserMacro.php:450
+#: include/classes/api/services/CUserMacro.php:537
+#: include/classes/api/services/CUserMacro.php:729
+#: include/classes/api/services/CUserMacro.php:791
 #: include/classes/api/services/CUser.php:542
 #: include/classes/api/services/CUser.php:1245
 #: include/classes/api/services/CUser.php:1773
@@ -13308,7 +13308,7 @@ msgstr "上行流量统计。返回整数"
 msgid "Output"
 msgstr ""
 
-#: include/classes/api/services/CDashboardGeneral.php:292
+#: include/classes/api/services/CDashboardGeneral.php:333
 #, c-format
 msgid "Overlapping widgets at X:%3$d, Y:%4$d on page #%2$d of dashboard \"%1$s\"."
 msgstr ""
@@ -14258,7 +14258,7 @@ msgstr "agent代理程序"
 msgid "Proxy"
 msgstr "agent代理程序"
 
-#: include/classes/api/services/CProxy.php:581
+#: include/classes/api/services/CProxy.php:588
 #, c-format
 msgid "Proxy \"%1$s\" already exists."
 msgstr ""
@@ -19344,7 +19344,7 @@ msgstr "欢迎来到"
 msgid "When active"
 msgstr "当启用时"
 
-#: include/classes/api/services/CDashboardGeneral.php:305
+#: include/classes/api/services/CDashboardGeneral.php:346
 #, c-format
 msgid "Widget at X:%3$d, Y:%4$d on page #%2$d of dashboard \"%1$s\" is out of bounds."
 msgstr ""
@@ -19685,9 +19685,6 @@ msgstr ""
 #: include/classes/api/services/CToken.php:313
 #: include/classes/api/services/CToken.php:414
 #: include/classes/api/services/CToken.php:448
-#: include/classes/api/services/CUserMacro.php:271
-#: include/classes/api/services/CUserMacro.php:331
-#: include/classes/api/services/CUserMacro.php:447
 msgid "You do not have permission to perform this operation."
 msgstr "您没有权限来完成此操作."
 
@@ -20220,8 +20217,8 @@ msgstr "不能变更"
 #: include/classes/api/services/CMediatype.php:731
 #: include/classes/api/services/CMediatype.php:748
 #: include/classes/api/services/CMediatype.php:800
-#: include/classes/api/services/CProxy.php:700
-#: include/classes/api/services/CProxy.php:774
+#: include/classes/api/services/CProxy.php:707
+#: include/classes/api/services/CProxy.php:781
 #: include/classes/api/services/CTriggerGeneral.php:794
 #: include/classes/api/services/CTriggerGeneral.php:827
 #: include/classes/api/services/CUserGroup.php:473
@@ -21344,10 +21341,10 @@ msgstr "简要描述"
 #: include/classes/api/services/CMaintenance.php:502
 #: include/classes/api/services/CMaintenance.php:724
 #: include/classes/api/services/CMediatype.php:793
-#: include/classes/api/services/CProxy.php:651
-#: include/classes/api/services/CProxy.php:676
-#: include/classes/api/services/CProxy.php:783
-#: include/classes/api/services/CProxy.php:795
+#: include/classes/api/services/CProxy.php:658
+#: include/classes/api/services/CProxy.php:683
+#: include/classes/api/services/CProxy.php:790
+#: include/classes/api/services/CProxy.php:802
 #: include/classes/api/services/CTriggerGeneral.php:800
 #: include/classes/api/services/CTriggerGeneral.php:833
 #: include/classes/api/services/CValueMap.php:583
@@ -21455,9 +21452,9 @@ msgstr "模板ID\"%1$s\"已传送%2$s次"
 #: include/classes/api/services/CHostPrototype.php:1688
 #: include/classes/api/services/CHostPrototype.php:1700
 #: include/classes/api/services/CHttpTest.php:744
-#: include/classes/api/services/CProxy.php:683
-#: include/classes/api/services/CProxy.php:694
-#: include/classes/api/services/CProxy.php:768
+#: include/classes/api/services/CProxy.php:690
+#: include/classes/api/services/CProxy.php:701
+#: include/classes/api/services/CProxy.php:775
 #: include/classes/api/services/CReport.php:195
 #: include/classes/api/services/CReport.php:577
 #: include/classes/api/services/CReport.php:583
@@ -21649,8 +21646,8 @@ msgstr "异常的文本 \"%1$s\""
 #: include/classes/api/services/CItemGeneral.php:1622
 #: include/classes/api/services/CItemGeneral.php:1648
 #: include/classes/api/services/CItemGeneral.php:1685
-#: include/classes/api/services/CProxy.php:738
-#: include/classes/api/services/CProxy.php:755
+#: include/classes/api/services/CProxy.php:745
+#: include/classes/api/services/CProxy.php:762
 #: include/classes/api/services/CTriggerGeneral.php:821
 #, c-format
 msgid "unexpected value \"%1$s\""
