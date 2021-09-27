@@ -24,6 +24,10 @@
  */
 class CItem extends CItemGeneral {
 
+	public const ACCESS_RULES = parent::ACCESS_RULES + [
+		'clear' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
+	];
+
 	protected $tableName = 'items';
 	protected $tableAlias = 'i';
 	protected $sortColumns = ['itemid', 'name', 'key_', 'delay', 'history', 'trends', 'type', 'status'];
