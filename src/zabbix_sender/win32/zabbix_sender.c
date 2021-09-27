@@ -61,7 +61,7 @@ int	zabbix_sender_send_values(const char *address, unsigned short port, const ch
 
 	zbx_vector_ptr_create(&zbx_addrs);
 
-	if (FAIL == zbx_set_data_destination_hosts(address, "<server>", sender_add_serveractive_host_cb, NULL,
+	if (FAIL == zbx_set_data_destination_hosts(address, port, "<server>", sender_add_serveractive_host_cb, NULL,
 			&zbx_addrs, result))
 	{
 		zbx_vector_ptr_clear_ext(&zbx_addrs, zbx_addr_free);

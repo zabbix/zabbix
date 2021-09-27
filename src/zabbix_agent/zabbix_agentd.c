@@ -979,8 +979,8 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 	{
 		char	*error;
 
-		if (FAIL == zbx_set_data_destination_hosts(active_hosts, "ServerActive", add_serveractive_host_cb, &hostnames, NULL,
-				&error))
+		if (FAIL == zbx_set_data_destination_hosts(active_hosts, ZBX_DEFAULT_SERVER_PORT, "ServerActive",
+				add_serveractive_host_cb, &hostnames, NULL, &error))
 		{
 			zbx_error("%s", error);
 			exit(EXIT_FAILURE);

@@ -909,8 +909,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 	{
 		char	*error;
 
-		if (FAIL == zbx_set_data_destination_hosts(CONFIG_SERVER, "Server", proxy_add_serveractive_host_cb,
-				NULL, NULL, &error))
+		if (FAIL == zbx_set_data_destination_hosts(CONFIG_SERVER, (unsigned short)CONFIG_SERVER_PORT, "Server",
+				proxy_add_serveractive_host_cb, NULL, NULL, &error))
 		{
 			zbx_error("%s", error);
 			exit(EXIT_FAILURE);

@@ -898,7 +898,8 @@ static void	zbx_load_config(const char *config_file)
 		{
 			char	*error;
 
-			if (FAIL == zbx_set_data_destination_hosts(cfg_active_hosts, "ServerActive",
+			if (FAIL == zbx_set_data_destination_hosts(cfg_active_hosts,
+					(unsigned short)ZBX_DEFAULT_SERVER_PORT, "ServerActive",
 					sender_add_serveractive_host_cb, NULL, NULL, &error))
 			{
 				zbx_error("%s", error);
@@ -1074,38 +1075,27 @@ static void	parse_commandline(int argc, char **argv)
 
 	if (NULL != ZABBIX_SERVER)
 	{
+		unsigned short	port;
+		char		*error;
+
 		if (NULL != ZABBIX_SERVER_PORT)
 		{
-			zbx_vector_ptr_t	addrs;
-			zbx_addr_t		addr;
-
-			addr.ip = ZABBIX_SERVER;
-
-			if (SUCCEED != is_ushort(ZABBIX_SERVER_PORT, &addr.port) || MIN_ZABBIX_PORT > addr.port)
+			if (SUCCEED != is_ushort(ZABBIX_SERVER_PORT, &port) || MIN_ZABBIX_PORT > port)
 			{
 				zbx_error("option \"-p\" used with invalid port number \"%s\", valid port numbers are"
 						" %d-%d", ZABBIX_SERVER_PORT, (int)MIN_ZABBIX_PORT,
 						(int)MAX_ZABBIX_PORT);
 				exit(EXIT_FAILURE);
 			}
-
-			zbx_vector_ptr_create(&addrs);
-
-			zbx_vector_ptr_append(&addrs, &addr);
-			sender_add_serveractive_host_cb(&addrs, NULL, NULL);
-
-			zbx_vector_ptr_destroy(&addrs);
 		}
 		else
-		{
-			char	*error;
+			port = (unsigned short)ZBX_DEFAULT_SERVER_PORT;
 
-			if (FAIL == zbx_set_data_destination_hosts(ZABBIX_SERVER, "-z", sender_add_serveractive_host_cb,
-					NULL, NULL, &error))
-			{
-				zbx_error("%s", error);
-				exit(EXIT_FAILURE);
-			}
+		if (FAIL == zbx_set_data_destination_hosts(ZABBIX_SERVER, port, "-z",
+				sender_add_serveractive_host_cb, NULL, NULL, &error))
+		{
+			zbx_error("%s", error);
+			exit(EXIT_FAILURE);
 		}
 	}
 

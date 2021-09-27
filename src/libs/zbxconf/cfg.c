@@ -635,7 +635,7 @@ static int	addr_compare_func(const void *d1, const void *d2)
  *          using a callback function                                         *
  *                                                                            *
  ******************************************************************************/
-int	zbx_set_data_destination_hosts(char *str, const char *name, add_serveractive_host_f cb,
+int	zbx_set_data_destination_hosts(char *str, unsigned short port, const char *name, add_serveractive_host_f cb,
 		zbx_vector_str_t *hostnames, void *data, char **error)
 {
 	char			*r, *r_node;
@@ -660,8 +660,7 @@ int	zbx_set_data_destination_hosts(char *str, const char *name, add_serveractive
 			addr = zbx_malloc(NULL, sizeof(zbx_addr_t));
 			addr->ip = NULL;
 
-			if (SUCCEED != parse_serveractive_element(str, &addr->ip, &addr->port,
-					(unsigned short)ZBX_DEFAULT_SERVER_PORT))
+			if (SUCCEED != parse_serveractive_element(str, &addr->ip, &addr->port, port))
 			{
 				*error = zbx_dsprintf(NULL, "error parsing the \"%s\" parameter: address \"%s\" is "
 						"invalid", name, str);
