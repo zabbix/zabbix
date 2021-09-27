@@ -46,10 +46,20 @@ static int	sender_add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_ve
 int	zabbix_sender_send_values(const char *address, unsigned short port, const char *source,
 		const zabbix_sender_value_t *values, int count, char **result)
 {
-	zbx_socket_t		sock;
-	int			ret, i;
-	struct zbx_json		json;
-	zbx_vector_ptr_t	zbx_addrs;
+	zbx_socket_t					sock;
+	int						ret, i;
+	struct zbx_json					json;
+	static ZBX_THREAD_LOCAL zbx_vector_ptr_t	zbx_addrs;
+	static ZBX_THREAD_LOCAL char			*last_address;
+	static unsigned short				last_port;
+
+	if (NULL == address)
+	{
+		if (NULL != result)
+			*result = zbx_strdup(NULL, "address must not be NULL");
+
+		return FAIL;
+	}
 
 	if (1 > count)
 	{
@@ -59,15 +69,25 @@ int	zabbix_sender_send_values(const char *address, unsigned short port, const ch
 		return FAIL;
 	}
 
-	zbx_vector_ptr_create(&zbx_addrs);
+	if (NULL == last_address)
+		zbx_vector_ptr_create(&zbx_addrs);
 
-	if (FAIL == zbx_set_data_destination_hosts(address, port, "<server>", sender_add_serveractive_host_cb, NULL,
-			&zbx_addrs, result))
+	if (0 != zbx_strcmp_null(last_address, address) || port != last_port)
 	{
-		zbx_vector_ptr_clear_ext(&zbx_addrs, zbx_addr_free);
-		zbx_vector_ptr_destroy(&zbx_addrs);
+		last_address = zbx_strdup(last_address, address);
+		last_port = port;
 
-		return FAIL;
+		zbx_vector_ptr_clear_ext(&zbx_addrs, zbx_addr_free);
+
+		if (FAIL == zbx_set_data_destination_hosts(address, port, "<server>", sender_add_serveractive_host_cb,
+				NULL, &zbx_addrs, result))
+		{
+			zbx_free(last_address);
+			last_port = 0;
+			zbx_vector_ptr_clear_ext(&zbx_addrs, zbx_addr_free);
+			zbx_vector_ptr_destroy(&zbx_addrs);
+			return FAIL;
+		}
 	}
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
@@ -103,8 +123,6 @@ int	zabbix_sender_send_values(const char *address, unsigned short port, const ch
 		*result = zbx_strdup(NULL, zbx_socket_strerror());
 
 	zbx_json_free(&json);
-	zbx_vector_ptr_clear_ext(&zbx_addrs, zbx_addr_free);
-	zbx_vector_ptr_destroy(&zbx_addrs);
 
 	return ret;
 }

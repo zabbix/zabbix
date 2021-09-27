@@ -1252,7 +1252,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	}
 
 #endif
-	zbx_on_exit(ZBX_EXIT_STATUS());
+	zbx_on_exit(SUCCEED);
 
 	return SUCCEED;
 }
