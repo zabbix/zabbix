@@ -524,8 +524,8 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		$oldHashDiscovery = CDBHelper::getHash($sqlDiscovery);
 
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
-		$this->zbxTestClickLinkTextWait($this->host);
-		$this->zbxTestClickLinkTextWait('Discovery rules');
+		$form = $this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one();
+		$this->filterEntriesAndOpenDiscovery($form, $this->host);
 		$this->zbxTestClickLinkTextWait($name);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
@@ -1482,11 +1482,8 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 	 */
 	public function testFormLowLevelDiscovery_SimpleCreate($data) {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
-		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestCheckHeader('Hosts');
-
-		$this->zbxTestClickLinkTextWait($this->host);
-		$this->zbxTestClickLinkTextWait('Discovery rules');
+		$form = $this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one();
+		$this->filterEntriesAndOpenDiscovery($form, $this->host);
 		$this->zbxTestContentControlButtonClickTextWait('Create discovery rule');
 
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
@@ -1615,8 +1612,8 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 
 		if (isset($data['formCheck'])) {
 			$this->zbxTestOpen(self::HOST_LIST_PAGE);
-			$this->zbxTestClickLinkTextWait($this->host);
-			$this->zbxTestClickLinkTextWait('Discovery rules');
+			$form = $this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one();
+			$this->filterEntriesAndOpenDiscovery($form, $this->host);
 
 			if (isset ($data['dbName'])) {
 				$dbName = $data['dbName'];
@@ -1693,8 +1690,8 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 			}
 
 			$this->zbxTestOpen(self::HOST_LIST_PAGE);
-			$this->zbxTestClickLinkTextWait($this->host);
-			$this->zbxTestClickLinkTextWait('Discovery rules');
+			$form = $this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one();
+			$this->filterEntriesAndOpenDiscovery($form, $this->host);
 
 			$this->zbxTestCheckboxSelect("g_hostdruleid_$itemId");
 			$this->zbxTestClickButton('discoveryrule.massdelete');
