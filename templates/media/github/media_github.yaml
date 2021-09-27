@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-09-24T14:40:25Z'
+  date: '2021-09-27T17:34:09Z'
   media_types:
     -
       name: Github
@@ -72,7 +72,7 @@ zabbix_export:
                     url += '/';
                 }
         
-                if (url.indexOf('http://') == -1 && url.indexOf('https://') == -1) {
+                if (url.indexOf('http://') === -1 && url.indexOf('https://') === -1) {
                     url = 'https://' + url;
                 }
         
@@ -80,12 +80,10 @@ zabbix_export:
             },
         
             createProblemURL: function (zabbix_url, triggerid, eventid, event_source) {
-                var problem_url = '';
+                var problem_url = zabbix_url;
+        
                 if (event_source === '0') {
-                    problem_url = zabbix_url + 'tr_events.php?triggerid=' + triggerid + '&eventid=' + eventid;
-                }
-                else {
-                    problem_url = zabbix_url;
+                    problem_url += 'tr_events.php?triggerid=' + triggerid + '&eventid=' + eventid;
                 }
         
                 return problem_url;
@@ -143,6 +141,10 @@ zabbix_export:
                     }
                 }
         
+                if (typeof response !== 'object') {
+                    throw 'Cannot create Github incident. Response is not an object. Check debug log for more information.';
+                }
+        
                 if (request.getStatus() < 200 || request.getStatus() >= 300) {
                     var message = 'Request failed with status code ' + request.getStatus();
         
@@ -151,9 +153,6 @@ zabbix_export:
                     }
         
                     throw message + ' Check debug log for more information.';
-                }
-                else if (typeof response !== 'object') {
-                    throw 'Cannot create Github incident. Check debug log for more information.';
                 }
         
                 return response;
@@ -209,8 +208,7 @@ zabbix_export:
                 throw 'Field "zabbix_url" cannot be empty.';
             }
         
-            //check for backslash in the end of url and schema
-        
+            //check for backslash in the end of url and schema        
             github.url = Github.urlCheckFormat(github.url);
             params.zabbix_url = Github.urlCheckFormat(params.zabbix_url);
         
