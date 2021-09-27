@@ -564,7 +564,8 @@ int	zbx_eval_calc_histogram_quantile(const double q, const zbx_vector_dbl_t *val
 
 	if (0 == values->values_num)
 	{
-		*error = zbx_dsprintf(*error, "invalid zero number of rate buckets for function at \"%s\"",err_fn);
+		*error = zbx_dsprintf(*error, "invalid parameters: value of infinity bucket have to not be zero"
+				" for function at \"%s\"",err_fn);
 		return FAIL;
 	}
 
