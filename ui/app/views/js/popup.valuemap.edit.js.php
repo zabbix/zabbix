@@ -75,6 +75,7 @@ $(() => {
 });
 
 function submitValueMap(overlay) {
+	overlay.setLoading();
 	var $form = overlay.$dialogue.find('form'),
 		url = new Curl($form.attr('action'));
 
