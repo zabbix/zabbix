@@ -287,7 +287,7 @@ clean:
  *             trids_num           - [IN] trigger count in trids array                                    *
  *             links               - [OUT] pairs of trigger dependencies, list of links_up and links_down *
  *                                         links that we want to be present on the target host            *
- *             links2              - [OUT] processed links with entries that are already present exluded  *
+ *             links2              - [OUT] processed links with entries that are already present excluded *
  *             trigger_dep_ids_del - [OUT] - list of triggers dependencies that need to be deleted        *
  *                                                                                                        *
  * Return value: upon successful completion return SUCCEED, or FAIL on DB error                           *
