@@ -193,7 +193,7 @@ class CAudit {
 			'conditions' => ['usermacro.type' => ZBX_MACRO_TYPE_SECRET]
 		],
 		self::RESOURCE_PROXY => ['paths' => ['proxy.tls_psk_identity', 'proxy.tls_psk']],
-		self::RESOURCE_SCRIPT => ['paths' => ['script.password']],
+		self::RESOURCE_SCRIPT => ['paths' => ['script.password', 'script.privatekey']],
 		self::RESOURCE_USER => ['paths' => ['user.passwd']]
 	];
 
