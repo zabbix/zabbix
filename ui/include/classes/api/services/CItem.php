@@ -24,10 +24,6 @@
  */
 class CItem extends CItemGeneral {
 
-	public const ACCESS_RULES = parent::ACCESS_RULES + [
-		'clear' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
-	];
-
 	protected $tableName = 'items';
 	protected $tableAlias = 'i';
 	protected $sortColumns = ['itemid', 'name', 'key_', 'delay', 'history', 'trends', 'type', 'status'];
@@ -1287,55 +1283,5 @@ class CItem extends CItemGeneral {
 		}
 
 		return $sqlParts;
-	}
-
-	/**
-	 * Clear item history. Support web scenario history cleanup.
-	 *
-	 * @param array $itemids
-	 *
-	 * @return array
-	 */
-	public function clear(array $itemids): array {
-		$this->validateClear($itemids, $db_items);
-
-		Manager::History()->deleteHistory(array_column($db_items, 'value_type', 'itemid'));
-
-		self::addAuditLog(CAudit::ACTION_HISTORY_CLEAR, CAudit::RESOURCE_ITEM, $db_items);
-
-		return ['itemids' => $itemids];
-	}
-
-	/**
-	 * Validates the input parameters for the clear() method.
-	 *
-	 * @param array      $itemids
-	 * @param array|null $db_items
-	 *
-	 * @throws APIException if the input is invalid
-	 * @throws APIException if comperesion is enabled
-	 */
-	private function validateClear(array $itemids, array &$db_items = null): void {
-		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
-
-		if (!CApiInputValidator::validate($api_input_rules, $itemids, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
-		if (CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_STATUS)) {
-			self::exception(ZBX_API_ERROR_INTERNAL, _('History cleanup is not supported if compression is enabled'));
-		}
-
-		$db_items = $this->get([
-			'output' => ['itemid', 'value_type', 'name'],
-			'itemids' => $itemids,
-			'templated' => false,
-			'webitems' => true,
-			'editable' => true
-		]);
-
-		if (count($db_items) != count($itemids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
 	}
 }
