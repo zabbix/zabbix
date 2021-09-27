@@ -310,7 +310,6 @@ class CAudit {
 						'details' => (count($diff) == 0) ? '' : json_encode($diff)
 					];
 				}
-				break;
 		}
 
 		DB::insertBatch('auditlog', $auditlog);

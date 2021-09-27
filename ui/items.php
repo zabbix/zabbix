@@ -1061,7 +1061,7 @@ elseif (hasRequest('action') && getRequest('action') === 'item.masscopyto' && ha
 // clean history for selected items
 elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory'
 		&& hasRequest('group_itemid') && is_array(getRequest('group_itemid'))) {
-	$result = API::Item()->clear(getRequest('group_itemid'));
+	$result = (bool) API::Item()->clear(getRequest('group_itemid'));
 
 	if ($result) {
 		uncheckTableRows(getRequest('checkbox_hash'));
