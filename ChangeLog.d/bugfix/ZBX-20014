@@ -1,0 +1,1 @@
+........S. [ZBX-20014] fixed server audit to generate CUID during entiry creation instead of audit flush (arimdjonoks)

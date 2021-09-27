@@ -63,6 +63,7 @@ typedef struct zbx_audit_entry
 	struct zbx_json	details_json;
 	int		audit_action;
 	int		resource_type;
+	char		audit_cuid[CUID_LEN];
 } zbx_audit_entry_t;
 
 zbx_audit_entry_t	*zbx_audit_entry_init(zbx_uint64_t id, const char *name, int audit_action, int resource_type);
