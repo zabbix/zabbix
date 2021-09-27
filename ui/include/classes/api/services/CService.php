@@ -167,6 +167,12 @@ class CService extends CApiService {
 			}
 		}
 
+		if ($accessible_services !== null) {
+			$limit_services = $limit_services !== null
+				? array_intersect_key($limit_services, $accessible_services)
+				: $accessible_services;
+		}
+
 		$options['root_services'] = $permissions !== null ? $permissions['root_services'] : null;
 
 		$db_services = [];
@@ -177,10 +183,6 @@ class CService extends CApiService {
 		while (($options['limit'] === null || count($db_services) < $options['limit']) && $row = DBfetch($resource)) {
 			if ($options['countOutput']) {
 				return $row['rowscount'];
-			}
-
-			if ($accessible_services !== null && !array_key_exists($row['serviceid'], $accessible_services)) {
-				continue;
 			}
 
 			if ($limit_services !== null && !array_key_exists($row['serviceid'], $limit_services)) {
