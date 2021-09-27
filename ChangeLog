@@ -1,8 +1,13 @@
 Changes for 6.0.0alpha4
 
 New features:
+.......... [ZBXNEXT-6750] added IgnoreURLCertErrors configuration option to web service (yurii)
+A.F....... [ZBXNEXT-6470,ZBXNEXT-6917] implemented audit logging of global macro API object (rlataria)
+A.F....... [ZBXNEXT-6470,ZBXNEXT-6910] implemented audit logging of dashboard and templatedashboard API object (rlataria)
 
 Bug fixes:
+...G...... [ZBX-20015] fixed Zabbix agent not being able to retrieve active checks configuration on Windows (vso)
+........S. [ZBX-19989] fixed audit flush when used with Oracle (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.0alpha3
@@ -93,6 +98,12 @@ A.F....... [ZBXNEXT-6528,ZBXNEXT-6669] moved auditlog calls from frontend sectio
 
 Bug fixes:
 .........T [ZBX-19395] changed version in links of the templates and the media (mchudinov)
+
+--------------------------------------------------------------------------------
+Changes for 5.4.5rc2
+
+Bug fixes:
+...G...... [ZBX-20015] fixed Zabbix agent not being able to retrieve active checks configuration on Windows (vso)
 
 --------------------------------------------------------------------------------
 Changes for 5.4.5rc1
@@ -1118,6 +1129,12 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.16rc2
+
+Bug fixes:
+...G...... [ZBX-20015] fixed Zabbix agent not being able to retrieve active checks configuration on Windows (vso)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.16rc1
@@ -3349,6 +3366,11 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.34
+
+4.0.34rc1 was released as 4.0.34 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.0.34rc1
