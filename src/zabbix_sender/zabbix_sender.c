@@ -412,10 +412,44 @@ typedef struct
 	ZBX_THREAD_SENDVAL_TLS_ARGS	tls_vars;
 #endif
 	int				sync_timestamp;
+#ifndef _WINDOWS
+	int				fds[2];
+#endif
 }
 ZBX_THREAD_SENDVAL_ARGS;
 
 #define SUCCEED_PARTIAL	2
+
+#if !defined(_WINDOWS)
+static void	zbx_thread_handle_pipe_response(ZBX_THREAD_SENDVAL_ARGS *sendval_args)
+{
+	int	offset;
+	char	buffer[sizeof(int)], *ptr = buffer;
+
+	while (0 < (offset = read(sendval_args->fds[0], ptr, buffer + sizeof(buffer) - ptr)))
+		ptr += offset;
+
+	if (-1 == offset)
+		zabbix_log(LOG_LEVEL_WARNING, "cannot read data from pipe: %s", zbx_strerror(errno));
+
+	if (ptr - buffer != sizeof(int))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Incorrect response from child thread");
+		return;
+	}
+
+	offset = *((int *)buffer);
+
+	while (0 < offset--)
+	{
+		zbx_addr_t	*addr = sendval_args->addrs->values[0];
+
+		zbx_vector_ptr_remove(sendval_args->addrs, 0);
+		zbx_vector_ptr_append(sendval_args->addrs, addr);
+	}
+}
+#endif
+
 
 /******************************************************************************
  *                                                                            *
@@ -439,7 +473,8 @@ ZBX_THREAD_SENDVAL_ARGS;
  *           SUCCEED statuses that come after should not overwrite it         *
  *                                                                            *
  ******************************************************************************/
-static int	sender_threads_wait(ZBX_THREAD_HANDLE *threads, int threads_num, const int old_status)
+static int	sender_threads_wait(ZBX_THREAD_HANDLE *threads, zbx_thread_args_t *threads_args, int threads_num,
+		const int old_status)
 {
 	int		i, sp_count = 0, fail_count = 0;
 #if defined(_WINDOWS)
@@ -469,6 +504,13 @@ static int	sender_threads_wait(ZBX_THREAD_HANDLE *threads, int threads_num, cons
 				}
 			}
 		}
+#if !defined(_WINDOWS)
+		else
+			zbx_thread_handle_pipe_response((ZBX_THREAD_SENDVAL_ARGS *)threads_args->args);
+
+		close(((ZBX_THREAD_SENDVAL_ARGS *)threads_args->args)->fds[0]);
+		close(((ZBX_THREAD_SENDVAL_ARGS *)threads_args->args)->fds[1]);
+#endif
 
 		threads[i] = ZBX_THREAD_HANDLE_NULL;
 	}
@@ -660,8 +702,12 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 	ZBX_THREAD_SENDVAL_ARGS	*sendval_args = (ZBX_THREAD_SENDVAL_ARGS *)((zbx_thread_args_t *)args)->args;
 	int			tcp_ret, ret = FAIL;
 	zbx_socket_t		sock;
-
 #if !defined(_WINDOWS)
+	int			i;
+	zbx_addr_t		*last_addr;
+
+	last_addr = (zbx_addr_t *)sendval_args->addrs->values[0];
+
 	zbx_set_sender_signal_handlers();
 #endif
 
@@ -708,7 +754,26 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 
 	if (FAIL == tcp_ret)
 		zabbix_log(LOG_LEVEL_DEBUG, "send value error: %s", zbx_socket_strerror());
+#if !defined(_WINDOWS)
+	for (i = sendval_args->addrs->values_num - 1; i >= 0; i--)
+	{
+		if (last_addr == sendval_args->addrs->values[i])
+		{
+			int	offset = sendval_args->addrs->values_num - i;
 
+			if (0 == i)
+				offset = 0;
+
+			if (FAIL == zbx_write_all(sendval_args->fds[1], (char *)&offset, sizeof(offset)))
+				zabbix_log(LOG_LEVEL_WARNING, "cannot write data to pipe: %s", zbx_strerror(errno));
+
+			close(sendval_args->fds[0]);
+			close(sendval_args->fds[1]);
+			break;
+		}
+	}
+
+#endif
 	zbx_thread_exit(ret);
 }
 
@@ -734,14 +799,14 @@ static int	perform_data_sending(ZBX_THREAD_SENDVAL_ARGS *sendval_args, int old_s
 {
 	int			i, ret;
 	ZBX_THREAD_HANDLE	*threads = NULL;
+	zbx_thread_args_t	*threads_args, *thread_args;
 
 	threads = (ZBX_THREAD_HANDLE *)zbx_calloc(threads, destinations_count, sizeof(ZBX_THREAD_HANDLE));
+	threads_args = (zbx_thread_args_t *)zbx_calloc(NULL, destinations_count, sizeof(zbx_thread_args_t));
 
 	for (i = 0; i < destinations_count; i++)
 	{
-		zbx_thread_args_t	*thread_args;
-
-		thread_args = (zbx_thread_args_t *)zbx_malloc(NULL, sizeof(zbx_thread_args_t));
+		thread_args = threads_args + i;
 
 		thread_args->args = &sendval_args[i];
 
@@ -757,15 +822,20 @@ static int	perform_data_sending(ZBX_THREAD_SENDVAL_ARGS *sendval_args, int old_s
 		}
 
 		destinations[i].thread = &threads[i];
-
-		zbx_thread_start(send_value, thread_args, &threads[i]);
 #ifndef _WINDOWS
-		zbx_free(thread_args);
+		if (-1 == pipe(sendval_args[i].fds))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "Cannot create data pipe: %s", strerror_from_system(errno));
+			threads[i] = (ZBX_THREAD_HANDLE)ZBX_THREAD_ERROR;
+			continue;
+		}
 #endif
+		zbx_thread_start(send_value, thread_args, &threads[i]);
 	}
 
-	ret = sender_threads_wait(threads, destinations_count, old_status);
+	ret = sender_threads_wait(threads, threads_args, destinations_count, old_status);
 
+	zbx_free(threads_args);
 	zbx_free(threads);
 
 	return ret;

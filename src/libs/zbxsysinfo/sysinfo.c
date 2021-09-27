@@ -1731,38 +1731,6 @@ static int	deserialize_agent_result(char *data, AGENT_RESULT *result)
 
 /******************************************************************************
  *                                                                            *
- * Function: write_all                                                        *
- *                                                                            *
- * Purpose: call write in a loop, iterating until all the data is written.    *
- *                                                                            *
- * Parameters: fd      - [IN] descriptor                                      *
- *             buf     - [IN] buffer to write                                 *
- *             n       - [IN] bytes count to write                            *
- *                                                                            *
- * Return value: SUCCEED - n bytes successfully written                       *
- *               FAIL    - less than n bytes are written                      *
- *                                                                            *
- ******************************************************************************/
-static int	write_all(int fd, const char *buf, size_t n)
-{
-	ssize_t	ret;
-
-	while (0 < n)
-	{
-		if (-1 != (ret = write(fd, buf, n)))
-		{
-			buf += ret;
-			n -= ret;
-		}
-		else if (EINTR != errno)
-			return FAIL;
-	}
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: zbx_execute_threaded_metric                                      *
  *                                                                            *
  * Purpose: execute metric in a separate process/thread so it can be          *
@@ -1815,7 +1783,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 		ret = metric_func(request, result);
 		serialize_agent_result(&data, &data_alloc, &data_offset, ret, result);
 
-		ret = write_all(fds[1], data, data_offset);
+		ret = zbx_write_all(fds[1], data, data_offset);
 
 		zbx_free(data);
 		free_result(result);

@@ -1355,6 +1355,7 @@ void	find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, s
 int	zbx_read(int fd, char *buf, size_t count, const char *encoding);
 int	zbx_is_regular_file(const char *path);
 char	*zbx_fgets(char *buffer, int size, FILE *fp);
+int	zbx_write_all(int fd, const char *buf, size_t n);
 
 int	MAIN_ZABBIX_ENTRY(int flags);
 

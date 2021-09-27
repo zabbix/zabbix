@@ -186,6 +186,39 @@ char	*zbx_fgets(char *buffer, int size, FILE *fp)
 
 	return s;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_write_all                                                    *
+ *                                                                            *
+ * Purpose: call write in a loop, iterating until all the data is written.    *
+ *                                                                            *
+ * Parameters: fd      - [IN] descriptor                                      *
+ *             buf     - [IN] buffer to write                                 *
+ *             n       - [IN] bytes count to write                            *
+ *                                                                            *
+ * Return value: SUCCEED - n bytes successfully written                       *
+ *               FAIL    - less than n bytes are written                      *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_write_all(int fd, const char *buf, size_t n)
+{
+	ssize_t	ret;
+
+	while (0 < n)
+	{
+		if (-1 != (ret = write(fd, buf, n)))
+		{
+			buf += ret;
+			n -= ret;
+		}
+		else if (EINTR != errno)
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #else	/* _WINDOWS */
 static	int	get_file_time_stat(const char *path, zbx_file_time_t *time)
 {
