@@ -2380,16 +2380,12 @@ class CService extends CApiService {
 	 *      - from          - the beginning of the interval, timestamp;
 	 *      - to            - the end of the interval, timestamp.
 	 *
-	 * Returns the following availability information for each service:
-	 *  - status            - the current status of the service;
-	 *  - problems          - an array of triggers that are currently in problem state and belong to the given service
-	 *                        or it's descendants;
-	 *  - sla               - an array of requested intervals with SLA information:
-	 *      - from              - the beginning of the interval;
-	 *      - to                - the end of the interval;
-	 *      - okTime            - the time the service was in OK state, in seconds;
-	 *      - problemTime       - the time the service was in problem state, in seconds;
-	 *      - downtimeTime      - the time the service was down, in seconds.
+	 * Returns an array of requested intervals with SLA information:
+	 *  - from              - the beginning of the interval;
+	 *  - to                - the end of the interval;
+	 *  - okTime            - the time the service was in OK state, in seconds;
+	 *  - problemTime       - the time the service was in problem state, in seconds;
+	 *  - downtimeTime      - the time the service was down, in seconds.
 	 *
 	 * If the service calculation algorithm is set to SERVICE_ALGORITHM_NONE, the method will return an empty 'problems'
 	 * array and null for all of the calculated values.
@@ -2431,11 +2427,7 @@ class CService extends CApiService {
 
 			// initial data
 			foreach ($services as $service) {
-				$rs[$service['serviceid']] = [
-					'status' => $service['algorithm'] != ZBX_SERVICE_STATUS_CALC_SET_OK ? $service['status'] : null,
-					'problems' => [],
-					'sla' => []
-				];
+				$rs[$service['serviceid']] = [];
 			}
 
 			if ($usedSeviceIds) {
@@ -2455,46 +2447,6 @@ class CService extends CApiService {
 					while ($data = DBfetch($query)) {
 						$services[$data['serviceid']]['alarms'][] = $data;
 					}
-				}
-
-				// add problem events
-				$deep_problem_serviceids = $problemServiceIds;
-				$deep_services = $services;
-
-				while ($problemServiceIds) {
-					$child_services = $this->get([
-						'output' => ['serviceid', 'name', 'status', 'algorithm'],
-						'selectParents' => ['serviceid'],
-						'parentids' => $problemServiceIds,
-						'preservekeys' => true
-					]);
-
-					$child_services = array_filter($child_services,
-						static function (array $service): bool {
-							return $service['algorithm'] != ZBX_SERVICE_STATUS_CALC_SET_OK && $service['status'] > 0;
-						}
-					);
-
-					$deep_services += $child_services;
-
-					$problemServiceIds = array_keys($child_services);
-					$deep_problem_serviceids = array_merge($deep_problem_serviceids, $problemServiceIds);
-				}
-
-				if ($deep_problem_serviceids) {
-					$deep_problem_events = [];
-
-					$query = DBSelect(
-						'SELECT sp.eventid, sp.serviceid, sp.severity'.
-						' FROM service_problem sp'.
-						' WHERE '.dbConditionId('sp.serviceid', $deep_problem_serviceids)
-					);
-
-					while ($row = DBfetch($query)) {
-						$deep_problem_events[$row['serviceid']][$row['eventid']] = ['eventid' => $row['eventid']];
-					}
-
-					$rs = $this->escalateProblems($deep_services, $deep_problem_events, $rs);
 				}
 
 				$slaCalculator = new CServicesSlaCalculator();
@@ -2522,7 +2474,7 @@ class CService extends CApiService {
 							];
 						}
 
-						$rs[$service['serviceid']]['sla'][] = [
+						$rs[$service['serviceid']][] = [
 							'from' => $interval['from'],
 							'to' => $interval['to'],
 							'sla' => $intervalSla['ok'],
@@ -2536,56 +2488,6 @@ class CService extends CApiService {
 		}
 
 		return $rs;
-	}
-
-	/**
-	 * Escalate problem events from the child services to their parents and adds them to $slaData.
-	 * The escalation will stop if a service has status calculation disabled or is in OK state.
-	 *
-	 * @param array $services
-	 * @param array $problem_events  An array of service problems.
-	 * @param array $slaData
-	 *
-	 * @return array
-	 */
-	protected function escalateProblems(array $services, array $problem_events, array $slaData) {
-		$parentProblems = [];
-		foreach ($problem_events as $serviceId => $service_problem_events) {
-			$service = $services[$serviceId];
-
-			// add the problem events of the current service to the data
-			if (array_key_exists($serviceId, $slaData)) {
-				$slaData[$serviceId]['problems'] = zbx_array_merge($slaData[$serviceId]['problems'],
-					$service_problem_events
-				);
-			}
-
-			// add the same problem events to the parent services
-			foreach ($service['parents'] as $parent) {
-				$parentServiceId = $parent['serviceid'];
-
-				if (isset($services[$parentServiceId])) {
-					$parentService = $services[$parentServiceId];
-
-					// escalate only if status calculation is enabled for the parent service and it's in problem state
-					if ($parentService['algorithm'] != ZBX_SERVICE_STATUS_CALC_SET_OK && $parentService['status'] > 0) {
-						if (!isset($parentProblems[$parentServiceId])) {
-							$parentProblems[$parentServiceId] = [];
-						}
-						$parentProblems[$parentServiceId] = zbx_array_merge($parentProblems[$parentServiceId],
-							$service_problem_events
-						);
-					}
-				}
-			}
-		}
-
-		// propagate the problems to the parents
-		if ($parentProblems) {
-			$slaData = $this->escalateProblems($services, $parentProblems, $slaData);
-		}
-
-		return $slaData;
 	}
 
 	/**
