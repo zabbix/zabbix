@@ -79,6 +79,8 @@
 #include "zbxvault.h"
 #include "zbxdiag.h"
 #include "zbxtrends.h"
+#include "ha/ha.h"
+#include "sighandler.h"
 
 #ifdef HAVE_OPENIPMI
 #include "ipmi/ipmi_manager.h"
@@ -120,6 +122,7 @@ const char	*help_message[] = {
 	"                                  lld, valuecache, locks) or everything if section is",
 	"                                  not specified",
 	"      " ZBX_SERVICE_CACHE_RELOAD "        Reload service manager cache",
+	"      " ZBX_HA_STATUS "                   Log HA cluster status",
 	"",
 	"      Log level control targets:",
 	"        process-type              All processes of specified type",
@@ -172,6 +175,7 @@ static char	shortopts[] = "c:hVR:f";
 int		threads_num = 0;
 pid_t		*threads = NULL;
 static int	*threads_flags;
+static int	ha_status = ZBX_NODE_STATUS_UNKNOWN;
 
 unsigned char			program_type	= ZBX_PROGRAM_TYPE_SERVER;
 ZBX_THREAD_LOCAL unsigned char	process_type	= ZBX_PROCESS_TYPE_UNKNOWN;
@@ -342,7 +346,8 @@ char	*CONFIG_WEBSERVICE_URL	= NULL;
 
 int	CONFIG_SERVICEMAN_SYNC_FREQUENCY	= 60;
 
-volatile sig_atomic_t	zbx_diaginfo_scope = ZBX_DIAGINFO_UNDEFINED;
+static volatile sig_atomic_t	zbx_diaginfo_scope = ZBX_DIAGINFO_UNDEFINED;
+static volatile sig_atomic_t	zbx_ha_report = 0;
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
@@ -1062,8 +1067,6 @@ int	main(int argc, char **argv)
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
 		exit(SUCCEED == zbx_sigusr_send(t.data) ? EXIT_SUCCESS : EXIT_FAILURE);
 
-	zbx_initialize_events();
-
 	if (FAIL == zbx_ipc_service_init_env(CONFIG_SOCKET_PATH, &error))
 	{
 		zbx_error("Cannot initialize IPC services: %s", error);
@@ -1076,18 +1079,25 @@ int	main(int argc, char **argv)
 
 static void	zbx_main_sigusr_handler(int flags)
 {
-	if (ZBX_RTC_DIAGINFO == ZBX_RTC_GET_MSG(flags))
-	{
-		int	scope = ZBX_RTC_GET_SCOPE(flags);
+	int	scope;
 
-		if (ZBX_DIAGINFO_ALL == scope)
-		{
-			zbx_diaginfo_scope = (1 << ZBX_DIAGINFO_HISTORYCACHE) | (1 << ZBX_DIAGINFO_VALUECACHE) |
-					(1 << ZBX_DIAGINFO_PREPROCESSING) | (1 << ZBX_DIAGINFO_LLD) |
-					(1 << ZBX_DIAGINFO_ALERTING) | (1 << ZBX_DIAGINFO_LOCKS);
-		}
-		else
-			zbx_diaginfo_scope = 1 << scope;
+	switch (ZBX_RTC_GET_MSG(flags))
+	{
+		case ZBX_RTC_DIAGINFO:
+			scope = ZBX_RTC_GET_SCOPE(flags);
+
+			if (ZBX_DIAGINFO_ALL == scope)
+			{
+				zbx_diaginfo_scope = (1 << ZBX_DIAGINFO_HISTORYCACHE) | (1 << ZBX_DIAGINFO_VALUECACHE) |
+						(1 << ZBX_DIAGINFO_PREPROCESSING) | (1 << ZBX_DIAGINFO_LLD) |
+						(1 << ZBX_DIAGINFO_ALERTING) | (1 << ZBX_DIAGINFO_LOCKS);
+			}
+			else
+				zbx_diaginfo_scope = 1 << scope;
+			break;
+		case ZBX_RTC_HA_STATUS:
+			zbx_ha_report = 1;
+			break;
 	}
 
 }
@@ -1165,109 +1175,17 @@ static void	zbx_check_db(void)
 	}
 }
 
-int	MAIN_ZABBIX_ENTRY(int flags)
+/******************************************************************************
+ *                                                                            *
+ * Function: server_startup                                                   *
+ *                                                                            *
+ * Purpose: initialize shared resources and start processes                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	server_startup(zbx_socket_t *listen_sock)
 {
-	zbx_socket_t	listen_sock;
-	char		*error = NULL;
-	int		i, db_type;
-
-	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
-	{
-		printf("Starting Zabbix Server. Zabbix %s (revision %s).\nPress Ctrl+C to exit.\n\n",
-				ZABBIX_VERSION, ZABBIX_REVISION);
-	}
-
-	if (SUCCEED != zbx_locks_create(&error))
-	{
-		zbx_error("cannot create locks: %s", error);
-		zbx_free(error);
-		exit(EXIT_FAILURE);
-	}
-
-	if (SUCCEED != zabbix_open_log(CONFIG_LOG_TYPE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE, &error))
-	{
-		zbx_error("cannot open log: %s", error);
-		zbx_free(error);
-		exit(EXIT_FAILURE);
-	}
-
-#ifdef HAVE_NETSNMP
-#	define SNMP_FEATURE_STATUS	"YES"
-#else
-#	define SNMP_FEATURE_STATUS	" NO"
-#endif
-#ifdef HAVE_OPENIPMI
-#	define IPMI_FEATURE_STATUS	"YES"
-#else
-#	define IPMI_FEATURE_STATUS	" NO"
-#endif
-#ifdef HAVE_LIBCURL
-#	define LIBCURL_FEATURE_STATUS	"YES"
-#else
-#	define LIBCURL_FEATURE_STATUS	" NO"
-#endif
-#if defined(HAVE_LIBCURL) && defined(HAVE_LIBXML2)
-#	define VMWARE_FEATURE_STATUS	"YES"
-#else
-#	define VMWARE_FEATURE_STATUS	" NO"
-#endif
-#ifdef HAVE_SMTP_AUTHENTICATION
-#	define SMTP_AUTH_FEATURE_STATUS	"YES"
-#else
-#	define SMTP_AUTH_FEATURE_STATUS	" NO"
-#endif
-#ifdef HAVE_UNIXODBC
-#	define ODBC_FEATURE_STATUS	"YES"
-#else
-#	define ODBC_FEATURE_STATUS	" NO"
-#endif
-#if defined(HAVE_SSH2) || defined(HAVE_SSH)
-#	define SSH_FEATURE_STATUS	"YES"
-#else
-#	define SSH_FEATURE_STATUS	" NO"
-#endif
-#ifdef HAVE_IPV6
-#	define IPV6_FEATURE_STATUS	"YES"
-#else
-#	define IPV6_FEATURE_STATUS	" NO"
-#endif
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-#	define TLS_FEATURE_STATUS	"YES"
-#else
-#	define TLS_FEATURE_STATUS	" NO"
-#endif
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "Starting Zabbix Server. Zabbix %s (revision %s).",
-			ZABBIX_VERSION, ZABBIX_REVISION);
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "****** Enabled features ******");
-	zabbix_log(LOG_LEVEL_INFORMATION, "SNMP monitoring:           " SNMP_FEATURE_STATUS);
-	zabbix_log(LOG_LEVEL_INFORMATION, "IPMI monitoring:           " IPMI_FEATURE_STATUS);
-	zabbix_log(LOG_LEVEL_INFORMATION, "Web monitoring:            " LIBCURL_FEATURE_STATUS);
-	zabbix_log(LOG_LEVEL_INFORMATION, "VMware monitoring:         " VMWARE_FEATURE_STATUS);
-	zabbix_log(LOG_LEVEL_INFORMATION, "SMTP authentication:       " SMTP_AUTH_FEATURE_STATUS);
-	zabbix_log(LOG_LEVEL_INFORMATION, "ODBC:                      " ODBC_FEATURE_STATUS);
-	zabbix_log(LOG_LEVEL_INFORMATION, "SSH support:               " SSH_FEATURE_STATUS);
-	zabbix_log(LOG_LEVEL_INFORMATION, "IPv6 support:              " IPV6_FEATURE_STATUS);
-	zabbix_log(LOG_LEVEL_INFORMATION, "TLS support:               " TLS_FEATURE_STATUS);
-	zabbix_log(LOG_LEVEL_INFORMATION, "******************************");
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "using configuration file: %s", CONFIG_FILE);
-
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	if (SUCCEED != zbx_coredump_disable())
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot disable core dump, exiting...");
-		exit(EXIT_FAILURE);
-	}
-#endif
-	if (FAIL == zbx_load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT, 1))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
-		exit(EXIT_FAILURE);
-	}
-
-	zbx_free_config();
+	int	i;
+	char	*error = NULL;
 
 	if (SUCCEED != init_database_cache(&error))
 	{
@@ -1325,47 +1243,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_vault_init_token_from_env(&error))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize vault token: %s", error);
-		zbx_free(error);
-		exit(EXIT_FAILURE);
-	}
-
-	if (SUCCEED != zbx_vault_init_db_credentials(&error))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database credentials from vault: %s", error);
-		zbx_free(error);
-		exit(EXIT_FAILURE);
-	}
-
-	if (ZBX_DB_UNKNOWN == (db_type = zbx_db_get_database_type()))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot use database \"%s\": database is not a Zabbix database",
-				CONFIG_DBNAME);
-		exit(EXIT_FAILURE);
-	}
-	else if (ZBX_DB_SERVER != db_type)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot use database \"%s\": its \"users\" table is empty (is this the"
-				" Zabbix proxy database?)", CONFIG_DBNAME);
-		exit(EXIT_FAILURE);
-	}
-
-	zbx_check_db();
-
-	DBcheck_character_set();
-
-	if (SUCCEED != DBcheck_double_type())
-	{
-		CONFIG_DOUBLE_PRECISION = ZBX_DB_DBL_PRECISION_DISABLED;
-		ZBX_DOUBLE_EPSILON = 0.000001;
-		zabbix_log(LOG_LEVEL_WARNING, "database is not upgraded to use double precision values");
-	}
-
-	if (SUCCEED != zbx_db_check_instanceid())
-		exit(EXIT_FAILURE);
-
 	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_POLLER_FORKS
 			+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS + CONFIG_PINGER_FORKS
 			+ CONFIG_ALERTER_FORKS + CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS
@@ -1382,7 +1259,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	if (0 != CONFIG_TRAPPER_FORKS)
 	{
-		if (FAIL == zbx_tcp_listen(&listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT))
+		if (FAIL == zbx_tcp_listen(listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "listener failed: %s", zbx_socket_strerror());
 			exit(EXIT_FAILURE);
@@ -1446,7 +1323,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_TRAPPER:
-				thread_args.args = &listen_sock;
+				thread_args.args = listen_sock;
 				zbx_thread_start(trapper_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_PINGER:
@@ -1540,43 +1417,19 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				break;
 		}
 	}
-
-	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
-		zbx_problems_export_init("main-process", 0);
-
-	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_HISTORY))
-		zbx_history_export_init("main-process", 0);
-
-	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_TRENDS))
-		zbx_trends_export_init("main-process", 0);
-
-
-	zbx_set_sigusr_handler(zbx_main_sigusr_handler);
-
-	while (ZBX_IS_RUNNING() && -1 == wait(&i))	/* wait for any child to exit */
-	{
-		if (EINTR != errno)
-		{
-			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
-			break;
-		}
-
-		/* check if the wait was interrupted because of diaginfo remote command */
-		if (ZBX_DIAGINFO_UNDEFINED != zbx_diaginfo_scope)
-		{
-			zbx_diag_log_info(zbx_diaginfo_scope);
-			zbx_diaginfo_scope = ZBX_DIAGINFO_UNDEFINED;
-		}
-	}
-
-	zbx_on_exit(ZBX_EXIT_STATUS());
-
-	return SUCCEED;
 }
 
-void	zbx_on_exit(int ret)
+/******************************************************************************
+ *                                                                            *
+ * Function: server_teardown                                                  *
+ *                                                                            *
+ * Purpose: terminate processes and destroy shared resources                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	server_teardown(int ret, zbx_socket_t *listen_sock)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
+	if (NULL != listen_sock)
+		zbx_tcp_close(listen_sock);
 
 	if (SUCCEED == DBtxn_ongoing())
 		DBrollback();
@@ -1609,6 +1462,260 @@ void	zbx_on_exit(int ret)
 		zbx_vmware_destroy();
 
 	free_selfmon_collector();
+}
+
+int	MAIN_ZABBIX_ENTRY(int flags)
+{
+	char		*error = NULL;
+	int		i, db_type, ret, new_ha_status;
+	zbx_socket_t	listen_sock;
+
+	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
+	{
+		printf("Starting Zabbix Server. Zabbix %s (revision %s).\nPress Ctrl+C to exit.\n\n",
+				ZABBIX_VERSION, ZABBIX_REVISION);
+	}
+
+	if (SUCCEED != zbx_locks_create(&error))
+	{
+		zbx_error("cannot create locks: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
+	if (SUCCEED != zabbix_open_log(CONFIG_LOG_TYPE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE, &error))
+	{
+		zbx_error("cannot open log: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
+#ifdef HAVE_NETSNMP
+#	define SNMP_FEATURE_STATUS	"YES"
+#else
+#	define SNMP_FEATURE_STATUS	" NO"
+#endif
+#ifdef HAVE_OPENIPMI
+#	define IPMI_FEATURE_STATUS	"YES"
+#else
+#	define IPMI_FEATURE_STATUS	" NO"
+#endif
+#ifdef HAVE_LIBCURL
+#	define LIBCURL_FEATURE_STATUS	"YES"
+#else
+#	define LIBCURL_FEATURE_STATUS	" NO"
+#endif
+#if defined(HAVE_LIBCURL) && defined(HAVE_LIBXML2)
+#	define VMWARE_FEATURE_STATUS	"YES"
+#else
+#	define VMWARE_FEATURE_STATUS	" NO"
+#endif
+#ifdef HAVE_SMTP_AUTHENTICATION
+#	define SMTP_AUTH_FEATURE_STATUS	"YES"
+#else
+#	define SMTP_AUTH_FEATURE_STATUS	" NO"
+#endif
+#ifdef HAVE_UNIXODBC
+#	define ODBC_FEATURE_STATUS	"YES"
+#else
+#	define ODBC_FEATURE_STATUS	" NO"
+#endif
+#if defined(HAVE_SSH2) || defined(HAVE_SSH)
+#	define SSH_FEATURE_STATUS	"YES"
+#else
+#	define SSH_FEATURE_STATUS	" NO"
+#endif
+#ifdef HAVE_IPV6
+#	define IPV6_FEATURE_STATUS	"YES"
+#else
+#	define IPV6_FEATURE_STATUS	" NO"
+#endif
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#	define TLS_FEATURE_STATUS	"YES"
+#else
+#	define TLS_FEATURE_STATUS	" NO"
+#endif
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "Starting Zabbix Server. Zabbix %s (revision %s).",
+			ZABBIX_VERSION, ZABBIX_REVISION);
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "****** Enabled features ******");
+	zabbix_log(LOG_LEVEL_INFORMATION, "SNMP monitoring:           " SNMP_FEATURE_STATUS);
+	zabbix_log(LOG_LEVEL_INFORMATION, "IPMI monitoring:           " IPMI_FEATURE_STATUS);
+	zabbix_log(LOG_LEVEL_INFORMATION, "Web monitoring:            " LIBCURL_FEATURE_STATUS);
+	zabbix_log(LOG_LEVEL_INFORMATION, "VMware monitoring:         " VMWARE_FEATURE_STATUS);
+	zabbix_log(LOG_LEVEL_INFORMATION, "SMTP authentication:       " SMTP_AUTH_FEATURE_STATUS);
+	zabbix_log(LOG_LEVEL_INFORMATION, "ODBC:                      " ODBC_FEATURE_STATUS);
+	zabbix_log(LOG_LEVEL_INFORMATION, "SSH support:               " SSH_FEATURE_STATUS);
+	zabbix_log(LOG_LEVEL_INFORMATION, "IPv6 support:              " IPV6_FEATURE_STATUS);
+	zabbix_log(LOG_LEVEL_INFORMATION, "TLS support:               " TLS_FEATURE_STATUS);
+	zabbix_log(LOG_LEVEL_INFORMATION, "******************************");
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "using configuration file: %s", CONFIG_FILE);
+
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	if (SUCCEED != zbx_coredump_disable())
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot disable core dump, exiting...");
+		exit(EXIT_FAILURE);
+	}
+#endif
+
+	zbx_initialize_events();
+
+	if (FAIL == zbx_load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT, 1))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
+		exit(EXIT_FAILURE);
+	}
+
+	zbx_free_config();
+
+	if (SUCCEED != zbx_vault_init_token_from_env(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize vault token: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
+	if (SUCCEED != zbx_vault_init_db_credentials(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database credentials from vault: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
+	if (ZBX_DB_UNKNOWN == (db_type = zbx_db_get_database_type()))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot use database \"%s\": database is not a Zabbix database",
+				CONFIG_DBNAME);
+		exit(EXIT_FAILURE);
+	}
+	else if (ZBX_DB_SERVER != db_type)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot use database \"%s\": its \"users\" table is empty (is this the"
+				" Zabbix proxy database?)", CONFIG_DBNAME);
+		exit(EXIT_FAILURE);
+	}
+
+	zbx_check_db();
+
+	DBcheck_character_set();
+
+	if (SUCCEED != DBcheck_double_type())
+	{
+		CONFIG_DOUBLE_PRECISION = ZBX_DB_DBL_PRECISION_DISABLED;
+		ZBX_DOUBLE_EPSILON = 0.000001;
+		zabbix_log(LOG_LEVEL_WARNING, "database is not upgraded to use double precision values");
+	}
+
+	if (SUCCEED != zbx_db_check_instanceid())
+		exit(EXIT_FAILURE);
+
+	if (SUCCEED != zbx_ha_start(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot start HA manager: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
+	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
+		zbx_problems_export_init("main-process", 0);
+
+	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_HISTORY))
+		zbx_history_export_init("main-process", 0);
+
+	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_TRENDS))
+		zbx_trends_export_init("main-process", 0);
+
+	zbx_set_sigusr_handler(zbx_main_sigusr_handler);
+
+	if (SUCCEED != zbx_ha_get_status(&ha_status, &error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot get HA status: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
+	//  TODO: log mode in text format
+	zabbix_log(LOG_LEVEL_INFORMATION, "starting server in %d mode", ha_status);
+
+	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
+		server_startup(&listen_sock);
+
+	while (ZBX_IS_RUNNING())	/* wait for any child to exit */
+	{
+		if (SUCCEED != zbx_ha_recv_status(&new_ha_status, &error))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot get HA manager status: %s", error);
+			zbx_free(error);
+			sig_exiting = ZBX_EXIT_FAILURE;
+			break;
+		}
+
+		if (ZBX_NODE_STATUS_UNKNOWN != new_ha_status)
+		{
+			//  TODO: switch to active/standby depending on new status
+			ha_status = new_ha_status;
+		}
+
+		if (0 < (ret = waitpid((pid_t)-1, &i, WNOHANG)))
+		{
+			sig_exiting = ZBX_EXIT_FAILURE;
+			break;
+		}
+
+		if (-1 == ret && EINTR != errno)
+		{
+			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
+			break;
+		}
+
+		/* check if the wait was interrupted because of remote commands */
+		if (ZBX_DIAGINFO_UNDEFINED != zbx_diaginfo_scope)
+		{
+			zbx_diag_log_info(zbx_diaginfo_scope);
+			zbx_diaginfo_scope = ZBX_DIAGINFO_UNDEFINED;
+		}
+		else if (0 != zbx_ha_report)
+		{
+			if (SUCCEED != zbx_ha_report_status(&error))
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "cannot create HA status report: %s", error);
+				zbx_free(error);
+				sig_exiting = ZBX_EXIT_FAILURE;
+				break;
+			}
+
+			zbx_ha_report = 1;
+		}
+	}
+
+	if (SUCCEED != zbx_ha_pause(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot pause HA manager: %s", error);
+		zbx_free(error);
+	}
+
+	zbx_on_exit(ZBX_EXIT_STATUS());
+
+	return SUCCEED;
+}
+
+void	zbx_on_exit(int ret)
+{
+	char	*error = NULL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
+
+	if (SUCCEED != zbx_ha_stop(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot stop HA manager: %s", error);
+		zbx_free(error);
+	}
+
+	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
+		server_teardown(ret, NULL);
 
 	zbx_uninitialize_events();
 

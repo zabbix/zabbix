@@ -95,7 +95,7 @@ zbx_ipc_async_socket_t;
 int	zbx_ipc_service_init_env(const char *path, char **error);
 void	zbx_ipc_service_free_env(void);
 int	zbx_ipc_service_start(zbx_ipc_service_t *service, const char *service_name, char **error);
-int	zbx_ipc_service_recv(zbx_ipc_service_t *service, int timeout, zbx_ipc_client_t **client,
+int	zbx_ipc_service_recv(zbx_ipc_service_t *service, double timeout, zbx_ipc_client_t **client,
 		zbx_ipc_message_t **message);
 void	zbx_ipc_service_close(zbx_ipc_service_t *service);
 

@@ -90,6 +90,7 @@ typedef int zbx_mutex_t;
 typedef int zbx_rwlock_t;
 #endif
 int		zbx_locks_create(char **error);
+void		zbx_locks_destroy();
 int		zbx_rwlock_create(zbx_rwlock_t *rwlock, zbx_rwlock_name_t name, char **error);
 zbx_mutex_t	zbx_mutex_addr_get(zbx_mutex_name_t mutex_name);
 zbx_rwlock_t	zbx_rwlock_addr_get(zbx_rwlock_name_t rwlock_name);

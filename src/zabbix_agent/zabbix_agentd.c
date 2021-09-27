@@ -27,6 +27,7 @@
 #include "comms.h"
 #include "modbtype.h"
 
+
 char	*CONFIG_HOSTS_ALLOWED		= NULL;
 char	*CONFIG_HOSTNAMES		= NULL;
 char	*CONFIG_HOSTNAME_ITEM		= NULL;
@@ -109,6 +110,7 @@ int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 #else
 #	include "zbxnix.h"
 #	include "sighandler.h"
+#	include "daemon.h"
 #endif
 #include "active.h"
 #include "listener.h"
@@ -1247,6 +1249,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		if (EINTR != errno)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
+			sig_exiting = ZBX_EXIT_FAILURE;
 			break;
 		}
 	}

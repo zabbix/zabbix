@@ -448,6 +448,7 @@ zbx_graph_yaxis_types_t;
 #define ZBX_SNMP_CACHE_RELOAD		"snmp_cache_reload"
 #define ZBX_DIAGINFO			"diaginfo"
 #define ZBX_TRIGGER_HOUSEKEEPER_EXECUTE "trigger_housekeeper_execute"
+#define ZBX_HA_STATUS			"ha_status"
 
 /* value for not supported items */
 #define ZBX_NOTSUPPORTED	"ZBX_NOTSUPPORTED"
@@ -975,6 +976,7 @@ zbx_task_t;
 #define ZBX_RTC_SECRETS_RELOAD			11
 #define ZBX_RTC_SERVICE_CACHE_RELOAD		12
 #define ZBX_RTC_TRIGGER_HOUSEKEEPER_EXECUTE	13
+#define ZBX_RTC_HA_STATUS			14
 
 typedef enum
 {

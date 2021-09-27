@@ -51,7 +51,7 @@ static int			shm_id, locks_disabled;
 #	include "cfg.h"
 #	include "threads.h"
 
-	static int		ZBX_SEM_LIST_ID;
+	static int		ZBX_SEM_LIST_ID = -1;
 	static unsigned char	mutexes;
 #endif
 
@@ -143,7 +143,8 @@ int	zbx_locks_create(char **error)
 	union semun	semopts;
 	int		i;
 
-	if (-1 == (ZBX_SEM_LIST_ID = semget(IPC_PRIVATE, ZBX_MUTEX_COUNT + ZBX_RWLOCK_COUNT, 0600)))
+	if (-1 == ZBX_SEM_LIST_ID &&
+			-1 == (ZBX_SEM_LIST_ID = semget(IPC_PRIVATE, ZBX_MUTEX_COUNT + ZBX_RWLOCK_COUNT, 0600)))
 	{
 		*error = zbx_dsprintf(*error, "cannot create semaphore set: %s", zbx_strerror(errno));
 		return FAIL;
@@ -168,6 +169,15 @@ int	zbx_locks_create(char **error)
 	}
 #endif
 	return SUCCEED;
+}
+
+void	zbx_locks_destroy()
+{
+#ifdef HAVE_PTHREAD_PROCESS_SHARED
+	shmdt(shared_lock);
+	shared_lock = NULL;
+	shm_id = 0;
+#endif
 }
 
 /******************************************************************************

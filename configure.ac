@@ -2082,6 +2082,7 @@ AC_OUTPUT([
 	src/zabbix_server/dbsyncer/Makefile
 	src/zabbix_server/dbconfig/Makefile
 	src/zabbix_server/discoverer/Makefile
+	src/zabbix_server/ha/Makefile
 	src/zabbix_server/housekeeper/Makefile
 	src/zabbix_server/httppoller/Makefile
 	src/zabbix_server/pinger/Makefile

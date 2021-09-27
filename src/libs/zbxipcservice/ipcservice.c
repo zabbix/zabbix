@@ -1675,18 +1675,18 @@ void	zbx_ipc_service_close(zbx_ipc_service_t *service)
  *               ZBX_IPC_RECV_TIMEOUT   - returned after timeout expired      *
  *                                                                            *
  ******************************************************************************/
-int	zbx_ipc_service_recv(zbx_ipc_service_t *service, int timeout, zbx_ipc_client_t **client,
+int	zbx_ipc_service_recv(zbx_ipc_service_t *service, double timeout, zbx_ipc_client_t **client,
 		zbx_ipc_message_t **message)
 {
 	int	ret, flags;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() timeout:%d", __func__, timeout);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() timeout:%.3f", __func__, timeout);
 
 	if (timeout != 0 && SUCCEED == zbx_queue_ptr_empty(&service->clients_recv))
 	{
 		if (ZBX_IPC_WAIT_FOREVER != timeout)
 		{
-			struct timeval	tv = {timeout, 0};
+			struct timeval	tv = {(int)timeout, (int)(timeout * 1000000) % 1000000};
 			evtimer_add(service->ev_timer, &tv);
 		}
 		flags = EVLOOP_ONCE;

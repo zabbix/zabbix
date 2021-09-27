@@ -24,7 +24,8 @@ SUBDIRS = \
 	availability \
 	lld \
 	reporter \
-	service
+	service \
+	ha
 
 sbin_PROGRAMS = zabbix_server
 
@@ -75,6 +76,7 @@ zabbix_server_LDADD = \
 	poller/libzbxpoller_server.a \
 	lld/libzbxlld.a \
 	libzbxserver.a \
+	ha/libzbxha.a \
 	$(top_builddir)/src/libs/zbxprometheus/libzbxprometheus.a \
 	$(top_builddir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_builddir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
