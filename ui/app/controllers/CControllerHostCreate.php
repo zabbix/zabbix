@@ -178,13 +178,9 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 	 */
 	private function createValueMaps(string $hostid): bool {
 		$valuemaps = $this->getInput('valuemaps', []);
-		$clone_mode = $this->hasInput('clone_hostid');
 
 		foreach ($valuemaps as $key => $valuemap) {
-			if ($clone_mode) {
-				unset($valuemap['valuemapid']);
-			}
-
+			unset($valuemap['valuemapid']);
 			$valuemaps[$key] = $valuemap + ['hostid' => $hostid];
 		}
 
