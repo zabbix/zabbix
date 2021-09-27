@@ -79,6 +79,12 @@ typedef struct
 	unsigned char	discover;
 	char		*event_name_orig;
 	char		*event_name;
+	unsigned char	priority_orig;
+	unsigned char	priority;
+	char		*comments_orig;
+	char		*comments;
+	char		*url_orig;
+	char		*url;
 	unsigned char	type_orig;
 	unsigned char	type;
 
@@ -90,8 +96,11 @@ typedef struct
 #define ZBX_FLAG_LINK_TRIGGER_UPDATE_OPDATA		__UINT64_C(0x00000010)
 #define ZBX_FLAG_LINK_TRIGGER_UPDATE_DISCOVER		__UINT64_C(0x00000020)
 #define ZBX_FLAG_LINK_TRIGGER_UPDATE_EVENT_NAME		__UINT64_C(0x00000040)
-#define ZBX_FLAG_LINK_TRIGGER_UPDATE_TYPE		__UINT64_C(0x00000080)
-#define ZBX_FLAG_LINK_TRIGGER_UPDATE_TEMPLATEID		__UINT64_C(0x00000100)
+#define ZBX_FLAG_LINK_TRIGGER_UPDATE_PRIORITY		__UINT64_C(0x00000080)
+#define ZBX_FLAG_LINK_TRIGGER_UPDATE_COMMENTS		__UINT64_C(0x00000100)
+#define ZBX_FLAG_LINK_TRIGGER_UPDATE_URL		__UINT64_C(0x00000200)
+#define ZBX_FLAG_LINK_TRIGGER_UPDATE_TYPE		__UINT64_C(0x00000400)
+#define ZBX_FLAG_LINK_TRIGGER_UPDATE_TEMPLATEID		__UINT64_C(0x00000800)
 
 #define ZBX_FLAG_LINK_TRIGGER_UPDATE									\
 	(ZBX_FLAG_LINK_TRIGGER_UPDATE_RECOVERY_MODE | ZBX_FLAG_LINK_TRIGGER_UPDATE_CORRELATION_MODE |	\
@@ -151,6 +160,17 @@ static void	zbx_host_triggers_main_data_clean(zbx_hashset_t *h)
 
 		if (0 != (trigger_entry->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_EVENT_NAME))
 			zbx_free(trigger_entry->event_name);
+
+		zbx_free(trigger_entry->comments_orig);
+
+		if (0 != (trigger_entry->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_COMMENTS))
+			zbx_free(trigger_entry->comments);
+
+		zbx_free(trigger_entry->url_orig);
+
+		if (0 != (trigger_entry->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_URL))
+			zbx_free(trigger_entry->url);
+
 	}
 
 	zbx_hashset_destroy(h);
@@ -581,7 +601,7 @@ static int	get_target_host_main_data(zbx_uint64_t hostid, zbx_vector_str_t *temp
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 		"select distinct t.triggerid,t.description,t.expression,t.recovery_expression"
 			",t.flags,t.recovery_mode,t.correlation_mode,t.correlation_tag,t.manual_close,t.opdata"
-			",t.discover,t.event_name,t.templateid,t.type"
+			",t.discover,t.event_name,t.priority,t.comments,t.url,t.templateid,t.type"
 		" from triggers t,functions f,items i"
 			" where t.triggerid=f.triggerid"
 				" and f.itemid=i.itemid"
@@ -610,7 +630,7 @@ static int	get_target_host_main_data(zbx_uint64_t hostid, zbx_vector_str_t *temp
 		target_host_trigger_entry.description = zbx_strdup(NULL, row[1]);
 		target_host_trigger_entry.expression = zbx_strdup(NULL, row[2]);
 		target_host_trigger_entry.recovery_expression = zbx_strdup(NULL, row[3]);
-		ZBX_DBROW2UINT64(target_host_trigger_entry.templateid_orig, row[12]);
+		ZBX_DBROW2UINT64(target_host_trigger_entry.templateid_orig, row[15]);
 		target_host_trigger_entry.templateid = 0;
 		ZBX_STR2UINT64(target_host_trigger_entry.flags, row[4]);
 
@@ -628,7 +648,13 @@ static int	get_target_host_main_data(zbx_uint64_t hostid, zbx_vector_str_t *temp
 		target_host_trigger_entry.discover = 0;
 		target_host_trigger_entry.event_name_orig = zbx_strdup(NULL, row[11]);
 		target_host_trigger_entry.event_name = NULL;
-		ZBX_STR2UCHAR(target_host_trigger_entry.type_orig, row[13]);
+		ZBX_STR2UCHAR(target_host_trigger_entry.priority_orig,  row[12]);
+		target_host_trigger_entry.priority = 0;
+		target_host_trigger_entry.comments_orig = zbx_strdup(NULL, row[13]);
+		target_host_trigger_entry.comments = NULL;
+		target_host_trigger_entry.url_orig = zbx_strdup(NULL, row[14]);
+		target_host_trigger_entry.url = NULL;
+		ZBX_STR2UCHAR(target_host_trigger_entry.type_orig, row[16]);
 		target_host_trigger_entry.type = 0;
 
 		zbx_hashset_insert(zbx_host_triggers_main_data, &target_host_trigger_entry,
@@ -767,6 +793,24 @@ static void	mark_updates_for_host_trigger(zbx_trigger_copy_t *trigger_copy,
 		main_found->update_flags |= ZBX_FLAG_LINK_TRIGGER_UPDATE_EVENT_NAME;
 	}
 
+	if (trigger_copy->priority != main_found->priority_orig)
+	{
+		main_found->priority = trigger_copy->priority;
+		main_found->update_flags |= ZBX_FLAG_LINK_TRIGGER_UPDATE_PRIORITY;
+	}
+
+	if (0 != strcmp(trigger_copy->comments, main_found->comments_orig))
+	{
+		main_found->comments = zbx_strdup(NULL, trigger_copy->comments);
+		main_found->update_flags |= ZBX_FLAG_LINK_TRIGGER_UPDATE_COMMENTS;
+	}
+
+	if (0 != strcmp(trigger_copy->url, main_found->url_orig))
+	{
+		main_found->url = zbx_strdup(NULL, trigger_copy->url);
+		main_found->update_flags |= ZBX_FLAG_LINK_TRIGGER_UPDATE_URL;
+	}
+
 	if (trigger_copy->type != main_found->type_orig)
 	{
 		main_found->type = trigger_copy->type;
@@ -879,6 +923,41 @@ static int	execute_triggers_updates(zbx_hashset_t *zbx_host_triggers_main_data)
 
 				zbx_audit_trigger_update_json_update_event_name(found->triggerid,
 						(int)found->flags, found->event_name_orig, found->event_name);
+			}
+
+			if (0 != (found->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_PRIORITY))
+			{
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%spriority=%d", d, found->priority);
+				d = ",";
+
+				zbx_audit_trigger_update_json_update_priority(found->triggerid,
+						(int)found->flags, found->priority_orig, found->priority);
+			}
+
+			if (0 != (found->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_COMMENTS))
+			{
+				char	*comments_esc = DBdyn_escape_string(found->comments);
+
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%scomments='%s'", d,
+						found->comments);
+				d = ",";
+				zbx_free(comments_esc);
+
+				zbx_audit_trigger_update_json_update_comments(found->triggerid,
+						(int)found->flags, found->comments_orig, found->comments);
+			}
+
+			if (0 != (found->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_URL))
+			{
+				char	*url_esc = DBdyn_escape_string(found->url);
+
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%surl='%s'", d,
+						found->url);
+				d = ",";
+				zbx_free(url_esc);
+
+				zbx_audit_trigger_update_json_update_url(found->triggerid,
+						(int)found->flags, found->url_orig, found->url);
 			}
 
 			if (0 != (found->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_TYPE))
