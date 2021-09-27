@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-09-24 19:55+0300\n"
-"PO-Revision-Date: 2021-09-19 07:04+0300\n"
+"PO-Revision-Date: 2021-09-26 11:57+0300\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
-"X-POOTLE-MTIME: 1632027850.000000\n"
+"X-POOTLE-MTIME: 1632650239.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:142
@@ -8267,19 +8267,19 @@ msgstr "אם המסנן תואם"
 #, c-format
 msgid "If less than %2$s child service has %1$s status or below"
 msgid_plural "If less than %2$s child services have %1$s status or below"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "אם פחות משירות צאצא %2$s הוא במצב %1$s ומטה"
+msgstr[1] "אם פחות מ־%2$s שירותים צאצאיים הם במצב %1$s ומטה"
 
 #: include/classes/helpers/CServiceHelper.php:45
 #, c-format
 msgid "If less than %2$s child services have %1$s status or below"
-msgstr ""
+msgstr "אם פחות מ־%2$s שירותים צאצאיים הם במצב %1$s ומטה"
 
 #: include/classes/helpers/CServiceHelper.php:50
 #: include/classes/helpers/CServiceHelper.php:101
 #, c-format
 msgid "If less than %2$s of child services have %1$s status or below"
-msgstr ""
+msgstr "אם פחות מ־%2$s מהשירותים צאצאיים הם במצב %1$s ומטה"
 
 #: include/classes/api/services/CReport.php:348
 msgid "If no user groups are specified, at least one user must be included in the mailing list."
@@ -8291,7 +8291,7 @@ msgstr "אם לא צוינו קבוצות משתמשים, יש לכלול לפח
 #: include/classes/helpers/CServiceHelper.php:110
 #, c-format
 msgid "If weight of child services with %1$s status or above is at least %2$s"
-msgstr ""
+msgstr "אם משקל השירותים הצאצאיים במצב %1$s ומעלה הוא לפחות %2$s"
 
 #: include/classes/helpers/CServiceHelper.php:65
 #: include/classes/helpers/CServiceHelper.php:70
@@ -8299,7 +8299,7 @@ msgstr ""
 #: include/classes/helpers/CServiceHelper.php:118
 #, c-format
 msgid "If weight of child services with %1$s status or below is less than %2$s"
-msgstr ""
+msgstr "אם משקל השירותים הצאצאיים במצב %1$s ומטה הוא לפחות %2$s "
 
 #: include/func.inc.php:1516 include/func.inc.php:1536
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
@@ -8311,7 +8311,7 @@ msgstr "חריגות למידור מסגרות פנימיות (Iframes)"
 
 #: include/classes/helpers/CServiceHelper.php:149
 msgid "Ignore this service"
-msgstr ""
+msgstr "התעלמות מהשירות הזה"
 
 #: app/controllers/CControllerAuditLogList.php:222
 #: app/views/administration.image.edit.php:60
@@ -17147,7 +17147,7 @@ msgstr "שם התבנית"
 
 #: report2.php:394
 msgid "Template trigger"
-msgstr "הקפצה של תבנית"
+msgstr "הקפצה מתבנית"
 
 #: templates.php:210
 msgid "Template updated"
@@ -17304,7 +17304,7 @@ msgstr "גרסת מסד הנתונים של Zabbix אינה תואמת לדרי�
 
 #: include/classes/items/CHelpItems.php:1129
 msgid "The average time a read from the virtual disk takes, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
-msgstr ""
+msgstr "הזמן שלוקח לקרוא מהכונן הווירטואלי, <url> - כתובת שירות ה־VMware,‏ <uuid> שם מארח המכונה הווירטואלית ב־VMware,‏ <instance> - מופע התקן הכונן"
 
 #: include/classes/items/CHelpItems.php:1133
 msgid "The average time a write to the virtual disk takes, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
@@ -18851,7 +18851,7 @@ msgstr "יומן אירועים של VMware,‏ <url> - כתובת שירות VM
 
 #: include/classes/items/CHelpItems.php:949
 msgid "VMware hypervisor BIOS UUID, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "המזהה הייחודי של ה־BIOS של ה־hypervisor של VMware‏, <url> - כתובת שירות VMware,‏ <uuid> - שם המארח של ה־VMware hypervisor"
 
 #: include/classes/items/CHelpItems.php:957
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -20629,7 +20629,7 @@ msgstr "פענוח ה־JSON נכשל"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:579
 msgid "find() - Check occurrence of pattern V (which fulfill operator O) for period T (1 - match, 0 - no match)"
-msgstr ""
+msgstr "find()‎ - בדיקת מופעי התבנית V (שמקיימת את הסימן O) למשך T (1 - תואם, 0 - לא תואם)"
 
 #: app/views/popup.maintenance.period.php:124 include/graphs.inc.php:86
 #: include/maintenances.inc.php:105
@@ -20935,7 +20935,7 @@ msgstr "log10()‎ - לוגריתם עשרוני"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:697
 msgid "logeventid() - Event ID of last log entry matching regular expression V for period T (1 - match, 0 - no match)"
-msgstr ""
+msgstr "logeventid()‎ - מזהה האירוע של רשומת היומן האחרונה שתואמת לביטוי הרגולרי V למשך T (1 - תואם, 0 - לא תואם)"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:704
 msgid "logseverity() - Log severity of the last log entry for period T"
@@ -20943,7 +20943,7 @@ msgstr "logseverity()‎ - חומרת היומן של רשומת היומן הא
 
 #: app/controllers/CControllerPopupTriggerExpr.php:711
 msgid "logsource() - Log source of the last log entry matching parameter V for period T (1 - match, 0 - no match)"
-msgstr ""
+msgstr "logsource()‎ - מקור היומן של רשומת היומן האחרונה שתואמת לביטוי הרגולרי V למשך T (1 - תואם, 0 - לא תואם)"
 
 #: include/events.inc.php:65
 msgid "low-level discovery rule"
@@ -21336,7 +21336,7 @@ msgstr "דרושה גישה לקריאה-כתיבה לשירות הצאצא „%
 #: include/classes/api/services/CService.php:476
 #, c-format
 msgid "read-write access to the child service \"%1$s\" must be retained"
-msgstr ""
+msgstr "יש לשמר את הגישה לקריאה-כתיבה לשירות הצאצא „%1$s”"
 
 #: include/classes/api/services/CService.php:463
 #: include/classes/api/services/CService.php:1739
@@ -21347,7 +21347,7 @@ msgstr "דרושה גישה לקריאה-כתיבה לשירות"
 #: include/classes/api/services/CService.php:1798
 #: include/classes/api/services/CService.php:1860
 msgid "read-write access to the service must be retained"
-msgstr ""
+msgstr "יש לשמר את הגישה לקריאה-כתיבה לשירות"
 
 #: include/classes/widgets/fields/CWidgetFieldNavTree.php:110
 msgid "reference to a non-existent tree element"
