@@ -18,16 +18,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'6.0.0alpha3');
+define('ZABBIX_VERSION',		'6.0.0alpha4');
 define('ZABBIX_API_VERSION',	'6.0.0');
 define('ZABBIX_EXPORT_VERSION',	'6.0');
 
-define('ZABBIX_DB_VERSION',		5050071);
+define('ZABBIX_DB_VERSION',		5050072);
 
 define('DB_VERSION_SUPPORTED',				0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',		1);
 define('DB_VERSION_HIGHER_THAN_MAXIMUM',	2);
 define('DB_VERSION_FAILED_TO_RETRIEVE',		3);
+define('DB_VERSION_NOT_SUPPORTED_ERROR',	4);
+define('DB_VERSION_NOT_SUPPORTED_WARNING',	5);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2021');
@@ -1339,6 +1341,7 @@ define('API_NUMERIC_RANGES',		41);
 define('API_UUID',					42);
 define('API_VAULT_SECRET',			43);
 define('API_CUID',					45);
+define('API_IP_RANGES',				46);
 
 // flags
 define('API_REQUIRED',					0x0001);
@@ -1355,6 +1358,7 @@ define('API_ALLOW_EVENT_TAGS_MACRO',	0x0400);
 define('API_PRESERVE_KEYS',				0x0800);
 define('API_ALLOW_MACRO',				0x1000);
 define('API_ALLOW_GLOBAL_REGEX',		0x2000);
+define('API_ALLOW_UNEXPECTED',			0x4000);
 
 // JSON error codes.
 if (!defined('JSON_ERROR_NONE')) {

@@ -5090,7 +5090,7 @@ return [
 				'default' => '0'
 			],
 			'resourceid' => [
-				'null' => false,
+				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20
 			],
