@@ -485,6 +485,12 @@ static int	sender_threads_wait(ZBX_THREAD_HANDLE *threads, zbx_thread_args_t *th
 	{
 		int	new_status;
 
+		if (ZBX_THREAD_ERROR == threads[i])
+		{
+			threads[i] = ZBX_THREAD_HANDLE_NULL;
+			continue;
+		}
+
 		if (SUCCEED_PARTIAL == (new_status = zbx_thread_wait(threads[i])))
 				sp_count++;
 
