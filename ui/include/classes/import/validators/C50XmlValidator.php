@@ -1816,7 +1816,7 @@ class C50XmlValidator extends CXmlValidatorGeneral {
 					'password' =>				['type' => XML_STRING, 'default' => ''],
 					'content_type' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::CONTENT_TYPE_HTML, 'in' => [CXmlConstantValue::CONTENT_TYPE_TEXT => CXmlConstantName::CONTENT_TYPE_TEXT, CXmlConstantValue::CONTENT_TYPE_HTML => CXmlConstantName::CONTENT_TYPE_HTML]],
 					'script_name' =>			['type' => XML_STRING, 'default' => ''],
-					'parameters' =>				['type' => 0, 'default' => '', 'ex_validate' => [$this, 'validateMediaTypeParameters'], 'ex_rules' => [$this, 'getMediaTypeParametersExtendedRules'], 'export' => [$this, 'mediaTypeParametersExport']],
+					'parameters' =>				['type' => 0, 'ex_validate' => [$this, 'validateMediaTypeParameters'], 'ex_rules' => [$this, 'getMediaTypeParametersExtendedRules'], 'export' => [$this, 'mediaTypeParametersExport']],
 					'gsm_modem' =>				['type' => XML_STRING, 'default' => ''],
 					'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
 					'max_sessions' =>			['type' => XML_STRING, 'default' => '1'],
@@ -2243,7 +2243,9 @@ class C50XmlValidator extends CXmlValidatorGeneral {
 		switch ($data['type']) {
 			case CXmlConstantName::SCRIPT:
 			case CXmlConstantValue::MEDIA_TYPE_SCRIPT:
-				return ['type' => XML_STRING, 'default' => '', 'preprocessor' => [$this, 'scriptParameterPreprocessor'], 'export' => [$this, 'scriptParameterExport']];
+				return ['type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
+					'parameter' => ['type' => XML_STRING]
+				]];
 
 			case CXmlConstantName::WEBHOOK:
 			case CXmlConstantValue::MEDIA_TYPE_WEBHOOK:
@@ -2255,7 +2257,7 @@ class C50XmlValidator extends CXmlValidatorGeneral {
 				]];
 
 			default:
-				return ['type' => XML_STRING, 'default' => ''];
+				return ['type' => XML_ARRAY, 'rules' => []];
 		}
 	}
 
@@ -2407,23 +2409,6 @@ class C50XmlValidator extends CXmlValidatorGeneral {
 		}
 
 		return $data['filter'];
-	}
-
-	/**
-	 * Converts script parameters to a string.
-	 *
-	 * @param array|string $data  Import data.
-	 *
-	 * @throws Exception if input is invalid.
-	 *
-	 * @return string
-	 */
-	public function scriptParameterPreprocessor($data) {
-		if (is_string($data) && $data !== '') {
-			throw new Exception(_s('Invalid tag "%1$s": %2$s.', 'parameters', _('an array is expected')));
-		}
-
-		return is_array($data) ? implode("\n", $data)."\n" : '';
 	}
 
 	/**
