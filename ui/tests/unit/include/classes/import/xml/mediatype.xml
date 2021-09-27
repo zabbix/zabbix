@@ -36,7 +36,7 @@
 			<script>return true;</script>
 		</media_type>
 		<media_type>
-			<name>Webhook</name>
+			<name>Webhook with parameters</name>
 			<type>WEBHOOK</type>
 			<parameters>
 				<parameter>

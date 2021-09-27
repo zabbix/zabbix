@@ -1990,7 +1990,7 @@ class CImportDataAdapterTest extends TestCase {
 				'script' => 'return true;'
 			] + $defaults,
 			[
-				'name' => 'Webhook',
+				'name' => 'Webhook with parameters',
 				'type' => (string) CXmlConstantValue::MEDIA_TYPE_WEBHOOK,
 				'parameters' => [
 					[
