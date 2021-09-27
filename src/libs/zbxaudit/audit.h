@@ -75,12 +75,14 @@ int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_e
 void	zbx_audit_init(int audit_mode_set);
 void	zbx_audit_flush(void);
 void	zbx_audit_update_json_append_string(const zbx_uint64_t id, const char *audit_op, const char *key,
-		const char *value);
+		const char *value, const char *table, const char *field);
 void	zbx_audit_update_json_append_uint64(const zbx_uint64_t id, const char *audit_op, const char *key,
-		uint64_t value);
+		uint64_t value, const char *table, const char *field);
 void	zbx_audit_update_json_append_no_value(const zbx_uint64_t id, const char *audit_op, const char *key);
-void	zbx_audit_update_json_append_int(const zbx_uint64_t id, const char *audit_op, const char *key, int value);
-void	zbx_audit_update_json_append_double(const zbx_uint64_t id, const char *audit_op, const char *key, double value);
+void	zbx_audit_update_json_append_int(const zbx_uint64_t id, const char *audit_op, const char *key, int value,
+		const char *table, const char *field);
+void	zbx_audit_update_json_append_double(const zbx_uint64_t id, const char *audit_op, const char *key, double value,
+		const char *table, const char *field);
 void	zbx_audit_update_json_update_string(const zbx_uint64_t id, const char *key, const char *value_old,
 		const char *value_new);
 void	zbx_audit_update_json_update_uint64(const zbx_uint64_t id, const char *key, uint64_t value_old,

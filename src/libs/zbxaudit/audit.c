@@ -303,11 +303,32 @@ void	zbx_audit_flush(void)
 	zbx_audit_clean();
 }
 
+static int	audit_field_default(const char *table_name, const char *field_name, const char *value)
+{
+	int			ret = FAIL;
+	const ZBX_TABLE		*table;
+	const ZBX_FIELD		*field;
+
+	if (NULL != table_name && NULL != (table = DBget_table(table_name)) &&
+			NULL != (field = DBget_field(table, field_name)))
+	{
+		if (NULL != value && NULL != field->default_value && 0 == strcmp(value, field->default_value))
+			ret = SUCCEED;
+		else if (NULL == value && NULL == field->default_value)
+			ret = SUCCEED;
+	}
+
+	return ret;
+}
+
 void	zbx_audit_update_json_append_string(const zbx_uint64_t id, const char *audit_op, const char *key,
-		const char *value)
+		const char *value, const char *table, const char *field)
 {
 	zbx_audit_entry_t	local_audit_entry, **found_audit_entry;
 	zbx_audit_entry_t	*local_audit_entry_x = &local_audit_entry;
+
+	if (SUCCEED == audit_field_default(table, field, value))
+		return;
 
 	local_audit_entry.id = id;
 
@@ -323,10 +344,15 @@ void	zbx_audit_update_json_append_string(const zbx_uint64_t id, const char *audi
 }
 
 void	zbx_audit_update_json_append_uint64(const zbx_uint64_t id, const char *audit_op, const char *key,
-		uint64_t value)
+		uint64_t value, const char *table, const char *field)
 {
+	char			buffer[MAX_ID_LEN];
 	zbx_audit_entry_t	local_audit_entry, **found_audit_entry;
 	zbx_audit_entry_t	*local_audit_entry_x = &local_audit_entry;
+
+	zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_I64, value);
+	if (SUCCEED == audit_field_default(table, field, buffer))
+		return;
 
 	local_audit_entry.id = id;
 
@@ -361,16 +387,40 @@ void	zbx_audit_update_json_append_no_value(const zbx_uint64_t id, const char *au
 	append_json_no_value(&((*found_audit_entry)->details_json), audit_op, key);
 }
 
-void	zbx_audit_update_json_append_int(const zbx_uint64_t id, const char *audit_op, const char *key, int value)
+void	zbx_audit_update_json_append_int(const zbx_uint64_t id, const char *audit_op, const char *key, int value,
+		const char *table, const char *field)
 {
-	PREPARE_UPDATE_JSON_APPEND_OP();
-	append_int_json(&((*found_audit_entry)->details_json), audit_op, key, value);
+	char	buffer[MAX_ID_LEN];
+
+	zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_I64, value);
+
+	if (SUCCEED == audit_field_default(table, field, buffer))
+	{
+		return;
+	}
+	else
+	{
+		PREPARE_UPDATE_JSON_APPEND_OP();
+		append_int_json(&((*found_audit_entry)->details_json), audit_op, key, value);
+	}
 }
 
-void	zbx_audit_update_json_append_double(const zbx_uint64_t id, const char *audit_op, const char *key, double value)
+void	zbx_audit_update_json_append_double(const zbx_uint64_t id, const char *audit_op, const char *key, double value,
+		const char *table, const char *field)
 {
-	PREPARE_UPDATE_JSON_APPEND_OP();
-	append_double_json(&((*found_audit_entry)->details_json), audit_op, key, value);
+	char	buffer[MAX_ID_LEN];
+
+	zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_DBL, value);
+
+	if (SUCCEED == audit_field_default(table, field, buffer))
+	{
+		return;
+	}
+	else
+	{
+		PREPARE_UPDATE_JSON_APPEND_OP();
+		append_double_json(&((*found_audit_entry)->details_json), audit_op, key, value);
+	}
 }
 
 void	zbx_audit_update_json_update_string(const zbx_uint64_t id, const char *key, const char *value_old,
