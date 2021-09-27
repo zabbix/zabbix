@@ -1375,17 +1375,12 @@ int	DBcopy_template_triggers(zbx_uint64_t hostid, const zbx_vector_uint64_t *tem
 
 	if (SUCCEED == res)
 	{
-		res = DBsync_template_dependencies_for_triggers(hostid, &new_triggerids, 0);
+		res = DBsync_template_dependencies_for_triggers(hostid, &temp_host_triggerids,
+				TRIGGER_DEP_SYNC_INSERT_OP);
 	}
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "HELLO WORLD");
 
 	if (SUCCEED == res)
-	{
-		res = DBsync_template_dependencies_for_triggers(hostid, &temp_host_triggerids, 1);
-	}
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "HELLO WORLD END");
+		res = DBsync_template_dependencies_for_triggers(hostid, &new_triggerids, TRIGGER_DEP_SYNC_UPDATE_OP);
 
 	if (SUCCEED == res)
 		res = DBcopy_template_trigger_tags(&new_triggerids, &cur_triggerids);

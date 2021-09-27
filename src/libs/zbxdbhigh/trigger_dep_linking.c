@@ -191,6 +191,9 @@ static int	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const zb
 				hostid);
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.templateid", all_templ_ids.values,
 			all_templ_ids.values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.triggerid", trids->values,
+			trids->values_num);
 
 	if (NULL == (result = DBselect("%s", sql)))
 	{
@@ -217,6 +220,7 @@ static int	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const zb
 
 		ZBX_STR2UINT64(map_id.first, row[0]);
 		ZBX_DBROW2UINT64(map_id.second, row[1]);
+
 		zbx_vector_uint64_pair_append(&map_ids, map_id);
 	}
 
@@ -269,9 +273,9 @@ clean:
 	return res;
 }
 
-/* esclude trigger dependencies from the update list (links - links2) that are already present on the target host */
-/* prepare the list of the trigger dependencies that need to be deleted on the target host, since they are not    */
-/* present on the template trigger */
+/* Take a list of pending trigger dependencies (links) and exlucde entries that are already present on the target */
+/* host to generate a new list (links2). Also, prepare the list of the trigger dependencies (trigger_dep_ids_del) */
+/* that need to be deleted on the target host, since they are not present on the template trigger                 */
 static int	prepare_the_neccessary_trigger_dependencies_updates_and_deletes(const zbx_vector_uint64_t *trids,
 		zbx_vector_uint64_pair_t *links, zbx_vector_uint64_pair_t *links2,
 		zbx_vector_uint64_t *trigger_dep_ids_del)
@@ -320,26 +324,21 @@ static int	prepare_the_neccessary_trigger_dependencies_updates_and_deletes(const
 
 		temp_t.trigger_down_id = trigger_id_down;
 
+		s = (zbx_trigger_dep_vec_entry_t *)zbx_malloc(NULL, sizeof(zbx_trigger_dep_vec_entry_t));
+		s->trigger_dep_id = trigger_dep_id;
+		s->trigger_down_id = trigger_id_down;
+		s->trigger_up_id = trigger_id_up;
+		s->status = 0;
+		s->flags = flags;
+
 		if (NULL != (found = (zbx_trigger_dep_entry_t *)zbx_hashset_search(&h, &temp_t)))
 		{
-			s = (zbx_trigger_dep_vec_entry_t *)zbx_malloc(NULL, sizeof(zbx_trigger_dep_vec_entry_t));
-			s->trigger_dep_id = trigger_dep_id;
-			s->trigger_down_id = trigger_id_down;
-			s->trigger_up_id = trigger_id_up;
-			s->status = 0;
-			s->flags = flags;
 			zbx_vector_trigger_up_entries_append(&(found->v), s);
 		}
 		else
 		{
 			zbx_trigger_dep_entry_t local_temp_t;
 
-			s = (zbx_trigger_dep_vec_entry_t *)zbx_malloc(NULL, sizeof(zbx_trigger_dep_vec_entry_t));
-			s->trigger_dep_id = trigger_dep_id;
-			s->trigger_down_id = trigger_id_down;
-			s->trigger_up_id = trigger_id_up;
-			s->status = 0;
-			s->flags = flags;
 			zbx_vector_trigger_up_entries_create(&(local_temp_t.v));
 			zbx_vector_trigger_up_entries_append(&(local_temp_t.v), s);
 			local_temp_t.trigger_down_id = trigger_id_down;
@@ -467,7 +466,8 @@ out:
 	return res;
 }
 
-static int	DBadd_and_remove_trigger_dependencies(zbx_vector_uint64_pair_t	*links, const zbx_vector_uint64_t *trids, zbx_hashset_t *triggers_flags)
+static int	DBadd_and_remove_trigger_dependencies(zbx_vector_uint64_pair_t	*links,
+		const zbx_vector_uint64_t *trids, zbx_hashset_t *triggers_flags)
 {
 	int				res = SUCCEED;
 	char				*sql = NULL;
@@ -519,14 +519,15 @@ clean:
  * Parameters: hostid    - [IN] host identifier from database                   *
  *             trids     - [IN] array of trigger identifiers from database      *
  *             trids_num - [IN] trigger count in trids array                    *
+ *             is_update - [IN] hint flag is trids list are new triggers        *
+ *                              or already present ones that need to be updated *
  *                                                                              *
  * Return value: upon successful completion return SUCCEED, or FAIL on DB error *
  *                                                                              *
  * Comments: !!! Don't forget to sync the code with PHP !!!                     *
  *                                                                              *
  ********************************************************************************/
-int	DBsync_template_dependencies_for_triggers(zbx_uint64_t hostid, const zbx_vector_uint64_t *trids,
-		int is_update)
+int	DBsync_template_dependencies_for_triggers(zbx_uint64_t hostid, const zbx_vector_uint64_t *trids, int is_update)
 {
 	int				res = SUCCEED;
 	zbx_vector_uint64_pair_t	links;
@@ -545,12 +546,12 @@ int	DBsync_template_dependencies_for_triggers(zbx_uint64_t hostid, const zbx_vec
 	if (FAIL == (res = DBresolve_template_trigger_dependencies(hostid, trids, &links, &triggers_flags)))
 		goto clean;
 
-	if (0 == is_update)
+	if (TRIGGER_DEP_SYNC_INSERT_OP == is_update)
 	{
 		if (FAIL == (res = DBadd_trigger_dependencies(&links, &triggers_flags)))
 			goto clean;
 	}
-	else if (1 == is_update)
+	else if (TRIGGER_DEP_SYNC_UPDATE_OP == is_update)
 	{
 		res = DBadd_and_remove_trigger_dependencies(&links, trids, &triggers_flags);
 	}
