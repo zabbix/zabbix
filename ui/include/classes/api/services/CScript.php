@@ -365,7 +365,7 @@ class CScript extends CApiService {
 
 		self::checkDuplicates($scripts, $db_scripts);
 
-		$this->addAffectedObjects($scripts, $db_scripts);
+		self::addAffectedObjects($scripts, $db_scripts);
 
 		// Validate if scripts belong to actions and scope can be changed.
 		$action_scriptids = [];
@@ -808,7 +808,7 @@ class CScript extends CApiService {
 	 * @return array
 	 */
 	public function delete(array $scriptids) {
-		$this->validateDelete($scriptids, $db_scripts);
+		self::validateDelete($scriptids, $db_scripts);
 
 		DB::delete('scripts', ['scriptid' => $scriptids]);
 
@@ -818,12 +818,12 @@ class CScript extends CApiService {
 	}
 
 	/**
-	 * @param array $scriptids
-	 * @param array $db_scripts
+	 * @param array      $scriptids
+	 * @param array|null $db_scripts
 	 *
 	 * @throws APIException if the input is invalid
 	 */
-	protected function validateDelete(array &$scriptids, array &$db_scripts = null) {
+	private static function validateDelete(array &$scriptids, array &$db_scripts = null) {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $scriptids, '/', $error)) {
@@ -872,6 +872,7 @@ class CScript extends CApiService {
 			'hostid' =>		['type' => API_ID],
 			'eventid' =>	['type' => API_ID]
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $data, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
@@ -923,6 +924,7 @@ class CScript extends CApiService {
 			'hostids' => $hostids,
 			'scriptids' => $data['scriptid']
 		]);
+
 		if (!$db_scripts) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
@@ -1406,7 +1408,7 @@ class CScript extends CApiService {
 	 * @param array $scripts
 	 * @param array $db_scripts
 	 */
-	private function addAffectedObjects(array $scripts, array &$db_scripts): void {
+	private static function addAffectedObjects(array $scripts, array &$db_scripts): void {
 		$scriptids = [];
 
 		foreach ($scripts as $script) {
