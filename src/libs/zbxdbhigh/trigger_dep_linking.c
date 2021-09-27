@@ -128,13 +128,13 @@ static void	zbx_triggers_dep_entries_clean(zbx_hashset_t *h)
 static int	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const zbx_vector_uint64_t *trids,
 		zbx_vector_uint64_pair_t *links, zbx_hashset_t *triggers_flags)
 {
+	char				*sql = NULL;
+	int				i, res = SUCCEED;
+	size_t				sql_alloc = 512, sql_offset;
 	DB_RESULT			result;
 	DB_ROW				row;
-	char				*sql = NULL;
-	size_t				sql_alloc = 512, sql_offset;
 	zbx_vector_uint64_pair_t	dep_list_ids, map_ids;
 	zbx_vector_uint64_t		all_templ_ids;
-	int				i, res = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -179,8 +179,8 @@ static int	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const zb
 
 	sql_offset = 0;
 
-	/* find triggers which have a parent template trigger that we have dependency on */
-	/* those are the dependency triggers that we are interested on our host */
+	/* find triggers which have a parent template trigger that we have dependency on, */
+	/* those are the dependency triggers of interest on our host */
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select t.triggerid,t.templateid,t.flags"
 			" from triggers t,functions f,items i"
@@ -278,7 +278,7 @@ clean:
  *                                                                                                        *
  * Function: prepare_the_neccessary_trigger_dependencies_updates_and_deletes                              *
  *                                                                                                        *
- * Purpose: takes a list of pending trigger dependencies (links) and excludes  entries that are           *
+ * Purpose: takes a list of pending trigger dependencies (links) and excludes entries that are            *
  *          already present on the target host to generate a new list (links2). Also, prepare the list    *
  *          of the trigger dependencies (trigger_dep_ids_del) that need to be deleted on the target       *
  *          host, since they are not present on the template trigger.                                     *
@@ -288,7 +288,7 @@ clean:
  *             links               - [OUT] pairs of trigger dependencies, list of links_up and links_down *
  *                                         links that we want to be present on the target host            *
  *             links2              - [OUT] processed links with entries that are already present excluded *
- *             trigger_dep_ids_del - [OUT] - list of triggers dependencies that need to be deleted        *
+ *             trigger_dep_ids_del - [OUT] list of triggers dependencies that need to be deleted          *
  *                                                                                                        *
  * Return value: upon successful completion return SUCCEED, or FAIL on DB error                           *
  *                                                                                                        *
@@ -298,11 +298,11 @@ static int	prepare_the_neccessary_trigger_dependencies_updates_and_deletes(const
 		zbx_vector_uint64_t *trigger_dep_ids_del)
 {
 	char			*sql = NULL;
+	int			i, res = SUCCEED;
 	size_t			sql_alloc = 256, sql_offset = 0;
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_hashset_t		h;
-	int			i, res = SUCCEED;
 	zbx_hashset_iter_t	iter1;
 	zbx_trigger_dep_entry_t	*found;
 
@@ -370,17 +370,17 @@ static int	prepare_the_neccessary_trigger_dependencies_updates_and_deletes(const
 
 		if (NULL != (found = (zbx_trigger_dep_entry_t *) zbx_hashset_search(&h, &temp_t)))
 		{
-			int	ii;
+			int	j;
 			int	found_trigger_up = 0;
 
-			for (ii = 0; ii < found->v.values_num; ii++)
+			for (j = 0; j < found->v.values_num; j++)
 			{
 				/* trigger_up are equal */
-				if (links->values[i].second == found->v.values[ii]->trigger_up_id)
+				if (links->values[i].second == found->v.values[j]->trigger_up_id)
 				{
 					found_trigger_up = 1;
-					/* mark it as preserve */
-					found->v.values[ii]->status = 1;
+					/* mark it as 'need to preserve' */
+					found->v.values[j]->status = 1;
 					break;
 				}
 			}
