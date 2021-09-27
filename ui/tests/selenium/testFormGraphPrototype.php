@@ -313,14 +313,16 @@ class testFormGraphPrototype extends CLegacyWebTest {
 		if (isset($data['template'])) {
 			$this->zbxTestLogin('templates.php');
 			$this->query('button:Reset')->one()->click();
-			$this->filterEntriesAndOpenDiscovery($data['template']);
+			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+			$this->filterEntriesAndOpenDiscovery($form, $data['template']);
 			$discoveryRule = $this->discoveryRuleTemplate;
 			$hostid = 30000;
 		}
 
 		if (isset($data['host'])) {
 			$this->zbxTestLogin(self::HOST_LIST_PAGE);
-			$this->filterEntriesAndOpenDiscovery($data['host']);
+			$form = $this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one();
+			$this->filterEntriesAndOpenDiscovery($form, $data['host']);
 			if (!isset($data['templatedHost'])) {
 				$discoveryRule = $this->discoveryRule;
 				$hostid = 40001;
@@ -1190,7 +1192,8 @@ class testFormGraphPrototype extends CLegacyWebTest {
 
 		if (isset($data['formCheck'])) {
 			$this->zbxTestOpen(self::HOST_LIST_PAGE);
-			$this->filterEntriesAndOpenDiscovery($this->host);
+			$form = $this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one();
+			$this->filterEntriesAndOpenDiscovery($form, $this->host);
 			$this->zbxTestClickLinkTextWait($this->discoveryRule);
 			$this->zbxTestClickLinkTextWait('Graph prototypes');
 
@@ -1215,7 +1218,8 @@ class testFormGraphPrototype extends CLegacyWebTest {
 			}
 
 			$this->zbxTestOpen(self::HOST_LIST_PAGE);
-			$this->filterEntriesAndOpenDiscovery($this->host);
+			$form = $this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one();
+			$this->filterEntriesAndOpenDiscovery($form, $this->host);
 			$this->zbxTestClickLinkTextWait($this->discoveryRule);
 			$this->zbxTestClickLinkTextWait('Graph prototypes');
 
@@ -1233,8 +1237,7 @@ class testFormGraphPrototype extends CLegacyWebTest {
 	 *
 	 * @param string    name of a host or template
 	 */
-	private function filterEntriesAndOpenDiscovery($name) {
-		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+	private function filterEntriesAndOpenDiscovery($form, $name) {
 		$form->fill(['Name' => $name]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
