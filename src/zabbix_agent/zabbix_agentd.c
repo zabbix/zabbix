@@ -1242,7 +1242,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		THIS_SHOULD_NEVER_HAPPEN;
 	}
 #else
-	while (-1 == wait(&i))	/* wait for any child to exit */
+	while (ZBX_IS_RUNNING() && -1 == wait(&i))	/* wait for any child to exit */
 	{
 		if (EINTR != errno)
 		{
@@ -1251,10 +1251,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		}
 	}
 
-	/* all exiting child processes should be caught by signal handlers */
-	THIS_SHOULD_NEVER_HAPPEN;
 #endif
-	zbx_on_exit(SUCCEED);
+	zbx_on_exit(ZBX_EXIT_STATUS());
 
 	return SUCCEED;
 }
@@ -1296,7 +1294,7 @@ void	zbx_free_service_resources(int ret)
 
 void	zbx_on_exit(int ret)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called");
+	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
 
 	zbx_free_service_resources(ret);
 

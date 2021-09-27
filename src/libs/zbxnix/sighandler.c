@@ -24,6 +24,7 @@
 #include "fatal.h"
 #include "sigcommon.h"
 #include "zbxcrypto.h"
+#include "daemon.h"
 
 int			sig_parent_pid = -1;
 volatile sig_atomic_t	sig_exiting;
@@ -116,9 +117,9 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 	{
 		SIG_CHECK_PARAMS(sig, siginfo, context);
 
-		if (0 == sig_exiting)
+		if (ZBX_EXIT_NONE == sig_exiting)
 		{
-			sig_exiting = 1;
+			sig_exiting = ZBX_EXIT_SUCCESS;
 
 			/* temporary variable is used to avoid compiler warning */
 			zbx_log_level_temp = sig_parent_pid == SIG_CHECKED_FIELD(siginfo, si_pid) ?
@@ -134,7 +135,6 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 			zbx_tls_free_on_signal();
 #endif
-			zbx_on_exit(SUCCEED);
 		}
 	}
 }
@@ -153,16 +153,15 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 	if (!SIG_PARENT_PROCESS)
 		exit_with_failure();
 
-	if (0 == sig_exiting)
+	if (ZBX_EXIT_NONE == sig_exiting)
 	{
-		sig_exiting = 1;
+		sig_exiting = ZBX_EXIT_FAILURE;
 		zabbix_log(LOG_LEVEL_CRIT, "One child process died (PID:%d,exitcode/signal:%d). Exiting ...",
 				SIG_CHECKED_FIELD(siginfo, si_pid), SIG_CHECKED_FIELD(siginfo, si_status));
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		zbx_tls_free_on_signal();
 #endif
-		zbx_on_exit(FAIL);
 	}
 }
 

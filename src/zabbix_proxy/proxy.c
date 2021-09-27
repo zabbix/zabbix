@@ -1396,7 +1396,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zbx_set_sigusr_handler(zbx_main_sigusr_handler);
 
-	while (-1 == wait(&i))	/* wait for any child to exit */
+	while (ZBX_IS_RUNNING() && -1 == wait(&i))	/* wait for any child to exit */
 	{
 		if (EINTR != errno)
 		{
@@ -1412,17 +1412,14 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		}
 	}
 
-	/* all exiting child processes should be caught by signal handlers */
-	THIS_SHOULD_NEVER_HAPPEN;
-
-	zbx_on_exit(FAIL);
+	zbx_on_exit(ZBX_EXIT_STATUS());
 
 	return SUCCEED;
 }
 
 void	zbx_on_exit(int ret)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called");
+	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
 
 	if (NULL != threads)
 	{
