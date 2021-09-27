@@ -96,7 +96,7 @@ void	zbx_audit_item_update_json_add_data(zbx_uint64_t itemid, const zbx_template
 	zbx_audit_update_json_append_uint64(itemid, AUDIT_DETAILS_ACTION_ADD, IT_OR_ITP_OR_DR(hostid), hostid,
 			AUDIT_TABLE_NAME, "hostid");
 	ADD_JSON_UI(interfaceid, AUDIT_TABLE_NAME, "interfaceid");
-	ADD_JSON_S(key, AUDIT_TABLE_NAME, "key_"); // API HAS 'key_' , but SQL 'key'
+	ADD_JSON_S(key, AUDIT_TABLE_NAME, "key_");
 	ADD_JSON_S(name, AUDIT_TABLE_NAME, "name");
 	ADD_JSON_UI(type, AUDIT_TABLE_NAME, "type");
 	ADD_JSON_S(url, AUDIT_TABLE_NAME, "url");
