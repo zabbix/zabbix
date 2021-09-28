@@ -42,7 +42,6 @@ DIST_SUBDIRS = \
 
 if SERVER
 SERVER_SUBDIRS = \
-	zbxcommshigh \
 	zbxdb \
 	zbxdbupgrade \
 	zbxdbcache \
@@ -69,7 +68,6 @@ SERVER_SUBDIRS = \
 else
 if PROXY
 PROXY_SUBDIRS = \
-	zbxcommshigh \
 	zbxdb \
 	zbxdbupgrade \
 	zbxdbcache \
@@ -104,6 +102,7 @@ SUBDIRS = \
 	zbxhttp \
 	zbxsysinfo \
 	zbxsys \
+	zbxcommshigh \
 	zbxcomms \
 	zbxjson \
 	zbxexec \
