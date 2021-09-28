@@ -185,35 +185,28 @@ class testFormMonitoringServices extends CWebTest {
 
 		// Check tabs available in the form
 		$tabs = ['Service', 'SLA', 'Tags', 'Child services'];
-		$this->assertEquals(count($tabs), $form->query('xpath:./' . '/li[@role="tab"]')->all()->count());
+		$this->assertEquals(count($tabs), $form->query('xpath:./'.'/li[@role="tab"]')->all()->count());
 
 		foreach ($tabs as $tab) {
-			$this->assertTrue($form->query('xpath:./' . '/li[@role="tab"]/' . '/a[text()='.CXPathHelper::escapeQuotes($tab).
+			$this->assertTrue($form->query('xpath:./'.'/li[@role="tab"]/'.'/a[text()='.CXPathHelper::escapeQuotes($tab).
 					']')->one()->isValid());
 		}
 
 		// Check layout at Service tab
 		$service_tab = $form->query('id:service-tab')->one();
 		foreach ($service_tabs_labels as $label) {
-			$this->assertTrue($service_tab->query('xpath:./' . '/label[text()='.CXPathHelper::escapeQuotes($label).']')->one(false)->isValid());
+			$this->assertTrue($service_tab->query('xpath:./'.'/label[text()='.CXPathHelper::escapeQuotes($label).']')
+					->one(false)->isValid());
 		}
 
 		// Check Problem tags table data
 		// Checks Problem tags table headers
-		$problem_tags = ['Name', 'Operation', 'Value', 'Action'];
-		$problem_tags_headers = $form->query('id:problem_tags')->asTable()->one()->getHeadersText();
-
-		foreach($problem_tags as $key => $header) {
-			$this->assertEquals($header, $problem_tags_headers[$key]);
-		}
+		$this->assertSame(['Name', 'Operation', 'Value', 'Action'],
+				$form->query('id:problem_tags')->asTable()->one()->getHeadersText());
 
 		// Check Problem tags table fields
-		$problem_tags_values = ['tag' => '', 'operator' => 'Equals', 'value' => ''];
-		$problem_tags_table = $form->query('id:problem_tags')->asMultifieldTable()->one()->getRowValue(0);
-
-		foreach($problem_tags_values as $key => $value) {
-			$this->assertEquals($value, $problem_tags_table[$key]);
-		}
+		$form->query('id:problem_tags')->asMultifieldTable()->one()
+				->checkValue([['tag' => '', 'operator' => 'Equals', 'value' => '']]);
 
 		$service_tab_limits = [
 			'Name' => 128,
@@ -252,41 +245,118 @@ class testFormMonitoringServices extends CWebTest {
 		$this->assertEquals(99.9 ,$sla_input_field->asElement()->getValue());
 
 		// Check Service times table labels
-		$service_times_lables= ['Type', 'Interval', 'Note', 'Action'];
-		$service_times_data = $sla_tab->query('id:times')->asTable()->one()->getHeadersText();
-		foreach($service_times_lables as $key => $value) {
-			$this->assertEquals($value, $service_times_data[$key]);
-		}
+		$this->assertSame(['Type', 'Interval', 'Note', 'Action'],
+				$form->query('id:sla-tab')->one()->query('id:times')->asTable()->one()->getHeadersText());
 
 		// Check layout at Tags tab
 		$form->selectTab('Tags');
-		$tags_tab = $form->query('id:tags-tab')->one();
 
 		// Check Tags tab lables
-		$this->assertTrue($tags_tab->query('xpath:.//label[text()="Tags"]')->one(false)->isValid());
+		$this->assertTrue($form->query('id:tags-tab')->one()
+				->query('xpath:.//label[text()="Tags"]')->one(false)->isValid());
 
 		// Check Tags tab Tags table header labels
-		$tags_tab_headers = ['Name', 'Value', 'Action'];
-		$tags_tab_labels = $tags_tab->query('id:tags-table')->asTable()->one()->getHeadersText();
 
-		foreach($tags_tab_headers as $key => $label) {
-			$this->assertEquals($label, $tags_tab_labels[$key]);
-		}
+		$this->assertSame(['Name', 'Value', 'Action'],
+				$form->query('id:tags-tab')->one()->query('id:tags-table')->asTable()->one()->getHeadersText());
 
 		// Check layout at Child services tab
 		$form->selectTab('Child services');
-		$child_services_tab = $form->query('id:child-services-tab')->one();
 
 		// Check Tags tab lables
-		$this->assertTrue($child_services_tab->query('xpath:.//label[text()="Child services"]')->one(false)->isValid());
+		$this->assertTrue($form->query('id:child-services-tab')->one()
+				->query('xpath:.//label[text()="Child services"]')->one(false)->isValid());
 
 		// Check Tags tab Tags table header labels
-		$child_services = ['Service', 'Status calculation rule', 'Problem tags', 'Action'];
-		$child_services_labels = $child_services_tab->query('id:children')->asTable()->one()->getHeadersText();
+		$this->assertSame(
+			['Service', 'Status calculation rule', 'Problem tags', 'Action'],
+		$form->query('id:child-services-tab')->one()->query('id:children')->asTable()->one()->getHeadersText());
 
-		foreach($child_services as $key => $label) {
-			$this->assertEquals($label, $child_services_labels[$key]);
-		}
+		$service = $form->getFieldContainer('Child services');
+		$service->query('button:Add')->waitUntilClickable()->one()->click();
+		$childs_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+
+		// Check popup title
+		$this->assertEquals('Add child services', $childs_dialog->query('id:dashboard-widget-head-title-services')->one()->getText());
+
+		// Check input fields maxlength
+		$this->assertEquals(255, $childs_dialog->query('id:services-filter-name')->one()->getAttribute('maxlength'));
+
+		// Check "select all" checkbox deffult value
+		$this->assertFalse($childs_dialog->query('id:serviceid_all')->asCheckbox()->one()->isChecked());
+
+		$child_services_data = [
+			[
+				'Name' => 'Update service',
+				'Status calculation rule' => 'Most critical if all children have problems',
+				'Problem tags' => ''
+			],
+			[
+				'Name' => 'Parent1',
+				'Status calculation rule' => 'Most critical if all children have problems',
+				'Problem tags' => ''
+			],
+			[
+				'Name' => 'Parent2',
+				'Status calculation rule' => 'Most critical if all children have problems',
+				'Problem tags' => ''
+			],
+			[
+				'Name' => 'Parent3 with problem tags',
+				'Status calculation rule' => 'Most critical if all children have problems',
+				'Problem tags' => 'test: test789test123: test456'
+			],
+			[
+				'Name' => 'Parent4',
+				'Status calculation rule' => 'Most critical if all children have problems',
+				'Problem tags' => ''
+			],
+			[
+				'Name' => 'Child1',
+				'Status calculation rule' => 'Most critical if all children have problems',
+				'Problem tags' => ''
+			],
+			[
+				'Name' => 'Child2 with tags',
+				'Status calculation rule' => 'Most critical if all children have problems',
+				'Problem tags' => 'test1: value1test2: value2'
+			],
+			[
+				'Name' => 'Child3',
+				'Status calculation rule' => 'Most critical if all children have problems',
+				'Problem tags' => ''
+			],
+			[
+				'Name' => 'Child4',
+				'Status calculation rule' => 'Most critical if all children have problems',
+				'Problem tags' => ''
+			],
+		];
+
+		$this->assertTableData($child_services_data, 'css:div.overlay-dialogue-body table.list-table'
+	);
+
+		// Enter and submit filtering data
+		$childs_dialog->query('id:services-filter-name')->one()->fill('Parent1');
+		$childs_dialog->query('button:Apply')->one()->waitUntilClickable()->click();
+
+		$childs_dialog->invalidate();
+		$childs_dialog->waitUntilReady();
+
+		// Check filtering result
+		$this->assertTableData([$child_services_data[1]], 'css:div[data-dialogueid="services"] table.list-table');
+
+		$childs_dialog->invalidate();
+
+		// Check filtering reset
+		$childs_dialog->query('button:Reset')->one()->waitUntilClickable()->click();
+
+		$childs_dialog->waitUntilReady();
+		$childs_dialog->invalidate();
+
+		$this->assertTableData($child_services_data, 'css:div.overlay-dialogue-body table.list-table');
+
+		$childs_dialog->invalidate();
 	}
 
 	public function getServicesData() {
@@ -620,6 +690,29 @@ class testFormMonitoringServices extends CWebTest {
 				// Find second dialog and work with it, because now there is multi-layer dialogs.
 				$service_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 				$service_form = $service_dialog->query('id:service-time-form')->waitUntilReady()->one()->asFluidForm();
+
+				// Check default values in popup
+				$this->assertEquals('Uptime', $service_form->query('id:service-time-type-focusable')->one()->getText());
+				$this->assertEquals('Sunday', $service_form->query('id:service-time-from-week-focusable')->one()->getText());
+				$this->assertEquals('Sunday', $service_form->query('id:service-time-till-week-focusable')->one()->getText());
+
+				$service_form_defaults = [
+						'id:service-time-from-hour' => [255, 'hh'],
+						'id:service-time-from-minute' => [255, 'mm'],
+						'id:service-time-till-hour' => [255, 'hh'],
+						'id:service-time-till-minute' => [255, 'mm']
+				];
+
+				// Check input fields maxlength
+				foreach ($service_form_defaults as $field => $max_length) {
+					$this->assertEquals($max_length[0], $service_form->query($field)->one()->getAttribute('maxlength'));
+				}
+
+				// Check input fields placeholders
+				foreach ($service_form_defaults as $field => $placeholder) {
+					$this->assertEquals($placeholder[1], $service_form->query($field)->one()->getAttribute('placeholder'));
+				}
+
 				$service_form->fill($data['sla']['Service times']);
 				$service_form->submit();
 
@@ -644,19 +737,19 @@ class testFormMonitoringServices extends CWebTest {
 			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 			// Check that Service with given name was not saved in DB.
 			$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services WHERE name='.
-					zbx_dbstr($data['fields']['Name'])));
+					CXPathHelper::escapeQuotes($data['fields']['Name'])));
 		}
 		else {
 			// Here Message text depends on Create or Update scenario.
 			$this->assertMessage(TEST_GOOD, ($update ? 'Service updated' : 'Service created'));
 			// Check that Service was actually created or updated in DB.
 			$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.
-					zbx_dbstr($data['fields']['Name'])));
+			CXPathHelper::escapeQuotes($data['fields']['Name'])));
 
 			if ($update) {
 				// In update scenario check that old name actually changed.
 				$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services WHERE name='.
-						zbx_dbstr(self::$update_service)));
+				CXPathHelper::escapeQuotes(self::$update_service)));
 				// In update scenario we need to rewrite name for updating service in order to update the same service in next case.
 				// This also could be done using service id, it's up to you, but my variant seems to be easier.
 				self::$update_service = $data['fields']['Name'];
@@ -789,14 +882,14 @@ class testFormMonitoringServices extends CWebTest {
 			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 			// Check that faulty service was not created in DB.
 			$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services WHERE name='.
-					zbx_dbstr($data['fields']['Name'])));
+					CXPathHelper::escapeQuotes($data['fields']['Name'])));
 		}
 		else {
 			// Check success message after service creation. I added message behavior in 22 and 45 lines.
 			$this->assertMessage(TEST_GOOD, 'Service created');
 			// Check that child was actually created in DB.
 			$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.
-					zbx_dbstr($data['fields']['Name'])));
+					CXPathHelper::escapeQuotes($data['fields']['Name'])));
 			// Check that child is present in frontend.
 			$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
 			// Firstly click on parent.
@@ -848,9 +941,9 @@ class testFormMonitoringServices extends CWebTest {
 		$this->assertTableData([]);
 		// Check that both parent and child remained in DB.
 		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.
-				zbx_dbstr($parent)));
+				CXPathHelper::escapeQuotes($parent)));
 		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.
-				zbx_dbstr($child)));
+				CXPathHelper::escapeQuotes($child)));
 		// Check that service linking is disappeared from DB.
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services_links WHERE serviceupid='.
 				self::$parentid.'AND servicedownid ='.self::$childid));
