@@ -507,6 +507,8 @@ class CService extends CApiService {
 	}
 
 	/**
+	 * @static
+	 *
 	 * @param array $parentids
 	 *
 	 * @return array|null
@@ -1024,6 +1026,8 @@ class CService extends CApiService {
 	}
 
 	/**
+	 * @static
+	 *
 	 * @param string   $parent_serviceid
 	 * @param array    $services
 	 * @param array    $relations
@@ -2053,6 +2057,8 @@ class CService extends CApiService {
 	}
 
 	/**
+	 * @static
+	 *
 	 * @return array
 	 *
 	 * @throws APIException
