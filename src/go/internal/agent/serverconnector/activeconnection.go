@@ -35,10 +35,11 @@ type activeConnection struct {
 	hostname  string
 	localAddr net.Addr
 	tlsConfig *tls.Config
+	timeout   int
 }
 
 func (c *activeConnection) Write(data []byte, timeout time.Duration) (err error) {
-	b, err := zbxcomms.Exchange(&c.addresses, &c.localAddr, timeout, data, c.tlsConfig)
+	b, err := zbxcomms.Exchange(&c.addresses, &c.localAddr, timeout, time.Second*time.Duration(c.timeout), data, c.tlsConfig)
 	if err != nil {
 		return err
 	}

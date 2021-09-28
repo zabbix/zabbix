@@ -62,9 +62,9 @@ type Listener struct {
 	tlsconfig *tls.Config
 }
 
-func Open(address string, localAddr *net.Addr, timeout time.Duration, timeoutMode int, args ...interface{}) (c *Connection, err error) {
+func open(address string, localAddr *net.Addr, timeout time.Duration, connect_timeout time.Duration, timeoutMode int, args ...interface{}) (c *Connection, err error) {
 	c = &Connection{state: connStateConnect, compress: true, timeout: timeout, timeoutMode: timeoutMode}
-	d := net.Dialer{Timeout: timeout, LocalAddr: *localAddr}
+	d := net.Dialer{Timeout: connect_timeout, LocalAddr: *localAddr}
 	c.conn, err = d.Dial("tcp", address)
 
 	if nil != err {
@@ -328,7 +328,7 @@ func (c *Listener) Close() (err error) {
 	return c.listener.Close()
 }
 
-func Exchange(addresses *[]string, localAddr *net.Addr, timeout time.Duration, data []byte, args ...interface{}) ([]byte, error) {
+func Exchange(addresses *[]string, localAddr *net.Addr, timeout time.Duration, connect_timeout time.Duration, data []byte, args ...interface{}) ([]byte, error) {
 	log.Tracef("connecting to [%s]", (*addresses)[0])
 
 	var tlsconfig *tls.Config
@@ -343,7 +343,7 @@ func Exchange(addresses *[]string, localAddr *net.Addr, timeout time.Duration, d
 	}
 
 	for i := 0; i < len(*addresses); i++ {
-		c, err = Open((*addresses)[0], localAddr, timeout, TimeoutModeFixed, tlsconfig)
+		c, err = open((*addresses)[0], localAddr, timeout, connect_timeout, TimeoutModeFixed, tlsconfig)
 		if err == nil {
 			break
 		}

@@ -173,7 +173,7 @@ func (c *Connector) refreshActiveChecks() {
 		return
 	}
 
-	data, err := zbxcomms.Exchange(&c.addresses, &c.localAddr, time.Second*time.Duration(c.options.Timeout), request, c.tlsConfig)
+	data, err := zbxcomms.Exchange(&c.addresses, &c.localAddr, time.Second*time.Duration(c.options.Timeout), time.Second*time.Duration(c.options.Timeout), request, c.tlsConfig)
 
 	if err != nil {
 		if c.lastError == nil || err.Error() != c.lastError.Error() {
@@ -353,6 +353,7 @@ func New(taskManager scheduler.Scheduler, addresses []string, hostname string, o
 		hostname:  hostname,
 		localAddr: c.localAddr,
 		tlsConfig: c.tlsConfig,
+		timeout:   options.Timeout,
 	}
 	c.resultCache = resultcache.New(&agent.Options, c.clientID, ac)
 
