@@ -185,29 +185,27 @@ Overlay.prototype.containFocus = function() {
 };
 
 /**
- * Sets dialogue in loading sate.
+ * Sets dialogue in loading state.
  */
 Overlay.prototype.setLoading = function() {
-	this.buttons_disabled_for_loading = [];
-	this.$dialogue.$body.addClass('is-loading');
+	this.$dialogue.$body.addClass('is-loading is-loading-fadein');
 	this.$dialogue.$controls.find('z-select, button').prop('disabled', true);
-	this.action_buttons.forEach(($button) => {
-		if ($button.prop('disabled') !== true) {
-			this.buttons_disabled_for_loading.push($button);
-			$button.prop('disabled', true);
-		}
+
+	this.$dialogue.$footer.find('button:not(.js-cancel)').each(function() {
+		$(this).prop('disabled', true);
 	});
 };
 
 /**
- * Sets dialogue in idle sate.
+ * Sets dialogue in idle state.
  */
 Overlay.prototype.unsetLoading = function() {
-	this.$dialogue.$body.removeClass('is-loading');
-	this.buttons_disabled_for_loading.forEach(($button) => {
-		$button.removeClass('is-loading').prop('disabled', false);
+	this.$dialogue.$body.removeClass('is-loading is-loading-fadein');
+	this.$dialogue.$footer.find('button:not(.js-cancel)').each(function() {
+		if ($(this).data('disabled') !== true) {
+			$(this).removeClass('is-loading').prop('disabled', false);
+		}
 	});
-	this.buttons_disabled_for_loading = [];
 };
 
 /**
@@ -309,7 +307,12 @@ Overlay.prototype.makeButton = function(obj) {
 		}
 
 		if (!('cancel' in obj) || !obj.cancel) {
-			$(e.target).blur().addClass('is-loading');
+			$(e.target)
+				.blur()
+				.addClass('is-loading')
+				.prop('disabled', true)
+				.siblings(':not(.js-cancel)')
+					.prop('disabled', true);
 		}
 
 		if (obj.action && obj.action(this) !== false) {
@@ -328,7 +331,9 @@ Overlay.prototype.makeButton = function(obj) {
 	}
 
 	if (obj.enabled === false) {
-		$button.prop('disabled', true);
+		$button
+			.prop('disabled', true)
+			.data('disabled', true);
 	}
 
 	return $button;
@@ -344,8 +349,6 @@ Overlay.prototype.makeButtons = function(arr) {
 
 	this.$btn_submit = null;
 	this.$btn_focus = null;
-	this.action_buttons = [];
-	this.buttons_disabled_for_loading = [];
 
 	arr.forEach(function(obj) {
 		if (typeof obj.action === 'string') {
@@ -356,10 +359,6 @@ Overlay.prototype.makeButtons = function(arr) {
 
 		if (obj.cancel) {
 			this.cancel_action = obj.action;
-		}
-
-		if (!obj.cancel) {
-			this.action_buttons.push($button);
 		}
 
 		if (obj.isSubmit) {

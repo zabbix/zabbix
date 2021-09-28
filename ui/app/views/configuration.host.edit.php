@@ -26,7 +26,8 @@
 
 $this->includeJsFile('configuration.host.edit.js.php');
 
-$cancel_button = new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))->setArgument('action', 'host.list'));
+$cancel_button = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))->setArgument('action', 'host.list')))
+	->addClass('js-cancel');
 
 $data += [
 	'form_name' => 'host-form',

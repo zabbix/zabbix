@@ -400,7 +400,7 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 					default:
 						buttons.push({
 							'title': t('Cancel'),
-							'class': 'btn-alt',
+							'class': 'btn-alt js-cancel',
 							'cancel': true,
 							'action': (typeof resp.cancel_action !== 'undefined') ? resp.cancel_action : function() {}
 						});

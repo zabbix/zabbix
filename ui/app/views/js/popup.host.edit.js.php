@@ -53,7 +53,6 @@ window.host_edit_popup = {
 
 	submit() {
 		this.removePopupMessages();
-		this.overlay.setLoading();
 
 		const fields = host_edit.preprocessFormFields(getFormFields(this.form));
 		const curl = new Curl(this.form.getAttribute('action'));
@@ -93,6 +92,7 @@ window.host_edit_popup = {
 	},
 
 	clone() {
+		this.overlay.setLoading();
 		const options = host_edit.preprocessFormFields(getFormFields(this.form));
 		delete options.sid;
 		options.clone = 1;
@@ -102,6 +102,7 @@ window.host_edit_popup = {
 	},
 
 	fullClone() {
+		this.overlay.setLoading();
 		const options = host_edit.preprocessFormFields(getFormFields(this.form));
 		delete options.sid;
 		options.full_clone = 1;
@@ -112,7 +113,6 @@ window.host_edit_popup = {
 
 	delete(hostid) {
 		this.removePopupMessages();
-		this.overlay.setLoading();
 
 		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', 'host.massdelete');

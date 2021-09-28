@@ -129,21 +129,19 @@
 		},
 
 		setLoading(active_button) {
-			this.form.classList.add('is-loading');
 			active_button.classList.add('is-loading');
 
 			const footer = this.form.querySelector('.tfoot-buttons');
 
-			for (const button of footer.querySelectorAll('button')) {
+			for (const button of footer.querySelectorAll('button:not(.js-cancel)')) {
 				button.disabled = true;
 			}
 		},
 
 		unsetLoading() {
-			this.form.classList.remove('is-loading');
 			const footer = this.form.querySelector('.tfoot-buttons');
 
-			for (const button of footer.querySelectorAll('button')) {
+			for (const button of footer.querySelectorAll('button:not(.js-cancel)')) {
 				button.classList.remove('is-loading');
 				button.disabled = false;
 			}
