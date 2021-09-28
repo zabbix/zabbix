@@ -68,9 +68,9 @@ There are no template links in this template.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|Velocloud |Velocloud: Clear metrics for aggregated data |<p>Clear metrics for aggregated data without errors.</p> |DEPENDENT |velocloud.get.clear_metrics<p>**Preprocessing**:</p><p>- CHECK_JSON_ERROR |
-|Velocloud |Velocloud: Clear metrics for logs data |<p>Clear metrics for logs data without errors.</p> |DEPENDENT |velocloud.get_logs.clear_metrics<p>**Preprocessing**:</p><p>- CHECK_JSON_ERROR |
-|Velocloud |Velocloud: Clear metrics for apps data |<p>Clear metrics for apps data without errors.</p> |DEPENDENT |velocloud.get_apps.clear_metrics<p>**Preprocessing**:</p><p>- CHECK_JSON_ERROR |
+|Velocloud |Velocloud: Clear metrics for aggregated data |<p>Clear metrics for aggregated data without errors.</p> |DEPENDENT |velocloud.get.clear_metrics<p>**Preprocessing**:</p><p>- CHECK_JSON_ERROR: `$.error`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Velocloud |Velocloud: Clear metrics for logs data |<p>Clear metrics for logs data without errors.</p> |DEPENDENT |velocloud.get_logs.clear_metrics<p>**Preprocessing**:</p><p>- CHECK_JSON_ERROR: `$.error`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Velocloud |Velocloud: Clear metrics for apps data |<p>Clear metrics for apps data without errors.</p> |DEPENDENT |velocloud.get_apps.clear_metrics<p>**Preprocessing**:</p><p>- CHECK_JSON_ERROR: `$.error`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Velocloud |Velocloud: Orchestrator API version |<p>Version of VMware SD-WAN Orchestrator API.</p> |DEPENDENT |velocloud.orchestrator.api_version<p>**Preprocessing**:</p><p>- JSONPATH: `$.version.apiVersion`</p> |
 |Velocloud |Velocloud: Orchestrator build |<p>Build of VMware SD-WAN Orchestrator API.</p> |DEPENDENT |velocloud.orchestrator.build<p>**Preprocessing**:</p><p>- JSONPATH: `$.version.build`</p> |
 |Velocloud |Velocloud: Orchestrator version |<p>Version of VMware SD-WAN Orchestrator API.</p> |DEPENDENT |velocloud.orchestrator.version<p>**Preprocessing**:</p><p>- JSONPATH: `$.version.version`</p> |

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-09-23T11:28:56Z'
+  date: '2021-09-28T18:49:20Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -66,12 +66,12 @@ zabbix_export:
                     if (response.error && response.error.message) {
                         throw response.error.message;
                     } else {
-                        throw 'Failed to receive data: invalid response status code';
+                        throw 'Failed to receive data: invalid response status code.';
                     }
                 }
             
                 if (typeof (response) !== 'object' || response === null) {
-                    throw 'Can not process response data: received data is not an object.';
+                    throw 'Cannot process response data: received data is not an object.';
                 }
             
                 return response;
@@ -79,11 +79,11 @@ zabbix_export:
             
             try {
             
-                if (params.token === '{$VELOCLOUD.TOKEN}') {
+                if (params.token === '\{\$VELOCLOUD.TOKEN\}') {
                     throw 'Please change {$VELOCLOUD.TOKEN} macro with the proper value.';
                 }
             
-                if (params.url.indexOf('http://') == -1 && params.url.indexOf('https://') == -1) {
+                if (params.url.indexOf('http://') === -1 && params.url.indexOf('https://') === -1) {
                     params.url = 'https://' + params.url;
                 }
             
@@ -102,7 +102,7 @@ zabbix_export:
                         edges = edges.concat(responseEdges);
                     }
                 } else {
-                    throw 'Can not process edges: enterprises is not an array.';
+                    throw 'Cannot process edges: enterprises is not an array.';
                 }
             
                 if (Array.isArray(edges)) {
@@ -124,13 +124,13 @@ zabbix_export:
                                 responseEdgeSDWan[e].enterpriseId = edges[i].enterpriseId;
                             }
                         } else {
-                            throw 'Can not process edges SDWan Path: edges SDWans is not an array.';
+                            throw 'Cannot process edges SDWan path: edges SDWans is not an array.';
                         }
             
                         edgeSDWan = edgeSDWan.concat(responseEdgeSDWan);
                     }
                 } else {
-                    throw 'Can not process edges SDWans: edges is not an array.';
+                    throw 'Cannot process edges SDWans: edges is not an array.';
                 }
             
             } catch (error) {
@@ -280,7 +280,7 @@ zabbix_export:
                     if (response.error) {
                         throw response.error.message;
                     } else {
-                        throw 'Failed to receive data: invalid response status code';
+                        throw 'Failed to receive data: invalid response status code.';
                     }
                 }
             
@@ -293,11 +293,11 @@ zabbix_export:
             
             try {
             
-                if (params.token === '{$VELOCLOUD.TOKEN}') {
+                if (params.token === '\{\$VELOCLOUD.TOKEN\}') {
                     throw 'Please change {$VELOCLOUD.TOKEN} macro with the proper value.';
                 }
             
-                if (params.url.indexOf('http://') == -1 && params.url.indexOf('https://') == -1) {
+                if (params.url.indexOf('http://') === -1 && params.url.indexOf('https://') === -1) {
                     params.url = 'https://' + params.url;
                 }
             
@@ -313,7 +313,7 @@ zabbix_export:
                         edges = edges.concat(responseEdges);
                     }
                 } else {
-                    throw 'Can not process edges: enterprises is not an array.';
+                    throw 'Cannot process edges: enterprises is not an array.';
                 }
             
                 if (Array.isArray(edges)) {
@@ -340,7 +340,7 @@ zabbix_export:
                                 responseApps[e].enterpriseId = edges[i].enterpriseId;
                             }
                         } else {
-                            throw 'Can not enrich apps: apps is not an array.';
+                            throw 'Cannot enrich apps: apps is not an array.';
                         }
             
                         if (Array.isArray(responseAppsLinks)) {
@@ -350,14 +350,14 @@ zabbix_export:
                                 responseAppsLinks[e].enterpriseId = edges[i].enterpriseId;
                             }
                         } else {
-                            throw 'Can not enrich apps: apps is not an array.';
+                            throw 'Cannot enrich apps: apps is not an array.';
                         }
             
                         apps = apps.concat(responseApps);
                         appsLinks = appsLinks.concat(responseAppsLinks);
                     }
                 } else {
-                    throw 'Can not process apps: edges is not an array.';
+                    throw 'Cannot process apps: edges is not an array.';
                 }
             
             } catch (error) {
@@ -510,7 +510,7 @@ zabbix_export:
                 }
             
                 if (typeof (response) !== 'object' || response === null) {
-                    throw 'Cant precess response data: received data is not an object';
+                    throw 'Cant precess response data: received data is not an object.';
                 }
             
                 return response;
@@ -518,11 +518,11 @@ zabbix_export:
             
             try {
             
-                if (params.token === '{$VELOCLOUD.TOKEN}') {
+                if (params.token === '\{\$VELOCLOUD.TOKEN\}') {
                     throw 'Please change {$VELOCLOUD.TOKEN} macro with the proper value.';
                 }
             
-                if (params.url.indexOf('http://') == -1 && params.url.indexOf('https://') == -1) {
+                if (params.url.indexOf('http://') === -1 && params.url.indexOf('https://') === -1) {
                     params.url = 'https://' + params.url;
                 }
             
@@ -547,7 +547,7 @@ zabbix_export:
                         firewallLogs[enterprises[i].id] = getHttpData(params.url + 'portal/rest/firewall/getEnterpriseFirewallLogs', JSON.stringify(body)).data;
                     }
                 } else {
-                    throw 'Can not process logs: enterprises is not an array.';
+                    throw 'Cannot process logs: enterprises is not an array.';
                 }
             
             } catch (error) {
