@@ -348,15 +348,11 @@ void	zbx_ha_kill(void)
 {
 	int	status;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
 	kill(ha_pid, SIGKILL);
 	waitpid(ha_pid, &status, 0);
 
 	if (SUCCEED == zbx_ipc_async_socket_connected(&ha_socket))
 		zbx_ipc_async_socket_close(&ha_socket);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************

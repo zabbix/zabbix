@@ -77,6 +77,7 @@ void	__zbx_rwlock_rdlock(const char *filename, int line, zbx_rwlock_t rwlock);
 void	__zbx_rwlock_unlock(const char *filename, int line, zbx_rwlock_t rwlock);
 void	zbx_rwlock_destroy(zbx_rwlock_t *rwlock);
 void	zbx_locks_disable(void);
+void	zbx_locks_enable(void);
 #else	/* fallback to semaphores if read-write locks are not available */
 #	define ZBX_RWLOCK_NULL				-1
 #	define ZBX_MUTEX_NULL				-1

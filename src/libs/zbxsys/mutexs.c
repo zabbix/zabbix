@@ -362,6 +362,20 @@ void	zbx_locks_disable(void)
 	/* attempting to destroy a locked pthread mutex results in undefined behavior */
 	locks_disabled = 1;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_locks_enable                                                 *
+ *                                                                            *
+ * Purpose:  enable locks                                                     *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_locks_enable(void)
+{
+	/* attempting to destroy a locked pthread mutex results in undefined behavior */
+	locks_disabled = 0;
+}
+
 #endif
 #endif	/* _WINDOWS */
 

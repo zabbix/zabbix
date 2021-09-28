@@ -1430,9 +1430,13 @@ static void	server_teardown(zbx_socket_t *listen_sock)
 	int	i;
 	char	*error = NULL;
 
-	/* hard kill all zabbix processes */
+	/* hard kill all zabbix processes, no logging or other  */
 
 	zbx_unset_child_signal_handler();
+
+	/* Disable locks so main process doesn't hang on logging if a process was              */
+	/* killed during logging. The locks will be re-enabled after logger is reinitialized   */
+	zbx_locks_disable();
 
 	zbx_ha_kill();
 
@@ -1454,6 +1458,8 @@ static void	server_teardown(zbx_socket_t *listen_sock)
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
+
+	zbx_locks_enable();
 
 	if (NULL != listen_sock)
 		zbx_tcp_unlisten(listen_sock);
@@ -1673,7 +1679,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		if (ZBX_NODE_STATUS_UNKNOWN != new_ha_status && ha_status != new_ha_status)
 		{
 			ha_status = new_ha_status;
-
 			zabbix_log(LOG_LEVEL_DEBUG, "HA status changed to: %d", ha_status);
 
 			switch (ha_status)
@@ -1697,7 +1702,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 							ha_status);
 					sig_exiting = ZBX_EXIT_FAILURE;
 					continue;
-
 			}
 		}
 

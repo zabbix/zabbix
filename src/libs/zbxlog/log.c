@@ -678,3 +678,9 @@ char	*strerror_from_module(unsigned long error, const wchar_t *module)
 	return utf8_string;
 }
 #endif	/* _WINDOWS */
+
+
+void	zbx_log_lock(void)
+{
+	LOCK_LOG;
+}
