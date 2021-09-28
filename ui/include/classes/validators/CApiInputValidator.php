@@ -814,11 +814,9 @@ class CApiInputValidator {
 		$valid = self::isInRange($data, $rule['in']);
 
 		if (!$valid) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
-				_n('value must be %1$s', 'value must be one of %1$s', str_replace([',', ':'], [', ', '-'], $rule['in']),
-					(str_replace([',', ':'], '', $rule['in']) != $rule['in']) ? 2 : 1
-				)
-			);
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _n('value must be %1$s', 'value must be one of %1$s',
+				strtr($rule['in'], [',' => ', ', ':' => '-']), (strpbrk($rule['in'], ',:') === false) ? 1 : 2
+			));
 		}
 
 		return $valid;
@@ -1044,13 +1042,6 @@ class CApiInputValidator {
 
 			if ($field_rule['type'] === API_MULTIPLE) {
 				foreach ($field_rule['rules'] as $multiple_rule) {
-					if (!array_key_exists($multiple_rule['if']['field'], $data)) {
-						$error = _s('Invalid parameter "%1$s": %2$s.', $path,
-							_s('the parameter "%1$s" is missing', $multiple_rule['if']['field'])
-						);
-						return false;
-					}
-
 					if (self::isInRange($data[$multiple_rule['if']['field']], $multiple_rule['if']['in'])) {
 						$field_rule = $multiple_rule;
 						break;
