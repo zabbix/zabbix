@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-03-20T05:45:18Z</date>
+   <date>2021-09-27T07:54:43Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -15,7 +15,7 @@
 &#13;
 You can discuss this template or leave feedback on our forum &#13;
 &#13;
-Template tooling version used: 0.35</description>
+Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -37,6 +37,7 @@ Template tooling version used: 0.35</description>
                <delay>0</delay>
                <history>7d</history>
                <trends>0</trends>
+               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <applications>
                   <application>
@@ -64,6 +65,7 @@ Template tooling version used: 0.35</description>
                <delay>0</delay>
                <history>7d</history>
                <trends>0</trends>
+               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <applications>
                   <application>
@@ -89,6 +91,7 @@ Template tooling version used: 0.35</description>
                <key>docker.containers</key>
                <history>0</history>
                <trends>0</trends>
+               <status>ENABLED</status>
                <value_type>TEXT</value_type>
                <applications>
                   <application>
@@ -102,6 +105,7 @@ Template tooling version used: 0.35</description>
                <key>docker.containers_size</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <units>B</units>
                <applications>
                   <application>
@@ -124,6 +128,7 @@ Template tooling version used: 0.35</description>
                <key>docker.containers.paused</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <description>Total number of containers paused on this host</description>
                <applications>
                   <application>
@@ -146,6 +151,7 @@ Template tooling version used: 0.35</description>
                <key>docker.containers.running</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <description>Total number of containers running on this host</description>
                <applications>
                   <application>
@@ -168,6 +174,7 @@ Template tooling version used: 0.35</description>
                <key>docker.containers.stopped</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <description>Total number of containers stopped on this host</description>
                <applications>
                   <application>
@@ -190,6 +197,7 @@ Template tooling version used: 0.35</description>
                <key>docker.containers.total</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <description>Total number of containers on this host</description>
                <applications>
                   <application>
@@ -212,6 +220,7 @@ Template tooling version used: 0.35</description>
                <key>docker.cpu_cfs_period.enabled</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <description>https://docs.docker.com/config/containers/resource_constraints/#configure-the-default-cfs-scheduler</description>
                <applications>
                   <application>
@@ -228,7 +237,7 @@ Template tooling version used: 0.35</description>
                   </step>
                   <step>
                      <type>BOOL_TO_DECIMAL</type>
-                     <params/>
+                     <params />
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -245,6 +254,7 @@ Template tooling version used: 0.35</description>
                <key>docker.cpu_cfs_quota.enabled</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <description>https://docs.docker.com/config/containers/resource_constraints/#configure-the-default-cfs-scheduler</description>
                <applications>
                   <application>
@@ -261,7 +271,7 @@ Template tooling version used: 0.35</description>
                   </step>
                   <step>
                      <type>BOOL_TO_DECIMAL</type>
-                     <params/>
+                     <params />
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -278,6 +288,7 @@ Template tooling version used: 0.35</description>
                <key>docker.cpu_set.enabled</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <description>https://docs.docker.com/config/containers/resource_constraints/#configure-the-default-cfs-scheduler</description>
                <applications>
                   <application>
@@ -294,7 +305,7 @@ Template tooling version used: 0.35</description>
                   </step>
                   <step>
                      <type>BOOL_TO_DECIMAL</type>
-                     <params/>
+                     <params />
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -311,6 +322,7 @@ Template tooling version used: 0.35</description>
                <key>docker.cpu_shares.enabled</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <description>https://docs.docker.com/config/containers/resource_constraints/#configure-the-default-cfs-scheduler</description>
                <applications>
                   <application>
@@ -327,7 +339,7 @@ Template tooling version used: 0.35</description>
                   </step>
                   <step>
                      <type>BOOL_TO_DECIMAL</type>
-                     <params/>
+                     <params />
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -343,6 +355,7 @@ Template tooling version used: 0.35</description>
                <key>docker.data_usage</key>
                <history>0</history>
                <trends>0</trends>
+               <status>ENABLED</status>
                <value_type>TEXT</value_type>
                <applications>
                   <application>
@@ -356,6 +369,7 @@ Template tooling version used: 0.35</description>
                <key>docker.debug.enabled</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <applications>
                   <application>
                      <name>Docker</name>
@@ -371,7 +385,7 @@ Template tooling version used: 0.35</description>
                   </step>
                   <step>
                      <type>BOOL_TO_DECIMAL</type>
-                     <params/>
+                     <params />
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -389,6 +403,7 @@ Template tooling version used: 0.35</description>
                <delay>0</delay>
                <history>7d</history>
                <trends>0</trends>
+               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <applications>
                   <application>
@@ -416,6 +431,7 @@ Template tooling version used: 0.35</description>
                <delay>0</delay>
                <history>7d</history>
                <trends>0</trends>
+               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>Docker storage driver &#13;
  https://docs.docker.com/storage/storagedriver/</description>
@@ -444,6 +460,7 @@ Template tooling version used: 0.35</description>
                <key>docker.goroutines</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <description>Number of goroutines</description>
                <applications>
                   <application>
@@ -465,6 +482,7 @@ Template tooling version used: 0.35</description>
                <key>docker.images</key>
                <history>0</history>
                <trends>0</trends>
+               <status>ENABLED</status>
                <value_type>TEXT</value_type>
                <applications>
                   <application>
@@ -478,6 +496,7 @@ Template tooling version used: 0.35</description>
                <key>docker.images_size</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <units>B</units>
                <applications>
                   <application>
@@ -500,6 +519,7 @@ Template tooling version used: 0.35</description>
                <key>docker.images.top_level</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <description>Number of top-level images</description>
                <applications>
                   <application>
@@ -522,6 +542,7 @@ Template tooling version used: 0.35</description>
                <key>docker.images.total</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <description>Number of images with intermediate image layers</description>
                <applications>
                   <application>
@@ -543,6 +564,7 @@ Template tooling version used: 0.35</description>
                <key>docker.info</key>
                <history>0</history>
                <trends>0</trends>
+               <status>ENABLED</status>
                <value_type>TEXT</value_type>
                <applications>
                   <application>
@@ -556,6 +578,7 @@ Template tooling version used: 0.35</description>
                <key>docker.ipv4_forwarding.enabled</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <applications>
                   <application>
                      <name>Docker</name>
@@ -571,7 +594,7 @@ Template tooling version used: 0.35</description>
                   </step>
                   <step>
                      <type>BOOL_TO_DECIMAL</type>
-                     <params/>
+                     <params />
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -588,6 +611,7 @@ Template tooling version used: 0.35</description>
                <key>docker.kernel_mem_tcp.enabled</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <applications>
                   <application>
                      <name>Docker</name>
@@ -603,7 +627,7 @@ Template tooling version used: 0.35</description>
                   </step>
                   <step>
                      <type>BOOL_TO_DECIMAL</type>
-                     <params/>
+                     <params />
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -620,6 +644,7 @@ Template tooling version used: 0.35</description>
                <key>docker.kernel_mem.enabled</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <applications>
                   <application>
                      <name>Docker</name>
@@ -635,7 +660,7 @@ Template tooling version used: 0.35</description>
                   </step>
                   <step>
                      <type>BOOL_TO_DECIMAL</type>
-                     <params/>
+                     <params />
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -653,6 +678,7 @@ Template tooling version used: 0.35</description>
                <delay>0</delay>
                <history>7d</history>
                <trends>0</trends>
+               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <applications>
                   <application>
@@ -679,6 +705,7 @@ Template tooling version used: 0.35</description>
                <key>docker.layers_size</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <units>B</units>
                <applications>
                   <application>
@@ -701,6 +728,7 @@ Template tooling version used: 0.35</description>
                <key>docker.live_restore.enabled</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <applications>
                   <application>
                      <name>Docker</name>
@@ -716,7 +744,7 @@ Template tooling version used: 0.35</description>
                   </step>
                   <step>
                      <type>BOOL_TO_DECIMAL</type>
-                     <params/>
+                     <params />
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -734,6 +762,7 @@ Template tooling version used: 0.35</description>
                <delay>0</delay>
                <history>7d</history>
                <trends>0</trends>
+               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <applications>
                   <application>
@@ -760,6 +789,7 @@ Template tooling version used: 0.35</description>
                <key>docker.mem_limit.enabled</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <applications>
                   <application>
                      <name>Docker</name>
@@ -775,7 +805,7 @@ Template tooling version used: 0.35</description>
                   </step>
                   <step>
                      <type>BOOL_TO_DECIMAL</type>
-                     <params/>
+                     <params />
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -792,6 +822,7 @@ Template tooling version used: 0.35</description>
                <key>docker.mem.total</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <units>B</units>
                <applications>
                   <application>
@@ -815,6 +846,7 @@ Template tooling version used: 0.35</description>
                <delay>0</delay>
                <history>1h</history>
                <trends>0</trends>
+               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <applications>
                   <application>
@@ -852,6 +884,7 @@ Template tooling version used: 0.35</description>
                <key>docker.ncpu</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <applications>
                   <application>
                      <name>Docker</name>
@@ -873,6 +906,7 @@ Template tooling version used: 0.35</description>
                <key>docker.nevents_listener</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <applications>
                   <application>
                      <name>Docker</name>
@@ -894,6 +928,7 @@ Template tooling version used: 0.35</description>
                <key>docker.nfd</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <description>Number of used File Descriptors</description>
                <applications>
                   <application>
@@ -916,6 +951,7 @@ Template tooling version used: 0.35</description>
                <key>docker.oomkill.disabled</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <applications>
                   <application>
                      <name>Docker</name>
@@ -931,7 +967,7 @@ Template tooling version used: 0.35</description>
                   </step>
                   <step>
                      <type>BOOL_TO_DECIMAL</type>
-                     <params/>
+                     <params />
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -949,6 +985,7 @@ Template tooling version used: 0.35</description>
                <delay>0</delay>
                <history>7d</history>
                <trends>0</trends>
+               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <applications>
                   <application>
@@ -976,6 +1013,7 @@ Template tooling version used: 0.35</description>
                <delay>0</delay>
                <history>7d</history>
                <trends>0</trends>
+               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <applications>
                   <application>
@@ -1002,6 +1040,7 @@ Template tooling version used: 0.35</description>
                <key>docker.pids_limit.enabled</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <applications>
                   <application>
                      <name>Docker</name>
@@ -1014,7 +1053,7 @@ Template tooling version used: 0.35</description>
                   </step>
                   <step>
                      <type>BOOL_TO_DECIMAL</type>
-                     <params/>
+                     <params />
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -1029,6 +1068,7 @@ Template tooling version used: 0.35</description>
                <name>Docker: Ping</name>
                <key>docker.ping</key>
                <history>7h</history>
+               <status>ENABLED</status>
                <applications>
                   <application>
                      <name>Docker</name>
@@ -1059,6 +1099,7 @@ Template tooling version used: 0.35</description>
                <delay>0</delay>
                <history>7d</history>
                <trends>0</trends>
+               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <applications>
                   <application>
@@ -1086,6 +1127,7 @@ Template tooling version used: 0.35</description>
                <delay>0</delay>
                <history>7d</history>
                <trends>0</trends>
+               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <applications>
                   <application>
@@ -1121,6 +1163,7 @@ Template tooling version used: 0.35</description>
                <key>docker.swap_limit.enabled</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <applications>
                   <application>
                      <name>Docker</name>
@@ -1136,7 +1179,7 @@ Template tooling version used: 0.35</description>
                   </step>
                   <step>
                      <type>BOOL_TO_DECIMAL</type>
-                     <params/>
+                     <params />
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -1153,6 +1196,7 @@ Template tooling version used: 0.35</description>
                <key>docker.volumes_size</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <units>B</units>
                <applications>
                   <application>
@@ -1204,6 +1248,7 @@ false - Returns only running containers</description>
                      <key>docker.container_info.created["{#NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <units>unixtime</units>
                      <application_prototypes>
                         <application_prototype>
@@ -1230,6 +1275,7 @@ false - Returns only running containers</description>
                      <key>docker.container_info.finished["{#NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>unixtime</units>
                      <application_prototypes>
@@ -1258,6 +1304,7 @@ false - Returns only running containers</description>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
+                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <application_prototypes>
                         <application_prototype>
@@ -1284,6 +1331,7 @@ false - Returns only running containers</description>
                      <key>docker.container_info.restart_count["{#NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <application_prototypes>
                         <application_prototype>
                            <name>Docker: Container {#NAME}</name>
@@ -1305,6 +1353,7 @@ false - Returns only running containers</description>
                      <key>docker.container_info.started["{#NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>unixtime</units>
                      <application_prototypes>
@@ -1332,6 +1381,7 @@ false - Returns only running containers</description>
                      <key>docker.container_info.state.dead["{#NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <application_prototypes>
                         <application_prototype>
                            <name>Docker: Container {#NAME}</name>
@@ -1347,7 +1397,7 @@ false - Returns only running containers</description>
                         </step>
                         <step>
                            <type>BOOL_TO_DECIMAL</type>
-                           <params/>
+                           <params />
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1361,6 +1411,7 @@ false - Returns only running containers</description>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
+                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <application_prototypes>
                         <application_prototype>
@@ -1396,6 +1447,7 @@ false - Returns only running containers</description>
                      <key>docker.container_info.state.exitcode["{#NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <application_prototypes>
                         <application_prototype>
                            <name>Docker: Container {#NAME}</name>
@@ -1421,6 +1473,7 @@ false - Returns only running containers</description>
                      <key>docker.container_info.state.oomkilled["{#NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <application_prototypes>
                         <application_prototype>
                            <name>Docker: Container {#NAME}</name>
@@ -1436,7 +1489,7 @@ false - Returns only running containers</description>
                         </step>
                         <step>
                            <type>BOOL_TO_DECIMAL</type>
-                           <params/>
+                           <params />
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1449,6 +1502,7 @@ false - Returns only running containers</description>
                      <key>docker.container_info.state.paused["{#NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <application_prototypes>
                         <application_prototype>
                            <name>Docker: Container {#NAME}</name>
@@ -1464,7 +1518,7 @@ false - Returns only running containers</description>
                         </step>
                         <step>
                            <type>BOOL_TO_DECIMAL</type>
-                           <params/>
+                           <params />
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1477,6 +1531,7 @@ false - Returns only running containers</description>
                      <key>docker.container_info.state.pid["{#NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <application_prototypes>
                         <application_prototype>
                            <name>Docker: Container {#NAME}</name>
@@ -1502,6 +1557,7 @@ false - Returns only running containers</description>
                      <key>docker.container_info.state.restarting["{#NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <application_prototypes>
                         <application_prototype>
                            <name>Docker: Container {#NAME}</name>
@@ -1517,7 +1573,7 @@ false - Returns only running containers</description>
                         </step>
                         <step>
                            <type>BOOL_TO_DECIMAL</type>
-                           <params/>
+                           <params />
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1530,6 +1586,7 @@ false - Returns only running containers</description>
                      <key>docker.container_info.state.running["{#NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <application_prototypes>
                         <application_prototype>
                            <name>Docker: Container {#NAME}</name>
@@ -1545,7 +1602,7 @@ false - Returns only running containers</description>
                         </step>
                         <step>
                            <type>BOOL_TO_DECIMAL</type>
-                           <params/>
+                           <params />
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1559,6 +1616,7 @@ false - Returns only running containers</description>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
+                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <application_prototypes>
                         <application_prototype>
@@ -1584,6 +1642,7 @@ false - Returns only running containers</description>
                      <key>docker.container_info["{#NAME}"]</key>
                      <history>0</history>
                      <trends>0</trends>
+                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>Return low-level information about a container</description>
                      <application_prototypes>
@@ -1593,11 +1652,36 @@ false - Returns only running containers</description>
                      </application_prototypes>
                   </item_prototype>
                   <item_prototype>
+                     <name>Container {#NAME}: CPU percent usage</name>
+                     <type>DEPENDENT</type>
+                     <key>docker.container_stats.cpu_pct_usage["{#NAME}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <status>ENABLED</status>
+                     <value_type>FLOAT</value_type>
+                     <units>%</units>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Docker: Container {#NAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.cpu_stats.cpu_usage.percent_usage</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>docker.container_stats["{#NAME}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
                      <name>Container {#NAME}: CPU kernelmode usage per second</name>
                      <type>DEPENDENT</type>
                      <key>docker.container_stats.cpu_usage.kernel.rate["{#NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>s</units>
                      <application_prototypes>
@@ -1612,7 +1696,7 @@ false - Returns only running containers</description>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
-                           <params/>
+                           <params />
                         </step>
                         <step>
                            <type>MULTIPLIER</type>
@@ -1629,6 +1713,7 @@ false - Returns only running containers</description>
                      <key>docker.container_stats.cpu_usage.throttled_periods["{#NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <description>Number of periods when the container hits its throttling limit</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1651,6 +1736,7 @@ false - Returns only running containers</description>
                      <key>docker.container_stats.cpu_usage.throttled_time["{#NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>s</units>
                      <description>Aggregate time the container was throttled for in nanoseconds</description>
@@ -1679,6 +1765,7 @@ false - Returns only running containers</description>
                      <key>docker.container_stats.cpu_usage.throttling_periods["{#NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <description>Number of periods with throttling active</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1701,6 +1788,7 @@ false - Returns only running containers</description>
                      <key>docker.container_stats.cpu_usage.total.rate["{#NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>s</units>
                      <application_prototypes>
@@ -1715,7 +1803,7 @@ false - Returns only running containers</description>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
-                           <params/>
+                           <params />
                         </step>
                         <step>
                            <type>MULTIPLIER</type>
@@ -1732,6 +1820,7 @@ false - Returns only running containers</description>
                      <key>docker.container_stats.cpu_usage.user.rate["{#NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>s</units>
                      <application_prototypes>
@@ -1746,7 +1835,7 @@ false - Returns only running containers</description>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
-                           <params/>
+                           <params />
                         </step>
                         <step>
                            <type>MULTIPLIER</type>
@@ -1763,6 +1852,7 @@ false - Returns only running containers</description>
                      <key>docker.container_stats.memory.commit_bytes["{#NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <units>B</units>
                      <application_prototypes>
                         <application_prototype>
@@ -1785,6 +1875,7 @@ false - Returns only running containers</description>
                      <key>docker.container_stats.memory.commit_peak_bytes["{#NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <units>B</units>
                      <application_prototypes>
                         <application_prototype>
@@ -1807,6 +1898,7 @@ false - Returns only running containers</description>
                      <key>docker.container_stats.memory.max_usage["{#NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <units>B</units>
                      <application_prototypes>
                         <application_prototype>
@@ -1829,6 +1921,7 @@ false - Returns only running containers</description>
                      <key>docker.container_stats.memory.private_working_set["{#NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <units>B</units>
                      <application_prototypes>
                         <application_prototype>
@@ -1851,6 +1944,7 @@ false - Returns only running containers</description>
                      <key>docker.container_stats.memory.usage["{#NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <units>B</units>
                      <application_prototypes>
                         <application_prototype>
@@ -1873,6 +1967,7 @@ false - Returns only running containers</description>
                      <key>docker.container_stats.online_cpus["{#NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <application_prototypes>
                         <application_prototype>
                            <name>Docker: Container {#NAME}</name>
@@ -1893,6 +1988,7 @@ false - Returns only running containers</description>
                      <key>docker.container_stats["{#NAME}"]</key>
                      <history>0</history>
                      <trends>0</trends>
+                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>Get container stats based on resource usage</description>
                      <application_prototypes>
@@ -1907,6 +2003,7 @@ false - Returns only running containers</description>
                      <key>docker.networks.rx_bytes["{#NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>B</units>
                      <application_prototypes>
@@ -1923,7 +2020,7 @@ false - Returns only running containers</description>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
-                           <params/>
+                           <params />
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1936,6 +2033,7 @@ false - Returns only running containers</description>
                      <key>docker.networks.rx_dropped["{#NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <application_prototypes>
                         <application_prototype>
@@ -1951,7 +2049,7 @@ false - Returns only running containers</description>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
-                           <params/>
+                           <params />
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1964,6 +2062,7 @@ false - Returns only running containers</description>
                      <key>docker.networks.rx_errors["{#NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <application_prototypes>
                         <application_prototype>
@@ -1979,7 +2078,7 @@ false - Returns only running containers</description>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
-                           <params/>
+                           <params />
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1992,6 +2091,7 @@ false - Returns only running containers</description>
                      <key>docker.networks.rx_packets["{#NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <application_prototypes>
                         <application_prototype>
@@ -2007,7 +2107,7 @@ false - Returns only running containers</description>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
-                           <params/>
+                           <params />
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2020,6 +2120,7 @@ false - Returns only running containers</description>
                      <key>docker.networks.tx_bytes["{#NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>B</units>
                      <application_prototypes>
@@ -2036,7 +2137,7 @@ false - Returns only running containers</description>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
-                           <params/>
+                           <params />
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2049,6 +2150,7 @@ false - Returns only running containers</description>
                      <key>docker.networks.tx_dropped["{#NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <application_prototypes>
                         <application_prototype>
@@ -2064,7 +2166,7 @@ false - Returns only running containers</description>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
-                           <params/>
+                           <params />
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2077,6 +2179,7 @@ false - Returns only running containers</description>
                      <key>docker.networks.tx_errors["{#NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <application_prototypes>
                         <application_prototype>
@@ -2092,7 +2195,7 @@ false - Returns only running containers</description>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
-                           <params/>
+                           <params />
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2105,6 +2208,7 @@ false - Returns only running containers</description>
                      <key>docker.networks.tx_packets["{#NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <application_prototypes>
                         <application_prototype>
@@ -2120,7 +2224,7 @@ false - Returns only running containers</description>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
-                           <params/>
+                           <params />
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2128,6 +2232,7 @@ false - Returns only running containers</description>
                      </master_item>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes />
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template App Docker:docker.container_info.state.exitcode["{#NAME}"].last()}&gt;0 and {Template App Docker:docker.container_info.state.running["{#NAME}"].last()}=0</expression>
@@ -2303,6 +2408,7 @@ false - Returns only running containers</description>
                      <key>docker.image.created["{#ID}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <units>unixtime</units>
                      <application_prototypes>
                         <application_prototype>
@@ -2329,6 +2435,7 @@ false - Returns only running containers</description>
                      <key>docker.image.size["{#ID}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <units>B</units>
                      <application_prototypes>
                         <application_prototype>
@@ -2346,6 +2453,7 @@ false - Returns only running containers</description>
                      </master_item>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes />
             </discovery_rule>
          </discovery_rules>
          <macros>
@@ -2394,8 +2502,8 @@ false - Returns only running containers</description>
                      <halign>0</halign>
                      <dynamic>0</dynamic>
                      <sort_triggers>0</sort_triggers>
-                     <url/>
-                     <application/>
+                     <url />
+                     <application />
                      <max_columns>3</max_columns>
                   </screen_item>
                   <screen_item>
@@ -2416,8 +2524,8 @@ false - Returns only running containers</description>
                      <halign>0</halign>
                      <dynamic>0</dynamic>
                      <sort_triggers>0</sort_triggers>
-                     <url/>
-                     <application/>
+                     <url />
+                     <application />
                      <max_columns>3</max_columns>
                   </screen_item>
                   <screen_item>
@@ -2438,8 +2546,8 @@ false - Returns only running containers</description>
                      <halign>0</halign>
                      <dynamic>0</dynamic>
                      <sort_triggers>0</sort_triggers>
-                     <url/>
-                     <application/>
+                     <url />
+                     <application />
                      <max_columns>3</max_columns>
                   </screen_item>
                   <screen_item>
@@ -2460,8 +2568,8 @@ false - Returns only running containers</description>
                      <halign>0</halign>
                      <dynamic>0</dynamic>
                      <sort_triggers>0</sort_triggers>
-                     <url/>
-                     <application/>
+                     <url />
+                     <application />
                      <max_columns>3</max_columns>
                   </screen_item>
                   <screen_item>
@@ -2482,8 +2590,8 @@ false - Returns only running containers</description>
                      <halign>0</halign>
                      <dynamic>0</dynamic>
                      <sort_triggers>0</sort_triggers>
-                     <url/>
-                     <application/>
+                     <url />
+                     <application />
                      <max_columns>3</max_columns>
                   </screen_item>
                </screen_items>
