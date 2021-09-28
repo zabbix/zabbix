@@ -38,7 +38,7 @@ zabbix_export:
           value: '{ALERT.SENDTO}'
         8:
           name: github_token
-          value: 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
+          value: '<PLACE GITHUB TOKEN>'
         9:
           name: github_url
           value: 'https://api.github.com'
