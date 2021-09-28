@@ -314,7 +314,7 @@ static int	audit_field_default(const char *table_name, const char *field_name, c
 	{
 		if (NULL != value && NULL != field->default_value && 0 == strcmp(value, field->default_value))
 			ret = SUCCEED;
-		else if (NULL == value && NULL == field->default_value)
+		else if ((NULL == value || '0' == *value) && NULL == field->default_value)
 			ret = SUCCEED;
 	}
 
@@ -350,7 +350,7 @@ void	zbx_audit_update_json_append_uint64(const zbx_uint64_t id, const char *audi
 	zbx_audit_entry_t	local_audit_entry, **found_audit_entry;
 	zbx_audit_entry_t	*local_audit_entry_x = &local_audit_entry;
 
-	zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_I64, value);
+	zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64, value);
 	if (SUCCEED == audit_field_default(table, field, buffer))
 		return;
 
@@ -392,7 +392,7 @@ void	zbx_audit_update_json_append_int(const zbx_uint64_t id, const char *audit_o
 {
 	char	buffer[MAX_ID_LEN];
 
-	zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_I64, value);
+	zbx_snprintf(buffer, sizeof(buffer), "%d", value);
 
 	if (SUCCEED == audit_field_default(table, field, buffer))
 	{
