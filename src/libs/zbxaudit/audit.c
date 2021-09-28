@@ -303,7 +303,7 @@ void	zbx_audit_flush(void)
 	zbx_audit_clean();
 }
 
-static int	audit_field_default(const char *table_name, const char *field_name, const char *value)
+static int	audit_field_default(const char *table_name, const char *field_name, const char *value, uint64_t id)
 {
 	int			ret = FAIL;
 	const ZBX_TABLE		*table;
@@ -312,9 +312,10 @@ static int	audit_field_default(const char *table_name, const char *field_name, c
 	if (NULL != table_name && NULL != (table = DBget_table(table_name)) &&
 			NULL != (field = DBget_field(table, field_name)))
 	{
+
 		if (NULL != value && NULL != field->default_value && 0 == strcmp(value, field->default_value))
 			ret = SUCCEED;
-		else if ((NULL == value || '0' == *value) && NULL == field->default_value)
+		else if ((NULL == value || (ZBX_TYPE_ID == field->type && 0 == id)) && NULL == field->default_value)
 			ret = SUCCEED;
 	}
 
@@ -327,7 +328,7 @@ void	zbx_audit_update_json_append_string(const zbx_uint64_t id, const char *audi
 	zbx_audit_entry_t	local_audit_entry, **found_audit_entry;
 	zbx_audit_entry_t	*local_audit_entry_x = &local_audit_entry;
 
-	if (SUCCEED == audit_field_default(table, field, value))
+	if (SUCCEED == audit_field_default(table, field, value, 0))
 		return;
 
 	local_audit_entry.id = id;
@@ -351,7 +352,7 @@ void	zbx_audit_update_json_append_uint64(const zbx_uint64_t id, const char *audi
 	zbx_audit_entry_t	*local_audit_entry_x = &local_audit_entry;
 
 	zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64, value);
-	if (SUCCEED == audit_field_default(table, field, buffer))
+	if (SUCCEED == audit_field_default(table, field, buffer, value))
 		return;
 
 	local_audit_entry.id = id;
@@ -394,7 +395,7 @@ void	zbx_audit_update_json_append_int(const zbx_uint64_t id, const char *audit_o
 
 	zbx_snprintf(buffer, sizeof(buffer), "%d", value);
 
-	if (SUCCEED == audit_field_default(table, field, buffer))
+	if (SUCCEED == audit_field_default(table, field, buffer, 0))
 	{
 		return;
 	}
@@ -412,7 +413,7 @@ void	zbx_audit_update_json_append_double(const zbx_uint64_t id, const char *audi
 
 	zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_DBL, value);
 
-	if (SUCCEED == audit_field_default(table, field, buffer))
+	if (SUCCEED == audit_field_default(table, field, buffer, 0))
 	{
 		return;
 	}
