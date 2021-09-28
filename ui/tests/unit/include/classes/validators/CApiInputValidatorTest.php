@@ -272,7 +272,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_STRING_UTF8, 'in' => 'xml,json'],
 				'XML',
 				'/1/name',
-				'Invalid parameter "/1/name": value must be one of xml, json.'
+				'Invalid parameter "/1/name": value must be one of "xml", "json".'
 			],
 			[
 				['type' => API_STRING_UTF8, 'in' => '\\,,.'],
@@ -375,7 +375,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_STRINGS_UTF8, 'in' => 'hostid,name'],
 				['hostid', 'host'],
 				'/output',
-				'Invalid parameter "/output/2": value must be one of hostid, name.'
+				'Invalid parameter "/output/2": value must be one of "hostid", "name".'
 			],
 			[
 				['type' => API_STRINGS_UTF8, 'in' => 'hostid,name', 'uniq' => true],
@@ -393,7 +393,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_STRINGS_UTF8, 'in' => '\\,,.,/,'],
 				['abc', '.', '/', ''],
 				'/output',
-				'Invalid parameter "/output/1": value must be empty or one of ,, ., /.'
+				'Invalid parameter "/output/1": value must be empty or one of ",", ".", "/".'
 			],
 			[
 				['type' => API_STRINGS_UTF8, 'in' => ''],
@@ -405,19 +405,19 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_STRINGS_UTF8, 'in' => 'a'],
 				['abc'],
 				'/output',
-				'Invalid parameter "/output/1": value must be a.'
+				'Invalid parameter "/output/1": value must be "a".'
 			],
 			[
 				['type' => API_STRINGS_UTF8, 'in' => 'a,b'],
 				['abc'],
 				'/output',
-				'Invalid parameter "/output/1": value must be one of a, b.'
+				'Invalid parameter "/output/1": value must be one of "a", "b".'
 			],
 			[
 				['type' => API_STRINGS_UTF8, 'in' => 'a,b,'],
 				['abc'],
 				'/output',
-				'Invalid parameter "/output/1": value must be empty or one of a, b.'
+				'Invalid parameter "/output/1": value must be empty or one of "a", "b".'
 			],
 			[
 				['type' => API_INT32],
@@ -1878,7 +1878,7 @@ class CApiInputValidatorTest extends TestCase {
 					['type' => '3', 'value' => 'c']
 				],
 				'/',
-				'Invalid parameter "/2/value": value must be empty or a.'
+				'Invalid parameter "/2/value": value must be empty or "a".'
 			],
 			[
 				['type' => API_OBJECTS, 'fields' => [
@@ -1894,7 +1894,7 @@ class CApiInputValidatorTest extends TestCase {
 					['type' => '3', 'value' => 'c']
 				],
 				'/',
-				'Invalid parameter "/3/value": value must be one of d, e, f.'
+				'Invalid parameter "/3/value": value must be one of "d", "e", "f".'
 			],
 			[
 				['type' => API_OBJECTS, 'fields' => [
@@ -1910,7 +1910,7 @@ class CApiInputValidatorTest extends TestCase {
 					['type' => '3', 'value' => 'c']
 				],
 				'/',
-				'Invalid parameter "/3/value": value must be empty or one of d, e, f.'
+				'Invalid parameter "/3/value": value must be empty or one of "d", "e", "f".'
 			],
 			[
 				['type' => API_OBJECTS, 'fields' => [
@@ -3107,7 +3107,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_OUTPUT],
 				'count',
 				'/output',
-				'Invalid parameter "/output": value must be extend.'
+				'Invalid parameter "/output": value must be "extend".'
 			],
 			[
 				['type' => API_OUTPUT, 'flags' => API_ALLOW_COUNT],
@@ -3119,13 +3119,13 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_OUTPUT],
 				'',
 				'/output',
-				'Invalid parameter "/output": value must be extend.'
+				'Invalid parameter "/output": value must be "extend".'
 			],
 			[
 				['type' => API_OUTPUT, 'flags' => API_ALLOW_COUNT],
 				'',
 				'/output',
-				'Invalid parameter "/output": value must be one of extend, count.'
+				'Invalid parameter "/output": value must be one of "extend", "count".'
 			],
 			[
 				['type' => API_OUTPUT],
@@ -3180,7 +3180,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_OUTPUT, 'in' => 'hostid,name'],
 				['hostid', 'host'],
 				'/output',
-				'Invalid parameter "/output/2": value must be one of hostid, name.'
+				'Invalid parameter "/output/2": value must be one of "hostid", "name".'
 			],
 			[
 				['type' => API_OUTPUT, 'in' => 'hostid,name'],
@@ -3307,13 +3307,13 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_SORTORDER],
 				'',
 				'/sortorder',
-				'Invalid parameter "/sortorder": value must be one of ASC, DESC.'
+				'Invalid parameter "/sortorder": value must be one of "ASC", "DESC".'
 			],
 			[
 				['type' => API_SORTORDER],
 				['asc'],
 				'/sortorder',
-				'Invalid parameter "/sortorder/1": value must be one of ASC, DESC.'
+				'Invalid parameter "/sortorder/1": value must be one of "ASC", "DESC".'
 			],
 			[
 				['type' => API_SORTORDER],
