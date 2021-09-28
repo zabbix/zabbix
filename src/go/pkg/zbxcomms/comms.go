@@ -328,10 +328,13 @@ func (c *Listener) Close() (err error) {
 	return c.listener.Close()
 }
 
-func Exchange(address string, localAddr *net.Addr, timeout time.Duration, data []byte, args ...interface{}) ([]byte, error) {
-	log.Tracef("connecting to [%s]", address)
+func Exchange(addresses *[]string, localAddr *net.Addr, timeout time.Duration, data []byte, args ...interface{}) ([]byte, error) {
+	log.Tracef("connecting to [%s]", (*addresses)[0])
 
 	var tlsconfig *tls.Config
+	var err error
+	var c *Connection
+
 	if len(args) > 0 {
 		var ok bool
 		if tlsconfig, ok = args[0].(*tls.Config); !ok {
@@ -339,30 +342,40 @@ func Exchange(address string, localAddr *net.Addr, timeout time.Duration, data [
 		}
 	}
 
-	c, err := Open(address, localAddr, timeout, TimeoutModeFixed, tlsconfig)
+	for i := 0; i < len(*addresses); i++ {
+		c, err = Open((*addresses)[0], localAddr, timeout, TimeoutModeFixed, tlsconfig)
+		if err == nil {
+			break
+		}
+
+		log.Tracef("cannot connect to [%s]: %s", (*addresses)[0], err)
+		tmp := (*addresses)[0]
+		*addresses = (*addresses)[1:]
+		*addresses = append(*addresses, tmp)
+	}
+
 	if err != nil {
-		log.Tracef("cannot connect to [%s]: %s", address, err)
 		return nil, err
 	}
 
 	defer c.Close()
 
-	log.Tracef("sending [%s] to [%s]", string(data), address)
+	log.Tracef("sending [%s] to [%s]", string(data), (*addresses)[0])
 
 	err = c.Write(data)
 	if err != nil {
-		log.Tracef("cannot send to [%s]: %s", address, err)
+		log.Tracef("cannot send to [%s]: %s", (*addresses)[0], err)
 		return nil, err
 	}
 
-	log.Tracef("receiving data from [%s]", address)
+	log.Tracef("receiving data from [%s]", (*addresses)[0])
 
 	b, err := c.Read()
 	if err != nil {
-		log.Tracef("cannot receive data from [%s]: %s", address, err)
+		log.Tracef("cannot receive data from [%s]: %s", (*addresses)[0], err)
 		return nil, err
 	}
-	log.Tracef("received [%s] from [%s]", string(b), address)
+	log.Tracef("received [%s] from [%s]", string(b), (*addresses)[0])
 
 	if len(b) == 0 {
 		return nil, errors.New("connection closed")

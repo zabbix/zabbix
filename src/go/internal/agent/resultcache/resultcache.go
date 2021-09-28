@@ -201,7 +201,7 @@ func createTableQuery(table string, id int) string {
 		table, id)
 }
 
-func prepareDiskCache(options *agent.AgentOptions, addresses []string, hostnames []string) (err error) {
+func prepareDiskCache(options *agent.AgentOptions, addresses [][]string, hostnames []string) (err error) {
 	type activeCombination struct {
 		address  string
 		hostname string
@@ -234,7 +234,7 @@ func prepareDiskCache(options *agent.AgentOptions, addresses []string, hostnames
 
 	for _, addr := range addresses {
 		for _, host := range hostnames {
-			combinations = append(combinations, activeCombination{address: addr, hostname: host})
+			combinations = append(combinations, activeCombination{address: addr[0], hostname: host})
 		}
 	}
 
@@ -329,7 +329,7 @@ addressCheck:
 	return nil
 }
 
-func Prepare(options *agent.AgentOptions, addresses []string, hostnames []string) (err error) {
+func Prepare(options *agent.AgentOptions, addresses [][]string, hostnames []string) (err error) {
 	if options.EnablePersistentBuffer == 1 && options.PersistentBufferFile == "" {
 		return errors.New("\"EnablePersistentBuffer\" parameter misconfiguration: \"PersistentBufferFile\" parameter is not set")
 	}

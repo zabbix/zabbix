@@ -31,14 +31,14 @@ import (
 )
 
 type activeConnection struct {
-	address   string
+	addresses []string
 	hostname  string
 	localAddr net.Addr
 	tlsConfig *tls.Config
 }
 
 func (c *activeConnection) Write(data []byte, timeout time.Duration) (err error) {
-	b, err := zbxcomms.Exchange(c.address, &c.localAddr, timeout, data, c.tlsConfig)
+	b, err := zbxcomms.Exchange(&c.addresses, &c.localAddr, timeout, data, c.tlsConfig)
 	if err != nil {
 		return err
 	}
@@ -61,7 +61,7 @@ func (c *activeConnection) Write(data []byte, timeout time.Duration) (err error)
 }
 
 func (c *activeConnection) Addr() (s string) {
-	return c.address
+	return c.addresses[0]
 }
 
 func (c *activeConnection) Hostname() (s string) {
