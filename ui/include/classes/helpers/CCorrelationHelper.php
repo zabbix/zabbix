@@ -100,21 +100,6 @@ class CCorrelationHelper {
 	}
 
 	/**
-	 * Return the label of correlation operation type.
-	 *
-	 * @static
-	 *
-	 * @param array $operation  An array of correlation operation data.
-	 *
-	 * @return string
-	 */
-	public static function getOperationLabel(array $operation): string {
-		$types = self::getOperationTypes();
-
-		return $types[$operation['type']];
-	}
-
-	/**
 	 * Returns the HTML representation of a correlation condition.
 	 *
 	 * @static

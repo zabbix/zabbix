@@ -100,7 +100,7 @@ if ($data['correlations']) {
 		CArrayHelper::sort($correlation['operations'], ['type']);
 
 		foreach ($correlation['operations'] as $operation) {
-			$operations[] = CCorrelationHelper::getOperationLabel($operation);
+			$operations[] = CCorrelationHelper::getOperationTypes()[$operation['type']];
 			$operations[] = BR();
 		}
 
