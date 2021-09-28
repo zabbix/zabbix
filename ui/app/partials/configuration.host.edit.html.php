@@ -334,13 +334,13 @@ $tags_tab = new CPartial('configuration.tags.tab', [
 
 // Macros tab.
 $macros_tab = (new CFormList('macrosFormList'))
-	->addRow(null, (new CRadioButtonList('show_inherited_macros', 0))
+	->addRow(null, (new CRadioButtonList('show_inherited_macros', (int) $data['show_inherited_macros']))
 		->addValue(_('Host macros'), 0)
 		->addValue(_('Inherited and host macros'), 1)
 		->setModern(true)
 	)
 	->addRow(null,
-		new CPartial('hostmacros.list.html', [
+		new CPartial($data['show_inherited_macros'] ? 'hostmacros.inherited.list.html' : 'hostmacros.list.html', [
 			'macros' => $data['host']['macros'],
 			'readonly' => $host_is_discovered
 		]), 'macros_container'

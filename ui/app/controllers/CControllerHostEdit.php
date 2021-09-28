@@ -65,6 +65,7 @@ class CControllerHostEdit extends CController {
 									]),
 			'ipmi_username'		=> 'db hosts.ipmi_username',
 			'ipmi_password'		=> 'db hosts.ipmi_password',
+			'show_inherited_macros' => 'in 0,1',
 			'tls_connect'		=> 'db hosts.tls_connect|in '.implode(',', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK,
 										HOST_ENCRYPTION_CERTIFICATE
 									]),
@@ -183,6 +184,7 @@ class CControllerHostEdit extends CController {
 			'clone_hostid' => $clone_hostid,
 			'host' => $this->host,
 			'is_psk_edit' => $this->hasInput('tls_psk_identity') && $this->hasInput('tls_psk'),
+			'show_inherited_macros' => $this->getInput('show_inherited_macros', 0),
 			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
 			'warning' => null,
 			'user' => [
@@ -451,11 +453,29 @@ class CControllerHostEdit extends CController {
 				'preservekeys' => true
 			]);
 
-			$inputs['macros'] = array_map(function ($macro) {
+			// Remove inherited macros data.
+			$macros = cleanInheritedMacros($this->getInput('macros', []));
+
+			// Remove empty new macro lines.
+			$macros = array_filter($macros, function ($macro) {
+				$keys = array_flip(['hostmacroid', 'macro', 'value', 'description']);
+
+				return (bool) array_filter(array_intersect_key($macro, $keys));
+			});
+
+			$macros = array_map(function ($macro) {
 				unset($macro['hostmacroid']);
 
 				return $macro + ['description' => ''];
-			}, $this->getInput('macros', []));
+			}, $macros);
+
+			// Add inherited macros to host macros.
+			$inputs['macros'] = $this->getInput('show_inherited_macros', 0)
+				? mergeInheritedMacros($macros, getInheritedMacros(array_keys($linked_templates)))
+				: $macros;
+
+			// Sort only after inherited macros are added. Otherwise the list will look chaotic.
+			$inputs['macros'] = array_values(order_macros($inputs['macros'], 'macro'));
 
 			$inputs['valuemaps'] = array_map(function ($valuemap) {
 				unset($valuemap['valuemapid']);
