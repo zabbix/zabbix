@@ -28,26 +28,59 @@
 	$(() => {
 		$('#imagetype').on('change', (e) => redirect(e.target.value));
 
-		getImages();
+		lazy_load.load(document.querySelectorAll('.lazyload-image img'));
 	});
 
-	async function getImages() {
-		const images = document.querySelectorAll('.lazyload-image img');
+	class lazyLoadImages {
 
-		if (images.length == 0) {
-			return;
+		constructor(root) {
+			this.options = {
+				root: root,
+				rootMargin: '0px 0px 0px 0px',
+				threshold: 1
+			}
+			const self = this;
+
+			new Promise((resolve) => {
+				self.observer = new IntersectionObserver(async (entries) => {
+					for (let i = 0; i < entries.length; i++) {
+						const entry = entries[i];
+
+						if (entry.isIntersecting) {
+							continue;
+						}
+
+						self.observer.unobserve(entry.target);
+
+						await self.imageLoadHandler(entry.target);
+					}
+
+					resolve();
+				}, this.options);
+			});
 		}
 
-		for (let i = 0; i < images.length; i++) {
-			await getImage(images[i]);
+		load(elems) {
+			if (elems.length == 0) {
+				return;
+			}
+
+			for (let i = 0; i < elems.length; i++) {
+				this.observer.observe(elems[i]);
+			}
+		}
+
+		async imageLoadHandler(elem) {
+			return new Promise((resolve, reject) => {
+				elem.onload = () => {
+					elem.removeAttribute('data-src');
+					resolve(elem);
+				};
+				elem.onerror = reject;
+				elem.src = elem.dataset.src;
+			});
 		}
 	}
 
-	async function getImage(elem) {
-		return new Promise((resolve, reject) => {
-			elem.onload = () => resolve(elem);
-			elem.onerror = reject;
-			elem.src = elem.dataset.src;
-		});
-	}
+	const lazy_load = new lazyLoadImages(document.querySelector('.adm-img'));
 </script>
