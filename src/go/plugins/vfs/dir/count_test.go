@@ -20,6 +20,8 @@
 package dir
 
 import (
+	"io/fs"
+	"reflect"
 	"testing"
 	"time"
 )
@@ -48,6 +50,7 @@ func Test_parseByte(t *testing.T) {
 			got, err := parseByte(tt.args.in)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("parseByte() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
 			if got != tt.want {
@@ -67,12 +70,12 @@ func Test_parseTime(t *testing.T) {
 		want    time.Duration
 		wantErr bool
 	}{
-		{"+second", args{"60"}, time.Duration(1 * time.Minute), false},
-		{"+second_suffix", args{"60s"}, time.Duration(1 * time.Minute), false},
-		{"+minute", args{"1m"}, time.Duration(1 * time.Minute), false},
-		{"+hour", args{"1h"}, time.Duration(1 * time.Hour), false},
-		{"+hour", args{"1d"}, time.Duration(1 * time.Hour * dayMultiplier), false},
-		{"+hour", args{"1w"}, time.Duration(1 * time.Hour * dayMultiplier * weekMultiplier), false},
+		{"+second", args{"60"}, time.Minute, false},
+		{"+second_suffix", args{"60s"}, time.Minute, false},
+		{"+minute", args{"1m"}, time.Minute, false},
+		{"+hour", args{"1h"}, time.Hour, false},
+		{"+hour", args{"1d"}, time.Hour * dayMultiplier, false},
+		{"+hour", args{"1w"}, time.Hour * dayMultiplier * weekMultiplier, false},
 		{"-empty", args{""}, 0, false},
 		{"-invalid_string", args{"foobar"}, 0, true},
 		{"-invalid_suffix", args{"1A"}, 0, true},
@@ -82,10 +85,35 @@ func Test_parseTime(t *testing.T) {
 			got, err := parseTime(tt.args.in)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("parseTime() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
 			if got != tt.want {
 				t.Errorf("parseTime() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_getAllMode(t *testing.T) {
+	tests := []struct {
+		name string
+		want map[fs.FileMode]bool
+	}{
+		{"new", map[fs.FileMode]bool{
+			modeFile:          true,
+			fs.ModeDir:        true,
+			fs.ModeSymlink:    true,
+			fs.ModeSocket:     true,
+			fs.ModeDevice:     true,
+			fs.ModeCharDevice: true,
+			fs.ModeNamedPipe:  true,
+		}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := getAllMode(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("getAllMode() = %v, want %v", got, tt.want)
 			}
 		})
 	}

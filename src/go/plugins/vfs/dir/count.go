@@ -34,6 +34,19 @@ import (
 )
 
 const (
+	emptyParam = iota
+	firstParam
+	secondParam
+	thirdParam
+	fourthParam
+	fifthParam
+	sixthParam
+	seventhParam
+	eightParam
+	ninthParam
+	tenthParam
+	eleventhParam
+
 	modeFile = 0
 
 	kilobyteType = 'K'
@@ -41,7 +54,7 @@ const (
 	gigabyteType = 'G'
 	terabyteType = 'T'
 
-	kb = int64(1000)
+	kb = 1000
 	mb = kb * 1000
 	gb = mb * 1000
 	tb = gb * 1000
@@ -52,8 +65,8 @@ const (
 	dayType     = 'd'
 	weekType    = 'w'
 
-	dayMultiplier  = time.Duration(24)
-	weekMultiplier = time.Duration(7)
+	dayMultiplier  = 24
+	weekMultiplier = 7
 )
 
 //Plugin -
@@ -64,9 +77,13 @@ type Plugin struct {
 type countParams struct {
 	path          string
 	minSize       string
+	parsedMinSize int64
 	maxSize       string
+	parsedMaxSize int64
 	minAge        string
+	parsedMinAge  time.Time
 	maxAge        string
+	parsedMaxAge  time.Time
 	maxDepth      int
 	typesInclude  map[fs.FileMode]bool
 	typesExclude  map[fs.FileMode]bool
@@ -90,7 +107,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 }
 
 func (p *Plugin) exportCount(params []string) (result interface{}, err error) {
-	cp, err := parseParams(params)
+	cp, err := getParams(params)
 	if err != nil {
 		return
 	}
@@ -98,106 +115,21 @@ func (p *Plugin) exportCount(params []string) (result interface{}, err error) {
 	return cp.getDirCount()
 }
 
-func (cp countParams) getDirCount() (int, error) {
+func (cp *countParams) getDirCount() (int, error) {
 	var count int
 
-	ogLength := len(strings.SplitAfter(cp.path, string(filepath.Separator)))
+	length := len(strings.SplitAfter(cp.path, string(filepath.Separator)))
 
-	var minSize, maxSize int64
-	var minAge, maxAge time.Time
-
-	var err error
-
-	if cp.minSize != "" {
-		minSize, err = parseByte(cp.minSize)
-		if err != nil {
-			return 0, zbxerr.ErrorInvalidParams.Wrap(err)
-		}
-	}
-
-	if cp.maxSize != "" {
-		maxSize, err = parseByte(cp.maxSize)
-		if err != nil {
-			return 0, zbxerr.ErrorInvalidParams.Wrap(err)
-		}
-	}
-
-	if cp.minAge != "" {
-		age, err := parseTime(cp.minAge)
-		if err != nil {
-			return 0, zbxerr.ErrorInvalidParams.Wrap(err)
-		}
-
-		minAge = time.Now().Add(-age)
-	}
-
-	if cp.maxAge != "" {
-		age, err := parseTime(cp.maxAge)
-		if err != nil {
-			return 0, zbxerr.ErrorInvalidParams.Wrap(err)
-		}
-
-		maxAge = time.Now().Add(-age)
+	err := cp.setMinMaxParams()
+	if err != nil {
+		return 0, zbxerr.ErrorInvalidParams.Wrap(err)
 	}
 
 	err = filepath.WalkDir(cp.path,
 		func(p string, d fs.DirEntry, err error) error {
-			if err != nil {
+			s, err := cp.skip(p, length, d, err)
+			if s {
 				return err
-			}
-
-			if p == cp.path {
-				return nil
-			}
-
-			length := len(strings.SplitAfter(p, string(filepath.Separator)))
-			if cp.maxDepth > 0 && length-ogLength > cp.maxDepth {
-				return fs.SkipDir
-			}
-
-			if cp.regInclude != nil && !cp.regInclude.Match([]byte(d.Name())) {
-				return nil
-			}
-
-			if cp.regExclude != nil && cp.regExclude.Match([]byte(d.Name())) {
-				return nil
-			}
-
-			if cp.dirRegExclude != nil && d.IsDir() && cp.dirRegExclude.Match([]byte(d.Name())) {
-				return fs.SkipDir
-			}
-
-			if len(cp.typesInclude) > 1 && !cp.typesInclude[d.Type()] {
-				return nil
-			}
-
-			if len(cp.typesExclude) > 1 && cp.typesExclude[d.Type()] {
-				return nil
-			}
-
-			i, err := d.Info()
-			if err != nil {
-				return err
-			}
-
-			if cp.minSize != "" {
-				if minSize > i.Size() {
-					return nil
-				}
-			}
-
-			if cp.maxSize != "" {
-				if maxSize < i.Size() {
-					return nil
-				}
-			}
-
-			if !i.ModTime().After(minAge) {
-				return nil
-			}
-
-			if i.ModTime().Before(maxAge) {
-				return nil
 			}
 
 			count++
@@ -208,81 +140,257 @@ func (cp countParams) getDirCount() (int, error) {
 	if err != nil {
 		return 0, zbxerr.ErrorCannotParseResult.Wrap(err)
 	}
+
 	return count, nil
 }
 
-func parseParams(params []string) (out countParams, err error) {
+func (cp *countParams) skip(path string, length int, d fs.DirEntry, err error) (bool, error) {
+	var s bool
+
+	s, err = cp.skipPath(path, length, err)
+	if s {
+		return true, err
+	}
+
+	s, err = cp.skipRegex(d)
+	if s {
+		return true, err
+	}
+
+	s = cp.skipType(d)
+	if s {
+		return true, nil
+	}
+
+	s, err = cp.skipInfo(d)
+	if s {
+		return true, err
+	}
+
+	return false, nil
+}
+
+func (cp *countParams) skipPath(path string, length int, err error) (bool, error) {
+	if err != nil {
+		return true, err
+	}
+
+	if path == cp.path {
+		return true, nil
+	}
+
+	currentLength := len(strings.SplitAfter(path, string(filepath.Separator)))
+	if cp.maxDepth > 0 && currentLength-length > cp.maxDepth {
+		return true, fs.SkipDir
+	}
+
+	return false, nil
+}
+
+func (cp *countParams) skipRegex(d fs.DirEntry) (bool, error) {
+	if cp.regInclude != nil && !cp.regInclude.Match([]byte(d.Name())) {
+		return true, nil
+	}
+
+	if cp.regExclude != nil && cp.regExclude.Match([]byte(d.Name())) {
+		return true, nil
+	}
+
+	if cp.dirRegExclude != nil && d.IsDir() && cp.dirRegExclude.Match([]byte(d.Name())) {
+		return true, fs.SkipDir
+	}
+
+	return false, nil
+}
+
+func (cp *countParams) skipType(d fs.DirEntry) bool {
+
+	if len(cp.typesInclude) > 1 && !cp.typesInclude[d.Type()] {
+		return true
+	}
+
+	if len(cp.typesExclude) > 1 && cp.typesExclude[d.Type()] {
+		return true
+	}
+
+	return false
+}
+
+func (cp *countParams) skipInfo(d fs.DirEntry) (bool, error) {
+	i, err := d.Info()
+	if err != nil {
+		return true, err
+	}
+
+	if cp.minSize != "" {
+		if cp.parsedMinSize > i.Size() {
+			return true, nil
+		}
+	}
+
+	if cp.maxSize != "" {
+		if cp.parsedMaxSize < i.Size() {
+			return true, nil
+		}
+	}
+
+	if !i.ModTime().After(cp.parsedMinAge) {
+		return true, nil
+	}
+
+	if i.ModTime().Before(cp.parsedMaxAge) {
+		return true, nil
+	}
+
+	return false, nil
+}
+
+func (cp *countParams) setMinMaxParams() (err error) {
+	err = cp.setMinParams()
+	if err != nil {
+		return
+	}
+
+	err = cp.setMaxParams()
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+func (cp *countParams) setMaxParams() (err error) {
+	if cp.maxSize != "" {
+		cp.parsedMaxSize, err = parseByte(cp.maxSize)
+		if err != nil {
+			return
+		}
+	}
+
+	if cp.maxAge != "" {
+		var age time.Duration
+		age, err = parseTime(cp.maxAge)
+		if err != nil {
+			return
+		}
+
+		cp.parsedMaxAge = time.Now().Add(-age)
+	}
+
+	return
+}
+
+func (cp *countParams) setMinParams() (err error) {
+	if cp.minSize != "" {
+		cp.parsedMinSize, err = parseByte(cp.minSize)
+		if err != nil {
+			err = zbxerr.ErrorInvalidParams.Wrap(err)
+
+			return
+		}
+	}
+
+	if cp.minAge != "" {
+		var age time.Duration
+		age, err = parseTime(cp.minAge)
+		if err != nil {
+			return
+		}
+
+		cp.parsedMinAge = time.Now().Add(-age)
+	}
+
+	return
+}
+
+func getParams(params []string) (out countParams, err error) {
 	out.maxDepth = -1
 
 	switch len(params) {
-	case 11:
+	case eleventhParam:
 		out.dirRegExclude, err = parseReg(params[10])
 		if err != nil {
 			err = zbxerr.New("Invalid eleventh parameter.").Wrap(err)
+
 			return
 		}
+
 		fallthrough
-	case 10:
+	case tenthParam:
 		out.maxAge = params[9]
 
 		fallthrough
-	case 9:
+	case ninthParam:
 		out.minAge = params[8]
 
 		fallthrough
-	case 8:
+	case eightParam:
 		out.maxSize = params[7]
+
 		fallthrough
-	case 7:
+	case seventhParam:
 		out.minSize = params[6]
+
 		fallthrough
-	case 6:
+	case sixthParam:
 		if params[5] != "" {
-			out.maxDepth, err = strconv.Atoi(string(params[5]))
+			out.maxDepth, err = strconv.Atoi(params[5])
 			if err != nil {
 				err = zbxerr.New("Invalid sixth parameter.").Wrap(err)
+
 				return
 			}
 		}
 
 		fallthrough
-	case 5:
+	case fifthParam:
 		out.typesExclude, err = parseType(params[4], true)
 		if err != nil {
 			err = zbxerr.New("Invalid fifth parameter.").Wrap(err)
+
 			return
 		}
+
 		fallthrough
-	case 4:
+	case fourthParam:
 		out.typesInclude, err = parseType(params[3], false)
 		if err != nil {
 			err = zbxerr.New("Invalid fourth parameter.").Wrap(err)
+
 			return
 		}
+
 		fallthrough
-	case 3:
+	case thirdParam:
 		out.regExclude, err = parseReg(params[2])
 		if err != nil {
 			err = zbxerr.New("Invalid third parameter.").Wrap(err)
+
 			return
 		}
+
 		fallthrough
-	case 2:
+	case secondParam:
 		out.regInclude, err = parseReg(params[1])
 		if err != nil {
 			err = zbxerr.New("Invalid second parameter.").Wrap(err)
+
 			return
 		}
+
 		fallthrough
-	case 1:
+	case firstParam:
 		out.path = params[0]
-	case 0:
-		err = zbxerr.New("Invalid first parameter.")
+	case emptyParam:
+		err = zbxerr.ErrorTooFewParameters
+
 		return
 	default:
-		err = zbxerr.ErrorInvalidParams
+		err = zbxerr.ErrorTooManyParameters
+
 		return
 	}
+	fmt.Println("incl", out.typesInclude)
 
 	return
 }
@@ -295,63 +403,75 @@ func parseReg(in string) (*regexp.Regexp, error) {
 	return regexp.Compile(in)
 }
 
-func parseType(in string, exclude bool) (map[fs.FileMode]bool, error) {
-	types := strings.SplitAfter(in, ",")
-	out := make(map[fs.FileMode]bool)
-
+func parseType(in string, exclude bool) (out map[fs.FileMode]bool, err error) {
 	if in == "" {
-		switch exclude {
-		case true:
-			return nil, nil
-		case false:
-			out[modeFile] = true
-			out[fs.ModeDir] = true
-			out[fs.ModeSymlink] = true
-			out[fs.ModeSocket] = true
-			out[fs.ModeDevice] = true
-			out[fs.ModeCharDevice] = true
-			out[fs.ModeNamedPipe] = true
-
-			return out, nil
-		}
+		return getEmptyType(exclude), nil
 	}
+
+	out = make(map[fs.FileMode]bool)
+	types := strings.SplitAfter(in, ",")
 
 	for _, t := range types {
 		switch t {
-		case "file":
-			out[modeFile] = true
-		case "dir":
-			out[fs.ModeDir] = true
-		case "sym":
-			out[fs.ModeSymlink] = true
-		case "sock":
-			out[fs.ModeSocket] = true
-		case "bdev":
-			out[fs.ModeDevice] = true
-		case "cdev":
-			out[fs.ModeCharDevice] = true
-		case "fifo":
-			out[fs.ModeNamedPipe] = true
-		case "dev":
-			out[fs.ModeDevice] = true
-			out[fs.ModeCharDevice] = true
 		case "all":
-			out[modeFile] = true
-			out[fs.ModeDir] = true
-			out[fs.ModeSymlink] = true
-			out[fs.ModeSocket] = true
-			out[fs.ModeDevice] = true
-			out[fs.ModeCharDevice] = true
-			out[fs.ModeNamedPipe] = true
-
 			//If all are set no need to iterate further
-			return out, nil
+			return getAllMode(), nil
 		default:
-			return nil, fmt.Errorf("invalid type: %s", t)
+			out, err = setIndividualType(out, t)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 
 	return out, nil
+}
+
+func setIndividualType(m map[fs.FileMode]bool, t string) (map[fs.FileMode]bool, error) {
+	switch t {
+	case "file":
+		m[modeFile] = true
+	case "dir":
+		m[fs.ModeDir] = true
+	case "sym":
+		m[fs.ModeSymlink] = true
+	case "sock":
+		m[fs.ModeSocket] = true
+	case "bdev":
+		m[fs.ModeDevice] = true
+	case "cdev":
+		m[fs.ModeCharDevice] = true
+	case "fifo":
+		m[fs.ModeNamedPipe] = true
+	case "dev":
+		m[fs.ModeDevice] = true
+		m[fs.ModeCharDevice] = true
+	default:
+		return nil, fmt.Errorf("invalid type: %s", t)
+	}
+
+	return m, nil
+}
+
+func getEmptyType(exclude bool) map[fs.FileMode]bool {
+	if exclude {
+		return nil
+	}
+
+	return getAllMode()
+}
+
+func getAllMode() map[fs.FileMode]bool {
+	out := make(map[fs.FileMode]bool)
+	out[modeFile] = true
+	out[fs.ModeDir] = true
+	out[fs.ModeSymlink] = true
+	out[fs.ModeSocket] = true
+	out[fs.ModeDevice] = true
+	out[fs.ModeCharDevice] = true
+	out[fs.ModeNamedPipe] = true
+
+	return out
 }
 
 func parseByte(in string) (int64, error) {
