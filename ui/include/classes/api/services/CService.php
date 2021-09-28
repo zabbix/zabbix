@@ -125,52 +125,25 @@ class CService extends CApiService {
 			$accessible_services = $permissions['r_services'] + $permissions['rw_services'];
 		}
 
-		$limit_services = null;
-
-		if ($options['parentids'] !== null) {
-			if ($accessible_services !== null) {
-				$options['parentids'] = array_intersect($options['parentids'],
-					array_keys([0 => true] + $accessible_services)
-				);
-			}
-
-			if ($options['deep_parentids']) {
-				$parents = array_fill_keys($options['parentids'], true);
-
-				if (!array_key_exists(0, $parents)) {
-					$_options = [
-						'output' => ['serviceupid', 'servicedownid']
-					];
-					$db_links = DBselect(DB::makeSql('services_links', $_options));
-
-					$relations = [];
-
-					while ($db_link = DBfetch($db_links)) {
-						$relations[$db_link['serviceupid']][$db_link['servicedownid']] = true;
-					}
-
-					$limit_services = [];
-
-					while ($parents) {
-						$next_parents = [];
-
-						foreach (array_intersect_key($relations, $parents) as $children) {
-							$next_parents += $children;
-						}
-
-						$parents = $next_parents;
-						$limit_services += $next_parents;
-					}
-				}
-
-				$options['parentids'] = null;
-			}
+		if ($options['parentids'] !== null && $accessible_services !== null) {
+			$options['parentids'] = array_intersect($options['parentids'],
+				array_keys([0 => true] + $accessible_services)
+			);
 		}
 
-		if ($accessible_services !== null) {
-			$limit_services = $limit_services !== null
-				? array_intersect_key($limit_services, $accessible_services)
-				: $accessible_services;
+		if ($options['parentids'] !== null && $options['deep_parentids']) {
+			$limit_services = self::getServicesByDeepParents($options['parentids']);
+
+			if ($accessible_services !== null) {
+				$limit_services = $limit_services !== null
+					? array_intersect_key($limit_services, $accessible_services)
+					: $accessible_services;
+			}
+
+			$options['parentids'] = null;
+		}
+		else {
+			$limit_services = $accessible_services;
 		}
 
 		$options['root_services'] = $permissions !== null ? $permissions['root_services'] : null;
@@ -531,6 +504,45 @@ class CService extends CApiService {
 				}
 			}
 		}
+	}
+
+	/**
+	 * @param array $parentids
+	 *
+	 * @return array|null
+	 */
+	private static function getServicesByDeepParents(array $parentids): ?array {
+		if (in_array(0, $parentids)) {
+			return null;
+		}
+
+		$parents = array_fill_keys($parentids, true);
+
+		$_options = [
+			'output' => ['serviceupid', 'servicedownid']
+		];
+		$db_links = DBselect(DB::makeSql('services_links', $_options));
+
+		$relations = [];
+
+		while ($db_link = DBfetch($db_links)) {
+			$relations[$db_link['serviceupid']][$db_link['servicedownid']] = true;
+		}
+
+		$limit_services = [];
+
+		while ($parents) {
+			$next_parents = [];
+
+			foreach (array_intersect_key($relations, $parents) as $children) {
+				$next_parents += $children;
+			}
+
+			$parents = $next_parents;
+			$limit_services += $next_parents;
+		}
+
+		return $limit_services;
 	}
 
 	/**
