@@ -27,5 +27,27 @@
 <script>
 	$(() => {
 		$('#imagetype').on('change', (e) => redirect(e.target.value));
+
+		getImages();
 	});
+
+	async function getImages() {
+		const images = document.querySelectorAll('.lazyload-image img');
+
+		if (images.length == 0) {
+			return;
+		}
+
+		for (let i = 0; i < images.length; i++) {
+			await getImage(images[i]);
+		}
+	}
+
+	async function getImage(elem) {
+		return new Promise((resolve, reject) => {
+			elem.onload = () => resolve(elem);
+			elem.onerror = reject;
+			elem.src = elem.dataset.src;
+		});
+	}
 </script>

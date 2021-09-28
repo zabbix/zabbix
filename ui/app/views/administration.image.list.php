@@ -85,16 +85,18 @@ else {
 	foreach ($data['images'] as $image) {
 		$img = ($image['imagetype'] == IMAGE_TYPE_BACKGROUND)
 			? new CLink(
-				new CImg('imgstore.php?width=200&height=200&iconid='.$image['imageid'], 'no image'),
+				(new CImg('#', 'no image'))
+					->setAttribute('data-src', 'imgstore.php?width=200&height=200&iconid='.$image['imageid']),
 				'image.php?imageid='.$image['imageid']
 			)
-			: new CImg('imgstore.php?iconid='.$image['imageid'], 'no image');
+			: (new CImg('#', 'no image'))->setAttribute('data-src', 'imgstore.php?iconid='.$image['imageid']);
 
 		$edit_url->setArgument('imageid', $image['imageid']);
 
 		$image_row->addItem(
 			(new CDiv())
 				->addClass(ZBX_STYLE_CELL)
+				->addClass('lazyload-image')
 				->addItem([$img, BR(), new CLink($image['name'], $edit_url->getUrl())])
 		);
 
