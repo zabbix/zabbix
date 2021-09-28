@@ -413,9 +413,7 @@ class CConfigurationExportBuilder {
 				'password' => $media_type['passwd'],
 				'content_type' => $media_type['content_type'],
 				'script_name' => $media_type['exec_path'],
-				'parameters' => ($media_type['type'] == MEDIA_TYPE_WEBHOOK)
-					? $media_type['parameters']
-					: $media_type['exec_params'],
+				'parameters' => self::formatMediaTypeParameters($media_type),
 				'gsm_modem' => $media_type['gsm_modem'],
 				'status' => $media_type['status'],
 				'max_sessions' => $media_type['maxsessions'],
@@ -433,6 +431,29 @@ class CConfigurationExportBuilder {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Format media type parameters.
+	 *
+	 * @static
+	 *
+	 * @param array $media_type
+	 *
+	 * @return array|string
+	 */
+	private static function formatMediaTypeParameters(array $media_type) {
+		if ($media_type['type'] == MEDIA_TYPE_EXEC) {
+			return $media_type['exec_params'];
+		}
+
+		if ($media_type['type'] == MEDIA_TYPE_WEBHOOK) {
+			CArrayHelper::sort($media_type['parameters'], ['name']);
+
+			return array_values($media_type['parameters']);
+		}
+
+		return [];
 	}
 
 	/**
