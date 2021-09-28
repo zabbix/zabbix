@@ -271,7 +271,7 @@ class CScript extends CApiService {
 
 		/*
 		 * Get general validation rules and firstly validate name uniqueness and all the possible fields, so that there
-		 * are no invalid fields for any of the script types. Unfortunaly there is also a drawback, since field types
+		 * are no invalid fields for any of the script types. Unfortunately there is also a drawback, since field types
 		 * validated before we know what rules belong to each script type.
 		 */
 		$api_input_rules = $this->getValidationRules('create', $common_fields);
@@ -514,7 +514,7 @@ class CScript extends CApiService {
 
 		/*
 		 * Get general validation rules and firstly validate name uniqueness and all the possible fields, so that there
-		 * are no invalid fields for any of the script types. Unfortunaly there is also a drawback, since field types
+		 * are no invalid fields for any of the script types. Unfortunately there is also a drawback, since field types
 		 * validated before we know what rules belong to each script type.
 		 */
 		$api_input_rules = $this->getValidationRules('update', $common_fields);
