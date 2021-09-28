@@ -87,7 +87,7 @@ class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 				'templates' => $this->processTemplates([
 					$this->getInput('add_templates', []), $this->getInput('templates', [])
 				]),
-				'clear_templates' => zbx_toObject($this->getInput('clear_templates', []), 'templateid'),
+				'templates_clear' => zbx_toObject($this->getInput('clear_templates', []), 'templateid'),
 				'macros' => $this->processUserMacros($this->getInput('macros', [])),
 				'inventory' => $inventory_enabled ? $this->getInput('host_inventory', []) : [],
 				'tls_connect' => $this->getInput('tls_connect', $this->host['tls_connect']),
