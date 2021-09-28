@@ -142,7 +142,7 @@ zabbix_export:
                 }
         
                 if (typeof response !== 'object') {
-                    throw 'Cannot create Github incident. Response is not an object. Check debug log for more information.';
+                    throw 'Failed to process response received from Github. Check debug log for more information.';
                 }
         
                 if (request.getStatus() < 200 || request.getStatus() >= 300) {
@@ -208,7 +208,7 @@ zabbix_export:
                 throw 'Field "zabbix_url" cannot be empty.';
             }
         
-            //check for backslash in the end of url and schema        
+            // Check for backslash in the end of url and schema.
             github.url = Github.urlCheckFormat(github.url);
             params.zabbix_url = Github.urlCheckFormat(params.zabbix_url);
         
