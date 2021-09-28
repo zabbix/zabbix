@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-11T08:04:12Z'
+  date: '2021-09-27T08:22:43Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -735,7 +735,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Docker: Service is down'
-                  expression: last(/Docker by Zabbix agent 2/docker.ping)=0
+                  expression: 'last(/Docker by Zabbix agent 2/docker.ping)=0'
         -
           uuid: 5e4999067e6948f893dc465f8e5a2b5f
           name: 'Docker: NCPU'
@@ -912,7 +912,7 @@ zabbix_export:
           triggers:
             -
               uuid: a4f00b4d25b54acfa61475c94651d8a5
-              expression: last(/Docker by Zabbix agent 2/docker.ping)=0
+              expression: 'last(/Docker by Zabbix agent 2/docker.ping)=0'
               name: 'Docker: Service is down'
               priority: AVERAGE
               manual_close: 'YES'
@@ -1385,6 +1385,26 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: 'Return low-level information about a container'
+              tags:
+                -
+                  tag: Application
+                  value: 'Docker: Container {#NAME}'
+            -
+              uuid: d54b82d76c7b44ca8995486e4bf46298
+              name: 'Container {#NAME}: CPU percent usage'
+              type: DEPENDENT
+              key: 'docker.container_stats.cpu_pct_usage["{#NAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.cpu_stats.cpu_usage.percent_usage
+              master_item:
+                key: 'docker.container_stats["{#NAME}"]'
               tags:
                 -
                   tag: Application
