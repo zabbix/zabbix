@@ -1058,7 +1058,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 {
 	zbx_socket_t	listen_sock;
 	char		*error = NULL;
-	int		i, j = 0;
+	int		i, j = 0, ret = SUCCEED;
 #ifdef _WINDOWS
 	DWORD		res;
 #endif
@@ -1254,8 +1254,10 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		}
 	}
 
+	ret = ZBX_EXIT_STATUS();
+
 #endif
-	zbx_on_exit(SUCCEED);
+	zbx_on_exit(ret);
 
 	return SUCCEED;
 }
