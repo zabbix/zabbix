@@ -217,6 +217,9 @@ class CControllerHostEdit extends CController {
 			CArrayHelper::sort($data['host']['tags'], ['tag', 'value']);
 		}
 
+		// Sort only after inherited macros are added. Otherwise the list will look chaotic.
+		$data['host']['macros'] = array_values(order_macros($data['host']['macros'], 'macro'));
+
 		if (!$data['host']['macros'] && $data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 			$data['host']['macros'][] = [
 				'type' => ZBX_MACRO_TYPE_TEXT,
@@ -473,9 +476,6 @@ class CControllerHostEdit extends CController {
 			$inputs['macros'] = $this->getInput('show_inherited_macros', 0)
 				? mergeInheritedMacros($macros, getInheritedMacros(array_keys($linked_templates)))
 				: $macros;
-
-			// Sort only after inherited macros are added. Otherwise the list will look chaotic.
-			$inputs['macros'] = array_values(order_macros($inputs['macros'], 'macro'));
 
 			$inputs['valuemaps'] = array_map(function ($valuemap) {
 				unset($valuemap['valuemapid']);
