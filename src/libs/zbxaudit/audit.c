@@ -147,10 +147,10 @@ int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_e
 		zbx_uint64_t proxy_hostid, zbx_uint64_t userid, const char *username, const char *clientip,
 		const char *output, const char *error)
 {
-	int	ret = SUCCEED;
-	char	auditid_cuid[CUID_LEN], execute_on_s[MAX_ID_LEN + 1], hostid_s[MAX_ID_LEN + 1],
-		eventid_s[MAX_ID_LEN + 1], proxy_hostid_s[MAX_ID_LEN + 1];
-
+	int		ret = SUCCEED;
+	char		auditid_cuid[CUID_LEN], execute_on_s[MAX_ID_LEN + 1], hostid_s[MAX_ID_LEN + 1],
+			eventid_s[MAX_ID_LEN + 1], proxy_hostid_s[MAX_ID_LEN + 1];
+	char		*details_esc;
 	struct zbx_json	details_json;
 	zbx_config_t	cfg;
 
@@ -188,26 +188,23 @@ int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_e
 		append_str_json(&details_json, AUDIT_DETAILS_ACTION_ADD, "script.command", script_command_orig);
 
 	if (NULL != output)
-	{
-		char	*output_esc;
-
-		output_esc = zbx_strdup(NULL, output);
-		zbx_json_escape(&output_esc);
-		append_str_json(&details_json, AUDIT_DETAILS_ACTION_ADD, "script.output", output_esc);
-		zbx_free(output_esc);
-	}
+		append_str_json(&details_json, AUDIT_DETAILS_ACTION_ADD, "script.output", output);
 
 	if (NULL != error)
 		append_str_json(&details_json, AUDIT_DETAILS_ACTION_ADD, "script.error", error);
+
+	details_esc = DBdyn_escape_string(details_json.buffer);
 
 	if (ZBX_DB_OK > DBexecute("insert into auditlog (auditid,userid,username,clock,action,ip,resourceid,"
 			"resourcename,resourcetype,recordsetid,details) values ('%s'," ZBX_FS_UI64 ",'%s',%d,'%d','%s',"
 			ZBX_FS_UI64 ",'%s',%d,'%s','%s')", auditid_cuid, userid, username, (int)time(NULL),
 			AUDIT_ACTION_EXECUTE, clientip, hostid, hostname, AUDIT_RESOURCE_SCRIPT, auditid_cuid,
-			details_json.buffer))
+			details_esc))
 	{
 		ret = FAIL;
 	}
+
+	zbx_free(details_esc);
 
 	zbx_json_free(&details_json);
 out:
@@ -265,6 +262,7 @@ void	zbx_audit_init(int audit_mode_set)
 void	zbx_audit_flush(void)
 {
 	char			audit_cuid[CUID_LEN], recsetid_cuid[CUID_LEN];
+	char			*details_esc;
 	zbx_hashset_iter_t	iter;
 	zbx_audit_entry_t	**audit_entry;
 	zbx_db_insert_t		db_insert_audit;
@@ -283,6 +281,7 @@ void	zbx_audit_flush(void)
 		if (AUDIT_ACTION_DELETE == (*audit_entry)->audit_action ||
 				0 != strcmp((*audit_entry)->details_json.buffer, "{}"))
 		{
+			details_esc = DBdyn_escape_string((*audit_entry)->details_json.buffer);
 #define AUDIT_USERID	0
 #define AUDIT_USERNAME	"System"
 #define AUDIT_IP	""
@@ -290,10 +289,11 @@ void	zbx_audit_flush(void)
 					(int)time(NULL), (*audit_entry)->audit_action, AUDIT_IP, (*audit_entry)->id,
 					(*audit_entry)->name, (*audit_entry)->resource_type,
 					recsetid_cuid, 0 == strcmp((*audit_entry)->details_json.buffer, "{}") ? "" :
-					(*audit_entry)->details_json.buffer);
+					details_esc);
 #undef AUDIT_USERID
 #undef AUDIT_USERNAME
 #undef AUDIT_IP
+			zbx_free(details_esc);
 		}
 	}
 
