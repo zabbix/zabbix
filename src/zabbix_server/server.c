@@ -1434,9 +1434,11 @@ static void	server_teardown(zbx_socket_t *listen_sock)
 
 	zbx_unset_child_signal_handler();
 
+#ifdef HAVE_PTHREAD_PROCESS_SHARED
 	/* Disable locks so main process doesn't hang on logging if a process was              */
 	/* killed during logging. The locks will be re-enabled after logger is reinitialized   */
 	zbx_locks_disable();
+#endif
 
 	zbx_ha_kill();
 
@@ -1459,7 +1461,9 @@ static void	server_teardown(zbx_socket_t *listen_sock)
 		exit(EXIT_FAILURE);
 	}
 
+#ifdef HAVE_PTHREAD_PROCESS_SHARED
 	zbx_locks_enable();
+#endif
 
 	if (NULL != listen_sock)
 		zbx_tcp_unlisten(listen_sock);
