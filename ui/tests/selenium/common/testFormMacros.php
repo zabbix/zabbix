@@ -501,22 +501,38 @@ abstract class testFormMacros extends CWebTest {
 
 		$form_type = ($host_type === 'host prototype') ? 'hostPrototype' : $host_type.'s';
 		if ($update) {
-			$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($name));
+			if ($host_type === 'host') {
+				$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
+				$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)->getColumn('Name');
+				$column->query('link', $name)->asPopupButton()->one()->select('Configuration');
+				$form = COverlayDialogElement::find()->asFluidForm()->one()->waitUntilVisible();
+			}
+			else {
+				$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($name));
 
-			$this->page->login()->open(
-				$is_prototype
-					? 'host_prototypes.php?form=update&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id
-					: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
-			);
+				$this->page->login()->open(
+					$is_prototype
+						? 'host_prototypes.php?form=update&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id
+						: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
+				);
+				$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
+			}
 		}
 		else {
-			$this->page->login()->open(
-				$is_prototype
-					? 'host_prototypes.php?form=create&context=host&parent_discoveryid='.$lld_id
-					: $host_type.'s.php?form=create'
-			);
+			if ($host_type === 'host') {
+				$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
+				$this->query('button:Create host')->one()->waitUntilClickable()->click();
+				$form = COverlayDialogElement::find()->asFluidForm()->one()->waitUntilVisible();
+			}
+			else {
+				$this->page->login()->open(
+					$is_prototype
+						? 'host_prototypes.php?form=create&context=host&parent_discoveryid='.$lld_id
+						: $host_type.'s.php?form=create'
+				);
+				$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
+			}
 
-			$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
 			$name = $is_prototype ? $data['Name'].' {#KEY}' : $data['Name'];
 			$form->fill([(($host_type === 'template') ? 'Template name' : 'Host name') => $name]);
 
@@ -526,7 +542,6 @@ abstract class testFormMacros extends CWebTest {
 			$form->fill(['Groups' => 'Zabbix servers']);
 		}
 
-		$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Macros');
 		$this->fillMacros($data['macros']);
 		$form->submit();
@@ -544,6 +559,11 @@ abstract class testFormMacros extends CWebTest {
 				$this->assertMessage(TEST_BAD, ($update ? 'Cannot update '.$object : 'Cannot add '.$object), $data['error']);
 				// Check that DB hash is not changed.
 				$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL_HOSTS));
+
+				if ($host_type === 'host') {
+					COverlayDialogElement::find()->one()->close();
+					COverlayDialogElement::ensureNotPresent();
+				}
 				break;
 		}
 	}
@@ -557,16 +577,26 @@ abstract class testFormMacros extends CWebTest {
 	 * @param int $lld_id			points to LLD rule id where host prototype belongs
 	 */
 	protected function checkRemoveAll($name, $host_type, $is_prototype = false, $lld_id = null) {
-		$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($name));
-
-		$this->page->login()->open(
-			$is_prototype
-				? 'host_prototypes.php?form=update&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id
-				: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
-		);
-
 		$form_type = ($host_type === 'host prototype') ? 'hostPrototype' : $host_type.'s';
-		$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
+
+		if ($host_type === 'host') {
+			$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
+			$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)->getColumn('Name');
+			$column->query('link', $name)->asPopupButton()->one()->select('Configuration');
+			$form = COverlayDialogElement::find()->asFluidForm()->one()->waitUntilVisible();
+		}
+		else {
+			$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($name));
+
+			$this->page->login()->open(
+				$is_prototype
+					? 'host_prototypes.php?form=update&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id
+					: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
+			);
+
+			$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
+		}
+
 		$form->selectTab('Macros');
 		$this->removeAllMacros();
 		$form->submit();
@@ -647,6 +677,7 @@ abstract class testFormMacros extends CWebTest {
 	 */
 	protected function checkChangeInheritedMacros($data, $host_type, $is_prototype = false, $lld_id = null) {
 		$form_type = ($host_type === 'host prototype') ? 'hostPrototype' : $host_type.'s';
+
 		if ($is_prototype) {
 			$this->page->login()->open('host_prototypes.php?form=create&context=host&parent_discoveryid='.$lld_id);
 			$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
@@ -656,8 +687,16 @@ abstract class testFormMacros extends CWebTest {
 			$form->fill(['Groups' => 'Zabbix servers']);
 		}
 		else {
-			$this->page->login()->open($host_type.'s.php?form=create');
-			$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
+			if ($host_type === 'host') {
+				$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
+				$this->query('button:Create host')->one()->waitUntilClickable()->click();
+				$form = COverlayDialogElement::find()->asFluidForm()->one()->waitUntilVisible();
+			}
+			else {
+				$this->page->login()->open($host_type.'s.php?form=create');
+				$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
+			}
+
 			$name = $host_type.' with edited global macro '.time();
 			$form->fill([
 				($host_type === 'template') ? 'Template name' : 'Host name' => $name,
@@ -773,6 +812,11 @@ abstract class testFormMacros extends CWebTest {
 				// Get new Global macro table.
 				$new_global_macros = $this->getGlobalMacrosFrotendTable();
 
+				if ($host_type === 'host') {
+					CElementQuery::getDriver()->executeScript('arguments[0].scrollTo(0, 0)',
+							[COverlayDialogElement::find()->one()->getContent()]
+					);
+				}
 				$radio_switcher->fill(ucfirst($host_type).' macros');
 				$this->page->waitUntilReady();
 				$expected_hostmacros = ($hostmacros[0]['macro'] !== '')
@@ -785,15 +829,26 @@ abstract class testFormMacros extends CWebTest {
 		}
 
 		$form->submit();
-
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD);
 		// Check saved edited macros in host/template form.
 		$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($name));
 
-		$this->page->open(
-			$is_prototype
-				? 'host_prototypes.php?form=update&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id
-				: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
-		);
+		if ($host_type === 'host') {
+			$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
+			$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
+					->getColumn('Name');
+			$column->query('link', $name)->asPopupButton()->one()->select('Configuration');
+			$form = COverlayDialogElement::find()->asFluidForm()->one()->waitUntilVisible();
+		}
+		else {
+			$this->page->open(
+				$is_prototype
+					? 'host_prototypes.php?form=update&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id
+					: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
+			);
+			$form->invalidate();
+		}
 
 		$form->selectTab('Macros');
 
@@ -851,6 +906,11 @@ abstract class testFormMacros extends CWebTest {
 				$this->assertEquals($new_global_macros, $this->getGlobalMacrosFrotendTable());
 				break;
 		}
+
+		if ($host_type === 'host') {
+			COverlayDialogElement::find()->one()->close();
+			COverlayDialogElement::ensureNotPresent();
+		}
 	}
 
 	public static function getRemoveInheritedMacrosData() {
@@ -900,20 +960,32 @@ abstract class testFormMacros extends CWebTest {
 	 * Test removing and resetting global macro on host, prototype or template.
 	 *
 	 * @param array      $data		      given data provider
-	 * @param array      $id		      host's, prototype's or template's id
 	 * @param string     $host_type	      string defining is it host, template or host prototype
+	 * @param int        $id		      host's, prototype's or template's id
 	 * @param boolean    $is_prototype    defines is it prototype or not
 	 * @param int        $lld_id		  points to LLD rule id where host prototype belongs
+	 * @param string     $name		      name of the host where macros are removed
 	 */
-	protected function checkRemoveInheritedMacros($data, $id, $host_type, $is_prototype = false, $lld_id = null) {
-		$link = $is_prototype
-			? 'host_prototypes.php?form=update&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id
-			: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0';
+	protected function checkRemoveInheritedMacros($data, $host_type, $id, $is_prototype = false,
+			$lld_id = null, $name = null) {
+		if ($host_type === 'host') {
+			$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
+			$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
+					->getColumn('Name');
+			$column->query('link', $name)->asPopupButton()->one()->select('Configuration');
+			$form = COverlayDialogElement::find()->asFluidForm()->one()->waitUntilVisible();
+		}
+		else {
+			$link = $is_prototype
+				? 'host_prototypes.php?form=update&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id
+				: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0';
 
-		$this->page->login()->open($link);
+			$this->page->login()->open($link);
 
-		$form_type = ($host_type === 'host prototype') ? 'hostPrototype' : $host_type.'s';
-		$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
+			$form_type = ($host_type === 'host prototype') ? 'hostPrototype' : $host_type.'s';
+			$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
+		}
+
 		$form->selectTab('Macros');
 		$radio_switcher = $this->query('id:show_inherited_macros')->asSegmentedRadio()->waitUntilPresent()->one();
 
@@ -987,6 +1059,11 @@ abstract class testFormMacros extends CWebTest {
 
 				$this->removeMacro($data['macros']);
 
+				if ($host_type === 'host') {
+					CElementQuery::getDriver()->executeScript('arguments[0].scrollTo(0, 0)',
+							[COverlayDialogElement::find()->one()->getContent()]
+					);
+				}
 				$radio_switcher->fill(ucfirst($host_type).' macros');
 				$this->page->waitUntilReady();
 
@@ -1040,7 +1117,19 @@ abstract class testFormMacros extends CWebTest {
 		}
 
 		$form->submit();
-		$this->page->open($link);
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD);
+
+		if ($host_type === 'host') {
+			$this->page->open('zabbix.php?action=host.view')->waitUntilReady();
+			$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
+					->getColumn('Name');
+			$column->query('link', $name)->asPopupButton()->one()->select('Configuration');
+		}
+		else {
+			$this->page->open($link);
+		}
+
 		$form->invalidate();
 		$form->selectTab('Macros');
 
@@ -1070,6 +1159,11 @@ abstract class testFormMacros extends CWebTest {
 				$this->checkInheritedGlobalMacros($expected_hostmacros);
 				break;
 		}
+		if ($host_type === 'host') {
+			COverlayDialogElement::find()->one()->close();
+			COverlayDialogElement::ensureNotPresent();
+		}
+
 	}
 
 	/**
@@ -1085,13 +1179,22 @@ abstract class testFormMacros extends CWebTest {
 	private function checkMacrosFields($name, $is_prototype, $lld_id, $form_type, $host_type, $data = null) {
 		$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($name));
 
-		$this->page->open(
-			$is_prototype
-				? 'host_prototypes.php?form=update&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id
-				: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
-		);
+		if ($host_type === 'host') {
+			$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
+			$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
+					->getColumn('Name');
+			$column->query('link', $name)->asPopupButton()->one()->select('Configuration');
+			$form = COverlayDialogElement::find()->asFluidForm()->one()->waitUntilVisible();
+		}
+		else {
+			$this->page->open(
+				$is_prototype
+					? 'host_prototypes.php?form=update&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id
+					: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
+			);
+			$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
+		}
 
-		$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Macros');
 
 		if ($data !== null) {
@@ -1109,6 +1212,11 @@ abstract class testFormMacros extends CWebTest {
 		$hostmacros = CDBHelper::getAll('SELECT macro, value, description, type FROM hostmacro where hostid ='.$id);
 
 		$this->checkInheritedGlobalMacros($hostmacros);
+
+		if ($host_type === 'host') {
+			COverlayDialogElement::find()->one()->close();
+			COverlayDialogElement::ensureNotPresent();
+		}
 	}
 
 	/**
@@ -1166,8 +1274,8 @@ abstract class testFormMacros extends CWebTest {
 	 * @param string	$url		url of configuration form of the corresponding entity
 	 * @param string	$source		type of entity that is being checked (hots, hostPrototype, template)
 	 */
-	public function checkSecretMacrosLayout($data, $url, $source) {
-		$this->openMacrosTab($url, $source, true);
+	public function checkSecretMacrosLayout($data, $url, $source, $name = null) {
+		$this->openMacrosTab($url, $source, true, $name);
 
 		// Check that value field is disabled for global macros in "Inherited and host macros" tab.
 		if (CTestArrayHelper::get($data, 'global', false)) {
@@ -1228,6 +1336,11 @@ abstract class testFormMacros extends CWebTest {
 				$this->assertFalse($value_field->getRevertButton()->isValid());
 			}
 		}
+
+		if ($source === 'hosts') {
+			COverlayDialogElement::find()->one()->close();
+			COverlayDialogElement::ensureNotPresent();
+		}
 	}
 
 	/**
@@ -1237,8 +1350,8 @@ abstract class testFormMacros extends CWebTest {
 	 * @param string	$url		url of configuration form of the corresponding entity
 	 * @param string	$source		type of entity that is being checked (hots, hostPrototype, template)
 	 */
-	public function createSecretMacros($data, $url, $source) {
-		$this->openMacrosTab($url, $source, true);
+	public function createSecretMacros($data, $url, $source, $name = null) {
+		$form = $this->openMacrosTab($url, $source, true, $name);
 
 		// Check that macro values have type plain text by default.
 		if (CTestArrayHelper::get($data, 'check_default_type', false)){
@@ -1267,10 +1380,13 @@ abstract class testFormMacros extends CWebTest {
 			$data_value_field->changeInputType(CInputGroupElement::TYPE_TEXT);
 		}
 
-		$this->query('button:Update')->one()->click();
+		$form->invalidate();
+		$form->submit();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD);
 
 		// Check value field for guest account.
-		$this->openMacrosTab($url, $source);
+		$this->openMacrosTab($url, $source, false, $name);
 		$guest_value_field = $this->getValueField($data['macro_fields']['macro']);
 
 		if (CTestArrayHelper::get($data, 'back_to_text', false)) {
@@ -1290,6 +1406,11 @@ abstract class testFormMacros extends CWebTest {
 		$this->assertEquals([$data['macro_fields']['value']['text'], $data['macro_fields']['description'], $type],
 				array_values(CDBHelper::getRow($sql))
 		);
+
+		if ($source === 'hosts') {
+			COverlayDialogElement::find()->one()->close();
+			COverlayDialogElement::ensureNotPresent();
+		}
 	}
 
 	/**
@@ -1299,8 +1420,8 @@ abstract class testFormMacros extends CWebTest {
 	 * @param string	$url		url of configuration form of the corresponding entity
 	 * @param string	$source		type of entity that is being checked (hots, hostPrototype, template)
 	 */
-	public function updateSecretMacros($data, $url, $source) {
-		$this->openMacrosTab($url, $source, true);
+	public function updateSecretMacros($data, $url, $source, $name = null) {
+		$form = $this->openMacrosTab($url, $source, true, $name);
 		$this->fillMacros([$data]);
 
 		// Check that new values are correct in Inherited and host prototype macros tab before saving the values.
@@ -1308,8 +1429,12 @@ abstract class testFormMacros extends CWebTest {
 				CInputGroupElement::TYPE_SECRET) ? true : false;
 		$this->checkInheritedTab($data, $secret);
 
-		$this->query('button:Update')->one()->click();
-		$this->openMacrosTab($url, $source);
+		$form->invalidate();
+		$form->submit();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD);
+
+		$this->openMacrosTab($url, $source, false, $name);
 
 		$value_field = $this->getValueField($data['macro']);
 		if (CTestArrayHelper::get($data['value'], 'type', CInputGroupElement::TYPE_SECRET) === CInputGroupElement::TYPE_SECRET) {
@@ -1325,6 +1450,11 @@ abstract class testFormMacros extends CWebTest {
 		// Check in DB that values of the updated macros are correct.
 		$sql = 'SELECT value FROM hostmacro WHERE macro='.zbx_dbstr($data['macro']);
 		$this->assertEquals($data['value']['text'], CDBHelper::getValue($sql));
+
+		if ($source === 'hosts') {
+			COverlayDialogElement::find()->one()->close();
+			COverlayDialogElement::ensureNotPresent();
+		}
 	}
 
 	/**
@@ -1334,8 +1464,8 @@ abstract class testFormMacros extends CWebTest {
 	 * @param string	$url		url of configuration form of the corresponding entity
 	 * @param string	$source		type of entity that is being checked (hots, hostPrototype, template)
 	 */
-	public function revertSecretMacroChanges($data, $url, $source) {
-		$this->openMacrosTab($url, $source, true);
+	public function revertSecretMacroChanges($data, $url, $source, $name = null) {
+		$form = $this->openMacrosTab($url, $source, true, $name);
 
 		$sql = 'SELECT * FROM hostmacro WHERE macro='.CDBHelper::escape($data['macro_fields']['macro']);
 		$old_values = CDBHelper::getRow($sql);
@@ -1357,40 +1487,21 @@ abstract class testFormMacros extends CWebTest {
 
 		// Press revert button and save the changes.
 		$value_field->getRevertButton()->click();
-		$this->query('button:Update')->one()->click();
+
+		$form->invalidate();
+		$form->submit();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD);
 
 		// Check that no macro value changes took place.
-		$this->openMacrosTab($url, $source);
+		$this->openMacrosTab($url, $source, false, $name);
 		$this->assertEquals('******', $this->getValueField($data['macro_fields']['macro'])->getValue());
 		$this->assertEquals($old_values, CDBHelper::getRow($sql));
-	}
 
-	/**
-	 *  Check how secret macro is resolved in item name for host, host prototype and template entities.
-	 *
-	 * @param array		$macro		given macro
-	 * @param string	$url		url of configuration form of the corresponding entity
-	 * @param string	$source		type of entity that is being checked (hots, hostPrototype, template)
-	 */
-	public function resolveSecretMacro($macro, $url, $source) {
-		$this->page->login()->open($url)->waitUntilReady();
-		$this->query('link:Items')->one()->click();
-		$this->page->waitUntilReady();
-
-		$this->assertTrue($this->query('link', 'Macro value: '.$macro['value'])->exists());
-
-		$this->openMacrosTab($url, $source);
-
-		$value_field = $this->getValueField($macro['macro']);
-		$value_field->changeInputType(CInputGroupElement::TYPE_SECRET);
-
-		$this->query('button:Update')->one()->click();
-		$this->openMacrosTab($url, $source);
-
-		$this->query('link:Items')->one()->click();
-		$this->page->waitUntilReady();
-
-		$this->assertTrue($this->query('link', 'Macro value: ******')->exists());
+		if ($source === 'hosts') {
+			COverlayDialogElement::find()->one()->close();
+			COverlayDialogElement::ensureNotPresent();
+		}
 	}
 
 	/**
@@ -1424,16 +1535,29 @@ abstract class testFormMacros extends CWebTest {
 	/**
 	 * Function opens Macros tab in corresponding instance configuration form.
 	 *
-	 * @param type $url			URL that leads to the configuration form of corresponding entity
-	 * @param type $source		type of entity that is being checked (hots, hostPrototype, template)
+	 * @param string $url		URL that leads to the configuration form of corresponding entity
+	 * @param string $source    type of entity that is being checked (host, hostPrototype, template)
 	 * @param type $login		flag that indicates whether login should occur before opening the configuration form
+	 * @param type $name		name of a host where macros are updated
 	 */
-	private function openMacrosTab($url, $source, $login = false) {
+	public function openMacrosTab($url, $source, $login = false, $name = null) {
 		if ($login) {
 			$this->page->login();
 		}
+
 		$this->page->open($url)->waitUntilReady();
-		$this->query('id:'.$source.'-form')->asForm()->one()->selectTab('Macros');
+
+		if ($source === 'hosts') {
+			$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilReady()
+					->findRow('Name', $name, true)->getColumn('Name');
+			$column->query('link', $name)->asPopupButton()->one()->select('Configuration');
+			$form = COverlayDialogElement::find()->asFluidForm()->one()->waitUntilVisible()->selectTab('Macros');
+		}
+		else {
+			$form = $this->query('id:'.$source.'-form')->asForm()->one()->selectTab('Macros');
+		}
+
+		return $form;
 	}
 
 	/**
@@ -1479,16 +1603,23 @@ abstract class testFormMacros extends CWebTest {
 		$global_macros = $this->getGlobalMacrosFrotendTable();
 
 		// Return to object's macros.
+		if ($host_type === 'host') {
+			CElementQuery::getDriver()->executeScript('arguments[0].scrollTo(0, 0)',
+					[COverlayDialogElement::find()->one()->getContent()]
+			);
+		}
 		$radio_switcher->fill(ucfirst($host_type).' macros');
 		$this->page->waitUntilReady();
 
 		return $global_macros;
 	}
 
-	public function createVaultMacros($data, $url, $source) {
-		$this->openMacrosTab($url, $source, true);
+	public function createVaultMacros($data, $url, $source, $name = null) {
+		$form = $this->openMacrosTab($url, $source, true, $name);
 		$this->fillMacros([$data['macro_fields']]);
-		$this->query('button:Update')->one()->click();
+		$form->submit();
+		$this->page->waitUntilReady();
+
 		if ($data['expected'] == TEST_BAD) {
 			$this->assertMessage($data['expected'], $data['title'], $data['message']);
 		}
@@ -1497,9 +1628,14 @@ abstract class testFormMacros extends CWebTest {
 			$sql = 'SELECT value, description, type FROM hostmacro WHERE macro='.zbx_dbstr($data['macro_fields']['macro']);
 			$this->assertEquals([$data['macro_fields']['value']['text'], $data['macro_fields']['description'], ZBX_MACRO_TYPE_VAULT],
 					array_values(CDBHelper::getRow($sql)));
-			$this->openMacrosTab($url, $source);
+			$this->openMacrosTab($url, $source, false, $name);
 			$value_field = $this->getValueField($data['macro_fields']['macro']);
 			$this->assertEquals($data['macro_fields']['value']['text'], $value_field->getValue());
+		}
+
+		if ($source === 'hosts') {
+			COverlayDialogElement::find()->one()->close();
+			COverlayDialogElement::ensureNotPresent();
 		}
 	}
 

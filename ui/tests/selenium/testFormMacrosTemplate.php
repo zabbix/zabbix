@@ -122,7 +122,7 @@ class testFormMacrosTemplate extends testFormMacros {
 	 * @onBeforeOnce prepareTemplateRemoveMacrosData
 	 */
 	public function testFormMacrosTemplate_RemoveInheritedMacro($data) {
-		$this->checkRemoveInheritedMacros($data, self::$templateid_remove_inherited, 'template');
+		$this->checkRemoveInheritedMacros($data, 'template', self::$templateid_remove_inherited);
 	}
 
 	public function getCreateSecretMacrosData() {
@@ -248,20 +248,6 @@ class testFormMacrosTemplate extends testFormMacros {
 	 */
 	public function testFormMacrosTemplate_UpdateSecretMacros($data) {
 		$this->updateSecretMacros($data, 'templates.php?form=update&templateid=99137', 'templates');
-	}
-
-	public function testFormMacrosTemplate_SecretMacroResolution() {
-		$macro = [
-			'macro' => '{$X_SECRET_HOST_MACRO_2_RESOLVE}',
-			'value' => 'Value 2 B resolved'
-		];
-		$this->resolveSecretMacro($macro, (new CUrl('zabbix.php'))
-			->setArgument('action', 'host.edit')
-			->setArgument('hostid', 99135)
-			->getUrl(),
-			'hosts',
-			'host'
-		);
 	}
 
 	public function getCreateVaultMacrosData() {

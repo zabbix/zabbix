@@ -129,7 +129,7 @@ class testFormMacrosHostPrototype extends testFormMacros {
 	 * @onBeforeOnce prepareHostPrototypeRemoveMacrosData
 	 */
 	public function testFormMacrosHostPrototype_RemoveInheritedMacro($data) {
-		$this->checkRemoveInheritedMacros($data, self::$host_prototoypeid_remove_inherited, 'host prototype',
+		$this->checkRemoveInheritedMacros($data, 'host prototype', self::$host_prototoypeid_remove_inherited,
 				self::IS_PROTOTYPE, self::LLD_ID);
 	}
 
@@ -180,7 +180,9 @@ class testFormMacrosHostPrototype extends testFormMacros {
 	 * @dataProvider getCreateSecretMacrosData
 	 */
 	public function testFormMacrosHostPrototype_CreateSecretMacros($data) {
-		$this->createSecretMacros($data, 'host_prototypes.php?form=update&context=host&parent_discoveryid=90001&hostid=99205', 'host-prototype');
+		$this->createSecretMacros($data, 'host_prototypes.php?form=update&context=host&parent_discoveryid=90001&hostid=99205',
+				'host-prototype'
+		);
 	}
 
 	public function getUpdateSecretMacrosData() {
