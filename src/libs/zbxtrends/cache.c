@@ -400,6 +400,23 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_tfc_destroy                                                  *
+ *                                                                            *
+ * Purpose: destroy trend function cache                                      *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_tfc_destroy(void)
+{
+	if (0 != CONFIG_TREND_FUNC_CACHE_SIZE)
+	{
+		zbx_mem_destroy(tfc_mem);
+		tfc_mem = NULL;
+		zbx_mutex_destroy(&tfc_lock);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_tfc_get_value                                                *
  *                                                                            *
  * Purpose: get value and state from trend function cache                     *

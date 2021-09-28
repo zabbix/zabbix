@@ -1099,7 +1099,6 @@ static void	zbx_main_sigusr_handler(int flags)
 			zbx_ha_report = 1;
 			break;
 	}
-
 }
 
 static void	zbx_check_db(void)
@@ -1222,23 +1221,9 @@ static void	server_startup(zbx_socket_t *listen_sock)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_history_init(&error))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize history storage: %s", error);
-		zbx_free(error);
-		exit(EXIT_FAILURE);
-	}
-
 	if (SUCCEED != zbx_tfc_init(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize trends read cache: %s", error);
-		zbx_free(error);
-		exit(EXIT_FAILURE);
-	}
-
-	if (FAIL == zbx_export_init(&error))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize export: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
@@ -1419,6 +1404,20 @@ static void	server_startup(zbx_socket_t *listen_sock)
 	}
 }
 
+static int	server_restart_logger(char **error)
+{
+	zabbix_close_log();
+	zbx_locks_destroy();
+
+	if (SUCCEED != zbx_locks_create(error))
+		return FAIL;
+
+	if (SUCCEED != zabbix_open_log(CONFIG_LOG_TYPE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE, error))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: server_teardown                                                  *
@@ -1426,42 +1425,46 @@ static void	server_startup(zbx_socket_t *listen_sock)
  * Purpose: terminate processes and destroy shared resources                  *
  *                                                                            *
  ******************************************************************************/
-static void	server_teardown(int ret, zbx_socket_t *listen_sock)
+static void	server_teardown(zbx_socket_t *listen_sock)
 {
-	if (NULL != listen_sock)
-		zbx_tcp_close(listen_sock);
+	int	i;
+	char	*error = NULL;
 
-	if (SUCCEED == DBtxn_ongoing())
-		DBrollback();
+	/* hard kill all zabbix processes */
 
-	if (NULL != threads)
+	zbx_unset_child_signal_handler();
+
+	zbx_ha_kill();
+
+	for (i = 0; i < threads_num; i++)
+		kill(threads[i], SIGKILL);
+
+	for (i = 0; i < threads_num; i++)
+		zbx_thread_wait(threads[i]);
+
+	zbx_free(threads);
+	zbx_free(threads_flags);
+
+	zbx_set_child_signal_handler();
+
+	/* restart logger because it could have been stuck in lock */
+	if (SUCCEED != server_restart_logger(&error))
 	{
-		zbx_threads_wait(threads, threads_flags, threads_num, ret);	/* wait for all child processes to exit */
-		zbx_free(threads);
-		zbx_free(threads_flags);
+		zbx_error("cannot restart logger: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
 	}
-#ifdef HAVE_PTHREAD_PROCESS_SHARED
-	zbx_locks_disable();
-#endif
-	free_metrics();
-	zbx_ipc_service_free_env();
 
-	DBconnect(ZBX_DB_CONNECT_EXIT);
+	if (NULL != listen_sock)
+		zbx_tcp_unlisten(listen_sock);
 
-	free_database_cache();
-
-	DBclose();
-
-	free_configuration_cache();
-
-	/* free history value cache */
+	/* destroy shared caches */
+	zbx_tfc_destroy();
 	zbx_vc_destroy();
-
-	/* free vmware support */
-	if (0 != CONFIG_VMWARE_FORKS)
-		zbx_vmware_destroy();
-
+	zbx_vmware_destroy();
 	free_selfmon_collector();
+	free_configuration_cache();
+	free_database_cache(ZBX_SYNC_NONE);
 }
 
 int	MAIN_ZABBIX_ENTRY(int flags)
@@ -1612,9 +1615,23 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	if (SUCCEED != zbx_db_check_instanceid())
 		exit(EXIT_FAILURE);
 
-	if (SUCCEED != zbx_ha_start(&error))
+	if (SUCCEED != zbx_ha_start(&error, ZBX_NODE_STATUS_UNKNOWN))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot start HA manager: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
+	if (SUCCEED != zbx_history_init(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize history storage: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
+	if (FAIL == zbx_export_init(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize export: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
@@ -1653,14 +1670,40 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			break;
 		}
 
-		if (ZBX_NODE_STATUS_UNKNOWN != new_ha_status)
+		if (ZBX_NODE_STATUS_UNKNOWN != new_ha_status && ha_status != new_ha_status)
 		{
-			//  TODO: switch to active/standby depending on new status
 			ha_status = new_ha_status;
+
+			zabbix_log(LOG_LEVEL_DEBUG, "HA status changed to: %d", ha_status);
+
+			switch (ha_status)
+			{
+				case ZBX_NODE_STATUS_ACTIVE:
+					server_startup(&listen_sock);
+					break;
+				case ZBX_NODE_STATUS_STANDBY:
+					server_teardown(&listen_sock);
+
+					if (SUCCEED != zbx_ha_start(&error, ZBX_NODE_STATUS_STANDBY))
+					{
+						zabbix_log(LOG_LEVEL_CRIT, "cannot start HA manager: %s", error);
+						zbx_free(error);
+						exit(EXIT_FAILURE);
+					}
+
+					break;
+				default:
+					zabbix_log(LOG_LEVEL_CRIT, "unsupported status %d received from HA manager",
+							ha_status);
+					sig_exiting = ZBX_EXIT_FAILURE;
+					continue;
+
+			}
 		}
 
 		if (0 < (ret = waitpid((pid_t)-1, &i, WNOHANG)))
 		{
+			zabbix_log(LOG_LEVEL_CRIT, "PROCESS EXIT: %d", ret);
 			sig_exiting = ZBX_EXIT_FAILURE;
 			break;
 		}
@@ -1715,7 +1758,39 @@ void	zbx_on_exit(int ret)
 	}
 
 	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
-		server_teardown(ret, NULL);
+	{
+		if (SUCCEED == DBtxn_ongoing())
+			DBrollback();
+
+		if (NULL != threads)
+		{
+			zbx_threads_wait(threads, threads_flags, threads_num, ret);	/* wait for all child processes to exit */
+			zbx_free(threads);
+			zbx_free(threads_flags);
+		}
+
+#ifdef HAVE_PTHREAD_PROCESS_SHARED
+		zbx_locks_disable();
+#endif
+		free_metrics();
+		zbx_ipc_service_free_env();
+
+		DBconnect(ZBX_DB_CONNECT_EXIT);
+
+		free_database_cache(ZBX_SYNC_ALL);
+
+		DBclose();
+
+		free_configuration_cache();
+
+		/* free history value cache */
+		zbx_vc_destroy();
+
+		/* free vmware support */
+		zbx_vmware_destroy();
+
+		free_selfmon_collector();
+	}
 
 	zbx_uninitialize_events();
 
@@ -1725,6 +1800,8 @@ void	zbx_on_exit(int ret)
 			ZABBIX_VERSION, ZABBIX_REVISION);
 
 	zabbix_close_log();
+
+	zbx_locks_destroy();
 
 #if defined(PS_OVERWRITE_ARGV)
 	setproctitle_free_env();

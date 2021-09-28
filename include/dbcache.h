@@ -608,8 +608,12 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned
 void	dc_flush_history(void);
 void	zbx_sync_history_cache(int *values_num, int *triggers_num, int *more);
 void	zbx_log_sync_history_cache_progress(void);
+
+#define ZBX_SYNC_NONE	0
+#define ZBX_SYNC_ALL	1
+
 int	init_database_cache(char **error);
-void	free_database_cache(void);
+void	free_database_cache(int);
 
 #define ZBX_STATS_HISTORY_COUNTER	0
 #define ZBX_STATS_HISTORY_FLOAT_COUNTER	1

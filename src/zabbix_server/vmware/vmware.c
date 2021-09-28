@@ -6568,11 +6568,16 @@ out:
 void	zbx_vmware_destroy(void)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	if (NULL != vmware_mem)
+	{
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
-	zbx_hashset_destroy(&vmware->strpool);
-	zbx_hashset_destroy(&evt_msg_strpool);
+		zbx_hashset_destroy(&vmware->strpool);
+		zbx_hashset_destroy(&evt_msg_strpool);
 #endif
-	zbx_mutex_destroy(&vmware_lock);
+		zbx_mem_destroy(vmware_mem);
+		vmware_mem = NULL;
+		zbx_mutex_destroy(&vmware_lock);
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

@@ -7213,6 +7213,8 @@ void	free_configuration_cache(void)
 
 	UNLOCK_CACHE;
 
+	zbx_mem_destroy(config_mem);
+	config_mem = NULL;
 	zbx_rwlock_destroy(&config_lock);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);

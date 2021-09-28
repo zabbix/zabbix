@@ -580,6 +580,7 @@ int	zbx_mem_create(zbx_mem_info_t **info, zbx_uint64_t size, const char *descr, 
 	/* allocate zbx_mem_info_t structure, its buckets, and description inside shared memory */
 
 	*info = (zbx_mem_info_t *)ALIGN8(base);
+	(*info)->base = base;
 	(*info)->shm_id = shm_id;
 	(*info)->orig_size = size;
 	size -= (char *)(*info + 1) - (char *)base;
@@ -627,6 +628,11 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return ret;
+}
+
+void	zbx_mem_destroy(zbx_mem_info_t *info)
+{
+	(void)shmdt(info->base);
 }
 
 void	*__zbx_mem_malloc(const char *file, int line, zbx_mem_info_t *info, const void *old, size_t size)

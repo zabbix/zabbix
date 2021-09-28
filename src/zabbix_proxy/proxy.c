@@ -1435,15 +1435,14 @@ void	zbx_on_exit(int ret)
 	zbx_ipc_service_free_env();
 
 	DBconnect(ZBX_DB_CONNECT_EXIT);
-	free_database_cache();
+	free_database_cache(ZBX_SYNC_ALL);
 	free_configuration_cache();
 	DBclose();
 
 	DBdeinit();
 
 	/* free vmware support */
-	if (0 != CONFIG_VMWARE_FORKS)
-		zbx_vmware_destroy();
+	zbx_vmware_destroy();
 
 	free_selfmon_collector();
 	free_proxy_history_lock();
@@ -1454,6 +1453,8 @@ void	zbx_on_exit(int ret)
 			ZABBIX_VERSION, ZABBIX_REVISION);
 
 	zabbix_close_log();
+
+	zbx_locks_destroy();
 
 #if defined(PS_OVERWRITE_ARGV)
 	setproctitle_free_env();

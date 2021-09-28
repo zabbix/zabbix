@@ -4615,19 +4615,29 @@ static void	DCsync_all(void)
  * Author: Alexei Vladishev, Alexander Vladishev                              *
  *                                                                            *
  ******************************************************************************/
-void	free_database_cache(void)
+void	free_database_cache(int sync)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	DCsync_all();
+	if (ZBX_SYNC_ALL == sync)
+		DCsync_all();
 
 	cache = NULL;
+
+	zbx_mem_destroy(hc_mem);
+	hc_mem = NULL;
+	zbx_mem_destroy(hc_index_mem);
+	hc_index_mem = NULL;
 
 	zbx_mutex_destroy(&cache_lock);
 	zbx_mutex_destroy(&cache_ids_lock);
 
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	{
+		zbx_mem_destroy(trend_mem);
+		trend_mem = NULL;
 		zbx_mutex_destroy(&trends_lock);
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

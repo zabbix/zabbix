@@ -218,6 +218,11 @@ void 	zbx_set_child_signal_handler(void)
 	sigaction(SIGCHLD, &phan, NULL);
 }
 
+void	zbx_unset_child_signal_handler(void)
+{
+	signal(SIGCHLD, SIG_IGN);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_set_metric_thread_signal_handler                             *

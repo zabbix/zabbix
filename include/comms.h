@@ -142,6 +142,7 @@ int	get_address_family(const char *addr, int *family, char *error, int max_error
 #endif
 
 int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen_port);
+void	zbx_tcp_unlisten(zbx_socket_t *s);
 
 int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept);
 void	zbx_tcp_unaccept(zbx_socket_t *s);

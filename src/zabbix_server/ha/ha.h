@@ -37,12 +37,15 @@
 #define ZBX_NODE_STATUS_UNAVAILABLE	2
 #define ZBX_NODE_STATUS_ACTIVE		3
 
-int	zbx_ha_start(char **error);
+int	zbx_ha_start(char **error, int ha_status);
 int	zbx_ha_pause(char **error);
 int	zbx_ha_stop(char **error);
+void	zbx_ha_kill(void);
 int	zbx_ha_report_status(char **error);
 int	zbx_ha_get_status(int *status, char **error);
 int	zbx_ha_recv_status(int *status, char **error);
+
+const char	*zbx_ha_status_str(int ha_status);
 
 #endif
 

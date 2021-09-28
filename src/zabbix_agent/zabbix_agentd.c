@@ -1295,6 +1295,10 @@ void	zbx_free_service_resources(int ret)
 			ZABBIX_VERSION, ZABBIX_REVISION);
 
 	zabbix_close_log();
+
+#ifndef _WINDOWS
+	zbx_locks_destroy();
+#endif
 }
 
 void	zbx_on_exit(int ret)

@@ -2512,13 +2512,15 @@ void	zbx_vc_destroy(void)
 	{
 		zbx_vector_vc_itemupdate_destroy(&vc_itemupdates);
 
-		zbx_rwlock_destroy(&vc_lock);
-
 		zbx_hashset_destroy(&vc_cache->items);
 		zbx_hashset_destroy(&vc_cache->strpool);
 
 		__vc_mem_free_func(vc_cache);
 		vc_cache = NULL;
+
+		zbx_mem_destroy(vc_mem);
+		vc_mem = NULL;
+		zbx_rwlock_destroy(&vc_lock);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
