@@ -126,13 +126,13 @@ static void	ha_notify_parent(zbx_ipc_client_t *client, int status)
  * Purpose: receive status message from HA service                            *
  *                                                                            *
  ******************************************************************************/
-static int	ha_recv_status(int *status, char **error)
+static int	ha_recv_status(int *status, int timeout, char **error)
 {
 	zbx_ipc_message_t	*message = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != zbx_ipc_async_socket_recv(&ha_socket, 1, &message))
+	if (SUCCEED != zbx_ipc_async_socket_recv(&ha_socket, timeout, &message))
 	{
 		*error = zbx_strdup(NULL, "cannot receive message from HA manager service");
 		return FAIL;
@@ -173,7 +173,19 @@ static int	ha_recv_status(int *status, char **error)
  ******************************************************************************/
 int	zbx_ha_recv_status(int *status, char **error)
 {
-	return ha_recv_status(status, error);
+	return ha_recv_status(status, 1, error);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_ha_peek_status                                               *
+ *                                                                            *
+ * Purpose: try to receive queued message without waiting                     *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_ha_try_recv_status(int *status, char **error)
+{
+	return ha_recv_status(status, 0, error);
 }
 
 /******************************************************************************
@@ -197,7 +209,7 @@ int	zbx_ha_get_status(int *status, char **error)
 		return FAIL;
 	}
 
-	return ha_recv_status(status, error);
+	return ha_recv_status(status, 1, error);
 }
 
 /******************************************************************************

@@ -1176,12 +1176,37 @@ static void	zbx_check_db(void)
 
 /******************************************************************************
  *                                                                            *
+ * Function: server_update_ha_status                                          *
+ *                                                                            *
+ * Purpose: check for queued status message and update HA status              *
+ *                                                                            *
+ ******************************************************************************/
+static int	server_update_status(void)
+{
+	int	status;
+	char	*error = NULL;
+
+	if (SUCCEED != zbx_ha_try_recv_status(&status, &error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot check HA manager status: %s", error);
+		zbx_free(error);
+		return FAIL;
+	}
+
+	if (ZBX_NODE_STATUS_STANDBY == status)
+		ha_status = status;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: server_startup                                                   *
  *                                                                            *
  * Purpose: initialize shared resources and start processes                   *
  *                                                                            *
  ******************************************************************************/
-static void	server_startup(zbx_socket_t *listen_sock)
+static int	server_startup(zbx_socket_t *listen_sock)
 {
 	int	i;
 	char	*error = NULL;
@@ -1190,42 +1215,42 @@ static void	server_startup(zbx_socket_t *listen_sock)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database cache: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		return FAIL;
 	}
 
 	if (SUCCEED != init_configuration_cache(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize configuration cache: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		return FAIL;
 	}
 
 	if (SUCCEED != init_selfmon_collector(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize self-monitoring: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		return FAIL;
 	}
 
 	if (0 != CONFIG_VMWARE_FORKS && SUCCEED != zbx_vmware_init(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize VMware cache: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		return FAIL;
 	}
 
 	if (SUCCEED != zbx_vc_init(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize history value cache: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		return FAIL;
 	}
 
 	if (SUCCEED != zbx_tfc_init(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize trends read cache: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		return FAIL;
 	}
 
 	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_POLLER_FORKS
@@ -1247,13 +1272,10 @@ static void	server_startup(zbx_socket_t *listen_sock)
 		if (FAIL == zbx_tcp_listen(listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "listener failed: %s", zbx_socket_strerror());
-			exit(EXIT_FAILURE);
+			return FAIL;
 		}
 	}
 
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_init_parent();
-#endif
 	zabbix_log(LOG_LEVEL_INFORMATION, "server #0 started [main process]");
 
 	for (i = 0; i < threads_num; i++)
@@ -1280,6 +1302,12 @@ static void	server_startup(zbx_socket_t *listen_sock)
 				zbx_thread_start(dbconfig_thread, &thread_args, &threads[i]);
 				DCconfig_wait_sync();
 
+				if (SUCCEED != server_update_status())
+					return FAIL;
+
+				if (ZBX_NODE_STATUS_ACTIVE != ha_status)
+					return SUCCEED;
+
 				DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 				if (SUCCEED != zbx_check_postinit_tasks(&error))
@@ -1287,7 +1315,9 @@ static void	server_startup(zbx_socket_t *listen_sock)
 					zabbix_log(LOG_LEVEL_CRIT, "cannot complete post initialization tasks: %s",
 							error);
 					zbx_free(error);
-					exit(EXIT_FAILURE);
+					DBclose();
+
+					return FAIL;
 				}
 
 				/* update maintenance states */
@@ -1402,6 +1432,12 @@ static void	server_startup(zbx_socket_t *listen_sock)
 				break;
 		}
 	}
+
+	/* startup/postinit tasks can take a long time, update status */
+	if (SUCCEED != server_update_status())
+		return FAIL;
+
+	return SUCCEED;
 }
 
 static int	server_restart_logger(char **error)
@@ -1475,6 +1511,13 @@ static void	server_teardown(zbx_socket_t *listen_sock)
 	free_selfmon_collector();
 	free_configuration_cache();
 	free_database_cache(ZBX_SYNC_NONE);
+
+	if (SUCCEED != zbx_ha_start(&error, ZBX_NODE_STATUS_STANDBY))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot start HA manager: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
 }
 
 int	MAIN_ZABBIX_ENTRY(int flags)
@@ -1632,6 +1675,10 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_tls_init_parent();
+#endif
+
 	if (SUCCEED != zbx_history_init(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize history storage: %s", error);
@@ -1664,11 +1711,19 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	//  TODO: log mode in text format
-	zabbix_log(LOG_LEVEL_INFORMATION, "starting server in %d mode", ha_status);
-
 	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
-		server_startup(&listen_sock);
+	{
+		if (SUCCEED != server_startup(&listen_sock))
+		{
+			sig_exiting = ZBX_EXIT_FAILURE;
+		}
+		else
+		{
+			/* check if the HA status has not been changed during startup process */
+			if (ZBX_NODE_STATUS_ACTIVE != ha_status)
+				server_teardown(&listen_sock);
+		}
+	}
 
 	while (ZBX_IS_RUNNING())	/* wait for any child to exit */
 	{
@@ -1688,18 +1743,18 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			switch (ha_status)
 			{
 				case ZBX_NODE_STATUS_ACTIVE:
-					server_startup(&listen_sock);
+					if (SUCCEED != server_startup(&listen_sock))
+					{
+						sig_exiting = ZBX_EXIT_FAILURE;
+						continue;
+					}
+
+					if (ZBX_NODE_STATUS_ACTIVE != ha_status)
+						server_teardown(&listen_sock);
+
 					break;
 				case ZBX_NODE_STATUS_STANDBY:
 					server_teardown(&listen_sock);
-
-					if (SUCCEED != zbx_ha_start(&error, ZBX_NODE_STATUS_STANDBY))
-					{
-						zabbix_log(LOG_LEVEL_CRIT, "cannot start HA manager: %s", error);
-						zbx_free(error);
-						exit(EXIT_FAILURE);
-					}
-
 					break;
 				default:
 					zabbix_log(LOG_LEVEL_CRIT, "unsupported status %d received from HA manager",

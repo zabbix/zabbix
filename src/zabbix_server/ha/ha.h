@@ -44,6 +44,7 @@ void	zbx_ha_kill(void);
 int	zbx_ha_report_status(char **error);
 int	zbx_ha_get_status(int *status, char **error);
 int	zbx_ha_recv_status(int *status, char **error);
+int	zbx_ha_try_recv_status(int *status, char **error);
 
 const char	*zbx_ha_status_str(int ha_status);
 

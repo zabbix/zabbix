@@ -1989,7 +1989,8 @@ int	zbx_ipc_async_socket_recv(zbx_ipc_async_socket_t *asocket, int timeout, zbx_
 	else
 		flags = EVLOOP_NONBLOCK;
 
-	asocket->state = ZBX_IPC_ASYNC_SOCKET_STATE_NONE;
+	/* do only single event base loop if timeout is not set */
+	asocket->state = (0 != timeout ? ZBX_IPC_ASYNC_SOCKET_STATE_NONE : ZBX_IPC_ASYNC_SOCKET_STATE_TIMEOUT);
 
 	do
 	{
