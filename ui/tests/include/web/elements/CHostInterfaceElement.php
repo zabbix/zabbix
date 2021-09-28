@@ -103,6 +103,7 @@ class CHostInterfaceElement extends CMultifieldTableElement {
 	public function updateRow($index, $values) {
 		$row = $this->getRow($index);
 		$controls = $this->getRowControls($row);
+
 		foreach ($values as $name => $value) {
 			if (array_key_exists($name, $controls)) {
 				try {
@@ -121,8 +122,12 @@ class CHostInterfaceElement extends CMultifieldTableElement {
 			}
 			else {
 				$xpath = 'xpath:.//div['.CXPathHelper::fromClass('list-accordion-item-body').']';
-				$form = $row->query($xpath)->asForm(['normalized' => true])->one(false);
-				if ($form->isValid()) {
+				$element = $row->query($xpath)->one(false);
+
+				if ($element->isValid()) {
+					$form = ($element->query('xpath:./*')->one()->getTagName() === 'ul')
+						? $element->asForm(['normalized' => true])
+						: $element->asFluidForm(['normalized' => true]);
 					$fields = $form->getFields();
 
 					if ($fields->exists($name)) {
