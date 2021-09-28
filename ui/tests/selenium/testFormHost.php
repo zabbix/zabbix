@@ -752,7 +752,8 @@ class testFormHost extends CWebTest {
 
 				// Check host fields.
 				$host = CTestArrayHelper::get($data, 'host_fields.Visible name', $data['host_fields']['Host name']);
-				$this->query('link', $host)->waitUntilClickable()->one()->click();
+				$this->query('link', $host)->asPopupButton()->one()->select('Configuration');
+				$form = COverlayDialogElement::find()->asFluidForm()->one()->waitUntilVisible();
 				$this->page->waitUntilReady();
 				$form->invalidate();
 				$form->checkValue($data['host_fields']);
@@ -775,18 +776,19 @@ class testFormHost extends CWebTest {
 				$this->assertDatabaseFields($data);
 
 				// Check interfaces field values.
-				$form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => $names])->checkValue($data['interfaces']);
+				$form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => $names])
+						->checkValue($data['interfaces']);
 				break;
 
 			case TEST_BAD:
 				$this->assertEquals($old_hash, CDBHelper::getHash($this->hosts_sql));
 				$this->assertEquals($interface_old_hash, CDBHelper::getHash($this->interface_snmp_sql));
-
-				$error_title = CTestArrayHelper::get($data, 'error_title', 'Cannot add host');
-				$this->assertMessage(TEST_BAD, $error_title, $data['error']);
-				COverlayDialogElement::find()->one()->close();
+				$this->assertMessage(TEST_BAD, CTestArrayHelper::get($data, 'error_title', 'Cannot add host'), $data['error']);
 				break;
 		}
+
+		COverlayDialogElement::find()->one()->close();
+		COverlayDialogElement::ensureNotPresent();
 	}
 
 	public static function getUpdateData() {
@@ -1373,7 +1375,8 @@ class testFormHost extends CWebTest {
 				else {
 					$host = CTestArrayHelper::get($data, 'host_fields.Visible name', 'testFormHost_Update Visible name');
 				}
-				$this->query('link', $host)->waitUntilClickable()->one()->forceClick();
+				$this->query('link', $host)->asPopupButton()->one()->select('Configuration');
+				$form = COverlayDialogElement::find()->asFluidForm()->one()->waitUntilVisible();
 				$this->page->waitUntilReady();
 				$form->invalidate();
 
@@ -1452,7 +1455,8 @@ class testFormHost extends CWebTest {
 				$this->assertDatabaseFields($source);
 
 				// Check interfaces field values.
-				$form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => $names])->checkValue($source['interfaces']);
+				$form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => $names])
+						->checkValue($source['interfaces']);
 				break;
 
 			case TEST_BAD:
@@ -1462,6 +1466,7 @@ class testFormHost extends CWebTest {
 				$error_title = CTestArrayHelper::get($data, 'error_title', 'Cannot update host');
 				$this->assertMessage(TEST_BAD, $error_title, $data['error']);
 				COverlayDialogElement::find()->one()->close();
+				COverlayDialogElement::ensureNotPresent();
 				break;
 		}
 	}
@@ -1619,7 +1624,8 @@ class testFormHost extends CWebTest {
 		$cloned_form = $form;
 		$form->invalidate();
 		$cloned_form->checkValue($original);
-		$cloned_form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => $container_names])->checkValue($original_interfaces);
+		$cloned_form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => $container_names])
+				->checkValue($original_interfaces);
 	}
 
 	public static function getСancelData() {
