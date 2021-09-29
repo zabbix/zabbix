@@ -51,6 +51,10 @@ func TestParseServerActive(t *testing.T) {
 		{"foo,foo", true, nil},
 		{"foo;foo", true, nil},
 		{"foo;bar,foo2;foo", true, nil},
+		{";", true, nil},
+		{" ;", true, nil},
+		{"; ", true, nil},
+		{" ; ", true, nil},
 	}
 
 	for i, p := range inputs {
