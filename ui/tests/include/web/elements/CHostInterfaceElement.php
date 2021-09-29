@@ -103,6 +103,7 @@ class CHostInterfaceElement extends CMultifieldTableElement {
 	public function updateRow($index, $values) {
 		$row = $this->getRow($index);
 		$controls = $this->getRowControls($row);
+		$form = null;
 
 		foreach ($values as $name => $value) {
 			if (array_key_exists($name, $controls)) {
@@ -121,16 +122,25 @@ class CHostInterfaceElement extends CMultifieldTableElement {
 				unset($values[$name]);
 			}
 			else {
-				$xpath = 'xpath:.//div['.CXPathHelper::fromClass('list-accordion-item-body').']';
-				$element = $row->query($xpath)->one(false);
+				if ($form === null) {
+					$xpath = 'xpath:.//div['.CXPathHelper::fromClass('list-accordion-item-body').']';
+					$element = $row->query($xpath)->one(false);
 
-				if ($element->isValid()) {
-					$form = ($element->query('xpath:./*')->one()->getTagName() === 'ul')
-						? $element->asForm(['normalized' => true])
-						: $element->asFluidForm(['normalized' => true]);
-					$fields = $form->getFields();
+					if ($element->isValid()) {
+						$form = ($element->query('xpath:./*')->one()->getTagName() === 'ul')
+							? $element->asForm(['normalized' => true])
+							: $element->asFluidForm(['normalized' => true]);
+						$fields = $form->getFields();
+					}
+				}
 
-					if ($fields->exists($name)) {
+				if ($name === 'Use bulk requests') {
+					$selector = 'xpath:.//label[contains(text(), "Use bulk requests")]/../input';
+					$row->query($selector)->asCheckbox()->one()->fill($value);
+					unset($values[$name]);
+				}
+				else {
+					if ($form !== null && $fields->exists($name)) {
 						$fields->get($name)->fill($value);
 						unset($values[$name]);
 					}
@@ -159,9 +169,13 @@ class CHostInterfaceElement extends CMultifieldTableElement {
 		$controls = parent::getRowControls($row, $headers);
 
 		$xpath = 'xpath:.//div['.CXPathHelper::fromClass('list-accordion-item-body').']';
-		$form = $row->query($xpath)->asForm(['normalized' => true])->one(false);
+		$element = $row->query($xpath)->one(false);
 
-		if ($form->isValid()) {
+		if ($element->isValid()) {
+			$form = ($element->query('xpath:./*')->one()->getTagName() === 'ul')
+					? $element->asForm(['normalized' => true])
+					: $element->asFluidForm(['normalized' => true]);
+
 			// Expand row for SNMP interface.
 			$button = $row->getColumn(0)->query('tag:button')->one();
 			if (in_array($button->getAttribute('title'), ['', 'Expand'])) {
@@ -174,5 +188,34 @@ class CHostInterfaceElement extends CMultifieldTableElement {
 		}
 
 		return $controls;
+	}
+
+	/*
+	 * @inheritdoc
+	 */
+	public function checkValue($expected, $raise_exception = true) {
+		$bulks = [];
+		foreach ($expected as $id => &$data) {
+			$bulks[$id] = CTestArrayHelper::get($data, 'Use bulk requests');
+			unset($data['Use bulk requests']);
+		}
+		unset($data);
+
+		$selector = 'xpath:.//label[contains(text(), "Use bulk requests")]/../input';
+		if (parent::checkValue($expected, $raise_exception)) {
+			$rows = $this->getRows();
+
+			foreach ($rows as $id => $row) {
+				if ($bulks[$id] === null) {
+					continue;
+				}
+
+				if (!$row->query($selector)->asCheckbox()->one()->checkValue($bulks[$id], $raise_exception)) {
+					return false;
+				}
+			}
+		}
+
+		return true;
 	}
 }

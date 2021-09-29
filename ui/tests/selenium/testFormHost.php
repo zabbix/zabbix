@@ -1465,10 +1465,11 @@ class testFormHost extends CWebTest {
 
 				$error_title = CTestArrayHelper::get($data, 'error_title', 'Cannot update host');
 				$this->assertMessage(TEST_BAD, $error_title, $data['error']);
-				COverlayDialogElement::find()->one()->close();
-				COverlayDialogElement::ensureNotPresent();
 				break;
 		}
+
+		COverlayDialogElement::find()->one()->close();
+		COverlayDialogElement::ensureNotPresent();
 	}
 
 	/**

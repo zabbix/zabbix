@@ -556,6 +556,9 @@ class CElementQuery implements IWaitable {
 				'/ul[contains(@class, "checkbox-list")]',
 				'/ul[contains(@class, "list-check-radio")]'
 			],
+			'CHostInterfaceElement'		=> [
+				'/div[contains(@class, "interface-container")]/..'
+			],
 			'CMultifieldTableElement'	=> [
 				'/table',
 				'/div/table', // TODO: remove after fix DEV-1071.
