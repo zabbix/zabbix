@@ -140,8 +140,8 @@ func (c *Connector) refreshActiveChecks() {
 		Version: version.Short(),
 	}
 
-	log.Debugf("[%d] In refreshActiveChecks() from [%s]", c.clientID, c.addresses[0])
-	defer log.Debugf("[%d] End of refreshActiveChecks() from [%s]", c.clientID, c.addresses[0])
+	log.Debugf("[%d] In refreshActiveChecks() from %s", c.clientID, c.addresses)
+	defer log.Debugf("[%d] End of refreshActiveChecks() from %s", c.clientID, c.addresses)
 
 	if a.HostInterface, err = processConfigItem(c.taskManager, time.Duration(c.options.Timeout)*time.Second, "HostInterface",
 		c.options.HostInterface, c.options.HostInterfaceItem, hostInterfaceLen, agent.LocalChecksClientID); err != nil {
@@ -177,8 +177,8 @@ func (c *Connector) refreshActiveChecks() {
 
 	if err != nil {
 		if c.lastError == nil || err.Error() != c.lastError.Error() {
-			log.Warningf("[%d] active check configuration update from [%s %s] started to fail (%s)", c.clientID,
-				c.addresses[0], c.hostname, err)
+			log.Warningf("[%d] active check configuration update from %s [%s] started to fail (%s)", c.clientID,
+				c.addresses, c.hostname, err)
 			c.lastError = err
 		}
 		return
