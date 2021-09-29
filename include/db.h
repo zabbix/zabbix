@@ -243,7 +243,6 @@ struct	_DC_TRIGGER;
 			'\0' != *str ? "<>'" : "",		\
 			'\0' != *str ? str   : " is not null",	\
 			'\0' != *str ? "'"   : ""
-
 #else
 #	define	DBbegin_multiple_update(sql, sql_alloc, sql_offset)	do {} while (0)
 #	define	DBend_multiple_update(sql, sql_alloc, sql_offset)	do {} while (0)

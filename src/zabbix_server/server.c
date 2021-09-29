@@ -331,6 +331,9 @@ char	*CONFIG_TLS_PSK_IDENTITY	= NULL;
 char	*CONFIG_TLS_PSK_FILE		= NULL;
 #endif
 
+char	*CONFIG_HA_NODE_NAME		= NULL;
+char	*CONFIG_EXTERNAL_ADDRESS	= NULL;
+
 static char	*CONFIG_SOCKET_PATH	= NULL;
 
 char	*CONFIG_HISTORY_STORAGE_URL		= NULL;
@@ -945,6 +948,10 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	1,			3600},
 		{"ListenBacklog",		&CONFIG_TCP_MAX_BACKLOG_SIZE,		TYPE_INT,
 			PARM_OPT,	0,			INT_MAX},
+		{"HANodeName",			&CONFIG_HA_NODE_NAME,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"ExternalAddress",		&CONFIG_EXTERNAL_ADDRESS,		TYPE_STRING,
+			PARM_OPT,	0,			0},
 		{NULL}
 	};
 
@@ -1186,7 +1193,7 @@ static int	server_update_status(void)
 	int	status;
 	char	*error = NULL;
 
-	if (SUCCEED != zbx_ha_try_recv_status(&status, &error))
+	if (SUCCEED != zbx_ha_recv_status(0, &status, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot check HA manager status: %s", error);
 		zbx_free(error);
@@ -1704,11 +1711,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zbx_set_sigusr_handler(zbx_main_sigusr_handler);
 
-	if (SUCCEED != zbx_ha_get_status(&ha_status, &error))
+	if (SUCCEED != zbx_ha_get_status(&error) ||
+			SUCCEED != zbx_ha_recv_status(ZBX_IPC_WAIT_FOREVER, &ha_status, &error))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot get HA status: %s", error);
+		zabbix_log(LOG_LEVEL_CRIT, "cannot start server: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		sig_exiting = ZBX_EXIT_FAILURE;
 	}
 
 	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
@@ -1727,9 +1735,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	while (ZBX_IS_RUNNING())	/* wait for any child to exit */
 	{
-		if (SUCCEED != zbx_ha_recv_status(&new_ha_status, &error))
+		if (SUCCEED != zbx_ha_recv_status(1, &new_ha_status, &error))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "cannot get HA manager status: %s", error);
+			zabbix_log(LOG_LEVEL_CRIT, "cannot receive HA manager status: %s", error);
 			zbx_free(error);
 			sig_exiting = ZBX_EXIT_FAILURE;
 			break;
