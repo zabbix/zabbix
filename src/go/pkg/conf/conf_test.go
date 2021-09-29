@@ -517,7 +517,14 @@ func Test_checkGlobPattern(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		{"+success", args{"/foo/bar"}, false},
+		{"+no_glob", args{"/foo/bar"}, false},
+		{"+glob", args{"/foo/bar/*.conf"}, false},
+		{"+glob_only", args{"/foo/bar/*"}, false},
+		{"+glob_in_name", args{"/foo/bar/foo*bar.conf"}, false},
+		{"+relative_name_with_glob", args{"./foo*bar"}, false},
+		{"+empty", args{""}, false},
+		{"-name_only_with_glob", args{"foo*bar"}, true},
+		{"-name_start_glob", args{"*bar"}, true},
 		{"-invalid_prefix", args{"*/foo/bar"}, true},
 		{"-invalid_string", args{"*"}, true},
 	}

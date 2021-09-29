@@ -484,6 +484,26 @@ func checkGlobPattern(path string) error {
 		return errors.New("path should be absolute")
 	}
 
+	var isGlob, hasSepLeft, hasSepRight bool
+
+	for _, p := range path {
+		switch p {
+		case '*':
+			isGlob = true
+		case filepath.Separator:
+			switch isGlob {
+			case true:
+				hasSepRight = true
+			case false:
+				hasSepLeft = true
+			}
+		}
+	}
+
+	if (isGlob && !hasSepLeft && hasSepRight) || (isGlob && !hasSepLeft && !hasSepRight) {
+		return errors.New("path should be absolute")
+	}
+
 	return nil
 }
 
