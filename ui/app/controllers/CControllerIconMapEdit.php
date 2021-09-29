@@ -74,8 +74,7 @@ class CControllerIconMapEdit extends CController {
 
 		$images = API::Image()->get([
 			'output' => ['imageid', 'name'],
-			'filter' => ['imagetype' => IMAGE_TYPE_ICON],
-			'sortfield' => ['name']
+			'filter' => ['imagetype' => IMAGE_TYPE_ICON]
 		]);
 
 		order_result($images, 'name');
