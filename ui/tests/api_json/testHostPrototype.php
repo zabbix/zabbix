@@ -55,7 +55,7 @@ class testHostPrototype extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			'inherit interfaces wiht empty interfaces' => [
+			'inherit interfaces with empty interfaces' => [
 				'request' => [
 					[
 						'ruleid' => 40066,
