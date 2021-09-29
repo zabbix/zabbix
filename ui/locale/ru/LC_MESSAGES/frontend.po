@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-20 10:47+0300\n"
-"PO-Revision-Date: 2021-06-17 14:02+0300\n"
-"Last-Translator: Alexey <dotneft@gmail.com>\n"
+"POT-Creation-Date: 2021-09-24 19:55+0300\n"
+"PO-Revision-Date: 2021-09-20 09:03+0300\n"
+"Last-Translator: Yurii <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1623931352.000000\n"
+"X-POOTLE-MTIME: 1632121438.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:142
@@ -3178,7 +3178,7 @@ msgstr "Не удалось обновить карту сети"
 msgid "Cannot update proxy"
 msgstr "Не удалось обновить прокси"
 
-#: include/classes/api/services/CProxy.php:629
+#: include/classes/api/services/CProxy.php:636
 #, c-format
 msgid "Cannot update proxy for discovered host \"%1$s\"."
 msgstr "Не удалось обновить прокси для обнаруженного узла сети \"%1$s\"."
@@ -6415,7 +6415,7 @@ msgstr "Сообщение об ошибке"
 #: include/blocks.inc.php:643
 #, c-format
 msgid "Error! Unable to start Zabbix server due to unsupported %1$s database server version. Must be at least (%2$s)"
-msgstr ""
+msgstr "Ошибка! Zabbix сервер не может стартовать из-за слишком старой версии сервера базы данных (%1$s). Минимальная разрешённая версия %2$s"
 
 #: include/classes/screens/CScreenHttpTestDetails.php:111
 #: include/classes/screens/CScreenHttpTestDetails.php:182
@@ -7365,8 +7365,8 @@ msgstr "Прототип графиков удален"
 msgid "Graph prototype updated"
 msgstr "Прототип графиков обновлен"
 
-#: include/classes/api/services/CDashboardGeneral.php:485
-#: include/classes/api/services/CDashboardGeneral.php:495
+#: include/classes/api/services/CDashboardGeneral.php:525
+#: include/classes/api/services/CDashboardGeneral.php:535
 #, c-format
 msgid "Graph prototype with ID \"%1$s\" is not available."
 msgstr "Прототип графиков с ID \"%1$s\" недоступен."
@@ -7400,8 +7400,8 @@ msgstr "Тип графика"
 msgid "Graph updated"
 msgstr "График обновлен"
 
-#: include/classes/api/services/CDashboardGeneral.php:457
-#: include/classes/api/services/CDashboardGeneral.php:464
+#: include/classes/api/services/CDashboardGeneral.php:497
+#: include/classes/api/services/CDashboardGeneral.php:504
 #, c-format
 msgid "Graph with ID \"%1$s\" is not available."
 msgstr "График с ID \"%1$s\" недоступен."
@@ -7892,7 +7892,7 @@ msgstr "Элементы группы узлов сети"
 msgid "Host group label type"
 msgstr "Тип подписи к группе узлов сети"
 
-#: include/classes/api/services/CDashboardGeneral.php:515
+#: include/classes/api/services/CDashboardGeneral.php:555
 #: include/classes/api/services/CScript.php:937
 #: include/classes/api/services/CSettings.php:236
 #: include/classes/api/services/CUserGroup.php:455
@@ -8067,7 +8067,7 @@ msgstr "Ошибка при обновлении узла сети."
 msgid "Host updated"
 msgstr "Узел сети обновлен"
 
-#: include/classes/api/services/CDashboardGeneral.php:532
+#: include/classes/api/services/CDashboardGeneral.php:572
 #, c-format
 msgid "Host with ID \"%1$s\" is not available."
 msgstr "Узел сети с ID \"%1$s\" недоступен."
@@ -9918,17 +9918,17 @@ msgstr "Ошибочные параметры метода."
 #: include/classes/api/services/CItemGeneral.php:2607
 #: include/classes/api/services/CItemGeneral.php:2617
 #: include/classes/api/services/CItemGeneral.php:2646
-#: include/classes/api/services/CProxy.php:651
-#: include/classes/api/services/CProxy.php:676
-#: include/classes/api/services/CProxy.php:682
-#: include/classes/api/services/CProxy.php:693
-#: include/classes/api/services/CProxy.php:699
-#: include/classes/api/services/CProxy.php:737
-#: include/classes/api/services/CProxy.php:754
-#: include/classes/api/services/CProxy.php:767
-#: include/classes/api/services/CProxy.php:773
-#: include/classes/api/services/CProxy.php:782
-#: include/classes/api/services/CProxy.php:794
+#: include/classes/api/services/CProxy.php:658
+#: include/classes/api/services/CProxy.php:683
+#: include/classes/api/services/CProxy.php:689
+#: include/classes/api/services/CProxy.php:700
+#: include/classes/api/services/CProxy.php:706
+#: include/classes/api/services/CProxy.php:744
+#: include/classes/api/services/CProxy.php:761
+#: include/classes/api/services/CProxy.php:774
+#: include/classes/api/services/CProxy.php:780
+#: include/classes/api/services/CProxy.php:789
+#: include/classes/api/services/CProxy.php:801
 #: include/classes/api/services/CReport.php:194
 #: include/classes/api/services/CReport.php:200
 #: include/classes/api/services/CReport.php:206
@@ -10316,8 +10316,8 @@ msgstr[0] "Прототип элементов данных обновлен"
 msgstr[1] "Прототипы элементов данных обновлены"
 msgstr[2] "Прототипы элементов данных обновлены"
 
-#: include/classes/api/services/CDashboardGeneral.php:429
-#: include/classes/api/services/CDashboardGeneral.php:437
+#: include/classes/api/services/CDashboardGeneral.php:469
+#: include/classes/api/services/CDashboardGeneral.php:477
 #, c-format
 msgid "Item prototype with ID \"%1$s\" is not available."
 msgstr "Прототип элементов данных с ID \"%1$s\" недоступен."
@@ -10375,8 +10375,8 @@ msgstr "Элемент данных не будет обновляться. За
 msgid "Item will not be refreshed. Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used."
 msgstr "Элемент данных не будет обновляться. Интервал обновления должен быть между 1s и 1d. Также можно использовать интервалы по расписанию/гибкие."
 
-#: include/classes/api/services/CDashboardGeneral.php:402
-#: include/classes/api/services/CDashboardGeneral.php:409
+#: include/classes/api/services/CDashboardGeneral.php:442
+#: include/classes/api/services/CDashboardGeneral.php:449
 #, c-format
 msgid "Item with ID \"%1$s\" is not available."
 msgstr "Элемент данных с ID \"%1$s\" недоступен."
@@ -11137,12 +11137,12 @@ msgid "Macro"
 msgstr "Макрос"
 
 #: include/classes/api/services/CHostBase.php:577
-#: include/classes/api/services/CUserMacro.php:668
+#: include/classes/api/services/CUserMacro.php:655
 #, c-format
 msgid "Macro \"%1$s\" already exists on \"%2$s\"."
 msgstr "Макрос \"%1$s\" уже существует у \"%2$s\"."
 
-#: include/classes/api/services/CUserMacro.php:420
+#: include/classes/api/services/CUserMacro.php:411
 #, c-format
 msgid "Macro \"%1$s\" already exists."
 msgstr "Макрос \"%1$s\" уже существует."
@@ -11358,7 +11358,7 @@ msgstr "Фигура карты сети"
 msgid "Map update failed."
 msgstr "Ошибка при обновлении карты сети."
 
-#: include/classes/api/services/CDashboardGeneral.php:549
+#: include/classes/api/services/CDashboardGeneral.php:589
 #, c-format
 msgid "Map with ID \"%1$s\" is not available."
 msgstr "Карта сети с ID \"%1$s\" недоступна."
@@ -12606,8 +12606,8 @@ msgstr "Нет прав доступа на вызов \"%1$s.%2$s\"."
 #: include/classes/api/services/CCorrelation.php:724
 #: include/classes/api/services/CCorrelation.php:934
 #: include/classes/api/services/CDashboardGeneral.php:77
-#: include/classes/api/services/CDashboardGeneral.php:233
-#: include/classes/api/services/CDashboardGeneral.php:248
+#: include/classes/api/services/CDashboardGeneral.php:274
+#: include/classes/api/services/CDashboardGeneral.php:289
 #: include/classes/api/services/CDashboard.php:343
 #: include/classes/api/services/CDiscoveryRule.php:578
 #: include/classes/api/services/CDiscoveryRule.php:619
@@ -12687,8 +12687,8 @@ msgstr "Нет прав доступа на вызов \"%1$s.%2$s\"."
 #: include/classes/api/services/CModule.php:214
 #: include/classes/api/services/CModule.php:246
 #: include/classes/api/services/CProxy.php:388
-#: include/classes/api/services/CProxy.php:623
-#: include/classes/api/services/CProxy.php:850
+#: include/classes/api/services/CProxy.php:630
+#: include/classes/api/services/CProxy.php:857
 #: include/classes/api/services/CRegexp.php:339
 #: include/classes/api/services/CRegexp.php:369
 #: include/classes/api/services/CReport.php:549
@@ -12722,11 +12722,11 @@ msgstr "Нет прав доступа на вызов \"%1$s.%2$s\"."
 #: include/classes/api/services/CTriggerPrototype.php:711
 #: include/classes/api/services/CUserGroup.php:326
 #: include/classes/api/services/CUserGroup.php:893
-#: include/classes/api/services/CUserMacro.php:353
-#: include/classes/api/services/CUserMacro.php:463
-#: include/classes/api/services/CUserMacro.php:550
-#: include/classes/api/services/CUserMacro.php:742
-#: include/classes/api/services/CUserMacro.php:804
+#: include/classes/api/services/CUserMacro.php:345
+#: include/classes/api/services/CUserMacro.php:450
+#: include/classes/api/services/CUserMacro.php:537
+#: include/classes/api/services/CUserMacro.php:729
+#: include/classes/api/services/CUserMacro.php:791
 #: include/classes/api/services/CUser.php:542
 #: include/classes/api/services/CUser.php:1245
 #: include/classes/api/services/CUser.php:1773
@@ -13527,7 +13527,7 @@ msgstr "Статистика исходящего трафика на сетев
 msgid "Output"
 msgstr "Вывод"
 
-#: include/classes/api/services/CDashboardGeneral.php:292
+#: include/classes/api/services/CDashboardGeneral.php:333
 #, c-format
 msgid "Overlapping widgets at X:%3$d, Y:%4$d on page #%2$d of dashboard \"%1$s\"."
 msgstr "Наложение виджетов на X:%3$d, Y:%4$d на странице #%2$d панели \"%1$s\"."
@@ -14476,7 +14476,7 @@ msgstr "Прокси"
 msgid "Proxy"
 msgstr "Прокси"
 
-#: include/classes/api/services/CProxy.php:581
+#: include/classes/api/services/CProxy.php:588
 #, c-format
 msgid "Proxy \"%1$s\" already exists."
 msgstr "Прокси \"%1$s\" уже существует."
@@ -19484,7 +19484,7 @@ msgstr "Предупреждающее сообщение"
 #: include/blocks.inc.php:649
 #, c-format
 msgid "Warning! Unsupported %1$s database server version. Should be at least (%2$s)"
-msgstr ""
+msgstr "Внимание! Ваш сервер базы данных версии %1$s слишком старый. Необходима как минимум версия %2$s"
 
 #: jsLoader.php:289
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
@@ -19600,7 +19600,7 @@ msgstr "Добро пожаловать в"
 msgid "When active"
 msgstr "Когда активен"
 
-#: include/classes/api/services/CDashboardGeneral.php:305
+#: include/classes/api/services/CDashboardGeneral.php:346
 #, c-format
 msgid "Widget at X:%3$d, Y:%4$d on page #%2$d of dashboard \"%1$s\" is out of bounds."
 msgstr "Виджет по X:%3$d, Y:%4$d на странице #%2$d панели \"%1$s\" выходит за границы."
@@ -19941,9 +19941,6 @@ msgstr "Вы не указали цели для глобального скри
 #: include/classes/api/services/CToken.php:313
 #: include/classes/api/services/CToken.php:414
 #: include/classes/api/services/CToken.php:448
-#: include/classes/api/services/CUserMacro.php:271
-#: include/classes/api/services/CUserMacro.php:331
-#: include/classes/api/services/CUserMacro.php:447
 msgid "You do not have permission to perform this operation."
 msgstr "У вас нет полномочий для выполнения этой операции."
 
@@ -20476,8 +20473,8 @@ msgstr "нельзя изменить"
 #: include/classes/api/services/CMediatype.php:731
 #: include/classes/api/services/CMediatype.php:748
 #: include/classes/api/services/CMediatype.php:800
-#: include/classes/api/services/CProxy.php:700
-#: include/classes/api/services/CProxy.php:774
+#: include/classes/api/services/CProxy.php:707
+#: include/classes/api/services/CProxy.php:781
 #: include/classes/api/services/CTriggerGeneral.php:794
 #: include/classes/api/services/CTriggerGeneral.php:827
 #: include/classes/api/services/CUserGroup.php:473
@@ -21600,10 +21597,10 @@ msgstr "краткое описание"
 #: include/classes/api/services/CMaintenance.php:502
 #: include/classes/api/services/CMaintenance.php:724
 #: include/classes/api/services/CMediatype.php:793
-#: include/classes/api/services/CProxy.php:651
-#: include/classes/api/services/CProxy.php:676
-#: include/classes/api/services/CProxy.php:783
-#: include/classes/api/services/CProxy.php:795
+#: include/classes/api/services/CProxy.php:658
+#: include/classes/api/services/CProxy.php:683
+#: include/classes/api/services/CProxy.php:790
+#: include/classes/api/services/CProxy.php:802
 #: include/classes/api/services/CTriggerGeneral.php:800
 #: include/classes/api/services/CTriggerGeneral.php:833
 #: include/classes/api/services/CValueMap.php:583
@@ -21711,9 +21708,9 @@ msgstr "шаблон с ID \"%1$s\" был встречен %2$s раз"
 #: include/classes/api/services/CHostPrototype.php:1688
 #: include/classes/api/services/CHostPrototype.php:1700
 #: include/classes/api/services/CHttpTest.php:744
-#: include/classes/api/services/CProxy.php:683
-#: include/classes/api/services/CProxy.php:694
-#: include/classes/api/services/CProxy.php:768
+#: include/classes/api/services/CProxy.php:690
+#: include/classes/api/services/CProxy.php:701
+#: include/classes/api/services/CProxy.php:775
 #: include/classes/api/services/CReport.php:195
 #: include/classes/api/services/CReport.php:577
 #: include/classes/api/services/CReport.php:583
@@ -21905,8 +21902,8 @@ msgstr "неожиданный текст \"%1$s\""
 #: include/classes/api/services/CItemGeneral.php:1622
 #: include/classes/api/services/CItemGeneral.php:1648
 #: include/classes/api/services/CItemGeneral.php:1685
-#: include/classes/api/services/CProxy.php:738
-#: include/classes/api/services/CProxy.php:755
+#: include/classes/api/services/CProxy.php:745
+#: include/classes/api/services/CProxy.php:762
 #: include/classes/api/services/CTriggerGeneral.php:821
 #, c-format
 msgid "unexpected value \"%1$s\""

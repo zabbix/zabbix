@@ -885,7 +885,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Host groups: Show all problems that have 2 speciffic tags, one of them contains a speciffic value.
+			// Host groups: Show all problems that have 2 specific tags, one of them contains a specific value.
 			[
 				[
 					'widget to update' => 'Reference widget 15',
@@ -904,7 +904,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Host groups: Show all problems that have at least one of 2 speciffic tags, one of them contains a value.
+			// Host groups: Show all problems that have at least one of 2 specific tags, one of them contains a value.
 			[
 				[
 					'widget to update' => 'Reference widget 16',
@@ -970,7 +970,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Host groups: 2 tags with Or operator, both of them equal to speciffic values.
+			// Host groups: 2 tags with Or operator, both of them equal to specific values.
 			[
 				[
 					'widget to update' => 'Reference widget 19',
@@ -1046,7 +1046,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Totals: Show all problems that have 2 speciffic tags, one of them contains a speciffic value.
+			// Totals: Show all problems that have 2 specific tags, one of them contains a specific value.
 			[
 				[
 					'widget to update' => 'Reference widget 23',
@@ -1064,7 +1064,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Totals: Show all problems that have at least one of 2 speciffic tags, one of them contains a value.
+			// Totals: Show all problems that have at least one of 2 specific tags, one of them contains a value.
 			[
 				[
 					'widget to update' => 'Reference widget 24',
@@ -1125,7 +1125,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Totals: 2 tags with Or operator, both of them equal to speciffic values.
+			// Totals: 2 tags with Or operator, both of them equal to specific values.
 			[
 				[
 					'widget to update' => 'Reference widget 27',
@@ -1179,7 +1179,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 				[
 					'widget to update' => 'Totals reference widget 2',
 					'fields' => [
-						'Name' => 'Totals: Display only unacknowledged problems with operational data withour timeline',
+						'Name' => 'Totals: Display only unacknowledged problems with operational data without timeline',
 						'Problem display' => 'Unacknowledged only',
 						'Show operational data' => 'Separately',
 						'Show timeline' => false
@@ -1632,7 +1632,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 
 	/*
 	 * This function checks problem details hintbox content for Host "ЗАББИКС Сервер" and severity "Average".
-	 * Only the number of problems and the values for one speciffic problem are checked.
+	 * Only the number of problems and the values for one specific problem are checked.
 	 */
 	private function checkPopupContent($data, $widget, $show){
 		$expected_popup = [
