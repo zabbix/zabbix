@@ -297,7 +297,7 @@ func (c *Connector) run() {
 	var lastFlush time.Time
 
 	defer log.PanicHook()
-	log.Debugf("[%d] starting server connector for '%s'", c.clientID, c.addresses[0])
+	log.Debugf("[%d] starting server connector for %s", c.clientID, c.addresses)
 
 	ticker := time.NewTicker(time.Second)
 run:
