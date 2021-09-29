@@ -22,8 +22,10 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
+/**
+ * @backup profiles
+ */
 class testZBX6663 extends CLegacyWebTest {
-
 
 	/**
 	 * The name of the discovery rule created in the test data set.
