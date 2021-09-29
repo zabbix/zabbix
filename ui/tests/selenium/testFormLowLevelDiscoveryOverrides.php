@@ -2010,7 +2010,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 				}
 				unset($condition);
 
-				// Check that Fiters are filled correctly.
+				// Check that Filters are filled correctly.
 				$filters_table = $override_overlay->query('id:overrides_filters')->asMultifieldTable()->one();
 				$mapping = $this->setFiltersTableMapping($filters_table);
 				$filters_table->setFieldMapping($mapping)->checkValue($override['Filters']['filter_conditions']);
