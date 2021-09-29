@@ -38,7 +38,7 @@ void	zbx_mock_test_entry(void **state)
 	ZBX_UNUSED(state);
 
 	zbx_mock_assert_result_eq("zbx_tcp_connect() return code", SUCCEED,
-			zbx_tcp_connect(&s, NULL, "127.0.0.1", 10050, 0, ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL));
+			zbx_tcp_connect(&s, NULL, "127.0.0.1", 10050, 0, 0, ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL));
 
 	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 	received = zbx_tcp_recv_ext(&s, 0, ZBX_TCP_LARGE);
