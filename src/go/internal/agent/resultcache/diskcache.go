@@ -240,7 +240,7 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 	}
 	if err = u.Write(data, time.Duration(timeout)*time.Second); err != nil {
 		if c.lastError == nil || err.Error() != c.lastError.Error() {
-			c.Warningf("history upload to [%s %s] started to fail: %s", u.Addr(), u.Hostname(), err)
+			c.Warningf("history upload to %s [%s] started to fail: %s", u.Addr(), u.Hostname(), err)
 			c.lastError = err
 		}
 		return
