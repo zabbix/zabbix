@@ -142,8 +142,8 @@ class CControllerHostEdit extends CController {
 					'selectDiscoveryRule' => ['itemid', 'name', 'parent_hostid'],
 					'selectGroups' => ['groupid'],
 					'selectHostDiscovery' => ['parent_hostid'],
-					'selectInterfaces' => ['interfaceid', 'type', 'available', 'error', 'details', 'ip', 'dns', 'port',
-						'useip'
+					'selectInterfaces' => ['interfaceid', 'type', 'main', 'available', 'error', 'details', 'ip', 'dns',
+						'port', 'useip'
 					],
 					'selectInventory' => array_column(getHostInventories(), 'db_field'),
 					'selectMacros' => ['hostmacroid', 'macro', 'value', 'description', 'type'],
