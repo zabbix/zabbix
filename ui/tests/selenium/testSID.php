@@ -24,6 +24,9 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
  * @backup token
+ *
+ * @dataSource ScheduledReports
+ *
  * @onBefore prepareTokenData
  */
 class testSID extends CWebTest {
@@ -661,16 +664,11 @@ class testSID extends CWebTest {
 	public function testSID_Links($data) {
 		foreach ([$data['link'], $data['link'].'&sid=test111116666666'] as $link) {
 			$this->page->login()->open($link)->waitUntilReady();
-			if (array_key_exists('incorrect_request', $data)) {
-				$this->assertMessage(TEST_BAD, 'Zabbix has received an incorrect request.', 'Operation cannot be'.
-						' performed due to unauthorized request.');
-			}
-			else {
-				$this->assertMessage(TEST_BAD, 'Access denied', 'You are logged in as "Admin". You have no permissions '.
-						'to access this page.');
-				$this->query('button:Go to "Dashboard"')->one()->waitUntilClickable()->click();
-				$this->assertContains('zabbix.php?action=dashboard', $this->page->getCurrentUrl());
-			}
+
+			$this->assertMessage(TEST_BAD, 'Access denied', 'You are logged in as "Admin". You have no permissions to access this page.');
+			$this->query('button:Go to "Dashboard"')->one()->waitUntilClickable()->click();
+
+			$this->assertContains('zabbix.php?action=dashboard', $this->page->getCurrentUrl());
 		}
 	}
 
@@ -728,7 +726,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM hosts',
-					'incorrect_request' => true,
+					'server_error' => true,
 					'link' => 'zabbix.php?action=host.edit'
 				]
 			],
@@ -737,7 +735,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM hosts',
-					'incorrect_request' => true,
+					'server_error' => true,
 					'link' => 'zabbix.php?action=host.edit&hostid=99062'
 				]
 			],
@@ -1173,7 +1171,7 @@ class testSID extends CWebTest {
 				[
 					'db' => 'SELECT * FROM report',
 					'incorrect_request' => true,
-					'link' => 'zabbix.php?action=scheduledreport.update&reportid=3'
+					'link' => 'zabbix.php?action=scheduledreport.edit&reportid=3'
 				]
 			]
 		];
@@ -1184,24 +1182,32 @@ class testSID extends CWebTest {
 	 */
 	public function testSID_ElementRemove($data) {
 		$hash_before = CDBHelper::getHash($data['db']);
-		$this->page->login()->open((!str_contains($data['link'], 'tokenid')) ? $data['link'] : $data['link'].self::$token_id)
-				->waitUntilReady();
+		$url = (!str_contains($data['link'], 'tokenid') ? $data['link'] : $data['link'].self::$token_id);
+		$this->page->login()->open($url)->waitUntilReady();
 		$this->query('xpath://input[@name="sid"]')->one()->delete();
 		$this->query(($this->query('button:Update')->exists()) ? 'button:Update' : 'xpath://button[text()="Add" and'.
 				' @type="submit"]')->waitUntilClickable()->one()->click();
 
-		if (array_key_exists('incorrect_request', $data)) {
-			$this->assertMessage(TEST_BAD, 'Access denied', 'You are logged in as "Admin". You have no permissions to '.
-					'access this page.');
+		if (CTestArrayHelper::get($data, 'incorrect_request')) {
+			$message = 'Access denied';
+			$details = 'You are logged in as "Admin". You have no permissions to access this page.';
+		}
+		elseif (CTestArrayHelper::get($data, 'server_error')) {
+			$message = 'Unexpected server error.';
+			$details = null;
+		}
+		else {
+			$message = 'Zabbix has received an incorrect request.';
+			$details = 'Operation cannot be performed due to unauthorized request.';
+		}
+		$this->assertMessage(TEST_BAD, $message, $details);
+
+		if (CTestArrayHelper::get($data, 'incorrect_request'))  {
 			$this->query('button:Go to "Dashboard"')->one()->waitUntilClickable()->click();
 			$this->page->waitUntilReady();
 			$this->assertContains('zabbix.php?action=dashboard', $this->page->getCurrentUrl());
 		}
-		else {
-			$this->assertMessage(TEST_BAD, 'Zabbix has received an incorrect request.', 'Operation cannot be'.
-					' performed due to unauthorized request.');
 
 		$this->assertEquals($hash_before, CDBHelper::getHash($data['db']));
-		}
 	}
 }
