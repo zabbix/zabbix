@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-09-28T18:49:20Z'
+  date: '2021-09-29T15:03:51Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -79,8 +79,8 @@ zabbix_export:
             
             try {
             
-                if (params.token === '\{\$VELOCLOUD.TOKEN\}') {
-                    throw 'Please change {$VELOCLOUD.TOKEN} macro with the proper value.';
+                if (params.token === '{' + '$VELOCLOUD.TOKEN}') {
+                    throw 'Please change {' + '$VELOCLOUD.TOKEN} macro with the proper value.';
                 }
             
                 if (params.url.indexOf('http://') === -1 && params.url.indexOf('https://') === -1) {
@@ -293,8 +293,8 @@ zabbix_export:
             
             try {
             
-                if (params.token === '\{\$VELOCLOUD.TOKEN\}') {
-                    throw 'Please change {$VELOCLOUD.TOKEN} macro with the proper value.';
+                if (params.token === '{' + '$VELOCLOUD.TOKEN}') {
+                    throw 'Please change {' + '$VELOCLOUD.TOKEN} macro with the proper value.';
                 }
             
                 if (params.url.indexOf('http://') === -1 && params.url.indexOf('https://') === -1) {
@@ -518,8 +518,8 @@ zabbix_export:
             
             try {
             
-                if (params.token === '\{\$VELOCLOUD.TOKEN\}') {
-                    throw 'Please change {$VELOCLOUD.TOKEN} macro with the proper value.';
+                if (params.token === '{' + '$VELOCLOUD.TOKEN}') {
+                    throw 'Please change {' + '$VELOCLOUD.TOKEN} macro with the proper value.';
                 }
             
                 if (params.url.indexOf('http://') === -1 && params.url.indexOf('https://') === -1) {
