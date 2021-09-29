@@ -28,49 +28,30 @@
 	$(() => {
 		$('#imagetype').on('change', (e) => redirect(e.target.value));
 
-		lazy_load.load(document.querySelectorAll('.lazyload-image img'));
+		new orderLoadImages(document.querySelector('.adm-img'));
 	});
 
-	class lazyLoadImages {
+	class orderLoadImages {
 
 		constructor(root) {
-			this.options = {
-				root: root,
-				rootMargin: '0px 0px 0px 0px',
-				threshold: 1
+			if (root instanceof Element) {
+				this.loadImages(root);
 			}
-			const self = this;
-
-			new Promise((resolve) => {
-				self.observer = new IntersectionObserver(async (entries) => {
-					for (let i = 0; i < entries.length; i++) {
-						const entry = entries[i];
-
-						if (entry.isIntersecting) {
-							continue;
-						}
-
-						self.observer.unobserve(entry.target);
-
-						await self.imageLoadHandler(entry.target);
-					}
-
-					resolve();
-				}, this.options);
-			});
 		}
 
-		load(elems) {
-			if (elems.length == 0) {
+		async loadImages(root) {
+			const images = root.querySelectorAll('img[data-src]');
+
+			if (images.length == 0) {
 				return;
 			}
 
-			for (let i = 0; i < elems.length; i++) {
-				this.observer.observe(elems[i]);
+			for (let i = 0; i < images.length; i++) {
+				await this.loadImage(images[i]);
 			}
 		}
 
-		async imageLoadHandler(elem) {
+		loadImage(elem) {
 			return new Promise((resolve, reject) => {
 				elem.onload = () => {
 					elem.removeAttribute('data-src');
@@ -81,6 +62,4 @@
 			});
 		}
 	}
-
-	const lazy_load = new lazyLoadImages(document.querySelector('.adm-img'));
 </script>
