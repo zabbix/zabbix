@@ -4560,10 +4560,12 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *i
 		item_prototype = (zbx_lld_item_prototype_t *)item_prototypes->values[index];
 
 		item_tag = (zbx_lld_item_tag_t *)zbx_malloc(NULL, sizeof(zbx_lld_item_tag_t));
+		item_tag->item_tagid = 0;
 		item_tag->tag = zbx_strdup(NULL, row[1]);
 		item_tag->tag_orig = NULL;
 		item_tag->value = zbx_strdup(NULL, row[2]);
 		item_tag->value_orig = NULL;
+		item_tag->flags = ZBX_FLAG_LLD_ITEM_TAG_UNSET;
 		zbx_vector_ptr_append(&item_prototype->item_tags, item_tag);
 	}
 	DBfree_result(result);

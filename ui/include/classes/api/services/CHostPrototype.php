@@ -1867,7 +1867,7 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * Compare two interface. Retun true if they are same, return false otherwise.
+	 * Compare two interface. Return true if they are same, return false otherwise.
 	 *
 	 * @param array $host_interface
 	 * @param array $db_interface

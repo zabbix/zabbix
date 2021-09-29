@@ -686,14 +686,15 @@ class testFormUserRoles extends CWebTest {
 		}
 	}
 
-	public function testFormUserRoles_SimpleUpdate() {
-		$hash_before = CDBHelper::getHash(self::ROLE_SQL);
-		$this->page->login()->open('zabbix.php?action=userrole.list');
-		$this->query('link', 'Admin role')->one()->click();
-		$this->query('button:Update')->one()->click();
-		$this->assertMessage(TEST_GOOD, 'User role updated');
-		$this->assertEquals($hash_before, CDBHelper::getHash(self::ROLE_SQL));
-	}
+	// TODO: Uncomment after ZBXNEXT-2406 will be fixed.
+//	public function testFormUserRoles_SimpleUpdate() {
+//		$hash_before = CDBHelper::getHash(self::ROLE_SQL);
+//		$this->page->login()->open('zabbix.php?action=userrole.list');
+//		$this->query('link', 'Admin role')->one()->click();
+//		$this->query('button:Update')->one()->click();
+//		$this->assertMessage(TEST_GOOD, 'User role updated');
+//		$this->assertEquals($hash_before, CDBHelper::getHash(self::ROLE_SQL));
+//	}
 
 	public static function getUpdateData() {
 		return [

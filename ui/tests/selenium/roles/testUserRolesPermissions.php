@@ -64,7 +64,10 @@ class testUserRolesPermissions extends CWebTest {
 		$role = CDataHelper::call('role.create', [
 			[
 				'name' => 'super_role',
-				'type' => 3
+				'type' => 3,
+				'rules' => [
+					'services.write.mode' => 1
+				]
 			]
 		]);
 		$this->assertArrayHasKey('roleids', $role);
@@ -1175,7 +1178,7 @@ class testUserRolesPermissions extends CWebTest {
 			if ($action_status) {
 				$this->query('id:list_mode')->asSegmentedRadio()->one()->select('Edit');
 				$this->page->waitUntilReady();
-				$this->changeRoleRule(['Manage services' => false]);
+				$this->changeRoleRule(['Read-write access to services' => 'None']);
 			}
 			else {
 				$this->checkLinks(['zabbix.php?action=service.list.edit']);

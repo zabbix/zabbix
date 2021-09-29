@@ -190,7 +190,7 @@ class CUserGroup extends CApiService {
 		self::updateTagFilters($usrgrps, __FUNCTION__);
 		self::updateUsersGroups($usrgrps, __FUNCTION__);
 
-		$this->addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_USER_GROUP, $usrgrps);
+		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_USER_GROUP, $usrgrps);
 
 		return ['usrgrpids' => $usrgrpids];
 	}
@@ -274,7 +274,7 @@ class CUserGroup extends CApiService {
 		self::updateTagFilters($usrgrps, __FUNCTION__, $db_usrgrps);
 		self::updateUsersGroups($usrgrps, __FUNCTION__, $db_usrgrps);
 
-		$this->addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER_GROUP, $usrgrps, $db_usrgrps);
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER_GROUP, $usrgrps, $db_usrgrps);
 
 		return ['usrgrpids'=> array_column($usrgrps, 'usrgrpid')];
 	}
@@ -861,7 +861,7 @@ class CUserGroup extends CApiService {
 		DB::delete('users_groups', ['usrgrpid' => $usrgrpids]);
 		DB::delete('usrgrp', ['usrgrpid' => $usrgrpids]);
 
-		$this->addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_USER_GROUP, $db_usrgrps);
+		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_USER_GROUP, $db_usrgrps);
 
 		return ['usrgrpids' => $usrgrpids];
 	}
