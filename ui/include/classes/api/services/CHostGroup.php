@@ -390,194 +390,14 @@ class CHostGroup extends CApiService {
 	}
 
 	/**
-	 * Prepare rights to inherit from parent host groups.
-	 *
-	 * @static
-	 *
-	 * @param array  $groups
-	 * @param string $groups[]['groupid']
-	 * @param string $groups[]['name']
-	 * @param array  $usrgrps
-	 * @param array  $db_usrgrps
-	 */
-	private static function prepareInheritedRights(array $groups, array &$usrgrps, array &$db_usrgrps): void {
-		$parent_names = [];
-
-		foreach ($groups as $group) {
-			$name = $group['name'];
-
-			while (($pos = strrpos($name, '/')) !== false) {
-				$name = substr($name, 0, $pos);
-				$parent_names[$name][] = $group['groupid'];
-			}
-		}
-
-		if ($parent_names) {
-			$options = [
-				'output' => ['groupid', 'name'],
-				'filter' => ['name' => array_keys($parent_names)]
-			];
-			$result = DBselect(DB::makeSql('hstgrp', $options));
-
-			$db_parent_groups = [];
-
-			while ($row = DBfetch($result)) {
-				$db_parent_groups[$row['name']] = $row['groupid'];
-			}
-
-			$parent_groupids = [];
-
-			foreach ($groups as $group) {
-				$name = $group['name'];
-
-				while (($pos = strrpos($name, '/')) !== false) {
-					$name = substr($name, 0, $pos);
-
-					if (array_key_exists($name, $db_parent_groups)) {
-						$parent_groupids[$db_parent_groups[$name]][] = $group['groupid'];
-						break;
-					}
-				}
-			}
-
-			if ($parent_groupids) {
-				$options = [
-					'output' => ['groupid', 'permission', 'id'],
-					'filter' => ['id' => array_keys($parent_groupids)]
-				];
-				$db_rights = DBselect(DB::makeSql('rights', $options));
-
-				while ($db_right = DBfetch($db_rights)) {
-					$usrgrps[$db_right['groupid']]['usrgrpid'] = $db_right['groupid'];
-					$db_usrgrps[$db_right['groupid']]['usrgrpid'] = $db_right['groupid'];
-					$db_usrgrps[$db_right['groupid']]['rights'] = [];
-
-					foreach ($parent_groupids[$db_right['id']] as $hstgrpid) {
-						$usrgrps[$db_right['groupid']]['rights'][] = [
-							'groupid' => $db_right['groupid'],
-							'permission' => $db_right['permission'],
-							'id' => $hstgrpid
-						];
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * Prepare tag filters to inherit from parent host groups.
-	 *
-	 * @static
-	 *
-	 * @param array  $groups
-	 * @param string $groups[]['groupid']
-	 * @param string $groups[]['name']
-	 * @param array  $usrgrps
-	 * @param array  $db_usrgrps
-	 */
-	private static function prepareInheritedTagFilters(array $groups, array &$usrgrps, array &$db_usrgrps): void {
-		$parent_names = [];
-
-		foreach ($groups as $group) {
-			$name = $group['name'];
-
-			while (($pos = strrpos($name, '/')) !== false) {
-				$name = substr($name, 0, $pos);
-				$parent_names[$name][] = $group['groupid'];
-			}
-		}
-
-		if ($parent_names) {
-			$options = [
-				'output' => ['groupid', 'name'],
-				'filter' => ['name' => array_keys($parent_names)]
-			];
-			$result = DBselect(DB::makeSql('hstgrp', $options));
-
-			$db_parent_groups = [];
-
-			while ($row = DBfetch($result)) {
-				$db_parent_groups[$row['name']] = $row['groupid'];
-			}
-
-			$parent_groupids = [];
-
-			foreach ($groups as $group) {
-				$name = $group['name'];
-
-				while (($pos = strrpos($name, '/')) !== false) {
-					$name = substr($name, 0, $pos);
-
-					if (array_key_exists($name, $db_parent_groups)) {
-						$parent_groupids[$db_parent_groups[$name]][] = $group['groupid'];
-						break;
-					}
-				}
-			}
-
-			if ($parent_groupids) {
-				$options = [
-					'output' => ['usrgrpid', 'groupid', 'tag', 'value'],
-					'filter' => ['groupid' => array_keys($parent_groupids)]
-				];
-				$db_tag_filters = DBselect(DB::makeSql('tag_filter', $options));
-
-				while ($db_tag_filter = DBfetch($db_tag_filters)) {
-					$usrgrps[$db_tag_filter['usrgrpid']]['usrgrpid'] = $db_tag_filter['usrgrpid'];
-					$db_usrgrps[$db_tag_filter['usrgrpid']]['usrgrpid'] = $db_tag_filter['usrgrpid'];
-					$db_usrgrps[$db_tag_filter['usrgrpid']]['tag_filters'] = [];
-
-					foreach ($parent_groupids[$db_tag_filter['groupid']] as $hstgrpid) {
-						$usrgrps[$db_tag_filter['usrgrpid']]['tag_filters'][] = [
-							'usrgrpid' => $db_tag_filter['usrgrpid'],
-							'groupid' => $hstgrpid,
-							'tag' => $db_tag_filter['tag'],
-							'value' => $db_tag_filter['value']
-						];
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * Inherit rights and tag filters of parent host groups.
-	 *
-	 * @param array $groups
-	 */
-	private static function inheritUserGroupsData(array $groups): void {
-		$usrgrps = [];
-		$db_usrgrps = [];
-
-		self::prepareInheritedRights($groups, $usrgrps, $db_usrgrps);
-		self::prepareInheritedTagFilters($groups, $usrgrps, $db_usrgrps);
-
-		if ($usrgrps) {
-			$usrgrps = array_values($usrgrps);
-
-			$options = [
-				'output' => ['usrgrpid', 'name'],
-				'usrgrpids' => array_keys($db_usrgrps)
-			];
-			$result = DBselect(DB::makeSql('usrgrp', $options));
-
-			while ($row = DBfetch($result)) {
-				$db_usrgrps[$row['usrgrpid']]['name'] = $row['name'];
-			}
-
-			CUserGroup::updateForce($usrgrps, $db_usrgrps);
-		}
-	}
-
-	/**
 	 * @param array  $groups
 	 *
 	 * @return array
 	 */
-	public function create(array $groups) {
+	public function create(array $groups): array {
 		self::validateCreate($groups);
 
-		$groupids = DB::insertBatch('hstgrp', $groups);
+		$groupids = DB::insert('hstgrp', $groups);
 
 		foreach ($groups as $index => &$group) {
 			$group['groupid'] = $groupids[$index];
@@ -596,7 +416,7 @@ class CHostGroup extends CApiService {
 	 *
 	 * @return array
 	 */
-	public function update(array $groups) {
+	public function update(array $groups): array {
 		$this->validateUpdate($groups, $db_groups);
 
 		$upd_groups = [];
@@ -604,19 +424,23 @@ class CHostGroup extends CApiService {
 		foreach ($groups as $group) {
 			$db_group = $db_groups[$group['groupid']];
 
-			if (array_key_exists('name', $group) && $group['name'] !== $db_group['name']) {
+			$upd_group = DB::getUpdatedValues('hstgrp', $group, $db_group);
+
+			if ($upd_group) {
 				$upd_groups[] = [
-					'values' => ['name' => $group['name']],
+					'values' => $upd_group,
 					'where' => ['groupid' => $group['groupid']]
 				];
 			}
 		}
 
-		DB::update('hstgrp', $upd_groups);
+		if ($upd_groups) {
+			DB::update('hstgrp', $upd_groups);
+		}
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_HOST_GROUP, $groups, $db_groups);
 
-		return ['groupids' => zbx_objectValues($groups, 'groupid')];
+		return ['groupids' => array_column($groups, 'groupid')];
 	}
 
 	/**
@@ -625,7 +449,7 @@ class CHostGroup extends CApiService {
 	 *
 	 * @return array
 	 */
-	public function delete(array $groupids, $nopermissions = false) {
+	public function delete(array $groupids, $nopermissions = false): array {
 		$this->validateDelete($groupids, $db_groups, $nopermissions);
 
 		// delete sysmap element
@@ -719,32 +543,9 @@ class CHostGroup extends CApiService {
 
 		DB::delete('hstgrp', ['groupid' => $groupids]);
 
-		$this->addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_HOST_GROUP, $db_groups);
+		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_HOST_GROUP, $db_groups);
 
 		return ['groupids' => $groupids];
-	}
-
-	/**
-	 * Check for duplicated host groups.
-	 *
-	 * @static
-	 *
-	 * @param array  $names
-	 *
-	 * @throws APIException if host group already exists.
-	 */
-	private static function checkDuplicates(array $names): void {
-		$db_groups = DB::select('hstgrp', [
-			'output' => ['name'],
-			'filter' => ['name' => $names],
-			'limit' => 1
-		]);
-
-		if ($db_groups) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Host group "%1$s" already exists.', $db_groups[0]['name'])
-			);
-		}
 	}
 
 	/**
@@ -763,42 +564,44 @@ class CHostGroup extends CApiService {
 			'uuid' =>	['type' => API_UUID],
 			'name' =>	['type' => API_HG_NAME, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hstgrp', 'name')]
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $groups, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		self::checkDuplicates(zbx_objectValues($groups, 'name'));
+		self::checkDuplicates($groups);
 		self::checkAndAddUuid($groups);
 	}
 
 	/**
-	 * Check that new UUIDs are not already used and generate UUIDs where missing.
+	 * @param array $groups
+	 * @param array $db_groups
 	 *
-	 * @static
-	 *
-	 * @param array $groups_to_create
-	 *
-	 * @throws APIException
+	 * @throws APIException if the input is invalid.
 	 */
-	private static function checkAndAddUuid(array &$groups_to_create): void {
-		foreach ($groups_to_create as &$group) {
-			if (!array_key_exists('uuid', $group)) {
-				$group['uuid'] = generateUuidV4();
-			}
-		}
-		unset($group);
+	protected function validateUpdate(array &$groups, array &$db_groups = null): void {
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid'], ['name']], 'fields' => [
+			'groupid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
+			'name' =>		['type' => API_HG_NAME, 'length' => DB::getFieldLength('hstgrp', 'name')]
+		]];
 
-		$db_uuid = DB::select('hstgrp', [
-			'output' => ['uuid'],
-			'filter' => ['uuid' => array_column($groups_to_create, 'uuid')],
-			'limit' => 1
+		if (!CApiInputValidator::validate($api_input_rules, $groups, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$db_groups = $this->get([
+			'output' => ['groupid', 'name', 'flags'],
+			'groupids' => array_column($groups, 'groupid'),
+			'editable' => true,
+			'preservekeys' => true
 		]);
 
-		if ($db_uuid) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
-			);
+		if (count($db_groups) != count($groups)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
+
+		self::checkGroupsNotDiscovered($db_groups);
+		self::checkDuplicates($groups, $db_groups);
 	}
 
 	/**
@@ -824,12 +627,11 @@ class CHostGroup extends CApiService {
 			'nopermissions' => $nopermissions
 		]);
 
+		if (count($db_groups) != count($groupids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
 		foreach ($groupids as $groupid) {
-			if (!array_key_exists($groupid, $db_groups)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
 			if ($db_groups[$groupid]['internal'] == ZBX_INTERNAL_GROUP) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Host group "%1$s" is internal and cannot be deleted.', $db_groups[$groupid]['name'])
@@ -895,52 +697,287 @@ class CHostGroup extends CApiService {
 	}
 
 	/**
-	 * @param array $groups
-	 * @param array $db_groups
+	 * Check for unique host group names.
 	 *
-	 * @throws APIException if the input is invalid.
+	 * @static
+	 *
+	 * @param array      $groups
+	 * @param array|null $db_groups
+	 *
+	 * @throws APIException if host group names are not unique.
 	 */
-	protected function validateUpdate(array &$groups, array &$db_groups = null) {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid'], ['name']], 'fields' => [
-			'groupid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
-			'name' =>		['type' => API_HG_NAME, 'length' => DB::getFieldLength('hstgrp', 'name')]
-		]];
-		if (!CApiInputValidator::validate($api_input_rules, $groups, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
-		// permissions
-		$db_groups = $this->get([
-			'output' => ['groupid', 'name', 'flags'],
-			'groupids' => zbx_objectValues($groups, 'groupid'),
-			'editable' => true,
-			'preservekeys' => true
-		]);
-
-		$update_discovered_validator = new CUpdateDiscoveredValidator([
-			'messageAllowed' => _('Cannot update a discovered host group.')
-		]);
-
+	private static function checkDuplicates(array $groups, array $db_groups = null): void {
 		$names = [];
 
 		foreach ($groups as $group) {
-			if (!array_key_exists($group['groupid'], $db_groups)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
+			if (!array_key_exists('name', $group)) {
+				continue;
 			}
 
-			$db_group = $db_groups[$group['groupid']];
-
-			$this->checkPartialValidator($group, $update_discovered_validator, $db_group);
-
-			if (array_key_exists('name', $group) && $group['name'] !== $db_group['name']) {
+			if ($db_groups === null || $group['name'] !== $db_groups[$group['groupid']]['name']) {
 				$names[] = $group['name'];
 			}
 		}
 
-		if ($names) {
-			self::checkDuplicates($names);
+		if (!$names) {
+			return;
+		}
+
+		$duplicates = DB::select('hstgrp', [
+			'output' => ['name'],
+			'filter' => ['name' => $names],
+			'limit' => 1
+		]);
+
+		if ($duplicates) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host group "%1$s" already exists.', $duplicates[0]['name']));
+		}
+	}
+
+	/**
+	 * Check that new UUIDs are not already used and generate UUIDs where missing.
+	 *
+	 * @static
+	 *
+	 * @param array $groups_to_create
+	 *
+	 * @throws APIException
+	 */
+	private static function checkAndAddUuid(array &$groups_to_create): void {
+		foreach ($groups_to_create as &$group) {
+			if (!array_key_exists('uuid', $group)) {
+				$group['uuid'] = generateUuidV4();
+			}
+		}
+		unset($group);
+
+		$db_uuid = DB::select('hstgrp', [
+			'output' => ['uuid'],
+			'filter' => ['uuid' => array_column($groups_to_create, 'uuid')],
+			'limit' => 1
+		]);
+
+		if ($db_uuid) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
+			);
+		}
+	}
+
+	/**
+	 * Check whether no one of passed groups are discovered host.
+	 *
+	 * @static
+	 *
+	 * @param array  $db_groups
+	 * @param string $db_groups[][name]
+	 * @param int    $db_groups[][flags]
+	 *
+	 * @throws APIException
+	 */
+	private static function checkGroupsNotDiscovered(array $db_groups): void {
+		foreach ($db_groups as $db_group) {
+			if ($db_group['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Cannot update a discovered host group "%1$s".', $db_group['name'])
+				);
+			}
+		}
+	}
+
+	/**
+	 * Validates if host groups may be deleted, due to maintenance constrain.
+	 *
+	 * @static
+	 *
+	 * @param array $groupids
+	 *
+	 * @throws APIException if a constrain failed
+	 */
+	private static function validateDeleteCheckMaintenances(array $groupids): void {
+		$maintenance = DBfetch(DBselect(
+			'SELECT m.name'.
+			' FROM maintenances m'.
+			' WHERE NOT EXISTS ('.
+				'SELECT NULL'.
+				' FROM maintenances_groups mg'.
+				' WHERE m.maintenanceid=mg.maintenanceid'.
+					' AND '.dbConditionInt('mg.groupid', $groupids, true).
+			')'.
+				' AND NOT EXISTS ('.
+					'SELECT NULL'.
+					' FROM maintenances_hosts mh'.
+					' WHERE m.maintenanceid=mh.maintenanceid'.
+				')'
+		));
+
+		if ($maintenance) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _n(
+				'Cannot delete host group because maintenance "%1$s" must contain at least one host or host group.',
+				'Cannot delete selected host groups because maintenance "%1$s" must contain at least one host or host group.',
+				$maintenance['name'],
+				count($groupids)
+			));
+		}
+	}
+
+	/**
+	 * Inherit user groups data of parent host groups.
+	 *
+	 * @param array $groups
+	 */
+	private static function inheritUserGroupsData(array $groups): void {
+		$group_links = self::getGroupLinks($groups);
+
+		if ($group_links) {
+			$usrgrps = [];
+			$db_usrgrps = [];
+
+			self::prepareInheritedRights($group_links, $usrgrps, $db_usrgrps);
+			self::prepareInheritedTagFilters($group_links, $usrgrps, $db_usrgrps);
+
+			$usrgrps = array_values($usrgrps);
+
+			if ($usrgrps) {
+				CUserGroup::updateForce($usrgrps, $db_usrgrps);
+			}
+		}
+	}
+
+	/**
+	 * Get links of parent groups to given groups.
+	 *
+	 * @param array $groups
+	 *
+	 * @return array Array where keys are parent group IDs and values are the array of child group IDs.
+	 */
+	private static function getGroupLinks(array $groups): array {
+		$parent_names = [];
+
+		foreach ($groups as $group) {
+			$name = $group['name'];
+
+			while (($pos = strrpos($name, '/')) !== false) {
+				$name = substr($name, 0, $pos);
+				$parent_names[$name] = true;
+			}
+		}
+
+		if (!$parent_names) {
+			return [];
+		}
+
+		$options = [
+			'output' => ['groupid', 'name'],
+			'filter' => ['name' => array_keys($parent_names)]
+		];
+		$result = DBselect(DB::makeSql('hstgrp', $options));
+
+		$parents_groupids = [];
+
+		while ($row = DBfetch($result)) {
+			$parents_groupids[$row['name']] = $row['groupid'];
+		}
+
+		if (!$parents_groupids) {
+			return [];
+		}
+
+		$group_links = [];
+
+		foreach ($groups as $group) {
+			$name = $group['name'];
+
+			while (($pos = strrpos($name, '/')) !== false) {
+				$name = substr($name, 0, $pos);
+
+				if (array_key_exists($name, $parents_groupids)) {
+					$group_links[$parents_groupids[$name]][] = $group['groupid'];
+					break;
+				}
+			}
+		}
+
+		return $group_links;
+	}
+
+	/**
+	 * Prepare rights to inherit from parent host groups.
+	 *
+	 * @static
+	 *
+	 * @param array  $group_links
+	 * @param array  $usrgrps
+	 * @param array  $db_usrgrps
+	 */
+	private static function prepareInheritedRights(array $group_links, array &$usrgrps, array &$db_usrgrps): void {
+		$db_rights = DBselect(
+			'SELECT r.groupid,r.permission,r.id,g.name'.
+			' FROM rights r,usrgrp g'.
+			' WHERE r.groupid=g.usrgrpid'.
+				' AND '.dbConditionInt('r.id', array_keys($group_links))
+		);
+
+		while ($db_right = DBfetch($db_rights)) {
+			if (!array_key_exists($db_right['groupid'], $usrgrps)) {
+				$usrgrps[$db_right['groupid']] = ['usrgrpid' => $db_right['groupid']];
+				$db_usrgrps[$db_right['groupid']] = [
+					'usrgrpid' => $db_right['groupid'],
+					'name' => $db_right['name']
+				];
+			}
+
+			if (!array_key_exists('rights', $db_usrgrps[$db_right['groupid']])) {
+				$db_usrgrps[$db_right['groupid']]['rights'] = [];
+			}
+
+			foreach ($group_links[$db_right['id']] as $hstgrpid) {
+				$usrgrps[$db_right['groupid']]['rights'][] = [
+					'permission' => $db_right['permission'],
+					'id' => $hstgrpid
+				];
+			}
+		}
+	}
+
+	/**
+	 * Prepare tag filters to inherit from parent host groups.
+	 *
+	 * @static
+	 *
+	 * @param array  $group_links
+	 * @param array  $usrgrps
+	 * @param array  $db_usrgrps
+	 */
+	private static function prepareInheritedTagFilters(array $group_links, array &$usrgrps,
+			array &$db_usrgrps): void {
+		$db_tag_filters = DBselect(
+			'SELECT t.usrgrpid,t.groupid,t.tag,t.value,g.name'.
+			' FROM tag_filter t,usrgrp g'.
+			' WHERE t.usrgrpid=g.usrgrpid'.
+				' AND '.dbConditionInt('t.groupid', array_keys($group_links))
+		);
+
+		while ($db_tag_filter = DBfetch($db_tag_filters)) {
+			if (!array_key_exists($db_tag_filter['usrgrpid'], $usrgrps)) {
+				$usrgrps[$db_tag_filter['usrgrpid']] = ['usrgrpid' => $db_tag_filter['usrgrpid']];
+				$db_usrgrps[$db_tag_filter['usrgrpid']] = [
+					'usrgrpid' => $db_tag_filter['usrgrpid'],
+					'name' => $db_tag_filter['name']
+				];
+			}
+
+			if (!array_key_exists('tag_filters', $db_usrgrps[$db_tag_filter['usrgrpid']])) {
+				$db_usrgrps[$db_tag_filter['usrgrpid']]['tag_filters'] = [];
+			}
+
+			foreach ($group_links[$db_tag_filter['groupid']] as $hstgrpid) {
+				$usrgrps[$db_tag_filter['usrgrpid']]['tag_filters'][] = [
+					'groupid' => $hstgrpid,
+					'tag' => $db_tag_filter['tag'],
+					'value' => $db_tag_filter['value']
+				];
+			}
 		}
 	}
 
@@ -968,7 +1005,7 @@ class CHostGroup extends CApiService {
 	}
 
 	/**
-	 * Replace existing hosts (non-discovered only) and templates of given host groups with given hosts and templates.
+	 * Replace existing hosts and templates of given host groups with given hosts and templates.
 	 *
 	 * @param array $data
 	 *
@@ -1099,10 +1136,6 @@ class CHostGroup extends CApiService {
 
 		if (!CApiInputValidator::validate($api_input_rules, $data, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
-		if (!array_key_exists('hosts', $data) && !array_key_exists('templates', $data)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one host or template must be specified.'));
 		}
 
 		$groupids = array_column($data['groups'], 'groupid');
@@ -1604,41 +1637,5 @@ class CHostGroup extends CApiService {
 		}
 
 		return $result;
-	}
-
-	/**
-	 * Validates if host groups may be deleted, due to maintenance constrain.
-	 *
-	 * @static
-	 *
-	 * @param array $groupids
-	 *
-	 * @throws APIException if a constrain failed
-	 */
-	private static function validateDeleteCheckMaintenances(array $groupids): void {
-		$maintenance = DBfetch(DBselect(
-			'SELECT m.name'.
-			' FROM maintenances m'.
-			' WHERE NOT EXISTS ('.
-				'SELECT NULL'.
-				' FROM maintenances_groups mg'.
-				' WHERE m.maintenanceid=mg.maintenanceid'.
-					' AND '.dbConditionInt('mg.groupid', $groupids, true).
-			')'.
-				' AND NOT EXISTS ('.
-					'SELECT NULL'.
-					' FROM maintenances_hosts mh'.
-					' WHERE m.maintenanceid=mh.maintenanceid'.
-				')'
-		));
-
-		if ($maintenance) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _n(
-				'Cannot delete host group because maintenance "%1$s" must contain at least one host or host group.',
-				'Cannot delete selected host groups because maintenance "%1$s" must contain at least one host or host group.',
-				$maintenance['name'],
-				count($groupids)
-			));
-		}
 	}
 }
