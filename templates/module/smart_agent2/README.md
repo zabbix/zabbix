@@ -1,5 +1,5 @@
 
-# SMART by Zabbix agent 2
+# Template Module SMART by Zabbix agent 2
 
 ## Overview
 
@@ -44,8 +44,8 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Disk discovery |<p>Discovery SMART disks.</p> |ZABBIX_PASSIVE |smart.disk.discovery |
-|Attribute discovery |<p>Discovery SMART Vendor Specific Attributes of disks.</p> |ZABBIX_PASSIVE |smart.attribute.discovery |
+|Disk discovery |<p>Discovery SMART disks.</p> |ZABBIX_PASSIVE |smart.disk.discovery<p>**Overrides:**</p><p>Self-test<br> - {#DISKTYPE} MATCHES_REGEX `nvme`<br>  - ITEM_PROTOTYPE LIKE `Self-test` - NO_DISCOVER</p><p>Not NVMe<br> - {#DISKTYPE} NOT_MATCHES_REGEX `nvme`<br>  - ITEM_PROTOTYPE REGEXP `Media|Percentage|Critical` - NO_DISCOVER</p> |
+|Attribute discovery |<p>Discovery SMART Vendor Specific Attributes of disks.</p> |ZABBIX_PASSIVE |smart.attribute.discovery<p>**Overrides:**</p><p>ID filter<br> - {#ID} MATCHES_REGEX `{$SMART.ATTRIBUTE.ID.MATCHES}` - {#NAME} MATCHES_REGEX `{$SMART.DISK.NAME.MATCHES}`<br>  - ITEM_PROTOTYPE REGEXP `` - NO_DISCOVER</p> |
 
 ## Items collected
 
@@ -56,11 +56,12 @@ There are no template links in this template.
 |Zabbix_raw_items |SMART [{#NAME}]: Serial number |<p>-</p> |DEPENDENT |smart.disk.sn[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.disk_name=='{#NAME}')].serial_number.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Zabbix_raw_items |SMART [{#NAME}]: Self-test passed |<p>The disk is passed the SMART self-test or not.</p> |DEPENDENT |smart.disk.test[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.disk_name=='{#NAME}')].ata_smart_data.self_test.status.passed.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Zabbix_raw_items |SMART [{#NAME}]: Temperature |<p>Current drive temperature.</p> |DEPENDENT |smart.disk.temperature[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.disk_name=='{#NAME}')].temperature.current.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
-|Zabbix_raw_items |SMART [{#NAME}]: Power on hours |<p>Count of hours in power-on state. The raw value of this attribute shows total count of hours (or minutes, or seconds, depending on manufacturer) in power-on state. "By default, the total expected lifetime of a hard disk in perfect condition is defined as 5 years (running every day and night on all days). This is equal to 1825 days in 24/7 mode or 43800 hours." On some pre-2005 drives, this raw value may advance erratically and/or "wrap around" (reset to zero periodically). https://en.wikipedia.org/wiki/S.M.A.R.T.#Known_ATA_S.M.A.R.T._attributes</p> |DEPENDENT |smart.disk.hours[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.disk_name=='{#NAME}')].power_on_time.hours.first()`</p> |
+|Zabbix_raw_items |SMART [{#NAME}]: Power on hours |<p>Count of hours in power-on state. The raw value of this attribute shows total count of hours (or minutes, or seconds, depending on manufacturer) in power-on state. "By default, the total expected lifetime of a hard disk in perfect condition is defined as 5 years (running every day and night on all days). This is equal to 1825 days in 24/7 mode or 43800 hours." On some pre-2005 drives, this raw value may advance erratically and/or "wrap around" (reset to zero periodically). https://en.wikipedia.org/wiki/S.M.A.R.T.#Known_ATA_S.M.A.R.T._attributes</p> |DEPENDENT |smart.disk.hours[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.disk_name=='{#NAME}')].power_on_time.hours.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Zabbix_raw_items |SMART [{#NAME}]: Percentage used |<p>Contains a vendor specific estimate of the percentage of NVM subsystem life used based on the actual usage and the manufacturer’s prediction of NVM life. A value of 100 indicates that the estimated endurance of the NVM in the NVM subsystem has been consumed, but may not indicate an NVM subsystem failure. The value is allowed to exceed 100. Percentages greater than 254 shall be represented as 255. This value shall be updated once per power-on hour (when the controller is not in a sleep state).</p> |DEPENDENT |smart.disk.percentage_used[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.disk_name=='{#NAME}')].nvme_smart_health_information_log.percentage_used.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Zabbix_raw_items |SMART [{#NAME}]: Critical warning |<p>This field indicates critical warnings for the state of the controller.</p> |DEPENDENT |smart.disk.critical_warning[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.disk_name=='{#NAME}')].nvme_smart_health_information_log.critical_warning.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Zabbix_raw_items |SMART [{#NAME}]: Media errors |<p>Contains the number of occurrences where the controller detected an unrecovered data integrity error. Errors such as uncorrectable ECC, CRC checksum failure, or LBA tag mismatch are included in this field.</p> |DEPENDENT |smart.disk.media_errors[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.disk_name=='{#NAME}')].nvme_smart_health_information_log.media_errors.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Zabbix_raw_items |SMART [{#NAME}]: ID {#ID} {#ATTRNAME} |<p>-</p> |DEPENDENT |smart.disk.error[{#NAME},{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.disk_name=='{#NAME}')].ata_smart_attributes.table[?(@.id=={#ID})].value.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
+|Zabbix_raw_items |SMART [{#NAME}]: ID {#ID} {#ATTRNAME} raw value |<p>-</p> |DEPENDENT |smart.disk.attr.raw[{#NAME},{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.disk_name=='{#NAME}')].ata_smart_attributes.table[?(@.id=={#ID})].raw.string.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 
 ## Triggers
 
