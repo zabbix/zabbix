@@ -2354,8 +2354,28 @@ static int	eval_execute_function_histogram_quantile(const zbx_eval_context_t *ct
 
 		for (; i < output->values_num; i++)
 		{
-			if (SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_DBL, &output->values[i], error))
+			if (ZBX_VARIANT_STR == output->values[i].type )
+			{
+				zbx_strupper(output->values[i].data.str);
+
+				if (0 == strcmp(output->values[i].data.str, "+INF") ||
+						0 == strcmp(output->values[i].data.str, "INF"))
+				{
+					zbx_variant_clear(&output->values[i]);
+					zbx_variant_set_dbl(&output->values[i], ZBX_INFINITY);
+				}
+				else
+				{
+					*error = zbx_dsprintf(*error, "invalid string values of backet"
+							" for function at \"%s\"", err_fn);
+					goto out;
+				}
+			}
+			else if (SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_DBL, &output->values[i],
+					error))
+			{
 				goto out;
+			}
 		}
 	}
 
