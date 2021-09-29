@@ -254,7 +254,7 @@ int	CONFIG_LOG_REMOTE_COMMANDS	= 0;
 int	CONFIG_UNSAFE_USER_PARAMETERS	= 0;
 
 char	*CONFIG_SERVER			= NULL;
-int	CONFIG_SERVER_PORT		= ZBX_DEFAULT_SERVER_PORT;
+int	CONFIG_SERVER_PORT;
 char	*CONFIG_HOSTNAME		= NULL;
 char	*CONFIG_HOSTNAME_ITEM		= NULL;
 
@@ -544,6 +544,16 @@ static void	zbx_set_defaults(void)
 
 	if (NULL == CONFIG_VAULTURL)
 		CONFIG_VAULTURL = zbx_strdup(CONFIG_VAULTURL, "https://127.0.0.1:8200");
+
+	if (0 == CONFIG_SERVER_PORT)
+	{
+		CONFIG_SERVER_PORT = ZBX_DEFAULT_SERVER_PORT;
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "ServerPort parameter is deprecated,"
+					" please specify port in Server parameter separated by ':' instead");
+	}
 }
 
 /******************************************************************************
