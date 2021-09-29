@@ -57,7 +57,7 @@
 		<replace file="ui/conf/zabbix.conf.php" token="{DBUSER}" value="${dbuser}"/>
 		<replace file="ui/conf/zabbix.conf.php" token="{DBPASSWORD}" value="${dbpassword}"/>
 		<replace file="ui/conf/zabbix.conf.php" token="{PHPUNIT_ERROR_LOG}" value="${phpunit_error_log}"/>
-                <chmod file="ui/conf/zabbix.conf.php" perm="go+w"/>
+                <chmod file="ui/conf/zabbix.conf.php" perm="go+rw"/>
 	</target>
 
 	<target name="create-saml-configs">
