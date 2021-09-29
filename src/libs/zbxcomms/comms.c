@@ -381,11 +381,14 @@ static void	zbx_socket_timeout_cleanup(zbx_socket_t *s)
  *                                                                            *
  * Purpose: connect to the specified address with an optional timeout value   *
  *                                                                            *
- * Parameters: s       - [IN] socket descriptor                               *
- *             addr    - [IN] the address                                     *
- *             addrlen - [IN] the length of addr structure                    *
- *             timeout - [IN] the connection timeout (0 - system default)     *
- *             error   - [OUT] the error message                              *
+ * Parameters: s                 [IN] socket descriptor                       *
+ *             addr              [IN] the address                             *
+ *             addrlen           [IN] the length of addr structure            *
+ *             timeout           [IN] the connect,send and receive timeout    *
+ *                                    (0 - system default)                    *
+ *             connect_timeout - [IN] the separate timeout for connect        *
+ *                                    (0 - use send and receive timeout)      *
+ *             error   -         [OUT] the error message                      *
  *                                                                            *
  * Return value: SUCCEED - connected successfully                             *
  *               FAIL - an error occurred                                     *
