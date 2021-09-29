@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-09-27T17:34:09Z'
+  date: '2021-09-29T15:51:36Z'
   media_types:
     -
       name: Github
@@ -221,12 +221,12 @@ zabbix_export:
                 { name: "Zabbix" }
             ];
         
-            // Adding label corresponding to trigger severity in Zabbix
-            if (params.event_severity !== 'undefined') {
+            // Adding label corresponding to trigger severity in Zabbix.
+            if (params.event_severity !== 'undefined' && params.event_source === '0') {
                 data.labels.push({ name: params.event_severity });
             }
         
-            //In case of update or resolve event
+            // In case of update or resolve event.
             if (params.event_source === '0' && (params.event_value === '0' || params.event_update_status === '1')) {
                 process_tags = false;
                 method = 'patch';
@@ -243,7 +243,7 @@ zabbix_export:
         
             var response = Github.request(method, url, data);
         
-            // Leave a comment if comment_data present
+            // Leave a comment if comment_data present.
             if (typeof comment_data === 'object') {
                 url = github.url + 'repos/' + github.repo + '/issues/' + github.issue_number + '/comments';
                 Github.request("post", url, comment_data);
