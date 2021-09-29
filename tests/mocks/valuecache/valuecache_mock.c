@@ -45,6 +45,7 @@ int	__wrap_zbx_mutex_create(zbx_mutex_t *mutex, zbx_mutex_name_t name, char **er
 void	__wrap_zbx_mutex_destroy(zbx_mutex_t *mutex);
 int	__wrap_zbx_mem_create(zbx_mem_info_t **info, zbx_uint64_t size, const char *descr, const char *param,
 		int allow_oom, char **error);
+void	__wrap_zbx_mem_destroy(zbx_mem_info_t *info);
 void	*__wrap___zbx_mem_malloc(const char *file, int line, zbx_mem_info_t *info, const void *old, size_t size);
 void	*__wrap___zbx_mem_realloc(const char *file, int line, zbx_mem_info_t *info, void *old, size_t size);
 void	__wrap___zbx_mem_free(const char *file, int line, zbx_mem_info_t *info, void *ptr);
@@ -535,6 +536,11 @@ int	__wrap_zbx_mem_create(zbx_mem_info_t **info, zbx_uint64_t size, const char *
 	ZBX_UNUSED(error);
 
 	return SUCCEED;
+}
+
+void	__wrap_zbx_mem_destroy(zbx_mem_info_t *info)
+{
+	zbx_free(info);
 }
 
 void	*__wrap___zbx_mem_malloc(const char *file, int line, zbx_mem_info_t *info, const void *old, size_t size)

@@ -81,6 +81,7 @@ COMMON_WRAP_FUNCS = \
 	-Wl,--wrap=zbx_mutex_create \
 	-Wl,--wrap=zbx_mutex_destroy \
 	-Wl,--wrap=zbx_mem_create \
+	-Wl,--wrap=zbx_mem_destroy \
 	-Wl,--wrap=__zbx_mem_malloc \
 	-Wl,--wrap=__zbx_mem_realloc \
 	-Wl,--wrap=__zbx_mem_free \
