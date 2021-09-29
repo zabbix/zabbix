@@ -170,12 +170,12 @@ static void free_log_result(log_result_t *result)
 	zbx_free(result);
 }
 
-int	process_value_cb(void *server, const char *host, const char *key,
+int	process_value_cb(zbx_vector_ptr_t *addrs, const char *host, const char *key,
 		const char *value, unsigned char state, zbx_uint64_t *lastlogsize, const int *mtime,
 		unsigned long *timestamp, const char *source, unsigned short *severity, unsigned long *logeventid,
 		unsigned char flags)
 {
-	log_result_t *result = (log_result_t *)server;
+	log_result_t *result = (log_result_t *)addrs;
 	if (result->values.values_num == result->slots)
 		return FAIL;
 
