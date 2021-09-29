@@ -329,7 +329,7 @@ func (c *Listener) Close() (err error) {
 }
 
 func Exchange(addresses *[]string, localAddr *net.Addr, timeout time.Duration, connect_timeout time.Duration, data []byte, args ...interface{}) ([]byte, error) {
-	log.Tracef("connecting to [%s]", (*addresses)[0])
+	log.Tracef("connecting to %s [timeout:%s, connection timeout:%s]", *addresses, timeout, connect_timeout)
 
 	var tlsconfig *tls.Config
 	var err error
