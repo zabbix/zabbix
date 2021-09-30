@@ -8726,6 +8726,17 @@ return [
 			]
 		]
 	],
+	'table_lock' => [
+		'key' => 'table_name',
+		'fields' => [
+			'table_name' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => ''
+			]
+		]
+	],
 	'dbversion' => [
 		'key' => '',
 		'fields' => [

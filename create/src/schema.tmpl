@@ -1899,7 +1899,11 @@ FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|status
 INDEX		|2		|lastaccess
 
+TABLE|table_lock|table_name|ZBX_DATA
+FIELD		|table_name	|t_varchar(64)	|''	|NOT NULL	|0
+ROW		|ha_node
+
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|5050073	|5050073
+ROW		|5050075	|5050075

@@ -90,6 +90,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 void	zbx_db_close(void);
 
 int	zbx_db_begin(void);
+int	zbx_db_begin_lock(const char *dbname, const char *fmt, va_list args);
 int	zbx_db_commit(void);
 int	zbx_db_rollback(void);
 int	zbx_db_txn_level(void);
@@ -221,14 +222,6 @@ int	zbx_dbms_mariadb_used(void);
 int	zbx_db_version_check(const char *database, zbx_uint32_t current_version, zbx_uint32_t min_version,
 		zbx_uint32_t max_version, zbx_uint32_t min_supported_version);
 void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_info_t *info);
-
-#if defined(HAVE_MYSQL)
-#	define ZBX_DB_LOCK_TABLE2(t1, t2)	"lock tables " t1 " write," t2 " write"
-#elif defined(HAVE_POSTGRESQL)
-#	define ZBX_DB_LOCK_TABLE2(t1, t2)	"lock table " t1 "," t2 " in exclusive mode"
-#else /* HAVE_ORACLE */
-#	define ZBX_DB_LOCK_TABLE2(t1, t2)	"lock table " t1 "," t2 " in exclusive mode"
-#endif
 
 #if defined(HAVE_MYSQL)
 #	define ZBX_DB_TIMESTAMP()	"unix_timestamp()"

@@ -36,6 +36,8 @@ static zbx_ipc_async_socket_t	ha_socket;
 
 extern char	*CONFIG_HA_NODE_NAME;
 extern char	*CONFIG_EXTERNAL_ADDRESS;
+extern char	*CONFIG_LISTEN_IP;
+extern int	CONFIG_LISTEN_PORT;
 
 #define ZBX_HA_IS_CLUSTER()	(NULL != CONFIG_HA_NODE_NAME && '\0' != *CONFIG_HA_NODE_NAME)
 
@@ -82,7 +84,7 @@ static int	ha_check_nodes(zbx_ha_info_t *info)
 	// TODO: implement HA status check
 	zabbix_log(LOG_LEVEL_DEBUG, "checking nodes (not implemented)");
 
-	info->ha_status = ZBX_NODE_STATUS_UNKNOWN;
+	//info->ha_status = ZBX_NODE_STATUS_UNKNOWN;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() status:%d", __func__, info->ha_status);
 
@@ -249,7 +251,7 @@ static int	ha_get_nodes(zbx_vector_ha_node_t *nodes)
 
 	DBfree_result(result);
 
-	return SUCCEED;
+	return DBtxn_status();
 }
 
 static int	ha_check_cluster_config(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes)
@@ -282,10 +284,34 @@ static int	ha_check_standalone_config(zbx_ha_info_t *info, zbx_vector_ha_node_t 
 	return SUCCEED;
 }
 
+static void	ha_get_address(char **address, unsigned short *port)
+{
+	if (NULL != CONFIG_EXTERNAL_ADDRESS)
+		(void)parse_serveractive_element(CONFIG_EXTERNAL_ADDRESS, address, port, 0);
+
+	if (NULL == *address)
+	{
+		if (NULL != CONFIG_LISTEN_IP)
+		{
+			char	*tmp;
+
+			zbx_strsplit(CONFIG_LISTEN_IP, ',', address, &tmp);
+			zbx_free(tmp);
+		}
+		else
+			*address = zbx_strdup(NULL, "localhost");
+	}
+
+	if (0 == *port)
+		*port = CONFIG_LISTEN_PORT;
+
+}
+
 static int	ha_register(zbx_ha_info_t *info)
 {
 	zbx_vector_ha_node_t	nodes;
 	int			ret;
+	DB_RESULT		result;
 
 	if (ZBX_DB_DOWN == info->db_status)
 	{
@@ -308,7 +334,8 @@ static int	ha_register(zbx_ha_info_t *info)
 
 	DBbegin();
 
-	ret = DBexecute_once(ZBX_DB_LOCK_TABLE2("ha_node", "ids"));
+	result = DBselect("select null from table_lock where table_name='ha_node'" ZBX_FOR_UPDATE);
+	DBfree_result(result);
 
 	if (SUCCEED != ha_get_nodes(&nodes))
 		goto out;
@@ -320,28 +347,35 @@ static int	ha_register(zbx_ha_info_t *info)
 
 	if (SUCCEED == ret)
 	{
-		char	*sql = NULL, *name_esc;
-		size_t	sql_alloc = 0, sql_offset = 0;
+		char		*sql = NULL, *name_esc, *address = NULL, *address_esc;
+		size_t		sql_alloc = 0, sql_offset = 0;
+		unsigned short	port = 0;
+
+		ha_get_address(&address, &port);
+		address_esc = DBdyn_escape_string(address);
 
 		if (0 == info->nodeid)
 		{
+
 			info->nodeid = DBget_maxid("ha_node");
 			name_esc = DBdyn_escape_string(info->name);
 
-			// TODO: determine address/port and insert them too
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "insert into ha_node"
-					" (ha_nodeid,name,status,lastaccess) values"
-					" (" ZBX_FS_UI64 ",'%s',%d," ZBX_DB_TIMESTAMP() ")",
-					info->nodeid, name_esc, info->ha_status);
-
-			zbx_free(name_esc);
+					" (ha_nodeid,name,address,port,status,lastaccess) values"
+					" (" ZBX_FS_UI64 ",'%s','%s',%hu, %d," ZBX_DB_TIMESTAMP() ")",
+					info->nodeid, name_esc, address_esc, port, info->ha_status);
 		}
 		else
 		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"update ha_node set lastaccess=" ZBX_DB_TIMESTAMP()
-					" where ha_nodeid=" ZBX_FS_UI64, info->nodeid);
+					"update ha_node set status=%d,address='%s',port=%d,lastaccess="
+					ZBX_DB_TIMESTAMP() " where ha_nodeid=" ZBX_FS_UI64,
+					info->ha_status, address_esc, port, info->nodeid);
 		}
+
+		zbx_free(address_esc);
+		zbx_free(address);
+		zbx_free(name_esc);
 
 		ret = DBexecute_once("%s", sql);
 		zbx_free(sql);
@@ -362,6 +396,17 @@ out:
 		info->ha_status = ZBX_NODE_STATUS_UNKNOWN;
 
 	return SUCCEED;
+}
+
+static int	ha_sign_out(zbx_ha_info_t *info)
+{
+	DB_RESULT	result;
+
+	DBbegin();
+	result = DBselect("select null from table_lock where table_name='ha_node'" ZBX_FOR_UPDATE);
+	DBfree_result(result);
+	DBexecute("update ha_node set status=%d where ha_nodeid=" ZBX_FS_UI64, ZBX_NODE_STATUS_STOPPED, info->nodeid);
+	DBcommit();
 }
 
 /*
@@ -719,7 +764,7 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 
 	zbx_free(info.error);
 
-	// TODO: update node status to stopped
+	ha_sign_out(&info);
 
 	DBclose();
 
