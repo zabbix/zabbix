@@ -244,8 +244,8 @@ class CMediatype extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		self::checkDuplicates($mediatypes, 'create');
-		self::validateByType($mediatypes, 'create');
+		self::checkDuplicates($mediatypes);
+		self::validateByType($mediatypes);
 	}
 
 	/**
@@ -353,8 +353,8 @@ class CMediatype extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		self::checkDuplicates($mediatypes, 'update', $db_mediatypes);
-		self::validateByType($mediatypes, 'update', $db_mediatypes);
+		self::checkDuplicates($mediatypes, $db_mediatypes);
+		self::validateByType($mediatypes, $db_mediatypes);
 
 		self::addAffectedObjects($mediatypes, $db_mediatypes);
 	}
@@ -365,12 +365,11 @@ class CMediatype extends CApiService {
 	 * @static
 	 *
 	 * @param array      $mediatypes
-	 * @param string     $method
 	 * @param array|null $db_mediatypes
 	 *
 	 * @throws APIException if a media type name is not unique.
 	 */
-	private static function checkDuplicates(array $mediatypes, string $method, array $db_mediatypes = null): void {
+	private static function checkDuplicates(array $mediatypes, array $db_mediatypes = null): void {
 		$names = [];
 
 		foreach ($mediatypes as $mediatype) {
@@ -378,7 +377,7 @@ class CMediatype extends CApiService {
 				continue;
 			}
 
-			if ($method === 'create' || $mediatype['name'] !== $db_mediatypes[$mediatype['mediatypeid']]['name']) {
+			if ($db_mediatypes === null || $mediatype['name'] !== $db_mediatypes[$mediatype['mediatypeid']]['name']) {
 				$names[] = $mediatype['name'];
 			}
 		}
@@ -387,12 +386,14 @@ class CMediatype extends CApiService {
 			return;
 		}
 
-		$duplicate = DBfetch(
-			DBselect('SELECT mt.name FROM media_type mt WHERE '.dbConditionString('mt.name', $names), 1)
-		);
+		$duplicates = DB::select('media_type', [
+			'output' => ['name'],
+			'filter' => ['name' => $names],
+			'limit' => 1
+		]);
 
-		if ($duplicate) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Media type "%1$s" already exists.', $duplicate['name']));
+		if ($duplicates) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Media type "%1$s" already exists.', $duplicates[0]['name']));
 		}
 	}
 
@@ -402,12 +403,13 @@ class CMediatype extends CApiService {
 	 * @static
 	 *
 	 * @param array      $mediatypes
-	 * @param string     $method
 	 * @param array|null $db_mediatypes
 	 *
 	 * @throws APIException
 	 */
-	private static function validateByType(array &$mediatypes, string $method, array $db_mediatypes = null): void {
+	private static function validateByType(array &$mediatypes, array $db_mediatypes = null): void {
+		$method = ($db_mediatypes === null) ? 'create' : 'update';
+
 		$db_defaults = DB::getDefaults('media_type');
 		$db_defaults['parameters'] = [];
 
@@ -639,18 +641,15 @@ class CMediatype extends CApiService {
 				continue;
 			}
 
-			$db_params = ($method === 'update') ? $db_mediatypes[$mediatype['mediatypeid']]['parameters'] : [];
+			$db_params = ($method === 'update')
+				? array_column($db_mediatypes[$mediatype['mediatypeid']]['parameters'], null, 'name')
+				: [];
 
 			foreach ($mediatype['parameters'] as &$param) {
-				$db_param = current(
-					array_filter($db_params, static function(array $db_param) use ($param): bool {
-						return $param['name'] === $db_param['name'];
-					})
-				);
-
-				if ($db_param) {
+				if (array_key_exists($param['name'], $db_params)) {
+					$db_param = $db_params[$param['name']];
 					$param['mediatype_paramid'] = $db_param['mediatype_paramid'];
-					unset($db_params[$db_param['mediatype_paramid']]);
+					unset($db_params[$db_param['name']]);
 
 					$upd_param = DB::getUpdatedValues('media_type_param', $param, $db_param);
 
@@ -667,7 +666,7 @@ class CMediatype extends CApiService {
 			}
 			unset($param);
 
-			$del_paramids = array_merge($del_paramids, array_keys($db_params));
+			$del_paramids = array_merge($del_paramids, array_column($db_params, 'mediatype_paramid'));
 		}
 		unset($mediatype);
 
