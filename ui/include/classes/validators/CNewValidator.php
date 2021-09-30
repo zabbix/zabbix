@@ -61,7 +61,7 @@ class CNewValidator {
 	 */
 	private function validate() {
 		foreach ($this->rules as $field => $rule) {
-			$result = $this->validateField($field, $rule);
+			$this->validateField($field, $rule);
 
 			if (array_key_exists($field, $this->input)) {
 				$this->output[$field] = $this->input[$field];
@@ -69,287 +69,255 @@ class CNewValidator {
 		}
 	}
 
-	private function validateField($field, $rules) {
-		if (false === ($rules = $this->validationRuleParser->parse($rules))) {
+	private function validateField($field, $rules): bool {
+		$rules = $this->validationRuleParser->parse($rules);
+
+		if ($rules === false) {
 			$this->addError(true, $this->validationRuleParser->getError());
+
 			return false;
 		}
 
 		$fatal = array_key_exists('fatal', $rules);
-
 		$flags = array_key_exists('flags', $rules) ? $rules['flags'] : 0x00;
 
-		foreach ($rules as $rule => $params) {
-			switch ($rule) {
-				/*
-				 * 'fatal' => true
-				 */
-				case 'fatal':
-					// nothing to do
-					break;
+		if (!array_key_exists($field, $this->input)) {
+			if (array_key_exists('required', $rules)) {
+				$this->addError($fatal, _s('Field "%1$s" is mandatory.', $field));
 
-				/*
-				 * 'not_empty' => true
-				 */
+				return false;
+			}
+
+			return true;
+		}
+
+		unset($rules['fatal'], $rules['flags'], $rules['required']);
+
+		foreach ($rules as $rule => $params) {
+			$value = $this->input[$field];
+
+			switch ($rule) {
 				case 'not_empty':
-					if (array_key_exists($field, $this->input) && $this->input[$field] === '') {
+					if ($value === '') {
 						$this->addError($fatal,
 							_s('Incorrect value for field "%1$s": %2$s.', $field, _('cannot be empty'))
 						);
+
 						return false;
 					}
 					break;
 
 				case 'json':
-					if (array_key_exists($field, $this->input)) {
-						if (!is_string($this->input[$field]) || json_decode($this->input[$field]) === null) {
-							$this->addError($fatal,
-								_s('Incorrect value for field "%1$s": %2$s.', $field, _('JSON string is expected'))
-							);
-							return false;
-						}
+					if (!is_string($value) || json_decode($value) === null) {
+						$this->addError($fatal,
+							_s('Incorrect value for field "%1$s": %2$s.', $field, _('JSON string is expected'))
+						);
+
+						return false;
 					}
 					break;
 
-				/*
-				 * 'in' => array(<values>)
-				 */
 				case 'in':
-					if (array_key_exists($field, $this->input)) {
-						if (!is_string($this->input[$field]) || !in_array($this->input[$field], $params)) {
-							$this->addError($fatal,
-								is_scalar($this->input[$field])
-									? _s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
-									: _s('Incorrect value for "%1$s" field.', $field)
-							);
-							return false;
-						}
+					if ((!is_string($value) && !is_numeric($value)) || !in_array($value, $params)) {
+						$this->addError($fatal,
+							is_scalar($value)
+								? _s('Incorrect value "%1$s" for "%2$s" field.', $value, $field)
+								: _s('Incorrect value for "%1$s" field.', $field)
+						);
+
+						return false;
 					}
 					break;
 
 				case 'int32':
-					if (array_key_exists($field, $this->input)) {
-						if (!is_string($this->input[$field]) || !self::is_int32($this->input[$field])) {
-							$this->addError($fatal,
-								is_scalar($this->input[$field])
-									? _s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
-									: _s('Incorrect value for "%1$s" field.', $field)
-							);
-							return false;
-						}
+					if ((!is_string($value) && !is_numeric($value)) || !self::is_int32($value)) {
+						$this->addError($fatal,
+							is_scalar($value)
+								? _s('Incorrect value "%1$s" for "%2$s" field.', $value, $field)
+								: _s('Incorrect value for "%1$s" field.', $field)
+						);
+
+						return false;
 					}
 					break;
 
 				case 'id':
-					if (array_key_exists($field, $this->input)) {
-						if (!is_string($this->input[$field]) || !self::is_id($this->input[$field])) {
-							$this->addError($fatal,
-								is_scalar($this->input[$field])
-									? _s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
-									: _s('Incorrect value for "%1$s" field.', $field)
-							);
-							return false;
-						}
-					}
-					break;
-
-				/*
-				 * 'array_id' => true
-				 */
-				case 'array_id':
-					if (array_key_exists($field, $this->input)) {
-						if (!is_array($this->input[$field]) || !$this->is_array_id($this->input[$field])) {
-							$this->addError($fatal,
-								is_scalar($this->input[$field])
-									? _s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
-									: _s('Incorrect value for "%1$s" field.', $field)
-							);
-							return false;
-						}
-					}
-					break;
-
-				/*
-				 * 'array' => true
-				 */
-				case 'array':
-					if (array_key_exists($field, $this->input) && !is_array($this->input[$field])) {
+					if ((!is_string($value) && !is_numeric($value)) || !self::is_id($value)) {
 						$this->addError($fatal,
-							_s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
+							is_scalar($value)
+								? _s('Incorrect value "%1$s" for "%2$s" field.', $value, $field)
+								: _s('Incorrect value for "%1$s" field.', $field)
 						);
 
 						return false;
 					}
 					break;
 
-				/*
-				 * 'array_db' => array(
-				 *     'table' => <table_name>,
-				 *     'field' => <field_name>
-				 * )
-				 */
-				case 'array_db':
-					if (array_key_exists($field, $this->input)) {
-						if (!is_array($this->input[$field])
-								|| !$this->is_array_db($this->input[$field], $params['table'], $params['field'], $flags)
-						) {
-							$this->addError($fatal,
-								is_scalar($this->input[$field])
-									? _s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
-									: _s('Incorrect value for "%1$s" field.', $field)
-							);
-							return false;
-						}
-					}
-					break;
+				case 'array_id':
+					if (!is_array($value) || !$this->is_array_id($value)) {
+						$this->addError($fatal,
+							is_scalar($value)
+								? _s('Incorrect value "%1$s" for "%2$s" field.', $value, $field)
+								: _s('Incorrect value for "%1$s" field.', $field)
+						);
 
-				/*
-				 * 'ge' => <value>
-				 */
-				case 'ge':
-					if (array_key_exists($field, $this->input)) {
-						if (!is_string($this->input[$field]) || !self::is_int32($this->input[$field])
-								|| $this->input[$field] < $params) {
-							$this->addError($fatal,
-								_s('Incorrect value for field "%1$s": %2$s.', $field, _s('value must be no less than "%1$s"', $params))
-							);
-
-							return false;
-						}
-					}
-					break;
-
-				/*
-				 * 'le' => <value>
-				 */
-				case 'le':
-					if (array_key_exists($field, $this->input)) {
-						if (!is_string($this->input[$field]) || !self::is_int32($this->input[$field])
-								|| $this->input[$field] > $params) {
-							$this->addError($fatal,
-								_s('Incorrect value for field "%1$s": %2$s.', $field, _s('value must be no greater than "%1$s"', $params))
-							);
-
-							return false;
-						}
-					}
-					break;
-
-				/*
-				 * 'db' => array(
-				 *     'table' => <table_name>,
-				 *     'field' => <field_name>
-				 * )
-				 */
-				case 'db':
-					if (array_key_exists($field, $this->input)) {
-						if (!$this->is_db($this->input[$field], $params['table'], $params['field'], $flags)) {
-							$this->addError($fatal,
-								is_scalar($this->input[$field])
-									? _s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
-									: _s('Incorrect value for "%1$s" field.', $field)
-							);
-							return false;
-						}
-					}
-					break;
-
-				/*
-				 * 'required' => true
-				 */
-				case 'required':
-					if (!array_key_exists($field, $this->input)) {
-						$this->addError($fatal, _s('Field "%1$s" is mandatory.', $field));
 						return false;
 					}
 					break;
 
-				/*
-				 * 'range_time' => true
-				 */
+				case 'array':
+					if (!is_array($value)) {
+						$this->addError($fatal,
+							is_scalar($value)
+								? _s('Incorrect value "%1$s" for "%2$s" field.', $value, $field)
+								: _s('Incorrect value for "%1$s" field.', $field)
+						);
+
+						return false;
+					}
+					break;
+
+				case 'array_db':
+					if (!is_array($value) || !$this->is_array_db($value, $params['table'], $params['field'], $flags)) {
+						$this->addError($fatal,
+							is_scalar($value)
+								? _s('Incorrect value "%1$s" for "%2$s" field.', $value, $field)
+								: _s('Incorrect value for "%1$s" field.', $field)
+						);
+
+						return false;
+					}
+					break;
+
+				case 'ge':
+					if ((!is_string($value) && !is_numeric($value)) || !self::is_int32($value) || $value < $params) {
+						$this->addError($fatal,
+							_s('Incorrect value for field "%1$s": %2$s.', $field,
+								_s('value must be no less than "%1$s"', $params)
+							)
+						);
+
+						return false;
+					}
+					break;
+
+				case 'le':
+					if ((!is_string($value) && !is_numeric($value)) || !self::is_int32($value) || $value > $params) {
+						$this->addError($fatal,
+							_s('Incorrect value for field "%1$s": %2$s.', $field,
+								_s('value must be no greater than "%1$s"', $params)
+							)
+						);
+
+						return false;
+					}
+					break;
+
+				case 'db':
+					$table_fields = DB::getSchema($params['table'])['fields'];
+
+					if ((!is_string($value) && !is_numeric($value))
+							|| !$this->check_db_value($table_fields[$params['field']], $value, $flags)) {
+						$this->addError($fatal,
+							is_scalar($value)
+								? _s('Incorrect value "%1$s" for "%2$s" field.', $value, $field)
+								: _s('Incorrect value for "%1$s" field.', $field)
+						);
+
+						return false;
+					}
+					break;
+
 				case 'range_time':
-					if (array_key_exists($field, $this->input) && !$this->isRangeTime($this->input[$field])) {
+					if ($this->range_time_parser === null) {
+						$this->range_time_parser = new CRangeTimeParser();
+					}
+
+					if (!is_string($value) || $this->range_time_parser->parse($value) != CParser::PARSE_SUCCESS) {
 						$this->addError($fatal,
 							_s('Incorrect value for field "%1$s": %2$s.', $field, _('a time is expected'))
 						);
+
 						return false;
 					}
 					break;
 
-				/*
-				 * 'time_periods' => true
-				 */
 				case 'time_periods':
-					if (array_key_exists($field, $this->input) && !$this->isTimePeriods($this->input[$field])) {
+					if ($this->time_periods_parser === null) {
+						$this->time_periods_parser = new CTimePeriodsParser(['usermacros' => true]);
+					}
+
+					if (!is_string($value) || $this->time_periods_parser->parse($value) != CParser::PARSE_SUCCESS) {
 						$this->addError($fatal,
 							_s('Incorrect value for field "%1$s": %2$s.', $field, _('a time period is expected'))
 						);
+
 						return false;
 					}
 					break;
 
-				/*
-				 * 'time_unit' => true
-				 */
 				case 'time_unit':
-					if (array_key_exists($field, $this->input)) {
-						$result = $this->isTimeUnit($this->input[$field], $params);
-						if (!$result['is_valid']) {
-							$this->addError($fatal,
-								_s('Incorrect value for field "%1$s": %2$s.', $field, $result['error'])
-							);
-							return false;
-						}
+					if (is_string($value) || is_numeric($value)) {
+						$result = $this->isTimeUnit($value, $params);
+						$error_message = $result['is_valid'] ? null : $result['error'];
+					}
+					else {
+						$error_message = _('a time period is expected');
+					}
+
+					if ($error_message !== null) {
+						$this->addError($fatal, _s('Incorrect value for field "%1$s": %2$s.', $field, $error_message));
+
+						return false;
 					}
 					break;
 
-				/*
-				 * 'rgb' => true
-				 */
 				case 'rgb':
-					if (array_key_exists($field, $this->input) && !$this->isRgb($this->input[$field])) {
+					if (!is_string($value) || preg_match('/^[A-F0-9]{6}$/', $value) == 0) {
 						$this->addError($fatal,
 							_s('Incorrect value for field "%1$s": %2$s.', $field,
 								_('a hexadecimal color code (6 symbols) is expected')
 							)
 						);
+
 						return false;
 					}
 					break;
 
-				/*
-				 * 'string' => true
-				 */
 				case 'string':
-					if (array_key_exists($field, $this->input) && !is_string($this->input[$field])) {
+					if (!is_string($value) && !is_numeric($value)) {
 						$this->addError($fatal,
 							_s('Incorrect value for field "%1$s": %2$s.', $field, _('a character string is expected'))
 						);
+
 						return false;
 					}
 					break;
 
-				/*
-				 * 'string' => true
-				 */
+				case 'bool':
+					if (!is_bool($value)) {
+						$this->addError($fatal,
+							_s('Incorrect value for field "%1$s": %2$s.', $field, _('a boolean value is expected'))
+						);
+
+						return false;
+					}
+					break;
+
 				case 'cuid':
-					if (array_key_exists($field, $this->input) && !self::isCuid($this->input[$field])) {
+					if (!self::isCuid($value)) {
 						$this->addError($fatal,
 							_s('Incorrect value for field "%1$s": %2$s.', $field, _('CUID is expected'))
 						);
+
 						return false;
 					}
 					break;
 
-				/*
-				 * 'flags' => <value1> | <value2> | ... | <valueN>
-				 */
-				case 'flags':
-					break;
-
 				default:
-					// the message can be not translated because it is an internal error
+					// Do not translate.
 					$this->addError($fatal, 'Invalid validation rule "'.$rule.'".');
+
 					return false;
 			}
 		}
@@ -471,30 +439,6 @@ class CNewValidator {
 	}
 
 	/**
-	 * Validate a string value against DB schema.
-	 *
-	 * @param string $value  [IN/OUT] IN - input value, OUT - changed value according to flags.
-	 * @param string $table  DB table name.
-	 * @param string $field  DB field name.
-	 * @param int $flags     Validation flags.
-	 *
-	 * @return bool
-	 */
-	private function is_db(&$value, $table, $field, $flags) {
-		$table_schema = DB::getSchema($table);
-
-		return (is_string($value) && $this->check_db_value($table_schema['fields'][$field], $value, $flags));
-	}
-
-	private function isTimePeriods($value) {
-		if ($this->time_periods_parser === null) {
-			$this->time_periods_parser = new CTimePeriodsParser(['usermacros' => true]);
-		}
-
-		return is_string($value) && $this->time_periods_parser->parse($value) == CParser::PARSE_SUCCESS;
-	}
-
-	/**
 	 * Validate a configuration value. Use simple interval parser to parse the string, convert to seconds and check
 	 * if the value is in between given min and max values. In some cases it's possible to enter 0, or even 0s or 0d.
 	 * If the value is incorrect, set an error.
@@ -553,18 +497,6 @@ class CNewValidator {
 		}
 
 		return ['is_valid' => true];
-	}
-
-	private function isRangeTime($value) {
-		if ($this->range_time_parser === null) {
-			$this->range_time_parser = new CRangeTimeParser();
-		}
-
-		return is_string($value) && $this->range_time_parser->parse($value) == CParser::PARSE_SUCCESS;
-	}
-
-	private function isRgb($value) {
-		return is_string($value) && preg_match('/^[A-F0-9]{6}$/', $value);
 	}
 
 	/**
