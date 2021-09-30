@@ -753,13 +753,24 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 							sock.buffer);
 				}
 			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "Unable to receive from [%s]:%d [%s]",
+						((zbx_addr_t *)sendval_args->addrs->values[0])->ip,
+						((zbx_addr_t *)sendval_args->addrs->values[0])->port,
+						zbx_socket_strerror());
+			}
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Unable to send to [%s]:%d [%s]",
+					((zbx_addr_t *)sendval_args->addrs->values[0])->ip,
+					((zbx_addr_t *)sendval_args->addrs->values[0])->port,
+					zbx_socket_strerror());
 		}
 
 		zbx_tcp_close(&sock);
 	}
-
-	if (FAIL == tcp_ret)
-		zabbix_log(LOG_LEVEL_DEBUG, "send value error: %s", zbx_socket_strerror());
 #if !defined(_WINDOWS)
 	for (i = sendval_args->addrs->values_num - 1; i >= 0; i--)
 	{
