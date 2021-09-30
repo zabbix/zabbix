@@ -51,7 +51,7 @@ static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_
 			break;
 		}
 
-		zabbix_log(level, "Unable to connect to the server [%s]:%d [%s]",
+		zabbix_log(level, "Unable to connect to [%s]:%d [%s]",
 				((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port,
 				zbx_socket_strerror());
 
@@ -99,11 +99,8 @@ int	connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_ptr_
 		if (0 != retry_interval)
 		{
 #if !defined(_WINDOWS) && !defined(__MINGW32)
-			int	n = addrs->values_num - 1;
-
-			zabbix_log(LOG_LEVEL_WARNING, "Unable to connect to the server [%s:%hu] [%s]. Will retry every"
-					" %d second(s)", ((zbx_addr_t *)addrs->values[n])->ip,
-					((zbx_addr_t *)addrs->values[n])->port, zbx_socket_strerror(), retry_interval);
+			zabbix_log(LOG_LEVEL_WARNING, "Will try to reconnect every %d second(s)",
+					retry_interval);
 
 			lastlogtime = (int)time(NULL);
 
