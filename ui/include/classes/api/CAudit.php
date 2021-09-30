@@ -109,10 +109,12 @@ class CAudit {
 		self::RESOURCE_HOUSEKEEPING => 'config',
 		self::RESOURCE_ICON_MAP => 'icon_map',
 		self::RESOURCE_IMAGE => 'images',
+		self::RESOURCE_MACRO => 'globalmacro',
 		self::RESOURCE_MODULE => 'module',
 		self::RESOURCE_PROXY => 'hosts',
 		self::RESOURCE_REGEXP => 'regexps',
 		self::RESOURCE_SCHEDULED_REPORT => 'report',
+		self::RESOURCE_SCRIPT => 'scripts',
 		self::RESOURCE_SETTINGS => 'config',
 		self::RESOURCE_TEMPLATE_DASHBOARD => 'dashboard',
 		self::RESOURCE_USER => 'users',
@@ -143,10 +145,12 @@ class CAudit {
 		self::RESOURCE_HOUSEKEEPING => null,
 		self::RESOURCE_ICON_MAP => 'name',
 		self::RESOURCE_IMAGE => 'name',
+		self::RESOURCE_MACRO => 'macro',
 		self::RESOURCE_MODULE => 'id',
 		self::RESOURCE_PROXY => 'host',
 		self::RESOURCE_REGEXP => 'name',
 		self::RESOURCE_SCHEDULED_REPORT => 'name',
+		self::RESOURCE_SCRIPT => 'name',
 		self::RESOURCE_SETTINGS => null,
 		self::RESOURCE_TEMPLATE_DASHBOARD => 'name',
 		self::RESOURCE_USER => 'username',
@@ -167,11 +171,13 @@ class CAudit {
 		self::RESOURCE_HOUSEKEEPING => 'housekeeping',
 		self::RESOURCE_ICON_MAP => 'iconmap',
 		self::RESOURCE_IMAGE => 'image',
+		self::RESOURCE_MACRO => 'usermacro',
 		self::RESOURCE_MODULE => 'module',
 		self::RESOURCE_PROXY => 'proxy',
 		self::RESOURCE_REGEXP => 'regexp',
-		self::RESOURCE_SETTINGS => 'settings',
 		self::RESOURCE_SCHEDULED_REPORT => 'report',
+		self::RESOURCE_SCRIPT => 'script',
+		self::RESOURCE_SETTINGS => 'settings',
 		self::RESOURCE_TEMPLATE_DASHBOARD => 'templatedashboard',
 		self::RESOURCE_USER => 'user',
 		self::RESOURCE_USER_GROUP => 'usergroup'
@@ -185,12 +191,15 @@ class CAudit {
 	private const MASKED_PATHS = [
 		self::RESOURCE_AUTHENTICATION => ['paths' => ['authentication.ldap_bind_password']],
 		self::RESOURCE_AUTH_TOKEN => ['paths' => ['token.token']],
-		self::RESOURCE_AUTOREGISTRATION => ['paths' => ['autoregistration.tls_psk_identity', 'autoregistration.tls_psk']],
-		// self::RESOURCE_MACRO => [
-		// 	'paths' => ['usermacro.value'],
-		// 	'conditions' => ['usermacro.type' => ZBX_MACRO_TYPE_SECRET]
-		// ],
+		self::RESOURCE_AUTOREGISTRATION => [
+			'paths' => ['autoregistration.tls_psk_identity', 'autoregistration.tls_psk']
+		],
+		self::RESOURCE_MACRO => [
+			'paths' => ['usermacro.value'],
+			'conditions' => ['usermacro.type' => ZBX_MACRO_TYPE_SECRET]
+		],
 		self::RESOURCE_PROXY => ['paths' => ['proxy.tls_psk_identity', 'proxy.tls_psk']],
+		self::RESOURCE_SCRIPT => ['paths' => ['script.password']],
 		self::RESOURCE_USER => ['paths' => ['user.passwd']]
 	];
 
@@ -212,6 +221,7 @@ class CAudit {
 		'regexp.expressions' => 'expressions',
 		'report.users' => 'report_user',
 		'report.user_groups' => 'report_usrgrp',
+		'script.parameters' => 'script_param',
 		'templatedashboard.pages' => 'dashboard_page',
 		'templatedashboard.pages.widgets' => 'widget',
 		'templatedashboard.pages.widgets.fields' => 'widget_field',
@@ -239,6 +249,7 @@ class CAudit {
 		'regexp.expressions' => 'expressionid',
 		'report.users' => 'reportuserid',
 		'report.user_groups' => 'reportusrgrpid',
+		'script.parameters' => 'script_paramid',
 		'templatedashboard.pages' => 'dashboard_pageid',
 		'templatedashboard.pages.widgets' => 'widgetid',
 		'templatedashboard.pages.widgets.fields' => 'widget_fieldid',
@@ -443,24 +454,24 @@ class CAudit {
 			$path = preg_replace('/\[[0-9]+\]/', '', $path);
 		}
 
+		if (!in_array($path, self::MASKED_PATHS[$resource]['paths'])) {
+			return false;
+		}
+
 		if (!array_key_exists('conditions', self::MASKED_PATHS[$resource])) {
-			return in_array($path, self::MASKED_PATHS[$resource]['paths']);
+			return true;
 		}
 
-		if (in_array($path, self::MASKED_PATHS[$resource])) {
-			$all_counditions = count(self::MASKED_PATHS[$resource]['conditions']);
-			$true_conditions = 0;
+		$all_counditions = count(self::MASKED_PATHS[$resource]['conditions']);
+		$true_conditions = 0;
 
-			foreach (self::MASKED_PATHS[$resource]['conditions'] as $condition_path => $value) {
-				if (array_key_exists($condition_path, $object) && $object[$condition_path] == $value) {
-					$true_conditions++;
-				}
+		foreach (self::MASKED_PATHS[$resource]['conditions'] as $condition_path => $value) {
+			if (array_key_exists($condition_path, $object) && $object[$condition_path] == $value) {
+				$true_conditions++;
 			}
-
-			return ($true_conditions == $all_counditions);
 		}
 
-		return false;
+		return ($true_conditions == $all_counditions);
 	}
 
 	/**
@@ -660,8 +671,7 @@ class CAudit {
 			}
 		}
 
-		foreach ($object as $path => $foo) {
-			$value = array_key_exists($path, $object) ? $object[$path] : null;
+		foreach ($object as $path => $value) {
 			$db_value = array_key_exists($path, $db_object) ? $db_object[$path] : null;
 
 			if ($db_value === null) {
@@ -669,14 +679,14 @@ class CAudit {
 					continue;
 				}
 
-				if (self::isValueToMask($resource, $path, $object)) {
-					$result[$path] = [self::DETAILS_ACTION_ADD, ZBX_SECRET_MASK];
-				}
-				elseif (in_array($path, self::BLOB_FIELDS)) {
+				if (in_array($path, self::BLOB_FIELDS)) {
 					$result[$path] = [self::DETAILS_ACTION_ADD];
 				}
 				else {
-					$result[$path] = [self::DETAILS_ACTION_ADD, $value];
+					$result[$path] = [
+						self::DETAILS_ACTION_ADD,
+						self::isValueToMask($resource, $path, $object) ? ZBX_SECRET_MASK : $value
+					];
 				}
 			}
 			elseif ($value != $db_value) {
@@ -684,14 +694,15 @@ class CAudit {
 					$result[self::getLastObjectPath($path)] = [self::DETAILS_ACTION_UPDATE];
 				}
 
-				if (self::isValueToMask($resource, $path, $full_object)) {
-					$result[$path] = [self::DETAILS_ACTION_UPDATE, ZBX_SECRET_MASK, ZBX_SECRET_MASK];
-				}
-				elseif (in_array($path, self::BLOB_FIELDS)) {
+				if (in_array($path, self::BLOB_FIELDS)) {
 					$result[$path] = [self::DETAILS_ACTION_UPDATE];
 				}
 				else {
-					$result[$path] = [self::DETAILS_ACTION_UPDATE, $value, $db_value];
+					$result[$path] = [
+						self::DETAILS_ACTION_UPDATE,
+						self::isValueToMask($resource, $path, $full_object) ? ZBX_SECRET_MASK : $value,
+						self::isValueToMask($resource, $path, $db_object) ? ZBX_SECRET_MASK : $db_value
+					];
 				}
 			}
 		}

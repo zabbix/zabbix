@@ -1,0 +1,1 @@
+........S. [ZBX-20014] fixed server audit to generate CUID during entry creation instead of audit flush (arimdjonoks)
