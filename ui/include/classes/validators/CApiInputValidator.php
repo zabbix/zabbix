@@ -1038,12 +1038,12 @@ class CApiInputValidator {
 
 		// validation of the values type
 		foreach ($rule['fields'] as $field_name => $field_rule) {
-			$flags = array_key_exists('flags', $field_rule) ? $field_rule['flags'] : 0x00;
-
 			if ($field_rule['type'] === API_MULTIPLE) {
 				foreach ($field_rule['rules'] as $multiple_rule) {
 					if (self::isInRange($data[$multiple_rule['if']['field']], $multiple_rule['if']['in'])) {
-						$field_rule = $multiple_rule;
+						$field_rule = $multiple_rule + array_intersect_key($field_rule,
+							array_flip(['flags', 'default', 'default_source'])
+						);
 						break;
 					}
 				}
@@ -1052,11 +1052,9 @@ class CApiInputValidator {
 					$error = 'Incorrect validation rules.';
 					return false;
 				}
-
-				if (array_key_exists('flags', $field_rule)) {
-					$flags = $multiple_rule['flags'];
-				}
 			}
+
+			$flags = array_key_exists('flags', $field_rule) ? $field_rule['flags'] : 0x00;
 
 			if (array_key_exists('default', $field_rule) && !array_key_exists($field_name, $data)) {
 				$data[$field_name] = $field_rule['default'];
