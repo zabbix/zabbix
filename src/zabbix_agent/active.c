@@ -718,9 +718,8 @@ static int	check_response(char *response)
 static int	send_buffer(zbx_vector_ptr_t *addrs)
 {
 	ZBX_ACTIVE_BUFFER_ELEMENT	*el;
-	int				ret = SUCCEED, i, now;
+	int				ret = SUCCEED, i, now, level;
 	zbx_timespec_t			ts;
-	const char			*err_send_step = "";
 	zbx_socket_t			s;
 	struct zbx_json 		json;
 
@@ -791,9 +790,10 @@ static int	send_buffer(zbx_vector_ptr_t *addrs)
 
 	zbx_json_close(&json);
 
+	level = 0 == buffer.first_error ? LOG_LEVEL_WARNING : LOG_LEVEL_DEBUG;
+
 	if (SUCCEED == (ret = connect_to_server(&s, CONFIG_SOURCE_IP, addrs, MIN(buffer.count * CONFIG_TIMEOUT, 60),
-			CONFIG_TIMEOUT, configured_tls_connect_mode, 0, 0 == buffer.first_error ? LOG_LEVEL_WARNING :
-					LOG_LEVEL_DEBUG)))
+			CONFIG_TIMEOUT, configured_tls_connect_mode, 0, level)))
 	{
 		zbx_timespec(&ts);
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_CLOCK, ts.sec);
@@ -816,15 +816,22 @@ static int	send_buffer(zbx_vector_ptr_t *addrs)
 					zabbix_log(LOG_LEVEL_DEBUG, "OK");
 			}
 			else
-				err_send_step = "[recv] ";
+			{
+				zabbix_log(level, "Unable to receive from [%s]:%d [%s]",
+						((zbx_addr_t *)addrs->values[0])->ip,
+						((zbx_addr_t *)addrs->values[0])->port,
+						zbx_socket_strerror());
+			}
 		}
 		else
-			err_send_step = "[send] ";
+		{
+			zabbix_log(level, "Unable to send to [%s]:%d [%s]",
+					((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port,
+					zbx_socket_strerror());
+		}
 
 		zbx_tcp_close(&s);
 	}
-	else
-		err_send_step = "[connect] ";
 
 	zbx_json_free(&json);
 
@@ -856,12 +863,9 @@ static int	send_buffer(zbx_vector_ptr_t *addrs)
 		{
 			int	n = addrs->values_num - 1;
 
-			zabbix_log(LOG_LEVEL_WARNING, "active check data upload to [%s:%hu] started to fail (%s%s)",
-					((zbx_addr_t *)addrs->values[n])->ip, ((zbx_addr_t *)addrs->values[n])->port,
-					err_send_step, zbx_socket_strerror());
+			zabbix_log(LOG_LEVEL_WARNING, "Active check data upload started to fail");
 			buffer.first_error = now;
 		}
-		zabbix_log(LOG_LEVEL_DEBUG, "send value error: %s%s", err_send_step, zbx_socket_strerror());
 	}
 ret:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
