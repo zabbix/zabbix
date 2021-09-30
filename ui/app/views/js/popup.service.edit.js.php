@@ -433,8 +433,8 @@ window.service_edit_popup = {
 
 		fetch(curl.getUrl(), {
 			method: 'POST',
-			headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
-			body: urlEncodeData(fields)
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify(fields)
 		})
 			.then((response) => response.json())
 			.then((response) => {

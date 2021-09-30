@@ -23,10 +23,13 @@
  * @var CView $this
  */
 
-$form = (new CForm())
+$form_action_url = (new CUrl('zabbix.php'))
+	->setArgument('action', $data['form_action'])
+	->getUrl();
+
+$form = (new CForm('post', $form_action_url))
 	->setId('service-form')
 	->setName('service_form')
-	->addVar('action', $data['form_action'])
 	->addVar('serviceid', $data['serviceid'])
 	->addItem(getMessages());
 
