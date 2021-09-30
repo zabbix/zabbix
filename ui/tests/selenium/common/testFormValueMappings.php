@@ -132,20 +132,27 @@ class testFormValueMappings extends CWebTest {
 	 */
 	public function checkClone($source, $action = 'Clone') {
 		// Create a clone and or a full clone of an existing host/template with value mappings.
-		$this->openValueMappingTab($source, true, false);
+		$form = $this->openValueMappingTab($source, true, false);
 		$this->query('button', $action)->one()->click();
-		$form = $this->query('name:'.$source.'sForm')->asForm()->one();
 		$form->getField(ucfirst($source).' name')->fill($action.' Valuemap Test');
 		$form->submit();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD);
 
 		// Get the id of the created host/template clone.
 		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr($action.' Valuemap Test'));
 
 		// Check value mappings were copied correctly.
-		$this->page->open($source.'s.php?form=update&'.$source.'id='.$hostid);
-		$form = $this->query('name:'.$source.'sForm')->asForm()->waitUntilVisible()->one();
-		$form->selectTab('Value mapping');
+		if ($source === 'host') {
+			$this->page->login()->open('zabbix.php?action=host.edit&hostid='.$hostid);
+			$cloned_form = $this->query('id:host-form')->asFluidForm()->waitUntilVisible()->one();
+		}
+		else {
+			$this->page->open($source.'s.php?form=update&'.$source.'id='.$hostid);
+			$cloned_form = $this->query('name:'.$source.'sForm')->asForm()->waitUntilVisible()->one();
+		}
 
+		$cloned_form->selectTab('Value mapping');
 		$this->assertTableData(self::EXISTING_VALUEMAPS, 'id:valuemap-formlist');
 	}
 
@@ -912,17 +919,29 @@ class testFormValueMappings extends CWebTest {
 	 * @param string $source		Entity (host or template) configuration of which should be opened.
 	 * @param boolean $login		Flag that determines if a login is required.
 	 * @param boolean $open_tab		Flag that determines if opening the value mapping tab is required.
+	 *
+	 * @return CFormElement|CFluidFormElemt    $form
 	 */
 	private function openValueMappingTab($source, $login = true, $open_tab = true) {
 		$sourceid = ($source === 'host') ? self::HOSTID : self::TEMPLATEID;
 		if ($login) {
 			$this->page->login();
 		}
-		$this->page->open($source.'s.php?form=update&'.$source.'id='.$sourceid);
-		$form = $this->query('name:'.$source.'sForm')->asForm()->waitUntilVisible()->one();
+
+		if ($source === 'host') {
+			$this->page->open('zabbix.php?action=host.edit&hostid='.$sourceid);
+			$form = $this->query('id:host-form')->asFluidForm()->waitUntilVisible()->one();
+		}
+		else {
+			$this->page->open($source.'s.php?form=update&'.$source.'id='.$sourceid);
+			$form = $this->query('name:'.$source.'sForm')->asForm()->waitUntilVisible()->one();
+		}
+
 		if ($open_tab) {
 			$form->selectTab('Value mapping');
 		}
+
+		return $form;
 	}
 
 	/**
@@ -1004,10 +1023,13 @@ class testFormValueMappings extends CWebTest {
 		$valuemap_id = CDBHelper::getValue($valuemap_sql.zbx_dbstr(self::DELETE_VALUEMAP));
 
 		// Delete the value mapping.
-		$this->openValueMappingTab($source);
+		$form = $this->openValueMappingTab($source);
 		$table = $this->query('id:valuemap-table')->asTable()->one();
 		$table->findRow('Name', self::DELETE_VALUEMAP)->query('button:Remove')->one()->click();
-		$this->query('button:Update')->one()->click();
+		$form->submit();
+
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD);
 
 		// Check that the deleted value mapping and its mappings are not present in the DB.
 		$this->assertEquals(0, CDBHelper::getCount($valuemap_sql.zbx_dbstr(self::DELETE_VALUEMAP)));
@@ -1041,8 +1063,15 @@ class testFormValueMappings extends CWebTest {
 		];
 
 		// Create a new host/template, populate the hosthroup but leave the name empty.
-		$this->page->login()->open($source.'s.php?form=create');
-		$form = $this->query('name:'.$source.'sForm')->asForm()->waitUntilVisible()->one();
+		if ($source === 'host') {
+			$this->page->login()->open('zabbix.php?action=host.edit');
+			$form = $this->query('id:host-form')->asFluidForm()->waitUntilVisible()->one();
+		}
+		else {
+			$this->page->login()->open($source.'s.php?form=create');
+			$form = $this->query('name:'.$source.'sForm')->asForm()->waitUntilVisible()->one();
+		}
+
 		$form->getField('Groups')->fill('Discovered hosts');
 
 		// Open value mappings tab and add a value mapping.
@@ -1055,7 +1084,8 @@ class testFormValueMappings extends CWebTest {
 
 		// Submit host/template configuration and wait for the error message to appear.
 		$form->submit();
-		CMessageElement::find()->waitUntilVisible()->one();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_BAD);
 
 		// Check that the value mapping data is still populated.
 		$this->assertTableData($reference_valuemaps, 'id:valuemap-formlist');
