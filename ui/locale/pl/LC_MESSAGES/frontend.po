@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-20 10:47+0300\n"
+"POT-Creation-Date: 2021-09-24 19:55+0300\n"
 "PO-Revision-Date: 2014-06-04 11:22+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zetosoftware.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -3175,7 +3175,7 @@ msgstr "Nie można zaktualizować mapy sieci"
 msgid "Cannot update proxy"
 msgstr "Nie można zaktualizować proxy"
 
-#: include/classes/api/services/CProxy.php:629
+#: include/classes/api/services/CProxy.php:636
 #, c-format
 msgid "Cannot update proxy for discovered host \"%1$s\"."
 msgstr "Nie można zaktualizować proxy na wykrytym hoście \"%1$s\"."
@@ -7362,8 +7362,8 @@ msgstr "Usunięto prototyp wykresu"
 msgid "Graph prototype updated"
 msgstr "Zaktualizowano prototyp wykresu"
 
-#: include/classes/api/services/CDashboardGeneral.php:485
-#: include/classes/api/services/CDashboardGeneral.php:495
+#: include/classes/api/services/CDashboardGeneral.php:525
+#: include/classes/api/services/CDashboardGeneral.php:535
 #, c-format
 msgid "Graph prototype with ID \"%1$s\" is not available."
 msgstr "Prototypowy wykres o ID \"%1$s\" jest niedostępny."
@@ -7397,8 +7397,8 @@ msgstr "Typ wykresu"
 msgid "Graph updated"
 msgstr "Zaktualizowano wykres"
 
-#: include/classes/api/services/CDashboardGeneral.php:457
-#: include/classes/api/services/CDashboardGeneral.php:464
+#: include/classes/api/services/CDashboardGeneral.php:497
+#: include/classes/api/services/CDashboardGeneral.php:504
 #, c-format
 msgid "Graph with ID \"%1$s\" is not available."
 msgstr "Wykres o ID \"%1$s\" jest niedostępny."
@@ -7889,7 +7889,7 @@ msgstr "Elementy grupy hostów"
 msgid "Host group label type"
 msgstr "Typ etykiety grupy hostów"
 
-#: include/classes/api/services/CDashboardGeneral.php:515
+#: include/classes/api/services/CDashboardGeneral.php:555
 #: include/classes/api/services/CScript.php:937
 #: include/classes/api/services/CSettings.php:236
 #: include/classes/api/services/CUserGroup.php:455
@@ -8064,7 +8064,7 @@ msgstr "Aktualizacja hosta się nie powiodła."
 msgid "Host updated"
 msgstr "Zaktualizowano hosta"
 
-#: include/classes/api/services/CDashboardGeneral.php:532
+#: include/classes/api/services/CDashboardGeneral.php:572
 #, c-format
 msgid "Host with ID \"%1$s\" is not available."
 msgstr "Host o ID \"%1$s\" jest niedostęny"
@@ -9915,17 +9915,17 @@ msgstr "Nieprawidłowe parametry metody."
 #: include/classes/api/services/CItemGeneral.php:2607
 #: include/classes/api/services/CItemGeneral.php:2617
 #: include/classes/api/services/CItemGeneral.php:2646
-#: include/classes/api/services/CProxy.php:651
-#: include/classes/api/services/CProxy.php:676
-#: include/classes/api/services/CProxy.php:682
-#: include/classes/api/services/CProxy.php:693
-#: include/classes/api/services/CProxy.php:699
-#: include/classes/api/services/CProxy.php:737
-#: include/classes/api/services/CProxy.php:754
-#: include/classes/api/services/CProxy.php:767
-#: include/classes/api/services/CProxy.php:773
-#: include/classes/api/services/CProxy.php:782
-#: include/classes/api/services/CProxy.php:794
+#: include/classes/api/services/CProxy.php:658
+#: include/classes/api/services/CProxy.php:683
+#: include/classes/api/services/CProxy.php:689
+#: include/classes/api/services/CProxy.php:700
+#: include/classes/api/services/CProxy.php:706
+#: include/classes/api/services/CProxy.php:744
+#: include/classes/api/services/CProxy.php:761
+#: include/classes/api/services/CProxy.php:774
+#: include/classes/api/services/CProxy.php:780
+#: include/classes/api/services/CProxy.php:789
+#: include/classes/api/services/CProxy.php:801
 #: include/classes/api/services/CReport.php:194
 #: include/classes/api/services/CReport.php:200
 #: include/classes/api/services/CReport.php:206
@@ -10313,8 +10313,8 @@ msgstr[0] "Zaktualizowano prototyp pozycji"
 msgstr[1] "Zaktualizowano prototypy pozycji"
 msgstr[2] "Zaktualizowano prototypów pozycji"
 
-#: include/classes/api/services/CDashboardGeneral.php:429
-#: include/classes/api/services/CDashboardGeneral.php:437
+#: include/classes/api/services/CDashboardGeneral.php:469
+#: include/classes/api/services/CDashboardGeneral.php:477
 #, c-format
 msgid "Item prototype with ID \"%1$s\" is not available."
 msgstr "Prototyp pozycji o ID \"%1$s\" jest niedostępny."
@@ -10372,8 +10372,8 @@ msgstr "Pozycja nie będzie odświeżona. Określony przedział aktualizacji wym
 msgid "Item will not be refreshed. Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used."
 msgstr "Pozycja nie będzie odświeżona. Przedział aktualizacji powinien być pomiędzy ls a ld. także Zaplanowane/Elastyczne przedziały mogą być używane."
 
-#: include/classes/api/services/CDashboardGeneral.php:402
-#: include/classes/api/services/CDashboardGeneral.php:409
+#: include/classes/api/services/CDashboardGeneral.php:442
+#: include/classes/api/services/CDashboardGeneral.php:449
 #, c-format
 msgid "Item with ID \"%1$s\" is not available."
 msgstr "Pozycja o ID \"%1$s\" jest niedostępna."
@@ -11134,12 +11134,12 @@ msgid "Macro"
 msgstr "Makro"
 
 #: include/classes/api/services/CHostBase.php:577
-#: include/classes/api/services/CUserMacro.php:668
+#: include/classes/api/services/CUserMacro.php:655
 #, c-format
 msgid "Macro \"%1$s\" already exists on \"%2$s\"."
 msgstr "Makro \"%1$s\" już istnieje w \"%2$s\"."
 
-#: include/classes/api/services/CUserMacro.php:420
+#: include/classes/api/services/CUserMacro.php:411
 #, c-format
 msgid "Macro \"%1$s\" already exists."
 msgstr "Makro \"%1$s\" już istnieje."
@@ -11355,7 +11355,7 @@ msgstr "Kształt mapy"
 msgid "Map update failed."
 msgstr "Aktualizacja mapy nieudana."
 
-#: include/classes/api/services/CDashboardGeneral.php:549
+#: include/classes/api/services/CDashboardGeneral.php:589
 #, c-format
 msgid "Map with ID \"%1$s\" is not available."
 msgstr "Mapa o ID \"%1$s\" jest niedostępna."
@@ -12603,8 +12603,8 @@ msgstr "Brak uprawnień do wywołania \"%1$s.%2$s\"."
 #: include/classes/api/services/CCorrelation.php:724
 #: include/classes/api/services/CCorrelation.php:934
 #: include/classes/api/services/CDashboardGeneral.php:77
-#: include/classes/api/services/CDashboardGeneral.php:233
-#: include/classes/api/services/CDashboardGeneral.php:248
+#: include/classes/api/services/CDashboardGeneral.php:274
+#: include/classes/api/services/CDashboardGeneral.php:289
 #: include/classes/api/services/CDashboard.php:343
 #: include/classes/api/services/CDiscoveryRule.php:578
 #: include/classes/api/services/CDiscoveryRule.php:619
@@ -12684,8 +12684,8 @@ msgstr "Brak uprawnień do wywołania \"%1$s.%2$s\"."
 #: include/classes/api/services/CModule.php:214
 #: include/classes/api/services/CModule.php:246
 #: include/classes/api/services/CProxy.php:388
-#: include/classes/api/services/CProxy.php:623
-#: include/classes/api/services/CProxy.php:850
+#: include/classes/api/services/CProxy.php:630
+#: include/classes/api/services/CProxy.php:857
 #: include/classes/api/services/CRegexp.php:339
 #: include/classes/api/services/CRegexp.php:369
 #: include/classes/api/services/CReport.php:549
@@ -12719,11 +12719,11 @@ msgstr "Brak uprawnień do wywołania \"%1$s.%2$s\"."
 #: include/classes/api/services/CTriggerPrototype.php:711
 #: include/classes/api/services/CUserGroup.php:326
 #: include/classes/api/services/CUserGroup.php:893
-#: include/classes/api/services/CUserMacro.php:353
-#: include/classes/api/services/CUserMacro.php:463
-#: include/classes/api/services/CUserMacro.php:550
-#: include/classes/api/services/CUserMacro.php:742
-#: include/classes/api/services/CUserMacro.php:804
+#: include/classes/api/services/CUserMacro.php:345
+#: include/classes/api/services/CUserMacro.php:450
+#: include/classes/api/services/CUserMacro.php:537
+#: include/classes/api/services/CUserMacro.php:729
+#: include/classes/api/services/CUserMacro.php:791
 #: include/classes/api/services/CUser.php:542
 #: include/classes/api/services/CUser.php:1245
 #: include/classes/api/services/CUser.php:1773
@@ -13524,7 +13524,7 @@ msgstr "Statystyka ruchu wychodzącego interfejsu sieciowego. Zwraca liczbę ca�
 msgid "Output"
 msgstr ""
 
-#: include/classes/api/services/CDashboardGeneral.php:292
+#: include/classes/api/services/CDashboardGeneral.php:333
 #, c-format
 msgid "Overlapping widgets at X:%3$d, Y:%4$d on page #%2$d of dashboard \"%1$s\"."
 msgstr ""
@@ -14473,7 +14473,7 @@ msgstr "Serwery proxy"
 msgid "Proxy"
 msgstr "Proxy"
 
-#: include/classes/api/services/CProxy.php:581
+#: include/classes/api/services/CProxy.php:588
 #, c-format
 msgid "Proxy \"%1$s\" already exists."
 msgstr "Proxy \"%1$s\" już istnieje."
@@ -19597,7 +19597,7 @@ msgstr "Witamy w"
 msgid "When active"
 msgstr "Kiedy włączone"
 
-#: include/classes/api/services/CDashboardGeneral.php:305
+#: include/classes/api/services/CDashboardGeneral.php:346
 #, c-format
 msgid "Widget at X:%3$d, Y:%4$d on page #%2$d of dashboard \"%1$s\" is out of bounds."
 msgstr ""
@@ -19938,9 +19938,6 @@ msgstr "Nie określiłeś celów dla operacji akcji globalnego skryptu \"%1$s\".
 #: include/classes/api/services/CToken.php:313
 #: include/classes/api/services/CToken.php:414
 #: include/classes/api/services/CToken.php:448
-#: include/classes/api/services/CUserMacro.php:271
-#: include/classes/api/services/CUserMacro.php:331
-#: include/classes/api/services/CUserMacro.php:447
 msgid "You do not have permission to perform this operation."
 msgstr "Nie masz uprawnień do wykonania tej operacji"
 
@@ -20473,8 +20470,8 @@ msgstr "nie może być zmieniony"
 #: include/classes/api/services/CMediatype.php:731
 #: include/classes/api/services/CMediatype.php:748
 #: include/classes/api/services/CMediatype.php:800
-#: include/classes/api/services/CProxy.php:700
-#: include/classes/api/services/CProxy.php:774
+#: include/classes/api/services/CProxy.php:707
+#: include/classes/api/services/CProxy.php:781
 #: include/classes/api/services/CTriggerGeneral.php:794
 #: include/classes/api/services/CTriggerGeneral.php:827
 #: include/classes/api/services/CUserGroup.php:473
@@ -21597,10 +21594,10 @@ msgstr "krótki opis"
 #: include/classes/api/services/CMaintenance.php:502
 #: include/classes/api/services/CMaintenance.php:724
 #: include/classes/api/services/CMediatype.php:793
-#: include/classes/api/services/CProxy.php:651
-#: include/classes/api/services/CProxy.php:676
-#: include/classes/api/services/CProxy.php:783
-#: include/classes/api/services/CProxy.php:795
+#: include/classes/api/services/CProxy.php:658
+#: include/classes/api/services/CProxy.php:683
+#: include/classes/api/services/CProxy.php:790
+#: include/classes/api/services/CProxy.php:802
 #: include/classes/api/services/CTriggerGeneral.php:800
 #: include/classes/api/services/CTriggerGeneral.php:833
 #: include/classes/api/services/CValueMap.php:583
@@ -21708,9 +21705,9 @@ msgstr "szablon o ID \"%1$s\" został przekazany %2$s razy"
 #: include/classes/api/services/CHostPrototype.php:1688
 #: include/classes/api/services/CHostPrototype.php:1700
 #: include/classes/api/services/CHttpTest.php:744
-#: include/classes/api/services/CProxy.php:683
-#: include/classes/api/services/CProxy.php:694
-#: include/classes/api/services/CProxy.php:768
+#: include/classes/api/services/CProxy.php:690
+#: include/classes/api/services/CProxy.php:701
+#: include/classes/api/services/CProxy.php:775
 #: include/classes/api/services/CReport.php:195
 #: include/classes/api/services/CReport.php:577
 #: include/classes/api/services/CReport.php:583
@@ -21902,8 +21899,8 @@ msgstr "nieoczekiwany tekst \"%1$s\""
 #: include/classes/api/services/CItemGeneral.php:1622
 #: include/classes/api/services/CItemGeneral.php:1648
 #: include/classes/api/services/CItemGeneral.php:1685
-#: include/classes/api/services/CProxy.php:738
-#: include/classes/api/services/CProxy.php:755
+#: include/classes/api/services/CProxy.php:745
+#: include/classes/api/services/CProxy.php:762
 #: include/classes/api/services/CTriggerGeneral.php:821
 #, c-format
 msgid "unexpected value \"%1$s\""

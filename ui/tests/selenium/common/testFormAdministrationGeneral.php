@@ -113,7 +113,7 @@ class testFormAdministrationGeneral extends CWebTest {
 		switch ($action) {
 			case 'Reset defaults':
 				if ($other) {
-					// In Other parameters form these fields have no default value, so can be filled with anyting.
+					// In Other parameters form these fields have no default value, so can be filled with anything.
 					$form->checkValue(
 						[
 							'Group for discovered hosts' => [],
