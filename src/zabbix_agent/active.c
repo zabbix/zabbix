@@ -634,7 +634,14 @@ static int	refresh_active_checks(zbx_vector_ptr_t *addrs)
 	}
 
 	if (SUCCEED != ret && SUCCEED == last_ret)
-		zabbix_log(LOG_LEVEL_WARNING, "active check configuration update started to fail");
+	{
+		int	n = addrs->values_num - 1;
+
+		zabbix_log(LOG_LEVEL_WARNING,
+				"active check configuration update from [%s:%hu] started to fail (%s)",
+				((zbx_addr_t *)addrs->values[n])->ip, ((zbx_addr_t *)addrs->values[n])->port,
+				zbx_socket_strerror());
+	}
 
 	last_ret = ret;
 
@@ -840,8 +847,10 @@ static int	send_buffer(zbx_vector_ptr_t *addrs)
 	{
 		if (0 == buffer.first_error)
 		{
+			int	n = addrs->values_num - 1;
+
 			zabbix_log(LOG_LEVEL_WARNING, "active check data upload to [%s:%hu] started to fail (%s%s)",
-					((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port,
+					((zbx_addr_t *)addrs->values[n])->ip, ((zbx_addr_t *)addrs->values[n])->port,
 					err_send_step, zbx_socket_strerror());
 			buffer.first_error = now;
 		}
