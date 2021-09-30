@@ -235,11 +235,13 @@ else {
 			(new CCol(
 				new CHorList([
 					(new CSimpleButton(_('Unlink')))
-						->addClass('js-tmpl-unlink ' . ZBX_STYLE_BTN_LINK)
-						->setAttribute('data-templateid', $template['templateid']),
-					(new CSimpleButton(_('Unlink and clear')))
-						->addClass('js-tmpl-unlink-and-clear ' . ZBX_STYLE_BTN_LINK)
-						->setAttribute('data-templateid', $template['templateid'])
+						->onClick('host_edit.unlinkTemplate(this)')
+						->addClass(ZBX_STYLE_BTN_LINK),
+					$data['clone_hostid'] === null
+						? (new CSimpleButton(_('Unlink and clear')))
+							->onClick('host_edit.unlinkAndClearTemplate(this, '.json_encode($template['templateid']).')')
+							->addClass(ZBX_STYLE_BTN_LINK)
+						: null
 				])
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]);

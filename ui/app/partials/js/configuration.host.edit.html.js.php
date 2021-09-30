@@ -109,15 +109,16 @@ $linked_templates = $host_is_discovered ? array_column($data['host']['parentTemp
 
 	window.host_edit = {
 		form_name: null,
+		form: null,
 
 		/**
 		 * Host form setup.
 		 */
 		init({form_name}) {
 			this.form_name = form_name;
+			this.form = document.getElementById(form_name);
 
 			this.initHostTab();
-			this.initTemplatesTab();
 			this.initMacrosTab();
 			this.initInventoryTab();
 			this.initEncryptionTab();
@@ -144,36 +145,21 @@ $linked_templates = $host_is_discovered ? array_column($data['host']['parentTemp
 			document.getElementById('visiblename').placeholder = placeholder;
 		},
 
-		/**
-		 * Sets up template element functionality.
-		 */
-		initTemplatesTab() {
-			document.getElementById('linked-template').addEventListener('click', (e) => {
-				const element = e.target;
+		// Templates tab functions.
 
-				if (element.classList.contains('js-tmpl-unlink')) {
-					if (typeof element.dataset.templateid === 'undefined') {
-						return;
-					}
+		unlinkTemplate(button) {
+			button.closest('tr').remove();
+			this.resetNewTemplatesField();
+		},
 
-					element.closest('tr').remove();
-					this.resetNewTemplatesField();
-				}
-				else if (element.classList.contains('js-tmpl-unlink-and-clear')) {
-					if (typeof element.dataset.templateid === 'undefined') {
-						return;
-					}
+		unlinkAndClearTemplate(button, templateid) {
+			const clear_tmpl = document.createElement('input');
+			clear_tmpl.type = 'hidden';
+			clear_tmpl.name = 'clear_templates[]';
+			clear_tmpl.value = templateid;
+			button.form.appendChild(clear_tmpl);
 
-					const clear_tmpl = document.createElement('input');
-					clear_tmpl.setAttribute('type', 'hidden');
-					clear_tmpl.setAttribute('name', 'clear_templates[]');
-					clear_tmpl.setAttribute('value', element.dataset.templateid);
-					element.form.appendChild(clear_tmpl);
-
-					element.closest('tr').remove();
-					this.resetNewTemplatesField();
-				}
-			});
+			this.unlinkTemplate(button);
 		},
 
 		/**
@@ -201,25 +187,53 @@ $linked_templates = $host_is_discovered ? array_column($data['host']['parentTemp
 							dstfrm: this.form_name,
 							dstfld1: 'add_templates_',
 							multiselect: '1',
-							disableids: this.getAssignedTemplates()
+							disableids: this.getLinkedTemplates()
 						}
 					}
 				});
 		},
 
 		/**
-		 * Collects ids of currently active (linked + new) templates.
+		 * Helper to get linked template IDs as an array.
 		 *
-		 * @return {array} Templateids.
+		 * @return {array}  Templateids.
 		 */
-		getAssignedTemplates() {
+		getLinkedTemplates() {
 			const linked_templateids = [];
 
-			document.querySelectorAll('[name^="templates["').forEach((input) => {
+			this.form.querySelectorAll('[name^="templates["').forEach((input) => {
 				linked_templateids.push(input.value);
 			});
 
-			return linked_templateids.concat(this.getNewlyAddedTemplates());
+			return linked_templateids;
+		},
+
+		/**
+		 * Helper to get added template IDs as an array.
+		 *
+		 * @return {array}  Templateids.
+		 */
+		getNewTemplates() {
+			const $template_multiselect = $('#add_templates_'),
+				templateids = [];
+
+			// Readonly forms don't have multiselect.
+			if ($template_multiselect.length) {
+				$template_multiselect.multiSelect('getData').forEach(template => {
+					templateids.push(template.id);
+				});
+			}
+
+			return templateids;
+		},
+
+		/**
+		 * Collects ids of currently active (linked + new) templates.
+		 *
+		 * @return {array}  Templateids.
+		 */
+		getAllTemplates() {
+			return this.getLinkedTemplates().concat(this.getNewTemplates());
 		},
 
 		/**
@@ -254,7 +268,7 @@ $linked_templates = $host_is_discovered ? array_column($data['host']['parentTemp
 					// Please note that macro initialization must take place once and only when the tab is visible.
 					if (e.type === 'tabsactivate') {
 						let panel_templateids = panel.data('templateids') || [],
-							templateids = this.getAssignedTemplates();
+							templateids = this.getAllTemplates();
 
 						if (panel_templateids.xor(templateids).length > 0) {
 							panel.data('templateids', templateids);
@@ -285,32 +299,9 @@ $linked_templates = $host_is_discovered ? array_column($data['host']['parentTemp
 					return;
 				}
 
-				this.macros_manager.load(e.target.value, this.getAssignedTemplates());
+				this.macros_manager.load(e.target.value, this.getAllTemplates());
 				this.updateEncryptionFields();
 			});
-		},
-
-		/**
-		 * Helper to get added template IDs as an array.
-		 *
-		 * @return {array}
-		*/
-		getNewlyAddedTemplates() {
-			let $template_multiselect = $('#add_templates_'),
-				templateids = [];
-
-			if (typeof $template_multiselect.data('multiSelect') === 'undefined') {
-				return templateids;
-			}
-
-			// Readonly forms don't have multiselect.
-			if ($template_multiselect.length) {
-				$template_multiselect.multiSelect('getData').forEach(template => {
-					templateids.push(template.id);
-				});
-			}
-
-			return templateids;
 		},
 
 		/**
