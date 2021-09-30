@@ -483,11 +483,16 @@ class CControllerHostEdit extends CController {
 				return $valuemap;
 			}, $this->getInput('valuemaps', []));
 
-			$inputs['interfaces'] = array_map(function ($interface) {
-				unset($interface['interfaceid'], $interface['items']);
+			$main_interfaces = $this->getInput('mainInterfaces', []);
+			$inputs['interfaces'] = $this->getInput('interfaces', []);
 
-				return $interface;
-			}, $this->getInput('interfaces', []));
+			foreach($inputs['interfaces'] as &$interface) {
+				$interface['main'] = (in_array($interface['interfaceid'], $main_interfaces))
+					? INTERFACE_PRIMARY
+					: INTERFACE_SECONDARY;
+				unset($interface['interfaceid'], $interface['items']);
+			}
+			unset($interface);
 
 			$inputs['parentTemplates'] = array_intersect_key($linked_templates, array_flip($field_templates));
 			$inputs['add_templates'] = array_map(function ($tmpl) {
