@@ -97,10 +97,8 @@ class testFormTabIndicators extends CWebTest {
 			// Host configuration form tab data.
 			[
 				[
-					'url' => (new CUrl('zabbix.php'))
-						->setArgument('action', 'host.create')
-						->getUrl(),
-					'form' => 'name:host-form',
+					'url' => 'zabbix.php?action=host.edit',
+					'form' => 'id:host-form',
 					'tabs' => [
 						[
 							'name' => 'Templates',
@@ -699,6 +697,9 @@ class testFormTabIndicators extends CWebTest {
 			$form = $this->query($data['form'])->asForm()->one()->waitUntilVisible();
 			$form->getField('Type')->fill('Graph');
 			$form->invalidate();
+		}
+		elseif ($data['url'] === 'zabbix.php?action=host.edit') {
+			$form = $this->query($data['form'])->asFluidForm()->one()->waitUntilVisible();
 		}
 		else {
 			$form = $this->query($data['form'])->asForm()->one()->waitUntilVisible();
