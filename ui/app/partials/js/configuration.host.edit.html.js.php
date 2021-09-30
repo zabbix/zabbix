@@ -201,25 +201,34 @@ $linked_templates = $host_is_discovered ? array_column($data['host']['parentTemp
 							dstfrm: this.form_name,
 							dstfld1: 'add_templates_',
 							multiselect: '1',
-							disableids: this.getAssignedTemplates()
+							disableids: this.getLinkedTemplates()
 						}
 					}
 				});
 		},
 
 		/**
-		 * Collects ids of currently active (linked + new) templates.
+		 * Get ids of linked templates.
 		 *
 		 * @return {array} Templateids.
 		 */
-		getAssignedTemplates() {
+		getLinkedTemplates() {
 			const linked_templateids = [];
 
 			document.querySelectorAll('[name^="templates["').forEach((input) => {
 				linked_templateids.push(input.value);
 			});
 
-			return linked_templateids.concat(this.getNewlyAddedTemplates());
+			return linked_templateids;
+		},
+
+		/**
+		 * Collects ids of all assigned templates (linked + new).
+		 *
+		 * @return {array} Templateids.
+		 */
+		getAssignedTemplates() {
+			return this.getLinkedTemplates().concat(this.getNewlyAddedTemplates());
 		},
 
 		/**
