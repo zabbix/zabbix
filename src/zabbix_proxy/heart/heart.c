@@ -66,7 +66,7 @@ static int	send_heartbeat(void)
 	reserved = j.buffer_size;
 
 	if (FAIL == (ret = connect_to_server(&sock, CONFIG_SOURCE_IP, &zbx_addrs, CONFIG_HEARTBEAT_FREQUENCY,
-			CONFIG_TIMEOUT, configured_tls_connect_mode, 0))) /* do not retry */
+			CONFIG_TIMEOUT, configured_tls_connect_mode, 0, LOG_LEVEL_DEBUG))) /* do not retry */
 	{
 		goto clean;
 	}

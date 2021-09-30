@@ -189,7 +189,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state)
 
 		/* retry till have a connection */
 		if (FAIL == connect_to_server(&sock, CONFIG_SOURCE_IP, &zbx_addrs, 600, CONFIG_TIMEOUT,
-				configured_tls_connect_mode, CONFIG_PROXYDATA_FREQUENCY))
+				configured_tls_connect_mode, CONFIG_PROXYDATA_FREQUENCY, LOG_LEVEL_WARNING))
 		{
 			goto clean;
 		}

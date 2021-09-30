@@ -607,7 +607,7 @@ static int	refresh_active_checks(zbx_vector_ptr_t *addrs)
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_PORT, CONFIG_LISTEN_PORT);
 
 	if (SUCCEED == (ret = connect_to_server(&s, CONFIG_SOURCE_IP, addrs, CONFIG_TIMEOUT, CONFIG_TIMEOUT,
-			configured_tls_connect_mode, 0)))
+			configured_tls_connect_mode, 0, SUCCEED != last_ret ? LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "sending [%s]", json.buffer);
 
@@ -634,12 +634,7 @@ static int	refresh_active_checks(zbx_vector_ptr_t *addrs)
 	}
 
 	if (SUCCEED != ret && SUCCEED == last_ret)
-	{
-		zabbix_log(LOG_LEVEL_WARNING,
-				"active check configuration update from [%s:%hu] started to fail (%s)",
-				((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port,
-				zbx_socket_strerror());
-	}
+		zabbix_log(LOG_LEVEL_WARNING, "active check configuration update started to fail");
 
 	last_ret = ret;
 
@@ -783,7 +778,8 @@ static int	send_buffer(zbx_vector_ptr_t *addrs)
 	zbx_json_close(&json);
 
 	if (SUCCEED == (ret = connect_to_server(&s, CONFIG_SOURCE_IP, addrs, MIN(buffer.count * CONFIG_TIMEOUT, 60),
-			CONFIG_TIMEOUT, configured_tls_connect_mode, 0)))
+			CONFIG_TIMEOUT, configured_tls_connect_mode, 0, 0 == buffer.first_error ? LOG_LEVEL_WARNING :
+					LOG_LEVEL_DEBUG)))
 	{
 		zbx_timespec(&ts);
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_CLOCK, ts.sec);

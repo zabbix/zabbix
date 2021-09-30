@@ -34,7 +34,8 @@ extern char	*CONFIG_TLS_PSK_IDENTITY;
 #endif
 
 static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_vector_ptr_t *addrs,
-		int timeout, int connect_timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2)
+		int timeout, int connect_timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
+		int level)
 {
 	int	ret, i;
 
@@ -47,17 +48,10 @@ static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_
 		if (FAIL != (ret = zbx_tcp_connect(s, source_ip, addr->ip, addr->port, timeout,
 				connect_timeout, tls_connect, tls_arg1, tls_arg2)))
 		{
-			if (0 != i)
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "Connected to the alternative server [%s]:%d",
-						((zbx_addr_t *)addrs->values[0])->ip,
-						((zbx_addr_t *)addrs->values[0])->port);
-			}
-
 			break;
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "Unable to connect to the server [%s]:%d [%s]",
+		zabbix_log(level, "Unable to connect to the server [%s]:%d [%s]",
 				((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port,
 				zbx_socket_strerror());
 
@@ -69,7 +63,7 @@ static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_
 }
 
 int	connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_ptr_t *addrs, int timeout,
-		int connect_timeout, unsigned int tls_connect, int retry_interval)
+		int connect_timeout, unsigned int tls_connect, int retry_interval, int level)
 {
 	int	res, lastlogtime, now;
 	char	*tls_arg1, *tls_arg2;
@@ -100,30 +94,18 @@ int	connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_ptr_
 	}
 
 	if (FAIL == (res = zbx_tcp_connect_failover(sock, source_ip, addrs, timeout, connect_timeout, tls_connect,
-			tls_arg1, tls_arg2)))
+			tls_arg1, tls_arg2, level)))
 	{
 		if (0 != retry_interval)
 		{
 #if !defined(_WINDOWS) && !defined(__MINGW32)
-			char	*str = NULL, *d = "";
-			int	i;
-
-			for (i = 0; i < addrs->values_num; i++)
-			{
-				zbx_addr_t	*addr = (zbx_addr_t *)addrs->values[i];
-
-				str = zbx_strdcatf(str, "%s[%s]:%d", d, addr->ip, (int)addr->port);
-				d = " ";
-			}
-			zabbix_log(LOG_LEVEL_WARNING, "Unable to connect to the server [%s] [%s]. Will retry every"
-					" %d second(s)", str, zbx_socket_strerror(), retry_interval);
-
-			zbx_free(str);
+			zabbix_log(LOG_LEVEL_WARNING, "Unable to connect to the server. Will retry every"
+					" %d second(s)", retry_interval);
 
 			lastlogtime = (int)time(NULL);
 
 			while (ZBX_IS_RUNNING() && FAIL == (res = zbx_tcp_connect_failover(sock, source_ip, addrs,
-					timeout, connect_timeout, tls_connect, tls_arg1, tls_arg2)))
+					timeout, connect_timeout, tls_connect, tls_arg1, tls_arg2, level)))
 			{
 				now = (int)time(NULL);
 

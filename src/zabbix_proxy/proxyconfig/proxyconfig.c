@@ -85,7 +85,7 @@ static void	process_configuration_sync(size_t *data_size)
 	zbx_json_free(&j);
 
 	if (FAIL == connect_to_server(&sock,CONFIG_SOURCE_IP, &zbx_addrs, 600, CONFIG_TIMEOUT,
-			configured_tls_connect_mode, CONFIG_PROXYCONFIG_RETRY))	/* retry till have a connection */
+			configured_tls_connect_mode, CONFIG_PROXYCONFIG_RETRY, LOG_LEVEL_WARNING))	/* retry till have a connection */
 	{
 		goto out;
 	}
