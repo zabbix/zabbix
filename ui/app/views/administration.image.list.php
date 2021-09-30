@@ -86,10 +86,12 @@ else {
 		$img = ($image['imagetype'] == IMAGE_TYPE_BACKGROUND)
 			? new CLink(
 				(new CImg('#', 'no image'))
-					->setAttribute('data-src', 'imgstore.php?width=200&height=200&iconid='.$image['imageid']),
+					->setAttribute('data-src', 'imgstore.php?width=200&height=200&iconid='.$image['imageid'])
+					->addStyle('display: none;'),
 				'image.php?imageid='.$image['imageid']
 			)
-			: (new CImg('#', 'no image'))->setAttribute('data-src', 'imgstore.php?iconid='.$image['imageid']);
+			: (new CImg('#', 'no image'))->setAttribute('data-src', 'imgstore.php?iconid='.$image['imageid'])
+				->addStyle('display: none;');
 
 		$edit_url->setArgument('imageid', $image['imageid']);
 
@@ -118,3 +120,11 @@ else {
 }
 
 $widget->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'load_images' => count($data['images'])
+	]).');
+'))
+	->setOnDocumentReady()
+	->show();

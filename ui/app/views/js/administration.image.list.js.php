@@ -25,41 +25,34 @@
 ?>
 
 <script>
-	$(() => {
-		$('#imagetype').on('change', (e) => redirect(e.target.value));
+	const view = {
 
-		new orderLoadImages(document.querySelector('.adm-img'));
-	});
+		async init({load_images}) {
+			document.getElementById('imagetype').addEventListener('change', (e) => {
+				redirect(e.target.value);
+			});
 
-	class orderLoadImages {
+			if (load_images) {
+				window.addEventListener('unhandledrejection', (e) => {
+					e.preventDefault();
+				});
 
-		constructor(root) {
-			if (root instanceof Element) {
-				this.loadImages(root);
+				for (const image of document.querySelectorAll('.adm-img img[data-src]')) {
+					await this.loadImage(image);
+				}
 			}
-		}
+		},
 
-		async loadImages(root) {
-			const images = root.querySelectorAll('img[data-src]');
-
-			if (images.length == 0) {
-				return;
-			}
-
-			for (let i = 0; i < images.length; i++) {
-				await this.loadImage(images[i]);
-			}
-		}
-
-		loadImage(elem) {
+		loadImage(image) {
 			return new Promise((resolve, reject) => {
-				elem.onload = () => {
-					elem.removeAttribute('data-src');
-					resolve(elem);
+				image.onload = () => {
+					image.removeAttribute('data-src');
+					resolve(image);
 				};
-				elem.onerror = reject;
-				elem.src = elem.dataset.src;
+				image.onerror = reject;
+				image.src = image.dataset.src;
+				image.style = '';
 			});
 		}
-	}
+	};
 </script>
