@@ -105,9 +105,20 @@ int	connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_ptr_
 		if (0 != retry_interval)
 		{
 #if !defined(_WINDOWS) && !defined(__MINGW32)
-			zabbix_log(LOG_LEVEL_WARNING, "Unable to connect to the server [%s]:%d [%s]. Will retry every"
-					" %d second(s)", ((zbx_addr_t *)addrs->values[0])->ip,
-					((zbx_addr_t *)addrs->values[0])->port, zbx_socket_strerror(), retry_interval);
+			char	*str = NULL, *d = "";
+			int	i;
+
+			for (i = 0; i < addrs->values_num; i++)
+			{
+				zbx_addr_t	*addr = (zbx_addr_t *)addrs->values[i];
+
+				str = zbx_strdcatf(str, "%s[%s]:%d", d, addr->ip, (int)addr->port);
+				d = " ";
+			}
+			zabbix_log(LOG_LEVEL_WARNING, "Unable to connect to the server [%s] [%s]. Will retry every"
+					" %d second(s)", str, zbx_socket_strerror(), retry_interval);
+
+			zbx_free(str);
 
 			lastlogtime = (int)time(NULL);
 
