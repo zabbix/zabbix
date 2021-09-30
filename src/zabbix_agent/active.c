@@ -560,7 +560,7 @@ static void process_config_item(struct zbx_json *json, char *config, size_t leng
 static int	refresh_active_checks(zbx_vector_ptr_t *addrs)
 {
 	static ZBX_THREAD_LOCAL int	last_ret = SUCCEED;
-	int				ret;
+	int				ret, level;
 	zbx_socket_t			s;
 	struct zbx_json			json;
 
@@ -606,8 +606,10 @@ static int	refresh_active_checks(zbx_vector_ptr_t *addrs)
 	if (ZBX_DEFAULT_AGENT_PORT != CONFIG_LISTEN_PORT)
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_PORT, CONFIG_LISTEN_PORT);
 
+	level = SUCCEED != last_ret ? LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING;
+
 	if (SUCCEED == (ret = connect_to_server(&s, CONFIG_SOURCE_IP, addrs, CONFIG_TIMEOUT, CONFIG_TIMEOUT,
-			configured_tls_connect_mode, 0, SUCCEED != last_ret ? LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING)))
+			configured_tls_connect_mode, 0, level)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "sending [%s]", json.buffer);
 
@@ -621,27 +623,32 @@ static int	refresh_active_checks(zbx_vector_ptr_t *addrs)
 
 				if (SUCCEED != last_ret)
 				{
-					zabbix_log(LOG_LEVEL_WARNING, "active check configuration update from [%s:%hu]"
+					zabbix_log(LOG_LEVEL_WARNING, "Active check configuration update from [%s:%hu]"
 							" is working again", ((zbx_addr_t *)addrs->values[0])->ip,
 							((zbx_addr_t *)addrs->values[0])->port);
 				}
 				parse_list_of_checks(s.buffer, ((zbx_addr_t *)addrs->values[0])->ip,
 						((zbx_addr_t *)addrs->values[0])->port);
 			}
+			else
+			{
+				zabbix_log(level, "Unable to receive from [%s]:%d [%s]",
+						((zbx_addr_t *)addrs->values[0])->ip,
+						((zbx_addr_t *)addrs->values[0])->port, zbx_socket_strerror());
+			}
+		}
+		else
+		{
+			zabbix_log(level, "Unable to send to [%s]:%d [%s]",
+					((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port,
+					zbx_socket_strerror());
 		}
 
 		zbx_tcp_close(&s);
 	}
 
 	if (SUCCEED != ret && SUCCEED == last_ret)
-	{
-		int	n = addrs->values_num - 1;
-
-		zabbix_log(LOG_LEVEL_WARNING,
-				"active check configuration update from [%s:%hu] started to fail (%s)",
-				((zbx_addr_t *)addrs->values[n])->ip, ((zbx_addr_t *)addrs->values[n])->port,
-				zbx_socket_strerror());
-	}
+		zabbix_log(LOG_LEVEL_WARNING, "Active check configuration update started to fail");
 
 	last_ret = ret;
 
