@@ -1788,7 +1788,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		/* check if the wait was interrupted because of remote commands */
 		if (ZBX_DIAGINFO_UNDEFINED != zbx_diaginfo_scope)
 		{
-			zbx_diag_log_info(zbx_diaginfo_scope);
+			if (ZBX_NODE_STATUS_ACTIVE == ha_status)
+				zbx_diag_log_info(zbx_diaginfo_scope);
+
 			zbx_diaginfo_scope = ZBX_DIAGINFO_UNDEFINED;
 		}
 		else if (0 != zbx_ha_report)
