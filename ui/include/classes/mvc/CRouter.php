@@ -305,16 +305,6 @@ class CRouter {
 
 		// legacy actions
 		'actionconf.php'				=> ['CLegacyAction', null, null],
-		'adm.housekeeper.php'			=> ['CLegacyAction', null, null],
-		'adm.iconmapping.php'			=> ['CLegacyAction', null, null],
-		'adm.images.php'				=> ['CLegacyAction', null, null],
-		'adm.macros.php'				=> ['CLegacyAction', null, null],
-		'adm.other.php'					=> ['CLegacyAction', null, null],
-		'adm.regexps.php'				=> ['CLegacyAction', null, null],
-		'adm.triggerdisplayoptions.php'	=> ['CLegacyAction', null, null],
-		'adm.triggerseverities.php'		=> ['CLegacyAction', null, null],
-		'adm.valuemapping.php'			=> ['CLegacyAction', null, null],
-		'adm.workingtime.php'			=> ['CLegacyAction', null, null],
 		'auditacts.php'					=> ['CLegacyAction', null, null],
 		'browserwarning.php'			=> ['CLegacyAction', null, null],
 		'chart.php'						=> ['CLegacyAction', null, null],
@@ -341,7 +331,6 @@ class CRouter {
 		'index_sso.php'					=> ['CLegacyAction', null, null],
 		'items.php'						=> ['CLegacyAction', null, null],
 		'jsrpc.php'						=> ['CLegacyAction', null, null],
-		'latest.php'					=> ['CLegacyAction', null, null],
 		'maintenance.php'				=> ['CLegacyAction', null, null],
 		'map.php'						=> ['CLegacyAction', null, null],
 		'overview.php'					=> ['CLegacyAction', null, null],
@@ -353,8 +342,7 @@ class CRouter {
 		'toptriggers.php'				=> ['CLegacyAction', null, null],
 		'tr_events.php'					=> ['CLegacyAction', null, null],
 		'trigger_prototypes.php'		=> ['CLegacyAction', null, null],
-		'triggers.php'					=> ['CLegacyAction', null, null],
-		'usergrps.php'					=> ['CLegacyAction', null, null]
+		'triggers.php'					=> ['CLegacyAction', null, null]
 	];
 
 	/**
