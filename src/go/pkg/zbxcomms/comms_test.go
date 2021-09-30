@@ -103,7 +103,7 @@ func TestReceive(t *testing.T) {
 			data, err := c.read(m, nil)
 			if err == nil {
 				if result.failed {
-					t.Errorf("Expcted error while got success")
+					t.Errorf("Expected error while got success")
 				} else {
 					var buffer bytes.Buffer
 					for j := 0; j < len(result.data); j++ {
