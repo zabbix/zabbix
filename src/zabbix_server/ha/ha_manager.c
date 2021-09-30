@@ -277,12 +277,36 @@ static int	ha_db_get_nodes(zbx_vector_ha_node_t *nodes)
  ******************************************************************************/
 static int	ha_check_cluster_config(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes)
 {
-	ZBX_UNUSED(nodes);
+	int	i, activate = SUCCEED;
 
-	info->ha_status = ZBX_NODE_STATUS_ERROR;
-	info->error = zbx_strdup(NULL, "cluster mode is not implemented");
+	for (i = 0; i < nodes->values_num; i++)
+	{
+		if ('\0' == *nodes->values[i]->name && ZBX_NODE_STATUS_STOPPED != nodes->values[i]->status)
+		{
+			ha_set_error(info, "found %s standalone node in HA mode",
+					zbx_ha_status_str(nodes->values[i]->status));
+			return FAIL;
+		}
 
-	return FAIL;
+		if (0 == strcmp(info->name, nodes->values[i]->name))
+		{
+			if (ZBX_NODE_STATUS_STOPPED != nodes->values[i]->status)
+			{
+				ha_set_error(info, "found %s duplicate \"%s\" node in HA mode",
+						zbx_ha_status_str(nodes->values[i]->status), info->name);
+				return FAIL;
+			}
+
+			info->nodeid = nodes->values[i]->nodeid;
+		}
+
+		if (ZBX_NODE_STATUS_ACTIVE == nodes->values[i]->status)
+			activate = FAIL;
+	}
+
+	info->ha_status = SUCCEED == activate ? ZBX_NODE_STATUS_ACTIVE : ZBX_NODE_STATUS_STANDBY;
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -469,6 +493,9 @@ out:
 static void	ha_db_update_status(zbx_ha_info_t *info)
 {
 	DB_RESULT	result;
+
+	if (ZBX_NODE_STATUS_ACTIVE != info->ha_status && ZBX_NODE_STATUS_STANDBY != info->ha_status)
+		return;
 
 	DBbegin();
 
