@@ -21,6 +21,10 @@
 
 class CControllerServiceStatusRuleValidate extends CController {
 
+	protected function init() {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
 	protected function checkInput(): bool {
 		$fields = [
 			'row_index' =>		'required|int32',

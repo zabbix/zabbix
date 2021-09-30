@@ -191,8 +191,8 @@
 
 			fetch(curl.getUrl(), {
 				method: 'POST',
-				headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
-				body: urlEncodeData(request_data)
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify(request_data)
 			})
 				.then((response) => response.json())
 				.then((response) => {

@@ -24,6 +24,10 @@ class CControllerServiceTimeValidate extends CController {
 	private $ts_from;
 	private $ts_to;
 
+	protected function init() {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
 	protected function checkInput(): bool {
 		$fields = [
 			'row_index' =>		'required|int32',
