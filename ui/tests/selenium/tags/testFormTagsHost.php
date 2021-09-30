@@ -28,16 +28,8 @@ class testFormTagsHost extends testFormTags {
 
 	public $update_name = 'Host with tags for updating';
 	public $clone_name = 'Host with tags for cloning';
-	public $link = null;
-	public $saved_link = null;
-
-	public function __construct() {
-		$this->link = self::HOST_LIST_PAGE;
-		$this->saved_link = (new CUrl('zabbix.php'))
-			->setArgument('action', 'host.edit')
-			->setArgument('hostid', '')
-			->getUrl();
-	}
+	public $link = 'zabbix.php?action=host.list';
+	public $saved_link = 'zabbix.php?action=host.edit&hostid=';
 
 	/**
 	 * Test creating of Host with tags.
