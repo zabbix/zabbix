@@ -2584,13 +2584,9 @@ class CApiInputValidator {
 			return false;
 		}
 
-		if ($data !== '') {
-			$pos = strrpos($data, "\n");
-
-			if ($pos === false || strlen($data) != $pos + 1) {
-				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('the last new line feed is missing'));
-				return false;
-			}
+		if ($data !== '' && mb_substr($data, -1) !== "\n") {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('the last new line feed is missing'));
+			return false;
 		}
 
 		return true;
