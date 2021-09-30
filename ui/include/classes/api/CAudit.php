@@ -113,6 +113,7 @@ class CAudit {
 		self::RESOURCE_PROXY => 'hosts',
 		self::RESOURCE_REGEXP => 'regexps',
 		self::RESOURCE_SCHEDULED_REPORT => 'report',
+		self::RESOURCE_SCRIPT => 'scripts',
 		self::RESOURCE_SETTINGS => 'config',
 		self::RESOURCE_TEMPLATE_DASHBOARD => 'dashboard',
 		self::RESOURCE_USER => 'users',
@@ -147,6 +148,7 @@ class CAudit {
 		self::RESOURCE_PROXY => 'host',
 		self::RESOURCE_REGEXP => 'name',
 		self::RESOURCE_SCHEDULED_REPORT => 'name',
+		self::RESOURCE_SCRIPT => 'name',
 		self::RESOURCE_SETTINGS => null,
 		self::RESOURCE_TEMPLATE_DASHBOARD => 'name',
 		self::RESOURCE_USER => 'username',
@@ -170,8 +172,9 @@ class CAudit {
 		self::RESOURCE_MODULE => 'module',
 		self::RESOURCE_PROXY => 'proxy',
 		self::RESOURCE_REGEXP => 'regexp',
-		self::RESOURCE_SETTINGS => 'settings',
 		self::RESOURCE_SCHEDULED_REPORT => 'report',
+		self::RESOURCE_SCRIPT => 'script',
+		self::RESOURCE_SETTINGS => 'settings',
 		self::RESOURCE_TEMPLATE_DASHBOARD => 'templatedashboard',
 		self::RESOURCE_USER => 'user',
 		self::RESOURCE_USER_GROUP => 'usergroup'
@@ -194,6 +197,7 @@ class CAudit {
 		],
 		self::RESOURCE_MEDIA_TYPE => ['paths' => ['mediatype.passwd']],
 		self::RESOURCE_PROXY => ['paths' => ['proxy.tls_psk_identity', 'proxy.tls_psk']],
+		self::RESOURCE_SCRIPT => ['paths' => ['script.password']],
 		self::RESOURCE_USER => ['paths' => ['user.passwd']]
 	];
 
@@ -216,6 +220,7 @@ class CAudit {
 		'regexp.expressions' => 'expressions',
 		'report.users' => 'report_user',
 		'report.user_groups' => 'report_usrgrp',
+		'script.parameters' => 'script_param',
 		'templatedashboard.pages' => 'dashboard_page',
 		'templatedashboard.pages.widgets' => 'widget',
 		'templatedashboard.pages.widgets.fields' => 'widget_field',
@@ -244,6 +249,7 @@ class CAudit {
 		'regexp.expressions' => 'expressionid',
 		'report.users' => 'reportuserid',
 		'report.user_groups' => 'reportusrgrpid',
+		'script.parameters' => 'script_paramid',
 		'templatedashboard.pages' => 'dashboard_pageid',
 		'templatedashboard.pages.widgets' => 'widgetid',
 		'templatedashboard.pages.widgets.fields' => 'widget_fieldid',

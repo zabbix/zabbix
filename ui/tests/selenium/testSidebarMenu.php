@@ -348,7 +348,7 @@ class testSidebarMenu extends CWebTest {
 			// Checking that collapsed, hidden sidemenu appears on clicking.
 			$this->query('xpath://aside[@class="sidebar is-'.$view.' is-opened"]')->one()->waitUntilVisible();
 
-			// Returning standart sidemenu view clicking on unhide, expand button.
+			// Returning standard sidemenu view clicking on unhide, expand button.
 			$this->query('button', $unhide)->one()->waitUntilClickable()->click();
 			$this->assertTrue($this->query('class:sidebar')->one()->isVisible());
 		}
