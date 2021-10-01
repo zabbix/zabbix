@@ -300,29 +300,6 @@ int	DBcommit(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: DBcommit_without_reconnect                                       *
- *                                                                            *
- * Purpose: commit a transaction without reconnecting on connection loss      *
- *                                                                            *
- ******************************************************************************/
-int	DBcommit_without_reconnect(void)
-{
-	if (ZBX_DB_OK > zbx_db_commit())
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "commit called on failed transaction, doing a rollback instead");
-
-		if (ZBX_DB_OK > zbx_db_rollback())
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot perform transaction rollback, connection will be reset");
-			DBclose();
-		}
-	}
-
-	return zbx_db_txn_end_error();
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: DBrollback                                                       *
  *                                                                            *
  * Purpose: rollback a transaction                                            *

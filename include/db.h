@@ -537,7 +537,6 @@ DB_ROW		DBfetch(DB_RESULT result);
 int		DBis_null(const char *field);
 void		DBbegin(void);
 int		DBcommit(void);
-int		DBcommit_without_reconnect(void);
 void		DBrollback(void);
 int		DBend(int ret);
 
