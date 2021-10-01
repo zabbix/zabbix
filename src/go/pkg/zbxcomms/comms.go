@@ -328,17 +328,20 @@ func (c *Listener) Close() (err error) {
 	return c.listener.Close()
 }
 
-func Exchange(addresses *[]string, localAddr *net.Addr, timeout time.Duration, connect_timeout time.Duration, data []byte, args ...interface{}) ([]byte, error) {
+func Exchange(addresses *[]string, localAddr *net.Addr, timeout time.Duration, connect_timeout time.Duration, data []byte, args ...interface{}) ([]byte, []error) {
 	log.Tracef("connecting to %s [timeout:%s, connection timeout:%s]", *addresses, timeout, connect_timeout)
 
 	var tlsconfig *tls.Config
 	var err error
+	var errs []error
 	var c *Connection
 
 	if len(args) > 0 {
 		var ok bool
 		if tlsconfig, ok = args[0].(*tls.Config); !ok {
-			return nil, fmt.Errorf("invalid TLS configuration parameter of type %T", args[0])
+			errs = append(errs, fmt.Errorf("invalid TLS configuration parameter of type %T", args[0]))
+			log.Tracef("%s", errs[len(errs)-1])
+			return nil, errs
 		}
 	}
 
@@ -348,14 +351,16 @@ func Exchange(addresses *[]string, localAddr *net.Addr, timeout time.Duration, c
 			break
 		}
 
-		log.Tracef("cannot connect to [%s]: %s", (*addresses)[0], err)
+		errs = append(errs, fmt.Errorf("cannot connect to [%s]: %s", (*addresses)[0], err))
+		log.Tracef("%s", errs[len(errs)-1])
+
 		tmp := (*addresses)[0]
 		*addresses = (*addresses)[1:]
 		*addresses = append(*addresses, tmp)
 	}
 
 	if err != nil {
-		return nil, err
+		return nil, errs
 	}
 
 	defer c.Close()
@@ -364,21 +369,25 @@ func Exchange(addresses *[]string, localAddr *net.Addr, timeout time.Duration, c
 
 	err = c.Write(data)
 	if err != nil {
-		log.Tracef("cannot send to [%s]: %s", (*addresses)[0], err)
-		return nil, err
+		errs = append(errs, fmt.Errorf("cannot send to [%s]: %s", (*addresses)[0], err))
+		log.Tracef("%s", errs[len(errs)-1])
+		return nil, errs
 	}
 
 	log.Tracef("receiving data from [%s]", (*addresses)[0])
 
 	b, err := c.Read()
 	if err != nil {
-		log.Tracef("cannot receive data from [%s]: %s", (*addresses)[0], err)
-		return nil, err
+		errs = append(errs, fmt.Errorf("cannot receive data from [%s]: %s", (*addresses)[0], err))
+		log.Tracef("%s", errs[len(errs)-1])
+		return nil, errs
 	}
 	log.Tracef("received [%s] from [%s]", string(b), (*addresses)[0])
 
 	if len(b) == 0 {
-		return nil, errors.New("connection closed")
+		errs = append(errs, fmt.Errorf("connection closed"))
+		log.Tracef("%s", errs[len(errs)-1])
+		return nil, errs
 	}
 
 	return b, nil

@@ -91,7 +91,7 @@ type AgentDataRequest struct {
 }
 
 type Uploader interface {
-	Write(data []byte, timeout time.Duration) (err error)
+	Write(data []byte, timeout time.Duration) (err []error)
 	Addr() (s []string)
 	Hostname() (s string)
 	CanRetry() (enabled bool)
@@ -105,7 +105,7 @@ type cacheData struct {
 	clientID   uint64
 	token      string
 	lastDataID uint64
-	lastError  error
+	lastErrors []error
 	retry      *time.Timer
 	timeout    int
 }

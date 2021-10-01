@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"net"
 	"net/url"
+	"reflect"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -50,7 +51,7 @@ type Connector struct {
 	addresses   []string
 	hostname    string
 	localAddr   net.Addr
-	lastError   error
+	lastErrors  []error
 	resultCache resultcache.ResultCache
 	taskManager scheduler.Scheduler
 	options     *agent.AgentOptions
@@ -173,20 +174,23 @@ func (c *Connector) refreshActiveChecks() {
 		return
 	}
 
-	data, err := zbxcomms.Exchange(&c.addresses, &c.localAddr, time.Second*time.Duration(c.options.Timeout), time.Second*time.Duration(c.options.Timeout), request, c.tlsConfig)
+	data, errs := zbxcomms.Exchange(&c.addresses, &c.localAddr, time.Second*time.Duration(c.options.Timeout), time.Second*time.Duration(c.options.Timeout), request, c.tlsConfig)
 
-	if err != nil {
-		if c.lastError == nil || err.Error() != c.lastError.Error() {
-			log.Warningf("[%d] active check configuration update from %s [%s] started to fail (%s)", c.clientID,
-				c.addresses, c.hostname, err)
-			c.lastError = err
+	if errs != nil {
+		if !reflect.DeepEqual(errs, c.lastErrors) {
+			log.Warningf("[%d] active check configuration update from host [%s] started to fail", c.clientID,
+				c.hostname)
+			for i := 0; i < len(errs); i++ {
+				log.Warningf("[%d] %s", c.clientID, errs[i])
+			}
+			c.lastErrors = errs
 		}
 		return
 	}
 
-	if c.lastError != nil {
+	if c.lastErrors != nil {
 		log.Warningf("[%d] active check configuration update from [%s] is working again", c.clientID, c.addresses[0])
-		c.lastError = nil
+		c.lastErrors = nil
 	}
 
 	var response activeChecksResponse

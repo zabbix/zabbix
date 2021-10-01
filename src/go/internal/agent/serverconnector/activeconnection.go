@@ -38,24 +38,25 @@ type activeConnection struct {
 	timeout   int
 }
 
-func (c *activeConnection) Write(data []byte, timeout time.Duration) (err error) {
-	b, err := zbxcomms.Exchange(&c.addresses, &c.localAddr, timeout, time.Second*time.Duration(c.timeout), data, c.tlsConfig)
-	if err != nil {
-		return err
+func (c *activeConnection) Write(data []byte, timeout time.Duration) []error {
+	b, errs := zbxcomms.Exchange(&c.addresses, &c.localAddr, timeout, time.Second*time.Duration(c.timeout), data, c.tlsConfig)
+	if errs != nil {
+		return errs
 	}
 
 	var response agentDataResponse
 
-	err = json.Unmarshal(b, &response)
+	err := json.Unmarshal(b, &response)
 	if err != nil {
-		return err
+		return []error{err}
 	}
 
 	if response.Response != "success" {
 		if len(response.Info) != 0 {
-			return fmt.Errorf("%s", response.Info)
+			return []error{fmt.Errorf("%s", response.Info)}
 		}
-		return errors.New("unsuccessful response")
+
+		return []error{errors.New("unsuccessful response")}
 	}
 
 	return nil

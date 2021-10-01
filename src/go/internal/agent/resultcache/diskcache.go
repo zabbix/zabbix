@@ -21,7 +21,9 @@ package resultcache
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"reflect"
 	"sync/atomic"
 	"time"
 
@@ -158,6 +160,7 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 	var result *AgentData
 	var rows *sql.Rows
 	var maxDataId, maxLogId uint64
+	var errs []error
 
 	if rows, err = c.database.Query(fmt.Sprintf("SELECT "+
 		"id,itemid,lastlogsize,mtime,state,value,eventsource,eventid,eventseverity,eventtimestamp,clock,ns"+
@@ -167,9 +170,14 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 	}
 
 	defer func() {
-		if err != nil && (c.lastError == nil || err.Error() != c.lastError.Error()) {
+		if errs != nil { // report errors not related to Write
+			return
+		}
+
+		errs = append(errs, err)
+		if !reflect.DeepEqual(errs, c.lastErrors) {
 			c.Warningf("cannot upload history data: %s", err)
-			c.lastError = err
+			c.lastErrors = errs
 		}
 	}()
 
@@ -238,17 +246,21 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 	if timeout > 60 {
 		timeout = 60
 	}
-	if err = u.Write(data, time.Duration(timeout)*time.Second); err != nil {
-		if c.lastError == nil || err.Error() != c.lastError.Error() {
-			c.Warningf("history upload to %s [%s] started to fail: %s", u.Addr(), u.Hostname(), err)
-			c.lastError = err
+	if errs = u.Write(data, time.Duration(timeout)*time.Second); errs != nil {
+		if !reflect.DeepEqual(errs, c.lastErrors) {
+			c.Warningf("history upload to [%s] [%s] started to fail", u.Addr()[0], u.Hostname())
+			for i := 0; i < len(errs); i++ {
+				c.Warningf("%s", errs[i])
+			}
+			c.lastErrors = errs
 		}
+		err = errors.New("history upload failed")
 		return
 	}
 
-	if c.lastError != nil {
-		c.Warningf("history upload to [%s %s] is working again", u.Addr(), u.Hostname())
-		c.lastError = nil
+	if c.lastErrors != nil {
+		c.Warningf("history upload to [%s] [%s] is working again", u.Addr()[0], u.Hostname())
+		c.lastErrors = nil
 	}
 	if maxDataId != 0 {
 		if _, err = c.database.Exec(fmt.Sprintf("DELETE FROM data_%d WHERE id<=?", c.serverID), maxDataId); err != nil {
