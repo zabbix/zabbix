@@ -1343,6 +1343,7 @@ define('API_VAULT_SECRET',			43);
 define('API_CUID',					45);
 define('API_IP_RANGES',				46);
 define('API_COND_FORMULA',			47);
+define('API_COND_FORMULAID',		48);
 
 // flags
 define('API_REQUIRED',					0x0001);

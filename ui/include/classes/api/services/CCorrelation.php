@@ -505,6 +505,58 @@ class CCorrelation extends CApiService {
 	}
 
 	/**
+	 * Returns validation rules for the filter object.
+	 *
+	 * @return array
+	 */
+	private static function getFilterValidationRules() {
+		$condition_fields = [
+			'type' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP, ZBX_CORR_CONDITION_EVENT_TAG_PAIR, ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE])],
+			'operator' =>	['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
+								['if' => ['field' => 'type', 'in' => ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP], 'type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL])],
+								['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE])], 'type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE])],
+								['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_EVENT_TAG_PAIR])], 'type' => API_INT32, 'in' => CONDITION_OPERATOR_EQUAL]
+			]],
+			'tag' =>		['type' => API_MULTIPLE, 'rules' => [
+								['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('corr_condition_tag', 'tag')],
+								['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP, ZBX_CORR_CONDITION_EVENT_TAG_PAIR])], 'type' => API_STRING_UTF8, 'in' => '']
+			]],
+			'groupid' =>	['type' => API_MULTIPLE, 'rules' => [
+								['if' => ['field' => 'type', 'in' => ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP], 'type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+								['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_EVENT_TAG_PAIR, ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE])], 'type' => API_STRING_UTF8, 'in' => '']
+			]],
+			'oldtag' =>		['type' => API_MULTIPLE, 'rules' => [
+								['if' => ['field' => 'type', 'in' => ZBX_CORR_CONDITION_EVENT_TAG_PAIR], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('corr_condition_tagpair', 'oldtag')],
+								['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP, ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE])], 'type' => API_STRING_UTF8, 'in' => '']
+			]],
+			'newtag' =>		['type' => API_MULTIPLE, 'rules' => [
+								['if' => ['field' => 'type', 'in' => ZBX_CORR_CONDITION_EVENT_TAG_PAIR], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('corr_condition_tagpair', 'newtag')],
+								['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP, ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE])], 'type' => API_STRING_UTF8, 'in' => '']
+			]],
+			'value' =>		['type' => API_MULTIPLE, 'rules' => [
+								['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('corr_condition_tagvalue', 'value')],
+								['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP, ZBX_CORR_CONDITION_EVENT_TAG_PAIR])], 'type' => API_STRING_UTF8, 'in' => '']
+			]]
+		];
+
+		return ['type' => API_OBJECT, 'fields' => [
+			'evaltype' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION])],
+			'formula' =>	['type' => API_MULTIPLE, 'rules' => [
+								['if' => ['field' => 'evaltype', 'in' => CONDITION_EVAL_TYPE_EXPRESSION], 'type' => API_COND_FORMULA, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('correlation', 'formula')],
+								['if' => ['field' => 'evaltype', 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR])], 'type' => API_STRING_UTF8, 'in' => '']
+			]],
+			'conditions' =>	['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
+								['if' => ['field' => 'evaltype', 'in' => CONDITION_EVAL_TYPE_EXPRESSION], 'type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['formulaid']], 'fields' => [
+									'formulaid' =>	['type' => API_COND_FORMULAID, 'flags' => API_REQUIRED]
+								] + $condition_fields],
+								['if' => ['field' => 'evaltype', 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR])], 'type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'fields' => [
+									'formulaid' =>	['type' => API_STRING_UTF8, 'in' => '']
+								] + $condition_fields]
+			]]
+		]];
+	}
+
+	/**
 	 * Validates the input parameters for the create() method.
 	 *
 	 * @param array $correlations
@@ -516,42 +568,7 @@ class CCorrelation extends CApiService {
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('correlation', 'name')],
 			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('correlation', 'description')],
 			'status' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_CORRELATION_ENABLED, ZBX_CORRELATION_DISABLED])],
-			'filter' =>			['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
-				'evaltype' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION])],
-				'formula' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'evaltype', 'in' => CONDITION_EVAL_TYPE_EXPRESSION], 'type' => API_COND_FORMULA, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('correlation', 'formula')],
-										['if' => ['field' => 'evaltype', 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR])], 'type' => API_STRING_UTF8, 'in' => '']
-				]],
-				'conditions' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['formulaid']], 'fields' => [
-					'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP, ZBX_CORR_CONDITION_EVENT_TAG_PAIR, ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE])],
-					'formulaid' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('correlation', 'formula')],
-					'operator' =>		['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
-											['if' => ['field' => 'type', 'in' => ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP], 'type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL])],
-											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE])], 'type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE])],
-											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_EVENT_TAG_PAIR])], 'type' => API_INT32, 'in' => CONDITION_OPERATOR_EQUAL]
-					]],
-					'tag' =>			['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('corr_condition_tag', 'tag')],
-											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP, ZBX_CORR_CONDITION_EVENT_TAG_PAIR])], 'type' => API_STRING_UTF8, 'in' => '']
-					]],
-					'groupid' =>		['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'type', 'in' => ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP], 'type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_EVENT_TAG_PAIR, ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE])], 'type' => API_STRING_UTF8, 'in' => '']
-					]],
-					'oldtag' =>			['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'type', 'in' => ZBX_CORR_CONDITION_EVENT_TAG_PAIR], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('corr_condition_tagpair', 'oldtag')],
-											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP, ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE])], 'type' => API_STRING_UTF8, 'in' => '']
-					]],
-					'newtag' =>			['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'type', 'in' => ZBX_CORR_CONDITION_EVENT_TAG_PAIR], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('corr_condition_tagpair', 'newtag')],
-											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP, ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE])], 'type' => API_STRING_UTF8, 'in' => '']
-					]],
-					'value' =>			['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('corr_condition_tagvalue', 'value')],
-											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP, ZBX_CORR_CONDITION_EVENT_TAG_PAIR])], 'type' => API_STRING_UTF8, 'in' => '']
-					]]
-				]]
-			]],
+			'filter' =>			self::getFilterValidationRules() + ['flags' => API_REQUIRED],
 			'operations' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['type']], 'fields' => [
 				'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_CORR_OPERATION_CLOSE_OLD, ZBX_CORR_OPERATION_CLOSE_NEW])],
 			]]
@@ -562,7 +579,7 @@ class CCorrelation extends CApiService {
 		}
 
 		self::checkDuplicates($correlations);
-		self::validateFormula($correlations, __FUNCTION__);
+		self::validateFormula($correlations);
 		self::checkHostGroups($correlations);
 	}
 
@@ -614,42 +631,7 @@ class CCorrelation extends CApiService {
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('correlation', 'name')],
 			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('correlation', 'description')],
 			'status' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_CORRELATION_ENABLED, ZBX_CORRELATION_DISABLED])],
-			'filter' =>			['type' => API_OBJECT, 'fields' => [
-				'evaltype' =>		['type' => API_INT32, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION])],
-				'formula' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'evaltype', 'in' => CONDITION_EVAL_TYPE_EXPRESSION], 'type' => API_COND_FORMULA, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('correlation', 'formula')],
-										['if' => ['field' => 'evaltype', 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR])], 'type' => API_STRING_UTF8, 'in' => '']
-				]],
-				'conditions' =>		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['formulaid']], 'fields' => [
-					'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP, ZBX_CORR_CONDITION_EVENT_TAG_PAIR, ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE])],
-					'formulaid' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('correlation', 'formula')],
-					'operator' =>		['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
-											['if' => ['field' => 'type', 'in' => ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP], 'type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL])],
-											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE])], 'type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE])],
-											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_EVENT_TAG_PAIR])], 'type' => API_INT32, 'in' => CONDITION_OPERATOR_EQUAL]
-					]],
-					'tag' =>			['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('corr_condition_tag', 'tag')],
-											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP, ZBX_CORR_CONDITION_EVENT_TAG_PAIR])], 'type' => API_STRING_UTF8, 'in' => '']
-					]],
-					'groupid' =>		['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'type', 'in' => ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP], 'type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_EVENT_TAG_PAIR, ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE])], 'type' => API_STRING_UTF8, 'in' => '']
-					]],
-					'oldtag' =>			['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'type', 'in' => ZBX_CORR_CONDITION_EVENT_TAG_PAIR], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('corr_condition_tagpair', 'oldtag')],
-											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP, ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE])], 'type' => API_STRING_UTF8, 'in' => '']
-					]],
-					'newtag' =>			['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'type', 'in' => ZBX_CORR_CONDITION_EVENT_TAG_PAIR], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('corr_condition_tagpair', 'newtag')],
-											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP, ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE])], 'type' => API_STRING_UTF8, 'in' => '']
-					]],
-					'value' =>			['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('corr_condition_tagvalue', 'value')],
-											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP, ZBX_CORR_CONDITION_EVENT_TAG_PAIR])], 'type' => API_STRING_UTF8, 'in' => '']
-					]]
-				]]
-			]],
+			'filter' =>			self::getFilterValidationRules(),
 			'operations' =>		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['type']], 'fields' => [
 				'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_CORR_OPERATION_CLOSE_OLD, ZBX_CORR_OPERATION_CLOSE_NEW])],
 			]]
@@ -668,7 +650,7 @@ class CCorrelation extends CApiService {
 		self::checkDuplicates($correlations, $db_correlations);
 
 		self::addAffectedObjects($correlations, $db_correlations);
-		self::validateFormula($correlations, __FUNCTION__, $db_correlations);
+		self::validateFormula($correlations);
 		self::checkHostGroups($correlations);
 	}
 
@@ -931,32 +913,6 @@ class CCorrelation extends CApiService {
 	}
 
 	/**
-	 * Validate correlation filter "formula" field.
-	 *
-	 * @param array				$correlation						One correlation containing the filter, formula and name.
-	 * @param string			$correlation['name']				Correlation name for error messages.
-	 * @param array				$correlation['filter']				Correlation filter array containing the formula.
-	 * @param string			$correlation['filter']['formula']	User-defined expression to be used for evaluating
-	 *																conditions of filters with a custom expression.
-	 * @param CConditionFormula $parser								Condition formula parser.
-	 *
-	 * @throws APIException if the input is invalid.
-	 */
-	// protected function validateFormula(array $correlation, CConditionFormula $parser) {
-	// 	if (is_array($correlation['filter']['formula'])) {
-	// 		self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-	// 	}
-
-	// 	if (!$parser->parse($correlation['filter']['formula'])) {
-	// 		self::exception(ZBX_API_ERROR_PARAMETERS,
-	// 			_s('Incorrect custom expression "%2$s" for correlation "%1$s": %3$s.',
-	// 				$correlation['name'], $correlation['filter']['formula'], $parser->error
-	// 			)
-	// 		);
-	// 	}
-	// }
-
-	/**
 	 * Validate correlation condition formula IDs. Check the "formulaid" field and that formula matches the conditions.
 	 *
 	 * @static
@@ -965,71 +921,31 @@ class CCorrelation extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected static function validateFormula(array $correlations, string $method, array $db_correlations = null): void {
-		$parser = new CConditionFormula();
+	protected static function validateFormula(array $correlations): void {
+		$condition_formula_parser = new CConditionFormula();
 
 		foreach ($correlations as $i => $correlation) {
 			if (!array_key_exists('filter', $correlation)) {
 				continue;
 			}
 
-			$filter_evaltype = ($method === 'validateUpdate')
-				? (
-					array_key_exists('evaltype', $correlation['filter'])
-						? $correlation['filter']['evaltype']
-						: $db_correlations['filter']['evaltype']
-				)
-				: $correlation['filter']['evaltype'];
+			if ($correlation['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+				$condition_formula_parser->parse($correlation['filter']['formula']);
 
-			if ($filter_evaltype != CONDITION_EVAL_TYPE_EXPRESSION) {
-				if (!array_key_exists('conditions', $correlation['filter'])) {
-					continue;
-				}
+				$constants = array_column($condition_formula_parser->constants, 'value', 'value');
+				$path = '/'.($i + 1).'/filter';
 
-				foreach ($correlation['filter']['conditions'] as $j => $condition) {
-					if (array_key_exists('formulaid', $condition) && $condition['formulaid'] != '') {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Invalid parameter "%1$s": %2$s.',
-								'/'.($i + 1).'/filter/conditions/'.($j + 1).'/formulaid',
-								_('value must be empty')
-							)
-						);
-					}
-				}
-			}
-			else {
-				if (!array_key_exists('conditions', $correlation['filter'])) {
-					continue;
-				}
-
-				$parser->parse($correlation['filter']['formula']);
-
-				$conditions = array_column($correlation['filter']['conditions'], 'formulaid', 'formulaid');
-				$constants = array_column($parser->constants, 'value', 'value');
-
-				if (count($conditions) != count($constants)) {
+				if (count($correlation['filter']['conditions']) != count($constants)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1).'/filter/formula', _('incorrect value')) // FIXME: rephrase message
+						_s('Invalid parameter "%1$s": %2$s.', $path.'/conditions', _('incorrect number of conditions'))
 					);
 				}
 
 				foreach ($correlation['filter']['conditions'] as $j => $condition) {
-					if (!preg_match('/^[A-Z]+$/', $condition['formulaid'])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Invalid parameter "%1$s": %2$s.',
-								'/'.($i + 1).'/filter/conditions/'.($j + 1).'/formulaid',
-								_('incorrect value')
-							)
-						);
-					}
-
 					if (!array_key_exists($condition['formulaid'], $constants)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Invalid parameter "%1$s": %2$s.',
-								'/'.($i + 1).'/filter/conditions/'.($j + 1).'/formulaid',
-								_s('not defined in %1$s', '/'.($i + 1).'/filter/formula')
-							)
-						);
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+							$path.'/conditions/'.($j + 1).'/formulaid', _('an identifier is not defined in the formula')
+						));
 					}
 				}
 			}

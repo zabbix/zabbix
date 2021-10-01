@@ -251,6 +251,55 @@ class CApiInputValidatorTest extends TestCase {
 				'Invalid parameter "/1/formula": invalid byte sequence in UTF-8.'
 			],
 			[
+				['type' => API_COND_FORMULAID],
+				'A',
+				'/1/formulaid',
+				'A'
+			],
+			[
+				['type' => API_COND_FORMULAID],
+				'ABCD',
+				'/1/formulaid',
+				'ABCD'
+			],
+			[
+				['type' => API_COND_FORMULAID],
+				'Ab',
+				'/1/formulaid',
+				'Invalid parameter "/1/formulaid": uppercase identifier expected.'
+			],
+			[
+				['type' => API_COND_FORMULAID],
+				'',
+				'/1/formulaid',
+				'Invalid parameter "/1/formulaid": cannot be empty.'
+			],
+			[
+				['type' => API_COND_FORMULAID],
+				[],
+				'/1/formulaid',
+				'Invalid parameter "/1/formulaid": a character string is expected.'
+			],
+			[
+				['type' => API_COND_FORMULAID],
+				true,
+				'/1/formulaid',
+				'Invalid parameter "/1/formulaid": a character string is expected.'
+			],
+			[
+				['type' => API_COND_FORMULAID],
+				null,
+				'/1/formulaid',
+				'Invalid parameter "/1/formulaid": a character string is expected.'
+			],
+			[
+				['type' => API_COND_FORMULAID],
+				// broken UTF-8 byte sequence
+				"\xd1".'12345',
+				'/1/formulaid',
+				'Invalid parameter "/1/formulaid": invalid byte sequence in UTF-8.'
+			],
+			[
 				['type' => API_STRING_UTF8, 'length' => 16],
 				'Zabbix server',
 				'/1/name',
