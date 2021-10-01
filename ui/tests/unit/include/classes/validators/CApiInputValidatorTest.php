@@ -1897,19 +1897,45 @@ class CApiInputValidatorTest extends TestCase {
 			[
 				['type' => API_OBJECTS, 'fields' => [
 					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:9'],
-					'value' =>	['type' => API_MULTIPLE, 'rules' => [
+					'value' =>	['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
+						['if' => ['field' => 'type', 'in' => '3'], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY]
+					]]
+				]],
+				[
+					['type' => '3']
+				],
+				'/',
+				'Invalid parameter "/1": the parameter "value" is missing.'
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => [
+					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:9'],
+					'value' =>	['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
+						['if' => ['field' => 'type', 'in' => '3'], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY]
+					]]
+				]],
+				[
+					['type' => '3', 'value' => '']
+				],
+				'/',
+				'Invalid parameter "/1/value": cannot be empty.'
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => [
+					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:9'],
+					'value' =>	['type' => API_MULTIPLE, 'default' => 1, 'rules' => [
 						['if' => ['field' => 'type', 'in' => '1,2'], 'type' => API_INT32],
 						['if' => ['field' => 'type', 'in' => '3'], 'type' => API_STRING_UTF8, 'default' => 'def'],
 					]]
 				]],
 				[
-					['type' => '1', 'value' => '-5'],
+					['type' => '1'],
 					['type' => '2', 'value' => '125'],
 					['type' => '3']
 				],
 				'/',
 				[
-					['type' => 1, 'value' => -5],
+					['type' => 1, 'value' => 1],
 					['type' => 2, 'value' => 125],
 					['type' => 3, 'value' => 'def']
 				]
