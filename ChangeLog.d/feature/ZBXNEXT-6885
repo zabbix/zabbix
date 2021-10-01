@@ -1,1 +1,0 @@
-A......... [ZBXNEXT-6470,ZBXNEXT-6885] implemented audit logging of mediatype API object; refactored mediatype.create, mediatype.update and mediatype.delete (agriscenko)
