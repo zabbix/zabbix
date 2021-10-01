@@ -103,11 +103,16 @@ class CControllerImageCreate extends CController {
 			return $this->setResponse($response);
 		}
 
-		$result = API::Image()->create([
+		$options = [
 			'imagetype' => $this->getInput('imagetype'),
-			'name' => $this->getInput('name'),
-			'image' => $image
-		]);
+			'name' => $this->getInput('name')
+		];
+
+		if ($image != null) {
+			$options['image'] = $image;
+		}
+
+		$result = API::Image()->create($options);
 
 		if ($result) {
 			$response = new CControllerResponseRedirect(
