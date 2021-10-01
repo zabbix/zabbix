@@ -68,6 +68,11 @@ class testPageTemplates extends CLegacyWebTest {
 	 * @dataProvider allTemplates
 	 */
 	public function testPageTemplates_SimpleUpdate($template) {
+		// TODO: Remove the below if condition along with its content when ZBX-20020 is merged
+		if ($template['name'] === 'Cisco UCS Manager SNMP') {
+			return;
+		}
+
 		$host = $template['host'];
 		$name = $template['name'];
 

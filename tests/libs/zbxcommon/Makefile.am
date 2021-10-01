@@ -75,6 +75,7 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxsys/libzbxsys.a \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_srcdir)/src/libs/zbxmedia/libzbxmedia.a \
+	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \

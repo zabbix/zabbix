@@ -1,8 +1,56 @@
-Changes for 5.4.5rc1
+Changes for 5.4.6rc1
 
 New features:
 
 Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.4.5
+
+5.4.5rc2 was released as 5.4.5 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.4.5rc2
+
+Bug fixes:
+...G...... [ZBX-20015] fixed Zabbix agent not being able to retrieve active checks configuration on Windows (vso)
+
+--------------------------------------------------------------------------------
+Changes for 5.4.5rc1
+
+New features:
+...G...PS. [ZBXNEXT-6840] improved protocol to support Zabbix proxy configuration of size up to 16 GB; improved performance and memory usage by freeing uncompressed data as fast as possible and compressing before connection (vso)
+...G...... [ZBXNEXT-6784] removed item being unsupported when swap is not configured (dgoloscapov)
+..F....... [ZBXNEXT-6852] updated localization for Zabbix Support URL (agriscenko)
+........S. [ZBXNEXT-6820] added utf8mb3 when checking for supported mysql character sets and collations (ashubin, wiper)
+.........T [ZBXNEXT-6789] added template for Travis CI (abiba)
+
+Bug fixes:
+A......... [ZBX-19954] fixed updating of the "subject" and "message" parameters in scheduled reports (Sasha)
+........S. [ZBX-19814] added ignoring final result in case if fping quits on a signal (dgoloscapov)
+...G...PS. [ZBX-19952] removed libmodbus linkage from server and proxy (yurii)
+.......PS. [ZBX-19931] fixed crash on big-endian systems when processing history (vso)
+........S. [ZBX-19440] added utf-8 support to zbx_set_json_strerror (dgoloscapov)
+.........T [ZBX-19864] fixed preprocessing of "Checkpoint sync time" item, fixed the regex in preprocessing in the "Ping time" item, fixed SQL request in the "Get transactions" item in "DB PostgreSQL" template (mchudinov)
+...G...... [ZBX-19614] fixed proc.num,proc.cpu.utilization,proc.mem metrics not working properly when compiled with unsupported Go version and improved performance by using functions introduced in Go 1.16 (esneiders, vso)
+..F....... [ZBX-19120] fixed escaping values in resolved macros in item test form for HTTP items when Request body type is JSON or XML (Ivo)
+A......... [ZBX-19850] fixed unnecessary updates of database records in the report.update() method (Sasha)
+.......PS. [ZBX-19712] fixed unavailable interface to affect only Zabbix agent checks,SNMP agent checks, IPMI checks and JMX monitoring (vso)
+....I..... [ZBX-19635] fixed build failure when DES is disabled in Net-SNMP or when LTO is used (vso)
+..F....... [ZBX-19817] fixed module config not being stored in database when module is discovered (gcalenko)
+...G...... [ZBX-19675] fixed Zabbix agent 2 -R windows service crash (esneiders)
+.........T [ZBX-19865] fixed typos in "F5 Big-IP SNMP" template (abakaldin)
+.........T [ZBX-19835] fixed incorrect master item in template "Hikvision camera by HTTP" (abakaldin)
+.........T [ZBX-19849] fixed a trigger name typo in the "MSSQL by ODBC" template (mchudinov)
+...G...... [ZBX-19613] fixed Zabbix agent 2 redis plugin to closer match redis-cli connection (esneiders)
+...G...... [ZBX-19510] fixed re-reading of old Windows events for various Windows event system synchronization problems (MVekslers)
+...G...... [ZBX-16803] fixed ability to use Interface Guid in network interface LLD (akozlovs)
+........S. [ZBX-19236] fixed task manager constantly busy with close_problem task if trigger no longer exists but event still exist (dgoloscapov)
+..F....... [ZBX-19581] fixed untranslated and incorrectly translated strings (agriscenko)
+.........T [ZBX-18680] fixed multi-channel notification issue in "Slack" media type (abiba)
+A.......S. [ZBX-19822] fixed Zabbix server not to populate housekeeper table with tasks that are never deleted when TimescaleDB partitioning is used (jfreibergs, vso)
+.........T [ZBX-19623] fixed Jira Service Desk URL in webhook (abiba)
+A......... [ZBX-19857] dropped support for the non-working option "with_gui_access" in the usergroup.get() method (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 5.4.4
@@ -22,6 +70,7 @@ A.F....... [ZBXNEXT-6528,ZBXNEXT-6569] improved performance of graphs and graphs
 A......... [ZBXNEXT-6528,ZBXNEXT-6566] improved performance of the user macros; added strict validation of user macros (Sasha, vmaksimovs)
 
 Bug fixes:
+...G...... [ZBX-19915] fixed go-sqlite3 in zabbix_agent2 (esneiders)
 .......P.. [ZBX-19743] fixed proxy crash when data sending has failed (dgoloscapov)
 A.F....... [ZBX-16822] fixed performance issues for installations with a lot of historical alerts (miks, talbergs)
 ........S. [ZBX-19745] fixed Zabbix server exiting when quoted user macro context ends with backslash (vso)
@@ -992,11 +1041,52 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
-Changes for 5.0.16rc1
+Changes for 5.0.17rc1
 
 New features:
 
 Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.0.16
+
+5.0.16rc2 was released as 5.0.16 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.16rc2
+
+Bug fixes:
+...G...... [ZBX-20015] fixed Zabbix agent not being able to retrieve active checks configuration on Windows (vso)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.16rc1
+
+New features:
+...G...PS. [ZBXNEXT-6840] improved protocol to support Zabbix proxy configuration of size up to 16 GB; improved performance and memory usage by freeing uncompressed data as fast as possible and compressing before connection (vso)
+...G...... [ZBXNEXT-6784] removed item being unsupported when swap is not configured (dgoloscapov)
+..F....... [ZBXNEXT-6852] updated localization for Zabbix Support URL (agriscenko)
+........S. [ZBXNEXT-6820] added utf8mb3 when checking for supported mysql character sets and collations (ashubin, wiper)
+
+Bug fixes:
+........S. [ZBX-19814] added ignoring final result in case if fping quits on a signal (dgoloscapov)
+.......PS. [ZBX-19931] fixed crash on big-endian systems when processing history (vso)
+........S. [ZBX-19440] added utf-8 support to zbx_set_json_strerror (dgoloscapov)
+.........T [ZBX-19864] fixed preprocessing of "Checkpoint sync time" item, fixed the regex in preprocessing in the "Ping time" item, fixed SQL request in the "Get transactions" item in "DB PostgreSQL" template (mchudinov)
+...G...... [ZBX-19614] fixed proc.num,proc.cpu.utilization,proc.mem metrics not working properly when compiled with unsupported Go version and improved performance by using functions introduced in Go 1.16 (esneiders, vso)
+..F....... [ZBX-19120] fixed escaping values in resolved macros in item test form for HTTP items when Request body type is JSON or XML (Ivo)
+..F....... [ZBX-19580] fixed date format mismatch in UI elements that are loaded via JavaScript (jfreibergs)
+..F....... [ZBX-19817] fixed module config not being stored in database when module is discovered (gcalenko)
+...G...... [ZBX-19675] fixed Zabbix agent 2 -R windows service crash (esneiders)
+.........T [ZBX-19865] fixed typos in "F5 Big-IP SNMP" template (abakaldin)
+.........T [ZBX-19849] fixed a trigger name typo in the "MSSQL by ODBC" template (mchudinov)
+...G...... [ZBX-19613] fixed Zabbix agent 2 redis plugin to closer match redis-cli connection (esneiders)
+...G...... [ZBX-19510] fixed re-reading of old Windows events for various Windows event system synchronization problems (MVekslers)
+...G...... [ZBX-16803] fixed ability to use Interface Guid in network interface LLD (akozlovs)
+........S. [ZBX-19236] fixed task manager constantly busy with close_problem task if trigger no longer exists but event still exist (dgoloscapov)
+.........T [ZBX-18680] fixed multi-channel notification issue in "Slack" media type (abiba)
+.........T [ZBX-19623] fixed Jira Service Desk URL in webhook (abiba)
+A.......S. [ZBX-19822] fixed Zabbix server not to populate housekeeper table with tasks that are never deleted when TimescaleDB partitioning is used (jfreibergs, vso)
+A......... [ZBX-19857] dropped support for the non-working option "with_gui_access" in the usergroup.get() method (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.15
@@ -3200,11 +3290,29 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
-Changes for 4.0.34rc1
+Changes for 4.0.35rc1
 
 New features:
 
 Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.34
+
+4.0.34rc1 was released as 4.0.34 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.34rc1
+
+New features:
+..F....... [ZBXNEXT-6852] updated localization for Zabbix Support URL (agriscenko)
+
+Bug fixes:
+........S. [ZBX-19814] added ignoring final result in case if fping quits on a signal (dgoloscapov)
+.......PS. [ZBX-19931] fixed crash on big-endian systems when processing history (vso)
+..F....... [ZBX-19580] fixed date format mismatch in UI elements that are loaded via JavaScript (jfreibergs)
+........S. [ZBX-19236] fixed task manager constantly busy with close_problem task if trigger no longer exists but event still exist (dgoloscapov)
+A......... [ZBX-19857] dropped support for the non-working option "with_gui_access" in the usergroup.get() method (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.33
