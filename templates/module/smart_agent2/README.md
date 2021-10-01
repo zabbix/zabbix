@@ -13,7 +13,6 @@ and with attribute IDs in {$SMART.ATTRIBUTE.ID.MATCHES} macros on the host level
 
 This template was tested on:
 
-- Zabbix, version 5.0 and later
 - Smartmontools, version 7.1 and later
 
 ## Setup
@@ -68,10 +67,10 @@ There are no template links in this template.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |SMART [{#NAME}]: Disk has been replaced (new serial number received) |<p>Device serial number has changed. Ack to close.</p> |`{TEMPLATE_NAME:smart.disk.sn[{#NAME}].diff()}=1 and {TEMPLATE_NAME:smart.disk.sn[{#NAME}].strlen()}>0` |INFO |<p>Manual close: YES</p> |
-|SMART [{#NAME}]: Disk self-test is not passed | |`{TEMPLATE_NAME:smart.disk.test[{#NAME}].last()}="false"` |HIGH | |
-|SMART [{#NAME}]: Average disk temperature is too high (over {$SMART.TEMPERATURE.MAX.WARN}°C for 5m) | |`{TEMPLATE_NAME:smart.disk.temperature[{#NAME}].avg(5m)}>{$SMART.TEMPERATURE.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- SMART [{#NAME}]: Average disk temperature is critical (over {$SMART.TEMPERATURE.MAX.CRIT}°C for 5m)</p> |
-|SMART [{#NAME}]: Average disk temperature is critical (over {$SMART.TEMPERATURE.MAX.CRIT}°C for 5m) | |`{TEMPLATE_NAME:smart.disk.temperature[{#NAME}].avg(5m)}>{$SMART.TEMPERATURE.MAX.CRIT}` |AVERAGE | |
-|SMART [{#NAME}]: NVMe disk percentage using is over 90% of estimated endurance | |`{TEMPLATE_NAME:smart.disk.percentage_used[{#NAME}].last()}>90` |AVERAGE | |
+|SMART [{#NAME}]: Disk self-test is not passed |<p>-</p> |`{TEMPLATE_NAME:smart.disk.test[{#NAME}].last()}="false"` |HIGH | |
+|SMART [{#NAME}]: Average disk temperature is too high (over {$SMART.TEMPERATURE.MAX.WARN}°C for 5m) |<p>-</p> |`{TEMPLATE_NAME:smart.disk.temperature[{#NAME}].avg(5m)}>{$SMART.TEMPERATURE.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- SMART [{#NAME}]: Average disk temperature is critical (over {$SMART.TEMPERATURE.MAX.CRIT}°C for 5m)</p> |
+|SMART [{#NAME}]: Average disk temperature is critical (over {$SMART.TEMPERATURE.MAX.CRIT}°C for 5m) |<p>-</p> |`{TEMPLATE_NAME:smart.disk.temperature[{#NAME}].avg(5m)}>{$SMART.TEMPERATURE.MAX.CRIT}` |AVERAGE | |
+|SMART [{#NAME}]: NVMe disk percentage using is over 90% of estimated endurance |<p>-</p> |`{TEMPLATE_NAME:smart.disk.percentage_used[{#NAME}].last()}>90` |AVERAGE | |
 |SMART [{#NAME}]: Attribute {#ID} {#ATTRNAME} is failed |<p>The value should be greater than THRESH.</p> |`{TEMPLATE_NAME:smart.disk.error[{#NAME},{#ID}].last()} <= {#THRESH}` |WARNING | |
 
 ## Feedback
