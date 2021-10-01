@@ -35,6 +35,7 @@ class CAudit {
 	public const ACTION_EXECUTE = 7;
 	public const ACTION_LOGIN_SUCCESS = 8;
 	public const ACTION_LOGIN_FAILED = 9;
+	public const ACTION_HISTORY_CLEAR = 10;
 
 	/**
 	 * Audit resources.
@@ -109,6 +110,7 @@ class CAudit {
 		self::RESOURCE_HOUSEKEEPING => 'config',
 		self::RESOURCE_ICON_MAP => 'icon_map',
 		self::RESOURCE_IMAGE => 'images',
+		self::RESOURCE_ITEM => 'items',
 		self::RESOURCE_MACRO => 'globalmacro',
 		self::RESOURCE_MODULE => 'module',
 		self::RESOURCE_PROXY => 'hosts',
@@ -145,6 +147,7 @@ class CAudit {
 		self::RESOURCE_HOUSEKEEPING => null,
 		self::RESOURCE_ICON_MAP => 'name',
 		self::RESOURCE_IMAGE => 'name',
+		self::RESOURCE_ITEM => 'name',
 		self::RESOURCE_MACRO => 'macro',
 		self::RESOURCE_MODULE => 'id',
 		self::RESOURCE_PROXY => 'host',
@@ -171,6 +174,7 @@ class CAudit {
 		self::RESOURCE_HOUSEKEEPING => 'housekeeping',
 		self::RESOURCE_ICON_MAP => 'iconmap',
 		self::RESOURCE_IMAGE => 'image',
+		self::RESOURCE_ITEM => 'item',
 		self::RESOURCE_MACRO => 'usermacro',
 		self::RESOURCE_MODULE => 'module',
 		self::RESOURCE_PROXY => 'proxy',
