@@ -89,7 +89,7 @@ There are no template links in this template.
 |InfluxDB: Health check was failed |<p>The InfluxDB instance is not available or unhealthy.</p> |`last(/InfluxDB by HTTP/influx.healthcheck)=0` |HIGH | |
 |InfluxDB: Version has changed (new version: {ITEM.VALUE}) |<p>InfluxDB version has changed. Ack to close.</p> |`last(/InfluxDB by HTTP/influxdb.version,#1)<>last(/InfluxDB by HTTP/influxdb.version,#2) and length(last(/InfluxDB by HTTP/influxdb.version))>0` |INFO |<p>Manual close: YES</p> |
 |InfluxDB: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`last(/InfluxDB by HTTP/influxdb.uptime)<10m` |INFO |<p>Manual close: YES</p> |
-|InfluxDB: Too many tasks failure runs (over {$INFLUXDB.TASK.RUN.FAIL.MAX.WARN} for 5m) |<p>"Number of failure runs completed across all tasks is too hight."</p> |`min(/InfluxDB by HTTP/influxdb.task_executor_complete.failed.rate,5m)>{$INFLUXDB.TASK.RUN.FAIL.MAX.WARN}` |WARNING | |
+|InfluxDB: Too many tasks failure runs (over {$INFLUXDB.TASK.RUN.FAIL.MAX.WARN} for 5m) |<p>"Number of failure runs completed across all tasks is too high."</p> |`min(/InfluxDB by HTTP/influxdb.task_executor_complete.failed.rate,5m)>{$INFLUXDB.TASK.RUN.FAIL.MAX.WARN}` |WARNING | |
 |InfluxDB: [{#ORG_NAME}]: Too many requests failures (over {$INFLUXDB.REQ.FAIL.MAX.WARN} for 5m) |<p>Too many query requests failed.</p> |`min(/InfluxDB by HTTP/influxdb.org.query_request.failed.rate["{#ORG_NAME}"],5m)>{$INFLUXDB.REQ.FAIL.MAX.WARN}` |WARNING | |
 
 ## Feedback
