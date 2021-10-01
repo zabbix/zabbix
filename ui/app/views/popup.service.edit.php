@@ -293,16 +293,37 @@ $child_services = (new CTable())
 			)
 	);
 
-$child_services_tab = (new CFormGrid())
-	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED)
-	->addItem([
-		new CLabel(_('Child services')),
-		new CFormField([
-			(new CDiv($child_services))
-				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-				->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+$child_services_filter = (new CHorList())
+	->setId('children-filter')
+	->addClass(ZBX_STYLE_INLINE_FILTER)
+	->addItem(new CLabel(_('Name'), 'children-filter-name'))
+	->addItem(
+		(new CTextBox(null))
+			->setId('children-filter-name')
+			->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH))
+	->addItem(
+		(new CSimpleButton(_('Filter')))
+			->addClass('js-filter')
+	)
+	->addItem(
+		(new CSimpleButton(_('Reset')))
+			->addClass('js-reset')
+			->addClass(ZBX_STYLE_BTN_ALT)
+	);
+
+$child_services_tab = [
+	(new CFormGrid())
+		->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED)
+		->addItem(new CFormField($child_services_filter))
+		->addItem([
+			new CLabel(_('Child services')),
+			new CFormField(
+				(new CDiv($child_services))
+					->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+					->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+			)
 		])
-	]);
+];
 
 $tabs = (new CTabView())
 	->setSelected(0)

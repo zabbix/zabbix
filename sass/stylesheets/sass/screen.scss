@@ -201,6 +201,18 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 			margin: 0;
 		}
 	}
+
+	&.inline-filter {
+		text-align: right;
+
+		> li {
+			margin-right: 10px;
+
+			&:last-child {
+				margin: 0;
+			}
+		}
+	}
 }
 
 .header-navigation {

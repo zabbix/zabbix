@@ -2420,6 +2420,12 @@ pre, pre a, pre td, pre span {
   margin: 0 6px 0 0; }
   .hor-list > li:last-child {
     margin: 0; }
+.hor-list.inline-filter {
+  text-align: right; }
+  .hor-list.inline-filter > li {
+    margin-right: 10px; }
+    .hor-list.inline-filter > li:last-child {
+      margin: 0; }
 
 .header-navigation {
   display: inline-block;

@@ -44,7 +44,7 @@ $controls = (new CForm())
 					->setAttribute('autofocus', 'autofocus')
 					->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 			)
-			->addItem(new CSubmitButton(_('Apply')))
+			->addItem(new CSubmitButton(_('Filter')))
 			->addItem(
 				(new CSimpleButton(_('Reset')))
 					->setAttribute('type', 'reset')

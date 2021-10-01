@@ -29,6 +29,7 @@ window.service_edit_popup = {
 
 	child_template: null,
 	serviceid: null,
+	children: new Map(),
 	overlay: null,
 	dialogue: null,
 	form: null,
@@ -57,6 +58,8 @@ window.service_edit_popup = {
 				problem_tags_html: children_problem_tags_html[service.serviceid]
 			});
 		}
+
+		this.filterChildren();
 
 		jQuery('#parent_serviceids_')
 			.multiSelect('getSelectButton')
@@ -121,13 +124,34 @@ window.service_edit_popup = {
 
 		// Setup Child services.
 		document
+			.getElementById('children-filter')
+			.addEventListener('click', (e) => {
+				if (e.target.classList.contains('js-filter')) {
+					this.filterChildren();
+				}
+				else if (e.target.classList.contains('js-reset')) {
+					document.getElementById('children-filter-name').value = '';
+					this.filterChildren();
+				}
+			});
+
+		document
+			.getElementById('children-filter-name')
+			.addEventListener('keypress', (e) => {
+				if (e.key === 'Enter') {
+					this.filterChildren();
+					e.preventDefault();
+				}
+			}, {passive: false});
+
+		document
 			.getElementById('children')
 			.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-add')) {
 					this.selectChildren();
 				}
 				else if (e.target.classList.contains('js-remove')) {
-					e.target.closest('tr').remove();
+					this.removeChild(e.target.closest('tr').dataset.serviceid);
 				}
 			});
 	},
@@ -186,11 +210,8 @@ window.service_edit_popup = {
 		this.onetime_downtime_template = `<span class="disabled"><?= _('One-time downtime') ?></span>`;
 
 		this.child_template = new Template(`
-			<tr>
-				<td class="<?= ZBX_STYLE_WORDWRAP ?>" style="max-width: <?= ZBX_TEXTAREA_BIG_WIDTH ?>px;">
-					#{name}
-					<input name="child_serviceids[#{serviceid}]" type="hidden" value="#{serviceid}">
-				</td>
+			<tr data-serviceid="#{serviceid}">
+				<td class="<?= ZBX_STYLE_WORDWRAP ?>" style="max-width: <?= ZBX_TEXTAREA_BIG_WIDTH ?>px;">#{name}</td>
 				<td>#{algorithm}</td>
 				<td class="<?= ZBX_STYLE_WORDWRAP ?>">#{*problem_tags_html}</td>
 				<td>
@@ -352,18 +373,44 @@ window.service_edit_popup = {
 	},
 
 	addChild(service) {
-		if (document.querySelector(`#children tbody input[name="child_serviceids[${service.serviceid}]"]`) !== null) {
+		if (this.children.has(service.serviceid)) {
 			return;
 		}
 
-		document
-			.querySelector('#children tbody')
-			.insertAdjacentHTML('beforeend', this.child_template.evaluate({
+		this.children.set(service.serviceid, service);
+	},
+
+	removeChild(serviceid) {
+		const child = this.form.querySelector(`#children tbody tr[data-serviceid="${serviceid}"]`);
+
+		if (child !== null) {
+			child.remove();
+		}
+
+		this.children.delete(serviceid);
+	},
+
+	filterChildren() {
+		const container = document.querySelector('#children tbody');
+
+		container.innerHTML = '';
+
+		const filter_name = document.getElementById('children-filter-name').value;
+
+		for (const service of this.children.values()) {
+			if (!service.name.includes(filter_name)) {
+				continue;
+			}
+
+			const child_html = this.child_template.evaluate({
 				serviceid: service.serviceid,
 				name: service.name,
 				algorithm: this.algorithm_names[service.algorithm],
 				problem_tags_html: service.problem_tags_html
-			}));
+			});
+
+			container.insertAdjacentHTML('beforeend', child_html);
+		}
 	},
 
 	selectChildren() {
