@@ -170,7 +170,7 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 	}
 
 	defer func() {
-		if errs != nil { // report errors not related to Write
+		if nil == err || errs != nil { // report errors not related to Write
 			return
 		}
 
@@ -248,7 +248,7 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 	}
 	if errs = u.Write(data, time.Duration(timeout)*time.Second); errs != nil {
 		if !reflect.DeepEqual(errs, c.lastErrors) {
-			c.Warningf("history upload to [%s] [%s] started to fail", u.Addr()[0], u.Hostname())
+			c.Warningf("history upload to [%s] [%s] started to fail", u.Addr(), u.Hostname())
 			for i := 0; i < len(errs); i++ {
 				c.Warningf("%s", errs[i])
 			}
@@ -259,7 +259,7 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 	}
 
 	if c.lastErrors != nil {
-		c.Warningf("history upload to [%s] [%s] is working again", u.Addr()[0], u.Hostname())
+		c.Warningf("history upload to [%s] [%s] is working again", u.Addr(), u.Hostname())
 		c.lastErrors = nil
 	}
 	if maxDataId != 0 {

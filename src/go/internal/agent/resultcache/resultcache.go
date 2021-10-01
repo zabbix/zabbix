@@ -92,7 +92,7 @@ type AgentDataRequest struct {
 
 type Uploader interface {
 	Write(data []byte, timeout time.Duration) (err []error)
-	Addr() (s []string)
+	Addr() (s string)
 	Hostname() (s string)
 	CanRetry() (enabled bool)
 }

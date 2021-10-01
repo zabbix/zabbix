@@ -62,8 +62,8 @@ func (c *activeConnection) Write(data []byte, timeout time.Duration) []error {
 	return nil
 }
 
-func (c *activeConnection) Addr() (s []string) {
-	return c.addresses
+func (c *activeConnection) Addr() (s string) {
+	return c.addresses[0]
 }
 
 func (c *activeConnection) Hostname() (s string) {
