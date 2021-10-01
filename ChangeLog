@@ -1044,8 +1044,13 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.17rc1
 
 New features:
+.......PS. [ZBXNEXT-6809] changed behavior of the vmware event log, the 'skip' option of the new item resets the VMware event cache (MVekslers)
 
 Bug fixes:
+.........T [ZBX-19284] added smart.disk.attr.raw item, removed unit for smart.disk.hours item in "SMART by Zabbix agent 2" template (mchudinov)
+..F....... [ZBX-19899] fixed mass update not working across pages for problems monitoring (jfreibergs)
+.........T [ZBX-19939] fixed typo in Clickhouse Template README (abiba)
+........S. [ZBX-19457] fixed failed query when updating application names longer than 255 characters (asestakovs)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.16
