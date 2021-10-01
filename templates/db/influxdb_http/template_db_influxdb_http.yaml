@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-09-24T10:45:50Z'
+  date: '2021-10-01T07:39:15Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -333,7 +333,7 @@ zabbix_export:
               expression: 'min(/InfluxDB by HTTP/influxdb.task_executor_complete.failed.rate,5m)>{$INFLUXDB.TASK.RUN.FAIL.MAX.WARN}'
               name: 'InfluxDB: Too many tasks failure runs (over {$INFLUXDB.TASK.RUN.FAIL.MAX.WARN} for 5m)'
               priority: WARNING
-              description: '"Number of failure runs completed across all tasks is too hight."'
+              description: '"Number of failure runs completed across all tasks is too high."'
         -
           uuid: a0183b6d934c4612b358c027c75eda6e
           name: 'InfluxDB: Task runs successful, rate'
