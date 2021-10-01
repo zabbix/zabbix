@@ -2973,7 +2973,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 			zbx_audit_host_update_json_add_details(host->hostid, host->host, proxy_hostid,
 					(int)ipmi_authtype, (int)ipmi_privilege, ipmi_username, ipmi_password,
 					(int)host->status, (int)ZBX_FLAG_DISCOVERY_CREATED, (int)tls_connect,
-					(int)tls_accept, tls_issuer, tls_subject, tls_psk_identity, tls_psk,
+					(int)tls_accept, tls_issuer, tls_subject, AUDIT_SECRET_MASK, AUDIT_SECRET_MASK,
 					host->custom_interfaces, host->inventory_mode);
 		}
 		else
@@ -3115,7 +3115,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 					d = ",";
 
 					zbx_audit_host_update_json_update_tls_psk_identity(host->hostid,
-							host->tls_psk_identity_orig, value_esc);
+							AUDIT_SECRET_MASK, AUDIT_SECRET_MASK);
 
 					zbx_free(value_esc);
 				}
@@ -3128,7 +3128,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 					d = ",";
 
 					zbx_audit_host_update_json_update_tls_psk(host->hostid,
-							host->tls_psk_orig, value_esc);
+							AUDIT_SECRET_MASK, AUDIT_SECRET_MASK);
 
 					zbx_free(value_esc);
 				}
