@@ -38,17 +38,15 @@ class testMultiselect extends CWebTest {
 	}
 
 	public function testMultiselect_SuggestCreateNew() {
-		$this->checkSuggest((new CUrl('zabbix.php'))
-			->setArgument('action', 'host.create')
-			->getUrl(),
-			'host-form', 'Groups', 'QQQwww', 'multiselect-suggest'
-		);
+		$this->checkSuggest('zabbix.php?action=host.edit','host-form', 'Groups', 'QQQwww', 'multiselect-suggest');
 	}
 
 	public function checkSuggest($link, $query, $name, $string, $class) {
 		$this->page->login()->open($link)->waitUntilReady();
 		$this->page->updateViewport();
-		$form = $this->query('name:'.$query)->asForm()->one();
+		$form = ($query === 'host-form')
+			? $this->query('name:'.$query)->asFluidForm()->one()
+			: $this->query('name:'.$query)->asForm()->one();
 		$field = $form->getField($name);
 		$element = $field->query('tag:input')->one();
 		$element->type($string);
