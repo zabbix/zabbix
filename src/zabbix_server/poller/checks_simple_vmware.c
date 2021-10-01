@@ -205,6 +205,7 @@ out:
  *             instance  - [IN] the performance counter instance or "" for    *
  *                              aggregate data                                *
  *             coeff     - [IN] the coefficient to apply to the value         *
+ *             unit      - [IN] the counter unit info (kilo, mega, % etc)     *
  *             result    - [OUT] the output result                            *
  *                                                                            *
  * Return value: SYSINFO_RET_OK, result has value - performance counter value *
@@ -220,13 +221,12 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service, const char *type, const char *id,
-		zbx_uint64_t counterid, const char *instance, int coeff, AGENT_RESULT *result)
+		zbx_uint64_t counterid, const char *instance, unsigned int coeff, int unit, AGENT_RESULT *result)
 {
 	zbx_vmware_perf_entity_t	*entity;
 	zbx_vmware_perf_counter_t	*perfcounter;
 	zbx_str_uint64_pair_t		*perfvalue;
 	int				i, ret = SYSINFO_RET_FAIL;
-	zbx_uint64_t			value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%s id:%s counterid:" ZBX_FS_UI64 " instance:%s", __func__,
 			type, id, counterid, instance);
@@ -286,8 +286,44 @@ static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service,
 		goto out;
 	}
 
-	value = perfvalue->value * coeff;
-	SET_UI64_RESULT(result, value);
+	if (0 != coeff)
+	{
+		SET_UI64_RESULT(result, perfvalue->value * coeff);
+	}
+	else
+	{
+		switch (unit)
+		{
+		case ZBX_VMWARE_UNIT_KILOBYTES:
+		case ZBX_VMWARE_UNIT_KILOBYTESPERSECOND:
+			SET_UI64_RESULT(result, perfvalue->value * ZBX_KIBIBYTE);
+			break;
+		case ZBX_VMWARE_UNIT_MEGABYTES:
+		case ZBX_VMWARE_UNIT_MEGABYTESPERSECOND:
+			SET_UI64_RESULT(result, perfvalue->value * ZBX_MEBIBYTE);
+			break;
+		case ZBX_VMWARE_UNIT_TERABYTES:
+			SET_UI64_RESULT(result, perfvalue->value * ZBX_TEBIBYTE);
+			break;
+		case ZBX_VMWARE_UNIT_PERCENT:
+			SET_DBL_RESULT(result, (double)perfvalue->value / 100.0);
+			break;
+		case ZBX_VMWARE_UNIT_JOULE:
+		case ZBX_VMWARE_UNIT_MEGAHERTZ:
+		case ZBX_VMWARE_UNIT_MICROSECOND:
+		case ZBX_VMWARE_UNIT_MILLISECOND:
+		case ZBX_VMWARE_UNIT_NUMBER:
+		case ZBX_VMWARE_UNIT_SECOND:
+		case ZBX_VMWARE_UNIT_WATT:
+			SET_UI64_RESULT(result, perfvalue->value);
+			break;
+		default:
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Performance counter type of unitInfo is unknown. "
+					"Counter id:" ZBX_FS_UI64, counterid));
+			goto out;
+		}
+	}
+
 	ret = SYSINFO_RET_OK;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
@@ -325,21 +361,22 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_get_counter_value_by_path(zbx_vmware_service_t *service, const char *type,
-		const char *id, const char *path, const char *instance, int coeff, AGENT_RESULT *result)
+		const char *id, const char *path, const char *instance, unsigned int coeff, AGENT_RESULT *result)
 {
 	zbx_uint64_t	counterid;
+	int		unit;
 
-	if (FAIL == zbx_vmware_service_get_counterid(service, path, &counterid))
+	if (FAIL == zbx_vmware_service_get_counterid(service, path, &counterid, &unit))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Performance counter is not available."));
 		return SYSINFO_RET_FAIL;
 	}
 
-	return vmware_service_get_counter_value_by_id(service, type, id, counterid, instance, coeff, result);
+	return vmware_service_get_counter_value_by_id(service, type, id, counterid, instance, coeff, unit, result);
 }
 
 static int	vmware_service_get_vm_counter(zbx_vmware_service_t *service, const char *uuid, const char *instance,
-		const char *path, int coeff, AGENT_RESULT *result)
+		const char *path, unsigned int coeff, AGENT_RESULT *result)
 {
 	zbx_vmware_vm_t	*vm;
 	int		ret = SYSINFO_RET_FAIL;
@@ -947,7 +984,7 @@ int	check_vcenter_hv_cpu_usage_perf(AGENT_REQUEST *request, const char *username
 		goto unlock;
 	}
 
-	ret = vmware_service_get_counter_value_by_path(service, "HostSystem", hv->id, "cpu/usage[average]", "", 1,
+	ret = vmware_service_get_counter_value_by_path(service, "HostSystem", hv->id, "cpu/usage[average]", "", 0,
 			result);
 unlock:
 	zbx_vmware_unlock();
@@ -988,7 +1025,7 @@ int	check_vcenter_hv_cpu_utilization(AGENT_REQUEST *request, const char *usernam
 	}
 
 	ret = vmware_service_get_counter_value_by_path(service, "HostSystem", hv->id, "cpu/utilization[average]", "",
-			1, result);
+			0, result);
 unlock:
 	zbx_vmware_unlock();
 out:
@@ -2008,7 +2045,7 @@ int	check_vcenter_cl_perfcounter(AGENT_REQUEST *request, const char *username, c
 	zbx_vmware_service_t	*service;
 	zbx_vmware_cluster_t	*cluster;
 	zbx_uint64_t		counterid;
-	int			ret = SYSINFO_RET_FAIL;
+	int			unit, ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2031,7 +2068,7 @@ int	check_vcenter_cl_perfcounter(AGENT_REQUEST *request, const char *username, c
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	if (FAIL == zbx_vmware_service_get_counterid(service, path, &counterid))
+	if (FAIL == zbx_vmware_service_get_counterid(service, path, &counterid, &unit))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Performance counter is not available."));
 		goto unlock;
@@ -2053,7 +2090,7 @@ int	check_vcenter_cl_perfcounter(AGENT_REQUEST *request, const char *username, c
 
 	/* the performance counter is already being monitored, try to get the results from statistics */
 	ret = vmware_service_get_counter_value_by_id(service, "ClusterComputeResource", cluster->id, counterid,
-			instance, 1, result);
+			instance, 1, unit, result);
 unlock:
 	zbx_vmware_unlock();
 out:
@@ -2069,7 +2106,7 @@ int	check_vcenter_hv_perfcounter(AGENT_REQUEST *request, const char *username, c
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	zbx_uint64_t		counterid;
-	int			ret = SYSINFO_RET_FAIL;
+	int			unit, ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2098,7 +2135,7 @@ int	check_vcenter_hv_perfcounter(AGENT_REQUEST *request, const char *username, c
 		goto unlock;
 	}
 
-	if (FAIL == zbx_vmware_service_get_counterid(service, path, &counterid))
+	if (FAIL == zbx_vmware_service_get_counterid(service, path, &counterid, &unit))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Performance counter is not available."));
 		goto unlock;
@@ -2112,7 +2149,8 @@ int	check_vcenter_hv_perfcounter(AGENT_REQUEST *request, const char *username, c
 	}
 
 	/* the performance counter is already being monitored, try to get the results from statistics */
-	ret = vmware_service_get_counter_value_by_id(service, "HostSystem", hv->id, counterid, instance, 1, result);
+	ret = vmware_service_get_counter_value_by_id(service, "HostSystem", hv->id, counterid, instance, 1, unit,
+			result);
 unlock:
 	zbx_vmware_unlock();
 out:
@@ -2464,7 +2502,7 @@ static int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *u
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	zbx_vmware_datastore_t	*datastore;
-	int			i, ret = SYSINFO_RET_FAIL, count = 0, ds_count = 0;
+	int			i, ret = SYSINFO_RET_FAIL, count = 0, ds_count = 0, unit;
 	zbx_uint64_t		latency = 0, counterid;
 	unsigned char		is_maxlatency = 0;
 
@@ -2508,7 +2546,7 @@ static int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *u
 		goto unlock;
 	}
 
-	if (FAIL == zbx_vmware_service_get_counterid(service, perfcounter, &counterid))
+	if (FAIL == zbx_vmware_service_get_counterid(service, perfcounter, &counterid, &unit))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Performance counter is not available."));
 		goto unlock;
@@ -2536,7 +2574,7 @@ static int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *u
 		}
 
 		if (SYSINFO_RET_OK != (ret = vmware_service_get_counter_value_by_id(service, "HostSystem", hv->id,
-				counterid, datastore->uuid, 1, result)))
+				counterid, datastore->uuid, 1, unit, result)))
 		{
 			goto unlock;
 		}
@@ -3123,7 +3161,8 @@ int	check_vcenter_vm_net_if_in(AGENT_REQUEST *request, const char *username, con
 {
 	zbx_vmware_service_t	*service;
 	const char		*path, *url, *uuid, *instance, *mode;
-	int 			coeff, ret = SYSINFO_RET_FAIL;
+	unsigned int 		coeff;
+	int 			ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -3185,7 +3224,8 @@ int	check_vcenter_vm_net_if_out(AGENT_REQUEST *request, const char *username, co
 {
 	zbx_vmware_service_t	*service;
 	const char		*path, *url, *uuid, *instance, *mode;
-	int 			coeff, ret = SYSINFO_RET_FAIL;
+	unsigned int 		coeff;
+	int 			ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -3372,7 +3412,8 @@ int	check_vcenter_vm_vfs_dev_read(AGENT_REQUEST *request, const char *username, 
 {
 	zbx_vmware_service_t	*service;
 	const char		*path, *url, *uuid, *instance, *mode;
-	int			coeff, ret = SYSINFO_RET_FAIL;
+	unsigned int 		coeff;
+	int 			ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -3434,7 +3475,8 @@ int	check_vcenter_vm_vfs_dev_write(AGENT_REQUEST *request, const char *username,
 {
 	zbx_vmware_service_t	*service;
 	const char		*path, *url, *uuid, *instance, *mode;
-	int			coeff, ret = SYSINFO_RET_FAIL;
+	unsigned int 		coeff;
+	int 			ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -3639,7 +3681,7 @@ int	check_vcenter_vm_perfcounter(AGENT_REQUEST *request, const char *username, c
 	zbx_vmware_service_t	*service;
 	zbx_vmware_vm_t		*vm;
 	zbx_uint64_t		counterid;
-	int			ret = SYSINFO_RET_FAIL;
+	int			unit, ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -3668,7 +3710,7 @@ int	check_vcenter_vm_perfcounter(AGENT_REQUEST *request, const char *username, c
 		goto unlock;
 	}
 
-	if (FAIL == zbx_vmware_service_get_counterid(service, path, &counterid))
+	if (FAIL == zbx_vmware_service_get_counterid(service, path, &counterid, &unit))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Performance counter is not available."));
 		goto unlock;
@@ -3682,7 +3724,8 @@ int	check_vcenter_vm_perfcounter(AGENT_REQUEST *request, const char *username, c
 	}
 
 	/* the performance counter is already being monitored, try to get the results from statistics */
-	ret = vmware_service_get_counter_value_by_id(service, "VirtualMachine", vm->id, counterid, instance, 1, result);
+	ret = vmware_service_get_counter_value_by_id(service, "VirtualMachine", vm->id, counterid, instance, 1, unit,
+			result);
 unlock:
 	zbx_vmware_unlock();
 out:
@@ -3888,7 +3931,7 @@ int	check_vcenter_vm_memory_usage(AGENT_REQUEST *request, const char *username, 
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	ret = vmware_service_get_vm_counter(service, uuid, "", "mem/usage[average]", 1, result);
+	ret = vmware_service_get_vm_counter(service, uuid, "", "mem/usage[average]", 0, result);
 unlock:
 	zbx_vmware_unlock();
 out:
@@ -3926,7 +3969,7 @@ int	check_vcenter_vm_cpu_latency(AGENT_REQUEST *request, const char *username, c
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	ret = vmware_service_get_vm_counter(service, uuid, "", "cpu/latency[average]", 1, result);
+	ret = vmware_service_get_vm_counter(service, uuid, "", "cpu/latency[average]", 0, result);
 unlock:
 	zbx_vmware_unlock();
 out:
@@ -3968,7 +4011,7 @@ int	check_vcenter_vm_cpu_readiness(AGENT_REQUEST *request, const char *username,
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	ret = vmware_service_get_vm_counter(service, uuid, instance, "cpu/readiness[average]", 1, result);
+	ret = vmware_service_get_vm_counter(service, uuid, instance, "cpu/readiness[average]", 0, result);
 unlock:
 	zbx_vmware_unlock();
 out:
@@ -4010,7 +4053,7 @@ int	check_vcenter_vm_cpu_swapwait(AGENT_REQUEST *request, const char *username, 
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	ret = vmware_service_get_vm_counter(service, uuid, instance, "cpu/swapwait[summation]", 1, result);
+	ret = vmware_service_get_vm_counter(service, uuid, instance, "cpu/swapwait[summation]", 0, result);
 unlock:
 	zbx_vmware_unlock();
 out:
@@ -4048,7 +4091,7 @@ int	check_vcenter_vm_cpu_usage_perf(AGENT_REQUEST *request, const char *username
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	ret = vmware_service_get_vm_counter(service, uuid, "", "cpu/usage[average]", 1, result);
+	ret = vmware_service_get_vm_counter(service, uuid, "", "cpu/usage[average]", 0, result);
 unlock:
 	zbx_vmware_unlock();
 out:
