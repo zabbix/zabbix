@@ -521,7 +521,7 @@ class CCorrelation extends CApiService {
 			'filter' =>			['type' => API_OBJECT, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
 				'evaltype' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION])],
 				'formula' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'evaltype', 'in' => CONDITION_EVAL_TYPE_EXPRESSION], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('correlation', 'formula')],
+										['if' => ['field' => 'evaltype', 'in' => CONDITION_EVAL_TYPE_EXPRESSION], 'type' => API_COND_FORMULA, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('correlation', 'formula')],
 										['if' => ['field' => 'evaltype', 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR])], 'type' => API_STRING_UTF8, 'in' => '']
 				]],
 				'conditions' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['formulaid']], 'fields' => [
@@ -619,7 +619,7 @@ class CCorrelation extends CApiService {
 			'filter' =>			['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
 				'evaltype' =>		['type' => API_INT32, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION])],
 				'formula' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'evaltype', 'in' => CONDITION_EVAL_TYPE_EXPRESSION], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('correlation', 'formula')],
+										['if' => ['field' => 'evaltype', 'in' => CONDITION_EVAL_TYPE_EXPRESSION], 'type' => API_COND_FORMULA, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('correlation', 'formula')],
 										['if' => ['field' => 'evaltype', 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR])], 'type' => API_STRING_UTF8, 'in' => '']
 				]],
 				'conditions' =>		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['formulaid']], 'fields' => [
@@ -1000,15 +1000,11 @@ class CCorrelation extends CApiService {
 				}
 			}
 			else {
-				if (!$parser->parse($correlation['filter']['formula'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1).'/filter/formula', $parser->error)
-					);
-				}
-
 				if (!array_key_exists('conditions', $correlation['filter'])) {
 					continue;
 				}
+
+				$parser->parse($correlation['filter']['formula']);
 
 				$conditions = array_column($correlation['filter']['conditions'], 'formulaid', 'formulaid');
 				$constants = array_column($parser->constants, 'value', 'value');

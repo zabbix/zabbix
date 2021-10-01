@@ -76,6 +76,9 @@ class CApiInputValidator {
 			case API_COLOR:
 				return self::validateColor($rule, $data, $path, $error);
 
+			case API_COND_FORMULA:
+				return self::validateCondFormula($rule, $data, $path, $error);
+
 			case API_STRING_UTF8:
 				return self::validateStringUtf8($rule, $data, $path, $error);
 
@@ -229,6 +232,7 @@ class CApiInputValidator {
 		switch ($rule['type']) {
 			case API_CALC_FORMULA:
 			case API_COLOR:
+			case API_COND_FORMULA:
 			case API_MULTIPLE:
 			case API_STRING_UTF8:
 			case API_INT32:
@@ -403,6 +407,37 @@ class CApiInputValidator {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
 				_('a hexadecimal color code (6 symbols) is expected')
 			);
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Calculated condition formula validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['length']  (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateCondFormula($rule, &$data, $path, &$error) {
+		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		$condition_formula_parser = new CConditionFormula();
+
+		if (!$condition_formula_parser->parse($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $condition_formula_parser->error);
 			return false;
 		}
 

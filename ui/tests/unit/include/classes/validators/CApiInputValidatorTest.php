@@ -202,6 +202,55 @@ class CApiInputValidatorTest extends TestCase {
 				'Invalid parameter "/1/color": invalid byte sequence in UTF-8.'
 			],
 			[
+				['type' => API_COND_FORMULA],
+				'A and B',
+				'/1/formula',
+				'A and B'
+			],
+			[
+				['type' => API_COND_FORMULA],
+				'(A and B) or C',
+				'/1/formula',
+				'(A and B) or C'
+			],
+			[
+				['type' => API_COND_FORMULA],
+				'A and',
+				'/1/formula',
+				'Invalid parameter "/1/formula": check expression starting from "d".'
+			],
+			[
+				['type' => API_COND_FORMULA],
+				'',
+				'/1/formula',
+				'Invalid parameter "/1/formula": cannot be empty.'
+			],
+			[
+				['type' => API_COND_FORMULA],
+				[],
+				'/1/formula',
+				'Invalid parameter "/1/formula": a character string is expected.'
+			],
+			[
+				['type' => API_COND_FORMULA],
+				true,
+				'/1/formula',
+				'Invalid parameter "/1/formula": a character string is expected.'
+			],
+			[
+				['type' => API_COND_FORMULA],
+				null,
+				'/1/formula',
+				'Invalid parameter "/1/formula": a character string is expected.'
+			],
+			[
+				['type' => API_COND_FORMULA],
+				// broken UTF-8 byte sequence
+				"\xd1".'12345',
+				'/1/formula',
+				'Invalid parameter "/1/formula": invalid byte sequence in UTF-8.'
+			],
+			[
 				['type' => API_STRING_UTF8, 'length' => 16],
 				'Zabbix server',
 				'/1/name',
