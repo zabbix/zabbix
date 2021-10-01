@@ -52,6 +52,9 @@ PREPARE_AUDIT_TRIGGER_UPDATE_H(comments, const char*)
 PREPARE_AUDIT_TRIGGER_UPDATE_H(url, const char*)
 PREPARE_AUDIT_TRIGGER_UPDATE_H(type, int)
 PREPARE_AUDIT_TRIGGER_UPDATE_H(templateid, zbx_uint64_t)
+PREPARE_AUDIT_TRIGGER_UPDATE_H(description, const char*)
+PREPARE_AUDIT_TRIGGER_UPDATE_H(expression, const char*)
+PREPARE_AUDIT_TRIGGER_UPDATE_H(recovery_expression, const char*)
 
 void	zbx_audit_DBselect_delete_for_trigger(const char *sql, zbx_vector_uint64_t *ids);
 void	zbx_audit_trigger_update_json_add_dependency(int flags, zbx_uint64_t triggerdepid,
@@ -60,5 +63,11 @@ void	zbx_audit_trigger_update_json_remove_dependency(int flags, zbx_uint64_t tri
 void	zbx_audit_trigger_update_json_add_tags_and_values(zbx_uint64_t triggerid, int flags, zbx_uint64_t triggertagid,
 		const char *tag, const char *value);
 void	zbx_audit_trigger_update_json_delete_tags(zbx_uint64_t triggerid, int flags, zbx_uint64_t triggertagid);
+
+#define PREPARE_AUDIT_TRIGGER_UPDATE_TAG_H(resource, type1)							\
+void	zbx_audit_trigger_update_json_update_tag_##resource(zbx_uint64_t triggerid, zbx_uint64_t triggertagid,	\
+		type1 resource##_old, type1 resource##_new);
+PREPARE_AUDIT_TRIGGER_UPDATE_TAG_H(tag, const char*)
+PREPARE_AUDIT_TRIGGER_UPDATE_TAG_H(value, const char*)
 
 #endif	/* ZABBIX_AUDIT_TRIGGER_H */

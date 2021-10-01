@@ -35,6 +35,7 @@ class CAudit {
 	public const ACTION_EXECUTE = 7;
 	public const ACTION_LOGIN_SUCCESS = 8;
 	public const ACTION_LOGIN_FAILED = 9;
+	public const ACTION_HISTORY_CLEAR = 10;
 
 	/**
 	 * Audit resources.
@@ -107,11 +108,15 @@ class CAudit {
 		self::RESOURCE_AUTOREGISTRATION => 'config',
 		self::RESOURCE_DASHBOARD => 'dashboard',
 		self::RESOURCE_HOUSEKEEPING => 'config',
+		self::RESOURCE_ICON_MAP => 'icon_map',
+		self::RESOURCE_IMAGE => 'images',
+		self::RESOURCE_ITEM => 'items',
 		self::RESOURCE_MACRO => 'globalmacro',
 		self::RESOURCE_MODULE => 'module',
 		self::RESOURCE_PROXY => 'hosts',
 		self::RESOURCE_REGEXP => 'regexps',
 		self::RESOURCE_SCHEDULED_REPORT => 'report',
+		self::RESOURCE_SCRIPT => 'scripts',
 		self::RESOURCE_SETTINGS => 'config',
 		self::RESOURCE_TEMPLATE_DASHBOARD => 'dashboard',
 		self::RESOURCE_USER => 'users',
@@ -140,11 +145,15 @@ class CAudit {
 		self::RESOURCE_AUTOREGISTRATION => null,
 		self::RESOURCE_DASHBOARD => 'name',
 		self::RESOURCE_HOUSEKEEPING => null,
+		self::RESOURCE_ICON_MAP => 'name',
+		self::RESOURCE_IMAGE => 'name',
+		self::RESOURCE_ITEM => 'name',
 		self::RESOURCE_MACRO => 'macro',
 		self::RESOURCE_MODULE => 'id',
 		self::RESOURCE_PROXY => 'host',
 		self::RESOURCE_REGEXP => 'name',
 		self::RESOURCE_SCHEDULED_REPORT => 'name',
+		self::RESOURCE_SCRIPT => 'name',
 		self::RESOURCE_SETTINGS => null,
 		self::RESOURCE_TEMPLATE_DASHBOARD => 'name',
 		self::RESOURCE_USER => 'username',
@@ -163,12 +172,16 @@ class CAudit {
 		self::RESOURCE_AUTOREGISTRATION => 'autoregistration',
 		self::RESOURCE_DASHBOARD => 'dashboard',
 		self::RESOURCE_HOUSEKEEPING => 'housekeeping',
+		self::RESOURCE_ICON_MAP => 'iconmap',
+		self::RESOURCE_IMAGE => 'image',
+		self::RESOURCE_ITEM => 'item',
 		self::RESOURCE_MACRO => 'usermacro',
 		self::RESOURCE_MODULE => 'module',
 		self::RESOURCE_PROXY => 'proxy',
 		self::RESOURCE_REGEXP => 'regexp',
-		self::RESOURCE_SETTINGS => 'settings',
 		self::RESOURCE_SCHEDULED_REPORT => 'report',
+		self::RESOURCE_SCRIPT => 'script',
+		self::RESOURCE_SETTINGS => 'settings',
 		self::RESOURCE_TEMPLATE_DASHBOARD => 'templatedashboard',
 		self::RESOURCE_USER => 'user',
 		self::RESOURCE_USER_GROUP => 'usergroup'
@@ -190,6 +203,7 @@ class CAudit {
 			'conditions' => ['usermacro.type' => ZBX_MACRO_TYPE_SECRET]
 		],
 		self::RESOURCE_PROXY => ['paths' => ['proxy.tls_psk_identity', 'proxy.tls_psk']],
+		self::RESOURCE_SCRIPT => ['paths' => ['script.password']],
 		self::RESOURCE_USER => ['paths' => ['user.passwd']]
 	];
 
@@ -205,11 +219,13 @@ class CAudit {
 		'dashboard.pages' => 'dashboard_page',
 		'dashboard.pages.widgets' => 'widget',
 		'dashboard.pages.widgets.fields' => 'widget_field',
+		'iconmap.mappings' => 'icon_mapping',
 		'proxy.hosts' => 'hosts',
 		'proxy.interface' => 'interface',
 		'regexp.expressions' => 'expressions',
 		'report.users' => 'report_user',
 		'report.user_groups' => 'report_usrgrp',
+		'script.parameters' => 'script_param',
 		'templatedashboard.pages' => 'dashboard_page',
 		'templatedashboard.pages.widgets' => 'widget',
 		'templatedashboard.pages.widgets.fields' => 'widget_field',
@@ -232,10 +248,12 @@ class CAudit {
 		'dashboard.pages' => 'dashboard_pageid',
 		'dashboard.pages.widgets' => 'widgetid',
 		'dashboard.pages.widgets.fields' => 'widget_fieldid',
+		'iconmap.mappings' => 'iconmappingid',
 		'proxy.hosts' => 'hostid',
 		'regexp.expressions' => 'expressionid',
 		'report.users' => 'reportuserid',
 		'report.user_groups' => 'reportusrgrpid',
+		'script.parameters' => 'script_paramid',
 		'templatedashboard.pages' => 'dashboard_pageid',
 		'templatedashboard.pages.widgets' => 'widgetid',
 		'templatedashboard.pages.widgets.fields' => 'widget_fieldid',
@@ -262,6 +280,13 @@ class CAudit {
 	 * @var array
 	 */
 	private const SKIP_FIELDS = ['token.creator_userid', 'token.created_at'];
+
+	/**
+	 * Array of paths that contain blob fields.
+	 *
+	 * @var array
+	 */
+	private const BLOB_FIELDS = ['image.image'];
 
 	/**
 	 * Add audit records.
@@ -612,6 +637,9 @@ class CAudit {
 			if (self::isValueToMask($resource, $path, $object)) {
 				$result[$path] = [self::DETAILS_ACTION_ADD, ZBX_SECRET_MASK];
 			}
+			elseif (in_array($path, self::BLOB_FIELDS)) {
+				$result[$path] = [self::DETAILS_ACTION_ADD];
+			}
 			else {
 				$result[$path] = [self::DETAILS_ACTION_ADD, $value];
 			}
@@ -655,21 +683,31 @@ class CAudit {
 					continue;
 				}
 
-				$result[$path] = [
-					self::DETAILS_ACTION_ADD,
-					self::isValueToMask($resource, $path, $object) ? ZBX_SECRET_MASK : $value
-				];
+				if (in_array($path, self::BLOB_FIELDS)) {
+					$result[$path] = [self::DETAILS_ACTION_ADD];
+				}
+				else {
+					$result[$path] = [
+						self::DETAILS_ACTION_ADD,
+						self::isValueToMask($resource, $path, $object) ? ZBX_SECRET_MASK : $value
+					];
+				}
 			}
 			elseif ($value != $db_value) {
 				if (self::isNestedObjectProperty($path)) {
 					$result[self::getLastObjectPath($path)] = [self::DETAILS_ACTION_UPDATE];
 				}
 
-				$result[$path] = [
-					self::DETAILS_ACTION_UPDATE,
-					self::isValueToMask($resource, $path, $full_object) ? ZBX_SECRET_MASK : $value,
-					self::isValueToMask($resource, $path, $db_object) ? ZBX_SECRET_MASK : $db_value
-				];
+				if (in_array($path, self::BLOB_FIELDS)) {
+					$result[$path] = [self::DETAILS_ACTION_UPDATE];
+				}
+				else {
+					$result[$path] = [
+						self::DETAILS_ACTION_UPDATE,
+						self::isValueToMask($resource, $path, $full_object) ? ZBX_SECRET_MASK : $value,
+						self::isValueToMask($resource, $path, $db_object) ? ZBX_SECRET_MASK : $db_value
+					];
+				}
 			}
 		}
 

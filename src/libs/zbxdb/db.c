@@ -2795,6 +2795,8 @@ out:
 
 #else
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	version_info->flag = DB_VERSION_SUPPORTED;
+	version_info->friendly_current_version = NULL;
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() version:%lu", __func__, (unsigned long)zbx_dbms_version_get());
 }

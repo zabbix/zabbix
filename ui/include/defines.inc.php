@@ -22,7 +22,7 @@ define('ZABBIX_VERSION',		'6.0.0alpha4');
 define('ZABBIX_API_VERSION',	'6.0.0');
 define('ZABBIX_EXPORT_VERSION',	'6.0');
 
-define('ZABBIX_DB_VERSION',		5050069);
+define('ZABBIX_DB_VERSION',		5050072);
 
 define('DB_VERSION_SUPPORTED',				0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',		1);
@@ -1342,6 +1342,7 @@ define('API_UUID',					42);
 define('API_VAULT_SECRET',			43);
 define('API_CUID',					45);
 define('API_IP_RANGES',				46);
+define('API_IMAGE',					47);
 
 // flags
 define('API_REQUIRED',					0x0001);
