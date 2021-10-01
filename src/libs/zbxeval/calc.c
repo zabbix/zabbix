@@ -517,7 +517,7 @@ static void	remove_duplicate_backet(zbx_vector_histogram_t *h)
 
 	h->values[inx] = last;
 
-	for (;h->values_num > inx + 1;)
+	while (h->values_num > inx + 1)
 		zbx_vector_histogram_remove_noorder(h, h->values_num - 1);
 }
 
