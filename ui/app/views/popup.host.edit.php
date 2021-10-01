@@ -100,7 +100,9 @@ $output = [
 		$this->readJsFile('popup.host.edit.js.php').
 		'host_edit_popup.init('.json_encode([
 			'popup_url' => $popup_url->getUrl(),
-			'form_name' => $data['form_name']
+			'form_name' => $data['form_name'],
+			'host_interfaces' => $data['host']['interfaces'],
+			'host_is_discovered' => ($data['host']['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
 		]).');',
 	'buttons' => $buttons
 ];

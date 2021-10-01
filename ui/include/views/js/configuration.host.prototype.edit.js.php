@@ -36,6 +36,10 @@
 	</tr>
 </script>
 
+<script type="text/x-jquery-tmpl" id="host-interface-row-tmpl">
+	<?= (new CPartial('configuration.host.interface.row'))->getOutput() ?>
+</script>
+
 <script type="text/javascript">
 	class InterfaceSourceSwitcher extends CBaseComponent {
 		constructor(target, source_input, add_button, data) {
@@ -72,8 +76,9 @@
 		}
 
 		initInherit() {
+			const host_interface_row_tmpl = document.getElementById('host-interface-row-tmpl').innerHTML;
 			const hostInterfaceManagerInherit = new HostInterfaceManager(this._data.inherited_interfaces,
-				JSON.parse(this._data.interface_manager_options)
+				host_interface_row_tmpl
 			);
 			hostInterfaceManagerInherit.setAllowEmptyMessage(!this._data.parent_is_template);
 			hostInterfaceManagerInherit.render();
@@ -81,9 +86,10 @@
 		}
 
 		initCustom() {
+			const host_interface_row_tmpl = document.getElementById('host-interface-row-tmpl').innerHTML;
 			// This is in global space, as Add functions uses it.
 			window.hostInterfaceManager = new HostInterfaceManager(this._data.custom_interfaces,
-				JSON.parse(this._data.interface_manager_options)
+				host_interface_row_tmpl
 			);
 			hostInterfaceManager.render();
 
@@ -168,50 +174,7 @@
 				'parent_is_template' => $parentHost['status'] == HOST_STATUS_TEMPLATE,
 				'is_templated' => $hostPrototype['templateid'] != 0,
 				'inherited_interfaces' => array_values($parentHost['interfaces']),
-				'custom_interfaces' => array_values($hostPrototype['interfaces']),
-				'interface_manager_options' => json_encode([
-					'interface_types' => [
-						'AGENT' => INTERFACE_TYPE_AGENT,
-						'SNMP' => INTERFACE_TYPE_SNMP,
-						'JMX' => INTERFACE_TYPE_JMX,
-						'IPMI' => INTERFACE_TYPE_IPMI
-					],
-					'interface_properties' => [
-						'SNMP_V1' => SNMP_V1,
-						'SNMP_V2C' => SNMP_V2C,
-						'SNMP_V3' => SNMP_V3,
-						'BULK_ENABLED' => SNMP_BULK_ENABLED,
-						'INTERFACE_PRIMARY' => INTERFACE_PRIMARY,
-						'INTERFACE_SECONDARY' => INTERFACE_SECONDARY,
-						'INTERFACE_USE_IP' => INTERFACE_USE_IP,
-						'SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV' => ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,
-						'SNMPV3_SECURITYLEVEL_AUTHNOPRIV' => ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,
-						'SNMPV3_SECURITYLEVEL_AUTHPRIV' => ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV,
-						'SNMPV3_AUTHPROTOCOL_MD5' => ITEM_SNMPV3_AUTHPROTOCOL_MD5,
-						'SNMPV3_PRIVPROTOCOL_DES' => ITEM_SNMPV3_PRIVPROTOCOL_DES
-					],
-					'styles' => [
-						'ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE' => ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE,
-						'ZBX_STYLE_HOST_INTERFACE_CONTAINER' => ZBX_STYLE_HOST_INTERFACE_CONTAINER,
-						'ZBX_STYLE_HOST_INTERFACE_CONTAINER_HEADER' => ZBX_STYLE_HOST_INTERFACE_CONTAINER_HEADER,
-						'ZBX_STYLE_HOST_INTERFACE_CELL_DETAILS' => ZBX_STYLE_HOST_INTERFACE_CELL_DETAILS,
-						'ZBX_STYLE_HOST_INTERFACE_BTN_MAIN_INTERFACE' => ZBX_STYLE_HOST_INTERFACE_BTN_MAIN_INTERFACE,
-						'ZBX_STYLE_HOST_INTERFACE_CELL_USEIP' => ZBX_STYLE_HOST_INTERFACE_CELL_USEIP,
-						'ZBX_STYLE_HOST_INTERFACE_BTN_TOGGLE' => ZBX_STYLE_HOST_INTERFACE_BTN_TOGGLE,
-						'ZBX_STYLE_LIST_ACCORDION_ITEM' => ZBX_STYLE_LIST_ACCORDION_ITEM,
-						'ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED' => ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED,
-						'ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND' => ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND,
-						'ZBX_STYLE_HOST_INTERFACE_ROW' => ZBX_STYLE_HOST_INTERFACE_ROW,
-						'ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE' => ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE,
-					],
-					'templates' => [
-						'interface_row' => (new CPartial('configuration.host.interface.row'))->getOutput(),
-						'no_interface_msg' => (new CDiv(_('No interfaces are defined.')))
-							->addClass(ZBX_STYLE_GREY)
-							->addStyle('padding: 5px 0px;')
-							->toString()
-					]
-				])
+				'custom_interfaces' => array_values($hostPrototype['interfaces'])
 			]) ?>
 		);
 

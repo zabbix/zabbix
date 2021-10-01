@@ -26,83 +26,86 @@
 $host_is_discovered = ($data['host']['flags'] == ZBX_FLAG_DISCOVERY_CREATED);
 $linked_templates = $host_is_discovered ? array_column($data['host']['parentTemplates'], 'templateid') : [];
 ?>
-<?php if (!$host_is_discovered): ?>
-	<script type="text/x-jquery-tmpl" id="macro-row-tmpl-inherited">
-		<?= (new CRow([
-				(new CCol([
-					(new CTextAreaFlexible('macros[#{rowNum}][macro]', '', ['add_post_js' => false]))
-						->addClass('macro')
-						->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
-						->setAttribute('placeholder', '{$MACRO}'),
-					new CInput('hidden', 'macros[#{rowNum}][inherited_type]', ZBX_PROPERTY_OWN)
-				]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-				(new CCol(
-					new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false)
-				))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-				(new CCol(
-					(new CButton('macros[#{rowNum}][remove]', _('Remove')))
-						->addClass(ZBX_STYLE_BTN_LINK)
-						->addClass('element-table-remove')
-				))->addClass(ZBX_STYLE_NOWRAP),
-				[
-					new CCol(
-						(new CDiv())
-							->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
-							->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-					),
-					new CCol(),
-					new CCol(
-						(new CDiv())
-							->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
-							->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-					)
-				]
-			]))
-				->addClass('form_row')
-				->toString().
-			(new CRow([
-				(new CCol(
-					(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
-						->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
-						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-						->setAttribute('placeholder', _('description'))
-				))
-					->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)
-					->setColSpan(7)
-			]))
-				->addClass('form_row')
-				->toString()
-		?>
-	</script>
 
-	<script type="text/x-jquery-tmpl" id="macro-row-tmpl">
-		<?= (new CRow([
-				(new CCol([
-					(new CTextAreaFlexible('macros[#{rowNum}][macro]', '', ['add_post_js' => false]))
-						->addClass('macro')
-						->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
-						->setAttribute('placeholder', '{$MACRO}')
-				]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-				(new CCol(
-					new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false)
-				))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-				(new CCol(
-					(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
-						->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
+<script type="text/x-jquery-tmpl" id="macro-row-tmpl-inherited">
+	<?= (new CRow([
+			(new CCol([
+				(new CTextAreaFlexible('macros[#{rowNum}][macro]', '', ['add_post_js' => false]))
+					->addClass('macro')
+					->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
+					->setAttribute('placeholder', '{$MACRO}'),
+				new CInput('hidden', 'macros[#{rowNum}][inherited_type]', ZBX_PROPERTY_OWN)
+			]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+			(new CCol(
+				new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false)
+			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+			(new CCol(
+				(new CButton('macros[#{rowNum}][remove]', _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('element-table-remove')
+			))->addClass(ZBX_STYLE_NOWRAP),
+			[
+				new CCol(
+					(new CDiv())
+						->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
 						->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-						->setAttribute('placeholder', _('description'))
-				))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-				(new CCol(
-					(new CButton('macros[#{rowNum}][remove]', _('Remove')))
-						->addClass(ZBX_STYLE_BTN_LINK)
-						->addClass('element-table-remove')
-				))->addClass(ZBX_STYLE_NOWRAP)
-			]))
-				->addClass('form_row')
-				->toString()
-		?>
-	</script>
-<?php endif ?>
+				),
+				new CCol(),
+				new CCol(
+					(new CDiv())
+						->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+						->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+				)
+			]
+		]))
+			->addClass('form_row')
+			->toString().
+		(new CRow([
+			(new CCol(
+				(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
+					->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setAttribute('placeholder', _('description'))
+			))
+				->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)
+				->setColSpan(7)
+		]))
+			->addClass('form_row')
+			->toString()
+	?>
+</script>
+
+<script type="text/x-jquery-tmpl" id="macro-row-tmpl">
+	<?= (new CRow([
+			(new CCol([
+				(new CTextAreaFlexible('macros[#{rowNum}][macro]', '', ['add_post_js' => false]))
+					->addClass('macro')
+					->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
+					->setAttribute('placeholder', '{$MACRO}')
+			]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+			(new CCol(
+				new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false)
+			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+			(new CCol(
+				(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
+					->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
+					->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+					->setAttribute('placeholder', _('description'))
+			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+			(new CCol(
+				(new CButton('macros[#{rowNum}][remove]', _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('element-table-remove')
+			))->addClass(ZBX_STYLE_NOWRAP)
+		]))
+			->addClass('form_row')
+			->toString()
+	?>
+</script>
+
+<script type="text/x-jquery-tmpl" id="host-interface-row-tmpl">
+	<?= (new CPartial('configuration.host.interface.row'))->getOutput() ?>
+</script>
 
 <script>
 	'use strict';
@@ -114,11 +117,11 @@ $linked_templates = $host_is_discovered ? array_column($data['host']['parentTemp
 		/**
 		 * Host form setup.
 		 */
-		init({form_name}) {
+		init({form_name, host_interfaces, host_is_discovered}) {
 			this.form_name = form_name;
 			this.form = document.getElementById(form_name);
 
-			this.initHostTab();
+			this.initHostTab(host_interfaces, host_is_discovered);
 			this.initMacrosTab();
 			this.initInventoryTab();
 			this.initEncryptionTab();
@@ -127,13 +130,15 @@ $linked_templates = $host_is_discovered ? array_column($data['host']['parentTemp
 		/**
 		 * Sets up visible name placeholder synchronization.
 		 */
-		initHostTab() {
+		initHostTab(host_interfaces, host_is_discovered) {
 			const host_field = document.getElementById('host');
 
 			['input', 'paste'].forEach((event_type) => {
 				host_field.addEventListener(event_type, (e) => this.setVisibleNamePlaceholder(e.target.value));
 			});
 			this.setVisibleNamePlaceholder(host_field.value);
+
+			this.initHostInterfaces(host_interfaces, host_is_discovered);
 		},
 
 		/**
@@ -143,6 +148,18 @@ $linked_templates = $host_is_discovered ? array_column($data['host']['parentTemp
 		 */
 		setVisibleNamePlaceholder(placeholder) {
 			document.getElementById('visiblename').placeholder = placeholder;
+		},
+
+		initHostInterfaces(host_interfaces, host_is_discovered) {
+			const host_interface_row_tmpl = document.getElementById('host-interface-row-tmpl').innerHTML;
+
+			window.hostInterfaceManager = new HostInterfaceManager(host_interfaces, host_interface_row_tmpl);
+
+			hostInterfaceManager.render();
+
+			if (host_is_discovered) {
+				hostInterfaceManager.makeReadonly();
+			}
 		},
 
 		// Templates tab functions.
@@ -426,61 +443,4 @@ $linked_templates = $host_is_discovered ? array_column($data['host']['parentTemp
 			return fields;
 		}
 	};
-
-	jQuery(document).ready(function() {
-		'use strict';
-
-		window.hostInterfaceManager = new HostInterfaceManager(
-			<?= json_encode($data['host']['interfaces']) ?>,
-			<?= json_encode([
-				'interface_types' => [
-					'AGENT' => INTERFACE_TYPE_AGENT,
-					'SNMP' => INTERFACE_TYPE_SNMP,
-					'JMX' => INTERFACE_TYPE_JMX,
-					'IPMI' => INTERFACE_TYPE_IPMI
-				],
-				'interface_properties' => [
-					'SNMP_V1' => SNMP_V1,
-					'SNMP_V2C' => SNMP_V2C,
-					'SNMP_V3' => SNMP_V3,
-					'BULK_ENABLED' => SNMP_BULK_ENABLED,
-					'INTERFACE_PRIMARY' => INTERFACE_PRIMARY,
-					'INTERFACE_SECONDARY' => INTERFACE_SECONDARY,
-					'INTERFACE_USE_IP' => INTERFACE_USE_IP,
-					'SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV' => ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,
-					'SNMPV3_SECURITYLEVEL_AUTHNOPRIV' => ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,
-					'SNMPV3_SECURITYLEVEL_AUTHPRIV' => ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV,
-					'SNMPV3_AUTHPROTOCOL_MD5' => ITEM_SNMPV3_AUTHPROTOCOL_MD5,
-					'SNMPV3_PRIVPROTOCOL_DES' => ITEM_SNMPV3_PRIVPROTOCOL_DES
-				],
-				'styles' => [
-					'ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE' => ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE,
-					'ZBX_STYLE_HOST_INTERFACE_CONTAINER' => ZBX_STYLE_HOST_INTERFACE_CONTAINER,
-					'ZBX_STYLE_HOST_INTERFACE_CONTAINER_HEADER' => ZBX_STYLE_HOST_INTERFACE_CONTAINER_HEADER,
-					'ZBX_STYLE_HOST_INTERFACE_CELL_DETAILS' => ZBX_STYLE_HOST_INTERFACE_CELL_DETAILS,
-					'ZBX_STYLE_HOST_INTERFACE_BTN_MAIN_INTERFACE' => ZBX_STYLE_HOST_INTERFACE_BTN_MAIN_INTERFACE,
-					'ZBX_STYLE_HOST_INTERFACE_CELL_USEIP' => ZBX_STYLE_HOST_INTERFACE_CELL_USEIP,
-					'ZBX_STYLE_HOST_INTERFACE_BTN_TOGGLE' => ZBX_STYLE_HOST_INTERFACE_BTN_TOGGLE,
-					'ZBX_STYLE_LIST_ACCORDION_ITEM' => ZBX_STYLE_LIST_ACCORDION_ITEM,
-					'ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED' => ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED,
-					'ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND' => ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND,
-					'ZBX_STYLE_HOST_INTERFACE_ROW' => ZBX_STYLE_HOST_INTERFACE_ROW,
-					'ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE' => ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE,
-				],
-				'templates' => [
-					'interface_row' => (new CPartial('configuration.host.interface.row'))->getOutput(),
-					'no_interface_msg' => (new CDiv(_('No interfaces are defined.')))
-						->addClass(ZBX_STYLE_GREY)
-						->addStyle('padding: 5px 0px;')
-						->toString()
-				]
-			]) ?>
-		);
-
-		hostInterfaceManager.render();
-
-		<?php if ($host_is_discovered): ?>
-			hostInterfaceManager.makeReadonly();
-		<?php endif; ?>
-	});
 </script>

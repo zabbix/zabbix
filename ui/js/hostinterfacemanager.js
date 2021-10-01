@@ -18,50 +18,76 @@
 **/
 
 
-/**
- * JavaScript class to manage Host interfaces.
- */
 class HostInterfaceManager {
 
-	constructor(data, options) {
+	static INTERFACE_TYPE_AGENT = 1;
+	static INTERFACE_TYPE_SNMP = 2;
+	static INTERFACE_TYPE_IPMI = 3;
+	static INTERFACE_TYPE_JMX = 4;
+	static SNMP_V1 = 1;
+	static SNMP_V2C = 2;
+	static SNMP_V3 = 3;
+	static SNMP_BULK_ENABLED = 1;
+	static INTERFACE_SECONDARY = 0;
+	static INTERFACE_PRIMARY = 1;
+	static INTERFACE_USE_IP = 1;
+	static ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV = 0;
+	static ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV = 1;
+	static ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV = 2;
+	static ITEM_SNMPV3_AUTHPROTOCOL_MD5 = 0;
+	static ITEM_SNMPV3_PRIVPROTOCOL_DES = 0;
+
+	static ZBX_STYLE_HOST_INTERFACE_BTN_MAIN_INTERFACE = 'interface-btn-main-interface';
+	static ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE = 'interface-btn-remove';
+	static ZBX_STYLE_HOST_INTERFACE_BTN_TOGGLE = 'interface-btn-toggle';
+	static ZBX_STYLE_HOST_INTERFACE_CELL_DETAILS = 'interface-cell-details';
+	static ZBX_STYLE_HOST_INTERFACE_CELL_USEIP = 'interface-cell-useip';
+	static ZBX_STYLE_HOST_INTERFACE_CONTAINER = 'interface-container';
+	static ZBX_STYLE_HOST_INTERFACE_CONTAINER_HEADER = 'interface-container-header';
+	static ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND = 'interface-input-expand';
+	static ZBX_STYLE_HOST_INTERFACE_ROW = 'interface-row';
+	static ZBX_STYLE_GREY = 'grey';
+	static ZBX_STYLE_LIST_ACCORDION_ITEM = 'list-accordion-item';
+	static ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED = 'list-accordion-item-opened';
+
+	constructor(data, host_interface_row_tmpl) {
 		// Constants.
-		this.TEMPLATE = new Template(options.templates.interface_row);
+		this.TEMPLATE = new Template(host_interface_row_tmpl);
 		this.DEFAULT_PORTS = {
 			agent: 10050,
 			snmp: 161,
 			jmx: 12345,
 			ipmi: 623
 		};
-		this.INTERFACE_TYPE_AGENT = options.interface_types.AGENT;
-		this.INTERFACE_TYPE_SNMP = options.interface_types.SNMP;
-		this.INTERFACE_TYPE_JMX = options.interface_types.JMX;
-		this.INTERFACE_TYPE_IPMI = options.interface_types.IPMI;
 		this.CONTAINER_IDS = {
-			[this.INTERFACE_TYPE_AGENT]: '#agentInterfaces',
-			[this.INTERFACE_TYPE_SNMP]: '#SNMPInterfaces',
-			[this.INTERFACE_TYPE_JMX]: '#JMXInterfaces',
-			[this.INTERFACE_TYPE_IPMI]: '#IPMIInterfaces'
+			[HostInterfaceManager.INTERFACE_TYPE_AGENT]: '#agentInterfaces',
+			[HostInterfaceManager.INTERFACE_TYPE_SNMP]: '#SNMPInterfaces',
+			[HostInterfaceManager.INTERFACE_TYPE_JMX]: '#JMXInterfaces',
+			[HostInterfaceManager.INTERFACE_TYPE_IPMI]: '#IPMIInterfaces'
 		};
 		this.INTERFACE_TYPES = {
-			'agent': this.INTERFACE_TYPE_AGENT,
-			'snmp': this.INTERFACE_TYPE_SNMP,
-			'jmx': this.INTERFACE_TYPE_JMX,
-			'ipmi': this.INTERFACE_TYPE_IPMI
+			'agent': HostInterfaceManager.INTERFACE_TYPE_AGENT,
+			'snmp': HostInterfaceManager.INTERFACE_TYPE_SNMP,
+			'jmx': HostInterfaceManager.INTERFACE_TYPE_JMX,
+			'ipmi': HostInterfaceManager.INTERFACE_TYPE_IPMI
 		};
 		this.INTERFACE_NAMES = {
-			[this.INTERFACE_TYPE_AGENT]: t('S_AGENT'),
-			[this.INTERFACE_TYPE_SNMP]: t('S_SNMP'),
-			[this.INTERFACE_TYPE_JMX]: t('S_JMX'),
-			[this.INTERFACE_TYPE_IPMI]: t('S_IPMI')
+			[HostInterfaceManager.INTERFACE_TYPE_AGENT]: t('Agent'),
+			[HostInterfaceManager.INTERFACE_TYPE_SNMP]: t('SNMP'),
+			[HostInterfaceManager.INTERFACE_TYPE_JMX]: t('JMX'),
+			[HostInterfaceManager.INTERFACE_TYPE_IPMI]: t('IPMI')
 		};
 
-		for (const [prop, value] of Object.entries({...options.interface_properties, ...options.styles})) {
-			this[prop] = value;
-		}
-
 		this.allow_empty_message = true;
-		this.$noInterfacesMsg = jQuery(options.templates.no_interface_msg)
-				.insertAfter(jQuery('.' + this.ZBX_STYLE_HOST_INTERFACE_CONTAINER_HEADER));
+
+		this.$noInterfacesMsg = jQuery('<div>', {
+			html: t('No interfaces are defined.'),
+			class: HostInterfaceManager.ZBX_STYLE_GREY,
+			css: {
+				'padding': '5px 0px'
+			}
+		})
+			.insertAfter(jQuery('.' + HostInterfaceManager.ZBX_STYLE_HOST_INTERFACE_CONTAINER_HEADER));
 
 		this.interfaces = {};
 		this.data = data;
@@ -102,9 +128,9 @@ class HostInterfaceManager {
 	}
 
 	setSnmpFields(elem, iface) {
-		if (iface.type != this.INTERFACE_TYPE_SNMP) {
+		if (iface.type != HostInterfaceManager.INTERFACE_TYPE_SNMP) {
 			return elem
-				.querySelector('.' + this.ZBX_STYLE_HOST_INTERFACE_CELL_DETAILS)
+				.querySelector('.' + HostInterfaceManager.ZBX_STYLE_HOST_INTERFACE_CELL_DETAILS)
 				.remove();
 		}
 
@@ -128,7 +154,7 @@ class HostInterfaceManager {
 				= iface.details.authprotocol;
 		}
 
-		if (iface.details.bulk == this.BULK_ENABLED) {
+		if (iface.details.bulk == HostInterfaceManager.SNMP_BULK_ENABLED) {
 			elem
 				.querySelector(`#interfaces_${iface.interfaceid}_details_bulk`)
 				.checked = true;
@@ -136,15 +162,15 @@ class HostInterfaceManager {
 
 		new CViewSwitcher(`interfaces_${iface.interfaceid}_details_version`, 'change',
 			{
-				[this.SNMP_V1]: [
+				[HostInterfaceManager.SNMP_V1]: [
 					`snmp_community_label_${iface.interfaceid}`,
 					`snmp_community_field_${iface.interfaceid}`
 				],
-				[this.SNMP_V2C]: [
+				[HostInterfaceManager.SNMP_V2C]: [
 					`snmp_community_label_${iface.interfaceid}`,
 					`snmp_community_field_${iface.interfaceid}`
 				],
-				[this.SNMP_V3]: [
+				[HostInterfaceManager.SNMP_V3]: [
 					`snmpv3_contextname_label_${iface.interfaceid}`,
 					`snmpv3_contextname_field_${iface.interfaceid}`,
 					`snmpv3_securityname_label_${iface.interfaceid}`,
@@ -166,17 +192,17 @@ class HostInterfaceManager {
 		jQuery(`#interfaces_${iface.interfaceid}_details_version`).on('change', (e) => {
 			jQuery(`#interfaces_${iface.interfaceid}_details_securitylevel`).off('change');
 
-			if (e.target.value == this.SNMP_V3) {
+			if (e.target.value == HostInterfaceManager.SNMP_V3) {
 				new CViewSwitcher(`interfaces_${iface.interfaceid}_details_securitylevel`, 'change',
 					{
-						[this.SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV]: [],
-						[this.SNMPV3_SECURITYLEVEL_AUTHNOPRIV]: [
+						[HostInterfaceManager.ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV]: [],
+						[HostInterfaceManager.ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV]: [
 							`snmpv3_authprotocol_label_${iface.interfaceid}`,
 							`snmpv3_authprotocol_field_${iface.interfaceid}`,
 							`snmpv3_authpassphrase_label_${iface.interfaceid}`,
 							`snmpv3_authpassphrase_field_${iface.interfaceid}`
 						],
-						[this.SNMPV3_SECURITYLEVEL_AUTHPRIV]: [
+						[HostInterfaceManager.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV]: [
 							`snmpv3_authprotocol_label_${iface.interfaceid}`,
 							`snmpv3_authprotocol_field_${iface.interfaceid}`,
 							`snmpv3_authpassphrase_label_${iface.interfaceid}`,
@@ -213,22 +239,22 @@ class HostInterfaceManager {
 			ip: '127.0.0.1',
 			main: '0',
 			details: {
-				version: this.SNMP_V2C,
+				version: HostInterfaceManager.SNMP_V2C,
 				community: '{$SNMP_COMMUNITY}',
-				bulk: this.BULK_ENABLED,
-				securitylevel: this.SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,
-				authprotocol: this.SNMPV3_AUTHPROTOCOL_MD5,
-				privprotocol: this.SNMPV3_PRIVPROTOCOL_DES
+				bulk: HostInterfaceManager.SNMP_BULK_ENABLED,
+				securitylevel: HostInterfaceManager.ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,
+				authprotocol: HostInterfaceManager.ITEM_SNMPV3_AUTHPROTOCOL_MD5,
+				privprotocol: HostInterfaceManager.ITEM_SNMPV3_PRIVPROTOCOL_DES
 			}
 		};
 	}
 
 	getInterfaces() {
 		let types = {
-			[this.INTERFACE_TYPE_AGENT]: {main: null, all: []},
-			[this.INTERFACE_TYPE_SNMP]: {main: null, all: []},
-			[this.INTERFACE_TYPE_JMX]: {main: null, all: []},
-			[this.INTERFACE_TYPE_IPMI]: {main: null, all: []}
+			[HostInterfaceManager.INTERFACE_TYPE_AGENT]: {main: null, all: []},
+			[HostInterfaceManager.INTERFACE_TYPE_SNMP]: {main: null, all: []},
+			[HostInterfaceManager.INTERFACE_TYPE_JMX]: {main: null, all: []},
+			[HostInterfaceManager.INTERFACE_TYPE_IPMI]: {main: null, all: []}
 		};
 
 		Object
@@ -236,7 +262,7 @@ class HostInterfaceManager {
 			.forEach(([_, value]) => {
 				types[value.type].all.push(value.interfaceid);
 
-				if (value.main == this.INTERFACE_PRIMARY) {
+				if (value.main == HostInterfaceManager.INTERFACE_PRIMARY) {
 					if (types[value.type].main !== null) {
 						throw new Error('Multiple default interfaces for same type.');
 					}
@@ -269,7 +295,7 @@ class HostInterfaceManager {
 
 		if (disabled) {
 			elem
-				.querySelector('.' + this.ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE)
+				.querySelector('.' + HostInterfaceManager.ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE)
 				.disabled = true;
 		}
 
@@ -277,14 +303,14 @@ class HostInterfaceManager {
 
 		// Set onclick actions.
 		elem
-			.querySelector('.' + this.ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE)
+			.querySelector('.' + HostInterfaceManager.ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE)
 			.addEventListener('click', () => this.removeById(iface.interfaceid));
 
 		elem
-			.querySelector('.' + this.ZBX_STYLE_HOST_INTERFACE_BTN_MAIN_INTERFACE)
+			.querySelector('.' + HostInterfaceManager.ZBX_STYLE_HOST_INTERFACE_BTN_MAIN_INTERFACE)
 			.addEventListener('click', () => this.setMainInterfaceById(iface.interfaceid));
 
-		[...elem.querySelectorAll('.' + this.ZBX_STYLE_HOST_INTERFACE_CELL_USEIP + ' input')].map(
+		[...elem.querySelectorAll('.' + HostInterfaceManager.ZBX_STYLE_HOST_INTERFACE_CELL_USEIP + ' input')].map(
 			(el) => el.addEventListener('click', (event) => this.setUseIp(elem, event.currentTarget.value))
 		);
 
@@ -319,11 +345,12 @@ class HostInterfaceManager {
 		this.resetMainInterfaces();
 		this.renderLayout();
 
-		if (new_data.type == this.INTERFACE_TYPE_SNMP) {
+		if (new_data.type == HostInterfaceManager.INTERFACE_TYPE_SNMP) {
 			const elem = document.getElementById(`interface_row_${new_data.interfaceid}`);
 			const index = [...elem.parentElement.children].indexOf(elem)
 
-			jQuery(this.CONTAINER_IDS[this.INTERFACE_TYPE_SNMP]).zbx_vertical_accordion('expandNth', index);
+			jQuery(this.CONTAINER_IDS[HostInterfaceManager.INTERFACE_TYPE_SNMP])
+				.zbx_vertical_accordion('expandNth', index);
 		}
 
 		return true;
@@ -341,14 +368,14 @@ class HostInterfaceManager {
 
 			if (!type_interfaces.main && type_interfaces.all.length) {
 				for (let i = 0; i < type_interfaces.all.length; i++) {
-					if (this.data[type_interfaces.all[i]].main == this.INTERFACE_PRIMARY) {
+					if (this.data[type_interfaces.all[i]].main == HostInterfaceManager.INTERFACE_PRIMARY) {
 						interfaces[type].main = this.data[type_interfaces.all[i]].interfaceid;
 					}
 				}
 
 				if (!type_interfaces.main) {
 					type_interfaces.main = type_interfaces.all[0];
-					this.data[type_interfaces.main].main = this.INTERFACE_PRIMARY;
+					this.data[type_interfaces.main].main = HostInterfaceManager.INTERFACE_PRIMARY;
 				}
 			}
 		}
@@ -374,8 +401,8 @@ class HostInterfaceManager {
 		const old = interfaces[type].main;
 
 		if (id != old) {
-			this.data[id].main = this.INTERFACE_PRIMARY;
-			this.data[old].main = this.INTERFACE_SECONDARY;
+			this.data[id].main = HostInterfaceManager.INTERFACE_PRIMARY;
+			this.data[old].main = HostInterfaceManager.INTERFACE_SECONDARY;
 		}
 
 		return true;
@@ -392,7 +419,7 @@ class HostInterfaceManager {
 		});
 
 		elem
-			.querySelector((use_ip == this.INTERFACE_USE_IP) ? '[name$="[ip]"]' : '[name$="[dns]"]')
+			.querySelector((use_ip == HostInterfaceManager.INTERFACE_USE_IP) ? '[name$="[ip]"]' : '[name$="[dns]"]')
 			.setAttribute('aria-required', true);
 
 		return true;
@@ -425,14 +452,18 @@ class HostInterfaceManager {
 		this.renderLayout();
 
 		// Add accordion functionality to SNMP interfaces.
-		jQuery(this.CONTAINER_IDS[this.INTERFACE_TYPE_SNMP])
-			.zbx_vertical_accordion({handler: '.' + this.ZBX_STYLE_HOST_INTERFACE_BTN_TOGGLE});
+		jQuery(this.CONTAINER_IDS[HostInterfaceManager.INTERFACE_TYPE_SNMP])
+			.zbx_vertical_accordion({handler: '.' + HostInterfaceManager.ZBX_STYLE_HOST_INTERFACE_BTN_TOGGLE});
 
 		// Add event to expand SNMP interface accordion if focused or clicked on inputs.
-		jQuery(this.CONTAINER_IDS[this.INTERFACE_TYPE_SNMP]).on("focus", "." + this.ZBX_STYLE_LIST_ACCORDION_ITEM + ":not(." + this.ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED + ") ." + this.ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND, (event) => {
-			var index = jQuery(event.currentTarget).closest('.' + this.ZBX_STYLE_LIST_ACCORDION_ITEM).index();
+		jQuery(this.CONTAINER_IDS[HostInterfaceManager.INTERFACE_TYPE_SNMP])
+				.on("focus", "." + HostInterfaceManager.ZBX_STYLE_LIST_ACCORDION_ITEM + ":not(." + HostInterfaceManager.ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED + ") ." + HostInterfaceManager.ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND, (event) => {
+			const index = jQuery(event.currentTarget)
+				.closest('.' + HostInterfaceManager.ZBX_STYLE_LIST_ACCORDION_ITEM)
+				.index();
 
-			jQuery(this.CONTAINER_IDS[this.INTERFACE_TYPE_SNMP]).zbx_vertical_accordion("expandNth", index);
+			jQuery(this.CONTAINER_IDS[HostInterfaceManager.INTERFACE_TYPE_SNMP])
+				.zbx_vertical_accordion("expandNth", index);
 		});
 
 		return true;
@@ -440,11 +471,11 @@ class HostInterfaceManager {
 
 	renderLayout() {
 		if (Object.keys(this.data).length > 0) {
-			jQuery('.' + this.ZBX_STYLE_HOST_INTERFACE_CONTAINER).show();
+			jQuery('.' + HostInterfaceManager.ZBX_STYLE_HOST_INTERFACE_CONTAINER).show();
 			this.$noInterfacesMsg.hide();
 		}
 		else {
-			jQuery('.' + this.ZBX_STYLE_HOST_INTERFACE_CONTAINER).hide();
+			jQuery('.' + HostInterfaceManager.ZBX_STYLE_HOST_INTERFACE_CONTAINER).hide();
 			this.$noInterfacesMsg.toggle(this.allow_empty_message);
 		}
 	}
@@ -487,12 +518,13 @@ class HostInterfaceManager {
 	}
 
 	makeReadonly() {
-		[...document.querySelectorAll('.' + this.ZBX_STYLE_HOST_INTERFACE_ROW)].map((row) => {
+		[...document.querySelectorAll('.' + HostInterfaceManager.ZBX_STYLE_HOST_INTERFACE_ROW)].map((row) => {
 			[...row.querySelectorAll('input, z-select')].map((el) => {
 				this.setReadonly(el);
 			});
 
-			[...row.querySelectorAll('.' + this.ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE)].map((el) => el.remove());
+			[...row.querySelectorAll('.' + HostInterfaceManager.ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE)]
+				.map((el) => el.remove());
 		});
 
 		return true;

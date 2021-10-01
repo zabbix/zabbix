@@ -28,11 +28,11 @@
 	const view = {
 		form: null,
 
-		init({form_name}) {
+		init({form_name, host_interfaces, host_is_discovered}) {
 			this.form = document.getElementById(form_name);
 			this.form.addEventListener('submit', this.events.submit);
 
-			host_edit.init({form_name});
+			host_edit.init({form_name, host_interfaces, host_is_discovered});
 		},
 
 		submit(button) {

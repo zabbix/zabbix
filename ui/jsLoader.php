@@ -304,10 +304,11 @@ $translate_strings = [
 		'S_CLOSE' => _('Close')
 	],
 	'hostinterfacemanager.js' => [
-		'S_AGENT' => _('Agent'),
-		'S_SNMP' => _('SNMP'),
-		'S_JMX' => _('JMX'),
-		'S_IPMI' => _('IPMI')
+		'Agent' => _('Agent'),
+		'SNMP' => _('SNMP'),
+		'JMX' => _('JMX'),
+		'IPMI' => _('IPMI'),
+		'No interfaces are defined.' => _('No interfaces are defined.')
 	],
 	'hostmacrosmanager.js' => [
 		'S_CHANGE' => _x('Change', 'verb'),
