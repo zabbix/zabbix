@@ -786,6 +786,40 @@ if (hasRequest('form') || (hasRequest('clone') && getRequest('itemid') != 0)) {
 		$data['trends_mode'] = getRequest('trends_mode', ITEM_STORAGE_CUSTOM);
 	}
 
+	$data['value_type_element_toggles'] = [];
+
+	$element_toggles = [
+		[ITEM_VALUE_TYPE_UINT64, 'units'],
+		[ITEM_VALUE_TYPE_UINT64, 'js-item-units-label'],
+		[ITEM_VALUE_TYPE_UINT64, 'js-item-units-field'],
+		[ITEM_VALUE_TYPE_FLOAT, 'units'],
+		[ITEM_VALUE_TYPE_FLOAT, 'js-item-units-label'],
+		[ITEM_VALUE_TYPE_FLOAT, 'js-item-units-field'],
+		[ITEM_VALUE_TYPE_FLOAT, 'js-item-trends-label'],
+		[ITEM_VALUE_TYPE_FLOAT, 'js-item-trends-field'],
+		[ITEM_VALUE_TYPE_UINT64, 'js-item-trends-label'],
+		[ITEM_VALUE_TYPE_UINT64, 'js-item-trends-field'],
+		[ITEM_VALUE_TYPE_LOG, 'logtimefmt'],
+		[ITEM_VALUE_TYPE_LOG, 'js-item-log-time-format-label'],
+		[ITEM_VALUE_TYPE_LOG, 'js-item-log-time-format-field'],
+		[ITEM_VALUE_TYPE_FLOAT, 'valuemapid'],
+		[ITEM_VALUE_TYPE_STR, 'valuemapid'],
+		[ITEM_VALUE_TYPE_STR, 'js-item-value-map-label'],
+		[ITEM_VALUE_TYPE_STR, 'js-item-value-map-field'],
+		[ITEM_VALUE_TYPE_STR, 'valuemap_name'],
+		[ITEM_VALUE_TYPE_FLOAT, 'js-item-value-map-label'],
+		[ITEM_VALUE_TYPE_FLOAT, 'js-item-value-map-field'],
+		[ITEM_VALUE_TYPE_FLOAT, 'valuemap_name'],
+		[ITEM_VALUE_TYPE_UINT64, 'valuemapid'],
+		[ITEM_VALUE_TYPE_UINT64, 'js-item-value-map-label'],
+		[ITEM_VALUE_TYPE_UINT64, 'js-item-value-map-field'],
+		[ITEM_VALUE_TYPE_UINT64, 'valuemap_name']
+	];
+
+	foreach ($element_toggles as [$type, $element_id]) {
+		zbx_subarray_push($data['value_type_element_toggles'], $type, $element_id);
+	}
+
 	// render view
 	if (!$has_errors) {
 		echo (new CView('configuration.item.prototype.edit', $data))->getOutput();

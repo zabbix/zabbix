@@ -1565,9 +1565,11 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		if (CTestArrayHelper::get($data, 'type') === 'Zabbix agent (active)'
 				&& substr(CTestArrayHelper::get($data, 'key'), 0, 8) === 'mqtt.get') {
 			$this->zbxTestTextNotVisible('Update interval');
-			$this->zbxTestAssertNotVisibleId('row_delay');
+			$this->zbxTestAssertNotVisibleId('js-item-delay-label');
+			$this->zbxTestAssertNotVisibleId('js-item-delay-field');
 			$this->zbxTestTextNotVisible('Custom intervals');
-			$this->zbxTestAssertNotVisibleId('row_flex_intervals');
+			$this->zbxTestAssertNotVisibleId('js-item-flex-intervals-label');
+			$this->zbxTestAssertNotVisibleId('js-item-flex-intervals-field');
 		}
 
 		$itemFlexFlag = true;
@@ -1656,15 +1658,19 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					// Check hidden update and custom interval for mqtt.get key.
 					if (substr(CTestArrayHelper::get($data, 'key'), 0, 8) === 'mqtt.get') {
 						$this->zbxTestTextNotVisible('Update interval');
-						$this->zbxTestAssertNotVisibleId('row_delay');
+						$this->zbxTestAssertNotVisibleId('js-item-delay-label');
+						$this->zbxTestAssertNotVisibleId('js-item-delay-field');
 						$this->zbxTestTextNotVisible('Custom intervals');
-						$this->zbxTestAssertNotVisibleId('row_flex_intervals');
+						$this->zbxTestAssertNotVisibleId('js-item-flex-intervals-label');
+						$this->zbxTestAssertNotVisibleId('js-item-flex-intervals-field');
 					}
 					else {
 						$this->zbxTestTextVisible('Update interval');
-						$this->zbxTestAssertVisibleId('row_delay');
+						$this->zbxTestAssertVisibleId('js-item-delay-label');
+						$this->zbxTestAssertVisibleId('js-item-delay-field');
 						$this->zbxTestTextVisible('Custom intervals');
-						$this->zbxTestAssertVisibleId('row_flex_intervals');
+						$this->zbxTestAssertVisibleId('js-item-flex-intervals-label');
+						$this->zbxTestAssertVisibleId('js-item-flex-intervals-field');
 					}
 					break;
 				default:

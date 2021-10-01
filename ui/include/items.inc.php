@@ -378,6 +378,228 @@ function itemTypeInterface($type = null) {
 }
 
 /**
+ * Creates array like [INTERFACE_TYPE_AGENT => [id1, id2], INTERFACE_TYPE_JMX => [id3], ...].
+ * Used to toggle Host interface options depending on Item type.
+ *
+ * @param array $interfaces Records of item interfaces.
+ *
+ * @return array
+ */
+function itemInterfaceidsByType(array $interfaces): array {
+	$interface_ids_by_type = [];
+
+	foreach ($interfaces as $interface) {
+		$interface_ids_by_types[$interface['type']][] = $interface['interfaceid'];
+	}
+
+	return $interface_ids_by_type;
+}
+
+/**
+ * Returns sets of element ids to show/hide when an item's field value is switched.
+ *
+ * @param array  $data  Item data.
+ * @param bool   $data['is_discovery_rule']
+ * @param array  $data['types']
+ *
+ * @return array  Consisting of several sets named by key with [type => [ids]] as entries.
+ * @return array['by_type']          Ids to toggle when the field 'type' is changed.
+ * @return array['by_authtype']      Ids to toggle when the field 'authtype' is changed.
+ * @return array['disable_by_type']  Dropdown entries of parent with {id} to disable for specific type.
+ */
+function itemFormElementToggles(array $data): array {
+	$element_toggles = [
+		'by_type' => [],
+		'by_authtype' => [],
+		'disable_by_type' => []
+	];
+
+	$element_toggles = [
+		[ITEM_TYPE_SIMPLE, 'js-item-username-label'],
+		[ITEM_TYPE_SIMPLE, 'js-item-username-field'],
+		[ITEM_TYPE_SIMPLE, 'username'],
+		[ITEM_TYPE_SIMPLE, 'js-item-password-label'],
+		[ITEM_TYPE_SIMPLE, 'js-item-password-field'],
+		[ITEM_TYPE_SIMPLE, 'password'],
+		[ITEM_TYPE_SNMP, 'snmp_oid'],
+		[ITEM_TYPE_SNMP, 'js-item-snmp-oid-label'],
+		[ITEM_TYPE_SNMP, 'js-item-snmp-oid-field'],
+		[ITEM_TYPE_IPMI, 'ipmi_sensor'],
+		[ITEM_TYPE_IPMI, 'js-item-impi-sensor-label'],
+		[ITEM_TYPE_IPMI, 'js-item-impi-sensor-field'],
+		[ITEM_TYPE_SSH, 'authtype'],
+		[ITEM_TYPE_SSH, 'js-item-authtype-label'],
+		[ITEM_TYPE_SSH, 'js-item-authtype-field'],
+		[ITEM_TYPE_SSH, 'username'],
+		[ITEM_TYPE_SSH, 'js-item-username-label'],
+		[ITEM_TYPE_SSH, 'js-item-username-field'],
+		[ITEM_TYPE_TELNET, 'username'],
+		[ITEM_TYPE_TELNET, 'js-item-username-label'],
+		[ITEM_TYPE_TELNET, 'js-item-username-field'],
+		[ITEM_TYPE_DB_MONITOR, 'username'],
+		[ITEM_TYPE_DB_MONITOR, 'js-item-username-label'],
+		[ITEM_TYPE_DB_MONITOR, 'js-item-username-field'],
+		[ITEM_TYPE_JMX, 'username'],
+		[ITEM_TYPE_JMX, 'js-item-username-label'],
+		[ITEM_TYPE_JMX, 'js-item-username-field'],
+		[ITEM_TYPE_JMX, 'jmx_endpoint'],
+		[ITEM_TYPE_JMX, 'js-item-jmx-endpoint-label'],
+		[ITEM_TYPE_JMX, 'js-item-jmx-endpoint-field'],
+		[ITEM_TYPE_SSH, 'password'],
+		[ITEM_TYPE_SSH, 'js-item-password-label'],
+		[ITEM_TYPE_SSH, 'js-item-password-field'],
+		[ITEM_TYPE_TELNET, 'password'],
+		[ITEM_TYPE_TELNET, 'js-item-password-label'],
+		[ITEM_TYPE_TELNET, 'js-item-password-field'],
+		[ITEM_TYPE_DB_MONITOR, 'password'],
+		[ITEM_TYPE_DB_MONITOR, 'js-item-password-label'],
+		[ITEM_TYPE_DB_MONITOR, 'js-item-password-field'],
+		[ITEM_TYPE_JMX, 'password'],
+		[ITEM_TYPE_JMX,'js-item-password-label'],
+		[ITEM_TYPE_JMX,'js-item-password-field'],
+		[ITEM_TYPE_SSH, 'js-item-executed-script-label'],
+		[ITEM_TYPE_SSH, 'js-item-executed-script-field'],
+		[ITEM_TYPE_TELNET, 'js-item-executed-script-label'],
+		[ITEM_TYPE_TELNET, 'js-item-executed-script-field'],
+		[ITEM_TYPE_DB_MONITOR, 'js-item-sql-query-label'],
+		[ITEM_TYPE_DB_MONITOR, 'js-item-sql-query-field'],
+		[ITEM_TYPE_CALCULATED, 'js-item-formula-label'],
+		[ITEM_TYPE_CALCULATED, 'js-item-formula-field'],
+		[ITEM_TYPE_SSH, 'params_script'],
+		[ITEM_TYPE_SSH, 'row_params'],
+		[ITEM_TYPE_TELNET, 'params_script'],
+		[ITEM_TYPE_TELNET, 'row_params'],
+		[ITEM_TYPE_DB_MONITOR, 'params_dbmonitor'],
+		[ITEM_TYPE_DB_MONITOR, 'row_params'],
+		[ITEM_TYPE_CALCULATED, 'params_calculted'],
+		[ITEM_TYPE_CALCULATED, 'row_params'],
+		[ITEM_TYPE_TRAPPER, 'trapper_hosts'],
+		[ITEM_TYPE_TRAPPER, 'js-item-trapper-hosts-label'],
+		[ITEM_TYPE_TRAPPER, 'js-item-trapper-hosts-field'],
+		[ITEM_TYPE_DEPENDENT, 'js-item-master-item-label'],
+		[ITEM_TYPE_DEPENDENT, 'js-item-master-item-field']
+	];
+
+	if ($data['display_interfaces']) {
+		$element_toggles = array_merge($element_toggles, [
+			[ITEM_TYPE_ZABBIX, 'js-item-interface-label'],
+			[ITEM_TYPE_ZABBIX, 'js-item-interface-field'],
+			[ITEM_TYPE_ZABBIX, 'interfaceid'],
+			[ITEM_TYPE_SIMPLE, 'js-item-interface-label'],
+			[ITEM_TYPE_SIMPLE, 'js-item-interface-field'],
+			[ITEM_TYPE_SIMPLE, 'interfaceid'],
+			[ITEM_TYPE_SNMP, 'js-item-interface-label'],
+			[ITEM_TYPE_SNMP, 'js-item-interface-field'],
+			[ITEM_TYPE_SNMP, 'interfaceid'],
+			[ITEM_TYPE_EXTERNAL, 'js-item-interface-label'],
+			[ITEM_TYPE_EXTERNAL, 'js-item-interface-field'],
+			[ITEM_TYPE_EXTERNAL, 'interfaceid'],
+			[ITEM_TYPE_IPMI, 'js-item-interface-label'],
+			[ITEM_TYPE_IPMI, 'js-item-interface-field'],
+			[ITEM_TYPE_IPMI, 'interfaceid'],
+			[ITEM_TYPE_SSH, 'js-item-interface-label'],
+			[ITEM_TYPE_SSH, 'js-item-interface-field'],
+			[ITEM_TYPE_SSH, 'interfaceid'],
+			[ITEM_TYPE_TELNET, 'js-item-interface-label'],
+			[ITEM_TYPE_TELNET, 'js-item-interface-field'],
+			[ITEM_TYPE_TELNET, 'interfaceid'],
+			[ITEM_TYPE_JMX, 'js-item-interface-label'],
+			[ITEM_TYPE_JMX, 'js-item-interface-field'],
+			[ITEM_TYPE_JMX, 'interfaceid'],
+			[ITEM_TYPE_SNMPTRAP, 'js-item-interface-label'],
+			[ITEM_TYPE_SNMPTRAP, 'js-item-interface-field'],
+			[ITEM_TYPE_SNMPTRAP, 'interfaceid'],
+			[ITEM_TYPE_HTTPAGENT, 'js-item-interface-label'],
+			[ITEM_TYPE_HTTPAGENT, 'js-item-interface-field'],
+			[ITEM_TYPE_HTTPAGENT, 'interfaceid']
+		]);
+	}
+
+	foreach ($element_toggles as [$type, $element_id]) {
+		zbx_subarray_push($element_toggles['by_type'], $type, $element_id);
+	}
+
+	$ui_elements = [
+		ITEM_TYPE_HTTPAGENT => [
+			'js-item-url-label', 'js-item-url-field', 'js-item-query-fields-label', 'js-item-query-fields-field',
+			'js-item-request-method-label', 'js-item-request-method-field', 'js-item-timeout-label',
+			'js-item-timeout-field', 'js-item-post-type-label', 'js-item-post-type-field', 'js-item-posts-label',
+			'js-item-posts-field', 'js-item-headers-label', 'js-item-headers-field', 'js-item-status-codes-label',
+			'js-item-status-codes-field', 'js-item-follow-redirects-label', 'js-item-follow-redirects-field',
+			'js-item-retrieve-mode-label', 'js-item-retrieve-mode-field', 'js-item-output-format-label',
+			'js-item-output-format-field', 'js-item-allow-traps-label', 'js-item-allow-traps-field',
+			'request_method', 'js-item-http-proxy-label', 'js-item-http-proxy-field', 'js-item-http-authtype-label',
+			'js-item-http-authtype-field', 'http_authtype', 'js-item-verify-peer-label', 'js-item-verify-peer-field',
+			'js-item-verify-host-label', 'js-item-verify-host-field', 'js-item-ssl-key-file-label',
+			'js-item-ssl-key-file-field', 'js-item-ssl-cert-file-label', 'js-item-ssl-cert-file-field',
+			'js-item-ssl-key-password-label', 'js-item-ssl-key-password-field', 'trapper_hosts', 'allow_traps'
+		],
+		ITEM_TYPE_SCRIPT => [
+			'js-item-parameters-label', 'js-item-parameters-field', 'js-item-script-label', 'js-item-script-field',
+			'js-item-timeout-label', 'js-item-timeout-field'
+		]
+	];
+
+	foreach ($ui_elements as $type => $element_ids) {
+		foreach ($element_ids as $element_id) {
+			zbx_subarray_push($element_toggles['by_type'], $type, $element_id);
+		}
+	}
+
+	foreach ($data['types'] as $type => $label) {
+		switch ($type) {
+			case ITEM_TYPE_DB_MONITOR:
+				$default_key = $data['is_discovery_rule']
+					? ZBX_DEFAULT_KEY_DB_MONITOR_DISCOVERY
+					: ZBX_DEFAULT_KEY_DB_MONITOR;
+				zbx_subarray_push($element_toggles['by_type'], $type,
+					['id' => 'key', 'defaultValue' => $default_key]
+				);
+				break;
+			case ITEM_TYPE_SSH:
+				zbx_subarray_push($element_toggles['by_type'], $type,
+					['id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_SSH]
+				);
+				break;
+			case ITEM_TYPE_TELNET:
+				zbx_subarray_push($element_toggles['by_type'], $type,
+					['id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_TELNET]
+				);
+				break;
+			default:
+				zbx_subarray_push($element_toggles['by_type'], $type, ['id' => 'key', 'defaultValue' => '']);
+		}
+	}
+
+	foreach ($data['types'] as $type => $label) {
+		if ($type == ITEM_TYPE_TRAPPER || $type == ITEM_TYPE_SNMPTRAP || $type == ITEM_TYPE_DEPENDENT) {
+			continue;
+		}
+
+		zbx_subarray_push($element_toggles['by_type'], $type, 'js-item-flex-intervals-label');
+		zbx_subarray_push($element_toggles['by_type'], $type, 'js-item-flex-intervals-field');
+		zbx_subarray_push($element_toggles['by_type'], $type, 'delay');
+		zbx_subarray_push($element_toggles['by_type'], $type, 'js-item-delay-label');
+		zbx_subarray_push($element_toggles['by_type'], $type, 'js-item-delay-field');
+	}
+
+	zbx_subarray_push($element_toggles['by_authtype'], ITEM_AUTHTYPE_PUBLICKEY, 'publickey');
+	zbx_subarray_push($element_toggles['by_authtype'], ITEM_AUTHTYPE_PUBLICKEY, 'js-item-public-key-label');
+	zbx_subarray_push($element_toggles['by_authtype'], ITEM_AUTHTYPE_PUBLICKEY, 'js-item-public-key-field');
+	zbx_subarray_push($element_toggles['by_authtype'], ITEM_AUTHTYPE_PUBLICKEY, 'privatekey');
+	zbx_subarray_push($element_toggles['by_authtype'], ITEM_AUTHTYPE_PUBLICKEY, 'js-item-private-key-label');
+	zbx_subarray_push($element_toggles['by_authtype'], ITEM_AUTHTYPE_PUBLICKEY, 'js-item-private-key-field');
+	zbx_subarray_push($element_toggles['disable_by_type'], ITEM_TYPE_CALCULATED, [
+		ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT
+	], 'value_type');
+	zbx_subarray_push($element_toggles['disable_by_type'], ITEM_TYPE_CALCULATED, [
+		ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT
+	], 'value_type_steps');
+
+	return $element_toggles;
+}
+
+/**
  * Copies the given items to the given hosts or templates.
  *
  * @param array $src_itemids  Items which will be copied to $dst_hostids.

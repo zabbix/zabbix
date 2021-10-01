@@ -644,13 +644,20 @@ class PreprocessingTabIndicatorItem extends TabIndicatorItem {
 		};
 
 		const observer_callback = (mutationList, _observer) => {
+			let change_detected = false;
+
 			mutationList.forEach((mutation) => {
 				switch (mutation.type) {
 					case 'childList':
-						this.addAttributes(element);
+						change_detected = true;
 						break;
 				}
 			});
+
+			if (change_detected) {
+				this.addAttributes(element);
+				target_node.dispatchEvent(new CustomEvent('preprocessing.change'));
+			}
 		};
 
 		if (target_node) {

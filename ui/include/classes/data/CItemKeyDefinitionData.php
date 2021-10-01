@@ -20,45 +20,18 @@
 
 
 /**
- * Class containing information about help items.
+ * Class containing information about Item Keys.
  */
-class CHelpItems {
+final class CItemKeyDefinitionData {
 
 	/**
-	 * A list of all available help items grouped by item type.
-	 *
-	 * @see CHelpItems::getItems()	for a description of the structure
-	 *
-	 * @var array
-	 */
-	protected $items = [];
-
-	public function __construct() {
-		$this->items = $this->getItems();
-	}
-
-	/**
-	 * Returns the help items available for the given item type.
-	 *
-	 * @param int $type
-	 *
-	 * @return array
-	 */
-	public function getByType($type) {
-		return $this->items[$type];
-	}
-
-	/**
-	 * Get list of all available help items grouped by item type.
-	 *
-	 * Each help item has the following properties:
-	 * - key			- default key
-	 * - description	- description of the item
-	 * - value_type		- Most likely (expected for success) value return type, or null if cannot say with certainty.
-	 *
-	 * @return array
-	 */
-	protected function getItems(): array {
+	* A list of all available items grouped by item type.
+	*
+	* @see CItemKeyDefinitionData::getItems()	for a description of the structure.
+	*
+	* @return array
+	*/
+	final static function getDefinitions(): array {
 		return [
 			ITEM_TYPE_ZABBIX => [
 				[
@@ -1680,16 +1653,46 @@ class CHelpItems {
 	}
 
 	/**
-	* Generate an array used for item type lookups in the form of: key_name[ => value_type.
-	* An '[' is appended to key name even if it doesn't expect parameters and value types of null are kept -
-	* this is done to make lookup more deterministic, avoid further matching by partial name.
+	* Returns the items available for the given item type.
+	*
+	* @param int $type
+	*
+	* @return array
+	*/
+	public static function getByType($type): array {
+		return static::getItems()[$type];
+	}
+
+	/**
+	* Get list of all available items grouped by item type.
+	*
+	* Each item has the following properties:
+	* - key				- default key
+	* - description		- description of the item
+	* - value_type		- Most likely (expected for success) value return type, or null if cannot say with certainty.
+	*
+	* @return array
+	*/
+	public static function getItems(): array {
+		static $item_definitions;
+
+		if ($item_definitions === null) {
+			$item_definitions = static::getDefinitions();
+		}
+
+		return $item_definitions;
+	}
+
+	/**
+	* Generate an array used for item type lookups in the form: key_name => value_type.
+	* Value type set to null if key return type varies based on paramaters.
 	*
 	* @return array
 	 */
-	function getTypeMapping(): array {
-		$mapping = [];
+	public static function getTypeSuggestionsByKey(): array {
+		$type_suggestions = [];
 
-		foreach ($this->items as $definitions) {
+		foreach (static::getItems() as $definitions) {
 			foreach ($definitions as $definition) {
 				$key = $definition['key'];
 				$value_type = $definition['value_type'];
@@ -1699,18 +1702,16 @@ class CHelpItems {
 					$key = substr($key, 0, $param_start_pos);
 				}
 
-				$key .= '[';
-
-				if (!array_key_exists($key, $mapping)) {
-					$mapping[$key] = $value_type;
+				if (!array_key_exists($key, $type_suggestions)) {
+					$type_suggestions[$key] = $value_type;
 				}
-				elseif ($mapping[$key] != $value_type) {
+				elseif ($type_suggestions[$key] != $value_type) {
 					// In case of Key name repeats with different types (f.e. zabbix[..]), reset to 'unknown'.
-					$mapping[$key] = null;
+					$type_suggestions[$key] = null;
 				}
 			}
 		}
 
-		return $mapping;
+		return $type_suggestions;
 	}
 }

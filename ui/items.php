@@ -1283,6 +1283,52 @@ if (getRequest('form') === 'create' || getRequest('form') === 'update'
 		'hk_trends' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS)
 	];
 
+	$data['value_type_element_toggles'] = [];
+
+	$element_toggles = [
+		[ITEM_VALUE_TYPE_UINT64, 'units'],
+		[ITEM_VALUE_TYPE_UINT64, 'js-item-units-label'],
+		[ITEM_VALUE_TYPE_UINT64, 'js-item-units-field'],
+		[ITEM_VALUE_TYPE_FLOAT, 'units'],
+		[ITEM_VALUE_TYPE_FLOAT, 'js-item-units-label'],
+		[ITEM_VALUE_TYPE_FLOAT, 'js-item-units-field'],
+		[ITEM_VALUE_TYPE_FLOAT, 'js-item-trends-label'],
+		[ITEM_VALUE_TYPE_FLOAT, 'js-item-trends-field'],
+		[ITEM_VALUE_TYPE_UINT64, 'js-item-trends-label'],
+		[ITEM_VALUE_TYPE_UINT64, 'js-item-trends-field'],
+		[ITEM_VALUE_TYPE_LOG, 'logtimefmt'],
+		[ITEM_VALUE_TYPE_LOG, 'js-item-log-time-format-label'],
+		[ITEM_VALUE_TYPE_LOG, 'js-item-log-time-format-field'],
+		[ITEM_VALUE_TYPE_FLOAT, 'valuemapid'],
+		[ITEM_VALUE_TYPE_STR, 'valuemapid'],
+		[ITEM_VALUE_TYPE_STR, 'js-item-value-map-label'],
+		[ITEM_VALUE_TYPE_STR, 'js-item-value-map-field'],
+		[ITEM_VALUE_TYPE_STR, 'valuemap_name'],
+		[ITEM_VALUE_TYPE_FLOAT, 'js-item-value-map-label'],
+		[ITEM_VALUE_TYPE_FLOAT, 'js-item-value-map-field'],
+		[ITEM_VALUE_TYPE_FLOAT, 'valuemap_name'],
+		[ITEM_VALUE_TYPE_UINT64, 'valuemapid'],
+		[ITEM_VALUE_TYPE_UINT64, 'js-item-value-map-label'],
+		[ITEM_VALUE_TYPE_UINT64, 'js-item-value-map-field'],
+		[ITEM_VALUE_TYPE_UINT64, 'valuemap_name'],
+		[ITEM_VALUE_TYPE_STR, 'inventory_link'],
+		[ITEM_VALUE_TYPE_STR, 'js-item-inventory-link-label'],
+		[ITEM_VALUE_TYPE_STR, 'js-item-inventory-link-field'],
+		[ITEM_VALUE_TYPE_TEXT, 'inventory_link'],
+		[ITEM_VALUE_TYPE_TEXT, 'js-item-inventory-link-label'],
+		[ITEM_VALUE_TYPE_TEXT, 'js-item-inventory-link-field'],
+		[ITEM_VALUE_TYPE_FLOAT, 'inventory_link'],
+		[ITEM_VALUE_TYPE_FLOAT, 'js-item-inventory-link-label'],
+		[ITEM_VALUE_TYPE_FLOAT, 'js-item-inventory-link-field'],
+		[ITEM_VALUE_TYPE_UINT64, 'inventory_link'],
+		[ITEM_VALUE_TYPE_UINT64, 'js-item-inventory-link-label'],
+		[ITEM_VALUE_TYPE_UINT64, 'js-item-inventory-link-field']
+	];
+
+	foreach ($element_toggles as [$type, $element_id]) {
+		zbx_subarray_push($data['value_type_element_toggles'], $type, $element_id);
+	}
+
 	// render view
 	if (!$has_errors) {
 		echo (new CView('configuration.item.edit', $data))->getOutput();

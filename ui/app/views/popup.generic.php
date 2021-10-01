@@ -45,15 +45,13 @@ if ($data['popup_type'] === 'triggers' && !array_key_exists('noempty', $options)
 	$value2 = (strpos($options['dstfld2'], 'id') !== false) ? 0 : '';
 	$value3 = (strpos($options['dstfld3'], 'id') !== false) ? 0 : '';
 
-	$empty_script = get_window_opener($options['dstfld1'], $value1);
-	$empty_script .= get_window_opener($options['dstfld2'], $value2);
-	$empty_script .= get_window_opener($options['dstfld3'], $value3);
-	$empty_script .= 'overlayDialogueDestroy(jQuery(this).closest("[data-dialogueid]").attr("data-dialogueid"));';
-	$empty_script .= 'return false;';
-
 	$empty_btn = (new CButton('empty', _('Empty')))
 		->addStyle('float: right; margin-left: 5px;')
-		->onClick($empty_script);
+		->onClick('return popup_generic.setEmpty(this, '.json_encode([
+			$options['dstfld1'] => $value1,
+			$options['dstfld2'] => $value2,
+			$options['dstfld3'], $value3
+		]).')');
 }
 else {
 	$empty_btn = null;
@@ -67,17 +65,7 @@ if (array_key_exists('groups', $data['filter'])) {
 	$hostgroup_ms = (new CMultiSelect($multiselect_options))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH);
 	$controls[] = (new CFormList())->addRow(new CLabel(_('Host group'), 'popup_host_group_ms'), $hostgroup_ms);
 
-	$output['script_inline'] .=
-		$hostgroup_ms->getPostJS().
-		'var overlay = overlays_stack.end();'.
-		'jQuery(".multiselect", overlay.$dialogue).each(function(i, ms) {'.
-			'jQuery(ms).on("change", {overlay: overlay}, function(e) {'.
-				'var groups = jQuery(this).multiSelect("getData").map(i => i.id),'.
-					'options = groups.length ? {groupid: groups[0]} : {filter_groupid_rst: 1, groupid: []};'.
-					'new_opts = jQuery.extend(e.data.overlay.options, options);'.
-				'PopUp(e.data.overlay.action, new_opts, e.data.overlay.dialogueid);'.
-			'});'.
-		'});';
+	$output['script_inline'] .= $hostgroup_ms->getPostJS(). 'popup_generic.setupHostGroupMultiselect();';
 }
 
 // Add host multiselect.
@@ -91,17 +79,7 @@ if (array_key_exists('hosts', $data['filter'])) {
 	}
 	$controls[] = (new CFormList())->addRow(new CLabel(_('Host'), 'popup_host_ms'), [$empty_btn, $host_ms]);
 
-	$output['script_inline'] .=
-		$host_ms->getPostJS().
-		'var overlay = overlays_stack.end();'.
-		'jQuery(".multiselect", overlay.$dialogue).each(function(i, ms) {'.
-			'jQuery(ms).on("change", {overlay: overlay}, function(e) {'.
-				'var hosts = jQuery(this).multiSelect("getData").map(i => i.id),'.
-					'options = hosts.length ? {hostid: hosts[0]} : {filter_hostid_rst: 1, hostid: []};'.
-					'new_opts = jQuery.extend(e.data.overlay.options, options);'.
-				'PopUp(e.data.overlay.action, new_opts, e.data.overlay.dialogueid);'.
-			'});'.
-		'});';
+	$output['script_inline'] .= $host_ms->getPostJS(). 'popup_generic.setupHostMultiselect();';
 }
 elseif ($empty_btn) {
 	$controls[] = (new CFormList())->addRow($empty_btn);
@@ -115,9 +93,7 @@ if ($data['popup_type'] === 'help_items') {
 		->setAttribute('autofocus', 'autofocus')
 		->setValue($options['itemtype']);
 
-	$output['script_inline'] .= '$("#itemtype").on("change", (e) => {'.
-		'reloadPopup($(e.target).closest("form").get(0));'.
-	'});';
+	$output['script_inline'] .= 'popup_generic.setupItemTypeChange();';
 
 	$header_form
 		->addVar('srctbl', $data['popup_type'])
@@ -165,9 +141,7 @@ if ($data['preselect_required']) {
 	$table->setNoDataMessage(_('Specify some filter condition to see the values.'));
 }
 
-$js_action_onclick = ' jQuery(this).removeAttr("onclick");'.
-	' overlayDialogueDestroy(jQuery(this).closest("[data-dialogueid]").attr("data-dialogueid"));'.
-	' return false;';
+$js_action_onclick = 'return popup_generic.closePopup(this);';
 
 // Output table rows.
 switch ($data['popup_type']) {
@@ -366,10 +340,16 @@ switch ($data['popup_type']) {
 
 	case 'help_items':
 		foreach ($data['table_records'] as $item) {
-			$action = get_window_opener($options['dstfld1'], $item[$options['srcfld1']], 'paste');
+			$action = 'popup_generic.setPopupOpenerFieldValues('.json_encode([
+				$options['dstfld1'] => $item[$options['srcfld1']]
+			]).');';
+			$action .= 'document.getElementById('.json_encode($options['dstfld1']).')'.
+					'.dispatchEvent(new CustomEvent(\'help_items.paste\'));';
 			$action .= 'updateItemFormElements();';
 			$action .= $options['srcfld2']
-				? get_window_opener($options['dstfld2'], $item[$options['srcfld2']])
+				? 'popup_generic.setPopupOpenerFieldValues('.json_encode([
+					$options['dstfld2'] => $item[$options['srcfld2']]
+				]).')'
 				: '';
 
 			$name = (new CLink($item['key'], 'javascript:void(0);'))->onClick($action.$js_action_onclick);
@@ -384,9 +364,11 @@ switch ($data['popup_type']) {
 				$name = $d_rule['name'].
 					NAME_DELIMITER.discovery_check2str($d_check['type'], $d_check['key_'], $d_check['ports']);
 
-				$action = get_window_opener($options['dstfld1'], $d_check[$options['srcfld1']]);
+				$action = 'popup_generic.setPopupOpenerFieldValues('.json_encode([
+					$options['dstfld1'] => $d_check[$options['srcfld1']]
+				]).')';
 				$action .= $options['srcfld2']
-					? get_window_opener($options['dstfld2'], $name)
+					? 'popup_generic.setPopupOpenerFieldValues('.json_encode([$options['dstfld2'] => $name]).');'
 					: '';
 
 				$table->addRow(
@@ -652,7 +634,7 @@ if (array_key_exists('table_records', $data) && (in_array($data['popup_type'], $
 	$output['data'] = $data['table_records'];
 }
 
-$output['script_inline'] =
+$output['script_inline'] = $this->readJsFile('popup.generic.js.php').
 	'jQuery(document).ready(function() {'.
 		$output['script_inline'].
 		'cookie.init();'.

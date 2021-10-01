@@ -23,34 +23,10 @@
  * @var CView $this
  */
 
-$interface_ids_by_types = [];
-foreach ($data['interfaces'] as $interface) {
-	$interface_ids_by_types[$interface['type']][] = $interface['interfaceid'];
-}
-
 include dirname(__FILE__).'/common.item.edit.js.php';
 include dirname(__FILE__).'/item.preprocessing.js.php';
 include dirname(__FILE__).'/editabletable.js.php';
 include dirname(__FILE__).'/itemtest.js.php';
-
-$this->data['valueTypeVisibility'] = [];
-zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_UINT64, 'units');
-zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_UINT64, 'row_units');
-zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_FLOAT, 'units');
-zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_FLOAT, 'row_units');
-zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_FLOAT, 'row_trends');
-zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_UINT64, 'row_trends');
-zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_LOG, 'logtimefmt');
-zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_LOG, 'row_logtimefmt');
-zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_FLOAT, 'valuemapid');
-zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_STR, 'valuemapid');
-zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_STR, 'row_valuemap');
-zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_STR, 'valuemap_name');
-zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_FLOAT, 'row_valuemap');
-zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_FLOAT, 'valuemap_name');
-zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_UINT64, 'valuemapid');
-zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_UINT64, 'row_valuemap');
-zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_UINT64, 'valuemap_name');
 ?>
 <script type="text/javascript">
 	jQuery(document).ready(function($) {
@@ -81,11 +57,9 @@ zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_UINT64, 'v
 		}
 
 		// field switchers
-		<?php
-		if (!empty($this->data['valueTypeVisibility'])) { ?>
-			var valueTypeSwitcher = new CViewSwitcher('value_type', 'change',
-				<?= zbx_jsvalue($this->data['valueTypeVisibility'], true) ?>);
-		<?php } ?>
+		<?php if (!empty($data['value_type_element_toggles'])): ?>
+			new CViewSwitcher('value_type', 'change', <?= json_encode($data['value_type_element_toggles']) ?>);
+		<?php endif; ?>
 
 		$('#type')
 			.change(function() {
@@ -105,8 +79,9 @@ zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_UINT64, 'v
 						&& (new_value == <?= ITEM_VALUE_TYPE_FLOAT ?>
 						|| new_value == <?= ITEM_VALUE_TYPE_UINT64 ?>)) {
 					if (trends.val() == 0) {
-						trends.val('<?= $this->data['trends_default'] ?>');
+						trends.val('<?= $data['trends_default'] ?>');
 					}
+
 					$('#trends_mode_1').prop('checked', true);
 				}
 
