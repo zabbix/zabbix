@@ -2155,4 +2155,49 @@ in:
 out:
   result: SUCCEED
   value: '0.2'
+---
+test case: Expression 'histogram_quantile(0.8, 0.2, 10, 0.4, 20, 1.0, 60, 1.2, 70, +Inf, 80)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'histogram_quantile(0.8, 0.2, 10, 0.4, 20, 1.0, 60, 1.2, 70, "+Inf", 80)'
+out:
+  result: SUCCEED
+  value: '1.08'
+---
+test case: Expression 'histogram_quantile(0.8, 0.2, 10, 0.4, 20, 1.0, 25, 1.0, 35, 1.2, 70, +Inf, 80)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'histogram_quantile(0.8, 0.2, 10, 0.4, 20, 1.0, 25, 1.0, 35, 1.2, 70, "+Inf", 80)'
+out:
+  result: SUCCEED
+  value: '1.08'
+---
+test case: Expression 'histogram_quantile(0.8, 0.2, 10, 1.0, 60, 0.4, 20, 1.2, 70, +Inf, 80)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'histogram_quantile(0.8, 0.2, 10, 1.0, 60, 0.4, 20, 1.2, 70, "+Inf", 80)'
+out:
+  result: SUCCEED
+  value: '1.08'
+---
+test case: Expression 'histogram_quantile(0.8, 0.1, 1)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'histogram_quantile(0.8, 0.1, 1)'
+out:
+  result: FAIL
+---
+test case: Expression 'histogram_quantile(0.8, 0.1, 1, 0.2, 2, 0.3, 3)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'histogram_quantile(0.8, 0.1, 1, 0.2, 2, 0.3, 3)'
+out:
+  result: FAIL
+---
+test case: Expression 'histogram_quantile(0.8, 0.2, 2, 0.1, "+Inf", 3)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_VAR]
+  expression: 'histogram_quantile(0.8, 0.2, 2, 0.1, "+Inf", 3)'
+out:
+  result: FAIL
 ...
