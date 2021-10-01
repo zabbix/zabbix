@@ -332,7 +332,7 @@ FIELD		|mediatypeid	|t_id		|	|NOT NULL	|0			|1|media_type
 FIELD		|eventsource	|t_integer	|	|NOT NULL	|0
 FIELD		|recovery	|t_integer	|	|NOT NULL	|0
 FIELD		|subject	|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|message	|t_shorttext	|''	|NOT NULL	|0
+FIELD		|message	|t_text		|''	|NOT NULL	|0
 UNIQUE		|1		|mediatypeid,eventsource,recovery
 
 TABLE|usrgrp|usrgrpid|ZBX_DATA
@@ -593,7 +593,7 @@ INDEX		|2		|discovery_groupid
 TABLE|triggers|triggerid|ZBX_TEMPLATE
 FIELD		|triggerid	|t_id		|	|NOT NULL	|0
 FIELD		|expression	|t_varchar(2048)|''	|NOT NULL	|0
-FIELD		|description	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|description	|t_shorttext	|''	|NOT NULL	|0
 FIELD		|url		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|value		|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
@@ -1471,7 +1471,7 @@ FIELD		|item_preprocid	|t_id		|	|NOT NULL	|0
 FIELD		|itemid		|t_id		|	|NOT NULL	|ZBX_PROXY			|1|items
 FIELD		|step		|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
-FIELD		|params		|t_shorttext	|''	|NOT NULL	|ZBX_PROXY
+FIELD		|params		|t_text		|''	|NOT NULL	|ZBX_PROXY
 FIELD		|error_handler	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|error_handler_params|t_varchar(255)|''	|NOT NULL	|ZBX_PROXY
 INDEX		|1		|itemid,step
@@ -1891,4 +1891,4 @@ INDEX		|1		|serviceid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|5050072	|5050072
+ROW		|5050075	|5050075

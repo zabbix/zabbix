@@ -65,7 +65,7 @@ class CControllerIconMapList extends CController {
 		}
 
 		$data['iconmaps'] = API::IconMap()->get([
-			'output' => ['mappings', 'name', 'iconmapid'],
+			'output' => ['iconmapid', 'name'],
 			'selectMappings' => ['inventory_link', 'expression', 'iconid'],
 			'editable' => true
 		]);

@@ -1086,7 +1086,7 @@ class testFormHost extends CWebTest {
 				]
 			],
 			// Successful host form update.
-			// Add defualt interface values.
+			// Add default interface values.
 			[
 				[
 					'expected' => TEST_GOOD,
