@@ -103,8 +103,18 @@ Bug fixes:
 Changes for 5.4.6rc1
 
 New features:
+.........T [ZBXNEXT-6888] added template "InfluxDB by HTTP" (ychukina)
+.......PS. [ZBXNEXT-6809] changed behavior of the vmware event log, the 'skip' option of the new item resets the VMware event cache (MVekslers)
 
 Bug fixes:
+.........T [ZBX-19284] added smart.disk.attr.raw item, removed unit for smart.disk.hours item in "SMART by Zabbix agent 2" template (mchudinov)
+..F....... [ZBX-19899] fixed mass update not working across pages (jfreibergs)
+..F....... [ZBX-19584] increased width for Subscriptions section of Scheduled reports to avoid text clipping (jfreibergs)
+..F....... [ZBX-19580] fixed date format mismatch in UI elements that are loaded via JavaScript (jfreibergs)
+..F....... [ZBX-19683] fixed editable UI tags component for discovered host edit form (miks)
+.........T [ZBX-19939] fixed typo in Clickhouse README (abiba)
+..F....... [ZBX-19883] fixed broken secret text macro button style (miks)
+.......PS. [ZBX-19848] fixed vmware perf counters that return percentage values (MVekslers)
 
 --------------------------------------------------------------------------------
 Changes for 5.4.5
