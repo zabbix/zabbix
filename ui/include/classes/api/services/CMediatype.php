@@ -616,7 +616,7 @@ class CMediatype extends CApiService {
 			'show_event_menu' =>		['type' => API_INT32, 'in' => DB::getDefault('media_type', 'show_event_menu')],
 			'event_menu_url' =>			['type' => API_STRING_UTF8, 'in' => DB::getDefault('media_type', 'event_menu_url')],
 			'event_menu_name' =>		['type' => API_STRING_UTF8, 'in' => DB::getDefault('media_type', 'event_menu_name')],
-			'parameters' =>				['type' => API_OBJECTS, 'fields' => []]
+			'parameters' =>				['type' => API_OBJECT, 'fields' => []]
 		];
 
 		return $api_input_rules;
