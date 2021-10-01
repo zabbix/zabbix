@@ -818,15 +818,10 @@ static int	DBpatch_5050071(void)
 
 static int	DBpatch_5050072(void)
 {
-	return DBcreate_index("ha_node", "ha_node_1", "status", 0);
+	return DBcreate_index("ha_node", "ha_node_1", "status,lastaccess", 0);
 }
 
 static int	DBpatch_5050073(void)
-{
-	return DBcreate_index("ha_node", "ha_node_2", "lastaccess", 0);
-}
-
-static int	DBpatch_5050074(void)
 {
 	const ZBX_TABLE	table =
 			{"table_lock", "table_name", 0,
@@ -840,7 +835,7 @@ static int	DBpatch_5050074(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_5050075(void)
+static int	DBpatch_5050074(void)
 {
 	if (0 == (ZBX_PROGRAM_TYPE_SERVER & program_type))
 		return SUCCEED;
@@ -925,6 +920,5 @@ DBPATCH_ADD(5050071, 0, 1)
 DBPATCH_ADD(5050072, 0, 1)
 DBPATCH_ADD(5050073, 0, 1)
 DBPATCH_ADD(5050074, 0, 1)
-DBPATCH_ADD(5050075, 0, 1)
 
 DBPATCH_END()
