@@ -392,6 +392,7 @@ class DB {
 						}
 						$values[$field] = zbx_dbstr($values[$field]);
 						break;
+
 					case self::FIELD_TYPE_ID:
 					case self::FIELD_TYPE_UINT:
 						if (!zbx_ctype_digit($values[$field])) {
@@ -399,18 +400,21 @@ class DB {
 						}
 						$values[$field] = zbx_dbstr($values[$field]);
 						break;
+
 					case self::FIELD_TYPE_INT:
 						if (!zbx_is_int($values[$field])) {
 							self::exception(self::DBEXECUTE_ERROR, _s('Incorrect value "%1$s" for int field "%2$s".', $values[$field], $field));
 						}
 						$values[$field] = zbx_dbstr($values[$field]);
 						break;
+
 					case self::FIELD_TYPE_FLOAT:
 						if (!is_numeric($values[$field])) {
 							self::exception(self::DBEXECUTE_ERROR, _s('Incorrect value "%1$s" for float field "%2$s".', $values[$field], $field));
 						}
 						$values[$field] = zbx_dbstr($values[$field]);
 						break;
+
 					case self::FIELD_TYPE_TEXT:
 						if ($DB['TYPE'] == ZBX_DB_ORACLE) {
 							$length = mb_strlen($values[$field]);
@@ -422,6 +426,7 @@ class DB {
 						}
 						$values[$field] = zbx_dbstr($values[$field]);
 						break;
+
 					case self::FIELD_TYPE_NCLOB:
 						// Using strlen because 4000 bytes is largest possible string literal in oracle query.
 						if ($DB['TYPE'] == ZBX_DB_ORACLE && strlen($values[$field]) > ORACLE_MAX_STRING_SIZE) {
@@ -432,6 +437,21 @@ class DB {
 							$values[$field] = zbx_dbstr($values[$field]);
 						}
 						break;
+
+					case self::FIELD_TYPE_BLOB:
+						switch ($DB['TYPE']) {
+							case ZBX_DB_MYSQL:
+								$values[$field] = zbx_dbstr($values[$field]);
+								break;
+
+							case ZBX_DB_POSTGRESQL:
+								$values[$field] = "'".pg_escape_bytea($values[$field])."'";
+								break;
+
+							case ZBX_DB_ORACLE:
+								// Do nothing; Check CImage.php to see how to update BLOB data with ORACLE DB.
+								break;
+						}
 				}
 			}
 		}
@@ -532,12 +552,21 @@ class DB {
 
 		$mandatory_fields = [];
 
-		if ($DB['TYPE'] == ZBX_DB_MYSQL) {
-			foreach ($table_schema['fields'] as $name => $field) {
-				if ($field['type'] == self::FIELD_TYPE_TEXT || $field['type'] == self::FIELD_TYPE_NCLOB) {
-					$mandatory_fields += [$name => $field['default']];
+		switch ($DB['TYPE']) {
+			case ZBX_DB_MYSQL:
+				foreach ($table_schema['fields'] as $name => $field) {
+					if ($field['type'] == self::FIELD_TYPE_TEXT || $field['type'] == self::FIELD_TYPE_NCLOB) {
+						$mandatory_fields += [$name => $field['default']];
+					}
 				}
-			}
+				break;
+
+			case ZBX_DB_ORACLE:
+				foreach ($table_schema['fields'] as $name => $field) {
+					if ($field['type'] == self::FIELD_TYPE_BLOB) {
+						$mandatory_fields += [$name => 'EMPTY_BLOB()'];
+					}
+				}
 		}
 
 		return $mandatory_fields;

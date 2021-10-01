@@ -91,7 +91,7 @@ abstract class CControllerProblem extends CController {
 	/**
 	 * Get additional data required for render filter as HTML.
 	 *
-	 * @param array $filter  Filter fileds values.
+	 * @param array $filter  Filter fields values.
 	 *
 	 * @return array
 	 */

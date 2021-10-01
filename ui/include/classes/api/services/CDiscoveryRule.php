@@ -24,11 +24,7 @@
  */
 class CDiscoveryRule extends CItemGeneral {
 
-	public const ACCESS_RULES = [
-		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
-		'create' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
-		'update' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
-		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+	public const ACCESS_RULES = parent::ACCESS_RULES + [
 		'copy' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
 	];
 
