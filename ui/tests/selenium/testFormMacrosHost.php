@@ -376,7 +376,7 @@ class testFormMacrosHost extends testFormMacros {
 						'description' => 'vault description2'
 					],
 					'title' => 'Cannot update host',
-					'message' => 'Invalid parameter "/1/macros/3/value": incorrect syntax near "path:".'
+					'message' => 'Invalid parameter "/1/macros/6/value": incorrect syntax near "path:".'
 				]
 			],
 			[
@@ -391,7 +391,7 @@ class testFormMacrosHost extends testFormMacros {
 						'description' => 'vault description3'
 					],
 					'title' => 'Cannot update host',
-					'message' => 'Invalid parameter "/1/macros/3/value": incorrect syntax near "/path:key".'
+					'message' => 'Invalid parameter "/1/macros/6/value": incorrect syntax near "/path:key".'
 				]
 			],
 			[
@@ -406,7 +406,7 @@ class testFormMacrosHost extends testFormMacros {
 						'description' => 'vault description4'
 					],
 					'title' => 'Cannot update host',
-					'message' => 'Invalid parameter "/1/macros/3/value": incorrect syntax near "path:key".'
+					'message' => 'Invalid parameter "/1/macros/6/value": incorrect syntax near "path:key".'
 				]
 			],
 			[
@@ -421,7 +421,7 @@ class testFormMacrosHost extends testFormMacros {
 						'description' => 'vault description5'
 					],
 					'title' => 'Cannot update host',
-					'message' => 'Invalid parameter "/1/macros/3/value": incorrect syntax near ":key".'
+					'message' => 'Invalid parameter "/1/macros/6/value": incorrect syntax near ":key".'
 				]
 			],
 			[
@@ -436,7 +436,7 @@ class testFormMacrosHost extends testFormMacros {
 						'description' => 'vault description6'
 					],
 					'title' => 'Cannot update host',
-					'message' => 'Invalid parameter "/1/macros/3/value": incorrect syntax near "path".'
+					'message' => 'Invalid parameter "/1/macros/6/value": incorrect syntax near "path".'
 				]
 			],
 			[
@@ -451,7 +451,7 @@ class testFormMacrosHost extends testFormMacros {
 						'description' => 'vault description8'
 					],
 					'title' => 'Cannot update host',
-					'message' => 'Invalid parameter "/1/macros/3/value": incorrect syntax near "/secret/path:key".'
+					'message' => 'Invalid parameter "/1/macros/6/value": incorrect syntax near "/secret/path:key".'
 				]
 			],
 			[
@@ -466,7 +466,7 @@ class testFormMacrosHost extends testFormMacros {
 						'description' => 'vault description9'
 					],
 					'title' => 'Cannot update host',
-					'message' => 'Invalid parameter "/1/macros/3/value": cannot be empty.'
+					'message' => 'Invalid parameter "/1/macros/6/value": cannot be empty.'
 				]
 			]
 		];
@@ -521,11 +521,6 @@ class testFormMacrosHost extends testFormMacros {
 	 * @dataProvider getUpdateVaultMacrosData
 	 */
 	public function testFormMacrosHost_UpdateVaultMacros($data) {
-		$this->updateVaultMacros($data, (new CUrl('zabbix.php'))
-			->setArgument('action', 'host.edit')
-			->setArgument('hostid', 99011)
-			->getUrl(),
-			'hosts'
-		);
+		$this->updateVaultMacros($data, 'zabbix.php?action=host.view', 'hosts', 'Host for suppression');
 	}
 }

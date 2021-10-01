@@ -1619,6 +1619,7 @@ abstract class testFormMacros extends CWebTest {
 		$this->fillMacros([$data['macro_fields']]);
 		$form->submit();
 		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD);
 
 		if ($data['expected'] == TEST_BAD) {
 			$this->assertMessage($data['expected'], $data['title'], $data['message']);
@@ -1639,11 +1640,14 @@ abstract class testFormMacros extends CWebTest {
 		}
 	}
 
-	public function updateVaultMacros($data, $url, $source) {
-		$this->openMacrosTab($url, $source, true);
+	public function updateVaultMacros($data, $url, $source, $name = null) {
+		$form = $this->openMacrosTab($url, $source, true, $name);
 		$this->fillMacros([$data]);
-		$this->query('button:Update')->one()->click();
-		$this->openMacrosTab($url, $source);
+		$form->submit();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD);
+
+		$this->openMacrosTab($url, $source, false, $name);
 		$result = [];
 		foreach (['macro', 'value', 'description'] as $field) {
 			$result[] = $this->query('xpath://textarea[@id="macros_'.$data['index'].'_'.$field.'"]')->one()->getText();
@@ -1652,5 +1656,10 @@ abstract class testFormMacros extends CWebTest {
 		array_push($result, ZBX_MACRO_TYPE_VAULT);
 		$sql = 'SELECT macro, value, description, type FROM hostmacro WHERE macro='.zbx_dbstr($data['macro']);
 		$this->assertEquals($result, array_values(CDBHelper::getRow($sql)));
+
+		if ($source === 'hosts') {
+			COverlayDialogElement::find()->one()->close();
+			COverlayDialogElement::ensureNotPresent();
+		}
 	}
 }
