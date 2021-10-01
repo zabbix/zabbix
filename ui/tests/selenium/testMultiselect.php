@@ -44,10 +44,8 @@ class testMultiselect extends CWebTest {
 	public function checkSuggest($link, $query, $name, $string, $class) {
 		$this->page->login()->open($link)->waitUntilReady();
 		$this->page->updateViewport();
-		$form = ($query === 'host-form')
-			? $this->query('name:'.$query)->asFluidForm()->one()
-			: $this->query('name:'.$query)->asForm()->one();
-		$field = $form->getField($name);
+		$form_type = ($query === 'host-form') ? CFluidFormElement::class : CFormElement::class;
+		$field = $this->query('name:'.$query)->cast($form_type)->one()->getField($name);
 		$element = $field->query('tag:input')->one();
 		$element->type($string);
 		$this->query('class', $class)->waitUntilVisible();
