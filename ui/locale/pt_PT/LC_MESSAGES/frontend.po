@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-03 19:53+0300\n"
+"POT-Creation-Date: 2021-09-17 19:53+0300\n"
 "PO-Revision-Date: 2013-10-10 08:35+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: none\n"
@@ -88,7 +88,7 @@ msgid_plural "%1$d days"
 msgstr[0] "%1$d dia"
 msgstr[1] "%1$d dias"
 
-#: jsLoader.php:330
+#: jsLoader.php:325
 #, c-format
 msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
@@ -173,7 +173,7 @@ msgstr[1] ""
 #: include/classes/widgets/CWidgetConfig.php:286
 #: include/classes/widgets/CWidgetConfig.php:287
 #: include/classes/widgets/CWidgetConfig.php:288 include/func.inc.php:2631
-#: jsLoader.php:175 jsLoader.php:176 jsLoader.php:177 jsLoader.php:178
+#: jsLoader.php:170 jsLoader.php:171 jsLoader.php:172 jsLoader.php:173
 #, c-format
 msgid "%1$s minute"
 msgid_plural "%1$s minutes"
@@ -187,7 +187,7 @@ msgid_plural "%1$s of %2$s elements in problem state"
 msgstr[0] ""
 msgstr[1] ""
 
-#: jsLoader.php:331
+#: jsLoader.php:326
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s preselected, use down,up arrow keys and enter to select"
@@ -220,14 +220,14 @@ msgstr[1] "restam %1$s tentativas"
 #: app/views/administration.user.edit.php:522
 #: include/classes/widgets/CWidgetConfig.php:283
 #: include/classes/widgets/CWidgetConfig.php:284 include/func.inc.php:2638
-#: jsLoader.php:173 jsLoader.php:174
+#: jsLoader.php:168 jsLoader.php:169
 #, c-format
 msgid "%1$s second"
 msgid_plural "%1$s seconds"
 msgstr[0] "%1$s segundo"
 msgstr[1] "%1$s segundos"
 
-#: jsLoader.php:312
+#: jsLoader.php:307
 #, c-format
 msgid "%1$s symbols remaining"
 msgstr ""
@@ -247,13 +247,13 @@ msgctxt "screen reader"
 msgid "%1$s, Severity, %2$s"
 msgstr ""
 
-#: jsLoader.php:325
+#: jsLoader.php:320
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, read only"
 msgstr ""
 
-#: jsLoader.php:368
+#: jsLoader.php:363
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, selected"
@@ -487,7 +487,7 @@ msgstr ""
 msgid "Ack"
 msgstr "Reconhecido"
 
-#: app/views/popup.acknowledge.edit.php:83 jsLoader.php:335
+#: app/views/popup.acknowledge.edit.php:83 jsLoader.php:330
 msgid "Acknowledge"
 msgstr "Reconhecer"
 
@@ -650,7 +650,7 @@ msgstr "Acção actualizada"
 #: include/classes/screens/CScreenProblem.php:1223 include/events.inc.php:288
 #: include/forms.inc.php:1222 include/views/configuration.action.edit.php:28
 #: include/views/monitoring.sysmap.list.php:68 jsLoader.php:146
-#: jsLoader.php:179 jsLoader.php:194 jsLoader.php:208 jsLoader.php:334
+#: jsLoader.php:174 jsLoader.php:189 jsLoader.php:203 jsLoader.php:329
 #: tr_events.php:182
 msgid "Actions"
 msgstr "Acções"
@@ -819,7 +819,7 @@ msgstr "Activo até"
 #: include/views/monitoring.sysmap.edit.php:304
 #: include/views/monitoring.sysmap.edit.php:325
 #: include/views/monitoring.sysmap.edit.php:362
-#: include/views/monitoring.sysmap.edit.php:430 jsLoader.php:198
+#: include/views/monitoring.sysmap.edit.php:430 jsLoader.php:193
 msgid "Add"
 msgstr "Adicionar"
 
@@ -827,7 +827,7 @@ msgstr "Adicionar"
 msgid "Add (message type limit reached)"
 msgstr ""
 
-#: jsLoader.php:168
+#: jsLoader.php:163
 msgid "Add a new widget"
 msgstr "Adicionar novo widget"
 
@@ -835,7 +835,7 @@ msgstr "Adicionar novo widget"
 msgid "Add child"
 msgstr "Adicionar filho"
 
-#: jsLoader.php:199
+#: jsLoader.php:194
 msgid "Add child element"
 msgstr "Adicionar elemento filho"
 
@@ -852,7 +852,7 @@ msgstr "Adicionar host"
 msgid "Add missing"
 msgstr ""
 
-#: jsLoader.php:200
+#: jsLoader.php:195
 msgid "Add multiple maps"
 msgstr "Adicionar multiplos mapas"
 
@@ -869,7 +869,8 @@ msgstr ""
 msgid "Add new override"
 msgstr ""
 
-#: jsLoader.php:147
+#: app/views/js/configuration.dashboard.edit.js.php:197
+#: app/views/js/monitoring.dashboard.view.js.php:307
 msgid "Add page"
 msgstr ""
 
@@ -911,7 +912,9 @@ msgstr ""
 msgid "Add user group"
 msgstr ""
 
-#: app/views/monitoring.dashboard.widget.edit.php:34 jsLoader.php:148
+#: app/views/js/configuration.dashboard.edit.js.php:193
+#: app/views/js/monitoring.dashboard.view.js.php:303
+#: app/views/monitoring.dashboard.widget.edit.php:34
 msgid "Add widget"
 msgstr "Adicionar widget"
 
@@ -919,7 +922,7 @@ msgstr "Adicionar widget"
 msgid "Added"
 msgstr ""
 
-#: jsLoader.php:323
+#: jsLoader.php:318
 #, c-format
 msgctxt "screen reader"
 msgid "Added, %1$s"
@@ -1015,7 +1018,7 @@ msgstr ""
 #: app/views/reports.scheduledreport.list.php:55
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:122
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:178
-#: include/views/monitoring.sysmap.edit.php:261 jsLoader.php:391
+#: include/views/monitoring.sysmap.edit.php:261 jsLoader.php:386
 msgid "All"
 msgstr "Tudo"
 
@@ -1033,7 +1036,7 @@ msgstr "Todos os grupos"
 msgid "All hosts"
 msgstr "Todos os hosts"
 
-#: jsLoader.php:279
+#: jsLoader.php:274
 msgid "All links should have \"Name\" and \"URL\" specified"
 msgstr "Todos os links devem ter \"Nome\" e \"URL\" definidos"
 
@@ -1164,8 +1167,8 @@ msgstr "Erro na aplicação."
 #: include/views/js/monitoring.sysmaps.js.php:480
 #: include/views/js/monitoring.sysmaps.js.php:604
 #: include/views/js/monitoring.sysmaps.js.php:709
-#: include/views/js/monitoring.sysmaps.js.php:815 jsLoader.php:201
-#: jsLoader.php:314
+#: include/views/js/monitoring.sysmaps.js.php:815 jsLoader.php:196
+#: jsLoader.php:309
 msgid "Apply"
 msgstr "Aplicar"
 
@@ -1183,7 +1186,7 @@ msgstr "Aproximando"
 msgid "Apr"
 msgstr "Abr"
 
-#: include/func.inc.php:103 include/func.inc.php:240 jsLoader.php:231
+#: include/func.inc.php:103 include/func.inc.php:240 jsLoader.php:226
 msgid "April"
 msgstr "Abril"
 
@@ -1331,7 +1334,7 @@ msgstr "Log de auditoria"
 msgid "Aug"
 msgstr "Ago"
 
-#: include/func.inc.php:107 include/func.inc.php:244 jsLoader.php:235
+#: include/func.inc.php:107 include/func.inc.php:244 jsLoader.php:230
 msgid "August"
 msgstr "Agosto"
 
@@ -1601,11 +1604,11 @@ msgstr ""
 msgid "Bottom"
 msgstr "Abaixo"
 
-#: jsLoader.php:271
+#: jsLoader.php:266
 msgid "Bring forward"
 msgstr "Trazer para frente"
 
-#: jsLoader.php:270
+#: jsLoader.php:265
 msgid "Bring to front"
 msgstr "Levar para tráz"
 
@@ -1685,7 +1688,7 @@ msgstr "Calcular SLA, SLA aceitável (em %)"
 msgid "Calculated"
 msgstr "Calculado"
 
-#: jsLoader.php:227
+#: jsLoader.php:222
 msgid "Calendar"
 msgstr ""
 
@@ -1693,7 +1696,7 @@ msgstr ""
 msgid "Callback"
 msgstr "Callback"
 
-#: jsLoader.php:326
+#: jsLoader.php:321
 msgctxt "screen reader"
 msgid "Can not be removed"
 msgstr ""
@@ -1727,8 +1730,8 @@ msgstr ""
 #: app/views/monitoring.dashboard.view.php:143
 #: app/views/popup.import.compare.php:162
 #: include/classes/html/CButtonCancel.php:25
-#: include/classes/setup/CSetupWizard.php:130 jsLoader.php:202
-#: jsLoader.php:212 jsLoader.php:315 jsLoader.php:387
+#: include/classes/setup/CSetupWizard.php:130 jsLoader.php:197
+#: jsLoader.php:207 jsLoader.php:310 jsLoader.php:382
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -1758,7 +1761,7 @@ msgstr "Não foi possível adicionar acção"
 msgid "Cannot add correlation"
 msgstr "Não foi possível adicionar correlação"
 
-#: jsLoader.php:149
+#: jsLoader.php:147
 #, c-format
 msgid "Cannot add dashboard page: maximum number of %1$d dashboard pages has been added."
 msgstr ""
@@ -1900,7 +1903,7 @@ msgstr ""
 msgid "Cannot add web scenario"
 msgstr "Não foi possível adicionar a apresentação de ecrãs"
 
-#: jsLoader.php:150
+#: jsLoader.php:148
 msgid "Cannot add widget: not enough free space on the dashboard."
 msgstr ""
 
@@ -2449,7 +2452,7 @@ msgstr ""
 msgid "Cannot execute script."
 msgstr ""
 
-#: jsLoader.php:282
+#: jsLoader.php:277
 msgid "Cannot expand macros."
 msgstr "Não foi possível expandir as macros."
 
@@ -2744,7 +2747,7 @@ msgstr "Não é possível configurar campos do inventário com o inventário des
 msgid "Cannot set session cookie."
 msgstr ""
 
-#: jsLoader.php:290
+#: jsLoader.php:285
 msgid "Cannot support notification audio for this device."
 msgstr ""
 
@@ -3345,11 +3348,11 @@ msgstr "Limpar histórico e tendências"
 msgid "Clear when unlinking"
 msgstr "Limpar ao desvincular"
 
-#: jsLoader.php:169
+#: jsLoader.php:164
 msgid "Click and drag to desired size."
 msgstr ""
 
-#: jsLoader.php:313
+#: jsLoader.php:308
 msgid "Click to view or edit"
 msgstr ""
 
@@ -3379,7 +3382,7 @@ msgstr "Relógio"
 #: include/views/configuration.template.edit.php:237
 #: include/views/configuration.trigger.prototype.edit.php:654
 #: include/views/configuration.triggers.edit.php:647
-#: include/views/monitoring.sysmap.edit.php:421 jsLoader.php:337
+#: include/views/monitoring.sysmap.edit.php:421 jsLoader.php:332
 msgid "Clone"
 msgstr "Clonar"
 
@@ -3390,8 +3393,8 @@ msgstr "Clonar"
 #: include/views/js/monitoring.sysmaps.js.php:487
 #: include/views/js/monitoring.sysmaps.js.php:611
 #: include/views/js/monitoring.sysmaps.js.php:716
-#: include/views/js/monitoring.sysmaps.js.php:819 jsLoader.php:213
-#: jsLoader.php:292 jsLoader.php:309 jsLoader.php:380
+#: include/views/js/monitoring.sysmaps.js.php:819 jsLoader.php:208
+#: jsLoader.php:287 jsLoader.php:304 jsLoader.php:375
 msgid "Close"
 msgstr "Fechar"
 
@@ -3421,8 +3424,8 @@ msgid "Close problems"
 msgstr ""
 
 #: include/classes/html/CCollapsibleUiWidget.php:55
-#: include/classes/widgets/CWidgetHelper.php:982 jsLoader.php:303
-#: jsLoader.php:308
+#: include/classes/widgets/CWidgetHelper.php:982 jsLoader.php:298
+#: jsLoader.php:303
 msgid "Collapse"
 msgstr "Recolher"
 
@@ -3439,7 +3442,7 @@ msgstr ""
 msgid "Colour"
 msgstr "Cor"
 
-#: include/classes/validators/CColorValidator.php:32 jsLoader.php:284
+#: include/classes/validators/CColorValidator.php:32 jsLoader.php:279
 #, c-format
 msgid "Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr "A cor \"%1$s\" não é correcta: é esperada cor no formato hexadecimal (6 símbolos)."
@@ -3566,7 +3569,7 @@ msgstr "Condições duplicadas para o correlacionamento \"%1$s\"."
 #: app/views/search.php:37 app/views/search.php:195 app/views/search.php:275
 #: include/classes/helpers/CMenuHelper.php:219
 #: include/classes/helpers/CRoleHelper.php:355
-#: include/views/inventory.host.view.php:222 jsLoader.php:336
+#: include/views/inventory.host.view.php:222 jsLoader.php:331
 msgid "Configuration"
 msgstr "Configuração"
 
@@ -3928,8 +3931,8 @@ msgstr "Coordenadas"
 #: include/views/configuration.copy.elements.php:77
 #: include/views/configuration.graph.list.php:237
 #: include/views/configuration.item.list.php:309
-#: include/views/configuration.triggers.list.php:342 jsLoader.php:151
-#: jsLoader.php:180 jsLoader.php:276
+#: include/views/configuration.triggers.list.php:342 jsLoader.php:149
+#: jsLoader.php:175 jsLoader.php:271
 msgid "Copy"
 msgstr "Copiar"
 
@@ -4060,11 +4063,11 @@ msgstr "Criar correlacionamento"
 msgid "Create dashboard"
 msgstr "Criar dashboard"
 
-#: jsLoader.php:341
+#: jsLoader.php:336
 msgid "Create dependent discovery rule"
 msgstr ""
 
-#: jsLoader.php:340
+#: jsLoader.php:335
 msgid "Create dependent item"
 msgstr "Criar item dependente"
 
@@ -4181,7 +4184,7 @@ msgstr "Criar mapa"
 msgid "Create media type"
 msgstr "Criar tipo de média"
 
-#: app/views/popup.import.php:130 jsLoader.php:338
+#: app/views/popup.import.php:130 jsLoader.php:333
 msgid "Create new"
 msgstr "Criar novo"
 
@@ -4201,7 +4204,7 @@ msgstr "Criar script"
 msgid "Create template"
 msgstr "Criar template"
 
-#: include/views/configuration.triggers.list.php:148 jsLoader.php:339
+#: include/views/configuration.triggers.list.php:148 jsLoader.php:334
 msgid "Create trigger"
 msgstr "Criar trigger"
 
@@ -4451,7 +4454,7 @@ msgstr ""
 #: include/html.inc.php:371 include/views/configuration.template.list.php:121
 #: include/views/configuration.template.list.php:233
 #: include/views/inventory.host.view.php:168
-#: include/views/inventory.host.view.php:172 jsLoader.php:342
+#: include/views/inventory.host.view.php:172 jsLoader.php:337
 msgid "Dashboards"
 msgstr "Dashboards"
 
@@ -4621,7 +4624,7 @@ msgstr "Dia da semana"
 msgid "Days"
 msgstr "Dias"
 
-#: app/controllers/CControllerPopupMediatypeTestSend.php:172 jsLoader.php:371
+#: app/controllers/CControllerPopupMediatypeTestSend.php:172 jsLoader.php:366
 msgid "Debug"
 msgstr "Debug"
 
@@ -4635,7 +4638,7 @@ msgstr "Modo de debug"
 msgid "Dec"
 msgstr "Dez"
 
-#: include/func.inc.php:111 include/func.inc.php:248 jsLoader.php:239
+#: include/func.inc.php:111 include/func.inc.php:248 jsLoader.php:234
 msgid "December"
 msgstr "Dezembro"
 
@@ -4650,7 +4653,7 @@ msgstr ""
 #: include/views/inventory.host.view.php:79
 #: include/views/js/monitoring.sysmaps.js.php:145
 #: include/views/js/monitoring.sysmaps.js.php:263
-#: include/views/js/monitoring.sysmaps.js.php:659 jsLoader.php:265
+#: include/views/js/monitoring.sysmaps.js.php:659 jsLoader.php:260
 msgid "Default"
 msgstr "Por omissão"
 
@@ -4765,8 +4768,8 @@ msgstr "Atrasado em"
 #: include/views/configuration.template.list.php:283
 #: include/views/configuration.trigger.prototype.list.php:207
 #: include/views/configuration.triggers.list.php:349
-#: include/views/monitoring.sysmap.list.php:109 jsLoader.php:152
-#: jsLoader.php:181 jsLoader.php:343
+#: include/views/monitoring.sysmap.list.php:109 jsLoader.php:150
+#: jsLoader.php:176 jsLoader.php:338
 msgid "Delete"
 msgstr "Eliminar"
 
@@ -4795,7 +4798,7 @@ msgstr "Eliminar acção actual?"
 msgid "Delete current correlation?"
 msgstr "Eliminar o correlacionamento atual?"
 
-#: jsLoader.php:344
+#: jsLoader.php:339
 msgid "Delete dashboard?"
 msgstr "Eliminar o dashboard?"
 
@@ -4839,7 +4842,7 @@ msgstr "Eliminar o protótipo de item?"
 msgid "Delete item?"
 msgstr "Eliminar item?"
 
-#: jsLoader.php:281
+#: jsLoader.php:276
 msgid "Delete links between selected elements?"
 msgstr "Eliminar associações entre os elementos seleccionados?"
 
@@ -4895,7 +4898,7 @@ msgstr "Eliminar os dashboards selecionados?"
 msgid "Delete selected discovery rules?"
 msgstr "Eliminar regras de descoberta seleccionadas?"
 
-#: jsLoader.php:268
+#: jsLoader.php:263
 msgid "Delete selected elements?"
 msgstr "Eliminar elementos seleccionados?"
 
@@ -4993,7 +4996,7 @@ msgstr ""
 msgid "Delete selected scripts?"
 msgstr "Eliminar scripts seleccionados?"
 
-#: jsLoader.php:269
+#: jsLoader.php:264
 msgid "Delete selected shapes?"
 msgstr "Eliminar as formas seleciondas?"
 
@@ -5550,7 +5553,7 @@ msgstr "Mostrar gráfico empilhado"
 #: app/views/administration.queue.details.php:85 app/views/search.php:184
 #: app/views/search.php:268 app/views/search.php:367
 #: include/actions.inc.php:1669 include/actions.inc.php:1741
-#: include/classes/helpers/CPagerHelper.php:147 jsLoader.php:383
+#: include/classes/helpers/CPagerHelper.php:147 jsLoader.php:378
 #, c-format
 msgid "Displaying %1$s of %2$s found"
 msgstr "A mostrar %1$s de %2$s encontrados"
@@ -5586,7 +5589,7 @@ msgstr ""
 msgid "Do not keep trends"
 msgstr ""
 
-#: jsLoader.php:221 jsLoader.php:345
+#: jsLoader.php:216 jsLoader.php:340
 msgid "Do you wish to replace the conditional expression?"
 msgstr "Deseja substituir a expressão condicional?"
 
@@ -5642,7 +5645,7 @@ msgctxt "discovery status"
 msgid "Down"
 msgstr "Descer"
 
-#: jsLoader.php:195 jsLoader.php:209
+#: jsLoader.php:190 jsLoader.php:204
 msgid "Download image"
 msgstr ""
 
@@ -5746,7 +5749,7 @@ msgstr "Item dinâmico"
 msgid "Dynamic items"
 msgstr ""
 
-#: jsLoader.php:280
+#: jsLoader.php:275
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr "Cada URL deve ter um nome único. Certifique-se que existe apenas um URL com esse nome"
 
@@ -5768,8 +5771,8 @@ msgstr ""
 #: include/views/configuration.triggers.edit.php:350
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:118
 #: include/views/js/monitoring.sysmaps.js.php:836
-#: include/views/js/monitoring.sysmaps.js.php:851 jsLoader.php:182
-#: jsLoader.php:203
+#: include/views/js/monitoring.sysmaps.js.php:851 jsLoader.php:177
+#: jsLoader.php:198
 msgid "Edit"
 msgstr "Editar"
 
@@ -5785,11 +5788,11 @@ msgstr "Editar mapa"
 msgid "Edit operation"
 msgstr ""
 
-#: jsLoader.php:204
+#: jsLoader.php:199
 msgid "Edit tree element"
 msgstr "Editar árvore de elementos"
 
-#: jsLoader.php:346
+#: jsLoader.php:341
 msgid "Edit trigger"
 msgstr "Editar trigger"
 
@@ -6182,7 +6185,7 @@ msgstr "Erro"
 msgid "Error in search request for table \"%1$s\"."
 msgstr "Erro no pedido de pesquisa para a tabela \"%1$s\"."
 
-#: include/func.inc.php:1642 jsLoader.php:223
+#: include/func.inc.php:1642 jsLoader.php:218
 msgid "Error message"
 msgstr ""
 
@@ -6297,7 +6300,7 @@ msgstr "Eliminar"
 msgid "Exclude host groups"
 msgstr "Eliminar grupos de hosts"
 
-#: app/controllers/CControllerAuditLogList.php:173 jsLoader.php:214
+#: app/controllers/CControllerAuditLogList.php:173 jsLoader.php:209
 msgid "Execute"
 msgstr "Executar"
 
@@ -6343,7 +6346,7 @@ msgstr "Executado"
 msgid "Executed script"
 msgstr "Script executado"
 
-#: jsLoader.php:215
+#: jsLoader.php:210
 msgid "Execution confirmation"
 msgstr "Confirmação de execução"
 
@@ -6359,8 +6362,8 @@ msgid "Exists"
 msgstr ""
 
 #: include/classes/html/CCollapsibleUiWidget.php:60
-#: include/classes/widgets/CWidgetHelper.php:982 jsLoader.php:304
-#: jsLoader.php:307
+#: include/classes/widgets/CWidgetHelper.php:982 jsLoader.php:299
+#: jsLoader.php:302
 msgid "Expand"
 msgstr "Expandir"
 
@@ -6481,7 +6484,7 @@ msgstr "Expressões"
 msgid "External check"
 msgstr "Verificação externa"
 
-#: jsLoader.php:251
+#: jsLoader.php:246
 msgctxt "Friday short"
 msgid "F"
 msgstr "S"
@@ -6505,7 +6508,9 @@ msgid "Failed"
 msgstr "Falhou"
 
 #: app/controllers/CControllerDashboardUpdate.php:142
-#: app/controllers/CControllerTemplateDashboardUpdate.php:136 jsLoader.php:153
+#: app/controllers/CControllerTemplateDashboardUpdate.php:136
+#: app/views/js/configuration.dashboard.edit.js.php:150
+#: app/views/js/monitoring.dashboard.view.js.php:258
 msgid "Failed to create dashboard"
 msgstr "Falha ao criar o dashboard"
 
@@ -6514,32 +6519,38 @@ msgstr "Falha ao criar o dashboard"
 msgid "Failed to parse URL."
 msgstr "Falha ao processar a URL."
 
-#: jsLoader.php:154
+#: jsLoader.php:151
 msgid "Failed to paste dashboard page."
 msgstr ""
 
-#: jsLoader.php:155
+#: jsLoader.php:152
 msgid "Failed to paste widget."
 msgstr ""
 
 #: app/controllers/CControllerDashboardUpdate.php:137
-#: app/controllers/CControllerTemplateDashboardUpdate.php:131 jsLoader.php:156
+#: app/controllers/CControllerTemplateDashboardUpdate.php:131
+#: app/views/js/configuration.dashboard.edit.js.php:151
+#: app/views/js/monitoring.dashboard.view.js.php:259
 msgid "Failed to update dashboard"
 msgstr "Falha ao atualizar o dashboard"
 
-#: jsLoader.php:157
+#: jsLoader.php:153
 msgid "Failed to update dashboard page properties."
 msgstr ""
 
-#: jsLoader.php:158
+#: jsLoader.php:154
 msgid "Failed to update dashboard properties."
+msgstr ""
+
+#: app/views/js/monitoring.dashboard.view.js.php:452
+msgid "Failed to update dashboard sharing."
 msgstr ""
 
 #: include/classes/api/services/CTemplate.php:624
 msgid "Failed to update template."
 msgstr "Falha ao atualizar o template."
 
-#: jsLoader.php:159
+#: jsLoader.php:155
 msgid "Failed to update widget properties."
 msgstr ""
 
@@ -6563,7 +6574,7 @@ msgstr "Mapas favoritos"
 msgid "Feb"
 msgstr "Fev"
 
-#: include/func.inc.php:101 include/func.inc.php:238 jsLoader.php:229
+#: include/func.inc.php:101 include/func.inc.php:238 jsLoader.php:224
 msgid "February"
 msgstr "Fevereiro"
 
@@ -6842,7 +6853,7 @@ msgstr "Francês (fr_FR)"
 msgid "Fri"
 msgstr "Sex"
 
-#: include/func.inc.php:123 include/func.inc.php:213 jsLoader.php:244
+#: include/func.inc.php:123 include/func.inc.php:213 jsLoader.php:239
 msgid "Friday"
 msgstr "Sexta-feira"
 
@@ -6969,7 +6980,7 @@ msgstr "Valor global"
 msgid "Go back to %1$s"
 msgstr "Voltar para %1$s"
 
-#: jsLoader.php:351
+#: jsLoader.php:346
 msgid "Go to"
 msgstr "Ir para"
 
@@ -7183,7 +7194,7 @@ msgstr "Já existe um gráfico com o nome \"%1$s\" em gráficos ou protótipos d
 #: include/views/inventory.host.view.php:158
 #: include/views/inventory.host.view.php:166
 #: include/views/inventory.host.view.php:194
-#: include/views/inventory.host.view.php:217 jsLoader.php:352
+#: include/views/inventory.host.view.php:217 jsLoader.php:347
 msgid "Graphs"
 msgstr "Gráficos"
 
@@ -7383,11 +7394,11 @@ msgstr "Ajuda"
 msgid "Hexadecimal to decimal"
 msgstr "Hexadecimal para decimal"
 
-#: include/views/monitoring.sysmap.constructor.php:57 jsLoader.php:258
+#: include/views/monitoring.sysmap.constructor.php:57 jsLoader.php:253
 msgid "Hidden"
 msgstr "Oculto"
 
-#: jsLoader.php:372
+#: jsLoader.php:367
 msgid "Hide debug"
 msgstr "Ocultar depuração"
 
@@ -7439,7 +7450,7 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:49
 #: include/forms.inc.php:550 include/views/configuration.item.list.php:89
 #: include/views/configuration.item.prototype.list.php:62 items.php:261
-#: jsLoader.php:353
+#: jsLoader.php:348
 msgid "History"
 msgstr "Histórico"
 
@@ -7527,7 +7538,7 @@ msgstr "Alinhamento horizontal"
 #: include/views/js/monitoring.sysmaps.js.php:92
 #: include/views/js/monitoring.sysmaps.js.php:161
 #: include/views/reports.toptriggers.php:83 items.php:982 items.php:1101
-#: jsLoader.php:260 jsLoader.php:354 report2.php:506
+#: jsLoader.php:255 jsLoader.php:349 report2.php:506
 msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "Host"
@@ -7565,7 +7576,7 @@ msgstr "Acesso ao host"
 msgid "Host added"
 msgstr "Host adicionado"
 
-#: app/controllers/CControllerPopupItemTest.php:1292
+#: app/controllers/CControllerPopupItemTest.php:1303
 #: app/views/popup.itemtestedit.view.php:98
 msgid "Host address"
 msgstr ""
@@ -7614,7 +7625,7 @@ msgstr[1] "Hosts activados"
 #: include/views/configuration.hostgroups.edit.php:51
 #: include/views/js/monitoring.sysmaps.js.php:95
 #: include/views/js/monitoring.sysmaps.js.php:102
-#: include/views/js/monitoring.sysmaps.js.php:152 jsLoader.php:263
+#: include/views/js/monitoring.sysmaps.js.php:152 jsLoader.php:258
 #: report2.php:398
 msgid "Host group"
 msgstr "Grupo de hosts"
@@ -8102,7 +8113,7 @@ msgstr ""
 #: app/views/administration.image.edit.php:66 image.php:26
 #: include/classes/helpers/CMapHelper.php:227 include/maps.inc.php:28
 #: include/maps.inc.php:307 include/views/js/monitoring.sysmaps.js.php:96
-#: jsLoader.php:264
+#: jsLoader.php:259
 msgid "Image"
 msgstr "Imagem"
 
@@ -9070,9 +9081,9 @@ msgstr ""
 #: app/controllers/CControllerPopupHttpStep.php:94
 #: app/controllers/CControllerPopupItemTestEdit.php:91
 #: app/controllers/CControllerPopupItemTestGetValue.php:104
-#: app/controllers/CControllerPopupItemTest.php:1284
-#: app/controllers/CControllerPopupItemTest.php:1292
-#: app/controllers/CControllerPopupItemTest.php:1299
+#: app/controllers/CControllerPopupItemTest.php:1295
+#: app/controllers/CControllerPopupItemTest.php:1303
+#: app/controllers/CControllerPopupItemTest.php:1310
 #: app/controllers/CControllerPopupItemTestSend.php:143
 #: app/controllers/CControllerPopupItemTestSend.php:172
 #: app/controllers/CControllerPopupItemTestSend.php:181
@@ -9421,7 +9432,7 @@ msgid "Insert"
 msgstr "Inserir"
 
 #: include/views/configuration.trigger.prototype.edit.php:136
-#: include/views/configuration.triggers.edit.php:162 jsLoader.php:347
+#: include/views/configuration.triggers.edit.php:162 jsLoader.php:342
 msgid "Insert expression"
 msgstr "Insira a expressão"
 
@@ -9879,7 +9890,7 @@ msgstr "Período de tempo inválido."
 #: include/classes/helpers/CMenuHelper.php:103
 #: include/classes/helpers/CRoleHelper.php:350
 #: include/views/configuration.host.edit.php:446
-#: include/views/configuration.host.prototype.edit.php:363 jsLoader.php:355
+#: include/views/configuration.host.prototype.edit.php:363 jsLoader.php:350
 msgid "Inventory"
 msgstr "Inventário"
 
@@ -10069,7 +10080,7 @@ msgstr ""
 msgid "Item tags"
 msgstr ""
 
-#: jsLoader.php:377
+#: jsLoader.php:372
 msgid "Item type does not use interface"
 msgstr ""
 
@@ -10230,7 +10241,7 @@ msgstr ""
 msgid "Jan"
 msgstr "Jan"
 
-#: include/func.inc.php:100 include/func.inc.php:237 jsLoader.php:228
+#: include/func.inc.php:100 include/func.inc.php:237 jsLoader.php:223
 msgid "January"
 msgstr "Janeiro"
 
@@ -10252,7 +10263,7 @@ msgstr ""
 msgid "Jul"
 msgstr "Jul"
 
-#: include/func.inc.php:106 include/func.inc.php:243 jsLoader.php:234
+#: include/func.inc.php:106 include/func.inc.php:243 jsLoader.php:229
 msgid "July"
 msgstr "Julho"
 
@@ -10260,7 +10271,7 @@ msgstr "Julho"
 msgid "Jun"
 msgstr "Jun"
 
-#: include/func.inc.php:105 include/func.inc.php:242 jsLoader.php:233
+#: include/func.inc.php:105 include/func.inc.php:242 jsLoader.php:228
 msgid "June"
 msgstr "Junho"
 
@@ -10443,11 +10454,11 @@ msgstr ""
 msgid "Last check"
 msgstr "Última verificação"
 
-#: jsLoader.php:358
+#: jsLoader.php:353
 msgid "Last hour graph"
 msgstr "Gráfico da última hora"
 
-#: jsLoader.php:359
+#: jsLoader.php:354
 msgid "Last month graph"
 msgstr "Gráfico do último mês"
 
@@ -10477,7 +10488,7 @@ msgstr ""
 msgid "Last value"
 msgstr "Último valor"
 
-#: jsLoader.php:360
+#: jsLoader.php:355
 msgid "Last week graph"
 msgstr "Gráfico da última semana"
 
@@ -10490,11 +10501,11 @@ msgstr "Gráfico da última semana"
 #: include/classes/helpers/CMenuHelper.php:61
 #: include/classes/helpers/CRoleHelper.php:383
 #: include/views/inventory.host.view.php:143
-#: include/views/inventory.host.view.php:149 jsLoader.php:356
+#: include/views/inventory.host.view.php:149 jsLoader.php:351
 msgid "Latest data"
 msgstr "Dados recentes"
 
-#: jsLoader.php:357
+#: jsLoader.php:352
 msgid "Latest values"
 msgstr "Últimos valores"
 
@@ -10820,7 +10831,7 @@ msgstr "A regra de autodescoberta (LLD) está em estado \"não suportado\""
 msgid "M"
 msgstr "M"
 
-#: jsLoader.php:247
+#: jsLoader.php:242
 msgctxt "Monday short"
 msgid "M"
 msgstr "M"
@@ -11005,7 +11016,7 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormMap.php:70 include/maps.inc.php:27
 #: include/views/js/monitoring.sysmaps.js.php:93
 #: include/views/js/monitoring.sysmaps.js.php:208
-#: include/views/monitoring.sysmap.edit.php:317 jsLoader.php:261 map.php:25
+#: include/views/monitoring.sysmap.edit.php:317 jsLoader.php:256 map.php:25
 msgid "Map"
 msgstr "Mapa"
 
@@ -11106,7 +11117,7 @@ msgstr "Mapas"
 msgid "Mar"
 msgstr "Mar"
 
-#: include/func.inc.php:102 include/func.inc.php:239 jsLoader.php:230
+#: include/func.inc.php:102 include/func.inc.php:239 jsLoader.php:225
 msgid "March"
 msgstr "Março"
 
@@ -11222,7 +11233,7 @@ msgstr[1] "O período máximo a ser exibido é de %1$s dias."
 msgid "Maximum total length of email address exceeded for media type with ID \"%1$s\"."
 msgstr ""
 
-#: include/func.inc.php:104 include/func.inc.php:241 jsLoader.php:232
+#: include/func.inc.php:104 include/func.inc.php:241 jsLoader.php:227
 msgid "May"
 msgstr "Mai"
 
@@ -11575,7 +11586,7 @@ msgstr ""
 msgid "Mon"
 msgstr "Seg"
 
-#: include/func.inc.php:119 include/func.inc.php:209 jsLoader.php:240
+#: include/func.inc.php:119 include/func.inc.php:209 jsLoader.php:235
 msgid "Monday"
 msgstr "Segunda-feira"
 
@@ -11616,11 +11627,11 @@ msgstr "Mês"
 msgid "Monthly"
 msgstr "Mensal"
 
-#: include/classes/html/CMultiSelect.php:83 jsLoader.php:319
+#: include/classes/html/CMultiSelect.php:83 jsLoader.php:314
 msgid "More matches found..."
 msgstr "Mais correspondentes encontrados..."
 
-#: jsLoader.php:329
+#: jsLoader.php:324
 #, c-format
 msgctxt "screen reader"
 msgid "More than %1$d matches for %2$s found"
@@ -11649,7 +11660,7 @@ msgstr "Múltiplo"
 msgid "Multiple PROBLEM events"
 msgstr "Múltiplos eventos de PROBLEMA"
 
-#: jsLoader.php:289
+#: jsLoader.php:284
 msgid "Mute"
 msgstr "Silenciar"
 
@@ -11919,7 +11930,7 @@ msgstr "Nova condição"
 msgid "New dashboard"
 msgstr "Novo dashboard"
 
-#: jsLoader.php:275
+#: jsLoader.php:270
 msgid "New element"
 msgstr "Novo elemento"
 
@@ -11956,7 +11967,7 @@ msgid "New triggers"
 msgstr "Novos triggers"
 
 #: app/views/monitoring.dashboard.view.php:175
-#: app/views/monitoring.host.dashboard.view.php:112 jsLoader.php:188
+#: app/views/monitoring.host.dashboard.view.php:112 jsLoader.php:183
 msgid "Next page"
 msgstr ""
 
@@ -12182,7 +12193,7 @@ msgstr "Sem imagem"
 #: app/views/popup.massupdate.item.php:67
 #: include/views/configuration.host.discovery.edit.php:493
 #: include/views/configuration.item.edit.php:546
-#: include/views/configuration.item.prototype.edit.php:533 jsLoader.php:376
+#: include/views/configuration.item.prototype.edit.php:533 jsLoader.php:371
 msgid "No interface found"
 msgstr "Interface não encontrado"
 
@@ -12222,7 +12233,7 @@ msgstr "Nenhuma macro encontrada."
 msgid "No maps added."
 msgstr "Nenhum mapa adicionado."
 
-#: include/classes/html/CMultiSelect.php:82 jsLoader.php:318
+#: include/classes/html/CMultiSelect.php:82 jsLoader.php:313
 msgid "No matches found"
 msgstr "Nenhuma correspondência encontrada"
 
@@ -12369,7 +12380,7 @@ msgstr ""
 #: include/classes/api/services/CProxy.php:733
 #: include/classes/api/services/CProxy.php:767
 #: include/classes/api/services/CProxy.php:854
-#: include/classes/api/services/CReport.php:925
+#: include/classes/api/services/CReport.php:910
 #: include/classes/api/services/CRole.php:388
 #: include/classes/api/services/CRole.php:805
 #: include/classes/api/services/CScript.php:540
@@ -12431,7 +12442,7 @@ msgstr "Não foi especificado o ficheiro de chave pública."
 msgid "No recipients for action operation message."
 msgstr "Não existem destinos para a operação mensagem da acção."
 
-#: include/classes/widgets/CWidgetConfig.php:282 jsLoader.php:183
+#: include/classes/widgets/CWidgetConfig.php:282 jsLoader.php:178
 msgid "No refresh"
 msgstr "Não atualizar"
 
@@ -12598,7 +12609,7 @@ msgstr "Notificar todos os envolvidos"
 msgid "Nov"
 msgstr "Nov"
 
-#: include/func.inc.php:110 include/func.inc.php:247 jsLoader.php:238
+#: include/func.inc.php:110 include/func.inc.php:247 jsLoader.php:233
 msgid "November"
 msgstr "Novembro"
 
@@ -12837,13 +12848,13 @@ msgstr "Out"
 msgid "Octal to decimal"
 msgstr "Octal para decimal"
 
-#: include/func.inc.php:109 include/func.inc.php:246 jsLoader.php:237
+#: include/func.inc.php:109 include/func.inc.php:246 jsLoader.php:232
 msgid "October"
 msgstr "Outubro"
 
 #: app/views/administration.proxy.list.php:155
 #: include/views/monitoring.sysmap.constructor.php:51
-#: include/views/monitoring.sysmap.constructor.php:61 jsLoader.php:257
+#: include/views/monitoring.sysmap.constructor.php:61 jsLoader.php:252
 msgid "Off"
 msgstr "Inactivo"
 
@@ -12856,7 +12867,7 @@ msgstr "Inactivo"
 #: app/views/report.services.php:82 app/views/report.services.php:83
 #: include/views/configuration.triggers.list.php:94
 #: include/views/js/common.item.edit.js.php:334
-#: include/views/js/configuration.httpconf.edit.js.php:103 jsLoader.php:388
+#: include/views/js/configuration.httpconf.edit.js.php:103 jsLoader.php:383
 #: report2.php:506
 msgid "Ok"
 msgstr "Ok"
@@ -12875,7 +12886,7 @@ msgstr ""
 
 #: app/views/administration.proxy.list.php:154
 #: include/views/monitoring.sysmap.constructor.php:51
-#: include/views/monitoring.sysmap.constructor.php:61 jsLoader.php:256
+#: include/views/monitoring.sysmap.constructor.php:61 jsLoader.php:251
 msgid "On"
 msgstr "Activo"
 
@@ -13465,7 +13476,7 @@ msgstr "Identidade PSK"
 msgid "PSK is too short. Minimum is %1$s hex-digits."
 msgstr "A chave PSK é muito pequena. O tamanho mínimo são %1$s dígitos hexadecimais."
 
-#: jsLoader.php:160
+#: jsLoader.php:156
 #, c-format
 msgid "Page %1$d"
 msgstr ""
@@ -13598,19 +13609,21 @@ msgstr "Senha (novamente)"
 msgid "Password is not mandatory for non internal authentication type."
 msgstr ""
 
-#: jsLoader.php:184 jsLoader.php:277
+#: jsLoader.php:179 jsLoader.php:272
 msgid "Paste"
 msgstr "Colar"
 
-#: jsLoader.php:161
+#: app/views/js/configuration.dashboard.edit.js.php:212
+#: app/views/js/monitoring.dashboard.view.js.php:322
 msgid "Paste page"
 msgstr ""
 
-#: jsLoader.php:162
+#: app/views/js/configuration.dashboard.edit.js.php:205
+#: app/views/js/monitoring.dashboard.view.js.php:315 jsLoader.php:157
 msgid "Paste widget"
 msgstr ""
 
-#: jsLoader.php:278
+#: jsLoader.php:273
 msgid "Paste without external links"
 msgstr "Colar sem os links externos"
 
@@ -13754,7 +13767,7 @@ msgstr ""
 msgid "Please enter the host name or host IP address and port number of the Zabbix server, as well as the name of the installation (optional)."
 msgstr "Por favor informe o nome ou IP e a porta do servidor Zabbix, assim como um nome para esta instalação (opcional)."
 
-#: jsLoader.php:266
+#: jsLoader.php:261
 msgid "Please select two elements"
 msgstr "Por favor seleccione dois elementos"
 
@@ -13788,7 +13801,7 @@ msgstr "Polaco (pl_PL)"
 msgid "Populates host inventory field"
 msgstr "Preenche o campo inventário do host"
 
-#: app/controllers/CControllerPopupItemTest.php:1299
+#: app/controllers/CControllerPopupItemTest.php:1310
 #: app/partials/monitoring.host.filter.php:113
 #: app/views/administration.authentication.edit.php:101
 #: app/views/administration.proxy.edit.php:54
@@ -13883,7 +13896,7 @@ msgid "Previous month"
 msgstr ""
 
 #: app/views/monitoring.dashboard.view.php:157
-#: app/views/monitoring.host.dashboard.view.php:94 jsLoader.php:189
+#: app/views/monitoring.host.dashboard.view.php:94 jsLoader.php:184
 msgid "Previous page"
 msgstr ""
 
@@ -14011,7 +14024,7 @@ msgstr ""
 msgid "Problem is suppressed"
 msgstr ""
 
-#: jsLoader.php:287
+#: jsLoader.php:282
 msgid "Problem on"
 msgstr "Problema em"
 
@@ -14059,7 +14072,7 @@ msgstr "Problema, se pelo menos um dos filhos tiver um problema"
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:35
 #: include/classes/widgets/views/widget.svggraph.form.view.php:295
 #: include/views/inventory.host.view.php:151
-#: include/views/inventory.host.view.php:156 jsLoader.php:361 report2.php:506
+#: include/views/inventory.host.view.php:156 jsLoader.php:356 report2.php:506
 msgid "Problems"
 msgstr "Problemas"
 
@@ -14093,7 +14106,7 @@ msgid "Prometheus to JSON"
 msgstr ""
 
 #: include/views/monitoring.sysmap.list.php:76
-#: include/views/monitoring.sysmap.list.php:77 jsLoader.php:163
+#: include/views/monitoring.sysmap.list.php:77 jsLoader.php:158
 msgid "Properties"
 msgstr "Propriedades"
 
@@ -14378,7 +14391,7 @@ msgstr "Retângulo"
 msgid "Refresh"
 msgstr "Atualizar"
 
-#: include/classes/widgets/forms/CWidgetForm.php:58 jsLoader.php:185
+#: include/classes/widgets/forms/CWidgetForm.php:58 jsLoader.php:180
 msgid "Refresh interval"
 msgstr "Intervalo de atualização"
 
@@ -14439,7 +14452,7 @@ msgstr "Expressões regulares"
 msgid "Related reports"
 msgstr ""
 
-#: jsLoader.php:170
+#: jsLoader.php:165
 msgid "Release to create a widget."
 msgstr ""
 
@@ -14581,8 +14594,8 @@ msgstr "Comando remoto"
 #: include/views/monitoring.sysmap.constructor.php:34
 #: include/views/monitoring.sysmap.constructor.php:40
 #: include/views/monitoring.sysmap.constructor.php:46
-#: include/views/monitoring.sysmap.edit.php:292 jsLoader.php:205
-#: jsLoader.php:274
+#: include/views/monitoring.sysmap.edit.php:292 jsLoader.php:200
+#: jsLoader.php:269
 msgid "Remove"
 msgstr "Eliminar"
 
@@ -14622,7 +14635,7 @@ msgstr ""
 msgid "Removed"
 msgstr ""
 
-#: jsLoader.php:324
+#: jsLoader.php:319
 #, c-format
 msgctxt "screen reader"
 msgid "Removed, %1$s"
@@ -14794,7 +14807,7 @@ msgstr "Confirmação de reinicialização"
 msgid "Reset defaults"
 msgstr "Reinicializar para valores por omissão"
 
-#: jsLoader.php:288
+#: jsLoader.php:283
 msgid "Resolved"
 msgstr "Resolvido"
 
@@ -15026,12 +15039,12 @@ msgstr "Executa o comando em no host. Retorna o texto retornado pelo comando; 1 
 msgid "Russian (ru_RU)"
 msgstr "Russo (ru_RU)"
 
-#: jsLoader.php:252
+#: jsLoader.php:247
 msgctxt "Saturday short"
 msgid "S"
 msgstr "S"
 
-#: jsLoader.php:253
+#: jsLoader.php:248
 msgctxt "Sunday short"
 msgid "S"
 msgstr "D"
@@ -15099,7 +15112,7 @@ msgstr "SNMP OID"
 msgid "SNMP agent"
 msgstr ""
 
-#: app/controllers/CControllerPopupItemTest.php:1284
+#: app/controllers/CControllerPopupItemTest.php:1295
 #: app/views/popup.discovery.check.php:68
 #: app/views/popup.itemtestedit.view.php:140
 #: include/views/js/configuration.host.edit.js.php:89
@@ -15255,7 +15268,7 @@ msgstr "Sans-Serif"
 msgid "Sat"
 msgstr "Sáb"
 
-#: include/func.inc.php:124 include/func.inc.php:214 jsLoader.php:245
+#: include/func.inc.php:124 include/func.inc.php:214 jsLoader.php:240
 msgid "Saturday"
 msgstr "Sábado"
 
@@ -15428,7 +15441,7 @@ msgstr "Script actualizado"
 #: app/views/administration.script.edit.php:31
 #: app/views/administration.script.list.php:31
 #: include/classes/helpers/CMenuHelper.php:291
-#: include/classes/helpers/CRoleHelper.php:463 jsLoader.php:362
+#: include/classes/helpers/CRoleHelper.php:463 jsLoader.php:357
 msgid "Scripts"
 msgstr "Scripts"
 
@@ -15508,7 +15521,7 @@ msgstr "Nome de segurança"
 #: include/views/configuration.item.prototype.edit.php:83
 #: include/views/configuration.item.prototype.edit.php:479
 #: include/views/configuration.services.edit.php:99
-#: include/views/js/monitoring.sysmaps.js.php:216 jsLoader.php:322
+#: include/views/js/monitoring.sysmaps.js.php:216 jsLoader.php:317
 msgid "Select"
 msgstr "Seleccionar"
 
@@ -15544,19 +15557,19 @@ msgstr "Elementos seleccionados"
 msgid "Selected items only"
 msgstr ""
 
-#: jsLoader.php:327
+#: jsLoader.php:322
 #, c-format
 msgctxt "screen reader"
 msgid "Selected, %1$s in position %2$d of %3$d"
 msgstr ""
 
-#: jsLoader.php:328
+#: jsLoader.php:323
 #, c-format
 msgctxt "screen reader"
 msgid "Selected, %1$s, read only, in position %2$d of %3$d"
 msgstr ""
 
-#: jsLoader.php:272
+#: jsLoader.php:267
 msgid "Send backward"
 msgstr "Enviar para trás"
 
@@ -15581,7 +15594,7 @@ msgstr "Enviar apenas para"
 msgid "Send to"
 msgstr "Enviar para"
 
-#: jsLoader.php:273
+#: jsLoader.php:268
 msgid "Send to back"
 msgstr "Enviar para trás"
 
@@ -15614,7 +15627,7 @@ msgstr "Separado"
 msgid "Separately"
 msgstr ""
 
-#: include/func.inc.php:108 include/func.inc.php:245 jsLoader.php:236
+#: include/func.inc.php:108 include/func.inc.php:245 jsLoader.php:231
 msgid "September"
 msgstr "Setembro"
 
@@ -15763,7 +15776,7 @@ msgstr ""
 msgid "Set host inventory mode"
 msgstr "Defina o modo de inventário de host"
 
-#: include/classes/html/CInputSecret.php:80 jsLoader.php:394
+#: include/classes/html/CInputSecret.php:80 jsLoader.php:389
 msgid "Set new value"
 msgstr ""
 
@@ -15853,7 +15866,7 @@ msgstr ""
 msgid "Shared"
 msgstr ""
 
-#: include/views/monitoring.sysmap.edit.php:414 jsLoader.php:348
+#: include/views/monitoring.sysmap.edit.php:414 jsLoader.php:343
 msgid "Sharing"
 msgstr "Partilha"
 
@@ -15995,7 +16008,7 @@ msgstr "Mostrar aviso se o Zabbix Server estiver offline"
 msgid "Show working time"
 msgstr "Mostrar horário de trabalho"
 
-#: include/views/monitoring.sysmap.constructor.php:57 jsLoader.php:259
+#: include/views/monitoring.sysmap.constructor.php:57 jsLoader.php:254
 msgid "Shown"
 msgstr "Exibido"
 
@@ -16104,7 +16117,7 @@ msgstr "Ignorada a cópia do gráfico \"%1$s\" para o host \"%2$s\"."
 msgid "Slovak (sk_SK)"
 msgstr "Eslovaco (sk_SK)"
 
-#: jsLoader.php:293
+#: jsLoader.php:288
 msgid "Snooze"
 msgstr "Adiar"
 
@@ -16228,7 +16241,7 @@ msgstr "Começar em"
 #: app/views/monitoring.dashboard.view.php:164
 #: app/views/monitoring.dashboard.view.php:232
 #: app/views/monitoring.host.dashboard.view.php:101
-#: app/views/monitoring.host.dashboard.view.php:165 jsLoader.php:164
+#: app/views/monitoring.host.dashboard.view.php:165 jsLoader.php:159
 msgid "Start slideshow"
 msgstr ""
 
@@ -16402,7 +16415,7 @@ msgstr ""
 #: app/views/monitoring.dashboard.view.php:163
 #: app/views/monitoring.dashboard.view.php:233
 #: app/views/monitoring.host.dashboard.view.php:100
-#: app/views/monitoring.host.dashboard.view.php:166 jsLoader.php:165
+#: app/views/monitoring.host.dashboard.view.php:166 jsLoader.php:160
 msgid "Stop slideshow"
 msgstr ""
 
@@ -16467,7 +16480,7 @@ msgctxt "encryption certificate"
 msgid "Subject"
 msgstr "Segurado"
 
-#: jsLoader.php:363
+#: jsLoader.php:358
 msgid "Submap"
 msgstr "Submapa"
 
@@ -16483,7 +16496,7 @@ msgstr ""
 msgid "Success Audit"
 msgstr "Auditoria de sucesso"
 
-#: include/func.inc.php:1641 jsLoader.php:222
+#: include/func.inc.php:1641 jsLoader.php:217
 msgid "Success message"
 msgstr ""
 
@@ -16496,7 +16509,7 @@ msgstr "Sumarização das estatísticas de entrada e saída da interface de rede
 msgid "Sun"
 msgstr "Dom"
 
-#: include/func.inc.php:126 include/func.inc.php:208 jsLoader.php:246
+#: include/func.inc.php:126 include/func.inc.php:208 jsLoader.php:241
 msgid "Sunday"
 msgstr "Domingo"
 
@@ -16595,12 +16608,12 @@ msgstr "Horário do sistema. Retorna: número inteiro - se o tipo for UTC; Texto
 msgid "System uptime in seconds. Returns integer"
 msgstr "Tempo desde a carga do sistema. Retorna: número inteiro"
 
-#: jsLoader.php:250
+#: jsLoader.php:245
 msgctxt "Thursday short"
 msgid "T"
 msgstr "Q"
 
-#: jsLoader.php:248
+#: jsLoader.php:243
 msgctxt "Tuesday short"
 msgid "T"
 msgstr "T"
@@ -17132,7 +17145,7 @@ msgstr ""
 msgid "Thu"
 msgstr "Qui"
 
-#: include/func.inc.php:122 include/func.inc.php:212 jsLoader.php:243
+#: include/func.inc.php:122 include/func.inc.php:212 jsLoader.php:238
 msgid "Thursday"
 msgstr "Quinta-feira"
 
@@ -17236,7 +17249,7 @@ msgstr "Timestamp"
 msgid "To"
 msgstr "Para"
 
-#: jsLoader.php:375
+#: jsLoader.php:370
 msgid "To set a host interface select a single item type for all items"
 msgstr "Para definir uma interface do host seleccionar um tipo de item único para todos os itens"
 
@@ -17368,7 +17381,7 @@ msgstr "Tendências"
 #: include/views/configuration.triggers.edit.php:571
 #: include/views/js/monitoring.sysmaps.js.php:94
 #: include/views/js/monitoring.sysmaps.js.php:792
-#: include/views/reports.toptriggers.php:83 jsLoader.php:262 jsLoader.php:364
+#: include/views/reports.toptriggers.php:83 jsLoader.php:257 jsLoader.php:359
 #: services.php:355
 msgid "Trigger"
 msgstr "Trigger"
@@ -17543,11 +17556,11 @@ msgstr "Protótipos de trigger actualizados"
 msgid "Trigger severity"
 msgstr "Severidade do trigger"
 
-#: jsLoader.php:349
+#: jsLoader.php:344
 msgid "Trigger status \"OK\""
 msgstr "Status do trigger \"OK\""
 
-#: jsLoader.php:350
+#: jsLoader.php:345
 msgid "Trigger status \"Problem\""
 msgstr "Status do trigger \"Problema\""
 
@@ -17599,7 +17612,7 @@ msgstr "Remover espaços"
 msgid "Tue"
 msgstr "Ter"
 
-#: include/func.inc.php:120 include/func.inc.php:210 jsLoader.php:241
+#: include/func.inc.php:120 include/func.inc.php:210 jsLoader.php:236
 msgid "Tuesday"
 msgstr "Terça-feira"
 
@@ -17612,7 +17625,7 @@ msgstr "Turco (tr_TR)"
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
 msgstr "Dois itens (\"%1$s\" e \"%2$s\") não podem preencher o campo de inventário \"%3$s\" de um host, isto levaria a um conflito."
 
-#: jsLoader.php:267
+#: jsLoader.php:262
 msgid "Two map elements should be selected"
 msgstr ""
 
@@ -17713,7 +17726,7 @@ msgstr "DESCONHECIDO"
 #: include/views/configuration.trigger.prototype.edit.php:530
 #: include/views/configuration.triggers.edit.php:557
 #: include/views/js/monitoring.sysmaps.js.php:314
-#: include/views/monitoring.sysmap.edit.php:278 items.php:158 jsLoader.php:365
+#: include/views/monitoring.sysmap.edit.php:278 items.php:158 jsLoader.php:360
 msgid "URL"
 msgstr "URL"
 
@@ -17759,7 +17772,7 @@ msgid "URL should have both \"name\" and \"url\" fields for map \"%1$s\"."
 msgstr "A URL deverá possuir os campos \"name\" e \"url\" no mapa \"%1$s\"."
 
 #: include/views/js/monitoring.sysmaps.js.php:311
-#: include/views/monitoring.sysmap.edit.php:311 jsLoader.php:366
+#: include/views/monitoring.sysmap.edit.php:311 jsLoader.php:361
 msgid "URLs"
 msgstr "URLs"
 
@@ -17952,7 +17965,7 @@ msgstr "Desassociar do template"
 msgid "Unlink from templates"
 msgstr "Desassociar dos templates"
 
-#: jsLoader.php:291
+#: jsLoader.php:286
 msgid "Unmute"
 msgstr "Reactivar"
 
@@ -18983,7 +18996,7 @@ msgstr "Nome visível"
 msgid "Visible name cannot be empty if host name is missing."
 msgstr "O nome visível não pode estar vazio se não estiver definido o nome do host."
 
-#: jsLoader.php:249
+#: jsLoader.php:244
 msgctxt "Wednesday short"
 msgid "W"
 msgstr "Q"
@@ -19000,11 +19013,11 @@ msgctxt "setup"
 msgid "Warning"
 msgstr "Aviso"
 
-#: include/func.inc.php:1643 jsLoader.php:224
+#: include/func.inc.php:1643 jsLoader.php:219
 msgid "Warning message"
 msgstr ""
 
-#: jsLoader.php:296
+#: jsLoader.php:291
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
 msgstr "Pedimos desculpa, foi atingido o número máximo possível de elementos."
 
@@ -19020,7 +19033,7 @@ msgstr "Pedimos desculpa, foi atingido o número máximo possível de elementos.
 #: include/views/inventory.host.view.php:136
 #: include/views/inventory.host.view.php:141
 #: include/views/inventory.host.view.php:206
-#: include/views/inventory.host.view.php:219 jsLoader.php:367
+#: include/views/inventory.host.view.php:219 jsLoader.php:362
 msgid "Web"
 msgstr "Web"
 
@@ -19090,7 +19103,7 @@ msgstr ""
 msgid "Wed"
 msgstr "Qua"
 
-#: include/func.inc.php:121 include/func.inc.php:211 jsLoader.php:242
+#: include/func.inc.php:121 include/func.inc.php:211 jsLoader.php:237
 msgid "Wednesday"
 msgstr "Quarta-feira"
 
@@ -19118,7 +19131,7 @@ msgstr "Quando activado"
 msgid "Widget at X:%3$d, Y:%4$d on page #%2$d of dashboard \"%1$s\" is out of bounds."
 msgstr ""
 
-#: jsLoader.php:191
+#: jsLoader.php:186
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr ""
 
@@ -19931,9 +19944,9 @@ msgstr "não pode ser modificado"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:141
 #: app/controllers/CControllerAuthenticationUpdate.php:213
-#: app/controllers/CControllerPopupItemTest.php:1284
-#: app/controllers/CControllerPopupItemTest.php:1292
-#: app/controllers/CControllerPopupItemTest.php:1299
+#: app/controllers/CControllerPopupItemTest.php:1295
+#: app/controllers/CControllerPopupItemTest.php:1303
+#: app/controllers/CControllerPopupItemTest.php:1310
 #: app/controllers/CControllerPopupLldOperation.php:131
 #: app/controllers/CControllerPopupLldOperation.php:138
 #: app/controllers/CControllerPopupLldOperation.php:143
@@ -20084,7 +20097,7 @@ msgstr ""
 msgid "circular item dependency is not allowed"
 msgstr "dependência circular entre itens não é permitida"
 
-#: jsLoader.php:299
+#: jsLoader.php:294
 msgid "colour"
 msgstr ""
 
@@ -20131,7 +20144,7 @@ msgstr ""
 msgid "countunique() - The number of unique values"
 msgstr ""
 
-#: include/func.inc.php:579 jsLoader.php:218
+#: include/func.inc.php:579 jsLoader.php:213
 msgctxt "day short"
 msgid "d"
 msgstr "d"
@@ -20330,7 +20343,7 @@ msgstr "configurações globais de limpeza de dados"
 msgid "graph pattern"
 msgstr ""
 
-#: include/func.inc.php:580 jsLoader.php:219
+#: include/func.inc.php:580 jsLoader.php:214
 msgctxt "hour short"
 msgid "h"
 msgstr "h"
@@ -20614,12 +20627,12 @@ msgstr "regra de autodescoberta (LLD)"
 msgid "ltrim() - Remove specified characters from the beginning of a string"
 msgstr ""
 
-#: include/func.inc.php:581 jsLoader.php:140 jsLoader.php:220 jsLoader.php:384
+#: include/func.inc.php:581 jsLoader.php:140 jsLoader.php:215 jsLoader.php:379
 msgctxt "minute short"
 msgid "m"
 msgstr "m"
 
-#: include/func.inc.php:578 jsLoader.php:217
+#: include/func.inc.php:578 jsLoader.php:212
 msgctxt "month short"
 msgid "m"
 msgstr "m"
@@ -20774,7 +20787,7 @@ msgstr ""
 msgid "name"
 msgstr "nome"
 
-#: include/classes/html/CMultiSelect.php:85 jsLoader.php:321
+#: include/classes/html/CMultiSelect.php:85 jsLoader.php:316
 msgid "new"
 msgstr "novo"
 
@@ -20909,7 +20922,7 @@ msgstr "saída"
 msgid "path/to/secret"
 msgstr ""
 
-#: include/classes/html/CMacroValue.php:139 jsLoader.php:395
+#: include/classes/html/CMacroValue.php:139 jsLoader.php:390
 msgid "path/to/secret:key"
 msgstr ""
 
@@ -21218,7 +21231,7 @@ msgstr ""
 msgid "time filter default period exceeds the max period"
 msgstr ""
 
-#: jsLoader.php:300
+#: jsLoader.php:295
 msgid "time shift"
 msgstr ""
 
@@ -21281,7 +21294,7 @@ msgid "truncate() - Truncates a value to decimal places"
 msgstr ""
 
 #: app/partials/layout.htmlpage.aside.php:74
-#: include/classes/html/CMultiSelect.php:84 jsLoader.php:320
+#: include/classes/html/CMultiSelect.php:84 jsLoader.php:315
 msgid "type here to search"
 msgstr "digite aqui para pesquisar"
 
@@ -21420,7 +21433,7 @@ msgstr "número de versão não suportado"
 #: include/views/js/configuration.httpconf.edit.js.php:73
 #: include/views/js/configuration.maintenance.edit.js.php:37
 #: include/views/js/configuration.maintenance.edit.js.php:61
-#: include/views/js/item.preprocessing.js.php:416 jsLoader.php:396
+#: include/views/js/item.preprocessing.js.php:416 jsLoader.php:391
 msgid "value"
 msgstr "valor"
 
@@ -21561,7 +21574,7 @@ msgstr ""
 msgid "wrong item type"
 msgstr ""
 
-#: include/func.inc.php:577 jsLoader.php:216
+#: include/func.inc.php:577 jsLoader.php:211
 msgctxt "year short"
 msgid "y"
 msgstr "a"
