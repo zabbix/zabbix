@@ -44,7 +44,7 @@ PREPARE_AUDIT_SNMP_INTERFACE_H(host_prototype)
 void	zbx_audit_host_update_json_add_proxy_hostid_and_hostname_and_inventory_mode(zbx_uint64_t hostid,
 		zbx_uint64_t proxy_hostid, const char *hostname, int inventory_mode);
 void	zbx_audit_host_update_json_add_tls_and_psk(zbx_uint64_t hostid, int tls_connect, int tls_accept,
-		const char *psk_identity, const char *psk);
+		const char *tls_psk_identity, const char *tls_psk);
 void	zbx_audit_host_update_json_add_inventory_mode(zbx_uint64_t hostid, int inventory_mode);
 void	zbx_audit_host_update_json_update_inventory_mode(zbx_uint64_t hostid, int inventory_mode_old,
 		int inventory_mode_new);
