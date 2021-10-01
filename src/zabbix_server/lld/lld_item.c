@@ -4520,6 +4520,24 @@ static void	lld_applications_validate(zbx_uint64_t hostid, zbx_uint64_t lld_rule
 		if (0 != application->applicationid && 0 == (application->flags & ZBX_FLAG_LLD_APPLICATION_UPDATE_NAME))
 			continue;
 
+		if (SUCCEED != zbx_is_utf8(application->name))
+		{
+			zbx_replace_invalid_utf8(application->name);
+			*error = zbx_strdcatf(*error,
+					"Cannot %s application: value \"%s\" has invalid UTF-8 sequence.\n",
+					(0 != application->applicationid ? "update" : "create"), application->name);
+			application->flags &= ~ZBX_FLAG_LLD_APPLICATION_DISCOVERED;
+			continue;
+		}
+
+		if (APPLICATION_NAME_LEN < zbx_strlen_utf8(application->name))
+		{
+			*error = zbx_strdcatf(*error, "Cannot %s application: value \"%s\" is too long.\n",
+					(0 != application->applicationid ? "update" : "create"), application->name);
+			application->flags &= ~ZBX_FLAG_LLD_APPLICATION_DISCOVERED;
+			continue;
+		}
+
 		/* iterate in reverse order so existing applications would have more priority */
 		/* than new applications which have 0 applicationid and therefore are located */
 		/* at the beginning of applications vector which is sorted by applicationid   */

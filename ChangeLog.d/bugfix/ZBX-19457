@@ -1,0 +1,1 @@
+........S. [ZBX-19457] fixed failed query when updating application names longer than 255 characters (asestakovs)
