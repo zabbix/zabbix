@@ -585,7 +585,7 @@ class CCorrelation extends CApiService {
 
 			foreach ($correlation['filter']['conditions'] as $condition) {
 				if ($condition['type'] == ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP) {
-					$groupids[] = $condition['groupid'];
+					$groupids[$condition['groupid']] = true;
 				}
 			}
 		}
@@ -596,7 +596,7 @@ class CCorrelation extends CApiService {
 
 		$groups_count = API::HostGroup()->get([
 			'countOutput' => true,
-			'groupids' => $groupids
+			'groupids' => array_keys($groupids)
 		]);
 
 		if ($groups_count != count($groupids)) {
