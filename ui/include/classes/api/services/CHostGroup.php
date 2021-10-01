@@ -1063,13 +1063,13 @@ class CHostGroup extends CApiService {
 	private function validateMassAdd(array $data, ?array &$db_groups): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
 			'groups' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
-				'groupid' =>		['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY]
+				'groupid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
 			'hosts' =>			['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['hostid']], 'fields' => [
-				'hostid'=>			['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY]
+				'hostid'=>			['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
 			'templates' =>		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
-				'templateid'=>		['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY]
+				'templateid'=>		['type' => API_ID, 'flags' => API_REQUIRED]
 			]]
 		]];
 
@@ -1124,13 +1124,13 @@ class CHostGroup extends CApiService {
 	private function validateMassUpdate(array &$data, ?array &$db_groups): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
 			'groups' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
-				'groupid' =>		['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY]
+				'groupid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
 			'hosts' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NORMALIZE, 'uniq' => [['hostid']], 'fields' => [
-				'hostid'=>			['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY]
+				'hostid'=>			['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
 			'templates' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
-				'templateid'=>		['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY]
+				'templateid'=>		['type' => API_ID, 'flags' => API_REQUIRED]
 			]]
 		]];
 
