@@ -335,7 +335,7 @@ int	zbx_default_dbl_compare_func(const void *d1, const void *d2)
 	const double	*p1 = (const double *)d1;
 	const double	*p2 = (const double *)d2;
 
-	ZBX_RETURN_IF_NOT_EQUAL(*p1, *p2);
+	ZBX_RETURN_IF_DBL_NOT_EQUAL(*p1, *p2);
 
 	return 0;
 }

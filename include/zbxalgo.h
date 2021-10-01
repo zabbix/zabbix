@@ -90,6 +90,16 @@ typedef void (*zbx_clean_func_t)(void *data);
 	if ((a) > (b))			\
 		return +1
 
+#define ZBX_RETURN_IF_DBL_NOT_EQUAL(a, b)	\
+						\
+	if (FAIL == zbx_double_compare(a, b))	\
+	{					\
+		if ((a) < (b))			\
+			return -1;		\
+		else				\
+			return +1;		\
+	}
+
 int	is_prime(int n);
 int	next_prime(int n);
 

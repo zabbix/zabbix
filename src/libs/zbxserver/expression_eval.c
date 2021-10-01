@@ -1385,9 +1385,10 @@ static void	expression_eval_exists(zbx_expression_eval_t *eval, zbx_expression_q
 
 /******************************************************************************
  *                                                                            *
- * Function: expression_eval_brate                                            *
+ * Function: expression_eval_bucket_rate                                      *
  *                                                                            *
  * Purpose: evaluate functions 'bucket_rate_foreach' for 'histogram_quantile' *
+ *          and evaluate functions 'bucket_percentile'                        *
  *                                                                            *
  * Parameters: eval      - [IN] the evaluation data                           *
  *             query     - [IN] the calculated item query                     *

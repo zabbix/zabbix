@@ -2759,8 +2759,11 @@ static int	evaluate_RATE(zbx_variant_t *value, DC_ITEM *item, const char *parame
 
 		for (i = values.values_num - 1; i >= 0; i--)
 		{
-			if (HVD(values.values[i].value) < HVD(last))
+			if (FAIL == zbx_double_compare(HVD(values.values[i].value), HVD(last)) &&
+					HVD(values.values[i].value) < HVD(last))
+			{
 				delta = delta + HVD(values.values[i].value);
+			}
 
 			last = values.values[i].value;
 		}
@@ -2768,13 +2771,9 @@ static int	evaluate_RATE(zbx_variant_t *value, DC_ITEM *item, const char *parame
 		/* Extrapolation */
 
 		if (ZBX_VALUE_NVALUES == arg1_type)
-		{
 			range = TS2DBL(LAST(values).timestamp) - TS2DBL(FIRST(values).timestamp);
-		}
 		else
-		{
 			range = seconds;
-		}
 
 		range_start = TS2DBL(ts_end) - range;
 		range_end = TS2DBL(ts_end);
@@ -2819,6 +2818,11 @@ out:
 			(FAIL == ret ? 0 : value->data.dbl), ZBX_NULL2EMPTY_STR(*error));
 
 	return ret;
+
+#	undef HVD
+#	undef TS2DBL
+#	undef LAST
+#	undef FIRST
 }
 
 int	zbx_evaluate_RATE(zbx_variant_t *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
