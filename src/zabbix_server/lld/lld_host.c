@@ -3113,11 +3113,10 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
 							"%stls_psk_identity='%s'", d, value_esc);
 					d = ",";
+					zbx_free(value_esc);
 
 					zbx_audit_host_update_json_update_tls_psk_identity(host->hostid,
 							AUDIT_SECRET_MASK, AUDIT_SECRET_MASK);
-
-					zbx_free(value_esc);
 				}
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK))
 				{
@@ -3126,11 +3125,10 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
 							"%stls_psk='%s'", d, value_esc);
 					d = ",";
+					zbx_free(value_esc);
 
 					zbx_audit_host_update_json_update_tls_psk(host->hostid,
 							AUDIT_SECRET_MASK, AUDIT_SECRET_MASK);
-
-					zbx_free(value_esc);
 				}
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_CUSTOM_INTERFACES))
 				{
