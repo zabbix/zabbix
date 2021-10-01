@@ -433,13 +433,11 @@ void	zbx_audit_host_update_json_add_details(zbx_uint64_t hostid, const char *hos
 	zbx_audit_update_json_append_string(hostid, AUDIT_DETAILS_ACTION_ADD, "host.ipmi_password", ipmi_password);
 	zbx_audit_update_json_append_int(hostid, AUDIT_DETAILS_ACTION_ADD, "host.status", status);
 	zbx_audit_update_json_append_int(hostid, AUDIT_DETAILS_ACTION_ADD, "host.flags", flags);
-	zbx_audit_update_json_append_int(hostid, AUDIT_DETAILS_ACTION_ADD, "host.tls_connect", tls_connect);
-	zbx_audit_update_json_append_int(hostid, AUDIT_DETAILS_ACTION_ADD, "host.tls_accept", tls_accept);
 	zbx_audit_update_json_append_string(hostid, AUDIT_DETAILS_ACTION_ADD, "host.tls_issuer", tls_issuer);
 	zbx_audit_update_json_append_string(hostid, AUDIT_DETAILS_ACTION_ADD, "host.tls_subject", tls_subject);
-	zbx_audit_update_json_append_string(hostid, AUDIT_DETAILS_ACTION_ADD, "host.tls_psk_identity",
-			tls_psk_identity);
-	zbx_audit_update_json_append_string(hostid, AUDIT_DETAILS_ACTION_ADD, "host.tls_psk", tls_psk);
+
+	zbx_audit_host_update_json_add_tls_and_psk(hostid, tls_connect, tls_accept, tls_psk_identity, tls_psk);
+
 	zbx_audit_update_json_append_int(hostid, AUDIT_DETAILS_ACTION_ADD, "host.custom_interfaces", custom_interfaces);
 	zbx_audit_update_json_append_int(hostid, AUDIT_DETAILS_ACTION_ADD, "host.inventory_mode", inventory_mode);
 }
