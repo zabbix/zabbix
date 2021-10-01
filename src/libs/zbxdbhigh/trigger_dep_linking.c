@@ -116,10 +116,9 @@ static void	zbx_triggers_dep_entries_clean(zbx_hashset_t *h)
  *          host and linked templates                                            *
  *                                                                               *
  * Parameters: hostid        - [IN] host identifier from database                *
- *             trids         - [IN] array of trigger identifiers from database   *
- *             trids_num     - [IN] trigger count in trids array                 *
+ *             trids         - [IN] vector of trigger identifiers from database  *
  *             links         - [OUT] pairs of trigger dependencies (down,up)     *
- *             trigger_flags - [OUT] map that lets audit know if trigger is      *
+ *             trigger_flags - [OUT] map that lets audit to know if trigger is   *
  *                                   a prototype or just trigger                 *
  *                                                                               *
  * Return value: upon successful completion return SUCCEED, or FAIL on DB error  *
@@ -276,25 +275,24 @@ clean:
 
 /**********************************************************************************************************
  *                                                                                                        *
- * Function: prepare_the_neccessary_trigger_dependencies_updates_and_deletes                              *
+ * Function: prepare_neccessary_trigger_dependencies_updates_and_deletes                                  *
  *                                                                                                        *
  * Purpose: takes a list of pending trigger dependencies (links) and excludes entries that are            *
- *          already present on the target host to generate a new list (links2). Also, prepare the list    *
- *          of the trigger dependencies (trigger_dep_ids_del) that need to be deleted on the target       *
- *          host, since they are not present on the template trigger.                                     *
+ *          already present on the target host to generate a new list (links_processed). Also, prepare    *
+ *          the list of the trigger dependencies (trigger_dep_ids_del) that need to be deleted on the     *
+ *          target host, since they are not present on the template trigger.                              *
  *                                                                                                        *
- * Parameters: trids               - [IN] array of trigger identifiers from database                      *
- *             trids_num           - [IN] trigger count in trids array                                    *
+ * Parameters: trids               - [IN] vector of trigger identifiers from database                     *
  *             links               - [OUT] pairs of trigger dependencies, list of links_up and links_down *
  *                                         links that we want to be present on the target host            *
- *             links2              - [OUT] processed links with entries that are already present excluded *
+ *             links_processed     - [OUT] processed links with entries that are already present excluded *
  *             trigger_dep_ids_del - [OUT] list of triggers dependencies that need to be deleted          *
  *                                                                                                        *
  * Return value: upon successful completion return SUCCEED, or FAIL on DB error                           *
  *                                                                                                        *
  *********************************************************************************************************/
-static int	prepare_the_neccessary_trigger_dependencies_updates_and_deletes(const zbx_vector_uint64_t *trids,
-		zbx_vector_uint64_pair_t *links, zbx_vector_uint64_pair_t *links2,
+static int	prepare_neccessary_trigger_dependencies_updates_and_deletes(const zbx_vector_uint64_t *trids,
+		zbx_vector_uint64_pair_t *links, zbx_vector_uint64_pair_t *links_processed,
 		zbx_vector_uint64_t *trigger_dep_ids_del)
 {
 	char			*sql = NULL;
@@ -303,7 +301,7 @@ static int	prepare_the_neccessary_trigger_dependencies_updates_and_deletes(const
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_hashset_t		h;
-	zbx_hashset_iter_t	iter1;
+	zbx_hashset_iter_t	iter;
 	zbx_trigger_dep_entry_t	*found;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -391,7 +389,7 @@ static int	prepare_the_neccessary_trigger_dependencies_updates_and_deletes(const
 
 				x.first = links->values[i].first;
 				x.second = links->values[i].second;
-				zbx_vector_uint64_pair_append(links2, x);
+				zbx_vector_uint64_pair_append(links_processed, x);
 			}
 		}
 		else
@@ -400,13 +398,13 @@ static int	prepare_the_neccessary_trigger_dependencies_updates_and_deletes(const
 
 			x.first = links->values[i].first;
 			x.second = links->values[i].second;
-			zbx_vector_uint64_pair_append(links2, x);
+			zbx_vector_uint64_pair_append(links_processed, x);
 		}
 	}
 
-	zbx_hashset_iter_reset(&h, &iter1);
+	zbx_hashset_iter_reset(&h, &iter);
 
-	while (NULL != (found = (zbx_trigger_dep_entry_t *)zbx_hashset_iter_next(&iter1)))
+	while (NULL != (found = (zbx_trigger_dep_entry_t *)zbx_hashset_iter_next(&iter)))
 	{
 		for (i = 0; i < found->v.values_num; i++)
 		{
@@ -483,18 +481,18 @@ out:
 static int	DBadd_and_remove_trigger_dependencies(zbx_vector_uint64_pair_t	*links,
 		const zbx_vector_uint64_t *trids, zbx_hashset_t *triggers_flags)
 {
-	int				res = SUCCEED;
+	int				res;
 	char				*sql = NULL;
 	size_t				sql_alloc = 0, sql_offset = 0;
-	zbx_vector_uint64_pair_t	links2;
+	zbx_vector_uint64_pair_t	links_processed;
 	zbx_vector_uint64_t		trigger_dep_ids_del;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&trigger_dep_ids_del);
-	zbx_vector_uint64_pair_create(&links2);
+	zbx_vector_uint64_pair_create(&links_processed);
 
-	if (FAIL == (res = prepare_the_neccessary_trigger_dependencies_updates_and_deletes(trids, links, &links2,
+	if (FAIL == (res = prepare_neccessary_trigger_dependencies_updates_and_deletes(trids, links, &links_processed,
 			&trigger_dep_ids_del)))
 	{
 		goto clean;
@@ -513,11 +511,11 @@ static int	DBadd_and_remove_trigger_dependencies(zbx_vector_uint64_pair_t	*links
 		}
 	}
 
-	res = DBadd_trigger_dependencies(&links2, triggers_flags);
+	res = DBadd_trigger_dependencies(&links_processed, triggers_flags);
 clean:
 	zbx_free(sql);
 	zbx_vector_uint64_destroy(&trigger_dep_ids_del);
-	zbx_vector_uint64_pair_destroy(&links2);
+	zbx_vector_uint64_pair_destroy(&links_processed);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(res));
 
@@ -531,8 +529,7 @@ clean:
  * Purpose: update trigger dependencies for specified host                      *
  *                                                                              *
  * Parameters: hostid    - [IN] host identifier from database                   *
- *             trids     - [IN] array of trigger identifiers from database      *
- *             trids_num - [IN] trigger count in trids array                    *
+ *             trids     - [IN] vector of trigger identifiers from database     *
  *             is_update - [IN] hint flag is trids list are new triggers        *
  *                              or already present ones that need to be updated *
  *                                                                              *
