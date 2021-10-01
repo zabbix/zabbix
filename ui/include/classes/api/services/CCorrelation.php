@@ -647,6 +647,10 @@ class CCorrelation extends CApiService {
 			'preservekeys' => true
 		]);
 
+		if (count($correlations) != count($db_correlations)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
 		self::checkDuplicates($correlations, $db_correlations);
 
 		self::addAffectedObjects($correlations, $db_correlations);
