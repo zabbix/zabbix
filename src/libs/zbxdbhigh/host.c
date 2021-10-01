@@ -3908,7 +3908,7 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 
 			if (0 != (host_prototype->flags & ZBX_FLAG_HPLINK_UPDATE_INVENTORY_MODE))
 			{
-				/* new host inventory value which is 'disabled' is handled later */
+				/* new host inventory value which is HOST_INVENTORY_DISABLED is handled later */
 				if (HOST_INVENTORY_DISABLED != host_prototype->inventory_mode)
 				{
 					if (HOST_INVENTORY_DISABLED == host_prototype->inventory_mode_orig)
