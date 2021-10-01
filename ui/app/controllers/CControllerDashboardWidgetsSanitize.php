@@ -33,8 +33,8 @@ class CControllerDashboardWidgetsSanitize extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'templateid' => 'db dashboard.templateid',
-			'widgets' => 'array'
+			'templateid' =>	'db dashboard.templateid',
+			'widgets' =>	'array'
 		];
 
 		$ret = $this->validateInput($fields);
