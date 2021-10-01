@@ -4328,6 +4328,36 @@ class CApiInputValidatorTest extends TestCase {
 				'Invalid parameter "/": a character string is expected.'
 			],
 			[
+				['type' => API_IMAGE],
+				null,
+				'/',
+				'Invalid parameter "/": a character string is expected.'
+			],
+			[
+				['type' => API_IMAGE],
+				1,
+				'/',
+				'Invalid parameter "/": a character string is expected.'
+			],
+			[
+				['type' => API_IMAGE],
+				true,
+				'/',
+				'Invalid parameter "/": a character string is expected.'
+			],
+			[
+				['type' => API_IMAGE],
+				"test",
+				'/',
+				'Invalid parameter "/": file format is unsupported.'
+			],
+			[
+				['type' => API_IMAGE],
+				"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQEAYAAABPYyMiAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAACXBIWXMAAAigAAAIoAAXhZTqAAAAB3RJTUUH4AsMCTElZR7X8QAAAAZiS0dEAAAAAAAA+UO7fwAAAQFJREFUSMdjYBgFQxWERq5Z/e61blZoyJp17z7o+dHP4ug1q969MFINDVuz5t3bd8KhoUD63bsLQHr9uw/G6bSz2G/N2nfPjZSBPgZZLACx+P9/VPrd+dBgYMi8N06jnsWBQB8/M5LHbzEKvRrokLNAfSuADkki32KQT17qZoANJs5ibA45B3T4ynfv9ZaR7oAooA/e6CUC4xpk0E2SHQBKI+/ezwsNB0WJ/nryQyJmzfJ3r4zLoA65QZwD3s8BJtb1796bXKJeWoA4pAKvQ96+nwAM8rXvXpucpF1uQA2Rm1CLJwLLhZXvnpvsomdBtBKYRrYB43jVu1f6c0eL5iELABMWPRgtjy4PAAAALnpUWHRkYXRlOmNyZWF0ZQAAeNozMjA00zU01DU0CjGwtDKxtDI21zYwsDIwAABB6wUWx8+KcAAAAC56VFh0ZGF0ZTptb2RpZnkAAHjaMzIwNNM1NNQ1NAoxsLQysbQyNtc2MLAyMAAAQesFFu7wIvgAAABqelRYdHN2ZzpiYXNlLXVyaQAAeNoFwQEOgyAMBdAT4Z/TLLjbVCykCVBDEa7ve1Ey/wEMaphzQoJWC/p0WNdGiUH3DQlaERszbCRYoZzdJVS0Xi6xFu5Ngjvzw2778uEp0sf7ff0dfrGRXmVvI9Or/wAOAAAAAElFTkSuQmCC",
+				'/',
+				base64_decode("iVBORw0KGgoAAAANSUhEUgAAABAAAAAQEAYAAABPYyMiAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAACXBIWXMAAAigAAAIoAAXhZTqAAAAB3RJTUUH4AsMCTElZR7X8QAAAAZiS0dEAAAAAAAA+UO7fwAAAQFJREFUSMdjYBgFQxWERq5Z/e61blZoyJp17z7o+dHP4ug1q969MFINDVuz5t3bd8KhoUD63bsLQHr9uw/G6bSz2G/N2nfPjZSBPgZZLACx+P9/VPrd+dBgYMi8N06jnsWBQB8/M5LHbzEKvRrokLNAfSuADkki32KQT17qZoANJs5ibA45B3T4ynfv9ZaR7oAooA/e6CUC4xpk0E2SHQBKI+/ezwsNB0WJ/nryQyJmzfJ3r4zLoA65QZwD3s8BJtb1796bXKJeWoA4pAKvQ96+nwAM8rXvXpucpF1uQA2Rm1CLJwLLhZXvnpvsomdBtBKYRrYB43jVu1f6c0eL5iELABMWPRgtjy4PAAAALnpUWHRkYXRlOmNyZWF0ZQAAeNozMjA00zU01DU0CjGwtDKxtDI21zYwsDIwAABB6wUWx8+KcAAAAC56VFh0ZGF0ZTptb2RpZnkAAHjaMzIwNNM1NNQ1NAoxsLQysbQyNtc2MLAyMAAAQesFFu7wIvgAAABqelRYdHN2ZzpiYXNlLXVyaQAAeNoFwQEOgyAMBdAT4Z/TLLjbVCykCVBDEa7ve1Ey/wEMaphzQoJWC/p0WNdGiUH3DQlaERszbCRYoZzdJVS0Xi6xFu5Ngjvzw2778uEp0sf7ff0dfrGRXmVvI9Or/wAOAAAAAElFTkSuQmCC")
+			],
+			[
 				['type' => API_EXEC_PARAMS],
 				null,
 				'/1/exec_params',

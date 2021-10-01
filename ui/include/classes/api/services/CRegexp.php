@@ -364,7 +364,6 @@ class CRegexp extends CApiService {
 			'preservekeys' => true
 		]);
 
-
 		if (count($db_regexs) != count($regexpids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}

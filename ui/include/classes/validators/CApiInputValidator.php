@@ -214,6 +214,9 @@ class CApiInputValidator {
 			case API_VAULT_SECRET:
 				return self::validateVaultSecret($rule, $data, $path, $error);
 
+			case API_IMAGE:
+				return self::validateImage($rule, $data, $path, $error);
+
 			case API_EXEC_PARAMS:
 				return self::validateExecParams($rule, $data, $path, $error);
 		}
@@ -277,6 +280,7 @@ class CApiInputValidator {
 			case API_UUID:
 			case API_CUID:
 			case API_VAULT_SECRET:
+			case API_IMAGE:
 			case API_EXEC_PARAMS:
 				return true;
 
@@ -2559,10 +2563,41 @@ class CApiInputValidator {
 	}
 
 	/**
+	 * Validate image.
+	 *
+	 * @param array  $rule
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateImage($rule, &$data, $path, &$error) {
+		if (self::checkStringUtf8(0, $data, $path, $error) === false) {
+			return false;
+		}
+
+		$data = base64_decode($data);
+
+		if (bccomp(strlen($data), ZBX_MAX_IMAGE_SIZE) == 1) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+				_s('image size must be less than %1$s', convertUnits(['value' => ZBX_MAX_IMAGE_SIZE, 'units' => 'B']))
+			);
+			return false;
+		}
+
+		if (@imageCreateFromString($data) === false) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('file format is unsupported'));
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * @param array  $rule
 	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY
 	 * @param int    $rule['length']  (optional)
-	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
 	 *

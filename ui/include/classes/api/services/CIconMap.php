@@ -152,7 +152,7 @@ class CIconMap extends CApiService {
 	 * @return array
 	 */
 	public function create(array $iconmaps) {
-		$this->validateCreate($iconmaps);
+		self::validateCreate($iconmaps);
 
 		$ins_iconmaps = [];
 
@@ -161,47 +161,45 @@ class CIconMap extends CApiService {
 			$ins_iconmaps[] = $iconmap;
 		}
 
-		$iconmapids = DB::insertBatch('icon_map', $ins_iconmaps);
+		$iconmapids = DB::insert('icon_map', $ins_iconmaps);
 
 		foreach ($iconmaps as $index => &$iconmap) {
 			$iconmap['iconmapid'] = $iconmapids[$index];
 		}
 		unset($iconmap);
 
-		$this->updateMappings($iconmaps, __FUNCTION__);
+		self::updateMappings($iconmaps, __FUNCTION__);
 
-		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_ICON_MAP, $iconmaps);
+		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_ICON_MAP, $iconmaps);
 
 		return ['iconmapids' => $iconmapids];
 	}
 
 	/**
+	 * @static
+	 *
 	 * @param array $iconmaps
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateCreate(array &$iconmaps) {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-		}
-
+	private static function validateCreate(array &$iconmaps) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
-			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY | API_REQUIRED, 'length' => DB::getFieldLength('icon_map', 'name')],
+			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('icon_map', 'name')],
 			'default_iconid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
-			'mappings' =>		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_REQUIRED, 'uniq' => [['inventory_link', 'expression']], 'fields' => [
+			'mappings' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['inventory_link', 'expression']], 'fields' => [
 				'iconid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
-				'expression' =>		['type' => API_REGEX, 'flags' => API_NOT_EMPTY | API_REQUIRED | API_ALLOW_GLOBAL_REGEX, 'length' => DB::getFieldLength('icon_mapping', 'expression')],
-				'inventory_link' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:70'],
-				'sortorder' =>		['type' => API_INT32, 'flags' => API_DEPRECATED]
+				'expression' =>		['type' => API_REGEX, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_GLOBAL_REGEX, 'length' => DB::getFieldLength('icon_mapping', 'expression')],
+				'inventory_link' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:70']
 			]]
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $iconmaps, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$this->checkDuplicates(zbx_objectValues($iconmaps, 'name'));
-		$this->checkMappings($iconmaps);
-		$this->checkIcons($iconmaps);
+		self::checkDuplicates($iconmaps);
+		self::checkMappings($iconmaps);
+		self::checkIcons($iconmaps);
 	}
 
 	/**
@@ -210,22 +208,12 @@ class CIconMap extends CApiService {
 	 * @return array
 	 */
 	public function update(array $iconmaps) {
-		$this->validateUpdate($iconmaps, $db_iconmaps);
+		self::validateUpdate($iconmaps, $db_iconmaps);
 
 		$upd_iconmaps = [];
 
 		foreach ($iconmaps as $iconmap) {
-			$db_iconmap = $db_iconmaps[$iconmap['iconmapid']];
-
-			$upd_iconmap = [];
-
-			if (array_key_exists('name', $iconmap) && $iconmap['name'] !== $db_iconmap['name']) {
-				$upd_iconmap['name'] = $iconmap['name'];
-			}
-			if (array_key_exists('default_iconid', $iconmap)
-					&& bccomp($iconmap['default_iconid'], $db_iconmap['default_iconid']) != 0) {
-				$upd_iconmap['default_iconid'] = $iconmap['default_iconid'];
-			}
+			$upd_iconmap = DB::getUpdatedValues('icon_map', $iconmap, $db_iconmaps[$iconmap['iconmapid']]);
 
 			if ($upd_iconmap) {
 				$upd_iconmaps[] = [
@@ -239,94 +227,101 @@ class CIconMap extends CApiService {
 			DB::update('icon_map', $upd_iconmaps);
 		}
 
-		$this->updateMappings($iconmaps, __FUNCTION__);
+		self::updateMappings($iconmaps, __FUNCTION__, $db_iconmaps);
 
-		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_ICON_MAP, $iconmaps, $db_iconmaps);
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_ICON_MAP, $iconmaps, $db_iconmaps);
 
-		return ['iconmapids' => zbx_objectValues($iconmaps, 'iconmapid')];
+		return ['iconmapids' => array_column($iconmaps, 'iconmapid')];
 	}
 
 	/**
+	 * @static
+	 *
 	 * @param array $iconmaps
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateUpdate(array &$iconmaps, array &$db_iconmaps = null) {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-		}
-
+	private static function validateUpdate(array &$iconmaps, array &$db_iconmaps = null) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['iconmapid'], ['name']], 'fields' => [
 			'iconmapid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('icon_map', 'name')],
 			'default_iconid' =>	['type' => API_ID],
 			'mappings' =>		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['inventory_link', 'expression']], 'fields' => [
 				'iconid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
-				'expression' =>		['type' => API_REGEX, 'flags' => API_NOT_EMPTY | API_REQUIRED | API_ALLOW_GLOBAL_REGEX, 'length' => DB::getFieldLength('icon_mapping', 'expression')],
-				'inventory_link' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:70'],
-				'sortorder' =>		['type' => API_INT32, 'flags' => API_DEPRECATED]
+				'expression' =>		['type' => API_REGEX, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_GLOBAL_REGEX, 'length' => DB::getFieldLength('icon_mapping', 'expression')],
+				'inventory_link' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:70']
 			]]
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $iconmaps, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
 		$db_iconmaps = DB::select('icon_map', [
 			'output' => ['iconmapid', 'name', 'default_iconid'],
-			'iconmapids' => zbx_objectValues($iconmaps, 'iconmapid'),
+			'iconmapids' => array_column($iconmaps, 'iconmapid'),
 			'preservekeys' => true
 		]);
 
-		$names = [];
-
-		foreach ($iconmaps as $iconmap) {
-			if (!array_key_exists($iconmap['iconmapid'], $db_iconmaps)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-
-			$db_iconmap = $db_iconmaps[$iconmap['iconmapid']];
-
-			if (array_key_exists('name', $iconmap) && $iconmap['name'] !== $db_iconmap['name']) {
-				$names[] = $iconmap['name'];
-			}
+		if (count($db_iconmaps) != count($iconmaps)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		if ($names) {
-			$this->checkDuplicates($names);
-		}
-		$this->checkMappings($iconmaps);
-		$this->checkIcons($iconmaps);
+		self::addAffectedObjects($iconmaps, $db_iconmaps);
+
+		self::checkDuplicates($iconmaps, $db_iconmaps);
+		self::checkMappings($iconmaps);
+		self::checkIcons($iconmaps);
 	}
 
 	/**
 	 * Check for duplicated icon maps.
 	 *
-	 * @param array $names
+	 * @static
+	 *
+	 * @param array      $iconmaps
+	 * @param array|null $db_iconmaps
 	 *
 	 * @throws APIException  if user already exists.
 	 */
-	private function checkDuplicates(array $names) {
-		$db_iconmaps = DB::select('icon_map', [
+	private static function checkDuplicates(array $iconmaps, array $db_iconmaps = null) {
+		$names = [];
+
+		foreach ($iconmaps as $iconmap) {
+			if (!array_key_exists('name', $iconmap)) {
+				continue;
+			}
+
+			if ($db_iconmaps === null || $iconmap['name'] !== $db_iconmaps[$iconmap['iconmapid']]['name']) {
+				$names[] = $iconmap['name'];
+			}
+		}
+
+		if (!$names) {
+			return;
+		}
+
+		$duplicates = DB::select('icon_map', [
 			'output' => ['name'],
 			'filter' => ['name' => $names],
 			'limit' => 1
 		]);
 
-		if ($db_iconmaps) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Icon map "%1$s" already exists.', $db_iconmaps[0]['name']));
+		if ($duplicates) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Icon map "%1$s" already exists.', $duplicates[0]['name']));
 		}
 	}
 
 	/**
 	 * Check icon mappings.
 	 *
-	 * @param $iconmaps
+	 * @static
+	 *
+	 * @param array $iconmaps
 	 *
 	 * @throws APIException
 	 */
-	private function checkMappings($iconmaps) {
+	private static function checkMappings(array $iconmaps): void {
 		$names = [];
 
 		foreach ($iconmaps as $iconmap) {
@@ -351,7 +346,7 @@ class CIconMap extends CApiService {
 				'filter' => ['name' => $names]
 			]);
 
-			$db_regexps = zbx_toHash($db_regexps, 'name');
+			$db_regexps = array_column($db_regexps, null, 'name');
 
 			foreach ($names as $name) {
 				if (!array_key_exists($name, $db_regexps)) {
@@ -366,11 +361,13 @@ class CIconMap extends CApiService {
 	/**
 	 * Check icons.
 	 *
-	 * @param $iconmaps
+	 * @static
+	 *
+	 * @param array $iconmaps
 	 *
 	 * @throws APIException
 	 */
-	private function checkIcons($iconmaps) {
+	private static function checkIcons(array $iconmaps): void {
 		$iconids = [];
 
 		foreach ($iconmaps as $iconmap) {
@@ -406,76 +403,60 @@ class CIconMap extends CApiService {
 	/**
 	 * Update table "icon_mapping".
 	 *
-	 * @param array  $iconmaps
-	 * @param string $method
+	 * @static
+	 *
+	 * @param array      $iconmaps
+	 * @param string     $method
+	 * @param array|null $db_iconmaps
 	 */
-	private function updateMappings(array $iconmaps, $method) {
-		$mappings = [];
-
-		foreach ($iconmaps as $iconmap) {
-			if (array_key_exists('mappings', $iconmap)) {
-				foreach ($iconmap['mappings'] as $index => $mapping) {
-					$mapping['iconmapid'] = $iconmap['iconmapid'];
-					$mapping['sortorder'] = $index;
-
-					$mappings[$iconmap['iconmapid']][] = $mapping;
-				}
-			}
-		}
-
-		if (!$mappings) {
-			return;
-		}
-
-		$db_mappings = ($method === 'update')
-			? DB::select('icon_mapping', [
-				'output' => ['iconmappingid', 'iconmapid', 'iconid', 'expression', 'inventory_link', 'sortorder'],
-				'filter' => ['iconmapid' => array_keys($mappings)],
-				'sortfield' => ['iconmapid', 'sortorder']
-			])
-			: [];
-
+	private static function updateMappings(array &$iconmaps, string $method, array $db_iconmaps = null): void {
 		$ins_mappings = [];
 		$upd_mappings = [];
 		$del_mappingids = [];
 
-		foreach ($db_mappings as $db_mapping) {
-			if ($mappings[$db_mapping['iconmapid']]) {
-				$mapping = array_shift($mappings[$db_mapping['iconmapid']]);
+		foreach ($iconmaps as &$iconmap) {
+			if (!array_key_exists('mappings', $iconmap)) {
+				continue;
+			}
 
-				$upd_mapping = [];
+			$db_mappings = ($method === 'update') ? $db_iconmaps[$iconmap['iconmapid']]['mappings'] : [];
 
-				if (bccomp($mapping['iconid'], $db_mapping['iconid']) != 0) {
-					$upd_mapping['iconid'] = $mapping['iconid'];
-				}
-				if ($mapping['expression'] !== $db_mapping['expression']) {
-					$upd_mapping['expression'] = $mapping['expression'];
-				}
-				if ($mapping['inventory_link'] != $db_mapping['inventory_link']) {
-					$upd_mapping['inventory_link'] = $mapping['inventory_link'];
-				}
-				if ($mapping['sortorder'] != $db_mapping['sortorder']) {
-					$upd_mapping['sortorder'] = $mapping['sortorder'];
-				}
+			foreach ($iconmap['mappings'] as $index => &$mapping) {
+				$mapping['sortorder'] = $index;
 
-				if ($upd_mapping) {
-					$upd_mappings[] = [
-						'values' => $upd_mapping,
-						'where' => ['iconmappingid' => $db_mapping['iconmappingid']]
-					];
+				$db_mapping = current(array_filter($db_mappings,
+					static function (array $db_mapping) use ($mapping): bool {
+						return ($mapping['inventory_link'] == $db_mapping['inventory_link']
+								&& $mapping['expression'] === $db_mapping['expression']);
+					}
+				));
+
+				if ($db_mapping) {
+					$mapping['iconmappingid'] = $db_mapping['iconmappingid'];
+
+					$upd_mapping = DB::getUpdatedValues('icon_mapping', $mapping, $db_mapping);
+
+					if ($upd_mapping) {
+						$upd_mappings[] = [
+							'values' => $upd_mapping,
+							'where' => ['iconmappingid' => $db_mapping['iconmappingid']]
+						];
+					}
+
+					unset($db_mappings[$db_mapping['iconmappingid']]);
+				}
+				else {
+					$ins_mappings[] = ['iconmapid' => $iconmap['iconmapid']] + $mapping;
 				}
 			}
-			else {
-				$del_mappingids[] = $db_mapping['iconmappingid'];
-			}
-		}
+			unset($mapping);
 
-		foreach ($iconmaps as $iconmap) {
-			$ins_mappings = array_merge($ins_mappings, $mappings[$iconmap['iconmapid']]);
+			$del_mappingids = array_merge($del_mappingids, array_keys($db_mappings));
 		}
+		unset($iconmap);
 
 		if ($ins_mappings) {
-			DB::insertBatch('icon_mapping', $ins_mappings);
+			$iconmappingids = DB::insert('icon_mapping', $ins_mappings);
 		}
 
 		if ($upd_mappings) {
@@ -485,6 +466,20 @@ class CIconMap extends CApiService {
 		if ($del_mappingids) {
 			DB::delete('icon_mapping', ['iconmappingid' => $del_mappingids]);
 		}
+
+		foreach ($iconmaps as &$iconmap) {
+			if (!array_key_exists('mappings', $iconmap)) {
+				continue;
+			}
+
+			foreach ($iconmap['mappings'] as &$mapping) {
+				if (!array_key_exists('iconmappingid', $mapping)) {
+					$mapping['iconmappingid'] = array_shift($iconmappingids);
+				}
+			}
+			unset($mapping);
+		}
+		unset($iconmap);
 	}
 
 	/**
@@ -493,43 +488,53 @@ class CIconMap extends CApiService {
 	 * @return array
 	 */
 	public function delete(array $iconmapids) {
-		$this->validateDelete($iconmapids, $db_iconmaps);
+		self::validateDelete($iconmapids, $db_iconmaps);
 
 		DB::delete('icon_mapping', ['iconmapid' => $iconmapids]);
 		DB::delete('icon_map', ['iconmapid' => $iconmapids]);
 
-		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_ICON_MAP, $db_iconmaps);
+		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_ICON_MAP, $db_iconmaps);
 
 		return ['iconmapids' => $iconmapids];
 	}
 
 	/**
-	 * @param array $iconmapids
-	 * @param array $db_iconmaps
+	 * @static
+	 *
+	 * @param array      $iconmapids
+	 * @param array|null $db_iconmaps
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateDelete(array &$iconmapids, array &$db_iconmaps = null) {
+	private static function validateDelete(array &$iconmapids, array &$db_iconmaps = null) {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+
 		if (!CApiInputValidator::validate($api_input_rules, $iconmapids, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$db_iconmaps = $this->get([
+		$db_iconmaps = DB::select('icon_map', [
 			'output' => ['iconmapid', 'name'],
 			'iconmapids' => $iconmapids,
-			'editable' => true,
 			'preservekeys' => true
 		]);
 
-		foreach ($iconmapids as $iconmapid) {
-			if (!array_key_exists($iconmapid, $db_iconmaps)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
+		if (count($db_iconmaps) != count($iconmapids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
+		self::checkUsedSysMaps($iconmapids, $db_iconmaps);
+	}
+
+	/**
+	 * @static
+	 *
+	 * @param array      $iconmapids
+	 * @param array|null $db_iconmaps
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	private static function checkUsedSysMaps(array $iconmapids, array $db_iconmaps): void {
 		$db_sysmaps = DB::select('sysmaps', [
 			'output' => ['name', 'iconmapid'],
 			'filter' => ['iconmapid' => $iconmapids],
@@ -561,5 +566,37 @@ class CIconMap extends CApiService {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Add the existing mappings to $db_iconmaps whether these are affected by the update.
+	 *
+	 * @static
+	 *
+	 * @param array $iconmaps
+	 * @param array $db_iconmaps
+	 */
+	private static function addAffectedObjects(array $iconmaps, array &$db_iconmaps): void {
+		$iconmapids = [];
+
+		foreach ($iconmaps as $iconmap) {
+			if (array_key_exists('mappings', $iconmap)) {
+				$iconmapids[] = $iconmap['iconmapid'];
+				$db_iconmaps[$iconmap['iconmapid']]['mappings'] = [];
+			}
+		}
+
+		if ($iconmapids) {
+			$options = [
+				'output' => ['iconmappingid', 'iconmapid', 'iconid', 'inventory_link', 'expression', 'sortorder'],
+				'filter' => ['iconmapid' => $iconmapids]
+			];
+			$db_mappings = DBselect(DB::makeSql('icon_mapping', $options));
+
+			while ($db_mapping = DBfetch($db_mappings)) {
+				$db_iconmaps[$db_mapping['iconmapid']]['mappings'][$db_mapping['iconmappingid']] =
+					array_diff_key($db_mapping, array_flip(['iconmapid']));
+			}
+		}
 	}
 }
