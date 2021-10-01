@@ -178,11 +178,11 @@ func (c *Connector) refreshActiveChecks() {
 
 	if errs != nil {
 		if !reflect.DeepEqual(errs, c.lastErrors) {
-			log.Warningf("[%d] active check configuration update from host [%s] started to fail", c.clientID,
-				c.hostname)
 			for i := 0; i < len(errs); i++ {
 				log.Warningf("[%d] %s", c.clientID, errs[i])
 			}
+			log.Warningf("[%d] active check configuration update from host [%s] started to fail", c.clientID,
+				c.hostname)
 			c.lastErrors = errs
 		}
 		return

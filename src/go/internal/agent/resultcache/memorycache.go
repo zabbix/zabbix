@@ -69,10 +69,10 @@ func (c *MemoryCache) upload(u Uploader) (err error) {
 	}
 	if errs := u.Write(data, time.Duration(timeout)*time.Second); errs != nil {
 		if !reflect.DeepEqual(errs, c.lastErrors) {
-			c.Warningf("history upload to [%s] [%s] started to fail", u.Addr(), u.Hostname())
 			for i := 0; i < len(errs); i++ {
 				c.Warningf("%s", errs[i])
 			}
+			c.Warningf("history upload to [%s] [%s] started to fail", u.Addr(), u.Hostname())
 			c.lastErrors = errs
 		}
 
