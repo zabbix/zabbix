@@ -123,9 +123,7 @@ class CCorrelation extends CApiService {
 	}
 
 	/**
-	 * Add correlations.
-	 *
-	 * @param array $correlations  An array of correlations.
+	 * @param array $correlations
 	 *
 	 * @return array
 	 */
@@ -517,7 +515,7 @@ class CCorrelation extends CApiService {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('correlation', 'name')],
 			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('correlation', 'description')],
-			'status' =>			['type' => API_INT32, 'in' => ZBX_CORRELATION_ENABLED.','.ZBX_CORRELATION_DISABLED],
+			'status' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_CORRELATION_ENABLED, ZBX_CORRELATION_DISABLED])],
 			'filter' =>			['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
 				'evaltype' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION])],
 				'formula' =>		['type' => API_MULTIPLE, 'rules' => [
@@ -555,7 +553,7 @@ class CCorrelation extends CApiService {
 				]]
 			]],
 			'operations' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['type']], 'fields' => [
-				'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => ZBX_CORR_OPERATION_CLOSE_OLD.','.ZBX_CORR_OPERATION_CLOSE_NEW],
+				'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_CORR_OPERATION_CLOSE_OLD, ZBX_CORR_OPERATION_CLOSE_NEW])],
 			]]
 		]];
 
@@ -615,7 +613,7 @@ class CCorrelation extends CApiService {
 			'correlationid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('correlation', 'name')],
 			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('correlation', 'description')],
-			'status' =>			['type' => API_INT32, 'in' => ZBX_CORRELATION_ENABLED.','.ZBX_CORRELATION_DISABLED],
+			'status' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_CORRELATION_ENABLED, ZBX_CORRELATION_DISABLED])],
 			'filter' =>			['type' => API_OBJECT, 'fields' => [
 				'evaltype' =>		['type' => API_INT32, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION])],
 				'formula' =>		['type' => API_MULTIPLE, 'rules' => [
@@ -653,7 +651,7 @@ class CCorrelation extends CApiService {
 				]]
 			]],
 			'operations' =>		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['type']], 'fields' => [
-				'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => ZBX_CORR_OPERATION_CLOSE_OLD.','.ZBX_CORR_OPERATION_CLOSE_NEW],
+				'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_CORR_OPERATION_CLOSE_OLD, ZBX_CORR_OPERATION_CLOSE_NEW])],
 			]]
 		]];
 
