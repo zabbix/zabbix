@@ -225,23 +225,16 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 
 		if (isset($data['template'])) {
 			$this->zbxTestLogin('templates.php');
-
-			// If the template is not present on this page anymore - check on next page.
-			for ($i = 0; $i < 2; $i++) {
-				if ($this->query('link', $data['template'])->one(false)->isValid() === true) {
-					break;
-				}
-				$this->query('xpath://div[@class="table-paging"]//span[@class="arrow-right"]/..')->one()->click();
-				$this->page->waitUntilReady();
-			}
-
-			$this->zbxTestClickLinkTextWait($data['template']);
+			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+			$this->filterEntriesAndOpenDiscovery($data['template'], $form);
 			$discoveryRule = $this->discoveryRuleTemplate;
 		}
 
 		if (isset($data['host'])) {
 			$this->zbxTestLogin(self::HOST_LIST_PAGE);
-			$this->zbxTestClickLinkTextWait($data['host']);
+			$form = $this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one();
+			$this->filterEntriesAndOpenDiscovery($data['host'], $form);
+//			$this->zbxTestClickLinkTextWait($data['host']);
 			if (!isset($data['templatedHost'])) {
 				$discoveryRule = $this->discoveryRule;
 			}
@@ -250,7 +243,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 			}
 		}
 
-		$this->zbxTestClickLinkTextWait('Discovery rules');
+//		$this->zbxTestClickLinkTextWait('Discovery rules');
 		$this->zbxTestClickLinkTextWait($discoveryRule);
 		$this->zbxTestClickLinkTextWait('Trigger prototypes');
 
@@ -454,8 +447,8 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		$oldHashTriggers = CDBHelper::getHash($sqlTriggers);
 
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
-		$this->zbxTestClickLinkTextWait($this->host);
-		$this->zbxTestClickLinkTextWait('Discovery rules');
+		$form = $this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one();
+		$this->filterEntriesAndOpenDiscovery($this->host, $form);
 		$this->zbxTestClickLinkTextWait($this->discoveryRule);
 		$this->zbxTestClickLinkTextWait('Trigger prototypes');
 
@@ -786,8 +779,8 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 	public function testFormTriggerPrototype_SimpleCreate($data) {
 
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
-		$this->zbxTestClickLinkTextWait($this->host);
-		$this->zbxTestClickLinkTextWait('Discovery rules');
+		$form = $this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one();
+		$this->filterEntriesAndOpenDiscovery($this->host, $form);
 		$this->zbxTestClickLinkTextWait($this->discoveryRule);
 		$this->zbxTestClickLinkTextWait('Trigger prototypes');
 		$this->zbxTestContentControlButtonClickTextWait('Create trigger prototype');
@@ -914,8 +907,8 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 
 		if (isset($data['formCheck'])) {
 			$this->zbxTestOpen(self::HOST_LIST_PAGE);
-			$this->zbxTestClickLinkTextWait($this->host);
-			$this->zbxTestClickLinkTextWait('Discovery rules');
+			$form = $this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one();
+			$this->filterEntriesAndOpenDiscovery($this->host, $form);
 			$this->zbxTestClickLinkTextWait($this->discoveryRule);
 			$this->zbxTestClickLinkTextWait('Trigger prototypes');
 
@@ -939,8 +932,8 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 			}
 
 			$this->zbxTestOpen(self::HOST_LIST_PAGE);
-			$this->zbxTestClickLinkTextWait($this->host);
-			$this->zbxTestClickLinkTextWait('Discovery rules');
+			$form = $this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one();
+			$this->filterEntriesAndOpenDiscovery($this->host, $form);
 			$this->zbxTestClickLinkTextWait($this->discoveryRule);
 			$this->zbxTestClickLinkTextWait('Trigger prototypes');
 
@@ -952,5 +945,18 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Trigger prototypes deleted');
 			$this->assertEquals(0, CDBHelper::getCount("SELECT triggerid FROM triggers where description = '".$description."'"));
 		}
+	}
+
+	/**
+	* Function for filtering necessary hosts and opening their Web scenarios.
+	*
+	* @param string    $name    name of a host or template where triggers are opened
+	*/
+	private function filterEntriesAndOpenDiscovery($name, $form) {
+		$this->query('button:Reset')->one()->click();
+		$form->fill(['Name' => $name]);
+		$this->query('button:Apply')->one()->waitUntilClickable()->click();
+		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
+				->getColumn('Discovery')->query('link:Discovery')->one()->click();
 	}
 }
