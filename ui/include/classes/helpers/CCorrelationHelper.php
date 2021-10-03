@@ -159,47 +159,4 @@ class CCorrelationHelper {
 
 		return $description;
 	}
-
-	/**
-	 * @static
-	 *
-	 * @param array $db_conditions
-	 * @param array $condition
-	 *
-	 * @return array|null
-	 */
-	public static function getDbConditionByCondition(array $db_conditions, array $condition): ?array {
-		foreach ($db_conditions as $db_condition) {
-			if ($condition['type'] != $db_condition['type']) {
-				continue;
-			}
-
-			if ($condition['type'] == ZBX_CORR_CONDITION_OLD_EVENT_TAG
-					|| $condition['type'] == ZBX_CORR_CONDITION_NEW_EVENT_TAG) {
-				if ($condition['tag'] != $db_condition['tag']) {
-					continue;
-				}
-			}
-			elseif ($condition['type'] == ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP) {
-				if ($condition['groupid'] != $db_condition['groupid']) {
-					continue;
-				}
-			}
-			elseif ($condition['type'] == ZBX_CORR_CONDITION_EVENT_TAG_PAIR) {
-				if ($condition['oldtag'] != $db_condition['oldtag'] ||$condition['newtag'] != $db_condition['newtag']) {
-					continue;
-				}
-			}
-			elseif ($condition['type'] == ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE
-					|| $condition['type'] == ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE) {
-				if ($condition['tag'] != $db_condition['tag'] || $condition['value'] != $db_condition['value']) {
-					continue;
-				}
-			}
-
-			return $db_condition;
-		}
-
-		return null;
-	}
 }

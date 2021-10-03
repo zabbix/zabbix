@@ -152,39 +152,84 @@ class CCorrelation extends CApiService {
 		return ['correlationids' => $correlationids];
 	}
 
+	/**
+	 * @static
+	 *
+	 * @param array $db_conditions
+	 * @param array $condition
+	 *
+	 * @return array|null
+	 */
+	private static function getDbCondition(array $db_conditions, array $condition): ?array {
+		foreach ($db_conditions as $db_condition) {
+			if ($condition['type'] != $db_condition['type']) {
+				continue;
+			}
+
+			switch ($condition['type']) {
+				case ZBX_CORR_CONDITION_OLD_EVENT_TAG:
+				case ZBX_CORR_CONDITION_NEW_EVENT_TAG:
+					if ($condition['tag'] === $db_condition['tag']) {
+						return $db_condition;
+					}
+					break;
+
+				case ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP:
+					if ($condition['operator'] == $db_condition['operator']
+							&& bccomp($condition['groupid'], $db_condition['groupid']) == 0) {
+						return $db_condition;
+					}
+					break;
+
+				case ZBX_CORR_CONDITION_EVENT_TAG_PAIR:
+					if ($condition['oldtag'] === $db_condition['oldtag']
+							&& $condition['newtag'] === $db_condition['newtag']) {
+						return $db_condition;
+					}
+					break;
+
+				case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
+				case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
+					if ($condition['operator'] == $db_condition['operator']
+							&& $condition['tag'] === $db_condition['tag']
+							&& $condition['value'] === $db_condition['value']) {
+						return $db_condition;
+					}
+					break;
+			}
+		}
+
+		return null;
+	}
+
 	private static function updateConditions(array &$correlations, string $method,
 			array $db_correlations = null): void {
 		$ins_conditions = [];
 		$del_corr_conditionids = [];
 
 		foreach ($correlations as &$correlation) {
-			$db_correlation = ($method === 'update')
-				? $db_correlations[$correlation['correlationid']]
+			if (!array_key_exists('filter', $correlation)) {
+				continue;
+			}
+
+			$db_conditions = ($method === 'update')
+				? $db_correlations[$correlation['correlationid']]['filter']['conditions']
 				: [];
 
-			if (array_key_exists('filter', $correlation) && array_key_exists('conditions', $correlation['filter'])) {
-				$db_conditions = ($method === 'update')
-					? $db_correlation['filter']['conditions']
-					: [];
+			foreach ($correlation['filter']['conditions'] as &$condition) {
+				$db_condition = self::getDbCondition($db_conditions, $condition);
 
-				foreach ($correlation['filter']['conditions'] as &$condition) {
-					$db_condition = CCorrelationHelper::getDbConditionByCondition($db_conditions, $condition);
-					if ($db_condition) {
-						$condition['corr_conditionid'] = $db_condition['corr_conditionid'];
-
-						unset($db_conditions[$db_condition['corr_conditionid']]);
-					}
-					else {
-						$ins_conditions[] = [
-							'correlationid' => $correlation['correlationid'],
-							'type' => $condition['type']
-						];
-					}
+				if ($db_condition !== null) {
+					$condition['corr_conditionid'] = $db_condition['corr_conditionid'];
+					unset($db_conditions[$db_condition['corr_conditionid']]);
 				}
-				unset($condition);
-
-				$del_corr_conditionids = array_merge($del_corr_conditionids, array_keys($db_conditions));
+				else {
+					$ins_conditions[] = ['correlationid' => $correlation['correlationid']] + $condition;
+				}
 			}
+			unset($condition);
+
+			$del_corr_conditionids = array_merge($del_corr_conditionids, array_keys($db_conditions));
 		}
 		unset($correlation);
 
@@ -193,93 +238,57 @@ class CCorrelation extends CApiService {
 		}
 
 		if ($del_corr_conditionids) {
-			DB::delete('corr_condition', ['corr_conditionid' => $del_corr_conditionids]);
 			DB::delete('corr_condition_tag', ['corr_conditionid' => $del_corr_conditionids]);
 			DB::delete('corr_condition_group', ['corr_conditionid' => $del_corr_conditionids]);
 			DB::delete('corr_condition_tagpair', ['corr_conditionid' => $del_corr_conditionids]);
 			DB::delete('corr_condition_tagvalue', ['corr_conditionid' => $del_corr_conditionids]);
+			DB::delete('corr_condition', ['corr_conditionid' => $del_corr_conditionids]);
 		}
 
 		$ins_condition_tags = [];
-		$ins_condition_hostgroups = [];
-		$ins_condition_tag_pairs = [];
-		$ins_condition_tag_values = [];
-
-		$upd_condition_tags = [];
-		$upd_condition_hostgroups = [];
-		$upd_condition_tag_pairs = [];
-		$upd_condition_tag_values = [];
+		$ins_condition_groups = [];
+		$ins_condition_tagpairs = [];
+		$ins_condition_tagvalues = [];
 
 		foreach ($correlations as &$correlation) {
-			if (array_key_exists('filter', $correlation) && array_key_exists('conditions', $correlation['filter'])) {
-				foreach ($correlation['filter']['conditions'] as &$condition) {
-					if (array_key_exists('corr_conditionid', $condition)) {
-						switch ($condition['type']) {
-							case ZBX_CORR_CONDITION_OLD_EVENT_TAG:
-							case ZBX_CORR_CONDITION_NEW_EVENT_TAG:
-								$upd_condition_tags[] = [
-									'values' => $condition,
-									'where' => ['corr_conditionid' => $condition['corr_conditionid']]
-								];
-								break;
+			if (!array_key_exists('filter', $correlation)) {
+				continue;
+			}
 
-							case ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP:
-								$upd_condition_hostgroups[] = [
-									'values' => $condition,
-									'where' => ['corr_conditionid' => $condition['corr_conditionid']]
-								];
-								break;
+			foreach ($correlation['filter']['conditions'] as &$condition) {
+				if (!array_key_exists('corr_conditionid', $condition)) {
+					$condition['corr_conditionid'] = array_shift($conditionids);
 
-							case ZBX_CORR_CONDITION_EVENT_TAG_PAIR:
-								$upd_condition_tag_pairs[] = [
-									'values' => $condition,
-									'where' => ['corr_conditionid' => $condition['corr_conditionid']]
-								];
-								break;
+					switch ($condition['type']) {
+						case ZBX_CORR_CONDITION_OLD_EVENT_TAG:
+						case ZBX_CORR_CONDITION_NEW_EVENT_TAG:
+							$ins_condition_tags[] = $condition;
+							break;
 
-							case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
-							case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
-								$upd_condition_tag_values[] = [
-									'values' => $condition,
-									'where' => ['corr_conditionid' => $condition['corr_conditionid']]
-								];
-								break;
-						}
-					}
-					else {
-						$condition['corr_conditionid'] = array_shift($conditionids);
+						case ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP:
+							$ins_condition_groups[] = $condition;
+							break;
 
-						switch ($condition['type']) {
-							case ZBX_CORR_CONDITION_OLD_EVENT_TAG:
-							case ZBX_CORR_CONDITION_NEW_EVENT_TAG:
-								$ins_condition_tags[] = $condition;
-								break;
+						case ZBX_CORR_CONDITION_EVENT_TAG_PAIR:
+							$ins_condition_tagpairs[] = $condition;
+							break;
 
-							case ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP:
-								$ins_condition_hostgroups[] = $condition;
-								break;
-
-							case ZBX_CORR_CONDITION_EVENT_TAG_PAIR:
-								$ins_condition_tag_pairs[] = $condition;
-								break;
-
-							case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
-							case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
-								$ins_condition_tag_values[] = $condition;
-								break;
-						}
+						case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
+						case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
+							$ins_condition_tagvalues[] = $condition;
+							break;
 					}
 				}
-				unset($condition);
+			}
+			unset($condition);
 
-				if (array_key_exists('evaltype', $correlation['filter'])
-						&& $correlation['filter']['evaltype']
-							!= $db_correlations[$correlation['correlationid']]['filter']['evaltype']) {
-					if ($correlation['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-						self::updateFormula($correlation['correlationid'], $correlation['filter']['formula'],
-							$correlation['filter']['conditions']
-						);
-					}
+			if (array_key_exists('evaltype', $correlation['filter'])
+					&& $correlation['filter']['evaltype']
+						!= $db_correlations[$correlation['correlationid']]['filter']['evaltype']) {
+				if ($correlation['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+					self::updateFormula($correlation['correlationid'], $correlation['filter']['formula'],
+						$correlation['filter']['conditions']
+					);
 				}
 			}
 		}
@@ -289,32 +298,16 @@ class CCorrelation extends CApiService {
 			DB::insert('corr_condition_tag', $ins_condition_tags, false);
 		}
 
-		if ($ins_condition_hostgroups) {
-			DB::insert('corr_condition_group', $ins_condition_hostgroups, false);
+		if ($ins_condition_groups) {
+			DB::insert('corr_condition_group', $ins_condition_groups, false);
 		}
 
-		if ($ins_condition_tag_pairs) {
-			DB::insert('corr_condition_tagpair', $ins_condition_tag_pairs, false);
+		if ($ins_condition_tagpairs) {
+			DB::insert('corr_condition_tagpair', $ins_condition_tagpairs, false);
 		}
 
-		if ($ins_condition_tag_values) {
-			DB::insert('corr_condition_tagvalue', $ins_condition_tag_values, false);
-		}
-
-		if ($upd_condition_tags) {
-			DB::update('corr_condition_tag', $upd_condition_tags);
-		}
-
-		if ($upd_condition_hostgroups) {
-			DB::update('corr_condition_group', $upd_condition_hostgroups);
-		}
-
-		if ($upd_condition_tag_pairs) {
-			DB::update('corr_condition_tagpair', $upd_condition_tag_pairs);
-		}
-
-		if ($upd_condition_tag_values) {
-			DB::update('corr_condition_tagvalue', $upd_condition_tag_values);
+		if ($ins_condition_tagvalues) {
+			DB::insert('corr_condition_tagvalue', $ins_condition_tagvalues, false);
 		}
 	}
 
