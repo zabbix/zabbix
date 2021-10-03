@@ -378,39 +378,19 @@ class CCorrelation extends CApiService {
 		$upd_correlations = [];
 
 		foreach ($correlations as $correlation) {
-			$correlationid = $correlation['correlationid'];
+			$db_correlation = $db_correlations[$correlation['correlationid']];
 
-			$correlation_update_object = [];
-			$db_correlation_update_object = [];
-			if (array_key_exists('name', $correlation)) {
-				$correlation_update_object['name'] = $correlation['name'];
-				$db_correlation_update_object['name'] = $db_correlations[$correlationid]['name'];
-			}
-			if (array_key_exists('description', $correlation)) {
-				$correlation_update_object['description'] = $correlation['description'];
-				$db_correlation_update_object['description'] = $db_correlations[$correlationid]['description'];
-			}
-			if (array_key_exists('status', $correlation)) {
-				$correlation_update_object['status'] = $correlation['status'];
-				$db_correlation_update_object['status'] = $db_correlations[$correlationid]['status'];
-			}
-			if (array_key_exists('filter', $correlation) && array_key_exists('evaltype', $correlation['filter'])) {
-				$correlation_update_object['evaltype'] = $correlation['filter']['evaltype'];
-				$db_correlation_update_object['evaltype'] = $db_correlations[$correlationid]['filter']['evaltype'];
-			}
-			if (array_key_exists('filter', $correlation) && array_key_exists('formula', $correlation['filter'])) {
-				$correlation_update_object['formula'] = $correlation['filter']['formula'];
-				$db_correlation_update_object['formula'] = $db_correlations[$correlationid]['filter']['formula'];
+			if (array_key_exists('filter', $correlation)) {
+				$correlation['evaltype'] = $correlation['filter']['evaltype'];
+				$db_correlation['evaltype'] = $db_correlation['filter']['evaltype'];
 			}
 
-			$upd_correlation = DB::getUpdatedValues('correlation', $correlation_update_object,
-				$db_correlation_update_object
-			);
+			$upd_correlation = DB::getUpdatedValues('correlation', $correlation, $db_correlation);
 
 			if ($upd_correlation) {
 				$upd_correlations[] = [
 					'values' => $upd_correlation,
-					'where' => ['correlationid' => $correlationid]
+					'where' => ['correlationid' => $correlation['correlationid']]
 				];
 			}
 		}
@@ -910,49 +890,47 @@ class CCorrelation extends CApiService {
 	 * @param array $db_correlations
 	 */
 	private static function addAffectedObjects(array $correlations, array &$db_correlations): void {
-		$correlationids = [/* 'filter' => [], */ 'conditions' => [], 'operations' => []];
+		$correlationids = ['filter' => [], 'operations' => []];
 
 		foreach ($correlations as $correlation) {
-			if (array_key_exists('filter', $correlation) && array_key_exists('conditions', $correlation['filter'])) {
-				$correlationids['conditions'] = $correlation['correlationid'];
+			if (array_key_exists('filter', $correlation)) {
+				$correlationids['filter'][] = $correlation['correlationid'];
 				$db_correlations[$correlation['correlationid']]['filter']['conditions'] = [];
 			}
 
 			if (array_key_exists('operations', $correlation)) {
-				$correlationids['operations'] = $correlation['correlationid'];
+				$correlationids['operations'][] = $correlation['correlationid'];
 				$db_correlations[$correlation['correlationid']]['operations'] = [];
 			}
 		}
 
-		$options = [
-			'output' => ['correlationid', 'evaltype', 'formula'],
-			'filter' => ['correlationid' => array_column($correlations, 'correlationid')]
-		];
-		$db_filters = DBselect(DB::makeSql('correlation', $options));
+		if ($correlationids['filter']) {
+			$options = [
+				'output' => ['correlationid', 'evaltype', 'formula'],
+				'filter' => ['correlationid' => $correlationids['filter']]
+			];
+			$db_filters = DBselect(DB::makeSql('correlation', $options));
 
-		while ($db_filter = DBfetch($db_filters)) {
-			$db_correlations[$db_filter['correlationid']]['filter'] =
-				array_diff_key($db_filter, array_flip(['correlationid']));
-		}
+			while ($db_filter = DBfetch($db_filters)) {
+				$db_correlations[$db_filter['correlationid']]['filter'] =
+					array_diff_key($db_filter, array_flip(['correlationid']));
+			}
 
-		if ($correlationids['conditions']) {
-			$conditions = [];
 			$sql = 'SELECT c.correlationid,c.corr_conditionid,c.type,ct.tag AS ct_tag,'.
 					'cg.operator AS cg_operator,cg.groupid,ctp.oldtag,ctp.newtag,ctv.tag AS ctv_tag,'.
 					'ctv.operator AS ctv_operator,ctv.value'.
 				' FROM corr_condition c'.
-				' LEFT JOIN corr_condition_tag ct ON ct.corr_conditionid = c.corr_conditionid'.
-				' LEFT JOIN corr_condition_group cg ON cg.corr_conditionid = c.corr_conditionid'.
-				' LEFT JOIN corr_condition_tagpair ctp ON ctp.corr_conditionid = c.corr_conditionid'.
-				' LEFT JOIN corr_condition_tagvalue ctv ON ctv.corr_conditionid = c.corr_conditionid'.
-				' WHERE '.dbConditionId('c.correlationid', [$correlationids['conditions']]);
+				' LEFT JOIN corr_condition_tag ct ON ct.corr_conditionid=c.corr_conditionid'.
+				' LEFT JOIN corr_condition_group cg ON cg.corr_conditionid=c.corr_conditionid'.
+				' LEFT JOIN corr_condition_tagpair ctp ON ctp.corr_conditionid=c.corr_conditionid'.
+				' LEFT JOIN corr_condition_tagvalue ctv ON ctv.corr_conditionid=c.corr_conditionid'.
+				' WHERE '.dbConditionId('c.correlationid', $correlationids['filter']);
 			$db_conditions = DBselect($sql);
 
 			while ($db_condition = DBfetch($db_conditions)) {
 				$condition = [
 					'corr_conditionid' => $db_condition['corr_conditionid'],
-					'type' => $db_condition['type'],
-					'formulaid' => ''
+					'type' => $db_condition['type']
 				];
 
 				switch ($db_condition['type']) {
@@ -981,26 +959,25 @@ class CCorrelation extends CApiService {
 						break;
 				}
 
-				$conditions[$db_condition['correlationid']][$db_condition['corr_conditionid']] = $condition;
+				$db_correlations[$db_condition['correlationid']]['filter']['conditions']
+					[$db_condition['corr_conditionid']] = $condition;
 			}
 
-			foreach ($conditions as $correlationid => $db_conditions) {
-				if ($db_correlations[$correlationid]['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-					$formula = $db_correlations[$correlationid]['filter']['formula'];
+			foreach ($db_correlations as $correlationid => &$db_correlation) {
+				if ($db_correlation['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+					$formula = $db_correlation['filter']['formula'];
 
 					$formulaids = CConditionHelper::getFormulaIds($formula);
 
-					foreach ($db_conditions as &$db_condition) {
+					foreach ($db_correlation['filter']['conditions'] as &$db_condition) {
 						$db_condition['formulaid'] = $formulaids[$db_condition['corr_conditionid']];
 					}
 					unset($db_condition);
 
-					$db_correlations[$correlationid]['filter']['formula']
-						= CConditionHelper::replaceNumericIds($formula, $formulaids);
+					$db_correlation['filter']['formula'] = CConditionHelper::replaceNumericIds($formula, $formulaids);
 				}
-
-				$db_correlations[$correlationid]['filter']['conditions'] = $db_conditions;
 			}
+			unset($db_correlation);
 		}
 
 		if ($correlationids['operations']) {
@@ -1012,7 +989,7 @@ class CCorrelation extends CApiService {
 
 			while ($db_operation = DBfetch($db_operations)) {
 				$db_correlations[$db_operation['correlationid']]['operations'][$db_operation['corr_operationid']] =
-				array_diff_key($db_operation, array_flip(['correlationid']));
+					array_diff_key($db_operation, array_flip(['correlationid']));
 			}
 		}
 	}
