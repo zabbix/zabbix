@@ -71,65 +71,55 @@ class CControllerCorrelationUpdate extends CController {
 	}
 
 	protected function doAction() {
-		$data = [
-			'conditions' => [],
-			'status' => ZBX_CORRELATION_DISABLED,
-			'formula' => ''
-		];
-
-		$this->getInputs($data, ['correlationid', 'name', 'description', 'evaltype', 'status', 'formula',
-			'op_close_new', 'op_close_old', 'conditions', 'new_condition'
-		]);
-
 		$correlation = [
-			'correlationid' => $data['correlationid'],
-			'name' => $data['name'],
-			'description' => $data['description'],
-			'status' => $data['status'],
+			'correlationid' => $this->getInput('correlationid'),
+			'name' => $this->getInput('name'),
+			'description' => $this->getInput('description', ''),
+			'status' => $this->getInput('status'),
 			'filter' => [
-				'evaltype' => $data['evaltype'],
-				'formula' => $data['formula'],
-				'conditions' => $data['conditions']
+				'evaltype' => $this->getInput('evaltype'),
+				'conditions' => $this->getInput('conditions', [])
 			],
 			'operations' => []
 		];
 
-		if ($correlation['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION
-				&& count($correlation['filter']['conditions']) < 2) {
-			$correlation['filter']['formula'] = '';
-			$correlation['filter']['evaltype'] = CONDITION_EVAL_TYPE_AND_OR;
+		if ($correlation['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+			if (count($correlation['filter']['conditions']) > 1) {
+				$correlation['filter']['formula'] = $this->getInput('formula', '');
+			}
+			else {
+				$correlation['filter']['evaltype'] = CONDITION_EVAL_TYPE_AND_OR;
+			}
 		}
-
-		if ($correlation['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
-			$correlation['filter']['formula'] = '';
+		else {
 			foreach ($correlation['filter']['conditions'] as &$condition) {
 				unset($condition['formulaid']);
 			}
 			unset($condition);
 		}
 
-		if (array_key_exists('op_close_old', $data)) {
+		if ($this->hasInput('op_close_old')) {
 			$correlation['operations'][] = ['type' => ZBX_CORR_OPERATION_CLOSE_OLD];
 		}
 
-		if (array_key_exists('op_close_new', $data)) {
+		if ($this->hasInput('op_close_new')) {
 			$correlation['operations'][] = ['type' => ZBX_CORR_OPERATION_CLOSE_NEW];
 		}
-
 
 		$result = API::Correlation()->update($correlation);
 
 		if ($result) {
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'correlation.list')
-				->setArgument('page', CPagerHelper::loadPage('correlation.list', null))
+			$response = new CControllerResponseRedirect(
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'correlation.list')
+					->setArgument('page', CPagerHelper::loadPage('correlation.list', null))
 			);
 			$response->setFormData(['uncheck' => '1']);
 			CMessageHelper::setSuccessTitle(_('Correlation updated'));
 		}
 		else {
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'correlation.edit')
+			$response = new CControllerResponseRedirect(
+				(new CUrl('zabbix.php'))->setArgument('action', 'correlation.edit')
 			);
 			$response->setFormData($this->getInputAll());
 			CMessageHelper::setErrorTitle(_('Cannot update correlation'));

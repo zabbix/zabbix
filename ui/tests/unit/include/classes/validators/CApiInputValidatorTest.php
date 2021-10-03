@@ -1881,6 +1881,58 @@ class CApiInputValidatorTest extends TestCase {
 			[
 				['type' => API_OBJECTS, 'fields' => [
 					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:9'],
+					'value' =>	['type' => API_MULTIPLE, 'rules' => [
+						['if' => ['field' => 'type', 'in' => '1,2'], 'flags' => API_REQUIRED, 'type' => API_INT32],
+						['else' => true, 'type' => API_UNEXPECTED]
+					]]
+				]],
+				[
+					['type' => '1', 'value' => '-5'],
+					['type' => '2', 'value' => '125'],
+					['type' => '7', 'value' => '123']
+				],
+				'/',
+				'Invalid parameter "/3": unexpected parameter "value".'
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => [
+					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:9'],
+					'value' =>	['type' => API_MULTIPLE, 'rules' => [
+						['if' => ['field' => 'type', 'in' => '1,2'], 'flags' => API_REQUIRED, 'type' => API_INT32],
+						['else' => true, 'type' => API_UNEXPECTED]
+					]]
+				]],
+				[
+					['type' => '1', 'value' => '-5'],
+					['type' => '2'],
+					['type' => '7']
+				],
+				'/',
+				'Invalid parameter "/2": the parameter "value" is missing.'
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => [
+					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:9'],
+					'value' =>	['type' => API_MULTIPLE, 'rules' => [
+						['if' => ['field' => 'type', 'in' => '1,2'], 'flags' => API_REQUIRED, 'type' => API_INT32],
+						['else' => true, 'type' => API_UNEXPECTED]
+					]]
+				]],
+				[
+					['type' => '1', 'value' => '-5'],
+					['type' => '2', 'value' => '125'],
+					['type' => '7']
+				],
+				'/',
+				[
+					['type' => 1, 'value' => -5],
+					['type' => 2, 'value' => 125],
+					['type' => 7]
+				]
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => [
+					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:9'],
 					'value' =>	['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
 						['if' => ['field' => 'type', 'in' => '1,2'], 'type' => API_INT32]
 					]]

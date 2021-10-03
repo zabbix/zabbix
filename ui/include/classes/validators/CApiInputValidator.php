@@ -1110,6 +1110,13 @@ class CApiInputValidator {
 				foreach ($field_rule['rules'] as $multiple_rule) {
 					if (array_key_exists('else', $multiple_rule)
 							|| self::isInRange($data[$multiple_rule['if']['field']], $multiple_rule['if']['in'])) {
+						if ($multiple_rule['type'] == API_UNEXPECTED && array_key_exists($field_name, $data)) {
+							$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+								_s('unexpected parameter "%1$s"', $field_name)
+							);
+							return false;
+						}
+
 						$field_rule += ['flags' => 0x00];
 						$multiple_rule += ['flags' => 0x00];
 						$multiple_rule['flags'] = ($field_rule['flags'] & API_REQUIRED) | $multiple_rule['flags'];

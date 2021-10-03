@@ -130,15 +130,14 @@ class CCorrelation extends CApiService {
 	public function create($correlations) {
 		self::validateCreate($correlations);
 
-		$correlation_tables = [];
+		$ins_correlations = [];
 
 		foreach ($correlations as $correlation) {
-			$correlation['evaltype'] = $correlation['filter']['evaltype'];
-			$correlation_tables[] = $correlation;
+			$ins_correlations[] = $correlation + ['evaltype' => $correlation['filter']['evaltype']];
 		}
 
 		// Insert correlations into DB, get back array with new correlation IDs.
-		$correlationids = DB::insert('correlation',$correlation_tables);
+		$correlationids = DB::insert('correlation', $ins_correlations);
 
 		foreach ($correlations as $index => &$correlation) {
 			$correlation['correlationid'] = $correlationids[$index];
@@ -512,30 +511,30 @@ class CCorrelation extends CApiService {
 	private static function getFilterValidationRules() {
 		$condition_fields = [
 			'type' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP, ZBX_CORR_CONDITION_EVENT_TAG_PAIR, ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE])],
-			'operator' =>	['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
+			'operator' =>	['type' => API_MULTIPLE, 'rules' => [
 								['if' => ['field' => 'type', 'in' => ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP], 'type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL])],
 								['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE])], 'type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE])],
-								['else' => true, 'type' => API_INT32, 'in' => CONDITION_OPERATOR_EQUAL]
+								['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'tag' =>		['type' => API_MULTIPLE, 'rules' => [
 								['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('corr_condition_tag', 'tag')],
-								['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
+								['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'groupid' =>	['type' => API_MULTIPLE, 'rules' => [
 								['if' => ['field' => 'type', 'in' => ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP], 'type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-								['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
+								['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'oldtag' =>		['type' => API_MULTIPLE, 'rules' => [
 								['if' => ['field' => 'type', 'in' => ZBX_CORR_CONDITION_EVENT_TAG_PAIR], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('corr_condition_tagpair', 'oldtag')],
-								['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
+								['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'newtag' =>		['type' => API_MULTIPLE, 'rules' => [
 								['if' => ['field' => 'type', 'in' => ZBX_CORR_CONDITION_EVENT_TAG_PAIR], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('corr_condition_tagpair', 'newtag')],
-								['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
+								['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'value' =>		['type' => API_MULTIPLE, 'rules' => [
 								['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('corr_condition_tagvalue', 'value')],
-								['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
+								['else' => true, 'type' => API_UNEXPECTED]
 			]]
 		];
 
@@ -543,14 +542,14 @@ class CCorrelation extends CApiService {
 			'evaltype' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION])],
 			'formula' =>	['type' => API_MULTIPLE, 'rules' => [
 								['if' => ['field' => 'evaltype', 'in' => CONDITION_EVAL_TYPE_EXPRESSION], 'type' => API_COND_FORMULA, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('correlation', 'formula')],
-								['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
+								['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'conditions' =>	['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
 								['if' => ['field' => 'evaltype', 'in' => CONDITION_EVAL_TYPE_EXPRESSION], 'type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['formulaid']], 'fields' => [
 									'formulaid' =>	['type' => API_COND_FORMULAID, 'flags' => API_REQUIRED]
 								] + $condition_fields],
 								['else' => true, 'type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'fields' => [
-									'formulaid' =>	['type' => API_STRING_UTF8, 'in' => '']
+									'formulaid' =>	['type' => API_UNEXPECTED]
 								] + $condition_fields]
 			]]
 		]];

@@ -68,20 +68,20 @@ class CControllerCorrelationCreate extends CController {
 			'status' => $this->getInput('status'),
 			'filter' => [
 				'evaltype' => $this->getInput('evaltype'),
-				'formula' => $this->getInput('formula', ''),
 				'conditions' => $this->getInput('conditions', [])
 			],
 			'operations' => []
 		];
 
-		if ($correlation['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION
-				&& count($correlation['filter']['conditions']) < 2) {
-			$correlation['filter']['formula'] = '';
-			$correlation['filter']['evaltype'] = CONDITION_EVAL_TYPE_AND_OR;
+		if ($correlation['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+			if (count($correlation['filter']['conditions']) > 1) {
+				$correlation['filter']['formula'] = $this->getInput('formula', '');
+			}
+			else {
+				$correlation['filter']['evaltype'] = CONDITION_EVAL_TYPE_AND_OR;
+			}
 		}
-
-		if ($correlation['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
-			$correlation['filter']['formula'] = '';
+		else {
 			foreach ($correlation['filter']['conditions'] as &$condition) {
 				unset($condition['formulaid']);
 			}
