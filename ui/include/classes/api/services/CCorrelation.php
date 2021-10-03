@@ -446,7 +446,7 @@ class CCorrelation extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private static function validateDelete(array $correlationids, array &$db_correlations = null): void {
+	private static function validateDelete(array &$correlationids, array &$db_correlations = null): void {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $correlationids, '/', $error)) {
