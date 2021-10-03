@@ -144,21 +144,19 @@ class CCorrelation extends CApiService {
 		}
 		unset($correlation);
 
-		self::updateConditionsAndOperations($correlations, __FUNCTION__);
+		self::updateConditions($correlations, __FUNCTION__);
+		self::updateOperations($correlations, __FUNCTION__);
 
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_CORRELATION, $correlations);
 
 		return ['correlationids' => $correlationids];
 	}
 
-	private static function updateConditionsAndOperations(array &$correlations, string $method,
+	private static function updateConditions(array &$correlations, string $method,
 			array $db_correlations = null): void {
 		$ins_conditions = [];
-		$ins_operations = [];
 		$del_corr_conditionids = [];
-		$del_corr_operationids = [];
 
-		// Collect conditions and operations to be created and set appropriate correlation ID.
 		foreach ($correlations as &$correlation) {
 			$db_correlation = ($method === 'update')
 				? $db_correlations[$correlation['correlationid']]
@@ -187,42 +185,11 @@ class CCorrelation extends CApiService {
 
 				$del_corr_conditionids = array_merge($del_corr_conditionids, array_keys($db_conditions));
 			}
-
-			if (!array_key_exists('operations', $correlation)) {
-				continue;
-			}
-
-			$db_operations = ($method === 'update')
-				? array_column($db_correlation['operations'], null, 'type')
-				: [];
-
-			foreach ($correlation['operations'] as &$operation) {
-				if (array_key_exists($operation['type'], $db_operations)) {
-					$operation['corr_operationid'] = $db_operations[$operation['type']]['corr_operationid'];
-					unset($db_operations[$operation['type']]);
-				}
-				else {
-					$ins_operations[] = ['correlationid' => $correlation['correlationid']] + $operation;
-				}
-			}
-			unset($operation);
-
-			$del_corr_operationids = array_merge($del_corr_operationids,
-				array_column($db_operations, 'corr_operationid')
-			);
 		}
 		unset($correlation);
 
 		if ($ins_conditions) {
 			$conditionids = DB::insert('corr_condition', $ins_conditions);
-		}
-
-		if ($ins_operations) {
-			$operationids = DB::insert('corr_operation', $ins_operations);
-		}
-
-		if ($del_corr_operationids) {
-			DB::delete('corr_operation', ['corr_operationid' => $del_corr_operationids]);
 		}
 
 		if ($del_corr_conditionids) {
@@ -315,15 +282,6 @@ class CCorrelation extends CApiService {
 					}
 				}
 			}
-
-			if (array_key_exists('operations', $correlation)) {
-				foreach ($correlation['operations'] as &$operation) {
-					if (!array_key_exists('corr_operationid', $operation)) {
-						$operation['corr_operationid'] = array_shift($operationids);
-					}
-				}
-				unset($operation);
-			}
 		}
 		unset($correlation);
 
@@ -358,6 +316,60 @@ class CCorrelation extends CApiService {
 		if ($upd_condition_tag_values) {
 			DB::update('corr_condition_tagvalue', $upd_condition_tag_values);
 		}
+	}
+
+	private static function updateOperations(array &$correlations, string $method,
+			array $db_correlations = null): void {
+		$ins_operations = [];
+		$del_corr_operationids = [];
+
+		foreach ($correlations as &$correlation) {
+			if (!array_key_exists('operations', $correlation)) {
+				continue;
+			}
+
+			$db_operations = ($method === 'update')
+				? array_column($db_correlations[$correlation['correlationid']]['operations'], null, 'type')
+				: [];
+
+			foreach ($correlation['operations'] as &$operation) {
+				if (array_key_exists($operation['type'], $db_operations)) {
+					$operation['corr_operationid'] = $db_operations[$operation['type']]['corr_operationid'];
+					unset($db_operations[$operation['type']]);
+				}
+				else {
+					$ins_operations[] = ['correlationid' => $correlation['correlationid']] + $operation;
+				}
+			}
+			unset($operation);
+
+			$del_corr_operationids = array_merge($del_corr_operationids,
+				array_column($db_operations, 'corr_operationid')
+			);
+		}
+		unset($correlation);
+
+		if ($ins_operations) {
+			$corr_operationids = DB::insert('corr_operation', $ins_operations);
+		}
+
+		if ($del_corr_operationids) {
+			DB::delete('corr_operation', ['corr_operationid' => $del_corr_operationids]);
+		}
+
+		foreach ($correlations as &$correlation) {
+			if (!array_key_exists('operations', $correlation)) {
+				continue;
+			}
+
+			foreach ($correlation['operations'] as &$operation) {
+				if (!array_key_exists('corr_operationid', $operation)) {
+					$operation['corr_operationid'] = array_shift($corr_operationids);
+				}
+			}
+			unset($operation);
+		}
+		unset($correlation);
 	}
 
 	/**
@@ -414,7 +426,8 @@ class CCorrelation extends CApiService {
 			DB::update('correlation', $upd_correlations);
 		}
 
-		self::updateConditionsAndOperations($correlations, __FUNCTION__, $db_correlations);
+		self::updateConditions($correlations, __FUNCTION__, $db_correlations);
+		self::updateOperations($correlations, __FUNCTION__, $db_correlations);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_CORRELATION, $correlations, $db_correlations);
 
