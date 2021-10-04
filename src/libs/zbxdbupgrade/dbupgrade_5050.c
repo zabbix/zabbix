@@ -818,33 +818,14 @@ static int	DBpatch_5050071(void)
 
 static int	DBpatch_5050072(void)
 {
-	return DBcreate_index("ha_node", "ha_node_1", "status,lastaccess", 0);
+	return DBcreate_index("ha_node", "ha_node_1", "name", 1);
 }
 
 static int	DBpatch_5050073(void)
 {
-	const ZBX_TABLE	table =
-			{"table_lock", "table_name", 0,
-				{
-					{"table_name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-					{0}
-				},
-				NULL
-			};
-
-	return DBcreate_table(&table);
+	return DBcreate_index("ha_node", "ha_node_2", "status,lastaccess", 0);
 }
 
-static int	DBpatch_5050074(void)
-{
-	if (0 == (ZBX_PROGRAM_TYPE_SERVER & program_type))
-		return SUCCEED;
-
-	if (ZBX_DB_OK > DBexecute("insert into table_lock values ('ha_node')"))
-		return FAIL;
-
-	return SUCCEED;
-}
 #endif
 
 DBPATCH_START(5050)
@@ -919,6 +900,5 @@ DBPATCH_ADD(5050070, 0, 1)
 DBPATCH_ADD(5050071, 0, 1)
 DBPATCH_ADD(5050072, 0, 1)
 DBPATCH_ADD(5050073, 0, 1)
-DBPATCH_ADD(5050074, 0, 1)
 
 DBPATCH_END()
