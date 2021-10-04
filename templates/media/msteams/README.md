@@ -20,6 +20,7 @@ First, you need to get a webhook URL for the channel. There are two ways to do t
 Good examples:<br>
 http://zabbix.com<br>
 https://zabbix.lan/<br>
+http://server.zabbix.lan/</br>
 http://localhost<br>
 http://127.0.0.1:8080<br>
 
