@@ -144,7 +144,7 @@
 			$(document).on('submit', '#problem_form', function(e) {
 				e.preventDefault();
 
-				acknowledgePopUp({eventids: chkbxRange.selectedIds}, this);
+				acknowledgePopUp({eventids: chkbxRange.getSelectedIds()}, this);
 			});
 		},
 

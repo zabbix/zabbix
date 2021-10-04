@@ -1026,7 +1026,7 @@ Function.prototype.bindAsEventListener = function (context) {
 function openMassupdatePopup(elem, popup_name, data = {}) {
 	const form = elem.closest('form');
 
-	data.ids = chkbxRange.selectedIds;
+	data.ids = chkbxRange.getSelectedIds();
 
 	switch (popup_name) {
 		case 'popup.massupdate.item':
