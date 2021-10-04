@@ -276,13 +276,12 @@ class testFormTags extends CWebTest {
 		}
 
 		$this->page->login()->open($this->link);
-		$this->query('button:Reset')->one()->click();
 
 		// This is workaround for host popup screenshot. We need to filter out hosts to minimize page scroll.
 		if ($object === 'host') {
 			if ($data['name'] === 'With tags' || $data['name'] === 'Long tag name and value') {
 				$filter = $this->query('name:zbx_filter')->asFluidForm()->one()->waitUntilReady();
-				$filter->fill(['Name' => 'Host with tags for updating']);
+				$filter->fill(['Name' => 'test']);
 				$this->query('button:Apply')->one()->waitUntilClickable()->click();
 				$this->page->waitUntilReady();
 			}
@@ -486,8 +485,6 @@ class testFormTags extends CWebTest {
 
 		$data['name'] = $this->update_name;
 		$this->page->login()->open($this->link);
-		$this->query('button:Reset')->one()->click();
-
 		$this->query('link', $this->update_name)->waitUntilPresent()->one()->click();
 
 		$form = ($object === 'host')
@@ -571,8 +568,6 @@ class testFormTags extends CWebTest {
 		$new_name = (strpos($object, 'prototype') !== false) ? 'Tags - '.$action.' '.$object.' {#KEY}' : '1Tags - '.$action.' '.$object;
 
 		$this->page->login()->open($this->link);
-		$this->query('button:Reset')->one()->click();
-
 		$this->query('link', $this->clone_name)->waitUntilClickable()->one()->click();
 
 		switch ($object) {
@@ -706,7 +701,7 @@ class testFormTags extends CWebTest {
 		if ($object === 'host') {
 			if ($data['name'] === 'With tags' || $data['name'] === 'Long tag name and value') {
 				$filter = $this->query('name:zbx_filter')->asFluidForm()->one()->waitUntilReady();
-				$filter->fill(['Name' => 'Host with tags for updating']);
+				$filter->fill(['Name' => 'Host-layout-test-001']);
 				$this->query('button:Apply')->one()->waitUntilClickable()->click();
 				$this->page->waitUntilReady();
 			}
@@ -757,8 +752,6 @@ class testFormTags extends CWebTest {
 	public function executeFullCloning($object, $parent) {
 		$new_name = '1Tags - full cloning of '.$parent.' with '.$object;
 		$this->page->login()->open($this->link);
-		$this->query('button:Reset')->one()->click();
-
 		$this->query('link', $this->clone_name)->waitUntilClickable()->one()->click();
 
 		// Get tags of object.
@@ -849,8 +842,6 @@ class testFormTags extends CWebTest {
 	 */
 	public function executeCopy($object, $target_type, $parent) {
 		$this->page->login()->open($this->link);
-		$this->query('button:Reset')->one()->click();
-
 		$this->query('link', $this->clone_name)->waitUntilClickable()->one()->click();
 
 		// Get tags of object and return to the list.
@@ -982,8 +973,6 @@ class testFormTags extends CWebTest {
 
 		// Open created element.
 		$this->page->open($this->link);
-		$this->query('button:Reset')->one()->click();
-
 		$this->query('link', $data['name'])->waitUntilClickable()->one()->click();
 		$form->selectTab('Tags');
 		$tags_table = $this->query('id:tags-table')->asMultifieldTable()->waitUntilVisible()->one();
