@@ -78,6 +78,7 @@ class CAudit {
 	public const RESOURCE_USER_ROLE = 44;
 	public const RESOURCE_AUTH_TOKEN = 45;
 	public const RESOURCE_SCHEDULED_REPORT = 46;
+	public const RESOURCE_HIGH_AVAILABILITY_NODE = 47;
 
 	/**
 	 * Audit details actions.

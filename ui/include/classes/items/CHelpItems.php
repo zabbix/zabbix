@@ -1185,6 +1185,10 @@ class CHelpItems {
 					'description' => _('Startup time of Zabbix server, Unix timestamp.')
 				],
 				[
+					'key' => 'zabbix[cluster,discovery,nodes]',
+					'description' => _('Return a list of High Availability cluster nodes and their parameters. Returns JSON')
+				],
+				[
 					'key' => 'zabbix[history]',
 					'description' => _('Number of values stored in table HISTORY.')
 				],

@@ -2055,3 +2055,9 @@ ini_set('precision', 14);
 if (function_exists('bcscale')) {
 	bcscale(7);
 }
+
+// High availabilty server node states.
+define('ZBX_NODE_STATUS_STANDBY', 0);
+define('ZBX_NODE_STATUS_STOPPED', 1);
+define('ZBX_NODE_STATUS_UNAVAILABLE', 2);
+define('ZBX_NODE_STATUS_ACTIVE', 3);

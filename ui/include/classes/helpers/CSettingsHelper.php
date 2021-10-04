@@ -80,6 +80,7 @@ class CSettingsHelper extends CConfigGeneralHelper {
 	public const SCHEDULED_REPORT_TEST_TIMEOUT = 'report_test_timeout';
 	public const DBVERSION_STATUS = 'dbversion_status';
 	public const AUDITLOG_ENABLED = 'auditlog_enabled';
+	public const HA_FAILOVER_DELAY = 'ha_failover_delay';
 
 	/**
 	 * Settings API object parameters array.
