@@ -1465,6 +1465,12 @@ static int	expression_eval_bucket_rate(zbx_expression_eval_t *eval, zbx_expressi
 			percentage = val_copy.data.dbl;
 		}
 
+		if (100 < percentage || 0 > percentage)
+		{
+			*error = zbx_strdup(NULL, "invalid value of percentile");
+			goto err;
+		}
+
 		pos = 1;
 	}
 	else if (2 == args_num)

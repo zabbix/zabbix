@@ -2389,7 +2389,7 @@ static int	eval_execute_function_histogram_quantile(const zbx_eval_context_t *ct
 
 	q = output->values[i].data.dbl;
 
-	if (q < 0 || q > 1 )
+	if (0 > q || 1 < q)
 	{
 		*error = zbx_dsprintf(*error, "invalid value of quantile for function at \"%s\"", err_fn);
 		return FAIL;
