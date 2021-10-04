@@ -277,16 +277,6 @@ class testFormTags extends CWebTest {
 
 		$this->page->login()->open($this->link);
 
-		// This is workaround for host popup screenshot. We need to filter out hosts to minimize page scroll.
-		if ($object === 'host') {
-			if ($data['name'] === 'With tags' || $data['name'] === 'Long tag name and value') {
-				$filter = $this->query('name:zbx_filter')->asFluidForm()->one()->waitUntilReady();
-				$filter->fill(['Name' => 'test']);
-				$this->query('button:Apply')->one()->waitUntilClickable()->click();
-				$this->page->waitUntilReady();
-			}
-		}
-
 		$this->query('button:Create '.$object)->waitUntilClickable()->one()->click();
 
 		$form = ($object === 'host')
@@ -696,16 +686,6 @@ class testFormTags extends CWebTest {
 		}
 
 		$this->page->open($this->saved_link.$id);
-
-		// This is workaround for host popup screenshot. We need to filter out hosts to minimize page scroll.
-		if ($object === 'host') {
-			if ($data['name'] === 'With tags' || $data['name'] === 'Long tag name and value') {
-				$filter = $this->query('name:zbx_filter')->asFluidForm()->one()->waitUntilReady();
-				$filter->fill(['Name' => 'Host-layout-test-001']);
-				$this->query('button:Apply')->one()->waitUntilClickable()->click();
-				$this->page->waitUntilReady();
-			}
-		}
 
 		if ($object === 'host') {
 			$form = $this->query('id:host-form')->waitUntilPresent()->asFluidForm()->one();
