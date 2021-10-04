@@ -279,10 +279,12 @@ class testFormTags extends CWebTest {
 
 		// This is workaround for host popup screenshot. We need to filter out hosts to minimize page scroll.
 		if ($object === 'host') {
-			$filter = $this->query('name:zbx_filter')->asFluidForm()->one()->waitUntilReady();
-			$filter->fill(['Name' => 'test']);
-			$this->query('button:Apply')->one()->waitUntilClickable()->click();
-			$this->page->waitUntilReady();
+			if ($data['name'] === 'With tags' || $data['name'] === 'Long tag name and value') {
+				$filter = $this->query('name:zbx_filter')->asFluidForm()->one()->waitUntilReady();
+				$filter->fill(['Name' => 'test']);
+				$this->query('button:Apply')->one()->waitUntilClickable()->click();
+				$this->page->waitUntilReady();
+			}
 		}
 
 		$this->query('button:Create '.$object)->waitUntilClickable()->one()->click();
@@ -697,10 +699,12 @@ class testFormTags extends CWebTest {
 
 		// This is workaround for host popup screenshot. We need to filter out hosts to minimize page scroll.
 		if ($object === 'host') {
-			$filter = $this->query('name:zbx_filter')->asFluidForm()->one()->waitUntilReady();
-			$filter->fill(['Name' => 'test']);
-			$this->query('button:Apply')->one()->waitUntilClickable()->click();
-			$this->page->waitUntilReady();
+			if ($data['name'] === 'With tags' || $data['name'] === 'Long tag name and value') {
+				$filter = $this->query('name:zbx_filter')->asFluidForm()->one()->waitUntilReady();
+				$filter->fill(['Name' => 'Host-layout-test-001']);
+				$this->query('button:Apply')->one()->waitUntilClickable()->click();
+				$this->page->waitUntilReady();
+			}
 		}
 
 		if ($object === 'host') {
@@ -1136,18 +1140,5 @@ class testFormTags extends CWebTest {
 		});
 
 		return array_values($inherited_tags);
-	}
-
-	/**
-	 * Function for filtering necessary hosts or templates.
-	 *
-	 * @param string         $name    name of a host
-	 */
-	private function filterTestHosts($tempate) {
-		$filter = $this->query('name:zbx_filter')->asFluidForm->one()->waitUntilReady();
-		$filter->fill(['Name' => 'test']);
-		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-//		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
-//				->getColumn('Graphs')->query('link:Graphs')->one()->click();
 	}
 }
