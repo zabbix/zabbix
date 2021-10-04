@@ -293,10 +293,10 @@ $child_services = (new CTable())
 			)
 	);
 
-$child_services_filter = (new CHorList())
+$child_services_filter = (new CList())
 	->setId('children-filter')
 	->addClass(ZBX_STYLE_INLINE_FILTER)
-	->addItem(new CLabel(_('Name'), 'children-filter-name'))
+	->addItem(new CLabel(_('Name'), 'children-filter-name'), ZBX_STYLE_INLINE_FILTER_LABEL)
 	->addItem(
 		(new CTextBox(null))
 			->setId('children-filter-name')

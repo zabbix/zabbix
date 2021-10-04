@@ -37,7 +37,8 @@ $controls = (new CForm())
 	->addVar('exclude_serviceids', $data['exclude_serviceids'])
 	->addItem(
 		(new CList())
-			->addItem(new CLabel(_('Name'), 'services-filter-name'))
+			->addClass(ZBX_STYLE_INLINE_FILTER)
+			->addItem(new CLabel(_('Name'), 'services-filter-name'), ZBX_STYLE_INLINE_FILTER_LABEL)
 			->addItem(
 				(new CTextBox('filter_name', $data['filter']['name']))
 					->setId('services-filter-name')

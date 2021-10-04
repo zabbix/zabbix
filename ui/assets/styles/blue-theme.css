@@ -1453,6 +1453,15 @@ footer {
     .search-suggest li.suggest-hover {
       background-color: #e8f5ff; }
 
+.inline-filter {
+  text-align: right; }
+  .inline-filter > li {
+    display: inline-block; }
+    .inline-filter > li:not(:last-child) {
+      margin-right: 3px; }
+    .inline-filter > li.inline-filter-label {
+      margin-right: 10px; }
+
 .icon-dashboard::before, .icon-problems::before, .icon-monitoring::before, .icon-inventory::before, .icon-reports::before, .icon-configuration::before, .icon-administration::before {
   content: '';
   width: 24px;
@@ -2433,12 +2442,6 @@ pre, pre a, pre td, pre span {
   margin: 0 6px 0 0; }
   .hor-list > li:last-child {
     margin: 0; }
-.hor-list.inline-filter {
-  text-align: right; }
-  .hor-list.inline-filter > li {
-    margin-right: 10px; }
-    .hor-list.inline-filter > li:last-child {
-      margin: 0; }
 
 .header-navigation {
   display: inline-block;
@@ -4217,6 +4220,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       .overlay-dialogue.modal .overlay-dialogue-controls z-select li {
         display: block;
         padding-left: 5px; }
+      .overlay-dialogue.modal .overlay-dialogue-controls .inline-filter li {
+        padding-left: 0; }
     .overlay-dialogue.modal > .overlay-close-btn {
       position: relative;
       float: right;
