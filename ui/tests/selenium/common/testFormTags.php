@@ -307,6 +307,7 @@ class testFormTags extends CWebTest {
 		if ($data['name'] === 'With tags' || $data['name'] === 'Long tag name and value') {
 			$dialog = COverlayDialogElement::find()->one()->waitUntilVisible();
 			$this->page->removeFocus();
+			sleep(1);
 			$screenshot_area = $dialog->query('id:tags-table')->one();
 			$this->assertScreenshot($screenshot_area, $data['name']);
 		}
@@ -717,6 +718,7 @@ class testFormTags extends CWebTest {
 		if ($data['name'] === 'With tags' || $data['name'] === 'Long tag name and value') {
 			$dialog = COverlayDialogElement::find()->one()->waitUntilVisible();
 			$this->page->removeFocus();
+			sleep(1);
 			$screenshot_area = $dialog->query('id:tags-table')->one();
 			$this->assertScreenshot($screenshot_area, $data['name']);
 		}
