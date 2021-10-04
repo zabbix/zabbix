@@ -272,10 +272,9 @@ clean:
 	return res;
 }
 
-
 /**********************************************************************************************************
  *                                                                                                        *
- * Function: prepare_neccessary_trigger_dependencies_updates_and_deletes                                  *
+ * Function: prepare_trigger_dependencies_updates_and_deletes                                             *
  *                                                                                                        *
  * Purpose: takes a list of pending trigger dependencies (links) and excludes entries that are            *
  *          already present on the target host to generate a new list (links_processed). Also, prepare    *
@@ -291,7 +290,7 @@ clean:
  * Return value: upon successful completion return SUCCEED, or FAIL on DB error                           *
  *                                                                                                        *
  *********************************************************************************************************/
-static int	prepare_neccessary_trigger_dependencies_updates_and_deletes(const zbx_vector_uint64_t *trids,
+static int	prepare_trigger_dependencies_updates_and_deletes(const zbx_vector_uint64_t *trids,
 		zbx_vector_uint64_pair_t *links, zbx_vector_uint64_pair_t *links_processed,
 		zbx_vector_uint64_t *trigger_dep_ids_del)
 {
@@ -492,7 +491,7 @@ static int	DBadd_and_remove_trigger_dependencies(zbx_vector_uint64_pair_t *links
 	zbx_vector_uint64_create(&trigger_dep_ids_del);
 	zbx_vector_uint64_pair_create(&links_processed);
 
-	if (FAIL == (res = prepare_neccessary_trigger_dependencies_updates_and_deletes(trids, links, &links_processed,
+	if (FAIL == (res = prepare_trigger_dependencies_updates_and_deletes(trids, links, &links_processed,
 			&trigger_dep_ids_del)))
 	{
 		goto clean;
