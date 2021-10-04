@@ -51,7 +51,8 @@ class CControllerHostView extends CControllerHost {
 		// Validate tags filter.
 		if ($ret && $this->hasInput('filter_tags')) {
 			foreach ($this->getInput('filter_tags') as $filter_tag) {
-				if (count($filter_tag) != 3
+				if (!is_array($filter_tag)
+						|| count($filter_tag) != 3
 						|| !array_key_exists('tag', $filter_tag) || !is_string($filter_tag['tag'])
 						|| !array_key_exists('value', $filter_tag) || !is_string($filter_tag['value'])
 						|| !array_key_exists('operator', $filter_tag) || !is_string($filter_tag['operator'])) {
