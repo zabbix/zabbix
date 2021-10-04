@@ -25,6 +25,8 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
  * Base class for Tags function tests.
+ *
+ * @backup profiles
  */
 class testFormTags extends CWebTest {
 
@@ -274,6 +276,15 @@ class testFormTags extends CWebTest {
 		}
 
 		$this->page->login()->open($this->link);
+
+		// This is workaround for host popup screenshot. We need to filter out hosts to minimize page scroll.
+		if ($object === 'host') {
+			$filter = $this->query('name:zbx_filter')->asFluidForm()->one()->waitUntilReady();
+			$filter->fill(['Name' => 'test']);
+			$this->query('button:Apply')->one()->waitUntilClickable()->click();
+			$this->page->waitUntilReady();
+		}
+
 		$this->query('button:Create '.$object)->waitUntilClickable()->one()->click();
 
 		$form = ($object === 'host')
@@ -683,6 +694,14 @@ class testFormTags extends CWebTest {
 		}
 
 		$this->page->open($this->saved_link.$id);
+
+		// This is workaround for host popup screenshot. We need to filter out hosts to minimize page scroll.
+		if ($object === 'host') {
+			$filter = $this->query('name:zbx_filter')->asFluidForm()->one()->waitUntilReady();
+			$filter->fill(['Name' => 'test']);
+			$this->query('button:Apply')->one()->waitUntilClickable()->click();
+			$this->page->waitUntilReady();
+		}
 
 		if ($object === 'host') {
 			$form = $this->query('id:host-form')->waitUntilPresent()->asFluidForm()->one();
@@ -1117,5 +1136,18 @@ class testFormTags extends CWebTest {
 		});
 
 		return array_values($inherited_tags);
+	}
+
+	/**
+	 * Function for filtering necessary hosts or templates.
+	 *
+	 * @param string         $name    name of a host
+	 */
+	private function filterTestHosts($tempate) {
+		$filter = $this->query('name:zbx_filter')->asFluidForm->one()->waitUntilReady();
+		$filter->fill(['Name' => 'test']);
+		$this->query('button:Apply')->one()->waitUntilClickable()->click();
+//		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
+//				->getColumn('Graphs')->query('link:Graphs')->one()->click();
 	}
 }
