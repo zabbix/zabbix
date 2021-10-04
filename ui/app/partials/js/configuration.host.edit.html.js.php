@@ -427,20 +427,69 @@ $linked_templates = $host_is_discovered ? array_column($data['host']['parentTemp
 		 * @return {Object}        Processed fields from host form.
 		 */
 		preprocessFormFields(fields) {
-			// Trim text fields.
-			fields.host = fields.host.trim();
-			fields.visiblename = fields.visiblename.trim();
-			fields.description = fields.description.trim();
-
+			this.trimFields(fields);
 			fields.status = fields.status || <?= HOST_STATUS_NOT_MONITORED ?>;
 
-			// TODO VM: check
 			if (document.querySelector('#change_psk')) {
 				delete fields.tls_psk_identity;
 				delete fields.tls_psk;
 			}
 
 			return fields;
+		},
+
+		trimFields(fields) {
+			const fields_to_trim = ['host', 'visiblename', 'description', 'ipmi_username', 'ipmi_password',
+				'tls_subject', 'tls_issuer', 'tls_psk_identity', 'tls_psk'];
+			for (const field of fields_to_trim) {
+				if (field in fields) {
+					fields[field] = fields[field].trim();
+				}
+			}
+
+			if ('interfaces' in fields) {
+				for (const key in fields.interfaces) {
+					const host_interface = fields.interfaces[key];
+					host_interface.ip = host_interface.ip.trim();
+					host_interface.dns = host_interface.dns.trim();
+					host_interface.port = host_interface.port.trim();
+
+					if ('details' in host_interface) {
+						const details = host_interface.details;
+						details.authpassphrase = details.authpassphrase.trim();
+						details.community = details.community.trim();
+						details.contextname = details.contextname.trim();
+						details.privpassphrase = details.privpassphrase.trim();
+						details.securityname = details.securityname.trim();
+					}
+				}
+			}
+
+			if ('macros' in fields) {
+				for (const key in fields.macros) {
+					const macro = fields.macros[key];
+					macro.macro = macro.macro.trim();
+					macro.value = macro.value.trim();
+
+					if ('description' in macro) {
+						macro.description = macro.description.trim();
+					}
+				}
+			}
+
+			if ('host_inventory' in fields) {
+				for (const key in fields.host_inventory) {
+					fields.host_inventory[key] = fields.host_inventory[key].trim();
+				}
+			}
+
+			if ('tags' in fields) {
+				for (const key in fields.tags) {
+					const tag = fields.tags[key];
+					tag.tag = tag.tag.trim();
+					tag.value = tag.value.trim();
+				}
+			}
 		}
 	};
 </script>
