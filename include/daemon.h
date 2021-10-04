@@ -43,9 +43,6 @@ void	zbx_set_sigusr_handler(void (*handler)(int flags));
 
 #define ZBX_DO_EXIT()
 
-
-
-
 #define START_MAIN_ZABBIX_ENTRY(allow_root, user, flags)	daemon_start(allow_root, user, flags)
 
 #endif	/* ZABBIX_DAEMON_H */
