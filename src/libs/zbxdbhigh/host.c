@@ -3607,7 +3607,7 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 	int				i, j, new_hosts = 0, new_hosts_templates = 0, new_group_prototypes = 0,
 					upd_group_prototypes = 0, new_hostmacros = 0, upd_hostmacros = 0,
 					new_tags = 0, new_interfaces = 0, upd_interfaces = 0, new_snmp = 0,
-					upd_snmp = 0, new_inventory_modes = 0, upd_inventory_modes = 0;
+					upd_snmp = 0, new_inventory_modes = 0, upd_inventory_modes = 0, res = SUCCEED;
 	zbx_db_insert_t			db_insert, db_insert_hdiscovery, db_insert_gproto,
 					db_insert_hmacro, db_insert_tag, db_insert_iface, db_insert_snmp,
 					db_insert_inventory_mode;
@@ -3741,9 +3741,16 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 	if (0 != new_hosts_templates)
 		hosttemplateid = DBget_maxid_num("hosts_templates", new_hosts_templates);
 
-	if (0 != del_hosttemplateids->values_num)
+	if (0 != del_hosttemplateids->values_num || 0 != del_hostmacroids->values_num || 0 != del_tagids->values_num ||
+			0 != del_snmpids->values_num || 0 != del_interfaceids->values_num ||
+			0 != del_inventory_modes_hostids.values_num)
 	{
 		sql2 = (char *)zbx_malloc(sql2, sql2_alloc);
+		DBbegin_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
+	}
+
+	if (0 != del_hosttemplateids->values_num)
+	{
 		zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, "delete from hosts_templates where");
 		DBadd_condition_alloc(&sql2, &sql2_alloc, &sql2_offset, "hosttemplateid",
 				del_hosttemplateids->values, del_hosttemplateids->values_num);
@@ -3904,7 +3911,8 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, " where hostid=" ZBX_FS_UI64 ";\n",
 					host_prototype->hostid);
 
-			DBexecute_overflowed_sql(&sql1, &sql1_alloc, &sql1_offset);
+			if (FAIL == (res = DBexecute_overflowed_sql(&sql1, &sql1_alloc, &sql1_offset)))
+				break;
 
 			if (0 != (host_prototype->flags & ZBX_FLAG_HPLINK_UPDATE_INVENTORY_MODE))
 			{
@@ -3923,7 +3931,11 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 								" where hostid=" ZBX_FS_UI64 ";\n",
 								host_prototype->inventory_mode, host_prototype->hostid);
 
-						DBexecute_overflowed_sql(&sql1, &sql1_alloc, &sql1_offset);
+						if (FAIL == (res = DBexecute_overflowed_sql(&sql1, &sql1_alloc,
+								&sql1_offset)))
+						{
+							break;
+						}
 					}
 				}
 
@@ -3967,7 +3979,8 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 						" where group_prototypeid=" ZBX_FS_UI64 ";\n",
 						group_prototype->templateid, group_prototype->group_prototypeid);
 
-				DBexecute_overflowed_sql(&sql1, &sql1_alloc, &sql1_offset);
+				if (FAIL == (res = DBexecute_overflowed_sql(&sql1, &sql1_alloc, &sql1_offset)))
+					break;
 
 				zbx_audit_host_prototype_update_json_update_group_details(host_prototype->hostid,
 						group_prototype->group_prototypeid, group_prototype->name,
@@ -4044,7 +4057,8 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 
 				zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
 						" where hostmacroid=" ZBX_FS_UI64 ";\n", hostmacro->hostmacroid);
-				DBexecute_overflowed_sql(&sql1, &sql1_alloc, &sql1_offset);
+				if (FAIL == (res = DBexecute_overflowed_sql(&sql1, &sql1_alloc, &sql1_offset)))
+					break;
 			}
 		}
 
@@ -4152,7 +4166,8 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 				zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
 						" where interfaceid=" ZBX_FS_UI64 ";\n", interface->interfaceid);
 
-				DBexecute_overflowed_sql(&sql1, &sql1_alloc, &sql1_offset);
+				if (FAIL == (res = DBexecute_overflowed_sql(&sql1, &sql1_alloc, &sql1_offset)))
+					break;
 			}
 
 			if (INTERFACE_TYPE_SNMP == interface->type)
@@ -4226,6 +4241,9 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 
 			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
 					" where hosttagid=" ZBX_FS_UI64 ";\n", tag->tagid);
+
+			if (FAIL == (res = DBexecute_overflowed_sql(&sql1, &sql1_alloc, &sql1_offset)))
+				break;
 		}
 	}
 
@@ -4274,8 +4292,8 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 		zbx_db_insert_clean(&db_insert_inventory_mode);
 	}
 
-	if (NULL != sql1 || new_hosts != host_prototypes->values_num || 0 != upd_group_prototypes ||
-			0 != upd_hostmacros || 0 != upd_interfaces || 0 != upd_snmp || 0 != upd_inventory_modes)
+	if (SUCCEED == res && (NULL != sql1 || new_hosts != host_prototypes->values_num || 0 != upd_group_prototypes ||
+			0 != upd_hostmacros || 0 != upd_interfaces || 0 != upd_snmp || 0 != upd_inventory_modes))
 	{
 		DBend_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
 
@@ -4285,11 +4303,16 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 		zbx_free(sql1);
 	}
 
-	if (0 != del_hosttemplateids->values_num || 0 != del_hostmacroids->values_num || 0 != del_tagids->values_num ||
+	if (SUCCEED == res && (NULL != sql2 || 0 != del_hosttemplateids->values_num ||
+			0 != del_hostmacroids->values_num || 0 != del_tagids->values_num ||
 			0 != del_interfaceids->values_num || 0 != del_snmpids->values_num ||
-			0 != del_inventory_modes_hostids.values_num)
+			0 != del_inventory_modes_hostids.values_num))
 	{
-		DBexecute("%s", sql2);
+		DBend_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
+
+		/* in ORACLE always present begin..end; */
+		if (16 < sql2_offset)
+			DBexecute("%s", sql2);
 		zbx_free(sql2);
 	}
 
