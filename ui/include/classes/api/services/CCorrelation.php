@@ -189,7 +189,7 @@ class CCorrelation extends CApiService {
 					break;
 
 				case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
-				case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
+				case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
 					if ($condition['operator'] == $db_condition['operator']
 							&& $condition['tag'] === $db_condition['tag']
 							&& $condition['value'] === $db_condition['value']) {
