@@ -325,8 +325,9 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 #define ZBX_VMWARE_HVPROP_VERSION			13
 #define ZBX_VMWARE_HVPROP_NAME				14
 #define ZBX_VMWARE_HVPROP_STATUS			15
+#define ZBX_VMWARE_HVPROP_MAINTENANCE			16
 
-#define ZBX_VMWARE_HVPROPS_NUM				16
+#define ZBX_VMWARE_HVPROPS_NUM				17
 
 /* virtual machine properties */
 #define ZBX_VMWARE_VMPROP_CPU_NUM			0
