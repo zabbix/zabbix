@@ -1,1 +1,0 @@
-.......PS. [ZBX-20010] fixed crash in zabbix-proxy-sqlite3 caused by uninitialized pointer in db_version_info struct (yurii)

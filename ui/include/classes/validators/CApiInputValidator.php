@@ -213,6 +213,12 @@ class CApiInputValidator {
 
 			case API_VAULT_SECRET:
 				return self::validateVaultSecret($rule, $data, $path, $error);
+
+			case API_IMAGE:
+				return self::validateImage($rule, $data, $path, $error);
+
+			case API_EXEC_PARAMS:
+				return self::validateExecParams($rule, $data, $path, $error);
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
@@ -275,6 +281,8 @@ class CApiInputValidator {
 			case API_UUID:
 			case API_CUID:
 			case API_VAULT_SECRET:
+			case API_IMAGE:
+			case API_EXEC_PARAMS:
 			case API_UNEXPECTED:
 				return true;
 
@@ -1105,6 +1113,11 @@ class CApiInputValidator {
 		// unexpected parameter validation
 		if (!($flags & API_ALLOW_UNEXPECTED)) {
 			foreach ($data as $field_name => $value) {
+				if (!$rule['fields']) {
+					$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('should be empty'));
+					return false;
+				}
+
 				if (!array_key_exists($field_name, $rule['fields'])) {
 					$error = _s('Invalid parameter "%1$s": %2$s.', $path,
 						_s('unexpected parameter "%1$s"', $field_name)
@@ -2628,6 +2641,71 @@ class CApiInputValidator {
 
 		if ($vault_secret_parser->parse($data) != CParser::PARSE_SUCCESS) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $vault_secret_parser->getError());
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Validate image.
+	 *
+	 * @param array  $rule
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateImage($rule, &$data, $path, &$error) {
+		if (self::checkStringUtf8(0, $data, $path, $error) === false) {
+			return false;
+		}
+
+		$data = base64_decode($data);
+
+		if (bccomp(strlen($data), ZBX_MAX_IMAGE_SIZE) == 1) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+				_s('image size must be less than %1$s', convertUnits(['value' => ZBX_MAX_IMAGE_SIZE, 'units' => 'B']))
+			);
+			return false;
+		}
+
+		if (@imageCreateFromString($data) === false) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('file format is unsupported'));
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY
+	 * @param int    $rule['length']  (optional)
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateExecParams(array $rule, &$data, string $path, string &$error): bool {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (($flags & API_NOT_EMPTY) == 0 && $data === '') {
+			return true;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		if ($data !== '' && mb_substr($data, -1) !== "\n") {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('the last new line feed is missing'));
 			return false;
 		}
 

@@ -205,11 +205,7 @@ if (array_key_exists('filter_options', $data)) { ?>
 		$(document).on('submit', '#problem_form', function(e) {
 			e.preventDefault();
 
-			var eventids = $('[id^="eventids_"]:checked', $(this)).map(function() {
-					return $(this).val();
-				}).get();
-
-			acknowledgePopUp({eventids: eventids}, this);
+			acknowledgePopUp({eventids: chkbxRange.selectedIds}, this);
 		});
 	});
 </script>
