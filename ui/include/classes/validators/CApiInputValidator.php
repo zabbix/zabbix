@@ -237,7 +237,6 @@ class CApiInputValidator {
 			case API_COLOR:
 			case API_COND_FORMULA:
 			case API_COND_FORMULAID:
-			case API_MULTIPLE:
 			case API_STRING_UTF8:
 			case API_INT32:
 			case API_UINT64:
@@ -276,11 +275,22 @@ class CApiInputValidator {
 			case API_UUID:
 			case API_CUID:
 			case API_VAULT_SECRET:
+			case API_UNEXPECTED:
 				return true;
 
 			case API_OBJECT:
 				foreach ($rule['fields'] as $field_name => $field_rule) {
 					if ($data !== null && array_key_exists($field_name, $data)) {
+						if ($field_rule['type'] === API_MULTIPLE) {
+							foreach ($field_rule['rules'] as $multiple_rule) {
+								if (array_key_exists('else', $multiple_rule)
+										|| self::isInRange($data[$multiple_rule['if']['field']], $multiple_rule['if']['in'])) {
+									$field_rule = $multiple_rule;
+									break;
+								}
+							}
+						}
+
 						$subpath = ($path === '/' ? $path : $path.'/').$field_name;
 						if (!self::validateDataUniqueness($field_rule, $data[$field_name], $subpath, $error)) {
 							return false;
@@ -1972,6 +1982,16 @@ class CApiInputValidator {
 		foreach ($data as $index => $object) {
 			foreach ($rule['fields'] as $field_name => $field_rule) {
 				if (array_key_exists($field_name, $object)) {
+					if ($field_rule['type'] === API_MULTIPLE) {
+						foreach ($field_rule['rules'] as $multiple_rule) {
+							if (array_key_exists('else', $multiple_rule)
+									|| self::isInRange($object[$multiple_rule['if']['field']], $multiple_rule['if']['in'])) {
+								$field_rule = $multiple_rule;
+								break;
+							}
+						}
+					}
+
 					$subpath = ($path === '/' ? $path : $path.'/').($index + 1).'/'.$field_name;
 					if (!self::validateDataUniqueness($field_rule, $object[$field_name], $subpath, $error)) {
 						return false;

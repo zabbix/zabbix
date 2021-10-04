@@ -5124,6 +5124,48 @@ class CApiInputValidatorTest extends TestCase {
 				'/',
 				false,
 				'Invalid parameter "/tags/2": value (tag, operator, value)=(tag, 0, ) already exists.'
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'tags' => ['type' => API_MULTIPLE, 'rules' => [
+						['else' => true, 'type' => API_OBJECTS, 'uniq' => [['tag', 'operator', 'value']], 'fields' => [
+							'tag'		=> ['type' => API_STRING_UTF8],
+							'operator'	=> ['type' => API_INT32],
+							'value'		=> ['type' => API_STRING_UTF8]
+						]]
+					]]
+				]],
+				[
+					'tags' => [
+						['tag' => 'tag', 'operator' => 0, 'value' => ''],
+						['tag' => 'tag', 'operator' => 0, 'value' => '']
+					]
+				],
+				'/',
+				false,
+				'Invalid parameter "/tags/2": value (tag, operator, value)=(tag, 0, ) already exists.'
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => [
+					'tags' => ['type' => API_MULTIPLE, 'rules' => [
+						['else' => true, 'type' => API_OBJECTS, 'uniq' => [['tag', 'operator', 'value']], 'fields' => [
+							'tag'		=> ['type' => API_STRING_UTF8],
+							'operator'	=> ['type' => API_INT32],
+							'value'		=> ['type' => API_STRING_UTF8]
+						]]
+					]]
+				]],
+				[
+					[
+						'tags' => [
+							['tag' => 'tag', 'operator' => 0, 'value' => ''],
+							['tag' => 'tag', 'operator' => 0, 'value' => '']
+						]
+					]
+				],
+				'/',
+				false,
+				'Invalid parameter "/1/tags/2": value (tag, operator, value)=(tag, 0, ) already exists.'
 			]
 		];
 	}
