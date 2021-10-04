@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-09-10 19:53+0300\n"
-"PO-Revision-Date: 2021-06-14 04:52+0300\n"
+"PO-Revision-Date: 2021-09-11 16:35+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1623639149.000000\n"
+"X-POOTLE-MTIME: 1631370943.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:139
@@ -19021,7 +19021,7 @@ msgstr "Y/m/d H:i:s"
 
 #: include/translateDefines.inc.php:37
 msgid "Y-n-d"
-msgstr ""
+msgstr "Y-n-d"
 
 #: include/views/js/monitoring.sysmaps.js.php:430
 msgid "Y1"
@@ -20227,11 +20227,11 @@ msgstr "少なくとも1つのLLDマクロを含めることが必要です"
 
 #: include/translateDefines.inc.php:38
 msgid "n-d"
-msgstr ""
+msgstr "n-d"
 
 #: include/translateDefines.inc.php:36
 msgid "n-d H:i"
-msgstr ""
+msgstr "n-d H:i"
 
 #: include/views/configuration.host.discovery.edit.php:125
 #: include/views/configuration.host.discovery.edit.php:221

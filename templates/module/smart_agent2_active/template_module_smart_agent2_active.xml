@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-02-08T18:34:37Z</date>
+   <date>2021-10-01T14:12:36Z</date>
    <groups>
       <group>
          <name>Templates/Modules</name>
@@ -11,11 +11,11 @@
       <template>
          <template>Template Module SMART by Zabbix agent active 2</template>
          <name>Template Module SMART by Zabbix agent active 2</name>
-         <description>The template for monitoring S.M.A.R.T. attributes of physical disk that works without any external scripts. It collects metrics by Zabbix agent active 2 version 5.0 and later with Smartmontools version 7.1 and later. Disk discovery LLD rule finds all HDD, SSD, NVMe disks with S.M.A.R.T. enabled. Attribute discovery LLD rule finds all Vendor Specific Attributes for each disk. If you want to skip some attributes, please set regular expressions with disk names in {$SMART.DISK.NAME.MATCHES} and with attribute IDs in {$SMART.ATTRIBUTE.ID.MATCHES} macros on the host level.&#13;
+         <description>The template for monitoring S.M.A.R.T. attributes of physical disk that works without any external scripts. It collects metrics by Zabbix agent 2 version 5.0 and later with Smartmontools version 7.1 and later. Disk discovery LLD rule finds all HDD, SSD, NVMe disks with S.M.A.R.T. enabled. Attribute discovery LLD rule finds all Vendor Specific Attributes for each disk. If you want to skip some attributes, please set regular expressions with disk names in {$SMART.DISK.NAME.MATCHES} and with attribute IDs in {$SMART.ATTRIBUTE.ID.MATCHES} macros on the host level.&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/415662-discussion-thread-for-official-zabbix-smart-disk-monitoring&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -50,6 +50,33 @@ Template tooling version used: 0.38</description>
                <description>Discovery SMART Vendor Specific Attributes of disks.</description>
                <item_prototypes>
                   <item_prototype>
+                     <name>SMART [{#NAME}]: ID {#ID} {#ATTRNAME} raw value</name>
+                     <type>DEPENDENT</type>
+                     <key>smart.disk.attr.raw[{#NAME},{#ID}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>{#DISKTYPE} {#NAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.disk_name=='{#NAME}')].ata_smart_attributes.table[?(@.id=={#ID})].raw.string.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>smart.disk.get</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
                      <name>SMART [{#NAME}]: ID {#ID} {#ATTRNAME}</name>
                      <type>DEPENDENT</type>
                      <key>smart.disk.error[{#NAME},{#ID}]</key>
@@ -83,7 +110,6 @@ Template tooling version used: 0.38</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <overrides>
                   <override>
                      <name>ID filter</name>
@@ -154,7 +180,6 @@ Template tooling version used: 0.38</description>
                      <key>smart.disk.hours[{#NAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <units>s</units>
                      <description>Count of hours in power-on state. The raw value of this attribute shows total count of hours (or minutes, or seconds, depending on manufacturer) in power-on state. "By default, the total expected lifetime of a hard disk in perfect condition is defined as 5 years (running every day and night on all days). This is equal to 1825 days in 24/7 mode or 43800 hours." On some pre-2005 drives, this raw value may advance erratically and/or "wrap around" (reset to zero periodically). https://en.wikipedia.org/wiki/S.M.A.R.T.#Known_ATA_S.M.A.R.T._attributes</description>
                      <application_prototypes>
                         <application_prototype>
@@ -165,6 +190,10 @@ Template tooling version used: 0.38</description>
                         <step>
                            <type>JSONPATH</type>
                            <params>$[?(@.disk_name=='{#NAME}')].power_on_time.hours.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -322,6 +351,11 @@ Template tooling version used: 0.38</description>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
+                           <expression>{avg(5m)}&gt;{$SMART.TEMPERATURE.MAX.CRIT}</expression>
+                           <name>SMART [{#NAME}]: Average disk temperature is critical (over {$SMART.TEMPERATURE.MAX.CRIT}°C for 5m)</name>
+                           <priority>AVERAGE</priority>
+                        </trigger_prototype>
+                        <trigger_prototype>
                            <expression>{avg(5m)}&gt;{$SMART.TEMPERATURE.MAX.WARN}</expression>
                            <name>SMART [{#NAME}]: Average disk temperature is too high (over {$SMART.TEMPERATURE.MAX.WARN}°C for 5m)</name>
                            <priority>WARNING</priority>
@@ -331,11 +365,6 @@ Template tooling version used: 0.38</description>
                                  <expression>{Template Module SMART by Zabbix agent active 2:smart.disk.temperature[{#NAME}].avg(5m)}&gt;{$SMART.TEMPERATURE.MAX.CRIT}</expression>
                               </dependency>
                            </dependencies>
-                        </trigger_prototype>
-                        <trigger_prototype>
-                           <expression>{avg(5m)}&gt;{$SMART.TEMPERATURE.MAX.CRIT}</expression>
-                           <name>SMART [{#NAME}]: Average disk temperature is critical (over {$SMART.TEMPERATURE.MAX.CRIT}°C for 5m)</name>
-                           <priority>AVERAGE</priority>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
@@ -375,7 +404,6 @@ Template tooling version used: 0.38</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <overrides>
                   <override>
                      <name>Self-test</name>
