@@ -478,7 +478,7 @@ out:
 	return res;
 }
 
-static int	DBadd_and_remove_trigger_dependencies(zbx_vector_uint64_pair_t	*links,
+static int	DBadd_and_remove_trigger_dependencies(zbx_vector_uint64_pair_t *links,
 		const zbx_vector_uint64_t *trids, zbx_hashset_t *triggers_flags)
 {
 	int				res;
@@ -530,8 +530,12 @@ clean:
  *                                                                              *
  * Parameters: hostid    - [IN] host identifier from database                   *
  *             trids     - [IN] vector of trigger identifiers from database     *
- *             is_update - [IN] hint flag is trids list are new triggers        *
- *                              or already present ones that need to be updated *
+ *             is_update - [IN] flag. Values:                                   *
+ *                              TRIGGER_DEP_SYNC_INSERT_OP - 'trids' contains   *
+ *                               identifiers of new triggers,                   *
+ *                              TRIGGER_DEP_SYNC_UPDATE_OP - 'trids' contains   *
+ *                               identifiers of already present triggers which  *
+ *                               need to be updated                             *
  *                                                                              *
  * Return value: upon successful completion return SUCCEED, or FAIL on DB error *
  *                                                                              *
