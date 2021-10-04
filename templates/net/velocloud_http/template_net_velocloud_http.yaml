@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-10-03T17:00:12Z'
+  date: '2021-10-04T15:05:35Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -401,7 +401,7 @@ zabbix_export:
           triggers:
             -
               uuid: 58541dfe798843fa822276e84a32b919
-              expression: 'change(/VMWare SD-WAN VeloCloud by HTTP/velocloud.system.properties)=1'
+              expression: 'last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.system.properties,#1)<>last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.system.properties,#2)'
               name: 'Velocloud: System properties have changed'
               priority: INFO
               description: 'System properties have changed.'
@@ -429,7 +429,7 @@ zabbix_export:
           item_prototypes:
             -
               uuid: 79aa9ebb1ce64944a78a7c8d7603f53b
-              name: 'Edge {#NAME}: Activation state'
+              name: 'Edge [{#NAME}]: Activation state'
               type: DEPENDENT
               key: 'velocloud.edge.activation[{#ID}]'
               delay: '0'
@@ -484,7 +484,7 @@ zabbix_export:
                   value: State
             -
               uuid: cecb2a3698704c4c89ef12eb3bb39222
-              name: 'Edge {#NAME}: Description'
+              name: 'Edge [{#NAME}]: Description'
               type: DEPENDENT
               key: 'velocloud.edge.description[{#ID}]'
               delay: '0'
@@ -527,7 +527,7 @@ zabbix_export:
                   value: text
             -
               uuid: 490afb422d0f457595343d49536470b7
-              name: 'Edge {#NAME}: HA state'
+              name: 'Edge [{#NAME}]: HA state'
               type: DEPENDENT
               key: 'velocloud.edge.ha_state[{#ID}]'
               delay: '0'
@@ -588,12 +588,12 @@ zabbix_export:
                 -
                   uuid: 075d35e3ed074b9daf01864b111945c7
                   expression: 'last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.ha_state[{#ID}])=3'
-                  name: 'Edge {#NAME}: HA state is in "FAILED" state'
+                  name: 'Edge [{#NAME}]: HA state is in "FAILED" state'
                   priority: WARNING
                   description: 'High availability state is "FAILED".'
             -
               uuid: fdb55947147249109da453009d6bd443
-              name: 'Edge {#NAME}: Model number'
+              name: 'Edge [{#NAME}]: Model number'
               type: DEPENDENT
               key: 'velocloud.edge.model[{#ID}]'
               delay: '0'
@@ -636,7 +636,7 @@ zabbix_export:
                   value: text
             -
               uuid: 0af44b485ae54de49a0385923c897bee
-              name: 'Edge {#NAME}: Service uptime'
+              name: 'Edge [{#NAME}]: Service uptime'
               type: DEPENDENT
               key: 'velocloud.edge.service_uptime[{#ID}]'
               delay: '0'
@@ -680,7 +680,7 @@ zabbix_export:
                   value: counter
             -
               uuid: e12fe7584fbd40268e7c16ed044aa4db
-              name: 'Edge {#NAME}: Software version'
+              name: 'Edge [{#NAME}]: Software version'
               type: DEPENDENT
               key: 'velocloud.edge.software_version[{#ID}]'
               delay: '0'
@@ -723,7 +723,7 @@ zabbix_export:
                   value: text
             -
               uuid: 74b49eac72574daab1b727045be118ca
-              name: 'Edge {#NAME}: State'
+              name: 'Edge [{#NAME}]: State'
               type: DEPENDENT
               key: 'velocloud.edge.state[{#ID}]'
               delay: '0'
@@ -782,12 +782,12 @@ zabbix_export:
                 -
                   uuid: 962d2d0c6f124424b2e5a7aca89d293f
                   expression: 'last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.state[{#ID}])=0'
-                  name: 'Edge {#NAME}: Edge is in "OFFLINE" state'
+                  name: 'Edge [{#NAME}]: Edge is in "OFFLINE" state'
                   priority: AVERAGE
                   description: 'Edge state is "OFFLINE".'
             -
               uuid: a86c1fa26d4d4481bdfb099338c27989
-              name: 'Edge {#NAME}: System uptime'
+              name: 'Edge [{#NAME}]: System uptime'
               type: DEPENDENT
               key: 'velocloud.edge.system_uptime[{#ID}]'
               delay: '0'
@@ -833,7 +833,7 @@ zabbix_export:
                 -
                   uuid: 156d96052fd54606828cc53484794bb2
                   expression: 'last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.system_uptime[{#ID}])>0 and last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.system_uptime[{#ID}])<600'
-                  name: 'Edge {#NAME}: Edge uptime is less than 10m'
+                  name: 'Edge [{#NAME}]: Edge uptime is less than 10m'
                   priority: WARNING
                   description: 'Edge was restarted.'
           master_item:
@@ -882,7 +882,7 @@ zabbix_export:
           item_prototypes:
             -
               uuid: 52859166849d4cdf860664f8d3b8088d
-              name: 'Gateway {#NAME}: Connected edges'
+              name: 'Gateway [{#NAME}]: Connected edges'
               type: DEPENDENT
               key: 'velocloud.gateway.connected_edges[{#ID}]'
               delay: '0'
@@ -920,14 +920,14 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: f0d7bdb2ac3540258ab6a276b43a382c
-                  expression: 'change(/VMWare SD-WAN VeloCloud by HTTP/velocloud.gateway.connected_edges[{#ID}])<>0'
-                  name: 'Gateway {#NAME}: The number of connected edges is changed'
+                  expression: 'last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.gateway.connected_edges[{#ID}],#1)<>last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.gateway.connected_edges[{#ID}],#2)'
+                  name: 'Gateway [{#NAME}]: The number of connected edges is changed'
                   priority: WARNING
                   description: 'The number of connected edges is changed.'
                   manual_close: 'YES'
             -
               uuid: 5e588efb83be4dc2bc29eaa0a6630718
-              name: 'Gateway {#NAME}: Description'
+              name: 'Gateway [{#NAME}]: Description'
               type: DEPENDENT
               key: 'velocloud.gateway.description[{#ID}]'
               delay: '0'
@@ -970,7 +970,7 @@ zabbix_export:
                   value: text
             -
               uuid: 7f2a0a68386744cb84fab35df8c55a07
-              name: 'Gateway {#NAME}: IP address'
+              name: 'Gateway [{#NAME}]: IP address'
               type: DEPENDENT
               key: 'velocloud.gateway.ip_address[{#ID}]'
               delay: '0'
@@ -1013,7 +1013,7 @@ zabbix_export:
                   value: text
             -
               uuid: b304460854f0485189f88df12483b5ac
-              name: 'Gateway {#NAME}: Service uptime'
+              name: 'Gateway [{#NAME}]: Service uptime'
               type: DEPENDENT
               key: 'velocloud.gateway.service_uptime[{#ID}]'
               delay: '0'
@@ -1057,7 +1057,7 @@ zabbix_export:
                   value: counter
             -
               uuid: 91784583eda943a7ace430413450391c
-              name: 'Gateway {#NAME}: State'
+              name: 'Gateway [{#NAME}]: State'
               type: DEPENDENT
               key: 'velocloud.gateway.state[{#ID}]'
               delay: '0'
@@ -1100,7 +1100,7 @@ zabbix_export:
                   value: State
             -
               uuid: d902600ef51640ffaaa4384ce505bcc2
-              name: 'Gateway {#NAME}: System uptime'
+              name: 'Gateway [{#NAME}]: System uptime'
               type: DEPENDENT
               key: 'velocloud.gateway.system_uptime[{#ID}]'
               delay: '0'
@@ -1146,12 +1146,12 @@ zabbix_export:
                 -
                   uuid: e51ea2da27284067bd3ec8fa4faffdde
                   expression: 'last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.gateway.system_uptime[{#ID}])>0 and last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.gateway.system_uptime[{#ID}])<600'
-                  name: 'Gateway {#NAME}: Gateway uptime is less that 10m'
+                  name: 'Gateway [{#NAME}]: Gateway uptime is less that 10m'
                   priority: WARNING
                   description: 'Gateway was restarted.'
             -
               uuid: 66c8fe8095724fb38966b05ef5d77a37
-              name: 'Gateway {#NAME}: Utilization CPU'
+              name: 'Gateway [{#NAME}]: Utilization CPU'
               type: DEPENDENT
               key: 'velocloud.gateway.utilization.cpu[{#ID}]'
               delay: '0'
@@ -1190,7 +1190,7 @@ zabbix_export:
                   value: gauge
             -
               uuid: b510c38771464024a66dc20ce9d75505
-              name: 'Gateway {#NAME}: Utilization load'
+              name: 'Gateway [{#NAME}]: Utilization load'
               type: DEPENDENT
               key: 'velocloud.gateway.utilization.load[{#ID}]'
               delay: '0'
@@ -1229,7 +1229,7 @@ zabbix_export:
                   value: gauge
             -
               uuid: ad83565ae40f480dacd56e63bd475ddc
-              name: 'Gateway {#NAME}: Utilization memory'
+              name: 'Gateway [{#NAME}]: Utilization memory'
               type: DEPENDENT
               key: 'velocloud.gateway.utilization.memory[{#ID}]'
               delay: '0'
@@ -1268,7 +1268,7 @@ zabbix_export:
                   value: gauge
             -
               uuid: b10c51350f604a8195e9c0176ca2de85
-              name: 'Gateway {#NAME}: Utilization overall'
+              name: 'Gateway [{#NAME}]: Utilization overall'
               type: DEPENDENT
               key: 'velocloud.gateway.utilization.overall[{#ID}]'
               delay: '0'
@@ -1308,7 +1308,7 @@ zabbix_export:
           graph_prototypes:
             -
               uuid: d8d9b176f439436ba6fe69ec8bc6409e
-              name: 'Gateway {#NAME}: Utilization'
+              name: 'Gateway [{#NAME}]: Utilization'
               graph_items:
                 -
                   color: 1A7C11
@@ -1379,7 +1379,7 @@ zabbix_export:
           item_prototypes:
             -
               uuid: 6b3351b9187d47ba804e5fcd8c6f474f
-              name: 'Link {#IP}({#NAME}): Best loss rx, %'
+              name: 'Link [{#NAME}]:[{#IP}]: Best loss rx, %'
               type: DEPENDENT
               key: 'velocloud.link.best_loss_rx.pct[{#ID}]'
               delay: '0'
@@ -1417,7 +1417,7 @@ zabbix_export:
                   value: gauge
             -
               uuid: 897c9055d51a4e75ba7bae1160c7303e
-              name: 'Link {#IP}({#NAME}): Best loss tx, %'
+              name: 'Link [{#NAME}]:[{#IP}]: Best loss tx, %'
               type: DEPENDENT
               key: 'velocloud.link.best_loss_tx.pct[{#ID}]'
               delay: '0'
@@ -1455,7 +1455,7 @@ zabbix_export:
                   value: gauge
             -
               uuid: 5602191f2e0f4cb2b2340a4cfc77cfc7
-              name: 'Link {#IP}({#NAME}): Bytes Rx'
+              name: 'Link [{#NAME}]:[{#IP}]: Bytes in'
               type: DEPENDENT
               key: 'velocloud.link.bytes_rx[{#ID}]'
               delay: '0'
@@ -1493,7 +1493,7 @@ zabbix_export:
                   value: gauge
             -
               uuid: 758b71f1692c46a8bb0611566b00031b
-              name: 'Link {#IP}({#NAME}): Bytes Tx'
+              name: 'Link [{#NAME}]:[{#IP}]: Bytes out'
               type: DEPENDENT
               key: 'velocloud.link.bytes_tx[{#ID}]'
               delay: '0'
@@ -1531,7 +1531,7 @@ zabbix_export:
                   value: gauge
             -
               uuid: 3320d368036b460091b3f20e3c5cebd9
-              name: 'Link {#IP}({#NAME}): Last active'
+              name: 'Link [{#NAME}]:[{#IP}]: Last active'
               type: DEPENDENT
               key: 'velocloud.link.last_active[{#ID}]'
               delay: '0'
@@ -1573,7 +1573,7 @@ zabbix_export:
                   value: counter
             -
               uuid: cf66e401adc6432e8052baf0128d6877
-              name: 'Link {#IP}({#NAME}): Packets Rx'
+              name: 'Link [{#NAME}]:[{#IP}]: Packets in'
               type: DEPENDENT
               key: 'velocloud.link.packets_rx[{#ID}]'
               delay: '0'
@@ -1611,7 +1611,7 @@ zabbix_export:
                   value: gauge
             -
               uuid: 152d25185f3e4e8b80ffea7d8ba25775
-              name: 'Link {#IP}({#NAME}): Packets Tx'
+              name: 'Link [{#NAME}]:[{#IP}]: Packets out'
               type: DEPENDENT
               key: 'velocloud.link.packets_tx[{#ID}]'
               delay: '0'
@@ -1649,7 +1649,7 @@ zabbix_export:
                   value: gauge
             -
               uuid: b1d5964d030841e28a8b9e80c8152e7a
-              name: 'Link {#IP}({#NAME}): State'
+              name: 'Link [{#NAME}]:[{#IP}]: State'
               type: DEPENDENT
               key: 'velocloud.link.state[{#ID}]'
               delay: '0'
@@ -1708,12 +1708,12 @@ zabbix_export:
                 -
                   uuid: abceaab09aea4cb482dc4b554502429b
                   expression: 'last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.link.state[{#ID}])<>1'
-                  name: 'Link {#IP}({#NAME}): Link state is not "STABLE"'
+                  name: 'Link [{#NAME}]:[{#IP}]: Link state is not "STABLE"'
                   priority: WARNING
                   description: 'Link state is not "STABLE".'
             -
               uuid: 43deb16e85644937a182b01eadb875d0
-              name: 'Link {#IP}({#NAME}): Total bytes'
+              name: 'Link [{#NAME}]:[{#IP}]: Total bytes'
               type: DEPENDENT
               key: 'velocloud.link.total_bytes[{#ID}]'
               delay: '0'
@@ -1751,7 +1751,7 @@ zabbix_export:
                   value: gauge
             -
               uuid: 622408bd703040339d1b4bdebed3280e
-              name: 'Link {#IP}({#NAME}): Total packets'
+              name: 'Link [{#NAME}]:[{#IP}]: Total packets'
               type: DEPENDENT
               key: 'velocloud.link.total_packets[{#ID}]'
               delay: '0'
@@ -1790,7 +1790,7 @@ zabbix_export:
           graph_prototypes:
             -
               uuid: d117ffc6c5f245099209ca3a471cc63f
-              name: 'Link {#IP}({#NAME}): Best loss'
+              name: 'Link [{#NAME}]:[{#IP}]: Best loss'
               graph_items:
                 -
                   color: 1A7C11
@@ -1805,7 +1805,7 @@ zabbix_export:
                     key: 'velocloud.link.best_loss_tx.pct[{#ID}]'
             -
               uuid: 951febf02caa4d4aa1417f8b8d11d89c
-              name: 'Link {#IP}({#NAME}): Bytes summary'
+              name: 'Link [{#NAME}]:[{#IP}]: Bytes summary'
               graph_items:
                 -
                   color: 1A7C11
@@ -1826,7 +1826,7 @@ zabbix_export:
                     key: 'velocloud.link.total_bytes[{#ID}]'
             -
               uuid: c656365e5c77496fac4c0a7d80d6cfd3
-              name: 'Link {#IP}({#NAME}): Packets summary'
+              name: 'Link [{#NAME}]:[{#IP}]: Packets summary'
               graph_items:
                 -
                   color: 1A7C11
@@ -1885,7 +1885,7 @@ zabbix_export:
           item_prototypes:
             -
               uuid: 2fafb7d1b4c1429381f2f46c60dafa28
-              name: 'Path {#SOURCE} => {#DESTINATION}({#NAME}): Bytes Rx'
+              name: 'Path [{#NAME}]:[{#SOURCE} => {#DESTINATION}]: Bytes in'
               type: DEPENDENT
               key: 'velocloud.sdwanpath.bytes_rx[{#NAME}/{#SOURCE}/{#DESTINATION}]'
               delay: '0'
@@ -1917,7 +1917,7 @@ zabbix_export:
                   value: gauge
             -
               uuid: 2fa176affa6b46ffae3682ea7cb96866
-              name: 'Path {#SOURCE} => {#DESTINATION}({#NAME}): Bytes Tx'
+              name: 'Path [{#NAME}]:[{#SOURCE} => {#DESTINATION}]: Bytes out'
               type: DEPENDENT
               key: 'velocloud.sdwanpath.bytes_tx[{#NAME}/{#SOURCE}/{#DESTINATION}]'
               delay: '0'
@@ -1949,7 +1949,7 @@ zabbix_export:
                   value: gauge
             -
               uuid: cf8f3d0c61994e49b493d79160da27bf
-              name: 'Path {#SOURCE} => {#DESTINATION}({#NAME}): Packets Rx'
+              name: 'Path [{#NAME}]:[{#SOURCE} => {#DESTINATION}]: Packets in'
               type: DEPENDENT
               key: 'velocloud.sdwanpath.packets_rx[{#NAME}/{#SOURCE}/{#DESTINATION}]'
               delay: '0'
@@ -1981,7 +1981,7 @@ zabbix_export:
                   value: gauge
             -
               uuid: 49fc4e85c5a5415793fc89f2c3cdec8f
-              name: 'Path {#SOURCE} => {#DESTINATION}({#NAME}): Packets Tx'
+              name: 'Path [{#NAME}]:[{#SOURCE} => {#DESTINATION}]: Packets out'
               type: DEPENDENT
               key: 'velocloud.sdwanpath.packets_tx[{#NAME}/{#SOURCE}/{#DESTINATION}]'
               delay: '0'
@@ -2013,7 +2013,7 @@ zabbix_export:
                   value: gauge
             -
               uuid: 98a0c2c3a3be47e9bd32cf719069cad2
-              name: 'Path {#SOURCE} => {#DESTINATION}({#NAME}): Packet Loss Rx'
+              name: 'Path [{#NAME}]:[{#SOURCE} => {#DESTINATION}]: Packet Loss in'
               type: DEPENDENT
               key: 'velocloud.sdwanpath.packet_loss_rx[{#NAME}/{#SOURCE}/{#DESTINATION}]'
               delay: '0'
@@ -2046,7 +2046,7 @@ zabbix_export:
                   value: gauge
             -
               uuid: 0f2ef8113a3644feae7b827675362485
-              name: 'Path {#SOURCE} => {#DESTINATION}({#NAME}): Packet Loss Tx'
+              name: 'Path [{#NAME}]:[{#SOURCE} => {#DESTINATION}]: Packet Loss out'
               type: DEPENDENT
               key: 'velocloud.sdwanpath.packet_loss_tx[{#NAME}/{#SOURCE}/{#DESTINATION}]'
               delay: '0'
@@ -2079,7 +2079,7 @@ zabbix_export:
                   value: gauge
             -
               uuid: 3a7ed14c13874c3088f28253a25a0c10
-              name: 'Path {#SOURCE} => {#DESTINATION}({#NAME}): Bytes total'
+              name: 'Path [{#NAME}]:[{#SOURCE} => {#DESTINATION}]: Bytes total'
               type: DEPENDENT
               key: 'velocloud.sdwanpath.total_bytes[{#NAME}/{#SOURCE}/{#DESTINATION}]'
               delay: '0'
@@ -2111,7 +2111,7 @@ zabbix_export:
                   value: gauge
             -
               uuid: 1f7bbdd7c1e24429878538b3b6bbddc4
-              name: 'Path {#SOURCE} => {#DESTINATION}({#NAME}): Total packets'
+              name: 'Path [{#NAME}]:[{#SOURCE} => {#DESTINATION}]: Total packets'
               type: DEPENDENT
               key: 'velocloud.sdwanpath.total_packets[{#NAME}/{#SOURCE}/{#DESTINATION}]'
               delay: '0'
@@ -2172,7 +2172,7 @@ zabbix_export:
           item_prototypes:
             -
               uuid: 25f6dc87f6014502a5eeb36ed3ddd7ed
-              name: 'SDWAN Peer {#NAME}({#TYPE}): Dead path'
+              name: 'SDWAN Peer [{#NAME}]:[{#TYPE}]: Dead path'
               type: DEPENDENT
               key: 'velocloud.sdwanpeer.dead_path[{#EDGE.ID}/{#ID}]'
               delay: '0'
@@ -2206,7 +2206,7 @@ zabbix_export:
                   value: gauge
             -
               uuid: 08fb5b9cf8464e4382224515ba75953d
-              name: 'SDWAN Peer {#NAME}({#TYPE}): Description'
+              name: 'SDWAN Peer [{#NAME}]:[{#TYPE}]: Description'
               type: DEPENDENT
               key: 'velocloud.sdwanpeer.description[{#EDGE.ID}/{#ID}]'
               delay: '0'
@@ -2246,7 +2246,7 @@ zabbix_export:
                   value: text
             -
               uuid: ece78f083d55413ab82a33f03c0204ef
-              name: 'SDWAN Peer {#NAME}({#TYPE}): Stable path'
+              name: 'SDWAN Peer [{#NAME}]:[{#TYPE}]: Stable path'
               type: DEPENDENT
               key: 'velocloud.sdwanpeer.stable_path[{#EDGE.ID}/{#ID}]'
               delay: '0'
@@ -2280,7 +2280,7 @@ zabbix_export:
                   value: gauge
             -
               uuid: 3884e4bf4e8a46508c04a6cd06ae1513
-              name: 'SDWAN Peer {#NAME}({#TYPE}): Standby path'
+              name: 'SDWAN Peer [{#NAME}]:[{#TYPE}]: Standby path'
               type: DEPENDENT
               key: 'velocloud.sdwanpeer.standby_path[{#EDGE.ID}/{#ID}]'
               delay: '0'
@@ -2314,7 +2314,7 @@ zabbix_export:
                   value: gauge
             -
               uuid: 39389b7b594e4b5da678ff985da0ba2a
-              name: 'SDWAN Peer {#NAME}({#TYPE}): Total path'
+              name: 'SDWAN Peer [{#NAME}]:[{#TYPE}]: Total path'
               type: DEPENDENT
               key: 'velocloud.sdwanpeer.total_path[{#EDGE.ID}/{#ID}]'
               delay: '0'
@@ -2348,7 +2348,7 @@ zabbix_export:
                   value: gauge
             -
               uuid: 474e118fa98340f68c73f4ddc5f54f5e
-              name: 'SDWAN Peer {#NAME}({#TYPE}): Unknown path'
+              name: 'SDWAN Peer [{#NAME}]:[{#TYPE}]: Unknown path'
               type: DEPENDENT
               key: 'velocloud.sdwanpeer.unknown_path[{#EDGE.ID}/{#ID}]'
               delay: '0'
@@ -2382,7 +2382,7 @@ zabbix_export:
                   value: gauge
             -
               uuid: 4e93b5e2f88747b093aba97d94d433f2
-              name: 'SDWAN Peer {#NAME}({#TYPE}): Unstable path'
+              name: 'SDWAN Peer [{#NAME}]:[{#TYPE}]: Unstable path'
               type: DEPENDENT
               key: 'velocloud.sdwanpeer.unstable_path[{#EDGE.ID}/{#ID}]'
               delay: '0'
@@ -2417,7 +2417,7 @@ zabbix_export:
           graph_prototypes:
             -
               uuid: 36438b5369794ea8a9147ec7675bc1a6
-              name: 'SDWAN Peer {#NAME}({#TYPE}): {#EDGE.ID}: Path overview'
+              name: 'SDWAN Peer [{#NAME}]:[{#TYPE}]: {#EDGE.ID}: Path overview'
               graph_items:
                 -
                   color: 1A7C11
