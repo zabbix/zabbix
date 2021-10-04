@@ -102,7 +102,7 @@ class CPagerHelper {
 	 * @return array
 	 */
 	protected static function prepareData($page, $num_rows) {
-		$rows_per_page = (int) CWebUser::$data['rows_per_page'];
+		$rows_per_page = CWebUser::$data['rows_per_page'];
 
 		$offset_down = 0;
 		$limit_exceeded = ($num_rows > CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT));

@@ -286,12 +286,22 @@ $child_services = (new CTable())
 		(new CTag('tfoot', true))
 			->addItem(
 				(new CCol(
-					(new CSimpleButton(_('Add')))
-						->addClass(ZBX_STYLE_BTN_LINK)
-						->addClass('js-add')
+					(new CList())
+						->addClass(ZBX_STYLE_INLINE_FILTER_FOOTER)
+						->addItem(
+							(new CSimpleButton(_('Add')))
+								->addClass(ZBX_STYLE_BTN_LINK)
+								->addClass('js-add')
+						)
+						->addItem(
+							(new CListItem(null))
+								->addClass(ZBX_STYLE_INLINE_FILTER_STATS)
+						)
 				))->setColSpan(4)
 			)
 	);
+
+
 
 $child_services_filter = (new CList())
 	->setId('children-filter')
@@ -338,14 +348,19 @@ $form
 	->addItem($tabs)
 	->addItem(
 		(new CScriptTag('
-			service_edit_popup.init('.json_encode([
+			const params = '.json_encode([
 				'serviceid' => $data['serviceid'],
 				'children' => $data['form']['children'],
 				'children_problem_tags_html' => $data['form']['children_problem_tags_html'],
 				'problem_tags' => $data['form']['problem_tags'],
 				'status_rules' => $data['form']['status_rules'],
-				'service_times' => $data['form']['times']
-			]).');
+				'service_times' => $data['form']['times'],
+				'search_limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
+			]).'
+
+			params.algorithm_names = '.json_encode(CServiceHelper::getAlgorithmNames(), JSON_FORCE_OBJECT).';
+
+			service_edit_popup.init(params);
 		'))->setOnDocumentReady()
 	);
 

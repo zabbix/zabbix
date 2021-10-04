@@ -13,3 +13,13 @@
 		}
 	}
 }
+
+.inline-filter-footer {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+
+	> li.inline-filter-stats {
+		color: $font-alt-color;
+	}
+}

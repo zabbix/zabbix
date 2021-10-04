@@ -25,19 +25,32 @@
 ?>
 
 window.service_edit_popup = {
-	algorithm_names: <?= json_encode(CServiceHelper::getAlgorithmNames(), JSON_FORCE_OBJECT) ?>,
-
+	status_rule_template: null,
+	time_template: null,
+	uptime_template: null,
+	downtime_template: null,
+	onetime_downtime_template: null,
 	child_template: null,
+
 	serviceid: null,
 	children: new Map(),
+
+	algorithm_names: null,
+	search_limit: null,
+
 	overlay: null,
 	dialogue: null,
 	form: null,
 
-	init({serviceid, children, children_problem_tags_html, problem_tags, status_rules, service_times}) {
+	init({serviceid, children, children_problem_tags_html, problem_tags, status_rules, service_times, algorithm_names,
+			search_limit}) {
 		this.initTemplates();
 
 		this.serviceid = serviceid;
+
+		this.algorithm_names = algorithm_names;
+		this.search_limit = search_limit;
+
 		this.overlay = overlays_stack.getById('service_edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
@@ -51,7 +64,7 @@ window.service_edit_popup = {
 		}
 
 		for (const service of children) {
-			this.addChild({
+			this.children.set(service.serviceid, {
 				serviceid: service.serviceid,
 				name: service.name,
 				algorithm: service.algorithm,
@@ -372,12 +385,15 @@ window.service_edit_popup = {
 		}
 	},
 
-	addChild(service) {
-		if (this.children.has(service.serviceid)) {
-			return;
-		}
-
-		this.children.set(service.serviceid, service);
+	renderChild(service) {
+		document
+			.querySelector('#children tbody')
+			.insertAdjacentHTML('beforeend', this.child_template.evaluate({
+				serviceid: service.serviceid,
+				name: service.name,
+				algorithm: this.algorithm_names[service.algorithm],
+				problem_tags_html: service.problem_tags_html
+			}));
 	},
 
 	removeChild(serviceid) {
@@ -388,6 +404,7 @@ window.service_edit_popup = {
 		}
 
 		this.children.delete(serviceid);
+		this.updateChildrenFilterStats();
 	},
 
 	filterChildren() {
@@ -395,22 +412,33 @@ window.service_edit_popup = {
 
 		container.innerHTML = '';
 
-		const filter_name = document.getElementById('children-filter-name').value;
+		const filter_name = document.getElementById('children-filter-name').value.toLowerCase();
+
+		let count = 0;
 
 		for (const service of this.children.values()) {
-			if (!service.name.includes(filter_name)) {
+			if (!service.name.toLowerCase().includes(filter_name)) {
 				continue;
 			}
 
-			const child_html = this.child_template.evaluate({
-				serviceid: service.serviceid,
-				name: service.name,
-				algorithm: this.algorithm_names[service.algorithm],
-				problem_tags_html: service.problem_tags_html
-			});
+			this.renderChild(service);
 
-			container.insertAdjacentHTML('beforeend', child_html);
+			if (++count == this.search_limit) {
+				break;
+			}
 		}
+
+		this.updateChildrenFilterStats();
+	},
+
+	updateChildrenFilterStats() {
+		const container = document.querySelector('#children tbody');
+
+		const stats_template = <?= json_encode(_('Displaying %1$s of %2$s found')) ?>;
+
+		document.querySelector('#children tfoot .inline-filter-stats').textContent = this.children.size > 0
+			? sprintf(stats_template, container.childElementCount, this.children.size)
+			: '';
 	},
 
 	selectChildren() {
@@ -431,8 +459,13 @@ window.service_edit_popup = {
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 			for (const service of e.detail) {
-				this.addChild(service);
+				if (!this.children.has(service.serviceid)) {
+					this.children.set(service.serviceid, service);
+					this.renderChild(service);
+				}
 			}
+
+			this.updateChildrenFilterStats();
 		});
 	},
 
@@ -467,6 +500,7 @@ window.service_edit_popup = {
 		const fields = getFormFields(this.form);
 
 		fields.name = fields.name.trim();
+		fields.child_serviceids = [...this.children.keys()];
 
 		for (const el of this.form.parentNode.children) {
 			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {

@@ -430,9 +430,6 @@ abstract class CController {
 	 */
 	abstract protected function doAction();
 
-	/**
-	 * @return array|null
-	 */
 	private function populateRawInput(): void {
 		switch ($this->getPostContentType()) {
 			case self::POST_CONTENT_TYPE_FORM:

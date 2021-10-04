@@ -1462,6 +1462,13 @@ footer {
     .inline-filter > li.inline-filter-label {
       margin-right: 10px; }
 
+.inline-filter-footer {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between; }
+  .inline-filter-footer > li.inline-filter-stats {
+    color: #768d99; }
+
 .icon-dashboard::before, .icon-problems::before, .icon-monitoring::before, .icon-inventory::before, .icon-reports::before, .icon-configuration::before, .icon-administration::before {
   content: '';
   width: 24px;
