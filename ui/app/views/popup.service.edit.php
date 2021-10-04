@@ -274,6 +274,7 @@ $tags_tab = (new CFormGrid())
 
 $child_services = (new CTable())
 	->setId('children')
+	->setAttribute('data-tab-indicator', count($data['form']['children']))
 	->setHeader(
 		(new CRowHeader([
 			_('Service'),
@@ -300,8 +301,6 @@ $child_services = (new CTable())
 				))->setColSpan(4)
 			)
 	);
-
-
 
 $child_services_filter = (new CList())
 	->setId('children-filter')

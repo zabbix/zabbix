@@ -405,6 +405,7 @@ window.service_edit_popup = {
 
 		this.children.delete(serviceid);
 		this.updateChildrenFilterStats();
+		this.updateTabIndicator();
 	},
 
 	filterChildren() {
@@ -429,6 +430,7 @@ window.service_edit_popup = {
 		}
 
 		this.updateChildrenFilterStats();
+		this.updateTabIndicator()
 	},
 
 	updateChildrenFilterStats() {
@@ -439,6 +441,12 @@ window.service_edit_popup = {
 		document.querySelector('#children tfoot .inline-filter-stats').textContent = this.children.size > 0
 			? sprintf(stats_template, container.childElementCount, this.children.size)
 			: '';
+	},
+
+	updateTabIndicator() {
+		document
+			.querySelector('#children')
+			.setAttribute('data-tab-indicator', this.children.size);
 	},
 
 	selectChildren() {
@@ -466,6 +474,7 @@ window.service_edit_popup = {
 			}
 
 			this.updateChildrenFilterStats();
+			this.updateTabIndicator();
 		});
 	},
 
