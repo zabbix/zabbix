@@ -2051,7 +2051,7 @@ class CApiInputValidatorTest extends TestCase {
 					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:9'],
 					'value' =>	['type' => API_MULTIPLE, 'default' => 1, 'rules' => [
 						['if' => ['field' => 'type', 'in' => '1,2'], 'type' => API_INT32],
-						['if' => ['field' => 'type', 'in' => '3'], 'type' => API_STRING_UTF8, 'default' => 'def'],
+						['if' => ['field' => 'type', 'in' => '3'], 'type' => API_STRING_UTF8, 'default' => 'def']
 					]]
 				]],
 				[
@@ -2071,7 +2071,7 @@ class CApiInputValidatorTest extends TestCase {
 					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:9'],
 					'value' =>	['type' => API_MULTIPLE, 'rules' => [
 						['if' => ['field' => 'type', 'in' => '1:2'], 'type' => API_STRING_UTF8, 'in' => 'a,b'],
-						['if' => ['field' => 'type', 'in' => '3'], 'type' => API_STRING_UTF8, 'in' => ''],
+						['if' => ['field' => 'type', 'in' => '3'], 'type' => API_STRING_UTF8, 'in' => '']
 					]]
 				]],
 				[
@@ -2087,7 +2087,7 @@ class CApiInputValidatorTest extends TestCase {
 					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:9'],
 					'value' =>	['type' => API_MULTIPLE, 'rules' => [
 						['if' => ['field' => 'type', 'in' => '1:2'], 'type' => API_STRING_UTF8, 'in' => 'a,'],
-						['if' => ['field' => 'type', 'in' => '3'], 'type' => API_STRING_UTF8, 'in' => 'c'],
+						['if' => ['field' => 'type', 'in' => '3'], 'type' => API_STRING_UTF8, 'in' => 'c']
 					]]
 				]],
 				[
@@ -2103,7 +2103,7 @@ class CApiInputValidatorTest extends TestCase {
 					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:9'],
 					'value' =>	['type' => API_MULTIPLE, 'rules' => [
 						['if' => ['field' => 'type', 'in' => '1:2'], 'type' => API_STRING_UTF8, 'in' => 'a,b'],
-						['if' => ['field' => 'type', 'in' => '3'], 'type' => API_STRING_UTF8, 'in' => 'd,e,f'],
+						['if' => ['field' => 'type', 'in' => '3'], 'type' => API_STRING_UTF8, 'in' => 'd,e,f']
 					]]
 				]],
 				[
@@ -2119,7 +2119,7 @@ class CApiInputValidatorTest extends TestCase {
 					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:9'],
 					'value' =>	['type' => API_MULTIPLE, 'rules' => [
 						['if' => ['field' => 'type', 'in' => '1:2'], 'type' => API_STRING_UTF8, 'in' => 'a,b'],
-						['if' => ['field' => 'type', 'in' => '3'], 'type' => API_STRING_UTF8, 'in' => 'd,e,f,'],
+						['if' => ['field' => 'type', 'in' => '3'], 'type' => API_STRING_UTF8, 'in' => 'd,e,f,']
 					]]
 				]],
 				[
@@ -2135,7 +2135,7 @@ class CApiInputValidatorTest extends TestCase {
 					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:9'],
 					'value' =>	['type' => API_MULTIPLE, 'rules' => [
 						['if' => ['field' => 'type', 'in' => '1:2'], 'type' => API_INT32, 'in' => '1'],
-						['if' => ['field' => 'type', 'in' => '3'], 'type' => API_INT32, 'in' => '2,3'],
+						['if' => ['field' => 'type', 'in' => '3'], 'type' => API_INT32, 'in' => '2,3']
 					]]
 				]],
 				[
@@ -2151,7 +2151,7 @@ class CApiInputValidatorTest extends TestCase {
 					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:9'],
 					'value' =>	['type' => API_MULTIPLE, 'rules' => [
 						['if' => ['field' => 'type', 'in' => '1:2'], 'type' => API_INT32, 'in' => '1,2'],
-						['if' => ['field' => 'type', 'in' => '3'], 'type' => API_INT32, 'in' => '4:6'],
+						['if' => ['field' => 'type', 'in' => '3'], 'type' => API_INT32, 'in' => '4:6']
 					]]
 				]],
 				[

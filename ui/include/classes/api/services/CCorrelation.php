@@ -573,7 +573,7 @@ class CCorrelation extends CApiService {
 			'status' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_CORRELATION_ENABLED, ZBX_CORRELATION_DISABLED])],
 			'filter' =>			self::getFilterValidationRules() + ['flags' => API_REQUIRED],
 			'operations' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['type']], 'fields' => [
-				'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_CORR_OPERATION_CLOSE_OLD, ZBX_CORR_OPERATION_CLOSE_NEW])],
+				'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_CORR_OPERATION_CLOSE_OLD, ZBX_CORR_OPERATION_CLOSE_NEW])]
 			]]
 		]];
 
@@ -636,7 +636,7 @@ class CCorrelation extends CApiService {
 			'status' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_CORRELATION_ENABLED, ZBX_CORRELATION_DISABLED])],
 			'filter' =>			self::getFilterValidationRules(),
 			'operations' =>		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['type']], 'fields' => [
-				'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_CORR_OPERATION_CLOSE_OLD, ZBX_CORR_OPERATION_CLOSE_NEW])],
+				'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_CORR_OPERATION_CLOSE_OLD, ZBX_CORR_OPERATION_CLOSE_NEW])]
 			]]
 		]];
 
