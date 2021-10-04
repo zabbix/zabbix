@@ -1619,7 +1619,6 @@ abstract class testFormMacros extends CWebTest {
 		$this->fillMacros([$data['macro_fields']]);
 		$form->submit();
 		$this->page->waitUntilReady();
-		$this->assertMessage(TEST_GOOD);
 
 		if ($data['expected'] == TEST_BAD) {
 			$this->assertMessage($data['expected'], $data['title'], $data['message']);

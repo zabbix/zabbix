@@ -474,6 +474,7 @@ class testFormMacrosHost extends testFormMacros {
 
 	/**
 	 * @dataProvider getCreateVaultMacrosData
+	 *
 	 */
 	public function testFormMacrosHost_CreateVaultMacros($data) {
 		$this->createVaultMacros($data, 'zabbix.php?action=host.view', 'hosts', 'Available host');
