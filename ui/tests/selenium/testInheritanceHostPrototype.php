@@ -153,11 +153,17 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		return [
 			[
 				[
-					'host' => 'test Inheritance host prototype',
-					'group' => 'Zabbix servers',
-					'templates' => [
-						['name' => 'Inheritance test template', 'group' => 'Templates']
-					]
+					'fields' => [
+						'Host name' => 'test Inheritance host prototype',
+						'Groups' => 'Zabbix servers'
+					],
+					'interfaces' => [
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'Agent'
+						]
+					],
+					'template' => 'Inheritance test template'
 				]
 			]
 		];
@@ -167,53 +173,39 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 	 * @dataProvider getCreateData
 	 */
 	public function testInheritanceHostPrototype_CreateHostLinkTemplate($data) {
-		$this->zbxTestLogin((new CUrl('zabbix.php'))
-			->setArgument('action', 'host.create')
-			->getUrl(),
-		);
-		$this->zbxTestInputTypeWait('host', $data['host']);
-		$this->query('xpath://ul[@id="hostlist"]//button[text()="Add"]')->asPopupButton()->one()->fill('Agent');
-		$this->zbxTestClickButtonMultiselect('groups_');
-		$this->zbxTestLaunchOverlayDialog('Host groups');
-		$this->zbxTestClickLinkTextWait($data['group']);
-		$this->zbxTestTabSwitch('Templates');
-		$this->zbxTestClickButtonMultiselect('add_templates_');
-		$this->zbxTestLaunchOverlayDialog('Templates');
+		$this->zbxTestLogin('zabbix.php?action=host.edit');
+		$form = $this->query('id:host-form')->asFluidForm()->one()->waitUntilVisible();
+		$form->fill($data['fields']);
 
-		foreach ($data['templates'] as $template) {
-			COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
-			$this->zbxTestLaunchOverlayDialog('Host groups');
-			COverlayDialogElement::find()->all()->last()->query('link', $template['group'])->one()->waitUntilClickable()->click();
-			$this->zbxTestClickLinkTextWait($template['name']);
-			$this->zbxTestWaitForPageToLoad();
-		}
+		$form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => ['1' => 'default']])
+				->fill($data['interfaces']);
+		$form->selectTab('Templates');
+		$form->getFieldContainer('Link new templates')->asMultiselect()->fill($data['template']);
+		$form->submit();
+		$this->page->waitUntilReady();
 
-		$this->zbxTestClickWait('add');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host added');
 
 		// DB check.
-		foreach ($data['templates'] as $template) {
-			// Linked templates on host.
-			$hosts_templates = 'SELECT NULL'.
-					' FROM hosts_templates'.
-					' WHERE hostid IN ('.
-						'SELECT hostid'.
-						' FROM hosts'.
-						' WHERE host='.zbx_dbstr($data['host']).
-					')'.
-					' AND templateid IN ('.
-						'SELECT hostid'.
-						' FROM hosts'.
-						' WHERE host='.zbx_dbstr($template['name']).
-					')';
+		$hosts_templates = 'SELECT NULL'.
+				' FROM hosts_templates'.
+				' WHERE hostid IN ('.
+					'SELECT hostid'.
+					' FROM hosts'.
+					' WHERE host='.zbx_dbstr($data['fields']['Host name']).
+				')'.
+				' AND templateid IN ('.
+					'SELECT hostid'.
+					' FROM hosts'.
+					' WHERE host='.zbx_dbstr($data['template']).
+				')';
 
-			$this->assertEquals(1, CDBHelper::getCount($hosts_templates));
+		$this->assertEquals(1, CDBHelper::getCount($hosts_templates));
 
-			// Host prototype on host and on template are the same.
-			$prototype_on_host = $this->sqlForHostPrototypeCompare($data['host']);
-			$prototype_on_template = $this->sqlForHostPrototypeCompare($template['name']);
-			$this->assertEquals($prototype_on_host, $prototype_on_template);
-		}
+		// Host prototype on host and on template are the same.
+		$prototype_on_host = $this->sqlForHostPrototypeCompare($data['fields']['Host name']);
+		$prototype_on_template = $this->sqlForHostPrototypeCompare($data['template']);
+		$this->assertEquals($prototype_on_host, $prototype_on_template);
 	}
 
 	/**
