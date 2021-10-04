@@ -58,7 +58,7 @@ class CControllerCorrelationEdit extends CController {
 		if ($this->hasInput('correlationid') && !$this->hasInput('form_refresh')) {
 			$correlations = API::Correlation()->get([
 				'output' => ['correlationid', 'name', 'description', 'status'],
-				'selectFilter' => ['formula', 'conditions', 'evaltype', 'eval_formula'],
+				'selectFilter' => ['formula', 'conditions', 'evaltype'],
 				'selectOperations' => ['type'],
 				'correlationids' => $this->getInput('correlationid'),
 				'editable' => true
@@ -69,6 +69,8 @@ class CControllerCorrelationEdit extends CController {
 			}
 
 			$this->correlation = $correlations[0];
+			CArrayHelper::sort($this->correlation['filter']['conditions'], ['formulaid']);
+
 			$op_types = array_column($this->correlation['operations'], 'type', 'type');
 			$this->correlation['op_close_old'] = array_key_exists(ZBX_CORR_OPERATION_CLOSE_OLD, $op_types);
 			$this->correlation['op_close_new'] = array_key_exists(ZBX_CORR_OPERATION_CLOSE_NEW, $op_types);
