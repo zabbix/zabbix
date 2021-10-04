@@ -1754,8 +1754,11 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout, unsigned char flags)
 	zbx_uint64_t	expected_len = 16 * ZBX_MEBIBYTE, reserved = 0, max_len;
 	unsigned char	expect = ZBX_TCP_EXPECT_HEADER;
 	int		protocol_version;
-
+#if defined(_WINDOWS)
+	max_len = ZBX_MAX_RECV_DATA_SIZE;
+#else
 	max_len = 0 != (flags & ZBX_TCP_LARGE) ? ZBX_MAX_RECV_LARGE_DATA_SIZE : ZBX_MAX_RECV_DATA_SIZE;
+#endif
 
 	if (0 != timeout)
 		zbx_socket_timeout_set(s, timeout);
