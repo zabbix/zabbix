@@ -28,7 +28,7 @@ typedef struct
 }
 resolve_dependencies_triggers_flags_t;
 
-static unsigned	triggers_flags_hash_func(const void *data)
+static zbx_hash_t	triggers_flags_hash_func(const void *data)
 {
 	const resolve_dependencies_triggers_flags_t	*trigger_entry =
 			(const resolve_dependencies_triggers_flags_t *)data;
@@ -69,12 +69,12 @@ typedef struct
 }
 zbx_trigger_dep_entry_t;
 
-static unsigned	zbx_trigger_dep_entries_hash_func(const void *data)
+static zbx_hash_t	zbx_trigger_dep_entries_hash_func(const void *data)
 {
 	const zbx_trigger_dep_entry_t	*trigger_dep_entry = (const zbx_trigger_dep_entry_t *)data;
 
 	return ZBX_DEFAULT_UINT64_HASH_ALGO(&((trigger_dep_entry)->trigger_down_id),
-			sizeof((trigger_dep_entry)->trigger_down_id), ZBX_DEFAULT_HASH_SEED);
+			sizeof(trigger_dep_entry->trigger_down_id), ZBX_DEFAULT_HASH_SEED);
 }
 
 static int	zbx_trigger_dep_entries_compare_func(const void *d1, const void *d2)
@@ -82,7 +82,7 @@ static int	zbx_trigger_dep_entries_compare_func(const void *d1, const void *d2)
 	const zbx_trigger_dep_entry_t	*trigger_dep_entry_1 = (const zbx_trigger_dep_entry_t *)d1;
 	const zbx_trigger_dep_entry_t	*trigger_dep_entry_2 = (const zbx_trigger_dep_entry_t *)d2;
 
-	ZBX_RETURN_IF_NOT_EQUAL((trigger_dep_entry_1)->trigger_down_id, (trigger_dep_entry_2)->trigger_down_id);
+	ZBX_RETURN_IF_NOT_EQUAL(trigger_dep_entry_1->trigger_down_id, trigger_dep_entry_2->trigger_down_id);
 
 	return 0;
 }
@@ -101,8 +101,8 @@ static void	zbx_triggers_dep_entries_clean(zbx_hashset_t *h)
 
 	while (NULL != (trigger_dep_entry = (zbx_trigger_dep_entry_t *)zbx_hashset_iter_next(&iter)))
 	{
-		zbx_vector_trigger_up_entries_clear_ext(&((trigger_dep_entry)->v), zbx_trigger_dep_vec_entry_clean);
-		zbx_vector_trigger_up_entries_destroy(&((trigger_dep_entry)->v));
+		zbx_vector_trigger_up_entries_clear_ext(&(trigger_dep_entry->v), zbx_trigger_dep_vec_entry_clean);
+		zbx_vector_trigger_up_entries_destroy(&(trigger_dep_entry->v));
 	}
 
 	zbx_hashset_destroy(h);
