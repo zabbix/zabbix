@@ -249,6 +249,7 @@ class CCorrelation extends CApiService {
 		$ins_condition_groups = [];
 		$ins_condition_tagpairs = [];
 		$ins_condition_tagvalues = [];
+		$upd_correlations = [];
 
 		foreach ($correlations as &$correlation) {
 			if (!array_key_exists('filter', $correlation)) {
@@ -282,13 +283,26 @@ class CCorrelation extends CApiService {
 			}
 			unset($condition);
 
-			if (array_key_exists('evaltype', $correlation['filter'])
-					&& $correlation['filter']['evaltype']
-						!= $db_correlations[$correlation['correlationid']]['filter']['evaltype']) {
+			if ($method === 'create' || array_key_exists('filter', $correlation)) {
 				if ($correlation['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-					self::updateFormula($correlation['correlationid'], $correlation['filter']['formula'],
-						$correlation['filter']['conditions']
+					$correlation['filter']['formula'] = CConditionHelper::replaceLetterIds(
+						$correlation['filter']['formula'],
+						array_column($correlation['filter']['conditions'], 'corr_conditionid', 'formulaid')
 					);
+				}
+				else {
+					$correlation['filter']['formula'] = '';
+				}
+
+				$db_formula = ($method === 'update')
+					? $db_correlations[$correlation['correlationid']]['filter']['formula']
+					: '';
+
+				if ($correlation['filter']['formula'] !== $db_formula) {
+					$upd_correlations[] = [
+						'values' => ['formula' => $correlation['filter']['formula']],
+						'where' => ['correlationid' => $correlation['correlationid']]
+					];
 				}
 			}
 		}
@@ -308,6 +322,10 @@ class CCorrelation extends CApiService {
 
 		if ($ins_condition_tagvalues) {
 			DB::insert('corr_condition_tagvalue', $ins_condition_tagvalues, false);
+		}
+
+		if ($upd_correlations) {
+			DB::update('correlation', $upd_correlations);
 		}
 	}
 
@@ -644,24 +662,6 @@ class CCorrelation extends CApiService {
 	}
 
 	/**
-	 * Converts a formula with letters to a formula with IDs and updates it.
-	 *
-	 * @param string 	$correlationid
-	 * @param string 	$formula_with_letters		Formula with letters.
-	 * @param array 	$conditions
-	 */
-	protected static function updateFormula($correlationid, $formula_with_letters, array $conditions) {
-		$formulaid_to_conditionid = [];
-
-		foreach ($conditions as $condition) {
-			$formulaid_to_conditionid[$condition['formulaid']] = $condition['corr_conditionid'];
-		}
-		$formula = CConditionHelper::replaceLetterIds($formula_with_letters, $formulaid_to_conditionid);
-
-		DB::updateByPk('correlation', $correlationid, ['formula' => $formula]);
-	}
-
-	/**
 	 * Validate correlation condition formula IDs. Check the "formulaid" field and that formula matches the conditions.
 	 *
 	 * @static
@@ -973,8 +973,6 @@ class CCorrelation extends CApiService {
 						$db_condition['formulaid'] = $formulaids[$db_condition['corr_conditionid']];
 					}
 					unset($db_condition);
-
-					$db_correlation['filter']['formula'] = CConditionHelper::replaceNumericIds($formula, $formulaids);
 				}
 			}
 			unset($db_correlation);
