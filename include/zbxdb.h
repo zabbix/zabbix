@@ -90,7 +90,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 void	zbx_db_close(void);
 
 int	zbx_db_begin(void);
-int	zbx_db_begin_lock(const char *dbname, const char *fmt, va_list args);
 int	zbx_db_commit(void);
 int	zbx_db_rollback(void);
 int	zbx_db_txn_level(void);
