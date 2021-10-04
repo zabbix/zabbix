@@ -144,11 +144,7 @@
 			$(document).on('submit', '#problem_form', function(e) {
 				e.preventDefault();
 
-				const eventids = $('[id^="eventids_"]:checked', $(this)).map(function() {
-					return $(this).val();
-				}).get();
-
-				acknowledgePopUp({eventids}, this);
+				acknowledgePopUp({eventids: chkbxRange.selectedIds}, this);
 			});
 		},
 

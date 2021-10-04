@@ -1026,7 +1026,7 @@ Function.prototype.bindAsEventListener = function (context) {
 function openMassupdatePopup(elem, popup_name, data = {}) {
 	const form = elem.closest('form');
 
-	data['ids'] = [...form.querySelectorAll('tbody input:checked')].map((input) => input.value);
+	data.ids = chkbxRange.selectedIds;
 
 	switch (popup_name) {
 		case 'popup.massupdate.item':
