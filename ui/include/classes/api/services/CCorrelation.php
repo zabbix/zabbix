@@ -525,7 +525,7 @@ class CCorrelation extends CApiService {
 								['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'groupid' =>	['type' => API_MULTIPLE, 'rules' => [
-								['if' => ['field' => 'type', 'in' => ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP], 'type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+								['if' => ['field' => 'type', 'in' => ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP], 'type' => API_ID, 'flags' => API_REQUIRED],
 								['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'oldtag' =>		['type' => API_MULTIPLE, 'rules' => [
@@ -537,7 +537,7 @@ class CCorrelation extends CApiService {
 								['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'value' =>		['type' => API_MULTIPLE, 'rules' => [
-								['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('corr_condition_tagvalue', 'value')],
+								['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('corr_condition_tagvalue', 'value')],
 								['else' => true, 'type' => API_UNEXPECTED]
 			]]
 		];
