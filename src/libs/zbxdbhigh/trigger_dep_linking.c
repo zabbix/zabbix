@@ -227,24 +227,21 @@ static int	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const zb
 
 	for (i = 0; i < dep_list_ids.values_num; i++)
 	{
-		int		j;
-		zbx_uint64_t	templateid_down, templateid_up, triggerid_down, triggerid_up, hst_triggerid,
-				tpl_triggerid;
-
-		templateid_down = dep_list_ids.values[i].first;
-		templateid_up = dep_list_ids.values[i].second;
+		zbx_uint64_t	templateid_down = dep_list_ids.values[i].first;
+		zbx_uint64_t	templateid_up = dep_list_ids.values[i].second;
 
 		/* Convert template ids to corresponding trigger ids.         */
 		/* If template trigger depends on host trigger rather than    */
 		/* template trigger then up id conversion will fail and the   */
 		/* original value (host trigger id) will be used as intended. */
-		triggerid_down = 0;
-		triggerid_up = templateid_up;
+		zbx_uint64_t	triggerid_down = 0;
+		zbx_uint64_t	triggerid_up = templateid_up;
+		int		j;
 
 		for (j = 0; j < map_ids.values_num; j++)
 		{
-			hst_triggerid = map_ids.values[j].first;
-			tpl_triggerid = map_ids.values[j].second;
+			zbx_uint64_t	hst_triggerid = map_ids.values[j].first;
+			zbx_uint64_t	tpl_triggerid = map_ids.values[j].second;
 
 			if (tpl_triggerid == templateid_down)
 				triggerid_down = hst_triggerid;
