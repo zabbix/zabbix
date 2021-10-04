@@ -1685,7 +1685,7 @@ final class CItemKeyDefinitionData {
 
 	/**
 	* Generate an array used for item type lookups in the form: key_name => value_type.
-	* Value type set to null if key return type varies based on paramaters.
+	* Value type set to null if key return type varies based on parameters.
 	*
 	* @return array
 	 */
