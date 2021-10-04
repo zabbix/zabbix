@@ -116,7 +116,7 @@ class CControllerImageUpdate extends CController {
 		if ($this->hasInput('imageid')) {
 			$options = [
 				'imageid' => $this->getInput('imageid'),
-				'name' => $this->getInput('name'),
+				'name' => $this->getInput('name')
 			];
 
 			if ($image !== null) {
