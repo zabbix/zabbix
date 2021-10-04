@@ -119,7 +119,8 @@ static int	tm_try_task_close_problem(zbx_uint64_t taskid)
 			zbx_vector_uint64_append(&triggerids, triggerid);
 			DCconfig_lock_triggers_by_triggerids(&triggerids, &locked_triggerids);
 
-			/* only close the problem if source trigger was successfully locked */
+			/* close the problem if source trigger was successfully locked or */
+			/* if the trigger doesn't exist, but event still exists */
 			if (0 != locked_triggerids.values_num)
 			{
 				ZBX_STR2UINT64(userid, row[0]);
@@ -128,6 +129,12 @@ static int	tm_try_task_close_problem(zbx_uint64_t taskid)
 
 				DCconfig_unlock_triggers(&locked_triggerids);
 
+				ret = SUCCEED;
+			}
+			else if (FAIL == DCconfig_trigger_exists(triggerid))
+			{
+				DBexecute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_DONE,
+						taskid);
 				ret = SUCCEED;
 			}
 		}

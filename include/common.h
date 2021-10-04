@@ -1140,7 +1140,12 @@ void	zbx_setproctitle(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 #define ZBX_JAN_2038		2145916800
 #define ZBX_JAN_1970_IN_SEC	2208988800.0	/* 1970 - 1900 in seconds */
 
-#define ZBX_MAX_RECV_DATA_SIZE	(1 * ZBX_GIBIBYTE)
+#define ZBX_MAX_RECV_DATA_SIZE		(1 * ZBX_GIBIBYTE)
+#if defined(_WINDOWS)
+#define ZBX_MAX_RECV_LARGE_DATA_SIZE	(1 * ZBX_GIBIBYTE)
+#else
+#define ZBX_MAX_RECV_LARGE_DATA_SIZE	(__UINT64_C(16) * ZBX_GIBIBYTE)
+#endif
 
 /* max length of base64 data */
 #define ZBX_MAX_B64_LEN		(16 * ZBX_KIBIBYTE)
@@ -1378,7 +1383,7 @@ int	zbx_user_macro_parse(const char *macro, int *macro_r, int *context_l, int *c
 int	zbx_user_macro_parse_dyn(const char *macro, char **name, char **context, int *length,
 		unsigned char *context_op);
 char	*zbx_user_macro_unquote_context_dyn(const char *context, int len);
-char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote);
+char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote, char **error);
 
 #define ZBX_SESSION_ACTIVE		0
 #define ZBX_SESSION_PASSIVE		1

@@ -255,8 +255,8 @@
 					}
 					else {
 						const message = dashboard.dashboardid === null
-							? t('Failed to create dashboard')
-							: t('Failed to update dashboard');
+							? <?= json_encode(_('Failed to create dashboard')) ?>
+							: <?= json_encode(_('Failed to update dashboard')) ?>;
 
 						addMessage(makeMessageBox('bad', [], message, true, false));
 					}
@@ -300,11 +300,11 @@
 					{
 						items: [
 							{
-								label: t('Add widget'),
+								label: <?= json_encode(_('Add widget')) ?>,
 								clickCallback: () => ZABBIX.Dashboard.addNewWidget()
 							},
 							{
-								label: t('Add page'),
+								label: <?= json_encode(_('Add page')) ?>,
 								clickCallback: () => ZABBIX.Dashboard.addNewDashboardPage()
 							}
 						]
@@ -312,14 +312,14 @@
 					{
 						items: [
 							{
-								label: t('Paste widget'),
+								label: <?= json_encode(_('Paste widget')) ?>,
 								clickCallback: () => ZABBIX.Dashboard.pasteWidget(
 									ZABBIX.Dashboard.getStoredWidgetDataCopy()
 								),
 								disabled: (ZABBIX.Dashboard.getStoredWidgetDataCopy() === null)
 							},
 							{
-								label: t('Paste page'),
+								label: <?= json_encode(_('Paste page')) ?>,
 								clickCallback: () => ZABBIX.Dashboard.pasteDashboardPage(
 									ZABBIX.Dashboard.getStoredDashboardPageDataCopy()
 								),
@@ -449,9 +449,10 @@
 							}
 						}
 
+						const title = <?= json_encode(_('Failed to update dashboard sharing.')) ?>;
 						const message_box = (typeof error === 'object' && 'html_string' in error)
 							? new DOMParser().parseFromString(error.html_string, 'text/html').body.firstElementChild
-							: makeMessageBox('bad', [], t('Failed to update dashboard sharing.'), true, false)[0];
+							: makeMessageBox('bad', [], title)[0];
 
 						form.parentNode.insertBefore(message_box, form);
 					});

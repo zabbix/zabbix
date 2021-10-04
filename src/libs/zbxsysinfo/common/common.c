@@ -30,7 +30,6 @@
 #include "system.h"
 #include "zabbix_stats.h"
 #include "zbxexec.h"
-#include "modbtype.h"
 
 #if !defined(_WINDOWS)
 #	define VFS_TEST_FILE "/etc/passwd"
@@ -92,8 +91,6 @@ ZBX_METRIC	parameters_common[] =
 	{"eventlog",		CF_HAVEPARAMS,	ONLY_ACTIVE,		"system"},
 
 	{"zabbix.stats",	CF_HAVEPARAMS,	ZABBIX_STATS,		"127.0.0.1,10051"},
-
-	{"modbus.get",		CF_HAVEPARAMS,	MODBUS_GET,		"tcp://127.0.0.1"},
 
 	{NULL}
 };

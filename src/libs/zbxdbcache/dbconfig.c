@@ -332,9 +332,18 @@ static zbx_uint64_t	get_item_nextcheck_seed(zbx_uint64_t itemid, zbx_uint64_t in
 #define ZBX_ITEM_TYPE_CHANGED		0x08
 #define ZBX_ITEM_DELAY_CHANGED		0x10
 
-static int	DCget_disable_until(const ZBX_DC_INTERFACE *interface)
+static int	DCget_disable_until(const ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *interface)
 {
-	return (NULL == interface) ? 0 : interface->disable_until;
+	switch (item->type)
+	{
+		case ITEM_TYPE_ZABBIX:
+		case ITEM_TYPE_SNMP:
+		case ITEM_TYPE_IPMI:
+		case ITEM_TYPE_JMX:
+			return (NULL == interface) ? 0 : interface->disable_until;
+		default:
+			return 0;
+	}
 }
 
 static int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *interface, int flags, int now,
@@ -366,8 +375,8 @@ static int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *in
 		return FAIL;
 	}
 
-	if (0 != (flags & ZBX_HOST_UNREACHABLE) && NULL != interface &&  0 != (disable_until =
-			DCget_disable_until(interface)))
+	if (0 != (flags & ZBX_HOST_UNREACHABLE) && NULL != interface && 0 != (disable_until =
+			DCget_disable_until(item, interface)))
 	{
 		item->nextcheck = calculate_item_nextcheck_unreachable(simple_interval,
 				custom_intervals, disable_until);
@@ -8421,6 +8430,20 @@ void	DCconfig_get_hosts_by_itemids(DC_HOST *hosts, const zbx_uint64_t *itemids, 
 	UNLOCK_CACHE;
 }
 
+int	DCconfig_trigger_exists(zbx_uint64_t triggerid)
+{
+	int	ret = SUCCEED;
+
+	RDLOCK_CACHE;
+
+	if (NULL == zbx_hashset_search(&config->triggers, &triggerid))
+		ret = FAIL;
+
+	UNLOCK_CACHE;
+
+	return ret;
+}
+
 void	DCconfig_get_triggers_by_triggerids(DC_TRIGGER *triggers, const zbx_uint64_t *triggerids, int *errcode,
 		size_t num)
 {
@@ -9537,7 +9560,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM **items)
 		/* don't apply unreachable item/host throttling for prioritized items */
 		if (ZBX_QUEUE_PRIORITY_HIGH != dc_item->queue_priority)
 		{
-			if (0 == (disable_until = DCget_disable_until(dc_interface)))
+			if (0 == (disable_until = DCget_disable_until(dc_item, dc_interface)))
 			{
 				/* move reachable items on reachable hosts to normal pollers */
 				if (ZBX_POLLER_TYPE_UNREACHABLE == poller_type &&
@@ -9665,7 +9688,7 @@ int	DCconfig_get_ipmi_poller_items(int now, DC_ITEM *items, int items_num, int *
 		/* don't apply unreachable item/host throttling for prioritized items */
 		if (ZBX_QUEUE_PRIORITY_HIGH != dc_item->queue_priority)
 		{
-			if (0 != (disable_until = DCget_disable_until(dc_interface)))
+			if (0 != (disable_until = DCget_disable_until(dc_item, dc_interface)))
 			{
 				if (disable_until > now)
 				{
@@ -12188,6 +12211,26 @@ void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_config_get_hk_mode                                           *
+ *                                                                            *
+ * Purpose: get housekeeping mode for history and trends tables               *
+ *                                                                            *
+ * Parameters: history_mode - [OUT] history housekeeping mode, can be either  *
+ *                                  disabled, enabled or partitioning         *
+ *             trends_mode  - [OUT] trends housekeeping mode, can be either   *
+ *                                  disabled, enabled or partitioning         *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_config_get_hk_mode(unsigned char *history_mode, unsigned char *trends_mode)
+{
+	RDLOCK_CACHE;
+	*history_mode = config->config->hk.history_mode;
+	*trends_mode = config->config->hk.trends_mode;
+	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_config_clean                                                 *
  *                                                                            *
  * Purpose: cleans global configuration data structure filled                 *
@@ -14171,6 +14214,17 @@ void	zbx_dc_eval_expand_user_macros(zbx_eval_context_t *ctx)
 
 	zbx_vector_uint64_destroy(&functionids);
 	zbx_vector_uint64_destroy(&hostids);
+}
+
+int	zbx_dc_maintenance_has_tags(void)
+{
+	int	ret;
+
+	RDLOCK_CACHE;
+	ret = config->maintenance_tags.num_data != 0 ? SUCCEED : FAIL;
+	UNLOCK_CACHE;
+
+	return ret;
 }
 
 #ifdef HAVE_TESTS
