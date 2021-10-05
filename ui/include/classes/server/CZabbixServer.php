@@ -368,6 +368,19 @@ class CZabbixServer {
 	 * @return bool
 	 */
 	public function isRunning($sid) {
+		$active_node = (new CHaNode())->get([
+			'output' => ['address', 'port', 'lastaccess'],
+			'filter' => ['status' => ZBX_NODE_STATUS_ACTIVE],
+			'limit' => 1
+		]);
+
+		if ($active_node && $active_node[0]['address'] === $this->host && $active_node[0]['port'] == $this->port) {
+			if (time() - $active_node[0]['lastaccess'] <
+					timeUnitToSeconds(CSettingsHelper::getGlobal(CSettingsHelper::HA_FAILOVER_DELAY))) {
+				return true;
+			}
+		}
+
 		$response = $this->request([
 			'request' => 'status.get',
 			'type' => 'ping',

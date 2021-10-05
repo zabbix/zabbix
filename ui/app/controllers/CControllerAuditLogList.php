@@ -242,7 +242,7 @@ class CControllerAuditLogList extends CController {
 			CAudit::RESOURCE_USER_GROUP => _('User group'),
 			CAudit::RESOURCE_USER_ROLE => _('User role'),
 			CAudit::RESOURCE_VALUE_MAP => _('Value map'),
-			CAudit::RESOURCE_HIGH_AVAILABILITY_NODE => _('High availability node')
+			CAudit::RESOURCE_HA_NODE => _('High availability node')
 		];
 	}
 

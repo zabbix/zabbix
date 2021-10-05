@@ -512,6 +512,8 @@ function getSeverityTableCell($severity, array $data, array $stat, $is_total = f
 }
 
 function make_status_of_zbx() {
+	global $ZBX_SERVER_STANDALONE;
+
 	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
@@ -660,82 +662,77 @@ function make_status_of_zbx() {
 		}
 	}
 
-	$ha_nodes = API::HaNode()->get([
-		'output' => ['name', 'address', 'port', 'lastaccess', 'status'],
-		'preservekeys' => true,
-		'sortfield' => 'status',
-		'sortorder' => 'DESC'
-	]);
+	$nodes_table = null;
+	$ha_cluster_enabled = false;
 
-	$ha_cluster_enabled = (bool) $ha_nodes;
+	if (!$ZBX_SERVER_STANDALONE) {
+		$ha_nodes = API::HaNode()->get([
+			'output' => ['name', 'address', 'port', 'lastaccess', 'status'],
+			'preservekeys' => true,
+			'sortfield' => 'status',
+			'sortorder' => 'DESC'
+		]);
 
-	foreach ($ha_nodes as $node) {
-		if ($node['name'] === '') {
-			$ha_cluster_enabled = false;
-			$ha_nodes = [];
-			break;
+		$ha_cluster_enabled = (bool) $ha_nodes;
+
+		foreach ($ha_nodes as $node) {
+			if ($node['name'] === '') {
+				$ha_cluster_enabled = false;
+				break;
+			}
 		}
 	}
 
-	if ($ha_cluster_enabled) {
+	if (!$ha_cluster_enabled) {
+		$table->addRow([_('High availability cluster'), _('Disabled'), '']);
+	}
+	else {
 		$failover_delay = CSettingsHelper::getGlobal(CSettingsHelper::HA_FAILOVER_DELAY);
 		$failover_delay_seconds = timeUnitToSeconds($failover_delay);
 		$failover_delay = secondsToPeriod($failover_delay_seconds);
-	}
 
-	$table->addRow([_('High availability cluster'),
-		$ha_cluster_enabled
-			? (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN)
-			: _('Disabled'),
-		$ha_cluster_enabled
-			? _s('Fail-over delay: %1$s', $failover_delay)
-			: ''
-	]);
+		$table->addRow([_('High availability cluster'),
+			(new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN),
+			_s('Fail-over delay: %1$s', $failover_delay)
+		]);
 
-	$nodes_table = null;
+		if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
+			$nodes_table = (new CTableInfo())
+				->setHeader([_('Name'), _('Address'), _('Last Access'), _('Status')])
+				->setHeadingColumn(0);
 
-	if ($ha_nodes) {
-		$nodes_table = (new CTableInfo())
-			->setHeader([_('Name'), _('IP Address'), _('Port'), _('Last Access'), _('Since Access'), _('Status')])
-			->setHeadingColumn(0);
+			foreach ($ha_nodes as $node) {
+				$status_element = new CCol();
 
-		foreach ($ha_nodes as $node) {
-			$status_element = new CCol();
+				switch($node['status']) {
+					case ZBX_NODE_STATUS_STOPPED:
+						$status_element
+							->addItem(_('Stopped'))
+							->addClass(ZBX_STYLE_GREY);
+						break;
+					case ZBX_NODE_STATUS_STANDBY:
+						$status_element->addItem(_('Standby'));
+						break;
+					case ZBX_NODE_STATUS_ACTIVE:
+						$status_element
+							->addItem(_('Active'))
+							->addClass(ZBX_STYLE_GREEN);
+						break;
+					case ZBX_NODE_STATUS_UNAVAILABLE:
+						$status_element
+							->addItem(_('Unavailable'))
+							->addClass(ZBX_STYLE_RED);
+						break;
+				}
 
-			switch($node['status']) {
-				case ZBX_NODE_STATUS_STOPPED:
+				$nodes_table->addRow([
+					(new CCol($node['name']))->addClass(ZBX_STYLE_NOWRAP),
+					$node['address'].':'.$node['port'],
+					(new CCol(convertUnitsS(time() - $node['lastaccess'])))
+						->setAttribute('title', zbx_date2str(DATE_TIME_FORMAT_SECONDS, $node['lastaccess'])),
 					$status_element
-						->addItem(_('Stopped'))
-						->addClass(ZBX_STYLE_GREY);
-					break;
-				case ZBX_NODE_STATUS_STANDBY:
-					$status_element->addItem(_('Standby'));
-					break;
-				case ZBX_NODE_STATUS_ACTIVE:
-					$status_element
-						->addItem(_('Active'))
-						->addClass(ZBX_STYLE_GREEN);
-					break;
-				case ZBX_NODE_STATUS_UNAVAILABLE:
-					$status_element
-						->addItem(_('Unavailable'))
-						->addClass(ZBX_STYLE_RED);
-					break;
+				]);
 			}
-
-			$time_format = (time() - $node['lastaccess'] >= $failover_delay_seconds
-					|| $node['status'] == ZBX_NODE_STATUS_STOPPED)
-				? DATE_TIME_FORMAT_SECONDS
-				: TIME_FORMAT_SECONDS;
-
-			$nodes_table->addRow([
-				(new CCol($node['name']))->addClass(ZBX_STYLE_NOWRAP),
-				$node['address'],
-				$node['port'],
-				zbx_date2str($time_format, $node['lastaccess']),
-				convertUnitsS(time() - $node['lastaccess']),
-				$status_element
-			]);
 		}
 	}
 

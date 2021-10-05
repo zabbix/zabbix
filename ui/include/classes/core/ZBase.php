@@ -182,6 +182,7 @@ class ZBase {
 
 				$this->loadConfigFile();
 				$this->initDB();
+				$this->checkNodeOverride();
 				$this->initLocales(CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_LANG));
 				$this->authenticateUser();
 
@@ -216,6 +217,7 @@ class ZBase {
 			case self::EXEC_MODE_API:
 				$this->loadConfigFile();
 				$this->initDB();
+				$this->checkNodeOverride();
 				$this->initLocales('en_us');
 				break;
 
@@ -709,5 +711,26 @@ class ZBase {
 		$this->module_manager->initModules();
 
 		array_map('error', $this->module_manager->getErrors());
+	}
+
+	function checkNodeOverride() {
+		global $ZBX_SERVER_STANDALONE, $ZBX_SERVER, $ZBX_SERVER_PORT;
+
+		if ($ZBX_SERVER_STANDALONE) {
+			return;
+		}
+
+		$active_node = (new CHaNode())->get([
+			'output' => ['address', 'port'],
+			'filter' => ['status' => ZBX_NODE_STATUS_ACTIVE],
+			'limit' => 1
+		]);
+
+		if (!$active_node) {
+			return;
+		}
+
+		$ZBX_SERVER = $active_node[0]['address'];
+		$ZBX_SERVER_PORT = $active_node[0]['port'];
 	}
 }

@@ -224,7 +224,7 @@ class API {
 	 * @return CHaNode
 	 */
 	public static function HaNode() {
-		return self::getApi('ha_node');
+		return self::getApi('hanode');
 	}
 
 	/**

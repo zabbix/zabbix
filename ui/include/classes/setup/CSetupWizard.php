@@ -638,7 +638,8 @@ class CSetupWizard extends CForm {
 			] + $db_creds_config + $vault_config,
 			'ZBX_SERVER' => $this->getConfig('ZBX_SERVER'),
 			'ZBX_SERVER_PORT' => $this->getConfig('ZBX_SERVER_PORT'),
-			'ZBX_SERVER_NAME' => $this->getConfig('ZBX_SERVER_NAME')
+			'ZBX_SERVER_NAME' => $this->getConfig('ZBX_SERVER_NAME'),
+			'ZBX_SERVER_STANDALONE' => $this->getConfig('ZBX_SERVER_STANDALONE')
 		];
 
 		$error = false;
@@ -991,7 +992,8 @@ class CSetupWizard extends CForm {
 					] + $db_creds_config + $vault_config,
 					'ZBX_SERVER' => $this->getConfig('ZBX_SERVER'),
 					'ZBX_SERVER_PORT' => $this->getConfig('ZBX_SERVER_PORT'),
-					'ZBX_SERVER_NAME' => $this->getConfig('ZBX_SERVER_NAME')
+					'ZBX_SERVER_NAME' => $this->getConfig('ZBX_SERVER_NAME'),
+					'ZBX_SERVER_STANDALONE' => $this->getConfig('ZBX_SERVER_STANDALONE')
 				];
 				die($config->getString());
 			}
