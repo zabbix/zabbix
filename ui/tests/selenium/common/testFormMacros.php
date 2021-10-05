@@ -549,6 +549,9 @@ abstract class testFormMacros extends CWebTest {
 		$object = $is_prototype ? 'host prototype' : $host_type;
 		switch ($data['expected']) {
 			case TEST_GOOD:
+				if ($host_type === 'host') {
+					COverlayDialogElement::ensureNotPresent();
+				}
 				$this->assertMessage(TEST_GOOD, $update ? ucfirst($object).' updated' : ucfirst($object).' added');
 				$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($name)));
 				// Check the results in form.
@@ -600,6 +603,9 @@ abstract class testFormMacros extends CWebTest {
 		$form->selectTab('Macros');
 		$this->removeAllMacros();
 		$form->submit();
+		if ($host_type === 'host') {
+			COverlayDialogElement::ensureNotPresent();
+		}
 
 		$this->assertMessage(TEST_GOOD, ($is_prototype ? 'Host prototype' : ucfirst($host_type)).' updated');
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($name)));
@@ -829,7 +835,9 @@ abstract class testFormMacros extends CWebTest {
 		}
 
 		$form->submit();
-		$this->page->waitUntilReady();
+		if ($host_type === 'host') {
+			COverlayDialogElement::ensureNotPresent();
+		}
 		$this->assertMessage(TEST_GOOD);
 		// Check saved edited macros in host/template form.
 		$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($name));
@@ -1117,7 +1125,9 @@ abstract class testFormMacros extends CWebTest {
 		}
 
 		$form->submit();
-		$this->page->waitUntilReady();
+		if ($host_type === 'host') {
+			COverlayDialogElement::ensureNotPresent();
+		}
 		$this->assertMessage(TEST_GOOD);
 
 		if ($host_type === 'host') {
@@ -1163,7 +1173,6 @@ abstract class testFormMacros extends CWebTest {
 			COverlayDialogElement::find()->one()->close();
 			COverlayDialogElement::ensureNotPresent();
 		}
-
 	}
 
 	/**
@@ -1382,7 +1391,9 @@ abstract class testFormMacros extends CWebTest {
 
 		$form->invalidate();
 		$form->submit();
-		$this->page->waitUntilReady();
+		if ($source === 'host') {
+			COverlayDialogElement::ensureNotPresent();
+		}
 		$this->assertMessage(TEST_GOOD);
 
 		// Check value field for guest account.
@@ -1431,7 +1442,9 @@ abstract class testFormMacros extends CWebTest {
 
 		$form->invalidate();
 		$form->submit();
-		$this->page->waitUntilReady();
+		if ($source === 'host') {
+			COverlayDialogElement::ensureNotPresent();
+		}
 		$this->assertMessage(TEST_GOOD);
 
 		$this->openMacrosTab($url, $source, false, $name);
@@ -1490,7 +1503,9 @@ abstract class testFormMacros extends CWebTest {
 
 		$form->invalidate();
 		$form->submit();
-		$this->page->waitUntilReady();
+		if ($source === 'host') {
+			COverlayDialogElement::ensureNotPresent();
+		}
 		$this->assertMessage(TEST_GOOD);
 
 		// Check that no macro value changes took place.
@@ -1618,12 +1633,15 @@ abstract class testFormMacros extends CWebTest {
 		$form = $this->openMacrosTab($url, $source, true, $name);
 		$this->fillMacros([$data['macro_fields']]);
 		$form->submit();
-		$this->page->waitUntilReady();
 
 		if ($data['expected'] == TEST_BAD) {
 			$this->assertMessage($data['expected'], $data['title'], $data['message']);
 		}
 		else {
+			if ($source === 'host') {
+				COverlayDialogElement::ensureNotPresent();
+			}
+
 			$this->assertMessage($data['expected'], $data['title']);
 			$sql = 'SELECT value, description, type FROM hostmacro WHERE macro='.zbx_dbstr($data['macro_fields']['macro']);
 			$this->assertEquals([$data['macro_fields']['value']['text'], $data['macro_fields']['description'], ZBX_MACRO_TYPE_VAULT],
@@ -1643,7 +1661,9 @@ abstract class testFormMacros extends CWebTest {
 		$form = $this->openMacrosTab($url, $source, true, $name);
 		$this->fillMacros([$data]);
 		$form->submit();
-		$this->page->waitUntilReady();
+		if ($source === 'host') {
+			COverlayDialogElement::ensureNotPresent();
+		}
 		$this->assertMessage(TEST_GOOD);
 
 		$this->openMacrosTab($url, $source, false, $name);
