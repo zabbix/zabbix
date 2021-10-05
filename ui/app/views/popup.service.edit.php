@@ -125,7 +125,9 @@ $service_tab = (new CFormGrid())
 				makeWarningIcon(
 					_('Status calculation rule and additional rules are only applicable to the child services.')
 				)
-			]))->setId('algorithm-not-applicable-warning')
+			]))
+				->setId('algorithm-not-applicable-warning')
+				->addStyle($data['form']['children'] ? 'display: none' : '')
 		], 'algorithm_focusable'),
 		new CFormField(
 			(new CSelect('algorithm'))
