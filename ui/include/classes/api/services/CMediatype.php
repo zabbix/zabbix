@@ -209,9 +209,7 @@ class CMediatype extends CApiService {
 
 		$simple_interval_parser = new CSimpleIntervalParser();
 
-		$i = 0;
-		foreach ($mediatypes as $mediatype) {
-			$i++;
+		foreach ($mediatypes as $i => $mediatype) {
 			// Check if media type already exists.
 			$db_mediatype = API::getApiService()->select('media_type', [
 				'output' => ['name'],
@@ -1290,7 +1288,7 @@ class CMediatype extends CApiService {
 		if ($type == MEDIA_TYPE_WEBHOOK) {
 			$api_input_rules['fields'] += [
 				'script' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'script')],
-				'timeout' =>			['type' => API_TIME_UNIT, 'length' => DB::getFieldLength('media_type', 'timeout'), 'in' => '1:60'],
+				'timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'timeout'), 'in' => '1:60'],
 				'process_tags' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_MEDIA_TYPE_TAGS_DISABLED, ZBX_MEDIA_TYPE_TAGS_ENABLED])],
 				'show_event_menu' =>	['type' => API_INT32, 'in' => implode(',', [ZBX_EVENT_MENU_HIDE, ZBX_EVENT_MENU_SHOW])],
 				// Should be checked as string not as URL because it can contain macros tags.
