@@ -97,13 +97,17 @@ window.service_edit_popup = {
 				.addEventListener('change', () => this.update());
 		}
 
-		this.update();
-
 		// Setup Problem tags.
-		jQuery(document.getElementById('problem_tags')).dynamicRows({
+		const $problem_tags = jQuery(document.getElementById('problem_tags'));
+
+		$problem_tags.dynamicRows({
 			template: '#problem-tag-row-tmpl',
 			rows: problem_tags
 		});
+
+		$problem_tags.on('tableupdate.dynamicRows', () => this.update());
+
+		document.getElementById('problem_tags').addEventListener('change', () => this.update());
 
 		// Setup Service rules.
 		document
@@ -167,6 +171,8 @@ window.service_edit_popup = {
 					this.removeChild(e.target.closest('tr').dataset.serviceid);
 				}
 			});
+
+		this.update();
 	},
 
 	initTemplates() {
@@ -240,6 +246,26 @@ window.service_edit_popup = {
 		const status_enabled = document.getElementById('algorithm').value != <?= ZBX_SERVICE_STATUS_CALC_SET_OK ?>;
 		const showsla = document.getElementById('showsla').checked;
 
+		let has_problem_tags = false;
+
+		for (const problem_tag of document.querySelectorAll('#problem_tags .js-problem-tag-tag')) {
+			if (problem_tag.value !== '') {
+				has_problem_tags = true;
+
+				break;
+			}
+		}
+
+		document
+			.getElementById('problem_tags')
+			.querySelectorAll('.js-problem-tag-input, .element-table-remove, .element-table-add')
+			.forEach((element) => {
+				element.disabled = this.children.size > 0;
+			});
+
+		document.getElementById('algorithm-not-applicable-warning').style.display =
+			this.children.size > 0 ? 'none' : '';
+
 		document.getElementById('additional_rules_label').style.display = advanced_configuration ? '' : 'none';
 		document.getElementById('additional_rules_field').style.display = advanced_configuration ? '' : 'none';
 		document.getElementById('status_propagation_rules_label').style.display = advanced_configuration ? '' : 'none';
@@ -268,6 +294,8 @@ window.service_edit_popup = {
 
 		document.getElementById('showsla').disabled = !status_enabled;
 		document.getElementById('goodsla').disabled = !status_enabled || !showsla;
+
+		document.querySelector('#children .js-add').disabled = has_problem_tags;
 	},
 
 	editStatusRule(row = null) {
@@ -406,6 +434,7 @@ window.service_edit_popup = {
 		this.children.delete(serviceid);
 		this.updateChildrenFilterStats();
 		this.updateTabIndicator();
+		this.update();
 	},
 
 	filterChildren() {
@@ -430,7 +459,7 @@ window.service_edit_popup = {
 		}
 
 		this.updateChildrenFilterStats();
-		this.updateTabIndicator()
+		this.updateTabIndicator();
 	},
 
 	updateChildrenFilterStats() {
@@ -475,6 +504,7 @@ window.service_edit_popup = {
 
 			this.updateChildrenFilterStats();
 			this.updateTabIndicator();
+			this.update();
 		});
 	},
 

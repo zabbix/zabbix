@@ -84,9 +84,12 @@ $service_tab = (new CFormGrid())
 							(new CTextBox('problem_tags[#{rowNum}][tag]', '#{tag}', false,
 								DB::getFieldLength('service_problem_tag', 'tag')
 							))
+								->addClass('js-problem-tag-input')
+								->addClass('js-problem-tag-tag')
 								->setAttribute('placeholder', _('tag'))
 								->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 							(new CSelect('problem_tags[#{rowNum}][operator]'))
+								->addClass('js-problem-tag-input')
 								->addOptions(CSelect::createOptionsFromArray([
 									SERVICE_TAG_OPERATOR_EQUAL => _('Equals'),
 									SERVICE_TAG_OPERATOR_LIKE => _('Contains')
@@ -95,6 +98,7 @@ $service_tab = (new CFormGrid())
 							(new CTextBox('problem_tags[#{rowNum}][value]', '#{value}', false,
 								DB::getFieldLength('service_problem_tag', 'value')
 							))
+								->addClass('js-problem-tag-input')
 								->setAttribute('placeholder', _('value'))
 								->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 							(new CSimpleButton(_('Remove')))
@@ -114,7 +118,15 @@ $service_tab = (new CFormGrid())
 		)
 	])
 	->addItem([
-		new CLabel(_('Status calculation rule'), 'algorithm_focusable'),
+		new CLabel([
+			_('Status calculation rule'),
+			(new CSpan([
+				' ',
+				makeWarningIcon(
+					_('Status calculation rule and Additional rules are only applicable to the child services.')
+				)
+			]))->setId('algorithm-not-applicable-warning')
+		], 'algorithm_focusable'),
 		new CFormField(
 			(new CSelect('algorithm'))
 				->setId('algorithm')
