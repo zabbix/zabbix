@@ -318,12 +318,9 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => (new CUrl('zabbix.php'))
-					->setArgument('action', 'host.create')
-					->setArgument('groupid', 0)
-					->getUrl(),
-				'title' =>	'Configuration of hosts',
-				'header' => 'Hosts',
+				'url' => 'zabbix.php?action=host.edit',
+				'title' =>	'Configuration of host',
+				'header' => 'New host',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
