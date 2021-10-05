@@ -610,7 +610,7 @@ class CUser extends CApiService {
 			}
 		}
 
-		$this->addAffectedObjects($users, $db_users);
+		self::addAffectedObjects($users, $db_users);
 
 		if ($usernames) {
 			$this->checkDuplicates($usernames);
@@ -628,10 +628,12 @@ class CUser extends CApiService {
 	/**
 	 * Add the existing medias and user groups to $db_users whether these are affected by the update.
 	 *
+	 * @static
+	 *
 	 * @param array $users
 	 * @param array $db_users
 	 */
-	private function addAffectedObjects(array $users, array &$db_users): void {
+	private static function addAffectedObjects(array $users, array &$db_users): void {
 		$userids = ['usrgrps' => [], 'medias' => []];
 
 		foreach ($users as $user) {
@@ -654,10 +656,8 @@ class CUser extends CApiService {
 			$db_usrgrps = DBselect(DB::makeSql('users_groups', $options));
 
 			while ($db_usrgrp = DBfetch($db_usrgrps)) {
-				$db_users[$db_usrgrp['userid']]['usrgrps'][$db_usrgrp['id']] = [
-					'id' => $db_usrgrp['id'],
-					'usrgrpid' => $db_usrgrp['usrgrpid']
-				];
+				$db_users[$db_usrgrp['userid']]['usrgrps'][$db_usrgrp['id']] =
+					array_diff_key($db_usrgrp, array_flip(['userid']));
 			}
 		}
 
@@ -669,14 +669,8 @@ class CUser extends CApiService {
 			$db_medias = DBselect(DB::makeSql('media', $options));
 
 			while ($db_media = DBfetch($db_medias)) {
-				$db_users[$db_media['userid']]['medias'][$db_media['mediaid']] = [
-					'mediaid' => $db_media['mediaid'],
-					'mediatypeid' => $db_media['mediatypeid'],
-					'sendto' => $db_media['sendto'],
-					'active' => $db_media['active'],
-					'severity' => $db_media['severity'],
-					'period' => $db_media['period']
-				];
+				$db_users[$db_media['userid']]['medias'][$db_media['mediaid']] =
+					array_diff_key($db_media, array_flip(['userid']));
 			}
 		}
 	}

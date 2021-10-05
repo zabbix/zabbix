@@ -45,6 +45,7 @@ zbx_audit_entry_t	*zbx_audit_entry_init(zbx_uint64_t id, const char *name, int a
 	audit_entry->name = zbx_strdup(NULL, name);
 	audit_entry->audit_action = audit_action;
 	audit_entry->resource_type = resource_type;
+	zbx_new_cuid(audit_entry->audit_cuid);
 	zbx_json_init(&(audit_entry->details_json), ZBX_JSON_STAT_BUF_LEN);
 
 	return audit_entry;
@@ -264,7 +265,7 @@ void	zbx_audit_init(int audit_mode_set)
 
 void	zbx_audit_flush(void)
 {
-	char			audit_cuid[CUID_LEN], recsetid_cuid[CUID_LEN];
+	char			recsetid_cuid[CUID_LEN];
 	zbx_hashset_iter_t	iter;
 	zbx_audit_entry_t	**audit_entry;
 	zbx_db_insert_t		db_insert_audit;
@@ -279,16 +280,15 @@ void	zbx_audit_flush(void)
 
 	while (NULL != (audit_entry = (zbx_audit_entry_t **)zbx_hashset_iter_next(&iter)))
 	{
-		zbx_new_cuid(audit_cuid);
 		if (AUDIT_ACTION_DELETE == (*audit_entry)->audit_action ||
 				0 != strcmp((*audit_entry)->details_json.buffer, "{}"))
 		{
 #define AUDIT_USERID	0
 #define AUDIT_USERNAME	"System"
 #define AUDIT_IP	""
-			zbx_db_insert_add_values(&db_insert_audit, audit_cuid, AUDIT_USERID, AUDIT_USERNAME,
-					(int)time(NULL), (*audit_entry)->audit_action, AUDIT_IP, (*audit_entry)->id,
-					(*audit_entry)->name, (*audit_entry)->resource_type,
+			zbx_db_insert_add_values(&db_insert_audit, (*audit_entry)->audit_cuid, AUDIT_USERID,
+					AUDIT_USERNAME, (int)time(NULL), (*audit_entry)->audit_action, AUDIT_IP,
+					(*audit_entry)->id, (*audit_entry)->name, (*audit_entry)->resource_type,
 					recsetid_cuid, 0 == strcmp((*audit_entry)->details_json.buffer, "{}") ? "" :
 					(*audit_entry)->details_json.buffer);
 #undef AUDIT_USERID

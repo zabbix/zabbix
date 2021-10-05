@@ -9105,7 +9105,7 @@ void	zbx_dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers, int now)
 	int	i;
 
 	/* calculate new execution/evaluation time for the evaluated triggers */
-	/* (timers with reseted execution time)                               */
+	/* (timers with reset execution time)                                 */
 	for (i = 0; i < timers->values_num; i++)
 	{
 		zbx_trigger_timer_t	*timer = (zbx_trigger_timer_t *)timers->values[i];

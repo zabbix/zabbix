@@ -167,768 +167,177 @@ class CMediatype extends CApiService {
 	}
 
 	/**
-	 * Validates the input parameters for the create() method.
-	 *
 	 * @param array $mediatypes
 	 *
 	 * @throws APIException if the input is invalid.
-	 */
-	protected function validateCreate(array $mediatypes) {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can create media types.'));
-		}
-
-		if (!$mediatypes) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
-		}
-
-		$required_fields = ['type', 'name'];
-
-		foreach ($mediatypes as $mediatype) {
-			if (!is_array($mediatype)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-			}
-
-			// Check required parameters.
-			$missing_keys = array_diff($required_fields, array_keys($mediatype));
-
-			if ($missing_keys) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Media type is missing parameters: %1$s', implode(', ', $missing_keys))
-				);
-			}
-			else {
-				foreach ($required_fields as $field) {
-					if ($mediatype[$field] === '' || $mediatype[$field] === null) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Field "%1$s" is missing a value for media type "%2$s".', $field, $mediatype['name'])
-						);
-					}
-				}
-			}
-		}
-
-		// Check for duplicate names.
-		$duplicate_name = CArrayHelper::findDuplicate($mediatypes, 'name');
-		if ($duplicate_name) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Media type "%1$s" already exists.', $duplicate_name['name']));
-		}
-
-		$simple_interval_parser = new CSimpleIntervalParser();
-
-		foreach ($mediatypes as $i => $mediatype) {
-			// Check if media type already exists.
-			$db_mediatype = API::getApiService()->select('media_type', [
-				'output' => ['name'],
-				'filter' => ['name' => $mediatype['name']],
-				'limit' => 1
-			]);
-
-			if ($db_mediatype) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Media type "%1$s" already exists.', $mediatype['name']));
-			}
-
-			// Check additional fields and values depending on media type.
-			$this->checkRequiredFieldsByType($mediatype);
-
-			switch ($mediatype['type']) {
-				case MEDIA_TYPE_EMAIL:
-					if (array_key_exists('smtp_authentication', $mediatype)) {
-						$smtp_authentication_validator = new CLimitedSetValidator([
-							'values' => [SMTP_AUTHENTICATION_NONE, SMTP_AUTHENTICATION_NORMAL]
-						]);
-
-						if (!$smtp_authentication_validator->validate($mediatype['smtp_authentication'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-								'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
-								$mediatype['smtp_authentication'],
-								'smtp_authentication',
-								$mediatype['name']
-							));
-						}
-					}
-
-					// Validate optional 'smtp_port' field.
-					if (array_key_exists('smtp_port', $mediatype) && !validatePortNumber($mediatype['smtp_port'])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
-							$mediatype['smtp_port'],
-							'smtp_port',
-							$mediatype['name']
-						));
-					}
-
-					// Validate optional field 'smtp_security'.
-					if (array_key_exists('smtp_security', $mediatype)) {
-						$smtp_security_validator = new CLimitedSetValidator([
-							'values' => [
-								SMTP_CONNECTION_SECURITY_NONE,
-								SMTP_CONNECTION_SECURITY_STARTTLS,
-								SMTP_CONNECTION_SECURITY_SSL_TLS
-							]
-						]);
-
-						if (!$smtp_security_validator->validate($mediatype['smtp_security'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-								'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
-								$mediatype['smtp_security'],
-								'smtp_security',
-								$mediatype['name']
-							));
-						}
-					}
-
-					// Validate optional field 'smtp_verify_peer'.
-					if (array_key_exists('smtp_verify_peer', $mediatype)) {
-						$smtp_verify_peer_validator = new CLimitedSetValidator([
-							'values' => [0, 1]
-						]);
-
-						if (!$smtp_verify_peer_validator->validate($mediatype['smtp_verify_peer'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-								'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
-								$mediatype['smtp_verify_peer'],
-								'smtp_verify_peer',
-								$mediatype['name']
-							));
-						}
-					}
-
-					// Validate optional field 'smtp_verify_host'.
-					if (array_key_exists('smtp_verify_host', $mediatype)) {
-						$smtp_verify_host_validator = new CLimitedSetValidator([
-							'values' => [0, 1]
-						]);
-
-						if (!$smtp_verify_host_validator->validate($mediatype['smtp_verify_host'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-								'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
-								$mediatype['smtp_verify_host'],
-								'smtp_verify_host',
-								$mediatype['name']
-							));
-						}
-					}
-
-					// Validate optional field 'content_type'.
-					if (array_key_exists('content_type', $mediatype)) {
-						$content_type_validator = new CLimitedSetValidator([
-							'values' => [
-								SMTP_MESSAGE_FORMAT_PLAIN_TEXT,
-								SMTP_MESSAGE_FORMAT_HTML
-							]
-						]);
-
-						if (!$content_type_validator->validate($mediatype['content_type'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-								'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
-								$mediatype['content_type'],
-								'content_type',
-								$mediatype['name']
-							));
-						}
-					}
-					break;
-
-				case MEDIA_TYPE_EXEC:
-					if (array_key_exists('exec_params', $mediatype) && $mediatype['exec_params'] !== '') {
-						$pos = strrpos($mediatype['exec_params'], "\n");
-
-						if ($pos === false || strlen($mediatype['exec_params']) != $pos + 1) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-								'Script parameters "%1$s" are missing the last new line feed for media type "%2$s".',
-								$mediatype['exec_params'],
-								$mediatype['name']
-							));
-						}
-					}
-					break;
-			}
-
-			$api_input_rules = $this->getValidationRules($mediatype['type'], 'create');
-			$validated_data = array_intersect_key($mediatype, $api_input_rules['fields']);
-
-			if (!CApiInputValidator::validate($api_input_rules, $validated_data, '/'.($i + 1), $error)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-			}
-			$mediatype = $validated_data + $mediatype;
-
-			// Validate optional 'status' field.
-			if (array_key_exists('status', $mediatype)) {
-				$status_validator = new CLimitedSetValidator([
-					'values' => [MEDIA_TYPE_STATUS_ACTIVE, MEDIA_TYPE_STATUS_DISABLED]
-				]);
-
-				if (!$status_validator->validate($mediatype['status'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
-						$mediatype['status'],
-						'status',
-						$mediatype['name']
-					));
-				}
-			}
-
-			// Validate optional 'maxsessions' field.
-			if (array_key_exists('maxsessions', $mediatype)) {
-				if ($mediatype['maxsessions'] === '') {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-						'maxsessions', _('cannot be empty')
-					));
-				}
-
-				$min = ($mediatype['type'] == MEDIA_TYPE_SMS) ? 1 : 0;
-				$max = ($mediatype['type'] == MEDIA_TYPE_SMS) ? 1 : 100;
-
-				if (!ctype_digit((string) $mediatype['maxsessions']) || $mediatype['maxsessions'] > $max
-						|| $mediatype['maxsessions'] < $min) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-						'maxsessions', _s('must be between "%1$s" and "%2$s"', $min, $max)
-					));
-				}
-			}
-
-			// Validate optional 'maxattempts' field.
-			if (array_key_exists('maxattempts', $mediatype)) {
-				if ($mediatype['maxattempts'] === '') {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-						'maxattempts', _('cannot be empty')
-					));
-				}
-
-				if (!ctype_digit((string) $mediatype['maxattempts']) || $mediatype['maxattempts'] > 100
-						|| $mediatype['maxattempts'] < 1) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-						'maxattempts', _s('must be between "%1$s" and "%2$s"', 1, 100)
-					));
-				}
-			}
-
-			// Validate optional 'attempt_interval' field.
-			if (array_key_exists('attempt_interval', $mediatype)) {
-				if ($mediatype['attempt_interval'] === '') {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-						'attempt_interval', _('cannot be empty')
-					));
-				}
-
-				if ($simple_interval_parser->parse($mediatype['attempt_interval']) == CParser::PARSE_SUCCESS) {
-					$attempt_interval = timeUnitToSeconds($mediatype['attempt_interval']);
-
-					if ($attempt_interval < 0 || $attempt_interval > 3600) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-							'attempt_interval', _s('must be between "%1$s" and "%2$s"', 0, 3600)
-						));
-					}
-				}
-				else {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-						'attempt_interval', _s('must be between "%1$s" and "%2$s"', 0, 3600)
-					));
-				}
-			}
-		}
-	}
-
-	/**
-	 * Validates the input parameters for the update() method.
-	 *
-	 * @param array $mediatypes
-	 *
-	 * @throws APIException if the input is invalid.
-	 */
-	protected function validateUpdate(array $mediatypes) {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can edit media types.'));
-		}
-
-		if (!$mediatypes) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
-		}
-
-		// Validate given IDs.
-		$this->checkObjectIds($mediatypes, 'mediatypeid',
-			_('No "%1$s" given for media type.'),
-			_('Empty media type ID.'),
-			_('Incorrect media type ID.')
-		);
-
-		$mediatypeids = zbx_objectValues($mediatypes, 'mediatypeid');
-
-		// Check value map names.
-		$db_mediatypes = API::getApiService()->select('media_type', [
-			'output' => ['mediatypeid', 'type', 'name', 'exec_path', 'status', 'smtp_port', 'smtp_verify_peer',
-				'smtp_verify_host', 'smtp_authentication', 'maxsessions', 'maxattempts', 'attempt_interval',
-				'content_type', 'script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url',
-				'event_menu_name'
-			],
-			'mediatypeids' => $mediatypeids,
-			'preservekeys' => true
-		]);
-
-		$check_names = [];
-		$simple_interval_parser = new CSimpleIntervalParser();
-
-		foreach ($mediatypes as $mediatype) {
-			// Check if this media type exists.
-			if (!array_key_exists($mediatype['mediatypeid'], $db_mediatypes)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-
-			// Validate "name" field.
-			if (array_key_exists('name', $mediatype)) {
-				if (is_array($mediatype['name'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-				}
-				elseif ($mediatype['name'] === '' || $mediatype['name'] === null || $mediatype['name'] === false) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value for field "%1$s": %2$s.', 'name', _('cannot be empty'))
-					);
-				}
-
-				$check_names[$mediatype['name']] = true;
-			}
-		}
-
-		if ($check_names) {
-			$db_mediatype_names = API::getApiService()->select('media_type', [
-				'output' => ['mediatypeid', 'name'],
-				'filter' => ['name' => array_keys($check_names)]
-			]);
-			$db_mediatype_names = zbx_toHash($db_mediatype_names, 'name');
-
-			foreach ($mediatypes as $mediatype) {
-				if (array_key_exists('name', $mediatype)
-						&& array_key_exists($mediatype['name'], $db_mediatype_names)
-						&& !idcmp($db_mediatype_names[$mediatype['name']]['mediatypeid'], $mediatype['mediatypeid'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Media type "%1$s" already exists.', $mediatype['name'])
-					);
-				}
-			}
-		}
-
-		// Populate "name" field, if not set. Type field should not be populated at this point.
-		$mediatypes = $this->extendFromObjects(zbx_toHash($mediatypes, 'mediatypeid'), $db_mediatypes, ['name']);
-
-		$duplicate_name = CArrayHelper::findDuplicate($mediatypes, 'name');
-		if ($duplicate_name) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Media type "%1$s" already exists.', $duplicate_name['name'])
-			);
-		}
-
-		$i = 0;
-		foreach ($mediatypes as $mediatype) {
-			$i++;
-			$db_mediatype = $db_mediatypes[$mediatype['mediatypeid']];
-
-			// Recheck mandatory fields if type changed.
-			if (array_key_exists('type', $mediatype) && $db_mediatype['type'] != $mediatype['type']) {
-				$this->checkRequiredFieldsByType($mediatype);
-			}
-			else {
-				$optional_fields_by_type = [
-					MEDIA_TYPE_EMAIL => ['smtp_server', 'smtp_helo', 'smtp_email'],
-					MEDIA_TYPE_EXEC => ['exec_path'],
-					MEDIA_TYPE_WEBHOOK => [],
-					MEDIA_TYPE_SMS => ['gsm_modem']
-				];
-
-				foreach ($optional_fields_by_type[$db_mediatype['type']] as $field) {
-					if (array_key_exists($field, $mediatype)
-							&& ($mediatype[$field] === '' || $mediatype[$field] === null)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Field "%1$s" is missing a value for media type "%2$s".',
-							$field,
-							$mediatype['name']
-						));
-					}
-				}
-
-				// Populate "type" field from DB, since it is not set and is required for further validation.
-				$mediatype['type'] = $db_mediatype['type'];
-			}
-
-			switch ($mediatype['type']) {
-				case MEDIA_TYPE_EMAIL:
-					if (array_key_exists('smtp_authentication', $mediatype)) {
-						$smtp_authentication_validator = new CLimitedSetValidator([
-							'values' => [SMTP_AUTHENTICATION_NONE, SMTP_AUTHENTICATION_NORMAL]
-						]);
-
-						if (!$smtp_authentication_validator->validate($mediatype['smtp_authentication'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-								'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
-								$mediatype['smtp_authentication'],
-								'smtp_authentication',
-								$mediatype['name']
-							));
-						}
-					}
-
-					// Validate optional 'smtp_port' field.
-					if (array_key_exists('smtp_port', $mediatype)
-							&& $db_mediatype['smtp_port'] != $mediatype['smtp_port']
-							&& !validatePortNumber($mediatype['smtp_port'])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
-							$mediatype['smtp_port'],
-							'smtp_port',
-							$mediatype['name']
-						));
-					}
-
-					// Validate optional field 'smtp_security'.
-					if (array_key_exists('smtp_security', $mediatype)) {
-						$smtp_security_validator = new CLimitedSetValidator([
-							'values' => [
-								SMTP_CONNECTION_SECURITY_NONE,
-								SMTP_CONNECTION_SECURITY_STARTTLS,
-								SMTP_CONNECTION_SECURITY_SSL_TLS
-							]
-						]);
-
-						if (!$smtp_security_validator->validate($mediatype['smtp_security'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-								'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
-								$mediatype['smtp_security'],
-								'smtp_security',
-								$mediatype['name']
-							));
-						}
-					}
-
-					// Validate optional field 'smtp_verify_peer'.
-					if (array_key_exists('smtp_verify_peer', $mediatype)
-							&& $db_mediatype['smtp_verify_peer'] != $mediatype['smtp_verify_peer']) {
-						$smtp_verify_peer_validator = new CLimitedSetValidator([
-							'values' => [0, 1]
-						]);
-
-						if (!$smtp_verify_peer_validator->validate($mediatype['smtp_verify_peer'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-								'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
-								$mediatype['smtp_verify_peer'],
-								'smtp_verify_peer',
-								$mediatype['name']
-							));
-						}
-					}
-
-					// Validate optional field 'smtp_verify_host'.
-					if (array_key_exists('smtp_verify_host', $mediatype)
-							&& $db_mediatype['smtp_verify_host'] != $mediatype['smtp_verify_host']) {
-						$smtp_verify_host_validator = new CLimitedSetValidator([
-							'values' => [0, 1]
-						]);
-
-						if (!$smtp_verify_host_validator->validate($mediatype['smtp_verify_host'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-								'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
-								$mediatype['smtp_verify_host'],
-								'smtp_verify_host',
-								$mediatype['name']
-							));
-						}
-					}
-
-					// Validate optional field 'content_type'.
-					if (array_key_exists('content_type', $mediatype)
-							&& $db_mediatype['content_type'] != $mediatype['content_type']) {
-						$content_type_validator = new CLimitedSetValidator([
-							'values' => [
-								SMTP_MESSAGE_FORMAT_PLAIN_TEXT,
-								SMTP_MESSAGE_FORMAT_HTML
-							]
-						]);
-
-						if (!$content_type_validator->validate($mediatype['content_type'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-								'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
-								$mediatype['content_type'],
-								'content_type',
-								$mediatype['name']
-							));
-						}
-					}
-					break;
-
-				case MEDIA_TYPE_EXEC:
-					if (array_key_exists('exec_params', $mediatype) && $mediatype['exec_params'] !== '') {
-						$pos = strrpos($mediatype['exec_params'], "\n");
-
-						if ($pos === false || strlen($mediatype['exec_params']) != $pos + 1) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-								'Script parameters "%1$s" are missing the last new line feed for media type "%2$s".',
-								$mediatype['exec_params'],
-								$mediatype['name']
-							));
-						}
-					}
-					break;
-			}
-
-			$api_input_rules = $this->getValidationRules($mediatype['type'], 'update');
-			$validated_data = array_intersect_key($mediatype, $api_input_rules['fields']);
-
-			if (!CApiInputValidator::validate($api_input_rules, $validated_data, '/'.$i, $error)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-			}
-			$mediatype = $validated_data + $mediatype;
-
-			// Validate optional 'status' field and only when status is changed.
-			if (array_key_exists('status', $mediatype) && $db_mediatype['status'] != $mediatype['status']) {
-				$status_validator = new CLimitedSetValidator([
-					'values' => [MEDIA_TYPE_STATUS_ACTIVE, MEDIA_TYPE_STATUS_DISABLED]
-				]);
-
-				if (!$status_validator->validate($mediatype['status'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
-						$mediatype['status'],
-						'status',
-						$mediatype['name']
-					));
-				}
-			}
-
-			// Validate optional 'maxsessions' field.
-			if (array_key_exists('maxsessions', $mediatype)
-					&& $db_mediatype['maxsessions'] != $mediatype['maxsessions']) {
-				if ($mediatype['maxsessions'] === '') {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-						'maxsessions', _('cannot be empty')
-					));
-				}
-
-				$min = ($mediatype['type'] == MEDIA_TYPE_SMS) ? 1 : 0;
-				$max = ($mediatype['type'] == MEDIA_TYPE_SMS) ? 1 : 100;
-
-				if (!ctype_digit((string) $mediatype['maxsessions']) || $mediatype['maxsessions'] > $max
-						|| $mediatype['maxsessions'] < $min) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-						'maxsessions', _s('must be between "%1$s" and "%2$s"', $min, $max)
-					));
-				}
-			}
-			elseif ($mediatype['type'] == MEDIA_TYPE_SMS && $mediatype['type'] != $db_mediatype['type']
-						&& $db_mediatype['maxsessions'] != 1) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-					'maxsessions', _s('must be between "%1$s" and "%2$s"', 1, 1)
-				));
-			}
-
-			// Validate optional 'maxattempts' field.
-			if (array_key_exists('maxattempts', $mediatype)
-					&& $db_mediatype['maxattempts'] != $mediatype['maxattempts']) {
-				if ($mediatype['maxattempts'] === '') {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-						'maxattempts', _('cannot be empty')
-					));
-				}
-
-				if (!ctype_digit((string) $mediatype['maxattempts']) || $mediatype['maxattempts'] > 100
-						|| $mediatype['maxattempts'] < 1) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-						'maxattempts', _s('must be between "%1$s" and "%2$s"', 1, 100)
-					));
-				}
-			}
-
-			// Validate optional 'attempt_interval' field.
-			if (array_key_exists('attempt_interval', $mediatype)
-					&& $db_mediatype['attempt_interval'] != $mediatype['attempt_interval']) {
-				if ($mediatype['attempt_interval'] === '') {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-						'attempt_interval', _('cannot be empty')
-					));
-				}
-
-				if ($simple_interval_parser->parse($mediatype['attempt_interval']) == CParser::PARSE_SUCCESS) {
-					$attempt_interval = timeUnitToSeconds($mediatype['attempt_interval']);
-
-					if ($attempt_interval < 0 || $attempt_interval > 3600) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-							'attempt_interval', _s('must be between "%1$s" and "%2$s"', 0, 3600)
-						));
-					}
-				}
-				else {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-						'attempt_interval', _s('must be between "%1$s" and "%2$s"', 0, 3600)
-					));
-				}
-			}
-		}
-	}
-
-	/**
-	 * Validates the event_menu_* input parameters.
-	 *
-	 * @param array $mediatype
-	 * @param array $db_mediatype
-	 *
-	 * @throws APIException if the input is invalid.
-	 */
-	private function validateEventMenu(array $mediatype, array $db_mediatype = null) {
-		if ($db_mediatype === null) {
-			$db_mediatype = DB::getDefaults('media_type');
-		}
-
-		foreach (['show_event_menu', 'event_menu_url', 'event_menu_name'] as $field_name) {
-			if (!array_key_exists($field_name, $mediatype)) {
-				$mediatype[$field_name] = $db_mediatype[$field_name];
-			}
-		}
-
-		foreach (['event_menu_url', 'event_menu_name'] as $field_name) {
-			if ($mediatype['show_event_menu'] == ZBX_EVENT_MENU_HIDE) {
-				if ($mediatype[$field_name] !== '') {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value for field "%1$s": %2$s.', $field_name, _('should be empty'))
-					);
-				}
-			}
-			else {
-				if ($mediatype[$field_name] === '') {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value for field "%1$s": %2$s.', $field_name, _('cannot be empty'))
-					);
-				}
-			}
-		}
-	}
-
-	/**
-	 * Add Media types.
-	 *
-	 * @param array  $mediatypes                           A multidimensional array with media types data.
-	 * @param int    $mediatypes[]['type']                 Transport used by the media type.
-	 * @param string $mediatypes[]['name']                 Name of the media type.
-	 * @param string $mediatypes[]['smtp_server']          SMTP server.
-	 * @param int    $mediatypes[]['smtp_port']            SMTP server port.
-	 * @param string $mediatypes[]['smtp_helo']            SMTP HELO.
-	 * @param string $mediatypes[]['smtp_email']           SMTP email.
-	 * @param int    $mediatypes[]['smtp_security']        SMTP connection security level.
-	 * @param int    $mediatypes[]['smtp_verify_peer']     SMTP verify peer.
-	 * @param int    $mediatypes[]['smtp_verify_host']     SMTP verify host.
-	 * @param int    $mediatypes[]['smtp_authentication']  SMTP authentication.
-	 * @param int    $mediatypes[]['content_type']         Message format.
-	 * @param string $mediatypes[]['exec_path']            Script name.
-	 * @param string $mediatypes[]['exec_params']          Script parameters.
-	 * @param string $mediatypes[]['gsm_modem']            Serial device name of the GSM modem.
-	 * @param string $mediatypes[]['username']             User name used for authentication.
-	 * @param string $mediatypes[]['passwd']               Password used for authentication.
-	 * @param int    $mediatypes[]['status']               Media type status.
-	 * @param int    $mediatypes[]['maxsessions']          Limit of simultaneously processed alerts.
-	 * @param int    $mediatypes[]['maxattempts']          Maximum attempts to deliver alert successfully.
-	 * @param string $mediatypes[]['attempt_interval']     Interval between alert delivery attempts.
-	 * @param string $mediatypes[]['script']               Webhook JavaScript body.
-	 * @param array  $mediatypes[]['parameters']           An array of webhook parameters:
-	 *                                                     ['name' => .., 'value' => ..]
-	 * @param string $mediatypes[]['timeout']              Webhook JavaScript HTTP request timeout.
-	 * @param string $mediatypes[]['process_tags']         Webhook HTTP response should be saved as tags.
-	 * @param string $mediatypes[]['show_event_menu']      Indicates presence of entry in event.get "urls" objects list.
-	 * @param string $mediatypes[]['event_menu_url']       Webhook additional info in frontend, supports received tags.
-	 * @param string $mediatypes[]['event_menu_name']      Webhook 'url' visual name.
-	 * @param string $mediatypes[]['description']          Media type description.
-	 * @param array  $mediatypes[]['message_templates']    An array of media type message templates.
 	 *
 	 * @return array
 	 */
-	public function create(array $mediatypes) {
-		$mediatypes = zbx_toArray($mediatypes);
-
-		$this->validateCreate($mediatypes);
+	public function create(array $mediatypes): array {
+		self::validateCreate($mediatypes);
 
 		$mediatypeids = DB::insert('media_type', $mediatypes);
-		$ins_media_type_param = [];
-		$ins_media_type_message = [];
 
-		foreach ($mediatypes as $i => $mediatype) {
-			$mediatypeid = $mediatypeids[$i];
-			$mediatypes[$i]['mediatypeid'] = $mediatypeid;
-
-			if ($mediatype['type'] == MEDIA_TYPE_WEBHOOK) {
-				if (array_key_exists('parameters', $mediatype)) {
-					foreach ($mediatype['parameters'] as $parameter) {
-						$ins_media_type_param[] = ['mediatypeid' => $mediatypeid] + $parameter;
-					}
-				}
-
-				$this->validateEventMenu($mediatype);
-			}
-
-			if (array_key_exists('message_templates', $mediatype)) {
-				foreach ($mediatype['message_templates'] as $message_template) {
-					$ins_media_type_message[] = ['mediatypeid' => $mediatypeid] + $message_template;
-				}
-			}
+		foreach ($mediatypes as $index => &$mediatype) {
+			$mediatype['mediatypeid'] = $mediatypeids[$index];
 		}
+		unset($mediatype);
 
-		if ($ins_media_type_param) {
-			DB::insertBatch('media_type_param', $ins_media_type_param);
-		}
+		self::updateParameters($mediatypes, __FUNCTION__);
+		self::updateMessageTemplates($mediatypes, __FUNCTION__);
 
-		if ($ins_media_type_message) {
-			DB::insert('media_type_message', $ins_media_type_message);
-		}
-
-		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_MEDIA_TYPE, $mediatypes);
+		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_MEDIA_TYPE, $mediatypes);
 
 		return ['mediatypeids' => $mediatypeids];
 	}
 
 	/**
-	 * Update Media types.
+	 * @static
 	 *
-	 * @param array  $mediatypes                           A multidimensional array with media types data.
-	 * @param int    $mediatypes[]['mediatypeid']          Media type ID.
-	 * @param int    $mediatypes[]['type']                 Transport used by the media type.
-	 * @param string $mediatypes[]['name']                 Name of the media type.
-	 * @param string $mediatypes[]['smtp_server']          SMTP server.
-	 * @param int    $mediatypes[]['smtp_port']            SMTP server port.
-	 * @param string $mediatypes[]['smtp_helo']            SMTP HELO.
-	 * @param string $mediatypes[]['smtp_email']           SMTP email.
-	 * @param int    $mediatypes[]['smtp_security']        SMTP connection security level.
-	 * @param int    $mediatypes[]['smtp_verify_peer']     SMTP verify peer.
-	 * @param int    $mediatypes[]['smtp_verify_host']     SMTP verify host.
-	 * @param int    $mediatypes[]['smtp_authentication']  SMTP authentication.
-	 * @param int    $mediatypes[]['content_type']         Message format.
-	 * @param string $mediatypes[]['exec_path']            Script name.
-	 * @param string $mediatypes[]['exec_params']          Script parameters.
-	 * @param string $mediatypes[]['gsm_modem']            Serial device name of the GSM modem.
-	 * @param string $mediatypes[]['username']             User name used for authentication.
-	 * @param string $mediatypes[]['passwd']               Password used for authentication.
-	 * @param int    $mediatypes[]['status']               Media type status.
-	 * @param int    $mediatypes[]['maxsessions']          Limit of simultaneously processed alerts.
-	 * @param int    $mediatypes[]['maxattempts']          Maximum attempts to deliver alert successfully.
-	 * @param string $mediatypes[]['attempt_interval']     Interval between alert delivery attempts.
-	 * @param string $mediatypes[]['script']               Webhook JavaScript body.
-	 * @param array  $mediatypes[]['parameters']           An array of webhook parameters:
-	 *                                                     ['name' => .., 'value' => ..]
-	 * @param string $mediatypes[]['timeout']              Webhook JavaScript HTTP request timeout.
-	 * @param string $mediatypes[]['process_tags']         Webhook HTTP response should be saved as tags.
-	 * @param string $mediatypes[]['show_event_menu']      Indicates presence of entry in event.get "urls" objects list.
-	 * @param string $mediatypes[]['event_menu_url']       Webhook additional info in frontend, supports received tags.
-	 * @param string $mediatypes[]['event_menu_name']      Webhook 'url' visual name.
-	 * @param string $mediatypes[]['description']          Media type description.
-	 * @param array  $mediatypes[]['message_templates']    An array of media type message templates.
+	 * @param array $mediatypes
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	private static function validateCreate(array &$mediatypes): void {
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
+			'type' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK])],
+			'name' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'name')],
+			'smtp_server' =>			['type' => API_STRING_UTF8],
+			'smtp_helo' =>				['type' => API_STRING_UTF8],
+			'smtp_email' =>				['type' => API_STRING_UTF8],
+			'exec_path' =>				['type' => API_STRING_UTF8],
+			'gsm_modem' =>				['type' => API_STRING_UTF8],
+			'username' =>				['type' => API_STRING_UTF8],
+			'passwd' =>					['type' => API_STRING_UTF8],
+			'status' =>					['type' => API_INT32, 'in' => implode(',', [MEDIA_TYPE_STATUS_ACTIVE, MEDIA_TYPE_STATUS_DISABLED])],
+			'smtp_port' =>				['type' => API_INT32],
+			'smtp_security' =>			['type' => API_INT32],
+			'smtp_verify_peer' =>		['type' => API_INT32],
+			'smtp_verify_host' =>		['type' => API_INT32],
+			'smtp_authentication' =>	['type' => API_INT32],
+			'exec_params' =>			['type' => API_STRING_UTF8],
+			'maxsessions' =>			['type' => API_INT32],
+			'maxattempts' =>			['type' => API_INT32, 'in' => '1:100'],
+			'attempt_interval' =>		['type' => API_TIME_UNIT, 'in' => '0:'.SEC_PER_HOUR],
+			'content_type' =>			['type' => API_INT32],
+			'script' =>					['type' => API_STRING_UTF8],
+			'timeout' =>				['type' => API_TIME_UNIT],
+			'process_tags' =>			['type' => API_INT32],
+			'show_event_menu' =>		['type' => API_INT32],
+			'event_menu_url' =>			['type' => API_STRING_UTF8],
+			'event_menu_name' =>		['type' => API_STRING_UTF8],
+			'description' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type', 'description')],
+			'parameters' =>				['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => []],
+			'message_templates' =>		['type' => API_OBJECTS, 'uniq' => [['eventsource', 'recovery']], 'fields' => [
+				'eventsource' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])],
+				'recovery' =>				['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
+												['if' => ['field' => 'eventsource', 'in' => implode(',', [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_SERVICE])], 'type' => API_INT32, 'in' => implode(',', [ACTION_OPERATION, ACTION_RECOVERY_OPERATION, ACTION_UPDATE_OPERATION])],
+												['if' => ['field' => 'eventsource', 'in' => implode(',', [EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION])], 'type' => API_INT32, 'in' => ACTION_OPERATION],
+												['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_INTERNAL], 'type' => API_INT32, 'in' => implode(',', [ACTION_OPERATION, ACTION_RECOVERY_OPERATION])]
+				]],
+				'subject' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type_message', 'subject')],
+				'message' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type_message', 'message')]
+			]]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $mediatypes, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		self::checkDuplicates($mediatypes);
+		self::validateByType($mediatypes);
+	}
+
+	/**
+	 * @param array $mediatypes
+	 *
+	 * @throws APIException if the input is invalid.
 	 *
 	 * @return array
 	 */
-	public function update(array $mediatypes) {
-		$mediatypes = zbx_toArray($mediatypes);
+	public function update(array $mediatypes): array {
+		self::validateUpdate($mediatypes, $db_mediatypes);
 
-		$this->validateUpdate($mediatypes);
+		$upd_mediatypes = [];
 
-		$update = [];
-		$webhooks_params = [];
-		$message_templates = [];
-		$default_values = DB::getDefaults('media_type');
+		foreach ($mediatypes as $mediatype) {
+			$upd_mediatype = DB::getUpdatedValues('media_type', $mediatype, $db_mediatypes[$mediatype['mediatypeid']]);
+
+			if ($upd_mediatype) {
+				$upd_mediatypes[] = [
+					'values' => $upd_mediatype,
+					'where' => ['mediatypeid' => $mediatype['mediatypeid']]
+				];
+			}
+		}
+
+		if ($upd_mediatypes) {
+			DB::update('media_type', $upd_mediatypes);
+		}
+
+		self::updateParameters($mediatypes, __FUNCTION__, $db_mediatypes);
+		self::updateMessageTemplates($mediatypes, __FUNCTION__, $db_mediatypes);
+
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_MEDIA_TYPE, $mediatypes, $db_mediatypes);
+
+		return ['mediatypeids' => array_column($mediatypes, 'mediatypeid')];
+	}
+
+	/**
+	 * @static
+	 *
+	 * @param array      $mediatypes
+	 * @param array|null $db_mediatypes
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	private static function validateUpdate(array &$mediatypes, ?array &$db_mediatypes): void {
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
+			'mediatypeid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
+			'type' =>					['type' => API_INT32, 'in' => implode(',', [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK])],
+			'name' =>					['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'name')],
+			'smtp_server' =>			['type' => API_STRING_UTF8],
+			'smtp_helo' =>				['type' => API_STRING_UTF8],
+			'smtp_email' =>				['type' => API_STRING_UTF8],
+			'exec_path' =>				['type' => API_STRING_UTF8],
+			'gsm_modem' =>				['type' => API_STRING_UTF8],
+			'username' =>				['type' => API_STRING_UTF8],
+			'passwd' =>					['type' => API_STRING_UTF8],
+			'status' =>					['type' => API_INT32, 'in' => implode(',', [MEDIA_TYPE_STATUS_ACTIVE, MEDIA_TYPE_STATUS_DISABLED])],
+			'smtp_port' =>				['type' => API_INT32],
+			'smtp_security' =>			['type' => API_INT32],
+			'smtp_verify_peer' =>		['type' => API_INT32],
+			'smtp_verify_host' =>		['type' => API_INT32],
+			'smtp_authentication' =>	['type' => API_INT32],
+			'exec_params' =>			['type' => API_STRING_UTF8],
+			'maxsessions' =>			['type' => API_INT32],
+			'maxattempts' =>			['type' => API_INT32, 'in' => '1:100'],
+			'attempt_interval' =>		['type' => API_TIME_UNIT, 'in' => '0:'.SEC_PER_HOUR],
+			'content_type' =>			['type' => API_INT32],
+			'script' =>					['type' => API_STRING_UTF8],
+			'timeout' =>				['type' => API_TIME_UNIT],
+			'process_tags' =>			['type' => API_INT32],
+			'show_event_menu' =>		['type' => API_INT32],
+			'event_menu_url' =>			['type' => API_STRING_UTF8],
+			'event_menu_name' =>		['type' => API_STRING_UTF8],
+			'description' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type', 'description')],
+			'parameters' =>				['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => []],
+			'message_templates' =>		['type' => API_OBJECTS, 'uniq' => [['eventsource', 'recovery']], 'fields' => [
+				'eventsource' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])],
+				'recovery' =>				['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
+												['if' => ['field' => 'eventsource', 'in' => implode(',', [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_SERVICE])], 'type' => API_INT32, 'in' => implode(',', [ACTION_OPERATION, ACTION_RECOVERY_OPERATION, ACTION_UPDATE_OPERATION])],
+												['if' => ['field' => 'eventsource', 'in' => implode(',', [EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION])], 'type' => API_INT32, 'in' => ACTION_OPERATION],
+												['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_INTERNAL], 'type' => API_INT32, 'in' => implode(',', [ACTION_OPERATION, ACTION_RECOVERY_OPERATION])]
+				]],
+				'subject' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type_message', 'subject')],
+				'message' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type_message', 'message')]
+			]]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $mediatypes, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
 		$db_mediatypes = DB::select('media_type', [
 			'output' => ['mediatypeid', 'type', 'name', 'smtp_server', 'smtp_helo', 'smtp_email', 'exec_path',
 				'gsm_modem', 'username', 'passwd', 'status', 'smtp_port', 'smtp_security', 'smtp_verify_peer',
@@ -936,277 +345,478 @@ class CMediatype extends CApiService {
 				'attempt_interval', 'content_type', 'script', 'timeout', 'process_tags', 'show_event_menu',
 				'event_menu_url', 'event_menu_name', 'description'
 			],
-			'filter' => ['mediatypeid' => zbx_objectValues($mediatypes, 'mediatypeid')],
+			'mediatypeids' => array_column($mediatypes, 'mediatypeid'),
 			'preservekeys' => true
 		]);
 
-		$type_switch_fields = [
-			MEDIA_TYPE_EMAIL => [
-				'smtp_server', 'smtp_helo', 'smtp_email', 'smtp_port', 'smtp_security', 'smtp_verify_peer',
-				'smtp_verify_host', 'smtp_authentication', 'passwd', 'username', 'content_type'
-			],
-			MEDIA_TYPE_EXEC => [
-				'exec_path', 'exec_params'
-			],
-			MEDIA_TYPE_SMS => [
-				'gsm_modem'
-			],
-			MEDIA_TYPE_WEBHOOK => [
-				'script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url', 'event_menu_name', 'parameters'
-			]
-		];
-		$default_values['parameters'] = [];
-
-		foreach ($mediatypes as $mediatype) {
-			$mediatypeid = $mediatype['mediatypeid'];
-			$db_mediatype = $db_mediatypes[$mediatypeid];
-			$db_type = $db_mediatype['type'];
-			$type = array_key_exists('type', $mediatype) ? $mediatype['type'] : $db_type;
-			unset($mediatype['mediatypeid']);
-
-			if ($type == MEDIA_TYPE_WEBHOOK) {
-				if (array_key_exists('parameters', $mediatype)) {
-					$params = [];
-
-					foreach ($mediatype['parameters'] as $param) {
-						$params[$param['name']] = $param['value'];
-					};
-
-					$webhooks_params[$mediatypeid] = $params;
-					unset($mediatype['parameters']);
-				}
-
-				if (array_key_exists('show_event_menu', $mediatype)
-						&& $mediatype['show_event_menu'] == ZBX_EVENT_MENU_HIDE) {
-					$mediatype += ['event_menu_url' => '', 'event_menu_name' => ''];
-				}
-
-				$this->validateEventMenu($mediatype, $db_mediatype);
-			}
-			else if ($db_type == MEDIA_TYPE_WEBHOOK) {
-				$webhooks_params[$mediatypeid] = [];
-			}
-
-			if (array_key_exists('message_templates', $mediatype)) {
-				$message_templates[$mediatypeid] = $mediatype['message_templates'];
-				unset($mediatype['message_templates']);
-			}
-
-			if ($type != $db_type) {
-				$mediatype = array_intersect_key($default_values,
-					array_fill_keys($type_switch_fields[$db_type], '')) + $mediatype;
-			}
-
-			if (!empty($mediatype)) {
-				$update[] = [
-					'values' => $mediatype,
-					'where' => ['mediatypeid' => $mediatypeid]
-				];
-			}
+		if (count($db_mediatypes) != count($mediatypes)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		DB::update('media_type', $update);
-		$mediatypeids = zbx_objectValues($mediatypes, 'mediatypeid');
+		self::checkDuplicates($mediatypes, $db_mediatypes);
+		self::validateByType($mediatypes, $db_mediatypes);
 
-		if ($webhooks_params) {
-			$ins_media_type_param = [];
-			$del_media_type_param = [];
-			$upd_media_type_param = [];
-			$db_webhooks_params = DB::select('media_type_param', [
-				'output' => ['mediatype_paramid', 'mediatypeid', 'name', 'value'],
-				'filter' => ['mediatypeid' => array_keys($webhooks_params)]
-			]);
-
-			foreach ($db_webhooks_params as $param) {
-				$mediatypeid = $param['mediatypeid'];
-
-				if (!array_key_exists($param['name'], $webhooks_params[$mediatypeid])) {
-					$del_media_type_param[] = $param['mediatype_paramid'];
-				}
-				elseif ($webhooks_params[$mediatypeid][$param['name']] !== $param['value']) {
-					$upd_media_type_param[] = [
-						'values' => ['value' => $webhooks_params[$mediatypeid][$param['name']]],
-						'where' => ['mediatype_paramid' => $param['mediatype_paramid']]
-					];
-					unset($webhooks_params[$mediatypeid][$param['name']]);
-				}
-				else {
-					unset($webhooks_params[$mediatypeid][$param['name']]);
-				}
-			}
-
-			$webhooks_params = array_filter($webhooks_params);
-
-			foreach ($webhooks_params as $mediatypeid => $params) {
-				foreach ($params as $name => $value) {
-					$ins_media_type_param[] = compact('mediatypeid', 'name', 'value');
-				}
-			}
-
-			if ($del_media_type_param) {
-				DB::delete('media_type_param', ['mediatype_paramid' => array_keys(array_flip($del_media_type_param))]);
-			}
-
-			if ($upd_media_type_param) {
-				DB::update('media_type_param', $upd_media_type_param);
-			}
-
-			if ($ins_media_type_param) {
-				DB::insert('media_type_param', $ins_media_type_param);
-			}
-		}
-
-		if ($message_templates) {
-			$db_media_type_messages = DB::select('media_type_message', [
-				'output' => ['mediatype_messageid', 'mediatypeid', 'eventsource', 'recovery', 'subject', 'message'],
-				'filter' => ['mediatypeid' => array_keys($message_templates)],
-				'preservekeys' => true
-			]);
-
-			$ins_media_type_message = [];
-			$del_media_type_message = zbx_toHash(array_keys($db_media_type_messages));
-			$upd_media_type_message = [];
-
-			$message_template_defaults = [
-				'subject' => DB::getDefault('media_type_message', 'subject'),
-				'message' => DB::getDefault('media_type_message', 'message')
-			];
-
-			foreach ($db_media_type_messages as $mediatype_messageid => $db_message_template) {
-				$db_mediatypeid = $db_message_template['mediatypeid'];
-
-				foreach ($message_templates[$db_mediatypeid] as $idx => $message_template) {
-					if ($db_message_template['eventsource'] == $message_template['eventsource']
-							&& $db_message_template['recovery'] == $message_template['recovery']) {
-						$values = [];
-						$message_template += $message_template_defaults;
-
-						if ($db_message_template['subject'] !== $message_template['subject']) {
-							$values['subject'] = $message_template['subject'];
-						}
-
-						if ($db_message_template['message'] !== $message_template['message']) {
-							$values['message'] = $message_template['message'];
-						}
-
-						if ($values) {
-							$upd_media_type_message[] = [
-								'values' => $values,
-								'where' => ['mediatype_messageid' => $mediatype_messageid]
-							];
-						}
-
-						unset($message_templates[$db_mediatypeid][$idx], $del_media_type_message[$mediatype_messageid]);
-					}
-				}
-			}
-
-			foreach ($message_templates as $mediatypeid => $templates) {
-				foreach ($templates as $template) {
-					$ins_media_type_message[] = ['mediatypeid' => $mediatypeid] + $template;
-				}
-			}
-
-			if ($del_media_type_message) {
-				DB::delete('media_type_message', ['mediatype_messageid' => $del_media_type_message]);
-			}
-
-			if ($upd_media_type_message) {
-				DB::update('media_type_message', $upd_media_type_message);
-			}
-
-			if ($ins_media_type_message) {
-				DB::insert('media_type_message', $ins_media_type_message);
-			}
-		}
-
-		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_MEDIA_TYPE, $mediatypes, $db_mediatypes);
-
-		return ['mediatypeids' => $mediatypeids];
+		self::addAffectedObjects($mediatypes, $db_mediatypes);
 	}
 
 	/**
-	 * Delete Media types.
+	 * Check for unique media type names.
 	 *
-	 * @param array $mediatypeids
+	 * @static
+	 *
+	 * @param array      $mediatypes
+	 * @param array|null $db_mediatypes
+	 *
+	 * @throws APIException if a media type name is not unique.
+	 */
+	private static function checkDuplicates(array $mediatypes, array $db_mediatypes = null): void {
+		$names = [];
+
+		foreach ($mediatypes as $mediatype) {
+			if (!array_key_exists('name', $mediatype)) {
+				continue;
+			}
+
+			if ($db_mediatypes === null || $mediatype['name'] !== $db_mediatypes[$mediatype['mediatypeid']]['name']) {
+				$names[] = $mediatype['name'];
+			}
+		}
+
+		if (!$names) {
+			return;
+		}
+
+		$duplicates = DB::select('media_type', [
+			'output' => ['name'],
+			'filter' => ['name' => $names],
+			'limit' => 1
+		]);
+
+		if ($duplicates) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Media type "%1$s" already exists.', $duplicates[0]['name']));
+		}
+	}
+
+	/**
+	 * Validate fields by type.
+	 *
+	 * @static
+	 *
+	 * @param array      $mediatypes
+	 * @param array|null $db_mediatypes
+	 *
+	 * @throws APIException
+	 */
+	private static function validateByType(array &$mediatypes, array $db_mediatypes = null): void {
+		$method = ($db_mediatypes === null) ? 'create' : 'update';
+
+		$db_defaults = DB::getDefaults('media_type');
+		$db_defaults['parameters'] = [];
+
+		if ($method === 'update') {
+			$type_fields = [
+				MEDIA_TYPE_EMAIL => [
+					'smtp_server', 'smtp_port', 'smtp_helo', 'smtp_email', 'smtp_security', 'smtp_verify_peer',
+					'smtp_verify_host', 'smtp_authentication', 'username', 'passwd', 'content_type'
+				],
+				MEDIA_TYPE_EXEC => [
+					'exec_path', 'exec_params'
+				],
+				MEDIA_TYPE_SMS => [
+					'gsm_modem', 'maxsessions'
+				],
+				MEDIA_TYPE_WEBHOOK => [
+					'script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url', 'event_menu_name',
+					'parameters'
+				]
+			];
+		}
+
+		foreach ($mediatypes as $i => &$mediatype) {
+			if ($method === 'create') {
+				$db_mediatype = $db_defaults;
+				$type = $mediatype['type'];
+			}
+			else {
+				$db_mediatype = $db_mediatypes[$mediatype['mediatypeid']];
+				$type = array_key_exists('type', $mediatype) ? $mediatype['type'] : $db_mediatype['type'];
+			}
+
+			$api_input_rules = self::getValidationRulesByType($mediatype, $method, $db_mediatype);
+			$type_data = array_intersect_key($mediatype, $api_input_rules['fields']);
+
+			if (!CApiInputValidator::validate($api_input_rules, $type_data, '/'.($i + 1), $error)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			}
+
+			if ($method === 'update') {
+				switch ($type) {
+					case MEDIA_TYPE_EMAIL:
+						if (array_key_exists('smtp_authentication', $mediatype)
+								&& $mediatype['smtp_security'] == SMTP_CONNECTION_SECURITY_NONE) {
+							$mediatype += [
+								'smtp_verify_peer' => $db_defaults['smtp_verify_peer'],
+								'smtp_verify_host' => $db_defaults['smtp_verify_host']
+							];
+						}
+
+						if (array_key_exists('smtp_authentication', $mediatype)
+								&& $mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_NONE) {
+							$mediatype += [
+								'username' => $db_defaults['username'],
+								'passwd' => $db_defaults['passwd']
+							];
+						}
+						break;
+
+					case MEDIA_TYPE_WEBHOOK:
+						if (array_key_exists('show_event_menu', $mediatype)
+								&& $mediatype['show_event_menu'] == ZBX_EVENT_MENU_HIDE) {
+							$mediatype += [
+								'event_menu_url' => $db_defaults['event_menu_url'],
+								'event_menu_name' => $db_defaults['event_menu_name']
+							];
+						}
+						break;
+				}
+
+				if ($type != $db_mediatype['type']) {
+					$mediatype =
+						array_intersect_key($db_defaults, array_flip($type_fields[$db_mediatype['type']])) + $mediatype;
+				}
+			}
+		}
+		unset($mediatype);
+	}
+
+	/**
+	 * Get type specific validation rules.
+	 *
+	 * @static
+	 *
+	 * @param array  $mediatype
+	 * @param string $method
+	 * @param array  $db_mediatype
 	 *
 	 * @return array
 	 */
-	public function delete(array $mediatypeids) {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can delete media types.'));
+	private static function getValidationRulesByType(array $mediatype, string $method, array $db_mediatype): array {
+		$type = array_key_exists('type', $mediatype) ? $mediatype['type'] : $db_mediatype['type'];
+		$api_input_rules = ['type' => API_OBJECT];
+
+		switch ($type) {
+			case MEDIA_TYPE_EMAIL:
+				$api_input_rules['fields'] = [
+					'smtp_server' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'smtp_server')],
+					'smtp_helo' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'smtp_helo')],
+					'smtp_email' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'smtp_email')],
+					'smtp_port' =>				['type' => API_INT32, 'in' => ZBX_MIN_PORT_NUMBER.':'.ZBX_MAX_PORT_NUMBER],
+					'smtp_security' =>			['type' => API_INT32, 'in' => implode(',', [SMTP_CONNECTION_SECURITY_NONE, SMTP_CONNECTION_SECURITY_STARTTLS, SMTP_CONNECTION_SECURITY_SSL_TLS])],
+					'smtp_authentication' =>	['type' => API_INT32, 'in' => implode(',', [SMTP_AUTHENTICATION_NONE, SMTP_AUTHENTICATION_NORMAL])],
+					'content_type' =>			['type' => API_INT32, 'in' => implode(',', [SMTP_MESSAGE_FORMAT_PLAIN_TEXT, SMTP_MESSAGE_FORMAT_HTML])]
+				];
+
+				$mediatype += array_intersect_key($db_mediatype, array_flip(['smtp_security', 'smtp_authentication']));
+
+				if ($mediatype['smtp_security'] == SMTP_CONNECTION_SECURITY_STARTTLS
+						|| $mediatype['smtp_security'] == SMTP_CONNECTION_SECURITY_SSL_TLS) {
+					$api_input_rules['fields'] += [
+						'smtp_verify_peer' =>	['type' => API_INT32, 'in' => '0,1'],
+						'smtp_verify_host' =>	['type' => API_INT32, 'in' => '0,1']
+					];
+				}
+
+				if ($mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_NORMAL) {
+					$api_input_rules['fields'] += [
+						'username' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type', 'username')],
+						'passwd' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type', 'passwd')]
+					];
+				}
+
+				if ($method === 'create' || $type != $db_mediatype['type']) {
+					foreach (['smtp_server', 'smtp_helo', 'smtp_email'] as $field) {
+						$api_input_rules['fields'][$field]['flags'] |= API_REQUIRED;
+					}
+				}
+				break;
+
+			case MEDIA_TYPE_EXEC:
+				$api_input_rules['fields'] = [
+					'exec_path' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'exec_path')],
+					'exec_params' =>	['type' => API_EXEC_PARAMS, 'length' => DB::getFieldLength('media_type', 'exec_params')]
+				];
+
+				if ($method === 'create' || $type != $db_mediatype['type']) {
+					$api_input_rules['fields']['exec_path']['flags'] |= API_REQUIRED;
+				}
+				break;
+
+			case MEDIA_TYPE_SMS:
+				$api_input_rules['fields'] = [
+					'gsm_modem' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'gsm_modem')],
+					'maxsessions' =>	['type' => API_INT32, 'in' => DB::getDefault('media_type', 'maxsessions')]
+				];
+
+				if ($method === 'create' || $type != $db_mediatype['type']) {
+					$api_input_rules['fields']['gsm_modem']['flags'] |= API_REQUIRED;
+				}
+				break;
+
+			case MEDIA_TYPE_WEBHOOK:
+				$api_input_rules['fields'] = [
+					'script' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'script')],
+					'timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:'.SEC_PER_MIN, 'length' => DB::getFieldLength('media_type', 'timeout')],
+					'process_tags' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_MEDIA_TYPE_TAGS_DISABLED, ZBX_MEDIA_TYPE_TAGS_ENABLED])],
+					'show_event_menu' =>	['type' => API_INT32, 'in' => implode(',', [ZBX_EVENT_MENU_HIDE, ZBX_EVENT_MENU_SHOW])],
+					'parameters' =>			['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
+						'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type_param', 'name')],
+						'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type_param', 'value')]
+					]]
+				];
+
+				$mediatype += array_intersect_key($db_mediatype, array_flip(['show_event_menu']));
+
+				if ($mediatype['show_event_menu'] == ZBX_EVENT_MENU_SHOW) {
+					$api_input_rules['fields'] += [
+						'event_menu_url' =>		['type' => API_URL, 'flags' => API_ALLOW_EVENT_TAGS_MACRO | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'event_menu_url')],
+						'event_menu_name' =>	['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'event_menu_name')]
+					];
+				}
+
+				if ($method === 'create' || $type != $db_mediatype['type']) {
+					$api_input_rules['fields']['script']['flags'] |= API_REQUIRED;
+
+					if ($mediatype['show_event_menu'] == ZBX_EVENT_MENU_SHOW) {
+						$api_input_rules['fields']['event_menu_url']['flags'] |= API_REQUIRED;
+						$api_input_rules['fields']['event_menu_name']['flags'] |= API_REQUIRED;
+					}
+				}
+				break;
 		}
 
-		$actions = API::Action()->get([
-			'mediatypeids' => $mediatypeids,
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true
-		]);
-		if (!empty($actions)) {
-			$action = reset($actions);
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Media types used by action "%1$s".', $action['name']));
+		$api_input_rules['fields'] += [
+			'smtp_server' =>			['type' => API_STRING_UTF8, 'in' => DB::getDefault('media_type', 'smtp_server')],
+			'smtp_helo' =>				['type' => API_STRING_UTF8, 'in' => DB::getDefault('media_type', 'smtp_helo')],
+			'smtp_email' =>				['type' => API_STRING_UTF8, 'in' => DB::getDefault('media_type', 'smtp_email')],
+			'exec_path' =>				['type' => API_STRING_UTF8, 'in' => DB::getDefault('media_type', 'exec_path')],
+			'gsm_modem' =>				['type' => API_STRING_UTF8, 'in' => DB::getDefault('media_type', 'gsm_modem')],
+			'username' =>				['type' => API_STRING_UTF8, 'in' => DB::getDefault('media_type', 'username')],
+			'passwd' =>					['type' => API_STRING_UTF8, 'in' => DB::getDefault('media_type', 'passwd')],
+			'smtp_port' =>				['type' => API_INT32, 'in' => DB::getDefault('media_type', 'smtp_port')],
+			'smtp_security' =>			['type' => API_INT32, 'in' => DB::getDefault('media_type', 'smtp_security')],
+			'smtp_verify_peer' =>		['type' => API_INT32, 'in' => DB::getDefault('media_type', 'smtp_verify_peer')],
+			'smtp_verify_host' =>		['type' => API_INT32, 'in' => DB::getDefault('media_type', 'smtp_verify_host')],
+			'smtp_authentication' =>	['type' => API_INT32, 'in' => DB::getDefault('media_type', 'smtp_authentication')],
+			'maxsessions' =>			['type' => API_INT32, 'in' => '0:100'],
+			'exec_params' =>			['type' => API_STRING_UTF8, 'in' => DB::getDefault('media_type', 'exec_params')],
+			'content_type' =>			['type' => API_INT32, 'in' => DB::getDefault('media_type', 'content_type')],
+			'script' =>					['type' => API_STRING_UTF8, 'in' => DB::getDefault('media_type', 'script')],
+			'timeout' =>				['type' => API_TIME_UNIT, 'in' => DB::getDefault('media_type', 'timeout')],
+			'process_tags' =>			['type' => API_INT32, 'in' => DB::getDefault('media_type', 'process_tags')],
+			'show_event_menu' =>		['type' => API_INT32, 'in' => DB::getDefault('media_type', 'show_event_menu')],
+			'event_menu_url' =>			['type' => API_STRING_UTF8, 'in' => DB::getDefault('media_type', 'event_menu_url')],
+			'event_menu_name' =>		['type' => API_STRING_UTF8, 'in' => DB::getDefault('media_type', 'event_menu_name')],
+			'parameters' =>				['type' => API_OBJECT, 'fields' => []]
+		];
+
+		return $api_input_rules;
+	}
+
+	/**
+	 * Update table "media_type_param" and populate mediatype.parameters by "mediatype_paramid" property.
+	 *
+	 * @static
+	 *
+	 * @param array      $mediatypes
+	 * @param string     $method
+	 * @param array|null $db_mediatypes
+	 */
+	private static function updateParameters(array &$mediatypes, string $method, array $db_mediatypes = null): void {
+		$ins_params = [];
+		$upd_params = [];
+		$del_paramids = [];
+
+		foreach ($mediatypes as &$mediatype) {
+			if (!array_key_exists('parameters', $mediatype)) {
+				continue;
+			}
+
+			$db_params = ($method === 'update')
+				? array_column($db_mediatypes[$mediatype['mediatypeid']]['parameters'], null, 'name')
+				: [];
+
+			foreach ($mediatype['parameters'] as &$param) {
+				if (array_key_exists($param['name'], $db_params)) {
+					$db_param = $db_params[$param['name']];
+					$param['mediatype_paramid'] = $db_param['mediatype_paramid'];
+					unset($db_params[$db_param['name']]);
+
+					$upd_param = DB::getUpdatedValues('media_type_param', $param, $db_param);
+
+					if ($upd_param) {
+						$upd_params[] = [
+							'values' => $upd_param,
+							'where' => ['mediatype_paramid' => $upd_param['mediatype_paramid']]
+						];
+					}
+				}
+				else {
+					$ins_params[] = ['mediatypeid' => $mediatype['mediatypeid']] + $param;
+				}
+			}
+			unset($param);
+
+			$del_paramids = array_merge($del_paramids, array_column($db_params, 'mediatype_paramid'));
+		}
+		unset($mediatype);
+
+		if ($del_paramids) {
+			DB::delete('media_type_param', ['mediatype_paramid' => $del_paramids]);
+		}
+
+		if ($upd_params) {
+			DB::update('media_type_param', $upd_params);
+		}
+
+		if ($ins_params) {
+			$paramids = DB::insert('media_type_param', $ins_params);
+		}
+
+		foreach ($mediatypes as &$mediatype) {
+			if (!array_key_exists('parameters', $mediatype)) {
+				continue;
+			}
+
+			foreach ($mediatype['parameters'] as &$param) {
+				if (!array_key_exists('mediatype_paramid', $param)) {
+					$param['mediatype_paramid'] = array_shift($paramids);
+				}
+			}
+			unset($param);
+		}
+		unset($mediatype);
+	}
+
+	/**
+	 * Update table "media_type_message" and populate mediatype.message_templates by "mediatype_messageid" property.
+	 *
+	 * @static
+	 *
+	 * @param array      $mediatypes
+	 * @param string     $method
+	 * @param array|null $db_mediatypes
+	 */
+	private static function updateMessageTemplates(array &$mediatypes, string $method, array $db_mediatypes = null): void {
+		$ins_messages = [];
+		$upd_messages = [];
+		$del_messageids = [];
+
+		foreach ($mediatypes as &$mediatype) {
+			if (!array_key_exists('message_templates', $mediatype)) {
+				continue;
+			}
+
+			$db_messages = ($method === 'update') ? $db_mediatypes[$mediatype['mediatypeid']]['message_templates'] : [];
+
+			foreach ($mediatype['message_templates'] as &$message) {
+				$db_message = current(
+					array_filter($db_messages, static function(array $db_message) use ($message): bool {
+						return $message['eventsource'] == $db_message['eventsource']
+							&& $message['recovery'] == $db_message['recovery'];
+					})
+				);
+
+				if ($db_message) {
+					$message['mediatype_messageid'] = $db_message['mediatype_messageid'];
+					unset($db_messages[$db_message['mediatype_messageid']]);
+
+					$upd_message = DB::getUpdatedValues('media_type_message', $message, $db_message);
+
+					if ($upd_message) {
+						$upd_messages[] = [
+							'values' => $upd_message,
+							'where' => ['mediatype_messageid' => $db_message['mediatype_messageid']]
+						];
+					}
+				}
+				else {
+					$ins_messages[] = ['mediatypeid' => $mediatype['mediatypeid']] + $message;
+				}
+			}
+			unset($message);
+
+			$del_messageids = array_merge($del_messageids, array_keys($db_messages));
+		}
+		unset($mediatype);
+
+		if ($del_messageids) {
+			DB::delete('media_type_message', ['mediatype_messageid' => $del_messageids]);
+		}
+
+		if ($upd_messages) {
+			DB::update('media_type_message', $upd_messages);
+		}
+
+		if ($ins_messages) {
+			$messageids = DB::insert('media_type_message', $ins_messages);
+		}
+
+		foreach ($mediatypes as &$mediatype) {
+			if (!array_key_exists('message_templates', $mediatype)) {
+				continue;
+			}
+
+			foreach ($mediatype['message_templates'] as &$message) {
+				if (!array_key_exists('mediatype_messageid', $message)) {
+					$message['mediatype_messageid'] = array_shift($messageids);
+				}
+			}
+			unset($message);
+		}
+		unset($mediatype);
+	}
+
+	/**
+	 * @param array $mediatypeids
+	 *
+	 * @throws APIException if the input is invalid.
+	 *
+	 * @return array
+	 */
+	public function delete(array $mediatypeids): array {
+		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+
+		if (!CApiInputValidator::validate($api_input_rules, $mediatypeids, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
 		$db_mediatypes = DB::select('media_type', [
 			'output' => ['mediatypeid', 'name'],
-			'mediatypeids' => $mediatypeids,
-			'preservekeys' => true
+			'mediatypeids' => $mediatypeids
 		]);
+
+		if (count($db_mediatypes) != count($mediatypeids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		$actions = API::Action()->get([
+			'output' => ['name'],
+			'mediatypeids' => $mediatypeids,
+			'limit' => 1
+		]);
+
+		if ($actions) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Media types used by action "%1$s".', $actions[0]['name']));
+		}
 
 		DB::delete('media_type', ['mediatypeid' => $mediatypeids]);
 
-		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_MEDIA_TYPE, $db_mediatypes);
+		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_MEDIA_TYPE, $db_mediatypes);
 
 		return ['mediatypeids' => $mediatypeids];
 	}
 
-	/**
-	 * Check required fields by type. Values for fields must not be empty.
-	 *
-	 * @param array		$mediatype							An array of media type data.
-	 * @param string	$mediatype['name']					Name of the media type.
-	 * @param string	$mediatype['type']					E-mail, Script and SMS.
-	 *
-	 * @throws APIException if the input is invalid.
-	 */
-	protected function checkRequiredFieldsByType(array $mediatype) {
-		$type_validator = new CLimitedSetValidator([
-			'values' => array_keys(media_type2str())
-		]);
-
-		if (!$type_validator->validate($mediatype['type'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-				'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
-				$mediatype['type'],
-				'type',
-				$mediatype['name']
-			));
-		}
-
-		$required_fields_by_type = [
-			MEDIA_TYPE_EMAIL => ['smtp_server', 'smtp_helo', 'smtp_email'],
-			MEDIA_TYPE_EXEC => ['exec_path'],
-			MEDIA_TYPE_WEBHOOK => [],
-			MEDIA_TYPE_SMS => ['gsm_modem']
-		];
-
-		foreach ($required_fields_by_type[$mediatype['type']] as $field) {
-			// Check if fields set on Create method. For update method they are checked when type is changed.
-			if (!array_key_exists($field, $mediatype)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Field "%1$s" is required for media type "%2$s".', $field, $mediatype['name'])
-				);
-			}
-			elseif (array_key_exists($field, $mediatype)
-					&& ($mediatype[$field] === '' || $mediatype[$field] === null)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Field "%1$s" is missing a value for media type "%2$s".', $field, $mediatype['name'])
-				);
-			}
-		}
-	}
-
-	protected function addRelatedObjects(array $options, array $result) {
+	protected function addRelatedObjects(array $options, array $result): array {
 		$result = parent::addRelatedObjects($options, $result);
 
 		// adding message templates
@@ -1270,48 +880,53 @@ class CMediatype extends CApiService {
 	}
 
 	/**
-	 * Get incomplete media type validation rules.
+	 * Add existing webhook parameters and message templates to $db_mediatypes, regardless of whether they will be
+	 * affected by the update.
 	 *
-	 * @param int    $type
-	 * @param string $method
+	 * @static
 	 *
-	 * @return array
+	 * @param array $mediatypes
+	 * @param array $db_mediatypes
 	 */
-	protected function getValidationRules($type, $method) {
-		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type', 'description')],
-			'message_templates' =>	['type' => API_OBJECTS, 'uniq' => [['eventsource', 'recovery']], 'fields' => [
-				'eventsource' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])],
-				'recovery' =>			['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
-											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_TRIGGERS.','.EVENT_SOURCE_SERVICE], 'type' => API_INT32, 'in' => implode(',', [ACTION_OPERATION, ACTION_RECOVERY_OPERATION, ACTION_UPDATE_OPERATION])],
-											['if' => ['field' => 'eventsource', 'in' => implode(',', [EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION])], 'type' => API_INT32, 'in' => ACTION_OPERATION],
-											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_INTERNAL], 'type' => API_INT32, 'in' => implode(',', [ACTION_OPERATION, ACTION_RECOVERY_OPERATION])]
-				]],
-				'subject' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type_message', 'subject')],
-				'message' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type_message', 'message')]
-			]]
-		]];
+	private static function addAffectedObjects(array $mediatypes, array &$db_mediatypes): void {
+		$mediatypeids = ['parameters' => [], 'message_templates' => []];
 
-		if ($type == MEDIA_TYPE_WEBHOOK) {
-			$api_input_rules['fields'] += [
-				'script' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'script')],
-				'timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'timeout'), 'in' => '1:60'],
-				'process_tags' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_MEDIA_TYPE_TAGS_DISABLED, ZBX_MEDIA_TYPE_TAGS_ENABLED])],
-				'show_event_menu' =>	['type' => API_INT32, 'in' => implode(',', [ZBX_EVENT_MENU_HIDE, ZBX_EVENT_MENU_SHOW])],
-				// Should be checked as string not as URL because it can contain macros tags.
-				'event_menu_url' =>		['type' => API_URL, 'flags' => API_ALLOW_EVENT_TAGS_MACRO, 'length' => DB::getFieldLength('media_type', 'event_menu_url')],
-				'event_menu_name' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type', 'event_menu_name')],
-				'parameters' =>			['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
-					'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type_param', 'name')],
-					'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('media_type_param', 'value')]
-				]]
-			];
+		foreach ($mediatypes as $mediatype) {
+			if (array_key_exists('parameters', $mediatype)) {
+				$mediatypeids['parameters'][] = $mediatype['mediatypeid'];
+				$db_mediatypes[$mediatype['mediatypeid']]['parameters'] = [];
+			}
 
-			if ($method === 'create') {
-				$api_input_rules['fields']['script']['flags'] |= API_REQUIRED;
+			if (array_key_exists('message_templates', $mediatype)) {
+				$mediatypeids['message_templates'][] = $mediatype['mediatypeid'];
+				$db_mediatypes[$mediatype['mediatypeid']]['message_templates'] = [];
 			}
 		}
 
-		return $api_input_rules;
+		if ($mediatypeids['parameters']) {
+			$options = [
+				'output' => ['mediatype_paramid', 'mediatypeid', 'name', 'value'],
+				'filter' => ['mediatypeid' => $mediatypeids['parameters']]
+			];
+			$db_params = DBselect(DB::makeSql('media_type_param', $options));
+
+			while ($db_param = DBfetch($db_params)) {
+				$db_mediatypes[$db_param['mediatypeid']]['parameters'][$db_param['mediatype_paramid']] =
+					array_diff_key($db_param, array_flip(['mediatypeid']));
+			}
+		}
+
+		if ($mediatypeids['message_templates']) {
+			$options = [
+				'output' => ['mediatype_messageid', 'mediatypeid', 'eventsource', 'recovery', 'subject', 'message'],
+				'filter' => ['mediatypeid' => $mediatypeids['message_templates']]
+			];
+			$db_messages = DBselect(DB::makeSql('media_type_message', $options));
+
+			while ($db_message = DBfetch($db_messages)) {
+				$db_mediatypes[$db_message['mediatypeid']]['message_templates'][$db_message['mediatype_messageid']] =
+					array_diff_key($db_message, array_flip(['mediatypeid']));
+			}
+		}
 	}
 }

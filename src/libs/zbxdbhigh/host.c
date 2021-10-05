@@ -1140,10 +1140,11 @@ static void	DBdelete_triggers_by_itemids(zbx_vector_uint64_t *itemids)
 
 	zbx_vector_uint64_create(&triggerids);
 
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select distinct triggerid from functions where");
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select distinct f.triggerid,t.description,t.flags from "
+			"functions f join triggers t on t.triggerid=f.triggerid where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids->values, itemids->values_num);
 
-	DBselect_uint64(sql, &triggerids);
+	zbx_audit_DBselect_delete_for_trigger(sql, &triggerids);
 
 	DBdelete_trigger_hierarchy(&triggerids);
 	zbx_vector_uint64_destroy(&triggerids);
