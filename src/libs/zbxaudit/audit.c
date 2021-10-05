@@ -263,7 +263,6 @@ void	zbx_audit_init(int audit_mode_set)
 void	zbx_audit_flush(void)
 {
 	char			recsetid_cuid[CUID_LEN];
-	char			*details_esc;
 	zbx_hashset_iter_t	iter;
 	zbx_audit_entry_t	**audit_entry;
 	zbx_db_insert_t		db_insert_audit;
@@ -281,7 +280,7 @@ void	zbx_audit_flush(void)
 		if (AUDIT_ACTION_DELETE == (*audit_entry)->audit_action ||
 				0 != strcmp((*audit_entry)->details_json.buffer, "{}"))
 		{
-			details_esc = DBdyn_escape_string((*audit_entry)->details_json.buffer);
+			char	*details_esc = DBdyn_escape_string((*audit_entry)->details_json.buffer);
 #define AUDIT_USERID	0
 #define AUDIT_USERNAME	"System"
 #define AUDIT_IP	""
