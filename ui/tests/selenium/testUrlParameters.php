@@ -126,68 +126,72 @@ class testUrlParameters extends CLegacyWebTest {
 				]
 			],
 			[
-				'title' => 'Configuration of hosts',
+				'title' => 'Configuration of host',
 				'check_server_name' => true,
 				'server_name_on_page' => true,
 				'test_cases' => [
 					[
-						'url' => (new CUrl('zabbix.php'))
-							->setArgument('action', 'host.edit')
-							->setArgument('hostid', 10084)
-							->getUrl(),
-						'text_present' => 'Hosts'
+						'url' => 'zabbix.php?action=host.edit&hostid=10084',
+						'text_present' => 'Host'
 					],
 					[
-						'url' => (new CUrl('zabbix.php'))
-							->setArgument('action', 'host.edit')
-							->setArgument('hostid', 9999999)
-							->getUrl(),
-						'text_not_present' => 'Hosts',
+						'url' => 'zabbix.php?action=host.edit&hostid=9999999',
+						'text_not_present' => 'Host',
+						'access_denied' => true,
 						'text_present' => [
-							'No permissions to referred object or it does not exist!'
+							'You are logged in as "Admin". You have no permissions to access this page.'
+						]
+					]
+				]
+			],
+			[
+				'title' => 'Fatal error, please report to the Zabbix team',
+				'check_server_name' => true,
+				'server_name_on_page' => false,
+				'test_cases' => [
+
+					[
+						'url' => 'zabbix.php?action=host.edit&hostid=abc',
+						'text_not_present' => 'Host',
+						'fatal_error' => true,
+						'text_present' => [
+							'Incorrect value "abc" for "hostid" field.',
+							'Controller: host.edit',
+							'action: host.edit',
+							'hostid: abc'
 						]
 					],
 					[
-						'url' => (new CUrl('zabbix.php'))
-							->setArgument('action', 'host.edit')
-							->setArgument('hostid', 'abc')
-							->getUrl(),
-						'text_not_present' => 'Hosts',
+						'url' => 'zabbix.php?action=host.edit&hostid= ',
+						'text_not_present' => 'Host',
+						'fatal_error' => true,
 						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "hostid" is not integer.'
+							'Incorrect value "" for "hostid" field.',
+							'Controller: host.edit',
+							'action: host.edit',
+							'hostid:'
 						]
 					],
 					[
-						'url' => (new CUrl('zabbix.php'))
-							->setArgument('action', 'host.edit')
-							->setArgument('hostid', '')
-							->getUrl(),
-						'text_not_present' => 'Hosts',
+						'url' => 'zabbix.php?action=host.edit&hostid=-1',
+						'text_not_present' => 'Host',
+						'fatal_error' => true,
 						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "hostid" is not integer.'
+							'Incorrect value "-1" for "hostid" field.',
+							'Controller: host.edit',
+							'action: host.edit',
+							'hostid: -1'
 						]
 					],
 					[
-						'url' => (new CUrl('zabbix.php'))
-							->setArgument('action', 'host.edit')
-							->setArgument('hostid', -1)
-							->getUrl(),
-						'text_not_present' => 'Hosts',
+						'url' => 'zabbix.php?action=host.edit&hostid=',
+						'text_not_present' => 'Host',
+						'fatal_error' => true,
 						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Incorrect value "-1" for "hostid" field.'
-						]
-					],
-					[
-						'url' => (new CUrl('zabbix.php'))
-							->setArgument('action', 'host.edit')
-							->getUrl(),
-						'text_not_present' => 'Hosts',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "hostid" is mandatory.'
+							'Incorrect value "" for "hostid" field.',
+							'Controller: host.edit',
+							'action: host.edit',
+							'hostid:'
 						]
 					]
 				]
