@@ -319,20 +319,11 @@ class testAgentItems extends CIntegrationTest {
 				]
 		],
 		[
-			'key' => 'net.tcp.socket.count[,'.PHPUNIT_PORT_PREFIX.self::AGENT_PORT_SUFFIX.']',
+			'key' => 'net.tcp.socket.count[,'.PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX.',,,listen]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'component' => self::COMPONENT_AGENT,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'result_exec' => 'netstat -atn | grep ":'.PHPUNIT_PORT_PREFIX.self::AGENT_PORT_SUFFIX.'" | wc -l',
-			'threshold' => 100
-		],
-		[
-			'key' => 'net.tcp.socket.count[127.0.0.1]',
-			'type' => ITEM_TYPE_ZABBIX,
-			'component' => self::COMPONENT_AGENT,
-			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'result_exec' => 'netstat -atn | grep "127.0.0.1" | wc -l',
-			'threshold' => 700
+			'result' => 1
 		],
 		[
 			'key' => 'net.tcp.socket.count[,,127.127.127.127]',
@@ -342,35 +333,18 @@ class testAgentItems extends CIntegrationTest {
 			'result' => 0
 		],
 		[
-			'key' => 'net.tcp.socket.count[,isakmp]',
+			'key' => 'net.udp.socket.count[,ssh]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'component' => self::COMPONENT_AGENT,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'result' => 0
+			'result_exec' => 'netstat -au --numeric-hosts -4 | grep ssh | wc -l'
 		],
 		[
-			'key' => 'net.udp.socket.count[,isakmp]',
-			'type' => ITEM_TYPE_ZABBIX,
-			'component' => self::COMPONENT_AGENT,
-			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'result' => 10,
-			'threshold' => 9
-		],
-		[
-			'key' => 'net.tcp.socket.count[,'.PHPUNIT_PORT_PREFIX.self::AGENT_PORT_SUFFIX.']',
+			'key' => 'net.tcp.socket.count[,'.PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX.',,,listen]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'component' => self::COMPONENT_AGENT2,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'result_exec' => 'netstat -atn | grep ":'.PHPUNIT_PORT_PREFIX.self::AGENT_PORT_SUFFIX.'" | wc -l',
-			'threshold' => 100
-		],
-		[
-			'key' => 'net.tcp.socket.count[127.0.0.1]',
-			'type' => ITEM_TYPE_ZABBIX,
-			'component' => self::COMPONENT_AGENT2,
-			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'result_exec' => 'netstat -atn | grep "127.0.0.1" | wc -l',
-			'threshold' => 700
+			'result' => 1
 		],
 		[
 			'key' => 'net.tcp.socket.count[,,127.127.127.127]',
@@ -380,19 +354,11 @@ class testAgentItems extends CIntegrationTest {
 			'result' => 0
 		],
 		[
-			'key' => 'net.tcp.socket.count[,isakmp]',
+			'key' => 'net.udp.socket.count[,ssh]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'component' => self::COMPONENT_AGENT2,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'result' => 0
-		],
-		[
-			'key' => 'net.udp.socket.count[,isakmp]',
-			'type' => ITEM_TYPE_ZABBIX,
-			'component' => self::COMPONENT_AGENT2,
-			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'result' => 10,
-			'threshold' => 9
+			'result_exec' => 'netstat -au --numeric-hosts -4 | grep ssh | wc -l'
 		]
 	];
 
@@ -627,6 +593,10 @@ class testAgentItems extends CIntegrationTest {
 				} else {
 					$actual = end($values);
 
+					if ($actual === false) {
+						$actual = 0;
+					}
+
 					if (array_key_exists('threshold', $item) && $item['threshold'] !== 0) {
 						$actual = substr($actual, 0, $item['threshold']);
 						$expected = substr($item['result'], 0, $item['threshold']);
@@ -652,6 +622,10 @@ class testAgentItems extends CIntegrationTest {
 				}
 				else {
 					$actual = end($values);
+				}
+
+				if ($actual === false) {
+					$actual = 0;
 				}
 
 				if (array_key_exists('threshold', $item) && $item['threshold'] !== 0) {
