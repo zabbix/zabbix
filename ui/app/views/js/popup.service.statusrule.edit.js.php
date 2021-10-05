@@ -80,8 +80,8 @@ window.service_status_rule_edit_popup = {
 
 		fetch(curl.getUrl(), {
 			method: 'POST',
-			headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
-			body: urlEncodeData(getFormFields(this.form))
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify(getFormFields(this.form))
 		})
 			.then((response) => response.json())
 			.then((response) => {

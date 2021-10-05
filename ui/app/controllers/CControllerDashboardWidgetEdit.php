@@ -25,14 +25,14 @@ class CControllerDashboardWidgetEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'templateid' => 'db dashboard.templateid',
-			'type' => 'string',
-			'name' => 'string',
-			'view_mode' => 'in '.implode(',', [ZBX_WIDGET_VIEW_MODE_NORMAL, ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER]),
-			'prev_type' => 'string',
-			'fields' => 'json',
-			'unique_id' => 'string',
-			'dashboard_page_unique_id' => 'string'
+			'templateid' =>					'db dashboard.templateid',
+			'type' =>						'string',
+			'name' =>						'string',
+			'view_mode' =>					'in '.implode(',', [ZBX_WIDGET_VIEW_MODE_NORMAL, ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER]),
+			'prev_type' =>					'string',
+			'fields' =>						'json',
+			'unique_id' =>					'string',
+			'dashboard_page_unique_id' =>	'string'
 		];
 
 		$ret = $this->validateInput($fields);

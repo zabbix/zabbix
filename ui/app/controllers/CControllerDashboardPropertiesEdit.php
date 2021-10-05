@@ -27,11 +27,11 @@ class CControllerDashboardPropertiesEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'template' => 'in 1',
-			'userid' => 'db users.userid',
-			'name' => 'required|db dashboard.name',
-			'display_period' => 'required|db dashboard.display_period|in '.implode(',', DASHBOARD_DISPLAY_PERIODS),
-			'auto_start' => 'required|db dashboard.auto_start|in 0,1'
+			'template' =>		'in 1',
+			'userid' =>			'db users.userid',
+			'name' =>			'required|db dashboard.name',
+			'display_period' =>	'required|db dashboard.display_period|in '.implode(',', DASHBOARD_DISPLAY_PERIODS),
+			'auto_start' =>		'required|db dashboard.auto_start|in 0,1'
 		];
 
 		$ret = $this->validateInput($fields);

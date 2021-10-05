@@ -74,7 +74,7 @@ class CServiceHelper {
 		];
 	}
 
-	public static function formatStatusRuleType(int $type, int $new_status, int $number, int $status): ?CObject {
+	public static function formatStatusRuleType(int $type, int $new_status, int $number, int $status): string {
 		$status = self::getStatusNames()[$status];
 
 		switch ($type) {
@@ -123,8 +123,10 @@ class CServiceHelper {
 		}
 
 		return $rule !== null
-			? new CObject([new CTag('em', true, self::getProblemStatusNames()[$new_status]), ' - ', $rule])
-			: null;
+			? (new CObject(
+				[new CTag('em', true, self::getProblemStatusNames()[$new_status]), ' - ', $rule]
+			))->toString()
+			: '';
 	}
 
 	public static function getStatusNames(): array {

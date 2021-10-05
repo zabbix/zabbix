@@ -81,19 +81,19 @@ foreach ($data['services'] as $serviceid => $service) {
 
 	$root_cause = [];
 
-	foreach ($data['events'][$serviceid] as $event) {
+	foreach (array_slice($service['problem_events'], 0, $data['max_in_table']) as $problem_event) {
 		if ($root_cause) {
 			$root_cause[] = ', ';
 		}
 
-		$root_cause[] = $data['can_monitor_problems']
-			? new CLink($event['name'],
+		$root_cause[] = $data['can_monitor_problems'] && $problem_event['triggerid'] !== null
+			? new CLink($problem_event['name'],
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'problem.view')
 					->setArgument('filter_name', '')
-					->setArgument('triggerids', [$event['objectid']])
+					->setArgument('triggerids', [$problem_event['triggerid']])
 			)
-			: $event['name'];
+			: $problem_event['name'];
 	}
 
 	$table->addRow(new CRow(array_merge($row, [
