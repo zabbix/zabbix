@@ -241,7 +241,7 @@ class testFormUserMedia extends CWebTest {
 					'error_message' => 'Incorrect value for field "period": a time period is expected'
 				]
 			],
-			// When active value is set to a speciffic moment.
+			// When active value is set to a specific moment.
 			[
 				[
 					'expected' => TEST_BAD,

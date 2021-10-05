@@ -451,7 +451,7 @@ class CImportDataAdapter {
 	}
 
 	/**
-	 * Format low-level disovery rule overrides.
+	 * Format low-level discovery rule overrides.
 	 *
 	 * @param array $discovery_rule  Data of single low-level discovery rule.
 	 *

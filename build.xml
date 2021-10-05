@@ -57,7 +57,7 @@
 		<replace file="ui/conf/zabbix.conf.php" token="{DBUSER}" value="${dbuser}"/>
 		<replace file="ui/conf/zabbix.conf.php" token="{DBPASSWORD}" value="${dbpassword}"/>
 		<replace file="ui/conf/zabbix.conf.php" token="{PHPUNIT_ERROR_LOG}" value="${phpunit_error_log}"/>
-                <chmod file="ui/conf/zabbix.conf.php" perm="go+w"/>
+		<chmod file="ui/conf/zabbix.conf.php" perm="go+rw"/>
 	</target>
 
 	<target name="create-saml-configs">
@@ -78,6 +78,7 @@
 		<replace file="${SIMPLESAMLPHP_CFG_FILE}" token="{ENTITY_ID}" value="${phpunit_sp_entity_id}"/>
 		<replace file="${SIMPLESAMLPHP_CFG_FILE}" token="{ASSERTION_CONSUMER_SERVICE}" value="${url}index_sso.php?acs"/>
 		<replace file="${SIMPLESAMLPHP_CFG_FILE}" token="{SINGLE_LOGOUT_SERVICE}" value="${url}index_sso.php?sls"/>
+		<chmod file="${SIMPLESAMLPHP_CFG_FILE}" perm="go+r"/>
 	</target>
 
 	<target name="init-integration">
