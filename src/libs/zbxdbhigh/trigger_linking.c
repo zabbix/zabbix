@@ -106,8 +106,9 @@ typedef struct
 	(ZBX_FLAG_LINK_TRIGGER_UPDATE_RECOVERY_MODE | ZBX_FLAG_LINK_TRIGGER_UPDATE_CORRELATION_MODE |	\
 	ZBX_FLAG_LINK_TRIGGER_UPDATE_CORRELATION_TAG | ZBX_FLAG_LINK_TRIGGER_UPDATE_MANUAL_CLOSE |	\
 	ZBX_FLAG_LINK_TRIGGER_UPDATE_OPDATA | ZBX_FLAG_LINK_TRIGGER_UPDATE_DISCOVER |			\
-	ZBX_FLAG_LINK_TRIGGER_UPDATE_EVENT_NAME | ZBX_FLAG_LINK_TRIGGER_UPDATE_TYPE |			\
-	ZBX_FLAG_LINK_TRIGGER_UPDATE_TEMPLATEID)
+	ZBX_FLAG_LINK_TRIGGER_UPDATE_EVENT_NAME | ZBX_FLAG_LINK_TRIGGER_UPDATE_PRIORITY |		\
+	ZBX_FLAG_LINK_TRIGGER_UPDATE_COMMENTS | ZBX_FLAG_LINK_TRIGGER_UPDATE_URL |			\
+	ZBX_FLAG_LINK_TRIGGER_UPDATE_TYPE | ZBX_FLAG_LINK_TRIGGER_UPDATE_TEMPLATEID)
 
 	zbx_uint64_t	update_flags;
 }
@@ -116,7 +117,7 @@ zbx_target_host_trigger_entry_t;
 ZBX_PTR_VECTOR_DECL(target_host_trigger_data, zbx_target_host_trigger_entry_t *)
 ZBX_PTR_VECTOR_IMPL(target_host_trigger_data, zbx_target_host_trigger_entry_t *)
 
-static unsigned	zbx_host_triggers_main_data_hash_func(const void *data)
+static zbx_hash_t	zbx_host_triggers_main_data_hash_func(const void *data)
 {
 	const zbx_target_host_trigger_entry_t	* trigger_entry = (const zbx_target_host_trigger_entry_t *)data;
 
@@ -189,7 +190,7 @@ typedef struct zbx_trigger_functions_entry
 
 } zbx_trigger_functions_entry_t;
 
-static unsigned	zbx_triggers_functions_hash_func(const void *data)
+static zbx_hash_t	zbx_triggers_functions_hash_func(const void *data)
 {
 	const zbx_trigger_functions_entry_t	*trigger_entry = (const zbx_trigger_functions_entry_t *)data;
 

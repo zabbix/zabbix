@@ -459,16 +459,18 @@ static int	DBadd_trigger_dependencies(zbx_vector_uint64_pair_t *links, zbx_hashs
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
 				res = FAIL;
-				goto out;
+
+				break;
 			}
 
 			triggerdepid++;
 		}
 
-		zbx_db_insert_execute(&db_insert);
+		if (SUCCEED == res)
+			zbx_db_insert_execute(&db_insert);
 		zbx_db_insert_clean(&db_insert);
 	}
-out:
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(res));
 
 	return res;
