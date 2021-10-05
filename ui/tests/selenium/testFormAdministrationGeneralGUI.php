@@ -437,7 +437,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// Invalid sting values.
+			// Invalid string values.
 			[
 				[
 					'expected' => TEST_BAD,

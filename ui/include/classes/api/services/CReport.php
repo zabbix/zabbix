@@ -558,7 +558,7 @@ class CReport extends CApiService {
 
 		while ($db_report_active_fields = DBfetch($db_reports_active_fields)) {
 			$db_reports[$db_report_active_fields['reportid']] +=
-				array_diff_key($db_report_active_fields, ['reportid' => true]);
+				array_diff_key($db_report_active_fields, array_flip(['reportid']));
 		}
 
 		$names = [];
@@ -647,7 +647,7 @@ class CReport extends CApiService {
 			$this->checkDashboards(array_keys($dashboardids));
 		}
 
-		$this->addAffectedObjects($reports, $db_reports);
+		self::addAffectedObjects($reports, $db_reports);
 
 		$this->checkUsers($reports, $db_reports);
 		$this->checkUserGroups($reports, $db_reports);
@@ -1040,10 +1040,12 @@ class CReport extends CApiService {
 	/**
 	 * Add existing users and user groups to $db_reports, regardless of whether they will be affected by the update.
 	 *
+	 * @static
+	 *
 	 * @param array $reports
 	 * @param array $db_reports
 	 */
-	private function addAffectedObjects(array $reports, array &$db_reports): void {
+	private static function addAffectedObjects(array $reports, array &$db_reports): void {
 		$reportids = [];
 
 		foreach ($reports as $report) {
@@ -1061,12 +1063,8 @@ class CReport extends CApiService {
 		$db_report_users = DBselect(DB::makeSql('report_user', $options));
 
 		while ($db_report_user = DBfetch($db_report_users)) {
-			$db_reports[$db_report_user['reportid']]['users'][$db_report_user['reportuserid']] = [
-				'reportuserid' => $db_report_user['reportuserid'],
-				'userid' => $db_report_user['userid'],
-				'exclude' => $db_report_user['exclude'],
-				'access_userid' => $db_report_user['access_userid']
-			];
+			$db_reports[$db_report_user['reportid']]['users'][$db_report_user['reportuserid']] =
+				array_diff_key($db_report_user, array_flip(['reportid']));
 		}
 
 		$options = [
@@ -1076,11 +1074,8 @@ class CReport extends CApiService {
 		$db_report_usrgrps = DBselect(DB::makeSql('report_usrgrp', $options));
 
 		while ($db_report_usrgrp = DBfetch($db_report_usrgrps)) {
-			$db_reports[$db_report_usrgrp['reportid']]['user_groups'][$db_report_usrgrp['reportusrgrpid']] = [
-				'reportusrgrpid' => $db_report_usrgrp['reportusrgrpid'],
-				'usrgrpid' => $db_report_usrgrp['usrgrpid'],
-				'access_userid' => $db_report_usrgrp['access_userid']
-			];
+			$db_reports[$db_report_usrgrp['reportid']]['user_groups'][$db_report_usrgrp['reportusrgrpid']] =
+				array_diff_key($db_report_usrgrp, array_flip(['reportid']));
 		}
 	}
 }

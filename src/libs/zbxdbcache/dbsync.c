@@ -2351,15 +2351,17 @@ int	zbx_dbsync_compare_triggers(zbx_dbsync_t *sync)
 	char			**row;
 
 	if (NULL == (result = DBselect(
-			"select distinct t.triggerid,t.description,t.expression,t.error,t.priority,t.type,t.value,"
+			"select t.triggerid,t.description,t.expression,t.error,t.priority,t.type,t.value,"
 				"t.state,t.lastchange,t.status,t.recovery_mode,t.recovery_expression,"
 				"t.correlation_mode,t.correlation_tag,t.opdata,t.event_name,null,null,null"
-			" from hosts h,items i,functions f,triggers t"
-			" where h.hostid=i.hostid"
-				" and i.itemid=f.itemid"
-				" and f.triggerid=t.triggerid"
-				" and h.status in (%d,%d)"
-				" and t.flags<>%d",
+			" from triggers t"
+			" where t.triggerid in (select distinct tg.triggerid"
+				" from hosts h,items i,functions f,triggers tg"
+				" where h.hostid=i.hostid"
+					" and i.itemid=f.itemid"
+					" and f.triggerid=tg.triggerid"
+					" and h.status in (%d,%d)"
+					" and tg.flags<>%d)",
 			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
 			ZBX_FLAG_DISCOVERY_PROTOTYPE)))
 	{
