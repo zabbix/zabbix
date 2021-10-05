@@ -1,3 +1,6 @@
+Attempting to remove the 65535 hard limit in the history text / log value
+
+
 Zabbix is free software, released under the GNU General Public License
 (GPL) version 2.
 
