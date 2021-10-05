@@ -4301,7 +4301,6 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 		/* in ORACLE always present begin..end; */
 		if (16 < sql1_offset)
 			DBexecute("%s", sql1);
-		zbx_free(sql1);
 	}
 
 	if (SUCCEED == res && (NULL != sql2 || 0 != del_hosttemplateids->values_num ||
@@ -4314,8 +4313,10 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 		/* in ORACLE always present begin..end; */
 		if (16 < sql2_offset)
 			DBexecute("%s", sql2);
-		zbx_free(sql2);
 	}
+
+	zbx_free(sql1);
+	zbx_free(sql2);
 
 	zbx_vector_db_tag_ptr_destroy(&upd_tags);
 	zbx_vector_uint64_destroy(&del_inventory_modes_hostids);
