@@ -30,6 +30,22 @@ $page['scripts'] = ['multiselect.js', 'textareaflexible.js', 'popup.condition.co
 	'class.tab-indicators.js'
 ];
 
+
+$ss = [];
+for ($i = 5001 ; $i <= 20000; $i++) {
+	$ss[] = [
+		'name' => 'Child service '.$i,
+		'parents' => [['serviceid' => 1]],
+		'showsla' => 0,
+		'algorithm' => 2,
+		'sortorder' => 0,
+	];
+}
+
+API::Service()->create($ss);
+exit;
+
+
 require_once dirname(__FILE__).'/include/page_header.php';
 // VAR							TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
