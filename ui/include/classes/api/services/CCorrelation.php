@@ -552,9 +552,7 @@ class CCorrelation extends CApiService {
 								['if' => ['field' => 'evaltype', 'in' => CONDITION_EVAL_TYPE_EXPRESSION], 'type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['formulaid']], 'fields' => [
 									'formulaid' =>	['type' => API_COND_FORMULAID, 'flags' => API_REQUIRED]
 								] + $condition_fields],
-								['else' => true, 'type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'fields' => [
-									'formulaid' =>	['type' => API_UNEXPECTED]
-								] + $condition_fields]
+								['else' => true, 'type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'fields' => $condition_fields]
 			]]
 		]];
 	}
