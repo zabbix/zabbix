@@ -662,7 +662,7 @@ class CHostGroup extends CApiService {
 			'preservekeys' => true
 		]);
 
-		self::checkHostsToUnlink($db_hosts, $groupids);
+		self::checkHostsWithoutGroups($db_hosts, $groupids);
 
 		$db_scripts = DB::select('scripts', [
 			'output' => ['groupid'],
@@ -1188,7 +1188,7 @@ class CHostGroup extends CApiService {
 				);
 			}
 
-			self::checkHostsToUnlink($del_db_hosts, $groupids);
+			self::checkHostsWithoutGroups($del_db_hosts, $groupids);
 		}
 	}
 
@@ -1242,7 +1242,7 @@ class CHostGroup extends CApiService {
 
 		self::checkHostsIds($hostids, $templateids, $db_hosts);
 		self::checkHostsNotDiscovered($db_hosts);
-		self::checkHostsToUnlink($db_hosts, $data['groupids']);
+		self::checkHostsWithoutGroups($db_hosts, $data['groupids']);
 
 		self::addHostsAndTemplates($db_groups, $all_hostids);
 	}
@@ -1295,7 +1295,7 @@ class CHostGroup extends CApiService {
 	}
 
 	/**
-	 * Check whether the given groups are able to unlink from given hosts and templates.
+	 * Check to exclude an opportunity to leave host without groups.
 	 *
 	 * @static
 	 *
@@ -1306,25 +1306,18 @@ class CHostGroup extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkHostsToUnlink(array $db_hosts, array $groupids): void {
+	private static function checkHostsWithoutGroups(array $db_hosts, array $groupids): void {
 		$hostids = array_keys($db_hosts);
 
-		$hostids_unable_to_unlink = array_diff($hostids, getUnlinkableHostIds($groupids, $hostids));
+		$hostids_without_groups = array_diff($hostids, getUnlinkableHostIds($groupids, $hostids));
 
-		if ($hostids_unable_to_unlink) {
-			$hostid = reset($hostids_unable_to_unlink);
-			$type = ($db_hosts[$hostid]['status'] == HOST_STATUS_TEMPLATE) ? 'template' : 'host';
+		if ($hostids_without_groups) {
+			$hostid = reset($hostids_without_groups);
+			$error = ($db_hosts[$hostid]['status'] == HOST_STATUS_TEMPLATE)
+				? _s('Template "%1$s" cannot be without host group.', $db_hosts[$hostid]['host'])
+				: _s('Host "%1$s" cannot be without host group.', $db_hosts[$hostid]['host']);
 
-			if ($type === 'host') {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Host "%1$s" cannot be without host group.', $db_hosts[$hostid]['host'])
-				);
-			}
-			else {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Template "%1$s" cannot be without host group.', $db_hosts[$hostid]['host'])
-				);
-			}
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 	}
 
