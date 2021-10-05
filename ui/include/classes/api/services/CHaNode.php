@@ -43,7 +43,6 @@ class CHaNode extends CApiService {
 			// filter
 			'ha_nodeids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'filter' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
-				'ha_nodeid' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'status' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [ZBX_NODE_STATUS_STANDBY, ZBX_NODE_STATUS_STOPPED, ZBX_NODE_STATUS_UNAVAILABLE, ZBX_NODE_STATUS_ACTIVE])],
 			]],
