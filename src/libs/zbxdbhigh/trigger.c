@@ -819,3 +819,230 @@ void	zbx_db_trigger_get_recovery_expression(const DB_TRIGGER *trigger, char **ex
 	else
 		db_trigger_get_expression(&cache->eval_ctx_r, expression);
 }
+
+static void	db_trigger_explain_expression(const zbx_eval_context_t *ctx, char **expression, int (*eval_func_cb)(
+		zbx_variant_t *, DC_ITEM *, const char *, const char *, const zbx_timespec_t *, char **))
+{
+	int			i;
+	zbx_eval_context_t	local_ctx;
+
+	zbx_eval_copy(&local_ctx, ctx, ctx->expression);
+	local_ctx.rules |= ZBX_EVAL_COMPOSE_MASK_ERROR;
+
+	for (i = 0; i < local_ctx.stack.values_num; i++)
+	{
+		zbx_eval_token_t	*token = &local_ctx.stack.values[i];
+		zbx_uint64_t		functionid;
+		DC_FUNCTION		function;
+		DC_ITEM			item;
+		int			err_func, err_item;
+
+		if (ZBX_EVAL_TOKEN_FUNCTIONID != token->type)
+		{
+			/* reset cached token values to get the original expression */
+			zbx_variant_clear(&token->value);
+			continue;
+		}
+
+		switch (token->value.type)
+		{
+			case ZBX_VARIANT_UI64:
+				functionid = token->value.data.ui64;
+				break;
+			case ZBX_VARIANT_NONE:
+				if (SUCCEED != is_uint64_n(local_ctx.expression + token->loc.l + 1,
+						token->loc.r - token->loc.l - 1, &functionid))
+				{
+					continue;
+				}
+				break;
+			default:
+				continue;
+		}
+
+		DCconfig_get_functions_by_functionids(&function, &functionid, &err_func, 1);
+
+		if (SUCCEED == err_func)
+		{
+			DCconfig_get_items_by_itemids(&item, &function.itemid, &err_item, 1);
+
+			if (SUCCEED == err_item)
+			{
+				char		*error = NULL, *value;
+				int		eval_ret;
+				zbx_variant_t	var;
+				zbx_timespec_t	ts;
+
+				zbx_timespec(&ts);
+
+				zbx_variant_clear(&token->value);
+
+				if (SUCCEED == (eval_ret = eval_func_cb(&var, &item, function.function,
+						function.parameter, &ts, &error)) && ZBX_VARIANT_NONE != var.type)
+				{
+					value = zbx_strdup(NULL, zbx_variant_value_desc(&var));
+				}
+				else
+					value = zbx_strdup(NULL, "*UNKNOWN*");
+
+				zbx_variant_set_str(&token->value, value);
+				DCconfig_clean_items(&item, &err_item, 1);
+			}
+			else
+			{
+				zbx_variant_clear(&token->value);
+				zbx_variant_set_str(&token->value, zbx_strdup(NULL, "*UNKNOWN*"));
+			}
+
+			DCconfig_clean_functions(&function, &err_func, 1);
+		}
+		else
+		{
+			zbx_variant_clear(&token->value);
+			zbx_variant_set_str(&token->value, zbx_strdup(NULL, "*UNKNOWN*"));
+		}
+	}
+
+	zbx_eval_compose_expression(&local_ctx, expression);
+
+	zbx_eval_clear(&local_ctx);
+}
+
+static void	db_trigger_get_function_value(const zbx_eval_context_t *ctx, int index, char **value_ret,
+		int (*eval_func_cb)(zbx_variant_t *, DC_ITEM *, const char *, const char *, const zbx_timespec_t *,
+		char **))
+{
+	int			i, func_idx = 1;
+	zbx_eval_context_t	local_ctx;
+
+	zbx_eval_copy(&local_ctx, ctx, ctx->expression);
+	local_ctx.rules |= ZBX_EVAL_COMPOSE_MASK_ERROR;
+
+	for (i = 0; i < local_ctx.stack.values_num; i++)
+	{
+		zbx_eval_token_t	*token = &local_ctx.stack.values[i];
+		zbx_uint64_t		functionid;
+		DC_FUNCTION		function;
+		DC_ITEM			item;
+		int			err_func, err_item;
+
+		if (ZBX_EVAL_TOKEN_FUNCTIONID != token->type)
+		{
+			/* reset cached token values to get the original expression */
+			zbx_variant_clear(&token->value);
+			continue;
+		}
+
+		switch (token->value.type)
+		{
+			case ZBX_VARIANT_UI64:
+				functionid = token->value.data.ui64;
+				break;
+			case ZBX_VARIANT_NONE:
+				if (SUCCEED != is_uint64_n(local_ctx.expression + token->loc.l + 1,
+						token->loc.r - token->loc.l - 1, &functionid))
+				{
+					continue;
+				}
+				break;
+			default:
+				continue;
+		}
+
+		DCconfig_get_functions_by_functionids(&function, &functionid, &err_func, 1);
+
+		if (SUCCEED == err_func)
+		{
+			DCconfig_get_items_by_itemids(&item, &function.itemid, &err_item, 1);
+
+			if (SUCCEED == err_item)
+			{
+				char		*error = NULL, *value;
+				int		eval_ret;
+				zbx_variant_t	var;
+				zbx_timespec_t	ts;
+
+				zbx_timespec(&ts);
+
+				zbx_variant_clear(&token->value);
+
+				if (SUCCEED == (eval_ret = eval_func_cb(&var, &item, function.function,
+						function.parameter, &ts, &error)) && ZBX_VARIANT_NONE != var.type)
+				{
+					value = zbx_strdup(NULL, zbx_variant_value_desc(&var));
+				}
+				else
+					value = zbx_strdup(NULL, "*UNKNOWN*");
+
+				zbx_variant_set_str(&token->value, value);
+				DCconfig_clean_items(&item, &err_item, 1);
+			}
+			else
+			{
+				zbx_variant_clear(&token->value);
+				zbx_variant_set_str(&token->value, zbx_strdup(NULL, "*UNKNOWN*"));
+			}
+
+			DCconfig_clean_functions(&function, &err_func, 1);
+		}
+		else
+		{
+			zbx_variant_clear(&token->value);
+			zbx_variant_set_str(&token->value, zbx_strdup(NULL, "*UNKNOWN*"));
+		}
+
+		if (index == func_idx)
+		{
+			*value_ret = zbx_strdup(NULL, token->value.data.str);
+			goto out;
+		}
+
+		func_idx++;
+	}
+
+	*value_ret = zbx_strdup(NULL, "*UNKNOWN*");
+out:
+	zbx_eval_clear(&local_ctx);
+}
+
+void	zbx_db_trigger_explain_expression(const DB_TRIGGER *trigger, char **expression,
+		int (*eval_func_cb)(zbx_variant_t *, DC_ITEM *, const char *, const char *, const zbx_timespec_t *,
+		char **), int recovery)
+{
+	zbx_trigger_cache_t		*cache;
+	zbx_trigger_cache_state_t	state;
+	const zbx_eval_context_t	*ctx;
+
+	state = (1 == recovery) ? ZBX_TRIGGER_CACHE_EVAL_CTX_R : ZBX_TRIGGER_CACHE_EVAL_CTX;
+
+	if (NULL == (cache = db_trigger_get_cache(trigger, state)))
+	{
+		*expression = zbx_strdup(NULL, "*UNKNOWN*");
+		return;
+	}
+
+	ctx = (1 == recovery) ? &cache->eval_ctx_r : &cache->eval_ctx;
+
+	db_trigger_explain_expression(ctx, expression, eval_func_cb);
+}
+
+void	zbx_db_trigger_get_function_value(const DB_TRIGGER *trigger, int index, char **value,
+		int (*eval_func_cb)(zbx_variant_t *, DC_ITEM *, const char *, const char *, const zbx_timespec_t *,
+		char **), int recovery)
+{
+	zbx_trigger_cache_t		*cache;
+	zbx_trigger_cache_state_t	state;
+	const zbx_eval_context_t	*ctx;
+
+	state = (1 == recovery) ? ZBX_TRIGGER_CACHE_EVAL_CTX_R : ZBX_TRIGGER_CACHE_EVAL_CTX;
+
+	if (NULL == (cache = db_trigger_get_cache(trigger, state)))
+	{
+		*value = zbx_strdup(NULL, "*UNKNOWN*");
+		return;
+	}
+
+	ctx = (1 == recovery) ? &cache->eval_ctx_r : &cache->eval_ctx;
+
+	db_trigger_get_function_value(ctx, index, value, eval_func_cb);
+}
