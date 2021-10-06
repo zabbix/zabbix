@@ -303,6 +303,8 @@ class TabIndicatorItem {
 
 class MacrosTabIndicatorItem extends TabIndicatorItem {
 
+	static ZBX_PROPERTY_INHERITED = 1;
+
 	constructor() {
 		super(TAB_INDICATOR_TYPE_COUNT);
 	}
@@ -310,9 +312,14 @@ class MacrosTabIndicatorItem extends TabIndicatorItem {
 	getValue() {
 		return [...document.querySelectorAll('#tbl_macros .form_row')].filter((row) => {
 			const macro = row.querySelector('textarea[name$="[macro]"]');
-			const value = row.querySelector('textarea[name$="[value]"]:not([readonly])');
+			const inherited_type = row.querySelector('input[name$="[inherited_type]"]');
 
-			return (macro !== null && macro.value !== '' && value !== null);
+			if (inherited_type !== null
+					&& parseInt(inherited_type.value, 10) == MacrosTabIndicatorItem.ZBX_PROPERTY_INHERITED) {
+				return false;
+			}
+
+			return (macro !== null && macro.value !== '');
 		})
 			.length;
 	}
