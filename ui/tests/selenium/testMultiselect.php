@@ -50,7 +50,7 @@ class testMultiselect extends CWebTest {
 		$element->type($string);
 		$this->query('class', $class)->waitUntilVisible();
 
-		$this->assertScreenshotExcept($element->parents('class:table-forms')->one(),
+		$this->assertScreenshotExcept($element->parents('class:form-grid')->one(),
 			[$element], $string
 		);
 	}
