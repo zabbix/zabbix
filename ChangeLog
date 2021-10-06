@@ -1,6 +1,7 @@
 Changes for 6.0.0alpha4
 
 New features:
+A.F.....S. [ZBXNEXT-2406] implemented service problem root cause analysis (ashubin, averza, wiper)
 A......... [ZBXNEXT-6470,ZBXNEXT-6885] implemented audit logging of mediatype API object; refactored mediatype.create, mediatype.update and mediatype.delete (agriscenko)
 .........T [ZBXNEXT-6888] added template "InfluxDB by HTTP" (ychukina)
 A.F....... [ZBXNEXT-6470,ZBXNEXT-6914] implemented audit logging of image and iconmap API objects (rlataria)
@@ -16,6 +17,10 @@ A.F....... [ZBXNEXT-6470,ZBXNEXT-6917] implemented audit logging of global macro
 A.F....... [ZBXNEXT-6470,ZBXNEXT-6910] implemented audit logging of dashboard and templatedashboard API object (rlataria)
 
 Bug fixes:
+........S. [ZBX-19781] fixed server not linking host prototype inventory mode (arimdjonoks)
+A......... [ZBX-19978] fixed SQL errors when trying to get count of the interfaces (Sasha)
+.........T [ZBX-19774] fixed README examples (abiba)
+.........T [ZBX-19776] fixed README file (abiba)
 .........T [ZBX-19284] added smart.disk.attr.raw item, removed unit for smart.disk.hours item in "SMART by Zabbix agent 2" template (mchudinov)
 ..F....... [ZBX-19899] fixed mass update not working across pages (jfreibergs)
 ..F....... [ZBX-19584] increased width for Subscriptions section of Scheduled reports to avoid text clipping (jfreibergs)
