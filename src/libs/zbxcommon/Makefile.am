@@ -15,4 +15,4 @@ libzbxcommon_a_SOURCES = \
 	xml.c \
 	zbxgetopt.c
 
-libzbxcommon_a_CFLAGS = $(ICONV_CFLAGS)
+libzbxcommon_a_CFLAGS = $(ICONV_CFLAGS) $(LIBXML2_CFLAGS)

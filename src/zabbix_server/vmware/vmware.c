@@ -3206,6 +3206,14 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 	hv->uuid = zbx_strdup(NULL, hv->props[ZBX_VMWARE_HVPROP_HW_UUID]);
 	hv->id = zbx_strdup(NULL, id);
 
+	if (NULL != (value = hv->props[ZBX_VMWARE_HVPROP_SENSOR]) &&
+			SUCCEED != zbx_xml_to_json(value, &hv->props[ZBX_VMWARE_HVPROP_SENSOR], error))
+	{
+		goto out;
+	}
+
+	zbx_free(value);
+
 	if (NULL != (value = zbx_xml_read_doc_value(details, "//*[@type='" ZBX_VMWARE_SOAP_CLUSTER "']")))
 		hv->clusterid = value;
 
