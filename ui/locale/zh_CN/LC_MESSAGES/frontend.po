@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-17 19:53+0300\n"
+"POT-Creation-Date: 2021-10-06 11:29+0300\n"
 "PO-Revision-Date: 2016-05-11 02:08+0300\n"
 "Last-Translator: 岂几 <tom3000@126.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -92,7 +92,7 @@ msgid "%1$d day"
 msgid_plural "%1$d days"
 msgstr[0] "%1$d 天"
 
-#: jsLoader.php:325
+#: jsLoader.php:306
 #, c-format
 msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
@@ -170,7 +170,7 @@ msgstr[0] "%1$s 消息"
 #: include/classes/widgets/CWidgetConfig.php:286
 #: include/classes/widgets/CWidgetConfig.php:287
 #: include/classes/widgets/CWidgetConfig.php:288 include/func.inc.php:2631
-#: jsLoader.php:170 jsLoader.php:171 jsLoader.php:172 jsLoader.php:173
+#: jsLoader.php:151 jsLoader.php:152 jsLoader.php:153 jsLoader.php:154
 #, c-format
 msgid "%1$s minute"
 msgid_plural "%1$s minutes"
@@ -182,7 +182,7 @@ msgid "%1$s of %2$s element in problem state"
 msgid_plural "%1$s of %2$s elements in problem state"
 msgstr[0] "处于问题状态的 %2$s 元素的 %1$s"
 
-#: jsLoader.php:326
+#: jsLoader.php:307
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s preselected, use down,up arrow keys and enter to select"
@@ -212,13 +212,13 @@ msgstr[0] "剩余%1$s 重试次数"
 #: app/views/administration.user.edit.php:522
 #: include/classes/widgets/CWidgetConfig.php:283
 #: include/classes/widgets/CWidgetConfig.php:284 include/func.inc.php:2638
-#: jsLoader.php:168 jsLoader.php:169
+#: jsLoader.php:149 jsLoader.php:150
 #, c-format
 msgid "%1$s second"
 msgid_plural "%1$s seconds"
 msgstr[0] "%1$s 秒"
 
-#: jsLoader.php:307
+#: jsLoader.php:288
 #, c-format
 msgid "%1$s symbols remaining"
 msgstr ""
@@ -237,13 +237,13 @@ msgctxt "screen reader"
 msgid "%1$s, Severity, %2$s"
 msgstr "%1$s, 严重性, %2$s"
 
-#: jsLoader.php:320
+#: jsLoader.php:301
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, read only"
 msgstr "%1$s, 只读"
 
-#: jsLoader.php:363
+#: jsLoader.php:344
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, selected"
@@ -474,7 +474,7 @@ msgstr ""
 msgid "Ack"
 msgstr "确认"
 
-#: app/views/popup.acknowledge.edit.php:83 jsLoader.php:330
+#: app/views/popup.acknowledge.edit.php:83 jsLoader.php:311
 msgid "Acknowledge"
 msgstr "确认"
 
@@ -587,7 +587,7 @@ msgstr "动作 \"%1$s\" 没有定义操作。"
 msgid "Action added"
 msgstr "动作已添加"
 
-#: include/classes/core/ZBase.php:536
+#: include/classes/core/ZBase.php:499
 #, c-format
 msgid "Action class %1$s must extend %2$s class."
 msgstr ""
@@ -634,8 +634,8 @@ msgstr "动作已更新"
 #: include/classes/screens/CScreenProblem.php:1162
 #: include/classes/screens/CScreenProblem.php:1223 include/events.inc.php:288
 #: include/forms.inc.php:1222 include/views/configuration.action.edit.php:28
-#: include/views/monitoring.sysmap.list.php:68 jsLoader.php:146
-#: jsLoader.php:174 jsLoader.php:189 jsLoader.php:203 jsLoader.php:329
+#: include/views/monitoring.sysmap.list.php:68 jsLoader.php:127
+#: jsLoader.php:155 jsLoader.php:170 jsLoader.php:184 jsLoader.php:310
 #: tr_events.php:182
 msgid "Actions"
 msgstr "动作"
@@ -804,7 +804,7 @@ msgstr "启用直到"
 #: include/views/monitoring.sysmap.edit.php:304
 #: include/views/monitoring.sysmap.edit.php:325
 #: include/views/monitoring.sysmap.edit.php:362
-#: include/views/monitoring.sysmap.edit.php:430 jsLoader.php:193
+#: include/views/monitoring.sysmap.edit.php:430 jsLoader.php:174
 msgid "Add"
 msgstr "添加"
 
@@ -812,7 +812,7 @@ msgstr "添加"
 msgid "Add (message type limit reached)"
 msgstr ""
 
-#: jsLoader.php:163
+#: jsLoader.php:144
 msgid "Add a new widget"
 msgstr "添加新构件"
 
@@ -820,7 +820,7 @@ msgstr "添加新构件"
 msgid "Add child"
 msgstr "添加子节点"
 
-#: jsLoader.php:194
+#: jsLoader.php:175
 msgid "Add child element"
 msgstr "添加子节点元素"
 
@@ -837,7 +837,7 @@ msgstr "添加主机"
 msgid "Add missing"
 msgstr ""
 
-#: jsLoader.php:195
+#: jsLoader.php:176
 msgid "Add multiple maps"
 msgstr "添加多个拓扑图"
 
@@ -907,7 +907,7 @@ msgstr "添加构件"
 msgid "Added"
 msgstr ""
 
-#: jsLoader.php:318
+#: jsLoader.php:299
 #, c-format
 msgctxt "screen reader"
 msgid "Added, %1$s"
@@ -1003,7 +1003,7 @@ msgstr "对齐拓扑元素"
 #: app/views/reports.scheduledreport.list.php:55
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:122
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:178
-#: include/views/monitoring.sysmap.edit.php:261 jsLoader.php:386
+#: include/views/monitoring.sysmap.edit.php:261 jsLoader.php:367
 msgid "All"
 msgstr "所有"
 
@@ -1021,7 +1021,7 @@ msgstr "所有组"
 msgid "All hosts"
 msgstr "所有主机"
 
-#: jsLoader.php:274
+#: jsLoader.php:255
 msgid "All links should have \"Name\" and \"URL\" specified"
 msgstr "所有的链接应含 特定的名称和URL"
 
@@ -1152,8 +1152,8 @@ msgstr "应用集 错误."
 #: include/views/js/monitoring.sysmaps.js.php:480
 #: include/views/js/monitoring.sysmaps.js.php:604
 #: include/views/js/monitoring.sysmaps.js.php:709
-#: include/views/js/monitoring.sysmaps.js.php:815 jsLoader.php:196
-#: jsLoader.php:309
+#: include/views/js/monitoring.sysmaps.js.php:815 jsLoader.php:177
+#: jsLoader.php:290
 msgid "Apply"
 msgstr "应用"
 
@@ -1171,7 +1171,7 @@ msgstr "接近中"
 msgid "Apr"
 msgstr "四月"
 
-#: include/func.inc.php:103 include/func.inc.php:240 jsLoader.php:226
+#: include/func.inc.php:103 include/func.inc.php:240 jsLoader.php:207
 msgid "April"
 msgstr "四月"
 
@@ -1319,7 +1319,7 @@ msgstr "审计日志"
 msgid "Aug"
 msgstr "八月"
 
-#: include/func.inc.php:107 include/func.inc.php:244 jsLoader.php:230
+#: include/func.inc.php:107 include/func.inc.php:244 jsLoader.php:211
 msgid "August"
 msgstr "八月"
 
@@ -1535,7 +1535,7 @@ msgstr ""
 msgid "Blocked"
 msgstr "锁定的"
 
-#: include/classes/core/ZBase.php:363
+#: include/classes/core/ZBase.php:357
 msgid "Blue"
 msgstr "蓝"
 
@@ -1589,11 +1589,11 @@ msgstr ""
 msgid "Bottom"
 msgstr "底部"
 
-#: jsLoader.php:266
+#: jsLoader.php:247
 msgid "Bring forward"
 msgstr "向上一层"
 
-#: jsLoader.php:265
+#: jsLoader.php:246
 msgid "Bring to front"
 msgstr "移到上一层"
 
@@ -1619,7 +1619,7 @@ msgstr "CERT"
 
 #: app/views/hintbox.eventlist.php:116
 #: app/views/monitoring.widget.problems.view.php:109
-#: include/classes/graph/CSvgGraph.php:1080
+#: include/classes/graph/CSvgGraph.php:1086
 #: include/classes/screens/CScreenProblem.php:974
 #: include/classes/screens/CScreenProblem.php:1184 include/events.inc.php:373
 msgid "CLOSING"
@@ -1673,7 +1673,7 @@ msgstr "计算SLA, 可接受的SAL(%计)"
 msgid "Calculated"
 msgstr "可计算的"
 
-#: jsLoader.php:222
+#: jsLoader.php:203
 msgid "Calendar"
 msgstr "日历"
 
@@ -1681,7 +1681,7 @@ msgstr "日历"
 msgid "Callback"
 msgstr "回调"
 
-#: jsLoader.php:321
+#: jsLoader.php:302
 msgctxt "screen reader"
 msgid "Can not be removed"
 msgstr "无法被删除"
@@ -1715,8 +1715,8 @@ msgstr "无法被删除"
 #: app/views/monitoring.dashboard.view.php:143
 #: app/views/popup.import.compare.php:162
 #: include/classes/html/CButtonCancel.php:25
-#: include/classes/setup/CSetupWizard.php:130 jsLoader.php:197
-#: jsLoader.php:207 jsLoader.php:310 jsLoader.php:382
+#: include/classes/setup/CSetupWizard.php:130 jsLoader.php:178
+#: jsLoader.php:188 jsLoader.php:291 jsLoader.php:363
 msgid "Cancel"
 msgstr "取消"
 
@@ -1746,7 +1746,7 @@ msgstr "无法添加操作"
 msgid "Cannot add correlation"
 msgstr "无法添加关联"
 
-#: jsLoader.php:147
+#: jsLoader.php:128
 #, c-format
 msgid "Cannot add dashboard page: maximum number of %1$d dashboard pages has been added."
 msgstr ""
@@ -1887,7 +1887,7 @@ msgstr ""
 msgid "Cannot add web scenario"
 msgstr "不能添加web场景"
 
-#: jsLoader.php:148
+#: jsLoader.php:129
 msgid "Cannot add widget: not enough free space on the dashboard."
 msgstr ""
 
@@ -2395,7 +2395,7 @@ msgstr ""
 msgid "Cannot execute script."
 msgstr ""
 
-#: jsLoader.php:277
+#: jsLoader.php:258
 msgid "Cannot expand macros."
 msgstr "无法扩展宏."
 
@@ -2561,7 +2561,7 @@ msgid "Cannot link template."
 msgstr "无法链接到模板。"
 
 #: app/controllers/CControllerModuleEdit.php:106
-#: include/classes/core/ZBase.php:704
+#: include/classes/core/ZBase.php:667
 #, c-format
 msgid "Cannot load module at: %1$s."
 msgid_plural "Cannot load modules at: %1$s."
@@ -2688,7 +2688,7 @@ msgstr "无法设置审计字段为已经禁止的审计."
 msgid "Cannot set session cookie."
 msgstr ""
 
-#: jsLoader.php:285
+#: jsLoader.php:266
 msgid "Cannot support notification audio for this device."
 msgstr ""
 
@@ -3262,7 +3262,7 @@ msgstr "模板 %1$s 存在环形引用。"
 msgid "Circular template linkage is not allowed."
 msgstr "不允许环形模板链接."
 
-#: include/classes/core/ZBase.php:530
+#: include/classes/core/ZBase.php:493
 #, c-format
 msgid "Class %1$s not found for action %2$s."
 msgstr ""
@@ -3283,11 +3283,11 @@ msgstr "清除历史和趋势"
 msgid "Clear when unlinking"
 msgstr "清除当无链接时"
 
-#: jsLoader.php:164
+#: jsLoader.php:145
 msgid "Click and drag to desired size."
 msgstr ""
 
-#: jsLoader.php:308
+#: jsLoader.php:289
 msgid "Click to view or edit"
 msgstr ""
 
@@ -3317,7 +3317,7 @@ msgstr "时钟"
 #: include/views/configuration.template.edit.php:237
 #: include/views/configuration.trigger.prototype.edit.php:654
 #: include/views/configuration.triggers.edit.php:647
-#: include/views/monitoring.sysmap.edit.php:421 jsLoader.php:332
+#: include/views/monitoring.sysmap.edit.php:421 jsLoader.php:313
 msgid "Clone"
 msgstr "克隆"
 
@@ -3328,8 +3328,8 @@ msgstr "克隆"
 #: include/views/js/monitoring.sysmaps.js.php:487
 #: include/views/js/monitoring.sysmaps.js.php:611
 #: include/views/js/monitoring.sysmaps.js.php:716
-#: include/views/js/monitoring.sysmaps.js.php:819 jsLoader.php:208
-#: jsLoader.php:287 jsLoader.php:304 jsLoader.php:375
+#: include/views/js/monitoring.sysmaps.js.php:819 jsLoader.php:189
+#: jsLoader.php:268 jsLoader.php:285 jsLoader.php:356
 msgid "Close"
 msgstr "关闭"
 
@@ -3359,8 +3359,8 @@ msgid "Close problems"
 msgstr ""
 
 #: include/classes/html/CCollapsibleUiWidget.php:55
-#: include/classes/widgets/CWidgetHelper.php:982 jsLoader.php:298
-#: jsLoader.php:303
+#: include/classes/widgets/CWidgetHelper.php:982 jsLoader.php:279
+#: jsLoader.php:284
 msgid "Collapse"
 msgstr "宕机"
 
@@ -3377,7 +3377,7 @@ msgstr ""
 msgid "Colour"
 msgstr "颜色"
 
-#: include/classes/validators/CColorValidator.php:32 jsLoader.php:279
+#: include/classes/validators/CColorValidator.php:32 jsLoader.php:260
 #, c-format
 msgid "Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr "颜色 \"%1$s\" 是错误的: 期望十六进制的颜色代码(6 个符号)."
@@ -3504,7 +3504,7 @@ msgstr "条件复制关联项 \"%1$s\"。"
 #: app/views/search.php:37 app/views/search.php:195 app/views/search.php:275
 #: include/classes/helpers/CMenuHelper.php:219
 #: include/classes/helpers/CRoleHelper.php:355
-#: include/views/inventory.host.view.php:222 jsLoader.php:331
+#: include/views/inventory.host.view.php:222 jsLoader.php:312
 msgid "Configuration"
 msgstr "配置"
 
@@ -3866,8 +3866,8 @@ msgstr "座标"
 #: include/views/configuration.copy.elements.php:77
 #: include/views/configuration.graph.list.php:237
 #: include/views/configuration.item.list.php:309
-#: include/views/configuration.triggers.list.php:342 jsLoader.php:149
-#: jsLoader.php:175 jsLoader.php:271
+#: include/views/configuration.triggers.list.php:342 jsLoader.php:130
+#: jsLoader.php:156 jsLoader.php:252
 msgid "Copy"
 msgstr "复制"
 
@@ -3995,11 +3995,11 @@ msgstr "创建关联项"
 msgid "Create dashboard"
 msgstr "创建仪表盘"
 
-#: jsLoader.php:336
+#: jsLoader.php:317
 msgid "Create dependent discovery rule"
 msgstr ""
 
-#: jsLoader.php:335
+#: jsLoader.php:316
 msgid "Create dependent item"
 msgstr "创建仪表盘依赖项"
 
@@ -4116,7 +4116,7 @@ msgstr "创建拓扑图"
 msgid "Create media type"
 msgstr "创建媒体类型"
 
-#: app/views/popup.import.php:130 jsLoader.php:333
+#: app/views/popup.import.php:130 jsLoader.php:314
 msgid "Create new"
 msgstr "创建新的"
 
@@ -4136,7 +4136,7 @@ msgstr "创建脚本"
 msgid "Create template"
 msgstr "创建模板"
 
-#: include/views/configuration.triggers.list.php:148 jsLoader.php:334
+#: include/views/configuration.triggers.list.php:148 jsLoader.php:315
 msgid "Create trigger"
 msgstr "创建触发器"
 
@@ -4311,7 +4311,7 @@ msgstr "DNS名称"
 msgid "Daily"
 msgstr "每日"
 
-#: include/classes/core/ZBase.php:364
+#: include/classes/core/ZBase.php:358
 msgid "Dark"
 msgstr "暗色"
 
@@ -4385,7 +4385,7 @@ msgstr ""
 #: include/html.inc.php:371 include/views/configuration.template.list.php:121
 #: include/views/configuration.template.list.php:233
 #: include/views/inventory.host.view.php:168
-#: include/views/inventory.host.view.php:172 jsLoader.php:337
+#: include/views/inventory.host.view.php:172 jsLoader.php:318
 msgid "Dashboards"
 msgstr "仪表盘"
 
@@ -4555,7 +4555,7 @@ msgstr "星期几"
 msgid "Days"
 msgstr "天数"
 
-#: app/controllers/CControllerPopupMediatypeTestSend.php:172 jsLoader.php:366
+#: app/controllers/CControllerPopupMediatypeTestSend.php:172 jsLoader.php:347
 msgid "Debug"
 msgstr "调试"
 
@@ -4569,7 +4569,7 @@ msgstr "调试模式"
 msgid "Dec"
 msgstr "十二"
 
-#: include/func.inc.php:111 include/func.inc.php:248 jsLoader.php:234
+#: include/func.inc.php:111 include/func.inc.php:248 jsLoader.php:215
 msgid "December"
 msgstr "十二"
 
@@ -4584,7 +4584,7 @@ msgstr ""
 #: include/views/inventory.host.view.php:79
 #: include/views/js/monitoring.sysmaps.js.php:145
 #: include/views/js/monitoring.sysmaps.js.php:263
-#: include/views/js/monitoring.sysmaps.js.php:659 jsLoader.php:260
+#: include/views/js/monitoring.sysmaps.js.php:659 jsLoader.php:241
 msgid "Default"
 msgstr "默认"
 
@@ -4699,8 +4699,8 @@ msgstr "被延迟由于"
 #: include/views/configuration.template.list.php:283
 #: include/views/configuration.trigger.prototype.list.php:207
 #: include/views/configuration.triggers.list.php:349
-#: include/views/monitoring.sysmap.list.php:109 jsLoader.php:150
-#: jsLoader.php:176 jsLoader.php:338
+#: include/views/monitoring.sysmap.list.php:109 jsLoader.php:131
+#: jsLoader.php:157 jsLoader.php:319
 msgid "Delete"
 msgstr "删除"
 
@@ -4729,7 +4729,7 @@ msgstr "删除目前的动作?"
 msgid "Delete current correlation?"
 msgstr "删除当前的关联项？"
 
-#: jsLoader.php:339
+#: jsLoader.php:320
 msgid "Delete dashboard?"
 msgstr "你确定要删除仪表盘？"
 
@@ -4773,7 +4773,7 @@ msgstr "删除监控项目模板?"
 msgid "Delete item?"
 msgstr "删除监控项?"
 
-#: jsLoader.php:276
+#: jsLoader.php:257
 msgid "Delete links between selected elements?"
 msgstr "删除所选组件间的连接?"
 
@@ -4829,7 +4829,7 @@ msgstr "删除所有的仪表盘？（危险）"
 msgid "Delete selected discovery rules?"
 msgstr "删除所选的发现规则?"
 
-#: jsLoader.php:263
+#: jsLoader.php:244
 msgid "Delete selected elements?"
 msgstr "删除所选的元素?"
 
@@ -4926,7 +4926,7 @@ msgstr ""
 msgid "Delete selected scripts?"
 msgstr "删除所选的脚本?"
 
-#: jsLoader.php:264
+#: jsLoader.php:245
 msgid "Delete selected shapes?"
 msgstr "删除所选形状？"
 
@@ -5480,7 +5480,7 @@ msgstr "显示堆叠数据图"
 #: app/views/administration.queue.details.php:85 app/views/search.php:184
 #: app/views/search.php:268 app/views/search.php:367
 #: include/actions.inc.php:1669 include/actions.inc.php:1741
-#: include/classes/helpers/CPagerHelper.php:147 jsLoader.php:378
+#: include/classes/helpers/CPagerHelper.php:147 jsLoader.php:359
 #, c-format
 msgid "Displaying %1$s of %2$s found"
 msgstr "显示 已自动发现的 %2$s中的%1$s"
@@ -5516,7 +5516,7 @@ msgstr ""
 msgid "Do not keep trends"
 msgstr ""
 
-#: jsLoader.php:216 jsLoader.php:340
+#: jsLoader.php:197 jsLoader.php:321
 msgid "Do you wish to replace the conditional expression?"
 msgstr "您想要替换条件式表达式吗?"
 
@@ -5572,7 +5572,7 @@ msgctxt "discovery status"
 msgid "Down"
 msgstr "下"
 
-#: jsLoader.php:190 jsLoader.php:204
+#: jsLoader.php:171 jsLoader.php:185
 msgid "Download image"
 msgstr ""
 
@@ -5676,7 +5676,7 @@ msgstr "动态监控项"
 msgid "Dynamic items"
 msgstr "动态监控项"
 
-#: jsLoader.php:275
+#: jsLoader.php:256
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr "每个URL必须是唯一的. 请确保只有一个被命名的 URL."
 
@@ -5698,8 +5698,8 @@ msgstr ""
 #: include/views/configuration.triggers.edit.php:350
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:118
 #: include/views/js/monitoring.sysmaps.js.php:836
-#: include/views/js/monitoring.sysmaps.js.php:851 jsLoader.php:177
-#: jsLoader.php:198
+#: include/views/js/monitoring.sysmaps.js.php:851 jsLoader.php:158
+#: jsLoader.php:179
 msgid "Edit"
 msgstr "编辑"
 
@@ -5715,11 +5715,11 @@ msgstr "编辑拓扑图"
 msgid "Edit operation"
 msgstr ""
 
-#: jsLoader.php:199
+#: jsLoader.php:180
 msgid "Edit tree element"
 msgstr "编辑树元素"
 
-#: jsLoader.php:341
+#: jsLoader.php:322
 msgid "Edit trigger"
 msgstr "编辑触发器"
 
@@ -6112,7 +6112,7 @@ msgstr "错误"
 msgid "Error in search request for table \"%1$s\"."
 msgstr "查找表请求出现 \"%1$s\"的错误."
 
-#: include/func.inc.php:1642 jsLoader.php:218
+#: include/func.inc.php:1642 jsLoader.php:199
 msgid "Error message"
 msgstr "错误信息"
 
@@ -6225,7 +6225,7 @@ msgstr "除外"
 msgid "Exclude host groups"
 msgstr "排除主机组"
 
-#: app/controllers/CControllerAuditLogList.php:173 jsLoader.php:209
+#: app/controllers/CControllerAuditLogList.php:173 jsLoader.php:190
 msgid "Execute"
 msgstr "执行"
 
@@ -6271,7 +6271,7 @@ msgstr "已执行"
 msgid "Executed script"
 msgstr "已执行的脚本"
 
-#: jsLoader.php:210
+#: jsLoader.php:191
 msgid "Execution confirmation"
 msgstr "执行确认"
 
@@ -6287,8 +6287,8 @@ msgid "Exists"
 msgstr ""
 
 #: include/classes/html/CCollapsibleUiWidget.php:60
-#: include/classes/widgets/CWidgetHelper.php:982 jsLoader.php:299
-#: jsLoader.php:302
+#: include/classes/widgets/CWidgetHelper.php:982 jsLoader.php:280
+#: jsLoader.php:283
 msgid "Expand"
 msgstr "扩展"
 
@@ -6409,7 +6409,7 @@ msgstr "表达式"
 msgid "External check"
 msgstr "外部检查"
 
-#: jsLoader.php:246
+#: jsLoader.php:227
 msgctxt "Friday short"
 msgid "F"
 msgstr "F"
@@ -6444,11 +6444,11 @@ msgstr "创建仪表盘失败"
 msgid "Failed to parse URL."
 msgstr "无法解析URL。"
 
-#: jsLoader.php:151
+#: jsLoader.php:132
 msgid "Failed to paste dashboard page."
 msgstr ""
 
-#: jsLoader.php:152
+#: jsLoader.php:133
 msgid "Failed to paste widget."
 msgstr ""
 
@@ -6459,11 +6459,11 @@ msgstr ""
 msgid "Failed to update dashboard"
 msgstr "更新仪表盘失败"
 
-#: jsLoader.php:153
+#: jsLoader.php:134
 msgid "Failed to update dashboard page properties."
 msgstr ""
 
-#: jsLoader.php:154
+#: jsLoader.php:135
 msgid "Failed to update dashboard properties."
 msgstr ""
 
@@ -6475,7 +6475,7 @@ msgstr ""
 msgid "Failed to update template."
 msgstr "更新模板失败"
 
-#: jsLoader.php:155
+#: jsLoader.php:136
 msgid "Failed to update widget properties."
 msgstr ""
 
@@ -6499,7 +6499,7 @@ msgstr "常用的拓扑图"
 msgid "Feb"
 msgstr "二月"
 
-#: include/func.inc.php:101 include/func.inc.php:238 jsLoader.php:224
+#: include/func.inc.php:101 include/func.inc.php:238 jsLoader.php:205
 msgid "February"
 msgstr "二月"
 
@@ -6778,7 +6778,7 @@ msgstr "法语 (fr_FR)"
 msgid "Fri"
 msgstr "周五"
 
-#: include/func.inc.php:123 include/func.inc.php:213 jsLoader.php:239
+#: include/func.inc.php:123 include/func.inc.php:213 jsLoader.php:220
 msgid "Friday"
 msgstr "周五"
 
@@ -6906,7 +6906,7 @@ msgstr "全局值"
 msgid "Go back to %1$s"
 msgstr "返回 %1$s"
 
-#: jsLoader.php:346
+#: jsLoader.php:327
 msgid "Go to"
 msgstr "到"
 
@@ -7119,7 +7119,7 @@ msgstr "图表名称 \"%1$s\" 已经存在在图表或者图表原型."
 #: include/views/inventory.host.view.php:158
 #: include/views/inventory.host.view.php:166
 #: include/views/inventory.host.view.php:194
-#: include/views/inventory.host.view.php:217 jsLoader.php:347
+#: include/views/inventory.host.view.php:217 jsLoader.php:328
 msgid "Graphs"
 msgstr "图形"
 
@@ -7319,11 +7319,11 @@ msgstr "帮助"
 msgid "Hexadecimal to decimal"
 msgstr "十六进制到十进制"
 
-#: include/views/monitoring.sysmap.constructor.php:57 jsLoader.php:253
+#: include/views/monitoring.sysmap.constructor.php:57 jsLoader.php:234
 msgid "Hidden"
 msgstr "隐藏的"
 
-#: jsLoader.php:367
+#: jsLoader.php:348
 msgid "Hide debug"
 msgstr "隐藏调试"
 
@@ -7351,11 +7351,11 @@ msgstr "阶"
 msgid "High"
 msgstr "严重"
 
-#: include/classes/core/ZBase.php:366
+#: include/classes/core/ZBase.php:360
 msgid "High-contrast dark"
 msgstr "高对比度暗色"
 
-#: include/classes/core/ZBase.php:365
+#: include/classes/core/ZBase.php:359
 msgid "High-contrast light"
 msgstr "高对比度亮色"
 
@@ -7376,7 +7376,7 @@ msgstr "高亮整行"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:49
 #: include/forms.inc.php:550 include/views/configuration.item.list.php:89
 #: include/views/configuration.item.prototype.list.php:62 items.php:261
-#: jsLoader.php:348
+#: jsLoader.php:329
 msgid "History"
 msgstr "历史记录"
 
@@ -7464,7 +7464,7 @@ msgstr "横向对齐"
 #: include/views/js/monitoring.sysmaps.js.php:92
 #: include/views/js/monitoring.sysmaps.js.php:161
 #: include/views/reports.toptriggers.php:83 items.php:982 items.php:1101
-#: jsLoader.php:255 jsLoader.php:349 report2.php:506
+#: jsLoader.php:236 jsLoader.php:330 report2.php:506
 msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "主机"
@@ -7548,7 +7548,7 @@ msgstr[0] "主机已启用"
 #: include/views/configuration.hostgroups.edit.php:51
 #: include/views/js/monitoring.sysmaps.js.php:95
 #: include/views/js/monitoring.sysmaps.js.php:102
-#: include/views/js/monitoring.sysmaps.js.php:152 jsLoader.php:258
+#: include/views/js/monitoring.sysmaps.js.php:152 jsLoader.php:239
 #: report2.php:398
 msgid "Host group"
 msgstr "主机群组"
@@ -8035,7 +8035,7 @@ msgstr ""
 #: app/views/administration.image.edit.php:66 image.php:26
 #: include/classes/helpers/CMapHelper.php:227 include/maps.inc.php:28
 #: include/maps.inc.php:307 include/views/js/monitoring.sysmaps.js.php:96
-#: jsLoader.php:259
+#: jsLoader.php:240
 msgid "Image"
 msgstr "图片"
 
@@ -9354,7 +9354,7 @@ msgid "Insert"
 msgstr "插入"
 
 #: include/views/configuration.trigger.prototype.edit.php:136
-#: include/views/configuration.triggers.edit.php:162 jsLoader.php:342
+#: include/views/configuration.triggers.edit.php:162 jsLoader.php:323
 msgid "Insert expression"
 msgstr "插入表达式"
 
@@ -9811,7 +9811,7 @@ msgstr "无效的时间段"
 #: include/classes/helpers/CMenuHelper.php:103
 #: include/classes/helpers/CRoleHelper.php:350
 #: include/views/configuration.host.edit.php:446
-#: include/views/configuration.host.prototype.edit.php:363 jsLoader.php:350
+#: include/views/configuration.host.prototype.edit.php:363 jsLoader.php:331
 msgid "Inventory"
 msgstr "资产记录"
 
@@ -9997,7 +9997,7 @@ msgstr ""
 msgid "Item tags"
 msgstr ""
 
-#: jsLoader.php:372
+#: jsLoader.php:353
 msgid "Item type does not use interface"
 msgstr ""
 
@@ -10158,7 +10158,7 @@ msgstr ""
 msgid "Jan"
 msgstr "一月"
 
-#: include/func.inc.php:100 include/func.inc.php:237 jsLoader.php:223
+#: include/func.inc.php:100 include/func.inc.php:237 jsLoader.php:204
 msgid "January"
 msgstr "一月"
 
@@ -10180,7 +10180,7 @@ msgstr ""
 msgid "Jul"
 msgstr "七月"
 
-#: include/func.inc.php:106 include/func.inc.php:243 jsLoader.php:229
+#: include/func.inc.php:106 include/func.inc.php:243 jsLoader.php:210
 msgid "July"
 msgstr "七月"
 
@@ -10188,7 +10188,7 @@ msgstr "七月"
 msgid "Jun"
 msgstr "六月"
 
-#: include/func.inc.php:105 include/func.inc.php:242 jsLoader.php:228
+#: include/func.inc.php:105 include/func.inc.php:242 jsLoader.php:209
 msgid "June"
 msgstr "六月"
 
@@ -10365,11 +10365,11 @@ msgstr ""
 msgid "Last check"
 msgstr "最近检查记录"
 
-#: jsLoader.php:353
+#: jsLoader.php:334
 msgid "Last hour graph"
 msgstr "最近一小时"
 
-#: jsLoader.php:354
+#: jsLoader.php:335
 msgid "Last month graph"
 msgstr "上月图形"
 
@@ -10399,7 +10399,7 @@ msgstr ""
 msgid "Last value"
 msgstr "最新数据"
 
-#: jsLoader.php:355
+#: jsLoader.php:336
 msgid "Last week graph"
 msgstr "上周图形"
 
@@ -10412,11 +10412,11 @@ msgstr "上周图形"
 #: include/classes/helpers/CMenuHelper.php:61
 #: include/classes/helpers/CRoleHelper.php:383
 #: include/views/inventory.host.view.php:143
-#: include/views/inventory.host.view.php:149 jsLoader.php:351
+#: include/views/inventory.host.view.php:149 jsLoader.php:332
 msgid "Latest data"
 msgstr "最新数据"
 
-#: jsLoader.php:352
+#: jsLoader.php:333
 msgid "Latest values"
 msgstr "最新值"
 
@@ -10743,7 +10743,7 @@ msgstr "低级发现规则在“不支持”状态"
 msgid "M"
 msgstr "M"
 
-#: jsLoader.php:242
+#: jsLoader.php:223
 msgctxt "Monday short"
 msgid "M"
 msgstr "M"
@@ -10928,7 +10928,7 @@ msgstr "手动关闭"
 #: include/classes/widgets/forms/CWidgetFormMap.php:70 include/maps.inc.php:27
 #: include/views/js/monitoring.sysmaps.js.php:93
 #: include/views/js/monitoring.sysmaps.js.php:208
-#: include/views/monitoring.sysmap.edit.php:317 jsLoader.php:256 map.php:25
+#: include/views/monitoring.sysmap.edit.php:317 jsLoader.php:237 map.php:25
 msgid "Map"
 msgstr "拓扑图"
 
@@ -11029,7 +11029,7 @@ msgstr "拓扑图"
 msgid "Mar"
 msgstr "三月"
 
-#: include/func.inc.php:102 include/func.inc.php:239 jsLoader.php:225
+#: include/func.inc.php:102 include/func.inc.php:239 jsLoader.php:206
 msgid "March"
 msgstr "三月"
 
@@ -11144,7 +11144,7 @@ msgstr[0] "将要显示的最大时间区间是%1$s天"
 msgid "Maximum total length of email address exceeded for media type with ID \"%1$s\"."
 msgstr "email 地址最大长度超出媒体类型 ID: \"%1$s\"。"
 
-#: include/func.inc.php:104 include/func.inc.php:241 jsLoader.php:227
+#: include/func.inc.php:104 include/func.inc.php:241 jsLoader.php:208
 msgid "May"
 msgstr "五月"
 
@@ -11489,7 +11489,7 @@ msgstr ""
 msgid "Mon"
 msgstr "一"
 
-#: include/func.inc.php:119 include/func.inc.php:209 jsLoader.php:235
+#: include/func.inc.php:119 include/func.inc.php:209 jsLoader.php:216
 msgid "Monday"
 msgstr "周一"
 
@@ -11530,11 +11530,11 @@ msgstr "月"
 msgid "Monthly"
 msgstr "每月"
 
-#: include/classes/html/CMultiSelect.php:83 jsLoader.php:314
+#: include/classes/html/CMultiSelect.php:83 jsLoader.php:295
 msgid "More matches found..."
 msgstr "更多匹配发现..."
 
-#: jsLoader.php:324
+#: jsLoader.php:305
 #, c-format
 msgctxt "screen reader"
 msgid "More than %1$d matches for %2$s found"
@@ -11563,7 +11563,7 @@ msgstr "多重"
 msgid "Multiple PROBLEM events"
 msgstr "多重问题事件"
 
-#: jsLoader.php:284
+#: jsLoader.php:265
 msgid "Mute"
 msgstr "静音"
 
@@ -11833,7 +11833,7 @@ msgstr "新的触发条件"
 msgid "New dashboard"
 msgstr "新仪表盘"
 
-#: jsLoader.php:270
+#: jsLoader.php:251
 msgid "New element"
 msgstr "新的组件"
 
@@ -11870,7 +11870,7 @@ msgid "New triggers"
 msgstr "新触发器"
 
 #: app/views/monitoring.dashboard.view.php:175
-#: app/views/monitoring.host.dashboard.view.php:112 jsLoader.php:183
+#: app/views/monitoring.host.dashboard.view.php:112 jsLoader.php:164
 msgid "Next page"
 msgstr ""
 
@@ -12096,7 +12096,7 @@ msgstr "没有图片"
 #: app/views/popup.massupdate.item.php:67
 #: include/views/configuration.host.discovery.edit.php:493
 #: include/views/configuration.item.edit.php:546
-#: include/views/configuration.item.prototype.edit.php:533 jsLoader.php:371
+#: include/views/configuration.item.prototype.edit.php:533 jsLoader.php:352
 msgid "No interface found"
 msgstr "没有找到接口"
 
@@ -12136,7 +12136,7 @@ msgstr "未发现宏"
 msgid "No maps added."
 msgstr "未添加拓扑图."
 
-#: include/classes/html/CMultiSelect.php:82 jsLoader.php:313
+#: include/classes/html/CMultiSelect.php:82 jsLoader.php:294
 msgid "No matches found"
 msgstr "没有找到匹配"
 
@@ -12345,7 +12345,7 @@ msgstr "没有指定的公钥文件"
 msgid "No recipients for action operation message."
 msgstr "没有动作操作信息的收受者。"
 
-#: include/classes/widgets/CWidgetConfig.php:282 jsLoader.php:178
+#: include/classes/widgets/CWidgetConfig.php:282 jsLoader.php:159
 msgid "No refresh"
 msgstr "没有刷新"
 
@@ -12512,7 +12512,7 @@ msgstr "通知所有参与者"
 msgid "Nov"
 msgstr "十一"
 
-#: include/func.inc.php:110 include/func.inc.php:247 jsLoader.php:233
+#: include/func.inc.php:110 include/func.inc.php:247 jsLoader.php:214
 msgid "November"
 msgstr "十一月"
 
@@ -12751,13 +12751,13 @@ msgstr "十月"
 msgid "Octal to decimal"
 msgstr "八进制转十进制"
 
-#: include/func.inc.php:109 include/func.inc.php:246 jsLoader.php:232
+#: include/func.inc.php:109 include/func.inc.php:246 jsLoader.php:213
 msgid "October"
 msgstr "十月"
 
 #: app/views/administration.proxy.list.php:155
 #: include/views/monitoring.sysmap.constructor.php:51
-#: include/views/monitoring.sysmap.constructor.php:61 jsLoader.php:252
+#: include/views/monitoring.sysmap.constructor.php:61 jsLoader.php:233
 msgid "Off"
 msgstr "关"
 
@@ -12770,7 +12770,7 @@ msgstr "关"
 #: app/views/report.services.php:82 app/views/report.services.php:83
 #: include/views/configuration.triggers.list.php:94
 #: include/views/js/common.item.edit.js.php:334
-#: include/views/js/configuration.httpconf.edit.js.php:103 jsLoader.php:383
+#: include/views/js/configuration.httpconf.edit.js.php:103 jsLoader.php:364
 #: report2.php:506
 msgid "Ok"
 msgstr "正常"
@@ -12789,7 +12789,7 @@ msgstr ""
 
 #: app/views/administration.proxy.list.php:154
 #: include/views/monitoring.sysmap.constructor.php:51
-#: include/views/monitoring.sysmap.constructor.php:61 jsLoader.php:251
+#: include/views/monitoring.sysmap.constructor.php:61 jsLoader.php:232
 msgid "On"
 msgstr "开"
 
@@ -12932,7 +12932,7 @@ msgstr ""
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr "由于未认证的请求, 操作无法完成."
 
-#: jsLoader.php:143
+#: jsLoader.php:124
 msgid "Operation details"
 msgstr "操作细节"
 
@@ -13328,7 +13328,7 @@ msgstr "POP"
 
 #: app/views/hintbox.eventlist.php:116
 #: app/views/monitoring.widget.problems.view.php:109 chart5.php:199
-#: include/classes/graph/CSvgGraph.php:1075
+#: include/classes/graph/CSvgGraph.php:1081
 #: include/classes/screens/CScreenProblem.php:974
 #: include/classes/screens/CScreenProblem.php:1184 include/events.inc.php:373
 #: include/triggers.inc.php:250 include/views/monitoring.overview.items.php:36
@@ -13378,7 +13378,7 @@ msgstr "共享密钥一致性"
 msgid "PSK is too short. Minimum is %1$s hex-digits."
 msgstr "PSK太短。最小的值是 %1$s 的十六进制数字。"
 
-#: jsLoader.php:156
+#: jsLoader.php:137
 #, c-format
 msgid "Page %1$d"
 msgstr ""
@@ -13511,7 +13511,7 @@ msgstr "密码 (再次确认)"
 msgid "Password is not mandatory for non internal authentication type."
 msgstr "非内部身份验证类型的密码不是强制的。"
 
-#: jsLoader.php:179 jsLoader.php:272
+#: jsLoader.php:160 jsLoader.php:253
 msgid "Paste"
 msgstr "粘贴"
 
@@ -13521,11 +13521,11 @@ msgid "Paste page"
 msgstr ""
 
 #: app/views/js/configuration.dashboard.edit.js.php:205
-#: app/views/js/monitoring.dashboard.view.js.php:315 jsLoader.php:157
+#: app/views/js/monitoring.dashboard.view.js.php:315 jsLoader.php:138
 msgid "Paste widget"
 msgstr ""
 
-#: jsLoader.php:273
+#: jsLoader.php:254
 msgid "Paste without external links"
 msgstr "粘贴无外部链接"
 
@@ -13670,7 +13670,7 @@ msgstr ""
 msgid "Please enter the host name or host IP address and port number of the Zabbix server, as well as the name of the installation (optional)."
 msgstr "请输入主机名或主机IP地址和zabbix服务器的端口号，以及安装的名称（可选）。"
 
-#: jsLoader.php:261
+#: jsLoader.php:242
 msgid "Please select two elements"
 msgstr "请选择两个组件"
 
@@ -13799,7 +13799,7 @@ msgid "Previous month"
 msgstr "上一个月"
 
 #: app/views/monitoring.dashboard.view.php:157
-#: app/views/monitoring.host.dashboard.view.php:94 jsLoader.php:184
+#: app/views/monitoring.host.dashboard.view.php:94 jsLoader.php:165
 msgid "Previous page"
 msgstr ""
 
@@ -13927,7 +13927,7 @@ msgstr "问题没有被制止"
 msgid "Problem is suppressed"
 msgstr "问题已被制止"
 
-#: jsLoader.php:282
+#: jsLoader.php:263
 msgid "Problem on"
 msgstr "问题在"
 
@@ -13975,7 +13975,7 @@ msgstr "问题, 如果至少一个下层有一个问题"
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:35
 #: include/classes/widgets/views/widget.svggraph.form.view.php:295
 #: include/views/inventory.host.view.php:151
-#: include/views/inventory.host.view.php:156 jsLoader.php:356 report2.php:506
+#: include/views/inventory.host.view.php:156 jsLoader.php:337 report2.php:506
 msgid "Problems"
 msgstr "问题"
 
@@ -14009,7 +14009,7 @@ msgid "Prometheus to JSON"
 msgstr ""
 
 #: include/views/monitoring.sysmap.list.php:76
-#: include/views/monitoring.sysmap.list.php:77 jsLoader.php:158
+#: include/views/monitoring.sysmap.list.php:77 jsLoader.php:139
 msgid "Properties"
 msgstr "属性"
 
@@ -14160,7 +14160,7 @@ msgstr ""
 
 #: app/views/hintbox.eventlist.php:100
 #: app/views/monitoring.widget.problems.view.php:93
-#: include/classes/graph/CSvgGraph.php:1071
+#: include/classes/graph/CSvgGraph.php:1077
 #: include/classes/screens/CScreenProblem.php:958
 #: include/classes/screens/CScreenProblem.php:1172 include/events.inc.php:357
 msgid "RESOLVED"
@@ -14293,7 +14293,7 @@ msgstr "矩形"
 msgid "Refresh"
 msgstr "刷新"
 
-#: include/classes/widgets/forms/CWidgetForm.php:58 jsLoader.php:180
+#: include/classes/widgets/forms/CWidgetForm.php:58 jsLoader.php:161
 msgid "Refresh interval"
 msgstr "刷新间隔"
 
@@ -14353,7 +14353,7 @@ msgstr "正则表达式"
 msgid "Related reports"
 msgstr ""
 
-#: jsLoader.php:165
+#: jsLoader.php:146
 msgid "Release to create a widget."
 msgstr ""
 
@@ -14495,8 +14495,8 @@ msgstr "远程命令"
 #: include/views/monitoring.sysmap.constructor.php:34
 #: include/views/monitoring.sysmap.constructor.php:40
 #: include/views/monitoring.sysmap.constructor.php:46
-#: include/views/monitoring.sysmap.edit.php:292 jsLoader.php:200
-#: jsLoader.php:269
+#: include/views/monitoring.sysmap.edit.php:292 jsLoader.php:181
+#: jsLoader.php:250
 msgid "Remove"
 msgstr "移除"
 
@@ -14536,7 +14536,7 @@ msgstr "删除，%1$s"
 msgid "Removed"
 msgstr ""
 
-#: jsLoader.php:319
+#: jsLoader.php:300
 #, c-format
 msgctxt "screen reader"
 msgid "Removed, %1$s"
@@ -14710,7 +14710,7 @@ msgstr "重设确认"
 msgid "Reset defaults"
 msgstr "重设预设"
 
-#: jsLoader.php:283
+#: jsLoader.php:264
 msgid "Resolved"
 msgstr "已解决"
 
@@ -14943,12 +14943,12 @@ msgstr "即在主机上指定的命令的执行。返回命令执行结果的文
 msgid "Russian (ru_RU)"
 msgstr "俄语 (ru_RU)"
 
-#: jsLoader.php:247
+#: jsLoader.php:228
 msgctxt "Saturday short"
 msgid "S"
 msgstr "S"
 
-#: jsLoader.php:248
+#: jsLoader.php:229
 msgctxt "Sunday short"
 msgid "S"
 msgstr "S"
@@ -15172,7 +15172,7 @@ msgstr "无衬线字体"
 msgid "Sat"
 msgstr "六"
 
-#: include/func.inc.php:124 include/func.inc.php:214 jsLoader.php:240
+#: include/func.inc.php:124 include/func.inc.php:214 jsLoader.php:221
 msgid "Saturday"
 msgstr "周六"
 
@@ -15341,7 +15341,7 @@ msgstr "脚本已更新"
 #: app/views/administration.script.edit.php:31
 #: app/views/administration.script.list.php:31
 #: include/classes/helpers/CMenuHelper.php:291
-#: include/classes/helpers/CRoleHelper.php:463 jsLoader.php:357
+#: include/classes/helpers/CRoleHelper.php:463 jsLoader.php:338
 msgid "Scripts"
 msgstr "脚本"
 
@@ -15421,7 +15421,7 @@ msgstr "安全名称"
 #: include/views/configuration.item.prototype.edit.php:83
 #: include/views/configuration.item.prototype.edit.php:479
 #: include/views/configuration.services.edit.php:99
-#: include/views/js/monitoring.sysmaps.js.php:216 jsLoader.php:317
+#: include/views/js/monitoring.sysmaps.js.php:216 jsLoader.php:298
 msgid "Select"
 msgstr "选择"
 
@@ -15457,19 +15457,19 @@ msgstr "所选的组件"
 msgid "Selected items only"
 msgstr "仅选择的监控项"
 
-#: jsLoader.php:322
+#: jsLoader.php:303
 #, c-format
 msgctxt "screen reader"
 msgid "Selected, %1$s in position %2$d of %3$d"
 msgstr "已选择，%1$s 在 %2$d 位置的 %3$d"
 
-#: jsLoader.php:323
+#: jsLoader.php:304
 #, c-format
 msgctxt "screen reader"
 msgid "Selected, %1$s, read only, in position %2$d of %3$d"
 msgstr "已选择，%1$s，只读，位于 %3$d 的位置 %2$d"
 
-#: jsLoader.php:267
+#: jsLoader.php:248
 msgid "Send backward"
 msgstr "往后发送"
 
@@ -15494,7 +15494,7 @@ msgstr "仅送到"
 msgid "Send to"
 msgstr "收件人"
 
-#: jsLoader.php:268
+#: jsLoader.php:249
 msgid "Send to back"
 msgstr "发回"
 
@@ -15527,7 +15527,7 @@ msgstr "分开的"
 msgid "Separately"
 msgstr ""
 
-#: include/func.inc.php:108 include/func.inc.php:245 jsLoader.php:231
+#: include/func.inc.php:108 include/func.inc.php:245 jsLoader.php:212
 msgid "September"
 msgstr "九月"
 
@@ -15646,7 +15646,7 @@ msgstr "服务"
 msgid "Services form a circular dependency."
 msgstr "服务形成了一个环."
 
-#: include/classes/core/ZBase.php:248 include/classes/core/ZBase.php:507
+#: include/classes/core/ZBase.php:242 include/classes/core/ZBase.php:470
 msgid "Session initialization error."
 msgstr ""
 
@@ -15676,7 +15676,7 @@ msgstr ""
 msgid "Set host inventory mode"
 msgstr "设置主机清单模式"
 
-#: include/classes/html/CInputSecret.php:80 jsLoader.php:389
+#: include/classes/html/CInputSecret.php:80 jsLoader.php:370
 msgid "Set new value"
 msgstr ""
 
@@ -15766,7 +15766,7 @@ msgstr ""
 msgid "Shared"
 msgstr ""
 
-#: include/views/monitoring.sysmap.edit.php:414 jsLoader.php:343
+#: include/views/monitoring.sysmap.edit.php:414 jsLoader.php:324
 msgid "Sharing"
 msgstr "分享"
 
@@ -15908,7 +15908,7 @@ msgstr "当Zabbix服务器停机时显示警告"
 msgid "Show working time"
 msgstr "查看工作时间"
 
-#: include/views/monitoring.sysmap.constructor.php:57 jsLoader.php:254
+#: include/views/monitoring.sysmap.constructor.php:57 jsLoader.php:235
 msgid "Shown"
 msgstr "已查看"
 
@@ -16017,7 +16017,7 @@ msgstr "略过复制图片\"%1$s\"到主机\"%2$s\"."
 msgid "Slovak (sk_SK)"
 msgstr "斯洛伐克(sk_SK)"
 
-#: jsLoader.php:288
+#: jsLoader.php:269
 msgid "Snooze"
 msgstr "Snooze"
 
@@ -16141,7 +16141,7 @@ msgstr "开始于"
 #: app/views/monitoring.dashboard.view.php:164
 #: app/views/monitoring.dashboard.view.php:232
 #: app/views/monitoring.host.dashboard.view.php:101
-#: app/views/monitoring.host.dashboard.view.php:165 jsLoader.php:159
+#: app/views/monitoring.host.dashboard.view.php:165 jsLoader.php:140
 msgid "Start slideshow"
 msgstr ""
 
@@ -16315,7 +16315,7 @@ msgstr ""
 #: app/views/monitoring.dashboard.view.php:163
 #: app/views/monitoring.dashboard.view.php:233
 #: app/views/monitoring.host.dashboard.view.php:100
-#: app/views/monitoring.host.dashboard.view.php:166 jsLoader.php:160
+#: app/views/monitoring.host.dashboard.view.php:166 jsLoader.php:141
 msgid "Stop slideshow"
 msgstr ""
 
@@ -16380,7 +16380,7 @@ msgctxt "encryption certificate"
 msgid "Subject"
 msgstr "主体"
 
-#: jsLoader.php:358
+#: jsLoader.php:339
 msgid "Submap"
 msgstr "子拓扑图"
 
@@ -16396,7 +16396,7 @@ msgstr ""
 msgid "Success Audit"
 msgstr "成功审计"
 
-#: include/func.inc.php:1641 jsLoader.php:217
+#: include/func.inc.php:1641 jsLoader.php:198
 msgid "Success message"
 msgstr "成功消息"
 
@@ -16409,7 +16409,7 @@ msgstr "网络接口上传下载的流量总和。返回整数"
 msgid "Sun"
 msgstr "日"
 
-#: include/func.inc.php:126 include/func.inc.php:208 jsLoader.php:241
+#: include/func.inc.php:126 include/func.inc.php:208 jsLoader.php:222
 msgid "Sunday"
 msgstr "日"
 
@@ -16508,12 +16508,12 @@ msgstr "系统时间。返回的是UTC整数。是服务器本地的时间"
 msgid "System uptime in seconds. Returns integer"
 msgstr "系统启动时间。返回整数"
 
-#: jsLoader.php:245
+#: jsLoader.php:226
 msgctxt "Thursday short"
 msgid "T"
 msgstr "T"
 
-#: jsLoader.php:243
+#: jsLoader.php:224
 msgctxt "Tuesday short"
 msgid "T"
 msgstr "T"
@@ -17043,7 +17043,7 @@ msgstr ""
 msgid "Thu"
 msgstr "四"
 
-#: include/func.inc.php:122 include/func.inc.php:212 jsLoader.php:238
+#: include/func.inc.php:122 include/func.inc.php:212 jsLoader.php:219
 msgid "Thursday"
 msgstr "周四"
 
@@ -17148,7 +17148,7 @@ msgstr "时间戳"
 msgid "To"
 msgstr "到"
 
-#: jsLoader.php:370
+#: jsLoader.php:351
 msgid "To set a host interface select a single item type for all items"
 msgstr "要设定一个主机接口, 选择一个单一的监控项类型给所有的监控项"
 
@@ -17280,7 +17280,7 @@ msgstr "趋势"
 #: include/views/configuration.triggers.edit.php:571
 #: include/views/js/monitoring.sysmaps.js.php:94
 #: include/views/js/monitoring.sysmaps.js.php:792
-#: include/views/reports.toptriggers.php:83 jsLoader.php:257 jsLoader.php:359
+#: include/views/reports.toptriggers.php:83 jsLoader.php:238 jsLoader.php:340
 #: services.php:355
 msgid "Trigger"
 msgstr "触发器"
@@ -17451,11 +17451,11 @@ msgstr "触发器模板已更新"
 msgid "Trigger severity"
 msgstr "触发器示警度"
 
-#: jsLoader.php:344
+#: jsLoader.php:325
 msgid "Trigger status \"OK\""
 msgstr "触发器状态 \"OK\""
 
-#: jsLoader.php:345
+#: jsLoader.php:326
 msgid "Trigger status \"Problem\""
 msgstr "触发器状态\"Problem\""
 
@@ -17507,7 +17507,7 @@ msgstr "修整"
 msgid "Tue"
 msgstr "二"
 
-#: include/func.inc.php:120 include/func.inc.php:210 jsLoader.php:236
+#: include/func.inc.php:120 include/func.inc.php:210 jsLoader.php:217
 msgid "Tuesday"
 msgstr "周二"
 
@@ -17520,7 +17520,7 @@ msgstr "土耳其语 (tr_TR)"
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
 msgstr "两个项目 (\"%1$s\"和\"%2$s\")不能填入一个主机资产纪录栏位\"%3$s\", 这会造成冲突."
 
-#: jsLoader.php:262
+#: jsLoader.php:243
 msgid "Two map elements should be selected"
 msgstr "应选择两个拓扑元素"
 
@@ -17621,7 +17621,7 @@ msgstr "未知的"
 #: include/views/configuration.trigger.prototype.edit.php:530
 #: include/views/configuration.triggers.edit.php:557
 #: include/views/js/monitoring.sysmaps.js.php:314
-#: include/views/monitoring.sysmap.edit.php:278 items.php:158 jsLoader.php:360
+#: include/views/monitoring.sysmap.edit.php:278 items.php:158 jsLoader.php:341
 msgid "URL"
 msgstr "URL"
 
@@ -17667,7 +17667,7 @@ msgid "URL should have both \"name\" and \"url\" fields for map \"%1$s\"."
 msgstr "拓扑图 \"%1$s\" URL、名称为必填项。"
 
 #: include/views/js/monitoring.sysmaps.js.php:311
-#: include/views/monitoring.sysmap.edit.php:311 jsLoader.php:361
+#: include/views/monitoring.sysmap.edit.php:311 jsLoader.php:342
 msgid "URLs"
 msgstr "URLs"
 
@@ -17757,7 +17757,7 @@ msgstr "解锁"
 msgid "Unblock selected users?"
 msgstr "解除锁定所选的用户?"
 
-#: include/classes/core/ZBase.php:610
+#: include/classes/core/ZBase.php:573
 #, c-format
 msgid "Unexpected response for action %1$s."
 msgstr ""
@@ -17860,7 +17860,7 @@ msgstr "自模板断开连接"
 msgid "Unlink from templates"
 msgstr "自模板断开链接"
 
-#: jsLoader.php:286
+#: jsLoader.php:267
 msgid "Unmute"
 msgstr "取消静音"
 
@@ -18805,7 +18805,7 @@ msgstr ""
 msgid "Vault authentication token"
 msgstr ""
 
-#: include/classes/core/ZBase.php:235
+#: include/classes/core/ZBase.php:229
 #: include/classes/setup/CSetupWizard.php:902 include/config.inc.php:53
 msgid "Vault connection failed."
 msgstr ""
@@ -18885,7 +18885,7 @@ msgstr "可见的名称"
 msgid "Visible name cannot be empty if host name is missing."
 msgstr "如果缺少主机名称, 可见的名称不能为空."
 
-#: jsLoader.php:244
+#: jsLoader.php:225
 msgctxt "Wednesday short"
 msgid "W"
 msgstr "W"
@@ -18902,11 +18902,11 @@ msgctxt "setup"
 msgid "Warning"
 msgstr "设置"
 
-#: include/func.inc.php:1643 jsLoader.php:219
+#: include/func.inc.php:1643 jsLoader.php:200
 msgid "Warning message"
 msgstr ""
 
-#: jsLoader.php:291
+#: jsLoader.php:272
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
 msgstr "很抱歉, 已经到了最大的组件数量."
 
@@ -18922,7 +18922,7 @@ msgstr "很抱歉, 已经到了最大的组件数量."
 #: include/views/inventory.host.view.php:136
 #: include/views/inventory.host.view.php:141
 #: include/views/inventory.host.view.php:206
-#: include/views/inventory.host.view.php:219 jsLoader.php:362
+#: include/views/inventory.host.view.php:219 jsLoader.php:343
 msgid "Web"
 msgstr "Web监测"
 
@@ -18990,7 +18990,7 @@ msgstr ""
 msgid "Wed"
 msgstr "三"
 
-#: include/func.inc.php:121 include/func.inc.php:211 jsLoader.php:237
+#: include/func.inc.php:121 include/func.inc.php:211 jsLoader.php:218
 msgid "Wednesday"
 msgstr "周三"
 
@@ -19018,7 +19018,7 @@ msgstr "当启用时"
 msgid "Widget at X:%3$d, Y:%4$d on page #%2$d of dashboard \"%1$s\" is out of bounds."
 msgstr ""
 
-#: jsLoader.php:186
+#: jsLoader.php:167
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr ""
 
@@ -19228,6 +19228,10 @@ msgstr "Y/m/d H:i:s"
 #: include/translateDefines.inc.php:30
 msgid "Y-m-d H:i:s"
 msgstr "Y-m-d H:i:s"
+
+#: include/translateDefines.inc.php:37
+msgid "Y-n-d"
+msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:446
 msgid "Y1"
@@ -19984,7 +19988,7 @@ msgstr ""
 msgid "circular item dependency is not allowed"
 msgstr "不允许循环项依赖"
 
-#: jsLoader.php:294
+#: jsLoader.php:275
 msgid "colour"
 msgstr "颜色"
 
@@ -20031,7 +20035,7 @@ msgstr "count() - 对于周期 T，成功检索的值 V（其满足运算符 O�
 msgid "countunique() - The number of unique values"
 msgstr ""
 
-#: include/func.inc.php:579 jsLoader.php:213
+#: include/func.inc.php:579 jsLoader.php:194
 msgctxt "day short"
 msgid "d"
 msgstr "d"
@@ -20230,7 +20234,7 @@ msgstr "全局管家设置"
 msgid "graph pattern"
 msgstr ""
 
-#: include/func.inc.php:580 jsLoader.php:214
+#: include/func.inc.php:580 jsLoader.php:195
 msgctxt "hour short"
 msgid "h"
 msgstr "h"
@@ -20513,12 +20517,12 @@ msgstr "底层发现规则"
 msgid "ltrim() - Remove specified characters from the beginning of a string"
 msgstr ""
 
-#: include/func.inc.php:581 jsLoader.php:140 jsLoader.php:215 jsLoader.php:379
+#: include/func.inc.php:581 jsLoader.php:121 jsLoader.php:196 jsLoader.php:360
 msgctxt "minute short"
 msgid "m"
 msgstr "m"
 
-#: include/func.inc.php:578 jsLoader.php:212
+#: include/func.inc.php:578 jsLoader.php:193
 msgctxt "month short"
 msgid "m"
 msgstr "m"
@@ -20663,6 +20667,14 @@ msgstr "必须在 \"%1$s\" 和 \"%2$s\" 之间"
 msgid "must contain at least one low-level discovery macro"
 msgstr "必须包含至少一个底层发现宏"
 
+#: include/translateDefines.inc.php:38
+msgid "n-d"
+msgstr ""
+
+#: include/translateDefines.inc.php:36
+msgid "n-d H:i"
+msgstr ""
+
 #: include/views/configuration.host.discovery.edit.php:182
 #: include/views/configuration.host.discovery.edit.php:320
 #: include/views/configuration.item.edit.php:218
@@ -20673,7 +20685,7 @@ msgstr "必须包含至少一个底层发现宏"
 msgid "name"
 msgstr "名字"
 
-#: include/classes/html/CMultiSelect.php:85 jsLoader.php:316
+#: include/classes/html/CMultiSelect.php:85 jsLoader.php:297
 msgid "new"
 msgstr "新"
 
@@ -20808,7 +20820,7 @@ msgstr "输出"
 msgid "path/to/secret"
 msgstr ""
 
-#: include/classes/html/CMacroValue.php:139 jsLoader.php:390
+#: include/classes/html/CMacroValue.php:139 jsLoader.php:371
 msgid "path/to/secret:key"
 msgstr ""
 
@@ -21117,7 +21129,7 @@ msgstr ""
 msgid "time filter default period exceeds the max period"
 msgstr ""
 
-#: jsLoader.php:295
+#: jsLoader.php:276
 msgid "time shift"
 msgstr "时间偏移"
 
@@ -21180,7 +21192,7 @@ msgid "truncate() - Truncates a value to decimal places"
 msgstr ""
 
 #: app/partials/layout.htmlpage.aside.php:74
-#: include/classes/html/CMultiSelect.php:84 jsLoader.php:315
+#: include/classes/html/CMultiSelect.php:84 jsLoader.php:296
 msgid "type here to search"
 msgstr "在此输入搜索"
 
@@ -21319,7 +21331,7 @@ msgstr "这个版本已经不被支持"
 #: include/views/js/configuration.httpconf.edit.js.php:73
 #: include/views/js/configuration.maintenance.edit.js.php:37
 #: include/views/js/configuration.maintenance.edit.js.php:61
-#: include/views/js/item.preprocessing.js.php:416 jsLoader.php:391
+#: include/views/js/item.preprocessing.js.php:416 jsLoader.php:372
 msgid "value"
 msgstr "值"
 
@@ -21460,7 +21472,7 @@ msgstr "错误的发现规则类型"
 msgid "wrong item type"
 msgstr "错误的监控项类型"
 
-#: include/func.inc.php:577 jsLoader.php:211
+#: include/func.inc.php:577 jsLoader.php:192
 msgctxt "year short"
 msgid "y"
 msgstr "y"
