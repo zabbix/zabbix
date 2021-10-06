@@ -50,9 +50,8 @@ class testMultiselect extends CWebTest {
 		$element->type($string);
 		$this->query('class', $class)->waitUntilVisible();
 
-		$this->assertScreenshotExcept($element->parents('class:form-grid')->one(),
-			[$element], $string
-		);
+		$this->assertScreenshotExcept($element->parents('class', (($query === 'host-form') ? 'form-grid' : 'table-forms'))
+				->one(), [$element], $string);
 	}
 
 	public function testMultiselect_NotSuggestAlreadySelected() {
