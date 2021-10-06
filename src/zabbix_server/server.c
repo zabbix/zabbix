@@ -1675,9 +1675,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	if (SUCCEED != zbx_db_check_instanceid())
 		exit(EXIT_FAILURE);
 
-	if (SUCCEED != zbx_ha_start(&error, ZBX_NODE_STATUS_UNKNOWN))
+	if (FAIL == zbx_export_init(&error))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot start HA manager: %s", error);
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize export: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
@@ -1689,9 +1689,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (FAIL == zbx_export_init(&error))
+	if (SUCCEED != zbx_ha_start(&error, ZBX_NODE_STATUS_UNKNOWN))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize export: %s", error);
+		zabbix_log(LOG_LEVEL_CRIT, "cannot start HA manager: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
