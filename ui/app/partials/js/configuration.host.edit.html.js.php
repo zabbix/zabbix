@@ -469,8 +469,10 @@ $linked_templates = $host_is_discovered ? array_column($data['host']['parentTemp
 				for (const key in fields.macros) {
 					const macro = fields.macros[key];
 					macro.macro = macro.macro.trim();
-					macro.value = macro.value.trim();
 
+					if ('value' in macro) {
+						macro.value = macro.value.trim();
+					}
 					if ('description' in macro) {
 						macro.description = macro.description.trim();
 					}
