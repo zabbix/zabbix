@@ -91,7 +91,6 @@ if (getRequest('parent_discoveryid')) {
 
 	if ($hostid != 0) {
 		$hostPrototype = API::HostPrototype()->get([
-			'hostids' => [$hostid],
 			'output' => API_OUTPUT_EXTEND,
 			'selectGroupLinks' => API_OUTPUT_EXTEND,
 			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
@@ -100,6 +99,7 @@ if (getRequest('parent_discoveryid')) {
 			'selectMacros' => ['hostmacroid', 'macro', 'value', 'type', 'description'],
 			'selectTags' => ['tag', 'value'],
 			'selectInterfaces' => ['type', 'main', 'useip', 'ip', 'dns', 'port', 'details'],
+			'hostids' => $hostid,
 			'editable' => true
 		]);
 		$hostPrototype = reset($hostPrototype);
@@ -125,7 +125,7 @@ $macros = cleanInheritedMacros(getRequest('macros', []));
 
 // Remove empty new macro lines.
 $macros = array_filter($macros, function($macro) {
-	$keys = array_flip(['hostmacroid', 'macro', 'value', 'description']);
+	$keys = array_flip(['macro', 'value', 'description']);
 
 	return (bool) array_filter(array_intersect_key($macro, $keys));
 });
@@ -186,8 +186,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		'discover' => getRequest('discover', DB::getDefault('hosts', 'discover')),
 		'groupLinks' => [],
 		'groupPrototypes' => [],
-		'tags' => $tags,
-		'macros' => $macros,
 		'templates' => array_merge(getRequest('templates', []), getRequest('add_templates', [])),
 		'custom_interfaces' => getRequest('custom_interfaces', DB::getDefault('hosts', 'custom_interfaces'))
 	];
@@ -196,16 +194,29 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$newHostPrototype['inventory_mode'] = getRequest('inventory_mode');
 	}
 
+	if ($tags) {
+		$newHostPrototype['tags'] = $tags;
+	}
+
+	if ($macros) {
+		$macros = array_map(function($macro) {
+			return array_diff_key($macro, array_flip(['hostmacroid']));
+		}, $macros);
+
+		$newHostPrototype['macros'] = $macros;
+	}
+
 	// API requires 'templateid' property.
 	if ($newHostPrototype['templates']) {
 		$newHostPrototype['templates'] = zbx_toObject($newHostPrototype['templates'], 'templateid');
 	}
+	else {
+		unset($newHostPrototype['templates']);
+	}
 
 	// add custom group prototypes
 	foreach (getRequest('group_prototypes', []) as $groupPrototype) {
-		if (!$groupPrototype['group_prototypeid']) {
-			unset($groupPrototype['group_prototypeid']);
-		}
+		unset($groupPrototype['group_prototypeid']);
 
 		if ($groupPrototype['name'] !== '') {
 			$newHostPrototype['groupPrototypes'][] = $groupPrototype;
@@ -215,21 +226,41 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	if ($newHostPrototype['custom_interfaces'] == HOST_PROT_INTERFACES_CUSTOM) {
 		$interfaces = getRequest('interfaces', []);
 
-		foreach ($interfaces as $key => $interface) {
+		foreach ($interfaces as &$interface) {
 			// Process SNMP interface fields.
 			if ($interface['type'] == INTERFACE_TYPE_SNMP) {
 				if (!array_key_exists('details', $interface)) {
 					$interface['details'] = [];
 				}
 
-				$interfaces[$key]['details']['bulk'] = array_key_exists('bulk', $interface['details'])
+				$interface['details']['bulk'] = array_key_exists('bulk', $interface['details'])
 					? SNMP_BULK_ENABLED
 					: SNMP_BULK_DISABLED;
+
+				if ($interface['details']['version'] == SNMP_V1 || $interface['details']['version'] == SNMP_V2C) {
+					unset($interface['details']['securityname'], $interface['details']['securitylevel'],
+						$interface['details']['authpassphrase'], $interface['details']['privpassphrase'],
+						$interface['details']['authprotocol'], $interface['details']['privprotocol'],
+						$interface['details']['contextname']
+					);
+				}
+				else {
+					switch ($interface['details']['securitylevel']) {
+						case ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV:
+							unset($interface['details']['authprotocol'], $interface['details']['authpassphrase']);
+							// break; is not missing here
+						case ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV:
+							unset($interface['details']['privprotocol'], $interface['details']['privpassphrase']);
+					}
+
+					unset($interface['details']['community']);
+				}
 			}
 
-			unset($interfaces[$key]['isNew'], $interfaces[$key]['items'], $interfaces[$key]['interfaceid']);
-			$interfaces[$key]['main'] = 0;
+			unset($interface['isNew'], $interface['items'], $interface['interfaceid']);
+			$interface['main'] = 0;
 		}
+		unset($interface);
 
 		$main_interfaces = getRequest('mainInterfaces', []);
 
@@ -253,24 +284,18 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$groupPrototypesByGroupId = zbx_toHash($hostPrototype['groupLinks'], 'groupid');
 			unset($groupPrototypesByGroupId[0]);
 			foreach (getRequest('group_links', []) as $groupId) {
-				if (isset($groupPrototypesByGroupId[$groupId])) {
-					$newHostPrototype['groupLinks'][] = [
-						'groupid' => $groupPrototypesByGroupId[$groupId]['groupid'],
-						'group_prototypeid' => $groupPrototypesByGroupId[$groupId]['group_prototypeid']
-					];
-				}
-				else {
-					$newHostPrototype['groupLinks'][] = [
-						'groupid' => $groupId
-					];
-				}
+				$newHostPrototype['groupLinks'][] = [
+					'groupid' => array_key_exists($groupId, $groupPrototypesByGroupId)
+						? $groupPrototypesByGroupId[$groupId]['groupid']
+						: $groupId
+				];
+
 			}
 		}
 		else {
 			unset($newHostPrototype['groupPrototypes'], $newHostPrototype['groupLinks']);
 		}
 
-		$newHostPrototype = CArrayHelper::unsetEqualValues($newHostPrototype, $hostPrototype, ['hostid']);
 		$result = API::HostPrototype()->update($newHostPrototype);
 
 		show_messages($result, _('Host prototype updated'), _('Cannot update host prototype'));
@@ -283,6 +308,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$newHostPrototype['groupLinks'][] = [
 				'groupid' => $groupId
 			];
+		}
+
+		if (count($newHostPrototype['groupPrototypes']) === 0) {
+			unset($newHostPrototype['groupPrototypes']);
 		}
 
 		$result = API::HostPrototype()->create($newHostPrototype);

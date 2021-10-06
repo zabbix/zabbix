@@ -44,21 +44,9 @@ abstract class CHostBase extends CApiService {
 			return;
 		}
 
-		// permission check
-		$templateIds = array_unique($templateIds);
-
-		$count = API::Template()->get([
-			'countOutput' => true,
-			'templateids' => $templateIds
-		]);
-
-		if ($count != count($templateIds)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
-
 		// check if someone passed duplicate templates in the same query
 		$templateIdDuplicates = zbx_arrayFindDuplicates($templateIds);
-		if (!zbx_empty($templateIdDuplicates)) {
+		if ($templateIdDuplicates) {
 			$duplicatesFound = [];
 			foreach ($templateIdDuplicates as $value => $count) {
 				$duplicatesFound[] = _s('template ID "%1$s" is passed %2$s times', $value, $count);
@@ -69,6 +57,14 @@ abstract class CHostBase extends CApiService {
 			);
 		}
 
+		$count = API::Template()->get([
+			'countOutput' => true,
+			'templateids' => $templateIds
+		]);
+
+		if ($count != count($templateIds)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
 		// get DB templates which exists in all targets
 		$res = DBselect('SELECT * FROM hosts_templates WHERE '.dbConditionInt('hostid', $targetIds));
 		$mas = [];
@@ -107,13 +103,12 @@ abstract class CHostBase extends CApiService {
 				' AND h.status='.HOST_STATUS_TEMPLATE;
 			if ($dbDepHost = DBfetch(DBselect($sql))) {
 				$tmpTpls = API::Template()->get([
-					'templateids' => $templateid,
-					'output'=> API_OUTPUT_EXTEND
+					'output'=> ['host'],
+					'templateids' => $templateid
 				]);
-				$tmpTpl = reset($tmpTpls);
 
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Trigger in template "%1$s" has dependency with trigger in template "%2$s".', $tmpTpl['host'], $dbDepHost['host']));
+					_s('Trigger in template "%1$s" has dependency with trigger in template "%2$s".', $tmpTpls[0]['host'], $dbDepHost['host']));
 			}
 		}
 
@@ -147,7 +142,12 @@ abstract class CHostBase extends CApiService {
 			self::checkCircularLinkage($hostsLinkageInserts);
 			self::checkDoubleLinkage($hostsLinkageInserts);
 
-			DB::insertBatch('hosts_templates', $hostsLinkageInserts);
+			$hosttemplateids = DB::insertBatch('hosts_templates', $hostsLinkageInserts);
+
+			foreach ($hostsLinkageInserts as &$host_linkage) {
+				$host_linkage['hosttemplateid'] = array_shift($hosttemplateids);
+			}
+			unset($host_linkage);
 		}
 
 		// check if all trigger templates are linked to host.
@@ -173,7 +173,7 @@ abstract class CHostBase extends CApiService {
 	protected function unlink($templateids, $targetids = null) {
 		$cond = ['templateid' => $templateids];
 		if (!is_null($targetids)) {
-			$cond['hostid'] =  $targetids;
+			$cond['hostid'] = $targetids;
 		}
 		DB::delete('hosts_templates', $cond);
 
@@ -184,7 +184,7 @@ abstract class CHostBase extends CApiService {
 				'nopermissions' => true
 			]);
 		}
-		else{
+		else {
 			$hosts = API::Host()->get([
 				'templateids' => $templateids,
 				'output' => ['hostid', 'host'],
