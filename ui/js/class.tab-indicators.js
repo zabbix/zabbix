@@ -308,8 +308,12 @@ class MacrosTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		return document
-			.querySelectorAll('#tbl_macros tr.form_row > td:first-child > textarea:not(:placeholder-shown):not([readonly])')
+		return [...document.querySelectorAll('#tbl_macros .form_row')].filter((row) => {
+			const macro = row.querySelector('textarea[name$="[macro]"]');
+			const value = row.querySelector('textarea[name$="[value]"]:not([readonly])');
+
+			return (macro !== null && macro.value !== '' && value !== null);
+		})
 			.length;
 	}
 
