@@ -981,26 +981,18 @@ class ChildServicesTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		return document
-			.querySelectorAll('#children tbody tr')
-			.length;
+		return document.querySelector('#children').dataset.tabIndicator;
 	}
 
 	initObserver(element) {
-		const target_node = document.querySelector('#children tbody');
+		const target_node = document.querySelector('#children');
 		const observer_options = {
-			childList: true,
-			subtree: true
+			attributes: true,
+			attributeFilter: ['data-tab-indicator']
 		};
 
 		const observer_callback = (mutationList, _observer) => {
-			mutationList.forEach((mutation) => {
-				switch (mutation.type) {
-					case 'childList':
-						this.addAttributes(element);
-						break;
-				}
-			});
+			this.addAttributes(element);
 		};
 
 		if (target_node) {

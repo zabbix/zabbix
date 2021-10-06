@@ -114,8 +114,8 @@ PREPARE_UPDATE_JSON_SNMP_INTERFACE_OP(funcname)									\
 PREPARE_AUDIT_SNMP_INTERFACE(host, host)
 PREPARE_AUDIT_SNMP_INTERFACE(host_prototype, hostprototype)
 
-void	zbx_audit_host_update_json_add_proxy_hostid_and_hostname(zbx_uint64_t hostid, zbx_uint64_t proxy_hostid,
-		const char *hostname)
+void	zbx_audit_host_update_json_add_proxy_hostid_and_hostname_and_inventory_mode(zbx_uint64_t hostid,
+		zbx_uint64_t proxy_hostid, const char *hostname, int inventory_mode)
 {
 	RETURN_IF_AUDIT_OFF();
 
@@ -124,11 +124,13 @@ void	zbx_audit_host_update_json_add_proxy_hostid_and_hostname(zbx_uint64_t hosti
 			AUDIT_TABLE_NAME, "proxy_hostid");
 	zbx_audit_update_json_append_string(hostid, AUDIT_DETAILS_ACTION_ADD, "host.host", hostname, AUDIT_TABLE_NAME,
 			"host");
+	zbx_audit_update_json_append_int(hostid, AUDIT_DETAILS_ACTION_ADD, "host.inventory_mode", inventory_mode, NULL,
+			NULL);
 #undef AUDIT_TABLE_NAME
 }
 
 void	zbx_audit_host_update_json_add_tls_and_psk(zbx_uint64_t hostid, int tls_connect, int tls_accept,
-		const char *psk_identity, const char *psk)
+		const char *tls_psk_identity, const char *tls_psk)
 {
 	RETURN_IF_AUDIT_OFF();
 
@@ -137,9 +139,9 @@ void	zbx_audit_host_update_json_add_tls_and_psk(zbx_uint64_t hostid, int tls_con
 			AUDIT_TABLE_NAME, "tls_connect");
 	zbx_audit_update_json_append_int(hostid, AUDIT_DETAILS_ACTION_ADD, "host.tls_accept", tls_accept,
 			AUDIT_TABLE_NAME, "tls_accept");
-	zbx_audit_update_json_append_string(hostid, AUDIT_DETAILS_ACTION_ADD, "host.psk_identity", psk_identity,
+	zbx_audit_update_json_append_string(hostid, AUDIT_DETAILS_ACTION_ADD, "host.psk_identity", tls_psk_identity,
 			AUDIT_TABLE_NAME, "tls_psk_identity");
-	zbx_audit_update_json_append_string(hostid, AUDIT_DETAILS_ACTION_ADD, "host.psk", psk, AUDIT_TABLE_NAME,
+	zbx_audit_update_json_append_string(hostid, AUDIT_DETAILS_ACTION_ADD, "host.psk", tls_psk, AUDIT_TABLE_NAME,
 			"tls_psk");
 #undef AUDIT_TABLE_NAME
 }
@@ -450,7 +452,7 @@ void	zbx_audit_host_del(zbx_uint64_t hostid, const char *hostname)
 void	zbx_audit_host_update_json_add_details(zbx_uint64_t hostid, const char *host, zbx_uint64_t proxy_hostid,
 		int ipmi_authtype, int ipmi_privilege, const char *ipmi_username, const char *ipmi_password,
 		int status, int flags, int tls_connect, int tls_accept, const char *tls_issuer, const char *tls_subject,
-		const char *tls_psk_identity, const char *tls_psk, int custom_interfaces)
+		const char *tls_psk_identity, const char *tls_psk, int custom_interfaces, int inventory_mode)
 {
 	RETURN_IF_AUDIT_OFF();
 
@@ -471,20 +473,17 @@ void	zbx_audit_host_update_json_add_details(zbx_uint64_t hostid, const char *hos
 			"status");
 	zbx_audit_update_json_append_int(hostid, AUDIT_DETAILS_ACTION_ADD, "host.flags", flags, AUDIT_TABLE_NAME,
 			"flags");
-	zbx_audit_update_json_append_int(hostid, AUDIT_DETAILS_ACTION_ADD, "host.tls_connect", tls_connect,
-			AUDIT_TABLE_NAME, "tls_connect");
-	zbx_audit_update_json_append_int(hostid, AUDIT_DETAILS_ACTION_ADD, "host.tls_accept", tls_accept,
-			AUDIT_TABLE_NAME, "tls_accept");
 	zbx_audit_update_json_append_string(hostid, AUDIT_DETAILS_ACTION_ADD, "host.tls_issuer", tls_issuer,
 			AUDIT_TABLE_NAME, "tls_issuer");
 	zbx_audit_update_json_append_string(hostid, AUDIT_DETAILS_ACTION_ADD, "host.tls_subject", tls_subject,
 			AUDIT_TABLE_NAME, "tls_subject");
-	zbx_audit_update_json_append_string(hostid, AUDIT_DETAILS_ACTION_ADD, "host.tls_psk_identity",
-			tls_psk_identity, AUDIT_TABLE_NAME, "tls_psk_identity");
-	zbx_audit_update_json_append_string(hostid, AUDIT_DETAILS_ACTION_ADD, "host.tls_psk", tls_psk, AUDIT_TABLE_NAME,
-			"tls_psk");
+
+	zbx_audit_host_update_json_add_tls_and_psk(hostid, tls_connect, tls_accept, tls_psk_identity, tls_psk);
+
 	zbx_audit_update_json_append_int(hostid, AUDIT_DETAILS_ACTION_ADD, "host.custom_interfaces", custom_interfaces,
 			AUDIT_TABLE_NAME, "custom_interfaces");
+	zbx_audit_update_json_append_int(hostid, AUDIT_DETAILS_ACTION_ADD, "host.inventory_mode", inventory_mode,
+			"host_inventory", "inventory_mode");
 #undef AUDIT_TABLE_NAME
 }
 
@@ -563,7 +562,7 @@ void	zbx_audit_host_prototype_del(zbx_uint64_t hostid, const char *hostname)
 }
 
 void	zbx_audit_host_prototype_update_json_add_details(zbx_uint64_t hostid, zbx_uint64_t templateid,
-		const char *name, int status, int discover, int custom_interfaces)
+		const char *name, int status, int discover, int custom_interfaces, int inventory_mode)
 {
 	RETURN_IF_AUDIT_OFF();
 
@@ -578,6 +577,8 @@ void	zbx_audit_host_prototype_update_json_add_details(zbx_uint64_t hostid, zbx_u
 			AUDIT_TABLE_NAME, "discover");
 	zbx_audit_update_json_append_int(hostid, AUDIT_DETAILS_ACTION_ADD, "hostprototype.custom_interfaces",
 			custom_interfaces, AUDIT_TABLE_NAME, "custom_interfaces");
+	zbx_audit_update_json_append_int(hostid, AUDIT_DETAILS_ACTION_ADD, "hostprototype.inventory_mode",
+			inventory_mode, "host_inventory", "inventory_mode");
 #undef AUDIT_TABLE_NAME
 }
 
@@ -602,6 +603,7 @@ PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE(name, const char*, string)
 PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE(status, int, int)
 PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE(discover, int, int)
 PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE(custom_interfaces, int, int)
+PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE(inventory_mode, int, int)
 #undef PREPARE_AUDIT_HOST_PROTOTYPE_UPDATE
 
 void	zbx_audit_host_prototype_update_json_add_group_details(zbx_uint64_t hostid, zbx_uint64_t group_prototypeid,

@@ -22,7 +22,7 @@ define('ZABBIX_VERSION',		'6.0.0alpha4');
 define('ZABBIX_API_VERSION',	'6.0.0');
 define('ZABBIX_EXPORT_VERSION',	'6.0');
 
-define('ZABBIX_DB_VERSION',		5050069);
+define('ZABBIX_DB_VERSION',		5050072);
 
 define('DB_VERSION_SUPPORTED',				0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',		1);
@@ -1342,6 +1342,8 @@ define('API_UUID',					42);
 define('API_VAULT_SECRET',			43);
 define('API_CUID',					45);
 define('API_IP_RANGES',				46);
+define('API_IMAGE',					47);
+define('API_EXEC_PARAMS',			48);
 
 // flags
 define('API_REQUIRED',					0x0001);
@@ -1793,6 +1795,10 @@ define('ZBX_STYLE_ACTIONS_NUM_YELLOW', 'icon-actions-number-yellow');
 define('ZBX_STYLE_ACTIONS_NUM_RED', 'icon-actions-number-red');
 define('ZBX_STYLE_INACTIVE_BG', 'inactive-bg');
 define('ZBX_STYLE_INFO_BG', 'info-bg');
+define('ZBX_STYLE_INLINE_FILTER', 'inline-filter');
+define('ZBX_STYLE_INLINE_FILTER_LABEL', 'inline-filter-label');
+define('ZBX_STYLE_INLINE_FILTER_FOOTER', 'inline-filter-footer');
+define('ZBX_STYLE_INLINE_FILTER_STATS', 'inline-filter-stats');
 define('ZBX_STYLE_INPUT_COLOR_PICKER', 'input-color-picker');
 define('ZBX_STYLE_LAYOUT_KIOSKMODE', 'layout-kioskmode');
 define('ZBX_STYLE_LAYOUT_WRAPPER', 'wrapper');

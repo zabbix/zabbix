@@ -43,7 +43,7 @@ static zbx_mutex_t	kstat_lock = ZBX_MUTEX_NULL;
  * Parameters: error - [OUT] the error message                                *
  *                                                                            *
  * Return value: SUCCEED - the kstat environment was refreshed successfully   *
- *               FAIL - otherwose                                             *
+ *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
 static int	zbx_kstat_refresh(char **error)
@@ -78,7 +78,7 @@ static int	zbx_kstat_refresh(char **error)
  *             error - [OUT] the error message                                *
  *                                                                            *
  * Return value: SUCCEED - the kstat environment was initialized successfully *
- *               FAIL - otherwose                                             *
+ *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
 int	zbx_kstat_init(zbx_kstat_t *kstat, char **error)

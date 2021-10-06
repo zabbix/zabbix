@@ -401,7 +401,16 @@ function DBfetch($cursor, $convertNulls = true) {
 			}
 			break;
 		case ZBX_DB_POSTGRESQL:
-			if (!$result = pg_fetch_assoc($cursor)) {
+			if ($result = pg_fetch_assoc($cursor)) {
+				$i = 0;
+				foreach ($result as &$value) {
+					if (pg_field_type($cursor, $i++) === 'bytea') {
+						$value = pg_unescape_bytea($value);
+					}
+				}
+				unset($value);
+			}
+			else {
 				pg_free_result($cursor);
 			}
 			break;

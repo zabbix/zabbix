@@ -35,7 +35,7 @@
  *                                                                            *
  * Purpose: load aliases from configuration                                   *
  *                                                                            *
- * Parameters: lines - aliase entries from configuration file                 *
+ * Parameters: lines - aliases from configuration file                        *
  *                                                                            *
  * Comments: calls add_alias() for each entry                                 *
  *                                                                            *
