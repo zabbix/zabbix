@@ -262,7 +262,7 @@ class CNewValidator {
 						$error_message = $result['is_valid'] ? null : $result['error'];
 					}
 					else {
-						$error_message = _('a time period is expected');
+						$error_message = _('a time unit is expected');
 					}
 
 					if ($error_message !== null) {
