@@ -1011,20 +1011,17 @@ int	zbx_ha_start(char **error, int ha_status)
 	if (FAIL == zbx_ipc_async_socket_send(&ha_socket, ZBX_IPC_SERVICE_HA_REGISTER, NULL, 0))
 	{
 		*error = zbx_dsprintf(NULL, "cannot queue message to HA manager service");
-		zbx_free(errmsg);
 		goto out;
 	}
 
 	if (FAIL == zbx_ipc_async_socket_flush(&ha_socket, ZBX_HA_SERVICE_TIMEOUT))
 	{
 		*error = zbx_dsprintf(NULL, "cannot send message to HA manager service");
-		zbx_free(errmsg);
 		goto out;
 	}
 
 	ret = SUCCEED;
 out:
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
