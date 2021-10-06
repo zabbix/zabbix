@@ -17,6 +17,7 @@ A.F....... [ZBXNEXT-6470,ZBXNEXT-6917] implemented audit logging of global macro
 A.F....... [ZBXNEXT-6470,ZBXNEXT-6910] implemented audit logging of dashboard and templatedashboard API object (rlataria)
 
 Bug fixes:
+....I..PS. [ZBX-19604] increased storage size of fields item_preproc.params, triggers.description and media_type_message.message for Oracle backend (MVekslers)
 ........S. [ZBX-19781] fixed server not linking host prototype inventory mode (arimdjonoks)
 A......... [ZBX-19978] fixed SQL errors when trying to get count of the interfaces (Sasha)
 .........T [ZBX-19774] fixed README examples (abiba)
