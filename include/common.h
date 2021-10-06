@@ -1657,7 +1657,6 @@ int	zbx_str_extract(const char *text, size_t len, char **value);
 #define AUDIT_RESOURCE_SCRIPT	25
 
 int	zbx_xml_to_json(char *xml_data, char **jstr, char **errmsg);
-int	zbx_json_to_xml(char *json_data, char **xstr, char **errmsg);
 #ifdef HAVE_LIBXML2
 int	zbx_open_xml(char *data, int options, int maxerrlen, void **xml_doc, void **root_node, char **errmsg);
 int	zbx_check_xml_memory(char *mem, int maxerrlen, char **errmsg);
