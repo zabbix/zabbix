@@ -227,7 +227,7 @@ $mediatype_formlist
 			->setAriaRequired(),
 		'row_webhook_script'
 	)
-	->addRow(new CLabel(_('Timeout'), 'timeout'),
+	->addRow((new CLabel(_('Timeout'), 'timeout'))->setAsteriskMark(),
 		(new CTextBox('timeout', $data['timeout']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 		'row_webhook_timeout'
 	)
