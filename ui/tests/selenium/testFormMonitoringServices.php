@@ -333,8 +333,7 @@ class testFormMonitoringServices extends CWebTest {
 			],
 		];
 
-		$this->assertTableData($child_services_data, 'css:div.overlay-dialogue-body table.list-table'
-	);
+		$this->assertTableData($child_services_data, 'css:div.overlay-dialogue-body table.list-table');
 
 		// Enter and submit filtering data
 		$childs_dialog->query('id:services-filter-name')->one()->fill('Parent1');
@@ -615,6 +614,37 @@ class testFormMonitoringServices extends CWebTest {
 					]
 				]
 			],
+			[
+				[
+					'fields' => [
+						'Name' => 'Service with childs'
+					],
+					'childs' => [
+						'Child services' => [
+							'Service' => 'Update service',
+							'Status calculation rule' => 'Most critical if all children have problems',
+							'Problem tags' => '',
+							'Action' => 'Remove'
+						]
+					]
+				]
+			],
+			// Check that you can create service with already existing name
+			[
+				[
+					'fields' => [
+						'Name' => 'Service dublicate',
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'Service dublicate',
+					],
+					'dublicate' => true
+				]
+			],
 			// This case should always be last, otherwise update sceanrio won't work.
 			[
 				[
@@ -722,10 +752,22 @@ class testFormMonitoringServices extends CWebTest {
 					return;
 				}
 			}
-			// Return to tab Service for filling it.
-			// In case if we have to fill other tab, switch to it in optimal order.
-			$form->selectTab('Service');
 		}
+		elseif (array_key_exists('childs', $data)) {
+			$form->selectTab('Child services');
+
+			$service = $form->getFieldContainer('Child services');
+			$service->query('button:Add')->waitUntilClickable()->one()->click();
+			$childs_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+			$childs_dialog->query('css:div[data-dialogueid="services"] table.list-table td input')->asCheckbox()->one()->click();
+			$childs_dialog->query('css:div[data-dialogueid="services"] div.overlay-dialogue-footer button')->one()->click();
+
+			$this->assertTableData([$data['childs']['Child services']], 'css: form#service-form div#child-services-tab table#children');
+		}
+
+		// Return to tab Service for filling it.
+		// In case if we have to fill other tab, switch to it in optimal order.
+		$form->selectTab('Service');
 
 		$form->fill($data['fields']);
 		$form->submit();
@@ -743,13 +785,16 @@ class testFormMonitoringServices extends CWebTest {
 			// Here Message text depends on Create or Update scenario.
 			$this->assertMessage(TEST_GOOD, ($update ? 'Service updated' : 'Service created'));
 			// Check that Service was actually created or updated in DB.
-			$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.
-			CXPathHelper::escapeQuotes($data['fields']['Name'])));
+			$count = (array_key_exists('dublicate', $data)) ? 2 : 1;
+			$this->assertEquals($count, CDBHelper::getCount('SELECT * FROM services WHERE name='.
+					CXPathHelper::escapeQuotes($data['fields']['Name']))
+			);
 
 			if ($update) {
 				// In update scenario check that old name actually changed.
 				$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services WHERE name='.
-				CXPathHelper::escapeQuotes(self::$update_service)));
+						CXPathHelper::escapeQuotes(self::$update_service))
+				);
 				// In update scenario we need to rewrite name for updating service in order to update the same service in next case.
 				// This also could be done using service id, it's up to you, but my variant seems to be easier.
 				self::$update_service = $data['fields']['Name'];
@@ -764,8 +809,21 @@ class testFormMonitoringServices extends CWebTest {
 						->query('link', $data['fields']['Parent services'])->waitUntilClickable()->one()->click();
 			}
 			// Find necessary Service name in table and localize its' row. Then in that row we can click Edit button.
-			$table->findRow('Name', $data['fields']['Name'])->query('xpath:.//button[@title="Edit"]')
-					->waitUntilClickable()->one()->click();
+			if (array_key_exists('childs', $data)) {
+				$row = $table->findRow('Name', $data['fields']['Name'], true);
+
+				$this->assertEquals($data['fields']['Name'].' '.count($data['childs']),
+						$row->getColumn('Name')->getText()
+				);
+
+				$row->query('xpath:.//button[@title="Edit"]')->waitUntilClickable()->one()->click();
+				$form->selectTab('Child services');
+				$this->assertTableData([$data['childs']['Child services']], 'css: form#service-form div#child-services-tab table#children');
+			}
+			else {
+				$table->findRow('Name', $data['fields']['Name'])->query('xpath:.//button[@title="Edit"]')
+				->waitUntilClickable()->one()->click();
+			}
 
 			COverlayDialogElement::find()->one()->waitUntilReady();
 			$form = $this->query('id:service-form')->asFluidForm()->one()->waitUntilReady();
@@ -796,10 +854,18 @@ class testFormMonitoringServices extends CWebTest {
 						], 'id:times'
 					);
 				}
+			}elseif(array_key_exists('childs', $data)) {
+				$form->selectTab('Child services');
+				$this->assertTableData([$data['childs']['Child services']], 'css: form#service-form div#child-services-tab table#children');
 			}
 
 			// This is easy framework function to check form values equal to data provider.
-			$form->checkValue($data['fields']);
+			if (array_key_exists('childs', $data)){
+				$form->checkValue($data['fields']['Name'].' '.count($data['childs']));
+			}
+			else {
+				$form->checkValue($data['fields']);
+			}
 		}
 	}
 
