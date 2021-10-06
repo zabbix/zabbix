@@ -25,7 +25,7 @@
 #define ZBX_IPC_SERVICE_HA_REGISTER	0
 #define ZBX_IPC_SERVICE_HA_PAUSE	1
 #define ZBX_IPC_SERVICE_HA_STOP		2
-#define ZBX_IPC_SERVICE_HA_REPORT	3
+#define ZBX_IPC_SERVICE_HA_NODES	3
 #define ZBX_IPC_SERVICE_HA_STATUS	4
 
 #define ZBX_NODE_STATUS_ERROR		-2
@@ -41,7 +41,7 @@ int	zbx_ha_stop(char **error);
 void	zbx_ha_kill(void);
 int	zbx_ha_get_status(char **error);
 int	zbx_ha_recv_status(int timeout, int *status, char **error);
-int	zbx_ha_report_status(char **error);
+int	zbx_ha_request_cluster_report(char **error);
 
 const char	*zbx_ha_status_str(int ha_status);
 

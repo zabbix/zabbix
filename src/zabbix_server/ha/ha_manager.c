@@ -24,6 +24,7 @@
 #include "zbxserialize.h"
 #include "ha.h"
 #include "threads.h"
+#include "zbxjson.h"
 #include "../../libs/zbxalgo/vectorimpl.h"
 
 #define ZBX_HA_POLL_PERIOD	5
@@ -101,19 +102,6 @@ static void	zbx_ha_node_free(zbx_ha_node_t *node)
 {
 	zbx_free(node->name);
 	zbx_free(node);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: ha_report_status                                                 *
- *                                                                            *
- * Purpose: report cluster status in log file                                 *
- *                                                                            *
- ******************************************************************************/
-static void	ha_report_status(void)
-{
-	// TODO: implement cluster status reporting in log file
-	zabbix_log(LOG_LEVEL_INFORMATION, "status reporting is not yet implemented ");
 }
 
 /******************************************************************************
@@ -942,6 +930,160 @@ finish:
 
 /******************************************************************************
  *                                                                            *
+ * Function: ha_db_get_cluster_status                                         *
+ *                                                                            *
+ * Purpose: get cluster status in lld compatible json format                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	ha_db_get_cluster_status(zbx_ha_info_t *info, char **status)
+{
+	DB_ROW			row;
+	DB_RESULT		result;
+	zbx_vector_ha_node_t	nodes;
+	int			i, db_time, ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (ZBX_DB_OK != info->db_status)
+		goto out;
+
+	result = DBselect_once("select " ZBX_DB_TIMESTAMP());
+
+	if (NULL == result || ZBX_DB_DOWN == (intptr_t)result)
+		goto out;
+
+	if (NULL != (row = DBfetch(result)))
+		db_time = atoi(row[0]);
+	else
+		db_time = 0;
+
+	DBfree_result(result);
+
+	zbx_vector_ha_node_create(&nodes);
+
+	if (SUCCEED == ha_db_get_nodes(&nodes, 0))
+	{
+		struct zbx_json	j;
+
+		zbx_json_initarray(&j, 1024);
+
+		for (i = 0; i < nodes.values_num; i++)
+		{
+			zbx_json_addobject(&j, NULL);
+
+			zbx_json_addstring(&j, ZBX_PROTO_TAG_ID, nodes.values[i]->nodeid.str, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, ZBX_PROTO_TAG_NAME, nodes.values[i]->name, ZBX_JSON_TYPE_STRING);
+			zbx_json_addint64(&j, ZBX_PROTO_TAG_STATUS, (zbx_int64_t)nodes.values[i]->status);
+			zbx_json_addint64(&j, ZBX_PROTO_TAG_LASTACCESS, (zbx_int64_t)nodes.values[i]->lastaccess);
+			zbx_json_addint64(&j, ZBX_PROTO_TAG_NOW, (zbx_int64_t)db_time);
+
+			zbx_json_close(&j);
+		}
+
+		*status = zbx_strdup(NULL, j.buffer);
+		zbx_json_free(&j);
+
+		ret = SUCCEED;
+	}
+	else
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get cluster nodes from database");
+
+	zbx_vector_ha_node_clear_ext(&nodes, zbx_ha_node_free);
+	zbx_vector_ha_node_destroy(&nodes);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+
+	return ret;
+}
+
+
+/******************************************************************************
+ *                                                                            *
+ * Function: ha_report_cluster_status                                         *
+ *                                                                            *
+ * Purpose: report cluster status in log file                                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	ha_report_cluster_status(zbx_ha_info_t *info)
+{
+	char	*cluster_status = NULL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (SUCCEED == ha_db_get_cluster_status(info, &cluster_status))
+	{
+		struct zbx_json_parse	jp, jp_node;
+
+		if (SUCCEED == zbx_json_open(cluster_status, &jp))
+		{
+			const char	*pnext;
+			char		name[256], id[26], buffer[256];
+			int		status, lastaccess, db_time;
+
+			zabbix_log(LOG_LEVEL_INFORMATION, "cluster status:");
+			zabbix_log(LOG_LEVEL_INFORMATION, "  %-26s %-40s %-11s %s", "id", "name", "status", "age");
+
+			for (pnext = NULL; NULL != (pnext = zbx_json_next(&jp, pnext));)
+			{
+				if (FAIL == zbx_json_brackets_open(pnext, &jp_node))
+				{
+					THIS_SHOULD_NEVER_HAPPEN;
+					continue;
+				}
+
+				if (SUCCEED != zbx_json_value_by_name(&jp_node, ZBX_PROTO_TAG_ID, id, sizeof(id), NULL))
+				{
+					THIS_SHOULD_NEVER_HAPPEN;
+					continue;
+				}
+
+				if (SUCCEED != zbx_json_value_by_name(&jp_node, ZBX_PROTO_TAG_NAME, name, sizeof(name),
+						NULL))
+				{
+					THIS_SHOULD_NEVER_HAPPEN;
+					continue;
+				}
+
+				if (SUCCEED != zbx_json_value_by_name(&jp_node, ZBX_PROTO_TAG_STATUS, buffer,
+						sizeof(buffer), NULL))
+				{
+					THIS_SHOULD_NEVER_HAPPEN;
+					continue;
+				}
+				status = atoi(buffer);
+
+				if (SUCCEED != zbx_json_value_by_name(&jp_node, ZBX_PROTO_TAG_LASTACCESS, buffer,
+						sizeof(buffer), NULL))
+				{
+					THIS_SHOULD_NEVER_HAPPEN;
+					continue;
+				}
+				lastaccess = atoi(buffer);
+
+				if (SUCCEED != zbx_json_value_by_name(&jp_node, ZBX_PROTO_TAG_NOW, buffer,
+						sizeof(buffer), NULL))
+				{
+					THIS_SHOULD_NEVER_HAPPEN;
+					continue;
+				}
+				db_time = atoi(buffer);
+
+				zabbix_log(LOG_LEVEL_INFORMATION, "  %26s %-40s %-11s %s", id, name,
+						zbx_ha_status_str(status), zbx_age2str(db_time - lastaccess));
+			}
+		}
+
+		zbx_free(cluster_status);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+
+}
+
+
+
+/******************************************************************************
+ *                                                                            *
  * Function: ha_db_update_exit_status                                         *
  *                                                                            *
  * Purpose: update node status in database on shutdown                        *
@@ -1002,14 +1144,14 @@ int	zbx_ha_recv_status(int timeout, int *status, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_ha_report_status                                             *
+ * Function: zbx_ha_request_cluster_report                                    *
  *                                                                            *
- * Purpose: report cluster status in log file                                 *
+ * Purpose: request HA manager to log cluster statistics                      *
  *                                                                            *
  ******************************************************************************/
-int	zbx_ha_report_status(char **error)
+int	zbx_ha_request_cluster_report(char **error)
 {
-	if (FAIL == zbx_ipc_async_socket_send(&ha_socket, ZBX_IPC_SERVICE_HA_REPORT, NULL, 0))
+	if (FAIL == zbx_ipc_async_socket_send(&ha_socket, ZBX_IPC_SERVICE_HA_NODES, NULL, 0))
 	{
 		*error = zbx_strdup(NULL, "cannot queue message to HA manager service");
 		return FAIL;
@@ -1272,8 +1414,8 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 				case ZBX_IPC_SERVICE_HA_PAUSE:
 					stop = SUCCEED;
 					break;
-				case ZBX_IPC_SERVICE_HA_REPORT:
-					ha_report_status();
+				case ZBX_IPC_SERVICE_HA_NODES:
+					ha_report_cluster_status(&info);
 					break;
 			}
 

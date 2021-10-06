@@ -1791,9 +1791,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		}
 		else if (0 != zbx_ha_report)
 		{
-			if (SUCCEED != zbx_ha_report_status(&error))
+			if (SUCCEED != zbx_ha_request_cluster_report(&error))
 			{
-				zabbix_log(LOG_LEVEL_CRIT, "cannot create HA status report: %s", error);
+				zabbix_log(LOG_LEVEL_CRIT, "cannot request node information from HA manager: %s", error);
 				zbx_free(error);
 				sig_exiting = ZBX_EXIT_FAILURE;
 				break;
