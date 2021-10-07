@@ -1,0 +1,1 @@
+.......PS. [ZBX-19866] fixed possible duplication of server log messages with first network error or interface activation (akozlovs)

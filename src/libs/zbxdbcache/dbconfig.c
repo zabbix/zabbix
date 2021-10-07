@@ -2472,10 +2472,6 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync)
 		interface->type = type;
 		interface->main = main_;
 		interface->useip = useip;
-		interface->errors_from = atoi(row[11]);
-		interface->available = (unsigned char)atoi(row[8]);
-		interface->disable_until = atoi(row[9]);
-		interface->availability_ts = time(NULL);
 		reset_snmp_stats |= (SUCCEED == DCstrpool_replace(found, &interface->ip, row[5]));
 		reset_snmp_stats |= (SUCCEED == DCstrpool_replace(found, &interface->dns, row[6]));
 		reset_snmp_stats |= (SUCCEED == DCstrpool_replace(found, &interface->port, row[7]));
@@ -2483,6 +2479,10 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync)
 
 		if (0 == found)
 		{
+			interface->errors_from = atoi(row[11]);
+			interface->available = (unsigned char)atoi(row[8]);
+			interface->disable_until = atoi(row[9]);
+			interface->availability_ts = time(NULL);
 			interface->reset_availability = 0;
 			interface->items_num = 0;
 		}
