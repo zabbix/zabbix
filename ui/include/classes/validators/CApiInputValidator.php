@@ -446,7 +446,7 @@ class CApiInputValidator {
 	 *
 	 * @return bool
 	 */
-	private static function validateCondFormula($rule, &$data, $path, &$error) {
+	private static function validateCondFormula(array $rule, &$data, string $path, string &$error): bool {
 		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
 			return false;
 		}
@@ -477,7 +477,7 @@ class CApiInputValidator {
 	 *
 	 * @return bool
 	 */
-	private static function validateCondFormulaId($rule, &$data, $path, &$error) {
+	private static function validateCondFormulaId(array $rule, &$data, string $path, string &$error): bool {
 		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
 			return false;
 		}
