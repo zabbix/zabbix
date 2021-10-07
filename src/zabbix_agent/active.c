@@ -861,8 +861,6 @@ static int	send_buffer(zbx_vector_ptr_t *addrs)
 	{
 		if (0 == buffer.first_error)
 		{
-			int	n = addrs->values_num - 1;
-
 			zabbix_log(LOG_LEVEL_WARNING, "Active check data upload started to fail");
 			buffer.first_error = now;
 		}
