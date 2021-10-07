@@ -979,8 +979,7 @@ static int	ha_db_get_cluster_status(zbx_ha_info_t *info, char **status)
 			zbx_json_addstring(&j, ZBX_PROTO_TAG_NAME, nodes.values[i]->name, ZBX_JSON_TYPE_STRING);
 			zbx_json_addint64(&j, ZBX_PROTO_TAG_STATUS, (zbx_int64_t)nodes.values[i]->status);
 			zbx_json_addint64(&j, ZBX_PROTO_TAG_LASTACCESS, (zbx_int64_t)nodes.values[i]->lastaccess);
-			zbx_json_addstring(&j, ZBX_PROTO_TAG_ADDRESS, (zbx_int64_t)nodes.values[i]->address,
-					ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, ZBX_PROTO_TAG_ADDRESS, nodes.values[i]->address, ZBX_JSON_TYPE_STRING);
 			zbx_json_addint64(&j, ZBX_PROTO_TAG_DB_TIMESTAMP, (zbx_int64_t)db_time);
 			zbx_json_addint64(&j, ZBX_PROTO_TAG_LASTACCESS_AGE,
 					(zbx_int64_t)(db_time -nodes.values[i]->lastaccess));
@@ -1091,7 +1090,102 @@ static void	ha_report_cluster_status(zbx_ha_info_t *info)
 #undef ZBX_HA_REPORT_FMT
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: ha_remove_node_by_index                                          *
+ *                                                                            *
+ * Purpose: remove node by its index in node list                             *
+ *                                                                            *
+ ******************************************************************************/
+static int	ha_remove_node_by_index(zbx_ha_info_t *info, int index, char **error)
+{
+	zbx_vector_ha_node_t	nodes;
+	int			ret = FAIL;
 
+	zbx_vector_ha_node_create(&nodes);
+
+	if (ZBX_DB_OK != ha_db_begin(info))
+	{
+		*error = zbx_strdup(NULL, "database connection problem");
+		return FAIL;
+	}
+
+	if (SUCCEED != ha_db_get_nodes(&nodes, 0))
+	{
+		*error = zbx_strdup(NULL, "database connection problem");
+		goto out;
+	}
+
+	index--;
+
+	if (0 > index || index >= nodes.values_num)
+	{
+		*error = zbx_strdup(NULL, "node index out of range");
+		goto out;
+	}
+
+	if (ZBX_NODE_STATUS_ACTIVE == nodes.values[index]->status ||
+			ZBX_NODE_STATUS_STANDBY == nodes.values[index]->status)
+	{
+		*error = zbx_dsprintf(NULL, "node is %s", zbx_ha_status_str(nodes.values[index]->status));
+		goto out;
+	}
+
+	if (ZBX_DB_OK > DBexecute_once("delete from ha_node where ha_nodeid='%s'", nodes.values[index]->nodeid.str))
+	{
+		*error = zbx_strdup(NULL, "database connection problem");
+		goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	if (SUCCEED == ret)
+	{
+		if (ZBX_DB_OK <= ha_db_commit(info))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "removed node \"%s\" with ID \"%s\"", nodes.values[index]->name,
+					nodes.values[index]->nodeid.str);
+		}
+	}
+	else
+		ha_db_rollback(info);
+
+	zbx_vector_ha_node_clear_ext(&nodes, zbx_ha_node_free);
+	zbx_vector_ha_node_destroy(&nodes);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: ha_report_cluster_status                                         *
+ *                                                                            *
+ * Purpose: report cluster status in log file                                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	ha_remove_node(zbx_ha_info_t *info, zbx_ipc_client_t *client, const zbx_ipc_message_t *message)
+{
+	int		index;
+	char		*error = NULL;
+	zbx_uint32_t	len = 0, error_len;
+	unsigned char	*data;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	memcpy(&index, message->data, sizeof(index));
+
+	ha_remove_node_by_index(info, index, &error);
+
+	zbx_serialize_prepare_str(len, error);
+
+	data = zbx_malloc(NULL, len);
+	zbx_serialize_str(data, error, error_len);
+	zbx_free(error);
+
+	zbx_ipc_client_send(client, ZBX_IPC_SERVICE_HA_REMOVE_NODE, data, len);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
 
 /******************************************************************************
  *                                                                            *
@@ -1175,6 +1269,33 @@ int	zbx_ha_request_cluster_report(char **error)
 	}
 
 	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_ha_remove_node                                               *
+ *                                                                            *
+ * Purpose: remove HA node                                                    *
+ *                                                                            *
+ * Comments: A new socket is opened to avoid interfering with notification    *
+ *           channel                                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_ha_remove_node(int node_num, char **error)
+{
+	unsigned char		*data;
+	zbx_uint32_t		error_len;
+
+	if (SUCCEED != zbx_ipc_async_exchange(ZBX_IPC_SERVICE_HA, ZBX_IPC_SERVICE_HA_REMOVE_NODE,
+			ZBX_HA_SERVICE_TIMEOUT, (unsigned char *)&node_num, sizeof(node_num), &data, error))
+	{
+		return FAIL;
+	}
+
+	(void)zbx_deserialize_str(data, error, error_len);
+	zbx_free(data);
+
+	return (0 == error_len ? SUCCEED : FAIL);
 }
 
 /******************************************************************************
@@ -1430,6 +1551,9 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 					break;
 				case ZBX_IPC_SERVICE_HA_NODES:
 					ha_report_cluster_status(&info);
+					break;
+				case ZBX_IPC_SERVICE_HA_REMOVE_NODE:
+					ha_remove_node(&info, client, message);
 					break;
 			}
 

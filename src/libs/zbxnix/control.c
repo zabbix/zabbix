@@ -237,6 +237,14 @@ int	parse_rtc_options(const char *opt, unsigned char program_type, int *message)
 		scope = 0;
 		data = 0;
 	}
+	else if (0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER)) &&
+			0 == strncmp(opt, ZBX_HA_REMOVE_NODE, ZBX_CONST_STRLEN(ZBX_HA_REMOVE_NODE)))
+	{
+		command = ZBX_RTC_HA_REMOVE_NODE;
+		scope = 0;
+		if ('=' == opt[ZBX_CONST_STRLEN(ZBX_HA_REMOVE_NODE)])
+			data = atoi(opt + ZBX_CONST_STRLEN(ZBX_HA_REMOVE_NODE) + 1);
+	}
 	else
 	{
 		zbx_error("invalid runtime control option: %s", opt);

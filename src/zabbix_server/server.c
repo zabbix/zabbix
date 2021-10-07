@@ -123,6 +123,7 @@ const char	*help_message[] = {
 	"                                  not specified",
 	"      " ZBX_SERVICE_CACHE_RELOAD "        Reload service manager cache",
 	"      " ZBX_HA_STATUS "                   Log HA cluster status",
+	"      " ZBX_HA_REMOVE_NODE "=target       Remove the HA node specified by its listed number",
 	"",
 	"      Log level control targets:",
 	"        process-type              All processes of specified type",
@@ -350,7 +351,8 @@ char	*CONFIG_WEBSERVICE_URL	= NULL;
 int	CONFIG_SERVICEMAN_SYNC_FREQUENCY	= 60;
 
 static volatile sig_atomic_t	zbx_diaginfo_scope = ZBX_DIAGINFO_UNDEFINED;
-static volatile sig_atomic_t	zbx_ha_report = 0;
+static volatile sig_atomic_t	zbx_rtc_ha_report = 0;
+static volatile sig_atomic_t	zbx_rtc_ha_remove_node = 0;
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
@@ -1103,7 +1105,10 @@ static void	zbx_main_sigusr_handler(int flags)
 				zbx_diaginfo_scope = 1 << scope;
 			break;
 		case ZBX_RTC_HA_STATUS:
-			zbx_ha_report = 1;
+			zbx_rtc_ha_report = 1;
+			break;
+		case ZBX_RTC_HA_REMOVE_NODE:
+			zbx_rtc_ha_remove_node = ZBX_RTC_GET_DATA(flags);
 			break;
 	}
 }
@@ -1789,7 +1794,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 			zbx_diaginfo_scope = ZBX_DIAGINFO_UNDEFINED;
 		}
-		else if (0 != zbx_ha_report)
+		else if (0 != zbx_rtc_ha_report)
 		{
 			if (SUCCEED != zbx_ha_request_cluster_report(&error))
 			{
@@ -1799,7 +1804,17 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				break;
 			}
 
-			zbx_ha_report = 1;
+			zbx_rtc_ha_report = 0;
+		}
+		else if (0 != zbx_rtc_ha_remove_node)
+		{
+			if (SUCCEED != zbx_ha_remove_node(zbx_rtc_ha_remove_node, &error))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot remove HA node: %s", error);
+				zbx_free(error);
+			}
+
+			zbx_rtc_ha_remove_node = 0;
 		}
 	}
 
