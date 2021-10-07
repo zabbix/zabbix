@@ -31,6 +31,7 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 @import "components/dashboard";
 @import "components/diff";
 @import "components/form-search";
+@import "components/inline-filter";
 @import "components/menu-main";
 @import "components/menu-user";
 @import "components/message-box";
@@ -3030,6 +3031,12 @@ $form-icon-btn: (
 					padding-left: 5px;
 				}
 			}
+
+			.inline-filter {
+				li {
+					padding-left: 0;
+				}
+			}
 		}
 
 		> .overlay-close-btn {
@@ -5303,7 +5310,6 @@ button {
 	&.icon-action-severity-changed,
 	&.icon-action-message,
 	&.icon-action-ack,
-	&.icon-invisible,
 	&.icon-problem-generated,
 	&.icon-problem-recovery,
 	&.icon-actions-number-gray,

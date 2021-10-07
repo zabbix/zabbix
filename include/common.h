@@ -1162,7 +1162,12 @@ void	zbx_setproctitle(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 #define ZBX_JAN_2038		2145916800
 #define ZBX_JAN_1970_IN_SEC	2208988800.0	/* 1970 - 1900 in seconds */
 
-#define ZBX_MAX_RECV_DATA_SIZE	(1 * ZBX_GIBIBYTE)
+#define ZBX_MAX_RECV_DATA_SIZE		(1 * ZBX_GIBIBYTE)
+#if defined(_WINDOWS)
+#define ZBX_MAX_RECV_LARGE_DATA_SIZE	(1 * ZBX_GIBIBYTE)
+#else
+#define ZBX_MAX_RECV_LARGE_DATA_SIZE	(__UINT64_C(16) * ZBX_GIBIBYTE)
+#endif
 
 /* max length of base64 data */
 #define ZBX_MAX_B64_LEN		(16 * ZBX_KIBIBYTE)
@@ -1485,14 +1490,14 @@ typedef struct
 }
 zbx_strloc_t;
 
-/* data used by macros, ldd macros and objectid tokens */
+/* data used by macros, lld macros and objectid tokens */
 typedef struct
 {
 	zbx_strloc_t	name;
 }
 zbx_token_macro_t;
 
-/* data used by macros, ldd macros and objectid tokens */
+/* data used by macros, lld macros and objectid tokens */
 typedef struct
 {
 	zbx_strloc_t	expression;
@@ -1574,6 +1579,7 @@ zbx_token_t;
 #define ZBX_TOKEN_SEARCH_REFERENCES		0x01
 #define ZBX_TOKEN_SEARCH_EXPRESSION_MACRO	0x02
 #define ZBX_TOKEN_SEARCH_FUNCTIONID		0x04
+#define ZBX_TOKEN_SEARCH_SIMPLE_MACRO		0x08	/* used by the upgrade patches only */
 
 typedef int zbx_token_search_t;
 
@@ -1583,7 +1589,8 @@ int	zbx_token_parse_user_macro(const char *expression, const char *macro, zbx_to
 int	zbx_token_parse_macro(const char *expression, const char *macro, zbx_token_t *token);
 int	zbx_token_parse_objectid(const char *expression, const char *macro, zbx_token_t *token);
 int	zbx_token_parse_lld_macro(const char *expression, const char *macro, zbx_token_t *token);
-int	zbx_token_parse_nested_macro(const char *expression, const char *macro, zbx_token_t *token);
+int	zbx_token_parse_nested_macro(const char *expression, const char *macro, int simple_macro_find,
+		zbx_token_t *token);
 
 int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char op);
 
@@ -1735,4 +1742,14 @@ char	*zbx_substr_unquote(const char *src, size_t left, size_t right);
 /* UTF-8 trimming */
 void	zbx_ltrim_utf8(char *str, const char *charlist);
 void	zbx_rtrim_utf8(char *str, const char *charlist);
+
+typedef struct
+{
+	char	*tag;
+	char	*value;
+}
+zbx_tag_t;
+
+void	zbx_free_tag(zbx_tag_t *tag);
+
 #endif

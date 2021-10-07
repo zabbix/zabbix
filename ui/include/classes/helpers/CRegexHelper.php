@@ -19,23 +19,29 @@
 **/
 
 
-/**
- * @var CView $this
- */
+class CRegexHelper {
 
-$output = [
-	'body' => (new CPartial('service.statusrule.row', [
-		'row_index' => $data['row_index'],
-		'new_status' => $data['form']['new_status'],
-		'type' => $data['form']['type'],
-		'limit_value' => $data['form']['limit_value'],
-		'limit_status' => $data['form']['limit_status']
-	]))->getOutput()
-];
+	public static function expression_type2str(int $type = null) {
+		$types = [
+			EXPRESSION_TYPE_INCLUDED => _('Character string included'),
+			EXPRESSION_TYPE_ANY_INCLUDED => _('Any character string included'),
+			EXPRESSION_TYPE_NOT_INCLUDED => _('Character string not included'),
+			EXPRESSION_TYPE_TRUE => _('Result is TRUE'),
+			EXPRESSION_TYPE_FALSE => _('Result is FALSE')
+		];
 
-if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
-	CProfiler::getInstance()->stop();
-	$output['debug'] = CProfiler::getInstance()->make()->toString();
+		if ($type === null) {
+			return $types;
+		}
+
+		return array_key_exists($type, $types) ? $types[$type] : _('Unknown');
+	}
+
+	public static function expressionDelimiters(): array {
+		return [
+			',' => ',',
+			'.' => '.',
+			'/' => '/'
+		];
+	}
 }
-
-echo json_encode($output);

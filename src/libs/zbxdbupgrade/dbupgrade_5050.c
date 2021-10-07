@@ -20,6 +20,8 @@
 #include "common.h"
 #include "db.h"
 #include "dbupgrade.h"
+#include "dbupgrade_macros.h"
+#include "log.h"
 
 extern unsigned char	program_type;
 
@@ -253,90 +255,15 @@ static int	DBpatch_5050015(void)
 	return DBcreate_index("service_tag", "service_tag_1", "serviceid", 0);
 }
 
-static void	DBpatch_get_role_rules(zbx_uint64_t roleid, int *ui_default_access, int *actions_default_access,
-		int *ui_conf_services)
-{
-	DB_ROW		row;
-	DB_RESULT	result;
-
-	result = DBselect("select value_int,name from role_rule where roleid=" ZBX_FS_UI64 " and name in "
-			"('ui.default_access', 'actions.default_access', 'ui.configuration.services')", roleid);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		int	value;
-		char	*name;
-
-		value = atoi(row[0]);
-		name = row[1];
-
-		if (0 == strcmp(name, "ui.default_access"))
-		{
-			*ui_default_access = value;
-		}
-		else if (0 == strcmp(name, "actions.default_access"))
-		{
-			*actions_default_access = value;
-		}
-		else if (0 == strcmp(name, "ui.configuration.services"))
-		{
-			*ui_conf_services = value;
-		}
-	}
-
-	DBfree_result(result);
-}
-
 static int	DBpatch_5050016(void)
 {
-	DB_ROW		row;
-	DB_RESULT	result;
-	int		ret = SUCCEED;
-
-	result = DBselect("select distinct roleid from role_rule");
-
-	while (NULL != (row = DBfetch(result)))
+	if (ZBX_DB_OK > DBexecute("update role_rule set name='actions.manage_services'"
+			" where name='ui.configuration.services'"))
 	{
-		zbx_uint64_t	roleid;
-		int ui_def_access = -1, act_def_access = -1, ui_conf_services = -1;
-
-		ZBX_STR2UINT64(roleid, row[0]);
-
-		DBpatch_get_role_rules(roleid, &ui_def_access, &act_def_access, &ui_conf_services);
-
-		if (ui_def_access == act_def_access && -1 != ui_conf_services)
-		{
-			if (ZBX_DB_OK > DBexecute("update role_rule set name='actions.manage_services' where"
-					" roleid=" ZBX_FS_UI64 " and name='ui.configuration.services'", roleid))
-			{
-				ret = FAIL;
-				goto out;
-			}
-		}
-		else if (1 == ui_def_access && -1 == ui_conf_services && 0 == act_def_access)
-		{
-			if (ZBX_DB_OK > DBexecute("insert into role_rule (role_ruleid,roleid,type,name,value_int,"
-					"value_str,value_moduleid) values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",0,"
-					"'actions.manage_services',1,'',NULL)", DBget_maxid("role_rule"), roleid))
-			{
-				ret = FAIL;
-				goto out;
-			}
-		}
-		else if (0 == ui_def_access && 1 == ui_conf_services && 1 == act_def_access)
-		{
-			if (ZBX_DB_OK > DBexecute("delete from role_rule where roleid=" ZBX_FS_UI64 " and "
-					"name='ui.configuration.services'", roleid))
-			{
-				ret = FAIL;
-				goto out;
-			}
-		}
+		return FAIL;
 	}
-out:
-	DBfree_result(result);
 
-	return ret;
+	return SUCCEED;
 }
 
 static int	DBpatch_5050017(void)
@@ -572,6 +499,323 @@ static int	DBpatch_5050050(void)
 
 	return SUCCEED;
 }
+
+#define DBPATCH_MESSAGE_SUBJECT_LEN		255
+#define DBPATCH_GRAPH_NAME_LEN			128
+#define DBPATCH_SYSMAPS_LABEL_LEN		255
+#define DBPATCH_SYSMAPS_ELEMENTS_LABEL_LEN	2048
+#define DBPATCH_SYSMAPS_LINKS_LABEL_LEN		2048
+
+#if defined(HAVE_ORACLE)
+#	define DBPATCH_SHORTTEXT_LEN		2048
+#else
+#	define DBPATCH_SHORTTEXT_LEN		65535
+#endif
+
+static int	dbpatch_update_simple_macro(const char *table, const char *field, const char *id, size_t field_len,
+		const char *descr)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	char		*sql;
+	size_t		sql_alloc = 4096, sql_offset = 0;
+	int		ret = SUCCEED;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	sql = zbx_malloc(NULL, sql_alloc);
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect("select %s,%s from %s", id, field, table);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_token_t	token;
+		char		*out = NULL;
+		size_t		out_alloc = 0, out_offset = 0, pos = 0, last_pos = 0;
+
+		for (; SUCCEED == zbx_token_find(row[1], (int)pos, &token, ZBX_TOKEN_SEARCH_BASIC |
+				ZBX_TOKEN_SEARCH_SIMPLE_MACRO); pos++)
+		{
+			char	*replace;
+
+			pos = token.loc.r;
+
+			if (ZBX_TOKEN_SIMPLE_MACRO != token.type)
+				continue;
+
+			replace = NULL;
+			dbpatch_convert_simple_macro(row[1], &token.data.simple_macro, 1, &replace);
+			zbx_strncpy_alloc(&out, &out_alloc, &out_offset, row[1] + last_pos, token.loc.l - last_pos);
+			replace = zbx_dsprintf(replace, "{?%s}", replace);
+			zbx_strcpy_alloc(&out, &out_alloc, &out_offset, replace);
+			zbx_free(replace);
+			last_pos = token.loc.r + 1;
+
+			pos = token.loc.r;
+		}
+
+		if (0 == out_alloc)
+			continue;
+
+		zbx_strcpy_alloc(&out, &out_alloc, &out_offset, row[1] + last_pos);
+
+		if (field_len >= zbx_strlen_utf8(out))
+		{
+			char	*esc;
+
+			esc = DBdyn_escape_field(table, field, out);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update %s set %s='%s'"
+					" where %s=%s;\n", table, field, esc, id, row[0]);
+			zbx_free(esc);
+
+			ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		}
+		else
+			zabbix_log(LOG_LEVEL_WARNING, "cannot convert %s, too long expression: \"%s\"", descr, row[0]);
+
+		zbx_free(out);
+	}
+	DBfree_result(result);
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (SUCCEED == ret && 16 < sql_offset)
+	{
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			ret = FAIL;
+	}
+
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_5050051(void)
+{
+	return dbpatch_update_simple_macro("opmessage", "subject", "operationid", DBPATCH_MESSAGE_SUBJECT_LEN,
+			"operation message subject");
+}
+
+static int	DBpatch_5050052(void)
+{
+	return dbpatch_update_simple_macro("opmessage", "message", "operationid", DBPATCH_SHORTTEXT_LEN,
+			"operation message body");
+}
+
+static int	DBpatch_5050053(void)
+{
+	return dbpatch_update_simple_macro("media_type_message", "subject", "mediatype_messageid",
+			DBPATCH_MESSAGE_SUBJECT_LEN, "media message subject");
+}
+
+static int	DBpatch_5050054(void)
+{
+	return dbpatch_update_simple_macro("media_type_message", "message", "mediatype_messageid",
+			DBPATCH_SHORTTEXT_LEN, "media message body");
+}
+
+static int	DBpatch_5050055(void)
+{
+	return dbpatch_update_simple_macro("graphs", "name", "graphid", DBPATCH_GRAPH_NAME_LEN, "graph name");
+}
+
+static int	DBpatch_5050056(void)
+{
+	return dbpatch_update_simple_macro("sysmaps", "label_string_host", "sysmapid", DBPATCH_SYSMAPS_LABEL_LEN,
+			"maps label host");
+}
+
+static int	DBpatch_5050057(void)
+{
+	return dbpatch_update_simple_macro("sysmaps", "label_string_hostgroup", "sysmapid", DBPATCH_SYSMAPS_LABEL_LEN,
+			"maps label hostgroup");
+}
+
+static int	DBpatch_5050058(void)
+{
+	return dbpatch_update_simple_macro("sysmaps", "label_string_trigger", "sysmapid", DBPATCH_SYSMAPS_LABEL_LEN,
+			"maps label trigger");
+}
+
+static int	DBpatch_5050059(void)
+{
+	return dbpatch_update_simple_macro("sysmaps", "label_string_map", "sysmapid", DBPATCH_SYSMAPS_LABEL_LEN,
+			"maps label map");
+}
+
+static int	DBpatch_5050060(void)
+{
+	return dbpatch_update_simple_macro("sysmaps", "label_string_image", "sysmapid", DBPATCH_SYSMAPS_LABEL_LEN,
+			"maps label image");
+}
+
+static int	DBpatch_5050061(void)
+{
+	return dbpatch_update_simple_macro("sysmaps_elements", "label", "selementid",
+			DBPATCH_SYSMAPS_ELEMENTS_LABEL_LEN, "maps element label");
+}
+
+static int	DBpatch_5050062(void)
+{
+	return dbpatch_update_simple_macro("sysmaps_links", "label", "linkid", DBPATCH_SYSMAPS_LINKS_LABEL_LEN,
+			"maps link label");
+}
+
+static int	DBpatch_5050063(void)
+{
+	return dbpatch_update_simple_macro("sysmap_shape", "text", "sysmap_shapeid", DBPATCH_SHORTTEXT_LEN,
+			"maps shape text");
+}
+
+static int	DBpatch_5050064(void)
+{
+	const ZBX_FIELD	field = {"value_serviceid", NULL, "services", "serviceid", 0, ZBX_TYPE_ID, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_field("role_rule", &field);
+}
+
+static int	DBpatch_5050065(void)
+{
+	const ZBX_FIELD	field = {"value_serviceid", NULL, "services", "serviceid", 0, ZBX_TYPE_ID, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("role_rule", 3, &field);
+}
+
+static int	DBpatch_5050066(void)
+{
+	return DBcreate_index("role_rule", "role_rule_3", "value_serviceid", 0);
+}
+
+static int	DBpatch_5050067(void)
+{
+	if (ZBX_DB_OK > DBexecute("update role_rule set name='services.write'"
+			" where name='actions.manage_services'"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBpatch_5050068_calc_services_write_value                        *
+ *                                                                            *
+ * Purpose: calculate services.write value for the specified role             *
+ *                                                                            *
+ * Parameters: roleid - [IN] the role identifier                              *
+ *             value  - [OUT] the services.write value                        *
+ *                                                                            *
+ * Return value: SUCCEED - the services.write value is calculated             *
+ *               FAIL    - the services.write rule already exists             *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBpatch_5050068_calc_services_write_value(zbx_uint64_t roleid, int *value)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		default_access = 1, ret = FAIL;
+
+	result = DBselect("select name,value_int from role_rule where roleid=" ZBX_FS_UI64, roleid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		/* write rule already exists, skip */
+		if (0 == strcmp("services.write", row[0]))
+			goto out;
+
+
+		if (0 == strcmp("actions.default_access", row[0]))
+			default_access = atoi(row[1]);
+	}
+
+	*value = default_access;
+	ret = SUCCEED;
+out:
+	DBfree_result(result);
+
+	return ret;
+}
+
+static int	DBpatch_5050068(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_db_insert_t	db_insert;
+	int		ret = FAIL;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_db_insert_prepare(&db_insert, "role_rule", "role_ruleid", "roleid", "type", "name", "value_int", NULL);
+
+	result = DBselect("select roleid,type from role");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	roleid;
+		int		services_write;
+
+		ZBX_STR2UINT64(roleid, row[0]);
+
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, 0, "service.read", 1);
+
+		if (SUCCEED == DBpatch_5050068_calc_services_write_value(roleid, &services_write))
+		{
+			int	role_type;
+
+			role_type = atoi(row[1]);
+
+			if (USER_TYPE_ZABBIX_ADMIN != role_type && USER_TYPE_SUPER_ADMIN != role_type)
+				services_write = 0;
+
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, 0, "services.write", services_write);
+		}
+
+	}
+	DBfree_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "role_ruleid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_5050069(void)
+{
+	const ZBX_FIELD	field = {"resourceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBdrop_not_null("auditlog", &field);
+}
+
+static int	DBpatch_5050070(void)
+{
+	const ZBX_FIELD	old_field = {"params", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"params", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("item_preproc", &field, &old_field);
+}
+
+static int	DBpatch_5050071(void)
+{
+	const ZBX_FIELD	old_field = {"description", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("triggers", &field, &old_field);
+}
+
+static int	DBpatch_5050072(void)
+{
+	const ZBX_FIELD	old_field = {"message", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"message", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("media_type_message", &field, &old_field);
+}
+
 #endif
 
 DBPATCH_START(5050)
@@ -623,5 +867,27 @@ DBPATCH_ADD(5050047, 0, 1)
 DBPATCH_ADD(5050048, 0, 1)
 DBPATCH_ADD(5050049, 0, 1)
 DBPATCH_ADD(5050050, 0, 1)
+DBPATCH_ADD(5050051, 0, 1)
+DBPATCH_ADD(5050052, 0, 1)
+DBPATCH_ADD(5050053, 0, 1)
+DBPATCH_ADD(5050054, 0, 1)
+DBPATCH_ADD(5050055, 0, 1)
+DBPATCH_ADD(5050056, 0, 1)
+DBPATCH_ADD(5050057, 0, 1)
+DBPATCH_ADD(5050058, 0, 1)
+DBPATCH_ADD(5050059, 0, 1)
+DBPATCH_ADD(5050060, 0, 1)
+DBPATCH_ADD(5050061, 0, 1)
+DBPATCH_ADD(5050062, 0, 1)
+DBPATCH_ADD(5050063, 0, 1)
+DBPATCH_ADD(5050064, 0, 1)
+DBPATCH_ADD(5050065, 0, 1)
+DBPATCH_ADD(5050066, 0, 1)
+DBPATCH_ADD(5050067, 0, 1)
+DBPATCH_ADD(5050068, 0, 1)
+DBPATCH_ADD(5050069, 0, 1)
+DBPATCH_ADD(5050070, 0, 1)
+DBPATCH_ADD(5050071, 0, 1)
+DBPATCH_ADD(5050072, 0, 1)
 
 DBPATCH_END()

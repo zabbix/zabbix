@@ -21,6 +21,10 @@
 
 class CControllerServiceUpdate extends CController {
 
+	protected function init() {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
 	protected function checkInput(): bool {
 		$fields = [
 			'serviceid' =>					'required|db services.serviceid',
@@ -99,9 +103,11 @@ class CControllerServiceUpdate extends CController {
 		return $ret;
 	}
 
+	/**
+	 * @throws APIException
+	 */
 	protected function checkPermissions(): bool {
-		if (!$this->checkAccess(CRoleHelper::UI_MONITORING_SERVICES)
-				|| !$this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SERVICES)) {
+		if (!$this->checkAccess(CRoleHelper::UI_MONITORING_SERVICES)) {
 			return false;
 		}
 
@@ -111,6 +117,9 @@ class CControllerServiceUpdate extends CController {
 		]);
 	}
 
+	/**
+	 * @throws APIException
+	 */
 	protected function doAction(): void {
 		$service = [
 			'showsla' => $this->hasInput('showsla') ? SERVICE_SHOW_SLA_ON : SERVICE_SHOW_SLA_OFF,

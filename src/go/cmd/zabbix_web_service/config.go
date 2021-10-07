@@ -33,4 +33,5 @@ type serviceOptions struct {
 	TLSCAFile   string `conf:"optional"`
 	TLSCertFile string `conf:"optional"`
 	TLSKeyFile  string `conf:"optional"`
+	IgnoreURLCertErrors int `conf:"optional,range=0:1,default=0"`
 }

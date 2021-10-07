@@ -578,7 +578,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		foreach ($module['menu_entries'] as $entry) {
 			$check_entry = CTestArrayHelper::get($module, 'top_menu_entry', $entry['name']);
 			$this->assertEquals(0, $this->query($xpath.$check_entry.'"]')->count());
-			// In case if module meny entry leads to an existing view, don't check that menu entry URL isn't available.
+			// In case if module many entry leads to an existing view, don't check that menu entry URL isn't available.
 			if (CTestArrayHelper::get($entry, 'check_disabled', true)) {
 				$this->page->open('zabbix.php?action='.$entry['action'])->waitUntilReady();
 				$message = CMessageElement::find()->one();
@@ -634,7 +634,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 			else {
 				$this->changeModuleStatusFromPage($module['module_name'], 'Enabled');
 			}
-			// Check message and confirm that changes, made by the module, were revered.
+			// Check message and confirm that changes, made by the module, were reversed.
 			$message = $from_form ? 'Module updated: ' : 'Module disabled: ';
 			$this->assertMessage(TEST_GOOD, $message.$module['module_name'].'.');
 			$this->assertModuleDisabled($module);

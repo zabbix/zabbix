@@ -130,8 +130,8 @@
 
 			fetch(curl.getUrl(), {
 				method: 'POST',
-				headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
-				body: urlEncodeData(request_data)
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify(request_data)
 			})
 				.then((response) => response.json())
 				.then((response) => {
@@ -152,8 +152,8 @@
 					}
 					else {
 						const message = this.dashboard.dashboardid === null
-							? t('Failed to create dashboard')
-							: t('Failed to update dashboard');
+							? <?= json_encode(_('Failed to create dashboard')) ?>
+							: <?= json_encode(_('Failed to update dashboard')) ?>;
 
 						addMessage(makeMessageBox('bad', [], message, true, false));
 					}
@@ -195,11 +195,11 @@
 					{
 						items: [
 							{
-								label: t('Add widget'),
+								label: <?= json_encode(_('Add widget')) ?>,
 								clickCallback: () => ZABBIX.Dashboard.addNewWidget()
 							},
 							{
-								label: t('Add page'),
+								label: <?= json_encode(_('Add page')) ?>,
 								clickCallback: () => ZABBIX.Dashboard.addNewDashboardPage()
 							}
 						]
@@ -207,14 +207,14 @@
 					{
 						items: [
 							{
-								label: t('Paste widget'),
+								label: <?= json_encode(_('Paste widget')) ?>,
 								clickCallback: () => ZABBIX.Dashboard.pasteWidget(
 									ZABBIX.Dashboard.getStoredWidgetDataCopy()
 								),
 								disabled: (ZABBIX.Dashboard.getStoredWidgetDataCopy() === null)
 							},
 							{
-								label: t('Paste page'),
+								label: <?= json_encode(_('Paste page')) ?>,
 								clickCallback: () => ZABBIX.Dashboard.pasteDashboardPage(
 									ZABBIX.Dashboard.getStoredDashboardPageDataCopy()
 								),

@@ -19,7 +19,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/forms.inc.php';
+require_once __DIR__ .'/../../include/forms.inc.php';
 
 class CControllerPopupServiceEdit extends CController {
 
@@ -44,9 +44,11 @@ class CControllerPopupServiceEdit extends CController {
 		return $ret;
 	}
 
+	/**
+	 * @throws APIException
+	 */
 	protected function checkPermissions(): bool {
-		if (!$this->checkAccess(CRoleHelper::UI_MONITORING_SERVICES)
-				|| !$this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SERVICES)) {
+		if (!$this->checkAccess(CRoleHelper::UI_MONITORING_SERVICES)) {
 			return false;
 		}
 
@@ -74,6 +76,9 @@ class CControllerPopupServiceEdit extends CController {
 		return true;
 	}
 
+	/**
+	 * @throws APIException
+	 */
 	protected function doAction(): void {
 		if ($this->service !== null) {
 			CArrayHelper::sort($this->service['parents'], ['name']);
@@ -137,6 +142,39 @@ class CControllerPopupServiceEdit extends CController {
 		$defaults = DB::getDefaults('services');
 
 		if ($this->service !== null) {
+			foreach ($this->service['status_rules'] as $index => &$status_rule) {
+				$status_rule += [
+					'row_index' => $index,
+					'name' => CServiceHelper::formatStatusRuleType((int) $status_rule['type'],
+						(int) $status_rule['new_status'], (int) $status_rule['limit_value'],
+						(int) $status_rule['limit_status']
+					)
+				];
+			}
+			unset($status_rule);
+
+			foreach ($this->service['times'] as $index => &$service_time) {
+				switch ($service_time['type']) {
+					case SERVICE_TIME_TYPE_UPTIME:
+					case SERVICE_TIME_TYPE_DOWNTIME:
+						$from = dowHrMinToStr($service_time['ts_from']);
+						$till = dowHrMinToStr($service_time['ts_to'], true);
+						break;
+
+					case SERVICE_TIME_TYPE_ONETIME_DOWNTIME:
+						$from = zbx_date2str(DATE_TIME_FORMAT, $service_time['ts_from']);
+						$till = zbx_date2str(DATE_TIME_FORMAT, $service_time['ts_to']);
+						break;
+				}
+
+				$service_time += [
+					'row_index' => $index,
+					'from' => $from,
+					'till' => $till
+				];
+			}
+			unset($service_time);
+
 			$data = [
 				'title' => _('Service'),
 				'serviceid' => $this->service['serviceid'],

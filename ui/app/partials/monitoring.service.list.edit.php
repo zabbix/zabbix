@@ -59,7 +59,7 @@ $table = (new CTableInfo())
 	]));
 
 foreach ($data['services'] as $serviceid => $service) {
-	$row = [new CCheckBox('serviceids['.$serviceid.']', $serviceid)];
+	$row = [(new CCheckBox('serviceids['.$serviceid.']', $serviceid))->setEnabled(!$service['readonly'])];
 
 	if ($data['is_filtered']) {
 		$parents = [];
@@ -81,19 +81,19 @@ foreach ($data['services'] as $serviceid => $service) {
 
 	$root_cause = [];
 
-	foreach ($data['events'][$serviceid] as $event) {
+	foreach (array_slice($service['problem_events'], 0, $data['max_in_table']) as $problem_event) {
 		if ($root_cause) {
 			$root_cause[] = ', ';
 		}
 
-		$root_cause[] = $data['can_monitor_problems']
-			? new CLink($event['name'],
+		$root_cause[] = $data['can_monitor_problems'] && $problem_event['triggerid'] !== null
+			? new CLink($problem_event['name'],
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'problem.view')
 					->setArgument('filter_name', '')
-					->setArgument('triggerids', [$event['objectid']])
+					->setArgument('triggerids', [$problem_event['triggerid']])
 			)
-			: $event['name'];
+			: $problem_event['name'];
 	}
 
 	$table->addRow(new CRow(array_merge($row, [
@@ -118,17 +118,20 @@ foreach ($data['services'] as $serviceid => $service) {
 				->addClass(ZBX_STYLE_BTN_ADD)
 				->addClass('js-add-child-service')
 				->setAttribute('data-serviceid', $serviceid)
-				->setTitle(_('Add child service')),
+				->setTitle(_('Add child service'))
+				->setEnabled(!$service['readonly']),
 			(new CButton(null))
 				->addClass(ZBX_STYLE_BTN_EDIT)
 				->addClass('js-edit-service')
 				->setAttribute('data-serviceid', $serviceid)
-				->setTitle(_('Edit')),
+				->setTitle(_('Edit'))
+				->setEnabled(!$service['readonly']),
 			(new CButton(null))
 				->addClass(ZBX_STYLE_BTN_REMOVE)
 				->addClass('js-remove-service')
 				->setAttribute('data-serviceid', $serviceid)
 				->setTitle(_('Delete'))
+				->setEnabled(!$service['readonly'])
 		]))->addClass(ZBX_STYLE_LIST_TABLE_ACTIONS)
 	])));
 }

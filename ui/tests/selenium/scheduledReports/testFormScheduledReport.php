@@ -761,16 +761,15 @@ class testFormScheduledReport extends CWebTest {
 		$this->executeAction($data, 'dashboard', 'Scheduled report created');
 	}
 
-	// TODO: Uncomment this scenario when ZBX-19850 is fixed.
-//	public function testFormScheduledReport_SimpleUpdate() {
-//		$old_hash = $this->getHash();
-//		$name = CDBHelper::getRandom('SELECT name FROM report', 1);
-//		$this->page->login()->open('zabbix.php?action=scheduledreport.list');
-//		$this->query('link', $name)->waitUntilClickable()->one()->click();
-//		$this->query('button:Update')->waitUntilClickable()->one()->click();
-//		$this->assertMessage(TEST_GOOD, 'Scheduled report updated');
-//		$this->assertEquals($old_hash, $this->getHash());
-//	}
+	public function testFormScheduledReport_SimpleUpdate() {
+		$old_hash = $this->getHash();
+		$name = CDBHelper::getRandom('SELECT name FROM report', 1);
+		$this->page->login()->open('zabbix.php?action=scheduledreport.list');
+		$this->query('link', $name)->waitUntilClickable()->one()->click();
+		$this->query('button:Update')->waitUntilClickable()->one()->click();
+		$this->assertMessage(TEST_GOOD, 'Scheduled report updated');
+		$this->assertEquals($old_hash, $this->getHash());
+	}
 
 	public function getUpdateData() {
 		$data = [];

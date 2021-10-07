@@ -20,7 +20,7 @@
 
 
 /**
- * Validate only trigger event name field expression macroses, other macroses will be ignored.
+ * Validate only trigger event name field expression macros, other macros will be ignored.
  */
 class CEventNameValidator extends CValidator {
 
@@ -33,7 +33,12 @@ class CEventNameValidator extends CValidator {
 	 */
 	public function validate($value) {
 		$p = 0;
-		$expr_macro = new CExpressionMacroParser();
+		$expr_macro = new CExpressionMacroParser([
+			'usermacros' => true,
+			'lldmacros' => true,
+			'host_macro_n' => true,
+			'empty_host' => true
+		]);
 		$expr_func_macro = new CExpressionMacroFunctionParser();
 
 		while (isset($value[$p])) {

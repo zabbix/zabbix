@@ -106,4 +106,8 @@ makeServerStatusOutput()->show();
 
 local_showFooter($data);
 
+require_once 'include/views/js/common.init.js.php';
+
+insertPagePostJs();
+
 echo '</div></body></html>';

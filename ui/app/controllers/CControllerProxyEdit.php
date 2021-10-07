@@ -27,31 +27,30 @@ class CControllerProxyEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'proxyid' =>		'db       hosts.hostid',
-			'host' =>			'db       hosts.host',
-			'status' =>			'db       hosts.status         |in '.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE,
-			'interfaceid' =>	'db       interface.interfaceid',
-			'dns' =>			'db       interface.dns',
-			'ip' =>				'db       interface.ip',
-			'useip' =>			'db       interface.useip      |in 0,1',
-			'port' =>			'db       interface.port',
-			'proxy_address' =>	'db       hosts.proxy_address',
-			'description' =>	'db       hosts.description',
-			'tls_connect' => 	'db       hosts.tls_connect    |in '.HOST_ENCRYPTION_NONE.','.HOST_ENCRYPTION_PSK.','.
+			'proxyid' =>			'db hosts.hostid',
+			'host' =>				'db hosts.host',
+			'status' =>				'db hosts.status|in '.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE,
+			'dns' =>				'db interface.dns',
+			'ip' =>					'db interface.ip',
+			'useip' =>				'db interface.useip|in 0,1',
+			'port' =>				'db interface.port',
+			'proxy_address' =>		'db hosts.proxy_address',
+			'description' =>		'db hosts.description',
+			'tls_connect' =>		'db hosts.tls_connect|in '.HOST_ENCRYPTION_NONE.','.HOST_ENCRYPTION_PSK.','.
 				HOST_ENCRYPTION_CERTIFICATE,
-			'tls_accept' => 	'db       hosts.tls_accept     |in 0,'.HOST_ENCRYPTION_NONE.','.HOST_ENCRYPTION_PSK.','.
+			'tls_accept' =>			'db hosts.tls_accept|in 0,'.HOST_ENCRYPTION_NONE.','.HOST_ENCRYPTION_PSK.','.
 				(HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK).','.
 				HOST_ENCRYPTION_CERTIFICATE.','.
 				(HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_CERTIFICATE).','.
 				(HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE).','.
 				(HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE),
-			'tls_psk' =>		'db       hosts.tls_psk',
-			'tls_psk_identity'=>'db       hosts.tls_psk_identity',
-			'psk_edit_mode' =>	'in 0,1',
-			'tls_issuer' => 	'db       hosts.tls_issuer',
-			'tls_subject' => 	'db       hosts.tls_subject',
-			'clone_proxyid' =>	'db       hosts.hostid',
-			'form_refresh' =>	'int32'
+			'tls_psk' =>			'db hosts.tls_psk',
+			'tls_psk_identity' =>	'db hosts.tls_psk_identity',
+			'psk_edit_mode' =>		'in 0,1',
+			'tls_issuer' =>			'db hosts.tls_issuer',
+			'tls_subject' =>		'db hosts.tls_subject',
+			'clone_proxyid' =>		'db hosts.hostid',
+			'form_refresh' =>		'int32'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -110,7 +109,7 @@ class CControllerProxyEdit extends CController {
 				'output' => ['host', 'status', 'proxy_address', 'description', 'tls_connect', 'tls_accept',
 					'tls_issuer', 'tls_subject'
 				],
-				'selectInterface' => ['interfaceid', 'dns', 'ip', 'useip', 'port'],
+				'selectInterface' => ['dns', 'ip', 'useip', 'port'],
 				'proxyids' => $data['proxyid']
 			]);
 			$proxy = $proxies[0];
@@ -125,7 +124,6 @@ class CControllerProxyEdit extends CController {
 			$data['tls_subject'] = $proxy['tls_subject'];
 
 			if ($data['status'] == HOST_STATUS_PROXY_PASSIVE) {
-				$data['interfaceid'] = $proxy['interface']['interfaceid'];
 				$data['dns'] = $proxy['interface']['dns'];
 				$data['ip'] = $proxy['interface']['ip'];
 				$data['useip'] = $proxy['interface']['useip'];
@@ -154,10 +152,6 @@ class CControllerProxyEdit extends CController {
 		$data['tls_issuer'] = $this->getInput('tls_issuer', $data['tls_issuer']);
 		$data['tls_subject'] = $this->getInput('tls_subject', $data['tls_subject']);
 		$data['form_refresh'] = $this->getInput('form_refresh', $data['form_refresh']);
-
-		if ($data['status'] == HOST_STATUS_PROXY_PASSIVE && $this->hasInput('interfaceid')) {
-			$data['interfaceid'] = $this->getInput('interfaceid');
-		}
 
 		if (!$data['proxyid'] && $this->hasInput('clone_proxyid')) {
 			$data['clone_proxyid'] = $this->getInput('clone_proxyid');

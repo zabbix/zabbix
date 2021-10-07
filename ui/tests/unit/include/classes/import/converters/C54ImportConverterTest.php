@@ -22,10 +22,143 @@
 class C54ImportConverterTest extends CImportConverterTest {
 
 	public function importConverterDataProvider(): array {
+		$simple_macros_source = '{Zabbix server:system.hostname.last()}'.
+			'{Zabbix server:system.hostname.last(0)}{{HOST.HOST}:system.hostname.min(1s)}'.
+			'{{HOST.HOST1}:system.hostname.max(1m)}{{HOST.HOST2}:system.hostname.avg(1h)}'.
+			'{{HOSTNAME}:system.hostname.min(1d)}{{HOSTNAME1}:system.hostname.max(24h)}'.
+			'{{HOSTNAME1}:system.hostname.max(24h,)}{{HOSTNAME2}:system.hostname.avg(3600)}';
+		$simple_macros_expected = '{?last(/Zabbix server/system.hostname)}'.
+			'{?last(/Zabbix server/system.hostname)}{?min(/'.'/system.hostname,1s)}'.
+			'{?max(/'.'/system.hostname,1m)}{?avg(/{HOST.HOST2}/system.hostname,1h)}'.
+			'{?min(/'.'/system.hostname,1d)}{?max(/'.'/system.hostname,24h)}'.
+			'{?max(/'.'/system.hostname,24h)}{?avg(/{HOST.HOST2}/system.hostname,3600s)}';
+
 		return [
 			[
 				[],
 				[]
+			],
+			[
+				[
+					'hosts' => [
+						[
+							'host' => 'Zabbix server',
+							'groups' => [
+								['name' => 'Zabbix servers']
+							],
+							'discovery_rules' => [
+								[
+									'name' => 'Mounted filesystem discovery',
+									'key' => 'vfs.fs.discovery',
+									'graph_prototypes' => [
+										[
+											'name' => $simple_macros_source
+										]
+									]
+								]
+							]
+						]
+					],
+					'graphs' => [
+						[
+							'name' => $simple_macros_source
+						]
+					],
+					'maps' => [
+						[
+							'label_string_host' => $simple_macros_source,
+							'label_string_hostgroup' => $simple_macros_source,
+							'label_string_trigger' => $simple_macros_source,
+							'label_string_map' => $simple_macros_source,
+							'label_string_image' => $simple_macros_source,
+							'selements' => [
+								[
+									'label' => $simple_macros_source
+								]
+							],
+							'shapes' => [
+								[
+									'text' => $simple_macros_source
+								]
+							],
+							'links' => [
+								[
+									'label' => $simple_macros_source
+								]
+							]
+						]
+					],
+					'media_types' => [
+						[
+							'message_templates' => [
+								[
+									'subject' => $simple_macros_source,
+									'message' => $simple_macros_source
+								]
+							]
+						]
+					]
+				],
+				[
+					'hosts' => [
+						[
+							'host' => 'Zabbix server',
+							'groups' => [
+								['name' => 'Zabbix servers']
+							],
+							'discovery_rules' => [
+								[
+									'name' => 'Mounted filesystem discovery',
+									'key' => 'vfs.fs.discovery',
+									'graph_prototypes' => [
+										[
+											'name' => $simple_macros_expected
+										]
+									]
+								]
+							]
+						]
+					],
+					'graphs' => [
+						[
+							'name' => $simple_macros_expected
+						]
+					],
+					'maps' => [
+						[
+							'label_string_host' => $simple_macros_expected,
+							'label_string_hostgroup' => $simple_macros_expected,
+							'label_string_trigger' => $simple_macros_expected,
+							'label_string_map' => $simple_macros_expected,
+							'label_string_image' => $simple_macros_expected,
+							'selements' => [
+								[
+									'label' => $simple_macros_expected
+								]
+							],
+							'shapes' => [
+								[
+									'text' => $simple_macros_expected
+								]
+							],
+							'links' => [
+								[
+									'label' => $simple_macros_expected
+								]
+							]
+						]
+					],
+					'media_types' => [
+						[
+							'message_templates' => [
+								[
+									'subject' => $simple_macros_expected,
+									'message' => $simple_macros_expected
+								]
+							]
+						]
+					]
+				]
 			]
 		];
 	}
