@@ -32,6 +32,7 @@ Bug fixes:
 Changes for 5.4.5rc1
 
 New features:
+.......... [ZBXNEXT-6750] added IgnoreURLCertErrors configuration option to web service (yurii)
 ...G...PS. [ZBXNEXT-6840] improved protocol to support Zabbix proxy configuration of size up to 16 GB; improved performance and memory usage by freeing uncompressed data as fast as possible and compressing before connection (vso)
 ...G...... [ZBXNEXT-6784] removed item being unsupported when swap is not configured (dgoloscapov)
 ..F....... [ZBXNEXT-6852] updated localization for Zabbix Support URL (agriscenko)
@@ -39,6 +40,7 @@ New features:
 .........T [ZBXNEXT-6789] added template for Travis CI (abiba)
 
 Bug fixes:
+.......PS. [ZBX-19898] fixed postgresql version decoding (yurii)
 A......... [ZBX-19954] fixed updating of the "subject" and "message" parameters in scheduled reports (Sasha)
 ........S. [ZBX-19814] added ignoring final result in case if fping quits on a signal (dgoloscapov)
 ...G...PS. [ZBX-19952] removed libmodbus linkage from server and proxy (yurii)
