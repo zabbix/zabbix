@@ -36,7 +36,7 @@
 
 #define ZBX_HA_NODE_LOCK	1
 
-static pid_t			ha_pid;
+static pid_t			ha_pid = ZBX_THREAD_ERROR;
 static zbx_ipc_async_socket_t	ha_socket;
 
 extern char	*CONFIG_HA_NODE_NAME;
@@ -1222,6 +1222,9 @@ int	zbx_ha_start(char **error, int ha_status)
 
 	ret = SUCCEED;
 out:
+	if (SUCCEED != ret && ZBX_THREAD_ERROR != ha_pid)
+		zbx_ha_kill();
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
