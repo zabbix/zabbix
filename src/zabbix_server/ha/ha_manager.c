@@ -91,6 +91,7 @@ typedef struct
 {
 	zbx_cuid_t	nodeid;
 	char		*name;
+	char		*address;
 	int		status;
 	int		lastaccess;
 }
@@ -102,6 +103,7 @@ ZBX_PTR_VECTOR_IMPL(ha_node, zbx_ha_node_t *)
 static void	zbx_ha_node_free(zbx_ha_node_t *node)
 {
 	zbx_free(node->name);
+	zbx_free(node->address);
 	zbx_free(node);
 }
 
@@ -284,7 +286,7 @@ static int	ha_db_get_nodes(zbx_vector_ha_node_t *nodes, int lock)
 	DB_ROW		row;
 	zbx_ha_node_t	*node;
 
-	result = DBselect_once("select ha_nodeid,name,status,lastaccess from ha_node order by ha_nodeid%s",
+	result = DBselect_once("select ha_nodeid,name,status,lastaccess,address,port from ha_node order by ha_nodeid%s",
 			(0 == lock ? "" : ZBX_FOR_UPDATE));
 
 	if (NULL == result || ZBX_DB_DOWN == (intptr_t)result)
@@ -297,6 +299,7 @@ static int	ha_db_get_nodes(zbx_vector_ha_node_t *nodes, int lock)
 		node->name = zbx_strdup(NULL, row[1]);
 		node->status = atoi(row[2]);
 		node->lastaccess = atoi(row[3]);
+		node->address = zbx_dsprintf(NULL, "%s:%s", row[4], row[5]);
 		zbx_vector_ha_node_append(nodes, node);
 	}
 
@@ -976,7 +979,11 @@ static int	ha_db_get_cluster_status(zbx_ha_info_t *info, char **status)
 			zbx_json_addstring(&j, ZBX_PROTO_TAG_NAME, nodes.values[i]->name, ZBX_JSON_TYPE_STRING);
 			zbx_json_addint64(&j, ZBX_PROTO_TAG_STATUS, (zbx_int64_t)nodes.values[i]->status);
 			zbx_json_addint64(&j, ZBX_PROTO_TAG_LASTACCESS, (zbx_int64_t)nodes.values[i]->lastaccess);
-			zbx_json_addint64(&j, ZBX_PROTO_TAG_NOW, (zbx_int64_t)db_time);
+			zbx_json_addstring(&j, ZBX_PROTO_TAG_ADDRESS, (zbx_int64_t)nodes.values[i]->address,
+					ZBX_JSON_TYPE_STRING);
+			zbx_json_addint64(&j, ZBX_PROTO_TAG_DB_TIMESTAMP, (zbx_int64_t)db_time);
+			zbx_json_addint64(&j, ZBX_PROTO_TAG_LASTACCESS_AGE,
+					(zbx_int64_t)(db_time -nodes.values[i]->lastaccess));
 
 			zbx_json_close(&j);
 		}
@@ -1007,6 +1014,8 @@ out:
  ******************************************************************************/
 static void	ha_report_cluster_status(zbx_ha_info_t *info)
 {
+#define ZBX_HA_REPORT_FMT	"%-25s %-25s %-30s %-11s %s"
+
 	char	*cluster_status = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -1018,12 +1027,12 @@ static void	ha_report_cluster_status(zbx_ha_info_t *info)
 		if (SUCCEED == zbx_json_open(cluster_status, &jp))
 		{
 			const char	*pnext;
-			char		name[256], id[26], buffer[256];
-			int		status, lastaccess, db_time, index = 1;
+			char		name[256], address[261], id[26], buffer[256];
+			int		status, lastaccess_age, index = 1;
 
 			zabbix_log(LOG_LEVEL_INFORMATION, "cluster status:");
-			zabbix_log(LOG_LEVEL_INFORMATION, "  %2s  %-25s %-40s %-11s %s", "#", "ID", "Name", "Status",
-					"Age");
+			zabbix_log(LOG_LEVEL_INFORMATION, "  %2s  " ZBX_HA_REPORT_FMT, "#", "ID", "Name",
+					"Address", "Status", "Last Access");
 
 			for (pnext = NULL; NULL != (pnext = zbx_json_next(&jp, pnext));)
 			{
@@ -1054,24 +1063,23 @@ static void	ha_report_cluster_status(zbx_ha_info_t *info)
 				}
 				status = atoi(buffer);
 
-				if (SUCCEED != zbx_json_value_by_name(&jp_node, ZBX_PROTO_TAG_LASTACCESS, buffer,
+				if (SUCCEED != zbx_json_value_by_name(&jp_node, ZBX_PROTO_TAG_LASTACCESS_AGE, buffer,
 						sizeof(buffer), NULL))
 				{
 					THIS_SHOULD_NEVER_HAPPEN;
 					continue;
 				}
-				lastaccess = atoi(buffer);
+				lastaccess_age = atoi(buffer);
 
-				if (SUCCEED != zbx_json_value_by_name(&jp_node, ZBX_PROTO_TAG_NOW, buffer,
-						sizeof(buffer), NULL))
+				if (SUCCEED != zbx_json_value_by_name(&jp_node, ZBX_PROTO_TAG_ADDRESS, address,
+						sizeof(address), NULL))
 				{
 					THIS_SHOULD_NEVER_HAPPEN;
 					continue;
 				}
-				db_time = atoi(buffer);
 
-				zabbix_log(LOG_LEVEL_INFORMATION, "  %2d. %25s %-40s %-11s %s", index++, id, name,
-						zbx_ha_status_str(status), zbx_age2str(db_time - lastaccess));
+				zabbix_log(LOG_LEVEL_INFORMATION, "  %2d. " ZBX_HA_REPORT_FMT, index++, id, name,
+						address, zbx_ha_status_str(status), zbx_age2str(lastaccess_age));
 			}
 		}
 
@@ -1080,6 +1088,7 @@ static void	ha_report_cluster_status(zbx_ha_info_t *info)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
+#undef ZBX_HA_REPORT_FMT
 }
 
 

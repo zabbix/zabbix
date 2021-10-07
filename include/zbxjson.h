@@ -178,6 +178,8 @@
 #define ZBX_PROTO_TAG_RECIPIENT			"recipient"
 #define ZBX_PROTO_TAG_RECIPIENTS		"recipients"
 #define ZBX_PROTO_TAG_LASTACCESS		"lastaccess"
+#define ZBX_PROTO_TAG_LASTACCESS_AGE		"lastaccess_age"
+#define ZBX_PROTO_TAG_DB_TIMESTAMP		"db_timestamp"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"
