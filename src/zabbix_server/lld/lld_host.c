@@ -452,7 +452,7 @@ static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, z
 		host->tls_psk_identity_orig = NULL;
 		host->tls_psk_orig = NULL;
 		host->jp_row = NULL;
-		host->inventory_mode = 0;
+		host->inventory_mode = HOST_INVENTORY_DISABLED;
 		host->status = 0;
 		host->custom_interfaces_orig = 0;
 		host->proxy_hostid_orig = 0;
@@ -2743,7 +2743,9 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 
 			if (host->inventory_mode_orig != host->inventory_mode)
 			{
-				zbx_audit_host_update_json_add_inventory_mode(host->hostid, (int)host->inventory_mode);
+				zbx_audit_host_update_json_update_inventory_mode(host->hostid,
+						(int)host->inventory_mode_orig, (int)host->inventory_mode);
+
 				if (HOST_INVENTORY_DISABLED == host->inventory_mode)
 					zbx_vector_uint64_append(&del_host_inventory_hostids, host->hostid);
 				else if (HOST_INVENTORY_DISABLED == host->inventory_mode_orig)
@@ -2962,14 +2964,17 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 
 			zbx_db_insert_add_values(&db_insert_hdiscovery, host->hostid, parent_hostid, host_proto);
 
+			if (HOST_INVENTORY_DISABLED != host->inventory_mode)
+			{
+				zbx_db_insert_add_values(&db_insert_hinventory, host->hostid,
+						(int)host->inventory_mode);
+			}
+
 			zbx_audit_host_update_json_add_details(host->hostid, host->host, proxy_hostid,
 					(int)ipmi_authtype, (int)ipmi_privilege, ipmi_username, ipmi_password,
 					(int)host->status, (int)ZBX_FLAG_DISCOVERY_CREATED, (int)tls_connect,
-					(int)tls_accept, tls_issuer, tls_subject, tls_psk_identity, tls_psk,
-					host->custom_interfaces);
-
-			if (HOST_INVENTORY_DISABLED != host->inventory_mode)
-				zbx_db_insert_add_values(&db_insert_hinventory, host->hostid, (int)host->inventory_mode);
+					(int)tls_accept, tls_issuer, tls_subject, AUDIT_SECRET_MASK, AUDIT_SECRET_MASK,
+					host->custom_interfaces, host->inventory_mode);
 		}
 		else
 		{
@@ -3108,11 +3113,10 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
 							"%stls_psk_identity='%s'", d, value_esc);
 					d = ",";
+					zbx_free(value_esc);
 
 					zbx_audit_host_update_json_update_tls_psk_identity(host->hostid,
-							host->tls_psk_identity_orig, value_esc);
-
-					zbx_free(value_esc);
+							AUDIT_SECRET_MASK, AUDIT_SECRET_MASK);
 				}
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK))
 				{
@@ -3121,11 +3125,10 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
 							"%stls_psk='%s'", d, value_esc);
 					d = ",";
+					zbx_free(value_esc);
 
 					zbx_audit_host_update_json_update_tls_psk(host->hostid,
-							host->tls_psk_orig, value_esc);
-
-					zbx_free(value_esc);
+							AUDIT_SECRET_MASK, AUDIT_SECRET_MASK);
 				}
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_CUSTOM_INTERFACES))
 				{

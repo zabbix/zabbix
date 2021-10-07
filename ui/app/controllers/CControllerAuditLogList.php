@@ -194,7 +194,8 @@ class CControllerAuditLogList extends CController {
 			CAudit::ACTION_ADD => _('Add'),
 			CAudit::ACTION_UPDATE => _('Update'),
 			CAudit::ACTION_DELETE => _('Delete'),
-			CAudit::ACTION_EXECUTE => _('Execute')
+			CAudit::ACTION_EXECUTE => _('Execute'),
+			CAudit::ACTION_HISTORY_CLEAR => _('History clear')
 		];
 	}
 
