@@ -250,11 +250,67 @@ final class CHistFunctionData {
 	];
 
 	/**
-	 * A subset of history functions for use in calculated item formulas only.
+	 * Additional requirements for history function usage in expressions.
 	 *
 	 * @var array
 	 */
-	private const CALCULATED_ONLY = [
+	private const EXPRESSION_RULES = [
+		'avg_foreach' => [[
+			'type' => 'require_math_parent',
+			'in' => ['avg', 'count', 'max', 'min', 'sum'],
+			'parameters' => ['count' => 1],
+			'position' => 0
+		]],
+		'bucket_rate_foreach' => [[
+			'type' => 'require_math_parent',
+			'in' => ['histogram_quantile'],
+			'parameters' => ['count' => 2],
+			'position' => 1
+		]],
+		'count_foreach' => [[
+			'type' => 'require_math_parent',
+			'in' => ['avg', 'count', 'max', 'min', 'sum'],
+			'parameters' => ['count' => 1],
+			'position' => 0
+		]],
+		'exists_foreach' => [[
+			'type' => 'require_math_parent',
+			'in' => ['avg', 'count', 'max', 'min', 'sum'],
+			'parameters' => ['count' => 1],
+			'position' => 0
+		]],
+		'last_foreach' => [[
+			'type' => 'require_math_parent',
+			'in' => ['avg', 'count', 'max', 'min', 'sum'],
+			'parameters' => ['count' => 1],
+			'position' => 0
+		]],
+		'max_foreach' => [[
+			'type' => 'require_math_parent',
+			'in' => ['avg', 'count', 'max', 'min', 'sum'],
+			'parameters' => ['count' => 1],
+			'position' => 0
+		]],
+		'min_foreach' => [[
+			'type' => 'require_math_parent',
+			'in' => ['avg', 'count', 'max', 'min', 'sum'],
+			'parameters' => ['count' => 1],
+			'position' => 0
+		]],
+		'sum_foreach' => [[
+			'type' => 'require_math_parent',
+			'in' => ['avg', 'count', 'max', 'min', 'sum'],
+			'parameters' => ['count' => 1],
+			'position' => 0
+		]]
+	];
+
+	/**
+	 * A subset of aggregating history functions for use in calculated item formulas.
+	 *
+	 * @var array
+	 */
+	private const AGGREGATING = [
 		'avg_foreach',
 		'bucket_percentile',
 		'bucket_rate_foreach',
@@ -281,6 +337,8 @@ final class CHistFunctionData {
 	private const VALUE_TYPES = [
 		'avg' => self::ITEM_VALUE_TYPES_NUM,
 		'avg_foreach' => self::ITEM_VALUE_TYPES_NUM,
+		'bucket_percentile' => self::ITEM_VALUE_TYPES_NUM,
+		'bucket_rate_foreach' => self::ITEM_VALUE_TYPES_NUM,
 		'change' => self::ITEM_VALUE_TYPES_ALL,
 		'count' => self::ITEM_VALUE_TYPES_ALL,
 		'count_foreach' => self::ITEM_VALUE_TYPES_ALL,
@@ -354,7 +412,7 @@ final class CHistFunctionData {
 			return false;
 		}
 
-		if (!$this->options['calculated'] && in_array($function, self::CALCULATED_ONLY, true)) {
+		if (!$this->options['calculated'] && in_array($function, self::AGGREGATING, true)) {
 			return false;
 		}
 
@@ -371,7 +429,33 @@ final class CHistFunctionData {
 			return self::PARAMETERS;
 		}
 
-		return array_diff_key(self::PARAMETERS, array_flip(self::CALCULATED_ONLY));
+		return array_diff_key(self::PARAMETERS, array_flip(self::AGGREGATING));
+	}
+
+	/**
+	 * Get additional requirements for history function usage in expressions.
+	 *
+	 * @return array
+	 */
+	public function getExpressionRules(): array {
+		if ($this->options['calculated']) {
+			return self::EXPRESSION_RULES;
+		}
+
+		return array_diff_key(self::EXPRESSION_RULES, array_flip(self::AGGREGATING));
+	}
+
+	/**
+	 * Check if function is aggregating wildcarded host/item queries and is exclusive to calculated item formulas.
+	 *
+	 * @static
+	 *
+	 * @param string $function
+	 *
+	 * @return bool
+	 */
+	public function isAggregating(string $function): bool {
+		return in_array($function, self::AGGREGATING);
 	}
 
 	/**
@@ -384,78 +468,6 @@ final class CHistFunctionData {
 			return self::VALUE_TYPES;
 		}
 
-		return array_diff_key(self::VALUE_TYPES, array_flip(self::CALCULATED_ONLY));
-	}
-
-	/**
-	 * Check if function is aggregating wildcarded host/item queries and is exclusive to calculated item formulas.
-	 *
-	 * @static
-	 *
-	 * @param string $function
-	 *
-	 * @return bool
-	 */
-	public static function isAggregating(string $function): bool {
-		switch ($function) {
-			case 'avg_foreach':
-			case 'count_foreach':
-			case 'exists_foreach':
-			case 'item_count':
-			case 'last_foreach':
-			case 'max_foreach':
-			case 'min_foreach':
-			case 'sum_foreach':
-				return true;
-
-			default:
-				return false;
-		}
-	}
-
-	/**
-	 * Check if the result of aggregating function is further aggregatable.
-	 *
-	 * @static
-	 *
-	 * @param string $function
-	 *
-	 * @return bool
-	 */
-	public static function isAggregatable(string $function): bool {
-		switch ($function) {
-			case 'avg_foreach':
-			case 'count_foreach':
-			case 'exists_foreach':
-			case 'last_foreach':
-			case 'max_foreach':
-			case 'min_foreach':
-			case 'sum_foreach':
-				return true;
-
-			default:
-				return false;
-		}
-	}
-
-	/**
-	 * Check if the result of aggregating function is further aggregatible by bucket aggregation function.
-	 *
-	 * @See CMathFunctionData::isAggregatingBucket().
-	 *
-	 * @static
-	 *
-	 * @param string $function
-	 *
-	 * @return bool
-	 */
-	public static function isAggregatableBucket(string $function): bool {
-		switch ($function) {
-			case 'bucket_rate_foreach':
-				return true;
-
-			default:
-				return false;
-		}
+		return array_diff_key(self::VALUE_TYPES, array_flip(self::AGGREGATING));
 	}
 }
