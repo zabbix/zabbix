@@ -103,7 +103,9 @@
 				const post_data = Object.keys(params)
 					.filter(key => !exclude.includes(key))
 					.reduce((post_data, key) => {
-						post_data[key] = params[key];
+						post_data[key] = (typeof params[key] === 'object')
+							? [...params[key]].filter(i => i)
+							: params[key];
 						return post_data;
 					}, {});
 
