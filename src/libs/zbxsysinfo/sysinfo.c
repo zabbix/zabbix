@@ -44,6 +44,10 @@
 #	include "specsysinfo.h"
 #endif
 
+#ifdef HAVE_SYS_UTSNAME_H
+#	include <sys/utsname.h>
+#endif
+
 typedef struct
 {
 	char				*pattern;
@@ -2059,4 +2063,147 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 void	zbx_mpoints_free(zbx_mpoint_t *mpoint)
 {
 	zbx_free(mpoint);
+}
+
+static int	retrieve_hostname(char **hostname, char **error)
+{
+#ifdef __hpux
+	long 		hostbufsize = 0;
+#elif _WINDOWS
+	char		buffer[256];
+#else
+	struct utsname	name;
+#endif
+
+#ifdef __hpux
+#ifdef _SC_HOST_NAME_MAX
+	hostbufsize = sysconf(_SC_HOST_NAME_MAX) + 1;
+#endif
+	if (0 == hostbufsize)
+		hostbufsize = 256;
+
+	*hostname = zbx_malloc(NULL, hostbufsize);
+
+	if (0 != gethostname(*hostname, hostbufsize))
+	{
+		zbx_free(*hostname);
+		*error = zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
+		return SYSINFO_RET_FAIL;
+	}
+#elif _WINDOWS
+	if (SUCCEED != gethostname(buffer, sizeof(buffer)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "gethostname() failed: %s", strerror_from_system(WSAGetLastError()));
+		*error = zbx_dsprintf(NULL, "Cannot obtain host name: %s", strerror_from_system(WSAGetLastError()));
+		return FAIL;
+	}
+	*hostname = zbx_strdup(NULL, buffer);
+#else
+	if (-1 == uname(&name))
+	{
+		*error = zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno));
+		return FAIL;
+	}
+
+	*hostname = zbx_strdup(NULL, name.nodename);
+#endif
+
+	return SUCCEED;
+}
+
+#ifdef _WINDOWS
+int	get_netbios_name(char **name, char **error)
+{
+	DWORD		dwSize = 256;
+	wchar_t		computerName[256];
+
+	/* Buffer size is chosen large enough to contain any DNS name, not just MAX_COMPUTERNAME_LENGTH + 1 */
+	/* characters. MAX_COMPUTERNAME_LENGTH is usually less than 32, but it varies among systems, so we  */
+	/* cannot use the constant in a precompiled Windows agent, which is expected to work on any system. */
+	if (0 == GetComputerName(computerName, &dwSize))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "GetComputerName() failed: %s", strerror_from_system(GetLastError()));
+		*error = zbx_dsprintf(NULL, "Cannot obtain computer name: %s", strerror_from_system(GetLastError()));
+
+		return FAIL;
+	}
+
+	*name = zbx_unicode_to_utf8(computerName);
+
+	return SUCCEED;
+}
+#endif
+
+int	get_system_hostname(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	char		*ptype, *ptransform, *hostname, *error = NULL;
+
+	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	ptype = get_rparam(request, 0);
+	ptransform = get_rparam(request, 1);
+
+	if (NULL != ptype && '\0' != *ptype && 0 != strcmp(ptype, "host"))
+	{
+		if (0 == strcmp(ptype, "shorthost"))
+		{
+			char	*dot;
+
+			if (FAIL == retrieve_hostname(&hostname, &error))
+			{
+				SET_MSG_RESULT(result, error);
+				return SYSINFO_RET_FAIL;
+			}
+
+			if (NULL != (dot = strchr(hostname, '.')))
+				*dot = '\0';
+		}
+		else if (0 == strcmp(ptype, "netbios"))
+		{
+#ifdef _WINDOWS
+			if (FAIL == get_netbios_name(&hostname, &error))
+			{
+				SET_MSG_RESULT(result, error);
+				return SYSINFO_RET_FAIL;
+			}
+#else
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "NetBIOS is not supported on the current platform."));
+			return SYSINFO_RET_FAIL;
+#endif
+		}
+		else
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
+			return SYSINFO_RET_FAIL;
+		}
+	}
+	else
+	{
+		if (FAIL == retrieve_hostname(&hostname, &error))
+		{
+			SET_MSG_RESULT(result, error);
+			return SYSINFO_RET_FAIL;
+		}
+	}
+
+	if (NULL != ptransform && '\0' != *ptransform && 0 != strcmp(ptransform, "none"))
+	{
+		if (0 == strcmp(ptransform, "lower"))
+		{
+			zbx_strlower(hostname);
+		}
+		else
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+			return SYSINFO_RET_FAIL;
+		}
+	}
+
+	SET_STR_RESULT(result, hostname);
+
+	return SYSINFO_RET_OK;
 }

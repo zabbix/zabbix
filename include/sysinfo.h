@@ -372,3 +372,5 @@ zbx_uint32_t get_thread_global_mutex_flag(void);
 #endif
 
 #endif
+
+int	get_system_hostname(AGENT_REQUEST *request, AGENT_RESULT *result);

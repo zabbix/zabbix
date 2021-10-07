@@ -66,7 +66,7 @@ func getHostname(params []string) (uname string, err error) {
 	switch ptransform {
 	case "lower":
 		uname = strings.ToLower(uname)
-	case "":
+	case "none", "":
 		break
 	default:
 		return "", errors.New("Invalid second parameter.")
