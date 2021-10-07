@@ -244,6 +244,9 @@ class CControllerHostEdit extends CController {
 			unset($macro);
 		}
 
+		order_result($data['host']['valuemaps'], 'name');
+		$data['host']['valuemaps'] = array_values($data['host']['valuemaps']);
+
 		if ($this->hasInput('groupids')) {
 			$data['groupids'] = $this->getInput('groupids', []);
 		}
