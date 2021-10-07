@@ -52,6 +52,7 @@ typedef struct
 }
 zbx_cuid_t;
 
+#define zbx_cuid_empty(a)	('\0' == *(a).str ? SUCCEED : FAIL)
 #define zbx_cuid_compare(a, b)	(0 == memcmp((a).str, (b).str, CUID_LEN) ? SUCCEED : FAIL)
 #define zbx_cuid_clear(a)	memset((a).str, 0, CUID_LEN)
 
@@ -614,7 +615,7 @@ static int	ha_db_register_node(zbx_ha_info_t *info)
 
 	zbx_vector_ha_node_create(&nodes);
 
-	if (SUCCEED != (ret = ha_db_create_node(info)) || '\0' == info->nodeid.str[0])
+	if (SUCCEED != (ret = ha_db_create_node(info)) || SUCCEED == zbx_cuid_empty(info->nodeid))
 		goto finish;
 
 	if (ZBX_DB_OK != ha_db_begin(info))
@@ -755,12 +756,12 @@ static int	ha_check_standby_nodes(zbx_ha_info_t *info, zbx_vector_ha_node_t *nod
  *          seconds, mark them unavailable and set own status to active       *
  *                                                                            *
  ******************************************************************************/
-static int	ha_check_active_node(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes)
+static int	ha_check_active_node(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes, int *ha_status)
 {
 	int	i, ret = SUCCEED;
 
 	if (ZBX_NODE_STATUS_UNKNOWN == info->ha_status)
-		info->ha_status = ZBX_NODE_STATUS_STANDBY;
+		*ha_status = ZBX_NODE_STATUS_STANDBY;
 
 	for (i = 0; i < nodes->values_num; i++)
 	{
@@ -774,7 +775,7 @@ static int	ha_check_active_node(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes
 	/*    database connection loss.                                 */
 	if (i == nodes->values_num || SUCCEED == zbx_cuid_compare(nodes->values[i]->nodeid, info->nodeid))
 	{
-		info->ha_status = ZBX_NODE_STATUS_ACTIVE;
+		*ha_status = ZBX_NODE_STATUS_ACTIVE;
 	}
 	else
 	{
@@ -795,7 +796,7 @@ static int	ha_check_active_node(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes
 				ret = FAIL;
 			}
 
-			info->ha_status = ZBX_NODE_STATUS_ACTIVE;
+			*ha_status = ZBX_NODE_STATUS_ACTIVE;
 		}
 	}
 
@@ -809,26 +810,17 @@ static int	ha_check_active_node(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes
  * Purpose: check if the node is registered in node table and get ID          *
  *                                                                            *
  ******************************************************************************/
-static int	ha_check_registered_node(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes)
+static zbx_ha_node_t	*ha_find_node_by_name(zbx_vector_ha_node_t *nodes, const char *name)
 {
 	int	i;
 
 	for (i = 0; i < nodes->values_num; i++)
 	{
-		if (0 == strcmp(info->name, nodes->values[i]->name))
-		{
-			info->nodeid = nodes->values[i]->nodeid;
-			break;
-		}
+		if (0 == strcmp(nodes->values[i]->name, name))
+			return nodes->values[i];
 	}
 
-	if (i == nodes->values_num)
-	{
-		ha_set_error(info, "cannot find server node \"%s\" in registry", info->name);
-		return FAIL;
-	}
-
-	return SUCCEED;
+	return NULL;
 }
 
 /******************************************************************************
@@ -841,9 +833,10 @@ static int	ha_check_registered_node(zbx_ha_info_t *info, zbx_vector_ha_node_t *n
 static int	ha_check_nodes(zbx_ha_info_t *info)
 {
 	zbx_vector_ha_node_t	nodes;
-	int			ret = SUCCEED, old_status;
+	zbx_ha_node_t		*node;
+	int			ret = SUCCEED, ha_status;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ha_status:%s", __func__, zbx_ha_status_str(info->ha_status));
 
 	zbx_vector_ha_node_create(&nodes);
 
@@ -852,23 +845,30 @@ static int	ha_check_nodes(zbx_ha_info_t *info)
 	if (ZBX_DB_OK != ha_db_begin(info))
 		goto finish;
 
+	ha_status = info->ha_status;
+
 	if (SUCCEED != ha_db_get_nodes(&nodes, ZBX_HA_NODE_LOCK))
 		goto out;
 
-	if (SUCCEED != (ret = ha_check_registered_node(info, &nodes)))
+	if (NULL == (node = ha_find_node_by_name(&nodes, info->name)))
+	{
+		ha_set_error(info, "cannot find server node \"%s\" in registry", info->name);
+		ret = FAIL;
 		goto out;
+	}
+
+	if (SUCCEED == zbx_cuid_empty(info->nodeid))
+		info->nodeid = node->nodeid;
 
 	if (FAIL == ha_db_update_config(info))
 		goto out;
-
-	old_status = info->ha_status;
 
 	if (ZBX_HA_IS_CLUSTER())
 	{
 		if (ZBX_NODE_STATUS_ACTIVE == info->ha_status)
 			ret = ha_check_standby_nodes(info, &nodes);
 		else /* passive status */
-			ret = ha_check_active_node(info, &nodes);
+			ret = ha_check_active_node(info, &nodes, &ha_status);
 	}
 	else
 		ret = SUCCEED;
@@ -880,8 +880,8 @@ static int	ha_check_nodes(zbx_ha_info_t *info)
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update ha_node set lastaccess=" ZBX_DB_TIMESTAMP());
 
-		if (old_status != info->ha_status)
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",status=%d", info->ha_status);
+		if (ha_status != node->status)
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",status=%d", ha_status);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where ha_nodeid='%s'", info->nodeid.str);
 
@@ -914,6 +914,7 @@ finish:
 				break;
 			case ZBX_DB_OK:
 				info->offline_ticks = 0;
+				info->ha_status = ha_status;
 				ret = SUCCEED;
 				break;
 		}
