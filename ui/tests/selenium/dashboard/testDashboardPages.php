@@ -77,7 +77,7 @@ class testDashboardPages extends CWebTest {
 	 * @var integer
 	 */
 	protected static $dashboardid_empty;
-	
+
 	/**
 	 * Id of dashboard for max pages amount check.
 	 *
