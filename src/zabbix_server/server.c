@@ -1445,6 +1445,10 @@ static int	server_startup(zbx_socket_t *listen_sock)
 		}
 	}
 
+	/* startup/postinit tasks can take a long time, update status */
+	if (SUCCEED != server_update_status())
+		return FAIL;
+
 	return SUCCEED;
 }
 
@@ -1708,11 +1712,26 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zbx_set_sigusr_handler(zbx_main_sigusr_handler);
 
-	if (SUCCEED != zbx_ha_get_status(&error))
+	if (SUCCEED != zbx_ha_get_status(&error) ||
+			SUCCEED != zbx_ha_recv_status(ZBX_IPC_WAIT_FOREVER, &ha_status, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot start server: %s", error);
 		zbx_free(error);
 		sig_exiting = ZBX_EXIT_FAILURE;
+	}
+
+	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
+	{
+		if (SUCCEED != server_startup(&listen_sock))
+		{
+			sig_exiting = ZBX_EXIT_FAILURE;
+		}
+		else
+		{
+			/* check if the HA status has not been changed during startup process */
+			if (ZBX_NODE_STATUS_ACTIVE != ha_status)
+				server_teardown(&listen_sock);
+		}
 	}
 
 	while (ZBX_IS_RUNNING())	/* wait for any child to exit */
