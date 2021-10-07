@@ -816,6 +816,45 @@ static int	DBpatch_5050072(void)
 	return DBmodify_field_type("media_type_message", &field, &old_field);
 }
 
+static int	DBpatch_5050073(void)
+{
+	const ZBX_FIELD	field = {"geomaps_tile_provider", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_5050074(void)
+{
+	const ZBX_FIELD	field = {"geomaps_tile_url", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_5050075(void)
+{
+	const ZBX_FIELD	field = {"geomaps_max_zoom", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_5050076(void)
+{
+	const ZBX_FIELD	field = {"geomaps_attribution", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_5050077(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update config set geomaps_tile_provider='OpenStreetMap.Mapnik'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(5050)
@@ -889,5 +928,10 @@ DBPATCH_ADD(5050069, 0, 1)
 DBPATCH_ADD(5050070, 0, 1)
 DBPATCH_ADD(5050071, 0, 1)
 DBPATCH_ADD(5050072, 0, 1)
+DBPATCH_ADD(5050073, 0, 1)
+DBPATCH_ADD(5050074, 0, 1)
+DBPATCH_ADD(5050075, 0, 1)
+DBPATCH_ADD(5050076, 0, 1)
+DBPATCH_ADD(5050077, 0, 1)
 
 DBPATCH_END()

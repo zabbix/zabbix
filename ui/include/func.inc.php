@@ -2659,3 +2659,49 @@ function generateUuidV4($seed = '') {
 
 	return bin2hex($data);
 }
+
+/**
+ * Function returns predefined Leaflet Tile providers with parameters.
+ *
+ * @return array
+ */
+function getTileProviders(): array {
+	return [
+		'OpenStreetMap.Mapnik' => [
+			'name' => 'OpenStreetMap Mapnik',
+			'geomaps_tile_url' => 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+			'geomaps_max_zoom' => '19',
+			'geomaps_attribution' => '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+		],
+		'OpenTopoMap' => [
+			'name' => 'OpenTopoMap',
+			'geomaps_tile_url' => 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+			'geomaps_max_zoom' => '17',
+			'geomaps_attribution' => 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+		],
+		'Stamen.TonerLite' => [
+			'name' => 'Stamen Toner Lite',
+			'geomaps_tile_url' => 'https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.png',
+			'geomaps_max_zoom' => '20',
+			'geomaps_attribution' => 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+		],
+		'Stamen.Terrain' => [
+			'name' => 'Stamen Terrain',
+			'geomaps_tile_url' => 'https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.png',
+			'geomaps_max_zoom' => '18',
+			'geomaps_attribution' => 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+		],
+		'USGS.USTopo' => [
+			'name' => 'USGS US Topo',
+			'geomaps_tile_url' => 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}',
+			'geomaps_max_zoom' => '20',
+			'geomaps_attribution' => 'Tiles courtesy of the <a href="https://usgs.gov/">U.S. Geological Survey</a>'
+		],
+		'USGS.USImagery' => [
+			'name' => 'USGS US Imagery',
+			'geomaps_tile_url' => 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}',
+			'geomaps_max_zoom' => '20',
+			'geomaps_attribution' => 'Tiles courtesy of the <a href="https://usgs.gov/">U.S. Geological Survey</a>'
+		]
+	];
+}

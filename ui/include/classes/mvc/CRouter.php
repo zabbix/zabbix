@@ -104,6 +104,8 @@ class CRouter {
 		'export.valuemaps'							=> ['CControllerExport',								'layout.export',		null],
 		'favourite.create'							=> ['CControllerFavouriteCreate',						'layout.javascript',	null],
 		'favourite.delete'							=> ['CControllerFavouriteDelete',						'layout.javascript',	null],
+		'geomaps.edit'								=> ['CControllerGeomapsEdit',							'layout.htmlpage',		'administration.geomaps.edit'],
+		'geomaps.update'							=> ['CControllerGeomapsUpdate',							null,					null],
 		'gui.edit'									=> ['CControllerGuiEdit',								'layout.htmlpage',		'administration.gui.edit'],
 		'gui.update'								=> ['CControllerGuiUpdate',								null,					null],
 		'hintbox.actionlist'						=> ['CControllerHintboxActionlist',						'layout.json',			'hintbox.actionlist'],

@@ -250,6 +250,8 @@ class CMenuHelper {
 							->setAction('macros.edit'),
 						(new CMenuItem(_('Trigger displaying options')))
 							->setAction('trigdisplay.edit'),
+						(new CMenuItem(_('Geographical maps')))
+							->setAction('geomaps.edit'),
 						(new CMenuItem(_('Modules')))
 							->setAction('module.list')
 							->setAliases(['module.edit', 'module.scan']),

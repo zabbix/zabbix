@@ -45,7 +45,8 @@ class CSettings extends CApiService {
 		'snmptrap_logging', 'default_lang', 'default_timezone', 'login_attempts', 'login_block', 'validate_uri_schemes',
 		'uri_valid_schemes', 'x_frame_options', 'iframe_sandboxing_enabled', 'iframe_sandboxing_exceptions',
 		'max_overview_table_size', 'connect_timeout', 'socket_timeout', 'media_type_test_timeout', 'script_timeout',
-		'item_test_timeout', 'url', 'report_test_timeout', 'auditlog_enabled'
+		'item_test_timeout', 'url', 'report_test_timeout', 'auditlog_enabled', 'geomaps_tile_provider',
+		'geomaps_tile_url', 'geomaps_max_zoom', 'geomaps_attribution'
 	];
 
 	/**
@@ -161,7 +162,7 @@ class CSettings extends CApiService {
 	 *
 	 * @return array
 	 */
-	protected function validateUpdate(array $settings): array {
+	protected function validateUpdate(array &$settings): array {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
 			'default_theme' =>					['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'in' => implode(',', array_keys(APP::getThemes()))],
 			'search_limit' =>					['type' => API_INT32, 'in' => '1:999999'],
@@ -216,7 +217,11 @@ class CSettings extends CApiService {
 			'item_test_timeout' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:300'],
 			'url' =>							['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'url')],
 			'report_test_timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:300'],
-			'auditlog_enabled' =>				['type' => API_INT32, 'in' => '0,1']
+			'auditlog_enabled' =>				['type' => API_INT32, 'in' => '0,1'],
+			'geomaps_tile_provider' =>			['type' => API_STRING_UTF8, 'in' => ','.implode(',', array_keys(getTileProviders()))],
+			'geomaps_tile_url' =>				['type' => API_URL, 'length' => DB::getFieldLength('config', 'geomaps_tile_url')],
+			'geomaps_max_zoom' =>				['type' => API_INT32, 'in' => '0:99999'],
+			'geomaps_attribution' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'geomaps_attribution')]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $settings, '/', $error)) {
@@ -249,6 +254,12 @@ class CSettings extends CApiService {
 					_s('User group with ID "%1$s" is not available.', $settings['alert_usrgrpid'])
 				);
 			}
+		}
+
+		if (array_key_exists('geomaps_tile_provider', $settings) && $settings['geomaps_tile_provider'] !== '') {
+			$settings['geomaps_tile_url'] = DB::getDefault('config', 'geomaps_tile_url');
+			$settings['geomaps_max_zoom'] = DB::getDefault('config', 'geomaps_max_zoom');
+			$settings['geomaps_attribution'] = DB::getDefault('config', 'geomaps_attribution');
 		}
 
 		$period_default_updated = array_key_exists('period_default', $settings);
