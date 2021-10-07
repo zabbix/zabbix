@@ -77,6 +77,13 @@ class testDashboardPages extends CWebTest {
 	 * @var integer
 	 */
 	protected static $dashboardid_empty;
+	
+	/**
+	 * Id of dashboard for max pages amount check.
+	 *
+	 * @var integer
+	 */
+	protected static $dashboardid_50_pages;
 
 	/**
 	 * New dashboards.
@@ -234,7 +241,16 @@ class testDashboardPages extends CWebTest {
 					]
 				]
 			],
-
+			[
+				'name' => 'Dashboard for limit check and navigation',
+				'display_period' => 30,
+				'auto_start' => 1,
+				'pages' => [
+					[], [], [], [], [], [], [], [], [], [],[], [], [], [], [], [], [], [], [], [],
+					[], [], [], [], [], [], [], [], [], [],[], [], [], [], [], [], [], [], [], [],
+					[], [], [], [], [], [], [], [], [], []
+				]
+			]
 		]);
 		$this->assertArrayHasKey('dashboardids', $response);
 		self::$dashboardid = $response['dashboardids'][0];
@@ -243,6 +259,7 @@ class testDashboardPages extends CWebTest {
 		self::$dashboardid_creation = $response['dashboardids'][3];
 		self::$dashboardid_delete = $response['dashboardids'][4];
 		self::$dashboardid_empty = $response['dashboardids'][5];
+		self::$dashboardid_50_pages = $response['dashboardids'][6];
 	}
 
 	/**
@@ -445,37 +462,19 @@ class testDashboardPages extends CWebTest {
 	 * Check displayed error message trying to add more than 50 pages.
 	 */
 	public function testDashboardPages_MaximumPageError() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&new=1')->waitUntilReady();
-		$dialog = COverlayDialogElement::find()->waitUntilVisible()->one();
-		$properties_form = $dialog->query('name:dashboard_properties_form')->asForm()->one();
-		$properties_form->fill(['Name' => 'Dashboard for limit check and navigation'])->submit();
-		$this->page->waitUntilReady();
-
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid_50_pages)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
-		for ($i = 0; $i <= 49; $i++) {
-			$dashboard->addPage();
-
-			if ($i !== 49) {
-				$page_dialog = COverlayDialogElement::find()->waitUntilVisible()->one();
-				$page_dialog->query('name:dashboard_page_properties_form')->asForm()->one()->submit();
-				$dashboard->waitUntilReady();
-			}
-		}
-
+		$dashboard->edit()->addPage();
 		$this->assertMessage(TEST_BAD, 'Cannot add dashboard page: maximum number of 50 dashboard pages has been added.');
 		$dashboard->save();
-		$this->assertMessage(TEST_GOOD, 'Dashboard created');
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 	}
 
 	/**
-	 * Swich pages using next/previous arrow buttons.
-	 *
-	 * @depends testDashboardPages_MaximumPageError
+	 * Switch pages using next/previous arrow buttons.
 	 */
 	public function testDashboardPages_Navigation() {
-		$this->page->login()->open('zabbix.php?action=dashboard.list')->waitUntilReady();
-		$this->query('link:Dashboard for limit check and navigation')->one()->click();
-		$this->page->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid_50_pages)->waitUntilReady();
 		$next_page = $this->query('xpath://button[@class="dashboard-next-page btn-iterator-page-next"]')->one();
 		$previous_page = $this->query('xpath://button[@class="dashboard-previous-page btn-iterator-page-previous"]')->one();
 		$next_page->isEnabled();
