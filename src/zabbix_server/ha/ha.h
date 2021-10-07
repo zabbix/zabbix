@@ -22,12 +22,13 @@
 
 #define ZBX_IPC_SERVICE_HA	"haservice"
 
-#define ZBX_IPC_SERVICE_HA_REGISTER	0
-#define ZBX_IPC_SERVICE_HA_PAUSE	1
-#define ZBX_IPC_SERVICE_HA_STOP		2
-#define ZBX_IPC_SERVICE_HA_STATUS	3
-#define ZBX_IPC_SERVICE_HA_GET_NODES	4
-#define ZBX_IPC_SERVICE_HA_REMOVE_NODE	5
+#define ZBX_IPC_SERVICE_HA_REGISTER		0
+#define ZBX_IPC_SERVICE_HA_PAUSE		1
+#define ZBX_IPC_SERVICE_HA_STOP			2
+#define ZBX_IPC_SERVICE_HA_STATUS		3
+#define ZBX_IPC_SERVICE_HA_GET_NODES		4
+#define ZBX_IPC_SERVICE_HA_REMOVE_NODE		5
+#define ZBX_IPC_SERVICE_HA_FAILOVER_DELAY	6
 
 #define ZBX_NODE_STATUS_ERROR		-2
 #define ZBX_NODE_STATUS_UNKNOWN		-1
@@ -44,7 +45,7 @@ int	zbx_ha_get_status(char **error);
 int	zbx_ha_recv_status(int timeout, int *status, char **error);
 int	zbx_ha_get_nodes(char **nodes, char **error);
 int	zbx_ha_remove_node(int node_num, char **error);
-void	zbx_ha_log_nodes(const char *nodes_json);
+int	zbx_ha_set_failover_delay(int delay, char **error);
 
 const char	*zbx_ha_status_str(int ha_status);
 

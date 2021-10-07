@@ -81,6 +81,7 @@
 #include "zbxtrends.h"
 #include "ha/ha.h"
 #include "sighandler.h"
+#include "rtc.h"
 
 #ifdef HAVE_OPENIPMI
 #include "ipmi/ipmi_manager.h"
@@ -124,6 +125,7 @@ const char	*help_message[] = {
 	"      " ZBX_SERVICE_CACHE_RELOAD "        Reload service manager cache",
 	"      " ZBX_HA_STATUS "                   Log HA cluster status",
 	"      " ZBX_HA_REMOVE_NODE "=target       Remove the HA node specified by its listed number",
+	"      " ZBX_HA_FAILOVER_DELAY "=delay     Set HA failover delay",
 	"",
 	"      Log level control targets:",
 	"        process-type              All processes of specified type",
@@ -350,9 +352,7 @@ char	*CONFIG_WEBSERVICE_URL	= NULL;
 
 int	CONFIG_SERVICEMAN_SYNC_FREQUENCY	= 60;
 
-static volatile sig_atomic_t	zbx_diaginfo_scope = ZBX_DIAGINFO_UNDEFINED;
-static volatile sig_atomic_t	zbx_rtc_ha_report = 0;
-static volatile sig_atomic_t	zbx_rtc_ha_remove_node = 0;
+static volatile sig_atomic_t	zbx_rtc_command;
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
@@ -1088,29 +1088,7 @@ int	main(int argc, char **argv)
 
 static void	zbx_main_sigusr_handler(int flags)
 {
-	int	scope;
-
-	switch (ZBX_RTC_GET_MSG(flags))
-	{
-		case ZBX_RTC_DIAGINFO:
-			scope = ZBX_RTC_GET_SCOPE(flags);
-
-			if (ZBX_DIAGINFO_ALL == scope)
-			{
-				zbx_diaginfo_scope = (1 << ZBX_DIAGINFO_HISTORYCACHE) | (1 << ZBX_DIAGINFO_VALUECACHE) |
-						(1 << ZBX_DIAGINFO_PREPROCESSING) | (1 << ZBX_DIAGINFO_LLD) |
-						(1 << ZBX_DIAGINFO_ALERTING) | (1 << ZBX_DIAGINFO_LOCKS);
-			}
-			else
-				zbx_diaginfo_scope = 1 << scope;
-			break;
-		case ZBX_RTC_HA_STATUS:
-			zbx_rtc_ha_report = 1;
-			break;
-		case ZBX_RTC_HA_REMOVE_NODE:
-			zbx_rtc_ha_remove_node = ZBX_RTC_GET_DATA(flags);
-			break;
-	}
+	zbx_rtc_command = flags;
 }
 
 static void	zbx_check_db(void)
@@ -1786,40 +1764,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			break;
 		}
 
-		/* check if the wait was interrupted because of remote commands */
-		if (ZBX_DIAGINFO_UNDEFINED != zbx_diaginfo_scope)
+		if (0 != zbx_rtc_command)
 		{
 			if (ZBX_NODE_STATUS_ACTIVE == ha_status)
-				zbx_diag_log_info(zbx_diaginfo_scope);
+				zbx_rtc_process_command(zbx_rtc_command);
 
-			zbx_diaginfo_scope = ZBX_DIAGINFO_UNDEFINED;
-		}
-		else if (0 != zbx_rtc_ha_report)
-		{
-			char	*nodes = NULL;
-
-			if (SUCCEED == zbx_ha_get_nodes(&nodes, &error))
-			{
-				zbx_ha_log_nodes(nodes);
-				zbx_free(nodes);
-			}
-			else
-			{
-				zabbix_log(LOG_LEVEL_CRIT, "get HA node information", error);
-				zbx_free(error);
-			}
-
-			zbx_rtc_ha_report = 0;
-		}
-		else if (0 != zbx_rtc_ha_remove_node)
-		{
-			if (SUCCEED != zbx_ha_remove_node(zbx_rtc_ha_remove_node, &error))
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "cannot remove HA node: %s", error);
-				zbx_free(error);
-			}
-
-			zbx_rtc_ha_remove_node = 0;
+			zbx_rtc_command = 0;
 		}
 	}
 

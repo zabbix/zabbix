@@ -1104,6 +1104,43 @@ static void	ha_remove_node(zbx_ha_info_t *info, zbx_ipc_client_t *client, const 
 
 /******************************************************************************
  *                                                                            *
+ * Function: ha_set_failover_delay                                            *
+ *                                                                            *
+ * Purpose: set failover delay                                                *
+ *                                                                            *
+ ******************************************************************************/
+static void	ha_set_failover_delay(zbx_ha_info_t *info, zbx_ipc_client_t *client, const zbx_ipc_message_t *message)
+{
+	int		delay;
+	char		*error = NULL;
+	zbx_uint32_t	len = 0, error_len;
+	unsigned char	*data;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	memcpy(&delay, message->data, sizeof(delay));
+
+	if (ZBX_DB_OK == info->db_status && ZBX_DB_OK <= DBexecute("update config set ha_failover_delay=%d", delay))
+	{
+		info->failover_delay = delay;
+		zabbix_log(LOG_LEVEL_WARNING, "HA failover delay set to %ds", delay);
+	}
+	else
+		error = "database error";
+
+	zbx_serialize_prepare_str(len, error);
+
+	data = zbx_malloc(NULL, len);
+	zbx_serialize_str(data, error, error_len);
+
+	zbx_ipc_client_send(client, ZBX_IPC_SERVICE_HA_FAILOVER_DELAY, data, len);
+	zbx_free(data);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: ha_send_node_list                                               *
  *                                                                            *
  * Purpose: reply to get nodes request                                        *
@@ -1247,6 +1284,33 @@ int	zbx_ha_remove_node(int node_num, char **error)
 
 	if (SUCCEED != zbx_ipc_async_exchange(ZBX_IPC_SERVICE_HA, ZBX_IPC_SERVICE_HA_REMOVE_NODE,
 			ZBX_HA_SERVICE_TIMEOUT, (unsigned char *)&node_num, sizeof(node_num), &data, error))
+	{
+		return FAIL;
+	}
+
+	(void)zbx_deserialize_str(data, error, error_len);
+	zbx_free(data);
+
+	return (0 == error_len ? SUCCEED : FAIL);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_ha_set_failover_delay                                        *
+ *                                                                            *
+ * Purpose: set HA failover delay                                             *
+ *                                                                            *
+ * Comments: A new socket is opened to avoid interfering with notification    *
+ *           channel                                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_ha_set_failover_delay(int delay, char **error)
+{
+	unsigned char		*data;
+	zbx_uint32_t		error_len;
+
+	if (SUCCEED != zbx_ipc_async_exchange(ZBX_IPC_SERVICE_HA, ZBX_IPC_SERVICE_HA_FAILOVER_DELAY,
+			ZBX_HA_SERVICE_TIMEOUT, (unsigned char *)&delay, sizeof(delay), &data, error))
 	{
 		return FAIL;
 	}
@@ -1411,85 +1475,6 @@ const char	*zbx_ha_status_str(int ha_status)
 	}
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: zbx_ha_log_nodes                                                 *
- *                                                                            *
- * Purpose: log registered HA nodes                                           *
- *                                                                            *
- ******************************************************************************/
-void	zbx_ha_log_nodes(const char *nodes_json)
-{
-#define ZBX_HA_REPORT_FMT	"%-25s %-25s %-30s %-11s %s"
-
-	struct zbx_json_parse	jp, jp_node;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (SUCCEED == zbx_json_open(nodes_json, &jp))
-	{
-		const char	*pnext;
-		char		name[256], address[261], id[26], buffer[256];
-		int		status, lastaccess_age, index = 1;
-
-		zabbix_log(LOG_LEVEL_INFORMATION, "cluster status:");
-		zabbix_log(LOG_LEVEL_INFORMATION, "  %2s  " ZBX_HA_REPORT_FMT, "#", "ID", "Name",
-				"Address", "Status", "Last Access");
-
-		for (pnext = NULL; NULL != (pnext = zbx_json_next(&jp, pnext));)
-		{
-			if (FAIL == zbx_json_brackets_open(pnext, &jp_node))
-			{
-				THIS_SHOULD_NEVER_HAPPEN;
-				continue;
-			}
-
-			if (SUCCEED != zbx_json_value_by_name(&jp_node, ZBX_PROTO_TAG_ID, id, sizeof(id), NULL))
-			{
-				THIS_SHOULD_NEVER_HAPPEN;
-				continue;
-			}
-
-			if (SUCCEED != zbx_json_value_by_name(&jp_node, ZBX_PROTO_TAG_NAME, name, sizeof(name),
-					NULL))
-			{
-				THIS_SHOULD_NEVER_HAPPEN;
-				continue;
-			}
-
-			if (SUCCEED != zbx_json_value_by_name(&jp_node, ZBX_PROTO_TAG_STATUS, buffer,
-					sizeof(buffer), NULL))
-			{
-				THIS_SHOULD_NEVER_HAPPEN;
-				continue;
-			}
-			status = atoi(buffer);
-
-			if (SUCCEED != zbx_json_value_by_name(&jp_node, ZBX_PROTO_TAG_LASTACCESS_AGE, buffer,
-					sizeof(buffer), NULL))
-			{
-				THIS_SHOULD_NEVER_HAPPEN;
-				continue;
-			}
-			lastaccess_age = atoi(buffer);
-
-			if (SUCCEED != zbx_json_value_by_name(&jp_node, ZBX_PROTO_TAG_ADDRESS, address,
-					sizeof(address), NULL))
-			{
-				THIS_SHOULD_NEVER_HAPPEN;
-				continue;
-			}
-
-			zabbix_log(LOG_LEVEL_INFORMATION, "  %2d. " ZBX_HA_REPORT_FMT, index++, id, name,
-					address, zbx_ha_status_str(status), zbx_age2str(lastaccess_age));
-		}
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-
-#undef ZBX_HA_REPORT_FMT
-}
-
 /*
  * main process loop
  */
@@ -1592,6 +1577,9 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 					break;
 				case ZBX_IPC_SERVICE_HA_REMOVE_NODE:
 					ha_remove_node(&info, client, message);
+					break;
+				case ZBX_IPC_SERVICE_HA_FAILOVER_DELAY:
+					ha_set_failover_delay(&info, client, message);
 					break;
 			}
 

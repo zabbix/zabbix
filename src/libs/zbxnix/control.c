@@ -245,6 +245,22 @@ int	parse_rtc_options(const char *opt, unsigned char program_type, int *message)
 		if ('=' == opt[ZBX_CONST_STRLEN(ZBX_HA_REMOVE_NODE)])
 			data = atoi(opt + ZBX_CONST_STRLEN(ZBX_HA_REMOVE_NODE) + 1);
 	}
+	else if (0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER)) &&
+			0 == strncmp(opt, ZBX_HA_FAILOVER_DELAY, ZBX_CONST_STRLEN(ZBX_HA_FAILOVER_DELAY)))
+	{
+		int	delay;
+
+		if ('=' == opt[ZBX_CONST_STRLEN(ZBX_HA_FAILOVER_DELAY)] &&
+				SUCCEED == is_time_suffix(opt + ZBX_CONST_STRLEN(ZBX_HA_FAILOVER_DELAY) + 1, &delay,
+				ZBX_LENGTH_UNLIMITED))
+		{
+			command = ZBX_RTC_HA_FAILOVER_DELAY;
+			scope = 0;
+			data = (unsigned int)delay;
+		}
+		else
+			zbx_error("invalid HA failover delay value: %s\n", opt);
+	}
 	else
 	{
 		zbx_error("invalid runtime control option: %s", opt);
