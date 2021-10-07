@@ -283,7 +283,7 @@ static int	ha_db_get_nodes(zbx_vector_ha_node_t *nodes, int lock)
 	DB_ROW		row;
 	zbx_ha_node_t	*node;
 
-	result = DBselect_once("select ha_nodeid,name,status,lastaccess from ha_node%s",
+	result = DBselect_once("select ha_nodeid,name,status,lastaccess from ha_node order by ha_nodeid%s",
 			(0 == lock ? "" : ZBX_FOR_UPDATE));
 
 	if (NULL == result || ZBX_DB_DOWN == (intptr_t)result)
@@ -1018,10 +1018,11 @@ static void	ha_report_cluster_status(zbx_ha_info_t *info)
 		{
 			const char	*pnext;
 			char		name[256], id[26], buffer[256];
-			int		status, lastaccess, db_time;
+			int		status, lastaccess, db_time, index = 1;
 
 			zabbix_log(LOG_LEVEL_INFORMATION, "cluster status:");
-			zabbix_log(LOG_LEVEL_INFORMATION, "  %-26s %-40s %-11s %s", "id", "name", "status", "age");
+			zabbix_log(LOG_LEVEL_INFORMATION, "  %2s  %-25s %-40s %-11s %s", "#", "ID", "Name", "Status",
+					"Age");
 
 			for (pnext = NULL; NULL != (pnext = zbx_json_next(&jp, pnext));)
 			{
@@ -1068,7 +1069,7 @@ static void	ha_report_cluster_status(zbx_ha_info_t *info)
 				}
 				db_time = atoi(buffer);
 
-				zabbix_log(LOG_LEVEL_INFORMATION, "  %26s %-40s %-11s %s", id, name,
+				zabbix_log(LOG_LEVEL_INFORMATION, "  %2d. %25s %-40s %-11s %s", index++, id, name,
 						zbx_ha_status_str(status), zbx_age2str(db_time - lastaccess));
 			}
 		}
