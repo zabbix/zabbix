@@ -246,9 +246,8 @@ class testDashboardPages extends CWebTest {
 				'display_period' => 30,
 				'auto_start' => 1,
 				'pages' => [
-					[], [], [], [], [], [], [], [], [], [],[], [], [], [], [], [], [], [], [], [],
-					[], [], [], [], [], [], [], [], [], [],[], [], [], [], [], [], [], [], [], [],
-					[], [], [], [], [], [], [], [], [], []
+					[], [], [], [], [], [], [], [], [], [],[], [], [], [], [], [], [], [], [], [],[], [], [], [], [],
+					[], [], [], [], [],[], [], [], [], [], [], [], [], [], [],[], [], [], [], [], [], [], [], [], []
 				]
 			]
 		]);
@@ -310,9 +309,6 @@ class testDashboardPages extends CWebTest {
 			$this->query('xpath://button[contains(@class, "slideshow-state")]')->one()->click();
 		}
 
-		// Check Stop/Start slideshow changing automatic slideshow option.
-
-
 		// Check page popup-menu options in created dashboard.
 		$this->openPageMenu('First_page_name');
 		$page_menu->hasTitles('ACTIONS');
@@ -326,7 +322,7 @@ class testDashboardPages extends CWebTest {
 	/**
 	 * Copy dashboard page.
 	 */
-	public function testDashboardPages_CopyPage() {
+	public function testDashboardPages_CopyPastePage() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid_copy)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 
@@ -455,11 +451,14 @@ class testDashboardPages extends CWebTest {
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 		$index = ($title === 'first_page_creation') ? 2 : 1;
-		$this->checkPageValues($title, $data['fields']['Page display period'], $index);
+		$this->selectPageAction($title, 'Properties', $index);
+		COverlayDialogElement::find()->waitUntilVisible()->one();
+		$page_form = $page_dialog->query('name:dashboard_page_properties_form')->asForm()->one();
+		$page_form->checkValue(['Name' => $title, 'Page display period' => $data['fields']['Page display period']]);
 	}
 
 	/**
-	 * Check displayed error message trying to add more than 50 pages.
+	 * Check displayed error message adding more than 50 pages.
 	 */
 	public function testDashboardPages_MaximumPageError() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid_50_pages)->waitUntilReady();
@@ -497,6 +496,9 @@ class testDashboardPages extends CWebTest {
 		$previous_page->isEnabled(false);
 	}
 
+	/**
+	 * Delete pages.
+	 */
 	public function testDashboardPages_Delete() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid_delete)->waitUntilReady();
 		$this->assertEquals(['Page 1', 'Page 2', 'Page 3'], $this->getTitles());
@@ -520,6 +522,9 @@ class testDashboardPages extends CWebTest {
 		$this->assertEquals(['Page 1'], $this->getTitles());
 	}
 
+	/**
+	 * Check default page names adding new pages.
+	 */
 	public function testDashboardPages_EmptyPagesName() {
 		// Check that first page do not has any name.
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid_empty)->waitUntilReady();
@@ -551,6 +556,9 @@ class testDashboardPages extends CWebTest {
 		$this->assertEquals(['Page 1', 'not_page_number', 'Page 3'], $this->getTitles());
 	}
 
+	/**
+	 * Check navigation in kiosk mode.
+	 */
 	public function testDashboardPages_KioskMode() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid_kiosk)->waitUntilReady();
 		$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
@@ -584,11 +592,33 @@ class testDashboardPages extends CWebTest {
 		$this->page->assertHeader('Dashboard for kiosk');
 	}
 
-	private function checkPageValues($page_name, $default_time, $index = 1) {
-		$this->selectPageAction($page_name, 'Properties', $index);
-		$page_dialog = COverlayDialogElement::find()->waitUntilVisible()->one();
-		$page_form = $page_dialog->query('name:dashboard_page_properties_form')->asForm()->one();
-		$page_form->checkValue(['Name' => $page_name, 'Page display period' => $default_time]);
+	// Check default period change for page.
+	public function testDashboardPages_DefaultPeriod() {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid_delete)->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one();
+		$dashboard->edit();
+		foreach (['10 seconds', '30 seconds', '1 minute', '2 minutes', '10 minutes', '30 minutes', '1 hour'] as $default) {
+			$this->query('id:dashboard-config')->one()->click();
+			$properties = COverlayDialogElement::find()->waitUntilVisible()->one();
+			$properties->query('name:dashboard_properties_form')->asForm()->one()->fill(['Default page display period' => $default]);
+			$properties->query('button:Apply')->one()->click();
+			$dashboard->waitUntilReady();
+
+			// Check that default time for page changed in edit mode and after dashboard save.
+			for ($i = 0; $i <= 1; $i++) {
+				$this->selectPageAction('Page 1', 'Properties');
+				$page_dialog = COverlayDialogElement::find()->waitUntilVisible()->one();
+				$page_dialog->query('name:dashboard_page_properties_form')->asForm()->one()
+						->checkValue(['Page display period' => 'Default ('.$default.')']);
+				$page_dialog->query('button:Cancel')->one()->click();
+
+				if ($i === 0) {
+					$dashboard->save();
+					$this->page->waitUntilReady();
+					$dashboard->edit();
+				}
+			}
+		}
 	}
 
 	private function openPageMenu($page_name, $index = 1) {
