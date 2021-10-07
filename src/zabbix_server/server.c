@@ -1796,12 +1796,17 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		}
 		else if (0 != zbx_rtc_ha_report)
 		{
-			if (SUCCEED != zbx_ha_request_cluster_report(&error))
+			char	*nodes = NULL;
+
+			if (SUCCEED == zbx_ha_get_nodes(&nodes, &error))
 			{
-				zabbix_log(LOG_LEVEL_CRIT, "cannot request node information from HA manager: %s", error);
+				zbx_ha_log_nodes(nodes);
+				zbx_free(nodes);
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "get HA node information", error);
 				zbx_free(error);
-				sig_exiting = ZBX_EXIT_FAILURE;
-				break;
 			}
 
 			zbx_rtc_ha_report = 0;

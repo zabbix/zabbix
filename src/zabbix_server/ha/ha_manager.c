@@ -155,7 +155,7 @@ static void	ha_notify_parent(zbx_ipc_client_t *client, int status, const char *i
 	ptr += zbx_serialize_value(ptr, status);
 	(void)zbx_serialize_str(ptr, info, info_len);
 
-	ret = zbx_ipc_client_send(client, ZBX_IPC_SERVICE_HA_STATUS, data, len);
+	ret = zbx_ipc_client_send(client, ZBX_IPC_SERVICE_HA_GET_NODES, data, len);
 	zbx_free(data);
 
 	if (SUCCEED != ret)
@@ -195,7 +195,7 @@ static int	ha_recv_status(int *status, int timeout, char **error)
 
 		switch (message->code)
 		{
-			case ZBX_IPC_SERVICE_HA_STATUS:
+			case ZBX_IPC_SERVICE_HA_GET_NODES:
 				ptr = message->data;
 				ptr += zbx_deserialize_value(ptr, status);
 				(void)zbx_deserialize_str(ptr, error, len);
@@ -934,12 +934,12 @@ finish:
 
 /******************************************************************************
  *                                                                            *
- * Function: ha_db_get_cluster_status                                         *
+ * Function: ha_db_get_nodes_json                                             *
  *                                                                            *
  * Purpose: get cluster status in lld compatible json format                  *
  *                                                                            *
  ******************************************************************************/
-static int	ha_db_get_cluster_status(zbx_ha_info_t *info, char **status)
+static int	ha_db_get_nodes_json(zbx_ha_info_t *info, char **nodes_json, char **error)
 {
 	DB_ROW			row;
 	DB_RESULT		result;
@@ -987,107 +987,21 @@ static int	ha_db_get_cluster_status(zbx_ha_info_t *info, char **status)
 			zbx_json_close(&j);
 		}
 
-		*status = zbx_strdup(NULL, j.buffer);
+		*nodes_json = zbx_strdup(NULL, j.buffer);
 		zbx_json_free(&j);
 
 		ret = SUCCEED;
 	}
-	else
-		zabbix_log(LOG_LEVEL_WARNING, "cannot get cluster nodes from database");
 
 	zbx_vector_ha_node_clear_ext(&nodes, zbx_ha_node_free);
 	zbx_vector_ha_node_destroy(&nodes);
 out:
+	if (SUCCEED != ret)
+		*error = zbx_strdup(NULL, "database error");
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return ret;
-}
-
-
-/******************************************************************************
- *                                                                            *
- * Function: ha_report_cluster_status                                         *
- *                                                                            *
- * Purpose: report cluster status in log file                                 *
- *                                                                            *
- ******************************************************************************/
-static void	ha_report_cluster_status(zbx_ha_info_t *info)
-{
-#define ZBX_HA_REPORT_FMT	"%-25s %-25s %-30s %-11s %s"
-
-	char	*cluster_status = NULL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (SUCCEED == ha_db_get_cluster_status(info, &cluster_status))
-	{
-		struct zbx_json_parse	jp, jp_node;
-
-		if (SUCCEED == zbx_json_open(cluster_status, &jp))
-		{
-			const char	*pnext;
-			char		name[256], address[261], id[26], buffer[256];
-			int		status, lastaccess_age, index = 1;
-
-			zabbix_log(LOG_LEVEL_INFORMATION, "cluster status:");
-			zabbix_log(LOG_LEVEL_INFORMATION, "  %2s  " ZBX_HA_REPORT_FMT, "#", "ID", "Name",
-					"Address", "Status", "Last Access");
-
-			for (pnext = NULL; NULL != (pnext = zbx_json_next(&jp, pnext));)
-			{
-				if (FAIL == zbx_json_brackets_open(pnext, &jp_node))
-				{
-					THIS_SHOULD_NEVER_HAPPEN;
-					continue;
-				}
-
-				if (SUCCEED != zbx_json_value_by_name(&jp_node, ZBX_PROTO_TAG_ID, id, sizeof(id), NULL))
-				{
-					THIS_SHOULD_NEVER_HAPPEN;
-					continue;
-				}
-
-				if (SUCCEED != zbx_json_value_by_name(&jp_node, ZBX_PROTO_TAG_NAME, name, sizeof(name),
-						NULL))
-				{
-					THIS_SHOULD_NEVER_HAPPEN;
-					continue;
-				}
-
-				if (SUCCEED != zbx_json_value_by_name(&jp_node, ZBX_PROTO_TAG_STATUS, buffer,
-						sizeof(buffer), NULL))
-				{
-					THIS_SHOULD_NEVER_HAPPEN;
-					continue;
-				}
-				status = atoi(buffer);
-
-				if (SUCCEED != zbx_json_value_by_name(&jp_node, ZBX_PROTO_TAG_LASTACCESS_AGE, buffer,
-						sizeof(buffer), NULL))
-				{
-					THIS_SHOULD_NEVER_HAPPEN;
-					continue;
-				}
-				lastaccess_age = atoi(buffer);
-
-				if (SUCCEED != zbx_json_value_by_name(&jp_node, ZBX_PROTO_TAG_ADDRESS, address,
-						sizeof(address), NULL))
-				{
-					THIS_SHOULD_NEVER_HAPPEN;
-					continue;
-				}
-
-				zabbix_log(LOG_LEVEL_INFORMATION, "  %2d. " ZBX_HA_REPORT_FMT, index++, id, name,
-						address, zbx_ha_status_str(status), zbx_age2str(lastaccess_age));
-			}
-		}
-
-		zbx_free(cluster_status);
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-
-#undef ZBX_HA_REPORT_FMT
 }
 
 /******************************************************************************
@@ -1190,6 +1104,41 @@ static void	ha_remove_node(zbx_ha_info_t *info, zbx_ipc_client_t *client, const 
 
 /******************************************************************************
  *                                                                            *
+ * Function: ha_send_node_list                                               *
+ *                                                                            *
+ * Purpose: reply to get nodes request                                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	ha_send_node_list(zbx_ha_info_t *info, zbx_ipc_client_t *client)
+{
+	int		ret;
+	char		*error = NULL, *nodes_json = NULL, *str;
+	zbx_uint32_t	len = 0, str_len;
+	unsigned char	*data, *ptr;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (SUCCEED == (ret = ha_db_get_nodes_json(info, &nodes_json, &error)))
+		str = nodes_json;
+	else
+		str = error;
+
+	zbx_serialize_prepare_value(len, ret);
+	zbx_serialize_prepare_str(len, str);
+
+	ptr = data = zbx_malloc(NULL, len);
+	ptr += zbx_serialize_value(ptr, ret);
+	(void)zbx_serialize_str(ptr, str, str_len);
+	zbx_free(str);
+
+	zbx_ipc_client_send(client, ZBX_IPC_SERVICE_HA_REMOVE_NODE, data, len);
+	zbx_free(data);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: ha_db_update_exit_status                                         *
  *                                                                            *
  * Purpose: update node status in database on shutdown                        *
@@ -1250,26 +1199,35 @@ int	zbx_ha_recv_status(int timeout, int *status, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_ha_request_cluster_report                                    *
+ * Function: zbx_ha_get_nodes                                                 *
  *                                                                            *
- * Purpose: request HA manager to log cluster statistics                      *
+ * Purpose: get HA nodes in json format                                       *
  *                                                                            *
  ******************************************************************************/
-int	zbx_ha_request_cluster_report(char **error)
+int	zbx_ha_get_nodes(char **nodes, char **error)
 {
-	if (FAIL == zbx_ipc_async_socket_send(&ha_socket, ZBX_IPC_SERVICE_HA_NODES, NULL, 0))
+	unsigned char		*data, *ptr;
+	zbx_uint32_t		str_len;
+	int			ret;
+	char			*str;
+
+	if (SUCCEED != zbx_ipc_async_exchange(ZBX_IPC_SERVICE_HA, ZBX_IPC_SERVICE_HA_GET_NODES,
+			ZBX_HA_SERVICE_TIMEOUT, NULL, 0, &data, error))
 	{
-		*error = zbx_strdup(NULL, "cannot queue message to HA manager service");
 		return FAIL;
 	}
 
-	if (FAIL == zbx_ipc_async_socket_flush(&ha_socket, ZBX_HA_SERVICE_TIMEOUT))
-	{
-		*error = zbx_strdup(NULL, "cannot send message to HA manager service");
-		return FAIL;
-	}
+	ptr = data;
+	ptr += zbx_deserialize_value(ptr, &ret);
+	(void)zbx_deserialize_str(ptr, &str, str_len);
+	zbx_free(data);
 
-	return SUCCEED;
+	if (SUCCEED == ret)
+		*nodes = str;
+	else
+		*error = str;
+
+	return ret;
 }
 
 /******************************************************************************
@@ -1453,6 +1411,85 @@ const char	*zbx_ha_status_str(int ha_status)
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_ha_log_nodes                                                 *
+ *                                                                            *
+ * Purpose: log registered HA nodes                                           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_ha_log_nodes(const char *nodes_json)
+{
+#define ZBX_HA_REPORT_FMT	"%-25s %-25s %-30s %-11s %s"
+
+	struct zbx_json_parse	jp, jp_node;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (SUCCEED == zbx_json_open(nodes_json, &jp))
+	{
+		const char	*pnext;
+		char		name[256], address[261], id[26], buffer[256];
+		int		status, lastaccess_age, index = 1;
+
+		zabbix_log(LOG_LEVEL_INFORMATION, "cluster status:");
+		zabbix_log(LOG_LEVEL_INFORMATION, "  %2s  " ZBX_HA_REPORT_FMT, "#", "ID", "Name",
+				"Address", "Status", "Last Access");
+
+		for (pnext = NULL; NULL != (pnext = zbx_json_next(&jp, pnext));)
+		{
+			if (FAIL == zbx_json_brackets_open(pnext, &jp_node))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+
+			if (SUCCEED != zbx_json_value_by_name(&jp_node, ZBX_PROTO_TAG_ID, id, sizeof(id), NULL))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+
+			if (SUCCEED != zbx_json_value_by_name(&jp_node, ZBX_PROTO_TAG_NAME, name, sizeof(name),
+					NULL))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+
+			if (SUCCEED != zbx_json_value_by_name(&jp_node, ZBX_PROTO_TAG_STATUS, buffer,
+					sizeof(buffer), NULL))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+			status = atoi(buffer);
+
+			if (SUCCEED != zbx_json_value_by_name(&jp_node, ZBX_PROTO_TAG_LASTACCESS_AGE, buffer,
+					sizeof(buffer), NULL))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+			lastaccess_age = atoi(buffer);
+
+			if (SUCCEED != zbx_json_value_by_name(&jp_node, ZBX_PROTO_TAG_ADDRESS, address,
+					sizeof(address), NULL))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+
+			zabbix_log(LOG_LEVEL_INFORMATION, "  %2d. " ZBX_HA_REPORT_FMT, index++, id, name,
+					address, zbx_ha_status_str(status), zbx_age2str(lastaccess_age));
+		}
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+
+#undef ZBX_HA_REPORT_FMT
+}
+
 /*
  * main process loop
  */
@@ -1550,8 +1587,8 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 				case ZBX_IPC_SERVICE_HA_PAUSE:
 					stop = SUCCEED;
 					break;
-				case ZBX_IPC_SERVICE_HA_NODES:
-					ha_report_cluster_status(&info);
+				case ZBX_IPC_SERVICE_HA_GET_NODES:
+					ha_send_node_list(&info, client);
 					break;
 				case ZBX_IPC_SERVICE_HA_REMOVE_NODE:
 					ha_remove_node(&info, client, message);
@@ -1580,7 +1617,7 @@ pause:
 				case ZBX_IPC_SERVICE_HA_REGISTER:
 					main_proc = client;
 					break;
-				case ZBX_IPC_SERVICE_HA_STATUS:
+				case ZBX_IPC_SERVICE_HA_GET_NODES:
 					ha_notify_parent(main_proc, info.ha_status, info.error);
 					break;
 				case ZBX_IPC_SERVICE_HA_STOP:

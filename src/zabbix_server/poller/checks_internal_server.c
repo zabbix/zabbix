@@ -22,6 +22,7 @@
 #include "preproc.h"
 #include "zbxlld.h"
 #include "checks_internal.h"
+#include "../ha/ha.h"
 
 /******************************************************************************
  *                                                                            *
@@ -206,6 +207,38 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 		}
 
 		SET_UI64_RESULT(result, value);
+	}
+	else if (0 == strcmp(param1, "cluster"))
+	{
+		char	*nodes = NULL, *error = NULL;
+
+		if (3 != nparams)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+			goto out;
+		}
+
+		param2 = get_rparam(request, 1);
+		if (0 != strcmp(param2, "discovery"))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+			goto out;
+		}
+
+		param2 = get_rparam(request, 2);
+		if (0 != strcmp(param2, "nodes"))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+			goto out;
+		}
+
+		if (SUCCEED != zbx_ha_get_nodes(&nodes, &error))
+		{
+			SET_MSG_RESULT(result, error);
+			goto out;
+		}
+
+		SET_TEXT_RESULT(result, nodes);
 	}
 	else
 	{
