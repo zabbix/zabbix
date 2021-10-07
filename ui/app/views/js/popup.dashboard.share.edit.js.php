@@ -58,8 +58,8 @@ window.dashboard_share_edit_popup = {
 
 		fetch(curl.getUrl(), {
 			method: 'POST',
-			headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
-			body: urlEncodeData(getFormFields(form))
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify(getFormFields(form))
 		})
 			.then((response) => response.json())
 			.then((response) => {
@@ -129,7 +129,7 @@ window.dashboard_share_edit_popup = {
 					break;
 
 				case 'usrgrpid':
-					if (document.getElementById(`user-group-shares_${value.usrgrpid}`) !== null) {
+					if (document.getElementById(`user-group-shares-${value.usrgrpid}`) !== null) {
 						continue;
 					}
 

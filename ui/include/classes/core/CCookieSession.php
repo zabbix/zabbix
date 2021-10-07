@@ -30,7 +30,7 @@ class CCookieSession implements SessionHandlerInterface {
 	public const COOKIE_NAME = ZBX_SESSION_NAME;
 
 	/**
-	 * Class consturctor. Set session handlers and start session.
+	 * Class constructor. Set session handlers and start session.
 	 */
 	public function __construct() {
 		// Set use standard cookie PHPSESSID to false.

@@ -438,6 +438,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	if (SUCCEED == (ret = zbx_script_prepare(&script, &host.hostid, error, sizeof(error))))
 	{
 		const char	*poutput = NULL, *perror = NULL;
+		int		audit_res;
 
 		if (0 == host.proxy_hostid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on ||
 				ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
@@ -453,8 +454,14 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		else
 			perror = error;
 
-		zbx_auditlog_global_script(script.type, script.execute_on, script.command_orig, host.hostid, host.name,
-				eventid, host.proxy_hostid, user->userid, user->username, clientip, poutput, perror);
+		audit_res = zbx_auditlog_global_script(script.type, script.execute_on, script.command_orig, host.hostid,
+				host.name, eventid, host.proxy_hostid, user->userid, user->username, clientip, poutput,
+				perror);
+
+		/* At the moment, there is no special processing of audit failures. */
+		/* It can fail only due to the DB errors and those are visible in   */
+		/* the log anyway */
+		ZBX_UNUSED(audit_res);
 	}
 fail:
 	if (SUCCEED != ret)

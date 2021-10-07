@@ -40,6 +40,7 @@
 #define AUDIT_RESOURCE_TRIGGER			13
 #define AUDIT_RESOURCE_HOST_GROUP		14
 #define AUDIT_RESOURCE_ITEM			15
+#define AUDIT_RESOURCE_SCENARIO			22
 #define AUDIT_RESOURCE_DISCOVERY_RULE		23
 #define AUDIT_RESOURCE_SCRIPT			25
 
@@ -62,6 +63,7 @@ typedef struct zbx_audit_entry
 	struct zbx_json	details_json;
 	int		audit_action;
 	int		resource_type;
+	char		audit_cuid[CUID_LEN];
 } zbx_audit_entry_t;
 
 zbx_audit_entry_t	*zbx_audit_entry_init(zbx_uint64_t id, const char *name, int audit_action, int resource_type);

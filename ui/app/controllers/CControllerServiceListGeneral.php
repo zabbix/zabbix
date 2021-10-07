@@ -33,6 +33,30 @@ abstract class CControllerServiceListGeneral extends CController {
 	protected $service;
 
 	/**
+	 * @return bool
+
+	 * @throws APIException
+	 */
+	protected function checkPermissions(): bool {
+		if ($this->hasInput('serviceid')) {
+			$db_service = API::Service()->get([
+				'output' => ['serviceid', 'name', 'status', 'goodsla', 'showsla', 'readonly'],
+				'serviceids' => $this->getInput('serviceid'),
+				'selectParents' => ['serviceid'],
+				'selectTags' => ['tag', 'value']
+			]);
+
+			if (!$db_service) {
+				return false;
+			}
+
+			$this->service = $db_service[0];
+		}
+
+		return true;
+	}
+
+	/**
 	 * @throws APIException
 	 */
 	protected function canEdit(): bool {
@@ -181,11 +205,9 @@ abstract class CControllerServiceListGeneral extends CController {
 		}
 
 		$options = [
-			'output' => [],
-			'selectParents' => ($filter['serviceid'] == self::WITHOUT_PARENTS_SERVICEID && !$is_filtered)
-				? null
-				: ['serviceid'],
-			'parentids' => !$is_filtered ? $filter['serviceid'] : null,
+			'output' => ['name'],
+			'parentids' => $filter['serviceid'],
+			'deep_parentids' => $is_filtered,
 			'childids' => $filter['without_children'] ? 0 : null,
 			'without_problem_tags' => $filter['without_problem_tags'],
 			'search' => ($filter['name'] === '')
@@ -209,8 +231,7 @@ abstract class CControllerServiceListGeneral extends CController {
 
 			if (!$filter['without_problem_tags']
 					&& ($filter['tag_source'] == ZBX_SERVICE_FILTER_TAGS_ANY
-						|| $filter['tag_source'] == ZBX_SERVICE_FILTER_TAGS_PROBLEM
-					)) {
+						|| $filter['tag_source'] == ZBX_SERVICE_FILTER_TAGS_PROBLEM)) {
 				$db_services += API::Service()->get($options + ['problem_tags' => $filter['tags']]);
 			}
 		}
@@ -218,85 +239,67 @@ abstract class CControllerServiceListGeneral extends CController {
 			$db_services += API::Service()->get($options);
 		}
 
-		if (!$db_services || !$is_filtered || $filter['serviceid'] == self::WITHOUT_PARENTS_SERVICEID) {
-			return array_keys($db_services);
-		}
-
-		$filtered_serviceids = [];
-
-		do {
-			$parentids = [];
-
-			foreach ($db_services as $db_serviceid => $db_service) {
-				$service_parentids = array_column($db_service['parents'], 'serviceid', 'serviceid');
-
-				if (array_key_exists($filter['serviceid'], $service_parentids)) {
-					$filtered_serviceids[$db_serviceid] = true;
-					unset($db_services[$db_serviceid]);
-				}
-				else {
-					$parentids += $service_parentids;
-				}
-			}
-
-			$db_parent_services = API::Service()->get([
-				'output' => [],
-				'selectParents' => ['serviceid'],
-				'serviceids' => $parentids,
-				'preservekeys' => true
-			]);
-
-			if (!$db_parent_services) {
-				break;
-			}
-
-			foreach ($db_services as &$db_service) {
-				$service_parentids = array_column($db_service['parents'], 'serviceid', 'serviceid');
-
-				$parentids = [];
-				foreach ($service_parentids as $service_parentid) {
-					$parentids += array_column($db_parent_services[$service_parentid]['parents'], null, 'serviceid');
-				}
-
-				$db_service['parents'] = $parentids;
-			}
-			unset($db_service);
-		} while (true);
-
-		return array_keys($filtered_serviceids);
+		return array_keys($db_services);
 	}
 
-	protected function getProblemEvents(array $serviceids): array {
-		$sla = API::Service()->getSla([
-			'serviceids' => $serviceids,
-			'intervals' => [['from' => 0, 'to' => 0]]
-		]);
-
-		$eventids_by_service = [];
+	/**
+	 * @param array $services
+	 */
+	protected static function extendProblemEvents(array &$services): void {
 		$eventids = [];
 
-		foreach ($sla as $serviceid => $service_sla) {
-			$eventids_by_service[$serviceid] = array_column($service_sla['problems'], 'eventid', 'eventid');
-			$eventids += $eventids_by_service[$serviceid];
+		foreach (array_column($services, 'problem_events') as $problem_events) {
+			$eventids += array_column($problem_events, 'eventid', 'eventid');
 		}
 
 		$events = API::Event()->get([
-			'output' => ['name', 'objectid', 'severity'],
+			'output' => ['objectid'],
 			'eventids' => $eventids,
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'value' => TRIGGER_VALUE_TRUE,
 			'preservekeys' => true
 		]);
 
-		CArrayHelper::sort($events, [
-			['field' => 'severity', 'order' => ZBX_SORT_DOWN],
-			['field' => 'name', 'order' => ZBX_SORT_UP]
-		]);
+		foreach ($services as &$service) {
+			$problem_events = [];
 
-		$events_sorted = [];
+			foreach ($service['problem_events'] as $problem_event) {
+				$triggerid = array_key_exists($problem_event['eventid'], $events)
+					? $events[$problem_event['eventid']]['objectid']
+					: 0;
 
-		foreach ($eventids_by_service as $serviceid => $service_events) {
-			$events_sorted[$serviceid] = array_intersect_key($events, $service_events);
+				if (!array_key_exists($triggerid, $problem_events)) {
+					$problem_events[$triggerid] = [];
+				}
+
+				if (!array_key_exists($problem_event['name'], $problem_events[$triggerid])) {
+					$problem_events[$triggerid][$problem_event['name']] = $problem_event['severity'];
+				}
+				else {
+					$problem_events[$triggerid][$problem_event['name']] = max($problem_event['severity'],
+						$problem_events[$triggerid][$problem_event['name']]
+					);
+				}
+			}
+
+			$service['problem_events'] = [];
+
+			foreach ($problem_events as $triggerid => $problem_events) {
+				foreach ($problem_events as $name => $severity) {
+					$service['problem_events'][] = [
+						'triggerid' => $triggerid != 0 ? $triggerid : null,
+						'name' => $name,
+						'severity' => $severity
+					];
+				}
+			}
+
+			CArrayHelper::sort($service['problem_events'], [
+				['field' => 'severity', 'order' => ZBX_SORT_DOWN],
+				['field' => 'name', 'order' => ZBX_SORT_UP]
+			]);
 		}
-
-		return $events_sorted;
+		unset($service);
 	}
 }

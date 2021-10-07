@@ -157,8 +157,6 @@ class CImage extends CApiService {
 		if (!is_null($options['select_image'])) {
 			$dbImg = DBselect('SELECT i.imageid,i.image FROM images i WHERE '.dbConditionInt('i.imageid', $imageids));
 			while ($img = DBfetch($dbImg)) {
-				// PostgreSQL images are stored escaped in the DB
-				$img['image'] = zbx_unescape_image($img['image']);
 				$result[$img['imageid']]['image'] = base64_encode($img['image']);
 			}
 		}
@@ -179,80 +177,58 @@ class CImage extends CApiService {
 	public function create($images) {
 		global $DB;
 
-		$images = zbx_toArray($images);
+		self::validateCreate($images);
 
-		$this->validateCreate($images);
+		if ($DB['TYPE'] === ZBX_DB_ORACLE) {
+			$upd_images_data = [];
 
-		foreach ($images as &$image) {
-			// decode BASE64
-			$image['image'] = base64_decode($image['image']);
-
-			// validate image (size and format)
-			$this->checkImage($image['image']);
-
-			list(,, $img_type) = getimagesizefromstring($image['image']);
-
-			if (!in_array($img_type, [IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG])) {
-				// Converting to PNG all images except PNG, JPEG and GIF
-				$image['image'] = $this->convertToPng($image['image']);
+			foreach ($images as $index => &$image) {
+				$upd_images_data[$index]['image'] = $image['image'];
+				unset($image['image']);
 			}
+			unset($image);
+		}
 
-			$imageid = get_dbid('images', 'imageid');
-			$values = [
-				'imageid' => $imageid,
-				'name' => zbx_dbstr($image['name']),
-				'imagetype' => zbx_dbstr($image['imagetype'])
-			];
+		$imageids = DB::insert('images', $images);
 
-			switch ($DB['TYPE']) {
-				case ZBX_DB_ORACLE:
-					$values['image'] = 'EMPTY_BLOB()';
-
-					$lob = oci_new_descriptor($DB['DB'], OCI_D_LOB);
-
-					$sql = 'INSERT INTO images ('.implode(' ,', array_keys($values)).') VALUES ('.implode(',', $values).')'.
-						' returning image into :imgdata';
-					$stmt = oci_parse($DB['DB'], $sql);
-					if (!$stmt) {
-						$e = oci_error($DB['DB']);
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Parse SQL error [%1$s] in [%2$s].', $e['message'], $e['sqltext']));
-					}
-
-					oci_bind_by_name($stmt, ':imgdata', $lob, -1, OCI_B_BLOB);
-					if (!oci_execute($stmt, OCI_DEFAULT)) {
-						$e = oci_error($stmt);
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Execute SQL error [%1$s] in [%2$s].', $e['message'], $e['sqltext']));
-					}
-					if (!$lob->save($image['image'])) {
-						$e = oci_error($stmt);
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Image load error [%1$s] in [%2$s].', $e['message'], $e['sqltext']));
-					}
-					$lob->free();
-					oci_free_statement($stmt);
-				break;
-				case ZBX_DB_MYSQL:
-						$values['image'] = zbx_dbstr($image['image']);
-						$sql = 'INSERT INTO images ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')';
-						if (!DBexecute($sql)) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-						}
-				break;
-				case ZBX_DB_POSTGRESQL:
-					$values['image'] = "'".pg_escape_bytea($image['image'])."'";
-					$sql = 'INSERT INTO images ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')';
-					if (!DBexecute($sql)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-					}
-				break;
+		foreach ($images as $index => &$image) {
+			if ($DB['TYPE'] === ZBX_DB_ORACLE) {
+				$upd_images_data[$index]['imageid'] = $imageids[$index];
+				$image['image'] = $upd_images_data[$index]['image'];
 			}
-
-			$image['imageid'] = $imageid;
+			$image['imageid'] = $imageids[$index];
 		}
 		unset($image);
 
-		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_IMAGE, $images);
+		if ($DB['TYPE'] === ZBX_DB_ORACLE) {
+			self::updateOracleImagesData($upd_images_data);
+		}
+
+		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_IMAGE, $images);
 
 		return ['imageids' => array_column($images, 'imageid')];
+	}
+
+	/**
+	 * @static
+	 *
+	 * @param array $images
+	 *
+	 * @throws APIException if the input is invalid
+	 */
+	private static function validateCreate(array &$images): void {
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
+			'imagetype' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => IMAGE_TYPE_ICON.','.IMAGE_TYPE_BACKGROUND],
+			'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('images', 'name')],
+			'image' =>		['type' => API_IMAGE, 'flags' => API_REQUIRED | API_NOT_EMPTY]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $images, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		self::checkDuplicates($images);
+		self::prepareImages($images);
 	}
 
 	/**
@@ -265,87 +241,128 @@ class CImage extends CApiService {
 	public function update($images) {
 		global $DB;
 
-		$images = zbx_toArray($images);
+		self::validateUpdate($images, $db_images);
 
-		$db_images = $this->get([
-			'output' => ['name', 'imagetype'],
+		if ($DB['TYPE'] === ZBX_DB_ORACLE) {
+			$upd_images_data = [];
+
+			foreach ($images as $index => &$image) {
+				if (array_key_exists('image', $image)) {
+					$upd_images_data[$index] = array_intersect_key($image, array_flip(['imageid', 'image']));
+					unset($image['image']);
+				}
+			}
+			unset($image);
+		}
+
+		$upd_images = [];
+
+		foreach ($images as $image) {
+			$upd_image = DB::getUpdatedValues('images', $image, $db_images[$image['imageid']]);
+
+			if ($upd_image) {
+				$upd_images[] = [
+					'values' => $upd_image,
+					'where' => ['imageid' => $image['imageid']]
+				];
+			}
+		}
+
+		if ($upd_images) {
+			DB::update('images', $upd_images);
+		}
+
+		if ($DB['TYPE'] === ZBX_DB_ORACLE) {
+			foreach ($images as $index => &$image) {
+				if (array_key_exists($index, $upd_images_data)) {
+					$image['image'] = $upd_images_data[$index]['image'];
+				}
+			}
+			unset($image);
+
+			if ($upd_images_data) {
+				self::updateOracleImagesData($upd_images_data, $db_images);
+			}
+		}
+
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_IMAGE, $images, $db_images);
+
+		return ['imageids' => array_column($images, 'imageid')];
+	}
+
+	/**
+	 * Saving image data to ORACLE database.
+	 *
+	 * @static
+	 *
+	 * @param array      $images
+	 * @param string     $images[]['image']
+	 * @param array|null $db_images
+	 */
+	private static function updateOracleImagesData(array $images, array $db_images = null): void {
+		global $DB;
+
+		foreach ($images as $image) {
+			if ($db_images !== null && $image['image'] === $db_images[$image['imageid']]['image']) {
+				continue;
+			}
+
+			$options = [
+				'output' => ['image'],
+				'imageids' => $image['imageid']
+			];
+
+			if (!$stmt = oci_parse($DB['DB'], DB::makeSql('images', $options).' FOR UPDATE')) {
+				$e = oci_error($DB['DB']);
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
+			}
+
+			if (!oci_execute($stmt, OCI_DEFAULT)) {
+				$e = oci_error($stmt);
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
+			}
+
+			if (false === ($row = oci_fetch_assoc($stmt))) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+			}
+
+			$row['IMAGE']->truncate();
+			$row['IMAGE']->save($image['image']);
+			$row['IMAGE']->free();
+		}
+	}
+
+	/**
+	 * @static
+	 *
+	 * @param array      $images
+	 * @param array|null $db_images
+	 *
+	 * @throws APIException if the input is invalid
+	 */
+	private static function validateUpdate(array &$images, array &$db_images = null): void {
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['imageid'], ['name']], 'fields' => [
+			'imageid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
+			'name' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('images', 'name')],
+			'image' =>		['type' => API_IMAGE, 'flags' => API_NOT_EMPTY]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $images, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$db_images = DB::select('images', [
+			'output' => ['imageid', 'name', 'image'],
 			'imageids' => array_column($images, 'imageid'),
 			'preservekeys' => true
 		]);
 
-		$this->validateUpdate($images, $db_images);
-
-		foreach ($images as $image) {
-			$values = [];
-
-			if (isset($image['name'])) {
-				$values['name'] = zbx_dbstr($image['name']);
-			}
-
-			if (isset($image['image'])) {
-				// decode BASE64
-				$image['image'] = base64_decode($image['image']);
-
-				// validate image
-				$this->checkImage($image['image']);
-
-				list(,, $img_type) = getimagesizefromstring($image['image']);
-
-				if (!in_array($img_type, [IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG])) {
-					// Converting to PNG all images except PNG, JPEG and GIF
-					$image['image'] = $this->convertToPng($image['image']);
-				}
-
-				switch ($DB['TYPE']) {
-					case ZBX_DB_POSTGRESQL:
-						$values['image'] = "'".pg_escape_bytea($image['image'])."'";
-						break;
-
-					case ZBX_DB_MYSQL:
-						$values['image'] = zbx_dbstr($image['image']);
-						break;
-
-					case ZBX_DB_ORACLE:
-						$sql = 'SELECT i.image FROM images i WHERE i.imageid='.zbx_dbstr($image['imageid']).' FOR UPDATE';
-
-						if (!$stmt = oci_parse($DB['DB'], $sql)) {
-							$e = oci_error($DB['DB']);
-							self::exception(ZBX_API_ERROR_PARAMETERS, 'SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
-						}
-
-						if (!oci_execute($stmt, OCI_DEFAULT)) {
-							$e = oci_error($stmt);
-							self::exception(ZBX_API_ERROR_PARAMETERS, 'SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
-						}
-
-						if (false === ($row = oci_fetch_assoc($stmt))) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-						}
-
-						$row['IMAGE']->truncate();
-						$row['IMAGE']->save($image['image']);
-						$row['IMAGE']->free();
-						break;
-				}
-			}
-
-			if ($values) {
-				$sqlUpd = [];
-				foreach ($values as $field => $value) {
-					$sqlUpd[] = $field.'='.$value;
-				}
-				$sql = 'UPDATE images SET '.implode(', ', $sqlUpd).' WHERE imageid='.zbx_dbstr($image['imageid']);
-				$result = DBexecute($sql);
-
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Could not save image!'));
-				}
-			}
+		if (count($db_images) != count($images)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_IMAGE, $images, $db_images);
-
-		return ['imageids' => zbx_objectValues($images, 'imageid')];
+		self::checkDuplicates($images, $db_images);
+		self::prepareImages($images);
 	}
 
 	/**
@@ -356,66 +373,7 @@ class CImage extends CApiService {
 	 * @return array
 	 */
 	public function delete(array $imageids) {
-		if (empty($imageids)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty parameters'));
-		}
-
-		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
-
-		// check if icon is used in icon maps
-		$dbIconmaps = DBselect(
-			'SELECT DISTINCT im.name'.
-			' FROM icon_map im,icon_mapping imp'.
-			' WHERE im.iconmapid=imp.iconmapid'.
-				' AND ('.dbConditionInt('im.default_iconid', $imageids).
-					' OR '.dbConditionInt('imp.iconid', $imageids).')'
-		);
-
-		$usedInIconmaps = [];
-		while ($iconmap = DBfetch($dbIconmaps)) {
-			$usedInIconmaps[] = $iconmap['name'];
-		}
-
-		if (!empty($usedInIconmaps)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_n('The image is used in icon map %1$s.', 'The image is used in icon maps %1$s.',
-					'"'.implode('", "', $usedInIconmaps).'"', count($usedInIconmaps))
-			);
-		}
-
-		// check if icon is used in maps
-		$dbSysmaps = DBselect(
-			'SELECT DISTINCT sm.sysmapid,sm.name'.
-			' FROM sysmaps_elements se,sysmaps sm'.
-			' WHERE sm.sysmapid=se.sysmapid'.
-				' AND (sm.iconmapid IS NULL'.
-					' OR se.use_iconmap='.SYSMAP_ELEMENT_USE_ICONMAP_OFF.')'.
-				' AND ('.dbConditionInt('se.iconid_off', $imageids).
-					' OR '.dbConditionInt('se.iconid_on', $imageids).
-					' OR '.dbConditionInt('se.iconid_disabled', $imageids).
-					' OR '.dbConditionInt('se.iconid_maintenance', $imageids).')'.
-				' OR '.dbConditionInt('sm.backgroundid', $imageids)
-		);
-
-		$usedInMaps = [];
-		while ($sysmap = DBfetch($dbSysmaps)) {
-			$usedInMaps[] = $sysmap['name'];
-		}
-
-		if (!empty($usedInMaps)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_n('The image is used in map %1$s.', 'The image is used in maps %1$s.',
-				'"'.implode('", "', $usedInMaps).'"', count($usedInMaps))
-			);
-		}
-
-		$db_images = $this->get([
-			'output' => ['imageid', 'name'],
-			'imageids' => $imageids,
-			'preservekeys' => true
-		]);
+		self::validateDelete($imageids, $db_images);
 
 		DB::update('sysmaps_elements', ['values' => ['iconid_off' => 0], 'where' => ['iconid_off' => $imageids]]);
 		DB::update('sysmaps_elements', ['values' => ['iconid_on' => 0], 'where' => ['iconid_on' => $imageids]]);
@@ -424,151 +382,38 @@ class CImage extends CApiService {
 
 		DB::delete('images', ['imageid' => $imageids]);
 
-		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_IMAGE, $db_images);
+		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_IMAGE, $db_images);
 
 		return ['imageids' => $imageids];
 	}
 
 	/**
-	 * Validate create.
+	 * @static
 	 *
-	 * @param array $images
+	 * @param array      $imageids
+	 * @param array|null $db_images
 	 *
-	 * @throws APIException if user has no permissions.
-	 * @throws APIException if wrong fields are passed.
-	 * @throws APIException if image with same name already exists.
+	 * @throws APIException if the input is invalid
 	 */
-	protected function validateCreate(array &$images) {
-		// validate permissions
-		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
+	private static function validateDelete(array &$imageids, array &$db_images = null): void {
+		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+
+		if (!CApiInputValidator::validate($api_input_rules, $imageids, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$db_images = DB::select('images', [
+			'output' => ['imageid', 'name'],
+			'imageids' => $imageids,
+			'preservekeys' => true
+		]);
+
+		if (count($db_images) != count($imageids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		if (!$images) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
-		}
-
-		// check fields
-		foreach ($images as &$image) {
-			$imageDbFields = [
-				'name' => null,
-				'image' => null,
-				'imagetype' => 1
-			];
-
-			if (!check_db_fields($imageDbFields, $image)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
-			}
-		}
-		unset($image);
-
-		// check host name duplicates
-		$collectionValidator = new CCollectionValidator([
-			'uniqueField' => 'name',
-			'messageDuplicate' => _('Image "%1$s" already exists.')
-		]);
-		$this->checkValidator($images, $collectionValidator);
-
-		// check existing names
-		$dbImages = API::getApiService()->select($this->tableName(), [
-			'output' => ['name'],
-			'filter' => ['name' => zbx_objectValues($images, 'name')],
-			'limit' => 1
-		]);
-
-		if ($dbImages) {
-			$dbImage = reset($dbImages);
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Image "%1$s" already exists.', $dbImage['name']));
-		}
-	}
-
-	/**
-	 * Validate update.
-	 *
-	 * @param array $images
-	 * @param array $db_images
-	 *
-	 * @throws APIException if user has no permissions.
-	 * @throws APIException if wrong fields are passed.
-	 * @throws APIException if image with same name already exists.
-	 */
-	protected function validateUpdate(array $images, array $db_images) {
-		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
-
-		if (!$images) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
-		}
-
-		foreach ($images as $image) {
-			if (!check_db_fields(['imageid'], $image)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
-			}
-		}
-
-		$changedImageNames = [];
-		foreach ($images as $image) {
-			if (!isset($db_images[$image['imageid']])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-			}
-
-			if (array_key_exists('imagetype', $image)) {
-				self::exception(
-					ZBX_API_ERROR_PARAMETERS,
-					_s('Cannot update "imagetype" for image "%1$s".', $db_images[$image['imageid']]['name'])
-				);
-			}
-
-			if (isset($image['name']) && !zbx_empty($image['name'])
-					&& $db_images[$image['imageid']]['name'] !== $image['name']) {
-				if (isset($changedImageNames[$image['name']])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Image "%1$s" already exists.', $image['name']));
-				}
-				else {
-					$changedImageNames[$image['name']] = true;
-				}
-			}
-		}
-
-		// check for existing image names
-		if ($changedImageNames) {
-			$dbImages = API::getApiService()->select($this->tableName(), [
-				'output' => ['name'],
-				'filter' => ['name' => array_keys($changedImageNames)],
-				'limit' => 1
-			]);
-
-			if ($dbImages) {
-				$dbImage = reset($dbImages);
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Image "%1$s" already exists.', $dbImage['name']));
-			}
-		}
-	}
-
-	/**
-	 * Validate image.
-	 *
-	 * @param string $image string representing image, for example, result of base64_decode()
-	 *
-	 * @throws APIException if image size is 1MB or greater.
-	 * @throws APIException if file format is unsupported, GD can not create image from given string
-	 */
-	protected function checkImage($image) {
-		// check size
-		if (bccomp(strlen($image), ZBX_MAX_IMAGE_SIZE) == 1) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Image size must be less than %1$s.', convertUnits([
-					'value' => ZBX_MAX_IMAGE_SIZE,
-					'units' => 'B'
-				]))
-			);
-		}
-
-		// check file format
-		if (@imageCreateFromString($image) === false) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('File format is unsupported.'));
-		}
+		self::checkUsedIconMaps($imageids);
+		self::checkUsedSysMaps($imageids);
 	}
 
 	/**
@@ -601,10 +446,13 @@ class CImage extends CApiService {
 	/**
 	 * Convert image body to PNG.
 	 *
+	 * @static
+	 *
 	 * @param string $image  Base64 encoded body of image.
+	 *
 	 * @return string
 	 */
-	protected function convertToPng($image) {
+	protected static function convertToPng($image): string {
 		$image = imagecreatefromstring($image);
 
 		ob_start();
@@ -614,5 +462,135 @@ class CImage extends CApiService {
 		imagedestroy($image);
 
 		return ob_get_clean();
+	}
+
+	/**
+	 * Check for unique image names.
+	 *
+	 * @static
+	 *
+	 * @param array      $images
+	 * @param array|null $db_images
+	 *
+	 * @throws APIException if image names are not unique.
+	 */
+	private static function checkDuplicates(array $images, array $db_images = null): void {
+		$names = [];
+
+		foreach ($images as $image) {
+			if (!array_key_exists('name', $image)) {
+				continue;
+			}
+
+			if ($db_images === null || $image['name'] !== $db_images[$image['imageid']]['name']) {
+				$names[] = $image['name'];
+			}
+		}
+
+		if (!$names) {
+			return;
+		}
+
+		$duplicates = DB::select('images', [
+			'output' => ['name'],
+			'filter' => ['name' => $names],
+			'limit' => 1
+		]);
+
+		if ($duplicates) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Image "%1$s" already exists.', $duplicates[0]['name']));
+		}
+	}
+
+	/**
+	 * Preparing images before saving to the DB.
+	 *
+	 * @static
+	 *
+	 * @param array  $images
+	 * @param string $images[]['image']  (optional)
+	 *
+	 * @return string
+	 */
+	private static function prepareImages(array &$images): void {
+		foreach ($images as &$image) {
+			if (!array_key_exists('image', $image)) {
+				continue;
+			}
+
+			list(,, $img_type) = getimagesizefromstring($image['image']);
+
+			// Converting to PNG all images except PNG, JPEG and GIF
+			if (!in_array($img_type, [IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG])) {
+				$image['image'] = self::convertToPng($image['image']);
+			}
+		}
+	}
+
+	/**
+	 * Validate image used in icon mapping.
+	 *
+	 * @static
+	 *
+	 * @param array $imageids
+	 *
+	 * @throws APIException if image used in icon mapping.
+	 */
+	private static function checkUsedIconMaps(array $imageids): void {
+		$used = [];
+
+		$db_iconmaps = DBselect(
+			'SELECT DISTINCT im.name'.
+			' FROM icon_map im,icon_mapping imp'.
+			' WHERE im.iconmapid=imp.iconmapid'.
+				' AND ('.dbConditionInt('im.default_iconid', $imageids).
+					' OR '.dbConditionInt('imp.iconid', $imageids).')'
+		);
+
+		while ($db_iconmap = DBfetch($db_iconmaps)) {
+			$used[] = $db_iconmap['name'];
+		}
+
+		if ($used) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _n('The image is used in icon map %1$s.',
+				'The image is used in icon maps %1$s.', '"'.implode('", "', $used).'"', count($used)
+			));
+		}
+	}
+
+	/**
+	 * Validate image used in maps.
+	 *
+	 * @static
+	 *
+	 * @param array $imageids
+	 *
+	 * @throws APIException if image used in map.
+	 */
+	private static function checkUsedSysMaps(array $imageids): void {
+		$used = [];
+
+		$db_sysmaps = DBselect(
+			'SELECT DISTINCT sm.sysmapid,sm.name'.
+			' FROM sysmaps_elements se,sysmaps sm'.
+			' WHERE sm.sysmapid=se.sysmapid'.
+				' AND (sm.iconmapid IS NULL'.
+					' OR se.use_iconmap='.SYSMAP_ELEMENT_USE_ICONMAP_OFF.')'.
+				' AND ('.dbConditionInt('se.iconid_off', $imageids).
+					' OR '.dbConditionInt('se.iconid_on', $imageids).
+					' OR '.dbConditionInt('se.iconid_disabled', $imageids).
+					' OR '.dbConditionInt('se.iconid_maintenance', $imageids).')'.
+				' OR '.dbConditionInt('sm.backgroundid', $imageids)
+		);
+
+		while ($db_sysmap = DBfetch($db_sysmaps)) {
+			$used[] = $db_sysmap['name'];
+		}
+
+		if ($used) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _n('The image is used in map %1$s.',
+				'The image is used in maps %1$s.', '"'.implode('", "', $used).'"', count($used)
+			));
+		}
 	}
 }

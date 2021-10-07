@@ -80,7 +80,7 @@ class CControllerAuditLogList extends CController {
 			'active_tab' => CProfile::get('web.auditlog.filter.active', 1)
 		];
 		$users = [];
-		$usernames = [];
+		$non_existent_userids = [];
 		$filter = [];
 
 		if (array_key_exists((int) $data['auditlog_action'], $data['actions'])) {
@@ -155,7 +155,7 @@ class CControllerAuditLogList extends CController {
 			$users = [];
 			foreach ($data['auditlogs'] as $auditlog) {
 				if (!array_key_exists($auditlog['userid'], $db_users)) {
-					$usernames[$auditlog['userid']] = $auditlog['username'];
+					$non_existent_userids[$auditlog['userid']] = true;
 					continue;
 				}
 
@@ -164,7 +164,7 @@ class CControllerAuditLogList extends CController {
 		}
 
 		$data['users'] = $users;
-		$data['usernames'] = $usernames;
+		$data['non_existent_userids'] = array_keys($non_existent_userids);
 
 		natsort($data['actions']);
 		natsort($data['resources']);
@@ -188,12 +188,14 @@ class CControllerAuditLogList extends CController {
 	 */
 	private static function getActionsList(): array {
 		return [
-			CAudit::ACTION_LOGIN => _('Login'),
+			CAudit::ACTION_LOGIN_SUCCESS => _('Login'),
+			CAudit::ACTION_LOGIN_FAILED => _('Failed login'),
 			CAudit::ACTION_LOGOUT => _('Logout'),
 			CAudit::ACTION_ADD => _('Add'),
 			CAudit::ACTION_UPDATE => _('Update'),
 			CAudit::ACTION_DELETE => _('Delete'),
-			CAudit::ACTION_EXECUTE => _('Execute')
+			CAudit::ACTION_EXECUTE => _('Execute'),
+			CAudit::ACTION_HISTORY_CLEAR => _('History clear')
 		];
 	}
 

@@ -1,13 +1,13 @@
 /*
- *  Duktape public API for Duktape 2.4.0.
+ *  Duktape public API for Duktape 2.6.0.
  *
  *  See the API reference for documentation on call semantics.  The exposed,
  *  supported API is between the "BEGIN PUBLIC API" and "END PUBLIC API"
  *  comments.  Other parts of the header are Duktape internal and related to
  *  e.g. platform/compiler/feature detection.
  *
- *  Git commit d4f2cff1c592d70f58bab8e1bd85705174c02a58 (v2.4.0).
- *  Git branch master.
+ *  Git commit fffa346eff06a8764b02c31d4336f63a773a95c3 (v2.6.0).
+ *  Git branch HEAD.
  *
  *  See Duktape AUTHORS.rst and LICENSE.txt for copyright and
  *  licensing information.
@@ -109,6 +109,7 @@
  *  * James Swift (https://github.com/phraemer)
  *  * Luis de Bethencourt (https://github.com/luisbg)
  *  * Ian Whyman (https://github.com/v00d00)
+ *  * Rick Sayre (https://github.com/whorfin)
  *  
  *  Other contributions
  *  ===================
@@ -175,16 +176,16 @@
  * development snapshots have 99 for patch level (e.g. 0.10.99 would be a
  * development version after 0.10.0 but before the next official release).
  */
-#define DUK_VERSION                       20400L
+#define DUK_VERSION                       20600L
 
 /* Git commit, describe, and branch for Duktape build.  Useful for
  * non-official snapshot builds so that application code can easily log
  * which Duktape snapshot was used.  Not available in the ECMAScript
  * environment.
  */
-#define DUK_GIT_COMMIT                    "d4f2cff1c592d70f58bab8e1bd85705174c02a58"
-#define DUK_GIT_DESCRIBE                  "v2.4.0"
-#define DUK_GIT_BRANCH                    "master"
+#define DUK_GIT_COMMIT                    "fffa346eff06a8764b02c31d4336f63a773a95c3"
+#define DUK_GIT_DESCRIBE                  "v2.6.0"
+#define DUK_GIT_BRANCH                    "HEAD"
 
 /* External duk_config.h provides platform/compiler/OS dependent
  * typedefs and macros, and DUK_USE_xxx config options so that
@@ -394,30 +395,35 @@ struct duk_time_components {
 #define DUK_DEFPROP_C                     DUK_DEFPROP_CONFIGURABLE
 #define DUK_DEFPROP_WE                    (DUK_DEFPROP_WRITABLE | DUK_DEFPROP_ENUMERABLE)
 #define DUK_DEFPROP_WC                    (DUK_DEFPROP_WRITABLE | DUK_DEFPROP_CONFIGURABLE)
+#define DUK_DEFPROP_EC                    (DUK_DEFPROP_ENUMERABLE | DUK_DEFPROP_CONFIGURABLE)
 #define DUK_DEFPROP_WEC                   (DUK_DEFPROP_WRITABLE | DUK_DEFPROP_ENUMERABLE | DUK_DEFPROP_CONFIGURABLE)
 #define DUK_DEFPROP_HAVE_W                DUK_DEFPROP_HAVE_WRITABLE
 #define DUK_DEFPROP_HAVE_E                DUK_DEFPROP_HAVE_ENUMERABLE
 #define DUK_DEFPROP_HAVE_C                DUK_DEFPROP_HAVE_CONFIGURABLE
 #define DUK_DEFPROP_HAVE_WE               (DUK_DEFPROP_HAVE_WRITABLE | DUK_DEFPROP_HAVE_ENUMERABLE)
 #define DUK_DEFPROP_HAVE_WC               (DUK_DEFPROP_HAVE_WRITABLE | DUK_DEFPROP_HAVE_CONFIGURABLE)
+#define DUK_DEFPROP_HAVE_EC               (DUK_DEFPROP_HAVE_ENUMERABLE | DUK_DEFPROP_HAVE_CONFIGURABLE)
 #define DUK_DEFPROP_HAVE_WEC              (DUK_DEFPROP_HAVE_WRITABLE | DUK_DEFPROP_HAVE_ENUMERABLE | DUK_DEFPROP_HAVE_CONFIGURABLE)
 #define DUK_DEFPROP_SET_W                 DUK_DEFPROP_SET_WRITABLE
 #define DUK_DEFPROP_SET_E                 DUK_DEFPROP_SET_ENUMERABLE
 #define DUK_DEFPROP_SET_C                 DUK_DEFPROP_SET_CONFIGURABLE
 #define DUK_DEFPROP_SET_WE                (DUK_DEFPROP_SET_WRITABLE | DUK_DEFPROP_SET_ENUMERABLE)
 #define DUK_DEFPROP_SET_WC                (DUK_DEFPROP_SET_WRITABLE | DUK_DEFPROP_SET_CONFIGURABLE)
+#define DUK_DEFPROP_SET_EC                (DUK_DEFPROP_SET_ENUMERABLE | DUK_DEFPROP_SET_CONFIGURABLE)
 #define DUK_DEFPROP_SET_WEC               (DUK_DEFPROP_SET_WRITABLE | DUK_DEFPROP_SET_ENUMERABLE | DUK_DEFPROP_SET_CONFIGURABLE)
 #define DUK_DEFPROP_CLEAR_W               DUK_DEFPROP_CLEAR_WRITABLE
 #define DUK_DEFPROP_CLEAR_E               DUK_DEFPROP_CLEAR_ENUMERABLE
 #define DUK_DEFPROP_CLEAR_C               DUK_DEFPROP_CLEAR_CONFIGURABLE
 #define DUK_DEFPROP_CLEAR_WE              (DUK_DEFPROP_CLEAR_WRITABLE | DUK_DEFPROP_CLEAR_ENUMERABLE)
 #define DUK_DEFPROP_CLEAR_WC              (DUK_DEFPROP_CLEAR_WRITABLE | DUK_DEFPROP_CLEAR_CONFIGURABLE)
+#define DUK_DEFPROP_CLEAR_EC              (DUK_DEFPROP_CLEAR_ENUMERABLE | DUK_DEFPROP_CLEAR_CONFIGURABLE)
 #define DUK_DEFPROP_CLEAR_WEC             (DUK_DEFPROP_CLEAR_WRITABLE | DUK_DEFPROP_CLEAR_ENUMERABLE | DUK_DEFPROP_CLEAR_CONFIGURABLE)
 #define DUK_DEFPROP_ATTR_W                (DUK_DEFPROP_HAVE_WEC | DUK_DEFPROP_W)
 #define DUK_DEFPROP_ATTR_E                (DUK_DEFPROP_HAVE_WEC | DUK_DEFPROP_E)
 #define DUK_DEFPROP_ATTR_C                (DUK_DEFPROP_HAVE_WEC | DUK_DEFPROP_C)
 #define DUK_DEFPROP_ATTR_WE               (DUK_DEFPROP_HAVE_WEC | DUK_DEFPROP_WE)
 #define DUK_DEFPROP_ATTR_WC               (DUK_DEFPROP_HAVE_WEC | DUK_DEFPROP_WC)
+#define DUK_DEFPROP_ATTR_EC               (DUK_DEFPROP_HAVE_WEC | DUK_DEFPROP_EC)
 #define DUK_DEFPROP_ATTR_WEC              (DUK_DEFPROP_HAVE_WEC | DUK_DEFPROP_WEC)
 
 /* Flags for duk_push_thread_raw() */
@@ -661,6 +667,7 @@ DUK_EXTERNAL_DECL void duk_swap_top(duk_context *ctx, duk_idx_t idx);
 DUK_EXTERNAL_DECL void duk_dup(duk_context *ctx, duk_idx_t from_idx);
 DUK_EXTERNAL_DECL void duk_dup_top(duk_context *ctx);
 DUK_EXTERNAL_DECL void duk_insert(duk_context *ctx, duk_idx_t to_idx);
+DUK_EXTERNAL_DECL void duk_pull(duk_context *ctx, duk_idx_t from_idx);
 DUK_EXTERNAL_DECL void duk_replace(duk_context *ctx, duk_idx_t to_idx);
 DUK_EXTERNAL_DECL void duk_copy(duk_context *ctx, duk_idx_t from_idx, duk_idx_t to_idx);
 DUK_EXTERNAL_DECL void duk_remove(duk_context *ctx, duk_idx_t idx);
@@ -1032,6 +1039,8 @@ DUK_EXTERNAL_DECL const char *duk_hex_encode(duk_context *ctx, duk_idx_t idx);
 DUK_EXTERNAL_DECL void duk_hex_decode(duk_context *ctx, duk_idx_t idx);
 DUK_EXTERNAL_DECL const char *duk_json_encode(duk_context *ctx, duk_idx_t idx);
 DUK_EXTERNAL_DECL void duk_json_decode(duk_context *ctx, duk_idx_t idx);
+DUK_EXTERNAL_DECL void duk_cbor_encode(duk_context *ctx, duk_idx_t idx, duk_uint_t encode_flags);
+DUK_EXTERNAL_DECL void duk_cbor_decode(duk_context *ctx, duk_idx_t idx, duk_uint_t decode_flags);
 
 DUK_EXTERNAL_DECL const char *duk_buffer_to_string(duk_context *ctx, duk_idx_t idx);
 

@@ -12,7 +12,7 @@ Released into the Public Domain by Ulrich Drepper <drepper@redhat.com>.  */
 #elif defined(_WINDOWS) || defined(__MINGW32__)
 /* Nothing to do in Windows */
 #else
-	#if defined(DUK_F_OLD_SOLARIS)
+	#if defined(ZBX_OLD_SOLARIS)
 		#include <sys/isa_defs.h>
 	#else
 		#include <machine/endian.h>
