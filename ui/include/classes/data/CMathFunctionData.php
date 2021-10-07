@@ -130,7 +130,7 @@ final class CMathFunctionData {
 	 *
 	 * @var array
 	 */
-	private const AGGREGATING = [
+	private const CALCULATED_ONLY = [
 		'count',
 		'histogram_quantile'
 	];
@@ -166,7 +166,7 @@ final class CMathFunctionData {
 			return false;
 		}
 
-		if (!$this->options['calculated'] && in_array($function, self::AGGREGATING, true)) {
+		if (!$this->options['calculated'] && in_array($function, self::CALCULATED_ONLY, true)) {
 			return false;
 		}
 
@@ -183,7 +183,7 @@ final class CMathFunctionData {
 			return self::PARAMETERS;
 		}
 
-		return array_diff_key(self::PARAMETERS, array_flip(self::AGGREGATING));
+		return array_diff_key(self::PARAMETERS, array_flip(self::CALCULATED_ONLY));
 	}
 
 	/**
@@ -196,6 +196,6 @@ final class CMathFunctionData {
 			return self::EXPRESSION_RULES;
 		}
 
-		return array_diff_key(self::EXPRESSION_RULES, array_flip(self::AGGREGATING));
+		return array_diff_key(self::EXPRESSION_RULES, array_flip(self::CALCULATED_ONLY));
 	}
 }
