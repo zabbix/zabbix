@@ -1549,25 +1549,25 @@ class testFormHost extends CWebTest {
 			[
 				[
 					'host_fields' => [
-						'Host name' => microtime().' clone with interface changes'
-					],
-					'interfaces' => [
-						[
-							'action' => USER_ACTION_ADD,
-							'type' => 'SNMP',
-							'ip' => '127.1.1.1',
-							'dns' => '',
-							'Connect to' => 'IP',
-							'port' => '122',
-							'SNMP version' => 'SNMPv3',
-							'Context name' => 'zabbix',
-							'Security name' => 'selenium',
-							'Security level' => 'authPriv',
-							'Authentication protocol' => 'SHA256',
-							'Authentication passphrase' => 'test123',
-							'Privacy protocol' => 'AES256',
-							'Privacy passphrase' => '456test',
-							'Use bulk requests' => false
+						'Host name' => microtime().' clone with interface changes',
+						'Interfaces' => [
+							[
+								'action' => USER_ACTION_ADD,
+								'type' => 'SNMP',
+								'ip' => '127.3.3.3',
+								'dns' => '',
+								'Connect to' => 'IP',
+								'port' => '122',
+								'SNMP version' => 'SNMPv3',
+								'Context name' => 'zabbix',
+								'Security name' => 'selenium',
+								'Security level' => 'authPriv',
+								'Authentication protocol' => 'SHA256',
+								'Authentication passphrase' => 'test123',
+								'Privacy protocol' => 'AES256',
+								'Privacy passphrase' => '456test',
+								'Use bulk requests' => false
+							]
 						]
 					]
 				]
@@ -1611,24 +1611,19 @@ class testFormHost extends CWebTest {
 		$this->query('button:Reset')->one()->click();
 		$filter = $this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one();
 		$filter->fill(['Name' => $name]);
-		$filter->query('button:Apply')->one()->waitUntilClickable()->click();
+		$filter->query('button:Apply')->waitUntilClickable()->one()->click();
 
 		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
 				->getColumn('Name')->query('tag:a')->waitUntilClickable()->one()->click();
-		$form = COverlayDialogElement::find()->asFluidForm()->one()->waitUntilVisible();
+		$form = COverlayDialogElement::find()->asFluidForm()->waitUntilVisible()->one();
 
 		// Get values from form.
 		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
 		$original = $form->getFields()->asValues();
-		// Get values from interface fields.
-		$container_names = ['1' => 'default'];
-		$interfaces_form = $form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => $container_names]);
-		$interfaces_form->fill(CTestArrayHelper::get($data, 'interfaces', []));
-		$original_interfaces = $interfaces_form->getValue();
 
 		// Clone host.
 		$this->query('button', $type)->waitUntilClickable()->one()->click();
-		$cloned_form = COverlayDialogElement::find()->asFluidForm()->one()->waitUntilVisible();
+		$cloned_form = COverlayDialogElement::find()->asFluidForm()->waitUntilPresent()->one();
 		$cloned_form->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Host added');
@@ -1636,10 +1631,11 @@ class testFormHost extends CWebTest {
 
 		// Check the values of the original host with the cloned host.
 		$this->query('link', $data['host_fields']['Host name'])->waitUntilClickable()->one()->forceClick();
-		$saved_form = COverlayDialogElement::find()->asFluidForm()->one()->waitUntilReady();
+		$saved_form = COverlayDialogElement::find()->asFluidForm()->waitUntilReady()->one();
 		$saved_form->checkValue($original);
-		$saved_form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => $container_names])
-				->checkValue($original_interfaces);
+
+		COverlayDialogElement::find()->one()->close();
+		COverlayDialogElement::ensureNotPresent();
 	}
 
 	public static function getСancelData() {

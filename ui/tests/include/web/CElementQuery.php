@@ -552,12 +552,13 @@ class CElementQuery implements IWaitable {
 				'/div/ul[contains(@class, "radio-list-control")]' // TODO: remove after fix DEV-1071.
 			],
 			'CCheckboxListElement'		=> [
-				'/div/div[@class="columns-wrapper columns-3"]', // TODO: fix after DEV-1859
+				'/div/div[@class="columns-wrapper columns-3"]', // TODO: fix after DEV-1859.
 				'/ul[contains(@class, "checkbox-list")]',
-				'/ul[contains(@class, "list-check-radio")]'
+				'/ul[contains(@class, "list-check-radio")]',
+				'/ul' // TODO: remove after ZBXNEXT-6757 (113) is fixed.
 			],
 			'CHostInterfaceElement'		=> [
-				'/div[contains(@class, "interface-container")]/..'
+				'/div/div[contains(@class, "interface-container")]/../..'
 			],
 			'CMultifieldTableElement'	=> [
 				'/table',
