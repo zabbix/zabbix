@@ -567,7 +567,7 @@ class testFormTemplateDashboards extends CWebTest {
 	 */
 	public function testFormTemplateDashboards_SimpleUpdate() {
 		$sql = 'SELECT * FROM widget w INNER JOIN dashboard_page dp ON dp.dashboard_pageid=w.dashboard_pageid '.
-				'INNER JOIN dashboard d ON d.dashboardid=dp.dashboardid';
+				'INNER JOIN dashboard d ON d.dashboardid=dp.dashboardid ORDER BY w.widgetid';
 		$old_hash = CDBHelper::getHash($sql);
 
 		$this->page->login()->open('zabbix.php?action=template.dashboard.edit&dashboardid='.self::$dashboardid_with_widgets);
@@ -582,7 +582,7 @@ class testFormTemplateDashboards extends CWebTest {
 	 */
 	public function testFormTemplateDashboards_Cancel() {
 		$sql = 'SELECT * FROM widget w INNER JOIN dashboard_page dp ON dp.dashboard_pageid=w.dashboard_pageid '.
-				'INNER JOIN dashboard d ON d.dashboardid=dp.dashboardid';
+				'INNER JOIN dashboard d ON d.dashboardid=dp.dashboardid ORDER BY w.widgetid';
 		$old_hash = CDBHelper::getHash($sql);
 		$fields = [
 			'Name' => 'Cancel dashboard update',
