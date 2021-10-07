@@ -450,6 +450,15 @@ class testDashboardPages extends CWebTest {
 		$dashboard->save();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+
+		$next_page = $this->query('xpath://button[@class="dashboard-next-page btn-iterator-page-next"]')->one();
+		if ($this->assertTrue($next_page->isEnabled())) {
+			do {
+				$next_page->waitUntilReady()->click();
+			}
+			while ($next_page->isEnabled(false));
+		}
+
 		$index = ($title === 'first_page_creation') ? 2 : 1;
 		$this->selectPageAction($title, 'Properties', $index);
 		COverlayDialogElement::find()->waitUntilVisible()->one();
