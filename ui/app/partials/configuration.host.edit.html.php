@@ -192,10 +192,14 @@ if ($host_is_discovered) {
 			$template_link = new CSpan($template['name']);
 		}
 
-		$linked_template_table->addRow([
-			$template_link,
-			(new CVar('templates[' . $template['templateid'] . ']', $template['templateid']))->removeId()
-		]);
+		$linked_template_table->addRow(
+			(new CCol([
+				$template_link,
+				(new CVar('templates[' . $template['templateid'] . ']', $template['templateid']))->removeId()
+			]))
+				->addClass(ZBX_STYLE_WORDWRAP)
+				->addStyle('max-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		);
 	}
 
 	$templates_tab->addItem([
@@ -228,10 +232,12 @@ else {
 		}
 
 		$linked_template_table->addRow([
-			[
+			(new CCol([
 				$template_link,
 				(new CVar('templates[]', $template['templateid']))->removeId()
-			],
+			]))
+				->addClass(ZBX_STYLE_WORDWRAP)
+				->addStyle('max-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
 			(new CCol(
 				new CHorList([
 					(new CSimpleButton(_('Unlink')))
