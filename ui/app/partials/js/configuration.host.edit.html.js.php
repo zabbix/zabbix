@@ -22,9 +22,6 @@
 /**
  * @var CView $this
  */
-
-$host_is_discovered = ($data['host']['flags'] == ZBX_FLAG_DISCOVERY_CREATED);
-$linked_templates = $host_is_discovered ? array_column($data['host']['parentTemplates'], 'templateid') : [];
 ?>
 
 <script type="text/x-jquery-tmpl" id="macro-row-tmpl-inherited">
@@ -113,6 +110,8 @@ $linked_templates = $host_is_discovered ? array_column($data['host']['parentTemp
 	window.host_edit = {
 		form_name: null,
 		form: null,
+		macros_initialized: false,
+		macros_templateids: [],
 
 		/**
 		 * Host form setup.
@@ -122,7 +121,7 @@ $linked_templates = $host_is_discovered ? array_column($data['host']['parentTemp
 			this.form = document.getElementById(form_name);
 
 			this.initHostTab(host_interfaces, host_is_discovered);
-			this.initMacrosTab();
+			this.initMacrosTab(host_is_discovered);
 			this.initInventoryTab();
 			this.initEncryptionTab();
 		},
@@ -256,68 +255,48 @@ $linked_templates = $host_is_discovered ? array_column($data['host']['parentTemp
 		/**
 		 * Set up of macros functionality.
 		 */
-		initMacrosTab() {
+		initMacrosTab(host_is_discovered) {
 			const $show_inherited_macros = $('input[name="show_inherited_macros"]');
 
-			this.macros_manager = new HostMacrosManager(<?= json_encode([
-				'properties' => [
-					'readonly' => $host_is_discovered,
-					'parent_hostid' => array_key_exists('parent_hostid', $data) ? $data['parent_hostid'] : null
-				],
-				'defines' => [
-					'ZBX_STYLE_TEXTAREA_FLEXIBLE' => ZBX_STYLE_TEXTAREA_FLEXIBLE,
-					'ZBX_PROPERTY_OWN' => ZBX_PROPERTY_OWN,
-					'ZBX_MACRO_TYPE_TEXT' => ZBX_MACRO_TYPE_TEXT,
-					'ZBX_MACRO_TYPE_SECRET' => ZBX_MACRO_TYPE_SECRET,
-					'ZBX_MACRO_TYPE_VAULT' => ZBX_MACRO_TYPE_VAULT,
-					'ZBX_STYLE_ICON_TEXT' => ZBX_STYLE_ICON_TEXT,
-					'ZBX_STYLE_ICON_INVISIBLE' => ZBX_STYLE_ICON_INVISIBLE,
-					'ZBX_STYLE_ICON_SECRET_TEXT' => ZBX_STYLE_ICON_SECRET_TEXT
-				]
-			]) ?>);
+				this.macros_manager = new HostMacrosManager({
+					'readonly': host_is_discovered
+				});
 
 			$('#host-tabs').on('tabscreate tabsactivate', (e, ui) => {
 				const panel = (e.type === 'tabscreate') ? ui.panel : ui.newPanel;
+				const show_inherited_macros = $show_inherited_macros.filter(':checked').val() == 1;
 
 				if (panel.attr('id') === 'macros-tab') {
-					let macros_initialized = (panel.data('macros_initialized') || false);
-
 					// Please note that macro initialization must take place once and only when the tab is visible.
 					if (e.type === 'tabsactivate') {
-						let panel_templateids = panel.data('templateids') || [],
-							templateids = this.getAllTemplates();
+						const templateids = this.getAllTemplates();
 
-						if (panel_templateids.xor(templateids).length > 0) {
-							panel.data('templateids', templateids);
-							this.macros_manager.load($show_inherited_macros.filter(':checked').val(),
-								templateids
-							);
-							panel.data('macros_initialized', true);
+						if (this.macros_templateids.xor(templateids).length > 0) {
+							this.macros_templateids = templateids;
+							this.macros_manager.load(show_inherited_macros, templateids);
+							this.macros_initialized = true;
 						}
 					}
 
-					if (macros_initialized) {
+					if (this.macros_initialized) {
 						return;
 					}
 
 					// Initialize macros.
-					<?php if ($host_is_discovered): ?>
+					if (host_is_discovered) {
 						$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', '#tbl_macros').textareaFlexible();
-					<?php else: ?>
-						this.macros_manager.initMacroTable($show_inherited_macros.filter(':checked').val());
-					<?php endif ?>
+					}
+					else {
+						this.macros_manager.initMacroTable(show_inherited_macros);
+					}
 
-					panel.data('macros_initialized', true);
+					this.macros_initialized = true;
 				}
 			});
 
-			$show_inherited_macros.on('change', (e) => {
-				if (e.target.name !== 'show_inherited_macros') {
-					return;
-				}
-
-				this.macros_manager.load(e.target.value, this.getAllTemplates());
-				this.updateEncryptionFields();
+			$show_inherited_macros.on('change', function() {
+				host_edit.macros_manager.load(this.value == 1, host_edit.getAllTemplates());
+				host_edit.updateEncryptionFields();
 			});
 		},
 

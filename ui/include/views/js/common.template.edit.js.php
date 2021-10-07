@@ -131,20 +131,8 @@
 			.trigger('input');
 
 		window.macros_manager = new HostMacrosManager(<?= json_encode([
-			'properties' => [
-				'readonly' => $data['readonly'],
-				'parent_hostid' =>  array_key_exists('parent_hostid', $data) ? $data['parent_hostid'] : null
-			],
-			'defines' => [
-				'ZBX_STYLE_TEXTAREA_FLEXIBLE' => ZBX_STYLE_TEXTAREA_FLEXIBLE,
-				'ZBX_PROPERTY_OWN' => ZBX_PROPERTY_OWN,
-				'ZBX_MACRO_TYPE_TEXT' => ZBX_MACRO_TYPE_TEXT,
-				'ZBX_MACRO_TYPE_SECRET' => ZBX_MACRO_TYPE_SECRET,
-				'ZBX_MACRO_TYPE_VAULT' => ZBX_MACRO_TYPE_VAULT,
-				'ZBX_STYLE_ICON_TEXT' => ZBX_STYLE_ICON_TEXT,
-				'ZBX_STYLE_ICON_INVISIBLE' => ZBX_STYLE_ICON_INVISIBLE,
-				'ZBX_STYLE_ICON_SECRET_TEXT' => ZBX_STYLE_ICON_SECRET_TEXT
-			]
+			'readonly' => $data['readonly'],
+			'parent_hostid' =>  array_key_exists('parent_hostid', $data) ? $data['parent_hostid'] : null
 		]) ?>);
 
 		$('#tabs').on('tabscreate tabsactivate', function(event, ui) {
@@ -160,7 +148,7 @@
 
 					if (panel_templateids.xor(templateids).length > 0) {
 						panel.data('templateids', templateids);
-						window.macros_manager.load($show_inherited_macros.val(),
+						window.macros_manager.load($show_inherited_macros.val() == 1,
 							linked_templateids.concat(templateids)
 						);
 						panel.data('macros_initialized', true);
@@ -190,7 +178,7 @@
 			}
 
 			let templateids = linked_templateids.concat(getAddTemplates());
-			window.macros_manager.load($(this).val(), templateids);
+			window.macros_manager.load($(this).val() == 1, templateids);
 		});
 	});
 </script>

@@ -292,8 +292,8 @@ $translate_strings = [
 		'No interfaces are defined.' => _('No interfaces are defined.')
 	],
 	'hostmacrosmanager.js' => [
-		'S_CHANGE' => _x('Change', 'verb'),
-		'S_REMOVE' => _('Remove')
+		'Change' => _x('Change', 'verb'),
+		'Remove' => _('Remove')
 	],
 	'multilineinput.js' => [
 		'S_N_SYMBOLS_REMAINING' => _('%1$s symbols remaining'),
