@@ -1183,6 +1183,7 @@ static void	ha_remove_node(zbx_ha_info_t *info, zbx_ipc_client_t *client, const 
 	zbx_free(error);
 
 	zbx_ipc_client_send(client, ZBX_IPC_SERVICE_HA_REMOVE_NODE, data, len);
+	zbx_free(data);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -1559,6 +1560,9 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 
 			zbx_ipc_message_free(message);
 		}
+
+		if (NULL != client)
+			zbx_ipc_client_release(client);
 	}
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "HA manager has been paused");
@@ -1586,6 +1590,9 @@ pause:
 
 			zbx_ipc_message_free(message);
 		}
+
+		if (NULL != client)
+			zbx_ipc_client_release(client);
 	}
 
 	zbx_free(info.error);
