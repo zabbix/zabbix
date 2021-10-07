@@ -218,7 +218,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Attempts' => '5',
 						'Attempt interval' => ''
 					],
-					'error_message' => 'Invalid parameter "/1/attempt_interval": value must be one of 0-3600.'
+					'error_message' => 'Invalid parameter "/1/attempt_interval": cannot be empty.'
 				]
 			],
 			// Attempt to add a webhook with Attempt interval out of range.
@@ -414,7 +414,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Attempts' => '1',
 						'Attempt interval' => ''
 					],
-					'error_message' => 'Invalid parameter "/1/attempt_interval": value must be one of 0-3600.'
+					'error_message' => 'Invalid parameter "/1/attempt_interval": cannot be empty.'
 				]
 			],
 			// Set a value of the attempt interval that is out of range.
