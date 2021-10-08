@@ -70,10 +70,9 @@ zbx_sysinfo_proc_t;
  ******************************************************************************/
 static int	zbx_solaris_version_get(unsigned int *major_version, unsigned int *minor_version)
 {
-	int		res;
 	struct utsname	name;
 
-	if (-1 == (res = uname(&name)))
+	if (-1 == uname(&name))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "%s(): uname() failed: %s", __func__, zbx_strerror(errno));
 
@@ -403,7 +402,7 @@ static int	proc_match_props(const zbx_sysinfo_proc_t *proc, const struct passwd 
 
 int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char			tmp[MAX_STRING_LEN], *procname, *proccomm, *param, *memtype = NULL;
+	char			*procname, *proccomm, *param, *memtype = NULL;
 	DIR			*dir;
 	struct dirent		*entries;
 	struct passwd		*usrinfo;
@@ -567,10 +566,9 @@ out:
 
 int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char			tmp[MAX_STRING_LEN], *procname, *proccomm, *param, *zone_parameter;
+	char			*procname, *proccomm, *param, *zone_parameter;
 	DIR			*dir;
 	struct dirent		*entries;
-	zbx_stat_t		buf;
 	struct passwd		*usrinfo;
 	psinfo_t		psinfo;	/* In the correct procfs.h, the structure name is psinfo_t */
 	int			proccount = 0, invalid_user = 0, proc_props = 0, zbx_proc_stat;
@@ -813,8 +811,7 @@ int	zbx_proc_get_processes(zbx_vector_ptr_t *processes, unsigned int flags)
 {
 	DIR			*dir;
 	struct dirent		*entries;
-	char			tmp[MAX_STRING_LEN];
-	int			pid, ret = FAIL, fd = -1, n;
+	int			ret = FAIL, fd = -1;
 	zbx_sysinfo_proc_t	*proc = NULL;
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);

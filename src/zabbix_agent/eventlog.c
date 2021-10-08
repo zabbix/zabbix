@@ -488,7 +488,7 @@ static int	zbx_get_handle_eventlog6(const wchar_t *wsource, zbx_uint64_t *lastlo
 		char **error)
 {
 	wchar_t	*event_query = NULL;
-	DWORD	status = 0;
+	DWORD	status;
 	char	*tmp_str = NULL;
 	int	ret = FAIL;
 

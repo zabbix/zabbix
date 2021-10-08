@@ -211,7 +211,7 @@ static int	get_interval_option(const char *fping, const char *dst, int *value, c
 
 	/* if we are here we have probably hit the usage or error message, let's collect it if it's error message */
 
-	if (ZBX_KIBIBYTE > strlen(out) && 0 != strlen(out))
+	if (NULL != out && ZBX_KIBIBYTE > strlen(out) && 0 != strlen(out))
 	{
 		zbx_rtrim(out, "\n");
 		zbx_strlcpy(error, out, max_error_len);

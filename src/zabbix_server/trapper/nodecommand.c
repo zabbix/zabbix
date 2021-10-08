@@ -44,7 +44,7 @@
 static int	execute_remote_script(const zbx_script_t *script, const DC_HOST *host, char **info, char *error,
 		size_t max_error_len)
 {
-	int		ret = FAIL, time_start;
+	int		ret, time_start;
 	zbx_uint64_t	taskid;
 	DB_RESULT	result = NULL;
 	DB_ROW		row;

@@ -301,7 +301,7 @@ static int	svc_RemoveEventSource()
 				ZABBIX_EVENT_SOURCE, strerror_from_system(GetLastError()));
 	}
 
-	return SUCCEED;
+	return ret;
 }
 
 int	ZabbixRemoveService(void)

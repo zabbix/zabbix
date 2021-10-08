@@ -383,7 +383,7 @@ int	daemon_start(int allow_root, const char *user, unsigned int flags)
 
 		signal(SIGHUP, SIG_IGN);
 
-		if (0 != (pid = zbx_fork()))
+		if (0 != zbx_fork())
 			exit(EXIT_SUCCESS);
 
 		if (-1 == chdir("/"))	/* this is to eliminate warning: ignoring return value of chdir */

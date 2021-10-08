@@ -42,8 +42,7 @@ static int	get_ifdata(const char *if_name,
 	struct ifnet		v;
 
 	kvm_t	*kp;
-	int	len = 0;
-	int	ret = SYSINFO_RET_FAIL;
+	int	len, ret = SYSINFO_RET_FAIL;
 
 	if (NULL == if_name || '\0' == *if_name)
 	{

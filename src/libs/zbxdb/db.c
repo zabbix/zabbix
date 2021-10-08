@@ -1589,6 +1589,8 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 #if defined(HAVE_ORACLE)
 	sword		err = OCI_SUCCESS;
 	ub4		prefetch_rows = 200, counter;
+
+	ZBX_UNUSED(counter);
 #elif defined(HAVE_POSTGRESQL)
 	char		*error = NULL;
 #elif defined(HAVE_SQLITE3)

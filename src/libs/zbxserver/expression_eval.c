@@ -323,7 +323,6 @@ static void	expression_init_query_one(zbx_expression_eval_t *eval, zbx_expressio
 static int	replace_key_param_wildcard_cb(const char *data, int key_type, int level, int num, int quoted, void *cb_data,
 		char **param)
 {
-	int	ret;
 	char	*tmp;
 
 	ZBX_UNUSED(key_type);
@@ -348,7 +347,7 @@ static int	replace_key_param_wildcard_cb(const char *data, int key_type, int lev
 	zbx_free(tmp);
 
 	/* escaping cannot result in unquotable parameter */
-	if (FAIL == (ret = quote_key_param(param, quoted)))
+	if (FAIL == quote_key_param(param, quoted))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
 		zbx_free(*param);

@@ -284,18 +284,15 @@ static char	*zbx_ifrow_get_utf8_description(const zbx_ifrow_t *pIfRow)
 		static wchar_t *(*mb_to_unicode)(const char *) = NULL;
 		wchar_t 	*wdescr;
 		char		*utf8_descr;
+		const OSVERSIONINFOEX	*vi;
 
-		if (NULL == mb_to_unicode)
-		{
-			const OSVERSIONINFOEX	*vi;
+		/* starting with Windows Vista (Windows Server 2008) the interface description */
+		/* is encoded in OEM codepage while earlier versions used ANSI codepage */
+		if (NULL != (vi = zbx_win_getversion()) && 6 <= vi->dwMajorVersion)
+			mb_to_unicode = zbx_oemcp_to_unicode;
+		else
+			mb_to_unicode = zbx_acp_to_unicode;
 
-			/* starting with Windows Vista (Windows Server 2008) the interface description */
-			/* is encoded in OEM codepage while earlier versions used ANSI codepage */
-			if (NULL != (vi = zbx_win_getversion()) && 6 <= vi->dwMajorVersion)
-				mb_to_unicode = zbx_oemcp_to_unicode;
-			else
-				mb_to_unicode = zbx_acp_to_unicode;
-		}
 		wdescr = mb_to_unicode(pIfRow->ifRow->bDescr);
 		utf8_descr = zbx_unicode_to_utf8(wdescr);
 		zbx_free(wdescr);

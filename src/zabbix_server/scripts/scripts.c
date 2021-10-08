@@ -237,7 +237,6 @@ int	zbx_check_script_user_permissions(zbx_uint64_t userid, zbx_uint64_t hostid, 
 {
 	int		ret = SUCCEED;
 	DB_RESULT	result;
-	DB_ROW		row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() userid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " scriptid:" ZBX_FS_UI64,
 			__func__, userid, hostid, script->scriptid);
@@ -257,7 +256,7 @@ int	zbx_check_script_user_permissions(zbx_uint64_t userid, zbx_uint64_t hostid, 
 		PERM_DENY,
 		script->host_access);
 
-	if (NULL == (row = DBfetch(result)))
+	if (NULL == DBfetch(result))
 		ret = FAIL;
 
 	DBfree_result(result);

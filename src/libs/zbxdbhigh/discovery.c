@@ -78,7 +78,6 @@ static DB_RESULT	discovery_get_dhost_by_ip_port(zbx_uint64_t druleid, const char
 static void	discovery_separate_host(const DB_DRULE *drule, DB_DHOST *dhost, const char *ip)
 {
 	DB_RESULT	result;
-	DB_ROW		row;
 	char		*ip_esc, *sql = NULL;
 	zbx_uint64_t	dhostid;
 
@@ -95,7 +94,7 @@ static void	discovery_separate_host(const DB_DRULE *drule, DB_DHOST *dhost, cons
 
 	result = DBselectN(sql, 1);
 
-	if (NULL != (row = DBfetch(result)))
+	if (NULL != DBfetch(result))
 	{
 		dhostid = DBget_maxid("dhosts");
 

@@ -293,7 +293,7 @@ static int	filter_condition_match(const struct zbx_json_parse *jp_row, const zbx
 static int	filter_evaluate_and_or(const lld_filter_t *filter, const struct zbx_json_parse *jp_row,
 		const zbx_vector_ptr_t *lld_macro_paths, char **info)
 {
-	int	i, ret = SUCCEED, rc = SUCCEED;
+	int	i, rc, ret = SUCCEED;
 	char	*lastmacro = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);

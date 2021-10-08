@@ -970,7 +970,7 @@ static int	time_period_parse(zbx_time_period_t *period, const char *text, int le
 	if (period->start_time >= period->end_time)
 		return FAIL;
 
-	if (0 != (len -= parsed_len))
+	if (0 != (len - parsed_len))
 		return FAIL;
 
 	return SUCCEED;
@@ -2257,7 +2257,7 @@ int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_interv
 	}
 	else
 	{
-		int	current_delay = 0, attempt = 0;
+		int	current_delay, attempt = 0;
 		time_t	next_interval, t, tmax, scheduled_check = 0;
 
 		/* first try to parse out and calculate scheduled intervals */

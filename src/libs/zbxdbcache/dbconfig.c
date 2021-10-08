@@ -13630,23 +13630,20 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 
 		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS))
 		{
-			if (proxy->auto_compress != diff->compress)
-				proxy->auto_compress = diff->compress;
-			else
+			proxy->auto_compress = diff->compress;
+
+			if (proxy->auto_compress == diff->compress)
 				diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS);
 		}
 		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTERROR))
 		{
-			if (proxy->last_version_error_time != diff->last_version_error_time)
-				proxy->last_version_error_time = diff->last_version_error_time;
+			proxy->last_version_error_time = diff->last_version_error_time;
 			diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTERROR);
 		}
 
 		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_PROXYDELAY))
 		{
-			if (proxy->proxy_delay != diff->proxy_delay)
-				proxy->proxy_delay = diff->proxy_delay;
-
+			proxy->proxy_delay = diff->proxy_delay;
 			diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_PROXYDELAY);
 		}
 

@@ -221,6 +221,9 @@ static const char	*zbx_get_vfs_name_by_type(int type)
 		vfs_names_alloc = num;
 	}
 
+	if (NULL == vfs_names)
+		return "unknown";
+
 	if (NULL == vfs_names[type] && NULL != (vfs = getvfsbytype(type)))
 		vfs_names[type] = zbx_strdup(vfs_names[type], vfs->vfsent_name);
 

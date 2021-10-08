@@ -139,7 +139,7 @@ static int	zbx_socket_peer_ip_save(zbx_socket_t *s)
 #ifdef HAVE_IPV6
 void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
 {
-	struct addrinfo	hints, *ai = NULL;
+	struct addrinfo	hints, *ai;
 
 	assert(ip);
 
@@ -149,17 +149,16 @@ void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
 	if (0 != getaddrinfo(ip, NULL, &hints, &ai))
 	{
 		host[0] = '\0';
-		goto out;
+
+		return;
 	}
 
 	if (0 != getnameinfo(ai->ai_addr, ai->ai_addrlen, host, hostlen, NULL, 0, NI_NAMEREQD))
 	{
 		host[0] = '\0';
-		goto out;
 	}
-out:
-	if (NULL != ai)
-		freeaddrinfo(ai);
+
+	freeaddrinfo(ai);
 }
 #else
 void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
@@ -402,7 +401,6 @@ static int	zbx_socket_connect(zbx_socket_t *s, const struct sockaddr *addr, sock
 #ifdef _WINDOWS
 	u_long		mode = 1;
 	FD_SET		fdw, fde;
-	int		res;
 	struct timeval	tv, *ptv;
 #endif
 	if (0 != timeout)
@@ -436,7 +434,7 @@ static int	zbx_socket_connect(zbx_socket_t *s, const struct sockaddr *addr, sock
 		return FAIL;
 	}
 
-	if (-1 == (res = select(0, NULL, &fdw, &fde, ptv)))
+	if (-1 == select(0, NULL, &fdw, &fde, ptv))
 	{
 		*error = zbx_strdup(*error, strerror_from_system(zbx_socket_last_error()));
 		return FAIL;
@@ -506,8 +504,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 		int timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2)
 {
 	int		ret = FAIL;
-	struct addrinfo	*ai = NULL, hints;
-	struct addrinfo	*ai_bind = NULL;
+	struct addrinfo	*ai,*ai_bind, hints;
 	char		service[8], *error = NULL;
 	void		(*func_socket_close)(zbx_socket_t *s);
 
@@ -540,14 +537,14 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 	if (0 != getaddrinfo(ip, service, &hints, &ai))
 	{
 		zbx_set_socket_strerror("cannot resolve [%s]", ip);
-		goto out;
+		goto out3;
 	}
 
 	if (ZBX_SOCKET_ERROR == (s->socket = socket(ai->ai_family, ai->ai_socktype | SOCK_CLOEXEC, ai->ai_protocol)))
 	{
 		zbx_set_socket_strerror("cannot create socket [[%s]:%hu]: %s",
 				ip, port, strerror_from_system(zbx_socket_last_error()));
-		goto out;
+		goto out2;
 	}
 
 #if !defined(_WINDOWS) && !SOCK_CLOEXEC
@@ -571,14 +568,14 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 		{
 			zbx_set_socket_strerror("invalid source IP address [%s]", source_ip);
 			func_socket_close(s);
-			goto out;
+			goto out2;
 		}
 
 		if (ZBX_PROTO_ERROR == zbx_bind(s->socket, ai_bind->ai_addr, ai_bind->ai_addrlen))
 		{
 			zbx_set_socket_strerror("bind() failed: %s", strerror_from_system(zbx_socket_last_error()));
 			func_socket_close(s);
-			goto out;
+			goto out1;
 		}
 	}
 
@@ -587,7 +584,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 		func_socket_close(s);
 		zbx_set_socket_strerror("cannot connect to [[%s]:%hu]: %s", ip, port, error);
 		zbx_free(error);
-		goto out;
+		goto out1;
 	}
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -597,7 +594,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 		zbx_tcp_close(s);
 		zbx_set_socket_strerror("TCP successful, cannot establish TLS to [[%s]:%hu]: %s", ip, port, error);
 		zbx_free(error);
-		goto out;
+		goto out1;
 	}
 #else
 	ZBX_UNUSED(tls_arg1);
@@ -606,13 +603,13 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 	zbx_strlcpy(s->peer, ip, sizeof(s->peer));
 
 	ret = SUCCEED;
-out:
-	if (NULL != ai)
-		freeaddrinfo(ai);
-
+out1:
 	if (NULL != ai_bind)
 		freeaddrinfo(ai_bind);
-
+out2:
+	if (NULL != ai)
+		freeaddrinfo(ai);
+out3:
 	return ret;
 }
 #else
@@ -989,7 +986,7 @@ void	zbx_tcp_close(zbx_socket_t *s)
 #ifdef HAVE_IPV6
 int	get_address_family(const char *addr, int *family, char *error, int max_error_len)
 {
-	struct addrinfo	hints, *ai = NULL;
+	struct addrinfo	hints, *ai;
 	int		err, res = FAIL;
 
 	memset(&hints, 0, sizeof(hints));
@@ -1000,22 +997,22 @@ int	get_address_family(const char *addr, int *family, char *error, int max_error
 	if (0 != (err = getaddrinfo(addr, NULL, &hints, &ai)))
 	{
 		zbx_snprintf(error, max_error_len, "%s: [%d] %s", addr, err, gai_strerror(err));
-		goto out;
+		goto out2;
 	}
 
 	if (PF_INET != ai->ai_family && PF_INET6 != ai->ai_family)
 	{
 		zbx_snprintf(error, max_error_len, "%s: unsupported address family", addr);
-		goto out;
+		goto out1;
 	}
 
 	*family = (int)ai->ai_family;
 
 	res = SUCCEED;
-out:
+out1:
 	if (NULL != ai)
 		freeaddrinfo(ai);
-
+out2:
 	return res;
 }
 #endif	/* HAVE_IPV6 */
