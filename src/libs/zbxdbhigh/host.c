@@ -5417,8 +5417,11 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 			d = ",";										\
 			zbx_free(str_esc);									\
 														\
-			zbx_audit_httptest_update_json_update_##field(httptest->httptestid,			\
-				ZBX_MACRO_SECRET_MASK, ZBX_MACRO_SECRET_MASK);					\
+			zbx_audit_httptest_update_json_update_##field(httptest->httptestid, 			\
+					(0 == strcmp("", httptest->field##_orig) ? httptest->field##_orig :	\
+					ZBX_MACRO_SECRET_MASK),							\
+					(0 == strcmp("", httptest->field) ? httptest->field :			\
+					ZBX_MACRO_SECRET_MASK));						\
 		}
 
 #define PREPARE_UPDATE_HTTPTEST_INT(FLAG, field)								\

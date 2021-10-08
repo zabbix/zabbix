@@ -861,7 +861,10 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 			zbx_free(str_esc);									\
 														\
 			zbx_audit_item_update_json_update_##field(item->itemid, item->flags,			\
-					ZBX_MACRO_SECRET_MASK, ZBX_MACRO_SECRET_MASK);				\
+					(0 == strcmp("", item->field##_orig) ? item->field##_orig : 		\
+					ZBX_MACRO_SECRET_MASK),							\
+					(0 == strcmp("", item->field) ? item->field :				\
+					ZBX_MACRO_SECRET_MASK));						\
 		}
 #define PREPARE_UPDATE_UC(FLAG_POSTFIX, field)									\
 		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_##FLAG_POSTFIX))			\
