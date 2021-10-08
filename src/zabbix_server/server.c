@@ -1487,10 +1487,6 @@ static void	server_teardown(zbx_socket_t *listen_sock)
 		exit(EXIT_FAILURE);
 	}
 
-#ifdef HAVE_PTHREAD_PROCESS_SHARED
-	zbx_locks_enable();
-#endif
-
 	if (NULL != listen_sock)
 		zbx_tcp_unlisten(listen_sock);
 
@@ -1501,6 +1497,10 @@ static void	server_teardown(zbx_socket_t *listen_sock)
 	free_selfmon_collector();
 	free_configuration_cache();
 	free_database_cache(ZBX_SYNC_NONE);
+
+#ifdef HAVE_PTHREAD_PROCESS_SHARED
+	zbx_locks_enable();
+#endif
 
 	if (SUCCEED != zbx_ha_start(&error, ZBX_NODE_STATUS_STANDBY))
 	{
