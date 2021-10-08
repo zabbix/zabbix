@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-10-04T15:05:35Z'
+  date: '2021-10-08T07:04:02Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -66,12 +66,12 @@ zabbix_export:
                     if (response.error && response.error.message) {
                         throw response.error.message;
                     } else {
-                        throw 'Failed to receive data: invalid response status code.';
+                        throw 'Failed to receive data: invalid response status code';
                     }
                 }
             
                 if (typeof (response) !== 'object' || response === null) {
-                    throw 'Cannot process response data: received data is not an object.';
+                    throw 'Can not process response data: received data is not an object.';
                 }
             
                 return response;
@@ -83,7 +83,7 @@ zabbix_export:
                     throw 'Please change {' + '$VELOCLOUD.TOKEN} macro with the proper value.';
                 }
             
-                if (params.url.indexOf('http://') === -1 && params.url.indexOf('https://') === -1) {
+                if (params.url.indexOf('http://') == -1 && params.url.indexOf('https://') == -1) {
                     params.url = 'https://' + params.url;
                 }
             
@@ -92,45 +92,46 @@ zabbix_export:
                 }
             
                 enterprises = getHttpData(params.url + 'portal/rest/monitoring/getAggregates', '{}').enterprises;
+            
+                if (!Array.isArray(enterprises)) {
+                    throw 'Can not process edges: enterprises is not an array.';
+                }
+            
                 links = getHttpData(params.url + 'portal/rest/monitoring/getAggregateEdgeLinkMetrics', '{}');
                 gateways = getHttpData(params.url + 'portal/rest/network/getNetworkGateways', JSON.stringify({ with: ['site'] }));
                 version = getHttpData(params.url + 'portal/rest/system/getVersionInfo', '{}');
             
-                if (Array.isArray(enterprises)) {
-                    for (var i in enterprises) {
-                        responseEdges = getHttpData(params.url + 'portal/rest/enterprise/getEnterpriseEdges', JSON.stringify({ enterpriseId: enterprises[i].id, with: ['site'] }));
-                        edges = edges.concat(responseEdges);
-                    }
-                } else {
-                    throw 'Cannot process edges: enterprises is not an array.';
+                for (var i in enterprises) {
+                    responseEdges = getHttpData(params.url + 'portal/rest/enterprise/getEnterpriseEdges', JSON.stringify({ enterpriseId: enterprises[i].id, with: ['site'] }));
+                    edges = edges.concat(responseEdges);
                 }
             
-                if (Array.isArray(edges)) {
-                    for (var i in edges) {
-                        responseEdgeSDWan = getHttpData(params.url + 'portal/rest/edge/getEdgeSDWANPeers', JSON.stringify({ enterpriseId: edges[i].enterpriseId, edgeId: edges[i].id }));
+                if (!Array.isArray(edges)) {
+                    throw 'Can not process edges SDWans: edges is not an array.';
+                }
             
-                        if (Array.isArray(responseEdgeSDWan)) {
-                            for (var e in responseEdgeSDWan) {
-                                data = {
-                                    'enterpriseId': edges[i].enterpriseId,
-                                    'edgeId': edges[i].id,
-                                    'peerLogicalId': responseEdgeSDWan[e].deviceLogicalId
-                                };
-                                responseEdgeSDWanPath = getHttpData(params.url + 'portal/rest/metrics/getEdgeSDWANPeerPathMetrics', JSON.stringify(data));
-                                edgeSDWanPath = edgeSDWanPath.concat(responseEdgeSDWanPath);
+                for (var i in edges) {
+                    responseEdgeSDWan = getHttpData(params.url + 'portal/rest/edge/getEdgeSDWANPeers', JSON.stringify({ enterpriseId: edges[i].enterpriseId, edgeId: edges[i].id }));
             
-                                responseEdgeSDWan[e].edgeId = edges[i].id;
-                                responseEdgeSDWan[e].edgeName = edges[i].name;
-                                responseEdgeSDWan[e].enterpriseId = edges[i].enterpriseId;
-                            }
-                        } else {
-                            throw 'Cannot process edges SDWan path: edges SDWans is not an array.';
-                        }
-            
-                        edgeSDWan = edgeSDWan.concat(responseEdgeSDWan);
+                    if (!Array.isArray(responseEdgeSDWan)) {
+                        throw 'Can not process edges SDWan Path: edges SDWans is not an array.';
                     }
-                } else {
-                    throw 'Cannot process edges SDWans: edges is not an array.';
+            
+                    for (var e in responseEdgeSDWan) {
+                        data = {
+                            'enterpriseId': edges[i].enterpriseId,
+                            'edgeId': edges[i].id,
+                            'peerLogicalId': responseEdgeSDWan[e].deviceLogicalId
+                        };
+                        responseEdgeSDWanPath = getHttpData(params.url + 'portal/rest/metrics/getEdgeSDWANPeerPathMetrics', JSON.stringify(data));
+                        edgeSDWanPath = edgeSDWanPath.concat(responseEdgeSDWanPath);
+            
+                        responseEdgeSDWan[e].edgeId = edges[i].id;
+                        responseEdgeSDWan[e].edgeName = edges[i].name;
+                        responseEdgeSDWan[e].enterpriseId = edges[i].enterpriseId;
+                    }
+            
+                    edgeSDWan = edgeSDWan.concat(responseEdgeSDWan);
                 }
             
             } catch (error) {
@@ -144,7 +145,7 @@ zabbix_export:
                 'gateways': gateways,
                 'edgeSDWan': edgeSDWan,
                 'edgeSDWanPath': edgeSDWanPath,
-                'version': version,
+                'info': version,
                 'error': error_msg.toString()
             });
           description: 'The JSON with result of Velocloud API requests.'
@@ -199,7 +200,7 @@ zabbix_export:
               value: text
         -
           uuid: 8a54309d8abc4fc7816b168329243de4
-          name: 'Velocloud: Aggregate script item errors'
+          name: 'Velocloud: Get data collection errors'
           type: DEPENDENT
           key: velocloud.get.error
           delay: '0'
@@ -252,7 +253,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.version.apiVersion
+                - $.info.apiVersion
           master_item:
             key: velocloud.get.clear_metrics
           tags:
@@ -290,7 +291,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.version.build
+                - $.info.build
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -332,7 +333,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.version.version
+                - $.info.version
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
