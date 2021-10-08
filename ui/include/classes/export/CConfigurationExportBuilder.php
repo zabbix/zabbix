@@ -418,17 +418,6 @@ class CConfigurationExportBuilder {
 		CArrayHelper::sort($media_types, ['name']);
 
 		foreach ($media_types as $media_type) {
-			$message_templates = [];
-
-			foreach ($media_type['message_templates'] as $message_template) {
-				$message_templates[] = [
-					'event_source' => $message_template['eventsource'],
-					'operation_mode' => $message_template['recovery'],
-					'subject' => $message_template['subject'],
-					'message' => $message_template['message']
-				];
-			}
-
 			$result[] = [
 				'name' => $media_type['name'],
 				'type' => $media_type['type'],
@@ -444,9 +433,7 @@ class CConfigurationExportBuilder {
 				'password' => $media_type['passwd'],
 				'content_type' => $media_type['content_type'],
 				'script_name' => $media_type['exec_path'],
-				'parameters' => ($media_type['type'] == MEDIA_TYPE_WEBHOOK)
-					? $media_type['parameters']
-					: $media_type['exec_params'],
+				'parameters' => self::formatMediaTypeParameters($media_type),
 				'gsm_modem' => $media_type['gsm_modem'],
 				'status' => $media_type['status'],
 				'max_sessions' => $media_type['maxsessions'],
@@ -459,7 +446,56 @@ class CConfigurationExportBuilder {
 				'event_menu_url' => $media_type['event_menu_url'],
 				'event_menu_name' => $media_type['event_menu_name'],
 				'description' => $media_type['description'],
-				'message_templates' => $message_templates
+				'message_templates' => self::formatMediaTypeMessageTemplates($media_type['message_templates'])
+			];
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Format media type parameters.
+	 *
+	 * @static
+	 *
+	 * @param array $media_type
+	 *
+	 * @return array|string
+	 */
+	private static function formatMediaTypeParameters(array $media_type) {
+		if ($media_type['type'] == MEDIA_TYPE_EXEC) {
+			return $media_type['exec_params'];
+		}
+
+		if ($media_type['type'] == MEDIA_TYPE_WEBHOOK) {
+			CArrayHelper::sort($media_type['parameters'], ['name']);
+
+			return array_values($media_type['parameters']);
+		}
+
+		return [];
+	}
+
+	/**
+	 * Format media type message templates.
+	 *
+	 * @static
+	 *
+	 * @param array $message_templates
+	 *
+	 * @return array
+	 */
+	private static function formatMediaTypeMessageTemplates(array $message_templates): array {
+		$result = [];
+
+		CArrayHelper::sort($message_templates, ['eventsource', 'recovery']);
+
+		foreach ($message_templates as $message_template) {
+			$result[] = [
+				'event_source' => $message_template['eventsource'],
+				'operation_mode' => $message_template['recovery'],
+				'subject' => $message_template['subject'],
+				'message' => $message_template['message']
 			];
 		}
 
