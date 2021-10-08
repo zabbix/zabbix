@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-06 11:29+0300\n"
+"POT-Creation-Date: 2021-10-08 19:53+0300\n"
 "PO-Revision-Date: 2016-05-11 02:08+0300\n"
 "Last-Translator: 岂几 <tom3000@126.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -5827,7 +5827,7 @@ msgstr ""
 #: include/classes/api/services/CMap.php:588
 #: include/classes/api/services/CMap.php:1033
 #: include/classes/api/services/CMediatype.php:182
-#: include/classes/api/services/CMediatype.php:448
+#: include/classes/api/services/CMediatype.php:446
 #: include/classes/api/services/CService.php:345
 #: include/classes/api/services/CService.php:378
 #: include/classes/api/services/CService.php:442
@@ -5841,7 +5841,7 @@ msgstr "空的输入参数."
 msgid "Empty map ID."
 msgstr "空的拓扑图ID。"
 
-#: include/classes/api/services/CMediatype.php:454
+#: include/classes/api/services/CMediatype.php:452
 msgid "Empty media type ID."
 msgstr "空的媒介类型ID。"
 
@@ -6536,8 +6536,8 @@ msgid "Field \"%1$s\" is missing a value for map \"%2$s\"."
 msgstr "字段 \"%1$s\" 缺少拓扑图 \"%2$s\" 的值。"
 
 #: include/classes/api/services/CMediatype.php:204
-#: include/classes/api/services/CMediatype.php:546
-#: include/classes/api/services/CMediatype.php:1205
+#: include/classes/api/services/CMediatype.php:544
+#: include/classes/api/services/CMediatype.php:1203
 #, c-format
 msgid "Field \"%1$s\" is missing a value for media type \"%2$s\"."
 msgstr "字段 \"%1$s\" 缺少媒体类型 \"%2$s\" 的值。"
@@ -6560,7 +6560,7 @@ msgstr "字段 \"%1$s\" 不是整数"
 msgid "Field \"%1$s\" is not string."
 msgstr "字段 \"%1$s\"不是字符串"
 
-#: include/classes/api/services/CMediatype.php:1199
+#: include/classes/api/services/CMediatype.php:1197
 #, c-format
 msgid "Field \"%1$s\" is required for media type \"%2$s\"."
 msgstr "字段 \"%1$s\" 需要媒体类型 \"%2$s\"."
@@ -7769,7 +7769,7 @@ msgstr "主机名称为\"%1$s\"的主机已存在"
 msgid "Host with the same visible name \"%1$s\" already exists."
 msgstr "显示名称为\"%1$s\" 的主机已经存在"
 
-#: app/controllers/CControllerHostView.php:122
+#: app/controllers/CControllerHostView.php:123
 #: app/controllers/CControllerPopupGeneric.php:123
 #: app/controllers/CControllerPopupGeneric.php:147
 #: app/partials/common.filter.item.php:46
@@ -8486,7 +8486,7 @@ msgstr "函数传入了错误的参数"
 #: include/classes/api/services/CMap.php:1239
 #: include/classes/api/services/CMap.php:1459
 #: include/classes/api/services/CMediatype.php:189
-#: include/classes/api/services/CMediatype.php:485
+#: include/classes/api/services/CMediatype.php:483
 msgid "Incorrect arguments passed to function."
 msgstr "函数传入了错误的参数。"
 
@@ -8722,7 +8722,7 @@ msgstr "错误的维护期间(至少要5分钟)"
 msgid "Incorrect map ID."
 msgstr "错误的拓扑图ID"
 
-#: include/classes/api/services/CMediatype.php:455
+#: include/classes/api/services/CMediatype.php:453
 msgid "Incorrect media type ID."
 msgstr "错误的 媒介类型ID"
 
@@ -8967,21 +8967,21 @@ msgstr "错误的值\"%1$s\"于无正负的整数栏位\"%2$s\"中."
 msgid "Incorrect value \"%1$s\" in field \"%2$s\" for correlation \"%3$s\"."
 msgstr "在关联项中\"%3$s\"，\"%2$s\"使用了错误的值\"%1$s\"。"
 
-#: include/classes/api/services/CMediatype.php:245
-#: include/classes/api/services/CMediatype.php:256
-#: include/classes/api/services/CMediatype.php:275
-#: include/classes/api/services/CMediatype.php:291
-#: include/classes/api/services/CMediatype.php:307
-#: include/classes/api/services/CMediatype.php:326
-#: include/classes/api/services/CMediatype.php:366
-#: include/classes/api/services/CMediatype.php:566
-#: include/classes/api/services/CMediatype.php:579
-#: include/classes/api/services/CMediatype.php:598
-#: include/classes/api/services/CMediatype.php:615
-#: include/classes/api/services/CMediatype.php:632
-#: include/classes/api/services/CMediatype.php:652
-#: include/classes/api/services/CMediatype.php:692
-#: include/classes/api/services/CMediatype.php:1181
+#: include/classes/api/services/CMediatype.php:243
+#: include/classes/api/services/CMediatype.php:254
+#: include/classes/api/services/CMediatype.php:273
+#: include/classes/api/services/CMediatype.php:289
+#: include/classes/api/services/CMediatype.php:305
+#: include/classes/api/services/CMediatype.php:324
+#: include/classes/api/services/CMediatype.php:364
+#: include/classes/api/services/CMediatype.php:564
+#: include/classes/api/services/CMediatype.php:577
+#: include/classes/api/services/CMediatype.php:596
+#: include/classes/api/services/CMediatype.php:613
+#: include/classes/api/services/CMediatype.php:630
+#: include/classes/api/services/CMediatype.php:650
+#: include/classes/api/services/CMediatype.php:690
+#: include/classes/api/services/CMediatype.php:1179
 #, c-format
 msgid "Incorrect value \"%1$s\" in field \"%2$s\" for media type \"%3$s\"."
 msgstr "\"%2$s\" 中 媒体值 \"%3$s\" 的 \"%1$s\" 值错误。"
@@ -9163,24 +9163,24 @@ msgstr "\"%1$s\" 字段的值不正确。"
 #: include/classes/api/services/CMap.php:687
 #: include/classes/api/services/CMap.php:1150
 #: include/classes/api/services/CMap.php:1156
-#: include/classes/api/services/CMediatype.php:377
-#: include/classes/api/services/CMediatype.php:387
-#: include/classes/api/services/CMediatype.php:396
-#: include/classes/api/services/CMediatype.php:403
-#: include/classes/api/services/CMediatype.php:412
-#: include/classes/api/services/CMediatype.php:421
-#: include/classes/api/services/CMediatype.php:427
-#: include/classes/api/services/CMediatype.php:489
-#: include/classes/api/services/CMediatype.php:704
-#: include/classes/api/services/CMediatype.php:714
-#: include/classes/api/services/CMediatype.php:721
-#: include/classes/api/services/CMediatype.php:730
-#: include/classes/api/services/CMediatype.php:737
-#: include/classes/api/services/CMediatype.php:747
-#: include/classes/api/services/CMediatype.php:756
-#: include/classes/api/services/CMediatype.php:762
-#: include/classes/api/services/CMediatype.php:793
-#: include/classes/api/services/CMediatype.php:800
+#: include/classes/api/services/CMediatype.php:375
+#: include/classes/api/services/CMediatype.php:385
+#: include/classes/api/services/CMediatype.php:394
+#: include/classes/api/services/CMediatype.php:401
+#: include/classes/api/services/CMediatype.php:410
+#: include/classes/api/services/CMediatype.php:419
+#: include/classes/api/services/CMediatype.php:425
+#: include/classes/api/services/CMediatype.php:487
+#: include/classes/api/services/CMediatype.php:702
+#: include/classes/api/services/CMediatype.php:712
+#: include/classes/api/services/CMediatype.php:719
+#: include/classes/api/services/CMediatype.php:728
+#: include/classes/api/services/CMediatype.php:735
+#: include/classes/api/services/CMediatype.php:745
+#: include/classes/api/services/CMediatype.php:754
+#: include/classes/api/services/CMediatype.php:760
+#: include/classes/api/services/CMediatype.php:791
+#: include/classes/api/services/CMediatype.php:798
 #: include/classes/api/services/CProxy.php:592
 #: include/classes/api/services/CProxy.php:599
 #: include/classes/api/services/CProxy.php:612
@@ -9762,35 +9762,31 @@ msgstr "无效的响应代码 \"%1$s\"."
 #: include/classes/import/validators/C42XmlValidator.php:1316
 #: include/classes/import/validators/C44XmlValidator.php:1721
 #: include/classes/import/validators/C44XmlValidator.php:1983
-#: include/classes/import/validators/C44XmlValidator.php:2093
-#: include/classes/import/validators/C44XmlValidator.php:2113
-#: include/classes/import/validators/C44XmlValidator.php:2137
-#: include/classes/import/validators/C44XmlValidator.php:2179
-#: include/classes/import/validators/C44XmlValidator.php:2240
+#: include/classes/import/validators/C44XmlValidator.php:2095
+#: include/classes/import/validators/C44XmlValidator.php:2115
+#: include/classes/import/validators/C44XmlValidator.php:2139
+#: include/classes/import/validators/C44XmlValidator.php:2181
 #: include/classes/import/validators/C50XmlValidator.php:1864
 #: include/classes/import/validators/C50XmlValidator.php:2126
-#: include/classes/import/validators/C50XmlValidator.php:2236
-#: include/classes/import/validators/C50XmlValidator.php:2256
-#: include/classes/import/validators/C50XmlValidator.php:2280
-#: include/classes/import/validators/C50XmlValidator.php:2322
-#: include/classes/import/validators/C50XmlValidator.php:2383
+#: include/classes/import/validators/C50XmlValidator.php:2238
+#: include/classes/import/validators/C50XmlValidator.php:2258
+#: include/classes/import/validators/C50XmlValidator.php:2282
+#: include/classes/import/validators/C50XmlValidator.php:2324
 #: include/classes/import/validators/C52XmlValidator.php:1986
 #: include/classes/import/validators/C52XmlValidator.php:2216
-#: include/classes/import/validators/C52XmlValidator.php:2401
-#: include/classes/import/validators/C52XmlValidator.php:2421
-#: include/classes/import/validators/C52XmlValidator.php:2445
-#: include/classes/import/validators/C52XmlValidator.php:2487
-#: include/classes/import/validators/C52XmlValidator.php:2548
-#: include/classes/import/validators/C52XmlValidator.php:2581
-#: include/classes/import/validators/C52XmlValidator.php:2587
+#: include/classes/import/validators/C52XmlValidator.php:2403
+#: include/classes/import/validators/C52XmlValidator.php:2423
+#: include/classes/import/validators/C52XmlValidator.php:2447
+#: include/classes/import/validators/C52XmlValidator.php:2489
+#: include/classes/import/validators/C52XmlValidator.php:2566
+#: include/classes/import/validators/C52XmlValidator.php:2572
 #: include/classes/import/validators/C54XmlValidator.php:2041
 #: include/classes/import/validators/C54XmlValidator.php:2271
-#: include/classes/import/validators/C54XmlValidator.php:2456
-#: include/classes/import/validators/C54XmlValidator.php:2476
-#: include/classes/import/validators/C54XmlValidator.php:2500
-#: include/classes/import/validators/C54XmlValidator.php:2561
-#: include/classes/import/validators/C54XmlValidator.php:2594
-#: include/classes/import/validators/C54XmlValidator.php:2600
+#: include/classes/import/validators/C54XmlValidator.php:2458
+#: include/classes/import/validators/C54XmlValidator.php:2478
+#: include/classes/import/validators/C54XmlValidator.php:2502
+#: include/classes/import/validators/C54XmlValidator.php:2579
+#: include/classes/import/validators/C54XmlValidator.php:2585
 #: include/classes/import/validators/CXmlValidatorGeneral.php:163
 #: include/classes/import/validators/CXmlValidatorGeneral.php:182
 #: include/classes/import/validators/CXmlValidatorGeneral.php:201
@@ -10403,7 +10399,7 @@ msgstr "最新数据"
 msgid "Last week graph"
 msgstr "上周图形"
 
-#: app/controllers/CControllerLatestView.php:187
+#: app/controllers/CControllerLatestView.php:189
 #: app/partials/monitoring.host.view.html.php:35
 #: app/partials/monitoring.host.view.html.php:105
 #: app/partials/monitoring.host.view.html.php:111
@@ -11165,9 +11161,9 @@ msgid "Media type"
 msgstr "报警媒介类型"
 
 #: include/classes/api/services/CMediatype.php:214
-#: include/classes/api/services/CMediatype.php:230
-#: include/classes/api/services/CMediatype.php:509
-#: include/classes/api/services/CMediatype.php:521
+#: include/classes/api/services/CMediatype.php:228
+#: include/classes/api/services/CMediatype.php:507
+#: include/classes/api/services/CMediatype.php:519
 #, c-format
 msgid "Media type \"%1$s\" already exists."
 msgstr "媒体类型 \"%1$s\" 已经存在。"
@@ -11225,7 +11221,7 @@ msgstr "ID为 \"%1$s\" 的媒体类型不可用。"
 msgid "Media types"
 msgstr "报警媒介类型"
 
-#: include/classes/api/services/CMediatype.php:1149
+#: include/classes/api/services/CMediatype.php:1147
 #, c-format
 msgid "Media types used by action \"%1$s\"."
 msgstr ""
@@ -11956,7 +11952,7 @@ msgstr "图形没有\"%1$s\"."
 msgid "No \"%1$s\" given for map."
 msgstr "\"%1$s\" 在拓扑图中未定义。"
 
-#: include/classes/api/services/CMediatype.php:453
+#: include/classes/api/services/CMediatype.php:451
 #, c-format
 msgid "No \"%1$s\" given for media type."
 msgstr "无\"%1$s\" 给与媒体值"
@@ -12275,7 +12271,7 @@ msgstr ""
 #: include/classes/api/services/CMap.php:1610
 #: include/classes/api/services/CMap.php:2048
 #: include/classes/api/services/CMap.php:2110
-#: include/classes/api/services/CMediatype.php:478
+#: include/classes/api/services/CMediatype.php:476
 #: include/classes/api/services/CModule.php:231
 #: include/classes/api/services/CProxy.php:186
 #: include/classes/api/services/CProxy.php:276
@@ -12830,7 +12826,7 @@ msgstr "只有超级管理员可以创建报警媒介类型."
 msgid "Only Super Admins can create user groups."
 msgstr "只要超级用户才能创建用户组。"
 
-#: include/classes/api/services/CMediatype.php:1139
+#: include/classes/api/services/CMediatype.php:1137
 msgid "Only Super Admins can delete media types."
 msgstr "只有超级管理员可以删除报警媒介类型."
 
@@ -12838,7 +12834,7 @@ msgstr "只有超级管理员可以删除报警媒介类型."
 msgid "Only Super Admins can delete user groups."
 msgstr "只有超级管理员可以删除用户群组."
 
-#: include/classes/api/services/CMediatype.php:444
+#: include/classes/api/services/CMediatype.php:442
 msgid "Only Super Admins can edit media types."
 msgstr "只有超级管理员可以编辑报警媒介类型."
 
@@ -13957,7 +13953,7 @@ msgstr "问题, 如果所有的下层都有问题"
 msgid "Problem, if at least one child has a problem"
 msgstr "问题, 如果至少一个下层有一个问题"
 
-#: app/controllers/CControllerProblemView.php:155
+#: app/controllers/CControllerProblemView.php:151
 #: app/partials/common.filter.trigger.php:47
 #: app/partials/monitoring.host.view.html.php:33
 #: app/partials/monitoring.host.view.html.php:36
@@ -15323,8 +15319,8 @@ msgstr "脚本名称"
 msgid "Script parameters"
 msgstr "脚本参数"
 
-#: include/classes/api/services/CMediatype.php:341
-#: include/classes/api/services/CMediatype.php:667
+#: include/classes/api/services/CMediatype.php:339
+#: include/classes/api/services/CMediatype.php:665
 #, c-format
 msgid "Script parameters \"%1$s\" are missing the last new line feed for media type \"%2$s\"."
 msgstr "脚本参数 \"%1$s\" 没有在上一个换行中找到对应 \"%2$s\" 的媒体类型。"
@@ -19648,20 +19644,16 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:2542
 #: include/classes/api/services/CItemGeneral.php:2564
 #: include/classes/api/services/CModule.php:298
-#: include/classes/import/validators/C44XmlValidator.php:2093
-#: include/classes/import/validators/C44XmlValidator.php:2113
-#: include/classes/import/validators/C44XmlValidator.php:2240
-#: include/classes/import/validators/C50XmlValidator.php:2236
-#: include/classes/import/validators/C50XmlValidator.php:2256
-#: include/classes/import/validators/C50XmlValidator.php:2383
-#: include/classes/import/validators/C52XmlValidator.php:2401
-#: include/classes/import/validators/C52XmlValidator.php:2421
-#: include/classes/import/validators/C52XmlValidator.php:2548
-#: include/classes/import/validators/C52XmlValidator.php:2587
-#: include/classes/import/validators/C54XmlValidator.php:2456
-#: include/classes/import/validators/C54XmlValidator.php:2476
-#: include/classes/import/validators/C54XmlValidator.php:2561
-#: include/classes/import/validators/C54XmlValidator.php:2600
+#: include/classes/import/validators/C44XmlValidator.php:2095
+#: include/classes/import/validators/C44XmlValidator.php:2115
+#: include/classes/import/validators/C50XmlValidator.php:2238
+#: include/classes/import/validators/C50XmlValidator.php:2258
+#: include/classes/import/validators/C52XmlValidator.php:2403
+#: include/classes/import/validators/C52XmlValidator.php:2423
+#: include/classes/import/validators/C52XmlValidator.php:2572
+#: include/classes/import/validators/C54XmlValidator.php:2458
+#: include/classes/import/validators/C54XmlValidator.php:2478
+#: include/classes/import/validators/C54XmlValidator.php:2585
 #: include/classes/import/validators/CXmlValidatorGeneral.php:283
 #: include/classes/validators/CApiInputValidator.php:497
 #: include/classes/validators/CApiInputValidator.php:629
@@ -19894,14 +19886,14 @@ msgstr "不能变更"
 #: include/classes/api/services/CMapElement.php:106
 #: include/classes/api/services/CMapElement.php:125
 #: include/classes/api/services/CMapElement.php:163
-#: include/classes/api/services/CMediatype.php:378
-#: include/classes/api/services/CMediatype.php:397
-#: include/classes/api/services/CMediatype.php:413
-#: include/classes/api/services/CMediatype.php:489
-#: include/classes/api/services/CMediatype.php:705
-#: include/classes/api/services/CMediatype.php:731
-#: include/classes/api/services/CMediatype.php:748
-#: include/classes/api/services/CMediatype.php:800
+#: include/classes/api/services/CMediatype.php:376
+#: include/classes/api/services/CMediatype.php:395
+#: include/classes/api/services/CMediatype.php:411
+#: include/classes/api/services/CMediatype.php:487
+#: include/classes/api/services/CMediatype.php:703
+#: include/classes/api/services/CMediatype.php:729
+#: include/classes/api/services/CMediatype.php:746
+#: include/classes/api/services/CMediatype.php:798
 #: include/classes/api/services/CProxy.php:612
 #: include/classes/api/services/CProxy.php:618
 #: include/classes/api/services/CTriggerGeneral.php:794
@@ -20649,15 +20641,15 @@ msgstr ""
 msgid "must be a valid LDAP user"
 msgstr "必需为一个正确的LDAP用户"
 
-#: include/classes/api/services/CMediatype.php:388
-#: include/classes/api/services/CMediatype.php:404
-#: include/classes/api/services/CMediatype.php:422
-#: include/classes/api/services/CMediatype.php:428
-#: include/classes/api/services/CMediatype.php:715
-#: include/classes/api/services/CMediatype.php:722
-#: include/classes/api/services/CMediatype.php:738
-#: include/classes/api/services/CMediatype.php:757
-#: include/classes/api/services/CMediatype.php:763
+#: include/classes/api/services/CMediatype.php:386
+#: include/classes/api/services/CMediatype.php:402
+#: include/classes/api/services/CMediatype.php:420
+#: include/classes/api/services/CMediatype.php:426
+#: include/classes/api/services/CMediatype.php:713
+#: include/classes/api/services/CMediatype.php:720
+#: include/classes/api/services/CMediatype.php:736
+#: include/classes/api/services/CMediatype.php:755
+#: include/classes/api/services/CMediatype.php:761
 #, c-format
 msgid "must be between \"%1$s\" and \"%2$s\""
 msgstr "必须在 \"%1$s\" 和 \"%2$s\" 之间"
@@ -20977,7 +20969,7 @@ msgstr "简要描述"
 #: include/classes/api/services/CItemGeneral.php:2528
 #: include/classes/api/services/CMaintenance.php:502
 #: include/classes/api/services/CMaintenance.php:724
-#: include/classes/api/services/CMediatype.php:793
+#: include/classes/api/services/CMediatype.php:791
 #: include/classes/api/services/CProxy.php:698
 #: include/classes/api/services/CProxy.php:824
 #: include/classes/api/services/CTriggerGeneral.php:800
@@ -21200,9 +21192,9 @@ msgstr "在此输入搜索"
 msgid "unacceptable URL"
 msgstr ""
 
-#: include/classes/import/validators/C44XmlValidator.php:2180
-#: include/classes/import/validators/C50XmlValidator.php:2323
-#: include/classes/import/validators/C52XmlValidator.php:2488
+#: include/classes/import/validators/C44XmlValidator.php:2182
+#: include/classes/import/validators/C50XmlValidator.php:2325
+#: include/classes/import/validators/C52XmlValidator.php:2490
 #: include/classes/import/validators/CXmlValidatorGeneral.php:298
 #, c-format
 msgid "unexpected constant \"%1$s\""
@@ -21210,10 +21202,10 @@ msgstr ""
 
 #: include/classes/export/CConfigurationExportBuilder.php:119
 #: include/classes/import/converters/CConstantImportConverter.php:60
-#: include/classes/import/validators/C44XmlValidator.php:2138
-#: include/classes/import/validators/C50XmlValidator.php:2281
-#: include/classes/import/validators/C52XmlValidator.php:2446
-#: include/classes/import/validators/C54XmlValidator.php:2501
+#: include/classes/import/validators/C44XmlValidator.php:2140
+#: include/classes/import/validators/C50XmlValidator.php:2283
+#: include/classes/import/validators/C52XmlValidator.php:2448
+#: include/classes/import/validators/C54XmlValidator.php:2503
 #, c-format
 msgid "unexpected constant value \"%1$s\""
 msgstr ""
@@ -21424,8 +21416,8 @@ msgstr ""
 #: include/classes/api/services/CMap.php:1157
 #: include/classes/api/services/CReport.php:209
 #: include/classes/api/services/CReport.php:612
-#: include/classes/import/validators/C52XmlValidator.php:2582
-#: include/classes/import/validators/C54XmlValidator.php:2595
+#: include/classes/import/validators/C52XmlValidator.php:2567
+#: include/classes/import/validators/C54XmlValidator.php:2580
 #: include/classes/validators/CApiInputValidator.php:459
 #: include/classes/validators/CApiInputValidator.php:784
 #: include/classes/validators/CNewValidator.php:517
