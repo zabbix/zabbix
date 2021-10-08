@@ -587,13 +587,13 @@ class testDashboardPages extends CWebTest {
 			}
 		}
 
-//		// Control panel screenshot - start/stop/next/previous.
-//		$this->page->removeFocus();
-//		foreach (['Stop', 'Start'] as $status) {
-//			$screenshot_area = $this->query('xpath://ul[@class="header-kioskmode-controls"]')->waitUntilVisible()->one();
-//			$this->assertScreenshot($screenshot_area, $status);
-//			$this->query('xpath://button[@title="'.$status.' slideshow"]')->one()->click();
-//		}
+		// Control panel screenshot - start/stop/next/previous.
+		$this->page->removeFocus();
+		foreach (['Stop', 'Start'] as $status) {
+			$screenshot_area = $this->query('xpath://ul[@class="header-kioskmode-controls"]')->waitUntilVisible()->one();
+			$this->assertScreenshot($screenshot_area, $status);
+			$this->query('xpath://button[@title="'.$status.' slideshow"]')->one()->click();
+		}
 
 		// Check that returned from kiosk view.
 		$this->query('xpath://button[@title="Normal view"]')->one()->click();
