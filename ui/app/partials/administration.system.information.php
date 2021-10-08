@@ -23,16 +23,7 @@
  * @var CPartial $this
  */
 
-global $DB, $ZBX_SERVER_STANDALONE;
-
-$server_details = '';
 $status = $data['status'];
-
-if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-	global $ZBX_SERVER, $ZBX_SERVER_PORT;
-
-	$server_details = $ZBX_SERVER.':'.$ZBX_SERVER_PORT;
-}
 
 $info_table = (new CTableInfo())
 	->setHeader([_('Parameter'), _('Value'), _('Details')])
@@ -40,7 +31,7 @@ $info_table = (new CTableInfo())
 	->addRow([_('Zabbix server is running'),
 		(new CSpan($status['is_running'] ? _('Yes') : _('No')))
 			->addClass($status['is_running'] ? ZBX_STYLE_GREEN : ZBX_STYLE_RED),
-		$server_details
+		$data['server_details']
 	])
 	->addRow([_('Number of hosts (enabled/disabled)'),
 		$status['has_status'] ? $status['hosts_count'] : '',
@@ -83,37 +74,30 @@ $info_table->addRow([_('Number of users (online)'), $status['has_status'] ? $sta
 	$status['has_status'] ? (new CSpan($status['users_online']))->addClass(ZBX_STYLE_GREEN) : ''
 ]);
 
-if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
+if ($data['for_superadmin']) {
 	$info_table->addRow([_('Required server performance, new values per second'),
 		($status['has_status'] && array_key_exists('vps_total', $status)) ? round($status['vps_total'], 2) : '', ''
 	]);
-}
 
-// Check requirements.
-if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-	$setup = new CFrontendSetup();
-	$reqs = $setup->checkRequirements();
-	$reqs[] = $setup->checkSslFiles();
-
-	foreach ($reqs as $req) {
-		if ($req['result'] == CFrontendSetup::CHECK_FATAL) {
+	// Check requirements.
+	foreach ($data['requirements'] as $requirement) {
+		if ($requirement['result'] == CFrontendSetup::CHECK_FATAL) {
 			$info_table->addRow(
-				(new CRow([$req['name'], $req['current'], $req['error']]))->addClass(ZBX_STYLE_RED)
+				(new CRow([$requirement['name'], $requirement['current'], $requirement['error']]))
+					->addClass(ZBX_STYLE_RED)
 			);
 		}
 	}
 
-	$db = DB::getDbBackend();
-
-	if (!$db->checkEncoding()) {
+	if ($data['encoding_warning'] !== '') {
 		$info_table->addRow(
-			(new CRow((new CCol($db->getWarning()))->setAttribute('colspan', 3)))->addClass(ZBX_STYLE_RED)
+			(new CRow((new CCol($data['encoding_warning']))->setAttribute('colspan', 3)))->addClass(ZBX_STYLE_RED)
 		);
 	}
 }
 
 // Warn if database history $info_tables have not been upgraded.
-if (!$DB['DOUBLE_IEEE754']) {
+if (!$data['float_double_precision']) {
 	$info_table->addRow([
 		_('Database history $info_tables upgraded'),
 		(new CSpan(_('No')))->addClass(ZBX_STYLE_RED),
@@ -122,93 +106,64 @@ if (!$DB['DOUBLE_IEEE754']) {
 }
 
 // Check DB version.
-if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-	$dbversion_status = CSettingsHelper::getGlobal(CSettingsHelper::DBVERSION_STATUS);
+if ($data['for_superadmin']) {
+	foreach ($data['dbversion_status'] as $dbversion) {
+		if ($dbversion->flag != DB_VERSION_SUPPORTED) {
+			switch ($dbversion->flag) {
+				case DB_VERSION_LOWER_THAN_MINIMUM:
+					$error = _s('Minimum required %1$s database version is %2$s.', $dbversion->database,
+						$dbversion->min_version
+					);
+					break;
 
-	if ($dbversion_status !== '') {
-		$dbversion_status = json_decode($dbversion_status);
+				case DB_VERSION_HIGHER_THAN_MAXIMUM:
+					$error = _s('Maximum required %1$s database version is %2$s.', $dbversion->database,
+						$dbversion->max_version
+					);
+					break;
 
-		foreach ($dbversion_status as $dbversion) {
-			if ($dbversion->flag != DB_VERSION_SUPPORTED) {
-				switch ($dbversion->flag) {
-					case DB_VERSION_LOWER_THAN_MINIMUM:
-						$error = _s('Minimum required %1$s database version is %2$s.', $dbversion->database,
-							$dbversion->min_version
-						);
-						break;
+				case DB_VERSION_FAILED_TO_RETRIEVE:
+					$error = _('Unable to retrieve database version.');
+					$dbversion->current_version = '';
+					break;
 
-					case DB_VERSION_HIGHER_THAN_MAXIMUM:
-						$error = _s('Maximum required %1$s database version is %2$s.', $dbversion->database,
-							$dbversion->max_version
-						);
-						break;
+				case DB_VERSION_NOT_SUPPORTED_ERROR:
+					$error = _s('Error! Unable to start Zabbix server due to unsupported %1$s database server version. Must be at least (%2$s)',
+						$dbversion->database, $dbversion->min_supported_version
+					);
+					break;
 
-					case DB_VERSION_FAILED_TO_RETRIEVE:
-						$error = _('Unable to retrieve database version.');
-						$dbversion->current_version = '';
-						break;
-
-					case DB_VERSION_NOT_SUPPORTED_ERROR:
-						$error = _s('Error! Unable to start Zabbix server due to unsupported %1$s database server version. Must be at least (%2$s)',
-							$dbversion->database, $dbversion->min_supported_version
-						);
-						break;
-
-					case DB_VERSION_NOT_SUPPORTED_WARNING:
-						$error = _s('Warning! Unsupported %1$s database server version. Should be at least (%2$s)',
-							$dbversion->database, $dbversion->min_supported_version
-						);
-						break;
-				}
-
-				$info_table->addRow(
-					(new CRow([$dbversion->database, $dbversion->current_version, $error]))->addClass(ZBX_STYLE_RED)
-				);
+				case DB_VERSION_NOT_SUPPORTED_WARNING:
+					$error = _s('Warning! Unsupported %1$s database server version. Should be at least (%2$s)',
+						$dbversion->database, $dbversion->min_supported_version
+					);
+					break;
 			}
+
+			$info_table->addRow(
+				(new CRow([$dbversion->database, $dbversion->current_version, $error]))->addClass(ZBX_STYLE_RED)
+			);
 		}
 	}
 }
 
 $nodes_table = null;
-$ha_cluster_enabled = false;
 
-if (!$ZBX_SERVER_STANDALONE) {
-	$ha_nodes = API::HaNode()->get([
-		'output' => ['name', 'address', 'port', 'lastaccess', 'status'],
-		'preservekeys' => true,
-		'sortfield' => 'status',
-		'sortorder' => 'DESC'
-	]);
-
-	$ha_cluster_enabled = (bool) $ha_nodes;
-
-	foreach ($ha_nodes as $node) {
-		if ($node['name'] === '') {
-			$ha_cluster_enabled = false;
-			break;
-		}
-	}
-}
-
-if (!$ha_cluster_enabled) {
+if (!$data['ha_cluster_enabled']) {
 	$info_table->addRow([_('High availability cluster'), _('Disabled'), '']);
 }
 else {
-	$failover_delay = CSettingsHelper::getGlobal(CSettingsHelper::HA_FAILOVER_DELAY);
-	$failover_delay_seconds = timeUnitToSeconds($failover_delay);
-	$failover_delay = secondsToPeriod($failover_delay_seconds);
-
 	$info_table->addRow([_('High availability cluster'),
 		(new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN),
-		_s('Fail-over delay: %1$s', $failover_delay)
+		_s('Fail-over delay: %1$s', $data['failover_delay'])
 	]);
 
-	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
+	if ($data['for_superadmin']) {
 		$nodes_table = (new CTableInfo())
 			->setHeader([_('Name'), _('Address'), _('Last access'), _('Status')])
 			->setHeadingColumn(0);
 
-		foreach ($ha_nodes as $node) {
+		foreach ($data['ha_nodes'] as $node) {
 			$status_element = new CCol();
 
 			switch($node['status']) {
