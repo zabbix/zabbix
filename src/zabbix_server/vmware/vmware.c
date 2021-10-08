@@ -139,6 +139,7 @@ typedef struct
 {
 	char		*path;
 	zbx_uint64_t	id;
+	int		unit;
 }
 zbx_vmware_counter_t;
 
@@ -2341,8 +2342,38 @@ static int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL 
 		"</ns0:RetrievePropertiesEx>"							\
 		ZBX_POST_VSPHERE_FOOTER
 
+#	define STR2UNIT(unit, val)								\
+		if (0 == strcmp("joule",val))							\
+			unit = ZBX_VMWARE_UNIT_JOULE;						\
+		else if (0 == strcmp("kiloBytes",val))						\
+			unit = ZBX_VMWARE_UNIT_KILOBYTES;					\
+		else if (0 == strcmp("kiloBytesPerSecond",val))					\
+			unit = ZBX_VMWARE_UNIT_KILOBYTESPERSECOND;				\
+		else if (0 == strcmp("megaBytes",val))						\
+			unit = ZBX_VMWARE_UNIT_MEGABYTES;					\
+		else if (0 == strcmp("megaBytesPerSecond",val))					\
+			unit = ZBX_VMWARE_UNIT_MEGABYTESPERSECOND;				\
+		else if (0 == strcmp("megaHertz",val))						\
+			unit = ZBX_VMWARE_UNIT_MEGAHERTZ;					\
+		else if (0 == strcmp("microsecond",val))					\
+			unit = ZBX_VMWARE_UNIT_MICROSECOND;					\
+		else if (0 == strcmp("millisecond",val))					\
+			unit = ZBX_VMWARE_UNIT_MILLISECOND;					\
+		else if (0 == strcmp("number",val))						\
+			unit = ZBX_VMWARE_UNIT_NUMBER;						\
+		else if (0 == strcmp("percent",val))						\
+			unit = ZBX_VMWARE_UNIT_PERCENT;						\
+		else if (0 == strcmp("second",val))						\
+			unit = ZBX_VMWARE_UNIT_SECOND;						\
+		else if (0 == strcmp("teraBytes",val))						\
+			unit = ZBX_VMWARE_UNIT_TERABYTES;					\
+		else if (0 == strcmp("watt",val))						\
+			unit = ZBX_VMWARE_UNIT_WATT;						\
+		else										\
+			unit = ZBX_VMWARE_UNIT_UNDEFINED
+
 	char		tmp[MAX_STRING_LEN], *group = NULL, *key = NULL, *rollup = NULL, *stats = NULL,
-			*counterid = NULL;
+			*counterid = NULL, *unit = NULL;
 	xmlDoc		*doc = NULL;
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
@@ -2388,12 +2419,21 @@ static int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL 
 		rollup = zbx_xml_read_node_value(doc, nodeset->nodeTab[i], "*[local-name()='rollupType']");
 		stats = zbx_xml_read_node_value(doc, nodeset->nodeTab[i], "*[local-name()='statsType']");
 		counterid = zbx_xml_read_node_value(doc, nodeset->nodeTab[i], "*[local-name()='key']");
+		unit = zbx_xml_read_node_value(doc, nodeset->nodeTab[i],
+				"*[local-name()='unitInfo']/*[local-name()='key']");
 
-		if (NULL != group && NULL != key && NULL != rollup && NULL != counterid)
+		if (NULL != group && NULL != key && NULL != rollup && NULL != counterid && NULL != unit)
 		{
 			counter = (zbx_vmware_counter_t *)zbx_malloc(NULL, sizeof(zbx_vmware_counter_t));
 			counter->path = zbx_dsprintf(NULL, "%s/%s[%s]", group, key, rollup);
 			ZBX_STR2UINT64(counter->id, counterid);
+			STR2UNIT(counter->unit, unit);
+
+			if (ZBX_VMWARE_UNIT_UNDEFINED == counter->unit)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "Unknown performance counter " ZBX_FS_UI64
+						" type of unitInfo:%s", counter->id, unit);
+			}
 
 			zbx_vector_ptr_append(counters, counter);
 
@@ -2401,11 +2441,19 @@ static int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL 
 					counter->id);
 		}
 
-		if (NULL != group && NULL != key && NULL != rollup && NULL != counterid && NULL != stats)
+		if (NULL != group && NULL != key && NULL != rollup && NULL != counterid && NULL != stats &&
+				NULL != unit)
 		{
 			counter = (zbx_vmware_counter_t *)zbx_malloc(NULL, sizeof(zbx_vmware_counter_t));
 			counter->path = zbx_dsprintf(NULL, "%s/%s[%s,%s]", group, key, rollup, stats);
 			ZBX_STR2UINT64(counter->id, counterid);
+			STR2UNIT(counter->unit, unit);
+
+			if (ZBX_VMWARE_UNIT_UNDEFINED == counter->unit)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "Unknown performance counter " ZBX_FS_UI64
+						" type of unitInfo:%s", counter->id, unit);
+			}
 
 			zbx_vector_ptr_append(counters, counter);
 
@@ -2418,6 +2466,7 @@ static int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL 
 		zbx_free(rollup);
 		zbx_free(key);
 		zbx_free(group);
+		zbx_free(unit);
 	}
 
 	ret = SUCCEED;
@@ -2431,6 +2480,9 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+
+#	undef STR2UNIT
+#	undef ZBX_POST_VMWARE_GET_PERFCOUNTER
 }
 
 /******************************************************************************
@@ -5335,7 +5387,7 @@ static void	vmware_service_add_perf_entity(zbx_vmware_service_t *service, const 
 
 		for (i = 0; NULL != counters[i]; i++)
 		{
-			if (SUCCEED == zbx_vmware_service_get_counterid(service, counters[i], &counterid))
+			if (SUCCEED == zbx_vmware_service_get_counterid(service, counters[i], &counterid, NULL))
 				vmware_counters_add_new(&pentity->counters, counterid);
 			else
 				zabbix_log(LOG_LEVEL_DEBUG, "cannot find performance counter %s", counters[i]);
@@ -6392,18 +6444,19 @@ out:
  *                                                                            *
  * Function: zbx_vmware_service_get_counterid                                 *
  *                                                                            *
- * Purpose: gets vmware performance counter id by the path                    *
+ * Purpose: gets vmware performance counter id and unit info by the path      *
  *                                                                            *
  * Parameters: service   - [IN] the vmware service                            *
  *             path      - [IN] the path of counter to retrieve in format     *
  *                              <group>/<key>[<rollup type>]                  *
  *             counterid - [OUT] the counter id                               *
+ *             unit      - [OUT] the counter unit info (kilo, mega, % etc)    *
  *                                                                            *
  * Return value: SUCCEED if the counter was found, FAIL otherwise             *
  *                                                                            *
  ******************************************************************************/
 int	zbx_vmware_service_get_counterid(zbx_vmware_service_t *service, const char *path,
-		zbx_uint64_t *counterid)
+		zbx_uint64_t *counterid, int *unit)
 {
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 	zbx_vmware_counter_t	*counter;
@@ -6415,6 +6468,9 @@ int	zbx_vmware_service_get_counterid(zbx_vmware_service_t *service, const char *
 		goto out;
 
 	*counterid = counter->id;
+
+	if (NULL != unit)
+		*unit = counter->unit;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() counterid:" ZBX_FS_UI64, __func__, *counterid);
 
