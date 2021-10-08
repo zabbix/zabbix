@@ -139,6 +139,10 @@ New features:
 .......PS. [ZBXNEXT-6809] changed behavior of the vmware event log, the 'skip' option of the new item resets the VMware event cache (MVekslers)
 
 Bug fixes:
+..F....... [ZBX-19997] fixed too long URL error when performing background page refresh (miks)
+A......... [ZBX-20021] fixed impossibility to import media types of type script with parameters from previous versions (agriscenko)
+....I..PS. [ZBX-20001] fixed crash and invalid bytecode error being generated on big-sendian systems when javascript is used; upgraded duktape to version 2.6 (vso)
+..F....... [ZBX-19419] fixed not refreshing graph widgets on dashboards (averza)
 A......... [ZBX-19978] fixed SQL errors when trying to get count of the interfaces (Sasha)
 .........T [ZBX-19774] fixed README examples (abiba)
 .........T [ZBX-19776] fixed README file (abiba)
