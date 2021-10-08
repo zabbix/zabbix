@@ -1,3 +1,4 @@
+//go:build !windows
 // +build !windows
 
 /*
@@ -61,6 +62,7 @@ type AgentOptions struct {
 	TLSKeyFile             string   `conf:"optional"`
 	TLSServerCertIssuer    string   `conf:"optional"`
 	TLSServerCertSubject   string   `conf:"optional"`
+	Plugin                 []string `conf:"optional"`
 
 	AllowKey interface{} `conf:"optional"`
 	DenyKey  interface{} `conf:"optional"`

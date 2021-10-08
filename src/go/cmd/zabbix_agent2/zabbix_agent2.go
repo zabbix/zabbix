@@ -30,6 +30,7 @@ import (
 	"time"
 
 	_ "zabbix.com/plugins"
+	"zabbix.com/plugins/dynamic"
 
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/agent/keyaccess"
@@ -319,6 +320,9 @@ func main() {
 	if err = log.Open(log.Console, log.Warning, "", 0); err != nil {
 		fatalExit("cannot initialize logger", err)
 	}
+
+	//TODO: read paths from config
+	dynamic.RegisterDynamicPlugins("dynamic/test.go")
 
 	if argTest || argPrint {
 		var level int
