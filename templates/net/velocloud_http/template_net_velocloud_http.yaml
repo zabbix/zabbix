@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-10-08T07:04:02Z'
+  date: '2021-10-08T14:18:49Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -66,12 +66,12 @@ zabbix_export:
                     if (response.error && response.error.message) {
                         throw response.error.message;
                     } else {
-                        throw 'Failed to receive data: invalid response status code';
+                        throw 'Failed to receive data: invalid response status code.';
                     }
                 }
             
                 if (typeof (response) !== 'object' || response === null) {
-                    throw 'Can not process response data: received data is not an object.';
+                    throw 'Cannot process response data: received data is not an object.';
                 }
             
                 return response;
@@ -83,7 +83,7 @@ zabbix_export:
                     throw 'Please change {' + '$VELOCLOUD.TOKEN} macro with the proper value.';
                 }
             
-                if (params.url.indexOf('http://') == -1 && params.url.indexOf('https://') == -1) {
+                if (params.url.indexOf('http://') === -1 && params.url.indexOf('https://') === -1) {
                     params.url = 'https://' + params.url;
                 }
             
@@ -94,7 +94,7 @@ zabbix_export:
                 enterprises = getHttpData(params.url + 'portal/rest/monitoring/getAggregates', '{}').enterprises;
             
                 if (!Array.isArray(enterprises)) {
-                    throw 'Can not process edges: enterprises is not an array.';
+                    throw 'Cannot process edges: enterprises is not an array.';
                 }
             
                 links = getHttpData(params.url + 'portal/rest/monitoring/getAggregateEdgeLinkMetrics', '{}');
@@ -107,14 +107,14 @@ zabbix_export:
                 }
             
                 if (!Array.isArray(edges)) {
-                    throw 'Can not process edges SDWans: edges is not an array.';
+                    throw 'Cannot process edges SDWans: edges is not an array.';
                 }
             
                 for (var i in edges) {
                     responseEdgeSDWan = getHttpData(params.url + 'portal/rest/edge/getEdgeSDWANPeers', JSON.stringify({ enterpriseId: edges[i].enterpriseId, edgeId: edges[i].id }));
             
                     if (!Array.isArray(responseEdgeSDWan)) {
-                        throw 'Can not process edges SDWan Path: edges SDWans is not an array.';
+                        throw 'Cannot process edges SDWan Path: edges SDWans is not an array.';
                     }
             
                     for (var e in responseEdgeSDWan) {
