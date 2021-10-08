@@ -456,8 +456,7 @@ class testDashboardPages extends CWebTest {
 			do {
 				$next_page->waitUntilReady()->click();
 			} while ($next_page->isClickable() === true);
-			$this->query('xpath://ul[@class="sortable-list"]//span[@title='.CXPathHelper::escapeQuotes($title).
-					']/following-sibling::button[@title="Actions"]')->waitUntilVisible();
+			$this->query('xpath://ul[@class="sortable-list"]//span[@title='.CXPathHelper::escapeQuotes($title).']/following-sibling::button[@title="Actions"]')->waitUntilVisible();
 		}
 
 		$index = ($title === 'first_page_creation') ? 2 : 1;
