@@ -51,7 +51,8 @@ class CControllerHostView extends CControllerHost {
 		// Validate tags filter.
 		if ($ret && $this->hasInput('filter_tags')) {
 			foreach ($this->getInput('filter_tags') as $filter_tag) {
-				if (count($filter_tag) != 3
+				if (!is_array($filter_tag)
+						|| count($filter_tag) != 3
 						|| !array_key_exists('tag', $filter_tag) || !is_string($filter_tag['tag'])
 						|| !array_key_exists('value', $filter_tag) || !is_string($filter_tag['value'])
 						|| !array_key_exists('operator', $filter_tag) || !is_string($filter_tag['operator'])) {
@@ -168,22 +169,24 @@ class CControllerHostView extends CControllerHost {
 			'page' => $this->hasInput('page') ? $this->getInput('page') : null
 		];
 
-		$refresh_curl = (new CUrl('zabbix.php'))
-			->setArgument('action', 'host.view.refresh')
-			->setArgument('filter_name', $filter['name'])
-			->setArgument('filter_groupids', $filter['groupids'])
-			->setArgument('filter_ip', $filter['ip'])
-			->setArgument('filter_dns', $filter['dns'])
-			->setArgument('filter_port', $filter['port'])
-			->setArgument('filter_status', $filter['status'])
-			->setArgument('filter_evaltype', $filter['evaltype'])
-			->setArgument('filter_tags', $filter['tags'])
-			->setArgument('filter_severities', $filter['severities'])
-			->setArgument('filter_show_suppressed', $filter['show_suppressed'])
-			->setArgument('filter_maintenance_status', $filter['maintenance_status'])
-			->setArgument('sort', $sort)
-			->setArgument('sortorder', $sortorder)
-			->setArgument('page', $filter['page']);
+		$refresh_curl = (new CUrl('zabbix.php'))->setArgument('action', 'host.view.refresh');
+
+		$refresh_data = array_filter([
+			'filter_name' => $filter['name'],
+			'filter_groupids' => $filter['groupids'],
+			'filter_ip' => $filter['ip'],
+			'filter_dns' => $filter['dns'],
+			'filter_port' => $filter['port'],
+			'filter_status' => $filter['status'],
+			'filter_evaltype' => $filter['evaltype'],
+			'filter_tags' => $filter['tags'],
+			'filter_severities' => $filter['severities'],
+			'filter_show_suppressed' => $filter['show_suppressed'],
+			'filter_maintenance_status' => $filter['maintenance_status'],
+			'sort' => $sort,
+			'sortorder' => $sortorder,
+			'page' => $filter['page']
+		]);
 
 		$prepared_data = $this->prepareData($filter, $sort, $sortorder);
 
@@ -192,6 +195,7 @@ class CControllerHostView extends CControllerHost {
 			'sort' => $sort,
 			'sortorder' => $sortorder,
 			'refresh_url' => $refresh_curl->getUrl(),
+			'refresh_data' => $refresh_data,
 			'refresh_interval' => CWebUser::getRefresh() * 1000,
 			'active_tab' => $active_tab
 		] + $prepared_data;
