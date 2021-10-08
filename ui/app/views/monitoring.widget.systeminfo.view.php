@@ -25,7 +25,7 @@
 
 $output = [
 	'name' => $data['name'],
-	'body' => make_status_of_zbx()->toString()
+	'body' => (new CPartial('administration.system.information', ['status' => get_status()]))->getOutput()
 ];
 
 if (($messages = getMessages()) !== null) {
