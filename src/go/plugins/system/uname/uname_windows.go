@@ -35,16 +35,16 @@ func getHostname(params []string) (uname string, err error) {
 		return "", errors.New("Too many parameters.")
 	}
 
-	var ptype, ptransform string
+	var mode, transform string
 
 	if len(params) > 0 {
-		ptype = params[0]
+		mode = params[0]
 		if len(params) > 1 {
-			ptransform = params[1]
+			transform = params[1]
 		}
 	}
 
-	switch ptype {
+	switch mode {
 	case "netbios", "":
 		w := make([]uint16, windows.MAX_COMPUTERNAME_LENGTH+1)
 		sz := uint32(len(w))
@@ -63,7 +63,7 @@ func getHostname(params []string) (uname string, err error) {
 		return "", errors.New("Invalid first parameter.")
 	}
 
-	switch ptransform {
+	switch transform {
 	case "lower":
 		uname = strings.ToLower(uname)
 	case "none", "":
