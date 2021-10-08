@@ -198,12 +198,12 @@ PREPARE_AUDIT_TRIGGER_UPDATE(manual_close, int, int)
 PREPARE_AUDIT_TRIGGER_UPDATE(opdata, const char*, string)
 PREPARE_AUDIT_TRIGGER_UPDATE(discover, int, int)
 PREPARE_AUDIT_TRIGGER_UPDATE(event_name, const char*, string)
-PREPARE_AUDIT_TRIGGER_UPDATE(type, int, int)
-PREPARE_AUDIT_TRIGGER_UPDATE(templateid, zbx_uint64_t, uint64)
-PREPARE_AUDIT_TRIGGER_UPDATE(description, const char*, string)
 PREPARE_AUDIT_TRIGGER_UPDATE(priority, int, int)
 PREPARE_AUDIT_TRIGGER_UPDATE(comments, const char*, string)
 PREPARE_AUDIT_TRIGGER_UPDATE(url, const char*, string)
+PREPARE_AUDIT_TRIGGER_UPDATE(type, int, int)
+PREPARE_AUDIT_TRIGGER_UPDATE(templateid, zbx_uint64_t, uint64)
+PREPARE_AUDIT_TRIGGER_UPDATE(description, const char*, string)
 PREPARE_AUDIT_TRIGGER_UPDATE(expression, const char*, string)
 PREPARE_AUDIT_TRIGGER_UPDATE(recovery_expression, const char*, string)
 
@@ -243,8 +243,8 @@ void	zbx_audit_DBselect_delete_for_trigger(const char *sql, zbx_vector_uint64_t 
 	zbx_vector_uint64_sort(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
 
-void	zbx_audit_trigger_update_json_add_dependency(int flags, zbx_uint64_t triggerdepid,
-		zbx_uint64_t triggerid, zbx_uint64_t triggerid_up)
+void	zbx_audit_trigger_update_json_add_dependency(int flags, zbx_uint64_t triggerdepid, zbx_uint64_t triggerid,
+		zbx_uint64_t triggerid_up)
 {
 	char	audit_key[AUDIT_DETAILS_KEY_LEN], audit_key_triggerid_up[AUDIT_DETAILS_KEY_LEN];
 	int	resource_type;
@@ -272,13 +272,17 @@ void	zbx_audit_trigger_update_json_add_dependency(int flags, zbx_uint64_t trigge
 			"trigger_depends", "triggerid_up");
 }
 
-void	zbx_audit_trigger_update_json_delete_dependency(zbx_uint64_t triggerdepid, zbx_uint64_t triggerid)
+void	zbx_audit_trigger_update_json_remove_dependency(int flags, zbx_uint64_t triggerdepid, zbx_uint64_t triggerid)
 {
 	char	audit_key[AUDIT_DETAILS_KEY_LEN];
+	int	resource_type;
 
 	RETURN_IF_AUDIT_OFF();
 
-	zbx_snprintf(audit_key, sizeof(audit_key), "trigger.dependencies[" ZBX_FS_UI64 "]", triggerdepid);
+	resource_type = trigger_flag_to_resource_type(flags);
+
+	zbx_snprintf(audit_key, sizeof(audit_key), "trigger%s.dependencies[" ZBX_FS_UI64 "]",
+			(AUDIT_RESOURCE_TRIGGER == resource_type) ? "" : "prototype", triggerdepid);
 
 	zbx_audit_update_json_append_no_value(triggerid, AUDIT_DETAILS_ACTION_DELETE, audit_key);
 }

@@ -21,11 +21,11 @@ instance is available for connection.
 ## Configuration
 The Zabbix Agent's configuration file is used to configure plugins.
 
-**Plugins.Memcached.KeepAlive** — Sets a time for waiting before unused connections will be closed.  
+**Plugins.Memcached.KeepAlive** — The amount of time a connection can remain idle before it is closed.  
 *Default value:* 300 sec.  
 *Limits:* 60-900
 
-**Plugins.Memcached.Timeout** — The maximum time for waiting when a request has to be done.  
+**Plugins.Memcached.Timeout** — The maximum amount of time in seconds to wait for a request to be done.  
 *Default value:* equals the global Timeout configuration parameter.  
 *Limits:* 1-30
 

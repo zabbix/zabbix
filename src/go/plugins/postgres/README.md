@@ -21,18 +21,18 @@ available for connection, and you have necessary access rights.
 ## Configuration
 The Zabbix Agent's configuration file is used to configure plugins.
 
-**Plugins.Postgres.CallTimeout** — The maximum time in seconds for waiting when a request has to be done.  
+**Plugins.Postgres.CallTimeout** — The maximum amount of time in seconds to wait for a request to be done.  
 *Default value:* equals the global Timeout configuration parameter.  
 *Limits:* 1-30
 
-**Plugins.Postgres.Timeout** — The maximum time in seconds for waiting when a connection has to be established.  
+**Plugins.Postgres.Timeout** — The maximum amount of time in seconds to wait for a connection to be established.  
 *Default value:* equals the global Timeout configuration parameter.  
 *Limits:* 1-30
 
 **Plugins.Postgres.CustomQueriesPath** — Full pathname of a directory containing *.sql* files with custom queries.  
 *Default value:* — (the feature is disabled by default)
 
-**Plugins.Postgres.KeepAlive** — Sets a time for waiting before unused connections will be closed.  
+**Plugins.Postgres.KeepAlive** — The amount of time a connection can remain idle before it is closed.  
 *Default value:* 300 sec.  
 *Limits:* 60-900
 
