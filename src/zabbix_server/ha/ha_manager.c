@@ -1407,23 +1407,19 @@ int	zbx_ha_pause(char **error)
  ******************************************************************************/
 int	zbx_ha_stop(char **error)
 {
-	int	status, ret = FAIL;
+	int	ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (SUCCEED == ha_send_manager_message(ZBX_IPC_SERVICE_HA_STOP, error))
 	{
-		while (-1 == waitpid(ha_pid, &status, 0))
+		if (ZBX_THREAD_ERROR == zbx_thread_wait(ha_pid))
 		{
-			if (EINTR == errno)
-				continue;
-
 			*error = zbx_dsprintf(NULL, "failed to wait for HA manager to exit: %s", zbx_strerror(errno));
 			goto out;
 		}
 
 		ret = SUCCEED;
-		goto out;
 	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
@@ -1440,10 +1436,8 @@ out:
  ******************************************************************************/
 void	zbx_ha_kill(void)
 {
-	int	status;
-
 	kill(ha_pid, SIGKILL);
-	waitpid(ha_pid, &status, 0);
+	zbx_thread_wait(ha_pid);
 
 	if (SUCCEED == zbx_ipc_async_socket_connected(&ha_socket))
 		zbx_ipc_async_socket_close(&ha_socket);
