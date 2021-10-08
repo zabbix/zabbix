@@ -220,7 +220,7 @@ void 	zbx_set_child_signal_handler(void)
 
 void	zbx_unset_child_signal_handler(void)
 {
-	signal(SIGCHLD, SIG_IGN);
+	signal(SIGCHLD, SIG_DFL);
 }
 
 /******************************************************************************
