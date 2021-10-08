@@ -311,16 +311,11 @@ static int	audit_field_default(const char *table_name, const char *field_name, c
 	if (NULL != table_name && NULL != (table = DBget_table(table_name)) &&
 			NULL != (field = DBget_field(table, field_name)))
 	{
-		if (NULL != value && NULL != field->default_value && (0 == strcmp(value, field->default_value) ||
-				(ZBX_TYPE_FLOAT == field->type && SUCCEED == zbx_double_compare(atof(value),
-				atof(field->default_value)))))
-		{
+
+		if (NULL != value && NULL != field->default_value && 0 == strcmp(value, field->default_value))
 			ret = SUCCEED;
-		}
 		else if ((NULL == value || (ZBX_TYPE_ID == field->type && 0 == id)) && NULL == field->default_value)
-		{
 			ret = SUCCEED;
-		}
 	}
 
 	return ret;
@@ -346,28 +341,6 @@ void	zbx_audit_update_json_append_string(const zbx_uint64_t id, const char *audi
 	}
 
 	append_str_json(&((*found_audit_entry)->details_json), audit_op, key, value);
-}
-
-void	zbx_audit_update_json_append_string_secret(const zbx_uint64_t id, const char *audit_op, const char *key,
-		const char *value, const char *table, const char *field)
-{
-	zbx_audit_entry_t	local_audit_entry, **found_audit_entry;
-	zbx_audit_entry_t	*local_audit_entry_x = &local_audit_entry;
-
-	if (SUCCEED == audit_field_default(table, field, value, 0))
-		return;
-
-	local_audit_entry.id = id;
-
-	found_audit_entry = (zbx_audit_entry_t**)zbx_hashset_search(&zbx_audit, &(local_audit_entry_x));
-
-	if (NULL == found_audit_entry)
-	{
-		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
-	}
-
-	append_str_json(&((*found_audit_entry)->details_json), audit_op, key, ZBX_MACRO_SECRET_MASK);
 }
 
 void	zbx_audit_update_json_append_uint64(const zbx_uint64_t id, const char *audit_op, const char *key,

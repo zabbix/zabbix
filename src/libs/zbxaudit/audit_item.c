@@ -153,8 +153,8 @@ void	zbx_audit_item_update_json_add_data(zbx_uint64_t itemid, const zbx_template
 	ADD_JSON_UI(output_format, AUDIT_TABLE_NAME, "output_format");
 	ADD_JSON_S(params, AUDIT_TABLE_NAME, "params");
 
-	zbx_audit_update_json_append_string_secret(itemid, AUDIT_DETAILS_ACTION_ADD, IT_OR_ITP_OR_DR(password),
-			item->password, AUDIT_TABLE_NAME, "password");
+	zbx_audit_update_json_append_string(itemid, AUDIT_DETAILS_ACTION_ADD, IT_OR_ITP_OR_DR(password),
+			ZBX_MACRO_SECRET_MASK, AUDIT_TABLE_NAME, "password");
 
 	ADD_JSON_UI(post_type, AUDIT_TABLE_NAME, "post_type");
 	ADD_JSON_S(posts, AUDIT_TABLE_NAME, "posts");
@@ -167,8 +167,8 @@ void	zbx_audit_item_update_json_add_data(zbx_uint64_t itemid, const zbx_template
 	ADD_JSON_S(ssl_cert_file, AUDIT_TABLE_NAME, "ssl_cert_file");
 	ADD_JSON_S(ssl_key_file, AUDIT_TABLE_NAME, "ssl_key_file");
 
-	zbx_audit_update_json_append_string_secret(itemid, AUDIT_DETAILS_ACTION_ADD, IT_OR_ITP_OR_DR(ssl_key_password),
-			item->ssl_key_password, AUDIT_TABLE_NAME, "ssl_key_password");
+	zbx_audit_update_json_append_string(itemid, AUDIT_DETAILS_ACTION_ADD, IT_OR_ITP_OR_DR(ssl_key_password),
+			ZBX_MACRO_SECRET_MASK, AUDIT_TABLE_NAME, "ssl_key_password");
 
 	ADD_JSON_UI(status, AUDIT_TABLE_NAME, "status");
 	ADD_JSON_S(status_codes, AUDIT_TABLE_NAME, "status_codes");
@@ -248,7 +248,7 @@ void	zbx_audit_item_update_json_add_lld_data(zbx_uint64_t itemid, const zbx_lld_
 	ADD_JSON_S(snmp_oid, AUDIT_TABLE_NAME, "snmp_oid");
 	ADD_JSON_P_UI(authtype, AUDIT_TABLE_NAME, "authtype");
 	ADD_JSON_S(username, AUDIT_TABLE_NAME, "username");
-	zbx_audit_update_json_append_string_secret(itemid, AUDIT_DETAILS_ACTION_ADD, IT(password), item->password, AUDIT_TABLE_NAME, "password");
+	zbx_audit_update_json_append_string(itemid, AUDIT_DETAILS_ACTION_ADD, IT(password), ZBX_MACRO_SECRET_MASK, AUDIT_TABLE_NAME, "password");
 	ADD_JSON_P_S(publickey, AUDIT_TABLE_NAME, "publickey");
 	ADD_JSON_P_S(privatekey, AUDIT_TABLE_NAME, "privatekey");
 	ADD_JSON_S(description, AUDIT_TABLE_NAME, "description");
@@ -270,8 +270,8 @@ void	zbx_audit_item_update_json_add_lld_data(zbx_uint64_t itemid, const zbx_lld_
 	ADD_JSON_P_UI(output_format, AUDIT_TABLE_NAME, "output_format");
 	ADD_JSON_S(ssl_cert_file, AUDIT_TABLE_NAME, "ssl_cert_file");
 	ADD_JSON_S(ssl_key_file, AUDIT_TABLE_NAME, "ssl_key_file");
-	zbx_audit_update_json_append_string_secret(itemid, AUDIT_DETAILS_ACTION_ADD, IT(ssl_key_password),
-			item->ssl_key_password, AUDIT_TABLE_NAME, "ssl_key_password");
+	zbx_audit_update_json_append_string(itemid, AUDIT_DETAILS_ACTION_ADD, IT(ssl_key_password),
+			ZBX_MACRO_SECRET_MASK, AUDIT_TABLE_NAME, "ssl_key_password");
 	ADD_JSON_P_UI(verify_peer, AUDIT_TABLE_NAME, "verify_peer");
 	ADD_JSON_P_UI(verify_host, AUDIT_TABLE_NAME, "verify_host");
 	ADD_JSON_P_UI(allow_traps, AUDIT_TABLE_NAME, "allow_traps");
