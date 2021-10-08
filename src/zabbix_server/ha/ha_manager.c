@@ -144,7 +144,6 @@ static void	ha_notify_parent(zbx_ipc_client_t *client, int status, const char *i
 	unsigned char	*ptr, *data;
 	int		ret;
 
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() status:%s info:%s", __func__, zbx_ha_status_str(status),
 			ZBX_NULL2EMPTY_STR(info));
 
@@ -1599,7 +1598,7 @@ pause:
 				case ZBX_IPC_SERVICE_HA_REGISTER:
 					main_proc = client;
 					break;
-				case ZBX_IPC_SERVICE_HA_GET_NODES:
+				case ZBX_IPC_SERVICE_HA_STATUS:
 					ha_notify_parent(main_proc, info.ha_status, info.error);
 					break;
 				case ZBX_IPC_SERVICE_HA_STOP:
