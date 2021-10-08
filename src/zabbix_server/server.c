@@ -1798,9 +1798,6 @@ void	zbx_on_exit(int ret)
 
 	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
 	{
-		if (SUCCEED == DBtxn_ongoing())
-			DBrollback();
-
 		if (NULL != threads)
 		{
 			zbx_threads_wait(threads, threads_flags, threads_num, ret);	/* wait for all child processes to exit */
