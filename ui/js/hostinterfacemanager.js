@@ -219,13 +219,10 @@ class HostInterfaceManager {
 	}
 
 	generateId() {
-		let id = 1;
+		const keys = Object.keys(this.data).map(Number);
+		const max_key = Math.max(0, ...keys);
 
-		while (this.data[id] !== undefined) {
-			id++;
-		}
-
-		return id;
+		return max_key+1;
 	}
 
 	getNewData(type) {
