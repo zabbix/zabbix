@@ -452,11 +452,12 @@ class testDashboardPages extends CWebTest {
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
 		$next_page = $this->query('xpath://button[@class="dashboard-next-page btn-iterator-page-next"]')->one();
-		if ($this->assertTrue($next_page->isEnabled())) {
+		if ($next_page->isClickable() === true) {
 			do {
 				$next_page->waitUntilReady()->click();
-			}
-			while ($next_page->isEnabled(false));
+			} while ($next_page->isClickable() === true);
+			$this->query('xpath://ul[@class="sortable-list"]//span[@title='.CXPathHelper::escapeQuotes($title).
+					']/following-sibling::button[@title="Actions"]')->waitUntilVisible();
 		}
 
 		$index = ($title === 'first_page_creation') ? 2 : 1;
