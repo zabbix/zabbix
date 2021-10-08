@@ -47,11 +47,7 @@ class CControllerGeomapsUpdate extends CController {
 							->getUrl()
 					);
 
-					$response->setFormData(array_filter($this->getInputAll()) + [
-						'geomaps_tile_provider' => '',
-						'geomaps_tile_url' => '',
-						'geomaps_max_zoom' => 0
-					]);
+					$response->setFormData($this->getInputAll());
 					CMessageHelper::setErrorTitle(_('Cannot update configuration'));
 					$this->setResponse($response);
 					break;

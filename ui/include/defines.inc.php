@@ -1344,6 +1344,7 @@ define('API_CUID',					45);
 define('API_IP_RANGES',				46);
 define('API_IMAGE',					47);
 define('API_EXEC_PARAMS',			48);
+define('API_LAT_LNG_ZOOM',			49);
 
 // flags
 define('API_REQUIRED',					0x0001);
@@ -1460,6 +1461,7 @@ define('WIDGET_DATA_OVER',			'dataover');
 define('WIDGET_DISCOVERY',			'discovery');
 define('WIDGET_FAV_GRAPHS',			'favgraphs');
 define('WIDGET_FAV_MAPS',			'favmaps');
+define('WIDGET_GEOMAP',				'geomap');
 define('WIDGET_SVG_GRAPH',			'svggraph');
 define('WIDGET_GRAPH',				'graph');
 define('WIDGET_GRAPH_PROTOTYPE',	'graphprototype');

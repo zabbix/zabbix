@@ -30,10 +30,10 @@ class CControllerGeomapsEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'geomaps_tile_provider'		=> 'db config.geomaps_tile_provider',
-			'geomaps_tile_url'			=> 'db config.geomaps_tile_url',
-			'geomaps_max_zoom'			=> 'db config.geomaps_max_zoom',
-			'geomaps_attribution'		=> 'db config.geomaps_attribution'
+			'geomaps_tile_provider'	=> 'string',
+			'geomaps_tile_url'		=> 'string',
+			'geomaps_max_zoom'		=> 'string',
+			'geomaps_attribution'	=> 'string'
 		];
 
 		$ret = $this->validateInput($fields);
