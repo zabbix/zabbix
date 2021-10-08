@@ -3365,7 +3365,7 @@ static int	evaluate_RATE(zbx_variant_t *value, DC_ITEM *item, const char *parame
 			if (FAIL == zbx_double_compare(HVD(values.values[i].value), HVD(last)) &&
 					HVD(values.values[i].value) < HVD(last))
 			{
-				delta = delta + HVD(values.values[i].value);
+				delta = delta + HVD(last);
 			}
 
 			last = values.values[i].value;

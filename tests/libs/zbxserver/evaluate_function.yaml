@@ -3564,7 +3564,7 @@ in:
   params: '4'
 out:
   return: SUCCEED
-  value: 0.75
+  value: 1
 
 ---
 test case: Evaluate rate() with reset and UINT64 data
@@ -3588,7 +3588,7 @@ in:
   params: '4'
 out:
   return: SUCCEED
-  value: 0.75
+  value: 1
 ---
 test case: Evaluate rate() extrapolation without change UINT64 data
 in:
@@ -3678,5 +3678,22 @@ in:
 out:
   return: FAIL
   value: 0
+---
+test case: Evaluate rate() with negative reset
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 11
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 1
+      ts: 2021-03-27 10:01:01.000000000 +00:00
+  time: 2021-03-27 10:01:01.000000000 +00:00
+  function: rate
+  params: '1'
+out:
+  return: SUCCEED
+  value: 1
 
 ...
