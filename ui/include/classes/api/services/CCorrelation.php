@@ -202,6 +202,13 @@ class CCorrelation extends CApiService {
 		return null;
 	}
 
+	/**
+	 * @static
+	 *
+	 * @param array      $correlations
+	 * @param string     $method
+	 * @param array|null $db_correlations
+	 */
 	private static function updateConditions(array &$correlations, string $method,
 			array $db_correlations = null): void {
 		$ins_conditions = [];
@@ -329,6 +336,13 @@ class CCorrelation extends CApiService {
 		}
 	}
 
+	/**
+	 * @static
+	 *
+	 * @param array      $correlations
+	 * @param string     $method
+	 * @param array|null $db_correlations
+	 */
 	private static function updateOperations(array &$correlations, string $method,
 			array $db_correlations = null): void {
 		$ins_operations = [];
@@ -384,13 +398,11 @@ class CCorrelation extends CApiService {
 	}
 
 	/**
-	 * Update correlations.
-	 *
-	 * @param array $correlations  An array of correlations.
+	 * @param array $correlations
 	 *
 	 * @return array
 	 */
-	public function update($correlations) {
+	public function update(array $correlations): array {
 		self::validateUpdate($correlations, $db_correlations);
 
 		$upd_correlations = [];
@@ -426,13 +438,11 @@ class CCorrelation extends CApiService {
 	}
 
 	/**
-	 * Delete correlations.
-	 *
-	 * @param array $correlationids  An array of correlation IDs.
+	 * @param array $correlationids
 	 *
 	 * @return array
 	 */
-	public function delete(array $correlationids) {
+	public function delete(array $correlationids): array {
 		self::validateDelete($correlationids, $db_correlations);
 
 		DB::delete('correlation', ['correlationid' => $correlationids]);
@@ -444,6 +454,8 @@ class CCorrelation extends CApiService {
 
 	/**
 	 * Validates the input parameters for the delete() method.
+	 *
+	 * @static
 	 *
 	 * @param array      $correlationids
 	 * @param array|null $db_correlations
@@ -510,6 +522,8 @@ class CCorrelation extends CApiService {
 	/**
 	 * Returns validation rules for the filter object.
 	 *
+	 * @static
+	 *
 	 * @return array
 	 */
 	private static function getFilterValidationRules(): array {
@@ -559,6 +573,8 @@ class CCorrelation extends CApiService {
 
 	/**
 	 * Validates the input parameters for the create() method.
+	 *
+	 * @static
 	 *
 	 * @param array $correlations
 	 *
@@ -621,6 +637,8 @@ class CCorrelation extends CApiService {
 	}
 
 	/**
+	 * @static
+	 *
 	 * @param array      $correlations
 	 * @param array|null $db_correlations
 	 *
@@ -702,8 +720,8 @@ class CCorrelation extends CApiService {
 	/**
 	 * Apply query output options.
 	 *
-	 * @param type $table_name
-	 * @param type $table_alias
+	 * @param string $table_name
+	 * @param string $table_alias
 	 * @param array $options
 	 * @param array $sql_parts
 	 *
@@ -738,7 +756,7 @@ class CCorrelation extends CApiService {
 	 *
 	 * @return array
 	 */
-	protected function addRelatedObjects(array $options, array $result) {
+	protected function addRelatedObjects(array $options, array $result): array {
 		$result = parent::addRelatedObjects($options, $result);
 
 		$correlationids = array_keys($result);
