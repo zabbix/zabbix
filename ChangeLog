@@ -1,3 +1,23 @@
+Changes for 5.0.17rc1
+
+New features:
+.......PS. [ZBXNEXT-6809] changed behavior of the vmware event log, the 'skip' option of the new item resets the VMware event cache (MVekslers)
+
+Bug fixes:
+A......... [ZBX-19978] fixed SQL errors when trying to get count of the interfaces (Sasha)
+.........T [ZBX-19774] fixed README examples (abiba)
+.........T [ZBX-19776] fixed README file (abiba)
+.........T [ZBX-19284] added smart.disk.attr.raw item, removed unit for smart.disk.hours item in "SMART by Zabbix agent 2" template (mchudinov)
+..F....... [ZBX-19899] fixed mass update not working across pages for problems monitoring (jfreibergs)
+.........T [ZBX-19939] fixed typo in Clickhouse Template README (abiba)
+........S. [ZBX-19457] fixed failed query when updating application names longer than 255 characters (asestakovs)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.16
+
+5.0.16rc2 was released as 5.0.16 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.16rc2
 
 Bug fixes:
@@ -2233,6 +2253,15 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.35rc1
+
+New features:
+.......PS. [ZBXNEXT-6809] changed behavior of the vmware event log, the 'skip' option of the new item resets the VMware event cache (MVekslers)
+
+Bug fixes:
+........S. [ZBX-19457] fixed failed query when updating application names longer than 255 characters (asestakovs)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.34

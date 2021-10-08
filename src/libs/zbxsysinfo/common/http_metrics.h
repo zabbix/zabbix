@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -18,24 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "sysinfo.h"
 
-require_once dirname(__FILE__).'/../include/CAPITest.php';
+#ifndef ZABBIX_SYSINFO_COMMON_HTTP_METRICS_H
+#define ZABBIX_SYSINFO_COMMON_HTTP_METRICS_H
 
-class testAPIInfo extends CAPITest {
-	public function testAPIInfo_VersionWithAuth() {
-		$error = [
-			'code' => -32602,
-			'message' => 'Invalid params.',
-			'data' => 'The "apiinfo.version" method must be called without the "auth" parameter.'
-		];
+extern ZBX_METRIC	parameters_common_http[];
 
-		$this->call('apiinfo.version', [], $error);
-	}
-
-	public function testAPIInfo_VersionWithoutAuth() {
-		$this->disableAuthorization();
-		$result = $this->call('apiinfo.version', []);
-
-		$this->assertSame('5.0.17', $result['result']);
-	}
-}
+#endif /* ZABBIX_SYSINFO_COMMON_HTTP_METRICS_H */

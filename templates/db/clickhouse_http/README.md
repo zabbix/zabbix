@@ -31,8 +31,8 @@ create file /etc/clickhouse-server/users.d/zabbix.xml
         <allow_databases>
           <database>test</database>
         </allow_databases>
-        </zabbix>
-     </zabbix>
+      </zabbix>
+    </users>
   </yandex>   
 
 ```

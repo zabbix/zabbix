@@ -421,7 +421,6 @@ class testFormAction extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Name');
 		$this->zbxTestAssertVisibleId('name');
 		$this->zbxTestAssertAttribute('//input[@id="name"]', 'maxlength', 255);
-		$this->zbxTestAssertAttribute('//input[@id="name"]', 'size', 20);
 		$this->zbxTestAssertAttribute('//input[@id="name"]', 'autofocus');
 
 		$this->zbxTestTextPresent('Enabled');
@@ -655,7 +654,6 @@ class testFormAction extends CLegacyWebTest {
 				break;
 			case 'Uptime/Downtime':
 				$this->zbxTestAssertAttribute('//input[@id="value"]', 'maxlength', 15);
-				$this->zbxTestAssertAttribute('//input[@id="value"]', 'size', 20);
 				break;
 		}
 
@@ -788,7 +786,6 @@ class testFormAction extends CLegacyWebTest {
 			case 'Discovery check':
 				$this->zbxTestAssertElementPresentXpath('//input[@id=\'dcheck\']');
 				$this->zbxTestAssertAttribute('//input[@id=\'dcheck\']', 'maxlength', 255);
-				$this->zbxTestAssertAttribute('//input[@id=\'dcheck\']', 'size', 20);
 				$this->zbxTestAssertAttribute('//input[@id=\'dcheck\']', 'readonly');
 				$this->zbxTestAssertElementPresentXpath('//button[@id=\'btn1\']');
 				$this->zbxTestAssertElementText('//button[@id=\'btn1\']', 'Select');
@@ -813,7 +810,6 @@ class testFormAction extends CLegacyWebTest {
 				$this->assertEquals('1h', $form->getField('Default operation step duration')->getValue());
 				$this->zbxTestAssertVisibleId('esc_period');
 				$this->zbxTestAssertAttribute('//input[@id=\'esc_period\']', 'maxlength', 255);
-				$this->zbxTestAssertAttribute('//input[@id=\'esc_period\']', 'size', 20);
 
 				$this->assertEquals($operations_field->getHeadersText(), ['Steps', 'Details', 'Start in', 'Duration', 'Action']);
 				$this->assertTrue($form->getField('Pause operations for suppressed problems')->getValue());
@@ -833,7 +829,6 @@ class testFormAction extends CLegacyWebTest {
 				$this->assertEquals('1h', $form->getField('Default operation step duration')->getValue());
 				$this->zbxTestAssertVisibleId('esc_period');
 				$this->zbxTestAssertAttribute('//input[@id=\'esc_period\']', 'maxlength', 255);
-				$this->zbxTestAssertAttribute('//input[@id=\'esc_period\']', 'size', 20);
 
 				$this->assertEquals($operations_field->getHeadersText(), ['Steps', 'Details', 'Start in', 'Duration', 'Action']);
 				$recovery_field = $form->getField('Recovery operations')->asTable();
@@ -915,19 +910,16 @@ class testFormAction extends CLegacyWebTest {
 					$this->zbxTestTextPresent('Steps');
 					$this->zbxTestAssertVisibleId('operation_esc_step_from');
 					$this->zbxTestAssertAttribute('//input[@id=\'operation_esc_step_from\']', 'maxlength', 5);
-					$this->zbxTestAssertAttribute('//input[@id=\'operation_esc_step_from\']', 'size', 20);
 					$this->zbxTestAssertAttribute('//input[@id=\'operation_esc_step_from\']', 'value', 1);
 
 					$this->zbxTestTextPresent('(0 - infinitely)');
 					$this->zbxTestAssertVisibleId('operation_esc_step_to');
 					$this->zbxTestAssertAttribute('//input[@id=\'operation_esc_step_to\']', 'maxlength', 5);
-					$this->zbxTestAssertAttribute('//input[@id=\'operation_esc_step_to\']', 'size', 20);
 					$this->zbxTestAssertAttribute('//input[@id=\'operation_esc_step_to\']', 'value', 1);
 
 					$this->zbxTestTextPresent(['Step duration', '(0 - use action default)']);
 					$this->zbxTestAssertVisibleId('operation_esc_period');
 					$this->zbxTestAssertAttribute('//input[@id=\'operation_esc_period\']', 'maxlength', 255);
-					$this->zbxTestAssertAttribute('//input[@id=\'operation_esc_period\']', 'size', 20);
 					$this->zbxTestAssertAttribute('//input[@id=\'operation_esc_period\']', 'value', 0);
 					break;
 				}
@@ -1048,7 +1040,6 @@ class testFormAction extends CLegacyWebTest {
 				$this->zbxTestTextPresent('Subject');
 				$this->zbxTestAssertVisibleId('operation_opmessage_subject');
 				$this->zbxTestAssertAttribute('//input[@id=\'operation_opmessage_subject\']', 'maxlength', 255);
-				$this->zbxTestAssertAttribute('//input[@id=\'operation_opmessage_subject\']', 'size', 20);
 
 				$this->zbxTestTextPresent('Message');
 				$this->zbxTestAssertVisibleId('operation_opmessage_message');
@@ -1143,7 +1134,6 @@ class testFormAction extends CLegacyWebTest {
 			$this->zbxTestTextPresent('Commands');
 			$this->zbxTestAssertVisibleXpath('//input[@id="operation_opcommand_command_ipmi"]');
 			$this->zbxTestAssertAttribute('//*[@id="operation_opcommand_command_ipmi"]', 'maxlength', 255);
-			$this->zbxTestAssertAttribute('//*[@id="operation_opcommand_command_ipmi"]', 'size', 20);
 			$this->zbxTestAssertElementValue('operation_opcommand_command_ipmi', '');
 		}
 		else {
@@ -1179,7 +1169,6 @@ class testFormAction extends CLegacyWebTest {
 				$this->zbxTestTextPresent('User name');
 				$this->zbxTestAssertVisibleXpath('//input[@id=\'operation_opcommand_username\']');
 				$this->zbxTestAssertAttribute('//*[@id=\'operation_opcommand_username\']', 'maxlength', 255);
-				$this->zbxTestAssertAttribute('//*[@id=\'operation_opcommand_username\']', 'size', 20);
 				$this->zbxTestAssertElementValue('operation_opcommand_username', '');
 				break;
 			case 'IPMI':
@@ -1197,7 +1186,6 @@ class testFormAction extends CLegacyWebTest {
 				$this->zbxTestTextPresent('Password');
 				$this->zbxTestAssertVisibleXpath('//input[@id=\'operation_opcommand_password\']');
 				$this->zbxTestAssertAttribute('//*[@id=\'operation_opcommand_password\']', 'maxlength', 255);
-				$this->zbxTestAssertAttribute('//*[@id=\'operation_opcommand_password\']', 'size', 20);
 				$this->zbxTestAssertElementValue('operation_opcommand_password', '');
 
 				$this->zbxTestAssertNotVisibleId('opcommand_passphrase');
@@ -1209,7 +1197,6 @@ class testFormAction extends CLegacyWebTest {
 				$this->zbxTestTextPresent('Key passphrase');
 				$this->zbxTestAssertVisibleXpath('//input[@id=\'opcommand_passphrase\']');
 				$this->zbxTestAssertAttribute('//*[@id=\'opcommand_passphrase\']', 'maxlength', 255);
-				$this->zbxTestAssertAttribute('//*[@id=\'opcommand_passphrase\']', 'size', 20);
 				$this->zbxTestAssertElementValue('opcommand_passphrase', '');
 
 				$this->zbxTestAssertNotVisibleXpath('//input[@id=\'operation_opcommand_password\']');
@@ -1217,13 +1204,11 @@ class testFormAction extends CLegacyWebTest {
 				$this->zbxTestTextPresent('Public key file');
 				$this->zbxTestAssertVisibleXpath('//input[@id=\'operation_opcommand_publickey\']');
 				$this->zbxTestAssertAttribute('//*[@id=\'operation_opcommand_publickey\']', 'maxlength', 255);
-				$this->zbxTestAssertAttribute('//*[@id=\'operation_opcommand_publickey\']', 'size', 20);
 				$this->zbxTestAssertElementValue('operation_opcommand_publickey', '');
 
 				$this->zbxTestTextPresent('Private key file');
 				$this->zbxTestAssertVisibleXpath('//input[@id=\'operation_opcommand_privatekey\']');
 				$this->zbxTestAssertAttribute('//*[@id=\'operation_opcommand_privatekey\']', 'maxlength', 255);
-				$this->zbxTestAssertAttribute('//*[@id=\'operation_opcommand_privatekey\']', 'size', 20);
 				$this->zbxTestAssertElementValue('operation_opcommand_privatekey', '');
 				break;
 			default:
@@ -1247,7 +1232,6 @@ class testFormAction extends CLegacyWebTest {
 				$this->zbxTestTextPresent('Port');
 				$this->zbxTestAssertVisibleXpath('//input[@id=\'operation_opcommand_port\']');
 				$this->zbxTestAssertAttribute('//input[@id=\'operation_opcommand_port\']', 'maxlength', 255);
-				$this->zbxTestAssertAttribute('//input[@id=\'operation_opcommand_port\']', 'size', 20);
 				$this->zbxTestAssertElementValue('operation_opcommand_port', '');
 				break;
 			default:
@@ -1258,7 +1242,6 @@ class testFormAction extends CLegacyWebTest {
 		if ($new_operation_opcommand_type == 'Global script') {
 			$this->zbxTestAssertVisibleXpath('//input[@id=\'operation_opcommand_script\']');
 			$this->zbxTestAssertAttribute('//*[@id=\'operation_opcommand_script\']', 'maxlength', 255);
-			$this->zbxTestAssertAttribute('//*[@id=\'operation_opcommand_script\']', 'size', 20);
 			$this->zbxTestAssertAttribute('//*[@id=\'operation_opcommand_script\']', 'readonly');
 			$this->zbxTestAssertElementValue('operation_opcommand_script', '');
 		}

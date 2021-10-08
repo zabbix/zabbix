@@ -34,6 +34,7 @@ noinst_LIBRARIES = \
 libzbxagentsysinfo_a_CFLAGS = \
 	-DWITH_AGENT_METRICS \
 	-DWITH_COMMON_METRICS \
+	-DWITH_HTTP_METRICS \
 	-DWITH_SIMPLE_METRICS \
 	-DWITH_SPECIFIC_METRICS \
 	-DWITH_HOSTNAME_METRIC
@@ -53,6 +54,7 @@ libzbxagent2sysinfo_a_SOURCES = \
 # SERVER version of sysinfo library
 libzbxserversysinfo_a_CFLAGS = \
 	-DWITH_COMMON_METRICS \
+	-DWITH_HTTP_METRICS \
 	-DWITH_SIMPLE_METRICS
 
 libzbxserversysinfo_a_SOURCES = \
@@ -61,6 +63,7 @@ libzbxserversysinfo_a_SOURCES = \
 # PROXY version of sysinfo library
 libzbxproxysysinfo_a_CFLAGS = \
 	-DWITH_COMMON_METRICS \
+	-DWITH_HTTP_METRICS \
 	-DWITH_SIMPLE_METRICS \
 	-DWITH_HOSTNAME_METRIC
 
