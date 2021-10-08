@@ -1,8 +1,14 @@
 Changes for 6.0.0alpha5
 
 New features:
+...G...... [ZBXNEXT-6428] moved plugins config options to separate files (akozlovs, esneiders, kalimulin, MVekslers)
 
 Bug fixes:
+..F....... [ZBX-19997] fixed too long URL error when performing background page refresh (miks)
+A......... [ZBX-20021] fixed impossibility to import media types of type script with parameters from previous versions (agriscenko)
+........S. [ZBX-19889] fixed server not updating trigger dependencies and other data during linking (arimdjonoks)
+....I..PS. [ZBX-20001] fixed crash and invalid bytecode error being generated on big-sendian systems when javascript is used; upgraded duktape to version 2.6 (vso)
+..F....... [ZBX-19419] fixed not refreshing graph widgets on dashboards (averza)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.0alpha4
