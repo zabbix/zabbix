@@ -2136,7 +2136,7 @@ int	get_netbios_name(char **name, char **error)
 
 int	get_system_hostname(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		*ptype, *ptransform, *hostname, *error = NULL;
+	char		*type, *transform, *hostname, *error = NULL;
 
 	if (2 < request->nparam)
 	{
@@ -2144,12 +2144,12 @@ int	get_system_hostname(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	ptype = get_rparam(request, 0);
-	ptransform = get_rparam(request, 1);
+	type = get_rparam(request, 0);
+	transform = get_rparam(request, 1);
 
-	if (NULL != ptype && '\0' != *ptype && 0 != strcmp(ptype, "host"))
+	if (NULL != type && '\0' != *type && 0 != strcmp(type, "host"))
 	{
-		if (0 == strcmp(ptype, "shorthost"))
+		if (0 == strcmp(type, "shorthost"))
 		{
 			char	*dot;
 
@@ -2162,7 +2162,7 @@ int	get_system_hostname(AGENT_REQUEST *request, AGENT_RESULT *result)
 			if (NULL != (dot = strchr(hostname, '.')))
 				*dot = '\0';
 		}
-		else if (0 == strcmp(ptype, "netbios"))
+		else if (0 == strcmp(type, "netbios"))
 		{
 #ifdef _WINDOWS
 			if (FAIL == get_netbios_name(&hostname, &error))
@@ -2190,9 +2190,9 @@ int	get_system_hostname(AGENT_REQUEST *request, AGENT_RESULT *result)
 		}
 	}
 
-	if (NULL != ptransform && '\0' != *ptransform && 0 != strcmp(ptransform, "none"))
+	if (NULL != transform && '\0' != *transform && 0 != strcmp(transform, "none"))
 	{
-		if (0 == strcmp(ptransform, "lower"))
+		if (0 == strcmp(transform, "lower"))
 		{
 			zbx_strlower(hostname);
 		}
