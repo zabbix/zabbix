@@ -125,8 +125,9 @@ class CExpressionValidator extends CValidator {
 	/**
 	 * Validate expression (recursive helper).
 	 *
-	 * @param array $tokens             A hierarchy of tokens.
+	 * @param array      $tokens        A hierarchy of tokens.
 	 * @param array|null $parent_token  Parent token containing the hierarchy of tokens.
+	 * @param int|null   $position      The parameter number in the math function.
 	 *
 	 * @return bool
 	 */
@@ -195,13 +196,6 @@ class CExpressionValidator extends CValidator {
 					if (!$this->validateHistFunctionExpressionRules($token, $parent_token, $position)) {
 						$this->setError(_s('incorrect usage of function "%1$s"', $token['data']['function']));
 
-						return false;
-					}
-
-					break;
-
-				case CExpressionParserResult::TOKEN_TYPE_EXPRESSION:
-					if (!$this->validateRecursively($token['data']['tokens'], null)) {
 						return false;
 					}
 
