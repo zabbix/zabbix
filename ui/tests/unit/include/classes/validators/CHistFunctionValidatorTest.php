@@ -76,7 +76,7 @@ class CHistFunctionValidatorTest extends TestCase {
 			['bucket_percentile(/host/key, 1h)', ['calculated' => true], ['rc' => false, 'error' => 'mandatory parameter is missing in function "bucket_percentile"']],
 			['bucket_percentile(/host/key, 1h, 101)', ['calculated' => true], ['rc' => false, 'error' => 'invalid third parameter in function "bucket_percentile"']],
 			['bucket_percentile(/host/key, 1h, 50)', ['calculated' => true], ['rc' => true, 'error' => null]],
-			['bucket_percentile(/host/key, 1h:now-24h, 50)', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['bucket_percentile(/host/key, 1h:now-24h, 50)', ['calculated' => true], ['rc' => false, 'error' => 'invalid second parameter in function "bucket_percentile"']],
 
 			['bucket_rate_foreach(/host/key[*])', ['calculated' => true], ['rc' => false, 'error' => 'mandatory parameter is missing in function "bucket_rate_foreach"']],
 			['bucket_rate_foreach(/host/key[*], 1h, 0)', ['calculated' => true], ['rc' => false, 'error' => 'invalid third parameter in function "bucket_rate_foreach"']],

@@ -46,7 +46,7 @@ final class CHistFunctionData {
 		],
 		'bucket_percentile' => [
 			['rules' => [['type' => 'query']]],
-			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC]]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC_ONLY]]],
 			['rules' => [
 				['type' => 'regexp', 'pattern' => '/^((\d+(\.\d{0,4})?)|(\.\d{1,4}))$/'],
 				['type' => 'number', 'min' => 0, 'max' => 100]
