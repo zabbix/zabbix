@@ -35,7 +35,7 @@ class CHaNode extends CApiService {
 	 * @param array $options
 	 *
 	 * @return array|string
-
+	 *
 	 * @throws APIException
 	 */
 	public function get(array $options = []) {
