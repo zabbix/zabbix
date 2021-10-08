@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-10 19:53+0300\n"
+"POT-Creation-Date: 2021-10-08 19:52+0300\n"
 "PO-Revision-Date: 2020-06-04 05:05+0300\n"
 "Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -5658,7 +5658,7 @@ msgstr ""
 #: include/classes/api/services/CMap.php:581
 #: include/classes/api/services/CMap.php:1022
 #: include/classes/api/services/CMediatype.php:175
-#: include/classes/api/services/CMediatype.php:441
+#: include/classes/api/services/CMediatype.php:439
 #: include/classes/api/services/CScreenItem.php:140
 #: include/classes/api/services/CScreenItem.php:271
 #: include/classes/api/services/CScreen.php:417
@@ -5684,7 +5684,7 @@ msgstr "출력 파라미터가 공백입니다."
 msgid "Empty map ID."
 msgstr "맵ID가 공백입니다."
 
-#: include/classes/api/services/CMediatype.php:447
+#: include/classes/api/services/CMediatype.php:445
 msgid "Empty media type ID."
 msgstr "미디어 타입ID가 공백입니다."
 
@@ -6272,8 +6272,8 @@ msgid "Field \"%1$s\" is missing a value for map \"%2$s\"."
 msgstr "맵 \"%2$s\"를 위한 필드 \"%1$s\"가 설정되어 있지 않습니다."
 
 #: include/classes/api/services/CMediatype.php:197
-#: include/classes/api/services/CMediatype.php:539
-#: include/classes/api/services/CMediatype.php:1198
+#: include/classes/api/services/CMediatype.php:537
+#: include/classes/api/services/CMediatype.php:1196
 #, c-format
 msgid "Field \"%1$s\" is missing a value for media type \"%2$s\"."
 msgstr "미디어 타입 \"%2$s\"를 위한 필드 \"%1$s\"가 설정되어 있지 않습니다."
@@ -6301,7 +6301,7 @@ msgstr "항목 \"%1$s\"의 정수치가 아닙니다."
 msgid "Field \"%1$s\" is not string."
 msgstr "항목 \"%1$s\"은 문자열이 아닙니다."
 
-#: include/classes/api/services/CMediatype.php:1192
+#: include/classes/api/services/CMediatype.php:1190
 #, c-format
 msgid "Field \"%1$s\" is required for media type \"%2$s\"."
 msgstr "미디어 타입 \"%2$s\"를 위한 필드 \"%1$s\"를 지정해 주십시오."
@@ -7567,7 +7567,7 @@ msgstr "같은 호스트 이름\"%1$s\"를 지닌 호스트가 이미 존재합�
 msgid "Host with the same visible name \"%1$s\" already exists."
 msgstr "같은 호스트의 표시 이름 \"%1$s\"를 지닌 호스트가 이미 존재합니다."
 
-#: app/controllers/CControllerHostView.php:200
+#: app/controllers/CControllerHostView.php:204
 #: app/controllers/CControllerPopupGeneric.php:116
 #: app/controllers/CControllerPopupGeneric.php:140
 #: app/partials/common.filter.trigger.php:68
@@ -8275,7 +8275,7 @@ msgstr "설정항목이 잘못되어 있습니다."
 #: include/classes/api/services/CMap.php:1228
 #: include/classes/api/services/CMap.php:1448
 #: include/classes/api/services/CMediatype.php:182
-#: include/classes/api/services/CMediatype.php:478
+#: include/classes/api/services/CMediatype.php:476
 #: include/classes/api/services/CScreen.php:497
 #: include/classes/api/services/CScreen.php:571
 #: include/classes/api/services/CScreen.php:762
@@ -8565,7 +8565,7 @@ msgstr "맵ID가 올바르지 않습니다."
 msgid "Incorrect max columns provided for screen element."
 msgstr "스크린 요소의 최대열수가 올바르지 않습니다."
 
-#: include/classes/api/services/CMediatype.php:448
+#: include/classes/api/services/CMediatype.php:446
 msgid "Incorrect media type ID."
 msgstr "미디어 타입 ID가 올바르지 않습니다."
 
@@ -8865,21 +8865,21 @@ msgstr "부호없는 정수 항목\"%2$s\"의 값 \"%1$s\"가 올바르지 않�
 msgid "Incorrect value \"%1$s\" in field \"%2$s\" for correlation \"%3$s\"."
 msgstr "상관관계 \"%3$s\"의 필드 \"%2$s\"의 값 \"%1$s\"이 올바르지 않습니다."
 
-#: include/classes/api/services/CMediatype.php:238
-#: include/classes/api/services/CMediatype.php:249
-#: include/classes/api/services/CMediatype.php:268
-#: include/classes/api/services/CMediatype.php:284
-#: include/classes/api/services/CMediatype.php:300
-#: include/classes/api/services/CMediatype.php:319
-#: include/classes/api/services/CMediatype.php:359
-#: include/classes/api/services/CMediatype.php:559
-#: include/classes/api/services/CMediatype.php:572
-#: include/classes/api/services/CMediatype.php:591
-#: include/classes/api/services/CMediatype.php:608
-#: include/classes/api/services/CMediatype.php:625
-#: include/classes/api/services/CMediatype.php:645
-#: include/classes/api/services/CMediatype.php:685
-#: include/classes/api/services/CMediatype.php:1174
+#: include/classes/api/services/CMediatype.php:236
+#: include/classes/api/services/CMediatype.php:247
+#: include/classes/api/services/CMediatype.php:266
+#: include/classes/api/services/CMediatype.php:282
+#: include/classes/api/services/CMediatype.php:298
+#: include/classes/api/services/CMediatype.php:317
+#: include/classes/api/services/CMediatype.php:357
+#: include/classes/api/services/CMediatype.php:557
+#: include/classes/api/services/CMediatype.php:570
+#: include/classes/api/services/CMediatype.php:589
+#: include/classes/api/services/CMediatype.php:606
+#: include/classes/api/services/CMediatype.php:623
+#: include/classes/api/services/CMediatype.php:643
+#: include/classes/api/services/CMediatype.php:683
+#: include/classes/api/services/CMediatype.php:1172
 #, c-format
 msgid "Incorrect value \"%1$s\" in field \"%2$s\" for media type \"%3$s\"."
 msgstr "미디어 타입 \"%3$s\"를 위한 필드 \"%2$s\"내의 값 \"%1$s\"가 올바르지 않습니다."
@@ -9041,24 +9041,24 @@ msgstr ""
 #: include/classes/api/services/CMap.php:680
 #: include/classes/api/services/CMap.php:1139
 #: include/classes/api/services/CMap.php:1145
-#: include/classes/api/services/CMediatype.php:370
-#: include/classes/api/services/CMediatype.php:380
-#: include/classes/api/services/CMediatype.php:389
-#: include/classes/api/services/CMediatype.php:396
-#: include/classes/api/services/CMediatype.php:405
-#: include/classes/api/services/CMediatype.php:414
-#: include/classes/api/services/CMediatype.php:420
-#: include/classes/api/services/CMediatype.php:482
-#: include/classes/api/services/CMediatype.php:697
-#: include/classes/api/services/CMediatype.php:707
-#: include/classes/api/services/CMediatype.php:714
-#: include/classes/api/services/CMediatype.php:723
-#: include/classes/api/services/CMediatype.php:730
-#: include/classes/api/services/CMediatype.php:740
-#: include/classes/api/services/CMediatype.php:749
-#: include/classes/api/services/CMediatype.php:755
-#: include/classes/api/services/CMediatype.php:786
-#: include/classes/api/services/CMediatype.php:793
+#: include/classes/api/services/CMediatype.php:368
+#: include/classes/api/services/CMediatype.php:378
+#: include/classes/api/services/CMediatype.php:387
+#: include/classes/api/services/CMediatype.php:394
+#: include/classes/api/services/CMediatype.php:403
+#: include/classes/api/services/CMediatype.php:412
+#: include/classes/api/services/CMediatype.php:418
+#: include/classes/api/services/CMediatype.php:480
+#: include/classes/api/services/CMediatype.php:695
+#: include/classes/api/services/CMediatype.php:705
+#: include/classes/api/services/CMediatype.php:712
+#: include/classes/api/services/CMediatype.php:721
+#: include/classes/api/services/CMediatype.php:728
+#: include/classes/api/services/CMediatype.php:738
+#: include/classes/api/services/CMediatype.php:747
+#: include/classes/api/services/CMediatype.php:753
+#: include/classes/api/services/CMediatype.php:784
+#: include/classes/api/services/CMediatype.php:791
 #: include/classes/api/services/CProxy.php:558
 #: include/classes/api/services/CProxy.php:565
 #: include/classes/api/services/CProxy.php:578
@@ -9647,18 +9647,16 @@ msgstr "2번째의 파라미터가 올바르지 않습니다."
 #: include/classes/import/validators/C42XmlValidator.php:1336
 #: include/classes/import/validators/C44XmlValidator.php:1741
 #: include/classes/import/validators/C44XmlValidator.php:2023
-#: include/classes/import/validators/C44XmlValidator.php:2133
-#: include/classes/import/validators/C44XmlValidator.php:2153
-#: include/classes/import/validators/C44XmlValidator.php:2177
-#: include/classes/import/validators/C44XmlValidator.php:2219
-#: include/classes/import/validators/C44XmlValidator.php:2280
+#: include/classes/import/validators/C44XmlValidator.php:2135
+#: include/classes/import/validators/C44XmlValidator.php:2155
+#: include/classes/import/validators/C44XmlValidator.php:2179
+#: include/classes/import/validators/C44XmlValidator.php:2221
 #: include/classes/import/validators/C50XmlValidator.php:1884
 #: include/classes/import/validators/C50XmlValidator.php:2166
-#: include/classes/import/validators/C50XmlValidator.php:2276
-#: include/classes/import/validators/C50XmlValidator.php:2296
-#: include/classes/import/validators/C50XmlValidator.php:2320
-#: include/classes/import/validators/C50XmlValidator.php:2362
-#: include/classes/import/validators/C50XmlValidator.php:2423
+#: include/classes/import/validators/C50XmlValidator.php:2278
+#: include/classes/import/validators/C50XmlValidator.php:2298
+#: include/classes/import/validators/C50XmlValidator.php:2322
+#: include/classes/import/validators/C50XmlValidator.php:2364
 #: include/classes/import/validators/CXmlValidatorGeneral.php:133
 #: include/classes/import/validators/CXmlValidatorGeneral.php:152
 #: include/classes/import/validators/CXmlValidatorGeneral.php:171
@@ -11022,9 +11020,9 @@ msgid "Media type"
 msgstr "연락 방법"
 
 #: include/classes/api/services/CMediatype.php:207
-#: include/classes/api/services/CMediatype.php:223
-#: include/classes/api/services/CMediatype.php:502
-#: include/classes/api/services/CMediatype.php:514
+#: include/classes/api/services/CMediatype.php:221
+#: include/classes/api/services/CMediatype.php:500
+#: include/classes/api/services/CMediatype.php:512
 #, c-format
 msgid "Media type \"%1$s\" already exists."
 msgstr "미디어 타입 \"%1$s\"는 이미 존재합니다."
@@ -11081,7 +11079,7 @@ msgstr "ID \"%1$s\"의 미디어 타입은 사용할 수 없습니다."
 msgid "Media types"
 msgstr "미디어 타입"
 
-#: include/classes/api/services/CMediatype.php:1142
+#: include/classes/api/services/CMediatype.php:1140
 #, c-format
 msgid "Media types used by action \"%1$s\"."
 msgstr ""
@@ -11766,7 +11764,7 @@ msgstr "그래프에 \"%1$s\"가 정의되어 있지 않습니다."
 msgid "No \"%1$s\" given for map."
 msgstr "맵에 \"%1$s\"가 정의되어 있지 않습니다."
 
-#: include/classes/api/services/CMediatype.php:446
+#: include/classes/api/services/CMediatype.php:444
 #, c-format
 msgid "No \"%1$s\" given for media type."
 msgstr "미디어 타입에 \"%1$s\"이 정의되어 있지 않습니다."
@@ -12155,7 +12153,7 @@ msgstr "시스템 액세스 권한이 없습니다."
 #: include/classes/api/services/CMap.php:1561
 #: include/classes/api/services/CMap.php:1999
 #: include/classes/api/services/CMap.php:2061
-#: include/classes/api/services/CMediatype.php:471
+#: include/classes/api/services/CMediatype.php:469
 #: include/classes/api/services/CModule.php:224
 #: include/classes/api/services/CProxy.php:163
 #: include/classes/api/services/CProxy.php:253
@@ -12717,7 +12715,7 @@ msgstr "최고관리자만 미디어 타입을 작성할 수 있습니다."
 msgid "Only Super Admins can create user groups."
 msgstr "최고 관리자만 미디어타입을 작성할 수 있습니다."
 
-#: include/classes/api/services/CMediatype.php:1132
+#: include/classes/api/services/CMediatype.php:1130
 msgid "Only Super Admins can delete media types."
 msgstr "최고관리자만 미디어 타입을 삭제할 수 있습니다."
 
@@ -12725,7 +12723,7 @@ msgstr "최고관리자만 미디어 타입을 삭제할 수 있습니다."
 msgid "Only Super Admins can delete user groups."
 msgstr "최고관리자만 유저 그룹을 삭제할 수 있습니다."
 
-#: include/classes/api/services/CMediatype.php:437
+#: include/classes/api/services/CMediatype.php:435
 msgid "Only Super Admins can edit media types."
 msgstr "최고관리자만 미디어 타입을 수정할 수 있습니다."
 
@@ -15161,8 +15159,8 @@ msgstr "스크립트 이름 \"%1$s\"은 스크립트\"%2$s\"의 메뉴 경로에
 msgid "Script parameters"
 msgstr "스크립트 파라미터"
 
-#: include/classes/api/services/CMediatype.php:334
-#: include/classes/api/services/CMediatype.php:660
+#: include/classes/api/services/CMediatype.php:332
+#: include/classes/api/services/CMediatype.php:658
 #, c-format
 msgid "Script parameters \"%1$s\" are missing the last new line feed for media type \"%2$s\"."
 msgstr "미디어 타입 \"%2$s\"를 위한 스크립트 파라미터 \"%1$s\"에 마지막 개행이 없습니다."
@@ -19424,12 +19422,10 @@ msgstr "모든 미디어"
 #: include/classes/api/services/CItemGeneral.php:2276
 #: include/classes/api/services/CItemGeneral.php:2298
 #: include/classes/api/services/CModule.php:291
-#: include/classes/import/validators/C44XmlValidator.php:2133
-#: include/classes/import/validators/C44XmlValidator.php:2153
-#: include/classes/import/validators/C44XmlValidator.php:2280
-#: include/classes/import/validators/C50XmlValidator.php:2276
-#: include/classes/import/validators/C50XmlValidator.php:2296
-#: include/classes/import/validators/C50XmlValidator.php:2423
+#: include/classes/import/validators/C44XmlValidator.php:2135
+#: include/classes/import/validators/C44XmlValidator.php:2155
+#: include/classes/import/validators/C50XmlValidator.php:2278
+#: include/classes/import/validators/C50XmlValidator.php:2298
 #: include/classes/import/validators/CXmlValidatorGeneral.php:252
 #: include/classes/validators/CApiInputValidator.php:441
 #: include/classes/validators/CApiInputValidator.php:573
@@ -19601,14 +19597,14 @@ msgstr "변경할 수 없습니다"
 #: include/classes/api/services/CMapElement.php:106
 #: include/classes/api/services/CMapElement.php:125
 #: include/classes/api/services/CMapElement.php:163
-#: include/classes/api/services/CMediatype.php:371
-#: include/classes/api/services/CMediatype.php:390
-#: include/classes/api/services/CMediatype.php:406
-#: include/classes/api/services/CMediatype.php:482
-#: include/classes/api/services/CMediatype.php:698
-#: include/classes/api/services/CMediatype.php:724
-#: include/classes/api/services/CMediatype.php:741
-#: include/classes/api/services/CMediatype.php:793
+#: include/classes/api/services/CMediatype.php:369
+#: include/classes/api/services/CMediatype.php:388
+#: include/classes/api/services/CMediatype.php:404
+#: include/classes/api/services/CMediatype.php:480
+#: include/classes/api/services/CMediatype.php:696
+#: include/classes/api/services/CMediatype.php:722
+#: include/classes/api/services/CMediatype.php:739
+#: include/classes/api/services/CMediatype.php:791
 #: include/classes/api/services/CProxy.php:578
 #: include/classes/api/services/CProxy.php:584
 #: include/classes/api/services/CTriggerGeneral.php:703
@@ -20194,15 +20190,15 @@ msgstr "ms"
 msgid "must be a valid LDAP user"
 msgstr "유효한 LDAP서버가 필요합니다."
 
-#: include/classes/api/services/CMediatype.php:381
-#: include/classes/api/services/CMediatype.php:397
-#: include/classes/api/services/CMediatype.php:415
-#: include/classes/api/services/CMediatype.php:421
-#: include/classes/api/services/CMediatype.php:708
-#: include/classes/api/services/CMediatype.php:715
-#: include/classes/api/services/CMediatype.php:731
-#: include/classes/api/services/CMediatype.php:750
-#: include/classes/api/services/CMediatype.php:756
+#: include/classes/api/services/CMediatype.php:379
+#: include/classes/api/services/CMediatype.php:395
+#: include/classes/api/services/CMediatype.php:413
+#: include/classes/api/services/CMediatype.php:419
+#: include/classes/api/services/CMediatype.php:706
+#: include/classes/api/services/CMediatype.php:713
+#: include/classes/api/services/CMediatype.php:729
+#: include/classes/api/services/CMediatype.php:748
+#: include/classes/api/services/CMediatype.php:754
 #: include/classes/api/services/CScreen.php:401
 #, c-format
 msgid "must be between \"%1$s\" and \"%2$s\""
@@ -20446,7 +20442,7 @@ msgstr "짧은 설명"
 #: include/classes/api/services/CItemGeneral.php:2262
 #: include/classes/api/services/CMaintenance.php:495
 #: include/classes/api/services/CMaintenance.php:717
-#: include/classes/api/services/CMediatype.php:786
+#: include/classes/api/services/CMediatype.php:784
 #: include/classes/api/services/CProxy.php:664
 #: include/classes/api/services/CProxy.php:790
 #: include/classes/api/services/CTriggerGeneral.php:709
@@ -20607,8 +20603,8 @@ msgstr "검색 문자열을 입력"
 msgid "unacceptable URL"
 msgstr ""
 
-#: include/classes/import/validators/C44XmlValidator.php:2220
-#: include/classes/import/validators/C50XmlValidator.php:2363
+#: include/classes/import/validators/C44XmlValidator.php:2222
+#: include/classes/import/validators/C50XmlValidator.php:2365
 #: include/classes/import/validators/CXmlValidatorGeneral.php:267
 #, c-format
 msgid "unexpected constant \"%1$s\""
@@ -20616,8 +20612,8 @@ msgstr ""
 
 #: include/classes/export/CConfigurationExportBuilder.php:105
 #: include/classes/import/converters/CConstantImportConverter.php:60
-#: include/classes/import/validators/C44XmlValidator.php:2178
-#: include/classes/import/validators/C50XmlValidator.php:2321
+#: include/classes/import/validators/C44XmlValidator.php:2180
+#: include/classes/import/validators/C50XmlValidator.php:2323
 #, c-format
 msgid "unexpected constant value \"%1$s\""
 msgstr ""

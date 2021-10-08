@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-10 19:53+0300\n"
+"POT-Creation-Date: 2021-10-08 19:52+0300\n"
 "PO-Revision-Date: 2021-06-15 21:34+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -5810,7 +5810,7 @@ msgstr "Пустой тип условия фильтрации для дейс�
 #: include/classes/api/services/CMap.php:581
 #: include/classes/api/services/CMap.php:1022
 #: include/classes/api/services/CMediatype.php:175
-#: include/classes/api/services/CMediatype.php:441
+#: include/classes/api/services/CMediatype.php:439
 #: include/classes/api/services/CScreenItem.php:140
 #: include/classes/api/services/CScreenItem.php:271
 #: include/classes/api/services/CScreen.php:417
@@ -5836,7 +5836,7 @@ msgstr "Пустые входные параметры."
 msgid "Empty map ID."
 msgstr "Пустой ID карты сети."
 
-#: include/classes/api/services/CMediatype.php:447
+#: include/classes/api/services/CMediatype.php:445
 msgid "Empty media type ID."
 msgstr "Пустой ID типа оповещений."
 
@@ -6426,8 +6426,8 @@ msgid "Field \"%1$s\" is missing a value for map \"%2$s\"."
 msgstr "В поле \"%1$s\" пропущено значение у карты сети \"%2$s\"."
 
 #: include/classes/api/services/CMediatype.php:197
-#: include/classes/api/services/CMediatype.php:539
-#: include/classes/api/services/CMediatype.php:1198
+#: include/classes/api/services/CMediatype.php:537
+#: include/classes/api/services/CMediatype.php:1196
 #, c-format
 msgid "Field \"%1$s\" is missing a value for media type \"%2$s\"."
 msgstr "В поле \"%1$s\" пропущено значение типа оповещений \"%2$s\"."
@@ -6455,7 +6455,7 @@ msgstr "Поле \"%1$s\" не целое число."
 msgid "Field \"%1$s\" is not string."
 msgstr "Поле \"%1$s\" не строка."
 
-#: include/classes/api/services/CMediatype.php:1192
+#: include/classes/api/services/CMediatype.php:1190
 #, c-format
 msgid "Field \"%1$s\" is required for media type \"%2$s\"."
 msgstr "Поле \"%1$s\" обязательно у типа оповещений \"%2$s\"."
@@ -7733,7 +7733,7 @@ msgstr "Узел сети с таким же именем \"%1$s\" уже сущ
 msgid "Host with the same visible name \"%1$s\" already exists."
 msgstr "Узел сети с таким же видимым именем \"%1$s\" уже существует."
 
-#: app/controllers/CControllerHostView.php:200
+#: app/controllers/CControllerHostView.php:204
 #: app/controllers/CControllerPopupGeneric.php:116
 #: app/controllers/CControllerPopupGeneric.php:140
 #: app/partials/common.filter.trigger.php:68
@@ -8441,7 +8441,7 @@ msgstr "В функцию переданы некорректные аргуме
 #: include/classes/api/services/CMap.php:1228
 #: include/classes/api/services/CMap.php:1448
 #: include/classes/api/services/CMediatype.php:182
-#: include/classes/api/services/CMediatype.php:478
+#: include/classes/api/services/CMediatype.php:476
 #: include/classes/api/services/CScreen.php:497
 #: include/classes/api/services/CScreen.php:571
 #: include/classes/api/services/CScreen.php:762
@@ -8731,7 +8731,7 @@ msgstr "Некорректный ID карты сети."
 msgid "Incorrect max columns provided for screen element."
 msgstr "Указано некорретное значение максимального количества колонок для элемента комплексного экрана."
 
-#: include/classes/api/services/CMediatype.php:448
+#: include/classes/api/services/CMediatype.php:446
 msgid "Incorrect media type ID."
 msgstr "Некорректный ID типа оповещений."
 
@@ -9031,21 +9031,21 @@ msgstr "Некорректное значение \"%1$s\" для поля це�
 msgid "Incorrect value \"%1$s\" in field \"%2$s\" for correlation \"%3$s\"."
 msgstr "Некорректное значение \"%1$s\" в поле \"%2$s\" у корреляции \"%3$s\"."
 
-#: include/classes/api/services/CMediatype.php:238
-#: include/classes/api/services/CMediatype.php:249
-#: include/classes/api/services/CMediatype.php:268
-#: include/classes/api/services/CMediatype.php:284
-#: include/classes/api/services/CMediatype.php:300
-#: include/classes/api/services/CMediatype.php:319
-#: include/classes/api/services/CMediatype.php:359
-#: include/classes/api/services/CMediatype.php:559
-#: include/classes/api/services/CMediatype.php:572
-#: include/classes/api/services/CMediatype.php:591
-#: include/classes/api/services/CMediatype.php:608
-#: include/classes/api/services/CMediatype.php:625
-#: include/classes/api/services/CMediatype.php:645
-#: include/classes/api/services/CMediatype.php:685
-#: include/classes/api/services/CMediatype.php:1174
+#: include/classes/api/services/CMediatype.php:236
+#: include/classes/api/services/CMediatype.php:247
+#: include/classes/api/services/CMediatype.php:266
+#: include/classes/api/services/CMediatype.php:282
+#: include/classes/api/services/CMediatype.php:298
+#: include/classes/api/services/CMediatype.php:317
+#: include/classes/api/services/CMediatype.php:357
+#: include/classes/api/services/CMediatype.php:557
+#: include/classes/api/services/CMediatype.php:570
+#: include/classes/api/services/CMediatype.php:589
+#: include/classes/api/services/CMediatype.php:606
+#: include/classes/api/services/CMediatype.php:623
+#: include/classes/api/services/CMediatype.php:643
+#: include/classes/api/services/CMediatype.php:683
+#: include/classes/api/services/CMediatype.php:1172
 #, c-format
 msgid "Incorrect value \"%1$s\" in field \"%2$s\" for media type \"%3$s\"."
 msgstr "Некорректное значение \"%1$s\" в поле \"%2$s\" у типа оповещений \"%3$s\"."
@@ -9207,24 +9207,24 @@ msgstr "Некорректное значение для \"%1$s\" поля."
 #: include/classes/api/services/CMap.php:680
 #: include/classes/api/services/CMap.php:1139
 #: include/classes/api/services/CMap.php:1145
-#: include/classes/api/services/CMediatype.php:370
-#: include/classes/api/services/CMediatype.php:380
-#: include/classes/api/services/CMediatype.php:389
-#: include/classes/api/services/CMediatype.php:396
-#: include/classes/api/services/CMediatype.php:405
-#: include/classes/api/services/CMediatype.php:414
-#: include/classes/api/services/CMediatype.php:420
-#: include/classes/api/services/CMediatype.php:482
-#: include/classes/api/services/CMediatype.php:697
-#: include/classes/api/services/CMediatype.php:707
-#: include/classes/api/services/CMediatype.php:714
-#: include/classes/api/services/CMediatype.php:723
-#: include/classes/api/services/CMediatype.php:730
-#: include/classes/api/services/CMediatype.php:740
-#: include/classes/api/services/CMediatype.php:749
-#: include/classes/api/services/CMediatype.php:755
-#: include/classes/api/services/CMediatype.php:786
-#: include/classes/api/services/CMediatype.php:793
+#: include/classes/api/services/CMediatype.php:368
+#: include/classes/api/services/CMediatype.php:378
+#: include/classes/api/services/CMediatype.php:387
+#: include/classes/api/services/CMediatype.php:394
+#: include/classes/api/services/CMediatype.php:403
+#: include/classes/api/services/CMediatype.php:412
+#: include/classes/api/services/CMediatype.php:418
+#: include/classes/api/services/CMediatype.php:480
+#: include/classes/api/services/CMediatype.php:695
+#: include/classes/api/services/CMediatype.php:705
+#: include/classes/api/services/CMediatype.php:712
+#: include/classes/api/services/CMediatype.php:721
+#: include/classes/api/services/CMediatype.php:728
+#: include/classes/api/services/CMediatype.php:738
+#: include/classes/api/services/CMediatype.php:747
+#: include/classes/api/services/CMediatype.php:753
+#: include/classes/api/services/CMediatype.php:784
+#: include/classes/api/services/CMediatype.php:791
 #: include/classes/api/services/CProxy.php:558
 #: include/classes/api/services/CProxy.php:565
 #: include/classes/api/services/CProxy.php:578
@@ -9813,18 +9813,16 @@ msgstr "Ошибочный второй параметр."
 #: include/classes/import/validators/C42XmlValidator.php:1336
 #: include/classes/import/validators/C44XmlValidator.php:1741
 #: include/classes/import/validators/C44XmlValidator.php:2023
-#: include/classes/import/validators/C44XmlValidator.php:2133
-#: include/classes/import/validators/C44XmlValidator.php:2153
-#: include/classes/import/validators/C44XmlValidator.php:2177
-#: include/classes/import/validators/C44XmlValidator.php:2219
-#: include/classes/import/validators/C44XmlValidator.php:2280
+#: include/classes/import/validators/C44XmlValidator.php:2135
+#: include/classes/import/validators/C44XmlValidator.php:2155
+#: include/classes/import/validators/C44XmlValidator.php:2179
+#: include/classes/import/validators/C44XmlValidator.php:2221
 #: include/classes/import/validators/C50XmlValidator.php:1884
 #: include/classes/import/validators/C50XmlValidator.php:2166
-#: include/classes/import/validators/C50XmlValidator.php:2276
-#: include/classes/import/validators/C50XmlValidator.php:2296
-#: include/classes/import/validators/C50XmlValidator.php:2320
-#: include/classes/import/validators/C50XmlValidator.php:2362
-#: include/classes/import/validators/C50XmlValidator.php:2423
+#: include/classes/import/validators/C50XmlValidator.php:2278
+#: include/classes/import/validators/C50XmlValidator.php:2298
+#: include/classes/import/validators/C50XmlValidator.php:2322
+#: include/classes/import/validators/C50XmlValidator.php:2364
 #: include/classes/import/validators/CXmlValidatorGeneral.php:133
 #: include/classes/import/validators/CXmlValidatorGeneral.php:152
 #: include/classes/import/validators/CXmlValidatorGeneral.php:171
@@ -11210,9 +11208,9 @@ msgid "Media type"
 msgstr "Способ оповещений"
 
 #: include/classes/api/services/CMediatype.php:207
-#: include/classes/api/services/CMediatype.php:223
-#: include/classes/api/services/CMediatype.php:502
-#: include/classes/api/services/CMediatype.php:514
+#: include/classes/api/services/CMediatype.php:221
+#: include/classes/api/services/CMediatype.php:500
+#: include/classes/api/services/CMediatype.php:512
 #, c-format
 msgid "Media type \"%1$s\" already exists."
 msgstr "Тип медиа \"%1$s\" уже существует."
@@ -11275,7 +11273,7 @@ msgstr "Способ оповещения с ID \"%1$s\" недоступен."
 msgid "Media types"
 msgstr "Способы оповещений"
 
-#: include/classes/api/services/CMediatype.php:1142
+#: include/classes/api/services/CMediatype.php:1140
 #, c-format
 msgid "Media types used by action \"%1$s\"."
 msgstr "Способы оповещения используются действием \"%1$s\"."
@@ -11970,7 +11968,7 @@ msgstr "Не задано \"%1$s\" для графика."
 msgid "No \"%1$s\" given for map."
 msgstr "Не указан \"%1$s\" у карты сети."
 
-#: include/classes/api/services/CMediatype.php:446
+#: include/classes/api/services/CMediatype.php:444
 #, c-format
 msgid "No \"%1$s\" given for media type."
 msgstr "Не указан \"%1$s\" у типа оповещений."
@@ -12359,7 +12357,7 @@ msgstr "Нет прав доступа в систему."
 #: include/classes/api/services/CMap.php:1561
 #: include/classes/api/services/CMap.php:1999
 #: include/classes/api/services/CMap.php:2061
-#: include/classes/api/services/CMediatype.php:471
+#: include/classes/api/services/CMediatype.php:469
 #: include/classes/api/services/CModule.php:224
 #: include/classes/api/services/CProxy.php:163
 #: include/classes/api/services/CProxy.php:253
@@ -12921,7 +12919,7 @@ msgstr "Только Супер Администраторы могут созд
 msgid "Only Super Admins can create user groups."
 msgstr "Только Супер Администраторы могут создавать группы пользователей."
 
-#: include/classes/api/services/CMediatype.php:1132
+#: include/classes/api/services/CMediatype.php:1130
 msgid "Only Super Admins can delete media types."
 msgstr "Только Супер Администраторы могут удалять способы оповещения."
 
@@ -12929,7 +12927,7 @@ msgstr "Только Супер Администраторы могут удал
 msgid "Only Super Admins can delete user groups."
 msgstr "Только Супер Администраторы могут удалять группы пользователей."
 
-#: include/classes/api/services/CMediatype.php:437
+#: include/classes/api/services/CMediatype.php:435
 msgid "Only Super Admins can edit media types."
 msgstr "Только Супер Администраторы могут менять способы оповещения."
 
@@ -15373,8 +15371,8 @@ msgstr "Имя скрипта \"%1$s\" уже используется в пут
 msgid "Script parameters"
 msgstr "Параметры скрипта"
 
-#: include/classes/api/services/CMediatype.php:334
-#: include/classes/api/services/CMediatype.php:660
+#: include/classes/api/services/CMediatype.php:332
+#: include/classes/api/services/CMediatype.php:658
 #, c-format
 msgid "Script parameters \"%1$s\" are missing the last new line feed for media type \"%2$s\"."
 msgstr "Пропущен символ новой строки в параметрах скрипта \"%1$s\" для типа оповещений \"%2$s\"."
@@ -19667,12 +19665,10 @@ msgstr "все способы оповещения"
 #: include/classes/api/services/CItemGeneral.php:2276
 #: include/classes/api/services/CItemGeneral.php:2298
 #: include/classes/api/services/CModule.php:291
-#: include/classes/import/validators/C44XmlValidator.php:2133
-#: include/classes/import/validators/C44XmlValidator.php:2153
-#: include/classes/import/validators/C44XmlValidator.php:2280
-#: include/classes/import/validators/C50XmlValidator.php:2276
-#: include/classes/import/validators/C50XmlValidator.php:2296
-#: include/classes/import/validators/C50XmlValidator.php:2423
+#: include/classes/import/validators/C44XmlValidator.php:2135
+#: include/classes/import/validators/C44XmlValidator.php:2155
+#: include/classes/import/validators/C50XmlValidator.php:2278
+#: include/classes/import/validators/C50XmlValidator.php:2298
 #: include/classes/import/validators/CXmlValidatorGeneral.php:252
 #: include/classes/validators/CApiInputValidator.php:441
 #: include/classes/validators/CApiInputValidator.php:573
@@ -19844,14 +19840,14 @@ msgstr "нельзя изменить"
 #: include/classes/api/services/CMapElement.php:106
 #: include/classes/api/services/CMapElement.php:125
 #: include/classes/api/services/CMapElement.php:163
-#: include/classes/api/services/CMediatype.php:371
-#: include/classes/api/services/CMediatype.php:390
-#: include/classes/api/services/CMediatype.php:406
-#: include/classes/api/services/CMediatype.php:482
-#: include/classes/api/services/CMediatype.php:698
-#: include/classes/api/services/CMediatype.php:724
-#: include/classes/api/services/CMediatype.php:741
-#: include/classes/api/services/CMediatype.php:793
+#: include/classes/api/services/CMediatype.php:369
+#: include/classes/api/services/CMediatype.php:388
+#: include/classes/api/services/CMediatype.php:404
+#: include/classes/api/services/CMediatype.php:480
+#: include/classes/api/services/CMediatype.php:696
+#: include/classes/api/services/CMediatype.php:722
+#: include/classes/api/services/CMediatype.php:739
+#: include/classes/api/services/CMediatype.php:791
 #: include/classes/api/services/CProxy.php:578
 #: include/classes/api/services/CProxy.php:584
 #: include/classes/api/services/CTriggerGeneral.php:703
@@ -20436,15 +20432,15 @@ msgstr "мс"
 msgid "must be a valid LDAP user"
 msgstr "должен быть действительным пользователем LDAP"
 
-#: include/classes/api/services/CMediatype.php:381
-#: include/classes/api/services/CMediatype.php:397
-#: include/classes/api/services/CMediatype.php:415
-#: include/classes/api/services/CMediatype.php:421
-#: include/classes/api/services/CMediatype.php:708
-#: include/classes/api/services/CMediatype.php:715
-#: include/classes/api/services/CMediatype.php:731
-#: include/classes/api/services/CMediatype.php:750
-#: include/classes/api/services/CMediatype.php:756
+#: include/classes/api/services/CMediatype.php:379
+#: include/classes/api/services/CMediatype.php:395
+#: include/classes/api/services/CMediatype.php:413
+#: include/classes/api/services/CMediatype.php:419
+#: include/classes/api/services/CMediatype.php:706
+#: include/classes/api/services/CMediatype.php:713
+#: include/classes/api/services/CMediatype.php:729
+#: include/classes/api/services/CMediatype.php:748
+#: include/classes/api/services/CMediatype.php:754
 #: include/classes/api/services/CScreen.php:401
 #, c-format
 msgid "must be between \"%1$s\" and \"%2$s\""
@@ -20688,7 +20684,7 @@ msgstr "краткое описание"
 #: include/classes/api/services/CItemGeneral.php:2262
 #: include/classes/api/services/CMaintenance.php:495
 #: include/classes/api/services/CMaintenance.php:717
-#: include/classes/api/services/CMediatype.php:786
+#: include/classes/api/services/CMediatype.php:784
 #: include/classes/api/services/CProxy.php:664
 #: include/classes/api/services/CProxy.php:790
 #: include/classes/api/services/CTriggerGeneral.php:709
@@ -20849,8 +20845,8 @@ msgstr "начните печатать для поиска"
 msgid "unacceptable URL"
 msgstr "неприемлемый URL"
 
-#: include/classes/import/validators/C44XmlValidator.php:2220
-#: include/classes/import/validators/C50XmlValidator.php:2363
+#: include/classes/import/validators/C44XmlValidator.php:2222
+#: include/classes/import/validators/C50XmlValidator.php:2365
 #: include/classes/import/validators/CXmlValidatorGeneral.php:267
 #, c-format
 msgid "unexpected constant \"%1$s\""
@@ -20858,8 +20854,8 @@ msgstr "неожиданная константа \"%1$s\""
 
 #: include/classes/export/CConfigurationExportBuilder.php:105
 #: include/classes/import/converters/CConstantImportConverter.php:60
-#: include/classes/import/validators/C44XmlValidator.php:2178
-#: include/classes/import/validators/C50XmlValidator.php:2321
+#: include/classes/import/validators/C44XmlValidator.php:2180
+#: include/classes/import/validators/C50XmlValidator.php:2323
 #, c-format
 msgid "unexpected constant value \"%1$s\""
 msgstr "неожиданное значение константы \"%1$s\""
