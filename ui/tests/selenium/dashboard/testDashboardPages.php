@@ -630,6 +630,12 @@ class testDashboardPages extends CWebTest {
 		}
 	}
 
+	/**
+	 * Open page popup menu.
+	 *
+	 * @param string $page_name		page name where to open menu
+	 * @param integer $index		number of page that has duplicated name
+	 */
 	private function openPageMenu($page_name, $index = 1) {
 		$selector = '//ul[@class="sortable-list"]//span[@title='.CXPathHelper::escapeQuotes($page_name);
 
@@ -640,6 +646,12 @@ class testDashboardPages extends CWebTest {
 		$this->query('xpath:('.$selector.']/following-sibling::button)['.$index.']')->waitUntilPresent()->one()->click()->waitUntilVisible();
 	}
 
+	/**
+	 * Select page by name.
+	 *
+	 * @param string $page_name		page name where to open menu
+	 * @param integer $index		number of page that has duplicated name
+	 */
 	private function selectPage($page_name, $index = 1) {
 		$selection = '//ul[@class="sortable-list"]//span[@title=';
 		$this->query('xpath:('.$selection.CXPathHelper::escapeQuotes($page_name).'])['.$index.']')
@@ -648,11 +660,23 @@ class testDashboardPages extends CWebTest {
 				->one()->waitUntilPresent();
 	}
 
+	/**
+	 * Select action from pages popup menu.
+	 *
+	 * @param string $page_name		page name where to open menu
+	 * @param string $menu_item		action name
+	 * @param integer $index		number of page that has duplicated name
+	 */
 	private function selectPageAction($page_name, $menu_item, $index = 1) {
 		$this->openPageMenu($page_name, $index);
 		$this->query('xpath://ul[@role="menu"]')->waitUntilVisible()->asPopupMenu()->one()->select($menu_item);
 	}
 
+	/**
+	 * Get pages names.
+	 *
+	 * @return string
+	 */
 	private function getTitles() {
 		$pages = $this->query('xpath:.//li[@class="sortable-item"]')->all();
 		if ($pages->count() > 0) {
@@ -660,6 +684,9 @@ class testDashboardPages extends CWebTest {
 		}
 	}
 
+	/**
+	 * Checks dashboard page properties.
+	 */
 	private function checkPageProperties() {
 		$page_dialog = COverlayDialogElement::find()->waitUntilVisible()->one();
 		$page_form = $page_dialog->query('name:dashboard_page_properties_form')->asForm()->one();
