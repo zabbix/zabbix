@@ -5330,9 +5330,10 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 
 			zbx_audit_httptest_update_json_add_data(httptest->httptestid, httptest->templateid,
 					httptest->name, httptest->delay, (int)httptest->status, httptest->agent,
-					(int)httptest->authentication, httptest->http_user, httptest->http_proxy,
-					httptest->retries, httptest->ssl_cert_file, httptest->ssl_key_file,
-					httptest->verify_peer, httptest->verify_host, hostid);
+					(int)httptest->authentication, httptest->http_user, httptest->http_password,
+					httptest->http_proxy, httptest->retries, httptest->ssl_cert_file,
+					httptest->ssl_key_file, httptest->ssl_key_password, httptest->verify_peer,
+					httptest->verify_host, hostid);
 
 			for (j = 0; j < httptest->httpsteps.values_num; j++)
 			{
