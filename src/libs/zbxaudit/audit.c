@@ -304,26 +304,50 @@ void	zbx_audit_flush(void)
 
 static int	audit_field_default(const char *table_name, const char *field_name, const char *value, uint64_t id)
 {
-	int			ret = FAIL;
-	const ZBX_TABLE		*table;
-	const ZBX_FIELD		*field;
+	static ZBX_THREAD_LOCAL char		cached_table_name[ZBX_TABLENAME_LEN_MAX];
+	static ZBX_THREAD_LOCAL const ZBX_TABLE	*table = NULL;
+	const ZBX_FIELD				*field;
 
-	if (NULL != table_name && NULL != (table = DBget_table(table_name)) &&
-			NULL != (field = DBget_field(table, field_name)))
+	if (NULL == table_name)
+		return FAIL;
+
+	/* Often 'table_name' stays the same and only 'field_name' changes in successive calls of this function. */
+	/* Here a simple caching of DBget_table() result is implemented. We rely on static array 'cached_table_name' */
+	/* initialization with zero bytes, i.e. with empty string. */
+
+	if ('\0' == cached_table_name[0] || 0 != strcmp(cached_table_name, table_name))
 	{
-		if (NULL != value && NULL != field->default_value && (0 == strcmp(value, field->default_value) ||
+		if (NULL == (table = DBget_table(table_name)))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "%s(): cannot find table '%s'", __func__, table_name);
+			THIS_SHOULD_NEVER_HAPPEN;
+			return FAIL;
+		}
+
+		zbx_strlcpy(cached_table_name, table_name, sizeof(cached_table_name));
+	}
+
+	if (NULL == (field = DBget_field(table, field_name)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "%s(): table '%s', cannot find field '%s'", __func__, table_name,
+				field_name);
+		THIS_SHOULD_NEVER_HAPPEN;
+		return FAIL;
+	}
+
+	if (NULL != field->default_value)
+	{
+		if (NULL != value && (0 == strcmp(value, field->default_value) ||
 				(ZBX_TYPE_FLOAT == field->type && SUCCEED == zbx_double_compare(atof(value),
 				atof(field->default_value)))))
 		{
-			ret = SUCCEED;
-		}
-		else if ((NULL == value || (ZBX_TYPE_ID == field->type && 0 == id)) && NULL == field->default_value)
-		{
-			ret = SUCCEED;
+			return SUCCEED;
 		}
 	}
+	else if (NULL == value || (ZBX_TYPE_ID == field->type && 0 == id))
+		return SUCCEED;
 
-	return ret;
+	return FAIL;
 }
 
 void	zbx_audit_update_json_append_string(const zbx_uint64_t id, const char *audit_op, const char *key,
