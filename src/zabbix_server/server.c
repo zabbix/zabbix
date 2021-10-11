@@ -178,7 +178,9 @@ static char	shortopts[] = "c:hVR:f";
 int		threads_num = 0;
 pid_t		*threads = NULL;
 static int	*threads_flags;
+
 static int	ha_status = ZBX_NODE_STATUS_UNKNOWN;
+zbx_cuid_t	ha_sessionid;
 
 unsigned char			program_type	= ZBX_PROGRAM_TYPE_SERVER;
 ZBX_THREAD_LOCAL unsigned char	process_type	= ZBX_PROCESS_TYPE_UNKNOWN;
@@ -1535,6 +1537,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
+
+	zbx_new_cuid(ha_sessionid.str);
 
 #ifdef HAVE_NETSNMP
 #	define SNMP_FEATURE_STATUS	"YES"

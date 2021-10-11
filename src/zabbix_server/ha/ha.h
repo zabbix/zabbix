@@ -20,6 +20,8 @@
 #ifndef ZABBIX_HA_H
 #define ZABBIX_HAH_H
 
+#include "common.h"
+
 #define ZBX_IPC_SERVICE_HA	"haservice"
 
 #define ZBX_IPC_SERVICE_HA_REGISTER		0
@@ -36,6 +38,16 @@
 #define ZBX_NODE_STATUS_STOPPED		1
 #define ZBX_NODE_STATUS_UNAVAILABLE	2
 #define ZBX_NODE_STATUS_ACTIVE		3
+
+typedef struct
+{
+	char	str[CUID_LEN];
+}
+zbx_cuid_t;
+
+#define zbx_cuid_empty(a)	('\0' == *(a).str ? SUCCEED : FAIL)
+#define zbx_cuid_compare(a, b)	(0 == memcmp((a).str, (b).str, CUID_LEN) ? SUCCEED : FAIL)
+#define zbx_cuid_clear(a)	memset((a).str, 0, CUID_LEN)
 
 int	zbx_ha_start(char **error, int ha_status);
 int	zbx_ha_pause(char **error);
