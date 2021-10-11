@@ -195,11 +195,10 @@ static void	elastic_log_error(CURL *handle, CURLcode error, const char *errbuf)
 {
 	char		http_status[MAX_STRING_LEN];
 	long int	http_code;
-	CURLcode	curl_err;
 
 	if (CURLE_HTTP_RETURNED_ERROR == error)
 	{
-		if (CURLE_OK == (curl_err = curl_easy_getinfo(handle, CURLINFO_RESPONSE_CODE, &http_code)))
+		if (CURLE_OK == curl_easy_getinfo(handle, CURLINFO_RESPONSE_CODE, &http_code))
 			zbx_snprintf(http_status, sizeof(http_status), "HTTP status code: %ld", http_code);
 		else
 			zbx_strlcpy(http_status, "unknown HTTP status code", sizeof(http_status));

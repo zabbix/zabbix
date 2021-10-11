@@ -1226,7 +1226,7 @@ static int	lld_function_make(const zbx_lld_function_t *function_proto, zbx_vecto
 		char **error)
 {
 	int			i, ret;
-	zbx_lld_function_t	*function = NULL;
+	zbx_lld_function_t	*function;
 	char			*proto_parameter = NULL;
 
 	for (i = 0; i < functions->values_num; i++)
@@ -1722,7 +1722,7 @@ static void 	lld_trigger_dependency_make(const zbx_lld_trigger_prototype_t *trig
 {
 	zbx_lld_trigger_t			*trigger, *dep_trigger;
 	const zbx_lld_trigger_prototype_t	*dep_trigger_prototype;
-	zbx_lld_dependency_t			*dependency = NULL;
+	zbx_lld_dependency_t			*dependency;
 	zbx_uint64_t				triggerid_up;
 	int					i, j, index;
 
@@ -3378,7 +3378,7 @@ static void	lld_trigger_cache_add_trigger_node(zbx_hashset_t *cache, zbx_lld_tri
 	trigger_node_local.trigger_ref.triggerid = trigger->triggerid;
 	trigger_node_local.trigger_ref.trigger = trigger;
 
-	if (NULL != (trigger_node = (zbx_lld_trigger_node_t *)zbx_hashset_search(cache, &trigger_node_local)))
+	if (NULL != zbx_hashset_search(cache, &trigger_node_local))
 		return;
 
 	trigger_node = lld_trigger_cache_append(cache, trigger->triggerid, trigger);

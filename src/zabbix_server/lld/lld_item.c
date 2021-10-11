@@ -1103,7 +1103,7 @@ static void	lld_item_dependencies_get(const zbx_vector_ptr_t *item_prototypes, z
 
 		while (NULL != (row = DBfetch(result)))
 		{
-			zbx_item_dependence_t	*dependence = NULL;
+			zbx_item_dependence_t	*dependence;
 			zbx_uint64_t		itemid, master_itemid;
 			unsigned int		item_flags;
 

@@ -830,7 +830,7 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 {
 	char			*buffer = NULL;
 	int			i;
-	zbx_lld_host_t		*host = NULL;
+	zbx_lld_host_t		*host;
 	zbx_vector_db_tag_ptr_t	tmp_tags;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -1224,7 +1224,7 @@ static zbx_lld_group_t	*lld_group_make(zbx_vector_ptr_t *groups, zbx_uint64_t gr
 {
 	char		*buffer = NULL;
 	int		i;
-	zbx_lld_group_t	*group = NULL;
+	zbx_lld_group_t	*group;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -3953,7 +3953,7 @@ static void	lld_interface_make(zbx_vector_ptr_t *interfaces, zbx_uint64_t parent
 		const char *privpassphrase, unsigned char authprotocol, unsigned char privprotocol,
 		const char *contextname)
 {
-	zbx_lld_interface_t	*interface = NULL;
+	zbx_lld_interface_t	*interface;
 	int			i;
 
 	for (i = 0; i < interfaces->values_num; i++)

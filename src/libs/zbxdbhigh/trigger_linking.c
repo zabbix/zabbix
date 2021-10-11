@@ -363,12 +363,11 @@ static int	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const zb
 	while (NULL != (row = DBfetch(result)))
 	{
 		zbx_uint64_pair_t			map_id;
-		resolve_dependencies_triggers_flags_t	*found, temp_t;
+		resolve_dependencies_triggers_flags_t	temp_t;
 
 		ZBX_STR2UINT64(temp_t.triggerid, row[0]);
 
-		if (NULL == (found = (resolve_dependencies_triggers_flags_t *)zbx_hashset_search(triggers_flags,
-				&temp_t)))
+		if (NULL == zbx_hashset_search(triggers_flags, &temp_t))
 		{
 			resolve_dependencies_triggers_flags_t	local_temp_t;
 

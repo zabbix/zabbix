@@ -319,7 +319,6 @@ static void	set_daemon_signal_handlers(void)
  ******************************************************************************/
 int	daemon_start(int allow_root, const char *user, unsigned int flags)
 {
-	pid_t		pid;
 	struct passwd	*pwd;
 
 	if (0 == allow_root && 0 == getuid())	/* running as root? */
@@ -376,7 +375,7 @@ int	daemon_start(int allow_root, const char *user, unsigned int flags)
 
 	if (0 == (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
-		if (0 != (pid = zbx_fork()))
+		if (0 != zbx_fork())
 			exit(EXIT_SUCCESS);
 
 		setsid();

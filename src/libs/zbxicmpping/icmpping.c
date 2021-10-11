@@ -200,7 +200,7 @@ static int	get_interval_option(const char *fping, const char *dst, int *value, c
 			}
 
 			/* check if we hit the error message */
-			if (NULL != (p = strstr(out, " as root")))
+			if (NULL != strstr(out, " as root"))
 			{
 				zbx_rtrim(out, "\n");
 				zbx_strlcpy(error, out, max_error_len);

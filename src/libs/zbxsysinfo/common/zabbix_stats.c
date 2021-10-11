@@ -190,7 +190,7 @@ int	zbx_get_remote_zabbix_stats_queue(const char *ip, unsigned short port, const
 
 int	ZABBIX_STATS(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const char	*ip_str, *port_str, *tmp;
+	const char	*ip_str, *port_str;
 	unsigned short	port_number;
 
 	if (5 < request->nparam)
@@ -217,7 +217,7 @@ int	ZABBIX_STATS(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (SUCCEED != zbx_get_remote_zabbix_stats(ip_str, port_number, result))
 			return SYSINFO_RET_FAIL;
 	}
-	else if (0 == strcmp((tmp = get_rparam(request, 2)), ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE))
+	else if (0 == strcmp(get_rparam(request, 2), ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE))
 	{
 		if (SUCCEED != zbx_get_remote_zabbix_stats_queue(ip_str, port_number, get_rparam(request, 3),
 				get_rparam(request, 4), result))
