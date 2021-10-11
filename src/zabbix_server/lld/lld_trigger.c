@@ -2688,8 +2688,8 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 			{
 				zbx_vector_uint64_append(&del_triggerdepids, dependency->triggerdepid);
 
-				zbx_audit_trigger_update_json_delete_dependency(dependency->triggerdepid,
-						trigger->triggerid);
+				zbx_audit_trigger_update_json_remove_dependency(ZBX_FLAG_DISCOVERY_NORMAL,
+						dependency->triggerdepid, trigger->triggerid);
 				continue;
 			}
 

@@ -1,8 +1,14 @@
 Changes for 6.0.0alpha5
 
 New features:
+...G...... [ZBXNEXT-6428] moved plugins config options to separate files (akozlovs, esneiders, kalimulin, MVekslers)
 
 Bug fixes:
+..F....... [ZBX-19997] fixed too long URL error when performing background page refresh (miks)
+A......... [ZBX-20021] fixed impossibility to import media types of type script with parameters from previous versions (agriscenko)
+........S. [ZBX-19889] fixed server not updating trigger dependencies and other data during linking (arimdjonoks)
+....I..PS. [ZBX-20001] fixed crash and invalid bytecode error being generated on big-sendian systems when javascript is used; upgraded duktape to version 2.6 (vso)
+..F....... [ZBX-19419] fixed not refreshing graph widgets on dashboards (averza)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.0alpha4
@@ -139,6 +145,10 @@ New features:
 .......PS. [ZBXNEXT-6809] changed behavior of the vmware event log, the 'skip' option of the new item resets the VMware event cache (MVekslers)
 
 Bug fixes:
+..F....... [ZBX-19997] fixed too long URL error when performing background page refresh (miks)
+A......... [ZBX-20021] fixed impossibility to import media types of type script with parameters from previous versions (agriscenko)
+....I..PS. [ZBX-20001] fixed crash and invalid bytecode error being generated on big-sendian systems when javascript is used; upgraded duktape to version 2.6 (vso)
+..F....... [ZBX-19419] fixed not refreshing graph widgets on dashboards (averza)
 A......... [ZBX-19978] fixed SQL errors when trying to get count of the interfaces (Sasha)
 .........T [ZBX-19774] fixed README examples (abiba)
 .........T [ZBX-19776] fixed README file (abiba)
@@ -166,6 +176,7 @@ Bug fixes:
 Changes for 5.4.5rc1
 
 New features:
+.......... [ZBXNEXT-6750] added IgnoreURLCertErrors configuration option to web service (yurii)
 ...G...PS. [ZBXNEXT-6840] improved protocol to support Zabbix proxy configuration of size up to 16 GB; improved performance and memory usage by freeing uncompressed data as fast as possible and compressing before connection (vso)
 ...G...... [ZBXNEXT-6784] removed item being unsupported when swap is not configured (dgoloscapov)
 ..F....... [ZBXNEXT-6852] updated localization for Zabbix Support URL (agriscenko)
@@ -173,6 +184,7 @@ New features:
 .........T [ZBXNEXT-6789] added template for Travis CI (abiba)
 
 Bug fixes:
+.......PS. [ZBX-19898] fixed postgresql version decoding (yurii)
 A......... [ZBX-19954] fixed updating of the "subject" and "message" parameters in scheduled reports (Sasha)
 ........S. [ZBX-19814] added ignoring final result in case if fping quits on a signal (dgoloscapov)
 ...G...PS. [ZBX-19952] removed libmodbus linkage from server and proxy (yurii)
@@ -1194,6 +1206,10 @@ New features:
 .......PS. [ZBXNEXT-6809] changed behavior of the vmware event log, the 'skip' option of the new item resets the VMware event cache (MVekslers)
 
 Bug fixes:
+..F....... [ZBX-19997] fixed too long URL error when performing background page refresh (miks)
+A......... [ZBX-20021] fixed impossibility to import media types of type script with parameters from previous versions (agriscenko)
+...G...... [ZBX-20008] removed curl and ldap linkage from agent2 (yurii)
+....I..PS. [ZBX-20001] fixed crash and invalid bytecode error being generated on big-sendian systems when javascript is used; upgraded duktape to version 2.6 (vso)
 A......... [ZBX-19978] fixed SQL errors when trying to get count of the interfaces (Sasha)
 .........T [ZBX-19774] fixed README examples (abiba)
 .........T [ZBX-19776] fixed README file (abiba)
@@ -3451,6 +3467,8 @@ New features:
 .......PS. [ZBXNEXT-6809] changed behavior of the vmware event log, the 'skip' option of the new item resets the VMware event cache (MVekslers)
 
 Bug fixes:
+.......PS. [ZBX-19428] fixed high CPU usage and preprocessing workers exiting with timeout when starting numerous poller, trapper and discoverer processes (vso)
+...G...... [ZBX-19510] fixed re-reading of old Windows events for various Windows event system synchronization problems (MVekslers)
 ........S. [ZBX-19457] fixed failed query when updating application names longer than 255 characters (asestakovs)
 
 --------------------------------------------------------------------------------
