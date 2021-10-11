@@ -139,7 +139,7 @@ static int	zbx_socket_peer_ip_save(zbx_socket_t *s)
 #ifdef HAVE_IPV6
 void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
 {
-	struct addrinfo	hints, *ai;
+	struct addrinfo	hints, *ai = NULL;
 
 	assert(ip);
 
@@ -149,16 +149,17 @@ void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
 	if (0 != getaddrinfo(ip, NULL, &hints, &ai))
 	{
 		host[0] = '\0';
-
-		return;
+		goto out;
 	}
 
 	if (0 != getnameinfo(ai->ai_addr, ai->ai_addrlen, host, hostlen, NULL, 0, NI_NAMEREQD))
 	{
 		host[0] = '\0';
+		goto out;
 	}
-
-	freeaddrinfo(ai);
+out:
+	if (NULL != ai)
+		freeaddrinfo(ai);
 }
 #else
 void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
@@ -504,7 +505,8 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 		int timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2)
 {
 	int		ret = FAIL;
-	struct addrinfo	*ai,*ai_bind, hints;
+	struct addrinfo	*ai = NULL, hints;
+	struct addrinfo	*ai_bind = NULL;
 	char		service[8], *error = NULL;
 	void		(*func_socket_close)(zbx_socket_t *s);
 
@@ -537,14 +539,14 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 	if (0 != getaddrinfo(ip, service, &hints, &ai))
 	{
 		zbx_set_socket_strerror("cannot resolve [%s]", ip);
-		goto out3;
+		goto out;
 	}
 
 	if (ZBX_SOCKET_ERROR == (s->socket = socket(ai->ai_family, ai->ai_socktype | SOCK_CLOEXEC, ai->ai_protocol)))
 	{
 		zbx_set_socket_strerror("cannot create socket [[%s]:%hu]: %s",
 				ip, port, strerror_from_system(zbx_socket_last_error()));
-		goto out2;
+		goto out;
 	}
 
 #if !defined(_WINDOWS) && !SOCK_CLOEXEC
@@ -568,14 +570,14 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 		{
 			zbx_set_socket_strerror("invalid source IP address [%s]", source_ip);
 			func_socket_close(s);
-			goto out2;
+			goto out;
 		}
 
 		if (ZBX_PROTO_ERROR == zbx_bind(s->socket, ai_bind->ai_addr, ai_bind->ai_addrlen))
 		{
 			zbx_set_socket_strerror("bind() failed: %s", strerror_from_system(zbx_socket_last_error()));
 			func_socket_close(s);
-			goto out1;
+			goto out;
 		}
 	}
 
@@ -584,7 +586,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 		func_socket_close(s);
 		zbx_set_socket_strerror("cannot connect to [[%s]:%hu]: %s", ip, port, error);
 		zbx_free(error);
-		goto out1;
+		goto out;
 	}
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -594,7 +596,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 		zbx_tcp_close(s);
 		zbx_set_socket_strerror("TCP successful, cannot establish TLS to [[%s]:%hu]: %s", ip, port, error);
 		zbx_free(error);
-		goto out1;
+		goto out;
 	}
 #else
 	ZBX_UNUSED(tls_arg1);
@@ -603,13 +605,13 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 	zbx_strlcpy(s->peer, ip, sizeof(s->peer));
 
 	ret = SUCCEED;
-out1:
-	if (NULL != ai_bind)
-		freeaddrinfo(ai_bind);
-out2:
+out:
 	if (NULL != ai)
 		freeaddrinfo(ai);
-out3:
+
+	if (NULL != ai_bind)
+		freeaddrinfo(ai_bind);
+
 	return ret;
 }
 #else
@@ -986,7 +988,7 @@ void	zbx_tcp_close(zbx_socket_t *s)
 #ifdef HAVE_IPV6
 int	get_address_family(const char *addr, int *family, char *error, int max_error_len)
 {
-	struct addrinfo	hints, *ai;
+	struct addrinfo	hints, *ai = NULL;
 	int		err, res = FAIL;
 
 	memset(&hints, 0, sizeof(hints));
@@ -997,22 +999,22 @@ int	get_address_family(const char *addr, int *family, char *error, int max_error
 	if (0 != (err = getaddrinfo(addr, NULL, &hints, &ai)))
 	{
 		zbx_snprintf(error, max_error_len, "%s: [%d] %s", addr, err, gai_strerror(err));
-		goto out2;
+		goto out;
 	}
 
 	if (PF_INET != ai->ai_family && PF_INET6 != ai->ai_family)
 	{
 		zbx_snprintf(error, max_error_len, "%s: unsupported address family", addr);
-		goto out1;
+		goto out;
 	}
 
 	*family = (int)ai->ai_family;
 
 	res = SUCCEED;
-out1:
+out:
 	if (NULL != ai)
 		freeaddrinfo(ai);
-out2:
+
 	return res;
 }
 #endif	/* HAVE_IPV6 */
