@@ -21,6 +21,7 @@
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+use Facebook\WebDriver\Exception\UnexpectedAlertOpenException;
 
 /**
  * @backup dashboard, hosts
@@ -995,7 +996,15 @@ class testFormTemplateDashboards extends CWebTest {
 	 * @dataProvider getWidgetsCreateData
 	 */
 	public function testFormTemplateDashboards_CreateWidget($data) {
-		$this->page->login()->open('zabbix.php?action=template.dashboard.edit&dashboardid='.self::$empty_dashboardid);
+		try {
+			$this->page->login()->open('zabbix.php?action=template.dashboard.edit&dashboardid='.self::$empty_dashboardid);
+		}
+		catch (UnexpectedAlertOpenException $e) {
+			// Sometimes previous test leaves dashboard edit page open.
+			$this->page->acceptAlert();
+			$this->page->login()->open('zabbix.php?action=template.dashboard.edit&dashboardid='.self::$empty_dashboardid);
+		}
+
 		$this->query('button:Add')->one()->waitUntilClickable()->click();
 		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 
@@ -1205,6 +1214,8 @@ class testFormTemplateDashboards extends CWebTest {
 			}
 
 			$this->assertEquals($created_values, $reopened_form->getFields()->asValues());
+
+			$this->closeDialogue();
 		}
 	}
 }
