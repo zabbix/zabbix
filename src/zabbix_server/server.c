@@ -1644,6 +1644,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
+	if (SUCCEED != init_database_cache(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database cache: %s", error);
+		zbx_free(error);
+		return FAIL;
+	}
+
 	zbx_check_db();
 
 	DBcheck_character_set();

@@ -4528,6 +4528,12 @@ int	init_database_cache(char **error)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	if (NULL != cache)
+	{
+		ret = SUCCEED;
+		goto out;
+	}
+
 	if (SUCCEED != (ret = zbx_mutex_create(&cache_lock, ZBX_MUTEX_CACHE, error)))
 		goto out;
 
