@@ -29,10 +29,10 @@ INSERT INTO hstgrp (groupid,name,internal) VALUES (50011,'API host group delete4
 INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (50011, 'API host prototype {#FSNAME}', 'API host prototype {#FSNAME}', 0, 2, '');
 INSERT INTO hstgrp (groupid,name,internal) VALUES (50014,'API group for host prototype',0);
 INSERT INTO host_discovery (hostid,parent_hostid,parent_itemid) VALUES (50011,NULL,40066);
-INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (108, 50011, 'API discovery group {#HV.NAME}', NULL, NULL);
+INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1080, 50011, 'API discovery group {#HV.NAME}', NULL, NULL);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (109, 50011, '', 50014, NULL);
 INSERT INTO hstgrp (groupid,name,internal,flags) VALUES (50015,'API discovery group {#HV.NAME}',0,4);
-INSERT INTO group_discovery (groupid, parent_group_prototypeid, name) VALUES (50015, 108, 'API discovery group {#HV.NAME}');
+INSERT INTO group_discovery (groupid, parent_group_prototypeid, name) VALUES (50015, 1080, 'API discovery group {#HV.NAME}');
 -- host prototype for delete
 INSERT INTO hosts (hostid, host, name, status, flags, description, custom_interfaces) VALUES (50015, 'API host prototype for delete {#FSNAME}', 'API host prototype for delete {#FSNAME}', 0, 2, '', 1);
 INSERT INTO host_discovery (hostid,parent_hostid,parent_itemid) VALUES (50015,NULL,40066);
