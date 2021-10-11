@@ -33,7 +33,6 @@ import (
 	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/dynamic"
 	"zabbix.com/pkg/plugin"
-	"zabbix.com/pkg/zbxcmd"
 	"zabbix.com/pkg/zbxerr"
 )
 
@@ -53,6 +52,8 @@ type Options struct {
 
 var impl Plugin
 
+var pluginPaths map[string]string
+
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 	if err := conf.Unmarshal(options, &p.options); err != nil {
 		p.Errf("cannot unmarshal configuration options: %s", err)
@@ -68,11 +69,11 @@ func (p *Plugin) Validate(options interface{}) error { return nil }
 
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	p.start("key")
+	// p.start(pluginPaths[key], 3*time.Second)
+	p.responseChan = make(chan interface{})
 
 	req := zmq4.NewReq(context.Background())
 	defer req.Close()
-
 	err = req.Dial(fmt.Sprintf("ipc:///tmp/%s", key))
 	if err != nil {
 		return
@@ -103,26 +104,28 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return nil, zbxerr.ErrorCannotFetchData
 	}
 }
-func (p *Plugin) start(path string, timeout time.Duration) {
-	zbxcmd.Execute(path, timeout, "")
-}
 
-func (p *Plugin) stop(path string) {
-	//TODO: stop the binary
-}
+// func (p *Plugin) start(path string, timeout time.Duration) {
+// 	fmt.Println("starting", path)
+// 	zbxcmd.Execute("/home/eriks/zabbix/src/go/dynamic/main", timeout, "")
+// }
+
+// func (p *Plugin) stop(path string) {
+// 	//TODO: stop the binary
+// }
 
 func (p *Plugin) listen(req zmq4.Socket) {
 	for {
 		msg, err := req.Recv()
 		if err != nil {
-			log.Fatalf("could not recv greeting: %v", err)
+			log.Fatalf("could not recv response: %v", err)
 			p.errChan <- err.Error()
 			return
 		}
 
 		var resp dynamic.Plugin
 
-		if err := json.Unmarshal(msg.Bytes(), &p); err != nil {
+		if err := json.Unmarshal(msg.Bytes(), &resp); err != nil {
 			p.errChan <- err.Error()
 			return
 		}
@@ -142,7 +145,7 @@ func (p *Plugin) listen(req zmq4.Socket) {
 	}
 }
 
-func RegisterDynamicPlugins(paths string) {
+func RegisterDynamicPlugins(paths []string) {
 	var plugins []plugin.Accessor
 	for _, p := range paths {
 		// TODO  start plugins and get their type / stop plugin
@@ -151,16 +154,14 @@ func RegisterDynamicPlugins(paths string) {
 
 	//TODO: for testing exporter
 	plugins = append(plugins, &impl)
-	pluginPaths["dynamic.test"] = "dynamic/main.go"
+	pluginPaths["dynamic.test"] = "dynamic/main"
 
 	//TODO: get plugin type / interface{} (EXPORTER WATCHER, etc)
 	for _, p := range plugins {
 		// get fields from dynamic plugin config ?
-		plugin.RegisterMetrics(p, "dynamic", "test", "Exporter Test")
+		plugin.RegisterMetrics(p, "Dynamic", "dynamic.test", "Exporter Test.")
 	}
 }
-
-var pluginPaths map[string]string
 
 func init() {
 	pluginPaths = make(map[string]string)

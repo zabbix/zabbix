@@ -322,7 +322,7 @@ func main() {
 	}
 
 	//TODO: read paths from config
-	dynamic.RegisterDynamicPlugins("dynamic/test.go")
+	dynamic.RegisterDynamicPlugins([]string{"dynamic/main.go"})
 
 	if argTest || argPrint {
 		var level int

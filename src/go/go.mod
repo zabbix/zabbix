@@ -13,7 +13,7 @@ require (
 	github.com/go-ldap/ldap v3.0.3+incompatible
 	github.com/go-ole/go-ole v1.2.4
 	github.com/go-sql-driver/mysql v1.5.0
-	github.com/go-zeromq/zmq4 v0.13.0 // indirect
+	github.com/go-zeromq/zmq4 v0.13.0
 	github.com/goburrow/modbus v0.1.0
 	github.com/goburrow/serial v0.1.0 // indirect
 	github.com/godbus/dbus v4.1.0+incompatible
