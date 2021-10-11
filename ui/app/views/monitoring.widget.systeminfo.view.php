@@ -25,9 +25,7 @@
 
 $output = [
 	'name' => $data['name'],
-	'body' => (new CPartial('administration.system.information',
-		CSystemInformationData::getData(CWebUser::getType() == USER_TYPE_SUPER_ADMIN)
-	))->getOutput()
+	'body' => (new CPartial('administration.system.information', $data['system_information']))->getOutput()
 ];
 
 if (($messages = getMessages()) !== null) {

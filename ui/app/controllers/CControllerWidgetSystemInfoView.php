@@ -36,6 +36,7 @@ class CControllerWidgetSystemInfoView extends CControllerWidget {
 	protected function doAction() {
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultName()),
+			'system_information' => CSystemInformationHelper::getData(CWebUser::getType() == USER_TYPE_SUPER_ADMIN),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

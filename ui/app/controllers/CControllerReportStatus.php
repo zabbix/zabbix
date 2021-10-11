@@ -35,7 +35,9 @@ class CControllerReportStatus extends CController {
 
 	protected function doAction() {
 		// no data is passed to the view
-		$response = new CControllerResponseData([]);
+		$response = new CControllerResponseData([
+			'system_information' => CSystemInformationHelper::getData(CWebUser::getType() == USER_TYPE_SUPER_ADMIN)
+		]);
 		$response->setTitle(_('System information'));
 		$this->setResponse($response);
 	}

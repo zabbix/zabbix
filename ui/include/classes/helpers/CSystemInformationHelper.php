@@ -22,7 +22,76 @@
 /**
  * Class collecting various system information aspects.
  */
-final class CSystemInformationData {
+class CSystemInformationHelper {
+	/**
+	 * Prepare data used to compile as System information.
+	 *
+	 * @param bool $for_superadmin  Include data meant for USER_TYPE_SUPER_ADMIN eyes only.
+	 *
+	 * @return array
+	 */
+	public static function getData(bool $for_superadmin = false): array {
+		global $DB, $ZBX_SERVER_STANDALONE, $ZBX_SERVER, $ZBX_SERVER_PORT;
+
+		$data = [
+			'status' => static::getServerStatus($ZBX_SERVER, (int) $ZBX_SERVER_PORT),
+			'for_superadmin' => $for_superadmin,
+			'requirements' => [],
+			'server_details' => '',
+			'float_double_precision' => $DB['DOUBLE_IEEE754'],
+			'ha_cluster_enabled' => false
+		];
+
+		$db_backend = DB::getDbBackend();
+		$data['encoding_warning'] = $db_backend->checkEncoding() ? '' : $db_backend->getWarning();
+
+		$ha_cluster_enabled = false;
+
+		if (!$ZBX_SERVER_STANDALONE) {
+			$ha_nodes = API::HaNode()->get([
+				'output' => ['name', 'address', 'port', 'lastaccess', 'status'],
+				'preservekeys' => true,
+				'sortfield' => 'status',
+				'sortorder' => 'DESC'
+			]);
+
+			$ha_cluster_enabled = (bool) $ha_nodes;
+
+			foreach ($ha_nodes as $node) {
+				if ($node['name'] === '') {
+					$ha_cluster_enabled = false;
+					$ha_nodes = [];
+					break;
+				}
+			}
+		}
+
+		$data['ha_cluster_enabled'] = $ha_cluster_enabled;
+
+		if ($ha_cluster_enabled) {
+			$failover_delay = CSettingsHelper::getGlobal(CSettingsHelper::HA_FAILOVER_DELAY);
+			$failover_delay_seconds = timeUnitToSeconds($failover_delay);
+			$data['failover_delay'] = secondsToPeriod($failover_delay_seconds);
+		}
+
+		if (!$for_superadmin) {
+			return $data;
+		}
+
+		$data['server_details'] = $ZBX_SERVER.':'.$ZBX_SERVER_PORT;
+		$data['ha_nodes'] = $ha_nodes;
+
+		$setup = new CFrontendSetup();
+		$requirements = $setup->checkRequirements();
+		$requirements[] = $setup->checkSslFiles();
+		$data['requirements'] = $requirements;
+
+		$data['dbversion_status'] = CSettingsHelper::getGlobal(CSettingsHelper::DBVERSION_STATUS);
+		$data['dbversion_status'] = $data['dbversion_status'] === '' ? [] : json_decode($data['dbversion_status']);
+
+		return $data;
+	}
+
 	/**
 	 * Get a summary of running server stats.
 	 *
@@ -31,7 +100,7 @@ final class CSystemInformationData {
 	 *
 	 * @return array
 	 */
-	final static function getServerStatus(string $ZBX_SERVER, int $ZBX_SERVER_PORT): array {
+	private static function getServerStatus(string $ZBX_SERVER, int $ZBX_SERVER_PORT): array {
 		$status = [
 			'is_running' => false,
 			'has_status' => false
@@ -174,74 +243,5 @@ final class CSystemInformationData {
 		}
 
 		return $status;
-	}
-
-	/**
-	 * Prepare data used to compile as System information.
-	 *
-	 * @param bool $for_superadmin  Include data meant for USER_TYPE_SUPER_ADMIN eyes only.
-	 *
-	 * @return array
-	 */
-	public static function getData(bool $for_superadmin = false): array {
-		global $DB, $ZBX_SERVER_STANDALONE, $ZBX_SERVER, $ZBX_SERVER_PORT;
-
-		$data = [
-			'status' => static::getServerStatus($ZBX_SERVER, (int) $ZBX_SERVER_PORT),
-			'for_superadmin' => $for_superadmin,
-			'requirements' => [],
-			'server_details' => '',
-			'float_double_precision' => $DB['DOUBLE_IEEE754'],
-			'ha_cluster_enabled' => false
-		];
-
-		$db_backend = DB::getDbBackend();
-		$data['encoding_warning'] = $db_backend->checkEncoding() ? '' : $db_backend->getWarning();
-
-		$ha_cluster_enabled = false;
-
-		if (!$ZBX_SERVER_STANDALONE) {
-			$ha_nodes = API::HaNode()->get([
-				'output' => ['name', 'address', 'port', 'lastaccess', 'status'],
-				'preservekeys' => true,
-				'sortfield' => 'status',
-				'sortorder' => 'DESC'
-			]);
-
-			$ha_cluster_enabled = (bool) $ha_nodes;
-
-			foreach ($ha_nodes as $node) {
-				if ($node['name'] === '') {
-					$ha_cluster_enabled = false;
-					$ha_nodes = [];
-					break;
-				}
-			}
-		}
-
-		$data['ha_cluster_enabled'] = $ha_cluster_enabled;
-
-		if ($ha_cluster_enabled) {
-			$failover_delay = CSettingsHelper::getGlobal(CSettingsHelper::HA_FAILOVER_DELAY);
-			$failover_delay_seconds = timeUnitToSeconds($failover_delay);
-			$data['failover_delay'] = secondsToPeriod($failover_delay_seconds);
-		}
-
-		if (!$for_superadmin) {
-			return $data;
-		}
-
-		$data['server_details'] = $ZBX_SERVER.':'.$ZBX_SERVER_PORT;
-		$data['ha_nodes'] = $ha_nodes;
-
-		$setup = new CFrontendSetup();
-		$requirements = $setup->checkRequirements();
-		$requirements[] = $setup->checkSslFiles();
-		$data['requirements'] = $requirements;
-
-		$data['dbversion_status'] = CSettingsHelper::getGlobal(CSettingsHelper::DBVERSION_STATUS);
-		$data['dbversion_status'] = $data['dbversion_status'] === '' ? [] : json_decode($data['dbversion_status']);
-
-		return $data;
 	}
 }

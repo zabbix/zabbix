@@ -27,7 +27,5 @@ require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
 $widget = (new CWidget())
 	->setTitle(_('System information'))
-	->addItem(new CPartial('administration.system.information',
-		CSystemInformationData::getData(CWebUser::getType() == USER_TYPE_SUPER_ADMIN)
-	))
+	->addItem(new CPartial('administration.system.information', $data['system_information']))
 	->show();
