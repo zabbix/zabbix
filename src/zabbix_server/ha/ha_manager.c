@@ -630,8 +630,7 @@ static int	ha_db_register_node(zbx_ha_info_t *info)
 
 	if (SUCCEED == ret)
 	{
-		char		*sql = NULL, *address = NULL, *address_esc;
-		size_t		sql_alloc = 0, sql_offset = 0;
+		char		*address = NULL, *address_esc;
 		unsigned short	port = 0;
 
 		ha_status = SUCCEED == activate ? ZBX_NODE_STATUS_ACTIVE : ZBX_NODE_STATUS_STANDBY;
@@ -639,16 +638,11 @@ static int	ha_db_register_node(zbx_ha_info_t *info)
 		ha_get_external_address(&address, &port);
 		address_esc = DBdyn_escape_string(address);
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"update ha_node set status=%d,address='%s',port=%d,lastaccess="
+		(void)DBexecute_once("update ha_node set status=%d,address='%s',port=%d,lastaccess="
 				ZBX_DB_TIMESTAMP() " where ha_nodeid='%s'",
 				ha_status, address_esc, port, info->nodeid.str);
-
 		zbx_free(address_esc);
 		zbx_free(address);
-
-		(void)DBexecute_once("%s", sql);
-		zbx_free(sql);
 	}
 out:
 	if (SUCCEED == ret)
