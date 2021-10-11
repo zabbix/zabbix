@@ -192,7 +192,7 @@ void	zbx_audit_item_update_json_add_data(zbx_uint64_t itemid, const zbx_template
 				"itemprototype.valuemapid", item->valuemapid, AUDIT_TABLE_NAME, "valuemapid");
 	}
 
-	ADD_JSON_UI(verify_host, AUDIT_TABLE_NAME, "valuemapid");
+	ADD_JSON_UI(verify_host, AUDIT_TABLE_NAME, "verify_host");
 	ADD_JSON_UI(verify_peer, AUDIT_TABLE_NAME, "verify_peer");
 
 	if ONLY_ITEM_PROTOTYPE
@@ -228,9 +228,11 @@ void	zbx_audit_item_update_json_add_lld_data(zbx_uint64_t itemid, const zbx_lld_
 #define ADD_JSON_P_UI(x, t, f)	zbx_audit_update_json_append_uint64(itemid, AUDIT_DETAILS_ACTION_ADD, IT(x),\
 		item_prototype->x, t, f)
 #define AUDIT_TABLE_NAME	"items"
-	zbx_audit_update_json_append_uint64(itemid, AUDIT_DETAILS_ACTION_ADD, IT(itemid), itemid, AUDIT_TABLE_NAME, "itemid");
+	zbx_audit_update_json_append_uint64(itemid, AUDIT_DETAILS_ACTION_ADD, IT(itemid), itemid, AUDIT_TABLE_NAME,
+			"itemid");
 	ADD_JSON_S(delay, AUDIT_TABLE_NAME, "delay");
-	zbx_audit_update_json_append_uint64(itemid, AUDIT_DETAILS_ACTION_ADD, IT(hostid), hostid, AUDIT_TABLE_NAME, "hostid");
+	zbx_audit_update_json_append_uint64(itemid, AUDIT_DETAILS_ACTION_ADD, IT(hostid), hostid, AUDIT_TABLE_NAME,
+			"hostid");
 	ADD_JSON_S(name, AUDIT_TABLE_NAME, "name");
 	ADD_JSON_S(key, AUDIT_TABLE_NAME, "key_");
 	ADD_JSON_P_UI(type, AUDIT_TABLE_NAME, "type");
@@ -248,12 +250,14 @@ void	zbx_audit_item_update_json_add_lld_data(zbx_uint64_t itemid, const zbx_lld_
 	ADD_JSON_S(snmp_oid, AUDIT_TABLE_NAME, "snmp_oid");
 	ADD_JSON_P_UI(authtype, AUDIT_TABLE_NAME, "authtype");
 	ADD_JSON_S(username, AUDIT_TABLE_NAME, "username");
-	zbx_audit_update_json_append_string_secret(itemid, AUDIT_DETAILS_ACTION_ADD, IT(password), item->password, AUDIT_TABLE_NAME, "password");
+	zbx_audit_update_json_append_string_secret(itemid, AUDIT_DETAILS_ACTION_ADD, IT(password), item->password,
+			AUDIT_TABLE_NAME, "password");
 	ADD_JSON_P_S(publickey, AUDIT_TABLE_NAME, "publickey");
 	ADD_JSON_P_S(privatekey, AUDIT_TABLE_NAME, "privatekey");
 	ADD_JSON_S(description, AUDIT_TABLE_NAME, "description");
 	ADD_JSON_P_UI(interfaceid, AUDIT_TABLE_NAME, "interfaceid");
-	zbx_audit_update_json_append_uint64(itemid, AUDIT_DETAILS_ACTION_ADD, "item.flags", ZBX_FLAG_DISCOVERY_CREATED, AUDIT_TABLE_NAME, "itemid");
+	zbx_audit_update_json_append_uint64(itemid, AUDIT_DETAILS_ACTION_ADD, "item.flags", ZBX_FLAG_DISCOVERY_CREATED,
+			AUDIT_TABLE_NAME, "flags");
 	ADD_JSON_S(jmx_endpoint, AUDIT_TABLE_NAME, "jmx_endpoint");
 	ADD_JSON_UI(master_itemid, AUDIT_TABLE_NAME, "master_itemid");
 	ADD_JSON_S(timeout, AUDIT_TABLE_NAME, "timeout");

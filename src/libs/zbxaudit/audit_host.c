@@ -124,8 +124,15 @@ void	zbx_audit_host_update_json_add_proxy_hostid_and_hostname_and_inventory_mode
 			AUDIT_TABLE_NAME, "proxy_hostid");
 	zbx_audit_update_json_append_string(hostid, AUDIT_DETAILS_ACTION_ADD, "host.host", hostname, AUDIT_TABLE_NAME,
 			"host");
-	zbx_audit_update_json_append_int(hostid, AUDIT_DETAILS_ACTION_ADD, "host.inventory_mode", inventory_mode, NULL,
-			NULL);
+
+	/*
+	 * Currently we hawe 3 valid values for inventory_mode: HOST_INVENTORY_DISABLED (-1), HOST_INVENTORY_MANUAL (0),
+	 * which is default value and HOST_INVENTORY_AUTOMATIC (1). In database we write only 2 of them:
+	 * HOST_INVENTORY_MANUAL and HOST_INVENTORY_AUTOMATIC. From the other side in auditlog we mast to write all of
+	 * them except default, i.e. HOST_INVENTORY_DISABLED and HOST_INVENTORY_AUTOMATIC
+	 *  */
+	zbx_audit_update_json_append_int(hostid, AUDIT_DETAILS_ACTION_ADD, "host.inventory_mode", inventory_mode,
+			"host_inventory", "inventory_mode");
 #undef AUDIT_TABLE_NAME
 }
 
