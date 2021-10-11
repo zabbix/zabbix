@@ -49,18 +49,18 @@ GRANT SELECT ON V$SYSTEM_PARAMETER TO zabbix_mon;
 ## Configuration
 The Zabbix agent 2 configuration file is used to configure plugins.
 
-**Plugins.Oracle.CallTimeout** — The maximum time in seconds for waiting when a request has to be done.  
+**Plugins.Oracle.CallTimeout** — The maximum amount of time in seconds to wait for a request to be done.  
 *Default value:* equals the global Timeout configuration parameter.  
 *Limits:* 1-30
 
-**Plugins.Oracle.ConnectTimeout** — The maximum time in seconds for waiting when a connection has to be established.  
+**Plugins.Oracle.ConnectTimeout** — The maximum amount of time in seconds to wait for a connection to be established.  
 *Default value:* equals the global Timeout configuration parameter.  
 *Limits:* 1-30
 
 **Plugins.Oracle.CustomQueriesPath** — Full pathname of a directory containing *.sql* files with custom queries.  
 *Default value:* — (the feature is disabled by default)
 
-**Plugins.Oracle.KeepAlive** — Sets a time for waiting before unused connections will be closed.  
+**Plugins.Oracle.KeepAlive** — The amount of time a connection can remain idle before it is closed.  
 *Default value:* 300 sec.  
 *Limits:* 60-900
 

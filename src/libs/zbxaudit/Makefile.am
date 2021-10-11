@@ -7,5 +7,11 @@ libzbxaudit_a_SOURCES = \
 	audit.h \
 	audit_host.c \
 	audit_host.h \
+	audit_httptest.c \
+	audit_httptest.h \
 	audit_item.c \
-	audit_item.h
+	audit_item.h \
+	audit_trigger.c \
+	audit_trigger.h \
+	audit_graph.c \
+	audit_graph.h

@@ -190,7 +190,7 @@ class CUserGroup extends CApiService {
 		self::updateTagFilters($usrgrps, __FUNCTION__);
 		self::updateUsersGroups($usrgrps, __FUNCTION__);
 
-		$this->addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_USER_GROUP, $usrgrps);
+		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_USER_GROUP, $usrgrps);
 
 		return ['usrgrpids' => $usrgrpids];
 	}
@@ -274,7 +274,7 @@ class CUserGroup extends CApiService {
 		self::updateTagFilters($usrgrps, __FUNCTION__, $db_usrgrps);
 		self::updateUsersGroups($usrgrps, __FUNCTION__, $db_usrgrps);
 
-		$this->addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER_GROUP, $usrgrps, $db_usrgrps);
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER_GROUP, $usrgrps, $db_usrgrps);
 
 		return ['usrgrpids'=> array_column($usrgrps, 'usrgrpid')];
 	}
@@ -344,7 +344,7 @@ class CUserGroup extends CApiService {
 		}
 		unset($usrgrp);
 
-		$this->addAffectedObjects($usrgrps, $db_usrgrps);
+		self::addAffectedObjects($usrgrps, $db_usrgrps);
 
 		if ($names) {
 			$this->checkDuplicates($names);
@@ -861,7 +861,7 @@ class CUserGroup extends CApiService {
 		DB::delete('users_groups', ['usrgrpid' => $usrgrpids]);
 		DB::delete('usrgrp', ['usrgrpid' => $usrgrpids]);
 
-		$this->addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_USER_GROUP, $db_usrgrps);
+		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_USER_GROUP, $db_usrgrps);
 
 		return ['usrgrpids' => $usrgrpids];
 	}
@@ -1064,10 +1064,12 @@ class CUserGroup extends CApiService {
 	/**
 	 * Add the existing rights, tag_filters and userids to $db_usrgrps whether these are affected by the update.
 	 *
+	 * @static
+	 *
 	 * @param array $usrgrps
 	 * @param array $db_usrgrps
 	 */
-	private function addAffectedObjects(array $usrgrps, array &$db_usrgrps): void {
+	private static function addAffectedObjects(array $usrgrps, array &$db_usrgrps): void {
 		$usrgrpids = ['rights' => [], 'tag_filters' => [], 'users' => []];
 
 		foreach ($usrgrps as $usrgrp) {
@@ -1095,11 +1097,8 @@ class CUserGroup extends CApiService {
 			$db_rights = DBselect(DB::makeSql('rights', $options));
 
 			while ($db_right = DBfetch($db_rights)) {
-				$db_usrgrps[$db_right['groupid']]['rights'][$db_right['rightid']] = [
-					'rightid' => $db_right['rightid'],
-					'id' => $db_right['id'],
-					'permission' => $db_right['permission']
-				];
+				$db_usrgrps[$db_right['groupid']]['rights'][$db_right['rightid']] =
+					array_diff_key($db_right, array_flip(['groupid']));
 			}
 		}
 
@@ -1111,12 +1110,8 @@ class CUserGroup extends CApiService {
 			$db_tags = DBselect(DB::makeSql('tag_filter', $options));
 
 			while ($db_tag = DBfetch($db_tags)) {
-				$db_usrgrps[$db_tag['usrgrpid']]['tag_filters'][$db_tag['tag_filterid']] = [
-					'tag_filterid' => $db_tag['tag_filterid'],
-					'groupid' => $db_tag['groupid'],
-					'tag' => $db_tag['tag'],
-					'value' => $db_tag['value']
-				];
+				$db_usrgrps[$db_tag['usrgrpid']]['tag_filters'][$db_tag['tag_filterid']] =
+					array_diff_key($db_tag, array_flip(['usrgrpid']));
 			}
 		}
 
@@ -1128,10 +1123,8 @@ class CUserGroup extends CApiService {
 			$db_users = DBselect(DB::makeSql('users_groups', $options));
 
 			while ($db_user = DBfetch($db_users)) {
-				$db_usrgrps[$db_user['usrgrpid']]['users'][$db_user['id']] = [
-					'id' => $db_user['id'],
-					'userid' => $db_user['userid']
-				];
+				$db_usrgrps[$db_user['usrgrpid']]['users'][$db_user['id']] =
+					array_diff_key($db_user, array_flip(['usrgrpid']));
 			}
 		}
 	}

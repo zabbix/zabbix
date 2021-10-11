@@ -96,7 +96,7 @@ int	get_value_agent(const DC_ITEM *item, AGENT_RESULT *result)
 
 		if (SUCCEED != zbx_tcp_send(&s, item->key))
 			ret = NETWORK_ERROR;
-		else if (FAIL != (received_len = zbx_tcp_recv_ext(&s, 0)))
+		else if (FAIL != (received_len = zbx_tcp_recv_ext(&s, 0, 0)))
 			ret = SUCCEED;
 		else if (SUCCEED == zbx_alarm_timed_out())
 			ret = TIMEOUT_ERROR;

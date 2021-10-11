@@ -1088,7 +1088,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 #endif
 	DCstrpool_replace(found, &config->config->default_timezone, row[31]);
 
-	config->config->auditlog_enabled = atoi(row[32]);
+	config->config->auditlog_enabled = atoi(row[33]);
 
 	if (SUCCEED == ret && SUCCEED == zbx_dbsync_next(sync, &rowid, &db_row, &tag))	/* table must have */
 		zabbix_log(LOG_LEVEL_ERR, "table 'config' has multiple records");	/* only one record */
@@ -9105,7 +9105,7 @@ void	zbx_dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers, int now)
 	int	i;
 
 	/* calculate new execution/evaluation time for the evaluated triggers */
-	/* (timers with reseted execution time)                               */
+	/* (timers with reset execution time)                                 */
 	for (i = 0; i < timers->values_num; i++)
 	{
 		zbx_trigger_timer_t	*timer = (zbx_trigger_timer_t *)timers->values[i];

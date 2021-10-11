@@ -275,6 +275,18 @@ class CApiInputValidatorTest extends TestCase {
 				'Invalid parameter "/1/name": value must be one of xml, json.'
 			],
 			[
+				['type' => API_STRING_UTF8, 'in' => '\\,,.'],
+				',',
+				'/1/name',
+				','
+			],
+			[
+				['type' => API_STRING_UTF8, 'in' => ''],
+				'abc',
+				'/output',
+				'Invalid parameter "/output": value must be empty.'
+			],
+			[
 				['type' => API_STRINGS_UTF8],
 				['hostid', 'name'],
 				'/output',
@@ -370,6 +382,18 @@ class CApiInputValidatorTest extends TestCase {
 				['hostid', 'name', 'name'],
 				'/output',
 				'Invalid parameter "/output/3": value (name) already exists.'
+			],
+			[
+				['type' => API_STRINGS_UTF8, 'in' => '\\,,.,/,'],
+				[',', '.', '/', ''],
+				'/output',
+				[',', '.', '/', '']
+			],
+			[
+				['type' => API_STRINGS_UTF8, 'in' => '\\,,.,/,'],
+				['abc', '.', '/', ''],
+				'/output',
+				'Invalid parameter "/output/1": value must be empty or one of ,, ., /.'
 			],
 			[
 				['type' => API_INT32],
@@ -1209,7 +1233,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_OBJECT, 'fields' => []],
 				['host' => 'Zabbix server'],
 				'/',
-				'Invalid parameter "/": unexpected parameter "host".'
+				'Invalid parameter "/": should be empty.'
 			],
 			[
 				['type' => API_OBJECT, 'fields' => [
@@ -1229,6 +1253,20 @@ class CApiInputValidatorTest extends TestCase {
 				],
 				'/',
 				'Invalid parameter "/": unexpected parameter "name".'
+			],
+			[
+				['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+					'host' => ['type' => API_STRING_UTF8]
+				]],
+				[
+					'host' => 'Zabbix server',
+					'name' => 'Zabbix server'
+				],
+				'/',
+				[
+					'host' => 'Zabbix server',
+					'name' => 'Zabbix server'
+				]
 			],
 			[
 				['type' => API_OBJECT, 'fields' => [
@@ -1422,7 +1460,13 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_OBJECTS, 'fields' => []],
 				[['host' => 'Zabbix server']],
 				'/',
-				'Invalid parameter "/1": unexpected parameter "host".'
+				'Invalid parameter "/1": should be empty.'
+			],
+			[
+				['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => []],
+				[['host' => 'Zabbix server']],
+				'/',
+				[['host' => 'Zabbix server']]
 			],
 			[
 				['type' => API_OBJECTS, 'fields' => [
@@ -3340,6 +3384,60 @@ class CApiInputValidatorTest extends TestCase {
 				'Invalid parameter "/1/ip": an IP address is expected.'
 			],
 			[
+				['type' => API_IP_RANGES],
+				'',
+				'/1/ip_range',
+				''
+			],
+			[
+				['type' => API_IP_RANGES],
+				[],
+				'/1/ip_range',
+				'Invalid parameter "/1/ip_range": a character string is expected.'
+			],
+			[
+				['type' => API_IP_RANGES],
+				true,
+				'/1/ip_range',
+				'Invalid parameter "/1/ip_range": a character string is expected.'
+			],
+			[
+				['type' => API_IP_RANGES],
+				null,
+				'/1/ip_range',
+				'Invalid parameter "/1/ip_range": a character string is expected.'
+			],
+			[
+				['type' => API_IP_RANGES],
+				'0.0.0;0',
+				'/1/ip_range',
+				'Invalid parameter "/1/ip_range": invalid address range "0.0.0;0".'
+			],
+			[
+				['type' => API_IP_RANGES],
+				'1.1.1.1',
+				'/1/ip_range',
+				'1.1.1.1'
+			],
+			[
+				['type' => API_IP_RANGES, 'length' => 11],
+				'192.168.3.5',
+				'/1/ip_range',
+				'192.168.3.5'
+			],
+			[
+				['type' => API_IP_RANGES, 'length' => 10],
+				'192.168.3.5',
+				'/1/ip_range',
+				'Invalid parameter "/1/ip_range": value is too long.'
+			],
+			[
+				['type' => API_IP_RANGES],
+				'192.168.3.5,192.168.6.240',
+				'/1/ip_range',
+				'192.168.3.5,192.168.6.240'
+			],
+			[
 				['type' => API_DNS],
 				'',
 				'/1/dns',
@@ -3379,7 +3477,7 @@ class CApiInputValidatorTest extends TestCase {
 			[
 				['type' => API_DNS, 'flags' => API_ALLOW_USER_MACRO],
 				'{$MACRO: "context"}',
-				'/1/ip',
+				'/1/dns',
 				'{$MACRO: "context"}'
 			],
 			[
@@ -3518,7 +3616,7 @@ class CApiInputValidatorTest extends TestCase {
 			[
 				['type' => API_PORT, 'flags' => API_ALLOW_USER_MACRO],
 				'{$MACRO: "context"}',
-				'/1/ip',
+				'/1/port',
 				'{$MACRO: "context"}'
 			],
 			[
@@ -4228,6 +4326,96 @@ class CApiInputValidatorTest extends TestCase {
 				null,
 				'/',
 				'Invalid parameter "/": a character string is expected.'
+			],
+			[
+				['type' => API_IMAGE],
+				null,
+				'/',
+				'Invalid parameter "/": a character string is expected.'
+			],
+			[
+				['type' => API_IMAGE],
+				1,
+				'/',
+				'Invalid parameter "/": a character string is expected.'
+			],
+			[
+				['type' => API_IMAGE],
+				true,
+				'/',
+				'Invalid parameter "/": a character string is expected.'
+			],
+			[
+				['type' => API_IMAGE],
+				"test",
+				'/',
+				'Invalid parameter "/": file format is unsupported.'
+			],
+			[
+				['type' => API_IMAGE],
+				"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQEAYAAABPYyMiAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAACXBIWXMAAAigAAAIoAAXhZTqAAAAB3RJTUUH4AsMCTElZR7X8QAAAAZiS0dEAAAAAAAA+UO7fwAAAQFJREFUSMdjYBgFQxWERq5Z/e61blZoyJp17z7o+dHP4ug1q969MFINDVuz5t3bd8KhoUD63bsLQHr9uw/G6bSz2G/N2nfPjZSBPgZZLACx+P9/VPrd+dBgYMi8N06jnsWBQB8/M5LHbzEKvRrokLNAfSuADkki32KQT17qZoANJs5ibA45B3T4ynfv9ZaR7oAooA/e6CUC4xpk0E2SHQBKI+/ezwsNB0WJ/nryQyJmzfJ3r4zLoA65QZwD3s8BJtb1796bXKJeWoA4pAKvQ96+nwAM8rXvXpucpF1uQA2Rm1CLJwLLhZXvnpvsomdBtBKYRrYB43jVu1f6c0eL5iELABMWPRgtjy4PAAAALnpUWHRkYXRlOmNyZWF0ZQAAeNozMjA00zU01DU0CjGwtDKxtDI21zYwsDIwAABB6wUWx8+KcAAAAC56VFh0ZGF0ZTptb2RpZnkAAHjaMzIwNNM1NNQ1NAoxsLQysbQyNtc2MLAyMAAAQesFFu7wIvgAAABqelRYdHN2ZzpiYXNlLXVyaQAAeNoFwQEOgyAMBdAT4Z/TLLjbVCykCVBDEa7ve1Ey/wEMaphzQoJWC/p0WNdGiUH3DQlaERszbCRYoZzdJVS0Xi6xFu5Ngjvzw2778uEp0sf7ff0dfrGRXmVvI9Or/wAOAAAAAElFTkSuQmCC",
+				'/',
+				base64_decode("iVBORw0KGgoAAAANSUhEUgAAABAAAAAQEAYAAABPYyMiAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAACXBIWXMAAAigAAAIoAAXhZTqAAAAB3RJTUUH4AsMCTElZR7X8QAAAAZiS0dEAAAAAAAA+UO7fwAAAQFJREFUSMdjYBgFQxWERq5Z/e61blZoyJp17z7o+dHP4ug1q969MFINDVuz5t3bd8KhoUD63bsLQHr9uw/G6bSz2G/N2nfPjZSBPgZZLACx+P9/VPrd+dBgYMi8N06jnsWBQB8/M5LHbzEKvRrokLNAfSuADkki32KQT17qZoANJs5ibA45B3T4ynfv9ZaR7oAooA/e6CUC4xpk0E2SHQBKI+/ezwsNB0WJ/nryQyJmzfJ3r4zLoA65QZwD3s8BJtb1796bXKJeWoA4pAKvQ96+nwAM8rXvXpucpF1uQA2Rm1CLJwLLhZXvnpvsomdBtBKYRrYB43jVu1f6c0eL5iELABMWPRgtjy4PAAAALnpUWHRkYXRlOmNyZWF0ZQAAeNozMjA00zU01DU0CjGwtDKxtDI21zYwsDIwAABB6wUWx8+KcAAAAC56VFh0ZGF0ZTptb2RpZnkAAHjaMzIwNNM1NNQ1NAoxsLQysbQyNtc2MLAyMAAAQesFFu7wIvgAAABqelRYdHN2ZzpiYXNlLXVyaQAAeNoFwQEOgyAMBdAT4Z/TLLjbVCykCVBDEa7ve1Ey/wEMaphzQoJWC/p0WNdGiUH3DQlaERszbCRYoZzdJVS0Xi6xFu5Ngjvzw2778uEp0sf7ff0dfrGRXmVvI9Or/wAOAAAAAElFTkSuQmCC")
+			],
+			[
+				['type' => API_EXEC_PARAMS],
+				null,
+				'/1/exec_params',
+				'Invalid parameter "/1/exec_params": a character string is expected.'
+			],
+			[
+				['type' => API_EXEC_PARAMS],
+				true,
+				'/1/exec_params',
+				'Invalid parameter "/1/exec_params": a character string is expected.'
+			],
+			[
+				['type' => API_EXEC_PARAMS],
+				1,
+				'/1/exec_params',
+				'Invalid parameter "/1/exec_params": a character string is expected.'
+			],
+			[
+				['type' => API_EXEC_PARAMS],
+				[],
+				'/1/exec_params',
+				'Invalid parameter "/1/exec_params": a character string is expected.'
+			],
+			[
+				['type' => API_EXEC_PARAMS],
+				'',
+				'/1/exec_params',
+				''
+			],
+			[
+				['type' => API_EXEC_PARAMS, 'flags' => API_NOT_EMPTY],
+				'',
+				'/1/exec_params',
+				'Invalid parameter "/1/exec_params": cannot be empty.'
+			],
+			[
+				['type' => API_EXEC_PARAMS, 'length' => 2],
+				'abc',
+				'/1/exec_params',
+				'Invalid parameter "/1/exec_params": value is too long.'
+			],
+			[
+				['type' => API_EXEC_PARAMS],
+				'abc',
+				'/1/exec_params',
+				'Invalid parameter "/1/exec_params": the last new line feed is missing.'
+			],
+			[
+				['type' => API_EXEC_PARAMS],
+				'ab'."\n".'c',
+				'/1/exec_params',
+				'Invalid parameter "/1/exec_params": the last new line feed is missing.'
+			],
+			[
+				['type' => API_EXEC_PARAMS],
+				'abc'."\n",
+				'/1/exec_params',
+				'abc'."\n"
 			]
 		];
 	}

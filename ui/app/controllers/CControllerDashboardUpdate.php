@@ -23,15 +23,19 @@ class CControllerDashboardUpdate extends CController {
 
 	private $dashboard_pages;
 
+	protected function init() {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
 	protected function checkInput() {
 		$fields = [
-			'dashboardid' => 'db dashboard.dashboardid',
-			'name' => 'required|db dashboard.name|not_empty',
-			'userid' => 'required|db dashboard.userid',
-			'display_period' => 'required|db dashboard.display_period|in '.implode(',', DASHBOARD_DISPLAY_PERIODS),
-			'auto_start' => 'required|db dashboard.auto_start|in 0,1',
-			'pages' => 'array',
-			'sharing' => 'array'
+			'dashboardid' =>	'db dashboard.dashboardid',
+			'name' =>			'required|db dashboard.name|not_empty',
+			'userid' =>			'required|db dashboard.userid',
+			'display_period' =>	'required|db dashboard.display_period|in '.implode(',', DASHBOARD_DISPLAY_PERIODS),
+			'auto_start' =>		'required|db dashboard.auto_start|in 0,1',
+			'pages' =>			'array',
+			'sharing' =>		'array'
 		];
 
 		$ret = $this->validateInput($fields);

@@ -29,6 +29,7 @@ require_once dirname(__FILE__).'/testGraphLinking.php';
 require_once dirname(__FILE__).'/testEscalations.php';
 require_once dirname(__FILE__).'/testComplexServiceStatus.php';
 require_once dirname(__FILE__).'/testServiceRoles.php';
+require_once dirname(__FILE__).'/testExpressionMacros.php';
 require_once dirname(__FILE__).'/testAgentItems.php';
 
 class IntegrationTests {
@@ -45,6 +46,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testEscalations');
 		$suite->addTestSuite('testComplexServiceStatus');
 		$suite->addTestSuite('testServiceRoles');
+		$suite->addTestSuite('testExpressionMacros');
 		$suite->addTestSuite('testAgentItems');
 
 		return $suite;

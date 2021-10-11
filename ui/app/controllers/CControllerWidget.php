@@ -43,7 +43,7 @@ abstract class CControllerWidget extends CController {
 	 * Initialization function.
 	 */
 	protected function init() {
-		$this->disableSIDValidation();
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
 	/**

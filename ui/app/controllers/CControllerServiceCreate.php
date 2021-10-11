@@ -21,6 +21,10 @@
 
 class CControllerServiceCreate extends CController {
 
+	protected function init() {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
 	protected function checkInput(): bool {
 		$fields = [
 			'name' =>						'required|db services.name|not_empty',

@@ -1,4 +1,3 @@
-<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -18,24 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "http.h"
 
-/**
- * @var CView $this
- */
+ZBX_METRIC	parameters_common_http[] =
+/*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
+{
+	{"web.page.get",	CF_HAVEPARAMS,	WEB_PAGE_GET,		"localhost,,80"},
+	{"web.page.perf",	CF_HAVEPARAMS,	WEB_PAGE_PERF,		"localhost,,80"},
+	{"web.page.regexp",	CF_HAVEPARAMS,	WEB_PAGE_REGEXP,	"localhost,,80,OK"},
 
-$output = [
-	'body' => (new CPartial('service.time.row', [
-		'row_index' => $data['row_index'],
-		'type' => $data['form']['type'],
-		'ts_from' => $data['form']['ts_from'],
-		'ts_to' => $data['form']['ts_to'],
-		'note' => $data['form']['note']
-	]))->getOutput()
-];
-
-if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
-	CProfiler::getInstance()->stop();
-	$output['debug'] = CProfiler::getInstance()->make()->toString();
-}
-
-echo json_encode($output);
+	{NULL}
+};
