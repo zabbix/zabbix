@@ -546,28 +546,22 @@ static int	ha_db_create_node(zbx_ha_info_t *info)
 
 	if (SUCCEED == ret)
 	{
-		char	*sql = NULL, *name_esc;
-		size_t	sql_alloc = 0, sql_offset = 0;
+		char	*name_esc;
 
 		zbx_new_cuid(nodeid.str);
 		name_esc = DBdyn_escape_string(info->name);
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "insert into ha_node"
-				" (ha_nodeid,name,status,lastaccess) values"
-				" ('%s','%s', %d," ZBX_DB_TIMESTAMP() ")",
+		(void)DBexecute_once("insert into ha_node (ha_nodeid,name,status,lastaccess)"
+				" values ('%s','%s', %d," ZBX_DB_TIMESTAMP() ")",
 				nodeid.str, name_esc, ZBX_NODE_STATUS_STOPPED);
 
 		zbx_free(name_esc);
-		(void)DBexecute_once("%s", sql);
-		zbx_free(sql);
 	}
-
 out:
 	if (SUCCEED == ret)
 		ha_db_commit(info);
 	else
 		ha_db_rollback(info);
-
 finish:
 	if (SUCCEED == ret)
 	{
