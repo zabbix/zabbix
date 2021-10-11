@@ -1,32 +1,24 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:10Z'
+  version: '6.0'
+  date: '2021-10-11T06:07:13Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
   templates:
     -
-      uuid: 815b5a81b29a477695fddbd533ad9c84
-      template: 'Mikrotik SNMP'
-      name: 'Mikrotik SNMP'
+      uuid: c8db153405704d859ba5ee19f08b46f3
+      template: 'MikroTik CRS125-24G-1S-2HnD-IN SNMP'
+      name: 'MikroTik CRS125-24G-1S-2HnD-IN SNMP'
       description: |
-        Template Net Mikrotik
+        The template for monitoring Switch MikroTik CRS125-24G-1S-2HnD-IN.
+        24x Gigabit Ethernet layer 3 Smart Switch, 1x SFP cage, LCD, 802.11b/g/n Dual Chain wireless, 600MHz CPU, 128MB RAM, Metal desktop case, RouterOS L5
         
         MIBs used:
         HOST-RESOURCES-MIB
         MIKROTIK-MIB
         
-        Known Issues:
-        
-          Description: Doesn't have ifHighSpeed filled. fixed in more recent versions
-          Version: RouterOS 6.28 or lower
-        
-          Description: Doesn't have any temperature sensors
-          Version: RouterOS 6.38.5
-          Device: Mikrotik 941-2nD, Mikrotik 951G-2HnD
-        
-        Template tooling version used: 0.38
+        Template tooling version used: 0.39
       templates:
         -
           name: 'Generic SNMP'
@@ -37,7 +29,7 @@ zabbix_export:
           name: 'Templates/Network devices'
       items:
         -
-          uuid: 260eff3ec4034e33aea9c25962a782be
+          uuid: 2fc0c608418046d0bbfc371f5f8d8c22
           name: 'Firmware version'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.14988.1.1.7.4.0
@@ -60,15 +52,15 @@ zabbix_export:
               value: Inventory
           triggers:
             -
-              uuid: 62a9cd04a4dc4f5a9b59a01e54fb983f
-              expression: 'last(/Mikrotik SNMP/system.hw.firmware,#1)<>last(/Mikrotik SNMP/system.hw.firmware,#2) and length(last(/Mikrotik SNMP/system.hw.firmware))>0'
+              uuid: f0c59541e6df4c649e7c2ef76d7bda4b
+              expression: 'last(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/system.hw.firmware,#1)<>last(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/system.hw.firmware,#2) and length(last(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/system.hw.firmware))>0'
               name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
               description: 'Firmware version has changed. Ack to close'
               manual_close: 'YES'
         -
-          uuid: 8d2c5a405ffa42fc81a2c9b914e20874
+          uuid: 6a3ca4bce4da4e8eb6a15a2dcf51bce1
           name: 'Hardware model name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
@@ -88,7 +80,7 @@ zabbix_export:
               tag: Application
               value: Inventory
         -
-          uuid: 2c5a89f75a8d4e38ad021b3539ce8273
+          uuid: 589cacbe509547bf944f7c8e3a518c7d
           name: 'Hardware serial number'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.14988.1.1.7.3.0
@@ -112,14 +104,14 @@ zabbix_export:
               value: Inventory
           triggers:
             -
-              uuid: 6c1dcb2e8e76405887af69a6a08e53df
-              expression: 'last(/Mikrotik SNMP/system.hw.serialnumber,#1)<>last(/Mikrotik SNMP/system.hw.serialnumber,#2) and length(last(/Mikrotik SNMP/system.hw.serialnumber))>0'
+              uuid: a1cf2d27ddc447988aa808318aef167f
+              expression: 'last(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/system.hw.serialnumber,#1)<>last(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/system.hw.serialnumber,#2) and length(last(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
         -
-          uuid: 7e3b3e78086742a7b9cda953367a2d83
+          uuid: 31fb56c30de1477bbe69306c2b9e3d69
           name: 'Operating system'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.14988.1.1.4.4.0
@@ -143,14 +135,14 @@ zabbix_export:
               value: Inventory
           triggers:
             -
-              uuid: 739f60e0862d4fe88cc2a5fe626211a8
-              expression: 'last(/Mikrotik SNMP/system.sw.os[mtxrLicVersion.0],#1)<>last(/Mikrotik SNMP/system.sw.os[mtxrLicVersion.0],#2) and length(last(/Mikrotik SNMP/system.sw.os[mtxrLicVersion.0]))>0'
+              uuid: 9bfebd1764bb4acc82fa8c7f175c0b87
+              expression: 'last(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/system.sw.os[mtxrLicVersion.0],#1)<>last(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/system.sw.os[mtxrLicVersion.0],#2) and length(last(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/system.sw.os[mtxrLicVersion.0]))>0'
               name: 'Operating system description has changed'
               priority: INFO
               description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
               manual_close: 'YES'
         -
-          uuid: 0636e173288d42e68faf62c381a65087
+          uuid: cb66968d87fe41a2ad4c5cb769849be4
           name: 'Total memory'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.2.3.1.5.65536
@@ -178,7 +170,7 @@ zabbix_export:
               tag: Application
               value: Memory
         -
-          uuid: 7d4a1591887848028ea8bae81b7d01a7
+          uuid: 62b4597135824686b5de3cd51fcd46f4
           name: 'Used memory'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.2.3.1.6.65536
@@ -198,7 +190,7 @@ zabbix_export:
               tag: Application
               value: Memory
         -
-          uuid: 56017f610bf74f0aaaa92e9183e68ea5
+          uuid: 414bec3767eb49c39bd67a135f60ba02
           name: 'Memory utilization'
           type: CALCULATED
           key: 'vm.memory.util[memoryUsedPercentage.Memory]'
@@ -213,14 +205,14 @@ zabbix_export:
               value: Memory
           triggers:
             -
-              uuid: e4b4ba5ec80c4d83adbb10739edf4574
-              expression: 'min(/Mikrotik SNMP/vm.memory.util[memoryUsedPercentage.Memory],5m)>{$MEMORY.UTIL.MAX}'
+              uuid: 9af92a1dddd0405587bb090b8fd5757d
+              expression: 'min(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/vm.memory.util[memoryUsedPercentage.Memory],5m)>{$MEMORY.UTIL.MAX}'
               name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
       discovery_rules:
         -
-          uuid: fb2a399dbdb54484a9f58ae2437c32fb
+          uuid: 6d574937fd7e47c8ba7da4fc7df2b812
           name: 'CPU discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.2.1.25.3.3.1.1]'
@@ -229,7 +221,7 @@ zabbix_export:
           description: 'HOST-RESOURCES-MIB::hrProcessorTable discovery'
           item_prototypes:
             -
-              uuid: 560173245c8245128bc7071b8201fe12
+              uuid: bbf74ce8d13f4b3eb6e3a949f9fc95fc
               name: '#{#SNMPINDEX}: CPU utilization'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.25.3.3.1.2.{#SNMPINDEX}'
@@ -246,15 +238,15 @@ zabbix_export:
                   value: CPU
               trigger_prototypes:
                 -
-                  uuid: 7843aa49df2b4f218bf633bee4f01df6
-                  expression: 'min(/Mikrotik SNMP/system.cpu.util[hrProcessorLoad.{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
+                  uuid: c06050c48eac4f8f90df94c6d125f369
+                  expression: 'min(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/system.cpu.util[hrProcessorLoad.{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
                   name: '#{#SNMPINDEX}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'CPU utilization is too high. The system might be slow to respond.'
           graph_prototypes:
             -
-              uuid: 1e6e64b461dc4010a582d2f39fcfa4f8
+              uuid: 7af56504cad442c68f801cbfff17952b
               name: '#{#SNMPINDEX}: CPU utilization'
               ymin_type_1: FIXED
               ymax_type_1: FIXED
@@ -263,10 +255,10 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Mikrotik SNMP'
+                    host: 'MikroTik CRS125-24G-1S-2HnD-IN SNMP'
                     key: 'system.cpu.util[hrProcessorLoad.{#SNMPINDEX}]'
         -
-          uuid: 9a4ae5c2a50d4414ab0eed2c70bcd9c3
+          uuid: 4001b2da26774319b5e8754eccb9ace6
           name: 'Temperature CPU discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.14988.1.1.3.11]'
@@ -277,7 +269,7 @@ zabbix_export:
             Since temperature of CPU is not available on all Mikrotik hardware, this is done to avoid unsupported items.
           item_prototypes:
             -
-              uuid: ad101c676b5243eca67eb68d879f5212
+              uuid: e998ed1fcfc7498a873448c59d912f48
               name: 'CPU: Temperature'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.14988.1.1.3.11.{#SNMPINDEX}'
@@ -300,19 +292,19 @@ zabbix_export:
                   value: Temperature
               trigger_prototypes:
                 -
-                  uuid: edcc83694dc847f8a8dcb7e192f96404
-                  expression: 'avg(/Mikrotik SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"CPU"}'
+                  uuid: 9f6533c6505948abb10869f4d0a11070
+                  expression: 'avg(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"CPU"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Mikrotik SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"CPU"}-3'
+                  recovery_expression: 'max(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"CPU"}-3'
                   name: 'CPU: Temperature is above critical threshold: >{$TEMP_CRIT:"CPU"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
                 -
-                  uuid: 1c380934165343a68345c761de9cbdb5
-                  expression: 'avg(/Mikrotik SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"CPU"}'
+                  uuid: e683521cc3de43eaa7c8ecbbb360fb7d
+                  expression: 'avg(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"CPU"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Mikrotik SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:"CPU"}-3'
+                  recovery_expression: 'max(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:"CPU"}-3'
                   name: 'CPU: Temperature is above warning threshold: >{$TEMP_WARN:"CPU"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -320,18 +312,18 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'CPU: Temperature is above critical threshold: >{$TEMP_CRIT:"CPU"}'
-                      expression: 'avg(/Mikrotik SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"CPU"}'
-                      recovery_expression: 'max(/Mikrotik SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"CPU"}-3'
+                      expression: 'avg(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"CPU"}'
+                      recovery_expression: 'max(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"CPU"}-3'
                 -
-                  uuid: 47a89879a7db47e9bf598e27f7c084e7
-                  expression: 'avg(/Mikrotik SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"CPU"}'
+                  uuid: 2d1bba8f19694737a6cb59e12289327c
+                  expression: 'avg(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"CPU"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'min(/Mikrotik SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"CPU"}+3'
+                  recovery_expression: 'min(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"CPU"}+3'
                   name: 'CPU: Temperature is too low: <{$TEMP_CRIT_LOW:"CPU"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
         -
-          uuid: 9c6a401a70ec4dba92bd9e270fe7dc79
+          uuid: fd1e16940eef4715906c2f8241df141e
           name: 'Temperature sensor discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.14988.1.1.3.10]'
@@ -343,7 +335,7 @@ zabbix_export:
             this is done to avoid unsupported items.
           item_prototypes:
             -
-              uuid: 2bfb758ca6264401902524b32e04f472
+              uuid: b9b599a6f7d746959af746bf348c3c45
               name: 'Device: Temperature'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.14988.1.1.3.10.{#SNMPINDEX}'
@@ -368,19 +360,19 @@ zabbix_export:
                   value: Temperature
               trigger_prototypes:
                 -
-                  uuid: 21afb343688c4c0e8189a7dbc4f441e1
-                  expression: 'avg(/Mikrotik SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Device"}'
+                  uuid: 8db96c9e7d164b0fa6d2af61899ea427
+                  expression: 'avg(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Device"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Mikrotik SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Device"}-3'
+                  recovery_expression: 'max(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Device"}-3'
                   name: 'Device: Temperature is above critical threshold: >{$TEMP_CRIT:"Device"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
                 -
-                  uuid: 0ba64ff53885473ca8dcd333a770a7ed
-                  expression: 'avg(/Mikrotik SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"Device"}'
+                  uuid: 33c12e280a464d20960ae73341ea3dbe
+                  expression: 'avg(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"Device"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Mikrotik SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:"Device"}-3'
+                  recovery_expression: 'max(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:"Device"}-3'
                   name: 'Device: Temperature is above warning threshold: >{$TEMP_WARN:"Device"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -388,18 +380,18 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Device: Temperature is above critical threshold: >{$TEMP_CRIT:"Device"}'
-                      expression: 'avg(/Mikrotik SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Device"}'
-                      recovery_expression: 'max(/Mikrotik SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Device"}-3'
+                      expression: 'avg(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Device"}'
+                      recovery_expression: 'max(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Device"}-3'
                 -
-                  uuid: cdbfc8fabf9f45fc95dedba327e30a1d
-                  expression: 'avg(/Mikrotik SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"Device"}'
+                  uuid: 4fa5ef5d55fd4fc8a21516dbfb0ff7eb
+                  expression: 'avg(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"Device"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'min(/Mikrotik SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"Device"}+3'
+                  recovery_expression: 'min(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"Device"}+3'
                   name: 'Device: Temperature is too low: <{$TEMP_CRIT_LOW:"Device"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
         -
-          uuid: 017797e68eae49afaa864dd57757bbd8
+          uuid: 6da207d2ffa84756a676fa7e7bd19e40
           name: 'LTE modem discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#IFNAME},1.3.6.1.4.1.14988.1.1.14.1.1.2,{#IFALIAS},1.3.6.1.2.1.31.1.1.1.18,{#IFTYPE},1.3.6.1.2.1.2.2.1.3]'
@@ -419,7 +411,7 @@ zabbix_export:
           description: 'MIKROTIK-MIB::mtxrLTEModemInterfaceIndex'
           item_prototypes:
             -
-              uuid: 25cf4b11ade848fb9947ef85c59da65a
+              uuid: 28a57925dbcf410287cc33e680208531
               name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSRP'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.14988.1.1.16.1.1.4.{#SNMPINDEX}'
@@ -436,12 +428,12 @@ zabbix_export:
                   value: 'Interface {#IFNAME}({#IFALIAS})'
               trigger_prototypes:
                 -
-                  uuid: f23c654001384f6e981fd33aeab0af6f
-                  expression: 'max(/Mikrotik SNMP/lte.modem.rsrp[mtxrLTEModemSignalRSRP.{#SNMPINDEX}],5m) < {$LTEMODEM.RSRP.MIN.WARN}'
+                  uuid: fd43c6f8ed834db3a69e6c30c29878ed
+                  expression: 'max(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/lte.modem.rsrp[mtxrLTEModemSignalRSRP.{#SNMPINDEX}],5m) < {$LTEMODEM.RSRP.MIN.WARN}'
                   name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSRP is low (below {$LTEMODEM.RSRP.MIN.WARN}dbm for 5m)'
                   priority: WARNING
             -
-              uuid: 467f6179fa7d43c2a23333330c1ceac1
+              uuid: bf05683ec6bd4882af965c5671bca4c8
               name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSRQ'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.14988.1.1.16.1.1.3.{#SNMPINDEX}'
@@ -458,12 +450,12 @@ zabbix_export:
                   value: 'Interface {#IFNAME}({#IFALIAS})'
               trigger_prototypes:
                 -
-                  uuid: 57f8757b80914c248a35d0899791a48e
-                  expression: 'max(/Mikrotik SNMP/lte.modem.rsrq[mtxrLTEModemSignalRSRQ.{#SNMPINDEX}],5m) < {$LTEMODEM.RSRQ.MIN.WARN}'
+                  uuid: 685f5eba5ddd4b2ba3173fc82367b476
+                  expression: 'max(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/lte.modem.rsrq[mtxrLTEModemSignalRSRQ.{#SNMPINDEX}],5m) < {$LTEMODEM.RSRQ.MIN.WARN}'
                   name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSRQ is low (below {$LTEMODEM.RSRQ.MIN.WARN}db for 5m)'
                   priority: WARNING
             -
-              uuid: 0994d40dab10493c96c4f79d0cc5e619
+              uuid: 39b0a1c4d5134fb7a2a6bd114278a773
               name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSSI'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.14988.1.1.16.1.1.2.{#SNMPINDEX}'
@@ -480,12 +472,12 @@ zabbix_export:
                   value: 'Interface {#IFNAME}({#IFALIAS})'
               trigger_prototypes:
                 -
-                  uuid: e2c692d5d4ca49b688656a1abe6228e5
-                  expression: 'max(/Mikrotik SNMP/lte.modem.rssi[mtxrLTEModemSignalRSSI.{#SNMPINDEX}],5m) < {$LTEMODEM.RSSI.MIN.WARN}'
+                  uuid: 4a4f14e171504413ae16d92597fe1024
+                  expression: 'max(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/lte.modem.rssi[mtxrLTEModemSignalRSSI.{#SNMPINDEX}],5m) < {$LTEMODEM.RSSI.MIN.WARN}'
                   name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSSI is low (below {$LTEMODEM.RSSI.MIN.WARN}dbm for 5m)'
                   priority: WARNING
             -
-              uuid: 1c5a284353964175b4541c78fea7d07d
+              uuid: 250f123915b94618b4af6aa4166f6e9a
               name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem SINR'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.14988.1.1.16.1.1.7.{#SNMPINDEX}'
@@ -502,40 +494,40 @@ zabbix_export:
                   value: 'Interface {#IFNAME}({#IFALIAS})'
               trigger_prototypes:
                 -
-                  uuid: e163c4af8ff1451a8728e569c5d3c04c
-                  expression: 'max(/Mikrotik SNMP/lte.modem.sinr[mtxrLTEModemSignalSINR.{#SNMPINDEX}],5m) < {$LTEMODEM.SINR.MIN.WARN}'
+                  uuid: ed070d7bccb649a49b29eda9b8a02192
+                  expression: 'max(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/lte.modem.sinr[mtxrLTEModemSignalSINR.{#SNMPINDEX}],5m) < {$LTEMODEM.SINR.MIN.WARN}'
                   name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem SINR is low (below {$LTEMODEM.SINR.MIN.WARN}db for 5m)'
                   priority: WARNING
           graph_prototypes:
             -
-              uuid: 4f6bc67c40eb441189ec233f926f19ec
+              uuid: efcb23bafcdc48f1b64090c437c18799
               name: 'Interface {#IFNAME}({#IFALIAS}): Modem Signal. {#SNMPINDEX}'
               graph_items:
                 -
                   color: 1A7C11
                   item:
-                    host: 'Mikrotik SNMP'
+                    host: 'MikroTik CRS125-24G-1S-2HnD-IN SNMP'
                     key: 'lte.modem.sinr[mtxrLTEModemSignalSINR.{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'Mikrotik SNMP'
+                    host: 'MikroTik CRS125-24G-1S-2HnD-IN SNMP'
                     key: 'lte.modem.rsrq[mtxrLTEModemSignalRSRQ.{#SNMPINDEX}]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
-                    host: 'Mikrotik SNMP'
+                    host: 'MikroTik CRS125-24G-1S-2HnD-IN SNMP'
                     key: 'lte.modem.rsrp[mtxrLTEModemSignalRSRP.{#SNMPINDEX}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   item:
-                    host: 'Mikrotik SNMP'
+                    host: 'MikroTik CRS125-24G-1S-2HnD-IN SNMP'
                     key: 'lte.modem.rssi[mtxrLTEModemSignalRSSI.{#SNMPINDEX}]'
         -
-          uuid: 5eada6e6837648859ccb440525281698
+          uuid: e6a361bc321a401dbcc3a362799d450a
           name: 'AP channel discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#IFNAME},1.3.6.1.4.1.14988.1.1.14.1.1.2,{#IFALIAS},1.3.6.1.2.1.31.1.1.1.18,{#IFTYPE},1.3.6.1.2.1.2.2.1.3,{#IFADMINSTATUS},1.3.6.1.2.1.2.2.1.7]'
@@ -555,7 +547,7 @@ zabbix_export:
           description: 'MIKROTIK-MIB::mtxrWlAp'
           item_prototypes:
             -
-              uuid: db129187106741d88fc14774a1a5652d
+              uuid: cbaec92328d34e08a4c168961cfc8833
               name: 'Interface {#IFNAME}({#IFALIAS}): AP authenticated clients'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.14988.1.1.1.3.1.11.{#SNMPINDEX}'
@@ -569,7 +561,7 @@ zabbix_export:
                   tag: Application
                   value: 'Interface {#IFNAME}({#IFALIAS})'
             -
-              uuid: a9ca50960dd043038808f3572d1fb281
+              uuid: ede61f7e21cc41e2abe7e8931aef6b95
               name: 'Interface {#IFNAME}({#IFALIAS}): AP band'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.14988.1.1.1.3.1.8.{#SNMPINDEX}'
@@ -590,7 +582,7 @@ zabbix_export:
                   tag: Application
                   value: 'Interface {#IFNAME}({#IFALIAS})'
             -
-              uuid: 9f5c294b30d24e5084e8953173bf886e
+              uuid: 3ce1884489f4482a887756abf92248e5
               name: 'Interface {#IFNAME}({#IFALIAS}): SSID'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.14988.1.1.1.3.1.4.{#SNMPINDEX}'
@@ -611,7 +603,7 @@ zabbix_export:
                   tag: Application
                   value: 'Interface {#IFNAME}({#IFALIAS})'
             -
-              uuid: 6140d7fe8011400cb827339f8f6f9cdf
+              uuid: 56bdd3739b874e8db259ac6e4736affb
               name: 'Interface {#IFNAME}({#IFALIAS}): AP noise floor'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.14988.1.1.1.3.1.9.{#SNMPINDEX}'
@@ -631,7 +623,7 @@ zabbix_export:
                   tag: Application
                   value: 'Interface {#IFNAME}({#IFALIAS})'
             -
-              uuid: 45fc6875a91d47debb4e39d93e5b8186
+              uuid: f952b47d2a4e4f2991db17dd89e79f24
               name: 'Interface {#IFNAME}({#IFALIAS}): AP registered clients'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.14988.1.1.1.3.1.6.{#SNMPINDEX}'
@@ -645,7 +637,7 @@ zabbix_export:
                   tag: Application
                   value: 'Interface {#IFNAME}({#IFALIAS})'
         -
-          uuid: 644433b2a1fa4b38916e2ae4bf74c28d
+          uuid: a2e92faea0da45b59a9dd254440c875b
           name: 'CAPsMAN AP channel discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#IFNAME},1.3.6.1.4.1.14988.1.1.14.1.1.2,{#IFALIAS},1.3.6.1.2.1.31.1.1.1.18,{#IFTYPE},1.3.6.1.2.1.2.2.1.3]'
@@ -665,7 +657,7 @@ zabbix_export:
           description: 'MIKROTIK-MIB::mtxrWlCMChannel'
           item_prototypes:
             -
-              uuid: 5dc0caa311304e6a96c620b10f52f267
+              uuid: dfcc5d5ab4584fd48ea22b5f5e00e8c6
               name: 'Interface {#IFNAME}({#IFALIAS}): AP authenticated clients'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.14988.1.1.1.7.1.3.{#SNMPINDEX}'
@@ -679,7 +671,7 @@ zabbix_export:
                   tag: Application
                   value: 'Interface {#IFNAME}({#IFALIAS})'
             -
-              uuid: 7df773f57c234d219f5a75e11844f5e0
+              uuid: 6509bb0c5e044c0580398ca99b768b75
               name: 'Interface {#IFNAME}({#IFALIAS}): AP channel'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.14988.1.1.1.7.1.5.{#SNMPINDEX}'
@@ -700,7 +692,7 @@ zabbix_export:
                   tag: Application
                   value: 'Interface {#IFNAME}({#IFALIAS})'
             -
-              uuid: 0db356f16542489586aacdecb029f691
+              uuid: 8661f6e91dbf4d9a93785f07157eec93
               name: 'Interface {#IFNAME}({#IFALIAS}): AP registered clients'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.14988.1.1.1.7.1.2.{#SNMPINDEX}'
@@ -714,7 +706,7 @@ zabbix_export:
                   tag: Application
                   value: 'Interface {#IFNAME}({#IFALIAS})'
             -
-              uuid: e2212bb46d804d6687a2fe992f867b9d
+              uuid: ec83a91a8b284f3a9137c8c4cf36a9c3
               name: 'Interface {#IFNAME}({#IFALIAS}): AP state'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.14988.1.1.1.7.1.4.{#SNMPINDEX}'
@@ -736,13 +728,13 @@ zabbix_export:
                   value: 'Interface {#IFNAME}({#IFALIAS})'
               trigger_prototypes:
                 -
-                  uuid: e4aedbd5e0c64cf48831bf08192e19bf
-                  expression: 'last(/Mikrotik SNMP/ssid.state[mtxrWlCMState.{#SNMPINDEX}])<>"running-ap"'
+                  uuid: 89940e123e8c4c04b402a436c977d999
+                  expression: 'last(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/ssid.state[mtxrWlCMState.{#SNMPINDEX}])<>"running-ap"'
                   name: 'Interface {#IFNAME}({#IFALIAS}): AP interface {#IFNAME}({#IFALIAS}) is not running'
                   priority: WARNING
                   description: 'Access point interface can be not running by different reasons - disabled interface, power off, network link down.'
         -
-          uuid: 6bb65981928d40378a95ee74aff82cc5
+          uuid: 6b80e43f0d004ab4baeb51a772d91457
           name: 'Storage discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.2.1.25.2.3.1.3,{#ALLOC_UNITS},1.3.6.1.2.1.25.2.3.1.4,{#STORAGE_TYPE},1.3.6.1.2.1.25.2.3.1.2]'
@@ -762,7 +754,7 @@ zabbix_export:
           description: 'HOST-RESOURCES-MIB::hrStorage discovery with storage filter'
           item_prototypes:
             -
-              uuid: b602ff4381e04e50a9282fe6f9f5c834
+              uuid: 929ef695efdf4e60a2e47cc0be74e69c
               name: 'Disk-{#SNMPINDEX}: Space utilization'
               type: CALCULATED
               key: 'vfs.fs.pused[hrStorageSize.{#SNMPINDEX}]'
@@ -776,7 +768,7 @@ zabbix_export:
                   tag: Application
                   value: Storage
             -
-              uuid: 64747345083e4b38b0e963ccd0b8271b
+              uuid: 1c12733c14eb45a8bb36b3fcb8ef7ce7
               name: 'Disk-{#SNMPINDEX}: Total space'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.25.2.3.1.5.{#SNMPINDEX}'
@@ -804,7 +796,7 @@ zabbix_export:
                   tag: Application
                   value: Storage
             -
-              uuid: 35034472b281453bbfbcf65b5d60dd7e
+              uuid: 6202b55760514c64832b9df48828c344
               name: 'Disk-{#SNMPINDEX}: Used space'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.25.2.3.1.6.{#SNMPINDEX}'
@@ -825,10 +817,10 @@ zabbix_export:
                   value: Storage
           trigger_prototypes:
             -
-              uuid: c866ac0197ee401ab0c5cc6ec0757985
+              uuid: e5df295edd2848329708aaf765a8e8be
               expression: |
-                last(/Mikrotik SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"} and
-                ((last(/Mikrotik SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Mikrotik SNMP/vfs.fs.used[hrStorageSize.{#SNMPINDEX}]))<5G or timeleft(/Mikrotik SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}],1h,100)<1d)
+                last(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"} and
+                ((last(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/vfs.fs.used[hrStorageSize.{#SNMPINDEX}]))<5G or timeleft(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}],1h,100)<1d)
               name: 'Disk-{#SNMPINDEX}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: AVERAGE
@@ -839,10 +831,10 @@ zabbix_export:
                  - The disk will be full in less than 24 hours.
               manual_close: 'YES'
             -
-              uuid: 9adb977fde7345d8950265a9127cde57
+              uuid: 31ff4cd8ae95435193ecc37238327c4c
               expression: |
-                last(/Mikrotik SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.WARN:"Disk-{#SNMPINDEX}"} and
-                ((last(/Mikrotik SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Mikrotik SNMP/vfs.fs.used[hrStorageSize.{#SNMPINDEX}]))<10G or timeleft(/Mikrotik SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}],1h,100)<1d)
+                last(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.WARN:"Disk-{#SNMPINDEX}"} and
+                ((last(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/vfs.fs.used[hrStorageSize.{#SNMPINDEX}]))<10G or timeleft(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}],1h,100)<1d)
               name: 'Disk-{#SNMPINDEX}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"Disk-{#SNMPINDEX}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: WARNING
@@ -856,11 +848,11 @@ zabbix_export:
                 -
                   name: 'Disk-{#SNMPINDEX}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"}%)'
                   expression: |
-                    last(/Mikrotik SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"} and
-                    ((last(/Mikrotik SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Mikrotik SNMP/vfs.fs.used[hrStorageSize.{#SNMPINDEX}]))<5G or timeleft(/Mikrotik SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}],1h,100)<1d)
+                    last(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"} and
+                    ((last(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/vfs.fs.used[hrStorageSize.{#SNMPINDEX}]))<5G or timeleft(/MikroTik CRS125-24G-1S-2HnD-IN SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}],1h,100)<1d)
           graph_prototypes:
             -
-              uuid: 82acee070ff1461ba0cdff337184da97
+              uuid: e4d5a4fb28804aacb284c58ce3b8cc09
               name: 'Disk-{#SNMPINDEX}: Disk space usage'
               width: '600'
               height: '340'
@@ -872,14 +864,14 @@ zabbix_export:
                   calc_fnc: LAST
                   type: GRAPH_SUM
                   item:
-                    host: 'Mikrotik SNMP'
+                    host: 'MikroTik CRS125-24G-1S-2HnD-IN SNMP'
                     key: 'vfs.fs.total[hrStorageSize.{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   color: C80000
                   calc_fnc: LAST
                   item:
-                    host: 'Mikrotik SNMP'
+                    host: 'MikroTik CRS125-24G-1S-2HnD-IN SNMP'
                     key: 'vfs.fs.used[hrStorageSize.{#SNMPINDEX}]'
       macros:
         -
@@ -935,7 +927,7 @@ zabbix_export:
           value: '80'
   graphs:
     -
-      uuid: 42efab7c7fae46729b2ad410b0be57cc
+      uuid: 468ff969bf854e30b118c517caa85d82
       name: 'Memory utilization'
       ymin_type_1: FIXED
       ymax_type_1: FIXED
@@ -944,5 +936,5 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'Mikrotik SNMP'
+            host: 'MikroTik CRS125-24G-1S-2HnD-IN SNMP'
             key: 'vm.memory.util[memoryUsedPercentage.Memory]'
