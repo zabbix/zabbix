@@ -808,6 +808,7 @@ static int	DBpatch_5050071(void)
 					{"port", "10051", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"lastaccess", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"sessionid", "", NULL, NULL, 0, ZBX_TYPE_CUID, ZBX_NOTNULL, 0},
 					{0}
 				},
 				NULL
@@ -824,6 +825,13 @@ static int	DBpatch_5050072(void)
 static int	DBpatch_5050073(void)
 {
 	return DBcreate_index("ha_node", "ha_node_2", "status,lastaccess", 0);
+}
+
+static int	DBpatch_5050074(void)
+{
+	const ZBX_FIELD	field = {"resource_cuid", NULL, NULL, NULL, 0, ZBX_TYPE_CUID, 0, 0};
+
+	return DBadd_field("auditlog", &field);
 }
 
 #endif
@@ -900,5 +908,6 @@ DBPATCH_ADD(5050070, 0, 1)
 DBPATCH_ADD(5050071, 0, 1)
 DBPATCH_ADD(5050072, 0, 1)
 DBPATCH_ADD(5050073, 0, 1)
+DBPATCH_ADD(5050074, 0, 1)
 
 DBPATCH_END()
