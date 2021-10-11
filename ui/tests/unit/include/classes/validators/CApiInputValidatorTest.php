@@ -202,6 +202,104 @@ class CApiInputValidatorTest extends TestCase {
 				'Invalid parameter "/1/color": invalid byte sequence in UTF-8.'
 			],
 			[
+				['type' => API_COND_FORMULA],
+				'A and B',
+				'/1/formula',
+				'A and B'
+			],
+			[
+				['type' => API_COND_FORMULA],
+				'(A and B) or C',
+				'/1/formula',
+				'(A and B) or C'
+			],
+			[
+				['type' => API_COND_FORMULA],
+				'A and',
+				'/1/formula',
+				'Invalid parameter "/1/formula": check expression starting from "d".'
+			],
+			[
+				['type' => API_COND_FORMULA],
+				'',
+				'/1/formula',
+				'Invalid parameter "/1/formula": cannot be empty.'
+			],
+			[
+				['type' => API_COND_FORMULA],
+				[],
+				'/1/formula',
+				'Invalid parameter "/1/formula": a character string is expected.'
+			],
+			[
+				['type' => API_COND_FORMULA],
+				true,
+				'/1/formula',
+				'Invalid parameter "/1/formula": a character string is expected.'
+			],
+			[
+				['type' => API_COND_FORMULA],
+				null,
+				'/1/formula',
+				'Invalid parameter "/1/formula": a character string is expected.'
+			],
+			[
+				['type' => API_COND_FORMULA],
+				// broken UTF-8 byte sequence
+				"\xd1".'12345',
+				'/1/formula',
+				'Invalid parameter "/1/formula": invalid byte sequence in UTF-8.'
+			],
+			[
+				['type' => API_COND_FORMULAID],
+				'A',
+				'/1/formulaid',
+				'A'
+			],
+			[
+				['type' => API_COND_FORMULAID],
+				'ABCD',
+				'/1/formulaid',
+				'ABCD'
+			],
+			[
+				['type' => API_COND_FORMULAID],
+				'Ab',
+				'/1/formulaid',
+				'Invalid parameter "/1/formulaid": uppercase identifier expected.'
+			],
+			[
+				['type' => API_COND_FORMULAID],
+				'',
+				'/1/formulaid',
+				'Invalid parameter "/1/formulaid": cannot be empty.'
+			],
+			[
+				['type' => API_COND_FORMULAID],
+				[],
+				'/1/formulaid',
+				'Invalid parameter "/1/formulaid": a character string is expected.'
+			],
+			[
+				['type' => API_COND_FORMULAID],
+				true,
+				'/1/formulaid',
+				'Invalid parameter "/1/formulaid": a character string is expected.'
+			],
+			[
+				['type' => API_COND_FORMULAID],
+				null,
+				'/1/formulaid',
+				'Invalid parameter "/1/formulaid": a character string is expected.'
+			],
+			[
+				['type' => API_COND_FORMULAID],
+				// broken UTF-8 byte sequence
+				"\xd1".'12345',
+				'/1/formulaid',
+				'Invalid parameter "/1/formulaid": invalid byte sequence in UTF-8.'
+			],
+			[
 				['type' => API_STRING_UTF8, 'length' => 16],
 				'Zabbix server',
 				'/1/name',
@@ -272,7 +370,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_STRING_UTF8, 'in' => 'xml,json'],
 				'XML',
 				'/1/name',
-				'Invalid parameter "/1/name": value must be one of xml, json.'
+				'Invalid parameter "/1/name": value must be one of "xml", "json".'
 			],
 			[
 				['type' => API_STRING_UTF8, 'in' => '\\,,.'],
@@ -375,7 +473,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_STRINGS_UTF8, 'in' => 'hostid,name'],
 				['hostid', 'host'],
 				'/output',
-				'Invalid parameter "/output/2": value must be one of hostid, name.'
+				'Invalid parameter "/output/2": value must be one of "hostid", "name".'
 			],
 			[
 				['type' => API_STRINGS_UTF8, 'in' => 'hostid,name', 'uniq' => true],
@@ -393,7 +491,31 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_STRINGS_UTF8, 'in' => '\\,,.,/,'],
 				['abc', '.', '/', ''],
 				'/output',
-				'Invalid parameter "/output/1": value must be empty or one of ,, ., /.'
+				'Invalid parameter "/output/1": value must be empty or one of ",", ".", "/".'
+			],
+			[
+				['type' => API_STRINGS_UTF8, 'in' => ''],
+				['abc'],
+				'/output',
+				'Invalid parameter "/output/1": value must be empty.'
+			],
+			[
+				['type' => API_STRINGS_UTF8, 'in' => 'a'],
+				['abc'],
+				'/output',
+				'Invalid parameter "/output/1": value must be "a".'
+			],
+			[
+				['type' => API_STRINGS_UTF8, 'in' => 'a,b'],
+				['abc'],
+				'/output',
+				'Invalid parameter "/output/1": value must be one of "a", "b".'
+			],
+			[
+				['type' => API_STRINGS_UTF8, 'in' => 'a,b,'],
+				['abc'],
+				'/output',
+				'Invalid parameter "/output/1": value must be empty or one of "a", "b".'
 			],
 			[
 				['type' => API_INT32],
@@ -1735,6 +1857,83 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_OBJECTS, 'fields' => [
 					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:9'],
 					'value' =>	['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
+						['if' => ['field' => 'type', 'in' => '1,2'], 'type' => API_INT32],
+						['if' => ['field' => 'type', 'in' => '3,4'], 'type' => API_STRING_UTF8],
+						['else' => true, 'type' => API_BOOLEAN]
+					]]
+				]],
+				[
+					['type' => '1', 'value' => '-5'],
+					['type' => '2', 'value' => '125'],
+					['type' => '3', 'value' => 'text'],
+					['type' => '4', 'value' => 'text3'],
+					['type' => '7', 'value' => true]
+				],
+				'/',
+				[
+					['type' => 1, 'value' => -5],
+					['type' => 2, 'value' => 125],
+					['type' => 3, 'value' => 'text'],
+					['type' => 4, 'value' => 'text3'],
+					['type' => 7, 'value' => true]
+				]
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => [
+					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:9'],
+					'value' =>	['type' => API_MULTIPLE, 'rules' => [
+						['if' => ['field' => 'type', 'in' => '1,2'], 'flags' => API_REQUIRED, 'type' => API_INT32],
+						['else' => true, 'type' => API_UNEXPECTED]
+					]]
+				]],
+				[
+					['type' => '1', 'value' => '-5'],
+					['type' => '2', 'value' => '125'],
+					['type' => '7', 'value' => '123']
+				],
+				'/',
+				'Invalid parameter "/3": unexpected parameter "value".'
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => [
+					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:9'],
+					'value' =>	['type' => API_MULTIPLE, 'rules' => [
+						['if' => ['field' => 'type', 'in' => '1,2'], 'flags' => API_REQUIRED, 'type' => API_INT32],
+						['else' => true, 'type' => API_UNEXPECTED]
+					]]
+				]],
+				[
+					['type' => '1', 'value' => '-5'],
+					['type' => '2'],
+					['type' => '7']
+				],
+				'/',
+				'Invalid parameter "/2": the parameter "value" is missing.'
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => [
+					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:9'],
+					'value' =>	['type' => API_MULTIPLE, 'rules' => [
+						['if' => ['field' => 'type', 'in' => '1,2'], 'flags' => API_REQUIRED, 'type' => API_INT32],
+						['else' => true, 'type' => API_UNEXPECTED]
+					]]
+				]],
+				[
+					['type' => '1', 'value' => '-5'],
+					['type' => '2', 'value' => '125'],
+					['type' => '7']
+				],
+				'/',
+				[
+					['type' => 1, 'value' => -5],
+					['type' => 2, 'value' => 125],
+					['type' => 7]
+				]
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => [
+					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:9'],
+					'value' =>	['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
 						['if' => ['field' => 'type', 'in' => '1,2'], 'type' => API_INT32]
 					]]
 				]],
@@ -1758,6 +1957,210 @@ class CApiInputValidatorTest extends TestCase {
 				],
 				'/',
 				'Incorrect validation rules.'
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => [
+					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:9'],
+					'value' =>	['type' => API_MULTIPLE, 'rules' => [
+						['if' => ['field' => 'type', 'in' => '1,2'], 'type' => API_INT32]
+					]]
+				]],
+				[
+					['type' => '1'],
+					['type' => '2']
+				],
+				'/',
+				[
+					['type' => 1],
+					['type' => 2]
+				]
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => [
+					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:9'],
+					'value' =>	['type' => API_MULTIPLE, 'default' => '5', 'rules' => [
+						['if' => ['field' => 'type', 'in' => '1,2'], 'type' => API_INT32]
+					]]
+				]],
+				[
+					['type' => '1'],
+					['type' => '2']
+				],
+				'/',
+				[
+					['type' => 1, 'value' => 5],
+					['type' => 2, 'value' => 5]
+				]
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => [
+					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:9'],
+					'value' =>	['type' => API_MULTIPLE, 'rules' => [
+						['if' => ['field' => 'type', 'in' => '1,2'], 'type' => API_INT32, 'flags' => API_REQUIRED]
+					]]
+				]],
+				[
+					['type' => '1']
+				],
+				'/',
+				'Invalid parameter "/1": the parameter "value" is missing.'
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => [
+					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:9'],
+					'value' =>	['type' => API_MULTIPLE, 'rules' => [
+						['if' => ['field' => 'type', 'in' => '1,2'], 'type' => API_INT32],
+						['if' => ['field' => 'type', 'in' => '3'], 'type' => API_INT32, 'flags' => API_REQUIRED]
+					]]
+				]],
+				[
+					['type' => '1'],
+					['type' => '3']
+				],
+				'/',
+				'Invalid parameter "/2": the parameter "value" is missing.'
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => [
+					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:9'],
+					'value' =>	['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
+						['if' => ['field' => 'type', 'in' => '3'], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY]
+					]]
+				]],
+				[
+					['type' => '3']
+				],
+				'/',
+				'Invalid parameter "/1": the parameter "value" is missing.'
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => [
+					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:9'],
+					'value' =>	['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
+						['if' => ['field' => 'type', 'in' => '3'], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY]
+					]]
+				]],
+				[
+					['type' => '3', 'value' => '']
+				],
+				'/',
+				'Invalid parameter "/1/value": cannot be empty.'
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => [
+					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:9'],
+					'value' =>	['type' => API_MULTIPLE, 'default' => 1, 'rules' => [
+						['if' => ['field' => 'type', 'in' => '1,2'], 'type' => API_INT32],
+						['if' => ['field' => 'type', 'in' => '3'], 'type' => API_STRING_UTF8, 'default' => 'def']
+					]]
+				]],
+				[
+					['type' => '1'],
+					['type' => '2', 'value' => '125'],
+					['type' => '3']
+				],
+				'/',
+				[
+					['type' => 1, 'value' => 1],
+					['type' => 2, 'value' => 125],
+					['type' => 3, 'value' => 'def']
+				]
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => [
+					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:9'],
+					'value' =>	['type' => API_MULTIPLE, 'rules' => [
+						['if' => ['field' => 'type', 'in' => '1:2'], 'type' => API_STRING_UTF8, 'in' => 'a,b'],
+						['if' => ['field' => 'type', 'in' => '3'], 'type' => API_STRING_UTF8, 'in' => '']
+					]]
+				]],
+				[
+					['type' => '1', 'value' => 'a'],
+					['type' => '2', 'value' => 'b'],
+					['type' => '3', 'value' => 'c']
+				],
+				'/',
+				'Invalid parameter "/3/value": value must be empty.'
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => [
+					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:9'],
+					'value' =>	['type' => API_MULTIPLE, 'rules' => [
+						['if' => ['field' => 'type', 'in' => '1:2'], 'type' => API_STRING_UTF8, 'in' => 'a,'],
+						['if' => ['field' => 'type', 'in' => '3'], 'type' => API_STRING_UTF8, 'in' => 'c']
+					]]
+				]],
+				[
+					['type' => '1', 'value' => 'a'],
+					['type' => '2', 'value' => 'b'],
+					['type' => '3', 'value' => 'c']
+				],
+				'/',
+				'Invalid parameter "/2/value": value must be empty or "a".'
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => [
+					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:9'],
+					'value' =>	['type' => API_MULTIPLE, 'rules' => [
+						['if' => ['field' => 'type', 'in' => '1:2'], 'type' => API_STRING_UTF8, 'in' => 'a,b'],
+						['if' => ['field' => 'type', 'in' => '3'], 'type' => API_STRING_UTF8, 'in' => 'd,e,f']
+					]]
+				]],
+				[
+					['type' => '1', 'value' => 'a'],
+					['type' => '2', 'value' => 'b'],
+					['type' => '3', 'value' => 'c']
+				],
+				'/',
+				'Invalid parameter "/3/value": value must be one of "d", "e", "f".'
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => [
+					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:9'],
+					'value' =>	['type' => API_MULTIPLE, 'rules' => [
+						['if' => ['field' => 'type', 'in' => '1:2'], 'type' => API_STRING_UTF8, 'in' => 'a,b'],
+						['if' => ['field' => 'type', 'in' => '3'], 'type' => API_STRING_UTF8, 'in' => 'd,e,f,']
+					]]
+				]],
+				[
+					['type' => '1', 'value' => 'a'],
+					['type' => '2', 'value' => 'b'],
+					['type' => '3', 'value' => 'c']
+				],
+				'/',
+				'Invalid parameter "/3/value": value must be empty or one of "d", "e", "f".'
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => [
+					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:9'],
+					'value' =>	['type' => API_MULTIPLE, 'rules' => [
+						['if' => ['field' => 'type', 'in' => '1:2'], 'type' => API_INT32, 'in' => '1'],
+						['if' => ['field' => 'type', 'in' => '3'], 'type' => API_INT32, 'in' => '2,3']
+					]]
+				]],
+				[
+					['type' => '1', 'value' => '1'],
+					['type' => '2', 'value' => '2'],
+					['type' => '3', 'value' => '3']
+				],
+				'/',
+				'Invalid parameter "/2/value": value must be 1.'
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => [
+					'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:9'],
+					'value' =>	['type' => API_MULTIPLE, 'rules' => [
+						['if' => ['field' => 'type', 'in' => '1:2'], 'type' => API_INT32, 'in' => '1,2'],
+						['if' => ['field' => 'type', 'in' => '3'], 'type' => API_INT32, 'in' => '4:6']
+					]]
+				]],
+				[
+					['type' => '1', 'value' => '1'],
+					['type' => '2', 'value' => '2'],
+					['type' => '3', 'value' => '3']
+				],
+				'/',
+				'Invalid parameter "/3/value": value must be one of 4-6.'
 			],
 			[
 				['type' => API_OBJECTS, 'fields' => [
@@ -2908,7 +3311,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_OUTPUT],
 				'count',
 				'/output',
-				'Invalid parameter "/output": value must be one of extend.'
+				'Invalid parameter "/output": value must be "extend".'
 			],
 			[
 				['type' => API_OUTPUT, 'flags' => API_ALLOW_COUNT],
@@ -2920,13 +3323,13 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_OUTPUT],
 				'',
 				'/output',
-				'Invalid parameter "/output": value must be one of extend.'
+				'Invalid parameter "/output": value must be "extend".'
 			],
 			[
 				['type' => API_OUTPUT, 'flags' => API_ALLOW_COUNT],
 				'',
 				'/output',
-				'Invalid parameter "/output": value must be one of extend, count.'
+				'Invalid parameter "/output": value must be one of "extend", "count".'
 			],
 			[
 				['type' => API_OUTPUT],
@@ -2981,7 +3384,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_OUTPUT, 'in' => 'hostid,name'],
 				['hostid', 'host'],
 				'/output',
-				'Invalid parameter "/output/2": value must be one of hostid, name.'
+				'Invalid parameter "/output/2": value must be one of "hostid", "name".'
 			],
 			[
 				['type' => API_OUTPUT, 'in' => 'hostid,name'],
@@ -3108,13 +3511,13 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_SORTORDER],
 				'',
 				'/sortorder',
-				'Invalid parameter "/sortorder": value must be one of ASC, DESC.'
+				'Invalid parameter "/sortorder": value must be one of "ASC", "DESC".'
 			],
 			[
 				['type' => API_SORTORDER],
 				['asc'],
 				'/sortorder',
-				'Invalid parameter "/sortorder/1": value must be one of ASC, DESC.'
+				'Invalid parameter "/sortorder/1": value must be one of "ASC", "DESC".'
 			],
 			[
 				['type' => API_SORTORDER],
@@ -4811,6 +5214,48 @@ class CApiInputValidatorTest extends TestCase {
 				'/',
 				false,
 				'Invalid parameter "/tags/2": value (tag, operator, value)=(tag, 0, ) already exists.'
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'tags' => ['type' => API_MULTIPLE, 'rules' => [
+						['else' => true, 'type' => API_OBJECTS, 'uniq' => [['tag', 'operator', 'value']], 'fields' => [
+							'tag'		=> ['type' => API_STRING_UTF8],
+							'operator'	=> ['type' => API_INT32],
+							'value'		=> ['type' => API_STRING_UTF8]
+						]]
+					]]
+				]],
+				[
+					'tags' => [
+						['tag' => 'tag', 'operator' => 0, 'value' => ''],
+						['tag' => 'tag', 'operator' => 0, 'value' => '']
+					]
+				],
+				'/',
+				false,
+				'Invalid parameter "/tags/2": value (tag, operator, value)=(tag, 0, ) already exists.'
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => [
+					'tags' => ['type' => API_MULTIPLE, 'rules' => [
+						['else' => true, 'type' => API_OBJECTS, 'uniq' => [['tag', 'operator', 'value']], 'fields' => [
+							'tag'		=> ['type' => API_STRING_UTF8],
+							'operator'	=> ['type' => API_INT32],
+							'value'		=> ['type' => API_STRING_UTF8]
+						]]
+					]]
+				]],
+				[
+					[
+						'tags' => [
+							['tag' => 'tag', 'operator' => 0, 'value' => ''],
+							['tag' => 'tag', 'operator' => 0, 'value' => '']
+						]
+					]
+				],
+				'/',
+				false,
+				'Invalid parameter "/1/tags/2": value (tag, operator, value)=(tag, 0, ) already exists.'
 			]
 		];
 	}
