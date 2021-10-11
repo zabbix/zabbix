@@ -259,8 +259,8 @@ static int	ha_db_update_config(zbx_ha_info_t *info)
 	if (NULL == result || ZBX_DB_DOWN == (intptr_t)result)
 		return FAIL;
 
-	row = DBfetch(result);
-	if (SUCCEED != is_time_suffix(row[0], &info->failover_delay, ZBX_LENGTH_UNLIMITED))
+	if (NULL == (row = DBfetch(result)) ||
+			SUCCEED != is_time_suffix(row[0], &info->failover_delay, ZBX_LENGTH_UNLIMITED))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
 	}
