@@ -18,7 +18,7 @@
 **/
 
 #ifndef ZABBIX_HA_H
-#define ZABBIX_HAH_H
+#define ZABBIX_HA_H
 
 #include "common.h"
 

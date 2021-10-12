@@ -49,6 +49,8 @@
 #define AUDIT_RESOURCE_ITEM_PROTOTYPE		36
 #define AUDIT_RESOURCE_HOST_PROTOTYPE		37
 
+#define AUDIT_RESOURCE_HA_NODE			47
+
 #define RETURN_IF_AUDIT_OFF()					\
 	if (ZBX_AUDITLOG_ENABLED != zbx_get_audit_mode())	\
 		return						\
@@ -59,13 +61,18 @@ zbx_hashset_t	*zbx_get_audit_hashset(void);
 typedef struct zbx_audit_entry
 {
 	zbx_uint64_t	id;
+	char		*cuid;
 	char		*name;
 	struct zbx_json	details_json;
 	int		audit_action;
 	int		resource_type;
-} zbx_audit_entry_t;
+}
+zbx_audit_entry_t;
 
 zbx_audit_entry_t	*zbx_audit_entry_init(zbx_uint64_t id, const char *name, int audit_action, int resource_type);
+zbx_audit_entry_t	*zbx_audit_entry_init_cuid(const char *cuid, const char *name, int audit_action,
+		int resource_type);
+
 
 int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_execute_on,
 		const char *script_command_orig, zbx_uint64_t hostid, const char *hostname, zbx_uint64_t eventid,
@@ -73,7 +80,10 @@ int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_e
 		const char *output, const char *error);
 
 void	zbx_audit_init(int audit_mode_set);
+void	zbx_audit_clean(void);
 void	zbx_audit_flush(void);
+void	zbx_audit_flush_once(void);
+int	zbx_audit_initialized(void);
 void	zbx_audit_update_json_append_string(const zbx_uint64_t id, const char *audit_op, const char *key,
 		const char *value);
 void	zbx_audit_update_json_append_uint64(const zbx_uint64_t id, const char *audit_op, const char *key,
@@ -88,4 +98,9 @@ void	zbx_audit_update_json_update_uint64(const zbx_uint64_t id, const char *key,
 void	zbx_audit_update_json_update_int(const zbx_uint64_t id, const char *key, int value_old, int value_new);
 void	zbx_audit_update_json_update_double(const zbx_uint64_t id, const char *key, double value_old, double value_new);
 void	zbx_audit_update_json_delete(const zbx_uint64_t id, const char *audit_op, const char *key);
+
+zbx_audit_entry_t	*zbx_audit_get_entry(zbx_uint64_t id, const char *cuid);
+void	zbx_audit_entry_append_int(zbx_audit_entry_t *entry, int audit_op, char *key, ...);
+void	zbx_audit_entry_append_string(zbx_audit_entry_t *entry, int audit_op, const char *key, ...);
+
 #endif	/* ZABBIX_AUDIT_H */

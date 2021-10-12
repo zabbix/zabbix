@@ -23,6 +23,10 @@
 
 #include "audit.h"
 
+#define AUDIT_USERID	0
+#define AUDIT_USERNAME	"System"
+#define AUDIT_IP	""
+
 static int		audit_mode;
 static zbx_hashset_t	zbx_audit;
 
@@ -42,6 +46,23 @@ zbx_audit_entry_t	*zbx_audit_entry_init(zbx_uint64_t id, const char *name, int a
 
 	audit_entry = (zbx_audit_entry_t*)zbx_malloc(NULL, sizeof(zbx_audit_entry_t));
 	audit_entry->id = id;
+	audit_entry->cuid = NULL;
+	audit_entry->name = zbx_strdup(NULL, name);
+	audit_entry->audit_action = audit_action;
+	audit_entry->resource_type = resource_type;
+	zbx_json_init(&(audit_entry->details_json), ZBX_JSON_STAT_BUF_LEN);
+
+	return audit_entry;
+}
+
+zbx_audit_entry_t	*zbx_audit_entry_init_cuid(const char *cuid, const char *name, int audit_action,
+		int resource_type)
+{
+	zbx_audit_entry_t	*audit_entry;
+
+	audit_entry = (zbx_audit_entry_t*)zbx_malloc(NULL, sizeof(zbx_audit_entry_t));
+	audit_entry->id = 0;
+	audit_entry->cuid = zbx_strdup(NULL, cuid);
 	audit_entry->name = zbx_strdup(NULL, name);
 	audit_entry->audit_action = audit_action;
 	audit_entry->resource_type = resource_type;
@@ -219,9 +240,14 @@ out:
 static unsigned	zbx_audit_hash_func(const void *data)
 {
 	const zbx_audit_entry_t	* const *audit_entry = (const zbx_audit_entry_t * const *)data;
+	zbx_hash_t	hash;
 
-	return ZBX_DEFAULT_UINT64_HASH_ALGO(&((*audit_entry)->id), sizeof((*audit_entry)->id),
-			ZBX_DEFAULT_HASH_SEED);
+	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&(*audit_entry)->id);
+
+	if (NULL != (*audit_entry)->cuid)
+		hash = ZBX_DEFAULT_STRING_HASH_ALGO((*audit_entry)->cuid, strlen((*audit_entry)->cuid), hash);
+
+	return hash;
 }
 
 static int	zbx_audit_compare_func(const void *d1, const void *d2)
@@ -231,10 +257,10 @@ static int	zbx_audit_compare_func(const void *d1, const void *d2)
 
 	ZBX_RETURN_IF_NOT_EQUAL((*audit_entry_1)->id, (*audit_entry_2)->id);
 
-	return 0;
+	return zbx_strcmp_null((*audit_entry_1)->cuid, (*audit_entry_2)->cuid);
 }
 
-static void	zbx_audit_clean(void)
+void	zbx_audit_clean(void)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_audit_entry_t	**audit_entry;
@@ -247,6 +273,7 @@ static void	zbx_audit_clean(void)
 	{
 		zbx_json_free(&((*audit_entry)->details_json));
 		zbx_free((*audit_entry)->name);
+		zbx_free((*audit_entry)->cuid);
 		zbx_free(*audit_entry);
 	}
 
@@ -260,6 +287,14 @@ void	zbx_audit_init(int audit_mode_set)
 #define AUDIT_HASHSET_DEF_SIZE	100
 	zbx_hashset_create(&zbx_audit, AUDIT_HASHSET_DEF_SIZE, zbx_audit_hash_func, zbx_audit_compare_func);
 #undef AUDIT_HASHSET_DEF_SIZE
+}
+
+int	zbx_audit_initialized(void)
+{
+	if (ZBX_AUDITLOG_ENABLED != zbx_get_audit_mode())
+		return SUCCEED;
+
+	return 0 == zbx_audit.num_slots ? SUCCEED : FAIL;
 }
 
 void	zbx_audit_flush(void)
@@ -283,22 +318,71 @@ void	zbx_audit_flush(void)
 		if (AUDIT_ACTION_DELETE == (*audit_entry)->audit_action ||
 				0 != strcmp((*audit_entry)->details_json.buffer, "{}"))
 		{
-#define AUDIT_USERID	0
-#define AUDIT_USERNAME	"System"
-#define AUDIT_IP	""
 			zbx_db_insert_add_values(&db_insert_audit, audit_cuid, AUDIT_USERID, AUDIT_USERNAME,
 					(int)time(NULL), (*audit_entry)->audit_action, AUDIT_IP, (*audit_entry)->id,
 					(*audit_entry)->name, (*audit_entry)->resource_type,
 					recsetid_cuid, 0 == strcmp((*audit_entry)->details_json.buffer, "{}") ? "" :
 					(*audit_entry)->details_json.buffer);
-#undef AUDIT_USERID
-#undef AUDIT_USERNAME
-#undef AUDIT_IP
 		}
 	}
 
 	zbx_db_insert_execute(&db_insert_audit);
 	zbx_db_insert_clean(&db_insert_audit);
+
+	zbx_audit_clean();
+}
+
+void	zbx_audit_flush_once(void)
+{
+	char			audit_cuid[CUID_LEN], recsetid_cuid[CUID_LEN];
+	int			ret;
+	zbx_hashset_iter_t	iter;
+	zbx_audit_entry_t	**audit_entry;
+
+	RETURN_IF_AUDIT_OFF();
+
+	zbx_new_cuid(recsetid_cuid);
+	zbx_hashset_iter_reset(&zbx_audit, &iter);
+
+	while (NULL != (audit_entry = (zbx_audit_entry_t **)zbx_hashset_iter_next(&iter)))
+	{
+		char id[ZBX_MAX_UINT64_LEN + 1], *pfield, *pvalue, *name_esc;
+
+		if (AUDIT_ACTION_DELETE != (*audit_entry)->audit_action &&
+				0 == strcmp((*audit_entry)->details_json.buffer, "{}"))
+		{
+			continue;
+		}
+
+		zbx_new_cuid(audit_cuid);
+
+		if (0 != (*audit_entry)->id)
+		{
+			zbx_snprintf(id, sizeof(id), ZBX_FS_UI64, (*audit_entry)->id);
+			pfield = "resourceid";
+			pvalue = id;
+		}
+		else
+		{
+			pfield = "resource_cuid";
+			pvalue = (*audit_entry)->cuid;
+		}
+
+		name_esc = DBdyn_escape_string((*audit_entry)->name);
+
+		ret = DBexecute_once("insert into auditlog (auditid,userid,username,"
+				"clock,action,ip,%s,resourcename,resourcetype,recordsetid,details) values"
+				" ('%s',%d,'%s','%d','%d','%s','%s','%s',%d,'%s','%s')",
+				pfield, audit_cuid, AUDIT_USERID, AUDIT_USERNAME, (int)time(NULL),
+				(*audit_entry)->audit_action, AUDIT_IP, pvalue, name_esc, (*audit_entry)->resource_type,
+				recsetid_cuid, 0 == strcmp((*audit_entry)->details_json.buffer, "{}") ? "" :
+						(*audit_entry)->details_json.buffer);
+
+		zbx_free(name_esc);
+
+		if (ZBX_DB_OK > ret)
+			break;
+	}
 
 	zbx_audit_clean();
 }
@@ -310,6 +394,7 @@ void	zbx_audit_update_json_append_string(const zbx_uint64_t id, const char *audi
 	zbx_audit_entry_t	*local_audit_entry_x = &local_audit_entry;
 
 	local_audit_entry.id = id;
+	local_audit_entry.cuid = NULL;
 
 	found_audit_entry = (zbx_audit_entry_t**)zbx_hashset_search(&zbx_audit, &(local_audit_entry_x));
 
@@ -329,6 +414,7 @@ void	zbx_audit_update_json_append_uint64(const zbx_uint64_t id, const char *audi
 	zbx_audit_entry_t	*local_audit_entry_x = &local_audit_entry;
 
 	local_audit_entry.id = id;
+	local_audit_entry.cuid = NULL;
 
 	found_audit_entry = (zbx_audit_entry_t**)zbx_hashset_search(&zbx_audit, &(local_audit_entry_x));
 
@@ -346,6 +432,7 @@ void	zbx_audit_update_json_append_uint64(const zbx_uint64_t id, const char *audi
 	zbx_audit_entry_t	*local_audit_entry_x = &local_audit_entry;	\
 										\
 	local_audit_entry.id = id;						\
+	local_audit_entry.cuid = NULL;						\
 										\
 	found_audit_entry = (zbx_audit_entry_t**)zbx_hashset_search(&zbx_audit,	\
 			&(local_audit_entry_x));				\
@@ -406,3 +493,66 @@ void	zbx_audit_update_json_delete(const zbx_uint64_t id, const char *audit_op, c
 	PREPARE_UPDATE_JSON_APPEND_OP();
 	delete_json(&((*found_audit_entry)->details_json), audit_op, key);
 }
+
+zbx_audit_entry_t	*zbx_audit_get_entry(zbx_uint64_t id, const char *cuid)
+{
+	zbx_audit_entry_t	local_audit_entry, *plocal_audit_entry = &local_audit_entry, **paudit_entry;
+
+	local_audit_entry.id = id;
+	local_audit_entry.cuid = (char *)cuid;
+
+	if (NULL == (paudit_entry = (zbx_audit_entry_t**)zbx_hashset_search(&zbx_audit, &plocal_audit_entry)))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
+
+	return *paudit_entry;
+}
+
+
+void	zbx_audit_entry_append_int(zbx_audit_entry_t *entry, int audit_op, char *key, ...)
+{
+	va_list		args;
+	int		value1, value2;
+
+	va_start(args, key);
+	value1 = va_arg(args, int);
+
+	switch (audit_op)
+	{
+		case AUDIT_ACTION_ADD:
+			append_int_json(&entry->details_json, AUDIT_DETAILS_ACTION_ADD, key, value1);
+			break;
+		case AUDIT_ACTION_UPDATE:
+			value2 = va_arg(args, int);
+			update_int_json(&entry->details_json, key, value1, value2);
+			break;
+	}
+
+	va_end(args);
+}
+
+void	zbx_audit_entry_append_string(zbx_audit_entry_t *entry, int audit_op, const char *key, ...)
+{
+	va_list		args;
+	const char	*value1, *value2;
+
+	va_start(args, key);
+	value1 = va_arg(args, const char *);
+
+	switch (audit_op)
+	{
+		case AUDIT_ACTION_ADD:
+			append_str_json(&entry->details_json, AUDIT_DETAILS_ACTION_ADD, key, value1);
+			break;
+		case AUDIT_ACTION_UPDATE:
+			value2 = va_arg(args, const char *);
+			update_str_json(&entry->details_json, key, value1, value2);
+			break;
+	}
+
+	va_end(args);
+}
+
+

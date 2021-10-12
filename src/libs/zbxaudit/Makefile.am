@@ -14,4 +14,6 @@ libzbxaudit_a_SOURCES = \
 	audit_trigger.c \
 	audit_trigger.h \
 	audit_graph.c \
-	audit_graph.h
+	audit_graph.h \
+	audit_ha.c \ 
+	audit_ha.h

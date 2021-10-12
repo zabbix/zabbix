@@ -25,6 +25,8 @@
 #include "threads.h"
 #include "zbxjson.h"
 #include "../../libs/zbxalgo/vectorimpl.h"
+#include "../../libs/zbxaudit/audit.h"
+#include "../../libs/zbxaudit/audit_ha.h"
 
 #define ZBX_HA_POLL_PERIOD	5
 
@@ -74,6 +76,9 @@ typedef struct
 	/* number of ticks active node has not been updated its lastaccess */
 	int		offline_ticks_active;
 
+	/* 0 if auditlog is disabled */
+	int		auditlog;
+
 	const char	*name;
 	char		*error;
 }
@@ -87,6 +92,7 @@ typedef struct
 	zbx_cuid_t	sessionid;
 	char		*name;
 	char		*address;
+	unsigned short	port;
 	int		status;
 	int		lastaccess;
 }
@@ -249,16 +255,21 @@ static int	ha_db_update_config(zbx_ha_info_t *info)
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	result = DBselect_once("select ha_failover_delay from config");
+	result = DBselect_once("select ha_failover_delay,auditlog_enabled from config");
 
 	if (NULL == result || ZBX_DB_DOWN == (intptr_t)result)
 		return FAIL;
 
-	if (NULL == (row = DBfetch(result)) ||
-			SUCCEED != is_time_suffix(row[0], &info->failover_delay, ZBX_LENGTH_UNLIMITED))
+	if (NULL != (row = DBfetch(result)))
 	{
-		THIS_SHOULD_NEVER_HAPPEN;
+		if (SUCCEED != is_time_suffix(row[0], &info->failover_delay, ZBX_LENGTH_UNLIMITED))
+			THIS_SHOULD_NEVER_HAPPEN;
+
+		info->auditlog = atoi(row[1]);
 	}
+	else
+		THIS_SHOULD_NEVER_HAPPEN;
+
 	DBfree_result(result);
 
 	return SUCCEED;
@@ -294,7 +305,8 @@ static int	ha_db_get_nodes(zbx_vector_ha_node_t *nodes, int lock)
 		node->name = zbx_strdup(NULL, row[1]);
 		node->status = atoi(row[2]);
 		node->lastaccess = atoi(row[3]);
-		node->address = zbx_dsprintf(NULL, "%s:%s", row[4], row[5]);
+		node->address = zbx_strdup(NULL, row[4]);
+		node->port = atoi(row[5]);
 		zbx_strlcpy(node->sessionid.str, row[6], sizeof(node->sessionid));
 		zbx_vector_ha_node_append(nodes, node);
 	}
@@ -302,6 +314,26 @@ static int	ha_db_get_nodes(zbx_vector_ha_node_t *nodes, int lock)
 	DBfree_result(result);
 
 	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: ha_check_registered_node                                         *
+ *                                                                            *
+ * Purpose: check if the node is registered in node table and get ID          *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_ha_node_t	*ha_find_node_by_name(zbx_vector_ha_node_t *nodes, const char *name)
+{
+	int	i;
+
+	for (i = 0; i < nodes->values_num; i++)
+	{
+		if (0 == strcmp(nodes->values[i]->name, name))
+			return nodes->values[i];
+	}
+
+	return NULL;
 }
 
 /******************************************************************************
@@ -553,6 +585,9 @@ static int	ha_db_create_node(zbx_ha_info_t *info)
 	if (SUCCEED != ha_db_get_nodes(&nodes, 0))
 		goto out;
 
+	if (FAIL == ha_db_update_config(info))
+		goto out;
+
 	for (i = 0; i < nodes.values_num; i++)
 	{
 		if (0 == strcmp(info->name, nodes.values[i]->name))
@@ -574,9 +609,16 @@ static int	ha_db_create_node(zbx_ha_info_t *info)
 		zbx_new_cuid(nodeid.str);
 		name_esc = DBdyn_escape_string(info->name);
 
-		(void)DBexecute_once("insert into ha_node (ha_nodeid,name,status,lastaccess)"
+		if (ZBX_DB_OK <= DBexecute_once("insert into ha_node (ha_nodeid,name,status,lastaccess)"
 				" values ('%s','%s', %d," ZBX_DB_TIMESTAMP() ")",
-				nodeid.str, name_esc, ZBX_NODE_STATUS_STOPPED);
+				nodeid.str, name_esc, ZBX_NODE_STATUS_STOPPED))
+		{
+			zbx_audit_init(info->auditlog);
+			zbx_audit_ha_create_entry(AUDIT_ACTION_ADD, nodeid.str, info->name);
+			zbx_audit_ha_add_create_fields(nodeid.str, info->name, ZBX_NODE_STATUS_STOPPED);
+			zbx_audit_flush_once();
+		}
+
 
 		zbx_free(name_esc);
 	}
@@ -644,7 +686,6 @@ out:
 	return ret;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: ha_db_register_node                                              *
@@ -678,9 +719,6 @@ static int	ha_db_register_node(zbx_ha_info_t *info)
 	if (SUCCEED != ha_db_get_nodes(&nodes, ZBX_HA_NODE_LOCK))
 		goto out;
 
-	if (FAIL == ha_db_update_config(info))
-		goto out;
-
 	if (SUCCEED != ha_db_get_time(&db_time))
 		goto out;
 
@@ -691,18 +729,55 @@ static int	ha_db_register_node(zbx_ha_info_t *info)
 
 	if (SUCCEED == ret)
 	{
-		char		*address = NULL, *address_esc;
+		char		*address = NULL, *sql = NULL;
+		size_t		sql_alloc = 0, sql_offset = 0;
 		unsigned short	port = 0;
+		zbx_ha_node_t	*node;
+
+		if (NULL == (node = ha_find_node_by_name(&nodes, info->name)))
+		{
+			ha_set_error(info, "cannot find server node \"%s\" in registry", info->name);
+			ret = FAIL;
+			goto out;
+		}
 
 		ha_status = SUCCEED == activate ? ZBX_NODE_STATUS_ACTIVE : ZBX_NODE_STATUS_STANDBY;
-
 		ha_get_external_address(&address, &port);
-		address_esc = DBdyn_escape_string(address);
 
-		(void)DBexecute_once("update ha_node set status=%d,address='%s',port=%d,sessionid='%s',lastaccess="
-				ZBX_DB_TIMESTAMP() " where ha_nodeid='%s'",
-				ha_status, address_esc, port, ha_sessionid.str, info->nodeid.str);
-		zbx_free(address_esc);
+		zbx_audit_init(info->auditlog);
+		zbx_audit_ha_create_entry(AUDIT_ACTION_UPDATE, info->nodeid.str, info->name);
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update ha_node set lastaccess="
+					ZBX_DB_TIMESTAMP() ",sessionid='%s'", ha_sessionid.str);
+
+		if (ha_status != node->status)
+		{
+			zbx_audit_ha_update_field_int(info->nodeid.str, "ha_node.status", node->status, ha_status);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",status=%d", ha_status);
+		}
+
+		if (0 != strcmp(address, node->address))
+		{
+			char	*address_esc;
+
+			address_esc = DBdyn_escape_string(address);
+			zbx_audit_ha_update_field_string(node->nodeid.str, "ha_node.address", node->address, address);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",address='%s'", address_esc);
+			zbx_free(address_esc);
+		}
+
+		if (port != node->port)
+		{
+			zbx_audit_ha_update_field_int(info->nodeid.str, "ha_node.port", node->port, port);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",port=%d", port);
+		}
+
+		if (ZBX_DB_OK <= DBexecute_once("%s where ha_nodeid='%s'", sql, info->nodeid.str))
+			zbx_audit_flush_once();
+		else
+			zbx_audit_clean();
+
+		zbx_free(sql);
 		zbx_free(address);
 	}
 out:
@@ -758,7 +833,14 @@ static int	ha_check_standby_nodes(zbx_ha_info_t *info, zbx_vector_ha_node_t *nod
 			continue;
 
 		if (db_time >= nodes->values[i]->lastaccess + info->failover_delay)
+		{
 			zbx_vector_str_append(&unavailable_nodes, nodes->values[i]->nodeid.str);
+
+			zbx_audit_ha_create_entry(AUDIT_ACTION_UPDATE, nodes->values[i]->nodeid.str,
+					nodes->values[i]->name);
+			zbx_audit_ha_update_field_int(nodes->values[i]->nodeid.str, "ha_node.status",
+					nodes->values[i]->status, ZBX_NODE_STATUS_UNAVAILABLE);
+		}
 	}
 
 	if (0 != unavailable_nodes.values_num)
@@ -830,38 +912,24 @@ static int	ha_check_active_node(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes
 
 		if (info->failover_delay / ZBX_HA_POLL_PERIOD + 1 < info->offline_ticks_active)
 		{
-
 			if (ZBX_DB_OK > DBexecute("update ha_node set status=%d where ha_nodeid='%s'",
 					ZBX_NODE_STATUS_UNAVAILABLE, nodes->values[i]->nodeid.str))
 			{
 				ret = FAIL;
 			}
+			else
+			{
+				zbx_audit_ha_create_entry(AUDIT_ACTION_UPDATE, nodes->values[i]->nodeid.str,
+						nodes->values[i]->name);
+				zbx_audit_ha_update_field_int(nodes->values[i]->nodeid.str, "ha_node.status",
+						nodes->values[i]->status, ZBX_NODE_STATUS_UNAVAILABLE);
 
-			*ha_status = ZBX_NODE_STATUS_ACTIVE;
+				*ha_status = ZBX_NODE_STATUS_ACTIVE;
+			}
 		}
 	}
 
 	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: ha_check_registered_node                                         *
- *                                                                            *
- * Purpose: check if the node is registered in node table and get ID          *
- *                                                                            *
- ******************************************************************************/
-static zbx_ha_node_t	*ha_find_node_by_name(zbx_vector_ha_node_t *nodes, const char *name)
-{
-	int	i;
-
-	for (i = 0; i < nodes->values_num; i++)
-	{
-		if (0 == strcmp(nodes->values[i]->name, name))
-			return nodes->values[i];
-	}
-
-	return NULL;
 }
 
 /******************************************************************************
@@ -914,6 +982,8 @@ static int	ha_check_nodes(zbx_ha_info_t *info)
 	if (SUCCEED != ha_db_get_time(&db_time))
 		goto out;
 
+	zbx_audit_init(info->auditlog);
+
 	if (ZBX_HA_IS_CLUSTER())
 	{
 		if (ZBX_NODE_STATUS_ACTIVE == info->ha_status)
@@ -932,18 +1002,31 @@ static int	ha_check_nodes(zbx_ha_info_t *info)
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update ha_node set lastaccess=" ZBX_DB_TIMESTAMP());
 
 		if (ha_status != node->status)
+		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",status=%d", ha_status);
+
+			zbx_audit_ha_create_entry(AUDIT_ACTION_UPDATE, node->nodeid.str, node->name);
+			zbx_audit_ha_update_field_int(node->nodeid.str, "ha_node.status", node->status,
+					ha_status);
+		}
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where ha_nodeid='%s'", info->nodeid.str);
 
 		(void)DBexecute_once("%s", sql);
+
 		zbx_free(sql);
 	}
 out:
 	if (SUCCEED == ret)
+	{
+		zbx_audit_flush_once();
 		ha_db_commit(info);
+	}
 	else
+	{
+		zbx_audit_clean();
 		ha_db_rollback(info);
+	}
 
 finish:
 	if (SUCCEED == ret)
@@ -1005,18 +1088,21 @@ static int	ha_db_get_nodes_json(zbx_ha_info_t *info, char **nodes_json, char **e
 	if (SUCCEED == ha_db_get_nodes(&nodes, 0))
 	{
 		struct zbx_json	j;
+		char		address[512];
 
 		zbx_json_initarray(&j, 1024);
 
 		for (i = 0; i < nodes.values_num; i++)
 		{
+			zbx_snprintf(address, sizeof(address), "%s:%uh", nodes.values[i]->address,
+					nodes.values[i]->port);
 			zbx_json_addobject(&j, NULL);
 
 			zbx_json_addstring(&j, ZBX_PROTO_TAG_ID, nodes.values[i]->nodeid.str, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, ZBX_PROTO_TAG_NAME, nodes.values[i]->name, ZBX_JSON_TYPE_STRING);
 			zbx_json_addint64(&j, ZBX_PROTO_TAG_STATUS, (zbx_int64_t)nodes.values[i]->status);
 			zbx_json_addint64(&j, ZBX_PROTO_TAG_LASTACCESS, (zbx_int64_t)nodes.values[i]->lastaccess);
-			zbx_json_addstring(&j, ZBX_PROTO_TAG_ADDRESS, nodes.values[i]->address, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, ZBX_PROTO_TAG_ADDRESS, address, ZBX_JSON_TYPE_STRING);
 			zbx_json_addint64(&j, ZBX_PROTO_TAG_DB_TIMESTAMP, (zbx_int64_t)db_time);
 			zbx_json_addint64(&j, ZBX_PROTO_TAG_LASTACCESS_AGE,
 					(zbx_int64_t)(db_time -nodes.values[i]->lastaccess));
@@ -1086,6 +1172,13 @@ static int	ha_remove_node_by_index(zbx_ha_info_t *info, int index, char **error)
 	{
 		*error = zbx_strdup(NULL, "database connection problem");
 		goto out;
+	}
+	else
+	{
+		zbx_audit_init(info->auditlog);
+		zbx_audit_ha_create_entry(AUDIT_ACTION_DELETE, nodes.values[index]->nodeid.str,
+				nodes.values[index]->name);
+		zbx_audit_flush_once();
 	}
 
 	ret = SUCCEED;
@@ -1229,8 +1322,14 @@ static void	ha_db_update_exit_status(zbx_ha_info_t *info)
 	if (SUCCEED != ha_db_lock_nodes(info))
 		goto out;
 
-	DBexecute_once("update ha_node set status=%d where ha_nodeid='%s'",
-			ZBX_NODE_STATUS_STOPPED, info->nodeid.str);
+	if (ZBX_DB_OK <= DBexecute_once("update ha_node set status=%d where ha_nodeid='%s'",
+			ZBX_NODE_STATUS_STOPPED, info->nodeid.str))
+	{
+		zbx_audit_init(info->auditlog);
+		zbx_audit_ha_create_entry(AUDIT_ACTION_UPDATE, info->nodeid.str, info->name);
+		zbx_audit_ha_update_field_int(info->nodeid.str, "ha_node.status", info->ha_status, ZBX_NODE_STATUS_STOPPED);
+		zbx_audit_flush_once();
+	}
 out:
 	ha_db_commit(info);
 }
@@ -1540,6 +1639,7 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 	info.offline_ticks_active = 0;
 	info.lastaccess_active = 0;
 	info.failover_delay = ZBX_HA_DEFAULT_FAILOVER_DELAY;
+	info.auditlog = 0;
 
 	lastcheck = zbx_time();
 

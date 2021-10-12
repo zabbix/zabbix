@@ -53,6 +53,7 @@ void	zbx_audit_trigger_create_entry(int audit_action, zbx_uint64_t triggerid, co
 	resource_type = trigger_flag_to_resource_type(flags);
 
 	local_audit_trigger_entry.id = triggerid;
+	local_audit_trigger_entry.cuid = NULL;
 
 	found_audit_trigger_entry = (zbx_audit_entry_t**)zbx_hashset_search(zbx_get_audit_hashset(),
 			&(local_audit_trigger_entry_x));

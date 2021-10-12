@@ -30,6 +30,7 @@ void	zbx_audit_httptest_create_entry(int audit_action, zbx_uint64_t httptestid, 
 	RETURN_IF_AUDIT_OFF();
 
 	local_audit_httptest_entry.id = httptestid;
+	local_audit_httptest_entry.cuid = NULL;
 
 	found_audit_httptest_entry = (zbx_audit_entry_t**)zbx_hashset_search(zbx_get_audit_hashset(),
 			&(local_audit_httptest_entry_x));

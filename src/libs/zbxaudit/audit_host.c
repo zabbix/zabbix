@@ -189,6 +189,7 @@ void	zbx_audit_##funcname##_create_entry(int audit_action, zbx_uint64_t hostid, 
 	RETURN_IF_AUDIT_OFF();											\
 														\
 	local_audit_host_entry.id = hostid;									\
+	local_audit_host_entry.cuid = NULL;									\
 														\
 	found_audit_host_entry = (zbx_audit_entry_t**)zbx_hashset_search(zbx_get_audit_hashset(),		\
 			&(local_audit_host_entry_x));								\
@@ -803,6 +804,7 @@ void	zbx_audit_host_group_create_entry(int audit_action, zbx_uint64_t groupid, c
 	RETURN_IF_AUDIT_OFF();
 
 	local_audit_group_entry.id = groupid;
+	local_audit_group_entry.cuid = NULL;
 
 	found_audit_group_entry = (zbx_audit_entry_t**)zbx_hashset_search(zbx_get_audit_hashset(),
 			&(local_audit_group_entry_x));

@@ -947,4 +947,5 @@ int	zbx_db_trigger_get_itemid(const DB_TRIGGER *trigger, int index, zbx_uint64_t
 void	zbx_db_trigger_get_itemids(const DB_TRIGGER *trigger, zbx_vector_uint64_t *itemids);
 
 int	DBselect_ids_names(const char *sql, zbx_vector_uint64_t *ids, zbx_vector_str_t *names);
+
 #endif

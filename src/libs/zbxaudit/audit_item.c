@@ -56,6 +56,7 @@ void	zbx_audit_item_create_entry(int audit_action, zbx_uint64_t itemid, const ch
 	resource_type = item_flag_to_resource_type(flags);
 
 	local_audit_item_entry.id = itemid;
+	local_audit_item_entry.cuid = NULL;
 
 	found_audit_item_entry = (zbx_audit_entry_t**)zbx_hashset_search(zbx_get_audit_hashset(),
 			&(local_audit_item_entry_x));
@@ -361,6 +362,7 @@ void	zbx_audit_item_create_entry_for_delete(zbx_uint64_t id, const char *name, i
 	resource_type = item_flag_to_resource_type(flag);
 
 	local_audit_item_entry.id = id;
+	local_audit_item_entry.cuid = NULL;
 
 	found_audit_item_entry = (zbx_audit_entry_t**)zbx_hashset_search(zbx_get_audit_hashset(),
 			&(local_audit_item_entry_x));
