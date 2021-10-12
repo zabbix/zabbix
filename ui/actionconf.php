@@ -249,51 +249,48 @@ elseif (hasRequest('add_operation') && hasRequest('new_operation')) {
 	$new_operation = getRequest('new_operation');
 	$result = true;
 
-	$new_operation['recovery'] = ACTION_OPERATION;
 	$new_operation['eventsource'] = $eventsource;
 
-	if (API::Action()->validateOperationsIntegrity($new_operation)) {
-		$_REQUEST['operations'] = getRequest('operations', []);
+	$_REQUEST['operations'] = getRequest('operations', []);
 
-		$uniqOperations = [
-			OPERATION_TYPE_HOST_ADD => 0,
-			OPERATION_TYPE_HOST_REMOVE => 0,
-			OPERATION_TYPE_HOST_ENABLE => 0,
-			OPERATION_TYPE_HOST_DISABLE => 0,
-			OPERATION_TYPE_HOST_INVENTORY => 0
-		];
+	$uniqOperations = [
+		OPERATION_TYPE_HOST_ADD => 0,
+		OPERATION_TYPE_HOST_REMOVE => 0,
+		OPERATION_TYPE_HOST_ENABLE => 0,
+		OPERATION_TYPE_HOST_DISABLE => 0,
+		OPERATION_TYPE_HOST_INVENTORY => 0
+	];
 
-		if (array_key_exists($new_operation['operationtype'], $uniqOperations)) {
-			$uniqOperations[$new_operation['operationtype']]++;
+	if (array_key_exists($new_operation['operationtype'], $uniqOperations)) {
+		$uniqOperations[$new_operation['operationtype']]++;
 
-			foreach ($_REQUEST['operations'] as $operationId => $operation) {
-				if (array_key_exists($operation['operationtype'], $uniqOperations)
+		foreach ($_REQUEST['operations'] as $operationId => $operation) {
+			if (array_key_exists($operation['operationtype'], $uniqOperations)
 					&& (!array_key_exists('id', $new_operation)
 						|| bccomp($new_operation['id'], $operationId) != 0)) {
-					$uniqOperations[$operation['operationtype']]++;
-				}
-			}
-
-			if ($uniqOperations[$new_operation['operationtype']] > 1) {
-				$result = false;
-				error(_s('Operation "%1$s" already exists.', operation_type2str($new_operation['operationtype'])));
-				show_messages();
+				$uniqOperations[$operation['operationtype']]++;
 			}
 		}
 
-		if ($result) {
-			if (isset($_REQUEST['new_operation']['id'])) {
-				$_REQUEST['operations'][$_REQUEST['new_operation']['id']] = $_REQUEST['new_operation'];
-			}
-			else {
-				$_REQUEST['operations'][] = $_REQUEST['new_operation'];
-			}
-
-			sortOperations($eventsource, $_REQUEST['operations']);
+		if ($uniqOperations[$new_operation['operationtype']] > 1) {
+			$result = false;
+			error(_s('Operation "%1$s" already exists.', operation_type2str($new_operation['operationtype'])));
+			show_messages();
 		}
-
-		unset($_REQUEST['new_operation']);
 	}
+
+	if ($result) {
+		if (isset($_REQUEST['new_operation']['id'])) {
+			$_REQUEST['operations'][$_REQUEST['new_operation']['id']] = $_REQUEST['new_operation'];
+		}
+		else {
+			$_REQUEST['operations'][] = $_REQUEST['new_operation'];
+		}
+
+		sortOperations($eventsource, $_REQUEST['operations']);
+	}
+
+	unset($_REQUEST['new_operation']);
 }
 elseif (hasRequest('add_recovery_operation') && hasRequest('new_recovery_operation')) {
 	$new_recovery_operation = getRequest('new_recovery_operation');
@@ -301,32 +298,28 @@ elseif (hasRequest('add_recovery_operation') && hasRequest('new_recovery_operati
 	$new_recovery_operation['recovery'] = ACTION_RECOVERY_OPERATION;
 	$new_recovery_operation['eventsource'] = $eventsource;
 
-	if (API::Action()->validateOperationsIntegrity($new_recovery_operation)) {
-		$_REQUEST['recovery_operations'] = getRequest('recovery_operations', []);
+	$_REQUEST['recovery_operations'] = getRequest('recovery_operations', []);
 
-		if (isset($_REQUEST['new_recovery_operation']['id'])) {
-			$_REQUEST['recovery_operations'][$_REQUEST['new_recovery_operation']['id']] = $_REQUEST['new_recovery_operation'];
-		}
-		else {
-			$_REQUEST['recovery_operations'][] = $_REQUEST['new_recovery_operation'];
-		}
-
-		unset($_REQUEST['new_recovery_operation']);
+	if (isset($_REQUEST['new_recovery_operation']['id'])) {
+		$_REQUEST['recovery_operations'][$_REQUEST['new_recovery_operation']['id']] = $_REQUEST['new_recovery_operation'];
 	}
+	else {
+		$_REQUEST['recovery_operations'][] = $_REQUEST['new_recovery_operation'];
+	}
+
+	unset($_REQUEST['new_recovery_operation']);
 }
 elseif (hasRequest('add_update_operation') && $new_update_operation) {
 	$new_update_operation['recovery'] = ACTION_UPDATE_OPERATION;
 	$new_update_operation['eventsource'] = $eventsource;
 
-	if (API::Action()->validateOperationsIntegrity($new_update_operation)) {
-		if (array_key_exists('id', $new_update_operation)) {
-			$update_operations[$new_update_operation['id']] = $new_update_operation;
-		}
-		else {
-			$update_operations[] = $new_update_operation;
-		}
-		$new_update_operation = [];
+	if (array_key_exists('id', $new_update_operation)) {
+		$update_operations[$new_update_operation['id']] = $new_update_operation;
 	}
+	else {
+		$update_operations[] = $new_update_operation;
+	}
+	$new_update_operation = [];
 }
 elseif (hasRequest('edit_operationid')) {
 	$_REQUEST['edit_operationid'] = array_keys($_REQUEST['edit_operationid']);
