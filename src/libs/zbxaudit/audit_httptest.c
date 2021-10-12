@@ -41,8 +41,6 @@ void	zbx_audit_httptest_create_entry(int audit_action, zbx_uint64_t httptestid, 
 		local_audit_httptest_entry_insert = zbx_audit_entry_init(httptestid, name, audit_action,
 				AUDIT_RESOURCE_SCENARIO);
 
-		zbx_json_init(&(local_audit_httptest_entry_insert->details_json), ZBX_JSON_STAT_BUF_LEN);
-
 		zbx_hashset_insert(zbx_get_audit_hashset(), &local_audit_httptest_entry_insert,
 				sizeof(local_audit_httptest_entry_insert));
 	}
