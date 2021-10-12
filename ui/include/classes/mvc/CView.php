@@ -76,6 +76,13 @@ class CView {
 	private $js_files = [];
 
 	/**
+	 * List of CSS files for inclusion into a HTML page using <link rel="stylesheet" type="text/css" src="...">.
+	 *
+	 * @var array
+	 */
+	private $css_files = [];
+
+	/**
 	 * Create a view based on view name and data.
 	 *
 	 * @param string $name  View name to search for.
@@ -195,6 +202,24 @@ class CView {
 	 */
 	public function getJsFiles() {
 		return $this->js_files;
+	}
+
+	/**
+	 * Add a CSS file to this view.
+	 *
+	 * @param string $src
+	 */
+	public function addCssFile($src) {
+		$this->css_files[] = $src;
+	}
+
+	/**
+	 * Get list of CSS files added to this view.
+	 *
+	 * @return array
+	 */
+	public function getCssFiles() {
+		return $this->css_files;
 	}
 
 	/**

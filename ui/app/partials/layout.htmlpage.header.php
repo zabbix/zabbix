@@ -66,6 +66,8 @@ $pageHeader
 		->getUrl()
 	);
 
+array_map([$pageHeader, 'addCssFile'], $data['stylesheet']['files']);
+
 if ($scripts) {
 	$pageHeader->addJsFile((new CUrl('jsLoader.php'))
 		->setArgument('ver', ZABBIX_VERSION)

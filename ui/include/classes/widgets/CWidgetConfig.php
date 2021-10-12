@@ -90,7 +90,7 @@ class CWidgetConfig {
 			WIDGET_DISCOVERY			=> 'CWidget',
 			WIDGET_FAV_GRAPHS			=> 'CWidget',
 			WIDGET_FAV_MAPS				=> 'CWidget',
-			WIDGET_GEOMAP				=> 'CWidget',
+			WIDGET_GEOMAP				=> 'CWidgetGeoMap',
 			WIDGET_GRAPH				=> 'CWidgetGraph',
 			WIDGET_GRAPH_PROTOTYPE		=> 'CWidgetGraphPrototype',
 			WIDGET_HOST_AVAIL			=> 'CWidget',

@@ -4723,8 +4723,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   padding: 3px 0 7px; }
 
 .overlay-descr {
-  background: linear-gradient(#000000 30%, transparent), linear-gradient(transparent, #000000 70%) 0 100%, radial-gradient(50% 0, farthest-side, rgba(0, 0, 0, 0.4), transparent), radial-gradient(50% 100%, farthest-side, rgba(0, 0, 0, 0.4), transparent) 0 100%;
-  background: linear-gradient(#000000 30%, transparent), linear-gradient(transparent, #000000 70%) 0 100%, radial-gradient(farthest-side at 50% 0, rgba(0, 0, 0, 0.4), transparent), radial-gradient(farthest-side at 50% 100%, rgba(0, 0, 0, 0.4), transparent) 0 100%;
+  background: linear-gradient(#000000 30%, rgba(0, 0, 0, 0)), linear-gradient(rgba(0, 0, 0, 0), #000000 70%) 0 100%, radial-gradient(50% 0, farthest-side, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0)), radial-gradient(50% 100%, farthest-side, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0)) 0 100%;
+  background: linear-gradient(#000000 30%, rgba(0, 0, 0, 0)), linear-gradient(rgba(0, 0, 0, 0), #000000 70%) 0 100%, radial-gradient(farthest-side at 50% 0, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0)), radial-gradient(farthest-side at 50% 100%, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0)) 0 100%;
   background-repeat: no-repeat;
   background-color: #000000;
   background-size: 100% 40px, 100% 40px, 100% 4px, 100% 4px;
@@ -5451,8 +5451,8 @@ svg {
   .columns-wrapper.columns-3 > div,
   .columns-wrapper.columns-3 > li {
     display: block;
-    flex: 0 0 33.33333%;
-    max-width: 33.33333%; }
+    flex: 0 0 33.3333333333%;
+    max-width: 33.3333333333%; }
   .columns-wrapper .column-5 {
     flex: 0 0 5%;
     max-width: 5%; }
@@ -6002,8 +6002,8 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
     border-radius: 50%;
     background: #f8f8f8; }
   .range-control.range-control-focus .range-control-thumb {
-    margin-top: -6.66667px;
-    margin-left: -6.66667px;
+    margin-top: -6.6666666667px;
+    margin-left: -6.6666666667px;
     background: #f8f8f8;
     border: 2px solid #fafafa; }
   .range-control.range-control-focus .range-control-progress {
@@ -6480,6 +6480,50 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   .audit-details-wrapper .audit-show-details-btn-wrapper {
     margin: 0 5px 0 5px; }
 
+.geomap-filter-button,
+.navigate-home-button {
+  background-image: url("../img/icon-sprite.svg");
+  background-repeat: no-repeat; }
+
+.geomap-filter-button {
+  background-position: -243px -543px !important; }
+
+.navigate-home-button {
+  background-position: -117px -506px !important; }
+
+.geomap-filter {
+  border: 2px solid rgba(68, 68, 68, 0.4);
+  background-color: #000000;
+  padding: 10px 30px 5px 10px;
+  position: absolute;
+  margin-right: -2px;
+  margin-top: 5px;
+  display: none;
+  right: 0; }
+
+.geomap-filter.collapsed {
+  display: table; }
+
+.geomap-filter li {
+  width: calc(100% + 20px); }
+
+.geomap-filter label {
+  white-space: nowrap; }
+
+.marker-cluster {
+  background: none; }
+
+.marker-cluster div {
+  text-align: center;
+  border-radius: 50%;
+  margin-left: 5px;
+  margin-top: 5px;
+  height: 30px;
+  width: 30px; }
+
+.marker-cluster span {
+  line-height: 30px; }
+
 .sidebar .logo:focus .sidebar-logo {
   box-shadow: 0 0 0 2px #000000; }
 .sidebar button:focus {
@@ -6890,7 +6934,7 @@ z-select button.focusable:focus,
 .log-warning-bg,
 .log-high-bg,
 .log-disaster-bg {
-  background-color: transparent !important; }
+  background-color: rgba(0, 0, 0, 0) !important; }
   .na-bg::before,
   .normal-bg::before,
   .info-bg::before,
@@ -7035,7 +7079,7 @@ td.inactive-bg {
   color: #ffffff; }
 
 .inactive-bg, td.inactive-bg {
-  background-color: transparent !important;
+  background-color: rgba(0, 0, 0, 0) !important;
   padding-left: 42px; }
   .inactive-bg::before {
     content: '';

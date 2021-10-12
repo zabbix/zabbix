@@ -24,7 +24,8 @@ class CControllerProfileUpdate extends CController {
 	protected function checkInput() {
 		$fields = [
 			'idx' =>		'required|string',
-			'value_int' =>	'required|int32',
+			'value_int' =>	'int32',
+			'value_str' =>	'string',
 			'idx2' =>		'array_id'
 		];
 
@@ -87,6 +88,8 @@ class CControllerProfileUpdate extends CController {
 					$ret = true;
 					break;
 
+				case 'web.dashboard.widget.geomap.default_view':
+				case 'web.dashboard.widget.geomap.severity_filter':
 				case !!preg_match('/web.dashboard.widget.navtree.item-\d+.toggle/', $this->getInput('idx')):
 				case 'web.dashboard.widget.navtree.item.selected':
 					$ret = $this->hasInput('idx2');
@@ -94,6 +97,19 @@ class CControllerProfileUpdate extends CController {
 
 				default:
 					$ret = false;
+			}
+		}
+
+		if ($ret) {
+			switch ($this->getInput('idx')) {
+				case 'web.dashboard.widget.geomap.default_view':
+				case 'web.dashboard.widget.geomap.severity_filter':
+					$ret = $this->hasInput('value_str');
+					break;
+
+				default:
+					$ret = $this->hasInput('value_int');
+					break;
 			}
 		}
 
@@ -110,10 +126,28 @@ class CControllerProfileUpdate extends CController {
 
 	protected function doAction() {
 		$idx = $this->getInput('idx');
-		$value_int = $this->getInput('value_int');
+		$value_int = $this->getInput('value_int', 0);
+		$value_str = $this->getInput('value_str', '');
 
 		DBstart();
 		switch ($idx) {
+			case 'web.dashboard.widget.geomap.default_view':
+				foreach ($this->getInput('idx2') as $idx2) {
+					CProfile::update($idx, $value_str, PROFILE_TYPE_STR, $idx2);
+				}
+				break;
+
+			case 'web.dashboard.widget.geomap.severity_filter':
+				if ($value_str === '') { // default value
+					CProfile::delete($idx, $this->getInput('idx2'));
+				}
+				else {
+					foreach ($this->getInput('idx2') as $idx2) {
+						CProfile::update($idx, $value_str, PROFILE_TYPE_STR, $idx2);
+					}
+				}
+				break;
+
 			case !!preg_match('/web.dashboard.widget.navtree.item-\d+.toggle/', $this->getInput('idx')):
 				if ($value_int == 1) { // default value
 					CProfile::delete($idx, $this->getInput('idx2'));

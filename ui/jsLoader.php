@@ -36,6 +36,7 @@ $availableJScripts = [
 	'class.widget.js' => 'widgets/',
 	'class.widget.iterator.js' => 'widgets/',
 	'class.widget.clock.js' => 'widgets/',
+	'class.widget.geomap.js' => 'widgets/',
 	'class.widget.graph.js' => 'widgets/',
 	'class.widget.graph-prototype.js' => 'widgets/',
 	'class.widget.map.js' => 'widgets/',
@@ -63,6 +64,9 @@ $availableJScripts = [
 	// vendors
 	'jquery.js' => 'vendors/',
 	'jquery-ui.js' => 'vendors/',
+	'leaflet.contextmenu.min.js' => 'vendors/aratcliffe/Leaflet.contextmenu/',
+	'leaflet.js' => 'vendors/Leaflet/Leaflet/',
+	'leaflet.markercluster.js' => 'vendors/Leaflet/Leaflet.markercluster/',
 	// classes
 	'component.z-select.js' => '',
 	'class.base-component.js' => '',
@@ -71,6 +75,7 @@ $availableJScripts = [
 	'class.cdate.js' => '',
 	'class.cdebug.js' => '',
 	'class.cmap.js' => '',
+	'class.geomaps.js' => '',
 	'class.localstorage.js' => '',
 	'class.menu.js' => '',
 	'class.menu-item.js' => '',
@@ -143,6 +148,24 @@ $tranStrings = [
 		'Click and drag to desired size.' => _('Click and drag to desired size.'),
 		'Release to create a widget.' => _('Release to create a widget.')
 	],
+	'class.geomaps.js' => [
+		'No problems' => _('No problems'),
+		'Not classified' => _('Not classified'),
+		'Information' => _('Information'),
+		'Warning' => _('Warning'),
+		'Average' => _('Average'),
+		'High' => _('High'),
+		'Disaster' => _('Disaster'),
+		'Severity filter' => _('Severity filter'),
+		'Navigate to default view' => _('Navigate to default view'),
+		'Host' => _('Host'),
+		'D' => _x('D', 'abbreviation of severity level'),
+		'H' => _x('H', 'abbreviation of severity level'),
+		'A' => _x('A', 'abbreviation of severity level'),
+		'W' => _x('W', 'abbreviation of severity level'),
+		'I' => _x('I', 'abbreviation of severity level'),
+		'N' => _x('N', 'abbreviation of severity level')
+	],
 	'class.widget.js' => [
 		'10 seconds' => _n('%1$s second', '%1$s seconds', 10),
 		'30 seconds' => _n('%1$s second', '%1$s seconds', 30),
@@ -157,6 +180,9 @@ $tranStrings = [
 		'No refresh' => _('No refresh'),
 		'Paste' => _s('Paste'),
 		'Refresh interval' => _s('Refresh interval')
+	],
+	'class.widget.geomap.js' => [
+		'Set this view as default' => _('Set this view as default')
 	],
 	'class.widget.iterator.js' => [
 		'Next page' => _s('Next page'),

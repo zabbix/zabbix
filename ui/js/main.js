@@ -669,6 +669,23 @@ function updateUserProfile(idx, value_int, idx2) {
 	});
 }
 
+/**
+ * Toggles filter state and updates title and icons accordingly.
+ *
+ * @param {string} 	idx					User profile index
+ * @param {string} 	value_str			String value
+ * @param {object} 	idx2				An array of IDs
+ */
+function updateUserProfileString(idx, value_str, idx2) {
+	return sendAjaxData('zabbix.php?action=profile.update', {
+		data: {
+			idx: idx,
+			value_str: value_str,
+			idx2: idx2
+		}
+	});
+}
+
 function changeWidgetState(obj, widgetId, idx) {
 	var widgetObj = jQuery('#' + widgetId + '_widget'),
 		css = switchElementClass(obj, 'btn-widget-collapse', 'btn-widget-expand'),
