@@ -461,6 +461,9 @@ static int	ha_check_standalone_config(zbx_ha_info_t *info, zbx_vector_ha_node_t 
 
 	for (i = 0; i < nodes->values_num; i++)
 	{
+		if ('\0' == *nodes->values[i]->name)
+			continue;
+
 		if (ZBX_NODE_STATUS_STOPPED != nodes->values[i]->status &&
 				SUCCEED == ha_is_available(info, nodes->values[i]->lastaccess, db_time))
 		{
