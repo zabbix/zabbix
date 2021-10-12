@@ -26,5 +26,33 @@ ZBX_METRIC	parameter_hostname =
 
 int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return get_system_hostname(request, result);
+	int		rc;
+	char		*hostname;
+	long 		hostbufsize = 0;
+
+	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		return SYSINFO_RET_FAIL;
+	}
+
+#ifdef _SC_HOST_NAME_MAX
+	hostbufsize = sysconf(_SC_HOST_NAME_MAX) + 1;
+#endif
+	if (0 == hostbufsize)
+		hostbufsize = 256;
+
+	hostname = zbx_malloc(NULL, hostbufsize);
+
+	if (0 != gethostname(hostname, hostbufsize))
+	{
+		zbx_free(hostname);
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (FAIL == (rc = hostname_handle_params(request, result, hostname)))
+		zbx_free(hostname);
+
+	return rc;
 }
