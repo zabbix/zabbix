@@ -508,7 +508,7 @@ static int	ha_check_cluster_config(zbx_ha_info_t *info, zbx_vector_ha_node_t *no
 
 		if ('\0' == *nodes->values[i]->name)
 		{
-			ha_set_error(info, "found %s standalone node in HA mode",
+			ha_set_error(info, "HA mode cannot be used when standalone node is %s",
 					zbx_ha_status_str(nodes->values[i]->status));
 			return FAIL;
 		}
