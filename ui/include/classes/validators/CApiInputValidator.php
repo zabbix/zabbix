@@ -94,6 +94,9 @@ class CApiInputValidator {
 			case API_INTS32:
 				return self::validateInts32($rule, $data, $path, $error);
 
+			case API_INT32_RANGES:
+				return self::validateInt32Ranges($rule, $data, $path, $error);
+
 			case API_UINT64:
 				return self::validateUInt64($rule, $data, $path, $error);
 
@@ -245,6 +248,7 @@ class CApiInputValidator {
 			case API_COND_FORMULAID:
 			case API_STRING_UTF8:
 			case API_INT32:
+			case API_INT32_RANGES:
 			case API_UINT64:
 			case API_UINTS64:
 			case API_FLOAT:
@@ -981,6 +985,57 @@ class CApiInputValidator {
 			}
 		}
 		unset($value);
+
+		return true;
+	}
+
+	/**
+	 * Validate integer ranges.
+	 * Example:
+	 *   0-100,200,300-400
+	 *
+	 * @static
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY
+	 * @param int    $rule['length']  (optional)
+	 * @param string $rule['in']      (optional) A comma-delimited character string, for example: '0,60:900'
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateInt32Ranges(array $rule, &$data, string $path, string &$error): bool {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8($flags, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if ($data === '') {
+			return true;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		$parser = new CRangesParser(['with_minus' => true]);
+
+		if ($parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid range expression'));
+			return false;
+		}
+
+		foreach ($parser->getRanges() as $ranges) {
+			foreach ($ranges as $range) {
+				if (!self::checkInt32In($rule, $range, $path, $error)) {
+					return false;
+				}
+			}
+		}
 
 		return true;
 	}
