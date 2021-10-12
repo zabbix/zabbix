@@ -38,13 +38,9 @@ void	zbx_audit_httptest_create_entry(int audit_action, zbx_uint64_t httptestid, 
 	{
 		zbx_audit_entry_t	*local_audit_httptest_entry_insert;
 
-		local_audit_httptest_entry_insert = (zbx_audit_entry_t*)zbx_malloc(NULL,
-				sizeof(zbx_audit_entry_t));
+		local_audit_httptest_entry_insert = zbx_audit_entry_init(httptestid, name, audit_action,
+				AUDIT_RESOURCE_SCENARIO);
 
-		local_audit_httptest_entry_insert->id = httptestid;
-		local_audit_httptest_entry_insert->name = zbx_strdup(NULL, name);
-		local_audit_httptest_entry_insert->audit_action = audit_action;
-		local_audit_httptest_entry_insert->resource_type = AUDIT_RESOURCE_SCENARIO;
 		zbx_json_init(&(local_audit_httptest_entry_insert->details_json), ZBX_JSON_STAT_BUF_LEN);
 
 		zbx_hashset_insert(zbx_get_audit_hashset(), &local_audit_httptest_entry_insert,
