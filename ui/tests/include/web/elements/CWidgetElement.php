@@ -75,7 +75,7 @@ class CWidgetElement extends CElement {
 	 * @return CFormElement
 	 */
 	public function edit() {
-	// Edit can sometimes fail so we have to retry this operation.
+		// Edit can sometimes fail so we have to retry this operation.
 		for ($i = 0; $i < 2; $i++) {
 			$this->query('xpath:.//button[@class="btn-widget-edit"]')->waitUntilPresent()->one()->click(true);
 
