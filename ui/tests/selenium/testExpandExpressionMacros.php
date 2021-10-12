@@ -250,6 +250,21 @@ class testExpandExpressionMacros extends CWebTest {
 		];
 	}
 
+	public function writeValuesToItems() {
+		// Add values for items in order to expanding macros.
+		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$last_itemid.", ".time().", 2, 0)");
+		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$last_itemid.", ".time().", 4, 0)");
+
+		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$avg_itemid.", ".time().", 3, 0)");
+		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$avg_itemid.", ".time().", 5, 0)");
+
+		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$min_itemid.", ".time().", 1, 0)");
+		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$min_itemid.", ".time().", 3, 0)");
+
+		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$max_itemid.", ".time().", 7, 0)");
+		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$max_itemid.", ".time().", 2, 0)");
+	}
+
 	/**
 	 * Test for checking expression macro expand in graph names.
 	 *
@@ -298,6 +313,7 @@ class testExpandExpressionMacros extends CWebTest {
 				'height' => 500,
 				'label_type'=> 0,
 				'selements' =>  [
+					// Host 'Host for expression macro Avg'.
 					[
 						'selementid' => '20',
 						'elements' => [
@@ -309,6 +325,7 @@ class testExpandExpressionMacros extends CWebTest {
 						'x' => '139',
 						'y' => '27'
 					],
+					// Image.
 					[
 						'selementid' => '21',
 						'elementtype' => 4,
@@ -317,6 +334,7 @@ class testExpandExpressionMacros extends CWebTest {
 						'x' => '250',
 						'y' => '350'
 					],
+					// Host 'Host for expression macro Min'.
 					[
 						'selementid' => '22',
 						'elements' => [
@@ -331,6 +349,7 @@ class testExpandExpressionMacros extends CWebTest {
 					],
 				],
 				'links' => [
+					// Link between 'Host for expression macro Avg' and 'Host for expression macro Min'.
 					[
 						'selementid1' => '20',
 						'selementid2' => '22',
@@ -343,6 +362,9 @@ class testExpandExpressionMacros extends CWebTest {
 		self::$mapid = $maps['sysmapids'][0];
 	}
 
+	/**
+	 * Test for checking expression macro expand in map's elements.
+	 */
 	public function testExpandExpressionMacros_Map() {
 		$this->writeValuesToItems();
 		$this->page->login()->open('zabbix.php?action=map.view&sysmapid='.self::$mapid)->waitUntilReady();
@@ -354,20 +376,5 @@ class testExpandExpressionMacros extends CWebTest {
 			'height' => 15
 		];
 		$this->assertScreenshotExcept($map_image, $covered_region, 'Map with expression macros');
-	}
-
-	public function writeValuesToItems() {
-		// Add values for items in order to expanding macros.
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$last_itemid.", ".time().", 2, 0)");
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$last_itemid.", ".time().", 4, 0)");
-
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$avg_itemid.", ".time().", 3, 0)");
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$avg_itemid.", ".time().", 5, 0)");
-
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$min_itemid.", ".time().", 1, 0)");
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$min_itemid.", ".time().", 3, 0)");
-
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$max_itemid.", ".time().", 7, 0)");
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$max_itemid.", ".time().", 2, 0)");
 	}
 }
