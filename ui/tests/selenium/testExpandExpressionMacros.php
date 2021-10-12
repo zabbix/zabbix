@@ -356,7 +356,7 @@ class testExpandExpressionMacros extends CWebTest {
 		$this->assertScreenshotExcept($map_image, $covered_region, 'Map with expression macros');
 	}
 
-	private function writeValuesToItems() {
+	public function writeValuesToItems() {
 		// Add values for items in order to expanding macros.
 		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$last_itemid.", ".time().", 2, 0)");
 		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$last_itemid.", ".time().", 4, 0)");
