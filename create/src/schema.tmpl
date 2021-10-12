@@ -1108,10 +1108,10 @@ FIELD		|ip		|t_varchar(39)	|''	|NOT NULL	|0
 FIELD		|action		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|resourcetype	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|resourceid	|t_id		|	|NULL		|0
+FIELD		|resource_cuid	|t_cuid		|	|NULL		|0
 FIELD		|resourcename	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|recordsetid	|t_cuid		|	|NOT NULL	|0
 FIELD		|details	|t_longtext	|''	|NOT NULL	|0
-FIELD		|resource_cuid	|t_cuid		|	|NULL		|0
 INDEX		|1		|userid,clock
 INDEX		|2		|clock
 INDEX		|3		|resourcetype,resourceid
@@ -1904,4 +1904,4 @@ INDEX		|2		|status,lastaccess
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|5050074	|5050074
+ROW		|5050078	|5050078

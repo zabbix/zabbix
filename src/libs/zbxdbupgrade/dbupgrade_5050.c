@@ -364,50 +364,6 @@ static int	DBpatch_5050034(void)
 	return DBset_default("config", &field);
 }
 
-static int	DBpatch_5050035(void)
-{
-	return DBdrop_table("auditlog");
-}
-
-static int	DBpatch_5050036(void)
-{
-	const ZBX_TABLE table =
-		{"auditlog", "auditid", 0,
-			{
-				{"auditid", NULL, NULL, NULL, 0, ZBX_TYPE_CUID, ZBX_NOTNULL, 0},
-				{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
-				{"username", "", NULL, NULL, 100, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-				{"ip", "", NULL, NULL, 39, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"action", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-				{"resourcetype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-				{"resourceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-				{"resourcename", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"recordsetid", NULL, NULL, NULL, 0, ZBX_TYPE_CUID, ZBX_NOTNULL, 0},
-				{"details", "", NULL, NULL, 0, ZBX_TYPE_LONGTEXT, ZBX_NOTNULL, 0},
-				{0}
-			},
-			NULL
-		};
-
-	return DBcreate_table(&table);
-}
-
-static int	DBpatch_5050037(void)
-{
-	return DBcreate_index("auditlog", "auditlog_1", "userid,clock", 0);
-}
-
-static int	DBpatch_5050038(void)
-{
-	return DBcreate_index("auditlog", "auditlog_2", "clock", 0);
-}
-
-static int	DBpatch_5050039(void)
-{
-	return DBcreate_index("auditlog", "auditlog_3", "resourcetype,resourceid", 0);
-}
-
 static int	DBpatch_5050040(void)
 {
 	if (0 == (ZBX_PROGRAM_TYPE_SERVER & program_type))
@@ -783,13 +739,6 @@ static int	DBpatch_5050068(void)
 	return ret;
 }
 
-static int	DBpatch_5050069(void)
-{
-	const ZBX_FIELD	field = {"resourceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
-
-	return DBdrop_not_null("auditlog", &field);
-}
-
 static int	DBpatch_5050070(void)
 {
 	const ZBX_FIELD	field = {"ha_failover_delay", "1m", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
@@ -829,10 +778,49 @@ static int	DBpatch_5050073(void)
 
 static int	DBpatch_5050074(void)
 {
-	const ZBX_FIELD	field = {"resource_cuid", NULL, NULL, NULL, 0, ZBX_TYPE_CUID, 0, 0};
-
-	return DBadd_field("auditlog", &field);
+	return DBdrop_table("auditlog");
 }
+
+static int	DBpatch_5050075(void)
+{
+	const ZBX_TABLE table =
+		{"auditlog", "auditid", 0,
+			{
+				{"auditid", NULL, NULL, NULL, 0, ZBX_TYPE_CUID, ZBX_NOTNULL, 0},
+				{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+				{"username", "", NULL, NULL, 100, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"ip", "", NULL, NULL, 39, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"action", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"resourcetype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"resourceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+				{"resource_cuid", NULL, NULL, NULL, 0, ZBX_TYPE_CUID, 0, 0},
+				{"resourcename", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"recordsetid", NULL, NULL, NULL, 0, ZBX_TYPE_CUID, ZBX_NOTNULL, 0},
+				{"details", "", NULL, NULL, 0, ZBX_TYPE_LONGTEXT, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5050076(void)
+{
+	return DBcreate_index("auditlog", "auditlog_1", "userid,clock", 0);
+}
+
+static int	DBpatch_5050077(void)
+{
+	return DBcreate_index("auditlog", "auditlog_2", "clock", 0);
+}
+
+static int	DBpatch_5050078(void)
+{
+	return DBcreate_index("auditlog", "auditlog_3", "resourcetype,resourceid", 0);
+}
+
 
 #endif
 
@@ -869,11 +857,6 @@ DBPATCH_ADD(5050031, 0, 1)
 DBPATCH_ADD(5050032, 0, 1)
 DBPATCH_ADD(5050033, 0, 1)
 DBPATCH_ADD(5050034, 0, 1)
-DBPATCH_ADD(5050035, 0, 1)
-DBPATCH_ADD(5050036, 0, 1)
-DBPATCH_ADD(5050037, 0, 1)
-DBPATCH_ADD(5050038, 0, 1)
-DBPATCH_ADD(5050039, 0, 1)
 DBPATCH_ADD(5050040, 0, 1)
 DBPATCH_ADD(5050041, 0, 1)
 DBPATCH_ADD(5050042, 0, 1)
@@ -903,11 +886,14 @@ DBPATCH_ADD(5050065, 0, 1)
 DBPATCH_ADD(5050066, 0, 1)
 DBPATCH_ADD(5050067, 0, 1)
 DBPATCH_ADD(5050068, 0, 1)
-DBPATCH_ADD(5050069, 0, 1)
 DBPATCH_ADD(5050070, 0, 1)
 DBPATCH_ADD(5050071, 0, 1)
 DBPATCH_ADD(5050072, 0, 1)
 DBPATCH_ADD(5050073, 0, 1)
 DBPATCH_ADD(5050074, 0, 1)
+DBPATCH_ADD(5050075, 0, 1)
+DBPATCH_ADD(5050076, 0, 1)
+DBPATCH_ADD(5050077, 0, 1)
+DBPATCH_ADD(5050078, 0, 1)
 
 DBPATCH_END()
