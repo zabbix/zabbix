@@ -619,8 +619,8 @@ void	zbx_addr_copy(zbx_vector_ptr_t *addr_to, const zbx_vector_ptr_t *addr_from)
 
 static int	addr_compare_func(const void *d1, const void *d2)
 {
-	const zbx_addr_t	*a1 = *(const zbx_addr_t **)d1;
-	const zbx_addr_t	*a2 = *(const zbx_addr_t **)d2;
+	const zbx_addr_t	*a1 = *(const zbx_addr_t * const *)d1;
+	const zbx_addr_t	*a2 = *(const zbx_addr_t * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(a1->port, a2->port);
 

@@ -242,8 +242,12 @@ int	parse_rtc_options(const char *opt, unsigned char program_type, int *message)
 	{
 		command = ZBX_RTC_HA_REMOVE_NODE;
 		scope = 0;
-		if ('=' == opt[ZBX_CONST_STRLEN(ZBX_HA_REMOVE_NODE)])
-			data = atoi(opt + ZBX_CONST_STRLEN(ZBX_HA_REMOVE_NODE) + 1);
+		if ('=' != opt[ZBX_CONST_STRLEN(ZBX_HA_REMOVE_NODE)] ||
+				SUCCEED != is_uint32(opt + ZBX_CONST_STRLEN(ZBX_HA_REMOVE_NODE) + 1, &data))
+		{
+			zbx_error("invalid HA node number: %s\n", opt);
+			return FAIL;
+		}
 	}
 	else if (0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER)) &&
 			0 == strncmp(opt, ZBX_HA_FAILOVER_DELAY, ZBX_CONST_STRLEN(ZBX_HA_FAILOVER_DELAY)))
@@ -259,7 +263,10 @@ int	parse_rtc_options(const char *opt, unsigned char program_type, int *message)
 			data = (unsigned int)delay;
 		}
 		else
+		{
 			zbx_error("invalid HA failover delay value: %s\n", opt);
+			return FAIL;
+		}
 	}
 	else
 	{

@@ -115,7 +115,7 @@ int	connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_ptr_
 					lastlogtime = now;
 				}
 
-				sleep(retry_interval);
+				sleep((unsigned int)retry_interval);
 			}
 
 			if (FAIL != res)

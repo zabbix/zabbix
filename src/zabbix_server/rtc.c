@@ -31,7 +31,7 @@
  ******************************************************************************/
 static void	rtc_diaginfo(int scope)
 {
-	int	flags;
+	unsigned int	flags;
 
 	if (ZBX_DIAGINFO_ALL == scope)
 	{
@@ -40,7 +40,7 @@ static void	rtc_diaginfo(int scope)
 				(1 << ZBX_DIAGINFO_ALERTING) | 	(1 << ZBX_DIAGINFO_LOCKS);
 	}
 	else
-		flags = 1 << scope;
+		flags = 1u << scope;
 
 	zbx_diag_log_info(flags);
 }
