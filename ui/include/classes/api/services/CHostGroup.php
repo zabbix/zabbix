@@ -422,9 +422,7 @@ class CHostGroup extends CApiService {
 		$upd_groups = [];
 
 		foreach ($groups as $group) {
-			$db_group = $db_groups[$group['groupid']];
-
-			$upd_group = DB::getUpdatedValues('hstgrp', $group, $db_group);
+			$upd_group = DB::getUpdatedValues('hstgrp', $group, $db_groups[$group['groupid']]);
 
 			if ($upd_group) {
 				$upd_groups[] = [
@@ -449,13 +447,11 @@ class CHostGroup extends CApiService {
 	 *
 	 * @return array
 	 */
-	public function delete(array $groupids, $nopermissions = false): array {
+	public function delete(array $groupids, bool $nopermissions = false): array {
 		$this->validateDelete($groupids, $db_groups, $nopermissions);
 
 		// delete sysmap element
-		if (!empty($groupids)) {
-			DB::delete('sysmaps_elements', ['elementtype' => SYSMAP_ELEMENT_TYPE_HOST_GROUP, 'elementid' => $groupids]);
-		}
+		DB::delete('sysmaps_elements', ['elementtype' => SYSMAP_ELEMENT_TYPE_HOST_GROUP, 'elementid' => $groupids]);
 
 		// disable actions
 		// actions from conditions
@@ -556,10 +552,6 @@ class CHostGroup extends CApiService {
 	 * @throws APIException if the input is invalid.
 	 */
 	private static function validateCreate(array &$groups): void {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can create host groups.'));
-		}
-
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['name']], 'fields' => [
 			'uuid' =>	['type' => API_UUID],
 			'name' =>	['type' => API_HG_NAME, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hstgrp', 'name')]
@@ -615,6 +607,7 @@ class CHostGroup extends CApiService {
 	 */
 	private function validateDelete(array $groupids, array &$db_groups = null, bool $nopermissions): void {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+
 		if (!CApiInputValidator::validate($api_input_rules, $groupids, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
@@ -639,17 +632,17 @@ class CHostGroup extends CApiService {
 			}
 		}
 
-		// check if a group is used in a group prototype
-		$group_prototype = DBFetch(DBselect(
-			'SELECT groupid'.
-			' FROM group_prototype gp'.
-			' WHERE '.dbConditionInt('groupid', $groupids),
-			1
-		));
-		if ($group_prototype) {
+		// Check if a group is used by a host prototype.
+		$group_prototypes = DB::select('group_prototype', [
+			'output' => ['groupid'],
+			'filter' => ['groupid' => $groupids],
+			'limit' => 1
+		]);
+
+		if ($group_prototypes) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Group "%1$s" cannot be deleted, because it is used by a host prototype.',
-					$db_groups[$group_prototype['groupid']]['name']
+					$db_groups[$group_prototypes[0]['groupid']]['name']
 				)
 			);
 		}
@@ -690,17 +683,16 @@ class CHostGroup extends CApiService {
 			);
 		}
 
-		$corr_condition_group = DBFetch(DBselect(
-			'SELECT cg.groupid'.
-			' FROM corr_condition_group cg'.
-			' WHERE '.dbConditionInt('cg.groupid', $groupids),
-			1
-		));
+		$corr_condition_groups = DB::select('corr_condition_group', [
+			'output' => ['groupid'],
+			'filter' => ['groupid' => $groupids],
+			'limit' => 1
+		]);
 
-		if ($corr_condition_group) {
+		if ($corr_condition_groups) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Group "%1$s" cannot be deleted, because it is used in a correlation condition.',
-					$db_groups[$corr_condition_group['groupid']]['name']
+					$db_groups[$corr_condition_groups[0]['groupid']]['name']
 				)
 			);
 		}
@@ -827,8 +819,7 @@ class CHostGroup extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _n(
 				'Cannot delete host group because maintenance "%1$s" must contain at least one host or host group.',
 				'Cannot delete selected host groups because maintenance "%1$s" must contain at least one host or host group.',
-				$maintenance['name'],
-				count($groupids)
+				$maintenance['name'], count($groupids)
 			));
 		}
 	}
@@ -848,10 +839,8 @@ class CHostGroup extends CApiService {
 			self::prepareInheritedRights($group_links, $usrgrps, $db_usrgrps);
 			self::prepareInheritedTagFilters($group_links, $usrgrps, $db_usrgrps);
 
-			$usrgrps = array_values($usrgrps);
-
 			if ($usrgrps) {
-				CUserGroup::updateForce($usrgrps, $db_usrgrps);
+				CUserGroup::updateForce(array_values($usrgrps), $db_usrgrps);
 			}
 		}
 	}
