@@ -75,7 +75,7 @@ static void	str_base64_encode_rfc2047(const char *src, char **p_base64)
 		/* So, one "encoded-word" can hold up to 63 characters of Base64-encoded string. */
 		/* Encoding 45 bytes produces a 61 byte long Base64-encoded string which meets the limit. */
 		/* Encoding 46 bytes produces a 65 byte long Base64-encoded string which exceeds the limit. */
-		for (p1 = p0, c_len; '\0' != *p1; p1 += c_len)
+		for (p1 = p0; '\0' != *p1; p1 += c_len)
 		{
 			/* an invalid UTF-8 character or length of a string more than 45 bytes */
 			if (0 == (c_len = zbx_utf8_char_len(p1)) || 45 < p1 - p0 + c_len)
