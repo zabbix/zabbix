@@ -211,7 +211,6 @@ static int	get_problem_update_actions(const DB_ACKNOWLEDGE *ack, int actions, ch
 static void	item_description(char **data, const char *key, zbx_uint64_t hostid)
 {
 	AGENT_REQUEST	request;
-	const char	*param;
 	char		c, *p, *m, *n, *str_out = NULL, *replace_to = NULL;
 	int		macro_r, context_l, context_r;
 
@@ -249,21 +248,16 @@ static void	item_description(char **data, const char *key, zbx_uint64_t hostid)
 			*n = c;
 			p = n;
 		}
-		else if ('1' <= *(m + 1) && *(m + 1) <= '9')
-		{
-			/* macros $1, $2, ... */
-
-			*m = '\0';
-			str_out = zbx_strdcat(str_out, p);
-			*m++ = '$';
-
-			if (NULL != (param = get_rparam(&request, *m - '0' - 1)))
-				str_out = zbx_strdcat(str_out, param);
-
-			p = m + 1;
-		}
 		else
 		{
+			if ('1' <= *(m + 1) && *(m + 1) <= '9')
+			{
+				/* macros $1, $2, ... */
+				zabbix_log(LOG_LEVEL_WARNING, "Use of positional macros ($1,$2… $9 - referring to the "
+						"first, second… ninth parameter of the item key '%s') is now "
+						"deprecated", key);
+			}
+
 			/* just a dollar sign */
 
 			c = *++m;
