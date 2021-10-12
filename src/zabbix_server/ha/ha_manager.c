@@ -467,8 +467,8 @@ static int	ha_check_standalone_config(zbx_ha_info_t *info, zbx_vector_ha_node_t 
 		if (ZBX_NODE_STATUS_STOPPED != nodes->values[i]->status &&
 				SUCCEED == ha_is_available(info, nodes->values[i]->lastaccess, db_time))
 		{
-			ha_set_error(info, "found %s node in standalone mode",
-					zbx_ha_status_str(nodes->values[i]->status));
+			ha_set_error(info, "standalone mode cannot be used when node \"%s\" is %s",
+					nodes->values[i]->name, zbx_ha_status_str(nodes->values[i]->status));
 			return FAIL;
 		}
 	}
@@ -1660,7 +1660,6 @@ pause:
 	zbx_ipc_service_close(&service);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "HA manager has been stopped");
-
 
 	exit(EXIT_SUCCESS);
 
