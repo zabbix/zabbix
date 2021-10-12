@@ -135,6 +135,16 @@ if (hasRequest('add') || hasRequest('update')) {
 					&& !array_key_exists('default_msg', $operation['opmessage'])) {
 				$operation['opmessage']['default_msg'] = 1;
 			}
+
+			unset($operation['operationid'], $operation['actionid'], $operation['eventsource'], $operation['recovery'],
+				$operation['id'], $operation['mediatypeid']
+			);
+
+			if ($eventsource != EVENT_SOURCE_TRIGGERS && $eventsource != EVENT_SOURCE_SERVICE) {
+				unset($operation['esc_period'], $operation['esc_step_from'], $operation['esc_step_to'],
+					$operation['evaltype']
+				);
+			}
 		}
 		unset($operation);
 	}
@@ -154,10 +164,33 @@ if (hasRequest('add') || hasRequest('update')) {
 			$filter['evaltype'] = CONDITION_EVAL_TYPE_AND_OR;
 		}
 	}
+
+	foreach ($filter['conditions'] as &$condition) {
+		if ($filter['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+			unset($condition['formulaid']);
+		}
+
+		if ($condition['conditiontype'] != CONDITION_TYPE_EVENT_TAG_VALUE) {
+			unset($condition['value2']);
+		}
+	}
+	unset($condition);
+
 	$action['filter'] = $filter;
 
 	if ($eventsource == EVENT_SOURCE_TRIGGERS) {
 		$action['pause_suppressed'] = getRequest('pause_suppressed', ACTION_PAUSE_SUPPRESSED_FALSE);
+	}
+
+	switch ($eventsource) {
+		case EVENT_SOURCE_DISCOVERY:
+		case EVENT_SOURCE_AUTOREGISTRATION:
+			unset($action['recovery_operations']);
+			// break; is not missing here
+
+		case EVENT_SOURCE_INTERNAL:
+			unset($action['update_operations']);
+			break;
 	}
 
 	DBstart();
@@ -413,16 +446,19 @@ if (hasRequest('form')) {
 
 	if ($data['actionid']) {
 		$data['action'] = API::Action()->get([
+			'output' => ['actionid', 'name', 'eventsource', 'status', 'esc_period', 'pause_suppressed'],
+			'selectFilter' => ['evaltype', 'formula', 'conditions'],
+			'selectOperations' => ['operationtype', 'esc_period', 'esc_step_from', 'esc_step_to', 'evaltype',
+				'opconditions', 'opmessage', 'opmessage_grp', 'opmessage_usr', 'opcommand', 'opcommand_grp',
+				'opcommand_hst', 'opgroup', 'optemplate', 'opinventory'
+			],
+			'selectRecoveryOperations' => ['operationtype', 'opmessage', 'opmessage_grp', 'opmessage_usr', 'opcommand',
+				'opcommand_grp', 'opcommand_hst'
+			],
+			'selectUpdateOperations' => ['operationtype', 'opmessage', 'opmessage_grp', 'opmessage_usr', 'opcommand',
+				'opcommand_grp', 'opcommand_hst'
+			],
 			'actionids' => $data['actionid'],
-			'selectOperations' => API_OUTPUT_EXTEND,
-			'selectRecoveryOperations' => ['operationid', 'actionid', 'operationtype', 'opmessage', 'opmessage_grp',
-				'opmessage_usr', 'opcommand', 'opcommand_hst', 'opcommand_grp'
-			],
-			'selectUpdateOperations' => ['operationid', 'actionid', 'operationtype', 'opmessage', 'opmessage_grp',
-				'opmessage_usr', 'opcommand', 'opcommand_hst', 'opcommand_grp'
-			],
-			'selectFilter' => ['formula', 'conditions', 'evaltype'],
-			'output' => API_OUTPUT_EXTEND,
 			'editable' => true
 		]);
 		$data['action'] = reset($data['action']);
