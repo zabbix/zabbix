@@ -801,6 +801,12 @@ static int	ha_check_active_node(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes
 			break;
 	}
 
+	if ('\0' == *nodes->values[i]->name)
+	{
+		ha_set_error(info, "found active standalone node in HA mode");
+		return FAIL;
+	}
+
 	/* 1) No active nodes - set this node as active.                */
 	/* 2) This node is active - update it's status as it might have */
 	/*    switched itself to standby mode in the case of prolonged  */
