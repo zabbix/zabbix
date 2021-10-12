@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
 /**
  * @backup history, hosts
  *
- * @onBefore prepareMacrosExpandData
+ * @onBefore prepareItemsData, prepareMapsData, writeValuesToItems
  */
 class testExpandExpressionMacros extends CWebTest {
 
@@ -90,11 +90,18 @@ class testExpandExpressionMacros extends CWebTest {
 	 */
 	protected static $max_itemid;
 
-	public function prepareMacrosExpandData() {
+	/**
+	 * The id of the map with expanded expression macros.
+	 *
+	 * @var integer
+	 */
+	protected static $mapid;
+
+	public function prepareItemsData() {
 		// Create hostgroup for hosts with items and graphs.
 		$hostgroups = CDataHelper::call('hostgroup.create', [
 			[
-				'name' => 'Group for macro expand testing',
+				'name' => 'Group for macro expand testing'
 			]
 		]);
 		$this->assertArrayHasKey('groupids', $hostgroups);
@@ -249,23 +256,11 @@ class testExpandExpressionMacros extends CWebTest {
 	 * @dataProvider getGraphData
 	 */
 	public function testExpandExpressionMacros_Graph($data) {
-		// Add values for items in order to expanding macros.
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$last_itemid.", ".time().", 2, 0)");
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$last_itemid.", ".time().", 4, 0)");
-
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$avg_itemid.", ".time().", 3, 0)");
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$avg_itemid.", ".time().", 5, 0)");
-
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$min_itemid.", ".time().", 1, 0)");
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$min_itemid.", ".time().", 3, 0)");
-
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$max_itemid.", ".time().", 7, 0)");
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$max_itemid.", ".time().", 2, 0)");
-
+		$this->writeValuesToItems();
 		$this->page->login()->open('zabbix.php?action=host.view&groupids%5B%5D='.self::$hostgroupid)
 				->waitUntilReady();
-		$table = $this->query('xpath://form[@name="host_view"]/table[@class="list-table"]')->waitUntilReady()
-				->asTable()->one();
+		$table = $this->query('xpath://form[@name="host_view"]/table[@class="list-table"]')->asTable()
+				->waitUntilReady()->one();
 		$table->findRow('Name', $data['host_name'])->getColumn('Graphs')->query('tag:a')->one()->click();
 		$this->page->waitUntilReady();
 		$this->waitUntilGraphIsLoaded();
@@ -294,7 +289,85 @@ class testExpandExpressionMacros extends CWebTest {
 		return $this->query('xpath://div[not(contains(@class,"is-loading"))]/img')->waitUntilPresent()->one();
 	}
 
-	public function testExpandExpressionMacros_Map($data) {
+	public function prepareMapsData() {
+		// Create map with macros in elements names.
+		$maps = CDataHelper::call('map.create', [
+			[
+				'name' => 'Map with expression macros',
+				'width' => 500,
+				'height' => 500,
+				'label_type'=> 0,
+				'selements' =>  [
+					[
+						'selementid' => '20',
+						'elements' => [
+							['hostid' => self::$avg_hostid]
+						],
+						'elementtype' => 0,
+						'iconid_off' => '151',
+						'label' => '{?avg(/{HOST.HOST}/trapper,1h)}',
+						'x' => '139',
+						'y' => '27'
+					],
+					[
+						'selementid' => '21',
+						'elementtype' => 4,
+						'iconid_off' => '6',
+						'label' => '{?last(/Host for expression macro Last/trapper)}',
+						'x' => '250',
+						'y' => '350'
+					],
+					[
+						'selementid' => '22',
+						'elements' => [
+							['hostid' => self::$min_hostid]
+						],
+						'elementtype' => 0,
+						'iconid_off' => '151',
+						'label' => '{?min(/{HOST.HOST}/trapper,1d)}',
+						'x' => '89',
+						'y' => '377',
+						'iconid_off' => '141'
+					],
+				],
+				'links' => [
+					[
+						'selementid1' => '20',
+						'selementid2' => '22',
+						'label' => '{?max(/Host for expression macro Max/trapper,1w)}',
+					]
+				]
+			]
+		]);
+		$this->assertArrayHasKey('sysmapids', $maps);
+		self::$mapid = $maps['sysmapids'][0];
+	}
 
+	public function testExpandExpressionMacros_Map() {
+		$this->writeValuesToItems();
+		$this->page->login()->open('zabbix.php?action=map.view&sysmapid='.self::$mapid)->waitUntilReady();
+		$map_image = $this->query('id:flickerfreescreen_mapimg')->waitUntilPresent()->one();
+		$covered_region = [
+			'x' => 416,
+			'y' => 484,
+			'width' => 81,
+			'height' => 15
+		];
+		$this->assertScreenshotExcept($map_image, $covered_region, 'Map with expression macros');
+	}
+
+	private function writeValuesToItems() {
+		// Add values for items in order to expanding macros.
+		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$last_itemid.", ".time().", 2, 0)");
+		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$last_itemid.", ".time().", 4, 0)");
+
+		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$avg_itemid.", ".time().", 3, 0)");
+		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$avg_itemid.", ".time().", 5, 0)");
+
+		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$min_itemid.", ".time().", 1, 0)");
+		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$min_itemid.", ".time().", 3, 0)");
+
+		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$max_itemid.", ".time().", 7, 0)");
+		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$max_itemid.", ".time().", 2, 0)");
 	}
 }
