@@ -348,9 +348,9 @@ class testExpandExpressionMacros extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=map.view&sysmapid='.self::$mapid)->waitUntilReady();
 		$map_image = $this->query('id:flickerfreescreen_mapimg')->waitUntilPresent()->one();
 		$covered_region = [
-			'x' => 416,
+			'x' => 410,
 			'y' => 484,
-			'width' => 81,
+			'width' => 83,
 			'height' => 15
 		];
 		$this->assertScreenshotExcept($map_image, $covered_region, 'Map with expression macros');
