@@ -2168,9 +2168,10 @@ class CApiInputValidator {
 	/**
 	 * Validate IP ranges. Multiple IPs separated by comma character.
 	 * Example:
-	 *   127.0.0.1,192.168.3.2
+	 *   127.0.0.1,192.168.1.1-254,192.168.2.1-100,192.168.3.0/24
 	 *
 	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_DNS, API_ALLOW_RANGE
 	 * @param int    $rule['length']  (optional)
 	 * @param mixed  $data
 	 * @param string $path
@@ -2179,7 +2180,9 @@ class CApiInputValidator {
 	 * @return bool
 	 */
 	private static function validateIpRanges($rule, &$data, $path, &$error) {
-		if (self::checkStringUtf8(0, $data, $path, $error) === false) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8($flags, $data, $path, $error) === false) {
 			return false;
 		}
 
@@ -2192,7 +2195,11 @@ class CApiInputValidator {
 			return false;
 		}
 
-		$ip_range_parser = new CIPRangeParser(['v6' => ZBX_HAVE_IPV6, 'ranges' => false]);
+		$ip_range_parser = new CIPRangeParser([
+			'v6' => ZBX_HAVE_IPV6,
+			'dns' => ($flags & API_ALLOW_DNS),
+			'ranges' => ($flags & API_ALLOW_RANGE)
+		]);
 
 		if (!$ip_range_parser->parse($data)) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $ip_range_parser->getError());

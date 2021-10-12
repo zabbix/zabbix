@@ -525,7 +525,7 @@ class CProxy extends CApiService {
 			'tls_subject' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'tls_subject')],
 			'tls_psk_identity' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'tls_psk_identity')],
 			'tls_psk' =>			['type' => API_PSK, 'length' => DB::getFieldLength('hosts', 'tls_psk')],
-			'proxy_address' =>		['type' => API_IP_RANGES, 'length' => DB::getFieldLength('hosts', 'proxy_address')],
+			'proxy_address' =>		['type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS, 'length' => DB::getFieldLength('hosts', 'proxy_address')],
 			'hosts' =>				['type' => API_OBJECTS, 'uniq' => [['hostid']], 'fields' => [
 				'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
@@ -828,7 +828,7 @@ class CProxy extends CApiService {
 			'tls_subject' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'tls_subject')],
 			'tls_psk_identity' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'tls_psk_identity')],
 			'tls_psk' =>			['type' => API_PSK, 'length' => DB::getFieldLength('hosts', 'tls_psk')],
-			'proxy_address' =>		['type' => API_IP_RANGES, 'length' => DB::getFieldLength('hosts', 'proxy_address')],
+			'proxy_address' =>		['type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS, 'length' => DB::getFieldLength('hosts', 'proxy_address')],
 			'hosts' =>				['type' => API_OBJECTS, 'uniq' => [['hostid']], 'fields' => [
 				'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
 			]],

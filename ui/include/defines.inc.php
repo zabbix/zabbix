@@ -1349,21 +1349,23 @@ define('API_COND_FORMULAID',		50);
 define('API_UNEXPECTED',			51);
 
 // flags
-define('API_REQUIRED',					0x0001);
-define('API_NOT_EMPTY',					0x0002);
-define('API_ALLOW_NULL',				0x0004);
-define('API_NORMALIZE',					0x0008);
-define('API_DEPRECATED',				0x0010);
-define('API_ALLOW_USER_MACRO',			0x0020);
-define('API_ALLOW_COUNT',				0x0040);
-define('API_ALLOW_LLD_MACRO',			0x0080);
-define('API_REQUIRED_LLD_MACRO',		0x0100);
-define('API_TIME_UNIT_WITH_YEAR',		0x0200);
-define('API_ALLOW_EVENT_TAGS_MACRO',	0x0400);
-define('API_PRESERVE_KEYS',				0x0800);
-define('API_ALLOW_MACRO',				0x1000);
-define('API_ALLOW_GLOBAL_REGEX',		0x2000);
-define('API_ALLOW_UNEXPECTED',			0x4000);
+define('API_REQUIRED',					0x00001);
+define('API_NOT_EMPTY',					0x00002);
+define('API_ALLOW_NULL',				0x00004);
+define('API_NORMALIZE',					0x00008);
+define('API_DEPRECATED',				0x00010);
+define('API_ALLOW_USER_MACRO',			0x00020);
+define('API_ALLOW_COUNT',				0x00040);
+define('API_ALLOW_LLD_MACRO',			0x00080);
+define('API_REQUIRED_LLD_MACRO',		0x00100);
+define('API_TIME_UNIT_WITH_YEAR',		0x00200);
+define('API_ALLOW_EVENT_TAGS_MACRO',	0x00400);
+define('API_PRESERVE_KEYS',				0x00800);
+define('API_ALLOW_MACRO',				0x01000);
+define('API_ALLOW_GLOBAL_REGEX',		0x02000);
+define('API_ALLOW_UNEXPECTED',			0x04000);
+define('API_ALLOW_DNS',					0x08000);
+define('API_ALLOW_RANGE',				0x10000);
 
 // JSON error codes.
 if (!defined('JSON_ERROR_NONE')) {

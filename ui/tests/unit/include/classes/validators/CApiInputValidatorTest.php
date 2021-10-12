@@ -3793,6 +3793,12 @@ class CApiInputValidatorTest extends TestCase {
 				''
 			],
 			[
+				['type' => API_IP_RANGES, 'flags' => API_NOT_EMPTY],
+				'',
+				'/1/ip_range',
+				'Invalid parameter "/1/ip_range": cannot be empty.'
+			],
+			[
 				['type' => API_IP_RANGES],
 				[],
 				'/1/ip_range',
@@ -3839,6 +3845,30 @@ class CApiInputValidatorTest extends TestCase {
 				'192.168.3.5,192.168.6.240',
 				'/1/ip_range',
 				'192.168.3.5,192.168.6.240'
+			],
+			[
+				['type' => API_IP_RANGES],
+				'www.example.com',
+				'/1/ip_range',
+				'Invalid parameter "/1/ip_range": invalid address range "www.example.com".'
+			],
+			[
+				['type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS],
+				'www.example.com',
+				'/1/ip_range',
+				'www.example.com'
+			],
+			[
+				['type' => API_IP_RANGES],
+				'192.168.3.5,192.168.6.1-240',
+				'/1/ip_range',
+				'Invalid parameter "/1/ip_range": invalid address range "192.168.6.1-240".'
+			],
+			[
+				['type' => API_IP_RANGES, 'flags' => API_ALLOW_RANGE],
+				'192.168.3.5,192.168.6.1-240',
+				'/1/ip_range',
+				'192.168.3.5,192.168.6.1-240'
 			],
 			[
 				['type' => API_DNS],
