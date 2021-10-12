@@ -2069,10 +2069,10 @@ void	zbx_mpoints_free(zbx_mpoint_t *mpoint)
 int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *hostname)
 {
 	char		*type, *transform;
-	
+
 	type = get_rparam(request, 0);
 	transform = get_rparam(request, 1);
-	
+
 	if (NULL != type && '\0' != *type && 0 != strcmp(type, "host"))
 	{
 		if (0 == strcmp(type, "shorthost"))
@@ -2093,7 +2093,7 @@ int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *h
 			return FAIL;
 		}
 	}
-	
+
 	if (NULL != transform && '\0' != *transform && 0 != strcmp(transform, "none"))
 	{
 		if (0 == strcmp(transform, "lower"))
