@@ -164,7 +164,7 @@ class CHostInterface extends CApiService {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
-		if ($this->outputIsRequested('details', $options['output'])) {
+		if (!$options['countOutput'] && $this->outputIsRequested('details', $options['output'])) {
 			$sqlParts['left_join'][] = ['alias' => 'his', 'table' => 'interface_snmp', 'using' => 'interfaceid'];
 			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
 		}
@@ -1150,7 +1150,7 @@ class CHostInterface extends CApiService {
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
-		if ($this->outputIsRequested('details', $options['output'])) {
+		if (!$options['countOutput'] && $this->outputIsRequested('details', $options['output'])) {
 			// Select interface type to check show details array or not.
 			$sqlParts = $this->addQuerySelect('hi.type', $sqlParts);
 

@@ -76,40 +76,44 @@ function httptest_status2style($status) {
 /**
  * Delete web scenario item and web scenario step item history and trends by given web scenario IDs.
  *
- * @param array $http_testids
+ * @param array $httptestids
  *
  * @return bool
  */
-function deleteHistoryByHttpTestIds(array $http_testids) {
+function deleteHistoryByHttpTestIds(array $httptestids): bool {
+	DBstart();
+
 	$itemids = [];
 
 	$db_items = DBselect(
 		'SELECT hti.itemid'.
 		' FROM httptestitem hti'.
-		' WHERE '.dbConditionInt('httptestid', $http_testids).
+		' WHERE '.dbConditionInt('httptestid', $httptestids).
 		' UNION ALL '.
 		'SELECT hsi.itemid'.
 		' FROM httpstep hs,httpstepitem hsi'.
 		' WHERE hs.httpstepid=hsi.httpstepid'.
-			' AND '.dbConditionInt('httptestid', $http_testids)
+			' AND '.dbConditionInt('httptestid', $httptestids)
 	);
 
 	while ($db_item = DBfetch($db_items)) {
 		$itemids[] = $db_item['itemid'];
 	}
 
-	if ($itemids) {
-		$items = API::Item()->get([
-			'output' => ['itemid', 'value_type'],
-			'itemids' => $itemids,
-			'editable' => true,
-			'webitems' => true
-		]);
+	$result = true;
 
-		return Manager::History()->deleteHistory(array_column($items, 'value_type', 'itemid'));
+	if ($itemids) {
+		$result = (bool) API::History()->clear($itemids);
 	}
 
-	return true;
+	$result = ($result && DB::update('httptest', [
+		'values' => ['nextcheck' => 0],
+		'where' => ['httptestid' => $httptestids]
+	]));
+
+	$result = DBend($result);
+
+	return $result;
 }
 
 function get_httptest_by_httptestid($httptestid) {

@@ -535,24 +535,6 @@ class testUserGroup extends CAPITest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/rights/1/permission": value must be one of 0, 2, 3.'
-			],
-			// Check successfully update and create of user group with all properties.
-			[
-				'group' => [
-					'name' => 'API user group with users and rights',
-					'gui_access' => GROUP_GUI_ACCESS_INTERNAL,
-					'users_status' => 1,
-					'debug_mode' => 1,
-					'rights' => [
-						'id' => '50012',
-						'permission' => '3'
-					],
-					'users' => [
-						['userid' => 2],
-						['userid' => '8']
-					]
-				],
-				'expected_error' => null
 			]
 		];
 	}

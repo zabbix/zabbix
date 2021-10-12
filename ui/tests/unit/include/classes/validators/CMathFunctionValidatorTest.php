@@ -162,6 +162,15 @@ class CMathFunctionValidatorTest extends TestCase {
 			['floor(1)', ['rc' => true, 'error' => null]],
 			['floor(1, 1)', ['rc' => false, 'error' => 'invalid number of parameters in function "floor"']],
 
+			['histogram_quantile()', ['rc' => false, 'error' => 'invalid number of parameters in function "histogram_quantile"']],
+			['histogram_quantile(1)', ['rc' => false, 'error' => 'invalid number of parameters in function "histogram_quantile"']],
+			['histogram_quantile(1, 1)', ['rc' => true, 'error' => null]],
+			['histogram_quantile(1, 1, 1)', ['rc' => false, 'error' => 'invalid number of parameters in function "histogram_quantile"']],
+			['histogram_quantile(1, 1, 1, 1)', ['rc' => false, 'error' => 'invalid number of parameters in function "histogram_quantile"']],
+			['histogram_quantile(1, 1, 1, 1, 1)', ['rc' => true, 'error' => null]],
+			['histogram_quantile(1, 1, 1, 1, 1, 1)', ['rc' => false, 'error' => 'invalid number of parameters in function "histogram_quantile"']],
+			['histogram_quantile(1, 1, 1, 1, 1, 1, 1)', ['rc' => true, 'error' => null]],
+
 			['in()', ['rc' => false, 'error' => 'invalid number of parameters in function "in"']],
 			['in(1)', ['rc' => false, 'error' => 'invalid number of parameters in function "in"']],
 			['in(1, 1)', ['rc' => true, 'error' => null]],

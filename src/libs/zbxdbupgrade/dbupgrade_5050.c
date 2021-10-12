@@ -717,7 +717,7 @@ static int	DBpatch_5050068_calc_services_write_value(zbx_uint64_t roleid, int *v
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		default_access = 1;
+	int		default_access = 1, ret = FAIL;
 
 	result = DBselect("select name,value_int from role_rule where roleid=" ZBX_FS_UI64, roleid);
 
@@ -725,16 +725,19 @@ static int	DBpatch_5050068_calc_services_write_value(zbx_uint64_t roleid, int *v
 	{
 		/* write rule already exists, skip */
 		if (0 == strcmp("services.write", row[0]))
-			return FAIL;
+			goto out;
+
 
 		if (0 == strcmp("actions.default_access", row[0]))
 			default_access = atoi(row[1]);
 	}
-	DBfree_result(result);
 
 	*value = default_access;
+	ret = SUCCEED;
+out:
+	DBfree_result(result);
 
-	return SUCCEED;
+	return ret;
 }
 
 static int	DBpatch_5050068(void)
@@ -780,6 +783,37 @@ static int	DBpatch_5050068(void)
 	zbx_db_insert_clean(&db_insert);
 
 	return ret;
+}
+
+static int	DBpatch_5050069(void)
+{
+	const ZBX_FIELD	field = {"resourceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBdrop_not_null("auditlog", &field);
+}
+
+static int	DBpatch_5050070(void)
+{
+	const ZBX_FIELD	old_field = {"params", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"params", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("item_preproc", &field, &old_field);
+}
+
+static int	DBpatch_5050071(void)
+{
+	const ZBX_FIELD	old_field = {"description", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("triggers", &field, &old_field);
+}
+
+static int	DBpatch_5050072(void)
+{
+	const ZBX_FIELD	old_field = {"message", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"message", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("media_type_message", &field, &old_field);
 }
 
 #endif
@@ -851,5 +885,9 @@ DBPATCH_ADD(5050065, 0, 1)
 DBPATCH_ADD(5050066, 0, 1)
 DBPATCH_ADD(5050067, 0, 1)
 DBPATCH_ADD(5050068, 0, 1)
+DBPATCH_ADD(5050069, 0, 1)
+DBPATCH_ADD(5050070, 0, 1)
+DBPATCH_ADD(5050071, 0, 1)
+DBPATCH_ADD(5050072, 0, 1)
 
 DBPATCH_END()

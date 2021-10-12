@@ -27,10 +27,14 @@ class CControllerDashboardWidgetsSanitize extends CController {
 	private $context;
 	private $widgets = [];
 
+	protected function init() {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
 	protected function checkInput() {
 		$fields = [
-			'templateid' => 'db dashboard.templateid',
-			'widgets' => 'array'
+			'templateid' =>	'db dashboard.templateid',
+			'widgets' =>	'array'
 		];
 
 		$ret = $this->validateInput($fields);

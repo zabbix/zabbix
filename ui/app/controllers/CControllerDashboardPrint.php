@@ -27,9 +27,9 @@ class CControllerDashboardPrint extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'dashboardid' => 'required|db dashboard.dashboardid',
-			'from' => 'range_time',
-			'to' => 'range_time'
+			'dashboardid' =>	'required|db dashboard.dashboardid',
+			'from' =>			'range_time',
+			'to' =>				'range_time'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod();

@@ -76,11 +76,11 @@ class CApiInputValidator {
 			case API_COLOR:
 				return self::validateColor($rule, $data, $path, $error);
 
-			case API_MULTIPLE:
-				if ($parent_data !== null) {
-					return self::validateMultiple($rule, $data, $path, $error, $parent_data);
-				}
-				break;
+			case API_COND_FORMULA:
+				return self::validateCondFormula($rule, $data, $path, $error);
+
+			case API_COND_FORMULAID:
+				return self::validateCondFormulaId($rule, $data, $path, $error);
 
 			case API_STRING_UTF8:
 				return self::validateStringUtf8($rule, $data, $path, $error);
@@ -175,6 +175,9 @@ class CApiInputValidator {
 			case API_IP:
 				return self::validateIp($rule, $data, $path, $error);
 
+			case API_IP_RANGES:
+				return self::validateIpRanges($rule, $data, $path, $error);
+
 			case API_DNS:
 				return self::validateDns($rule, $data, $path, $error);
 
@@ -210,6 +213,12 @@ class CApiInputValidator {
 
 			case API_VAULT_SECRET:
 				return self::validateVaultSecret($rule, $data, $path, $error);
+
+			case API_IMAGE:
+				return self::validateImage($rule, $data, $path, $error);
+
+			case API_EXEC_PARAMS:
+				return self::validateExecParams($rule, $data, $path, $error);
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
@@ -232,7 +241,8 @@ class CApiInputValidator {
 		switch ($rule['type']) {
 			case API_CALC_FORMULA:
 			case API_COLOR:
-			case API_MULTIPLE:
+			case API_COND_FORMULA:
+			case API_COND_FORMULAID:
 			case API_STRING_UTF8:
 			case API_INT32:
 			case API_UINT64:
@@ -259,6 +269,7 @@ class CApiInputValidator {
 			case API_VARIABLE_NAME:
 			case API_URL:
 			case API_IP:
+			case API_IP_RANGES:
 			case API_DNS:
 			case API_PORT:
 			case API_TRIGGER_EXPRESSION:
@@ -270,11 +281,24 @@ class CApiInputValidator {
 			case API_UUID:
 			case API_CUID:
 			case API_VAULT_SECRET:
+			case API_IMAGE:
+			case API_EXEC_PARAMS:
+			case API_UNEXPECTED:
 				return true;
 
 			case API_OBJECT:
 				foreach ($rule['fields'] as $field_name => $field_rule) {
 					if ($data !== null && array_key_exists($field_name, $data)) {
+						if ($field_rule['type'] === API_MULTIPLE) {
+							foreach ($field_rule['rules'] as $multiple_rule) {
+								if (array_key_exists('else', $multiple_rule)
+										|| self::isInRange($data[$multiple_rule['if']['field']], $multiple_rule['if']['in'])) {
+									$field_rule = $multiple_rule;
+									break;
+								}
+							}
+						}
+
 						$subpath = ($path === '/' ? $path : $path.'/').$field_name;
 						if (!self::validateDataUniqueness($field_rule, $data[$field_name], $subpath, $error)) {
 							return false;
@@ -412,30 +436,92 @@ class CApiInputValidator {
 	}
 
 	/**
-	 * Multiple data types validator.
+	 * Calculated condition formula validator.
 	 *
 	 * @param array  $rule
-	 * @param array  $rule['rules']
+	 * @param int    $rule['length']  (optional)
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
-	 * @param array  $parent_data
 	 *
 	 * @return bool
 	 */
-	private static function validateMultiple($rule, &$data, $path, &$error, array $parent_data) {
-		foreach ($rule['rules'] as $field_rule) {
-			if (self::isInRange($parent_data[$field_rule['if']['field']], $field_rule['if']['in'])) {
-				unset($field_rule['if']);
-
-				return self::validateData($field_rule, $data, $path, $error);
-			}
+	private static function validateCondFormula(array $rule, &$data, string $path, string &$error): bool {
+		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
 		}
 
-		// This message can be untranslated because warn about incorrect validation rules at a development stage.
-		$error = 'Incorrect validation rules.';
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
 
-		return false;
+		$condition_formula_parser = new CConditionFormula();
+
+		if (!$condition_formula_parser->parse($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $condition_formula_parser->error);
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Calculated condition formula ID validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['length']  (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateCondFormulaId(array $rule, &$data, string $path, string &$error): bool {
+		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		if (preg_match('/^[A-Z]+$/', $data) !== 1) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('uppercase identifier expected'));
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Returns unescaped array of "in" rules.
+	 *
+	 * @static
+	 *
+	 * @param string $in  A comma-delimited character string. For example, 'xml,json' or '\,,.,/'.
+	 *
+	 * @return array  An array of "in" rules. For example, ['xml', 'json'] or [',', '.', '/'].
+	 */
+	private static function unescapeInRule(string $in): array {
+		$result = [];
+		$pos = 0;
+
+		do {
+			preg_match('/^([^,\\\\]|\\\\[,\\\\])*/', substr($in, $pos), $matches);
+			$result[] = strtr($matches[0], ['\\,' => ',', '\\\\' => '\\']);
+			$pos += strlen($matches[0]);
+
+			if (!isset($in[$pos])) {
+				break;
+			}
+
+			$pos++;
+		}
+		while (true);
+
+		return $result;
 	}
 
 	/**
@@ -443,7 +529,8 @@ class CApiInputValidator {
 	 *
 	 * @param array  $rule
 	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_NULL
-	 * @param string $rule['in']      (optional) a comma-delimited character string, for example: 'xml,json'
+	 * @param string $rule['in']      (optional) A comma-delimited character string, for example: 'xml,json'.
+	 *                                           Comma and backslash char can be escaped.
 	 * @param int    $rule['length']  (optional)
 	 * @param mixed  $data
 	 * @param string $path
@@ -462,11 +549,31 @@ class CApiInputValidator {
 			return false;
 		}
 
-		if (array_key_exists('in', $rule) && !in_array($data, explode(',', $rule['in']), true)) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
-				_s('value must be one of %1$s', str_replace(',', ', ', $rule['in']))
-			);
-			return false;
+		if (array_key_exists('in', $rule)) {
+			$in = self::unescapeInRule($rule['in']);
+
+			if (!in_array($data, $in, true)) {
+				if (($i = array_search('', $in)) !== false) {
+					unset($in[$i]);
+				}
+
+				if ($i === false) {
+					$error = _n('value must be %1$s', 'value must be one of %1$s', '"'.implode('", "', $in).'"',
+						count($in)
+					);
+				}
+				elseif ($in) {
+					$error = _n('value must be empty or %1$s', 'value must be empty or one of %1$s',
+						'"'.implode('", "', $in).'"', count($in)
+					);
+				}
+				else {
+					$error = _s('value must be empty');
+				}
+
+				$error = _s('Invalid parameter "%1$s": %2$s.', $path, $error);
+				return false;
+			}
 		}
 
 		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
@@ -793,9 +900,9 @@ class CApiInputValidator {
 		$valid = self::isInRange($data, $rule['in']);
 
 		if (!$valid) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
-				_s('value must be one of %1$s', str_replace([',', ':'], [', ', '-'], $rule['in']))
-			);
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _n('value must be %1$s', 'value must be one of %1$s',
+				strtr($rule['in'], [',' => ', ', ':' => '-']), (strpbrk($rule['in'], ',:') === false) ? 1 : 2
+			));
 		}
 
 		return $valid;
@@ -981,7 +1088,8 @@ class CApiInputValidator {
 	 * @param array  $rul
 	 * @param int    $rule['flags']                                   (optional) API_ALLOW_NULL
 	 * @param array  $rule['fields']
-	 * @param int    $rule['fields'][<field_name>]['flags']           (optional) API_REQUIRED, API_DEPRECATED
+	 * @param int    $rule['fields'][<field_name>]['flags']           (optional) API_REQUIRED, API_DEPRECATED,
+	 *                                                                           API_ALLOW_UNEXPECTED
 	 * @param mixed  $rule['fields'][<field_name>]['default']         (optional)
 	 * @param string $rule['fields'][<field_name>]['default_source']  (optional)
 	 * @param mixed  $data
@@ -1003,15 +1111,50 @@ class CApiInputValidator {
 		}
 
 		// unexpected parameter validation
-		foreach ($data as $field_name => $value) {
-			if (!array_key_exists($field_name, $rule['fields'])) {
-				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _s('unexpected parameter "%1$s"', $field_name));
-				return false;
+		if (!($flags & API_ALLOW_UNEXPECTED)) {
+			foreach ($data as $field_name => $value) {
+				if (!$rule['fields']) {
+					$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('should be empty'));
+					return false;
+				}
+
+				if (!array_key_exists($field_name, $rule['fields'])) {
+					$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+						_s('unexpected parameter "%1$s"', $field_name)
+					);
+					return false;
+				}
 			}
 		}
 
 		// validation of the values type
 		foreach ($rule['fields'] as $field_name => $field_rule) {
+			if ($field_rule['type'] === API_MULTIPLE) {
+				foreach ($field_rule['rules'] as $multiple_rule) {
+					if (array_key_exists('else', $multiple_rule)
+							|| self::isInRange($data[$multiple_rule['if']['field']], $multiple_rule['if']['in'])) {
+						if ($multiple_rule['type'] == API_UNEXPECTED && array_key_exists($field_name, $data)) {
+							$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+								_s('unexpected parameter "%1$s"', $field_name)
+							);
+							return false;
+						}
+
+						$field_rule += ['flags' => 0x00];
+						$multiple_rule += ['flags' => 0x00];
+						$multiple_rule['flags'] = ($field_rule['flags'] & API_REQUIRED) | $multiple_rule['flags'];
+						$field_rule = $multiple_rule +
+							array_intersect_key($field_rule, array_flip(['default', 'default_source']));
+						break;
+					}
+				}
+
+				if ($field_rule['type'] === API_MULTIPLE) {
+					$error = 'Incorrect validation rules.';
+					return false;
+				}
+			}
+
 			$flags = array_key_exists('flags', $field_rule) ? $field_rule['flags'] : 0x00;
 
 			if (array_key_exists('default', $field_rule) && !array_key_exists($field_name, $data)) {
@@ -1218,7 +1361,8 @@ class CApiInputValidator {
 	 * Array of objects validator.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_NULL, API_NORMALIZE, API_PRESERVE_KEYS
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_NULL, API_NORMALIZE, API_PRESERVE_KEYS,
+	 *                                           API_ALLOW_UNEXPECTED
 	 * @param array  $rule['fields']
 	 * @param int    $rule['length']  (optional)
 	 * @param mixed  $data
@@ -1263,7 +1407,8 @@ class CApiInputValidator {
 
 		foreach ($data as $index => &$value) {
 			$subpath = ($path === '/' ? $path : $path.'/').($index + 1);
-			if (!self::validateObject(['fields' => $rule['fields']], $value, $subpath, $error)) {
+			if (!self::validateObject(['flags' => ($flags & API_ALLOW_UNEXPECTED), 'fields' => $rule['fields']], $value,
+					$subpath, $error)) {
 				return false;
 			}
 		}
@@ -1850,6 +1995,16 @@ class CApiInputValidator {
 		foreach ($data as $index => $object) {
 			foreach ($rule['fields'] as $field_name => $field_rule) {
 				if (array_key_exists($field_name, $object)) {
+					if ($field_rule['type'] === API_MULTIPLE) {
+						foreach ($field_rule['rules'] as $multiple_rule) {
+							if (array_key_exists('else', $multiple_rule)
+									|| self::isInRange($object[$multiple_rule['if']['field']], $multiple_rule['if']['in'])) {
+								$field_rule = $multiple_rule;
+								break;
+							}
+						}
+					}
+
 					$subpath = ($path === '/' ? $path : $path.'/').($index + 1).'/'.$field_name;
 					if (!self::validateDataUniqueness($field_rule, $object[$field_name], $subpath, $error)) {
 						return false;
@@ -2004,6 +2159,43 @@ class CApiInputValidator {
 
 		if ($ip_parser->parse($data) != CParser::PARSE_SUCCESS) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an IP address is expected'));
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Validate IP ranges. Multiple IPs separated by comma character.
+	 * Example:
+	 *   127.0.0.1,192.168.3.2
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['length']  (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateIpRanges($rule, &$data, $path, &$error) {
+		if (self::checkStringUtf8(0, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if ($data === '') {
+			return true;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		$ip_range_parser = new CIPRangeParser(['v6' => ZBX_HAVE_IPV6, 'ranges' => false]);
+
+		if (!$ip_range_parser->parse($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $ip_range_parser->getError());
 			return false;
 		}
 
@@ -2449,6 +2641,71 @@ class CApiInputValidator {
 
 		if ($vault_secret_parser->parse($data) != CParser::PARSE_SUCCESS) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $vault_secret_parser->getError());
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Validate image.
+	 *
+	 * @param array  $rule
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateImage($rule, &$data, $path, &$error) {
+		if (self::checkStringUtf8(0, $data, $path, $error) === false) {
+			return false;
+		}
+
+		$data = base64_decode($data);
+
+		if (bccomp(strlen($data), ZBX_MAX_IMAGE_SIZE) == 1) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+				_s('image size must be less than %1$s', convertUnits(['value' => ZBX_MAX_IMAGE_SIZE, 'units' => 'B']))
+			);
+			return false;
+		}
+
+		if (@imageCreateFromString($data) === false) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('file format is unsupported'));
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY
+	 * @param int    $rule['length']  (optional)
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateExecParams(array $rule, &$data, string $path, string &$error): bool {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (($flags & API_NOT_EMPTY) == 0 && $data === '') {
+			return true;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		if ($data !== '' && mb_substr($data, -1) !== "\n") {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('the last new line feed is missing'));
 			return false;
 		}
 

@@ -72,6 +72,17 @@ class CHistFunctionValidatorTest extends TestCase {
 			['avg(/host/key, 3551w)', [], ['rc' => false, 'error' => 'invalid second parameter in function "avg"']],
 			['avg(/host/key, #256,)', [], ['rc' => false, 'error' => 'invalid number of parameters in function "avg"']],
 
+			['bucket_percentile(/host/key)', ['calculated' => true], ['rc' => false, 'error' => 'mandatory parameter is missing in function "bucket_percentile"']],
+			['bucket_percentile(/host/key, 1h)', ['calculated' => true], ['rc' => false, 'error' => 'mandatory parameter is missing in function "bucket_percentile"']],
+			['bucket_percentile(/host/key, 1h, 101)', ['calculated' => true], ['rc' => false, 'error' => 'invalid third parameter in function "bucket_percentile"']],
+			['bucket_percentile(/host/key, 1h, 50)', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['bucket_percentile(/host/key, 1h:now-24h, 50)', ['calculated' => true], ['rc' => false, 'error' => 'invalid second parameter in function "bucket_percentile"']],
+
+			['bucket_rate_foreach(/host/key[*])', ['calculated' => true], ['rc' => false, 'error' => 'mandatory parameter is missing in function "bucket_rate_foreach"']],
+			['bucket_rate_foreach(/host/key[*], 1h, 0)', ['calculated' => true], ['rc' => false, 'error' => 'invalid third parameter in function "bucket_rate_foreach"']],
+			['bucket_rate_foreach(/host/key[*], 1h)', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['bucket_rate_foreach(/host/key[*], 1h, 1)', ['calculated' => true], ['rc' => true, 'error' => null]],
+
 			['change(/host/key)', [], ['rc' => true, 'error' => null]],
 			['change(/host/key,)', [], ['rc' => false, 'error' => 'invalid number of parameters in function "change"']],
 
@@ -471,6 +482,11 @@ class CHistFunctionValidatorTest extends TestCase {
 			['percentile(/host/key, 1s, {#LLDMACRO})', ['lldmacros' => true], ['rc' => true, 'error' => null]],
 			['percentile(/host/key, 1s, "{$MACRO}{#LLDMACRO}")', ['usermacros' => true, 'lldmacros' => true], ['rc' => true, 'error' => null]],
 			['percentile(/host/key, #256, 5,)', [], ['rc' => false, 'error' => 'invalid number of parameters in function "percentile"']],
+
+			['rate(/host/key)=1', [], ['rc' => false, 'error' => 'mandatory parameter is missing in function "rate"']],
+			['rate(/host/key, 1h)=1', [], ['rc' => true, 'error' => null]],
+			['rate(/host/key, 1h:now/h-1h)=1', [], ['rc' => true, 'error' => null]],
+			['rate(/host/key, 1h, 1)=1', [], ['rc' => false, 'error' => 'invalid number of parameters in function "rate"']],
 
 			['skewness(/host/key)', [], ['rc' => false, 'error' => 'mandatory parameter is missing in function "skewness"']],
 			['skewness(/host/key,)', [], ['rc' => false, 'error' => 'invalid second parameter in function "skewness"']],

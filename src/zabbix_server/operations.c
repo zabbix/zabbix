@@ -44,7 +44,7 @@ zbx_dcheck_source_t;
  * Purpose: select hostid of discovered host                                  *
  *                                                                            *
  * Parameters: event          - [IN] source event data                        *
- *             hostname       - [OUT] hostname where event occured            *
+ *             hostname       - [OUT] hostname where event occurred           *
  *                                                                            *
  * Return value: hostid - existing hostid, 0 - if not found                   *
  *                                                                            *
@@ -446,12 +446,12 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_
 				zbx_db_insert_execute(&db_insert);
 				zbx_db_insert_clean(&db_insert);
 
-				zbx_audit_host_create_entry(AUDIT_ACTION_ADD, hostid, hostname);
-				zbx_audit_host_update_json_add_proxy_hostid_and_hostname(hostid, proxy_hostid,
-						host_unique);
-
 				if (HOST_INVENTORY_DISABLED != cfg->default_inventory_mode)
 					DBadd_host_inventory(hostid, cfg->default_inventory_mode);
+
+				zbx_audit_host_create_entry(AUDIT_ACTION_ADD, hostid, hostname);
+				zbx_audit_host_update_json_add_proxy_hostid_and_hostname_and_inventory_mode(hostid,
+						proxy_hostid, host_unique, cfg->default_inventory_mode);
 
 				interfaceid = DBadd_interface(hostid, interface_type, 1, row[2], row[3], port,
 						ZBX_CONN_DEFAULT);
@@ -577,8 +577,6 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_
 						tls_accepted, tls_accepted, psk_identity, psk);
 
 					zbx_audit_host_create_entry(AUDIT_ACTION_ADD, hostid, hostname);
-					zbx_audit_host_update_json_add_proxy_hostid_and_hostname(hostid, proxy_hostid,
-							hostname);
 					zbx_audit_host_update_json_add_tls_and_psk(hostid, tls_accepted, tls_accepted,
 							AUDIT_SECRET_MASK, AUDIT_SECRET_MASK);
 				}
@@ -588,8 +586,6 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_
 							"name", NULL);
 
 					zbx_audit_host_create_entry(AUDIT_ACTION_ADD, hostid, hostname);
-					zbx_audit_host_update_json_add_proxy_hostid_and_hostname(hostid, proxy_hostid,
-							hostname);
 					zbx_db_insert_add_values(&db_insert, hostid, proxy_hostid, hostname,
 							hostname);
 				}
@@ -599,6 +595,9 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_
 
 				if (HOST_INVENTORY_DISABLED != cfg->default_inventory_mode)
 					DBadd_host_inventory(hostid, cfg->default_inventory_mode);
+
+				zbx_audit_host_update_json_add_proxy_hostid_and_hostname_and_inventory_mode(hostid,
+						proxy_hostid, hostname, cfg->default_inventory_mode);
 
 				DBadd_interface(hostid, INTERFACE_TYPE_AGENT, useip, row[2], row[3], port, flags);
 

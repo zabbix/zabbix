@@ -102,7 +102,7 @@ class testJSONRPC extends CAPITest {
 					'error' => [
 						'code' => -32600,
 						'message' => 'Invalid request.',
-						'data' => 'Invalid parameter "/jsonrpc": value must be one of 2.0.'
+						'data' => 'Invalid parameter "/jsonrpc": value must be "2.0".'
 					],
 					'id' => null
 				]

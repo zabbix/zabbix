@@ -198,7 +198,7 @@ class testHost extends CAPITest {
 
 	public static function dataHostFieldPresence() {
 		return [
-			'Check if {"ouput": "extend"} includes "inventory_mode" and excludes write-only properties' => [
+			'Check if {"output": "extend"} includes "inventory_mode" and excludes write-only properties' => [
 				'request' => [
 					'output' => 'extend',
 					'hostids' => ['99013']
