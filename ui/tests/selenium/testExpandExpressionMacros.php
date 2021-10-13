@@ -251,9 +251,12 @@ class testExpandExpressionMacros extends CWebTest {
 	}
 
 	public function writeValuesToItems() {
-		// Add values for items in order to expanding macros.
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$last_itemid.", ".time().", 2, 0)");
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$last_itemid.", ".time().", 4, 0)");
+		// Add values for items.
+		$time = time();
+		$last_time = $time+1;
+
+		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$last_itemid.", ".$time.", 2, 0)");
+		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$last_itemid.", ".$last_time.", 4, 0)");
 
 		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$avg_itemid.", ".time().", 3, 0)");
 		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$avg_itemid.", ".time().", 5, 0)");
