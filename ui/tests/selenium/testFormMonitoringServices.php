@@ -38,6 +38,8 @@ class testFormMonitoringServices extends CWebTest {
 	// These ids are needed to check service linking in delete childs scenario.
 	private static $parentid;
 	private static $childid;
+	private static $parentid_2;
+	private static $childid_2;
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -158,6 +160,8 @@ class testFormMonitoringServices extends CWebTest {
 
 		self::$parentid = $services['Parent2'];
 		self::$childid = $services['Child3'];
+		self::$parentid_2 = $services['Parent4'];
+		self::$childid_2 = $services['Child4'];
 	}
 
 	// Please check my comments about Layout scenario in PR.
@@ -1015,19 +1019,35 @@ class testFormMonitoringServices extends CWebTest {
 				self::$parentid.'AND servicedownid ='.self::$childid));
 	}
 
-	// Please, after learning all my code and comments in testFormMonitoringServices_DeleteChild, rewrite this scenario in similar way.
-	public function testFormMonitoringServices_DeleteParentService() {
+	public function testFormMonitoringServices_DeleteParent() {
+		$parent = 'Parent4';
+		$child = 'Child4';
+
 		$this->page->login()->open('zabbix.php?action=service.list.edit');
+		$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
+
+		$table->findRow('Name', $parent, true)->query('link', $parent)->waitUntilClickable()->one()->click();
 
 		$this->page->waitUntilReady();
 
-		$table = $this->query('class:list-table')->asTable()->one();
-		$table->getRow(0)->waitUntilClickable()->query('class:js-remove-service')->one()->click();
+		$table->findRow('Name', $child, true)->query('xpath:.//button[contains(@class, "btn-edit")]')
+		->one()->waitUntilClickable()->click();
 
-		$this->page->acceptAlert();
+		COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $this->query('id:service-form')->asFluidForm()->one()->waitUntilReady();
+
+		$parent_services = $form->getField('Parent services')->asMultiselect()->clear();
+		$form->submit();
+
 		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Service updated');
+		$this->assertTableData([]);
 
-		$table->getRow(0)->waitUntilVisible();
-		$this->assertTrue($table->getRow(0)->query('xpath://tr[@class="nothing-to-show"]')->waitUntilVisible()->one()->isValid());
+		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.
+				CXPathHelper::escapeQuotes($parent)));
+		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.
+				CXPathHelper::escapeQuotes($child)));
+		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services_links WHERE serviceupid='.
+				self::$parentid_2.' AND servicedownid ='.self::$childid_2));
 	}
 }
