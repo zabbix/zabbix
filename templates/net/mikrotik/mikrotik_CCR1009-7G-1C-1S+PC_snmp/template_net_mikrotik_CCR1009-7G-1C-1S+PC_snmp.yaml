@@ -1,0 +1,940 @@
+zabbix_export:
+  version: '6.0'
+  date: '2021-10-11T06:06:44Z'
+  groups:
+    -
+      uuid: 36bff6c29af64692839d077febfc7079
+      name: 'Templates/Network devices'
+  templates:
+    -
+      uuid: d596d6d231bf49c08890aa3ff135ecc6
+      template: 'MikroTik CCR1009-7G-1C-1SPC SNMP'
+      name: 'MikroTik CCR1009-7G-1C-1S+PC SNMP'
+      description: |
+        The template for monitoring Ethernet router MikroTik CCR1009-7G-1C-1S+PC.
+        7x Gigabit Ethernet, 1x Combo port (SFP or Gigabit Ethernet), 1xSFP+ cage, 9 cores x 1GHz CPU, 2GB RAM, LCD panel, passive cooling desktop enclosure, SmartCard slot, RouterOS L6, PSU
+        
+        MIBs used:
+        HOST-RESOURCES-MIB
+        MIKROTIK-MIB
+        
+        Template tooling version used: 0.39
+      templates:
+        -
+          name: 'Generic SNMP'
+        -
+          name: 'Interfaces SNMP'
+      groups:
+        -
+          name: 'Templates/Network devices'
+      items:
+        -
+          uuid: 4367659d4f49400aa0a4674c74ad00b8
+          name: 'Firmware version'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.14988.1.1.7.4.0
+          key: system.hw.firmware
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: MIKROTIK-MIB
+            Current firmware version.
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
+          triggers:
+            -
+              uuid: 79b791b5ce1a4e5e8f68b561aeaac838
+              expression: 'last(/MikroTik CCR1009-7G-1C-1SPC SNMP/system.hw.firmware,#1)<>last(/MikroTik CCR1009-7G-1C-1SPC SNMP/system.hw.firmware,#2) and length(last(/MikroTik CCR1009-7G-1C-1SPC SNMP/system.hw.firmware))>0'
+              name: 'Firmware has changed'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: INFO
+              description: 'Firmware version has changed. Ack to close'
+              manual_close: 'YES'
+        -
+          uuid: 3d375341d2a140679973c46fe7281dd5
+          name: 'Hardware model name'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.1.0
+          key: system.hw.model
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          inventory_link: MODEL
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
+        -
+          uuid: b1233463a69346b68d538f1c43aa467d
+          name: 'Hardware serial number'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.14988.1.1.7.3.0
+          key: system.hw.serialnumber
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: MIKROTIK-MIB
+            RouterBOARD serial number.
+          inventory_link: SERIALNO_A
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
+          triggers:
+            -
+              uuid: a981ac3d5e7843049eb581ab284edd04
+              expression: 'last(/MikroTik CCR1009-7G-1C-1SPC SNMP/system.hw.serialnumber,#1)<>last(/MikroTik CCR1009-7G-1C-1SPC SNMP/system.hw.serialnumber,#2) and length(last(/MikroTik CCR1009-7G-1C-1SPC SNMP/system.hw.serialnumber))>0'
+              name: 'Device has been replaced (new serial number received)'
+              priority: INFO
+              description: 'Device serial number has changed. Ack to close'
+              manual_close: 'YES'
+        -
+          uuid: f9d30c789f16452d89ee417a2aee11f1
+          name: 'Operating system'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.14988.1.1.4.4.0
+          key: 'system.sw.os[mtxrLicVersion.0]'
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: MIKROTIK-MIB
+            Software version.
+          inventory_link: OS
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: Application
+              value: Inventory
+          triggers:
+            -
+              uuid: f7e4983c483944869d44fe5ea4289786
+              expression: 'last(/MikroTik CCR1009-7G-1C-1SPC SNMP/system.sw.os[mtxrLicVersion.0],#1)<>last(/MikroTik CCR1009-7G-1C-1SPC SNMP/system.sw.os[mtxrLicVersion.0],#2) and length(last(/MikroTik CCR1009-7G-1C-1SPC SNMP/system.sw.os[mtxrLicVersion.0]))>0'
+              name: 'Operating system description has changed'
+              priority: INFO
+              description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
+              manual_close: 'YES'
+        -
+          uuid: 5546cedfd50648d2a893b6ea59fd7453
+          name: 'Total memory'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.25.2.3.1.5.65536
+          key: 'vm.memory.total[hrStorageSize.Memory]'
+          history: 7d
+          units: B
+          description: |
+            MIB: HOST-RESOURCES-MIB
+            The size of the storage represented by this entry, in
+            units of hrStorageAllocationUnits. This object is
+            writable to allow remote configuration of the size of
+            the storage area in those cases where such an
+            operation makes sense and is possible on the
+            underlying system. For example, the amount of main
+            memory allocated to a buffer pool might be modified or
+            the amount of disk space allocated to virtual memory
+            might be modified.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1024'
+          tags:
+            -
+              tag: Application
+              value: Memory
+        -
+          uuid: 5a78d97bd5f14a6b97873a3abe41db20
+          name: 'Used memory'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.25.2.3.1.6.65536
+          key: 'vm.memory.used[hrStorageUsed.Memory]'
+          history: 7d
+          units: B
+          description: |
+            MIB: HOST-RESOURCES-MIB
+            The amount of the storage represented by this entry that is allocated, in units of hrStorageAllocationUnits.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1024'
+          tags:
+            -
+              tag: Application
+              value: Memory
+        -
+          uuid: dc5f8ec0557c4e9980f2224e150e89e7
+          name: 'Memory utilization'
+          type: CALCULATED
+          key: 'vm.memory.util[memoryUsedPercentage.Memory]'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          params: 'last(//vm.memory.used[hrStorageUsed.Memory])/last(//vm.memory.total[hrStorageSize.Memory])*100'
+          description: 'Memory utilization in %'
+          tags:
+            -
+              tag: Application
+              value: Memory
+          triggers:
+            -
+              uuid: 6a571f6691ec459bbc63e1a8dece1c04
+              expression: 'min(/MikroTik CCR1009-7G-1C-1SPC SNMP/vm.memory.util[memoryUsedPercentage.Memory],5m)>{$MEMORY.UTIL.MAX}'
+              name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+              priority: AVERAGE
+              description: 'The system is running out of free memory.'
+      discovery_rules:
+        -
+          uuid: b5d7f793a40449af9342a0751d606c04
+          name: 'CPU discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.2.1.25.3.3.1.1]'
+          key: hrProcessorLoad.discovery
+          delay: 1h
+          description: 'HOST-RESOURCES-MIB::hrProcessorTable discovery'
+          item_prototypes:
+            -
+              uuid: 39223b273e314bf88eccfa23d2bdf520
+              name: '#{#SNMPINDEX}: CPU utilization'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.25.3.3.1.2.{#SNMPINDEX}'
+              key: 'system.cpu.util[hrProcessorLoad.{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: |
+                MIB: HOST-RESOURCES-MIB
+                The average, over the last minute, of the percentage of time that this processor was not idle. Implementations may approximate this one minute smoothing period if necessary.
+              tags:
+                -
+                  tag: Application
+                  value: CPU
+              trigger_prototypes:
+                -
+                  uuid: 1586816e4cfe4060b9c2d4c305439e4d
+                  expression: 'min(/MikroTik CCR1009-7G-1C-1SPC SNMP/system.cpu.util[hrProcessorLoad.{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
+                  name: '#{#SNMPINDEX}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+                  opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'CPU utilization is too high. The system might be slow to respond.'
+          graph_prototypes:
+            -
+              uuid: 473d7e39becc4c56bef6687d3e197dd8
+              name: '#{#SNMPINDEX}: CPU utilization'
+              ymin_type_1: FIXED
+              ymax_type_1: FIXED
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'MikroTik CCR1009-7G-1C-1SPC SNMP'
+                    key: 'system.cpu.util[hrProcessorLoad.{#SNMPINDEX}]'
+        -
+          uuid: f3b3f73ab8ad4138b4acb0f3ff7aa732
+          name: 'Temperature CPU discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.14988.1.1.3.11]'
+          key: mtxrHlProcessorTemperature.discovery
+          delay: 1h
+          description: |
+            MIKROTIK-MIB::mtxrHlProcessorTemperature
+            Since temperature of CPU is not available on all Mikrotik hardware, this is done to avoid unsupported items.
+          item_prototypes:
+            -
+              uuid: f52a2b2e6f6045119473176e6680fb67
+              name: 'CPU: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.14988.1.1.3.11.{#SNMPINDEX}'
+              key: 'sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}]'
+              delay: 3m
+              value_type: FLOAT
+              units: °C
+              description: |
+                MIB: MIKROTIK-MIB
+                mtxrHlProcessorTemperature Processor temperature in Celsius (degrees C).
+                Might be missing in entry models (RB750, RB450G..).
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.1'
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
+              trigger_prototypes:
+                -
+                  uuid: 7662e3eded674ca996c98d5af253d767
+                  expression: 'avg(/MikroTik CCR1009-7G-1C-1SPC SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"CPU"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'max(/MikroTik CCR1009-7G-1C-1SPC SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"CPU"}-3'
+                  name: 'CPU: Temperature is above critical threshold: >{$TEMP_CRIT:"CPU"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                -
+                  uuid: ad69a0bc0507456787ef21628985e22f
+                  expression: 'avg(/MikroTik CCR1009-7G-1C-1SPC SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"CPU"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'max(/MikroTik CCR1009-7G-1C-1SPC SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:"CPU"}-3'
+                  name: 'CPU: Temperature is above warning threshold: >{$TEMP_WARN:"CPU"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  dependencies:
+                    -
+                      name: 'CPU: Temperature is above critical threshold: >{$TEMP_CRIT:"CPU"}'
+                      expression: 'avg(/MikroTik CCR1009-7G-1C-1SPC SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"CPU"}'
+                      recovery_expression: 'max(/MikroTik CCR1009-7G-1C-1SPC SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"CPU"}-3'
+                -
+                  uuid: d66e0fa34fbf4fc49ac5ebfed3f6dbb0
+                  expression: 'avg(/MikroTik CCR1009-7G-1C-1SPC SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"CPU"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'min(/MikroTik CCR1009-7G-1C-1SPC SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"CPU"}+3'
+                  name: 'CPU: Temperature is too low: <{$TEMP_CRIT_LOW:"CPU"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+        -
+          uuid: bea5c8de3a354405a60f417e7c3f9852
+          name: 'Temperature sensor discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.14988.1.1.3.10]'
+          key: mtxrHlTemperature.discovery
+          delay: 1h
+          description: |
+            MIKROTIK-MIB::mtxrHlTemperature
+            Since temperature sensor is not available on all Mikrotik hardware,
+            this is done to avoid unsupported items.
+          item_prototypes:
+            -
+              uuid: b2ac80947a314b8590500aed1ba15b34
+              name: 'Device: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.14988.1.1.3.10.{#SNMPINDEX}'
+              key: 'sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}]'
+              delay: 3m
+              value_type: FLOAT
+              units: °C
+              description: |
+                MIB: MIKROTIK-MIB
+                mtxrHlTemperature Device temperature in Celsius (degrees C).
+                Might be missing in entry models (RB750, RB450G..).
+                
+                Reference: http://wiki.mikrotik.com/wiki/Manual:SNMP
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.1'
+              tags:
+                -
+                  tag: Application
+                  value: Temperature
+              trigger_prototypes:
+                -
+                  uuid: d9e2f17aa26d47239ba7ee40d5b39759
+                  expression: 'avg(/MikroTik CCR1009-7G-1C-1SPC SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Device"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'max(/MikroTik CCR1009-7G-1C-1SPC SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Device"}-3'
+                  name: 'Device: Temperature is above critical threshold: >{$TEMP_CRIT:"Device"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                -
+                  uuid: f6bcaf561a23406e84a22549aed2485d
+                  expression: 'avg(/MikroTik CCR1009-7G-1C-1SPC SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"Device"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'max(/MikroTik CCR1009-7G-1C-1SPC SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:"Device"}-3'
+                  name: 'Device: Temperature is above warning threshold: >{$TEMP_WARN:"Device"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  dependencies:
+                    -
+                      name: 'Device: Temperature is above critical threshold: >{$TEMP_CRIT:"Device"}'
+                      expression: 'avg(/MikroTik CCR1009-7G-1C-1SPC SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Device"}'
+                      recovery_expression: 'max(/MikroTik CCR1009-7G-1C-1SPC SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Device"}-3'
+                -
+                  uuid: fcf0566a31b9400c9790638caad03e34
+                  expression: 'avg(/MikroTik CCR1009-7G-1C-1SPC SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"Device"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'min(/MikroTik CCR1009-7G-1C-1SPC SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"Device"}+3'
+                  name: 'Device: Temperature is too low: <{$TEMP_CRIT_LOW:"Device"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+        -
+          uuid: d7d28fbb900742f58ba741a7b2810656
+          name: 'LTE modem discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#IFNAME},1.3.6.1.4.1.14988.1.1.14.1.1.2,{#IFALIAS},1.3.6.1.2.1.31.1.1.1.18,{#IFTYPE},1.3.6.1.2.1.2.2.1.3]'
+          key: mtxrLTEModem.discovery
+          delay: 1h
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#IFTYPE}'
+                value: ^1$
+                formulaid: B
+              -
+                macro: '{#IFNAME}'
+                value: '{$IFNAME.LTEMODEM.MATCHES}'
+                formulaid: A
+          description: 'MIKROTIK-MIB::mtxrLTEModemInterfaceIndex'
+          item_prototypes:
+            -
+              uuid: 89139aaa90244af89be5b13e31e568db
+              name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSRP'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.14988.1.1.16.1.1.4.{#SNMPINDEX}'
+              key: 'lte.modem.rsrp[mtxrLTEModemSignalRSRP.{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: dbm
+              description: |
+                MIB: MIKROTIK-MIB
+                mtxrLTEModemSignalRSRP Reference Signal Received Power.
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+              trigger_prototypes:
+                -
+                  uuid: 88449b36f96740349cd1e08127b7b39c
+                  expression: 'max(/MikroTik CCR1009-7G-1C-1SPC SNMP/lte.modem.rsrp[mtxrLTEModemSignalRSRP.{#SNMPINDEX}],5m) < {$LTEMODEM.RSRP.MIN.WARN}'
+                  name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSRP is low (below {$LTEMODEM.RSRP.MIN.WARN}dbm for 5m)'
+                  priority: WARNING
+            -
+              uuid: 5f60c2de483e4aae8fbedc50798f3bb9
+              name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSRQ'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.14988.1.1.16.1.1.3.{#SNMPINDEX}'
+              key: 'lte.modem.rsrq[mtxrLTEModemSignalRSRQ.{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: db
+              description: |
+                MIB: MIKROTIK-MIB
+                mtxrLTEModemSignalRSRQ Reference Signal Received Quality.
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+              trigger_prototypes:
+                -
+                  uuid: cdab150de72d4e8bb2af4e412be6de27
+                  expression: 'max(/MikroTik CCR1009-7G-1C-1SPC SNMP/lte.modem.rsrq[mtxrLTEModemSignalRSRQ.{#SNMPINDEX}],5m) < {$LTEMODEM.RSRQ.MIN.WARN}'
+                  name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSRQ is low (below {$LTEMODEM.RSRQ.MIN.WARN}db for 5m)'
+                  priority: WARNING
+            -
+              uuid: df09bd33847c4cf9931b68c49fa0cc2e
+              name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSSI'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.14988.1.1.16.1.1.2.{#SNMPINDEX}'
+              key: 'lte.modem.rssi[mtxrLTEModemSignalRSSI.{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: dbm
+              description: |
+                MIB: MIKROTIK-MIB
+                mtxrLTEModemSignalRSSI Received Signal Strength Indicator.
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+              trigger_prototypes:
+                -
+                  uuid: 5eb2071556a749b382e8d6668fc7c699
+                  expression: 'max(/MikroTik CCR1009-7G-1C-1SPC SNMP/lte.modem.rssi[mtxrLTEModemSignalRSSI.{#SNMPINDEX}],5m) < {$LTEMODEM.RSSI.MIN.WARN}'
+                  name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSSI is low (below {$LTEMODEM.RSSI.MIN.WARN}dbm for 5m)'
+                  priority: WARNING
+            -
+              uuid: 10459f3a756e48f991bbddf9e466f5bb
+              name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem SINR'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.14988.1.1.16.1.1.7.{#SNMPINDEX}'
+              key: 'lte.modem.sinr[mtxrLTEModemSignalSINR.{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: db
+              description: |
+                MIB: MIKROTIK-MIB
+                mtxrLTEModemSignalSINR Signal to Interference & Noise Ratio.
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+              trigger_prototypes:
+                -
+                  uuid: 9e119f5f5ae74caeb58e9736f5e7e8b1
+                  expression: 'max(/MikroTik CCR1009-7G-1C-1SPC SNMP/lte.modem.sinr[mtxrLTEModemSignalSINR.{#SNMPINDEX}],5m) < {$LTEMODEM.SINR.MIN.WARN}'
+                  name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem SINR is low (below {$LTEMODEM.SINR.MIN.WARN}db for 5m)'
+                  priority: WARNING
+          graph_prototypes:
+            -
+              uuid: 38deeca2121f4698834d9f8c984be4bf
+              name: 'Interface {#IFNAME}({#IFALIAS}): Modem Signal. {#SNMPINDEX}'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'MikroTik CCR1009-7G-1C-1SPC SNMP'
+                    key: 'lte.modem.sinr[mtxrLTEModemSignalSINR.{#SNMPINDEX}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'MikroTik CCR1009-7G-1C-1SPC SNMP'
+                    key: 'lte.modem.rsrq[mtxrLTEModemSignalRSRQ.{#SNMPINDEX}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'MikroTik CCR1009-7G-1C-1SPC SNMP'
+                    key: 'lte.modem.rsrp[mtxrLTEModemSignalRSRP.{#SNMPINDEX}]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  item:
+                    host: 'MikroTik CCR1009-7G-1C-1SPC SNMP'
+                    key: 'lte.modem.rssi[mtxrLTEModemSignalRSSI.{#SNMPINDEX}]'
+        -
+          uuid: 2f9915f91c984f56af4f9505c52aea9a
+          name: 'AP channel discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#IFNAME},1.3.6.1.4.1.14988.1.1.14.1.1.2,{#IFALIAS},1.3.6.1.2.1.31.1.1.1.18,{#IFTYPE},1.3.6.1.2.1.2.2.1.3,{#IFADMINSTATUS},1.3.6.1.2.1.2.2.1.7]'
+          key: mtxrWlAp.discovery
+          delay: 1h
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#IFTYPE}'
+                value: ^71$
+                formulaid: B
+              -
+                macro: '{#IFADMINSTATUS}'
+                value: ^1$
+                formulaid: A
+          description: 'MIKROTIK-MIB::mtxrWlAp'
+          item_prototypes:
+            -
+              uuid: 0bfd56d26ed04702904b7846f9d27d89
+              name: 'Interface {#IFNAME}({#IFALIAS}): AP authenticated clients'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.14988.1.1.1.3.1.11.{#SNMPINDEX}'
+              key: 'ssid.authclient[mtxrWlApAuthClientCount.{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: MIKROTIK-MIB
+                mtxrWlApAuthClientCount Number of authentication clients.
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+            -
+              uuid: e9b16dbe554948ffac6a124c2545e8ed
+              name: 'Interface {#IFNAME}({#IFALIAS}): AP band'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.14988.1.1.1.3.1.8.{#SNMPINDEX}'
+              key: 'ssid.band[mtxrWlApBand.{#SNMPINDEX}]'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: MIKROTIK-MIB
+                mtxrWlApBand
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+            -
+              uuid: ec6db43c1009423db17a9db20c193801
+              name: 'Interface {#IFNAME}({#IFALIAS}): SSID'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.14988.1.1.1.3.1.4.{#SNMPINDEX}'
+              key: 'ssid.name[mtxrWlApSsid.{#SNMPINDEX}]'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: MIKROTIK-MIB
+                mtxrWlApSsid Service Set Identifier.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+            -
+              uuid: f6b5c40031a9451d93e0c1a53c60d90e
+              name: 'Interface {#IFNAME}({#IFALIAS}): AP noise floor'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.14988.1.1.1.3.1.9.{#SNMPINDEX}'
+              key: 'ssid.noise[mtxrWlApNoiseFloor.{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              description: |
+                MIB: MIKROTIK-MIB
+                mtxrWlApNoiseFloor
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 15m
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+            -
+              uuid: 4fe579127b3249b08c210c8b3f767f7a
+              name: 'Interface {#IFNAME}({#IFALIAS}): AP registered clients'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.14988.1.1.1.3.1.6.{#SNMPINDEX}'
+              key: 'ssid.regclient[mtxrWlApClientCount.{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: MIKROTIK-MIB
+                mtxrWlApClientCount Client established connection to AP, but didn't finish all authetncation procedures for full connection.
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+        -
+          uuid: 8bb2e43eaeae433381360f436151ca96
+          name: 'CAPsMAN AP channel discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#IFNAME},1.3.6.1.4.1.14988.1.1.14.1.1.2,{#IFALIAS},1.3.6.1.2.1.31.1.1.1.18,{#IFTYPE},1.3.6.1.2.1.2.2.1.3]'
+          key: mtxrWlCMChannel.discovery
+          delay: 1h
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#IFTYPE}'
+                value: ^1$
+                formulaid: B
+              -
+                macro: '{#IFNAME}'
+                value: '{$IFNAME.WIFI.MATCHES}'
+                formulaid: A
+          description: 'MIKROTIK-MIB::mtxrWlCMChannel'
+          item_prototypes:
+            -
+              uuid: 2ae0d22024c74c80ba6be1549fa4f17e
+              name: 'Interface {#IFNAME}({#IFALIAS}): AP authenticated clients'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.14988.1.1.1.7.1.3.{#SNMPINDEX}'
+              key: 'ssid.authclient[mtxrWlCMAuthClientCount.{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: MIKROTIK-MIB
+                mtxrWlCMAuthClientCount Number of authentication clients.
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+            -
+              uuid: 9e85e8cd51f0489d8aaefdc31ccbffd4
+              name: 'Interface {#IFNAME}({#IFALIAS}): AP channel'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.14988.1.1.1.7.1.5.{#SNMPINDEX}'
+              key: 'ssid.channel[mtxrWlCMChannel.{#SNMPINDEX}]'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: MIKROTIK-MIB
+                mtxrWlCMChannel
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+            -
+              uuid: 2844bdd0d5094a38a88f756e1fed71ad
+              name: 'Interface {#IFNAME}({#IFALIAS}): AP registered clients'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.14988.1.1.1.7.1.2.{#SNMPINDEX}'
+              key: 'ssid.regclient[mtxrWlCMRegClientCount.{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: MIKROTIK-MIB
+                mtxrWlCMRegClientCount Client established connection to AP, but didn't finish all authetncation procedures for full connection.
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+            -
+              uuid: 16791055befb41f3b12dabf4aa0c6540
+              name: 'Interface {#IFNAME}({#IFALIAS}): AP state'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.14988.1.1.1.7.1.4.{#SNMPINDEX}'
+              key: 'ssid.state[mtxrWlCMState.{#SNMPINDEX}]'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: MIKROTIK-MIB
+                mtxrWlCMState Wireless interface state.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: Application
+                  value: 'Interface {#IFNAME}({#IFALIAS})'
+              trigger_prototypes:
+                -
+                  uuid: f282823a66354c1aa88b2338efb376f0
+                  expression: 'last(/MikroTik CCR1009-7G-1C-1SPC SNMP/ssid.state[mtxrWlCMState.{#SNMPINDEX}])<>"running-ap"'
+                  name: 'Interface {#IFNAME}({#IFALIAS}): AP interface {#IFNAME}({#IFALIAS}) is not running'
+                  priority: WARNING
+                  description: 'Access point interface can be not running by different reasons - disabled interface, power off, network link down.'
+        -
+          uuid: d8ff7af06d6d4fe39d7ab93eb803978a
+          name: 'Storage discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.2.1.25.2.3.1.3,{#ALLOC_UNITS},1.3.6.1.2.1.25.2.3.1.4,{#STORAGE_TYPE},1.3.6.1.2.1.25.2.3.1.2]'
+          key: storage.discovery
+          delay: 1h
+          filter:
+            evaltype: OR
+            conditions:
+              -
+                macro: '{#STORAGE_TYPE}'
+                value: .+4$
+                formulaid: A
+              -
+                macro: '{#STORAGE_TYPE}'
+                value: .+hrStorageFixedDisk
+                formulaid: B
+          description: 'HOST-RESOURCES-MIB::hrStorage discovery with storage filter'
+          item_prototypes:
+            -
+              uuid: 30dd1b502cac45538f16b4d985966d55
+              name: 'Disk-{#SNMPINDEX}: Space utilization'
+              type: CALCULATED
+              key: 'vfs.fs.pused[hrStorageSize.{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              params: '(last(//vfs.fs.used[hrStorageSize.{#SNMPINDEX}])/last(//vfs.fs.total[hrStorageSize.{#SNMPINDEX}]))*100'
+              description: 'Space utilization in % for Disk-{#SNMPINDEX}'
+              tags:
+                -
+                  tag: Application
+                  value: Storage
+            -
+              uuid: 565b745c23864f1797a2cb3a11eedf7f
+              name: 'Disk-{#SNMPINDEX}: Total space'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.25.2.3.1.5.{#SNMPINDEX}'
+              key: 'vfs.fs.total[hrStorageSize.{#SNMPINDEX}]'
+              history: 7d
+              units: B
+              description: |
+                MIB: HOST-RESOURCES-MIB
+                The size of the storage represented by this entry, in
+                units of hrStorageAllocationUnits. This object is
+                writable to allow remote configuration of the size of
+                the storage area in those cases where such an
+                operation makes sense and is possible on the
+                underlying system. For example, the amount of main
+                memory allocated to a buffer pool might be modified or
+                the amount of disk space allocated to virtual memory
+                might be modified.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1024'
+              tags:
+                -
+                  tag: Application
+                  value: Storage
+            -
+              uuid: 8cfa6b214639494fa8db1cb673f45e1d
+              name: 'Disk-{#SNMPINDEX}: Used space'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.25.2.3.1.6.{#SNMPINDEX}'
+              key: 'vfs.fs.used[hrStorageSize.{#SNMPINDEX}]'
+              history: 7d
+              units: B
+              description: |
+                MIB: HOST-RESOURCES-MIB
+                The amount of the storage represented by this entry that is allocated, in units of hrStorageAllocationUnits.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1024'
+              tags:
+                -
+                  tag: Application
+                  value: Storage
+          trigger_prototypes:
+            -
+              uuid: 93eaacd1543d440c93faa4b7c4fcd02d
+              expression: |
+                last(/MikroTik CCR1009-7G-1C-1SPC SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"} and
+                ((last(/MikroTik CCR1009-7G-1C-1SPC SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/MikroTik CCR1009-7G-1C-1SPC SNMP/vfs.fs.used[hrStorageSize.{#SNMPINDEX}]))<5G or timeleft(/MikroTik CCR1009-7G-1C-1SPC SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}],1h,100)<1d)
+              name: 'Disk-{#SNMPINDEX}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"}%)'
+              opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
+              priority: AVERAGE
+              description: |
+                Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"}.
+                 Second condition should be one of the following:
+                 - The disk free space is less than 5G.
+                 - The disk will be full in less than 24 hours.
+              manual_close: 'YES'
+            -
+              uuid: 70397fb0b0754a42a9c97c77c2037d2a
+              expression: |
+                last(/MikroTik CCR1009-7G-1C-1SPC SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.WARN:"Disk-{#SNMPINDEX}"} and
+                ((last(/MikroTik CCR1009-7G-1C-1SPC SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/MikroTik CCR1009-7G-1C-1SPC SNMP/vfs.fs.used[hrStorageSize.{#SNMPINDEX}]))<10G or timeleft(/MikroTik CCR1009-7G-1C-1SPC SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}],1h,100)<1d)
+              name: 'Disk-{#SNMPINDEX}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"Disk-{#SNMPINDEX}"}%)'
+              opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
+              priority: WARNING
+              description: |
+                Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.WARN:"Disk-{#SNMPINDEX}"}.
+                 Second condition should be one of the following:
+                 - The disk free space is less than 10G.
+                 - The disk will be full in less than 24 hours.
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'Disk-{#SNMPINDEX}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"}%)'
+                  expression: |
+                    last(/MikroTik CCR1009-7G-1C-1SPC SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"} and
+                    ((last(/MikroTik CCR1009-7G-1C-1SPC SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/MikroTik CCR1009-7G-1C-1SPC SNMP/vfs.fs.used[hrStorageSize.{#SNMPINDEX}]))<5G or timeleft(/MikroTik CCR1009-7G-1C-1SPC SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}],1h,100)<1d)
+          graph_prototypes:
+            -
+              uuid: bff3cf781de1430d81a20a71a055e35d
+              name: 'Disk-{#SNMPINDEX}: Disk space usage'
+              width: '600'
+              height: '340'
+              type: PIE
+              show_3d: 'YES'
+              graph_items:
+                -
+                  color: '969696'
+                  calc_fnc: LAST
+                  type: GRAPH_SUM
+                  item:
+                    host: 'MikroTik CCR1009-7G-1C-1SPC SNMP'
+                    key: 'vfs.fs.total[hrStorageSize.{#SNMPINDEX}]'
+                -
+                  sortorder: '1'
+                  color: C80000
+                  calc_fnc: LAST
+                  item:
+                    host: 'MikroTik CCR1009-7G-1C-1SPC SNMP'
+                    key: 'vfs.fs.used[hrStorageSize.{#SNMPINDEX}]'
+      macros:
+        -
+          macro: '{$CPU.UTIL.CRIT}'
+          value: '90'
+        -
+          macro: '{$IFNAME.LTEMODEM.MATCHES}'
+          value: ^lte
+          description: 'This macro is used in LTE modem discovery. It can be overridden on the host.'
+        -
+          macro: '{$IFNAME.WIFI.MATCHES}'
+          value: WIFI
+          description: 'This macro is used in CAPsMAN AP channel discovery. It can be overridden on the host level.'
+        -
+          macro: '{$LTEMODEM.RSRP.MIN.WARN}'
+          value: '-100'
+          description: 'The LTE modem RSRP minimum value for warning trigger expression.'
+        -
+          macro: '{$LTEMODEM.RSRQ.MIN.WARN}'
+          value: '-20'
+          description: 'The LTE modem RSRQ minimum value for warning trigger expression.'
+        -
+          macro: '{$LTEMODEM.RSSI.MIN.WARN}'
+          value: '-100'
+          description: 'The LTE modem RSSI minimum value for warning trigger expression.'
+        -
+          macro: '{$LTEMODEM.SINR.MIN.WARN}'
+          value: '0'
+          description: 'The LTE modem SINR minimum value for warning trigger expression.'
+        -
+          macro: '{$MEMORY.UTIL.MAX}'
+          value: '90'
+        -
+          macro: '{$TEMP_CRIT}'
+          value: '60'
+        -
+          macro: '{$TEMP_CRIT:"CPU"}'
+          value: '75'
+        -
+          macro: '{$TEMP_CRIT_LOW}'
+          value: '5'
+        -
+          macro: '{$TEMP_WARN}'
+          value: '50'
+        -
+          macro: '{$TEMP_WARN:"CPU"}'
+          value: '70'
+        -
+          macro: '{$VFS.FS.PUSED.MAX.CRIT}'
+          value: '90'
+        -
+          macro: '{$VFS.FS.PUSED.MAX.WARN}'
+          value: '80'
+  graphs:
+    -
+      uuid: 852cd213b59640f09cd62303fa4c0d9d
+      name: 'Memory utilization'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'MikroTik CCR1009-7G-1C-1SPC SNMP'
+            key: 'vm.memory.util[memoryUsedPercentage.Memory]'
