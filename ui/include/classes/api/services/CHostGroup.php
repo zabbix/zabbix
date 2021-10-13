@@ -1063,14 +1063,14 @@ class CHostGroup extends CApiService {
 	 */
 	private function validateMassAdd(array $data, ?array &$db_groups): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
-			'groups' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
-				'groupid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
+			'groups' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
+				'groupid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
-			'hosts' =>			['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['hostid']], 'fields' => [
-				'hostid'=>			['type' => API_ID, 'flags' => API_REQUIRED]
+			'hosts' =>		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['hostid']], 'fields' => [
+				'hostid'=>		['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
-			'templates' =>		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
-				'templateid'=>		['type' => API_ID, 'flags' => API_REQUIRED]
+			'templates' =>	['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
+				'templateid'=>	['type' => API_ID, 'flags' => API_REQUIRED]
 			]]
 		]];
 
@@ -1082,16 +1082,14 @@ class CHostGroup extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one host or template must be specified.'));
 		}
 
-		$groupids = array_column($data['groups'], 'groupid');
-
 		$db_groups = $this->get([
 			'output' => ['groupid','name'],
-			'groupids' => $groupids,
+			'groupids' => array_column($data['groups'], 'groupid'),
 			'editable' => true,
 			'preservekeys' => true
 		]);
 
-		if (count($db_groups) != count($groupids)) {
+		if (count($db_groups) != count($data['groups'])) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
@@ -1142,14 +1140,14 @@ class CHostGroup extends CApiService {
 	 */
 	private function validateMassUpdate(array &$data, ?array &$db_groups): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
-			'groups' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
-				'groupid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
+			'groups' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
+				'groupid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
-			'hosts' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NORMALIZE, 'uniq' => [['hostid']], 'fields' => [
-				'hostid'=>			['type' => API_ID, 'flags' => API_REQUIRED]
+			'hosts' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NORMALIZE, 'uniq' => [['hostid']], 'fields' => [
+				'hostid'=>		['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
-			'templates' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
-				'templateid'=>		['type' => API_ID, 'flags' => API_REQUIRED]
+			'templates' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
+				'templateid'=>	['type' => API_ID, 'flags' => API_REQUIRED]
 			]]
 		]];
 
