@@ -23,6 +23,7 @@
  * Class to log audit records.
  */
 class CAudit {
+
 	/**
 	 * Audit actions.
 	 *
