@@ -290,6 +290,10 @@ class testExpandExpressionMacros extends CWebTest {
 			'width' => 1144,
 			'height' => 279
 		];
+		// TODO: delete this debug information when test failing is fixed.
+		echo (json_encode(CDBHelper::getAll(
+				'SELECT * FROM history where itemid ='.self::$last_itemid
+		), JSON_PRETTY_PRINT));
 		$this->assertScreenshotExcept($this->waitUntilGraphIsLoaded(), $covered_region, $data['host_name']);
 	}
 
