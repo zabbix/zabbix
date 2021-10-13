@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
 /**
  * @backup history, hosts
  *
- * @onBefore prepareItemsData, prepareMapsData, writeValuesToItems
+ * @onBeforeOnce prepareItemsData, prepareMapsData, writeValuesToItems
  */
 class testExpandExpressionMacros extends CWebTest {
 
@@ -253,7 +253,7 @@ class testExpandExpressionMacros extends CWebTest {
 	public function writeValuesToItems() {
 		// Add values for items.
 		$time = time();
-		$last_time = $time+1;
+		$last_time = $time+100;
 
 		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$last_itemid.", ".$time.", 2, 0)");
 		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$last_itemid.", ".$last_time.", 4, 0)");
@@ -290,10 +290,6 @@ class testExpandExpressionMacros extends CWebTest {
 			'width' => 1144,
 			'height' => 279
 		];
-		// TODO: delete this debug information when test failing is fixed.
-		echo (json_encode(CDBHelper::getAll(
-				'SELECT * FROM history where itemid ='.self::$last_itemid
-		), JSON_PRETTY_PRINT));
 		$this->assertScreenshotExcept($this->waitUntilGraphIsLoaded(), $covered_region, $data['host_name']);
 	}
 
