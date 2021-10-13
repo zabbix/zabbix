@@ -67,9 +67,6 @@ typedef struct
 	/* last access time of active node */
 	int		lastaccess_active;
 
-	/* number of 5 second ticks since HA manager restart */
-	int		ticks;
-
 	/* number of ticks without database connection */
 	int		offline_ticks;
 
@@ -953,8 +950,6 @@ static int	ha_check_nodes(zbx_ha_info_t *info)
 
 	zbx_vector_ha_node_create(&nodes);
 
-	info->ticks++;
-
 	if (ZBX_DB_OK != ha_db_begin(info))
 		goto finish;
 
@@ -1638,7 +1633,6 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 	info.ha_status = (int)(uintptr_t)((zbx_thread_args_t *)args)->args;
 	info.error = NULL;
 	info.db_status = ZBX_DB_DOWN;
-	info.ticks = 0;
 	info.offline_ticks = 0;
 	info.offline_ticks_active = 0;
 	info.lastaccess_active = 0;
