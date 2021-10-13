@@ -69,8 +69,8 @@ void	zbx_audit_graph_create_entry(int audit_action, zbx_uint64_t graphid, const 
 
 		if (AUDIT_ACTION_ADD == audit_action)
 		{
-			zbx_audit_update_json_append_uint64(graphid, AUDIT_GRAPH_ID, AUDIT_DETAILS_ACTION_ADD, GR_OR_GRP(graphid),
-					graphid, "graphs", "graphid");
+			zbx_audit_update_json_append_uint64(graphid, AUDIT_GRAPH_ID, AUDIT_DETAILS_ACTION_ADD,
+					GR_OR_GRP(graphid), graphid, "graphs", "graphid");
 		}
 	}
 }
@@ -120,12 +120,14 @@ void	zbx_audit_graph_update_json_add_data(zbx_uint64_t graphid, const char *name
 	AUDIT_KEY_SNPRINTF(discover)
 #undef AUDIT_KEY_SNPRINTF
 	zbx_audit_update_json_append_no_value(graphid, AUDIT_GRAPH_ID, AUDIT_DETAILS_ACTION_ADD, audit_key);
-#define ADD_STR(r, t, f) zbx_audit_update_json_append_string(graphid, AUDIT_GRAPH_ID, AUDIT_DETAILS_ACTION_ADD, audit_key_##r, r, t, f);
-#define ADD_UINT64(r, t, f) zbx_audit_update_json_append_uint64(graphid, AUDIT_GRAPH_ID, AUDIT_DETAILS_ACTION_ADD, audit_key_##r, r, t,\
-		f);
-#define ADD_INT(r, t, f) zbx_audit_update_json_append_int(graphid, AUDIT_GRAPH_ID, AUDIT_DETAILS_ACTION_ADD, audit_key_##r, r, t, f);
-#define ADD_DOUBLE(r, t, f) zbx_audit_update_json_append_double(graphid, AUDIT_GRAPH_ID, AUDIT_DETAILS_ACTION_ADD, audit_key_##r, r, t,\
-		f);
+#define ADD_STR(r, t, f) zbx_audit_update_json_append_string(graphid, AUDIT_GRAPH_ID, AUDIT_DETAILS_ACTION_ADD, \
+		audit_key_##r, r, t, f);
+#define ADD_UINT64(r, t, f) zbx_audit_update_json_append_uint64(graphid, AUDIT_GRAPH_ID, AUDIT_DETAILS_ACTION_ADD, \
+		audit_key_##r, r, t, f);
+#define ADD_INT(r, t, f) zbx_audit_update_json_append_int(graphid, AUDIT_GRAPH_ID, AUDIT_DETAILS_ACTION_ADD, \
+		audit_key_##r, r, t, f);
+#define ADD_DOUBLE(r, t, f) zbx_audit_update_json_append_double(graphid, AUDIT_GRAPH_ID, AUDIT_DETAILS_ACTION_ADD, \
+		audit_key_##r, r, t, f);
 #define	AUDIT_TABLE_NAME	"graphs"
 	ADD_STR(name, AUDIT_TABLE_NAME, "name")
 	ADD_INT(width, AUDIT_TABLE_NAME, "width")
@@ -181,10 +183,12 @@ void	zbx_audit_graph_update_json_add_gitems(zbx_uint64_t graphid, int flags, zbx
 	AUDIT_KEY_GITEMS_SNPRINTF(itemid, .)
 
 	zbx_audit_update_json_append_no_value(graphid, AUDIT_GRAPH_ID, AUDIT_DETAILS_ACTION_ADD, audit_key_);
-#define ADD_STR(r, t, f) zbx_audit_update_json_append_string(graphid, AUDIT_GRAPH_ID, AUDIT_DETAILS_ACTION_ADD, audit_key_##r, r, t, f);
-#define ADD_INT(r, t, f) zbx_audit_update_json_append_int(graphid, AUDIT_GRAPH_ID, AUDIT_DETAILS_ACTION_ADD, audit_key_##r, r, t, f);
-#define ADD_UINT64(r, t, f) zbx_audit_update_json_append_uint64(graphid, AUDIT_GRAPH_ID, AUDIT_DETAILS_ACTION_ADD, audit_key_##r, r, t,\
-		f);
+#define ADD_STR(r, t, f) zbx_audit_update_json_append_string(graphid, AUDIT_GRAPH_ID, AUDIT_DETAILS_ACTION_ADD,	\
+		audit_key_##r, r, t, f);
+#define ADD_INT(r, t, f) zbx_audit_update_json_append_int(graphid, AUDIT_GRAPH_ID, AUDIT_DETAILS_ACTION_ADD,	\
+		audit_key_##r, r, t, f);
+#define ADD_UINT64(r, t, f) zbx_audit_update_json_append_uint64(graphid, AUDIT_GRAPH_ID, AUDIT_DETAILS_ACTION_ADD, \
+		audit_key_##r, r, t, f);
 #define	AUDIT_TABLE_NAME	"graphs_items"
 	ADD_INT(drawtype, AUDIT_TABLE_NAME, "drawtype")
 	ADD_INT(sortorder, AUDIT_TABLE_NAME, "sortorder")
@@ -211,7 +215,7 @@ void	zbx_audit_graph_update_json_update_##resource(zbx_uint64_t graphid, int fla
 														\
 	zbx_snprintf(buf, sizeof(buf), GR_OR_GRP(resource));							\
 														\
-	zbx_audit_update_json_update_##type2(graphid, AUDIT_GRAPH_ID, buf, resource##_old, resource##_new);			\
+	zbx_audit_update_json_update_##type2(graphid, AUDIT_GRAPH_ID, buf, resource##_old, resource##_new);	\
 }
 
 PREPARE_AUDIT_GRAPH_UPDATE(name, const char*, string)
@@ -263,7 +267,8 @@ void	zbx_audit_graph_update_json_update_gitem_update_##resource(zbx_uint64_t gra
 														\
 	AUDIT_KEY_GITEMS_SNPRINTF(resource, .)									\
 														\
-	zbx_audit_update_json_update_##type2(graphid, AUDIT_GRAPH_ID, audit_key_##resource, resource##_old, resource##_new);	\
+	zbx_audit_update_json_update_##type2(graphid, AUDIT_GRAPH_ID, audit_key_##resource, resource##_old,	\
+			resource##_new);									\
 }
 PREPARE_AUDIT_GRAPH_UPDATE(itemid, zbx_uint64_t, uint64)
 PREPARE_AUDIT_GRAPH_UPDATE(drawtype,int, int)
