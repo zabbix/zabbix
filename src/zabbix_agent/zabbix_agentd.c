@@ -1164,6 +1164,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #endif
 	/* --- START THREADS ---*/
 
+	zbx_set_terminate_signal_handlers();
+
 	/* allocate memory for a collector, all listeners and active checks */
 	threads_num = CONFIG_COLLECTOR_FORKS + CONFIG_PASSIVE_FORKS + CONFIG_ACTIVE_FORKS;
 
@@ -1417,6 +1419,7 @@ int	main(int argc, char **argv)
 			load_perf_counters(CONFIG_PERF_COUNTERS, CONFIG_PERF_COUNTERS_EN);
 #else
 			zbx_set_common_signal_handlers();
+			zbx_set_terminate_signal_handlers();
 #endif
 #ifndef _WINDOWS
 			if (FAIL == zbx_load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT, 0))

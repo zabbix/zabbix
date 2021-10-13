@@ -1060,6 +1060,32 @@ finish:
 
 /******************************************************************************
  *                                                                            *
+ * Function: ha_db_update_lastaccess                                          *
+ *                                                                            *
+ * Purpose: update node lastaccess                                            *
+ *                                                                            *
+ ******************************************************************************/
+static void	ha_db_update_lastaccess(zbx_ha_info_t *info)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ha_status:%s", __func__, zbx_ha_status_str(info->ha_status));
+
+	if (ZBX_DB_OK != ha_db_begin(info))
+		goto out;
+
+	if (SUCCEED == ha_db_lock_nodes(info))
+	{
+		DBexecute_once("update ha_node set lastaccess=" ZBX_DB_TIMESTAMP() " where ha_nodeid='%s'",
+				info->nodeid.str);
+		ha_db_commit(info);
+	}
+	else
+		ha_db_rollback(info);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: ha_db_get_nodes_json                                             *
  *                                                                            *
  * Purpose: get cluster status in lld compatible json format                  *
@@ -1542,6 +1568,12 @@ int	zbx_ha_stop(char **error)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	if (ZBX_THREAD_ERROR == ha_pid)
+	{
+		*error = zbx_strdup(NULL, "HA manager has not been started");
+		goto out;
+	}
+
 	if (SUCCEED == ha_send_manager_message(ZBX_IPC_SERVICE_HA_STOP, error))
 	{
 		if (ZBX_THREAD_ERROR == zbx_thread_wait(ha_pid))
@@ -1553,6 +1585,8 @@ int	zbx_ha_stop(char **error)
 		ret = SUCCEED;
 	}
 out:
+	ha_pid = ZBX_THREAD_ERROR;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
@@ -1569,6 +1603,7 @@ void	zbx_ha_kill(void)
 {
 	kill(ha_pid, SIGKILL);
 	zbx_thread_wait(ha_pid);
+	ha_pid = ZBX_THREAD_ERROR;
 
 	if (SUCCEED == zbx_ipc_async_socket_connected(&ha_socket))
 		zbx_ipc_async_socket_close(&ha_socket);
@@ -1721,7 +1756,10 @@ pause:
 
 	while (SUCCEED != stop)
 	{
-		(void)zbx_ipc_service_recv(&service, ZBX_IPC_WAIT_FOREVER, &client, &message);
+		(void)zbx_ipc_service_recv(&service, ZBX_HA_POLL_PERIOD, &client, &message);
+
+		if (ZBX_DB_FAIL != info.db_status)
+			ha_db_update_lastaccess(&info);
 
 		if (NULL != message)
 		{

@@ -1683,6 +1683,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
+	zbx_set_terminate_signal_handlers();
+
 	if (SUCCEED != zbx_ha_start(&error, ZBX_NODE_STATUS_UNKNOWN))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot start HA manager: %s", error);
@@ -1814,12 +1816,6 @@ void	zbx_on_exit(int ret)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
 
-	if (SUCCEED != zbx_ha_stop(&error))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot stop HA manager: %s", error);
-		zbx_free(error);
-	}
-
 	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
 	{
 		if (NULL != threads)
@@ -1850,6 +1846,12 @@ void	zbx_on_exit(int ret)
 		zbx_vmware_destroy();
 
 		free_selfmon_collector();
+	}
+
+	if (SUCCEED != zbx_ha_stop(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot stop HA manager: %s", error);
+		zbx_free(error);
 	}
 
 	zbx_uninitialize_events();
