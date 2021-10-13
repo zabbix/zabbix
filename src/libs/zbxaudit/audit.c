@@ -510,7 +510,6 @@ zbx_audit_entry_t	*zbx_audit_get_entry(zbx_uint64_t id, const char *cuid)
 	return *paudit_entry;
 }
 
-
 void	zbx_audit_entry_append_int(zbx_audit_entry_t *entry, int audit_op, char *key, ...)
 {
 	va_list		args;

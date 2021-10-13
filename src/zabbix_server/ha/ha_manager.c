@@ -30,8 +30,7 @@
 
 #define ZBX_HA_POLL_PERIOD	5
 
-// TODO: use more realistic timeout after testing
-#define ZBX_HA_SERVICE_TIMEOUT	1
+#define ZBX_HA_SERVICE_TIMEOUT	10
 
 #define ZBX_HA_DEFAULT_FAILOVER_DELAY	SEC_PER_MIN
 
@@ -855,7 +854,7 @@ static int	ha_check_standby_nodes(zbx_ha_info_t *info, zbx_vector_ha_node_t *nod
 		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "ha_nodeid",
 				(const char **)unavailable_nodes.values, unavailable_nodes.values_num);
 
-		if (ZBX_DB_OK > DBexecute("%s", sql))
+		if (ZBX_DB_OK > DBexecute_once("%s", sql))
 			ret = FAIL;
 
 		zbx_free(sql);

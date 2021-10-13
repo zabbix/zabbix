@@ -1723,6 +1723,18 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		}
 	}
 
+	if (NULL == CONFIG_HA_NODE_NAME || '\0' == *CONFIG_HA_NODE_NAME)
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "standalone node started in \"%s\" mode",
+				zbx_ha_status_str(ha_status));
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "\"%s\" node started in \"%s\" mode", CONFIG_HA_NODE_NAME,
+				zbx_ha_status_str(ha_status));
+
+	}
+
 	while (ZBX_IS_RUNNING())	/* wait for any child to exit */
 	{
 		if (SUCCEED != zbx_ha_recv_status(1, &new_ha_status, &error))
@@ -1736,7 +1748,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		if (ZBX_NODE_STATUS_UNKNOWN != new_ha_status && ha_status != new_ha_status)
 		{
 			ha_status = new_ha_status;
-			zabbix_log(LOG_LEVEL_DEBUG, "HA status changed to: %d", ha_status);
+			zabbix_log(LOG_LEVEL_INFORMATION, "\"%s\" node switched to \"%s\" mode", CONFIG_HA_NODE_NAME,
+							zbx_ha_status_str(ha_status));
 
 			switch (ha_status)
 			{
