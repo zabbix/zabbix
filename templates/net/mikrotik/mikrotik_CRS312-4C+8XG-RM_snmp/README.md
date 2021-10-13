@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 The template for monitoring Switch MikroTik CRS312-4C+8XG-RM.
 
 Switch of the future: the first MikroTik product with 10G RJ45 Ethernet ports and SFP+

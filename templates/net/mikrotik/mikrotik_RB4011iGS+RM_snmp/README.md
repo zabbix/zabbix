@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 The template for monitoring Ethernet router MikroTik RB4011iGS+RM.
 
 Powerful 10xGigabit port router with a Quad-core 1.4Ghz CPU, 1GB RAM, SFP+ 10Gbps cage and desktop case with rack ears
