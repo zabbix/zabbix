@@ -734,7 +734,6 @@ exit:
  *                                                                            *
  * Parameters: xml_node - [IN] the XML data to process                        *
  *             jstr     - [OUT] the JSON output                               *
- *             errmsg   - [OUT] error message                                 *
  *                                                                            *
  * Return value: SUCCEED - the value was processed successfully               *
  *               FAIL - otherwise                                             *
