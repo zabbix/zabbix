@@ -20,11 +20,36 @@
 #include "sysinfo.h"
 #include "log.h"
 
+#ifdef HAVE_SYS_UTSNAME_H
+#	include <sys/utsname.h>
+#endif
+
 ZBX_METRIC	parameter_hostname =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
 	{"system.hostname",     CF_HAVEPARAMS,  SYSTEM_HOSTNAME,        NULL};
 
 int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return get_system_hostname(request, result);
+	struct utsname	name;
+	char		*hostname;
+	int		rc;
+
+	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (-1 == uname(&name))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
+		return SYSINFO_RET_FAIL;
+	}
+
+	hostname = zbx_strdup(NULL, name.nodename);
+
+	if (FAIL == (rc = hostname_handle_params(request, result, hostname)))
+		zbx_free(hostname);
+
+	return rc;
 }
