@@ -480,6 +480,7 @@ static int	ha_db_commit(zbx_ha_info_t *info)
  ******************************************************************************/
 static int	ha_is_available(const zbx_ha_info_t *info, int lastaccess, int db_time)
 {
+	zabbix_log(LOG_LEVEL_INFORMATION, "lastaccess:%d, failover:%d, db_time:%d", lastaccess, info->failover_delay, db_time);
 	if (lastaccess + info->failover_delay <= db_time)
 		return FAIL;
 
@@ -574,6 +575,40 @@ static int	ha_check_cluster_config(zbx_ha_info_t *info, zbx_vector_ha_node_t *no
 
 /******************************************************************************
  *                                                                            *
+ * Function: ha_db_get_time                                                   *
+ *                                                                            *
+ * Purpose: get current database time                                         *
+ *                                                                            *
+ ******************************************************************************/
+static int	ha_db_get_time(int *db_time)
+{
+	DB_ROW			row;
+	DB_RESULT		result;
+	int			ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	result = DBselect_once("select " ZBX_DB_TIMESTAMP());
+
+	if (NULL == result || ZBX_DB_DOWN == (intptr_t)result)
+		goto out;
+
+	if (NULL != (row = DBfetch(result)))
+		*db_time = atoi(row[0]);
+	else
+		*db_time = 0;
+
+	DBfree_result(result);
+
+	ret = SUCCEED;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s db_time:%d", __func__, zbx_result_string(ret), *db_time);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: ha_db_create_node                                                *
  *                                                                            *
  * Purpose: add new node record in ha_node table if necessary                 *
@@ -585,7 +620,7 @@ static int	ha_check_cluster_config(zbx_ha_info_t *info, zbx_vector_ha_node_t *no
 static int	ha_db_create_node(zbx_ha_info_t *info)
 {
 	zbx_vector_ha_node_t	nodes;
-	int			i, ret = FAIL, activate;
+	int			i, ret = FAIL, activate, db_time;
 	zbx_cuid_t		nodeid;
 	char			*name_esc;
 
@@ -602,6 +637,9 @@ static int	ha_db_create_node(zbx_ha_info_t *info)
 	if (FAIL == ha_db_update_config(info))
 		goto out;
 
+	if (SUCCEED != ha_db_get_time(&db_time))
+		goto out;
+
 	for (i = 0; i < nodes.values_num; i++)
 	{
 		if (0 == strcmp(info->name, nodes.values[i]->name))
@@ -613,12 +651,12 @@ static int	ha_db_create_node(zbx_ha_info_t *info)
 
 	if (ZBX_HA_IS_CLUSTER())
 	{
-		if (SUCCEED != ha_check_cluster_config(info, &nodes, 0, &activate))
+		if (SUCCEED != ha_check_cluster_config(info, &nodes, db_time, &activate))
 			goto out;
 	}
 	else
 	{
-		if (SUCCEED != ha_check_standalone_config(info, &nodes, 0))
+		if (SUCCEED != ha_check_standalone_config(info, &nodes, db_time))
 			goto out;
 	}
 
@@ -665,40 +703,6 @@ finish:
 	zbx_vector_ha_node_destroy(&nodes);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: ha_db_get_time                                                   *
- *                                                                            *
- * Purpose: get current database time                                         *
- *                                                                            *
- ******************************************************************************/
-static int	ha_db_get_time(int *db_time)
-{
-	DB_ROW			row;
-	DB_RESULT		result;
-	int			ret = FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	result = DBselect_once("select " ZBX_DB_TIMESTAMP());
-
-	if (NULL == result || ZBX_DB_DOWN == (intptr_t)result)
-		goto out;
-
-	if (NULL != (row = DBfetch(result)))
-		*db_time = atoi(row[0]);
-	else
-		*db_time = 0;
-
-	DBfree_result(result);
-
-	ret = SUCCEED;
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s db_time:%d", __func__, zbx_result_string(ret), *db_time);
 
 	return ret;
 }
@@ -1612,6 +1616,35 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_ha_change_loglevel                                           *
+ *                                                                            *
+ * Purpose: change HA manager log level                                       *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_ha_change_loglevel(int direction, char **error)
+{
+	int		ret = FAIL;
+	zbx_uint32_t	cmd;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (ZBX_THREAD_ERROR == ha_pid)
+	{
+		*error = zbx_strdup(NULL, "HA manager has not been started");
+		goto out;
+	}
+
+	cmd = 0 < direction ? ZBX_IPC_SERVICE_HA_LOGLEVEL_INCREASE :  ZBX_IPC_SERVICE_HA_LOGLEVEL_DECREASE;
+
+	ret = ha_send_manager_message(cmd, error);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_ha_kill                                                      *
  *                                                                            *
  * Purpose: kill HA manager                                                   *
@@ -1651,6 +1684,18 @@ const char	*zbx_ha_status_str(int ha_status)
 		default:
 			return "unknown";
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_ha_check_pid                                                 *
+ *                                                                            *
+ * Purpose: check if the pid is HA manager pid                                *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_ha_check_pid(pid_t pid)
+{
+	return pid == ha_pid ? SUCCEED : FAIL;
 }
 
 /*
@@ -1756,6 +1801,28 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 				case ZBX_IPC_SERVICE_HA_FAILOVER_DELAY:
 					ha_set_failover_delay(&info, client, message);
 					break;
+				case ZBX_IPC_SERVICE_HA_LOGLEVEL_INCREASE:
+					if (SUCCEED != zabbix_increase_log_level())
+					{
+						zabbix_log(LOG_LEVEL_INFORMATION, "cannot increase log level:"
+								" maximum level has been already set");
+					}
+					else
+					{
+						zabbix_log(LOG_LEVEL_INFORMATION, "log level has been increased to %s",
+								zabbix_get_log_level_string());
+					}					break;
+				case ZBX_IPC_SERVICE_HA_LOGLEVEL_DECREASE:
+					if (SUCCEED != zabbix_decrease_log_level())
+					{
+						zabbix_log(LOG_LEVEL_INFORMATION, "cannot decrease log level:"
+								" minimum level has been already set");
+					}
+					else
+					{
+						zabbix_log(LOG_LEVEL_INFORMATION, "log level has been decreased to %s",
+								zabbix_get_log_level_string());
+					}					break;
 			}
 
 			zbx_ipc_message_free(message);

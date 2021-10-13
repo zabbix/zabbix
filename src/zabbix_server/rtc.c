@@ -21,6 +21,7 @@
 #include "log.h"
 #include "zbxdiag.h"
 #include "ha/ha.h"
+#include "../libs/zbxnix/control.h"
 
 /******************************************************************************
  *                                                                            *
@@ -167,6 +168,105 @@ static void	rtc_ha_failover_delay(int delay)
 
 /******************************************************************************
  *                                                                            *
+ * Function: rtc_change_loglevel_main                                         *
+ *                                                                            *
+ * Purpose: change log level of main process                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	rtc_change_loglevel_main(unsigned int command)
+{
+	if (ZBX_RTC_LOG_LEVEL_INCREASE == command)
+	{
+		if (SUCCEED != zabbix_increase_log_level())
+		{
+			zabbix_log(LOG_LEVEL_INFORMATION, "cannot increase log level:"
+					" maximum level has been already set");
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_INFORMATION, "log level has been increased to %s",
+					zabbix_get_log_level_string());
+		}
+	}
+	else
+	{
+		if (SUCCEED != zabbix_decrease_log_level())
+		{
+			zabbix_log(LOG_LEVEL_INFORMATION, "cannot decrease log level:"
+					" minimum level has been already set");
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_INFORMATION, "log level has been decreased to %s",
+					zabbix_get_log_level_string());
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: rtc_change_loglevel_ha                                           *
+ *                                                                            *
+ * Purpose: change log level of HA manager                                    *
+ *                                                                            *
+ ******************************************************************************/
+static void	rtc_change_loglevel_ha(unsigned int command)
+{
+	int	direction;
+	char	*error = NULL;
+
+	direction = ZBX_RTC_LOG_LEVEL_INCREASE == command ? 1 : -1;
+
+	if (SUCCEED != zbx_ha_change_loglevel(direction, &error))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot change HA manager log level: %s", error);
+		zbx_free(error);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: rtc_change_loglevel                                              *
+ *                                                                            *
+ * Purpose: process log level changes affecting main/ha manager processes     *
+ *                                                                            *
+ ******************************************************************************/
+static void	rtc_change_loglevel(unsigned int command, unsigned int scope, unsigned int data)
+{
+	if ((ZBX_RTC_LOG_SCOPE_FLAG | ZBX_RTC_LOG_SCOPE_PID) == scope)
+	{
+		if (0 == data || getpid() == (pid_t)data)
+			rtc_change_loglevel_main(command);
+
+		if (0 == data || SUCCEED == zbx_ha_check_pid((pid_t)data))
+			rtc_change_loglevel_ha(command);
+		return;
+	}
+
+	if (ZBX_PROCESS_TYPE_MAIN == scope)
+	{
+		if (1 < data)
+		{
+			zabbix_log(LOG_LEVEL_ERR, "cannot redirect signal: \"%s #%d\" process does not exist",
+					get_process_type_string(scope), data);
+		}
+		else
+			rtc_change_loglevel_main(command);
+	}
+	else if (ZBX_PROCESS_TYPE_HA_MANAGER == scope)
+	{
+		if (1 < data)
+		{
+			zabbix_log(LOG_LEVEL_ERR, "cannot redirect signal: \"%s #%d\" process does not exist",
+					get_process_type_string(scope), data);
+		}
+		else
+			rtc_change_loglevel_ha(command);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_rtc_process_command                                          *
  *                                                                            *
  * Purpose: process runtime command                                           *
@@ -189,6 +289,11 @@ void	zbx_rtc_process_command(int command)
 			break;
 		case ZBX_RTC_HA_FAILOVER_DELAY:
 			rtc_ha_failover_delay(ZBX_RTC_GET_DATA(command));
+			break;
+		case ZBX_RTC_LOG_LEVEL_INCREASE:
+		case ZBX_RTC_LOG_LEVEL_DECREASE:
+			rtc_change_loglevel(ZBX_RTC_GET_MSG(command), ZBX_RTC_GET_SCOPE(command),
+					ZBX_RTC_GET_DATA(command));
 			break;
 	}
 

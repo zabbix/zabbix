@@ -31,6 +31,8 @@
 #define ZBX_IPC_SERVICE_HA_GET_NODES		4
 #define ZBX_IPC_SERVICE_HA_REMOVE_NODE		5
 #define ZBX_IPC_SERVICE_HA_FAILOVER_DELAY	6
+#define ZBX_IPC_SERVICE_HA_LOGLEVEL_INCREASE	7
+#define ZBX_IPC_SERVICE_HA_LOGLEVEL_DECREASE	8
 
 #define ZBX_NODE_STATUS_ERROR		-2
 #define ZBX_NODE_STATUS_UNKNOWN		-1
@@ -58,8 +60,10 @@ int	zbx_ha_recv_status(int timeout, int *status, char **error);
 int	zbx_ha_get_nodes(char **nodes, char **error);
 int	zbx_ha_remove_node(int node_num, char **error);
 int	zbx_ha_set_failover_delay(int delay, char **error);
+int	zbx_ha_change_loglevel(int direction, char **error);
 
 const char	*zbx_ha_status_str(int ha_status);
+int	zbx_ha_check_pid(pid_t pid);
 
 #endif
 

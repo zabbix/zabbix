@@ -61,7 +61,7 @@
 #include "../zabbix_server/availability/avail_manager.h"
 #include "zbxvault.h"
 #include "zbxdiag.h"
-
+#include "sighandler.h"
 
 #ifdef HAVE_OPENIPMI
 #include "../zabbix_server/ipmi/ipmi_manager.h"

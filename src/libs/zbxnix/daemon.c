@@ -188,7 +188,8 @@ void	zbx_set_sigusr_handler(void (*handler)(int flags))
 static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
 #ifdef HAVE_SIGQUEUE
-	int	flags;
+	int		flags;
+	unsigned int	scope;
 #endif
 	SIG_CHECK_PARAMS(sig, siginfo, context);
 
@@ -237,10 +238,25 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 			break;
 		case ZBX_RTC_LOG_LEVEL_INCREASE:
 		case ZBX_RTC_LOG_LEVEL_DECREASE:
-			if ((ZBX_RTC_LOG_SCOPE_FLAG | ZBX_RTC_LOG_SCOPE_PID) == ZBX_RTC_GET_SCOPE(flags))
+			scope = ZBX_RTC_GET_SCOPE(flags);
+
+			if ((ZBX_RTC_LOG_SCOPE_FLAG | ZBX_RTC_LOG_SCOPE_PID) == scope)
+			{
 				zbx_signal_process_by_pid(ZBX_RTC_GET_DATA(flags), flags);
+			}
 			else
-				zbx_signal_process_by_type(ZBX_RTC_GET_SCOPE(flags), ZBX_RTC_GET_DATA(flags), flags);
+			{
+				if (scope < ZBX_PROCESS_TYPE_EXT_FIRST)
+				{
+					zbx_signal_process_by_type(ZBX_RTC_GET_SCOPE(flags), ZBX_RTC_GET_DATA(flags),
+							flags);
+				}
+			}
+
+			/* call custom sigusr handler to handle log level changes for non worker processes */
+			if (NULL != zbx_sigusr_handler)
+				zbx_sigusr_handler(flags);
+
 			break;
 		case ZBX_RTC_SNMP_CACHE_RELOAD:
 			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_UNREACHABLE, ZBX_RTC_GET_DATA(flags), flags);
