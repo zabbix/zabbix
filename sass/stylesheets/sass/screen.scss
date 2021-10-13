@@ -3524,7 +3524,6 @@ $form-icon-btn: (
 			}
 		}
 	}
-
 }
 
 .notif-body {
@@ -3566,19 +3565,6 @@ $form-icon-btn: (
 		float: left;
 		margin-top: 20px;
 		background: url($sprite-path) no-repeat -11px -587px;
-	}
-
-}
-
-.notif-indic-container {
-	border-top: 1px solid $table-border-color;
-	margin: 0 0 0 -19px;
-	padding: 14px 0 0;
-
-	.notif-indic {
-		float: none;
-		display: inline-block;
-		margin: 0 2px 0 0;
 	}
 }
 

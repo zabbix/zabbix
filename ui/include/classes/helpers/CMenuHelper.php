@@ -48,15 +48,6 @@ class CMenuHelper {
 						'httpdetails.php', 'host.dashboard.view'
 					])
 				: null,
-			CWebUser::checkAccess(CRoleHelper::UI_MONITORING_OVERVIEW)
-				? (new CMenuItem(_('Overview')))
-					->setSubMenu(new CMenu([
-						(new CMenuItem(_('Trigger overview')))
-							->setUrl((new CUrl('overview.php'))->setArgument('type', 0), 'overview.php?type=0'),
-						(new CMenuItem(_('Data overview')))
-							->setUrl((new CUrl('overview.php'))->setArgument('type', 1), 'overview.php?type=1')
-					]))
-				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA)
 				? (new CMenuItem(_('Latest data')))
 					->setAction('latest.view')
