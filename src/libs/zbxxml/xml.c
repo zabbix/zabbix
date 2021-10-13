@@ -270,7 +270,7 @@ static void	xml_to_vector(xmlNode *xml_node, zbx_vector_xml_node_ptr_t *nodes)
 		node = (zbx_xml_node_t *)zbx_malloc(NULL, sizeof(zbx_xml_node_t));
 
 		if (NULL != xml_node->name)
-			node->name = zbx_strdup(NULL, (char *)xml_node->name);
+			node->name = zbx_strdup(NULL, (const char *)xml_node->name);
 		else
 			node->name = NULL;
 
@@ -286,13 +286,13 @@ static void	xml_to_vector(xmlNode *xml_node, zbx_vector_xml_node_ptr_t *nodes)
 				if (NULL == (value = xmlNodeGetContent(xml_node)))
 					break;
 
-				node->value = zbx_strdup(NULL, (char *)value);
+				node->value = zbx_strdup(NULL, (const char *)value);
 				xmlFree(value);
 				break;
 			case XML_CDATA_SECTION_NODE:
 				if (NULL == (value = xmlNodeGetContent(xml_node)))
 					break;
-				node->value = zbx_strdup(NULL, (char *)value);
+				node->value = zbx_strdup(NULL, (const char *)value);
 				node->name = zbx_strdup(node->name, XML_CDATA_NAME);
 				xmlFree(value);
 				break;
@@ -311,7 +311,7 @@ static void	xml_to_vector(xmlNode *xml_node, zbx_vector_xml_node_ptr_t *nodes)
 					if (NULL != (value = xmlGetProp(xml_node, attr->name)))
 					{
 						zbx_vector_str_append(&node->attributes, zbx_strdup(NULL,
-								(char *)value));
+								(const char *)value));
 						xmlFree(value);
 					}
 					else
@@ -632,9 +632,8 @@ exit:
 int	zbx_xmlnode_to_json(void *xml_node, char **jstr)
 {
 #ifndef HAVE_LIBXML2
-	ZBX_UNUSED(xml_data);
+	ZBX_UNUSED(xml_node);
 	ZBX_UNUSED(jstr);
-	*errmsg = zbx_dsprintf(*errmsg, "Zabbix was compiled without libxml2 support");
 	return FAIL;
 #else
 	struct zbx_json			json;
