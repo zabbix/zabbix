@@ -230,6 +230,10 @@ static void	ha_set_error(zbx_ha_info_t *info, const char *fmt, ...)
 	va_list	args;
 	size_t	len;
 
+	/* don't override errors */
+	if (ZBX_NODE_STATUS_ERROR == info->ha_status)
+		return;
+
 	va_start(args, fmt);
 	len = (size_t)vsnprintf(NULL, 0, fmt, args) + 1;
 	va_end(args);
