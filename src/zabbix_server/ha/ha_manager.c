@@ -877,9 +877,6 @@ static int	ha_check_active_node(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes
 {
 	int	i, ret = SUCCEED;
 
-	if (ZBX_NODE_STATUS_UNKNOWN == info->ha_status)
-		*ha_status = ZBX_NODE_STATUS_STANDBY;
-
 	for (i = 0; i < nodes->values_num; i++)
 	{
 		if (ZBX_NODE_STATUS_ACTIVE == nodes->values[i]->status)
