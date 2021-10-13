@@ -182,7 +182,7 @@ class ZBase {
 
 				$this->loadConfigFile();
 				$this->initDB();
-				$this->setActiveNode();
+				$this->setServerAddress();
 				$this->initLocales(CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_LANG));
 				$this->authenticateUser();
 
@@ -217,7 +217,7 @@ class ZBase {
 			case self::EXEC_MODE_API:
 				$this->loadConfigFile();
 				$this->initDB();
-				$this->setActiveNode();
+				$this->setServerAddress();
 				$this->initLocales('en_us');
 				break;
 
@@ -718,18 +718,18 @@ class ZBase {
 	 *
 	 * @return void
 	 */
-	function setActiveNode(): void {
+	function setServerAddress(): void {
 		global $ZBX_SERVER_STANDALONE, $ZBX_SERVER, $ZBX_SERVER_PORT;
 
 		if ($ZBX_SERVER_STANDALONE) {
 			return;
 		}
 
-		$active_node = (new CHaNode())->get([
+		$active_node = API::getApiService('hanode')->get([
 			'output' => ['address', 'port'],
 			'filter' => ['status' => ZBX_NODE_STATUS_ACTIVE],
 			'limit' => 1
-		]);
+		], false);
 
 		if (!$active_node) {
 			return;

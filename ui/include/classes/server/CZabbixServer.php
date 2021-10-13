@@ -368,11 +368,11 @@ class CZabbixServer {
 	 * @return bool
 	 */
 	public function isRunning($sid) {
-		$active_node = (new CHaNode())->get([
+		$active_node = API::getApiService('hanode')->get([
 			'output' => ['address', 'port', 'lastaccess'],
 			'filter' => ['status' => ZBX_NODE_STATUS_ACTIVE],
 			'limit' => 1
-		]);
+		], false);
 
 		if ($active_node && $active_node[0]['address'] === $this->host && $active_node[0]['port'] == $this->port) {
 			if ((time() - $active_node[0]['lastaccess']) <

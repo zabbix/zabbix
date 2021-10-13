@@ -25,7 +25,8 @@
 class CHaNode extends CApiService {
 
 	public const ACCESS_RULES = [
-		'get' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
+		// Actual check for USER_TYPE_SUPER_ADMIN performed inside.
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
 	];
 
 	protected $tableName = 'ha_node';
@@ -39,7 +40,11 @@ class CHaNode extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	public function get(array $options = []) {
+	public function get(array $options = [], bool $api_call = true) {
+		if ($api_call && self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+		}
+
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
 			'ha_nodeids' =>				['type' => API_CUIDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
