@@ -146,10 +146,10 @@ void	zbx_audit_host_update_json_add_tls_and_psk(zbx_uint64_t hostid, int tls_con
 			AUDIT_TABLE_NAME, "tls_connect");
 	zbx_audit_update_json_append_int(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, "host.tls_accept", tls_accept,
 			AUDIT_TABLE_NAME, "tls_accept");
-	zbx_audit_update_json_append_string(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, "host.tls_psk_identity", tls_psk_identity,
-			AUDIT_TABLE_NAME, "tls_psk_identity");
-	zbx_audit_update_json_append_string(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, "host.tls_psk", tls_psk, AUDIT_TABLE_NAME,
-			"tls_psk");
+	zbx_audit_update_json_append_string_secret(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, "host.tls_psk_identity",
+			tls_psk_identity, AUDIT_TABLE_NAME, "tls_psk_identity");
+	zbx_audit_update_json_append_string_secret(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, "host.tls_psk", tls_psk,
+			AUDIT_TABLE_NAME, "tls_psk");
 #undef AUDIT_TABLE_NAME
 }
 

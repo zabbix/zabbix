@@ -31,8 +31,6 @@
 #define AUDIT_DETAILS_ACTION_UPDATE	"update"
 #define AUDIT_DETAILS_ACTION_DELETE	"delete"
 
-#define AUDIT_SECRET_MASK		"******"
-
 #define	AUDIT_DETAILS_KEY_LEN		100
 
 #define AUDIT_RESOURCE_HOST			4

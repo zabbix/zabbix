@@ -2973,7 +2973,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 			zbx_audit_host_update_json_add_details(host->hostid, host->host, proxy_hostid,
 					(int)ipmi_authtype, (int)ipmi_privilege, ipmi_username, ipmi_password,
 					(int)host->status, (int)ZBX_FLAG_DISCOVERY_CREATED, (int)tls_connect,
-					(int)tls_accept, tls_issuer, tls_subject, AUDIT_SECRET_MASK, AUDIT_SECRET_MASK,
+					(int)tls_accept, tls_issuer, tls_subject, tls_psk_identity, tls_psk,
 					host->custom_interfaces, host->inventory_mode);
 		}
 		else
@@ -3116,7 +3116,10 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 					zbx_free(value_esc);
 
 					zbx_audit_host_update_json_update_tls_psk_identity(host->hostid,
-							AUDIT_SECRET_MASK, AUDIT_SECRET_MASK);
+							(0 == strcmp("", host->tls_psk_identity_orig) ?
+							host->tls_psk_identity_orig : ZBX_MACRO_SECRET_MASK),
+							(0 == strcmp("", tls_psk_identity) ?
+							tls_psk_identity : ZBX_MACRO_SECRET_MASK));
 				}
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK))
 				{
@@ -3128,7 +3131,9 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 					zbx_free(value_esc);
 
 					zbx_audit_host_update_json_update_tls_psk(host->hostid,
-							AUDIT_SECRET_MASK, AUDIT_SECRET_MASK);
+							(0 == strcmp("", host->tls_psk_orig) ?
+							host->tls_psk_orig : ZBX_MACRO_SECRET_MASK),
+							(0 == strcmp("", tls_psk) ? tls_psk : ZBX_MACRO_SECRET_MASK));
 				}
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_CUSTOM_INTERFACES))
 				{
