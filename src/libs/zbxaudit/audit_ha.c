@@ -50,6 +50,10 @@ void	zbx_audit_ha_add_create_fields(const char *nodeid, const char *name, int st
 	zbx_audit_entry_append_string(entry, AUDIT_ACTION_ADD, "ha_node.ha_nodeid", nodeid);
 	zbx_audit_entry_append_string(entry, AUDIT_ACTION_ADD, "ha_node.name", name);
 	zbx_audit_entry_append_int(entry, AUDIT_ACTION_ADD, "ha_node.status", status);
+
+	/* node is created with empty address and default port */
+	zbx_audit_entry_append_string(entry, AUDIT_ACTION_ADD, "ha_node.address", "");
+	zbx_audit_entry_append_int(entry, AUDIT_ACTION_ADD, "ha_node.port", 10051);
 }
 
 void	zbx_audit_ha_update_field_string(const char *nodeid, const char *key, const char *old_value,
