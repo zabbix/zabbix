@@ -374,7 +374,7 @@ class testExpandExpressionMacros extends CWebTest {
 		$covered_region = [
 			'x' => 410,
 			'y' => 484,
-			'width' => 8,
+			'width' => 82,
 			'height' => 13
 		];
 		$this->assertScreenshotExcept($map_image, $covered_region, 'Map with expression macros');
