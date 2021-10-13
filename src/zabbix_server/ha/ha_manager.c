@@ -808,8 +808,6 @@ finish:
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() nodeid:%s ha_status:%s db_status:%d", __func__,
 			info->nodeid.str, zbx_ha_status_str(info->ha_status), info->db_status);
-
-	return ret;
 }
 
 /******************************************************************************
@@ -1758,7 +1756,7 @@ pause:
 	{
 		(void)zbx_ipc_service_recv(&service, ZBX_HA_POLL_PERIOD, &client, &message);
 
-		if (ZBX_DB_FAIL != info.db_status)
+		if (ZBX_NODE_STATUS_STANDBY == info.ha_status || ZBX_NODE_STATUS_ACTIVE == info.ha_status)
 			ha_db_update_lastaccess(&info);
 
 		if (NULL != message)
