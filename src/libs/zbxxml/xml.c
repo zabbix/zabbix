@@ -170,11 +170,12 @@ static size_t	xml_escape_xpath_stringsize(const char *string)
 
 /**********************************************************************************
  *                                                                                *
- * Function: xml_escape_xpath_insstring                                           *
+ * Function: xml_escape_xpath_string                                              *
  *                                                                                *
  * Purpose: replace " symbol in string with ""                                    *
  *                                                                                *
- * Parameters: string - [IN/OUT] the string to update                             *
+ * Parameters: string - [IN] the xpath string to escape                           *
+ *             p      - [OUT] the result string                                   *
  *                                                                                *
  **********************************************************************************/
 static void xml_escape_xpath_string(char *p, const char *string)
