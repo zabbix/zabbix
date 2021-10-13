@@ -20,6 +20,7 @@
 #include "zbxalgo.h"
 #include "zbxjson.h"
 #include "audit.h"
+#include "audit_ha.h"
 
 void	zbx_audit_ha_create_entry(int audit_action, const char *nodeid, const char *name)
 {
@@ -47,9 +48,9 @@ void	zbx_audit_ha_add_create_fields(const char *nodeid, const char *name, int st
 
 	entry = zbx_audit_get_entry(0, nodeid);
 
-	zbx_audit_entry_append_string(entry, AUDIT_ACTION_ADD, "ha_node.ha_nodeid", nodeid);
-	zbx_audit_entry_append_string(entry, AUDIT_ACTION_ADD, "ha_node.name", name);
-	zbx_audit_entry_append_int(entry, AUDIT_ACTION_ADD, "ha_node.status", status);
+	zbx_audit_entry_append_string(entry, AUDIT_ACTION_ADD, ZBX_AUDIT_HA_NODEID, nodeid);
+	zbx_audit_entry_append_string(entry, AUDIT_ACTION_ADD, ZBX_AUDIT_HA_NAME, name);
+	zbx_audit_entry_append_int(entry, AUDIT_ACTION_ADD, ZBX_AUDIT_HA_STATUS, status);
 }
 
 void	zbx_audit_ha_update_field_string(const char *nodeid, const char *key, const char *old_value,
