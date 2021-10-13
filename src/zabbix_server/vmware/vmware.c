@@ -343,8 +343,10 @@ static zbx_uint64_t	evt_req_chunk_size;
 
 #define ZBX_VM_NONAME_XML	"noname.xml"
 
+#define ZBX_HVPROPMAP_EXT(property, func)								\
+	{property, ZBX_XPATH_PROP_OBJECTS(ZBX_VMWARE_SOAP_HV) ZBX_XPATH_PROP_NAME_NODE(property), func}
 #define ZBX_HVPROPMAP(property)										\
-	{property, ZBX_XPATH_PROP_OBJECTS(ZBX_VMWARE_SOAP_HV) ZBX_XPATH_PROP_NAME_NODE(property), NULL}
+	ZBX_HVPROPMAP_EXT(property, NULL)
 #define ZBX_VMPROPMAP(property)										\
 	{property, ZBX_XPATH_PROP_OBJECTS(ZBX_VMWARE_SOAP_VM) ZBX_XPATH_PROP_NAME_NODE(property), NULL}
 
@@ -377,10 +379,8 @@ static zbx_vmware_propmap_t	hv_propmap[] = {
 	ZBX_HVPROPMAP("summary.config.name"),			/* ZBX_VMWARE_HVPROP_NAME */
 	ZBX_HVPROPMAP("overallStatus"),				/* ZBX_VMWARE_HVPROP_STATUS */
 	ZBX_HVPROPMAP("runtime.inMaintenanceMode"),		/* ZBX_VMWARE_HVPROP_MAINTENANCE */
-	{"summary.runtime.healthSystemRuntime.systemHealthInfo.numericSensorInfo",
-			ZBX_XPATH_PROP_OBJECTS(ZBX_VMWARE_SOAP_HV)
-			ZBX_XPATH_PROP_NAME_NODE("summary.runtime.healthSystemRuntime.systemHealthInfo."
-			"numericSensorInfo"), zbx_xmlnode_to_json} /* ZBX_VMWARE_HVPROP_SENSOR */
+	ZBX_HVPROPMAP_EXT("summary.runtime.healthSystemRuntime.systemHealthInfo.numericSensorInfo",
+			zbx_xmlnode_to_json)			/* ZBX_VMWARE_HVPROP_SENSOR */
 };
 
 static zbx_vmware_propmap_t	vm_propmap[] = {
