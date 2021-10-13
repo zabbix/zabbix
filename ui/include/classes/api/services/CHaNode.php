@@ -30,6 +30,7 @@ class CHaNode extends CApiService {
 
 	protected $tableName = 'ha_node';
 	protected $sortColumns = ['name', 'lastaccess', 'status'];
+	protected $tableAlias = 'han';
 
 	/**
 	 * @param array $options
