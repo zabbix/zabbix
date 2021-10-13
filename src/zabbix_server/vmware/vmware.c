@@ -348,13 +348,13 @@ static zbx_uint64_t	evt_req_chunk_size;
 #define ZBX_VMPROPMAP(property)										\
 	{property, ZBX_XPATH_PROP_OBJECTS(ZBX_VMWARE_SOAP_VM) ZBX_XPATH_PROP_NAME_NODE(property), NULL}
 
-typedef int	(*preprocfunc_t)(void *, char **);
+typedef int	(*nodeprocfunc_t)(void *, char **);
 
 typedef struct
 {
 	const char	*name;
 	const char	*xpath;
-	preprocfunc_t	func;
+	nodeprocfunc_t	func;
 }
 zbx_vmware_propmap_t;
 
