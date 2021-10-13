@@ -37,15 +37,15 @@ type Session struct {
 
 // PluginOptions option from config file
 type PluginOptions struct {
-	// Timeout is the maximum time in seconds for waiting when a connection has to be established.
+	// Timeout is the maximum amount of time in seconds to wait for a connection to be established.
 	// Default value equals to the global timeout.
 	Timeout int `conf:"optional,range=1:30"`
 
-	// CallTimeout is the maximum time in seconds for waiting when a request has to be done.
+	// CallTimeout is the maximum amount of time in seconds to wait for a request to be done.
 	// Default value equals to the global agent timeout.
 	CallTimeout int `conf:"optional,range=1:30"`
 
-	// KeepAlive is a time to wait before unused connections will be closed.
+	// KeepAlive is amount of time a connection can remain idle before it is closed.
 	KeepAlive int `conf:"optional,range=60:900,default=300"`
 
 	// Sessions stores pre-defined named sets of connections settings.

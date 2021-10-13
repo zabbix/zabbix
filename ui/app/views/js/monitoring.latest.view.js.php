@@ -31,6 +31,7 @@
 <script type="text/javascript">
 	function latestPage() {
 		this.refresh_url = '<?= $data['refresh_url'] ?>';
+		this.refresh_data = <?= json_encode($data['refresh_data']) ?>;
 		this.refresh_interval = <?= $data['refresh_interval'] ?>;
 		this.running = false;
 		this.timeout = null;
@@ -51,7 +52,12 @@
 	latestPage.prototype.refresh = function() {
 		this.setLoading();
 
-		var deferred = $.getJSON(this.refresh_url);
+		var deferred = $.ajax({
+			url: this.refresh_url,
+			data: this.refresh_data,
+			type: 'post',
+			dataType: 'json'
+		});
 
 		return this.bindDataEvents(deferred);
 	};

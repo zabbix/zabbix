@@ -1,0 +1,1 @@
+..F.....S. [ZBXNEXT-6879] implemented new history functions "rate", "bucket_rate_foreach" and "bucket_percentile" and math function "histogram_quantile" (miks, MVekslers)

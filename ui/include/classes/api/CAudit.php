@@ -106,6 +106,7 @@ class CAudit {
 		self::RESOURCE_AUTHENTICATION => 'config',
 		self::RESOURCE_AUTH_TOKEN => 'token',
 		self::RESOURCE_AUTOREGISTRATION => 'config',
+		self::RESOURCE_CORRELATION => 'correlation',
 		self::RESOURCE_DASHBOARD => 'dashboard',
 		self::RESOURCE_HOST_GROUP => 'hstgrp',
 		self::RESOURCE_HOUSEKEEPING => 'config',
@@ -145,6 +146,7 @@ class CAudit {
 		self::RESOURCE_AUTHENTICATION => null,
 		self::RESOURCE_AUTH_TOKEN => 'name',
 		self::RESOURCE_AUTOREGISTRATION => null,
+		self::RESOURCE_CORRELATION => 'name',
 		self::RESOURCE_DASHBOARD => 'name',
 		self::RESOURCE_HOST_GROUP => 'name',
 		self::RESOURCE_HOUSEKEEPING => null,
@@ -174,6 +176,7 @@ class CAudit {
 		self::RESOURCE_AUTHENTICATION => 'authentication',
 		self::RESOURCE_AUTH_TOKEN => 'token',
 		self::RESOURCE_AUTOREGISTRATION => 'autoregistration',
+		self::RESOURCE_CORRELATION => 'correlation',
 		self::RESOURCE_DASHBOARD => 'dashboard',
 		self::RESOURCE_HOST_GROUP => 'hostgroup',
 		self::RESOURCE_HOUSEKEEPING => 'housekeeping',
@@ -221,6 +224,9 @@ class CAudit {
 	 * @var array
 	 */
 	private const NESTED_OBJECTS_TABLE_NAMES = [
+		'correlation.filter' => 'correlation',
+		'correlation.filter.conditions' => 'corr_condition',
+		'correlation.operations' => 'corr_operation',
 		'dashboard.users' => 'dashboard_user',
 		'dashboard.userGroups' => 'dashboard_usrgrp',
 		'dashboard.pages' => 'dashboard_page',
@@ -254,6 +260,8 @@ class CAudit {
 	 * @var array
 	 */
 	private const NESTED_OBJECTS_IDS = [
+		'correlation.filter.conditions' => 'corr_conditionid',
+		'correlation.operations' => 'corr_operationid',
 		'dashboard.users' => 'dashboard_userid',
 		'dashboard.userGroups' => 'dashboard_usrgrpid',
 		'dashboard.pages' => 'dashboard_pageid',

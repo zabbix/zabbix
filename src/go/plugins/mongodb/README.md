@@ -38,7 +38,7 @@ db.createUser({
 ## Configuration
 The Zabbix Agent's configuration file is used to configure plugins.
 
-**Plugins.Mongo.KeepAlive** — Sets a time for waiting before unused connections will be closed.  
+**Plugins.Mongo.KeepAlive** — The amount of time a connection can remain idle before it is closed.  
 *Default value:* 300 sec.  
 *Limits:* 60-900
 

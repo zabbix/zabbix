@@ -276,5 +276,7 @@ int	zbx_eval_calc_stddevsamp(zbx_vector_dbl_t *values, double *result, char **er
 int	zbx_eval_calc_sumofsquares(zbx_vector_dbl_t *values, double *result, char **error);
 int	zbx_eval_calc_varpop(zbx_vector_dbl_t *values, double *result, char **error);
 int	zbx_eval_calc_varsamp(zbx_vector_dbl_t *values, double *result, char **error);
+int	zbx_eval_calc_histogram_quantile(const double q, const zbx_vector_dbl_t *values, const char *err_fn,
+		double *result, char **error);
 
 #endif

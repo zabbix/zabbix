@@ -1659,6 +1659,7 @@ function get_item_function_info(string $expr) {
 		'min' => $rules['numeric'],
 		'nodata' => $rules['numeric_as_0or1'] + $rules['string_as_0or1'],
 		'percentile' => $rules['numeric'],
+		'rate' => $rules['numeric'],
 		'skewness' => $rules['numeric_as_float'],
 		'stddevpop' => $rules['numeric_as_float'],
 		'stddevsamp' => $rules['numeric_as_float'],
