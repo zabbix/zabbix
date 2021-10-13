@@ -34,25 +34,23 @@ class CSystemInformationHelper {
 
 		$data = [
 			'status' => static::getServerStatus($ZBX_SERVER, (int) $ZBX_SERVER_PORT),
-			'requirements' => [],
 			'server_details' => '',
-			'float_double_precision' => $DB['DOUBLE_IEEE754'],
-			'ha_cluster_enabled' => false
+			'float_double_precision' => $DB['DOUBLE_IEEE754']
 		];
 
 		$db_backend = DB::getDbBackend();
 		$data['encoding_warning'] = $db_backend->checkEncoding() ? '' : $db_backend->getWarning();
 
-		$ha_cluster_enabled = false;
 		$ha_nodes = [];
+		$ha_cluster_enabled = false;
 
 		if (!$ZBX_SERVER_STANDALONE) {
-			$ha_nodes = API::HaNode()->get([
+			$ha_nodes = API::getApiService('hanode')->get([
 				'output' => ['name', 'address', 'port', 'lastaccess', 'status'],
 				'preservekeys' => true,
 				'sortfield' => 'status',
 				'sortorder' => 'DESC'
-			]);
+			], false);
 
 			$ha_cluster_enabled = (bool) $ha_nodes;
 
@@ -85,8 +83,8 @@ class CSystemInformationHelper {
 		$requirements[] = $setup->checkSslFiles();
 		$data['requirements'] = $requirements;
 
-		$data['dbversion_status'] = CSettingsHelper::getGlobal(CSettingsHelper::DBVERSION_STATUS);
-		$data['dbversion_status'] = $data['dbversion_status'] === '' ? [] : json_decode($data['dbversion_status']);
+		$db_version_status = CSettingsHelper::getGlobal(CSettingsHelper::DBVERSION_STATUS);
+		$data['dbversion_status'] = $db_version_status === '' ? [] : json_decode($db_version_status);
 
 		return $data;
 	}
