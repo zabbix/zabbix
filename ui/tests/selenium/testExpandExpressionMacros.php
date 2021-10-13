@@ -21,9 +21,9 @@
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 
 /**
- * @backup history, hosts
- *
  * @onBefore prepareItemsData, prepareMapsData, writeValuesToItems
+ *
+ * @onAfter clearData
  */
 class testExpandExpressionMacros extends CWebTest {
 
@@ -252,20 +252,20 @@ class testExpandExpressionMacros extends CWebTest {
 
 	public function writeValuesToItems() {
 		// Add values for items.
-		$time = time();
-		$last_time = $time+100;
+		$time = time()-100;
+		$last_time = time();
 
 		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$last_itemid.", ".$time.", 2, 0)");
 		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$last_itemid.", ".$last_time.", 4, 0)");
 
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$avg_itemid.", ".time().", 3, 0)");
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$avg_itemid.", ".time().", 5, 0)");
+		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$avg_itemid.", ".$time.", 3, 0)");
+		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$avg_itemid.", ".$last_time.", 5, 0)");
 
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$min_itemid.", ".time().", 1, 0)");
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$min_itemid.", ".time().", 3, 0)");
+		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$min_itemid.", ".$time.", 1, 0)");
+		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$min_itemid.", ".$last_time.", 3, 0)");
 
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$max_itemid.", ".time().", 7, 0)");
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$max_itemid.", ".time().", 2, 0)");
+		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$max_itemid.", ".$time.", 7, 0)");
+		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$max_itemid.", ".$last_time.", 2, 0)");
 	}
 
 	/**
@@ -377,5 +377,28 @@ class testExpandExpressionMacros extends CWebTest {
 			'height' => 15
 		];
 		$this->assertScreenshotExcept($map_image, $covered_region, 'Map with expression macros');
+	}
+
+	/**
+	 * Delete all created data after test.
+	 */
+	public static function clearData() {
+		// Delete Hosts.
+		CDataHelper::call('host.delete', [
+				self::$last_hostid,
+				self::$avg_hostid,
+				self::$max_hostid,
+				self::$min_hostid
+		]);
+
+		// Delete Host group.
+		CDataHelper::call('hostgroup.delete', [
+				self::$hostgroupid
+		]);
+
+		// Delete Maps.
+		CDataHelper::call('map.delete', [
+				self::$mapid
+		]);
 	}
 }
