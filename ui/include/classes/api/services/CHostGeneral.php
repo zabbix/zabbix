@@ -93,7 +93,7 @@ abstract class CHostGeneral extends CHostBase {
 		$allHostIds = array_merge($hostIds, $templateIds);
 
 		// add groups
-		if ($data['groups']) {
+		if (array_key_exists('groups', $data) && $data['groups']) {
 			$options = ['groups' => $data['groups']];
 
 			if ($data['hosts']) {
