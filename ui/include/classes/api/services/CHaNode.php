@@ -50,7 +50,7 @@ class CHaNode extends CApiService {
 			]],
 			// output
 			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', ['ha_nodeid', 'name', 'address', 'port', 'lastaccess', 'status']), 'default' => API_OUTPUT_EXTEND],
-			'countOutput' =>			['type' => API_BOOLEAN, 'default' => false],
+			'countOutput' =>			['type' => API_FLAG, 'default' => false],
 			// sort and limit
 			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
 			'sortorder' =>				['type' => API_SORTORDER, 'default' => []],

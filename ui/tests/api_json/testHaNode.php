@@ -245,11 +245,11 @@ class testHaNode extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			'Rejects non-boolean countOutput' => [
+			'Accepts countOutput as false' => [
 				'request' => [
-					'countOutput' => 'abc'
+					'countOutput' => false
 				],
-				'expected_error' => 'Invalid parameter "/countOutput": a boolean is expected.'
+				'expected_error' => null
 			],
 		];
 	}
@@ -279,19 +279,36 @@ class testHaNode extends CAPITest {
 					'status' => 1
 				]
 			],
-			'Check absence of fields via output limitation' => [
+			'Check absence of fields via output limitation, and sorting with limit' => [
 				'request' => [
-					'ha_nodeids' => 'ckuo7i1nw000h0sajj3l3hh8u',
-					'output' => ['name', 'address']
+					'output' => ['name', 'address'],
+					'countOutput' => false,
+					'sortfield' => 'name',
+					'sortorder' => 'DESC',
+					'limit' => 1
 				],
 				'expected_result' => [
 					'ha_nodeid' => null,
-					'name' => 'node-active',
-					'address' => '192.168.1.13',
+					'name' => 'node8',
+					'address' => '192.168.1.12',
 					'port' => null,
 					'status' => null
 				]
-			]
+			],
+			'Check countOutput' => [
+				'request' => [
+					'countOutput' => true
+				],
+				'expected_result' => 9
+			],
+			'Check countOutput with filter' => [
+				'request' => [
+					'filter' => ['status' => ZBX_NODE_STATUS_STOPPED],
+					'countOutput' => true
+				],
+				'expected_result' => 3
+			],
+
 		];
 	}
 
@@ -300,6 +317,11 @@ class testHaNode extends CAPITest {
 	 */
 	public function testHaNode_FieldPresenceAndExclusion($params, $expected_result) {
 		$result = $this->call('hanode.get', $params);
+
+		if (!is_array($expected_result)) {
+			$this->assertEquals($result['result'], $expected_result, 'countCoutput rows should match');
+			return;
+		}
 
 		foreach ($result['result'] as $node) {
 			foreach ($expected_result as $field => $expected_value){
