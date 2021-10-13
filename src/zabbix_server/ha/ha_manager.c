@@ -912,7 +912,7 @@ static int	ha_check_active_node(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes
 
 		if (info->failover_delay / ZBX_HA_POLL_PERIOD + 1 < info->offline_ticks_active)
 		{
-			if (ZBX_DB_OK > DBexecute("update ha_node set status=%d where ha_nodeid='%s'",
+			if (ZBX_DB_OK > DBexecute_once("update ha_node set status=%d where ha_nodeid='%s'",
 					ZBX_NODE_STATUS_UNAVAILABLE, nodes->values[i]->nodeid.str))
 			{
 				ret = FAIL;
@@ -1248,7 +1248,7 @@ static void	ha_set_failover_delay(zbx_ha_info_t *info, zbx_ipc_client_t *client,
 
 	memcpy(&delay, message->data, sizeof(delay));
 
-	if (ZBX_DB_OK == info->db_status && ZBX_DB_OK <= DBexecute("update config set ha_failover_delay=%d", delay))
+	if (ZBX_DB_OK == info->db_status && ZBX_DB_OK <= DBexecute_once("update config set ha_failover_delay=%d", delay))
 	{
 		info->failover_delay = delay;
 		zabbix_log(LOG_LEVEL_WARNING, "HA failover delay set to %ds", delay);
