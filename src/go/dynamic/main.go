@@ -27,77 +27,109 @@ import (
 	"time"
 
 	"github.com/go-zeromq/zmq4"
-	"zabbix.com/pkg/dynamic"
+	"zabbix.com/pkg/plugin"
+	"zabbix.com/pkg/shared"
 )
 
+const SockAddr = "/tmp/dynamic.sock"
+
 func main() {
-	//  Socket to talk to clients
-	write("starting\n")
+	f, _ := os.Create("/tmp/dynamic.log")
+	defer f.Close()
+
+	writeDebug(f, "starting")
 	rep := zmq4.NewRep(context.Background())
 	defer rep.Close()
 
-	err := rep.Listen("ipc:///tmp/dynamic.test")
+	if err := os.RemoveAll(SockAddr); err != nil {
+		writeDebug(f, err.Error())
+	}
+
+	err := rep.Listen(fmt.Sprintf("ipc://%s", SockAddr))
 	if err != nil {
-		// return err or log
-		write(err.Error())
+		writeDebug(f, err.Error())
 		return
 	}
 
-loop:
+	// loop:
 	for {
-		//  Wait for next request from client
+		writeDebug(f, "listening for req")
 		msg, err := rep.Recv()
 		if err != nil {
-			// return err or log
-			write(err.Error())
+			writeDebug(f, err.Error())
 			return
 		}
 
-		write("got msg")
-		var reqData dynamic.Plugin
+		writeDebug(f, "got msg")
+		var reqData shared.Plugin
 
 		err = json.Unmarshal(msg.Bytes(), &reqData)
 		if err != nil {
-			// return err or log
-			write(err.Error())
+			writeDebug(f, err.Error())
 			return
 		}
 
-		write(fmt.Sprintf("values: %+v\n", reqData))
-
+		writeDebug(f, fmt.Sprintf("values: %+v", reqData))
 		switch reqData.Command {
-		case dynamic.Export:
-
-			var reqData dynamic.Plugin
-			reqData.RespType = dynamic.Response
-			reqData.Value = "Dynamic plugin export test success"
-
-			respBytes, err := json.Marshal(reqData)
-			if err != nil {
-				write(fmt.Sprintf("could not create reply: %s\n", err.Error()))
-				return
-			}
-
-			write("Sending output\n")
-			time.Sleep(time.Second)
-			err = rep.Send(zmq4.NewMsg(respBytes))
-			if err != nil {
-				write(fmt.Sprintf("could not send reply: %s\n", err.Error()))
-				return
-			}
-			write("Sent\n")
-
-			// Export(reqData.Params, rep)
-			break loop
-			// should be continue to wait for next request or shut down
+		case shared.Export:
+			writeDebug(f, "got Export")
+			export(rep, reqData.Key, reqData.Params, f)
+		case shared.Metrics:
+			writeDebug(f, "got Metric")
+			metric(rep, f)
 		}
 	}
 }
 
-func write(in string) {
-	d1 := []byte(in)
-	err := os.WriteFile("/tmp/dynamic.log", d1, 0644)
+func writeDebug(f *os.File, in string) {
+	d1 := []byte(in + "\n")
+	_, err := f.Write(d1)
 	if err != nil {
 		panic(err)
 	}
+}
+
+func metric(sock zmq4.Socket, f *os.File) {
+	var respData shared.Plugin
+	respData.RespType = shared.Metrics
+	respData.Supported = shared.Export
+	respData.Name = impl.Name()
+	for key, metric := range plugin.Metrics {
+		respData.Params = append(respData.Params, key)
+		respData.Params = append(respData.Params, metric.Description)
+	}
+
+	respBytes, err := json.Marshal(respData)
+	if err != nil {
+		writeDebug(f, fmt.Sprintf("could not create reply: %s", err.Error()))
+		return
+	}
+
+	writeDebug(f, "Sending metric output\n")
+	err = sock.Send(zmq4.NewMsg(respBytes))
+	if err != nil {
+		writeDebug(f, fmt.Sprintf("could not send reply: %s", err.Error()))
+		return
+	}
+}
+
+func export(sock zmq4.Socket, key string, params []string, f *os.File) {
+	var reqData shared.Plugin
+	reqData.RespType = shared.Response
+	reqData.Value, reqData.Error = impl.Export(key, params, emptyCtx{})
+
+	respBytes, err := json.Marshal(reqData)
+	if err != nil {
+		writeDebug(f, fmt.Sprintf("could not create reply: %s", err.Error()))
+		return
+	}
+
+	writeDebug(f, "Sending output")
+	time.Sleep(time.Second)
+	err = sock.Send(zmq4.NewMsg(respBytes))
+	if err != nil {
+		writeDebug(f, fmt.Sprintf("could not send reply: %s", err.Error()))
+		return
+	}
+	writeDebug(f, "Sent")
 }

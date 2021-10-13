@@ -17,10 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package dynamic
+package shared
 
 const (
 	Export = iota
+	Metrics
 	Start
 	Stop
 	Watcher
@@ -31,9 +32,13 @@ const (
 )
 
 type Plugin struct {
-	Command  int
-	Params   []string
-	RespType int
-	Value    interface{}
-	ErrMsg   string
+	Command   int
+	Params    []string
+	RespType  int
+	Supported int
+	Value     interface{}
+	ErrMsg    string
+	Name      string
+	Key       string
+	Error     error
 }

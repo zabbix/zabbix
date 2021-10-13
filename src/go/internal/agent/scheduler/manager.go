@@ -24,6 +24,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"os/exec"
 	"sort"
 	"time"
 
@@ -36,6 +37,7 @@ import (
 	"zabbix.com/pkg/itemutil"
 	"zabbix.com/pkg/log"
 	"zabbix.com/pkg/plugin"
+	"zabbix.com/plugins/external"
 )
 
 const (
@@ -55,7 +57,9 @@ type Manager struct {
 	// number of active tasks (running in their own goroutines)
 	activeTasksNum int
 	// number of seconds left on shutdown timer
-	shutdownSeconds int
+	shutdownSeconds    int
+	externalPlugins    []string
+	externalPluginCmds []*exec.Cmd
 }
 
 // updateRequest contains list of metrics monitored by a client and additional client configuration data.
@@ -459,6 +463,21 @@ func (m *Manager) Stop() {
 	m.input <- nil
 }
 
+func (m *Manager) StartExternal() {
+	for _, path := range m.externalPlugins {
+		m.externalPluginCmds = append(m.externalPluginCmds, external.Start(path))
+	}
+}
+
+func (m *Manager) StopExternal() {
+	for _, cmd := range m.externalPluginCmds {
+		if err := cmd.Process.Kill(); err != nil {
+			log.Critf("failed to kill external plugin: %s", err.Error())
+		}
+		// external.Stop(path)
+	}
+}
+
 func (m *Manager) UpdateTasks(clientID uint64, writer plugin.ResultWriter,
 	expressions []*glexpr.Expression, requests []*plugin.Request) {
 
@@ -541,6 +560,7 @@ func (m *Manager) configure(options *agent.AgentOptions) (err error) {
 func NewManager(options *agent.AgentOptions) (mannager *Manager, err error) {
 	var m Manager
 	m.init()
+	m.externalPlugins = options.ExternalPlugins
 	if err = m.validatePlugins(options); err != nil {
 		return
 	}

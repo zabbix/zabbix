@@ -1,6 +1,3 @@
-//go:build !windows
-// +build !windows
-
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -20,18 +17,21 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package dynamic
+package external
 
 import (
 	"context"
 	"encoding/json"
 	"fmt"
 	"log"
+	"os/exec"
+	"path/filepath"
 	"time"
 
-	"github.com/go-zeromq/zmq4"
 	"zabbix.com/pkg/conf"
-	"zabbix.com/pkg/dynamic"
+	"zabbix.com/pkg/shared"
+
+	"github.com/go-zeromq/zmq4"
 	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/zbxerr"
 )
@@ -40,8 +40,10 @@ import (
 type Plugin struct {
 	plugin.Base
 	options      Options
+	Type         int
 	responseChan chan interface{}
 	errChan      chan string
+	Params       []string
 }
 
 // Options -
@@ -69,29 +71,11 @@ func (p *Plugin) Validate(options interface{}) error { return nil }
 
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	// p.start(pluginPaths[key], 3*time.Second)
 	p.responseChan = make(chan interface{})
 
 	req := zmq4.NewReq(context.Background())
+	sendRequest(pluginPaths[key], shared.Export, params, req)
 	defer req.Close()
-	err = req.Dial(fmt.Sprintf("ipc:///tmp/%s", key))
-	if err != nil {
-		return
-	}
-
-	var reqData dynamic.Plugin
-	reqData.Command = dynamic.Export
-	reqData.Params = params
-
-	reqBytes, err := json.Marshal(reqData)
-	if err != nil {
-		return
-	}
-
-	err = req.Send(zmq4.NewMsg(reqBytes))
-	if err != nil {
-		return
-	}
 
 	go p.listen(req)
 
@@ -105,15 +89,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 }
 
-// func (p *Plugin) start(path string, timeout time.Duration) {
-// 	fmt.Println("starting", path)
-// 	zbxcmd.Execute("/home/eriks/zabbix/src/go/dynamic/main", timeout, "")
-// }
-
-// func (p *Plugin) stop(path string) {
-// 	//TODO: stop the binary
-// }
-
 func (p *Plugin) listen(req zmq4.Socket) {
 	for {
 		msg, err := req.Recv()
@@ -123,7 +98,7 @@ func (p *Plugin) listen(req zmq4.Socket) {
 			return
 		}
 
-		var resp dynamic.Plugin
+		var resp shared.Plugin
 
 		if err := json.Unmarshal(msg.Bytes(), &resp); err != nil {
 			p.errChan <- err.Error()
@@ -131,12 +106,12 @@ func (p *Plugin) listen(req zmq4.Socket) {
 		}
 
 		switch resp.RespType {
-		case dynamic.Response:
+		case shared.Response:
 			p.responseChan <- resp.Value
 			return
-		case dynamic.Request:
+		case shared.Request:
 			fmt.Printf("Request: %v", resp.Value)
-		case dynamic.Error:
+		case shared.Error:
 			p.errChan <- resp.ErrMsg
 			return
 		default:
@@ -145,24 +120,86 @@ func (p *Plugin) listen(req zmq4.Socket) {
 	}
 }
 
-func RegisterDynamicPlugins(paths []string) {
-	var plugins []plugin.Accessor
+func RegisterDynamicPlugins(paths []string, timeout time.Duration) error {
 	for _, p := range paths {
-		// TODO  start plugins and get their type / stop plugin
-		fmt.Println(p)
+
+		cmd := Start(p)
+		accessor, err := getPlugin(p)
+		if err != nil {
+			return err
+		}
+
+		for i := 0; i < len(accessor.Params); i += 2 {
+			pluginPaths[accessor.Params[i]] = p
+		}
+
+		plugin.RegisterMetrics(&accessor, accessor.Name(), accessor.Params...)
+		err = cmd.Process.Kill()
+		if err != nil {
+			return err
+		}
 	}
 
-	//TODO: for testing exporter
-	plugins = append(plugins, &impl)
-	pluginPaths["dynamic.test"] = "dynamic/main"
-
-	//TODO: get plugin type / interface{} (EXPORTER WATCHER, etc)
-	for _, p := range plugins {
-		// get fields from dynamic plugin config ?
-		plugin.RegisterMetrics(p, "Dynamic", "dynamic.test", "Exporter Test.")
-	}
+	return nil
 }
 
 func init() {
 	pluginPaths = make(map[string]string)
+}
+
+func Start(path string) *exec.Cmd {
+	cmd := exec.Command(path)
+	cmd.Start()
+	return cmd
+}
+
+func getPlugin(path string) (Plugin, error) {
+	req := zmq4.NewReq(context.Background())
+	defer req.Close()
+
+	if err := sendRequest(path, shared.Metrics, nil, req); err != nil {
+		return Plugin{}, err
+	}
+
+	msg, err := req.Recv()
+	if err != nil {
+		return Plugin{}, err
+	}
+
+	var resp shared.Plugin
+	if err := json.Unmarshal(msg.Bytes(), &resp); err != nil {
+		return Plugin{}, err
+	}
+
+	switch resp.RespType {
+	case shared.Metrics:
+		var p Plugin
+		p.Type = resp.Supported
+		p.Params = resp.Params
+		p.SetCapacity(1)
+
+		return p, err
+	default:
+		return Plugin{}, fmt.Errorf("unknown response type:%x", resp.RespType)
+	}
+}
+
+func sendRequest(path string, command int, params []string, sock zmq4.Socket) error {
+	err := sock.Dial(fmt.Sprintf("ipc:///tmp/%s.sock", filepath.Base(path)))
+	if err != nil {
+		return err
+	}
+
+	reqData := shared.Plugin{Command: command, Params: params}
+	reqBytes, err := json.Marshal(reqData)
+	if err != nil {
+		return err
+	}
+
+	err = sock.Send(zmq4.NewMsg(reqBytes))
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -30,7 +30,7 @@ import (
 	"time"
 
 	_ "zabbix.com/plugins"
-	"zabbix.com/plugins/dynamic"
+	"zabbix.com/plugins/external"
 
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/agent/keyaccess"
@@ -321,8 +321,9 @@ func main() {
 		fatalExit("cannot initialize logger", err)
 	}
 
-	//TODO: read paths from config
-	dynamic.RegisterDynamicPlugins([]string{"dynamic/main.go"})
+	if err = external.RegisterDynamicPlugins(agent.Options.ExternalPlugins, time.Duration(agent.Options.Timeout)); err != nil {
+		fatalExit("cannot register external plugins", err)
+	}
 
 	if argTest || argPrint {
 		var level int
@@ -348,7 +349,10 @@ func main() {
 		if m, err = scheduler.NewManager(&agent.Options); err != nil {
 			fatalExit("cannot create scheduling manager", err)
 		}
+
 		m.Start()
+		m.StartExternal()
+
 		if err = configUpdateItemParameters(m, &agent.Options); err != nil {
 			fatalExit("cannot process configuration", err)
 		}
@@ -371,9 +375,10 @@ func main() {
 		}
 
 		m.Stop()
+		m.StopExternal()
+
 		monitor.Wait(monitor.Scheduler)
 		os.Exit(0)
-
 	}
 
 	if argVerbose {
@@ -486,6 +491,7 @@ func main() {
 	}
 
 	manager.Start()
+	manager.StartExternal()
 
 	if err = configUpdateItemParameters(manager, &agent.Options); err != nil {
 		fatalExit("cannot process configuration", err)
@@ -554,6 +560,7 @@ func main() {
 	monitor.Wait(monitor.Input)
 
 	manager.Stop()
+	manager.StopExternal()
 	monitor.Wait(monitor.Scheduler)
 
 	// split shutdown in two steps to ensure that result cache is still running while manager is
