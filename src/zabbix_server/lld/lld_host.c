@@ -3117,9 +3117,9 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 
 					zbx_audit_host_update_json_update_tls_psk_identity(host->hostid,
 							(0 == strcmp("", host->tls_psk_identity_orig) ?
-							host->tls_psk_identity_orig : ZBX_MACRO_SECRET_MASK),
+							"" : ZBX_MACRO_SECRET_MASK),
 							(0 == strcmp("", tls_psk_identity) ?
-							tls_psk_identity : ZBX_MACRO_SECRET_MASK));
+							"" : ZBX_MACRO_SECRET_MASK));
 				}
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK))
 				{
@@ -3132,8 +3132,8 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 
 					zbx_audit_host_update_json_update_tls_psk(host->hostid,
 							(0 == strcmp("", host->tls_psk_orig) ?
-							host->tls_psk_orig : ZBX_MACRO_SECRET_MASK),
-							(0 == strcmp("", tls_psk) ? tls_psk : ZBX_MACRO_SECRET_MASK));
+							"" : ZBX_MACRO_SECRET_MASK),
+							(0 == strcmp("", tls_psk) ? "" : ZBX_MACRO_SECRET_MASK));
 				}
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_CUSTOM_INTERFACES))
 				{
