@@ -46,6 +46,7 @@ class CSystemInformationHelper {
 		$data['encoding_warning'] = $db_backend->checkEncoding() ? '' : $db_backend->getWarning();
 
 		$ha_cluster_enabled = false;
+		$ha_nodes = [];
 
 		if (!$ZBX_SERVER_STANDALONE) {
 			$ha_nodes = API::HaNode()->get([
