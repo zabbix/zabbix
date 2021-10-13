@@ -303,7 +303,8 @@ static zbx_uint64_t	evt_req_chunk_size;
 
 #define ZBX_VM_NONAME_XML	"noname.xml"
 
-#define ZBX_PROPMAP(property)		{property, ZBX_XPATH_PROP_NAME(property), NULL}
+#define ZBX_PROPMAP_EXT(property, func)	{property, ZBX_XPATH_PROP_NAME(property), func}
+#define ZBX_PROPMAP(property)		ZBX_PROPMAP_EXT(property, NULL)
 
 typedef int	(*nodeprocfunc_t)(void *, char **);
 
@@ -334,9 +335,8 @@ static zbx_vmware_propmap_t	hv_propmap[] = {
 	ZBX_PROPMAP("summary.config.name"),			/* ZBX_VMWARE_HVPROP_NAME */
 	ZBX_PROPMAP("overallStatus"),				/* ZBX_VMWARE_HVPROP_STATUS */
 	ZBX_PROPMAP("runtime.inMaintenanceMode"),		/* ZBX_VMWARE_HVPROP_MAINTENANCE */
-	{"summary.runtime.healthSystemRuntime.systemHealthInfo.numericSensorInfo",
-			ZBX_XPATH_PROP_NAME("summary.runtime.healthSystemRuntime.systemHealthInfo."
-			"numericSensorInfo"), zbx_xmlnode_to_json} /* ZBX_VMWARE_HVPROP_SENSOR */
+	ZBX_PROPMAP_EXT("summary.runtime.healthSystemRuntime.systemHealthInfo.numericSensorInfo",
+			zbx_xmlnode_to_json)			/* ZBX_VMWARE_HVPROP_SENSOR */
 };
 
 static zbx_vmware_propmap_t	vm_propmap[] = {
