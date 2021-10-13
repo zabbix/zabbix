@@ -23,7 +23,8 @@
  * @var CPartial $this
  */
 
-$status = $data['status'];
+$sysinfo = $data['system_information'];
+$status = $sysinfo['status'];
 
 $info_table = (new CTableInfo())
 	->setHeader([_('Parameter'), _('Value'), _('Details')])
@@ -31,7 +32,7 @@ $info_table = (new CTableInfo())
 	->addRow([_('Zabbix server is running'),
 		(new CSpan($status['is_running'] ? _('Yes') : _('No')))
 			->addClass($status['is_running'] ? ZBX_STYLE_GREEN : ZBX_STYLE_RED),
-		$data['server_details']
+		$sysinfo['server_details']
 	])
 	->addRow([_('Number of hosts (enabled/disabled)'),
 		$status['has_status'] ? $status['hosts_count'] : '',
@@ -74,13 +75,13 @@ $info_table->addRow([_('Number of users (online)'), $status['has_status'] ? $sta
 	$status['has_status'] ? (new CSpan($status['users_online']))->addClass(ZBX_STYLE_GREEN) : ''
 ]);
 
-if ($data['for_superadmin']) {
+if ($data['user_role'] == USER_TYPE_SUPER_ADMIN) {
 	$info_table->addRow([_('Required server performance, new values per second'),
 		($status['has_status'] && array_key_exists('vps_total', $status)) ? round($status['vps_total'], 2) : '', ''
 	]);
 
 	// Check requirements.
-	foreach ($data['requirements'] as $requirement) {
+	foreach ($sysinfo['requirements'] as $requirement) {
 		if ($requirement['result'] == CFrontendSetup::CHECK_FATAL) {
 			$info_table->addRow(
 				(new CRow([$requirement['name'], $requirement['current'], $requirement['error']]))
@@ -89,15 +90,15 @@ if ($data['for_superadmin']) {
 		}
 	}
 
-	if ($data['encoding_warning'] !== '') {
+	if ($sysinfo['encoding_warning'] !== '') {
 		$info_table->addRow(
-			(new CRow((new CCol($data['encoding_warning']))->setAttribute('colspan', 3)))->addClass(ZBX_STYLE_RED)
+			(new CRow((new CCol($sysinfo['encoding_warning']))->setAttribute('colspan', 3)))->addClass(ZBX_STYLE_RED)
 		);
 	}
 }
 
 // Warn if database history $info_tables have not been upgraded.
-if (!$data['float_double_precision']) {
+if (!$sysinfo['float_double_precision']) {
 	$info_table->addRow([
 		_('Database history $info_tables upgraded'),
 		(new CSpan(_('No')))->addClass(ZBX_STYLE_RED),
@@ -106,8 +107,8 @@ if (!$data['float_double_precision']) {
 }
 
 // Check DB version.
-if ($data['for_superadmin']) {
-	foreach ($data['dbversion_status'] as $dbversion) {
+if ($data['user_role'] == USER_TYPE_SUPER_ADMIN) {
+	foreach ($sysinfo['dbversion_status'] as $dbversion) {
 		if ($dbversion->flag != DB_VERSION_SUPPORTED) {
 			switch ($dbversion->flag) {
 				case DB_VERSION_LOWER_THAN_MINIMUM:
@@ -149,21 +150,21 @@ if ($data['for_superadmin']) {
 
 $nodes_table = null;
 
-if (!$data['ha_cluster_enabled']) {
+if (!$sysinfo['ha_cluster_enabled']) {
 	$info_table->addRow([_('High availability cluster'), _('Disabled'), '']);
 }
 else {
 	$info_table->addRow([_('High availability cluster'),
 		(new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN),
-		_s('Fail-over delay: %1$s', $data['failover_delay'])
+		_s('Fail-over delay: %1$s', $sysinfo['failover_delay'])
 	]);
 
-	if ($data['for_superadmin']) {
+	if ($data['user_role'] == USER_TYPE_SUPER_ADMIN) {
 		$nodes_table = (new CTableInfo())
 			->setHeader([_('Name'), _('Address'), _('Last access'), _('Status')])
 			->setHeadingColumn(0);
 
-		foreach ($data['ha_nodes'] as $node) {
+		foreach ($sysinfo['ha_nodes'] as $node) {
 			$status_element = new CCol();
 
 			switch($node['status']) {

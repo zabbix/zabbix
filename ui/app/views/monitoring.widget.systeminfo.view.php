@@ -25,7 +25,10 @@
 
 $output = [
 	'name' => $data['name'],
-	'body' => (new CPartial('administration.system.information', $data['system_information']))->getOutput()
+	'body' => (new CPartial('administration.system.information', [
+		'system_information' => $data['system_information'],
+		'user_role' => $data['user_role']
+	]))->getOutput()
 ];
 
 if (($messages = getMessages()) !== null) {

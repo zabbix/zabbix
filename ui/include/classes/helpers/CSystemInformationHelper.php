@@ -23,19 +23,17 @@
  * Class collecting various system information aspects.
  */
 class CSystemInformationHelper {
+
 	/**
 	 * Prepare data used to compile as System information.
 	 *
-	 * @param bool $for_superadmin  Include data meant for USER_TYPE_SUPER_ADMIN eyes only.
-	 *
 	 * @return array
 	 */
-	public static function getData(bool $for_superadmin = false): array {
+	public static function getData(): array {
 		global $DB, $ZBX_SERVER_STANDALONE, $ZBX_SERVER, $ZBX_SERVER_PORT;
 
 		$data = [
 			'status' => static::getServerStatus($ZBX_SERVER, (int) $ZBX_SERVER_PORT),
-			'for_superadmin' => $for_superadmin,
 			'requirements' => [],
 			'server_details' => '',
 			'float_double_precision' => $DB['DOUBLE_IEEE754'],
@@ -75,7 +73,7 @@ class CSystemInformationHelper {
 			$data['failover_delay'] = secondsToPeriod($failover_delay_seconds);
 		}
 
-		if (!$for_superadmin) {
+		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
 			return $data;
 		}
 
