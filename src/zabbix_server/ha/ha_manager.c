@@ -378,7 +378,7 @@ static int	ha_db_lock_nodes(zbx_ha_info_t *info)
 {
 	DB_RESULT	result;
 
-	result = DBselect_once("select null from ha_node" ZBX_FOR_UPDATE);
+	result = DBselect_once("select null from ha_node order by ha_nodeid" ZBX_FOR_UPDATE);
 
 	if (NULL == result)
 	{
