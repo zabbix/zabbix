@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
 /**
  * @backup history, hosts
  *
- * @onBeforeOnce prepareItemsData, prepareMapsData, writeValuesToItems
+ * @onBefore prepareItemsData, prepareMapsData, writeValuesToItems
  */
 class testExpandExpressionMacros extends CWebTest {
 
@@ -274,7 +274,6 @@ class testExpandExpressionMacros extends CWebTest {
 	 * @dataProvider getGraphData
 	 */
 	public function testExpandExpressionMacros_Graph($data) {
-		$this->writeValuesToItems();
 		$this->page->login()->open('zabbix.php?action=host.view&groupids%5B%5D='.self::$hostgroupid)
 				->waitUntilReady();
 		$table = $this->query('xpath://form[@name="host_view"]/table[@class="list-table"]')->asTable()
@@ -369,7 +368,6 @@ class testExpandExpressionMacros extends CWebTest {
 	 * Test for checking expression macro expand in map's elements.
 	 */
 	public function testExpandExpressionMacros_Map() {
-		$this->writeValuesToItems();
 		$this->page->login()->open('zabbix.php?action=map.view&sysmapid='.self::$mapid)->waitUntilReady();
 		$map_image = $this->query('id:flickerfreescreen_mapimg')->waitUntilPresent()->one();
 		$covered_region = [
