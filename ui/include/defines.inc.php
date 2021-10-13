@@ -2044,7 +2044,7 @@ define('ZBX_ROLE_RULE_API_WILDCARD_ALIAS',		'*.*');
 // Allows to set "rel" tag value "noreferer" when setting target="_blank".
 define('ZBX_NOREFERER', true);
 
-// High availabilty server node states.
+// High availability server node states.
 define('ZBX_NODE_STATUS_STANDBY', 0);
 define('ZBX_NODE_STATUS_STOPPED', 1);
 define('ZBX_NODE_STATUS_UNAVAILABLE', 2);
