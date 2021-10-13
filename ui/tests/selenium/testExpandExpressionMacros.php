@@ -369,7 +369,8 @@ class testExpandExpressionMacros extends CWebTest {
 	 */
 	public function testExpandExpressionMacros_Map() {
 		$this->page->login()->open('zabbix.php?action=map.view&sysmapid='.self::$mapid)->waitUntilReady();
-		$map_image = $this->query('id:flickerfreescreen_mapimg')->waitUntilPresent()->one();
+		$map_image = $this->query('xpath://div[@id="flickerfreescreen_mapimg"]/div/*[name()="svg"]')
+				->waitUntilPresent()->one();
 		$covered_region = [
 			'x' => 410,
 			'y' => 484,
