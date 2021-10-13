@@ -1,0 +1,1 @@
+.........T [ZBX-19237] changed condition in SQL request of pgsql.connections.sum.waiting item in DB PostgreSQL template to exclude rows with idle state (mchudinov)
