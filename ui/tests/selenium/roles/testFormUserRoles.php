@@ -649,7 +649,7 @@ class testFormUserRoles extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=userrole.edit&roleid=1');
 		$this->page->assertTitle('Configuration of user roles');
 		$this->page->assertHeader('User roles');
-		$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
+		$form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
 		$this->assertEquals(255, $form->getField('Name')->getAttribute('maxlength'));
 		$this->assertEquals($roles, $this->query('id:user-type')->one()->asZDropdown()->getOptions()->asText());
 
@@ -848,7 +848,7 @@ class testFormUserRoles extends CWebTest {
 
 	public function testFormUserRoles_Clone() {
 		$this->page->login()->open('zabbix.php?action=userrole.edit&roleid=2');
-		$form = $this->query('id:userrole-form')->waitUntilReady()->asFluidForm()->one();
+		$form = $this->query('id:userrole-form')->waitUntilReady()->asForm()->one();
 		$values = $form->getFields()->asValues();
 		$role_name = $values['Name'];
 		$this->query('button:Clone')->one()->click();
@@ -897,7 +897,7 @@ class testFormUserRoles extends CWebTest {
 		foreach(['userrole.edit', 'userrole.edit&roleid=2'] as $link) {
 			$hash_before = CDBHelper::getHash(self::ROLE_SQL);
 			$this->page->login()->open('zabbix.php?action='.$link);
-			$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
+			$form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
 			$form->fill(['Name' => 'cancellation_name_user']);
 			$this->query('button:Cancel')->one()->click();
 			$this->assertEquals($hash_before, CDBHelper::getHash(self::ROLE_SQL));
@@ -911,7 +911,7 @@ class testFormUserRoles extends CWebTest {
 		$this->page->userLogin('super_role_check', 'test5678');
 		$this->page->open('zabbix.php?action=userrole.list')->waitUntilReady();
 		$this->query('link:super_role')->one()->click();
-		$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
+		$form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
 		$this->assertEquals('User cannot change the user type of own role.',
 				$this->query('xpath://input[@id="type"]/following::span')->one()->getText()
 		);
@@ -926,7 +926,7 @@ class testFormUserRoles extends CWebTest {
 		foreach ([true, false] as $enable_modules) {
 			$modules = ['4th Module', '5th Module'];
 			$this->page->open('zabbix.php?action=userrole.edit&roleid=2')->waitUntilReady();
-			$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
+			$form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
 			if ($enable_modules === true) {
 				$this->assertTrue($form->query('xpath://label[text()="No enabled modules found."]')->one()->isDisplayed());
 				$this->page->open('zabbix.php?action=module.list')->waitUntilReady();
@@ -959,7 +959,7 @@ class testFormUserRoles extends CWebTest {
 				$hash_before = CDBHelper::getHash(self::ROLE_SQL);
 			}
 		}
-		$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
+		$form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
 		$form->fill($data['fields']);
 
 		if (array_key_exists('api_methods', $data)) {
@@ -988,7 +988,7 @@ class testFormUserRoles extends CWebTest {
 				$this->page->login()->open('zabbix.php?action=userrole.edit&roleid='.$id);
 			}
 
-			$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
+			$form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
 
 			if (array_key_exists('space', $data)) {
 				$data['fields']['Name'] = trim($data['fields']['Name']);
