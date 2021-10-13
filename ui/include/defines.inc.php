@@ -2044,6 +2044,12 @@ define('ZBX_ROLE_RULE_API_WILDCARD_ALIAS',		'*.*');
 // Allows to set "rel" tag value "noreferer" when setting target="_blank".
 define('ZBX_NOREFERER', true);
 
+// High availabilty server node states.
+define('ZBX_NODE_STATUS_STANDBY', 0);
+define('ZBX_NODE_STATUS_STOPPED', 1);
+define('ZBX_NODE_STATUS_UNAVAILABLE', 2);
+define('ZBX_NODE_STATUS_ACTIVE', 3);
+
 // init $_REQUEST
 ini_set('variables_order', 'GP');
 $_REQUEST = $_POST + $_GET;
@@ -2055,9 +2061,3 @@ ini_set('precision', 14);
 if (function_exists('bcscale')) {
 	bcscale(7);
 }
-
-// High availabilty server node states.
-define('ZBX_NODE_STATUS_STANDBY', 0);
-define('ZBX_NODE_STATUS_STOPPED', 1);
-define('ZBX_NODE_STATUS_UNAVAILABLE', 2);
-define('ZBX_NODE_STATUS_ACTIVE', 3);
