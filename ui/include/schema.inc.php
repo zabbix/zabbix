@@ -8691,8 +8691,8 @@ return [
 		'fields' => [
 			'ha_nodeid' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20
+				'type' => DB::FIELD_TYPE_CUID,
+				'length' => 25
 			],
 			'name' => [
 				'null' => false,
@@ -8723,6 +8723,11 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
+			],
+			'sessionid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CUID,
+				'length' => 25
 			]
 		]
 	],

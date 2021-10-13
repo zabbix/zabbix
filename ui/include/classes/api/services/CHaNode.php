@@ -41,7 +41,7 @@ class CHaNode extends CApiService {
 	public function get(array $options = []) {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
-			'hanodeids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'ha_nodeids' =>				['type' => API_CUIDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'filter' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
 				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'address' =>				['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
@@ -76,9 +76,8 @@ class CHaNode extends CApiService {
 		}
 
 		if ($db_nodes) {
-			$db_nodes = $this->unsetExtraFields($db_nodes, ['name', 'address', 'port', 'lastaccess', 'status'],
-				$options['output']
-			);
+			$db_nodes = $this->unsetExtraFields($db_nodes, ['ha_nodeid'], $options['output']);
+			$db_nodes = $this->unsetExtraFields($db_nodes, ['sessionid']);
 
 			if (!$options['preservekeys']) {
 				$db_nodes = array_values($db_nodes);
