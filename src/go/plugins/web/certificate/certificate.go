@@ -223,14 +223,14 @@ func getParsedParameters(params []string) (address, port, domain string, err err
 	if ip := net.ParseIP(cutBrackets(params[2])); ip != nil {
 		address, port, err = parseURL(params[2], params[1])
 		if err != nil {
-			return "", "", "", fmt.Errorf("failed to parse ip %s, and port %s, err: %s", params[2], params[1], err.Error())
+			return "", "", "", fmt.Errorf("failed to parse ip %s, and port %s, %s", params[2], params[1], err.Error())
 		}
 
 		return
 	}
 
 	if err = uri.IsHostnameOnly(params[2]); err != nil {
-		return "", "", "", fmt.Errorf("failed to parse host %s, err: %s, required hostname or IPv4", params[2], err.Error())
+		return "", "", "", fmt.Errorf("failed to parse host %s, %s, required: hostname or IPv4", params[2], err.Error())
 	}
 
 	domain = params[2]
