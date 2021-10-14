@@ -35,7 +35,7 @@ extern char	*CONFIG_TLS_PSK_IDENTITY;
 
 static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_vector_ptr_t *addrs,
 		int timeout, int connect_timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
-		int level)
+		int loglevel)
 {
 	int	ret, i;
 
@@ -51,7 +51,7 @@ static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_
 			break;
 		}
 
-		zabbix_log(level, "Unable to connect to [%s]:%d [%s]",
+		zabbix_log(loglevel, "Unable to connect to [%s]:%d [%s]",
 				((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port,
 				zbx_socket_strerror());
 
