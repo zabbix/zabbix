@@ -45,7 +45,7 @@ class CSystemInfoHelper {
 		$ha_cluster_enabled = false;
 
 		if (!$ZBX_SERVER_STANDALONE) {
-			$ha_nodes = API::getApiService('hanode')->get([
+			$ha_nodes = API::HaNode()->get([
 				'output' => ['name', 'address', 'port', 'lastaccess', 'status'],
 				'preservekeys' => true,
 				'sortfield' => 'status',
