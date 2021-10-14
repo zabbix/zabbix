@@ -129,7 +129,7 @@ class CHostInterfaceElement extends CMultifieldTableElement {
 					if ($element->isValid()) {
 						$form = ($element->query('xpath:./*')->one()->getTagName() === 'ul')
 							? $element->asForm(['normalized' => true])
-							: $element->asFluidForm(['normalized' => true]);
+							: $element->asForm(['normalized' => true]);
 						$fields = $form->getFields();
 					}
 				}
@@ -174,7 +174,7 @@ class CHostInterfaceElement extends CMultifieldTableElement {
 		if ($element->isValid()) {
 			$form = ($element->query('xpath:./*')->one()->getTagName() === 'ul')
 					? $element->asForm(['normalized' => true])
-					: $element->asFluidForm(['normalized' => true]);
+					: $element->asForm(['normalized' => true]);
 
 			// Expand row for SNMP interface.
 			$button = $row->getColumn(0)->query('tag:button')->one();
