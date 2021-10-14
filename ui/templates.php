@@ -246,7 +246,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		// create / update template
 		$template = [
 			'host' => $templateName,
-			'name' => getRequest('visiblename', ''),
+			'name' => (getRequest('visiblename', '') === '') ? $templateName : getRequest('visiblename'),
 			'groups' => zbx_toObject($groups, 'groupid'),
 			'templates' => $templates,
 			'macros' => $macros,

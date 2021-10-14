@@ -35,6 +35,273 @@ abstract class CHostGeneral extends CHostBase {
 	];
 
 	/**
+	 * Check for unique host names.
+	 *
+	 * @param array      $hosts
+	 * @param array|null $db_hosts
+	 *
+	 * @throws APIException if host names are not unique.
+	 */
+	protected function checkDuplicates(array $hosts, array $db_hosts = null): void {
+		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
+
+		$h_names = [];
+		$v_names = [];
+
+		foreach ($hosts as $host) {
+			if (array_key_exists('host', $host)) {
+				if ($db_hosts === null || $host['host'] !== $db_hosts[$host[$id_field_name]]['host']) {
+					$h_names[] = $host['host'];
+				}
+			}
+
+			if (array_key_exists('name', $host)) {
+				if ($db_hosts === null || $host['name'] !== $db_hosts[$host[$id_field_name]]['name']) {
+					$v_names[] = $host['name'];
+				}
+			}
+		}
+
+		if ($h_names) {
+			$duplicate = DB::select('hosts', [
+				'output' => ['host', 'status'],
+				'filter' => [
+					'flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED],
+					'host' => $h_names
+				],
+				'limit' => 1
+			]);
+
+			if ($duplicate) {
+				$error = ($duplicate['status'] == HOST_STATUS_TEMPLATE)
+					? _s('Template with the same name "%1$s" already exists.', $duplicate['host'])
+					: _s('Host with the same name "%1$s" already exists.', $duplicate['host']);
+
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			}
+		}
+
+		if ($v_names) {
+			$duplicate = DB::select('hosts', [
+				'output' => ['name', 'status'],
+				'filter' => [
+					'flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED],
+					'host' => $v_names
+				],
+				'limit' => 1
+			]);
+
+			if ($duplicate) {
+				$error = ($duplicate['status'] == HOST_STATUS_TEMPLATE)
+					? _s('Template with the same name "%1$s" already exists.', $duplicate['name'])
+					: _s('Host with the same name "%1$s" already exists.', $duplicate['name']);
+
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			}
+		}
+	}
+
+	/**
+	 * Update table "hosts_groups" and populate hosts.groups by "hostgroupid" property.
+	 *
+	 * @param array      $hosts
+	 * @param string     $method
+	 * @param array|null $db_hosts
+	 */
+	protected function updateGroups(array &$hosts, string $method, array $db_hosts = null): void {
+		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
+
+		$ins_hosts_groups = [];
+		$del_hostgroupids = [];
+
+		foreach ($hosts as &$host) {
+			if (!array_key_exists('groups', $host)) {
+				continue;
+			}
+
+			$db_groups = ($method === 'update')
+				? array_column($db_hosts[$host[$id_field_name]]['groups'], null, 'groupid')
+				: [];
+
+			foreach ($host['groups'] as &$group) {
+				if (array_key_exists($group['groupid'], $db_groups)) {
+					$group['hostgroupid'] = $db_groups[$group['groupid']]['hostgroupid'];
+					unset($db_groups[$group['groupid']]);
+				}
+				else {
+					$ins_hosts_groups[] = [
+						'hostid' => $host[$id_field_name],
+						'groupid' => $group['groupid']
+					];
+				}
+			}
+			unset($group);
+
+			$del_hostgroupids = array_merge($del_hostgroupids, array_column($db_groups, 'id'));
+		}
+		unset($host);
+
+		if ($del_hostgroupids) {
+			DB::delete('hosts_groups', ['hostgroupid' => $del_hostgroupids]);
+		}
+
+		if ($ins_hosts_groups) {
+			$hostgroupids = DB::insertBatch('hosts_groups', $ins_hosts_groups);
+		}
+
+		foreach ($hosts as &$host) {
+			if (!array_key_exists('groups', $host)) {
+				continue;
+			}
+
+			foreach ($host['groups'] as &$group) {
+				if (!array_key_exists('hostgroupid', $group)) {
+					$group['hostgroupid'] = array_shift($hostgroupids);
+				}
+			}
+			unset($group);
+		}
+		unset($host);
+	}
+
+	/**
+	 * @param array      $hosts
+	 * @param string     $method
+	 * @param array|null $db_hosts
+	 */
+	protected function updateTagsNew(array &$hosts, string $method, array $db_hosts = null): void {
+		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
+
+		$ins_tags = [];
+		$del_hosttagids = [];
+
+		foreach ($hosts as &$host) {
+			if (!array_key_exists('tags', $host)) {
+				continue;
+			}
+
+			$db_tags = ($method === 'update')
+				? $db_hosts[$host[$id_field_name]]['tags']
+				: [];
+
+			$hosttagid_by_tag_value = [];
+			foreach ($db_tags as $db_tag) {
+				$hosttagid_by_tag_value[$db_tag['tag']][$db_tag['value']] = $db_tag['hosttagid'];
+			}
+
+			foreach ($host['tags'] as &$tag) {
+				if (array_key_exists($tag['tag'], $hosttagid_by_tag_value)
+						&& array_key_exists($tag['value'], $hosttagid_by_tag_value[$tag['tag']])) {
+					$tag['hosttagid'] = $hosttagid_by_tag_value[$tag['tag']][$tag['value']];
+					unset($db_tags[$tag['hosttagid']]);
+				}
+				else {
+					$ins_tags[] = ['hostid' => $host[$id_field_name]] + $tag;
+				}
+			}
+			unset($tag);
+
+			$del_hosttagids = array_merge($del_hosttagids, array_keys($db_tags));
+		}
+		unset($host);
+
+		if ($del_hosttagids) {
+			DB::delete('host_tag', ['hosttagid' => $del_hosttagids]);
+		}
+
+		if ($ins_tags) {
+			$hosttagids = DB::insert('host_tag', $ins_tags);
+		}
+
+		foreach ($hosts as &$host) {
+			if (!array_key_exists('tags', $host)) {
+				continue;
+			}
+
+			foreach ($host['tags'] as &$tag) {
+				if (!array_key_exists('hosttagid', $tag)) {
+					$tag['hosttagid'] = array_shift($hosttagids);
+				}
+			}
+			unset($tag);
+		}
+		unset($host);
+	}
+
+	/**
+	 * @param array      $hosts
+	 * @param string     $method
+	 * @param array|null $db_hosts
+	 */
+	protected function updateHostMacrosNew(array &$hosts, string $method, array $db_hosts = null): void {
+		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
+
+		$ins_hostmacros = [];
+		$upd_hostmacros = [];
+		$del_hostmacroids = [];
+
+		foreach ($hosts as &$host) {
+			if (!array_key_exists('macros', $host)) {
+				continue;
+			}
+
+			$db_macros = ($method === 'update')
+				? array_column($db_hosts[$host[$id_field_name]]['macros'], null, 'macro')
+				: [];
+
+			foreach ($host['macros'] as &$macro) {
+				if (array_key_exists($macro['macro'], $db_macros)) {
+					$db_macro = $db_macros[$macro['macro']];
+					$macro['hostmacroid'] = $db_macro['hostmacroid'];
+					unset($db_macros[$macro['macro']]);
+
+					$upd_hostmacro = DB::getUpdatedValues('hostmacro', $macro, $db_macro);
+
+					if ($upd_hostmacro) {
+						$upd_hostmacros[] = [
+							'values' => $upd_hostmacro,
+							'where' => ['hostmacroid' => $macro['hostmacroid']]
+						];
+					}
+				}
+				else {
+					$ins_hostmacros[] = ['hostid' => $host[$id_field_name]] + $macro;
+				}
+			}
+			unset($macro);
+
+			$del_hostmacroids = array_merge($del_hostmacroids, array_column($db_macros, 'hostmacroid'));
+		}
+		unset($host);
+
+		if ($del_hostmacroids) {
+			DB::delete('hostmacro', ['hostmacroid' => $del_hostmacroids]);
+		}
+
+		if ($upd_hostmacros) {
+			DB::update('hostmacro', $upd_hostmacros);
+		}
+
+		if ($ins_hostmacros) {
+			$hostmacroids = DB::insert('hostmacro', $ins_hostmacros);
+		}
+
+		foreach ($hosts as &$host) {
+			if (!array_key_exists('macros', $host)) {
+				continue;
+			}
+
+			foreach ($host['macros'] as &$macro) {
+				if (!array_key_exists('hostmacroid', $macro)) {
+					$macro['hostmacroid'] = array_shift($hostmacroids);
+				}
+			}
+			unset($macro);
+		}
+		unset($host);
+	}
+
+	/**
 	 * Checks if the current user has access to the given hosts and templates. Assumes the "hostid" field is valid.
 	 *
 	 * @param array $hostids    an array of host or template IDs
