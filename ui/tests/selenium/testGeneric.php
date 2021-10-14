@@ -30,13 +30,6 @@ class testGeneric extends CLegacyWebTest {
 			// monitoring
 			['zabbix.php?action=dashboard.view',					'Dashboard'],
 
-			['overview.php',												'Overview [refreshed every 30 sec.]'],
-			['overview.php?form_refresh=1&groupid=0&type=0&view_style=0',	'Overview [refreshed every 30 sec.]'],
-
-			['overview.php?form_refresh=1&groupid=0&type=0&view_style=1',	'Overview [refreshed every 30 sec.]'],
-			['overview.php?form_refresh=1&groupid=0&type=1&view_style=0',	'Overview [refreshed every 30 sec.]'],
-			['overview.php?form_refresh=1&groupid=0&type=1&view_style=1',	'Overview [refreshed every 30 sec.]'],
-
 			['zabbix.php?action=web.view',					'Web monitoring'],
 			['zabbix.php?action=latest.view',	'Latest data'],
 
