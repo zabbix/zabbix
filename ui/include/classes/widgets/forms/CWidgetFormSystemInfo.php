@@ -29,7 +29,7 @@ class CWidgetFormSystemInfo extends CWidgetForm {
 
 		$field_info_type = (new CWidgetFieldRadioButtonList('info_type', _('Show'), [
 			SYSTEM_INFO_SERVER_STATS => _('System stats'),
-			SYSTEM_INFO_HAC_STATUS => _('High availability cluster')
+			SYSTEM_INFO_HAC_STATUS => _('High availability nodes')
 		]))
 			->setDefault(SYSTEM_INFO_SERVER_STATS)
 			->setModern(true);
