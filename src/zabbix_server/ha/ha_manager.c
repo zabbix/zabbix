@@ -245,6 +245,135 @@ static void	ha_set_error(zbx_ha_info_t *info, const char *fmt, ...)
 
 /******************************************************************************
  *                                                                            *
+ * Function: ha_db_begin                                                      *
+ *                                                                            *
+ * Purpose: start database transaction                                        *
+ *                                                                            *
+ * Comments: Sets error status on non-recoverable database error              *
+ *                                                                            *
+ ******************************************************************************/
+static int	ha_db_begin(zbx_ha_info_t *info)
+{
+	if (ZBX_DB_DOWN == info->db_status)
+		info->db_status = DBconnect(ZBX_DB_CONNECT_ONCE);
+
+	if (ZBX_DB_OK == info->db_status)
+		info->db_status = zbx_db_begin();
+
+	if (ZBX_DB_FAIL == info->db_status)
+		ha_set_error(info, "database error");
+
+	return info->db_status;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: ha_db_rollback                                                   *
+ *                                                                            *
+ * Purpose: roll back database transaction                                    *
+ *                                                                            *
+ * Comments: Sets error status on non-recoverable database error              *
+ *                                                                            *
+ ******************************************************************************/
+static int	ha_db_rollback(zbx_ha_info_t *info)
+{
+	if (ZBX_DB_OK > (info->db_status = zbx_db_rollback()))
+	{
+		if (ZBX_DB_DOWN == info->db_status)
+			DBclose();
+	}
+
+	if (ZBX_DB_FAIL == info->db_status)
+		ha_set_error(info, "database error");
+
+	return info->db_status;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: ha_db_commit                                                     *
+ *                                                                            *
+ * Purpose: commit/rollback database transaction depending on commit result   *
+ *                                                                            *
+ * Comments: Sets error status on non-recoverable database error              *
+ *                                                                            *
+ ******************************************************************************/
+static int	ha_db_commit(zbx_ha_info_t *info)
+{
+	if (ZBX_DB_OK <= info->db_status)
+		info->db_status = zbx_db_commit();
+
+	if (ZBX_DB_OK > info->db_status)
+	{
+		zbx_db_rollback();
+
+		if (ZBX_DB_FAIL == info->db_status)
+			ha_set_error(info, "database error");
+		else
+			DBclose();
+	}
+
+	return info->db_status;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: ha_db_select                                                     *
+ *                                                                            *
+ * Purpose: perform database select sql query based on current database       *
+ *          connection status                                                 *
+ *                                                                            *
+ ******************************************************************************/
+static DB_RESULT	ha_db_select(zbx_ha_info_t *info, const char *sql, ...)
+{
+	va_list		args;
+	DB_RESULT	result;
+
+	if (ZBX_DB_OK != info->db_status)
+		return NULL;
+
+	va_start(args, sql);
+	result = zbx_db_vselect(sql, args);
+	va_end(args);
+
+	if (NULL == result)
+	{
+		info->db_status = ZBX_DB_FAIL;
+	}
+	else if (ZBX_DB_DOWN == (intptr_t)result)
+	{
+		info->db_status = ZBX_DB_DOWN;
+		result = NULL;
+	}
+
+	return result;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: ha_db_select                                                     *
+ *                                                                            *
+ * Purpose: perform database sql query based on current database              *
+ *          connection status                                                 *
+ *                                                                            *
+ ******************************************************************************/
+
+static int	ha_db_execute(zbx_ha_info_t *info, const char *sql, ...)
+{
+	va_list	args;
+
+	if (ZBX_DB_OK != info->db_status)
+		return FAIL;
+
+	va_start(args, sql);
+	info->db_status = zbx_db_vexecute(sql, args);
+	va_end(args);
+
+	return ZBX_DB_OK <= info->db_status ? SUCCEED : FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: ha_db_update_config                                              *
  *                                                                            *
  * Purpose: update HA configuration from database                             *
@@ -255,9 +384,7 @@ static int	ha_db_update_config(zbx_ha_info_t *info)
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	result = DBselect_once("select ha_failover_delay,auditlog_enabled from config");
-
-	if (NULL == result || ZBX_DB_DOWN == (intptr_t)result)
+	if (NULL == (result = ha_db_select(info, "select ha_failover_delay,auditlog_enabled from config")))
 		return FAIL;
 
 	if (NULL != (row = DBfetch(result)))
@@ -285,18 +412,18 @@ static int	ha_db_update_config(zbx_ha_info_t *info)
  *               FAIL    - database/connection error                          *
  *                                                                            *
  ******************************************************************************/
-static int	ha_db_get_nodes(zbx_vector_ha_node_t *nodes, int lock)
+static int	ha_db_get_nodes(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes, int lock)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_ha_node_t	*node;
 
-	result = DBselect_once("select ha_nodeid,name,status,lastaccess,address,port,sessionid"
+	if (NULL == (result = ha_db_select(info, "select ha_nodeid,name,status,lastaccess,address,port,sessionid"
 			" from ha_node order by ha_nodeid%s",
-			(0 == lock ? "" : ZBX_FOR_UPDATE));
-
-	if (NULL == result || ZBX_DB_DOWN == (intptr_t)result)
+			(0 == lock ? "" : ZBX_FOR_UPDATE))))
+	{
 		return FAIL;
+	}
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -378,93 +505,12 @@ static int	ha_db_lock_nodes(zbx_ha_info_t *info)
 {
 	DB_RESULT	result;
 
-	result = DBselect_once("select null from ha_node order by ha_nodeid" ZBX_FOR_UPDATE);
-
-	if (NULL == result)
-	{
-		ha_set_error(info, "cannot connect to database");
-		return FAIL;
-	}
-
-	if (ZBX_DB_DOWN == (intptr_t)result)
+	if (NULL == (result = ha_db_select(info, "select null from ha_node order by ha_nodeid" ZBX_FOR_UPDATE)))
 		return FAIL;
 
 	DBfree_result(result);
 
 	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: ha_db_begin                                                      *
- *                                                                            *
- * Purpose: start database transaction                                        *
- *                                                                            *
- * Comments: Sets error status on non-recoverable database error              *
- *                                                                            *
- ******************************************************************************/
-static int	ha_db_begin(zbx_ha_info_t *info)
-{
-	if (ZBX_DB_DOWN == info->db_status)
-		info->db_status = DBconnect(ZBX_DB_CONNECT_ONCE);
-
-	if (ZBX_DB_OK == info->db_status)
-		info->db_status = zbx_db_begin();
-
-	if (ZBX_DB_FAIL == info->db_status)
-		ha_set_error(info, "database error");
-
-	return info->db_status;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: ha_db_rollback                                                   *
- *                                                                            *
- * Purpose: roll back database transaction                                    *
- *                                                                            *
- * Comments: Sets error status on non-recoverable database error              *
- *                                                                            *
- ******************************************************************************/
-static int	ha_db_rollback(zbx_ha_info_t *info)
-{
-	if (ZBX_DB_OK > (info->db_status = zbx_db_rollback()))
-	{
-		if (ZBX_DB_DOWN == info->db_status)
-			DBclose();
-	}
-
-	if (ZBX_DB_FAIL == info->db_status)
-		ha_set_error(info, "database error");
-
-	return info->db_status;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: ha_db_commit                                                     *
- *                                                                            *
- * Purpose: commit/rollback database transaction depending on commit result   *
- *                                                                            *
- * Comments: Sets error status on non-recoverable database error              *
- *                                                                            *
- ******************************************************************************/
-static int	ha_db_commit(zbx_ha_info_t *info)
-{
-	if (ZBX_DB_OK == info->db_status)
-		info->db_status = zbx_db_commit();
-
-	if (ZBX_DB_OK != info->db_status)
-	{
-		zbx_db_rollback();
-
-		if (ZBX_DB_FAIL == info->db_status)
-			ha_set_error(info, "database error");
-		else
-			DBclose();
-	}
-
-	return info->db_status;
 }
 
 /******************************************************************************
@@ -580,7 +626,7 @@ static int	ha_check_cluster_config(zbx_ha_info_t *info, zbx_vector_ha_node_t *no
  * Purpose: get current database time                                         *
  *                                                                            *
  ******************************************************************************/
-static int	ha_db_get_time(int *db_time)
+static int	ha_db_get_time(zbx_ha_info_t *info, int *db_time)
 {
 	DB_ROW			row;
 	DB_RESULT		result;
@@ -588,9 +634,7 @@ static int	ha_db_get_time(int *db_time)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	result = DBselect_once("select " ZBX_DB_TIMESTAMP());
-
-	if (NULL == result || ZBX_DB_DOWN == (intptr_t)result)
+	if (NULL == (result = ha_db_select(info, "select " ZBX_DB_TIMESTAMP())))
 		goto out;
 
 	if (NULL != (row = DBfetch(result)))
@@ -631,10 +675,13 @@ static void	ha_db_create_node(zbx_ha_info_t *info)
 	if (ZBX_DB_OK != ha_db_begin(info))
 		goto finish;
 
-	if (SUCCEED != ha_db_get_nodes(&nodes, 0))
+	if (SUCCEED != ha_db_get_nodes(info, &nodes, 0))
 		goto out;
 
 	if (FAIL == ha_db_update_config(info))
+		goto out;
+
+	if (SUCCEED != ha_db_get_time(info, &db_time))
 		goto out;
 
 	for (i = 0; i < nodes.values_num; i++)
@@ -663,7 +710,7 @@ static void	ha_db_create_node(zbx_ha_info_t *info)
 	zbx_new_cuid(nodeid.str);
 	name_esc = DBdyn_escape_string(info->name);
 
-	if (ZBX_DB_OK <= DBexecute_once("insert into ha_node (ha_nodeid,name,status,lastaccess)"
+	if (SUCCEED == ha_db_execute(info, "insert into ha_node (ha_nodeid,name,status,lastaccess)"
 			" values ('%s','%s', %d," ZBX_DB_TIMESTAMP() ")",
 			nodeid.str, name_esc, ZBX_NODE_STATUS_STOPPED))
 	{
@@ -729,10 +776,10 @@ static void	ha_db_register_node(zbx_ha_info_t *info)
 	if (ZBX_DB_OK != ha_db_begin(info))
 		goto finish;
 
-	if (SUCCEED != ha_db_get_nodes(&nodes, ZBX_HA_NODE_LOCK))
+	if (SUCCEED != ha_db_get_nodes(info, &nodes, ZBX_HA_NODE_LOCK))
 		goto out;
 
-	if (SUCCEED != ha_db_get_time(&db_time))
+	if (SUCCEED != ha_db_get_time(info, &db_time))
 		goto out;
 
 	if (ZBX_HA_IS_CLUSTER())
@@ -783,7 +830,7 @@ static void	ha_db_register_node(zbx_ha_info_t *info)
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",port=%d", port);
 	}
 
-	if (ZBX_DB_OK <= DBexecute_once("%s where ha_nodeid='%s'", sql, info->nodeid.str))
+	if (SUCCEED == ha_db_execute(info, "%s where ha_nodeid='%s'", sql, info->nodeid.str))
 		zbx_audit_flush_once();
 	else
 		zbx_audit_clean();
@@ -855,7 +902,7 @@ static int	ha_check_standby_nodes(zbx_ha_info_t *info, zbx_vector_ha_node_t *nod
 		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "ha_nodeid",
 				(const char **)unavailable_nodes.values, unavailable_nodes.values_num);
 
-		if (ZBX_DB_OK > DBexecute_once("%s", sql))
+		if (SUCCEED != ha_db_execute(info, "%s", sql))
 			ret = FAIL;
 
 		zbx_free(sql);
@@ -915,7 +962,7 @@ static int	ha_check_active_node(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes
 
 		if (info->failover_delay / ZBX_HA_POLL_PERIOD + 1 < info->offline_ticks_active)
 		{
-			if (ZBX_DB_OK > DBexecute_once("update ha_node set status=%d where ha_nodeid='%s'",
+			if (SUCCEED != ha_db_execute(info, "update ha_node set status=%d where ha_nodeid='%s'",
 					ZBX_NODE_STATUS_UNAVAILABLE, nodes->values[i]->nodeid.str))
 			{
 				ret = FAIL;
@@ -962,7 +1009,7 @@ static void	ha_check_nodes(zbx_ha_info_t *info)
 
 	ha_status = info->ha_status;
 
-	if (SUCCEED != ha_db_get_nodes(&nodes, ZBX_HA_NODE_LOCK))
+	if (SUCCEED != ha_db_get_nodes(info, &nodes, ZBX_HA_NODE_LOCK))
 		goto out;
 
 	if (NULL == (node = ha_find_node_by_name(&nodes, info->name)))
@@ -984,7 +1031,7 @@ static void	ha_check_nodes(zbx_ha_info_t *info)
 	if (SUCCEED != ha_db_update_config(info))
 		goto out;
 
-	if (SUCCEED != ha_db_get_time(&db_time))
+	if (SUCCEED != ha_db_get_time(info, &db_time))
 		goto out;
 
 	if (ZBX_HA_IS_CLUSTER())
@@ -1016,7 +1063,7 @@ static void	ha_check_nodes(zbx_ha_info_t *info)
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where ha_nodeid='%s'", info->nodeid.str);
 
-	if (ZBX_DB_OK <= DBexecute_once("%s", sql))
+	if (SUCCEED == ha_db_execute(info, "%s", sql))
 		zbx_audit_flush_once();
 	else
 		zbx_audit_clean();
@@ -1070,10 +1117,10 @@ static void	ha_db_update_lastaccess(zbx_ha_info_t *info)
 	if (ZBX_DB_OK != ha_db_begin(info))
 		goto out;
 
-	if (SUCCEED == ha_db_lock_nodes(info))
+	if (SUCCEED == ha_db_lock_nodes(info) &&
+			SUCCEED == ha_db_execute(info, "update ha_node set lastaccess=" ZBX_DB_TIMESTAMP()
+					" where ha_nodeid='%s'", info->nodeid.str))
 	{
-		DBexecute_once("update ha_node set lastaccess=" ZBX_DB_TIMESTAMP() " where ha_nodeid='%s'",
-				info->nodeid.str);
 		ha_db_commit(info);
 	}
 	else
@@ -1099,12 +1146,12 @@ static int	ha_db_get_nodes_json(zbx_ha_info_t *info, char **nodes_json, char **e
 	if (ZBX_DB_OK != info->db_status)
 		goto out;
 
-	if (SUCCEED != ha_db_get_time(&db_time))
+	if (SUCCEED != ha_db_get_time(info, &db_time))
 		goto out;
 
 	zbx_vector_ha_node_create(&nodes);
 
-	if (SUCCEED == ha_db_get_nodes(&nodes, 0))
+	if (SUCCEED == ha_db_get_nodes(info, &nodes, 0))
 	{
 		struct zbx_json	j;
 		char		address[512];
@@ -1166,7 +1213,7 @@ static int	ha_remove_node_by_index(zbx_ha_info_t *info, int index, char **error)
 		return FAIL;
 	}
 
-	if (SUCCEED != ha_db_get_nodes(&nodes, 0))
+	if (SUCCEED != ha_db_get_nodes(info, &nodes, 0))
 	{
 		*error = zbx_strdup(NULL, "database connection problem");
 		goto out;
@@ -1187,7 +1234,7 @@ static int	ha_remove_node_by_index(zbx_ha_info_t *info, int index, char **error)
 		goto out;
 	}
 
-	if (ZBX_DB_OK > DBexecute_once("delete from ha_node where ha_nodeid='%s'", nodes.values[index]->nodeid.str))
+	if (SUCCEED != ha_db_execute(info, "delete from ha_node where ha_nodeid='%s'", nodes.values[index]->nodeid.str))
 	{
 		*error = zbx_strdup(NULL, "database connection problem");
 		goto out;
@@ -1269,7 +1316,7 @@ static void	ha_set_failover_delay(zbx_ha_info_t *info, zbx_ipc_client_t *client,
 
 	memcpy(&delay, message->data, sizeof(delay));
 
-	if (ZBX_DB_OK == info->db_status && ZBX_DB_OK <= DBexecute_once("update config set ha_failover_delay=%d", delay))
+	if (SUCCEED == ha_db_execute(info, "update config set ha_failover_delay=%d", delay))
 	{
 		info->failover_delay = delay;
 		zabbix_log(LOG_LEVEL_WARNING, "HA failover delay set to %ds", delay);
@@ -1341,7 +1388,7 @@ static void	ha_db_update_exit_status(zbx_ha_info_t *info)
 	if (SUCCEED != ha_db_lock_nodes(info))
 		goto out;
 
-	if (ZBX_DB_OK <= DBexecute_once("update ha_node set status=%d where ha_nodeid='%s'",
+	if (SUCCEED == ha_db_execute(info, "update ha_node set status=%d where ha_nodeid='%s'",
 			ZBX_NODE_STATUS_STOPPED, info->nodeid.str))
 	{
 		zbx_audit_init(info->auditlog);
