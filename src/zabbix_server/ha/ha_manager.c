@@ -686,13 +686,10 @@ finish:
 	{
 		switch (info->db_status)
 		{
-			case ZBX_DB_FAIL:
-				ha_set_error(info, "database error");
-				break;
 			case ZBX_DB_DOWN:
 				ret = SUCCEED;
 				break;
-			default:
+			case ZBX_DB_OK:
 				info->nodeid = nodeid;
 				ret = SUCCEED;
 				break;
@@ -813,15 +810,8 @@ out:
 finish:
 	if (ZBX_NODE_STATUS_ERROR != info->ha_status)
 	{
-		switch (info->db_status)
-		{
-			case ZBX_DB_FAIL:
-				ha_set_error(info, "database error");
-				break;
-			case ZBX_DB_OK:
-				info->ha_status = ha_status;
-				break;
-		}
+		if (ZBX_DB_OK == info->db_status)
+			info->ha_status = ha_status;
 	}
 
 	zbx_vector_ha_node_clear_ext(&nodes, zbx_ha_node_free);
@@ -1053,9 +1043,6 @@ finish:
 	{
 		switch (info->db_status)
 		{
-			case ZBX_DB_FAIL:
-				ha_set_error(info, "database error");
-				break;
 			case ZBX_DB_DOWN:
 				info->offline_ticks++;
 
