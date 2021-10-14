@@ -38,6 +38,10 @@
 #	include "common/common.h"
 #endif
 
+#ifdef WITH_HTTP_METRICS
+#	include "common/http_metrics.h"
+#endif
+
 #ifdef WITH_SIMPLE_METRICS
 #	include "simple/simple.h"
 #endif
@@ -234,6 +238,17 @@ void	init_metrics(void)
 	for (i = 0; NULL != parameters_common_local[i].key; i++)
 	{
 		if (SUCCEED != add_metric_local(&parameters_common_local[i], error, sizeof(error)))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot add item key: %s", error);
+			exit(EXIT_FAILURE);
+		}
+	}
+#endif
+
+#ifdef WITH_HTTP_METRICS
+	for (i = 0; NULL != parameters_common_http[i].key; i++)
+	{
+		if (SUCCEED != add_metric(&parameters_common_http[i], error, sizeof(error)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot add item key: %s", error);
 			exit(EXIT_FAILURE);

@@ -50,6 +50,10 @@
 			<arg line="-I/usr/include"/>
 			<arg line="-I/usr/local/include"/>
 			<arg line="-I./include"/>
+			<!-- Exclude Duktape library from checking -->
+			<arg line="-isrc/libs/zbxembed/duk_config.h"/>
+			<arg line="-isrc/libs/zbxembed/duktape.c"/>
+			<arg line="-isrc/libs/zbxembed/duktape.h"/>
 			<arg line="--suppress=variableScope:*"/>
 			<arg line="--suppress=ConfigurationNotChecked:*"/>
 			<arg line="--inconclusive"/>

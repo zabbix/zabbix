@@ -934,7 +934,7 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'item_count(1)',
-					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "item_count(1)".'
+					'error' => 'Invalid parameter "/1/params": incorrect usage of function "item_count".'
 				]
 			],
 			// cot() function validation.

@@ -21,11 +21,11 @@ instance is available for connection.
 ## Configuration
 The Zabbix Agent's configuration file is used to configure plugins.
 
-**Plugins.Redis.KeepAlive** — The amount of time a connection can remain idle before it is closed.  
+**Plugins.Redis.KeepAlive** — Sets a time for waiting before unused connections will be closed.  
 *Default value:* 300 sec.  
 *Limits:* 60-900
 
-**Plugins.Redis.Timeout** — The maximum amount of time in seconds to wait for a request to be done.  
+**Plugins.Redis.Timeout** — The maximum time for waiting when a request has to be done.  
 *Default value:* equals the global Timeout configuration parameter.  
 *Limits:* 1-30
 
