@@ -21,14 +21,15 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $output = [
 	'name' => $data['name'],
-	'body' => (new CPartial('administration.system.information', [
-		'system_information' => $data['system_information'],
-		'user_role' => $data['user_role'],
-		'info_type' => $data['info_type']
+	'body' => (new CPartial('administration.system.info', [
+		'system_info' => $data['system_info'],
+		'info_type' => $data['info_type'],
+		'user_type' => $data['user_type']
 	]))->getOutput()
 ];
 

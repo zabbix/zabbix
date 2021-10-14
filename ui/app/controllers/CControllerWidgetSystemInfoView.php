@@ -19,7 +19,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/blocks.inc.php';
+require_once __DIR__.'/../../include/blocks.inc.php';
 
 class CControllerWidgetSystemInfoView extends CControllerWidget {
 
@@ -39,9 +39,9 @@ class CControllerWidgetSystemInfoView extends CControllerWidget {
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultName()),
-			'system_information' => CSystemInformationHelper::getData(),
+			'system_info' => CSystemInfoHelper::getData(),
 			'info_type' => $fields['info_type'],
-			'user_role' => CWebUser::getType(),
+			'user_type' => CWebUser::getType(),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
