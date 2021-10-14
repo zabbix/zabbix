@@ -262,7 +262,7 @@ class testHaNode extends CAPITest {
 	}
 
 	/**
-	 * Verify technical fields like sessionid are not returned, ha_nodeid can be excluded from result.
+	 * Verify technical fields like ha_sessionid are not returned, ha_nodeid can be excluded from result.
 	 */
 	public static function hanode_field_map() {
 		return [
@@ -276,7 +276,8 @@ class testHaNode extends CAPITest {
 					'name' => 'node5',
 					'address' => '192.168.1.9',
 					'port' => '10053',
-					'status' => 1
+					'status' => 1,
+					'ha_sessionid' => null
 				]
 			],
 			'Check absence of fields via output limitation, and sorting with limit' => [
@@ -292,7 +293,8 @@ class testHaNode extends CAPITest {
 					'name' => 'node8',
 					'address' => '192.168.1.12',
 					'port' => null,
-					'status' => null
+					'status' => null,
+					'ha_sessionid' => null
 				]
 			],
 			'Check countOutput' => [

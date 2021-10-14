@@ -8724,7 +8724,7 @@ return [
 				'length' => 10,
 				'default' => '0'
 			],
-			'sessionid' => [
+			'ha_sessionid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CUID,
 				'length' => 25,

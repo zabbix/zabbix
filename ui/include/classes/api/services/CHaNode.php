@@ -83,7 +83,7 @@ class CHaNode extends CApiService {
 
 		if ($db_nodes) {
 			$db_nodes = $this->unsetExtraFields($db_nodes, ['ha_nodeid'], $options['output']);
-			$db_nodes = $this->unsetExtraFields($db_nodes, ['sessionid']);
+			$db_nodes = $this->unsetExtraFields($db_nodes, ['ha_sessionid']);
 
 			if (!$options['preservekeys']) {
 				$db_nodes = array_values($db_nodes);
