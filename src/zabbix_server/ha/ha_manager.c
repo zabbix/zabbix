@@ -653,6 +653,24 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: ha_flush_audit                                                   *
+ *                                                                            *
+ * Purpose: flush audit taking in account database connection status          *
+ *                                                                            *
+ ******************************************************************************/
+static void	ha_flush_audit(zbx_ha_info_t *info)
+{
+	if (ZBX_DB_OK > info->db_status)
+	{
+		zbx_audit_clean();
+		return;
+	}
+
+	info->db_status = zbx_audit_flush_once();
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: ha_db_create_node                                                *
  *                                                                            *
  * Purpose: add new node record in ha_node table if necessary                 *
@@ -714,7 +732,7 @@ static void	ha_db_create_node(zbx_ha_info_t *info)
 		zbx_audit_init(info->auditlog);
 		zbx_audit_ha_create_entry(AUDIT_ACTION_ADD, nodeid.str, info->name);
 		zbx_audit_ha_add_create_fields(nodeid.str, info->name, ZBX_NODE_STATUS_STOPPED);
-		zbx_audit_flush_once();
+		ha_flush_audit(info);
 	}
 
 	zbx_free(name_esc);
@@ -827,10 +845,8 @@ static void	ha_db_register_node(zbx_ha_info_t *info)
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",port=%d", port);
 	}
 
-	if (SUCCEED == ha_db_execute(info, "%s where ha_nodeid='%s'", sql, info->nodeid.str))
-		zbx_audit_flush_once();
-	else
-		zbx_audit_clean();
+	ha_db_execute(info, "%s where ha_nodeid='%s'", sql, info->nodeid.str);
+	ha_flush_audit(info);
 
 	zbx_free(sql);
 	zbx_free(address);
@@ -908,7 +924,7 @@ static int	ha_check_standby_nodes(zbx_ha_info_t *info, zbx_vector_ha_node_t *nod
 	zbx_vector_str_destroy(&unavailable_nodes);
 
 	if (SUCCEED == ret)
-		zbx_audit_flush_once();
+		ha_flush_audit(info);
 	else
 		zbx_audit_clean();
 
@@ -1060,10 +1076,8 @@ static void	ha_check_nodes(zbx_ha_info_t *info)
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where ha_nodeid='%s'", info->nodeid.str);
 
-	if (SUCCEED == ha_db_execute(info, "%s", sql))
-		zbx_audit_flush_once();
-	else
-		zbx_audit_clean();
+	ha_db_execute(info, "%s", sql);
+	ha_flush_audit(info);
 
 	zbx_free(sql);
 out:
@@ -1241,7 +1255,7 @@ static int	ha_remove_node_by_index(zbx_ha_info_t *info, int index, char **error)
 		zbx_audit_init(info->auditlog);
 		zbx_audit_ha_create_entry(AUDIT_ACTION_DELETE, nodes.values[index]->nodeid.str,
 				nodes.values[index]->name);
-		zbx_audit_flush_once();
+		ha_flush_audit(info);
 	}
 
 	ret = SUCCEED;
@@ -1391,7 +1405,7 @@ static void	ha_db_update_exit_status(zbx_ha_info_t *info)
 		zbx_audit_init(info->auditlog);
 		zbx_audit_ha_create_entry(AUDIT_ACTION_UPDATE, info->nodeid.str, info->name);
 		zbx_audit_ha_update_field_int(info->nodeid.str, ZBX_AUDIT_HA_STATUS, info->ha_status, ZBX_NODE_STATUS_STOPPED);
-		zbx_audit_flush_once();
+		ha_flush_audit(info);
 	}
 out:
 	ha_db_commit(info);

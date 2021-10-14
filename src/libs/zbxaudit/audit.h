@@ -82,7 +82,7 @@ int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_e
 void	zbx_audit_init(int audit_mode_set);
 void	zbx_audit_clean(void);
 void	zbx_audit_flush(void);
-void	zbx_audit_flush_once(void);
+int	zbx_audit_flush_once(void);
 int	zbx_audit_initialized(void);
 void	zbx_audit_update_json_append_string(const zbx_uint64_t id, const char *audit_op, const char *key,
 		const char *value);

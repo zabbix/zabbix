@@ -332,14 +332,15 @@ void	zbx_audit_flush(void)
 	zbx_audit_clean();
 }
 
-void	zbx_audit_flush_once(void)
+int	zbx_audit_flush_once(void)
 {
 	char			audit_cuid[CUID_LEN], recsetid_cuid[CUID_LEN];
-	int			ret;
+	int			ret = ZBX_DB_OK;
 	zbx_hashset_iter_t	iter;
 	zbx_audit_entry_t	**audit_entry;
 
-	RETURN_IF_AUDIT_OFF();
+	if (ZBX_AUDITLOG_ENABLED != zbx_get_audit_mode())
+		return ZBX_DB_OK;
 
 	zbx_new_cuid(recsetid_cuid);
 	zbx_hashset_iter_reset(&zbx_audit, &iter);
@@ -385,6 +386,8 @@ void	zbx_audit_flush_once(void)
 	}
 
 	zbx_audit_clean();
+
+	return ret;
 }
 
 void	zbx_audit_update_json_append_string(const zbx_uint64_t id, const char *audit_op, const char *key,

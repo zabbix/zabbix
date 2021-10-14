@@ -1439,13 +1439,13 @@ int	get_process_type_by_name(const char *proc_type_str)
 
 	for (i = 0; i < ZBX_PROCESS_TYPE_COUNT; i++)
 	{
-		if (0 == strcmp(proc_type_str, get_process_type_string(i)))
+		if (0 == strcmp(proc_type_str, get_process_type_string((unsigned char)i)))
 			return i;
 	}
 
 	for (i = ZBX_PROCESS_TYPE_EXT_FIRST; i <= ZBX_PROCESS_TYPE_EXT_LAST; i++)
 	{
-		if (0 == strcmp(proc_type_str, get_process_type_string(i)))
+		if (0 == strcmp(proc_type_str, get_process_type_string((unsigned char)i)))
 			return i;
 	}
 
