@@ -113,6 +113,12 @@ class testCalculatedFormula extends CWebTest {
 					'formula' => 'bitand(last(/host/key,"{$USERMACRO}:now-24h"),123)'
 				]
 			],
+			// bucket_percentile() function.
+			[
+				[
+					'formula' => 'bucket_percentile(/host/trap[*],30m,70)'
+				]
+			],
 			// cbrt() function.
 			[
 				[
@@ -410,6 +416,17 @@ class testCalculatedFormula extends CWebTest {
 					'formula' => 'fuzzytime(/host/trap,5h)'
 				]
 			],
+			// histogram_quantile() function.
+			[
+				[
+					'formula' => 'histogram_quantile(0.7,bucket_rate_foreach(/host/trap[*],30m))'
+				]
+			],
+			[
+				[
+					'formula' => "histogram_quantile(0.7,1.0,last(/host/trap[1.0]),7.5,last(/host/trap[7.5]),\"+Inf\",last(/host/trap[Inf]))"
+				]
+			],
 			// last() function.
 			[
 				[
@@ -587,6 +604,12 @@ class testCalculatedFormula extends CWebTest {
 			[
 				[
 					'formula' => "radians(last(//trap))"
+				]
+			],
+			// rate() function.
+			[
+				[
+					'formula' => 'rate(/host/trap,1h:now-30m)'
 				]
 			],
 			// round()function.
@@ -827,6 +850,28 @@ class testCalculatedFormula extends CWebTest {
 					'expected' => TEST_BAD,
 					'formula' => 'bitand(/*/key,1h:now/h,123)',
 					'error' => 'Invalid parameter "/1/params": incorrect usage of function "bitand".'
+				]
+			],
+			// bucket_percentile() function validation.
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'bucket_percentile(/host/trap[*],30m,123)',
+					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "bucket_percentile".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'bucket_percentile(/host/trap[*],#4,10)',
+					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "bucket_percentile".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'bucket_percentile(host/trap[*],30m,45)',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "bucket_percentile(host/trap[*],30m,45)".'
 				]
 			],
 			// change() function validation.
@@ -1118,6 +1163,56 @@ class testCalculatedFormula extends CWebTest {
 					'expected' => TEST_BAD,
 					'formula' => 'fuzzytime(/*/trap,65w)',
 					'error' => 'Invalid parameter "/1/params": invalid first parameter in function "fuzzytime".'
+				]
+			],
+			// histogram_quantile() function validation.
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'histogram_quantile(0.7,bucket_rate_foreach(/host/trap[*]))',
+					'error' => 'Invalid parameter "/1/params": mandatory parameter is missing in function "bucket_rate_foreach".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'histogram_quantile(0.7,bucket_rate_foreach(host/trap[*],30m))',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "histogram_quantile(0.7,bucket_rate_foreach(host/trap[*],30m))".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'histogram_quantile(test,bucket_rate_foreach(/host/trap[*],3h))',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "histogram_quantile(test,bucket_rate_foreach(/host/trap[*],3h))".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => "histogram_quantile(test,1.0,last(/host/trap[1.0]),7.5,last(/host/trap[7.5]),\"+Inf\",last(/host/trap[Inf]))",
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "histogram_quantile(test,1.0,last(/host/trap[1.0]),7.5,last(/host/trap[7.5]),"+Inf",last(/host/trap[Inf]))".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => "histogram_quantile(0.7,test,last(/host/trap[1.0]),7.5,last(/host/trap[7.5]),\"+Inf\",last(/host/trap[Inf]))",
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "histogram_quantile(0.7,test,last(/host/trap[1.0]),7.5,last(/host/trap[7.5]),"+Inf",last(/host/trap[Inf]))".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => "histogram_quantile(0.7,1.0,last(/host/trap[1.0]))",
+					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "histogram_quantile".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => "histogram_quantile(0.7,1.0,last(/host/trap[1.0]),7.5,(/host/trap[7.5]),\"+Inf\",last(/host/trap[Inf]))",
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "histogram_quantile(0.7,1.0,last(/host/trap[1.0]),7.5,(/host/trap[7.5]),"+Inf",last(/host/trap[Inf]))".'
 				]
 			],
 			// last() function validation.
@@ -1804,6 +1899,35 @@ class testCalculatedFormula extends CWebTest {
 					'expected' => TEST_BAD,
 					'formula' => 'trendsum(/host/item,1h)',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "trendsum".'
+				]
+			],
+			// rate() function.
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'rate(/host/item,test)',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "rate(/host/item,test)".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'rate(/host/item,,)',
+					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "rate".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'rate(/host/item,)',
+					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "rate".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'rate(/item,1h:now-30m)',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "rate(/item,1h:now-30m)".'
 				]
 			],
 			// Deprecated functions validation.
