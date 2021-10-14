@@ -772,6 +772,48 @@ class testFormTrigger extends CLegacyWebTest {
 						]
 					]
 				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'description' => 'MyTrigger_rate',
+					'expression' => 'rate(/Simple form test host/test-item-reuse,2m:now-1h)>0.5',
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'description' => 'MyTrigger_rate',
+					'expression' => 'rate(/Simple form test host/test-item-reuse,test)>0.5',
+					'error_msg' => 'Cannot add trigger',
+					'errors' => [
+						"Invalid parameter \"/1/expression\": incorrect expression starting from ".
+						"\"rate(/Simple form test host/test-item-reuse,test)>0.5\"."
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'description' => 'MyTrigger_rate',
+					'expression' => 'rate(Simple form test host/test-item-reuse,1h)>0.5',
+					'error_msg' => 'Cannot add trigger',
+					'errors' => [
+						"Invalid parameter \"/1/expression\": incorrect expression starting from ".
+						"\"rate(Simple form test host/test-item-reuse,1h)>0.5\"."
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'description' => 'MyTrigger_rate',
+					'expression' => 'rate(/Simple form test host/test,1h)>0.5',
+					'error_msg' => 'Cannot add trigger',
+					'errors' => [
+						'Incorrect item key "test" provided for trigger expression on "Simple form test host".'
+					]
+				]
 			]
 		];
 	}
