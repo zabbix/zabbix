@@ -223,8 +223,7 @@ static unsigned	zbx_audit_hash_func(const void *data)
 
 	hash = ZBX_DEFAULT_UINT64_HASH_ALGO(&((*audit_entry)->id), sizeof((*audit_entry)->id), ZBX_DEFAULT_HASH_SEED);
 
-	return ZBX_DEFAULT_UINT64_HASH_ALGO(&((*audit_entry)->id_table), sizeof((*audit_entry)->id_table),
-			hash);
+	return ZBX_DEFAULT_UINT64_HASH_ALGO(&((*audit_entry)->id_table), sizeof((*audit_entry)->id_table), hash);
 }
 
 static int	zbx_audit_compare_func(const void *d1, const void *d2)

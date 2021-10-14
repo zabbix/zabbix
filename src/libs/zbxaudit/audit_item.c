@@ -255,8 +255,8 @@ void	zbx_audit_item_update_json_add_lld_data(zbx_uint64_t itemid, const zbx_lld_
 	ADD_JSON_S(snmp_oid, AUDIT_TABLE_NAME, "snmp_oid");
 	ADD_JSON_P_UI(authtype, AUDIT_TABLE_NAME, "authtype");
 	ADD_JSON_S(username, AUDIT_TABLE_NAME, "username");
-	zbx_audit_update_json_append_string_secret(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD, IT(password), item->password,
-			AUDIT_TABLE_NAME, "password");
+	zbx_audit_update_json_append_string_secret(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD, IT(password),
+			item->password, AUDIT_TABLE_NAME, "password");
 	ADD_JSON_P_S(publickey, AUDIT_TABLE_NAME, "publickey");
 	ADD_JSON_P_S(privatekey, AUDIT_TABLE_NAME, "privatekey");
 	ADD_JSON_S(description, AUDIT_TABLE_NAME, "description");
