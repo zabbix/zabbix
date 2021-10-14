@@ -1728,7 +1728,7 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 	zbx_ipc_client_t	*client, *main_proc = NULL;
 	zbx_ipc_message_t	*message;
 	int			stop = FAIL;
-	double			lastcheck, now, nextcheck, timeout;
+	double			lastcheck, now, nextcheck;
 	zbx_ha_info_t		info;
 
 	zbx_setproctitle("ha manager");
@@ -1795,9 +1795,7 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 				nextcheck += ZBX_HA_POLL_PERIOD;
 		}
 
-		timeout = nextcheck - now;
-
-		(void)zbx_ipc_service_recv(&service, timeout, &client, &message);
+		(void)zbx_ipc_service_recv(&service, nextcheck - now, &client, &message);
 
 		if (NULL != message)
 		{
