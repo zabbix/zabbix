@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 The template for monitoring Switch MikroTik CRS326-24S+2Q+RM.
 
 Our fastest switch for the most demanding setups

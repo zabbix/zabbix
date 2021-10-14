@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 The template for monitoring Ethernet router MikroTik RB3011UiAS-RM.
 
 1U rackmount, 10xGigabit Ethernet, SFP, USB 3.0, LCD, PoE out on port 10, 2x1.4GHz CPU, 1GB RAM, RouterOS L5
