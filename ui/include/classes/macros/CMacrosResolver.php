@@ -1348,8 +1348,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		}
 		unset($item);
 
-		$types = ['usermacros' => true, 'references' => true];
-		$macro_values = [];
+		$types = ['usermacros' => true];
 		$usermacros = [];
 
 		foreach ($items as $key => $item) {
@@ -1358,56 +1357,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			if ($matched_macros['usermacros']) {
 				$usermacros[$key] = ['hostids' => [$item['hostid']], 'macros' => $matched_macros['usermacros']];
 			}
-
-			if ($matched_macros['references']) {
-				$macro_values[$key] = $matched_macros['references'];
-			}
 		}
 
-		if ($macro_values) {
-			$items_with_unresolved_keys = [];
-			$expanded_keys = [];
-
-			// Resolve macros in item key.
-			foreach ($macro_values as $key => $macros) {
-				if (!array_key_exists('key_expanded', $items[$key])) {
-					$items_with_unresolved_keys[$key] = [
-						'itemid' => $items[$key]['itemid'],
-						'hostid' => $items[$key]['hostid'],
-						'key_' => $items[$key]['key_']
-					];
-				}
-				else {
-					$expanded_keys[$key] = $items[$key]['key_expanded'];
-				}
-			}
-
-			if ($items_with_unresolved_keys) {
-				foreach ($this->resolveItemKeys($items_with_unresolved_keys) as $key => $item) {
-					$expanded_keys[$key] = $item['key_expanded'];
-				}
-			}
-
-			$item_key_parser = new CItemKey();
-
-			foreach ($expanded_keys as $key => $expanded_key) {
-				if ($item_key_parser->parse($expanded_key) == CParser::PARSE_SUCCESS) {
-					foreach ($macro_values[$key] as $macro => &$value) {
-						if (($param = $item_key_parser->getParam($macro[1] - 1)) !== null) {
-							$value = $param;
-						}
-					}
-					unset($value);
-				}
-			}
-		}
-
-		foreach ($this->getUserMacros($usermacros) as $key => $usermacros_data) {
-			$macro_values[$key] = array_key_exists($key, $macro_values)
-				? array_merge($macro_values[$key], $usermacros_data['macros'])
-				: $usermacros_data['macros'];
-		}
-
+		$macro_values = array_column($this->getUserMacros($usermacros), 'macros');
 		$types = $this->transformToPositionTypes($types);
 
 		// Replace macros to value.
