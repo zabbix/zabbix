@@ -13629,10 +13629,9 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 
 		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS))
 		{
-			proxy->auto_compress = diff->compress;
-
 			if (proxy->auto_compress == diff->compress)
 				diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS);
+			proxy->auto_compress = diff->compress;
 		}
 		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTERROR))
 		{

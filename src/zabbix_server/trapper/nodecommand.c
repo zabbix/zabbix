@@ -44,7 +44,7 @@
 static int	execute_remote_script(const zbx_script_t *script, const DC_HOST *host, char **info, char *error,
 		size_t max_error_len)
 {
-	int		ret, time_start;
+	int		time_start;
 	zbx_uint64_t	taskid;
 	DB_RESULT	result = NULL;
 	DB_ROW		row;
@@ -67,6 +67,8 @@ static int	execute_remote_script(const zbx_script_t *script, const DC_HOST *host
 
 		if (NULL != (row = DBfetch(result)))
 		{
+			int	ret;
+
 			if (SUCCEED == (ret = atoi(row[0])))
 				*info = zbx_strdup(*info, row[1]);
 			else

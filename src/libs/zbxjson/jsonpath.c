@@ -225,7 +225,6 @@ static void	jsonpath_list_free(zbx_jsonpath_list_node_t *list)
 	{
 		zbx_jsonpath_list_node_t	*item = list;
 
-		item = list;
 		list = list->next;
 		zbx_free(item);
 	}

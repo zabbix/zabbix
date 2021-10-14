@@ -3103,7 +3103,6 @@ static void	DBhost_prototypes_tags_make(zbx_vector_ptr_t *host_prototypes, zbx_v
 			host_prototype = (zbx_host_prototype_t *)host_prototypes->values[i];
 		}
 
-
 		tag = zbx_db_tag_create(row[1], row[2]);
 		tag->tagid = 0;
 		zbx_vector_db_tag_ptr_append(&host_prototype->tags, tag);
