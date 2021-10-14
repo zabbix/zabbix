@@ -436,6 +436,7 @@ func TestIsHostnameOnly(t *testing.T) {
 		{"query", args{"www.example.com?foo=example&bar=test"}, true},
 		{"user_and_password", args{"username:password@example.com/"}, true},
 		{"port", args{"example.com:443"}, true},
+		{"fake_port", args{"example.com:abc"}, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

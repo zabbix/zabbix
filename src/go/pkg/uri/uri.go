@@ -247,7 +247,7 @@ func (v URIValidator) Validate(value *string) error {
 
 func IsHostnameOnly(host string) error {
 	if strings.Contains(host, ":/") {
-		return fmt.Errorf("%s must be hostname only", host)
+		return fmt.Errorf("must not contain scheme")
 	}
 
 	uri, err := New(host, &Defaults{Port: "", Scheme: ""})
@@ -255,9 +255,28 @@ func IsHostnameOnly(host string) error {
 		return err
 	}
 
-	if uri.Port() != "" || uri.Socket() != "" || uri.User() != "" || uri.Password() != "" ||
-		uri.Query() != "" || uri.Path() != "" {
-		return fmt.Errorf("%s must be hostname only", host)
+	if uri.Port() != "" {
+		return fmt.Errorf("must not contain port")
+	}
+
+	if uri.Socket() != "" {
+		return fmt.Errorf("must not contain socket")
+	}
+
+	if uri.User() != "" {
+		return fmt.Errorf("must not contain user")
+	}
+
+	if uri.Password() != "" {
+		return fmt.Errorf("must not contain password")
+	}
+
+	if uri.Query() != "" {
+		return fmt.Errorf("must not contain query")
+	}
+
+	if uri.Path() != "" {
+		return fmt.Errorf("must not contain path")
 	}
 
 	return nil
