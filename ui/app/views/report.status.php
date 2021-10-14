@@ -21,15 +21,16 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
-require_once dirname(__FILE__).'/../../include/blocks.inc.php';
+require_once __DIR__.'/../../include/blocks.inc.php';
 
-$widget = (new CWidget())
+(new CWidget())
 	->setTitle(_('System information'))
-	->addItem(new CPartial('administration.system.information', [
-		'system_information' => $data['system_information'],
+	->addItem(new CPartial('administration.system.info', [
+		'system_info' => $data['system_info'],
 		'info_type' => SYSTEM_INFO_SERVER_STATS | SYSTEM_INFO_HAC_STATUS,
-		'user_role' => $data['user_role']
+		'user_type' => $data['user_type']
 	]))
 	->show();

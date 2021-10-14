@@ -21,24 +21,25 @@
 
 /**
  * @var CPartial $this
+ * @var array    $data
  */
 
-$nodes_table = null;
 $info_table = (new CTableInfo());
-$sysinfo = $data['system_information'];
 
 if ($data['info_type'] & SYSTEM_INFO_SERVER_STATS) {
-	$status = $sysinfo['status'];
+	$status = $data['system_info']['status'];
 
 	$info_table
 		->setHeader([_('Parameter'), _('Value'), _('Details')])
 		->setHeadingColumn(0)
-		->addRow([_('Zabbix server is running'),
+		->addRow([
+			_('Zabbix server is running'),
 			(new CSpan($status['is_running'] ? _('Yes') : _('No')))
 				->addClass($status['is_running'] ? ZBX_STYLE_GREEN : ZBX_STYLE_RED),
-			$sysinfo['server_details']
+			$data['system_info']['server_details']
 		])
-		->addRow([_('Number of hosts (enabled/disabled)'),
+		->addRow([
+			_('Number of hosts (enabled/disabled)'),
 			$status['has_status'] ? $status['hosts_count'] : '',
 			$status['has_status']
 				? [
@@ -47,62 +48,73 @@ if ($data['info_type'] & SYSTEM_INFO_SERVER_STATS) {
 				]
 				: ''
 		])
-		->addRow([_('Number of templates'),
-			$status['has_status'] ? $status['hosts_count_template'] : '', ''
+		->addRow([
+			_('Number of templates'),
+			$status['has_status'] ? $status['hosts_count_template'] : '',
+			''
+		])
+		->addRow([
+			(new CSpan(_('Number of items (enabled/disabled/not supported)')))
+				->setTitle(_('Only items assigned to enabled hosts are counted')),
+			$status['has_status'] ? $status['items_count'] : '',
+			$status['has_status']
+				? [
+					(new CSpan($status['items_count_monitored']))->addClass(ZBX_STYLE_GREEN), ' / ',
+					(new CSpan($status['items_count_disabled']))->addClass(ZBX_STYLE_RED), ' / ',
+					(new CSpan($status['items_count_not_supported']))->addClass(ZBX_STYLE_GREY)
+				]
+				: ''
+		])
+		->addRow([
+			(new CSpan(_('Number of triggers (enabled/disabled [problem/ok])')))
+				->setTitle(_('Only triggers assigned to enabled hosts and depending on enabled items are counted')),
+			$status['has_status'] ? $status['triggers_count'] : '',
+			$status['has_status']
+				? [
+					$status['triggers_count_enabled'], ' / ',
+					$status['triggers_count_disabled'], ' [',
+					(new CSpan($status['triggers_count_on']))->addClass(ZBX_STYLE_RED), ' / ',
+					(new CSpan($status['triggers_count_off']))->addClass(ZBX_STYLE_GREEN), ']'
+				]
+				: ''
+		])
+		->addRow([
+			_('Number of users (online)'),
+			$status['has_status'] ? $status['users_count'] : '',
+			$status['has_status'] ? (new CSpan($status['users_online']))->addClass(ZBX_STYLE_GREEN) : ''
 		]);
 
-	$title = (new CSpan(_('Number of items (enabled/disabled/not supported)')))
-		->setTitle(_('Only items assigned to enabled hosts are counted'));
-	$info_table->addRow([$title, $status['has_status'] ? $status['items_count'] : '',
-		$status['has_status']
-			? [
-				(new CSpan($status['items_count_monitored']))->addClass(ZBX_STYLE_GREEN), ' / ',
-				(new CSpan($status['items_count_disabled']))->addClass(ZBX_STYLE_RED), ' / ',
-				(new CSpan($status['items_count_not_supported']))->addClass(ZBX_STYLE_GREY)
-			]
-			: ''
-	]);
-
-	$title = (new CSpan(_('Number of triggers (enabled/disabled [problem/ok])')))
-		->setTitle(_('Only triggers assigned to enabled hosts and depending on enabled items are counted'));
-	$info_table->addRow([$title, $status['has_status'] ? $status['triggers_count'] : '',
-		$status['has_status']
-			? [
-				$status['triggers_count_enabled'], ' / ',
-				$status['triggers_count_disabled'], ' [',
-				(new CSpan($status['triggers_count_on']))->addClass(ZBX_STYLE_RED), ' / ',
-				(new CSpan($status['triggers_count_off']))->addClass(ZBX_STYLE_GREEN), ']'
-			]
-			: ''
-	]);
-	$info_table->addRow([_('Number of users (online)'), $status['has_status'] ? $status['users_count'] : '',
-		$status['has_status'] ? (new CSpan($status['users_online']))->addClass(ZBX_STYLE_GREEN) : ''
-	]);
-
-	if ($data['user_role'] == USER_TYPE_SUPER_ADMIN) {
-		$info_table->addRow([_('Required server performance, new values per second'),
-			($status['has_status'] && array_key_exists('vps_total', $status)) ? round($status['vps_total'], 2) : '', ''
+	if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
+		$info_table->addRow([
+			_('Required server performance, new values per second'),
+			($status['has_status'] && array_key_exists('vps_total', $status)) ? round($status['vps_total'], 2) : '',
+			''
 		]);
 
 		// Check requirements.
-		foreach ($sysinfo['requirements'] as $requirement) {
+		foreach ($data['system_info']['requirements'] as $requirement) {
 			if ($requirement['result'] == CFrontendSetup::CHECK_FATAL) {
 				$info_table->addRow(
-					(new CRow([$requirement['name'], $requirement['current'], $requirement['error']]))
-						->addClass(ZBX_STYLE_RED)
+					(new CRow([
+						$requirement['name'],
+						$requirement['current'],
+						$requirement['error']
+					]))->addClass(ZBX_STYLE_RED)
 				);
 			}
 		}
 
-		if ($sysinfo['encoding_warning'] !== '') {
+		if ($data['system_info']['encoding_warning'] !== '') {
 			$info_table->addRow(
-				(new CRow((new CCol($sysinfo['encoding_warning']))->setAttribute('colspan', 3)))->addClass(ZBX_STYLE_RED)
+				(new CRow(
+					(new CCol($data['system_info']['encoding_warning']))->setAttribute('colspan', 3)
+				))->addClass(ZBX_STYLE_RED)
 			);
 		}
 	}
 
 	// Warn if database history $info_tables have not been upgraded.
-	if (!$sysinfo['float_double_precision']) {
+	if (!$data['system_info']['float_double_precision']) {
 		$info_table->addRow([
 			_('Database history $info_tables upgraded'),
 			(new CSpan(_('No')))->addClass(ZBX_STYLE_RED),
@@ -111,8 +123,8 @@ if ($data['info_type'] & SYSTEM_INFO_SERVER_STATS) {
 	}
 
 	// Check DB version.
-	if ($data['user_role'] == USER_TYPE_SUPER_ADMIN) {
-		foreach ($sysinfo['dbversion_status'] as $dbversion) {
+	if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
+		foreach ($data['system_info']['dbversion_status'] as $dbversion) {
 			if ($dbversion->flag == DB_VERSION_SUPPORTED) {
 				continue;
 			}
@@ -155,22 +167,24 @@ if ($data['info_type'] & SYSTEM_INFO_SERVER_STATS) {
 	}
 }
 
-if (!$sysinfo['ha_cluster_enabled']) {
+if (!$data['system_info']['ha_cluster_enabled']) {
 	$info_table->addRow([_('High availability cluster'), _('Disabled'), '']);
 }
 else {
 	$info_table->addRow([_('High availability cluster'),
 		(new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN),
-		_s('Fail-over delay: %1$s', $sysinfo['failover_delay'])
+		_s('Fail-over delay: %1$s', $data['system_info']['failover_delay'])
 	]);
 }
 
-if ($data['info_type'] & SYSTEM_INFO_HAC_STATUS && $data['user_role'] == USER_TYPE_SUPER_ADMIN) {
+$nodes_table = null;
+
+if ($data['info_type'] & SYSTEM_INFO_HAC_STATUS && $data['user_type'] == USER_TYPE_SUPER_ADMIN) {
 	$nodes_table = (new CTableInfo())
 		->setHeader([_('Name'), _('Address'), _('Last access'), _('Status')])
 		->setHeadingColumn(0);
 
-	foreach ($sysinfo['ha_nodes'] as $node) {
+	foreach ($data['system_info']['ha_nodes'] as $node) {
 		$status_element = new CCol();
 
 		switch($node['status']) {
@@ -204,8 +218,7 @@ if ($data['info_type'] & SYSTEM_INFO_HAC_STATUS && $data['user_role'] == USER_TY
 	}
 }
 
-$wrapper = (new CDiv())
+(new CDiv())
 	->addItem($info_table)
-	->addItem($nodes_table);
-
-$wrapper->show();
+	->addItem($nodes_table)
+	->show();

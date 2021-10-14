@@ -22,7 +22,7 @@
 /**
  * Class collecting various system information aspects.
  */
-class CSystemInformationHelper {
+class CSystemInfoHelper {
 
 	/**
 	 * Prepare data used to compile as System information.
