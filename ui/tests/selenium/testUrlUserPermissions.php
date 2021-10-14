@@ -50,26 +50,6 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'overview.php',
-				'title' =>	'Overview [refreshed every 30 sec.]',
-				'header' =>	'Trigger overview',
-				'users' => [
-					'guest' => true,
-					'user-zabbix' => true,
-					'admin-zabbix' => true
-				]
-			]],
-			[[
-				'url' => 'overview.php?form_refresh=1&groupid=0&type=0&view_style=0',
-				'title' =>	'Overview [refreshed every 30 sec.]',
-				'header' =>	'Trigger overview',
-				'users' => [
-					'guest' => true,
-					'user-zabbix' => true,
-					'admin-zabbix' => true
-				]
-			]],
-			[[
 				'url' => 'zabbix.php?action=web.view',
 				'title' =>	'Web monitoring',
 				'header' =>	'Web monitoring',
