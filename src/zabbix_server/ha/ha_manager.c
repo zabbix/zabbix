@@ -1728,7 +1728,7 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 	zbx_ipc_client_t	*client, *main_proc = NULL;
 	zbx_ipc_message_t	*message;
 	int			stop = FAIL;
-	double			lastcheck, now, nextcheck;
+	double			now, nextcheck;
 	zbx_ha_info_t		info;
 
 	zbx_setproctitle("ha manager");
@@ -1753,7 +1753,7 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 	info.failover_delay = ZBX_HA_DEFAULT_FAILOVER_DELAY;
 	info.auditlog = 0;
 
-	lastcheck = zbx_time();
+	now = zbx_time();
 
 	if (ZBX_NODE_STATUS_UNKNOWN == info.ha_status)
 	{
@@ -1762,10 +1762,10 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 		if (ZBX_NODE_STATUS_ERROR == info.ha_status)
 			goto pause;
 		else
-			nextcheck = lastcheck + ZBX_HA_POLL_PERIOD;
+			nextcheck = now + ZBX_HA_POLL_PERIOD;
 	}
 	else
-		nextcheck = lastcheck + SEC_PER_MIN;
+		nextcheck = now + SEC_PER_MIN;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "HA manager started in %s mode", zbx_ha_status_str(info.ha_status));
 
