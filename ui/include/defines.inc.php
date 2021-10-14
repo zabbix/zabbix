@@ -2045,10 +2045,10 @@ define('ZBX_ROLE_RULE_API_WILDCARD_ALIAS',		'*.*');
 define('ZBX_NOREFERER', true);
 
 // High availability server node states.
-define('ZBX_NODE_STATUS_STANDBY', 0);
-define('ZBX_NODE_STATUS_STOPPED', 1);
-define('ZBX_NODE_STATUS_UNAVAILABLE', 2);
-define('ZBX_NODE_STATUS_ACTIVE', 3);
+define('ZBX_NODE_STATUS_STANDBY',		0);
+define('ZBX_NODE_STATUS_STOPPED',		1);
+define('ZBX_NODE_STATUS_UNAVAILABLE',	2);
+define('ZBX_NODE_STATUS_ACTIVE',		3);
 
 // init $_REQUEST
 ini_set('variables_order', 'GP');
