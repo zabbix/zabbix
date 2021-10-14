@@ -726,7 +726,7 @@ finish:
 static void	ha_db_register_node(zbx_ha_info_t *info)
 {
 	zbx_vector_ha_node_t	nodes;
-	int			ret, ha_status = ZBX_NODE_STATUS_UNKNOWN, activate = SUCCEED, db_time;
+	int			ha_status = ZBX_NODE_STATUS_UNKNOWN, activate = SUCCEED, db_time;
 	char			*address = NULL, *sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	unsigned short		port = 0;
@@ -736,7 +736,7 @@ static void	ha_db_register_node(zbx_ha_info_t *info)
 
 	zbx_vector_ha_node_create(&nodes);
 
-	if (SUCCEED != (ret = ha_db_create_node(info)) || SUCCEED == zbx_cuid_empty(info->nodeid))
+	if (SUCCEED !=  ha_db_create_node(info) || SUCCEED == zbx_cuid_empty(info->nodeid))
 		goto finish;
 
 	if (ZBX_DB_OK != ha_db_begin(info))
@@ -762,7 +762,6 @@ static void	ha_db_register_node(zbx_ha_info_t *info)
 	if (NULL == (node = ha_find_node_by_name(&nodes, info->name)))
 	{
 		ha_set_error(info, "cannot find server node \"%s\" in registry", info->name);
-		ret = FAIL;
 		goto out;
 	}
 
