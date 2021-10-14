@@ -637,9 +637,6 @@ static void	ha_db_create_node(zbx_ha_info_t *info)
 	if (FAIL == ha_db_update_config(info))
 		goto out;
 
-	if (SUCCEED != ha_db_get_time(&db_time))
-		goto out;
-
 	for (i = 0; i < nodes.values_num; i++)
 	{
 		if (0 == strcmp(info->name, nodes.values[i]->name))
@@ -648,6 +645,9 @@ static void	ha_db_create_node(zbx_ha_info_t *info)
 			goto out;
 		}
 	}
+
+	if (SUCCEED != ha_db_get_time(&db_time))
+		goto out;
 
 	if (ZBX_HA_IS_CLUSTER())
 	{
@@ -662,7 +662,7 @@ static void	ha_db_create_node(zbx_ha_info_t *info)
 
 	zbx_new_cuid(nodeid.str);
 	name_esc = DBdyn_escape_string(info->name);
-
+	zabbix_log(LOG_LEVEL_INFORMATION, "sleeping kill -SIGALRM %d", zbx_get_thread_id()); sleep(3600);
 	if (ZBX_DB_OK <= DBexecute_once("insert into ha_node (ha_nodeid,name,status,lastaccess)"
 			" values ('%s','%s', %d," ZBX_DB_TIMESTAMP() ")",
 			nodeid.str, name_esc, ZBX_NODE_STATUS_STOPPED))
