@@ -938,15 +938,6 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			[
 				[
 					'field' =>  [
-						'Max number of columns and rows in overview tables' => '5'
-					],
-					'link' => 'overview.php',
-					'row_count' => 6		// Plus 1 info row in table.
-				]
-			],
-			[
-				[
-					'field' =>  [
 						'Max count of elements to show inside table cell' => '2'
 					],
 					'link' => 'templates.php?filter_name=cisco',
