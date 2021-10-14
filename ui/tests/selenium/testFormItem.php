@@ -968,7 +968,7 @@ class testFormItem extends CLegacyWebTest {
 		// Open hosts page.
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		// Find filter form and filter necessary host.
-		$this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one()->fill(['Name' => $this->host]);
+		$this->query('name:zbx_filter')->asForm()->waitUntilReady()->one()->fill(['Name' => $this->host]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		// Find Items link in host row and click it.
 		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $this->host)
@@ -2164,7 +2164,7 @@ class testFormItem extends CLegacyWebTest {
 	 * Function for filtering necessary hosts or templates and opening their Items.
 	 */
 	private function filterEntriesAndOpenItems() {
-		$form = $this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one();
+		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 		$form->fill(['Name' => $this->host]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $this->host)

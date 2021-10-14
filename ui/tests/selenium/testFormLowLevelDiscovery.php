@@ -179,7 +179,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 
 		if (isset($data['host'])) {
 			$this->zbxTestLogin(self::HOST_LIST_PAGE);
-			$form = $this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one();
+			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 			$this->filterEntriesAndOpenDiscovery($form, $data['host']);
 			if (isset($data['templatedHost'])) {
 				$hostid = 30001;
@@ -524,7 +524,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		$oldHashDiscovery = CDBHelper::getHash($sqlDiscovery);
 
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
-		$form = $this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one();
+		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 		$this->filterEntriesAndOpenDiscovery($form, $this->host);
 		$this->zbxTestClickLinkTextWait($name);
 		$this->zbxTestClickWait('update');
@@ -1482,7 +1482,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 	 */
 	public function testFormLowLevelDiscovery_SimpleCreate($data) {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
-		$form = $this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one();
+		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 		$this->filterEntriesAndOpenDiscovery($form, $this->host);
 		$this->zbxTestContentControlButtonClickTextWait('Create discovery rule');
 
@@ -1612,7 +1612,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 
 		if (isset($data['formCheck'])) {
 			$this->zbxTestOpen(self::HOST_LIST_PAGE);
-			$form = $this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one();
+			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 			$this->filterEntriesAndOpenDiscovery($form, $this->host);
 
 			if (isset ($data['dbName'])) {
@@ -1690,7 +1690,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 			}
 
 			$this->zbxTestOpen(self::HOST_LIST_PAGE);
-			$form = $this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one();
+			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 			$this->filterEntriesAndOpenDiscovery($form, $this->host);
 
 			$this->zbxTestCheckboxSelect("g_hostdruleid_$itemId");

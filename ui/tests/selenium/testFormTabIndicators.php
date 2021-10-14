@@ -699,7 +699,7 @@ class testFormTabIndicators extends CWebTest {
 			$form->invalidate();
 		}
 		elseif ($data['url'] === 'zabbix.php?action=host.edit') {
-			$form = $this->query($data['form'])->asFluidForm()->one()->waitUntilVisible();
+			$form = $this->query($data['form'])->asForm()->one()->waitUntilVisible();
 		}
 		else {
 			$form = $this->query($data['form'])->asForm()->one()->waitUntilVisible();

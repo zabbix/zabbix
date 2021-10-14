@@ -171,7 +171,7 @@ class testZBX6663 extends CLegacyWebTest {
 		if (isset($zbx_data['host'])) {
 			$this->zbxTestLogin(self::HOST_LIST_PAGE);
 			$this->query('button:Reset')->one()->click();
-			$form = $this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one();
+			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 			$form->fill(['Name' => $zbx_data['host']]);
 			$this->query('button:Apply')->one()->waitUntilClickable()->click();
 

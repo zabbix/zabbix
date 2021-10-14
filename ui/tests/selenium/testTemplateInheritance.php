@@ -52,7 +52,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->filterEntriesAndOpenObjects($this->hostName, 'Name', $this->hostName);
-		$form = COverlayDialogElement::find()->asFluidForm()->one()->waitUntilVisible();
+		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		$form->selectTab('Templates');
 		$this->zbxTestClickButtonMultiselect('add_templates_');
 		$this->zbxTestLaunchOverlayDialog('Templates');
@@ -178,7 +178,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->filterEntriesAndOpenObjects($this->hostName, 'Name', $this->hostName);
-		$form = COverlayDialogElement::find()->asFluidForm()->one()->waitUntilVisible();
+		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		$form->selectTab('Templates');
 		$table = $form->query('id:linked-template')->asTable()->one()->waitUntilVisible();
 		$table->findRow('Name', $template)
@@ -535,7 +535,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 	 */
 	private function filterEntriesAndOpenObjects($host, $column, $objects) {
 		$this->query('button:Reset')->one()->click();
-		$filter = $this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one();
+		$filter = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 		$filter->fill(['Name' => $host]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 

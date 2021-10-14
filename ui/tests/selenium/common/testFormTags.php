@@ -280,7 +280,7 @@ class testFormTags extends CWebTest {
 		$this->query('button:Create '.$object)->waitUntilClickable()->one()->click();
 
 		$form = ($object === 'host')
-			? COverlayDialogElement::find()->asFluidForm()->one()->waitUntilVisible()
+			? COverlayDialogElement::find()->asForm()->one()->waitUntilVisible()
 			: $this->query($locator)->waitUntilPresent()->asForm()->one();
 
 		if ($object === 'host prototype') {
@@ -479,7 +479,7 @@ class testFormTags extends CWebTest {
 		$this->query('link', $this->update_name)->waitUntilPresent()->one()->click();
 
 		$form = ($object === 'host')
-			? $this->query('id:host-form')->waitUntilPresent()->asFluidForm()->one()
+			? $this->query('id:host-form')->waitUntilPresent()->asForm()->one()
 			: $this->query($locator)->asForm()->waitUntilPresent()->one();
 
 		$form->selectTab('Tags');
@@ -579,7 +579,7 @@ class testFormTags extends CWebTest {
 				break;
 
 			case 'host':
-				$form = $this->query('name:host-form')->asFluidForm()->waitUntilPresent()->one();
+				$form = $this->query('name:host-form')->asForm()->waitUntilPresent()->one();
 				$form->fill(['Host name' => $new_name]);
 				$sql_old_name = 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($this->clone_name);
 				$sql_new_name = 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($new_name);
@@ -689,7 +689,7 @@ class testFormTags extends CWebTest {
 		$this->page->open($this->saved_link.$id);
 
 		if ($object === 'host') {
-			$form = $this->query('id:host-form')->waitUntilPresent()->asFluidForm()->one();
+			$form = $this->query('id:host-form')->waitUntilPresent()->asForm()->one();
 		}
 
 		$form->selectTab('Tags');
@@ -746,7 +746,7 @@ class testFormTags extends CWebTest {
 		$this->query('link', $name)->waitUntilClickable()->one()->click();
 
 		if ($parent === 'Host') {
-			$form = $this->query('id:host-form')->asFluidForm()->waitUntilPresent()->one();
+			$form = $this->query('id:host-form')->asForm()->waitUntilPresent()->one();
 		}
 
 		$form->fill([$parent.' name' => $new_name]);
@@ -757,7 +757,7 @@ class testFormTags extends CWebTest {
 
 		if ($parent === 'Host') {
 			$this->query('button:Reset')->one()->click();
-			$form = $this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one();
+			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 			$form->fill(['Name' => $this->host]);
 			$this->query('button:Apply')->one()->waitUntilClickable()->click();
 
@@ -852,7 +852,7 @@ class testFormTags extends CWebTest {
 
 			if ($target_type === 'Host') {
 				$this->query('button:Reset')->one()->click();
-				$filter = $this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one();
+				$filter = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 				$filter->fill(['Name' => $parent]);
 				$this->query('button:Apply')->one()->waitUntilClickable()->click();
 				$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $parent)

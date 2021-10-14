@@ -777,7 +777,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		// Go to host and change Encryption settings.
 		$this->page->open('zabbix.php?action=host.edit&hostid='.self::HOST_ID);
-		$form = $this->query('id:host-form')->asFluidForm()->one()->waitUntilVisible();
+		$form = $this->query('id:host-form')->asForm()->one()->waitUntilVisible();
 		$form->selectTab('Encryption');
 		$form->fill(['Connections to host' => $data['connection_to_host']]);
 
@@ -998,7 +998,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 
-		$form = $this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one();
+		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 		$form->fill(['Name' => $host]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $host)

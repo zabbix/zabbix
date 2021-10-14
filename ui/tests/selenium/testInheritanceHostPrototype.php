@@ -174,7 +174,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 	 */
 	public function testInheritanceHostPrototype_CreateHostLinkTemplate($data) {
 		$this->zbxTestLogin('zabbix.php?action=host.edit');
-		$form = $this->query('id:host-form')->asFluidForm()->one()->waitUntilVisible();
+		$form = $this->query('id:host-form')->asForm()->one()->waitUntilVisible();
 		$form->fill($data['fields']);
 
 		$form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => ['1' => 'default']])

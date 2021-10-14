@@ -51,7 +51,7 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestCheckHeader('Hosts');
-		$filter = $this->query('name:zbx_filter')->asFluidForm()->one();
+		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
 		$filter->getField('Host groups')->select($this->HostGroup);
 		$filter->submit();
@@ -227,7 +227,7 @@ class testPageHosts extends CLegacyWebTest {
 
 	public function testPageHosts_FilterByName() {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
-		$filter = $this->query('name:zbx_filter')->asFluidForm()->one();
+		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
 		$filter->getField('Name')->fill($this->HostName);
 		$filter->submit();
@@ -239,7 +239,7 @@ class testPageHosts extends CLegacyWebTest {
 		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
 
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
-		$filter = $this->query('name:zbx_filter')->asFluidForm()->one();
+		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
 		$filter->fill([
 			'Templates' => [
@@ -254,7 +254,7 @@ class testPageHosts extends CLegacyWebTest {
 
 	public function testPageHosts_FilterByProxy() {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
-		$filter = $this->query('name:zbx_filter')->asFluidForm()->one();
+		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
 
 		$this->zbxTestClickXpathWait('//label[text()="Proxy"]');
@@ -275,7 +275,7 @@ class testPageHosts extends CLegacyWebTest {
 
 	public function testPageHosts_FilterNone() {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
-		$filter = $this->query('name:zbx_filter')->asFluidForm()->one();
+		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
 		$filter->getField('Name')->fill('1928379128ksdhksdjfh');
 		$filter->submit();
@@ -288,7 +288,7 @@ class testPageHosts extends CLegacyWebTest {
 
 	public function testPageHosts_FilterByAllFields() {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
-		$filter = $this->query('name:zbx_filter')->asFluidForm()->one();
+		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
 		$filter->getField('Host groups')->select($this->HostGroup);
 		$filter->getField('Name')->fill($this->HostName);
@@ -692,7 +692,7 @@ class testPageHosts extends CLegacyWebTest {
 			->setArgument('filter_set', 1)
 			->getUrl()
 		);
-		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asFluidForm()->one();
+		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$form->fill(['id:filter_evaltype' => $data['evaluation_type']]);
 		$this->setTags($data['tags']);
 		$form->submit();

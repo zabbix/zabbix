@@ -29,7 +29,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 	public function testFormHostLinkTemplates_Layout() {
 		$this->page->login()->open('zabbix.php?action=host.list')->waitUntilReady();
 		$this->query('button:Create host')->one()->click();
-		$form = COverlayDialogElement::find()->asFluidForm()->one()->waitUntilVisible();
+		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		$form->selectTab('Inventory');
 
 		$inventoryFields = getHostInventories();
@@ -46,7 +46,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$this->query('button:Reset')->one()->click();
 		$this->zbxTestClickLinkTextWait($this->host_for_template);
 
-		$dialog = COverlayDialogElement::find()->asFluidForm()->waitUntilReady()->one();
+		$dialog = COverlayDialogElement::find()->asForm()->waitUntilReady()->one();
 		$dialog->selectTab('Templates');
 		$dialog->fill(['Link new templates' => 'Linux by Zabbix agent']);
 
@@ -78,7 +78,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$this->query('button:Reset')->one()->click();
 		$this->zbxTestClickLinkTextWait($this->host_for_template);
 
-		$dialog = COverlayDialogElement::find()->asFluidForm()->waitUntilReady()->one();
+		$dialog = COverlayDialogElement::find()->asForm()->waitUntilReady()->one();
 		$dialog->selectTab('Templates');
 
 		// Clicks button named "Unlink" next to a template by name.
@@ -108,7 +108,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$this->query('button:Reset')->one()->click();
 		$this->zbxTestClickLinkTextWait($this->host_for_template);
 
-		$form = $this->query('name:host-form')->asFluidForm()->waitUntilReady()->one();
+		$form = $this->query('name:host-form')->asForm()->waitUntilReady()->one();
 		$form->selectTab('Templates');
 		$form->fill(['Link new templates' => 'Linux by Zabbix agent']);
 
@@ -140,7 +140,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$this->query('button:Reset')->one()->click();
 		$this->zbxTestClickLinkTextWait($this->host_for_template);
 
-		$dialog = COverlayDialogElement::find()->asFluidForm()->waitUntilReady()->one();
+		$dialog = COverlayDialogElement::find()->asForm()->waitUntilReady()->one();
 		$dialog->selectTab('Templates');
 
 		// Clicks button named "Unlink and clear" next to a template by name.

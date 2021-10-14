@@ -145,7 +145,7 @@ class testFormValueMappings extends CWebTest {
 		// Check value mappings were copied correctly.
 		if ($source === 'host') {
 			$this->page->login()->open('zabbix.php?action=host.edit&hostid='.$hostid);
-			$cloned_form = $this->query('id:host-form')->asFluidForm()->waitUntilVisible()->one();
+			$cloned_form = $this->query('id:host-form')->asForm()->waitUntilVisible()->one();
 		}
 		else {
 			$this->page->open($source.'s.php?form=update&'.$source.'id='.$hostid);
@@ -930,7 +930,7 @@ class testFormValueMappings extends CWebTest {
 
 		if ($source === 'host') {
 			$this->page->open('zabbix.php?action=host.edit&hostid='.$sourceid);
-			$form = $this->query('id:host-form')->asFluidForm()->waitUntilVisible()->one();
+			$form = $this->query('id:host-form')->asForm()->waitUntilVisible()->one();
 		}
 		else {
 			$this->page->open($source.'s.php?form=update&'.$source.'id='.$sourceid);
@@ -1065,7 +1065,7 @@ class testFormValueMappings extends CWebTest {
 		// Create a new host/template, populate the hosthroup but leave the name empty.
 		if ($source === 'host') {
 			$this->page->login()->open('zabbix.php?action=host.edit');
-			$form = $this->query('id:host-form')->asFluidForm()->waitUntilVisible()->one();
+			$form = $this->query('id:host-form')->asForm()->waitUntilVisible()->one();
 		}
 		else {
 			$this->page->login()->open($source.'s.php?form=create');

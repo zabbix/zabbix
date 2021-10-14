@@ -431,7 +431,7 @@ class testPageTemplates extends CLegacyWebTest {
 		$table->findRow('Name', $template)->query('link:Hosts')->one()->click();
 		// Check that Hosts page is opened.
 		$this->page->assertHeader('Hosts');
-		$filter = $this->query('name:zbx_filter')->waitUntilPresent()->asFluidForm()->one();
+		$filter = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$table->invalidate();
 		// Check that correct Hosts are filtered.
 		$this->assertEquals([$template], $filter->getField('Templates')->getValue());

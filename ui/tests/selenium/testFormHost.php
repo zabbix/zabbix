@@ -198,7 +198,7 @@ class testFormHost extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=host.list')->waitUntilReady();
 		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $hostname)->getColumn('Name')
 				->query('link', $hostname)->waitUntilClickable()->one()->click();
-		$form = COverlayDialogElement::find()->asFluidForm()->one()->waitUntilVisible();
+		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 
 		// Check tabs available in the form
 		$tabs = ['Host', 'Templates', 'IPMI', 'Tags', 'Macros', 'Inventory', 'Encryption', 'Value mapping'];
@@ -230,7 +230,7 @@ class testFormHost extends CWebTest {
 		// Click the "expand" icon (in the 0th column) for the SNMP interface (1th row).
 		$interfaces_form->getRow(1)->getColumn(0)->query('tag:button')->one()->click();
 		$snmp_form = $interfaces_form->getRow(1)->query('xpath:.//div[@class="form-grid"]')->one()->parents()
-				->asFluidForm(['normalized' => true])->one();
+				->asForm(['normalized' => true])->one();
 		$data = [
 			'SNMPv1' => ['SNMP version', 'SNMP community'],
 			'SNMPv2' => ['SNMP version', 'SNMP community'],
@@ -741,7 +741,7 @@ class testFormHost extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=host.list')->waitUntilReady();
 		$this->query('button:Create host')->one()->waitUntilClickable()->click();
-		$form = COverlayDialogElement::find()->asFluidForm()->one()->waitUntilVisible();
+		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
 
 		// Set name for field "Default".
@@ -759,7 +759,7 @@ class testFormHost extends CWebTest {
 				$host = CTestArrayHelper::get($data, 'host_fields.Visible name', $data['host_fields']['Host name']);
 				$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $host)
 						->getColumn('Name')->query('link', $host)->waitUntilClickable()->one()->click();
-				$form = COverlayDialogElement::find()->asFluidForm()->one()->waitUntilReady();
+				$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
 				$form->checkValue($data['host_fields']);
 
 				foreach ($interfaces as &$interface) {
@@ -1359,7 +1359,7 @@ class testFormHost extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=host.list')->waitUntilReady();
 		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $hostname)->getColumn('Name')
 				->query('link', $hostname)->waitUntilClickable()->one()->click();
-		$form = COverlayDialogElement::find()->asFluidForm()->one()->waitUntilVisible();
+		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
 
 		// Set name for field "Default".
@@ -1380,7 +1380,7 @@ class testFormHost extends CWebTest {
 				}
 				$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $host)
 						->getColumn('Name')->query('link', $host)->waitUntilClickable()->one()->click();
-				$form = COverlayDialogElement::find()->asFluidForm()->one()->waitUntilVisible();
+				$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 
 				// Update or add new source data from host data.
 				foreach (CTestArrayHelper::get($data, 'host_fields', []) as $key => $value) {
@@ -1521,13 +1521,13 @@ class testFormHost extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=host.list')->waitUntilReady();
 		$this->query('button:Reset')->one()->click();
-		$filter = $this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one();
+		$filter = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 		$filter->fill(['Name' => $host]);
 		$filter->query('button:Apply')->one()->waitUntilClickable()->click();
 
 		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $host, true)
 				->getColumn('Name')->query('tag:a')->waitUntilClickable()->one()->click();
-		$form = COverlayDialogElement::find()->asFluidForm()->one()->waitUntilVisible();
+		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 
 		$this->page->waitUntilReady();
 		$form->submit();
@@ -1609,13 +1609,13 @@ class testFormHost extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=host.list')->waitUntilReady();
 		$this->query('button:Reset')->one()->click();
-		$filter = $this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one();
+		$filter = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 		$filter->fill(['Name' => $name]);
 		$filter->query('button:Apply')->waitUntilClickable()->one()->click();
 
 		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
 				->getColumn('Name')->query('tag:a')->waitUntilClickable()->one()->click();
-		$form = COverlayDialogElement::find()->asFluidForm()->waitUntilVisible()->one();
+		$form = COverlayDialogElement::find()->asForm()->waitUntilVisible()->one();
 
 		// Get values from form.
 		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
@@ -1623,7 +1623,7 @@ class testFormHost extends CWebTest {
 
 		// Clone host.
 		$this->query('button', $type)->waitUntilClickable()->one()->click();
-		$cloned_form = COverlayDialogElement::find()->asFluidForm()->waitUntilPresent()->one();
+		$cloned_form = COverlayDialogElement::find()->asForm()->waitUntilPresent()->one();
 		$cloned_form->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Host added');
@@ -1631,7 +1631,7 @@ class testFormHost extends CWebTest {
 
 		// Check the values of the original host with the cloned host.
 		$this->query('link', $data['host_fields']['Host name'])->waitUntilClickable()->one()->forceClick();
-		$saved_form = COverlayDialogElement::find()->asFluidForm()->waitUntilReady()->one();
+		$saved_form = COverlayDialogElement::find()->asForm()->waitUntilReady()->one();
 		$saved_form->checkValue($original);
 
 		COverlayDialogElement::find()->one()->close();
@@ -1701,7 +1701,7 @@ class testFormHost extends CWebTest {
 
 		// Change the host data to make sure that the changes are not saved to the database after cancellation.
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-		$form = $dialog->asFluidForm();
+		$form = $dialog->asForm();
 		$form->fill(['Host name' => $new_name]);
 		$interfaces_form = $form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => ['1' => 'default']]);
 		$interfaces_form->fill($interface);

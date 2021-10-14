@@ -505,7 +505,7 @@ abstract class testFormMacros extends CWebTest {
 				$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
 				$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)->getColumn('Name');
 				$column->query('link', $name)->asPopupButton()->one()->select('Configuration');
-				$form = COverlayDialogElement::find()->asFluidForm()->one()->waitUntilVisible();
+				$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 			}
 			else {
 				$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($name));
@@ -522,7 +522,7 @@ abstract class testFormMacros extends CWebTest {
 			if ($host_type === 'host') {
 				$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
 				$this->query('button:Create host')->one()->waitUntilClickable()->click();
-				$form = COverlayDialogElement::find()->asFluidForm()->one()->waitUntilVisible();
+				$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 			}
 			else {
 				$this->page->login()->open(
@@ -586,7 +586,7 @@ abstract class testFormMacros extends CWebTest {
 			$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
 			$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)->getColumn('Name');
 			$column->query('link', $name)->asPopupButton()->one()->select('Configuration');
-			$form = COverlayDialogElement::find()->asFluidForm()->one()->waitUntilVisible();
+			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
 		else {
 			$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($name));
@@ -696,7 +696,7 @@ abstract class testFormMacros extends CWebTest {
 			if ($host_type === 'host') {
 				$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
 				$this->query('button:Create host')->one()->waitUntilClickable()->click();
-				$form = COverlayDialogElement::find()->asFluidForm()->one()->waitUntilVisible();
+				$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 			}
 			else {
 				$this->page->login()->open($host_type.'s.php?form=create');
@@ -847,7 +847,7 @@ abstract class testFormMacros extends CWebTest {
 			$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
 					->getColumn('Name');
 			$column->query('link', $name)->asPopupButton()->one()->select('Configuration');
-			$form = COverlayDialogElement::find()->asFluidForm()->one()->waitUntilVisible();
+			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
 		else {
 			$this->page->open(
@@ -981,7 +981,7 @@ abstract class testFormMacros extends CWebTest {
 			$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
 					->getColumn('Name');
 			$column->query('link', $name)->asPopupButton()->one()->select('Configuration');
-			$form = COverlayDialogElement::find()->asFluidForm()->one()->waitUntilVisible();
+			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
 		else {
 			$link = $is_prototype
@@ -1193,7 +1193,7 @@ abstract class testFormMacros extends CWebTest {
 			$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
 					->getColumn('Name');
 			$column->query('link', $name)->asPopupButton()->one()->select('Configuration');
-			$form = COverlayDialogElement::find()->asFluidForm()->one()->waitUntilVisible();
+			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
 		else {
 			$this->page->open(
@@ -1566,7 +1566,7 @@ abstract class testFormMacros extends CWebTest {
 			$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilReady()
 					->findRow('Name', $name, true)->getColumn('Name');
 			$column->query('link', $name)->asPopupButton()->one()->select('Configuration');
-			$form = COverlayDialogElement::find()->asFluidForm()->one()->waitUntilVisible()->selectTab('Macros');
+			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible()->selectTab('Macros');
 		}
 		else {
 			$form = $this->query('id:'.$source.'-form')->asForm()->one()->selectTab('Macros');

@@ -2284,7 +2284,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 	 * @param string    $name    name of a host
 	 */
 	private function filterEntriesAndOpenDiscovery($name) {
-		$form = $this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one();
+		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 		$form->fill(['Name' => $name]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)

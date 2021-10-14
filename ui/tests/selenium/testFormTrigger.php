@@ -195,7 +195,7 @@ class testFormTrigger extends CLegacyWebTest {
 
 		if (isset($data['host'])) {
 			$this->zbxTestLogin(self::HOST_LIST_PAGE);
-			$form = $this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one();
+			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 			$this->filterEntriesAndOpenTriggers($data['host'], $form);
 		}
 
@@ -400,7 +400,7 @@ class testFormTrigger extends CLegacyWebTest {
 		$oldHashFunctions = CDBHelper::getHash($sqlFunctions);
 
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
-		$form = $this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one();
+		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 		$this->filterEntriesAndOpenTriggers($this->host, $form);
 		$this->zbxTestClickLinkTextWait($data['description']);
 		$this->zbxTestClickWait('update');
@@ -771,7 +771,7 @@ class testFormTrigger extends CLegacyWebTest {
 	 */
 	public function testFormTrigger_SimpleCreate($data) {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
-		$form = $this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one();
+		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 		$this->filterEntriesAndOpenTriggers($this->host, $form);
 		$this->zbxTestCheckTitle('Configuration of triggers');
 		$this->zbxTestCheckHeader('Triggers');

@@ -1563,7 +1563,7 @@ class testFormWeb extends CLegacyWebTest {
 	 */
 	private function filterEntriesAndOpenWeb($host) {
 		$this->query('button:Reset')->one()->click();
-		$form = $this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one();
+		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 		$form->fill(['Name' => $host]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $host)

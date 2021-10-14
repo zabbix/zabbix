@@ -205,7 +205,7 @@ class testFormGraph extends CLegacyWebTest {
 		if (isset($data['host'])) {
 			$this->zbxTestLogin(self::HOST_LIST_PAGE);
 			$this->query('button:Reset')->one()->click();
-			$form = $this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one();
+			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 			$this->filterEntriesAndOpenGraph($data['host'], $form);
 			if (isset($data['templatedHost'])) {
 				$hostid = 30001;

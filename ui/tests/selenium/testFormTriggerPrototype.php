@@ -232,9 +232,8 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 
 		if (isset($data['host'])) {
 			$this->zbxTestLogin(self::HOST_LIST_PAGE);
-			$form = $this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one();
+			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 			$this->filterEntriesAndOpenDiscovery($data['host'], $form);
-//			$this->zbxTestClickLinkTextWait($data['host']);
 			if (!isset($data['templatedHost'])) {
 				$discoveryRule = $this->discoveryRule;
 			}
@@ -243,7 +242,6 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 			}
 		}
 
-//		$this->zbxTestClickLinkTextWait('Discovery rules');
 		$this->zbxTestClickLinkTextWait($discoveryRule);
 		$this->zbxTestClickLinkTextWait('Trigger prototypes');
 
@@ -289,7 +287,6 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Name');
 		$this->zbxTestAssertVisibleXpath("//input[@name='description']");
 		$this->zbxTestAssertAttribute("//input[@name='description']", 'maxlength', 255);
-		$this->zbxTestAssertAttribute("//input[@name='description']", 'size', 20);
 
 		if (!(isset($data['constructor'])) || $data['constructor'] == 'open_close') {
 			$this->zbxTestTextPresent(['Expression', 'Expression constructor']);
@@ -358,7 +355,6 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		$this->zbxTestTextPresent('URL');
 		$this->zbxTestAssertVisibleId('url');
 		$this->zbxTestAssertAttribute("//input[@id='url']", 'maxlength', 255);
-		$this->zbxTestAssertAttribute("//input[@id='url']", 'size', 20);
 
 		$this->zbxTestAssertElementPresentId('priority_0');
 		$this->assertTrue($this->zbxTestCheckboxSelected('priority_0'));
@@ -447,7 +443,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		$oldHashTriggers = CDBHelper::getHash($sqlTriggers);
 
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
-		$form = $this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one();
+		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 		$this->filterEntriesAndOpenDiscovery($this->host, $form);
 		$this->zbxTestClickLinkTextWait($this->discoveryRule);
 		$this->zbxTestClickLinkTextWait('Trigger prototypes');
@@ -779,7 +775,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 	public function testFormTriggerPrototype_SimpleCreate($data) {
 
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
-		$form = $this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one();
+		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 		$this->filterEntriesAndOpenDiscovery($this->host, $form);
 		$this->zbxTestClickLinkTextWait($this->discoveryRule);
 		$this->zbxTestClickLinkTextWait('Trigger prototypes');
@@ -907,7 +903,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 
 		if (isset($data['formCheck'])) {
 			$this->zbxTestOpen(self::HOST_LIST_PAGE);
-			$form = $this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one();
+			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 			$this->filterEntriesAndOpenDiscovery($this->host, $form);
 			$this->zbxTestClickLinkTextWait($this->discoveryRule);
 			$this->zbxTestClickLinkTextWait('Trigger prototypes');
@@ -932,7 +928,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 			}
 
 			$this->zbxTestOpen(self::HOST_LIST_PAGE);
-			$form = $this->query('name:zbx_filter')->asFluidForm()->waitUntilReady()->one();
+			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 			$this->filterEntriesAndOpenDiscovery($this->host, $form);
 			$this->zbxTestClickLinkTextWait($this->discoveryRule);
 			$this->zbxTestClickLinkTextWait('Trigger prototypes');

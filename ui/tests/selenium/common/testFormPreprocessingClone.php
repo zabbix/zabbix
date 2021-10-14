@@ -269,7 +269,7 @@ class testFormPreprocessingClone extends CWebTest {
 		// Fill cloned host or template form and save it.
 		$form = ($template)
 			? $this->query('name:templatesForm')->asForm()->waitUntilPresent()->one()
-			: $this->query('id:host-form')->asFluidForm()->waitUntilPresent()->one();
+			: $this->query('id:host-form')->asForm()->waitUntilPresent()->one();
 
 		$new_host_name = 'Cloned host name'.time();
 		$form->fill([($template) ? 'Template name' : 'Host name' => $new_host_name]);
