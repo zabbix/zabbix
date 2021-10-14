@@ -395,6 +395,12 @@ class CHostGroup extends CApiService {
 	 * @return array
 	 */
 	public function create(array $groups): array {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('No permissions to call "%1$s.%2$s".', 'hostgroup', __FUNCTION__)
+			);
+		}
+
 		self::validateCreate($groups);
 
 		$groupids = DB::insert('hstgrp', $groups);

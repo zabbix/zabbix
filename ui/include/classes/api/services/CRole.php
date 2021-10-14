@@ -132,6 +132,12 @@ class CRole extends CApiService {
 	 * @throws APIException
 	 */
 	public function create(array $roles): array {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('No permissions to call "%1$s.%2$s".', 'role', __FUNCTION__)
+			);
+		}
+
 		$this->validateCreate($roles);
 
 		$ins_roles = [];
@@ -219,6 +225,12 @@ class CRole extends CApiService {
 	 * @throws APIException
 	 */
 	public function update(array $roles): array {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('No permissions to call "%1$s.%2$s".', 'role', __FUNCTION__)
+			);
+		}
+
 		$this->validateUpdate($roles, $db_roles);
 
 		$upd_roles = [];
@@ -328,6 +340,12 @@ class CRole extends CApiService {
 	 * @throws APIException
 	 */
 	public function delete(array $roleids): array {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('No permissions to call "%1$s.%2$s".', 'role', __FUNCTION__)
+			);
+		}
+
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $roleids, '/', $error)) {

@@ -152,6 +152,12 @@ class CIconMap extends CApiService {
 	 * @return array
 	 */
 	public function create(array $iconmaps) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('No permissions to call "%1$s.%2$s".', 'iconmap', __FUNCTION__)
+			);
+		}
+
 		self::validateCreate($iconmaps);
 
 		$ins_iconmaps = [];
@@ -208,6 +214,12 @@ class CIconMap extends CApiService {
 	 * @return array
 	 */
 	public function update(array $iconmaps) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('No permissions to call "%1$s.%2$s".', 'iconmap', __FUNCTION__)
+			);
+		}
+
 		self::validateUpdate($iconmaps, $db_iconmaps);
 
 		$upd_iconmaps = [];
@@ -488,6 +500,12 @@ class CIconMap extends CApiService {
 	 * @return array
 	 */
 	public function delete(array $iconmapids) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('No permissions to call "%1$s.%2$s".', 'iconmap', __FUNCTION__)
+			);
+		}
+
 		self::validateDelete($iconmapids, $db_iconmaps);
 
 		DB::delete('icon_mapping', ['iconmapid' => $iconmapids]);

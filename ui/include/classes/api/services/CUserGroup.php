@@ -171,6 +171,12 @@ class CUserGroup extends CApiService {
 	 * @return array
 	 */
 	public function create(array $usrgrps) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('No permissions to call "%1$s.%2$s".', 'usergroup', __FUNCTION__)
+			);
+		}
+
 		$this->validateCreate($usrgrps);
 
 		$ins_usrgrps = [];
@@ -249,6 +255,12 @@ class CUserGroup extends CApiService {
 	 * @return array
 	 */
 	public function update($usrgrps) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('No permissions to call "%1$s.%2$s".', 'usergroup', __FUNCTION__)
+			);
+		}
+
 		$this->validateUpdate($usrgrps, $db_usrgrps);
 
 		self::updateForce($usrgrps, $db_usrgrps);
@@ -865,6 +877,12 @@ class CUserGroup extends CApiService {
 	 * @return array
 	 */
 	public function delete(array $usrgrpids) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('No permissions to call "%1$s.%2$s".', 'usergroup', __FUNCTION__)
+			);
+		}
+
 		$this->validateDelete($usrgrpids, $db_usrgrps);
 
 		DB::delete('rights', ['groupid' => $usrgrpids]);

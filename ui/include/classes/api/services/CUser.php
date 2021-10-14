@@ -253,6 +253,12 @@ class CUser extends CApiService {
 	 * @return array
 	 */
 	public function create(array $users) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('No permissions to call "%1$s.%2$s".', 'user', __FUNCTION__)
+			);
+		}
+
 		$this->validateCreate($users);
 
 		$ins_users = [];
