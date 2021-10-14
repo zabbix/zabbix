@@ -617,10 +617,10 @@ out:
  *               FAIL    - node configuration or database error               *
  *                                                                            *
  ******************************************************************************/
-static int	ha_db_create_node(zbx_ha_info_t *info)
+static void	ha_db_create_node(zbx_ha_info_t *info)
 {
 	zbx_vector_ha_node_t	nodes;
-	int			i, ret = FAIL, activate, db_time;
+	int			i, activate, db_time;
 	zbx_cuid_t		nodeid;
 	char			*name_esc;
 
@@ -674,34 +674,22 @@ static int	ha_db_create_node(zbx_ha_info_t *info)
 	}
 
 	zbx_free(name_esc);
-
 out:
 	if (ZBX_NODE_STATUS_ERROR != info->ha_status)
 		ha_db_commit(info);
 	else
 		ha_db_rollback(info);
-
 finish:
 	if (ZBX_NODE_STATUS_ERROR != info->ha_status)
 	{
-		switch (info->db_status)
-		{
-			case ZBX_DB_DOWN:
-				ret = SUCCEED;
-				break;
-			case ZBX_DB_OK:
-				info->nodeid = nodeid;
-				ret = SUCCEED;
-				break;
-		}
+		if (ZBX_DB_OK == info->db_status)
+			info->nodeid = nodeid;
 	}
 
 	zbx_vector_ha_node_clear_ext(&nodes, zbx_ha_node_free);
 	zbx_vector_ha_node_destroy(&nodes);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-
-	return ret;
 }
 
 /******************************************************************************
@@ -733,7 +721,9 @@ static void	ha_db_register_node(zbx_ha_info_t *info)
 
 	zbx_vector_ha_node_create(&nodes);
 
-	if (SUCCEED !=  ha_db_create_node(info) || SUCCEED == zbx_cuid_empty(info->nodeid))
+	ha_db_create_node(info);
+
+	if (SUCCEED == zbx_cuid_empty(info->nodeid))
 		goto finish;
 
 	if (ZBX_DB_OK != ha_db_begin(info))
