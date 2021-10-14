@@ -29,14 +29,18 @@ class CControllerWidgetSystemInfoView extends CControllerWidget {
 		$this->setType(WIDGET_SYSTEM_INFO);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fields' => 'json'
+			'fields' => 'json',
+			'info_type' => 'in '.SYSTEM_INFO_SERVER_STATS.','.SYSTEM_INFO_HAC_STATUS
 		]);
 	}
 
 	protected function doAction() {
+		$fields = $this->getForm()->getFieldsData();
+
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultName()),
 			'system_information' => CSystemInformationHelper::getData(),
+			'info_type' => $fields['info_type'],
 			'user_role' => CWebUser::getType(),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

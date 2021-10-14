@@ -458,6 +458,9 @@ class CWidgetConfig {
 			case WIDGET_SVG_GRAPH:
 				return new CWidgetFormSvgGraph($data, $templateid);
 
+			case WIDGET_SYSTEM_INFO:
+				return new CWidgetFormSystemInfo($data, $templateid);
+
 			case WIDGET_TRIG_OVER:
 				return new CWidgetFormTrigOver($data, $templateid);
 

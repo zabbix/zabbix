@@ -20,16 +20,24 @@
 
 
 /**
- * @var CView $this
+ * System information widget form.
  */
+class CWidgetFormSystemInfo extends CWidgetForm {
 
-require_once dirname(__FILE__).'/../../include/blocks.inc.php';
+	public function __construct($data, $templateid) {
+		parent::__construct($data, $templateid, WIDGET_SYSTEM_INFO);
 
-$widget = (new CWidget())
-	->setTitle(_('System information'))
-	->addItem(new CPartial('administration.system.information', [
-		'system_information' => $data['system_information'],
-		'info_type' => SYSTEM_INFO_SERVER_STATS | SYSTEM_INFO_HAC_STATUS,
-		'user_role' => $data['user_role']
-	]))
-	->show();
+		$field_info_type = (new CWidgetFieldRadioButtonList('info_type', _('Show'), [
+			SYSTEM_INFO_SERVER_STATS => _('System stats'),
+			SYSTEM_INFO_HAC_STATUS => _('High availability cluster')
+		]))
+			->setDefault(SYSTEM_INFO_SERVER_STATS)
+			->setModern(true);
+
+		if (array_key_exists('info_type', $this->data)) {
+			$field_info_type->setValue($this->data['info_type']);
+		}
+
+		$this->fields[$field_info_type->getName()] = $field_info_type;
+	}
+}

@@ -27,7 +27,8 @@ $output = [
 	'name' => $data['name'],
 	'body' => (new CPartial('administration.system.information', [
 		'system_information' => $data['system_information'],
-		'user_role' => $data['user_role']
+		'user_role' => $data['user_role'],
+		'info_type' => $data['info_type']
 	]))->getOutput()
 ];
 

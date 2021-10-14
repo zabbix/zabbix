@@ -1006,6 +1006,10 @@ define('EVENT_OBJECT_ITEM',				4);
 define('EVENT_OBJECT_LLDRULE',			5);
 define('EVENT_OBJECT_SERVICE',			6);
 
+// System information widget constants.
+define('SYSTEM_INFO_SERVER_STATS',	0x01);
+define('SYSTEM_INFO_HAC_STATUS',	0x02);
+
 // Problem and event tag constants.
 define('TAG_EVAL_TYPE_AND_OR',		0);
 define('TAG_EVAL_TYPE_OR',			2);

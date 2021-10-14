@@ -8727,7 +8727,8 @@ return [
 			'sessionid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CUID,
-				'length' => 25
+				'length' => 25,
+				'default' => ''
 			]
 		]
 	],
