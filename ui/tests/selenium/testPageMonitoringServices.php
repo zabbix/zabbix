@@ -190,6 +190,13 @@ class testPageMonitoringServices extends CWebTest {
 				'goodsla' => 99.99,
 				'sortorder' => 18,
 			],
+			[
+				'name' => 'Server with problem',
+				'algorithm' => 1,
+				'showsla' => 1,
+				'goodsla' => 99.99,
+				'sortorder' => 18,
+			],
 
 		]);
 
@@ -229,6 +236,8 @@ class testPageMonitoringServices extends CWebTest {
 				]
 			]
 		]);
+
+		DBexecute('UPDATE services SET status=5 WHERE name="Server with problem"');
 	}
 
 	public function testPageMonitoringServices_LayoutView()
@@ -347,7 +356,9 @@ class testPageMonitoringServices extends CWebTest {
 					'result' => [
 						'Name' => 'Server 3 1'
 					]
-				],
+				]
+			],
+			[
 				[
 					'evaluation_type' => 'Or',
 					'tags' => [
@@ -360,19 +371,23 @@ class testPageMonitoringServices extends CWebTest {
 					'result' => [
 						'Name' => 'Server 3 1'
 					]
-				],
+				]
+			],
+			[
 				[
 					'evaluation_type' => 'And/Or',
 					'tags' => [
 						[
 							'name' => 'test',
-							'operator' => 'Exits',
+							'operator' => 'Exists',
 						],
 					],
 					'result' => [
 						'Name' => 'Server 3 1'
 					]
-				],
+				]
+			],
+			[
 				[
 					'evaluation_type' => 'And/Or',
 					'tags' => [
@@ -385,20 +400,37 @@ class testPageMonitoringServices extends CWebTest {
 					'result' => [
 						'Name' => 'Server 3 1'
 					]
-				],
+				]
+			],
+			[
 				[
 					'evaluation_type' => 'And/Or',
 					'tags' => [
 						[
 							'name' => 'test',
-							'operator' => 'Does not exit',
+							'operator' => 'Does not exist',
 						],
 					],
 					'result' => [
-						'Name' => 'Server 4',
-						'Name' => 'Server 5',
+						'Name' => 'Server 1',
+						'Name' => 'Server 2 1',
+						'Name' => 'Server 6 for delete by checkbox',
+						'Name' => 'Server 7 for delete by action button',
+						'Name' => 'Server 8 parent with child for delete child 1',
+						'Name' => 'Server 9 parent with child for delete parent 1',
+						'Name' => 'Server 10 child for Server 8',
+						'Name' => 'Server 11 child for Server 9',
+						'Name' => 'Server for mass delete 1',
+						'Name' => 'Server for mass delete 2',
+						'Name' => 'Server for mass delete 3',
+						'Name' => 'Server for mass update 1',
+						'Name' => 'Server for mass update 2',
+						'Name' => 'Server for mass update 3',
+						'Name' => 'Server with problem'
 					]
-				],
+				]
+			],
+			[
 				[
 					'evaluation_type' => 'And/Or',
 					'tags' => [
@@ -412,7 +444,9 @@ class testPageMonitoringServices extends CWebTest {
 						'Name' => 'Server 4',
 						'Name' => 'Server 5',
 					]
-				],
+				]
+			],
+			[
 				[
 					'evaluation_type' => 'And/Or',
 					'tags' => [
@@ -425,7 +459,9 @@ class testPageMonitoringServices extends CWebTest {
 					'result' => [
 						'Name' => 'Server 3 1'
 					]
-				],
+				]
+			],
+			[
 				[
 					'evaluation_type' => 'Or',
 					'tags' => [
@@ -438,7 +474,9 @@ class testPageMonitoringServices extends CWebTest {
 					'result' => [
 						'Name' => 'Server 3 1'
 					]
-				],
+				]
+			],
+			[
 				[
 					'evaluation_type' => 'Or',
 					'tags' => [
@@ -450,7 +488,9 @@ class testPageMonitoringServices extends CWebTest {
 					'result' => [
 						'Name' => 'Server 3 1'
 					]
-				],
+				]
+			],
+			[
 				[
 					'evaluation_type' => 'Or',
 					'tags' => [
@@ -464,19 +504,23 @@ class testPageMonitoringServices extends CWebTest {
 						'Name' => 'Server 3 1'
 					]
 				],
+			],
+			[
 				[
 					'evaluation_type' => 'Or',
 					'tags' => [
 						[
 							'name' => 'test',
-							'operator' => 'Does not exit',
+							'operator' => 'Does not exist',
 						],
 					],
 					'result' => [
 						'Name' => 'Server 4',
 						'Name' => 'Server 5',
 					]
-				],
+				]
+			],
+			[
 				[
 					'evaluation_type' => 'Or',
 					'tags' => [
@@ -490,7 +534,9 @@ class testPageMonitoringServices extends CWebTest {
 						'Name' => 'Server 4',
 						'Name' => 'Server 5',
 					]
-				],
+				]
+			],
+			[
 				[
 					'children' => [
 						'id:filter_without_children'
@@ -500,7 +546,9 @@ class testPageMonitoringServices extends CWebTest {
 						'Name' => 'Server 4',
 						'Name' => 'Server 5'
 					]
-				],
+				]
+			],
+			[
 				[
 					'problem' => [
 						'id:filter_without_problem_tags'
@@ -510,6 +558,16 @@ class testPageMonitoringServices extends CWebTest {
 						'Name' => 'Server 2',
 						'Name' => 'Server 3',
 						'Name' => 'Server 4'
+					]
+				]
+			],
+			[
+				[
+					'status' => [
+						'id:filter_status_2'
+					],
+					'result' => [
+						'Name' => 'Server with problem',
 					]
 				]
 			]
@@ -574,24 +632,37 @@ class testPageMonitoringServices extends CWebTest {
 			$this->assertTrue($filter_form->query('button', $button)->exists());
 		}
 
-		$form->fill(['id:filter_evaltype' => $data['evaluation_type']]);
-		$this->setTags($data['tags']);
-		$form->submit();
-		$this->page->waitUntilReady();
+		if (array_key_exists('evaluation_type', $data)) {
+			$form->fill(['id:filter_evaltype' => $data['evaluation_type']]);
+			$this->setTags($data['tags']);
+			$form->submit();
+			$this->page->waitUntilReady();
 
-		// Check filtered result.
-		foreach ($data['result'] as $result) {
+			// Check filtered result.
 			$filtering = $this->getTableResult('Name');
-			$this->assertEquals($filtering[0], $result);
-		}
+			$filtering = array_values($filtering);
+			$this->assertTableDataColumn($filtering, 'Name');
 
-		// Reset filter due to not influence further tests.
-		$form->query('button:Reset')->one()->click();
+			// Reset filter due to not influence further tests.
+			$form->query('button:Reset')->one()->click();
+		}
 
 		// Filter by name
 		$form->fill(['id:filter_name' => 'Server 3']);
 		$form->submit();
 		$this->assertEquals(['Server 3 1'], $this->getTableData());
+
+		// Reset filter due to not influence further tests.
+		$form->query('button:Reset')->one()->click();
+
+		if (array_key_exists('status', $data)) {
+			$form->fill(['id:filter_status' => 'Problem']);
+			$form->submit();
+
+			$filtering = $this->getTableResult('Name');
+			$filtering = array_values($filtering);
+			$this->assertTableDataColumn($filtering, 'Name');
+		}
 
 		if($edit) {
 
@@ -609,17 +680,15 @@ class testPageMonitoringServices extends CWebTest {
 			// Check filtered result.
 
 			if (array_key_exists('children', $data)) {
-				foreach ($data['children'] as $result) {
-					$filtering = $this->getTableResult('Name');
-					$this->assertEquals($filtering, $result);
-				}
+				$filtering = $this->getTableResult('Name');
+				$filtering = array_values($filtering);
+				$this->assertTableDataColumn($filtering, 'Name');
 			}
 
-			if(array_key_exists('problem', $data)) {
-				foreach ($data['problem'] as $result) {
-					$filtering = $this->getTableResult('Name');
-					$this->assertEquals($filtering, $result);
-				}
+			if (array_key_exists('problem', $data)) {
+				$filtering = $this->getTableResult('Name');
+				$filtering = array_values($filtering);
+				$this->assertTableDataColumn($filtering, 'Name');
 			}
 
 
