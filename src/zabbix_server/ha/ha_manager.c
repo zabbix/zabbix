@@ -329,7 +329,7 @@ static DB_RESULT	ha_db_select(zbx_ha_info_t *info, const char *sql, ...)
 	va_list		args;
 	DB_RESULT	result;
 
-	if (ZBX_DB_OK != info->db_status)
+	if (ZBX_DB_OK > info->db_status)
 		return NULL;
 
 	va_start(args, sql);
@@ -362,7 +362,7 @@ static int	ha_db_execute(zbx_ha_info_t *info, const char *sql, ...)
 {
 	va_list	args;
 
-	if (ZBX_DB_OK != info->db_status)
+	if (ZBX_DB_OK > info->db_status)
 		return FAIL;
 
 	va_start(args, sql);
@@ -681,9 +681,6 @@ static void	ha_db_create_node(zbx_ha_info_t *info)
 	if (FAIL == ha_db_update_config(info))
 		goto out;
 
-	if (SUCCEED != ha_db_get_time(info, &db_time))
-		goto out;
-
 	for (i = 0; i < nodes.values_num; i++)
 	{
 		if (0 == strcmp(info->name, nodes.values[i]->name))
@@ -693,7 +690,7 @@ static void	ha_db_create_node(zbx_ha_info_t *info)
 		}
 	}
 
-	if (SUCCEED != ha_db_get_time(&db_time))
+	if (SUCCEED != ha_db_get_time(info, &db_time))
 		goto out;
 
 	if (ZBX_HA_IS_CLUSTER())
