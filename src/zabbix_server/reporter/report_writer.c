@@ -155,7 +155,8 @@ static int	rw_get_report(const char *url, const char *cookie, int width, int hei
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_POST, 1L)) ||
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_URL, CONFIG_WEBSERVICE_URL)) ||
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_HTTPHEADER, headers)) ||
-			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_POSTFIELDS, j.buffer)))
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_POSTFIELDS, j.buffer)) ||
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = ZBX_CURLOPT_ACCEPT_ENCODING, "")))
 	{
 		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", (int)opt,
 				(curl_error = rw_curl_error(err)));
