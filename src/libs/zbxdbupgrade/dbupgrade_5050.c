@@ -757,7 +757,7 @@ static int	DBpatch_5050071(void)
 					{"port", "10051", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"lastaccess", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-					{"sessionid", "", NULL, NULL, 0, ZBX_TYPE_CUID, ZBX_NOTNULL, 0},
+					{"ha_sessionid", "", NULL, NULL, 0, ZBX_TYPE_CUID, ZBX_NOTNULL, 0},
 					{0}
 				},
 				NULL
