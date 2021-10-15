@@ -93,12 +93,32 @@ abstract class CHostGeneral extends CHostBase {
 		$allHostIds = array_merge($hostIds, $templateIds);
 
 		// add groups
-		if (!empty($data['groups'])) {
-			API::HostGroup()->massAdd([
-				'hosts' => $data['hosts'],
-				'templates' => $data['templates'],
-				'groups' => $data['groups']
-			]);
+		if (array_key_exists('groups', $data) && $data['groups']) {
+			$options = ['groups' => $data['groups']];
+
+			if ($data['hosts']) {
+				$options += [
+					'hosts' => array_map(
+						static function($host) {
+							return array_intersect_key($host, array_flip(['hostid']));
+						},
+						$data['hosts']
+					)
+				];
+			}
+
+			if ($data['templates']) {
+				$options += [
+					'templates' => array_map(
+						static function($template) {
+							return array_intersect_key($template, array_flip(['templateid']));
+						},
+						$data['templates']
+					)
+				];
+			}
+
+			API::HostGroup()->massAdd($options);
 		}
 
 		// link templates
@@ -178,7 +198,17 @@ abstract class CHostGeneral extends CHostBase {
 		}
 
 		if (isset($data['groupids'])) {
-			API::HostGroup()->massRemove($data);
+			$options = ['groupids' => $data['groupids']];
+
+			if ($data['hostids']) {
+				$options['hostids'] = $data['hostids'];
+			}
+
+			if ($data['templateids']) {
+				$options['templateids'] = $data['templateids'];
+			}
+
+			API::HostGroup()->massRemove($options);
 		}
 
 		return [$this->pkOption() => $data[$this->pkOption()]];

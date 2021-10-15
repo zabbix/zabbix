@@ -48,6 +48,10 @@ class CAutoregistration extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			return [];
+		}
+
 		if ($options['output'] === API_OUTPUT_EXTEND) {
 			$options['output'] = ['tls_accept'];
 		}
@@ -78,6 +82,12 @@ class CAutoregistration extends CApiService {
 	 * @return bool
 	 */
 	public function update(array $autoreg) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('No permissions to call "%1$s.%2$s".', 'autoregistration', __FUNCTION__)
+			);
+		}
+
 		$this->validateUpdate($autoreg, $db_autoreg);
 
 		$upd_config = [];

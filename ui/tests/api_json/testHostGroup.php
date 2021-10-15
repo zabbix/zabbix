@@ -254,7 +254,7 @@ class testHostGroup extends CAPITest {
 					'name' => 'API updated discovered group'
 					]
 				],
-				'expected_error' => 'Cannot update a discovered host group.'
+				'expected_error' => 'Cannot update a discovered host group "API discovery group {#HV.NAME}".'
 			],
 			// Check successfully update.
 			[
