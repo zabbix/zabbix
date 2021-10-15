@@ -1471,10 +1471,20 @@ static void	server_teardown(zbx_socket_t *listen_sock)
 	zbx_ha_kill();
 
 	for (i = 0; i < threads_num; i++)
+	{
+		if (!threads[i])
+			continue;
+
 		kill(threads[i], SIGKILL);
+	}
 
 	for (i = 0; i < threads_num; i++)
+	{
+		if (!threads[i])
+			continue;
+
 		zbx_thread_wait(threads[i]);
+	}
 
 	zbx_free(threads);
 	zbx_free(threads_flags);
