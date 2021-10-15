@@ -446,10 +446,11 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_
 				zbx_db_insert_execute(&db_insert);
 				zbx_db_insert_clean(&db_insert);
 
+				zbx_audit_host_create_entry(AUDIT_ACTION_ADD, hostid, hostname);
+
 				if (HOST_INVENTORY_DISABLED != cfg->default_inventory_mode)
 					DBadd_host_inventory(hostid, cfg->default_inventory_mode);
 
-				zbx_audit_host_create_entry(AUDIT_ACTION_ADD, hostid, hostname);
 				zbx_audit_host_update_json_add_proxy_hostid_and_hostname_and_inventory_mode(hostid,
 						proxy_hostid, host_unique, cfg->default_inventory_mode);
 
