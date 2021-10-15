@@ -526,7 +526,6 @@ static int	ha_db_lock_nodes(zbx_ha_info_t *info)
  ******************************************************************************/
 static int	ha_is_available(const zbx_ha_info_t *info, int lastaccess, int db_time)
 {
-	zabbix_log(LOG_LEVEL_INFORMATION, "lastaccess:%d, failover:%d, db_time:%d", lastaccess, info->failover_delay, db_time);
 	if (lastaccess + info->failover_delay <= db_time)
 		return FAIL;
 
