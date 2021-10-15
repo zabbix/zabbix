@@ -24,7 +24,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"time"
 
 	"github.com/go-zeromq/zmq4"
 	"zabbix.com/pkg/plugin"
@@ -125,7 +124,6 @@ func export(sock zmq4.Socket, key string, params []string, f *os.File) {
 	}
 
 	writeDebug(f, "Sending output")
-	time.Sleep(time.Second)
 	err = sock.Send(zmq4.NewMsg(respBytes))
 	if err != nil {
 		writeDebug(f, fmt.Sprintf("could not send reply: %s", err.Error()))

@@ -351,7 +351,6 @@ func main() {
 		}
 
 		m.Start()
-		m.StartExternal()
 
 		if err = configUpdateItemParameters(m, &agent.Options); err != nil {
 			fatalExit("cannot process configuration", err)
@@ -375,7 +374,6 @@ func main() {
 		}
 
 		m.Stop()
-		m.StopExternal()
 
 		monitor.Wait(monitor.Scheduler)
 		os.Exit(0)
@@ -491,7 +489,6 @@ func main() {
 	}
 
 	manager.Start()
-	manager.StartExternal()
 
 	if err = configUpdateItemParameters(manager, &agent.Options); err != nil {
 		fatalExit("cannot process configuration", err)
@@ -560,7 +557,7 @@ func main() {
 	monitor.Wait(monitor.Input)
 
 	manager.Stop()
-	manager.StopExternal()
+
 	monitor.Wait(monitor.Scheduler)
 
 	// split shutdown in two steps to ensure that result cache is still running while manager is

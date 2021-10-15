@@ -44,6 +44,8 @@ type Plugin struct {
 	responseChan chan interface{}
 	errChan      chan string
 	Params       []string
+	Cmd          *exec.Cmd
+	Path         string
 }
 
 // Options -
@@ -123,8 +125,10 @@ func (p *Plugin) listen(req zmq4.Socket) {
 func RegisterDynamicPlugins(paths []string, timeout time.Duration) error {
 	for _, p := range paths {
 
-		cmd := Start(p)
-		accessor, err := getPlugin(p)
+		// cmd := Start(p)
+		cmd := exec.Command(p)
+		cmd.Start()
+		accessor, name, err := getPlugin(p)
 		if err != nil {
 			return err
 		}
@@ -133,7 +137,9 @@ func RegisterDynamicPlugins(paths []string, timeout time.Duration) error {
 			pluginPaths[accessor.Params[i]] = p
 		}
 
-		plugin.RegisterMetrics(&accessor, accessor.Name(), accessor.Params...)
+		accessor.Path = p
+
+		plugin.RegisterMetrics(&accessor, name, accessor.Params...)
 		err = cmd.Process.Kill()
 		if err != nil {
 			return err
@@ -147,28 +153,33 @@ func init() {
 	pluginPaths = make(map[string]string)
 }
 
-func Start(path string) *exec.Cmd {
-	cmd := exec.Command(path)
-	cmd.Start()
-	return cmd
+func (p *Plugin) Start() {
+	p.Cmd = exec.Command(p.Path)
+	//TODO: log err ?
+	p.Cmd.Start()
 }
 
-func getPlugin(path string) (Plugin, error) {
+func (p *Plugin) Stop() {
+	//TODO: log err ?
+	p.Cmd.Process.Kill()
+}
+
+func getPlugin(path string) (Plugin, string, error) {
 	req := zmq4.NewReq(context.Background())
 	defer req.Close()
 
 	if err := sendRequest(path, shared.Metrics, nil, req); err != nil {
-		return Plugin{}, err
+		return Plugin{}, "", err
 	}
 
 	msg, err := req.Recv()
 	if err != nil {
-		return Plugin{}, err
+		return Plugin{}, "", err
 	}
 
 	var resp shared.Plugin
 	if err := json.Unmarshal(msg.Bytes(), &resp); err != nil {
-		return Plugin{}, err
+		return Plugin{}, "", err
 	}
 
 	switch resp.RespType {
@@ -178,9 +189,9 @@ func getPlugin(path string) (Plugin, error) {
 		p.Params = resp.Params
 		p.SetCapacity(1)
 
-		return p, err
+		return p, resp.Name, err
 	default:
-		return Plugin{}, fmt.Errorf("unknown response type:%x", resp.RespType)
+		return Plugin{}, "", fmt.Errorf("unknown response type:%x", resp.RespType)
 	}
 }
 
