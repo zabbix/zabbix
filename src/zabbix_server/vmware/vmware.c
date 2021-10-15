@@ -696,11 +696,7 @@ static int	zbx_soap_post(const char *fn_parent, CURL *easyhandle, const char *re
 	if (NULL != fn_parent)
 		zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", fn_parent, resp->data);
 
-	if (SUCCEED != zbx_xml_try_read_value(resp->data, resp->offset, ZBX_XPATH_FAULTSTRING(), &doc, &val, error))
-	{
-		ret = FAIL;
-	}
-	else
+	if (SUCCEED == zbx_xml_try_read_value(resp->data, resp->offset, ZBX_XPATH_FAULTSTRING(), &doc, &val, error))
 	{
 		if (NULL != val)
 		{
@@ -718,6 +714,8 @@ static int	zbx_soap_post(const char *fn_parent, CURL *easyhandle, const char *re
 			zbx_xml_free_doc(doc);
 		}
 	}
+	else
+		ret = FAIL;
 
 	return ret;
 }
