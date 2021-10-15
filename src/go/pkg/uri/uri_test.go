@@ -179,6 +179,12 @@ func TestNew(t *testing.T) {
 			false,
 		},
 		{
+			"Parse URI with scheme, path and port, defaults are not set",
+			args{"http://localhost:80/foo/bar", nil},
+			&URI{scheme: "http", host: "localhost", port: "80", rawUri: "http://localhost:80/foo/bar", path: "/foo/bar"},
+			false,
+		},
+		{
 			"Parse URI without scheme and port, defaults are not set",
 			args{"localhost", nil},
 			&URI{scheme: "tcp", host: "localhost", rawUri: "localhost"},
@@ -407,6 +413,35 @@ func TestURIValidator_Validate(t *testing.T) {
 			}
 			if err := v.Validate(tt.args.value); (err != nil) != tt.wantErr {
 				t.Errorf("Validate() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestIsHostnameOnly(t *testing.T) {
+	type args struct {
+		host string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{"valid_hostname", args{"example.com"}, false},
+		{"valid_hostname_2", args{"www.example.com"}, false},
+		{"ip", args{"1.2.3.4"}, false},
+		{"full_url", args{"https://www.example.com/foo/bar.tst?foo=example&bar=test"}, true},
+		{"scheme_url", args{"https://www.example.com"}, true},
+		{"path", args{"www.example.com/foo/bar.tst"}, true},
+		{"query", args{"www.example.com?foo=example&bar=test"}, true},
+		{"user_and_password", args{"username:password@example.com/"}, true},
+		{"port", args{"example.com:443"}, true},
+		{"fake_port", args{"example.com:abc"}, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := IsHostnameOnly(tt.args.host); (err != nil) != tt.wantErr {
+				t.Errorf("IsHostnameOnly() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
