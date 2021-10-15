@@ -124,8 +124,6 @@ void	zbx_socket_timeout_set(zbx_socket_t *s, int timeout);
 #define ZBX_TCP_SEC_TLS_PSK_TXT		"psk"
 #define ZBX_TCP_SEC_TLS_CERT_TXT	"cert"
 
-#define ZBX_TCP_COMMON_TIMEOUT		0	/* don't use separate timeout when establishing connection */
-
 const char	*zbx_tcp_connection_type_name(unsigned int type);
 
 #define zbx_tcp_send(s, d)				zbx_tcp_send_ext((s), (d), strlen(d), 0, ZBX_TCP_PROTOCOL, 0)
