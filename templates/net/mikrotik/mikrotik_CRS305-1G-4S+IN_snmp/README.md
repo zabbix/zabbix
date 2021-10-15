@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 The template for monitoring Switch MikroTik CRS305-1G-4S+IN.
 
 Five-port desktop switch with one Gigabit Ethernet port and four SFP+ 10Gbps ports

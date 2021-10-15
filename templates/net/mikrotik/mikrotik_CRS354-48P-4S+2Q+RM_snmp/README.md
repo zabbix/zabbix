@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 The template for monitoring Switch MikroTik CRS354-48P-4S+2Q+RM.
 
 The 48 port champion you’ve been waiting for - now with PoE-out!

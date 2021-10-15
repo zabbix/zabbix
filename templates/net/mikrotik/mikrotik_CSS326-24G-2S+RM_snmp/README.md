@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 The template for monitoring Switch MikroTik CSS326-24G-2S+RM.
 
 SwOS powered 24 port Gigabit Ethernet switch with two SFP+ ports in 1U rackmount case

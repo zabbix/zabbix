@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 The template for monitoring Ethernet router MikroTik hEX S.
 
 5x Gigabit Ethernet, SFP, Dual Core 880MHz CPU, 256MB RAM, USB, microSD, RouterOS L4, IPsec hardware encryption support and The Dude server package

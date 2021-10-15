@@ -68,7 +68,7 @@ void	zbx_audit_graph_create_entry(int audit_action, zbx_uint64_t graphid, const 
 		if (AUDIT_ACTION_ADD == audit_action)
 		{
 			zbx_audit_update_json_append_uint64(graphid, AUDIT_DETAILS_ACTION_ADD, GR_OR_GRP(graphid),
-					graphid);
+					graphid, "graphs", "graphid");
 		}
 	}
 }
@@ -118,34 +118,38 @@ void	zbx_audit_graph_update_json_add_data(zbx_uint64_t graphid, const char *name
 	AUDIT_KEY_SNPRINTF(discover)
 #undef AUDIT_KEY_SNPRINTF
 	zbx_audit_update_json_append_no_value(graphid, AUDIT_DETAILS_ACTION_ADD, audit_key);
-#define ADD_STR(r) zbx_audit_update_json_append_string(graphid, AUDIT_DETAILS_ACTION_ADD, audit_key_##r, r);
-#define ADD_UINT64(r) zbx_audit_update_json_append_uint64(graphid, AUDIT_DETAILS_ACTION_ADD, audit_key_##r, r);
-#define ADD_INT(r) zbx_audit_update_json_append_int(graphid, AUDIT_DETAILS_ACTION_ADD, audit_key_##r, r);
-#define ADD_DOUBLE(r) zbx_audit_update_json_append_double(graphid, AUDIT_DETAILS_ACTION_ADD, audit_key_##r, r);
-	ADD_STR(name)
-	ADD_INT(width)
-	ADD_INT(height)
-	ADD_DOUBLE(yaxismin)
-	ADD_DOUBLE(yaxismax)
-	ADD_UINT64(templateid)
-	ADD_INT(show_work_period)
-	ADD_INT(show_triggers)
-	ADD_INT(graphtype)
-	ADD_INT(show_legend)
-	ADD_INT(show_3d)
-	ADD_DOUBLE(percent_left)
-	ADD_DOUBLE(percent_right)
-	ADD_INT(ymin_type)
-	ADD_INT(ymax_type)
-	ADD_UINT64(ymin_itemid)
-	ADD_UINT64(ymax_itemid)
-	ADD_INT(flags)
+#define ADD_STR(r, t, f) zbx_audit_update_json_append_string(graphid, AUDIT_DETAILS_ACTION_ADD, audit_key_##r, r, t, f);
+#define ADD_UINT64(r, t, f) zbx_audit_update_json_append_uint64(graphid, AUDIT_DETAILS_ACTION_ADD, audit_key_##r, r, t,\
+		f);
+#define ADD_INT(r, t, f) zbx_audit_update_json_append_int(graphid, AUDIT_DETAILS_ACTION_ADD, audit_key_##r, r, t, f);
+#define ADD_DOUBLE(r, t, f) zbx_audit_update_json_append_double(graphid, AUDIT_DETAILS_ACTION_ADD, audit_key_##r, r, t,\
+		f);
+#define	AUDIT_TABLE_NAME	"graphs"
+	ADD_STR(name, AUDIT_TABLE_NAME, "name")
+	ADD_INT(width, AUDIT_TABLE_NAME, "width")
+	ADD_INT(height, AUDIT_TABLE_NAME, "height")
+	ADD_DOUBLE(yaxismin, AUDIT_TABLE_NAME, "yaxismin")
+	ADD_DOUBLE(yaxismax, AUDIT_TABLE_NAME, "yaxismax")
+	ADD_UINT64(templateid, AUDIT_TABLE_NAME, "templateid")
+	ADD_INT(show_work_period, AUDIT_TABLE_NAME, "show_work_period")
+	ADD_INT(show_triggers, AUDIT_TABLE_NAME, "show_triggers")
+	ADD_INT(graphtype, AUDIT_TABLE_NAME, "graphtype")
+	ADD_INT(show_legend, AUDIT_TABLE_NAME, "show_legend")
+	ADD_INT(show_3d, AUDIT_TABLE_NAME, "show_3d")
+	ADD_DOUBLE(percent_left, AUDIT_TABLE_NAME, "percent_left")
+	ADD_DOUBLE(percent_right, AUDIT_TABLE_NAME, "percent_right")
+	ADD_INT(ymin_type, AUDIT_TABLE_NAME, "ymin_type")
+	ADD_INT(ymax_type, AUDIT_TABLE_NAME, "ymax_type")
+	ADD_UINT64(ymin_itemid, AUDIT_TABLE_NAME, "ymin_itemid")
+	ADD_UINT64(ymax_itemid, AUDIT_TABLE_NAME, "ymax_itemid")
+	ADD_INT(flags, AUDIT_TABLE_NAME, "flags")
 	if (AUDIT_RESOURCE_GRAPH_PROTOTYPE == resource_type)
-		ADD_INT(discover)
+		ADD_INT(discover, AUDIT_TABLE_NAME, "discover")
 #undef ADD_STR
 #undef ADD_UINT64
 #undef ADD_INT
 #undef ADD_DOUBLE
+#undef AUDIT_TABLE_NAME
 }
 
 void	zbx_audit_graph_update_json_add_gitems(zbx_uint64_t graphid, int flags, zbx_uint64_t gitemid, int drawtype,
@@ -175,19 +179,21 @@ void	zbx_audit_graph_update_json_add_gitems(zbx_uint64_t graphid, int flags, zbx
 	AUDIT_KEY_GITEMS_SNPRINTF(itemid, .)
 
 	zbx_audit_update_json_append_no_value(graphid, AUDIT_DETAILS_ACTION_ADD, audit_key_);
-#define ADD_STR(r) zbx_audit_update_json_append_string(graphid, AUDIT_DETAILS_ACTION_ADD, audit_key_##r, r);
-#define ADD_INT(r) zbx_audit_update_json_append_int(graphid, AUDIT_DETAILS_ACTION_ADD, audit_key_##r, r);
-#define ADD_UINT64(r) zbx_audit_update_json_append_uint64(graphid, AUDIT_DETAILS_ACTION_ADD, audit_key_##r, r);
-	ADD_INT(drawtype)
-	ADD_INT(sortorder)
-	ADD_STR(color);
-	ADD_INT(yaxisside)
-	ADD_INT(calc_fnc)
-	ADD_INT(type)
-	ADD_UINT64(itemid)
+#define ADD_STR(r, t, f) zbx_audit_update_json_append_string(graphid, AUDIT_DETAILS_ACTION_ADD, audit_key_##r, r, t, f);
+#define ADD_INT(r, t, f) zbx_audit_update_json_append_int(graphid, AUDIT_DETAILS_ACTION_ADD, audit_key_##r, r, t, f);
+#define ADD_UINT64(r, t, f) zbx_audit_update_json_append_uint64(graphid, AUDIT_DETAILS_ACTION_ADD, audit_key_##r, r, t,\
+		f);
+#define	AUDIT_TABLE_NAME	"graphs_items"
+	ADD_INT(drawtype, AUDIT_TABLE_NAME, "drawtype")
+	ADD_INT(sortorder, AUDIT_TABLE_NAME, "sortorder")
+	ADD_STR(color, AUDIT_TABLE_NAME, "color");
+	ADD_INT(yaxisside, AUDIT_TABLE_NAME, "yaxisside")
+	ADD_INT(calc_fnc, AUDIT_TABLE_NAME, "calc_fnc")
+	ADD_INT(type, AUDIT_TABLE_NAME, "type")
+	ADD_UINT64(itemid, AUDIT_TABLE_NAME, "itemid")
 #undef ADD_STR
 #undef ADD_INT
-#undef ADD_UINT64
+#undef AUDIT_TABLE_NAME
 }
 
 #define PREPARE_AUDIT_GRAPH_UPDATE(resource, type1, type2)							\

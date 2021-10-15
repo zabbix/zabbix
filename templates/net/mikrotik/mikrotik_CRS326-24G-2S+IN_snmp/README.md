@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 The template for monitoring Switch MikroTik CRS326-24G-2S+IN.
 
 24 Gigabit ports, 2 SFP+ cages and a desktop case – server room power for your home!
