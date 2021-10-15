@@ -628,9 +628,9 @@ static int	ha_check_cluster_config(zbx_ha_info_t *info, zbx_vector_ha_node_t *no
  ******************************************************************************/
 static int	ha_db_get_time(zbx_ha_info_t *info, int *db_time)
 {
-	DB_ROW			row;
-	DB_RESULT		result;
-	int			ret = FAIL;
+	DB_ROW		row;
+	DB_RESULT	result;
+	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 

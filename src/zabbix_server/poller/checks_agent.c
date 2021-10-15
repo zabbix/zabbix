@@ -90,7 +90,7 @@ int	get_value_agent(const DC_ITEM *item, AGENT_RESULT *result)
 	}
 
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, item->interface.addr, item->interface.port, 0,
-			ZBX_TCP_COMMON_TIMEOUT, item->host.tls_connect, tls_arg1, tls_arg2)))
+			item->host.tls_connect, tls_arg1, tls_arg2)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", item->key);
 
