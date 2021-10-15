@@ -24,13 +24,34 @@
  * @var array $data
  */
 
+switch ($data['info_type']) {
+	case ZBX_SYSTEM_INFO_SERVER_STATS:
+		$body = (new CPartial('administration.system.info', [
+			'system_info' => $data['system_info'],
+			'user_type' => $data['user_type']
+		]))->getOutput();
+		break;
+
+	case ZBX_SYSTEM_INFO_HAC_STATUS:
+		if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
+			$body = (new CPartial('administration.ha.nodes', [
+				'ha_nodes' => $data['system_info']['ha_nodes']
+			]))->getOutput();
+		}
+		else {
+			$body = (new CTableInfo())
+				->setNoDataMessage(_('No permissions to referred object or it does not exist!'))
+				->toString();
+		}
+		break;
+
+	default:
+		$body = '';
+}
+
 $output = [
 	'name' => $data['name'],
-	'body' => (new CPartial('administration.system.info', [
-		'system_info' => $data['system_info'],
-		'info_type' => $data['info_type'],
-		'user_type' => $data['user_type']
-	]))->getOutput()
+	'body' => $body
 ];
 
 if (($messages = getMessages()) !== null) {

@@ -28,9 +28,21 @@ require_once __DIR__.'/../../include/blocks.inc.php';
 
 (new CWidget())
 	->setTitle(_('System information'))
-	->addItem(new CPartial('administration.system.info', [
-		'system_info' => $data['system_info'],
-		'info_type' => SYSTEM_INFO_SERVER_STATS | SYSTEM_INFO_HAC_STATUS,
-		'user_type' => $data['user_type']
-	]))
+	->addItem(
+		(new CDiv(
+			new CPartial('administration.system.info', [
+				'system_info' => $data['system_info'],
+				'user_type' => $data['user_type']
+			])
+		))->addClass(ZBX_STYLE_CONTAINER)
+	)
+	->addItem(
+		$data['user_type'] == USER_TYPE_SUPER_ADMIN
+			? (new CDiv(
+				new CPartial('administration.ha.nodes', [
+					'ha_nodes' => $data['system_info']['ha_nodes']
+				])
+			))->addClass(ZBX_STYLE_CONTAINER)
+			: null
+	)
 	->show();

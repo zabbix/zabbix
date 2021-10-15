@@ -29,8 +29,7 @@ class CControllerWidgetSystemInfoView extends CControllerWidget {
 		$this->setType(WIDGET_SYSTEM_INFO);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fields' => 'json',
-			'info_type' => 'in '.SYSTEM_INFO_SERVER_STATS.','.SYSTEM_INFO_HAC_STATUS
+			'fields' => 'json'
 		]);
 	}
 
