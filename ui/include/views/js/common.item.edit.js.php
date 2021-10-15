@@ -129,8 +129,6 @@ $element_toggles = itemFormElementToggles($data);
 		initLookupHooks() {
 			['change', 'input', 'help_items.paste'].forEach((event_type) => {
 				this.key_field.addEventListener(event_type, (e) => {
-					console.log(event_type)
-
 					if (this.preprocessing_active) {
 						return this.lookup(this.key_field.value, false);
 					}

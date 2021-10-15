@@ -34,6 +34,7 @@ $output = [
 $options = $data['options'];
 $controls = [];
 $form = null;
+$script_inline = '';
 
 // Construct table header.
 $header_form = ($data['popup_type'] === 'help_items') ? (new CForm())->cleanItems() : new CDiv();
@@ -65,7 +66,7 @@ if (array_key_exists('groups', $data['filter'])) {
 	$hostgroup_ms = (new CMultiSelect($multiselect_options))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH);
 	$controls[] = (new CFormList())->addRow(new CLabel(_('Host group'), 'popup_host_group_ms'), $hostgroup_ms);
 
-	$output['script_inline'] .= $hostgroup_ms->getPostJS(). 'popup_generic.setupHostGroupMultiselect();';
+	$script_inline .= $hostgroup_ms->getPostJS(). 'popup_generic.initGroupsFilter();';
 }
 
 // Add host multiselect.
@@ -79,7 +80,7 @@ if (array_key_exists('hosts', $data['filter'])) {
 	}
 	$controls[] = (new CFormList())->addRow(new CLabel(_('Host'), 'popup_host_ms'), [$empty_btn, $host_ms]);
 
-	$output['script_inline'] .= $host_ms->getPostJS(). 'popup_generic.setupHostMultiselect();';
+	$script_inline .= $host_ms->getPostJS(). 'popup_generic.initHostsFilter();';
 }
 elseif ($empty_btn) {
 	$controls[] = (new CFormList())->addRow($empty_btn);
@@ -93,7 +94,7 @@ if ($data['popup_type'] === 'help_items') {
 		->setAttribute('autofocus', 'autofocus')
 		->setValue($options['itemtype']);
 
-	$output['script_inline'] .= 'popup_generic.setupItemTypeChange();';
+	$script_inline .= 'popup_generic.initHelpItems();';
 
 	$header_form
 		->addVar('srctbl', $data['popup_type'])
@@ -339,7 +340,9 @@ switch ($data['popup_type']) {
 		break;
 
 	case 'help_items':
-		foreach ($data['table_records'] as $item) {
+		foreach ($data['table_records'] as $key => $item) {
+			$item['key'] = $key;
+
 			$action = 'popup_generic.setPopupOpenerFieldValues('.json_encode([
 				$options['dstfld1'] => $item[$options['srcfld1']]
 			]).');';
@@ -626,19 +629,33 @@ if ($data['multiselect'] && $form !== null) {
 }
 
 // Types require results returned as array.
-$types = ['users', 'usrgrp', 'templates', 'hosts', 'host_templates', 'host_groups', 'proxies', 'items',
-	'item_prototypes', 'graphs', 'graph_prototypes', 'roles', 'api_methods', 'valuemaps', 'dashboard'
+$types = [
+	'api_methods',
+	'dashboard',
+	'graphs',
+	'graph_prototypes',
+	'hosts',
+	'host_templates',
+	'host_groups',
+	'items',
+	'item_prototypes',
+	'proxies',
+	'roles',
+	'templates',
+	'users',
+	'usrgrp',
+	'valuemaps'
 ];
 
-if (array_key_exists('table_records', $data) && (in_array($data['popup_type'], $types) || $data['multiselect'])) {
+if (array_key_exists('table_records', $data) && ($data['multiselect'] || in_array($data['popup_type'], $types))) {
 	$output['data'] = $data['table_records'];
 }
 
+$script_inline .= 'popup_generic.init();';
+
 $output['script_inline'] = $this->readJsFile('popup.generic.js.php').
 	'jQuery(document).ready(function() {'.
-		$output['script_inline'].
-		'cookie.init();'.
-		'chkbxRange.init();'.
+		$script_inline.
 	'});';
 
 if ($form) {

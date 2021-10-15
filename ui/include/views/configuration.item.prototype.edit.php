@@ -921,7 +921,7 @@ $widget->show();
 
 (new CScriptTag('
 	item_type_lookup.init('.json_encode([
-		'key_type_suggestions' => CItemKeyDefinitionData::getTypeSuggestionsByKey()
+		'key_type_suggestions' => CItemData::getTypeSuggestionsByKey()
 	]).');
 '))
 	->setOnDocumentReady()
