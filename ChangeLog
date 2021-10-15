@@ -1,9 +1,16 @@
 Changes for 6.0.0alpha5
 
 New features:
+A.F....... [ZBXNEXT-6470,ZBXNEXT-6868] implemented complete audit logging of host groups; added strict validation for hostgroup.massadd, hostgroup.massupdate, hostgroup.massremove API methods; changed sortfield used in audit log report to auditid (vmaksimovs)
+.........T [ZBXNEXT-6970] added templates for "MikroTik" Ethernet routers and Switches (mchudinov)
+..F.....S. [ZBXNEXT-6879] implemented new history functions "rate", "bucket_rate_foreach" and "bucket_percentile" and math function "histogram_quantile" (miks, MVekslers)
+A.F....... [ZBXNEXT-6470,ZBXNEXT-6929] implemented audit logging of correlation API object (rlataria, Sasha)
 ...G...... [ZBXNEXT-6428] moved plugins config options to separate files (akozlovs, esneiders, kalimulin, MVekslers)
 
 Bug fixes:
+...G...... [ZBXNEXT-6708] fixed 3rd parameter for Zabbix agent 2 web.certificate.get plugin (esneiders)
+........S. [ZBX-20006] fixed Zabbix server must not audit default DB values (akozlovs)
+...G...... [ZBX-20008] removed curl and ldap linkage from agent2 (yurii)
 ..F....... [ZBX-19997] fixed too long URL error when performing background page refresh (miks)
 A......... [ZBX-20021] fixed impossibility to import media types of type script with parameters from previous versions (agriscenko)
 ........S. [ZBX-19889] fixed server not updating trigger dependencies and other data during linking (arimdjonoks)
