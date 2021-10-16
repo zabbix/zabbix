@@ -1,36 +1,32 @@
 
-# IIS by Zabbix agent
+# Template App IIS by Zabbix agent
 
 ## Overview
 
 For Zabbix version: 5.0 and higher  
-The template to monitor IIS (Internet Information Services) by Zabbix that works without any external scripts.<br>
-Your server must have the following roles:
-```text
-Web Server
-IIS Management Scripts and Tools
-```
+The template to monitor IIS (Internet Information Services) by Zabbix that works without any external scripts.
 
 
 This template was tested on:
 
 - Windows Server, version 2012R2
-- Zabbix, version 5.0
 
 ## Setup
 
 > See [Zabbix template operation](https://www.zabbix.com/documentation/5.0/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
 
-1\. [Import](https://www.zabbix.com/documentation/5.0/manual/xml_export_import/templates) the template ([template_app_iis_agent.xml](template_app_iis_agent.xml) or [template_app_iis_agent_active.xml](template_app_iis_agent_active.xml)) into Zabbix.
+You have to enable the following Windows Features (Control Panel > Programs and Features > Turn Windows features on or off) on you server
+```text
+Web Server (IIS)
+Web Server (IIS)\Management Tools\IIS Management Scripts and Tools
+```
 
-2\. [Link](https://www.zabbix.com/documentation/5.0/manual/config/templates/linking) the imported template to a host with IIS.
-
-3\. Optionally, it is possible to customize the template:
-  - Set value for the macro {$IIS.QUEUE.MAX.WARN}, if you want to receive alerts when a number of requests in the application pool queue exceeds the threshold.
-  - If you use a non-standard port for the IIS, don't forget to update the macros {$IIS.SERVICE} and {$IIS.PORT}.
-  - Change the value of macro {$IIS.APPPOOL.MONITORED} to "0", if you want to disable all notifications about application pools state.<br>
-  You can also add additional context macro {$IIS.APPPOOL.MONITORED:<AppPoolName>} for excluding specific application pools from monitoring.
-  - Change regexp in the marcos {$IIS.APPPOOL.MATCHES} and {$IIS.APPPOOL.NOT_MATCHES} used for filtering application pools discovery results.
+Optionally, it is possible to customize the template:
+- Set value for the macro {$IIS.QUEUE.MAX.WARN}, if you want to receive alerts when a number of requests in the application pool queue exceeds the threshold.
+- If you use a non-standard port for the IIS, don't forget to update the macros {$IIS.SERVICE} and {$IIS.PORT}.
+- Change the value of macro {$IIS.APPPOOL.MONITORED} to "0", if you want to disable all notifications about application pools state.<br>
+You can also add additional context macro {$IIS.APPPOOL.MONITORED:<AppPoolName>} for excluding specific application pools from monitoring.
+- Change regexp in the marcos {$IIS.APPPOOL.MATCHES} and {$IIS.APPPOOL.NOT_MATCHES} used for filtering application pools discovery results.
 
 
 ## Zabbix configuration
@@ -47,7 +43,7 @@ No specific Zabbix configuration is required.
 |{$IIS.PORT} |<p>Listening port.</p> |`80` |
 |{$IIS.QUEUE.MAX.TIME} |<p>The time during which the queue length may exceed the threshold.</p> |`5m` |
 |{$IIS.QUEUE.MAX.WARN} |<p>Maximum application pool's request queue length for trigger expression.</p> |`` |
-|{$IIS.SERVICE} |<p>The service (http/https/etc) for port check. See "net.tcp.service" documentation page for more information: https://www.zabbix.com/documentation/5.0/manual/config/items/itemtypes/simple_checks</p> |`http` |
+|{$IIS.SERVICE} |<p>The service (http/https/etc) for port check. See "net.tcp.service" documentation page for more information.</p> |`http` |
 
 ## Template links
 
