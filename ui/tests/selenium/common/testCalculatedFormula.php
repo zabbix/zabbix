@@ -424,7 +424,7 @@ class testCalculatedFormula extends CWebTest {
 			],
 			[
 				[
-					'formula' => "histogram_quantile(0.7,1.0,last(/host/trap[1.0]),7.5,last(/host/trap[7.5]),\"+Inf\",last(/host/trap[Inf]))"
+					'formula' => 'histogram_quantile(0.7,1.0,last(/host/trap[1.0]),7.5,last(/host/trap[7.5]),"+Inf",last(/host/trap[Inf]))'
 				]
 			],
 			// last() function.

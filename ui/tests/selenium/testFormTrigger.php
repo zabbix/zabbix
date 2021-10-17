@@ -934,6 +934,7 @@ class testFormTrigger extends CLegacyWebTest {
 
 		if (!isset($data['constructor'])) {
 			$this->zbxTestClickWait('add');
+			$this->page->waitUntilReady();
 			switch ($data['expected']) {
 				case TEST_GOOD:
 					$this->zbxTestWaitUntilMessageTextPresent('msg-good' ,'Trigger added');
@@ -942,12 +943,7 @@ class testFormTrigger extends CLegacyWebTest {
 					$this->zbxTestAssertElementText("//a[text()='$description']/ancestor::tr/td[6]", $expression);
 					break;
 				case TEST_BAD:
-					$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error_msg']);
-					$this->zbxTestCheckTitle('Configuration of triggers');
-					foreach ($data['errors'] as $msg) {
-						$msg = str_replace('<', '&lt;', $msg);
-						$this->zbxTestTextPresent($msg);
-					}
+					$this->assertMessage(TEST_BAD, $data['error_msg'], $data['errors']);
 					$this->zbxTestTextPresent('Name');
 					$this->zbxTestTextPresent('Expression');
 					$this->zbxTestTextPresent('Description');
