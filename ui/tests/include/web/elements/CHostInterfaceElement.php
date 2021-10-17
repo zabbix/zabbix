@@ -172,9 +172,7 @@ class CHostInterfaceElement extends CMultifieldTableElement {
 		$element = $row->query($xpath)->one(false);
 
 		if ($element->isValid()) {
-			$form = ($element->query('xpath:./*')->one()->getTagName() === 'ul')
-					? $element->asForm(['normalized' => true])
-					: $element->asForm(['normalized' => true]);
+			$form = $element->asForm(['normalized' => true]);
 
 			// Expand row for SNMP interface.
 			$button = $row->getColumn(0)->query('tag:button')->one();
