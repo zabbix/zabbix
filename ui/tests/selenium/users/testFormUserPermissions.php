@@ -289,11 +289,11 @@ class testFormUserPermissions extends CWebTest {
 		$form->checkValue($data['before']);
 
 		$this->page->open('zabbix.php?action=userrole.edit&roleid='.self::$admin_roleid);
-		$fluid_form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
+		$role_form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
 
 		$update_field = (array_key_exists('User type', $data['before'])) ? $data['after'] : $data['change'];
-		$fluid_form->fill($update_field);
-		$fluid_form->submit();
+		$role_form->fill($update_field);
+		$role_form->submit();
 
 		$this->page->open('zabbix.php?action=user.edit&userid='.self::$admin_user);
 		$form->selectTab('Permissions');
@@ -320,7 +320,7 @@ class testFormUserPermissions extends CWebTest {
 			// Select UI elements from $fields. Other elements from report, will be disabled.
 			if ($status === 'status-green') {
 				$this->page->open('zabbix.php?action=userrole.edit&roleid='.self::$admin_roleid);
-				$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
+				$form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
 				$form->fill($fields);
 				$form->submit();
 				$this->page->open('zabbix.php?action=user.edit&userid='.self::$admin_user);
@@ -368,7 +368,7 @@ class testFormUserPermissions extends CWebTest {
 
 					// User role page.
 					$this->page->open('zabbix.php?action=userrole.edit&roleid='.self::$admin_roleid);
-					$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
+					$form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
 
 					// API gets disabled.
 					if ($api_status_field === 'Disabled') {
@@ -464,7 +464,7 @@ class testFormUserPermissions extends CWebTest {
 			if ($enable_modules) {
 				$this->assertEquals('status-green', $this->query($selector.'"4"]')->one()->getAttribute('class'));
 				$this->page->open('zabbix.php?action=userrole.edit&roleid='.self::$admin_roleid);
-				$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
+				$form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
 				$form->getField('4th Module')->uncheck();
 				$form->submit();
 			}
