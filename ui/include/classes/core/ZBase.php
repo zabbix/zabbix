@@ -719,10 +719,10 @@ class ZBase {
 	 *
 	 * @return void
 	 */
-	function setServerAddress(): void {
-		global $ZBX_SERVER_STANDALONE, $ZBX_SERVER, $ZBX_SERVER_PORT;
+	private function setServerAddress(): void {
+		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
-		if ($ZBX_SERVER_STANDALONE) {
+		if ($ZBX_SERVER !== null && $ZBX_SERVER_PORT !== null) {
 			return;
 		}
 
@@ -732,11 +732,9 @@ class ZBase {
 			'limit' => 1
 		], false);
 
-		if (!$active_node) {
-			return;
+		if ($active_node) {
+			$ZBX_SERVER = $active_node[0]['address'];
+			$ZBX_SERVER_PORT = $active_node[0]['port'];
 		}
-
-		$ZBX_SERVER = $active_node[0]['address'];
-		$ZBX_SERVER_PORT = $active_node[0]['port'];
 	}
 }

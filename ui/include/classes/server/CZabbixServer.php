@@ -368,16 +368,17 @@ class CZabbixServer {
 	 * @return bool
 	 */
 	public function isRunning($sid) {
-		$active_node = API::getApiService('hanode')->get([
+		$active_nodes = API::HaNode()->get([
 			'output' => ['address', 'port', 'lastaccess'],
-			'filter' => ['status' => ZBX_NODE_STATUS_ACTIVE],
-			'limit' => 1
+			'filter' => ['status' => ZBX_NODE_STATUS_ACTIVE]
 		], false);
 
-		if ($active_node && $active_node[0]['address'] === $this->host && $active_node[0]['port'] == $this->port) {
-			if ((time() - $active_node[0]['lastaccess']) <
-					timeUnitToSeconds(CSettingsHelper::getGlobal(CSettingsHelper::HA_FAILOVER_DELAY))) {
-				return true;
+		foreach ($active_nodes as $node) {
+			if ($node['address'] === $this->host && $node['port'] == $this->port) {
+				if ((time() - $node['lastaccess']) <
+						timeUnitToSeconds(CSettingsHelper::getGlobal(CSettingsHelper::HA_FAILOVER_DELAY))) {
+					return true;
+				}
 			}
 		}
 
@@ -392,6 +393,7 @@ class CZabbixServer {
 		}
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => []];
+
 		return CApiInputValidator::validate($api_input_rules, $response, '/', $this->error);
 	}
 

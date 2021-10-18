@@ -29,12 +29,9 @@ $DB['VAULT_TOKEN']		= '';
 // For upgraded installations, please read database upgrade notes before enabling this option.
 $DB['DOUBLE_IEEE754']	= true;
 
-$ZBX_SERVER				= 'localhost';
-$ZBX_SERVER_PORT		= '10051';
+// $ZBX_SERVER			= '';
+// $ZBX_SERVER_PORT		= '';
 $ZBX_SERVER_NAME		= '';
-// With High availability cluster active, uncomment and set to true to override communications
-// from UI to the server specified above, instead of the active node.
-// $ZBX_SERVER_STANDALONE = true;
 
 $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 

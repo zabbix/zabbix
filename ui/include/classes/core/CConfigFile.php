@@ -166,10 +166,6 @@ class CConfigFile {
 			$this->config['ZBX_SERVER_NAME'] = $ZBX_SERVER_NAME;
 		}
 
-		if (isset($ZBX_SERVER_STANDALONE)) {
-			$this->config['ZBX_SERVER_STANDALONE'] = $ZBX_SERVER_STANDALONE;
-		}
-
 		if (isset($IMAGE_FORMAT_DEFAULT)) {
 			$this->config['IMAGE_FORMAT_DEFAULT'] = $IMAGE_FORMAT_DEFAULT;
 		}
@@ -224,14 +220,12 @@ class CConfigFile {
 	}
 
 	public function makeGlobal() {
-		global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT, $ZBX_SERVER_NAME, $ZBX_SERVER_STANDALONE,
-				$IMAGE_FORMAT_DEFAULT, $HISTORY, $SSO;
+		global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT, $ZBX_SERVER_NAME, $IMAGE_FORMAT_DEFAULT, $HISTORY, $SSO;
 
 		$DB = $this->config['DB'];
 		$ZBX_SERVER = $this->config['ZBX_SERVER'];
 		$ZBX_SERVER_PORT = $this->config['ZBX_SERVER_PORT'];
 		$ZBX_SERVER_NAME = $this->config['ZBX_SERVER_NAME'];
-		$ZBX_SERVER_STANDALONE = $this->config['ZBX_SERVER_STANDALONE'];
 		$IMAGE_FORMAT_DEFAULT = $this->config['IMAGE_FORMAT_DEFAULT'];
 		$HISTORY = $this->config['HISTORY'];
 		$SSO = $this->config['SSO'];
@@ -308,12 +302,9 @@ $DB[\'VAULT_TOKEN\']		= \''.addcslashes($this->config['DB']['VAULT_TOKEN'], "'\\
 // For upgraded installations, please read database upgrade notes before enabling this option.
 $DB[\'DOUBLE_IEEE754\']	= '.($this->config['DB']['DOUBLE_IEEE754'] ? 'true' : 'false').';
 
-$ZBX_SERVER				= \''.addcslashes($this->config['ZBX_SERVER'], "'\\").'\';
-$ZBX_SERVER_PORT		= \''.addcslashes($this->config['ZBX_SERVER_PORT'], "'\\").'\';
+// $ZBX_SERVER			= \'\';
+// $ZBX_SERVER_PORT		= \'\';
 $ZBX_SERVER_NAME		= \''.addcslashes($this->config['ZBX_SERVER_NAME'], "'\\").'\';
-// With High availability cluster active, uncomment and set to true to override communications
-// from UI to the server specified above, instead of the active node.
-// $ZBX_SERVER_STANDALONE	= '.((bool) $this->config['ZBX_SERVER_STANDALONE'] ? 'true' : 'false').';
 
 $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 
@@ -355,10 +346,9 @@ $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 			'VAULT_DB_PATH' => '',
 			'VAULT_TOKEN' => ''
 		];
-		$this->config['ZBX_SERVER'] = 'localhost';
-		$this->config['ZBX_SERVER_PORT'] = '10051';
+		$this->config['ZBX_SERVER'] = null;
+		$this->config['ZBX_SERVER_PORT'] = null;
 		$this->config['ZBX_SERVER_NAME'] = '';
-		$this->config['ZBX_SERVER_STANDALONE'] = false;
 		$this->config['IMAGE_FORMAT_DEFAULT'] = IMAGE_FORMAT_PNG;
 		$this->config['HISTORY'] = null;
 		$this->config['SSO'] = null;
