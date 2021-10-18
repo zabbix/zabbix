@@ -1625,7 +1625,7 @@ int	zbx_ha_stop(char **error)
 
 	if (ZBX_THREAD_ERROR == ha_pid)
 	{
-		*error = zbx_strdup(NULL, "HA manager has not been started");
+		ret = SUCCEED;
 		goto out;
 	}
 
