@@ -725,7 +725,7 @@ static void	ha_db_create_node(zbx_ha_info_t *info)
 	name_esc = DBdyn_escape_string(info->name);
 
 	if (SUCCEED == ha_db_execute(info, "insert into ha_node (ha_nodeid,name,status,lastaccess)"
-			" values ('%s','%s', %d," ZBX_DB_TIMESTAMP() ")",
+			" values ('%s','%s',%d," ZBX_DB_TIMESTAMP() ")",
 			nodeid.str, name_esc, ZBX_NODE_STATUS_STOPPED))
 	{
 		zbx_audit_init(info->auditlog);
