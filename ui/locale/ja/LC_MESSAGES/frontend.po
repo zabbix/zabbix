@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-10-15 19:55+0300\n"
-"PO-Revision-Date: 2021-10-12 13:34+0300\n"
+"PO-Revision-Date: 2021-10-17 13:40+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1634038464.000000\n"
+"X-POOTLE-MTIME: 1634470859.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:142
@@ -1316,7 +1316,7 @@ msgstr "少なくとも1つのホストグループまたはホストが選択�
 #: include/classes/api/services/CHostGroup.php:1088
 #: include/classes/api/services/CHostGroup.php:1245
 msgid "At least one host or template must be specified."
-msgstr ""
+msgstr "少なくとも1つのホストかテンプレートを指定する必要があります。"
 
 #: include/classes/api/services/CMaintenance.php:380
 #: include/classes/api/services/CMaintenance.php:388
@@ -2622,13 +2622,13 @@ msgstr "テンプレート表示名に空白は設定できません。"
 #: include/classes/api/services/CRole.php:683
 #, c-format
 msgid "Cannot have non-default \"%2$s\" rule while having \"%3$s\" set to %4$d for user role \"%1$s\"."
-msgstr ""
+msgstr "ユーザーの役割\"%1$s\"の\"%3$s\"を%4$dに設定している間はデフォルト以外の\"%2$s\"ルールを設定できません。"
 
 #: include/classes/api/services/CRole.php:569
 #: include/classes/api/services/CRole.php:645
 #, c-format
 msgid "Cannot have non-empty tag value while having empty tag in rule \"%2$s\" for user role \"%1$s\"."
-msgstr ""
+msgstr "ユーサーの役割\"%1$s\"のルール\"%2$s\"内に空のタグがある間は空ではないタグの値を設定できません。"
 
 #: include/classes/import/importers/CTemplateImporter.php:253
 #: include/classes/import/importers/CTemplateImporter.php:405
@@ -2781,7 +2781,7 @@ msgstr "セッションクッキーを設定できません。"
 #: include/classes/api/services/CService.php:1324
 #, c-format
 msgid "Cannot specify \"propagation_rule\" parameter without specifying \"propagation_value\" parameter for service \"%1$s\"."
-msgstr ""
+msgstr "サービス\"%1$s\"は\"propagation_value\"パラメータを指定せずに\"propagation_rule\"パラメータを指定できません。"
 
 #: jsLoader.php:264
 msgid "Cannot support notification audio for this device."
@@ -2879,7 +2879,7 @@ msgstr "ディスカバリされたグラフを更新できません。"
 #: include/classes/api/services/CHostGroup.php:792
 #, c-format
 msgid "Cannot update a discovered host group \"%1$s\"."
-msgstr ""
+msgstr "ディスカバリされたホストグループ\"%1$s\"を更新できません。"
 
 #: include/classes/api/services/CHttpTest.php:514
 #, c-format
@@ -4666,7 +4666,7 @@ msgstr "小数点以下桁数"
 
 #: include/classes/helpers/CServiceHelper.php:150
 msgid "Decrease by"
-msgstr ""
+msgstr "深刻度を減らす"
 
 #: app/views/administration.iconmap.edit.php:108
 #: include/classes/widgets/forms/CWidgetForm.php:54 include/hosts.inc.php:31
@@ -8068,18 +8068,18 @@ msgstr "システムの識別文字列。文字列値を返す。"
 #, c-format
 msgid "If at least %2$s child service has %1$s status or above"
 msgid_plural "If at least %2$s child services have %1$s status or above"
-msgstr[0] ""
+msgstr[0] "少なくとも%2$s個の子サービスの状態が%1$s以上"
 
 #: include/classes/helpers/CServiceHelper.php:35
 #, c-format
 msgid "If at least %2$s child services have %1$s status or above"
-msgstr ""
+msgstr "少なくとも%2$s個の子サービスの状態が%1$s以上"
 
 #: include/classes/helpers/CServiceHelper.php:40
 #: include/classes/helpers/CServiceHelper.php:89
 #, c-format
 msgid "If at least %2$s of child services have %1$s status or above"
-msgstr ""
+msgstr "少なくとも子サービスの%2$sの状態が%1$s以上"
 
 #: app/views/popup.lldoverride.php:54
 msgid "If filter matches"
@@ -8089,18 +8089,18 @@ msgstr "フィルターが一致した場合"
 #, c-format
 msgid "If less than %2$s child service has %1$s status or below"
 msgid_plural "If less than %2$s child services have %1$s status or below"
-msgstr[0] ""
+msgstr[0] "%2$s個未満の子サービスのステータスが%1$s以下"
 
 #: include/classes/helpers/CServiceHelper.php:45
 #, c-format
 msgid "If less than %2$s child services have %1$s status or below"
-msgstr ""
+msgstr "%2$s個未満の子サービスのステータスが%1$s以下"
 
 #: include/classes/helpers/CServiceHelper.php:50
 #: include/classes/helpers/CServiceHelper.php:101
 #, c-format
 msgid "If less than %2$s of child services have %1$s status or below"
-msgstr ""
+msgstr "子サービスの%2$s未満のステータスが%1$s以下"
 
 #: include/classes/api/services/CReport.php:348
 msgid "If no user groups are specified, at least one user must be included in the mailing list."
@@ -8112,7 +8112,7 @@ msgstr "ユーザーグループを指定しない場合は、少なくともメ
 #: include/classes/helpers/CServiceHelper.php:110
 #, c-format
 msgid "If weight of child services with %1$s status or above is at least %2$s"
-msgstr ""
+msgstr "ステータスが%1$s以上の子サービスの重みが少なくとも%2$s"
 
 #: include/classes/helpers/CServiceHelper.php:65
 #: include/classes/helpers/CServiceHelper.php:70
@@ -8120,7 +8120,7 @@ msgstr ""
 #: include/classes/helpers/CServiceHelper.php:118
 #, c-format
 msgid "If weight of child services with %1$s status or below is less than %2$s"
-msgstr ""
+msgstr "ステータスが%1$s以下の子サービスの重みが%2$s未満"
 
 #: include/func.inc.php:1516 include/func.inc.php:1536
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
@@ -9199,7 +9199,7 @@ msgstr "フィールド\"%1$s\": %2$sの値が正しくありません。"
 
 #: include/classes/helpers/CServiceHelper.php:149
 msgid "Increase by"
-msgstr ""
+msgstr "深刻度を増やす"
 
 #: include/locales.inc.php:60
 msgid "Indonesian (id_ID)"
@@ -14160,12 +14160,12 @@ msgstr "表示のみ"
 #: app/views/administration.user.edit.php:552
 #: app/views/administration.userrole.edit.php:180
 msgid "Read-only access to services"
-msgstr ""
+msgstr "サービスの表示のみ"
 
 #: app/views/administration.user.edit.php:561
 #: app/views/administration.userrole.edit.php:204
 msgid "Read-only access to services with tag"
-msgstr ""
+msgstr "タグとサービスの表示のみ"
 
 #: app/partials/administration.usergroup.grouprights.html.php:69
 #: app/views/administration.usergroup.edit.php:132
@@ -14181,12 +14181,12 @@ msgstr "表示/設定"
 #: app/views/administration.user.edit.php:507
 #: app/views/administration.userrole.edit.php:139
 msgid "Read-write access to services"
-msgstr ""
+msgstr "サービスの表示/設定"
 
 #: app/views/administration.user.edit.php:516
 #: app/views/administration.userrole.edit.php:163
 msgid "Read-write access to services with tag"
-msgstr ""
+msgstr "タグとサービスの表示/設定"
 
 #: include/classes/items/CHelpItems.php:93
 #: include/classes/items/CHelpItems.php:471
@@ -14229,7 +14229,7 @@ msgstr "受信者"
 #: app/views/reports.auditlog.list.php:74
 #: app/views/reports.auditlog.list.php:96
 msgid "Recordset ID"
-msgstr ""
+msgstr "記録ID"
 
 #: app/views/administration.user.edit.php:684
 #: include/classes/screens/CScreenProblem.php:1067
@@ -14817,7 +14817,7 @@ msgstr "MBeanオブジェクトの属性の値を返す。"
 #: include/classes/items/CHelpItems.php:349
 #: include/classes/items/CHelpItems.php:731
 msgid "Returns 4-digit string containing octal number with Unix permissions"
-msgstr ""
+msgstr "UNIXのバーミッションを4桁の8進数文字列で返す"
 
 #: include/classes/items/CHelpItems.php:809
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
@@ -14848,12 +14848,12 @@ msgstr "関連付けられているZabbix Java Gatewayの情報を返す。有�
 #: include/classes/items/CHelpItems.php:145
 #: include/classes/items/CHelpItems.php:527
 msgid "Returns number of TCP sockets that match parameters. Returns integer"
-msgstr ""
+msgstr "パラメータに一致したTCPソケットの数を返す。整数を返す"
 
 #: include/classes/items/CHelpItems.php:161
 #: include/classes/items/CHelpItems.php:543
 msgid "Returns number of UDP sockets that match parameters. Returns integer"
-msgstr ""
+msgstr "パラメータに一致したUDPソケットの数を返す。整数で返す"
 
 #: include/classes/items/CHelpItems.php:805
 msgid "Returns percentage of lost ICMP ping packets."
@@ -15589,7 +15589,6 @@ msgid "Service data storage period"
 msgstr "サービスデータの保存期間"
 
 #: app/controllers/CControllerServiceDelete.php:69
-#, fuzzy
 msgid "Service deleted"
 msgid_plural "Services deleted"
 msgstr[0] "サービスを削除しました"
@@ -15708,11 +15707,11 @@ msgstr "新しい値を設定"
 
 #: app/views/popup.service.statusrule.edit.php:39
 msgid "Set status to"
-msgstr ""
+msgstr "設定するステータス"
 
 #: include/classes/helpers/CServiceHelper.php:28
 msgid "Set status to OK"
-msgstr ""
+msgstr "ステータスを正常に設定"
 
 #: app/views/js/popup.itemtestedit.view.js.php:365 include/forms.inc.php:1416
 #: include/views/js/item.preprocessing.js.php:67
@@ -18947,7 +18946,7 @@ msgstr "ホスト名を設定しない場合、表示名は必須項目です。
 #: include/classes/helpers/CServiceHelper.php:57
 #: include/classes/helpers/CServiceHelper.php:67
 msgid "W"
-msgstr ""
+msgstr "W"
 
 #: jsLoader.php:223
 msgctxt "Wednesday short"
@@ -19071,7 +19070,7 @@ msgstr "毎週"
 
 #: app/views/popup.service.edit.php:217
 msgid "Weight"
-msgstr ""
+msgstr "重み"
 
 #: include/classes/setup/CSetupWizard.php:45
 msgid "Welcome"
@@ -19494,6 +19493,9 @@ msgid ""
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
 "2. Incorrect network configuration.\n"
 msgstr ""
+"Zabbixサーバー\"%1$s\"へ到達できません。以下の原因が考えられます：\n"
+"1. \"zabbix.conf.php\"に設定されたサーバーのIP/DNSが正しくない。\n"
+"2. ネットワークの設定が正しくない。\n"
 
 #: app/views/administration.script.edit.php:125
 msgid "Zabbix server (proxy)"
@@ -19748,7 +19750,7 @@ msgstr "具体的な時間を指定してください"
 
 #: include/classes/api/services/CCorrelation.php:730
 msgid "an identifier is not defined in the formula"
-msgstr ""
+msgstr "識別子は式で定義されていません"
 
 #: include/classes/validators/CApiInputValidator.php:659
 msgid "an integer is expected"
@@ -20372,7 +20374,7 @@ msgstr "\"%1$s\"から始まる条件式が正しくありません"
 
 #: include/classes/api/services/CCorrelation.php:723
 msgid "incorrect number of conditions"
-msgstr ""
+msgstr "条件の数が正しくありません"
 
 #: include/classes/parsers/CParser.php:118
 #, c-format
@@ -20950,23 +20952,23 @@ msgstr ""
 #: include/classes/api/services/CService.php:2343
 #, c-format
 msgid "read-write access to the child service \"%1$s\" is required"
-msgstr ""
+msgstr "子サービス\"%1$s\"への表示/設定アクセス権が必要です"
 
 #: include/classes/api/services/CService.php:497
 #, c-format
 msgid "read-write access to the child service \"%1$s\" must be retained"
-msgstr ""
+msgstr "子サービス\"%1$s\"への表示/設定アクセス権を保持していません"
 
 #: include/classes/api/services/CService.php:484
 #: include/classes/api/services/CService.php:2260
 #: include/classes/api/services/CService.php:2320
 msgid "read-write access to the service is required"
-msgstr ""
+msgstr "サービスへの表示/設定アクセス権が必要です"
 
 #: include/classes/api/services/CService.php:2319
 #: include/classes/api/services/CService.php:2381
 msgid "read-write access to the service must be retained"
-msgstr ""
+msgstr "サービスへの表示/設定アクセス権限を保持していません"
 
 #: include/classes/widgets/fields/CWidgetFieldNavTree.php:110
 msgid "reference to a non-existent tree element"
@@ -21422,7 +21424,7 @@ msgstr "サポートされていないバージョン番号です"
 
 #: include/classes/validators/CApiInputValidator.php:491
 msgid "uppercase identifier expected"
-msgstr ""
+msgstr "大文字の識別子が必要です"
 
 #: app/partials/configuration.tags.tab.php:67
 #: app/partials/monitoring.host.filter.php:57
