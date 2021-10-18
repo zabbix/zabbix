@@ -1347,7 +1347,6 @@ static int	server_startup(zbx_socket_t *listen_sock)
 				break;
 			case ZBX_PROCESS_TYPE_HTTPPOLLER:
 				zbx_thread_start(httppoller_thread, &thread_args, &threads[i]);
-				return FAIL;
 				break;
 			case ZBX_PROCESS_TYPE_DISCOVERER:
 				zbx_thread_start(discoverer_thread, &thread_args, &threads[i]);
