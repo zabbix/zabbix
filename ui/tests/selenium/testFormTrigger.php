@@ -776,14 +776,14 @@ class testFormTrigger extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'description' => 'MyTrigger_rate',
+					'description' => 'MyTrigger_rate_good',
 					'expression' => 'rate(/Simple form test host/test-item-reuse,2m:now-1h)>0.5',
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'description' => 'MyTrigger_rate',
+					'description' => 'MyTrigger_rate_bad_second_par',
 					'expression' => 'rate(/Simple form test host/test-item-reuse,test)>0.5',
 					'error_msg' => 'Cannot add trigger',
 					'errors' => [
@@ -795,7 +795,7 @@ class testFormTrigger extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'description' => 'MyTrigger_rate',
+					'description' => 'MyTrigger_rate_no_slash',
 					'expression' => 'rate(Simple form test host/test-item-reuse,1h)>0.5',
 					'error_msg' => 'Cannot add trigger',
 					'errors' => [
@@ -807,7 +807,7 @@ class testFormTrigger extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'description' => 'MyTrigger_rate',
+					'description' => 'MyTrigger_rate_bad_key',
 					'expression' => 'rate(/Simple form test host/test,1h)>0.5',
 					'error_msg' => 'Cannot add trigger',
 					'errors' => [
