@@ -1252,7 +1252,7 @@ class CHostPrototype extends CHostBase {
 				? array_column($db_host_prototypes[$host_prototype['hostid']]['groupLinks'], null, 'groupid')
 				: [];
 
-			$groupids = array_diff_key(array_column($host_prototype['groupLinks'], null, 'groupid'), $db_group_links);
+			$groupids += array_diff_key(array_column($host_prototype['groupLinks'], null, 'groupid'), $db_group_links);
 		}
 
 		if (!$groupids) {
