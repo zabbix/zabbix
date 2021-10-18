@@ -1726,6 +1726,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		if (SUCCEED != server_startup(&listen_sock))
 		{
 			sig_exiting = ZBX_EXIT_FAILURE;
+			ha_status = ZBX_NODE_STATUS_ERROR;
 		}
 		else
 		{
@@ -1735,16 +1736,19 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		}
 	}
 
-	if (NULL == CONFIG_HA_NODE_NAME || '\0' == *CONFIG_HA_NODE_NAME)
+	if (ZBX_NODE_STATUS_ERROR != ha_status)
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "standalone node started in \"%s\" mode",
-				zbx_ha_status_str(ha_status));
-	}
-	else
-	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "\"%s\" node started in \"%s\" mode", CONFIG_HA_NODE_NAME,
-				zbx_ha_status_str(ha_status));
+		if (NULL == CONFIG_HA_NODE_NAME || '\0' == *CONFIG_HA_NODE_NAME)
+		{
+			zabbix_log(LOG_LEVEL_INFORMATION, "standalone node started in \"%s\" mode",
+					zbx_ha_status_str(ha_status));
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_INFORMATION, "\"%s\" node started in \"%s\" mode", CONFIG_HA_NODE_NAME,
+					zbx_ha_status_str(ha_status));
 
+		}
 	}
 
 	while (ZBX_IS_RUNNING())	/* wait for any child to exit */
@@ -1769,6 +1773,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 					if (SUCCEED != server_startup(&listen_sock))
 					{
 						sig_exiting = ZBX_EXIT_FAILURE;
+						ha_status = ZBX_NODE_STATUS_ERROR;
 						continue;
 					}
 
