@@ -255,7 +255,7 @@ static void	item_description(char **data, const char *key, zbx_uint64_t hostid)
 				/* macros $1, $2, ... */
 				zabbix_log(LOG_LEVEL_WARNING, "Use of positional macros ($1,$2... $9 - referring to the"
 						" first, second... ninth parameter of the item key '%s') is "
-						"not supported anymore", key);
+						"no longer supported", key);
 
 				warning = 1;
 			}
