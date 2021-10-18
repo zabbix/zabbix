@@ -413,7 +413,7 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 	zbx_ipc_message_t	message;
 	zbx_alerter_dispatch_t	dispatch = {0};
 	int			report_status = FAIL, started_num = 0, sent_num = 0, finished_num = 0;
-	double			time_now, time_stat, time_idle = 0;
+	double			time_now, time_stat, time_wake, time_idle = 0;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -470,8 +470,9 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 
 		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
-		zbx_update_env(zbx_time());
-		time_idle += time_now;
+		time_wake = zbx_time();
+		zbx_update_env(time_wake);
+		time_idle += time_now - time_now;
 
 		switch (message.code)
 		{
