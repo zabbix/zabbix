@@ -472,7 +472,7 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 
 		time_wake = zbx_time();
 		zbx_update_env(time_wake);
-		time_idle += time_now - time_now;
+		time_idle += time_wake - time_now;
 
 		switch (message.code)
 		{
