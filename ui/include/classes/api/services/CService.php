@@ -50,12 +50,12 @@ class CService extends CApiService {
 	/**
 	 * @param array      $options
 	 * @param array|null $permissions
+	 * @param bool       $preserve_related_ids
 	 *
 	 * @return array|string
-	 *
 	 * @throws APIException
 	 */
-	private function doGet(array $options = [], array $permissions = null) {
+	private function doGet(array $options = [], array $permissions = null, bool $preserve_related_ids = false) {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
 			'serviceids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
@@ -171,10 +171,8 @@ class CService extends CApiService {
 		}
 
 		if ($db_services) {
-			$db_services = $this->addRelatedObjects($options, $db_services, $permissions);
-			$db_services = $this->unsetExtraFields($db_services, ['serviceid', 'sortorder', 'name'],
-				$options['output']
-			);
+			$db_services = $this->addRelatedObjects($options, $db_services, $permissions, $preserve_related_ids);
+			$db_services = $this->unsetExtraFields($db_services, ['serviceid'], $options['output']);
 
 			if (!$options['preservekeys']) {
 				$db_services = array_values($db_services);
@@ -192,9 +190,7 @@ class CService extends CApiService {
 	 * @throws APIException
 	 */
 	public function create(array $services): array {
-		$permissions = self::getPermissions();
-
-		$this->validateCreate($services, $permissions);
+		$this->validateCreate($services);
 
 		$ins_services = [];
 
@@ -206,30 +202,29 @@ class CService extends CApiService {
 		$serviceids = DB::insert('services', $ins_services);
 		$services = array_combine($serviceids, $services);
 
-		$this->updateTags($services, __FUNCTION__);
-		$this->updateProblemTags($services, __FUNCTION__);
-		$this->updateParents($services, __FUNCTION__, $permissions);
-		$this->updateChildren($services, __FUNCTION__);
-		$this->updateTimes($services,  __FUNCTION__);
-		$this->updateStatusRules($services, __FUNCTION__);
+		$this->updateTags($services);
+		$this->updateProblemTags($services);
+		$this->updateParents($services);
+		$this->updateChildren($services);
+		$this->updateTimes($services);
+		$this->updateStatusRules($services);
 
 		foreach ($services as $serviceid => &$service) {
 			$service['serviceid'] = $serviceid;
 		}
 		unset($service);
 
-		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_IT_SERVICE, $services);
+		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_IT_SERVICE, $services);
 
 		return ['serviceids' => $serviceids];
 	}
 
 	/**
 	 * @param array $services
-	 * @param array $permissions
 	 *
 	 * @throws APIException
 	 */
-	private function validateCreate(array &$services, array $permissions): void {
+	private function validateCreate(array &$services): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('services', 'name')],
 			'algorithm' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_SERVICE_STATUS_CALC_SET_OK, ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL, ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE])],
@@ -281,7 +276,7 @@ class CService extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$this->checkPermissions($permissions, $services);
+		$this->checkPermissions($services);
 
 		$this->checkGoodSla($services);
 		$this->checkStatusPropagation($services);
@@ -299,9 +294,7 @@ class CService extends CApiService {
 	 * @throws APIException
 	 */
 	public function update(array $services): array {
-		$permissions = self::getPermissions();
-
-		$this->validateUpdate($services, $db_services, $permissions);
+		$this->validateUpdate($services, $db_services);
 
 		$upd_services = [];
 
@@ -322,14 +315,14 @@ class CService extends CApiService {
 
 		$services = array_column($services, null, 'serviceid');
 
-		$this->updateTags($services, __FUNCTION__);
-		$this->updateProblemTags($services, __FUNCTION__);
-		$this->updateParents($services, __FUNCTION__, $permissions);
-		$this->updateChildren($services, __FUNCTION__);
-		$this->updateTimes($services, __FUNCTION__);
-		$this->updateStatusRules($services, __FUNCTION__);
+		$this->updateTags($services, $db_services);
+		$this->updateProblemTags($services, $db_services);
+		$this->updateParents($services, $db_services);
+		$this->updateChildren($services, $db_services);
+		$this->updateTimes($services, $db_services);
+		$this->updateStatusRules($services, $db_services);
 
-		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_IT_SERVICE, $services, $db_services);
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_IT_SERVICE, $services, $db_services);
 
 		return ['serviceids' => array_column($services, 'serviceid')];
 	}
@@ -337,11 +330,10 @@ class CService extends CApiService {
 	/**
 	 * @param array      $services
 	 * @param array|null $db_services
-	 * @param array      $permissions
 	 *
 	 * @throws APIException
 	 */
-	private function validateUpdate(array &$services, ?array &$db_services, array $permissions): void {
+	private function validateUpdate(array &$services, ?array &$db_services): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['serviceid']], 'fields' => [
 			'serviceid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('services', 'name')],
@@ -401,16 +393,18 @@ class CService extends CApiService {
 			'selectParents' => ['serviceid'],
 			'selectChildren' => ['serviceid'],
 			'selectTags' => ['tag', 'value'],
-			'selectProblemTags' => API_OUTPUT_COUNT,
+			'selectProblemTags' => ['tag', 'operator', 'value'],
+			'selectTimes' => ['type', 'ts_from', 'ts_to', 'note'],
+			'selectStatusRules' => ['type', 'limit_value', 'limit_status', 'new_status'],
 			'serviceids' => array_column($services, 'serviceid'),
 			'preservekeys' => true
-		]);
+		], null, true);
 
 		if (count($db_services) != count($services)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$this->checkPermissions($permissions, $services, $db_services);
+		$this->checkPermissions($services, $db_services);
 
 		$this->checkParentChildRelations($services, $db_services);
 		$this->checkStatusPropagation($services, $db_services);
@@ -445,7 +439,7 @@ class CService extends CApiService {
 
 		DB::insertBatch('housekeeper', $ins_housekeeper);
 
-		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_IT_SERVICE, $db_services);
+		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_IT_SERVICE, $db_services);
 
 		return ['serviceids' => $serviceids];
 	}
@@ -628,21 +622,23 @@ class CService extends CApiService {
 	 * @param array      $options
 	 * @param array      $result
 	 * @param array|null $permissions
+	 * @param bool       $preserve_ids
 	 *
 	 * @return array
 	 *
 	 * @throws APIException
 	 */
-	protected function addRelatedObjects(array $options, array $result, array $permissions = null): array {
+	protected function addRelatedObjects(array $options, array $result, array $permissions = null,
+			bool $preserve_ids = false): array {
 		$result = parent::addRelatedObjects($options, $result);
 
-		$this->addRelatedParents($options, $result, $permissions);
-		$this->addRelatedChildren($options, $result, $permissions);
-		$this->addRelatedTags($options, $result);
-		$this->addRelatedProblemTags($options, $result);
+		$this->addRelatedParents($options, $result, $permissions, $preserve_ids);
+		$this->addRelatedChildren($options, $result, $permissions, $preserve_ids);
+		$this->addRelatedTags($options, $result, $preserve_ids);
+		$this->addRelatedProblemTags($options, $result, $preserve_ids);
 		$this->addRelatedProblemEvents($options, $result);
-		$this->addRelatedTimes($options, $result);
-		$this->addRelatedStatusRules($options, $result);
+		$this->addRelatedTimes($options, $result, $preserve_ids);
+		$this->addRelatedStatusRules($options, $result, $preserve_ids);
 		$this->addRelatedAlarms($options, $result);
 
 		return $result;
@@ -652,12 +648,24 @@ class CService extends CApiService {
 	 * @param array      $options
 	 * @param array      $result
 	 * @param array|null $permissions
+	 * @param bool       $preserve_ids
 	 *
 	 * @throws APIException
 	 */
-	private function addRelatedParents(array $options, array &$result, ?array $permissions): void {
+	private function addRelatedParents(array $options, array &$result, ?array $permissions, bool $preserve_ids): void {
 		if ($options['selectParents'] === null) {
 			return;
+		}
+
+		$_options = [
+			'output' => ['linkid', 'serviceupid', 'servicedownid']
+		];
+		$db_links = DBselect(DB::makeSql('services_links', $_options));
+
+		$relations = [];
+
+		while ($db_link = DBfetch($db_links)) {
+			$relations[$db_link['servicedownid']][$db_link['serviceupid']] = $db_link['linkid'];
 		}
 
 		/*
@@ -671,28 +679,50 @@ class CService extends CApiService {
 			'preservekeys' => true
 		], $permissions);
 
-		$relation_map = $this->createRelationMap($result, 'servicedownid', 'serviceupid', 'services_links');
+		foreach ($result as $serviceid => &$row) {
+			$row['parents'] = array_key_exists($serviceid, $relations)
+				? array_intersect_key($parents, $relations[$serviceid])
+				: [];
 
-		$result = $relation_map->mapMany($result, $parents, 'parents');
-
-		if ($options['selectParents'] === API_OUTPUT_COUNT) {
-			foreach ($result as &$row) {
+			if ($options['selectParents'] === API_OUTPUT_COUNT) {
 				$row['parents'] = (string) count($row['parents']);
 			}
-			unset($row);
+			else {
+				if ($preserve_ids) {
+					foreach ($row['parents'] as $parent_serviceid => &$parent) {
+						$parent['linkid'] = $relations[$serviceid][$parent_serviceid];
+					}
+					unset($parent);
+				}
+
+				$row['parents'] = array_values($row['parents']);
+			}
 		}
+		unset($row);
 	}
 
 	/**
 	 * @param array      $options
 	 * @param array      $result
 	 * @param array|null $permissions
+	 * @param bool       $preserve_ids
 	 *
 	 * @throws APIException
 	 */
-	private function addRelatedChildren(array $options, array &$result, ?array $permissions): void {
+	private function addRelatedChildren(array $options, array &$result, ?array $permissions, bool $preserve_ids): void {
 		if ($options['selectChildren'] === null) {
 			return;
+		}
+
+		$_options = [
+			'output' => ['linkid', 'serviceupid', 'servicedownid']
+		];
+		$db_links = DBselect(DB::makeSql('services_links', $_options));
+
+		$relations = [];
+
+		while ($db_link = DBfetch($db_links)) {
+			$relations[$db_link['serviceupid']][$db_link['servicedownid']] = $db_link['linkid'];
 		}
 
 		/*
@@ -706,26 +736,42 @@ class CService extends CApiService {
 			'preservekeys' => true
 		], $permissions);
 
-		$relation_map = $this->createRelationMap($result, 'serviceupid', 'servicedownid', 'services_links');
+		foreach ($result as $serviceid => &$row) {
+			$row['children'] = array_key_exists($serviceid, $relations)
+				? array_intersect_key($children, $relations[$serviceid])
+				: [];
 
-		$result = $relation_map->mapMany($result, $children, 'children');
-
-		if ($options['selectChildren'] === API_OUTPUT_COUNT) {
-			foreach ($result as &$row) {
+			if ($options['selectChildren'] === API_OUTPUT_COUNT) {
 				$row['children'] = (string) count($row['children']);
 			}
-			unset($row);
+			else {
+				if ($preserve_ids) {
+					foreach ($row['children'] as $child_serviceid => &$child) {
+						$child['linkid'] = $relations[$serviceid][$child_serviceid];
+					}
+					unset($child);
+				}
+
+				$row['children'] = array_values($row['children']);
+			}
 		}
+		unset($row);
 	}
 
 	/**
 	 * @param array $options
 	 * @param array $result
+	 * @param bool  $preserve_ids
 	 */
-	private function addRelatedTags(array $options, array &$result): void {
+	private function addRelatedTags(array $options, array &$result, bool $preserve_ids): void {
 		if ($options['selectTags'] === null) {
 			return;
 		}
+
+		foreach ($result as &$row) {
+			$row['tags'] = [];
+		}
+		unset($row);
 
 		if ($options['selectTags'] === API_OUTPUT_COUNT) {
 			$output = ['servicetagid', 'serviceid'];
@@ -737,18 +783,29 @@ class CService extends CApiService {
 			$output = array_unique(array_merge(['servicetagid', 'serviceid'], $options['selectTags']));
 		}
 
-		$tags = DB::select('service_tag', [
+		$_options = [
 			'output' => $output,
-			'filter' => ['serviceid' => array_keys($result)],
-			'preservekeys' => true
-		]);
-		$relation_map = $this->createRelationMap($tags, 'serviceid', 'servicetagid');
-		$tags = $this->unsetExtraFields($tags, ['servicetagid', 'serviceid']);
-		$result = $relation_map->mapMany($result, $tags, 'tags');
+			'filter' => ['serviceid' => array_keys($result)]
+		];
+		$db_tags = DBselect(DB::makeSql('service_tag', $_options));
+
+		while ($db_tag = DBfetch($db_tags)) {
+			$serviceid = $db_tag['serviceid'];
+
+			if (!$this->outputIsRequested('serviceid', $output)) {
+				unset($db_tag['serviceid']);
+			}
+
+			if (!$preserve_ids) {
+				unset($db_tag['servicetagid']);
+			}
+
+			$result[$serviceid]['tags'][] = $db_tag;
+		}
 
 		if ($options['selectTags'] === API_OUTPUT_COUNT) {
 			foreach ($result as &$row) {
-				$row['tags'] = (string)count($row['tags']);
+				$row['tags'] = (string) count($row['tags']);
 			}
 			unset($row);
 		}
@@ -757,11 +814,17 @@ class CService extends CApiService {
 	/**
 	 * @param array $options
 	 * @param array $result
+	 * @param bool  $preserve_ids
 	 */
-	private function addRelatedProblemTags(array $options, array &$result): void {
+	private function addRelatedProblemTags(array $options, array &$result, bool $preserve_ids): void {
 		if ($options['selectProblemTags'] === null) {
 			return;
 		}
+
+		foreach ($result as &$row) {
+			$row['problem_tags'] = [];
+		}
+		unset($row);
 
 		if ($options['selectProblemTags'] === API_OUTPUT_COUNT) {
 			$output = ['service_problem_tagid', 'serviceid'];
@@ -773,14 +836,25 @@ class CService extends CApiService {
 			$output = array_unique(array_merge(['service_problem_tagid', 'serviceid'], $options['selectProblemTags']));
 		}
 
-		$problem_tags = DB::select('service_problem_tag', [
+		$_options = [
 			'output' => $output,
-			'filter' => ['serviceid' => array_keys($result)],
-			'preservekeys' => true
-		]);
-		$relation_map = $this->createRelationMap($problem_tags, 'serviceid', 'service_problem_tagid');
-		$problem_tags = $this->unsetExtraFields($problem_tags, ['service_problem_tagid', 'serviceid']);
-		$result = $relation_map->mapMany($result, $problem_tags, 'problem_tags');
+			'filter' => ['serviceid' => array_keys($result)]
+		];
+		$db_problem_tags = DBselect(DB::makeSql('service_problem_tag', $_options));
+
+		while ($db_problem_tag = DBfetch($db_problem_tags)) {
+			$serviceid = $db_problem_tag['serviceid'];
+
+			if (!$this->outputIsRequested('serviceid', $output)) {
+				unset($db_problem_tag['serviceid']);
+			}
+
+			if (!$preserve_ids) {
+				unset($db_problem_tag['service_problem_tagid']);
+			}
+
+			$result[$serviceid]['problem_tags'][] = $db_problem_tag;
+		}
 
 		if ($options['selectProblemTags'] === API_OUTPUT_COUNT) {
 			foreach ($result as &$row) {
@@ -924,11 +998,17 @@ class CService extends CApiService {
 	/**
 	 * @param array $options
 	 * @param array $result
+	 * @param bool  $preserve_ids
 	 */
-	private function addRelatedTimes(array $options, array &$result): void {
+	private function addRelatedTimes(array $options, array &$result, bool $preserve_ids): void {
 		if ($options['selectTimes'] === null) {
 			return;
 		}
+
+		foreach ($result as &$row) {
+			$row['times'] = [];
+		}
+		unset($row);
 
 		if ($options['selectTimes'] === API_OUTPUT_COUNT) {
 			$output = ['timeid', 'serviceid'];
@@ -940,14 +1020,25 @@ class CService extends CApiService {
 			$output = array_unique(array_merge(['timeid', 'serviceid'], $options['selectTimes']));
 		}
 
-		$times = DB::select('services_times', [
+		$_options = [
 			'output' => $output,
-			'filter' => ['serviceid' => array_keys($result)],
-			'preservekeys' => true
-		]);
-		$relation_map = $this->createRelationMap($times, 'serviceid', 'timeid');
-		$times = $this->unsetExtraFields($times, ['timeid', 'serviceid']);
-		$result = $relation_map->mapMany($result, $times, 'times');
+			'filter' => ['serviceid' => array_keys($result)]
+		];
+		$db_times = DBselect(DB::makeSql('services_times', $_options));
+
+		while ($db_time = DBfetch($db_times)) {
+			$serviceid = $db_time['serviceid'];
+
+			if (!$this->outputIsRequested('serviceid', $output)) {
+				unset($db_time['serviceid']);
+			}
+
+			if (!$preserve_ids) {
+				unset($db_time['timeid']);
+			}
+
+			$result[$serviceid]['times'][] = $db_time;
+		}
 
 		if ($options['selectTimes'] === API_OUTPUT_COUNT) {
 			foreach ($result as &$row) {
@@ -957,10 +1048,20 @@ class CService extends CApiService {
 		}
 	}
 
-	private function addRelatedStatusRules(array $options, array &$result): void {
+	/**
+	 * @param array $options
+	 * @param array $result
+	 * @param bool  $preserve_ids
+	 */
+	private function addRelatedStatusRules(array $options, array &$result, bool $preserve_ids): void {
 		if ($options['selectStatusRules'] === null) {
 			return;
 		}
+
+		foreach ($result as &$row) {
+			$row['status_rules'] = [];
+		}
+		unset($row);
 
 		if ($options['selectStatusRules'] === API_OUTPUT_COUNT) {
 			$output = ['service_status_ruleid', 'serviceid'];
@@ -972,14 +1073,25 @@ class CService extends CApiService {
 			$output = array_unique(array_merge(['service_status_ruleid', 'serviceid'], $options['selectStatusRules']));
 		}
 
-		$status_rules = DB::select('service_status_rule', [
+		$_options = [
 			'output' => $output,
-			'filter' => ['serviceid' => array_keys($result)],
-			'preservekeys' => true
-		]);
-		$relation_map = $this->createRelationMap($status_rules, 'serviceid', 'service_status_ruleid');
-		$status_rules = $this->unsetExtraFields($status_rules, ['service_status_ruleid', 'serviceid']);
-		$result = $relation_map->mapMany($result, $status_rules, 'status_rules');
+			'filter' => ['serviceid' => array_keys($result)]
+		];
+		$db_status_rules = DBselect(DB::makeSql('service_status_rule', $_options));
+
+		while ($db_status_rule = DBfetch($db_status_rules)) {
+			$serviceid = $db_status_rule['serviceid'];
+
+			if (!$this->outputIsRequested('serviceid', $output)) {
+				unset($db_status_rule['serviceid']);
+			}
+
+			if (!$preserve_ids) {
+				unset($db_status_rule['service_status_ruleid']);
+			}
+
+			$result[$serviceid]['status_rules'][] = $db_status_rule;
+		}
 
 		if ($options['selectStatusRules'] === API_OUTPUT_COUNT) {
 			foreach ($result as &$row) {
@@ -998,6 +1110,11 @@ class CService extends CApiService {
 			return;
 		}
 
+		foreach ($result as &$row) {
+			$row['alarms'] = [];
+		}
+		unset($row);
+
 		if ($options['selectAlarms'] === API_OUTPUT_COUNT) {
 			$output = ['servicealarmid', 'serviceid'];
 		}
@@ -1008,14 +1125,20 @@ class CService extends CApiService {
 			$output = array_unique(array_merge(['servicealarmid', 'serviceid'], $options['selectAlarms']));
 		}
 
-		$alarms = DB::select('service_alarms', [
+		$_options = [
 			'output' => $output,
-			'filter' => ['serviceid' => array_keys($result)],
-			'preservekeys' => true
-		]);
-		$relation_map = $this->createRelationMap($alarms, 'serviceid', 'servicealarmid');
-		$alarms = $this->unsetExtraFields($alarms, ['servicealarmid', 'serviceid']);
-		$result = $relation_map->mapMany($result, $alarms, 'alarms');
+			'filter' => ['serviceid' => array_keys($result)]
+		];
+		$db_alarms = DBselect(DB::makeSql('service_alarms', $_options));
+
+		while ($db_alarm = DBfetch($db_alarms)) {
+			$serviceid = $db_alarm['serviceid'];
+
+			unset($db_alarm['servicealarmid']);
+			unset($db_alarm['serviceid']);
+
+			$result[$serviceid]['alarms'][] = $db_alarm;
+		}
 
 		if ($options['selectAlarms'] === API_OUTPUT_COUNT) {
 			foreach ($result as &$row) {
@@ -1414,7 +1537,7 @@ class CService extends CApiService {
 				$has_problem_tags = count($service['problem_tags']) > 0;
 			}
 			elseif ($db_services !== null) {
-				$has_problem_tags = $db_services[$service['serviceid']]['problem_tags'] > 0;
+				$has_problem_tags = count($db_services[$service['serviceid']]['problem_tags']) > 0;
 			}
 			else {
 				$has_problem_tags = false;
@@ -1607,10 +1730,10 @@ class CService extends CApiService {
 	}
 
 	/**
-	 * @param array  $services
-	 * @param string $method
+	 * @param array      $services
+	 * @param array|null $db_services
 	 */
-	private function updateTags(array $services, string $method): void {
+	private function updateTags(array &$services, array $db_services = null): void {
 		$serviceids = [];
 
 		foreach ($services as $serviceid => $service) {
@@ -1625,55 +1748,59 @@ class CService extends CApiService {
 
 		$del_tags = [];
 		$ins_tags = [];
+		$ins_tags_ref = [];
 
-		if ($method === 'update') {
-			$db_tags = DB::select('service_tag', [
-				'output' => ['servicetagid', 'serviceid', 'tag', 'value'],
-				'filter' => ['serviceid' => array_keys($serviceids)]
-			]);
+		if ($db_services !== null) {
+			foreach (array_keys($serviceids) as $serviceid) {
+				$tags_ref = [];
 
-			foreach ($db_tags as $db_tag) {
-				$del_tags[$db_tag['serviceid']][$db_tag['tag']][$db_tag['value']] = $db_tag['servicetagid'];
+				foreach ($services[$serviceid]['tags'] as &$tag) {
+					$tags_ref[$tag['tag']][$tag['value']] = &$tag;
+				}
+				unset($tag);
+
+				foreach ($db_services[$serviceid]['tags'] as $db_tag) {
+					if (array_key_exists($db_tag['tag'], $tags_ref)
+							&& array_key_exists($db_tag['value'], $tags_ref[$db_tag['tag']])) {
+						$tags_ref[$db_tag['tag']][$db_tag['value']]['servicetagid'] = $db_tag['servicetagid'];
+					}
+					else {
+						$del_tags[$db_tag['servicetagid']] = true;
+					}
+				}
 			}
 		}
 
 		foreach (array_keys($serviceids) as $serviceid) {
-			foreach ($services[$serviceid]['tags'] as $tag) {
-				if (array_key_exists($serviceid, $del_tags)
-						&& array_key_exists($tag['tag'], $del_tags[$serviceid])
-						&& array_key_exists($tag['value'], $del_tags[$serviceid][$tag['tag']])) {
-					unset($del_tags[$serviceid][$tag['tag']][$tag['value']]);
+			foreach ($services[$serviceid]['tags'] as &$tag) {
+				if (array_key_exists('servicetagid', $tag)) {
+					continue;
 				}
-				else {
-					$ins_tags[] = ['serviceid' => $serviceid] + $tag;
-				}
+
+				$ins_tags[] = ['serviceid' => $serviceid] + $tag;
+				$ins_tags_ref[] = &$tag;
 			}
+			unset($tag);
 		}
 
 		if ($del_tags) {
-			$del_servicetagids = [];
-
-			foreach ($del_tags as $del_tags) {
-				foreach ($del_tags as $del_tags) {
-					foreach ($del_tags as $servicetagid) {
-						$del_servicetagids[$servicetagid] = true;
-					}
-				}
-			}
-
-			DB::delete('service_tag', ['servicetagid' => array_keys($del_servicetagids)]);
+			DB::delete('service_tag', ['servicetagid' => array_keys($del_tags)]);
 		}
 
 		if ($ins_tags) {
-			DB::insertBatch('service_tag', $ins_tags);
+			$servicetagids = DB::insertBatch('service_tag', $ins_tags);
+
+			foreach ($servicetagids as $index => $servicetagid) {
+				$ins_tags_ref[$index]['servicetagid'] = $servicetagid;
+			}
 		}
 	}
 
 	/**
-	 * @param array  $services
-	 * @param string $method
+	 * @param array      $services
+	 * @param array|null $db_services
 	 */
-	private function updateProblemTags(array $services, string $method): void {
+	private function updateProblemTags(array &$services, array $db_services = null): void {
 		$serviceids = [];
 
 		foreach ($services as $serviceid => $service) {
@@ -1688,66 +1815,64 @@ class CService extends CApiService {
 
 		$del_problem_tags = [];
 		$ins_problem_tags = [];
+		$ins_problem_tags_ref = [];
 
-		if ($method === 'update') {
-			$db_problem_tags = DB::select('service_problem_tag', [
-				'output' => ['service_problem_tagid', 'serviceid', 'tag', 'operator', 'value'],
-				'filter' => ['serviceid' => array_keys($serviceids)]
-			]);
+		if ($db_services !== null) {
+			foreach (array_keys($serviceids) as $serviceid) {
+				$problem_tags_ref = [];
 
-			foreach ($db_problem_tags as $db_problem_tag) {
-				$del_problem_tags[$db_problem_tag['serviceid']][$db_problem_tag['tag']][$db_problem_tag['operator']]
-					[$db_problem_tag['value']] = $db_problem_tag['service_problem_tagid'];
+				foreach ($services[$serviceid]['problem_tags'] as &$problem_tag) {
+					$problem_tags_ref[$problem_tag['tag']][$problem_tag['operator']][$problem_tag['value']] =
+						&$problem_tag;
+				}
+				unset($problem_tag);
+
+				foreach ($db_services[$serviceid]['problem_tags'] as $db_problem_tag) {
+					if (array_key_exists($db_problem_tag['tag'], $problem_tags_ref)
+							&& array_key_exists($db_problem_tag['operator'], $problem_tags_ref[$db_problem_tag['tag']])
+							&& array_key_exists($db_problem_tag['value'],
+								$problem_tags_ref[$db_problem_tag['tag']][$db_problem_tag['operator']]
+							)) {
+						$problem_tags_ref[$db_problem_tag['tag']][$db_problem_tag['operator']][$db_problem_tag['value']]
+							['service_problem_tagid'] = $db_problem_tag['service_problem_tagid'];
+					}
+					else {
+						$del_problem_tags[$db_problem_tag['service_problem_tagid']] = true;
+					}
+				}
 			}
 		}
 
 		foreach (array_keys($serviceids) as $serviceid) {
-			foreach ($services[$serviceid]['problem_tags'] as $problem_tag) {
-				if (array_key_exists($serviceid, $del_problem_tags)
-						&& array_key_exists($problem_tag['tag'], $del_problem_tags[$serviceid])
-						&& array_key_exists($problem_tag['operator'],
-							$del_problem_tags[$serviceid][$problem_tag['tag']]
-						)
-						&& array_key_exists($problem_tag['value'],
-							$del_problem_tags[$serviceid][$problem_tag['tag']][$problem_tag['operator']]
-						)) {
-					unset($del_problem_tags[$serviceid][$problem_tag['tag']][$problem_tag['operator']]
-						[$problem_tag['value']]
-					);
+			foreach ($services[$serviceid]['problem_tags'] as &$problem_tag) {
+				if (array_key_exists('service_problem_tagid', $problem_tag)) {
+					continue;
 				}
-				else {
-					$ins_problem_tags[] = ['serviceid' => $serviceid] + $problem_tag;
-				}
+
+				$ins_problem_tags[] = ['serviceid' => $serviceid] + $problem_tag;
+				$ins_problem_tags_ref[] = &$problem_tag;
 			}
+			unset($problem_tag);
 		}
 
 		if ($del_problem_tags) {
-			$del_service_problem_tagids = [];
-
-			foreach ($del_problem_tags as $del_problem_tags) {
-				foreach ($del_problem_tags as $del_problem_tags) {
-					foreach ($del_problem_tags as $del_problem_tags) {
-						foreach ($del_problem_tags as $service_problem_tagid) {
-							$del_service_problem_tagids[$service_problem_tagid] = true;
-						}
-					}
-				}
-			}
-
-			DB::delete('service_problem_tag', ['service_problem_tagid' => array_keys($del_service_problem_tagids)]);
+			DB::delete('service_problem_tag', ['service_problem_tagid' => array_keys($del_problem_tags)]);
 		}
 
 		if ($ins_problem_tags) {
-			DB::insertBatch('service_problem_tag', $ins_problem_tags);
+			$service_problem_tagids = DB::insertBatch('service_problem_tag', $ins_problem_tags);
+
+			foreach ($service_problem_tagids as $index => $service_problem_tagid) {
+				$ins_problem_tags_ref[$index]['service_problem_tagid'] = $service_problem_tagid;
+			}
 		}
 	}
 
 	/**
-	 * @param array  $services
-	 * @param string $method
-	 * @param array  $permissions
+	 * @param array      $services
+	 * @param array|null $db_services
 	 */
-	private function updateParents(array $services, string $method, array $permissions): void {
+	private function updateParents(array &$services, array $db_services = null): void {
 		$serviceids = [];
 
 		foreach ($services as $serviceid => $service) {
@@ -1762,61 +1887,58 @@ class CService extends CApiService {
 
 		$del_parents = [];
 		$ins_parents = [];
+		$ins_parents_ref = [];
 
-		if ($method === 'update') {
-			if ($permissions['r_services'] === null || $permissions['rw_services'] === null) {
-				$accessible_services = null;
-			}
-			else {
-				$accessible_services = $permissions['r_services'] + $permissions['rw_services'];
-			}
+		if ($db_services !== null) {
+			foreach (array_keys($serviceids) as $serviceid) {
+				$parents_ref = [];
 
-			$db_parents = DB::select('services_links', [
-				'output' => ['linkid', 'serviceupid', 'servicedownid'],
-				'filter' => $accessible_services !== null
-					? ['servicedownid' => array_keys($serviceids), 'serviceupid' => array_keys($accessible_services)]
-					: ['servicedownid' => array_keys($serviceids)]
-			]);
+				foreach ($services[$serviceid]['parents'] as &$parent) {
+					$parents_ref[$parent['serviceid']] = &$parent;
+				}
+				unset($parent);
 
-			foreach ($db_parents as $db_parent) {
-				$del_parents[$db_parent['servicedownid']][$db_parent['serviceupid']] = $db_parent['linkid'];
+				foreach ($db_services[$serviceid]['parents'] as $db_parent) {
+					if (array_key_exists($db_parent['serviceid'], $parents_ref)) {
+						$parents_ref[$db_parent['serviceid']]['linkid'] = $db_parent['linkid'];
+					}
+					else {
+						$del_parents[$db_parent['linkid']] = true;
+					}
+				}
 			}
 		}
 
 		foreach (array_keys($serviceids) as $serviceid) {
-			foreach ($services[$serviceid]['parents'] as $parent) {
-				if (array_key_exists($serviceid, $del_parents)
-						&& array_key_exists($parent['serviceid'], $del_parents[$serviceid])) {
-					unset($del_parents[$serviceid][$parent['serviceid']]);
+			foreach ($services[$serviceid]['parents'] as &$parent) {
+				if (array_key_exists('linkid', $parent)) {
+					continue;
 				}
-				else {
-					$ins_parents[] = ['serviceupid' => $parent['serviceid'], 'servicedownid' => $serviceid];
-				}
+
+				$ins_parents[] = ['servicedownid' => $serviceid, 'serviceupid' => $parent['serviceid']];
+				$ins_parents_ref[] = &$parent;
 			}
+			unset($parent);
 		}
 
 		if ($del_parents) {
-			$del_linkids = [];
-
-			foreach ($del_parents as $del_parents) {
-				foreach ($del_parents as $linkid) {
-					$del_linkids[$linkid] = true;
-				}
-			}
-
-			DB::delete('services_links', ['linkid' => array_keys($del_linkids)]);
+			DB::delete('services_links', ['linkid' => array_keys($del_parents)]);
 		}
 
 		if ($ins_parents) {
-			DB::insertBatch('services_links', $ins_parents);
+			$linkids = DB::insertBatch('services_links', $ins_parents);
+
+			foreach ($linkids as $index => $linkid) {
+				$ins_parents_ref[$index]['linkid'] = $linkid;
+			}
 		}
 	}
 
 	/**
-	 * @param array  $services
-	 * @param string $method
+	 * @param array      $services
+	 * @param array|null $db_services
 	 */
-	private function updateChildren(array $services, string $method): void {
+	private function updateChildren(array &$services, array $db_services = null): void {
 		$serviceids = [];
 
 		foreach ($services as $serviceid => $service) {
@@ -1831,52 +1953,58 @@ class CService extends CApiService {
 
 		$del_children = [];
 		$ins_children = [];
+		$ins_children_ref = [];
 
-		if ($method === 'update') {
-			$db_children = DB::select('services_links', [
-				'output' => ['linkid', 'serviceupid', 'servicedownid'],
-				'filter' => ['serviceupid' => array_keys($serviceids)]
-			]);
+		if ($db_services !== null) {
+			foreach (array_keys($serviceids) as $serviceid) {
+				$children_ref = [];
 
-			foreach ($db_children as $db_child) {
-				$del_children[$db_child['serviceupid']][$db_child['servicedownid']] = $db_child['linkid'];
+				foreach ($services[$serviceid]['children'] as &$child) {
+					$children_ref[$child['serviceid']] = &$child;
+				}
+				unset($child);
+
+				foreach ($db_services[$serviceid]['children'] as $db_child) {
+					if (array_key_exists($db_child['serviceid'], $children_ref)) {
+						$children_ref[$db_child['serviceid']]['linkid'] = $db_child['linkid'];
+					}
+					else {
+						$del_children[$db_child['linkid']] = true;
+					}
+				}
 			}
 		}
 
 		foreach (array_keys($serviceids) as $serviceid) {
-			foreach ($services[$serviceid]['children'] as $child) {
-				if (array_key_exists($serviceid, $del_children)
-						&& array_key_exists($child['serviceid'], $del_children[$serviceid])) {
-					unset($del_children[$serviceid][$child['serviceid']]);
+			foreach ($services[$serviceid]['children'] as &$child) {
+				if (array_key_exists('linkid', $child)) {
+					continue;
 				}
-				else {
-					$ins_children[] = ['serviceupid' => $serviceid, 'servicedownid' => $child['serviceid']];
-				}
+
+				$ins_children[] = ['serviceupid' => $serviceid, 'servicedownid' => $child['serviceid']];
+				$ins_children_ref[] = &$child;
 			}
+			unset($child);
 		}
 
 		if ($del_children) {
-			$del_linkids = [];
-
-			foreach ($del_children as $del_children) {
-				foreach ($del_children as $linkid) {
-					$del_linkids[$linkid] = true;
-				}
-			}
-
-			DB::delete('services_links', ['linkid' => array_keys($del_linkids)]);
+			DB::delete('services_links', ['linkid' => array_keys($del_children)]);
 		}
 
 		if ($ins_children) {
-			DB::insertBatch('services_links', $ins_children);
+			$linkids = DB::insertBatch('services_links', $ins_children);
+
+			foreach ($linkids as $index => $linkid) {
+				$ins_children_ref[$index]['linkid'] = $linkid;
+			}
 		}
 	}
 
 	/**
-	 * @param array  $services
-	 * @param string $method
+	 * @param array      $services
+	 * @param array|null $db_services
 	 */
-	private function updateTimes(array $services, string $method): void {
+	private function updateTimes(array &$services, array $db_services = null): void {
 		$serviceids = [];
 
 		foreach ($services as $serviceid => $service) {
@@ -1891,67 +2019,64 @@ class CService extends CApiService {
 
 		$del_times = [];
 		$ins_times = [];
+		$ins_times_ref = [];
 		$upd_times = [];
 
-		if ($method === 'update') {
-			$db_times = DB::select('services_times', [
-				'output' => ['timeid', 'serviceid', 'type', 'ts_from', 'ts_to', 'note'],
-				'filter' => ['serviceid' => array_keys($serviceids)]
-			]);
+		if ($db_services !== null) {
+			foreach (array_keys($serviceids) as $serviceid) {
+				$times_ref = [];
 
-			foreach ($db_times as $db_time) {
-				$del_times[$db_time['serviceid']][$db_time['type']][$db_time['ts_from']][$db_time['ts_to']] = [
-					'timeid' => $db_time['timeid'],
-					'fields' => [
-						'note' => $db_time['note']
-					]
-				];
+				foreach ($services[$serviceid]['times'] as &$time) {
+					$times_ref[$time['type']][$time['ts_from']][$time['ts_to']] = &$time;
+				}
+				unset($time);
+
+				foreach ($db_services[$serviceid]['times'] as $db_time) {
+					if (array_key_exists($db_time['type'], $times_ref)
+							&& array_key_exists($db_time['ts_from'], $times_ref[$db_time['type']])
+							&& array_key_exists($db_time['ts_to'], $times_ref[$db_time['type']][$db_time['ts_from']])) {
+						$time_ref = &$times_ref[$db_time['type']][$db_time['ts_from']][$db_time['ts_to']];
+
+						$time_ref['timeid'] = $db_time['timeid'];
+
+						$upd_time = DB::getUpdatedValues('services_times', $db_time, $time_ref);
+
+						if ($upd_time) {
+							$upd_times[] = [
+								'values' => $upd_time,
+								'where' => ['timeid' => $db_time['timeid']]
+							];
+						}
+					}
+					else {
+						$del_times[$db_time['timeid']] = true;
+					}
+				}
 			}
 		}
 
 		foreach (array_keys($serviceids) as $serviceid) {
-			foreach ($services[$serviceid]['times'] as $time) {
-				if (array_key_exists($serviceid, $del_times)
-						&& array_key_exists($time['type'], $del_times[$serviceid])
-						&& array_key_exists($time['ts_from'], $del_times[$serviceid][$time['type']])
-						&& array_key_exists($time['ts_to'], $del_times[$serviceid][$time['type']][$time['ts_from']])) {
-					$db_time = $del_times[$serviceid][$time['type']][$time['ts_from']][$time['ts_to']];
-
-					$upd_time = DB::getUpdatedValues('services_times', $time, $db_time['fields']);
-
-					if ($upd_time) {
-						$upd_times[] = [
-							'values' => $upd_time,
-							'where' => ['timeid' => $db_time['timeid']]
-						];
-					}
-
-					unset($del_times[$serviceid][$time['type']][$time['ts_from']][$time['ts_to']]);
+			foreach ($services[$serviceid]['times'] as &$time) {
+				if (array_key_exists('timeid', $time)) {
+					continue;
 				}
-				else {
-					$ins_times[] = ['serviceid' => $serviceid] + $time;
-				}
+
+				$ins_times[] = ['serviceid' => $serviceid] + $time;
+				$ins_times_ref[] = &$time;
 			}
+			unset($time);
 		}
 
 		if ($del_times) {
-			$del_timeids = [];
-
-			foreach ($del_times as $del_times) {
-				foreach ($del_times as $del_times) {
-					foreach ($del_times as $del_times) {
-						foreach ($del_times as $time) {
-							$del_timeids[$time['timeid']] = true;
-						}
-					}
-				}
-			}
-
-			DB::delete('services_times', ['timeid' => array_keys($del_timeids)]);
+			DB::delete('services_times', ['timeid' => array_keys($del_times)]);
 		}
 
 		if ($ins_times) {
-			DB::insertBatch('services_times', $ins_times);
+			$timeids = DB::insertBatch('services_times', $ins_times);
+
+			foreach ($timeids as $index => $timeid) {
+				$ins_times_ref[$index]['timeid'] = $timeid;
+			}
 		}
 
 		if ($upd_times) {
@@ -1960,10 +2085,10 @@ class CService extends CApiService {
 	}
 
 	/**
-	 * @param array  $services
-	 * @param string $method
+	 * @param array      $services
+	 * @param array|null $db_services
 	 */
-	private function updateStatusRules(array $services, string $method): void {
+	private function updateStatusRules(array &$services, array $db_services = null): void {
 		$serviceids = [];
 
 		foreach ($services as $serviceid => $service) {
@@ -1978,77 +2103,72 @@ class CService extends CApiService {
 
 		$del_status_rules = [];
 		$ins_status_rules = [];
+		$ins_status_rules_ref = [];
 		$upd_status_rules = [];
 
-		if ($method === 'update') {
-			$db_status_rules = DB::select('service_status_rule', [
-				'output' => ['service_status_ruleid', 'serviceid', 'type', 'limit_value', 'limit_status', 'new_status'],
-				'filter' => ['serviceid' => array_keys($serviceids)]
-			]);
+		if ($db_services !== null) {
+			foreach (array_keys($serviceids) as $serviceid) {
+				$status_rules_ref = [];
 
-			foreach ($db_status_rules as $db_status_rule) {
-				$del_status_rules[$db_status_rule['serviceid']][$db_status_rule['type']][$db_status_rule['limit_value']]
-					[$db_status_rule['limit_status']] = [
-						'service_status_ruleid' => $db_status_rule['service_status_ruleid'],
-						'fields' => [
-							'new_status' => $db_status_rule['new_status']
-						]
-					];
+				foreach ($services[$serviceid]['status_rules'] as &$status_rule) {
+					$status_rules_ref[$status_rule['type']][$status_rule['limit_value']][$status_rule['limit_status']] =
+						&$status_rule;
+				}
+				unset($status_rule);
+
+				foreach ($db_services[$serviceid]['status_rules'] as $db_status_rule) {
+					if (array_key_exists($db_status_rule['type'], $status_rules_ref)
+							&& array_key_exists($db_status_rule['limit_value'],
+								$status_rules_ref[$db_status_rule['type']]
+							)
+							&& array_key_exists($db_status_rule['limit_status'],
+								$status_rules_ref[$db_status_rule['type']][$db_status_rule['limit_value']]
+							)) {
+						$status_rule_ref = &$status_rules_ref[$db_status_rule['type']][$db_status_rule['limit_value']]
+							[$db_status_rule['limit_status']];
+
+						$status_rule_ref['service_status_ruleid'] = $db_status_rule['service_status_ruleid'];
+
+						$upd_status_rule = DB::getUpdatedValues('service_status_rule', $db_status_rule,
+							$status_rule_ref
+						);
+
+						if ($upd_status_rule) {
+							$upd_status_rules[] = [
+								'values' => $upd_status_rule,
+								'where' => ['service_status_ruleid' => $db_status_rule['service_status_ruleid']]
+							];
+						}
+					}
+					else {
+						$del_status_rules[$db_status_rule['service_status_ruleid']] = true;
+					}
+				}
 			}
 		}
 
 		foreach (array_keys($serviceids) as $serviceid) {
-			foreach ($services[$serviceid]['status_rules'] as $status_rule) {
-				if (array_key_exists($serviceid, $del_status_rules)
-						&& array_key_exists($status_rule['type'], $del_status_rules[$serviceid])
-						&& array_key_exists($status_rule['limit_value'],
-							$del_status_rules[$serviceid][$status_rule['type']]
-						)
-						&& array_key_exists($status_rule['limit_status'],
-							$del_status_rules[$serviceid][$status_rule['type']][$status_rule['limit_value']]
-						)) {
-					$db_status_rule = $del_status_rules[$serviceid][$status_rule['type']][$status_rule['limit_value']]
-						[$status_rule['limit_status']];
-
-					$upd_status_rule = DB::getUpdatedValues('service_status_rule', $status_rule,
-						$db_status_rule['fields']
-					);
-
-					if ($upd_status_rule) {
-						$upd_status_rules[] = [
-							'values' => $upd_status_rule,
-							'where' => ['service_status_ruleid' => $db_status_rule['service_status_ruleid']]
-						];
-					}
-
-					unset($del_status_rules[$serviceid][$status_rule['type']][$status_rule['limit_value']]
-						[$status_rule['limit_status']]
-					);
+			foreach ($services[$serviceid]['status_rules'] as &$status_rule) {
+				if (array_key_exists('service_status_ruleid', $status_rule)) {
+					continue;
 				}
-				else {
-					$ins_status_rules[] = ['serviceid' => $serviceid] + $status_rule;
-				}
+
+				$ins_status_rules[] = ['serviceid' => $serviceid] + $status_rule;
+				$ins_status_rules_ref[] = &$status_rule;
 			}
+			unset($status_rule);
 		}
 
 		if ($del_status_rules) {
-			$del_service_status_ruleids = [];
-
-			foreach ($del_status_rules as $del_status_rules) {
-				foreach ($del_status_rules as $del_status_rules) {
-					foreach ($del_status_rules as $del_status_rules) {
-						foreach ($del_status_rules as $status_rule) {
-							$del_service_status_ruleids[$status_rule['service_status_ruleid']] = true;
-						}
-					}
-				}
-			}
-
-			DB::delete('service_status_rule', ['service_status_ruleid' => array_keys($del_service_status_ruleids)]);
+			DB::delete('service_status_rule', ['service_status_ruleid' => array_keys($del_status_rules)]);
 		}
 
 		if ($ins_status_rules) {
-			DB::insertBatch('service_status_rule', $ins_status_rules);
+			$service_status_ruleids = DB::insertBatch('service_status_rule', $ins_status_rules);
+
+			foreach ($service_status_ruleids as $index => $service_status_ruleid) {
+				$ins_status_rules_ref[$index]['service_status_ruleid'] = $service_status_ruleid;
+			}
 		}
 
 		if ($upd_status_rules) {
@@ -2195,18 +2315,17 @@ class CService extends CApiService {
 	}
 
 	/**
-	 * @param array      $permissions
 	 * @param array      $services
 	 * @param array|null $db_services
 	 *
 	 * @throws APIException
 	 */
-	private function checkPermissions(array $permissions, array $services, array $db_services = null): void {
+	private function checkPermissions(array $services, array $db_services = null): void {
 		[
 			'r_services' => $r_services,
 			'rw_services' => $rw_services,
 			'rw_tag' => $rw_tag
-		] = $permissions;
+		] = self::getPermissions();
 
 		if ($r_services === null || $rw_services === null) {
 			$accessible_services = null;
@@ -2411,6 +2530,8 @@ class CService extends CApiService {
 	 * @param array $options
 	 *
 	 * @return array    as array(serviceId2 => data1, serviceId2 => data2, ...)
+	 *
+	 * @throws APIException
 	 */
 	public function getSla(array $options) {
 		$serviceIds = (isset($options['serviceids'])) ? zbx_toArray($options['serviceids']) : null;
