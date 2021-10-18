@@ -56,6 +56,13 @@ class CMultifieldTableElement extends CTableElement {
 	protected $names;
 
 	/**
+	 * Field mapping aliases.
+	 *
+	 * @var array
+	 */
+	protected $aliases = [];
+
+	/**
 	 * Get field mapping.
 	 *
 	 * @return array
@@ -197,8 +204,19 @@ class CMultifieldTableElement extends CTableElement {
 				$name = $label;
 			}
 
+			$aliases = [];
+			if ($name !== $label) {
+				$aliases[] = $label;
+			}
+			$aliases[] = $i;
+
 			if (!empty($this->names) && array_key_exists($name, $this->names)) {
+				$aliases[] = $name;
 				$name = $this->names[$name];
+			}
+
+			foreach ($aliases as $alias) {
+				$this->aliases[$alias] = $name;
 			}
 
 			$result[$label] = [
@@ -333,9 +351,11 @@ class CMultifieldTableElement extends CTableElement {
 	public function updateRow($index, $values) {
 		$controls = $this->getRowControls($this->getRow($index));
 		foreach ($values as $name => $value) {
-			if (array_key_exists($name, $controls)) {
+			$field = (array_key_exists($name, $this->aliases)) ? $this->aliases[$name] : $name;
+
+			if (array_key_exists($field, $controls)) {
 				try {
-					$controls[$name]->fill($value);
+					$controls[$field]->fill($value);
 				}
 				catch (\Exception $e1) {
 					if (!($e1 instanceof UnrecognizedExceptionException)
@@ -345,7 +365,7 @@ class CMultifieldTableElement extends CTableElement {
 
 					try {
 						$controls = $this->getRowControls($this->getRow($index));
-						$controls[$name]->fill($value);
+						$controls[$field]->fill($value);
 					}
 					catch (\Exception $e2) {
 						throw $e1;
@@ -410,7 +430,9 @@ class CMultifieldTableElement extends CTableElement {
 
 		foreach ($this->getValue() as $index => $values) {
 			foreach ($fields as $name => $value) {
-				if (array_key_exists($name, $values) && $values[$name] === $value) {
+				$field = (array_key_exists($name, $this->aliases)) ? $this->aliases[$name] : $name;
+
+				if (array_key_exists($field, $values) && $values[$field] === $value) {
 					$indices[] = $index;
 					break;
 				}
@@ -551,10 +573,12 @@ class CMultifieldTableElement extends CTableElement {
 			}
 
 			$controls = $this->getRowControls($row, $headers);
-			foreach ($expected[$id] as $field => $value) {
+			foreach ($expected[$id] as $name => $value) {
+				$field = (array_key_exists($name, $this->aliases)) ? $this->aliases[$name] : $name;
+
 				if (!array_key_exists($field, $controls)) {
 					if ($raise_exception) {
-						throw new Exception('Expected field "'.$field.'" is not present in multifield element row.');
+						throw new Exception('Expected field "'.$name.'" is not present in multifield element row.');
 					}
 
 					return false;
@@ -567,7 +591,7 @@ class CMultifieldTableElement extends CTableElement {
 				}
 				catch (Exception $exception) {
 					if ($raise_exception) {
-						CExceptionHelper::setMessage($exception, 'Multifield element value for field "'.$field.
+						CExceptionHelper::setMessage($exception, 'Multifield element value for field "'.$name.
 								'['.$id.']" is invalid: '.$exception->getMessage()
 						);
 					}

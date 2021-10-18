@@ -5330,9 +5330,10 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 
 			zbx_audit_httptest_update_json_add_data(httptest->httptestid, httptest->templateid,
 					httptest->name, httptest->delay, (int)httptest->status, httptest->agent,
-					(int)httptest->authentication, httptest->http_user, httptest->http_proxy,
-					httptest->retries, httptest->ssl_cert_file, httptest->ssl_key_file,
-					httptest->verify_peer, httptest->verify_host, hostid);
+					(int)httptest->authentication, httptest->http_user, httptest->http_password,
+					httptest->http_proxy, httptest->retries, httptest->ssl_cert_file,
+					httptest->ssl_key_file, httptest->ssl_key_password, httptest->verify_peer,
+					httptest->verify_host, hostid);
 
 			for (j = 0; j < httptest->httpsteps.values_num; j++)
 			{
@@ -5416,8 +5417,9 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 			d = ",";										\
 			zbx_free(str_esc);									\
 														\
-			zbx_audit_httptest_update_json_update_##field(httptest->httptestid,			\
-				ZBX_MACRO_SECRET_MASK, ZBX_MACRO_SECRET_MASK);					\
+			zbx_audit_httptest_update_json_update_##field(httptest->httptestid, 			\
+					(0 == strcmp("", httptest->field##_orig) ? "" :ZBX_MACRO_SECRET_MASK),	\
+					(0 == strcmp("", httptest->field) ? "" : ZBX_MACRO_SECRET_MASK));	\
 		}
 
 #define PREPARE_UPDATE_HTTPTEST_INT(FLAG, field)								\

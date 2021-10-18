@@ -592,14 +592,14 @@ class DB {
 			switch ($table_schema['fields'][$table_schema['key']]['type']) {
 				case DB::FIELD_TYPE_ID:
 					$resultids[$key] = $id;
-					$row[$table_schema['key']] = $id;
+					$row = [$table_schema['key'] => $id] + $row;
 					$id = bcadd($id, 1, 0);
 					break;
 
 				case DB::FIELD_TYPE_CUID:
 					$id = CCuid::generate();
 					$resultids[$key] = $id;
-					$row[$table_schema['key']] = $id;
+					$row = [$table_schema['key'] => $id] + $row;
 					break;
 			}
 		}

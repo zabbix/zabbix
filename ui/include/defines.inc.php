@@ -1344,7 +1344,10 @@ define('API_CUID',					45);
 define('API_IP_RANGES',				46);
 define('API_IMAGE',					47);
 define('API_EXEC_PARAMS',			48);
-define('API_LAT_LNG_ZOOM',			49);
+define('API_COND_FORMULA',			49);
+define('API_COND_FORMULAID',		50);
+define('API_UNEXPECTED',			51);
+define('API_LAT_LNG_ZOOM',			52);
 
 // flags
 define('API_REQUIRED',					0x0001);

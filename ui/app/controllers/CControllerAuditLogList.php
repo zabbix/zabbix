@@ -104,7 +104,7 @@ class CControllerAuditLogList extends CController {
 				'resourcename', 'details', 'recordsetid'
 			],
 			'filter' => $filter,
-			'sortfield' => 'clock',
+			'sortfield' => 'auditid',
 			'sortorder' => ZBX_SORT_DOWN,
 			'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 		];
