@@ -212,7 +212,7 @@ static void	item_description(char **data, const char *key, zbx_uint64_t hostid)
 {
 	AGENT_REQUEST	request;
 	char		c, *p, *m, *n, *str_out = NULL, *replace_to = NULL;
-	int		macro_r, context_l, context_r;
+	int		macro_r, context_l, context_r, warning = 0;
 
 	init_request(&request);
 
@@ -250,12 +250,14 @@ static void	item_description(char **data, const char *key, zbx_uint64_t hostid)
 		}
 		else
 		{
-			if ('1' <= *(m + 1) && *(m + 1) <= '9')
+			if (0 == warning && '1' <= *(m + 1) && *(m + 1) <= '9')
 			{
 				/* macros $1, $2, ... */
-				zabbix_log(LOG_LEVEL_WARNING, "Use of positional macros ($1,$2… $9 - referring to the "
-						"first, second… ninth parameter of the item key '%s') is now "
+				zabbix_log(LOG_LEVEL_WARNING, "Use of positional macros ($1,$2... $9 - referring to the"
+						" first, second... ninth parameter of the item key '%s') is now "
 						"deprecated", key);
+
+				warning = 1;
 			}
 
 			/* just a dollar sign */
