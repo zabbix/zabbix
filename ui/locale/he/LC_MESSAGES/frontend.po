@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-10-08 19:52+0300\n"
-"PO-Revision-Date: 2021-10-05 12:00+0300\n"
+"PO-Revision-Date: 2021-10-17 12:06+0300\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
-"X-POOTLE-MTIME: 1633428005.000000\n"
+"X-POOTLE-MTIME: 1634465207.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:139
@@ -15563,7 +15563,6 @@ msgid "Service data storage period \"%1$s\"."
 msgstr "תקופת אחסון נתוני שירות „%1$s”."
 
 #: services.php:108
-#, fuzzy
 msgid "Service deleted"
 msgstr "שירות נמחק"
 
@@ -15712,7 +15711,7 @@ msgstr "צורה"
 
 #: include/menu.inc.php:203
 msgid "Share"
-msgstr ""
+msgstr "שיתוף"
 
 #: include/views/monitoring.screen.edit.php:219
 #: include/views/monitoring.slideconf.edit.php:272
@@ -18003,7 +18002,7 @@ msgstr "מצב מעודכן של המארח „%1$s”."
 #: include/classes/screens/CScreenTriggersOverview.php:53
 #, c-format
 msgid "Updated: %1$s"
-msgstr ""
+msgstr "עדכון: %1$s"
 
 #: app/views/administration.image.edit.php:52
 msgid "Upload"
@@ -18291,7 +18290,7 @@ msgstr "המשתמש עם המזהה „%1$s” לא זמין."
 #: include/classes/api/services/CUser.php:476
 #, c-format
 msgid "User with alias \"%1$s\" already exists."
-msgstr ""
+msgstr "כבר קיים משתמש עם הכינוי „%1$s”."
 
 #: include/actions.inc.php:1854 include/actions.inc.php:1949
 msgid "User/Recipient"
@@ -19136,7 +19135,7 @@ msgstr "Y-m-d H:i:s"
 
 #: include/translateDefines.inc.php:37
 msgid "Y-n-d"
-msgstr ""
+msgstr "Y-n-d"
 
 #: include/views/js/monitoring.sysmaps.js.php:430
 msgid "Y1"
@@ -19230,7 +19229,7 @@ msgstr "אין לך אפשרות להחליף מארחים בבחירה הנוכ
 #: include/classes/api/services/CAction.php:1913
 #, c-format
 msgid "You did not specify targets for action operation command \"%1$s\"."
-msgstr ""
+msgstr "לא ציינת יעדים לפקודת פעילות פעולה „%1$s”."
 
 #: include/classes/api/services/CAction.php:1906
 #, c-format
@@ -19364,6 +19363,9 @@ msgid ""
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
 "2. Incorrect network configuration.\n"
 msgstr ""
+"אי אפשר להגיע לשרת ה־Zabbix‏ „%1$s”. סיבות אפשריות:\n"
+"1. IP/DNS שגוי ב־„zabbix.conf.php”;\n"
+"2. הגדרות רשת שגויות.\n"
 
 #: app/partials/popup.operations.php:234
 #: app/views/administration.script.edit.php:56 include/actions.inc.php:875
@@ -19921,7 +19923,7 @@ msgstr "כלל הגילוי „%1$s” במארח „%2$s” אינו במעקב
 #: app/partials/monitoring.latest.view.html.php:126
 #, c-format
 msgid "displaying %1$s to %2$s of %3$s Items"
-msgstr ""
+msgstr "מוצגים %1$s עד %2$s מתוך %3$s פריטים"
 
 #: app/views/popup.lldoperation.php:67 include/actions.inc.php:27
 #: include/correlation.inc.php:34
@@ -20078,12 +20080,12 @@ msgstr "שגיאת תחביר ליד „%1$s“"
 
 #: include/classes/parsers/CTriggerExpression.php:501
 msgid "incorrect trigger expression"
-msgstr ""
+msgstr "ביטוי הקפצה שגוי"
 
 #: include/classes/parsers/CTriggerExpression.php:515
 #, c-format
 msgid "incorrect trigger expression starting from \"%1$s\""
-msgstr ""
+msgstr "ביטוי הקפצה שגוי החל מ־„%1$s”"
 
 #: include/events.inc.php:37
 msgctxt "event source"
@@ -20337,11 +20339,11 @@ msgstr "חייב להכיל לפחות מאקרו אחד של זיהוי ברמ�
 
 #: include/translateDefines.inc.php:38
 msgid "n-d"
-msgstr ""
+msgstr "n-d"
 
 #: include/translateDefines.inc.php:36
 msgid "n-d H:i"
-msgstr ""
+msgstr "n-d H:i"
 
 #: include/views/configuration.host.discovery.edit.php:125
 #: include/views/configuration.host.discovery.edit.php:221
