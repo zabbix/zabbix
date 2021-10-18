@@ -571,7 +571,7 @@ class CElementQuery implements IWaitable {
 			],
 			'CColorPickerElement'		=> '/div[contains(@class, "input-color-picker")]',
 			'CMultilineElement'			=> '/div[contains(@class, "multilineinput-control")]',
-			'CInputGroupElement'		=> '/div[contains(@class, "input-group")]'
+			'CInputGroupElement'		=> '/div[contains(@class, "macro-input-group")]'
 		];
 
 		if ($class !== null) {

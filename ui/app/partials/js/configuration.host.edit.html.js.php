@@ -45,13 +45,13 @@
 				new CCol(
 					(new CDiv())
 						->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
-						->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+						->setAdaptiveWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 				),
 				new CCol(),
 				new CCol(
 					(new CDiv())
 						->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
-						->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+						->setAdaptiveWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 				)
 			]
 		]))

@@ -193,4 +193,4 @@ $table->show();
 
 // Initializing input secret and macro value init script separately.
 (new CScriptTag("jQuery('.input-secret').inputSecret();"))->show();
-(new CScriptTag("jQuery('.input-group').macroValue();"))->show();
+(new CScriptTag("jQuery('.macro-input-group').macroValue();"))->show();

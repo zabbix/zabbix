@@ -159,7 +159,7 @@ class HostMacrosManager {
 						jQuery('#macros_'+macro_num+'_value').prop('disabled', true);
 					}
 					$('#macros_'+macro_num+'_value')
-						.closest('.input-group')
+						.closest('.macro-input-group')
 						.find('.btn-undo')
 						.hide();
 					$('#macros_'+macro_num+'_value_btn').prop('disabled', true);
@@ -179,7 +179,7 @@ class HostMacrosManager {
 				}
 			})
 			.on('afteradd.dynamicRows', function() {
-				$('.input-group').macroValue();
+				$('.macro-input-group').macroValue();
 			});
 
 		this.initMacroFields($parent);

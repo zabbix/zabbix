@@ -34,14 +34,14 @@
 
 	function btnUndoFocusEventHandle() {
 		$(this)
-			.closest('.input-group')
+			.closest('.macro-input-group')
 			.find('.btn-undo')
 			.toggleClass('is-focused');
 	}
 
 	function btnUndoClickEventHandle() {
 		var $this = $(this),
-			$container = $this.closest('.input-group'),
+			$container = $this.closest('.macro-input-group'),
 			$input_container = $('.input-secret, .textarea-flexible', $container),
 			$input = $('.input-secret input[type=password], .textarea-flexible', $container),
 			$dropdown_value = $('.dropdown-value', $container);
@@ -94,7 +94,7 @@
 	function inputDropdownValueChangeEventHandle() {
 		var $this = $(this),
 			value_type = $this.val(),
-			$container = $this.closest('.input-group'),
+			$container = $this.closest('.macro-input-group'),
 			curr_value_type = getCurrentValueType($container);
 
 		if (value_type == curr_value_type) {
@@ -166,7 +166,7 @@
 	var methods = {
 		init() {
 			return this.each(function () {
-				$('.input-secret input, .input-group .textarea-flexible', $(this))
+				$('.input-secret input, .macro-input-group .textarea-flexible', $(this))
 					.off('focus blur', btnUndoFocusEventHandle)
 					.on('focus blur', btnUndoFocusEventHandle);
 				$('.btn-undo', $(this))

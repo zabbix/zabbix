@@ -5731,10 +5731,9 @@ $range-input-width: 31px;
 
 // Input group
 
-.input-group {
+.macro-input-group {
 	position: relative;
 	display: flex;
-	flex-wrap: wrap;
 	align-items: stretch;
 	width: 100%;
 

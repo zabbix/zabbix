@@ -651,7 +651,7 @@ class CElement extends CBaseElement implements IWaitable {
 			return $this->asMultiline($options);
 		}
 
-		if (in_array('input-group', $class)) {
+		if (in_array('macro-input-group', $class)) {
 			return $this->asInputGroup($options);
 		}
 

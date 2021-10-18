@@ -3861,7 +3861,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .radio-list-control input[type="radio"][disabled] + label, z-select[disabled] button,
 .z-select[disabled] button, z-select[readonly] button,
 .z-select[readonly] button, .multiselect[aria-disabled], input[disabled], input[readonly], textarea[disabled], textarea[readonly], select option[disabled], select[disabled], select[readonly], .checkbox-radio[readonly] span,
-.checkbox-radio[readonly] + label span, .checkbox-radio[disabled] + label span, .input-group button.btn-dropdown-toggle:disabled {
+.checkbox-radio[readonly] + label span, .checkbox-radio[disabled] + label span, .macro-input-group button.btn-dropdown-toggle:disabled {
   color: #525252;
   background-color: #2b2b2b !important;
   border-color: #3d3d3d; }
@@ -6128,30 +6128,29 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
 .host-avail-widget .host-avail-total {
   background: transparent; }
 
-.input-group {
+.macro-input-group {
   position: relative;
   display: flex;
-  flex-wrap: wrap;
   align-items: stretch;
   width: 100%; }
-  .input-group * {
+  .macro-input-group * {
     box-sizing: border-box; }
-  .input-group input,
-  .input-group textarea {
+  .macro-input-group input,
+  .macro-input-group textarea {
     flex: 1;
     border-right: 0; }
-    .input-group input:focus + .btn-undo, .input-group input:active + .btn-undo,
-    .input-group textarea:focus + .btn-undo,
-    .input-group textarea:active + .btn-undo {
+    .macro-input-group input:focus + .btn-undo, .macro-input-group input:active + .btn-undo,
+    .macro-input-group textarea:focus + .btn-undo,
+    .macro-input-group textarea:active + .btn-undo {
       border-top-color: #768d99;
       border-bottom-color: #768d99; }
-  .input-group button {
+  .macro-input-group button {
     position: relative; }
-    .input-group button.btn-change {
+    .macro-input-group button.btn-change {
       border-radius: 0; }
-      .input-group button.btn-change:disabled {
+      .macro-input-group button.btn-change:disabled {
         display: none; }
-    .input-group button.btn-undo {
+    .macro-input-group button.btn-undo {
       display: none;
       width: 24px;
       border-left: 0;
@@ -6161,7 +6160,7 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
       border-radius: 0;
       background-color: #383838;
       transition: border-color .2s ease-out, box-shadow .2s ease-out; }
-      .input-group button.btn-undo::before {
+      .macro-input-group button.btn-undo::before {
         position: absolute;
         top: 0;
         left: 0;
@@ -6170,18 +6169,18 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
         height: 22px;
         content: '';
         background: url("../img/icon-sprite.svg?20200407") no-repeat -119px -474px; }
-      .input-group button.btn-undo.is-focused {
+      .macro-input-group button.btn-undo.is-focused {
         border-top: 1px solid #768d99;
         border-bottom: 1px solid #768d99; }
-      .input-group button.btn-undo:hover, .input-group button.btn-undo:focus, .input-group button.btn-undo:active {
+      .macro-input-group button.btn-undo:hover, .macro-input-group button.btn-undo:focus, .macro-input-group button.btn-undo:active {
         border-top: 1px solid #768d99;
         border-bottom: 1px solid #768d99;
         color: #f2f2f2;
         background-color: #5e737e;
         border-color: #5e737e; }
-        .input-group button.btn-undo:hover::before, .input-group button.btn-undo:focus::before, .input-group button.btn-undo:active::before {
+        .macro-input-group button.btn-undo:hover::before, .macro-input-group button.btn-undo:focus::before, .macro-input-group button.btn-undo:active::before {
           background-position: -431px -474px; }
-    .input-group button.btn-dropdown-toggle {
+    .macro-input-group button.btn-dropdown-toggle {
       border-color: #768d99;
       border-top-left-radius: 0;
       border-bottom-left-radius: 0; }

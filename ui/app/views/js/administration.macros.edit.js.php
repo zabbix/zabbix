@@ -64,10 +64,10 @@
 			})
 			.dynamicRows({template: '#macro-row-tmpl'})
 			.on('afteradd.dynamicRows', function() {
-				$('.input-group', table).macroValue();
+				$('.macro-input-group', table).macroValue();
 				$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', table).textareaFlexible();
 			})
-			.find('.input-group')
+			.find('.macro-input-group')
 			.macroValue();
 
 		table
