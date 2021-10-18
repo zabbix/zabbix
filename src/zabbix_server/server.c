@@ -1313,7 +1313,8 @@ static int	server_startup(zbx_socket_t *listen_sock)
 					zbx_free(error);
 					DBclose();
 
-					return FAIL;
+					ret = FAIL;
+					goto out;
 				}
 
 				/* update maintenance states */
