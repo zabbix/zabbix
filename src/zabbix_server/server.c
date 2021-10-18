@@ -1200,7 +1200,7 @@ static int	server_update_status(void)
  ******************************************************************************/
 static int	server_startup(zbx_socket_t *listen_sock)
 {
-	int	i;
+	int	i, ret = SUCCEED;
 	char	*error = NULL;
 
 	if (SUCCEED != init_database_cache(&error))
@@ -1245,6 +1245,14 @@ static int	server_startup(zbx_socket_t *listen_sock)
 		return FAIL;
 	}
 
+	if (0 != CONFIG_TRAPPER_FORKS)
+	{
+		if (FAIL == zbx_tcp_listen(listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "listener failed: %s", zbx_socket_strerror());
+			return FAIL;
+		}
+	}
 	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_POLLER_FORKS
 			+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS + CONFIG_PINGER_FORKS
 			+ CONFIG_ALERTER_FORKS + CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS
@@ -1259,16 +1267,9 @@ static int	server_startup(zbx_socket_t *listen_sock)
 	threads = (pid_t *)zbx_calloc(threads, threads_num, sizeof(pid_t));
 	threads_flags = (int *)zbx_calloc(threads_flags, threads_num, sizeof(int));
 
-	if (0 != CONFIG_TRAPPER_FORKS)
-	{
-		if (FAIL == zbx_tcp_listen(listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT))
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "listener failed: %s", zbx_socket_strerror());
-			return FAIL;
-		}
-	}
-
 	zabbix_log(LOG_LEVEL_INFORMATION, "server #0 started [main process]");
+
+	zbx_set_exit_on_terminate();
 
 	for (i = 0; i < threads_num; i++)
 	{
@@ -1295,10 +1296,13 @@ static int	server_startup(zbx_socket_t *listen_sock)
 				DCconfig_wait_sync();
 
 				if (SUCCEED != server_update_status())
-					return FAIL;
+				{
+					ret = FAIL;
+					goto out;
+				}
 
 				if (ZBX_NODE_STATUS_ACTIVE != ha_status)
-					return SUCCEED;
+					goto out;
 
 				DBconnect(ZBX_DB_CONNECT_NORMAL);
 
@@ -1427,9 +1431,11 @@ static int	server_startup(zbx_socket_t *listen_sock)
 
 	/* startup/postinit tasks can take a long time, update status */
 	if (SUCCEED != server_update_status())
-		return FAIL;
+		ret = FAIL;
+out:
+	zbx_unset_exit_on_terminate();
 
-	return SUCCEED;
+	return ret;
 }
 
 static int	server_restart_logger(char **error)
@@ -1693,7 +1699,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	zbx_set_terminate_signal_handlers();
+	zbx_unset_exit_on_terminate();
 
 	if (SUCCEED != zbx_ha_start(&error, ZBX_NODE_STATUS_UNKNOWN))
 	{

@@ -21,11 +21,13 @@
 #define ZABBIX_SIGHANDLER_H
 
 void	zbx_set_common_signal_handlers(void);
-void	zbx_set_terminate_signal_handlers(void);
 void	zbx_set_child_signal_handler(void);
 void	zbx_unset_child_signal_handler(void);
 void	zbx_set_metric_thread_signal_handler(void);
 void	zbx_block_signals(sigset_t *orig_mask);
 void	zbx_unblock_signals(const sigset_t *orig_mask);
+
+void	zbx_set_exit_on_terminate(void);
+void	zbx_unset_exit_on_terminate(void);
 
 #endif

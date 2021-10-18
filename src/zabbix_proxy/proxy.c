@@ -1277,8 +1277,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	DBcheck_character_set();
 
-	zbx_set_terminate_signal_handlers();
-
 	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_HEARTBEAT_FORKS + CONFIG_DATASENDER_FORKS
 			+ CONFIG_POLLER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS
 			+ CONFIG_PINGER_FORKS + CONFIG_HOUSEKEEPER_FORKS + CONFIG_HTTPPOLLER_FORKS
@@ -1407,6 +1405,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	}
 
 	zbx_set_sigusr_handler(zbx_main_sigusr_handler);
+	zbx_unset_exit_on_terminate();
 
 	while (ZBX_IS_RUNNING() && -1 == wait(&i))	/* wait for any child to exit */
 	{

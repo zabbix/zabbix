@@ -1163,9 +1163,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_tls_init_parent();
 #endif
 	/* --- START THREADS ---*/
-#ifndef _WINDOWS
-	zbx_set_terminate_signal_handlers();
-#endif
+
 	/* allocate memory for a collector, all listeners and active checks */
 	threads_num = CONFIG_COLLECTOR_FORKS + CONFIG_PASSIVE_FORKS + CONFIG_ACTIVE_FORKS;
 
@@ -1246,6 +1244,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		THIS_SHOULD_NEVER_HAPPEN;
 	}
 #else
+	zbx_unset_exit_on_terminate();
+
 	while (ZBX_IS_RUNNING() && -1 == wait(&i))	/* wait for any child to exit */
 	{
 		if (EINTR != errno)
@@ -1419,7 +1419,6 @@ int	main(int argc, char **argv)
 			load_perf_counters(CONFIG_PERF_COUNTERS, CONFIG_PERF_COUNTERS_EN);
 #else
 			zbx_set_common_signal_handlers();
-			zbx_set_terminate_signal_handlers();
 #endif
 #ifndef _WINDOWS
 			if (FAIL == zbx_load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT, 0))

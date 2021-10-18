@@ -1740,7 +1740,7 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 	char			*error = NULL;
 	zbx_ipc_client_t	*client, *main_proc = NULL;
 	zbx_ipc_message_t	*message;
-	int			stop = FAIL;
+	int			pause = FAIL, stop = FAIL;
 	double			now, nextcheck;
 	zbx_ha_info_t		info;
 
@@ -1782,7 +1782,7 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "HA manager started in %s mode", zbx_ha_status_str(info.ha_status));
 
-	while (SUCCEED != stop && ZBX_NODE_STATUS_ERROR != info.ha_status)
+	while (SUCCEED != pause && ZBX_NODE_STATUS_ERROR != info.ha_status)
 	{
 		now = zbx_time();
 
@@ -1820,8 +1820,11 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 				case ZBX_IPC_SERVICE_HA_STATUS:
 					ha_notify_parent(main_proc, info.ha_status, info.error);
 					break;
-				case ZBX_IPC_SERVICE_HA_PAUSE:
+				case ZBX_IPC_SERVICE_HA_STOP:
 					stop = SUCCEED;
+					ZBX_FALLTHROUGH;
+				case ZBX_IPC_SERVICE_HA_PAUSE:
+					pause = SUCCEED;
 					break;
 				case ZBX_IPC_SERVICE_HA_GET_NODES:
 					ha_send_node_list(&info, client);
@@ -1865,8 +1868,6 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "HA manager has been paused");
 pause:
-	stop = FAIL;
-
 	while (SUCCEED != stop)
 	{
 		(void)zbx_ipc_service_recv(&service, ZBX_HA_POLL_PERIOD, &client, &message);

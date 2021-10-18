@@ -28,6 +28,7 @@
 
 int			sig_parent_pid = -1;
 volatile sig_atomic_t	sig_exiting;
+static volatile sig_atomic_t	sig_exit_on_terminate = 1;
 
 static void	log_fatal_signal(int sig, siginfo_t *siginfo, void *context)
 {
@@ -94,42 +95,6 @@ static void	alarm_signal_handler(int sig, siginfo_t *siginfo, void *context)
 
 /******************************************************************************
  *                                                                            *
- * Function: startup_terminate_signal_handler                                 *
- *                                                                            *
- * Purpose: handle terminate signals: SIGHUP, SIGINT, SIGTERM, SIGUSR2        *
- *          during daemon startup                                             *
- *                                                                            *
- ******************************************************************************/
-static void	startup_terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
-{
-	int zbx_log_level_temp;
-
-	SIG_CHECK_PARAMS(sig, siginfo, context);
-
-	if (ZBX_EXIT_NONE == sig_exiting)
-	{
-		sig_exiting = ZBX_EXIT_SUCCESS;
-
-		/* temporary variable is used to avoid compiler warning */
-		zbx_log_level_temp = sig_parent_pid == SIG_CHECKED_FIELD(siginfo, si_pid) ?
-				LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING;
-		zabbix_log(zbx_log_level_temp,
-				"Got signal [signal:%d(%s),sender_pid:%d,sender_uid:%d,"
-				"reason:%d]. Exiting ...",
-				sig, get_signal_name(sig),
-				SIG_CHECKED_FIELD(siginfo, si_pid),
-				SIG_CHECKED_FIELD(siginfo, si_uid),
-				SIG_CHECKED_FIELD(siginfo, si_code));
-
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		zbx_tls_free_on_signal();
-#endif
-		zbx_on_exit(SUCCEED);
-	}
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: terminate_signal_handler                                         *
  *                                                                            *
  * Purpose: handle terminate signals: SIGHUP, SIGINT, SIGTERM, SIGUSR2        *
@@ -171,6 +136,8 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 			zbx_tls_free_on_signal();
 #endif
+			if (0 != sig_exit_on_terminate)
+				zbx_on_exit(SUCCEED);
 		}
 	}
 }
@@ -217,7 +184,7 @@ void	zbx_set_common_signal_handlers(void)
 	sigemptyset(&phan.sa_mask);
 	phan.sa_flags = SA_SIGINFO;
 
-	phan.sa_sigaction = startup_terminate_signal_handler;
+	phan.sa_sigaction = terminate_signal_handler;
 	sigaction(SIGINT, &phan, NULL);
 	sigaction(SIGQUIT, &phan, NULL);
 	sigaction(SIGHUP, &phan, NULL);
@@ -236,26 +203,27 @@ void	zbx_set_common_signal_handlers(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_set_terminate_signal_handlers                                *
+ * Function: zbx_set_exit_on_terminate                                        *
  *                                                                            *
- * Purpose: set terminate signal handlers                                     *
+ * Purpose: make main process to exit on terminate signals                    *
  *                                                                            *
  ******************************************************************************/
-void	zbx_set_terminate_signal_handlers(void)
+void	zbx_set_exit_on_terminate(void)
 {
-	struct sigaction	phan;
+	sig_exit_on_terminate = 1;
+}
 
-	sig_parent_pid = (int)getpid();
-
-	sigemptyset(&phan.sa_mask);
-	phan.sa_flags = SA_SIGINFO;
-
-	phan.sa_sigaction = terminate_signal_handler;
-	sigaction(SIGINT, &phan, NULL);
-	sigaction(SIGQUIT, &phan, NULL);
-	sigaction(SIGHUP, &phan, NULL);
-	sigaction(SIGTERM, &phan, NULL);
-	sigaction(SIGUSR2, &phan, NULL);
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_unset_exit_on_terminate                                      *
+ *                                                                            *
+ * Purpose: make main process to set exit flag and continue to work on        *
+ *          terminate signals                                                 *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_unset_exit_on_terminate(void)
+{
+	sig_exit_on_terminate = 0;
 }
 
 /******************************************************************************
