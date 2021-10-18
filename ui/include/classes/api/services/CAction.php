@@ -1283,104 +1283,6 @@ class CAction extends CApiService {
 		}
 	}
 
-	/**
-	 * @static
-	 *
-	 * @param array $operations
-	 *
-	 * @throws APIException
-	 */
-	private static function validateOperationsIntegrity(array $operations): void {
-		$all_groupids = [];
-		$all_hostids = [];
-		$all_templateids = [];
-		$all_userids = [];
-		$all_usrgrpids = [];
-		$all_mediatypeids = [];
-		$all_scriptids = [];
-
-		foreach ($operations as $operation) {
-			if ($operation['recovery'] == ACTION_OPERATION) {
-				if ((array_key_exists('esc_step_from', $operation) || array_key_exists('esc_step_to', $operation))
-						&& (!array_key_exists('esc_step_from', $operation)
-							|| !array_key_exists('esc_step_to', $operation))) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_('Parameters "esc_step_from" and "esc_step_to" must be set together.')
-					);
-				}
-
-				if (array_key_exists('esc_step_from', $operation) && array_key_exists('esc_step_to', $operation)) {
-					if ($operation['esc_step_from'] > $operation['esc_step_to'] && $operation['esc_step_to'] != 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_('Incorrect action operation escalation step values.')
-						);
-					}
-				}
-			}
-
-			switch ($operation['operationtype']) {
-				case OPERATION_TYPE_MESSAGE:
-					if (array_key_exists('opmessage_usr', $operation)) {
-						$all_userids += array_column($operation['opmessage_usr'], 'userid', 'userid');
-					}
-
-					if (array_key_exists('opmessage_grp', $operation)) {
-						$all_usrgrpids += array_column($operation['opmessage_grp'], 'usrgrpid', 'usrgrpid');
-					}
-					// break; is not missing here
-
-				case OPERATION_TYPE_ACK_MESSAGE:
-					if ($operation['opmessage']['mediatypeid'] != 0) {
-						$all_mediatypeids[$operation['opmessage']['mediatypeid']] =
-							$operation['opmessage']['mediatypeid'];
-					}
-					break;
-
-				case OPERATION_TYPE_COMMAND:
-					$all_scriptids[$operation['opcommand']['scriptid']] = $operation['opcommand']['scriptid'];
-
-					if ($operation['eventsource'] == EVENT_SOURCE_SERVICE) {
-						break;
-					}
-
-					$groupids = array_column($operation['opcommand_grp'], 'groupid', 'groupid');
-					$hostids = [];
-					$without_current = true;
-
-					if (array_key_exists('opcommand_hst', $operation)) {
-						foreach ($operation['opcommand_hst'] as $opcommand_hst) {
-							if ($opcommand_hst['hostid'] == 0) {
-								$without_current = false;
-							}
-							else {
-								$hostids[$opcommand_hst['hostid']] = $opcommand_hst['hostid'];
-							}
-						}
-					}
-
-					if (!$groupids && !$hostids && $without_current) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_('No targets specified for action operation global script.') // FIXME: add this check to anywhere
-						);
-					}
-
-					$all_groupids += $groupids;
-					$all_hostids += $hostids;
-					break;
-
-				case OPERATION_TYPE_GROUP_ADD:
-				case OPERATION_TYPE_GROUP_REMOVE:
-					$all_groupids += array_column($operation['opgroup'], 'groupid', 'groupid');
-					break;
-
-				case OPERATION_TYPE_TEMPLATE_ADD:
-				case OPERATION_TYPE_TEMPLATE_REMOVE:
-					$all_templateids += array_column($operation['optemplate'], 'templateid', 'templateid');
-					break;
-			}
-		}
-	}
-
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
@@ -2868,12 +2770,9 @@ class CAction extends CApiService {
 		]);
 
 		if ($count != count($groupids)) {
-			// FIXME: change error message
-			// self::exception(ZBX_API_ERROR_PERMISSIONS, ($method === 'condition')
-			// 	? _('Incorrect action condition host group. Host group does not exist or you have no access to it.')
-			// 	: _('Incorrect action operation host group. Host group does not exist or you have no access to it.')
-			// );
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_('Incorrect action condition or operation host group. Host group does not exist or you have no access to it.')
+			);
 		}
 	}
 
@@ -2940,12 +2839,9 @@ class CAction extends CApiService {
 		]);
 
 		if ($count != count($hostids)) {
-			// FIXME: change error message
-			// self::exception(ZBX_API_ERROR_PERMISSIONS, ($source === 'condition')
-			// 	? _('Incorrect action condition host. Host does not exist or you have no access to it.')
-			// 	: _('Incorrect action operation host. Host does not exist or you have no access to it.')
-			// );
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_('Incorrect action condition or operation host. Host does not exist or you have no access to it.')
+			);
 		}
 	}
 
@@ -3099,12 +2995,9 @@ class CAction extends CApiService {
 		]);
 
 		if ($count != count($templateids)) {
-			// FIXME: change error message
-			// self::exception(ZBX_API_ERROR_PERMISSIONS, ($source === 'condition')
-			// 	? _('Incorrect action condition template. Template does not exist or you have no access to it.')
-			// 	: _('Incorrect action operation template. Template does not exist or you have no access to it.')
-			// );
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_('Incorrect action condition or operation template. Template does not exist or you have no access to it.')
+			);
 		}
 	}
 
