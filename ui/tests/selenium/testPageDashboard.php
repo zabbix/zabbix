@@ -86,6 +86,31 @@ class testPageDashboard extends CLegacyWebTest {
 		}
 	}
 
+	public function testPageDashboard_CheckDasboardPopupLayout() {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&new=1')->waitUntilReady();
+		$dialog = COverlayDialogElement::find()->waitUntilVisible()->one();
+		$this->assertEquals('Dashboard properties', $dialog->getTitle());
+		$properties_form = $dialog->query('name:dashboard_properties_form')->asForm()->one();
+		$this->assertEquals(['Owner', 'Name', 'Default page display period', 'Start slideshow automatically'],
+				$properties_form->getLabels()->asText()
+		);
+
+		// Check available display periods.
+		$this->assertEquals(['10 seconds', '30 seconds', '1 minute', '2 minutes', '10 minutes', '30 minutes', '1 hour'],
+				$properties_form->query('name:display_period')->asZDropdown()->one()->getOptions()->asText()
+		);
+		$properties_form->fill(['Name' => 'Dashboard creation']);
+		$properties_form->submit();
+		$this->page->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one();
+
+		// Check popup-menu options.
+		$this->query('id:dashboard-add')->one()->click();
+		$add_menu = $this->query('xpath://ul[@role="menu"]')->asPopupMenu()->one();
+		$this->assertEquals(['Add widget', 'Add page', 'Paste widget', 'Paste page'], $add_menu->getItems()->asText());
+		$dashboard->cancelEditing();
+	}
+
 	public function testPageDashboard_AddFavouriteGraphs() {
 		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
 
