@@ -451,12 +451,9 @@ class CHostPrototype extends CHostBase {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$ruleids = array_keys(array_flip(array_column($host_prototypes, 'ruleid')));
-
 		self::checkDuplicates($host_prototypes);
-		self::checkDiscoveryRulePermissions($ruleids);
+		self::checkDiscoveryRules($host_prototypes);
 		self::checkHostGroupsPermissions($host_prototypes);
-		self::checkHostDiscovery($ruleids);
 		self::checkAndAddUuid($host_prototypes);
 		self::checkMainInterfaces($host_prototypes);
 	}
@@ -1134,31 +1131,6 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * @static
-	 *
-	 * @param array $ruleids
-	 *
-	 * @throws APIException
-	 */
-	private static function checkHostDiscovery(array $ruleids): void {
-		// Check if the host is discovered.
-		$duplicates = DBfetchArray(DBselect(
-			'SELECT h.host'.
-			' FROM items i,hosts h'.
-			' WHERE i.hostid=h.hostid'.
-				' AND '.dbConditionInt('i.itemid', $ruleids).
-				' AND h.flags='.ZBX_FLAG_DISCOVERY_CREATED,
-			1
-		));
-
-		if ($duplicates) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Cannot create a host prototype on a discovered host "%1$s".', $duplicates[0]['host'])
-			);
-		}
-	}
-
-	/**
 	 * Check that only host prototypes on templates have UUID. Add UUID to all host prototypes on templates,
 	 * if it doesn't exist.
 	 *
@@ -1169,14 +1141,12 @@ class CHostPrototype extends CHostBase {
 	 * @throws APIException
 	 */
 	private static function checkAndAddUuid(array &$host_prototypes): void {
-		$discovery_ruleids = array_keys(array_flip(array_column($host_prototypes, 'ruleid')));
-
 		$db_templated_rules = DBfetchArrayAssoc(DBselect(
-			'SELECT i.itemid, h.status'.
-			' FROM items i, hosts h'.
-			' WHERE '.dbConditionInt('i.itemid', $discovery_ruleids).
+			'SELECT i.itemid,h.status'.
+			' FROM items i,hosts h'.
+			' WHERE '.dbConditionInt('i.itemid', array_keys(array_flip(array_column($host_prototypes, 'ruleid')))).
 			' AND i.hostid=h.hostid'.
-			' AND h.status = ' . HOST_STATUS_TEMPLATE
+			' AND h.status='.HOST_STATUS_TEMPLATE
 		), 'itemid');
 
 		foreach ($host_prototypes as $index => &$host_prototype) {
@@ -1214,11 +1184,13 @@ class CHostPrototype extends CHostBase {
 	 *
 	 * @static
 	 *
-	 * @param array $ruleids
+	 * @param array $host_prototypes
 	 *
 	 * @throws APIException if the user doesn't have write permissions for the given LLD rules
 	 */
-	private static function checkDiscoveryRulePermissions(array $ruleids): void {
+	private static function checkDiscoveryRules(array $host_prototypes): void {
+		$ruleids = array_keys(array_flip(array_column($host_prototypes, 'ruleid')));
+
 		$count = API::DiscoveryRule()->get([
 			'countOutput' => true,
 			'itemids' => $ruleids,
@@ -1227,6 +1199,22 @@ class CHostPrototype extends CHostBase {
 
 		if ($count != count($ruleids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		// Check if the host is discovered.
+		$db_hosts = DBfetchArray(DBselect(
+			'SELECT h.host'.
+			' FROM items i,hosts h'.
+			' WHERE i.hostid=h.hostid'.
+				' AND '.dbConditionInt('i.itemid', $ruleids).
+				' AND h.flags='.ZBX_FLAG_DISCOVERY_CREATED,
+			1
+		));
+
+		if ($db_hosts) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Cannot create a host prototype on a discovered host "%1$s".', $db_hosts[0]['host'])
+			);
 		}
 	}
 
