@@ -850,13 +850,11 @@ static void	ha_db_register_node(zbx_ha_info_t *info)
 
 	zbx_free(sql);
 	zbx_free(address);
-
 out:
 	if (ZBX_NODE_STATUS_ERROR != info->ha_status)
 		ha_db_commit(info);
 	else
 		ha_db_rollback(info);
-
 finish:
 	if (ZBX_NODE_STATUS_ERROR != info->ha_status)
 	{
