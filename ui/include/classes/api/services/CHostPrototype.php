@@ -571,13 +571,8 @@ class CHostPrototype extends CHostBase {
 
 		self::addAffectedObjects($host_prototypes, $db_host_prototypes);
 
-		foreach ($host_prototypes as &$host_prototype) {
-			$host_prototype['ruleid'] = $db_host_prototypes[$host_prototype['hostid']]['ruleid'];
-		}
-		unset($host_prototype);
-
 		$host_prototypes = $this->extendObjectsByKey($host_prototypes, $db_host_prototypes, 'hostid',
-			['host', 'name', 'custom_interfaces']
+			['host', 'name', 'custom_interfaces', 'ruleid']
 		);
 
 		self::checkDuplicates($host_prototypes, $db_host_prototypes);
@@ -1099,41 +1094,30 @@ class CHostPrototype extends CHostBase {
 	 * @throws APIException  if host prototype with same host or name already exists.
 	 */
 	private static function checkDuplicates(array $host_prototypes, array $db_host_prototypes = null): void {
-		$names_by_ruleid = [];
-		$hosts_by_ruleid = [];
+		$names_by_field = [];
+		$messages = [
+			'host' => _('Host prototype with host name "%1$s" already exists in discovery rule "%2$s".'),
+			'name' => _('Host prototype with visible name "%1$s" already exists in discovery rule "%2$s".')
+		];
 
 		foreach ($host_prototypes as $host_prototype) {
-			$ruleid = array_key_exists('ruleid', $host_prototype)
-				? $host_prototype['ruleid']
-				: $db_host_prototypes[$host_prototype['hostid']]['ruleid'];
+			$db_host_prototype = ($db_host_prototypes !== null) ? $db_host_prototypes[$host_prototype['hostid']] : null;
 
-			if (array_key_exists('name', $host_prototype)) {
-				if ($db_host_prototypes === null
-						|| $host_prototype['name'] !== $db_host_prototypes[$host_prototype['hostid']]['name']) {
-					$names_by_ruleid[$ruleid][] = $host_prototype['name'];
-				}
-			}
-
-			if (array_key_exists('host', $host_prototype)) {
-				if ($db_host_prototypes === null
-						|| $host_prototype['host'] !== $db_host_prototypes[$host_prototype['hostid']]['host']) {
-					$hosts_by_ruleid[$ruleid][] = $host_prototype['host'];
+			foreach (['host', 'name'] as $field) {
+				if ($db_host_prototype === null || $host_prototype[$field] !== $db_host_prototype[$field]) {
+					$names_by_field[$field][$host_prototype['ruleid']][] = $host_prototype[$field];
 				}
 			}
 		}
 
-		if (!$names_by_ruleid && !$hosts_by_ruleid) {
-			return;
-		}
-
-		if ($names_by_ruleid) {
+		foreach ($names_by_field as $field => $names_by_ruleid) {
 			$sql_where = [];
 			foreach ($names_by_ruleid as $ruleid => $names) {
-				$sql_where[] = '(i.itemid='.$ruleid.' AND '.dbConditionString('h.name', $names).')';
+				$sql_where[] = '(i.itemid='.$ruleid.' AND '.dbConditionString('h.'.$field, $names).')';
 			}
 
 			$duplicates = DBfetchArray(DBselect(
-					'SELECT i.name AS rule,h.name'.
+					'SELECT i.name AS rule,h.'.$field.
 					' FROM items i,host_discovery hd,hosts h'.
 					' WHERE i.itemid=hd.parent_itemid'.
 						' AND hd.hostid=h.hostid'.
@@ -1143,33 +1127,7 @@ class CHostPrototype extends CHostBase {
 
 			if ($duplicates) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Host prototype with visible name "%1$s" already exists in discovery rule "%2$s".',
-						$duplicates[0]['name'], $duplicates[0]['rule']
-					)
-				);
-			}
-		}
-
-		if ($hosts_by_ruleid) {
-			$sql_where = [];
-			foreach ($hosts_by_ruleid as $ruleid => $hosts) {
-				$sql_where[] = '(i.itemid='.$ruleid.' AND '.dbConditionString('h.host', $hosts).')';
-			}
-
-			$duplicates = DBfetchArray(DBselect(
-				'SELECT i.name AS rule,h.host'.
-				' FROM items i,host_discovery hd,hosts h'.
-				' WHERE i.itemid=hd.parent_itemid'.
-					' AND hd.hostid=h.hostid'.
-					' AND ('.implode(' OR ', $sql_where).')',
-				1
-			));
-
-			if ($duplicates) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Host prototype with host name "%1$s" already exists in discovery rule "%2$s".',
-						$duplicates[0]['host'], $duplicates[0]['rule']
-					)
+					_params($messages[$field], [$duplicates[0][$field], $duplicates[0]['rule']])
 				);
 			}
 		}
