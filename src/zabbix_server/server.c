@@ -1347,6 +1347,7 @@ static int	server_startup(zbx_socket_t *listen_sock)
 				break;
 			case ZBX_PROCESS_TYPE_HTTPPOLLER:
 				zbx_thread_start(httppoller_thread, &thread_args, &threads[i]);
+				return FAIL;
 				break;
 			case ZBX_PROCESS_TYPE_DISCOVERER:
 				zbx_thread_start(discoverer_thread, &thread_args, &threads[i]);
@@ -1831,15 +1832,15 @@ void	zbx_on_exit(int ret)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
 
+	if (NULL != threads)
+	{
+		zbx_threads_wait(threads, threads_flags, threads_num, ret);	/* wait for all child processes to exit */
+		zbx_free(threads);
+		zbx_free(threads_flags);
+	}
+
 	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
 	{
-		if (NULL != threads)
-		{
-			zbx_threads_wait(threads, threads_flags, threads_num, ret);	/* wait for all child processes to exit */
-			zbx_free(threads);
-			zbx_free(threads_flags);
-		}
-
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 		zbx_locks_disable();
 #endif
