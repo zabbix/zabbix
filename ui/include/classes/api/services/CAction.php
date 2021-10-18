@@ -933,7 +933,7 @@ class CAction extends CApiService {
 
 								if ($upd_opcommand) {
 									$upd_opcommands[] = [
-										'values' => $upd_opmessage,
+										'values' => $upd_opcommand,
 										'where' => ['operationid' => $operation['operationid']]
 									];
 								}
@@ -1233,6 +1233,25 @@ class CAction extends CApiService {
 	public function delete(array $actionids): array {
 		$this->validateDelete($actionids, $db_actions);
 
+		$operationids = array_keys(DB::select('operations', [
+			'output' => ['operationid'],
+			'filter' => ['actionid' => $actionids],
+			'preservekeys' => true
+		]));
+
+		DB::delete('opcommand', ['operationid' => $operationids]);
+		DB::delete('opcommand_grp', ['operationid' => $operationids]);
+		DB::delete('opcommand_hst', ['operationid' => $operationids]);
+		DB::delete('opmessage', ['operationid' => $operationids]);
+		DB::delete('opmessage_grp', ['operationid' => $operationids]);
+		DB::delete('opmessage_usr', ['operationid' => $operationids]);
+		DB::delete('opgroup', ['operationid' => $operationids]);
+		DB::delete('optemplate', ['operationid' => $operationids]);
+		DB::delete('opinventory', ['operationid' => $operationids]);
+		DB::delete('opconditions', ['operationid' => $operationids]);
+
+		DB::delete('operations', ['actionid' => $actionids]);
+		DB::delete('conditions', ['actionid' => $actionids]);
 		DB::delete('actions', ['actionid' => $actionids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_ACTION, $db_actions);
@@ -1246,7 +1265,7 @@ class CAction extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private function validateDelete(array &$actionids, ?array &$db_actions): void {
+	private function validateDelete(array &$actionids, array &$db_actions = null): void {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $actionids, '/', $error)) {
@@ -1341,7 +1360,7 @@ class CAction extends CApiService {
 
 					if (!$groupids && !$hostids && $without_current) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_('No targets specified for action operation global script.')
+							_('No targets specified for action operation global script.') // FIXME: add this check to anywhere
 						);
 					}
 
@@ -1360,14 +1379,6 @@ class CAction extends CApiService {
 					break;
 			}
 		}
-
-		self::checkMediatypesExist($all_mediatypeids);
-		self::checkScriptsExist($all_scriptids);
-		self::checkHostGroupsPermissions($all_groupids, 'operation');
-		self::checkHostsPermissions($all_hostids, 'operation');
-		self::checkTemplatesPermissions($all_templateids, 'operation');
-		self::checkUsersPermissions($all_userids);
-		self::checkUserGroupsPermissions($all_usrgrpids);
 	}
 
 	protected function addRelatedObjects(array $options, array $result) {
@@ -2072,11 +2083,11 @@ class CAction extends CApiService {
 			case EVENT_SOURCE_TRIGGERS:
 				$value_rules = [
 					['if' => ['field' => 'conditiontype', 'in' => implode(',', [CONDITION_TYPE_HOST_GROUP, CONDITION_TYPE_HOST, CONDITION_TYPE_TRIGGER, CONDITION_TYPE_TEMPLATE])], 'type' => API_ID, 'flags' => API_REQUIRED],
-					['if' => ['field' => 'conditiontype', 'in' => implode(',', [CONDITION_TYPE_TRIGGER_NAME, CONDITION_TYPE_EVENT_TAG])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getDefault('conditions', 'value')],
+					['if' => ['field' => 'conditiontype', 'in' => implode(',', [CONDITION_TYPE_TRIGGER_NAME, CONDITION_TYPE_EVENT_TAG])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('conditions', 'value')],
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_TRIGGER_SEVERITY], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1))],
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_TIME_PERIOD], 'type' => API_TIME_PERIOD, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('conditions', 'value')],
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_SUPPRESSED], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PROBLEM_SUPPRESSED_FALSE, ZBX_PROBLEM_SUPPRESSED_TRUE])],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TAG_VALUE], 'type' => API_STRING_UTF8, 'length' => DB::getDefault('conditions', 'value')]
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TAG_VALUE], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('conditions', 'value')]
 				];
 				$operator_rules = [
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_HOST_GROUP], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_HOST_GROUP))],
@@ -2096,13 +2107,10 @@ class CAction extends CApiService {
 				$value_rules = [
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DHOST_IP], 'type' => API_IP_RANGES, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_RANGE, 'length' => DB::getFieldLength('conditions', 'value')],
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DSERVICE_TYPE], 'flags' => API_REQUIRED, 'in' => implode(',', [SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP, SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2c, SVC_ICMPPING, SVC_SNMPv3, SVC_HTTPS, SVC_TELNET])],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DSERVICE_PORT], 'type' => API_INT32_RANGES, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getDefault('conditions', 'value'), 'in' => ZBX_MIN_PORT_NUMBER.':'.ZBX_MAX_PORT_NUMBER],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DSERVICE_PORT], 'type' => API_INT32_RANGES, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('conditions', 'value'), 'in' => ZBX_MIN_PORT_NUMBER.':'.ZBX_MAX_PORT_NUMBER],
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DSTATUS], 'flags' => API_REQUIRED, 'in' => implode(',', [DOBJECT_STATUS_UP, DOBJECT_STATUS_DOWN, DOBJECT_STATUS_DISCOVER, DOBJECT_STATUS_LOST])],
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DUPTIME], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:'.SEC_PER_MONTH],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DVALUE], 'type' => API_MULTIPLE, 'rules' => [
-						['if' => ['field' => 'operator', 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL])], 'type' => API_STRING_UTF8, 'length' => DB::getDefault('conditions', 'value')],
-						['else' => true, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getDefault('conditions', 'value')]
-					]],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DVALUE], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('conditions', 'value')],
 					['if' => ['field' => 'conditiontype', 'in' => implode(',', [CONDITION_TYPE_DRULE, CONDITION_TYPE_DCHECK, CONDITION_TYPE_PROXY])], 'type' => API_ID, 'flags' => API_REQUIRED],
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DOBJECT], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [EVENT_OBJECT_DHOST, EVENT_OBJECT_DSERVICE])]
 				];
@@ -2123,7 +2131,7 @@ class CAction extends CApiService {
 			case EVENT_SOURCE_AUTOREGISTRATION:
 				$value_rules = [
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_PROXY], 'type' => API_ID, 'flags' => API_REQUIRED],
-					['if' => ['field' => 'conditiontype', 'in' => implode(',', [CONDITION_TYPE_HOST_NAME, CONDITION_TYPE_HOST_METADATA])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getDefault('conditions', 'value')]
+					['if' => ['field' => 'conditiontype', 'in' => implode(',', [CONDITION_TYPE_HOST_NAME, CONDITION_TYPE_HOST_METADATA])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('conditions', 'value')]
 				];
 				$operator_rules = [
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_PROXY], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_PROXY))],
@@ -2136,8 +2144,8 @@ class CAction extends CApiService {
 				$value_rules = [
 					['if' => ['field' => 'conditiontype', 'in' => implode(',', [CONDITION_TYPE_HOST_GROUP, CONDITION_TYPE_HOST, CONDITION_TYPE_TEMPLATE])], 'type' => API_ID, 'flags' => API_REQUIRED],
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TYPE], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [EVENT_TYPE_ITEM_NOTSUPPORTED, EVENT_TYPE_LLDRULE_NOTSUPPORTED, EVENT_TYPE_TRIGGER_UNKNOWN])],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TAG], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getDefault('conditions', 'value')],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TAG_VALUE], 'type' => API_STRING_UTF8, 'length' => DB::getDefault('conditions', 'value')]
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TAG], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('conditions', 'value')],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TAG_VALUE], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('conditions', 'value')]
 				];
 				$operator_rules = [
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_HOST_GROUP], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_HOST_GROUP))],
@@ -2152,8 +2160,8 @@ class CAction extends CApiService {
 			case EVENT_SOURCE_SERVICE:
 				$value_rules = [
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_SERVICE], 'type' => API_ID, 'flags' => API_REQUIRED],
-					['if' => ['field' => 'conditiontype', 'in' => implode(',', [CONDITION_TYPE_SERVICE_NAME, CONDITION_TYPE_EVENT_TAG])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getDefault('conditions', 'value')],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TAG_VALUE], 'type' => API_STRING_UTF8, 'length' => DB::getDefault('conditions', 'value')]
+					['if' => ['field' => 'conditiontype', 'in' => implode(',', [CONDITION_TYPE_SERVICE_NAME, CONDITION_TYPE_EVENT_TAG])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('conditions', 'value')],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TAG_VALUE], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('conditions', 'value')]
 				];
 				$operator_rules = [
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_SERVICE], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_SERVICE))],
@@ -2166,12 +2174,12 @@ class CAction extends CApiService {
 
 		$condition_fields = [
 			'conditiontype' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', self::VALID_CONDITION_TYPES[$eventsource])],
+			'operator' =>		['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => $operator_rules],
 			'value' =>			['type' => API_MULTIPLE, 'rules' => $value_rules],
 			'value2' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TAG_VALUE], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('conditions', 'value2')],
 									['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'operator' =>		['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => $operator_rules]
+			]]
 		];
 
 		return [
@@ -2212,11 +2220,11 @@ class CAction extends CApiService {
 			'default_msg' =>	['type' => API_INT32, 'in' => implode(',', [0, 1]), 'default' => DB::getDefault('opmessage', 'default_msg')],
 			'subject' =>		['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'default_msg', 'in' => 0], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('opmessage', 'subject')],
-									['if' => ['field' => 'default_msg', 'in' => 1], 'type' => API_STRING_UTF8, 'in' => DB::getDefault('opmessage', 'subject')]
+									['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'message' =>		['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'default_msg', 'in' => 0], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('opmessage', 'message')],
-									['if' => ['field' => 'default_msg', 'in' => 1], 'type' => API_STRING_UTF8, 'in' => DB::getDefault('opmessage', 'message')]
+									['else' => true, 'type' => API_UNEXPECTED]
 			]]
 		];
 		$all_opmessage_fields = [
@@ -2348,11 +2356,11 @@ class CAction extends CApiService {
 			'status' =>					['type' => API_INT32, 'in' => implode(',', [ACTION_STATUS_ENABLED, ACTION_STATUS_DISABLED])],
 			'esc_period' =>				['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'eventsource', 'in' => implode(',', [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])], 'type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => '0,'.SEC_PER_MIN.':'.SEC_PER_WEEK, 'length' => DB::getFieldLength('actions', 'esc_period')],
-											['if' => ['field' => 'eventsource', 'in' => implode(',', [EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION])], 'type' => API_STRING_UTF8, 'in' => DB::getDefault('actions', 'esc_period')]
+											['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'pause_suppressed' =>		['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_TRIGGERS], 'type' => API_INT32, 'in' => implode(',', [ACTION_PAUSE_SUPPRESSED_FALSE, ACTION_PAUSE_SUPPRESSED_TRUE])],
-											['if' => ['field' => 'eventsource', 'in' => implode(',', [EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])], 'type' => API_INT32, 'in' => DB::getDefault('actions', 'pause_suppressed')]
+											['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'filter' =>					['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_TRIGGERS], 'type' => API_OBJECT, 'fields' => self::getFilterValidationRules(EVENT_SOURCE_TRIGGERS)],
@@ -2387,7 +2395,20 @@ class CAction extends CApiService {
 
 		self::checkDuplicates($actions);
 		self::checkFilter($actions);
-		self::checkOperations($actions);
+		self::checkOperations($actions, 'create');
+
+		self::checkMediatypesPermissions($actions);
+		self::checkScriptsPermissions($actions);
+		self::checkHostGroupsPermissions($actions);
+		self::checkHostsPermissions($actions);
+		self::checkTemplatesPermissions($actions);
+		self::checkUsersPermissions($actions);
+		self::checkUserGroupsPermissions($actions);
+		self::checkTriggersPermissions($actions);
+		self::checkDRulesPermissions($actions);
+		self::checkDChecksPermissions($actions);
+		self::checkProxiesPermissions($actions);
+		self::checkServicesPermissions($actions);
 	}
 
 	/**
@@ -2426,11 +2447,11 @@ class CAction extends CApiService {
 			'status' =>					['type' => API_INT32, 'in' => implode(',', [ACTION_STATUS_ENABLED, ACTION_STATUS_DISABLED])],
 			'esc_period' =>				['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'eventsource', 'in' => implode(',', [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])], 'type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => '0,'.SEC_PER_MIN.':'.SEC_PER_WEEK, 'length' => DB::getFieldLength('actions', 'esc_period')],
-											['if' => ['field' => 'eventsource', 'in' => implode(',', [EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION])], 'type' => API_STRING_UTF8, 'in' => DB::getDefault('actions', 'esc_period')]
+											['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'pause_suppressed' =>		['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_TRIGGERS], 'type' => API_INT32, 'in' => implode(',', [ACTION_PAUSE_SUPPRESSED_FALSE, ACTION_PAUSE_SUPPRESSED_TRUE])],
-											['if' => ['field' => 'eventsource', 'in' => implode(',', [EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])], 'type' => API_INT32, 'in' => DB::getDefault('actions', 'pause_suppressed')]
+											['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'filter' =>					['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_TRIGGERS], 'type' => API_OBJECT, 'fields' => self::getFilterValidationRules(EVENT_SOURCE_TRIGGERS)],
@@ -2476,7 +2497,20 @@ class CAction extends CApiService {
 		self::addAffectedObjects($actions, $db_actions);
 
 		self::checkFilter($actions);
-		self::checkOperations($actions, $db_actions);
+		self::checkOperations($actions, 'update', $db_actions);
+
+		self::checkMediatypesPermissions($actions);
+		self::checkScriptsPermissions($actions);
+		self::checkHostGroupsPermissions($actions);
+		self::checkHostsPermissions($actions);
+		self::checkTemplatesPermissions($actions);
+		self::checkUsersPermissions($actions);
+		self::checkUserGroupsPermissions($actions);
+		self::checkTriggersPermissions($actions);
+		self::checkDRulesPermissions($actions);
+		self::checkDChecksPermissions($actions);
+		self::checkProxiesPermissions($actions);
+		self::checkServicesPermissions($actions);
 	}
 
 	/**
@@ -2524,15 +2558,6 @@ class CAction extends CApiService {
 		$condition_formula_parser = new CConditionFormula();
 		$ip_range_parser = new CIPRangeParser(['v6' => ZBX_HAVE_IPV6, 'dns' => false, 'max_ipv4_cidr' => 30]);
 
-		$all_groupids = [];
-		$all_hostids = [];
-		$all_triggerids = [];
-		$all_templateids = [];
-		$all_druleids = [];
-		$all_dcheckids = [];
-		$all_proxyids = [];
-		$all_serviceids = [];
-
 		foreach ($actions as $i => $action) {
 			if (!array_key_exists('filter', $action)) {
 				continue;
@@ -2560,90 +2585,41 @@ class CAction extends CApiService {
 					));
 				}
 
-				$value = $condition['value'];
-
-				switch ($condition['conditiontype']) {
-					case CONDITION_TYPE_HOST_GROUP:
-						$all_groupids[$value] = $value;
-						break;
-
-					case CONDITION_TYPE_HOST:
-						$all_hostids[$value] = $value;
-						break;
-
-					case CONDITION_TYPE_TRIGGER:
-						$all_triggerids[$value] = $value;
-						break;
-
-					case CONDITION_TYPE_DHOST_IP:
-						if (!$ip_range_parser->parse($value)) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-								$path.'/conditions/'.($j + 1).'/value', $ip_range_parser->getError()
-							));
-						}
-						break;
-
-					case CONDITION_TYPE_TEMPLATE:
-						$all_templateids[$value] = $value;
-						break;
-
-					case CONDITION_TYPE_DRULE:
-						$all_druleids[$value] = $value;
-						break;
-
-					case CONDITION_TYPE_DCHECK:
-						$all_dcheckids[$value] = $value;
-						break;
-
-					case CONDITION_TYPE_PROXY:
-						$all_proxyids[$value] = $value;
-						break;
-
-					case CONDITION_TYPE_SERVICE:
-						$all_serviceids[$value] = $value;
-						break;
+				if ($condition['conditiontype'] == CONDITION_TYPE_DHOST_IP) {
+					if (!$ip_range_parser->parse($condition['value'])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+							$path.'/conditions/'.($j + 1).'/value', $ip_range_parser->getError()
+						));
+					}
 				}
 			}
 		}
-
-		self::checkHostGroupsPermissions($all_groupids, 'condition');
-		self::checkHostsPermissions($all_hostids, 'condition');
-		self::checkTemplatesPermissions($all_templateids, 'condition');
-		self::checkTriggersPermissions($all_triggerids);
-		self::checkDRulesPermissions($all_druleids);
-		self::checkDChecksPermissions($all_dcheckids);
-		self::checkProxiesPermissions($all_proxyids);
-		self::checkServicesPermissions($all_serviceids);
 	}
 
 	/**
 	 * @static
 	 *
 	 * @param array      $actions
+	 * @param string     $method
 	 * @param array|null $db_actions
 	 *
 	 * @throws APIException
 	 */
-	private static function checkOperations(array &$actions, array $db_actions = null): void {
-		$operations_defaults = ['operations' => [], 'recovery_operations' => [], 'update_operations' => []];
-		$operations_to_validate = [];
+	private static function checkOperations(array &$actions, string $method, array $db_actions = null): void {
+		$all_operations = [];
+		$operations_types = ['operations' => ACTION_OPERATION, 'recovery_operations' => ACTION_RECOVERY_OPERATION,
+			'update_operations' => ACTION_UPDATE_OPERATION
+		];
 
 		foreach ($actions as &$action) {
-			if ($db_actions === null) {
-				$db_action = $operations_defaults;
-			}
-			else {
-				if (!array_intersect_key($action, $operations_defaults)) {
-					continue;
-				}
+			$db_action = ($method === 'update')
+				? $db_actions[$action['actionid']]
+				: [];
 
-				$db_action = $db_actions[$action['actionid']];
-			}
-
-			foreach ($operations_defaults as $operations_name => $defaults) {
+			foreach ($operations_types as $operations_name => $type) {
 				$$operations_name = array_key_exists($operations_name, $action)
-					? $action[$operations_name]
-					: (array_key_exists($operations_name, $db_action) ? $db_action[$operations_name] : []);
+					? true
+					: array_key_exists($operations_name, $db_action);
 			}
 
 			if (!$operations && !$recovery_operations && !$update_operations) {
@@ -2652,54 +2628,88 @@ class CAction extends CApiService {
 				);
 			}
 
-			if (array_key_exists('operations', $action)) {
-				$unique_operations = [
-					OPERATION_TYPE_HOST_ADD => 0,
-					OPERATION_TYPE_HOST_REMOVE => 0,
-					OPERATION_TYPE_HOST_ENABLE => 0,
-					OPERATION_TYPE_HOST_DISABLE => 0,
-					OPERATION_TYPE_HOST_INVENTORY => 0
-				];
+			$unique_operations = [
+				OPERATION_TYPE_HOST_ADD => 0,
+				OPERATION_TYPE_HOST_REMOVE => 0,
+				OPERATION_TYPE_HOST_ENABLE => 0,
+				OPERATION_TYPE_HOST_DISABLE => 0,
+				OPERATION_TYPE_HOST_INVENTORY => 0
+			];
 
-				foreach ($action['operations'] as &$operation) {
-					$operation['recovery'] = ACTION_OPERATION;
-					$operations_to_validate[] = $operation + ['eventsource' => $action['eventsource']];
+			foreach ($operations_types as $operations_name => $type) {
+				if (array_key_exists($operations_name, $action)) {
+					foreach ($action[$operations_name] as &$operation) {
+						if ($type === ACTION_OPERATION) {
+							if (array_key_exists($operation['operationtype'], $unique_operations)) {
+								$unique_operations[$operation['operationtype']]++;
 
-					if (array_key_exists($operation['operationtype'], $unique_operations)) {
-						$unique_operations[$operation['operationtype']]++;
-
-						if ($unique_operations[$operation['operationtype']] > 1) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Operation "%1$s" already exists for action "%2$s".',
-									operation_type2str($operation['operationtype']), $action['name']
-								)
-							);
+								if ($unique_operations[$operation['operationtype']] > 1) {
+									self::exception(ZBX_API_ERROR_PARAMETERS,
+										_s('Operation "%1$s" already exists for action "%2$s".',
+											operation_type2str($operation['operationtype']), $action['name']
+										)
+									);
+								}
+							}
 						}
+
+						$operation['recovery'] = $type;
+						$operation['eventsource'] = $action['eventsource'];
 					}
-				}
-				unset($operation);
-			}
+					unset($operation);
 
-			if (array_key_exists('recovery_operations', $action)) {
-				foreach ($action['recovery_operations'] as &$operation) {
-					$operation['recovery'] = ACTION_RECOVERY_OPERATION;
-					$operations_to_validate[] = $operation + ['eventsource' => $action['eventsource']];
+					$all_operations = array_merge($all_operations, $action[$operations_name]);
 				}
-				unset($operation);
-			}
-
-			if (array_key_exists('update_operations', $action)) {
-				foreach ($action['update_operations'] as &$operation) {
-					$operation['recovery'] = ACTION_UPDATE_OPERATION;
-					$operations_to_validate[] = $operation + ['eventsource' => $action['eventsource']];
-				}
-				unset($operation);
 			}
 		}
 		unset($action);
 
-		if ($operations_to_validate) {
-			self::validateOperationsIntegrity($operations_to_validate);
+		if (!$all_operations) {
+			return;
+		}
+
+		foreach ($all_operations as $operation) {
+			if ($operation['recovery'] == ACTION_OPERATION) {
+				if ((array_key_exists('esc_step_from', $operation) || array_key_exists('esc_step_to', $operation))
+						&& (!array_key_exists('esc_step_from', $operation)
+							|| !array_key_exists('esc_step_to', $operation))) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_('Parameters "esc_step_from" and "esc_step_to" must be set together.')
+					);
+				}
+
+				if (array_key_exists('esc_step_from', $operation) && array_key_exists('esc_step_to', $operation)) {
+					if ($operation['esc_step_from'] > $operation['esc_step_to'] && $operation['esc_step_to'] != 0) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_('Incorrect action operation escalation step values.')
+						);
+					}
+				}
+			}
+
+			if ($operation['operationtype'] == OPERATION_TYPE_COMMAND
+					&& $operation['eventsource'] != EVENT_SOURCE_SERVICE) {
+				$groupids = array_column($operation['opcommand_grp'], 'groupid', 'groupid');
+				$hostids = [];
+				$without_current = true;
+
+				if (array_key_exists('opcommand_hst', $operation)) {
+					foreach ($operation['opcommand_hst'] as $opcommand_hst) {
+						if ($opcommand_hst['hostid'] == 0) {
+							$without_current = false;
+						}
+						else {
+							$hostids[$opcommand_hst['hostid']] = $opcommand_hst['hostid'];
+						}
+					}
+				}
+
+				if (!$groupids && !$hostids && $without_current) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_('No targets specified for action operation global script.')
+					);
+				}
+			}
 		}
 	}
 
@@ -2708,14 +2718,34 @@ class CAction extends CApiService {
 	 *
 	 * @static
 	 *
-	 * @param array $mediatypeids
+	 * @param array $actions
 	 *
 	 * @throws APIException if invalid media types given.
 	 */
-	private static function checkMediatypesExist(array $mediatypeids): void {
+	private static function checkMediatypesPermissions(array $actions): void {
+		$mediatypeids = [];
+		$operations = [];
+		$operation_names = ['operations' => [], 'recovery_operations' => [], 'update_operations' => []];
+
+		foreach ($actions as $action) {
+			foreach (array_keys($operation_names) as $operation_name) {
+				if (array_key_exists($operation_name, $action)) {
+					$operations = array_merge($operations, $action[$operation_name]);
+				}
+			}
+		}
+
+		foreach ($operations as $operation) {
+			if ($operation['operationtype'] == OPERATION_TYPE_ACK_MESSAGE) {
+				$mediatypeids[] = $operation['opmessage']['mediatypeid'];
+			}
+		}
+
 		if (!$mediatypeids) {
 			return;
 		}
+
+		$mediatypeids = array_keys(array_flip($mediatypeids));
 
 		$count = API::MediaType()->get([
 			'countOutput' => true,
@@ -2734,14 +2764,34 @@ class CAction extends CApiService {
 	 *
 	 * @static
 	 *
-	 * @param array $scriptids
+	 * @param array $actions
 	 *
 	 * @throws APIException if invalid global scripts given.
 	 */
-	private static function checkScriptsExist(array $scriptids): void {
+	private static function checkScriptsPermissions(array $actions): void {
+		$scriptids = [];
+		$operations = [];
+		$operation_names = ['operations' => [], 'recovery_operations' => [], 'update_operations' => []];
+
+		foreach ($actions as $action) {
+			foreach (array_keys($operation_names) as $operation_name) {
+				if (array_key_exists($operation_name, $action)) {
+					$operations = array_merge($operations, $action[$operation_name]);
+				}
+			}
+		}
+
+		foreach ($operations as $operation) {
+			if ($operation['operationtype'] == OPERATION_TYPE_COMMAND) {
+				$scriptids[] = $operation['opcommand']['scriptid'];
+			}
+		}
+
 		if (!$scriptids) {
 			return;
 		}
+
+		$scriptids = array_keys(array_flip($scriptids));
 
 		$count = API::Script()->get([
 			'countOutput' => true,
@@ -2761,15 +2811,55 @@ class CAction extends CApiService {
 	 *
 	 * @static
 	 *
-	 * @param array  $groupids
-	 * @param string $source
+	 * @param array $actions
 	 *
 	 * @throws APIException if the user doesn't have write permissions for the given host groups.
 	 */
-	private static function checkHostGroupsPermissions(array $groupids, string $source): void {
+	private static function checkHostGroupsPermissions(array $actions): void {
+		$groupids = [];
+		$operations = [];
+		$operation_names = ['operations' => [], 'recovery_operations' => [], 'update_operations' => []];
+
+		foreach ($actions as $action) {
+			foreach (array_keys($operation_names) as $operation_name) {
+				if (array_key_exists($operation_name, $action)) {
+					$operations = array_merge($operations, $action[$operation_name]);
+				}
+			}
+
+			if (!array_key_exists('filter', $action) && !array_key_exists('conditions', $action['filter'])) {
+				continue;
+			}
+
+			foreach ($action['filter']['conditions'] as $condition) {
+				if ($condition['conditiontype'] == CONDITION_TYPE_HOST_GROUP) {
+					$groupids[] = $condition['value'];
+				}
+			}
+		}
+
+		foreach ($operations as $operation) {
+			switch ($operation['operationtype']) {
+				case OPERATION_TYPE_COMMAND:
+					if ($operation['eventsource'] == EVENT_SOURCE_SERVICE) {
+						break;
+					}
+
+					$groupids = array_merge($groupids, array_column($operation['opcommand_grp'], 'groupid'));
+					break;
+
+				case OPERATION_TYPE_GROUP_ADD:
+				case OPERATION_TYPE_GROUP_REMOVE:
+					$groupids = array_merge($groupids, array_column($operation['opgroup'], 'groupid'));
+					break;
+			}
+		}
+
 		if (!$groupids) {
 			return;
 		}
+
+		$groupids = array_keys(array_flip($groupids));
 
 		$count = API::HostGroup()->get([
 			'countOutput' => true,
@@ -2778,10 +2868,12 @@ class CAction extends CApiService {
 		]);
 
 		if ($count != count($groupids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, ($source === 'condition')
-				? _('Incorrect action condition host group. Host group does not exist or you have no access to it.')
-				: _('Incorrect action operation host group. Host group does not exist or you have no access to it.')
-			);
+			// FIXME: change error message
+			// self::exception(ZBX_API_ERROR_PERMISSIONS, ($method === 'condition')
+			// 	? _('Incorrect action condition host group. Host group does not exist or you have no access to it.')
+			// 	: _('Incorrect action operation host group. Host group does not exist or you have no access to it.')
+			// );
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 	}
 
@@ -2790,15 +2882,56 @@ class CAction extends CApiService {
 	 *
 	 * @static
 	 *
-	 * @param array  $hostids
-	 * @param string $source
+	 * @param array $actions
 	 *
 	 * @throws APIException if the user doesn't have write permissions for the given hosts.
 	 */
-	private static function checkHostsPermissions(array $hostids, string $source): void {
+	private static function checkHostsPermissions(array $actions): void {
+		$hostids = [];
+		$operations = [];
+		$operation_names = ['operations' => [], 'recovery_operations' => [], 'update_operations' => []];
+
+		foreach ($actions as $action) {
+			foreach (array_keys($operation_names) as $operation_name) {
+				if (array_key_exists($operation_name, $action)) {
+					$operations = array_merge($operations, $action[$operation_name]);
+				}
+			}
+
+			if (!array_key_exists('filter', $action) && !array_key_exists('conditions', $action['filter'])) {
+				continue;
+			}
+
+			foreach ($action['filter']['conditions'] as $condition) {
+				if ($condition['conditiontype'] == CONDITION_TYPE_HOST) {
+					$hostids[] = $condition['value'];
+				}
+			}
+		}
+
+		foreach ($operations as $operation) {
+			switch ($operation['operationtype']) {
+				case OPERATION_TYPE_COMMAND:
+					if ($operation['eventsource'] == EVENT_SOURCE_SERVICE) {
+						break;
+					}
+
+					if (array_key_exists('opcommand_hst', $operation)) {
+						foreach ($operation['opcommand_hst'] as $opcommand_hst) {
+							if ($opcommand_hst['hostid'] != 0) {
+								$hostids[] = $opcommand_hst['hostid'];
+							}
+						}
+					}
+					break;
+			}
+		}
+
 		if (!$hostids) {
 			return;
 		}
+
+		$hostids = array_keys(array_flip($hostids));
 
 		$count = API::Host()->get([
 			'countOutput' => true,
@@ -2807,10 +2940,12 @@ class CAction extends CApiService {
 		]);
 
 		if ($count != count($hostids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, ($source === 'condition')
-				? _('Incorrect action condition host. Host does not exist or you have no access to it.')
-				: _('Incorrect action operation host. Host does not exist or you have no access to it.')
-			);
+			// FIXME: change error message
+			// self::exception(ZBX_API_ERROR_PERMISSIONS, ($source === 'condition')
+			// 	? _('Incorrect action condition host. Host does not exist or you have no access to it.')
+			// 	: _('Incorrect action operation host. Host does not exist or you have no access to it.')
+			// );
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 	}
 
@@ -2819,14 +2954,36 @@ class CAction extends CApiService {
 	 *
 	 * @static
 	 *
-	 * @param array  $userids
+	 * @param array $actions
 	 *
 	 * @throws APIException if the user doesn't have write permissions for the given users.
 	 */
-	private static function checkUsersPermissions(array $userids): void {
+	private static function checkUsersPermissions(array $actions): void {
+		$userids = [];
+		$operations = [];
+		$operation_names = ['operations' => [], 'recovery_operations' => [], 'update_operations' => []];
+
+		foreach ($actions as $action) {
+			foreach (array_keys($operation_names) as $operation_name) {
+				if (array_key_exists($operation_name, $action)) {
+					$operations = array_merge($operations, $action[$operation_name]);
+				}
+			}
+		}
+
+		foreach ($operations as $operation) {
+			if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE) {
+				if (array_key_exists('opmessage_usr', $operation)) {
+					$userids = array_merge($userids, array_column($operation['opmessage_usr'], 'userid'));
+				}
+			}
+		}
+
 		if (!$userids) {
 			return;
 		}
+
+		$userids = array_keys(array_flip($userids));
 
 		$count = API::User()->get([
 			'countOutput' => true,
@@ -2845,14 +3002,36 @@ class CAction extends CApiService {
 	 *
 	 * @static
 	 *
-	 * @param array $usrgrpids
+	 * @param array $actions
 	 *
 	 * @throws APIException if the user doesn't have write permissions for the given user groups.
 	 */
-	private static function checkUserGroupsPermissions(array $usrgrpids): void {
+	private static function checkUserGroupsPermissions(array $actions): void {
+		$usrgrpids = [];
+		$operations = [];
+		$operation_names = ['operations' => [], 'recovery_operations' => [], 'update_operations' => []];
+
+		foreach ($actions as $action) {
+			foreach (array_keys($operation_names) as $operation_name) {
+				if (array_key_exists($operation_name, $action)) {
+					$operations = array_merge($operations, $action[$operation_name]);
+				}
+			}
+		}
+
+		foreach ($operations as $operation) {
+			if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE) {
+				if (array_key_exists('opmessage_grp', $operation)) {
+					$usrgrpids = array_merge($usrgrpids, array_column($operation['opmessage_grp'], 'usrgrpid'));
+				}
+			}
+		}
+
 		if (!$usrgrpids) {
 			return;
 		}
+
+		$usrgrpids = array_keys(array_flip($usrgrpids));
 
 		$count = API::UserGroup()->get([
 			'countOutput' => true,
@@ -2871,15 +3050,47 @@ class CAction extends CApiService {
 	 *
 	 * @static
 	 *
-	 * @param array  $templateids
-	 * @param string $source
+	 * @param array $actions
 	 *
 	 * @throws APIException if the user doesn't have write permissions for the given templates.
 	 */
-	private static function checkTemplatesPermissions(array $templateids, string $source): void {
+	private static function checkTemplatesPermissions(array $actions): void {
+		$templateids = [];
+		$operations = [];
+		$operation_names = ['operations' => [], 'recovery_operations' => [], 'update_operations' => []];
+
+		foreach ($actions as $action) {
+			foreach (array_keys($operation_names) as $operation_name) {
+				if (array_key_exists($operation_name, $action)) {
+					$operations = array_merge($operations, $action[$operation_name]);
+				}
+			}
+
+			if (!array_key_exists('filter', $action) && !array_key_exists('conditions', $action['filter'])) {
+				continue;
+			}
+
+			foreach ($action['filter']['conditions'] as $condition) {
+				if ($condition['conditiontype'] == CONDITION_TYPE_TEMPLATE) {
+					$templateids[] = $condition['value'];
+				}
+			}
+		}
+
+		foreach ($operations as $operation) {
+			switch ($operation['operationtype']) {
+				case OPERATION_TYPE_TEMPLATE_ADD:
+				case OPERATION_TYPE_TEMPLATE_REMOVE:
+					$templateids = array_merge($templateids, array_column($operation['optemplate'], 'templateid'));
+					break;
+			}
+		}
+
 		if (!$templateids) {
 			return;
 		}
+
+		$templateids = array_keys(array_flip($templateids));
 
 		$count = API::Template()->get([
 			'countOutput' => true,
@@ -2888,10 +3099,12 @@ class CAction extends CApiService {
 		]);
 
 		if ($count != count($templateids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, ($source === 'condition')
-				? _('Incorrect action condition template. Template does not exist or you have no access to it.')
-				: _('Incorrect action operation template. Template does not exist or you have no access to it.')
-			);
+			// FIXME: change error message
+			// self::exception(ZBX_API_ERROR_PERMISSIONS, ($source === 'condition')
+			// 	? _('Incorrect action condition template. Template does not exist or you have no access to it.')
+			// 	: _('Incorrect action operation template. Template does not exist or you have no access to it.')
+			// );
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 	}
 
@@ -2900,14 +3113,30 @@ class CAction extends CApiService {
 	 *
 	 * @static
 	 *
-	 * @param array $triggerids
+	 * @param array $actions
 	 *
 	 * @throws APIException if the user doesn't have write permissions for the given triggers.
 	 */
-	private static function checkTriggersPermissions(array $triggerids) {
+	private static function checkTriggersPermissions(array $actions): void {
+		$triggerids = [];
+
+		foreach ($actions as $action) {
+			if (!array_key_exists('filter', $action) && !array_key_exists('conditions', $action['filter'])) {
+				continue;
+			}
+
+			foreach ($action['filter']['conditions'] as $condition) {
+				if ($condition['conditiontype'] == CONDITION_TYPE_TRIGGER) {
+					$triggerids[$condition['value']] = true;
+				}
+			}
+		}
+
 		if (!$triggerids) {
 			return;
 		}
+
+		$triggerids = array_keys($triggerids);
 
 		$count = API::Trigger()->get([
 			'countOutput' => true,
@@ -2927,14 +3156,30 @@ class CAction extends CApiService {
 	 *
 	 * @static
 	 *
-	 * @param array $druleids
+	 * @param array $actions
 	 *
 	 * @throws APIException if the user doesn't have write permissions for the given discovery rules.
 	 */
-	private static function checkDRulesPermissions(array $druleids): void {
+	private static function checkDRulesPermissions(array $actions): void {
+		$druleids = [];
+
+		foreach ($actions as $action) {
+			if (!array_key_exists('filter', $action) && !array_key_exists('conditions', $action['filter'])) {
+				continue;
+			}
+
+			foreach ($action['filter']['conditions'] as $condition) {
+				if ($condition['conditiontype'] == CONDITION_TYPE_DRULE) {
+					$druleids[$condition['value']] = true;
+				}
+			}
+		}
+
 		if (!$druleids) {
 			return;
 		}
+
+		$druleids = array_keys($druleids);
 
 		$count = API::DRule()->get([
 			'countOutput' => true,
@@ -2954,14 +3199,30 @@ class CAction extends CApiService {
 	 *
 	 * @static
 	 *
-	 * @param array $dcheckids
+	 * @param array $actions
 	 *
 	 * @throws APIException if the user doesn't have write permissions for the given discovery checks.
 	 */
-	private static function checkDChecksPermissions(array $dcheckids): void {
+	private static function checkDChecksPermissions(array $actions): void {
+		$dcheckids = [];
+
+		foreach ($actions as $action) {
+			if (!array_key_exists('filter', $action) && !array_key_exists('conditions', $action['filter'])) {
+				continue;
+			}
+
+			foreach ($action['filter']['conditions'] as $condition) {
+				if ($condition['conditiontype'] == CONDITION_TYPE_DCHECK) {
+					$druleids[$condition['value']] = true;
+				}
+			}
+		}
+
 		if (!$dcheckids) {
 			return;
 		}
+
+		$dcheckids = array_keys($dcheckids);
 
 		$count = API::DCheck()->get([
 			'countOutput' => true,
@@ -2981,14 +3242,30 @@ class CAction extends CApiService {
 	 *
 	 * @static
 	 *
-	 * @param array $proxyids
+	 * @param array $actions
 	 *
 	 * @throws APIException if the user doesn't have write permissions for the given proxies.
 	 */
-	private static function checkProxiesPermissions(array $proxyids): void {
+	private static function checkProxiesPermissions(array $actions): void {
+		$proxyids = [];
+
+		foreach ($actions as $action) {
+			if (!array_key_exists('filter', $action) && !array_key_exists('conditions', $action['filter'])) {
+				continue;
+			}
+
+			foreach ($action['filter']['conditions'] as $condition) {
+				if ($condition['conditiontype'] == CONDITION_TYPE_PROXY) {
+					$proxyids[$condition['value']] = true;
+				}
+			}
+		}
+
 		if (!$proxyids) {
 			return;
 		}
+
+		$proxyids = array_keys($proxyids);
 
 		$count = API::Proxy()->get([
 			'countOutput' => true,
@@ -3008,14 +3285,30 @@ class CAction extends CApiService {
 	 *
 	 * @static
 	 *
-	 * @param array $serviceids
+	 * @param array $actions
 	 *
 	 * @throws APIException if the user doesn't have write permissions for the given services.
 	 */
-	private static function checkServicesPermissions(array $serviceids): void {
+	private static function checkServicesPermissions(array $actions): void {
+		$serviceids = [];
+
+		foreach ($actions as $action) {
+			if (!array_key_exists('filter', $action) && !array_key_exists('conditions', $action['filter'])) {
+				continue;
+			}
+
+			foreach ($action['filter']['conditions'] as $condition) {
+				if ($condition['conditiontype'] == CONDITION_TYPE_SERVICE) {
+					$serviceids[$condition['value']] = true;
+				}
+			}
+		}
+
 		if ($serviceids) {
 			return;
 		}
+
+		$serviceids = array_keys($serviceids);
 
 		$count = API::Service()->get([
 			'countOutput' => true,
@@ -3038,20 +3331,24 @@ class CAction extends CApiService {
 	 * @param array|null $db_actions
 	 */
 	private static function addAffectedObjects(array $actions, array &$db_actions = null): void {
+		$operations_names = [
+			ACTION_OPERATION => 'operations',
+			ACTION_RECOVERY_OPERATION => 'recovery_operations',
+			ACTION_UPDATE_OPERATION => 'update_operations'
+		];
+
 		$actionids = ['filter' => [], 'operations' => []];
 
 		foreach ($actions as $action) {
-			$db_action = &$db_actions[$action['actionid']];
-
 			if (array_key_exists('filter', $action)) {
 				$actionids['filter'][] = $action['actionid'];
-				$db_action['filter'] = [];
+				$db_actions[$action['actionid']]['filter'] = [];
 			}
 
-			foreach (['operations', 'recovery_operations', 'update_operations'] as $operations_name) {
+			foreach ($operations_names as $operations_name) {
 				if (array_key_exists($operations_name, $action)) {
 					$actionids['operations'][$action['actionid']] = true;
-					$db_action[$operations_name] = [];
+					$db_actions[$action['actionid']][$operations_name] = [];
 				}
 			}
 		}
@@ -3103,12 +3400,6 @@ class CAction extends CApiService {
 				' LEFT JOIN opinventory i ON i.operationid=o.operationid'.
 			' WHERE '.dbConditionId('o.actionid', array_keys($actionids['operations']))
 		);
-
-		$operations_names = [
-			ACTION_OPERATION => 'operations',
-			ACTION_RECOVERY_OPERATION => 'recovery_operations',
-			ACTION_UPDATE_OPERATION => 'update_operations'
-		];
 
 		while ($db_operation = DBfetch($db_operations)) {
 			$operation = [

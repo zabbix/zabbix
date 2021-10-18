@@ -123,7 +123,6 @@ if (hasRequest('add') || hasRequest('update')) {
 	$action = [
 		'name' => getRequest('name'),
 		'status' => getRequest('status', ACTION_STATUS_DISABLED),
-		'esc_period' => getRequest('esc_period', DB::getDefault('actions', 'esc_period')),
 		'operations' => getRequest('operations', []),
 		'recovery_operations' => getRequest('recovery_operations', []),
 		'update_operations' => getRequest('update_operations', [])
@@ -136,11 +135,19 @@ if (hasRequest('add') || hasRequest('update')) {
 				$operation['opmessage']['default_msg'] = 1;
 			}
 
+			if ($operation_key === 'recovery_operations') {
+				unset($operation['opmessage']['mediatypeid']);
+			}
+
+			if (array_key_exists('opmessage', $operation) && $operation['opmessage']['default_msg'] == 1) {
+				unset($operation['opmessage']['subject'], $operation['opmessage']['message']);
+			}
+
 			unset($operation['operationid'], $operation['actionid'], $operation['eventsource'], $operation['recovery'],
-				$operation['id'], $operation['mediatypeid']
+				$operation['id']
 			);
 
-			if ($eventsource != EVENT_SOURCE_TRIGGERS && $eventsource != EVENT_SOURCE_SERVICE) {
+			if ($eventsource != EVENT_SOURCE_TRIGGERS) {
 				unset($operation['esc_period'], $operation['esc_step_from'], $operation['esc_step_to'],
 					$operation['evaltype']
 				);
@@ -177,6 +184,10 @@ if (hasRequest('add') || hasRequest('update')) {
 	unset($condition);
 
 	$action['filter'] = $filter;
+
+	if (in_array($eventsource, [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
+		$action['esc_period'] = getRequest('esc_period', DB::getDefault('actions', 'esc_period'));
+	}
 
 	if ($eventsource == EVENT_SOURCE_TRIGGERS) {
 		$action['pause_suppressed'] = getRequest('pause_suppressed', ACTION_PAUSE_SUPPRESSED_FALSE);
