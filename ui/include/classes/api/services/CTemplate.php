@@ -349,7 +349,8 @@ class CTemplate extends CHostGeneral {
 		$this->updateGroups($templates, __FUNCTION__);
 		$this->updateTagsNew($templates, __FUNCTION__);
 		$this->updateHostMacrosNew($templates, __FUNCTION__);
-		// $this->updateTemplates($templates, __FUNCTION__);
+		$this->updateTemplates($templates, __FUNCTION__);
+		$this->updateTemplatesElements($templates, __FUNCTION__);
 
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_TEMPLATE, $templates);
 

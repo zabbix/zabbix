@@ -104,7 +104,7 @@ abstract class CHostBase extends CApiService {
 				: [];
 			$has_ins_templates = false;
 
-			foreach ($hosts['templates'] as $template) {
+			foreach ($host['templates'] as $template) {
 				if (array_key_exists($template['templateid'], $db_templates)) {
 					unset($db_templates['templateid']);
 				}
@@ -340,10 +340,9 @@ abstract class CHostBase extends CApiService {
 		$triggers_templateids = [];
 
 		$result = DBselect(
-			'SELECT DISTINCT i.hostid,t.triggerid'.
-			' FROM items i,functions f,triggers t'.
+			'SELECT DISTINCT i.hostid,f.triggerid'.
+			' FROM items i,functions f'.
 			' WHERE f.itemid=i.itemid'.
-				' AND t.triggerid=f.triggerid'.
 				' AND '.dbConditionInt('i.hostid', $templateids)
 		);
 
@@ -380,10 +379,8 @@ abstract class CHostBase extends CApiService {
 		);
 
 		while ($row = DBfetch($result)) {
-			foreach ($triggers_templateids[$row['triggerid_down']] as $templateids) {
-				foreach ($templateids as $templateid) {
-					$dep_templates[$templateid][$row['hostid']] = true;
-				}
+			foreach ($triggers_templateids[$row['triggerid_down']] as $templateid) {
+				$dep_templates[$templateid][$row['hostid']][$row['triggerid_down']] = true;
 			}
 		}
 
@@ -399,22 +396,32 @@ abstract class CHostBase extends CApiService {
 			$templateids = array_flip(array_column($host['templates'], 'templateid'));
 			$path = '/'.($i1 + 1).'/templates';
 
-			foreach ($hosts['templates'] as $i2 => $template) {
+			foreach ($host['templates'] as $i2 => $template) {
 				if (!array_key_exists($template['templateid'], $dep_templates)) {
 					continue;
 				}
 
-				$not_linked_templateids = array_diff_key($dep_templates[$template['templateid']], $templateids);
+				$not_linked_templates = array_diff_key($dep_templates[$template['templateid']], $templateids);
 
-				if ($not_linked_templateids) {
+				if ($not_linked_templates) {
+					$templateid = key($not_linked_templates);
+					$triggerid = key($not_linked_templates[$templateid]);
+
 					$templates = DB::select('hosts', [
 						'output' => ['host'],
-						'hostids' => key($not_linked_templateids)
+						'hostids' => $templateid
+					]);
+
+					$triggers = DB::select('triggers', [
+						'output' => ['description'],
+						'triggerids' => $triggerid
 					]);
 
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
 						$path.'/'.($i2 + 1).'/templateid',
-						_s('unable to link without template "%1$s" due to trigger dependency', $templates[0]['host'])
+						_s('unable to link without template "%1$s" due to dependency of trigger "%2$s"',
+							$templates[0]['host'], $triggers[0]['description']
+						)
 					));
 				}
 			}
@@ -445,9 +452,9 @@ abstract class CHostBase extends CApiService {
 		);
 
 		while ($row = DBfetch($result)) {
-			foreach ($triggers_templateids[$row['triggerid']] as $templateids) {
-				foreach ($templateids as $templateid) {
-					$dep_templates[$templateid][$row['hostid']] = true;
+			foreach ($triggers_templateids[$row['triggerid']] as $templateid) {
+				if (bccomp($row['hostid'], $templateid) != 0) {
+					$dep_templates[$templateid][$row['hostid']][$row['triggerid']] = true;
 				}
 			}
 		}
@@ -464,22 +471,32 @@ abstract class CHostBase extends CApiService {
 			$templateids = array_flip(array_column($host['templates'], 'templateid'));
 			$path = '/'.($i1 + 1).'/templates';
 
-			foreach ($hosts['templates'] as $i2 => $template) {
+			foreach ($host['templates'] as $i2 => $template) {
 				if (!array_key_exists($template['templateid'], $dep_templates)) {
 					continue;
 				}
 
-				$not_linked_templateids = array_diff_key($dep_templates[$template['templateid']], $templateids);
+				$not_linked_templates = array_diff_key($dep_templates[$template['templateid']], $templateids);
 
-				if ($not_linked_templateids) {
+				if ($not_linked_templates) {
+					$templateid = key($not_linked_templates);
+					$triggerid = key($not_linked_templates[$templateid]);
+
 					$templates = DB::select('hosts', [
 						'output' => ['host'],
-						'hostids' => key($not_linked_templateids)
+						'hostids' => $templateid
+					]);
+
+					$triggers = DB::select('triggers', [
+						'output' => ['description'],
+						'triggerids' => $triggerid
 					]);
 
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
 						$path.'/'.($i2 + 1).'/templateid',
-						_s('unable to link without template "%1$s" due to trigger expression', $templates[0]['host'])
+						_s('unable to link without template "%1$s" due to expression of trigger "%2$s"',
+							$templates[0]['host'], $triggers[0]['description']
+						)
 					));
 				}
 			}
@@ -493,7 +510,7 @@ abstract class CHostBase extends CApiService {
 	 * @param string     $method
 	 * @param array|null $db_hosts
 	 */
-	protected function updateTemplates(array $hosts, string $method, $db_hosts = null): void {
+	protected function updateTemplates(array &$hosts, string $method, $db_hosts = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
 
 		$ins_hosts_templates = [];

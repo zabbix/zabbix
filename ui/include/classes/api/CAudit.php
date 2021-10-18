@@ -121,13 +121,14 @@ class CAudit {
 	];
 
 	/**
-	 * Table primary keys of audit resources.
-	 * resource => table key
+	 * ID field names of audit resources.
+	 * resource => ID field name
 	 *
 	 * @var array
 	 */
-	private const TABLE_PKS = [
-		self::RESOURCE_PROXY => 'proxyid'
+	private const ID_FIELD_NAMES = [
+		self::RESOURCE_PROXY => 'proxyid',
+		self::RESOURCE_TEMPLATE => 'templateid'
 	];
 
 	/**
@@ -322,8 +323,8 @@ class CAudit {
 				break;
 
 			default:
-				$table_key = array_key_exists($resource, self::TABLE_PKS)
-					? self::TABLE_PKS[$resource]
+				$table_key = array_key_exists($resource, self::ID_FIELD_NAMES)
+					? self::ID_FIELD_NAMES[$resource]
 					: DB::getPk(self::TABLE_NAMES[$resource]);
 
 				foreach ($objects as $object) {

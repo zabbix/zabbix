@@ -302,6 +302,116 @@ abstract class CHostGeneral extends CHostBase {
 	}
 
 	/**
+	 * Change elements of linked or unliked templates on target hosts or templates.
+	 *
+	 * @param array      $hosts
+	 * @param string     $method
+	 * @param array|null $db_hosts
+	 */
+	protected function updateTemplatesElements(array $hosts, string $method, array $db_hosts = null): void {
+		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
+
+		$ins_links = [];
+		$del_links = [];
+
+		foreach ($hosts as $host) {
+			if (array_key_exists('templates', $host)) {
+				$db_templates = ($method === 'update') ? $db_hosts[$host[$id_field_name]]['templates'] : [];
+
+				foreach ($host['templates'] as $template) {
+					if (!array_key_exists($template['hosttemplateid'], $db_templates)) {
+						$ins_links[$template['templateid']][$host[$id_field_name]] = true;
+					}
+				}
+			}
+
+			if (array_key_exists('templates_clear', $host)) {
+				foreach ($host['templates'] as $template) {
+					$del_links[$template['templateid']][$host[$id_field_name]] = true;
+				}
+			}
+		}
+
+		while ($del_links) {
+			$templateid = key($del_links);
+			$hostids = reset($del_links);
+			$templateids = [$templateid];
+			unset($del_links[$templateid]);
+
+			foreach ($del_links as $templateid => $_hostids) {
+				if ($_hostids === $hostids) {
+					$templateids[] = $templateid;
+					unset($del_links[$templateid]);
+				}
+			}
+
+			self::deleteTemplatesElements($templateids, array_keys($hostids));
+		}
+
+		while ($ins_links) {
+			$templateid = key($ins_links);
+			$hostids = reset($ins_links);
+			$templateids = [$templateid];
+			unset($ins_links[$templateid]);
+
+			foreach ($ins_links as $templateid => $_hostids) {
+				if ($_hostids === $hostids) {
+					$templateids[] = $templateid;
+					unset($ins_links[$templateid]);
+				}
+			}
+
+			self::addTemplatesElements($templateids, array_keys($hostids));
+		}
+	}
+
+	/**
+	 * Delete elements of given templates from given hosts or templates.
+	 *
+	 * @static
+	 *
+	 * @param array $templateids
+	 * @param array $hostids
+	 */
+	private static function deleteTemplatesElements(array $templateids, array $hostids): void {
+
+	}
+
+	/**
+	 * Add elements of given templates to given hosts or templates.
+	 *
+	 * @static
+	 *
+	 * @param array $templateids
+	 * @param array $hostids
+	 */
+	private static function addTemplatesElements(array $templateids, array $hostids): void {
+		// TODO: Modify parameters of syncTemplates methods when complete audit log will be implementing for hosts.
+		$link_request = [
+			'templateids' => $templateids,
+			'hostids' => $hostids
+		];
+
+		foreach ($templateids as $templateid) {
+			// Fist link web items, so that later regular items can use web item as their master item.
+			Manager::HttpTest()->link($templateid, $hostids);
+		}
+
+		API::Item()->syncTemplates($link_request);
+		API::DiscoveryRule()->syncTemplates($link_request);
+		API::ItemPrototype()->syncTemplates($link_request);
+		API::HostPrototype()->syncTemplates($link_request);
+
+		API::Trigger()->syncTemplates($link_request);
+		API::TriggerPrototype()->syncTemplates($link_request);
+		API::GraphPrototype()->syncTemplates($link_request);
+		API::Graph()->syncTemplates($link_request);
+
+		API::Trigger()->syncTemplateDependencies($link_request);
+		API::TriggerPrototype()->syncTemplateDependencies($link_request);
+	}
+
+	/**
 	 * Checks if the current user has access to the given hosts and templates. Assumes the "hostid" field is valid.
 	 *
 	 * @param array $hostids    an array of host or template IDs
