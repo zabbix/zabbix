@@ -820,7 +820,7 @@ void	zbx_db_trigger_get_recovery_expression(const DB_TRIGGER *trigger, char **ex
 		db_trigger_get_expression(&cache->eval_ctx_r, expression);
 }
 
-static void	evaluate_function_by_token(zbx_uint64_t functionid, char **value, int (*eval_func_cb)(
+static void	evaluate_function_by_id(zbx_uint64_t functionid, char **value, int (*eval_func_cb)(
 		zbx_variant_t *, DC_ITEM *, const char *, const char *, const zbx_timespec_t *, char **))
 {
 	DC_ITEM		item;
@@ -846,6 +846,7 @@ static void	evaluate_function_by_token(zbx_uint64_t functionid, char **value, in
 					function.parameter, &ts, &error)) && ZBX_VARIANT_NONE != var.type)
 			{
 				*value = zbx_strdup(NULL, zbx_variant_value_desc(&var));
+				zbx_variant_clear(&var);
 			}
 			else
 				zbx_free(error);
@@ -874,7 +875,6 @@ static void	db_trigger_explain_expression(const zbx_eval_context_t *ctx, char **
 		zbx_eval_token_t	*token = &local_ctx.stack.values[i];
 		char			*value;
 		zbx_uint64_t		functionid;
-		int			eval_ret;
 
 		if (ZBX_EVAL_TOKEN_FUNCTIONID != token->type)
 		{
@@ -900,7 +900,7 @@ static void	db_trigger_explain_expression(const zbx_eval_context_t *ctx, char **
 		}
 
 		zbx_variant_clear(&token->value);
-		evaluate_function_by_token(functionid, &value, eval_func_cb);
+		evaluate_function_by_id(functionid, &value, eval_func_cb);
 		zbx_variant_set_str(&token->value, value);
 	}
 
@@ -923,7 +923,7 @@ static void	db_trigger_get_function_value(const zbx_eval_context_t *ctx, int ind
 		zbx_eval_token_t	*token = &local_ctx.stack.values[i];
 		zbx_uint64_t		functionid;
 
-		if (ZBX_EVAL_TOKEN_FUNCTIONID != token->type || token->opt + 1 != index)
+		if (ZBX_EVAL_TOKEN_FUNCTIONID != token->type || (int)token->opt + 1 != index)
 			continue;
 
 		switch (token->value.type)
@@ -942,7 +942,7 @@ static void	db_trigger_get_function_value(const zbx_eval_context_t *ctx, int ind
 				continue;
 		}
 
-		evaluate_function_by_token(functionid, value_ret, eval_func_cb);
+		evaluate_function_by_id(functionid, value_ret, eval_func_cb);
 		break;
 	}
 
