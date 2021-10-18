@@ -45,7 +45,7 @@ class CSettings extends CApiService {
 		'snmptrap_logging', 'default_lang', 'default_timezone', 'login_attempts', 'login_block', 'validate_uri_schemes',
 		'uri_valid_schemes', 'x_frame_options', 'iframe_sandboxing_enabled', 'iframe_sandboxing_exceptions',
 		'max_overview_table_size', 'connect_timeout', 'socket_timeout', 'media_type_test_timeout', 'script_timeout',
-		'item_test_timeout', 'url', 'report_test_timeout', 'auditlog_enabled'
+		'item_test_timeout', 'url', 'report_test_timeout', 'auditlog_enabled', 'ha_failover_delay'
 	];
 
 	/**

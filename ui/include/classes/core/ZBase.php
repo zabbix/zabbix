@@ -25,6 +25,7 @@ use Core\CModule,
 require_once dirname(__FILE__).'/CAutoloader.php';
 
 class ZBase {
+
 	const EXEC_MODE_DEFAULT = 'default';
 	const EXEC_MODE_SETUP = 'setup';
 	const EXEC_MODE_API = 'api';
@@ -182,6 +183,7 @@ class ZBase {
 
 				$this->loadConfigFile();
 				$this->initDB();
+				$this->setServerAddress();
 				$this->initLocales(CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_LANG));
 				$this->authenticateUser();
 
@@ -216,6 +218,7 @@ class ZBase {
 			case self::EXEC_MODE_API:
 				$this->loadConfigFile();
 				$this->initDB();
+				$this->setServerAddress();
 				$this->initLocales('en_us');
 				break;
 
@@ -709,5 +712,31 @@ class ZBase {
 		$this->module_manager->initModules();
 
 		array_map('error', $this->module_manager->getErrors());
+	}
+
+	/**
+	 * Check for High availability override to standalone mode, set server to use for system information checks.
+	 *
+	 * @return void
+	 */
+	function setServerAddress(): void {
+		global $ZBX_SERVER_STANDALONE, $ZBX_SERVER, $ZBX_SERVER_PORT;
+
+		if ($ZBX_SERVER_STANDALONE) {
+			return;
+		}
+
+		$active_node = API::getApiService('hanode')->get([
+			'output' => ['address', 'port'],
+			'filter' => ['status' => ZBX_NODE_STATUS_ACTIVE],
+			'limit' => 1
+		], false);
+
+		if (!$active_node) {
+			return;
+		}
+
+		$ZBX_SERVER = $active_node[0]['address'];
+		$ZBX_SERVER_PORT = $active_node[0]['port'];
 	}
 }

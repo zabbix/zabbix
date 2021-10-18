@@ -19,31 +19,25 @@
 **/
 
 
-require_once __DIR__.'/../../include/blocks.inc.php';
+/**
+ * System information widget form.
+ */
+class CWidgetFormSystemInfo extends CWidgetForm {
 
-class CControllerWidgetSystemInfoView extends CControllerWidget {
+	public function __construct($data, $templateid) {
+		parent::__construct($data, $templateid, WIDGET_SYSTEM_INFO);
 
-	public function __construct() {
-		parent::__construct();
+		$field_info_type = (new CWidgetFieldRadioButtonList('info_type', _('Show'), [
+			ZBX_SYSTEM_INFO_SERVER_STATS => _('System stats'),
+			ZBX_SYSTEM_INFO_HAC_STATUS => _('High availability nodes')
+		]))
+			->setDefault(ZBX_SYSTEM_INFO_SERVER_STATS)
+			->setModern(true);
 
-		$this->setType(WIDGET_SYSTEM_INFO);
-		$this->setValidationRules([
-			'name' => 'string',
-			'fields' => 'json'
-		]);
-	}
+		if (array_key_exists('info_type', $this->data)) {
+			$field_info_type->setValue($this->data['info_type']);
+		}
 
-	protected function doAction() {
-		$fields = $this->getForm()->getFieldsData();
-
-		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', $this->getDefaultName()),
-			'system_info' => CSystemInfoHelper::getData(),
-			'info_type' => $fields['info_type'],
-			'user_type' => CWebUser::getType(),
-			'user' => [
-				'debug_mode' => $this->getDebugMode()
-			]
-		]));
+		$this->fields[$field_info_type->getName()] = $field_info_type;
 	}
 }

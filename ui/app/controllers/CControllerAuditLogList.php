@@ -214,6 +214,7 @@ class CControllerAuditLogList extends CController {
 			CAudit::RESOURCE_DISCOVERY_RULE => _('Discovery rule'),
 			CAudit::RESOURCE_GRAPH => _('Graph'),
 			CAudit::RESOURCE_GRAPH_PROTOTYPE => _('Graph prototype'),
+			CAudit::RESOURCE_HA_NODE => _('High availability node'),
 			CAudit::RESOURCE_HOST => _('Host'),
 			CAudit::RESOURCE_HOST_GROUP => _('Host group'),
 			CAudit::RESOURCE_HOST_PROTOTYPE => _('Host prototype'),

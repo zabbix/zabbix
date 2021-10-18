@@ -8729,7 +8729,18 @@ return [
 				'length' => 10,
 				'default' => '0'
 			],
-			'sessionid' => [
+			'ha_sessionid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CUID,
+				'length' => 25,
+				'default' => ''
+			]
+		]
+	],
+	'table_lock' => [
+		'key' => 'table_name',
+		'fields' => [
+			'table_name' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CUID,
 				'length' => 25,

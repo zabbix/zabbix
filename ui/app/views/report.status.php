@@ -21,10 +21,28 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
-require_once dirname(__FILE__).'/../../include/blocks.inc.php';
+require_once __DIR__.'/../../include/blocks.inc.php';
 
-$widget = (new CWidget())
+(new CWidget())
 	->setTitle(_('System information'))
-	->addItem(make_status_of_zbx())->show();
+	->addItem(
+		(new CDiv(
+			new CPartial('administration.system.info', [
+				'system_info' => $data['system_info'],
+				'user_type' => $data['user_type']
+			])
+		))->addClass(ZBX_STYLE_CONTAINER)
+	)
+	->addItem(
+		$data['user_type'] == USER_TYPE_SUPER_ADMIN
+			? (new CDiv(
+				new CPartial('administration.ha.nodes', [
+					'ha_nodes' => $data['system_info']['ha_nodes']
+				])
+			))->addClass(ZBX_STYLE_CONTAINER)
+			: null
+	)
+	->show();

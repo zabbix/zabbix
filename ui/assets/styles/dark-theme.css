@@ -391,12 +391,17 @@ main {
   position: relative;
   min-width: 1200px;
   padding: 10px; }
+  main > .container:not(:first-of-type) {
+    margin-top: 10px; }
 
 footer {
   margin-top: auto; }
 
 output {
   display: block; }
+
+.container {
+  background: #2b2b2b; }
 
 header {
   display: flex;

@@ -1006,6 +1006,10 @@ define('EVENT_OBJECT_ITEM',				4);
 define('EVENT_OBJECT_LLDRULE',			5);
 define('EVENT_OBJECT_SERVICE',			6);
 
+// System information widget constants.
+define('ZBX_SYSTEM_INFO_SERVER_STATS',	0);
+define('ZBX_SYSTEM_INFO_HAC_STATUS',	1);
+
 // Problem and event tag constants.
 define('TAG_EVAL_TYPE_AND_OR',		0);
 define('TAG_EVAL_TYPE_OR',			2);
@@ -1795,6 +1799,7 @@ define('ZBX_STYLE_INACTIVE_BG', 'inactive-bg');
 define('ZBX_STYLE_INFO_BG', 'info-bg');
 define('ZBX_STYLE_INPUT_COLOR_PICKER', 'input-color-picker');
 define('ZBX_STYLE_LAYOUT_KIOSKMODE', 'layout-kioskmode');
+define('ZBX_STYLE_CONTAINER', 'container');
 define('ZBX_STYLE_LAYOUT_WRAPPER', 'wrapper');
 define('ZBX_STYLE_LEFT', 'left');
 define('ZBX_STYLE_LINK_ACTION', 'link-action');
@@ -2043,6 +2048,12 @@ define('ZBX_ROLE_RULE_API_WILDCARD_ALIAS',		'*.*');
 
 // Allows to set "rel" tag value "noreferer" when setting target="_blank".
 define('ZBX_NOREFERER', true);
+
+// High availability server node states.
+define('ZBX_NODE_STATUS_STANDBY',		0);
+define('ZBX_NODE_STATUS_STOPPED',		1);
+define('ZBX_NODE_STATUS_UNAVAILABLE',	2);
+define('ZBX_NODE_STATUS_ACTIVE',		3);
 
 // init $_REQUEST
 ini_set('variables_order', 'GP');
