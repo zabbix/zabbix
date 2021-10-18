@@ -203,7 +203,7 @@ class CControllerWidgetGeoMapView extends CControllerWidget {
 		if (array_key_exists('default_view', $fields)
 				&& $fields['default_view'] !== ''
 				&& $geoloc_parser->parse($fields['default_view']) == CParser::PARSE_SUCCESS) {
-			return [$geoloc_parser->result + $defaults, false];
+			return [$geoloc_parser->result + ['zoom' => ceil(($max_zoom - 1) / 2)], true];
 		}
 
 		return [$defaults, false];

@@ -32,7 +32,7 @@ const view = {
 		this.defaults = {
 			geomaps_tile_url: '',
 			geomaps_attribution: '',
-			geomaps_max_zoom: 0
+			geomaps_max_zoom: ''
 		};
 
 		document.querySelector('[name="geomaps_tile_provider"]')
