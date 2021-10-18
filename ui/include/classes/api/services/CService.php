@@ -792,13 +792,11 @@ class CService extends CApiService {
 		while ($db_tag = DBfetch($db_tags)) {
 			$serviceid = $db_tag['serviceid'];
 
-			if (!$this->outputIsRequested('serviceid', $output)) {
-				unset($db_tag['serviceid']);
-			}
-
 			if (!$preserve_ids) {
 				unset($db_tag['servicetagid']);
 			}
+
+			unset($db_tag['serviceid']);
 
 			$result[$serviceid]['tags'][] = $db_tag;
 		}
@@ -845,13 +843,11 @@ class CService extends CApiService {
 		while ($db_problem_tag = DBfetch($db_problem_tags)) {
 			$serviceid = $db_problem_tag['serviceid'];
 
-			if (!$this->outputIsRequested('serviceid', $output)) {
-				unset($db_problem_tag['serviceid']);
-			}
-
 			if (!$preserve_ids) {
 				unset($db_problem_tag['service_problem_tagid']);
 			}
+
+			unset($db_problem_tag['serviceid']);
 
 			$result[$serviceid]['problem_tags'][] = $db_problem_tag;
 		}
@@ -1029,13 +1025,11 @@ class CService extends CApiService {
 		while ($db_time = DBfetch($db_times)) {
 			$serviceid = $db_time['serviceid'];
 
-			if (!$this->outputIsRequested('serviceid', $output)) {
-				unset($db_time['serviceid']);
-			}
-
 			if (!$preserve_ids) {
 				unset($db_time['timeid']);
 			}
+
+			unset($db_time['serviceid']);
 
 			$result[$serviceid]['times'][] = $db_time;
 		}
@@ -1082,13 +1076,11 @@ class CService extends CApiService {
 		while ($db_status_rule = DBfetch($db_status_rules)) {
 			$serviceid = $db_status_rule['serviceid'];
 
-			if (!$this->outputIsRequested('serviceid', $output)) {
-				unset($db_status_rule['serviceid']);
-			}
-
 			if (!$preserve_ids) {
 				unset($db_status_rule['service_status_ruleid']);
 			}
+
+			unset($db_status_rule['serviceid']);
 
 			$result[$serviceid]['status_rules'][] = $db_status_rule;
 		}
