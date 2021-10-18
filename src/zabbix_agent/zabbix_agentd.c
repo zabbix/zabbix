@@ -1163,9 +1163,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_tls_init_parent();
 #endif
 	/* --- START THREADS ---*/
-
+#ifndef _WINDOWS
 	zbx_set_terminate_signal_handlers();
-
+#endif
 	/* allocate memory for a collector, all listeners and active checks */
 	threads_num = CONFIG_COLLECTOR_FORKS + CONFIG_PASSIVE_FORKS + CONFIG_ACTIVE_FORKS;
 
