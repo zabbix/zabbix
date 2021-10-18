@@ -86,12 +86,7 @@ class CWidgetGeoMap extends CWidget {
 	_initMap(config) {
 		const options = {
 			minZoom: 1,
-			maxZoom: config.max_zoom//,
-//			contextmenu: true,
-//			contextmenuItems: [{
-//				text: t('Set this view as default'),
-//				callback: this.updateDefaultView.bind(this)
-//			}]
+			maxZoom: config.max_zoom
 		};
 		const latLng = new L.latLng([config.center.latitude, config.center.longitude]);
 		this._view_set = ('view_set' in config && config.view_set);
@@ -290,6 +285,16 @@ class CWidgetGeoMap extends CWidget {
 		};
 
 		const makeTableRows = () => {
+			hosts.sort((a, b) => {
+				if (a.properties.name < b.properties.name) {
+					return -1;
+				}
+				if (a.properties.name > b.properties.name) {
+					return 1;
+				}
+				return 0;
+			});
+
 			let rows = ``;
 			hosts.forEach(host => {
 				rows += `
