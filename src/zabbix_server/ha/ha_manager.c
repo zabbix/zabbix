@@ -938,7 +938,8 @@ static int	ha_check_standby_nodes(zbx_ha_info_t *info, zbx_vector_ha_node_t *nod
  *          seconds, mark them unavailable and set own status to active       *
  *                                                                            *
  ******************************************************************************/
-static int	ha_check_active_node(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes, int *ha_status)
+static int	ha_check_active_node(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes, int *unavailable_index,
+		int *ha_status)
 {
 	int	i, ret = SUCCEED;
 
@@ -976,20 +977,8 @@ static int	ha_check_active_node(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes
 
 		if (info->failover_delay / ZBX_HA_POLL_PERIOD + 1 < info->offline_ticks_active)
 		{
-			if (SUCCEED != ha_db_execute(info, "update ha_node set status=%d where ha_nodeid='%s'",
-					ZBX_NODE_STATUS_UNAVAILABLE, nodes->values[i]->ha_nodeid.str))
-			{
-				ret = FAIL;
-			}
-			else
-			{
-				zbx_audit_ha_create_entry(AUDIT_ACTION_UPDATE, nodes->values[i]->ha_nodeid.str,
-						nodes->values[i]->name);
-				zbx_audit_ha_update_field_int(nodes->values[i]->ha_nodeid.str, ZBX_AUDIT_HA_STATUS,
-						nodes->values[i]->status, ZBX_NODE_STATUS_UNAVAILABLE);
-
-				*ha_status = ZBX_NODE_STATUS_ACTIVE;
-			}
+			*unavailable_index = i;
+			*ha_status = ZBX_NODE_STATUS_ACTIVE;
 		}
 	}
 
@@ -1009,7 +998,7 @@ static void	ha_check_nodes(zbx_ha_info_t *info)
 {
 	zbx_vector_ha_node_t	nodes;
 	zbx_ha_node_t		*node;
-	int			ha_status, db_time;
+	int			ha_status, db_time, unavailable_index = 0;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 
@@ -1057,7 +1046,7 @@ static void	ha_check_nodes(zbx_ha_info_t *info)
 		}
 		else /* passive status */
 		{
-			if (SUCCEED != ha_check_active_node(info, &nodes, &ha_status))
+			if (SUCCEED != ha_check_active_node(info, &nodes, &unavailable_index, &ha_status))
 				goto out;
 		}
 	}
@@ -1077,7 +1066,18 @@ static void	ha_check_nodes(zbx_ha_info_t *info)
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where ha_nodeid='%s'", info->ha_nodeid.str);
 
-	ha_db_execute(info, "%s", sql);
+	if (SUCCEED == ha_db_execute(info, "%s", sql) && 0 != unavailable_index)
+	{
+		zbx_ha_node_t	*last_active = nodes.values[unavailable_index];
+
+		ha_db_execute(info, "update ha_node set status=%d where ha_nodeid='%s'",
+				ZBX_NODE_STATUS_UNAVAILABLE, last_active->ha_nodeid.str);
+
+		zbx_audit_ha_create_entry(AUDIT_ACTION_UPDATE, last_active->ha_nodeid.str, last_active->name);
+		zbx_audit_ha_update_field_int(last_active->ha_nodeid.str, ZBX_AUDIT_HA_STATUS, last_active->status,
+				ZBX_NODE_STATUS_UNAVAILABLE);
+	}
+
 	ha_flush_audit(info);
 
 	zbx_free(sql);
