@@ -46,13 +46,13 @@
 					new CCol(
 						(new CDiv())
 							->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
-							->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+							->setAdaptiveWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 					),
 					new CCol(),
 					new CCol(
 						(new CDiv())
 							->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
-							->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+							->setAdaptiveWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 					)
 				]
 			]))
@@ -163,9 +163,7 @@
 				<?php if ($data['readonly']): ?>
 					$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', '#tbl_macros').textareaFlexible();
 				<?php else: ?>
-					window.macros_manager.initMacroTable($('#tbl_macros'),
-						($('input[name="show_inherited_macros"]:checked').val() == 1)
-					);
+					window.macros_manager.initMacroTable($('input[name="show_inherited_macros"]:checked').val() == 1);
 				<?php endif ?>
 
 				panel.data('macros_initialized', true);
