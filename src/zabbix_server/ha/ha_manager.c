@@ -27,6 +27,7 @@
 #include "../../libs/zbxalgo/vectorimpl.h"
 #include "../../libs/zbxaudit/audit.h"
 #include "../../libs/zbxaudit/audit_ha.h"
+#include "../../libs/zbxaudit/audit_settings.h"
 
 #define ZBX_HA_POLL_PERIOD	5
 
@@ -1323,19 +1324,38 @@ static void	ha_set_failover_delay(zbx_ha_info_t *info, zbx_ipc_client_t *client,
 	char		*error = NULL;
 	zbx_uint32_t	len = 0, error_len;
 	unsigned char	*data;
+	DB_RESULT	result;
+	DB_ROW		row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	if (NULL == (result = ha_db_select(info, "select configid,ha_failover_delay from config")))
+	{
+		error = "database error";
+		goto out;
+	}
+
 	memcpy(&delay, message->data, sizeof(delay));
 
-	if (SUCCEED == ha_db_execute(info, "update config set ha_failover_delay=%d", delay))
+	if (NULL != (row = DBfetch(result)) &&
+		SUCCEED == ha_db_execute(info, "update config set ha_failover_delay=%d", delay))
 	{
+		zbx_uint64_t	configid;
+
 		info->failover_delay = delay;
 		zabbix_log(LOG_LEVEL_WARNING, "HA failover delay set to %ds", delay);
+
+		ZBX_STR2UINT64(configid, row[0]);
+		zbx_audit_init(info->auditlog);
+		zbx_audit_settings_create_entry(AUDIT_ACTION_UPDATE, 1);
+		zbx_audit_update_json_update_int(1, "settings.ha_failover_delay", atoi(row[1]), delay);
+		ha_flush_audit(info);
 	}
 	else
 		error = "database error";
 
+	DBfree_result(result);
+out:
 	zbx_serialize_prepare_str(len, error);
 
 	data = zbx_malloc(NULL, len);

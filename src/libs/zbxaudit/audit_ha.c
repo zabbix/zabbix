@@ -73,3 +73,4 @@ void	zbx_audit_ha_update_field_int(const char *nodeid, const char *key, int old_
 	entry = zbx_audit_get_entry(0, nodeid);
 	zbx_audit_entry_append_int(entry, AUDIT_ACTION_UPDATE, key, old_value, new_value);
 }
+

@@ -1816,6 +1816,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		{
 			if (ZBX_NODE_STATUS_ACTIVE == ha_status)
 				zbx_rtc_process_command(zbx_rtc_command);
+			else
+				zabbix_log(LOG_LEVEL_INFORMATION, "runtime commands can be executed only in active mode");
 
 			zbx_rtc_command = 0;
 		}

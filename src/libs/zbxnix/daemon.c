@@ -210,7 +210,8 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 
 	if (NULL == threads)
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot redirect signal: shutdown in progress");
+		zabbix_log(LOG_LEVEL_ERR, "cannot redirect signal: server is either shutting down"
+				" or is running in standby mode");
 		return;
 	}
 
