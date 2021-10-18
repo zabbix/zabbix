@@ -1172,7 +1172,7 @@ static int	ha_db_get_nodes_json(zbx_ha_info_t *info, char **nodes_json, char **e
 
 		for (i = 0; i < nodes.values_num; i++)
 		{
-			zbx_snprintf(address, sizeof(address), "%s:%uh", nodes.values[i]->address,
+			zbx_snprintf(address, sizeof(address), "%s:%hu", nodes.values[i]->address,
 					nodes.values[i]->port);
 			zbx_json_addobject(&j, NULL);
 
