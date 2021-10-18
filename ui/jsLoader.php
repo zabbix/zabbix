@@ -64,7 +64,6 @@ $availableJScripts = [
 	// vendors
 	'jquery.js' => 'vendors/',
 	'jquery-ui.js' => 'vendors/',
-	'leaflet.contextmenu.min.js' => 'vendors/aratcliffe/Leaflet.contextmenu/',
 	'leaflet.js' => 'vendors/Leaflet/Leaflet/',
 	'leaflet.markercluster.js' => 'vendors/Leaflet/Leaflet.markercluster/',
 	// classes
@@ -149,22 +148,8 @@ $tranStrings = [
 		'Release to create a widget.' => _('Release to create a widget.')
 	],
 	'class.geomaps.js' => [
-		'No problems' => _('No problems'),
-		'Not classified' => _('Not classified'),
-		'Information' => _('Information'),
-		'Warning' => _('Warning'),
-		'Average' => _('Average'),
-		'High' => _('High'),
-		'Disaster' => _('Disaster'),
 		'Severity filter' => _('Severity filter'),
-		'Navigate to default view' => _('Navigate to default view'),
-		'Host' => _('Host'),
-		'D' => _x('D', 'abbreviation of severity level'),
-		'H' => _x('H', 'abbreviation of severity level'),
-		'A' => _x('A', 'abbreviation of severity level'),
-		'W' => _x('W', 'abbreviation of severity level'),
-		'I' => _x('I', 'abbreviation of severity level'),
-		'N' => _x('N', 'abbreviation of severity level')
+		'Navigate to default view' => _('Navigate to default view')
 	],
 	'class.widget.js' => [
 		'10 seconds' => _n('%1$s second', '%1$s seconds', 10),
@@ -182,7 +167,22 @@ $tranStrings = [
 		'Refresh interval' => _s('Refresh interval')
 	],
 	'class.widget.geomap.js' => [
-		'Set this view as default' => _('Set this view as default')
+		'Actions' => _('Actions'),
+		'Set this view as default' => _('Set this view as default'),
+		'No problems' => _('No problems'),
+		'Not classified' => _('Not classified'),
+		'Information' => _('Information'),
+		'Warning' => _('Warning'),
+		'Average' => _('Average'),
+		'High' => _('High'),
+		'Disaster' => _('Disaster'),
+		'Host' => _('Host'),
+		'D' => _x('D', 'abbreviation of severity level'),
+		'H' => _x('H', 'abbreviation of severity level'),
+		'A' => _x('A', 'abbreviation of severity level'),
+		'W' => _x('W', 'abbreviation of severity level'),
+		'I' => _x('I', 'abbreviation of severity level'),
+		'N' => _x('N', 'abbreviation of severity level')
 	],
 	'class.widget.iterator.js' => [
 		'Next page' => _s('Next page'),

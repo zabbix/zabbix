@@ -32,7 +32,6 @@ if (array_key_exists('error', $data)) {
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');
 $this->addJsFile('leaflet.js');
-$this->addJsFile('leaflet.contextmenu.min.js');
 $this->addJsFile('class.dashboard.js');
 $this->addJsFile('class.dashboard.page.js');
 $this->addJsFile('class.dashboard.widget.placeholder.js');
@@ -58,7 +57,6 @@ $this->addJsFile('class.sortable.js');
 $this->includeJsFile('monitoring.dashboard.print.js.php');
 
 $this->addCssFile('assets/styles/vendors/Leaflet/Leaflet/leaflet.css');
-$this->addCssFile('assets/styles/vendors/aratcliffe/Leaflet.contextmenu/leaflet.contextmenu.min.css');
 
 $this->enableLayoutModes();
 $this->setLayoutMode(ZBX_LAYOUT_KIOSKMODE);

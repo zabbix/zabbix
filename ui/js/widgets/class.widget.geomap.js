@@ -86,12 +86,12 @@ class CWidgetGeoMap extends CWidget {
 	_initMap(config) {
 		const options = {
 			minZoom: 1,
-			maxZoom: config.max_zoom,
-			contextmenu: true,
-			contextmenuItems: [{
-				text: t('Set this view as default'),
-				callback: this.updateDefaultView.bind(this)
-			}]
+			maxZoom: config.max_zoom//,
+//			contextmenu: true,
+//			contextmenuItems: [{
+//				text: t('Set this view as default'),
+//				callback: this.updateDefaultView.bind(this)
+//			}]
 		};
 		const latLng = new L.latLng([config.center.latitude, config.center.longitude]);
 		this._view_set = ('view_set' in config && config.view_set);
@@ -154,6 +154,30 @@ class CWidgetGeoMap extends CWidget {
 
 		this._map.getContainer().addEventListener('cluster.dblclick', (e) => {
 			e.detail.layer.zoomToBounds({padding: [20, 20]});
+		});
+
+		this._map.getContainer().addEventListener('contextmenu', (e) => {
+			if (e.target.classList.contains('leaflet-container')) {
+				const $obj = $(e.target);
+				const menu = [{
+					label: t('Actions'),
+					items: [{
+						label: t('Set this view as default'),
+						clickCallback: this.updateDefaultView.bind(this)
+					}]
+				}];
+
+				$obj.menuPopup(menu, e, {
+					position: {
+						of: $obj,
+						my: 'left top',
+						at: 'left+'+e.layerX+' top+'+e.layerY,
+						collision: 'fit'
+					}
+				});
+			}
+
+			e.preventDefault();
 		});
 	}
 
