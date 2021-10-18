@@ -576,7 +576,7 @@ class CHostPrototype extends CHostBase {
 		);
 
 		self::checkDuplicates($host_prototypes, $db_host_prototypes);
-		self::checkHostGroupsPermissions($host_prototypes);
+		self::checkHostGroupsPermissions($host_prototypes, $db_host_prototypes);
 		self::checkMainInterfaces($host_prototypes);
 	}
 
@@ -1236,10 +1236,11 @@ class CHostPrototype extends CHostBase {
 	 * @static
 	 *
 	 * @param array $host_prototypes
+	 * @param array $db_host_prototypes
 	 *
 	 * @throws APIException if the user doesn't have write permissions for the given host groups
 	 */
-	private static function checkHostGroupsPermissions(array $host_prototypes): void {
+	private static function checkHostGroupsPermissions(array $host_prototypes, array $db_host_prototypes = null): void {
 		$groupids = [];
 
 		foreach ($host_prototypes as $host_prototype) {
@@ -1247,13 +1248,11 @@ class CHostPrototype extends CHostBase {
 				continue;
 			}
 
-			foreach ($host_prototype['groupLinks'] as $group_link) {
-				if (array_key_exists('groupid', $group_link)) {
-					continue;
-				}
+			$db_group_links = ($db_host_prototypes !== null)
+				? array_column($db_host_prototypes[$host_prototype['hostid']]['groupLinks'], null, 'groupid')
+				: [];
 
-				$groupids[$group_link['groupid']] = true;
-			}
+			$groupids = array_diff_key(array_column($host_prototype['groupLinks'], null, 'groupid'), $db_group_links);
 		}
 
 		if (!$groupids) {
@@ -1273,13 +1272,11 @@ class CHostPrototype extends CHostBase {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		foreach ($groupids as $groupid) {
-			// Check if group prototypes use discovered host groups.
-			if ($db_groups[$groupid]['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+		// Check if group prototypes use discovered host groups.
+		foreach ($db_groups as $db_group) {
+			if ($db_group['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Group prototype cannot be based on a discovered host group "%1$s".',
-						$db_groups[$groupid]['name']
-					)
+					_s('Group prototype cannot be based on a discovered host group "%1$s".', $db_group['name'])
 				);
 			}
 		}
