@@ -47,6 +47,13 @@
 #define AUDIT_RESOURCE_ITEM_PROTOTYPE		36
 #define AUDIT_RESOURCE_HOST_PROTOTYPE		37
 
+#define AUDIT_HOST_ID		1
+#define AUDIT_HOSTGRP_ID	2
+#define AUDIT_ITEM_ID		3
+#define AUDIT_TRIGGER_ID	4
+#define AUDIT_GRAPH_ID		5
+#define AUDIT_HTTPTEST_ID	6
+
 #define RETURN_IF_AUDIT_OFF()					\
 	if (ZBX_AUDITLOG_ENABLED != zbx_get_audit_mode())	\
 		return						\
@@ -57,6 +64,7 @@ zbx_hashset_t	*zbx_get_audit_hashset(void);
 typedef struct zbx_audit_entry
 {
 	zbx_uint64_t	id;
+	int		id_table;
 	char		*name;
 	struct zbx_json	details_json;
 	int		audit_action;
@@ -64,7 +72,8 @@ typedef struct zbx_audit_entry
 	char		audit_cuid[CUID_LEN];
 } zbx_audit_entry_t;
 
-zbx_audit_entry_t	*zbx_audit_entry_init(zbx_uint64_t id, const char *name, int audit_action, int resource_type);
+zbx_audit_entry_t	*zbx_audit_entry_init(zbx_uint64_t id, const int id_table, const char *name, int audit_action,
+		int resource_type);
 
 int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_execute_on,
 		const char *script_command_orig, zbx_uint64_t hostid, const char *hostname, zbx_uint64_t eventid,
@@ -73,22 +82,25 @@ int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_e
 
 void	zbx_audit_init(int audit_mode_set);
 void	zbx_audit_flush(void);
-void	zbx_audit_update_json_append_string(const zbx_uint64_t id, const char *audit_op, const char *key,
-		const char *value, const char *table, const char *field);
-void	zbx_audit_update_json_append_string_secret(const zbx_uint64_t id, const char *audit_op, const char *key,
-		const char *value, const char *table, const char *field);
-void	zbx_audit_update_json_append_uint64(const zbx_uint64_t id, const char *audit_op, const char *key,
-		uint64_t value, const char *table, const char *field);
-void	zbx_audit_update_json_append_no_value(const zbx_uint64_t id, const char *audit_op, const char *key);
-void	zbx_audit_update_json_append_int(const zbx_uint64_t id, const char *audit_op, const char *key, int value,
-		const char *table, const char *field);
-void	zbx_audit_update_json_append_double(const zbx_uint64_t id, const char *audit_op, const char *key, double value,
-		const char *table, const char *field);
-void	zbx_audit_update_json_update_string(const zbx_uint64_t id, const char *key, const char *value_old,
-		const char *value_new);
-void	zbx_audit_update_json_update_uint64(const zbx_uint64_t id, const char *key, uint64_t value_old,
-		uint64_t value_new);
-void	zbx_audit_update_json_update_int(const zbx_uint64_t id, const char *key, int value_old, int value_new);
-void	zbx_audit_update_json_update_double(const zbx_uint64_t id, const char *key, double value_old, double value_new);
-void	zbx_audit_update_json_delete(const zbx_uint64_t id, const char *audit_op, const char *key);
+void	zbx_audit_update_json_append_string(const zbx_uint64_t id, const int id_table, const char *audit_op,
+		const char *key, const char *value, const char *table, const char *field);
+void	zbx_audit_update_json_append_string_secret(const zbx_uint64_t id, const int id_table, const char *audit_op,
+		const char *key, const char *value, const char *table, const char *field);
+void	zbx_audit_update_json_append_uint64(const zbx_uint64_t id, const int id_table, const char *audit_op,
+		const char *key, uint64_t value, const char *table, const char *field);
+void	zbx_audit_update_json_append_no_value(const zbx_uint64_t id, const int id_table, const char *audit_op,
+		const char *key);
+void	zbx_audit_update_json_append_int(const zbx_uint64_t id, const int id_table, const char *audit_op,
+		const char *key, int value, const char *table, const char *field);
+void	zbx_audit_update_json_append_double(const zbx_uint64_t id, const int id_table, const char *audit_op,
+		const char *key, double value, const char *table, const char *field);
+void	zbx_audit_update_json_update_string(const zbx_uint64_t id, const int id_table, const char *key,
+		const char *value_old, const char *value_new);
+void	zbx_audit_update_json_update_uint64(const zbx_uint64_t id, const int id_table, const char *key,
+		uint64_t value_old, uint64_t value_new);
+void	zbx_audit_update_json_update_int(const zbx_uint64_t id, const int id_table, const char *key, int value_old,
+		int value_new);
+void	zbx_audit_update_json_update_double(const zbx_uint64_t id, const int id_table, const char *key,
+		double value_old, double value_new);
+void	zbx_audit_update_json_delete(const zbx_uint64_t id, const int id_table, const char *audit_op, const char *key);
 #endif	/* ZABBIX_AUDIT_H */
