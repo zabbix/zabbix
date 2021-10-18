@@ -1343,23 +1343,22 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @return array
 	 */
 	public function resolveItemNames(array $items) {
-		foreach ($items as &$item) {
-			$item['name_expanded'] = $item['name'];
-		}
-		unset($item);
-
 		$types = ['usermacros' => true];
 		$usermacros = [];
 
-		foreach ($items as $key => $item) {
+		foreach ($items as $key => &$item) {
+			$item['name_expanded'] = $item['name'];
 			$matched_macros = self::extractMacros([$item['name_expanded']], $types);
 
 			if ($matched_macros['usermacros']) {
 				$usermacros[$key] = ['hostids' => [$item['hostid']], 'macros' => $matched_macros['usermacros']];
 			}
 		}
+		unset($item);
 
-		$macro_values = array_column($this->getUserMacros($usermacros), 'macros');
+		$macro_values = array_combine(array_keys($usermacros),
+			array_column($this->getUserMacros($usermacros), 'macros')
+		);
 		$types = $this->transformToPositionTypes($types);
 
 		// Replace macros to value.
