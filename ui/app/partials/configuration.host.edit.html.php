@@ -443,25 +443,21 @@ $encryption_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Connections from host')),
 		new CFormField([
-			(new CList())
-				->addItem(
-					(new CCheckBox('tls_in_none'))
-						->setChecked(($tls_accept & HOST_ENCRYPTION_NONE))
-						->setLabel(_('No encryption'))
-						->setEnabled(!$host_is_discovered)
-				)
-				->addItem(
-					(new CCheckBox('tls_in_psk'))
-						->setChecked(($tls_accept & HOST_ENCRYPTION_PSK))
-						->setLabel(_('PSK'))
-						->setEnabled(!$host_is_discovered)
-				)
-				->addItem(
-					(new CCheckBox('tls_in_cert'))
-						->setChecked(($tls_accept & HOST_ENCRYPTION_CERTIFICATE))
-						->setLabel(_('Certificate'))
-						->setEnabled(!$host_is_discovered)
-				),
+			(new CList([
+				(new CCheckBox('tls_in_none'))
+					->setChecked(($tls_accept & HOST_ENCRYPTION_NONE))
+					->setLabel(_('No encryption'))
+					->setEnabled(!$host_is_discovered),
+				(new CCheckBox('tls_in_psk'))
+					->setChecked(($tls_accept & HOST_ENCRYPTION_PSK))
+					->setLabel(_('PSK'))
+					->setEnabled(!$host_is_discovered),
+				(new CCheckBox('tls_in_cert'))
+					->setChecked(($tls_accept & HOST_ENCRYPTION_CERTIFICATE))
+					->setLabel(_('Certificate'))
+					->setEnabled(!$host_is_discovered)
+			]))
+				->addClass(ZBX_STYLE_LIST_CHECK_RADIO),
 			new CInput('hidden', 'tls_accept', $tls_accept)
 		])
 	])

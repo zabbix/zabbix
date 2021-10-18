@@ -665,6 +665,8 @@ footer {
     width: 100%; }
   .form-grid .form-field td {
     padding: 0 5px 5px 0; }
+  .form-grid .form-field .list-check-radio {
+    line-height: 1.4em; }
   .form-grid.form-grid-1-1 {
     grid-template-columns: repeat(2, minmax(15%, max-content) auto); }
     .form-grid.form-grid-1-1.label-width-true {
