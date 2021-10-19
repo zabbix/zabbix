@@ -94,7 +94,6 @@ void	zbx_audit_init(int audit_mode_set);
 void	zbx_audit_clean(void);
 void	zbx_audit_flush(void);
 int	zbx_audit_flush_once(void);
-int	zbx_audit_initialized(void);
 void	zbx_audit_update_json_append_string(const zbx_uint64_t id, const int id_table, const char *audit_op,
 		const char *key, const char *value, const char *table, const char *field);
 void	zbx_audit_update_json_append_string_secret(const zbx_uint64_t id, const int id_table, const char *audit_op,

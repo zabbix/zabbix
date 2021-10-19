@@ -292,14 +292,6 @@ void	zbx_audit_init(int audit_mode_set)
 #undef AUDIT_HASHSET_DEF_SIZE
 }
 
-int	zbx_audit_initialized(void)
-{
-	if (ZBX_AUDITLOG_ENABLED != zbx_get_audit_mode())
-		return SUCCEED;
-
-	return 0 == zbx_audit.num_slots ? SUCCEED : FAIL;
-}
-
 void	zbx_audit_flush(void)
 {
 	char			recsetid_cuid[CUID_LEN];
@@ -353,7 +345,8 @@ int	zbx_audit_flush_once(void)
 
 	while (NULL != (audit_entry = (zbx_audit_entry_t **)zbx_hashset_iter_next(&iter)))
 	{
-		char id[ZBX_MAX_UINT64_LEN + 1], *pfield, *pvalue, *name_esc, *details_esc;
+		char	id[ZBX_MAX_UINT64_LEN + 1], *pvalue, *name_esc, *details_esc;
+		const char	*pfield;
 
 		if (AUDIT_ACTION_DELETE != (*audit_entry)->audit_action &&
 				0 == strcmp((*audit_entry)->details_json.buffer, "{}"))
@@ -640,6 +633,9 @@ void	zbx_audit_entry_append_int(zbx_audit_entry_t *entry, int audit_op, const ch
 			value2 = va_arg(args, int);
 			update_int_json(&entry->details_json, key, value1, value2);
 			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			break;
 	}
 
 	va_end(args);
@@ -661,6 +657,9 @@ void	zbx_audit_entry_append_string(zbx_audit_entry_t *entry, int audit_op, const
 		case AUDIT_ACTION_UPDATE:
 			value2 = va_arg(args, const char *);
 			update_str_json(&entry->details_json, key, value1, value2);
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
 			break;
 	}
 

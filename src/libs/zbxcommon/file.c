@@ -203,14 +203,14 @@ char	*zbx_fgets(char *buffer, int size, FILE *fp)
  ******************************************************************************/
 int	zbx_write_all(int fd, const char *buf, size_t n)
 {
-	ssize_t	ret;
-
 	while (0 < n)
 	{
+		ssize_t	ret;
+
 		if (-1 != (ret = write(fd, buf, n)))
 		{
 			buf += ret;
-			n -= ret;
+			n -= (size_t)ret;
 		}
 		else if (EINTR != errno)
 			return FAIL;
