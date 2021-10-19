@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-10-08T14:18:49Z'
+  date: '2021-10-19T19:19:20Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -22,7 +22,7 @@ zabbix_export:
       items:
         -
           uuid: 3d96f6e755934bc8a4ee7300a165adae
-          name: 'Velocloud: Get aggregated data'
+          name: 'Velocloud: Get data'
           type: SCRIPT
           key: velocloud.get
           history: '0'
@@ -169,14 +169,14 @@ zabbix_export:
               value: script
         -
           uuid: 9df4ba5324d94d0fb54d3231311016a6
-          name: 'Velocloud: Clear metrics for aggregated data'
+          name: 'Velocloud: Clear data'
           type: DEPENDENT
           key: velocloud.get.clear_metrics
           delay: '0'
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Clear metrics for aggregated data without errors.'
+          description: 'Clear metrics for data without errors.'
           preprocessing:
             -
               type: CHECK_JSON_ERROR
@@ -784,7 +784,7 @@ zabbix_export:
                   uuid: 962d2d0c6f124424b2e5a7aca89d293f
                   expression: 'last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.state[{#ID}])=0'
                   name: 'Edge [{#NAME}]: Edge is in "OFFLINE" state'
-                  priority: AVERAGE
+                  priority: WARNING
                   description: 'Edge state is "OFFLINE".'
             -
               uuid: a86c1fa26d4d4481bdfb099338c27989
@@ -834,7 +834,7 @@ zabbix_export:
                 -
                   uuid: 156d96052fd54606828cc53484794bb2
                   expression: 'last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.system_uptime[{#ID}])>0 and last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.system_uptime[{#ID}])<600'
-                  name: 'Edge [{#NAME}]: Edge uptime is less than 10m'
+                  name: 'Edge [{#NAME}]: Edge has been restarted (uptime < 10m)'
                   priority: WARNING
                   description: 'Edge was restarted.'
           master_item:
@@ -1147,7 +1147,7 @@ zabbix_export:
                 -
                   uuid: e51ea2da27284067bd3ec8fa4faffdde
                   expression: 'last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.gateway.system_uptime[{#ID}])>0 and last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.gateway.system_uptime[{#ID}])<600'
-                  name: 'Gateway [{#NAME}]: Gateway uptime is less that 10m'
+                  name: 'Gateway [{#NAME}]: Gateway has been restarted (uptime < 10m)'
                   priority: WARNING
                   description: 'Gateway was restarted.'
             -
