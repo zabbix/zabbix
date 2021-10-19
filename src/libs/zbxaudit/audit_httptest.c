@@ -31,6 +31,7 @@ void	zbx_audit_httptest_create_entry(int audit_action, zbx_uint64_t httptestid, 
 
 	local_audit_httptest_entry.id = httptestid;
 	local_audit_httptest_entry.cuid = NULL;
+	local_audit_httptest_entry.id_table = AUDIT_HTTPTEST_ID;
 
 	found_audit_httptest_entry = (zbx_audit_entry_t**)zbx_hashset_search(zbx_get_audit_hashset(),
 			&(local_audit_httptest_entry_x));
@@ -39,14 +40,8 @@ void	zbx_audit_httptest_create_entry(int audit_action, zbx_uint64_t httptestid, 
 	{
 		zbx_audit_entry_t	*local_audit_httptest_entry_insert;
 
-		local_audit_httptest_entry_insert = (zbx_audit_entry_t*)zbx_malloc(NULL,
-				sizeof(zbx_audit_entry_t));
-
-		local_audit_httptest_entry_insert->id = httptestid;
-		local_audit_httptest_entry_insert->name = zbx_strdup(NULL, name);
-		local_audit_httptest_entry_insert->audit_action = audit_action;
-		local_audit_httptest_entry_insert->resource_type = AUDIT_RESOURCE_SCENARIO;
-		zbx_json_init(&(local_audit_httptest_entry_insert->details_json), ZBX_JSON_STAT_BUF_LEN);
+		local_audit_httptest_entry_insert = zbx_audit_entry_init(httptestid, AUDIT_HTTPTEST_ID, name,
+				audit_action, AUDIT_RESOURCE_SCENARIO);
 
 		zbx_hashset_insert(zbx_get_audit_hashset(), &local_audit_httptest_entry_insert,
 				sizeof(local_audit_httptest_entry_insert));
@@ -55,8 +50,9 @@ void	zbx_audit_httptest_create_entry(int audit_action, zbx_uint64_t httptestid, 
 
 void	zbx_audit_httptest_update_json_add_data(zbx_uint64_t httptestid, zbx_uint64_t templateid, const char *name,
 		const char *delay, unsigned char status, const char *agent, unsigned char authentication,
-		const char *httpuser, const char *http_proxy, int retries,  const char *ssl_cert_file,
-		const char *ssl_key_file, int verify_peer, int verify_host, zbx_uint64_t hostid)
+		const char *httpuser, const char *httppassword, const char *http_proxy, int retries,
+		const char *ssl_cert_file, const char *ssl_key_file, const char *ssl_key_password, int verify_peer,
+		int verify_host, zbx_uint64_t hostid)
 {
 	char	audit_key_templateid[AUDIT_DETAILS_KEY_LEN], audit_key_name[AUDIT_DETAILS_KEY_LEN],
 		audit_key_delay[AUDIT_DETAILS_KEY_LEN], audit_key_status[AUDIT_DETAILS_KEY_LEN],
@@ -69,7 +65,9 @@ void	zbx_audit_httptest_update_json_add_data(zbx_uint64_t httptestid, zbx_uint64
 	RETURN_IF_AUDIT_OFF();
 
 #define AUDIT_KEY_SNPRINTF(r) zbx_snprintf(audit_key_##r, sizeof(audit_key_##r), "httptest."#r);
-	zbx_audit_update_json_append_uint64(httptestid, AUDIT_DETAILS_ACTION_ADD, "httptest.httptestid", httptestid);
+#define AUDIT_TABLE_NAME	"httptest"
+	zbx_audit_update_json_append_uint64(httptestid, AUDIT_HTTPTEST_ID, AUDIT_DETAILS_ACTION_ADD,
+			"httptest.httptestid", httptestid, AUDIT_TABLE_NAME, "httptestid");
 	AUDIT_KEY_SNPRINTF(templateid)
 	AUDIT_KEY_SNPRINTF(name)
 	AUDIT_KEY_SNPRINTF(delay)
@@ -85,27 +83,31 @@ void	zbx_audit_httptest_update_json_add_data(zbx_uint64_t httptestid, zbx_uint64
 	AUDIT_KEY_SNPRINTF(verify_host)
 	AUDIT_KEY_SNPRINTF(hostid)
 #undef AUDIT_KEY_SNPRINTF
-#define ADD_STR(r) zbx_audit_update_json_append_string(httptestid, AUDIT_DETAILS_ACTION_ADD, audit_key_##r, r);
-#define ADD_UINT64(r) zbx_audit_update_json_append_uint64(httptestid, AUDIT_DETAILS_ACTION_ADD, audit_key_##r, r);
-#define ADD_INT(r) zbx_audit_update_json_append_int(httptestid, AUDIT_DETAILS_ACTION_ADD, audit_key_##r, r);
-	ADD_UINT64(templateid)
-	ADD_STR(name)
-	ADD_STR(delay)
-	ADD_INT(status)
-	ADD_STR(agent)
-	ADD_INT(authentication)
-	ADD_STR(httpuser)
-	zbx_audit_update_json_append_string(httptestid, AUDIT_DETAILS_ACTION_ADD, "httptest.httppassword",
-				ZBX_MACRO_SECRET_MASK);
-	ADD_STR(http_proxy)
-	ADD_INT(retries)
-	ADD_STR(ssl_cert_file)
-	ADD_STR(ssl_key_file)
-	zbx_audit_update_json_append_string(httptestid, AUDIT_DETAILS_ACTION_ADD, "httptest.ssl_key_password",
-			ZBX_MACRO_SECRET_MASK);
-	ADD_INT(verify_peer)
-	ADD_INT(verify_host)
-	ADD_UINT64(hostid)
+#define ADD_STR(r, t, f) zbx_audit_update_json_append_string(httptestid, AUDIT_HTTPTEST_ID, AUDIT_DETAILS_ACTION_ADD, \
+		audit_key_##r, r, t, f);
+#define ADD_UINT64(r, t, f) zbx_audit_update_json_append_uint64(httptestid, AUDIT_HTTPTEST_ID, \
+		AUDIT_DETAILS_ACTION_ADD, audit_key_##r, r, t, f);
+#define ADD_INT(r, t, f) zbx_audit_update_json_append_int(httptestid, AUDIT_HTTPTEST_ID, AUDIT_DETAILS_ACTION_ADD, \
+		audit_key_##r, r, t, f);
+	ADD_UINT64(templateid, AUDIT_TABLE_NAME, "templateid")
+	ADD_STR(name, AUDIT_TABLE_NAME, "name")
+	ADD_STR(delay, AUDIT_TABLE_NAME, "delay")
+	ADD_INT(status, AUDIT_TABLE_NAME, "status")
+	ADD_STR(agent, AUDIT_TABLE_NAME, "agent")
+	ADD_INT(authentication, AUDIT_TABLE_NAME, "authentication")
+	ADD_STR(httpuser, AUDIT_TABLE_NAME, "http_user")
+	zbx_audit_update_json_append_string_secret(httptestid, AUDIT_HTTPTEST_ID, AUDIT_DETAILS_ACTION_ADD,
+			"httptest.httppassword", httppassword, AUDIT_TABLE_NAME, "http_password");
+	ADD_STR(http_proxy, AUDIT_TABLE_NAME, "http_proxy")
+	ADD_INT(retries, AUDIT_TABLE_NAME, "retries")
+	ADD_STR(ssl_cert_file, AUDIT_TABLE_NAME, "ssl_cert_file")
+	ADD_STR(ssl_key_file, AUDIT_TABLE_NAME, "ssl_key_file")
+	zbx_audit_update_json_append_string_secret(httptestid, AUDIT_HTTPTEST_ID, AUDIT_DETAILS_ACTION_ADD,
+			"httptest.ssl_key_password", ssl_key_password, AUDIT_TABLE_NAME, "ssl_key_password");
+	ADD_INT(verify_peer, AUDIT_TABLE_NAME, "verify_peer")
+	ADD_INT(verify_host, AUDIT_TABLE_NAME, "verify_host")
+	ADD_UINT64(hostid, AUDIT_TABLE_NAME, "hostid")
+#undef AUDIT_TABLE_NAME
 #undef ADD_STR
 #undef ADD_UINT64
 #undef ADD_INT
@@ -121,7 +123,8 @@ void	zbx_audit_httptest_update_json_update_##resource(zbx_uint64_t httptestid, t
 														\
 	zbx_snprintf(buf, sizeof(buf), "httptest."#resource);							\
 														\
-	zbx_audit_update_json_update_##type2(httptestid, buf, resource##_old, resource##_new);			\
+	zbx_audit_update_json_update_##type2(httptestid, AUDIT_HTTPTEST_ID, buf, resource##_old,		\
+			resource##_new);									\
 }
 
 PREPARE_AUDIT_HTTPTEST_UPDATE(templateid, zbx_uint64_t, uint64)
@@ -178,9 +181,13 @@ void	zbx_audit_httptest_update_json_add_httptest_tag(zbx_uint64_t httptestid, zb
 	zbx_snprintf(audit_key_tag, sizeof(audit_key_tag), "httptest.tags[" ZBX_FS_UI64 "].tag", tagid);
 	zbx_snprintf(audit_key_value, sizeof(audit_key_value), "httptest.tags[" ZBX_FS_UI64 "].value", tagid);
 
-	zbx_audit_update_json_append_no_value(httptestid, AUDIT_DETAILS_ACTION_ADD, audit_key);
-	zbx_audit_update_json_append_string(httptestid, AUDIT_DETAILS_ACTION_ADD, audit_key_tag, tag);
-	zbx_audit_update_json_append_string(httptestid, AUDIT_DETAILS_ACTION_ADD, audit_key_value, value);
+#define AUDIT_TABLE_NAME	"httptest_tag"
+	zbx_audit_update_json_append_no_value(httptestid, AUDIT_HTTPTEST_ID, AUDIT_DETAILS_ACTION_ADD, audit_key);
+	zbx_audit_update_json_append_string(httptestid, AUDIT_HTTPTEST_ID, AUDIT_DETAILS_ACTION_ADD, audit_key_tag,
+			tag, AUDIT_TABLE_NAME, "tag");
+	zbx_audit_update_json_append_string(httptestid, AUDIT_HTTPTEST_ID, AUDIT_DETAILS_ACTION_ADD, audit_key_value,
+			value, AUDIT_TABLE_NAME, "value");
+#undef AUDIT_TABLE_NAME
 }
 
 void	zbx_audit_httptest_update_json_delete_tags(zbx_uint64_t httptestid, zbx_uint64_t tagid)
@@ -191,7 +198,7 @@ void	zbx_audit_httptest_update_json_delete_tags(zbx_uint64_t httptestid, zbx_uin
 
 	zbx_snprintf(buf, sizeof(buf), "httptest.tags[" ZBX_FS_UI64 "]", tagid);
 
-	zbx_audit_update_json_append_no_value(httptestid, AUDIT_DETAILS_ACTION_DELETE, buf);
+	zbx_audit_update_json_append_no_value(httptestid, AUDIT_HTTPTEST_ID, AUDIT_DETAILS_ACTION_DELETE, buf);
 }
 
 void	zbx_audit_httptest_update_json_add_httptest_httpstep(zbx_uint64_t httptestid, zbx_uint64_t httpstepid,
@@ -211,7 +218,8 @@ void	zbx_audit_httptest_update_json_add_httptest_httpstep(zbx_uint64_t httptesti
 	zbx_snprintf(audit_key_name, sizeof(audit_key_name), "httptest.steps[" ZBX_FS_UI64 "].name", httpstepid);
 	zbx_snprintf(audit_key_no, sizeof(audit_key_no), "httptest.steps[" ZBX_FS_UI64 "].no", httpstepid);
 	zbx_snprintf(audit_key_url, sizeof(audit_key_url), "httptest.steps[" ZBX_FS_UI64 "].url", httpstepid);
-	zbx_snprintf(audit_key_timeout, sizeof(audit_key_timeout), "httptest.steps[" ZBX_FS_UI64 "].timeout", httpstepid);
+	zbx_snprintf(audit_key_timeout, sizeof(audit_key_timeout), "httptest.steps[" ZBX_FS_UI64 "].timeout",
+			httpstepid);
 	zbx_snprintf(audit_key_posts, sizeof(audit_key_posts), "httptest.steps[" ZBX_FS_UI64 "].posts", httpstepid);
 	zbx_snprintf(audit_key_required, sizeof(audit_key_required), "httptest.steps[" ZBX_FS_UI64 "].required",
 			httpstepid);
@@ -224,22 +232,32 @@ void	zbx_audit_httptest_update_json_add_httptest_httpstep(zbx_uint64_t httptesti
 	zbx_snprintf(audit_key_post_type, sizeof(audit_key_post_type), "httptest.steps[" ZBX_FS_UI64 "].post_type",
 			httpstepid);
 
-	zbx_audit_update_json_append_no_value(httptestid, AUDIT_DETAILS_ACTION_ADD, audit_key);
-	zbx_audit_update_json_append_string(httptestid, AUDIT_DETAILS_ACTION_ADD, audit_key_name, name);
-	zbx_audit_update_json_append_int(httptestid, AUDIT_DETAILS_ACTION_ADD, audit_key_no, no);
-	zbx_audit_update_json_append_string(httptestid, AUDIT_DETAILS_ACTION_ADD, audit_key_url, url);
-	zbx_audit_update_json_append_string(httptestid, AUDIT_DETAILS_ACTION_ADD, audit_key_timeout, timeout);
-	zbx_audit_update_json_append_string(httptestid, AUDIT_DETAILS_ACTION_ADD, audit_key_posts, posts);
-	zbx_audit_update_json_append_string(httptestid, AUDIT_DETAILS_ACTION_ADD, audit_key_required, required);
-	zbx_audit_update_json_append_string(httptestid, AUDIT_DETAILS_ACTION_ADD, audit_key_status_codes, status_codes);
-	zbx_audit_update_json_append_int(httptestid, AUDIT_DETAILS_ACTION_ADD, audit_key_follow_redirects,
-			follow_redirects);
-	zbx_audit_update_json_append_int(httptestid, AUDIT_DETAILS_ACTION_ADD, audit_key_retrieve_mode, retrieve_mode);
-	zbx_audit_update_json_append_int(httptestid, AUDIT_DETAILS_ACTION_ADD, audit_key_post_type, post_type);
+#define AUDIT_TABLE_NAME	"httpstep"
+	zbx_audit_update_json_append_string(httptestid, AUDIT_HTTPTEST_ID, AUDIT_DETAILS_ACTION_ADD, audit_key_name,
+			name, AUDIT_TABLE_NAME, "name");
+	zbx_audit_update_json_append_int(httptestid, AUDIT_HTTPTEST_ID, AUDIT_DETAILS_ACTION_ADD, audit_key_no, no,
+			AUDIT_TABLE_NAME, "no");
+	zbx_audit_update_json_append_string(httptestid, AUDIT_HTTPTEST_ID, AUDIT_DETAILS_ACTION_ADD, audit_key_url,
+			url, AUDIT_TABLE_NAME, "url");
+	zbx_audit_update_json_append_string(httptestid, AUDIT_HTTPTEST_ID, AUDIT_DETAILS_ACTION_ADD, audit_key_timeout,
+			timeout, AUDIT_TABLE_NAME, "timeout");
+	zbx_audit_update_json_append_string(httptestid, AUDIT_HTTPTEST_ID, AUDIT_DETAILS_ACTION_ADD, audit_key_posts,
+			posts, AUDIT_TABLE_NAME, "posts");
+	zbx_audit_update_json_append_string(httptestid, AUDIT_HTTPTEST_ID, AUDIT_DETAILS_ACTION_ADD,
+			audit_key_required, required, AUDIT_TABLE_NAME, "required");
+	zbx_audit_update_json_append_string(httptestid, AUDIT_HTTPTEST_ID, AUDIT_DETAILS_ACTION_ADD,
+			audit_key_status_codes, status_codes, AUDIT_TABLE_NAME, "status_codes");
+	zbx_audit_update_json_append_int(httptestid, AUDIT_HTTPTEST_ID, AUDIT_DETAILS_ACTION_ADD,
+			audit_key_follow_redirects, follow_redirects, AUDIT_TABLE_NAME, "follow_redirects");
+	zbx_audit_update_json_append_int(httptestid, AUDIT_HTTPTEST_ID, AUDIT_DETAILS_ACTION_ADD,
+			audit_key_retrieve_mode, retrieve_mode, AUDIT_TABLE_NAME, "retrieve_mode");
+	zbx_audit_update_json_append_int(httptestid, AUDIT_HTTPTEST_ID, AUDIT_DETAILS_ACTION_ADD,
+			audit_key_post_type, post_type, AUDIT_TABLE_NAME, "post_type");
+#undef AUDIT_TABLE_NAME
 }
 
 #define PREPARE_AUDIT_HTTPSTEP_UPDATE(resource, type1, type2)							\
-void	zbx_audit_httptest_update_json_httpstep_update_##resource(zbx_uint64_t httptestid, 			\
+void	zbx_audit_httptest_update_json_httpstep_update_##resource(zbx_uint64_t httptestid,			\
 		zbx_uint64_t httpstepid, type1 resource##_old, type1 resource##_new)				\
 {														\
 	char	buf[AUDIT_DETAILS_KEY_LEN];									\
@@ -248,7 +266,8 @@ void	zbx_audit_httptest_update_json_httpstep_update_##resource(zbx_uint64_t http
 														\
 	zbx_snprintf(buf, sizeof(buf), "httptest.steps[" ZBX_FS_UI64 "]."#resource, httpstepid);		\
 														\
-	zbx_audit_update_json_update_##type2(httptestid, buf, resource##_old, resource##_new);			\
+	zbx_audit_update_json_update_##type2(httptestid, AUDIT_HTTPTEST_ID, buf, resource##_old,		\
+			resource##_new);									\
 }
 
 PREPARE_AUDIT_HTTPSTEP_UPDATE(url, const char*, string)
@@ -303,9 +322,13 @@ void	zbx_audit_httptest_update_json_add_httptest_field(zbx_uint64_t httptestid, 
 	zbx_snprintf(audit_key_value, sizeof(audit_key_value), "httptest.%s[" ZBX_FS_UI64 "].value", audit_key_type,
 			httptestfieldid);
 
-	zbx_audit_update_json_append_no_value(httptestid, AUDIT_DETAILS_ACTION_ADD, audit_key);
-	zbx_audit_update_json_append_string(httptestid, AUDIT_DETAILS_ACTION_ADD, audit_key_name, name);
-	zbx_audit_update_json_append_string(httptestid, AUDIT_DETAILS_ACTION_ADD, audit_key_value, value);
+#define AUDIT_TABLE_NAME	"httpstep_field"
+	zbx_audit_update_json_append_no_value(httptestid, AUDIT_HTTPTEST_ID, AUDIT_DETAILS_ACTION_ADD, audit_key);
+	zbx_audit_update_json_append_string(httptestid, AUDIT_HTTPTEST_ID, AUDIT_DETAILS_ACTION_ADD, audit_key_name,
+			name, AUDIT_TABLE_NAME, "name");
+	zbx_audit_update_json_append_string(httptestid, AUDIT_HTTPTEST_ID, AUDIT_DETAILS_ACTION_ADD, audit_key_value,
+			value, AUDIT_TABLE_NAME, "value");
+#undef AUDIT_TABLE_NAME
 }
 
 void	zbx_audit_httptest_update_json_delete_httptest_field(zbx_uint64_t httptestid, zbx_uint64_t fieldid, int type)
@@ -317,7 +340,7 @@ void	zbx_audit_httptest_update_json_delete_httptest_field(zbx_uint64_t httptesti
 	zbx_snprintf(audit_key_type, sizeof(audit_key_type), "%s", field_type_to_name(type));
 	zbx_snprintf(audit_key, sizeof(audit_key), "httptest.%s[" ZBX_FS_UI64 "]",audit_key_type, fieldid);
 
-	zbx_audit_update_json_append_no_value(httptestid, AUDIT_DETAILS_ACTION_DELETE, audit_key);
+	zbx_audit_update_json_append_no_value(httptestid, AUDIT_HTTPTEST_ID, AUDIT_DETAILS_ACTION_DELETE, audit_key);
 }
 
 void	zbx_audit_httptest_update_json_add_httpstep_field(zbx_uint64_t httptestid, zbx_uint64_t httpstepid,
@@ -336,10 +359,13 @@ void	zbx_audit_httptest_update_json_add_httpstep_field(zbx_uint64_t httptestid, 
 	zbx_snprintf(audit_key_value, sizeof(audit_key_value),
 			"httptest.steps[" ZBX_FS_UI64 "].%s[" ZBX_FS_UI64 "].value", httpstepid, audit_key_type,
 			httpstepfieldid);
-
-	zbx_audit_update_json_append_no_value(httptestid, AUDIT_DETAILS_ACTION_ADD, audit_key);
-	zbx_audit_update_json_append_string(httptestid, AUDIT_DETAILS_ACTION_ADD, audit_key_name, name);
-	zbx_audit_update_json_append_string(httptestid, AUDIT_DETAILS_ACTION_ADD, audit_key_value, value);
+#define AUDIT_TABLE_NAME	"httpstep_field"
+	zbx_audit_update_json_append_no_value(httptestid, AUDIT_HTTPTEST_ID, AUDIT_DETAILS_ACTION_ADD, audit_key);
+	zbx_audit_update_json_append_string(httptestid, AUDIT_HTTPTEST_ID, AUDIT_DETAILS_ACTION_ADD, audit_key_name,
+			name, AUDIT_TABLE_NAME, "name");
+	zbx_audit_update_json_append_string(httptestid, AUDIT_HTTPTEST_ID, AUDIT_DETAILS_ACTION_ADD, audit_key_value,
+			value, AUDIT_TABLE_NAME, "value");
+#undef AUDIT_TABLE_NAME
 }
 
 void	zbx_audit_httptest_update_json_delete_httpstep_field(zbx_uint64_t httptestid, zbx_uint64_t httpstepid,
@@ -353,5 +379,5 @@ void	zbx_audit_httptest_update_json_delete_httpstep_field(zbx_uint64_t httptesti
 	zbx_snprintf(audit_key, sizeof(audit_key), "httptest.steps[" ZBX_FS_UI64 "].%s[" ZBX_FS_UI64 "]",
 			httpstepid, audit_key_type, fieldid);
 
-	zbx_audit_update_json_append_no_value(httptestid, AUDIT_DETAILS_ACTION_DELETE, audit_key);
+	zbx_audit_update_json_append_no_value(httptestid, AUDIT_HTTPTEST_ID, AUDIT_DETAILS_ACTION_DELETE, audit_key);
 }

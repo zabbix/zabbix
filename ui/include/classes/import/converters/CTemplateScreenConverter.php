@@ -331,7 +331,7 @@ class CTemplateScreenConverter extends CConverter {
 	 *
 	 * @static
 	 *
-	 * @param array $dimensions      Prefered axis dimensions.
+	 * @param array $dimensions      Preferred axis dimensions.
 	 * @param array $dimensions_min  Minimal axis dimensions.
 	 * @param int   $target          Target summary size.
 	 *

@@ -185,7 +185,7 @@ Overlay.prototype.containFocus = function() {
 };
 
 /**
- * Sets dialogue in loading sate.
+ * Sets dialogue in loading state.
  */
 Overlay.prototype.setLoading = function() {
 	this.$dialogue.$body.addClass('is-loading');
@@ -194,7 +194,7 @@ Overlay.prototype.setLoading = function() {
 };
 
 /**
- * Sets dialogue in idle sate.
+ * Sets dialogue in idle state.
  */
 Overlay.prototype.unsetLoading = function() {
 	this.$dialogue.$body.removeClass('is-loading');

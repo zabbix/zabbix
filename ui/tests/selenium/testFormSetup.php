@@ -195,7 +195,7 @@ class testFormSetup extends CWebTest {
 				$this->assertFalse($form->getField($field_name)->isVisible());
 			}
 
-			// Check layout when "Store credetials in" is set to "HashiCorp Vault".
+			// Check layout when "Store credentials in" is set to "HashiCorp Vault".
 			$credentials_field->select('HashiCorp Vault');
 			$form->invalidate();
 			foreach (['User', 'Password'] as $field_name) {

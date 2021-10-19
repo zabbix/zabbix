@@ -3466,4 +3466,234 @@ in:
 out:
   return: FAIL
   value:
+---
+test case: Evaluate rate(), with DOUBLE data
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 2
+      ts: 2021-03-27 10:01:01.000000000 +00:00
+    - value: 3
+      ts: 2021-03-27 10:01:02.000000000 +00:00
+  time: 2021-03-27 10:01:02.000000000 +00:00
+  function: rate
+  params: '2'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate rate(), with UINT64 data
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 2
+      ts: 2021-03-27 10:01:01.000000000 +00:00
+    - value: 3
+      ts: 2021-03-27 10:01:02.000000000 +00:00
+  time: 2021-03-27 10:01:02.000000000 +00:00
+  function: rate
+  params: '2'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate rate() extrapolation, with DOUBLE data
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 2
+      ts: 2021-03-27 10:01:01.000000000 +00:00
+    - value: 3
+      ts: 2021-03-27 10:01:02.000000000 +00:00
+  time: 2021-03-27 10:01:02.500000000 +00:00
+  function: rate
+  params: '3'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate rate() extrapolation, with UINT64 data
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 2
+      ts: 2021-03-27 10:01:01.000000000 +00:00
+    - value: 3
+      ts: 2021-03-27 10:01:02.000000000 +00:00
+  time: 2021-03-27 10:01:02.500000000 +00:00
+  function: rate
+  params: '3'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate rate() with reset and DOUBLE data
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 2
+      ts: 2021-03-27 10:01:01.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 10:01:02.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:01:03.000000000 +00:00
+    - value: 3
+      ts: 2021-03-27 10:01:04.000000000 +00:00
+  time: 2021-03-27 10:01:04.000000000 +00:00
+  function: rate
+  params: '4'
+out:
+  return: SUCCEED
+  value: 1
+
+---
+test case: Evaluate rate() with reset and UINT64 data
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 2
+      ts: 2021-03-27 10:01:01.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 10:01:02.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:01:03.000000000 +00:00
+    - value: 3
+      ts: 2021-03-27 10:01:04.000000000 +00:00
+  time: 2021-03-27 10:01:04.000000000 +00:00
+  function: rate
+  params: '4'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate rate() extrapolation without change UINT64 data
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 1
+      ts: 2021-03-27 10:01:01.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 10:01:02.000000000 +00:00
+  time: 2021-03-27 10:01:02.500000000 +00:00
+  function: rate
+  params: '3'
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate rate() extrapolation without change DOUBLE data
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 1
+      ts: 2021-03-27 10:01:01.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 10:01:02.000000000 +00:00
+  time: 2021-03-27 10:01:02.500000000 +00:00
+  function: rate
+  params: '3'
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate rate() without DOUBLE data
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 2
+      ts: 2021-03-27 10:01:01.000000000 +00:00
+  time: 2021-03-27 10:01:04.500000000 +00:00
+  function: rate
+  params: '1'
+out:
+  return: FAIL
+  value: 0
+---
+test case: Evaluate rate() without 2 DOUBLE backet
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 2
+      ts: 2021-03-27 10:01:02.000000000 +00:00
+  time: 2021-03-27 10:01:02.500000000 +00:00
+  function: rate
+  params: '1'
+out:
+  return: FAIL
+  value: 0
+---
+test case: Evaluate rate() with STR data
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 2
+      ts: 2021-03-27 10:01:02.000000000 +00:00
+  time: 2021-03-27 10:01:02.000000000 +00:00
+  function: rate
+  params: '2'
+out:
+  return: FAIL
+  value: 0
+---
+test case: Evaluate rate() with negative reset
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 11
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 1
+      ts: 2021-03-27 10:01:01.000000000 +00:00
+  time: 2021-03-27 10:01:01.000000000 +00:00
+  function: rate
+  params: '1'
+out:
+  return: SUCCEED
+  value: 1
+
 ...

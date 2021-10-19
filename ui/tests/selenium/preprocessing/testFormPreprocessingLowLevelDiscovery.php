@@ -287,7 +287,7 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 	/**
 	 * Add preprocessing steps to templated LLD for cloning.
 	 */
-	public function prepareСloneTemplatedLLDPreprocessing() {
+	public function prepareCloneTemplatedLLDPreprocessing() {
 		CDataHelper::call('discoveryrule.update', [
 			'itemid' => '15011',
 			'preprocessing' => self::CLONE_PREPROCESSING
@@ -295,7 +295,7 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 	}
 
 	/**
-	 * @onBefore prepareСloneTemplatedLLDPreprocessing
+	 * @onBefore prepareCloneTemplatedLLDPreprocessing
 	 */
 	public function testFormPreprocessingLowLevelDiscovery_CloneTemplatedLLD() {
 		$link = 'host_discovery.php?form=update&context=host&itemid='.self::INHERITANCE_LLDID;

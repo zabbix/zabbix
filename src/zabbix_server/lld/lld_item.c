@@ -3259,7 +3259,8 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%spassword='%s'", d, value_esc);
 		d = ",";
 		zbx_audit_item_update_json_update_password(item->itemid, (int)ZBX_FLAG_DISCOVERY_CREATED,
-				ZBX_MACRO_SECRET_MASK, ZBX_MACRO_SECRET_MASK);
+				(0 == strcmp("", item->password_orig) ? "" : ZBX_MACRO_SECRET_MASK),
+				(0 == strcmp("", item->password) ? "" : ZBX_MACRO_SECRET_MASK));
 		zbx_free(value_esc);
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_PUBLICKEY))
@@ -3441,7 +3442,8 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sssl_key_password='%s'", d, value_esc);
 		d = ",";
 		zbx_audit_item_update_json_update_ssl_key_password(item->itemid, (int)ZBX_FLAG_DISCOVERY_CREATED,
-				ZBX_MACRO_SECRET_MASK, ZBX_MACRO_SECRET_MASK);
+				(0 == strcmp("", item->ssl_key_password_orig) ? "" : ZBX_MACRO_SECRET_MASK),
+				(0 == strcmp("", item->ssl_key_password) ? "" : ZBX_MACRO_SECRET_MASK));
 		zbx_free(value_esc);
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_VERIFY_PEER))

@@ -382,41 +382,6 @@ class testUrlParameters extends CLegacyWebTest {
 				]
 			],
 			[
-				'title' => 'Overview [refreshed every 30 sec.]',
-				'check_server_name' => true,
-				'server_name_on_page' => true,
-				'test_cases' => [
-					[
-						'url' => 'overview.php?groupid=4&type=0',
-						'text_present' => 'Overview'
-					],
-					[
-						'url' => 'overview.php?groupid=abc&type=abc',
-						'text_not_present' => 'Overview',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "type" is not integer.'
-						]
-					],
-					[
-						'url' => 'overview.php?groupid=&type=',
-						'text_not_present' => 'Overview',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "type" is not integer.'
-						]
-					],
-					[
-						'url' => 'overview.php?groupid=-1&type=-1',
-						'text_not_present' => 'Overview',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Incorrect value "-1" for "type" field.'
-						]
-					]
-				]
-			],
-			[
 				'title' => 'Details of web scenario',
 				'check_server_name' => true,
 				'server_name_on_page' => true,

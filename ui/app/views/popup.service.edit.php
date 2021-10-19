@@ -23,10 +23,13 @@
  * @var CView $this
  */
 
-$form = (new CForm())
+$form_action_url = (new CUrl('zabbix.php'))
+	->setArgument('action', $data['form_action'])
+	->getUrl();
+
+$form = (new CForm('post', $form_action_url))
 	->setId('service-form')
 	->setName('service_form')
-	->addVar('action', $data['form_action'])
 	->addVar('serviceid', $data['serviceid'])
 	->addItem(getMessages());
 
@@ -81,9 +84,12 @@ $service_tab = (new CFormGrid())
 							(new CTextBox('problem_tags[#{rowNum}][tag]', '#{tag}', false,
 								DB::getFieldLength('service_problem_tag', 'tag')
 							))
+								->addClass('js-problem-tag-input')
+								->addClass('js-problem-tag-tag')
 								->setAttribute('placeholder', _('tag'))
 								->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 							(new CSelect('problem_tags[#{rowNum}][operator]'))
+								->addClass('js-problem-tag-input')
 								->addOptions(CSelect::createOptionsFromArray([
 									SERVICE_TAG_OPERATOR_EQUAL => _('Equals'),
 									SERVICE_TAG_OPERATOR_LIKE => _('Contains')
@@ -92,6 +98,7 @@ $service_tab = (new CFormGrid())
 							(new CTextBox('problem_tags[#{rowNum}][value]', '#{value}', false,
 								DB::getFieldLength('service_problem_tag', 'value')
 							))
+								->addClass('js-problem-tag-input')
 								->setAttribute('placeholder', _('value'))
 								->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 							(new CSimpleButton(_('Remove')))
@@ -111,7 +118,17 @@ $service_tab = (new CFormGrid())
 		)
 	])
 	->addItem([
-		new CLabel(_('Status calculation rule'), 'algorithm_focusable'),
+		new CLabel([
+			_('Status calculation rule'),
+			(new CSpan([
+				' ',
+				makeWarningIcon(
+					_('Status calculation rule and additional rules are only applicable if child services exist.')
+				)
+			]))
+				->setId('algorithm-not-applicable-warning')
+				->addStyle($data['form']['children'] ? 'display: none' : '')
+		], 'algorithm_focusable'),
 		new CFormField(
 			(new CSelect('algorithm'))
 				->setId('algorithm')
@@ -133,10 +150,6 @@ $additional_rules = (new CTable())
 	->setHeader(
 		(new CRowHeader([_('Name'), _('Action')]))->addClass(ZBX_STYLE_GREY)
 	);
-
-foreach ($data['form']['status_rules'] as $row_index => $rule) {
-	$additional_rules->addItem(new CPartial('service.statusrule.row', ['row_index' => $row_index] + $rule));
-}
 
 $additional_rules->addItem(
 	(new CTag('tfoot', true))
@@ -219,10 +232,6 @@ $times = (new CTable())
 		(new CRowHeader([_('Type'), _('Interval'), _('Note'), _('Action')]))->addClass(ZBX_STYLE_GREY)
 	);
 
-foreach ($data['form']['times'] as $row_index => $time) {
-	$times->addItem(new CPartial('service.time.row', ['row_index' => $row_index] + $time));
-}
-
 $times->addItem(
 	(new CTag('tfoot', true))
 		->addItem(
@@ -279,6 +288,7 @@ $tags_tab = (new CFormGrid())
 
 $child_services = (new CTable())
 	->setId('children')
+	->setAttribute('data-tab-indicator', count($data['form']['children']))
 	->setHeader(
 		(new CRowHeader([
 			_('Service'),
@@ -291,23 +301,52 @@ $child_services = (new CTable())
 		(new CTag('tfoot', true))
 			->addItem(
 				(new CCol(
-					(new CSimpleButton(_('Add')))
-						->addClass(ZBX_STYLE_BTN_LINK)
-						->addClass('js-add')
+					(new CList())
+						->addClass(ZBX_STYLE_INLINE_FILTER_FOOTER)
+						->addItem(
+							(new CSimpleButton(_('Add')))
+								->addClass(ZBX_STYLE_BTN_LINK)
+								->addClass('js-add')
+						)
+						->addItem(
+							(new CListItem(null))
+								->addClass(ZBX_STYLE_INLINE_FILTER_STATS)
+						)
 				))->setColSpan(4)
 			)
 	);
 
-$child_services_tab = (new CFormGrid())
-	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED)
-	->addItem([
-		new CLabel(_('Child services')),
-		new CFormField([
-			(new CDiv($child_services))
-				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-				->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+$child_services_filter = (new CList())
+	->setId('children-filter')
+	->addClass(ZBX_STYLE_INLINE_FILTER)
+	->addItem(new CLabel(_('Name'), 'children-filter-name'), ZBX_STYLE_INLINE_FILTER_LABEL)
+	->addItem(
+		(new CTextBox(null))
+			->setId('children-filter-name')
+			->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH))
+	->addItem(
+		(new CSimpleButton(_('Filter')))
+			->addClass('js-filter')
+	)
+	->addItem(
+		(new CSimpleButton(_('Reset')))
+			->addClass('js-reset')
+			->addClass(ZBX_STYLE_BTN_ALT)
+	);
+
+$child_services_tab = [
+	(new CFormGrid())
+		->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED)
+		->addItem(new CFormField($child_services_filter))
+		->addItem([
+			new CLabel(_('Child services')),
+			new CFormField(
+				(new CDiv($child_services))
+					->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+					->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+			)
 		])
-	]);
+];
 
 $tabs = (new CTabView())
 	->setSelected(0)
@@ -322,12 +361,19 @@ $form
 	->addItem($tabs)
 	->addItem(
 		(new CScriptTag('
-			service_edit_popup.init('.json_encode([
+			const params = '.json_encode([
 				'serviceid' => $data['serviceid'],
 				'children' => $data['form']['children'],
 				'children_problem_tags_html' => $data['form']['children_problem_tags_html'],
-				'problem_tags' => $data['form']['problem_tags']
-			]).');
+				'problem_tags' => $data['form']['problem_tags'],
+				'status_rules' => $data['form']['status_rules'],
+				'service_times' => $data['form']['times'],
+				'search_limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
+			]).'
+
+			params.algorithm_names = '.json_encode(CServiceHelper::getAlgorithmNames(), JSON_FORCE_OBJECT).';
+
+			service_edit_popup.init(params);
 		'))->setOnDocumentReady()
 	);
 

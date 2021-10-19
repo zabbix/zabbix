@@ -333,7 +333,8 @@ int	zbx_vmware_get_statistics(zbx_vmware_stats_t *stats);
 
 zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* username, const char* password);
 
-int	zbx_vmware_service_get_counterid(zbx_vmware_service_t *service, const char *path, zbx_uint64_t *counterid);
+int	zbx_vmware_service_get_counterid(zbx_vmware_service_t *service, const char *path, zbx_uint64_t *counterid,
+		int *unit);
 int	zbx_vmware_service_add_perf_counter(zbx_vmware_service_t *service, const char *type, const char *id,
 		zbx_uint64_t counterid, const char *instance);
 zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_t *service, const char *type,
@@ -396,6 +397,22 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 #define ZBX_VMWARE_SOAP_DS		"Datastore"
 #define ZBX_VMWARE_SOAP_HV		"HostSystem"
 #define ZBX_VMWARE_SOAP_VM		"VirtualMachine"
+
+/* Indicates the unit of measure represented by a counter or statistical value */
+#define ZBX_VMWARE_UNIT_UNDEFINED		0
+#define ZBX_VMWARE_UNIT_JOULE			1
+#define ZBX_VMWARE_UNIT_KILOBYTES		2
+#define ZBX_VMWARE_UNIT_KILOBYTESPERSECOND	3
+#define ZBX_VMWARE_UNIT_MEGABYTES		4
+#define ZBX_VMWARE_UNIT_MEGABYTESPERSECOND	5
+#define ZBX_VMWARE_UNIT_MEGAHERTZ		6
+#define ZBX_VMWARE_UNIT_MICROSECOND		7
+#define ZBX_VMWARE_UNIT_MILLISECOND		8
+#define ZBX_VMWARE_UNIT_NUMBER			9
+#define ZBX_VMWARE_UNIT_PERCENT			10
+#define ZBX_VMWARE_UNIT_SECOND			11
+#define ZBX_VMWARE_UNIT_TERABYTES		12
+#define ZBX_VMWARE_UNIT_WATT			13
 
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
 

@@ -30,12 +30,13 @@ void	zbx_audit_settings_create_entry(int audit_action, zbx_uint64_t configid)
 
 	local_audit_entry.id = configid;
 	local_audit_entry.cuid = NULL;
+	local_audit_entry.id_table = AUDIT_CONFIG_ID;
 
 	if (NULL == zbx_hashset_search(zbx_get_audit_hashset(), &plocal_audit_entry))
 	{
 		zbx_audit_entry_t	*new_entry;
 
-		new_entry = zbx_audit_entry_init(configid, "", audit_action, AUDIT_RESOURCE_SETTINGS);
+		new_entry = zbx_audit_entry_init(configid, AUDIT_CONFIG_ID, "", audit_action, AUDIT_RESOURCE_SETTINGS);
 		zbx_hashset_insert(zbx_get_audit_hashset(), &new_entry, sizeof(new_entry));
 	}
 }

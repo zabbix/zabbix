@@ -71,7 +71,7 @@ if ($data['conditions']) {
 			continue;
 		}
 
-		$label = isset($condition['formulaid']) ? $condition['formulaid'] : num2letter($i);
+		$label = ($data['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) ? $condition['formulaid'] : num2letter($i);
 
 		$labelSpan = (new CSpan($label))
 			->addClass('label')
@@ -80,7 +80,7 @@ if ($data['conditions']) {
 
 		$condition_table->addRow([
 				$labelSpan,
-				(new CCol(getCorrConditionDescription($condition, $data['group_names'])))
+				(new CCol(CCorrelationHelper::getConditionDescription($condition, $data['group_names'])))
 					->addClass(ZBX_STYLE_TABLE_FORMS_OVERFLOW_BREAK),
 				(new CCol([
 					(new CButton('remove', _('Remove')))
@@ -134,7 +134,9 @@ $form_list
 
 $form_list
 	->addRow(_('Description'),
-		(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextArea('description', $data['description']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setMaxlength(DB::getFieldLength('hosts', 'description'))
 	)
 	->addRow(
 		_('Operations'),

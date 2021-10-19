@@ -1,3 +1,4 @@
+//go:build linux && amd64
 // +build linux,amd64
 
 /*
@@ -504,5 +505,34 @@ func TestRawAccess(t *testing.T) {
 
 	if !reflect.DeepEqual(expectedOpts, returnedOpts) {
 		t.Errorf("Expected '%+v' while got '%+v'", expectedOpts, returnedOpts)
+	}
+}
+
+func Test_checkGlobPattern(t *testing.T) {
+	type args struct {
+		path string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{"+no_glob", args{"/foo/bar"}, false},
+		{"+glob", args{"/foo/bar/*.conf"}, false},
+		{"+glob_only", args{"/foo/bar/*"}, false},
+		{"+glob_in_name", args{"/foo/bar/foo*bar.conf"}, false},
+		{"+relative_name_with_glob", args{"./foo*bar"}, false},
+		{"+empty", args{""}, false},
+		{"-name_only_with_glob", args{"foo*bar"}, true},
+		{"-name_start_glob", args{"*bar"}, true},
+		{"-invalid_prefix", args{"*/foo/bar"}, true},
+		{"-invalid_string", args{"*"}, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := checkGlobPattern(tt.args.path); (err != nil) != tt.wantErr {
+				t.Errorf("checkGlobPattern() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
 	}
 }

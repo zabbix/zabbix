@@ -674,7 +674,7 @@ static int	DBpatch_5050068_calc_services_write_value(zbx_uint64_t roleid, int *v
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		default_access = 1;
+	int		default_access = 1, ret = FAIL;
 
 	result = DBselect("select name,value_int from role_rule where roleid=" ZBX_FS_UI64, roleid);
 
@@ -682,16 +682,19 @@ static int	DBpatch_5050068_calc_services_write_value(zbx_uint64_t roleid, int *v
 	{
 		/* write rule already exists, skip */
 		if (0 == strcmp("services.write", row[0]))
-			return FAIL;
+			goto out;
+
 
 		if (0 == strcmp("actions.default_access", row[0]))
 			default_access = atoi(row[1]);
 	}
-	DBfree_result(result);
 
 	*value = default_access;
+	ret = SUCCEED;
+out:
+	DBfree_result(result);
 
-	return SUCCEED;
+	return ret;
 }
 
 static int	DBpatch_5050068(void)
@@ -741,12 +744,58 @@ static int	DBpatch_5050068(void)
 
 static int	DBpatch_5050070(void)
 {
+	const ZBX_FIELD	old_field = {"params", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"params", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("item_preproc", &field, &old_field);
+}
+
+static int	DBpatch_5050071(void)
+{
+	const ZBX_FIELD	old_field = {"description", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("triggers", &field, &old_field);
+}
+
+static int	DBpatch_5050072(void)
+{
+	const ZBX_FIELD	old_field = {"message", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"message", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("media_type_message", &field, &old_field);
+}
+
+static int	DBpatch_5050073(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx like 'web.overview.%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5050074(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("delete from role_rule where name='ui.monitoring.overview'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5050075(void)
+{
 	const ZBX_FIELD	field = {"ha_failover_delay", "1m", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_5050071(void)
+static int	DBpatch_5050076(void)
 {
 	const ZBX_TABLE	table =
 			{"ha_node", "ha_nodeid", 0,
@@ -766,22 +815,22 @@ static int	DBpatch_5050071(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_5050072(void)
+static int	DBpatch_5050077(void)
 {
 	return DBcreate_index("ha_node", "ha_node_1", "name", 1);
 }
 
-static int	DBpatch_5050073(void)
+static int	DBpatch_5050078(void)
 {
 	return DBcreate_index("ha_node", "ha_node_2", "status,lastaccess", 0);
 }
 
-static int	DBpatch_5050074(void)
+static int	DBpatch_5050079(void)
 {
 	return DBdrop_table("auditlog");
 }
 
-static int	DBpatch_5050075(void)
+static int	DBpatch_5050080(void)
 {
 	const ZBX_TABLE table =
 		{"auditlog", "auditid", 0,
@@ -806,21 +855,20 @@ static int	DBpatch_5050075(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_5050076(void)
+static int	DBpatch_5050081(void)
 {
 	return DBcreate_index("auditlog", "auditlog_1", "userid,clock", 0);
 }
 
-static int	DBpatch_5050077(void)
+static int	DBpatch_5050082(void)
 {
 	return DBcreate_index("auditlog", "auditlog_2", "clock", 0);
 }
 
-static int	DBpatch_5050078(void)
+static int	DBpatch_5050083(void)
 {
 	return DBcreate_index("auditlog", "auditlog_3", "resourcetype,resourceid", 0);
 }
-
 
 #endif
 
@@ -895,5 +943,10 @@ DBPATCH_ADD(5050075, 0, 1)
 DBPATCH_ADD(5050076, 0, 1)
 DBPATCH_ADD(5050077, 0, 1)
 DBPATCH_ADD(5050078, 0, 1)
+DBPATCH_ADD(5050079, 0, 1)
+DBPATCH_ADD(5050080, 0, 1)
+DBPATCH_ADD(5050081, 0, 1)
+DBPATCH_ADD(5050082, 0, 1)
+DBPATCH_ADD(5050083, 0, 1)
 
 DBPATCH_END()

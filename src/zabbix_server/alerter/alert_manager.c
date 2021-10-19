@@ -503,7 +503,7 @@ static void	am_update_mediatype(zbx_am_t *manager, zbx_uint64_t mediatypeid, uns
  * Parameters: manager   - [IN] the alert manager                             *
  *             mediatype - [IN] the media type                                *
  *                                                                            *
- * Comments: The media tyep is inserted into queue only if it was not already *
+ * Comments: The media type is inserted into queue only if it was not already *
  *           queued and if the number of media type alerts being processed    *
  *           not reached the limit.                                           *
  *           If media type is already queued only its location in the queue   *

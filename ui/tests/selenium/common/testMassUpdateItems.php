@@ -1718,7 +1718,7 @@ class testMassUpdateItems extends CWebTest{
 							]
 						]
 					],
-					'details' => 'Invalid parameter "/1/tags/1/tag": cannot be empty.'
+					'details' => 'Invalid parameter "/1/tags/2/tag": cannot be empty.'
 				]
 			],
 			// TODO: Uncomment this case when ZBX-19263 is fixed.

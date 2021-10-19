@@ -216,7 +216,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$interfaces = getRequest('interfaces', []);
 
 		foreach ($interfaces as $key => $interface) {
-			// Proccess SNMP interface fields.
+			// Process SNMP interface fields.
 			if ($interface['type'] == INTERFACE_TYPE_SNMP) {
 				if (!array_key_exists('details', $interface)) {
 					$interface['details'] = [];

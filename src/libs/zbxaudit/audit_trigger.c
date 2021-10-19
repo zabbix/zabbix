@@ -54,6 +54,7 @@ void	zbx_audit_trigger_create_entry(int audit_action, zbx_uint64_t triggerid, co
 
 	local_audit_trigger_entry.id = triggerid;
 	local_audit_trigger_entry.cuid = NULL;
+	local_audit_trigger_entry.id_table = AUDIT_TRIGGER_ID;
 
 	found_audit_trigger_entry = (zbx_audit_entry_t**)zbx_hashset_search(zbx_get_audit_hashset(),
 			&(local_audit_trigger_entry_x));
@@ -62,14 +63,15 @@ void	zbx_audit_trigger_create_entry(int audit_action, zbx_uint64_t triggerid, co
 	{
 		zbx_audit_entry_t	*local_audit_trigger_entry_insert;
 
-		local_audit_trigger_entry_insert = zbx_audit_entry_init(triggerid, name, audit_action, resource_type);
+		local_audit_trigger_entry_insert = zbx_audit_entry_init(triggerid, AUDIT_TRIGGER_ID, name, audit_action,
+				resource_type);
 		zbx_hashset_insert(zbx_get_audit_hashset(), &local_audit_trigger_entry_insert,
 				sizeof(local_audit_trigger_entry_insert));
 
 		if (AUDIT_ACTION_ADD == audit_action)
 		{
-			zbx_audit_update_json_append_uint64(triggerid, AUDIT_DETAILS_ACTION_ADD,
-					TR_OR_TRP(triggerid), triggerid);
+			zbx_audit_update_json_append_uint64(triggerid, AUDIT_TRIGGER_ID, AUDIT_DETAILS_ACTION_ADD,
+					TR_OR_TRP(triggerid), triggerid, "triggers", "triggerid");
 		}
 	}
 }
@@ -116,29 +118,34 @@ void	zbx_audit_trigger_update_json_add_data(zbx_uint64_t triggerid, zbx_uint64_t
 	if (AUDIT_RESOURCE_TRIGGER_PROTOTYPE == resource_type)
 		AUDIT_KEY_SNPRINTF(discover)
 #undef AUDIT_KEY_SNPRINTF
-	zbx_audit_update_json_append_no_value(triggerid, AUDIT_DETAILS_ACTION_ADD, audit_key);
-#define ADD_STR(r) zbx_audit_update_json_append_string(triggerid, AUDIT_DETAILS_ACTION_ADD, audit_key_##r, r);
-#define ADD_UINT64(r) zbx_audit_update_json_append_uint64(triggerid, AUDIT_DETAILS_ACTION_ADD, audit_key_##r, r);
-#define ADD_INT(r) zbx_audit_update_json_append_int(triggerid, AUDIT_DETAILS_ACTION_ADD, audit_key_##r, r);
-	ADD_STR(event_name)
-	ADD_STR(opdata)
-	ADD_STR(comments)
-	ADD_INT(flags)
-	ADD_INT(priority)
-	ADD_UINT64(state)
-	ADD_INT(status)
-	ADD_UINT64(templateid)
-	ADD_INT(type)
-	ADD_STR(url)
-	ADD_UINT64(value)
-	ADD_INT(recovery_mode)
-	ADD_INT(correlation_mode)
-	ADD_STR(correlation_tag)
-	ADD_INT(manual_close)
+	zbx_audit_update_json_append_no_value(triggerid, AUDIT_TRIGGER_ID, AUDIT_DETAILS_ACTION_ADD, audit_key);
+#define ADD_STR(r, t, f) zbx_audit_update_json_append_string(triggerid, AUDIT_TRIGGER_ID, AUDIT_DETAILS_ACTION_ADD, \
+		audit_key_##r, r, t, f);
+#define ADD_UINT64(r,t, f) zbx_audit_update_json_append_uint64(triggerid, AUDIT_TRIGGER_ID, AUDIT_DETAILS_ACTION_ADD, \
+		audit_key_##r, r, t, f);
+#define ADD_INT(r, t, f) zbx_audit_update_json_append_int(triggerid, AUDIT_TRIGGER_ID, AUDIT_DETAILS_ACTION_ADD, \
+		audit_key_##r, r, t, f);
+#define AUDIT_TABLE_NAME	"triggers"
+	ADD_STR(event_name, AUDIT_TABLE_NAME, "event_name")
+	ADD_STR(opdata, AUDIT_TABLE_NAME, "opdata")
+	ADD_STR(comments, AUDIT_TABLE_NAME, "comments")
+	ADD_INT(flags, AUDIT_TABLE_NAME, "flags")
+	ADD_INT(priority, AUDIT_TABLE_NAME, "priority")
+	ADD_UINT64(state, AUDIT_TABLE_NAME, "state")
+	ADD_INT(status, AUDIT_TABLE_NAME, "status")
+	ADD_UINT64(templateid, AUDIT_TABLE_NAME, "templateid")
+	ADD_INT(type, AUDIT_TABLE_NAME, "type")
+	ADD_STR(url, AUDIT_TABLE_NAME, "url")
+	ADD_UINT64(value, AUDIT_TABLE_NAME, "value")
+	ADD_INT(recovery_mode, AUDIT_TABLE_NAME, "recovery_mode")
+	ADD_INT(correlation_mode, AUDIT_TABLE_NAME, "correlation_mode")
+	ADD_STR(correlation_tag, AUDIT_TABLE_NAME, "correlation_tag")
+	ADD_INT(manual_close, AUDIT_TABLE_NAME, "manual_close")
 
 	if (AUDIT_RESOURCE_TRIGGER_PROTOTYPE == resource_type)
-		ADD_UINT64(discover)
+		ADD_UINT64(discover, AUDIT_TABLE_NAME, "discover")
 
+#undef AUDIT_TABLE_NAME
 #undef ADD_STR
 #undef ADD_UINT64
 #undef ADD_INT
@@ -154,7 +161,8 @@ void	zbx_audit_trigger_update_json_add_expr(zbx_uint64_t triggerid, int flags, c
 	resource_type = trigger_flag_to_resource_type(flags);
 
 	zbx_snprintf(buf, sizeof(buf), TR_OR_TRP(expression));
-	zbx_audit_update_json_append_string(triggerid, AUDIT_DETAILS_ACTION_ADD, buf, expression);
+	zbx_audit_update_json_append_string(triggerid, AUDIT_TRIGGER_ID, AUDIT_DETAILS_ACTION_ADD, buf, expression,
+			"triggers", "expression");
 }
 
 void	zbx_audit_trigger_update_json_add_rexpr(zbx_uint64_t triggerid, int flags, const char *recovery_expression)
@@ -167,7 +175,8 @@ void	zbx_audit_trigger_update_json_add_rexpr(zbx_uint64_t triggerid, int flags, 
 	resource_type = trigger_flag_to_resource_type(flags);
 
 	zbx_snprintf(buf, sizeof(buf), TR_OR_TRP(recovery_expression));
-	zbx_audit_update_json_append_string(triggerid, AUDIT_DETAILS_ACTION_ADD, buf, recovery_expression);
+	zbx_audit_update_json_append_string(triggerid, AUDIT_TRIGGER_ID, AUDIT_DETAILS_ACTION_ADD, buf,
+			recovery_expression, "triggers", "recovery_expression");
 }
 
 #define PREPARE_AUDIT_TRIGGER_UPDATE(resource, type1, type2)							\
@@ -180,10 +189,10 @@ void	zbx_audit_trigger_update_json_update_##resource(zbx_uint64_t triggerid, int
 	RETURN_IF_AUDIT_OFF();											\
 														\
 	resource_type = trigger_flag_to_resource_type(flags);							\
-													\
+														\
 	zbx_snprintf(buf, sizeof(buf), TR_OR_TRP(resource));							\
 														\
-	zbx_audit_update_json_update_##type2(triggerid, buf, resource##_old, resource##_new);			\
+	zbx_audit_update_json_update_##type2(triggerid, AUDIT_TRIGGER_ID, buf, resource##_old, resource##_new);	\
 }
 
 PREPARE_AUDIT_TRIGGER_UPDATE(recovery_mode, int, int)
@@ -193,8 +202,14 @@ PREPARE_AUDIT_TRIGGER_UPDATE(manual_close, int, int)
 PREPARE_AUDIT_TRIGGER_UPDATE(opdata, const char*, string)
 PREPARE_AUDIT_TRIGGER_UPDATE(discover, int, int)
 PREPARE_AUDIT_TRIGGER_UPDATE(event_name, const char*, string)
+PREPARE_AUDIT_TRIGGER_UPDATE(priority, int, int)
+PREPARE_AUDIT_TRIGGER_UPDATE(comments, const char*, string)
+PREPARE_AUDIT_TRIGGER_UPDATE(url, const char*, string)
 PREPARE_AUDIT_TRIGGER_UPDATE(type, int, int)
 PREPARE_AUDIT_TRIGGER_UPDATE(templateid, zbx_uint64_t, uint64)
+PREPARE_AUDIT_TRIGGER_UPDATE(description, const char*, string)
+PREPARE_AUDIT_TRIGGER_UPDATE(expression, const char*, string)
+PREPARE_AUDIT_TRIGGER_UPDATE(recovery_expression, const char*, string)
 
 #undef PREPARE_AUDIT_ITEM_UPDATE
 #undef TR_OR_TRP
@@ -232,8 +247,8 @@ void	zbx_audit_DBselect_delete_for_trigger(const char *sql, zbx_vector_uint64_t 
 	zbx_vector_uint64_sort(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
 
-void	zbx_audit_trigger_update_json_add_dependency(int flags, zbx_uint64_t triggerdepid,
-		zbx_uint64_t triggerid, zbx_uint64_t triggerid_up)
+void	zbx_audit_trigger_update_json_add_dependency(int flags, zbx_uint64_t triggerdepid, zbx_uint64_t triggerid,
+		zbx_uint64_t triggerid_up)
 {
 	char	audit_key[AUDIT_DETAILS_KEY_LEN], audit_key_triggerid_up[AUDIT_DETAILS_KEY_LEN];
 	int	resource_type;
@@ -256,8 +271,24 @@ void	zbx_audit_trigger_update_json_add_dependency(int flags, zbx_uint64_t trigge
 				ZBX_FS_UI64 "].dependsOnTriggerid", triggerdepid);
 	}
 
-	zbx_audit_update_json_append_no_value(triggerid, AUDIT_DETAILS_ACTION_ADD, audit_key);
-	zbx_audit_update_json_append_uint64(triggerid, AUDIT_DETAILS_ACTION_ADD, audit_key_triggerid_up, triggerid_up);
+	zbx_audit_update_json_append_no_value(triggerid, AUDIT_TRIGGER_ID, AUDIT_DETAILS_ACTION_ADD, audit_key);
+	zbx_audit_update_json_append_uint64(triggerid, AUDIT_TRIGGER_ID, AUDIT_DETAILS_ACTION_ADD,
+			audit_key_triggerid_up, triggerid_up, "trigger_depends", "triggerid_up");
+}
+
+void	zbx_audit_trigger_update_json_remove_dependency(int flags, zbx_uint64_t triggerdepid, zbx_uint64_t triggerid)
+{
+	char	audit_key[AUDIT_DETAILS_KEY_LEN];
+	int	resource_type;
+
+	RETURN_IF_AUDIT_OFF();
+
+	resource_type = trigger_flag_to_resource_type(flags);
+
+	zbx_snprintf(audit_key, sizeof(audit_key), "trigger%s.dependencies[" ZBX_FS_UI64 "]",
+			(AUDIT_RESOURCE_TRIGGER == resource_type) ? "" : "prototype", triggerdepid);
+
+	zbx_audit_update_json_append_no_value(triggerid, AUDIT_TRIGGER_ID, AUDIT_DETAILS_ACTION_DELETE, audit_key);
 }
 
 void	zbx_audit_trigger_update_json_add_tags_and_values(zbx_uint64_t triggerid, int flags, zbx_uint64_t triggertagid,
@@ -273,17 +304,17 @@ void	zbx_audit_trigger_update_json_add_tags_and_values(zbx_uint64_t triggerid, i
 
 	if (AUDIT_RESOURCE_TRIGGER == resource_type)
 	{
-		zbx_snprintf(audit_key, AUDIT_DETAILS_KEY_LEN, "trigger.tags[" ZBX_FS_UI64 "]", triggertagid);
-		zbx_snprintf(audit_key_tag, AUDIT_DETAILS_KEY_LEN, "trigger.tags[" ZBX_FS_UI64 "].tag", triggertagid);
-		zbx_snprintf(audit_key_value, AUDIT_DETAILS_KEY_LEN, "trigger.tags[" ZBX_FS_UI64 "].value",
+		zbx_snprintf(audit_key, sizeof(audit_key), "trigger.tags[" ZBX_FS_UI64 "]", triggertagid);
+		zbx_snprintf(audit_key_tag, sizeof(audit_key_tag), "trigger.tags[" ZBX_FS_UI64 "].tag", triggertagid);
+		zbx_snprintf(audit_key_value, sizeof(audit_key_value), "trigger.tags[" ZBX_FS_UI64 "].value",
 				triggertagid);
 	}
 	else if(AUDIT_RESOURCE_TRIGGER_PROTOTYPE == resource_type)
 	{
-		zbx_snprintf(audit_key, AUDIT_DETAILS_KEY_LEN, "triggerprototype.tags[" ZBX_FS_UI64 "]", triggertagid);
-		zbx_snprintf(audit_key_tag, AUDIT_DETAILS_KEY_LEN, "triggerprototype.tags[" ZBX_FS_UI64 "].tag",
+		zbx_snprintf(audit_key, sizeof(audit_key), "triggerprototype.tags[" ZBX_FS_UI64 "]", triggertagid);
+		zbx_snprintf(audit_key_tag, sizeof(audit_key_tag), "triggerprototype.tags[" ZBX_FS_UI64 "].tag",
 				triggertagid);
-		zbx_snprintf(audit_key_value, AUDIT_DETAILS_KEY_LEN, "triggerprototype.tags[" ZBX_FS_UI64 "].value",
+		zbx_snprintf(audit_key_value, sizeof(audit_key_value), "triggerprototype.tags[" ZBX_FS_UI64 "].value",
 				triggertagid);
 	}
 	else
@@ -293,9 +324,13 @@ void	zbx_audit_trigger_update_json_add_tags_and_values(zbx_uint64_t triggerid, i
 		exit(EXIT_FAILURE);
 	}
 
-	zbx_audit_update_json_append_no_value(triggerid, AUDIT_DETAILS_ACTION_ADD, audit_key);
-	zbx_audit_update_json_append_string(triggerid, AUDIT_DETAILS_ACTION_ADD, audit_key_tag, tag);
-	zbx_audit_update_json_append_string(triggerid, AUDIT_DETAILS_ACTION_ADD, audit_key_value, value);
+#define AUDIT_TABLE_NAME	"trigger_tag"
+	zbx_audit_update_json_append_no_value(triggerid, AUDIT_TRIGGER_ID, AUDIT_DETAILS_ACTION_ADD, audit_key);
+	zbx_audit_update_json_append_string(triggerid, AUDIT_TRIGGER_ID, AUDIT_DETAILS_ACTION_ADD, audit_key_tag,
+			tag, AUDIT_TABLE_NAME, "tag");
+	zbx_audit_update_json_append_string(triggerid, AUDIT_TRIGGER_ID, AUDIT_DETAILS_ACTION_ADD, audit_key_value,
+			value, AUDIT_TABLE_NAME, "value");
+#undef AUDIT_TABLE_NAME
 }
 
 void	zbx_audit_trigger_update_json_delete_tags(zbx_uint64_t triggerid, int flags, zbx_uint64_t triggertagid)
@@ -308,9 +343,27 @@ void	zbx_audit_trigger_update_json_delete_tags(zbx_uint64_t triggerid, int flags
 	resource_type = trigger_flag_to_resource_type(flags);
 
 	if (AUDIT_RESOURCE_TRIGGER == resource_type)
-		zbx_snprintf(audit_key, AUDIT_DETAILS_KEY_LEN, "trigger.tags[" ZBX_FS_UI64 "]", triggertagid);
+		zbx_snprintf(audit_key, sizeof(audit_key), "trigger.tags[" ZBX_FS_UI64 "]", triggertagid);
 	else
-		zbx_snprintf(audit_key, AUDIT_DETAILS_KEY_LEN, "triggerprototype.tags[" ZBX_FS_UI64 "]", triggertagid);
+		zbx_snprintf(audit_key, sizeof(audit_key), "triggerprototype.tags[" ZBX_FS_UI64 "]", triggertagid);
 
-	zbx_audit_update_json_append_no_value(triggerid, AUDIT_DETAILS_ACTION_DELETE, audit_key);
+	zbx_audit_update_json_append_no_value(triggerid, AUDIT_TRIGGER_ID, AUDIT_DETAILS_ACTION_DELETE, audit_key);
 }
+
+#define PREPARE_AUDIT_TRIGGER_UPDATE_TAG(resource, type1, type2)						\
+void	zbx_audit_trigger_update_json_update_tag_##resource(zbx_uint64_t triggerid, zbx_uint64_t triggertagid,	\
+		type1 resource##_old, type1 resource##_new)							\
+{														\
+	char	buf[AUDIT_DETAILS_KEY_LEN];									\
+														\
+	RETURN_IF_AUDIT_OFF();											\
+														\
+	zbx_snprintf(buf, sizeof(buf), "trigger.tags[" ZBX_FS_UI64 "]", triggertagid);				\
+														\
+	zbx_audit_update_json_update_##type2(triggerid, AUDIT_TRIGGER_ID, buf, resource##_old, resource##_new);	\
+}
+
+PREPARE_AUDIT_TRIGGER_UPDATE_TAG(tag, const char*, string)
+PREPARE_AUDIT_TRIGGER_UPDATE_TAG(value, const char*, string)
+
+#undef PREPARE_AUDIT_TRIGGER_UPDATE_TAG
