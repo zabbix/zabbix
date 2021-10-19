@@ -131,6 +131,7 @@ class CWidgetGeoMap extends CWidget {
 		}, false);
 
 		this._map.getContainer().addEventListener('filter', (e) => {
+			this.removeHintBoxes();
 			this.updateFilter(e.detail.join(','));
 		}, false);
 
@@ -213,12 +214,7 @@ class CWidgetGeoMap extends CWidget {
 
 		// Close opened hintboxes when moving/zooming/resizing widget.
 		this._map.on('zoomstart movestart resize', () => {
-			const markers = this._map._container.parentNode.querySelectorAll('.marker-cluster, .leaflet-marker-icon');
-			[...markers].forEach((m) => {
-				if ('hintboxid' in m) {
-					hintBox.deleteHint(m);
-				}
-			});
+			this.removeHintBoxes();
 		});
 	}
 
@@ -294,6 +290,18 @@ class CWidgetGeoMap extends CWidget {
 		updateUserProfileString('web.dashboard.widget.geomap.default_view', view, [this._widgetid]);
 		this._map.setDefaultView(ll, zoom);
 		this._map.navigateHomeControl.show();
+	}
+
+	/**
+	 * Function to delete all opened hintboxes.
+	 */
+	removeHintBoxes() {
+		const markers = this._map._container.parentNode.querySelectorAll('.marker-cluster, .leaflet-marker-icon');
+		[...markers].forEach((m) => {
+			if ('hintboxid' in m) {
+				hintBox.deleteHint(m);
+			}
+		});
 	}
 
 	/**
