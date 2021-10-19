@@ -185,7 +185,7 @@
 						label_after: '}',
 						grow: 'auto',
 						rows: 0,
-						maxlength: <?= (int) $data['preprocessing_script_maxlength'] ?>
+						maxlength: <?= $data['preprocessing_script_maxlength'] ?>
 					});
 
 				case '<?= ZBX_PREPROC_PROMETHEUS_PATTERN ?>':
