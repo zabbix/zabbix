@@ -694,6 +694,8 @@ class ZBase {
 		$active_node = API::getApiService('hanode')->get([
 			'output' => ['address', 'port'],
 			'filter' => ['status' => ZBX_NODE_STATUS_ACTIVE],
+			'sortfield' => 'lastaccess',
+			'sortorder' => 'DESC',
 			'limit' => 1
 		], false);
 
