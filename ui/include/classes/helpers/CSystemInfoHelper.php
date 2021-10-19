@@ -28,9 +28,11 @@ class CSystemInfoHelper {
 	 * Prepare data used to compile as System information.
 	 *
 	 * @return array
+	 *
+	 * @throws APIException
 	 */
 	public static function getData(): array {
-		global $DB, $ZBX_SERVER_STANDALONE, $ZBX_SERVER, $ZBX_SERVER_PORT;
+		global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT;
 
 		$data = [
 			'status' => static::getServerStatus($ZBX_SERVER, (int) $ZBX_SERVER_PORT),
@@ -41,29 +43,28 @@ class CSystemInfoHelper {
 		$db_backend = DB::getDbBackend();
 		$data['encoding_warning'] = $db_backend->checkEncoding() ? '' : $db_backend->getWarning();
 
-		$ha_nodes = [];
 		$ha_cluster_enabled = false;
 
-		if (!$ZBX_SERVER_STANDALONE) {
-			$ha_nodes = API::HaNode()->get([
-				'output' => ['name', 'address', 'port', 'lastaccess', 'status'],
-				'preservekeys' => true,
-				'sortfield' => 'status',
-				'sortorder' => 'DESC'
-			], false);
+		$ha_nodes = API::HaNode()->get([
+			'output' => ['name', 'address', 'port', 'lastaccess', 'status'],
+			'preservekeys' => true,
+			'sortfield' => 'status',
+			'sortorder' => 'DESC'
+		], false);
 
-			$ha_cluster_enabled = (bool) $ha_nodes;
-
-			foreach ($ha_nodes as $node) {
-				if ($node['name'] === '') {
-					$ha_cluster_enabled = false;
-					$ha_nodes = [];
-					break;
-				}
+		foreach ($ha_nodes as $node) {
+			if ($node['name'] === '' && $node['status'] == ZBX_NODE_STATUS_ACTIVE) {
+				$ha_cluster_enabled = false;
+				$ha_nodes = [];
+				break;
+			}
+			elseif ($node['status'] == ZBX_NODE_STATUS_STANDBY || $node['status'] == ZBX_NODE_STATUS_ACTIVE) {
+				$ha_cluster_enabled = true;
 			}
 		}
 
 		$data['ha_cluster_enabled'] = $ha_cluster_enabled;
+		$data['ha_nodes'] = $ha_nodes;
 
 		if ($ha_cluster_enabled) {
 			$failover_delay = CSettingsHelper::getGlobal(CSettingsHelper::HA_FAILOVER_DELAY);
@@ -76,7 +77,6 @@ class CSystemInfoHelper {
 		}
 
 		$data['server_details'] = $ZBX_SERVER.':'.$ZBX_SERVER_PORT;
-		$data['ha_nodes'] = $ha_nodes;
 
 		$setup = new CFrontendSetup();
 		$requirements = $setup->checkRequirements();
@@ -92,12 +92,12 @@ class CSystemInfoHelper {
 	/**
 	 * Get a summary of running server stats.
 	 *
-	 * @param string $ZBX_SERVER
-	 * @param int $ZBX_SERVER_PORT
+	 * @param string|null  $ZBX_SERVER
+	 * @param int|null     $ZBX_SERVER_PORT
 	 *
 	 * @return array
 	 */
-	private static function getServerStatus(string $ZBX_SERVER, int $ZBX_SERVER_PORT): array {
+	private static function getServerStatus(?string $ZBX_SERVER, ?int $ZBX_SERVER_PORT): array {
 		$status = [
 			'is_running' => false,
 			'has_status' => false
