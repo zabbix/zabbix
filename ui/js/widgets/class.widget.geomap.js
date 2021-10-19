@@ -145,14 +145,13 @@ class CWidgetGeoMap extends CWidget {
 			}
 
 			const container = this._map._container;
-			const content = this.makePopupContent(cluster.layer.getAllChildMarkers().map(o => o.feature));
-			const style = [
-				'left: 0px;',
-				'top: 0px;',
-				'max-height: 90vh;',
-				'overflow: auto;',
-				'display: block;'
-			].join('');
+			const style = 'left: 0px; top: 0px;';
+
+			const content = document.createElement('div');
+			content.style.overflow = 'auto';
+			content.style.maxHeight = (cluster.originalEvent.clientY-60)+'px';
+			content.style.display = 'block';
+			content.appendChild(this.makePopupContent(cluster.layer.getAllChildMarkers().map(o => o.feature)));
 
 			node.hintBoxItem = hintBox.createBox(e, node, content, '', true, style, container.parentNode);
 
