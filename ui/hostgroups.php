@@ -237,8 +237,6 @@ if (hasRequest('form')) {
 		if (!hasRequest('form_refresh')) {
 			$data['name'] = $data['group']['name'];
 		}
-
-		$data['deletable_host_groups'] = getDeletableHostGroupIds([$data['groupid']]);
 	}
 
 	// render view

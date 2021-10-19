@@ -4523,15 +4523,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     margin-top: 20px;
     background: url("../img/icon-sprite.svg?20200407") no-repeat -11px -587px; }
 
-.notif-indic-container {
-  border-top: 1px solid #333333;
-  margin: 0 0 0 -19px;
-  padding: 14px 0 0; }
-  .notif-indic-container .notif-indic {
-    float: none;
-    display: inline-block;
-    margin: 0 2px 0 0; }
-
 .dashed-border td {
   border: 1px dashed #333333; }
 
@@ -7025,9 +7016,6 @@ td.log-disaster-bg {
   width: 34px;
   height: 27px;
   position: relative;
-  margin: 0 0 0 -42px; }
-
-.notif-indic-container {
   margin: 0 0 0 -42px; }
 
 td.inactive-bg {
