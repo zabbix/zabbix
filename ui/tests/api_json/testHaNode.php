@@ -193,7 +193,7 @@ class testHaNode extends CAPITest {
 				'request' => [
 					'output' => ''
 				],
-				'expected_error' => 'Invalid parameter "/output": value must be one of extend.'
+				'expected_error' => 'Invalid parameter "/output": value must be "extend".'
 			],
 			'Accepts output as array' => [
 				'request' => [
@@ -205,7 +205,7 @@ class testHaNode extends CAPITest {
 				'request' => [
 					'output' => ['name', 'status', 'unexpected_field']
 				],
-				'expected_error' => 'Invalid parameter "/output/3": value must be one of ha_nodeid, name, address, port, lastaccess, status.'
+				'expected_error' => 'Invalid parameter "/output/3": value must be one of "ha_nodeid", "name", "address", "port", "lastaccess", "status".'
 			],
 			'Accepts preservekeys' => [
 				'request' => [
@@ -223,7 +223,7 @@ class testHaNode extends CAPITest {
 				'request' => [
 					'sortfield' => 'port'
 				],
-				'expected_error' => 'Invalid parameter "/sortfield/1": value must be one of name, lastaccess, status.'
+				'expected_error' => 'Invalid parameter "/sortfield/1": value must be one of "name", "lastaccess", "status".'
 			],
 			'Accepts sortorder' => [
 				'request' => [
@@ -237,7 +237,7 @@ class testHaNode extends CAPITest {
 					'sortfield' => 'name',
 					'sortorder' => 'RAND()'
 				],
-				'expected_error' => 'Invalid parameter "/sortorder": value must be one of ASC, DESC.'
+				'expected_error' => 'Invalid parameter "/sortorder": value must be one of "ASC", "DESC".'
 			],
 			'Accepts countOutput' => [
 				'request' => [
