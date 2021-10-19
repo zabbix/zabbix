@@ -469,16 +469,11 @@ class CControllerHostEdit extends CController {
 				return (bool) array_filter(array_intersect_key($macro, $keys));
 			});
 
-			$macros = array_map(function ($macro) {
+			$inputs['macros'] = array_map(function ($macro) {
 				unset($macro['hostmacroid']);
 
 				return $macro + ['description' => ''];
 			}, $macros);
-
-			// Add inherited macros to host macros.
-			$inputs['macros'] = $this->getInput('show_inherited_macros', 0)
-				? mergeInheritedMacros($macros, getInheritedMacros(array_keys($linked_templates)))
-				: $macros;
 
 			$inputs['valuemaps'] = array_map(function ($valuemap) {
 				unset($valuemap['valuemapid']);
