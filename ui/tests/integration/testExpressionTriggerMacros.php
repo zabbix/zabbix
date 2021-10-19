@@ -28,7 +28,7 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * @backup items,actions,triggers,alerts,hosts,users,scripts,history_uint
  * @hosts test_actions
  */
-class testEscalations extends CIntegrationTest {
+class testExpressionTriggerMacros extends CIntegrationTest {
 
 	private static $hostid;
 	private static $triggerid;
