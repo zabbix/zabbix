@@ -1220,13 +1220,13 @@ static int	ha_remove_node_by_index(zbx_ha_info_t *info, int index, char **error)
 	zbx_vector_ha_node_t	nodes;
 	int			ret = FAIL;
 
-	zbx_vector_ha_node_create(&nodes);
-
 	if (ZBX_DB_OK != ha_db_begin(info))
 	{
 		*error = zbx_strdup(NULL, "database connection problem");
 		return FAIL;
 	}
+
+	zbx_vector_ha_node_create(&nodes);
 
 	if (SUCCEED != ha_db_get_nodes(info, &nodes, 0))
 	{
