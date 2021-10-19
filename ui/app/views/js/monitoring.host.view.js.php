@@ -29,6 +29,7 @@
 		host_view_form: null,
 		filter: null,
 		refresh_url: null,
+		refresh_simple_url: null,
 		refresh_interval: null,
 		refresh_counters: null,
 		running: false,
@@ -39,9 +40,13 @@
 		_popup_message_box: null,
 
 		init({filter_options, refresh_url, refresh_interval, applied_filter_groupids}) {
-			this.refresh_url = refresh_url;
+			this.refresh_url = new Curl(refresh_url, false);
 			this.refresh_interval = refresh_interval;
 			this.applied_filter_groupids = applied_filter_groupids;
+
+			const url = new Curl('zabbix.php', false);
+			url.setArgument('action', 'host.view.refresh');
+			this.refresh_simple_url = url.getUrl();
 
 			this.initTabFilter(filter_options);
 
@@ -72,8 +77,7 @@
 		},
 
 		getFiltersCounters() {
-			return $.post('zabbix.php', {
-				action: 'host.view.refresh',
+			return $.post(this.refresh_simple_url, {
 				filter_counters: 1
 			})
 			.done((json) => {
@@ -89,9 +93,7 @@
 		},
 
 		reloadPartialAndTabCounters() {
-			const url = new Curl('', false);
-			url.setArgument('action', 'host.view.refresh');
-			this.refresh_url = url.getUrl();
+			this.refresh_url = new Curl('', false);
 
 			this.unscheduleRefresh();
 			this.refresh();
@@ -101,8 +103,7 @@
 				const filter_item = this.filter._active_item;
 
 				if (this.filter._active_item.hasCounter()) {
-					$.post('zabbix.php', {
-						action: 'host.view.refresh',
+					$.post(this.refresh_simple_url, {
 						filter_counters: 1,
 						counter_index: filter_item._index
 					}).done((json) => {
@@ -145,7 +146,23 @@
 		refresh() {
 			this.setLoading();
 
-			this.deferred = $.getJSON(this.refresh_url);
+			const params = this.refresh_url.getArgumentsObject();
+			const exclude = ['action', 'filter_src', 'filter_show_counter', 'filter_custom_time', 'filter_name'];
+			const post_data = Object.keys(params)
+				.filter(key => !exclude.includes(key))
+				.reduce((post_data, key) => {
+					post_data[key] = (typeof params[key] === 'object')
+						? [...params[key]].filter(i => i)
+						: params[key];
+					return post_data;
+				}, {});
+
+			this.deferred = $.ajax({
+				url: this.refresh_simple_url,
+				data: post_data,
+				type: 'post',
+				dataType: 'json'
+			});
 
 			return this.bindDataEvents(this.deferred);
 		},

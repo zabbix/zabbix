@@ -130,7 +130,6 @@ if ($data['action'] === 'problem.view') {
 	(new CScriptTag('
 		view.init('.json_encode([
 			'filter_options' => $data['filter_options'],
-			'refresh_url' => $data['refresh_url'],
 			'refresh_interval' => $data['refresh_interval'],
 			'filter_defaults' => $data['filter_defaults']
 		]).');

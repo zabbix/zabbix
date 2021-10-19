@@ -388,10 +388,8 @@ class CWidget extends CBaseComponent {
 
 			fetch(curl.getUrl(), {
 				method: 'POST',
-				headers: {
-					'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-				},
-				body: urlEncodeData({widgetid: this._widgetid, rf_rate})
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({widgetid: this._widgetid, rf_rate})
 			});
 		}
 	}
@@ -601,10 +599,8 @@ class CWidget extends CBaseComponent {
 
 		return fetch(curl.getUrl(), {
 			method: 'POST',
-			headers: {
-				'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-			},
-			body: urlEncodeData(this._getUpdateRequestData()),
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify(this._getUpdateRequestData()),
 			signal: this._update_abort_controller.signal
 		})
 			.then((response) => response.json())

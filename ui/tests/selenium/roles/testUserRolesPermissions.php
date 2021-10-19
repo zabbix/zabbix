@@ -315,13 +315,6 @@ class testUserRolesPermissions extends CWebTest {
 	 */
 	public function testUserRolesPermissions_ProblemsActionsAll() {
 		$problem = 'Test trigger with tag';
-		$context_before = [
-			'Problems',
-			'Acknowledge',
-			'Configuration',
-			'Webhook url for all',
-			'1_item'
-		];
 		$actions = [
 			'Add problem comments' => false,
 			'Change severity' => false,
@@ -352,21 +345,8 @@ class testUserRolesPermissions extends CWebTest {
 						->one()->isAttributePresent('onclick'));
 			}
 
-			// Overview page.
-			$this->page->open('overview.php?type=0')->waitUntilReady();
-			$this->query('class:list-table')->asTable()->one()->findRow('Triggers', '1_trigger_Disaster')
-					->getColumn('1_Host_to_check_Monitoring_Overview')->query('xpath://td[@class="disaster-bg cursor-pointer"]')
-					->one()->click();
-			$this->page->waitUntilReady();
-
-			$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
 			if ($action_status) {
-				$this->assertTrue($popup->hasItems($context_before));
 				$this->changeRoleRule($actions);
-			}
-			else {
-				$context_after = array_values(array_diff($context_before, ['Acknowledge']));
-				$this->assertTrue($popup->hasItems($context_after));
 			}
 		}
 	}
@@ -914,7 +894,6 @@ class testUserRolesPermissions extends CWebTest {
 					'displayed_ui' => [
 						'Dashboard',
 						'Hosts',
-						'Overview',
 						'Latest data',
 						'Maps',
 						'Discovery',
@@ -930,7 +909,6 @@ class testUserRolesPermissions extends CWebTest {
 					'displayed_ui' => [
 						'Dashboard',
 						'Problems',
-						'Overview',
 						'Latest data',
 						'Maps',
 						'Discovery',
@@ -942,28 +920,11 @@ class testUserRolesPermissions extends CWebTest {
 			[
 				[
 					'section' => 'Monitoring',
-					'page' => 'Overview',
-					'displayed_ui' => [
-						'Dashboard',
-						'Problems',
-						'Hosts',
-						'Latest data',
-						'Maps',
-						'Discovery',
-						'Services'
-					],
-					'link' => ['overview.php']
-				]
-			],
-			[
-				[
-					'section' => 'Monitoring',
 					'page' => 'Latest data',
 					'displayed_ui' => [
 						'Dashboard',
 						'Problems',
 						'Hosts',
-						'Overview',
 						'Maps',
 						'Discovery',
 						'Services'
@@ -979,7 +940,6 @@ class testUserRolesPermissions extends CWebTest {
 						'Dashboard',
 						'Problems',
 						'Hosts',
-						'Overview',
 						'Latest data',
 						'Discovery',
 						'Services'
@@ -995,7 +955,6 @@ class testUserRolesPermissions extends CWebTest {
 						'Dashboard',
 						'Problems',
 						'Hosts',
-						'Overview',
 						'Latest data',
 						'Maps',
 						'Services'
@@ -1011,7 +970,6 @@ class testUserRolesPermissions extends CWebTest {
 						'Dashboard',
 						'Problems',
 						'Hosts',
-						'Overview',
 						'Latest data',
 						'Maps',
 						'Discovery'
@@ -1088,7 +1046,6 @@ class testUserRolesPermissions extends CWebTest {
 					'displayed_ui' => [
 						'Problems',
 						'Hosts',
-						'Overview',
 						'Latest data',
 						'Maps',
 						'Discovery',
@@ -1101,7 +1058,6 @@ class testUserRolesPermissions extends CWebTest {
 					'button' => 'Hosts',
 					'displayed_ui' => [
 						'Hosts',
-						'Overview',
 						'Latest data',
 						'Maps',
 						'Discovery',
@@ -1145,7 +1101,7 @@ class testUserRolesPermissions extends CWebTest {
 			}
 			else {
 				$this->checkLinks(['zabbix.php?action=dashboard.view'], $data['button']);
-				$this->changeRoleRule(['Monitoring' => ['Dashboard', 'Problems', 'Hosts', 'Overview', 'Latest data', 'Maps',
+				$this->changeRoleRule(['Monitoring' => ['Dashboard', 'Problems', 'Hosts', 'Latest data', 'Maps',
 						'Discovery', 'Services']]
 				);
 			}

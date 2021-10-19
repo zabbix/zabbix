@@ -35,10 +35,13 @@
 		refresh_timer: null,
 		filter_counter_fetch: null,
 
-		init({filter_options, refresh_url, refresh_interval, filter_defaults}) {
-			this.refresh_url = refresh_url;
+		init({filter_options, refresh_interval, filter_defaults}) {
 			this.refresh_interval = refresh_interval;
 			this.filter_defaults = filter_defaults;
+
+			const url = new Curl('zabbix.php', false);
+			url.setArgument('action', 'problem.view.refresh');
+			this.refresh_url = url.getUrl();
 
 			this.initFilter(filter_options);
 			this.initAcknowledge();

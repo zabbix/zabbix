@@ -29,9 +29,6 @@
 static char	*called_key = NULL;
 
 int	__wrap_SYSTEM_LOCALTIME(const char *command, AGENT_RESULT *result);
-int	__wrap_WEB_PAGE_GET(const char *command, AGENT_RESULT *result);
-int	__wrap_WEB_PAGE_PERF(const char *command, AGENT_RESULT *result);
-int	__wrap_WEB_PAGE_REGEXP(const char *command, AGENT_RESULT *result);
 int	__wrap_VFS_FILE_SIZE(const char *command, AGENT_RESULT *result);
 int	__wrap_VFS_FILE_TIME(const char *command, AGENT_RESULT *result);
 int	__wrap_VFS_FILE_EXISTS(const char *command, AGENT_RESULT *result);
@@ -91,36 +88,6 @@ int	__wrap_SYSTEM_LOCALTIME(const char *command, AGENT_RESULT *result)
 	ZBX_UNUSED(result);
 
 	called_key = "system.localtime";
-
-	return SUCCEED;
-}
-
-int	__wrap_WEB_PAGE_GET(const char *command, AGENT_RESULT *result)
-{
-	ZBX_UNUSED(command);
-	ZBX_UNUSED(result);
-
-	called_key = "web.page.get";
-
-	return SUCCEED;
-}
-
-int	__wrap_WEB_PAGE_PERF(const char *command, AGENT_RESULT *result)
-{
-	ZBX_UNUSED(command);
-	ZBX_UNUSED(result);
-
-	called_key = "web.page.perf";
-
-	return SUCCEED;
-}
-
-int	__wrap_WEB_PAGE_REGEXP(const char *command, AGENT_RESULT *result)
-{
-	ZBX_UNUSED(command);
-	ZBX_UNUSED(result);
-
-	called_key = "web.page.regexp";
 
 	return SUCCEED;
 }

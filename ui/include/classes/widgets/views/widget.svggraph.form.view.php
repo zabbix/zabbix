@@ -148,7 +148,8 @@ $scripts[] =
 		'preview_data.xhr = jQuery.ajax({'.
 			'url: url.getUrl(),'.
 			'method: "POST",'.
-			'data: data,'.
+			'contentType: "application/json",'.
+			'data: JSON.stringify(data),'.
 			'dataType: "json",'.
 			'success: function(r) {'.
 				'if (preview_data.timeoutid) {'.

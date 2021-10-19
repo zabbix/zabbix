@@ -1729,6 +1729,35 @@ out:
 	return status;
 }
 
+typedef struct
+{
+	zbx_service_t	*service;
+	int		severity;
+}
+zbx_service_severity_t;
+
+static void	service_add_cause(zbx_vector_ptr_t *causes, zbx_service_t *service, int severity)
+{
+	int			i;
+	zbx_service_severity_t	*cause;
+
+	for (i = 0; i < causes->values_num; i++)
+	{
+		cause = (zbx_service_severity_t *)causes->values[i];
+		if (cause->service == service)
+		{
+			if (cause->severity > severity)
+				cause->severity = severity;
+			return;
+		}
+	}
+
+	cause = (zbx_service_severity_t *)zbx_malloc(NULL, sizeof(zbx_service_severity_t));
+	cause->service = service;
+	cause->severity = severity;
+	zbx_vector_ptr_append(causes, cause);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: service_get_causes                                               *
@@ -1737,26 +1766,70 @@ out:
  *          specified severity state                                          *
  *                                                                            *
  * Parameters: service   - [IN] the service                                   *
- *             severity  - [IN] the required severity                         *
- *             eventids  - [OUT] the services                                 *
+ *             severity  - [IN] the required severity (-1 if there is no      *
+ *                              minimum severity required)                    *
+ *             eventids  - [OUT] the root cause events                        *
  *                                                                            *
  * Comments: The returned list includes children, grandchildren etc           *
  *                                                                            *
  ******************************************************************************/
-static void	service_get_causes(const zbx_service_t *service, int severity, zbx_vector_ptr_t *services)
+static void	service_get_causes(const zbx_service_t *service, int severity, zbx_vector_uint64_t *eventids)
 {
-	int			status, child_status, i, index;
-	zbx_vector_ptr_t	children, causes;
+	int			i, min_severity;
+	zbx_vector_ptr_t	causes;
 	zbx_service_rule_t	*n_rule = NULL, *w_rule = NULL;
 
-	zbx_vector_ptr_create(&children);
+	/* calculate the minimum severity by reversing propagation rule */
+	if (ZBX_SERVICE_STATUS_OK != severity)
+	{
+		switch (service->propagation_rule)
+		{
+			case ZBX_SERVICE_STATUS_PROPAGATION_INCREASE:
+				min_severity = severity - service->propagation_value;
+				if (ZBX_SERVICE_STATUS_OK >= min_severity)
+					min_severity = ZBX_SERVICE_STATUS_OK + 1;
+				severity = min_severity;
+				break;
+			case ZBX_SERVICE_STATUS_PROPAGATION_DECREASE:
+				min_severity = severity + service->propagation_value;
+				if (TRIGGER_SEVERITY_COUNT <= min_severity)
+					min_severity = TRIGGER_SEVERITY_COUNT - 1;
+				severity = min_severity;
+				break;
+			case ZBX_SERVICE_STATUS_PROPAGATION_FIXED:
+				min_severity = TRIGGER_SEVERITY_NOT_CLASSIFIED;
+				severity = ZBX_SERVICE_STATUS_OK;
+				break;
+			default:
+				min_severity = severity;
+		}
+	}
+	else
+		min_severity = TRIGGER_SEVERITY_NOT_CLASSIFIED;
+
+	if (0 == service->children.values_num)
+	{
+		for (i = 0; i < service->service_problems.values_num; i++)
+		{
+			zbx_service_problem_t	*service_problem;
+
+			service_problem = (zbx_service_problem_t *)service->service_problems.values[i];
+
+			if (service_problem->severity >= min_severity)
+				zbx_vector_uint64_append(eventids, service_problem->eventid);
+		}
+
+		return;
+	}
+
 	zbx_vector_ptr_create(&causes);
 
-	if ((status = service_get_main_status(service)) >= severity)
+	if (service_get_main_status(service) >= min_severity)
 	{
 		for (i = 0; i < service->children.values_num; i++)
 		{
 			zbx_service_t	*child = (zbx_service_t *)service->children.values[i];
+			int		child_status;
 
 			if (SUCCEED != service_get_status(child, &child_status) ||
 					ZBX_SERVICE_STATUS_OK == child_status)
@@ -1764,39 +1837,24 @@ static void	service_get_causes(const zbx_service_t *service, int severity, zbx_v
 				continue;
 			}
 
-			if ((ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE == service->algorithm &&
-					child_status >= severity) ||
-					ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL == service->algorithm)
+			if (ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL == service->algorithm)
+				service_add_cause(&causes, child, ZBX_SERVICE_STATUS_OK);
+
+			if (ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE == service->algorithm &&
+					child_status >= min_severity)
 			{
-				zbx_vector_ptr_append(&causes, child);
+				service_add_cause(&causes, child, severity);
 			}
-			else
-				zbx_vector_ptr_append(&children, child);
 		}
 	}
-	else
-		zbx_vector_ptr_append_array(&children, service->children.values, service->children.values_num);
-
-	for (i = 0; i < causes.values_num; i++)
-	{
-		zbx_vector_ptr_append(services, causes.values[i]);
-		service_get_causes((const zbx_service_t *)causes.values[i], severity, services);
-	}
-
-	if (0 == children.values_num)
-		goto out;
-
-	zbx_vector_ptr_sort(&children, ZBX_DEFAULT_PTR_COMPARE_FUNC);
 
 	for (i = 0; i < service->status_rules.values_num; i++)
 	{
 		zbx_service_rule_t	*rule = (zbx_service_rule_t *)service->status_rules.values[i];
 
 		/* check if the rule can return status of acceptable severity */
-		if (rule->new_status < severity)
+		if (rule->new_status < min_severity)
 			continue;
-
-		zbx_vector_ptr_clear(&causes);
 
 		if (ZBX_SERVICE_STATUS_OK == service_get_rule_status(service, rule))
 			continue;
@@ -1819,64 +1877,51 @@ static void	service_get_causes(const zbx_service_t *service, int severity, zbx_v
 
 	if (NULL != n_rule)
 	{
-		int	total_weight, total_num;
+		int			total_weight, total_num;
+		zbx_vector_ptr_t	children;
 
-		zbx_vector_ptr_clear(&causes);
-		service_get_children_by_status(service, n_rule->limit_status, &causes, &total_weight, &total_num);
+		zbx_vector_ptr_create(&children);
 
-		for (i = 0; i < causes.values_num && 0 != children.values_num; i++)
-		{
-			zbx_service_t	*child = (zbx_service_t *)causes.values[i];
+		service_get_children_by_status(service, n_rule->limit_status, &children, &total_weight, &total_num);
 
-			if (FAIL == (index = zbx_vector_ptr_bsearch(&children, child, ZBX_DEFAULT_PTR_COMPARE_FUNC)))
-				continue;
+		for (i = 0; i < children.values_num; i++)
+			service_add_cause(&causes, (zbx_service_t *)children.values[i], n_rule->limit_status);
 
-			zbx_vector_ptr_remove(&children, index);
-			zbx_vector_ptr_append(services, child);
-			service_get_causes(child, n_rule->limit_status, services);
-		}
-
-		/* check if weight based rule is not covered by the count based rule */
-		if (NULL != w_rule && w_rule->limit_status >= n_rule->limit_status)
-			goto out;
+		zbx_vector_ptr_destroy(&children);
 	}
 
+	/* cause is only added once, even if weight based rule is covered by the count based rule */
 	if (NULL != w_rule)
 	{
-		int	total_weight, total_num;
+		int			total_weight, total_num;
+		zbx_vector_ptr_t	children;
 
-		zbx_vector_ptr_clear(&causes);
-		service_get_children_by_status(service, w_rule->limit_status, &causes, &total_weight, &total_num);
+		zbx_vector_ptr_create(&children);
 
-		/* children with 0 weight cannot affect weight based rule, skip them */
-		for (i = 0; i < children.values_num; )
+		service_get_children_by_status(service, w_rule->limit_status, &children, &total_weight, &total_num);
+
+		for (i = 0; i < children.values_num; i++)
 		{
 			zbx_service_t	*child = (zbx_service_t *)children.values[i];
 
 			if (0 == child->weight)
-				zbx_vector_ptr_remove(&children, i);
-			else
-				i++;
-		}
-
-		for (i = 0; i < causes.values_num && 0 != children.values_num; i++)
-		{
-			zbx_service_t	*child = (zbx_service_t *)causes.values[i];
-
-			if (0 == child->weight)
 				continue;
 
-			if (FAIL == (index = zbx_vector_ptr_bsearch(&children, child, ZBX_DEFAULT_PTR_COMPARE_FUNC)))
-				continue;
-
-			zbx_vector_ptr_remove(&children, index);
-			zbx_vector_ptr_append(services, child);
-			service_get_causes(child, w_rule->limit_status, services);
+			service_add_cause(&causes, child, w_rule->limit_status);
 		}
+
+		zbx_vector_ptr_destroy(&children);
 	}
-out:
+
+	for (i = 0; i < causes.values_num; i++)
+	{
+		zbx_service_severity_t	*cause = (zbx_service_severity_t *)causes.values[i];
+
+		service_get_causes(cause->service, cause->severity, eventids);
+	}
+
+	zbx_vector_ptr_clear_ext(&causes, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&causes);
-	zbx_vector_ptr_destroy(&children);
 }
 
 /******************************************************************************
@@ -1891,35 +1936,7 @@ out:
  ******************************************************************************/
 void	service_get_rootcause_eventids(const zbx_service_t *parent, zbx_vector_uint64_t *eventids)
 {
-	zbx_vector_ptr_t	services;
-	int			i, j;
-
-	for (j = 0; j < parent->service_problems.values_num; j++)
-	{
-		zbx_service_problem_t	*service_problem;
-
-		service_problem = (zbx_service_problem_t *)parent->service_problems.values[j];
-		zbx_vector_uint64_append(eventids, service_problem->eventid);
-	}
-
-	zbx_vector_ptr_create(&services);
-
-	service_get_causes(parent, TRIGGER_SEVERITY_NOT_CLASSIFIED, &services);
-
-	for (i = 0; i < services.values_num; i++)
-	{
-		zbx_service_t	*service = (zbx_service_t *)services.values[i];
-
-		for (j = 0; j < service->service_problems.values_num; j++)
-		{
-			zbx_service_problem_t	*service_problem;
-
-			service_problem = (zbx_service_problem_t *)service->service_problems.values[j];
-			zbx_vector_uint64_append(eventids, service_problem->eventid);
-		}
-	}
-
-	zbx_vector_ptr_destroy(&services);
+	service_get_causes(parent, ZBX_SERVICE_STATUS_OK, eventids);
 
 	zbx_vector_uint64_sort(eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -2851,9 +2868,6 @@ static void	process_rootcause(const zbx_ipc_message_t *message, zbx_service_mana
 
 		if (0 == eventids.values_num)
 			continue;
-
-		zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		zbx_vector_uint64_uniq(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 		zbx_service_serialize_rootcause(&data, &data_alloc, &data_offset, serviceids.values[i], &eventids);
 		zbx_vector_uint64_clear(&eventids);

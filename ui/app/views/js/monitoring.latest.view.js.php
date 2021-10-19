@@ -31,14 +31,16 @@
 <script>
 	const view = {
 		refresh_url: null,
+		refresh_data: null,
 		refresh_interval: null,
 		running: false,
 		timeout: null,
 		_refresh_message_box: null,
 		_popup_message_box: null,
 
-		init({refresh_url, refresh_interval}) {
+		init({refresh_url, refresh_data, refresh_interval}) {
 			this.refresh_url = refresh_url;
+			this.refresh_data = refresh_data;
 			this.refresh_interval = refresh_interval;
 
 			this.liveFilter();
@@ -80,7 +82,12 @@
 		refresh() {
 			this.setLoading();
 
-			var deferred = $.getJSON(this.refresh_url);
+			var deferred = $.ajax({
+				url: this.refresh_url,
+				data: this.refresh_data,
+				type: 'post',
+				dataType: 'json'
+			});
 
 			return this.bindDataEvents(deferred);
 		},

@@ -28,7 +28,7 @@ $form = (new CForm())
 	->setName('services_form');
 
 // Enable form submitting on Enter.
-$form->addItem((new CInput('submit'))->addStyle('display: none;'));
+$form->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
 $controls = (new CForm())
 	->cleanItems()
@@ -37,14 +37,15 @@ $controls = (new CForm())
 	->addVar('exclude_serviceids', $data['exclude_serviceids'])
 	->addItem(
 		(new CList())
-			->addItem(new CLabel(_('Name'), 'services-filter-name'))
+			->addClass(ZBX_STYLE_INLINE_FILTER)
+			->addItem(new CLabel(_('Name'), 'services-filter-name'), ZBX_STYLE_INLINE_FILTER_LABEL)
 			->addItem(
 				(new CTextBox('filter_name', $data['filter']['name']))
 					->setId('services-filter-name')
 					->setAttribute('autofocus', 'autofocus')
 					->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 			)
-			->addItem(new CSubmitButton(_('Apply')))
+			->addItem(new CSubmitButton(_('Filter')))
 			->addItem(
 				(new CSimpleButton(_('Reset')))
 					->setAttribute('type', 'reset')

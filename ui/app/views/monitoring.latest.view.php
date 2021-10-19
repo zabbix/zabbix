@@ -117,6 +117,7 @@ $widget->show();
 (new CScriptTag('
 	view.init('.json_encode([
 		'refresh_url' => $data['refresh_url'],
+		'refresh_data' => $data['refresh_data'],
 		'refresh_interval' => $data['refresh_interval']
 	]).');
 '))
