@@ -232,7 +232,7 @@ class CControllerHostEdit extends CController {
 		// Reset Secret text macros and set warning for cloned host.
 		if ($data['host']['hostid'] === null) {
 			foreach ($data['host']['macros'] as &$macro) {
-				if ($macro['type'] == ZBX_MACRO_TYPE_SECRET) {
+				if ($macro['type'] == ZBX_MACRO_TYPE_SECRET && !array_key_exists('value', $macro)) {
 					$macro = [
 						'type' => ZBX_MACRO_TYPE_TEXT,
 						'value' => ''
