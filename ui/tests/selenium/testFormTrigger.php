@@ -788,7 +788,7 @@ class testFormTrigger extends CLegacyWebTest {
 					'error_msg' => 'Cannot add trigger',
 					'errors' => [
 						"Invalid parameter \"/1/expression\": incorrect expression starting from ".
-						"\"rate(/Simple form test host/test-item-reuse,test)>0.5\"."
+								"\"rate(/Simple form test host/test-item-reuse,test)>0.5\"."
 					]
 				]
 			],
@@ -800,7 +800,7 @@ class testFormTrigger extends CLegacyWebTest {
 					'error_msg' => 'Cannot add trigger',
 					'errors' => [
 						"Invalid parameter \"/1/expression\": incorrect expression starting from ".
-						"\"rate(Simple form test host/test-item-reuse,1h)>0.5\"."
+								"\"rate(Simple form test host/test-item-reuse,1h)>0.5\"."
 					]
 				]
 			],
