@@ -258,6 +258,12 @@ int	parse_rtc_options(const char *opt, unsigned char program_type, int *message)
 				SUCCEED == is_time_suffix(opt + ZBX_CONST_STRLEN(ZBX_HA_SET_FAILOVER_DELAY) + 1, &delay,
 				ZBX_LENGTH_UNLIMITED))
 		{
+			if (delay < 10 || delay > 15 * SEC_PER_MIN)
+			{
+				zbx_error("failover delay must be in range from 10s to 15m");
+				return FAIL;
+			}
+
 			command = ZBX_RTC_HA_SET_FAILOVER_DELAY;
 			scope = 0;
 			data = (unsigned int)delay;
