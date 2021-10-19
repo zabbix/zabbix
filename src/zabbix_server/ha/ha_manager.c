@@ -105,6 +105,10 @@ static void	zbx_ha_node_free(zbx_ha_node_t *node)
 	zbx_free(node);
 }
 
+static void	ha_set_error(zbx_ha_info_t *info, const char *fmt, ...) __zbx_attr_format_printf(2, 3);
+static DB_RESULT	ha_db_select(zbx_ha_info_t *info, const char *sql, ...) __zbx_attr_format_printf(2, 3);
+static int	ha_db_execute(zbx_ha_info_t *info, const char *sql, ...) __zbx_attr_format_printf(2, 3);
+
 /******************************************************************************
  *                                                                            *
  * Function: ha_send_manager_message                                          *
