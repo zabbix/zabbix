@@ -50,8 +50,7 @@ class CGeomapCoordinatesParser extends CParser {
 		}
 
 		if ((float) $matches['latitude'] < -90 || (float) $matches['latitude'] > 90
-				|| (float) $matches['longitude'] < -180 || (float) $matches['longitude'] > 180
-				|| array_key_exists('zoom', $matches) && (int) $matches['zoom'] < 0) {
+				|| (float) $matches['longitude'] < -180 || (float) $matches['longitude'] > 180) {
 			return self::PARSE_FAIL;
 		}
 
