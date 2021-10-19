@@ -281,6 +281,28 @@ class TabIndicatorItem {
 	}
 
 	/**
+	 * Init observer for HTML changes.
+	 *
+	 * @param {string}      selector          CSS selector for node to watch changes on.
+	 * @param {HTMLElement} element           Node to apply indicator/count updates to.
+	 * @param {object}      observer_options  Options that describe which DOM mutations should trigger the callback.
+	 *                                        Defaults to {childList: true, subtree: true}.
+	 */
+	initMutationObserver(selector, element, observer_options) {
+		const target_node = document.querySelector(selector);
+
+		if (target_node === null) {
+			return;
+		}
+
+		if (typeof observer_options === 'undefined') {
+			observer_options = {childList: true, subtree: true};
+		}
+
+		new MutationObserver(() => this.addAttributes(element)).observe(target_node, observer_options);
+	}
+
+	/**
 	 * Add tab indicator attribute to tab element.
 	 *
 	 * @param {HTMLElement} element  tab element
@@ -322,29 +344,16 @@ class MacrosTabIndicatorItem extends TabIndicatorItem {
 	 * @param {HTMLElement} element
 	 */
 	initObserver(element) {
-		const target_node = document.querySelector('#tbl_macros');
-		const observer_options = {
-			childList: true,
-			attributes: true,
-			attributeFilter: ['value', 'style'], // Use style because textarea don't have value attribute.
-			subtree: true
-		};
-
-		const observer_callback = (mutationList, _observer) => {
-			mutationList.forEach((mutation) => {
-				switch (mutation.type) {
-					case 'childList':
-					case 'attributes':
-						this.addAttributes(element);
-						break;
-				}
-			});
-		};
-
-		if (target_node) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node, observer_options);
-		}
+		this.initMutationObserver(
+			'#tbl_macros',
+			element,
+			{
+				childList: true,
+				attributes: true,
+				attributeFilter: ['value', 'style'], // Use style because textarea don't have value attribute.
+				subtree: true
+			}
+		);
 	}
 }
 
@@ -377,26 +386,7 @@ class LinkedTemplateTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		const target_node = document.querySelector('#add_templates_ .multiselect-list');
-		const observer_options = {
-			childList: true,
-			subtree: true
-		};
-
-		const observer_callback = (mutationList, _observer) => {
-			mutationList.forEach((mutation) => {
-				switch (mutation.type) {
-					case 'childList':
-						this.addAttributes(element);
-						break;
-				}
-			});
-		};
-
-		if (target_node) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node, observer_options);
-		}
+		this.initMutationObserver('#add_templates_ .multiselect-list', element);
 	}
 }
 
@@ -413,29 +403,16 @@ class TagsTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		const target_node = document.querySelector('#tags-table');
-		const observer_options = {
-			childList: true,
-			attributes: true,
-			attributeFilter: ['value', 'style'], // Use style because textarea don't have value attribute.
-			subtree: true
-		};
-
-		const observer_callback = (mutationList, _observer) => {
-			mutationList.forEach((mutation) => {
-				switch (mutation.type) {
-					case 'childList':
-					case 'attributes':
-						this.addAttributes(element);
-						break;
-				}
-			});
-		};
-
-		if (target_node) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node, observer_options);
-		}
+		this.initMutationObserver(
+			'#tags-table',
+			element,
+			{
+				childList: true,
+				attributes: true,
+				attributeFilter: ['value', 'style'], // Use style because textarea don't have value attribute.
+				subtree: true
+			}
+		);
 	}
 }
 
@@ -601,26 +578,7 @@ class GroupsTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		const target_node = document.querySelector('#group_links_ .multiselect-list');
-		const observer_options = {
-			childList: true,
-			subtree: true
-		};
-
-		const observer_callback = (mutationList, _observer) => {
-			mutationList.forEach((mutation) => {
-				switch (mutation.type) {
-					case 'childList':
-						this.addAttributes(element);
-						break;
-				}
-			});
-		};
-
-		if (target_node) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node, observer_options);
-		}
+		this.initMutationObserver('#group_links_ .multiselect-list', element);
 	}
 }
 
@@ -637,33 +595,7 @@ class PreprocessingTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		const target_node = document.querySelector('#preprocessing');
-		const observer_options = {
-			childList: true,
-			subtree: true
-		};
-
-		const observer_callback = (mutationList, _observer) => {
-			let change_detected = false;
-
-			mutationList.forEach((mutation) => {
-				switch (mutation.type) {
-					case 'childList':
-						change_detected = true;
-						break;
-				}
-			});
-
-			if (change_detected) {
-				this.addAttributes(element);
-				target_node.dispatchEvent(new CustomEvent('preprocessing.change'));
-			}
-		};
-
-		if (target_node) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node, observer_options);
-		}
+		this.initMutationObserver('#preprocessing', element);
 	}
 }
 
@@ -680,26 +612,7 @@ class DependencyTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		const target_node = document.querySelector('#dependency-table tbody');
-		const observer_options = {
-			childList: true,
-			subtree: true
-		};
-
-		const observer_callback = (mutationList, _observer) => {
-			mutationList.forEach((mutation) => {
-				switch (mutation.type) {
-					case 'childList':
-						this.addAttributes(element);
-						break;
-				}
-			});
-		};
-
-		if (target_node) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node, observer_options);
-		}
+		this.initMutationObserver('#dependency-table tbody', element);
 	}
 }
 
@@ -716,29 +629,16 @@ class LldMacrosTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		const target_node = document.querySelector('#lld_macro_paths');
-		const observer_options = {
-			childList: true,
-			attributes: true,
-			attributeFilter: ['value', 'style'], // Use style because textarea don't have value attribute.
-			subtree: true
-		};
-
-		const observer_callback = (mutationList, _observer) => {
-			mutationList.forEach((mutation) => {
-				switch (mutation.type) {
-					case 'childList':
-					case 'attributes':
-						this.addAttributes(element);
-						break;
-				}
-			});
-		};
-
-		if (target_node) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node, observer_options);
-		}
+		this.initMutationObserver(
+			'#lld_macro_paths',
+			element,
+			{
+				childList: true,
+				attributes: true,
+				attributeFilter: ['value', 'style'], // Use style because textarea don't have value attribute.
+				subtree: true
+			}
+		);
 	}
 }
 
@@ -755,29 +655,16 @@ class FiltersTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		const target_node = document.querySelector('#conditions');
-		const observer_options = {
-			childList: true,
-			attributes: true,
-			attributeFilter: ['value'],
-			subtree: true
-		};
-
-		const observer_callback = (mutationList, _observer) => {
-			mutationList.forEach((mutation) => {
-				switch (mutation.type) {
-					case 'childList':
-					case 'attributes':
-						this.addAttributes(element);
-						break;
-				}
-			});
-		};
-
-		if (target_node) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node, observer_options);
-		}
+		this.initMutationObserver(
+			'#conditions',
+			element,
+			{
+				childList: true,
+				attributes: true,
+				attributeFilter: ['value'],
+				subtree: true
+			}
+		);
 	}
 }
 
@@ -794,26 +681,7 @@ class OverridesTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		const target_node = document.querySelector('.lld-overrides-table tbody');
-		const observer_options = {
-			childList: true,
-			subtree: true
-		};
-
-		const observer_callback = (mutationList, _observer) => {
-			mutationList.forEach((mutation) => {
-				switch (mutation.type) {
-					case 'childList':
-						this.addAttributes(element);
-						break;
-				}
-			});
-		};
-
-		if (target_node) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node, observer_options);
-		}
+		this.initMutationObserver('.lld-overrides-table tbody', element);
 	}
 }
 
@@ -830,26 +698,7 @@ class StepsTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		const target_node = document.querySelector('.httpconf-steps-dynamic-row tbody');
-		const observer_options = {
-			childList: true,
-			subtree: true
-		};
-
-		const observer_callback = (mutationList, _observer) => {
-			mutationList.forEach((mutation) => {
-				switch (mutation.type) {
-					case 'childList':
-						this.addAttributes(element);
-						break;
-				}
-			});
-		};
-
-		if (target_node) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node, observer_options);
-		}
+		this.initMutationObserver('.httpconf-steps-dynamic-row tbody', element);
 	}
 }
 
@@ -919,38 +768,9 @@ class OperationsTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		const target_node_op = document.querySelector('#op-table tbody');
-		const target_node_rec = document.querySelector('#rec-table tbody');
-		const target_node_upd = document.querySelector('#upd-table tbody');
-		const observer_options = {
-			childList: true,
-			subtree: true
-		};
-
-		const observer_callback = (mutationList, _observer) => {
-			mutationList.forEach((mutation) => {
-				switch (mutation.type) {
-					case 'childList':
-						this.addAttributes(element);
-						break;
-				}
-			});
-		};
-
-		if (target_node_op) {
-			const observer_op = new MutationObserver(observer_callback);
-			observer_op.observe(target_node_op, observer_options);
-		}
-
-		if (target_node_rec) {
-			const observer_rec = new MutationObserver(observer_callback);
-			observer_rec.observe(target_node_rec, observer_options);
-		}
-
-		if (target_node_upd) {
-			const observer_upd = new MutationObserver(observer_callback);
-			observer_upd.observe(target_node_upd, observer_options);
-		}
+		this.initMutationObserver('#op-table tbody', element);
+		this.initMutationObserver('#rec-table tbody', element);
+		this.initMutationObserver('#upd-table tbody', element);
 	}
 }
 
@@ -994,26 +814,7 @@ class ChildServicesTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		const target_node = document.querySelector('#children tbody');
-		const observer_options = {
-			childList: true,
-			subtree: true
-		};
-
-		const observer_callback = (mutationList, _observer) => {
-			mutationList.forEach((mutation) => {
-				switch (mutation.type) {
-					case 'childList':
-						this.addAttributes(element);
-						break;
-				}
-			});
-		};
-
-		if (target_node) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node, observer_options);
-		}
+		this.initMutationObserver('#children tbody', element);
 	}
 }
 
@@ -1030,26 +831,7 @@ class TimeTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		const target_node = document.querySelector('#time-table tbody');
-		const observer_options = {
-			childList: true,
-			subtree: true
-		};
-
-		const observer_callback = (mutationList, _observer) => {
-			mutationList.forEach((mutation) => {
-				switch (mutation.type) {
-					case 'childList':
-						this.addAttributes(element);
-						break;
-				}
-			});
-		};
-
-		if (target_node) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node, observer_options);
-		}
+		this.initMutationObserver('#time-table tbody', element);
 	}
 }
 
@@ -1086,26 +868,7 @@ class MediaTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		const target_node = document.querySelector('#media-table tbody');
-		const observer_options = {
-			childList: true,
-			subtree: true
-		};
-
-		const observer_callback = (mutationList, _observer) => {
-			mutationList.forEach((mutation) => {
-				switch (mutation.type) {
-					case 'childList':
-						this.addAttributes(element);
-						break;
-				}
-			});
-		};
-
-		if (target_node) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node, observer_options);
-		}
+		this.initMutationObserver('#media-table tbody', element);
 	}
 }
 
@@ -1122,26 +885,7 @@ class MessageTemplateTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		const target_node = document.querySelector('#message-templates tbody');
-		const observer_options = {
-			childList: true,
-			subtree: true
-		};
-
-		const observer_callback = (mutationList, _observer) => {
-			mutationList.forEach((mutation) => {
-				switch (mutation.type) {
-					case 'childList':
-						this.addAttributes(element);
-						break;
-				}
-			});
-		};
-
-		if (target_node) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node, observer_options);
-		}
+		this.initMutationObserver('#message-templates tbody', element);
 	}
 }
 
@@ -1196,32 +940,8 @@ class SharingTabIndicatorItem extends TabIndicatorItem {
 			});
 		});
 
-		const target_node_group = document.querySelector('#user-group-share-table tbody');
-		const target_node_user = document.querySelector('#user-share-table tbody');
-		const observer_options = {
-			childList: true,
-			subtree: true
-		};
-
-		const observer_callback = (mutationList, _observer) => {
-			mutationList.forEach((mutation) => {
-				switch (mutation.type) {
-					case 'childList':
-						this.addAttributes(element);
-						break;
-				}
-			});
-		};
-
-		if (target_node_group) {
-			const observer_group = new MutationObserver(observer_callback);
-			observer_group.observe(target_node_group, observer_options);
-		}
-
-		if (target_node_user) {
-			const observer_user = new MutationObserver(observer_callback);
-			observer_user.observe(target_node_user, observer_options);
-		}
+		this.initMutationObserver('#user-group-share-table tbody', element);
+		this.initMutationObserver('#user-share-table tbody', element);
 	}
 }
 
@@ -1238,26 +958,7 @@ class GraphDatasetTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		const target_node = document.querySelector('#data_sets');
-		const observer_options = {
-			childList: true,
-			subtree: true
-		};
-
-		const observer_callback = (mutationList, _observer) => {
-			mutationList.forEach((mutation) => {
-				switch (mutation.type) {
-					case 'childList':
-						this.addAttributes(element);
-						break;
-				}
-			});
-		};
-
-		if (target_node) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node, observer_options);
-		}
+		this.initMutationObserver('#data_sets', element);
 	}
 }
 
@@ -1380,26 +1081,7 @@ class GraphOverridesTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		const target_node = document.querySelector('.overrides-list');
-		const observer_options = {
-			childList: true,
-			subtree: true
-		};
-
-		const observer_callback = (mutationList, _observer) => {
-			mutationList.forEach((mutation) => {
-				switch (mutation.type) {
-					case 'childList':
-						this.addAttributes(element);
-						break;
-				}
-			});
-		};
-
-		if (target_node) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node, observer_options);
-		}
+		this.initMutationObserver('.overrides-list', element);
 	}
 }
 
@@ -1436,25 +1118,6 @@ class ValuemapsTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		const target_node = document.querySelector('#valuemap-table');
-		const observer_options = {
-			childList: true,
-			subtree: true
-		};
-
-		const observer_callback = (mutationList, _observer) => {
-			mutationList.forEach((mutation) => {
-				switch (mutation.type) {
-					case 'childList':
-						this.addAttributes(element);
-						break;
-				}
-			});
-		};
-
-		if (target_node) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node, observer_options);
-		}
+		this.initMutationObserver('#valuemap-table', element);
 	}
 }
