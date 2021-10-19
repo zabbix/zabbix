@@ -1399,7 +1399,7 @@ static void	ha_send_node_list(zbx_ha_info_t *info, zbx_ipc_client_t *client)
 	(void)zbx_serialize_str(ptr, str, str_len);
 	zbx_free(str);
 
-	zbx_ipc_client_send(client, ZBX_IPC_SERVICE_HA_REMOVE_NODE, data, len);
+	zbx_ipc_client_send(client, ZBX_IPC_SERVICE_HA_GET_NODES, data, len);
 	zbx_free(data);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
