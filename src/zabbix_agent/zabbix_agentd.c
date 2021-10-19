@@ -746,7 +746,7 @@ static int	add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vector_st
 	forks = CONFIG_ACTIVE_FORKS;
 	CONFIG_ACTIVE_FORKS += new_forks;
 	CONFIG_ACTIVE_ARGS = (ZBX_THREAD_ACTIVECHK_ARGS *)zbx_realloc(CONFIG_ACTIVE_ARGS,
-			sizeof(ZBX_THREAD_ACTIVECHK_ARGS) * CONFIG_ACTIVE_FORKS);
+			sizeof(ZBX_THREAD_ACTIVECHK_ARGS) * (size_t)CONFIG_ACTIVE_FORKS);
 
 	for (i = 0; i < new_forks; i++, forks++)
 	{
@@ -1176,8 +1176,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 #endif
-	threads = (ZBX_THREAD_HANDLE *)zbx_calloc(threads, threads_num, sizeof(ZBX_THREAD_HANDLE));
-	threads_flags = (int *)zbx_calloc(threads_flags, threads_num, sizeof(int));
+	threads = (ZBX_THREAD_HANDLE *)zbx_calloc(threads, (size_t)threads_num, sizeof(ZBX_THREAD_HANDLE));
+	threads_flags = (int *)zbx_calloc(threads_flags, (size_t)threads_num, sizeof(int));
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "agent #0 started [main process]");
 

@@ -1264,8 +1264,8 @@ static int	server_startup(zbx_socket_t *listen_sock)
 			+ CONFIG_LLDMANAGER_FORKS + CONFIG_LLDWORKER_FORKS + CONFIG_ALERTDB_FORKS
 			+ CONFIG_HISTORYPOLLER_FORKS + CONFIG_AVAILMAN_FORKS + CONFIG_REPORTMANAGER_FORKS
 			+ CONFIG_REPORTWRITER_FORKS + CONFIG_SERVICEMAN_FORKS + CONFIG_PROBLEMHOUSEKEEPER_FORKS;
-	threads = (pid_t *)zbx_calloc(threads, threads_num, sizeof(pid_t));
-	threads_flags = (int *)zbx_calloc(threads_flags, threads_num, sizeof(int));
+	threads = (pid_t *)zbx_calloc(threads, (size_t)threads_num, sizeof(pid_t));
+	threads_flags = (int *)zbx_calloc(threads_flags, (size_t)threads_num, sizeof(int));
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "server #0 started [main process]");
 

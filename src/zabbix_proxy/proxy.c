@@ -1286,8 +1286,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			+ CONFIG_PREPROCMAN_FORKS + CONFIG_PREPROCESSOR_FORKS + CONFIG_HISTORYPOLLER_FORKS
 			+ CONFIG_AVAILMAN_FORKS;
 
-	threads = (pid_t *)zbx_calloc(threads, threads_num, sizeof(pid_t));
-	threads_flags = (int *)zbx_calloc(threads_flags, threads_num, sizeof(int));
+	threads = (pid_t *)zbx_calloc(threads, (size_t)threads_num, sizeof(pid_t));
+	threads_flags = (int *)zbx_calloc(threads_flags, (size_t)threads_num, sizeof(int));
 
 	if (0 != CONFIG_TRAPPER_FORKS)
 	{
@@ -1419,7 +1419,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		/* check if the wait was interrupted because of diaginfo remote command */
 		if (ZBX_DIAGINFO_UNDEFINED != zbx_diaginfo_scope)
 		{
-			zbx_diag_log_info(zbx_diaginfo_scope);
+			zbx_diag_log_info((unsigned int)zbx_diaginfo_scope);
 			zbx_diaginfo_scope = ZBX_DIAGINFO_UNDEFINED;
 		}
 	}

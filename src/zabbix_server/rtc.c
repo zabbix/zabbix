@@ -60,7 +60,7 @@ static void	rtc_ha_status(void)
 
 	if (SUCCEED != zbx_ha_get_nodes(&nodes, &error))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot get HA node information: %s", error);
+		zabbix_log(LOG_LEVEL_ERR, "cannot get HA node information: %s", error);
 		zbx_free(error);
 		return;
 	}
@@ -143,7 +143,7 @@ static void	rtc_remove_node(int index)
 
 	if (SUCCEED != zbx_ha_remove_node(index, &error))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot remove HA node: %s", error);
+		zabbix_log(LOG_LEVEL_ERR, "cannot remove HA node: %s", error);
 		zbx_free(error);
 	}
 }
@@ -161,7 +161,7 @@ static void	rtc_ha_failover_delay(int delay)
 
 	if (SUCCEED != zbx_ha_set_failover_delay(delay, &error))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot set HA failover delay: %s", error);
+		zabbix_log(LOG_LEVEL_ERR, "cannot set HA failover delay: %s", error);
 		zbx_free(error);
 	}
 }
@@ -173,7 +173,7 @@ static void	rtc_ha_failover_delay(int delay)
  * Purpose: change log level of main process                                  *
  *                                                                            *
  ******************************************************************************/
-static void	rtc_change_loglevel_main(unsigned int command)
+static void	rtc_change_loglevel_main(int command)
 {
 	if (ZBX_RTC_LOG_LEVEL_INCREASE == command)
 	{
@@ -210,7 +210,7 @@ static void	rtc_change_loglevel_main(unsigned int command)
  * Purpose: change log level of HA manager                                    *
  *                                                                            *
  ******************************************************************************/
-static void	rtc_change_loglevel_ha(unsigned int command)
+static void	rtc_change_loglevel_ha(int command)
 {
 	int	direction;
 	char	*error = NULL;
@@ -231,7 +231,7 @@ static void	rtc_change_loglevel_ha(unsigned int command)
  * Purpose: process log level changes affecting main/ha manager processes     *
  *                                                                            *
  ******************************************************************************/
-static void	rtc_change_loglevel(unsigned int command, unsigned int scope, unsigned int data)
+static void	rtc_change_loglevel(int command, int scope, int data)
 {
 	if ((ZBX_RTC_LOG_SCOPE_FLAG | ZBX_RTC_LOG_SCOPE_PID) == scope)
 	{

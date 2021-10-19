@@ -1006,7 +1006,7 @@ zbx_httptest_auth_t;
 typedef struct
 {
 	zbx_task_t	task;
-	int		flags;
+	unsigned int	flags;
 	int		data;
 }
 ZBX_TASK_EX;
