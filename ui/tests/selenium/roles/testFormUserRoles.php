@@ -626,7 +626,7 @@ class testFormUserRoles extends CWebTest {
 						'User type' => 'Super admin',
 						'Default access to new modules' => false,
 						'API methods' => 'Deny list',
-						'Monitoring' => ['Overview', 'Maps'],
+						'Monitoring' => ['Maps'],
 						'Reports' => [],
 						'Create and edit dashboards' => false
 					],

@@ -336,7 +336,6 @@ class CRouter {
 		'jsrpc.php'						=> ['CLegacyAction', null, null],
 		'maintenance.php'				=> ['CLegacyAction', null, null],
 		'map.php'						=> ['CLegacyAction', null, null],
-		'overview.php'					=> ['CLegacyAction', null, null],
 		'report2.php'					=> ['CLegacyAction', null, null],
 		'report4.php'					=> ['CLegacyAction', null, null],
 		'sysmap.php'					=> ['CLegacyAction', null, null],

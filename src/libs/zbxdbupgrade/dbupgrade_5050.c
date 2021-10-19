@@ -818,33 +818,55 @@ static int	DBpatch_5050072(void)
 
 static int	DBpatch_5050073(void)
 {
-	const ZBX_FIELD	field = {"geomaps_tile_provider", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
 
-	return DBadd_field("config", &field);
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx like 'web.overview.%%'"))
+		return FAIL;
+
+	return SUCCEED;
 }
 
 static int	DBpatch_5050074(void)
 {
-	const ZBX_FIELD	field = {"geomaps_tile_url", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
 
-	return DBadd_field("config", &field);
+	if (ZBX_DB_OK > DBexecute("delete from role_rule where name='ui.monitoring.overview'"))
+		return FAIL;
+
+	return SUCCEED;
 }
 
 static int	DBpatch_5050075(void)
 {
-	const ZBX_FIELD	field = {"geomaps_max_zoom", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"geomaps_tile_provider", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
 static int	DBpatch_5050076(void)
 {
-	const ZBX_FIELD	field = {"geomaps_attribution", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"geomaps_tile_url", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
 static int	DBpatch_5050077(void)
+{
+	const ZBX_FIELD	field = {"geomaps_max_zoom", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_5050078(void)
+{
+	const ZBX_FIELD	field = {"geomaps_attribution", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_5050079(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -933,5 +955,7 @@ DBPATCH_ADD(5050074, 0, 1)
 DBPATCH_ADD(5050075, 0, 1)
 DBPATCH_ADD(5050076, 0, 1)
 DBPATCH_ADD(5050077, 0, 1)
+DBPATCH_ADD(5050078, 0, 1)
+DBPATCH_ADD(5050079, 0, 1)
 
 DBPATCH_END()
