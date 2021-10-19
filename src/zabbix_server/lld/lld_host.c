@@ -830,7 +830,7 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 {
 	char			*buffer = NULL;
 	int			i;
-	zbx_lld_host_t		*host;
+	zbx_lld_host_t		*host = NULL;
 	zbx_vector_db_tag_ptr_t	tmp_tags;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -913,6 +913,12 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 	}
 	else
 	{
+		if (NULL == host)
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
+		}
+
 		/* host technical name */
 		if (0 != strcmp(host->host_proto, host_proto))	/* the new host prototype differs */
 		{
@@ -1224,7 +1230,7 @@ static zbx_lld_group_t	*lld_group_make(zbx_vector_ptr_t *groups, zbx_uint64_t gr
 {
 	char		*buffer = NULL;
 	int		i;
-	zbx_lld_group_t	*group;
+	zbx_lld_group_t	*group = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1289,6 +1295,12 @@ static zbx_lld_group_t	*lld_group_make(zbx_vector_ptr_t *groups, zbx_uint64_t gr
 	}
 	else
 	{
+		if (NULL == group)
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
+		}
+
 		/* update an already existing group */
 
 		/* group name */
@@ -3953,7 +3965,7 @@ static void	lld_interface_make(zbx_vector_ptr_t *interfaces, zbx_uint64_t parent
 		const char *privpassphrase, unsigned char authprotocol, unsigned char privprotocol,
 		const char *contextname)
 {
-	zbx_lld_interface_t	*interface;
+	zbx_lld_interface_t	*interface = NULL;
 	int			i;
 
 	for (i = 0; i < interfaces->values_num; i++)
@@ -3993,6 +4005,12 @@ static void	lld_interface_make(zbx_vector_ptr_t *interfaces, zbx_uint64_t parent
 	}
 	else
 	{
+		if (NULL == interface)
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
+		}
+
 		/* interface which are already added */
 		if (interface->type != type)
 		{

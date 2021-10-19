@@ -1226,7 +1226,7 @@ static int	lld_function_make(const zbx_lld_function_t *function_proto, zbx_vecto
 		char **error)
 {
 	int			i, ret;
-	zbx_lld_function_t	*function;
+	zbx_lld_function_t	*function = NULL;
 	char			*proto_parameter = NULL;
 
 	for (i = 0; i < functions->values_num; i++)
@@ -1262,6 +1262,12 @@ static int	lld_function_make(const zbx_lld_function_t *function_proto, zbx_vecto
 	}
 	else
 	{
+		if (NULL == function)
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
+		}
+
 		if (function->itemid != itemid)
 		{
 			function->itemid_orig = function->itemid;
@@ -1722,7 +1728,7 @@ static void 	lld_trigger_dependency_make(const zbx_lld_trigger_prototype_t *trig
 {
 	zbx_lld_trigger_t			*trigger, *dep_trigger;
 	const zbx_lld_trigger_prototype_t	*dep_trigger_prototype;
-	zbx_lld_dependency_t			*dependency;
+	zbx_lld_dependency_t			*dependency = NULL;
 	zbx_uint64_t				triggerid_up;
 	int					i, j, index;
 
@@ -1782,6 +1788,12 @@ static void 	lld_trigger_dependency_make(const zbx_lld_trigger_prototype_t *trig
 				}
 
 				zbx_vector_ptr_append(&dep_trigger->dependents, trigger);
+
+				if (NULL == dependency)
+				{
+					THIS_SHOULD_NEVER_HAPPEN;
+					exit(EXIT_FAILURE);
+				}
 
 				dependency->trigger_up = dep_trigger;
 				dependency->flags = ZBX_FLAG_LLD_DEPENDENCY_DISCOVERED;

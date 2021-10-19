@@ -1103,7 +1103,7 @@ static void	lld_item_dependencies_get(const zbx_vector_ptr_t *item_prototypes, z
 
 		while (NULL != (row = DBfetch(result)))
 		{
-			zbx_item_dependence_t	*dependence;
+			zbx_item_dependence_t	*dependence = NULL;
 			zbx_uint64_t		itemid, master_itemid;
 			unsigned int		item_flags;
 
@@ -1128,6 +1128,12 @@ static void	lld_item_dependencies_get(const zbx_vector_ptr_t *item_prototypes, z
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			{
 				zbx_vector_uint64_append(&next_check_masterids, dependence->itemid);
+			}
+
+			if (NULL == dependence)
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				exit(EXIT_FAILURE);
 			}
 
 			if (NEXT_CHECK_BY_ITEM_IDS != check_type || 0 == dependence->master_itemid)
