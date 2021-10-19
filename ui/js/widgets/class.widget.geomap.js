@@ -211,6 +211,16 @@ class CWidgetGeoMap extends CWidget {
 
 			e.preventDefault();
 		});
+
+		// Close opened hintboxes when moving/zooming/resizing widget.
+		this._map.on('zoomstart movestart resize', () => {
+			const markers = this._map._container.parentNode.querySelectorAll('.marker-cluster, .leaflet-marker-icon');
+			[...markers].forEach((m) => {
+				if ('hintboxid' in m) {
+					hintBox.deleteHint(m);
+				}
+			});
+		});
 	}
 
 	/**
