@@ -302,8 +302,10 @@ $DB[\'VAULT_TOKEN\']		= \''.addcslashes($this->config['DB']['VAULT_TOKEN'], "'\\
 // For upgraded installations, please read database upgrade notes before enabling this option.
 $DB[\'DOUBLE_IEEE754\']	= '.($this->config['DB']['DOUBLE_IEEE754'] ? 'true' : 'false').';
 
+// Uncomment and set to desired values to override Zabbix hostname/IP and port.
 // $ZBX_SERVER			= \'\';
 // $ZBX_SERVER_PORT		= \'\';
+
 $ZBX_SERVER_NAME		= \''.addcslashes($this->config['ZBX_SERVER_NAME'], "'\\").'\';
 
 $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
