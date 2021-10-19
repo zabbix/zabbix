@@ -772,6 +772,48 @@ class testFormTrigger extends CLegacyWebTest {
 						]
 					]
 				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'description' => 'MyTrigger_rate_good',
+					'expression' => 'rate(/Simple form test host/test-item-reuse,2m:now-1h)>0.5',
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'description' => 'MyTrigger_rate_bad_second_par',
+					'expression' => 'rate(/Simple form test host/test-item-reuse,test)>0.5',
+					'error_msg' => 'Cannot add trigger',
+					'errors' => [
+						"Invalid parameter \"/1/expression\": incorrect expression starting from ".
+						"\"rate(/Simple form test host/test-item-reuse,test)>0.5\"."
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'description' => 'MyTrigger_rate_no_slash',
+					'expression' => 'rate(Simple form test host/test-item-reuse,1h)>0.5',
+					'error_msg' => 'Cannot add trigger',
+					'errors' => [
+						"Invalid parameter \"/1/expression\": incorrect expression starting from ".
+						"\"rate(Simple form test host/test-item-reuse,1h)>0.5\"."
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'description' => 'MyTrigger_rate_bad_key',
+					'expression' => 'rate(/Simple form test host/test,1h)>0.5',
+					'error_msg' => 'Cannot add trigger',
+					'errors' => [
+						'Incorrect item key "test" provided for trigger expression on "Simple form test host".'
+					]
+				]
 			]
 		];
 	}
@@ -892,6 +934,7 @@ class testFormTrigger extends CLegacyWebTest {
 
 		if (!isset($data['constructor'])) {
 			$this->zbxTestClickWait('add');
+			$this->page->waitUntilReady();
 			switch ($data['expected']) {
 				case TEST_GOOD:
 					$this->zbxTestWaitUntilMessageTextPresent('msg-good' ,'Trigger added');
@@ -900,12 +943,7 @@ class testFormTrigger extends CLegacyWebTest {
 					$this->zbxTestAssertElementText("//a[text()='$description']/ancestor::tr/td[6]", $expression);
 					break;
 				case TEST_BAD:
-					$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error_msg']);
-					$this->zbxTestCheckTitle('Configuration of triggers');
-					foreach ($data['errors'] as $msg) {
-						$msg = str_replace('<', '&lt;', $msg);
-						$this->zbxTestTextPresent($msg);
-					}
+					$this->assertMessage(TEST_BAD, $data['error_msg'], $data['errors']);
 					$this->zbxTestTextPresent('Name');
 					$this->zbxTestTextPresent('Expression');
 					$this->zbxTestTextPresent('Description');
