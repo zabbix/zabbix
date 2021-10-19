@@ -777,7 +777,7 @@ class testFormTrigger extends CLegacyWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'description' => 'MyTrigger_rate_good',
-					'expression' => 'rate(/Simple form test host/test-item-reuse,2m:now-1h)>0.5',
+					'expression' => 'rate(/Simple form test host/test-item-reuse,2m:now-1h)>0.5'
 				]
 			],
 			[
