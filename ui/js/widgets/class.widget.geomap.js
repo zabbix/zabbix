@@ -103,9 +103,6 @@ class CWidgetGeoMap extends CWidget {
 
 		// Create markers layer.
 		this._markers = L.geoJSON([], {
-			onEachFeature: function (point, layer) {
-				layer.bindPopup(this.makePopupContent.bind(this, [point]));
-			}.bind(this),
 			pointToLayer: function (point, ll) {
 				return L.marker(ll, {
 					icon: this._icons[point.properties.severity]
@@ -139,12 +136,52 @@ class CWidgetGeoMap extends CWidget {
 
 		this._map.getContainer().addEventListener('cluster.click', (e) => {
 			const cluster = e.detail;
-			const hosts = cluster.layer.getAllChildMarkers().map(o => o.feature);
+			const node = cluster.originalEvent.srcElement.classList.contains('marker-cluster')
+				? cluster.originalEvent.srcElement
+				: cluster.originalEvent.srcElement.closest('.marker-cluster');
 
-			L.popup()
-				.setContent(this.makePopupContent(hosts))
-				.setLatLng(cluster.layer.getLatLng())
-				.openOn(this._map);
+			if ('hintBoxItem' in node) {
+				return;
+			}
+
+			const container = this._map._container;
+			const content = this.makePopupContent(cluster.layer.getAllChildMarkers().map(o => o.feature));
+			const style = [
+				'left: 0px;',
+				'top: 0px;',
+				'max-height: 90vh;',
+				'overflow: auto;',
+				'display: block;'
+			].join('');
+
+			node.hintBoxItem = hintBox.createBox(e, node, content, '', true, style, container.parentNode);
+
+			node.hintBoxItem.position({
+				of: node.hintBoxItem,
+				my: 'center bottom',
+				at: `left+${cluster.containerPoint.x}px top+${cluster.containerPoint.y+15}px`,
+				collision: 'fit'
+			});
+		});
+
+		this._markers.on('click', (e) => {
+			const node = e.originalEvent.srcElement;
+			if ('hintBoxItem' in node) {
+				return;
+			}
+
+			const container = this._map._container;
+			const content = this.makePopupContent([e.layer.feature]);
+			const style = 'left: 0px; top: 0px;';
+
+			node.hintBoxItem = hintBox.createBox(e, node, content, '', true, style, container.parentNode);
+
+			node.hintBoxItem.position({
+				of: node.hintBoxItem,
+				my: 'center bottom',
+				at: `left+${e.containerPoint.x}px top+${e.containerPoint.y-10}px`,
+				collision: 'fit'
+			});
 		});
 
 		this._map.getContainer().addEventListener('cluster.dblclick', (e) => {
@@ -312,7 +349,7 @@ class CWidgetGeoMap extends CWidget {
 			return rows;
 		};
 
-		return `
+		const html = `
 			<table class="list-table">
 			<thead>
 			<tr>
@@ -327,6 +364,12 @@ class CWidgetGeoMap extends CWidget {
 			</thead>
 			<tbody>${makeTableRows()}</tbody>
 			</table>`;
+
+		// Make DOM.
+		const dom = document.createElement('template');
+		dom.innerHTML = html;
+
+		return dom.content;
 	}
 
 	/**
