@@ -2494,6 +2494,25 @@ class CAction extends CApiService {
 						));
 					}
 				}
+
+				if ($condition['conditiontype'] == CONDITION_TYPE_DVALUE) {
+					if ($condition['operator'] == CONDITION_OPERATOR_EQUAL
+							|| $condition['operator'] == CONDITION_OPERATOR_NOT_EQUAL) {
+						continue;
+					}
+
+					if (!array_key_exists('value', $condition)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+							$path.'/conditions/'.($j + 1), _s('the parameter "%1$s" is missing', 'value')
+						));
+					}
+
+					if ($condition['value'] === '') {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+							$path.'/conditions/'.($j + 1).'/value', _('cannot be empty')
+						));
+					}
+				}
 			}
 		}
 	}
