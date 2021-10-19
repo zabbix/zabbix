@@ -453,6 +453,7 @@ void	zbx_audit_update_json_append_string(const zbx_uint64_t id, const int id_tab
 		return;
 
 	local_audit_entry.id = id;
+	local_audit_entry.cuid = NULL;
 	local_audit_entry.id_table = id_table;
 	found_audit_entry = (zbx_audit_entry_t**)zbx_hashset_search(&zbx_audit, &(local_audit_entry_x));
 
@@ -475,6 +476,7 @@ void	zbx_audit_update_json_append_string_secret(const zbx_uint64_t id, const int
 		return;
 
 	local_audit_entry.id = id;
+	local_audit_entry.cuid = NULL;
 	local_audit_entry.id_table = id_table;
 	found_audit_entry = (zbx_audit_entry_t**)zbx_hashset_search(&zbx_audit, &(local_audit_entry_x));
 
@@ -499,6 +501,7 @@ void	zbx_audit_update_json_append_uint64(const zbx_uint64_t id, const int id_tab
 		return;
 
 	local_audit_entry.id = id;
+	local_audit_entry.cuid = NULL;
 	local_audit_entry.id_table = id_table;
 	found_audit_entry = (zbx_audit_entry_t**)zbx_hashset_search(&zbx_audit, &(local_audit_entry_x));
 
@@ -516,6 +519,7 @@ void	zbx_audit_update_json_append_uint64(const zbx_uint64_t id, const int id_tab
 	zbx_audit_entry_t	*local_audit_entry_x = &local_audit_entry;	\
 										\
 	local_audit_entry.id = id;						\
+	local_audit_entry.cuid = NULL;						\
 	local_audit_entry.id_table = id_table;					\
 	found_audit_entry = (zbx_audit_entry_t**)zbx_hashset_search(&zbx_audit,	\
 			&(local_audit_entry_x));				\

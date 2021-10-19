@@ -287,7 +287,7 @@ void	zbx_rtc_process_command(int command)
 		case ZBX_RTC_HA_REMOVE_NODE:
 			rtc_remove_node(ZBX_RTC_GET_DATA(command));
 			break;
-		case ZBX_RTC_HA_FAILOVER_DELAY:
+		case ZBX_RTC_HA_SET_FAILOVER_DELAY:
 			rtc_ha_failover_delay(ZBX_RTC_GET_DATA(command));
 			break;
 		case ZBX_RTC_LOG_LEVEL_INCREASE:

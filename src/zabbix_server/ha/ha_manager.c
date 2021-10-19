@@ -1360,7 +1360,7 @@ out:
 	data = zbx_malloc(NULL, len);
 	zbx_serialize_str(data, error, error_len);
 
-	zbx_ipc_client_send(client, ZBX_IPC_SERVICE_HA_FAILOVER_DELAY, data, len);
+	zbx_ipc_client_send(client, ZBX_IPC_SERVICE_HA_SET_FAILOVER_DELAY, data, len);
 	zbx_free(data);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -1542,7 +1542,7 @@ int	zbx_ha_set_failover_delay(int delay, char **error)
 	unsigned char		*data;
 	zbx_uint32_t		error_len;
 
-	if (SUCCEED != zbx_ipc_async_exchange(ZBX_IPC_SERVICE_HA, ZBX_IPC_SERVICE_HA_FAILOVER_DELAY,
+	if (SUCCEED != zbx_ipc_async_exchange(ZBX_IPC_SERVICE_HA, ZBX_IPC_SERVICE_HA_SET_FAILOVER_DELAY,
 			ZBX_HA_SERVICE_TIMEOUT, (unsigned char *)&delay, sizeof(delay), &data, error))
 	{
 		return FAIL;
@@ -1853,7 +1853,7 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 				case ZBX_IPC_SERVICE_HA_REMOVE_NODE:
 					ha_remove_node(&info, client, message);
 					break;
-				case ZBX_IPC_SERVICE_HA_FAILOVER_DELAY:
+				case ZBX_IPC_SERVICE_HA_SET_FAILOVER_DELAY:
 					ha_set_failover_delay(&info, client, message);
 					break;
 				case ZBX_IPC_SERVICE_HA_LOGLEVEL_INCREASE:

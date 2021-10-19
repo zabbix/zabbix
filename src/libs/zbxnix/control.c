@@ -250,15 +250,15 @@ int	parse_rtc_options(const char *opt, unsigned char program_type, int *message)
 		}
 	}
 	else if (0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER)) &&
-			0 == strncmp(opt, ZBX_HA_FAILOVER_DELAY, ZBX_CONST_STRLEN(ZBX_HA_FAILOVER_DELAY)))
+			0 == strncmp(opt, ZBX_HA_SET_FAILOVER_DELAY, ZBX_CONST_STRLEN(ZBX_HA_SET_FAILOVER_DELAY)))
 	{
 		int	delay;
 
-		if ('=' == opt[ZBX_CONST_STRLEN(ZBX_HA_FAILOVER_DELAY)] &&
-				SUCCEED == is_time_suffix(opt + ZBX_CONST_STRLEN(ZBX_HA_FAILOVER_DELAY) + 1, &delay,
+		if ('=' == opt[ZBX_CONST_STRLEN(ZBX_HA_SET_FAILOVER_DELAY)] &&
+				SUCCEED == is_time_suffix(opt + ZBX_CONST_STRLEN(ZBX_HA_SET_FAILOVER_DELAY) + 1, &delay,
 				ZBX_LENGTH_UNLIMITED))
 		{
-			command = ZBX_RTC_HA_FAILOVER_DELAY;
+			command = ZBX_RTC_HA_SET_FAILOVER_DELAY;
 			scope = 0;
 			data = (unsigned int)delay;
 		}

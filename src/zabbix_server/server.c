@@ -125,7 +125,7 @@ const char	*help_message[] = {
 	"      " ZBX_SERVICE_CACHE_RELOAD "        Reload service manager cache",
 	"      " ZBX_HA_STATUS "                   Log HA cluster status",
 	"      " ZBX_HA_REMOVE_NODE "=target       Remove the HA node specified by its listed number",
-	"      " ZBX_HA_FAILOVER_DELAY "=delay     Set HA failover delay",
+	"      " ZBX_HA_SET_FAILOVER_DELAY "=delay Set HA failover delay",
 	"",
 	"      Log level control targets:",
 	"        process-type              All processes of specified type",
