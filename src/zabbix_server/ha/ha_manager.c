@@ -997,7 +997,7 @@ static void	ha_check_nodes(zbx_ha_info_t *info)
 {
 	zbx_vector_ha_node_t	nodes;
 	zbx_ha_node_t		*node;
-	int			ha_status, db_time, unavailable_index = 0;
+	int			ha_status, db_time, unavailable_index = FAIL;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 
@@ -1065,7 +1065,7 @@ static void	ha_check_nodes(zbx_ha_info_t *info)
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where ha_nodeid='%s'", info->ha_nodeid.str);
 
-	if (SUCCEED == ha_db_execute(info, "%s", sql) && 0 != unavailable_index)
+	if (SUCCEED == ha_db_execute(info, "%s", sql) && FAIL != unavailable_index)
 	{
 		zbx_ha_node_t	*last_active = nodes.values[unavailable_index];
 
