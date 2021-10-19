@@ -816,9 +816,9 @@ class testFormValueMappings extends CWebTest {
 	 * @param string $action	Action to be performed with value mappings.
 	 */
 	public function checkAction($data, $source, $action) {
-		if (static::$previous_class !== get_called_class()) {
-			static::$previous_class = get_called_class();
-			static::$previous_valuemap_name = static::UPDATE_VALUEMAP1;
+		if (self::$previous_class !== get_called_class()) {
+			self::$previous_class = get_called_class();
+			self::$previous_valuemap_name = static::UPDATE_VALUEMAP1;
 		}
 
 		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
