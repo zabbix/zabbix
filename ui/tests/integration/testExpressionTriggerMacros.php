@@ -303,7 +303,7 @@ class testEscalations extends CIntegrationTest {
 
 		$response = $this->call('alert.get', [
 			'actionids' => [self::$trigger_actionid],
-			'output' => 'extend',
+			'output' => 'extend'
 		]);
 		$this->assertArrayHasKey(2, $response['result']);
 

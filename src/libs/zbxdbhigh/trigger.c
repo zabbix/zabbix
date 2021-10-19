@@ -836,14 +836,13 @@ static void	evaluate_function_by_id(zbx_uint64_t functionid, char **value, int (
 		if (SUCCEED == err_item)
 		{
 			char		*error = NULL;
-			int		eval_ret;
 			zbx_variant_t	var;
 			zbx_timespec_t	ts;
 
 			zbx_timespec(&ts);
 
-			if (SUCCEED == (eval_ret = eval_func_cb(&var, &item, function.function,
-					function.parameter, &ts, &error)) && ZBX_VARIANT_NONE != var.type)
+			if (SUCCEED == eval_func_cb(&var, &item, function.function,
+					function.parameter, &ts, &error) && ZBX_VARIANT_NONE != var.type)
 			{
 				*value = zbx_strdup(NULL, zbx_variant_value_desc(&var));
 				zbx_variant_clear(&var);
