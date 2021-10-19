@@ -1320,4 +1320,418 @@ final class CItemData {
 
 		return $type_suggestions;
 	}
+
+	/**
+	 * Returns sets of elements (DOM IDs, default field values, dependent option values) to set visible,
+	 * disabled, or set value of, when a 'parent' field value is changed.
+	 *
+	 * @param array $data
+	 * @param bool  $data['is_discovery_rule']  Determines default value for ITEM_TYPE_DB_MONITOR Key field.
+	 *
+	 * @return array
+	 */
+	public static function fieldSwitchingConfiguration($data): array {
+		return [
+			// Ids to toggle when the field 'type' is changed.
+			'for_type' => [
+				ITEM_TYPE_CALCULATED => [
+					'delay',
+					'js-item-delay-field',
+					'js-item-delay-label',
+					'js-item-flex-intervals-field',
+					'js-item-flex-intervals-label',
+					'js-item-formula-field',
+					'js-item-formula-label',
+					'js-item-trends-field',
+					'js-item-trends-label',
+					['id' => 'key', 'defaultValue' => '']
+				],
+				ITEM_TYPE_DB_MONITOR => [
+					'delay',
+					'js-item-delay-field',
+					'js-item-delay-label',
+					'js-item-flex-intervals-field',
+					'js-item-flex-intervals-label',
+					'js-item-password-field',
+					'js-item-password-label',
+					'js-item-sql-query-field',
+					'js-item-sql-query-label',
+					'js-item-trends-field',
+					'js-item-trends-label',
+					'js-item-username-field',
+					'js-item-username-label',
+					'password',
+					'username',
+					['id' => 'key', 'defaultValue' => $data['is_discovery_rule']
+						? ZBX_DEFAULT_KEY_DB_MONITOR_DISCOVERY
+						: ZBX_DEFAULT_KEY_DB_MONITOR
+					]
+				],
+				ITEM_TYPE_DEPENDENT => [
+					'js-item-master-item-field',
+					'js-item-master-item-label',
+					'js-item-trends-field',
+					'js-item-trends-label',
+					['id' => 'key', 'defaultValue' => '']
+				],
+				ITEM_TYPE_EXTERNAL => [
+					'delay',
+					'interfaceid',
+					'js-item-delay-field',
+					'js-item-delay-label',
+					'js-item-flex-intervals-field',
+					'js-item-flex-intervals-label',
+					'js-item-interface-field',
+					'js-item-interface-label',
+					'js-item-trends-field',
+					'js-item-trends-label',
+					['id' => 'key', 'defaultValue' => '']
+				],
+				ITEM_TYPE_HTTPAGENT => [
+					'allow_traps',
+					'delay',
+					'http_authtype',
+					'interfaceid',
+					'js-item-allow-traps-field',
+					'js-item-allow-traps-label',
+					'js-item-delay-field',
+					'js-item-delay-label',
+					'js-item-flex-intervals-field',
+					'js-item-flex-intervals-label',
+					'js-item-follow-redirects-field',
+					'js-item-follow-redirects-label',
+					'js-item-headers-field',
+					'js-item-headers-label',
+					'js-item-http-authtype-field',
+					'js-item-http-authtype-label',
+					'js-item-http-proxy-field',
+					'js-item-http-proxy-label',
+					'js-item-interface-field',
+					'js-item-interface-label',
+					'js-item-output-format-field',
+					'js-item-output-format-label',
+					'js-item-post-type-field',
+					'js-item-post-type-label',
+					'js-item-posts-field',
+					'js-item-posts-label',
+					'js-item-query-fields-field',
+					'js-item-query-fields-label',
+					'js-item-request-method-field',
+					'js-item-request-method-label',
+					'js-item-retrieve-mode-field',
+					'js-item-retrieve-mode-label',
+					'js-item-ssl-cert-file-field',
+					'js-item-ssl-cert-file-label',
+					'js-item-ssl-key-file-field',
+					'js-item-ssl-key-file-label',
+					'js-item-ssl-key-password-field',
+					'js-item-ssl-key-password-label',
+					'js-item-status-codes-field',
+					'js-item-status-codes-label',
+					'js-item-timeout-field',
+					'js-item-timeout-label',
+					'js-item-trends-field',
+					'js-item-trends-label',
+					'js-item-url-field',
+					'js-item-url-label',
+					'js-item-verify-host-field',
+					'js-item-verify-host-label',
+					'js-item-verify-peer-field',
+					'js-item-verify-peer-label',
+					'request_method',
+					'trapper_hosts',
+					['id' => 'key', 'defaultValue' => '']
+				],
+				ITEM_TYPE_INTERNAL => [
+					'delay',
+					'js-item-delay-field',
+					'js-item-delay-label',
+					'js-item-flex-intervals-field',
+					'js-item-flex-intervals-label',
+					'js-item-trends-field',
+					'js-item-trends-label',
+					['id' => 'key', 'defaultValue' => '']
+				],
+				ITEM_TYPE_IPMI => [
+					'delay',
+					'interfaceid',
+					'ipmi_sensor',
+					'js-item-delay-field',
+					'js-item-delay-label',
+					'js-item-flex-intervals-field',
+					'js-item-flex-intervals-label',
+					'js-item-impi-sensor-field',
+					'js-item-impi-sensor-label',
+					'js-item-interface-field',
+					'js-item-interface-label',
+					'js-item-trends-field',
+					'js-item-trends-label',
+					['id' => 'key', 'defaultValue' => '']
+				],
+				ITEM_TYPE_JMX => [
+					'delay',
+					'interfaceid',
+					'jmx_endpoint',
+					'js-item-delay-field',
+					'js-item-delay-label',
+					'js-item-flex-intervals-field',
+					'js-item-flex-intervals-label',
+					'js-item-interface-field',
+					'js-item-interface-label',
+					'js-item-jmx-endpoint-field',
+					'js-item-jmx-endpoint-label',
+					'js-item-password-field',
+					'js-item-password-label',
+					'js-item-trends-field',
+					'js-item-trends-label',
+					'js-item-username-field',
+					'js-item-username-label',
+					'password',
+					'username',
+					['id' => 'key', 'defaultValue' => '']
+				],
+				ITEM_TYPE_SCRIPT => [
+					'delay',
+					'js-item-delay-field',
+					'js-item-delay-label',
+					'js-item-flex-intervals-field',
+					'js-item-flex-intervals-label',
+					'js-item-parameters-field',
+					'js-item-parameters-label',
+					'js-item-script-field',
+					'js-item-script-label',
+					'js-item-timeout-field',
+					'js-item-timeout-label',
+					'js-item-trends-field',
+					'js-item-trends-label',
+					['id' => 'key', 'defaultValue' => '']
+				],
+				ITEM_TYPE_SIMPLE => [
+					'delay',
+					'interfaceid',
+					'js-item-delay-field',
+					'js-item-delay-label',
+					'js-item-flex-intervals-field',
+					'js-item-flex-intervals-label',
+					'js-item-interface-field',
+					'js-item-interface-label',
+					'js-item-password-field',
+					'js-item-password-label',
+					'js-item-trends-field',
+					'js-item-trends-label',
+					'js-item-username-field',
+					'js-item-username-label',
+					'password',
+					'status',
+					'username',
+					['id' => 'key', 'defaultValue' => '']
+				],
+				ITEM_TYPE_SNMP => [
+					'delay',
+					'interfaceid',
+					'js-item-delay-field',
+					'js-item-delay-label',
+					'js-item-flex-intervals-field',
+					'js-item-flex-intervals-label',
+					'js-item-interface-field',
+					'js-item-interface-label',
+					'js-item-snmp-oid-field',
+					'js-item-snmp-oid-label',
+					'snmp_oid',
+					['id' => 'key', 'defaultValue' => '']
+				],
+				ITEM_TYPE_SNMPTRAP => [
+					'interfaceid',
+					'js-item-interface-field',
+					'js-item-interface-label',
+					'js-item-trends-field',
+					'js-item-trends-label',
+					['id' => 'key', 'defaultValue' => '']
+				],
+				ITEM_TYPE_SSH => [
+					'authtype',
+					'delay',
+					'interfaceid',
+					'js-item-authtype-field',
+					'js-item-authtype-label',
+					'js-item-delay-field',
+					'js-item-delay-label',
+					'js-item-executed-script-field',
+					'js-item-executed-script-label',
+					'js-item-flex-intervals-field',
+					'js-item-flex-intervals-label',
+					'js-item-interface-field',
+					'js-item-interface-label',
+					'js-item-password-field',
+					'js-item-password-label',
+					'js-item-trends-field',
+					'js-item-trends-label',
+					'js-item-username-field',
+					'js-item-username-label',
+					'params_script',
+					'password',
+					'username',
+					['id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_SSH]
+				],
+				ITEM_TYPE_TELNET => [
+					'delay',
+					'interfaceid',
+					'js-item-delay-field',
+					'js-item-delay-label',
+					'js-item-executed-script-field',
+					'js-item-executed-script-label',
+					'js-item-flex-intervals-field',
+					'js-item-flex-intervals-label',
+					'js-item-interface-field',
+					'js-item-interface-label',
+					'js-item-password-field',
+					'js-item-password-label',
+					'js-item-trends-field',
+					'js-item-trends-label',
+					'js-item-username-field',
+					'js-item-username-label',
+					'params_script',
+					'password',
+					'username',
+					['id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_TELNET]
+				],
+				ITEM_TYPE_TRAPPER => [
+					'js-item-trapper-hosts-field',
+					'js-item-trapper-hosts-label',
+					'js-item-trends-field',
+					'js-item-trends-label',
+					'trapper_hosts',
+					['id' => 'key', 'defaultValue' => '']
+				],
+				ITEM_TYPE_ZABBIX => [
+					'delay',
+					'interfaceid',
+					'js-item-delay-field',
+					'js-item-delay-label',
+					'js-item-flex-intervals-field',
+					'js-item-flex-intervals-label',
+					'js-item-interface-field',
+					'js-item-interface-label',
+					'js-item-trends-field',
+					'js-item-trends-label',
+					['id' => 'key', 'defaultValue' => '']
+				],
+				ITEM_TYPE_ZABBIX_ACTIVE => [
+					'delay',
+					'js-item-delay-field',
+					'js-item-delay-label',
+					'js-item-flex-intervals-field',
+					'js-item-flex-intervals-label',
+					['id' => 'key', 'defaultValue' => '']
+				]
+			],
+			// Ids to toggle when the field 'authtype' is changed.
+			'for_authtype' => [
+				ITEM_AUTHTYPE_PUBLICKEY => [
+					'js-item-private-key-field',
+					'js-item-private-key-label',
+					'js-item-public-key-field',
+					'js-item-public-key-label',
+					'privatekey',
+					'publickey'
+				]
+			],
+			// Dropdown entries of parent with {id} to disable for specific type.
+			'disable_for_type' => [
+				ITEM_TYPE_CALCULATED => [
+					'value_type' => [
+						ITEM_VALUE_TYPE_STR,
+						ITEM_VALUE_TYPE_LOG,
+						ITEM_VALUE_TYPE_TEXT
+					],
+					'value_type_steps' => [
+						ITEM_VALUE_TYPE_STR,
+						ITEM_VALUE_TYPE_LOG,
+						ITEM_VALUE_TYPE_TEXT
+					]
+				]
+			],
+			'for_http_auth_type' => [
+				HTTPTEST_AUTH_BASIC => [
+					'js-item-http-username-label',
+					'js-item-http-username-field',
+					'js-item-http-password-label',
+					'js-item-http-password-field'
+				],
+				HTTPTEST_AUTH_NTLM => [
+					'js-item-http-username-label',
+					'js-item-http-username-field',
+					'js-item-http-password-label',
+					'js-item-http-password-field'
+				],
+				HTTPTEST_AUTH_KERBEROS => [
+					'js-item-http-username-label',
+					'js-item-http-username-field',
+					'js-item-http-password-label',
+					'js-item-http-password-field'
+				],
+				HTTPTEST_AUTH_DIGEST => [
+					'js-item-http-username-label',
+					'js-item-http-username-field',
+					'js-item-http-password-label',
+					'js-item-http-password-field'
+				]
+			],
+			'for_traps' => [
+				HTTPCHECK_ALLOW_TRAPS_ON => [
+					'js-item-trapper-hosts-label',
+					'js-item-trapper-hosts-field'
+				]
+			],
+			'for_value_type' => [
+				ITEM_VALUE_TYPE_FLOAT => [
+					'inventory_link',
+					'js-item-inventory-link-field',
+					'js-item-inventory-link-label',
+					'js-item-trends-field',
+					'js-item-trends-label',
+					'js-item-units-field',
+					'js-item-units-label',
+					'js-item-value-map-field',
+					'js-item-value-map-label',
+					'units',
+					'valuemap_name',
+					'valuemapid'
+				],
+				ITEM_VALUE_TYPE_LOG => [
+					'js-item-log-time-format-field',
+					'js-item-log-time-format-label',
+					'logtimefmt'
+				],
+				ITEM_VALUE_TYPE_STR => [
+					'inventory_link',
+					'js-item-inventory-link-field',
+					'js-item-inventory-link-label',
+					'js-item-value-map-field',
+					'js-item-value-map-label',
+					'valuemap_name',
+					'valuemapid'
+				],
+				ITEM_VALUE_TYPE_TEXT => [
+					'inventory_link',
+					'js-item-inventory-link-field',
+					'js-item-inventory-link-label'
+				],
+				ITEM_VALUE_TYPE_UINT64 => [
+					'inventory_link',
+					'js-item-inventory-link-field',
+					'js-item-inventory-link-label',
+					'js-item-trends-field',
+					'js-item-trends-label',
+					'js-item-units-field',
+					'js-item-units-label',
+					'js-item-value-map-field',
+					'js-item-value-map-label',
+					'units',
+					'valuemap_name',
+					'valuemapid'
+				]
+			]
+		];
+	}
 }

@@ -57,9 +57,7 @@ include __DIR__.'/itemtest.js.php';
 		}
 
 		// field switchers
-		<?php if (!empty($data['value_type_element_toggles'])): ?>
-			new CViewSwitcher('value_type', 'change', <?= json_encode($data['value_type_element_toggles']) ?>);
-		<?php endif; ?>
+		new CViewSwitcher('value_type', 'change', item_form.field_switches.for_value_type);
 
 		var old_value,
 			value_type = $('#value_type');

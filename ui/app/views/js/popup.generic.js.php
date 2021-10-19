@@ -37,6 +37,7 @@ window.popup_generic = {
 
 	initGroupsFilter() {
 		var overlay = overlays_stack.end();
+
 		jQuery('.multiselect', overlay.$dialogue).each(function (i, ms) {
 			jQuery(ms).on('change', {overlay: overlay}, function (e) {
 				var groups = jQuery(this).multiSelect('getData').map(i => i.id),
@@ -50,6 +51,7 @@ window.popup_generic = {
 
 	initHostsFilter() {
 		var overlay = overlays_stack.end();
+
 		jQuery('.multiselect', overlay.$dialogue).each(function (i, ms) {
 			jQuery(ms).on('change', {overlay: overlay}, function (e) {
 				var hosts = jQuery(this).multiSelect('getData').map(i => i.id),
@@ -76,6 +78,7 @@ window.popup_generic = {
 
 	closePopup(sender) {
 		const $sender = jQuery(sender).removeAttr('onclick');
+
 		overlayDialogueDestroy($sender.closest('[data-dialogueid]').attr('data-dialogueid'));
 
 		return false;

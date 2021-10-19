@@ -31,8 +31,8 @@ include dirname(__FILE__).'/itemtest.js.php';
 <script type="text/javascript">
 	jQuery(document).ready(function($) {
 		function typeChangeHandler() {
-			// selected item type
-			var type = parseInt($('#type').val()),
+			// Selected item type.
+			var type = parseInt($('#type').val(), 10),
 				asterisk = '<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>';
 
 			$('#keyButton').prop('disabled',
@@ -56,15 +56,11 @@ include dirname(__FILE__).'/itemtest.js.php';
 			}
 		}
 
-		// field switchers
-		<?php if (!empty($data['value_type_element_toggles'])): ?>
-			new CViewSwitcher('value_type', 'change', <?= json_encode($data['value_type_element_toggles']) ?>);
-		<?php endif; ?>
+		// Field switchers.
+		new CViewSwitcher('value_type', 'change', item_form.field_switches.for_value_type);
 
 		$('#type')
-			.change(function() {
-				typeChangeHandler();
-			})
+			.change(typeChangeHandler)
 			.trigger('change');
 
 		// Whenever non-numeric type is changed back to numeric type, set the default value in "trends" field.

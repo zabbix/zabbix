@@ -50,7 +50,61 @@
 	</tr>
 </script>
 <script>
-	jQuery(function($) {
+	function setAuthTypeLabel() {
+		if (jQuery('#authtype').val() == <?= json_encode(ITEM_AUTHTYPE_PUBLICKEY) ?>
+				&& jQuery('#type').val() == <?= json_encode(ITEM_TYPE_SSH) ?>) {
+			jQuery('#row_password label').html(<?= json_encode(_('Key passphrase')) ?>);
+		}
+		else {
+			jQuery('#row_password label').html(<?= json_encode(_('Password')) ?>);
+		}
+	}
+
+	const item_form = {
+		init({interfaces, key_type_suggestions, testable_item_types, field_switches, interface_types}) {
+			this.interfaces = interfaces;
+			this.testable_item_types = testable_item_types;
+			this.field_switches = field_switches;
+			this.interface_types = interface_types;
+
+			if (typeof key_type_suggestions !== 'undefined') {
+				item_type_lookup.init(key_type_suggestions);
+			}
+		}
+	}
+
+	function updateItemFormElements() {
+		// test button
+		var testable_item_types = item_form.testable_item_types,
+			type = parseInt(jQuery('#type').val(), 10),
+			key = jQuery('#key').val();
+
+		if (type == <?= ITEM_TYPE_SIMPLE ?> && (key.substr(0, 7) === 'vmware.' || key.substr(0, 8) === 'icmpping')) {
+			jQuery('#test_item').prop('disabled', true);
+		}
+		else {
+			jQuery('#test_item').prop('disabled', (testable_item_types.indexOf(type) == -1));
+		}
+
+		// delay field
+		if (type == <?= ITEM_TYPE_ZABBIX_ACTIVE ?>) {
+			const toggle_fields = [
+				'delay',
+				'js-item-delay-label',
+				'js-item-delay-field',
+				'js-item-flex-intervals-label',
+				'js-item-flex-intervals-field'
+			];
+			const set_hidden = (key.substr(0, 8) === 'mqtt.get'),
+				object_switcher = globalAllObjForViewSwitcher['type'];
+
+			toggle_fields.forEach((element_id) =>
+				object_switcher[set_hidden ? 'hideObj' : 'showObj']({id: element_id})
+			);
+		}
+	}
+
+	jQuery(document).ready(function($) {
 		$('#delayFlexTable').on('click', 'input[type="radio"]', function() {
 			var rowNum = $(this).attr('id').split('_')[2];
 
@@ -66,249 +120,37 @@
 			}
 		});
 
-		$('#delayFlexTable').dynamicRows({
-			template: '#delayFlexRow'
-		});
-	});
-</script>
-<?php
+		$('#delayFlexTable').dynamicRows({template: '#delayFlexRow'});
 
-$element_toggles = itemFormElementToggles($data);
-?>
-<script>
-	const ZBX_STYLE_DISPLAY_NONE = <?= json_encode(ZBX_STYLE_DISPLAY_NONE) ?>;
+		new CViewSwitcher('authtype', 'change', item_form.field_switches.for_authtype);
 
-	const item_type_lookup = {
-		key_type_suggestions: [],
-		preprocessing_active: false,
-		form: null,
-		key_field: null,
-		item_tab_type_field: null,
-		preprocessing_tab_type_field: null,
-		preprocessing_tab_type_row_nodes: [],
-		last_lookup: '',
-		inferred_type: null,
-
-		init({key_type_suggestions}) {
-			this.key_type_suggestions = key_type_suggestions;
-			this.form = document.querySelector('#item-form, #item-prototype-form');
-			this.key_field = this.form.querySelector('[name=key]');
-			this.item_tab_type_field = this.form.querySelector('[name=value_type]');
-			this.item_tab_type_field_hint = this.form.querySelector('.js-item-type-hint');
-			this.preprocessing_tab_type_field = this.form.querySelector('[name=value_type_steps]');
-			this.preprocessing_tab_type_row_nodes = this.form.querySelectorAll('.js-item-preprocessing-type');
-
-			this.initPreprocessignTabField();
-			this.initItemTabField();
-			this.initLookupHooks();
-			this.initPreprocessingObserver();
-			this.updatePreprocessingState();
-
-			this.lookup(this.key_field.value, false);
-		},
-
-		initPreprocessignTabField() {
-			this.preprocessing_tab_type_field.readOnly = this.item_tab_type_field.readOnly;
-
-			this.preprocessing_tab_type_field.addEventListener('change', (e) => {
-				this.item_tab_type_field.value = this.preprocessing_tab_type_field.value;
-			});
-		},
-
-		initItemTabField() {
-			this.item_tab_type_field.addEventListener('change', (e) => {
-				this.preprocessing_tab_type_field.value = this.item_tab_type_field.value;
-
-				this.item_tab_type_field_hint.classList.toggle(ZBX_STYLE_DISPLAY_NONE, (
-					this.preprocessing_active || this.inferred_type === null
-							|| this.item_tab_type_field.value == this.inferred_type
-				));
-			});
-		},
-
-		initLookupHooks() {
-			['change', 'input', 'help_items.paste'].forEach((event_type) => {
-				this.key_field.addEventListener(event_type, (e) => {
-					if (this.preprocessing_active) {
-						return this.lookup(this.key_field.value, false);
-					}
-
-					this.lookup(this.key_field.value);
-				});
-			});
-		},
-
-		updatePreprocessingState() {
-			const last_state_active = this.preprocessing_active;
-				change_event = new CustomEvent('change');
-
-			this.preprocessing_active = (this.form.querySelector('.preprocessing-step') != null);
-
-			if (last_state_active && !this.preprocessing_active) {
-				this.last_lookup = '';
-				this.key_field.dispatchEvent(change_event);
-			}
-
-			this.preprocessing_tab_type_row_nodes.forEach((element) =>
-				element.classList.toggle(ZBX_STYLE_DISPLAY_NONE, !this.preprocessing_active)
-			);
-			this.item_tab_type_field.dispatchEvent(change_event);
-		},
-
-		initPreprocessingObserver() {
-			this.form.querySelector('#preprocessing').addEventListener('preprocessing.change',
-				() => this.updatePreprocessingState()
-			);
-		},
-
-		/**
-		 * Infer expected Item value type from (partial) key name.
-		 *
-		 * Best case scenario a direct match to a key name is found.
-		 * Otherwise a check is performed to see that key names matching so far are of the same type.
-		 * Else type is undetermined (null).
-		 *
-		 * @param {string}  key_part           Key name part entered.
-		 * @param {boolean} set_to_field=true  Pass False to perform background lookup, not updating input states.
-		 * @return {void}
-		 */
-		lookup(key_part, set_to_field = true) {
-			key_part = key_part
-				.split('[')
-				.shift()
-				.trimLeft()
-				.toLowerCase();
-
-			if (key_part === this.last_lookup) {
-				return;
-			}
-
-			this.last_lookup = key_part;
-			this.inferred_type = null;
-
-			if (key_part === '') {
-				return;
-			}
-
-			if (this.last_lookup in this.key_type_suggestions) {
-				this.inferred_type = this.key_type_suggestions[this.last_lookup];
-			}
-			else {
-				const matches = Object.entries(this.key_type_suggestions)
-						.filter(([key_name, value_type]) => key_name.startsWith(this.last_lookup));
-
-				if (matches.length > 0) {
-					const sample_type = matches[0][1];
-
-					if (matches.length == 1 || matches.every(([key_name, value_type]) => value_type === sample_type)) {
-						this.inferred_type = sample_type;
-					}
-				}
-			}
-
-			if (this.inferred_type === null) {
-				return;
-			}
-
-			if (set_to_field) {
-				this.item_tab_type_field.value = this.inferred_type;
-			}
-
-			this.item_tab_type_field.dispatchEvent(new CustomEvent('change'));
-		}
-	};
-
-	function setAuthTypeLabel() {
-		if (jQuery('#authtype').val() == <?= json_encode(ITEM_AUTHTYPE_PUBLICKEY) ?>
-				&& jQuery('#type').val() == <?= json_encode(ITEM_TYPE_SSH) ?>) {
-			jQuery('#row_password label').html(<?= json_encode(_('Key passphrase')) ?>);
-		}
-		else {
-			jQuery('#row_password label').html(<?= json_encode(_('Password')) ?>);
-		}
-	}
-
-	function updateItemFormElements() {
-		// test button
-		var testable_item_types = <?= json_encode(CControllerPopupItemTest::getTestableItemTypes($data['hostid'])) ?>,
-			type = parseInt(jQuery('#type').val(), 10),
-			key = jQuery('#key').val();
-
-		if (type == <?= ITEM_TYPE_SIMPLE ?> && (key.substr(0, 7) === 'vmware.' || key.substr(0, 8) === 'icmpping')) {
-			jQuery('#test_item').prop('disabled', true);
-		}
-		else {
-			jQuery('#test_item').prop('disabled', (testable_item_types.indexOf(type) == -1));
-		}
-
-		// delay field
-		if (type == <?= ITEM_TYPE_ZABBIX_ACTIVE ?>) {
-			const toggle_fields = ['delay', 'js-item-delay-label', 'js-item-delay-field',
-				'js-item-flex-intervals-label', 'js-item-flex-intervals-field'],
-				set_hidden = (key.substr(0, 8) === 'mqtt.get'),
-				object_switcher = globalAllObjForViewSwitcher['type'];
-
-			toggle_fields.forEach((element_id) =>
-				object_switcher[set_hidden ? 'hideObj' : 'showObj']({id: element_id})
-			);
-		}
-	}
-
-	jQuery(document).ready(function($) {
-		<?php if (!empty($element_toggles['by_authtype'])): ?>
-			new CViewSwitcher('authtype', 'change', <?=json_encode($element_toggles['by_authtype']) ?>);
-		<?php endif; ?>
-		<?php if (!empty($element_toggles['by_type'])): ?>
-			new CViewSwitcher('type', 'change',
-				<?= json_encode($element_toggles['by_type']); ?>,
-				<?= json_encode($element_toggles['disable_by_type']); ?>
-			);
-		<?php endif; ?>
+		new CViewSwitcher('type', 'change', item_form.field_switches.for_type, item_form.field_switches.disable_for_type);
 
 		if ($('#http_authtype').length) {
-			new CViewSwitcher('http_authtype', 'change', <?= json_encode([
-				HTTPTEST_AUTH_BASIC => [
-					'js-item-http-username-label',
-					'js-item-http-username-field',
-					'js-item-http-password-label',
-					'js-item-http-password-field'
-				],
-				HTTPTEST_AUTH_NTLM => [
-					'js-item-http-username-label',
-					'js-item-http-username-field',
-					'js-item-http-password-label',
-					'js-item-http-password-field'
-				],
-				HTTPTEST_AUTH_KERBEROS => [
-					'js-item-http-username-label',
-					'js-item-http-username-field',
-					'js-item-http-password-label',
-					'js-item-http-password-field'
-				],
-				HTTPTEST_AUTH_DIGEST => [
-					'js-item-http-username-label',
-					'js-item-http-username-field',
-					'js-item-http-password-label',
-					'js-item-http-password-field'
-				]
-			]) ?>);
+			new CViewSwitcher('http_authtype', 'change', item_form.field_switches.for_http_auth_type);
 		}
 
 		if ($('#allow_traps').length) {
-			new CViewSwitcher('allow_traps', 'change', <?= json_encode([
-				HTTPCHECK_ALLOW_TRAPS_ON => ['js-item-trapper-hosts-label', 'js-item-trapper-hosts-field']
-			]) ?>);
+			new CViewSwitcher('allow_traps', 'change', item_form.field_switches.for_traps);
 		}
 
 		$("#key").on('keyup change', updateItemFormElements);
 
 		$('#parameters_table').dynamicRows({template: '#parameters_table_row'});
 
+		const item_interface_types = item_form.interface_types,
+			interface_ids_by_types = {};
+
+		for (const interface of Object.values(item_form.interfaces)) {
+			if (typeof interface_ids_by_types[interface.type] === 'undefined') {
+				interface_ids_by_types[interface.type] = [];
+			}
+
+			interface_ids_by_types[interface.type].push(interface.interfaceid);
+		}
+
 		$('#type')
 			.change(function() {
-				var item_interface_types = <?= json_encode(itemTypeInterface()) ?>,
-					interface_ids_by_types = <?= json_encode(itemInterfaceidsByType($data['interfaces'])) ?>;
-
 				updateItemFormElements();
 				organizeInterfaces(interface_ids_by_types, item_interface_types, parseInt($(this).val(), 10));
 
@@ -381,4 +223,129 @@ $element_toggles = itemFormElementToggles($data);
 			}
 		});
 	});
+
+	const item_type_lookup = {
+		key_type_suggestions: [],
+		preprocessing_active: false,
+		form: null,
+		key_field: null,
+		item_tab_type_field: null,
+		preprocessing_tab_type_field: null,
+		last_lookup: '',
+		inferred_type: null,
+
+		init(key_type_suggestions) {
+			this.key_type_suggestions = key_type_suggestions;
+			this.form = document.querySelector('#item-form, #item-prototype-form');
+			this.key_field = this.form.querySelector('[name=key]');
+			this.item_tab_type_field = this.form.querySelector('[name=value_type]');
+			this.preprocessing_tab_type_field = this.form.querySelector('[name=value_type_steps]');
+
+			this.preprocessing_tab_type_field.addEventListener('change', (e) => {
+				this.item_tab_type_field.value = this.preprocessing_tab_type_field.value;
+			});
+
+			this.item_tab_type_field.addEventListener('change', (e) => {
+				this.preprocessing_tab_type_field.value = this.item_tab_type_field.value;
+
+				this.form.querySelector('#js-item-type-hint')
+					.classList.toggle(<?= json_encode(ZBX_STYLE_DISPLAY_NONE) ?>, (
+						this.preprocessing_active || this.inferred_type === null
+								|| this.item_tab_type_field.value == this.inferred_type
+					));
+			});
+
+			['change', 'input', 'help_items.paste'].forEach((event_type) => {
+				this.key_field.addEventListener(event_type, (e) => {
+					if (this.preprocessing_active) {
+						return this.lookup(this.key_field.value, false);
+					}
+
+					this.lookup(this.key_field.value);
+				});
+			});
+
+			this.form.querySelector('#preprocessing').addEventListener('item.preprocessing.change',
+				() => this.updatePreprocessingState()
+			);
+
+			this.updatePreprocessingState();
+
+			this.lookup(this.key_field.value, false);
+		},
+
+		updatePreprocessingState() {
+			const last_state_active = this.preprocessing_active;
+				change_event = new CustomEvent('change');
+
+			this.preprocessing_active = (this.form.querySelector('.preprocessing-step') != null);
+
+			if (last_state_active && !this.preprocessing_active) {
+				this.last_lookup = '';
+				this.key_field.dispatchEvent(change_event);
+			}
+
+			this.form.querySelectorAll('.js-item-preprocessing-type').forEach((element) =>
+				element.classList.toggle(<?= json_encode(ZBX_STYLE_DISPLAY_NONE) ?>, !this.preprocessing_active)
+			);
+
+			this.item_tab_type_field.dispatchEvent(change_event);
+		},
+
+		/**
+		 * Infer expected Item value type from (partial) key name.
+		 *
+		 * Best case scenario a direct match to a key name is found.
+		 * Otherwise a check is performed to see that key names matching so far are of the same type.
+		 * Else type is undetermined (null).
+		 *
+		 * @param {string}  key_part           Key name part entered.
+		 * @param {boolean} set_to_field=true  Pass False to perform background lookup, not updating input states.
+		 * @return {void}
+		 */
+		lookup(key_part, set_to_field = true) {
+			key_part = key_part
+				.split('[')
+				.shift()
+				.trimLeft()
+				.toLowerCase();
+
+			if (key_part === this.last_lookup) {
+				return;
+			}
+
+			this.last_lookup = key_part;
+			this.inferred_type = null;
+
+			if (key_part === '') {
+				return;
+			}
+
+			if (this.last_lookup in this.key_type_suggestions) {
+				this.inferred_type = this.key_type_suggestions[this.last_lookup];
+			}
+			else {
+				const matches = Object.entries(this.key_type_suggestions)
+						.filter(([key_name, value_type]) => key_name.startsWith(this.last_lookup));
+
+				if (matches.length > 0) {
+					const sample_type = matches[0][1];
+
+					if (matches.length == 1 || matches.every(([key_name, value_type]) => value_type === sample_type)) {
+						this.inferred_type = sample_type;
+					}
+				}
+			}
+
+			if (this.inferred_type === null) {
+				return;
+			}
+
+			if (set_to_field) {
+				this.item_tab_type_field.value = this.inferred_type;
+			}
+
+			this.item_tab_type_field.dispatchEvent(new CustomEvent('change'));
+		}
+	};
 </script>

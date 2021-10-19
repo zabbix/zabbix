@@ -525,6 +525,7 @@ if ($data['display_interfaces']) {
 	]);
 	$form->addVar('selectedInterfaceId', $data['interfaceid']);
 }
+
 $item_tab
 	->addItem([
 		(new CLabel(_('SNMP OID'), 'snmp_oid'))
@@ -701,10 +702,10 @@ $item_tab
 		new CLabel(_('Description')),
 		new CFormField((new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
 	])
-	->addItem(
+	->addItem([
 		new CLabel(_('Enabled')),
 		new CFormField((new CCheckBox('status', ITEM_STATUS_ACTIVE))->setChecked($data['status'] == ITEM_STATUS_ACTIVE))
-	);
+	]);
 
 /*
  * Condition tab.
@@ -979,3 +980,13 @@ $widget->addItem($form);
 require_once dirname(__FILE__).'/js/configuration.host.discovery.edit.js.php';
 
 $widget->show();
+
+(new CScriptTag('
+	item_form.init('.json_encode([
+		'interfaces' => $data['interfaces'],
+		'testable_item_types' => CControllerPopupItemTest::getTestableItemTypes($data['hostid']),
+		'field_switches' => CItemData::fieldSwitchingConfiguration($data),
+		'interface_types' => itemTypeInterface()
+	]).');
+'))
+	->show();
