@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $widget = (new CWidget())->setTitle(_('Items'));
@@ -112,6 +113,53 @@ if (!$readonly) {
 				',{itemtype: jQuery("#type").val()}), null, this);'
 		);
 }
+
+$item_type_options = CSelect::createOptionsFromArray([
+	ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
+	ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
+	ITEM_VALUE_TYPE_STR => _('Character'),
+	ITEM_VALUE_TYPE_LOG => _('Log'),
+	ITEM_VALUE_TYPE_TEXT => _('Text')
+]);
+$type_mismatch_hint = (new CSpan(makeWarningIcon(_('This type of information may not match the key.'))))
+	->setId('js-item-type-hint')
+	->addStyle('margin: 5px 0 0 5px;')
+	->addClass(ZBX_STYLE_DISPLAY_NONE);
+
+$item_tab
+	// Append item key to form list.
+	->addItem([
+		(new CLabel(_('Key'), 'key'))->setAsteriskMark(),
+		new CFormField($key_controls)
+	])
+	->addItem([
+		new CLabel(_('Type of information'), 'label-value-type'),
+		new CFormField([
+			(new CSelect('value_type'))
+				->setFocusableElementId('label-value-type')
+				->setId('value_type')
+				->setValue($data['value_type'])
+				->addOptions($item_type_options)
+				->setReadonly($readonly),
+			$type_mismatch_hint
+		])
+	])
+	// Append ITEM_TYPE_HTTPAGENT URL field to form list.
+	->addItem([
+		(new CLabel(_('URL'), 'url'))
+			->setAsteriskMark()
+			->setId('js-item-url-label'),
+		(new CFormField([
+			(new CTextBox('url', $data['url'], $readonly, DB::getFieldLength('items', 'url')))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired(),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			(new CButton('httpcheck_parseurl', _('Parse')))
+				->addClass(ZBX_STYLE_BTN_GREY)
+				->setEnabled(!$readonly)
+				->setAttribute('data-action', 'parse_url')
+		]))->setId('js-item-url-field')
+	]);
 
 // Prepare ITEM_TYPE_HTTPAGENT query fields.
 $query_fields_data = [];
@@ -580,16 +628,16 @@ $item_tab
 	])
 	->addItem([
 		(new CLabel(_('Authentication method'), 'label-authtype'))->setId('js-item-authtype-label'),
-		(new CFormField((new CSelect('authtype'))
-			->setId('authtype')
-			->setFocusableElementId('label-authtype')
-			->setValue($data['authtype'])
-			->addOptions(CSelect::createOptionsFromArray([
-				ITEM_AUTHTYPE_PASSWORD => _('Password'),
-				ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
-			]))
-			->setReadonly($discovered_item),
-
+		(new CFormField(
+			(new CSelect('authtype'))
+				->setId('authtype')
+				->setFocusableElementId('label-authtype')
+				->setValue($data['authtype'])
+				->addOptions(CSelect::createOptionsFromArray([
+					ITEM_AUTHTYPE_PASSWORD => _('Password'),
+					ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
+				]))
+				->setReadonly($discovered_item)
 		))->setId('js-item-authtype-field')
 	])
 	->addItem([
@@ -665,56 +713,7 @@ $item_tab
 			->setAriaRequired()
 			->setReadonly($discovered_item)
 		))->setId('js-item-formula-field')
-	]);
-
-$item_type_options = CSelect::createOptionsFromArray([
-	ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
-	ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
-	ITEM_VALUE_TYPE_STR => _('Character'),
-	ITEM_VALUE_TYPE_LOG => _('Log'),
-	ITEM_VALUE_TYPE_TEXT => _('Text')
-]);
-$type_mismatch_hint = (new CSpan(makeWarningIcon(_('This type of information may not match the key.'))))
-	->addStyle('margin: 5px 0 0 5px;')
-	->addClass('js-item-type-hint')
-	->addClass(ZBX_STYLE_DISPLAY_NONE);
-
-$item_tab
-	// Append item key to form list.
-	->addItem([
-		(new CLabel(_('Key'), 'key'))->setAsteriskMark(),
-		new CFormField($key_controls)
 	])
-	// Append ITEM_TYPE_HTTPAGENT URL field to form list.
-	->addItem([
-		(new CLabel(_('URL'), 'url'))
-			->setAsteriskMark()
-			->setId('js-item-url-label'),
-		(new CFormField([
-			(new CTextBox('url', $data['url'], $readonly, DB::getFieldLength('items', 'url')))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setAriaRequired(),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			(new CButton('httpcheck_parseurl', _('Parse')))
-				->addClass(ZBX_STYLE_BTN_GREY)
-				->setEnabled(!$readonly)
-				->setAttribute('data-action', 'parse_url')
-		]))->setId('js-item-url-field')
-	])
-	->addItem([
-		new CLabel(_('Type of information'), 'label-value-type'),
-		new CFormField([
-			(new CSelect('value_type'))
-				->setFocusableElementId('label-value-type')
-				->setId('value_type')
-				->setValue($data['value_type'])
-				->addOptions($item_type_options)
-				->setReadonly($readonly),
-			$type_mismatch_hint
-		])
-	]);
-
-$item_tab
 	->addItem([
 		(new CLabel(_('Units')))->setId('js-item-units-label'),
 		(new CFormField((new CTextBox('units', $data['units'], $readonly))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)))
@@ -1055,9 +1054,12 @@ require_once dirname(__FILE__).'/js/configuration.item.edit.js.php';
 $widget->show();
 
 (new CScriptTag('
-	item_type_lookup.init('.json_encode([
-		'key_type_suggestions' => CItemData::getTypeSuggestionsByKey()
+	item_form.init('.json_encode([
+		'interfaces' => $data['interfaces'],
+		'key_type_suggestions' => CItemData::getTypeSuggestionsByKey(),
+		'testable_item_types' => CControllerPopupItemTest::getTestableItemTypes($data['hostid']),
+		'field_switches' => CItemData::fieldSwitchingConfiguration($data),
+		'interface_types' => itemTypeInterface()
 	]).');
 '))
-	->setOnDocumentReady()
 	->show();
