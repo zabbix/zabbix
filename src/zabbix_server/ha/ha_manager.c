@@ -1870,7 +1870,8 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 					{
 						zabbix_log(LOG_LEVEL_INFORMATION, "log level has been increased to %s",
 								zabbix_get_log_level_string());
-					}					break;
+					}
+					break;
 				case ZBX_IPC_SERVICE_HA_LOGLEVEL_DECREASE:
 					if (SUCCEED != zabbix_decrease_log_level())
 					{
@@ -1881,7 +1882,8 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 					{
 						zabbix_log(LOG_LEVEL_INFORMATION, "log level has been decreased to %s",
 								zabbix_get_log_level_string());
-					}					break;
+					}
+					break;
 			}
 
 			zbx_ipc_message_free(message);
