@@ -274,10 +274,12 @@ class testEscalations extends CIntegrationTest {
 	public function testExpressionTriggerMacros_testUpdateOperation() {
 		$this->clearLog(self::COMPONENT_SERVER);
 
-		$response = $this->call('event.acknowledge', [
+		$response = $this->callUntilDataIsPresent('event.acknowledge', [
 			'eventids' => [self::$eventid],
 			'action' => ZBX_PROBLEM_UPDATE_ACKNOWLEDGE
-		]);
+		], 5, 2);
+		$this->assertArrayHasKey('eventids', $response['result']);
+		$this->assertEquals(self::$eventid, $response['result']['eventids'][0]);
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute_update_operations()', true, 120);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute_update_operations()', true, 10, 3);
