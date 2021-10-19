@@ -35,7 +35,9 @@ switch ($data['info_type']) {
 	case ZBX_SYSTEM_INFO_HAC_STATUS:
 		if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
 			$body = (new CPartial('administration.ha.nodes', [
-				'ha_nodes' => $data['system_info']['ha_nodes']
+				'ha_nodes' => $data['system_info']['ha_nodes'],
+				'ha_cluster_enabled' => $data['system_info']['ha_cluster_enabled'],
+				'failover_delay' => $data['system_info']['failover_delay']
 			]))->getOutput();
 		}
 		else {

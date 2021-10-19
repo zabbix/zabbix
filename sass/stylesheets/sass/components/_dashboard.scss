@@ -400,6 +400,12 @@
 				}
 			}
 		}
+
+		&.sticky-footer {
+			tfoot {
+				bottom: -8px;
+			}
+		}
 	}
 
 	.debug-output {

@@ -37,6 +37,7 @@ class CSystemInfoHelper {
 		$data = [
 			'status' => static::getServerStatus($ZBX_SERVER, (int) $ZBX_SERVER_PORT),
 			'server_details' => '',
+			'failover_delay' => 0,
 			'float_double_precision' => $DB['DOUBLE_IEEE754']
 		];
 

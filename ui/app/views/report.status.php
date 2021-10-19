@@ -37,10 +37,12 @@ require_once __DIR__.'/../../include/blocks.inc.php';
 		))->addClass(ZBX_STYLE_CONTAINER)
 	)
 	->addItem(
-		$data['user_type'] == USER_TYPE_SUPER_ADMIN
+		($data['user_type'] == USER_TYPE_SUPER_ADMIN && $data['system_info']['ha_cluster_enabled'])
 			? (new CDiv(
 				new CPartial('administration.ha.nodes', [
-					'ha_nodes' => $data['system_info']['ha_nodes']
+					'ha_nodes' => $data['system_info']['ha_nodes'],
+					'ha_cluster_enabled' => $data['system_info']['ha_cluster_enabled'],
+					'failover_delay' => $data['system_info']['failover_delay']
 				])
 			))->addClass(ZBX_STYLE_CONTAINER)
 			: null

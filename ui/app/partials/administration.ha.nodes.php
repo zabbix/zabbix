@@ -26,42 +26,57 @@
 
 $nodes_table = (new CTableInfo())
 	->setHeader([_('Name'), _('Address'), _('Last access'), _('Status')])
-	->setHeadingColumn(0);
+	->setHeadingColumn(0)
+	->addClass(ZBX_STYLE_LIST_TABLE_STICKY_HEADER)
+	->addClass(ZBX_STYLE_LIST_TABLE_STICKY_FOOTER);
 
-foreach ($data['ha_nodes'] as $node) {
-	$status_element = new CCol();
+if ($data['ha_cluster_enabled']) {
+	foreach ($data['ha_nodes'] as $node) {
+		$status_element = new CCol();
 
-	switch($node['status']) {
-		case ZBX_NODE_STATUS_STOPPED:
+		switch($node['status']) {
+			case ZBX_NODE_STATUS_STOPPED:
+				$status_element
+					->addItem(_('Stopped'))
+					->addClass(ZBX_STYLE_GREY);
+				break;
+
+			case ZBX_NODE_STATUS_STANDBY:
+				$status_element->addItem(_('Standby'));
+				break;
+
+			case ZBX_NODE_STATUS_ACTIVE:
+				$status_element
+					->addItem(_('Active'))
+					->addClass(ZBX_STYLE_GREEN);
+				break;
+
+			case ZBX_NODE_STATUS_UNAVAILABLE:
+				$status_element
+					->addItem(_('Unavailable'))
+					->addClass(ZBX_STYLE_RED);
+				break;
+		}
+
+		$nodes_table->addRow([
+			(new CCol($node['name']))->addClass(ZBX_STYLE_NOWRAP),
+			$node['address'].':'.$node['port'],
+			(new CCol(convertUnitsS(time() - $node['lastaccess'])))
+				->setAttribute('title', zbx_date2str(DATE_TIME_FORMAT_SECONDS, $node['lastaccess'])),
 			$status_element
-				->addItem(_('Stopped'))
-				->addClass(ZBX_STYLE_GREY);
-			break;
-
-		case ZBX_NODE_STATUS_STANDBY:
-			$status_element->addItem(_('Standby'));
-			break;
-
-		case ZBX_NODE_STATUS_ACTIVE:
-			$status_element
-				->addItem(_('Active'))
-				->addClass(ZBX_STYLE_GREEN);
-			break;
-
-		case ZBX_NODE_STATUS_UNAVAILABLE:
-			$status_element
-				->addItem(_('Unavailable'))
-				->addClass(ZBX_STYLE_RED);
-			break;
+		]);
 	}
 
-	$nodes_table->addRow([
-		(new CCol($node['name']))->addClass(ZBX_STYLE_NOWRAP),
-		$node['address'].':'.$node['port'],
-		(new CCol(convertUnitsS(time() - $node['lastaccess'])))
-			->setAttribute('title', zbx_date2str(DATE_TIME_FORMAT_SECONDS, $node['lastaccess'])),
-		$status_element
-	]);
+	$nodes_table
+		->addItem(
+			new CTag('tfoot', true,
+				(new CRow(
+					(new CCol(_s('Fail-over delay: %1$s', $data['failover_delay'])))
+						->addClass('table-info')
+						->setColSpan(4)
+				))
+			)
+		);
 }
 
 $nodes_table->show();
