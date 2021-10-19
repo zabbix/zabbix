@@ -32,7 +32,7 @@ class testExpandExpressionMacros extends CWebTest {
 	 *
 	 * @var integer
 	 */
-	protected static $hostgroupid ;
+	protected static $hostgroupid;
 
 	/**
 	 * The id of the host for macro with last function.
@@ -169,7 +169,7 @@ class testExpandExpressionMacros extends CWebTest {
 				'key_' => 'trapper',
 				'type' => 2,
 				'value_type' => 0
-			],
+			]
 		]);
 		self::$last_itemid = $items['itemids'][0];
 		self::$avg_itemid = $items['itemids'][1];
@@ -252,7 +252,7 @@ class testExpandExpressionMacros extends CWebTest {
 
 	public function writeValuesToItems() {
 		// Add values for items.
-		$time = time()-100;
+		$time = time() - 100;
 		$last_time = time();
 
 		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$last_itemid.", ".$time.", 2, 0)");
@@ -368,6 +368,7 @@ class testExpandExpressionMacros extends CWebTest {
 	 * Test for checking expression macro expand in map's elements.
 	 */
 	public function testExpandExpressionMacros_Map() {
+		// Open map in view mode.
 		$this->page->login()->open('zabbix.php?action=map.view&sysmapid='.self::$mapid)->waitUntilReady();
 		$map_image = $this->query('xpath://div[@id="flickerfreescreen_mapimg"]/div/*[name()="svg"]')
 				->waitUntilPresent()->one();
@@ -378,6 +379,24 @@ class testExpandExpressionMacros extends CWebTest {
 			'height' => 13
 		];
 		$this->assertScreenshotExcept($map_image, $covered_region, 'Map with expression macros');
+
+		// Open map in edit mode.
+		$this->query('button:Edit map')->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
+
+		// Expand macros is off by default.
+		$this->assertTrue($this->query('xpath://button[@id="expand_macros" and text() = "Off"]')
+				->waitUntilVisible()->exists()
+		);
+		$map_edited = $this->query('id:map-area')->waitUntilPresent()->one();
+		$this->assertScreenshot($map_edited, 'Edited map macros OFF');
+
+		// Turn expanding macros on.
+		$this->query('id:expand_macros')->waitUntilClickable()->one()->click();
+		$this->assertTrue($this->query('xpath://button[@id="expand_macros" and text() = "On"]')
+				->waitUntilVisible()->exists()
+		);
+		$this->assertScreenshot($map_edited, 'Edited map macros ON');
 	}
 
 	/**
