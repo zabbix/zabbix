@@ -35,6 +35,52 @@ abstract class CHostGeneral extends CHostBase {
 	];
 
 	/**
+	 * Check for valid host groups.
+	 *
+	 * @param array      $hosts
+	 * @param array|null $db_hosts
+	 */
+	protected function checkGroups(array $hosts, array $db_hosts = null): void {
+		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
+
+		$edit_groupids = [];
+
+		foreach ($hosts as $host) {
+			if (!array_key_exists('groups', $host)) {
+				continue;
+			}
+
+			$groupids = array_column($host['groups'], 'groupid');
+
+			if ($db_hosts === null) {
+				$edit_groupids += array_flip($groupids);
+			}
+			else {
+				$db_groupids = array_column($db_hosts[$host[$id_field_name]]['groups'], 'groupid');
+
+				$ins_groupids = array_flip(array_diff($groupids, $db_groupids));
+				$del_groupids = array_flip(array_diff($db_groupids, $groupids));
+
+				$edit_groupids += $ins_groupids + $del_groupids;
+			}
+		}
+
+		if (!$edit_groupids) {
+			return;
+		}
+
+		$count = API::HostGroup()->get([
+			'countOutput' => true,
+			'groupids' => array_keys($edit_groupids),
+			'editable' => true
+		]);
+
+		if ($count != count($edit_groupids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+	}
+
+	/**
 	 * Check for unique host names.
 	 *
 	 * @param array      $hosts
@@ -99,6 +145,60 @@ abstract class CHostGeneral extends CHostBase {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 		}
+	}
+
+	/**
+	 * Check macros for host.update, template.update and hostprototype.update methods.
+	 *
+	 * @param array  $hosts
+	 * @param array  $db_hosts
+	 *
+	 * @throws APIException if input of host macros data is invalid.
+	 */
+	protected function checkUpdateMacros(array &$hosts, array $db_hosts): void {
+		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
+
+		foreach ($hosts as $i1 => &$host) {
+			if (!array_key_exists('macros', $host)) {
+				continue;
+			}
+
+			$db_macros = array_column($db_hosts[$host[$id_field_name]]['macros'], null, 'macro');
+			$path = '/'.($i1 + 1).'/macros';
+
+			foreach ($host['macros'] as $i2 => &$macro) {
+				if (array_key_exists($macro['macro'], $db_macros)) {
+					$type_default = $db_macros[$macro['macro']]['type'];
+					$value_flags = 0x00;
+				}
+				else {
+					$type_default = ZBX_MACRO_TYPE_TEXT;
+					$value_flags = API_REQUIRED;
+				}
+
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+					'macro' =>			['type' => API_USER_MACRO],
+					'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT]), 'default' => $type_default],
+					'value' =>			['type' => API_MULTIPLE, 'flags' => $value_flags, 'rules' => [
+											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_MACRO_TYPE_VAULT])], 'type' => API_VAULT_SECRET, 'length' => DB::getFieldLength('hostmacro', 'value')],
+											['else' => true, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')]
+					]],
+					'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')]
+				]];
+
+				if (!CApiInputValidator::validate($api_input_rules, $macro, $path.'/'.($i2 + 1), $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+
+				if (array_key_exists($macro['macro'], $db_macros)
+						&& $macro['type'] != $db_macros[$macro['macro']]['type']
+						&& $db_macros[$macro['macro']]['type'] == ZBX_MACRO_TYPE_SECRET) {
+					$macro += ['value' => ''];
+				}
+			}
+			unset($macro);
+		}
+		unset($host);
 	}
 
 	/**
@@ -233,7 +333,7 @@ abstract class CHostGeneral extends CHostBase {
 	 * @param string     $method
 	 * @param array|null $db_hosts
 	 */
-	protected function updateHostMacrosNew(array &$hosts, string $method, array $db_hosts = null): void {
+	protected function updateMacros(array &$hosts, string $method, array $db_hosts = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
 
 		$ins_hostmacros = [];
@@ -1348,6 +1448,114 @@ abstract class CHostGeneral extends CHostBase {
 
 		if (!CApiInputValidator::validate($api_input_rules, $host, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+	}
+
+	/**
+	 * Add the existing host groups, templates, tags, macros. Also add an empty array of templates to clear.
+	 *
+	 * @param array $hosts
+	 * @param array $db_hosts
+	 */
+	public function addAffectedObjects(array $hosts, array &$db_hosts): void {
+		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
+
+		$hostids = ['groups' => [], 'templates' => [], 'tags' => [], 'macros' => []];
+
+		foreach ($hosts as $host) {
+			if (array_key_exists('groups', $host)) {
+				$hostids['groups'][] = $host[$id_field_name];
+				$db_hosts[$host[$id_field_name]]['groups'] = [];
+			}
+
+			if (array_key_exists('templates', $host)) {
+				$hostids['templates'][] = $host[$id_field_name];
+				$db_hosts[$host[$id_field_name]]['templates'] = [];
+			}
+
+			if (array_key_exists('templates_clear', $host)) {
+				$db_hosts[$host[$id_field_name]]['templates_clear'] = [];
+			}
+
+			if (array_key_exists('tags', $host)) {
+				$hostids['tags'][] = $host[$id_field_name];
+				$db_hosts[$host[$id_field_name]]['tags'] = [];
+			}
+
+			if (array_key_exists('macros', $host)) {
+				$hostids['macros'][] = $host[$id_field_name];
+				$db_hosts[$host[$id_field_name]]['macros'] = [];
+			}
+		}
+
+		if ($hostids['groups']) {
+			$db_groups = API::HostGroup()->get([
+				'output' => [],
+				$id_field_name.'s' => $hostids['groups'],
+				'preservekeys' => true
+			]);
+
+			$options = [
+				'output' => ['hostgroupid', 'hostid', 'groupid'],
+				'filter' => [
+					'hostid' => $hostids['groups'],
+					'groupid' => array_keys($db_groups)
+				]
+			];
+			$db_groups = DBselect(DB::makeSql('hosts_groups', $options));
+
+			while ($db_group = DBfetch($db_groups)) {
+				$db_hosts[$db_group['hostid']]['groups'][$db_group['hostgroupid']] =
+					array_diff_key($db_group, array_flip(['hostid']));
+			}
+		}
+
+		if ($hostids['templates']) {
+			$db_templates = API::Template()->get([
+				'output' => [],
+				$id_field_name.'s' => $hostids['templates'],
+				'preservekeys' => true
+			]);
+
+			$options = [
+				'output' => ['hosttemplateid', 'hostid', 'templateid'],
+				'filter' => [
+					'hostid' => $hostids['templates'],
+					'templateid' => array_keys($db_templates)
+				]
+			];
+			$db_templates = DBselect(DB::makeSql('hosts_templates', $options));
+
+			while ($db_template = DBfetch($db_templates)) {
+				$db_hosts[$db_template['hostid']]['templates'][$db_template['hosttemplateid']] =
+					array_diff_key($db_template, array_flip(['hostid']));
+			}
+		}
+
+		if ($hostids['tags']) {
+			$options = [
+				'output' => ['hosttagid', 'hostid', 'tag', 'value'],
+				'filter' => ['hostid' => $hostids['tags']]
+			];
+			$db_tags = DBselect(DB::makeSql('host_tag', $options));
+
+			while ($db_tag = DBfetch($db_tags)) {
+				$db_hosts[$db_tag['hostid']]['tags'][$db_tag['hosttagid']] =
+					array_diff_key($db_tag, array_flip(['hostid']));
+			}
+		}
+
+		if ($hostids['macros']) {
+			$options = [
+				'output' => ['hostmacroid', 'hostid', 'macro', 'value', 'description', 'type'],
+				'filter' => ['hostid' => $hostids['macros']]
+			];
+			$db_macros = DBselect(DB::makeSql('hostmacro', $options));
+
+			while ($db_macro = DBfetch($db_macros)) {
+				$db_hosts[$db_macro['hostid']]['macros'][$db_macro['hostmacroid']] =
+					array_diff_key($db_macro, array_flip(['hostid']));
+			}
 		}
 	}
 }

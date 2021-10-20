@@ -42,41 +42,41 @@ abstract class CHostBase extends CApiService {
 	protected function checkTemplates(array $hosts, array $db_hosts = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
 
-		$editable_templateids = [];
+		$edit_templateids = [];
 
 		foreach ($hosts as $host) {
-			if (!array_key_exists('templates', $host)) {
-				continue;
+			if (array_key_exists('templates', $host)) {
+				$templateids = array_column($host['templates'], 'templateid');
+
+				if ($db_hosts === null) {
+					$edit_templateids += array_flip($templateids);
+				}
+				else {
+					$db_templateids = array_column($db_hosts[$host[$id_field_name]]['templates'], 'templateid');
+
+					$ins_templateids = array_flip(array_diff($templateids, $db_templateids));
+					$del_templateids = array_flip(array_diff($db_templateids, $templateids));
+
+					$edit_templateids += $ins_templateids + $del_templateids;
+				}
 			}
 
-			$templateids = array_column($host['templates'], 'templateid');
-
-			if ($db_hosts === null) {
-				$editable_templateids += array_flip($templateids);
-			}
-			else {
-				$db_templateids = array_column($db_hosts[$host[$id_field_name]]['templates'], 'templateid');
-
-				$ins_templateids = array_flip(array_diff($templateids, $db_templateids));
-				$del_templateids = array_flip(array_diff($db_templateids, $templateids));
-
-				$editable_templateids += $ins_templateids + $del_templateids;
+			if (array_key_exists('templates_clear', $host)) {
+				$edit_templateids += array_flip(array_column($host['templates_clear'], 'templateid'));
 			}
 		}
 
-		if (!$editable_templateids) {
+		if (!$edit_templateids) {
 			return;
 		}
 
-		$editable_templateids = array_keys($editable_templateids);
-
 		$count = API::Template()->get([
 			'countOutput' => true,
-			'templateids' => $editable_templateids,
+			'templateids' => array_keys($edit_templateids),
 			'editable' => true
 		]);
 
-		if ($count != count($editable_templateids)) {
+		if ($count != count($edit_templateids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 	}
@@ -1005,8 +1005,8 @@ abstract class CHostBase extends CApiService {
 				if (!array_key_exists('hostmacroid', $hostmacro)) {
 					foreach (['macro', 'value'] as $field_name) {
 						if (!array_key_exists($field_name, $hostmacro)) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $path,
-								_s('the parameter "%1$s" is missing', $field_name)
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+								$path.'/'.($i2 + 1), _s('the parameter "%1$s" is missing', $field_name)
 							));
 						}
 					}
