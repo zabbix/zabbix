@@ -146,7 +146,7 @@ class CExpressionValidatorTest extends TestCase {
 			['foo(1, 2, 3)', [], ['rc' => false, 'error' => 'unknown function "foo"']],
 			['change(1, 2, 3)', [], ['rc' => false, 'error' => 'incorrect usage of function "change"']],
 			['count(123)', [], ['rc' => false, 'error' => 'incorrect usage of function "count"']],
-			['avg(bucket_rate_foreach(/host/*, 1))', ['calculated' => true], ['rc' => false, 'error' => 'incorrect usage of function "bucket_rate_foreach"']],
+			['avg(bucket_rate_foreach(/host/*, 1))', ['calculated' => true], ['rc' => false, 'error' => 'incorrect usage of function "bucket_rate_foreach"']]
 		];
 	}
 

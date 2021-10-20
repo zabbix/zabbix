@@ -1615,6 +1615,11 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_TRIGGER_STATE			"{TRIGGER.STATE}"
 #define MVAR_TRIGGER_TEMPLATE_NAME		"{TRIGGER.TEMPLATE.NAME}"
 #define MVAR_TRIGGER_HOSTGROUP_NAME		"{TRIGGER.HOSTGROUP.NAME}"
+#define MVAR_FUNCTION_VALUE			"{FUNCTION.VALUE}"
+#define MVAR_FUNCTION_RECOVERY_VALUE		"{FUNCTION.RECOVERY.VALUE}"
+#define MVAR_TRIGGER_EXPRESSION_EXPLAIN		"{TRIGGER.EXPRESSION.EXPLAIN}"
+#define MVAR_TRIGGER_EXPRESSION_RECOVERY_EXPLAIN	"{TRIGGER.EXPRESSION.RECOVERY.EXPLAIN}"
+
 #define MVAR_STATUS				"{STATUS}"			/* deprecated */
 #define MVAR_TRIGGER_VALUE			"{TRIGGER.VALUE}"
 #define MVAR_TRIGGER_URL			"{TRIGGER.URL}"
@@ -1781,6 +1786,7 @@ static const char	*ex_macros[] =
 	MVAR_ITEM_VALUE, MVAR_ITEM_VALUETYPE,
 	MVAR_ITEM_LOG_DATE, MVAR_ITEM_LOG_TIME, MVAR_ITEM_LOG_AGE, MVAR_ITEM_LOG_SOURCE,
 	MVAR_ITEM_LOG_SEVERITY, MVAR_ITEM_LOG_NSEVERITY, MVAR_ITEM_LOG_EVENTID,
+	MVAR_FUNCTION_VALUE, MVAR_FUNCTION_RECOVERY_VALUE,
 	NULL
 };
 
@@ -3203,6 +3209,31 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 					else
 						replace_to = zbx_strdup(replace_to, "");
 				}
+				else if (0 == strcmp(m, MVAR_TRIGGER_EXPRESSION_EXPLAIN))
+				{
+					zbx_db_trigger_explain_expression(&c_event->trigger, &replace_to,
+							evaluate_function2, 0);
+				}
+				else if (0 == strcmp(m, MVAR_TRIGGER_EXPRESSION_RECOVERY_EXPLAIN))
+				{
+					if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == c_event->trigger.recovery_mode)
+					{
+						zbx_db_trigger_explain_expression(&c_event->trigger, &replace_to,
+								evaluate_function2, 1);
+					}
+					else
+						replace_to = zbx_strdup(replace_to, "");
+				}
+				else if (1 == indexed_macro && 0 == strcmp(m, MVAR_FUNCTION_VALUE))
+				{
+					zbx_db_trigger_get_function_value(&c_event->trigger, N_functionid,
+							&replace_to, evaluate_function2, 0);
+				}
+				else if (1 == indexed_macro && 0 == strcmp(m, MVAR_FUNCTION_RECOVERY_VALUE))
+				{
+					zbx_db_trigger_get_function_value(&c_event->trigger, N_functionid,
+							&replace_to, evaluate_function2, 1);
+				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_HOSTGROUP_NAME))
 				{
 					ret = DBget_trigger_hostgroup_name(c_event->objectid, userid, &replace_to);
@@ -3449,6 +3480,31 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 					}
 					else
 						replace_to = zbx_strdup(replace_to, "");
+				}
+				else if (0 == strcmp(m, MVAR_TRIGGER_EXPRESSION_EXPLAIN))
+				{
+					zbx_db_trigger_explain_expression(&c_event->trigger, &replace_to,
+							evaluate_function2, 0);
+				}
+				else if (0 == strcmp(m, MVAR_TRIGGER_EXPRESSION_RECOVERY_EXPLAIN))
+				{
+					if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == c_event->trigger.recovery_mode)
+					{
+						zbx_db_trigger_explain_expression(&c_event->trigger, &replace_to,
+								evaluate_function2, 1);
+					}
+					else
+						replace_to = zbx_strdup(replace_to, "");
+				}
+				else if (1 == indexed_macro && 0 == strcmp(m, MVAR_FUNCTION_VALUE))
+				{
+					zbx_db_trigger_get_function_value(&c_event->trigger, N_functionid,
+							&replace_to, evaluate_function2, 0);
+				}
+				else if (1 == indexed_macro && 0 == strcmp(m, MVAR_FUNCTION_RECOVERY_VALUE))
+				{
+					zbx_db_trigger_get_function_value(&c_event->trigger, N_functionid,
+							&replace_to, evaluate_function2, 1);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_HOSTGROUP_NAME))
 				{
@@ -4248,9 +4304,22 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 					ret = DBitem_lastvalue(&event->trigger, &replace_to, N_functionid,
 							raw_value);
 				}
-				else if (0 == strcmp(m, MVAR_TIME) && 0 != (macro_type & MACRO_TYPE_EVENT_NAME))
+				else if (0 != (macro_type & MACRO_TYPE_EVENT_NAME))
 				{
-					replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL), tz));
+					if (0 == strcmp(m, MVAR_TIME))
+					{
+						replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL), tz));
+					}
+					else if (0 == strcmp(m, MVAR_TRIGGER_EXPRESSION_EXPLAIN))
+					{
+						zbx_db_trigger_explain_expression(&event->trigger, &replace_to,
+								evaluate_function2, 0);
+					}
+					else if (1 == indexed_macro && 0 == strcmp(m, MVAR_FUNCTION_VALUE))
+					{
+						zbx_db_trigger_get_function_value(&event->trigger, N_functionid,
+								&replace_to, evaluate_function2, 0);
+					}
 				}
 			}
 		}
