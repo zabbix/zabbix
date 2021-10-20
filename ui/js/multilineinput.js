@@ -196,7 +196,6 @@
 							placeholder_textarea: '',
 							label_before: '',
 							label_after: '',
-							// maxlength: null,
 							rows: 20,
 							grow: 'fixed',
 							readonly: false,
