@@ -402,6 +402,8 @@
 		}
 
 		&.sticky-footer {
+			margin-bottom: -8px;
+
 			tfoot {
 				bottom: -8px;
 			}
