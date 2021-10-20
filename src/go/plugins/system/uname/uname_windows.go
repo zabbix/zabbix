@@ -53,9 +53,16 @@ func getHostname(params []string) (uname string, err error) {
 		}
 		uname = windows.UTF16ToString(w)
 	case "host":
-		uname, err = os.Hostname()
+		if uname, err = os.Hostname(); err != nil {
+			return "", err
+		}
+		if err != nil {
+			return "", err
+		}
 	case "shorthost":
-		uname, err = os.Hostname()
+		if uname, err = os.Hostname(); err != nil {
+			return "", err
+		}
 		if idx := strings.Index(uname, "."); idx > 0 {
 			uname = uname[:idx]
 		}
