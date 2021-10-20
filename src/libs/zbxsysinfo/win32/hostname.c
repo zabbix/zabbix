@@ -69,6 +69,10 @@ int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 		}
 		else if (0 == strcmp(type, "netbios"))
 		{
+			/* Buffer size is chosen large enough to contain any DNS name, not just                      */
+			/* MAX_COMPUTERNAME_LENGTH + 1 characters. MAX_COMPUTERNAME_LENGTH is usually less than 32,  */
+			/* but it varies among systems, so we cannot use the constant in a precompiled Windows agent,*/
+			/* which is expected to work on any system.                                                  */
 			if (0 == GetComputerName(computerName, &dwSize))
 			{
 				zabbix_log(LOG_LEVEL_ERR, "GetComputerName() failed: %s",
