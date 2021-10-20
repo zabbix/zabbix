@@ -50,7 +50,7 @@ class CMultilineInput extends CDiv {
 	 * @param string   $options['placeholder_textarea']  Placeholder for empty value for textarea.
 	 * @param string   $options['label_before']          Label, placed before textarea (HTML allowed, default: '').
 	 * @param string   $options['label_after']           Label, placed after textarea (HTML allowed, default: '').
-	 * @param int|null $options['maxlength']             Max characters length (default: null).
+	 * @param int      $options['maxlength']             Max characters length (optional).
 	 * @param bool     $options['line_numbers']          Show line numbers (default: true).
 	 * @param int      $options['rows']                  Textarea rows number for grow=fixed
 	 *                                                   or rows limit for grow=auto if more than 0 (default: 20).

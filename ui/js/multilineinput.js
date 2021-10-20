@@ -113,16 +113,19 @@
 			$textarea = $('<textarea>', {
 				class: 'multilineinput-textarea' + monospace_font,
 				text: obj.$hidden.val(),
-				maxlength: obj.options.maxlength,
 				readonly: obj.options.readonly ? true : null,
 				placeholder: obj.options.placeholder_textarea
 			}).attr('wrap', 'off'),
 			$line_numbers = $('<ul>', {class: 'multilineinput-line-numbers' + monospace_font}).append('<li>'),
-			$footer = $('<div>', {
-				class: obj.options.maxlength !== null ? 'multilineinput-chars-remaining' : 'multilineinput-char-count'
-			}).html(sprintf(
-				obj.options.maxlength !== null ? t('S_N_CHARS_REMAINING') : t('S_N_CHAR_COUNT'), '<span>0</span>'
-			));
+			$footer = $('<div>', {class: 'multilineinput-char-count'});
+
+		if ('maxlength' in obj.options) {
+			$textarea.attr('maxlength', obj.options.maxlength);
+			$footer.html(sprintf(t('S_N_CHARS_REMAINING'), '<span>0</span>'));
+		}
+		else {
+			$footer.html(sprintf(t('S_N_CHAR_COUNT'), '<span>0</span>'));
+		}
 
 		overlayDialogue({
 			'title': obj.options.title,
@@ -168,7 +171,9 @@
 		$textarea
 			.on('change contextmenu keydown keyup paste scroll', function() {
 				var value = $(this).val();
-				updateCharCount(obj.options.maxlength !== null ? obj.options.maxlength - value.length : value.length);
+
+				updateCharCount(('maxlength' in obj.options) ? obj.options.maxlength - value.length : value.length);
+
 				if (obj.options.line_numbers) {
 					updateLineNumbers(value.split("\n").length);
 				}
@@ -191,7 +196,7 @@
 							placeholder_textarea: '',
 							label_before: '',
 							label_after: '',
-							maxlength: null,
+							// maxlength: null,
 							rows: 20,
 							grow: 'fixed',
 							readonly: false,
