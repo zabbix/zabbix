@@ -65,6 +65,17 @@ class CAction extends CApiService {
 	];
 
 	/**
+	 * Operation group names.
+	 *
+	 * @var array
+	 */
+	private const OPERATION_GROUPS = [
+		ACTION_OPERATION => 'operations',
+		ACTION_RECOVERY_OPERATION => 'recovery_operations',
+		ACTION_UPDATE_OPERATION => 'update_operations'
+	];
+
+	/**
 	 * Get actions data
 	 *
 	 * @param array $options
@@ -720,14 +731,14 @@ class CAction extends CApiService {
 		$del_operationids = [];
 
 		foreach ($actions as &$action) {
-			foreach (['operations', 'recovery_operations', 'update_operations'] as $operations_name) {
-				if (!array_key_exists($operations_name, $action)) {
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
 					continue;
 				}
 
-				$db_operations = ($method === 'update') ? $db_actions[$action['actionid']][$operations_name] : [];
+				$db_operations = ($method === 'update') ? $db_actions[$action['actionid']][$operation_group] : [];
 
-				foreach ($action[$operations_name] as &$operation) {
+				foreach ($action[$operation_group] as &$operation) {
 					$db_operation = current(
 						array_filter($db_operations, static function (array $db_operation) use ($operation): bool {
 							return $operation['operationtype'] == $db_operation['operationtype']
@@ -808,18 +819,18 @@ class CAction extends CApiService {
 		$upd_opinventories = [];
 
 		foreach ($actions as &$action) {
-			foreach (['operations', 'recovery_operations', 'update_operations'] as $operations_name) {
-				if (!array_key_exists($operations_name, $action)) {
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
 					continue;
 				}
 
-				foreach ($action[$operations_name] as &$operation) {
+				foreach ($action[$operation_group] as &$operation) {
 					if (!array_key_exists('operationid', $operation)) {
 						$operation['operationid'] = array_shift($operationids);
 					}
 
 					if ($method === 'update') {
-						$db_operations = $db_actions[$action['actionid']][$operations_name];
+						$db_operations = $db_actions[$action['actionid']][$operation_group];
 						$db_operation = array_key_exists($operation['operationid'], $db_operations)
 							? $db_operations[$operation['operationid']]
 							: [];
@@ -1148,12 +1159,12 @@ class CAction extends CApiService {
 		}
 
 		foreach ($actions as &$action) {
-			foreach (['operations', 'recovery_operations', 'update_operations'] as $operations_name) {
-				if (!array_key_exists($operations_name, $action)) {
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
 					continue;
 				}
 
-				foreach ($action[$operations_name] as &$operation) {
+				foreach ($action[$operation_group] as &$operation) {
 					if (array_key_exists('opconditions', $operation)) {
 						foreach ($operation['opconditions'] as &$opcondition) {
 							if (!array_key_exists('opconditionid', $opcondition)) {
@@ -2521,25 +2532,19 @@ class CAction extends CApiService {
 	 * @throws APIException
 	 */
 	private static function checkOperations(array &$actions, string $method, array $db_actions = null): void {
-		$operation_groups = [
-			ACTION_OPERATION => 'operations',
-			ACTION_RECOVERY_OPERATION => 'recovery_operations',
-			ACTION_UPDATE_OPERATION => 'update_operations'
-		];
-
 		foreach ($actions as &$action) {
 			if ($method === 'create') {
 				$db_action = [];
 			}
 			else {
-				if (!array_intersect_key($action, array_flip($operation_groups))) {
+				if (!array_intersect_key($action, array_flip(self::OPERATION_GROUPS))) {
 					continue;
 				}
 
 				$db_action = $db_actions[$action['actionid']];
 			}
 
-			$operations = array_intersect_key($action + $db_action, array_flip($operation_groups));
+			$operations = array_intersect_key($action + $db_action, array_flip(self::OPERATION_GROUPS));
 
 			if (!array_filter($operations, 'boolval')) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -2555,14 +2560,13 @@ class CAction extends CApiService {
 				OPERATION_TYPE_HOST_INVENTORY => 0
 			];
 
-			foreach ($operation_groups as $recovery => $operation_group) {
+			foreach (self::OPERATION_GROUPS as $recovery => $operation_group) {
 				if (!array_key_exists($operation_group, $action)) {
 					continue;
 				}
 
 				foreach ($action[$operation_group] as &$operation) {
 					$operation['recovery'] = $recovery;
-					$operation['eventsource'] = $action['eventsource'];
 
 					if ($recovery == ACTION_OPERATION) {
 						if (array_key_exists($operation['operationtype'], $unique_operations)) {
@@ -2635,20 +2639,21 @@ class CAction extends CApiService {
 	 */
 	private static function checkMediatypesPermissions(array $actions): void {
 		$mediatypeids = [];
-		$operations = [];
-		$operation_names = ['operations' => [], 'recovery_operations' => [], 'update_operations' => []];
 
 		foreach ($actions as $action) {
-			foreach (array_keys($operation_names) as $operation_name) {
-				if (array_key_exists($operation_name, $action)) {
-					$operations = array_merge($operations, $action[$operation_name]);
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
+					continue;
 				}
-			}
-		}
 
-		foreach ($operations as $operation) {
-			if ($operation['operationtype'] == OPERATION_TYPE_ACK_MESSAGE) {
-				$mediatypeids[] = $operation['opmessage']['mediatypeid'];
+				foreach ($action[$operation_group] as $operation) {
+					if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE
+							|| $operation['operationtype'] == OPERATION_TYPE_ACK_MESSAGE) {
+						if ($operation['opmessage']['mediatypeid'] != 0) {
+							$mediatypeids[$operation['opmessage']['mediatypeid']] = true;
+						}
+					}
+				}
 			}
 		}
 
@@ -2656,7 +2661,7 @@ class CAction extends CApiService {
 			return;
 		}
 
-		$mediatypeids = array_keys(array_flip($mediatypeids));
+		$mediatypeids = array_keys($mediatypeids);
 
 		$count = API::MediaType()->get([
 			'countOutput' => true,
@@ -2681,20 +2686,18 @@ class CAction extends CApiService {
 	 */
 	private static function checkScriptsPermissions(array $actions): void {
 		$scriptids = [];
-		$operations = [];
-		$operation_names = ['operations' => [], 'recovery_operations' => [], 'update_operations' => []];
 
 		foreach ($actions as $action) {
-			foreach (array_keys($operation_names) as $operation_name) {
-				if (array_key_exists($operation_name, $action)) {
-					$operations = array_merge($operations, $action[$operation_name]);
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
+					continue;
 				}
-			}
-		}
 
-		foreach ($operations as $operation) {
-			if ($operation['operationtype'] == OPERATION_TYPE_COMMAND) {
-				$scriptids[] = $operation['opcommand']['scriptid'];
+				foreach ($action[$operation_group] as $operation) {
+					if ($operation['operationtype'] == OPERATION_TYPE_COMMAND) {
+						$scriptids[$operation['opcommand']['scriptid']] = true;
+					}
+				}
 			}
 		}
 
@@ -2702,7 +2705,7 @@ class CAction extends CApiService {
 			return;
 		}
 
-		$scriptids = array_keys(array_flip($scriptids));
+		$scriptids = array_keys($scriptids);
 
 		$count = API::Script()->get([
 			'countOutput' => true,
@@ -2728,43 +2731,32 @@ class CAction extends CApiService {
 	 */
 	private static function checkHostGroupsPermissions(array $actions): void {
 		$groupids = [];
-		$operations = [];
-		$operation_names = ['operations' => [], 'recovery_operations' => [], 'update_operations' => []];
 
 		foreach ($actions as $action) {
-			foreach (array_keys($operation_names) as $operation_name) {
-				if (array_key_exists($operation_name, $action)) {
-					$operations = array_merge($operations, $action[$operation_name]);
-				}
-			}
-
-			if (!array_key_exists('filter', $action) || !array_key_exists('conditions', $action['filter'])) {
-				continue;
-			}
-
-			foreach ($action['filter']['conditions'] as $condition) {
-				if ($condition['conditiontype'] == CONDITION_TYPE_HOST_GROUP) {
-					$groupids[] = $condition['value'];
-				}
-			}
-		}
-
-		foreach ($operations as $operation) {
-			switch ($operation['operationtype']) {
-				case OPERATION_TYPE_COMMAND:
-					if ($operation['eventsource'] == EVENT_SOURCE_SERVICE) {
-						break;
+			if (array_key_exists('filter', $action) && array_key_exists('conditions', $action['filter'])) {
+				foreach ($action['filter']['conditions'] as $condition) {
+					if ($condition['conditiontype'] == CONDITION_TYPE_HOST_GROUP) {
+						$groupids[] = $condition['value'];
 					}
+				}
+			}
 
-					if (array_key_exists('opcommand_grp', $operation)) {
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
+					continue;
+				}
+
+				foreach ($action[$operation_group] as $operation) {
+					if ($operation['operationtype'] == OPERATION_TYPE_COMMAND
+							&& $action['eventsource'] != EVENT_SOURCE_SERVICE
+							&& array_key_exists('opcommand_grp', $operation)) {
 						$groupids = array_merge($groupids, array_column($operation['opcommand_grp'], 'groupid'));
 					}
-					break;
-
-				case OPERATION_TYPE_GROUP_ADD:
-				case OPERATION_TYPE_GROUP_REMOVE:
-					$groupids = array_merge($groupids, array_column($operation['opgroup'], 'groupid'));
-					break;
+					elseif ($operation['operationtype'] == OPERATION_TYPE_GROUP_ADD
+							|| $operation['operationtype'] == OPERATION_TYPE_GROUP_REMOVE) {
+						$groupids = array_merge($groupids, array_column($operation['opgroup'], 'groupid'));
+					}
+				}
 			}
 		}
 
@@ -2798,42 +2790,32 @@ class CAction extends CApiService {
 	 */
 	private static function checkHostsPermissions(array $actions): void {
 		$hostids = [];
-		$operations = [];
-		$operation_names = ['operations' => [], 'recovery_operations' => [], 'update_operations' => []];
 
 		foreach ($actions as $action) {
-			foreach (array_keys($operation_names) as $operation_name) {
-				if (array_key_exists($operation_name, $action)) {
-					$operations = array_merge($operations, $action[$operation_name]);
-				}
-			}
-
-			if (!array_key_exists('filter', $action) || !array_key_exists('conditions', $action['filter'])) {
-				continue;
-			}
-
-			foreach ($action['filter']['conditions'] as $condition) {
-				if ($condition['conditiontype'] == CONDITION_TYPE_HOST) {
-					$hostids[] = $condition['value'];
-				}
-			}
-		}
-
-		foreach ($operations as $operation) {
-			switch ($operation['operationtype']) {
-				case OPERATION_TYPE_COMMAND:
-					if ($operation['eventsource'] == EVENT_SOURCE_SERVICE) {
-						break;
+			if (array_key_exists('filter', $action) && array_key_exists('conditions', $action['filter'])) {
+				foreach ($action['filter']['conditions'] as $condition) {
+					if ($condition['conditiontype'] == CONDITION_TYPE_HOST) {
+						$hostids[] = $condition['value'];
 					}
+				}
+			}
 
-					if (array_key_exists('opcommand_hst', $operation)) {
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
+					continue;
+				}
+
+				foreach ($action[$operation_group] as $operation) {
+					if ($operation['operationtype'] == OPERATION_TYPE_COMMAND
+							&& $action['eventsource'] != EVENT_SOURCE_SERVICE
+							&& array_key_exists('opcommand_hst', $operation)) {
 						foreach ($operation['opcommand_hst'] as $opcommand_hst) {
 							if ($opcommand_hst['hostid'] != 0) {
 								$hostids[] = $opcommand_hst['hostid'];
 							}
 						}
 					}
-					break;
+				}
 			}
 		}
 
@@ -2867,21 +2849,18 @@ class CAction extends CApiService {
 	 */
 	private static function checkUsersPermissions(array $actions): void {
 		$userids = [];
-		$operations = [];
-		$operation_names = ['operations' => [], 'recovery_operations' => [], 'update_operations' => []];
 
 		foreach ($actions as $action) {
-			foreach (array_keys($operation_names) as $operation_name) {
-				if (array_key_exists($operation_name, $action)) {
-					$operations = array_merge($operations, $action[$operation_name]);
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
+					continue;
 				}
-			}
-		}
 
-		foreach ($operations as $operation) {
-			if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE) {
-				if (array_key_exists('opmessage_usr', $operation)) {
-					$userids = array_merge($userids, array_column($operation['opmessage_usr'], 'userid'));
+				foreach ($action[$operation_group] as $operation) {
+					if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE
+							&& array_key_exists('opmessage_usr', $operation)) {
+						$userids = array_merge($userids, array_column($operation['opmessage_usr'], 'userid'));
+					}
 				}
 			}
 		}
@@ -2915,21 +2894,18 @@ class CAction extends CApiService {
 	 */
 	private static function checkUserGroupsPermissions(array $actions): void {
 		$usrgrpids = [];
-		$operations = [];
-		$operation_names = ['operations' => [], 'recovery_operations' => [], 'update_operations' => []];
 
 		foreach ($actions as $action) {
-			foreach (array_keys($operation_names) as $operation_name) {
-				if (array_key_exists($operation_name, $action)) {
-					$operations = array_merge($operations, $action[$operation_name]);
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
+					continue;
 				}
-			}
-		}
 
-		foreach ($operations as $operation) {
-			if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE) {
-				if (array_key_exists('opmessage_grp', $operation)) {
-					$usrgrpids = array_merge($usrgrpids, array_column($operation['opmessage_grp'], 'usrgrpid'));
+				foreach ($action[$operation_group] as $operation) {
+					if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE
+							&& array_key_exists('opmessage_grp', $operation)) {
+						$usrgrpids = array_merge($usrgrpids, array_column($operation['opmessage_grp'], 'usrgrpid'));
+					}
 				}
 			}
 		}
@@ -2963,33 +2939,27 @@ class CAction extends CApiService {
 	 */
 	private static function checkTemplatesPermissions(array $actions): void {
 		$templateids = [];
-		$operations = [];
-		$operation_names = ['operations' => [], 'recovery_operations' => [], 'update_operations' => []];
 
 		foreach ($actions as $action) {
-			foreach (array_keys($operation_names) as $operation_name) {
-				if (array_key_exists($operation_name, $action)) {
-					$operations = array_merge($operations, $action[$operation_name]);
+			if (array_key_exists('filter', $action) && array_key_exists('conditions', $action['filter'])) {
+				foreach ($action['filter']['conditions'] as $condition) {
+					if ($condition['conditiontype'] == CONDITION_TYPE_TEMPLATE) {
+						$templateids[] = $condition['value'];
+					}
 				}
 			}
 
-			if (!array_key_exists('filter', $action) || !array_key_exists('conditions', $action['filter'])) {
-				continue;
-			}
-
-			foreach ($action['filter']['conditions'] as $condition) {
-				if ($condition['conditiontype'] == CONDITION_TYPE_TEMPLATE) {
-					$templateids[] = $condition['value'];
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
+					continue;
 				}
-			}
-		}
 
-		foreach ($operations as $operation) {
-			switch ($operation['operationtype']) {
-				case OPERATION_TYPE_TEMPLATE_ADD:
-				case OPERATION_TYPE_TEMPLATE_REMOVE:
-					$templateids = array_merge($templateids, array_column($operation['optemplate'], 'templateid'));
-					break;
+				foreach ($action[$operation_group] as $operation) {
+					if ($operation['operationtype'] == OPERATION_TYPE_TEMPLATE_ADD
+							|| $operation['operationtype'] == OPERATION_TYPE_TEMPLATE_REMOVE) {
+						$templateids = array_merge($templateids, array_column($operation['optemplate'], 'templateid'));
+					}
+				}
 			}
 		}
 
@@ -3235,12 +3205,6 @@ class CAction extends CApiService {
 	 * @param array|null $db_actions
 	 */
 	private static function addAffectedObjects(array $actions, array &$db_actions = null): void {
-		$operations_names = [
-			ACTION_OPERATION => 'operations',
-			ACTION_RECOVERY_OPERATION => 'recovery_operations',
-			ACTION_UPDATE_OPERATION => 'update_operations'
-		];
-
 		$actionids = ['filter' => [], 'operations' => []];
 
 		foreach ($actions as $action) {
@@ -3249,11 +3213,17 @@ class CAction extends CApiService {
 				$db_actions[$action['actionid']]['filter'] = [];
 			}
 
-			foreach ($operations_names as $operations_name) {
-				if (array_key_exists($operations_name, $action)) {
-					$actionids['operations'][$action['actionid']] = true;
-					$db_actions[$action['actionid']][$operations_name] = [];
-				}
+			$operation_groups = array_intersect_key(self::OPERATION_GROUPS,
+				getAllowedOperations($action['eventsource'])
+			);
+
+			if (!array_intersect_key($action, array_flip($operation_groups))) {
+				continue;
+			}
+
+			foreach ($operation_groups as $operation_group) {
+				$actionids['operations'][$action['actionid']] = true;
+				$db_actions[$action['actionid']][$operation_group] = [];
 			}
 		}
 
@@ -3399,9 +3369,9 @@ class CAction extends CApiService {
 					break;
 			}
 
-			$operations_name = $operations_names[$db_operation['recovery']];
+			$operation_group = self::OPERATION_GROUPS[$db_operation['recovery']];
 
-			$db_actions[$db_operation['actionid']][$operations_name][$db_operation['operationid']] = $operation;
+			$db_actions[$db_operation['actionid']][$operation_group][$db_operation['operationid']] = $operation;
 		}
 	}
 }
