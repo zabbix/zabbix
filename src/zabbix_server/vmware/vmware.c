@@ -303,12 +303,16 @@ static zbx_uint64_t	evt_req_chunk_size;
 
 #define ZBX_VM_NONAME_XML	"noname.xml"
 
-#define ZBX_PROPMAP(property)		{property, ZBX_XPATH_PROP_NAME(property)}
+#define ZBX_PROPMAP_EXT(property, func)	{property, ZBX_XPATH_PROP_NAME(property), func}
+#define ZBX_PROPMAP(property)		ZBX_PROPMAP_EXT(property, NULL)
+
+typedef int	(*nodeprocfunc_t)(void *, char **);
 
 typedef struct
 {
 	const char	*name;
 	const char	*xpath;
+	nodeprocfunc_t	func;
 }
 zbx_vmware_propmap_t;
 
@@ -325,12 +329,14 @@ static zbx_vmware_propmap_t	hv_propmap[] = {
 	ZBX_PROPMAP("summary.hardware.vendor"), 		/* ZBX_VMWARE_HVPROP_HW_VENDOR */
 	ZBX_PROPMAP("summary.quickStats.overallMemoryUsage"),	/* ZBX_VMWARE_HVPROP_MEMORY_USED */
 	{"runtime.healthSystemRuntime.systemHealthInfo", 	/* ZBX_VMWARE_HVPROP_HEALTH_STATE */
-			ZBX_XPATH_HV_SENSOR_STATUS("VMware Rollup Health State")},
+			ZBX_XPATH_HV_SENSOR_STATUS("VMware Rollup Health State"), NULL},
 	ZBX_PROPMAP("summary.quickStats.uptime"),		/* ZBX_VMWARE_HVPROP_UPTIME */
 	ZBX_PROPMAP("summary.config.product.version"),		/* ZBX_VMWARE_HVPROP_VERSION */
 	ZBX_PROPMAP("summary.config.name"),			/* ZBX_VMWARE_HVPROP_NAME */
 	ZBX_PROPMAP("overallStatus"),				/* ZBX_VMWARE_HVPROP_STATUS */
-	ZBX_PROPMAP("runtime.inMaintenanceMode")		/* ZBX_VMWARE_HVPROP_MAINTENANCE */
+	ZBX_PROPMAP("runtime.inMaintenanceMode"),		/* ZBX_VMWARE_HVPROP_MAINTENANCE */
+	ZBX_PROPMAP_EXT("summary.runtime.healthSystemRuntime.systemHealthInfo.numericSensorInfo",
+			zbx_xmlnode_to_json)			/* ZBX_VMWARE_HVPROP_SENSOR */
 };
 
 static zbx_vmware_propmap_t	vm_propmap[] = {
@@ -780,7 +786,12 @@ static char	**xml_read_props(xmlDoc *xdoc, const zbx_vmware_propmap_t *propmap, 
 			{
 				nodeset = xpathObj->nodesetval;
 
-				if (NULL != (val = xmlNodeListGetString(xdoc, nodeset->nodeTab[0]->xmlChildrenNode, 1)))
+				if (NULL != propmap[i].func)
+				{
+					propmap[i].func((void *)nodeset->nodeTab[0], &props[i]);
+				}
+				else if (NULL != (val = xmlNodeListGetString(xdoc,
+						nodeset->nodeTab[0]->xmlChildrenNode, 1)))
 				{
 					props[i] = zbx_strdup(NULL, (const char *)val);
 					xmlFree(val);
