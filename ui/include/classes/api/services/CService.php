@@ -193,9 +193,7 @@ class CService extends CApiService {
 	 * @return array
 	 */
 	public function create(array $services): array {
-		$permissions = self::getPermissions();
-
-		$this->validateCreate($services, $permissions);
+		self::validateCreate($services);
 
 		$ins_services = [];
 
@@ -211,12 +209,12 @@ class CService extends CApiService {
 		}
 		unset($service);
 
-		$this->updateTags($services);
-		$this->updateProblemTags($services);
-		$this->updateParents($services);
-		$this->updateChildren($services);
-		$this->updateTimes($services);
-		$this->updateStatusRules($services);
+		self::updateTags($services);
+		self::updateProblemTags($services);
+		self::updateParents($services);
+		self::updateChildren($services);
+		self::updateTimes($services);
+		self::updateStatusRules($services);
 
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_IT_SERVICE, $services);
 
@@ -225,11 +223,10 @@ class CService extends CApiService {
 
 	/**
 	 * @param array $services
-	 * @param array $permissions
 	 *
 	 * @throws APIException
 	 */
-	private function validateCreate(array &$services, array $permissions): void {
+	private static function validateCreate(array &$services): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('services', 'name')],
 			'algorithm' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_SERVICE_STATUS_CALC_SET_OK, ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL, ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE])],
@@ -281,14 +278,14 @@ class CService extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$this->checkPermissions($permissions, $services);
+		self::checkPermissions(self::getPermissions(), $services);
 
-		$this->checkGoodSla($services);
-		$this->checkStatusPropagation($services);
-		$this->checkAlgorithmDependencies($services);
-		$this->checkChildrenOrProblemTags($services);
-		$this->checkCircularReferences($services);
-		$this->checkTimes($services);
+		self::checkGoodSla($services);
+		self::checkStatusPropagation($services);
+		self::checkAlgorithmDependencies($services);
+		self::checkChildrenOrProblemTags($services);
+		self::checkCircularReferences($services);
+		self::checkTimes($services);
 	}
 
 	/**
@@ -299,9 +296,7 @@ class CService extends CApiService {
 	 * @throws APIException
 	 */
 	public function update(array $services): array {
-		$permissions = self::getPermissions();
-
-		$this->validateUpdate($services, $db_services, $permissions);
+		self::validateUpdate($services, $db_services);
 
 		$upd_services = [];
 
@@ -320,12 +315,12 @@ class CService extends CApiService {
 			DB::update('services', $upd_services);
 		}
 
-		$this->updateTags($services, $db_services);
-		$this->updateProblemTags($services, $db_services);
-		$this->updateParents($services, $db_services);
-		$this->updateChildren($services, $db_services);
-		$this->updateTimes($services, $db_services);
-		$this->updateStatusRules($services, $db_services);
+		self::updateTags($services, $db_services);
+		self::updateProblemTags($services, $db_services);
+		self::updateParents($services, $db_services);
+		self::updateChildren($services, $db_services);
+		self::updateTimes($services, $db_services);
+		self::updateStatusRules($services, $db_services);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_IT_SERVICE, $services, $db_services);
 
@@ -335,11 +330,10 @@ class CService extends CApiService {
 	/**
 	 * @param array      $services
 	 * @param array|null $db_services
-	 * @param array      $permissions
 	 *
 	 * @throws APIException
 	 */
-	private function validateUpdate(array &$services, ?array &$db_services, array $permissions): void {
+	private static function validateUpdate(array &$services, ?array &$db_services): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['serviceid']], 'fields' => [
 			'serviceid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('services', 'name')],
@@ -392,7 +386,7 @@ class CService extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$db_services = $this->doGet([
+		$db_services = DB::select('services', [
 			'output' => ['serviceid', 'name', 'status', 'algorithm', 'showsla', 'goodsla', 'sortorder', 'weight',
 				'propagation_rule', 'propagation_value'
 			],
@@ -404,17 +398,19 @@ class CService extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$this->addAffectedObjects($services, $db_services, $permissions);
+		$permissions = self::getPermissions();
 
-		$this->checkPermissions($permissions, $services, $db_services);
+		self::addAffectedObjects($services, $db_services, $permissions);
 
-		$this->checkParentChildRelations($services, $db_services);
-		$this->checkStatusPropagation($services, $db_services);
-		$this->checkGoodSla($services, $db_services);
-		$this->checkAlgorithmDependencies($services, $db_services);
-		$this->checkChildrenOrProblemTags($services);
-		$this->checkCircularReferences($services, $db_services);
-		$this->checkTimes($services);
+		self::checkPermissions($permissions, $services, $db_services);
+
+		self::checkParentChildRelations($services, $db_services);
+		self::checkStatusPropagation($services, $db_services);
+		self::checkGoodSla($services, $db_services);
+		self::checkAlgorithmDependencies($services, $db_services);
+		self::checkChildrenOrProblemTags($services);
+		self::checkCircularReferences($services, $db_services);
+		self::checkTimes($services);
 	}
 
 	/**
@@ -503,8 +499,6 @@ class CService extends CApiService {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @param array $parentids
 	 *
 	 * @return array|null
@@ -634,12 +628,12 @@ class CService extends CApiService {
 
 		$this->addRelatedParents($options, $result, $permissions);
 		$this->addRelatedChildren($options, $result, $permissions);
-		$this->addRelatedTags($options, $result);
-		$this->addRelatedProblemTags($options, $result);
-		$this->addRelatedProblemEvents($options, $result);
-		$this->addRelatedTimes($options, $result);
-		$this->addRelatedStatusRules($options, $result);
-		$this->addRelatedAlarms($options, $result);
+		self::addRelatedTags($options, $result);
+		self::addRelatedProblemTags($options, $result);
+		self::addRelatedProblemEvents($options, $result);
+		self::addRelatedTimes($options, $result);
+		self::addRelatedStatusRules($options, $result);
+		self::addRelatedAlarms($options, $result);
 
 		return $result;
 	}
@@ -746,7 +740,7 @@ class CService extends CApiService {
 	 * @param array $options
 	 * @param array $result
 	 */
-	private function addRelatedTags(array $options, array &$result): void {
+	private static function addRelatedTags(array $options, array &$result): void {
 		if ($options['selectTags'] === null) {
 			return;
 		}
@@ -792,7 +786,7 @@ class CService extends CApiService {
 	 * @param array $options
 	 * @param array $result
 	 */
-	private function addRelatedProblemTags(array $options, array &$result): void {
+	private static function addRelatedProblemTags(array $options, array &$result): void {
 		if ($options['selectProblemTags'] === null) {
 			return;
 		}
@@ -840,7 +834,7 @@ class CService extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private function addRelatedProblemEvents(array $options, array &$result): void {
+	private static function addRelatedProblemEvents(array $options, array &$result): void {
 		if ($options['selectProblemEvents'] === null) {
 			return;
 		}
@@ -879,11 +873,25 @@ class CService extends CApiService {
 		 * Performance optimized:
 		 * - Not filtering the output by the related service IDs.
 		 */
-		$services = $this->doGet([
+		$services = DB::select('services', [
 			'output' => ['status', 'algorithm', 'weight', 'propagation_rule', 'propagation_value'],
-			'selectStatusRules' => ['type', 'limit_value', 'limit_status', 'new_status'],
 			'preservekeys' => true
 		]);
+
+		foreach ($services as &$service) {
+			$service['status_rules'] = [];
+		}
+		unset($service);
+
+		$_options = [
+			'output' => ['serviceid', 'type', 'limit_value', 'limit_status', 'new_status'],
+			'filter' => ['serviceid' => array_keys($services)]
+		];
+		$db_status_rules = DBselect(DB::makeSql('service_status_rule', $_options));
+
+		while ($db_status_rule = DBfetch($db_status_rules)) {
+			$services[$db_status_rule['serviceid']]['status_rules'][] = $db_status_rule;
+		}
 
 		if ($options['selectProblemEvents'] === API_OUTPUT_COUNT) {
 			$output = ['serviceid'];
@@ -973,7 +981,7 @@ class CService extends CApiService {
 	 * @param array $options
 	 * @param array $result
 	 */
-	private function addRelatedTimes(array $options, array &$result): void {
+	private static function addRelatedTimes(array $options, array &$result): void {
 		if ($options['selectTimes'] === null) {
 			return;
 		}
@@ -1019,7 +1027,7 @@ class CService extends CApiService {
 	 * @param array $options
 	 * @param array $result
 	 */
-	private function addRelatedStatusRules(array $options, array &$result): void {
+	private static function addRelatedStatusRules(array $options, array &$result): void {
 		if ($options['selectStatusRules'] === null) {
 			return;
 		}
@@ -1065,7 +1073,7 @@ class CService extends CApiService {
 	 * @param array $options
 	 * @param array $result
 	 */
-	private function addRelatedAlarms(array $options, array &$result): void {
+	private static function addRelatedAlarms(array $options, array &$result): void {
 		if ($options['selectAlarms'] === null) {
 			return;
 		}
@@ -1108,8 +1116,6 @@ class CService extends CApiService {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @param string   $parent_serviceid
 	 * @param array    $services
 	 * @param array    $relations
@@ -1362,7 +1368,7 @@ class CService extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private function checkParentChildRelations(array $services, array $db_services): void {
+	private static function checkParentChildRelations(array $services, array $db_services): void {
 		$services = array_column($services, null, 'serviceid');
 
 		foreach ($services as $serviceid => $service) {
@@ -1397,7 +1403,7 @@ class CService extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private function checkStatusPropagation(array $services, array $db_services = null): void {
+	private static function checkStatusPropagation(array $services, array $db_services = null): void {
 		foreach ($services as $service) {
 			$name = $db_services !== null ? $db_services[$service['serviceid']]['name'] : $service['name'];
 
@@ -1453,7 +1459,7 @@ class CService extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private function checkGoodSla(array $services, array $db_services = null): void {
+	private static function checkGoodSla(array $services, array $db_services = null): void {
 		foreach ($services as $service) {
 			$name = $db_services !== null ? $db_services[$service['serviceid']]['name'] : $service['name'];
 
@@ -1472,7 +1478,7 @@ class CService extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private function checkAlgorithmDependencies(array $services, array $db_services = null): void {
+	private static function checkAlgorithmDependencies(array $services, array $db_services = null): void {
 		foreach ($services as $service) {
 			$name = $db_services !== null ? $db_services[$service['serviceid']]['name'] : $service['name'];
 
@@ -1525,7 +1531,7 @@ class CService extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private function checkChildrenOrProblemTags(array $services): void {
+	private static function checkChildrenOrProblemTags(array $services): void {
 		$parent_serviceids = [];
 
 		foreach ($services as $service) {
@@ -1538,22 +1544,26 @@ class CService extends CApiService {
 			return;
 		}
 
-		$db_parent_services = $this->doGet([
-			'output' => ['name'],
-			'selectProblemTags' => API_OUTPUT_COUNT,
-			'serviceids' => $parent_serviceids,
-			'preservekeys' => true
+		$db_problem_tags = DB::select('service_problem_tag', [
+			'output' => ['serviceid'],
+			'filter' => ['serviceid' => $parent_serviceids],
+			'limit' => 1
 		]);
 
-		foreach ($db_parent_services as $db_parent_service) {
-			if ($db_parent_service['problem_tags'] > 0) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Service "%1$s" cannot have problem tags and children at the same time.',
-						$db_parent_service['name']
-					)
-				);
-			}
+		if (!$db_problem_tags) {
+			return;
 		}
+
+		$db_parent_services = DB::select('services', [
+			'output' => ['name'],
+			'serviceids' => $db_problem_tags[0]['serviceid']
+		]);
+
+		self::exception(ZBX_API_ERROR_PARAMETERS,
+			_s('Service "%1$s" cannot have problem tags and children at the same time.',
+				$db_parent_services[0]['name']
+			)
+		);
 	}
 
 	/**
@@ -1562,7 +1572,7 @@ class CService extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private function checkCircularReferences(array $services, array $db_services = null): void {
+	private static function checkCircularReferences(array $services, array $db_services = null): void {
 		$add_references = [];
 		$del_references = [];
 
@@ -1606,7 +1616,7 @@ class CService extends CApiService {
 			$del_references[$parent_serviceid] = array_diff_key($del_references[$parent_serviceid], $common_references);
 		}
 
-		if ($this->hasCircularReferences($add_references, $del_references)) {
+		if (self::hasCircularReferences($add_references, $del_references)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Services form a circular dependency.'));
 		}
 	}
@@ -1617,7 +1627,7 @@ class CService extends CApiService {
 	 *
 	 * @return bool
 	 */
-	private function hasCircularReferences(array $add_references, array $del_references): bool {
+	private static function hasCircularReferences(array $add_references, array $del_references): bool {
 		$reverse_references = [];
 
 		foreach ($add_references as $parent_serviceid => $children) {
@@ -1674,7 +1684,7 @@ class CService extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private function checkTimes(array $services): void {
+	private static function checkTimes(array $services): void {
 		foreach ($services as $service) {
 			if (!array_key_exists('times', $service)) {
 				continue;
@@ -1693,19 +1703,19 @@ class CService extends CApiService {
 	 * @param array $db_services
 	 * @param array $permissions
 	 */
-	private function addAffectedObjects(array $services, array &$db_services, array $permissions) {
-		$this->addAffectedParentsAndChildren($db_services, $permissions);
-		$this->addAffectedTags($db_services);
-		$this->addAffectedProblemTags($db_services);
-		$this->addAffectedTimes($services, $db_services);
-		$this->addAffectedStatusRules($services, $db_services);
+	private static function addAffectedObjects(array $services, array &$db_services, array $permissions) {
+		self::addAffectedParentsAndChildren($db_services, $permissions);
+		self::addAffectedTags($db_services);
+		self::addAffectedProblemTags($db_services);
+		self::addAffectedTimes($services, $db_services);
+		self::addAffectedStatusRules($services, $db_services);
 	}
 
 	/**
 	 * @param array $db_services
 	 * @param array $permissions
 	 */
-	private function addAffectedParentsAndChildren(array &$db_services, array $permissions): void {
+	private static function addAffectedParentsAndChildren(array &$db_services, array $permissions): void {
 		foreach ($db_services as &$db_service) {
 			$db_service['parents'] = [];
 			$db_service['children'] = [];
@@ -1745,7 +1755,7 @@ class CService extends CApiService {
 	/**
 	 * @param array $db_services
 	 */
-	private function addAffectedTags(array &$db_services): void {
+	private static function addAffectedTags(array &$db_services): void {
 		foreach ($db_services as &$db_service) {
 			$db_service['tags'] = [];
 		}
@@ -1769,7 +1779,7 @@ class CService extends CApiService {
 	/**
 	 * @param array $db_services
 	 */
-	private function addAffectedProblemTags(array &$db_services): void {
+	private static function addAffectedProblemTags(array &$db_services): void {
 		foreach ($db_services as &$db_service) {
 			$db_service['problem_tags'] = [];
 		}
@@ -1794,42 +1804,13 @@ class CService extends CApiService {
 	 * @param array $services
 	 * @param array $db_services
 	 */
-	private function addAffectedTimes(array $services, array &$db_services): void {
+	private static function addAffectedTimes(array $services, array &$db_services): void {
 		$affected_serviceids = [];
 
 		foreach ($services as $service) {
 			if (array_key_exists('times', $service)) {
 				$affected_serviceids[$service['serviceid']] = true;
 				$db_services[$service['serviceid']]['times'] = [];
-			}
-		}
-
-		$_options = [
-			'output' => ['service_status_ruleid', 'serviceid', 'type', 'limit_value', 'limit_status', 'new_status'],
-			'filter' => ['serviceid' => array_keys($affected_serviceids)]
-		];
-		$db_status_rules = DBselect(DB::makeSql('service_status_rule', $_options));
-
-		while ($db_status_rule = DBfetch($db_status_rules)) {
-			$serviceid = $db_status_rule['serviceid'];
-
-			unset($db_status_rule['serviceid']);
-
-			$db_services[$serviceid]['status_rules'][] = $db_status_rule;
-		}
-	}
-
-	/**
-	 * @param array $services
-	 * @param array $db_services
-	 */
-	private function addAffectedStatusRules(array $services, array &$db_services): void {
-		$affected_serviceids = [];
-
-		foreach ($services as $service) {
-			if (array_key_exists('status_rules', $service)) {
-				$affected_serviceids[$service['serviceid']] = true;
-				$db_services[$service['serviceid']]['status_rules'] = [];
 			}
 		}
 
@@ -1849,10 +1830,39 @@ class CService extends CApiService {
 	}
 
 	/**
+	 * @param array $services
+	 * @param array $db_services
+	 */
+	private static function addAffectedStatusRules(array $services, array &$db_services): void {
+		$affected_serviceids = [];
+
+		foreach ($services as $service) {
+			if (array_key_exists('status_rules', $service)) {
+				$affected_serviceids[$service['serviceid']] = true;
+				$db_services[$service['serviceid']]['status_rules'] = [];
+			}
+		}
+
+		$_options = [
+			'output' => ['service_status_ruleid', 'serviceid', 'type', 'limit_value', 'limit_status', 'new_status'],
+			'filter' => ['serviceid' => array_keys($affected_serviceids)]
+		];
+		$db_status_rules = DBselect(DB::makeSql('service_status_rule', $_options));
+
+		while ($db_status_rule = DBfetch($db_status_rules)) {
+			$serviceid = $db_status_rule['serviceid'];
+
+			unset($db_status_rule['serviceid']);
+
+			$db_services[$serviceid]['status_rules'][] = $db_status_rule;
+		}
+	}
+
+	/**
 	 * @param array      $services
 	 * @param array|null $db_services
 	 */
-	private function updateTags(array &$services, array $db_services = null): void {
+	private static function updateTags(array &$services, array $db_services = null): void {
 		$del_tags = [];
 		$ins_tags = [];
 
@@ -1871,7 +1881,8 @@ class CService extends CApiService {
 
 				foreach ($db_services[$service['serviceid']]['tags'] as $db_tag) {
 					if (array_key_exists($db_tag['tag'], $tags_ref)
-							&& array_key_exists($db_tag['value'], $tags_ref[$db_tag['tag']])) {
+							&& array_key_exists($db_tag['value'], $tags_ref[$db_tag['tag']])
+							&& !array_key_exists('servicetagid', $tags_ref[$db_tag['tag']][$db_tag['value']])) {
 						$tags_ref[$db_tag['tag']][$db_tag['value']]['servicetagid'] = $db_tag['servicetagid'];
 					}
 					else {
@@ -1926,7 +1937,7 @@ class CService extends CApiService {
 	 * @param array      $services
 	 * @param array|null $db_services
 	 */
-	private function updateProblemTags(array &$services, array $db_services = null): void {
+	private static function updateProblemTags(array &$services, array $db_services = null): void {
 		$del_problem_tags = [];
 		$ins_problem_tags = [];
 
@@ -1949,6 +1960,10 @@ class CService extends CApiService {
 							&& array_key_exists($db_problem_tag['operator'], $problem_tags_ref[$db_problem_tag['tag']])
 							&& array_key_exists($db_problem_tag['value'],
 								$problem_tags_ref[$db_problem_tag['tag']][$db_problem_tag['operator']]
+							)
+							&& !array_key_exists('service_problem_tagid',
+								$problem_tags_ref[$db_problem_tag['tag']][$db_problem_tag['operator']]
+									[$db_problem_tag['value']]
 							)) {
 						$problem_tags_ref[$db_problem_tag['tag']][$db_problem_tag['operator']][$db_problem_tag['value']]
 							['service_problem_tagid'] = $db_problem_tag['service_problem_tagid'];
@@ -2005,7 +2020,7 @@ class CService extends CApiService {
 	 * @param array      $services
 	 * @param array|null $db_services
 	 */
-	private function updateParents(array &$services, array $db_services = null): void {
+	private static function updateParents(array &$services, array $db_services = null): void {
 		$del_parents = [];
 		$ins_parents = [];
 
@@ -2023,7 +2038,8 @@ class CService extends CApiService {
 				unset($parent);
 
 				foreach ($db_services[$service['serviceid']]['parents'] as $db_parent) {
-					if (array_key_exists($db_parent['serviceid'], $parents_ref)) {
+					if (array_key_exists($db_parent['serviceid'], $parents_ref)
+							&& !array_key_exists('linkid', $parents_ref[$db_parent['serviceid']])) {
 						$parents_ref[$db_parent['serviceid']]['linkid'] = $db_parent['linkid'];
 					}
 					else {
@@ -2078,7 +2094,7 @@ class CService extends CApiService {
 	 * @param array      $services
 	 * @param array|null $db_services
 	 */
-	private function updateChildren(array &$services, array $db_services = null): void {
+	private static function updateChildren(array &$services, array $db_services = null): void {
 		$del_children = [];
 		$ins_children = [];
 
@@ -2096,7 +2112,8 @@ class CService extends CApiService {
 				unset($child);
 
 				foreach ($db_services[$service['serviceid']]['children'] as $db_child) {
-					if (array_key_exists($db_child['serviceid'], $children_ref)) {
+					if (array_key_exists($db_child['serviceid'], $children_ref)
+							&& !array_key_exists('linkid', $children_ref[$db_child['serviceid']])) {
 						$children_ref[$db_child['serviceid']]['linkid'] = $db_child['linkid'];
 					}
 					else {
@@ -2151,7 +2168,7 @@ class CService extends CApiService {
 	 * @param array      $services
 	 * @param array|null $db_services
 	 */
-	private function updateTimes(array &$services, array $db_services = null): void {
+	private static function updateTimes(array &$services, array $db_services = null): void {
 		$del_times = [];
 		$ins_times = [];
 		$upd_times = [];
@@ -2172,7 +2189,10 @@ class CService extends CApiService {
 				foreach ($db_services[$service['serviceid']]['times'] as $db_time) {
 					if (array_key_exists($db_time['type'], $times_ref)
 							&& array_key_exists($db_time['ts_from'], $times_ref[$db_time['type']])
-							&& array_key_exists($db_time['ts_to'], $times_ref[$db_time['type']][$db_time['ts_from']])) {
+							&& array_key_exists($db_time['ts_to'], $times_ref[$db_time['type']][$db_time['ts_from']])
+							&& !array_key_exists('timeid',
+								$times_ref[$db_time['type']][$db_time['ts_from']][$db_time['ts_to']]
+							)) {
 						$time_ref = &$times_ref[$db_time['type']][$db_time['ts_from']][$db_time['ts_to']];
 
 						$time_ref['timeid'] = $db_time['timeid'];
@@ -2222,7 +2242,7 @@ class CService extends CApiService {
 				}
 
 				foreach ($service['times'] as &$time) {
-					if (array_key_exists('servicetagid', $time)) {
+					if (array_key_exists('timeid', $time)) {
 						continue;
 					}
 
@@ -2242,7 +2262,7 @@ class CService extends CApiService {
 	 * @param array      $services
 	 * @param array|null $db_services
 	 */
-	private function updateStatusRules(array &$services, array $db_services = null): void {
+	private static function updateStatusRules(array &$services, array $db_services = null): void {
 		$del_status_rules = [];
 		$ins_status_rules = [];
 		$upd_status_rules = [];
@@ -2268,6 +2288,10 @@ class CService extends CApiService {
 							)
 							&& array_key_exists($db_status_rule['limit_status'],
 								$status_rules_ref[$db_status_rule['type']][$db_status_rule['limit_value']]
+							)
+							&& !array_key_exists('service_status_ruleid',
+								$status_rules_ref[$db_status_rule['type']][$db_status_rule['limit_value']]
+									[$db_status_rule['limit_status']]
 							)) {
 						$status_rule_ref = &$status_rules_ref[$db_status_rule['type']][$db_status_rule['limit_value']]
 							[$db_status_rule['limit_status']];
@@ -2338,8 +2362,6 @@ class CService extends CApiService {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @throws APIException
 	 *
 	 * @return array
@@ -2482,7 +2504,7 @@ class CService extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private function checkPermissions(array $permissions, array $services, array $db_services = null): void {
+	private static function checkPermissions(array $permissions, array $services, array $db_services = null): void {
 		[
 			'r_services' => $r_services,
 			'rw_services' => $rw_services,
@@ -2517,7 +2539,7 @@ class CService extends CApiService {
 				}
 			}
 			else {
-				$count = $this->doGet([
+				$count = DB::select('services', [
 					'countOutput' => true,
 					'serviceids' => $referred_services
 				]);
@@ -2616,7 +2638,7 @@ class CService extends CApiService {
 				$inaccessible_services = array_diff_key($new_child_services, $rw_services);
 
 				if ($inaccessible_services) {
-					$inaccessible_service = $this->doGet([
+					$inaccessible_service = DB::select('services', [
 						'output' => ['name'],
 						'serviceids' => array_keys($inaccessible_services)[0]
 					])[0];
@@ -2653,17 +2675,19 @@ class CService extends CApiService {
 			));
 
 			foreach ($affected_rw_services as $serviceid => $num_rw_parents) {
-				if ($num_rw_parents !== null && $num_rw_parents < 1) {
-					$inaccessible_service = $this->doGet([
-						'output' => ['name'],
-						'serviceids' => $serviceid
-					])[0];
-
-					$error_detail = _('read-write access to the service must be retained');
-					$error = _s('Cannot update service "%1$s": %2$s.', $inaccessible_service['name'], $error_detail);
-
-					self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+				if ($num_rw_parents === null || $num_rw_parents > 0) {
+					continue;
 				}
+
+				$inaccessible_service = DB::select('services', [
+					'output' => ['name'],
+					'serviceids' => $serviceid
+				])[0];
+
+				$error_detail = _('read-write access to the service must be retained');
+				$error = _s('Cannot update service "%1$s": %2$s.', $inaccessible_service['name'], $error_detail);
+
+				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
 			}
 		}
 	}
