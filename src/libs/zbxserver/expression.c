@@ -4563,15 +4563,6 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 		if (0 != (macro_type & MACRO_TYPE_HTTP_JSON) && NULL != replace_to)
 			zbx_json_escape(&replace_to);
 
-		if (0 != (macro_type & MACRO_TYPE_HTTP_XML) && NULL != replace_to)
-		{
-			char	*replace_to_esc;
-
-			replace_to_esc = xml_escape_dyn(replace_to);
-			zbx_free(replace_to);
-			replace_to = replace_to_esc;
-		}
-
 		if (ZBX_TOKEN_FUNC_MACRO == token.type && NULL != replace_to)
 		{
 			if (SUCCEED != (ret = zbx_calculate_macro_function(*data, &token.data.func_macro, &replace_to)))
@@ -5522,14 +5513,6 @@ static void	process_lld_macro_token(char **data, zbx_token_t *token, int flags, 
 	{
 		zbx_json_escape(&replace_to);
 	}
-	else if (0 != (flags & ZBX_TOKEN_XML))
-	{
-		char	*replace_to_esc;
-
-		replace_to_esc = xml_escape_dyn(replace_to);
-		zbx_free(replace_to);
-		replace_to = replace_to_esc;
-	}
 	else if (0 != (flags & ZBX_TOKEN_REGEXP))
 	{
 		zbx_regexp_escape(&replace_to);
@@ -6390,11 +6373,12 @@ static void	substitute_macros_in_xml_elements(const DC_ITEM *item, const struct 
 				}
 				else
 				{
-					substitute_lld_macros(&value_tmp, jp_row, lld_macro_paths, ZBX_MACRO_XML, NULL,
+					substitute_lld_macros(&value_tmp, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL,
 							0);
 				}
 
-				xmlNodeSetContent(node, (xmlChar *)value_tmp);
+				xmlNodeSetContent(node, NULL);
+				xmlNodeAddContent(node, (xmlChar *)value_tmp);
 
 				zbx_free(value_tmp);
 				xmlFree(value);
@@ -6416,7 +6400,8 @@ static void	substitute_macros_in_xml_elements(const DC_ITEM *item, const struct 
 							0);
 				}
 
-				xmlNodeSetContent(node, (xmlChar *)value_tmp);
+				xmlNodeSetContent(node, NULL);
+				xmlNodeAddContent(node, (xmlChar *)value_tmp);
 
 				zbx_free(value_tmp);
 				xmlFree(value);
@@ -6436,8 +6421,10 @@ static void	substitute_macros_in_xml_elements(const DC_ITEM *item, const struct 
 								NULL, 0);
 					}
 					else
+					{
 						substitute_lld_macros(&value_tmp, jp_row, lld_macro_paths,
-								ZBX_MACRO_XML, NULL, 0);
+								ZBX_MACRO_ANY, NULL, 0);
+					}
 
 					xmlSetProp(node, attr->name, (xmlChar *)value_tmp);
 
