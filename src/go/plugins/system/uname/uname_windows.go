@@ -56,9 +56,6 @@ func getHostname(params []string) (uname string, err error) {
 		if uname, err = os.Hostname(); err != nil {
 			return "", err
 		}
-		if err != nil {
-			return "", err
-		}
 	case "shorthost":
 		if uname, err = os.Hostname(); err != nil {
 			return "", err
