@@ -354,7 +354,7 @@ $divTabs->addTab('ipmiTab', _('IPMI'),
 $divTabs->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab', [
 		'source' => 'host',
 		'tags' => $data['tags'],
-		'readonly' => false
+		'readonly' => $data['readonly']
 	]), TAB_INDICATOR_TAGS
 );
 

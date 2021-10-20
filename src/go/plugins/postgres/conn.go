@@ -73,7 +73,7 @@ func (conn *PGConn) Query(ctx context.Context, query string, args ...interface{}
 	return
 }
 
-// QueryByName executes a query from queryStorage by its name and returns a singe row.
+// QueryByName executes a query from queryStorage by its name and returns a single row.
 func (conn *PGConn) QueryByName(ctx context.Context, queryName string, args ...interface{}) (rows *sql.Rows, err error) {
 	if sql, ok := (*conn.queryStorage).Get(queryName + sqlExt); ok {
 		normalizedSQL := strings.TrimRight(strings.TrimSpace(sql), ";")
@@ -95,7 +95,7 @@ func (conn *PGConn) QueryRow(ctx context.Context, query string, args ...interfac
 	return
 }
 
-// QueryRowByName executes a query from queryStorage by its name and returns a singe row.
+// QueryRowByName executes a query from queryStorage by its name and returns a single row.
 func (conn *PGConn) QueryRowByName(ctx context.Context, queryName string, args ...interface{}) (row *sql.Row, err error) {
 	if sql, ok := (*conn.queryStorage).Get(queryName + sqlExt); ok {
 		normalizedSQL := strings.TrimRight(strings.TrimSpace(sql), ";")

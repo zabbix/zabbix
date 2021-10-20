@@ -57,7 +57,7 @@ final class CComponentRegistry {
 	}
 
 	/**
-	 * Check if а component has been registered.
+	 * Check if a component has been registered.
 	 *
 	 * @param string $name  Component name.
 	 *

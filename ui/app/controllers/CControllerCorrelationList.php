@@ -19,8 +19,6 @@
 **/
 
 
-require_once __DIR__.'/../../include/correlation.inc.php';
-
 class CControllerCorrelationList extends CController {
 
 	protected function init() {

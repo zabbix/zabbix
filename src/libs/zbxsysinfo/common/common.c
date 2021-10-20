@@ -24,13 +24,11 @@
 
 #include "file.h"
 #include "dir.h"
-#include "http.h"
 #include "net.h"
 #include "dns.h"
 #include "system.h"
 #include "zabbix_stats.h"
 #include "zbxexec.h"
-#include "modbtype.h"
 
 #if !defined(_WINDOWS)
 #	define VFS_TEST_FILE "/etc/passwd"
@@ -60,10 +58,6 @@ ZBX_METRIC	parameters_common[] =
 {
 	{"system.localtime",	CF_HAVEPARAMS,	SYSTEM_LOCALTIME,	"utc"},
 	{"system.run",		CF_HAVEPARAMS,	SYSTEM_RUN,		"echo test"},
-
-	{"web.page.get",	CF_HAVEPARAMS,	WEB_PAGE_GET,		"localhost,,80"},
-	{"web.page.perf",	CF_HAVEPARAMS,	WEB_PAGE_PERF,		"localhost,,80"},
-	{"web.page.regexp",	CF_HAVEPARAMS,	WEB_PAGE_REGEXP,	"localhost,,80,OK"},
 
 	{"vfs.file.size",	CF_HAVEPARAMS,	VFS_FILE_SIZE,		VFS_TEST_FILE},
 	{"vfs.file.time",	CF_HAVEPARAMS,	VFS_FILE_TIME,		VFS_TEST_FILE ",modify"},
@@ -95,8 +89,6 @@ ZBX_METRIC	parameters_common[] =
 	{"eventlog",		CF_HAVEPARAMS,	ONLY_ACTIVE,		"system"},
 
 	{"zabbix.stats",	CF_HAVEPARAMS,	ZABBIX_STATS,		"127.0.0.1,10051"},
-
-	{"modbus.get",		CF_HAVEPARAMS,	MODBUS_GET,		"tcp://127.0.0.1"},
 
 	{NULL}
 };

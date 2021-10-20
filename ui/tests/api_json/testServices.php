@@ -4871,8 +4871,7 @@ class testServices extends CAPITest {
 					'selectAlarms' => ''
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/selectAlarms": value must be one of '.
-						implode(', ', [API_OUTPUT_EXTEND, API_OUTPUT_COUNT]).'.',
+					'error' => 'Invalid parameter "/selectAlarms": value must be one of "extend", "count".',
 					'result' => []
 				]
 			],
@@ -4922,7 +4921,7 @@ class testServices extends CAPITest {
 					'selectAlarms' => ['']
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/selectAlarms/1": value must be one of clock, value.',
+					'error' => 'Invalid parameter "/selectAlarms/1": value must be one of "clock", "value".',
 					'result' => []
 				]
 			],
@@ -4952,8 +4951,7 @@ class testServices extends CAPITest {
 					'selectChildren' => ''
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/selectChildren": value must be one of '.
-						implode(', ', [API_OUTPUT_EXTEND, API_OUTPUT_COUNT]).'.',
+					'error' => 'Invalid parameter "/selectChildren": value must be one of "extend", "count".',
 					'result' => []
 				]
 			],
@@ -5003,7 +5001,7 @@ class testServices extends CAPITest {
 					'selectChildren' => ['']
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/selectChildren/1": value must be one of serviceid, name, status, algorithm, showsla, goodsla, sortorder, weight, propagation_rule, propagation_value, readonly.',
+					'error' => 'Invalid parameter "/selectChildren/1": value must be one of "serviceid", "name", "status", "algorithm", "showsla", "goodsla", "sortorder", "weight", "propagation_rule", "propagation_value", "readonly".',
 					'result' => []
 				]
 			],
@@ -5033,8 +5031,7 @@ class testServices extends CAPITest {
 					'selectParents' => ''
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/selectParents": value must be one of '.
-						implode(', ', [API_OUTPUT_EXTEND, API_OUTPUT_COUNT]).'.',
+					'error' => 'Invalid parameter "/selectParents": value must be one of "extend", "count".',
 					'result' => []
 				]
 			],
@@ -5084,7 +5081,7 @@ class testServices extends CAPITest {
 					'selectParents' => ['']
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/selectParents/1": value must be one of serviceid, name, status, algorithm, showsla, goodsla, sortorder, weight, propagation_rule, propagation_value, readonly.',
+					'error' => 'Invalid parameter "/selectParents/1": value must be one of "serviceid", "name", "status", "algorithm", "showsla", "goodsla", "sortorder", "weight", "propagation_rule", "propagation_value", "readonly".',
 					'result' => []
 				]
 			],
@@ -5114,8 +5111,7 @@ class testServices extends CAPITest {
 					'selectProblemTags' => ''
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/selectProblemTags": value must be one of '.
-						implode(', ', [API_OUTPUT_EXTEND, API_OUTPUT_COUNT]).'.',
+					'error' => 'Invalid parameter "/selectProblemTags": value must be one of "extend", "count".',
 					'result' => []
 				]
 			],
@@ -5165,7 +5161,7 @@ class testServices extends CAPITest {
 					'selectProblemTags' => ['']
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/selectProblemTags/1": value must be one of tag, operator, value.',
+					'error' => 'Invalid parameter "/selectProblemTags/1": value must be one of "tag", "operator", "value".',
 					'result' => []
 				]
 			],
@@ -5195,8 +5191,7 @@ class testServices extends CAPITest {
 					'selectStatusRules' => ''
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/selectStatusRules": value must be one of '.
-						implode(', ', [API_OUTPUT_EXTEND, API_OUTPUT_COUNT]).'.',
+					'error' => 'Invalid parameter "/selectStatusRules": value must be one of "extend", "count".',
 					'result' => []
 				]
 			],
@@ -5246,7 +5241,7 @@ class testServices extends CAPITest {
 					'selectStatusRules' => ['']
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/selectStatusRules/1": value must be one of type, limit_value, limit_status, new_status.',
+					'error' => 'Invalid parameter "/selectStatusRules/1": value must be one of "type", "limit_value", "limit_status", "new_status".',
 					'result' => []
 				]
 			],
@@ -5276,8 +5271,7 @@ class testServices extends CAPITest {
 					'selectTags' => ''
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/selectTags": value must be one of '.
-						implode(', ', [API_OUTPUT_EXTEND, API_OUTPUT_COUNT]).'.',
+					'error' => 'Invalid parameter "/selectTags": value must be one of "extend", "count".',
 					'result' => []
 				]
 			],
@@ -5327,7 +5321,7 @@ class testServices extends CAPITest {
 					'selectTags' => ['']
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/selectTags/1": value must be one of tag, value.',
+					'error' => 'Invalid parameter "/selectTags/1": value must be one of "tag", "value".',
 					'result' => []
 				]
 			],
@@ -5357,8 +5351,7 @@ class testServices extends CAPITest {
 					'selectTimes' => ''
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/selectTimes": value must be one of '.
-						implode(', ', [API_OUTPUT_EXTEND, API_OUTPUT_COUNT]).'.',
+					'error' => 'Invalid parameter "/selectTimes": value must be one of "extend", "count".',
 					'result' => []
 				]
 			],
@@ -5408,7 +5401,7 @@ class testServices extends CAPITest {
 					'selectTimes' => ['']
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/selectTimes/1": value must be one of type, ts_from, ts_to, note.',
+					'error' => 'Invalid parameter "/selectTimes/1": value must be one of "type", "ts_from", "ts_to", "note".',
 					'result' => []
 				]
 			]

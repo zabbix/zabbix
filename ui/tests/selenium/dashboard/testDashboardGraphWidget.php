@@ -1554,7 +1554,7 @@ class testDashboardGraphWidget extends CWebTest {
 		$form->submit();
 		$this->saveGraphWidget(CTestArrayHelper::get($data, 'main_fields.Name', 'Graph'));
 
-		// Check valuse in created widget.
+		// Check values in created widget.
 		if (CTestArrayHelper::get($data, 'check_form', false)) {
 			$this->openGraphWidgetConfiguration(CTestArrayHelper::get($data, 'main_fields.Name', 'Graph'));
 			$this->checkWidgetForm($data);
@@ -1848,7 +1848,7 @@ class testDashboardGraphWidget extends CWebTest {
 		COverlayDialogElement::ensureNotPresent();
 		$this->saveGraphWidget(CTestArrayHelper::get($data, 'main_fields.Name', 'Test cases for update'));
 
-		// Check valuse in updated widget.
+		// Check values in updated widget.
 		if (CTestArrayHelper::get($data, 'check_form', false)) {
 			$this->openGraphWidgetConfiguration(CTestArrayHelper::get($data, 'main_fields.Name', 'Test cases for update'));
 			$this->checkWidgetForm($data);

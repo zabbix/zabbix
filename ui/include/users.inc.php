@@ -88,19 +88,6 @@ function user_auth_type2str($authType) {
 }
 
 /**
- * Unblock user account.
- *
- * @param array $userIds
- *
- * @return bool
- */
-function unblock_user_login($userIds) {
-	zbx_value2array($userIds);
-
-	return DBexecute('UPDATE users SET attempt_failed=0 WHERE '.dbConditionInt('userid', $userIds));
-}
-
-/**
  * Get users ids by groups ids.
  *
  * @param array $userGroupIds

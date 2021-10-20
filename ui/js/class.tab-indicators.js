@@ -808,13 +808,14 @@ class ChildServicesTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		return document
-			.querySelectorAll('#children tbody tr')
-			.length;
+		return document.querySelector('#children').dataset.tabIndicator;
 	}
 
 	initObserver(element) {
-		this.initMutationObserver('#children tbody', element);
+		this.initMutationObserver('#children', element, {
+			attributes: true,
+			attributeFilter: ['data-tab-indicator']
+		});
 	}
 }
 

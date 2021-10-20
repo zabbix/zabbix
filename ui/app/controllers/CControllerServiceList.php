@@ -54,22 +54,7 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 			return false;
 		}
 
-		if ($this->hasInput('serviceid')) {
-			$db_service = API::Service()->get([
-				'output' => ['serviceid', 'name', 'status', 'goodsla', 'showsla', 'readonly'],
-				'serviceids' => $this->getInput('serviceid'),
-				'selectParents' => ['serviceid'],
-				'selectTags' => ['tag', 'value']
-			]);
-
-			if (!$db_service) {
-				return false;
-			}
-
-			$this->service = $db_service[0];
-		}
-
-		return true;
+		return parent::checkPermissions();
 	}
 
 	/**
@@ -150,6 +135,7 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 			'output' => ['serviceid', 'name', 'status', 'goodsla', 'showsla', 'readonly'],
 			'selectParents' => $filter['filter_set'] ? ['serviceid', 'name'] : null,
 			'selectChildren' => API_OUTPUT_COUNT,
+			'selectProblemEvents' => ['eventid', 'severity', 'name'],
 			'selectTags' => ['tag', 'value'],
 			'serviceids' => $db_serviceids,
 			'sortfield' => ['sortorder', 'name'],
@@ -157,7 +143,7 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 			'preservekeys' => true
 		]);
 
-		$data['events'] = $this->getProblemEvents($db_serviceids);
+		self::extendProblemEvents($data['services']);
 
 		$data['tags'] = makeTags($data['services'], true, 'serviceid', ZBX_TAG_COUNT_DEFAULT, $filter['tags']);
 

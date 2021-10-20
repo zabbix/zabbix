@@ -1442,7 +1442,7 @@ static int	execute_graphs_inserts(zbx_vector_graphs_copies_t *graphs_copies_inse
 						graphs_itemsid, template_entry->drawtype_orig,
 						template_entry->sortorder_orig, template_entry->color_orig,
 						template_entry->yaxisside_orig, template_entry->calc_fnc_orig,
-						template_entry->type_orig);
+						template_entry->type_orig, template_entry->itemid);
 				graphs_itemsid++;
 			}
 		}

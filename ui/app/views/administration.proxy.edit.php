@@ -42,10 +42,6 @@ $proxyForm = (new CForm())
 	->addVar('psk_edit_mode', $data['psk_edit_mode'])
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
 
-if ($data['status'] == HOST_STATUS_PROXY_PASSIVE && array_key_exists('interfaceid', $data)) {
-	$proxyForm->addVar('interfaceid', $data['interfaceid']);
-}
-
 if (array_key_exists('clone_proxyid', $data)) {
 	$proxyForm->addVar('clone_proxyid', $data['clone_proxyid']);
 }

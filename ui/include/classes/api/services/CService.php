@@ -60,6 +60,7 @@ class CService extends CApiService {
 			// filter
 			'serviceids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'parentids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'deep_parentids' =>			['type' => API_BOOLEAN, 'default' => false],
 			'childids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'evaltype' =>				['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
 			'tags' =>					['type' => API_OBJECTS, 'default' => [], 'fields' => [
@@ -84,16 +85,17 @@ class CService extends CApiService {
 				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
 			]],
 			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
-			'startSearch' =>			['type' => API_BOOLEAN, 'default' => false],
-			'excludeSearch' =>			['type' => API_BOOLEAN, 'default' => false],
+			'startSearch' =>			['type' => API_FLAG, 'default' => false],
+			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
 			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
 			// output
 			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', ['serviceid', 'name', 'status', 'algorithm', 'showsla', 'goodsla', 'sortorder', 'weight', 'propagation_rule', 'propagation_value', 'readonly']), 'default' => API_OUTPUT_EXTEND],
-			'countOutput' =>			['type' => API_BOOLEAN, 'default' => false],
+			'countOutput' =>			['type' => API_FLAG, 'default' => false],
 			'selectParents' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['serviceid', 'name', 'status', 'algorithm', 'showsla', 'goodsla', 'sortorder', 'weight', 'propagation_rule', 'propagation_value', 'readonly']), 'default' => null],
 			'selectChildren' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['serviceid', 'name', 'status', 'algorithm', 'showsla', 'goodsla', 'sortorder', 'weight', 'propagation_rule', 'propagation_value', 'readonly']), 'default' => null],
 			'selectTags' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['tag', 'value']), 'default' => null],
 			'selectProblemTags' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['tag', 'operator', 'value']), 'default' => null],
+			'selectProblemEvents' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['eventid', 'severity', 'name']), 'default' => null],
 			'selectTimes' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['type', 'ts_from', 'ts_to', 'note']), 'default' => null],
 			'selectStatusRules' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['type', 'limit_value', 'limit_status', 'new_status']), 'default' => null],
 			'selectAlarms' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['clock', 'value']), 'default' => null],
@@ -123,10 +125,25 @@ class CService extends CApiService {
 			$accessible_services = $permissions['r_services'] + $permissions['rw_services'];
 		}
 
-		if ($accessible_services !== null) {
-			$options['serviceids'] = array_key_exists('serviceids', $options) && $options['serviceids'] !== null
-				? array_keys(array_intersect_key($accessible_services, array_flip($options['serviceids'])))
-				: array_keys($accessible_services);
+		if ($options['parentids'] !== null && $accessible_services !== null) {
+			$options['parentids'] = array_intersect($options['parentids'],
+				array_keys([0 => true] + $accessible_services)
+			);
+		}
+
+		if ($options['parentids'] !== null && $options['deep_parentids']) {
+			$limit_services = self::getServicesByDeepParents($options['parentids']);
+
+			if ($accessible_services !== null) {
+				$limit_services = $limit_services !== null
+					? array_intersect_key($limit_services, $accessible_services)
+					: $accessible_services;
+			}
+
+			$options['parentids'] = null;
+		}
+		else {
+			$limit_services = $accessible_services;
 		}
 
 		$options['root_services'] = $permissions !== null ? $permissions['root_services'] : null;
@@ -134,11 +151,15 @@ class CService extends CApiService {
 		$db_services = [];
 
 		$sql = $this->createSelectQuery('services', $options);
-		$resource = DBselect($sql, $options['limit']);
+		$resource = DBselect($sql);
 
-		while ($row = DBfetch($resource)) {
+		while (($options['limit'] === null || count($db_services) < $options['limit']) && $row = DBfetch($resource)) {
 			if ($options['countOutput']) {
 				return $row['rowscount'];
+			}
+
+			if ($limit_services !== null && !array_key_exists($row['serviceid'], $limit_services)) {
+				continue;
 			}
 
 			if ($this->outputIsRequested('readonly', $options['output'])) {
@@ -486,6 +507,47 @@ class CService extends CApiService {
 	}
 
 	/**
+	 * @static
+	 *
+	 * @param array $parentids
+	 *
+	 * @return array|null
+	 */
+	private static function getServicesByDeepParents(array $parentids): ?array {
+		if (in_array(0, $parentids)) {
+			return null;
+		}
+
+		$parents = array_fill_keys($parentids, true);
+
+		$_options = [
+			'output' => ['serviceupid', 'servicedownid']
+		];
+		$db_links = DBselect(DB::makeSql('services_links', $_options));
+
+		$relations = [];
+
+		while ($db_link = DBfetch($db_links)) {
+			$relations[$db_link['serviceupid']][$db_link['servicedownid']] = true;
+		}
+
+		$limit_services = [];
+
+		while ($parents) {
+			$next_parents = [];
+
+			foreach (array_intersect_key($relations, $parents) as $children) {
+				$next_parents += $children;
+			}
+
+			$parents = $next_parents;
+			$limit_services += $next_parents;
+		}
+
+		return $limit_services;
+	}
+
+	/**
 	 * @param string $table_name
 	 * @param string $table_alias
 	 * @param array  $options
@@ -574,195 +636,642 @@ class CService extends CApiService {
 	protected function addRelatedObjects(array $options, array $result, array $permissions = null): array {
 		$result = parent::addRelatedObjects($options, $result);
 
-		$serviceids = array_keys($result);
-
-		if ($options['selectParents'] !== null) {
-			$relation_map = $this->createRelationMap($result, 'servicedownid', 'serviceupid', 'services_links');
-
-			$parents = $this->doGet([
-				'output' => ($options['selectParents'] === API_OUTPUT_COUNT) ? [] : $options['selectParents'],
-				'serviceids' => $relation_map->getRelatedIds(),
-				'sortfield' => $options['sortfield'],
-				'sortorder' => $options['sortorder'],
-				'preservekeys' => true
-			], $permissions);
-
-			$result = $relation_map->mapMany($result, $parents, 'parents');
-
-			if ($options['selectParents'] === API_OUTPUT_COUNT) {
-				foreach ($result as &$row) {
-					$row['parents'] = (string) count($row['parents']);
-				}
-				unset($row);
-			}
-		}
-
-		if ($options['selectChildren'] !== null) {
-			$relation_map = $this->createRelationMap($result, 'serviceupid', 'servicedownid', 'services_links');
-
-			$children = $this->doGet([
-				'output' => ($options['selectChildren'] === API_OUTPUT_COUNT) ? [] : $options['selectChildren'],
-				'serviceids' => $relation_map->getRelatedIds(),
-				'sortfield' => $options['sortfield'],
-				'sortorder' => $options['sortorder'],
-				'preservekeys' => true
-			], $permissions);
-
-			$result = $relation_map->mapMany($result, $children, 'children');
-
-			if ($options['selectChildren'] === API_OUTPUT_COUNT) {
-				foreach ($result as &$row) {
-					$row['children'] = (string) count($row['children']);
-				}
-				unset($row);
-			}
-		}
-
-		if ($options['selectTags'] !== null) {
-			if ($options['selectTags'] === API_OUTPUT_COUNT) {
-				$output = ['servicetagid', 'serviceid'];
-			}
-			elseif ($options['selectTags'] === API_OUTPUT_EXTEND) {
-				$output = ['servicetagid', 'serviceid', 'tag', 'value'];
-			}
-			else {
-				$output = array_unique(array_merge(['servicetagid', 'serviceid'], $options['selectTags']));
-			}
-
-			$tags = DB::select('service_tag', [
-				'output' => $output,
-				'filter' => ['serviceid' => $serviceids],
-				'preservekeys' => true
-			]);
-			$relation_map = $this->createRelationMap($tags, 'serviceid', 'servicetagid');
-			$tags = $this->unsetExtraFields($tags, ['servicetagid', 'serviceid']);
-			$result = $relation_map->mapMany($result, $tags, 'tags');
-
-			if ($options['selectTags'] === API_OUTPUT_COUNT) {
-				foreach ($result as &$row) {
-					$row['tags'] = (string) count($row['tags']);
-				}
-				unset($row);
-			}
-		}
-
-		if ($options['selectProblemTags'] !== null) {
-			if ($options['selectProblemTags'] === API_OUTPUT_COUNT) {
-				$output = ['service_problem_tagid', 'serviceid'];
-			}
-			elseif ($options['selectProblemTags'] === API_OUTPUT_EXTEND) {
-				$output = ['service_problem_tagid', 'serviceid', 'tag', 'operator', 'value'];
-			}
-			else {
-				$output = array_unique(array_merge(['service_problem_tagid', 'serviceid'],
-					$options['selectProblemTags']
-				));
-			}
-
-			$problem_tags = DB::select('service_problem_tag', [
-				'output' => $output,
-				'filter' => ['serviceid' => $serviceids],
-				'preservekeys' => true
-			]);
-			$relation_map = $this->createRelationMap($problem_tags, 'serviceid', 'service_problem_tagid');
-			$problem_tags = $this->unsetExtraFields($problem_tags, ['service_problem_tagid', 'serviceid']);
-			$result = $relation_map->mapMany($result, $problem_tags, 'problem_tags');
-
-			if ($options['selectProblemTags'] === API_OUTPUT_COUNT) {
-				foreach ($result as &$row) {
-					$row['problem_tags'] = (string) count($row['problem_tags']);
-				}
-				unset($row);
-			}
-		}
-
-		if ($options['selectTimes'] !== null) {
-			if ($options['selectTimes'] === API_OUTPUT_COUNT) {
-				$output = ['timeid', 'serviceid'];
-			}
-			elseif ($options['selectTimes'] === API_OUTPUT_EXTEND) {
-				$output = ['timeid', 'serviceid', 'type', 'ts_from', 'ts_to', 'note'];
-			}
-			else {
-				$output = array_unique(array_merge(['timeid', 'serviceid'], $options['selectTimes']));
-			}
-
-			$times = DB::select('services_times', [
-				'output' => $output,
-				'filter' => ['serviceid' => $serviceids],
-				'preservekeys' => true
-			]);
-			$relation_map = $this->createRelationMap($times, 'serviceid', 'timeid');
-			$times = $this->unsetExtraFields($times, ['timeid', 'serviceid']);
-			$result = $relation_map->mapMany($result, $times, 'times');
-
-			if ($options['selectTimes'] === API_OUTPUT_COUNT) {
-				foreach ($result as &$row) {
-					$row['times'] = (string) count($row['times']);
-				}
-				unset($row);
-			}
-		}
-
-		if ($options['selectStatusRules'] !== null) {
-			if ($options['selectStatusRules'] === API_OUTPUT_COUNT) {
-				$output = ['service_status_ruleid', 'serviceid'];
-			}
-			elseif ($options['selectStatusRules'] === API_OUTPUT_EXTEND) {
-				$output = ['service_status_ruleid', 'serviceid', 'type', 'limit_value', 'limit_status', 'new_status'];
-			}
-			else {
-				$output = array_unique(array_merge(['service_status_ruleid', 'serviceid'],
-					$options['selectStatusRules']
-				));
-			}
-
-			$status_rules = DB::select('service_status_rule', [
-				'output' => $output,
-				'filter' => ['serviceid' => $serviceids],
-				'preservekeys' => true
-			]);
-			$relation_map = $this->createRelationMap($status_rules, 'serviceid', 'service_status_ruleid');
-			$status_rules = $this->unsetExtraFields($status_rules, ['service_status_ruleid', 'serviceid']);
-			$result = $relation_map->mapMany($result, $status_rules, 'status_rules');
-
-			if ($options['selectStatusRules'] === API_OUTPUT_COUNT) {
-				foreach ($result as &$row) {
-					$row['status_rules'] = (string) count($row['status_rules']);
-				}
-				unset($row);
-			}
-		}
-
-		if ($options['selectAlarms'] !== null) {
-			if ($options['selectAlarms'] === API_OUTPUT_COUNT) {
-				$output = ['servicealarmid', 'serviceid'];
-			}
-			elseif ($options['selectAlarms'] === API_OUTPUT_EXTEND) {
-				$output = ['servicealarmid', 'serviceid', 'clock', 'value'];
-			}
-			else {
-				$output = array_unique(array_merge(['servicealarmid', 'serviceid'], $options['selectAlarms']));
-			}
-
-			$alarms = DB::select('service_alarms', [
-				'output' => $output,
-				'filter' => ['serviceid' => $serviceids],
-				'preservekeys' => true
-			]);
-			$relation_map = $this->createRelationMap($alarms, 'serviceid', 'servicealarmid');
-			$alarms = $this->unsetExtraFields($alarms, ['servicealarmid', 'serviceid']);
-			$result = $relation_map->mapMany($result, $alarms, 'alarms');
-
-			if ($options['selectAlarms'] === API_OUTPUT_COUNT) {
-				foreach ($result as &$row) {
-					$row['alarms'] = (string) count($row['alarms']);
-				}
-				unset($row);
-			}
-		}
+		$this->addRelatedParents($options, $result, $permissions);
+		$this->addRelatedChildren($options, $result, $permissions);
+		$this->addRelatedTags($options, $result);
+		$this->addRelatedProblemTags($options, $result);
+		$this->addRelatedProblemEvents($options, $result);
+		$this->addRelatedTimes($options, $result);
+		$this->addRelatedStatusRules($options, $result);
+		$this->addRelatedAlarms($options, $result);
 
 		return $result;
+	}
+
+	/**
+	 * @param array      $options
+	 * @param array      $result
+	 * @param array|null $permissions
+	 *
+	 * @throws APIException
+	 */
+	private function addRelatedParents(array $options, array &$result, ?array $permissions): void {
+		if ($options['selectParents'] === null) {
+			return;
+		}
+
+		/*
+		 * Performance optimized:
+		 * - Not filtering the output by the related service IDs.
+		 */
+		$parents = $this->doGet([
+			'output' => ($options['selectParents'] === API_OUTPUT_COUNT) ? [] : $options['selectParents'],
+			'sortfield' => $options['sortfield'],
+			'sortorder' => $options['sortorder'],
+			'preservekeys' => true
+		], $permissions);
+
+		$relation_map = $this->createRelationMap($result, 'servicedownid', 'serviceupid', 'services_links');
+
+		$result = $relation_map->mapMany($result, $parents, 'parents');
+
+		if ($options['selectParents'] === API_OUTPUT_COUNT) {
+			foreach ($result as &$row) {
+				$row['parents'] = (string) count($row['parents']);
+			}
+			unset($row);
+		}
+	}
+
+	/**
+	 * @param array      $options
+	 * @param array      $result
+	 * @param array|null $permissions
+	 *
+	 * @throws APIException
+	 */
+	private function addRelatedChildren(array $options, array &$result, ?array $permissions): void {
+		if ($options['selectChildren'] === null) {
+			return;
+		}
+
+		/*
+		 * Performance optimized:
+		 * - Not filtering the output by the related service IDs.
+		 */
+		$children = $this->doGet([
+			'output' => ($options['selectChildren'] === API_OUTPUT_COUNT) ? [] : $options['selectChildren'],
+			'sortfield' => $options['sortfield'],
+			'sortorder' => $options['sortorder'],
+			'preservekeys' => true
+		], $permissions);
+
+		$relation_map = $this->createRelationMap($result, 'serviceupid', 'servicedownid', 'services_links');
+
+		$result = $relation_map->mapMany($result, $children, 'children');
+
+		if ($options['selectChildren'] === API_OUTPUT_COUNT) {
+			foreach ($result as &$row) {
+				$row['children'] = (string) count($row['children']);
+			}
+			unset($row);
+		}
+	}
+
+	/**
+	 * @param array $options
+	 * @param array $result
+	 */
+	private function addRelatedTags(array $options, array &$result): void {
+		if ($options['selectTags'] === null) {
+			return;
+		}
+
+		if ($options['selectTags'] === API_OUTPUT_COUNT) {
+			$output = ['servicetagid', 'serviceid'];
+		}
+		elseif ($options['selectTags'] === API_OUTPUT_EXTEND) {
+			$output = ['servicetagid', 'serviceid', 'tag', 'value'];
+		}
+		else {
+			$output = array_unique(array_merge(['servicetagid', 'serviceid'], $options['selectTags']));
+		}
+
+		$tags = DB::select('service_tag', [
+			'output' => $output,
+			'filter' => ['serviceid' => array_keys($result)],
+			'preservekeys' => true
+		]);
+		$relation_map = $this->createRelationMap($tags, 'serviceid', 'servicetagid');
+		$tags = $this->unsetExtraFields($tags, ['servicetagid', 'serviceid']);
+		$result = $relation_map->mapMany($result, $tags, 'tags');
+
+		if ($options['selectTags'] === API_OUTPUT_COUNT) {
+			foreach ($result as &$row) {
+				$row['tags'] = (string)count($row['tags']);
+			}
+			unset($row);
+		}
+	}
+
+	/**
+	 * @param array $options
+	 * @param array $result
+	 */
+	private function addRelatedProblemTags(array $options, array &$result): void {
+		if ($options['selectProblemTags'] === null) {
+			return;
+		}
+
+		if ($options['selectProblemTags'] === API_OUTPUT_COUNT) {
+			$output = ['service_problem_tagid', 'serviceid'];
+		}
+		elseif ($options['selectProblemTags'] === API_OUTPUT_EXTEND) {
+			$output = ['service_problem_tagid', 'serviceid', 'tag', 'operator', 'value'];
+		}
+		else {
+			$output = array_unique(array_merge(['service_problem_tagid', 'serviceid'], $options['selectProblemTags']));
+		}
+
+		$problem_tags = DB::select('service_problem_tag', [
+			'output' => $output,
+			'filter' => ['serviceid' => array_keys($result)],
+			'preservekeys' => true
+		]);
+		$relation_map = $this->createRelationMap($problem_tags, 'serviceid', 'service_problem_tagid');
+		$problem_tags = $this->unsetExtraFields($problem_tags, ['service_problem_tagid', 'serviceid']);
+		$result = $relation_map->mapMany($result, $problem_tags, 'problem_tags');
+
+		if ($options['selectProblemTags'] === API_OUTPUT_COUNT) {
+			foreach ($result as &$row) {
+				$row['problem_tags'] = (string) count($row['problem_tags']);
+			}
+			unset($row);
+		}
+	}
+
+	/**
+	 * @param array $options
+	 * @param array $result
+	 *
+	 * @throws APIException
+	 */
+	private function addRelatedProblemEvents(array $options, array &$result): void {
+		if ($options['selectProblemEvents'] === null) {
+			return;
+		}
+
+		$_options = [
+			'output' => ['serviceupid', 'servicedownid']
+		];
+		$db_links = DBselect(DB::makeSql('services_links', $_options));
+
+		$relations = [];
+
+		while ($db_link = DBfetch($db_links)) {
+			$relations[$db_link['serviceupid']][$db_link['servicedownid']] = true;
+		}
+
+		$services_without_children = [];
+
+		$parents = $result;
+
+		while ($parents) {
+			$next_parents = [];
+
+			foreach (array_keys($parents) as $serviceid) {
+				if (array_key_exists($serviceid, $relations)) {
+					$next_parents += $relations[$serviceid];
+				}
+				else {
+					$services_without_children[$serviceid] = true;
+				}
+			}
+
+			$parents = $next_parents;
+		}
+
+		/*
+		 * Performance optimized:
+		 * - Not filtering the output by the related service IDs.
+		 */
+		$services = $this->doGet([
+			'output' => ['status', 'algorithm', 'weight', 'propagation_rule', 'propagation_value'],
+			'selectStatusRules' => ['type', 'limit_value', 'limit_status', 'new_status'],
+			'preservekeys' => true
+		]);
+
+		if ($options['selectProblemEvents'] === API_OUTPUT_COUNT) {
+			$output = ['serviceid'];
+		}
+		elseif ($options['selectProblemEvents'] === API_OUTPUT_EXTEND) {
+			$output = ['serviceid', 'eventid', 'severity', 'name'];
+		}
+		else {
+			$output = array_unique(array_merge(['serviceid', 'eventid'], $options['selectProblemEvents']));
+		}
+
+		$do_output_name = in_array('name', $output);
+
+		if ($do_output_name) {
+			$output = array_diff($output, ['name']);
+		}
+
+		$_options = [
+			'output' => $output
+		];
+		$db_service_problems = DBselect(DB::makeSql('service_problem', $_options));
+
+		$service_problems = array_fill_keys(array_keys($services_without_children), []);
+
+		while ($db_service_problem = DBfetch($db_service_problems)) {
+			$service_problems[$db_service_problem['serviceid']][] = $db_service_problem;
+		}
+
+		$problem_events = [];
+		$problem_events_ungrouped = [];
+
+		foreach (array_keys($result) as $serviceid) {
+			$problem_events[$serviceid] = $services[$serviceid]['status'] != ZBX_SEVERITY_OK
+				? self::getProblemEvents((string) $serviceid, $services, $relations, $service_problems)
+				: [];
+
+			$problem_events_ungrouped += $problem_events[$serviceid];
+		}
+
+		if ($do_output_name && $problem_events_ungrouped) {
+			$events = API::Event()->get([
+				'output' => ['name'],
+				'eventids' => array_keys($problem_events_ungrouped),
+				'source' => EVENT_SOURCE_TRIGGERS,
+				'object' => EVENT_OBJECT_TRIGGER,
+				'value' => TRIGGER_VALUE_TRUE,
+				'nopermissions' => true,
+				'preservekeys' => true
+			]);
+
+			if (count($events) != count($problem_events_ungrouped)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
+		}
+
+		foreach ($result as $serviceid => &$service) {
+			if ($options['selectProblemEvents'] === API_OUTPUT_COUNT) {
+				$service['problem_events'] = count($problem_events[$serviceid]);
+			}
+			else {
+				$service_problem_events = $problem_events[$serviceid];
+				$service_problem_events = $this->unsetExtraFields($service_problem_events, ['serviceid']);
+				$service_problem_events = $this->unsetExtraFields($service_problem_events, ['eventid'],
+					$options['selectProblemEvents']
+				);
+
+				if ($do_output_name) {
+					foreach ($service_problem_events as $eventid => &$problem_event) {
+						$problem_event['name'] = $events[$eventid]['name'];
+					}
+					unset($problem_event);
+				}
+
+				$service['problem_events'] = array_values($service_problem_events);
+			}
+		}
+		unset($service);
+	}
+
+	/**
+	 * @param array $options
+	 * @param array $result
+	 */
+	private function addRelatedTimes(array $options, array &$result): void {
+		if ($options['selectTimes'] === null) {
+			return;
+		}
+
+		if ($options['selectTimes'] === API_OUTPUT_COUNT) {
+			$output = ['timeid', 'serviceid'];
+		}
+		elseif ($options['selectTimes'] === API_OUTPUT_EXTEND) {
+			$output = ['timeid', 'serviceid', 'type', 'ts_from', 'ts_to', 'note'];
+		}
+		else {
+			$output = array_unique(array_merge(['timeid', 'serviceid'], $options['selectTimes']));
+		}
+
+		$times = DB::select('services_times', [
+			'output' => $output,
+			'filter' => ['serviceid' => array_keys($result)],
+			'preservekeys' => true
+		]);
+		$relation_map = $this->createRelationMap($times, 'serviceid', 'timeid');
+		$times = $this->unsetExtraFields($times, ['timeid', 'serviceid']);
+		$result = $relation_map->mapMany($result, $times, 'times');
+
+		if ($options['selectTimes'] === API_OUTPUT_COUNT) {
+			foreach ($result as &$row) {
+				$row['times'] = (string) count($row['times']);
+			}
+			unset($row);
+		}
+	}
+
+	private function addRelatedStatusRules(array $options, array &$result): void {
+		if ($options['selectStatusRules'] === null) {
+			return;
+		}
+
+		if ($options['selectStatusRules'] === API_OUTPUT_COUNT) {
+			$output = ['service_status_ruleid', 'serviceid'];
+		}
+		elseif ($options['selectStatusRules'] === API_OUTPUT_EXTEND) {
+			$output = ['service_status_ruleid', 'serviceid', 'type', 'limit_value', 'limit_status', 'new_status'];
+		}
+		else {
+			$output = array_unique(array_merge(['service_status_ruleid', 'serviceid'], $options['selectStatusRules']));
+		}
+
+		$status_rules = DB::select('service_status_rule', [
+			'output' => $output,
+			'filter' => ['serviceid' => array_keys($result)],
+			'preservekeys' => true
+		]);
+		$relation_map = $this->createRelationMap($status_rules, 'serviceid', 'service_status_ruleid');
+		$status_rules = $this->unsetExtraFields($status_rules, ['service_status_ruleid', 'serviceid']);
+		$result = $relation_map->mapMany($result, $status_rules, 'status_rules');
+
+		if ($options['selectStatusRules'] === API_OUTPUT_COUNT) {
+			foreach ($result as &$row) {
+				$row['status_rules'] = (string) count($row['status_rules']);
+			}
+			unset($row);
+		}
+	}
+
+	/**
+	 * @param array $options
+	 * @param array $result
+	 */
+	private function addRelatedAlarms(array $options, array &$result): void {
+		if ($options['selectAlarms'] === null) {
+			return;
+		}
+
+		if ($options['selectAlarms'] === API_OUTPUT_COUNT) {
+			$output = ['servicealarmid', 'serviceid'];
+		}
+		elseif ($options['selectAlarms'] === API_OUTPUT_EXTEND) {
+			$output = ['servicealarmid', 'serviceid', 'clock', 'value'];
+		}
+		else {
+			$output = array_unique(array_merge(['servicealarmid', 'serviceid'], $options['selectAlarms']));
+		}
+
+		$alarms = DB::select('service_alarms', [
+			'output' => $output,
+			'filter' => ['serviceid' => array_keys($result)],
+			'preservekeys' => true
+		]);
+		$relation_map = $this->createRelationMap($alarms, 'serviceid', 'servicealarmid');
+		$alarms = $this->unsetExtraFields($alarms, ['servicealarmid', 'serviceid']);
+		$result = $relation_map->mapMany($result, $alarms, 'alarms');
+
+		if ($options['selectAlarms'] === API_OUTPUT_COUNT) {
+			foreach ($result as &$row) {
+				$row['alarms'] = (string) count($row['alarms']);
+			}
+			unset($row);
+		}
+	}
+
+	/**
+	 * @static
+	 *
+	 * @param string   $parent_serviceid
+	 * @param array    $services
+	 * @param array    $relations
+	 * @param array    $service_problems
+	 * @param int|null $min_status
+	 *
+	 * @return array
+	 */
+	private static function getProblemEvents(string $parent_serviceid, array $services, array $relations,
+			array $service_problems, int $min_status = null): array {
+		$parent = $services[$parent_serviceid];
+
+		if (!array_key_exists($parent_serviceid, $relations)) {
+			if ($min_status !== null) {
+				$problem_events = array_filter($service_problems[$parent_serviceid],
+					static function (array $problem) use ($min_status): bool {
+						return $problem['severity'] >= $min_status;
+					}
+				);
+			}
+			else {
+				$problem_events = $service_problems[$parent_serviceid];
+			}
+
+			return array_column($problem_events, null, 'eventid');
+		}
+
+		$children = array_filter(array_intersect_key($services, $relations[$parent_serviceid]),
+			static function (array $service): bool {
+				return $service['propagation_rule'] != ZBX_SERVICE_STATUS_PROPAGATION_IGNORE;
+			}
+		);
+
+		$children_upstream_status = [];
+
+		foreach ($children as $child_serviceid => $child) {
+			if ($child['status'] == ZBX_SEVERITY_OK) {
+				$status = ZBX_SEVERITY_OK;
+			}
+			else {
+				switch ($child['propagation_rule']) {
+					case ZBX_SERVICE_STATUS_PROPAGATION_INCREASE:
+						$status = min(TRIGGER_SEVERITY_COUNT - 1, $child['status'] + $child['propagation_value']);
+						break;
+
+					case ZBX_SERVICE_STATUS_PROPAGATION_DECREASE:
+						$status = max(TRIGGER_SEVERITY_NOT_CLASSIFIED, $child['status'] - $child['propagation_value']);
+						break;
+
+					case ZBX_SERVICE_STATUS_PROPAGATION_FIXED:
+						$status = $child['propagation_value'];
+						break;
+
+					default:
+						$status = $child['status'];
+						break;
+				}
+			}
+
+			$children_upstream_status[$child_serviceid] = $status;
+		}
+
+		$not_ok_children = array_intersect_key($children, array_filter($children_upstream_status,
+			static function (int $status): bool {
+				return $status != ZBX_SEVERITY_OK;
+			}
+		));
+
+		switch ($parent['algorithm']) {
+			case ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL:
+				if (count($not_ok_children) == count($children)) {
+					$evaluate_children = array_fill_keys(array_keys($not_ok_children), null);
+					$evaluate_additional_rules = false;
+				}
+				else {
+					$evaluate_children = [];
+					$evaluate_additional_rules = true;
+				}
+
+				break;
+
+			case ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE:
+				if ($min_status !== null) {
+					$evaluate_children = [];
+
+					foreach ($not_ok_children as $child_serviceid => $child) {
+						if ($child['status'] < $min_status) {
+							continue;
+						}
+
+						switch ($child['propagation_rule']) {
+							case ZBX_SERVICE_STATUS_PROPAGATION_INCREASE:
+								$reverse_min_status = max(TRIGGER_SEVERITY_NOT_CLASSIFIED,
+									$min_status - $child['propagation_value']
+								);
+								break;
+
+							case ZBX_SERVICE_STATUS_PROPAGATION_DECREASE:
+								$reverse_min_status = min(TRIGGER_SEVERITY_COUNT - 1,
+									$min_status + $child['propagation_value']
+								);
+								break;
+
+							case ZBX_SERVICE_STATUS_PROPAGATION_FIXED:
+								$reverse_min_status = null;
+								break;
+
+							default:
+								$reverse_min_status = $min_status;
+								break;
+						}
+
+						$evaluate_children[$child_serviceid] = $reverse_min_status;
+					}
+
+					$evaluate_additional_rules = true;
+				}
+				else {
+					$evaluate_children = array_fill_keys(array_keys($not_ok_children), null);
+					$evaluate_additional_rules = false;
+				}
+
+				break;
+
+			default:
+				$evaluate_children = [];
+				$evaluate_additional_rules = true;
+		}
+
+		if ($evaluate_additional_rules) {
+			foreach ($parent['status_rules'] as $status_rule) {
+				if ($min_status !== null && $status_rule['new_status'] < $min_status) {
+					continue;
+				}
+
+				$is_less_than = in_array($status_rule['type'], [
+					ZBX_SERVICE_STATUS_RULE_TYPE_N_L,
+					ZBX_SERVICE_STATUS_RULE_TYPE_NP_L,
+					ZBX_SERVICE_STATUS_RULE_TYPE_W_L,
+					ZBX_SERVICE_STATUS_RULE_TYPE_WP_L
+				]);
+
+				$is_weight = in_array($status_rule['type'], [
+					ZBX_SERVICE_STATUS_RULE_TYPE_W_GE,
+					ZBX_SERVICE_STATUS_RULE_TYPE_WP_GE,
+					ZBX_SERVICE_STATUS_RULE_TYPE_W_L,
+					ZBX_SERVICE_STATUS_RULE_TYPE_WP_L
+				]);
+
+				$is_percentage = in_array($status_rule['type'], [
+					ZBX_SERVICE_STATUS_RULE_TYPE_NP_GE,
+					ZBX_SERVICE_STATUS_RULE_TYPE_NP_L,
+					ZBX_SERVICE_STATUS_RULE_TYPE_WP_GE,
+					ZBX_SERVICE_STATUS_RULE_TYPE_WP_L
+				]);
+
+				$rule_children = [];
+
+				foreach ($children as $child_serviceid => $child) {
+					$status_matched = $is_less_than
+						? $children_upstream_status[$child_serviceid] > $status_rule['limit_status']
+						: $children_upstream_status[$child_serviceid] >= $status_rule['limit_status'];
+
+					$weight_matched = !$is_weight || $child['weight'] > 0;
+
+					if ($status_matched && $weight_matched) {
+						$rule_children[$child_serviceid] = $child;
+					}
+				}
+
+				if ($is_weight) {
+					$value = 0;
+
+					foreach ($rule_children as $child) {
+						$value += $child['weight'];
+					}
+
+					$value_total = 0;
+
+					foreach ($children as $child) {
+						$value_total += $child['weight'];
+					}
+				}
+				else {
+					$value = count($rule_children);
+					$value_total = count($children);
+				}
+
+				$limit_value = $is_percentage
+					? $status_rule['limit_value'] * $value_total / 100
+					: $status_rule['limit_value'];
+
+				$rule_qualifies = $is_less_than ? $value_total - $value < $limit_value : $value >= $limit_value;
+
+				if ($rule_qualifies) {
+					$rule_min_status = $is_less_than ? $status_rule['limit_status'] + 1 : $status_rule['limit_status'];
+
+					foreach ($rule_children as $child_serviceid => $child) {
+						switch ($child['propagation_rule']) {
+							case ZBX_SERVICE_STATUS_PROPAGATION_INCREASE:
+								$reverse_rule_min_status = max(TRIGGER_SEVERITY_NOT_CLASSIFIED,
+									$rule_min_status - $child['propagation_value']
+								);
+								break;
+
+							case ZBX_SERVICE_STATUS_PROPAGATION_DECREASE:
+								$reverse_rule_min_status = min(TRIGGER_SEVERITY_COUNT - 1,
+									$rule_min_status + $child['propagation_value']
+								);
+								break;
+
+							case ZBX_SERVICE_STATUS_PROPAGATION_FIXED:
+								$reverse_rule_min_status = null;
+								break;
+
+							default:
+								$reverse_rule_min_status = $rule_min_status;
+								break;
+						}
+
+						if (array_key_exists($child_serviceid, $evaluate_children)) {
+							if ($evaluate_children[$child_serviceid] !== null) {
+								$evaluate_children[$child_serviceid] = min($evaluate_children[$child_serviceid],
+									$reverse_rule_min_status
+								);
+							}
+						}
+						else {
+							$evaluate_children[$child_serviceid] = $reverse_rule_min_status;
+						}
+					}
+				}
+			}
+		}
+
+		$problem_events = [];
+
+		foreach ($evaluate_children as $child_serviceid => $child_min_status) {
+			$problem_events += self::getProblemEvents((string) $child_serviceid, $services, $relations,
+				$service_problems, (int) $child_min_status
+			);
+		}
+
+		return $problem_events;
 	}
 
 	/**
@@ -1006,6 +1515,15 @@ class CService extends CApiService {
 			}
 		}
 
+		foreach (array_keys(array_intersect_key($add_references, $del_references)) as $parent_serviceid) {
+			$common_references = array_intersect_key($add_references[$parent_serviceid],
+				$del_references[$parent_serviceid]
+			);
+
+			$add_references[$parent_serviceid] = array_diff_key($add_references[$parent_serviceid], $common_references);
+			$del_references[$parent_serviceid] = array_diff_key($del_references[$parent_serviceid], $common_references);
+		}
+
 		if ($this->hasCircularReferences($add_references, $del_references)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Services form a circular dependency.'));
 		}
@@ -1020,9 +1538,9 @@ class CService extends CApiService {
 	private function hasCircularReferences(array $add_references, array $del_references): bool {
 		$reverse_references = [];
 
-		foreach ($add_references as $child_serviceid => $parents) {
-			foreach (array_keys($parents) as $parent_serviceid) {
-				$reverse_references[$parent_serviceid][$child_serviceid] = true;
+		foreach ($add_references as $parent_serviceid => $children) {
+			foreach (array_keys($children) as $child_serviceid) {
+				$reverse_references[$child_serviceid][$parent_serviceid] = true;
 			}
 		}
 
@@ -1035,29 +1553,29 @@ class CService extends CApiService {
 			$db_parents = [];
 
 			foreach ($db_links as $db_link) {
-				if (!array_key_exists($db_link['servicedownid'], $del_references)
-						|| !array_key_exists($db_link['serviceupid'], $del_references[$db_link['servicedownid']])) {
+				if (!array_key_exists($db_link['serviceupid'], $del_references)
+						|| !array_key_exists($db_link['servicedownid'], $del_references[$db_link['serviceupid']])) {
 					$db_parents[$db_link['servicedownid']][$db_link['serviceupid']] = true;
 				}
 			}
 
 			$next_references = [];
 
-			foreach ($add_references as $child_serviceid => $parents) {
-				foreach (array_keys($parents) as $parent_serviceid) {
+			foreach ($add_references as $parent_serviceid => $children) {
+				foreach (array_keys($children) as $child_serviceid) {
 					if ((string) $child_serviceid === (string) $parent_serviceid) {
 						return true;
 					}
 
-					if (array_key_exists($child_serviceid, $reverse_references)) {
-						foreach (array_keys($reverse_references[$child_serviceid]) as $serviceid) {
-							$next_references[$serviceid][$parent_serviceid] = true;
+					if (array_key_exists($parent_serviceid, $reverse_references)) {
+						foreach (array_keys($reverse_references[$parent_serviceid]) as $serviceid) {
+							$next_references[$serviceid][$child_serviceid] = true;
 						}
 					}
 
-					if (array_key_exists($child_serviceid, $db_parents)) {
-						foreach (array_keys($db_parents[$child_serviceid]) as $serviceid) {
-							$next_references[$serviceid][$parent_serviceid] = true;
+					if (array_key_exists($parent_serviceid, $db_parents)) {
+						foreach (array_keys($db_parents[$parent_serviceid]) as $serviceid) {
+							$next_references[$serviceid][$child_serviceid] = true;
 						}
 					}
 				}
@@ -1539,11 +2057,13 @@ class CService extends CApiService {
 	}
 
 	/**
+	 * @static
+	 *
 	 * @return array
 	 *
 	 * @throws APIException
 	 */
-	private function getPermissions(): array {
+	private static function getPermissions(): array {
 		$role = API::Role()->get([
 			'output' => [],
 			'selectRules' => ['services.read.mode', 'services.read.list', 'services.read.tag', 'services.write.mode',
@@ -1603,13 +2123,14 @@ class CService extends CApiService {
 			$rw_services += array_fill_keys(array_column($tags, 'serviceid'), 0);
 		}
 
+		$_options = [
+			'output' => ['serviceupid', 'servicedownid']
+		];
+		$db_links = DBselect(DB::makeSql('services_links', $_options));
+
 		$relations = [];
 
-		$db_links = DB::select('services_links', [
-			'output' => ['serviceupid', 'servicedownid']
-		]);
-
-		foreach ($db_links as $db_link) {
+		while ($db_link = DBfetch($db_links)) {
 			$relations[$db_link['serviceupid']][$db_link['servicedownid']] = true;
 		}
 
@@ -1877,16 +2398,12 @@ class CService extends CApiService {
 	 *      - from          - the beginning of the interval, timestamp;
 	 *      - to            - the end of the interval, timestamp.
 	 *
-	 * Returns the following availability information for each service:
-	 *  - status            - the current status of the service;
-	 *  - problems          - an array of triggers that are currently in problem state and belong to the given service
-	 *                        or it's descendants;
-	 *  - sla               - an array of requested intervals with SLA information:
-	 *      - from              - the beginning of the interval;
-	 *      - to                - the end of the interval;
-	 *      - okTime            - the time the service was in OK state, in seconds;
-	 *      - problemTime       - the time the service was in problem state, in seconds;
-	 *      - downtimeTime      - the time the service was down, in seconds.
+	 * Returns an array of requested intervals with SLA information:
+	 *  - from              - the beginning of the interval;
+	 *  - to                - the end of the interval;
+	 *  - okTime            - the time the service was in OK state, in seconds;
+	 *  - problemTime       - the time the service was in problem state, in seconds;
+	 *  - downtimeTime      - the time the service was down, in seconds.
 	 *
 	 * If the service calculation algorithm is set to SERVICE_ALGORITHM_NONE, the method will return an empty 'problems'
 	 * array and null for all of the calculated values.
@@ -1928,11 +2445,7 @@ class CService extends CApiService {
 
 			// initial data
 			foreach ($services as $service) {
-				$rs[$service['serviceid']] = [
-					'status' => $service['algorithm'] != ZBX_SERVICE_STATUS_CALC_SET_OK ? $service['status'] : null,
-					'problems' => [],
-					'sla' => []
-				];
+				$rs[$service['serviceid']] = [];
 			}
 
 			if ($usedSeviceIds) {
@@ -1952,46 +2465,6 @@ class CService extends CApiService {
 					while ($data = DBfetch($query)) {
 						$services[$data['serviceid']]['alarms'][] = $data;
 					}
-				}
-
-				// add problem events
-				$deep_problem_serviceids = $problemServiceIds;
-				$deep_services = $services;
-
-				while ($problemServiceIds) {
-					$child_services = $this->get([
-						'output' => ['serviceid', 'name', 'status', 'algorithm'],
-						'selectParents' => ['serviceid'],
-						'parentids' => $problemServiceIds,
-						'preservekeys' => true
-					]);
-
-					$child_services = array_filter($child_services,
-						static function (array $service): bool {
-							return $service['algorithm'] != ZBX_SERVICE_STATUS_CALC_SET_OK && $service['status'] > 0;
-						}
-					);
-
-					$deep_services += $child_services;
-
-					$problemServiceIds = array_keys($child_services);
-					$deep_problem_serviceids = array_merge($deep_problem_serviceids, $problemServiceIds);
-				}
-
-				if ($deep_problem_serviceids) {
-					$deep_problem_events = [];
-
-					$query = DBSelect(
-						'SELECT sp.eventid, sp.serviceid, sp.severity'.
-						' FROM service_problem sp'.
-						' WHERE '.dbConditionId('sp.serviceid', $deep_problem_serviceids)
-					);
-
-					while ($row = DBfetch($query)) {
-						$deep_problem_events[$row['serviceid']][$row['eventid']] = ['eventid' => $row['eventid']];
-					}
-
-					$rs = $this->escalateProblems($deep_services, $deep_problem_events, $rs);
 				}
 
 				$slaCalculator = new CServicesSlaCalculator();
@@ -2019,7 +2492,7 @@ class CService extends CApiService {
 							];
 						}
 
-						$rs[$service['serviceid']]['sla'][] = [
+						$rs[$service['serviceid']][] = [
 							'from' => $interval['from'],
 							'to' => $interval['to'],
 							'sla' => $intervalSla['ok'],
@@ -2033,56 +2506,6 @@ class CService extends CApiService {
 		}
 
 		return $rs;
-	}
-
-	/**
-	 * Escalate problem events from the child services to their parents and adds them to $slaData.
-	 * The escalation will stop if a service has status calculation disabled or is in OK state.
-	 *
-	 * @param array $services
-	 * @param array $problem_events  An array of service problems.
-	 * @param array $slaData
-	 *
-	 * @return array
-	 */
-	protected function escalateProblems(array $services, array $problem_events, array $slaData) {
-		$parentProblems = [];
-		foreach ($problem_events as $serviceId => $service_problem_events) {
-			$service = $services[$serviceId];
-
-			// add the problem events of the current service to the data
-			if (array_key_exists($serviceId, $slaData)) {
-				$slaData[$serviceId]['problems'] = zbx_array_merge($slaData[$serviceId]['problems'],
-					$service_problem_events
-				);
-			}
-
-			// add the same problem events to the parent services
-			foreach ($service['parents'] as $parent) {
-				$parentServiceId = $parent['serviceid'];
-
-				if (isset($services[$parentServiceId])) {
-					$parentService = $services[$parentServiceId];
-
-					// escalate only if status calculation is enabled for the parent service and it's in problem state
-					if ($parentService['algorithm'] != ZBX_SERVICE_STATUS_CALC_SET_OK && $parentService['status'] > 0) {
-						if (!isset($parentProblems[$parentServiceId])) {
-							$parentProblems[$parentServiceId] = [];
-						}
-						$parentProblems[$parentServiceId] = zbx_array_merge($parentProblems[$parentServiceId],
-							$service_problem_events
-						);
-					}
-				}
-			}
-		}
-
-		// propagate the problems to the parents
-		if ($parentProblems) {
-			$slaData = $this->escalateProblems($services, $parentProblems, $slaData);
-		}
-
-		return $slaData;
 	}
 
 	/**

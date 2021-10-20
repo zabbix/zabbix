@@ -23,12 +23,16 @@ class CControllerDashboardWidgetCheck extends CController {
 
 	private $context;
 
+	protected function init() {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
 	protected function checkInput() {
 		$fields = [
-			'templateid' => 'db dashboard.templateid',
-			'type' => 'required|string',
-			'name' => 'required|string',
-			'fields' => 'json'
+			'templateid' =>	'db dashboard.templateid',
+			'type' =>		'required|string',
+			'name' =>		'required|string',
+			'fields' =>		'json'
 		];
 
 		$ret = $this->validateInput($fields);

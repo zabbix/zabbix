@@ -20,7 +20,7 @@
 
 
 /**
- * Validate only trigger event name field expression macroses, other macroses will be ignored.
+ * Validate only trigger event name field expression macros, other macros will be ignored.
  */
 class CEventNameValidator extends CValidator {
 

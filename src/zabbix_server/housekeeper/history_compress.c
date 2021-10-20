@@ -267,7 +267,7 @@ void	hk_history_compression_init(void)
 
 	if (0 == zbx_strcmp_null(cfg.db.extension, ZBX_CONFIG_DB_EXTENSION_TIMESCALE))
 	{
-		/* surpress notice logs during DB initialization */
+		/* suppress notice logs during DB initialization */
 		result = DBselect("show client_min_messages");
 
 		if (NULL != (row = DBfetch(result)))

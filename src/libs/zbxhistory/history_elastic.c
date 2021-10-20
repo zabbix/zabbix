@@ -1034,8 +1034,9 @@ void	zbx_elastic_version_extract(struct zbx_json *json)
 	CURL				*handle;
 	size_t				version_len = 0;
 	char				*version_friendly = NULL, errbuf[CURL_ERROR_SIZE];
-	int				flag, major_num, minor_num, increment_num, ret = FAIL;
+	int				major_num, minor_num, increment_num, ret = FAIL;
 	zbx_uint32_t			version;
+	struct zbx_db_version_info_t	db_version_info;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1111,8 +1112,15 @@ out:
 		}
 	}
 
-	flag = zbx_db_version_check("ElasticDB", version, ZBX_ELASTIC_MIN_VERSION, ZBX_DBVERSION_UNDEFINED);
-	zbx_db_version_json_create(json, "ElasticDB", version_friendly, ZBX_ELASTIC_MIN_VERSION_FRIENDLY, "", flag);
+	db_version_info.database = "ElasticDB";
+	db_version_info.friendly_current_version = version_friendly;
+	db_version_info.friendly_min_version = ZBX_ELASTIC_MIN_VERSION_FRIENDLY;
+	db_version_info.friendly_max_version = "";
+	db_version_info.friendly_min_supported_version = NULL;
+	db_version_info.flag = zbx_db_version_check(db_version_info.database, version, ZBX_ELASTIC_MIN_VERSION,
+			ZBX_DBVERSION_UNDEFINED, ZBX_DBVERSION_UNDEFINED);
+
+	zbx_db_version_json_create(json, &db_version_info);
 	ZBX_ELASTIC_SVERSION = version;
 	zbx_free(version_friendly);
 	zbx_free(page.data);
