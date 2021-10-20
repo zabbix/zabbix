@@ -62,7 +62,7 @@ func init() {
 func (p *Plugin) exportVMVMemorySize(mode string) (result interface{}, err error) {
 	mem, err := win32.GlobalMemoryStatusEx()
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, err
 	}
 	switch mode {
 	case "", "total":
