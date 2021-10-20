@@ -20,6 +20,17 @@
 #include "common.h"
 #include "zbxalgo.h"
 #include "zbxeval.h"
+#include "log.h"
+#include "../../libs/zbxalgo/vectorimpl.h"
+
+typedef struct
+{
+	double	upper;
+	double	count;
+}
+zbx_histogram_t;
+ZBX_VECTOR_DECL(histogram, zbx_histogram_t)
+ZBX_VECTOR_IMPL(histogram, zbx_histogram_t)
 
 static int	zbx_is_normal_double(double dbl)
 {
@@ -110,16 +121,6 @@ err:
 	return FAIL;
 }
 
-static int	zbx_vector_dbl_compare(const void *d1, const void *d2)
-{
-	const double	*p1 = (const double *)d1;
-	const double	*p2 = (const double *)d2;
-
-	ZBX_RETURN_IF_NOT_EQUAL(*p1, *p2);
-
-	return 0;
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: find_median                                                      *
@@ -134,7 +135,7 @@ static int	zbx_vector_dbl_compare(const void *d1, const void *d2)
  ******************************************************************************/
 static double	find_median(zbx_vector_dbl_t *v)
 {
-	zbx_vector_dbl_sort(v, zbx_vector_dbl_compare);
+	zbx_vector_dbl_sort(v, ZBX_DEFAULT_DBL_COMPARE_FUNC);
 
 	if (0 == v->values_num % 2)	/* number of elements is even */
 		return (v->values[v->values_num / 2 - 1] + v->values[v->values_num / 2]) / 2.0;
@@ -491,4 +492,175 @@ err:
 	*error = zbx_strdup(*error, "cannot calculate varsamp() value");
 
 	return FAIL;
+}
+
+static void	remove_duplicate_backet(zbx_vector_histogram_t *h)
+{
+	zbx_histogram_t	b, last = h->values[0];
+	int		i, inx = 0;
+
+	for (i = 1; i < h->values_num; i++)
+	{
+		b = h->values[i];
+
+		if (SUCCEED == zbx_double_compare(b.upper, last.upper))
+		{
+			last.count += b.count;
+		}
+		else
+		{
+			h->values[inx] = last;
+			last = b;
+			inx++;
+		}
+	}
+
+	h->values[inx] = last;
+
+	while (h->values_num > inx + 1)
+		zbx_vector_histogram_remove_noorder(h, h->values_num - 1);
+}
+
+static void	ensure_histogram_monotonic(zbx_vector_histogram_t *h)
+{
+	double	max = h->values[0].count;
+	int	i;
+
+	for (i = 1; i < h->values_num; i++)
+	{
+		if (h->values[i].count > max)
+			max = h->values[i].count;
+		else if (h->values[i].count < max)
+			h->values[i].count = max;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_eval_calc_histogram_quantile                                 *
+ *                                                                            *
+ * Purpose: calculate histogram quantile base on vector, where odd position   *
+ *          is bucket upper bound ('le') and even position is 'rate' value    *
+ *                                                                            *
+ * Parameters: q      - [IN] quantile value from 0 till 1                     *
+ *             values - [IN] non-empty vector with input data                 *
+ *             err_fn - [IN] function name for error info                     *
+ *             result - [OUT] calculated value                                *
+ *             error  - [OUT] dynamically allocated error message             *
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully                             *
+ *               FAIL - failed to evaluate function (see 'error')             *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_eval_calc_histogram_quantile(const double q, const zbx_vector_dbl_t *values, const char *err_fn,
+		double *result, char **error)
+{
+#	define LAST(v)		v.values[v.values_num - 1]
+
+	zbx_vector_histogram_t	histogram;
+	double			res, total, rank, count, end, start;
+	zbx_histogram_t		hg;
+	int			i, ret = FAIL;
+
+	if (0 == values->values_num)
+	{
+		*error = zbx_dsprintf(*error, "invalid parameter: number of histogram buckets must not be zero"
+				" for function at \"%s\"",err_fn);
+		return FAIL;
+	}
+
+	zbx_vector_histogram_create(&histogram);
+
+	for (i = 0; i < values->values_num;)
+	{
+		hg.upper = values->values[i++];
+		hg.count = values->values[i++];
+		zbx_vector_histogram_append(&histogram, hg);
+	}
+
+	if (histogram.values_num < 2)
+	{
+		*error = zbx_dsprintf(*error, "invalid number of rate buckets for function at \"%s\"",err_fn);
+		goto err;
+	}
+
+	zbx_vector_histogram_sort(&histogram, ZBX_DEFAULT_DBL_COMPARE_FUNC);
+
+	if (FP_INFINITE != fpclassify(LAST(histogram).upper))
+	{
+		*error = zbx_dsprintf(*error, "invalid last infinity rate buckets for function at \"%s\"", err_fn);
+		goto err;
+	}
+
+	if (0 == LAST(histogram).count)
+	{
+		*error = zbx_dsprintf(*error, "invalid parameters: value of infinity bucket must not be zero"
+				" for function at \"%s\"", err_fn);
+		goto err;
+	}
+
+	remove_duplicate_backet(&histogram);
+
+	if (histogram.values_num < 2)
+	{
+		*error = zbx_dsprintf(*error,
+				"invalid number of rate buckets with duplicates for function at \"%s\"", err_fn);
+		goto err;
+	}
+
+	ensure_histogram_monotonic(&histogram);
+	total = LAST(histogram).count;
+
+	if (FP_ZERO == fpclassify(total))
+	{
+		*error = zbx_dsprintf(*error, "invalid zero value of infinity bucket for function at \"%s\"", err_fn);
+		goto err;
+	}
+
+	rank = q * total;
+
+	for (i = 0; i < histogram.values_num - 1; i++)
+	{
+		if (histogram.values[i].count >= rank)
+			break;
+	}
+
+	if (i == histogram.values_num - 1)
+	{
+		res = histogram.values[histogram.values_num - 2].upper;
+		goto end;
+	}
+
+	if (0 == i && 0 >= histogram.values[0].upper)
+	{
+		res = histogram.values[0].upper;
+		goto end;
+	}
+
+	start = 0;
+	end = histogram.values[i].upper;
+	count = histogram.values[i].count;
+
+	if (i > 0)
+	{
+		start = histogram.values[i - 1].upper;
+		count -= histogram.values[i - 1].count;
+		rank -= histogram.values[i - 1].count;
+	}
+
+	res = start + (end - start) * (rank / count);
+
+end:
+	if (SUCCEED != zbx_is_normal_double(res))
+	{
+		*error = zbx_dsprintf(*error, "cannot calculate value for function at \"%s\"", err_fn);
+		goto err;
+	}
+
+	*result = res;
+	ret = SUCCEED;
+err:
+	zbx_vector_histogram_destroy(&histogram);
+
+	return ret;
 }

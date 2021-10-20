@@ -44,17 +44,6 @@ class testSidebarMenu extends CWebTest {
 			[
 				[
 					'section' => 'Monitoring',
-					'page' => 'Overview',
-					'third_level' =>
-					[
-						'Trigger overview',
-						'Data overview'
-					]
-				]
-			],
-			[
-				[
-					'section' => 'Monitoring',
 					'page' => 'Latest data'
 				]
 			],

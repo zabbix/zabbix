@@ -83,7 +83,7 @@ PREPARE_AUDIT_HOST_INTERFACE_H(funcname, contextname, const char*)						\
 PREPARE_AUDIT_HOST_H(host, AUDIT_RESOURCE_HOST)
 PREPARE_AUDIT_HOST_H(host_prototype, AUDIT_RESOURCE_HOST_PROTOTYPE)
 
-#define PREPARE_AUDIT_HOST_UPDATE_H(resource, type1)						\
+#define PREPARE_AUDIT_HOST_UPDATE_H(resource, type1)							\
 void	zbx_audit_host_update_json_update_##resource(zbx_uint64_t hostid, type1 old_##resource,		\
 		type1 new_##resource);									\
 
@@ -202,7 +202,7 @@ void	zbx_audit_host_group_create_entry(int audit_action, zbx_uint64_t groupid, c
 void	zbx_audit_host_group_del(zbx_uint64_t groupid, const char *name);
 void	zbx_audit_host_group_update_json_add_details(zbx_uint64_t groupid, const char *name, int flags);
 
-#define PREPARE_AUDIT_HOST_GROUP_UPDATE_H(resource, type1)						\
+#define PREPARE_AUDIT_HOST_GROUP_UPDATE_H(resource, type1)							\
 void	zbx_audit_host_group_update_json_update_##resource(zbx_uint64_t groupid, type1 old_##resource,		\
 		type1 new_##resource);										\
 

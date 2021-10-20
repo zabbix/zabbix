@@ -1,9 +1,16 @@
 Changes for 6.0.0alpha5
 
 New features:
+A.F....... [ZBXNEXT-6470,ZBXNEXT-6868] implemented complete audit logging of host groups; added strict validation for hostgroup.massadd, hostgroup.massupdate, hostgroup.massremove API methods; changed sortfield used in audit log report to auditid (vmaksimovs)
+.........T [ZBXNEXT-6970] added templates for "MikroTik" Ethernet routers and Switches (mchudinov)
+..F.....S. [ZBXNEXT-6879] implemented new history functions "rate", "bucket_rate_foreach" and "bucket_percentile" and math function "histogram_quantile" (miks, MVekslers)
+A.F....... [ZBXNEXT-6470,ZBXNEXT-6929] implemented audit logging of correlation API object (rlataria, Sasha)
 ...G...... [ZBXNEXT-6428] moved plugins config options to separate files (akozlovs, esneiders, kalimulin, MVekslers)
 
 Bug fixes:
+...G...... [ZBXNEXT-6708] fixed 3rd parameter for Zabbix agent 2 web.certificate.get plugin (esneiders)
+........S. [ZBX-20006] fixed Zabbix server must not audit default DB values (akozlovs)
+...G...... [ZBX-20008] removed curl and ldap linkage from agent2 (yurii)
 ..F....... [ZBX-19997] fixed too long URL error when performing background page refresh (miks)
 A......... [ZBX-20021] fixed impossibility to import media types of type script with parameters from previous versions (agriscenko)
 ........S. [ZBX-19889] fixed server not updating trigger dependencies and other data during linking (arimdjonoks)
@@ -136,6 +143,18 @@ A.F....... [ZBXNEXT-6528,ZBXNEXT-6669] moved auditlog calls from frontend sectio
 
 Bug fixes:
 .........T [ZBX-19395] changed version in links of the templates and the media (mchudinov)
+
+--------------------------------------------------------------------------------
+Changes for 5.4.7rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.4.6
+
+5.4.6rc1 was released as 5.4.6 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.4.6rc1
@@ -1198,6 +1217,18 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.18rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.0.17
+
+5.0.17rc1 was released as 5.0.17 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.0.17rc1
@@ -3459,6 +3490,18 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.36rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.35
+
+4.0.35rc1 was released as 4.0.35 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.0.35rc1
