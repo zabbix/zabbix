@@ -887,6 +887,10 @@ class CHelpItems {
 					'description' => _('VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name')
 				],
 				[
+					'key' => ' vmware.hv.maintenance[<url>,<uuid>]',
+					'description' => _('VMware hypervisor maintenance status, <url> - VMware service URL, <uuid> - VMware hypervisor host name')
+				],
+				[
 					'key' => 'vmware.hv.memory.size.ballooned[<url>,<uuid>]',
 					'description' => _('VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name')
 				],
