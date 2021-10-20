@@ -49,7 +49,22 @@ int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	type = get_rparam(request, 0);
 	transform = get_rparam(request, 1);
 
-	if (NULL != type && '\0' != *type && 0 != strcmp(type, "host"))
+	if (NULL != type && '\0' != *type && 0 != strcmp(type, "netbios"))
+	{
+		if (0 == GetComputerName(computerName, &dwSize))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "GetComputerName() failed: %s",
+					strerror_from_system(GetLastError()));
+
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain computer name: %s",
+					strerror_from_system(GetLastError())));
+
+			return SYSINFO_RET_FAIL;
+		}
+
+		name = zbx_unicode_to_utf8(computerName);
+	}
+	else
 	{
 		if (0 == strcmp(type, "shorthost"))
 		{
@@ -67,37 +82,21 @@ int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			name = zbx_strdup(NULL, buffer);
 		}
-		else if (0 == strcmp(type, "netbios"))
+		else if (0 == strcmp(type, "host"))
 		{
-			if (0 == GetComputerName(computerName, &dwSize))
+			retrieve_hostname(buffer, sizeof(buffer), &error);
+			if (NULL != error)
 			{
-				zabbix_log(LOG_LEVEL_ERR, "GetComputerName() failed: %s",
-						strerror_from_system(GetLastError()));
-
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain computer name: %s",
-						strerror_from_system(GetLastError())));
-
+				SET_MSG_RESULT(result, error);
 				return SYSINFO_RET_FAIL;
 			}
-
-			name = zbx_unicode_to_utf8(computerName);
+			name = zbx_strdup(NULL, buffer);
 		}
 		else
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 			return SYSINFO_RET_FAIL;
 		}
-	}
-	else
-	{
-		retrieve_hostname(&buffer, sizeof(buffer), &error);
-		if (NULL != error)
-		{
-			SET_MSG_RESULT(result, error);
-			return SYSINFO_RET_FAIL;
-		}
-
-		name = zbx_strdup(NULL, buffer);
 	}
 
 	if (NULL != transform && '\0' != *transform && 0 != strcmp(transform, "none"))
@@ -108,6 +107,7 @@ int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 		}
 		else
 		{
+			zbx_free(name);
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 			return SYSINFO_RET_FAIL;
 		}
