@@ -6557,8 +6557,7 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 .sidebar.is-compact:not(.is-opened) .form-search .search-icon {
   opacity: .75; }
 
-.list-table thead th,
-.list-table tfoot td {
+.list-table thead th {
   border-color: #404040; }
 .list-table.compact-view tr:hover td.na-bg, .list-table.compact-view tr:hover td.info-bg, .list-table.compact-view tr:hover td.warning-bg, .list-table.compact-view tr:hover td.average-bg, .list-table.compact-view tr:hover td.high-bg, .list-table.compact-view tr:hover td.disaster-bg {
   color: #000000; }
@@ -6567,6 +6566,8 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 .list-table.compact-view td.na-bg, .list-table.compact-view td.info-bg, .list-table.compact-view td.warning-bg, .list-table.compact-view td.average-bg, .list-table.compact-view td.high-bg, .list-table.compact-view td.disaster-bg {
   color: #000000;
   box-shadow: inset 0 -1px 0 0 rgba(0, 0, 0, 0.1); }
+.list-table.sticky-footer tfoot tr:first-of-type td {
+  border-color: #404040; }
 
 .dashboard-navigation-tabs .csortable > .csortable-item > div, .dashboard-navigation-tabs .csortable-list > .csortable-item > div:hover {
   border: 1px solid transparent; }

@@ -199,8 +199,7 @@ $toc-title-bg-color: #4f4f4f;
 
 // Tables.
 .list-table {
-	thead th,
-	tfoot td {
+	thead th {
 		border-color: lighten($table-border-color, 3%);
 	}
 
@@ -236,6 +235,12 @@ $toc-title-bg-color: #4f4f4f;
 				color: #000000;
 				box-shadow: inset 0 -1px 0 0 rgba(0, 0, 0, .1);
 			}
+		}
+	}
+
+	&.sticky-footer {
+		tfoot tr:first-of-type td {
+			border-color: lighten($table-border-color, 3%);
 		}
 	}
 }
