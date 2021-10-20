@@ -107,6 +107,13 @@ class testDashboardPages extends CWebTest {
 	protected static $dashboardid_50_pages;
 
 	/**
+	 * Id of dashboard for page navigation.
+	 *
+	 * @var integer
+	 */
+	protected static $dashboardid_navigation;
+
+	/**
 	 * Create new dashboards for autotest.
 	 */
 	public function prepareDashboardData() {
@@ -259,6 +266,37 @@ class testDashboardPages extends CWebTest {
 				'display_period' => 30,
 				'auto_start' => 1,
 				'pages' => [[]]
+			],
+			[
+				'name' => 'Dashboard for page navigation',
+				'display_period' => 30,
+				'auto_start' => 1,
+				'pages' => [
+					[
+						'name' => 'long_name_to_check_navigation_1'
+					],
+					[
+						'name' => 'long_name_to_check_navigation_2'
+					],
+					[
+						'name' => 'long_name_to_check_navigation_3'
+					],
+					[
+						'name' => 'long_name_to_check_navigation_4'
+					],
+					[
+						'name' => 'long_name_to_check_navigation_5'
+					],
+					[
+						'name' => 'long_name_to_check_navigation_6'
+					],
+					[
+						'name' => 'long_name_to_check_navigation_7'
+					],
+					[
+						'name' => 'long_name_to_check_navigation_8'
+					]
+				]
 			]
 		]);
 		$this->assertArrayHasKey('dashboardids', $response);
@@ -270,6 +308,7 @@ class testDashboardPages extends CWebTest {
 		self::$dashboardid_empty = $response['dashboardids'][5];
 		self::$dashboardid_50_pages = $response['dashboardids'][6];
 		self::$dashboardid_paste = $response['dashboardids'][7];
+		self::$dashboardid_navigation = $response['dashboardids'][8];
 	}
 
 	/**
@@ -500,26 +539,26 @@ class testDashboardPages extends CWebTest {
 	 * Switch pages using next/previous arrow buttons.
 	 */
 	public function testDashboardPages_Navigation() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid_50_pages)->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid_navigation)->waitUntilReady();
 		$next_page = $this->query(self::NEXT_BUTTON)->one();
 		$previous_page = $this->query(self::PREVIOUS_BUTTON)->one();
+
+		// Check selected page.
+		$this->assertEquals('long_name_to_check_navigation_1', $this->query('xpath://li/div[@class="selected-tab"]')->one()->getText());
+
+		// Navigate on dashboard.
+		foreach ([$next_page, $previous_page] as $navigation) {
+			while ($navigation->isClickable()) {
+				$navigation->waitUntilReady()->click();
+			}
+			if ($navigation === $next_page) {
+				$this->assertTrue($next_page->isEnabled(false));
+				$this->assertTrue($previous_page->isEnabled());
+				$this->assertEquals('long_name_to_check_navigation_8', $this->query('xpath://li/div[@class="selected-tab"]')->one()->getText());
+			}
+		}
+
 		$this->assertTrue($next_page->isEnabled());
-		$this->assertTrue($previous_page->isEnabled(false));
-
-		for ($i = 1; $i <= 3; $i++) {
-			$this->assertEquals('Page '.$i, $this->query('xpath://div[@class="selected-tab"]/span')->one()->waitUntilPresent()->getText());
-			if ($i !== 3) {
-				$next_page->waitUntilReady()->click();
-			}
-		}
-		$this->assertTrue($previous_page->isEnabled());
-
-		for ($i = 3; $i >= 1; $i--) {
-			$this->assertEquals('Page '.$i, $this->query('xpath://div[@class="selected-tab"]/span')->one()->waitUntilPresent()->getText());
-			if ($i !== 1) {
-				$previous_page->waitUntilReady()->click();
-			}
-		}
 		$this->assertTrue($previous_page->isEnabled(false));
 	}
 
