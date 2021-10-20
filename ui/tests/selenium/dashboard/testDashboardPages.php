@@ -34,14 +34,14 @@ class testDashboardPages extends CWebTest {
 	 *
 	 * @var string
 	 */
-	protected static $next_button = 'xpath://button[@class="dashboard-next-page btn-iterator-page-next"]';
+	const NEXT_BUTTON = 'xpath://button[@class="dashboard-next-page btn-iterator-page-next"]';
 
 	/**
 	 * Previous page button in dashboard.
 	 *
 	 * @var string
 	 */
-	protected static $previous_button = 'xpath://button[@class="dashboard-previous-page btn-iterator-page-previous"]';
+	const PREVIOUS_BUTTON = 'xpath://button[@class="dashboard-previous-page btn-iterator-page-previous"]';
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -148,24 +148,19 @@ class testDashboardPages extends CWebTest {
 						'name' => 'first_page_copy',
 						'widgets' => [
 							[
-								'name' => 'First page clock',
+								'name' => 'First page clock 1',
 								'type' => 'clock',
 								'x' => 0,
 								'y' => 0,
 								'width' => 5,
 								'height' => 5,
 								'view_mode' => 0
-							]
-						]
-					],
-					[
-						'name' => 'second_page_copy',
-						'widgets' => [
+							],
 							[
-								'name' => 'Second page clock',
+								'name' => 'First page clock 2',
 								'type' => 'clock',
-								'x' => 0,
-								'y' => 0,
+								'x' => 6,
+								'y' => 5,
 								'width' => 5,
 								'height' => 5,
 								'view_mode' => 0
@@ -325,17 +320,18 @@ class testDashboardPages extends CWebTest {
 	 * Copy dashboard page.
 	 */
 	public function testDashboardPages_CopyPastePage() {
+		$query_pageid = 'SELECT dashboard_pageid FROM dashboard_page WHERE dashboardid='.zbx_dbstr(self::$dashboardid_copy).' ORDER BY dashboard_pageid DESC';
+		$query_widgets = 'SELECT type, name, x, y, width, height, view_mode FROM widget WHERE dashboard_pageid=';
+		$first_pageid = CDBHelper::getValue($query_pageid);
+		$first_page_widgets = CDBHelper::getHash($query_widgets.zbx_dbstr($first_pageid));
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid_copy)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 
-		// Save widget name on first page.
-		$widget_header = $dashboard->getWidgets()->last()->getHeaderText();
-
 		// Save dashboard page names before copy.
-		$pages_before = $this->getPagesTitles();
-		$this->selectPageAction('first_page_copy', 'Copy');
 		$dashboard->edit();
 		$this->page->waitUntilReady();
+		$pages_before = $this->getPagesTitles();
+		$this->selectPageAction('first_page_copy', 'Copy');
 		$this->query('id:dashboard-add')->one()->click();
 		$this->query('xpath://ul[@role="menu"]')->asPopupMenu()->one()->select('Paste page');
 		$dashboard->waitUntilReady();
@@ -345,18 +341,12 @@ class testDashboardPages extends CWebTest {
 
 		// Assert that new page added.
 		$this->assertEquals($pages_before, $this->getPagesTitles());
-
-		// Check that same widget copied with added page.
-		$this->assertEquals($widget_header, $dashboard->getWidgets()->last()->getHeaderText());
-
-		// Change widget name, to be sure that this page is correct after dashboard save.
-		$dashboard->getWidgets()->last()->edit()->fill(['Name' => 'First page clock + changed name'])->submit();
 		$dashboard->save();
 		$this->page->waitUntilReady();
-		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
-		$this->assertEquals($pages_before, $this->getPagesTitles());
-		$this->selectPage('first_page_copy', 2);
-		$this->assertEquals('First page clock + changed name', $dashboard->getWidgets()->last()->getHeaderText());
+
+		// Check and compare widget of second and first pages.
+		$second_pageid = CDBHelper::getValue($query_pageid);
+		$this->assertEquals($first_page_widgets, CDBHelper::getHash($query_widgets.zbx_dbstr($second_pageid)));
 	}
 
 	public static function getCreateData() {
@@ -453,7 +443,7 @@ class testDashboardPages extends CWebTest {
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
-		$next_page = $this->query(self::$next_button)->one();
+		$next_page = $this->query(self::NEXT_BUTTON)->one();
 		while ($next_page->isClickable()) {
 			$next_page->waitUntilReady()->click();
 			$this->query('xpath://ul[@class="sortable-list"]//span[@title='.CXPathHelper::escapeQuotes($title).']/following-sibling::button[@title="Actions"]')->waitUntilVisible();
@@ -486,8 +476,8 @@ class testDashboardPages extends CWebTest {
 	 */
 	public function testDashboardPages_Navigation() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid_50_pages)->waitUntilReady();
-		$next_page = $this->query(self::$next_button)->one();
-		$previous_page = $this->query(self::$previous_button)->one();
+		$next_page = $this->query(self::NEXT_BUTTON)->one();
+		$previous_page = $this->query(self::PREVIOUS_BUTTON)->one();
 		$this->assertTrue($next_page->isEnabled());
 		$this->assertTrue($previous_page->isEnabled(false));
 
@@ -698,6 +688,7 @@ class testDashboardPages extends CWebTest {
 	private function checkPageProperties() {
 		$page_dialog = COverlayDialogElement::find()->waitUntilVisible()->one();
 		$page_form = $page_dialog->query('name:dashboard_page_properties_form')->asForm()->one();
+		$this->assertEquals('255', $page_form->query('id:name')->one()->getAttribute('maxlength'));
 		$this->assertEquals('Dashboard page properties', $page_dialog->getTitle());
 		$this->assertEquals(['Name', 'Page display period'], $page_form->getLabels()->asText());
 		$this->assertEquals(['Default (30 seconds)', '10 seconds', '30 seconds', '1 minute', '2 minutes', '10 minutes',
