@@ -2596,8 +2596,8 @@ class CAction extends CApiService {
 					}
 
 					if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE) {
-						$has_groups = array_key_exists('opcommand_grp', $operation) && $operation['opcommand_grp'];
-						$has_users = array_key_exists('opcommand_grp', $operation) && $operation['opcommand_grp'];
+						$has_groups = array_key_exists('opmessage_grp', $operation) && $operation['opmessage_grp'];
+						$has_users = array_key_exists('opmessage_usr', $operation) && $operation['opmessage_usr'];
 
 						if (!$has_groups && !$has_users) {
 							self::exception(ZBX_API_ERROR_PARAMETERS,
