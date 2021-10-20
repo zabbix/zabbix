@@ -2738,7 +2738,7 @@ class CAction extends CApiService {
 				}
 			}
 
-			if (!array_key_exists('filter', $action) && !array_key_exists('conditions', $action['filter'])) {
+			if (!array_key_exists('filter', $action) || !array_key_exists('conditions', $action['filter'])) {
 				continue;
 			}
 
@@ -2756,7 +2756,9 @@ class CAction extends CApiService {
 						break;
 					}
 
-					$groupids = array_merge($groupids, array_column($operation['opcommand_grp'], 'groupid'));
+					if (array_key_exists('opcommand_grp', $operation)) {
+						$groupids = array_merge($groupids, array_column($operation['opcommand_grp'], 'groupid'));
+					}
 					break;
 
 				case OPERATION_TYPE_GROUP_ADD:
@@ -2806,7 +2808,7 @@ class CAction extends CApiService {
 				}
 			}
 
-			if (!array_key_exists('filter', $action) && !array_key_exists('conditions', $action['filter'])) {
+			if (!array_key_exists('filter', $action) || !array_key_exists('conditions', $action['filter'])) {
 				continue;
 			}
 
@@ -2971,7 +2973,7 @@ class CAction extends CApiService {
 				}
 			}
 
-			if (!array_key_exists('filter', $action) && !array_key_exists('conditions', $action['filter'])) {
+			if (!array_key_exists('filter', $action) || !array_key_exists('conditions', $action['filter'])) {
 				continue;
 			}
 
@@ -3023,7 +3025,7 @@ class CAction extends CApiService {
 		$triggerids = [];
 
 		foreach ($actions as $action) {
-			if (!array_key_exists('filter', $action) && !array_key_exists('conditions', $action['filter'])) {
+			if (!array_key_exists('filter', $action) || !array_key_exists('conditions', $action['filter'])) {
 				continue;
 			}
 
@@ -3066,7 +3068,7 @@ class CAction extends CApiService {
 		$druleids = [];
 
 		foreach ($actions as $action) {
-			if (!array_key_exists('filter', $action) && !array_key_exists('conditions', $action['filter'])) {
+			if (!array_key_exists('filter', $action) || !array_key_exists('conditions', $action['filter'])) {
 				continue;
 			}
 
@@ -3109,7 +3111,7 @@ class CAction extends CApiService {
 		$dcheckids = [];
 
 		foreach ($actions as $action) {
-			if (!array_key_exists('filter', $action) && !array_key_exists('conditions', $action['filter'])) {
+			if (!array_key_exists('filter', $action) || !array_key_exists('conditions', $action['filter'])) {
 				continue;
 			}
 
@@ -3152,7 +3154,7 @@ class CAction extends CApiService {
 		$proxyids = [];
 
 		foreach ($actions as $action) {
-			if (!array_key_exists('filter', $action) && !array_key_exists('conditions', $action['filter'])) {
+			if (!array_key_exists('filter', $action) || !array_key_exists('conditions', $action['filter'])) {
 				continue;
 			}
 
@@ -3195,7 +3197,7 @@ class CAction extends CApiService {
 		$serviceids = [];
 
 		foreach ($actions as $action) {
-			if (!array_key_exists('filter', $action) && !array_key_exists('conditions', $action['filter'])) {
+			if (!array_key_exists('filter', $action) || !array_key_exists('conditions', $action['filter'])) {
 				continue;
 			}
 
