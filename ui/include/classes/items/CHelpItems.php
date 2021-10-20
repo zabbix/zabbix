@@ -981,6 +981,10 @@ class CHelpItems {
 					'description' => _('Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage')
 				],
 				[
+					'key' => 'vmware.hv.sensors.get[<url>,<uuid>]',
+					'description' => _('VMware hypervisor HW vendor state sensors, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON')
+				],
+				[
 					'key' => 'vmware.hv.sensor.health.state[<url>,<uuid>]',
 					'description' => _('VMware hypervisor health state rollup sensor, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red')
 				],

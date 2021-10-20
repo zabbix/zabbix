@@ -85,6 +85,7 @@ static zbx_vmcheck_t	vmchecks[] =
 	{"hv.maintenance", VMCHECK_FUNC(check_vcenter_hv_maintenance)},
 	{"hv.uptime", VMCHECK_FUNC(check_vcenter_hv_uptime)},
 	{"hv.version", VMCHECK_FUNC(check_vcenter_hv_version)},
+	{"hv.sensors.get", VMCHECK_FUNC(check_vcenter_hv_sensors_get)},
 	{"hv.vm.num", VMCHECK_FUNC(check_vcenter_hv_vm_num)},
 
 	{"vm.cluster.name", VMCHECK_FUNC(check_vcenter_vm_cluster_name)},
