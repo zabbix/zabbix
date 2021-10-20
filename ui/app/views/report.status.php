@@ -42,7 +42,7 @@ require_once __DIR__.'/../../include/blocks.inc.php';
 				new CPartial('administration.ha.nodes', [
 					'ha_nodes' => $data['system_info']['ha_nodes'],
 					'ha_cluster_enabled' => $data['system_info']['ha_cluster_enabled'],
-					'failover_delay' => $data['system_info']['failover_delay']
+					'failover_delay' => null
 				])
 			))->addClass(ZBX_STYLE_CONTAINER)
 			: null

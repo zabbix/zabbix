@@ -67,16 +67,18 @@ if ($data['ha_cluster_enabled']) {
 		]);
 	}
 
-	$nodes_table
-		->addItem(
-			new CTag('tfoot', true,
-				(new CRow(
-					(new CCol(_s('Fail-over delay: %1$s', $data['failover_delay'])))
-						->addClass('table-info')
-						->setColSpan(4)
-				))
-			)
-		);
+	if ($data['failover_delay'] !== null) {
+		$nodes_table
+			->addItem(
+				new CTag('tfoot', true,
+					(new CRow(
+						(new CCol(_s('Fail-over delay: %1$s', $data['failover_delay'])))
+							->addClass('table-info')
+							->setColSpan(4)
+					))
+				)
+			);
+	}
 }
 
 $nodes_table->show();
