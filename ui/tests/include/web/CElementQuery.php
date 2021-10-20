@@ -555,7 +555,6 @@ class CElementQuery implements IWaitable {
 				'/div/div[@class="columns-wrapper columns-3"]', // TODO: fix after DEV-1859.
 				'/ul[contains(@class, "checkbox-list")]',
 				'/ul[contains(@class, "list-check-radio")]',
-				'/ul' // TODO: remove after ZBXNEXT-6757 (113) is fixed.
 			],
 			'CHostInterfaceElement'		=> [
 				'/div/div[contains(@class, "interface-container")]/../..'
