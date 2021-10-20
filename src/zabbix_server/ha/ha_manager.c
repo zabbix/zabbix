@@ -67,9 +67,6 @@ typedef struct
 	/* last access time of active node */
 	int		lastaccess_active;
 
-	/* number of ticks without database connection */
-	int		offline_ticks;
-
 	/* number of ticks active node has not been updated its lastaccess */
 	int		offline_ticks_active;
 
@@ -135,28 +132,31 @@ static int	ha_send_manager_message(zbx_uint32_t code, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Function: ha_notify_parent                                                 *
+ * Function: ha_update_parent                                                 *
  *                                                                            *
- * Purpose: notify parent process                                             *
+ * Purpose: update parent process with ha_status and failover delay           *
  *                                                                            *
  ******************************************************************************/
-static void	ha_notify_parent(zbx_ipc_client_t *client, int status, const char *info)
+static void	ha_update_parent(zbx_ipc_client_t *client, zbx_ha_info_t *info)
 {
-	zbx_uint32_t	len = 0, info_len;
+	zbx_uint32_t	len = 0, error_len;
 	unsigned char	*ptr, *data;
+	const char	*error = info->error;
 	int		ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() status:%s info:%s", __func__, zbx_ha_status_str(status),
-			ZBX_NULL2EMPTY_STR(info));
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ha_status:%s info:%s", __func__, zbx_ha_status_str(info->ha_status),
+			ZBX_NULL2EMPTY_STR(info->error));
 
-	zbx_serialize_prepare_value(len, status);
-	zbx_serialize_prepare_str(len, info);
+	zbx_serialize_prepare_value(len, info->ha_status);
+	zbx_serialize_prepare_value(len, info->failover_delay);
+	zbx_serialize_prepare_str(len, error);
 
 	ptr = data = (unsigned char *)zbx_malloc(NULL, len);
-	ptr += zbx_serialize_value(ptr, status);
-	(void)zbx_serialize_str(ptr, info, info_len);
+	ptr += zbx_serialize_value(ptr, info->ha_status);
+	ptr += zbx_serialize_value(ptr, info->failover_delay);
+	(void)zbx_serialize_str(ptr, error, error_len);
 
-	ret = zbx_ipc_client_send(client, ZBX_IPC_SERVICE_HA_GET_NODES, data, len);
+	ret = zbx_ipc_client_send(client, ZBX_IPC_SERVICE_HA_UPDATE, data, len);
 	zbx_free(data);
 
 	if (SUCCEED != ret)
@@ -170,53 +170,18 @@ static void	ha_notify_parent(zbx_ipc_client_t *client, int status, const char *i
 
 /******************************************************************************
  *                                                                            *
- * Function: ha_recv_status                                                   *
+ * Function: ha_send_heartbeat                                                *
  *                                                                            *
- * Purpose: receive status message from HA service                            *
+ * Purpose: send heartbeat message to main process                            *
  *                                                                            *
  ******************************************************************************/
-static int	ha_recv_status(int *status, int timeout, char **error)
+static void	ha_send_heartbeat(zbx_ipc_client_t *client)
 {
-	zbx_ipc_message_t	*message = NULL;
-	int			ret = SUCCEED;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (SUCCEED != zbx_ipc_async_socket_recv(&ha_socket, timeout, &message))
+	if (SUCCEED != zbx_ipc_client_send(client, ZBX_IPC_SERVICE_HA_HEARTBEAT, NULL, 0))
 	{
-		*error = zbx_strdup(NULL, "cannot receive message from HA manager service");
-		ret = FAIL;
-		goto out;
+		zabbix_log(LOG_LEVEL_CRIT, "cannot send HA heartbeat to main process");
+		exit(EXIT_FAILURE);
 	}
-
-	if (NULL != message)
-	{
-		unsigned char	*ptr;
-		zbx_uint32_t	len;
-
-		switch (message->code)
-		{
-			case ZBX_IPC_SERVICE_HA_GET_NODES:
-				ptr = message->data;
-				ptr += zbx_deserialize_value(ptr, status);
-				(void)zbx_deserialize_str(ptr, error, len);
-
-				if (ZBX_NODE_STATUS_ERROR == *status)
-					ret = FAIL;
-				break;
-			default:
-				*status = ZBX_NODE_STATUS_UNKNOWN;
-		}
-
-		zbx_ipc_message_free(message);
-	}
-	else
-		*status = ZBX_NODE_STATUS_UNKNOWN;
-
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() status:%d", __func__, *status);
-
-	return ret;
 }
 
 /******************************************************************************
@@ -1093,22 +1058,8 @@ out:
 finish:
 	if (ZBX_NODE_STATUS_ERROR != info->ha_status)
 	{
-		switch (info->db_status)
-		{
-			case ZBX_DB_DOWN:
-				info->offline_ticks++;
-
-				if (ZBX_HA_IS_CLUSTER() && ZBX_NODE_STATUS_ACTIVE == info->ha_status)
-				{
-					if (info->failover_delay / ZBX_HA_POLL_PERIOD < info->offline_ticks)
-						info->ha_status = ZBX_NODE_STATUS_STANDBY;
-				}
-				break;
-			case ZBX_DB_OK:
-				info->offline_ticks = 0;
-				info->ha_status = ha_status;
-				break;
-		}
+		if (ZBX_DB_OK == info->db_status)
+			info->ha_status = ha_status;
 	}
 
 	zbx_vector_ha_node_clear_ext(&nodes, zbx_ha_node_free);
@@ -1452,7 +1403,7 @@ int	zbx_ha_get_status(char **error)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	ret = ha_send_manager_message(ZBX_IPC_SERVICE_HA_STATUS, error);
+	ret = ha_send_manager_message(ZBX_IPC_SERVICE_HA_UPDATE, error);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -1463,12 +1414,86 @@ int	zbx_ha_get_status(char **error)
  *                                                                            *
  * Function: zbx_ha_recv_status                                               *
  *                                                                            *
- * Purpose: receive status message from HA service                            *
+ * Purpose: handle HA manager notifications                                   *
+ *                                                                            *
+ * Comments: This function also monitors heartbeat notifications and          *
+ *           returns standby status if no heartbeats are received for         *
+ *           failover delay - poll period seconds. This would make main       *
+ *           process to switch to standby mode and initiate teardown process  *
  *                                                                            *
  ******************************************************************************/
-int	zbx_ha_recv_status(int timeout, int *status, char **error)
+int	zbx_ha_recv_status(int timeout, int *ha_status, char **error)
 {
-	return ha_recv_status(status, timeout, error);
+	zbx_ipc_message_t	*message = NULL;
+	int			ret = SUCCEED, ha_status_old;
+	time_t			now;
+	static time_t		last_hb;
+	static int		ha_failover_delay = ZBX_HA_DEFAULT_FAILOVER_DELAY;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	while (1)
+	{
+		unsigned char	*ptr;
+		zbx_uint32_t	len;
+
+		if (SUCCEED != zbx_ipc_async_socket_recv(&ha_socket, timeout, &message))
+		{
+			*ha_status = ZBX_NODE_STATUS_ERROR;
+			*error = zbx_strdup(NULL, "cannot receive message from HA manager service");
+			ret = FAIL;
+			goto out;
+		}
+
+		now = time(NULL);
+
+		if (NULL == message)
+			break;
+
+		switch (message->code)
+		{
+			case ZBX_IPC_SERVICE_HA_UPDATE:
+				ha_status_old = *ha_status;
+
+				ptr = message->data;
+				ptr += zbx_deserialize_value(ptr, ha_status);
+				ptr += zbx_deserialize_value(ptr, &ha_failover_delay);
+				(void)zbx_deserialize_str(ptr, error, len);
+
+				if (ZBX_NODE_STATUS_ERROR == *ha_status)
+				{
+					ret = FAIL;
+					goto out;
+				}
+
+				/* reset heartbeat on status change */
+				if (ha_status_old != *ha_status)
+					last_hb = now;
+
+				break;
+			case ZBX_IPC_SERVICE_HA_HEARTBEAT:
+				last_hb = now;
+				break;
+		}
+
+		zbx_ipc_message_free(message);
+
+		/* reset timeout for getting pending messages */
+		timeout = 0;
+	}
+
+	if (ZBX_HA_IS_CLUSTER() && *ha_status == ZBX_NODE_STATUS_ACTIVE && 0 != last_hb)
+	{
+		if (last_hb + ha_failover_delay - ZBX_HA_POLL_PERIOD <= now || now < last_hb)
+		{
+			*ha_status = ZBX_NODE_STATUS_STANDBY;
+			ret = SUCCEED;
+		}
+	}
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
 }
 
 /******************************************************************************
@@ -1765,8 +1790,8 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 	char			*error = NULL;
 	zbx_ipc_client_t	*client, *main_proc = NULL;
 	zbx_ipc_message_t	*message;
-	int			pause = FAIL, stop = FAIL;
-	double			now, nextcheck;
+	int			pause = FAIL, stop = FAIL, ticks_num = 0, nextcheck;
+	double			now, tick;
 	zbx_ha_info_t		info;
 
 	zbx_setproctitle("ha manager");
@@ -1785,13 +1810,13 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 	info.ha_status = (int)(uintptr_t)((zbx_thread_args_t *)args)->args;
 	info.error = NULL;
 	info.db_status = ZBX_DB_DOWN;
-	info.offline_ticks = 0;
 	info.offline_ticks_active = 0;
 	info.lastaccess_active = 0;
 	info.failover_delay = ZBX_HA_DEFAULT_FAILOVER_DELAY;
 	info.auditlog = 0;
 
 	now = zbx_time();
+	tick = now;
 
 	if (ZBX_NODE_STATUS_UNKNOWN == info.ha_status)
 	{
@@ -1800,10 +1825,15 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 		if (ZBX_NODE_STATUS_ERROR == info.ha_status)
 			goto pause;
 		else
-			nextcheck = now + ZBX_HA_POLL_PERIOD;
+			nextcheck = ZBX_HA_POLL_PERIOD;
 	}
 	else
-		nextcheck = now + SEC_PER_MIN;
+	{
+		/* Server switches to standby mode when database is offline for <failover delay> - <poll period> */
+		/* seconds. If that happens, delay the next database check for twice of poll period time to      */
+		/* ensure that the same node does not take over after recovery.                                  */
+		nextcheck = ZBX_HA_POLL_PERIOD * 2;
+	}
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "HA manager started in %s mode", zbx_ha_status_str(info.ha_status));
 
@@ -1811,29 +1841,45 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 	{
 		now = zbx_time();
 
-		if (nextcheck <= now)
+		if (tick <= now)
 		{
-			int	old_status = info.ha_status;
+			ticks_num++;
 
-			if (ZBX_NODE_STATUS_UNKNOWN == info.ha_status)
-				ha_db_register_node(&info);
-			else
-				ha_check_nodes(&info);
-
-			if (old_status != info.ha_status && ZBX_NODE_STATUS_UNKNOWN != info.ha_status)
+			if (nextcheck <= ticks_num)
 			{
+				int	old_status = info.ha_status, delay;
+
+				if (ZBX_NODE_STATUS_UNKNOWN == info.ha_status)
+					ha_db_register_node(&info);
+				else
+					ha_check_nodes(&info);
+
 				if (NULL != main_proc)
-					ha_notify_parent(main_proc, info.ha_status, info.error);
+				{
+					if (old_status != info.ha_status && ZBX_NODE_STATUS_UNKNOWN != info.ha_status)
+						ha_update_parent(main_proc, &info);
+				}
+
+				if (ZBX_NODE_STATUS_ERROR == info.ha_status)
+					break;
+
+				/* in offline mode try connecting to database every second otherwise */
+				/* with small failover delay (10s) it might switch to standby mode   */
+				/* despite connection being restored shortly                         */
+				delay = ZBX_DB_OK <= info.db_status ? ZBX_HA_POLL_PERIOD : 1;
+
+				while (nextcheck <= ticks_num)
+					nextcheck += delay;
 			}
 
-			if (ZBX_NODE_STATUS_ERROR == info.ha_status)
-				break;
+			if (NULL != main_proc && ZBX_DB_OK <= info.db_status)
+				ha_send_heartbeat(main_proc);
 
-			while (nextcheck <= now)
-				nextcheck += ZBX_HA_POLL_PERIOD;
+			while (tick <= now)
+				tick++;
 		}
 
-		(void)zbx_ipc_service_recv(&service, nextcheck - now, &client, &message);
+		(void)zbx_ipc_service_recv(&service, tick - now, &client, &message);
 
 		if (NULL != message)
 		{
@@ -1842,8 +1888,8 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 				case ZBX_IPC_SERVICE_HA_REGISTER:
 					main_proc = client;
 					break;
-				case ZBX_IPC_SERVICE_HA_STATUS:
-					ha_notify_parent(main_proc, info.ha_status, info.error);
+				case ZBX_IPC_SERVICE_HA_UPDATE:
+					ha_update_parent(main_proc, &info);
 					break;
 				case ZBX_IPC_SERVICE_HA_STOP:
 					stop = SUCCEED;
@@ -1859,6 +1905,7 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 					break;
 				case ZBX_IPC_SERVICE_HA_SET_FAILOVER_DELAY:
 					ha_set_failover_delay(&info, client, message);
+					ha_update_parent(main_proc, &info);
 					break;
 				case ZBX_IPC_SERVICE_HA_LOGLEVEL_INCREASE:
 					if (SUCCEED != zabbix_increase_log_level())
@@ -1909,8 +1956,8 @@ pause:
 				case ZBX_IPC_SERVICE_HA_REGISTER:
 					main_proc = client;
 					break;
-				case ZBX_IPC_SERVICE_HA_STATUS:
-					ha_notify_parent(main_proc, info.ha_status, info.error);
+				case ZBX_IPC_SERVICE_HA_UPDATE:
+					ha_update_parent(main_proc, &info);
 					break;
 				case ZBX_IPC_SERVICE_HA_STOP:
 					stop = SUCCEED;

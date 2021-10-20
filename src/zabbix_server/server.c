@@ -179,7 +179,8 @@ int		threads_num = 0;
 pid_t		*threads = NULL;
 static int	*threads_flags;
 
-static int	ha_status = ZBX_NODE_STATUS_UNKNOWN;
+static int	ha_status = ZBX_NODE_STATUS_UNINITIALIZED;
+static int	ha_status_old;
 zbx_cuid_t	ha_sessionid;
 
 unsigned char			program_type	= ZBX_PROGRAM_TYPE_SERVER;
@@ -1173,20 +1174,16 @@ static void	zbx_check_db(void)
  * Purpose: check for queued status message and update HA status              *
  *                                                                            *
  ******************************************************************************/
-static int	server_update_status(void)
+static int	server_update_ha_status(void)
 {
-	int	status;
 	char	*error = NULL;
 
-	if (SUCCEED != zbx_ha_recv_status(0, &status, &error))
+	if (SUCCEED != zbx_ha_recv_status(0, &ha_status, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot check HA manager status: %s", error);
 		zbx_free(error);
 		return FAIL;
 	}
-
-	if (ZBX_NODE_STATUS_STANDBY == status)
-		ha_status = status;
 
 	return SUCCEED;
 }
@@ -1295,7 +1292,7 @@ static int	server_startup(zbx_socket_t *listen_sock)
 				zbx_thread_start(dbconfig_thread, &thread_args, &threads[i]);
 				DCconfig_wait_sync();
 
-				if (SUCCEED != server_update_status())
+				if (SUCCEED != server_update_ha_status())
 				{
 					ret = FAIL;
 					goto out;
@@ -1431,7 +1428,7 @@ static int	server_startup(zbx_socket_t *listen_sock)
 	}
 
 	/* startup/postinit tasks can take a long time, update status */
-	if (SUCCEED != server_update_status())
+	if (SUCCEED != server_update_ha_status())
 		ret = FAIL;
 out:
 	zbx_unset_exit_on_terminate();
@@ -1532,7 +1529,7 @@ static void	server_teardown(zbx_socket_t *listen_sock)
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
 	char		*error = NULL;
-	int		i, db_type, ret, new_ha_status;
+	int		i, db_type, ret;
 	zbx_socket_t	listen_sock;
 
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
@@ -1720,8 +1717,19 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zbx_set_sigusr_handler(zbx_main_sigusr_handler);
 
-	if (SUCCEED != zbx_ha_get_status(&error) ||
-			SUCCEED != zbx_ha_recv_status(ZBX_IPC_WAIT_FOREVER, &ha_status, &error))
+	if (SUCCEED == zbx_ha_get_status(&error))
+	{
+		while (ZBX_IS_RUNNING() && ZBX_NODE_STATUS_UNINITIALIZED == ha_status)
+		{
+			if (SUCCEED != zbx_ha_recv_status(ZBX_IPC_WAIT_FOREVER, &ha_status, &error))
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "cannot start server: %s", error);
+				zbx_free(error);
+				sig_exiting = ZBX_EXIT_FAILURE;
+			}
+		}
+	}
+	else
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot start server: %s", error);
 		zbx_free(error);
@@ -1758,9 +1766,11 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		}
 	}
 
-	while (ZBX_IS_RUNNING())	/* wait for any child to exit */
+	ha_status_old = ha_status;
+
+	while (ZBX_IS_RUNNING())
 	{
-		if (SUCCEED != zbx_ha_recv_status(1, &new_ha_status, &error))
+		if (SUCCEED != zbx_ha_recv_status(1, &ha_status, &error))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot receive HA manager status: %s", error);
 			zbx_free(error);
@@ -1768,9 +1778,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			break;
 		}
 
-		if (ZBX_NODE_STATUS_UNKNOWN != new_ha_status && ha_status != new_ha_status)
+		if (ZBX_NODE_STATUS_UNKNOWN != ha_status && ha_status != ha_status_old)
 		{
-			ha_status = new_ha_status;
+			ha_status_old = ha_status;
 			zabbix_log(LOG_LEVEL_INFORMATION, "\"%s\" node switched to \"%s\" mode", CONFIG_HA_NODE_NAME,
 							zbx_ha_status_str(ha_status));
 
