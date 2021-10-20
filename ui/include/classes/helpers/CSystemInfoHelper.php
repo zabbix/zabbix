@@ -104,10 +104,15 @@ class CSystemInfoHelper {
 			'has_status' => false
 		];
 
+		if ($ZBX_SERVER === null && $ZBX_SERVER_PORT === null) {
+			return $status;
+		}
+
 		$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
 			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
 			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::SOCKET_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
 		);
+
 		$status['is_running'] = $server->isRunning(CSessionHelper::getId());
 
 		if ($status['is_running'] === false) {
@@ -117,6 +122,7 @@ class CSystemInfoHelper {
 		$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
 			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)), 15, ZBX_SOCKET_BYTES_LIMIT
 		);
+
 		$server_status = $server->getStatus(CSessionHelper::getId());
 		$status['has_status'] = (bool) $server_status;
 

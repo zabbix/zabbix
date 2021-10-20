@@ -126,11 +126,11 @@ class CZabbixServer {
 	/**
 	 * Class constructor.
 	 *
-	 * @param string $host
-	 * @param int $port
-	 * @param int $connect_timeout
-	 * @param int $timeout
-	 * @param int $totalBytesLimit
+	 * @param string|null $host
+	 * @param int|null    $port
+	 * @param int         $connect_timeout
+	 * @param int         $timeout
+	 * @param int         $totalBytesLimit
 	 */
 	public function __construct($host, $port, $connect_timeout, $timeout, $totalBytesLimit) {
 		$this->host = $host;
@@ -370,15 +370,16 @@ class CZabbixServer {
 	public function isRunning($sid) {
 		$active_nodes = API::HaNode()->get([
 			'output' => ['address', 'port', 'lastaccess'],
-			'filter' => ['status' => ZBX_NODE_STATUS_ACTIVE]
+			'filter' => ['status' => ZBX_NODE_STATUS_ACTIVE],
+			'sortfield' => 'lastaccess',
+			'sortorder' => 'DESC',
+			'limit' => 1
 		], false);
 
-		foreach ($active_nodes as $node) {
-			if ($node['address'] === $this->host && $node['port'] == $this->port) {
-				if ((time() - $node['lastaccess']) <
-						timeUnitToSeconds(CSettingsHelper::getGlobal(CSettingsHelper::HA_FAILOVER_DELAY))) {
-					return true;
-				}
+		if ($active_node && $active_node[0]['address'] === $this->host && $active_node[0]['port'] == $this->port) {
+			if ((time() - $active_node[0]['lastaccess']) <
+					timeUnitToSeconds(CSettingsHelper::getGlobal(CSettingsHelper::HA_FAILOVER_DELAY))) {
+				return true;
 			}
 		}
 
