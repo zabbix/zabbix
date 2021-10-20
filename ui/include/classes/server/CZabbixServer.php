@@ -368,7 +368,7 @@ class CZabbixServer {
 	 * @return bool
 	 */
 	public function isRunning($sid) {
-		$active_node = API::HaNode()->get([
+		$active_node = API::getApiService('hanode')->get([
 			'output' => ['address', 'port', 'lastaccess'],
 			'filter' => ['status' => ZBX_NODE_STATUS_ACTIVE],
 			'sortfield' => 'lastaccess',
