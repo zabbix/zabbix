@@ -44,10 +44,6 @@
 #	include "specsysinfo.h"
 #endif
 
-#ifdef HAVE_SYS_UTSNAME_H
-#	include <sys/utsname.h>
-#endif
-
 typedef struct
 {
 	char				*pattern;
@@ -2068,7 +2064,7 @@ void	zbx_mpoints_free(zbx_mpoint_t *mpoint)
 #ifndef _WINDOWS
 int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *hostname)
 {
-	char		*type, *transform;
+	char	*type, *transform;
 
 	type = get_rparam(request, 0);
 	transform = get_rparam(request, 1);
