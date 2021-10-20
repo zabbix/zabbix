@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-10-20T07:24:02Z</date>
+   <date>2021-08-03T06:48:21Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -59,6 +59,7 @@
                      <key>vfs.dev.queue_size[{#DEVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Current average disk queue, the number of requests outstanding on the disk at the time the performance data is collected.</description>
                      <application_prototypes>
@@ -89,6 +90,7 @@
                      <type>CALCULATED</type>
                      <key>vfs.dev.read.await[{#DEVNAME}]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>!ms</units>
                      <params>(last("vfs.dev.read.time.rate[{#DEVNAME}]")/(last("vfs.dev.read.rate[{#DEVNAME}]")+(last("vfs.dev.read.rate[{#DEVNAME}]")=0)))*1000*(last("vfs.dev.read.rate[{#DEVNAME}]") &gt; 0)</params>
@@ -105,6 +107,7 @@
                      <key>vfs.dev.read.rate[{#DEVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>!r/s</units>
                      <description>r/s. The number (after merges) of read requests completed per second for the device.</description>
@@ -133,6 +136,7 @@
                      <key>vfs.dev.read.time.rate[{#DEVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Rate of total read time counter. Used in r_await calculation</description>
                      <applications>
@@ -164,6 +168,7 @@
                      <key>vfs.dev.util[{#DEVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>%</units>
                      <description>This item is the percentage of elapsed time that the selected disk drive was busy servicing read or writes requests.</description>
@@ -195,6 +200,7 @@
                      <type>CALCULATED</type>
                      <key>vfs.dev.write.await[{#DEVNAME}]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>!ms</units>
                      <params>(last("vfs.dev.write.time.rate[{#DEVNAME}]")/(last("vfs.dev.write.rate[{#DEVNAME}]")+(last("vfs.dev.write.rate[{#DEVNAME}]")=0)))*1000*(last("vfs.dev.write.rate[{#DEVNAME}]") &gt; 0)</params>
@@ -211,6 +217,7 @@
                      <key>vfs.dev.write.rate[{#DEVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>!w/s</units>
                      <description>w/s. The number (after merges) of write requests completed per second for the device.</description>
@@ -239,6 +246,7 @@
                      <key>vfs.dev.write.time.rate[{#DEVNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Rate of total write time counter. Used in w_await calculation</description>
                      <applications>
@@ -269,6 +277,7 @@
                      <key>vfs.file.contents[/sys/block/{#DEVNAME}/stat]</key>
                      <history>0</history>
                      <trends>0</trends>
+                     <status>ENABLED</status>
                      <value_type>TEXT</value_type>
                      <description>Get contents of /sys/block/{#DEVNAME}/stat for disk stats.</description>
                      <applications>
@@ -410,6 +419,7 @@
                <name>Interrupts per second</name>
                <key>system.cpu.intr</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <applications>
                   <application>
@@ -427,6 +437,7 @@
                <name>Load average (1m avg)</name>
                <key>system.cpu.load[all,avg1]</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <applications>
                   <application>
@@ -438,6 +449,7 @@
                <name>Load average (15m avg)</name>
                <key>system.cpu.load[all,avg15]</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <applications>
                   <application>
@@ -449,6 +461,7 @@
                <name>Load average (5m avg)</name>
                <key>system.cpu.load[all,avg5]</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <applications>
                   <application>
@@ -460,6 +473,7 @@
                <name>Number of CPUs</name>
                <key>system.cpu.num</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <applications>
                   <application>
                      <name>CPU</name>
@@ -476,6 +490,7 @@
                <name>Context switches per second</name>
                <key>system.cpu.switches</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <applications>
                   <application>
@@ -495,6 +510,7 @@
                <key>system.cpu.util</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <description>CPU utilization in %</description>
@@ -535,6 +551,7 @@ and {Template Module Linux CPU by Zabbix agent:system.cpu.load[all,avg15].last()
                <name>CPU guest nice time</name>
                <key>system.cpu.util[,guest_nice]</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <description>Time spent running a niced guest (virtual CPU for guest operating systems under the control of the Linux kernel)</description>
@@ -548,6 +565,7 @@ and {Template Module Linux CPU by Zabbix agent:system.cpu.load[all,avg15].last()
                <name>CPU guest time</name>
                <key>system.cpu.util[,guest]</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <description>Guest  time (time  spent  running  a  virtual  CPU  for  a  guest  operating  system)</description>
@@ -561,6 +579,7 @@ and {Template Module Linux CPU by Zabbix agent:system.cpu.load[all,avg15].last()
                <name>CPU idle time</name>
                <key>system.cpu.util[,idle]</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <description>The time the CPU has spent doing nothing.</description>
@@ -574,6 +593,7 @@ and {Template Module Linux CPU by Zabbix agent:system.cpu.load[all,avg15].last()
                <name>CPU interrupt time</name>
                <key>system.cpu.util[,interrupt]</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <description>The amount of time the CPU has been servicing hardware interrupts.</description>
@@ -587,6 +607,7 @@ and {Template Module Linux CPU by Zabbix agent:system.cpu.load[all,avg15].last()
                <name>CPU iowait time</name>
                <key>system.cpu.util[,iowait]</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <description>Amount of time the CPU has been waiting for I/O to complete.</description>
@@ -600,6 +621,7 @@ and {Template Module Linux CPU by Zabbix agent:system.cpu.load[all,avg15].last()
                <name>CPU nice time</name>
                <key>system.cpu.util[,nice]</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <description>The time the CPU has spent running users' processes that have been niced.</description>
@@ -613,6 +635,7 @@ and {Template Module Linux CPU by Zabbix agent:system.cpu.load[all,avg15].last()
                <name>CPU softirq time</name>
                <key>system.cpu.util[,softirq]</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <description>The amount of time the CPU has been servicing software interrupts.</description>
@@ -626,6 +649,7 @@ and {Template Module Linux CPU by Zabbix agent:system.cpu.load[all,avg15].last()
                <name>CPU steal time</name>
                <key>system.cpu.util[,steal]</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <description>The amount of CPU 'stolen' from this virtual machine by the hypervisor for other tasks (such as running another virtual machine).</description>
@@ -639,6 +663,7 @@ and {Template Module Linux CPU by Zabbix agent:system.cpu.load[all,avg15].last()
                <name>CPU system time</name>
                <key>system.cpu.util[,system]</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <description>The time the CPU has spent running the kernel and its processes.</description>
@@ -652,6 +677,7 @@ and {Template Module Linux CPU by Zabbix agent:system.cpu.load[all,avg15].last()
                <name>CPU user time</name>
                <key>system.cpu.util[,user]</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <description>The time the CPU has spent running users' processes that are not niced.</description>
@@ -727,6 +753,7 @@ and {Template Module Linux CPU by Zabbix agent:system.cpu.load[all,avg15].last()
                      <name>{#FSNAME}: Free inodes in %</name>
                      <key>vfs.fs.inode[{#FSNAME},pfree]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>%</units>
                      <application_prototypes>
@@ -763,6 +790,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                      <name>{#FSNAME}: Space utilization</name>
                      <key>vfs.fs.size[{#FSNAME},pused]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>%</units>
                      <description>Space utilization in % for {#FSNAME}</description>
@@ -776,6 +804,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                      <name>{#FSNAME}: Total space</name>
                      <key>vfs.fs.size[{#FSNAME},total]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <units>B</units>
                      <description>Total space in Bytes</description>
                      <application_prototypes>
@@ -788,6 +817,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                      <name>{#FSNAME}: Used space</name>
                      <key>vfs.fs.size[{#FSNAME},used]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <units>B</units>
                      <description>Used storage in Bytes</description>
                      <application_prototypes>
@@ -930,6 +960,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <key>kernel.maxfiles</key>
                <delay>1h</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <description>It could be increased by using sysctrl utility or modifying file /etc/sysctl.conf.</description>
                <applications>
                   <application>
@@ -955,6 +986,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <key>kernel.maxproc</key>
                <delay>1h</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <description>It could be increased by using sysctrl utility or modifying file /etc/sysctl.conf.</description>
                <applications>
                   <application>
@@ -985,6 +1017,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <name>Number of processes</name>
                <key>proc.num</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <applications>
                   <application>
                      <name>General</name>
@@ -995,6 +1028,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <name>Number of running processes</name>
                <key>proc.num[,,run]</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <applications>
                   <application>
                      <name>General</name>
@@ -1006,6 +1040,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <key>system.boottime</key>
                <delay>15m</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <units>unixtime</units>
                <applications>
                   <application>
@@ -1025,6 +1060,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <delay>1h</delay>
                <history>2w</history>
                <trends>0</trends>
+               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>System host name.</description>
                <inventory_link>NAME</inventory_link>
@@ -1053,6 +1089,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <name>System local time</name>
                <key>system.localtime</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <units>unixtime</units>
                <description>System local time of the host.</description>
                <applications>
@@ -1076,6 +1113,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <delay>1h</delay>
                <history>2w</history>
                <trends>0</trends>
+               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>Operating system architecture of the host.</description>
                <applications>
@@ -1096,6 +1134,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <delay>1h</delay>
                <history>2w</history>
                <trends>0</trends>
+               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <inventory_link>OS</inventory_link>
                <applications>
@@ -1131,6 +1170,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <delay>1h</delay>
                <history>2w</history>
                <trends>0</trends>
+               <status>ENABLED</status>
                <value_type>TEXT</value_type>
                <applications>
                   <application>
@@ -1150,6 +1190,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <delay>1h</delay>
                <history>2w</history>
                <trends>0</trends>
+               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>The information as normally returned by 'uname -a'.</description>
                <applications>
@@ -1170,6 +1211,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <delay>30s</delay>
                <history>2w</history>
                <trends>0d</trends>
+               <status>ENABLED</status>
                <units>uptime</units>
                <description>System uptime in 'N days, hh:mm:ss' format.</description>
                <applications>
@@ -1191,6 +1233,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <name>Number of logged in users</name>
                <key>system.users.num</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <description>Number of users who are currently logged in.</description>
                <applications>
                   <application>
@@ -1204,6 +1247,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <delay>15m</delay>
                <history>7d</history>
                <trends>0</trends>
+               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <applications>
                   <application>
@@ -1270,6 +1314,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <name>Free swap space</name>
                <key>system.swap.size[,free]</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <units>B</units>
                <description>The free space of swap volume/file in bytes.</description>
                <applications>
@@ -1282,6 +1327,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <name>Free swap space in %</name>
                <key>system.swap.size[,pfree]</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <description>The free space of swap volume/file in percent.</description>
@@ -1295,6 +1341,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <name>Total swap space</name>
                <key>system.swap.size[,total]</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <units>B</units>
                <description>The total space of swap volume/file in bytes.</description>
                <applications>
@@ -1307,6 +1354,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <name>Available memory</name>
                <key>vm.memory.size[available]</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <units>B</units>
                <description>Available memory, in Linux, available = free + buffers + cache. On other platforms calculation may vary. See also: https://www.zabbix.com/documentation/5.0/manual/appendix/items/vm.memory.size_params</description>
                <applications>
@@ -1319,6 +1367,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <name>Available memory in %</name>
                <key>vm.memory.size[pavailable]</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <description>Available memory as percentage of total. See also: https://www.zabbix.com/documentation/5.0/manual/appendix/items/vm.memory.size_params</description>
@@ -1332,6 +1381,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <name>Total memory</name>
                <key>vm.memory.size[total]</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <units>B</units>
                <description>Total memory in Bytes</description>
                <applications>
@@ -1346,6 +1396,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <key>vm.memory.utilization</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <description>Memory used percentage is calculated as (100-pavailable)</description>
@@ -1443,6 +1494,7 @@ Template tooling version used: 0.38</description>
                      <key>net.if.in["{#IFNAME}",dropped]</key>
                      <delay>3m</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <application_prototypes>
                         <application_prototype>
                            <name>Interface {#IFNAME}</name>
@@ -1460,6 +1512,7 @@ Template tooling version used: 0.38</description>
                      <key>net.if.in["{#IFNAME}",errors]</key>
                      <delay>3m</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <application_prototypes>
                         <application_prototype>
                            <name>Interface {#IFNAME}</name>
@@ -1477,6 +1530,7 @@ Template tooling version used: 0.38</description>
                      <key>net.if.in["{#IFNAME}"]</key>
                      <delay>3m</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <units>bps</units>
                      <application_prototypes>
                         <application_prototype>
@@ -1499,6 +1553,7 @@ Template tooling version used: 0.38</description>
                      <key>net.if.out["{#IFNAME}",dropped]</key>
                      <delay>3m</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <application_prototypes>
                         <application_prototype>
                            <name>Interface {#IFNAME}</name>
@@ -1516,6 +1571,7 @@ Template tooling version used: 0.38</description>
                      <key>net.if.out["{#IFNAME}",errors]</key>
                      <delay>3m</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <application_prototypes>
                         <application_prototype>
                            <name>Interface {#IFNAME}</name>
@@ -1533,6 +1589,7 @@ Template tooling version used: 0.38</description>
                      <key>net.if.out["{#IFNAME}"]</key>
                      <delay>3m</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <units>bps</units>
                      <application_prototypes>
                         <application_prototype>
@@ -1555,41 +1612,42 @@ Template tooling version used: 0.38</description>
                      <key>vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"]</key>
                      <history>7d</history>
                      <trends>0</trends>
-                     <description>Indicates the interface RFC2863 operational state as a string.&#13;
-Possible values are:"unknown", "notpresent", "down", "lowerlayerdown", "testing","dormant", "up".&#13;
-Reference: https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-net</description>
+                     <status>ENABLED</status>
+                     <description>Reference: https://www.kernel.org/doc/Documentation/networking/operstates.txt</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Interface {#IFNAME}</name>
                         </application_prototype>
                      </application_prototypes>
                      <valuemap>
-                        <name>IF-MIB::ifOperStatus</name>
+                        <name>ifOperStatus</name>
                      </valuemap>
                      <preprocessing>
                         <step>
                            <type>JAVASCRIPT</type>
                            <params>var newvalue;
 switch(value) {
-  case "up":
+  case "unkonwn":
+    newvalue = 0;
+    break;
+  case "notpresent":
     newvalue = 1;
     break;
   case "down":
     newvalue = 2;
     break;
+  case "lowerlayerdown":
+    newvalue = 3;
+    break;
   case "testing":
     newvalue = 4;
     break;
-  case "unknown":
+  case "dormant":
     newvalue = 5;
     break;
-  case "dormant":
+  case "up":
     newvalue = 6;
-    break;
-  case "notPresent":
-    newvalue = 7;
-    break;
-  default:
+    break;  default:
     newvalue = "Problem parsing interface operstate in JS";
 }
 return newvalue;</params>
@@ -1619,6 +1677,7 @@ WARNING: if closed manually - won't fire again on next poll, because of .diff.</
                      <delay>1h</delay>
                      <history>7d</history>
                      <trends>0d</trends>
+                     <status>ENABLED</status>
                      <description>Indicates the interface protocol type as a decimal value.&#13;
 See include/uapi/linux/if_arp.h for all possible values.&#13;
 Reference: https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-net</description>
@@ -1669,7 +1728,7 @@ or {Template Module Linux network interfaces by Zabbix agent:net.if.out["{#IFNAM
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                      <recovery_expression>{Template Module Linux network interfaces by Zabbix agent:net.if.in["{#IFNAME}",errors].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8&#13;
 and {Template Module Linux network interfaces by Zabbix agent:net.if.out["{#IFNAME}",errors].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8</recovery_expression>
-                     <name>Interface {#IFNAME}: High error rate (&gt; {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)</name>
+                     <name>Interface {#IFNAME}: High error rate (&gt;{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)</name>
                      <opdata>errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}</opdata>
                      <priority>WARNING</priority>
                      <description>Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold</description>
@@ -2327,19 +2386,27 @@ and {Template Module Linux CPU by Zabbix agent:system.cpu.load[all,avg15].last()
    </graphs>
    <value_maps>
       <value_map>
-         <name>IF-MIB::ifOperStatus</name>
+         <name>ifOperStatus</name>
          <mappings>
             <mapping>
+               <value>0</value>
+               <newvalue>unknown</newvalue>
+            </mapping>
+            <mapping>
                <value>1</value>
-               <newvalue>up</newvalue>
+               <newvalue>notpresent</newvalue>
             </mapping>
             <mapping>
                <value>2</value>
                <newvalue>down</newvalue>
             </mapping>
             <mapping>
+               <value>3</value>
+               <newvalue>lowerlayerdown</newvalue>
+            </mapping>
+            <mapping>
                <value>4</value>
-               <newvalue>unknown</newvalue>
+               <newvalue>testing</newvalue>
             </mapping>
             <mapping>
                <value>5</value>
@@ -2347,11 +2414,7 @@ and {Template Module Linux CPU by Zabbix agent:system.cpu.load[all,avg15].last()
             </mapping>
             <mapping>
                <value>6</value>
-               <newvalue>notPresent</newvalue>
-            </mapping>
-            <mapping>
-               <value>7</value>
-               <newvalue>lowerLayerDown</newvalue>
+               <newvalue>up</newvalue>
             </mapping>
          </mappings>
       </value_map>
