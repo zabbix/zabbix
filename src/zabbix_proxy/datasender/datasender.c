@@ -137,7 +137,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state)
 
 	zbx_vector_ptr_create(&tasks);
 
-	if (SUCCEED == upload_state && ZBX_TASK_UPDATE_FREQUENCY <= now - task_timestamp)
+	if (SUCCEED == upload_state && CONFIG_TASK_UPDATE_FREQUENCY <= now - task_timestamp)
 	{
 		task_timestamp = now;
 
@@ -306,10 +306,10 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 
 		zbx_setproctitle("%s [sent %d values in " ZBX_FS_DBL " sec, idle %d sec]",
 				get_process_type_string(process_type), records, time_diff,
-				ZBX_PROXY_DATA_MORE != more ? ZBX_TASK_UPDATE_FREQUENCY : 0);
+				ZBX_PROXY_DATA_MORE != more ? CONFIG_TASK_UPDATE_FREQUENCY : 0);
 
 		if (ZBX_PROXY_DATA_MORE != more)
-			zbx_sleep_loop(ZBX_TASK_UPDATE_FREQUENCY);
+			zbx_sleep_loop(CONFIG_TASK_UPDATE_FREQUENCY);
 	}
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);

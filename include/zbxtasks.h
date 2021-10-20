@@ -23,8 +23,6 @@
 #include "zbxalgo.h"
 #include "zbxjson.h"
 
-#define ZBX_TASK_UPDATE_FREQUENCY	1
-
 #define ZBX_REMOTE_COMMAND_TTL		(SEC_PER_MIN * 10)
 #define ZBX_DATA_TTL			30
 

@@ -1558,7 +1558,7 @@ done:
 				proxy->proxy_data_nextcheck = (int)calculate_proxy_nextcheck(
 						hostid, CONFIG_PROXYDATA_FREQUENCY, now);
 				proxy->proxy_tasks_nextcheck = (int)calculate_proxy_nextcheck(
-						hostid, ZBX_TASK_UPDATE_FREQUENCY, now);
+						hostid, CONFIG_TASK_UPDATE_FREQUENCY, now);
 
 				DCupdate_proxy_queue(proxy);
 			}
@@ -10890,7 +10890,7 @@ void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck, int pr
 			if (0 != (update_nextcheck & ZBX_PROXY_TASKS_NEXTCHECK))
 			{
 				dc_proxy->proxy_tasks_nextcheck = (int)calculate_proxy_nextcheck(
-						hostid, ZBX_TASK_UPDATE_FREQUENCY, now);
+						hostid, CONFIG_TASK_UPDATE_FREQUENCY, now);
 			}
 
 			DCupdate_proxy_queue(dc_proxy);
