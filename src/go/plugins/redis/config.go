@@ -33,10 +33,10 @@ type Session struct {
 }
 
 type PluginOptions struct {
-	// Timeout is the maximum amount of time in seconds to wait for a request to be done. Default value equals the global timeout.
+	// Timeout is the maximum time for waiting when a request has to be done. Default value equals the global timeout.
 	Timeout int `conf:"optional,range=1:30"`
 
-	// KeepAlive is amount of time a connection can remain idle before it is closed.
+	// KeepAlive is a time to wait before unused connections will be closed.
 	KeepAlive int `conf:"optional,range=60:900,default=300"`
 
 	// Sessions stores pre-defined named sets of connections settings.

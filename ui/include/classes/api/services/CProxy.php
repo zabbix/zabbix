@@ -182,6 +182,12 @@ class CProxy extends CApiService {
 	 * @return array
 	 */
 	public function create(array $proxies) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('No permissions to call "%1$s.%2$s".', 'proxy', __FUNCTION__)
+			);
+		}
+
 		$this->validateCreate($proxies);
 
 		$proxyids = DB::insert('hosts', $proxies);
@@ -207,6 +213,12 @@ class CProxy extends CApiService {
 	 * @return array
 	 */
 	public function update(array $proxies) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('No permissions to call "%1$s.%2$s".', 'proxy', __FUNCTION__)
+			);
+		}
+
 		$this->validateUpdate($proxies, $db_proxies);
 
 		$upd_proxies = [];
@@ -371,6 +383,12 @@ class CProxy extends CApiService {
 	 * @throws APIException if the input is invalid.
 	 */
 	private function validateDelete(array &$proxyids, array &$db_proxies = null) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('No permissions to call "%1$s.%2$s".', 'proxy', __FUNCTION__)
+			);
+		}
+
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $proxyids, '/', $error)) {
