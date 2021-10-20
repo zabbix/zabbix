@@ -348,7 +348,7 @@ $macros_tab = (new CFormList('macrosFormList'))
 		->setModern(true)
 	)
 	->addRow(null,
-		new CPartial($data['show_inherited_macros'] ? 'hostmacros.inherited.list.html' : 'hostmacros.list.html', [
+		new CPartial('hostmacros.list.html', [
 			'macros' => $data['host']['macros'],
 			'readonly' => $host_is_discovered
 		]), 'macros_container'

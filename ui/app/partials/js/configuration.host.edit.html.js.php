@@ -111,7 +111,7 @@
 		form_name: null,
 		form: null,
 		macros_initialized: false,
-		macros_templateids: [],
+		macros_templateids: null,
 
 		/**
 		 * Host form setup.
@@ -271,10 +271,19 @@
 					if (e.type === 'tabsactivate') {
 						const templateids = this.getAllTemplates();
 
-						if (this.macros_templateids.xor(templateids).length > 0) {
+						// First time always load inherited macros.
+						if (this.macros_templateids === null) {
+							this.macros_templateids = templateids;
+
+							if (show_inherited_macros) {
+								this.macros_manager.load(show_inherited_macros, templateids);
+								this.macros_initialized = true;
+							}
+						}
+						// Other times load inherited macros only if templates changed.
+						else if (show_inherited_macros && this.macros_templateids.xor(templateids).length > 0) {
 							this.macros_templateids = templateids;
 							this.macros_manager.load(show_inherited_macros, templateids);
-							this.macros_initialized = true;
 						}
 					}
 

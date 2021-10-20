@@ -217,7 +217,6 @@ class CControllerHostEdit extends CController {
 			CArrayHelper::sort($data['host']['tags'], ['tag', 'value']);
 		}
 
-		// Sort only after inherited macros are added. Otherwise the list will look chaotic.
 		$data['host']['macros'] = array_values(order_macros($data['host']['macros'], 'macro'));
 
 		if (!$data['host']['macros'] && $data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
