@@ -76,7 +76,12 @@ class CSystemInfoHelper {
 			return $data;
 		}
 
-		$data['server_details'] = $ZBX_SERVER.':'.$ZBX_SERVER_PORT;
+		if ($ZBX_SERVER !== null && $ZBX_SERVER_PORT !== null) {
+			$data['server_details'] = $ZBX_SERVER.':'.$ZBX_SERVER_PORT;
+		}
+		elseif (count($ha_nodes) == 1) {
+			$data['server_details'] = $ha_nodes[0]['address'].':'.$ha_nodes[0]['port'];
+		}
 
 		$setup = new CFrontendSetup();
 		$requirements = $setup->checkRequirements();
