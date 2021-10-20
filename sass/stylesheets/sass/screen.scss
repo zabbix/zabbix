@@ -1368,7 +1368,8 @@ form {
 		}
 	}
 
-	tfoot {
+	tfoot,
+	.tfoot-buttons {
 		.table-forms-td-right {
 			padding-top: 5px;
 		}
@@ -1376,10 +1377,6 @@ form {
 		button {
 			margin: 0 10px 0 0;
 		}
-	}
-
-	.tfoot-buttons {
-		@extend tfoot;
 	}
 
 	td {

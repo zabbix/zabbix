@@ -199,7 +199,8 @@ $toc-title-bg-color: #4f4f4f;
 
 // Tables.
 .list-table {
-	thead th {
+	thead th,
+	tfoot td {
 		border-color: lighten($table-border-color, 3%);
 	}
 

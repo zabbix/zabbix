@@ -5,7 +5,7 @@
 
 html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var,
 b,
-strong, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, .table-forms .tfoot-buttons, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary,
+strong, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary,
 time, mark, audio, video {
   margin: 0;
   padding: 0;
@@ -1017,7 +1017,7 @@ footer {
       border-bottom: 1px solid #333333; }
       .dashboard-grid-widget-content .list-table tbody tr:last-child th.list-table-footer, .dashboard-grid-widget-content .list-table tbody tr:last-child td.list-table-footer {
         border-bottom: 0; }
-    .dashboard-grid-widget-content .list-table.sticky-footer tfoot, .dashboard-grid-widget-content .list-table.sticky-footer .table-forms .tfoot-buttons, .table-forms .dashboard-grid-widget-content .list-table.sticky-footer .tfoot-buttons {
+    .dashboard-grid-widget-content .list-table.sticky-footer tfoot {
       bottom: -8px; }
   .dashboard-grid-widget-content .debug-output {
     max-height: none;
@@ -2693,12 +2693,12 @@ form.is-loading {
     background: #000000; }
   .list-table.sticky-footer tbody tr:last-of-type td, .list-table.sticky-footer tbody tr:last-of-type th {
     border-bottom: none; }
-  .list-table.sticky-footer tfoot, .list-table.sticky-footer .table-forms .tfoot-buttons, .table-forms .list-table.sticky-footer .tfoot-buttons {
+  .list-table.sticky-footer tfoot {
     position: sticky;
     bottom: 0;
     z-index: 1;
     background: #000000; }
-    .list-table.sticky-footer tfoot tr:first-of-type td, .list-table.sticky-footer .table-forms .tfoot-buttons tr:first-of-type td, .table-forms .list-table.sticky-footer .tfoot-buttons tr:first-of-type td, .list-table.sticky-footer tfoot tr:first-of-type th, .list-table.sticky-footer .table-forms .tfoot-buttons tr:first-of-type th, .table-forms .list-table.sticky-footer .tfoot-buttons tr:first-of-type th {
+    .list-table.sticky-footer tfoot tr:first-of-type td, .list-table.sticky-footer tfoot tr:first-of-type th {
       border-top: 2px solid #262626;
       border-bottom: 0; }
 
@@ -3131,9 +3131,11 @@ form.is-loading {
     text-align: left; }
     .table-forms th:last-child {
       padding: 0; }
-  .table-forms tfoot .table-forms-td-right, .table-forms .tfoot-buttons .table-forms-td-right {
+  .table-forms tfoot .table-forms-td-right,
+  .table-forms .tfoot-buttons .table-forms-td-right {
     padding-top: 5px; }
-  .table-forms tfoot button, .table-forms .tfoot-buttons button {
+  .table-forms tfoot button,
+  .table-forms .tfoot-buttons button {
     margin: 0 10px 0 0; }
   .table-forms td {
     position: relative; }
