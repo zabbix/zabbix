@@ -120,7 +120,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 	}
 	$pageTitle .= isset($page['title']) ? $page['title'] : _('Zabbix');
 
-	if ((defined('ZBX_PAGE_DO_REFRESH') || defined('ZBX_PAGE_DO_JS_REFRESH')) && CWebUser::getRefresh() != 0) {
+	if (defined('ZBX_PAGE_DO_JS_REFRESH') && CWebUser::getRefresh() != 0) {
 		$pageTitle .= ' ['._s('refreshed every %1$s sec.', CWebUser::getRefresh()).']';
 	}
 

@@ -37,20 +37,9 @@ function get_image_by_imageid($imageid) {
 
 	if (!isset($images[$imageid])) {
 		$row = DBfetch(DBselect('SELECT i.* FROM images i WHERE i.imageid='.zbx_dbstr($imageid)));
-		$row['image'] = zbx_unescape_image($row['image']);
 		$images[$imageid] = $row;
 	}
 	return $images[$imageid];
-}
-
-function zbx_unescape_image($image) {
-	global $DB;
-
-	$result = $image ? $image : 0;
-	if ($DB['TYPE'] == ZBX_DB_POSTGRESQL) {
-		$result = pg_unescape_bytea($image);
-	}
-	return $result;
 }
 
 /**

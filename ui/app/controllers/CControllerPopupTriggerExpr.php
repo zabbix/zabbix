@@ -842,6 +842,13 @@ class CControllerPopupTriggerExpr extends CController {
 				'description' => _('rand() - A random integer value'),
 				'allowed_types' => $this->allowedTypesAny
 			],
+			'rate' => [
+				'types' => [ZBX_FUNCTION_TYPE_HISTORY],
+				'description' => _('rate() - Returns per-second average rate for monotonically increasing counters'),
+				'params' => $this->param1Sec + $this->period_optional,
+				'allowed_types' => $this->allowedTypesNumeric,
+				'operators' => $this->operators
+			],
 			'repeat' => [
 				'types' => [ZBX_FUNCTION_TYPE_STRING],
 				'description' => _('repeat() - Returns a string composed of value repeated count times'),

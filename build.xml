@@ -78,6 +78,7 @@
 		<replace file="${SIMPLESAMLPHP_CFG_FILE}" token="{ENTITY_ID}" value="${phpunit_sp_entity_id}"/>
 		<replace file="${SIMPLESAMLPHP_CFG_FILE}" token="{ASSERTION_CONSUMER_SERVICE}" value="${url}index_sso.php?acs"/>
 		<replace file="${SIMPLESAMLPHP_CFG_FILE}" token="{SINGLE_LOGOUT_SERVICE}" value="${url}index_sso.php?sls"/>
+		<chmod file="${SIMPLESAMLPHP_CFG_FILE}" perm="go+r"/>
 	</target>
 
 	<target name="init-integration">
