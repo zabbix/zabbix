@@ -46,9 +46,8 @@ class CSystemInfoHelper {
 
 		$ha_cluster_enabled = false;
 
-		$ha_nodes = API::HaNode()->get([
+		$ha_nodes = API::getApiService('hanode')->get([
 			'output' => ['name', 'address', 'port', 'lastaccess', 'status'],
-			'preservekeys' => true,
 			'sortfield' => 'status',
 			'sortorder' => 'DESC'
 		], false);
