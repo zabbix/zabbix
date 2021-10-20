@@ -2521,23 +2521,27 @@ class CAction extends CApiService {
 	 * @throws APIException
 	 */
 	private static function checkOperations(array &$actions, string $method, array $db_actions = null): void {
-		$all_operations = [];
-		$operations_types = ['operations' => ACTION_OPERATION, 'recovery_operations' => ACTION_RECOVERY_OPERATION,
-			'update_operations' => ACTION_UPDATE_OPERATION
+		$operation_groups = [
+			ACTION_OPERATION => 'operations',
+			ACTION_RECOVERY_OPERATION => 'recovery_operations',
+			ACTION_UPDATE_OPERATION => 'update_operations'
 		];
 
 		foreach ($actions as &$action) {
-			$db_action = ($method === 'update')
-				? $db_actions[$action['actionid']]
-				: [];
+			if ($method === 'create') {
+				$db_action = [];
+			}
+			else {
+				if (!array_intersect_key($action, array_flip($operation_groups))) {
+					continue;
+				}
 
-			foreach ($operations_types as $operations_name => $type) {
-				$$operations_name = array_key_exists($operations_name, $action)
-					? true
-					: array_key_exists($operations_name, $db_action);
+				$db_action = $db_actions[$action['actionid']];
 			}
 
-			if (!$operations && !$recovery_operations && !$update_operations) {
+			$operations = array_intersect_key($action + $db_action, array_flip($operation_groups));
+
+			if (!array_filter($operations, 'boolval')) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('No operations defined for action "%1$s".', $action['name'])
 				);
@@ -2551,81 +2555,73 @@ class CAction extends CApiService {
 				OPERATION_TYPE_HOST_INVENTORY => 0
 			];
 
-			foreach ($operations_types as $operations_name => $type) {
-				if (array_key_exists($operations_name, $action)) {
-					foreach ($action[$operations_name] as &$operation) {
-						if ($type === ACTION_OPERATION) {
-							if (array_key_exists($operation['operationtype'], $unique_operations)) {
-								$unique_operations[$operation['operationtype']]++;
+			foreach ($operation_groups as $recovery => $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
+					continue;
+				}
 
-								if ($unique_operations[$operation['operationtype']] > 1) {
-									self::exception(ZBX_API_ERROR_PARAMETERS,
-										_s('Operation "%1$s" already exists for action "%2$s".',
-											operation_type2str($operation['operationtype']), $action['name']
-										)
-									);
-								}
+				foreach ($action[$operation_group] as &$operation) {
+					$operation['recovery'] = $recovery;
+					$operation['eventsource'] = $action['eventsource'];
+
+					if ($recovery == ACTION_OPERATION) {
+						if (array_key_exists($operation['operationtype'], $unique_operations)) {
+							$unique_operations[$operation['operationtype']]++;
+
+							if ($unique_operations[$operation['operationtype']] > 1) {
+								self::exception(ZBX_API_ERROR_PARAMETERS,
+									_s('Operation "%1$s" already exists for action "%2$s".',
+										operation_type2str($operation['operationtype']), $action['name']
+									)
+								);
 							}
 						}
 
-						$operation['recovery'] = $type;
-						$operation['eventsource'] = $action['eventsource'];
-					}
-					unset($operation);
+						if (array_key_exists('esc_step_from', $operation)
+								|| array_key_exists('esc_step_to', $operation)) {
+							if (!array_key_exists('esc_step_from', $operation)
+									|| !array_key_exists('esc_step_to', $operation)) {
+								self::exception(ZBX_API_ERROR_PARAMETERS,
+									_('Parameters "esc_step_from" and "esc_step_to" must be set together.')
+								);
+							}
 
-					$all_operations = array_merge($all_operations, $action[$operations_name]);
+							if ($operation['esc_step_from'] > $operation['esc_step_to']
+									&& $operation['esc_step_to'] != 0) {
+								self::exception(ZBX_API_ERROR_PARAMETERS,
+									_('Incorrect action operation escalation step values.')
+								);
+							}
+						}
+					}
+
+					if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE) {
+						$has_groups = array_key_exists('opcommand_grp', $operation) && $operation['opcommand_grp'];
+						$has_users = array_key_exists('opcommand_grp', $operation) && $operation['opcommand_grp'];
+
+						if (!$has_groups && !$has_users) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_('No recipients specified for action operation message.')
+							);
+						}
+					}
+
+					if ($operation['operationtype'] == OPERATION_TYPE_COMMAND
+							&& $action['eventsource'] != EVENT_SOURCE_SERVICE) {
+						$has_groups = array_key_exists('opcommand_grp', $operation) && $operation['opcommand_grp'];
+						$has_hosts = array_key_exists('opcommand_hst', $operation) && $operation['opcommand_hst'];
+
+						if (!$has_groups && !$has_hosts) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_('No targets specified for action operation global script.')
+							);
+						}
+					}
 				}
+				unset($operation);
 			}
 		}
 		unset($action);
-
-		if (!$all_operations) {
-			return;
-		}
-
-		foreach ($all_operations as $operation) {
-			if ($operation['recovery'] == ACTION_OPERATION) {
-				if ((array_key_exists('esc_step_from', $operation) || array_key_exists('esc_step_to', $operation))
-						&& (!array_key_exists('esc_step_from', $operation)
-							|| !array_key_exists('esc_step_to', $operation))) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_('Parameters "esc_step_from" and "esc_step_to" must be set together.')
-					);
-				}
-
-				if (array_key_exists('esc_step_from', $operation) && array_key_exists('esc_step_to', $operation)) {
-					if ($operation['esc_step_from'] > $operation['esc_step_to'] && $operation['esc_step_to'] != 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_('Incorrect action operation escalation step values.')
-						);
-					}
-				}
-			}
-
-			if ($operation['operationtype'] == OPERATION_TYPE_COMMAND
-					&& $operation['eventsource'] != EVENT_SOURCE_SERVICE) {
-				$groupids = array_column($operation['opcommand_grp'], 'groupid', 'groupid');
-				$hostids = [];
-				$without_current = true;
-
-				if (array_key_exists('opcommand_hst', $operation)) {
-					foreach ($operation['opcommand_hst'] as $opcommand_hst) {
-						if ($opcommand_hst['hostid'] == 0) {
-							$without_current = false;
-						}
-						else {
-							$hostids[$opcommand_hst['hostid']] = $opcommand_hst['hostid'];
-						}
-					}
-				}
-
-				if (!$groupids && !$hostids && $without_current) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_('No targets specified for action operation global script.')
-					);
-				}
-			}
-		}
 	}
 
 	/**
