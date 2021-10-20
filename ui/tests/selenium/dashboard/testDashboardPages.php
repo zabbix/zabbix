@@ -65,6 +65,13 @@ class testDashboardPages extends CWebTest {
 	protected static $dashboardid_copy;
 
 	/**
+	 * Id of dashboard for paste.
+	 *
+	 * @var integer
+	 */
+	protected static $dashboardid_paste;
+
+	/**
 	 * Id of dashboard for kiosk mode.
 	 *
 	 * @var integer
@@ -246,6 +253,12 @@ class testDashboardPages extends CWebTest {
 				'auto_start' => 1,
 				'pages' => [[], [], [], [], [], [], [], [], [], [],[], [], [], [], [], [], [], [], [], [],[], [], [], [],
 					[],[], [], [], [], [],[], [], [], [], [], [], [], [], [], [],[], [], [], [], [], [], [], [], [], []]
+			],
+			[
+				'name' => 'Dashboard for paste',
+				'display_period' => 30,
+				'auto_start' => 1,
+				'pages' => [[]]
 			]
 		]);
 		$this->assertArrayHasKey('dashboardids', $response);
@@ -256,6 +269,7 @@ class testDashboardPages extends CWebTest {
 		self::$dashboardid_delete = $response['dashboardids'][4];
 		self::$dashboardid_empty = $response['dashboardids'][5];
 		self::$dashboardid_50_pages = $response['dashboardids'][6];
+		self::$dashboardid_paste = $response['dashboardids'][7];
 	}
 
 	/**
@@ -320,33 +334,44 @@ class testDashboardPages extends CWebTest {
 	 * Copy dashboard page.
 	 */
 	public function testDashboardPages_CopyPastePage() {
-		$query_pageid = 'SELECT dashboard_pageid FROM dashboard_page WHERE dashboardid='.zbx_dbstr(self::$dashboardid_copy).' ORDER BY dashboard_pageid DESC';
-		$query_widgets = 'SELECT type, name, x, y, width, height, view_mode FROM widget WHERE dashboard_pageid=';
-		$first_pageid = CDBHelper::getValue($query_pageid);
-		$first_page_widgets = CDBHelper::getHash($query_widgets.zbx_dbstr($first_pageid));
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid_copy)->waitUntilReady();
-		$dashboard = CDashboardElement::find()->one();
+		foreach ([self::$dashboardid_copy, self::$dashboardid_paste] as $dashboardid) {
+			$query_pageid = 'SELECT dashboard_pageid FROM dashboard_page WHERE dashboardid=';
+			$query_widgets = 'SELECT type, name, x, y, width, height, view_mode FROM widget WHERE dashboard_pageid=';
+			$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid_copy)->waitUntilReady();
+			$dashboard = CDashboardElement::find()->one();
 
-		// Save dashboard page names before copy.
-		$dashboard->edit();
-		$this->page->waitUntilReady();
-		$pages_before = $this->getPagesTitles();
-		$this->selectPageAction('first_page_copy', 'Copy');
-		$this->query('id:dashboard-add')->one()->click();
-		$this->query('xpath://ul[@role="menu"]')->asPopupMenu()->one()->select('Paste page');
-		$dashboard->waitUntilReady();
+			// Save hash and copy first page.
+			$dashboard->edit();
+			$this->page->waitUntilReady();
+			$this->selectPageAction('first_page_copy', 'Copy');
+			$first_pageid = CDBHelper::getValue($query_pageid.zbx_dbstr(self::$dashboardid_copy).' ORDER BY dashboard_pageid DESC');
+			$first_page_widgets = CDBHelper::getHash($query_widgets.zbx_dbstr($first_pageid));
 
-		// Copied page added.
-		array_push($pages_before, 'first_page_copy');
+			// Open another dashboard to paste copied page.
+			if ($dashboardid === self::$dashboardid_paste) {
+				$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid)->waitUntilReady();
+				$dashboard->edit();
+				$this->page->waitUntilReady();
+			}
 
-		// Assert that new page added.
-		$this->assertEquals($pages_before, $this->getPagesTitles());
-		$dashboard->save();
-		$this->page->waitUntilReady();
+			// Save dashboard page names before copy and paste page.
+			$titles_before = $this->getPagesTitles();
+			$this->query('id:dashboard-add')->one()->click();
+			$this->query('xpath://ul[@role="menu"]')->asPopupMenu()->one()->select('Paste page');
+			$dashboard->waitUntilReady();
 
-		// Check and compare widget of second and first pages.
-		$second_pageid = CDBHelper::getValue($query_pageid);
-		$this->assertEquals($first_page_widgets, CDBHelper::getHash($query_widgets.zbx_dbstr($second_pageid)));
+			// Copied page added.
+			array_push($titles_before, 'first_page_copy');
+
+			// Assert that new page added.
+			$this->assertEquals($titles_before, $this->getPagesTitles());
+			$dashboard->save();
+			$this->page->waitUntilReady();
+
+			// Check and compare widgets of copied page.
+			$pasted_pageid = CDBHelper::getValue($query_pageid.zbx_dbstr($dashboardid).' ORDER BY dashboard_pageid DESC');
+			$this->assertEquals($first_page_widgets, CDBHelper::getHash($query_widgets.zbx_dbstr($pasted_pageid)));
+		}
 	}
 
 	public static function getCreateData() {
