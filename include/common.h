@@ -1471,7 +1471,6 @@ int	zbx_strcmp_natural(const char *s1, const char *s2);
 
 /* additional token flags */
 #define ZBX_TOKEN_JSON		0x0010000
-#define ZBX_TOKEN_XML		0x0020000
 #define ZBX_TOKEN_REGEXP	0x0040000
 #define ZBX_TOKEN_XPATH		0x0080000
 #define ZBX_TOKEN_REGEXP_OUTPUT	0x0100000
