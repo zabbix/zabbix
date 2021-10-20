@@ -1742,8 +1742,6 @@ static void 	lld_trigger_dependency_make(const zbx_lld_trigger_prototype_t *trig
 
 		if (FAIL != index)
 		{
-			int	dependency_found = 0;
-
 			/* creating trigger dependency based on trigger prototype */
 
 			dep_trigger_prototype = (zbx_lld_trigger_prototype_t *)trigger_prototypes->values[index];
@@ -1764,6 +1762,8 @@ static void 	lld_trigger_dependency_make(const zbx_lld_trigger_prototype_t *trig
 				}
 				else
 				{
+					int	dependency_found = 0;
+
 					for (j = 0; j < trigger->dependencies.values_num; j++)
 					{
 						dependency = (zbx_lld_dependency_t *)trigger->dependencies.values[j];
