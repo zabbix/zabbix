@@ -31,6 +31,7 @@ require_once dirname(__FILE__).'/testComplexServiceStatus.php';
 require_once dirname(__FILE__).'/testServiceRoles.php';
 require_once dirname(__FILE__).'/testExpressionMacros.php';
 require_once dirname(__FILE__).'/testExpressionTriggerMacros.php';
+require_once dirname(__FILE__).'/testAgentItems.php';
 
 class IntegrationTests {
 	public static function suite() {
@@ -48,6 +49,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testServiceRoles');
 		$suite->addTestSuite('testExpressionMacros');
 		$suite->addTestSuite('testExpressionTriggerMacros');
+		$suite->addTestSuite('testAgentItems');
 
 		return $suite;
 	}
