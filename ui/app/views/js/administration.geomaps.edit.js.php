@@ -46,11 +46,25 @@ const view = {
 			const max_zoom = document.getElementById('geomaps_max_zoom');
 			const data = this.tile_providers[e.target.value] || this.defaults;
 
-			tile_url.readOnly = (e.target.value !== '');
+			if (e.target.value !== '') {
+				tile_url.readOnly = true;
+				attribution.readOnly = true;
+				max_zoom.readOnly = true;
+				tile_url.tabIndex = -1;
+				attribution.tabIndex = -1;
+				max_zoom.tabIndex = -1;
+			}
+			else {
+				tile_url.readOnly = false;
+				attribution.readOnly = false;
+				max_zoom.readOnly = false;
+				tile_url.removeAttribute('tabIndex');
+				attribution.removeAttribute('tabIndex');
+				max_zoom.removeAttribute('tabIndex');
+			}
+
 			tile_url.value = data.geomaps_tile_url;
-			attribution.readOnly = (e.target.value !== '');
 			attribution.value = data.geomaps_attribution;
-			max_zoom.readOnly = (e.target.value !== '');
 			max_zoom.value = data.geomaps_max_zoom;
 		}
 	}
