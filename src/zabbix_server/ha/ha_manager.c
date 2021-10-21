@@ -227,7 +227,7 @@ static int	ha_db_begin(zbx_ha_info_t *info)
 	if (ZBX_DB_DOWN == info->db_status)
 		info->db_status = DBconnect(ZBX_DB_CONNECT_ONCE);
 
-	if (ZBX_DB_OK == info->db_status)
+	if (ZBX_DB_OK <= info->db_status)
 		info->db_status = zbx_db_begin();
 
 	if (ZBX_DB_FAIL == info->db_status)
@@ -659,7 +659,7 @@ static void	ha_db_create_node(zbx_ha_info_t *info)
 
 	zbx_vector_ha_node_create(&nodes);
 
-	if (ZBX_DB_OK != ha_db_begin(info))
+	if (ZBX_DB_OK > ha_db_begin(info))
 		goto finish;
 
 	if (SUCCEED != ha_db_get_nodes(info, &nodes, 0))
@@ -713,7 +713,7 @@ out:
 finish:
 	if (ZBX_NODE_STATUS_ERROR != info->ha_status)
 	{
-		if (ZBX_DB_OK == info->db_status)
+		if (ZBX_DB_OK <= info->db_status)
 			info->ha_nodeid = nodeid;
 	}
 
@@ -757,7 +757,7 @@ static void	ha_db_register_node(zbx_ha_info_t *info)
 	if (SUCCEED == zbx_cuid_empty(info->ha_nodeid))
 		goto finish;
 
-	if (ZBX_DB_OK != ha_db_begin(info))
+	if (ZBX_DB_OK > ha_db_begin(info))
 		goto finish;
 
 	if (SUCCEED != ha_db_get_nodes(info, &nodes, ZBX_HA_NODE_LOCK))
@@ -827,7 +827,7 @@ out:
 finish:
 	if (ZBX_NODE_STATUS_ERROR != info->ha_status)
 	{
-		if (ZBX_DB_OK == info->db_status)
+		if (ZBX_DB_OK <= info->db_status)
 			info->ha_status = ha_status;
 	}
 
@@ -975,7 +975,7 @@ static void	ha_check_nodes(zbx_ha_info_t *info)
 
 	zbx_vector_ha_node_create(&nodes);
 
-	if (ZBX_DB_OK != ha_db_begin(info))
+	if (ZBX_DB_OK > ha_db_begin(info))
 		goto finish;
 
 	ha_status = info->ha_status;
@@ -1058,7 +1058,7 @@ out:
 finish:
 	if (ZBX_NODE_STATUS_ERROR != info->ha_status)
 	{
-		if (ZBX_DB_OK == info->db_status)
+		if (ZBX_DB_OK <= info->db_status)
 			info->ha_status = ha_status;
 	}
 
@@ -1080,7 +1080,7 @@ static void	ha_db_update_lastaccess(zbx_ha_info_t *info)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ha_status:%s", __func__, zbx_ha_status_str(info->ha_status));
 
-	if (ZBX_DB_OK != ha_db_begin(info))
+	if (ZBX_DB_OK > ha_db_begin(info))
 		goto out;
 
 	if (SUCCEED == ha_db_lock_nodes(info) &&
@@ -1109,7 +1109,7 @@ static int	ha_db_get_nodes_json(zbx_ha_info_t *info, char **nodes_json, char **e
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (ZBX_DB_OK != info->db_status)
+	if (ZBX_DB_OK > info->db_status)
 		goto out;
 
 	if (SUCCEED != ha_db_get_time(info, &db_time))
@@ -1171,7 +1171,7 @@ static int	ha_remove_node_by_index(zbx_ha_info_t *info, int index, char **error)
 	zbx_vector_ha_node_t	nodes;
 	int			ret = FAIL;
 
-	if (ZBX_DB_OK != ha_db_begin(info))
+	if (ZBX_DB_OK > ha_db_begin(info))
 	{
 		*error = zbx_strdup(NULL, "database connection problem");
 		return FAIL;
@@ -1368,7 +1368,7 @@ static void	ha_db_update_exit_status(zbx_ha_info_t *info)
 	if (ZBX_NODE_STATUS_ACTIVE != info->ha_status && ZBX_NODE_STATUS_STANDBY != info->ha_status)
 		return;
 
-	if (ZBX_DB_OK != ha_db_begin(info))
+	if (ZBX_DB_OK > ha_db_begin(info))
 		return;
 
 	if (SUCCEED != ha_db_lock_nodes(info))
