@@ -77,7 +77,6 @@
 #include "postinit.h"
 #include "export.h"
 #include "zbxvault.h"
-#include "zbxdiag.h"
 #include "zbxtrends.h"
 #include "ha/ha.h"
 #include "sighandler.h"
@@ -1844,7 +1843,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		if (0 != zbx_rtc_command)
 		{
 			if (ZBX_NODE_STATUS_ACTIVE == ha_status)
-				zbx_rtc_process_command(zbx_rtc_command);
+				zbx_rtc_process_command((unsigned int)zbx_rtc_command);
 			else
 				zabbix_log(LOG_LEVEL_INFORMATION, "runtime commands can be executed only in active mode");
 

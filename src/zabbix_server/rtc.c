@@ -22,12 +22,13 @@
 #include "zbxdiag.h"
 #include "ha/ha.h"
 #include "../libs/zbxnix/control.h"
+#include "rtc.h"
 
 /******************************************************************************
  *                                                                            *
  * Function: rtc_diaginfo                                                     *
  *                                                                            *
- * Purpose: process diaginfo runtime commmand                                 *
+ * Purpose: process diaginfo runtime command                                  *
  *                                                                            *
  ******************************************************************************/
 static void	rtc_diaginfo(int scope)
@@ -50,7 +51,7 @@ static void	rtc_diaginfo(int scope)
  *                                                                            *
  * Function: rtc_ha_status                                                    *
  *                                                                            *
- * Purpose: process ha_status runtime commmand                                *
+ * Purpose: process ha_status runtime command                                 *
  *                                                                            *
  ******************************************************************************/
 static void	rtc_ha_status(void)
@@ -134,7 +135,7 @@ static void	rtc_ha_status(void)
  *                                                                            *
  * Function: rtc_remove_node                                                  *
  *                                                                            *
- * Purpose: process ha_remove_node runtime commmand                           *
+ * Purpose: process ha_remove_node runtime command                            *
  *                                                                            *
  ******************************************************************************/
 static void	rtc_remove_node(int index)
@@ -152,7 +153,7 @@ static void	rtc_remove_node(int index)
  *                                                                            *
  * Function: rtc_ha_failover_delay                                            *
  *                                                                            *
- * Purpose: process ha_failover_delay runtime commmand                        *
+ * Purpose: process ha_failover_delay runtime command                         *
  *                                                                            *
  ******************************************************************************/
 static void	rtc_ha_failover_delay(int delay)
@@ -248,7 +249,7 @@ static void	rtc_change_loglevel(int command, int scope, int data)
 		if (1 < data)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "cannot redirect signal: \"%s #%d\" process does not exist",
-					get_process_type_string(scope), data);
+					get_process_type_string((unsigned char)scope), data);
 		}
 		else
 			rtc_change_loglevel_main(command);
@@ -258,7 +259,7 @@ static void	rtc_change_loglevel(int command, int scope, int data)
 		if (1 < data)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "cannot redirect signal: \"%s #%d\" process does not exist",
-					get_process_type_string(scope), data);
+					get_process_type_string((unsigned char)scope), data);
 		}
 		else
 			rtc_change_loglevel_ha(command);
@@ -272,7 +273,7 @@ static void	rtc_change_loglevel(int command, int scope, int data)
  * Purpose: process runtime command                                           *
  *                                                                            *
  ******************************************************************************/
-void	zbx_rtc_process_command(int command)
+void	zbx_rtc_process_command(unsigned int command)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() command:%d", __func__, ZBX_RTC_GET_MSG(command));
 

@@ -469,7 +469,7 @@ static void	ha_get_external_address(char **address, unsigned short *port)
 	}
 
 	if (0 == *port)
-		*port = CONFIG_LISTEN_PORT;
+		*port = (unsigned short)CONFIG_LISTEN_PORT;
 }
 
 /******************************************************************************
@@ -1284,7 +1284,7 @@ static void	ha_remove_node(zbx_ha_info_t *info, zbx_ipc_client_t *client, const 
 static void	ha_set_failover_delay(zbx_ha_info_t *info, zbx_ipc_client_t *client, const zbx_ipc_message_t *message)
 {
 	int		delay;
-	char		*error = NULL;
+	const char	*error = NULL;
 	zbx_uint32_t	len = 0, error_len;
 	unsigned char	*data;
 	DB_RESULT	result;

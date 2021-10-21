@@ -20,6 +20,6 @@
 #ifndef ZABBIX_RTC_H
 #define ZABBIX_RTC_H
 
-void	zbx_rtc_process_command(int command);
+void	zbx_rtc_process_command(unsigned int command);
 
 #endif
