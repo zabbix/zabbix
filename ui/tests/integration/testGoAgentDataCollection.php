@@ -20,15 +20,15 @@
 
 require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 
-define('COMPARE_AVERAGE', 0);
-define('COMPARE_LAST', 1);
-
 /**
  * Test suite for agent2 (GO agent) metric collection.
  *
  * @backup history
  */
 class testGoAgentDataCollection extends CIntegrationTest {
+
+	const COMPARE_AVERAGE = 0;
+	const COMPARE_LAST = 1;
 
 	private static $hostids = [];
 	private static $itemids = [];
@@ -244,7 +244,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_FLOAT,
 			'threshold' => 10.0,
-			'compareType' => COMPARE_AVERAGE
+			'compareType' => self::COMPARE_AVERAGE
 		],
 		[
 			'key' => 'system.swap.in[,pages]',
@@ -269,7 +269,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_FLOAT,
 			'threshold' => 1.0,
-			'compareType' => COMPARE_AVERAGE
+			'compareType' => self::COMPARE_AVERAGE
 		],
 		[
 			'key' => 'net.tcp.service.perf[ssh]',
@@ -546,7 +546,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 
 			case ITEM_VALUE_TYPE_FLOAT:
 			case ITEM_VALUE_TYPE_UINT64:
-				if (CTestArrayHelper::get($item, 'compareType', COMPARE_LAST) === COMPARE_AVERAGE) {
+				if (CTestArrayHelper::get($item, 'compareType', self::COMPARE_LAST) === self::COMPARE_AVERAGE) {
 					$value = [];
 					foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
 						$value[$component] = 0;
