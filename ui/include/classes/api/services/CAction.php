@@ -2472,7 +2472,7 @@ class CAction extends CApiService {
 		$ip_range_parser = new CIPRangeParser(['v6' => ZBX_HAVE_IPV6, 'dns' => false, 'max_ipv4_cidr' => 30]);
 
 		foreach ($actions as $i => $action) {
-			if (!array_key_exists('filter', $action)) {
+			if (!array_key_exists('filter', $action) || !array_key_exists('conditions', $action['filter'])) {
 				continue;
 			}
 
@@ -2649,7 +2649,8 @@ class CAction extends CApiService {
 				foreach ($action[$operation_group] as $operation) {
 					if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE
 							|| $operation['operationtype'] == OPERATION_TYPE_ACK_MESSAGE) {
-						if ($operation['opmessage']['mediatypeid'] != 0) {
+						if (array_key_exists('mediatypeid', $operation)
+								&& $operation['opmessage']['mediatypeid'] != 0) {
 							$mediatypeids[$operation['opmessage']['mediatypeid']] = true;
 						}
 					}
