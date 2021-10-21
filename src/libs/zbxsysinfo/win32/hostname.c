@@ -49,7 +49,7 @@ int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	type = get_rparam(request, 0);
 	transform = get_rparam(request, 1);
 
-	if (NULL != type && '\0' != *type && 0 != strcmp(type, "netbios"))
+	if (NULL == type || '\0' == *type || 0 == strcmp(type, "netbios"))
 	{
 		/* Buffer size is chosen large enough to contain any DNS name, not just                      */
 		/* MAX_COMPUTERNAME_LENGTH + 1 characters. MAX_COMPUTERNAME_LENGTH is usually less than 32,  */
@@ -94,7 +94,7 @@ int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 				SET_MSG_RESULT(result, error);
 				return SYSINFO_RET_FAIL;
 			}
-			
+
 			name = zbx_strdup(NULL, buffer);
 		}
 		else
