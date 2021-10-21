@@ -386,7 +386,6 @@ static int	ha_db_get_nodes(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes, int
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_ha_node_t	*node;
 
 	if (NULL == (result = ha_db_select(info, "select ha_nodeid,name,status,lastaccess,address,port,ha_sessionid"
 			" from ha_node order by ha_nodeid%s",
@@ -397,13 +396,21 @@ static int	ha_db_get_nodes(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes, int
 
 	while (NULL != (row = DBfetch(result)))
 	{
+		zbx_ha_node_t	*node;
+
 		node = (zbx_ha_node_t *)zbx_malloc(NULL, sizeof(zbx_ha_node_t));
 		zbx_strlcpy(node->ha_nodeid.str, row[0], sizeof(node->ha_nodeid));
 		node->name = zbx_strdup(NULL, row[1]);
 		node->status = atoi(row[2]);
 		node->lastaccess = atoi(row[3]);
 		node->address = zbx_strdup(NULL, row[4]);
-		node->port = atoi(row[5]);
+
+		if (SUCCEED != is_ushort(row[5], &node->port))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "node \"%s\" has invalid port value \"%s\"", row[1], row[5]);
+			node->port = 0;
+		}
+
 		zbx_strlcpy(node->ha_sessionid.str, row[6], sizeof(node->ha_sessionid));
 		zbx_vector_ha_node_append(nodes, node);
 	}
