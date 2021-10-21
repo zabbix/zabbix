@@ -1488,10 +1488,7 @@ int	zbx_ha_recv_status(int timeout, int *ha_status, char **error)
 	if (ZBX_HA_IS_CLUSTER() && *ha_status == ZBX_NODE_STATUS_ACTIVE && 0 != last_hb)
 	{
 		if (last_hb + ha_failover_delay - ZBX_HA_POLL_PERIOD <= now || now < last_hb)
-		{
 			*ha_status = ZBX_NODE_STATUS_STANDBY;
-			ret = SUCCEED;
-		}
 	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
