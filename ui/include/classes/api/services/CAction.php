@@ -621,8 +621,6 @@ class CAction extends CApiService {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @param array      $actions
 	 * @param string     $method
 	 * @param array|null $db_actions
@@ -719,8 +717,6 @@ class CAction extends CApiService {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @param array      $actions
 	 * @param string     $method
 	 * @param array|null $db_actions
@@ -1983,8 +1979,6 @@ class CAction extends CApiService {
 	/**
 	 * Returns validation rules for the filter object.
 	 *
-	 * @static
-	 *
 	 * @param int $eventsource  Action event source. Possible values:
 	 *                          EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
 	 *                          EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
@@ -2112,8 +2106,6 @@ class CAction extends CApiService {
 
 	/**
 	 * Returns validation rules for objects of normal, recovery and update operations.
-	 *
-	 * @static
 	 *
 	 * @param int $recovery     Action operation mode. Possible values:
 	 *                          ACTION_OPERATION, ACTION_RECOVERY_OPERATION, ACTION_UPDATE_OPERATION
@@ -2429,8 +2421,6 @@ class CAction extends CApiService {
 	/**
 	 * Check for unique action names.
 	 *
-	 * @static
-	 *
 	 * @param array      $actions
 	 * @param array|null $db_actions
 	 *
@@ -2461,8 +2451,6 @@ class CAction extends CApiService {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @param array $actions
 	 *
 	 * @throws APIException
@@ -2505,8 +2493,7 @@ class CAction extends CApiService {
 						));
 					}
 				}
-
-				if ($condition['conditiontype'] == CONDITION_TYPE_DVALUE) {
+				elseif ($condition['conditiontype'] == CONDITION_TYPE_DVALUE) {
 					if ($condition['operator'] == CONDITION_OPERATOR_EQUAL
 							|| $condition['operator'] == CONDITION_OPERATOR_NOT_EQUAL) {
 						continue;
@@ -2523,8 +2510,6 @@ class CAction extends CApiService {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @param array      $actions
 	 * @param string     $method
 	 * @param array|null $db_actions
@@ -2609,8 +2594,7 @@ class CAction extends CApiService {
 							);
 						}
 					}
-
-					if ($operation['operationtype'] == OPERATION_TYPE_COMMAND
+					elseif ($operation['operationtype'] == OPERATION_TYPE_COMMAND
 							&& $action['eventsource'] != EVENT_SOURCE_SERVICE) {
 						$has_groups = array_key_exists('opcommand_grp', $operation) && $operation['opcommand_grp'];
 						$has_hosts = array_key_exists('opcommand_hst', $operation) && $operation['opcommand_hst'];
@@ -2630,8 +2614,6 @@ class CAction extends CApiService {
 
 	/**
 	 * Checks if all the given media types are valid.
-	 *
-	 * @static
 	 *
 	 * @param array $actions
 	 *
@@ -2679,8 +2661,6 @@ class CAction extends CApiService {
 	/**
 	 * Checks if all the given global scripts are valid.
 	 *
-	 * @static
-	 *
 	 * @param array $actions
 	 *
 	 * @throws APIException if invalid global scripts given.
@@ -2723,8 +2703,6 @@ class CAction extends CApiService {
 
 	/**
 	 * Checks if the current user has access to the given host groups.
-	 *
-	 * @static
 	 *
 	 * @param array $actions
 	 *
@@ -2783,8 +2761,6 @@ class CAction extends CApiService {
 	/**
 	 * Checks if the current user has access to the given hosts.
 	 *
-	 * @static
-	 *
 	 * @param array $actions
 	 *
 	 * @throws APIException if the user doesn't have write permissions for the given hosts.
@@ -2842,8 +2818,6 @@ class CAction extends CApiService {
 	/**
 	 * Checks if the current user has access to the given users.
 	 *
-	 * @static
-	 *
 	 * @param array $actions
 	 *
 	 * @throws APIException if the user doesn't have write permissions for the given users.
@@ -2887,8 +2861,6 @@ class CAction extends CApiService {
 	/**
 	 * Checks if the current user has access to the given user groups.
 	 *
-	 * @static
-	 *
 	 * @param array $actions
 	 *
 	 * @throws APIException if the user doesn't have write permissions for the given user groups.
@@ -2931,8 +2903,6 @@ class CAction extends CApiService {
 
 	/**
 	 * Checks if the current user has access to the given templates.
-	 *
-	 * @static
 	 *
 	 * @param array $actions
 	 *
@@ -2986,8 +2956,6 @@ class CAction extends CApiService {
 	/**
 	 * Checks if the current user has access to the given triggers.
 	 *
-	 * @static
-	 *
 	 * @param array $actions
 	 *
 	 * @throws APIException if the user doesn't have write permissions for the given triggers.
@@ -3028,8 +2996,6 @@ class CAction extends CApiService {
 
 	/**
 	 * Checks if the current user has access to the given discovery rules.
-	 *
-	 * @static
 	 *
 	 * @param array $actions
 	 *
@@ -3072,8 +3038,6 @@ class CAction extends CApiService {
 	/**
 	 * Checks if the current user has access to the given discovery checks.
 	 *
-	 * @static
-	 *
 	 * @param array $actions
 	 *
 	 * @throws APIException if the user doesn't have write permissions for the given discovery checks.
@@ -3114,8 +3078,6 @@ class CAction extends CApiService {
 
 	/**
 	 * Checks if the current user has access to the given proxies.
-	 *
-	 * @static
 	 *
 	 * @param array $actions
 	 *
@@ -3158,8 +3120,6 @@ class CAction extends CApiService {
 	/**
 	 * Checks if the current user has access to the given services.
 	 *
-	 * @static
-	 *
 	 * @param array $actions
 	 *
 	 * @throws APIException if the user doesn't have write permissions for the given services.
@@ -3199,8 +3159,6 @@ class CAction extends CApiService {
 
 	/**
 	 * Add existing filter with conditions and operations to $db_actions if they are affected by the update.
-	 *
-	 * @static
 	 *
 	 * @param array      $actions
 	 * @param array|null $db_actions
@@ -3335,17 +3293,21 @@ class CAction extends CApiService {
 					}
 
 					$operation['opcommand_grp'] = $db_operation['opcommand_grpid']
-						? [$db_operation['opcommand_grpid'] => [
-							'opcommand_grpid' => $db_operation['opcommand_grpid'],
-							'groupid' => $db_operation['groupid']
-						]]
+						? [
+							$db_operation['opcommand_grpid'] => [
+								'opcommand_grpid' => $db_operation['opcommand_grpid'],
+								'groupid' => $db_operation['groupid']
+							]
+						]
 						: [];
 
 					$operation['opcommand_hst'] = $db_operation['opcommand_hstid']
-						? [$db_operation['opcommand_hstid'] => [
-							'opcommand_hstid' => $db_operation['opcommand_hstid'],
-							'hostid' => $db_operation['hostid']
-						]]
+						? [
+							$db_operation['opcommand_hstid'] => [
+								'opcommand_hstid' => $db_operation['opcommand_hstid'],
+								'hostid' => $db_operation['hostid']
+							]
+						]
 						: [];
 					break;
 
