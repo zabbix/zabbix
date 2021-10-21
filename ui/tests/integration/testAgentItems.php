@@ -49,7 +49,7 @@ class testAgentItems extends CIntegrationTest {
 			'type' => ITEM_TYPE_ZABBIX,
 			'component' => self::COMPONENT_AGENT,
 			'valueType' => ITEM_VALUE_TYPE_TEXT,
-			'result_exec' => 'stat -c \'%U\' '.self::TEST_FILE_NAME,
+			'result_exec' => 'stat -c \'%U\' '.self::TEST_FILE_NAME
 		],
 		[
 			'key' => 'vfs.file.owner['.self::TEST_FILE_NAME.',group,id]',
