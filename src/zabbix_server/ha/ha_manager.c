@@ -1794,6 +1794,7 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 	int			pause = FAIL, stop = FAIL, ticks_num = 0, nextcheck;
 	double			now, tick;
 	zbx_ha_info_t		info;
+	zbx_timespec_t		timeout;
 
 	zbx_setproctitle("ha manager");
 
@@ -1877,7 +1878,10 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 				tick++;
 		}
 
-		(void)zbx_ipc_service_recv(&service, tick - now, &client, &message);
+		timeout.sec = (int)(tick - now);
+		timeout.ns = (int)((tick - now) * 1000000) % 1000000;
+
+		(void)zbx_ipc_service_recv(&service, &timeout, &client, &message);
 
 		if (NULL != message)
 		{
@@ -1940,9 +1944,12 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "HA manager has been paused");
 pause:
+	timeout.sec = ZBX_HA_POLL_PERIOD;
+	timeout.ns = 0;
+
 	while (SUCCEED != stop)
 	{
-		(void)zbx_ipc_service_recv(&service, ZBX_HA_POLL_PERIOD, &client, &message);
+		(void)zbx_ipc_service_recv(&service, &timeout, &client, &message);
 
 		if (ZBX_NODE_STATUS_STANDBY == info.ha_status || ZBX_NODE_STATUS_ACTIVE == info.ha_status)
 			ha_db_update_lastaccess(&info);

@@ -3318,9 +3318,10 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 	zbx_ipc_client_t	*client;
 	zbx_ipc_message_t	*message;
 	int			ret, events_num = 0, tags_update_num = 0, problems_delete_num = 0,
-				service_update_num = 0, timeout = 1;
+				service_update_num = 0;
 	double			time_stat, time_idle = 0, time_now, time_flush = 0, time_cleanup = 0, sec;
 	zbx_service_manager_t	service_manager;
+	zbx_timespec_t		timeout = {1, 0};
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -3424,7 +3425,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 		}
 
 		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
-		ret = zbx_ipc_service_recv(&service, timeout, &client, &message);
+		ret = zbx_ipc_service_recv(&service, &timeout, &client, &message);
 		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 		sec = zbx_time();
 		zbx_update_env(sec);
@@ -3481,11 +3482,11 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 		if (NULL != message)
 			continue;
 
-		if (0 == timeout)
+		if (0 == timeout.sec)
 			break;
 
 		if (!ZBX_IS_RUNNING())
-			timeout = 0;
+			timeout.sec = 0;
 	}
 
 	service_manager_free(&service_manager);
