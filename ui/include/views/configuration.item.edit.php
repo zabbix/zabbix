@@ -906,7 +906,8 @@ $itemTab = (new CTabView())
 			'source' => 'item',
 			'tags' => $data['tags'],
 			'show_inherited_tags' => $data['show_inherited_tags'],
-			'readonly' => $discovered_item
+			'readonly' => $discovered_item,
+			'tabs_id' => 'tabs'
 		]),
 		TAB_INDICATOR_TAGS
 	)

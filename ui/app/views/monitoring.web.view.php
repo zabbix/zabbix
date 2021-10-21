@@ -26,7 +26,6 @@
 $this->addJsFile('gtlc.js');
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('layout.mode.js');
-$this->addJsFile('multiselect.js');
 $this->addJsFile('class.tagfilteritem.js');
 
 $this->includeJsFile('monitoring.web.view.js.php');
@@ -94,4 +93,8 @@ $web_layout_mode = $this->getLayoutMode();
 		])
 	)
 	->addItem($data['screen_view'])
+	->show();
+
+(new CScriptTag('view.init();'))
+	->setOnDocumentReady()
 	->show();

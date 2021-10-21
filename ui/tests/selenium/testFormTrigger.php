@@ -187,28 +187,18 @@ class testFormTrigger extends CLegacyWebTest {
 	 * @dataProvider layout
 	 */
 	public function testFormTrigger_CheckLayout($data) {
-
 		if (isset($data['template'])) {
 			$this->zbxTestLogin('templates.php');
-
-			// If the template is not present on this page anymore - check on next page.
-			for ($i = 0; $i < 2; $i++) {
-				if ($this->query('link', $data['template'])->one(false)->isValid() === true) {
-					break;
-				}
-				$this->query('xpath://div[@class="table-paging"]//span[@class="arrow-right"]/..')->one()->click();
-				$this->page->waitUntilReady();
-			}
-
-			$this->zbxTestClickLinkTextWait($data['template']);
+			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+			$this->filterEntriesAndOpenTriggers($data['template'], $form);
 		}
 
 		if (isset($data['host'])) {
-			$this->zbxTestLogin('hosts.php');
-			$this->zbxTestClickLinkTextWait($data['host']);
+			$this->zbxTestLogin(self::HOST_LIST_PAGE);
+			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+			$this->filterEntriesAndOpenTriggers($data['host'], $form);
 		}
 
-		$this->zbxTestClickXpathWait('//div[@class="header-navigation"]//a[text()="Triggers"]');
 		$this->zbxTestCheckTitle('Configuration of triggers');
 		$this->zbxTestCheckHeader('Triggers');
 
@@ -409,9 +399,9 @@ class testFormTrigger extends CLegacyWebTest {
 		$oldHashTriggers = CDBHelper::getHash($sqlTriggers);
 		$oldHashFunctions = CDBHelper::getHash($sqlFunctions);
 
-		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestClickLinkTextWait($this->host);
-		$this->zbxTestClickXpathWait('//div[@class="header-navigation"]//a[text()="Triggers"]');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
+		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+		$this->filterEntriesAndOpenTriggers($this->host, $form);
 		$this->zbxTestClickLinkTextWait($data['description']);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of triggers');
@@ -822,9 +812,9 @@ class testFormTrigger extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormTrigger_SimpleCreate($data) {
-		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestClickLinkTextWait($this->host);
-		$this->zbxTestClickXpathWait('//div[@class="header-navigation"]//a[text()="Triggers"]');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
+		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+		$this->filterEntriesAndOpenTriggers($this->host, $form);
 		$this->zbxTestCheckTitle('Configuration of triggers');
 		$this->zbxTestCheckHeader('Triggers');
 
@@ -995,5 +985,18 @@ class testFormTrigger extends CLegacyWebTest {
 				}
 			}
 		}
+	}
+
+	/**
+	* Function for filtering necessary hosts and opening their Web scenarios.
+	*
+	* @param string    $name    name of a host or template where triggers are opened
+	*/
+	private function filterEntriesAndOpenTriggers($name, $form) {
+		$this->query('button:Reset')->one()->click();
+		$form->fill(['Name' => $name]);
+		$this->query('button:Apply')->one()->waitUntilClickable()->click();
+		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
+			->getColumn('Triggers')->query('link:Triggers')->one()->click();
 	}
 }

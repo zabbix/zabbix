@@ -641,8 +641,6 @@ footer {
   row-gap: 10px;
   column-gap: 10px;
   grid-template-columns: minmax(15%, max-content) auto; }
-  .form-grid.label-width-fixed {
-    grid-template-columns: minmax(100px, max-content) auto; }
   .form-grid.label-width-true {
     grid-template-columns: max-content auto; }
   .form-grid > label {
@@ -667,16 +665,14 @@ footer {
     width: 100%; }
   .form-grid .form-field td {
     padding: 0 5px 5px 0; }
+  .form-grid .form-field .list-check-radio {
+    line-height: 1.4em; }
   .form-grid.form-grid-1-1 {
     grid-template-columns: repeat(2, minmax(15%, max-content) auto); }
-    .form-grid.form-grid-1-1.label-width-fixed {
-      grid-template-columns: repeat(2, minmax(100px, max-content) auto); }
     .form-grid.form-grid-1-1.label-width-true {
       grid-template-columns: repeat(2, max-content auto); }
   .form-grid.form-grid-3-1 {
     grid-template-columns: minmax(15%, max-content) 3fr max-content auto; }
-    .form-grid.form-grid-3-1.label-width-fixed {
-      grid-template-columns: minmax(100px, max-content) 3fr max-content auto; }
     .form-grid.form-grid-3-1.label-width-true {
       grid-template-columns: max-content auto 3fr max-content auto; }
   .form-grid.form-grid-1-1 .form-field:not(.field-fluid), .form-grid.form-grid-3-1 .form-field:not(.field-fluid) {
@@ -3872,7 +3868,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .radio-list-control input[type="radio"][disabled] + label, z-select[disabled] button,
 .z-select[disabled] button, z-select[readonly] button,
 .z-select[readonly] button, .multiselect[aria-disabled], input[disabled], input[readonly], textarea[disabled], textarea[readonly], select option[disabled], select[disabled], select[readonly], .checkbox-radio[readonly] span,
-.checkbox-radio[readonly] + label span, .checkbox-radio[disabled] + label span, .input-group button.btn-dropdown-toggle:disabled {
+.checkbox-radio[readonly] + label span, .checkbox-radio[disabled] + label span, .macro-input-group button.btn-dropdown-toggle:disabled {
   color: #acbbc2;
   background-color: #ebebeb !important;
   border-color: #ccd5d9; }
@@ -4267,6 +4263,12 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     top: 0;
     z-index: 4;
     margin: 0 0 10px; }
+  .overlay-dialogue .form-grid {
+    grid-template-columns: minmax(100px, max-content) auto; }
+    .overlay-dialogue .form-grid.form-grid-1-1 {
+      grid-template-columns: repeat(2, minmax(100px, max-content) auto); }
+    .overlay-dialogue .form-grid.form-grid-3-1 {
+      grid-template-columns: minmax(100px, max-content) 3fr max-content auto; }
   .overlay-dialogue .list-table {
     white-space: normal;
     border: 0; }
@@ -6126,30 +6128,29 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
 .host-avail-widget .host-avail-total {
   background: transparent; }
 
-.input-group {
+.macro-input-group {
   position: relative;
   display: flex;
-  flex-wrap: wrap;
   align-items: stretch;
   width: 100%; }
-  .input-group * {
+  .macro-input-group * {
     box-sizing: border-box; }
-  .input-group input,
-  .input-group textarea {
+  .macro-input-group input,
+  .macro-input-group textarea {
     flex: 1;
     border-right: 0; }
-    .input-group input:focus + .btn-undo, .input-group input:active + .btn-undo,
-    .input-group textarea:focus + .btn-undo,
-    .input-group textarea:active + .btn-undo {
+    .macro-input-group input:focus + .btn-undo, .macro-input-group input:active + .btn-undo,
+    .macro-input-group textarea:focus + .btn-undo,
+    .macro-input-group textarea:active + .btn-undo {
       border-top-color: #02659f;
       border-bottom-color: #02659f; }
-  .input-group button {
+  .macro-input-group button {
     position: relative; }
-    .input-group button.btn-change {
+    .macro-input-group button.btn-change {
       border-radius: 0; }
-      .input-group button.btn-change:disabled {
+      .macro-input-group button.btn-change:disabled {
         display: none; }
-    .input-group button.btn-undo {
+    .macro-input-group button.btn-undo {
       display: none;
       width: 24px;
       border-left: 0;
@@ -6159,7 +6160,7 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
       border-radius: 0;
       background-color: #ffffff;
       transition: border-color .2s ease-out, box-shadow .2s ease-out; }
-      .input-group button.btn-undo::before {
+      .macro-input-group button.btn-undo::before {
         position: absolute;
         top: 0;
         left: 0;
@@ -6168,18 +6169,18 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
         height: 22px;
         content: '';
         background: url("../img/icon-sprite.svg?20200407") no-repeat -119px -474px; }
-      .input-group button.btn-undo.is-focused {
+      .macro-input-group button.btn-undo.is-focused {
         border-top: 1px solid #02659f;
         border-bottom: 1px solid #02659f; }
-      .input-group button.btn-undo:hover, .input-group button.btn-undo:focus, .input-group button.btn-undo:active {
+      .macro-input-group button.btn-undo:hover, .macro-input-group button.btn-undo:focus, .macro-input-group button.btn-undo:active {
         border-top: 1px solid #02659f;
         border-bottom: 1px solid #02659f;
         color: #ffffff;
         background-color: #02659f;
         border-color: #02659f; }
-        .input-group button.btn-undo:hover::before, .input-group button.btn-undo:focus::before, .input-group button.btn-undo:active::before {
+        .macro-input-group button.btn-undo:hover::before, .macro-input-group button.btn-undo:focus::before, .macro-input-group button.btn-undo:active::before {
           background-position: -431px -474px; }
-    .input-group button.btn-dropdown-toggle {
+    .macro-input-group button.btn-dropdown-toggle {
       border-color: #02659f;
       border-top-left-radius: 0;
       border-bottom-left-radius: 0; }
@@ -6342,7 +6343,8 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
     .interface-container .interface-row:not(:first-of-type) {
       margin-top: 5px; }
     .interface-container .interface-row[data-type] .interface-cell-details {
-      display: none; }
+      display: none;
+      grid-column: 1/-1; }
     .interface-container .interface-row .interface-cell {
       align-self: center; }
       .interface-container .interface-row .interface-cell .interface-btn-toggle {
@@ -6503,6 +6505,15 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
     content: '\2013';
     float: left;
     margin-left: -1em; }
+
+.overlay-dialogue #host-form #tagsFormList .table-forms-td-left,
+.overlay-dialogue #host-form #macrosFormList .table-forms-td-left,
+.overlay-dialogue #host-form #valuemap-formlist .table-forms-td-left {
+  display: none; }
+.overlay-dialogue #host-form #tagsFormList .table-forms-td-right,
+.overlay-dialogue #host-form #macrosFormList .table-forms-td-right,
+.overlay-dialogue #host-form #valuemap-formlist .table-forms-td-right {
+  width: 100%; }
 
 .audit-details-popup-wrapper {
   margin: 5px 10px; }
