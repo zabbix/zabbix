@@ -245,7 +245,8 @@ class CDBHelper {
 			if ($DB['PASSWORD'] !== '') {
 				putenv('PGPASSWORD='.$DB['PASSWORD']);
 			}
-			exec('pg_dump -U'.$DB['USER'].' -Fd -j5 -t'.implode(' -t', $tables).' '.$DB['DATABASE'].' -f '.PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].'.'.$index.'.dump');
+			$server = $DB['SERVER'] !== '' ? ' -h'.$DB['SERVER'] : '';
+			exec('pg_dump'.$server.' -U'.$DB['USER'].' -Fd -j5 -t'.implode(' -t', $tables).' '.$DB['DATABASE'].' -f '.PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].'.'.$index.'.dump');
 		}
 		else {
 			$suffix = '_tmp'.count(self::$backups);
@@ -276,7 +277,8 @@ class CDBHelper {
 			if ($DB['PASSWORD'] !== '') {
 				putenv('PGPASSWORD='.$DB['PASSWORD']);
 			}
-			exec('pg_restore -U'.$DB['USER'].' -Fd -j5 --clean -d '.$DB['DATABASE'].' '.PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].'.'.$index.'.dump');
+			$server = $DB['SERVER'] !== '' ? ' -h'.$DB['SERVER'] : '';
+			exec('pg_restore'.$server.' -U'.$DB['USER'].' -Fd -j5 --clean -d '.$DB['DATABASE'].' '.PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].'.'.$index.'.dump');
 			exec('rm -rf '.PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].'.'.$index.'.dump');
 		}
 		else {
