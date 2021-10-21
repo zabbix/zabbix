@@ -1820,9 +1820,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 		if (ZBX_NODE_STATUS_STANDBY == ha_status)
 		{
-			time_t	 now;
-
-			now = time(NULL);
 			if (standby_warning_time + SEC_PER_HOUR <= now)
 			{
 				zabbix_log(LOG_LEVEL_INFORMATION, "\"%s\" node is working in \"%s\" mode",

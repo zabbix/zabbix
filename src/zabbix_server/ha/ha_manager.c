@@ -1465,6 +1465,7 @@ int	zbx_ha_recv_status(int timeout, int *ha_status, char **error)
 
 				if (ZBX_NODE_STATUS_ERROR == *ha_status)
 				{
+					zbx_ipc_message_free(message);
 					ret = FAIL;
 					goto out;
 				}
