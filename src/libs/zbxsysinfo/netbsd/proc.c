@@ -67,7 +67,6 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char			*procname, *proccomm, *param, *args;
 	int			do_task, pagesize, count, i, proccount = 0, invalid_user = 0, proc_ok, comm_ok, op, arg;
 	double			value = 0.0, memsize = 0;
-	size_t			sz;
 	struct kinfo_proc2	*proc, *pproc;
 	struct passwd		*usrinfo;
 
@@ -196,7 +195,6 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char			*procname, *proccomm, *param, *args;
 	int			proccount = 0, invalid_user = 0, zbx_proc_stat;
 	int			count, i, proc_ok, stat_ok, comm_ok, op, arg;
-	size_t			sz;
 	struct kinfo_proc2	*proc, *pproc;
 	struct passwd		*usrinfo;
 

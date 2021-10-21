@@ -60,8 +60,7 @@ else {
 	$tab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')), [
 			(new CSubmit('clone', _('Clone')))->setEnabled(CWebUser::getType() == USER_TYPE_SUPER_ADMIN),
-			(new CButtonDelete(_('Delete selected group?'), url_param('form').url_param('groupid')))
-				->setEnabled(array_key_exists($data['groupid'], $data['deletable_host_groups'])),
+			(new CButtonDelete(_('Delete selected group?'), url_param('form').url_param('groupid'))),
 			new CButtonCancel()
 		]
 	));

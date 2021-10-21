@@ -23,9 +23,9 @@ require_once 'vendor/autoload.php';
 require_once dirname(__FILE__).'/CFormElement.php';
 
 /**
- * Fluid form element.
+ * Grid form element.
  */
-class CFluidFormElement extends CFormElement {
+class CGridFormElement extends CFormElement {
 
 	const TABLE_FORM = 'div[contains(@class, "form-grid")]';
 	const TABLE_FORM_FIELD = 'following-sibling::div[1]';

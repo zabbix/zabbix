@@ -1034,4 +1034,10 @@ int	zbx_hc_check_proxy(zbx_uint64_t proxyid);
 
 void	zbx_dc_eval_expand_user_macros(zbx_eval_context_t *ctx);
 
+void	zbx_db_trigger_explain_expression(const DB_TRIGGER *trigger, char **expression,
+		int (*eval_func_cb)(zbx_variant_t *, DC_ITEM *, const char *, const char *, const zbx_timespec_t *,
+		char **), int recovery);
+void	zbx_db_trigger_get_function_value(const DB_TRIGGER *trigger, int index, char **value,
+		int (*eval_func_cb)(zbx_variant_t *, DC_ITEM *, const char *, const char *, const zbx_timespec_t *,
+		char **), int recovery);
 #endif

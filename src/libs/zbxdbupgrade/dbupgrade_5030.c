@@ -1221,7 +1221,6 @@ static void	zbx_split_name(const char *name, char **menu_path, const char **name
 static int	zbx_make_script_name_unique(const char *name, int *suffix, char **unique_name)
 {
 	DB_RESULT	result;
-	DB_ROW		row;
 	char		*sql, *try_name = NULL, *try_name_esc = NULL;
 
 	while (1)
@@ -1252,7 +1251,7 @@ static int	zbx_make_script_name_unique(const char *name, int *suffix, char **uni
 
 		zbx_free(sql);
 
-		if (NULL == (row = DBfetch(result)))
+		if (NULL == DBfetch(result))
 		{
 			*unique_name = try_name;
 			DBfree_result(result);

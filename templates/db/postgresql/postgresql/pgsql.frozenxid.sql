@@ -10,7 +10,6 @@ FROM (
 	(
 		SELECT ((1 - max(age)::double precision / current_setting('autovacuum_freeze_max_age')::integer) * 100)::numeric(9,6)
 		FROM T
-		WHERE age < fma
 	) prc_before_av,
 	(
 		SELECT ((1 - max(age)::double precision / -((1 << 31) + 1)) * 100)::numeric(9,6)

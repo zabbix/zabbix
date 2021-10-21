@@ -415,7 +415,6 @@ static int	check_parent_service_intersection(zbx_vector_uint64_t *parent_ids, zb
 static int	check_db_parent_rule_tag_match(zbx_vector_uint64_t *parent_ids, zbx_vector_tags_t *tags)
 {
 	DB_RESULT	result;
-	DB_ROW		row;
 	char		*sql = NULL;
 	int		i, perm = PERM_DENY;
 	size_t		sql_alloc = 0, sql_offset = 0;
@@ -454,7 +453,7 @@ static int	check_db_parent_rule_tag_match(zbx_vector_uint64_t *parent_ids, zbx_v
 
 	result = DBselect("%s) limit 1", sql);
 
-	if (NULL != (row = DBfetch(result)))
+	if (NULL != DBfetch(result))
 	{
 		perm = PERM_READ;
 	}
@@ -2269,7 +2268,6 @@ static int	check_unfinished_alerts(const DB_ESCALATION *escalation)
 	int		ret;
 	char		*sql;
 	DB_RESULT	result;
-	DB_ROW		row;
 
 	if (0 == escalation->r_eventid)
 		return SUCCEED;
@@ -2280,7 +2278,7 @@ static int	check_unfinished_alerts(const DB_ESCALATION *escalation)
 	result = DBselectN(sql, 1);
 	zbx_free(sql);
 
-	if (NULL != (row = DBfetch(result)))
+	if (NULL != DBfetch(result))
 		ret = FAIL;
 	else
 		ret = SUCCEED;
