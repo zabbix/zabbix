@@ -119,7 +119,7 @@ static int	get_interval_option(const char *fping, const char *dst, int *value, c
 {
 	char		*out = NULL;
 	unsigned int	intervals[] = {0, 1, 10};
-	size_t		i;
+	size_t		i, out_len;
 	int		ret = FAIL;
 
 	for (i = 0; i < ARRSIZE(intervals); i++)
@@ -200,7 +200,7 @@ static int	get_interval_option(const char *fping, const char *dst, int *value, c
 			}
 
 			/* check if we hit the error message */
-			if (NULL != (p = strstr(out, " as root")))
+			if (NULL != strstr(out, " as root"))
 			{
 				zbx_rtrim(out, "\n");
 				zbx_strlcpy(error, out, max_error_len);
@@ -211,7 +211,7 @@ static int	get_interval_option(const char *fping, const char *dst, int *value, c
 
 	/* if we are here we have probably hit the usage or error message, let's collect it if it's error message */
 
-	if (ZBX_KIBIBYTE > strlen(out) && 0 != strlen(out))
+	if (NULL != out && ZBX_KIBIBYTE > (out_len = strlen(out)) && 0 != out_len)
 	{
 		zbx_rtrim(out, "\n");
 		zbx_strlcpy(error, out, max_error_len);

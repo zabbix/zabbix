@@ -535,7 +535,7 @@ int	zbx_dbsync_compare_autoreg_psk(zbx_dbsync_t *sync)
 	else if ('\0' != dbsync_env.cache->autoreg_psk_identity[0])
 			dbsync_add_row(sync, 0, ZBX_DBSYNC_ROW_REMOVE, NULL);
 
-	if (1 == num_records && NULL != (dbrow = DBfetch(result)))
+	if (1 == num_records && NULL != DBfetch(result))
 		zabbix_log(LOG_LEVEL_ERR, "table 'config_autoreg_tls' has multiple records");
 
 	DBfree_result(result);

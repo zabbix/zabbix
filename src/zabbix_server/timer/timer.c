@@ -583,7 +583,7 @@ static int	update_host_maintenances(void)
  ******************************************************************************/
 ZBX_THREAD_ENTRY(timer_thread, args)
 {
-	double		sec = 0.0;
+	double		sec;
 	int		maintenance_time = 0, update_time = 0, idle = 1, events_num, hosts_num, update;
 	char		*info = NULL;
 	size_t		info_alloc = 0, info_offset = 0;

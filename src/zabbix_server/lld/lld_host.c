@@ -628,7 +628,7 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 		const zbx_lld_row_t *lld_row, const zbx_vector_ptr_t *lld_macros)
 {
 	char		*buffer = NULL;
-	int		i;
+	int		i, host_found = 0;
 	zbx_lld_host_t	*host;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -645,10 +645,13 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 		zbx_lrtrim(buffer, ZBX_WHITESPACE);
 
 		if (0 == strcmp(host->host, buffer))
+		{
+			host_found = 1;
 			break;
+		}
 	}
 
-	if (i == hosts->values_num)	/* no host found */
+	if (0 == host_found)	/* no host found */
 	{
 		host = (zbx_lld_host_t *)zbx_malloc(NULL, sizeof(zbx_lld_host_t));
 
@@ -983,7 +986,7 @@ static zbx_lld_group_t	*lld_group_make(zbx_vector_ptr_t *groups, zbx_uint64_t gr
 		const char *name_proto, const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macros)
 {
 	char		*buffer = NULL;
-	int		i;
+	int		i, group_found = 0;
 	zbx_lld_group_t	*group = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -1003,10 +1006,13 @@ static zbx_lld_group_t	*lld_group_make(zbx_vector_ptr_t *groups, zbx_uint64_t gr
 		zbx_lrtrim(buffer, ZBX_WHITESPACE);
 
 		if (0 == strcmp(group->name, buffer))
+		{
+			group_found = 1;
 			break;
+		}
 	}
 
-	if (i == groups->values_num)	/* no group found */
+	if (0 == group_found)
 	{
 		/* trying to find an already existing group */
 
@@ -3100,7 +3106,7 @@ static void	lld_interface_make(zbx_vector_ptr_t *interfaces, zbx_uint64_t parent
 		const char *contextname)
 {
 	zbx_lld_interface_t	*interface = NULL;
-	int			i;
+	int			i, interface_found = 0;
 
 	for (i = 0; i < interfaces->values_num; i++)
 	{
@@ -3110,12 +3116,15 @@ static void	lld_interface_make(zbx_vector_ptr_t *interfaces, zbx_uint64_t parent
 			continue;
 
 		if (interface->parent_interfaceid == parent_interfaceid)
+		{
+			interface_found = 1;
 			break;
+		}
 	}
 
-	if (i == interfaces->values_num)
+	if (0 == interface_found)
 	{
-		/* interface which should be deleted */
+		/* interface should be deleted */
 		interface = (zbx_lld_interface_t *)zbx_malloc(NULL, sizeof(zbx_lld_interface_t));
 
 		interface->interfaceid = interfaceid;
@@ -3133,7 +3142,7 @@ static void	lld_interface_make(zbx_vector_ptr_t *interfaces, zbx_uint64_t parent
 	}
 	else
 	{
-		/* interface which are already added */
+		/* interface already has been added */
 		if (interface->type != type)
 		{
 			interface->type_orig = type;

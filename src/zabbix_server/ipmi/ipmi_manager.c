@@ -958,7 +958,7 @@ static void	ipmi_manager_process_value_result(zbx_ipmi_manager_t *manager, zbx_i
 			break;
 		default:
 			/* don't change item's state when network related error occurs */
-			state = poller->request->item_state;
+			break;
 	}
 
 	zbx_free(value);

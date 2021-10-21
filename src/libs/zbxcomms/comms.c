@@ -402,7 +402,6 @@ static int	zbx_socket_connect(zbx_socket_t *s, const struct sockaddr *addr, sock
 #ifdef _WINDOWS
 	u_long		mode = 1;
 	FD_SET		fdw, fde;
-	int		res;
 	struct timeval	tv, *ptv;
 #endif
 	if (0 != timeout)
@@ -436,7 +435,7 @@ static int	zbx_socket_connect(zbx_socket_t *s, const struct sockaddr *addr, sock
 		return FAIL;
 	}
 
-	if (-1 == (res = select(0, NULL, &fdw, &fde, ptv)))
+	if (-1 == select(0, NULL, &fdw, &fde, ptv))
 	{
 		*error = zbx_strdup(*error, strerror_from_system(zbx_socket_last_error()));
 		return FAIL;
