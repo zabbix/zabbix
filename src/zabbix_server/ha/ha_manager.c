@@ -453,6 +453,9 @@ static void	ha_get_external_address(char **address, unsigned short *port)
 
 			zbx_strsplit(CONFIG_LISTEN_IP, ',', address, &tmp);
 			zbx_free(tmp);
+
+			if (0 == strcmp(*address, "0.0.0.0") || 0 == strcmp(*address, "::"))
+				*address = zbx_strdup(*address, "localhost");
 		}
 		else
 			*address = zbx_strdup(NULL, "localhost");
