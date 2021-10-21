@@ -3152,7 +3152,6 @@ int	zbx_db_get_database_type(void)
 {
 	const char	*result_string;
 	DB_RESULT	result;
-	DB_ROW		row;
 	int		ret = ZBX_DB_UNKNOWN;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -3165,7 +3164,7 @@ int	zbx_db_get_database_type(void)
 		goto out;
 	}
 
-	if (NULL != (row = DBfetch(result)))
+	if (NULL != DBfetch(result))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "there is at least 1 record in \"users\" table");
 		ret = ZBX_DB_SERVER;

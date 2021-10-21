@@ -711,7 +711,7 @@ static int	housekeeping_process_rule(int now, zbx_hk_rule_t *rule)
 	{
 		char			buffer[MAX_STRING_LEN];
 		char			*sql = NULL;
-		size_t			sql_alloc = 0, sql_offset = 0;
+		size_t			sql_alloc = 0, sql_offset;
 		zbx_vector_uint64_t	ids;
 		int			ret;
 

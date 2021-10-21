@@ -1050,7 +1050,7 @@ static int	lld_function_make(const zbx_lld_function_t *function_proto, zbx_vecto
 		zbx_uint64_t itemid, const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macros,
 		char **error)
 {
-	int			i, ret;
+	int			i, ret, function_found = 0;
 	zbx_lld_function_t	*function = NULL;
 	char			*proto_parameter = NULL;
 
@@ -1062,13 +1062,16 @@ static int	lld_function_make(const zbx_lld_function_t *function_proto, zbx_vecto
 			continue;
 
 		if (function->index == function_proto->index)
+		{
+			function_found = 1;
 			break;
+		}
 	}
 
 	if (FAIL == (ret = lld_parameter_make(function_proto->parameter, &proto_parameter, jp_row, lld_macros, error)))
 		goto clean;
 
-	if (i == functions->values_num)
+	if (0 == function_found)
 	{
 		function = (zbx_lld_function_t *)zbx_malloc(NULL, sizeof(zbx_lld_function_t));
 
@@ -1514,6 +1517,8 @@ static void 	lld_trigger_dependency_make(const zbx_lld_trigger_prototype_t *trig
 				}
 				else
 				{
+					int	dependency_found = 0;
+
 					for (j = 0; j < trigger->dependencies.values_num; j++)
 					{
 						dependency = (zbx_lld_dependency_t *)trigger->dependencies.values[j];
@@ -1522,10 +1527,13 @@ static void 	lld_trigger_dependency_make(const zbx_lld_trigger_prototype_t *trig
 							continue;
 
 						if (dependency->triggerid_up == dep_trigger->triggerid)
+						{
+							dependency_found = 1;
 							break;
+						}
 					}
 
-					if (j == trigger->dependencies.values_num)
+					if (0 == dependency_found)
 					{
 						dependency = (zbx_lld_dependency_t *)zbx_malloc(NULL, sizeof(zbx_lld_dependency_t));
 
@@ -3000,7 +3008,7 @@ static void	lld_trigger_cache_add_trigger_node(zbx_hashset_t *cache, zbx_lld_tri
 	trigger_node_local.trigger_ref.triggerid = trigger->triggerid;
 	trigger_node_local.trigger_ref.trigger = trigger;
 
-	if (NULL != (trigger_node = (zbx_lld_trigger_node_t *)zbx_hashset_search(cache, &trigger_node_local)))
+	if (NULL != zbx_hashset_search(cache, &trigger_node_local))
 		return;
 
 	trigger_node = lld_trigger_cache_append(cache, trigger->triggerid, trigger);

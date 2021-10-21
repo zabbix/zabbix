@@ -1937,7 +1937,6 @@ static int	check_unfinished_alerts(const DB_ESCALATION *escalation)
 	int		ret;
 	char		*sql;
 	DB_RESULT	result;
-	DB_ROW		row;
 
 	if (0 == escalation->r_eventid)
 		return SUCCEED;
@@ -1948,7 +1947,7 @@ static int	check_unfinished_alerts(const DB_ESCALATION *escalation)
 	result = DBselectN(sql, 1);
 	zbx_free(sql);
 
-	if (NULL != (row = DBfetch(result)))
+	if (NULL != DBfetch(result))
 		ret = FAIL;
 	else
 		ret = SUCCEED;
