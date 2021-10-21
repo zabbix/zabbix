@@ -188,8 +188,8 @@ void	zbx_set_sigusr_handler(void (*handler)(int flags))
 static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
 #ifdef HAVE_SIGQUEUE
-	int		flags;
-	unsigned int	scope;
+	int	flags;
+	int	scope;
 #endif
 	SIG_CHECK_PARAMS(sig, siginfo, context);
 

@@ -2473,7 +2473,7 @@ ZBX_THREAD_ENTRY(report_manager_thread, args)
 			double	delay = 1 - (sec - time_now);
 
 			timeout.sec = (int)delay;
-			timeout.ns = (int)(delay * 1000000) % 1000000;
+			timeout.ns = (int)(delay * 1000000000) % 1000000000;
 		}
 
 		time_now = sec;

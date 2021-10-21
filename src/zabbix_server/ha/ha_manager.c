@@ -1879,7 +1879,7 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 		}
 
 		timeout.sec = (int)(tick - now);
-		timeout.ns = (int)((tick - now) * 1000000) % 1000000;
+		timeout.ns = (int)((tick - now) * 1000000000) % 1000000000;
 
 		(void)zbx_ipc_service_recv(&service, &timeout, &client, &message);
 
