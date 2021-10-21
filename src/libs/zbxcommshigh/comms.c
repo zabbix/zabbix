@@ -66,7 +66,7 @@ static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_
 int	connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_ptr_t *addrs, int timeout,
 		int connect_timeout, unsigned int tls_connect, int retry_interval, int level)
 {
-	int	res, lastlogtime, now;
+	int	res;
 	char	*tls_arg1, *tls_arg2;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In connect_to_server() [%s]:%d [timeout:%d, connection timeout:%d]",
@@ -100,15 +100,15 @@ int	connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_ptr_
 		if (0 != retry_interval)
 		{
 #if !defined(_WINDOWS) && !defined(__MINGW32)
+			int	lastlogtime = (int)time(NULL);
+
 			zabbix_log(LOG_LEVEL_WARNING, "Will try to reconnect every %d second(s)",
 					retry_interval);
-
-			lastlogtime = (int)time(NULL);
 
 			while (ZBX_IS_RUNNING() && FAIL == (res = zbx_tcp_connect_failover(sock, source_ip, addrs,
 					timeout, connect_timeout, tls_connect, tls_arg1, tls_arg2, LOG_LEVEL_DEBUG)))
 			{
-				now = (int)time(NULL);
+				int	now = (int)time(NULL);
 
 				if (LOG_ENTRY_INTERVAL_DELAY <= now - lastlogtime)
 				{
