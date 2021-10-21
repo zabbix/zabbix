@@ -1818,8 +1818,7 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 	info.failover_delay = ZBX_HA_DEFAULT_FAILOVER_DELAY;
 	info.auditlog = 0;
 
-	now = zbx_time();
-	tick = now;
+	tick = zbx_time();
 
 	if (ZBX_NODE_STATUS_UNKNOWN == info.ha_status)
 	{
@@ -1842,9 +1841,7 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 
 	while (SUCCEED != pause && ZBX_NODE_STATUS_ERROR != info.ha_status)
 	{
-		now = zbx_time();
-
-		if (tick <= now)
+		if (tick <= (now = zbx_time()))
 		{
 			ticks_num++;
 
