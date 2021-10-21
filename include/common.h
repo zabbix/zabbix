@@ -1471,7 +1471,6 @@ int	zbx_strcmp_natural(const char *s1, const char *s2);
 
 /* additional token flags */
 #define ZBX_TOKEN_JSON		0x0010000
-#define ZBX_TOKEN_XML		0x0020000
 #define ZBX_TOKEN_REGEXP	0x0040000
 #define ZBX_TOKEN_XPATH		0x0080000
 #define ZBX_TOKEN_REGEXP_OUTPUT	0x0100000
@@ -1710,6 +1709,7 @@ zbx_function_type_t;
 
 zbx_function_type_t	zbx_get_function_type(const char *func);
 int	zbx_query_xpath(zbx_variant_t *value, const char *params, char **errmsg);
+int	zbx_xmlnode_to_json(void *xml_node, char **jstr);
 int	zbx_xml_to_json(char *xml_data, char **jstr, char **errmsg);
 int	zbx_json_to_xml(char *json_data, char **xstr, char **errmsg);
 #ifdef HAVE_LIBXML2
