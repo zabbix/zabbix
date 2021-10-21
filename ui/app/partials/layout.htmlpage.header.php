@@ -66,7 +66,9 @@ $pageHeader
 		->getUrl()
 	);
 
-array_map([$pageHeader, 'addCssFile'], $data['stylesheet']['files']);
+foreach ($data['stylesheet']['files'] as $css_file) {
+	$pageHeader->addCssFile($css_file);
+}
 
 if ($scripts) {
 	$pageHeader->addJsFile((new CUrl('jsLoader.php'))
