@@ -1769,6 +1769,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	ha_status_old = ha_status;
 
+	if (ZBX_NODE_STATUS_STANDBY == ha_status)
+		standby_warning_time = time(NULL);
+
 	while (ZBX_IS_RUNNING())
 	{
 		time_t	now;
