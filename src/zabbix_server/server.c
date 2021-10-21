@@ -1531,6 +1531,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	char		*error = NULL;
 	int		i, db_type, ret;
 	zbx_socket_t	listen_sock;
+	time_t		standby_warning_time;
 
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
@@ -1770,6 +1771,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	while (ZBX_IS_RUNNING())
 	{
+		time_t	now;
+
 		if (SUCCEED != zbx_ha_recv_status(1, &ha_status, &error))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot receive HA manager status: %s", error);
@@ -1777,6 +1780,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			sig_exiting = ZBX_EXIT_FAILURE;
 			break;
 		}
+
+		now = time(NULL);
 
 		if (ZBX_NODE_STATUS_UNKNOWN != ha_status && ha_status != ha_status_old)
 		{
@@ -1800,12 +1805,26 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 					break;
 				case ZBX_NODE_STATUS_STANDBY:
 					server_teardown(&listen_sock);
+					standby_warning_time = now;
 					break;
 				default:
 					zabbix_log(LOG_LEVEL_CRIT, "unsupported status %d received from HA manager",
 							ha_status);
 					sig_exiting = ZBX_EXIT_FAILURE;
 					continue;
+			}
+		}
+
+		if (ZBX_NODE_STATUS_STANDBY == ha_status)
+		{
+			time_t	 now;
+
+			now = time(NULL);
+			if (standby_warning_time + SEC_PER_HOUR <= now)
+			{
+				zabbix_log(LOG_LEVEL_INFORMATION, "\"%s\" node is working in \"%s\" mode",
+						CONFIG_HA_NODE_NAME, zbx_ha_status_str(ha_status));
+				standby_warning_time = now;
 			}
 		}
 
