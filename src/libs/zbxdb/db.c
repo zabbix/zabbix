@@ -1421,7 +1421,6 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	int	ret = ZBX_DB_OK;
 	double	sec = 0;
 #if defined(HAVE_MYSQL)
-	int		status;
 #elif defined(HAVE_ORACLE)
 	sword		err = OCI_SUCCESS;
 #elif defined(HAVE_POSTGRESQL)
@@ -1442,7 +1441,8 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 
 	if (ZBX_DB_OK != txn_error)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "ignoring query [txnlev:%d] [%s] within failed transaction", txn_level, sql);
+		zabbix_log(LOG_LEVEL_DEBUG, "ignoring query [txnlev:%d] [%s] within failed transaction", txn_level,
+				sql);
 		ret = ZBX_DB_FAIL;
 		goto clean;
 	}
@@ -1457,7 +1457,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	}
 	else
 	{
-		if (0 != (status = mysql_query(conn, sql)))
+		if (0 != mysql_query(conn, sql))
 		{
 			zbx_db_errlog(ERR_Z3005, mysql_errno(conn), mysql_error(conn), sql);
 
@@ -1465,6 +1465,8 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 		}
 		else
 		{
+			int	status;
+
 			do
 			{
 				if (0 != mysql_field_count(conn))
@@ -1589,6 +1591,8 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 #if defined(HAVE_ORACLE)
 	sword		err = OCI_SUCCESS;
 	ub4		prefetch_rows = 200, counter;
+
+	ZBX_UNUSED(counter);
 #elif defined(HAVE_POSTGRESQL)
 	char		*error = NULL;
 #elif defined(HAVE_SQLITE3)

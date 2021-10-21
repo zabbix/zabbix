@@ -296,6 +296,7 @@ type ThrottlingData struct {
 type CPUUsage struct {
 	TotalUsage        uint64   `json:"total_usage"`
 	PercpuUsage       []uint64 `json:"percpu_usage"`
+	PercentUsage      float64  `json:"percent_usage"`
 	UsageInKernelmode uint64   `json:"usage_in_kernelmode"`
 	UsageInUsermode   uint64   `json:"usage_in_usermode"`
 }

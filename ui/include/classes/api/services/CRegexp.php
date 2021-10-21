@@ -43,6 +43,12 @@ class CRegexp extends CApiService {
 	 * @return array|int
 	 */
 	public function get(array $options = []) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('No permissions to call "%1$s.%2$s".', 'regexp', __FUNCTION__)
+			);
+		}
+
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
 			'regexpids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
@@ -104,6 +110,12 @@ class CRegexp extends CApiService {
 	 * @return array
 	 */
 	public function create(array $regexs): array {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('No permissions to call "%1$s.%2$s".', 'regexp', __FUNCTION__)
+			);
+		}
+
 		$this->validateCreate($regexs);
 
 		$regexids = DB::insert('regexps', $regexs);
@@ -273,6 +285,12 @@ class CRegexp extends CApiService {
 	 * @return array
 	 */
 	public function update(array $regexs): array {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('No permissions to call "%1$s.%2$s".', 'regexp', __FUNCTION__)
+			);
+		}
+
 		$this->validateUpdate($regexs, $db_regexs);
 
 		$upd_regexs = [];
@@ -352,6 +370,12 @@ class CRegexp extends CApiService {
 	 * @return array
 	 */
 	public function delete(array $regexpids): array {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('No permissions to call "%1$s.%2$s".', 'regexp', __FUNCTION__)
+			);
+		}
+
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $regexpids, '/', $error)) {

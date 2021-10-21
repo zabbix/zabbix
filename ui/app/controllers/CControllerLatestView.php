@@ -136,18 +136,19 @@ class CControllerLatestView extends CControllerLatest {
 
 		$view_curl = (new CUrl('zabbix.php'))->setArgument('action', 'latest.view');
 
-		$refresh_curl = (new CUrl('zabbix.php'))
-			->setArgument('action', 'latest.view.refresh')
-			->setArgument('filter_groupids', $filter['groupids'])
-			->setArgument('filter_hostids', $filter['hostids'])
-			->setArgument('filter_select', $filter['select'])
-			->setArgument('filter_show_without_data', $filter['show_without_data'] ? 1 : null)
-			->setArgument('filter_show_details', $filter['show_details'] ? 1 : null)
-			->setArgument('filter_evaltype', $filter['evaltype'])
-			->setArgument('filter_tags', $filter['tags'])
-			->setArgument('sort', $sort_field)
-			->setArgument('sortorder', $sort_order)
-			->setArgument('page', $this->hasInput('page') ? $this->getInput('page') : null);
+		$refresh_curl = (new CUrl('zabbix.php'))->setArgument('action', 'latest.view.refresh');
+		$refresh_data = array_filter([
+			'filter_groupids' => $filter['groupids'],
+			'filter_hostids' => $filter['hostids'],
+			'filter_select' => $filter['select'],
+			'filter_show_without_data' => $filter['show_without_data'] ? 1 : null,
+			'filter_show_details' => $filter['show_details'] ? 1 : null,
+			'filter_evaltype' => $filter['evaltype'],
+			'filter_tags' => $filter['tags'],
+			'sort' => $sort_field,
+			'sortorder' => $sort_order,
+			'page' => $this->hasInput('page') ? $this->getInput('page') : null
+		]);
 
 		// data sort and pager
 		$prepared_data = $this->prepareData($filter, $sort_field, $sort_order);
@@ -163,6 +164,7 @@ class CControllerLatestView extends CControllerLatest {
 			'sort_order' => $sort_order,
 			'view_curl' => $view_curl,
 			'refresh_url' => $refresh_curl->getUrl(),
+			'refresh_data' => $refresh_data,
 			'refresh_interval' => CWebUser::getRefresh() * 1000,
 			'active_tab' => CProfile::get('web.latest.filter.active', 1),
 			'paging' => $paging,
