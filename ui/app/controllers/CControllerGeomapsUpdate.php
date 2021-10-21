@@ -24,10 +24,6 @@
  */
 class CControllerGeomapsUpdate extends CController {
 
-	protected function init(): void {
-		$this->disableSIDValidation();
-	}
-
 	protected function checkInput(): bool {
 		$fields = [
 			'geomaps_tile_provider'		=> 'required|db config.geomaps_tile_provider',
