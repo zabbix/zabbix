@@ -239,18 +239,17 @@ class CDBHelper {
 		static::getTables($tables, $top_table);
 		self::$backups[] = $tables;
 
+		$suffix = '_tmp'.count(self::$backups);
+
 		if ($DB['TYPE'] === ZBX_DB_POSTGRESQL) {
-			$index = count(self::$backups) - 1;
 
 			if ($DB['PASSWORD'] !== '') {
 				putenv('PGPASSWORD='.$DB['PASSWORD']);
 			}
 			$server = $DB['SERVER'] !== '' ? ' -h'.$DB['SERVER'] : '';
-			exec('pg_dump'.$server.' -U'.$DB['USER'].' -Fd -j5 -t'.implode(' -t', $tables).' '.$DB['DATABASE'].' -f '.PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].'.'.$index.'.dump');
+			exec('pg_dump'.$server.' -U'.$DB['USER'].' -Fd -j5 -t'.implode(' -t', $tables).' '.$DB['DATABASE'].' -f '.PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].$suffix.'.dump');
 		}
 		else {
-			$suffix = '_tmp'.count(self::$backups);
-
 			foreach ($tables as $table) {
 				DBexecute('DROP TABLE IF EXISTS '.$table.$suffix);
 				DBexecute('CREATE TABLE '.$table.$suffix.' AS SELECT * FROM '.$table);
@@ -269,21 +268,19 @@ class CDBHelper {
 			return;
 		}
 
+		$suffix = '_tmp'.count(self::$backups);
 		$tables = array_pop(self::$backups);
 
 		if ($DB['TYPE'] === ZBX_DB_POSTGRESQL) {
-			$index = count(self::$backups);
 
 			if ($DB['PASSWORD'] !== '') {
 				putenv('PGPASSWORD='.$DB['PASSWORD']);
 			}
 			$server = $DB['SERVER'] !== '' ? ' -h'.$DB['SERVER'] : '';
-			exec('pg_restore'.$server.' -U'.$DB['USER'].' -Fd -j5 --clean -d '.$DB['DATABASE'].' '.PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].'.'.$index.'.dump');
-			exec('rm -rf '.PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].'.'.$index.'.dump');
+			exec('pg_restore'.$server.' -U'.$DB['USER'].' -Fd -j5 --clean -d '.$DB['DATABASE'].' '.PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].$suffix.'.dump');
+			exec('rm -rf '.PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].$suffix.'.dump');
 		}
 		else {
-			$suffix = '_tmp'.count(self::$backups);
-
 			$result = DBselect('SELECT @@unique_checks,@@foreign_key_checks');
 			$row = DBfetch($result);
 			DBexecute('SET unique_checks=0,foreign_key_checks=0');
