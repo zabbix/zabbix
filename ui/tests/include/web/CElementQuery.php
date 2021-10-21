@@ -554,7 +554,7 @@ class CElementQuery implements IWaitable {
 			'CCheckboxListElement'		=> [
 				'/div/div[@class="columns-wrapper columns-3"]', // TODO: fix after DEV-1859.
 				'/ul[contains(@class, "checkbox-list")]',
-				'/ul[contains(@class, "list-check-radio")]',
+				'/ul[contains(@class, "list-check-radio")]'
 			],
 			'CHostInterfaceElement'		=> [
 				'/div/div[contains(@class, "interface-container")]/../..'
