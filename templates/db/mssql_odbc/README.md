@@ -30,7 +30,9 @@ This template was tested on:
   Do not forget to install Microsoft ODBC driver on Zabbix server or Zabbix proxy.  
   See Microsoft documentation for instructions: https://docs.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server?view=sql-server-ver15.  
   **Note! Credentials in the odbc.ini do not work for MSSQL.**  
-3. For named instance set the value of {$MSSQL.INSTANCE} macro as MSSQL$instance name.  
+
+For named instance set the value of {$MSSQL.INSTANCE} macro as MSSQL$instance name.
+In case if MSSQL was installed using default configuration do not change {$MSSQL.INSTANCE} macro value.
 
 The "Service's TCP port state" item uses {HOST.CONN} and {$MSSQL.PORT} macros to check the availability of MSSQL instance.
 If your instance uses a non-default TCP port, set the port in your section of odbc.ini in the line Server = IP or FQDN name, port.

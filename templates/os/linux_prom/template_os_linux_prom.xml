@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-10-20T07:24:02Z</date>
+   <date>2021-08-03T06:42:19Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -67,6 +67,7 @@ Template tooling version used: 0.38</description>
                <delay>0</delay>
                <history>7d</history>
                <trends>0</trends>
+               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <applications>
                   <application>
@@ -94,6 +95,7 @@ version</params>
                <key>fd.open[node_exporter]</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <applications>
                   <application>
@@ -117,6 +119,7 @@ version</params>
                <key>kernel.maxfiles[node_exporter]</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>It could be increased by using sysctrl utility or modifying file /etc/sysctl.conf.</description>
                <applications>
@@ -158,6 +161,7 @@ version</params>
                <key>node_exporter.get</key>
                <history>1h</history>
                <trends>0</trends>
+               <status>ENABLED</status>
                <value_type>TEXT</value_type>
                <applications>
                   <application>
@@ -181,6 +185,7 @@ version</params>
                <key>system.boottime[node_exporter]</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>unixtime</units>
                <applications>
@@ -205,6 +210,7 @@ version</params>
                <key>system.cpu.guest_nice[node_exporter]</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <description>Time spent running a niced guest (virtual CPU for guest operating systems under the control of the Linux kernel)</description>
@@ -245,6 +251,7 @@ return valueArr.reduce(function(acc,obj){
                <key>system.cpu.guest[node_exporter]</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <description>Guest  time (time  spent  running  a  virtual  CPU  for  a  guest  operating  system)</description>
@@ -285,6 +292,7 @@ return valueArr.reduce(function(acc,obj){
                <key>system.cpu.idle[node_exporter]</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <description>The time the CPU has spent doing nothing.</description>
@@ -325,6 +333,7 @@ return valueArr.reduce(function(acc,obj){
                <key>system.cpu.interrupt[node_exporter]</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <description>The amount of time the CPU has been servicing hardware interrupts.</description>
@@ -365,6 +374,7 @@ return valueArr.reduce(function(acc,obj){
                <key>system.cpu.intr[node_exporter]</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <applications>
                   <application>
@@ -392,6 +402,7 @@ return valueArr.reduce(function(acc,obj){
                <key>system.cpu.iowait[node_exporter]</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <description>Amount of time the CPU has been waiting for I/O to complete.</description>
@@ -432,6 +443,7 @@ return valueArr.reduce(function(acc,obj){
                <key>system.cpu.load.avg1[node_exporter]</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <applications>
                   <application>
@@ -455,6 +467,7 @@ return valueArr.reduce(function(acc,obj){
                <key>system.cpu.load.avg15[node_exporter]</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <applications>
                   <application>
@@ -478,6 +491,7 @@ return valueArr.reduce(function(acc,obj){
                <key>system.cpu.load.avg5[node_exporter]</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <applications>
                   <application>
@@ -501,6 +515,7 @@ return valueArr.reduce(function(acc,obj){
                <key>system.cpu.nice[node_exporter]</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <description>The time the CPU has spent running users' processes that have been niced.</description>
@@ -541,6 +556,7 @@ return valueArr.reduce(function(acc,obj){
                <key>system.cpu.num[node_exporter]</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <applications>
                   <application>
                      <name>CPU</name>
@@ -568,6 +584,7 @@ return JSON.parse(value).length
                <key>system.cpu.softirq[node_exporter]</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <description>The amount of time the CPU has been servicing software interrupts.</description>
@@ -608,6 +625,7 @@ return valueArr.reduce(function(acc,obj){
                <key>system.cpu.steal[node_exporter]</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <description>The amount of CPU 'stolen' from this virtual machine by the hypervisor for other tasks (such as running another virtual machine).</description>
@@ -648,6 +666,7 @@ return valueArr.reduce(function(acc,obj){
                <key>system.cpu.switches[node_exporter]</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <applications>
                   <application>
@@ -675,6 +694,7 @@ return valueArr.reduce(function(acc,obj){
                <key>system.cpu.system[node_exporter]</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <description>The time the CPU has spent running the kernel and its processes.</description>
@@ -715,6 +735,7 @@ return valueArr.reduce(function(acc,obj){
                <key>system.cpu.user[node_exporter]</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <description>The time the CPU has spent running users' processes that are not niced.</description>
@@ -755,6 +776,7 @@ return valueArr.reduce(function(acc,obj){
                <key>system.cpu.util[node_exporter]</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <description>CPU utilization in %</description>
@@ -798,6 +820,7 @@ and {Template OS Linux by Prom:system.cpu.load.avg15[node_exporter].last()}&gt;0
                <delay>0</delay>
                <history>2w</history>
                <trends>0</trends>
+               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>Labeled system information as provided by the uname system call.</description>
                <applications>
@@ -830,6 +853,7 @@ and {Template OS Linux by Prom:system.cpu.load.avg15[node_exporter].last()}&gt;0
                <key>system.localtime[node_exporter]</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>unixtime</units>
                <description>System local time of the host.</description>
@@ -865,6 +889,7 @@ and {Template OS Linux by Prom:system.cpu.load.avg15[node_exporter].last()}&gt;0
                <delay>1h</delay>
                <history>2w</history>
                <trends>0</trends>
+               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>System host name.</description>
                <inventory_link>NAME</inventory_link>
@@ -904,6 +929,7 @@ nodename</params>
                <delay>1h</delay>
                <history>2w</history>
                <trends>0</trends>
+               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>Operating system architecture of the host.</description>
                <applications>
@@ -933,6 +959,7 @@ machine</params>
                <delay>1h</delay>
                <history>2w</history>
                <trends>0</trends>
+               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <inventory_link>OS</inventory_link>
                <applications>
@@ -971,6 +998,7 @@ machine</params>
                <key>system.swap.free[node_exporter]</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>B</units>
                <description>The free space of swap volume/file in bytes.</description>
@@ -995,6 +1023,7 @@ machine</params>
                <type>CALCULATED</type>
                <key>system.swap.pfree[node_exporter]</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <params>last("system.swap.free[node_exporter]")/last("system.swap.total[node_exporter]")*100</params>
@@ -1011,6 +1040,7 @@ machine</params>
                <key>system.swap.total[node_exporter]</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>B</units>
                <description>The total space of swap volume/file in bytes.</description>
@@ -1037,6 +1067,7 @@ machine</params>
                <delay>0</delay>
                <history>2w</history>
                <trends>0d</trends>
+               <status>ENABLED</status>
                <units>uptime</units>
                <description>System uptime in 'N days, hh:mm:ss' format.</description>
                <applications>
@@ -1075,6 +1106,7 @@ return (Math.floor(Date.now()/1000)-Number(value));</params>
                <key>vm.memory.available[node_exporter]</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>B</units>
                <description>Available memory, in Linux, available = free + buffers + cache. On other platforms calculation may vary. See also: https://www.zabbix.com/documentation/5.0/manual/appendix/items/vm.memory.size_params</description>
@@ -1100,6 +1132,7 @@ return (Math.floor(Date.now()/1000)-Number(value));</params>
                <key>vm.memory.total[node_exporter]</key>
                <delay>0</delay>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>B</units>
                <description>Total memory in Bytes</description>
@@ -1124,6 +1157,7 @@ return (Math.floor(Date.now()/1000)-Number(value));</params>
                <type>CALCULATED</type>
                <key>vm.memory.util[node_exporter]</key>
                <history>7d</history>
+               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <params>(last("vm.memory.total[node_exporter]")-last("vm.memory.available[node_exporter]"))/last("vm.memory.total[node_exporter]")*100</params>
@@ -1201,6 +1235,7 @@ return (Math.floor(Date.now()/1000)-Number(value));</params>
                      <key>net.if.in.discards[node_exporter,"{#IFNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <application_prototypes>
                         <application_prototype>
@@ -1228,6 +1263,7 @@ return (Math.floor(Date.now()/1000)-Number(value));</params>
                      <key>net.if.in.errors[node_exporter,"{#IFNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <application_prototypes>
                         <application_prototype>
@@ -1255,6 +1291,7 @@ return (Math.floor(Date.now()/1000)-Number(value));</params>
                      <key>net.if.in[node_exporter,"{#IFNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>bps</units>
                      <application_prototypes>
@@ -1287,6 +1324,7 @@ return (Math.floor(Date.now()/1000)-Number(value));</params>
                      <key>net.if.out.discards[node_exporter,"{#IFNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <application_prototypes>
                         <application_prototype>
@@ -1314,6 +1352,7 @@ return (Math.floor(Date.now()/1000)-Number(value));</params>
                      <key>net.if.out.errors[node_exporter"{#IFNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <application_prototypes>
                         <application_prototype>
@@ -1341,6 +1380,7 @@ return (Math.floor(Date.now()/1000)-Number(value));</params>
                      <key>net.if.out[node_exporter,"{#IFNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>bps</units>
                      <application_prototypes>
@@ -1374,6 +1414,7 @@ return (Math.floor(Date.now()/1000)-Number(value));</params>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0d</trends>
+                     <status>ENABLED</status>
                      <units>bps</units>
                      <description>Sets value to 0 if metric is missing in node_exporter output.</description>
                      <application_prototypes>
@@ -1405,16 +1446,15 @@ return (Math.floor(Date.now()/1000)-Number(value));</params>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
-                     <description>Indicates the interface RFC2863 operational state as a string.&#13;
-Possible values are:"unknown", "notpresent", "down", "lowerlayerdown", "testing","dormant", "up".&#13;
-Reference: https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-net</description>
+                     <status>ENABLED</status>
+                     <description>Reference: https://www.kernel.org/doc/Documentation/networking/operstates.txt</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Interface {#IFNAME}({#IFALIAS})</name>
                         </application_prototype>
                      </application_prototypes>
                      <valuemap>
-                        <name>IF-MIB::ifOperStatus</name>
+                        <name>ifOperStatus</name>
                      </valuemap>
                      <preprocessing>
                         <step>
@@ -1426,25 +1466,27 @@ operstate</params>
                            <type>JAVASCRIPT</type>
                            <params>var newvalue;
 switch(value) {
-  case "up":
+  case "unkonwn":
+    newvalue = 0;
+    break;
+  case "notpresent":
     newvalue = 1;
     break;
   case "down":
     newvalue = 2;
     break;
+  case "lowerlayerdown":
+    newvalue = 3;
+    break;
   case "testing":
     newvalue = 4;
     break;
-  case "unknown":
+  case "dormant":
     newvalue = 5;
     break;
-  case "dormant":
+  case "up":
     newvalue = 6;
-    break;
-  case "notPresent":
-    newvalue = 7;
-    break;
-  default:
+    break;  default:
     newvalue = "Problem parsing interface operstate in JS";
 }
 return newvalue;</params>
@@ -1478,6 +1520,7 @@ WARNING: if closed manually - won't fire again on next poll, because of .diff.</
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0d</trends>
+                     <status>ENABLED</status>
                      <description>node_network_protocol_type protocol_type value of /sys/class/net/&lt;iface&gt;.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1559,7 +1602,7 @@ and&#13;
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                      <recovery_expression>{Template OS Linux by Prom:net.if.in[node_exporter,"{#IFNAME}"].avg(15m)}&lt;(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Template OS Linux by Prom:net.if.speed[node_exporter,"{#IFNAME}"].last()} and&#13;
 {Template OS Linux by Prom:net.if.out[node_exporter,"{#IFNAME}"].avg(15m)}&lt;(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Template OS Linux by Prom:net.if.speed[node_exporter,"{#IFNAME}"].last()}</recovery_expression>
-                     <name>Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (&gt; {$IF.UTIL.MAX:"{#IFNAME}"}% )</name>
+                     <name>Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (&gt;{$IF.UTIL.MAX:"{#IFNAME}"}% )</name>
                      <opdata>In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}</opdata>
                      <priority>WARNING</priority>
                      <description>The network interface utilization is close to its estimated maximum bandwidth.</description>
@@ -1578,7 +1621,7 @@ or {Template OS Linux by Prom:net.if.out.errors[node_exporter"{#IFNAME}"].min(5m
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                      <recovery_expression>{Template OS Linux by Prom:net.if.in.errors[node_exporter,"{#IFNAME}"].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8&#13;
 and {Template OS Linux by Prom:net.if.out.errors[node_exporter"{#IFNAME}"].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8</recovery_expression>
-                     <name>Interface {#IFNAME}({#IFALIAS}): High error rate (&gt; {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)</name>
+                     <name>Interface {#IFNAME}({#IFALIAS}): High error rate (&gt;{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)</name>
                      <opdata>errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}</opdata>
                      <priority>WARNING</priority>
                      <description>Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold</description>
@@ -1708,6 +1751,7 @@ and {Template OS Linux by Prom:net.if.out.errors[node_exporter"{#IFNAME}"].max(5
                      <key>vfs.dev.queue_size[node_exporter,"{#DEVNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Current average disk queue, the number of requests outstanding on the disk at the time the performance data is collected.</description>
                      <application_prototypes>
@@ -1735,6 +1779,7 @@ and {Template OS Linux by Prom:net.if.out.errors[node_exporter"{#IFNAME}"].max(5
                      <type>CALCULATED</type>
                      <key>vfs.dev.read.await[node_exporter,"{#DEVNAME}"]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>!ms</units>
                      <params>(last("vfs.dev.read.time.rate[node_exporter,\"{#DEVNAME}\"]")/(last("vfs.dev.read.rate[node_exporter,\"{#DEVNAME}\"]")+(last("vfs.dev.read.rate[node_exporter,\"{#DEVNAME}\"]")=0)))*1000*(last("vfs.dev.read.rate[node_exporter,\"{#DEVNAME}\"]") &gt; 0)</params>
@@ -1751,6 +1796,7 @@ and {Template OS Linux by Prom:net.if.out.errors[node_exporter"{#IFNAME}"].max(5
                      <key>vfs.dev.read.rate[node_exporter,"{#DEVNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>!r/s</units>
                      <description>r/s. The number (after merges) of read requests completed per second for the device.</description>
@@ -1780,6 +1826,7 @@ and {Template OS Linux by Prom:net.if.out.errors[node_exporter"{#IFNAME}"].max(5
                      <key>vfs.dev.read.time.rate[node_exporter,"{#DEVNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Rate of total read time counter. Used in r_await calculation</description>
                      <applications>
@@ -1808,6 +1855,7 @@ and {Template OS Linux by Prom:net.if.out.errors[node_exporter"{#IFNAME}"].max(5
                      <key>vfs.dev.util[node_exporter,"{#DEVNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>%</units>
                      <description>This item is the percentage of elapsed time that the selected disk drive was busy servicing read or writes requests.</description>
@@ -1840,6 +1888,7 @@ and {Template OS Linux by Prom:net.if.out.errors[node_exporter"{#IFNAME}"].max(5
                      <type>CALCULATED</type>
                      <key>vfs.dev.write.await[node_exporter,"{#DEVNAME}"]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>!ms</units>
                      <params>(last("vfs.dev.write.time.rate[node_exporter,\"{#DEVNAME}\"]")/(last("vfs.dev.write.rate[node_exporter,\"{#DEVNAME}\"]")+(last("vfs.dev.write.rate[node_exporter,\"{#DEVNAME}\"]")=0)))*1000*(last("vfs.dev.write.rate[node_exporter,\"{#DEVNAME}\"]") &gt; 0)</params>
@@ -1856,6 +1905,7 @@ and {Template OS Linux by Prom:net.if.out.errors[node_exporter"{#IFNAME}"].max(5
                      <key>vfs.dev.write.rate[node_exporter,"{#DEVNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>!w/s</units>
                      <description>w/s. The number (after merges) of write requests completed per second for the device.</description>
@@ -1885,6 +1935,7 @@ and {Template OS Linux by Prom:net.if.out.errors[node_exporter"{#IFNAME}"].max(5
                      <key>vfs.dev.write.time.rate[node_exporter,"{#DEVNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Rate of total write time counter. Used in w_await calculation</description>
                      <applications>
@@ -2055,6 +2106,7 @@ and {Template OS Linux by Prom:net.if.out.errors[node_exporter"{#IFNAME}"].max(5
                      <key>vfs.fs.free[node_exporter,"{#FSNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>B</units>
                      <application_prototypes>
@@ -2079,6 +2131,7 @@ and {Template OS Linux by Prom:net.if.out.errors[node_exporter"{#IFNAME}"].max(5
                      <key>vfs.fs.inode.pfree[node_exporter,"{#FSNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>%</units>
                      <application_prototypes>
@@ -2139,6 +2192,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                      <type>CALCULATED</type>
                      <key>vfs.fs.pused[node_exporter,"{#FSNAME}"]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>%</units>
                      <params>(last("vfs.fs.used[node_exporter,\"{#FSNAME}\"]")/last("vfs.fs.total[node_exporter,\"{#FSNAME}\"]"))*100</params>
@@ -2155,6 +2209,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                      <key>vfs.fs.total[node_exporter,"{#FSNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>B</units>
                      <description>Total space in Bytes</description>
@@ -2179,6 +2234,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                      <type>CALCULATED</type>
                      <key>vfs.fs.used[node_exporter,"{#FSNAME}"]</key>
                      <history>7d</history>
+                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>B</units>
                      <params>(last("vfs.fs.total[node_exporter,\"{#FSNAME}\"]")-last("vfs.fs.free[node_exporter,\"{#FSNAME}\"]"))</params>
@@ -2914,19 +2970,27 @@ and {Template OS Linux by Prom:system.cpu.load.avg15[node_exporter].last()}&gt;0
    </graphs>
    <value_maps>
       <value_map>
-         <name>IF-MIB::ifOperStatus</name>
+         <name>ifOperStatus</name>
          <mappings>
             <mapping>
+               <value>0</value>
+               <newvalue>unknown</newvalue>
+            </mapping>
+            <mapping>
                <value>1</value>
-               <newvalue>up</newvalue>
+               <newvalue>notpresent</newvalue>
             </mapping>
             <mapping>
                <value>2</value>
                <newvalue>down</newvalue>
             </mapping>
             <mapping>
+               <value>3</value>
+               <newvalue>lowerlayerdown</newvalue>
+            </mapping>
+            <mapping>
                <value>4</value>
-               <newvalue>unknown</newvalue>
+               <newvalue>testing</newvalue>
             </mapping>
             <mapping>
                <value>5</value>
@@ -2934,11 +2998,7 @@ and {Template OS Linux by Prom:system.cpu.load.avg15[node_exporter].last()}&gt;0
             </mapping>
             <mapping>
                <value>6</value>
-               <newvalue>notPresent</newvalue>
-            </mapping>
-            <mapping>
-               <value>7</value>
-               <newvalue>lowerLayerDown</newvalue>
+               <newvalue>up</newvalue>
             </mapping>
          </mappings>
       </value_map>

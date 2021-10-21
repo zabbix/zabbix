@@ -20,7 +20,7 @@ This template was tested on:
 3. Set the user name and password in host macros ({$ORACLE.USER}, {$ORACLE.PASSWORD}, {$ORACLE.SERVICE}) if you want to override parameters from the Zabbix agent configuration file.
 
 Test availability:
- ```zabbix_get -s oracle-host -k  oracle.ping["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"```
+ ```zabbix_get -s oracle-host -k  oracle.ping["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]```
 
 
 ## Zabbix configuration
