@@ -426,7 +426,7 @@ static void	zbx_thread_handle_pipe_response(ZBX_THREAD_SENDVAL_ARGS *sendval_arg
 	int	offset;
 	char	buffer[sizeof(int)], *ptr = buffer;
 
-	while (0 < (offset = read(sendval_args->fds[0], ptr, buffer + sizeof(buffer) - ptr)))
+	while (0 < (offset = (int)read(sendval_args->fds[0], ptr, (size_t)(buffer + sizeof(buffer) - ptr))))
 		ptr += offset;
 
 	if (-1 == offset)
@@ -438,7 +438,7 @@ static void	zbx_thread_handle_pipe_response(ZBX_THREAD_SENDVAL_ARGS *sendval_arg
 		return;
 	}
 
-	offset = *((int *)buffer);
+	memcpy(&offset, buffer, sizeof(int));
 
 	while (0 < offset--)
 	{
@@ -706,7 +706,7 @@ static void	zbx_set_sender_signal_handlers(void)
 static	ZBX_THREAD_ENTRY(send_value, args)
 {
 	ZBX_THREAD_SENDVAL_ARGS	*sendval_args = (ZBX_THREAD_SENDVAL_ARGS *)((zbx_thread_args_t *)args)->args;
-	int			tcp_ret, ret = FAIL;
+	int			ret = FAIL;
 	zbx_socket_t		sock;
 #if !defined(_WINDOWS)
 	int			i;
@@ -724,8 +724,8 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 		zbx_tls_take_vars(&sendval_args->tls_vars);
 	}
 #endif
-	if (SUCCEED == (tcp_ret = connect_to_server(&sock, CONFIG_SOURCE_IP, sendval_args->addrs,
-			CONFIG_SENDER_TIMEOUT, CONFIG_TIMEOUT, configured_tls_connect_mode, 0, LOG_LEVEL_DEBUG)))
+	if (SUCCEED == connect_to_server(&sock, CONFIG_SOURCE_IP, sendval_args->addrs,
+			CONFIG_SENDER_TIMEOUT, CONFIG_TIMEOUT, configured_tls_connect_mode, 0, LOG_LEVEL_DEBUG))
 	{
 		if (1 == sendval_args->sync_timestamp)
 		{
@@ -737,9 +737,9 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 			zbx_json_adduint64(&sendval_args->json, ZBX_PROTO_TAG_NS, ts.ns);
 		}
 
-		if (SUCCEED == (tcp_ret = zbx_tcp_send(&sock, sendval_args->json.buffer)))
+		if (SUCCEED == zbx_tcp_send(&sock, sendval_args->json.buffer))
 		{
-			if (SUCCEED == (tcp_ret = zbx_tcp_recv(&sock)))
+			if (SUCCEED == zbx_tcp_recv(&sock))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "answer [%s]", sock.buffer);
 
@@ -816,14 +816,14 @@ static int	perform_data_sending(ZBX_THREAD_SENDVAL_ARGS *sendval_args, int old_s
 {
 	int			i, ret;
 	ZBX_THREAD_HANDLE	*threads = NULL;
-	zbx_thread_args_t	*threads_args, *thread_args;
+	zbx_thread_args_t	*threads_args;
 
-	threads = (ZBX_THREAD_HANDLE *)zbx_calloc(threads, destinations_count, sizeof(ZBX_THREAD_HANDLE));
-	threads_args = (zbx_thread_args_t *)zbx_calloc(NULL, destinations_count, sizeof(zbx_thread_args_t));
+	threads = (ZBX_THREAD_HANDLE *)zbx_calloc(threads, (size_t)destinations_count, sizeof(ZBX_THREAD_HANDLE));
+	threads_args = (zbx_thread_args_t *)zbx_calloc(NULL, (size_t)destinations_count, sizeof(zbx_thread_args_t));
 
 	for (i = 0; i < destinations_count; i++)
 	{
-		thread_args = threads_args + i;
+		zbx_thread_args_t	*thread_args = threads_args + i;
 
 		thread_args->args = &sendval_args[i];
 
@@ -842,7 +842,8 @@ static int	perform_data_sending(ZBX_THREAD_SENDVAL_ARGS *sendval_args, int old_s
 #ifndef _WINDOWS
 		if (-1 == pipe(sendval_args[i].fds))
 		{
-			zabbix_log(LOG_LEVEL_ERR, "Cannot create data pipe: %s", strerror_from_system(errno));
+			zabbix_log(LOG_LEVEL_ERR, "Cannot create data pipe: %s",
+					strerror_from_system((unsigned long)errno));
 			threads[i] = (ZBX_THREAD_HANDLE)ZBX_THREAD_ERROR;
 			continue;
 		}
