@@ -34,6 +34,11 @@ extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
+extern zbx_vector_ptr_t	zbx_addrs;
+extern char		*CONFIG_HOSTNAME;
+extern char		*CONFIG_SOURCE_IP;
+extern unsigned int	configured_tls_connect_mode;
+
 static void	zbx_proxyconfig_sigusr_handler(int flags)
 {
 	if (ZBX_RTC_CONFIG_CACHE_RELOAD == ZBX_RTC_GET_MSG(flags))
@@ -60,10 +65,6 @@ static void	process_configuration_sync(size_t *data_size)
 	char			value[16], *error = NULL, *buffer = NULL;
 	size_t			buffer_size, reserved;
 	struct zbx_json		j;
-	extern zbx_vector_ptr_t	zbx_addrs;
-	extern char		*CONFIG_HOSTNAME;
-	extern char		*CONFIG_SOURCE_IP;
-	extern unsigned int	configured_tls_connect_mode;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 

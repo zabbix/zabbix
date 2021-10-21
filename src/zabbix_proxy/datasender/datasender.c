@@ -37,6 +37,11 @@ extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
+extern zbx_vector_ptr_t	zbx_addrs;
+extern char		*CONFIG_HOSTNAME;
+extern char		*CONFIG_SOURCE_IP;
+extern unsigned int	configured_tls_connect_mode;
+
 #define ZBX_DATASENDER_AVAILABILITY		0x0001
 #define ZBX_DATASENDER_HISTORY			0x0002
 #define ZBX_DATASENDER_DISCOVERY		0x0004
@@ -99,10 +104,6 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state)
 	zbx_timespec_t		ts;
 	char			*error = NULL, *buffer = NULL;
 	zbx_vector_ptr_t	tasks;
-	extern zbx_vector_ptr_t	zbx_addrs;
-	extern char		*CONFIG_HOSTNAME;
-	extern char		*CONFIG_SOURCE_IP;
-	extern unsigned int	configured_tls_connect_mode;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 

@@ -32,6 +32,12 @@ extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
+extern zbx_vector_ptr_t	zbx_addrs;
+extern char		*CONFIG_HOSTNAME;
+extern char		*CONFIG_SOURCE_IP;
+extern int		CONFIG_TIMEOUT;
+extern unsigned int	configured_tls_connect_mode;
+
 /******************************************************************************
  *                                                                            *
  * Function: send_heartbeat                                                   *
@@ -44,11 +50,6 @@ static int	send_heartbeat(void)
 	int			ret = SUCCEED;
 	char			*error = NULL, *buffer = NULL;
 	size_t			buffer_size, reserved;
-	extern zbx_vector_ptr_t	zbx_addrs;
-	extern char		*CONFIG_HOSTNAME;
-	extern char		*CONFIG_SOURCE_IP;
-	extern int		CONFIG_TIMEOUT;
-	extern unsigned int	configured_tls_connect_mode;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In send_heartbeat()");
 
