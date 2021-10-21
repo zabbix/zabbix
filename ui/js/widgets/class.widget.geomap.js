@@ -84,16 +84,18 @@ class CWidgetGeoMap extends CWidget {
 	}
 
 	_initMap(config) {
-		const options = {
-			minZoom: 1,
-			maxZoom: config.max_zoom
-		};
 		const latLng = new L.latLng([config.center.latitude, config.center.longitude]);
 		this._view_set = ('view_set' in config && config.view_set);
 
 		// Initialize map and load tile layer.
-		this._map = L.map(this._unique_id, options).setView(latLng, config.center.zoom);
-		L.tileLayer(config.tile_url, {attribution: config.attribution}).addTo(this._map);
+		this._map = L.map(this._unique_id).setView(latLng, config.center.zoom);
+		L.tileLayer(config.tile_url, {
+			minZoom: 1,
+			maxZoom: parseInt(config.max_zoom, 10),
+			minNativeZoom: 1,
+			maxNativeZoom: parseInt(config.max_zoom, 10),
+			attribution: config.attribution
+		}).addTo(this._map);
 
 		this.initSeverities(config.colors);
 
