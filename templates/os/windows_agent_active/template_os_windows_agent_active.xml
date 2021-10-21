@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-11-22T08:28:49Z</date>
+   <date>2021-10-21T06:23:07Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -11,7 +11,7 @@
       <template>
          <template>Template Module Windows CPU by Zabbix agent active</template>
          <name>Template Module Windows CPU by Zabbix agent active</name>
-         <description>Template tooling version used: 0.38</description>
+         <description>Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -220,7 +220,7 @@ and are waiting to be executed.</description>
       <template>
          <template>Template Module Windows filesystems by Zabbix agent active</template>
          <name>Template Module Windows filesystems by Zabbix agent active</name>
-         <description>Template tooling version used: 0.38</description>
+         <description>Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -318,7 +318,6 @@ and are waiting to be executed.</description>
                      </application_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template Module Windows filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},pused].last()}&gt;{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and&#13;
@@ -429,7 +428,7 @@ and are waiting to be executed.</description>
       <template>
          <template>Template Module Windows generic by Zabbix agent active</template>
          <name>Template Module Windows generic by Zabbix agent active</name>
-         <description>Template tooling version used: 0.38</description>
+         <description>Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -602,7 +601,7 @@ and are waiting to be executed.</description>
       <template>
          <template>Template Module Windows memory by Zabbix agent active</template>
          <name>Template Module Windows memory by Zabbix agent active</name>
-         <description>Template tooling version used: 0.38</description>
+         <description>Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -859,7 +858,7 @@ A typical Event ID 2019 is recorded in the system event log.</description>
       <template>
          <template>Template Module Windows network by Zabbix agent active</template>
          <name>Template Module Windows network by Zabbix agent active</name>
-         <description>Template tooling version used: 0.38</description>
+         <description>Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -1179,7 +1178,6 @@ WARNING: if closed manually - won't fire again on next poll, because of .diff.</
                      </master_item>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template Module Windows network by Zabbix agent active:net.if.speed["{#IFGUID}"].change()}&lt;0 and&#13;
@@ -1399,7 +1397,7 @@ return JSON.stringify({"data": output})</params>
       <template>
          <template>Template Module Windows physical disks by Zabbix agent active</template>
          <name>Template Module Windows physical disks by Zabbix agent active</name>
-         <description>Template tooling version used: 0.38</description>
+         <description>Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -1572,7 +1570,6 @@ return JSON.stringify({"data": output})</params>
                      </application_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template Module Windows physical disks by Zabbix agent active:perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Write",60].min(15m)} &gt; {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}</expression>
@@ -1710,7 +1707,7 @@ return JSON.stringify({"data": output})</params>
          <name>Template Module Windows services by Zabbix agent active</name>
          <description>Template Services OS Windows&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -1779,7 +1776,6 @@ Template tooling version used: 0.38</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
          </discovery_rules>
          <macros>
@@ -1813,7 +1809,7 @@ Template tooling version used: 0.38</description>
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387224-discussion-thread-for-official-zabbix-template-for-windows&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <templates>
             <template>
                <name>Template Module Windows CPU by Zabbix agent active</name>
@@ -2213,95 +2209,6 @@ Template tooling version used: 0.38</description>
             <mapping>
                <value>13</value>
                <newvalue>1394</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>CIM_LogicalDevice::Availability</name>
-         <mappings>
-            <mapping>
-               <value>1</value>
-               <newvalue>Other</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>Unknown</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>Running/Full Power</newvalue>
-            </mapping>
-            <mapping>
-               <value>4</value>
-               <newvalue>Warning</newvalue>
-            </mapping>
-            <mapping>
-               <value>5</value>
-               <newvalue>In Test</newvalue>
-            </mapping>
-            <mapping>
-               <value>6</value>
-               <newvalue>Not Applicable</newvalue>
-            </mapping>
-            <mapping>
-               <value>7</value>
-               <newvalue>Power Off</newvalue>
-            </mapping>
-            <mapping>
-               <value>8</value>
-               <newvalue>Off Line</newvalue>
-            </mapping>
-            <mapping>
-               <value>9</value>
-               <newvalue>Off Duty</newvalue>
-            </mapping>
-            <mapping>
-               <value>10</value>
-               <newvalue>Degraded</newvalue>
-            </mapping>
-            <mapping>
-               <value>11</value>
-               <newvalue>Not Installed</newvalue>
-            </mapping>
-            <mapping>
-               <value>12</value>
-               <newvalue>Install Error</newvalue>
-            </mapping>
-            <mapping>
-               <value>13</value>
-               <newvalue>Power Save - Unknown</newvalue>
-            </mapping>
-            <mapping>
-               <value>14</value>
-               <newvalue>Power Save - Low Power Mode</newvalue>
-            </mapping>
-            <mapping>
-               <value>15</value>
-               <newvalue>Power Save - Standby</newvalue>
-            </mapping>
-            <mapping>
-               <value>16</value>
-               <newvalue>Power Cycle</newvalue>
-            </mapping>
-            <mapping>
-               <value>17</value>
-               <newvalue>Power Save - Warning</newvalue>
-            </mapping>
-            <mapping>
-               <value>18</value>
-               <newvalue>Paused</newvalue>
-            </mapping>
-            <mapping>
-               <value>19</value>
-               <newvalue>Not Ready</newvalue>
-            </mapping>
-            <mapping>
-               <value>20</value>
-               <newvalue>Not Configured</newvalue>
-            </mapping>
-            <mapping>
-               <value>21</value>
-               <newvalue>Quiesced</newvalue>
             </mapping>
          </mappings>
       </value_map>
