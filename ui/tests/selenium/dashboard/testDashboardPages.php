@@ -370,7 +370,7 @@ class testDashboardPages extends CWebTest {
 	}
 
 	/**
-	 * Copy dashboard page.
+	 * Copy dashboard page to same dashboard and another one.
 	 */
 	public function testDashboardPages_CopyPastePage() {
 		foreach ([self::$dashboardid_copy, self::$dashboardid_paste] as $dashboardid) {
@@ -510,7 +510,9 @@ class testDashboardPages extends CWebTest {
 		$next_page = $this->query(self::NEXT_BUTTON)->one();
 		while ($next_page->isClickable()) {
 			$next_page->waitUntilReady()->click();
-			$this->query('xpath://ul[@class="sortable-list"]//span[@title='.CXPathHelper::escapeQuotes($title).']/following-sibling::button[@title="Actions"]')->waitUntilVisible();
+			$this->query("xpath://ul[@class='sortable-list']//span[@title=".CXPathHelper::escapeQuotes($title).
+					']/following-sibling::button[@title="Actions"]')->waitUntilVisible();
+			$this->page->waitUntilReady();
 		}
 
 		$index = (array_key_exists('duplicate', $data)) ? 2 : 1;
@@ -544,7 +546,8 @@ class testDashboardPages extends CWebTest {
 		$previous_page = $this->query(self::PREVIOUS_BUTTON)->one();
 
 		// Check selected page.
-		$this->assertEquals('long_name_to_check_navigation_1', $this->query('xpath://li/div[@class="selected-tab"]')->one()->getText());
+		$this->assertEquals('long_name_to_check_navigation_1', $this->
+				query('xpath://li/div[@class="selected-tab"]')->one()->getText());
 
 		// Navigate on dashboard.
 		foreach ([$next_page, $previous_page] as $navigation) {
@@ -554,7 +557,8 @@ class testDashboardPages extends CWebTest {
 			if ($navigation === $next_page) {
 				$this->assertTrue($next_page->isEnabled(false));
 				$this->assertTrue($previous_page->isEnabled());
-				$this->assertEquals('long_name_to_check_navigation_8', $this->query('xpath://li/div[@class="selected-tab"]')->one()->getText());
+				$this->assertEquals('long_name_to_check_navigation_8', $this->
+						query('xpath://li/div[@class="selected-tab"]')->one()->getText());
 			}
 		}
 
