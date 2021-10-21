@@ -65,6 +65,7 @@ typedef struct
 zbx_tfc_t;
 
 static zbx_tfc_t	*cache = NULL;
+static int		alloc_num = 0;
 
 /*
  * The shared memory is split in three parts:
@@ -154,8 +155,6 @@ static int	tfc_compare_func(const void *v1, const void *v2)
  ******************************************************************************/
 static void	*tfc_malloc_func(void *old, size_t size)
 {
-	static int	alloc_num = 0;
-
 	if (sizeof(zbx_tfc_slot_t) == size)
 		return tfc_alloc_slot();
 
@@ -344,7 +343,7 @@ static zbx_tfc_data_t	*tfc_index_add(zbx_tfc_data_t *data_local)
  ******************************************************************************/
 int	zbx_tfc_init(char **error)
 {
-	zbx_uint64_t	size_reserved;
+	zbx_uint64_t	size_reserved, size_actual;
 	int		ret = FAIL;
 
 	if (0 == CONFIG_TREND_FUNC_CACHE_SIZE)
@@ -368,12 +367,13 @@ int	zbx_tfc_init(char **error)
 
 	cache =  (zbx_tfc_t *)__tfc_mem_realloc_func(NULL, sizeof(zbx_tfc_t));
 
+	size_actual = CONFIG_TREND_FUNC_CACHE_SIZE;
 	/* (8 + 8) * 3 - overhead for 3 allocations */
-	CONFIG_TREND_FUNC_CACHE_SIZE -= size_reserved + sizeof(zbx_tfc_t) + (8 + 8) * 3;
+	size_actual -= size_reserved + sizeof(zbx_tfc_t) + (8 + 8) * 3;
 
 	/* 5/4 - reversing critical load factor which is accounted for when inserting new hashset entry */
 	/* but ignored when creating hashset with the specified size                                    */
-	cache->slots_num = CONFIG_TREND_FUNC_CACHE_SIZE / (16 * 5 / 4 + sizeof(zbx_tfc_slot_t));
+	cache->slots_num = size_actual / (16 * 5 / 4 + sizeof(zbx_tfc_slot_t));
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s(): slots:%u", __func__, cache->slots_num);
 
@@ -384,6 +384,7 @@ int	zbx_tfc_init(char **error)
 	cache->lru_tail = UINT32_MAX;
 
 	cache->slots = (zbx_tfc_slot_t *)__tfc_mem_malloc_func(NULL, sizeof(zbx_tfc_slot_t) * cache->slots_num);
+
 	cache->free_head = UINT32_MAX;
 	cache->free_slot = 0;
 
@@ -412,6 +413,7 @@ void	zbx_tfc_destroy(void)
 		zbx_mem_destroy(tfc_mem);
 		tfc_mem = NULL;
 		zbx_mutex_destroy(&tfc_lock);
+		alloc_num = 0;
 	}
 }
 
