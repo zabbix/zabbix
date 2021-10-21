@@ -239,17 +239,20 @@ class CDBHelper {
 		static::getTables($tables, $top_table);
 		self::$backups[] = $tables;
 
-		$suffix = '_tmp'.count(self::$backups);
+		if ($DB['TYPE'] === ZBX_DB_POSTGRESQL) {
+			$index = count(self::$backups) - 1;
 
-		foreach ($tables as $table) {
-			DBexecute('DROP TABLE IF EXISTS '.$table.$suffix);
+			if ($DB['PASSWORD'] !== '') {
+				putenv('PGPASSWORD='.$DB['PASSWORD']);
+			}
+			exec('pg_dump -U'.$DB['USER'].' -Fd -j5 -t'.implode(' -t', $tables).' '.$DB['DATABASE'].' -f '.PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].'.'.$index.'.dump');
+		}
+		else {
+			$suffix = '_tmp'.count(self::$backups);
 
-			switch ($DB['TYPE']) {
-				case ZBX_DB_MYSQL:
-					DBexecute('CREATE TABLE '.$table.$suffix.' AS SELECT * FROM '.$table);
-					break;
-				default:
-					DBexecute('SELECT * INTO TABLE '.$table.$suffix.' FROM '.$table);
+			foreach ($tables as $table) {
+				DBexecute('DROP TABLE IF EXISTS '.$table.$suffix);
+				DBexecute('CREATE TABLE '.$table.$suffix.' AS SELECT * FROM '.$table);
 			}
 		}
 	}
@@ -265,25 +268,33 @@ class CDBHelper {
 			return;
 		}
 
-		$suffix = '_tmp'.count(self::$backups);
 		$tables = array_pop(self::$backups);
 
-		if ($DB['TYPE'] == ZBX_DB_MYSQL) {
+		if ($DB['TYPE'] === ZBX_DB_POSTGRESQL) {
+			$index = count(self::$backups);
+
+			if ($DB['PASSWORD'] !== '') {
+				putenv('PGPASSWORD='.$DB['PASSWORD']);
+			}
+			exec('pg_restore -U'.$DB['USER'].' -Fd -j5 --clean -d '.$DB['DATABASE'].' '.PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].'.'.$index.'.dump');
+			exec('rm -rf '.PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].'.'.$index.'.dump');
+		}
+		else {
+			$suffix = '_tmp'.count(self::$backups);
+
 			$result = DBselect('SELECT @@unique_checks,@@foreign_key_checks');
 			$row = DBfetch($result);
 			DBexecute('SET unique_checks=0,foreign_key_checks=0');
-		}
 
-		foreach (array_reverse($tables) as $table) {
-			DBexecute('DELETE FROM '.$table);
-		}
+			foreach (array_reverse($tables) as $table) {
+				DBexecute('DELETE FROM '.$table);
+			}
 
-		foreach ($tables as $table) {
-			DBexecute('INSERT INTO '.$table.' SELECT * FROM '.$table.$suffix);
-			DBexecute('DROP TABLE '.$table.$suffix);
-		}
+			foreach ($tables as $table) {
+				DBexecute('INSERT INTO '.$table.' SELECT * FROM '.$table.$suffix);
+				DBexecute('DROP TABLE '.$table.$suffix);
+			}
 
-		if ($DB['TYPE'] == ZBX_DB_MYSQL) {
 			DBexecute('SET foreign_key_checks='.$row['@@foreign_key_checks'].',unique_checks='.$row['@@unique_checks']);
 		}
 	}
