@@ -1934,38 +1934,38 @@ class CHostPrototype extends CHostBase {
 										'bulk' =>			['type' => API_INT32, 'in' => implode(',', [SNMP_BULK_DISABLED, SNMP_BULK_ENABLED])],
 										'community' =>		['type' => API_MULTIPLE, 'rules' => [
 																['if' => ['field' => 'version', 'in' => implode(',', [SNMP_V1, SNMP_V2C])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('interface_snmp', 'community')],
-																['if' => ['field' => 'version', 'in' => SNMP_V3], 'type' => API_STRING_UTF8, 'in' => '']
+																['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
 										]],
 										'contextname' =>	['type' => API_MULTIPLE, 'rules' => [
 																['if' => ['field' => 'version', 'in' => SNMP_V3], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'contextname')],
-																['if' => ['field' => 'version', 'in' => implode(',', [SNMP_V1, SNMP_V2C])], 'type' => API_STRING_UTF8, 'in' => '']
+																['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
 										]],
 										'securityname' =>	['type' => API_MULTIPLE, 'rules' => [
 																['if' => ['field' => 'version', 'in' => SNMP_V3], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'securityname')],
-																['if' => ['field' => 'version', 'in' => implode(',', [SNMP_V1, SNMP_V2C])], 'type' => API_STRING_UTF8, 'in' => '']
+																['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
 										]],
 										'securitylevel' =>	['type' => API_MULTIPLE, 'rules' => [
 																['if' => ['field' => 'version', 'in' => SNMP_V3], 'type' => API_INT32, 'default' => DB::getDefault('interface_snmp', 'securitylevel'), 'in' => implode(',', [ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV])],
-																['if' => ['field' => 'version', 'in' => implode(',', [SNMP_V1, SNMP_V2C])], 'type' => API_STRING_UTF8, 'in' => '']
+																['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
 										]],
 										'authprotocol' =>	['type' => API_MULTIPLE, 'rules' => [
 																['if' => ['field' => 'securitylevel', 'in' => implode(',', [ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV])], 'type' => API_INT32, 'in' => implode(',', array_keys(getSnmpV3AuthProtocols()))],
-																['if' => ['field' => 'securitylevel', 'in' => ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV], 'type' => API_STRING_UTF8, 'in' => '0,']
+																['else' => true, 'type' => API_STRING_UTF8, 'in' => '0,']
 										]],
 										'authpassphrase' =>	['type' => API_MULTIPLE, 'rules' => [
 																['if' => ['field' => 'securitylevel', 'in' => implode(',', [ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'authpassphrase')],
-																['if' => ['field' => 'securitylevel', 'in' => ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV], 'type' => API_STRING_UTF8, 'in' => '']
+																['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
 										]],
 										'privprotocol' =>	['type' => API_MULTIPLE, 'rules' => [
 																['if' => ['field' => 'securitylevel', 'in' => ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV], 'type' => API_INT32, 'in' => implode(',', array_keys(getSnmpV3PrivProtocols()))],
-																['if' => ['field' => 'securitylevel', 'in' => implode(',', [ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV])], 'type' => API_STRING_UTF8, 'in' => '0,']
+																['else' => true, 'type' => API_STRING_UTF8, 'in' => '0,']
 										]],
 										'privpassphrase' =>	['type' => API_MULTIPLE, 'rules' => [
 																['if' => ['field' => 'securitylevel', 'in' => ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'privpassphrase')],
-																['if' => ['field' => 'securitylevel', 'in' => implode(',', [ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV])], 'type' => API_STRING_UTF8, 'in' => '']
+																['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
 										]]
 									]],
-									['if' => ['field' => 'type', 'in' => implode(',', [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_IPMI, INTERFACE_TYPE_JMX])], 'type' => API_OBJECT, 'fields' => []]
+									['else' => true, 'type' => API_OBJECT, 'fields' => []]
 				]]
 			]],
 			['if' => ['field' => 'custom_interfaces', 'in' => HOST_PROT_INTERFACES_INHERIT], 'type' => API_OBJECTS, 'fields' => []]
