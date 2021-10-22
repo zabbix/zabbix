@@ -36,24 +36,30 @@ window.service_edit_popup = {
 	children: new Map(),
 
 	algorithm_names: null,
+	create_url: null,
+	update_url: null,
 	search_limit: null,
 
 	overlay: null,
 	dialogue: null,
 	form: null,
+	footer: null,
 
 	init({serviceid, children, children_problem_tags_html, problem_tags, status_rules, service_times, algorithm_names,
-			search_limit}) {
+			create_url, update_url, search_limit}) {
 		this.initTemplates();
 
 		this.serviceid = serviceid;
 
 		this.algorithm_names = algorithm_names;
+		this.create_url = create_url;
+		this.update_url = update_url;
 		this.search_limit = search_limit;
 
 		this.overlay = overlays_stack.getById('service_edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.footer = this.overlay.$dialogue.$footer[0];
 
 		for (const status_rule of status_rules) {
 			this.addStatusRule(status_rule);
@@ -437,6 +443,15 @@ window.service_edit_popup = {
 		this.update();
 	},
 
+	removeAllChildren() {
+		document.querySelector('#children tbody').innerHTML = '';
+
+		this.children.clear();
+		this.updateChildrenFilterStats();
+		this.updateTabIndicator();
+		this.update();
+	},
+
 	filterChildren() {
 		const container = document.querySelector('#children tbody');
 
@@ -535,8 +550,26 @@ window.service_edit_popup = {
 		});
 	},
 
+	clone() {
+		this.serviceid = null;
+
+		this.removeAllChildren();
+
+		for (const element of this.footer.querySelectorAll('.js-update, .js-clone')) {
+			element.classList.add('<?= ZBX_STYLE_DISPLAY_NONE ?>');
+		}
+
+		for (const element of this.footer.querySelectorAll('.js-add')) {
+			element.classList.remove('<?= ZBX_STYLE_DISPLAY_NONE ?>');
+		}
+	},
+
 	submit() {
 		const fields = getFormFields(this.form);
+
+		if (this.serviceid !== null) {
+			fields.serviceid = this.serviceid;
+		}
 
 		fields.name = fields.name.trim();
 		fields.child_serviceids = [...this.children.keys()];
@@ -549,7 +582,7 @@ window.service_edit_popup = {
 
 		this.overlay.setLoading();
 
-		const curl = new Curl(this.form.getAttribute('action'));
+		const curl = new Curl(this.serviceid !== null ? this.update_url : this.create_url);
 
 		fetch(curl.getUrl(), {
 			method: 'POST',

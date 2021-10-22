@@ -23,14 +23,9 @@
  * @var CView $this
  */
 
-$form_action_url = (new CUrl('zabbix.php'))
-	->setArgument('action', $data['form_action'])
-	->getUrl();
-
-$form = (new CForm('post', $form_action_url))
+$form = (new CForm('post'))
 	->setId('service-form')
 	->setName('service_form')
-	->addVar('serviceid', $data['serviceid'])
 	->addItem(getMessages());
 
 // Enable form submitting on Enter.
@@ -368,6 +363,12 @@ $form
 				'problem_tags' => $data['form']['problem_tags'],
 				'status_rules' => $data['form']['status_rules'],
 				'service_times' => $data['form']['times'],
+				'create_url' => (new CUrl('zabbix.php'))
+					->setArgument('action', 'service.create')
+					->getUrl(),
+				'update_url' => (new CUrl('zabbix.php'))
+					->setArgument('action', 'service.update')
+					->getUrl(),
 				'search_limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
 			]).'
 
@@ -377,17 +378,46 @@ $form
 		'))->setOnDocumentReady()
 	);
 
-$output = [
-	'header' => $data['title'],
-	'body' => $form->toString(),
-	'buttons' => [
+if ($data['serviceid'] !== null) {
+	$buttons = [
 		[
-			'title' => $data['serviceid'] !== null ? _('Update') : _('Add'),
+			'title' => _('Update'),
+			'class' => 'js-update',
+			'keepOpen' => true,
+			'isSubmit' => true,
+			'action' => 'service_edit_popup.submit();'
+		],
+		[
+			'title' => _('Clone'),
+			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-clone']),
+			'keepOpen' => true,
+			'action' => 'service_edit_popup.clone();'
+		],
+		[
+			'title' => _('Add'),
+			'class' => implode(' ', [ZBX_STYLE_DISPLAY_NONE, 'js-add']),
 			'keepOpen' => true,
 			'isSubmit' => true,
 			'action' => 'service_edit_popup.submit();'
 		]
-	],
+	];
+}
+else {
+	$buttons = [
+		[
+			'title' => _('Add'),
+			'class' => 'js-add',
+			'keepOpen' => true,
+			'isSubmit' => true,
+			'action' => 'service_edit_popup.submit();'
+		]
+	];
+}
+
+$output = [
+	'header' => $data['title'],
+	'body' => $form->toString(),
+	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().
 		$this->readJsFile('popup.service.edit.js.php')
 ];
