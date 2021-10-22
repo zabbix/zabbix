@@ -25,6 +25,11 @@
 ?>
 
 window.popup_generic = {
+	init() {
+		cookie.init();
+		chkbxRange.init();
+	},
+
 	setPopupOpenerFieldValues(entries) {
 		Object.entries(entries).forEach(([element_id, set_value]) => {
 			const target_element = document.getElementById(element_id);
@@ -40,11 +45,10 @@ window.popup_generic = {
 
 		jQuery('.multiselect', overlay.$dialogue).each(function (i, ms) {
 			jQuery(ms).on('change', {overlay: overlay}, function (e) {
-				var groups = jQuery(this).multiSelect('getData').map(i => i.id),
-					options = groups.length ? {groupid: groups[0]} : {filter_groupid_rst: 1, groupid: []};
+				const groups = jQuery(this).multiSelect('getData').map(i => i.id);
+				const options = groups.length ? {groupid: groups[0]} : {filter_groupid_rst: 1, groupid: []};
 
-				new_opts = jQuery.extend(e.data.overlay.options, options);
-				PopUp(e.data.overlay.action, new_opts, e.data.overlay.dialogueid);
+				PopUp(e.data.overlay.action, {...e.data.overlay.options, ...options}, e.data.overlay.dialogueid);
 			});
 		});
 	},
@@ -54,11 +58,10 @@ window.popup_generic = {
 
 		jQuery('.multiselect', overlay.$dialogue).each(function (i, ms) {
 			jQuery(ms).on('change', {overlay: overlay}, function (e) {
-				var hosts = jQuery(this).multiSelect('getData').map(i => i.id),
-					options = hosts.length ? {hostid: hosts[0]} : {filter_hostid_rst: 1, hostid: []};
+				const hosts = jQuery(this).multiSelect('getData').map(i => i.id);
+				const options = hosts.length ? {hostid: hosts[0]} : {filter_hostid_rst: 1, hostid: []};
 
-				new_opts = jQuery.extend(e.data.overlay.options, options);
-				PopUp(e.data.overlay.action, new_opts, e.data.overlay.dialogueid);
+				PopUp(e.data.overlay.action, {...e.data.overlay.options, ...options}, e.data.overlay.dialogueid);
 			});
 		});
 	},
@@ -69,23 +72,18 @@ window.popup_generic = {
 		});
 	},
 
-	setEmpty(sender, reset_fields) {
-		this.setPopupOpenerFieldValues(reset_fields)
-		overlayDialogueDestroy(jQuery(sender).closest('[data-dialogueid]').attr('data-dialogueid'));
+	setEmpty(e, reset_fields) {
+		e.preventDefault();
 
-		return false;
+		this.setPopupOpenerFieldValues(reset_fields);
+		overlayDialogueDestroy(jQuery(e.target).closest('[data-dialogueid]').attr('data-dialogueid'));
 	},
 
-	closePopup(sender) {
-		const $sender = jQuery(sender).removeAttr('onclick');
+	closePopup(e) {
+		e.preventDefault();
+
+		const $sender = jQuery(e.target).removeAttr('onclick');
 
 		overlayDialogueDestroy($sender.closest('[data-dialogueid]').attr('data-dialogueid'));
-
-		return false;
-	},
-
-	init() {
-		cookie.init();
-		chkbxRange.init();
 	}
 };

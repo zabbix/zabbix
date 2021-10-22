@@ -48,7 +48,7 @@ if ($data['popup_type'] === 'triggers' && !array_key_exists('noempty', $options)
 
 	$empty_btn = (new CButton('empty', _('Empty')))
 		->addStyle('float: right; margin-left: 5px;')
-		->onClick('return popup_generic.setEmpty(this, '.json_encode([
+		->onClick('popup_generic.setEmpty(event, '.json_encode([
 			$options['dstfld1'] => $value1,
 			$options['dstfld2'] => $value2,
 			$options['dstfld3'], $value3
@@ -142,7 +142,7 @@ if ($data['preselect_required']) {
 	$table->setNoDataMessage(_('Specify some filter condition to see the values.'));
 }
 
-$js_action_onclick = 'return popup_generic.closePopup(this);';
+$js_action_onclick = 'popup_generic.closePopup(event);';
 
 // Output table rows.
 switch ($data['popup_type']) {

@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $widget = (new CWidget())->setTitle(_('Item prototypes'));
@@ -590,7 +591,7 @@ if ($data['display_interfaces']) {
 	$form->addVar('selectedInterfaceId', $data['interfaceid']);
 }
 
-// Append SNMP common fields fields.
+// Append SNMP common fields.
 $item_tab->addItem([
 	(new CLabel(_('SNMP OID'), 'snmp_oid'))
 		->setAsteriskMark()
@@ -915,7 +916,7 @@ else {
 $form->addItem($item_tabs);
 $widget->addItem($form);
 
-require_once dirname(__FILE__).'/js/configuration.item.prototype.edit.js.php';
+require_once __DIR__.'/js/configuration.item.prototype.edit.js.php';
 
 $widget->show();
 
