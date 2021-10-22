@@ -172,23 +172,15 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 
 		if (isset($data['template'])) {
 			$this->zbxTestLogin('templates.php');
-
-			// If the template is not present on this page anymore - check on next page.
-			for ($i = 0; $i < 2; $i++) {
-				if ($this->query('link', $data['template'])->one(false)->isValid() === true) {
-					break;
-				}
-				$this->query('xpath://div[@class="table-paging"]//span[@class="arrow-right"]/..')->one()->click();
-				$this->page->waitUntilReady();
-			}
-
-			$this->zbxTestClickLinkTextWait($data['template']);
+			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+			$this->filterEntriesAndOpenDiscovery($form, $data['template']);
 			$hostid = 30000;
 		}
 
 		if (isset($data['host'])) {
-			$this->zbxTestLogin('hosts.php');
-			$this->zbxTestClickLinkTextWait($data['host']);
+			$this->zbxTestLogin(self::HOST_LIST_PAGE);
+			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+			$this->filterEntriesAndOpenDiscovery($form, $data['host']);
 			if (isset($data['templatedHost'])) {
 				$hostid = 30001;
 			}
@@ -196,8 +188,6 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 				$hostid = 40001;
 			}
 		}
-
-		$this->zbxTestClickLinkTextWait('Discovery rules');
 
 		if (isset($data['form'])) {
 			$this->zbxTestClickLinkTextWait($data['form']);
@@ -533,9 +523,9 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		$sqlDiscovery = 'select itemid, hostid, name, key_, delay from items order by itemid';
 		$oldHashDiscovery = CDBHelper::getHash($sqlDiscovery);
 
-		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestClickLinkTextWait($this->host);
-		$this->zbxTestClickLinkTextWait('Discovery rules');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
+		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+		$this->filterEntriesAndOpenDiscovery($form, $this->host);
 		$this->zbxTestClickLinkTextWait($name);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
@@ -1491,12 +1481,9 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormLowLevelDiscovery_SimpleCreate($data) {
-		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestCheckHeader('Hosts');
-
-		$this->zbxTestClickLinkTextWait($this->host);
-		$this->zbxTestClickLinkTextWait('Discovery rules');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
+		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+		$this->filterEntriesAndOpenDiscovery($form, $this->host);
 		$this->zbxTestContentControlButtonClickTextWait('Create discovery rule');
 
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
@@ -1626,9 +1613,9 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		}
 
 		if (isset($data['formCheck'])) {
-			$this->zbxTestOpen('hosts.php');
-			$this->zbxTestClickLinkTextWait($this->host);
-			$this->zbxTestClickLinkTextWait('Discovery rules');
+			$this->zbxTestOpen(self::HOST_LIST_PAGE);
+			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+			$this->filterEntriesAndOpenDiscovery($form, $this->host);
 
 			if (isset ($data['dbName'])) {
 				$dbName = $data['dbName'];
@@ -1708,9 +1695,9 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 				$itemId = $row['itemid'];
 			}
 
-			$this->zbxTestOpen('hosts.php');
-			$this->zbxTestClickLinkTextWait($this->host);
-			$this->zbxTestClickLinkTextWait('Discovery rules');
+			$this->zbxTestOpen(self::HOST_LIST_PAGE);
+			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+			$this->filterEntriesAndOpenDiscovery($form, $this->host);
 
 			$this->zbxTestCheckboxSelect("g_hostdruleid_$itemId");
 			$this->zbxTestClickButton('discoveryrule.massdelete');
@@ -2148,5 +2135,18 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 			);
 			$this->assertEquals($lld_macro['path'], $row->getColumn('JSONPath')->query('tag:textarea')->one()->getValue());
 		}
+	}
+
+	/**
+	 * Function for filtering necessary hosts or templates and opening their Discovery rules.
+	 *
+	 * @param CFormELement   $form    filter form element
+	 * @param string         $name    name of a host or template
+	 */
+	private function filterEntriesAndOpenDiscovery($form, $name) {
+		$form->fill(['Name' => $name]);
+		$this->query('button:Apply')->one()->waitUntilClickable()->click();
+		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
+				->getColumn('Discovery')->query('link:Discovery')->one()->click();
 	}
 }

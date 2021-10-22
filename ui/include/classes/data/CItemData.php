@@ -69,7 +69,7 @@ final class CItemData {
 			'system.cpu.num[<type>]',
 			'system.cpu.switches',
 			'system.cpu.util[<cpu>,<type>,<mode>,<logical_or_physical>]',
-			'system.hostname[<type>]',
+			'system.hostname[<type>,<transform>]',
 			'system.hw.chassis[<info>]',
 			'system.hw.cpu[<cpu>,<info>]',
 			'system.hw.devices[<type>]',
@@ -166,7 +166,7 @@ final class CItemData {
 			'system.cpu.num[<type>]',
 			'system.cpu.switches',
 			'system.cpu.util[<cpu>,<type>,<mode>,<logical_or_physical>]',
-			'system.hostname[<type>]',
+			'system.hostname[<type>,<transform>]',
 			'system.hw.chassis[<info>]',
 			'system.hw.cpu[<cpu>,<info>]',
 			'system.hw.devices[<type>]',
@@ -252,6 +252,7 @@ final class CItemData {
 			'vmware.hv.hw.model[<url>,<uuid>]',
 			'vmware.hv.hw.uuid[<url>,<uuid>]',
 			'vmware.hv.hw.vendor[<url>,<uuid>]',
+			'vmware.hv.maintenance[<url>,<uuid>]',
 			'vmware.hv.memory.size.ballooned[<url>,<uuid>]',
 			'vmware.hv.memory.used[<url>,<uuid>]',
 			'vmware.hv.network.in[<url>,<uuid>,<mode>]',
@@ -259,6 +260,7 @@ final class CItemData {
 			'vmware.hv.perfcounter[<url>,<uuid>,<path>,<instance>]',
 			'vmware.hv.power[<url>,<uuid>,<max>]',
 			'vmware.hv.sensor.health.state[<url>,<uuid>]',
+			'vmware.hv.sensors.get[<url>,<uuid>]',
 			'vmware.hv.status[<url>,<uuid>]',
 			'vmware.hv.uptime[<url>,<uuid>]',
 			'vmware.hv.version[<url>,<uuid>]',
@@ -1063,7 +1065,7 @@ final class CItemData {
 				'description' => _('CPU utilization percentage. Returns float'),
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
-			'system.hostname[<type>]' => [
+			'system.hostname[<type>,<transform>]' => [
 				'description' => _('System host name. Returns string'),
 				'value_type' => ITEM_VALUE_TYPE_STR
 			],
@@ -1347,6 +1349,10 @@ final class CItemData {
 				'description' => _('VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name'),
 				'value_type' => ITEM_VALUE_TYPE_STR
 			],
+			'vmware.hv.maintenance[<url>,<uuid>]' => [
+				'description' => _('VMware hypervisor maintenance status, <url> - VMware service URL, <uuid> - VMware hypervisor host name'),
+				'value_type' => null
+			],
 			'vmware.hv.memory.size.ballooned[<url>,<uuid>]' => [
 				'description' => _('VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
@@ -1374,6 +1380,10 @@ final class CItemData {
 			'vmware.hv.sensor.health.state[<url>,<uuid>]' => [
 				'description' => _('VMware hypervisor health state rollup sensor, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
+			],
+			'vmware.hv.sensors.get[<url>,<uuid>]' => [
+				'description' => _('VMware hypervisor HW vendor state sensors, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'vmware.hv.status[<url>,<uuid>]' => [
 				'description' => _('VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name'),

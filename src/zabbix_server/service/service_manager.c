@@ -2805,7 +2805,7 @@ static void	process_events(zbx_vector_ptr_t *events, zbx_service_manager_t *serv
 				zbx_hashset_remove_direct(&service_manager->problem_events, ptr);
 				break;
 			case TRIGGER_VALUE_PROBLEM:
-				if (NULL != (ptr = zbx_hashset_search(&service_manager->problem_events, &event)))
+				if (NULL != zbx_hashset_search(&service_manager->problem_events, &event))
 				{
 					zabbix_log(LOG_LEVEL_ERR, "cannot process event \"" ZBX_FS_UI64 "\": event"
 							" already processed", event->eventid);
@@ -2940,7 +2940,7 @@ static void	service_update_event_severity(zbx_service_manager_t *service_manager
 {
 	int			index;
 	zbx_service_problem_t	*service_problem;
-	zbx_services_diff_t	*services_diff, services_diff_local;
+	zbx_services_diff_t	services_diff_local;
 
 	if (FAIL == (index = zbx_vector_ptr_search(&service->service_problems, &eventid,
 			ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
@@ -2953,7 +2953,7 @@ static void	service_update_event_severity(zbx_service_manager_t *service_manager
 
 	services_diff_local.serviceid = service->serviceid;
 
-	if (NULL == (services_diff = zbx_hashset_search(&service_manager->service_diffs, &services_diff_local)))
+	if (NULL == zbx_hashset_search(&service_manager->service_diffs, &services_diff_local))
 	{
 		zbx_vector_ptr_create(&services_diff_local.service_problems);
 		zbx_vector_ptr_create(&services_diff_local.service_problems_recovered);

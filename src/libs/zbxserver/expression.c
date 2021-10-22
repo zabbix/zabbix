@@ -211,9 +211,8 @@ static int	get_problem_update_actions(const DB_ACKNOWLEDGE *ack, int actions, ch
 static void	item_description(char **data, const char *key, zbx_uint64_t hostid)
 {
 	AGENT_REQUEST	request;
-	const char	*param;
 	char		c, *p, *m, *n, *str_out = NULL, *replace_to = NULL;
-	int		macro_r, context_l, context_r;
+	int		macro_r, context_l, context_r, warning = 0;
 
 	init_request(&request);
 
@@ -249,21 +248,18 @@ static void	item_description(char **data, const char *key, zbx_uint64_t hostid)
 			*n = c;
 			p = n;
 		}
-		else if ('1' <= *(m + 1) && *(m + 1) <= '9')
-		{
-			/* macros $1, $2, ... */
-
-			*m = '\0';
-			str_out = zbx_strdcat(str_out, p);
-			*m++ = '$';
-
-			if (NULL != (param = get_rparam(&request, *m - '0' - 1)))
-				str_out = zbx_strdcat(str_out, param);
-
-			p = m + 1;
-		}
 		else
 		{
+			if (0 == warning && '1' <= *(m + 1) && *(m + 1) <= '9')
+			{
+				/* macros $1, $2, ... */
+				zabbix_log(LOG_LEVEL_WARNING, "Use of positional macros ($1,$2... $9 - referring to the"
+						" first, second... ninth parameter of the item key '%s') is "
+						"no longer supported", key);
+
+				warning = 1;
+			}
+
 			/* just a dollar sign */
 
 			c = *++m;
@@ -4837,15 +4833,6 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 		if (0 != (macro_type & MACRO_TYPE_HTTP_JSON) && NULL != replace_to)
 			zbx_json_escape(&replace_to);
 
-		if (0 != (macro_type & MACRO_TYPE_HTTP_XML) && NULL != replace_to)
-		{
-			char	*replace_to_esc;
-
-			replace_to_esc = xml_escape_dyn(replace_to);
-			zbx_free(replace_to);
-			replace_to = replace_to_esc;
-		}
-
 		if (ZBX_TOKEN_FUNC_MACRO == token.type && NULL != replace_to)
 		{
 			if (SUCCEED != (ret = zbx_calculate_macro_function(*data, &token.data.func_macro, &replace_to)))
@@ -5740,14 +5727,6 @@ static void	process_lld_macro_token(char **data, zbx_token_t *token, int flags, 
 	{
 		zbx_json_escape(&replace_to);
 	}
-	else if (0 != (flags & ZBX_TOKEN_XML))
-	{
-		char	*replace_to_esc;
-
-		replace_to_esc = xml_escape_dyn(replace_to);
-		zbx_free(replace_to);
-		replace_to = replace_to_esc;
-	}
 	else if (0 != (flags & ZBX_TOKEN_REGEXP))
 	{
 		zbx_regexp_escape(&replace_to);
@@ -6599,11 +6578,12 @@ static void	substitute_macros_in_xml_elements(const DC_ITEM *item, const struct 
 				}
 				else
 				{
-					substitute_lld_macros(&value_tmp, jp_row, lld_macro_paths, ZBX_MACRO_XML, NULL,
+					substitute_lld_macros(&value_tmp, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL,
 							0);
 				}
 
-				xmlNodeSetContent(node, (xmlChar *)value_tmp);
+				xmlNodeSetContent(node, NULL);
+				xmlNodeAddContent(node, (xmlChar *)value_tmp);
 
 				zbx_free(value_tmp);
 				xmlFree(value);
@@ -6626,7 +6606,8 @@ static void	substitute_macros_in_xml_elements(const DC_ITEM *item, const struct 
 							0);
 				}
 
-				xmlNodeSetContent(node, (xmlChar *)value_tmp);
+				xmlNodeSetContent(node, NULL);
+				xmlNodeAddContent(node, (xmlChar *)value_tmp);
 
 				zbx_free(value_tmp);
 				xmlFree(value);
@@ -6646,8 +6627,10 @@ static void	substitute_macros_in_xml_elements(const DC_ITEM *item, const struct 
 								MACRO_TYPE_HTTP_XML, NULL, 0);
 					}
 					else
+					{
 						substitute_lld_macros(&value_tmp, jp_row, lld_macro_paths,
-								ZBX_MACRO_XML, NULL, 0);
+								ZBX_MACRO_ANY, NULL, 0);
+					}
 
 					xmlSetProp(node, attr->name, (xmlChar *)value_tmp);
 

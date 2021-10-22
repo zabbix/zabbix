@@ -23,6 +23,7 @@ import (
 	"errors"
 	"os"
 	"runtime"
+	"strings"
 	"syscall"
 
 	"golang.org/x/sys/windows"
@@ -30,12 +31,17 @@ import (
 )
 
 func getHostname(params []string) (uname string, err error) {
-	if len(params) > 1 {
+	if len(params) > 2 {
 		return "", errors.New("Too many parameters.")
 	}
-	var mode string
+
+	var mode, transform string
+
 	if len(params) > 0 {
 		mode = params[0]
+		if len(params) > 1 {
+			transform = params[1]
+		}
 	}
 
 	switch mode {
@@ -45,12 +51,32 @@ func getHostname(params []string) (uname string, err error) {
 		if err = syscall.GetComputerName(&w[0], &sz); err != nil {
 			return "", err
 		}
-		return windows.UTF16ToString(w), nil
+		uname = windows.UTF16ToString(w)
 	case "host":
-		return os.Hostname()
+		if uname, err = os.Hostname(); err != nil {
+			return "", err
+		}
+	case "shorthost":
+		if uname, err = os.Hostname(); err != nil {
+			return "", err
+		}
+		if idx := strings.Index(uname, "."); idx > 0 {
+			uname = uname[:idx]
+		}
 	default:
 		return "", errors.New("Invalid first parameter.")
 	}
+
+	switch transform {
+	case "lower":
+		uname = strings.ToLower(uname)
+	case "none", "":
+		break
+	default:
+		return "", errors.New("Invalid second parameter.")
+	}
+
+	return
 }
 
 func getArch() string {

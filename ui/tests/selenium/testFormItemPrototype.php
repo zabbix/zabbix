@@ -2194,9 +2194,8 @@ class testFormItemPrototype extends CLegacyWebTest {
 		}
 
 		if (isset($data['formCheck'])) {
-			$this->zbxTestOpen('hosts.php');
-			$this->zbxTestClickLinkTextWait($this->host);
-			$this->zbxTestClickLinkTextWait('Discovery rules');
+			$this->zbxTestOpen(self::HOST_LIST_PAGE);
+			$this->filterEntriesAndOpenDiscovery($this->host);
 			$this->zbxTestClickLinkTextWait($this->discoveryRule);
 			$this->zbxTestClickLinkTextWait('Item prototypes');
 			$this->zbxTestCheckHeader('Item prototypes');
@@ -2272,9 +2271,8 @@ class testFormItemPrototype extends CLegacyWebTest {
 				$itemId = $row['itemid'];
 			}
 
-			$this->zbxTestOpen('hosts.php');
-			$this->zbxTestClickLinkTextWait($this->host);
-			$this->zbxTestClickLinkTextWait('Discovery rules');
+			$this->zbxTestOpen(self::HOST_LIST_PAGE);
+			$this->filterEntriesAndOpenDiscovery($this->host);
 			$this->zbxTestClickLinkTextWait($this->discoveryRule);
 			$this->zbxTestClickLinkTextWait('Item prototypes');
 
@@ -2284,5 +2282,18 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$this->zbxTestAcceptAlert();
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item prototypes deleted');
 		}
+	}
+
+	/**
+	 * Function for filtering necessary hosts and opening its Discovery rules.
+	 *
+	 * @param string    $name    name of a host
+	 */
+	private function filterEntriesAndOpenDiscovery($name) {
+		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+		$form->fill(['Name' => $name]);
+		$this->query('button:Apply')->one()->waitUntilClickable()->click();
+		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
+				->getColumn('Discovery')->query('link:Discovery')->one()->click();
 	}
 }

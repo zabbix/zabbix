@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:47Z'
+  version: '6.0'
+  date: '2021-10-21T10:49:24Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -19,7 +19,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387224-discussion-thread-for-official-zabbix-template-for-windows
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.39
       templates:
         -
           name: 'Windows CPU by Zabbix agent'
@@ -119,16 +119,16 @@ zabbix_export:
                   fields:
                     -
                       type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: INTEGER
                       name: columns
                       value: '1'
                     -
                       type: INTEGER
                       name: rows
                       value: '1'
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -143,16 +143,16 @@ zabbix_export:
                   fields:
                     -
                       type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: INTEGER
                       name: columns
                       value: '1'
                     -
                       type: INTEGER
                       name: rows
                       value: '1'
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -167,16 +167,16 @@ zabbix_export:
                   fields:
                     -
                       type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: INTEGER
                       name: columns
                       value: '1'
                     -
                       type: INTEGER
                       name: rows
                       value: '1'
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -191,16 +191,16 @@ zabbix_export:
                   fields:
                     -
                       type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: INTEGER
                       name: columns
                       value: '1'
                     -
                       type: INTEGER
                       name: rows
                       value: '1'
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -211,7 +211,7 @@ zabbix_export:
       uuid: e358504d59404f688e236444dd82d2c3
       template: 'Windows CPU by Zabbix agent'
       name: 'Windows CPU by Zabbix agent'
-      description: 'Template tooling version used: 0.38'
+      description: 'Template tooling version used: 0.39'
       groups:
         -
           name: Templates/Modules
@@ -390,7 +390,7 @@ zabbix_export:
       uuid: cb28abff977b4b6eb34665ff2218163b
       template: 'Windows filesystems by Zabbix agent'
       name: 'Windows filesystems by Zabbix agent'
-      description: 'Template tooling version used: 0.38'
+      description: 'Template tooling version used: 0.39'
       groups:
         -
           name: Templates/Modules
@@ -561,7 +561,7 @@ zabbix_export:
       uuid: 95c4026f8ade4fa7b72f8140fc152aea
       template: 'Windows generic by Zabbix agent'
       name: 'Windows generic by Zabbix agent'
-      description: 'Template tooling version used: 0.38'
+      description: 'Template tooling version used: 0.39'
       groups:
         -
           name: Templates/Modules
@@ -698,7 +698,7 @@ zabbix_export:
       uuid: 539b4b98f6fb4e12bbdf3bcdb85df2d1
       template: 'Windows memory by Zabbix agent'
       name: 'Windows memory by Zabbix agent'
-      description: 'Template tooling version used: 0.38'
+      description: 'Template tooling version used: 0.39'
       groups:
         -
           name: Templates/Modules
@@ -917,7 +917,7 @@ zabbix_export:
       uuid: 6ad6a4d1e677461ca6d1d5b2dcaba6d2
       template: 'Windows network by Zabbix agent'
       name: 'Windows network by Zabbix agent'
-      description: 'Template tooling version used: 0.38'
+      description: 'Template tooling version used: 0.39'
       groups:
         -
           name: Templates/Modules
@@ -1212,7 +1212,7 @@ zabbix_export:
               recovery_expression: |
                 avg(/Windows network by Zabbix agent/net.if.in["{#IFGUID}"],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Windows network by Zabbix agent/net.if.speed["{#IFGUID}"]) and
                 avg(/Windows network by Zabbix agent/net.if.out["{#IFGUID}"],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Windows network by Zabbix agent/net.if.speed["{#IFGUID}"])
-              name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}% )'
+              name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'The network interface utilization is close to its estimated maximum bandwidth.'
@@ -1298,8 +1298,8 @@ zabbix_export:
                       return {
                           "{#IFNAME}": net.Name,
                           "{#IFDESCR}": net.Description,
-                          "{#IFALIAS}" : net.NetConnectionID,
-                          "{#IFGUID}" : net.GUID
+                          "{#IFALIAS}": net.NetConnectionID,
+                          "{#IFGUID}": net.GUID
                       }})
                   return JSON.stringify({"data": output})
             -
@@ -1354,16 +1354,16 @@ zabbix_export:
                   fields:
                     -
                       type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: INTEGER
                       name: columns
                       value: '1'
                     -
                       type: INTEGER
                       name: rows
                       value: '1'
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -1464,7 +1464,7 @@ zabbix_export:
       uuid: 4026647be95a47de98b0f09dc36ce72f
       template: 'Windows physical disks by Zabbix agent'
       name: 'Windows physical disks by Zabbix agent'
-      description: 'Template tooling version used: 0.38'
+      description: 'Template tooling version used: 0.39'
       groups:
         -
           name: Templates/Modules
@@ -1711,7 +1711,7 @@ zabbix_export:
       description: |
         Template Services OS Windows
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.39
       groups:
         -
           name: Templates/Modules
@@ -1791,6 +1791,9 @@ zabbix_export:
               value: '1'
               newvalue: Paused
             -
+              value: '2'
+              newvalue: 'Start pending'
+            -
               value: '3'
               newvalue: 'Pause pending'
             -
@@ -1808,9 +1811,6 @@ zabbix_export:
             -
               value: '255'
               newvalue: 'No such service'
-            -
-              value: '2'
-              newvalue: 'Start pending'
   triggers:
     -
       uuid: cc301d844a7b42e79756d1bc74adf307

@@ -33,8 +33,9 @@ const TAB_INDICATOR_UPDATE_EVENT = 'tab-indicator-update';
  */
 class TabIndicators {
 
-	constructor() {
+	constructor(tabs_id = 'tabs') {
 		try {
+			this.tabs_id = tabs_id;
 			this.form = this.getForm();
 			this.activateIndicators();
 		} catch (error) {
@@ -49,7 +50,7 @@ class TabIndicators {
 	 */
 	getForm() {
 		const TEMPLATE = document.querySelector('#templates-form');
-		const HOST = document.querySelector('#hosts-form');
+		const HOST = document.querySelector('#host-form');
 		const AUTHENTICATION = document.querySelector('#authentication-form');
 		const HOST_PROTOTYPE = document.querySelector('#host-prototype-form');
 		const ITEM = document.querySelector('#item-form');
@@ -113,7 +114,7 @@ class TabIndicators {
 	 * Activate tab indicators.
 	 */
 	activateIndicators() {
-		for (const element of this.form.querySelectorAll('#tabs a')) {
+		for (const element of this.form.querySelectorAll('#' + this.tabs_id + ' a')) {
 			const indicator_item = this.getIndicatorItem(this.getIndicatorNameByElement(element));
 
 			if (indicator_item instanceof TabIndicatorItem) {
@@ -366,14 +367,26 @@ class LinkedTemplateTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		const target_node = document.querySelector('#add_templates_ .multiselect-list');
+		const multiselect_node = document.querySelector('#add_templates_');
+		const linked_node = document.querySelector('#linked-template');
 
-		if (target_node !== null) {
-			const observer = new MutationObserver(() => {
-				this.addAttributes(element);
+		if (linked_node !== null) {
+			const linked_observer = new MutationObserver(() => {
+				this.addAttributes(element)
 			});
 
-			observer.observe(target_node, {
+			linked_observer.observe(linked_node, {
+				childList: true,
+				subtree: true
+			});
+		}
+
+		if (multiselect_node !== null) {
+			const multiselect_observer = new MutationObserver(() => {
+				this.addAttributes(element)
+			});
+
+			multiselect_observer.observe(multiselect_node.parentNode, {
 				childList: true,
 				subtree: true
 			});
