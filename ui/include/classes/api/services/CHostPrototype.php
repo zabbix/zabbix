@@ -1964,11 +1964,11 @@ class CHostPrototype extends CHostBase {
 																['if' => ['field' => 'securitylevel', 'in' => ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'privpassphrase')],
 																['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
 										]]
-									]],
-									['else' => true, 'type' => API_OBJECT, 'fields' => []]
+								]],
+								['else' => true, 'type' => API_OBJECT, 'fields' => []]
 				]]
 			]],
-			['if' => ['field' => 'custom_interfaces', 'in' => HOST_PROT_INTERFACES_INHERIT], 'type' => API_OBJECTS, 'fields' => []]
+			['else' => true, 'type' => API_OBJECTS, 'fields' => []]
 		]];
 	}
 
