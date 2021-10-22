@@ -406,8 +406,6 @@ class CHostPrototype extends CHostBase {
 	/**
 	 * Validates the input parameters for the create() method.
 	 *
-	 * @static
-	 *
 	 * @param array $host_prototypes
 	 *
 	 * @throws APIException if the input is invalid.
@@ -1012,8 +1010,6 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @param array $host_prototypeids
 	 *
 	 * @return array
@@ -1083,8 +1079,6 @@ class CHostPrototype extends CHostBase {
 	/**
 	 * Check for duplicated names and hosts.
 	 *
-	 * @static
-	 *
 	 * @param array      $host_prototypes
 	 * @param array|null $db_host_prototypes
 	 *
@@ -1134,8 +1128,6 @@ class CHostPrototype extends CHostBase {
 	 * Check that only host prototypes on templates have UUID. Add UUID to all host prototypes on templates,
 	 * if it doesn't exist.
 	 *
-	 * @static
-	 *
 	 * @param array $host_prototypes
 	 *
 	 * @throws APIException
@@ -1182,8 +1174,6 @@ class CHostPrototype extends CHostBase {
 	/**
 	 * Checks if the current user has access to the given LLD rules.
 	 *
-	 * @static
-	 *
 	 * @param array $host_prototypes
 	 *
 	 * @throws APIException if the user doesn't have write permissions for the given LLD rules
@@ -1220,8 +1210,6 @@ class CHostPrototype extends CHostBase {
 
 	/**
 	 * Checks if the current user has access to the given host groups.
-	 *
-	 * @static
 	 *
 	 * @param array $host_prototypes
 	 * @param array $db_host_prototypes
@@ -1273,8 +1261,6 @@ class CHostPrototype extends CHostBase {
 	/**
 	 * Checks if the current user has access to the given host prototypes.
 	 *
-	 * @static
-	 *
 	 * @param array $host_prototypeids
 	 *
 	 * @throws APIException if the user doesn't have write permissions for the host prototypes.
@@ -1300,8 +1286,6 @@ class CHostPrototype extends CHostBase {
 	/**
 	 * Checks if the given host prototypes are not inherited from a template.
 	 *
-	 * @static
-	 *
 	 * @param array $host_prototypeids
 	 *
 	 * @throws APIException  if at least one host prototype is inherited
@@ -1317,8 +1301,6 @@ class CHostPrototype extends CHostBase {
 	/**
 	 * Check if main interfaces are correctly set for every interface type. Each host must either have only one main
 	 * interface for each interface type, or have no interface of that type at all.
-	 *
-	 * @static
 	 *
 	 * @param array $host_prototype  Host prototype object.
 	 * @param array $interfaces      All single host prototype interfaces including existing ones in DB.
@@ -1367,8 +1349,6 @@ class CHostPrototype extends CHostBase {
 	 * Deletes the given group prototype and all discovered groups.
 	 * Deletes also group prototype children.
 	 *
-	 * @static
-	 *
 	 * @param array $group_prototypeids
 	 */
 	private static function deleteGroupPrototypes(array $group_prototypeids): void {
@@ -1401,8 +1381,6 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @param array      $host_prototypes
 	 * @param string     $method
 	 * @param array|null $db_host_prototypes
@@ -1498,8 +1476,6 @@ class CHostPrototype extends CHostBase {
 	/**
 	 * Compare two interface. Return true if they are same, return false otherwise.
 	 *
-	 * @static
-	 *
 	 * @param array $host_interface
 	 * @param array $db_interfaces
 	 *
@@ -1534,8 +1510,6 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @param array      $host_prototypes
 	 * @param string     $method
 	 * @param array|null $db_host_prototypes
@@ -1596,8 +1570,6 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @param array      $host_prototypes
 	 * @param string     $method
 	 * @param array|null $db_host_prototypes
@@ -1698,8 +1670,6 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @param array      $host_prototypes
 	 * @param string     $method
 	 * @param array|null $db_host_prototypes
@@ -1889,8 +1859,6 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @param array $host_prototypes
 	 */
 	private static function createHostDiscoveries(array $host_prototypes): void {
@@ -1909,8 +1877,6 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @return array
 	 */
 	private static function getInterfacesValidationRules(): array {
@@ -1973,8 +1939,6 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @param array $host_prototypes
 	 * @param array $db_host_prototypes
 	 */
