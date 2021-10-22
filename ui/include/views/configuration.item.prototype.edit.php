@@ -929,5 +929,4 @@ $widget->show();
 		'field_switches' => CItemData::fieldSwitchingConfiguration($data),
 		'interface_types' => itemTypeInterface()
 	]).');
-'))
-	->show();
+'))->show();

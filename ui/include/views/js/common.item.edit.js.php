@@ -138,8 +138,8 @@
 
 		$('#parameters_table').dynamicRows({template: '#parameters_table_row'});
 
-		const item_interface_types = item_form.interface_types,
-			interface_ids_by_types = {};
+		const item_interface_types = item_form.interface_types;
+		const interface_ids_by_types = {};
 
 		for (const interface of Object.values(item_form.interfaces)) {
 			if (typeof interface_ids_by_types[interface.type] === 'undefined') {
@@ -251,7 +251,7 @@
 				this.form.querySelector('#js-item-type-hint')
 					.classList.toggle(<?= json_encode(ZBX_STYLE_DISPLAY_NONE) ?>, (
 						this.preprocessing_active || this.inferred_type === null
-								|| this.item_tab_type_field.value == this.inferred_type
+							|| this.item_tab_type_field.value == this.inferred_type
 					));
 			});
 
@@ -265,9 +265,9 @@
 				});
 			});
 
-			this.form.querySelector('#preprocessing').addEventListener('item.preprocessing.change',
-				() => this.updatePreprocessingState()
-			);
+			this.form.querySelector('#preprocessing').addEventListener('item.preprocessing.change', () => {
+				this.updatePreprocessingState();
+			});
 
 			this.updatePreprocessingState();
 
@@ -276,9 +276,9 @@
 
 		updatePreprocessingState() {
 			const last_state_active = this.preprocessing_active;
-				change_event = new CustomEvent('change');
+			const change_event = new CustomEvent('change');
 
-			this.preprocessing_active = (this.form.querySelector('.preprocessing-step') != null);
+			this.preprocessing_active = (this.form.querySelector('.preprocessing-step') !== null);
 
 			if (last_state_active && !this.preprocessing_active) {
 				this.last_lookup = '';
@@ -325,8 +325,9 @@
 				this.inferred_type = this.key_type_suggestions[this.last_lookup];
 			}
 			else {
-				const matches = Object.entries(this.key_type_suggestions)
-						.filter(([key_name, value_type]) => key_name.startsWith(this.last_lookup));
+				const matches = Object.entries(this.key_type_suggestions).filter(([key_name, value_type]) => {
+					key_name.startsWith(this.last_lookup);
+				});
 
 				if (matches.length > 0) {
 					const sample_type = matches[0][1];

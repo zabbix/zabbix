@@ -119,8 +119,6 @@ $query_fields->items = [json_encode($query_fields_data)];
 // Prepare ITEM_TYPE_SCRIPT parameters.
 $parameters_data = [];
 
-// Prepare ITEM_TYPE_SCRIPT parameters.
-$parameters_data = [];
 if ($data['parameters']) {
 	$parameters_data = $data['parameters'];
 }
@@ -978,7 +976,7 @@ else {
 $form->addItem($tab);
 $widget->addItem($form);
 
-require_once dirname(__FILE__).'/js/configuration.host.discovery.edit.js.php';
+require_once __DIR__.'/js/configuration.host.discovery.edit.js.php';
 
 $widget->show();
 
@@ -989,5 +987,4 @@ $widget->show();
 		'field_switches' => CItemData::fieldSwitchingConfiguration($data),
 		'interface_types' => itemTypeInterface()
 	]).');
-'))
-	->show();
+'))->show();

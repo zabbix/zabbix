@@ -1050,7 +1050,7 @@ else {
 $form->addItem($item_tabs);
 $widget->addItem($form);
 
-require_once dirname(__FILE__).'/js/configuration.item.edit.js.php';
+require_once __DIR__.'/js/configuration.item.edit.js.php';
 
 $widget->show();
 
@@ -1062,5 +1062,4 @@ $widget->show();
 		'field_switches' => CItemData::fieldSwitchingConfiguration($data),
 		'interface_types' => itemTypeInterface()
 	]).');
-'))
-	->show();
+'))->show();
