@@ -3497,6 +3497,7 @@ Changes for 4.0.36rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-19872] removed redundant escaping in XML data of HTTP agent POST request (asestakovs)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.35
