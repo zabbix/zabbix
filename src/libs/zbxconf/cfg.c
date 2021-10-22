@@ -593,6 +593,40 @@ int	check_cfg_feature_str(const char *parameter, const char *value, const char *
 	return SUCCEED;
 }
 
+void	zbx_addr_free(zbx_addr_t *addr)
+{
+	zbx_free(addr->ip);
+	zbx_free(addr);
+}
+
+void	zbx_addr_copy(zbx_vector_ptr_t *addr_to, const zbx_vector_ptr_t *addr_from)
+{
+	int	j;
+
+	for (j = 0; j < addr_from->values_num; j++)
+	{
+		const zbx_addr_t	*addr;
+		zbx_addr_t		*addr_ptr;
+
+		addr = (const zbx_addr_t *)addr_from->values[j];
+
+		addr_ptr = zbx_malloc(NULL, sizeof(zbx_addr_t));
+		addr_ptr->ip = zbx_strdup(NULL, addr->ip);
+		addr_ptr->port = addr->port;
+		zbx_vector_ptr_append(addr_to, addr_ptr);
+	}
+}
+
+static int	addr_compare_func(const void *d1, const void *d2)
+{
+	const zbx_addr_t	*a1 = *(const zbx_addr_t * const *)d1;
+	const zbx_addr_t	*a2 = *(const zbx_addr_t * const *)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(a1->port, a2->port);
+
+	return strcmp(a1->ip, a2->ip);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_set_data_destination_hosts                                   *
@@ -601,39 +635,79 @@ int	check_cfg_feature_str(const char *parameter, const char *value, const char *
  *          using a callback function                                         *
  *                                                                            *
  ******************************************************************************/
-void	zbx_set_data_destination_hosts(char *active_hosts, add_serveractive_host_f cb, zbx_vector_str_t *hostnames)
+int	zbx_set_data_destination_hosts(char *str, unsigned short port, const char *name, add_serveractive_host_f cb,
+		zbx_vector_str_t *hostnames, void *data, char **error)
 {
-	char	*l = active_hosts, *r;
+	char			*r, *r_node;
+	zbx_vector_ptr_t	addrs, cluster_addrs;
+	int			ret = SUCCEED;
+
+	zbx_vector_ptr_create(&addrs);
+	zbx_vector_ptr_create(&cluster_addrs);
 
 	do
 	{
-		char		*host = NULL;
-		unsigned short	port;
-
-		if (NULL != (r = strchr(l, ',')))
+		if (NULL != (r = strchr(str, ',')))
 			*r = '\0';
 
-		if (SUCCEED != parse_serveractive_element(l, &host, &port, (unsigned short)ZBX_DEFAULT_SERVER_PORT))
+		do
 		{
-			zbx_error("error parsing the \"ServerActive\" parameter: address \"%s\" is invalid", l);
-			exit(EXIT_FAILURE);
-		}
+			zbx_addr_t	*addr;
 
-		if (SUCCEED != cb(host, port, hostnames))
-		{
-			zbx_error("error parsing the \"ServerActive\" parameter: address \"%s\" specified more than"
-					" once", l);
-			zbx_free(host);
-			exit(EXIT_FAILURE);
-		}
+			if (NULL != (r_node = strchr(str, ';')))
+				*r_node = '\0';
 
-		zbx_free(host);
+			addr = zbx_malloc(NULL, sizeof(zbx_addr_t));
+			addr->ip = NULL;
+
+			if (SUCCEED != parse_serveractive_element(str, &addr->ip, &addr->port, port))
+			{
+				*error = zbx_dsprintf(NULL, "error parsing the \"%s\" parameter: address \"%s\" is "
+						"invalid", name, str);
+				ret = FAIL;
+			}
+			else if (FAIL == is_supported_ip(addr->ip) && FAIL == zbx_validate_hostname(addr->ip))
+			{
+				*error = zbx_dsprintf(NULL, "error parsing the \"%s\" parameter: address \"%s\""
+						" is invalid", name, str);
+				ret = FAIL;
+			}
+			else if (SUCCEED == zbx_vector_ptr_search(&addrs, addr, addr_compare_func))
+			{
+				*error = zbx_dsprintf(NULL, "error parsing the \"%s\" parameter: address \"%s\""
+						" specified more than once", name, str);
+				ret = FAIL;
+			}
+
+			if (NULL != r_node)
+			{
+				*r_node = ';';
+				str = r_node + 1;
+			}
+
+			zbx_vector_ptr_append(&cluster_addrs, addr);
+			zbx_vector_ptr_append(&addrs, addr);
+
+			if (FAIL == ret)
+				goto fail;
+		}
+		while (NULL != r_node);
+
+		cb(&cluster_addrs, hostnames, data);
+
+		cluster_addrs.values_num = 0;
 
 		if (NULL != r)
 		{
 			*r = ',';
-			l = r + 1;
+			str = r + 1;
 		}
 	}
 	while (NULL != r);
+fail:
+	zbx_vector_ptr_destroy(&cluster_addrs);
+	zbx_vector_ptr_clear_ext(&addrs, (zbx_clean_func_t)zbx_addr_free);
+	zbx_vector_ptr_destroy(&addrs);
+
+	return ret;
 }

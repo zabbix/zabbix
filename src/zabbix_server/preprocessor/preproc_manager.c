@@ -1491,6 +1491,7 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 	zbx_preprocessing_manager_t	manager;
 	int				ret;
 	double				time_stat, time_idle = 0, time_now, time_flush, sec;
+	zbx_timespec_t			timeout = {ZBX_PREPROCESSING_MANAGER_DELAY, 0};
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -1538,7 +1539,7 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 		}
 
 		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
-		ret = zbx_ipc_service_recv(&service, ZBX_PREPROCESSING_MANAGER_DELAY, &client, &message);
+		ret = zbx_ipc_service_recv(&service, &timeout, &client, &message);
 		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 		sec = zbx_time();
 		zbx_update_env(sec);

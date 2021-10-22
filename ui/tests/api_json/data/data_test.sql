@@ -1644,3 +1644,14 @@ INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (5
 -- services
 INSERT INTO services (serviceid, name) VALUES (1, 'API Service for delete');
 INSERT INTO services (serviceid, name) VALUES (2, 'API Service for update');
+
+-- high availability nodes
+INSERT INTO ha_node (name,address,port,status,ha_nodeid) VALUES ('node1','192.168.1.5','10051','0','ckuo7i1nv00090sajelcon0su');
+INSERT INTO ha_node (name,address,port,status,ha_nodeid) VALUES ('node2','192.168.1.6','10051','0','ckuo7i1nv000a0saj1fcdkeu4');
+INSERT INTO ha_node (name,address,port,status,ha_nodeid) VALUES ('node3','192.168.1.7','10052','0','ckuo7i1nv000b0saj3j8hxm2b');
+INSERT INTO ha_node (name,address,port,status,ha_nodeid) VALUES ('node4','192.168.1.8','10052','1','ckuo7i1nv000c0sajz85xcrtt');
+INSERT INTO ha_node (name,address,port,status,ha_nodeid) VALUES ('node5','192.168.1.9','10053','1','ckuo7i1nv000d0sajd95y1b6x');
+INSERT INTO ha_node (name,address,port,status,ha_nodeid) VALUES ('node6','192.168.1.10','10053','2','ckuo7i1nw000e0sajwfttc1mp');
+INSERT INTO ha_node (name,address,port,status,ha_nodeid) VALUES ('node7','192.168.1.11','10053','2','ckuo7i1nw000f0sajtzv1c6v3');
+INSERT INTO ha_node (name,address,port,status,ha_nodeid) VALUES ('node8','192.168.1.12','10051','1','ckuo7i1nw000g0sajjsjre7e3');
+INSERT INTO ha_node (name,address,port,status,ha_nodeid) VALUES ('node-active','192.168.1.13','10051','3','ckuo7i1nw000h0sajj3l3hh8u');
