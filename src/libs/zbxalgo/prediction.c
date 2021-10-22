@@ -592,7 +592,7 @@ while(0)
 					ZBX_MATRIX_EL(coefficients, first_nonzero, 0));
 	}
 
-	radius = lower_bound = 1.0 / lower_bound;
+	radius = 1.0 / lower_bound;
 
 	/* Weierstrass (Durand-Kerner) method */
 	while (ZBX_MAX_ITERATIONS >= ++iteration && !roots_ok)

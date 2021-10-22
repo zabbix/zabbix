@@ -28,158 +28,244 @@
 	<?= CTagFilterFieldHelper::getTemplate(); ?>
 </script>
 
-<script type="text/javascript">
-	function latestPage() {
-		this.refresh_url = '<?= $data['refresh_url'] ?>';
-		this.refresh_data = <?= json_encode($data['refresh_data']) ?>;
-		this.refresh_interval = <?= $data['refresh_interval'] ?>;
-		this.running = false;
-		this.timeout = null;
-	}
+<script>
+	const view = {
+		refresh_url: null,
+		refresh_data: null,
+		refresh_interval: null,
+		running: false,
+		timeout: null,
+		_refresh_message_box: null,
+		_popup_message_box: null,
 
-	latestPage.prototype.getCurrentForm = function() {
-		return $('form[name=items]');
-	};
+		init({refresh_url, refresh_data, refresh_interval}) {
+			this.refresh_url = refresh_url;
+			this.refresh_data = refresh_data;
+			this.refresh_interval = refresh_interval;
 
-	latestPage.prototype.addMessages = function(messages) {
-		$('.wrapper main').before(messages);
-	};
+			this.liveFilter();
+			this.start();
+		},
 
-	latestPage.prototype.removeMessages = function() {
-		$('.wrapper .msg-bad').remove();
-	};
+		getCurrentForm() {
+			return $('form[name=items]');
+		},
 
-	latestPage.prototype.refresh = function() {
-		this.setLoading();
+		_addRefreshMessage(messages) {
+			this._removeRefreshMessage();
 
-		var deferred = $.ajax({
-			url: this.refresh_url,
-			data: this.refresh_data,
-			type: 'post',
-			dataType: 'json'
-		});
+			this._refresh_message_box = $($.parseHTML(messages));
+			addMessage(this._refresh_message_box);
+		},
 
-		return this.bindDataEvents(deferred);
-	};
-
-	latestPage.prototype.setLoading = function() {
-		this.getCurrentForm().addClass('is-loading is-loading-fadein delayed-15s');
-	};
-
-	latestPage.prototype.clearLoading = function() {
-		this.getCurrentForm().removeClass('is-loading is-loading-fadein delayed-15s');
-	};
-
-	latestPage.prototype.doRefresh = function(body) {
-		this.getCurrentForm().replaceWith(body);
-		chkbxRange.init();
-	};
-
-	latestPage.prototype.bindDataEvents = function(deferred) {
-		var that = this;
-
-		deferred
-			.done(function(response) {
-				that.onDataDone.call(that, response);
-			})
-			.fail(function(jqXHR) {
-				that.onDataFail.call(that, jqXHR);
-			})
-			.always(this.onDataAlways.bind(this));
-
-		return deferred;
-	};
-
-	latestPage.prototype.onDataDone = function(response) {
-		this.clearLoading();
-		this.removeMessages();
-		this.doRefresh(response.body);
-
-		if ('messages' in response) {
-			this.addMessages(response.messages);
-		}
-	};
-
-	latestPage.prototype.onDataFail = function(jqXHR) {
-		// Ignore failures caused by page unload.
-		if (jqXHR.status == 0) {
-			return;
-		}
-
-		this.clearLoading();
-
-		var messages = $(jqXHR.responseText).find('.msg-global');
-
-		if (messages.length) {
-			this.getCurrentForm().html(messages);
-		}
-		else {
-			this.getCurrentForm().html(jqXHR.responseText);
-		}
-	};
-
-	latestPage.prototype.onDataAlways = function() {
-		if (this.running) {
-			this.scheduleRefresh();
-		}
-	};
-
-	latestPage.prototype.scheduleRefresh = function() {
-		this.unscheduleRefresh();
-		this.timeout = setTimeout((function() {
-			this.timeout = null;
-			this.refresh();
-		}).bind(this), this.refresh_interval);
-	};
-
-	latestPage.prototype.unscheduleRefresh = function() {
-		if (this.timeout !== null) {
-			clearTimeout(this.timeout);
-			this.timeout = null;
-		}
-	};
-
-	latestPage.prototype.start = function() {
-		if (this.refresh_interval != 0) {
-			this.running = true;
-			this.scheduleRefresh();
-		}
-	};
-
-	latestPage.prototype.stop = function() {
-		this.running = false;
-		this.unscheduleRefresh();
-	};
-
-	latestPage.prototype.liveFilter = function() {
-		var $filter_hostids = $('#filter_hostids_'),
-			$filter_show_without_data = $('#filter_show_without_data');
-
-		$filter_hostids.on('change', function() {
-			var no_hosts_selected = !$(this).multiSelect('getData').length;
-
-			if (no_hosts_selected) {
-				$filter_show_without_data.prop('checked', true);
+		_removeRefreshMessage() {
+			if (this._refresh_message_box !== null) {
+				this._refresh_message_box.remove();
+				this._refresh_message_box = null;
 			}
+		},
 
-			$filter_show_without_data.prop('disabled', no_hosts_selected);
-		});
+		_addPopupMessage(message_box) {
+			this._removePopupMessage();
 
-		$('#filter-tags')
-			.dynamicRows({template: '#filter-tag-row-tmpl'})
-			.on('afteradd.dynamicRows', function() {
-				var rows = this.querySelectorAll('.form_row');
-				new CTagFilterItem(rows[rows.length - 1]);
+			this._popup_message_box = message_box;
+			addMessage(this._popup_message_box);
+		},
+
+		_removePopupMessage() {
+			if (this._popup_message_box !== null) {
+				this._popup_message_box.remove();
+				this._popup_message_box = null;
+			}
+		},
+
+		refresh() {
+			this.setLoading();
+
+			var deferred = $.ajax({
+				url: this.refresh_url,
+				data: this.refresh_data,
+				type: 'post',
+				dataType: 'json'
 			});
 
-		// Init existing fields once loaded.
-		document.querySelectorAll('#filter-tags .form_row').forEach(row => {
-			new CTagFilterItem(row);
-		});
-	};
+			return this.bindDataEvents(deferred);
+		},
 
-	$(function() {
-		window.latest_page = new latestPage();
-		window.latest_page.liveFilter();
-	});
+		setLoading() {
+			this.getCurrentForm().addClass('is-loading is-loading-fadein delayed-15s');
+		},
+
+		clearLoading() {
+			this.getCurrentForm().removeClass('is-loading is-loading-fadein delayed-15s');
+		},
+
+		doRefresh(body) {
+			this.getCurrentForm().replaceWith(body);
+			chkbxRange.init();
+		},
+
+		bindDataEvents(deferred) {
+			var that = this;
+
+			deferred
+				.done(function(response) {
+					that.onDataDone.call(that, response);
+				})
+				.fail(function(jqXHR) {
+					that.onDataFail.call(that, jqXHR);
+				})
+				.always(this.onDataAlways.bind(this));
+
+			return deferred;
+		},
+
+		onDataDone(response) {
+			this.clearLoading();
+			this._removeRefreshMessage();
+			this.doRefresh(response.body);
+
+			if ('messages' in response) {
+				this._addRefreshMessage(response.messages);
+			}
+		},
+
+		onDataFail(jqXHR) {
+			// Ignore failures caused by page unload.
+			if (jqXHR.status == 0) {
+				return;
+			}
+
+			this.clearLoading();
+
+			var messages = $(jqXHR.responseText).find('.msg-global');
+
+			if (messages.length) {
+				this.getCurrentForm().html(messages);
+			}
+			else {
+				this.getCurrentForm().html(jqXHR.responseText);
+			}
+		},
+
+		onDataAlways() {
+			if (this.running) {
+				this.scheduleRefresh();
+			}
+		},
+
+		scheduleRefresh() {
+			this.unscheduleRefresh();
+			this.timeout = setTimeout((function() {
+				this.timeout = null;
+				this.refresh();
+			}).bind(this), this.refresh_interval);
+		},
+
+		unscheduleRefresh() {
+			if (this.timeout !== null) {
+				clearTimeout(this.timeout);
+				this.timeout = null;
+			}
+		},
+
+		start() {
+			if (this.refresh_interval != 0) {
+				this.running = true;
+				this.scheduleRefresh();
+			}
+		},
+
+		stop() {
+			this.running = false;
+			this.unscheduleRefresh();
+		},
+
+		liveFilter() {
+			var $filter_hostids = $('#filter_hostids_'),
+				$filter_show_without_data = $('#filter_show_without_data');
+
+			$filter_hostids.on('change', function() {
+				var no_hosts_selected = !$(this).multiSelect('getData').length;
+
+				if (no_hosts_selected) {
+					$filter_show_without_data.prop('checked', true);
+				}
+
+				$filter_show_without_data.prop('disabled', no_hosts_selected);
+			});
+
+			$('#filter-tags')
+				.dynamicRows({template: '#filter-tag-row-tmpl'})
+				.on('afteradd.dynamicRows', function() {
+					var rows = this.querySelectorAll('.form_row');
+					new CTagFilterItem(rows[rows.length - 1]);
+				});
+
+			// Init existing fields once loaded.
+			document.querySelectorAll('#filter-tags .form_row').forEach(row => {
+				new CTagFilterItem(row);
+			});
+		},
+
+		editHost(hostid) {
+			const host_data = {hostid};
+
+			this.openHostPopup(host_data);
+		},
+
+		openHostPopup(host_data) {
+			this._removePopupMessage();
+			const original_url = location.href;
+
+			const overlay = PopUp('popup.host.edit', host_data, 'host_edit', document.activeElement);
+
+			this.unscheduleRefresh();
+
+			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostDelete, {once: true});
+			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+				history.replaceState({}, '', original_url);
+				this.scheduleRefresh();
+			}, {once: true});
+		},
+
+		events: {
+			hostSuccess(e) {
+				const data = e.detail;
+
+				if ('success' in data) {
+					const title = data.success.title;
+					let messages = [];
+
+					if ('messages' in data.success) {
+						messages = data.success.messages;
+					}
+
+					view._addPopupMessage(makeMessageBox('good', messages, title));
+				}
+
+				view.refresh();
+			},
+
+			hostDelete(e) {
+				const data = e.detail;
+
+				if ('success' in data) {
+					const title = data.success.title;
+					let messages = [];
+
+					if ('messages' in data.success) {
+						messages = data.success.messages;
+					}
+
+					view._addPopupMessage(makeMessageBox('good', messages, title));
+				}
+
+				uncheckTableRows('');
+				view.refresh();
+			}
+		}
+	}
 </script>

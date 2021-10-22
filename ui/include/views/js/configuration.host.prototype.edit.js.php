@@ -36,6 +36,10 @@
 	</tr>
 </script>
 
+<script type="text/x-jquery-tmpl" id="host-interface-row-tmpl">
+	<?= (new CPartial('configuration.host.interface.row'))->getOutput() ?>
+</script>
+
 <script type="text/javascript">
 	class InterfaceSourceSwitcher extends CBaseComponent {
 		constructor(target, source_input, add_button, data) {
@@ -72,19 +76,25 @@
 		}
 
 		initInherit() {
-			const hostInterfaceManagerInherit = new HostInterfaceManager(this._data.inherited_interfaces);
+			const host_interface_row_tmpl = document.getElementById('host-interface-row-tmpl').innerHTML;
+			const hostInterfaceManagerInherit = new HostInterfaceManager(this._data.inherited_interfaces,
+				host_interface_row_tmpl
+			);
 			hostInterfaceManagerInherit.setAllowEmptyMessage(!this._data.parent_is_template);
 			hostInterfaceManagerInherit.render();
-			HostInterfaceManager.makeReadonly();
+			hostInterfaceManagerInherit.makeReadonly();
 		}
 
 		initCustom() {
+			const host_interface_row_tmpl = document.getElementById('host-interface-row-tmpl').innerHTML;
 			// This is in global space, as Add functions uses it.
-			window.hostInterfaceManager = new HostInterfaceManager(this._data.custom_interfaces);
+			window.hostInterfaceManager = new HostInterfaceManager(this._data.custom_interfaces,
+				host_interface_row_tmpl
+			);
 			hostInterfaceManager.render();
 
 			if (this._data.is_templated) {
-				HostInterfaceManager.makeReadonly();
+				hostInterfaceManager.makeReadonly();
 			}
 		}
 
@@ -154,6 +164,8 @@
 	}
 
 	jQuery(function() {
+		'use strict';
+
 		const interface_source_switcher = new InterfaceSourceSwitcher(
 			document.getElementById('interfaces-table'),
 			document.getElementById('custom_interfaces'),
@@ -190,5 +202,49 @@
 			jQuery('#tbl_group_prototypes').find('input').prop('readonly', true);
 			jQuery('#tbl_group_prototypes').find('button').prop('disabled', true);
 		<?php endif ?>
+
+		jQuery('#tls_connect, #tls_in_psk, #tls_in_cert').change(function() {
+			jQuery('#tls_issuer, #tls_subject').closest('li').toggle(jQuery('#tls_in_cert').is(':checked')
+					|| jQuery('input[name=tls_connect]:checked').val() == <?= HOST_ENCRYPTION_CERTIFICATE ?>);
+
+			jQuery('#tls_psk, #tls_psk_identity, .tls_psk').closest('li').toggle(jQuery('#tls_in_psk').is(':checked')
+					|| jQuery('input[name=tls_connect]:checked').val() == <?= HOST_ENCRYPTION_PSK ?>);
+		});
+
+		jQuery('input[name=inventory_mode]').click(function() {
+			// Action depending on which button was clicked.
+			const $inventory_fields = jQuery('#inventorylist :input:gt(2)');
+
+			switch (this.value) {
+				case '<?= HOST_INVENTORY_DISABLED ?>':
+					$inventory_fields.prop('disabled', true);
+					jQuery('.populating_item').hide();
+					break;
+				case '<?= HOST_INVENTORY_MANUAL ?>':
+					$inventory_fields.prop('disabled', false);
+					jQuery('.populating_item').hide();
+					break;
+				case '<?= HOST_INVENTORY_AUTOMATIC ?>':
+					$inventory_fields.prop('disabled', false);
+					$inventory_fields.filter('.linked_to_item').prop('disabled', true);
+					jQuery('.populating_item').show();
+					break;
+			}
+		});
+
+		// Refresh field visibility on document load.
+		let tls_accept = jQuery('#tls_accept').val();
+
+		if ((tls_accept & <?= HOST_ENCRYPTION_NONE ?>) == <?= HOST_ENCRYPTION_NONE ?>) {
+			jQuery('#tls_in_none').prop('checked', true);
+		}
+		if ((tls_accept & <?= HOST_ENCRYPTION_PSK ?>) == <?= HOST_ENCRYPTION_PSK ?>) {
+			jQuery('#tls_in_psk').prop('checked', true);
+		}
+		if ((tls_accept & <?= HOST_ENCRYPTION_CERTIFICATE ?>) == <?= HOST_ENCRYPTION_CERTIFICATE ?>) {
+			jQuery('#tls_in_cert').prop('checked', true);
+		}
+
+		jQuery('input[name=tls_connect]').trigger('change');
 	});
 </script>

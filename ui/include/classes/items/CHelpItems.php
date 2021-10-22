@@ -233,7 +233,7 @@ class CHelpItems {
 					'description' => _('CPU utilization percentage. Returns float')
 				],
 				[
-					'key' => 'system.hostname[<type>]',
+					'key' => 'system.hostname[<type>,<transform>]',
 					'description' => _('System host name. Returns string')
 				],
 				[
@@ -615,7 +615,7 @@ class CHelpItems {
 					'description' => _('CPU utilization percentage. Returns float')
 				],
 				[
-					'key' => 'system.hostname[<type>]',
+					'key' => 'system.hostname[<type>,<transform>]',
 					'description' => _('System host name. Returns string')
 				],
 				[
