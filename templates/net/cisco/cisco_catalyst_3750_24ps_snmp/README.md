@@ -3,7 +3,7 @@
 
 ## Overview
 
-![Product picture](images/pic.png)
+![Product picture](images/pic.png?raw=true)
 > Courtesy of Cisco Systems, Inc. Unauthorized use not permitted.
 
 For Zabbix version: 5.0 and higher  
