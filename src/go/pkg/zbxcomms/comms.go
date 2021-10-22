@@ -62,7 +62,8 @@ type Listener struct {
 	tlsconfig *tls.Config
 }
 
-func open(address string, localAddr *net.Addr, timeout time.Duration, connect_timeout time.Duration, timeoutMode int, args ...interface{}) (c *Connection, err error) {
+func open(address string, localAddr *net.Addr, timeout time.Duration, connect_timeout time.Duration, timeoutMode int,
+	args ...interface{}) (c *Connection, err error) {
 	c = &Connection{state: connStateConnect, compress: true, timeout: timeout, timeoutMode: timeoutMode}
 	d := net.Dialer{Timeout: connect_timeout, LocalAddr: *localAddr}
 	c.conn, err = d.Dial("tcp", address)
@@ -328,7 +329,8 @@ func (c *Listener) Close() (err error) {
 	return c.listener.Close()
 }
 
-func Exchange(addresses *[]string, localAddr *net.Addr, timeout time.Duration, connect_timeout time.Duration, data []byte, args ...interface{}) ([]byte, []error) {
+func Exchange(addresses *[]string, localAddr *net.Addr, timeout time.Duration, connect_timeout time.Duration,
+	data []byte, args ...interface{}) ([]byte, []error) {
 	log.Tracef("connecting to %s [timeout:%s, connection timeout:%s]", *addresses, timeout, connect_timeout)
 
 	var tlsconfig *tls.Config
@@ -341,6 +343,7 @@ func Exchange(addresses *[]string, localAddr *net.Addr, timeout time.Duration, c
 		if tlsconfig, ok = args[0].(*tls.Config); !ok {
 			errs = append(errs, fmt.Errorf("invalid TLS configuration parameter of type %T", args[0]))
 			log.Tracef("%s", errs[len(errs)-1])
+
 			return nil, errs
 		}
 	}
@@ -371,6 +374,7 @@ func Exchange(addresses *[]string, localAddr *net.Addr, timeout time.Duration, c
 	if err != nil {
 		errs = append(errs, fmt.Errorf("cannot send to [%s]: %s", (*addresses)[0], err))
 		log.Tracef("%s", errs[len(errs)-1])
+
 		return nil, errs
 	}
 
@@ -380,6 +384,7 @@ func Exchange(addresses *[]string, localAddr *net.Addr, timeout time.Duration, c
 	if err != nil {
 		errs = append(errs, fmt.Errorf("cannot receive data from [%s]: %s", (*addresses)[0], err))
 		log.Tracef("%s", errs[len(errs)-1])
+
 		return nil, errs
 	}
 	log.Tracef("received [%s] from [%s]", string(b), (*addresses)[0])
@@ -387,6 +392,7 @@ func Exchange(addresses *[]string, localAddr *net.Addr, timeout time.Duration, c
 	if len(b) == 0 {
 		errs = append(errs, fmt.Errorf("connection closed"))
 		log.Tracef("%s", errs[len(errs)-1])
+
 		return nil, errs
 	}
 

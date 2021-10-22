@@ -174,7 +174,8 @@ func (c *Connector) refreshActiveChecks() {
 		return
 	}
 
-	data, errs := zbxcomms.Exchange(&c.addresses, &c.localAddr, time.Second*time.Duration(c.options.Timeout), time.Second*time.Duration(c.options.Timeout), request, c.tlsConfig)
+	data, errs := zbxcomms.Exchange(&c.addresses, &c.localAddr, time.Second*time.Duration(c.options.Timeout),
+		time.Second*time.Duration(c.options.Timeout), request, c.tlsConfig)
 
 	if errs != nil {
 		if !reflect.DeepEqual(errs, c.lastErrors) {
@@ -338,7 +339,8 @@ func (c *Connector) updateOptions(options *agent.AgentOptions) {
 	c.localAddr = &net.TCPAddr{IP: net.ParseIP(agent.Options.SourceIP), Port: 0}
 }
 
-func New(taskManager scheduler.Scheduler, addresses []string, hostname string, options *agent.AgentOptions) (connector *Connector, err error) {
+func New(taskManager scheduler.Scheduler, addresses []string, hostname string,
+	options *agent.AgentOptions) (connector *Connector, err error) {
 	c := &Connector{
 		taskManager: taskManager,
 		addresses:   addresses,
