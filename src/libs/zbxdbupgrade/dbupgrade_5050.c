@@ -825,6 +825,7 @@ static int	DBpatch_5050077(void)
 }
 
 static int	DBpatch_5050078(void)
+{
 	const ZBX_FIELD	field = {"ha_failover_delay", "1m", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
