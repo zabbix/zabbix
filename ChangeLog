@@ -1075,8 +1075,27 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.18rc1
 
 New features:
+.......PS. [ZBXNEXT-2475] added handling of compressed content to web monitoring (akozlovs)
+...G...... [ZBXNEXT-6782] added new parameters for system.hostname (dgoloscapov)
+...G...... [ZBXNEXT-6677] added cpu percent field to docker.container_stats key for docker plugin in Zabbix agent 2 (esneiders)
+.......PS. [ZBXNEXT-6608] added support for vmware key named 'vmware.hv.sensors.get' (MVekslers)
+.......PS. [ZBXNEXT-6644] added support for vmware key named 'vmware.hv.maintenance' (MVekslers)
 
 Bug fixes:
+.........T [ZBX-19958] fixed macro with regular expression for interfaces discovery in OS linux template (vkhaliev)
+........S. [ZBX-20065] fixed count() function gt,ge,lt,le operations (dgoloscapov, wiper)
+..F....... [ZBX-18611] fixed division by zero error due to small graph size when using gradient lines (Ivo)
+A......... [ZBX-20079] fixed web scenarios import / export error when authentication method is kerberos (rlataria)
+...G...... [ZBX-18988] added vm.vmemory.size metric to Zabbix agent 2 for Windows (esneiders)
+.........T [ZBX-19569] changed linked template "Zabbix agent" to "Zabbix agent active" in templates "Windows by Zabbix agent active" and "Linux by Zabbix agent active" (mchudinov)
+.........T [ZBX-18554] fixed MSSQL by ODBC README (abiba)
+........S. [ZBX-19872] removed redundant escaping in XML data of HTTP agent POST request (asestakovs)
+.........T [ZBX-19920] changed setup instruction in README of the "IIS by Zabbix agent" template (mchudinov)
+.........T [ZBX-19237] changed condition in SQL request of pgsql.connections.sum.waiting item in DB PostgreSQL template to exclude rows with idle state (mchudinov)
+.........T [ZBX-20019] fixed README file in Oracle by Zabbix Agent 2 template (vkhaliev)
+.........T [ZBX-19622] fixed interface operstate valuemap in the linux templates (afayantsev)
+...G...... [ZBXNEXT-6708] fixed 3rd parameter for Zabbix agent 2 web.certificate.get plugin (esneiders)
+.........T [ZBX-20017] added new metrics, fixed update intervals in the "F5 Big-IP" template (abakaldin)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.17
