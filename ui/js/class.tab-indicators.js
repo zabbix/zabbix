@@ -345,18 +345,17 @@ class LinkedTemplateTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		const target_node = document.querySelector('#linked-template');
-		const multiselect_node = document.querySelector('#add_templates_');
 		let count = 0;
+		const target_node = document.querySelector('#linked-template');
 
-		// Count saved templates.
 		if (target_node !== null) {
 			count += target_node
 				.querySelectorAll('tbody tr')
 				.length;
 		}
 
-		// Count new templates in multiselect.
+		const multiselect_node = document.querySelector('#add_templates_');
+
 		if (multiselect_node !== null) {
 			count += multiselect_node
 				.querySelectorAll('.selected li')
@@ -367,7 +366,6 @@ class LinkedTemplateTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		const multiselect_node = document.querySelector('#add_templates_');
 		const linked_node = document.querySelector('#linked-template');
 
 		if (linked_node !== null) {
@@ -380,6 +378,8 @@ class LinkedTemplateTabIndicatorItem extends TabIndicatorItem {
 				subtree: true
 			});
 		}
+
+		const multiselect_node = document.querySelector('#add_templates_');
 
 		if (multiselect_node !== null) {
 			const multiselect_observer = new MutationObserver(() => {
