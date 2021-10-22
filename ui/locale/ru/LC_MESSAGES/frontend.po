@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-08 19:53+0300\n"
+"POT-Creation-Date: 2021-10-22 19:54+0300\n"
 "PO-Revision-Date: 2021-06-17 14:02+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -15,7 +15,7 @@ msgstr ""
 "X-Poedit-Basepath: ../../\n"
 "X-POOTLE-MTIME: 1623931354.000000\n"
 
-#: include/classes/items/CHelpItems.php:1073
+#: include/classes/items/CHelpItems.php:1081
 msgid "\tThe average time a read from the virtual disk takes , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
 msgstr "\tСреднее время чтения с виртуального диска, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware, <экземпляр> - экземпляр дискового устройства"
 
@@ -35,9 +35,9 @@ msgstr "\"%1$s\" вместо \"%2$s\""
 #: include/classes/import/validators/C40XmlValidator.php:1258
 #: include/classes/import/validators/C42XmlValidator.php:1316
 #: include/classes/import/validators/C44XmlValidator.php:1721
-#: include/classes/import/validators/C50XmlValidator.php:1864
-#: include/classes/import/validators/C52XmlValidator.php:1986
-#: include/classes/import/validators/C54XmlValidator.php:2041
+#: include/classes/import/validators/C50XmlValidator.php:1871
+#: include/classes/import/validators/C52XmlValidator.php:1993
+#: include/classes/import/validators/C54XmlValidator.php:2048
 #, c-format
 msgid "\"%1$s\" is expected"
 msgstr "\"%1$s\" ожидалось"
@@ -1110,11 +1110,11 @@ msgstr "Разрешенные методы"
 msgid "Alternatively, you can install it manually:"
 msgstr "В качестве альтернативы, вы можете установить его вручную:"
 
-#: include/classes/items/CHelpItems.php:989
+#: include/classes/items/CHelpItems.php:997
 msgid "Amount of guest physical memory that is swapped out to the swap space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Количество физической памяти гостя, которое выгружено в файл подкачки, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:1013
+#: include/classes/items/CHelpItems.php:1021
 msgid "Amount of host physical memory consumed for backing up guest physical memory pages, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Общее количество потребляемой физической памяти хоста на резервное копирование страниц физической памяти гостя,  <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
@@ -1506,11 +1506,11 @@ msgstr "Доступен"
 msgid "Average"
 msgstr "Средняя"
 
-#: include/classes/items/CHelpItems.php:1069
+#: include/classes/items/CHelpItems.php:1077
 msgid "Average number of outstanding read requests to the virtual disk during the collection interval , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
 msgstr "Среднее количество ожидающих запросов чтения к виртуальному диску в течении интервала опроса, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware, <экземпляр> - экземпляр дискового устройства"
 
-#: include/classes/items/CHelpItems.php:1089
+#: include/classes/items/CHelpItems.php:1097
 msgid "Average number of outstanding write requests to the virtual disk during the collection interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
 msgstr "Среднее количество ожидающих запросов записи к виртуальному диску в течении интервала опроса, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware, <экземпляр> - экземпляр дискового устройства"
 
@@ -1677,7 +1677,7 @@ msgstr "Информация о ЦПУ. Возвращает строку или
 msgid "CPU load. Returns float"
 msgstr "Загрузка ЦПУ. Возвращает дробное значение"
 
-#: include/classes/items/CHelpItems.php:969
+#: include/classes/items/CHelpItems.php:977
 msgid "CPU time spent waiting for swap-in, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance"
 msgstr "Затраченное время CPU на ожидание операций к файлу подкачки, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware, <экземпляр> - экземпляр CPU"
 
@@ -1689,7 +1689,7 @@ msgstr "Использование CPU в процентном отношени�
 msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Использование CPU в процентном отношении в течении интервала, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
-#: include/classes/items/CHelpItems.php:977
+#: include/classes/items/CHelpItems.php:985
 msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Использование CPU в процентном отношении в течении интервала, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
@@ -3186,11 +3186,11 @@ msgstr "Регистрозависимое имя входа"
 msgid "Catalan (ca_ES)"
 msgstr "Каталонский (ca_ES)"
 
-#: include/classes/items/CHelpItems.php:1123
+#: include/classes/items/CHelpItems.php:1131
 msgid "Catches all SNMP traps that match regex. If regexp is unspecified, catches any trap."
 msgstr "Отлов всех SNMP трапов, которые совпадают с регулярным выражением. Если регулярное выражение не задано, под условие попадают все трапы."
 
-#: include/classes/items/CHelpItems.php:1119
+#: include/classes/items/CHelpItems.php:1127
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
 msgstr "Отлов всех SNMP трапов, которые не были пойманы ни одним элементом данных snmptrap[]."
 
@@ -3648,7 +3648,7 @@ msgstr "Дубликаты условий для корреляции \"%1$s\"."
 msgid "Configuration"
 msgstr "Настройка"
 
-#: include/classes/items/CHelpItems.php:1213
+#: include/classes/items/CHelpItems.php:1221
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "Статистика конфигурационного кэша. Кэш - буфер (режимы: pfree, total, used, free)."
 
@@ -4109,11 +4109,11 @@ msgstr "Количество совпадающих строк в монитор
 msgid "Count of matched lines in log file monitoring. Returns integer"
 msgstr "Количество совпадающих строк в мониторинге файлов журналов. Возвращает целое число"
 
-#: include/classes/items/CHelpItems.php:1189
+#: include/classes/items/CHelpItems.php:1197
 msgid "Count of values enqueued in the low-level discovery processing queue."
 msgstr "Количество значений в очереди низкоуровневого обнаружения на обработку."
 
-#: include/classes/items/CHelpItems.php:1193
+#: include/classes/items/CHelpItems.php:1201
 msgid "Count of values enqueued in the preprocessing queue."
 msgstr "Количество значений в очереди на предварительную обработку."
 
@@ -4552,7 +4552,7 @@ msgstr "Панели"
 msgid "Dashed line"
 msgstr "Пунктирная линия"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:2214
+#: include/classes/graphdraw/CLineGraphDraw.php:2223
 #: include/classes/graphdraw/CPieGraphDraw.php:772
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
@@ -5510,15 +5510,15 @@ msgstr "Обнаружение хранилищ данных гипервизо�
 msgid "Discovery of VMware hypervisors, <url> - VMware service URL. Returns JSON"
 msgstr "Обнаружение гипервизоров VMware, <url> - URL службы VMware. Возвращает JSON"
 
-#: include/classes/items/CHelpItems.php:1097
+#: include/classes/items/CHelpItems.php:1105
 msgid "Discovery of VMware virtual machine disk devices, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
 msgstr "Обнаружение устройств дисков виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware. Возвращает JSON"
 
-#: include/classes/items/CHelpItems.php:1109
+#: include/classes/items/CHelpItems.php:1117
 msgid "Discovery of VMware virtual machine file systems, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
 msgstr "Обнаружение файловых систем виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware. Возвращает JSON"
 
-#: include/classes/items/CHelpItems.php:985
+#: include/classes/items/CHelpItems.php:993
 msgid "Discovery of VMware virtual machines, <url> - VMware service URL. Returns JSON"
 msgstr "Обнаружение виртуальных машин VMware, <url> - URL службы VMware. Возвращает JSON"
 
@@ -8091,7 +8091,7 @@ msgstr "Интерфейсы IPMI"
 msgid "IPMI sensor"
 msgstr "IPMI датчик"
 
-#: include/classes/items/CHelpItems.php:1299
+#: include/classes/items/CHelpItems.php:1307
 msgid "IPMI sensor IDs and other sensor-related parameters. Returns JSON."
 msgstr "ID датчиков IPMI и другие связанные с датчиками параметры. Возвращает JSON."
 
@@ -9940,27 +9940,27 @@ msgstr "Ошибочный код ответа \"%1$s\"."
 #: include/classes/import/validators/C44XmlValidator.php:2115
 #: include/classes/import/validators/C44XmlValidator.php:2139
 #: include/classes/import/validators/C44XmlValidator.php:2181
-#: include/classes/import/validators/C50XmlValidator.php:1864
-#: include/classes/import/validators/C50XmlValidator.php:2126
-#: include/classes/import/validators/C50XmlValidator.php:2238
-#: include/classes/import/validators/C50XmlValidator.php:2258
-#: include/classes/import/validators/C50XmlValidator.php:2282
-#: include/classes/import/validators/C50XmlValidator.php:2324
-#: include/classes/import/validators/C52XmlValidator.php:1986
-#: include/classes/import/validators/C52XmlValidator.php:2216
-#: include/classes/import/validators/C52XmlValidator.php:2403
-#: include/classes/import/validators/C52XmlValidator.php:2423
-#: include/classes/import/validators/C52XmlValidator.php:2447
-#: include/classes/import/validators/C52XmlValidator.php:2489
-#: include/classes/import/validators/C52XmlValidator.php:2566
-#: include/classes/import/validators/C52XmlValidator.php:2572
-#: include/classes/import/validators/C54XmlValidator.php:2041
-#: include/classes/import/validators/C54XmlValidator.php:2271
-#: include/classes/import/validators/C54XmlValidator.php:2458
-#: include/classes/import/validators/C54XmlValidator.php:2478
-#: include/classes/import/validators/C54XmlValidator.php:2502
-#: include/classes/import/validators/C54XmlValidator.php:2579
-#: include/classes/import/validators/C54XmlValidator.php:2585
+#: include/classes/import/validators/C50XmlValidator.php:1871
+#: include/classes/import/validators/C50XmlValidator.php:2133
+#: include/classes/import/validators/C50XmlValidator.php:2245
+#: include/classes/import/validators/C50XmlValidator.php:2265
+#: include/classes/import/validators/C50XmlValidator.php:2289
+#: include/classes/import/validators/C50XmlValidator.php:2331
+#: include/classes/import/validators/C52XmlValidator.php:1993
+#: include/classes/import/validators/C52XmlValidator.php:2223
+#: include/classes/import/validators/C52XmlValidator.php:2410
+#: include/classes/import/validators/C52XmlValidator.php:2430
+#: include/classes/import/validators/C52XmlValidator.php:2454
+#: include/classes/import/validators/C52XmlValidator.php:2496
+#: include/classes/import/validators/C52XmlValidator.php:2573
+#: include/classes/import/validators/C52XmlValidator.php:2579
+#: include/classes/import/validators/C54XmlValidator.php:2048
+#: include/classes/import/validators/C54XmlValidator.php:2278
+#: include/classes/import/validators/C54XmlValidator.php:2465
+#: include/classes/import/validators/C54XmlValidator.php:2485
+#: include/classes/import/validators/C54XmlValidator.php:2509
+#: include/classes/import/validators/C54XmlValidator.php:2586
+#: include/classes/import/validators/C54XmlValidator.php:2592
 #: include/classes/import/validators/CXmlValidatorGeneral.php:163
 #: include/classes/import/validators/CXmlValidatorGeneral.php:182
 #: include/classes/import/validators/CXmlValidatorGeneral.php:201
@@ -12021,7 +12021,7 @@ msgstr "Время ожидания сети при тесте регулярн�
 msgid "Network timeout for script execution"
 msgstr "Время ожидания сети при выполнении скриптов"
 
-#: include/classes/items/CHelpItems.php:1053
+#: include/classes/items/CHelpItems.php:1061
 msgid "Network utilization (combined transmit-rates and receive-rates) during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance"
 msgstr "Утилизация сети (совокупность скоростей передачи и приёма) в течении интервала, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware, <экземпляр> - экземпляр сетевого интерфейса"
 
@@ -12732,7 +12732,7 @@ msgstr "Количество CPU. Возвращает целое число"
 msgid "Number of available DS paths, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - Datastore name, <partitionid> - internal id of physical device from vmware.hv.datastore.discovery"
 msgstr "Количество доступных путей к хранилищу данных, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware, <хранилище данных> - имя хранилища данных, <id раздела> - внутренний id физического устройства с vmware.hv.datastore.discovery"
 
-#: include/classes/items/CHelpItems.php:1153
+#: include/classes/items/CHelpItems.php:1161
 msgid "Number of enabled items on the host."
 msgstr "Количество активированных элементов данных у узла сети."
 
@@ -12744,25 +12744,25 @@ msgstr "Количество узлов сети (активированных/�
 msgid "Number of items (enabled/disabled/not supported)"
 msgstr "Количество элементов данных (активированных/деактивированных/неподдерживаемых)"
 
-#: include/classes/items/CHelpItems.php:1177
+#: include/classes/items/CHelpItems.php:1185
 msgid "Number of items in Zabbix database."
 msgstr "Количество элементов данных в базе данных Zabbix."
 
-#: include/classes/items/CHelpItems.php:1205
+#: include/classes/items/CHelpItems.php:1213
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr "Количество элементов данных в истории прокси, которые еще не были отправлены на сервер"
 
-#: include/classes/items/CHelpItems.php:1209
+#: include/classes/items/CHelpItems.php:1217
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
 msgstr "Количество элементов данных в очереди, которые задерживаются от и до секунд, включительно."
 
 #: include/classes/items/CHelpItems.php:389
 #: include/classes/items/CHelpItems.php:739
-#: include/classes/items/CHelpItems.php:1225
+#: include/classes/items/CHelpItems.php:1233
 msgid "Number of items in the queue which are delayed in Zabbix server or proxy by \"from\" till \"to\" seconds, inclusive."
 msgstr "Количество элементов данных в очереди, которые задерживаются на Zabbix сервере или прокси \"от\" и \"до\" секунд, включительно."
 
-#: include/classes/items/CHelpItems.php:1173
+#: include/classes/items/CHelpItems.php:1181
 msgid "Number of monitored hosts"
 msgstr "Количество наблюдаемых узлов сети"
 
@@ -12787,7 +12787,7 @@ msgstr "Количество ядер процессора гипервизор�
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Количество потоков процессора гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
-#: include/classes/items/CHelpItems.php:957
+#: include/classes/items/CHelpItems.php:965
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Количество процессоров виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
@@ -12812,15 +12812,15 @@ msgstr "Количество шаблонов"
 msgid "Number of triggers (enabled/disabled [problem/ok])"
 msgstr "Количество триггеров (активированных/деактивированных [проблема/ок])"
 
-#: include/classes/items/CHelpItems.php:1241
+#: include/classes/items/CHelpItems.php:1249
 msgid "Number of triggers in Zabbix database."
 msgstr "Количество триггеров в базе данных Zabbix."
 
-#: include/classes/items/CHelpItems.php:1181
+#: include/classes/items/CHelpItems.php:1189
 msgid "Number of unsupported items in Zabbix database."
 msgstr "Количество неподдерживаемых элементов данных в базе данных Zabbix."
 
-#: include/classes/items/CHelpItems.php:1157
+#: include/classes/items/CHelpItems.php:1165
 msgid "Number of unsupported items on the host."
 msgstr "Количество неподдерживаемых элементов данных у узла сети."
 
@@ -12833,35 +12833,35 @@ msgstr "Количество пользователей (в сети)"
 msgid "Number of users logged in. Returns integer"
 msgstr "Количество пользователей в системе. Возвращает число"
 
-#: include/classes/items/CHelpItems.php:1133
+#: include/classes/items/CHelpItems.php:1141
 msgid "Number of values stored in table HISTORY."
 msgstr "Количество значений записанных в таблице HISTORY."
 
-#: include/classes/items/CHelpItems.php:1137
+#: include/classes/items/CHelpItems.php:1145
 msgid "Number of values stored in table HISTORY_LOG."
 msgstr "Количество значений записанных в таблице HISTORY_LOG."
 
-#: include/classes/items/CHelpItems.php:1141
+#: include/classes/items/CHelpItems.php:1149
 msgid "Number of values stored in table HISTORY_STR."
 msgstr "Количество значений записанных в таблице HISTORY_STR."
 
-#: include/classes/items/CHelpItems.php:1145
+#: include/classes/items/CHelpItems.php:1153
 msgid "Number of values stored in table HISTORY_TEXT."
 msgstr "Количество значений записанных в таблице HISTORY_TEXT."
 
-#: include/classes/items/CHelpItems.php:1149
+#: include/classes/items/CHelpItems.php:1157
 msgid "Number of values stored in table HISTORY_UINT."
 msgstr "Количество значений записанных в таблице HISTORY_UINT."
 
-#: include/classes/items/CHelpItems.php:1233
+#: include/classes/items/CHelpItems.php:1241
 msgid "Number of values stored in table TRENDS."
 msgstr "Количество значений записанных в таблице TRENDS."
 
-#: include/classes/items/CHelpItems.php:1237
+#: include/classes/items/CHelpItems.php:1245
 msgid "Number of values stored in table TRENDS_UINT."
 msgstr "Количество значений записанных в таблице TRENDS_UINT."
 
-#: include/classes/items/CHelpItems.php:941
+#: include/classes/items/CHelpItems.php:949
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Количество виртуальных машин на VMware гипервизоре, <url> - URL службы VMware, <uuid> - имя хоста VMware гипервизора"
 
@@ -13752,7 +13752,7 @@ msgstr "Приостановить операции для подавленны�
 msgid "Peak memory usage: %1$s"
 msgstr "Пиковое использование памяти: %1$s"
 
-#: include/classes/items/CHelpItems.php:953
+#: include/classes/items/CHelpItems.php:961
 msgid "Percent of time the virtual machine is unable to run because it is contending for access to the physical CPU(s), <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Процент времени, когда виртуальной машине не удалось запуститься по причине конкурирования за доступ к физическим CPU, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
@@ -13760,11 +13760,11 @@ msgstr "Процент времени, когда виртуальной маш�
 msgid "Percentage"
 msgstr "Проценты"
 
-#: include/classes/items/CHelpItems.php:1037
+#: include/classes/items/CHelpItems.php:1045
 msgid "Percentage of host physical memory that has been consumed, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Процент использования физической памяти хоста, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:961
+#: include/classes/items/CHelpItems.php:969
 msgid "Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance"
 msgstr "Процент времени, когда виртуальная машина была готова, но не удалось запланировать выполнение на физическом CPU, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware, <экземпляр> - экземпляр CPU"
 
@@ -13948,7 +13948,7 @@ msgstr "Post поля"
 msgid "Post type"
 msgstr "Тип Post"
 
-#: include/classes/items/CHelpItems.php:921
+#: include/classes/items/CHelpItems.php:925
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
 msgstr "Потребляемая мощность, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware, <макс> - максимально разрешенная потребляемая мощность"
 
@@ -14872,7 +14872,7 @@ msgstr "Требуемые права доступа к узлам сети"
 msgid "Required performance (vps)"
 msgstr "Требуемое быстродействие (знч/сек)"
 
-#: include/classes/items/CHelpItems.php:1217
+#: include/classes/items/CHelpItems.php:1225
 msgid "Required performance of the Zabbix server, in new values per second expected."
 msgstr "Требуемая производительность Zabbix сервера, в ожидаемом количестве новых значений в секунду."
 
@@ -15030,19 +15030,19 @@ msgstr "Получение содержимого файла. Возвращае
 msgid "Retry"
 msgstr "Повтор"
 
-#: include/classes/items/CHelpItems.php:1289
+#: include/classes/items/CHelpItems.php:1297
 msgid "Return a JSON array with LLD macros describing the MBean objects or their attributes. Can be used for LLD."
 msgstr "Возвращает JSON массив с LLD макросами, которые описывают MBean объекты и их атрибуты. Можно использовать для LLD."
 
-#: include/classes/items/CHelpItems.php:1293
+#: include/classes/items/CHelpItems.php:1301
 msgid "Return a JSON array with MBean objects or their attributes. Compared to jmx.discovery it does not define LLD macros. Can be used for LLD."
 msgstr "Возвращает JSON массив с MBean объектами и их атрибутами. В сравнении с jmx.discovery этот ключ не задает LLD макросы. Можно использовать для LLD."
 
-#: include/classes/items/CHelpItems.php:1271
+#: include/classes/items/CHelpItems.php:1279
 msgid "Return first column of the first row of the SQL query result."
 msgstr "Возвращает первую колонку первой строки результата SQL запрос."
 
-#: include/classes/items/CHelpItems.php:1285
+#: include/classes/items/CHelpItems.php:1293
 msgid "Return value of an attribute of MBean object."
 msgstr "Возвращает значение атрибута MBean объекта."
 
@@ -15050,25 +15050,25 @@ msgstr "Возвращает значение атрибута MBean объек�
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
 msgstr "Получение времени ответа на ICMP ping в секундах. Например: 0.02"
 
-#: include/classes/items/CHelpItems.php:1165
+#: include/classes/items/CHelpItems.php:1173
 msgid "Returns a JSON array describing the host network interfaces configured in Zabbix. Can be used for LLD."
 msgstr "Возвращает JSON массив, который описывает сетевые интерфейсы узла сети в Zabbix. Можно использовать в LLD."
 
 #: include/classes/items/CHelpItems.php:385
 #: include/classes/items/CHelpItems.php:735
-#: include/classes/items/CHelpItems.php:1221
+#: include/classes/items/CHelpItems.php:1229
 msgid "Returns a JSON object containing Zabbix server or proxy internal metrics."
 msgstr "Получение JSON объекта, который содержит внутренние метрики Zabbix сервера или прокси."
 
-#: include/classes/items/CHelpItems.php:1169
+#: include/classes/items/CHelpItems.php:1177
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx."
 msgstr "Получение доступности определенного типа проверок на узле сети. Значение этого элемента данных соответствует иконкам доступности в списке узлов сети. Допустимые типы: agent, snmp, ipmi, jmx."
 
-#: include/classes/items/CHelpItems.php:1161
+#: include/classes/items/CHelpItems.php:1169
 msgid "Returns current maintenance status of the host."
 msgstr "Получение текущего состояния обслуживания узла сети."
 
-#: include/classes/items/CHelpItems.php:1185
+#: include/classes/items/CHelpItems.php:1193
 msgid "Returns information associated with Zabbix Java gateway. Valid params are: ping, version."
 msgstr "Возвращает информацию относящуюся к Zabbix Java gateway. Допустимые параметры: ping, version."
 
@@ -16374,7 +16374,7 @@ msgstr "Время начала"
 msgid "Starting TLS failed."
 msgstr "Инициализация TLS не удалась."
 
-#: include/classes/items/CHelpItems.php:1129
+#: include/classes/items/CHelpItems.php:1137
 msgid "Startup time of Zabbix server, Unix timestamp."
 msgstr "Время запуска Zabbix сервера, Unix timestamp."
 
@@ -16392,7 +16392,7 @@ msgctxt "history source selection method"
 msgid "Static"
 msgstr "Статическое"
 
-#: include/classes/items/CHelpItems.php:1265
+#: include/classes/items/CHelpItems.php:1273
 msgid "Statistics and availability of Zabbix write cache. Cache - one of values (modes: all, float, uint, str, log, text, not supported), history (modes: pfree, free, total, used, pused), index (modes: pfree, free, total, used, pused), trend (modes: pfree, free, total, used, pused)."
 msgstr "Статистика и доступность кэша записи в Zabbix. Кэш - одно из значений (режимы: all, float, uint, str, log, text, not supported), history (режимы: pfree, free, total, used, pused), index (режимы: pfree, free, total, used, pused), trend (режимы: pfree, free, total, used, pused)."
 
@@ -17106,7 +17106,7 @@ msgstr "Метод \"%1$s.%2$s\" должен вызываться без \"auth
 msgid "The Zabbix database version does not match current requirements. Your database version: %1$s. Required version: %2$s. Please contact your system administrator."
 msgstr "Версия базы данных Zabbix не соответствует текущим требованиям. Ваша версия базы данных: %1$s. Требуемая версия: %2$s. Пожалуйста, обратитесь к своему системному администратору."
 
-#: include/classes/items/CHelpItems.php:1077
+#: include/classes/items/CHelpItems.php:1085
 msgid "The average time a write to the virtual disk takes, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
 msgstr "Среднее время записи на виртуальный диск, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware, <экземпляр> - экземпляр дискового устройства"
 
@@ -17299,7 +17299,7 @@ msgstr "До"
 msgid "Time"
 msgstr "Время"
 
-#: include/classes/items/CHelpItems.php:1197
+#: include/classes/items/CHelpItems.php:1205
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
 msgstr "Время конкретного процесса Zabbix или группы процессов (задаётся <типом> и <режимом>) проведённое в <состоянии> в процентах."
 
@@ -17312,7 +17312,7 @@ msgstr "Затрачено времени:"
 msgid "Time filter default period"
 msgstr "Период фильтра времени по умолчанию "
 
-#: include/classes/items/CHelpItems.php:1201
+#: include/classes/items/CHelpItems.php:1209
 msgid "Time of proxy last access. Name - proxy name. Valid params are: lastaccess - Unix timestamp, delay - seconds."
 msgstr "Время последнего обращения прокси. Имя - имя прокси. Допустимые параметры: lastaccess - штамп времени в Unix формате, задержка - секунды."
 
@@ -17411,7 +17411,7 @@ msgstr "Всего затрачено времени на Elasticsearch: %1$s"
 msgid "Total SQL time: %1$s"
 msgstr "Всего затрачено времени на SQL: %1$s"
 
-#: include/classes/items/CHelpItems.php:993
+#: include/classes/items/CHelpItems.php:1001
 msgid "Total time elapsed, in seconds, since last operating system boot-up, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Общее время, в секундах, прошедшее с момента последней загрузки операционной системы, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
@@ -17432,11 +17432,11 @@ msgstr "Трассировка"
 msgid "Transaction has not been closed. Aborting..."
 msgstr "Транзакция не была закрыта. Откат..."
 
-#: include/classes/items/CHelpItems.php:1275
+#: include/classes/items/CHelpItems.php:1283
 msgid "Transform SQL query result into a JSON array for low-level discovery."
 msgstr "Преобразование результата SQL запроса в JSON массив для низкоуровневого обнаружения."
 
-#: include/classes/items/CHelpItems.php:1279
+#: include/classes/items/CHelpItems.php:1287
 msgid "Transform SQL query result into a JSON array."
 msgstr "Преобразование результата SQL запроса в JSON массив."
 
@@ -17467,7 +17467,7 @@ msgctxt "missing data function"
 msgid "Treat as 0"
 msgstr "В виде 0"
 
-#: include/classes/items/CHelpItems.php:1229
+#: include/classes/items/CHelpItems.php:1237
 msgid "Trend function cache statistics. Valid parameters are: all, hits, phits, misses, pmisses, items, pitems and requests."
 msgstr "Статистика кэша функции динамики изменений. Допустимые значения: all, hits, phits, misses, pmisses, items, pitems и requests."
 
@@ -18260,7 +18260,7 @@ msgstr "Карты верхнего уровня"
 msgid "Uptime"
 msgstr "Доступен"
 
-#: include/classes/items/CHelpItems.php:1245
+#: include/classes/items/CHelpItems.php:1253
 msgid "Uptime of Zabbix server process in seconds."
 msgstr "Время работы процесса Zabbix сервера в секундах."
 
@@ -18619,7 +18619,7 @@ msgstr "Атрибут имени пользователя"
 msgid "Users"
 msgstr "Пользователи"
 
-#: include/classes/items/CHelpItems.php:1261
+#: include/classes/items/CHelpItems.php:1269
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "Статистика VMware кэша. Возможные режимы: total, free, pfree, used и pused."
 
@@ -18660,7 +18660,11 @@ msgstr "Журнал событий VMware, <url> - URL службы VMware, <mo
 msgid "VMware hypervisor BIOS uuid, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Uuid BIOS гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
-#: include/classes/items/CHelpItems.php:901
+#: include/classes/items/CHelpItems.php:929
+msgid "VMware hypervisor HW vendor state sensors, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:905
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Размер ballooned памяти гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
@@ -18684,9 +18688,13 @@ msgstr "Статистика записи в хранилище данных г�
 msgid "VMware hypervisor datastores list, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Список хранилищ гипервизора VMware, <url> - URL службы VMware, <datastore> - имя хранилища"
 
-#: include/classes/items/CHelpItems.php:925
+#: include/classes/items/CHelpItems.php:933
 msgid "VMware hypervisor health state rollup sensor, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
 msgstr "Состояние агрегированного датчика работоспособности VMware, <url> - URL службы VMware, <uuid> - имя хоста VMware гипервизора. Возвращает 0 - серый; 1 - зелёный; 2 - жёлтый; 3 - красный"
+
+#: include/classes/items/CHelpItems.php:901
+msgid "VMware hypervisor maintenance status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:889
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18696,15 +18704,15 @@ msgstr "Модель гипервизора VMware, <url> - URL службы VMw
 msgid "VMware hypervisor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Имя гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
-#: include/classes/items/CHelpItems.php:909
+#: include/classes/items/CHelpItems.php:913
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "Статистика входящего трафика сетевого интервейса гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware, <mode> - bps"
 
-#: include/classes/items/CHelpItems.php:913
+#: include/classes/items/CHelpItems.php:917
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "Статистика исходящего трафика сетевого интерфейса гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware, <mode> - bps"
 
-#: include/classes/items/CHelpItems.php:917
+#: include/classes/items/CHelpItems.php:921
 msgid "VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "Счетчик производительности гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware, <path> - путь к счетчику производительности, <instance> - экземпляр счетчика производительности"
 
@@ -18720,7 +18728,7 @@ msgstr "Модель процессора гипервизора VMware, <url> -
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Использование процессора гипервизора VMware в Гц, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
-#: include/classes/items/CHelpItems.php:929
+#: include/classes/items/CHelpItems.php:937
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Состояние гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
@@ -18728,11 +18736,11 @@ msgstr "Состояние гипервизора VMware, <url> - URL служб
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Общий размер памяти гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
-#: include/classes/items/CHelpItems.php:933
+#: include/classes/items/CHelpItems.php:941
 msgid "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Время работы гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
-#: include/classes/items/CHelpItems.php:905
+#: include/classes/items/CHelpItems.php:909
 msgid "VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Размер памяти используемой гипервизором VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
@@ -18740,7 +18748,7 @@ msgstr "Размер памяти используемой гипервизор�
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Имя поставщика гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
-#: include/classes/items/CHelpItems.php:937
+#: include/classes/items/CHelpItems.php:945
 msgid "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Версия гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
@@ -18748,103 +18756,103 @@ msgstr "Версия гипервизора VMware, <url> - URL службы VMw
 msgid "VMware service full name, <url> - VMware service URL"
 msgstr "Полное имя сервиса VMware, <url> - URL службы VMware"
 
-#: include/classes/items/CHelpItems.php:945
+#: include/classes/items/CHelpItems.php:953
 msgid "VMware service version, <url> - VMware service URL"
 msgstr "Версия сервиса VMware, <url> - URL службы VMware"
 
-#: include/classes/items/CHelpItems.php:1005
+#: include/classes/items/CHelpItems.php:1013
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Размер ballooned памяти виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:1065
+#: include/classes/items/CHelpItems.php:1073
 msgid "VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Объем записанных данных на хранилище данных виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:1009
+#: include/classes/items/CHelpItems.php:1017
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Размер сжатой памяти виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:981
+#: include/classes/items/CHelpItems.php:989
 msgid "VMware virtual machine datacenter name, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns string"
 msgstr "Имя датацентра виртуальной машины VMware,  <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware. Возвращает строку"
 
-#: include/classes/items/CHelpItems.php:1101
+#: include/classes/items/CHelpItems.php:1109
 msgid "VMware virtual machine disk device read statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "Статистика чтения дискового устройства виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware, <instance> - экземпляр дискового устройства, <mode> - bps/ops - байт/операций в секунду"
 
-#: include/classes/items/CHelpItems.php:1105
+#: include/classes/items/CHelpItems.php:1113
 msgid "VMware virtual machine disk device write statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "Статистика записи на дисковое устройство виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware, <instance> - экземпляр дискового устройства, <mode> - bps/ops - байт/операций в секунду"
 
-#: include/classes/items/CHelpItems.php:1113
+#: include/classes/items/CHelpItems.php:1121
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
 msgstr "Статистика файловой системы виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware, <fsname> - имя файловой системы, <mode> - total/free/used/pfree/pused"
 
-#: include/classes/items/CHelpItems.php:1029
+#: include/classes/items/CHelpItems.php:1037
 msgid "VMware virtual machine guest memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Использование памяти гостевой виртуальной машиной VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:1033
+#: include/classes/items/CHelpItems.php:1041
 msgid "VMware virtual machine host memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Использование памяти виртуальной машиной VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:997
+#: include/classes/items/CHelpItems.php:1005
 msgid "VMware virtual machine hypervisor name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Имя виртуальной машины гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:949
+#: include/classes/items/CHelpItems.php:957
 msgid "VMware virtual machine name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Имя виртульной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:1045
+#: include/classes/items/CHelpItems.php:1053
 msgid "VMware virtual machine network interface input statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "Статистика входящего трафика сетевого интерфейса витруальной машниы VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware, <instance> - экземпляр сетевого интерфейса, <mode> - bps/pps - байт/пакетов в секунду"
 
-#: include/classes/items/CHelpItems.php:1049
+#: include/classes/items/CHelpItems.php:1057
 msgid "VMware virtual machine network interface output statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "Статистика исходящего трафика сетевого интерфейса виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware, <instance> - экземпляр сетевого интерфейса, <mode> - bps/pps - байт/пакетов в секунду"
 
-#: include/classes/items/CHelpItems.php:1057
+#: include/classes/items/CHelpItems.php:1065
 msgid "VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "Счетчик производительности виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware, <path> - путь к счетчику производительности, <instance> - экземпляр счетчика производительности"
 
-#: include/classes/items/CHelpItems.php:1061
+#: include/classes/items/CHelpItems.php:1069
 msgid "VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Состояние питания витруальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:1017
+#: include/classes/items/CHelpItems.php:1025
 msgid "VMware virtual machine private memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Размер частной памяти витруальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:965
+#: include/classes/items/CHelpItems.php:973
 msgid "VMware virtual machine processor ready time ms, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Время готовности процессора виртуальной машины VMware в мс, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:973
+#: include/classes/items/CHelpItems.php:981
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Использование процессора виртуальной машины VMware в Гц , <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:1021
+#: include/classes/items/CHelpItems.php:1029
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Размер разделяемой памяти виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:1025
+#: include/classes/items/CHelpItems.php:1033
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Размер памяти выгруженной в файл подкачки витруальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:1001
+#: include/classes/items/CHelpItems.php:1009
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Общий размер памяти виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:1081
+#: include/classes/items/CHelpItems.php:1089
 msgid "VMware virtual machine uncommitted storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Объем не записанных данных на хранилище данных виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:1085
+#: include/classes/items/CHelpItems.php:1093
 msgid "VMware virtual machine unshared storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Размер неразделяемого пространства хранилища виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:1093
+#: include/classes/items/CHelpItems.php:1101
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Время работы виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
@@ -18939,11 +18947,11 @@ msgstr "Значение \"%1$s\" является недопустимым дл
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is %4$d characters."
 msgstr "Значение \"%1$s\" является слишком длинным для поля \"%2$s\" - %3$d символов. Допустимая длина %4$d символов."
 
-#: include/classes/items/CHelpItems.php:1253
+#: include/classes/items/CHelpItems.php:1261
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
 msgstr "Эффективность кэша значений. Допустимые параметры: requests, hits и misses."
 
-#: include/classes/items/CHelpItems.php:1249
+#: include/classes/items/CHelpItems.php:1257
 msgid "Value cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "Статистика кэша значений. Допустимые значения: total, free, pfree, used и pused."
 
@@ -19081,7 +19089,7 @@ msgstr "Версия"
 msgid "Version of Zabbix agent. Returns string"
 msgstr "Версия Zabbix агента. Возвращает строку"
 
-#: include/classes/items/CHelpItems.php:1257
+#: include/classes/items/CHelpItems.php:1265
 msgid "Version of Zabbix server or proxy"
 msgstr "Версия Zabbix сервера или прокси"
 
@@ -19442,7 +19450,7 @@ msgid "Y axis MAX value must be greater than Y axis MIN value"
 msgstr "МАКС значение оси Y должно быть больше чем МИН значение оси Y"
 
 #: include/classes/api/services/CGraphGeneral.php:343
-#: include/classes/graphdraw/CLineGraphDraw.php:1872
+#: include/classes/graphdraw/CLineGraphDraw.php:1881
 msgid "Y axis MAX value must be greater than Y axis MIN value."
 msgstr "МАКС значение оси Y должно быть больше чем МИН значение оси Y."
 
@@ -19514,9 +19522,9 @@ msgstr "ГГГГ-ММ-ДД чч:мм:сс"
 #: include/classes/import/validators/C40XmlValidator.php:1258
 #: include/classes/import/validators/C42XmlValidator.php:1316
 #: include/classes/import/validators/C44XmlValidator.php:1721
-#: include/classes/import/validators/C50XmlValidator.php:1864
-#: include/classes/import/validators/C52XmlValidator.php:1986
-#: include/classes/import/validators/C54XmlValidator.php:2041
+#: include/classes/import/validators/C50XmlValidator.php:1871
+#: include/classes/import/validators/C52XmlValidator.php:1993
+#: include/classes/import/validators/C54XmlValidator.php:2048
 msgctxt "XML date and time format"
 msgid "YYYY-MM-DDThh:mm:ssZ"
 msgstr "YYYY-MM-DDThh:mm:ssZ"
@@ -19897,14 +19905,14 @@ msgstr "ожидается IP адрес"
 #: include/classes/api/services/CModule.php:298
 #: include/classes/import/validators/C44XmlValidator.php:2095
 #: include/classes/import/validators/C44XmlValidator.php:2115
-#: include/classes/import/validators/C50XmlValidator.php:2238
-#: include/classes/import/validators/C50XmlValidator.php:2258
-#: include/classes/import/validators/C52XmlValidator.php:2403
-#: include/classes/import/validators/C52XmlValidator.php:2423
-#: include/classes/import/validators/C52XmlValidator.php:2572
-#: include/classes/import/validators/C54XmlValidator.php:2458
-#: include/classes/import/validators/C54XmlValidator.php:2478
-#: include/classes/import/validators/C54XmlValidator.php:2585
+#: include/classes/import/validators/C50XmlValidator.php:2245
+#: include/classes/import/validators/C50XmlValidator.php:2265
+#: include/classes/import/validators/C52XmlValidator.php:2410
+#: include/classes/import/validators/C52XmlValidator.php:2430
+#: include/classes/import/validators/C52XmlValidator.php:2579
+#: include/classes/import/validators/C54XmlValidator.php:2465
+#: include/classes/import/validators/C54XmlValidator.php:2485
+#: include/classes/import/validators/C54XmlValidator.php:2592
 #: include/classes/import/validators/CXmlValidatorGeneral.php:283
 #: include/classes/validators/CApiInputValidator.php:497
 #: include/classes/validators/CApiInputValidator.php:629
@@ -21351,9 +21359,9 @@ msgstr "таблица \"%1$s\" не найдена"
 
 #: include/classes/export/CConfigurationExportBuilder.php:87
 #: include/classes/import/validators/C44XmlValidator.php:1983
-#: include/classes/import/validators/C50XmlValidator.php:2126
-#: include/classes/import/validators/C52XmlValidator.php:2216
-#: include/classes/import/validators/C54XmlValidator.php:2271
+#: include/classes/import/validators/C50XmlValidator.php:2133
+#: include/classes/import/validators/C52XmlValidator.php:2223
+#: include/classes/import/validators/C54XmlValidator.php:2278
 #: include/classes/import/validators/CXmlValidatorGeneral.php:183
 #: include/classes/import/validators/CXmlValidatorGeneral.php:202
 #, c-format
@@ -21444,8 +21452,8 @@ msgid "unacceptable URL"
 msgstr "неприемлемый URL"
 
 #: include/classes/import/validators/C44XmlValidator.php:2182
-#: include/classes/import/validators/C50XmlValidator.php:2325
-#: include/classes/import/validators/C52XmlValidator.php:2490
+#: include/classes/import/validators/C50XmlValidator.php:2332
+#: include/classes/import/validators/C52XmlValidator.php:2497
 #: include/classes/import/validators/CXmlValidatorGeneral.php:298
 #, c-format
 msgid "unexpected constant \"%1$s\""
@@ -21454,9 +21462,9 @@ msgstr "неожиданная константа \"%1$s\""
 #: include/classes/export/CConfigurationExportBuilder.php:119
 #: include/classes/import/converters/CConstantImportConverter.php:60
 #: include/classes/import/validators/C44XmlValidator.php:2140
-#: include/classes/import/validators/C50XmlValidator.php:2283
-#: include/classes/import/validators/C52XmlValidator.php:2448
-#: include/classes/import/validators/C54XmlValidator.php:2503
+#: include/classes/import/validators/C50XmlValidator.php:2290
+#: include/classes/import/validators/C52XmlValidator.php:2455
+#: include/classes/import/validators/C54XmlValidator.php:2510
 #, c-format
 msgid "unexpected constant value \"%1$s\""
 msgstr "неожиданное значение константы \"%1$s\""
@@ -21667,8 +21675,8 @@ msgstr "значение должно быть не меньше чем \"%1$s\"
 #: include/classes/api/services/CMap.php:1157
 #: include/classes/api/services/CReport.php:209
 #: include/classes/api/services/CReport.php:612
-#: include/classes/import/validators/C52XmlValidator.php:2567
-#: include/classes/import/validators/C54XmlValidator.php:2580
+#: include/classes/import/validators/C52XmlValidator.php:2574
+#: include/classes/import/validators/C54XmlValidator.php:2587
 #: include/classes/validators/CApiInputValidator.php:459
 #: include/classes/validators/CApiInputValidator.php:784
 #: include/classes/validators/CNewValidator.php:517

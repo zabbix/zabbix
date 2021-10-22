@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-08 19:53+0300\n"
+"POT-Creation-Date: 2021-10-22 19:54+0300\n"
 "PO-Revision-Date: 2014-10-03 08:43+0300\n"
 "Last-Translator: ΓΙΑΝΝΗΣ <yannis@computerstudio.gr>\n"
 "Language-Team: none\n"
@@ -19,7 +19,7 @@ msgstr ""
 "X-Generator: Pootle 2.5.1.3\n"
 "X-POOTLE-MTIME: 1412318596.000000\n"
 
-#: include/classes/items/CHelpItems.php:1073
+#: include/classes/items/CHelpItems.php:1081
 msgid "\tThe average time a read from the virtual disk takes , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
 msgstr ""
 
@@ -39,9 +39,9 @@ msgstr ""
 #: include/classes/import/validators/C40XmlValidator.php:1258
 #: include/classes/import/validators/C42XmlValidator.php:1316
 #: include/classes/import/validators/C44XmlValidator.php:1721
-#: include/classes/import/validators/C50XmlValidator.php:1864
-#: include/classes/import/validators/C52XmlValidator.php:1986
-#: include/classes/import/validators/C54XmlValidator.php:2041
+#: include/classes/import/validators/C50XmlValidator.php:1871
+#: include/classes/import/validators/C52XmlValidator.php:1993
+#: include/classes/import/validators/C54XmlValidator.php:2048
 #, c-format
 msgid "\"%1$s\" is expected"
 msgstr ""
@@ -1092,11 +1092,11 @@ msgstr ""
 msgid "Alternatively, you can install it manually:"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:989
+#: include/classes/items/CHelpItems.php:997
 msgid "Amount of guest physical memory that is swapped out to the swap space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1013
+#: include/classes/items/CHelpItems.php:1021
 msgid "Amount of host physical memory consumed for backing up guest physical memory pages, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
@@ -1484,11 +1484,11 @@ msgstr "Διαθέσιμο"
 msgid "Average"
 msgstr "Μέση"
 
-#: include/classes/items/CHelpItems.php:1069
+#: include/classes/items/CHelpItems.php:1077
 msgid "Average number of outstanding read requests to the virtual disk during the collection interval , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1089
+#: include/classes/items/CHelpItems.php:1097
 msgid "Average number of outstanding write requests to the virtual disk during the collection interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
 msgstr ""
 
@@ -1655,7 +1655,7 @@ msgstr ""
 msgid "CPU load. Returns float"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:969
+#: include/classes/items/CHelpItems.php:977
 msgid "CPU time spent waiting for swap-in, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance"
 msgstr ""
 
@@ -1667,7 +1667,7 @@ msgstr ""
 msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:977
+#: include/classes/items/CHelpItems.php:985
 msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
@@ -3121,11 +3121,11 @@ msgstr ""
 msgid "Catalan (ca_ES)"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1123
+#: include/classes/items/CHelpItems.php:1131
 msgid "Catches all SNMP traps that match regex. If regexp is unspecified, catches any trap."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1119
+#: include/classes/items/CHelpItems.php:1127
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
 msgstr ""
 
@@ -3583,7 +3583,7 @@ msgstr ""
 msgid "Configuration"
 msgstr "Διαμόρφωση"
 
-#: include/classes/items/CHelpItems.php:1213
+#: include/classes/items/CHelpItems.php:1221
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "Διαμόρφωση στατιστικών cache. Cache - buffer (λειτουργίες: pfree, συνολική, χρήση, ελεύθερη)"
 
@@ -4030,11 +4030,11 @@ msgstr ""
 msgid "Count of matched lines in log file monitoring. Returns integer"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1189
+#: include/classes/items/CHelpItems.php:1197
 msgid "Count of values enqueued in the low-level discovery processing queue."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1193
+#: include/classes/items/CHelpItems.php:1201
 msgid "Count of values enqueued in the preprocessing queue."
 msgstr ""
 
@@ -4472,7 +4472,7 @@ msgstr ""
 msgid "Dashed line"
 msgstr "Διακεκομμένη γραμμή"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:2214
+#: include/classes/graphdraw/CLineGraphDraw.php:2223
 #: include/classes/graphdraw/CPieGraphDraw.php:772
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
@@ -5430,15 +5430,15 @@ msgstr ""
 msgid "Discovery of VMware hypervisors, <url> - VMware service URL. Returns JSON"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1097
+#: include/classes/items/CHelpItems.php:1105
 msgid "Discovery of VMware virtual machine disk devices, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1109
+#: include/classes/items/CHelpItems.php:1117
 msgid "Discovery of VMware virtual machine file systems, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:985
+#: include/classes/items/CHelpItems.php:993
 msgid "Discovery of VMware virtual machines, <url> - VMware service URL. Returns JSON"
 msgstr ""
 
@@ -8004,7 +8004,7 @@ msgstr "Διεπαφές IPMI"
 msgid "IPMI sensor"
 msgstr "Αισθητήρας IPMI"
 
-#: include/classes/items/CHelpItems.php:1299
+#: include/classes/items/CHelpItems.php:1307
 msgid "IPMI sensor IDs and other sensor-related parameters. Returns JSON."
 msgstr ""
 
@@ -9853,27 +9853,27 @@ msgstr "Άκυρος κωδικός απόκρισης \"%1$s\"."
 #: include/classes/import/validators/C44XmlValidator.php:2115
 #: include/classes/import/validators/C44XmlValidator.php:2139
 #: include/classes/import/validators/C44XmlValidator.php:2181
-#: include/classes/import/validators/C50XmlValidator.php:1864
-#: include/classes/import/validators/C50XmlValidator.php:2126
-#: include/classes/import/validators/C50XmlValidator.php:2238
-#: include/classes/import/validators/C50XmlValidator.php:2258
-#: include/classes/import/validators/C50XmlValidator.php:2282
-#: include/classes/import/validators/C50XmlValidator.php:2324
-#: include/classes/import/validators/C52XmlValidator.php:1986
-#: include/classes/import/validators/C52XmlValidator.php:2216
-#: include/classes/import/validators/C52XmlValidator.php:2403
-#: include/classes/import/validators/C52XmlValidator.php:2423
-#: include/classes/import/validators/C52XmlValidator.php:2447
-#: include/classes/import/validators/C52XmlValidator.php:2489
-#: include/classes/import/validators/C52XmlValidator.php:2566
-#: include/classes/import/validators/C52XmlValidator.php:2572
-#: include/classes/import/validators/C54XmlValidator.php:2041
-#: include/classes/import/validators/C54XmlValidator.php:2271
-#: include/classes/import/validators/C54XmlValidator.php:2458
-#: include/classes/import/validators/C54XmlValidator.php:2478
-#: include/classes/import/validators/C54XmlValidator.php:2502
-#: include/classes/import/validators/C54XmlValidator.php:2579
-#: include/classes/import/validators/C54XmlValidator.php:2585
+#: include/classes/import/validators/C50XmlValidator.php:1871
+#: include/classes/import/validators/C50XmlValidator.php:2133
+#: include/classes/import/validators/C50XmlValidator.php:2245
+#: include/classes/import/validators/C50XmlValidator.php:2265
+#: include/classes/import/validators/C50XmlValidator.php:2289
+#: include/classes/import/validators/C50XmlValidator.php:2331
+#: include/classes/import/validators/C52XmlValidator.php:1993
+#: include/classes/import/validators/C52XmlValidator.php:2223
+#: include/classes/import/validators/C52XmlValidator.php:2410
+#: include/classes/import/validators/C52XmlValidator.php:2430
+#: include/classes/import/validators/C52XmlValidator.php:2454
+#: include/classes/import/validators/C52XmlValidator.php:2496
+#: include/classes/import/validators/C52XmlValidator.php:2573
+#: include/classes/import/validators/C52XmlValidator.php:2579
+#: include/classes/import/validators/C54XmlValidator.php:2048
+#: include/classes/import/validators/C54XmlValidator.php:2278
+#: include/classes/import/validators/C54XmlValidator.php:2465
+#: include/classes/import/validators/C54XmlValidator.php:2485
+#: include/classes/import/validators/C54XmlValidator.php:2509
+#: include/classes/import/validators/C54XmlValidator.php:2586
+#: include/classes/import/validators/C54XmlValidator.php:2592
 #: include/classes/import/validators/CXmlValidatorGeneral.php:163
 #: include/classes/import/validators/CXmlValidatorGeneral.php:182
 #: include/classes/import/validators/CXmlValidatorGeneral.php:201
@@ -11917,7 +11917,7 @@ msgstr ""
 msgid "Network timeout for script execution"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1053
+#: include/classes/items/CHelpItems.php:1061
 msgid "Network utilization (combined transmit-rates and receive-rates) during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance"
 msgstr ""
 
@@ -12628,7 +12628,7 @@ msgstr ""
 msgid "Number of available DS paths, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - Datastore name, <partitionid> - internal id of physical device from vmware.hv.datastore.discovery"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1153
+#: include/classes/items/CHelpItems.php:1161
 msgid "Number of enabled items on the host."
 msgstr ""
 
@@ -12640,25 +12640,25 @@ msgstr ""
 msgid "Number of items (enabled/disabled/not supported)"
 msgstr "Αριθμός συλλεκτών (ενεργοί/ανενεργοί/ανυποστήρικτοι)"
 
-#: include/classes/items/CHelpItems.php:1177
+#: include/classes/items/CHelpItems.php:1185
 msgid "Number of items in Zabbix database."
 msgstr "Αριθμός συλλεκτών βάσεως δεδομένων Zabbix."
 
-#: include/classes/items/CHelpItems.php:1205
+#: include/classes/items/CHelpItems.php:1213
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr "Αριθμός συλλεκτών στο ιστορικό διαμεσολαβητή οι οποίοι ακόμη δεν απεστάλησαν στον εξυπηρετητή"
 
-#: include/classes/items/CHelpItems.php:1209
+#: include/classes/items/CHelpItems.php:1217
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
 msgstr "Αριθμός συλλεκτών στην ουρά οι οποίοι καθυστερούν από έως σε δευτερόλεπτα, χωρίς αποκλεισμούς."
 
 #: include/classes/items/CHelpItems.php:389
 #: include/classes/items/CHelpItems.php:739
-#: include/classes/items/CHelpItems.php:1225
+#: include/classes/items/CHelpItems.php:1233
 msgid "Number of items in the queue which are delayed in Zabbix server or proxy by \"from\" till \"to\" seconds, inclusive."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1173
+#: include/classes/items/CHelpItems.php:1181
 msgid "Number of monitored hosts"
 msgstr "Αριθμός εποπτευόμενων συλλεκτών"
 
@@ -12683,7 +12683,7 @@ msgstr "Αριθμός πυρήνων επεξεργαστή σε VMware hypervi
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Αριθμός νημάτων επεξεργαστή σε VMware hypervisor, <url> - URL υπηρεσία VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:957
+#: include/classes/items/CHelpItems.php:965
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Αριθμός επεξεργαστών σε VMware εικονική μηχανή, <url> - URL υπηρεσία VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
@@ -12708,15 +12708,15 @@ msgstr ""
 msgid "Number of triggers (enabled/disabled [problem/ok])"
 msgstr "Αριθμός εναυσμάτων (ενεργά/ανενεργά) [προβληματικά/ok]"
 
-#: include/classes/items/CHelpItems.php:1241
+#: include/classes/items/CHelpItems.php:1249
 msgid "Number of triggers in Zabbix database."
 msgstr "Αριθμός εναυσμάτων βάσεως δεδομένων Zabbix."
 
-#: include/classes/items/CHelpItems.php:1181
+#: include/classes/items/CHelpItems.php:1189
 msgid "Number of unsupported items in Zabbix database."
 msgstr "Αριθμός ανυποστήρικτων συλλεκτών βάσεως δεδομένων Zabbix."
 
-#: include/classes/items/CHelpItems.php:1157
+#: include/classes/items/CHelpItems.php:1165
 msgid "Number of unsupported items on the host."
 msgstr ""
 
@@ -12729,35 +12729,35 @@ msgstr "Αριθμός χρηστών (σε σύνδεση)"
 msgid "Number of users logged in. Returns integer"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1133
+#: include/classes/items/CHelpItems.php:1141
 msgid "Number of values stored in table HISTORY."
 msgstr "Αριθμός αποθηκευμένων τιμών στον πίνακα HISTORY."
 
-#: include/classes/items/CHelpItems.php:1137
+#: include/classes/items/CHelpItems.php:1145
 msgid "Number of values stored in table HISTORY_LOG."
 msgstr "Αριθμός αποθηκευμένων τιμών στον πίνακα HISTORY_LOG."
 
-#: include/classes/items/CHelpItems.php:1141
+#: include/classes/items/CHelpItems.php:1149
 msgid "Number of values stored in table HISTORY_STR."
 msgstr "Αριθμός αποθηκευμένων τιμών στον πίνακα HISTORY_STR."
 
-#: include/classes/items/CHelpItems.php:1145
+#: include/classes/items/CHelpItems.php:1153
 msgid "Number of values stored in table HISTORY_TEXT."
 msgstr "Αριθμός αποθηκευμένων τιμών στον πίνακα HISTORY_TEXT."
 
-#: include/classes/items/CHelpItems.php:1149
+#: include/classes/items/CHelpItems.php:1157
 msgid "Number of values stored in table HISTORY_UINT."
 msgstr "Αριθμός αποθηκευμένων τιμών στον πίνακα HISTORY_UINT."
 
-#: include/classes/items/CHelpItems.php:1233
+#: include/classes/items/CHelpItems.php:1241
 msgid "Number of values stored in table TRENDS."
 msgstr "Αριθμός αποθηκευμένων τιμών στον πίνακα TRENDS."
 
-#: include/classes/items/CHelpItems.php:1237
+#: include/classes/items/CHelpItems.php:1245
 msgid "Number of values stored in table TRENDS_UINT."
 msgstr "Αριθμός αποθηκευμένων τιμών στον πίνακα TRENDS_UINT."
 
-#: include/classes/items/CHelpItems.php:941
+#: include/classes/items/CHelpItems.php:949
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Αριθμός εικονικών μηχανών VMware hypervisor, <url> - URL υπηρεσία VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
@@ -13647,7 +13647,7 @@ msgstr ""
 msgid "Peak memory usage: %1$s"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:953
+#: include/classes/items/CHelpItems.php:961
 msgid "Percent of time the virtual machine is unable to run because it is contending for access to the physical CPU(s), <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
@@ -13655,11 +13655,11 @@ msgstr ""
 msgid "Percentage"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1037
+#: include/classes/items/CHelpItems.php:1045
 msgid "Percentage of host physical memory that has been consumed, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:961
+#: include/classes/items/CHelpItems.php:969
 msgid "Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance"
 msgstr ""
 
@@ -13843,7 +13843,7 @@ msgstr ""
 msgid "Post type"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:921
+#: include/classes/items/CHelpItems.php:925
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
 msgstr ""
 
@@ -14767,7 +14767,7 @@ msgstr "Απαιτούμενα δικαιώματα ξενιστή"
 msgid "Required performance (vps)"
 msgstr "Απαιτούμενη απόδοση (vps)"
 
-#: include/classes/items/CHelpItems.php:1217
+#: include/classes/items/CHelpItems.php:1225
 msgid "Required performance of the Zabbix server, in new values per second expected."
 msgstr "Απαιτούμενη απόδοση εξυπηρετητή Zabbix, αναμένεται σε νέες τιμές ανά δευτερόλεπτο."
 
@@ -14925,19 +14925,19 @@ msgstr ""
 msgid "Retry"
 msgstr "Επανάληψη"
 
-#: include/classes/items/CHelpItems.php:1289
+#: include/classes/items/CHelpItems.php:1297
 msgid "Return a JSON array with LLD macros describing the MBean objects or their attributes. Can be used for LLD."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1293
+#: include/classes/items/CHelpItems.php:1301
 msgid "Return a JSON array with MBean objects or their attributes. Compared to jmx.discovery it does not define LLD macros. Can be used for LLD."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1271
+#: include/classes/items/CHelpItems.php:1279
 msgid "Return first column of the first row of the SQL query result."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1285
+#: include/classes/items/CHelpItems.php:1293
 msgid "Return value of an attribute of MBean object."
 msgstr ""
 
@@ -14945,25 +14945,25 @@ msgstr ""
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
 msgstr "Επιστροφή χρόνου απόκρισης ICMP ping σε δευτερόλεπτα. Παράδειγμα: 0.02"
 
-#: include/classes/items/CHelpItems.php:1165
+#: include/classes/items/CHelpItems.php:1173
 msgid "Returns a JSON array describing the host network interfaces configured in Zabbix. Can be used for LLD."
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:385
 #: include/classes/items/CHelpItems.php:735
-#: include/classes/items/CHelpItems.php:1221
+#: include/classes/items/CHelpItems.php:1229
 msgid "Returns a JSON object containing Zabbix server or proxy internal metrics."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1169
+#: include/classes/items/CHelpItems.php:1177
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx."
 msgstr "Επιστροφή διαθεσιμότητας συγκεκριμένου τύπου ελέγχου ξενιστή. Τιμή συλλέκτη αντιστοιχεί σε διαθέσιμα εικονίδια στον κατάλογο ξενιστή. Έγκυροι τύποι είναι: αντιπρόσωπος, snmp, ipmi, jmx."
 
-#: include/classes/items/CHelpItems.php:1161
+#: include/classes/items/CHelpItems.php:1169
 msgid "Returns current maintenance status of the host."
 msgstr "Επιστρέφει κατάσταση τρέχουσας συντήρησης ξενιστή."
 
-#: include/classes/items/CHelpItems.php:1185
+#: include/classes/items/CHelpItems.php:1193
 msgid "Returns information associated with Zabbix Java gateway. Valid params are: ping, version."
 msgstr "Επιστρέφει πληροφορίες σχετιζόμενες με πύλη Zabbix Java. Έγκυρες παράμετροι είναι: ping, version."
 
@@ -16266,7 +16266,7 @@ msgstr ""
 msgid "Starting TLS failed."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1129
+#: include/classes/items/CHelpItems.php:1137
 msgid "Startup time of Zabbix server, Unix timestamp."
 msgstr "Χρόνος λειτουργίας εξυπηρετητή Zabbix, Unix timestamp."
 
@@ -16284,7 +16284,7 @@ msgctxt "history source selection method"
 msgid "Static"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1265
+#: include/classes/items/CHelpItems.php:1273
 msgid "Statistics and availability of Zabbix write cache. Cache - one of values (modes: all, float, uint, str, log, text, not supported), history (modes: pfree, free, total, used, pused), index (modes: pfree, free, total, used, pused), trend (modes: pfree, free, total, used, pused)."
 msgstr ""
 
@@ -16998,7 +16998,7 @@ msgstr "Η \"%1$s.%2$s\" μέθοδος να καλείται χωρίς \"auth\
 msgid "The Zabbix database version does not match current requirements. Your database version: %1$s. Required version: %2$s. Please contact your system administrator."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1077
+#: include/classes/items/CHelpItems.php:1085
 msgid "The average time a write to the virtual disk takes, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
 msgstr ""
 
@@ -17189,7 +17189,7 @@ msgstr "Έως"
 msgid "Time"
 msgstr "Χρόνος"
 
-#: include/classes/items/CHelpItems.php:1197
+#: include/classes/items/CHelpItems.php:1205
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
 msgstr ""
 
@@ -17202,7 +17202,7 @@ msgstr ""
 msgid "Time filter default period"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1201
+#: include/classes/items/CHelpItems.php:1209
 msgid "Time of proxy last access. Name - proxy name. Valid params are: lastaccess - Unix timestamp, delay - seconds."
 msgstr ""
 
@@ -17301,7 +17301,7 @@ msgstr ""
 msgid "Total SQL time: %1$s"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:993
+#: include/classes/items/CHelpItems.php:1001
 msgid "Total time elapsed, in seconds, since last operating system boot-up, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
@@ -17322,11 +17322,11 @@ msgstr ""
 msgid "Transaction has not been closed. Aborting..."
 msgstr "Η συναλλαγή δεν έκλεισε. Ματαίωση..."
 
-#: include/classes/items/CHelpItems.php:1275
+#: include/classes/items/CHelpItems.php:1283
 msgid "Transform SQL query result into a JSON array for low-level discovery."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1279
+#: include/classes/items/CHelpItems.php:1287
 msgid "Transform SQL query result into a JSON array."
 msgstr ""
 
@@ -17357,7 +17357,7 @@ msgctxt "missing data function"
 msgid "Treat as 0"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1229
+#: include/classes/items/CHelpItems.php:1237
 msgid "Trend function cache statistics. Valid parameters are: all, hits, phits, misses, pmisses, items, pitems and requests."
 msgstr ""
 
@@ -18146,7 +18146,7 @@ msgstr "Χάρτες Άνω επίπεδο"
 msgid "Uptime"
 msgstr "Χρόνος διαθεσιμότητας"
 
-#: include/classes/items/CHelpItems.php:1245
+#: include/classes/items/CHelpItems.php:1253
 msgid "Uptime of Zabbix server process in seconds."
 msgstr "Χρόνος διαθεσιμότητας υπηρεσίας εξυπηρετητή Zabbix σε δευτερόλεπτα."
 
@@ -18500,7 +18500,7 @@ msgstr ""
 msgid "Users"
 msgstr "Χρήστες"
 
-#: include/classes/items/CHelpItems.php:1261
+#: include/classes/items/CHelpItems.php:1269
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "Στατιστικά cache VMware. Έγκυροι τρόποι: total, free, pfree, used and pused."
 
@@ -18541,7 +18541,11 @@ msgstr ""
 msgid "VMware hypervisor BIOS uuid, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hypervisor BIOS uuid, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:901
+#: include/classes/items/CHelpItems.php:929
+msgid "VMware hypervisor HW vendor state sensors, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:905
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Μέγεθος μνήμης ballooned VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
@@ -18565,8 +18569,12 @@ msgstr "Στατιστικά datastore write VMware hypervisor, <url> - URL υπ
 msgid "VMware hypervisor datastores list, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:925
+#: include/classes/items/CHelpItems.php:933
 msgid "VMware hypervisor health state rollup sensor, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:901
+msgid "VMware hypervisor maintenance status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:889
@@ -18577,15 +18585,15 @@ msgstr "Τύπος VMware hypervisor, <url> - URL υπηρεσίας VMware, <uu
 msgid "VMware hypervisor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Όνομα VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:909
+#: include/classes/items/CHelpItems.php:913
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "Στατιστικά εισόδου δικτύου VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor, <mode> - bps"
 
-#: include/classes/items/CHelpItems.php:913
+#: include/classes/items/CHelpItems.php:917
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "Στατιστικά εξόδου δικτύου VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor, <mode> - bps"
 
-#: include/classes/items/CHelpItems.php:917
+#: include/classes/items/CHelpItems.php:921
 msgid "VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr ""
 
@@ -18601,7 +18609,7 @@ msgstr "Τύπος επεξεργαστή VMware hypervisor, <url> - URL υπη�
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Χρήση επεξεργαστή VMware hypervisor σε Hz, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:929
+#: include/classes/items/CHelpItems.php:937
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Κατάσταση VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
@@ -18609,11 +18617,11 @@ msgstr "Κατάσταση VMware hypervisor, <url> - URL υπηρεσίας VMw
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Συνολικό μέγεθος μνήμης VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:933
+#: include/classes/items/CHelpItems.php:941
 msgid "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Χρόνος λειτουργίας VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:905
+#: include/classes/items/CHelpItems.php:909
 msgid "VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Μέγεθος χρησιμοποιούμενης μνήμης VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
@@ -18621,7 +18629,7 @@ msgstr "Μέγεθος χρησιμοποιούμενης μνήμης VMware hy
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Όνομα κατασκευαστή VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:937
+#: include/classes/items/CHelpItems.php:945
 msgid "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Έκδοση VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
@@ -18629,103 +18637,103 @@ msgstr "Έκδοση VMware hypervisor, <url> - URL υπηρεσίας VMware, <
 msgid "VMware service full name, <url> - VMware service URL"
 msgstr "Πλήρες όνομα υπηρεσίας VMware, <url> - URL υπηρεσίας VMware"
 
-#: include/classes/items/CHelpItems.php:945
+#: include/classes/items/CHelpItems.php:953
 msgid "VMware service version, <url> - VMware service URL"
 msgstr "Έκδοση υπηρεσίας VMware, <url> - URL υπηρεσίας VMware"
 
-#: include/classes/items/CHelpItems.php:1005
+#: include/classes/items/CHelpItems.php:1013
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Μέγεθος μνήμης ballooned εικονικής μηχανής VMware, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware"
 
-#: include/classes/items/CHelpItems.php:1065
+#: include/classes/items/CHelpItems.php:1073
 msgid "VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Δεσμευμένος αποθηκευτικός χώρος εικονικής μηχανής VMware, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware"
 
-#: include/classes/items/CHelpItems.php:1009
+#: include/classes/items/CHelpItems.php:1017
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Μέγεθος συμπιεσμένης μνήμης εικονικής μηχανής VMware, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware"
 
-#: include/classes/items/CHelpItems.php:981
+#: include/classes/items/CHelpItems.php:989
 msgid "VMware virtual machine datacenter name, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns string"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1101
+#: include/classes/items/CHelpItems.php:1109
 msgid "VMware virtual machine disk device read statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "Στατιστικά ανάγνωσης συσκευής δίσκου εικονικής μηχανής VMware, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware, <instance> - instance συσκευής δίσκου, <mode> - bps/ops - bytes/λειτουργίες ανά δευτερόλεπτο"
 
-#: include/classes/items/CHelpItems.php:1105
+#: include/classes/items/CHelpItems.php:1113
 msgid "VMware virtual machine disk device write statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "Στατιστικά εγγραφής συσκευής δίσκου εικονικής μηχανής VMware, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware, <instance> - instance συσκευής δίσκου, <mode> - bps/ops - bytes/λειτουργίες ανά δευτερόλεπτο"
 
-#: include/classes/items/CHelpItems.php:1113
+#: include/classes/items/CHelpItems.php:1121
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
 msgstr "Στατιστικά συστήματος αρχείων εικονικής μηχανής VMware, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware, <fsname> - όνομα αρχείου συστήματος, <mode> - total/free/used/pfree/pused"
 
-#: include/classes/items/CHelpItems.php:1029
+#: include/classes/items/CHelpItems.php:1037
 msgid "VMware virtual machine guest memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Χρήση μνήμης λογικής εικονικής μηχανής VMware, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware"
 
-#: include/classes/items/CHelpItems.php:1033
+#: include/classes/items/CHelpItems.php:1041
 msgid "VMware virtual machine host memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Χρήση μνήμης ξενιστή εικονικής μηχανής VMware, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware"
 
-#: include/classes/items/CHelpItems.php:997
+#: include/classes/items/CHelpItems.php:1005
 msgid "VMware virtual machine hypervisor name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Όνομα VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware"
 
-#: include/classes/items/CHelpItems.php:949
+#: include/classes/items/CHelpItems.php:957
 msgid "VMware virtual machine name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Όνομα εικονικής μηχανής VMware, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware"
 
-#: include/classes/items/CHelpItems.php:1045
+#: include/classes/items/CHelpItems.php:1053
 msgid "VMware virtual machine network interface input statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "Στατιστικά εισόδου δικτύου εικονικής μηχανής VMware, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware, <instance> - instance διεπαφή δικτύου, <mode> - bps/pps - bytes/packets per second"
 
-#: include/classes/items/CHelpItems.php:1049
+#: include/classes/items/CHelpItems.php:1057
 msgid "VMware virtual machine network interface output statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "Στατιστικά εξόδου δικτύου εικονικής μηχανής VMware, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware, <instance> - instance διεπαφή δικτύου, <mode> - bps/pps - bytes/packets per second"
 
-#: include/classes/items/CHelpItems.php:1057
+#: include/classes/items/CHelpItems.php:1065
 msgid "VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1061
+#: include/classes/items/CHelpItems.php:1069
 msgid "VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Κατάσταση ενέργειας εικονικής μηχανής VMware, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware"
 
-#: include/classes/items/CHelpItems.php:1017
+#: include/classes/items/CHelpItems.php:1025
 msgid "VMware virtual machine private memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Μέγεθος ιδιωτικής μνήμης εικονικής μηχανής VMware, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware"
 
-#: include/classes/items/CHelpItems.php:965
+#: include/classes/items/CHelpItems.php:973
 msgid "VMware virtual machine processor ready time ms, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:973
+#: include/classes/items/CHelpItems.php:981
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Χρήση επεξεργαστή σε Hz εικονικής μηχανής VMware, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware"
 
-#: include/classes/items/CHelpItems.php:1021
+#: include/classes/items/CHelpItems.php:1029
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Μέγεθος κοινόχρηστης μνήμης εικονικής μηχανής VMware, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware"
 
-#: include/classes/items/CHelpItems.php:1025
+#: include/classes/items/CHelpItems.php:1033
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Μέγεθος ανταλλασσόμενης μνήμης εικονικής μηχανής VMware, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware"
 
-#: include/classes/items/CHelpItems.php:1001
+#: include/classes/items/CHelpItems.php:1009
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Μέγεθος συνολικής μνήμης εικονικής μηχανής VMware, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware"
 
-#: include/classes/items/CHelpItems.php:1081
+#: include/classes/items/CHelpItems.php:1089
 msgid "VMware virtual machine uncommitted storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Αδιάθετος αποθηκευτικός χώρος εικονικής μηχανής VMware, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware"
 
-#: include/classes/items/CHelpItems.php:1085
+#: include/classes/items/CHelpItems.php:1093
 msgid "VMware virtual machine unshared storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Αδιαμοίραστος αποθηκευτικός χώρος εικονικής μηχανής VMware, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware"
 
-#: include/classes/items/CHelpItems.php:1093
+#: include/classes/items/CHelpItems.php:1101
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Χρόνος λειτουργίας εικονικής μηχανής VMware, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή εικονικής μηχανής VMware"
 
@@ -18820,11 +18828,11 @@ msgstr "Τιμή \"%1$s\" άκυρη για παράμετρο \"grid_show\". Ε
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is %4$d characters."
 msgstr "Η Τιμή \"%1$s\" είναι μεγάλη για το πεδίο \"%2$s\" - %3$d χαρακτήρες. Επιτρεπόμενο μήκος %4$d χαρακτήρες."
 
-#: include/classes/items/CHelpItems.php:1253
+#: include/classes/items/CHelpItems.php:1261
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
 msgstr "Αποτελεσματικότητα τιμής cache. Έγκυρες παράμετροι: αιτήματα, επιτυχίες και αποτυχίες."
 
-#: include/classes/items/CHelpItems.php:1249
+#: include/classes/items/CHelpItems.php:1257
 msgid "Value cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "Στατιστικά τιμής cache. Έγκυρες τρόποι: total, free, pfree, used and pused."
 
@@ -18962,7 +18970,7 @@ msgstr ""
 msgid "Version of Zabbix agent. Returns string"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1257
+#: include/classes/items/CHelpItems.php:1265
 msgid "Version of Zabbix server or proxy"
 msgstr ""
 
@@ -19321,7 +19329,7 @@ msgid "Y axis MAX value must be greater than Y axis MIN value"
 msgstr ""
 
 #: include/classes/api/services/CGraphGeneral.php:343
-#: include/classes/graphdraw/CLineGraphDraw.php:1872
+#: include/classes/graphdraw/CLineGraphDraw.php:1881
 msgid "Y axis MAX value must be greater than Y axis MIN value."
 msgstr "Μέγιστη τιμή άξονα Y να είναι μεγαλύτερη της ΕΛΑΧ τιμής άξονα Y."
 
@@ -19393,9 +19401,9 @@ msgstr ""
 #: include/classes/import/validators/C40XmlValidator.php:1258
 #: include/classes/import/validators/C42XmlValidator.php:1316
 #: include/classes/import/validators/C44XmlValidator.php:1721
-#: include/classes/import/validators/C50XmlValidator.php:1864
-#: include/classes/import/validators/C52XmlValidator.php:1986
-#: include/classes/import/validators/C54XmlValidator.php:2041
+#: include/classes/import/validators/C50XmlValidator.php:1871
+#: include/classes/import/validators/C52XmlValidator.php:1993
+#: include/classes/import/validators/C54XmlValidator.php:2048
 msgctxt "XML date and time format"
 msgid "YYYY-MM-DDThh:mm:ssZ"
 msgstr ""
@@ -19773,14 +19781,14 @@ msgstr ""
 #: include/classes/api/services/CModule.php:298
 #: include/classes/import/validators/C44XmlValidator.php:2095
 #: include/classes/import/validators/C44XmlValidator.php:2115
-#: include/classes/import/validators/C50XmlValidator.php:2238
-#: include/classes/import/validators/C50XmlValidator.php:2258
-#: include/classes/import/validators/C52XmlValidator.php:2403
-#: include/classes/import/validators/C52XmlValidator.php:2423
-#: include/classes/import/validators/C52XmlValidator.php:2572
-#: include/classes/import/validators/C54XmlValidator.php:2458
-#: include/classes/import/validators/C54XmlValidator.php:2478
-#: include/classes/import/validators/C54XmlValidator.php:2585
+#: include/classes/import/validators/C50XmlValidator.php:2245
+#: include/classes/import/validators/C50XmlValidator.php:2265
+#: include/classes/import/validators/C52XmlValidator.php:2410
+#: include/classes/import/validators/C52XmlValidator.php:2430
+#: include/classes/import/validators/C52XmlValidator.php:2579
+#: include/classes/import/validators/C54XmlValidator.php:2465
+#: include/classes/import/validators/C54XmlValidator.php:2485
+#: include/classes/import/validators/C54XmlValidator.php:2592
 #: include/classes/import/validators/CXmlValidatorGeneral.php:283
 #: include/classes/validators/CApiInputValidator.php:497
 #: include/classes/validators/CApiInputValidator.php:629
@@ -21228,9 +21236,9 @@ msgstr ""
 
 #: include/classes/export/CConfigurationExportBuilder.php:87
 #: include/classes/import/validators/C44XmlValidator.php:1983
-#: include/classes/import/validators/C50XmlValidator.php:2126
-#: include/classes/import/validators/C52XmlValidator.php:2216
-#: include/classes/import/validators/C54XmlValidator.php:2271
+#: include/classes/import/validators/C50XmlValidator.php:2133
+#: include/classes/import/validators/C52XmlValidator.php:2223
+#: include/classes/import/validators/C54XmlValidator.php:2278
 #: include/classes/import/validators/CXmlValidatorGeneral.php:183
 #: include/classes/import/validators/CXmlValidatorGeneral.php:202
 #, c-format
@@ -21321,8 +21329,8 @@ msgid "unacceptable URL"
 msgstr ""
 
 #: include/classes/import/validators/C44XmlValidator.php:2182
-#: include/classes/import/validators/C50XmlValidator.php:2325
-#: include/classes/import/validators/C52XmlValidator.php:2490
+#: include/classes/import/validators/C50XmlValidator.php:2332
+#: include/classes/import/validators/C52XmlValidator.php:2497
 #: include/classes/import/validators/CXmlValidatorGeneral.php:298
 #, c-format
 msgid "unexpected constant \"%1$s\""
@@ -21331,9 +21339,9 @@ msgstr ""
 #: include/classes/export/CConfigurationExportBuilder.php:119
 #: include/classes/import/converters/CConstantImportConverter.php:60
 #: include/classes/import/validators/C44XmlValidator.php:2140
-#: include/classes/import/validators/C50XmlValidator.php:2283
-#: include/classes/import/validators/C52XmlValidator.php:2448
-#: include/classes/import/validators/C54XmlValidator.php:2503
+#: include/classes/import/validators/C50XmlValidator.php:2290
+#: include/classes/import/validators/C52XmlValidator.php:2455
+#: include/classes/import/validators/C54XmlValidator.php:2510
 #, c-format
 msgid "unexpected constant value \"%1$s\""
 msgstr ""
@@ -21544,8 +21552,8 @@ msgstr ""
 #: include/classes/api/services/CMap.php:1157
 #: include/classes/api/services/CReport.php:209
 #: include/classes/api/services/CReport.php:612
-#: include/classes/import/validators/C52XmlValidator.php:2567
-#: include/classes/import/validators/C54XmlValidator.php:2580
+#: include/classes/import/validators/C52XmlValidator.php:2574
+#: include/classes/import/validators/C54XmlValidator.php:2587
 #: include/classes/validators/CApiInputValidator.php:459
 #: include/classes/validators/CApiInputValidator.php:784
 #: include/classes/validators/CNewValidator.php:517
