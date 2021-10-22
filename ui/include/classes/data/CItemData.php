@@ -1350,8 +1350,8 @@ final class CItemData {
 				'value_type' => ITEM_VALUE_TYPE_STR
 			],
 			'vmware.hv.maintenance[<url>,<uuid>]' => [
-				'description' => _('VMware hypervisor maintenance status, <url> - VMware service URL, <uuid> - VMware hypervisor host name'),
-				'value_type' => null
+				'description' => _('VVMware hypervisor maintenance status, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns 0 - not in maintenance; 1 - in maintenance'),
+				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'vmware.hv.memory.size.ballooned[<url>,<uuid>]' => [
 				'description' => _('VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name'),
