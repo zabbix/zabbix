@@ -631,7 +631,7 @@ class CAction extends CApiService {
 		$del_conditionids = [];
 
 		foreach ($actions as &$action) {
-			if (!array_key_exists('filter', $action)) {
+			if (!array_key_exists('filter', $action) || !array_key_exists('conditions', $action['filter'])) {
 				continue;
 			}
 
@@ -3168,12 +3168,17 @@ class CAction extends CApiService {
 	 * @param array|null $db_actions
 	 */
 	private static function addAffectedObjects(array $actions, array &$db_actions = null): void {
-		$actionids = ['filter' => [], 'operations' => []];
+		$actionids = ['filter' => [], 'conditions' => [], 'operations' => []];
 
 		foreach ($actions as $action) {
 			if (array_key_exists('filter', $action)) {
 				$actionids['filter'][] = $action['actionid'];
 				$db_actions[$action['actionid']]['filter'] = [];
+
+				if (array_key_exists('conditions', $action['filter'])) {
+					$actionids['conditions'][] = $action['actionid'];
+					$db_actions[$action['actionid']]['filter']['conditions'] = [];
+				}
 			}
 
 			$operation_groups = array_intersect_key(self::OPERATION_GROUPS,
@@ -3198,19 +3203,20 @@ class CAction extends CApiService {
 			$db_filters = DBselect(DB::makeSql('actions', $options));
 
 			while ($db_filter = DBfetch($db_filters)) {
-				$db_actions[$db_filter['actionid']]['filter'] =
-					array_diff_key($db_filter, array_flip(['actionid'])) + ['conditions' => []];
+				$db_actions[$db_filter['actionid']]['filter'] += array_diff_key($db_filter, array_flip(['actionid']));
 			}
 
-			$options = [
-				'output' => ['conditionid', 'actionid', 'conditiontype', 'operator', 'value', 'value2'],
-				'filter' => ['actionid' => $actionids['filter']]
-			];
-			$db_conditions = DBselect(DB::makeSql('conditions', $options));
+			if ($actionids['conditions']) {
+				$options = [
+					'output' => ['conditionid', 'actionid', 'conditiontype', 'operator', 'value', 'value2'],
+					'filter' => ['actionid' => $actionids['conditions']]
+				];
+				$db_conditions = DBselect(DB::makeSql('conditions', $options));
 
-			while ($db_condition = DBfetch($db_conditions)) {
-				$db_actions[$db_condition['actionid']]['filter']['conditions'][$db_condition['conditionid']] =
-					array_diff_key($db_condition, array_flip(['actionid']));
+				while ($db_condition = DBfetch($db_conditions)) {
+					$db_actions[$db_condition['actionid']]['filter']['conditions'][$db_condition['conditionid']] =
+						array_diff_key($db_condition, array_flip(['actionid']));
+				}
 			}
 		}
 
@@ -3218,22 +3224,16 @@ class CAction extends CApiService {
 			return;
 		}
 
+		$operationids = array_fill_keys([
+			'opconditions', 'opmessage_grp', 'opmessage_usr', 'opcommand_grp', 'opcommand_hst', 'opgroup', 'optemplate'
+		], []);
+
 		$db_operations = DBselect(
 			'SELECT o.operationid,o.actionid,o.operationtype,o.esc_period,o.esc_step_from,o.esc_step_to,o.evaltype,'.
-				'o.recovery,oc.opconditionid,oc.conditiontype,oc.operator,oc.value,m.default_msg,m.subject,m.message,'.
-				'm.mediatypeid,mg.opmessage_grpid,mg.usrgrpid,mu.opmessage_usrid,mu.userid,c.scriptid,'.
-				'cg.opcommand_grpid,cg.groupid,ch.opcommand_hstid,ch.hostid,g.opgroupid,g.groupid,t.optemplateid,'.
-				't.templateid,i.inventory_mode'.
+				'o.recovery,m.default_msg,m.subject,m.message,m.mediatypeid,c.scriptid,i.inventory_mode'.
 			' FROM operations o'.
-				' LEFT JOIN opconditions oc ON oc.operationid=o.operationid'.
 				' LEFT JOIN opmessage m ON m.operationid=o.operationid'.
-				' LEFT JOIN opmessage_grp mg ON mg.operationid=o.operationid'.
-				' LEFT JOIN opmessage_usr mu ON mu.operationid=o.operationid'.
 				' LEFT JOIN opcommand c ON c.operationid=o.operationid'.
-				' LEFT JOIN opcommand_grp cg ON cg.operationid=o.operationid'.
-				' LEFT JOIN opcommand_hst ch ON ch.operationid=o.operationid'.
-				' LEFT JOIN opgroup g ON g.operationid=o.operationid'.
-				' LEFT JOIN optemplate t ON t.operationid=o.operationid'.
 				' LEFT JOIN opinventory i ON i.operationid=o.operationid'.
 			' WHERE '.dbConditionId('o.actionid', array_keys($actionids['operations']))
 		);
@@ -3249,10 +3249,15 @@ class CAction extends CApiService {
 			$eventsource = $db_actions[$db_operation['actionid']]['eventsource'];
 
 			if ($db_operation['recovery'] == ACTION_OPERATION
-					&& ($eventsource == EVENT_SOURCE_TRIGGERS || $eventsource == EVENT_SOURCE_SERVICE)) {
+					&& in_array($eventsource, [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
 				$operation['esc_period'] = $db_operation['esc_period'];
 				$operation['esc_step_from'] = $db_operation['esc_step_from'];
 				$operation['esc_step_to'] = $db_operation['esc_step_to'];
+
+				if ($eventsource == EVENT_SOURCE_TRIGGERS) {
+					$operation['opconditions'] = [];
+					$operationids['opconditions'][$db_operation['operationid']] = true;
+				}
 			}
 
 			switch ($db_operation['operationtype']) {
@@ -3266,73 +3271,37 @@ class CAction extends CApiService {
 						'mediatypeid' => $db_operation['mediatypeid']
 					];
 
-					if ($db_operation['operationtype'] != OPERATION_TYPE_MESSAGE) {
-						break;
+					if ($db_operation['operationtype'] == OPERATION_TYPE_MESSAGE) {
+						$operation['opmessage_grp'] = [];
+						$operation['opmessage_usr'] = [];
+						$operationids['opmessage_grp'][$db_operation['operationid']] = true;
+						$operationids['opmessage_usr'][$db_operation['operationid']] = true;
 					}
-
-					$operation['opmessage_grp'] = $db_operation['opmessage_grpid']
-						? [
-							$db_operation['opmessage_grpid'] => [
-								'opmessage_grpid' => $db_operation['opmessage_grpid'],
-								'usrgrpid' => $db_operation['usrgrpid']
-							]
-						]
-						: [];
-
-					$operation['opmessage_usr'] = $db_operation['opmessage_usrid']
-						? [
-							$db_operation['opmessage_usrid'] => [
-								'opmessage_usrid' => $db_operation['opmessage_usrid'],
-								'userid' => $db_operation['userid']
-							]
-						]
-						: [];
 					break;
 
 				case OPERATION_TYPE_COMMAND:
 					$operation['opcommand']['scriptid'] = $db_operation['scriptid'];
 
-					if ($eventsource == EVENT_SOURCE_SERVICE) {
-						break;
+					if ($eventsource != EVENT_SOURCE_SERVICE) {
+						$operation['opcommand_grp'] = [];
+						$operation['opcommand_hst'] = [];
+						$operationids['opcommand_grp'][$db_operation['operationid']] = true;
+						$operationids['opcommand_hst'][$db_operation['operationid']] = true;
 					}
-
-					$operation['opcommand_grp'] = $db_operation['opcommand_grpid']
-						? [
-							$db_operation['opcommand_grpid'] => [
-								'opcommand_grpid' => $db_operation['opcommand_grpid'],
-								'groupid' => $db_operation['groupid']
-							]
-						]
-						: [];
-
-					$operation['opcommand_hst'] = $db_operation['opcommand_hstid']
-						? [
-							$db_operation['opcommand_hstid'] => [
-								'opcommand_hstid' => $db_operation['opcommand_hstid'],
-								'hostid' => $db_operation['hostid']
-							]
-						]
-						: [];
 					break;
 
 				case OPERATION_TYPE_GROUP_ADD:
 				case OPERATION_TYPE_GROUP_REMOVE:
-					$operation['opgroup'][$db_operation['opgroupid']] = [
-						'opgroupid' => $db_operation['opgroupid'],
-						'groupid' => $db_operation['groupid']
-					];
+					$operationids['opgroup'][$db_operation['operationid']] = true;
 					break;
 
 				case OPERATION_TYPE_TEMPLATE_ADD:
 				case OPERATION_TYPE_TEMPLATE_REMOVE:
-					$operation['optemplate'][$db_operation['optemplateid']] = [
-						'optemplateid' => $db_operation['optemplateid'],
-						'templateid' => $db_operation['templateid']
-					];
+					$operationids['optemplate'][$db_operation['operationid']] = true;
 					break;
 
 				case OPERATION_TYPE_HOST_INVENTORY:
-					$operation['inventory']['inventory_mode'] = $db_operation['inventory_mode'];
+					$operation['opinventory']['inventory_mode'] = $db_operation['inventory_mode'];
 					break;
 			}
 
@@ -3340,5 +3309,101 @@ class CAction extends CApiService {
 
 			$db_actions[$db_operation['actionid']][$operation_group][$db_operation['operationid']] = $operation;
 		}
+
+		$db_opdata = [];
+
+		if ($operationids['opconditions']) {
+			$options = [
+				'output' => ['opconditionid', 'operationid', 'conditiontype', 'operator', 'value'],
+				'filter' => ['operationid' => array_keys($operationids['opconditions'])]
+			];
+			$db_opconditions = DBselect(DB::makeSql('opconditions', $options));
+
+			while ($db_opcondition = DBfetch($db_opconditions)) {
+				$db_opdata[$db_opcondition['operationid']]['opconditions'][$db_opcondition['opconditionid']] =
+					array_diff_key($db_opcondition, array_flip(['operationid']));
+			}
+		}
+
+		if ($operationids['opmessage_grp']) {
+			$options = [
+				'output' => ['opmessage_grpid', 'operationid', 'usrgrpid'],
+				'filter' => ['operationid' => array_keys($operationids['opmessage_grp'])]
+			];
+			$db_opmessage_grps = DBselect(DB::makeSql('opmessage_grp', $options));
+
+			while ($db_opmessage_grp = DBfetch($db_opmessage_grps)) {
+				$db_opdata[$db_opmessage_grp['operationid']]['opmessage_grp'][$db_opmessage_grp['opmessage_grpid']] =
+					array_diff_key($db_opmessage_grp, array_flip(['operationid']));
+			}
+		}
+
+		if ($operationids['opmessage_usr']) {
+			$options = [
+				'output' => ['opmessage_usrid', 'operationid', 'userid'],
+				'filter' => ['operationid' => array_keys($operationids['opmessage_usr'])]
+			];
+			$db_opmessage_usrs = DBselect(DB::makeSql('opmessage_usr', $options));
+
+			while ($db_opmessage_usr = DBfetch($db_opmessage_usrs)) {
+				$db_opdata[$db_opmessage_usr['operationid']]['opmessage_usr'][$db_opmessage_usr['opmessage_usrid']] =
+					array_diff_key($db_opmessage_usr, array_flip(['operationid']));
+			}
+		}
+
+		if ($operationids['opcommand_grp']) {
+			$options = [
+				'output' => ['opcommand_grpid', 'operationid', 'groupid'],
+				'filter' => ['operationid' => array_keys($operationids['opcommand_grp'])]
+			];
+			$db_opcommand_grps = DBselect(DB::makeSql('opcommand_grp', $options));
+
+			while ($db_opcommand_grp = DBfetch($db_opcommand_grps)) {
+				$db_opdata[$db_opcommand_grp['operationid']]['opcommand_grp'][$db_opcommand_grp['opcommand_grpid']] =
+					array_diff_key($db_opcommand_grp, array_flip(['operationid']));
+			}
+		}
+
+		if ($operationids['opgroup']) {
+			$options = [
+				'output' => ['opgroupid', 'operationid', 'groupid'],
+				'filter' => ['operationid' => array_keys($operationids['opgroup'])]
+			];
+			$db_opgroups = DBselect(DB::makeSql('opgroup', $options));
+
+			while ($db_opgroup = DBfetch($db_opgroups)) {
+				$db_opdata[$db_opgroup['operationid']]['opgroup'][$db_opgroup['opgroupid']] =
+					array_diff_key($db_opgroup, array_flip(['operationid']));
+			}
+		}
+
+		if ($operationids['optemplate']) {
+			$options = [
+				'output' => ['optemplateid', 'operationid', 'templateid'],
+				'filter' => ['operationid' => array_keys($operationids['optemplate'])]
+			];
+			$db_optemplates = DBselect(DB::makeSql('optemplate', $options));
+
+			while ($db_optemplate = DBfetch($db_optemplates)) {
+				$db_opdata[$db_optemplate['operationid']]['optemplate'][$db_optemplate['optemplateid']] =
+					array_diff_key($db_optemplate, array_flip(['operationid']));
+			}
+		}
+
+		foreach ($db_actions as &$db_action) {
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $db_action)) {
+					continue;
+				}
+
+				foreach ($db_action[$operation_group] as &$db_operation) {
+					if (array_key_exists($db_operation['operationid'], $db_opdata)) {
+						$db_operation = array_merge($db_operation, $db_opdata[$db_operation['operationid']]);
+					}
+				}
+				unset($db_operation);
+			}
+		}
+		unset($db_action);
 	}
 }
