@@ -512,10 +512,10 @@ static int	sender_threads_wait(ZBX_THREAD_HANDLE *threads, zbx_thread_args_t *th
 		}
 #if !defined(_WINDOWS)
 		else
-			zbx_thread_handle_pipe_response((ZBX_THREAD_SENDVAL_ARGS *)threads_args->args);
+			zbx_thread_handle_pipe_response((ZBX_THREAD_SENDVAL_ARGS *)threads_args[i].args);
 
-		close(((ZBX_THREAD_SENDVAL_ARGS *)threads_args->args)->fds[0]);
-		close(((ZBX_THREAD_SENDVAL_ARGS *)threads_args->args)->fds[1]);
+		close(((ZBX_THREAD_SENDVAL_ARGS *)threads_args[i].args)->fds[0]);
+		close(((ZBX_THREAD_SENDVAL_ARGS *)threads_args[i].args)->fds[1]);
 #endif
 
 		threads[i] = ZBX_THREAD_HANDLE_NULL;
