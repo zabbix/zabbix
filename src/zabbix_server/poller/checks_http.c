@@ -374,6 +374,13 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 		goto clean;
 	}
 
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, ZBX_CURLOPT_ACCEPT_ENCODING, "")))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set cURL encoding option: %s",
+				curl_easy_strerror(err)));
+		goto clean;
+	}
+
 	*errbuf = '\0';
 
 	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
