@@ -1832,13 +1832,13 @@ class CAction extends CApiService {
 	/**
 	 * Returns an array of update operations according to requested options.
 	 *
-	 * @param array  $update_operations                 An array of update operations.
-	 * @param string $update_operations[<operationid>]  Operation ID.
-	 * @param array  $update_options                    An array of update operation options from request.
+	 * @param array        $update_operations                 An array of update operations.
+	 * @param string       $update_operations[<operationid>]  Operation ID.
+	 * @param array|string $update_options                    An array of options from request, or "extend".
 	 *
 	 * @return array
 	 */
-	protected function getUpdateOperations(array $update_operations, array $update_options): array {
+	protected function getUpdateOperations(array $update_operations, $update_options): array {
 		$opmessages = [];
 		$nonack_messages = [];
 		$opcommands = [];
