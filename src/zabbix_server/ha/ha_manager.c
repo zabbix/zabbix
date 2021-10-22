@@ -612,7 +612,7 @@ static int	ha_db_get_time(zbx_ha_info_t *info, int *db_time)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (NULL == (result = ha_db_select(info, "select " ZBX_DB_TIMESTAMP())))
+	if (NULL == (result = ha_db_select(info, "select " ZBX_DB_TIMESTAMP() " from config")))
 		goto out;
 
 	if (NULL != (row = DBfetch(result)))
