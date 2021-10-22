@@ -79,6 +79,13 @@ class testItemRate extends CIntegrationTest {
 			'start' => 0,
 			'step' => 32,
 			'count' => 120
+		],
+		[
+			'key' => 'kuber_metric[Inf2]',
+			'value_type' => ITEM_VALUE_TYPE_FLOAT,
+			'start' => 0,
+			'step' => 32,
+			'count' => 120
 		]
 	];
 
@@ -86,15 +93,6 @@ class testItemRate extends CIntegrationTest {
 		[
 			'api_request' => [
 				'output' => ['value'],
-				'history' => ITEM_VALUE_TYPE_FLOAT,
-				/*
-				'itemids' => [],
-				'time_from' => 0,
-				'time_till' => 0,
-				*/
-				'sortorder' => 'DESC',
-				'sortfield' => 'clock',
-				'limit' => 1
 			],
 			'expected_result' => [
 				[
@@ -112,15 +110,23 @@ class testItemRate extends CIntegrationTest {
 		[
 			'api_request' => [
 				'output' => ['value'],
-				'history' => ITEM_VALUE_TYPE_FLOAT,
-				/*
-				'itemids' => [],
-				'time_from' => 0,
-				'time_till' => 0,
-				*/
-				'sortorder' => 'DESC',
-				'sortfield' => 'clock',
-				'limit' => 1
+			],
+			'expected_result' => [
+				[
+					'value' => '2',
+				]
+			],
+			'expected_error' => false,
+			'item' => [
+				'name' => 'rate[0.3]',
+				'params' => 'rate(/'.'/kuber_metric[0.3],60)',
+				'delay' => 1,
+				'item_num' => 0
+			]
+		],
+		[
+			'api_request' => [
+				'output' => ['value'],
 			],
 			'expected_result' => [
 				[
@@ -138,15 +144,6 @@ class testItemRate extends CIntegrationTest {
 		[
 			'api_request' => [
 				'output' => ['value'],
-				'history' => ITEM_VALUE_TYPE_FLOAT,
-				/*
-				'itemids' => [],
-				'time_from' => 0,
-				'time_till' => 0,
-				*/
-				'sortorder' => 'DESC',
-				'sortfield' => 'clock',
-				'limit' => 1
 			],
 			'expected_result' => [
 				[
@@ -164,15 +161,23 @@ class testItemRate extends CIntegrationTest {
 		[
 			'api_request' => [
 				'output' => ['value'],
-				'history' => ITEM_VALUE_TYPE_FLOAT,
-				/*
-				'itemids' => [],
-				'time_from' => 0,
-				'time_till' => 0,
-				*/
-				'sortorder' => 'DESC',
-				'sortfield' => 'clock',
-				'limit' => 1
+			],
+			'expected_result' => [
+				[
+					'value' => '0.1',
+				]
+			],
+			'expected_error' => false,
+			'item' => [
+				'name' => 'histogram_quantile-2rates',
+				'params' => 'histogram_quantile(0.8,0.1,last(/'.'/rate[0.1]),"Inf",last(/'.'/rate[Inf]))',
+				'delay' => 1,
+				'item_num' => 0
+			]
+		],
+		[
+			'api_request' => [
+				'output' => ['value'],
 			],
 			'expected_result' => [
 				[
@@ -186,7 +191,46 @@ class testItemRate extends CIntegrationTest {
 				'delay' => 1,
 				'item_num' => 0
 			]
-		]
+		],
+		[
+			'api_request' => [
+				'output' => ['value'],
+			],
+			'expected_result' => [
+				[
+					'value' => '32',
+				]
+			],
+			'expected_error' => false,
+			'item' => [
+				'name' => 'rate[Inf2]',
+				'params' => 'rate(/'.'/kuber_metric[Inf2],60)',
+				'delay' => 1,
+				'item_num' => 0
+				]
+		],
+		[
+			'api_request' => false,
+			'expected_result' => false,
+			'expected_error' => 'Cannot evaluate expression: invalid string values of backet for function at "histogram_quantile(0.8,0.1,last(//rate[0.1]),"Inf2",last(//rate[Inf2]))"',
+			'item' => [
+				'name' => 'histogram_quantile-fail-Inf2',
+				'params' => 'histogram_quantile(0.8,0.1,last(/'.'/rate[0.1]),"Inf2",last(/'.'/rate[Inf2]))',
+				'delay' => 1,
+				'item_num' => 0
+			]
+		],
+		[
+			'api_request' => false,
+			'expected_result' => false,
+			'expected_error' => 'Cannot evaluate expression: invalid last infinity rate buckets for function at "histogram_quantile(0.8,0.1,last(//rate[0.1]),0.3,last(//rate[0.3]))"',
+			'item' => [
+				'name' => 'histogram_quantile-fail-withoutInf',
+				'params' => 'histogram_quantile(0.8,0.1,last(/'.'/rate[0.1]),0.3,last(/'.'/rate[0.3]))',
+				'delay' => 1,
+				'item_num' => 0
+			]
+		],
 	];
 
 	/**
@@ -270,7 +314,6 @@ class testItemRate extends CIntegrationTest {
 			$scenario['api_request']['time_from'] = self::$items[$scenario['item']['item_num']]['time_from'];
 			$scenario['api_request']['time_till'] = self::$items[$scenario['item']['item_num']]['time_till'];
 		}
-
 		return true;
 	}
 
@@ -346,20 +389,36 @@ class testItemRate extends CIntegrationTest {
 	 * @depends testItemRate_Send
 	 */
 	public function testItemRate_Get($api_request, $expected_result, $expected_error, $item) {
+
+		$req = [
+			'history' => ITEM_VALUE_TYPE_FLOAT,
+			'sortorder' => 'DESC',
+			'sortfield' => 'clock',
+			'limit' => 1
+		];
+
 		foreach (self::$scenarios as $scenario) {
 			if ($scenario['item'] != $item)
 				continue;
-			$api_request = $scenario['api_request'];
+			$api_request = array_merge($scenario['api_request'], $req);
 			break;
 		}
 
-		$result = $this->call('history.get', $api_request, $expected_error);
+		if ($expected_error === false) {
+			$result = $this->call('history.get', $api_request, $expected_error);
+		} else {
+			$result = $this->call('item.get',[
+				'itemids' => $api_request['itemids'],
+				'output' => ['error']
+				]
+			);
+		}
 
 		if ($expected_error === false) {
 			$this->assertSame($result['result'], $expected_result);
 		}
 		else {
-			$this->assertSame($result['error']['data'], $expected_error);
+			$this->assertSame($result['result'][0]['error'], $expected_error);
 		}
 	}
 }
