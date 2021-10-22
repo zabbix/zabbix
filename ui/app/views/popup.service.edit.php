@@ -379,6 +379,7 @@ $form
 	);
 
 if ($data['serviceid'] !== null) {
+	$title = _('Service');
 	$buttons = [
 		[
 			'title' => _('Update'),
@@ -391,7 +392,7 @@ if ($data['serviceid'] !== null) {
 			'title' => _('Clone'),
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-clone']),
 			'keepOpen' => true,
-			'action' => 'service_edit_popup.clone();'
+			'action' => 'service_edit_popup.clone('.json_encode(_('New service')).');'
 		],
 		[
 			'title' => _('Add'),
@@ -403,6 +404,7 @@ if ($data['serviceid'] !== null) {
 	];
 }
 else {
+	$title = _('New service');
 	$buttons = [
 		[
 			'title' => _('Add'),
@@ -415,7 +417,7 @@ else {
 }
 
 $output = [
-	'header' => $data['title'],
+	'header' => $title,
 	'body' => $form->toString(),
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().

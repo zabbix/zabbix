@@ -59,6 +59,7 @@ window.service_edit_popup = {
 		this.overlay = overlays_stack.getById('service_edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.header = this.overlay.$dialogue.$header[0];
 		this.footer = this.overlay.$dialogue.$footer[0];
 
 		for (const status_rule of status_rules) {
@@ -550,10 +551,12 @@ window.service_edit_popup = {
 		});
 	},
 
-	clone() {
+	clone(dialog_title) {
 		this.serviceid = null;
 
 		this.removeAllChildren();
+
+		this.header.textContent = dialog_title;
 
 		for (const element of this.footer.querySelectorAll('.js-update, .js-clone')) {
 			element.classList.add('<?= ZBX_STYLE_DISPLAY_NONE ?>');
