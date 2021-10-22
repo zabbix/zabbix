@@ -128,30 +128,79 @@ if (hasRequest('add') || hasRequest('update')) {
 		'update_operations' => getRequest('update_operations', [])
 	];
 
-	foreach (['operations', 'recovery_operations', 'update_operations'] as $operation_key) {
-		foreach ($action[$operation_key] as &$operation) {
-			if (array_key_exists('opmessage', $operation)
-					&& !array_key_exists('default_msg', $operation['opmessage'])) {
-				$operation['opmessage']['default_msg'] = 1;
+	foreach (['operations', 'recovery_operations', 'update_operations'] as $operation_group) {
+		foreach ($action[$operation_group] as &$operation) {
+			if ($operation_group === 'operations') {
+				if ($eventsource == EVENT_SOURCE_TRIGGERS) {
+					if (array_key_exists('opconditions', $operation)) {
+						foreach ($operation['opconditions'] as &$opcondition) {
+							unset($opcondition['opconditionid'], $opcondition['operationid']);
+						}
+						unset($opcondition);
+					}
+					else {
+						$operation['opconditions'] = [];
+					}
+				}
+				elseif ($eventsource == EVENT_SOURCE_DISCOVERY || $eventsource == EVENT_SOURCE_AUTOREGISTRATION) {
+					unset($operation['esc_period'], $operation['esc_step_from'], $operation['esc_step_to'],
+						$operation['evaltype']
+					);
+				}
 			}
-
-			if ($operation_key === 'recovery_operations') {
+			elseif ($operation_group === 'recovery_operations') {
 				unset($operation['opmessage']['mediatypeid']);
+
+				if ($operation['operationtype'] == OPERATION_TYPE_COMMAND) {
+					unset($operation['opmessage']);
+				}
 			}
 
-			if (array_key_exists('opmessage', $operation) && $operation['opmessage']['default_msg'] == 1) {
-				unset($operation['opmessage']['subject'], $operation['opmessage']['message']);
+			if (array_key_exists('opmessage', $operation)) {
+				if (!array_key_exists('default_msg', $operation['opmessage'])) {
+					$operation['opmessage']['default_msg'] = 1;
+				}
+
+				if ($operation['opmessage']['default_msg'] == 1) {
+					unset($operation['opmessage']['subject'], $operation['opmessage']['message']);
+				}
+			}
+
+			if (array_key_exists('opmessage_grp', $operation) || array_key_exists('opmessage_usr', $operation)) {
+				if (!array_key_exists('opmessage_grp', $operation)) {
+					$operation['opmessage_grp'] = [];
+				}
+
+				if (!array_key_exists('opmessage_usr', $operation)) {
+					$operation['opmessage_usr'] = [];
+				}
+			}
+
+			if (array_key_exists('opcommand_grp', $operation) || array_key_exists('opcommand_hst', $operation)) {
+				if (array_key_exists('opcommand_grp', $operation)) {
+					foreach ($operation['opcommand_grp'] as &$opcommand_grp) {
+						unset($opcommand_grp['opcommand_grpid']);
+					}
+					unset($opcommand_grp);
+				}
+				else {
+					$operation['opcommand_grp'] = [];
+				}
+
+				if (array_key_exists('opcommand_hst', $operation)) {
+					foreach ($operation['opcommand_hst'] as &$opcommand_hst) {
+						unset($opcommand_hst['opcommand_hstid']);
+					}
+					unset($opcommand_hst);
+				}
+				else {
+					$operation['opcommand_hst'] = [];
+				}
 			}
 
 			unset($operation['operationid'], $operation['actionid'], $operation['eventsource'], $operation['recovery'],
 				$operation['id']
 			);
-
-			if ($eventsource != EVENT_SOURCE_TRIGGERS) {
-				unset($operation['esc_period'], $operation['esc_step_from'], $operation['esc_step_to'],
-					$operation['evaltype']
-				);
-			}
 		}
 		unset($operation);
 	}
