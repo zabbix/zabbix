@@ -3271,6 +3271,10 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 		{
 			if (0 != history_num)
 			{
+				const ZBX_DC_HISTORY	*phistory = NULL;
+				const ZBX_DC_TREND	*ptrends = NULL;
+				int			history_num_loc = 0, trends_num_loc = 0;
+
 				DCmodule_prepare_history(history, history_num, history_float, &history_float_num,
 						history_integer, &history_integer_num, history_string,
 						&history_string_num, history_text, &history_text_num, history_log,
@@ -3279,13 +3283,6 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 				DCmodule_sync_history(history_float_num, history_integer_num, history_string_num,
 						history_text_num, history_log_num, history_float, history_integer,
 						history_string, history_text, history_log);
-			}
-
-			if (0 != history_num)
-			{
-				const ZBX_DC_HISTORY	*phistory = NULL;
-				const ZBX_DC_TREND	*ptrends = NULL;
-				int			history_num_loc = 0, trends_num_loc = 0;
 
 				if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_HISTORY))
 				{

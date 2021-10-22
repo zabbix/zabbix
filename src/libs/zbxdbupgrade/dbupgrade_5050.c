@@ -790,12 +790,47 @@ static int	DBpatch_5050074(void)
 
 static int	DBpatch_5050075(void)
 {
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.hosts.sort' where idx='web.hosts.php.sort'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5050076(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.hosts.sortorder' where idx='web.hosts.php.sortorder'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5050077(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set value_str='host.list' where idx='web.pager.entity' "
+				"and value_str='hosts.php'"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5050078(void)
 	const ZBX_FIELD	field = {"ha_failover_delay", "1m", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_5050076(void)
+static int	DBpatch_5050079(void)
 {
 	const ZBX_TABLE	table =
 			{"ha_node", "ha_nodeid", 0,
@@ -815,22 +850,22 @@ static int	DBpatch_5050076(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_5050077(void)
+static int	DBpatch_5050080(void)
 {
 	return DBcreate_index("ha_node", "ha_node_1", "name", 1);
 }
 
-static int	DBpatch_5050078(void)
+static int	DBpatch_5050081(void)
 {
 	return DBcreate_index("ha_node", "ha_node_2", "status,lastaccess", 0);
 }
 
-static int	DBpatch_5050079(void)
+static int	DBpatch_5050082(void)
 {
 	return DBdrop_table("auditlog");
 }
 
-static int	DBpatch_5050080(void)
+static int	DBpatch_5050083(void)
 {
 	const ZBX_TABLE table =
 		{"auditlog", "auditid", 0,
@@ -855,17 +890,17 @@ static int	DBpatch_5050080(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_5050081(void)
+static int	DBpatch_5050084(void)
 {
 	return DBcreate_index("auditlog", "auditlog_1", "userid,clock", 0);
 }
 
-static int	DBpatch_5050082(void)
+static int	DBpatch_5050085(void)
 {
 	return DBcreate_index("auditlog", "auditlog_2", "clock", 0);
 }
 
-static int	DBpatch_5050083(void)
+static int	DBpatch_5050086(void)
 {
 	return DBcreate_index("auditlog", "auditlog_3", "resourcetype,resourceid", 0);
 }
@@ -948,5 +983,8 @@ DBPATCH_ADD(5050080, 0, 1)
 DBPATCH_ADD(5050081, 0, 1)
 DBPATCH_ADD(5050082, 0, 1)
 DBPATCH_ADD(5050083, 0, 1)
+DBPATCH_ADD(5050084, 0, 1)
+DBPATCH_ADD(5050085, 0, 1)
+DBPATCH_ADD(5050086, 0, 1)
 
 DBPATCH_END()

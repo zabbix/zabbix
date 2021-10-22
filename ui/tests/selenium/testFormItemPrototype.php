@@ -2114,9 +2114,11 @@ class testFormItemPrototype extends CLegacyWebTest {
 		if (CTestArrayHelper::get($data, 'type') === 'Zabbix agent (active)'
 				&& substr(CTestArrayHelper::get($data, 'key'), 0, 8) === 'mqtt.get') {
 			$this->zbxTestTextNotVisible('Update interval');
-			$this->zbxTestAssertNotVisibleId('row_delay');
+			$this->zbxTestAssertNotVisibleId('js-item-delay-label');
+			$this->zbxTestAssertNotVisibleId('js-item-delay-field');
 			$this->zbxTestTextNotVisible('Custom intervals');
-			$this->zbxTestAssertNotVisibleId('row_flex_intervals');
+			$this->zbxTestAssertNotVisibleId('js-item-flex-intervals-label');
+			$this->zbxTestAssertNotVisibleId('js-item-flex-intervals-field');
 		}
 
 		$itemFlexFlag = true;
@@ -2192,9 +2194,8 @@ class testFormItemPrototype extends CLegacyWebTest {
 		}
 
 		if (isset($data['formCheck'])) {
-			$this->zbxTestOpen('hosts.php');
-			$this->zbxTestClickLinkTextWait($this->host);
-			$this->zbxTestClickLinkTextWait('Discovery rules');
+			$this->zbxTestOpen(self::HOST_LIST_PAGE);
+			$this->filterEntriesAndOpenDiscovery($this->host);
 			$this->zbxTestClickLinkTextWait($this->discoveryRule);
 			$this->zbxTestClickLinkTextWait('Item prototypes');
 			$this->zbxTestCheckHeader('Item prototypes');
@@ -2229,15 +2230,19 @@ class testFormItemPrototype extends CLegacyWebTest {
 					// Check hidden update and custom interval for mqtt.get key.
 					if (substr(CTestArrayHelper::get($data, 'key'), 0, 8) === 'mqtt.get') {
 						$this->zbxTestTextNotVisible('Update interval');
-						$this->zbxTestAssertNotVisibleId('row_delay');
+						$this->zbxTestAssertNotVisibleId('js-item-delay-label');
+						$this->zbxTestAssertNotVisibleId('js-item-delay-field');
 						$this->zbxTestTextNotVisible('Custom intervals');
-						$this->zbxTestAssertNotVisibleId('row_flex_intervals');
+						$this->zbxTestAssertNotVisibleId('js-item-flex-intervals-label');
+						$this->zbxTestAssertNotVisibleId('js-item-flex-intervals-field');
 					}
 					else {
 						$this->zbxTestTextVisible('Update interval');
-						$this->zbxTestAssertVisibleId('row_delay');
+						$this->zbxTestAssertVisibleId('js-item-delay-label');
+						$this->zbxTestAssertVisibleId('js-item-delay-field');
 						$this->zbxTestTextVisible('Custom intervals');
-						$this->zbxTestAssertVisibleId('row_flex_intervals');
+						$this->zbxTestAssertVisibleId('js-item-flex-intervals-label');
+						$this->zbxTestAssertVisibleId('js-item-flex-intervals-field');
 					}
 					break;
 				default:
@@ -2266,9 +2271,8 @@ class testFormItemPrototype extends CLegacyWebTest {
 				$itemId = $row['itemid'];
 			}
 
-			$this->zbxTestOpen('hosts.php');
-			$this->zbxTestClickLinkTextWait($this->host);
-			$this->zbxTestClickLinkTextWait('Discovery rules');
+			$this->zbxTestOpen(self::HOST_LIST_PAGE);
+			$this->filterEntriesAndOpenDiscovery($this->host);
 			$this->zbxTestClickLinkTextWait($this->discoveryRule);
 			$this->zbxTestClickLinkTextWait('Item prototypes');
 
@@ -2278,5 +2282,18 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$this->zbxTestAcceptAlert();
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item prototypes deleted');
 		}
+	}
+
+	/**
+	 * Function for filtering necessary hosts and opening its Discovery rules.
+	 *
+	 * @param string    $name    name of a host
+	 */
+	private function filterEntriesAndOpenDiscovery($name) {
+		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+		$form->fill(['Name' => $name]);
+		$this->query('button:Apply')->one()->waitUntilClickable()->click();
+		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
+				->getColumn('Discovery')->query('link:Discovery')->one()->click();
 	}
 }

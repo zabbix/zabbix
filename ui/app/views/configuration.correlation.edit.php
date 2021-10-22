@@ -23,8 +23,6 @@
  * @var CView $this
  */
 
-$this->addJsFile('multiselect.js');
-$this->addJsFile('textareaflexible.js');
 $this->addJsFile('popup.condition.common.js');
 $this->includeJsFile('configuration.correlation.edit.js.php');
 

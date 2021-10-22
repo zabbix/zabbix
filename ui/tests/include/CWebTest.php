@@ -20,11 +20,12 @@
 
 require_once 'vendor/autoload.php';
 
-require_once dirname(__FILE__).'/CTest.php';
-require_once dirname(__FILE__).'/web/CPage.php';
-require_once dirname(__FILE__).'/helpers/CXPathHelper.php';
-require_once dirname(__FILE__).'/helpers/CImageHelper.php';
-require_once dirname(__FILE__).'/../../include/classes/helpers/CMessageHelper.php';
+require_once __DIR__.'/CTest.php';
+require_once __DIR__.'/web/CPage.php';
+require_once __DIR__.'/helpers/CXPathHelper.php';
+require_once __DIR__.'/helpers/CImageHelper.php';
+require_once __DIR__.'/../../include/classes/helpers/CMessageHelper.php';
+require_once __DIR__.'/../../include/classes/routing/CUrl.php';
 
 define('TEST_GOOD', 0);
 define('TEST_BAD', 1);
@@ -40,6 +41,7 @@ class CWebTest extends CTest {
 	const NETWORK_THROTTLING_OFFLINE	= 'offline';
 	const NETWORK_THROTTLING_SLOW		= 'slow';
 	const NETWORK_THROTTLING_FAST		= 'fast';
+	const HOST_LIST_PAGE				= 'zabbix.php?action=host.list';
 
 	// Screenshot capture on error.
 	private $capture_screenshot = true;

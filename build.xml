@@ -57,6 +57,7 @@
 		<replace file="ui/conf/zabbix.conf.php" token="{DBUSER}" value="${dbuser}"/>
 		<replace file="ui/conf/zabbix.conf.php" token="{DBPASSWORD}" value="${dbpassword}"/>
 		<replace file="ui/conf/zabbix.conf.php" token="{PHPUNIT_ERROR_LOG}" value="${phpunit_error_log}"/>
+		<replace file="ui/conf/zabbix.conf.php" token="{SERVER_PORT}" value="${phpunit_port_prefix}51"/>	<!-- 51 - CIntegrationTest::SERVER_PORT_SUFFIX -->
 		<chmod file="ui/conf/zabbix.conf.php" perm="go+rw"/>
 	</target>
 
@@ -172,7 +173,6 @@
 			<arg line="-q"/>
 			<arg line="-h '${dbhost}'"/>
 			<arg line="-U '${dbuser}'"/>
-			<arg line="-1"/>
 			<arg line="--set ON_ERROR_STOP=1"/>
 			<arg line="${dbname}"/>
 		</exec>

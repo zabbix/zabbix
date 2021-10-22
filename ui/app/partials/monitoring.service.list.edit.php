@@ -119,7 +119,7 @@ foreach ($data['services'] as $serviceid => $service) {
 				->addClass('js-add-child-service')
 				->setAttribute('data-serviceid', $serviceid)
 				->setTitle(_('Add child service'))
-				->setEnabled(!$service['readonly']),
+				->setEnabled(!$service['readonly'] && $service['problem_tags'] == 0),
 			(new CButton(null))
 				->addClass(ZBX_STYLE_BTN_EDIT)
 				->addClass('js-edit-service')

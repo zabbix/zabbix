@@ -296,6 +296,7 @@ static char	*zbx_ifrow_get_utf8_description(const zbx_ifrow_t *pIfRow)
 			else
 				mb_to_unicode = zbx_acp_to_unicode;
 		}
+
 		wdescr = mb_to_unicode(pIfRow->ifRow->bDescr);
 		utf8_descr = zbx_unicode_to_utf8(wdescr);
 		zbx_free(wdescr);

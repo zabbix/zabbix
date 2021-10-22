@@ -69,13 +69,13 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 	$(obj.querySelector('#tbl_macros')).dynamicRows({template: '#macro-row-tmpl'});
 	$(obj.querySelector('#tbl_macros'))
 		.on('afteradd.dynamicRows', () => {
-			$('.input-group', $(obj.querySelector('#tbl_macros'))).macroValue();
+			$('.macro-input-group', $(obj.querySelector('#tbl_macros'))).macroValue();
 			$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', $(obj.querySelector('#tbl_macros'))).textareaFlexible();
 			obj.querySelector('#macro_add').scrollIntoView({block: 'nearest'});
 		});
 
 	$(obj.querySelector('#tbl_macros'))
-		.find('.input-group')
+		.find('.macro-input-group')
 		.macroValue();
 
 	$(obj.querySelector('#tbl_macros'))
@@ -457,22 +457,26 @@ function submitPopup(overlay) {
 
 	fetch(url.getUrl(), {
 		method: 'post',
-		headers: {
-			'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-		},
+		headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'},
 		body: $(form).serialize()
 	})
 	.then((response) => response.json())
 	.then((response) => {
+		if ('script_inline' in response) {
+			$('head').append(response.script_inline);
+		}
+
 		if ('errors' in response) {
 			overlay.unsetLoading();
 			$(response.errors).insertBefore(form);
 		}
 		else {
-			postMessageOk(response['title']);
+			postMessageOk(response.title);
+
 			if ('messages' in response) {
 				postMessageDetails('success', response.messages);
 			}
+
 			overlayDialogueDestroy(overlay.dialogueid);
 			location.href = location_url;
 		}
