@@ -3,4 +3,5 @@
 noinst_LIBRARIES = libzbxha.a
 
 libzbxha_a_SOURCES = \
-	ha_manager.c
+	ha_manager.c \
+	ha.h
