@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 
 ## Setup
 
@@ -64,7 +64,7 @@ Please report any issues with the template at https://support.zabbix.com
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 
 ## Setup
 
@@ -123,7 +123,7 @@ Please report any issues with the template at https://support.zabbix.com
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 
 ## Setup
 
@@ -176,7 +176,7 @@ Please report any issues with the template at https://support.zabbix.com
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 
 ## Setup
 
@@ -233,7 +233,7 @@ Please report any issues with the template at https://support.zabbix.com
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 
 ## Setup
 
@@ -250,7 +250,7 @@ No specific Zabbix configuration is required.
 |{$IF.ERRORS.WARN} |<p>-</p> |`2` |
 |{$IFCONTROL} |<p>-</p> |`1` |
 |{$NET.IF.IFNAME.MATCHES} |<p>-</p> |`^.*$` |
-|{$NET.IF.IFNAME.NOT_MATCHES} |<p>Filter out loopbacks, nulls, docker veth links and docker0 bridge by default</p> |`(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9a-z]+$|docker[0-9]+|br-[a-z0-9]{12})` |
+|{$NET.IF.IFNAME.NOT_MATCHES} |<p>Filter out loopbacks, nulls, docker veth links and docker0 bridge by default</p> |`(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9A-z]+$|docker[0-9]+|br-[a-z0-9]{12})` |
 
 ## Template links
 
@@ -336,7 +336,7 @@ There are no template links in this template.
 |Inventory |Operating system |<p>-</p> |ZABBIX_PASSIVE |system.sw.os<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |Inventory |Operating system architecture |<p>Operating system architecture of the host.</p> |ZABBIX_PASSIVE |system.sw.arch<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |Inventory |Software installed |<p>-</p> |ZABBIX_PASSIVE |system.sw.packages<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
-|Security |Checksum of /etc/passwd |<p>-</p> |ZABBIX_PASSIVE |vfs.file.cksum[/etc/passwd,sha256]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Security |Checksum of /etc/passwd |<p>-</p> |ZABBIX_PASSIVE |vfs.file.cksum[/etc/passwd]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Status |System uptime |<p>System uptime in 'N days, hh:mm:ss' format.</p> |ZABBIX_PASSIVE |system.uptime |
 
 ## Triggers
@@ -349,7 +349,7 @@ There are no template links in this template.
 |Configured max number of processes is too low (< {$KERNEL.MAXPROC.MIN}) |<p>-</p> |`last(/Linux generic by Zabbix agent/kernel.maxproc)<{$KERNEL.MAXPROC.MIN}` |INFO |<p>**Depends on**:</p><p>- Getting closer to process limit (over 80% used)</p> |
 |Getting closer to process limit (over 80% used) |<p>-</p> |`last(/Linux generic by Zabbix agent/proc.num)/last(/Linux generic by Zabbix agent/kernel.maxproc)*100>80` |WARNING | |
 |Operating system description has changed |<p>Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.</p> |`last(/Linux generic by Zabbix agent/system.sw.os,#1)<>last(/Linux generic by Zabbix agent/system.sw.os,#2) and length(last(/Linux generic by Zabbix agent/system.sw.os))>0` |INFO |<p>Manual close: YES</p><p>**Depends on**:</p><p>- System name has changed (new name: {ITEM.VALUE})</p> |
-|/etc/passwd has been changed |<p>-</p> |`last(/Linux generic by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#1)<>last(/Linux generic by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#2)` |INFO |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Operating system description has changed</p><p>- System name has changed (new name: {ITEM.VALUE})</p> |
+|/etc/passwd has been changed |<p>-</p> |`last(/Linux generic by Zabbix agent/vfs.file.cksum[/etc/passwd],#1)<>last(/Linux generic by Zabbix agent/vfs.file.cksum[/etc/passwd],#2)` |INFO |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Operating system description has changed</p><p>- System name has changed (new name: {ITEM.VALUE})</p> |
 |{HOST.NAME} has been restarted (uptime < 10m) |<p>The host uptime is less than 10 minutes</p> |`last(/Linux generic by Zabbix agent/system.uptime)<10m` |WARNING |<p>Manual close: YES</p> |
 
 ## Feedback
@@ -360,7 +360,7 @@ Please report any issues with the template at https://support.zabbix.com
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 New official Linux template. Requires agent of Zabbix 3.0.14, 3.4.5 and 4.0.0 or newer.
 
 ## Setup
