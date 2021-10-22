@@ -785,6 +785,7 @@ class CAction extends CApiService {
 		// operation conditions
 		$ins_opconditions = [];
 		$upd_opconditions = [];
+		$del_opconditionids = [];
 
 		// messages
 		$ins_opmessages = [];
@@ -844,7 +845,7 @@ class CAction extends CApiService {
 							? array_column($db_operation['opconditions'], null, 'value')
 							: [];
 
-						foreach ($operation['opconditions'] as $opcondition) {
+						foreach ($operation['opconditions'] as &$opcondition) {
 							if (array_key_exists($opcondition['value'], $db_opconditions)) {
 								$db_opcondition = $db_opconditions[$opcondition['value']];
 								$opcondition['opconditionid'] = $db_opcondition['opconditionid'];
@@ -863,6 +864,11 @@ class CAction extends CApiService {
 								$ins_opconditions[] = ['operationid' => $operation['operationid']] + $opcondition;
 							}
 						}
+						unset($opcondition);
+
+						$del_opconditionids = array_merge($del_opconditionids,
+							array_column($db_opconditions, 'opconditionid')
+						);
 					}
 
 					switch ($operation['operationtype']) {
@@ -1073,6 +1079,10 @@ class CAction extends CApiService {
 		unset($action);
 
 		// operation conditions
+		if ($del_opconditionids) {
+			DB::delete('opconditions', ['opconditionid' => $del_opconditionids]);
+		}
+
 		if ($upd_opconditions) {
 			DB::update('opconditions', $upd_opconditions);
 		}
