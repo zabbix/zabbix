@@ -146,8 +146,16 @@ class testHistoryManager extends CTest {
 	public function test($items, $history, $limit, $expected_result) {
 		DB::insertBatch('history_uint', $history, false);
 
-		$values = Manager::History()->getLastValues($items, $limit);
+		$values = Manager::History()
+			->setUsePrimaryKeys(false)
+			->getLastValues($items, $limit);
 
-		$this->assertSame($expected_result, $values);
+		$this->assertSame($expected_result, $values, 'Item history values are same via non-PK queries');
+
+		$values = Manager::History()
+			->setUsePrimaryKeys(true)
+			->getLastValues($items, $limit);
+
+		$this->assertSame($expected_result, $values, 'Item history values are same via with-PK queries');
 	}
 }
