@@ -1729,22 +1729,22 @@ class CService extends CApiService {
 			$accessible_services = $permissions['r_services'] + $permissions['rw_services'];
 		}
 
-		$options = [
+		$_options = [
 			'output' => ['linkid', 'serviceupid', 'servicedownid']
 		];
-		$db_links = DBselect(DB::makeSql('services_links', $options));
+		$db_links = DBselect(DB::makeSql('services_links', $_options));
 
 		while ($db_link = DBfetch($db_links)) {
 			if (array_key_exists($db_link['servicedownid'], $db_services)) {
 				if ($accessible_services === null || array_key_exists($db_link['serviceupid'], $accessible_services)) {
-					$db_services[$db_link['servicedownid']]['parents'][$db_link['linkid']] = [
+					$db_services[$db_link['servicedownid']]['parents'][] = [
 						'linkid' => $db_link['linkid'],
 						'serviceid' => $db_link['serviceupid']
 					];
 				}
 			}
 			elseif (array_key_exists($db_link['serviceupid'], $db_services)) {
-				$db_services[$db_link['serviceupid']]['children'][$db_link['linkid']] = [
+				$db_services[$db_link['serviceupid']]['children'][] = [
 					'linkid' => $db_link['linkid'],
 					'serviceid' => $db_link['servicedownid']
 				];
@@ -1761,16 +1761,18 @@ class CService extends CApiService {
 		}
 		unset($db_service);
 
-		$options = [
+		$_options = [
 			'output' => ['servicetagid', 'serviceid', 'tag', 'value'],
 			'filter' => ['serviceid' => array_keys($db_services)]
 		];
-		$db_tags = DBselect(DB::makeSql('service_tag', $options));
+		$db_tags = DBselect(DB::makeSql('service_tag', $_options));
 
 		while ($db_tag = DBfetch($db_tags)) {
-			$db_services[$db_tag['serviceid']]['tags'][$db_tag['servicetagid']] = array_diff_key($db_tag,
-				array_flip(['serviceid'])
-			);
+			$serviceid = $db_tag['serviceid'];
+
+			unset($db_tag['serviceid']);
+
+			$db_services[$serviceid]['tags'][] = $db_tag;
 		}
 	}
 
@@ -1783,15 +1785,18 @@ class CService extends CApiService {
 		}
 		unset($db_service);
 
-		$options = [
+		$_options = [
 			'output' => ['service_problem_tagid', 'serviceid', 'tag', 'operator', 'value'],
 			'filter' => ['serviceid' => array_keys($db_services)]
 		];
-		$db_problem_tags = DBselect(DB::makeSql('service_problem_tag', $options));
+		$db_problem_tags = DBselect(DB::makeSql('service_problem_tag', $_options));
 
 		while ($db_problem_tag = DBfetch($db_problem_tags)) {
-			$db_services[$db_problem_tag['serviceid']]['problem_tags'][$db_problem_tag['service_problem_tagid']] =
-				array_diff_key($db_problem_tag, array_flip(['serviceid']));
+			$serviceid = $db_problem_tag['serviceid'];
+
+			unset($db_problem_tag['serviceid']);
+
+			$db_services[$serviceid]['problem_tags'][] = $db_problem_tag;
 		}
 	}
 
@@ -1809,16 +1814,18 @@ class CService extends CApiService {
 			}
 		}
 
-		$options = [
+		$_options = [
 			'output' => ['timeid', 'serviceid', 'type', 'ts_from', 'ts_to', 'note'],
 			'filter' => ['serviceid' => array_keys($affected_serviceids)]
 		];
-		$db_times = DBselect(DB::makeSql('services_times', $options));
+		$db_times = DBselect(DB::makeSql('services_times', $_options));
 
 		while ($db_time = DBfetch($db_times)) {
-			$db_services[$db_time['serviceid']]['times'][$db_time['timeid']] = array_diff_key($db_time,
-				array_flip(['serviceid'])
-			);
+			$serviceid = $db_time['serviceid'];
+
+			unset($db_time['serviceid']);
+
+			$db_services[$serviceid]['times'][] = $db_time;
 		}
 	}
 
@@ -1836,16 +1843,18 @@ class CService extends CApiService {
 			}
 		}
 
-		$options = [
+		$_options = [
 			'output' => ['service_status_ruleid', 'serviceid', 'type', 'limit_value', 'limit_status', 'new_status'],
 			'filter' => ['serviceid' => array_keys($affected_serviceids)]
 		];
-		$db_status_rules = DBselect(DB::makeSql('service_status_rule', $options));
+		$db_status_rules = DBselect(DB::makeSql('service_status_rule', $_options));
 
 		while ($db_status_rule = DBfetch($db_status_rules)) {
-			$db_services[$db_status_rule['serviceid']]['status_rules'][] = array_diff_key($db_status_rule,
-				array_flip(['serviceid'])
-			);
+			$serviceid = $db_status_rule['serviceid'];
+
+			unset($db_status_rule['serviceid']);
+
+			$db_services[$serviceid]['status_rules'][] = $db_status_rule;
 		}
 	}
 
@@ -2417,10 +2426,10 @@ class CService extends CApiService {
 			$rw_services += array_fill_keys(array_column($tags, 'serviceid'), 0);
 		}
 
-		$options = [
+		$_options = [
 			'output' => ['serviceupid', 'servicedownid']
 		];
-		$db_links = DBselect(DB::makeSql('services_links', $options));
+		$db_links = DBselect(DB::makeSql('services_links', $_options));
 
 		$relations = [];
 
