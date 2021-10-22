@@ -514,7 +514,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 						" and status=%d",
 					host_esc, HOST_STATUS_TEMPLATE);
 
-			if (NULL != (row2 = DBfetch(result2)))
+			if (NULL != DBfetch(result2))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot add discovered host \"%s\":"
 						" template with the same name already exists", row[1]);
