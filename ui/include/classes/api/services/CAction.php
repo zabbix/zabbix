@@ -640,6 +640,10 @@ class CAction extends CApiService {
 			foreach ($action['filter']['conditions'] as &$condition) {
 				$db_condition = current(
 					array_filter($db_conditions, static function(array $db_condition) use ($condition): bool {
+						if ($condition['conditiontype'] == CONDITION_TYPE_SUPPRESSED) {
+							return $condition['conditiontype'] == $db_condition['conditiontype'];
+						}
+
 						return $condition['conditiontype'] == $db_condition['conditiontype']
 							&& $condition['value'] === $db_condition['value'];
 					})
@@ -1993,8 +1997,8 @@ class CAction extends CApiService {
 					['if' => ['field' => 'conditiontype', 'in' => implode(',', [CONDITION_TYPE_TRIGGER_NAME, CONDITION_TYPE_EVENT_TAG])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('conditions', 'value')],
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_TRIGGER_SEVERITY], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1))],
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_TIME_PERIOD], 'type' => API_TIME_PERIOD, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('conditions', 'value')],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_SUPPRESSED], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PROBLEM_SUPPRESSED_FALSE, ZBX_PROBLEM_SUPPRESSED_TRUE])],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TAG_VALUE], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('conditions', 'value')]
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TAG_VALUE], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('conditions', 'value')],
+					['else' => true, 'type' => API_UNEXPECTED]
 				];
 				$operator_rules = [
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_HOST_GROUP], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_HOST_GROUP))],
