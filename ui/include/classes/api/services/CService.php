@@ -510,10 +510,10 @@ class CService extends CApiService {
 
 		$parents = array_fill_keys($parentids, true);
 
-		$_options = [
+		$sql_options = [
 			'output' => ['serviceupid', 'servicedownid']
 		];
-		$db_links = DBselect(DB::makeSql('services_links', $_options));
+		$db_links = DBselect(DB::makeSql('services_links', $sql_options));
 
 		$relations = [];
 
@@ -650,10 +650,10 @@ class CService extends CApiService {
 			return;
 		}
 
-		$_options = [
+		$sql_options = [
 			'output' => ['linkid', 'serviceupid', 'servicedownid']
 		];
-		$db_links = DBselect(DB::makeSql('services_links', $_options));
+		$db_links = DBselect(DB::makeSql('services_links', $sql_options));
 
 		$relations = [];
 
@@ -699,10 +699,10 @@ class CService extends CApiService {
 			return;
 		}
 
-		$_options = [
+		$sql_options = [
 			'output' => ['linkid', 'serviceupid', 'servicedownid']
 		];
-		$db_links = DBselect(DB::makeSql('services_links', $_options));
+		$db_links = DBselect(DB::makeSql('services_links', $sql_options));
 
 		$relations = [];
 
@@ -760,11 +760,11 @@ class CService extends CApiService {
 			$output = array_unique(array_merge(['servicetagid', 'serviceid'], $options['selectTags']));
 		}
 
-		$_options = [
+		$sql_options = [
 			'output' => $output,
 			'filter' => ['serviceid' => array_keys($result)]
 		];
-		$db_tags = DBselect(DB::makeSql('service_tag', $_options));
+		$db_tags = DBselect(DB::makeSql('service_tag', $sql_options));
 
 		while ($db_tag = DBfetch($db_tags)) {
 			$serviceid = $db_tag['serviceid'];
@@ -806,11 +806,11 @@ class CService extends CApiService {
 			$output = array_unique(array_merge(['service_problem_tagid', 'serviceid'], $options['selectProblemTags']));
 		}
 
-		$_options = [
+		$sql_options = [
 			'output' => $output,
 			'filter' => ['serviceid' => array_keys($result)]
 		];
-		$db_problem_tags = DBselect(DB::makeSql('service_problem_tag', $_options));
+		$db_problem_tags = DBselect(DB::makeSql('service_problem_tag', $sql_options));
 
 		while ($db_problem_tag = DBfetch($db_problem_tags)) {
 			$serviceid = $db_problem_tag['serviceid'];
@@ -839,10 +839,10 @@ class CService extends CApiService {
 			return;
 		}
 
-		$_options = [
+		$sql_options = [
 			'output' => ['serviceupid', 'servicedownid']
 		];
-		$db_links = DBselect(DB::makeSql('services_links', $_options));
+		$db_links = DBselect(DB::makeSql('services_links', $sql_options));
 
 		$relations = [];
 
@@ -883,11 +883,11 @@ class CService extends CApiService {
 		}
 		unset($service);
 
-		$_options = [
+		$sql_options = [
 			'output' => ['serviceid', 'type', 'limit_value', 'limit_status', 'new_status'],
 			'filter' => ['serviceid' => array_keys($services)]
 		];
-		$db_status_rules = DBselect(DB::makeSql('service_status_rule', $_options));
+		$db_status_rules = DBselect(DB::makeSql('service_status_rule', $sql_options));
 
 		while ($db_status_rule = DBfetch($db_status_rules)) {
 			$services[$db_status_rule['serviceid']]['status_rules'][] = $db_status_rule;
@@ -909,10 +909,10 @@ class CService extends CApiService {
 			$output = array_diff($output, ['name']);
 		}
 
-		$_options = [
+		$sql_options = [
 			'output' => $output
 		];
-		$db_service_problems = DBselect(DB::makeSql('service_problem', $_options));
+		$db_service_problems = DBselect(DB::makeSql('service_problem', $sql_options));
 
 		$service_problems = array_fill_keys(array_keys($services_without_children), []);
 
@@ -1001,11 +1001,11 @@ class CService extends CApiService {
 			$output = array_unique(array_merge(['timeid', 'serviceid'], $options['selectTimes']));
 		}
 
-		$_options = [
+		$sql_options = [
 			'output' => $output,
 			'filter' => ['serviceid' => array_keys($result)]
 		];
-		$db_times = DBselect(DB::makeSql('services_times', $_options));
+		$db_times = DBselect(DB::makeSql('services_times', $sql_options));
 
 		while ($db_time = DBfetch($db_times)) {
 			$serviceid = $db_time['serviceid'];
@@ -1047,11 +1047,11 @@ class CService extends CApiService {
 			$output = array_unique(array_merge(['service_status_ruleid', 'serviceid'], $options['selectStatusRules']));
 		}
 
-		$_options = [
+		$sql_options = [
 			'output' => $output,
 			'filter' => ['serviceid' => array_keys($result)]
 		];
-		$db_status_rules = DBselect(DB::makeSql('service_status_rule', $_options));
+		$db_status_rules = DBselect(DB::makeSql('service_status_rule', $sql_options));
 
 		while ($db_status_rule = DBfetch($db_status_rules)) {
 			$serviceid = $db_status_rule['serviceid'];
@@ -1093,11 +1093,11 @@ class CService extends CApiService {
 			$output = array_unique(array_merge(['servicealarmid', 'serviceid'], $options['selectAlarms']));
 		}
 
-		$_options = [
+		$sql_options = [
 			'output' => $output,
 			'filter' => ['serviceid' => array_keys($result)]
 		];
-		$db_alarms = DBselect(DB::makeSql('service_alarms', $_options));
+		$db_alarms = DBselect(DB::makeSql('service_alarms', $sql_options));
 
 		while ($db_alarm = DBfetch($db_alarms)) {
 			$serviceid = $db_alarm['serviceid'];
@@ -1729,10 +1729,10 @@ class CService extends CApiService {
 			$accessible_services = $permissions['r_services'] + $permissions['rw_services'];
 		}
 
-		$_options = [
+		$sql_options = [
 			'output' => ['linkid', 'serviceupid', 'servicedownid']
 		];
-		$db_links = DBselect(DB::makeSql('services_links', $_options));
+		$db_links = DBselect(DB::makeSql('services_links', $sql_options));
 
 		while ($db_link = DBfetch($db_links)) {
 			if (array_key_exists($db_link['servicedownid'], $db_services)) {
@@ -1761,11 +1761,11 @@ class CService extends CApiService {
 		}
 		unset($db_service);
 
-		$_options = [
+		$sql_options = [
 			'output' => ['servicetagid', 'serviceid', 'tag', 'value'],
 			'filter' => ['serviceid' => array_keys($db_services)]
 		];
-		$db_tags = DBselect(DB::makeSql('service_tag', $_options));
+		$db_tags = DBselect(DB::makeSql('service_tag', $sql_options));
 
 		while ($db_tag = DBfetch($db_tags)) {
 			$serviceid = $db_tag['serviceid'];
@@ -1785,11 +1785,11 @@ class CService extends CApiService {
 		}
 		unset($db_service);
 
-		$_options = [
+		$sql_options = [
 			'output' => ['service_problem_tagid', 'serviceid', 'tag', 'operator', 'value'],
 			'filter' => ['serviceid' => array_keys($db_services)]
 		];
-		$db_problem_tags = DBselect(DB::makeSql('service_problem_tag', $_options));
+		$db_problem_tags = DBselect(DB::makeSql('service_problem_tag', $sql_options));
 
 		while ($db_problem_tag = DBfetch($db_problem_tags)) {
 			$serviceid = $db_problem_tag['serviceid'];
@@ -1814,11 +1814,11 @@ class CService extends CApiService {
 			}
 		}
 
-		$_options = [
+		$sql_options = [
 			'output' => ['timeid', 'serviceid', 'type', 'ts_from', 'ts_to', 'note'],
 			'filter' => ['serviceid' => array_keys($affected_serviceids)]
 		];
-		$db_times = DBselect(DB::makeSql('services_times', $_options));
+		$db_times = DBselect(DB::makeSql('services_times', $sql_options));
 
 		while ($db_time = DBfetch($db_times)) {
 			$serviceid = $db_time['serviceid'];
@@ -1843,11 +1843,11 @@ class CService extends CApiService {
 			}
 		}
 
-		$_options = [
+		$sql_options = [
 			'output' => ['service_status_ruleid', 'serviceid', 'type', 'limit_value', 'limit_status', 'new_status'],
 			'filter' => ['serviceid' => array_keys($affected_serviceids)]
 		];
-		$db_status_rules = DBselect(DB::makeSql('service_status_rule', $_options));
+		$db_status_rules = DBselect(DB::makeSql('service_status_rule', $sql_options));
 
 		while ($db_status_rule = DBfetch($db_status_rules)) {
 			$serviceid = $db_status_rule['serviceid'];
@@ -1863,49 +1863,35 @@ class CService extends CApiService {
 	 * @param array|null $db_services
 	 */
 	private static function updateTags(array &$services, array $db_services = null): void {
-		$del_tags = [];
 		$ins_tags = [];
+		$del_tags = [];
 
-		if ($db_services !== null) {
-			foreach ($services as &$service) {
-				if (!array_key_exists('tags', $service)) {
-					continue;
-				}
-
-				$tags_ref = [];
-
-				foreach ($service['tags'] as &$tag) {
-					$tags_ref[$tag['tag']][$tag['value']] = &$tag;
-				}
-				unset($tag);
-
-				foreach ($db_services[$service['serviceid']]['tags'] as $db_tag) {
-					if (array_key_exists($db_tag['tag'], $tags_ref)
-							&& array_key_exists($db_tag['value'], $tags_ref[$db_tag['tag']])
-							&& !array_key_exists('servicetagid', $tags_ref[$db_tag['tag']][$db_tag['value']])) {
-						$tags_ref[$db_tag['tag']][$db_tag['value']]['servicetagid'] = $db_tag['servicetagid'];
-					}
-					else {
-						$del_tags[$db_tag['servicetagid']] = true;
-					}
-				}
-			}
-			unset($service);
-		}
-
-		foreach ($services as $service) {
+		foreach ($services as &$service) {
 			if (!array_key_exists('tags', $service)) {
 				continue;
 			}
 
-			foreach ($service['tags'] as $tag) {
-				if (array_key_exists('servicetagid', $tag)) {
-					continue;
-				}
+			$db_tags = [];
 
-				$ins_tags[] = ['serviceid' => $service['serviceid']] + $tag;
+			if ($db_services !== null) {
+				foreach ($db_services[$service['serviceid']]['tags'] as $db_tag) {
+					$db_tags[$db_tag['tag']][$db_tag['value']] = $db_tag['servicetagid'];
+					$del_tags[$db_tag['servicetagid']] = true;
+				}
 			}
+
+			foreach ($service['tags'] as &$tag) {
+				if (array_key_exists($tag['tag'], $db_tags) && array_key_exists($tag['value'], $db_tags[$tag['tag']])) {
+					$tag['servicetagid'] = $db_tags[$tag['tag']][$tag['value']];
+					unset($del_tags[$tag['servicetagid']]);
+				}
+				else {
+					$ins_tags[] = ['serviceid' => $service['serviceid']] + $tag;
+				}
+			}
+			unset($tag);
 		}
+		unset($service);
 
 		if ($del_tags) {
 			DB::delete('service_tag', ['servicetagid' => array_keys($del_tags)]);
@@ -1930,6 +1916,7 @@ class CService extends CApiService {
 				}
 				unset($tag);
 			}
+			unset($service);
 		}
 	}
 
@@ -1938,57 +1925,43 @@ class CService extends CApiService {
 	 * @param array|null $db_services
 	 */
 	private static function updateProblemTags(array &$services, array $db_services = null): void {
-		$del_problem_tags = [];
 		$ins_problem_tags = [];
+		$del_problem_tags = [];
 
-		if ($db_services !== null) {
-			foreach ($services as &$service) {
-				if (!array_key_exists('problem_tags', $service)) {
-					continue;
-				}
-
-				$problem_tags_ref = [];
-
-				foreach ($service['problem_tags'] as &$problem_tag) {
-					$problem_tags_ref[$problem_tag['tag']][$problem_tag['operator']][$problem_tag['value']] =
-						&$problem_tag;
-				}
-				unset($problem_tag);
-
-				foreach ($db_services[$service['serviceid']]['problem_tags'] as $db_problem_tag) {
-					if (array_key_exists($db_problem_tag['tag'], $problem_tags_ref)
-							&& array_key_exists($db_problem_tag['operator'], $problem_tags_ref[$db_problem_tag['tag']])
-							&& array_key_exists($db_problem_tag['value'],
-								$problem_tags_ref[$db_problem_tag['tag']][$db_problem_tag['operator']]
-							)
-							&& !array_key_exists('service_problem_tagid',
-								$problem_tags_ref[$db_problem_tag['tag']][$db_problem_tag['operator']]
-									[$db_problem_tag['value']]
-							)) {
-						$problem_tags_ref[$db_problem_tag['tag']][$db_problem_tag['operator']][$db_problem_tag['value']]
-							['service_problem_tagid'] = $db_problem_tag['service_problem_tagid'];
-					}
-					else {
-						$del_problem_tags[$db_problem_tag['service_problem_tagid']] = true;
-					}
-				}
-			}
-			unset($service);
-		}
-
-		foreach ($services as $service) {
+		foreach ($services as &$service) {
 			if (!array_key_exists('problem_tags', $service)) {
 				continue;
 			}
 
-			foreach ($service['problem_tags'] as $problem_tag) {
-				if (array_key_exists('service_problem_tagid', $problem_tag)) {
-					continue;
-				}
+			$db_problem_tags = [];
 
-				$ins_problem_tags[] = ['serviceid' => $service['serviceid']] + $problem_tag;
+			if ($db_services !== null) {
+				foreach ($db_services[$service['serviceid']]['problem_tags'] as $db_problem_tag) {
+					$db_problem_tags[$db_problem_tag['tag']][$db_problem_tag['operator']][$db_problem_tag['value']] =
+						$db_problem_tag['service_problem_tagid'];
+
+					$del_problem_tags[$db_problem_tag['service_problem_tagid']] = true;
+				}
 			}
+
+			foreach ($service['problem_tags'] as &$problem_tag) {
+				if (array_key_exists($problem_tag['tag'], $db_problem_tags)
+						&& array_key_exists($problem_tag['operator'], $db_problem_tags[$problem_tag['tag']])
+						&& array_key_exists($problem_tag['value'],
+							$db_problem_tags[$problem_tag['tag']][$problem_tag['operator']]
+						)) {
+					$problem_tag['service_problem_tagid'] =
+						$db_problem_tags[$problem_tag['tag']][$problem_tag['operator']][$problem_tag['value']];
+
+					unset($del_problem_tags[$problem_tag['service_problem_tagid']]);
+				}
+				else {
+					$ins_problem_tags[] = ['serviceid' => $service['serviceid']] + $problem_tag;
+				}
+			}
+			unset($problem_tag);
 		}
+		unset($service);
 
 		if ($del_problem_tags) {
 			DB::delete('service_problem_tag', ['service_problem_tagid' => array_keys($del_problem_tags)]);
@@ -2013,6 +1986,7 @@ class CService extends CApiService {
 				}
 				unset($problem_tag);
 			}
+			unset($service);
 		}
 	}
 
@@ -2021,48 +1995,35 @@ class CService extends CApiService {
 	 * @param array|null $db_services
 	 */
 	private static function updateParents(array &$services, array $db_services = null): void {
-		$del_parents = [];
 		$ins_parents = [];
+		$del_parents = [];
 
-		if ($db_services !== null) {
-			foreach ($services as &$service) {
-				if (!array_key_exists('parents', $service)) {
-					continue;
-				}
-
-				$parents_ref = [];
-
-				foreach ($service['parents'] as &$parent) {
-					$parents_ref[$parent['serviceid']] = &$parent;
-				}
-				unset($parent);
-
-				foreach ($db_services[$service['serviceid']]['parents'] as $db_parent) {
-					if (array_key_exists($db_parent['serviceid'], $parents_ref)
-							&& !array_key_exists('linkid', $parents_ref[$db_parent['serviceid']])) {
-						$parents_ref[$db_parent['serviceid']]['linkid'] = $db_parent['linkid'];
-					}
-					else {
-						$del_parents[$db_parent['linkid']] = true;
-					}
-				}
-			}
-			unset($service);
-		}
-
-		foreach ($services as $service) {
+		foreach ($services as &$service) {
 			if (!array_key_exists('parents', $service)) {
 				continue;
 			}
 
-			foreach ($service['parents'] as $parent) {
-				if (array_key_exists('linkid', $parent)) {
-					continue;
-				}
+			$db_parents = [];
 
-				$ins_parents[] = ['servicedownid' => $service['serviceid'], 'serviceupid' => $parent['serviceid']];
+			if ($db_services !== null) {
+				foreach ($db_services[$service['serviceid']]['parents'] as $db_parent) {
+					$db_parents[$db_parent['serviceid']] = $db_parent['linkid'];
+					$del_parents[$db_parent['linkid']] = true;
+				}
 			}
+
+			foreach ($service['parents'] as &$parent) {
+				if (array_key_exists($parent['serviceid'], $db_parents)) {
+					$parent['linkid'] = $db_parents[$parent['serviceid']];
+					unset($del_parents[$parent['linkid']]);
+				}
+				else {
+					$ins_parents[] = ['servicedownid' => $service['serviceid'], 'serviceupid' => $parent['serviceid']];
+				}
+			}
+			unset($parent);
 		}
+		unset($service);
 
 		if ($del_parents) {
 			DB::delete('services_links', ['linkid' => array_keys($del_parents)]);
@@ -2087,6 +2048,7 @@ class CService extends CApiService {
 				}
 				unset($parent);
 			}
+			unset($service);
 		}
 	}
 
@@ -2095,48 +2057,35 @@ class CService extends CApiService {
 	 * @param array|null $db_services
 	 */
 	private static function updateChildren(array &$services, array $db_services = null): void {
-		$del_children = [];
 		$ins_children = [];
+		$del_children = [];
 
-		if ($db_services !== null) {
-			foreach ($services as &$service) {
-				if (!array_key_exists('children', $service)) {
-					continue;
-				}
-
-				$children_ref = [];
-
-				foreach ($service['children'] as &$child) {
-					$children_ref[$child['serviceid']] = &$child;
-				}
-				unset($child);
-
-				foreach ($db_services[$service['serviceid']]['children'] as $db_child) {
-					if (array_key_exists($db_child['serviceid'], $children_ref)
-							&& !array_key_exists('linkid', $children_ref[$db_child['serviceid']])) {
-						$children_ref[$db_child['serviceid']]['linkid'] = $db_child['linkid'];
-					}
-					else {
-						$del_children[$db_child['linkid']] = true;
-					}
-				}
-			}
-			unset($service);
-		}
-
-		foreach ($services as $service) {
+		foreach ($services as &$service) {
 			if (!array_key_exists('children', $service)) {
 				continue;
 			}
 
-			foreach ($service['children'] as $child) {
-				if (array_key_exists('linkid', $child)) {
-					continue;
-				}
+			$db_children = [];
 
-				$ins_children[] = ['serviceupid' => $service['serviceid'], 'servicedownid' => $child['serviceid']];
+			if ($db_services !== null) {
+				foreach ($db_services[$service['serviceid']]['children'] as $db_child) {
+					$db_children[$db_child['serviceid']] = $db_child['linkid'];
+					$del_children[$db_child['linkid']] = true;
+				}
 			}
+
+			foreach ($service['children'] as &$child) {
+				if (array_key_exists($child['serviceid'], $db_children)) {
+					$child['linkid'] = $db_children[$child['serviceid']];
+					unset($del_children[$child['linkid']]);
+				}
+				else {
+					$ins_children[] = ['serviceupid' => $service['serviceid'], 'servicedownid' => $child['serviceid']];
+				}
+			}
+			unset($child);
 		}
+		unset($service);
 
 		if ($del_children) {
 			DB::delete('services_links', ['linkid' => array_keys($del_children)]);
@@ -2161,6 +2110,7 @@ class CService extends CApiService {
 				}
 				unset($child);
 			}
+			unset($service);
 		}
 	}
 
@@ -2169,64 +2119,49 @@ class CService extends CApiService {
 	 * @param array|null $db_services
 	 */
 	private static function updateTimes(array &$services, array $db_services = null): void {
-		$del_times = [];
 		$ins_times = [];
 		$upd_times = [];
+		$del_times = [];
 
-		if ($db_services !== null) {
-			foreach ($services as &$service) {
-				if (!array_key_exists('times', $service)) {
-					continue;
-				}
-
-				$times_ref = [];
-
-				foreach ($service['times'] as &$time) {
-					$times_ref[$time['type']][$time['ts_from']][$time['ts_to']] = &$time;
-				}
-				unset($time);
-
-				foreach ($db_services[$service['serviceid']]['times'] as $db_time) {
-					if (array_key_exists($db_time['type'], $times_ref)
-							&& array_key_exists($db_time['ts_from'], $times_ref[$db_time['type']])
-							&& array_key_exists($db_time['ts_to'], $times_ref[$db_time['type']][$db_time['ts_from']])
-							&& !array_key_exists('timeid',
-								$times_ref[$db_time['type']][$db_time['ts_from']][$db_time['ts_to']]
-							)) {
-						$time_ref = &$times_ref[$db_time['type']][$db_time['ts_from']][$db_time['ts_to']];
-
-						$time_ref['timeid'] = $db_time['timeid'];
-
-						$upd_time = DB::getUpdatedValues('services_times', $db_time, $time_ref);
-
-						if ($upd_time) {
-							$upd_times[] = [
-								'values' => $upd_time,
-								'where' => ['timeid' => $db_time['timeid']]
-							];
-						}
-					}
-					else {
-						$del_times[$db_time['timeid']] = true;
-					}
-				}
-			}
-			unset($service);
-		}
-
-		foreach ($services as $service) {
+		foreach ($services as &$service) {
 			if (!array_key_exists('times', $service)) {
 				continue;
 			}
 
-			foreach ($service['times'] as $time) {
-				if (array_key_exists('timeid', $time)) {
-					continue;
-				}
+			$db_times = [];
 
-				$ins_times[] = ['serviceid' => $service['serviceid']] + $time;
+			if ($db_services !== null) {
+				foreach ($db_services[$service['serviceid']]['times'] as $db_time) {
+					$db_times[$db_time['type']][$db_time['ts_from']][$db_time['ts_to']] = $db_time;
+					$del_times[$db_time['timeid']] = true;
+				}
 			}
+
+			foreach ($service['times'] as &$time) {
+				if (array_key_exists($time['type'], $db_times)
+						&& array_key_exists($time['ts_from'], $db_times[$time['type']])
+						&& array_key_exists($time['ts_to'], $db_times[$time['type']][$time['ts_from']])) {
+					$time['timeid'] = $db_times[$time['type']][$time['ts_from']][$time['ts_to']]['timeid'];
+					unset($del_times[$time['timeid']]);
+
+					$upd_time = DB::getUpdatedValues('services_times', $time,
+						$db_times[$time['type']][$time['ts_from']][$time['ts_to']]
+					);
+
+					if ($upd_time) {
+						$upd_times[] = [
+							'values' => $upd_time,
+							'where' => ['timeid' => $time['timeid']]
+						];
+					}
+				}
+				else {
+					$ins_times[] = ['serviceid' => $service['serviceid']] + $time;
+				}
+			}
+			unset($time);
 		}
+		unset($service);
 
 		if ($del_times) {
 			DB::delete('services_times', ['timeid' => array_keys($del_times)]);
@@ -2251,6 +2186,7 @@ class CService extends CApiService {
 				}
 				unset($time);
 			}
+			unset($service);
 		}
 
 		if ($upd_times) {
@@ -2263,73 +2199,55 @@ class CService extends CApiService {
 	 * @param array|null $db_services
 	 */
 	private static function updateStatusRules(array &$services, array $db_services = null): void {
-		$del_status_rules = [];
 		$ins_status_rules = [];
 		$upd_status_rules = [];
+		$del_status_rules = [];
 
-		if ($db_services !== null) {
-			foreach ($services as &$service) {
-				if (!array_key_exists('status_rules', $service)) {
-					continue;
-				}
-
-				$status_rules_ref = [];
-
-				foreach ($service['status_rules'] as &$status_rule) {
-					$status_rules_ref[$status_rule['type']][$status_rule['limit_value']][$status_rule['limit_status']] =
-						&$status_rule;
-				}
-				unset($status_rule);
-
-				foreach ($db_services[$service['serviceid']]['status_rules'] as $db_status_rule) {
-					if (array_key_exists($db_status_rule['type'], $status_rules_ref)
-							&& array_key_exists($db_status_rule['limit_value'],
-								$status_rules_ref[$db_status_rule['type']]
-							)
-							&& array_key_exists($db_status_rule['limit_status'],
-								$status_rules_ref[$db_status_rule['type']][$db_status_rule['limit_value']]
-							)
-							&& !array_key_exists('service_status_ruleid',
-								$status_rules_ref[$db_status_rule['type']][$db_status_rule['limit_value']]
-									[$db_status_rule['limit_status']]
-							)) {
-						$status_rule_ref = &$status_rules_ref[$db_status_rule['type']][$db_status_rule['limit_value']]
-							[$db_status_rule['limit_status']];
-
-						$status_rule_ref['service_status_ruleid'] = $db_status_rule['service_status_ruleid'];
-
-						$upd_status_rule = DB::getUpdatedValues('service_status_rule', $db_status_rule,
-							$status_rule_ref
-						);
-
-						if ($upd_status_rule) {
-							$upd_status_rules[] = [
-								'values' => $upd_status_rule,
-								'where' => ['service_status_ruleid' => $db_status_rule['service_status_ruleid']]
-							];
-						}
-					}
-					else {
-						$del_status_rules[$db_status_rule['service_status_ruleid']] = true;
-					}
-				}
-			}
-			unset($service);
-		}
-
-		foreach ($services as $service) {
+		foreach ($services as &$service) {
 			if (!array_key_exists('status_rules', $service)) {
 				continue;
 			}
 
-			foreach ($service['status_rules'] as $status_rule) {
-				if (array_key_exists('service_status_ruleid', $status_rule)) {
-					continue;
-				}
+			$db_status_rules = [];
 
-				$ins_status_rules[] = ['serviceid' => $service['serviceid']] + $status_rule;
+			if ($db_services !== null) {
+				foreach ($db_services[$service['serviceid']]['status_rules'] as $db_status_rule) {
+					$db_status_rules[$db_status_rule['type']][$db_status_rule['limit_value']]
+						[$db_status_rule['limit_status']] = $db_status_rule;
+
+					$del_status_rules[$db_status_rule['service_status_ruleid']] = true;
+				}
 			}
+
+			foreach ($service['status_rules'] as &$status_rule) {
+				if (array_key_exists($status_rule['type'], $db_status_rules)
+						&& array_key_exists($status_rule['limit_value'], $db_status_rules[$status_rule['type']])
+						&& array_key_exists($status_rule['limit_status'],
+							$db_status_rules[$status_rule['type']][$status_rule['limit_value']]
+						)) {
+					$status_rule['service_status_ruleid'] = $db_status_rules[$status_rule['type']]
+						[$status_rule['limit_value']][$status_rule['limit_status']]['service_status_ruleid'];
+
+					unset($del_status_rules[$status_rule['service_status_ruleid']]);
+
+					$upd_status_rule = DB::getUpdatedValues('service_status_rule', $status_rule, $db_status_rules
+						[$status_rule['type']][$status_rule['limit_value']][$status_rule['limit_status']]
+					);
+
+					if ($upd_status_rule) {
+						$upd_status_rules[] = [
+							'values' => $upd_status_rule,
+							'where' => ['service_status_ruleid' => $status_rule['service_status_ruleid']]
+						];
+					}
+				}
+				else {
+					$ins_status_rules[] = ['serviceid' => $service['serviceid']] + $status_rule;
+				}
+			}
+			unset($status_rule);
 		}
+		unset($service);
 
 		if ($del_status_rules) {
 			DB::delete('service_status_rule', ['service_status_ruleid' => array_keys($del_status_rules)]);
@@ -2354,6 +2272,7 @@ class CService extends CApiService {
 				}
 				unset($status_rule);
 			}
+			unset($service);
 		}
 
 		if ($upd_status_rules) {
@@ -2426,10 +2345,10 @@ class CService extends CApiService {
 			$rw_services += array_fill_keys(array_column($tags, 'serviceid'), 0);
 		}
 
-		$_options = [
+		$sql_options = [
 			'output' => ['serviceupid', 'servicedownid']
 		];
-		$db_links = DBselect(DB::makeSql('services_links', $_options));
+		$db_links = DBselect(DB::makeSql('services_links', $sql_options));
 
 		$relations = [];
 
