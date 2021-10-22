@@ -1737,14 +1737,14 @@ class CService extends CApiService {
 		while ($db_link = DBfetch($db_links)) {
 			if (array_key_exists($db_link['servicedownid'], $db_services)) {
 				if ($accessible_services === null || array_key_exists($db_link['serviceupid'], $accessible_services)) {
-					$db_services[$db_link['servicedownid']]['parents'][] = [
+					$db_services[$db_link['servicedownid']]['parents'][$db_link['linkid']] = [
 						'linkid' => $db_link['linkid'],
 						'serviceid' => $db_link['serviceupid']
 					];
 				}
 			}
 			elseif (array_key_exists($db_link['serviceupid'], $db_services)) {
-				$db_services[$db_link['serviceupid']]['children'][] = [
+				$db_services[$db_link['serviceupid']]['children'][$db_link['linkid']] = [
 					'linkid' => $db_link['linkid'],
 					'serviceid' => $db_link['servicedownid']
 				];
@@ -1772,7 +1772,7 @@ class CService extends CApiService {
 
 			unset($db_tag['serviceid']);
 
-			$db_services[$serviceid]['tags'][] = $db_tag;
+			$db_services[$serviceid]['tags'][$db_tag['servicetagid']] = $db_tag;
 		}
 	}
 
@@ -1796,7 +1796,7 @@ class CService extends CApiService {
 
 			unset($db_problem_tag['serviceid']);
 
-			$db_services[$serviceid]['problem_tags'][] = $db_problem_tag;
+			$db_services[$serviceid]['problem_tags'][$db_problem_tag['service_problem_tagid']] = $db_problem_tag;
 		}
 	}
 
@@ -1825,7 +1825,7 @@ class CService extends CApiService {
 
 			unset($db_time['serviceid']);
 
-			$db_services[$serviceid]['times'][] = $db_time;
+			$db_services[$serviceid]['times'][$db_time['timeid']] = $db_time;
 		}
 	}
 
@@ -1854,7 +1854,7 @@ class CService extends CApiService {
 
 			unset($db_status_rule['serviceid']);
 
-			$db_services[$serviceid]['status_rules'][] = $db_status_rule;
+			$db_services[$serviceid]['status_rules'][$db_status_rule['service_status_ruleid']] = $db_status_rule;
 		}
 	}
 
