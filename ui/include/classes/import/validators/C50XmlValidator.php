@@ -336,6 +336,13 @@ class C50XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::INV_MODE_AUTOMATIC => CXmlConstantName::AUTOMATIC
 	];
 
+	private $HTTP_TEST_AUTHENTICATION = [
+		CXmlConstantValue::NONE => CXmlConstantName::NONE,
+		CXmlConstantValue::BASIC => CXmlConstantName::BASIC,
+		CXmlConstantValue::NTLM => CXmlConstantName::NTLM,
+		CXmlConstantValue::KERBEROS => CXmlConstantName::KERBEROS
+	];
+
 	/**
 	 * Get validation rules schema.
 	 *
@@ -871,7 +878,7 @@ class C50XmlValidator extends CXmlValidatorGeneral {
 								]]
 							]],
 							'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
-							'authentication' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => [CXmlConstantValue::NONE => CXmlConstantName::NONE, CXmlConstantValue::BASIC => CXmlConstantName::BASIC, CXmlConstantValue::NTLM => CXmlConstantName::NTLM]],
+							'authentication' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => $this->HTTP_TEST_AUTHENTICATION],
 							'http_user' =>				['type' => XML_STRING, 'default' => ''],
 							'http_password' =>			['type' => XML_STRING, 'default' => ''],
 							'verify_peer' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
@@ -1479,7 +1486,7 @@ class C50XmlValidator extends CXmlValidatorGeneral {
 								]]
 							]],
 							'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
-							'authentication' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => [CXmlConstantValue::NONE => CXmlConstantName::NONE, CXmlConstantValue::BASIC => CXmlConstantName::BASIC, CXmlConstantValue::NTLM => CXmlConstantName::NTLM]],
+							'authentication' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => $this->HTTP_TEST_AUTHENTICATION],
 							'http_user' =>				['type' => XML_STRING, 'default' => ''],
 							'http_password' =>			['type' => XML_STRING, 'default' => ''],
 							'verify_peer' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],

@@ -300,13 +300,14 @@ static int	filter_condition_match(const struct zbx_json_parse *jp_row, const zbx
 static int	filter_evaluate_and_or(const lld_filter_t *filter, const struct zbx_json_parse *jp_row,
 		const zbx_vector_ptr_t *lld_macro_paths)
 {
-	int	i, ret = SUCCEED, rc = SUCCEED;
+	int	i, ret = SUCCEED;
 	char	*lastmacro = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	for (i = 0; i < filter->conditions.values_num; i++)
 	{
+		int			rc;
 		const lld_condition_t	*condition = (lld_condition_t *)filter->conditions.values[i];
 
 		rc = filter_condition_match(jp_row, lld_macro_paths, condition);

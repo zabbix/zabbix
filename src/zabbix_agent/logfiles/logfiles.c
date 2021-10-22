@@ -2650,7 +2650,7 @@ static int	adjust_position_after_jump(struct st_logfile *logfile, zbx_uint64_t *
 	size_t		szbyte;
 	ssize_t		nbytes;
 	const char	*cr, *lf, *p_end;
-	char		*p, *p_nl, *p_next;
+	char		*p, *p_next;
 	zbx_uint64_t	lastlogsize_tmp, lastlogsize_aligned, lastlogsize_org, seek_pos, remainder;
 	char   		buf[32 * ZBX_KIBIBYTE];		/* buffer must be of size multiple of 4 as some character */
 							/* encodings use 4 bytes for every character */
@@ -2700,7 +2700,7 @@ static int	adjust_position_after_jump(struct st_logfile *logfile, zbx_uint64_t *
 		p = buf;
 		p_end = buf + nbytes;	/* no data from this position */
 
-		if (NULL != (p_nl = buf_find_newline(p, &p_next, p_end, cr, lf, szbyte)))
+		if (NULL != buf_find_newline(p, &p_next, p_end, cr, lf, szbyte))
 		{
 			/* found the beginning of line */
 
@@ -2748,7 +2748,7 @@ static int	adjust_position_after_jump(struct st_logfile *logfile, zbx_uint64_t *
 		p = buf;
 		p_end = buf + nbytes;	/* no data from this position */
 
-		if (NULL != (p_nl = buf_find_newline(p, &p_next, p_end, cr, lf, szbyte)))
+		if (NULL != buf_find_newline(p, &p_next, p_end, cr, lf, szbyte))
 		{
 			/* Found the beginning of line. It may not be the one closest to place we jumped to */
 			/* (it could be about sizeof(buf) bytes away) but it is ok for our purposes. */

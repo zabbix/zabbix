@@ -371,4 +371,9 @@ void	zbx_mpoints_free(zbx_mpoint_t *mpoint);
 zbx_uint32_t get_thread_global_mutex_flag(void);
 #endif
 
+#ifndef _WINDOWS
+int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *hostname);
 #endif
+
+#endif
+

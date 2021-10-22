@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2021-07-05T08:44:26Z</date>
+    <date>2021-10-07T10:13:14Z</date>
     <groups>
         <group>
             <name>Templates/Network devices</name>
@@ -23,6 +23,9 @@ Template tooling version used: 0.38</description>
                 </group>
             </groups>
             <applications>
+                <application>
+                    <name>Cluster</name>
+                </application>
                 <application>
                     <name>CPU</name>
                 </application>
@@ -89,6 +92,37 @@ on how to contact this person.</description>
                             <params>6h</params>
                         </step>
                     </preprocessing>
+                </item>
+                <item>
+                    <name>F5 BIG-IP: Failover status</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>1.3.6.1.4.1.3375.2.1.14.3.1.0</snmp_oid>
+                    <key>bigip.failover</key>
+                    <history>7d</history>
+                    <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
+The failover status ID on the system.&#13;
+unknown - the failover status of the device is unknown;&#13;
+offline - the device is offline;&#13;
+forcedOffline - the device is forced offline;&#13;
+standby - the device is standby;&#13;
+active - the device is active.</description>
+                    <applications>
+                        <application>
+                            <name>Cluster</name>
+                        </application>
+                    </applications>
+                    <valuemap>
+                        <name>SNMP sysCmFailoverStatusId</name>
+                    </valuemap>
+                    <triggers>
+                        <trigger>
+                            <expression>{count(10m,3,ne)}&gt;8 and {count(10m,4,ne)}&gt;6</expression>
+                            <name>F5 BIG-IP: Cluster not in sync: {ITEM.VALUE}</name>
+                            <opdata>{ITEM.LASTVALUE}</opdata>
+                            <priority>WARNING</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                    </triggers>
                 </item>
                 <item>
                     <name>F5 BIG-IP: Location</name>
@@ -314,6 +348,51 @@ Serial number</description>
                             <name>F5 BIG-IP: Chassis has been replaced (new serial number received)</name>
                             <priority>INFO</priority>
                             <description>Chassis serial number has changed. Ack to close</description>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>F5 BIG-IP: Sync Status</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>1.3.6.1.4.1.3375.2.1.14.1.1.0</snmp_oid>
+                    <key>bigip.syncstatus</key>
+                    <history>7d</history>
+                    <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
+The sync status ID on the system.&#13;
+unknown - the device is disconnected from the device group;&#13;
+syncing - the device is joining the device group or has requested changes from device group or inconsistent with the group;&#13;
+needManualSync - changes have been made on the device not syncd to the device group;&#13;
+inSync - the device is consistent with the device group;&#13;
+syncFailed - the device is inconsistent with the device group, requires user intervention;&#13;
+syncDisconnected - the device is not connected to any peers;&#13;
+standalone - the device is in a standalone configuration;&#13;
+awaitingInitialSync - the device is waiting for initial sync;&#13;
+incompatibleVersion - the device's version is incompatible with rest of the devices in the device group;&#13;
+partialSync - some but not all devices successfully received the last sync.</description>
+                    <applications>
+                        <application>
+                            <name>Cluster</name>
+                        </application>
+                    </applications>
+                    <valuemap>
+                        <name>SNMP sysCmSyncStatusId</name>
+                    </valuemap>
+                    <triggers>
+                        <trigger>
+                            <expression>{last()}=2</expression>
+                            <name>F5 BIG-IP: Changes have been made on the device not sync to the device group: {ITEM.VALUE}</name>
+                            <opdata>{ITEM.LASTVALUE}</opdata>
+                            <priority>WARNING</priority>
+                            <description>Changes have been made on the device not sync to the device group, requires user intervention</description>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                        <trigger>
+                            <expression>{last()}=4</expression>
+                            <name>F5 BIG-IP: The device is inconsistent with the device group: {ITEM.VALUE}</name>
+                            <opdata>{ITEM.LASTVALUE}</opdata>
+                            <priority>WARNING</priority>
+                            <description>The device is inconsistent with the device group, requires user intervention</description>
                             <manual_close>YES</manual_close>
                         </trigger>
                     </triggers>
@@ -610,6 +689,7 @@ the sensor data is available.</description>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.15.1.2.1.5.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.cert.expiration.date[{#CERT.NAME}]</key>
+                            <delay>6h</delay>
                             <history>7d</history>
                             <units>unixtime</units>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
@@ -622,7 +702,7 @@ The expiration date of the certificate in unix time.</description>
                             <preprocessing>
                                 <step>
                                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <params>1h</params>
+                                    <params>12h</params>
                                 </step>
                             </preprocessing>
                             <trigger_prototypes>
@@ -630,7 +710,7 @@ The expiration date of the certificate in unix time.</description>
                                     <expression>{last()} + 86400 * {$BIGIP.CERT.MIN} &lt; {now()}</expression>
                                     <name>F5 BIG-IP: Less than {$BIGIP.CERT.MIN} days left until the certificate expires ({#CERT.NAME})</name>
                                     <opdata>Expires: {ITEM.VALUE}</opdata>
-                                    <priority>INFO</priority>
+                                    <priority>WARNING</priority>
                                     <description>Please check certificate</description>
                                 </trigger_prototype>
                             </trigger_prototypes>
@@ -639,7 +719,7 @@ The expiration date of the certificate in unix time.</description>
                     <preprocessing>
                         <step>
                             <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>6h</params>
+                            <params>12h</params>
                         </step>
                     </preprocessing>
                 </discovery_rule>
@@ -656,6 +736,7 @@ The expiration date of the certificate in unix time.</description>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.3.2.1.2.1.3.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.chassis.fan.speed[{#FAN.INDEX}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>!rpm</units>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
@@ -680,6 +761,7 @@ fan speed data is available.&#13;
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.3.2.1.2.1.2.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.chassis.fan.status[{#FAN.INDEX}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
 The status of the indexed chassis fan on the system.,&#13;
@@ -705,6 +787,12 @@ Possible values: 0 - bad, 1 - good, 2 - notpresent.</description>
                                     <expression>{last()}=0</expression>
                                     <name>F5 BIG-IP: Fan[{#FAN.INDEX}] is in critical state</name>
                                     <priority>AVERAGE</priority>
+                                    <description>Please check the fan unit</description>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=2</expression>
+                                    <name>F5 BIG-IP: Fan[{#FAN.INDEX}] is not present</name>
+                                    <priority>INFO</priority>
                                     <description>Please check the fan unit</description>
                                 </trigger_prototype>
                             </trigger_prototypes>
@@ -744,6 +832,7 @@ Possible values: 0 - bad, 1 - good, 2 - notpresent.</description>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.3.2.2.2.1.2.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.chassis.power.status[{#POWER.INDEX}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
 The status of the indexed power supply on the system.,&#13;
@@ -768,7 +857,13 @@ Possible values: 0 - bad, 1 - good, 2 - notpresent.</description>
                                 <trigger_prototype>
                                     <expression>{last()}=0</expression>
                                     <name>F5 BIG-IP: Power supply [{#POWER.INDEX}] is in critical state</name>
-                                    <priority>AVERAGE</priority>
+                                    <priority>HIGH</priority>
+                                    <description>Please check the power supply unit</description>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=2</expression>
+                                    <name>F5 BIG-IP: Power supply [{#POWER.INDEX}] is not present</name>
+                                    <priority>INFO</priority>
                                     <description>Please check the power supply unit</description>
                                 </trigger_prototype>
                             </trigger_prototypes>
@@ -794,6 +889,7 @@ Possible values: 0 - bad, 1 - good, 2 - notpresent.</description>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.3.2.3.2.1.2.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.chassis.temp.value[{#TEMP.INDEX}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <value_type>FLOAT</value_type>
                             <units>°C</units>
@@ -812,6 +908,26 @@ the sensor data is available.</description>
                                     <params>1h</params>
                                 </step>
                             </preprocessing>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}&gt;{$BIGIP.TEMP.HIGH}</expression>
+                                    <name>F5 BIG-IP: Chassis temperature ({ITEM.LASTVALUE}) of sensor {#TEMP.INDEX} exceeds threshold of {$BIGIP.TEMP.HIGH} °C</name>
+                                    <opdata>{ITEM.LASTVALUE}</opdata>
+                                    <priority>HIGH</priority>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}&gt;{$BIGIP.TEMP.WARN}</expression>
+                                    <name>F5 BIG-IP: Chassis temperature ({ITEM.LASTVALUE}) of sensor {#TEMP.INDEX} exceeds threshold of {$BIGIP.TEMP.WARN} °C</name>
+                                    <opdata>{ITEM.LASTVALUE}</opdata>
+                                    <priority>WARNING</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>F5 BIG-IP: Chassis temperature ({ITEM.LASTVALUE}) of sensor {#TEMP.INDEX} exceeds threshold of {$BIGIP.TEMP.HIGH} °C</name>
+                                            <expression>{Template F5 Big-IP SNMP:bigip.chassis.temp.value[{#TEMP.INDEX}].last()}&gt;{$BIGIP.TEMP.HIGH}</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                            </trigger_prototypes>
                         </item_prototype>
                     </item_prototypes>
                     <graph_prototypes>
@@ -848,6 +964,7 @@ the sensor data is available.</description>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.7.5.2.1.23.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.cpu.idle.1m[{#HOST.ID},{#CPU.ID}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>%</units>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
@@ -863,6 +980,7 @@ The average time spent by the specified processor doing nothing for the associat
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.7.5.2.1.31.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.cpu.idle.5m[{#HOST.ID},{#CPU.ID}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>%</units>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
@@ -878,6 +996,7 @@ The average time spent by the specified processor doing nothing for the associat
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.7.5.2.1.15.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.cpu.idle.5s[{#HOST.ID},{#CPU.ID}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>%</units>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
@@ -893,6 +1012,7 @@ The average time spent by the specified processor doing nothing for the associat
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.7.5.2.1.26.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.cpu.iowait.1m[{#HOST.ID},{#CPU.ID}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>%</units>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
@@ -908,6 +1028,7 @@ The average time spent by the specified processor waiting for external I/O to co
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.7.5.2.1.34.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.cpu.iowait.5m[{#HOST.ID},{#CPU.ID}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>%</units>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
@@ -923,6 +1044,7 @@ The average time spent by the specified processor waiting for external I/O to co
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.7.5.2.1.18.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.cpu.iowait.5s[{#HOST.ID},{#CPU.ID}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>%</units>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
@@ -938,6 +1060,7 @@ The average time spent by the specified processor waiting for external I/O to co
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.7.5.2.1.24.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.cpu.irq.1m[{#HOST.ID},{#CPU.ID}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>%</units>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
@@ -953,6 +1076,7 @@ The average time spent by the specified processor servicing hardware interrupts 
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.7.5.2.1.32.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.cpu.irq.5m[{#HOST.ID},{#CPU.ID}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>%</units>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
@@ -968,6 +1092,7 @@ The average time spent by the specified processor servicing hardware interrupts 
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.7.5.2.1.16.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.cpu.irq.5s[{#HOST.ID},{#CPU.ID}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>%</units>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
@@ -983,6 +1108,7 @@ The average time spent by the specified processor servicing hardware interrupts 
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.7.5.2.1.21.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.cpu.nice.1m[{#HOST.ID},{#CPU.ID}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>%</units>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
@@ -998,6 +1124,7 @@ The average time spent by the specified processor running niced processes for th
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.7.5.2.1.29.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.cpu.nice.5m[{#HOST.ID},{#CPU.ID}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>%</units>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
@@ -1013,6 +1140,7 @@ The average time spent by the specified processor running niced processes for th
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.7.5.2.1.13.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.cpu.nice.5s[{#HOST.ID},{#CPU.ID}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>%</units>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
@@ -1028,6 +1156,7 @@ The average time spent by the specified processor running niced processes for th
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.7.5.2.1.25.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.cpu.spftirq.1m[{#HOST.ID},{#CPU.ID}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>%</units>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
@@ -1043,6 +1172,7 @@ The average time spent by the specified processor servicing soft interrupts for 
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.7.5.2.1.33.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.cpu.spftirq.5m[{#HOST.ID},{#CPU.ID}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>%</units>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
@@ -1058,6 +1188,7 @@ The average time spent by the specified processor servicing soft interrupts for 
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.7.5.2.1.17.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.cpu.spftirq.5s[{#HOST.ID},{#CPU.ID}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>%</units>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
@@ -1073,6 +1204,7 @@ The average time spent by the specified processor servicing soft interrupts for 
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.7.5.2.1.38.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.cpu.stolen.1m[{#HOST.ID},{#CPU.ID}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>%</units>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
@@ -1088,6 +1220,7 @@ The average time 'stolen' from the specified processor for the associated host i
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.7.5.2.1.37.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.cpu.stolen.1s[{#HOST.ID},{#CPU.ID}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>%</units>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
@@ -1103,6 +1236,7 @@ The average time 'stolen' from the specified processor for the associated host i
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.7.5.2.1.39.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.cpu.stolen.5m[{#HOST.ID},{#CPU.ID}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>%</units>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
@@ -1118,6 +1252,7 @@ The average time 'stolen' from the specified processor for the associated host i
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.7.5.2.1.22.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.cpu.system.1m[{#HOST.ID},{#CPU.ID}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>%</units>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
@@ -1133,6 +1268,7 @@ The average time spent by the specified processor servicing system calls for the
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.7.5.2.1.30.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.cpu.system.5m[{#HOST.ID},{#CPU.ID}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>%</units>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
@@ -1148,6 +1284,7 @@ The average time spent by the specified processor servicing system calls for the
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.7.5.2.1.14.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.cpu.system.5s[{#HOST.ID},{#CPU.ID}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>%</units>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
@@ -1163,6 +1300,7 @@ The average time spent by the specified processor servicing system calls for the
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.7.5.2.1.27.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.cpu.usageratio.1m[{#HOST.ID},{#CPU.ID}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>%</units>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
@@ -1187,6 +1325,7 @@ iowait:sysMultiHostCpuIowait1m</description>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.7.5.2.1.35.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.cpu.usageratio.5m[{#HOST.ID},{#CPU.ID}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>%</units>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
@@ -1221,6 +1360,7 @@ iowait:sysMultiHostCpuIowait5m</description>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.7.5.2.1.19.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.cpu.usageratio.5s[{#HOST.ID},{#CPU.ID}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>%</units>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
@@ -1245,6 +1385,7 @@ iowait:sysMultiHostCpuIowait5s</description>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.7.5.2.1.20.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.cpu.user.1m[{#HOST.ID},{#CPU.ID}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>%</units>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
@@ -1260,6 +1401,7 @@ The average time spent by the specified processor in user context for the associ
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.7.5.2.1.28.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.cpu.user.5m[{#HOST.ID},{#CPU.ID}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>%</units>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
@@ -1275,6 +1417,7 @@ The average time spent by the specified processor in user context for the associ
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.7.5.2.1.12.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.cpu.user.5s[{#HOST.ID},{#CPU.ID}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>%</units>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
@@ -1488,6 +1631,7 @@ The average time spent by the specified processor in user context for the associ
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.3.6.2.1.3.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.cpu.sensor.fan[{#CPU.SENSOR.SLOT},{#CPU.SENSOR.INDEX}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>!rpm</units>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
@@ -1512,6 +1656,7 @@ the sensor data is available.</description>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.3.6.2.1.4.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.cpu.sensor.name[{#CPU.SENSOR.SLOT},{#CPU.SENSOR.INDEX}]</key>
+                            <delay>1h</delay>
                             <history>7d</history>
                             <trends>0</trends>
                             <value_type>CHAR</value_type>
@@ -1534,6 +1679,7 @@ Identifier for the CPU.</description>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.3.6.2.1.2.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.cpu.sensor.temperature[{#CPU.SENSOR.SLOT},{#CPU.SENSOR.INDEX}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>°C</units>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
@@ -1616,6 +1762,7 @@ the sensor data is available.</description>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.7.3.2.1.2.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.disktable.blocksize[{#PART.NAME}]</key>
+                            <delay>1h</delay>
                             <history>7d</history>
                             <units>B</units>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
@@ -1625,18 +1772,13 @@ The number of bytes in the specified partition.</description>
                                     <name>Mount point [{#PART.NAME}]</name>
                                 </application_prototype>
                             </application_prototypes>
-                            <preprocessing>
-                                <step>
-                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <params>6h</params>
-                                </step>
-                            </preprocessing>
                         </item_prototype>
                         <item_prototype>
                             <name>F5 BIG-IP: Mount point [{#PART.NAME}]: Free blocks</name>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.7.3.2.1.4.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.disktable.freeblocks[{#PART.NAME}]</key>
+                            <delay>1h</delay>
                             <history>7d</history>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
 The number of free blocks in the specified partition.</description>
@@ -1645,18 +1787,13 @@ The number of free blocks in the specified partition.</description>
                                     <name>Mount point [{#PART.NAME}]</name>
                                 </application_prototype>
                             </application_prototypes>
-                            <preprocessing>
-                                <step>
-                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <params>6h</params>
-                                </step>
-                            </preprocessing>
                         </item_prototype>
                         <item_prototype>
                             <name>F5 BIG-IP: Mount point [{#PART.NAME}]: Free nodes</name>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.7.3.2.1.6.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.disktable.freenodes[{#PART.NAME}]</key>
+                            <delay>1h</delay>
                             <history>7d</history>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
 The number of free file nodes in the specified partition.</description>
@@ -1665,18 +1802,13 @@ The number of free file nodes in the specified partition.</description>
                                     <name>Mount point [{#PART.NAME}]</name>
                                 </application_prototype>
                             </application_prototypes>
-                            <preprocessing>
-                                <step>
-                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <params>6h</params>
-                                </step>
-                            </preprocessing>
                         </item_prototype>
                         <item_prototype>
                             <name>F5 BIG-IP: Mount point [{#PART.NAME}]: Total blocks</name>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.7.3.2.1.3.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.disktable.totalblocks[{#PART.NAME}]</key>
+                            <delay>1h</delay>
                             <history>7d</history>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
 The number of total blocks in the specified partition.</description>
@@ -1685,18 +1817,13 @@ The number of total blocks in the specified partition.</description>
                                     <name>Mount point [{#PART.NAME}]</name>
                                 </application_prototype>
                             </application_prototypes>
-                            <preprocessing>
-                                <step>
-                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <params>6h</params>
-                                </step>
-                            </preprocessing>
                         </item_prototype>
                         <item_prototype>
                             <name>F5 BIG-IP: Mount point [{#PART.NAME}]: Total nodes</name>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.7.3.2.1.5.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.disktable.totalnodes[{#PART.NAME}]</key>
+                            <delay>1h</delay>
                             <history>7d</history>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
 The number of total file nodes in the specified partition.</description>
@@ -1705,22 +1832,17 @@ The number of total file nodes in the specified partition.</description>
                                     <name>Mount point [{#PART.NAME}]</name>
                                 </application_prototype>
                             </application_prototypes>
-                            <preprocessing>
-                                <step>
-                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <params>6h</params>
-                                </step>
-                            </preprocessing>
                         </item_prototype>
                     </item_prototypes>
                     <trigger_prototypes>
                         <trigger_prototype>
-                            <expression>{Template F5 Big-IP SNMP:bigip.disktable.freeblocks[{#PART.NAME}].max(5m)}/{Template F5 Big-IP SNMP:bigip.disktable.totalblocks[{#PART.NAME}].min(5m)}*100&lt;{$BIGIP.FS.FREE.WARN.MIN}</expression>
+                            <expression>{Template F5 Big-IP SNMP:bigip.disktable.freeblocks[{#PART.NAME}].last()}/{Template F5 Big-IP SNMP:bigip.disktable.totalblocks[{#PART.NAME}].last()}*100&lt;{$BIGIP.FS.FREE.WARN.MIN:&quot;{#PART.NAME}&quot;}</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                            <recovery_expression>{Template F5 Big-IP SNMP:bigip.disktable.freeblocks[{#PART.NAME}].max(5m)}/{Template F5 Big-IP SNMP:bigip.disktable.totalblocks[{#PART.NAME}].min(5m)}*100&gt;{$BIGIP.FS.FREE.WARN.MAX}</recovery_expression>
+                            <recovery_expression>{Template F5 Big-IP SNMP:bigip.disktable.freeblocks[{#PART.NAME}].last()}/{Template F5 Big-IP SNMP:bigip.disktable.totalblocks[{#PART.NAME}].last()}*100&gt;{$BIGIP.FS.FREE.WARN.MAX:&quot;{#PART.NAME}&quot;}</recovery_expression>
                             <name>F5 BIG-IP: Low free space in file system [{#PART.NAME}] (less than {$BIGIP.FS.FREE.WARN.MIN}% for 5m)</name>
                             <priority>WARNING</priority>
                             <description>The system is running out of free space.</description>
+                            <manual_close>YES</manual_close>
                         </trigger_prototype>
                     </trigger_prototypes>
                     <graph_prototypes>
@@ -1765,6 +1887,7 @@ The number of total file nodes in the specified partition.</description>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.7.4.2.1.7.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.memory.total.other[{#HOST.ID}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>B</units>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
@@ -1786,6 +1909,7 @@ The total other non-TMM memory in bytes for the specified host.</description>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.7.4.2.1.9.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.memory.total.swap[{#HOST.ID}]</key>
+                            <delay>1d</delay>
                             <history>7d</history>
                             <units>B</units>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
@@ -1795,18 +1919,13 @@ The total swap in bytes for the specified host.</description>
                                     <name>Memory</name>
                                 </application>
                             </applications>
-                            <preprocessing>
-                                <step>
-                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <params>1h</params>
-                                </step>
-                            </preprocessing>
                         </item_prototype>
                         <item_prototype>
                             <name>F5 BIG-IP: Host [{#HOST.ID}]: Total memory</name>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.7.4.2.1.2.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.memory.total[{#HOST.ID}]</key>
+                            <delay>1d</delay>
                             <history>7d</history>
                             <units>B</units>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
@@ -1816,18 +1935,13 @@ The total host memory in bytes for the specified host.</description>
                                     <name>Memory</name>
                                 </application>
                             </applications>
-                            <preprocessing>
-                                <step>
-                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <params>1h</params>
-                                </step>
-                            </preprocessing>
                         </item_prototype>
                         <item_prototype>
                             <name>F5 BIG-IP: Host [{#HOST.ID}]: Used other non-TMM memory</name>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.7.4.2.1.8.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.memory.used.other[{#HOST.ID}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>B</units>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
@@ -1849,6 +1963,7 @@ The other non-TMM memory in bytes currently in use for the specified host.</desc
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.7.4.2.1.10.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.memory.used.swap[{#HOST.ID}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>B</units>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
@@ -1870,6 +1985,7 @@ The swap in bytes currently in use for the specified host.</description>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.7.4.2.1.3.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.memory.used[{#HOST.ID}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>B</units>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
@@ -2509,6 +2625,7 @@ rx - pause in coming data flow.</description>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.2.4.2.3.1.9.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.node.net.conn[{#NODE.NAME}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <description>MIB: F5-BIGIP-LOCAL-MIB&#13;
 The current connections from server-side to the specified node address.</description>
@@ -2529,6 +2646,7 @@ The current connections from server-side to the specified node address.</descrip
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.2.4.2.3.1.4.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.node.net.in.bytes.rate[{#NODE.NAME}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>Bps</units>
                             <description>MIB: F5-BIGIP-LOCAL-MIB&#13;
@@ -2554,6 +2672,7 @@ The rate of bytes received by the specified node address from server-side.</desc
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.2.4.2.3.1.3.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.node.net.in.pkts.rate[{#NODE.NAME}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>pps</units>
                             <description>MIB: F5-BIGIP-LOCAL-MIB&#13;
@@ -2579,6 +2698,7 @@ The rate of packets received by the specified node address from server-side.</de
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.2.4.2.3.1.6.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.node.net.out.bytes.rate[{#NODE.NAME}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>Bps</units>
                             <description>MIB: F5-BIGIP-LOCAL-MIB&#13;
@@ -2604,6 +2724,7 @@ The rate of bytes sent to server-side from the specified node address.</descript
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.2.4.2.3.1.5.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.node.net.out.pkts.rate[{#NODE.NAME}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>pps</units>
                             <description>MIB: F5-BIGIP-LOCAL-MIB&#13;
@@ -2629,6 +2750,7 @@ The rate of packets sent to server-side from the specified node address.</descri
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.2.4.2.3.1.21.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.node.net.sessions[{#NODE.NAME}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <description>MIB: F5-BIGIP-LOCAL-MIB&#13;
 The number of current sessions going through the specified node address.</description>
@@ -2649,6 +2771,7 @@ The number of current sessions going through the specified node address.</descri
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.2.4.2.3.1.22.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.node.overlimit[{#NODE.NAME}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <description>MIB: F5-BIGIP-LOCAL-MIB&#13;
 The last recorded value for the number of connections to the node address when connections hit a rate limit;&#13;
@@ -2670,6 +2793,7 @@ this calculation is only maintained if rate limiting is configured for the node.
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.2.4.2.3.1.23.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.node.overtime[{#NODE.NAME}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>s</units>
                             <description>MIB: F5-BIGIP-LOCAL-MIB&#13;
@@ -2744,10 +2868,90 @@ configured connection rate limit.</description>
                     <description>A table containing statistic information of pools.</description>
                     <item_prototypes>
                         <item_prototype>
+                            <name>F5 BIG-IP: Pool [{#POOL.NAME}]: Status available</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.3375.2.2.5.5.2.1.2.{#SNMPINDEX}</snmp_oid>
+                            <key>bigip.pool.available[{#POOL.NAME}]</key>
+                            <delay>5m</delay>
+                            <history>7d</history>
+                            <description>MIB: F5-BIGIP-LOCAL-MIB&#13;
+none(0),&#13;
+green(1),&#13;
+tyellow(2),&#13;
+tred(3),&#13;
+tblue(4),&#13;
+tgrey(5)</description>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Pool [{#POOL.NAME}]</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <valuemap>
+                                <name>SNMP ltmVsStatusAvailState</name>
+                            </valuemap>
+                            <preprocessing>
+                                <step>
+                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                                    <params>1h</params>
+                                </step>
+                            </preprocessing>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{count(120m,1,ne)}&gt;20</expression>
+                                    <name>F5 BIG-IP: Pool {#POOL.NAME} is not available in some capacity: {ITEM.VALUE1}</name>
+                                    <opdata>{ITEM.LASTVALUE}</opdata>
+                                    <priority>AVERAGE</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>F5 BIG-IP: Pool {#POOL.NAME} is not enabled in some capacity: {ITEM.VALUE1}</name>
+                                            <expression>{Template F5 Big-IP SNMP:bigip.pool.enabled[{#POOL.NAME}].count(120m,1,ne)}&gt;4</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>F5 BIG-IP: Pool [{#POOL.NAME}]: Status enabled</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.4.1.3375.2.2.5.5.2.1.3.{#SNMPINDEX}</snmp_oid>
+                            <key>bigip.pool.enabled[{#POOL.NAME}]</key>
+                            <delay>5m</delay>
+                            <history>7d</history>
+                            <description>MIB: F5-BIGIP-LOCAL-MIB&#13;
+The activity status of the specified pool, as specified by the user.&#13;
+none(0),&#13;
+enabled(1),&#13;
+disabled(2),&#13;
+disabledbyparent(3)</description>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Pool [{#POOL.NAME}]</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <valuemap>
+                                <name>SNMP ltmPoolStatusEnabledState</name>
+                            </valuemap>
+                            <preprocessing>
+                                <step>
+                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                                    <params>1h</params>
+                                </step>
+                            </preprocessing>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{count(120m,1,ne)}&gt;4</expression>
+                                    <name>F5 BIG-IP: Pool {#POOL.NAME} is not enabled in some capacity: {ITEM.VALUE1}</name>
+                                    <opdata>{ITEM.LASTVALUE}</opdata>
+                                    <priority>AVERAGE</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
                             <name>F5 BIG-IP: Pool [{#POOL.NAME}]: Current connections</name>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.2.5.2.3.1.8.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.pool.net.conn[{#POOL.NAME}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <description>MIB: F5-BIGIP-LOCAL-MIB&#13;
 The current connections from server-side to the specified pool.</description>
@@ -2768,6 +2972,7 @@ The current connections from server-side to the specified pool.</description>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.2.5.2.3.1.3.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.pool.net.in.bytes.rate[{#POOL.NAME}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>Bps</units>
                             <description>MIB: F5-BIGIP-LOCAL-MIB&#13;
@@ -2793,6 +2998,7 @@ The rate of bytes received by the specified pool from server-side.</description>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.2.5.2.3.1.2.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.pool.net.in.pkts.rate[{#POOL.NAME}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>pps</units>
                             <description>MIB: F5-BIGIP-LOCAL-MIB&#13;
@@ -2818,6 +3024,7 @@ The rate of packets received by the specified pool from server-side.</descriptio
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.2.5.2.3.1.5.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.pool.net.out.bytes.rate[{#POOL.NAME}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>Bps</units>
                             <description>MIB: F5-BIGIP-LOCAL-MIB&#13;
@@ -2843,6 +3050,7 @@ The rate of bytes sent to server-side from the specified pool.</description>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.2.5.2.3.1.4.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.pool.net.out.pkts.rate[{#POOL.NAME}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>pps</units>
                             <description>MIB: F5-BIGIP-LOCAL-MIB&#13;
@@ -2868,6 +3076,7 @@ The rate of packets sent to server-side from the specified pool.</description>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.2.5.2.3.1.31.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.pool.net.sessions[{#POOL.NAME}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <description>MIB: F5-BIGIP-LOCAL-MIB&#13;
 The number of current sessions going through the specified pool.</description>
@@ -2888,6 +3097,7 @@ The number of current sessions going through the specified pool.</description>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.2.5.2.3.1.19.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.pool.queue.age[{#POOL.NAME}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>s</units>
                             <description>MIB: F5-BIGIP-LOCAL-MIB&#13;
@@ -2913,6 +3123,7 @@ Age of the oldest queue entry, max.</description>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.2.5.2.3.1.18.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.pool.queue[{#POOL.NAME}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <description>MIB: F5-BIGIP-LOCAL-MIB&#13;
 Number of connections currently in queue, sum.</description>
@@ -2989,6 +3200,7 @@ Number of connections currently in queue, sum.</description>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.12.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.vserver.net.conn[{#VSERVER.NAME}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <description>MIB: F5-BIGIP-LOCAL-MIB&#13;
 The current connections from client-side to the specified virtual server.</description>
@@ -3009,6 +3221,7 @@ The current connections from client-side to the specified virtual server.</descr
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.7.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.vserver.net.in.bytes.rate[{#VSERVER.NAME}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>Bps</units>
                             <description>MIB: F5-BIGIP-LOCAL-MIB&#13;
@@ -3034,6 +3247,7 @@ The rate of bytes received by the specified virtual server from client-side.</de
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.6.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.vserver.net.in.pkts.rate[{#VSERVER.NAME}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>pps</units>
                             <description>MIB: F5-BIGIP-LOCAL-MIB&#13;
@@ -3059,6 +3273,7 @@ The rate of packets received by the specified virtual server from client-side.</
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.9.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.vserver.net.out.bytes.rate[{#VSERVER.NAME}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>Bps</units>
                             <description>MIB: F5-BIGIP-LOCAL-MIB&#13;
@@ -3084,6 +3299,7 @@ The rate of bytes sent to client-side from the specified virtual server.</descri
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.8.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.vserver.net.out.pkts.rate[{#VSERVER.NAME}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>pps</units>
                             <description>MIB: F5-BIGIP-LOCAL-MIB&#13;
@@ -3109,6 +3325,7 @@ The rate of packets sent to client-side from the specified virtual server.</desc
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.34.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.vserver.overlimit[{#VSERVER.NAME}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <description>MIB: F5-BIGIP-LOCAL-MIB&#13;
 The last recorded value for the number of connections to the virtual server when connections hit a rate limit;&#13;
@@ -3130,6 +3347,7 @@ this calculation is only maintained if rate limiting is configured for the servi
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.35.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.vserver.overtime[{#VSERVER.NAME}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>s</units>
                             <description>MIB: F5-BIGIP-LOCAL-MIB&#13;
@@ -3151,6 +3369,7 @@ Duration of time in seconds the specified virtual server has exceeded the config
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.32.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.vserver.usage.1m[{#VSERVER.NAME}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>%</units>
                             <description>MIB: F5-BIGIP-LOCAL-MIB&#13;
@@ -3172,6 +3391,7 @@ The percentage of time Virtual Server was busy over the last 1 minute.</descript
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.33.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.vserver.usage.5m[{#VSERVER.NAME}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>%</units>
                             <description>MIB: F5-BIGIP-LOCAL-MIB&#13;
@@ -3193,6 +3413,7 @@ The percentage of time Virtual Server was busy over the last 5 minutes.</descrip
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.31.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.vserver.usage.5s[{#VSERVER.NAME}]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>%</units>
                             <description>MIB: F5-BIGIP-LOCAL-MIB&#13;
@@ -3343,6 +3564,16 @@ The percentage of time Virtual Server was busy over the last 5 seconds.</descrip
                     <description>The recovery threshold of the swap utilization in %.</description>
                 </macro>
                 <macro>
+                    <macro>{$BIGIP.TEMP.HIGH}</macro>
+                    <value>50</value>
+                    <description>The critical threshold of the temperature in °C</description>
+                </macro>
+                <macro>
+                    <macro>{$BIGIP.TEMP.WARN}</macro>
+                    <value>45</value>
+                    <description>The warning threshold of the temperature in °C</description>
+                </macro>
+                <macro>
                     <macro>{$SNMP.TIMEOUT}</macro>
                     <value>5m</value>
                     <description>The time interval for SNMP agent availability trigger expression.</description>
@@ -3482,6 +3713,126 @@ The percentage of time Virtual Server was busy over the last 5 seconds.</descrip
                 <mapping>
                     <value>2</value>
                     <newvalue>unknown</newvalue>
+                </mapping>
+            </mappings>
+        </value_map>
+        <value_map>
+            <name>SNMP ltmPoolStatusEnabledState</name>
+            <mappings>
+                <mapping>
+                    <value>0</value>
+                    <newvalue>none</newvalue>
+                </mapping>
+                <mapping>
+                    <value>1</value>
+                    <newvalue>enabled</newvalue>
+                </mapping>
+                <mapping>
+                    <value>2</value>
+                    <newvalue>disabled</newvalue>
+                </mapping>
+                <mapping>
+                    <value>3</value>
+                    <newvalue>disabledbyparent</newvalue>
+                </mapping>
+            </mappings>
+        </value_map>
+        <value_map>
+            <name>SNMP ltmVsStatusAvailState</name>
+            <mappings>
+                <mapping>
+                    <value>0</value>
+                    <newvalue>none</newvalue>
+                </mapping>
+                <mapping>
+                    <value>1</value>
+                    <newvalue>green</newvalue>
+                </mapping>
+                <mapping>
+                    <value>2</value>
+                    <newvalue>yellow</newvalue>
+                </mapping>
+                <mapping>
+                    <value>3</value>
+                    <newvalue>red</newvalue>
+                </mapping>
+                <mapping>
+                    <value>4</value>
+                    <newvalue>blue</newvalue>
+                </mapping>
+                <mapping>
+                    <value>5</value>
+                    <newvalue>gray</newvalue>
+                </mapping>
+            </mappings>
+        </value_map>
+        <value_map>
+            <name>SNMP sysCmFailoverStatusId</name>
+            <mappings>
+                <mapping>
+                    <value>0</value>
+                    <newvalue>unknown</newvalue>
+                </mapping>
+                <mapping>
+                    <value>1</value>
+                    <newvalue>offline</newvalue>
+                </mapping>
+                <mapping>
+                    <value>2</value>
+                    <newvalue>forcedOffline</newvalue>
+                </mapping>
+                <mapping>
+                    <value>3</value>
+                    <newvalue>standby</newvalue>
+                </mapping>
+                <mapping>
+                    <value>4</value>
+                    <newvalue>active</newvalue>
+                </mapping>
+            </mappings>
+        </value_map>
+        <value_map>
+            <name>SNMP sysCmSyncStatusId</name>
+            <mappings>
+                <mapping>
+                    <value>0</value>
+                    <newvalue>unknown</newvalue>
+                </mapping>
+                <mapping>
+                    <value>1</value>
+                    <newvalue>syncing</newvalue>
+                </mapping>
+                <mapping>
+                    <value>2</value>
+                    <newvalue>needManualSync</newvalue>
+                </mapping>
+                <mapping>
+                    <value>3</value>
+                    <newvalue>inSync</newvalue>
+                </mapping>
+                <mapping>
+                    <value>4</value>
+                    <newvalue>syncFailed</newvalue>
+                </mapping>
+                <mapping>
+                    <value>5</value>
+                    <newvalue>syncDisconnected</newvalue>
+                </mapping>
+                <mapping>
+                    <value>6</value>
+                    <newvalue>standalone</newvalue>
+                </mapping>
+                <mapping>
+                    <value>7</value>
+                    <newvalue>awaitingInitialSync</newvalue>
+                </mapping>
+                <mapping>
+                    <value>8</value>
+                    <newvalue>incompatibleVersion</newvalue>
+                </mapping>
+                <mapping>
+                    <value>9</value>
+                    <newvalue>partialSync</newvalue>
                 </mapping>
             </mappings>
         </value_map>

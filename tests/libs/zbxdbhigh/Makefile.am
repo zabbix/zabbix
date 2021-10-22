@@ -35,6 +35,7 @@ COMMON_LIB = \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
+	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
 
@@ -116,6 +117,7 @@ PROXY_COMMON_LIB = \
 	$(top_srcdir)/src/libs/zbxdbcache/libzbxdbcache.a \
 	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
 	$(top_srcdir)/src/zabbix_proxy/libzbxproxy.a \
+	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxproxysysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_httpmetrics.a \

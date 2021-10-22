@@ -445,7 +445,6 @@ static int	validate_inventory_links(zbx_uint64_t hostid, const zbx_vector_uint64
 		char *error, size_t max_error_len)
 {
 	DB_RESULT	result;
-	DB_ROW		row;
 	char		*sql = NULL;
 	size_t		sql_alloc = 512, sql_offset;
 	int		ret = SUCCEED;
@@ -468,7 +467,7 @@ static int	validate_inventory_links(zbx_uint64_t hostid, const zbx_vector_uint64
 
 	result = DBselectN(sql, 1);
 
-	if (NULL != (row = DBfetch(result)))
+	if (NULL != DBfetch(result))
 	{
 		ret = FAIL;
 		zbx_strlcpy(error, "two items cannot populate one host inventory field", max_error_len);
@@ -503,7 +502,7 @@ static int	validate_inventory_links(zbx_uint64_t hostid, const zbx_vector_uint64
 
 	result = DBselectN(sql, 1);
 
-	if (NULL != (row = DBfetch(result)))
+	if (NULL != DBfetch(result))
 	{
 		ret = FAIL;
 		zbx_strlcpy(error, "two items cannot populate one host inventory field", max_error_len);
