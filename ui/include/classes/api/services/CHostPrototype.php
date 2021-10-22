@@ -1911,7 +1911,7 @@ class CHostPrototype extends CHostBase {
 																['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
 										]],
 										'securitylevel' =>	['type' => API_MULTIPLE, 'rules' => [
-																['if' => ['field' => 'version', 'in' => SNMP_V3], 'type' => API_INT32, 'default' => DB::getDefault('interface_snmp', 'securitylevel'), 'in' => implode(',', [ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV])],
+																['if' => ['field' => 'version', 'in' => SNMP_V3], 'type' => API_INT32, 'in' => implode(',', [ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV]), 'default' => DB::getDefault('interface_snmp', 'securitylevel')],
 																['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
 										]],
 										'authprotocol' =>	['type' => API_MULTIPLE, 'rules' => [
