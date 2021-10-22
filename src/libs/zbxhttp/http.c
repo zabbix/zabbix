@@ -341,7 +341,7 @@ int	zbx_http_get(const char *url, const char *header, long timeout, char **out, 
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, ZBX_CURLOPT_ACCEPT_ENCODING, "")))
 	{
-		*error = zbx_dsprintf(NULL, "Cannot set encoding: %s", curl_easy_strerror(err));
+		*error = zbx_dsprintf(NULL, "Cannot set cURL encoding option: %s", curl_easy_strerror(err));
 		goto clean;
 	}
 
