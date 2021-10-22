@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-10-22T17:45:05Z'
+  date: '2021-10-22T20:05:48Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -1923,7 +1923,7 @@ zabbix_export:
               newvalue: Standby
             -
               value: '1'
-              newvalue: Stoped
+              newvalue: Stopped
             -
               value: '2'
               newvalue: Unavailable
