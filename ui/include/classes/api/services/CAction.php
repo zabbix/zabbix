@@ -3227,6 +3227,20 @@ class CAction extends CApiService {
 					$db_actions[$db_condition['actionid']]['filter']['conditions'][$db_condition['conditionid']] =
 						array_diff_key($db_condition, array_flip(['actionid']));
 				}
+
+				foreach ($db_actions as &$db_action) {
+					if ($db_action['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+						$formula = $db_action['filter']['formula'];
+
+						$formulaids = CConditionHelper::getFormulaIds($formula);
+
+						foreach ($db_action['filter']['conditions'] as &$db_condition) {
+							$db_condition['formulaid'] = $formulaids[$db_condition['conditionid']];
+						}
+						unset($db_condition);
+					}
+				}
+				unset($db_action);
 			}
 		}
 
