@@ -1915,7 +1915,7 @@ class CHostPrototype extends CHostBase {
 	 */
 	private static function getInterfacesValidationRules(): array {
 		return ['type' => API_MULTIPLE, 'rules' => [
-			['if' => ['field' => 'custom_interfaces', 'in' => HOST_PROT_INTERFACES_CUSTOM], 'type' => API_OBJECTS, 'flags' => API_REQUIRED, 'fields' => [
+			['if' => ['field' => 'custom_interfaces', 'in' => HOST_PROT_INTERFACES_CUSTOM], 'type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NORMALIZE, 'fields' => [
 				'type' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_IPMI, INTERFACE_TYPE_JMX])],
 				'useip' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [INTERFACE_USE_DNS, INTERFACE_USE_IP])],
 				'ip' =>			['type' => API_MULTIPLE, 'rules' => [
