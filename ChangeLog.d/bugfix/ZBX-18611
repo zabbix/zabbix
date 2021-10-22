@@ -1,0 +1,1 @@
+..F....... [ZBX-18611] fixed division by zero error due to small graph size when using gradient lines (Ivo)
