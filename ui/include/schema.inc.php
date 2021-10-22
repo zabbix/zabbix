@@ -8736,17 +8736,6 @@ return [
 			]
 		]
 	],
-	'table_lock' => [
-		'key' => 'table_name',
-		'fields' => [
-			'table_name' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CUID,
-				'length' => 25,
-				'default' => ''
-			]
-		]
-	],
 	'dbversion' => [
 		'key' => '',
 		'fields' => [
