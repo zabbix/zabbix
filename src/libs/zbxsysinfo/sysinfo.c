@@ -2077,3 +2077,51 @@ void	zbx_mpoints_free(zbx_mpoint_t *mpoint)
 {
 	zbx_free(mpoint);
 }
+
+#ifndef _WINDOWS
+int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *hostname)
+{
+	char	*type, *transform;
+
+	type = get_rparam(request, 0);
+	transform = get_rparam(request, 1);
+
+	if (NULL != type && '\0' != *type && 0 != strcmp(type, "host"))
+	{
+		if (0 == strcmp(type, "shorthost"))
+		{
+			char	*dot;
+
+			if (NULL != (dot = strchr(hostname, '.')))
+				*dot = '\0';
+		}
+		else if (0 == strcmp(type, "netbios"))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "NetBIOS is not supported on the current platform."));
+			return FAIL;
+		}
+		else
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
+			return FAIL;
+		}
+	}
+
+	if (NULL != transform && '\0' != *transform && 0 != strcmp(transform, "none"))
+	{
+		if (0 == strcmp(transform, "lower"))
+		{
+			zbx_strlower(hostname);
+		}
+		else
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+			return FAIL;
+		}
+	}
+
+	SET_STR_RESULT(result, hostname);
+
+	return SUCCEED;
+}
+#endif
