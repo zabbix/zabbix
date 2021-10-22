@@ -113,9 +113,7 @@ class TabIndicators {
 	 * Activate tab indicators.
 	 */
 	activateIndicators() {
-		const tabs = this.form.querySelectorAll('#tabs a');
-
-		Object.values(tabs).map((element) => {
+		for (const element of this.form.querySelectorAll('#tabs a')) {
 			const indicator_item = this.getIndicatorItem(this.getIndicatorNameByElement(element));
 
 			if (indicator_item instanceof TabIndicatorItem) {
@@ -123,7 +121,7 @@ class TabIndicators {
 					.addAttributes(element)
 					.initObserver(element);
 			}
-		});
+		}
 	}
 
 	/**
@@ -136,7 +134,7 @@ class TabIndicators {
 	getIndicatorNameByElement(element) {
 		const attr = element.getAttribute('js-indicator');
 
-		if (attr) {
+		if (attr !== null) {
 			return attr
 				.split('-')
 				.map((value) => value[0].toUpperCase() + value.slice(1))
@@ -281,28 +279,6 @@ class TabIndicatorItem {
 	}
 
 	/**
-	 * Init observer for HTML changes.
-	 *
-	 * @param {string}      selector          CSS selector for node to watch changes on.
-	 * @param {HTMLElement} element           Node to apply indicator/count updates to.
-	 * @param {object}      observer_options  Options that describe which DOM mutations should trigger the callback.
-	 *                                        Defaults to {childList: true, subtree: true}.
-	 */
-	initMutationObserver(selector, element, observer_options) {
-		const target_node = document.querySelector(selector);
-
-		if (target_node === null) {
-			return;
-		}
-
-		if (typeof observer_options === 'undefined') {
-			observer_options = {childList: true, subtree: true};
-		}
-
-		new MutationObserver(() => this.addAttributes(element)).observe(target_node, observer_options);
-	}
-
-	/**
 	 * Add tab indicator attribute to tab element.
 	 *
 	 * @param {HTMLElement} element  tab element
@@ -344,16 +320,20 @@ class MacrosTabIndicatorItem extends TabIndicatorItem {
 	 * @param {HTMLElement} element
 	 */
 	initObserver(element) {
-		this.initMutationObserver(
-			'#tbl_macros',
-			element,
-			{
+		const target_node = document.querySelector('#tbl_macros');
+
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes(element);
+			});
+
+			observer.observe(target_node, {
 				childList: true,
 				attributes: true,
 				attributeFilter: ['value', 'style'], // Use style because textarea don't have value attribute.
 				subtree: true
-			}
-		);
+			});
+		}
 	}
 }
 
@@ -369,24 +349,35 @@ class LinkedTemplateTabIndicatorItem extends TabIndicatorItem {
 		let count = 0;
 
 		// Count saved templates.
-		if (target_node) {
+		if (target_node !== null) {
 			count += target_node
 				.querySelectorAll('tbody tr')
 				.length;
 		}
 
 		// Count new templates in multiselect.
-		if (multiselect_node) {
+		if (multiselect_node !== null) {
 			count += multiselect_node
 				.querySelectorAll('.selected li')
 				.length;
 		}
 
-		return isNaN(count) ? 0 : count;
+		return count;
 	}
 
 	initObserver(element) {
-		this.initMutationObserver('#add_templates_ .multiselect-list', element);
+		const target_node = document.querySelector('#add_templates_ .multiselect-list');
+
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes(element);
+			});
+
+			observer.observe(target_node, {
+				childList: true,
+				subtree: true
+			});
+		}
 	}
 }
 
@@ -403,16 +394,20 @@ class TagsTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		this.initMutationObserver(
-			'#tags-table',
-			element,
-			{
+		const target_node = document.querySelector('#tags-table');
+
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes(element);
+			});
+
+			observer.observe(target_node, {
 				childList: true,
 				attributes: true,
 				attributeFilter: ['value', 'style'], // Use style because textarea don't have value attribute.
 				subtree: true
-			}
-		);
+			});
+		}
 	}
 }
 
@@ -425,7 +420,7 @@ class HttpTabIndicatorItem extends TabIndicatorItem {
 	getValue() {
 		const element = document.querySelector('#http_auth_enabled');
 
-		if (element) {
+		if (element !== null) {
 			return element.checked;
 		}
 
@@ -435,7 +430,7 @@ class HttpTabIndicatorItem extends TabIndicatorItem {
 	initObserver(element) {
 		const target_node = document.querySelector('#http_auth_enabled');
 
-		if (target_node) {
+		if (target_node !== null) {
 			target_node.addEventListener('click', () => {
 				this.addAttributes(element);
 			});
@@ -452,7 +447,7 @@ class LdapTabIndicatorItem extends TabIndicatorItem {
 	getValue() {
 		const element = document.querySelector('#ldap_configured');
 
-		if (element) {
+		if (element !== null) {
 			return element.checked;
 		}
 
@@ -462,7 +457,7 @@ class LdapTabIndicatorItem extends TabIndicatorItem {
 	initObserver(element) {
 		const target_node = document.querySelector('#ldap_configured');
 
-		if (target_node) {
+		if (target_node !== null) {
 			target_node.addEventListener('click', () => {
 				this.addAttributes(element);
 			});
@@ -479,7 +474,7 @@ class SamlTabIndicatorItem extends TabIndicatorItem {
 	getValue() {
 		const element = document.querySelector('#saml_auth_enabled');
 
-		if (element) {
+		if (element !== null) {
 			return element.checked;
 		}
 
@@ -489,7 +484,7 @@ class SamlTabIndicatorItem extends TabIndicatorItem {
 	initObserver(element) {
 		const target_node = document.querySelector('#saml_auth_enabled');
 
-		if (target_node) {
+		if (target_node !== null) {
 			target_node.addEventListener('click', () => {
 				this.addAttributes(element);
 			});
@@ -506,7 +501,7 @@ class InventoryTabIndicatorItem extends TabIndicatorItem {
 	getValue() {
 		const element = document.querySelector('[name=inventory_mode]:checked');
 
-		if (element) {
+		if (element !== null) {
 			return (element.value === '0' || element.value === '1');
 		}
 
@@ -514,11 +509,11 @@ class InventoryTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		[...document.querySelectorAll('[name=inventory_mode]')].map((value) => {
-			value.addEventListener('click', () => {
+		for (const input of document.querySelectorAll('[name=inventory_mode]')) {
+			input.addEventListener('click', () => {
 				this.addAttributes(element);
 			});
-		});
+		}
 	}
 }
 
@@ -531,7 +526,7 @@ class EncryptionTabIndicatorItem extends TabIndicatorItem {
 	getValue() {
 		const tls_connect = document.querySelector('[name=tls_connect]:checked');
 
-		if (tls_connect && (tls_connect.value === '2' || tls_connect.value === '4')) {
+		if (tls_connect !== null && (tls_connect.value === '2' || tls_connect.value === '4')) {
 			return true;
 		}
 
@@ -543,22 +538,23 @@ class EncryptionTabIndicatorItem extends TabIndicatorItem {
 
 	initObserver(element) {
 		const tls_in_psk_node = document.querySelector('[name=tls_in_psk]');
-		const tls_in_cert_node = document.querySelector('[name=tls_in_cert]');
 
-		[...document.querySelectorAll('[name=tls_connect]')].map((value) =>
-			value.addEventListener('click', () => {
-				this.addAttributes(element);
-			})
-		);
-
-		if (tls_in_psk_node) {
+		if (tls_in_psk_node !== null) {
 			tls_in_psk_node.addEventListener('click', () => {
 				this.addAttributes(element);
 			});
 		}
 
-		if (tls_in_cert_node) {
+		const tls_in_cert_node = document.querySelector('[name=tls_in_cert]');
+
+		if (tls_in_cert_node !== null) {
 			tls_in_cert_node.addEventListener('click', () => {
+				this.addAttributes(element);
+			});
+		}
+
+		for (const input of document.querySelectorAll('[name=tls_connect]')) {
+			input.addEventListener('click', () => {
 				this.addAttributes(element);
 			});
 		}
@@ -578,7 +574,18 @@ class GroupsTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		this.initMutationObserver('#group_links_ .multiselect-list', element);
+		const target_node = document.querySelector('#group_links_ .multiselect-list');
+
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes(element);
+			});
+
+			observer.observe(target_node, {
+				childList: true,
+				subtree: true
+			});
+		}
 	}
 }
 
@@ -595,7 +602,18 @@ class PreprocessingTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		this.initMutationObserver('#preprocessing', element);
+		const target_node = document.querySelector('#preprocessing');
+
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes(element);
+			});
+
+			observer.observe(target_node, {
+				childList: true,
+				subtree: true
+			});
+		}
 	}
 }
 
@@ -612,7 +630,18 @@ class DependencyTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		this.initMutationObserver('#dependency-table tbody', element);
+		const target_node = document.querySelector('#dependency-table tbody');
+
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes(element);
+			});
+
+			observer.observe(target_node, {
+				childList: true,
+				subtree: true
+			});
+		}
 	}
 }
 
@@ -629,16 +658,20 @@ class LldMacrosTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		this.initMutationObserver(
-			'#lld_macro_paths',
-			element,
-			{
+		const target_node = document.querySelector('#lld_macro_paths');
+
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes(element);
+			});
+
+			observer.observe(target_node, {
 				childList: true,
 				attributes: true,
 				attributeFilter: ['value', 'style'], // Use style because textarea don't have value attribute.
 				subtree: true
-			}
-		);
+			});
+		}
 	}
 }
 
@@ -655,16 +688,20 @@ class FiltersTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		this.initMutationObserver(
-			'#conditions',
-			element,
-			{
+		const target_node = document.querySelector('#conditions');
+
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes(element);
+			});
+
+			observer.observe(target_node, {
 				childList: true,
 				attributes: true,
 				attributeFilter: ['value'],
 				subtree: true
-			}
-		);
+			});
+		}
 	}
 }
 
@@ -681,7 +718,18 @@ class OverridesTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		this.initMutationObserver('.lld-overrides-table tbody', element);
+		const target_node = document.querySelector('.lld-overrides-table tbody');
+
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes(element);
+			});
+
+			observer.observe(target_node, {
+				childList: true,
+				subtree: true
+			});
+		}
 	}
 }
 
@@ -698,7 +746,18 @@ class StepsTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		this.initMutationObserver('.httpconf-steps-dynamic-row tbody', element);
+		const target_node = document.querySelector('.httpconf-steps-dynamic-row tbody');
+
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes(element);
+			});
+
+			observer.observe(target_node, {
+				childList: true,
+				subtree: true
+			});
+		}
 	}
 }
 
@@ -725,23 +784,23 @@ class HttpAuthTabIndicatorItem extends TabIndicatorItem {
 	initObserver(element) {
 		const auth_node = document.querySelector('#authentication');
 
-		if (auth_node) {
+		if (auth_node !== null) {
 			auth_node.addEventListener('change', () => {
 				this.addAttributes(element);
 			});
 		}
 
-		[...document.querySelectorAll('#verify_peer, #verify_host')].map((value) => {
-			value.addEventListener('click', () => {
+		for (const input of document.querySelectorAll('#verify_peer, #verify_host')) {
+			input.addEventListener('click', () => {
 				this.addAttributes(element);
 			});
-		});
+		}
 
-		[...document.querySelectorAll('#ssl_cert_file, #ssl_key_file, #ssl_key_password')].map((value) => {
-			value.addEventListener('change', () => {
+		for (const input of document.querySelectorAll('#ssl_cert_file, #ssl_key_file, #ssl_key_password')) {
+			input.addEventListener('change', () => {
 				this.addAttributes(element);
 			});
-		});
+		}
 	}
 }
 
@@ -757,9 +816,11 @@ class OperationsTabIndicatorItem extends TabIndicatorItem {
 		count += document
 			.querySelectorAll('#op-table tbody tr:not(:last-child)')
 			.length;
+
 		count += document
 			.querySelectorAll('#rec-table tbody tr:not(:last-child)')
 			.length;
+
 		count += document
 			.querySelectorAll('#upd-table tbody tr:not(:last-child)')
 			.length;
@@ -768,9 +829,44 @@ class OperationsTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		this.initMutationObserver('#op-table tbody', element);
-		this.initMutationObserver('#rec-table tbody', element);
-		this.initMutationObserver('#upd-table tbody', element);
+		const target_node_op = document.querySelector('#op-table tbody');
+
+		if (target_node_op !== null) {
+			const observer_op = new MutationObserver(() => {
+				this.addAttributes(element);
+			});
+
+			observer_op.observe(target_node_op, {
+				childList: true,
+				subtree: true
+			});
+		}
+
+		const target_node_rec = document.querySelector('#rec-table tbody');
+
+		if (target_node_rec !== null) {
+			const observer_rec = new MutationObserver(() => {
+				this.addAttributes(element);
+			});
+
+			observer_rec.observe(target_node_rec, {
+				childList: true,
+				subtree: true
+			});
+		}
+
+		const target_node_upd = document.querySelector('#upd-table tbody');
+
+		if (target_node_upd !== null) {
+			const observer_upd = new MutationObserver(() => {
+				this.addAttributes(element);
+			});
+
+			observer_upd.observe(target_node_upd, {
+				childList: true,
+				subtree: true
+			});
+		}
 	}
 }
 
@@ -793,7 +889,7 @@ class SlaTabIndicatorItem extends TabIndicatorItem {
 	initObserver(element) {
 		const target_node = document.querySelector('#showsla');
 
-		if (target_node) {
+		if (target_node !== null) {
 			target_node.addEventListener('click', () => {
 				this.addAttributes(element);
 			});
@@ -808,14 +904,25 @@ class ChildServicesTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		return document.querySelector('#children').dataset.tabIndicator;
+		return document
+			.querySelector('#children')
+			.dataset
+			.tabIndicator;
 	}
 
 	initObserver(element) {
-		this.initMutationObserver('#children', element, {
-			attributes: true,
-			attributeFilter: ['data-tab-indicator']
-		});
+		const target_node = document.querySelector('#children');
+
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes(element);
+			});
+
+			observer.observe(target_node, {
+				attributes: true,
+				attributeFilter: ['data-tab-indicator']
+			});
+		}
 	}
 }
 
@@ -832,7 +939,18 @@ class TimeTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		this.initMutationObserver('#time-table tbody', element);
+		const target_node = document.querySelector('#time-table tbody');
+
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes(element);
+			});
+
+			observer.observe(target_node, {
+				childList: true,
+				subtree: true
+			});
+		}
 	}
 }
 
@@ -849,7 +967,6 @@ class TagFilterTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		// This event triggered in app/views/js/administration.usergroup.edit.js.php:179
 		document.addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
 			this.addAttributes(element);
 		});
@@ -863,13 +980,22 @@ class MediaTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		return document
-			.querySelectorAll('#media-table tbody tr')
-			.length;
+		return document.querySelectorAll('#media-table tbody tr').length;
 	}
 
 	initObserver(element) {
-		this.initMutationObserver('#media-table tbody', element);
+		const target_node = document.querySelector('#media-table tbody');
+
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes(element);
+			});
+
+			observer.observe(target_node, {
+				childList: true,
+				subtree: true
+			});
+		}
 	}
 }
 
@@ -886,7 +1012,18 @@ class MessageTemplateTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		this.initMutationObserver('#message-templates tbody', element);
+		const target_node = document.querySelector('#message-templates tbody');
+
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes(element);
+			});
+
+			observer.observe(target_node, {
+				childList: true,
+				subtree: true
+			});
+		}
 	}
 }
 
@@ -899,7 +1036,7 @@ class FrontendMessageTabIndicatorItem extends TabIndicatorItem {
 	getValue() {
 		const element = document.querySelector('#messages_enabled');
 
-		if (element) {
+		if (element !== null) {
 			return element.checked;
 		}
 
@@ -909,7 +1046,7 @@ class FrontendMessageTabIndicatorItem extends TabIndicatorItem {
 	initObserver(element) {
 		const target_node = document.querySelector('#messages_enabled');
 
-		if (target_node) {
+		if (target_node !== null) {
 			target_node.addEventListener('click', () => {
 				this.addAttributes(element);
 			});
@@ -926,7 +1063,7 @@ class SharingTabIndicatorItem extends TabIndicatorItem {
 	getValue() {
 		const element = document.querySelector("[name='private']:checked");
 
-		if (element && element.value > 0) {
+		if (element !== null && element.value > 0) {
 			return true;
 		}
 
@@ -935,14 +1072,37 @@ class SharingTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		[...document.querySelectorAll('[name=private]')].map((value) => {
-			value.addEventListener('click', () => {
+		for (const input of document.querySelectorAll('[name=private]')) {
+			input.addEventListener('click', () => {
 				this.addAttributes(element);
 			});
-		});
+		}
 
-		this.initMutationObserver('#user-group-share-table tbody', element);
-		this.initMutationObserver('#user-share-table tbody', element);
+		const target_node_group = document.querySelector('#user-group-share-table tbody');
+
+		if (target_node_group !== null) {
+			const observer_group = new MutationObserver(() => {
+				this.addAttributes(element);
+			});
+
+			observer_group.observe(target_node_group, {
+				childList: true,
+				subtree: true
+			});
+		}
+
+		const target_node_user = document.querySelector('#user-share-table tbody');
+
+		if (target_node_user !== null) {
+			const observer_user = new MutationObserver(() => {
+				this.addAttributes(element);
+			});
+
+			observer_user.observe(target_node_user, {
+				childList: true,
+				subtree: true
+			});
+		}
 	}
 }
 
@@ -959,7 +1119,18 @@ class GraphDatasetTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		this.initMutationObserver('#data_sets', element);
+		const target_node = document.querySelector('#data_sets');
+
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes(element);
+			});
+
+			observer.observe(target_node, {
+				childList: true,
+				subtree: true
+			});
+		}
 	}
 }
 
@@ -972,7 +1143,7 @@ class GraphOptionsTabIndicatorItem extends TabIndicatorItem {
 	getValue() {
 		const element = document.querySelector("[name='source']:checked");
 
-		if (element) {
+		if (element !== null) {
 			return element.value > 0;
 		}
 
@@ -980,11 +1151,11 @@ class GraphOptionsTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		[...document.querySelectorAll("[name='source']")].map((value) => {
-			value.addEventListener('click', () => {
+		for (const input of document.querySelectorAll("[name='source']")) {
+			input.addEventListener('click', () => {
 				this.addAttributes(element);
 			});
-		});
+		}
 	}
 }
 
@@ -997,7 +1168,7 @@ class GraphTimeTabIndicatorItem extends TabIndicatorItem {
 	getValue() {
 		const element = document.querySelector('#graph_time');
 
-		if (element) {
+		if (element !== null) {
 			return element.checked;
 		}
 
@@ -1007,7 +1178,7 @@ class GraphTimeTabIndicatorItem extends TabIndicatorItem {
 	initObserver(element) {
 		const target_node = document.querySelector('#graph_time');
 
-		if (target_node) {
+		if (target_node !== null) {
 			target_node.addEventListener('click', () => {
 				this.addAttributes(element);
 			});
@@ -1024,7 +1195,7 @@ class GraphLegendTabIndicatorItem extends TabIndicatorItem {
 	getValue() {
 		const element = document.querySelector('#legend');
 
-		if (element) {
+		if (element !== null) {
 			return element.checked;
 		}
 
@@ -1034,7 +1205,7 @@ class GraphLegendTabIndicatorItem extends TabIndicatorItem {
 	initObserver(element) {
 		const target_node = document.querySelector('#legend');
 
-		if (target_node) {
+		if (target_node !== null) {
 			target_node.addEventListener('click', () => {
 				this.addAttributes(element);
 			});
@@ -1051,7 +1222,7 @@ class GraphProblemsTabIndicatorItem extends TabIndicatorItem {
 	getValue() {
 		const element = document.querySelector('#show_problems');
 
-		if (element) {
+		if (element !== null) {
 			return element.checked;
 		}
 
@@ -1061,7 +1232,7 @@ class GraphProblemsTabIndicatorItem extends TabIndicatorItem {
 	initObserver(element) {
 		const target_node = document.querySelector('#show_problems');
 
-		if (target_node) {
+		if (target_node !== null) {
 			target_node.addEventListener('click', () => {
 				this.addAttributes(element);
 			});
@@ -1082,7 +1253,18 @@ class GraphOverridesTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		this.initMutationObserver('.overrides-list', element);
+		const target_node = document.querySelector('.overrides-list');
+
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes(element);
+			});
+
+			observer.observe(target_node, {
+				childList: true,
+				subtree: true
+			});
+		}
 	}
 }
 
@@ -1099,7 +1281,6 @@ class PermissionsTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		// This event triggered in app/views/js/administration.usergroup.edit.js.php:164
 		document.addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
 			this.addAttributes(element);
 		});
@@ -1119,6 +1300,17 @@ class ValuemapsTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		this.initMutationObserver('#valuemap-table', element);
+		const target_node = document.querySelector('#valuemap-table');
+
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes(element);
+			});
+
+			observer.observe(target_node, {
+				childList: true,
+				subtree: true
+			});
+		}
 	}
 }
