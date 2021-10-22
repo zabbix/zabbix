@@ -21,17 +21,16 @@
 #include "log.h"
 #include "zbxipcservice.h"
 #include "zbxserialize.h"
-#include "ha.h"
 #include "threads.h"
 #include "zbxjson.h"
 #include "../../libs/zbxalgo/vectorimpl.h"
 #include "../../libs/zbxaudit/audit.h"
 #include "../../libs/zbxaudit/audit_ha.h"
 #include "../../libs/zbxaudit/audit_settings.h"
+#include "zbxha.h"
+#include "ha.h"
 
 #define ZBX_HA_POLL_PERIOD	5
-
-#define ZBX_HA_SERVICE_TIMEOUT	10
 
 #define ZBX_HA_DEFAULT_FAILOVER_DELAY	SEC_PER_MIN
 
@@ -1500,39 +1499,6 @@ int	zbx_ha_recv_status(int timeout, int *ha_status, char **error)
 	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_ha_get_nodes                                                 *
- *                                                                            *
- * Purpose: get HA nodes in json format                                       *
- *                                                                            *
- ******************************************************************************/
-int	zbx_ha_get_nodes(char **nodes, char **error)
-{
-	unsigned char		*data, *ptr;
-	zbx_uint32_t		str_len;
-	int			ret;
-	char			*str;
-
-	if (SUCCEED != zbx_ipc_async_exchange(ZBX_IPC_SERVICE_HA, ZBX_IPC_SERVICE_HA_GET_NODES,
-			ZBX_HA_SERVICE_TIMEOUT, NULL, 0, &data, error))
-	{
-		return FAIL;
-	}
-
-	ptr = data;
-	ptr += zbx_deserialize_value(ptr, &ret);
-	(void)zbx_deserialize_str(ptr, &str, str_len);
-	zbx_free(data);
-
-	if (SUCCEED == ret)
-		*nodes = str;
-	else
-		*error = str;
 
 	return ret;
 }
