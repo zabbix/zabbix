@@ -1041,7 +1041,7 @@ class CControllerPopupGeneric extends CController {
 				break;
 
 			case 'help_items':
-				$records = CItemData::getForType($this->page_options['itemtype']);
+				$records = CItemData::getByType($this->page_options['itemtype']);
 				break;
 
 			case 'triggers':

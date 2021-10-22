@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -24,7 +24,800 @@
  */
 final class CItemData {
 
-	public static function get() {
+	private const KEYS_BY_TYPE = [
+		ITEM_TYPE_ZABBIX => [
+			'agent.hostmetadata',
+			'agent.hostname',
+			'agent.ping',
+			'agent.version',
+			'kernel.maxfiles',
+			'kernel.maxproc',
+			'kernel.openfiles',
+			'modbus.get[endpoint,<slaveid>,<function>,<address>,<count>,<type>,<endianness>,<offset>]',
+			'net.dns.record[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
+			'net.dns[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
+			'net.if.collisions[if]',
+			'net.if.discovery',
+			'net.if.in[if,<mode>]',
+			'net.if.list',
+			'net.if.out[if,<mode>]',
+			'net.if.total[if,<mode>]',
+			'net.tcp.listen[port]',
+			'net.tcp.port[<ip>,port]',
+			'net.tcp.service.perf[service,<ip>,<port>]',
+			'net.tcp.service[service,<ip>,<port>]',
+			'net.tcp.socket.count[<laddr>,<lport>,<raddr>,<rport>,<state>]',
+			'net.udp.listen[port]',
+			'net.udp.service.perf[service,<ip>,<port>]',
+			'net.udp.service[service,<ip>,<port>]',
+			'net.udp.socket.count[<laddr>,<lport>,<raddr>,<rport>,<state>]',
+			'perf_counter[counter,<interval>]',
+			'perf_counter_en[counter,<interval>]',
+			'perf_instance.discovery[object]',
+			'perf_instance_en.discovery[object]',
+			'proc.cpu.util[<name>,<user>,<type>,<cmdline>,<mode>,<zone>]',
+			'proc.mem[<name>,<user>,<mode>,<cmdline>,<memtype>]',
+			'proc.num[<name>,<user>,<state>,<cmdline>,<zone>]',
+			'proc_info[process,<attribute>,<type>]',
+			'sensor[device,sensor,<mode>]',
+			'service.info[service,<param>]',
+			'services[<type>,<state>,<exclude>]',
+			'system.boottime',
+			'system.cpu.discovery',
+			'system.cpu.intr',
+			'system.cpu.load[<cpu>,<mode>]',
+			'system.cpu.num[<type>]',
+			'system.cpu.switches',
+			'system.cpu.util[<cpu>,<type>,<mode>,<logical_or_physical>]',
+			'system.hostname[<type>]',
+			'system.hw.chassis[<info>]',
+			'system.hw.cpu[<cpu>,<info>]',
+			'system.hw.devices[<type>]',
+			'system.hw.macaddr[<interface>,<format>]',
+			'system.localtime[<type>]',
+			'system.run[command,<mode>]',
+			'system.stat[resource,<type>]',
+			'system.sw.arch',
+			'system.sw.os[<info>]',
+			'system.sw.packages[<package>,<manager>,<format>]',
+			'system.swap.in[<device>,<type>]',
+			'system.swap.out[<device>,<type>]',
+			'system.swap.size[<device>,<type>]',
+			'system.uname',
+			'system.uptime',
+			'system.users.num',
+			'vfs.dev.discovery',
+			'vfs.dev.read[<device>,<type>,<mode>]',
+			'vfs.dev.write[<device>,<type>,<mode>]',
+			'vfs.dir.count[dir,<regex_incl>,<regex_excl>,<types_incl>,<types_excl>,<max_depth>,<min_size>,<max_size>,<min_age>,<max_age>,<regex_excl_dir>]',
+			'vfs.dir.size[dir,<regex_incl>,<regex_excl>,<mode>,<max_depth>,<regex_excl_dir>]',
+			'vfs.file.cksum[file,<mode>]',
+			'vfs.file.contents[file,<encoding>]',
+			'vfs.file.exists[file,<types_incl>,<types_excl>]',
+			'vfs.file.get[file]',
+			'vfs.file.md5sum[file]',
+			'vfs.file.owner[file,<ownertype>,<resulttype>]',
+			'vfs.file.permissions[file]',
+			'vfs.file.regexp[file,regexp,<encoding>,<start line>,<end line>,<output>]',
+			'vfs.file.regmatch[file,regexp,<encoding>,<start line>,<end line>]',
+			'vfs.file.size[file,<mode>]',
+			'vfs.file.time[file,<mode>]',
+			'vfs.fs.discovery',
+			'vfs.fs.get',
+			'vfs.fs.inode[fs,<mode>]',
+			'vfs.fs.size[fs,<mode>]',
+			'vm.memory.size[<mode>]',
+			'vm.vmemory.size[<type>]',
+			'web.page.get[host,<path>,<port>]',
+			'web.page.perf[host,<path>,<port>]',
+			'web.page.regexp[host,<path>,<port>,regexp,<length>,<output>]',
+			'wmi.get[<namespace>,<query>]',
+			'wmi.getall[<namespace>,<query>]',
+			'zabbix.stats[<ip>,<port>,queue,<from>,<to>]',
+			'zabbix.stats[<ip>,<port>]'
+		],
+		ITEM_TYPE_ZABBIX_ACTIVE => [
+			'agent.hostmetadata',
+			'agent.hostname',
+			'agent.ping',
+			'agent.version',
+			'eventlog[name,<regexp>,<severity>,<source>,<eventid>,<maxlines>,<mode>]',
+			'kernel.maxfiles',
+			'kernel.maxproc',
+			'kernel.openfiles',
+			'log.count[file,<regexp>,<encoding>,<maxproclines>,<mode>,<maxdelay>,<options>]',
+			'log[file,<regexp>,<encoding>,<maxlines>,<mode>,<output>,<maxdelay>,<options>]',
+			'logrt.count[file_regexp,<regexp>,<encoding>,<maxproclines>,<mode>,<maxdelay>,<options>]',
+			'logrt[file_regexp,<regexp>,<encoding>,<maxlines>,<mode>,<output>,<maxdelay>,<options>]',
+			'modbus.get[endpoint,<slaveid>,<function>,<address>,<count>,<type>,<endianness>,<offset>]',
+			'mqtt.get[<broker_url>,topic]',
+			'net.dns.record[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
+			'net.dns[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
+			'net.if.collisions[if]',
+			'net.if.discovery',
+			'net.if.in[if,<mode>]',
+			'net.if.list',
+			'net.if.out[if,<mode>]',
+			'net.if.total[if,<mode>]',
+			'net.tcp.listen[port]',
+			'net.tcp.port[<ip>,port]',
+			'net.tcp.service.perf[service,<ip>,<port>]',
+			'net.tcp.service[service,<ip>,<port>]',
+			'net.tcp.socket.count[<laddr>,<lport>,<raddr>,<rport>,<state>]',
+			'net.udp.listen[port]',
+			'net.udp.service.perf[service,<ip>,<port>]',
+			'net.udp.service[service,<ip>,<port>]',
+			'net.udp.socket.count[<laddr>,<lport>,<raddr>,<rport>,<state>]',
+			'perf_counter[counter,<interval>]',
+			'perf_counter_en[counter,<interval>]',
+			'perf_instance.discovery[object]',
+			'perf_instance_en.discovery[object]',
+			'proc.cpu.util[<name>,<user>,<type>,<cmdline>,<mode>,<zone>]',
+			'proc.mem[<name>,<user>,<mode>,<cmdline>,<memtype>]',
+			'proc.num[<name>,<user>,<state>,<cmdline>,<zone>]',
+			'proc_info[process,<attribute>,<type>]',
+			'sensor[device,sensor,<mode>]',
+			'service.info[service,<param>]',
+			'services[<type>,<state>,<exclude>]',
+			'system.boottime',
+			'system.cpu.discovery',
+			'system.cpu.intr',
+			'system.cpu.load[<cpu>,<mode>]',
+			'system.cpu.num[<type>]',
+			'system.cpu.switches',
+			'system.cpu.util[<cpu>,<type>,<mode>,<logical_or_physical>]',
+			'system.hostname[<type>]',
+			'system.hw.chassis[<info>]',
+			'system.hw.cpu[<cpu>,<info>]',
+			'system.hw.devices[<type>]',
+			'system.hw.macaddr[<interface>,<format>]',
+			'system.localtime[<type>]',
+			'system.run[command,<mode>]',
+			'system.stat[resource,<type>]',
+			'system.sw.arch',
+			'system.sw.os[<info>]',
+			'system.sw.packages[<package>,<manager>,<format>]',
+			'system.swap.in[<device>,<type>]',
+			'system.swap.out[<device>,<type>]',
+			'system.swap.size[<device>,<type>]',
+			'system.uname',
+			'system.uptime',
+			'system.users.num',
+			'vfs.dev.discovery',
+			'vfs.dev.read[<device>,<type>,<mode>]',
+			'vfs.dev.write[<device>,<type>,<mode>]',
+			'vfs.dir.count[dir,<regex_incl>,<regex_excl>,<types_incl>,<types_excl>,<max_depth>,<min_size>,<max_size>,<min_age>,<max_age>,<regex_excl_dir>]',
+			'vfs.dir.size[dir,<regex_incl>,<regex_excl>,<mode>,<max_depth>,<regex_excl_dir>]',
+			'vfs.file.cksum[file,<mode>]',
+			'vfs.file.contents[file,<encoding>]',
+			'vfs.file.exists[file,<types_incl>,<types_excl>]',
+			'vfs.file.get[file]',
+			'vfs.file.md5sum[file]',
+			'vfs.file.owner[file,<ownertype>,<resulttype>]',
+			'vfs.file.permissions[file]',
+			'vfs.file.regexp[file,regexp,<encoding>,<start line>,<end line>,<output>]',
+			'vfs.file.regmatch[file,regexp,<encoding>,<start line>,<end line>]',
+			'vfs.file.size[file,<mode>]',
+			'vfs.file.time[file,<mode>]',
+			'vfs.fs.discovery',
+			'vfs.fs.get',
+			'vfs.fs.inode[fs,<mode>]',
+			'vfs.fs.size[fs,<mode>]',
+			'vm.memory.size[<mode>]',
+			'vm.vmemory.size[<type>]',
+			'web.page.get[host,<path>,<port>]',
+			'web.page.perf[host,<path>,<port>]',
+			'web.page.regexp[host,<path>,<port>,regexp,<length>,<output>]',
+			'wmi.get[<namespace>,<query>]',
+			'zabbix.stats[<ip>,<port>,queue,<from>,<to>]',
+			'zabbix.stats[<ip>,<port>]'
+		],
+		ITEM_TYPE_SIMPLE => [
+			'icmpping[<target>,<packets>,<interval>,<size>,<timeout>]',
+			'icmppingloss[<target>,<packets>,<interval>,<size>,<timeout>]',
+			'icmppingsec[<target>,<packets>,<interval>,<size>,<timeout>,<mode>]',
+			'net.tcp.service.perf[service,<ip>,<port>]',
+			'net.tcp.service[service,<ip>,<port>]',
+			'net.udp.service.perf[service,<ip>,<port>]',
+			'net.udp.service[service,<ip>,<port>]',
+			'vmware.cl.perfcounter[<url>,<id>,<path>,<instance>]',
+			'vmware.cluster.discovery[<url>]',
+			'vmware.cluster.status[<url>,<name>]',
+			'vmware.datastore.discovery[<url>]',
+			'vmware.datastore.hv.list[<url>,<datastore>]',
+			'vmware.datastore.read[<url>,<datastore>,<mode>]',
+			'vmware.datastore.size[<url>,<datastore>,<mode>]',
+			'vmware.datastore.write[<url>,<datastore>,<mode>]',
+			'vmware.dc.discovery[<url>]',
+			'vmware.eventlog[<url>,<mode>]',
+			'vmware.fullname[<url>]',
+			'vmware.hv.cluster.name[<url>,<uuid>]',
+			'vmware.hv.cpu.usage.perf[<url>,<uuid>]',
+			'vmware.hv.cpu.usage[<url>,<uuid>]',
+			'vmware.hv.cpu.utilization[<url>,<uuid>]',
+			'vmware.hv.datacenter.name[<url>,<uuid>]',
+			'vmware.hv.datastore.discovery[<url>,<uuid>]',
+			'vmware.hv.datastore.list[<url>,<uuid>]',
+			'vmware.hv.datastore.multipath[<url>,<uuid>,<datastore>,<partitionid>]',
+			'vmware.hv.datastore.read[<url>,<uuid>,<datastore>,<mode>]',
+			'vmware.hv.datastore.size[<url>,<uuid>,<datastore>,<mode>]',
+			'vmware.hv.datastore.write[<url>,<uuid>,<datastore>,<mode>]',
+			'vmware.hv.discovery[<url>]',
+			'vmware.hv.fullname[<url>,<uuid>]',
+			'vmware.hv.hw.cpu.freq[<url>,<uuid>]',
+			'vmware.hv.hw.cpu.model[<url>,<uuid>]',
+			'vmware.hv.hw.cpu.num[<url>,<uuid>]',
+			'vmware.hv.hw.cpu.threads[<url>,<uuid>]',
+			'vmware.hv.hw.memory[<url>,<uuid>]',
+			'vmware.hv.hw.model[<url>,<uuid>]',
+			'vmware.hv.hw.uuid[<url>,<uuid>]',
+			'vmware.hv.hw.vendor[<url>,<uuid>]',
+			'vmware.hv.memory.size.ballooned[<url>,<uuid>]',
+			'vmware.hv.memory.used[<url>,<uuid>]',
+			'vmware.hv.network.in[<url>,<uuid>,<mode>]',
+			'vmware.hv.network.out[<url>,<uuid>,<mode>]',
+			'vmware.hv.perfcounter[<url>,<uuid>,<path>,<instance>]',
+			'vmware.hv.power[<url>,<uuid>,<max>]',
+			'vmware.hv.sensor.health.state[<url>,<uuid>]',
+			'vmware.hv.status[<url>,<uuid>]',
+			'vmware.hv.uptime[<url>,<uuid>]',
+			'vmware.hv.version[<url>,<uuid>]',
+			'vmware.hv.vm.num[<url>,<uuid>]',
+			'vmware.version[<url>]',
+			'vmware.vm.cluster.name[<url>,<uuid>]',
+			'vmware.vm.cpu.latency[<url>,<uuid>]',
+			'vmware.vm.cpu.num[<url>,<uuid>]',
+			'vmware.vm.cpu.readiness[<url>,<uuid>,<instance>]',
+			'vmware.vm.cpu.ready[<url>,<uuid>]',
+			'vmware.vm.cpu.swapwait[<url>,<uuid>,<instance>]',
+			'vmware.vm.cpu.usage.perf[<url>,<uuid>]',
+			'vmware.vm.cpu.usage[<url>,<uuid>]',
+			'vmware.vm.datacenter.name[<url>,<uuid>]',
+			'vmware.vm.discovery[<url>]',
+			'vmware.vm.guest.memory.size.swapped[<url>,<uuid>]',
+			'vmware.vm.guest.osuptime[<url>,<uuid>]',
+			'vmware.vm.hv.name[<url>,<uuid>]',
+			'vmware.vm.memory.size.ballooned[<url>,<uuid>]',
+			'vmware.vm.memory.size.compressed[<url>,<uuid>]',
+			'vmware.vm.memory.size.consumed[<url>,<uuid>]',
+			'vmware.vm.memory.size.private[<url>,<uuid>]',
+			'vmware.vm.memory.size.shared[<url>,<uuid>]',
+			'vmware.vm.memory.size.swapped[<url>,<uuid>]',
+			'vmware.vm.memory.size.usage.guest[<url>,<uuid>]',
+			'vmware.vm.memory.size.usage.host[<url>,<uuid>]',
+			'vmware.vm.memory.size[<url>,<uuid>]',
+			'vmware.vm.memory.usage[<url>,<uuid>]',
+			'vmware.vm.net.if.discovery[<url>,<uuid>]',
+			'vmware.vm.net.if.in[<url>,<uuid>,<instance>,<mode>]',
+			'vmware.vm.net.if.out[<url>,<uuid>,<instance>,<mode>]',
+			'vmware.vm.net.if.usage[<url>,<uuid>,<instance>]',
+			'vmware.vm.perfcounter[<url>,<uuid>,<path>,<instance>]',
+			'vmware.vm.powerstate[<url>,<uuid>]',
+			'vmware.vm.storage.committed[<url>,<uuid>]',
+			'vmware.vm.storage.readoio[<url>,<uuid>,<instance>]',
+			'vmware.vm.storage.totalreadlatency[<url>,<uuid>,<instance>]',
+			'vmware.vm.storage.totalwritelatency[<url>,<uuid>,<instance>]',
+			'vmware.vm.storage.uncommitted[<url>,<uuid>]',
+			'vmware.vm.storage.unshared[<url>,<uuid>]',
+			'vmware.vm.storage.writeoio[<url>,<uuid>,<instance>]',
+			'vmware.vm.uptime[<url>,<uuid>]',
+			'vmware.vm.vfs.dev.discovery[<url>,<uuid>]',
+			'vmware.vm.vfs.dev.read[<url>,<uuid>,<instance>,<mode>]',
+			'vmware.vm.vfs.dev.write[<url>,<uuid>,<instance>,<mode>]',
+			'vmware.vm.vfs.fs.discovery[<url>,<uuid>]',
+			'vmware.vm.vfs.fs.size[<url>,<uuid>,<fsname>,<mode>]'
+		],
+		ITEM_TYPE_SNMPTRAP => [
+			'snmptrap.fallback',
+			'snmptrap[<regex>]'
+		],
+		ITEM_TYPE_INTERNAL => [
+			'zabbix[boottime]',
+			'zabbix[history]',
+			'zabbix[history_log]',
+			'zabbix[history_str]',
+			'zabbix[history_text]',
+			'zabbix[history_uint]',
+			'zabbix[host,,items]',
+			'zabbix[host,,items_unsupported]',
+			'zabbix[host,,maintenance]',
+			'zabbix[host,<type>,available]',
+			'zabbix[host,discovery,interfaces]',
+			'zabbix[hosts]',
+			'zabbix[items]',
+			'zabbix[items_unsupported]',
+			'zabbix[java,,<param>]',
+			'zabbix[lld_queue]',
+			'zabbix[preprocessing_queue]',
+			'zabbix[process,<type>,<mode>,<state>]',
+			'zabbix[proxy,<name>,<param>]',
+			'zabbix[proxy_history]',
+			'zabbix[queue,<from>,<to>]',
+			'zabbix[rcache,<cache>,<mode>]',
+			'zabbix[requiredperformance]',
+			'zabbix[stats,<ip>,<port>,queue,<from>,<to>]',
+			'zabbix[stats,<ip>,<port>]',
+			'zabbix[tcache, cache, <parameter>]',
+			'zabbix[trends]',
+			'zabbix[trends_uint]',
+			'zabbix[triggers]',
+			'zabbix[uptime]',
+			'zabbix[vcache,buffer,<mode>]',
+			'zabbix[vcache,cache,<parameter>]',
+			'zabbix[version]',
+			'zabbix[vmware,buffer,<mode>]',
+			'zabbix[wcache,<cache>,<mode>]'
+		],
+		ITEM_TYPE_DB_MONITOR => [
+			'db.odbc.discovery[<unique short description>,<dsn>,<connection string>]',
+			'db.odbc.get[<unique short description>,<dsn>,<connection string>]',
+			'db.odbc.select[<unique short description>,<dsn>,<connection string>]'
+		],
+		ITEM_TYPE_JMX => [
+			'jmx.discovery[<discovery mode>,<object name>,<unique short description>]',
+			'jmx.get[<discovery mode>,<object name>,<unique short description>]',
+			'jmx[object_name,attribute_name,<unique short description>]'
+		],
+		ITEM_TYPE_IPMI => [
+			'ipmi.get'
+		],
+	];
+
+	/**
+	 * Returns items available for the given item type as an array of key => details.
+	 *
+	 * @param int $type  ITEM_TYPE_ZABBIX, ITEM_TYPE_INTERNAL, etc.
+	 *
+	 * @return array
+	 */
+	public static function getByType(int $type): array {
+		return array_intersect_key(self::get(), array_flip(self::KEYS_BY_TYPE[$type]));
+	}
+
+	/**
+	 * Generate an array used for item type lookups in the form: key_name => value_type.
+	 * Value type set to null if key return type varies based on parameters.
+	 *
+	 * @return array
+	 */
+	public static function getTypeSuggestionsByKey(): array {
+		$type_suggestions = [];
+		$keys = self::get();
+
+		foreach ($keys as $key => $details) {
+			$value_type = $details['value_type'];
+			$param_start_pos = strpos($key, '[');
+
+			if ($param_start_pos !== false) {
+				$key = substr($key, 0, $param_start_pos);
+			}
+
+			if (!array_key_exists($key, $type_suggestions)) {
+				$type_suggestions[$key] = $value_type;
+			}
+			elseif ($type_suggestions[$key] != $value_type) {
+				// In case of Key name repeats with different types (f.e. zabbix[..]), reset to 'unknown'.
+				$type_suggestions[$key] = null;
+			}
+		}
+
+		return $type_suggestions;
+	}
+
+	/**
+	 * Returns sets of elements (DOM IDs, default field values, dependent option values) to set visible,
+	 * disabled, or set value of, when a 'parent' field value is changed.
+	 *
+	 * @param bool $data['is_discovery_rule']  Determines default value for ITEM_TYPE_DB_MONITOR Key field.
+	 *
+	 * @return array
+	 */
+	public static function fieldSwitchingConfiguration(array $data): array {
+		return [
+			// Ids to toggle when the field 'type' is changed.
+			'for_type' => [
+				ITEM_TYPE_CALCULATED => [
+					'delay',
+					'js-item-delay-field',
+					'js-item-delay-label',
+					'js-item-flex-intervals-field',
+					'js-item-flex-intervals-label',
+					'js-item-formula-field',
+					'js-item-formula-label',
+					'js-item-trends-field',
+					'js-item-trends-label',
+					['id' => 'key', 'defaultValue' => '']
+				],
+				ITEM_TYPE_DB_MONITOR => [
+					'delay',
+					'js-item-delay-field',
+					'js-item-delay-label',
+					'js-item-flex-intervals-field',
+					'js-item-flex-intervals-label',
+					'js-item-password-field',
+					'js-item-password-label',
+					'js-item-sql-query-field',
+					'js-item-sql-query-label',
+					'js-item-trends-field',
+					'js-item-trends-label',
+					'js-item-username-field',
+					'js-item-username-label',
+					'password',
+					'username',
+					['id' => 'key', 'defaultValue' => $data['is_discovery_rule']
+						? ZBX_DEFAULT_KEY_DB_MONITOR_DISCOVERY
+						: ZBX_DEFAULT_KEY_DB_MONITOR
+					]
+				],
+				ITEM_TYPE_DEPENDENT => [
+					'js-item-master-item-field',
+					'js-item-master-item-label',
+					'js-item-trends-field',
+					'js-item-trends-label',
+					['id' => 'key', 'defaultValue' => '']
+				],
+				ITEM_TYPE_EXTERNAL => [
+					'delay',
+					'interfaceid',
+					'js-item-delay-field',
+					'js-item-delay-label',
+					'js-item-flex-intervals-field',
+					'js-item-flex-intervals-label',
+					'js-item-interface-field',
+					'js-item-interface-label',
+					'js-item-trends-field',
+					'js-item-trends-label',
+					['id' => 'key', 'defaultValue' => '']
+				],
+				ITEM_TYPE_HTTPAGENT => [
+					'allow_traps',
+					'delay',
+					'http_authtype',
+					'interfaceid',
+					'js-item-allow-traps-field',
+					'js-item-allow-traps-label',
+					'js-item-delay-field',
+					'js-item-delay-label',
+					'js-item-flex-intervals-field',
+					'js-item-flex-intervals-label',
+					'js-item-follow-redirects-field',
+					'js-item-follow-redirects-label',
+					'js-item-headers-field',
+					'js-item-headers-label',
+					'js-item-http-authtype-field',
+					'js-item-http-authtype-label',
+					'js-item-http-proxy-field',
+					'js-item-http-proxy-label',
+					'js-item-interface-field',
+					'js-item-interface-label',
+					'js-item-output-format-field',
+					'js-item-output-format-label',
+					'js-item-post-type-field',
+					'js-item-post-type-label',
+					'js-item-posts-field',
+					'js-item-posts-label',
+					'js-item-query-fields-field',
+					'js-item-query-fields-label',
+					'js-item-request-method-field',
+					'js-item-request-method-label',
+					'js-item-retrieve-mode-field',
+					'js-item-retrieve-mode-label',
+					'js-item-ssl-cert-file-field',
+					'js-item-ssl-cert-file-label',
+					'js-item-ssl-key-file-field',
+					'js-item-ssl-key-file-label',
+					'js-item-ssl-key-password-field',
+					'js-item-ssl-key-password-label',
+					'js-item-status-codes-field',
+					'js-item-status-codes-label',
+					'js-item-timeout-field',
+					'js-item-timeout-label',
+					'js-item-trends-field',
+					'js-item-trends-label',
+					'js-item-url-field',
+					'js-item-url-label',
+					'js-item-verify-host-field',
+					'js-item-verify-host-label',
+					'js-item-verify-peer-field',
+					'js-item-verify-peer-label',
+					'request_method',
+					'trapper_hosts',
+					['id' => 'key', 'defaultValue' => '']
+				],
+				ITEM_TYPE_INTERNAL => [
+					'delay',
+					'js-item-delay-field',
+					'js-item-delay-label',
+					'js-item-flex-intervals-field',
+					'js-item-flex-intervals-label',
+					'js-item-trends-field',
+					'js-item-trends-label',
+					['id' => 'key', 'defaultValue' => '']
+				],
+				ITEM_TYPE_IPMI => [
+					'delay',
+					'interfaceid',
+					'ipmi_sensor',
+					'js-item-delay-field',
+					'js-item-delay-label',
+					'js-item-flex-intervals-field',
+					'js-item-flex-intervals-label',
+					'js-item-impi-sensor-field',
+					'js-item-impi-sensor-label',
+					'js-item-interface-field',
+					'js-item-interface-label',
+					'js-item-trends-field',
+					'js-item-trends-label',
+					['id' => 'key', 'defaultValue' => '']
+				],
+				ITEM_TYPE_JMX => [
+					'delay',
+					'interfaceid',
+					'jmx_endpoint',
+					'js-item-delay-field',
+					'js-item-delay-label',
+					'js-item-flex-intervals-field',
+					'js-item-flex-intervals-label',
+					'js-item-interface-field',
+					'js-item-interface-label',
+					'js-item-jmx-endpoint-field',
+					'js-item-jmx-endpoint-label',
+					'js-item-password-field',
+					'js-item-password-label',
+					'js-item-trends-field',
+					'js-item-trends-label',
+					'js-item-username-field',
+					'js-item-username-label',
+					'password',
+					'username',
+					['id' => 'key', 'defaultValue' => '']
+				],
+				ITEM_TYPE_SCRIPT => [
+					'delay',
+					'js-item-delay-field',
+					'js-item-delay-label',
+					'js-item-flex-intervals-field',
+					'js-item-flex-intervals-label',
+					'js-item-parameters-field',
+					'js-item-parameters-label',
+					'js-item-script-field',
+					'js-item-script-label',
+					'js-item-timeout-field',
+					'js-item-timeout-label',
+					'js-item-trends-field',
+					'js-item-trends-label',
+					['id' => 'key', 'defaultValue' => '']
+				],
+				ITEM_TYPE_SIMPLE => [
+					'delay',
+					'interfaceid',
+					'js-item-delay-field',
+					'js-item-delay-label',
+					'js-item-flex-intervals-field',
+					'js-item-flex-intervals-label',
+					'js-item-interface-field',
+					'js-item-interface-label',
+					'js-item-password-field',
+					'js-item-password-label',
+					'js-item-trends-field',
+					'js-item-trends-label',
+					'js-item-username-field',
+					'js-item-username-label',
+					'password',
+					'status',
+					'username',
+					['id' => 'key', 'defaultValue' => '']
+				],
+				ITEM_TYPE_SNMP => [
+					'delay',
+					'interfaceid',
+					'js-item-delay-field',
+					'js-item-delay-label',
+					'js-item-flex-intervals-field',
+					'js-item-flex-intervals-label',
+					'js-item-interface-field',
+					'js-item-interface-label',
+					'js-item-snmp-oid-field',
+					'js-item-snmp-oid-label',
+					'snmp_oid',
+					['id' => 'key', 'defaultValue' => '']
+				],
+				ITEM_TYPE_SNMPTRAP => [
+					'interfaceid',
+					'js-item-interface-field',
+					'js-item-interface-label',
+					'js-item-trends-field',
+					'js-item-trends-label',
+					['id' => 'key', 'defaultValue' => '']
+				],
+				ITEM_TYPE_SSH => [
+					'authtype',
+					'delay',
+					'interfaceid',
+					'js-item-authtype-field',
+					'js-item-authtype-label',
+					'js-item-delay-field',
+					'js-item-delay-label',
+					'js-item-executed-script-field',
+					'js-item-executed-script-label',
+					'js-item-flex-intervals-field',
+					'js-item-flex-intervals-label',
+					'js-item-interface-field',
+					'js-item-interface-label',
+					'js-item-password-field',
+					'js-item-password-label',
+					'js-item-trends-field',
+					'js-item-trends-label',
+					'js-item-username-field',
+					'js-item-username-label',
+					'params_script',
+					'password',
+					'username',
+					['id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_SSH]
+				],
+				ITEM_TYPE_TELNET => [
+					'delay',
+					'interfaceid',
+					'js-item-delay-field',
+					'js-item-delay-label',
+					'js-item-executed-script-field',
+					'js-item-executed-script-label',
+					'js-item-flex-intervals-field',
+					'js-item-flex-intervals-label',
+					'js-item-interface-field',
+					'js-item-interface-label',
+					'js-item-password-field',
+					'js-item-password-label',
+					'js-item-trends-field',
+					'js-item-trends-label',
+					'js-item-username-field',
+					'js-item-username-label',
+					'params_script',
+					'password',
+					'username',
+					['id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_TELNET]
+				],
+				ITEM_TYPE_TRAPPER => [
+					'js-item-trapper-hosts-field',
+					'js-item-trapper-hosts-label',
+					'js-item-trends-field',
+					'js-item-trends-label',
+					'trapper_hosts',
+					['id' => 'key', 'defaultValue' => '']
+				],
+				ITEM_TYPE_ZABBIX => [
+					'delay',
+					'interfaceid',
+					'js-item-delay-field',
+					'js-item-delay-label',
+					'js-item-flex-intervals-field',
+					'js-item-flex-intervals-label',
+					'js-item-interface-field',
+					'js-item-interface-label',
+					'js-item-trends-field',
+					'js-item-trends-label',
+					['id' => 'key', 'defaultValue' => '']
+				],
+				ITEM_TYPE_ZABBIX_ACTIVE => [
+					'delay',
+					'js-item-delay-field',
+					'js-item-delay-label',
+					'js-item-flex-intervals-field',
+					'js-item-flex-intervals-label',
+					['id' => 'key', 'defaultValue' => '']
+				]
+			],
+			// Ids to toggle when the field 'authtype' is changed.
+			'for_authtype' => [
+				ITEM_AUTHTYPE_PUBLICKEY => [
+					'js-item-private-key-field',
+					'js-item-private-key-label',
+					'js-item-public-key-field',
+					'js-item-public-key-label',
+					'privatekey',
+					'publickey'
+				]
+			],
+			// Dropdown entries of parent with {id} to disable for specific type.
+			'disable_for_type' => [
+				ITEM_TYPE_CALCULATED => [
+					'value_type' => [
+						ITEM_VALUE_TYPE_STR,
+						ITEM_VALUE_TYPE_LOG,
+						ITEM_VALUE_TYPE_TEXT
+					],
+					'value_type_steps' => [
+						ITEM_VALUE_TYPE_STR,
+						ITEM_VALUE_TYPE_LOG,
+						ITEM_VALUE_TYPE_TEXT
+					]
+				]
+			],
+			'for_http_auth_type' => [
+				HTTPTEST_AUTH_BASIC => [
+					'js-item-http-username-label',
+					'js-item-http-username-field',
+					'js-item-http-password-label',
+					'js-item-http-password-field'
+				],
+				HTTPTEST_AUTH_NTLM => [
+					'js-item-http-username-label',
+					'js-item-http-username-field',
+					'js-item-http-password-label',
+					'js-item-http-password-field'
+				],
+				HTTPTEST_AUTH_KERBEROS => [
+					'js-item-http-username-label',
+					'js-item-http-username-field',
+					'js-item-http-password-label',
+					'js-item-http-password-field'
+				],
+				HTTPTEST_AUTH_DIGEST => [
+					'js-item-http-username-label',
+					'js-item-http-username-field',
+					'js-item-http-password-label',
+					'js-item-http-password-field'
+				]
+			],
+			'for_traps' => [
+				HTTPCHECK_ALLOW_TRAPS_ON => [
+					'js-item-trapper-hosts-label',
+					'js-item-trapper-hosts-field'
+				]
+			],
+			'for_value_type' => [
+				ITEM_VALUE_TYPE_FLOAT => [
+					'inventory_link',
+					'js-item-inventory-link-field',
+					'js-item-inventory-link-label',
+					'js-item-trends-field',
+					'js-item-trends-label',
+					'js-item-units-field',
+					'js-item-units-label',
+					'js-item-value-map-field',
+					'js-item-value-map-label',
+					'units',
+					'valuemap_name',
+					'valuemapid'
+				],
+				ITEM_VALUE_TYPE_LOG => [
+					'js-item-log-time-format-field',
+					'js-item-log-time-format-label',
+					'logtimefmt'
+				],
+				ITEM_VALUE_TYPE_STR => [
+					'inventory_link',
+					'js-item-inventory-link-field',
+					'js-item-inventory-link-label',
+					'js-item-value-map-field',
+					'js-item-value-map-label',
+					'valuemap_name',
+					'valuemapid'
+				],
+				ITEM_VALUE_TYPE_TEXT => [
+					'inventory_link',
+					'js-item-inventory-link-field',
+					'js-item-inventory-link-label'
+				],
+				ITEM_VALUE_TYPE_UINT64 => [
+					'inventory_link',
+					'js-item-inventory-link-field',
+					'js-item-inventory-link-label',
+					'js-item-trends-field',
+					'js-item-trends-label',
+					'js-item-units-field',
+					'js-item-units-label',
+					'js-item-value-map-field',
+					'js-item-value-map-label',
+					'units',
+					'valuemap_name',
+					'valuemapid'
+				]
+			]
+		];
+	}
+
+	private static function get(): array {
 		return [
 			'agent.hostmetadata' => [
 				'description' => _('Agent host metadata. Returns string'),
@@ -937,800 +1730,6 @@ final class CItemData {
 			'zabbix[wcache,<cache>,<mode>]' => [
 				'description' => _('Statistics and availability of Zabbix write cache. Cache - one of values (modes: all, float, uint, str, log, text, not supported), history (modes: pfree, free, total, used, pused), index (modes: pfree, free, total, used, pused), trend (modes: pfree, free, total, used, pused).'),
 				'value_type' => null
-			]
-		];
-	}
-
-	public const KEYS_BY_TYPE = [
-		ITEM_TYPE_ZABBIX => [
-			'agent.hostmetadata',
-			'agent.hostname',
-			'agent.ping',
-			'agent.version',
-			'kernel.maxfiles',
-			'kernel.maxproc',
-			'kernel.openfiles',
-			'modbus.get[endpoint,<slaveid>,<function>,<address>,<count>,<type>,<endianness>,<offset>]',
-			'net.dns.record[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
-			'net.dns[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
-			'net.if.collisions[if]',
-			'net.if.discovery',
-			'net.if.in[if,<mode>]',
-			'net.if.list',
-			'net.if.out[if,<mode>]',
-			'net.if.total[if,<mode>]',
-			'net.tcp.listen[port]',
-			'net.tcp.port[<ip>,port]',
-			'net.tcp.service.perf[service,<ip>,<port>]',
-			'net.tcp.service[service,<ip>,<port>]',
-			'net.tcp.socket.count[<laddr>,<lport>,<raddr>,<rport>,<state>]',
-			'net.udp.listen[port]',
-			'net.udp.service.perf[service,<ip>,<port>]',
-			'net.udp.service[service,<ip>,<port>]',
-			'net.udp.socket.count[<laddr>,<lport>,<raddr>,<rport>,<state>]',
-			'perf_counter[counter,<interval>]',
-			'perf_counter_en[counter,<interval>]',
-			'perf_instance.discovery[object]',
-			'perf_instance_en.discovery[object]',
-			'proc.cpu.util[<name>,<user>,<type>,<cmdline>,<mode>,<zone>]',
-			'proc.mem[<name>,<user>,<mode>,<cmdline>,<memtype>]',
-			'proc.num[<name>,<user>,<state>,<cmdline>,<zone>]',
-			'proc_info[process,<attribute>,<type>]',
-			'sensor[device,sensor,<mode>]',
-			'service.info[service,<param>]',
-			'services[<type>,<state>,<exclude>]',
-			'system.boottime',
-			'system.cpu.discovery',
-			'system.cpu.intr',
-			'system.cpu.load[<cpu>,<mode>]',
-			'system.cpu.num[<type>]',
-			'system.cpu.switches',
-			'system.cpu.util[<cpu>,<type>,<mode>,<logical_or_physical>]',
-			'system.hostname[<type>]',
-			'system.hw.chassis[<info>]',
-			'system.hw.cpu[<cpu>,<info>]',
-			'system.hw.devices[<type>]',
-			'system.hw.macaddr[<interface>,<format>]',
-			'system.localtime[<type>]',
-			'system.run[command,<mode>]',
-			'system.stat[resource,<type>]',
-			'system.sw.arch',
-			'system.sw.os[<info>]',
-			'system.sw.packages[<package>,<manager>,<format>]',
-			'system.swap.in[<device>,<type>]',
-			'system.swap.out[<device>,<type>]',
-			'system.swap.size[<device>,<type>]',
-			'system.uname',
-			'system.uptime',
-			'system.users.num',
-			'vfs.dev.discovery',
-			'vfs.dev.read[<device>,<type>,<mode>]',
-			'vfs.dev.write[<device>,<type>,<mode>]',
-			'vfs.dir.count[dir,<regex_incl>,<regex_excl>,<types_incl>,<types_excl>,<max_depth>,<min_size>,<max_size>,<min_age>,<max_age>,<regex_excl_dir>]',
-			'vfs.dir.size[dir,<regex_incl>,<regex_excl>,<mode>,<max_depth>,<regex_excl_dir>]',
-			'vfs.file.cksum[file,<mode>]',
-			'vfs.file.contents[file,<encoding>]',
-			'vfs.file.exists[file,<types_incl>,<types_excl>]',
-			'vfs.file.get[file]',
-			'vfs.file.md5sum[file]',
-			'vfs.file.owner[file,<ownertype>,<resulttype>]',
-			'vfs.file.permissions[file]',
-			'vfs.file.regexp[file,regexp,<encoding>,<start line>,<end line>,<output>]',
-			'vfs.file.regmatch[file,regexp,<encoding>,<start line>,<end line>]',
-			'vfs.file.size[file,<mode>]',
-			'vfs.file.time[file,<mode>]',
-			'vfs.fs.discovery',
-			'vfs.fs.get',
-			'vfs.fs.inode[fs,<mode>]',
-			'vfs.fs.size[fs,<mode>]',
-			'vm.memory.size[<mode>]',
-			'vm.vmemory.size[<type>]',
-			'web.page.get[host,<path>,<port>]',
-			'web.page.perf[host,<path>,<port>]',
-			'web.page.regexp[host,<path>,<port>,regexp,<length>,<output>]',
-			'wmi.get[<namespace>,<query>]',
-			'wmi.getall[<namespace>,<query>]',
-			'zabbix.stats[<ip>,<port>,queue,<from>,<to>]',
-			'zabbix.stats[<ip>,<port>]'
-		],
-		ITEM_TYPE_ZABBIX_ACTIVE => [
-			'agent.hostmetadata',
-			'agent.hostname',
-			'agent.ping',
-			'agent.version',
-			'eventlog[name,<regexp>,<severity>,<source>,<eventid>,<maxlines>,<mode>]',
-			'kernel.maxfiles',
-			'kernel.maxproc',
-			'kernel.openfiles',
-			'log.count[file,<regexp>,<encoding>,<maxproclines>,<mode>,<maxdelay>,<options>]',
-			'log[file,<regexp>,<encoding>,<maxlines>,<mode>,<output>,<maxdelay>,<options>]',
-			'logrt.count[file_regexp,<regexp>,<encoding>,<maxproclines>,<mode>,<maxdelay>,<options>]',
-			'logrt[file_regexp,<regexp>,<encoding>,<maxlines>,<mode>,<output>,<maxdelay>,<options>]',
-			'modbus.get[endpoint,<slaveid>,<function>,<address>,<count>,<type>,<endianness>,<offset>]',
-			'mqtt.get[<broker_url>,topic]',
-			'net.dns.record[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
-			'net.dns[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
-			'net.if.collisions[if]',
-			'net.if.discovery',
-			'net.if.in[if,<mode>]',
-			'net.if.list',
-			'net.if.out[if,<mode>]',
-			'net.if.total[if,<mode>]',
-			'net.tcp.listen[port]',
-			'net.tcp.port[<ip>,port]',
-			'net.tcp.service.perf[service,<ip>,<port>]',
-			'net.tcp.service[service,<ip>,<port>]',
-			'net.tcp.socket.count[<laddr>,<lport>,<raddr>,<rport>,<state>]',
-			'net.udp.listen[port]',
-			'net.udp.service.perf[service,<ip>,<port>]',
-			'net.udp.service[service,<ip>,<port>]',
-			'net.udp.socket.count[<laddr>,<lport>,<raddr>,<rport>,<state>]',
-			'perf_counter[counter,<interval>]',
-			'perf_counter_en[counter,<interval>]',
-			'perf_instance.discovery[object]',
-			'perf_instance_en.discovery[object]',
-			'proc.cpu.util[<name>,<user>,<type>,<cmdline>,<mode>,<zone>]',
-			'proc.mem[<name>,<user>,<mode>,<cmdline>,<memtype>]',
-			'proc.num[<name>,<user>,<state>,<cmdline>,<zone>]',
-			'proc_info[process,<attribute>,<type>]',
-			'sensor[device,sensor,<mode>]',
-			'service.info[service,<param>]',
-			'services[<type>,<state>,<exclude>]',
-			'system.boottime',
-			'system.cpu.discovery',
-			'system.cpu.intr',
-			'system.cpu.load[<cpu>,<mode>]',
-			'system.cpu.num[<type>]',
-			'system.cpu.switches',
-			'system.cpu.util[<cpu>,<type>,<mode>,<logical_or_physical>]',
-			'system.hostname[<type>]',
-			'system.hw.chassis[<info>]',
-			'system.hw.cpu[<cpu>,<info>]',
-			'system.hw.devices[<type>]',
-			'system.hw.macaddr[<interface>,<format>]',
-			'system.localtime[<type>]',
-			'system.run[command,<mode>]',
-			'system.stat[resource,<type>]',
-			'system.sw.arch',
-			'system.sw.os[<info>]',
-			'system.sw.packages[<package>,<manager>,<format>]',
-			'system.swap.in[<device>,<type>]',
-			'system.swap.out[<device>,<type>]',
-			'system.swap.size[<device>,<type>]',
-			'system.uname',
-			'system.uptime',
-			'system.users.num',
-			'vfs.dev.discovery',
-			'vfs.dev.read[<device>,<type>,<mode>]',
-			'vfs.dev.write[<device>,<type>,<mode>]',
-			'vfs.dir.count[dir,<regex_incl>,<regex_excl>,<types_incl>,<types_excl>,<max_depth>,<min_size>,<max_size>,<min_age>,<max_age>,<regex_excl_dir>]',
-			'vfs.dir.size[dir,<regex_incl>,<regex_excl>,<mode>,<max_depth>,<regex_excl_dir>]',
-			'vfs.file.cksum[file,<mode>]',
-			'vfs.file.contents[file,<encoding>]',
-			'vfs.file.exists[file,<types_incl>,<types_excl>]',
-			'vfs.file.get[file]',
-			'vfs.file.md5sum[file]',
-			'vfs.file.owner[file,<ownertype>,<resulttype>]',
-			'vfs.file.permissions[file]',
-			'vfs.file.regexp[file,regexp,<encoding>,<start line>,<end line>,<output>]',
-			'vfs.file.regmatch[file,regexp,<encoding>,<start line>,<end line>]',
-			'vfs.file.size[file,<mode>]',
-			'vfs.file.time[file,<mode>]',
-			'vfs.fs.discovery',
-			'vfs.fs.get',
-			'vfs.fs.inode[fs,<mode>]',
-			'vfs.fs.size[fs,<mode>]',
-			'vm.memory.size[<mode>]',
-			'vm.vmemory.size[<type>]',
-			'web.page.get[host,<path>,<port>]',
-			'web.page.perf[host,<path>,<port>]',
-			'web.page.regexp[host,<path>,<port>,regexp,<length>,<output>]',
-			'wmi.get[<namespace>,<query>]',
-			'zabbix.stats[<ip>,<port>,queue,<from>,<to>]',
-			'zabbix.stats[<ip>,<port>]'
-		],
-		ITEM_TYPE_SIMPLE => [
-			'icmpping[<target>,<packets>,<interval>,<size>,<timeout>]',
-			'icmppingloss[<target>,<packets>,<interval>,<size>,<timeout>]',
-			'icmppingsec[<target>,<packets>,<interval>,<size>,<timeout>,<mode>]',
-			'net.tcp.service.perf[service,<ip>,<port>]',
-			'net.tcp.service[service,<ip>,<port>]',
-			'net.udp.service.perf[service,<ip>,<port>]',
-			'net.udp.service[service,<ip>,<port>]',
-			'vmware.cl.perfcounter[<url>,<id>,<path>,<instance>]',
-			'vmware.cluster.discovery[<url>]',
-			'vmware.cluster.status[<url>,<name>]',
-			'vmware.datastore.discovery[<url>]',
-			'vmware.datastore.hv.list[<url>,<datastore>]',
-			'vmware.datastore.read[<url>,<datastore>,<mode>]',
-			'vmware.datastore.size[<url>,<datastore>,<mode>]',
-			'vmware.datastore.write[<url>,<datastore>,<mode>]',
-			'vmware.dc.discovery[<url>]',
-			'vmware.eventlog[<url>,<mode>]',
-			'vmware.fullname[<url>]',
-			'vmware.hv.cluster.name[<url>,<uuid>]',
-			'vmware.hv.cpu.usage.perf[<url>,<uuid>]',
-			'vmware.hv.cpu.usage[<url>,<uuid>]',
-			'vmware.hv.cpu.utilization[<url>,<uuid>]',
-			'vmware.hv.datacenter.name[<url>,<uuid>]',
-			'vmware.hv.datastore.discovery[<url>,<uuid>]',
-			'vmware.hv.datastore.list[<url>,<uuid>]',
-			'vmware.hv.datastore.multipath[<url>,<uuid>,<datastore>,<partitionid>]',
-			'vmware.hv.datastore.read[<url>,<uuid>,<datastore>,<mode>]',
-			'vmware.hv.datastore.size[<url>,<uuid>,<datastore>,<mode>]',
-			'vmware.hv.datastore.write[<url>,<uuid>,<datastore>,<mode>]',
-			'vmware.hv.discovery[<url>]',
-			'vmware.hv.fullname[<url>,<uuid>]',
-			'vmware.hv.hw.cpu.freq[<url>,<uuid>]',
-			'vmware.hv.hw.cpu.model[<url>,<uuid>]',
-			'vmware.hv.hw.cpu.num[<url>,<uuid>]',
-			'vmware.hv.hw.cpu.threads[<url>,<uuid>]',
-			'vmware.hv.hw.memory[<url>,<uuid>]',
-			'vmware.hv.hw.model[<url>,<uuid>]',
-			'vmware.hv.hw.uuid[<url>,<uuid>]',
-			'vmware.hv.hw.vendor[<url>,<uuid>]',
-			'vmware.hv.memory.size.ballooned[<url>,<uuid>]',
-			'vmware.hv.memory.used[<url>,<uuid>]',
-			'vmware.hv.network.in[<url>,<uuid>,<mode>]',
-			'vmware.hv.network.out[<url>,<uuid>,<mode>]',
-			'vmware.hv.perfcounter[<url>,<uuid>,<path>,<instance>]',
-			'vmware.hv.power[<url>,<uuid>,<max>]',
-			'vmware.hv.sensor.health.state[<url>,<uuid>]',
-			'vmware.hv.status[<url>,<uuid>]',
-			'vmware.hv.uptime[<url>,<uuid>]',
-			'vmware.hv.version[<url>,<uuid>]',
-			'vmware.hv.vm.num[<url>,<uuid>]',
-			'vmware.version[<url>]',
-			'vmware.vm.cluster.name[<url>,<uuid>]',
-			'vmware.vm.cpu.latency[<url>,<uuid>]',
-			'vmware.vm.cpu.num[<url>,<uuid>]',
-			'vmware.vm.cpu.readiness[<url>,<uuid>,<instance>]',
-			'vmware.vm.cpu.ready[<url>,<uuid>]',
-			'vmware.vm.cpu.swapwait[<url>,<uuid>,<instance>]',
-			'vmware.vm.cpu.usage.perf[<url>,<uuid>]',
-			'vmware.vm.cpu.usage[<url>,<uuid>]',
-			'vmware.vm.datacenter.name[<url>,<uuid>]',
-			'vmware.vm.discovery[<url>]',
-			'vmware.vm.guest.memory.size.swapped[<url>,<uuid>]',
-			'vmware.vm.guest.osuptime[<url>,<uuid>]',
-			'vmware.vm.hv.name[<url>,<uuid>]',
-			'vmware.vm.memory.size.ballooned[<url>,<uuid>]',
-			'vmware.vm.memory.size.compressed[<url>,<uuid>]',
-			'vmware.vm.memory.size.consumed[<url>,<uuid>]',
-			'vmware.vm.memory.size.private[<url>,<uuid>]',
-			'vmware.vm.memory.size.shared[<url>,<uuid>]',
-			'vmware.vm.memory.size.swapped[<url>,<uuid>]',
-			'vmware.vm.memory.size.usage.guest[<url>,<uuid>]',
-			'vmware.vm.memory.size.usage.host[<url>,<uuid>]',
-			'vmware.vm.memory.size[<url>,<uuid>]',
-			'vmware.vm.memory.usage[<url>,<uuid>]',
-			'vmware.vm.net.if.discovery[<url>,<uuid>]',
-			'vmware.vm.net.if.in[<url>,<uuid>,<instance>,<mode>]',
-			'vmware.vm.net.if.out[<url>,<uuid>,<instance>,<mode>]',
-			'vmware.vm.net.if.usage[<url>,<uuid>,<instance>]',
-			'vmware.vm.perfcounter[<url>,<uuid>,<path>,<instance>]',
-			'vmware.vm.powerstate[<url>,<uuid>]',
-			'vmware.vm.storage.committed[<url>,<uuid>]',
-			'vmware.vm.storage.readoio[<url>,<uuid>,<instance>]',
-			'vmware.vm.storage.totalreadlatency[<url>,<uuid>,<instance>]',
-			'vmware.vm.storage.totalwritelatency[<url>,<uuid>,<instance>]',
-			'vmware.vm.storage.uncommitted[<url>,<uuid>]',
-			'vmware.vm.storage.unshared[<url>,<uuid>]',
-			'vmware.vm.storage.writeoio[<url>,<uuid>,<instance>]',
-			'vmware.vm.uptime[<url>,<uuid>]',
-			'vmware.vm.vfs.dev.discovery[<url>,<uuid>]',
-			'vmware.vm.vfs.dev.read[<url>,<uuid>,<instance>,<mode>]',
-			'vmware.vm.vfs.dev.write[<url>,<uuid>,<instance>,<mode>]',
-			'vmware.vm.vfs.fs.discovery[<url>,<uuid>]',
-			'vmware.vm.vfs.fs.size[<url>,<uuid>,<fsname>,<mode>]'
-		],
-		ITEM_TYPE_SNMPTRAP => [
-			'snmptrap.fallback',
-			'snmptrap[<regex>]'
-		],
-		ITEM_TYPE_INTERNAL => [
-			'zabbix[boottime]',
-			'zabbix[history]',
-			'zabbix[history_log]',
-			'zabbix[history_str]',
-			'zabbix[history_text]',
-			'zabbix[history_uint]',
-			'zabbix[host,,items]',
-			'zabbix[host,,items_unsupported]',
-			'zabbix[host,,maintenance]',
-			'zabbix[host,<type>,available]',
-			'zabbix[host,discovery,interfaces]',
-			'zabbix[hosts]',
-			'zabbix[items]',
-			'zabbix[items_unsupported]',
-			'zabbix[java,,<param>]',
-			'zabbix[lld_queue]',
-			'zabbix[preprocessing_queue]',
-			'zabbix[process,<type>,<mode>,<state>]',
-			'zabbix[proxy,<name>,<param>]',
-			'zabbix[proxy_history]',
-			'zabbix[queue,<from>,<to>]',
-			'zabbix[rcache,<cache>,<mode>]',
-			'zabbix[requiredperformance]',
-			'zabbix[stats,<ip>,<port>,queue,<from>,<to>]',
-			'zabbix[stats,<ip>,<port>]',
-			'zabbix[tcache, cache, <parameter>]',
-			'zabbix[trends]',
-			'zabbix[trends_uint]',
-			'zabbix[triggers]',
-			'zabbix[uptime]',
-			'zabbix[vcache,buffer,<mode>]',
-			'zabbix[vcache,cache,<parameter>]',
-			'zabbix[version]',
-			'zabbix[vmware,buffer,<mode>]',
-			'zabbix[wcache,<cache>,<mode>]'
-		],
-		ITEM_TYPE_DB_MONITOR => [
-			'db.odbc.discovery[<unique short description>,<dsn>,<connection string>]',
-			'db.odbc.get[<unique short description>,<dsn>,<connection string>]',
-			'db.odbc.select[<unique short description>,<dsn>,<connection string>]'
-		],
-		ITEM_TYPE_JMX => [
-			'jmx.discovery[<discovery mode>,<object name>,<unique short description>]',
-			'jmx.get[<discovery mode>,<object name>,<unique short description>]',
-			'jmx[object_name,attribute_name,<unique short description>]'
-		],
-		ITEM_TYPE_IPMI => [
-			'ipmi.get'
-		],
-	];
-
-	/**
-	 * Returns items available for the given item type as an array of key => details.
-	 *
-	 * @param int $type  ITEM_TYPE_ZABBIX, ITEM_TYPE_INTERNAL, etc.
-	 *
-	 * @return array
-	 */
-	public static function getForType(int $type): array {
-		return array_intersect_key(self::get(), array_flip(self::KEYS_BY_TYPE[$type]));
-	}
-
-	/**
-	 * Generate an array used for item type lookups in the form: key_name => value_type.
-	 * Value type set to null if key return type varies based on parameters.
-	 *
-	 * @return array
-	 */
-	public static function getTypeSuggestionsByKey(): array {
-		$type_suggestions = [];
-		$keys = self::get();
-
-		foreach ($keys as $key => $details) {
-			$value_type = $details['value_type'];
-			$param_start_pos = strpos($key, '[');
-
-			if ($param_start_pos !== false) {
-				$key = substr($key, 0, $param_start_pos);
-			}
-
-			if (!array_key_exists($key, $type_suggestions)) {
-				$type_suggestions[$key] = $value_type;
-			}
-			elseif ($type_suggestions[$key] != $value_type) {
-				// In case of Key name repeats with different types (f.e. zabbix[..]), reset to 'unknown'.
-				$type_suggestions[$key] = null;
-			}
-		}
-
-		return $type_suggestions;
-	}
-
-	/**
-	 * Returns sets of elements (DOM IDs, default field values, dependent option values) to set visible,
-	 * disabled, or set value of, when a 'parent' field value is changed.
-	 *
-	 * @param array $data
-	 * @param bool  $data['is_discovery_rule']  Determines default value for ITEM_TYPE_DB_MONITOR Key field.
-	 *
-	 * @return array
-	 */
-	public static function fieldSwitchingConfiguration($data): array {
-		return [
-			// Ids to toggle when the field 'type' is changed.
-			'for_type' => [
-				ITEM_TYPE_CALCULATED => [
-					'delay',
-					'js-item-delay-field',
-					'js-item-delay-label',
-					'js-item-flex-intervals-field',
-					'js-item-flex-intervals-label',
-					'js-item-formula-field',
-					'js-item-formula-label',
-					'js-item-trends-field',
-					'js-item-trends-label',
-					['id' => 'key', 'defaultValue' => '']
-				],
-				ITEM_TYPE_DB_MONITOR => [
-					'delay',
-					'js-item-delay-field',
-					'js-item-delay-label',
-					'js-item-flex-intervals-field',
-					'js-item-flex-intervals-label',
-					'js-item-password-field',
-					'js-item-password-label',
-					'js-item-sql-query-field',
-					'js-item-sql-query-label',
-					'js-item-trends-field',
-					'js-item-trends-label',
-					'js-item-username-field',
-					'js-item-username-label',
-					'password',
-					'username',
-					['id' => 'key', 'defaultValue' => $data['is_discovery_rule']
-						? ZBX_DEFAULT_KEY_DB_MONITOR_DISCOVERY
-						: ZBX_DEFAULT_KEY_DB_MONITOR
-					]
-				],
-				ITEM_TYPE_DEPENDENT => [
-					'js-item-master-item-field',
-					'js-item-master-item-label',
-					'js-item-trends-field',
-					'js-item-trends-label',
-					['id' => 'key', 'defaultValue' => '']
-				],
-				ITEM_TYPE_EXTERNAL => [
-					'delay',
-					'interfaceid',
-					'js-item-delay-field',
-					'js-item-delay-label',
-					'js-item-flex-intervals-field',
-					'js-item-flex-intervals-label',
-					'js-item-interface-field',
-					'js-item-interface-label',
-					'js-item-trends-field',
-					'js-item-trends-label',
-					['id' => 'key', 'defaultValue' => '']
-				],
-				ITEM_TYPE_HTTPAGENT => [
-					'allow_traps',
-					'delay',
-					'http_authtype',
-					'interfaceid',
-					'js-item-allow-traps-field',
-					'js-item-allow-traps-label',
-					'js-item-delay-field',
-					'js-item-delay-label',
-					'js-item-flex-intervals-field',
-					'js-item-flex-intervals-label',
-					'js-item-follow-redirects-field',
-					'js-item-follow-redirects-label',
-					'js-item-headers-field',
-					'js-item-headers-label',
-					'js-item-http-authtype-field',
-					'js-item-http-authtype-label',
-					'js-item-http-proxy-field',
-					'js-item-http-proxy-label',
-					'js-item-interface-field',
-					'js-item-interface-label',
-					'js-item-output-format-field',
-					'js-item-output-format-label',
-					'js-item-post-type-field',
-					'js-item-post-type-label',
-					'js-item-posts-field',
-					'js-item-posts-label',
-					'js-item-query-fields-field',
-					'js-item-query-fields-label',
-					'js-item-request-method-field',
-					'js-item-request-method-label',
-					'js-item-retrieve-mode-field',
-					'js-item-retrieve-mode-label',
-					'js-item-ssl-cert-file-field',
-					'js-item-ssl-cert-file-label',
-					'js-item-ssl-key-file-field',
-					'js-item-ssl-key-file-label',
-					'js-item-ssl-key-password-field',
-					'js-item-ssl-key-password-label',
-					'js-item-status-codes-field',
-					'js-item-status-codes-label',
-					'js-item-timeout-field',
-					'js-item-timeout-label',
-					'js-item-trends-field',
-					'js-item-trends-label',
-					'js-item-url-field',
-					'js-item-url-label',
-					'js-item-verify-host-field',
-					'js-item-verify-host-label',
-					'js-item-verify-peer-field',
-					'js-item-verify-peer-label',
-					'request_method',
-					'trapper_hosts',
-					['id' => 'key', 'defaultValue' => '']
-				],
-				ITEM_TYPE_INTERNAL => [
-					'delay',
-					'js-item-delay-field',
-					'js-item-delay-label',
-					'js-item-flex-intervals-field',
-					'js-item-flex-intervals-label',
-					'js-item-trends-field',
-					'js-item-trends-label',
-					['id' => 'key', 'defaultValue' => '']
-				],
-				ITEM_TYPE_IPMI => [
-					'delay',
-					'interfaceid',
-					'ipmi_sensor',
-					'js-item-delay-field',
-					'js-item-delay-label',
-					'js-item-flex-intervals-field',
-					'js-item-flex-intervals-label',
-					'js-item-impi-sensor-field',
-					'js-item-impi-sensor-label',
-					'js-item-interface-field',
-					'js-item-interface-label',
-					'js-item-trends-field',
-					'js-item-trends-label',
-					['id' => 'key', 'defaultValue' => '']
-				],
-				ITEM_TYPE_JMX => [
-					'delay',
-					'interfaceid',
-					'jmx_endpoint',
-					'js-item-delay-field',
-					'js-item-delay-label',
-					'js-item-flex-intervals-field',
-					'js-item-flex-intervals-label',
-					'js-item-interface-field',
-					'js-item-interface-label',
-					'js-item-jmx-endpoint-field',
-					'js-item-jmx-endpoint-label',
-					'js-item-password-field',
-					'js-item-password-label',
-					'js-item-trends-field',
-					'js-item-trends-label',
-					'js-item-username-field',
-					'js-item-username-label',
-					'password',
-					'username',
-					['id' => 'key', 'defaultValue' => '']
-				],
-				ITEM_TYPE_SCRIPT => [
-					'delay',
-					'js-item-delay-field',
-					'js-item-delay-label',
-					'js-item-flex-intervals-field',
-					'js-item-flex-intervals-label',
-					'js-item-parameters-field',
-					'js-item-parameters-label',
-					'js-item-script-field',
-					'js-item-script-label',
-					'js-item-timeout-field',
-					'js-item-timeout-label',
-					'js-item-trends-field',
-					'js-item-trends-label',
-					['id' => 'key', 'defaultValue' => '']
-				],
-				ITEM_TYPE_SIMPLE => [
-					'delay',
-					'interfaceid',
-					'js-item-delay-field',
-					'js-item-delay-label',
-					'js-item-flex-intervals-field',
-					'js-item-flex-intervals-label',
-					'js-item-interface-field',
-					'js-item-interface-label',
-					'js-item-password-field',
-					'js-item-password-label',
-					'js-item-trends-field',
-					'js-item-trends-label',
-					'js-item-username-field',
-					'js-item-username-label',
-					'password',
-					'status',
-					'username',
-					['id' => 'key', 'defaultValue' => '']
-				],
-				ITEM_TYPE_SNMP => [
-					'delay',
-					'interfaceid',
-					'js-item-delay-field',
-					'js-item-delay-label',
-					'js-item-flex-intervals-field',
-					'js-item-flex-intervals-label',
-					'js-item-interface-field',
-					'js-item-interface-label',
-					'js-item-snmp-oid-field',
-					'js-item-snmp-oid-label',
-					'snmp_oid',
-					['id' => 'key', 'defaultValue' => '']
-				],
-				ITEM_TYPE_SNMPTRAP => [
-					'interfaceid',
-					'js-item-interface-field',
-					'js-item-interface-label',
-					'js-item-trends-field',
-					'js-item-trends-label',
-					['id' => 'key', 'defaultValue' => '']
-				],
-				ITEM_TYPE_SSH => [
-					'authtype',
-					'delay',
-					'interfaceid',
-					'js-item-authtype-field',
-					'js-item-authtype-label',
-					'js-item-delay-field',
-					'js-item-delay-label',
-					'js-item-executed-script-field',
-					'js-item-executed-script-label',
-					'js-item-flex-intervals-field',
-					'js-item-flex-intervals-label',
-					'js-item-interface-field',
-					'js-item-interface-label',
-					'js-item-password-field',
-					'js-item-password-label',
-					'js-item-trends-field',
-					'js-item-trends-label',
-					'js-item-username-field',
-					'js-item-username-label',
-					'params_script',
-					'password',
-					'username',
-					['id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_SSH]
-				],
-				ITEM_TYPE_TELNET => [
-					'delay',
-					'interfaceid',
-					'js-item-delay-field',
-					'js-item-delay-label',
-					'js-item-executed-script-field',
-					'js-item-executed-script-label',
-					'js-item-flex-intervals-field',
-					'js-item-flex-intervals-label',
-					'js-item-interface-field',
-					'js-item-interface-label',
-					'js-item-password-field',
-					'js-item-password-label',
-					'js-item-trends-field',
-					'js-item-trends-label',
-					'js-item-username-field',
-					'js-item-username-label',
-					'params_script',
-					'password',
-					'username',
-					['id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_TELNET]
-				],
-				ITEM_TYPE_TRAPPER => [
-					'js-item-trapper-hosts-field',
-					'js-item-trapper-hosts-label',
-					'js-item-trends-field',
-					'js-item-trends-label',
-					'trapper_hosts',
-					['id' => 'key', 'defaultValue' => '']
-				],
-				ITEM_TYPE_ZABBIX => [
-					'delay',
-					'interfaceid',
-					'js-item-delay-field',
-					'js-item-delay-label',
-					'js-item-flex-intervals-field',
-					'js-item-flex-intervals-label',
-					'js-item-interface-field',
-					'js-item-interface-label',
-					'js-item-trends-field',
-					'js-item-trends-label',
-					['id' => 'key', 'defaultValue' => '']
-				],
-				ITEM_TYPE_ZABBIX_ACTIVE => [
-					'delay',
-					'js-item-delay-field',
-					'js-item-delay-label',
-					'js-item-flex-intervals-field',
-					'js-item-flex-intervals-label',
-					['id' => 'key', 'defaultValue' => '']
-				]
-			],
-			// Ids to toggle when the field 'authtype' is changed.
-			'for_authtype' => [
-				ITEM_AUTHTYPE_PUBLICKEY => [
-					'js-item-private-key-field',
-					'js-item-private-key-label',
-					'js-item-public-key-field',
-					'js-item-public-key-label',
-					'privatekey',
-					'publickey'
-				]
-			],
-			// Dropdown entries of parent with {id} to disable for specific type.
-			'disable_for_type' => [
-				ITEM_TYPE_CALCULATED => [
-					'value_type' => [
-						ITEM_VALUE_TYPE_STR,
-						ITEM_VALUE_TYPE_LOG,
-						ITEM_VALUE_TYPE_TEXT
-					],
-					'value_type_steps' => [
-						ITEM_VALUE_TYPE_STR,
-						ITEM_VALUE_TYPE_LOG,
-						ITEM_VALUE_TYPE_TEXT
-					]
-				]
-			],
-			'for_http_auth_type' => [
-				HTTPTEST_AUTH_BASIC => [
-					'js-item-http-username-label',
-					'js-item-http-username-field',
-					'js-item-http-password-label',
-					'js-item-http-password-field'
-				],
-				HTTPTEST_AUTH_NTLM => [
-					'js-item-http-username-label',
-					'js-item-http-username-field',
-					'js-item-http-password-label',
-					'js-item-http-password-field'
-				],
-				HTTPTEST_AUTH_KERBEROS => [
-					'js-item-http-username-label',
-					'js-item-http-username-field',
-					'js-item-http-password-label',
-					'js-item-http-password-field'
-				],
-				HTTPTEST_AUTH_DIGEST => [
-					'js-item-http-username-label',
-					'js-item-http-username-field',
-					'js-item-http-password-label',
-					'js-item-http-password-field'
-				]
-			],
-			'for_traps' => [
-				HTTPCHECK_ALLOW_TRAPS_ON => [
-					'js-item-trapper-hosts-label',
-					'js-item-trapper-hosts-field'
-				]
-			],
-			'for_value_type' => [
-				ITEM_VALUE_TYPE_FLOAT => [
-					'inventory_link',
-					'js-item-inventory-link-field',
-					'js-item-inventory-link-label',
-					'js-item-trends-field',
-					'js-item-trends-label',
-					'js-item-units-field',
-					'js-item-units-label',
-					'js-item-value-map-field',
-					'js-item-value-map-label',
-					'units',
-					'valuemap_name',
-					'valuemapid'
-				],
-				ITEM_VALUE_TYPE_LOG => [
-					'js-item-log-time-format-field',
-					'js-item-log-time-format-label',
-					'logtimefmt'
-				],
-				ITEM_VALUE_TYPE_STR => [
-					'inventory_link',
-					'js-item-inventory-link-field',
-					'js-item-inventory-link-label',
-					'js-item-value-map-field',
-					'js-item-value-map-label',
-					'valuemap_name',
-					'valuemapid'
-				],
-				ITEM_VALUE_TYPE_TEXT => [
-					'inventory_link',
-					'js-item-inventory-link-field',
-					'js-item-inventory-link-label'
-				],
-				ITEM_VALUE_TYPE_UINT64 => [
-					'inventory_link',
-					'js-item-inventory-link-field',
-					'js-item-inventory-link-label',
-					'js-item-trends-field',
-					'js-item-trends-label',
-					'js-item-units-field',
-					'js-item-units-label',
-					'js-item-value-map-field',
-					'js-item-value-map-label',
-					'units',
-					'valuemap_name',
-					'valuemapid'
-				]
 			]
 		];
 	}
