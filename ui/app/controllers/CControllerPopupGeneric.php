@@ -25,20 +25,6 @@ require_once dirname(__FILE__).'/../../include/items.inc.php';
 require_once dirname(__FILE__).'/../../include/users.inc.php';
 require_once dirname(__FILE__).'/../../include/js.inc.php';
 require_once dirname(__FILE__).'/../../include/discovery.inc.php';
-
-function get_window_opener($field, $value) {
-	if ($field === '') {
-		return '';
-	}
-
-	return '
-		try {'.
-			"document.getElementById(".zbx_jsvalue($field).").value=".zbx_jsvalue($value)."; ".
-		'} catch(e) {'.
-			'throw("Error: Target not found")'.
-		'}'."\n";
-}
-
 class CControllerPopupGeneric extends CController {
 
 	/**
@@ -1055,7 +1041,7 @@ class CControllerPopupGeneric extends CController {
 				break;
 
 			case 'help_items':
-				$records = (new CHelpItems())->getByType($this->page_options['itemtype']);
+				$records = CItemData::getByType($this->page_options['itemtype']);
 				break;
 
 			case 'triggers':
