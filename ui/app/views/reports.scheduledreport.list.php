@@ -23,8 +23,6 @@
  * @var CView $this
  */
 
-$this->addJsFile('multiselect.js');
-
 if ($data['uncheck']) {
 	uncheckTableRows('scheduledreport');
 }

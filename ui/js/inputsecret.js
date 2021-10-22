@@ -28,7 +28,7 @@
 		var $btn_change = $(this),
 			$input = $btn_change.siblings('input[type=password]'),
 			$btn_undo = $btn_change
-				.closest('.input-group')
+				.closest('.macro-input-group')
 				.find('.btn-undo');
 
 		$input

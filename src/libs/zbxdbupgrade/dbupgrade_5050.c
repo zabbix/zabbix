@@ -816,6 +816,64 @@ static int	DBpatch_5050072(void)
 	return DBmodify_field_type("media_type_message", &field, &old_field);
 }
 
+static int	DBpatch_5050073(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx like 'web.overview.%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5050074(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("delete from role_rule where name='ui.monitoring.overview'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5050075(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.hosts.sort' where idx='web.hosts.php.sort'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5050076(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.hosts.sortorder' where idx='web.hosts.php.sortorder'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5050077(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set value_str='host.list' where idx='web.pager.entity' "
+				"and value_str='hosts.php'"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(5050)
@@ -889,5 +947,10 @@ DBPATCH_ADD(5050069, 0, 1)
 DBPATCH_ADD(5050070, 0, 1)
 DBPATCH_ADD(5050071, 0, 1)
 DBPATCH_ADD(5050072, 0, 1)
+DBPATCH_ADD(5050073, 0, 1)
+DBPATCH_ADD(5050074, 0, 1)
+DBPATCH_ADD(5050075, 0, 1)
+DBPATCH_ADD(5050076, 0, 1)
+DBPATCH_ADD(5050077, 0, 1)
 
 DBPATCH_END()

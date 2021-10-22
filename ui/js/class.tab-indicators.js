@@ -33,8 +33,9 @@ const TAB_INDICATOR_UPDATE_EVENT = 'tab-indicator-update';
  */
 class TabIndicators {
 
-	constructor() {
+	constructor(tabs_id = 'tabs') {
 		try {
+			this.tabs_id = tabs_id;
 			this.form = this.getForm();
 			this.activateIndicators();
 		} catch (error) {
@@ -49,7 +50,7 @@ class TabIndicators {
 	 */
 	getForm() {
 		const TEMPLATE = document.querySelector('#templates-form');
-		const HOST = document.querySelector('#hosts-form');
+		const HOST = document.querySelector('#host-form');
 		const AUTHENTICATION = document.querySelector('#authentication-form');
 		const HOST_PROTOTYPE = document.querySelector('#host-prototype-form');
 		const ITEM = document.querySelector('#item-form');
@@ -113,7 +114,7 @@ class TabIndicators {
 	 * Activate tab indicators.
 	 */
 	activateIndicators() {
-		const tabs = this.form.querySelectorAll('#tabs a');
+		const tabs = this.form.querySelectorAll('#'+this.tabs_id+' a');
 
 		Object.values(tabs).map((element) => {
 			const indicator_item = this.getIndicatorItem(this.getIndicatorNameByElement(element));
@@ -377,11 +378,12 @@ class LinkedTemplateTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		const target_node = document.querySelector('#add_templates_ .multiselect-list');
 		const observer_options = {
 			childList: true,
 			subtree: true
 		};
+		const multiselect_node = document.querySelector('#add_templates_');
+		const linked_node = document.querySelector('#linked-template');
 
 		const observer_callback = (mutationList, _observer) => {
 			mutationList.forEach((mutation) => {
@@ -393,9 +395,14 @@ class LinkedTemplateTabIndicatorItem extends TabIndicatorItem {
 			});
 		};
 
-		if (target_node) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node, observer_options);
+		if (linked_node) {
+			const linked_observer = new MutationObserver(observer_callback);
+			linked_observer.observe(linked_node, observer_options);
+		}
+
+		if (multiselect_node) {
+			const multiselect_observer = new MutationObserver(observer_callback);
+			multiselect_observer.observe(multiselect_node.parentNode, observer_options);
 		}
 	}
 }

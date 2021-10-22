@@ -175,10 +175,6 @@ function get_icon($type, $params = []) {
 			}
 
 			return $icon;
-
-		case 'overviewhelp':
-			return (new CRedirectButton(SPACE, null))
-				->addClass(ZBX_STYLE_BTN_INFO);
 	}
 }
 
@@ -293,7 +289,9 @@ function getHostNavigation($current_element, $hostid, $lld_ruleid = 0) {
 		}
 
 		$host = new CSpan(new CLink(CHtml::encode($db_host['name']),
-			'hosts.php?form=update&hostid='.$db_host['hostid']
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'host.edit')
+				->setArgument('hostid', $db_host['hostid'])
 		));
 
 		if ($current_element === '') {
@@ -301,7 +299,9 @@ function getHostNavigation($current_element, $hostid, $lld_ruleid = 0) {
 		}
 
 		$list
-			->addItem(new CBreadcrumbs([new CSpan(new CLink(_('All hosts'), new CUrl('hosts.php'))), $host]))
+			->addItem(new CBreadcrumbs([new CSpan(new CLink(_('All hosts'),
+				(new CUrl('zabbix.php'))->setArgument('action', 'host.list'))), $host
+			]))
 			->addItem($status)
 			->addItem(getHostAvailabilityTable($db_host['interfaces']));
 

@@ -105,5 +105,6 @@ class testPageMaintenance extends CLegacyWebTest {
 		$this->assertEquals(0, CDBHelper::getCount($sql));
 		$sql = "select * from timeperiods where timeperiodid in (select timeperiodid from maintenances_windows where maintenanceid=$maintenanceid)";
 		$this->assertEquals(0, CDBHelper::getCount($sql));
+		$this->page->logout();
 	}
 }

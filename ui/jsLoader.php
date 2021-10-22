@@ -28,7 +28,7 @@ setupLocale(array_key_exists('lang', $_GET) ? (string) $_GET['lang'] : 'en_GB');
 require_once dirname(__FILE__).'/include/js.inc.php';
 
 // available scripts 'scriptFileName' => 'path relative to js/'
-$availableJScripts = [
+$available_js_cripts = [
 	'common.js' => '',
 	'class.dashboard.js' => '',
 	'class.dashboard.page.js' => '',
@@ -45,6 +45,8 @@ $availableJScripts = [
 	'class.widget.problemsbysv.js' => 'widgets/',
 	'class.widget.svggraph.js' => 'widgets/',
 	'class.widget.trigerover.js' => 'widgets/',
+	'hostinterfacemanager.js' => '',
+	'hostmacrosmanager.js' => '',
 	'menupopup.js' => '',
 	'gtlc.js' => '',
 	'functions.js' => '',
@@ -109,12 +111,11 @@ $availableJScripts = [
 	'report2.js' => 'pages/',
 	'report4.js' => 'pages/',
 	'setup.js' => 'pages/',
-	'monitoring.overview.js' => 'pages/',
 	'popup.condition.common.js' => 'pages/',
 	'popup.operation.common.js' => 'pages/'
 ];
 
-$tranStrings = [
+$translate_strings = [
 	'gtlc.js' => [
 		'S_MINUTE_SHORT' => _x('m', 'minute short')
 	],
@@ -282,6 +283,17 @@ $tranStrings = [
 		'S_COLLAPSE' => _('Collapse'),
 		'S_CLOSE' => _('Close')
 	],
+	'hostinterfacemanager.js' => [
+		'Agent' => _('Agent'),
+		'SNMP' => _('SNMP'),
+		'JMX' => _('JMX'),
+		'IPMI' => _('IPMI'),
+		'No interfaces are defined.' => _('No interfaces are defined.')
+	],
+	'hostmacrosmanager.js' => [
+		'Change' => _x('Change', 'verb'),
+		'Remove' => _('Remove')
+	],
 	'multilineinput.js' => [
 		'S_N_SYMBOLS_REMAINING' => _('%1$s symbols remaining'),
 		'S_CLICK_TO_VIEW_OR_EDIT' => _('Click to view or edit'),
@@ -376,7 +388,6 @@ $tranStrings = [
 
 $js = '';
 if (empty($_GET['files'])) {
-
 	$files = [
 		'jquery.js',
 		'jquery-ui.js',
@@ -401,6 +412,15 @@ if (empty($_GET['files'])) {
 		'chkbxrange.js',
 		'functions.js',
 		'menupopup.js',
+		'inputsecret.js',
+		'macrovalue.js',
+		'multiselect.js',
+		'class.cverticalaccordion.js',
+		'class.cviewswitcher.js',
+		'class.tab-indicators.js',
+		'hostinterfacemanager.js',
+		'hostmacrosmanager.js',
+		'textareaflexible.js',
 		'init.js'
 	];
 
@@ -414,7 +434,7 @@ if (empty($_GET['files'])) {
 	}
 
 	// load frontend messaging only for some pages
-	if (isset($_GET['showGuiMessaging']) && $_GET['showGuiMessaging']) {
+	if (array_key_exists('showGuiMessaging', $_GET) && $_GET['showGuiMessaging']) {
 		$files[] = 'class.browsertab.js';
 		$files[] = 'class.notification.collection.js';
 		$files[] = 'class.notifications.audio.js';
@@ -429,20 +449,20 @@ else {
 }
 
 $js .= 'if (typeof(locale) === "undefined") { var locale = {}; }'."\n";
+
 foreach ($files as $file) {
-	if (isset($tranStrings[$file])) {
-		foreach ($tranStrings[$file] as $origStr => $str) {
-			$js .= 'locale[\'' . $origStr . '\'] = ' . zbx_jsvalue($str) . ';';
+	if (array_key_exists($file, $translate_strings)) {
+		foreach ($translate_strings[$file] as $origStr => $str) {
+			$js .= 'locale[\''.$origStr.'\'] = '.json_encode($str).';';
 		}
 	}
 }
 
 foreach ($files as $file) {
-	if (isset($availableJScripts[$file])) {
-		$js .= file_get_contents('js/'.$availableJScripts[$file].$file)."\n";
+	if (array_key_exists($file, $available_js_cripts)) {
+		$js .= file_get_contents('js/'.$available_js_cripts[$file].$file)."\n";
 	}
 }
-
 
 $etag = md5($js);
 /**
