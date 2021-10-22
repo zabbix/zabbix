@@ -23,15 +23,16 @@ class CControllerDashboardWidgetConfigure extends CController {
 
 	private $context;
 
+	protected function init() {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
 	protected function checkInput() {
 		$fields = [
-			'templateid' => 'db dashboard.templateid',
-			'type' => 'required|string',
-			'fields' => 'json',
-			'view_mode' => 'required|in '.implode(',', [
-				ZBX_WIDGET_VIEW_MODE_NORMAL,
-				ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER
-			])
+			'templateid' =>	'db dashboard.templateid',
+			'type' =>		'required|string',
+			'fields' =>		'json',
+			'view_mode' =>	'required|in '.implode(',', [ZBX_WIDGET_VIEW_MODE_NORMAL, ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER])
 		];
 
 		$ret = $this->validateInput($fields);

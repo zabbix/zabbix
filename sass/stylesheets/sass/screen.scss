@@ -31,6 +31,7 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 @import "components/dashboard";
 @import "components/diff";
 @import "components/form-search";
+@import "components/inline-filter";
 @import "components/menu-main";
 @import "components/menu-user";
 @import "components/message-box";
@@ -3030,6 +3031,12 @@ $form-icon-btn: (
 					padding-left: 5px;
 				}
 			}
+
+			.inline-filter {
+				li {
+					padding-left: 0;
+				}
+			}
 		}
 
 		> .overlay-close-btn {
@@ -3092,6 +3099,19 @@ $form-icon-btn: (
 		top: 0;
 		z-index: 4;
 		margin: 0 0 10px;
+	}
+
+	.form-grid {
+		// 100px label column width for use in popup forms.
+		grid-template-columns: minmax(100px, max-content) auto;
+
+		&.form-grid-1-1 {
+			grid-template-columns: repeat(2, minmax(100px, max-content) auto);
+		}
+
+		&.form-grid-3-1 {
+			grid-template-columns: minmax(100px, max-content) 3fr max-content auto;
+		}
 	}
 
 	.list-table {
@@ -3517,7 +3537,6 @@ $form-icon-btn: (
 			}
 		}
 	}
-
 }
 
 .notif-body {
@@ -3559,19 +3578,6 @@ $form-icon-btn: (
 		float: left;
 		margin-top: 20px;
 		background: url($sprite-path) no-repeat -11px -587px;
-	}
-
-}
-
-.notif-indic-container {
-	border-top: 1px solid $table-border-color;
-	margin: 0 0 0 -19px;
-	padding: 14px 0 0;
-
-	.notif-indic {
-		float: none;
-		display: inline-block;
-		margin: 0 2px 0 0;
 	}
 }
 
@@ -5303,7 +5309,6 @@ button {
 	&.icon-action-severity-changed,
 	&.icon-action-message,
 	&.icon-action-ack,
-	&.icon-invisible,
 	&.icon-problem-generated,
 	&.icon-problem-recovery,
 	&.icon-actions-number-gray,
@@ -5719,10 +5724,9 @@ $range-input-width: 31px;
 
 // Input group
 
-.input-group {
+.macro-input-group {
 	position: relative;
 	display: flex;
-	flex-wrap: wrap;
 	align-items: stretch;
 	width: 100%;
 
@@ -6095,6 +6099,7 @@ $range-input-width: 31px;
 
 		&[data-type] .interface-cell-details {
 			display: none;
+			grid-column: 1/-1;
 		}
 
 		.interface-cell {
@@ -6357,6 +6362,20 @@ z-select,
 			content: '\2013';
 			float: left;
 			margin-left: -1em;
+		}
+	}
+}
+
+.overlay-dialogue #host-form {
+	#tagsFormList,
+	#macrosFormList,
+	#valuemap-formlist {
+		.table-forms-td-left {
+			display: none;
+		}
+
+		.table-forms-td-right {
+			width: 100%;
 		}
 	}
 }

@@ -77,7 +77,8 @@ class CAuditLog extends CApiService {
 		$fields = array_keys($this->getTableSchema($this->tableName())['fields']);
 		$actions = [
 			CAudit::ACTION_ADD, CAudit::ACTION_UPDATE, CAudit::ACTION_DELETE, CAudit::ACTION_LOGOUT,
-			CAudit::ACTION_EXECUTE, CAudit::ACTION_LOGIN_SUCCESS, CAudit::ACTION_LOGIN_FAILED
+			CAudit::ACTION_EXECUTE, CAudit::ACTION_LOGIN_SUCCESS, CAudit::ACTION_LOGIN_FAILED,
+			CAudit::ACTION_HISTORY_CLEAR
 		];
 		$resourcetype = [
 			CAudit::RESOURCE_ACTION, CAudit::RESOURCE_AUTHENTICATION, CAudit::RESOURCE_AUTH_TOKEN,

@@ -126,51 +126,72 @@ class testUrlParameters extends CLegacyWebTest {
 				]
 			],
 			[
-				'title' => 'Configuration of hosts',
+				'title' => 'Configuration of host',
 				'check_server_name' => true,
-				'server_name_on_page' => true,
+				'server_name_on_page' => false,
 				'test_cases' => [
 					[
-						'url' => 'hosts.php?form=update&hostid=10084',
-						'text_present' => 'Hosts'
+						'url' => 'zabbix.php?action=host.edit&hostid=10084',
+						'text_present' => 'Host'
 					],
 					[
-						'url' => 'hosts.php?form=update&hostid=9999999',
-						'text_not_present' => 'Hosts',
+						'url' => 'zabbix.php?action=host.edit&hostid=9999999',
+						'text_not_present' => 'Host',
+						'access_denied' => true,
 						'text_present' => [
-							'No permissions to referred object or it does not exist!'
+							'You are logged in as "Admin". You have no permissions to access this page.'
+						]
+					]
+				]
+			],
+			[
+				'title' => 'Fatal error, please report to the Zabbix team',
+				'check_server_name' => true,
+				'server_name_on_page' => false,
+				'test_cases' => [
+
+					[
+						'url' => 'zabbix.php?action=host.edit&hostid=abc',
+						'text_not_present' => 'Host',
+						'fatal_error' => true,
+						'text_present' => [
+							'Incorrect value "abc" for "hostid" field.',
+							'Controller: host.edit',
+							'action: host.edit',
+							'hostid: abc'
 						]
 					],
 					[
-						'url' => 'hosts.php?form=update&hostid=abc',
-						'text_not_present' => 'Hosts',
+						'url' => 'zabbix.php?action=host.edit&hostid= ',
+						'text_not_present' => 'Host',
+						'fatal_error' => true,
 						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "hostid" is not integer.'
+							'Incorrect value "" for "hostid" field.',
+							'Controller: host.edit',
+							'action: host.edit',
+							'hostid:'
 						]
 					],
 					[
-						'url' => 'hosts.php?form=update&hostid=',
-						'text_not_present' => 'Hosts',
+						'url' => 'zabbix.php?action=host.edit&hostid=-1',
+						'text_not_present' => 'Host',
+						'fatal_error' => true,
 						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "hostid" is not integer.'
+							'Incorrect value "-1" for "hostid" field.',
+							'Controller: host.edit',
+							'action: host.edit',
+							'hostid: -1'
 						]
 					],
 					[
-						'url' => 'hosts.php?form=update&hostid=-1',
-						'text_not_present' => 'Hosts',
+						'url' => 'zabbix.php?action=host.edit&hostid=',
+						'text_not_present' => 'Host',
+						'fatal_error' => true,
 						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Incorrect value "-1" for "hostid" field.'
-						]
-					],
-					[
-						'url' => 'hosts.php?form=update',
-						'text_not_present' => 'Hosts',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "hostid" is mandatory.'
+							'Incorrect value "" for "hostid" field.',
+							'Controller: host.edit',
+							'action: host.edit',
+							'hostid:'
 						]
 					]
 				]
@@ -378,41 +399,6 @@ class testUrlParameters extends CLegacyWebTest {
 					[
 						'url' => 'zabbix.php?action=discovery.edit',
 						'text_present' => 'Discovery rules'
-					]
-				]
-			],
-			[
-				'title' => 'Overview [refreshed every 30 sec.]',
-				'check_server_name' => true,
-				'server_name_on_page' => true,
-				'test_cases' => [
-					[
-						'url' => 'overview.php?groupid=4&type=0',
-						'text_present' => 'Overview'
-					],
-					[
-						'url' => 'overview.php?groupid=abc&type=abc',
-						'text_not_present' => 'Overview',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "type" is not integer.'
-						]
-					],
-					[
-						'url' => 'overview.php?groupid=&type=',
-						'text_not_present' => 'Overview',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "type" is not integer.'
-						]
-					],
-					[
-						'url' => 'overview.php?groupid=-1&type=-1',
-						'text_not_present' => 'Overview',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Incorrect value "-1" for "type" field.'
-						]
 					]
 				]
 			],

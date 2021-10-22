@@ -46,6 +46,22 @@ class CFormElement extends CElement {
 	protected $filter = null;
 
 	/**
+	 * @inheritdoc
+	 */
+	public static function createInstance(RemoteWebElement $element, $options = []) {
+		$instance = parent::createInstance($element, $options);
+
+		if (get_class($instance) !== CGridFormElement::class) {
+			$grid = $instance->query('xpath:.//div[contains(@class, "form-grid")]')->one(false);
+			if ($grid->isValid() && !$grid->parents('xpath:*[contains(@class, "table-forms-td-right")]')->exists()) {
+				return $instance->asGridForm($options);
+			}
+		}
+
+		return $instance;
+	}
+
+	/**
 	 * Get filter.
 	 *
 	 * @return CElementFilter
@@ -333,7 +349,7 @@ class CFormElement extends CElement {
 	 * @return $this
 	 */
 	protected function setFieldValue($field, $values) {
-		$classes = [CMultifieldTableElement::class, CMultiselectElement::class, CCheckboxListElement::class];
+		$classes = [CMultifieldTableElement::class, CMultiselectElement::class, CCheckboxListElement::class, CHostInterfaceElement::class];
 		$element = $this->getField($field);
 
 		if (is_array($values) && !in_array(get_class($element), $classes)) {
@@ -417,7 +433,7 @@ class CFormElement extends CElement {
 	 * @throws Exception
 	 */
 	protected function checkFieldValue($field, $values, $raise_exception = true) {
-		$classes = [CMultifieldTableElement::class, CMultiselectElement::class, CCheckboxListElement::class];
+		$classes = [CMultifieldTableElement::class, CMultiselectElement::class, CCheckboxListElement::class, CHostInterfaceElement::class];
 		$element = $this->getField($field);
 
 		if (is_array($values) && !in_array(get_class($element), $classes)) {
@@ -450,6 +466,12 @@ class CFormElement extends CElement {
 			return false;
 		}
 
-		return $element->checkValue($values, $raise_exception);
+		try {
+			return $element->checkValue($values, $raise_exception);
+		}
+		catch (\Exception $exception) {
+			CExceptionHelper::setMessage($exception, 'Failed to check value of field "'.$field.'":' . "\n" . $exception->getMessage());
+			throw $exception;
+		}
 	}
 }

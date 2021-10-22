@@ -31,6 +31,7 @@ class testPageReportsAudit extends CLegacyWebTest {
 		2 /* CAudit::ACTION_DELETE */ => 'Delete',
 		7 /* CAudit::ACTION_EXECUTE */ => 'Execute',
 		9 /* CAudit::ACTION_LOGIN_FAILED */ => 'Failed login',
+		10 /* CAudit::ACTION_HISTORY_CLEAR */ => 'History clear',
 		8 /* CAudit::ACTION_LOGIN_SUCCESS */ => 'Login',
 		4 /* CAudit::ACTION_LOGOUT */ => 'Logout',
 		1 /* CAudit::ACTION_UPDATE */ => 'Update'
@@ -88,7 +89,7 @@ class testPageReportsAudit extends CLegacyWebTest {
 
 	public static function auditActions() {
 		return [
-			['action' => 3 /* CAudit::ACTION_LOGIN */, 'resourcetype' => 0 /* CAudit::RESOURCE_USER */],
+			['action' => 8 /* CAudit::ACTION_LOGIN */, 'resourcetype' => 0 /* CAudit::RESOURCE_USER */],
 			['action' => 4 /* CAudit::ACTION_LOGOUT */, 'resourcetype' => 0 /* CAudit::RESOURCE_USER */],
 			['action' => 0 /* CAudit::ACTION_ADD */, 'resourcetype' => 0 /* CAudit::RESOURCE_USER */],
 			['action' => 1 /* CAudit::ACTION_UPDATE */, 'resourcetype' => 0 /* CAudit::RESOURCE_USER */],
@@ -187,29 +188,33 @@ class testPageReportsAudit extends CLegacyWebTest {
 
 				case 'Discovery rule':
 				case 'Host':
-					$this->assertEquals(['Execute', 'Failed login', 'Login', 'Logout'], $disabled);
+					$this->assertEquals(['Execute', 'Failed login','History clear', 'Login', 'Logout'], $disabled);
 					break;
 
+				case 'Image':
 				case 'Event correlation':
-					$this->assertEquals(['All', 'Delete'], $enabled);
+					$this->assertEquals(['All', 'Add', 'Delete', 'Update'], $enabled);
 					break;
 
 				case 'Housekeeping':
-				case 'Image':
 				case 'Settings':
 					$this->assertEquals(['All', 'Update'], $enabled);
 					break;
 
 				case 'Script':
-					$this->assertEquals(['Failed login', 'Login', 'Logout'], $disabled);
+					$this->assertEquals(['Failed login', 'History clear', 'Login', 'Logout'], $disabled);
 					break;
 
 				case 'User':
-					$this->assertEquals(['Execute'], $disabled);
+					$this->assertEquals(['Execute', 'History clear'], $disabled);
+					break;
+
+				case 'Item':
+					$this->assertEquals(['Execute', 'Failed login', 'Login', 'Logout'], $disabled);
 					break;
 
 				default:
-					$this->assertEquals(['Execute', 'Failed login', 'Login', 'Logout'], $disabled);
+					$this->assertEquals(['Execute', 'Failed login', 'History clear', 'Login', 'Logout'], $disabled);
 			}
 		}
 	}
@@ -237,8 +242,11 @@ class testPageReportsAudit extends CLegacyWebTest {
 		$this->assertEquals('Macros updated', $message->getTitle());
 
 		// Check Audit record about global macro update.
-		$this->page->open('zabbix.php?action=auditlog.list');
-		$this->query('button:Reset')->waitUntilVisible()->one()->click();
+		// TODO after ZBX-19918 fix: remove line with long auditlog link and uncomment 2 lines below.
+//		$this->page->open('zabbix.php?action=auditlog.list');
+//		$this->query('button:Reset')->waitUntilVisible()->one()->click();
+		$this->page->open('zabbix.php?action=auditlog.list&from=now-1h&to=now&filter_resourcetype='.
+				'-1&filter_resourceid=11&filter_action=-1&filter_recordsetid=&filter_set=1');
 		$rows = $this->query('class:list-table')->asTable()->one()->getRows();
 		// Get first row data.
 		$row = $rows->get(0);

@@ -130,7 +130,9 @@ class testFormMacrosHost extends testFormMacros {
 	 * @onBeforeOnce prepareHostRemoveMacrosData
 	 */
 	public function testFormMacrosHost_RemoveInheritedMacro($data) {
-		$this->checkRemoveInheritedMacros($data, self::$hostid_remove_inherited, 'host');
+		$this->checkRemoveInheritedMacros($data, 'host', self::$hostid_remove_inherited, false, null,
+				'Host for Inherited macros removing'
+		);
 	}
 
 	public function getSecretMacrosLayoutData() {
@@ -175,7 +177,7 @@ class testFormMacrosHost extends testFormMacros {
 	 * @dataProvider getSecretMacrosLayoutData
 	 */
 	public function testFormMacrosHost_CheckSecretMacrosLayout($data) {
-		$this->checkSecretMacrosLayout($data, 'hosts.php?form=update&hostid=99011', 'hosts');
+		$this->checkSecretMacrosLayout($data, 'zabbix.php?action=host.view', 'hosts', 'Host for suppression');
 	}
 
 	public function getCreateSecretMacrosData() {
@@ -227,7 +229,7 @@ class testFormMacrosHost extends testFormMacros {
 	 * @dataProvider getCreateSecretMacrosData
 	 */
 	public function testFormMacrosHost_CreateSecretMacros($data) {
-		$this->createSecretMacros($data, 'hosts.php?form=update&hostid=99134', 'hosts');
+		$this->createSecretMacros($data, 'zabbix.php?action=host.view', 'hosts', 'Available host');
 	}
 
 	public function getRevertSecretMacrosData() {
@@ -256,7 +258,7 @@ class testFormMacrosHost extends testFormMacros {
 	 * @dataProvider getRevertSecretMacrosData
 	 */
 	public function testFormMacrosHost_RevertSecretMacroChanges($data) {
-		$this->revertSecretMacroChanges($data, 'hosts.php?form=update&hostid=99135', 'hosts');
+		$this->revertSecretMacroChanges($data, 'zabbix.php?action=host.view', 'hosts', 'Available host in maintenance');
 	}
 
 	public function getUpdateSecretMacrosData() {
@@ -300,15 +302,36 @@ class testFormMacrosHost extends testFormMacros {
 	 * @dataProvider getUpdateSecretMacrosData
 	 */
 	public function testFormMacrosHost_UpdateSecretMacros($data) {
-		$this->updateSecretMacros($data, 'hosts.php?form=update&hostid=99135', 'hosts');
+		$this->updateSecretMacros($data, 'zabbix.php?action=host.view', 'hosts', 'Available host in maintenance');
 	}
 
+	/**
+	 * Check how secret macro is resolved in item name for host, host prototype and template entities.
+	 */
 	public function testFormMacrosHost_ResolveSecretMacro() {
+		$hostid = 99135;
+		$hostname = 'Available host in maintenance';
+
 		$macro = [
 			'macro' => '{$X_SECRET_HOST_MACRO_2_RESOLVE}',
 			'value' => 'Value 2 B resolved'
 		];
-		$this->resolveSecretMacro($macro, 'hosts.php?form=update&hostid=99135', 'hosts', 'host');
+
+		// Open Hosts items page and check macro resolved text.
+		$this->page->login()->open('items.php?filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host')->waitUntilReady();
+		$this->assertTrue($this->query('link', 'Macro value: '.$macro['value'])->exists());
+
+		// Open host form in popup and change macro type.
+		$form = $this->openMacrosTab('zabbix.php?action=host.view', 'hosts', false, $hostname);
+		$this->getValueField($macro['macro'])->changeInputType(CInputGroupElement::TYPE_SECRET);
+
+		$form->submit();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Host updated');
+
+		// Open items page and check secret macro appearance.
+		$this->page->open('items.php?filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host')->waitUntilReady();
+		$this->assertTrue($this->query('link', 'Macro value: ******')->exists());
 	}
 
 	public function getCreateVaultMacrosData() {
@@ -451,9 +474,10 @@ class testFormMacrosHost extends testFormMacros {
 
 	/**
 	 * @dataProvider getCreateVaultMacrosData
+	 *
 	 */
 	public function testFormMacrosHost_CreateVaultMacros($data) {
-		$this->createVaultMacros($data, 'hosts.php?form=update&hostid=99134', 'hosts');
+		$this->createVaultMacros($data, 'zabbix.php?action=host.view', 'hosts', 'Available host');
 	}
 
 	public function getUpdateVaultMacrosData() {
@@ -498,6 +522,6 @@ class testFormMacrosHost extends testFormMacros {
 	 * @dataProvider getUpdateVaultMacrosData
 	 */
 	public function testFormMacrosHost_UpdateVaultMacros($data) {
-		$this->updateVaultMacros($data, 'hosts.php?form=update&hostid=99011', 'hosts');
+		$this->updateVaultMacros($data, 'zabbix.php?action=host.view', 'hosts', 'Host for suppression');
 	}
 }

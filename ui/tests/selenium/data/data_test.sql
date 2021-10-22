@@ -1952,7 +1952,7 @@ INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (145, 'TagT
 INSERT INTO triggers (triggerid, description, expression, value, priority, state, lastchange, comments) VALUES (100064, 'Fifth trigger for tag filtering (no tags)', '{100064}>0', 0, 5, 0, '0', '');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100064, 99090, 100064, 'last', '$');
 
--- testPageMonitoringOverview
+-- testDashboardHostAvailabilityWidget
 INSERT INTO hstgrp (groupid, name, internal) VALUES (50011, 'Group to check Overview', 0);
 INSERT INTO hstgrp (groupid, name, internal) VALUES (50012, 'Another group to check Overview', 0);
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50011, '1_Host_to_check_Monitoring_Overview', '1_Host_to_check_Monitoring_Overview', 0, '');

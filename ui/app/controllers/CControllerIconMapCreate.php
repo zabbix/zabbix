@@ -23,7 +23,7 @@ class CControllerIconMapCreate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'iconmap'   => 'required | array'
+			'iconmap'   => 'required|array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -40,17 +40,17 @@ class CControllerIconMapCreate extends CController {
 	}
 
 	protected function doAction() {
-		$result = (bool) API::IconMap()->create((array) $this->getInput('iconmap'));
+		$result = (bool) API::IconMap()->create($this->getInput('iconmap'));
 
 		if ($result) {
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'iconmap.list')
+			$response = new CControllerResponseRedirect(
+				(new CUrl('zabbix.php'))->setArgument('action', 'iconmap.list')
 			);
 			CMessageHelper::setSuccessTitle(_('Icon map created'));
 		}
 		else {
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'iconmap.edit')
+			$response = new CControllerResponseRedirect(
+				(new CUrl('zabbix.php'))->setArgument('action', 'iconmap.edit')
 			);
 			$response->setFormData($this->getInputAll());
 			CMessageHelper::setErrorTitle(_('Cannot create icon map'));

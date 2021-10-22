@@ -198,7 +198,8 @@ $divTabs->addTab('tmplTab', _('Linked templates'), $tmplList, TAB_INDICATOR_LINK
 $divTabs->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab', [
 		'source' => 'template',
 		'tags' => $data['tags'],
-		'readonly' => $data['readonly']
+		'readonly' => $data['readonly'],
+		'tabs_id' => 'tabs'
 	]), TAB_INDICATOR_TAGS
 );
 

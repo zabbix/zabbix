@@ -27,7 +27,7 @@ class CControllerImageList extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'imagetype' => 'db images.imagetype | in '.IMAGE_TYPE_ICON.','.IMAGE_TYPE_BACKGROUND
+			'imagetype' => 'db images.imagetype|in '.IMAGE_TYPE_ICON.','.IMAGE_TYPE_BACKGROUND
 		];
 
 		$ret = $this->validateInput($fields);
