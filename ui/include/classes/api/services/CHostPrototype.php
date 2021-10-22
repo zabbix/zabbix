@@ -1968,7 +1968,7 @@ class CHostPrototype extends CHostBase {
 								['else' => true, 'type' => API_OBJECT, 'fields' => []]
 				]]
 			]],
-			['else' => true, 'type' => API_OBJECTS, 'fields' => []]
+			['else' => true, 'type' => API_OBJECT, 'fields' => []]
 		]];
 	}
 
