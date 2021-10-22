@@ -27,7 +27,6 @@ if ($data['error']) {
 	show_error_message($data['error']);
 }
 
-$this->addJsFile('multiselect.js');
 $this->addJsFile('layout.mode.js');
 $this->addJsFile('class.calendar.js');
 $this->addJsFile('gtlc.js');

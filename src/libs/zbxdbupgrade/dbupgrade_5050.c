@@ -840,33 +840,69 @@ static int	DBpatch_5050074(void)
 
 static int	DBpatch_5050075(void)
 {
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.hosts.sort' where idx='web.hosts.php.sort'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5050076(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.hosts.sortorder' where idx='web.hosts.php.sortorder'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5050077(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set value_str='host.list' where idx='web.pager.entity' "
+				"and value_str='hosts.php'"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5050078(void)
+{
 	const ZBX_FIELD	field = {"geomaps_tile_provider", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_5050076(void)
+static int	DBpatch_5050079(void)
 {
 	const ZBX_FIELD	field = {"geomaps_tile_url", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_5050077(void)
+static int	DBpatch_5050080(void)
 {
 	const ZBX_FIELD	field = {"geomaps_max_zoom", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_5050078(void)
+static int	DBpatch_5050081(void)
 {
 	const ZBX_FIELD	field = {"geomaps_attribution", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_5050079(void)
+static int	DBpatch_5050082(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -957,5 +993,8 @@ DBPATCH_ADD(5050076, 0, 1)
 DBPATCH_ADD(5050077, 0, 1)
 DBPATCH_ADD(5050078, 0, 1)
 DBPATCH_ADD(5050079, 0, 1)
+DBPATCH_ADD(5050080, 0, 1)
+DBPATCH_ADD(5050081, 0, 1)
+DBPATCH_ADD(5050082, 0, 1)
 
 DBPATCH_END()

@@ -24,7 +24,7 @@ class CMacroValue extends CInput {
 	/**
 	 * Container class.
 	 */
-	public const ZBX_STYLE_INPUT_GROUP = 'input-group';
+	public const ZBX_STYLE_MACRO_INPUT_GROUP = 'macro-input-group';
 	public const ZBX_STYLE_MACRO_VALUE_TEXT = 'macro-value-text';
 	public const ZBX_STYLE_MACRO_VALUE_SECRET = 'macro-value-secret';
 	public const ZBX_STYLE_MACRO_VALUE_VAULT = 'macro-value-vault';
@@ -124,7 +124,7 @@ class CMacroValue extends CInput {
 		$elements = [];
 
 		if ($value_type == ZBX_MACRO_TYPE_TEXT) {
-			$wrapper_class = self::ZBX_STYLE_INPUT_GROUP.' '.self::ZBX_STYLE_MACRO_VALUE_TEXT;
+			$wrapper_class = self::ZBX_STYLE_MACRO_INPUT_GROUP.' '.self::ZBX_STYLE_MACRO_VALUE_TEXT;
 			$dropdown_btn_class = ZBX_STYLE_ICON_TEXT;
 			$elements[] = (new CTextAreaFlexible($name.'[value]', $value, ['add_post_js' => $this->add_post_js]))
 				->setMaxlength($this->maxlength)
@@ -132,7 +132,7 @@ class CMacroValue extends CInput {
 				->setReadonly($readonly);
 		}
 		elseif ($value_type == ZBX_MACRO_TYPE_VAULT) {
-			$wrapper_class = self::ZBX_STYLE_INPUT_GROUP.' '.self::ZBX_STYLE_MACRO_VALUE_VAULT;
+			$wrapper_class = self::ZBX_STYLE_MACRO_INPUT_GROUP.' '.self::ZBX_STYLE_MACRO_VALUE_VAULT;
 			$dropdown_btn_class = ZBX_STYLE_ICON_SECRET_TEXT;
 			$elements[] = (new CTextAreaFlexible($name.'[value]', $value, ['add_post_js' => $this->add_post_js]))
 				->setMaxlength($this->maxlength)
@@ -140,7 +140,7 @@ class CMacroValue extends CInput {
 				->setReadonly($readonly);
 		}
 		else {
-			$wrapper_class = self::ZBX_STYLE_INPUT_GROUP.' '.self::ZBX_STYLE_MACRO_VALUE_SECRET;
+			$wrapper_class = self::ZBX_STYLE_MACRO_INPUT_GROUP.' '.self::ZBX_STYLE_MACRO_VALUE_SECRET;
 			$dropdown_btn_class = ZBX_STYLE_ICON_INVISIBLE;
 			$elements[] = (new CInputSecret($name.'[value]', $value, $this->add_post_js))
 				->setAttribute('maxlength', $this->maxlength)
