@@ -24,7 +24,6 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * Test suite for items state change verification.
  *
  * @required-components server
- * @configurationDataProvider serverConfigurationProvider
  * @hosts test_host
  * @backup history
  */
@@ -315,20 +314,6 @@ class testItemRate extends CIntegrationTest {
 			$scenario['api_request']['time_till'] = self::$items[$scenario['item']['item_num']]['time_till'];
 		}
 		return true;
-	}
-
-	/**
-	 * Component configuration provider for agent related tests.
-	 *
-	 * @return array
-	 */
-	public function serverConfigurationProvider() {
-		return [
-			self::COMPONENT_SERVER => [
-				'DebugLevel' => 5,
-				'LogFileSize' => 20
-			]
-		];
 	}
 
 	/**
