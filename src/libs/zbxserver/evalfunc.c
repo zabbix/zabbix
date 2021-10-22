@@ -465,27 +465,27 @@ static void	count_one_dbl(int *count, int op, double value, double pattern)
 	switch (op)
 	{
 		case OP_EQ:
-			if (value > pattern - ZBX_DOUBLE_EPSILON && value < pattern + ZBX_DOUBLE_EPSILON)
+			if (SUCCEED == zbx_double_compare(value, pattern))
 				(*count)++;
 			break;
 		case OP_NE:
-			if (!(value > pattern - ZBX_DOUBLE_EPSILON && value < pattern + ZBX_DOUBLE_EPSILON))
+			if (FAIL == zbx_double_compare(value, pattern))
 				(*count)++;
 			break;
 		case OP_GT:
-			if (value >= pattern + ZBX_DOUBLE_EPSILON)
+			if (value - pattern > ZBX_DOUBLE_EPSILON)
 				(*count)++;
 			break;
 		case OP_GE:
-			if (value > pattern - ZBX_DOUBLE_EPSILON)
+			if (value - pattern >= -ZBX_DOUBLE_EPSILON)
 				(*count)++;
 			break;
 		case OP_LT:
-			if (value <= pattern - ZBX_DOUBLE_EPSILON)
+			if (pattern - value > ZBX_DOUBLE_EPSILON)
 				(*count)++;
 			break;
 		case OP_LE:
-			if (value < pattern + ZBX_DOUBLE_EPSILON)
+			if (pattern - value >= -ZBX_DOUBLE_EPSILON)
 				(*count)++;
 	}
 }
