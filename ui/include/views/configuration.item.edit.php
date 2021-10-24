@@ -450,7 +450,7 @@ $item_tab
 				DB::getFieldLength('items', 'http_proxy')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]')
-			->disableAutocomplete(),
+			->disableAutocomplete()
 		))->setId('js-item-http-proxy-field')
 	])
 	// Append ITEM_TYPE_HTTPAGENT HTTP authentication to form list.
