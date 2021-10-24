@@ -951,7 +951,7 @@ else {
 	$item_tab->addItem([
 		(new CLabel(_('Populates host inventory field'), $host_inventory_select->getFocusableElementId()))
 			->setId('js-item-inventory-link-label'),
-		(new CFormField($host_inventory_select))->setId('js-item-inventory-link-field'),
+		(new CFormField($host_inventory_select))->setId('js-item-inventory-link-field')
 	]);
 }
 
