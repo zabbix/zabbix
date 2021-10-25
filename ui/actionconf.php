@@ -145,6 +145,9 @@ if (hasRequest('add') || hasRequest('update')) {
 						$operation['evaltype']
 					);
 				}
+				elseif ($eventsource == EVENT_SOURCE_INTERNAL || $eventsource == EVENT_SOURCE_SERVICE) {
+					unset($operation['evaltype']);
+				}
 			}
 			elseif ($operation_group === 'recovery_operations') {
 				unset($operation['opmessage']['mediatypeid']);
