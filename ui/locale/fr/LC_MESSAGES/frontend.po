@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-22 19:56+0300\n"
+"POT-Creation-Date: 2021-10-25 12:27+0300\n"
 "PO-Revision-Date: 2018-01-15 09:21+0300\n"
 "Last-Translator: Christophe <ctr@pmspos.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -151,7 +151,7 @@ msgid_plural "%1$s hosts in maintenance"
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/func.inc.php:2625
+#: include/func.inc.php:2482
 #, c-format
 msgid "%1$s hour"
 msgid_plural "%1$s hours"
@@ -178,7 +178,7 @@ msgstr[1] "%1$s messages"
 #: include/classes/widgets/CWidgetConfig.php:285
 #: include/classes/widgets/CWidgetConfig.php:286
 #: include/classes/widgets/CWidgetConfig.php:287
-#: include/classes/widgets/CWidgetConfig.php:288 include/func.inc.php:2631
+#: include/classes/widgets/CWidgetConfig.php:288 include/func.inc.php:2488
 #: jsLoader.php:150 jsLoader.php:151 jsLoader.php:152 jsLoader.php:153
 #, c-format
 msgid "%1$s minute"
@@ -225,7 +225,7 @@ msgstr[1] "%1$s essais restants"
 
 #: app/views/administration.user.edit.php:671
 #: include/classes/widgets/CWidgetConfig.php:283
-#: include/classes/widgets/CWidgetConfig.php:284 include/func.inc.php:2638
+#: include/classes/widgets/CWidgetConfig.php:284 include/func.inc.php:2495
 #: jsLoader.php:148 jsLoader.php:149
 #, c-format
 msgid "%1$s second"
@@ -304,7 +304,7 @@ msgstr "(Seuls les super administrateurs peuvent créer des groupes)"
 msgid "(no proxy)"
 msgstr "(pas de proxy)"
 
-#: include/classes/setup/CSetupWizard.php:311
+#: include/classes/setup/CSetupWizard.php:480
 msgid "0 - use default port"
 msgstr "0 - utiliser le port par défaut"
 
@@ -485,7 +485,7 @@ msgstr ""
 
 #: app/views/hintbox.eventlist.php:76
 #: app/views/monitoring.widget.problems.view.php:66
-#: include/actions.inc.php:161 include/blocks.inc.php:733
+#: include/actions.inc.php:161 include/blocks.inc.php:581
 #: include/classes/screens/CScreenProblem.php:868
 #: include/classes/screens/CScreenProblem.php:893
 #: include/classes/screens/CScreenProblem.php:1162 include/events.inc.php:290
@@ -608,7 +608,7 @@ msgstr ""
 msgid "Action added"
 msgstr "Action ajoutée"
 
-#: include/classes/core/ZBase.php:497
+#: include/classes/core/ZBase.php:500
 #, c-format
 msgid "Action class %1$s must extend %2$s class."
 msgstr ""
@@ -649,7 +649,7 @@ msgstr "Action mise à jour"
 #: app/views/administration.mediatype.edit.php:281
 #: app/views/configuration.discovery.edit.php:78
 #: app/views/monitoring.dashboard.view.php:114
-#: app/views/monitoring.widget.problems.view.php:67 include/blocks.inc.php:734
+#: app/views/monitoring.widget.problems.view.php:67 include/blocks.inc.php:582
 #: include/classes/helpers/CMenuHelper.php:168
 #: include/classes/helpers/CRoleHelper.php:361
 #: include/classes/screens/CScreenProblem.php:869
@@ -663,6 +663,7 @@ msgstr "Action mise à jour"
 msgid "Actions"
 msgstr "Actions"
 
+#: app/partials/administration.ha.nodes.php:50
 #: app/views/administration.proxy.edit.php:72
 #: app/views/administration.proxy.list.php:54
 #: app/views/administration.proxy.list.php:163
@@ -941,7 +942,7 @@ msgstr ""
 msgid "Add widget"
 msgstr "Ajouter un widget"
 
-#: app/controllers/CControllerAuditLogList.php:354
+#: app/controllers/CControllerAuditLogList.php:355
 #: app/controllers/CControllerPopupImportCompare.php:161
 msgid "Added"
 msgstr ""
@@ -958,6 +959,10 @@ msgstr ""
 
 #: app/views/popup.service.edit.php:161
 msgid "Additional rules"
+msgstr ""
+
+#: app/partials/administration.ha.nodes.php:28
+msgid "Address"
 msgstr ""
 
 #: include/hosts.inc.php:63 include/users.inc.php:53
@@ -991,7 +996,7 @@ msgstr "Âge inférieur à"
 msgid "Agent"
 msgstr "Agent"
 
-#: include/classes/data/CItemData.php:833
+#: include/classes/data/CItemData.php:836
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
 msgstr "Vérification de la disponibilité de l'agent. Aucun retour - indisponible ; 1 - disponible"
 
@@ -999,11 +1004,11 @@ msgstr "Vérification de la disponibilité de l'agent. Aucun retour - indisponib
 msgid "Agent encryption"
 msgstr "Chiffrement sur l'agent"
 
-#: include/classes/data/CItemData.php:825
+#: include/classes/data/CItemData.php:828
 msgid "Agent host metadata. Returns string"
 msgstr ""
 
-#: include/classes/data/CItemData.php:829
+#: include/classes/data/CItemData.php:832
 msgid "Agent host name. Returns string"
 msgstr "Nom d'hôte de l'agent. Retourne une chaîne"
 
@@ -1123,15 +1128,15 @@ msgstr "Hôtes autorisés"
 msgid "Allowed methods"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:682
+#: include/classes/setup/CSetupWizard.php:854
 msgid "Alternatively, you can install it manually:"
 msgstr "Alternativement, vous pouvez l'installer manuellement :"
 
-#: include/classes/data/CItemData.php:1449
+#: include/classes/data/CItemData.php:1452
 msgid "Amount of guest physical memory that is swapped out to the swap space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1469
+#: include/classes/data/CItemData.php:1472
 msgid "Amount of host physical memory consumed for backing up guest physical memory pages, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
@@ -1543,11 +1548,11 @@ msgstr "Disponible"
 msgid "Average"
 msgstr "Moyen"
 
-#: include/classes/data/CItemData.php:1529
+#: include/classes/data/CItemData.php:1532
 msgid "Average number of outstanding read requests to the virtual disk during the collection interval , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1549
+#: include/classes/data/CItemData.php:1552
 msgid "Average number of outstanding write requests to the virtual disk during the collection interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
 msgstr ""
 
@@ -1559,8 +1564,8 @@ msgstr ""
 msgid "Axes"
 msgstr "Axes"
 
-#: include/classes/setup/CSetupWizard.php:148
-#: include/classes/setup/CSetupWizard.php:567
+#: include/classes/setup/CSetupWizard.php:322
+#: include/classes/setup/CSetupWizard.php:741
 msgid "Back"
 msgstr "Retour"
 
@@ -1618,7 +1623,7 @@ msgstr ""
 msgid "Blocked"
 msgstr "Bloqué"
 
-#: include/classes/core/ZBase.php:355
+#: include/classes/core/ZBase.php:358
 msgid "Blue"
 msgstr "Bleu"
 
@@ -1708,31 +1713,31 @@ msgstr "CERT"
 msgid "CLOSING"
 msgstr "FERMETURE"
 
-#: include/classes/data/CItemData.php:1077
+#: include/classes/data/CItemData.php:1080
 msgid "CPU information. Returns string or integer"
 msgstr "Informations du CPU. Retourne une chaîne ou un entier"
 
-#: include/classes/data/CItemData.php:1053
+#: include/classes/data/CItemData.php:1056
 msgid "CPU load. Returns float"
 msgstr "Charge processeur. Retourne un flottant"
 
-#: include/classes/data/CItemData.php:1429
+#: include/classes/data/CItemData.php:1432
 msgid "CPU time spent waiting for swap-in, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1281
+#: include/classes/data/CItemData.php:1284
 msgid "CPU usage as a percentage during the interval depends on power management or HT, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1273
+#: include/classes/data/CItemData.php:1276
 msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1433
+#: include/classes/data/CItemData.php:1436
 msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1065
+#: include/classes/data/CItemData.php:1068
 msgid "CPU utilization percentage. Returns float"
 msgstr ""
 
@@ -1793,7 +1798,7 @@ msgstr "Rappel"
 #: app/views/monitoring.dashboard.view.php:141
 #: app/views/popup.import.compare.php:162
 #: include/classes/html/CButtonCancel.php:25
-#: include/classes/setup/CSetupWizard.php:130 jsLoader.php:177
+#: include/classes/setup/CSetupWizard.php:310 jsLoader.php:177
 #: jsLoader.php:187 jsLoader.php:301 jsLoader.php:373
 msgid "Cancel"
 msgstr "Annuler"
@@ -2022,7 +2027,7 @@ msgstr "Impossible de fermer le problème : %1$s."
 msgid "Cannot connect to LDAP server."
 msgstr "Impossible de se connecter au serveur LDAP."
 
-#: include/classes/setup/CSetupWizard.php:420
+#: include/classes/setup/CSetupWizard.php:579
 msgid "Cannot connect to the database."
 msgstr "Impossible de se connecter à la base de données."
 
@@ -2094,7 +2099,7 @@ msgstr ""
 msgid "Cannot create service \"%1$s\": %2$s."
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:678
+#: include/classes/setup/CSetupWizard.php:850
 msgid "Cannot create the configuration file."
 msgstr "Impossible de créer le fichier de configuration."
 
@@ -2710,7 +2715,7 @@ msgid "Cannot link template."
 msgstr "Impossible de lier le modèle."
 
 #: app/controllers/CControllerModuleEdit.php:106
-#: include/classes/core/ZBase.php:665
+#: include/classes/core/ZBase.php:668
 #, c-format
 msgid "Cannot load module at: %1$s."
 msgid_plural "Cannot load modules at: %1$s."
@@ -2774,7 +2779,7 @@ msgstr "Impossible de lire du XML : %1$s."
 msgid "Cannot read YAML: %1$s."
 msgstr ""
 
-#: include/classes/server/CZabbixServer.php:527
+#: include/classes/server/CZabbixServer.php:543
 #, c-format
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
 msgstr "Impossible de lire la réponse, veuillez vérifier la connexion avec le serveur Zabbix \"%1$s\"."
@@ -2793,7 +2798,7 @@ msgstr "Impossible d'enregistrer une règle de découverte sans vérifications."
 msgid "Cannot save widget \"%1$s\"."
 msgstr "Impossible de sauvegarder un widget: %1$s."
 
-#: include/classes/server/CZabbixServer.php:468
+#: include/classes/server/CZabbixServer.php:484
 #, c-format
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr "Impossible d'envoyer une commande, veuillez vérifier la connexion avec le serveur Zabbix \"%1$s\"."
@@ -3211,11 +3216,11 @@ msgstr ""
 msgid "Catalan (ca_ES)"
 msgstr "Catalan (ca_ES)"
 
-#: include/classes/data/CItemData.php:1037
+#: include/classes/data/CItemData.php:1040
 msgid "Catches all SNMP traps that match regex. If regexp is unspecified, catches any trap."
 msgstr "Reçoit tous les traps SNMP qui correspondent à la regex. Si la regex n'est pas spécifiée, reçoit tous les traps."
 
-#: include/classes/data/CItemData.php:1033
+#: include/classes/data/CItemData.php:1036
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
 msgstr "Reçoit tous les traps SNMP qui n'ont été reçus par aucun élément snmptrap[]."
 
@@ -3301,7 +3306,7 @@ msgstr ""
 msgid "Chassis"
 msgstr "Châssis"
 
-#: include/classes/data/CItemData.php:1073
+#: include/classes/data/CItemData.php:1076
 msgid "Chassis information. Returns string"
 msgstr "Informations du chaŝsis. Retourne une chaîne"
 
@@ -3330,8 +3335,8 @@ msgstr "Rechercher une erreur en utilisant une expression régulière"
 msgid "Check for not supported value"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:49
-#: include/classes/setup/CSetupWizard.php:279
+#: include/classes/setup/CSetupWizard.php:58
+#: include/classes/setup/CSetupWizard.php:451
 msgid "Check of pre-requisites"
 msgstr "Vérification des prérequis"
 
@@ -3350,43 +3355,43 @@ msgstr "Vérifiez le type"
 msgid "Checks"
 msgstr "Vérifications"
 
-#: include/classes/data/CItemData.php:925
+#: include/classes/data/CItemData.php:928
 msgid "Checks if DNS service is up. Returns 0 - DNS is down (server did not respond or DNS resolution failed); 1 - DNS is up"
 msgstr "Vérifie si le service DNS est actif. Retourne 0 - le DNS est inactif (le serveur n'a pas répondu ou la résolution DNS a échoué) ; 1 - le DNS est actif"
 
-#: include/classes/data/CItemData.php:1165
+#: include/classes/data/CItemData.php:1168
 msgid "Checks if file exists. Returns 0 - not found; 1 - file of the specified type exists"
 msgstr ""
 
-#: include/classes/data/CItemData.php:857
+#: include/classes/data/CItemData.php:860
 msgid "Checks if host is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful."
 msgstr ""
 
-#: include/classes/data/CItemData.php:957
+#: include/classes/data/CItemData.php:960
 msgid "Checks if it is possible to make TCP connection to specified port. Returns 0 - cannot connect; 1 - can connect"
 msgstr "Vérifie s'il est possible d'effectuer une connexion TCP au port spécifié. Retourne 0 - impossible de se connecter ; 1 - connexion possible"
 
-#: include/classes/data/CItemData.php:965
+#: include/classes/data/CItemData.php:968
 msgid "Checks if service is running and accepting TCP connections. Returns 0 - service is down; 1 - service is running"
 msgstr "Vérifie si un service fonctionne et accepte des connexions TCP. Retourne 0 - le service est inactif ; 1 - le service fonctionne"
 
-#: include/classes/data/CItemData.php:981
+#: include/classes/data/CItemData.php:984
 msgid "Checks if service is running and responding to UDP requests. Returns 0 - service is down; 1 - service is running"
 msgstr "Vérifie si un service fonctionne et répond aux requêtes UDP. Retourne 0 - le service est inactif ; 1 - le service fonctionne"
 
-#: include/classes/data/CItemData.php:953
+#: include/classes/data/CItemData.php:956
 msgid "Checks if this TCP port is in LISTEN state. Returns 0 - it is not in LISTEN state; 1 - it is in LISTEN state"
 msgstr "Vérifie si ce port TCP est en ÉCOUTE. Retourne 0 - le port n'est pas en écoute ; 1 - le port est en écoute"
 
-#: include/classes/data/CItemData.php:973
+#: include/classes/data/CItemData.php:976
 msgid "Checks if this UDP port is in LISTEN state. Returns 0 - it is not in LISTEN state; 1 - it is in LISTEN state"
 msgstr "Vérifie si ce port UDP est en ÉCOUTE. Retourne 0 - le port n'est pas en écoute ; 1 - le port est en écoute"
 
-#: include/classes/data/CItemData.php:961
+#: include/classes/data/CItemData.php:964
 msgid "Checks performance of TCP service. Returns 0 - service is down; seconds - the number of seconds spent while connecting to the service"
 msgstr "Vérifie la performance du service TCP. Retourne 0 - le service est inactif - le nombre de secondes passées à se connecter au service"
 
-#: include/classes/data/CItemData.php:977
+#: include/classes/data/CItemData.php:980
 msgid "Checks performance of UDP service. Returns 0 - service is down; seconds - the number of seconds spent waiting for response from the service"
 msgstr "Vérifie la performance du service UDP. Retourne 0 - le service est inactif - le nombre de secondes passées à attendre une réponse du service"
 
@@ -3415,7 +3420,7 @@ msgstr "Référence circulaire dans les modèles : %1$s."
 msgid "Circular template linkage is not allowed."
 msgstr "La liaison circulaire de modèle n'est pas autorisée."
 
-#: include/classes/core/ZBase.php:491
+#: include/classes/core/ZBase.php:494
 #, c-format
 msgid "Class %1$s not found for action %2$s."
 msgstr ""
@@ -3648,11 +3653,11 @@ msgstr "Conditions"
 msgid "Configuration"
 msgstr "Configuration"
 
-#: include/classes/data/CItemData.php:1689
+#: include/classes/data/CItemData.php:1692
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "Statistiques du cache de configuration. Cache - buffer (modes: pfree, total, used, free)."
 
-#: include/classes/setup/CSetupWizard.php:700
+#: include/classes/setup/CSetupWizard.php:872
 #, c-format
 msgid "Configuration file \"%1$s\" created."
 msgstr "Fichier de configuration \"%1$s\" créé."
@@ -3805,8 +3810,8 @@ msgstr "Configuration de la supervision web"
 msgid "Configuration updated"
 msgstr "Configuration mise à jour"
 
-#: include/classes/setup/CSetupWizard.php:53
-#: include/classes/setup/CSetupWizard.php:428
+#: include/classes/setup/CSetupWizard.php:62
+#: include/classes/setup/CSetupWizard.php:587
 msgid "Configure DB connection"
 msgstr "Configurer la connexion à la base de données"
 
@@ -3814,7 +3819,7 @@ msgstr "Configurer la connexion à la base de données"
 msgid "Confirmation text"
 msgstr "Texte de confirmation"
 
-#: include/classes/setup/CSetupWizard.php:698
+#: include/classes/setup/CSetupWizard.php:870
 msgid "Congratulations! You have successfully installed Zabbix frontend."
 msgstr "Félicitations ! Vous avez installé l'interface Zabbix avec succès."
 
@@ -3839,12 +3844,12 @@ msgstr "Sécurité de la connexion"
 msgid "Connection timeout"
 msgstr ""
 
-#: include/classes/server/CZabbixServer.php:481
+#: include/classes/server/CZabbixServer.php:497
 #, c-format
 msgid "Connection timeout of %1$s seconds exceeded when connecting to Zabbix server \"%2$s\"."
 msgstr "Délai d'attente de %1$s secondes dépassé lors de la connexion au serveur Zabbix \"%2$s\"."
 
-#: include/classes/server/CZabbixServer.php:592
+#: include/classes/server/CZabbixServer.php:608
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%1$s\" failed. Possible reasons:\n"
@@ -3852,7 +3857,7 @@ msgid ""
 "2. Incorrect DNS server configuration.\n"
 msgstr ""
 
-#: include/classes/server/CZabbixServer.php:580
+#: include/classes/server/CZabbixServer.php:596
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%1$s\" refused. Possible reasons:\n"
@@ -3862,7 +3867,7 @@ msgid ""
 "4. Firewall is blocking TCP connection.\n"
 msgstr ""
 
-#: include/classes/server/CZabbixServer.php:588
+#: include/classes/server/CZabbixServer.php:604
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%1$s\" timed out. Possible reasons:\n"
@@ -3870,7 +3875,7 @@ msgid ""
 "2. Firewall is blocking TCP connection.\n"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:373
+#: include/classes/setup/CSetupWizard.php:538
 msgid "Connection will not be encrypted because it uses a socket file (on Unix) or shared memory (Windows)."
 msgstr ""
 
@@ -4065,27 +4070,27 @@ msgstr "Corrélation mise à jour"
 msgid "Count"
 msgstr "Compte"
 
-#: include/classes/data/CItemData.php:1061
+#: include/classes/data/CItemData.php:1064
 msgid "Count of context switches. Returns integer"
 msgstr "Nombre de bascules de contexte. Retourne un entier"
 
-#: include/classes/data/CItemData.php:1149
+#: include/classes/data/CItemData.php:1152
 msgid "Count of directory entries, recursively. Returns integer"
 msgstr "Nombre d'entrées de répertoire, récursif. Renvoie un entier"
 
-#: include/classes/data/CItemData.php:905
+#: include/classes/data/CItemData.php:908
 msgid "Count of matched lines in log file monitoring with log rotation support. Returns integer"
 msgstr "Nombre de lignes correspondantes dans la supervision de fichier de log avec le support de la rotation des logs. Retourne un entier"
 
-#: include/classes/data/CItemData.php:897
+#: include/classes/data/CItemData.php:900
 msgid "Count of matched lines in log file monitoring. Returns integer"
 msgstr "Nombre de lignes correspondantes dans la supervision de fichier de log. Retourne un entier"
 
-#: include/classes/data/CItemData.php:1665
+#: include/classes/data/CItemData.php:1668
 msgid "Count of values enqueued in the low-level discovery processing queue."
 msgstr ""
 
-#: include/classes/data/CItemData.php:1669
+#: include/classes/data/CItemData.php:1672
 msgid "Count of values enqueued in the preprocessing queue."
 msgstr ""
 
@@ -4348,7 +4353,7 @@ msgstr "Hôte actuel"
 msgid "Current user"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:237
+#: include/classes/setup/CSetupWizard.php:409
 msgid "Current value"
 msgstr "Valeur actuelle"
 
@@ -4444,7 +4449,7 @@ msgstr "Nom DNS"
 msgid "Daily"
 msgstr "Journalier"
 
-#: include/classes/core/ZBase.php:356
+#: include/classes/core/ZBase.php:359
 msgid "Dark"
 msgstr "Sombre"
 
@@ -4556,16 +4561,16 @@ msgstr "Jeu de données"
 msgid "Data storage period"
 msgstr "Période de stockage des données"
 
-#: include/classes/setup/CSetupWizard.php:388
-#: include/classes/setup/CSetupWizard.php:534
-#: include/classes/setup/CSetupWizard.php:740
+#: include/classes/setup/CSetupWizard.php:551
+#: include/classes/setup/CSetupWizard.php:703
+#: include/classes/setup/CSetupWizard.php:938
 msgid "Database TLS CA file"
 msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:668
-#: include/classes/setup/CSetupWizard.php:400
-#: include/classes/setup/CSetupWizard.php:540
-#: include/classes/setup/CSetupWizard.php:748
+#: include/classes/setup/CSetupWizard.php:561
+#: include/classes/setup/CSetupWizard.php:711
+#: include/classes/setup/CSetupWizard.php:946
 msgid "Database TLS certificate file"
 msgstr ""
 
@@ -4573,32 +4578,32 @@ msgstr ""
 msgid "Database TLS certificate files must be read-only"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:412
-#: include/classes/setup/CSetupWizard.php:548
+#: include/classes/setup/CSetupWizard.php:571
+#: include/classes/setup/CSetupWizard.php:721
 msgid "Database TLS cipher list"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:370
-#: include/classes/setup/CSetupWizard.php:530
+#: include/classes/setup/CSetupWizard.php:534
+#: include/classes/setup/CSetupWizard.php:696
 msgid "Database TLS encryption"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:394
-#: include/classes/setup/CSetupWizard.php:537
-#: include/classes/setup/CSetupWizard.php:744
+#: include/classes/setup/CSetupWizard.php:556
+#: include/classes/setup/CSetupWizard.php:707
+#: include/classes/setup/CSetupWizard.php:942
 msgid "Database TLS key file"
 msgstr ""
 
-#: include/blocks.inc.php:609
-msgid "Database history tables upgraded"
+#: app/partials/administration.system.info.php:121
+msgid "Database history $info_tables upgraded"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:302
+#: include/classes/setup/CSetupWizard.php:472
 msgid "Database host"
 msgstr "Hôte base de données"
 
-#: include/classes/setup/CSetupWizard.php:406
-#: include/classes/setup/CSetupWizard.php:543
+#: include/classes/setup/CSetupWizard.php:566
+#: include/classes/setup/CSetupWizard.php:715
 msgid "Database host verification"
 msgstr ""
 
@@ -4606,35 +4611,35 @@ msgstr ""
 msgid "Database monitor"
 msgstr "Surveillance base de données"
 
-#: include/classes/setup/CSetupWizard.php:314
-#: include/classes/setup/CSetupWizard.php:510 setup.php:45
+#: include/classes/setup/CSetupWizard.php:482
+#: include/classes/setup/CSetupWizard.php:660 setup.php:45
 msgid "Database name"
 msgstr "Nom de la base de données"
 
-#: include/classes/setup/CSetupWizard.php:512
+#: include/classes/setup/CSetupWizard.php:668
 msgid "Database password"
 msgstr "Mot de passe utilisateur de la base de données"
 
-#: include/classes/setup/CSetupWizard.php:307
-#: include/classes/setup/CSetupWizard.php:509 setup.php:44
+#: include/classes/setup/CSetupWizard.php:476
+#: include/classes/setup/CSetupWizard.php:656 setup.php:44
 msgid "Database port"
 msgstr "Port de la base de données"
 
-#: include/classes/setup/CSetupWizard.php:319
-#: include/classes/setup/CSetupWizard.php:514
+#: include/classes/setup/CSetupWizard.php:486
+#: include/classes/setup/CSetupWizard.php:674
 msgid "Database schema"
 msgstr "Schéma de la base de données"
 
-#: include/classes/setup/CSetupWizard.php:508
+#: include/classes/setup/CSetupWizard.php:652
 msgid "Database server"
 msgstr "Serveur base de données"
 
-#: include/classes/setup/CSetupWizard.php:294
-#: include/classes/setup/CSetupWizard.php:495
+#: include/classes/setup/CSetupWizard.php:465
+#: include/classes/setup/CSetupWizard.php:635
 msgid "Database type"
 msgstr "Type de base de données"
 
-#: include/classes/setup/CSetupWizard.php:511
+#: include/classes/setup/CSetupWizard.php:664
 msgid "Database user"
 msgstr "Utilisateur base de données"
 
@@ -4667,7 +4672,7 @@ msgstr ""
 msgid "Day"
 msgstr "Jour"
 
-#: include/func.inc.php:2543
+#: include/func.inc.php:2400
 msgid "Day before yesterday"
 msgstr "Avant-hier"
 
@@ -4749,7 +4754,7 @@ msgid "Default host inventory mode"
 msgstr "Mode d'inventaire d'hôte par défaut"
 
 #: app/views/administration.gui.edit.php:70
-#: include/classes/setup/CSetupWizard.php:227
+#: include/classes/setup/CSetupWizard.php:399
 msgid "Default language"
 msgstr ""
 
@@ -4770,12 +4775,12 @@ msgid "Default page display period"
 msgstr ""
 
 #: app/views/administration.gui.edit.php:82
-#: include/classes/setup/CSetupWizard.php:476
+#: include/classes/setup/CSetupWizard.php:614
 msgid "Default theme"
 msgstr "Thème par défaut"
 
 #: app/views/administration.gui.edit.php:75
-#: include/classes/setup/CSetupWizard.php:469
+#: include/classes/setup/CSetupWizard.php:607
 msgid "Default time zone"
 msgstr ""
 
@@ -5116,7 +5121,7 @@ msgstr "Supprimer le déclencheur ?"
 msgid "Delete web scenario?"
 msgstr "Supprimer le scénario web ?"
 
-#: app/controllers/CControllerAuditLogList.php:357
+#: app/controllers/CControllerAuditLogList.php:358
 msgid "Deleted"
 msgstr ""
 
@@ -5179,7 +5184,7 @@ msgstr "Dépend de"
 msgid "Deployment status"
 msgstr "État du déploiement"
 
-#: app/controllers/CControllerAuditLogList.php:285
+#: app/controllers/CControllerAuditLogList.php:286
 #: app/partials/configuration.host.edit.html.php:147
 #: app/partials/hostmacros.list.html.php:37
 #: app/partials/massupdate.macros.tab.php:29
@@ -5211,11 +5216,12 @@ msgstr "État du déploiement"
 msgid "Description"
 msgstr "Description"
 
+#: app/partials/administration.system.info.php:30
 #: app/views/administration.mediatype.list.php:82
-#: app/views/js/reports.auditlog.list.js.php:152
+#: app/views/js/reports.auditlog.list.js.php:153
 #: app/views/reports.auditlog.list.php:96
-#: app/views/reports.auditlog.list.php:129 include/blocks.inc.php:525
-#: include/func.inc.php:1601 include/views/configuration.action.edit.php:175
+#: app/views/reports.auditlog.list.php:129 include/func.inc.php:1601
+#: include/views/configuration.action.edit.php:175
 #: include/views/configuration.action.edit.php:179
 #: include/views/configuration.action.edit.php:322
 #: include/views/configuration.action.edit.php:410
@@ -5231,7 +5237,7 @@ msgstr "Détails du scénario web"
 msgid "Device"
 msgstr "Équipement"
 
-#: include/classes/data/CItemData.php:1049
+#: include/classes/data/CItemData.php:1052
 msgid "Device interrupts. Returns integer"
 msgstr "Interruptions du périphérique. Retourne un entier"
 
@@ -5247,7 +5253,7 @@ msgstr ""
 msgid "Directory"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1153
+#: include/classes/data/CItemData.php:1156
 msgid "Directory size (in bytes). Returns integer"
 msgstr "Taille du dossier (en octets). Retourne un entier"
 
@@ -5347,6 +5353,7 @@ msgstr "Désactiver les déclencheurs sélectionnés ?"
 msgid "Disable selected web scenarios?"
 msgstr "Désactiver les scénarios web sélectionnés ?"
 
+#: app/partials/administration.system.info.php:180
 #: app/partials/configuration.filter.items.php:188
 #: app/partials/configuration.host.edit.html.php:363
 #: app/partials/monitoring.host.filter.php:129
@@ -5478,35 +5485,35 @@ msgstr "Liste des découvertes"
 msgid "Discovery object"
 msgstr "Objet de découverte"
 
-#: include/classes/data/CItemData.php:1229
+#: include/classes/data/CItemData.php:1232
 msgid "Discovery of VMware clusters, <url> - VMware service URL. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1237
+#: include/classes/data/CItemData.php:1240
 msgid "Discovery of VMware datastores, <url> - VMware service URL. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1289
+#: include/classes/data/CItemData.php:1292
 msgid "Discovery of VMware hypervisor datastores, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1313
+#: include/classes/data/CItemData.php:1316
 msgid "Discovery of VMware hypervisors, <url> - VMware service URL. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1557
+#: include/classes/data/CItemData.php:1560
 msgid "Discovery of VMware virtual machine disk devices, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1569
+#: include/classes/data/CItemData.php:1572
 msgid "Discovery of VMware virtual machine file systems, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1501
+#: include/classes/data/CItemData.php:1504
 msgid "Discovery of VMware virtual machine network interfaces, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1445
+#: include/classes/data/CItemData.php:1448
 msgid "Discovery of VMware virtual machines, <url> - VMware service URL. Returns JSON"
 msgstr ""
 
@@ -5594,15 +5601,15 @@ msgstr "Règles de découverte supprimées"
 msgid "Discovery status"
 msgstr "État de la découverte"
 
-#: include/classes/data/CItemData.php:1141
+#: include/classes/data/CItemData.php:1144
 msgid "Disk read statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps"
 msgstr "Statistiques de lecture du disque. Retourne un entier avec le type parmi sectors, operations, bytes ; un flottant avec le type parmi sps, ops, bps"
 
-#: include/classes/data/CItemData.php:1213
+#: include/classes/data/CItemData.php:1216
 msgid "Disk space in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Espace disque en octets ou en pourcentage du total. Retourne un entier pour les octets, un flottant pour le pourcentage"
 
-#: include/classes/data/CItemData.php:1145
+#: include/classes/data/CItemData.php:1148
 msgid "Disk write statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps"
 msgstr "Statistiques d'écriture du disque. Retourne un entier avec le type parmi sectors, operations, bytes ; un flottant avec le type parmi sps, ops, bps"
 
@@ -5719,7 +5726,7 @@ msgstr "Arrêté"
 msgid "Download image"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:684
+#: include/classes/setup/CSetupWizard.php:856
 msgid "Download the configuration file"
 msgstr "Télécharger le fichier de configuration"
 
@@ -5783,7 +5790,7 @@ msgid "Duplicate userid \"%1$s\" in users for map \"%2$s\"."
 msgstr "Identifiant d'utilisateur \"%1$s\" en doublon dans les utilisateurs pour la carte \"%2$s\"."
 
 #: app/views/hintbox.eventlist.php:75
-#: app/views/monitoring.widget.problems.view.php:65 include/blocks.inc.php:732
+#: app/views/monitoring.widget.problems.view.php:65 include/blocks.inc.php:580
 #: include/classes/screens/CScreenProblem.php:867
 #: include/classes/screens/CScreenProblem.php:892
 #: include/classes/screens/CScreenProblem.php:1161 include/events.inc.php:289
@@ -6094,6 +6101,7 @@ msgstr "Activer les scénarios web sélectionnés ?"
 msgid "Enable trapping"
 msgstr "Activer les trap"
 
+#: app/partials/administration.system.info.php:173
 #: app/partials/configuration.filter.items.php:187
 #: app/partials/configuration.host.edit.html.php:165
 #: app/partials/monitoring.host.filter.php:128
@@ -6224,7 +6232,7 @@ msgstr "Erreur dans la requête de recherche dans la table \"%1$s\"."
 msgid "Error message"
 msgstr "Message d'erreur"
 
-#: include/blocks.inc.php:643
+#: app/partials/administration.system.info.php:153
 #, c-format
 msgid "Error! Unable to start Zabbix server due to unsupported %1$s database server version. Must be at least (%2$s)"
 msgstr ""
@@ -6280,7 +6288,7 @@ msgstr ""
 msgid "Event list [previous 20]"
 msgstr "Liste d'événements [20 précédents]"
 
-#: include/classes/data/CItemData.php:853
+#: include/classes/data/CItemData.php:856
 msgid "Event log monitoring. Returns log"
 msgstr "Supervision du journal d'événements. Retourne un journal"
 
@@ -6343,11 +6351,11 @@ msgstr "Exclure un groupe d'hôte"
 msgid "Execute"
 msgstr "Exécuter"
 
-#: include/classes/data/CItemData.php:1593
+#: include/classes/data/CItemData.php:1596
 msgid "Execute WMI query and return the JSON document with all selected objects"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1589
+#: include/classes/data/CItemData.php:1592
 msgid "Execute WMI query and return the first selected object. Returns integer, float, string or text (depending on the request)"
 msgstr "Exécute une requête WMI et retourne le premier objet sélectionné. Retourne un entier, un flottant, une chaîne ou du texte (selon la requête)"
 
@@ -6531,9 +6539,15 @@ msgstr "FAUX"
 msgid "FTP"
 msgstr "FTP"
 
-#: include/classes/setup/CSetupWizard.php:253
+#: include/classes/setup/CSetupWizard.php:425
 msgid "Fail"
 msgstr "Échec"
+
+#: app/partials/administration.ha.nodes.php:75
+#: app/partials/administration.system.info.php:174
+#, c-format
+msgid "Fail-over delay: %1$s"
+msgstr ""
 
 #: app/views/monitoring.widget.web.view.php:30 include/actions.inc.php:2139
 #: include/views/administration.auditacts.list.php:88
@@ -6669,7 +6683,7 @@ msgstr "Le champ \"%1$s\" doit être manquant."
 msgid "Field \"host\" is mandatory."
 msgstr "Le champ \"hôte\" est obligatoire."
 
-#: include/classes/data/CItemData.php:1157
+#: include/classes/data/CItemData.php:1160
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256"
 msgstr ""
 
@@ -6682,15 +6696,15 @@ msgstr ""
 msgid "File is too big, max upload size is %1$s bytes."
 msgstr "Fichier trop volumineux, la taille maximale de téléchargement est de %1$s octets."
 
-#: include/classes/data/CItemData.php:1177
+#: include/classes/data/CItemData.php:1180
 msgid "File owner information. Returns string"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1193
+#: include/classes/data/CItemData.php:1196
 msgid "File size in bytes (default) or in newlines. Returns integer"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1197
+#: include/classes/data/CItemData.php:1200
 msgid "File time information. Returns integer (Unix timestamp)"
 msgstr "Information temporelle du fichier. Retourne un entier (timestamp Unix)"
 
@@ -6768,19 +6782,19 @@ msgstr ""
 msgid "Filters"
 msgstr "Filtres"
 
-#: include/classes/data/CItemData.php:1189
+#: include/classes/data/CItemData.php:1192
 msgid "Find string in a file. Returns 0 - match not found; 1 - found"
 msgstr "Trouver une chaîne dans un fichier. Retourne 0 - correspondance non trouvée ; 1 - trouvée"
 
-#: include/classes/data/CItemData.php:1185
+#: include/classes/data/CItemData.php:1188
 msgid "Find string in a file. Returns the line containing the matched string, or as specified by the optional output parameter"
 msgstr "Trouver une chaîne dans un fichier. Retourne la ligne contenant la chaîne correspondance, ou selon ce qui est spécifié dans le paramètre optionnel output"
 
-#: include/classes/data/CItemData.php:1585
+#: include/classes/data/CItemData.php:1588
 msgid "Find string on a web page. Returns the matched string, or as specified by the optional output parameter"
 msgstr "Trouver une chaîne sur une page web. Retourne la chaîne correspondante, ou selon ce qui est spécifié dans le paramètre optionnel output"
 
-#: include/classes/setup/CSetupWizard.php:145
+#: include/classes/setup/CSetupWizard.php:334
 msgid "Finish"
 msgstr "Terminé"
 
@@ -6936,11 +6950,6 @@ msgstr "GUI"
 msgid "GUI access disabled."
 msgstr "Accès GUI désactivé."
 
-#: include/classes/setup/CSetupWizard.php:61
-#: include/classes/setup/CSetupWizard.php:485
-msgid "GUI settings"
-msgstr ""
-
 #: include/classes/helpers/CMenuHelper.php:221
 #: include/classes/helpers/CRoleHelper.php:379
 msgid "General"
@@ -6964,7 +6973,7 @@ msgstr "Géorgien (ka_GE)"
 msgid "German (de_DE)"
 msgstr "Allemand (de_DE)"
 
-#: include/classes/data/CItemData.php:1577
+#: include/classes/data/CItemData.php:1580
 msgid "Get content of web page. Returns web page source as text"
 msgstr "Obtenir le contenu d'une page web. Retourne la source de la page web sous forme de texte"
 
@@ -7361,11 +7370,11 @@ msgstr "Matériel"
 msgid "Hardware (Full details)"
 msgstr "Matériel (détails complet)"
 
-#: include/classes/data/CItemData.php:1021
+#: include/classes/data/CItemData.php:1024
 msgid "Hardware sensor reading. Returns float"
 msgstr "Lecture d'un capteur matériel. Retourne un flottant"
 
-#: include/classes/setup/CSetupWizard.php:331
+#: include/classes/setup/CSetupWizard.php:499
 msgid "HashiCorp Vault"
 msgstr ""
 
@@ -7440,11 +7449,24 @@ msgstr "Hiérarchie"
 msgid "High"
 msgstr "Haut"
 
-#: include/classes/core/ZBase.php:358
+#: app/partials/administration.system.info.php:172
+#: app/partials/administration.system.info.php:179
+msgid "High availability cluster"
+msgstr ""
+
+#: app/controllers/CControllerAuditLogList.php:218
+msgid "High availability node"
+msgstr ""
+
+#: include/classes/widgets/forms/CWidgetFormSystemInfo.php:32
+msgid "High availability nodes"
+msgstr ""
+
+#: include/classes/core/ZBase.php:361
 msgid "High-contrast dark"
 msgstr "Noir à contraste élevé"
 
-#: include/classes/core/ZBase.php:357
+#: include/classes/core/ZBase.php:360
 msgid "High-contrast light"
 msgstr "Clair à contraste élevé"
 
@@ -7524,7 +7546,7 @@ msgstr "Horizontal"
 msgid "Horizontal align"
 msgstr "Alignement horizontal"
 
-#: app/controllers/CControllerAuditLogList.php:218
+#: app/controllers/CControllerAuditLogList.php:219
 #: app/partials/configuration.host.edit.html.php:527
 #: app/partials/monitoring.latest.view.html.php:40
 #: app/partials/popup.operations.php:175
@@ -7535,12 +7557,11 @@ msgstr "Alignement horizontal"
 #: app/views/monitoring.widget.problems.view.php:58
 #: app/views/popup.generic.php:81 app/views/popup.host.edit.php:97
 #: app/views/popup.massupdate.host.php:290 app/views/search.php:33
-#: include/actions.inc.php:50 include/blocks.inc.php:729
+#: include/actions.inc.php:50 include/blocks.inc.php:577
 #: include/classes/screens/CScreenHttpTest.php:112
 #: include/classes/screens/CScreenProblem.php:863
 #: include/classes/screens/CScreenProblem.php:887
 #: include/classes/screens/CScreenProblem.php:1158
-#: include/classes/setup/CSetupWizard.php:440
 #: include/classes/widgets/forms/CWidgetFormProblems.php:206
 #: include/classes/widgets/forms/CWidgetFormProblems.php:207
 #: include/hostgroups.inc.php:248 include/maps.inc.php:24
@@ -7629,7 +7650,7 @@ msgid_plural "Hosts enabled"
 msgstr[0] "Hôte activé"
 msgstr[1] "Hôtes désactivés"
 
-#: app/controllers/CControllerAuditLogList.php:219
+#: app/controllers/CControllerAuditLogList.php:220
 #: app/partials/administration.usergroup.grouprights.html.php:29
 #: app/partials/administration.usergroup.tagfilters.html.php:29
 #: app/partials/popup.operations.php:183
@@ -7762,7 +7783,7 @@ msgstr "Nom de l'hôte"
 msgid "Host networks"
 msgstr "Réseaux de l'hôte"
 
-#: app/controllers/CControllerAuditLogList.php:220
+#: app/controllers/CControllerAuditLogList.php:221
 #: app/views/popup.lldoperation.php:54
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:168
 msgid "Host prototype"
@@ -7918,7 +7939,7 @@ msgstr "Hôtes mis à jour"
 msgid "Hours"
 msgstr "Heures"
 
-#: app/controllers/CControllerAuditLogList.php:221
+#: app/controllers/CControllerAuditLogList.php:222
 #: app/views/administration.housekeeping.edit.php:29
 #: app/views/administration.housekeeping.edit.php:184
 #: include/classes/helpers/CMenuHelper.php:227 include/html.inc.php:884
@@ -8005,7 +8026,7 @@ msgstr "Interfaces IPMI"
 msgid "IPMI sensor"
 msgstr "Capteur IPMI"
 
-#: include/classes/data/CItemData.php:869
+#: include/classes/data/CItemData.php:872
 msgid "IPMI sensor IDs and other sensor-related parameters. Returns JSON."
 msgstr ""
 
@@ -8062,7 +8083,7 @@ msgstr "Correspondance d'icône supprimée"
 msgid "Icon map updated"
 msgstr "Correspondance d'icône mise à jour"
 
-#: app/controllers/CControllerAuditLogList.php:222
+#: app/controllers/CControllerAuditLogList.php:223
 #: app/views/administration.iconmap.edit.php:29
 #: app/views/administration.iconmap.list.php:27
 #: include/classes/helpers/CMenuHelper.php:234 include/html.inc.php:887
@@ -8097,7 +8118,7 @@ msgstr ""
 msgid "Identical namespace (%1$s) is used by modules located at %2$s."
 msgstr ""
 
-#: include/classes/data/CItemData.php:1125
+#: include/classes/data/CItemData.php:1128
 msgid "Identification of the system. Returns string"
 msgstr "Identification du système. Retourne une chaîne"
 
@@ -8173,7 +8194,7 @@ msgstr ""
 msgid "Ignore this service"
 msgstr ""
 
-#: app/controllers/CControllerAuditLogList.php:223
+#: app/controllers/CControllerAuditLogList.php:224
 #: app/views/administration.image.edit.php:60
 #: app/views/administration.image.edit.php:66 image.php:26
 #: include/classes/helpers/CMapHelper.php:227 include/maps.inc.php:28
@@ -8355,7 +8376,7 @@ msgstr ""
 msgid "Include subgroups"
 msgstr "Inclure les sous-groupes"
 
-#: include/classes/data/CItemData.php:937
+#: include/classes/data/CItemData.php:940
 msgid "Incoming traffic statistics on network interface. Returns integer"
 msgstr "Statistiques de trafic entrant sur une interface réseau. Retourne un entier"
 
@@ -8659,9 +8680,9 @@ msgstr "Nom ou valeur incorrecte du champ \"%1$s\" dans l'instruction \"where\" 
 msgid "Incorrect fields for sysmap."
 msgstr "Champs incorrects pour sysmap."
 
-#: include/classes/setup/CSetupWizard.php:740
-#: include/classes/setup/CSetupWizard.php:744
-#: include/classes/setup/CSetupWizard.php:748
+#: include/classes/setup/CSetupWizard.php:938
+#: include/classes/setup/CSetupWizard.php:942
+#: include/classes/setup/CSetupWizard.php:946
 #, c-format
 msgid "Incorrect file path for \"%1$s\": %2$s."
 msgstr ""
@@ -8835,9 +8856,9 @@ msgstr "Intervalle de ports incorrect."
 msgid "Incorrect regular expression \"%1$s\": \"%2$s\""
 msgstr "Expression régulière \"%1$s\" incorrecte : \"%2$s\""
 
-#: include/classes/server/CZabbixServer.php:493
-#: include/classes/server/CZabbixServer.php:535
-#: include/classes/server/CZabbixServer.php:542
+#: include/classes/server/CZabbixServer.php:509
+#: include/classes/server/CZabbixServer.php:551
+#: include/classes/server/CZabbixServer.php:558
 #, c-format
 msgid "Incorrect response received from Zabbix server \"%1$s\"."
 msgstr "Réponse incorrecte reçue du serveur Zabbix \"%1$s\"."
@@ -9256,7 +9277,7 @@ msgstr ""
 #: app/views/monitoring.widget.actionlog.view.php:39
 #: app/views/monitoring.widget.problems.view.php:57
 #: include/actions.inc.php:1827 include/actions.inc.php:1921
-#: include/blocks.inc.php:728 include/classes/screens/CScreenProblem.php:862
+#: include/blocks.inc.php:576 include/classes/screens/CScreenProblem.php:862
 #: include/classes/screens/CScreenProblem.php:886
 #: include/views/administration.auditacts.list.php:69
 #: include/views/configuration.graph.list.php:141
@@ -9276,11 +9297,11 @@ msgstr "Info"
 msgid "Information"
 msgstr "Information"
 
-#: include/classes/data/CItemData.php:1169
+#: include/classes/data/CItemData.php:1172
 msgid "Information about a file. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1025
+#: include/classes/data/CItemData.php:1028
 msgid "Information about a service. Returns integer with param as state, startup; string - with param as displayname, path, user; text - with param as description; Specifically for state: 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service; Specifically for startup: 0 - automatic, 1 - automatic delayed, 2 - manual, 3 - disabled, 4 - unknown"
 msgstr "Informations à propos d'un service. Retourne un entier avec param state, startup ; une chaîne avec param displayname, path, user ; du texte avec param description ; Pour state : 0 - en fonctionnement, 1 - en pause, 2 - démarrage en attente, 3 - pause en attente, 4 - continue en attente, 5 - arrêt en attente, 6 - arrêté, 7 - inconnu, 255 - service introuvable ; Pour startup : 0 - automatique, 1 - automatique avec délai, 2 - manuel, 3 - désactivé, 4 - inconnu"
 
@@ -9330,12 +9351,12 @@ msgstr "Insertion"
 msgid "Insert expression"
 msgstr "Insérer une expression"
 
-#: include/classes/setup/CSetupWizard.php:69
-#: include/classes/setup/CSetupWizard.php:705
+#: include/classes/setup/CSetupWizard.php:74
+#: include/classes/setup/CSetupWizard.php:877
 msgid "Install"
 msgstr "Installer"
 
-#: setup.php:174
+#: setup.php:172
 msgid "Installation"
 msgstr "Installation"
 
@@ -9855,7 +9876,7 @@ msgstr "Impossible de chercher par mot de passe utilisateur."
 msgid "Italian (it_IT)"
 msgstr "Italien (it_IT)"
 
-#: app/controllers/CControllerAuditLogList.php:225
+#: app/controllers/CControllerAuditLogList.php:226
 #: app/views/popup.massupdate.item.php:492 app/views/popup.triggerexpr.php:99
 #: app/views/popup.triggerwizard.php:92
 #: include/classes/screens/CScreenHistory.php:268
@@ -9940,7 +9961,7 @@ msgstr "Élément non sélectionné"
 msgid "Item pre-processing is missing parameters: %1$s"
 msgstr "Des paramètres manquent au prétraitement de l'élément: %1$s"
 
-#: app/controllers/CControllerAuditLogList.php:226
+#: app/controllers/CControllerAuditLogList.php:227
 #: app/views/popup.lldoperation.php:51 app/views/popup.massupdate.item.php:492
 #: include/classes/widgets/forms/CWidgetFormGraphPrototype.php:48
 #: include/forms.inc.php:892
@@ -10312,47 +10333,51 @@ msgctxt "page navigation"
 msgid "Last"
 msgstr "Dernière"
 
-#: include/func.inc.php:2596
+#: include/func.inc.php:2453
 #, c-format
 msgid "Last %1$d day"
 msgid_plural "Last %1$d days"
 msgstr[0] "Dernier %1$d jour"
 msgstr[1] "%1$d derniers jours"
 
-#: include/func.inc.php:2590
+#: include/func.inc.php:2447
 #, c-format
 msgid "Last %1$d hour"
 msgid_plural "Last %1$d hours"
 msgstr[0] "Dernière %1$d heure"
 msgstr[1] "%1$d dernières heures"
 
-#: include/func.inc.php:2583
+#: include/func.inc.php:2440
 #, c-format
 msgid "Last %1$d minute"
 msgid_plural "Last %1$d minutes"
 msgstr[0] "Dernière %1$d minute"
 msgstr[1] "Dernières %1$d minutes"
 
-#: include/func.inc.php:2599
+#: include/func.inc.php:2456
 #, c-format
 msgid "Last %1$d month"
 msgid_plural "Last %1$d months"
 msgstr[0] "Dernier %1$d mois"
 msgstr[1] "%1$d derniers mois"
 
-#: include/func.inc.php:2576
+#: include/func.inc.php:2433
 #, c-format
 msgid "Last %1$d second"
 msgid_plural "Last %1$d seconds"
 msgstr[0] "Dernière %1$d seconde"
 msgstr[1] "%1$d dernières secondes"
 
-#: include/func.inc.php:2602
+#: include/func.inc.php:2459
 #, c-format
 msgid "Last %1$d year"
 msgid_plural "Last %1$d years"
 msgstr[0] "Dernière %1$d année"
 msgstr[1] "%1$d dernières années"
+
+#: app/partials/administration.ha.nodes.php:28
+msgid "Last access"
+msgstr ""
 
 #: app/views/administration.token.list.php:143
 #: app/views/administration.user.token.list.php:99
@@ -10472,7 +10497,7 @@ msgstr "Légende"
 msgid "Length"
 msgstr ""
 
-#: setup.php:197
+#: setup.php:195
 msgid "Licensed under"
 msgstr ""
 
@@ -10576,31 +10601,31 @@ msgstr "Liens"
 msgid "List is empty"
 msgstr "La liste est vide"
 
-#: include/classes/data/CItemData.php:1137
+#: include/classes/data/CItemData.php:1140
 msgid "List of block devices and their type. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1045
+#: include/classes/data/CItemData.php:1048
 msgid "List of detected CPUs/CPU cores. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1201
+#: include/classes/data/CItemData.php:1204
 msgid "List of mounted filesystems and their types. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1205
+#: include/classes/data/CItemData.php:1208
 msgid "List of mounted filesystems, their types, disk space and inode statistics. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:933
+#: include/classes/data/CItemData.php:936
 msgid "List of network interfaces. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1001
+#: include/classes/data/CItemData.php:1004
 msgid "List of object instances of Windows performance counters, discovered using object names in English. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:997
+#: include/classes/data/CItemData.php:1000
 msgid "List of object instances of Windows performance counters. Returns JSON"
 msgstr ""
 
@@ -10614,19 +10639,19 @@ msgstr "Liste de partages pour les groupes d'utilisateurs"
 msgid "List of user shares"
 msgstr "Liste de partages pour les utilisateurs"
 
-#: include/classes/data/CItemData.php:1085
+#: include/classes/data/CItemData.php:1088
 msgid "Listing of MAC addresses. Returns string"
 msgstr "Liste des adresses MAC. Retourne une chaîne"
 
-#: include/classes/data/CItemData.php:1081
+#: include/classes/data/CItemData.php:1084
 msgid "Listing of PCI or USB devices. Returns text"
 msgstr "Liste des périphériques PCI ou USB. Retourne du texte"
 
-#: include/classes/data/CItemData.php:1109
+#: include/classes/data/CItemData.php:1112
 msgid "Listing of installed packages. Returns text"
 msgstr "Liste des paquets installés. Retourne du texte"
 
-#: include/classes/data/CItemData.php:1029
+#: include/classes/data/CItemData.php:1032
 msgid "Listing of services. Returns 0 - if empty; text - list of services separated by a newline"
 msgstr "Liste des services. Retourne 0 - si vide ; texte - liste des services séparés par un changement de ligne"
 
@@ -10634,7 +10659,7 @@ msgstr "Liste des services. Retourne 0 - si vide ; texte - liste des services s�
 msgid "Lithuanian (lt_LT)"
 msgstr "Lituanien (lt_LT)"
 
-#: include/classes/data/CItemData.php:1581
+#: include/classes/data/CItemData.php:1584
 msgid "Loading time of full web page (in seconds). Returns float"
 msgstr "Temps de chargement de la page web complète (en secondes). Retourne un flottant"
 
@@ -10671,11 +10696,11 @@ msgstr "Longitude de l'emplacement"
 msgid "Log"
 msgstr "Journal"
 
-#: include/classes/data/CItemData.php:909
+#: include/classes/data/CItemData.php:912
 msgid "Log file monitoring with log rotation support. Returns log"
 msgstr "Supervision d'un fichier de log avec support de la rotation. Retourne un log"
 
-#: include/classes/data/CItemData.php:901
+#: include/classes/data/CItemData.php:904
 msgid "Log file monitoring. Returns log"
 msgstr "Supervision d'un fichier de log. Retourne un log"
 
@@ -10749,11 +10774,11 @@ msgstr "Adresse MAC B"
 msgid "MD2"
 msgstr "MD2"
 
-#: include/classes/data/CItemData.php:1173
+#: include/classes/data/CItemData.php:1176
 msgid "MD5 checksum of file. Returns character string (MD5 hash of the file)"
 msgstr "Checksum MD5 d'un fichier. Retourne une chaîne de caractères (le hash MD5 du fichier)"
 
-#: app/controllers/CControllerAuditLogList.php:227
+#: app/controllers/CControllerAuditLogList.php:228
 #: app/partials/hostmacros.inherited.list.html.php:48
 #: app/partials/hostmacros.list.html.php:35
 #: app/partials/massupdate.macros.tab.php:29
@@ -10802,7 +10827,7 @@ msgstr "Filtre principal"
 msgid "Main navigation"
 msgstr "Navigation principale"
 
-#: app/controllers/CControllerAuditLogList.php:228
+#: app/controllers/CControllerAuditLogList.php:229
 #: include/classes/helpers/CMenuHelper.php:165
 #: include/classes/helpers/CRoleHelper.php:360
 #: include/views/configuration.maintenance.edit.php:259
@@ -10907,7 +10932,7 @@ msgstr ""
 msgid "Manually closed"
 msgstr "Fermé manuellement"
 
-#: app/controllers/CControllerAuditLogList.php:229
+#: app/controllers/CControllerAuditLogList.php:230
 #: include/classes/widgets/CWidgetConfig.php:54
 #: include/classes/widgets/forms/CWidgetFormMap.php:41
 #: include/classes/widgets/forms/CWidgetFormMap.php:70 include/maps.inc.php:27
@@ -11102,15 +11127,15 @@ msgstr ""
 msgid "Max period for time selector"
 msgstr ""
 
-#: include/classes/data/CItemData.php:885
+#: include/classes/data/CItemData.php:888
 msgid "Maximum number of opened files supported by OS. Returns integer"
 msgstr "Nombre maximal de fichiers ouverts supporté par le SE. Retourne un entier"
 
-#: include/classes/data/CItemData.php:889
+#: include/classes/data/CItemData.php:892
 msgid "Maximum number of processes supported by OS. Returns integer"
 msgstr "Nombre maximal de processus supporté par le SE. Retourne un entier"
 
-#: include/blocks.inc.php:632
+#: app/partials/administration.system.info.php:142
 #, c-format
 msgid "Maximum required %1$s database version is %2$s."
 msgstr ""
@@ -11145,7 +11170,7 @@ msgstr "Mai"
 msgid "Media"
 msgstr "Média"
 
-#: app/controllers/CControllerAuditLogList.php:230
+#: app/controllers/CControllerAuditLogList.php:231
 #: app/views/administration.mediatype.edit.php:270 report4.php:96
 msgid "Media type"
 msgstr "Type de média"
@@ -11221,11 +11246,11 @@ msgstr "Membres"
 msgid "Memory limit: %1$s"
 msgstr "Limite mémoire: %1$s"
 
-#: include/classes/data/CItemData.php:1217
+#: include/classes/data/CItemData.php:1220
 msgid "Memory size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Taille de la mémoire en octets ou en pourcentage du total. Retourne un entier pour les octets ; un flottant pour le pourcentage"
 
-#: include/classes/data/CItemData.php:1009
+#: include/classes/data/CItemData.php:1012
 msgid "Memory used by process in bytes. Returns integer"
 msgstr "Mémoire utilisée par un processeur en octets. Retourne un entier"
 
@@ -11312,7 +11337,7 @@ msgstr "Min"
 msgid "Minimum password length"
 msgstr ""
 
-#: include/blocks.inc.php:626
+#: app/partials/administration.system.info.php:136
 #, c-format
 msgid "Minimum required %1$s database version is %2$s."
 msgstr ""
@@ -11412,7 +11437,7 @@ msgstr "Mode"
 msgid "Model"
 msgstr "Modèle"
 
-#: app/controllers/CControllerAuditLogList.php:231
+#: app/controllers/CControllerAuditLogList.php:232
 #: app/views/administration.module.edit.php:52
 msgid "Module"
 msgstr ""
@@ -11610,6 +11635,7 @@ msgstr "NTLM"
 #: app/controllers/CControllerPopupTriggerWizard.php:134
 #: app/controllers/CControllerPopupValueMapUpdate.php:63
 #: app/controllers/CControllerPopupValueMapUpdate.php:70
+#: app/partials/administration.ha.nodes.php:28
 #: app/partials/configuration.filter.items.php:91
 #: app/partials/configuration.host.edit.html.php:177
 #: app/partials/configuration.host.edit.html.php:216
@@ -11781,7 +11807,7 @@ msgstr ""
 msgid "Network discovery data storage period"
 msgstr "Période de stockage des données de découverte réseau"
 
-#: include/classes/data/CItemData.php:941
+#: include/classes/data/CItemData.php:944
 msgid "Network interface list (includes interface type, status, IPv4 address, description). Returns text"
 msgstr "Liste des interfaces réseau (inclut le type d'interface, l'état, l'adresse IPv4, la description). Retourne du texte"
 
@@ -11823,7 +11849,7 @@ msgstr ""
 msgid "Network timeout for script execution"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1513
+#: include/classes/data/CItemData.php:1516
 msgid "Network utilization (combined transmit-rates and receive-rates) during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance"
 msgstr ""
 
@@ -11897,12 +11923,14 @@ msgstr "Nouveaux déclencheurs"
 msgid "Next page"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:142
-#: include/classes/setup/CSetupWizard.php:430
-#: include/classes/setup/CSetupWizard.php:567
+#: include/classes/setup/CSetupWizard.php:331
+#: include/classes/setup/CSetupWizard.php:589
+#: include/classes/setup/CSetupWizard.php:741
 msgid "Next step"
 msgstr "Prochaine étape"
 
+#: app/partials/administration.system.info.php:35
+#: app/partials/administration.system.info.php:122
 #: app/partials/configuration.filter.items.php:195
 #: app/partials/configuration.filter.items.php:202
 #: app/partials/configuration.filter.items.php:211
@@ -11917,8 +11945,7 @@ msgstr "Prochaine étape"
 #: app/views/popup.massupdate.item.php:337
 #: app/views/popup.massupdate.item.php:379
 #: app/views/popup.massupdate.trigger.php:64 include/actions.inc.php:33
-#: include/blocks.inc.php:532 include/blocks.inc.php:610
-#: include/blocks.inc.php:855 include/blocks.inc.php:859
+#: include/blocks.inc.php:703 include/blocks.inc.php:707
 #: include/classes/screens/CScreenProblem.php:1099
 #: include/classes/screens/CScreenProblem.php:1103
 #: include/classes/screens/CScreenProblem.php:1245 include/events.inc.php:198
@@ -12191,7 +12218,8 @@ msgstr ""
 #: app/controllers/CControllerWidgetIteratorGraphPrototypeView.php:305
 #: app/controllers/CControllerWidgetMapView.php:70
 #: app/controllers/CControllerWidgetPlainTextView.php:88
-#: app/views/monitoring.widget.graph.view.php:42 disc_prototypes.php:748
+#: app/views/monitoring.widget.graph.view.php:42
+#: app/views/monitoring.widget.systeminfo.view.php:45 disc_prototypes.php:748
 #: host_discovery.php:808 hostinventoriesoverview.php:73
 #: include/classes/api/services/CAction.php:1582
 #: include/classes/api/services/CAction.php:1863
@@ -12531,52 +12559,52 @@ msgstr "Nov"
 msgid "November"
 msgstr "Novembre"
 
-#: include/classes/data/CItemData.php:1057
+#: include/classes/data/CItemData.php:1060
 msgid "Number of CPUs. Returns integer"
 msgstr "Nombre de processeurs. Retourne un entier"
 
-#: include/classes/data/CItemData.php:1297
+#: include/classes/data/CItemData.php:1300
 msgid "Number of available DS paths, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - Datastore name, <partitionid> - internal id of physical device from vmware.hv.datastore.discovery"
 msgstr ""
 
-#: include/classes/data/CItemData.php:893
+#: include/classes/data/CItemData.php:896
 msgid "Number of currently open file descriptors. Returns integer"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1629
+#: include/classes/data/CItemData.php:1632
 msgid "Number of enabled items on the host."
 msgstr "Nombre d'éléments activés sur l'hôte."
 
-#: include/blocks.inc.php:536
+#: app/partials/administration.system.info.php:40
 msgid "Number of hosts (enabled/disabled)"
 msgstr ""
 
-#: include/blocks.inc.php:549
+#: app/partials/administration.system.info.php:55
 msgid "Number of items (enabled/disabled/not supported)"
 msgstr "Nombre d'éléments (activés/désactivés/non supportés)"
 
-#: include/classes/data/CItemData.php:1653
+#: include/classes/data/CItemData.php:1656
 msgid "Number of items in Zabbix database."
 msgstr "Nombre d'éléments dans la base de données Zabbix."
 
-#: include/classes/data/CItemData.php:1681
+#: include/classes/data/CItemData.php:1684
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr "Nombre d'éléments dans l'historique du proxy qui ne sont pas encore envoyés au serveur"
 
-#: include/classes/data/CItemData.php:1685
+#: include/classes/data/CItemData.php:1688
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
 msgstr "Nombre d'éléments dans la queue qui rencontrent un délai de from à to secondes, incluses."
 
-#: include/classes/data/CItemData.php:1597
-#: include/classes/data/CItemData.php:1697
+#: include/classes/data/CItemData.php:1600
+#: include/classes/data/CItemData.php:1700
 msgid "Number of items in the queue which are delayed in Zabbix server or proxy by \"from\" till \"to\" seconds, inclusive."
 msgstr "Nombre d'éléments de la file d'attente qui sont retardés sur le serveur Zabbix ou le proxy de \"from\" jusqu'à \"to\" en secondes, inclusif."
 
-#: include/classes/data/CItemData.php:1649
+#: include/classes/data/CItemData.php:1652
 msgid "Number of monitored hosts"
 msgstr "Nombre d'hôtes supervisés"
 
-#: include/classes/data/CItemData.php:929
+#: include/classes/data/CItemData.php:932
 msgid "Number of out-of-window collisions. Returns integer"
 msgstr "Nombre de collisions out-of-window. Retourne un entier"
 
@@ -12588,15 +12616,15 @@ msgstr "Nombre de problèmes"
 msgid "Number of problems and expand most critical one"
 msgstr "Nombre de problèmes et détailler le plus critique"
 
-#: include/classes/data/CItemData.php:1329
+#: include/classes/data/CItemData.php:1332
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Nombre de cœurs de processeur sur un hyperviseur VMware, <url> - URL du service VMware, <uuid> - nom d'hôte de l'hyperviseur VMware"
 
-#: include/classes/data/CItemData.php:1333
+#: include/classes/data/CItemData.php:1336
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Nombre de threads de processeur sur un hyperviseur VMware, <url> - URL du service VMware, <uuid> - nom d'hôte de l'hyperviseur VMware"
 
-#: include/classes/data/CItemData.php:1417
+#: include/classes/data/CItemData.php:1420
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Nombre de processeurs sur un hyperviseur VMware, <url> - URL du service VMware, <uuid> - nom d'hôte de l'hyperviseur VMware"
 
@@ -12613,67 +12641,67 @@ msgstr "Nombre de changements d'états"
 msgid "Number of steps"
 msgstr "Nombre d'étapes"
 
-#: include/blocks.inc.php:545
+#: app/partials/administration.system.info.php:50
 msgid "Number of templates"
 msgstr ""
 
-#: include/blocks.inc.php:560
+#: app/partials/administration.system.info.php:67
 msgid "Number of triggers (enabled/disabled [problem/ok])"
 msgstr "Nombre de déclencheurs (activés/désactivés [problème/ok])"
 
-#: include/classes/data/CItemData.php:1717
+#: include/classes/data/CItemData.php:1720
 msgid "Number of triggers in Zabbix database."
 msgstr "Nombre de déclencheurs dans la base de données Zabbix."
 
-#: include/classes/data/CItemData.php:1657
+#: include/classes/data/CItemData.php:1660
 msgid "Number of unsupported items in Zabbix database."
 msgstr "Nombre d'éléments non supportés dans la base de données Zabbix."
 
-#: include/classes/data/CItemData.php:1633
+#: include/classes/data/CItemData.php:1636
 msgid "Number of unsupported items on the host."
 msgstr "Nombre d'éléments non supportés sur l'hôte."
 
-#: include/blocks.inc.php:572
+#: app/partials/administration.system.info.php:84
 msgid "Number of users (online)"
 msgstr "Nombre d'utilisateurs (en ligne)"
 
-#: include/classes/data/CItemData.php:1133
+#: include/classes/data/CItemData.php:1136
 msgid "Number of users logged in. Returns integer"
 msgstr "Nombre d'utilisateurs connectés. Retourne un entier"
 
-#: include/classes/data/CItemData.php:1609
+#: include/classes/data/CItemData.php:1612
 msgid "Number of values stored in table HISTORY."
 msgstr "Nombre de valeurs stockées dans la table HISTORY."
 
-#: include/classes/data/CItemData.php:1613
+#: include/classes/data/CItemData.php:1616
 msgid "Number of values stored in table HISTORY_LOG."
 msgstr "Nombre de valeurs stockées dans la table HISTORY_LOG."
 
-#: include/classes/data/CItemData.php:1617
+#: include/classes/data/CItemData.php:1620
 msgid "Number of values stored in table HISTORY_STR."
 msgstr "Nombre de valeurs stockées dans la table HISTORY_STR."
 
-#: include/classes/data/CItemData.php:1621
+#: include/classes/data/CItemData.php:1624
 msgid "Number of values stored in table HISTORY_TEXT."
 msgstr "Nombre de valeurs stockées dans la table HISTORY_TEXT."
 
-#: include/classes/data/CItemData.php:1625
+#: include/classes/data/CItemData.php:1628
 msgid "Number of values stored in table HISTORY_UINT."
 msgstr "Nombre de valeurs stockées dans la table HISTORY_UINT."
 
-#: include/classes/data/CItemData.php:1709
+#: include/classes/data/CItemData.php:1712
 msgid "Number of values stored in table TRENDS."
 msgstr "Nombre de valeurs stockées dans la table TRENDS."
 
-#: include/classes/data/CItemData.php:1713
+#: include/classes/data/CItemData.php:1716
 msgid "Number of values stored in table TRENDS_UINT."
 msgstr "Nombre de valeurs stockées dans la table TRENDS_UINT."
 
-#: include/classes/data/CItemData.php:1401
+#: include/classes/data/CItemData.php:1404
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Nombre de machines virtuelles sur un hyperviseur VMware, <url> - URL du service VMware, <uuid> - nom d'hôte de l'hyperviseur VMware"
 
-#: include/classes/data/CItemData.php:1209
+#: include/classes/data/CItemData.php:1212
 msgid "Number or percentage of inodes. Returns integer for number; float for percentage"
 msgstr "Nombre ou pourcentage des i-nœuds. Retourne un entier pour le nombre, un flottant pour le pourcentage"
 
@@ -12782,7 +12810,7 @@ msgstr "Inactif"
 #: app/views/js/popup.massupdate.js.php:415
 #: app/views/js/popup.mediatypetest.edit.js.php:114
 #: app/views/js/popup.scriptexec.js.php:53
-#: app/views/js/reports.auditlog.list.js.php:157
+#: app/views/js/reports.auditlog.list.js.php:158
 #: app/views/monitoring.widget.web.view.php:30
 #: include/views/configuration.triggers.list.php:94
 #: include/views/js/common.item.edit.js.php:204
@@ -12840,7 +12868,7 @@ msgstr "Seules les vérifications d'agents Zabbix, SNMPv1, SNMPv2 et SNMPv3 peuv
 msgid "Only administrators can set map owner."
 msgstr "Seuls les administrateurs peuvent configurer le propriétaire de la carte."
 
-#: include/blocks.inc.php:550
+#: app/partials/administration.system.info.php:56
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "Seuls les éléments assignés à des hôtes activés sont comptés"
 
@@ -12887,7 +12915,7 @@ msgstr "Seul les super-admin peuvent spécifier le propriétaire d'un tableau de
 msgid "Only super admins can set report owner."
 msgstr ""
 
-#: include/blocks.inc.php:561
+#: app/partials/administration.system.info.php:68
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Seuls les déclencheurs assignés à des hôtes activés et dépendant d'éléments activés sont comptés"
 
@@ -12895,7 +12923,7 @@ msgstr "Seuls les déclencheurs assignés à des hôtes activés et dépendant d
 msgid "Opera"
 msgstr "Opera"
 
-#: include/classes/data/CItemData.php:1105
+#: include/classes/data/CItemData.php:1108
 msgid "Operating system information. Returns string"
 msgstr "Informations du système d'exploitation. Retourne une chaîne"
 
@@ -12924,7 +12952,7 @@ msgstr "L'opération n'a pas de groupe à exploiter."
 msgid "Operation has no template to operate."
 msgstr "L'opération n'a pas de modèle à exploiter."
 
-#: app/views/monitoring.widget.problems.view.php:64 include/blocks.inc.php:731
+#: app/views/monitoring.widget.problems.view.php:64 include/blocks.inc.php:579
 #: include/classes/screens/CScreenProblem.php:890
 #: include/classes/screens/CScreenProblem.php:1160 include/events.inc.php:184
 #: include/views/configuration.trigger.prototype.edit.php:84
@@ -13083,7 +13111,7 @@ msgstr "Autres paramètres"
 msgid "Others"
 msgstr "Autres"
 
-#: include/classes/data/CItemData.php:945
+#: include/classes/data/CItemData.php:948
 msgid "Outgoing traffic statistics on network interface. Returns integer"
 msgstr "Statistiques de trafic sortant sur une interface réseau. Retourne un entier"
 
@@ -13370,7 +13398,8 @@ msgctxt "page navigation"
 msgid "Pager"
 msgstr ""
 
-#: app/views/administration.mediatype.edit.php:103 include/blocks.inc.php:525
+#: app/partials/administration.system.info.php:30
+#: app/views/administration.mediatype.edit.php:103
 msgid "Parameter"
 msgstr "Paramètre"
 
@@ -13463,7 +13492,7 @@ msgstr "Passif"
 #: app/views/popup.massupdate.item.php:175
 #: app/views/popup.massupdate.item.php:199 disc_prototypes.php:218
 #: host_discovery.php:191 httpconf.php:74
-#: include/classes/setup/CSetupWizard.php:364
+#: include/classes/setup/CSetupWizard.php:527
 #: include/views/configuration.host.discovery.edit.php:413
 #: include/views/configuration.host.discovery.edit.php:554
 #: include/views/configuration.host.discovery.edit.php:593
@@ -13534,7 +13563,7 @@ msgstr "Suspendre les opérations des problèmes supprimés"
 msgid "Peak memory usage: %1$s"
 msgstr "Pic d'utilisation de la mémoire : %1$s"
 
-#: include/classes/data/CItemData.php:1413
+#: include/classes/data/CItemData.php:1416
 msgid "Percent of time the virtual machine is unable to run because it is contending for access to the physical CPU(s), <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
@@ -13542,11 +13571,11 @@ msgstr ""
 msgid "Percentage"
 msgstr "Pourcentage"
 
-#: include/classes/data/CItemData.php:1497
+#: include/classes/data/CItemData.php:1500
 msgid "Percentage of host physical memory that has been consumed, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1421
+#: include/classes/data/CItemData.php:1424
 msgid "Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance"
 msgstr ""
 
@@ -13558,7 +13587,7 @@ msgstr "Ligne de centile (gauche)"
 msgid "Percentile line (right)"
 msgstr "Ligne de centile (droite)"
 
-#: include/classes/data/CItemData.php:921
+#: include/classes/data/CItemData.php:924
 msgid "Performs a DNS query. Returns character string with the required type of information"
 msgstr "Réalise une requête DNS. Retourne une chaîne de caractères avec le type d'information requis"
 
@@ -13618,7 +13647,7 @@ msgid "Placing algorithm"
 msgstr "Algorithme de placement"
 
 #: app/views/administration.mediatype.edit.php:208
-#: include/classes/setup/CSetupWizard.php:330
+#: include/classes/setup/CSetupWizard.php:498
 #: include/classes/widgets/CWidgetConfig.php:56
 msgid "Plain text"
 msgstr "Texte brut"
@@ -13632,7 +13661,7 @@ msgstr "Jouer"
 msgid "Play sound"
 msgstr "Jouer un son"
 
-#: include/classes/setup/CSetupWizard.php:567
+#: include/classes/setup/CSetupWizard.php:741
 #, c-format
 msgid "Please check configuration parameters. If all is correct, press \"%1$s\" button, or \"%2$s\" button to change configuration parameters."
 msgstr "Veuillez vérifier les paramètres de configuration. Si tout est correct, appuyez sur le bouton \"%1$s\" ; sinon, le bouton \"%2$s\" pour changer les paramètres."
@@ -13645,18 +13674,14 @@ msgstr ""
 msgid "Please confirm that you want to remove all value mappings."
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:430
+#: include/classes/setup/CSetupWizard.php:589
 #, c-format
 msgid "Please create database manually, and set the configuration parameters for connection to this database. Press \"%1$s\" button when done."
 msgstr "Veiullez créer la base de données manuellement et configurer les paramètres de connexion. Appuyez sur le bouton \"%1$s\" quand c'est fait."
 
-#: include/classes/setup/CSetupWizard.php:888
+#: include/classes/setup/CSetupWizard.php:177
 msgid "Please enable \"allow_url_fopen\" directive."
 msgstr ""
-
-#: include/classes/setup/CSetupWizard.php:458
-msgid "Please enter the host name or host IP address and port number of the Zabbix server, as well as the name of the installation (optional)."
-msgstr "Veuillez renseigner le nom d'hôte ou l'adresse IP et le numéro de port du serveur Zabbix ainsi que le nom de l'installation (facultatif)."
 
 #: jsLoader.php:241
 msgid "Please select two elements"
@@ -13698,9 +13723,8 @@ msgstr "Remplit le champ d'inventaire d'hôte"
 #: app/views/administration.proxy.edit.php:49
 #: app/views/administration.script.edit.php:162
 #: app/views/configuration.host.list.php:118
-#: app/views/popup.itemtestedit.view.php:112
-#: include/classes/setup/CSetupWizard.php:445 include/hosts.inc.php:1228
-#: include/views/inventory.host.view.php:81 setup.php:62
+#: app/views/popup.itemtestedit.view.php:112 include/hosts.inc.php:1228
+#: include/views/inventory.host.view.php:81
 msgid "Port"
 msgstr "Port"
 
@@ -13728,7 +13752,7 @@ msgstr "Champs POST"
 msgid "Post type"
 msgstr "Type POST"
 
-#: include/classes/data/CItemData.php:1377
+#: include/classes/data/CItemData.php:1380
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
 msgstr ""
 
@@ -13736,8 +13760,8 @@ msgstr ""
 msgid "Power value"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:65
-#: include/classes/setup/CSetupWizard.php:565
+#: include/classes/setup/CSetupWizard.php:70
+#: include/classes/setup/CSetupWizard.php:739
 msgid "Pre-installation summary"
 msgstr "Résumé pré-installation"
 
@@ -13782,7 +13806,7 @@ msgid "Previous day"
 msgstr ""
 
 #: app/partials/scheduledreport.formgrid.html.php:88
-#: app/partials/scheduledreport.table.html.php:58 include/func.inc.php:2546
+#: app/partials/scheduledreport.table.html.php:58 include/func.inc.php:2403
 msgid "Previous month"
 msgstr "Mois précédent"
 
@@ -13796,12 +13820,12 @@ msgid "Previous value"
 msgstr "Valeur précédente"
 
 #: app/partials/scheduledreport.formgrid.html.php:87
-#: app/partials/scheduledreport.table.html.php:57 include/func.inc.php:2545
+#: app/partials/scheduledreport.table.html.php:57 include/func.inc.php:2402
 msgid "Previous week"
 msgstr "Semaine précédente"
 
 #: app/partials/scheduledreport.formgrid.html.php:89
-#: app/partials/scheduledreport.table.html.php:59 include/func.inc.php:2547
+#: app/partials/scheduledreport.table.html.php:59 include/func.inc.php:2404
 msgid "Previous year"
 msgstr "Année précédente"
 
@@ -13870,7 +13894,7 @@ msgstr "Niveau de privilège"
 #: app/views/monitoring.service.list.php:84
 #: app/views/monitoring.widget.problems.view.php:60
 #: app/views/popup.acknowledge.edit.php:33
-#: app/views/popup.mediatype.message.php:49 include/blocks.inc.php:730
+#: app/views/popup.mediatype.message.php:49 include/blocks.inc.php:578
 #: include/classes/helpers/CMediatypeHelper.php:48
 #: include/classes/screens/CScreenProblem.php:865
 #: include/classes/screens/CScreenProblem.php:888
@@ -13964,7 +13988,7 @@ msgstr "Problèmes"
 msgid "Problems by severity"
 msgstr "Problèmes par gravité"
 
-#: include/classes/data/CItemData.php:1005
+#: include/classes/data/CItemData.php:1008
 msgid "Process CPU utilization percentage. Returns float"
 msgstr ""
 
@@ -14010,7 +14034,7 @@ msgstr "L'URL fourni \"%1$s\" est invalide."
 msgid "Proxies"
 msgstr "Proxys"
 
-#: app/controllers/CControllerAuditLogList.php:232
+#: app/controllers/CControllerAuditLogList.php:233
 #: app/views/administration.proxy.edit.php:89
 #: app/views/administration.proxy.edit.php:142
 #: app/views/administration.queue.details.php:49
@@ -14204,7 +14228,7 @@ msgstr ""
 msgid "Read-write access to services with tag"
 msgstr ""
 
-#: include/classes/data/CItemData.php:913
+#: include/classes/data/CItemData.php:916
 msgid "Reads modbus data. Returns various types"
 msgstr ""
 
@@ -14306,7 +14330,7 @@ msgstr ""
 msgid "Regular"
 msgstr "Normal"
 
-#: app/controllers/CControllerAuditLogList.php:233
+#: app/controllers/CControllerAuditLogList.php:234
 #: app/views/popup.lldoverride.php:101 include/items.inc.php:1803
 #: include/views/configuration.host.discovery.edit.php:742
 msgid "Regular expression"
@@ -14636,7 +14660,7 @@ msgstr "Requête envoyée avec succès"
 msgid "Request type"
 msgstr "Type de requête"
 
-#: include/classes/setup/CSetupWizard.php:237
+#: include/classes/setup/CSetupWizard.php:409
 #: include/views/configuration.httpconf.edit.php:205
 msgid "Required"
 msgstr "Requis"
@@ -14649,11 +14673,11 @@ msgstr "Permissions d'hôte requses"
 msgid "Required performance (vps)"
 msgstr "Performance requise (vps)"
 
-#: include/classes/data/CItemData.php:1693
+#: include/classes/data/CItemData.php:1696
 msgid "Required performance of the Zabbix server, in new values per second expected."
 msgstr "Performance du serveur Zabbix requise, en nouvelles valeurs par seconde attendues."
 
-#: include/blocks.inc.php:576
+#: app/partials/administration.system.info.php:91
 msgid "Required server performance, new values per second"
 msgstr "Performance serveur requise, nouvelles valeurs par seconde"
 
@@ -14803,7 +14827,7 @@ msgstr ""
 msgid "Retrieve mode"
 msgstr "Mode de récupération"
 
-#: include/classes/data/CItemData.php:1161
+#: include/classes/data/CItemData.php:1164
 msgid "Retrieving contents of a file. Returns text"
 msgstr "Récupère le contenu d'un fichier. Retourne du texte"
 
@@ -14811,60 +14835,60 @@ msgstr "Récupère le contenu d'un fichier. Retourne du texte"
 msgid "Retry"
 msgstr "Réessayer"
 
-#: include/classes/data/CItemData.php:873
+#: include/classes/data/CItemData.php:876
 msgid "Return a JSON array with LLD macros describing the MBean objects or their attributes. Can be used for LLD."
 msgstr ""
 
-#: include/classes/data/CItemData.php:877
+#: include/classes/data/CItemData.php:880
 msgid "Return a JSON array with MBean objects or their attributes. Compared to jmx.discovery it does not define LLD macros. Can be used for LLD."
 msgstr ""
 
-#: include/classes/data/CItemData.php:849
+#: include/classes/data/CItemData.php:852
 msgid "Return first column of the first row of the SQL query result."
 msgstr "Retourne la première colonne de la première ligne du résultat d'une requête SQL."
 
-#: include/classes/data/CItemData.php:881
+#: include/classes/data/CItemData.php:884
 msgid "Return value of an attribute of MBean object."
 msgstr "Retourne la valeur d'un attribut d'un objet MBean."
 
-#: include/classes/data/CItemData.php:1181
+#: include/classes/data/CItemData.php:1184
 msgid "Returns 4-digit string containing octal number with Unix permissions"
 msgstr ""
 
-#: include/classes/data/CItemData.php:865
+#: include/classes/data/CItemData.php:868
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
 msgstr "Retourne le temps de réponse au ping ICMP en secondes. Exemple : 0.02"
 
-#: include/classes/data/CItemData.php:1645
+#: include/classes/data/CItemData.php:1648
 msgid "Returns a JSON array describing the host network interfaces configured in Zabbix. Can be used for LLD."
 msgstr ""
 
-#: include/classes/data/CItemData.php:1601
-#: include/classes/data/CItemData.php:1701
+#: include/classes/data/CItemData.php:1604
+#: include/classes/data/CItemData.php:1704
 msgid "Returns a JSON object containing Zabbix server or proxy internal metrics."
 msgstr "Retourne un objet JSON contenant les métriques internes du serveur Zabbix ou du proxy."
 
-#: include/classes/data/CItemData.php:1641
+#: include/classes/data/CItemData.php:1644
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx."
 msgstr "Retourne la disponibilité d'un type particulier de vérification sur l'hôte. La valeur correspond aux icônes de disponibilité dans la liste d'hôtes. Les types valides sont: agent, snmp, ipmi, jmx."
 
-#: include/classes/data/CItemData.php:1637
+#: include/classes/data/CItemData.php:1640
 msgid "Returns current maintenance status of the host."
 msgstr "Retourne l'état de maintenance actuel de l'hôte."
 
-#: include/classes/data/CItemData.php:1661
+#: include/classes/data/CItemData.php:1664
 msgid "Returns information associated with Zabbix Java gateway. Valid params are: ping, version."
 msgstr "Retourne les informations associées avec la passerelle Java de Zabbix. Les params valides sont : ping, version."
 
-#: include/classes/data/CItemData.php:969
+#: include/classes/data/CItemData.php:972
 msgid "Returns number of TCP sockets that match parameters. Returns integer"
 msgstr ""
 
-#: include/classes/data/CItemData.php:985
+#: include/classes/data/CItemData.php:988
 msgid "Returns number of UDP sockets that match parameters. Returns integer"
 msgstr ""
 
-#: include/classes/data/CItemData.php:861
+#: include/classes/data/CItemData.php:864
 msgid "Returns percentage of lost ICMP ping packets."
 msgstr "Retourne le pourcentage de paquets ICMP ping perdus."
 
@@ -14941,7 +14965,7 @@ msgstr ""
 msgid "Run script \"%1$s\" on hosts"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1093
+#: include/classes/data/CItemData.php:1096
 msgid "Run specified command on the host. Returns text result of the command; 1 - with mode as nowait (regardless of command result)"
 msgstr "Exécute la commande spécifiée sur l'hôte. Retourne le résultat textuel de la commande ; 1 - dans le mode nowait (indépendamment du résultat de la commande)"
 
@@ -15195,7 +15219,7 @@ msgstr ""
 msgid "Save changes"
 msgstr "Sauvegarder les modifications"
 
-#: include/classes/setup/CSetupWizard.php:685
+#: include/classes/setup/CSetupWizard.php:857
 #, c-format
 msgid "Save it as \"%1$s\""
 msgstr "L'enregistrer sous \"%1$s\""
@@ -15220,7 +15244,7 @@ msgstr "Planification"
 msgid "Scheduled check"
 msgstr "Vérification planifiée"
 
-#: app/controllers/CControllerAuditLogList.php:235
+#: app/controllers/CControllerAuditLogList.php:236
 #: app/views/reports.scheduledreport.edit.php:57
 msgid "Scheduled report"
 msgstr ""
@@ -15287,7 +15311,7 @@ msgctxt "selected problems"
 msgid "Scope"
 msgstr "Étendue"
 
-#: app/controllers/CControllerAuditLogList.php:236
+#: app/controllers/CControllerAuditLogList.php:237
 #: app/views/administration.mediatype.edit.php:217
 #: app/views/administration.script.edit.php:115
 #: app/views/administration.script.edit.php:185
@@ -15560,7 +15584,7 @@ msgstr "Serveur (proxy)"
 msgid "Server time"
 msgstr "Temps serveur"
 
-#: app/controllers/CControllerAuditLogList.php:224
+#: app/controllers/CControllerAuditLogList.php:225
 #: app/views/monitoring.service.list.edit.php:112
 #: app/views/popup.mediatype.message.php:58
 #: app/views/popup.service.edit.php:286 app/views/popup.service.edit.php:344
@@ -15683,7 +15707,7 @@ msgstr "Les services forment une dépendance circulaire."
 msgid "Services updated"
 msgstr ""
 
-#: include/classes/core/ZBase.php:241 include/classes/core/ZBase.php:468
+#: include/classes/core/ZBase.php:244 include/classes/core/ZBase.php:471
 msgid "Session initialization error."
 msgstr ""
 
@@ -15742,7 +15766,9 @@ msgstr "La définition du protocole LDAP a échoué."
 msgid "Setting LDAP referrals to \"Off\" failed."
 msgstr "La définition des références LDAP sur \"Off\" a échoué."
 
-#: app/controllers/CControllerAuditLogList.php:237
+#: app/controllers/CControllerAuditLogList.php:238
+#: include/classes/setup/CSetupWizard.php:66
+#: include/classes/setup/CSetupWizard.php:624
 msgid "Settings"
 msgstr ""
 
@@ -15831,6 +15857,7 @@ msgstr "Raccourci"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:108
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:180
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:252
+#: include/classes/widgets/forms/CWidgetFormSystemInfo.php:30
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:33
 #: include/views/js/monitoring.sysmaps.js.php:100 report2.php:546
 msgid "Show"
@@ -16040,7 +16067,7 @@ msgstr "Site - État / province"
 msgid "Size"
 msgstr "Taille"
 
-#: include/classes/server/CZabbixServer.php:514
+#: include/classes/server/CZabbixServer.php:530
 #, c-format
 msgid "Size of the response received from Zabbix server \"%1$s\" exceeds the allowed size of %2$s bytes. This value can be increased in the ZBX_SOCKET_BYTES_LIMIT constant in include/defines.inc.php."
 msgstr "La taille de la réponse reçue du serveur Zabbix \"%1$s\" dépasse la taille autorisée de %2$s octets. Cette valeur peut être augmentée dans la constante ZBX_SOCKET_BYTES_LIMIT dans include/defines.inc.php."
@@ -16086,7 +16113,7 @@ msgstr "Application logicielle D"
 msgid "Software application E"
 msgstr "Application logicielle E"
 
-#: include/classes/data/CItemData.php:1101
+#: include/classes/data/CItemData.php:1104
 msgid "Software architecture information. Returns string"
 msgstr "Information sur l'architecture logicielle. Retourne une chaîne"
 
@@ -16157,6 +16184,10 @@ msgstr "Escalier"
 msgid "Standard items"
 msgstr "Éléments standards"
 
+#: app/partials/administration.ha.nodes.php:45
+msgid "Standby"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:630
 #: app/controllers/CControllerPopupTriggerExpr.php:748
 msgid "Start"
@@ -16189,7 +16220,7 @@ msgstr ""
 msgid "Starting TLS failed."
 msgstr "Le démarrage de TLS a échoué."
 
-#: include/classes/data/CItemData.php:1605
+#: include/classes/data/CItemData.php:1608
 msgid "Startup time of Zabbix server, Unix timestamp."
 msgstr "Moment du démarrage du serveur Zabbix, timestamp Unix."
 
@@ -16207,13 +16238,14 @@ msgctxt "history source selection method"
 msgid "Static"
 msgstr "Statique"
 
-#: include/classes/data/CItemData.php:1741
+#: include/classes/data/CItemData.php:1744
 msgid "Statistics and availability of Zabbix write cache. Cache - one of values (modes: all, float, uint, str, log, text, not supported), history (modes: pfree, free, total, used, pused), index (modes: pfree, free, total, used, pused), trend (modes: pfree, free, total, used, pused)."
 msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:179
 #: app/controllers/CControllerPopupGeneric.php:193
 #: app/controllers/CControllerPopupGeneric.php:235
+#: app/partials/administration.ha.nodes.php:28
 #: app/partials/configuration.filter.items.php:184
 #: app/partials/monitoring.host.filter.php:125
 #: app/partials/monitoring.host.view.html.php:34
@@ -16370,6 +16402,10 @@ msgstr ""
 msgid "Stop slideshow"
 msgstr ""
 
+#: app/partials/administration.ha.nodes.php:40
+msgid "Stopped"
+msgstr ""
+
 #: app/views/popup.lldoperation.php:191 app/views/popup.lldoperation.php:212
 #: app/views/popup.massupdate.item.php:295
 #: app/views/popup.massupdate.item.php:311
@@ -16380,12 +16416,12 @@ msgstr ""
 msgid "Storage period"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:328
+#: include/classes/setup/CSetupWizard.php:496
 msgid "Store credentials in"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:500
-#: include/classes/setup/CSetupWizard.php:501
+#: include/classes/setup/CSetupWizard.php:642
+#: include/classes/setup/CSetupWizard.php:643
 msgid "Stored in HashiCorp Vault secret"
 msgstr ""
 
@@ -16451,7 +16487,7 @@ msgstr "Succès Audit"
 msgid "Success message"
 msgstr "Message de succès"
 
-#: include/classes/data/CItemData.php:949
+#: include/classes/data/CItemData.php:952
 msgid "Sum of incoming and outgoing traffic statistics on network interface. Returns integer"
 msgstr "Somme des statistiques de trafic entrant et sortant sur l'interface réseau. Retourne un entier"
 
@@ -16477,15 +16513,15 @@ msgstr "Support"
 msgid "Suppressed till: %1$s"
 msgstr "Supprimé jusqu'à: %1$s"
 
-#: include/classes/data/CItemData.php:1113
+#: include/classes/data/CItemData.php:1116
 msgid "Swap in (from device into memory) statistics. Returns integer"
 msgstr "Statistiques d'entrée de la swap (du périphérique à la mémoire). Retourne un entier"
 
-#: include/classes/data/CItemData.php:1117
+#: include/classes/data/CItemData.php:1120
 msgid "Swap out (from memory onto device) statistics. Returns integer"
 msgstr "Statistiques de sortie de la swap (de la mémoire au périphérique). Retourne un entier"
 
-#: include/classes/data/CItemData.php:1121
+#: include/classes/data/CItemData.php:1124
 msgid "Swap space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Taille de l'espace de swap en octets ou en pourcentage du total. Retourne un entier pour les octets ; un flottant pour le pourcentage"
 
@@ -16501,7 +16537,7 @@ msgstr "Changer de méthode d'authentification va réinitialiser toutes les sess
 msgid "System"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1041
+#: include/classes/data/CItemData.php:1044
 msgid "System boot time. Returns integer (Unix timestamp)"
 msgstr "Moment du démarrage du système. Retourne un entier (timestamp Unix)"
 
@@ -16520,26 +16556,30 @@ msgstr "Une erreur système est survenue. Merci de contacter un administrateur Z
 msgid "System error."
 msgstr "Erreur système."
 
-#: include/classes/data/CItemData.php:1069
+#: include/classes/data/CItemData.php:1072
 msgid "System host name. Returns string"
 msgstr "Nom d'hôte du système. Retourne une chaîne"
 
-#: app/controllers/CControllerReportStatus.php:39
-#: app/views/report.status.php:29 include/classes/helpers/CMenuHelper.php:103
+#: app/controllers/CControllerReportStatus.php:42
+#: app/views/report.status.php:30 include/classes/helpers/CMenuHelper.php:103
 #: include/classes/helpers/CRoleHelper.php:329
 #: include/classes/widgets/CWidgetConfig.php:61
 msgid "System information"
 msgstr "Information système"
 
-#: include/classes/data/CItemData.php:1097
+#: include/classes/data/CItemData.php:1100
 msgid "System statistics. Returns integer or float"
 msgstr "Statistiques du système. Retourne un entier ou un flottant"
 
-#: include/classes/data/CItemData.php:1089
+#: include/classes/widgets/forms/CWidgetFormSystemInfo.php:31
+msgid "System stats"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1092
 msgid "System time. Returns integer with type as UTC; string - with type as local"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1129
+#: include/classes/data/CItemData.php:1132
 msgid "System uptime in seconds. Returns integer"
 msgstr "Uptime du système en secondes. Retourne un entier"
 
@@ -16642,7 +16682,7 @@ msgstr "Valeur du tag"
 #: app/views/popup.massupdate.trigger.php:75
 #: app/views/popup.massupdate.trigger.php:150
 #: app/views/popup.service.edit.php:263 app/views/popup.service.edit.php:346
-#: include/blocks.inc.php:735 include/classes/screens/CScreenHttpTest.php:117
+#: include/blocks.inc.php:583 include/classes/screens/CScreenHttpTest.php:117
 #: include/classes/screens/CScreenProblem.php:839
 #: include/classes/screens/CScreenProblem.php:895
 #: include/classes/screens/CScreenProblem.php:1164
@@ -16698,7 +16738,7 @@ msgstr "Type de cible"
 msgid "Telnet"
 msgstr "Telnet"
 
-#: app/controllers/CControllerAuditLogList.php:238
+#: app/controllers/CControllerAuditLogList.php:239
 #: app/views/administration.mediatype.edit.php:280
 #: app/views/popup.massupdate.template.php:147 app/views/search.php:278
 #: include/actions.inc.php:49 include/forms.inc.php:529
@@ -16743,7 +16783,7 @@ msgstr ""
 msgid "Template cannot be linked to another template more than once even through other templates."
 msgstr "Un modèle ne peut pas être lié à un autre modèle plus d'une fois, même à travers d'autres modèles."
 
-#: app/controllers/CControllerAuditLogList.php:239
+#: app/controllers/CControllerAuditLogList.php:240
 msgid "Template dashboard"
 msgstr ""
 
@@ -16928,11 +16968,11 @@ msgstr "La méthode \"%1$s.%2$s\" doit être appelée sans le paramètre \"auth\
 msgid "The Zabbix database version does not match current requirements. Your database version: %1$s. Required version: %2$s. Please contact your system administrator."
 msgstr ""
 
-#: include/classes/data/CItemData.php:1533
+#: include/classes/data/CItemData.php:1536
 msgid "The average time a read from the virtual disk takes, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1537
+#: include/classes/data/CItemData.php:1540
 msgid "The average time a write to the virtual disk takes, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
 msgstr ""
 
@@ -16998,7 +17038,7 @@ msgstr "L'élément n'est plus découvert et sera supprimé dans %1$s (le %2$s �
 msgid "The item is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "L'élément n'est plus découvert et sera supprimé la prochaine fois que la règle de découverte est traitée."
 
-#: include/classes/data/CItemData.php:1013
+#: include/classes/data/CItemData.php:1016
 msgid "The number of processes. Returns integer"
 msgstr "Le nombre de processus. Retourne un entier"
 
@@ -17033,7 +17073,7 @@ msgstr ""
 msgid "Theme"
 msgstr "Thème"
 
-#: include/func.inc.php:2544
+#: include/func.inc.php:2401
 msgid "This day last week"
 msgstr "Ce jour la semaine dernière"
 
@@ -17046,11 +17086,11 @@ msgstr ""
 msgid "This is the test message from Zabbix"
 msgstr "Ceci est un message de test de Zabbix"
 
-#: include/func.inc.php:2552
+#: include/func.inc.php:2409
 msgid "This month"
 msgstr "Ce mois-ci"
 
-#: include/func.inc.php:2553
+#: include/func.inc.php:2410
 msgid "This month so far"
 msgstr "Ce mois-ci jusqu'à présent"
 
@@ -17059,19 +17099,19 @@ msgstr "Ce mois-ci jusqu'à présent"
 msgid "This type of information may not match the key."
 msgstr ""
 
-#: include/func.inc.php:2550
+#: include/func.inc.php:2407
 msgid "This week"
 msgstr "Cette semaine"
 
-#: include/func.inc.php:2551
+#: include/func.inc.php:2408
 msgid "This week so far"
 msgstr "Cette semaine jusqu'à présent"
 
-#: include/func.inc.php:2554
+#: include/func.inc.php:2411
 msgid "This year"
 msgstr "Cette année"
 
-#: include/func.inc.php:2555
+#: include/func.inc.php:2412
 msgid "This year so far"
 msgstr "Cette année jusqu'à présent"
 
@@ -17108,7 +17148,7 @@ msgstr "À"
 #: app/views/reports.auditlog.list.php:89 include/actions.inc.php:1700
 #: include/actions.inc.php:1754 include/actions.inc.php:1827
 #: include/actions.inc.php:1921 include/actions.inc.php:1976
-#: include/blocks.inc.php:710 include/classes/screens/CScreenProblem.php:816
+#: include/blocks.inc.php:558 include/classes/screens/CScreenProblem.php:816
 #: include/classes/screens/CScreenProblem.php:1155
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:31
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:32
@@ -17119,7 +17159,7 @@ msgstr "À"
 msgid "Time"
 msgstr "Temps"
 
-#: include/classes/data/CItemData.php:1673
+#: include/classes/data/CItemData.php:1676
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
 msgstr "Durée d'un processus Zabbix particulier ou d'un groupe de processus (identifié par <type> et <mode>) passé en pourcentage dans <state>."
 
@@ -17132,7 +17172,7 @@ msgstr ""
 msgid "Time filter default period"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1677
+#: include/classes/data/CItemData.php:1680
 msgid "Time of proxy last access. Name - proxy name. Valid params are: lastaccess - Unix timestamp, delay - seconds."
 msgstr ""
 
@@ -17193,11 +17233,11 @@ msgstr "À"
 msgid "To set a host interface select a single item type for all items"
 msgstr "Pour configurer une interface d'hôte, sélectionner un type d'élément pour tous les éléments"
 
-#: include/classes/screens/CScreenProblem.php:701 include/func.inc.php:2548
+#: include/classes/screens/CScreenProblem.php:701 include/func.inc.php:2405
 msgid "Today"
 msgstr "Aujourd'hui"
 
-#: include/func.inc.php:2549
+#: include/func.inc.php:2406
 msgid "Today so far"
 msgstr "Aujourd'hui jusqu'à présent"
 
@@ -17229,7 +17269,7 @@ msgstr "Temps total Elasticsearch: %1$s"
 msgid "Total SQL time: %1$s"
 msgstr "Temps SQL total : %1$s"
 
-#: include/classes/data/CItemData.php:1453
+#: include/classes/data/CItemData.php:1456
 msgid "Total time elapsed, in seconds, since last operating system boot-up, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
@@ -17250,11 +17290,11 @@ msgstr ""
 msgid "Transaction has not been closed. Aborting..."
 msgstr "La transaction n'a pas été fermée. Abandon..."
 
-#: include/classes/data/CItemData.php:841
+#: include/classes/data/CItemData.php:844
 msgid "Transform SQL query result into a JSON array for low-level discovery."
 msgstr ""
 
-#: include/classes/data/CItemData.php:845
+#: include/classes/data/CItemData.php:848
 msgid "Transform SQL query result into a JSON array."
 msgstr ""
 
@@ -17285,7 +17325,7 @@ msgctxt "missing data function"
 msgid "Treat as 0"
 msgstr "Traiter comme 0"
 
-#: include/classes/data/CItemData.php:1705
+#: include/classes/data/CItemData.php:1708
 msgid "Trend function cache statistics. Valid parameters are: all, hits, phits, misses, pmisses, items, pitems and requests."
 msgstr ""
 
@@ -17306,7 +17346,7 @@ msgstr "Période de stockage des tendances"
 msgid "Trends"
 msgstr "Tendances"
 
-#: app/controllers/CControllerAuditLogList.php:240
+#: app/controllers/CControllerAuditLogList.php:241
 #: app/controllers/CControllerPopupTriggerWizard.php:282
 #: app/views/popup.massupdate.trigger.php:149 include/actions.inc.php:46
 #: include/classes/graphdraw/CLineGraphDraw.php:472 include/events.inc.php:256
@@ -17412,7 +17452,7 @@ msgstr "Nom du déclencheur"
 msgid "Trigger overview"
 msgstr "Aperçu des déclencheurs"
 
-#: app/controllers/CControllerAuditLogList.php:241
+#: app/controllers/CControllerAuditLogList.php:242
 #: app/views/popup.lldoperation.php:52
 #: app/views/popup.massupdate.trigger.php:149
 #: include/views/configuration.trigger.prototype.edit.php:548
@@ -17716,11 +17756,11 @@ msgstr ""
 msgid "Ukrainian (uk_UA)"
 msgstr "Ukrainien (uk_UA)"
 
-#: include/classes/core/CConfigFile.php:249
+#: include/classes/core/CConfigFile.php:252
 msgid "Unable to change configuration file permissions to 0600."
 msgstr ""
 
-#: include/classes/core/CConfigFile.php:258
+#: include/classes/core/CConfigFile.php:261
 msgid "Unable to create the configuration file."
 msgstr "Impossible de créer le fichier de configuration."
 
@@ -17735,7 +17775,7 @@ msgstr ""
 msgid "Unable to load authentication API parameters."
 msgstr ""
 
-#: include/classes/core/CConfigFile.php:184
+#: include/classes/core/CConfigFile.php:187
 msgid "Unable to load database credentials from Vault."
 msgstr ""
 
@@ -17743,15 +17783,15 @@ msgstr ""
 msgid "Unable to load housekeeping API parameters."
 msgstr ""
 
-#: include/classes/helpers/CSettingsHelper.php:108
+#: include/classes/helpers/CSettingsHelper.php:109
 msgid "Unable to load settings API parameters."
 msgstr ""
 
-#: include/classes/core/CConfigFile.php:254
+#: include/classes/core/CConfigFile.php:257
 msgid "Unable to overwrite the existing configuration file."
 msgstr "Impossible d'écrire par-dessus le fichier de configuration existant."
 
-#: include/blocks.inc.php:638
+#: app/partials/administration.system.info.php:148
 msgid "Unable to retrieve database version."
 msgstr ""
 
@@ -17785,6 +17825,10 @@ msgstr "Evénements RÉSOLUS non acquitté"
 msgid "Unacknowledged only"
 msgstr "Non acquittés uniquement"
 
+#: app/partials/administration.ha.nodes.php:56
+msgid "Unavailable"
+msgstr ""
+
 #: app/views/administration.user.list.php:249
 msgid "Unblock"
 msgstr "Débloquer"
@@ -17793,7 +17837,7 @@ msgstr "Débloquer"
 msgid "Unblock selected users?"
 msgstr "Débloquer les utilisateurs sélectionnés ?"
 
-#: include/classes/core/ZBase.php:571
+#: include/classes/core/ZBase.php:574
 #, c-format
 msgid "Unexpected response for action %1$s."
 msgstr ""
@@ -18060,7 +18104,7 @@ msgstr "Opérations de mise à jour"
 msgid "Update problem"
 msgstr "Mise à jour du problème"
 
-#: app/controllers/CControllerAuditLogList.php:362
+#: app/controllers/CControllerAuditLogList.php:363
 #: app/controllers/CControllerPopupImportCompare.php:160
 msgid "Updated"
 msgstr ""
@@ -18084,7 +18128,7 @@ msgstr "Cartes de niveau supérieur"
 msgid "Uptime"
 msgstr "Temps de fonctionnement"
 
-#: include/classes/data/CItemData.php:1721
+#: include/classes/data/CItemData.php:1724
 msgid "Uptime of Zabbix server process in seconds."
 msgstr "Uptime du processus du serveur Zabbix en secondes."
 
@@ -18113,7 +18157,7 @@ msgstr ""
 msgid "Used in actions"
 msgstr "Utilisé dans les actions"
 
-#: app/controllers/CControllerAuditLogList.php:242
+#: app/controllers/CControllerAuditLogList.php:243
 #: app/partials/js/scheduledreport.subscription.js.php:78
 #: app/partials/popup.operations.php:105
 #: app/views/administration.token.edit.php:50
@@ -18122,7 +18166,7 @@ msgstr "Utilisé dans les actions"
 #: app/views/administration.user.edit.php:284
 #: app/views/reports.auditlog.list.php:90 httpconf.php:65
 #: include/actions.inc.php:1700 include/actions.inc.php:1754
-#: include/actions.inc.php:1976 include/classes/setup/CSetupWizard.php:358
+#: include/actions.inc.php:1976 include/classes/setup/CSetupWizard.php:522
 #: include/hosts.inc.php:61 include/users.inc.php:52
 #: include/views/configuration.httpconf.edit.php:165
 msgid "User"
@@ -18200,7 +18244,7 @@ msgid_plural "Users deleted"
 msgstr[0] "Utilisateur supprimé"
 msgstr[1] ""
 
-#: app/controllers/CControllerAuditLogList.php:243
+#: app/controllers/CControllerAuditLogList.php:244
 #: app/partials/js/scheduledreport.subscription.js.php:83
 #: app/partials/popup.operations.php:85
 #: app/views/administration.script.edit.php:241
@@ -18309,7 +18353,7 @@ msgstr "Mot de passe de l'utilisateur"
 msgid "User profile"
 msgstr "Profil utilisateur"
 
-#: app/controllers/CControllerAuditLogList.php:244
+#: app/controllers/CControllerAuditLogList.php:245
 #: app/views/administration.user.list.php:109
 #: app/views/administration.userrole.edit.php:385
 #: app/views/administration.userrole.edit.php:387
@@ -18417,8 +18461,8 @@ msgstr "Nom d'utilisateur"
 msgid "Username and password"
 msgstr "Nom d'utilisateur et mot de passe"
 
-#: include/classes/setup/CSetupWizard.php:600
-#: include/classes/setup/CSetupWizard.php:906
+#: include/classes/setup/CSetupWizard.php:194
+#: include/classes/setup/CSetupWizard.php:774
 msgid "Username and password must be stored in Vault secret keys \"username\" and \"password\"."
 msgstr ""
 
@@ -18444,240 +18488,240 @@ msgstr ""
 msgid "Users"
 msgstr "Utilisateurs"
 
-#: include/classes/data/CItemData.php:1737
+#: include/classes/data/CItemData.php:1740
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "statistiques du cache VMware. Les modes valides sont : total, free, pfree, used et pused."
 
-#: include/classes/data/CItemData.php:1225
+#: include/classes/data/CItemData.php:1228
 msgid "VMware cluster performance counter, <url> - VMware service URL, <id> - VMware cluster id, <path> - performance counter path, <instance> - performance counter instance"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1233
+#: include/classes/data/CItemData.php:1236
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
 msgstr "État du cluster VMware, <url> - URL du service VMware, <name> - Nom du cluster VMware"
 
-#: include/classes/data/CItemData.php:1257
+#: include/classes/data/CItemData.php:1260
 msgid "VMware datacenters and their IDs. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1249
-#: include/classes/data/CItemData.php:1305
+#: include/classes/data/CItemData.php:1252
+#: include/classes/data/CItemData.php:1308
 msgid "VMware datastore capacity statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Statistiques de capacité du datastore VMware en octets ou en pourcentage du total. Retourne un entier pour les octets ; un flottant pour le pourcentage"
 
-#: include/classes/data/CItemData.php:1241
+#: include/classes/data/CItemData.php:1244
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1245
+#: include/classes/data/CItemData.php:1248
 msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1253
+#: include/classes/data/CItemData.php:1256
 msgid "VMware datastore write statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1261
+#: include/classes/data/CItemData.php:1264
 msgid "VMware event log, <url> - VMware service URL, <mode> - all (default), skip - skip processing of older data"
 msgstr "Journal des événements VMware, <url> - URL du service VMware, <mode> - all (tout - par défaut), skip - ignorer le traitement des données plus anciennes"
 
-#: include/classes/data/CItemData.php:1345
+#: include/classes/data/CItemData.php:1348
 msgid "VMware hypervisor BIOS UUID, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1385
+#: include/classes/data/CItemData.php:1388
 msgid "VMware hypervisor HW vendor state sensors, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1357
+#: include/classes/data/CItemData.php:1360
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Taille de la mémoire \"balloon\" de l'hyperviseur VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de l'hyperviseur VMware"
 
-#: include/classes/data/CItemData.php:1269
+#: include/classes/data/CItemData.php:1272
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Nom du cluster de l'hyperviseur VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de l'hyperviseur VMware"
 
-#: include/classes/data/CItemData.php:1285
+#: include/classes/data/CItemData.php:1288
 msgid "VMware hypervisor datacenter name, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns string"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1301
+#: include/classes/data/CItemData.php:1304
 msgid "VMware hypervisor datastore read statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "Statistiques de lecture du datastore de l'hyperviseur VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de l'hyperviseur VMware, <datastore> - nom du datastore, <mode> - latence"
 
-#: include/classes/data/CItemData.php:1309
+#: include/classes/data/CItemData.php:1312
 msgid "VMware hypervisor datastore write statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "Statistiques d'écriture du datastore de l'hyperviseur VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de l'hyperviseur VMware, <datastore> - nom du datastore, <mode> - latence"
 
-#: include/classes/data/CItemData.php:1293
+#: include/classes/data/CItemData.php:1296
 msgid "VMware hypervisor datastores list, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1381
+#: include/classes/data/CItemData.php:1384
 msgid "VMware hypervisor health state rollup sensor, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1341
+#: include/classes/data/CItemData.php:1344
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Modèle de l'hyperviseur VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de l'hyperviseur VMware"
 
-#: include/classes/data/CItemData.php:1317
+#: include/classes/data/CItemData.php:1320
 msgid "VMware hypervisor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Nom de l'hyperviseur VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de l'hyperviseur VMware"
 
-#: include/classes/data/CItemData.php:1365
+#: include/classes/data/CItemData.php:1368
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "Statistiques d'entrée réseau de l'hyperviseur VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de l'hyperviseur VMware, <mode> - bps"
 
-#: include/classes/data/CItemData.php:1369
+#: include/classes/data/CItemData.php:1372
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "Statistiques de sortie réseau de l'hyperviseur VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de l'hyperviseur VMware, <mode> - bps"
 
-#: include/classes/data/CItemData.php:1373
+#: include/classes/data/CItemData.php:1376
 msgid "VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "Compteur de performance de l'hyperviseur VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de l'hyperviseur VMware, <path> - chemin du compteur de performance, <instance> - instance du compteur de performance"
 
-#: include/classes/data/CItemData.php:1321
+#: include/classes/data/CItemData.php:1324
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Fréquence du processeur de l'hyperviseur VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de l'hyperviseur VMware"
 
-#: include/classes/data/CItemData.php:1325
+#: include/classes/data/CItemData.php:1328
 msgid "VMware hypervisor processor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Modèle du processeur de l'hyperviseur VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de l'hyperviseur VMware"
 
-#: include/classes/data/CItemData.php:1277
+#: include/classes/data/CItemData.php:1280
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Utilisation du processeur de l'hyperviseur VMware en Hz, <url> - URL du service VMware, <uuid> - Nom d'hôte de l'hyperviseur VMware"
 
-#: include/classes/data/CItemData.php:1389
+#: include/classes/data/CItemData.php:1392
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "État de l'hyperviseur VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de l'hyperviseur VMware"
 
-#: include/classes/data/CItemData.php:1337
+#: include/classes/data/CItemData.php:1340
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Fréquence du processeur de l'hyperviseur VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de l'hyperviseur VMware"
 
-#: include/classes/data/CItemData.php:1393
+#: include/classes/data/CItemData.php:1396
 msgid "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Uptime de l'hyperviseur VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de l'hyperviseur VMware"
 
-#: include/classes/data/CItemData.php:1361
+#: include/classes/data/CItemData.php:1364
 msgid "VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Taille mémoire utilisée sur l'hyperviseur VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de l'hyperviseur VMware"
 
-#: include/classes/data/CItemData.php:1349
+#: include/classes/data/CItemData.php:1352
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "vendor name de l'hyperviseur VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de l'hyperviseur VMware"
 
-#: include/classes/data/CItemData.php:1397
+#: include/classes/data/CItemData.php:1400
 msgid "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Version de l'hyperviseur VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de l'hyperviseur VMware"
 
-#: include/classes/data/CItemData.php:1265
+#: include/classes/data/CItemData.php:1268
 msgid "VMware service full name, <url> - VMware service URL"
 msgstr "Nom complet du service VMware, <url> - URL du service VMware"
 
-#: include/classes/data/CItemData.php:1405
+#: include/classes/data/CItemData.php:1408
 msgid "VMware service version, <url> - VMware service URL"
 msgstr "Version du service VMware, <url> - URL du service VMware"
 
-#: include/classes/data/CItemData.php:1461
+#: include/classes/data/CItemData.php:1464
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Taille de la mémoire \"balloon\" d'une machine virtuelle VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de la machine virtuelle VMware"
 
-#: include/classes/data/CItemData.php:1525
+#: include/classes/data/CItemData.php:1528
 msgid "VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Espace de stockage utilisé d'une machine virtuelle VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de la machine virtuelle VMware"
 
-#: include/classes/data/CItemData.php:1465
+#: include/classes/data/CItemData.php:1468
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Taille de la mémoire compressée d'une machine virtuelle VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de la machine virtuelle VMware"
 
-#: include/classes/data/CItemData.php:1441
+#: include/classes/data/CItemData.php:1444
 msgid "VMware virtual machine datacenter name, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns string"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1561
+#: include/classes/data/CItemData.php:1564
 msgid "VMware virtual machine disk device read statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "Statistiques de lecture d'un disque d'une machine virtuelle VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de la machine virtuelle VMware, <instance> - instance du périphérique disque, <mode> - bps/ops - octets/opérations par seconde"
 
-#: include/classes/data/CItemData.php:1565
+#: include/classes/data/CItemData.php:1568
 msgid "VMware virtual machine disk device write statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "Statistiques d'écriture d'un disque d'une machine virtuelle VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de la machine virtuelle VMware, <instance> - instance du périphérique disque, <mode> - bps/ops - octets/opérations par seconde"
 
-#: include/classes/data/CItemData.php:1573
+#: include/classes/data/CItemData.php:1576
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
 msgstr "Statistiques d'un système de fichiers d'une machine virtuelle VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de la machine virtuelle VMware, <fsname> - nom du système de fichiers, <mode> - total/free/used/pfree/pused"
 
-#: include/classes/data/CItemData.php:1485
+#: include/classes/data/CItemData.php:1488
 msgid "VMware virtual machine guest memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Utilisation de la mémoire \"invité\" d'une machine virtuelle VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de la machine virtuelle VMware"
 
-#: include/classes/data/CItemData.php:1489
+#: include/classes/data/CItemData.php:1492
 msgid "VMware virtual machine host memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Utilisation de la mémoire \"hôte\" d'une machine virtuelle VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de la machine virtuelle VMware"
 
-#: include/classes/data/CItemData.php:1457
+#: include/classes/data/CItemData.php:1460
 msgid "VMware virtual machine hypervisor name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Nom de l'hyperviseur d'une machine virtuelle VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de la machine virtuelle VMware"
 
-#: include/classes/data/CItemData.php:1409
+#: include/classes/data/CItemData.php:1412
 msgid "VMware virtual machine name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Nom d'une machine virtuelle VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de la machine virtuelle VMware"
 
-#: include/classes/data/CItemData.php:1505
+#: include/classes/data/CItemData.php:1508
 msgid "VMware virtual machine network interface input statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "Statistiques d'entrée d'une interface réseau d'une machine virtuelle VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de la machine virtuelle VMware, <instance> - instance de l'interface réseau, <mode> - bps/ops - octets/operations par second"
 
-#: include/classes/data/CItemData.php:1509
+#: include/classes/data/CItemData.php:1512
 msgid "VMware virtual machine network interface output statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "Statistiques de sortie d'une interface réseau d'une machine virtuelle VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de la machine virtuelle VMware, <instance> - instance de l'interface réseau, <mode> - bps/ops - octets/operations par second"
 
-#: include/classes/data/CItemData.php:1517
+#: include/classes/data/CItemData.php:1520
 msgid "VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "Compteur de performance d'une machine virtuelle VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de la machine virtuelle VMware, <path> - chemin du compteur de performance, <instance> - instance du compteur de performance"
 
-#: include/classes/data/CItemData.php:1521
+#: include/classes/data/CItemData.php:1524
 msgid "VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "État de fonctionnement (allumée/éteinte) d'une machine virtuelle VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de la machine virtuelle VMware"
 
-#: include/classes/data/CItemData.php:1473
+#: include/classes/data/CItemData.php:1476
 msgid "VMware virtual machine private memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Taille de la mémoire privée d'une machine virtuelle VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de la machine virtuelle VMware"
 
-#: include/classes/data/CItemData.php:1425
+#: include/classes/data/CItemData.php:1428
 msgid "VMware virtual machine processor ready time ms, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Temps de disponibilité du processeur d'une machine virtuelle VMware en ms, <url> - URL du service VMware, <uuid> - Nom d'hôte de la machine virtuelle VMware"
 
-#: include/classes/data/CItemData.php:1437
+#: include/classes/data/CItemData.php:1440
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Utilisation du processeur d'une machine virtuelle VMware en Hz, <url> - URL du service VMware, <uuid> - Nom d'hôte de la machine virtuelle VMware"
 
-#: include/classes/data/CItemData.php:1477
+#: include/classes/data/CItemData.php:1480
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Taille de la mémoire partager d'une machine virtuelle VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de la machine virtuelle VMware"
 
-#: include/classes/data/CItemData.php:1481
+#: include/classes/data/CItemData.php:1484
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Taille de la mémoire swappée d'une machine virtuelle VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de la machine virtuelle VMware"
 
-#: include/classes/data/CItemData.php:1493
+#: include/classes/data/CItemData.php:1496
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Taille totale de la mémoire d'une machine virtuelle VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de la machine virtuelle VMware"
 
-#: include/classes/data/CItemData.php:1541
+#: include/classes/data/CItemData.php:1544
 msgid "VMware virtual machine uncommitted storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Espace de stockage inutilisé d'une machine virtuelle VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de la machine virtuelle VMware"
 
-#: include/classes/data/CItemData.php:1545
+#: include/classes/data/CItemData.php:1548
 msgid "VMware virtual machine unshared storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Espace de stockage non partagé d'une machine virtuelle VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de la machine virtuelle VMware"
 
-#: include/classes/data/CItemData.php:1553
+#: include/classes/data/CItemData.php:1556
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Uptime d'une machine virtuelle VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de la machine virtuelle VMware"
 
-#: include/classes/data/CItemData.php:1353
+#: include/classes/data/CItemData.php:1356
 msgid "VVMware hypervisor maintenance status, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns 0 - not in maintenance; 1 - in maintenance"
 msgstr ""
 
@@ -18702,6 +18746,7 @@ msgstr "Validation"
 #: app/controllers/CControllerPopupValueMapUpdate.php:117
 #: app/controllers/CControllerPopupValueMapUpdate.php:124
 #: app/controllers/CControllerPopupValueMapUpdate.php:136
+#: app/partials/administration.system.info.php:30
 #: app/partials/configuration.tags.tab.php:40
 #: app/partials/configuration.valuemap.php:32
 #: app/partials/hostmacros.list.html.php:36
@@ -18729,7 +18774,7 @@ msgstr "Validation"
 #: app/views/popup.massupdate.trigger.php:84
 #: app/views/popup.service.edit.php:65 app/views/popup.service.edit.php:271
 #: app/views/popup.testtriggerexpr.php:31 app/views/popup.valuemap.edit.php:51
-#: include/blocks.inc.php:525 include/classes/graphdraw/CPieGraphDraw.php:309
+#: include/classes/graphdraw/CPieGraphDraw.php:309
 #: include/classes/screens/CScreenHistory.php:279
 #: include/classes/screens/CScreenHistory.php:393
 #: include/views/configuration.host.discovery.edit.php:133
@@ -18774,11 +18819,11 @@ msgstr "La valeur \"%1$s\" est invalide pour le paramètre \"grid_show\". Les ch
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is %4$d characters."
 msgstr "La valeur \"%1$s\" est trop longue pour le champ \"%2$s\" - %3$d caractères. La longueur autorisée est de %4$d caractères."
 
-#: include/classes/data/CItemData.php:1729
+#: include/classes/data/CItemData.php:1732
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
 msgstr "Efficacité du cache de valeurs. Les paramètres valides sont : requests, hits et misses."
 
-#: include/classes/data/CItemData.php:1725
+#: include/classes/data/CItemData.php:1728
 msgid "Value cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "Statistiques du cache de valeurs. Les modes valides sont : total, free, pfree, used et pused."
 
@@ -18786,7 +18831,7 @@ msgstr "Statistiques du cache de valeurs. Les modes valides sont : total, free, 
 msgid "Value cannot be empty."
 msgstr ""
 
-#: app/controllers/CControllerAuditLogList.php:245
+#: app/controllers/CControllerAuditLogList.php:246
 msgid "Value map"
 msgstr "Table de correspondance"
 
@@ -18815,15 +18860,15 @@ msgstr "Table de correspondance"
 msgid "Value mappings"
 msgstr "Tables de correspondance"
 
-#: include/classes/data/CItemData.php:917
+#: include/classes/data/CItemData.php:920
 msgid "Value of MQTT topic. Format of returned data depends on the topic content. If wildcards are used, returns topic values in JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:993
+#: include/classes/data/CItemData.php:996
 msgid "Value of any Windows performance counter in English. Returns integer, float, string or text (depending on the request)"
 msgstr ""
 
-#: include/classes/data/CItemData.php:989
+#: include/classes/data/CItemData.php:992
 msgid "Value of any Windows performance counter. Returns integer, float, string or text (depending on the request)"
 msgstr "Valeur de n'importe quel compteur de performances Windows. Retourne un entier, un flottant une chaîne ou un texte (selon la requête)"
 
@@ -18864,22 +18909,22 @@ msgstr "Des valeurs sans nom ne sont pas autorisées dans les champs de formulai
 msgid "Variables"
 msgstr "Variables"
 
-#: include/classes/data/CItemData.php:1017
+#: include/classes/data/CItemData.php:1020
 msgid "Various information about specific process(es). Returns float"
 msgstr "Diverses informations sur le(s) processus spécifique(s). Retourne un nombre flottant"
 
-#: include/classes/setup/CSetupWizard.php:335
-#: include/classes/setup/CSetupWizard.php:519
+#: include/classes/setup/CSetupWizard.php:502
+#: include/classes/setup/CSetupWizard.php:682
 msgid "Vault API endpoint"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:350
-#: include/classes/setup/CSetupWizard.php:525
+#: include/classes/setup/CSetupWizard.php:515
+#: include/classes/setup/CSetupWizard.php:690
 msgid "Vault authentication token"
 msgstr ""
 
-#: include/classes/core/ZBase.php:228
-#: include/classes/setup/CSetupWizard.php:902 include/config.inc.php:53
+#: include/classes/core/ZBase.php:231
+#: include/classes/setup/CSetupWizard.php:191 include/config.inc.php:53
 msgid "Vault connection failed."
 msgstr ""
 
@@ -18887,8 +18932,8 @@ msgstr ""
 msgid "Vault secret"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:342
-#: include/classes/setup/CSetupWizard.php:522
+#: include/classes/setup/CSetupWizard.php:508
+#: include/classes/setup/CSetupWizard.php:686
 msgid "Vault secret path"
 msgstr ""
 
@@ -18900,7 +18945,7 @@ msgstr "Fabricant"
 msgid "Verbose"
 msgstr "Verbeux"
 
-#: include/classes/setup/CSetupWizard.php:382
+#: include/classes/setup/CSetupWizard.php:546
 msgid "Verify database certificate"
 msgstr ""
 
@@ -18909,11 +18954,11 @@ msgstr ""
 msgid "Version"
 msgstr ""
 
-#: include/classes/data/CItemData.php:837
+#: include/classes/data/CItemData.php:840
 msgid "Version of Zabbix agent. Returns string"
 msgstr "Version de l'agent Zabbix. Retourne une chaîne"
 
-#: include/classes/data/CItemData.php:1733
+#: include/classes/data/CItemData.php:1736
 msgid "Version of Zabbix server or proxy"
 msgstr ""
 
@@ -18942,7 +18987,7 @@ msgstr ""
 msgid "View as"
 msgstr "Afficher comme"
 
-#: include/classes/data/CItemData.php:1221
+#: include/classes/data/CItemData.php:1224
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Taille de l'espace virtuel en octets ou en pourcentage du toutal. Retourne un entier pour les octets; un flottant pour les pourcentages"
 
@@ -18975,7 +19020,7 @@ msgstr "M"
 msgid "Warning"
 msgstr "Avertissement"
 
-#: include/classes/setup/CSetupWizard.php:249
+#: include/classes/setup/CSetupWizard.php:421
 msgctxt "setup"
 msgid "Warning"
 msgstr "Avertissement"
@@ -18984,7 +19029,7 @@ msgstr "Avertissement"
 msgid "Warning message"
 msgstr ""
 
-#: include/blocks.inc.php:649
+#: app/partials/administration.system.info.php:159
 #, c-format
 msgid "Warning! Unsupported %1$s database server version. Should be at least (%2$s)"
 msgstr ""
@@ -19017,7 +19062,7 @@ msgstr "Web"
 msgid "Web monitoring"
 msgstr "Supervision Web"
 
-#: app/controllers/CControllerAuditLogList.php:234
+#: app/controllers/CControllerAuditLogList.php:235
 msgid "Web scenario"
 msgstr "Scénario web"
 
@@ -19089,11 +19134,11 @@ msgstr "Hebdomadaire"
 msgid "Weight"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:45
+#: include/classes/setup/CSetupWizard.php:54
 msgid "Welcome"
 msgstr "Bienvenue"
 
-#: include/classes/setup/CSetupWizard.php:181
+#: include/classes/setup/CSetupWizard.php:353
 msgid "Welcome to"
 msgstr "Bienvenue dans"
 
@@ -19359,6 +19404,7 @@ msgstr "Année"
 msgid "Yearly"
 msgstr "Annuel"
 
+#: app/partials/administration.system.info.php:35
 #: app/partials/configuration.filter.items.php:194
 #: app/partials/configuration.filter.items.php:201
 #: app/partials/configuration.filter.items.php:210
@@ -19372,8 +19418,8 @@ msgstr "Annuel"
 #: app/views/popup.massupdate.item.php:336
 #: app/views/popup.massupdate.item.php:378
 #: app/views/popup.massupdate.trigger.php:65 include/actions.inc.php:32
-#: include/blocks.inc.php:532 include/blocks.inc.php:855
-#: include/blocks.inc.php:859 include/classes/screens/CScreenProblem.php:1099
+#: include/blocks.inc.php:703 include/blocks.inc.php:707
+#: include/classes/screens/CScreenProblem.php:1099
 #: include/classes/screens/CScreenProblem.php:1103
 #: include/classes/screens/CScreenProblem.php:1245 include/events.inc.php:198
 #: include/events.inc.php:202 include/events.inc.php:392
@@ -19394,7 +19440,7 @@ msgstr "Annuel"
 msgid "Yes"
 msgstr "Oui"
 
-#: include/classes/screens/CScreenProblem.php:709 include/func.inc.php:2542
+#: include/classes/screens/CScreenProblem.php:709 include/func.inc.php:2399
 msgid "Yesterday"
 msgstr "Hier"
 
@@ -19405,7 +19451,7 @@ msgstr "Vous êtes connecté en tant que \"%1$s\"."
 
 #: app/views/administration.gui.edit.php:66
 #: app/views/administration.user.edit.php:233
-#: include/classes/setup/CSetupWizard.php:219
+#: include/classes/setup/CSetupWizard.php:391
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "Certaines langues ne peuvent pas être choisi, car elles ne sont pas toutes installées sur le serveur web."
 
@@ -19423,6 +19469,7 @@ msgid "You did not specify targets for action operation global script \"%1$s\"."
 msgstr ""
 
 #: include/classes/api/services/CAuditLog.php:73
+#: include/classes/api/services/CHaNode.php:45
 #: include/classes/api/services/CHost.php:848
 #: include/classes/api/services/CHost.php:913
 #: include/classes/api/services/CMaintenance.php:535
@@ -19499,11 +19546,10 @@ msgid "Zabbix login form"
 msgstr "Formulaire de connexion Zabbix"
 
 #: app/views/administration.script.edit.php:125
-#: include/classes/setup/CSetupWizard.php:556
 msgid "Zabbix server"
 msgstr "Serveur Zabbix"
 
-#: include/classes/server/CZabbixServer.php:584
+#: include/classes/server/CZabbixServer.php:600
 #, c-format
 msgid ""
 "Zabbix server \"%1$s\" cannot be reached. Possible reasons:\n"
@@ -19515,26 +19561,18 @@ msgstr ""
 msgid "Zabbix server (proxy)"
 msgstr "Serveur Zabbix (proxy)"
 
-#: include/classes/setup/CSetupWizard.php:57
-#: include/classes/setup/CSetupWizard.php:456
-msgid "Zabbix server details"
-msgstr "Détails du serveur Zabbix"
-
-#: jsrpc.php:82
+#: jsrpc.php:91
 msgid "Zabbix server is not running: the information displayed may not be current."
 msgstr "Le serveur Zabbix ne fonctionne pas : les informations affichées peuvent ne pas être actuelles."
 
-#: include/blocks.inc.php:531
+#: app/partials/administration.system.info.php:34
 msgid "Zabbix server is running"
 msgstr "Le serveur Zabbix est en cours d'exécution"
 
-#: include/classes/setup/CSetupWizard.php:560
+#: include/classes/setup/CSetupWizard.php:602
+#: include/classes/setup/CSetupWizard.php:733
 msgid "Zabbix server name"
 msgstr "Nom du serveur Zabbix"
-
-#: include/classes/setup/CSetupWizard.php:557
-msgid "Zabbix server port"
-msgstr "Port du serveur Zabbix"
 
 #: include/items.inc.php:92
 msgid "Zabbix trapper"
@@ -20126,7 +20164,7 @@ msgstr "jours"
 #: app/controllers/CControllerMapView.php:123
 #: app/partials/js/configuration.valuemap.js.php:156
 #: app/views/popup.generic.php:599 app/views/popup.valuemap.edit.php:83
-#: include/classes/setup/CSetupWizard.php:497
+#: include/classes/setup/CSetupWizard.php:639
 #: include/classes/widgets/CWidgetHelper.php:69
 msgid "default"
 msgstr "défaut"
@@ -20921,7 +20959,7 @@ msgstr "autre"
 msgid "output"
 msgstr "sortie"
 
-#: include/classes/setup/CSetupWizard.php:344
+#: include/classes/setup/CSetupWizard.php:510
 msgid "path/to/secret"
 msgstr ""
 
