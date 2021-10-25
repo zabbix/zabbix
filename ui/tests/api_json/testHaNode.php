@@ -31,7 +31,7 @@ class testHaNode extends CAPITest {
 		return [
 			'No params' => [
 				'request' => [],
-				'expected_error' => null,
+				'expected_error' => null
 			],
 			'Too short ha_nodeid' => [
 				'request' => [
@@ -47,7 +47,7 @@ class testHaNode extends CAPITest {
 			],
 			'Empty ha_nodeids' => [
 				'request' => [
-					'ha_nodeids' => '',
+					'ha_nodeids' => ''
 				],
 				'expected_error' => 'Invalid parameter "/ha_nodeids": an array is expected.'
 			],
@@ -110,7 +110,7 @@ class testHaNode extends CAPITest {
 			'Multiple nodes by address' => [
 				'request' => [
 					'filter' => [
-						'address' => ['192.168.1.9', '192.168.1.10',]
+						'address' => ['192.168.1.9', '192.168.1.10']
 					]
 				],
 				'expected_error' => null
@@ -126,7 +126,7 @@ class testHaNode extends CAPITest {
 			'Multiple nodes by name' => [
 				'request' => [
 					'filter' => [
-						'name' => ['node1', 'node3',]
+						'name' => ['node1', 'node3']
 					]
 				],
 				'expected_error' => null
@@ -250,7 +250,7 @@ class testHaNode extends CAPITest {
 					'countOutput' => false
 				],
 				'expected_error' => null
-			],
+			]
 		];
 	}
 
@@ -309,7 +309,7 @@ class testHaNode extends CAPITest {
 					'countOutput' => true
 				],
 				'expected_result' => 3
-			],
+			]
 
 		];
 	}

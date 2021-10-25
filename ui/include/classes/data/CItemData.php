@@ -362,7 +362,7 @@ final class CItemData {
 		],
 		ITEM_TYPE_IPMI => [
 			'ipmi.get'
-		],
+		]
 	];
 
 	/**

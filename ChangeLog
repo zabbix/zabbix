@@ -1,6 +1,7 @@
 Changes for 6.0.0alpha5
 
 New features:
+A.FG...PS. [ZBXNEXT-6923,ZBXNEXT-6928] added High availability cluster support (ashubin, jfreibergs, vso, wiper)
 ..F....... [ZBXNEXT-6896] added automatic Item type suggestion (ashubin, jfreibergs)
 ..F....... [ZBXNEXT-7004] implemented service cloning (averza)
 A......... [ZBXNEXT-6470,ZBXNEXT-6951] implemented audit logging of services API object (averza)

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-22 19:56+0300\n"
+"POT-Creation-Date: 2021-10-25 12:27+0300\n"
 "PO-Revision-Date: 2021-03-19 18:15+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -146,7 +146,7 @@ msgid "%1$s host in maintenance"
 msgid_plural "%1$s hosts in maintenance"
 msgstr[0] ""
 
-#: include/func.inc.php:2625
+#: include/func.inc.php:2482
 #, c-format
 msgid "%1$s hour"
 msgid_plural "%1$s hours"
@@ -170,7 +170,7 @@ msgstr[0] "%1$s tin nhắn "
 #: include/classes/widgets/CWidgetConfig.php:285
 #: include/classes/widgets/CWidgetConfig.php:286
 #: include/classes/widgets/CWidgetConfig.php:287
-#: include/classes/widgets/CWidgetConfig.php:288 include/func.inc.php:2631
+#: include/classes/widgets/CWidgetConfig.php:288 include/func.inc.php:2488
 #: jsLoader.php:150 jsLoader.php:151 jsLoader.php:152 jsLoader.php:153
 #, c-format
 msgid "%1$s minute"
@@ -212,7 +212,7 @@ msgstr[0] "%1$s thử lại "
 
 #: app/views/administration.user.edit.php:671
 #: include/classes/widgets/CWidgetConfig.php:283
-#: include/classes/widgets/CWidgetConfig.php:284 include/func.inc.php:2638
+#: include/classes/widgets/CWidgetConfig.php:284 include/func.inc.php:2495
 #: jsLoader.php:148 jsLoader.php:149
 #, c-format
 msgid "%1$s second"
@@ -287,7 +287,7 @@ msgstr "(chỉ có nhóm super admins mới có thể tạo nhóm)"
 msgid "(no proxy)"
 msgstr "(không proxy)"
 
-#: include/classes/setup/CSetupWizard.php:311
+#: include/classes/setup/CSetupWizard.php:480
 msgid "0 - use default port"
 msgstr "0 - Cổng sử dụng mặc định"
 
@@ -465,7 +465,7 @@ msgstr ""
 
 #: app/views/hintbox.eventlist.php:76
 #: app/views/monitoring.widget.problems.view.php:66
-#: include/actions.inc.php:161 include/blocks.inc.php:733
+#: include/actions.inc.php:161 include/blocks.inc.php:581
 #: include/classes/screens/CScreenProblem.php:868
 #: include/classes/screens/CScreenProblem.php:893
 #: include/classes/screens/CScreenProblem.php:1162 include/events.inc.php:290
@@ -588,7 +588,7 @@ msgstr ""
 msgid "Action added"
 msgstr "Action được thêm vào"
 
-#: include/classes/core/ZBase.php:497
+#: include/classes/core/ZBase.php:500
 #, c-format
 msgid "Action class %1$s must extend %2$s class."
 msgstr ""
@@ -627,7 +627,7 @@ msgstr "Hành động đã cập nhật"
 #: app/views/administration.mediatype.edit.php:281
 #: app/views/configuration.discovery.edit.php:78
 #: app/views/monitoring.dashboard.view.php:114
-#: app/views/monitoring.widget.problems.view.php:67 include/blocks.inc.php:734
+#: app/views/monitoring.widget.problems.view.php:67 include/blocks.inc.php:582
 #: include/classes/helpers/CMenuHelper.php:168
 #: include/classes/helpers/CRoleHelper.php:361
 #: include/classes/screens/CScreenProblem.php:869
@@ -641,6 +641,7 @@ msgstr "Hành động đã cập nhật"
 msgid "Actions"
 msgstr "Hành động"
 
+#: app/partials/administration.ha.nodes.php:50
 #: app/views/administration.proxy.edit.php:72
 #: app/views/administration.proxy.list.php:54
 #: app/views/administration.proxy.list.php:163
@@ -919,7 +920,7 @@ msgstr ""
 msgid "Add widget"
 msgstr "Thêm ô điều khiển"
 
-#: app/controllers/CControllerAuditLogList.php:354
+#: app/controllers/CControllerAuditLogList.php:355
 #: app/controllers/CControllerPopupImportCompare.php:161
 msgid "Added"
 msgstr ""
@@ -936,6 +937,10 @@ msgstr ""
 
 #: app/views/popup.service.edit.php:161
 msgid "Additional rules"
+msgstr ""
+
+#: app/partials/administration.ha.nodes.php:28
+msgid "Address"
 msgstr ""
 
 #: include/hosts.inc.php:63 include/users.inc.php:53
@@ -969,7 +974,7 @@ msgstr "Thời gian ít hơn"
 msgid "Agent"
 msgstr "Agent"
 
-#: include/classes/data/CItemData.php:833
+#: include/classes/data/CItemData.php:836
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
 msgstr "Kiểm tra tính sẵn sàng của agent. Trả về 0 - không sẵn sàng; 1 - sẵn sàng"
 
@@ -977,11 +982,11 @@ msgstr "Kiểm tra tính sẵn sàng của agent. Trả về 0 - không sẵn s�
 msgid "Agent encryption"
 msgstr "Mã hóa agent"
 
-#: include/classes/data/CItemData.php:825
+#: include/classes/data/CItemData.php:828
 msgid "Agent host metadata. Returns string"
 msgstr ""
 
-#: include/classes/data/CItemData.php:829
+#: include/classes/data/CItemData.php:832
 msgid "Agent host name. Returns string"
 msgstr "Tên máy chủ agent. Trả về kiểu string"
 
@@ -1101,15 +1106,15 @@ msgstr "Những host được phép"
 msgid "Allowed methods"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:682
+#: include/classes/setup/CSetupWizard.php:854
 msgid "Alternatively, you can install it manually:"
 msgstr "Xen kẽ, bạn có thể cài đặt chúng bằng tay:"
 
-#: include/classes/data/CItemData.php:1449
+#: include/classes/data/CItemData.php:1452
 msgid "Amount of guest physical memory that is swapped out to the swap space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1469
+#: include/classes/data/CItemData.php:1472
 msgid "Amount of host physical memory consumed for backing up guest physical memory pages, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
@@ -1523,11 +1528,11 @@ msgstr "Sẵn sàng"
 msgid "Average"
 msgstr "Trung bình"
 
-#: include/classes/data/CItemData.php:1529
+#: include/classes/data/CItemData.php:1532
 msgid "Average number of outstanding read requests to the virtual disk during the collection interval , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1549
+#: include/classes/data/CItemData.php:1552
 msgid "Average number of outstanding write requests to the virtual disk during the collection interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
 msgstr ""
 
@@ -1539,8 +1544,8 @@ msgstr ""
 msgid "Axes"
 msgstr "Trục"
 
-#: include/classes/setup/CSetupWizard.php:148
-#: include/classes/setup/CSetupWizard.php:567
+#: include/classes/setup/CSetupWizard.php:322
+#: include/classes/setup/CSetupWizard.php:741
 msgid "Back"
 msgstr "Quay lại"
 
@@ -1598,7 +1603,7 @@ msgstr ""
 msgid "Blocked"
 msgstr "Bị khóa"
 
-#: include/classes/core/ZBase.php:355
+#: include/classes/core/ZBase.php:358
 msgid "Blue"
 msgstr "Xanh da trời"
 
@@ -1688,31 +1693,31 @@ msgstr "CERT"
 msgid "CLOSING"
 msgstr "ĐÓNG"
 
-#: include/classes/data/CItemData.php:1077
+#: include/classes/data/CItemData.php:1080
 msgid "CPU information. Returns string or integer"
 msgstr "Thông tin SPU. Trả về kiểu string hoặc integer"
 
-#: include/classes/data/CItemData.php:1053
+#: include/classes/data/CItemData.php:1056
 msgid "CPU load. Returns float"
 msgstr "CPU load. Trả về kiều float"
 
-#: include/classes/data/CItemData.php:1429
+#: include/classes/data/CItemData.php:1432
 msgid "CPU time spent waiting for swap-in, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1281
+#: include/classes/data/CItemData.php:1284
 msgid "CPU usage as a percentage during the interval depends on power management or HT, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1273
+#: include/classes/data/CItemData.php:1276
 msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1433
+#: include/classes/data/CItemData.php:1436
 msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1065
+#: include/classes/data/CItemData.php:1068
 msgid "CPU utilization percentage. Returns float"
 msgstr ""
 
@@ -1773,7 +1778,7 @@ msgstr "Gọi lại"
 #: app/views/monitoring.dashboard.view.php:141
 #: app/views/popup.import.compare.php:162
 #: include/classes/html/CButtonCancel.php:25
-#: include/classes/setup/CSetupWizard.php:130 jsLoader.php:177
+#: include/classes/setup/CSetupWizard.php:310 jsLoader.php:177
 #: jsLoader.php:187 jsLoader.php:301 jsLoader.php:373
 msgid "Cancel"
 msgstr "Hủy bỏ"
@@ -2001,7 +2006,7 @@ msgstr "Không thể đóng lại vấn đề: %1$s."
 msgid "Cannot connect to LDAP server."
 msgstr "Không thể kết nối đến máy chủ LDAP."
 
-#: include/classes/setup/CSetupWizard.php:420
+#: include/classes/setup/CSetupWizard.php:579
 msgid "Cannot connect to the database."
 msgstr "Không thể kết nối đến cơ sở dữ liệu."
 
@@ -2070,7 +2075,7 @@ msgstr ""
 msgid "Cannot create service \"%1$s\": %2$s."
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:678
+#: include/classes/setup/CSetupWizard.php:850
 msgid "Cannot create the configuration file."
 msgstr "Không thể tạo tập tin cấu hình."
 
@@ -2650,7 +2655,7 @@ msgid "Cannot link template."
 msgstr "Không thể kết nối mẫu"
 
 #: app/controllers/CControllerModuleEdit.php:106
-#: include/classes/core/ZBase.php:665
+#: include/classes/core/ZBase.php:668
 #, c-format
 msgid "Cannot load module at: %1$s."
 msgid_plural "Cannot load modules at: %1$s."
@@ -2713,7 +2718,7 @@ msgstr "Không thể đọc XML: %1$s."
 msgid "Cannot read YAML: %1$s."
 msgstr ""
 
-#: include/classes/server/CZabbixServer.php:527
+#: include/classes/server/CZabbixServer.php:543
 #, c-format
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
 msgstr "Không thể đọc các câu trả lời, kiểm tra kết nối với zabbix server \"%1$s\"."
@@ -2732,7 +2737,7 @@ msgstr "Không thể lưu các quy tắc phát hiện với các kiểm 
 msgid "Cannot save widget \"%1$s\"."
 msgstr "Không thể lưu ô điều khiển \"%1$s\"."
 
-#: include/classes/server/CZabbixServer.php:468
+#: include/classes/server/CZabbixServer.php:484
 #, c-format
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr "Không thể gửi lệnh, kiểm tra kết nối đến zabbix server \"%1$s\"."
@@ -3144,11 +3149,11 @@ msgstr ""
 msgid "Catalan (ca_ES)"
 msgstr "Catalan (ca_ES)"
 
-#: include/classes/data/CItemData.php:1037
+#: include/classes/data/CItemData.php:1040
 msgid "Catches all SNMP traps that match regex. If regexp is unspecified, catches any trap."
 msgstr "Chọn tất cả các trap SNMP phù hợp với regex. Nếu regrexp không được chỉ định, chọn bất kỳ trap nào."
 
-#: include/classes/data/CItemData.php:1033
+#: include/classes/data/CItemData.php:1036
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
 msgstr "Chọn tất cả các trap SNMP không bị chọn bởi bất kỳ item snmptrap [] nào."
 
@@ -3234,7 +3239,7 @@ msgstr ""
 msgid "Chassis"
 msgstr "Chassis"
 
-#: include/classes/data/CItemData.php:1073
+#: include/classes/data/CItemData.php:1076
 msgid "Chassis information. Returns string"
 msgstr "Thông tin Chassis. Trả về kiểu string"
 
@@ -3263,8 +3268,8 @@ msgstr ""
 msgid "Check for not supported value"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:49
-#: include/classes/setup/CSetupWizard.php:279
+#: include/classes/setup/CSetupWizard.php:58
+#: include/classes/setup/CSetupWizard.php:451
 msgid "Check of pre-requisites"
 msgstr "Kiểm tra điều kiện tiên quyết"
 
@@ -3283,43 +3288,43 @@ msgstr "Kiểu kiểm tra"
 msgid "Checks"
 msgstr "Kiểm tra"
 
-#: include/classes/data/CItemData.php:925
+#: include/classes/data/CItemData.php:928
 msgid "Checks if DNS service is up. Returns 0 - DNS is down (server did not respond or DNS resolution failed); 1 - DNS is up"
 msgstr "Kiểm tra nếu máy chủ DNS bật. Trả về 0 - DNS tắt (Máy chủ không trả lời hoặc độ phân giải DNS lỗi);"
 
-#: include/classes/data/CItemData.php:1165
+#: include/classes/data/CItemData.php:1168
 msgid "Checks if file exists. Returns 0 - not found; 1 - file of the specified type exists"
 msgstr ""
 
-#: include/classes/data/CItemData.php:857
+#: include/classes/data/CItemData.php:860
 msgid "Checks if host is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful."
 msgstr ""
 
-#: include/classes/data/CItemData.php:957
+#: include/classes/data/CItemData.php:960
 msgid "Checks if it is possible to make TCP connection to specified port. Returns 0 - cannot connect; 1 - can connect"
 msgstr "Kiểm tra nếu có thể thực hiện kết nối TCP đến cổng được chỉ định. Trả về 0 - không thể kết nối; 1 - có thể kết nối"
 
-#: include/classes/data/CItemData.php:965
+#: include/classes/data/CItemData.php:968
 msgid "Checks if service is running and accepting TCP connections. Returns 0 - service is down; 1 - service is running"
 msgstr "Kiểm tra nếu dịch vụ đang chạy và chấp nhận kết nối TCP. Trả về 0 - dịch vụ không chạy; 1 - dịch vụ đang chạy"
 
-#: include/classes/data/CItemData.php:981
+#: include/classes/data/CItemData.php:984
 msgid "Checks if service is running and responding to UDP requests. Returns 0 - service is down; 1 - service is running"
 msgstr "Kiểm tra nếu dịch vụ đang chạy và đáp ứng yêu cầu đến UDP. Trả về 0 - dịch vụ không chạy; 1 - dịch vụ đang chạy"
 
-#: include/classes/data/CItemData.php:953
+#: include/classes/data/CItemData.php:956
 msgid "Checks if this TCP port is in LISTEN state. Returns 0 - it is not in LISTEN state; 1 - it is in LISTEN state"
 msgstr "Kiểm tra nếu cổng TCP này là trong trạng thái LISTEN. Trả về 0 - nó không ở trạng thái LISTEN; 1 - nó không ở trạng thái LISTEN"
 
-#: include/classes/data/CItemData.php:973
+#: include/classes/data/CItemData.php:976
 msgid "Checks if this UDP port is in LISTEN state. Returns 0 - it is not in LISTEN state; 1 - it is in LISTEN state"
 msgstr "Kiểm tra nếu cổng UDP này là trong trạng thái LISTEN. Trả về 0 - nó không ở trạng thái LISTEN; 1 - nó ở trạng thái LISTEN"
 
-#: include/classes/data/CItemData.php:961
+#: include/classes/data/CItemData.php:964
 msgid "Checks performance of TCP service. Returns 0 - service is down; seconds - the number of seconds spent while connecting to the service"
 msgstr "Kiểm tra performance của dịch vụ TCP. Trả về 0 - dịch vụ không chạy; giây - số giây đã sử dụng trong khi kết nối với dịch vụ"
 
-#: include/classes/data/CItemData.php:977
+#: include/classes/data/CItemData.php:980
 msgid "Checks performance of UDP service. Returns 0 - service is down; seconds - the number of seconds spent waiting for response from the service"
 msgstr "Kiểm tra performance của dịch vụ UDP. Trả về 0 - Dịch vụ không chạy; giây - số giây dành để chờ phản hồi từ dịch vụ"
 
@@ -3348,7 +3353,7 @@ msgstr "Thông tư tham khảo cho các template: %1$s."
 msgid "Circular template linkage is not allowed."
 msgstr "Liên kết thông tư template không được cho phép."
 
-#: include/classes/core/ZBase.php:491
+#: include/classes/core/ZBase.php:494
 #, c-format
 msgid "Class %1$s not found for action %2$s."
 msgstr ""
@@ -3581,11 +3586,11 @@ msgstr "Các điều kiện"
 msgid "Configuration"
 msgstr "Cấu hình"
 
-#: include/classes/data/CItemData.php:1689
+#: include/classes/data/CItemData.php:1692
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "Cấu hình thống kê cache. Cache - buffer (chế độ:  pfree, total, used, free)."
 
-#: include/classes/setup/CSetupWizard.php:700
+#: include/classes/setup/CSetupWizard.php:872
 #, c-format
 msgid "Configuration file \"%1$s\" created."
 msgstr "Tập tin cấu hình \"%1$s\" đã tạo."
@@ -3738,8 +3743,8 @@ msgstr "Cấu hình của web monitoring"
 msgid "Configuration updated"
 msgstr "Cấu hình đã cập nhật"
 
-#: include/classes/setup/CSetupWizard.php:53
-#: include/classes/setup/CSetupWizard.php:428
+#: include/classes/setup/CSetupWizard.php:62
+#: include/classes/setup/CSetupWizard.php:587
 msgid "Configure DB connection"
 msgstr "Cấu hình kết nối DB"
 
@@ -3747,7 +3752,7 @@ msgstr "Cấu hình kết nối DB"
 msgid "Confirmation text"
 msgstr "Xác nhận văn bản"
 
-#: include/classes/setup/CSetupWizard.php:698
+#: include/classes/setup/CSetupWizard.php:870
 msgid "Congratulations! You have successfully installed Zabbix frontend."
 msgstr "Chúc mừng! Bạn đã cài đặt thành công Zabbix frontend."
 
@@ -3772,12 +3777,12 @@ msgstr "Bảo mật kết nối"
 msgid "Connection timeout"
 msgstr ""
 
-#: include/classes/server/CZabbixServer.php:481
+#: include/classes/server/CZabbixServer.php:497
 #, c-format
 msgid "Connection timeout of %1$s seconds exceeded when connecting to Zabbix server \"%2$s\"."
 msgstr "Thời gian kết nối của %1$s đã vượt quá khi kết nối đến máy chủ Zabbix \"%2$s\"."
 
-#: include/classes/server/CZabbixServer.php:592
+#: include/classes/server/CZabbixServer.php:608
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%1$s\" failed. Possible reasons:\n"
@@ -3785,7 +3790,7 @@ msgid ""
 "2. Incorrect DNS server configuration.\n"
 msgstr ""
 
-#: include/classes/server/CZabbixServer.php:580
+#: include/classes/server/CZabbixServer.php:596
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%1$s\" refused. Possible reasons:\n"
@@ -3795,7 +3800,7 @@ msgid ""
 "4. Firewall is blocking TCP connection.\n"
 msgstr ""
 
-#: include/classes/server/CZabbixServer.php:588
+#: include/classes/server/CZabbixServer.php:604
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%1$s\" timed out. Possible reasons:\n"
@@ -3803,7 +3808,7 @@ msgid ""
 "2. Firewall is blocking TCP connection.\n"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:373
+#: include/classes/setup/CSetupWizard.php:538
 msgid "Connection will not be encrypted because it uses a socket file (on Unix) or shared memory (Windows)."
 msgstr ""
 
@@ -3995,27 +4000,27 @@ msgstr "Liên kết được cập nhật"
 msgid "Count"
 msgstr "Đếm"
 
-#: include/classes/data/CItemData.php:1061
+#: include/classes/data/CItemData.php:1064
 msgid "Count of context switches. Returns integer"
 msgstr "Đếm bởi chuyển ngữ cảnh. Trả về kiểu integer"
 
-#: include/classes/data/CItemData.php:1149
+#: include/classes/data/CItemData.php:1152
 msgid "Count of directory entries, recursively. Returns integer"
 msgstr "Đếm các mục trong thư mục, đệ quy. Trả về kiểu integer"
 
-#: include/classes/data/CItemData.php:905
+#: include/classes/data/CItemData.php:908
 msgid "Count of matched lines in log file monitoring with log rotation support. Returns integer"
 msgstr "Đếm các dòng khớp nhau trong giám sát tệp nhật ký với hỗ trợ xoay vòng nhật ký. Trả về kiểu integer"
 
-#: include/classes/data/CItemData.php:897
+#: include/classes/data/CItemData.php:900
 msgid "Count of matched lines in log file monitoring. Returns integer"
 msgstr "Đếm các dòng khớp nhau trong giám sát tệp nhật ký. Trả về kiểu integer"
 
-#: include/classes/data/CItemData.php:1665
+#: include/classes/data/CItemData.php:1668
 msgid "Count of values enqueued in the low-level discovery processing queue."
 msgstr ""
 
-#: include/classes/data/CItemData.php:1669
+#: include/classes/data/CItemData.php:1672
 msgid "Count of values enqueued in the preprocessing queue."
 msgstr ""
 
@@ -4278,7 +4283,7 @@ msgstr "Host hiện tại"
 msgid "Current user"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:237
+#: include/classes/setup/CSetupWizard.php:409
 msgid "Current value"
 msgstr "Giá trị hiện tại"
 
@@ -4374,7 +4379,7 @@ msgstr "TÊN DNS"
 msgid "Daily"
 msgstr "Hàng ngày"
 
-#: include/classes/core/ZBase.php:356
+#: include/classes/core/ZBase.php:359
 msgid "Dark"
 msgstr "Tối"
 
@@ -4485,16 +4490,16 @@ msgstr "Đặt lại dữ liệu"
 msgid "Data storage period"
 msgstr "Chu kì lưu trữ dữ liệu"
 
-#: include/classes/setup/CSetupWizard.php:388
-#: include/classes/setup/CSetupWizard.php:534
-#: include/classes/setup/CSetupWizard.php:740
+#: include/classes/setup/CSetupWizard.php:551
+#: include/classes/setup/CSetupWizard.php:703
+#: include/classes/setup/CSetupWizard.php:938
 msgid "Database TLS CA file"
 msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:668
-#: include/classes/setup/CSetupWizard.php:400
-#: include/classes/setup/CSetupWizard.php:540
-#: include/classes/setup/CSetupWizard.php:748
+#: include/classes/setup/CSetupWizard.php:561
+#: include/classes/setup/CSetupWizard.php:711
+#: include/classes/setup/CSetupWizard.php:946
 msgid "Database TLS certificate file"
 msgstr ""
 
@@ -4502,32 +4507,32 @@ msgstr ""
 msgid "Database TLS certificate files must be read-only"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:412
-#: include/classes/setup/CSetupWizard.php:548
+#: include/classes/setup/CSetupWizard.php:571
+#: include/classes/setup/CSetupWizard.php:721
 msgid "Database TLS cipher list"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:370
-#: include/classes/setup/CSetupWizard.php:530
+#: include/classes/setup/CSetupWizard.php:534
+#: include/classes/setup/CSetupWizard.php:696
 msgid "Database TLS encryption"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:394
-#: include/classes/setup/CSetupWizard.php:537
-#: include/classes/setup/CSetupWizard.php:744
+#: include/classes/setup/CSetupWizard.php:556
+#: include/classes/setup/CSetupWizard.php:707
+#: include/classes/setup/CSetupWizard.php:942
 msgid "Database TLS key file"
 msgstr ""
 
-#: include/blocks.inc.php:609
-msgid "Database history tables upgraded"
+#: app/partials/administration.system.info.php:121
+msgid "Database history $info_tables upgraded"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:302
+#: include/classes/setup/CSetupWizard.php:472
 msgid "Database host"
 msgstr "Cơ sở dữ liệu host"
 
-#: include/classes/setup/CSetupWizard.php:406
-#: include/classes/setup/CSetupWizard.php:543
+#: include/classes/setup/CSetupWizard.php:566
+#: include/classes/setup/CSetupWizard.php:715
 msgid "Database host verification"
 msgstr ""
 
@@ -4535,35 +4540,35 @@ msgstr ""
 msgid "Database monitor"
 msgstr "Cơ sở dữ liệu theo dõi"
 
-#: include/classes/setup/CSetupWizard.php:314
-#: include/classes/setup/CSetupWizard.php:510 setup.php:45
+#: include/classes/setup/CSetupWizard.php:482
+#: include/classes/setup/CSetupWizard.php:660 setup.php:45
 msgid "Database name"
 msgstr "tên cơ sở dữ liệu"
 
-#: include/classes/setup/CSetupWizard.php:512
+#: include/classes/setup/CSetupWizard.php:668
 msgid "Database password"
 msgstr "Mật khẩu cơ sở dữ liệu"
 
-#: include/classes/setup/CSetupWizard.php:307
-#: include/classes/setup/CSetupWizard.php:509 setup.php:44
+#: include/classes/setup/CSetupWizard.php:476
+#: include/classes/setup/CSetupWizard.php:656 setup.php:44
 msgid "Database port"
 msgstr "Cổng sơ sở dữ liệu"
 
-#: include/classes/setup/CSetupWizard.php:319
-#: include/classes/setup/CSetupWizard.php:514
+#: include/classes/setup/CSetupWizard.php:486
+#: include/classes/setup/CSetupWizard.php:674
 msgid "Database schema"
 msgstr "Giản đồ cơ sở dữ liệu"
 
-#: include/classes/setup/CSetupWizard.php:508
+#: include/classes/setup/CSetupWizard.php:652
 msgid "Database server"
 msgstr "Máy chủ cơ sở dữ liệu"
 
-#: include/classes/setup/CSetupWizard.php:294
-#: include/classes/setup/CSetupWizard.php:495
+#: include/classes/setup/CSetupWizard.php:465
+#: include/classes/setup/CSetupWizard.php:635
 msgid "Database type"
 msgstr "Kiểu cơ sở dữ liệu"
 
-#: include/classes/setup/CSetupWizard.php:511
+#: include/classes/setup/CSetupWizard.php:664
 msgid "Database user"
 msgstr "Người dùng cơ sở dữ liệu"
 
@@ -4596,7 +4601,7 @@ msgstr ""
 msgid "Day"
 msgstr "Ngày"
 
-#: include/func.inc.php:2543
+#: include/func.inc.php:2400
 msgid "Day before yesterday"
 msgstr "Ngày trước hôm qua"
 
@@ -4678,7 +4683,7 @@ msgid "Default host inventory mode"
 msgstr "Chế độ kiểm kê máy chủ mặc định"
 
 #: app/views/administration.gui.edit.php:70
-#: include/classes/setup/CSetupWizard.php:227
+#: include/classes/setup/CSetupWizard.php:399
 msgid "Default language"
 msgstr ""
 
@@ -4699,12 +4704,12 @@ msgid "Default page display period"
 msgstr ""
 
 #: app/views/administration.gui.edit.php:82
-#: include/classes/setup/CSetupWizard.php:476
+#: include/classes/setup/CSetupWizard.php:614
 msgid "Default theme"
 msgstr "Theme mặc định"
 
 #: app/views/administration.gui.edit.php:75
-#: include/classes/setup/CSetupWizard.php:469
+#: include/classes/setup/CSetupWizard.php:607
 msgid "Default time zone"
 msgstr ""
 
@@ -5045,7 +5050,7 @@ msgstr "Xóa trigger?"
 msgid "Delete web scenario?"
 msgstr "Xóa web scanario?"
 
-#: app/controllers/CControllerAuditLogList.php:357
+#: app/controllers/CControllerAuditLogList.php:358
 msgid "Deleted"
 msgstr ""
 
@@ -5108,7 +5113,7 @@ msgstr "Phụ thuộc vào"
 msgid "Deployment status"
 msgstr "Trạng thái triển khai"
 
-#: app/controllers/CControllerAuditLogList.php:285
+#: app/controllers/CControllerAuditLogList.php:286
 #: app/partials/configuration.host.edit.html.php:147
 #: app/partials/hostmacros.list.html.php:37
 #: app/partials/massupdate.macros.tab.php:29
@@ -5140,11 +5145,12 @@ msgstr "Trạng thái triển khai"
 msgid "Description"
 msgstr "Mô tả"
 
+#: app/partials/administration.system.info.php:30
 #: app/views/administration.mediatype.list.php:82
-#: app/views/js/reports.auditlog.list.js.php:152
+#: app/views/js/reports.auditlog.list.js.php:153
 #: app/views/reports.auditlog.list.php:96
-#: app/views/reports.auditlog.list.php:129 include/blocks.inc.php:525
-#: include/func.inc.php:1601 include/views/configuration.action.edit.php:175
+#: app/views/reports.auditlog.list.php:129 include/func.inc.php:1601
+#: include/views/configuration.action.edit.php:175
 #: include/views/configuration.action.edit.php:179
 #: include/views/configuration.action.edit.php:322
 #: include/views/configuration.action.edit.php:410
@@ -5160,7 +5166,7 @@ msgstr "Chi tiết của web scenario"
 msgid "Device"
 msgstr "Thiết bị"
 
-#: include/classes/data/CItemData.php:1049
+#: include/classes/data/CItemData.php:1052
 msgid "Device interrupts. Returns integer"
 msgstr "Thiết bị ngắt. Trả về kiểu integer"
 
@@ -5176,7 +5182,7 @@ msgstr ""
 msgid "Directory"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1153
+#: include/classes/data/CItemData.php:1156
 msgid "Directory size (in bytes). Returns integer"
 msgstr "Kích thước thư mục (byte). Trả về integer"
 
@@ -5276,6 +5282,7 @@ msgstr "Vô hiệu hóa các trigger đã chọn?"
 msgid "Disable selected web scenarios?"
 msgstr "Vô hiệu hóa web scenario đã chọn?"
 
+#: app/partials/administration.system.info.php:180
 #: app/partials/configuration.filter.items.php:188
 #: app/partials/configuration.host.edit.html.php:363
 #: app/partials/monitoring.host.filter.php:129
@@ -5407,35 +5414,35 @@ msgstr "Danh sách phát hiện"
 msgid "Discovery object"
 msgstr "Đối tượng phát hiện"
 
-#: include/classes/data/CItemData.php:1229
+#: include/classes/data/CItemData.php:1232
 msgid "Discovery of VMware clusters, <url> - VMware service URL. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1237
+#: include/classes/data/CItemData.php:1240
 msgid "Discovery of VMware datastores, <url> - VMware service URL. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1289
+#: include/classes/data/CItemData.php:1292
 msgid "Discovery of VMware hypervisor datastores, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1313
+#: include/classes/data/CItemData.php:1316
 msgid "Discovery of VMware hypervisors, <url> - VMware service URL. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1557
+#: include/classes/data/CItemData.php:1560
 msgid "Discovery of VMware virtual machine disk devices, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1569
+#: include/classes/data/CItemData.php:1572
 msgid "Discovery of VMware virtual machine file systems, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1501
+#: include/classes/data/CItemData.php:1504
 msgid "Discovery of VMware virtual machine network interfaces, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1445
+#: include/classes/data/CItemData.php:1448
 msgid "Discovery of VMware virtual machines, <url> - VMware service URL. Returns JSON"
 msgstr ""
 
@@ -5520,15 +5527,15 @@ msgstr "Các quy tắc phát hiện đã xóa"
 msgid "Discovery status"
 msgstr "Trạng thái phát hiện"
 
-#: include/classes/data/CItemData.php:1141
+#: include/classes/data/CItemData.php:1144
 msgid "Disk read statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps"
 msgstr "Đĩa đọc số liệu thống kê. Trả về kiểu integer với kiểu trong  mảng, thao tác, bytes; float với kiểu sps, ops, bps"
 
-#: include/classes/data/CItemData.php:1213
+#: include/classes/data/CItemData.php:1216
 msgid "Disk space in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Dung lượng đĩa tính theo byte hoặc theo tỉ lệ phần trăm trên tổng số. Trả về kiểu integer hoặc byte; float cho tỉ lệ phần trăm"
 
-#: include/classes/data/CItemData.php:1145
+#: include/classes/data/CItemData.php:1148
 msgid "Disk write statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps"
 msgstr "Thống kê đĩa ghi. Trả về kiểu integer với loại trong các ngành, hoạt động, byte; float với loại trong sps, ops, bps"
 
@@ -5645,7 +5652,7 @@ msgstr "Down"
 msgid "Download image"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:684
+#: include/classes/setup/CSetupWizard.php:856
 msgid "Download the configuration file"
 msgstr "Tải xuống tệp tin cấu hình"
 
@@ -5709,7 +5716,7 @@ msgid "Duplicate userid \"%1$s\" in users for map \"%2$s\"."
 msgstr "Tạo bản sao id người dùng \"%1$s\" trong người dùng cho sơ đồ \"%2$s\"."
 
 #: app/views/hintbox.eventlist.php:75
-#: app/views/monitoring.widget.problems.view.php:65 include/blocks.inc.php:732
+#: app/views/monitoring.widget.problems.view.php:65 include/blocks.inc.php:580
 #: include/classes/screens/CScreenProblem.php:867
 #: include/classes/screens/CScreenProblem.php:892
 #: include/classes/screens/CScreenProblem.php:1161 include/events.inc.php:289
@@ -6020,6 +6027,7 @@ msgstr "Kích hoạt web scenario đã được chọn?"
 msgid "Enable trapping"
 msgstr "Kích hoạt trap"
 
+#: app/partials/administration.system.info.php:173
 #: app/partials/configuration.filter.items.php:187
 #: app/partials/configuration.host.edit.html.php:165
 #: app/partials/monitoring.host.filter.php:128
@@ -6150,7 +6158,7 @@ msgstr "Lỗi trong yêu cầu tìm kiếm cho bảng \"%1$s\"."
 msgid "Error message"
 msgstr "Tin nhắn lỗi"
 
-#: include/blocks.inc.php:643
+#: app/partials/administration.system.info.php:153
 #, c-format
 msgid "Error! Unable to start Zabbix server due to unsupported %1$s database server version. Must be at least (%2$s)"
 msgstr ""
@@ -6206,7 +6214,7 @@ msgstr ""
 msgid "Event list [previous 20]"
 msgstr "Danh sách sự kiện [20 trở lại]"
 
-#: include/classes/data/CItemData.php:853
+#: include/classes/data/CItemData.php:856
 msgid "Event log monitoring. Returns log"
 msgstr "Theo dõi log sự kiện. Trả về log"
 
@@ -6268,11 +6276,11 @@ msgstr "Loại trừ các nhóm máy chủ"
 msgid "Execute"
 msgstr "Thực hiện"
 
-#: include/classes/data/CItemData.php:1593
+#: include/classes/data/CItemData.php:1596
 msgid "Execute WMI query and return the JSON document with all selected objects"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1589
+#: include/classes/data/CItemData.php:1592
 msgid "Execute WMI query and return the first selected object. Returns integer, float, string or text (depending on the request)"
 msgstr "Thực hiện truy vấn WMI và trả về đối tượng được trả về đầu tiên. Trả về kiểu integer, float, string hoặc text (tùy theo yêu cầu)"
 
@@ -6456,9 +6464,15 @@ msgstr "SAI"
 msgid "FTP"
 msgstr "FTP"
 
-#: include/classes/setup/CSetupWizard.php:253
+#: include/classes/setup/CSetupWizard.php:425
 msgid "Fail"
 msgstr "Thất bại"
+
+#: app/partials/administration.ha.nodes.php:75
+#: app/partials/administration.system.info.php:174
+#, c-format
+msgid "Fail-over delay: %1$s"
+msgstr ""
 
 #: app/views/monitoring.widget.web.view.php:30 include/actions.inc.php:2139
 #: include/views/administration.auditacts.list.php:88
@@ -6594,7 +6608,7 @@ msgstr "Trường \"%1$s\" phải bị lỗi."
 msgid "Field \"host\" is mandatory."
 msgstr "Trường \"máy chủ\" là bắt buộc."
 
-#: include/classes/data/CItemData.php:1157
+#: include/classes/data/CItemData.php:1160
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256"
 msgstr ""
 
@@ -6607,15 +6621,15 @@ msgstr ""
 msgid "File is too big, max upload size is %1$s bytes."
 msgstr "Tập tin quá lớn, kích thước tải lên tối đa là %1$s byte."
 
-#: include/classes/data/CItemData.php:1177
+#: include/classes/data/CItemData.php:1180
 msgid "File owner information. Returns string"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1193
+#: include/classes/data/CItemData.php:1196
 msgid "File size in bytes (default) or in newlines. Returns integer"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1197
+#: include/classes/data/CItemData.php:1200
 msgid "File time information. Returns integer (Unix timestamp)"
 msgstr "Thông tin thời gian tập tin. Trả về kiểu integer (dấu thời gian Unix)"
 
@@ -6693,19 +6707,19 @@ msgstr ""
 msgid "Filters"
 msgstr "Bộ lọc"
 
-#: include/classes/data/CItemData.php:1189
+#: include/classes/data/CItemData.php:1192
 msgid "Find string in a file. Returns 0 - match not found; 1 - found"
 msgstr "Tìm chuỗi trong một tệp tin. Trả về 0 - không tìm thấy; 1 - tìm thấy"
 
-#: include/classes/data/CItemData.php:1185
+#: include/classes/data/CItemData.php:1188
 msgid "Find string in a file. Returns the line containing the matched string, or as specified by the optional output parameter"
 msgstr "Tìm chuỗi trong một tập tin. Trả về dòng chứa chuỗi khớp hoặc theo chỉ định của tham số đầu ra tùy chọn"
 
-#: include/classes/data/CItemData.php:1585
+#: include/classes/data/CItemData.php:1588
 msgid "Find string on a web page. Returns the matched string, or as specified by the optional output parameter"
 msgstr "Tìm chuỗi trên một trang web. Trả về chuỗi khớp hoặc theo chỉ định của tham số đầu ra tùy chọn"
 
-#: include/classes/setup/CSetupWizard.php:145
+#: include/classes/setup/CSetupWizard.php:334
 msgid "Finish"
 msgstr "Hoàn thành"
 
@@ -6861,11 +6875,6 @@ msgstr "GUI"
 msgid "GUI access disabled."
 msgstr "Truy cập GUI bị vô hiệu hóa."
 
-#: include/classes/setup/CSetupWizard.php:61
-#: include/classes/setup/CSetupWizard.php:485
-msgid "GUI settings"
-msgstr ""
-
 #: include/classes/helpers/CMenuHelper.php:221
 #: include/classes/helpers/CRoleHelper.php:379
 msgid "General"
@@ -6889,7 +6898,7 @@ msgstr "Georgian (ka_GE)"
 msgid "German (de_DE)"
 msgstr "German (de_DE)"
 
-#: include/classes/data/CItemData.php:1577
+#: include/classes/data/CItemData.php:1580
 msgid "Get content of web page. Returns web page source as text"
 msgstr "Nội dung của trang web. Trả về nguồn trang web dưới dạng văn bản"
 
@@ -7284,11 +7293,11 @@ msgstr "Phần cứng"
 msgid "Hardware (Full details)"
 msgstr "Phần cứng (đầy đủ các chi tiết)"
 
-#: include/classes/data/CItemData.php:1021
+#: include/classes/data/CItemData.php:1024
 msgid "Hardware sensor reading. Returns float"
 msgstr "Đọc cảm biến phần cứng. Trả về kiểu float"
 
-#: include/classes/setup/CSetupWizard.php:331
+#: include/classes/setup/CSetupWizard.php:499
 msgid "HashiCorp Vault"
 msgstr ""
 
@@ -7363,11 +7372,24 @@ msgstr "Thứ bậc"
 msgid "High"
 msgstr "Cao"
 
-#: include/classes/core/ZBase.php:358
+#: app/partials/administration.system.info.php:172
+#: app/partials/administration.system.info.php:179
+msgid "High availability cluster"
+msgstr ""
+
+#: app/controllers/CControllerAuditLogList.php:218
+msgid "High availability node"
+msgstr ""
+
+#: include/classes/widgets/forms/CWidgetFormSystemInfo.php:32
+msgid "High availability nodes"
+msgstr ""
+
+#: include/classes/core/ZBase.php:361
 msgid "High-contrast dark"
 msgstr "Độ tương phản tối"
 
-#: include/classes/core/ZBase.php:357
+#: include/classes/core/ZBase.php:360
 msgid "High-contrast light"
 msgstr "Độ tương phản sáng"
 
@@ -7447,7 +7469,7 @@ msgstr "Chiều ngang"
 msgid "Horizontal align"
 msgstr "Sắp xếp theo chiều ngang"
 
-#: app/controllers/CControllerAuditLogList.php:218
+#: app/controllers/CControllerAuditLogList.php:219
 #: app/partials/configuration.host.edit.html.php:527
 #: app/partials/monitoring.latest.view.html.php:40
 #: app/partials/popup.operations.php:175
@@ -7458,12 +7480,11 @@ msgstr "Sắp xếp theo chiều ngang"
 #: app/views/monitoring.widget.problems.view.php:58
 #: app/views/popup.generic.php:81 app/views/popup.host.edit.php:97
 #: app/views/popup.massupdate.host.php:290 app/views/search.php:33
-#: include/actions.inc.php:50 include/blocks.inc.php:729
+#: include/actions.inc.php:50 include/blocks.inc.php:577
 #: include/classes/screens/CScreenHttpTest.php:112
 #: include/classes/screens/CScreenProblem.php:863
 #: include/classes/screens/CScreenProblem.php:887
 #: include/classes/screens/CScreenProblem.php:1158
-#: include/classes/setup/CSetupWizard.php:440
 #: include/classes/widgets/forms/CWidgetFormProblems.php:206
 #: include/classes/widgets/forms/CWidgetFormProblems.php:207
 #: include/hostgroups.inc.php:248 include/maps.inc.php:24
@@ -7549,7 +7570,7 @@ msgid "Host enabled"
 msgid_plural "Hosts enabled"
 msgstr[0] "Host được kích hoạtCác host được kích hoạt"
 
-#: app/controllers/CControllerAuditLogList.php:219
+#: app/controllers/CControllerAuditLogList.php:220
 #: app/partials/administration.usergroup.grouprights.html.php:29
 #: app/partials/administration.usergroup.tagfilters.html.php:29
 #: app/partials/popup.operations.php:183
@@ -7682,7 +7703,7 @@ msgstr "Tên host"
 msgid "Host networks"
 msgstr "Các mạng host"
 
-#: app/controllers/CControllerAuditLogList.php:220
+#: app/controllers/CControllerAuditLogList.php:221
 #: app/views/popup.lldoperation.php:54
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:168
 msgid "Host prototype"
@@ -7837,7 +7858,7 @@ msgstr "Các host đã cập nhật"
 msgid "Hours"
 msgstr "Giờ"
 
-#: app/controllers/CControllerAuditLogList.php:221
+#: app/controllers/CControllerAuditLogList.php:222
 #: app/views/administration.housekeeping.edit.php:29
 #: app/views/administration.housekeeping.edit.php:184
 #: include/classes/helpers/CMenuHelper.php:227 include/html.inc.php:884
@@ -7924,7 +7945,7 @@ msgstr "Giao diện IPMI"
 msgid "IPMI sensor"
 msgstr "IPMI sensor"
 
-#: include/classes/data/CItemData.php:869
+#: include/classes/data/CItemData.php:872
 msgid "IPMI sensor IDs and other sensor-related parameters. Returns JSON."
 msgstr ""
 
@@ -7981,7 +8002,7 @@ msgstr "Biểu tượng bản đồ đã xóa"
 msgid "Icon map updated"
 msgstr "Biểu tượng bản đồ được cập nhật"
 
-#: app/controllers/CControllerAuditLogList.php:222
+#: app/controllers/CControllerAuditLogList.php:223
 #: app/views/administration.iconmap.edit.php:29
 #: app/views/administration.iconmap.list.php:27
 #: include/classes/helpers/CMenuHelper.php:234 include/html.inc.php:887
@@ -8016,7 +8037,7 @@ msgstr ""
 msgid "Identical namespace (%1$s) is used by modules located at %2$s."
 msgstr ""
 
-#: include/classes/data/CItemData.php:1125
+#: include/classes/data/CItemData.php:1128
 msgid "Identification of the system. Returns string"
 msgstr "Nhận dạng hệ thống. Trả về kiểu string"
 
@@ -8090,7 +8111,7 @@ msgstr ""
 msgid "Ignore this service"
 msgstr ""
 
-#: app/controllers/CControllerAuditLogList.php:223
+#: app/controllers/CControllerAuditLogList.php:224
 #: app/views/administration.image.edit.php:60
 #: app/views/administration.image.edit.php:66 image.php:26
 #: include/classes/helpers/CMapHelper.php:227 include/maps.inc.php:28
@@ -8272,7 +8293,7 @@ msgstr ""
 msgid "Include subgroups"
 msgstr "Bao gồm các nhóm nhỏ"
 
-#: include/classes/data/CItemData.php:937
+#: include/classes/data/CItemData.php:940
 msgid "Incoming traffic statistics on network interface. Returns integer"
 msgstr "Thống kê lưu lượng truy cập đến interface mạng. Trả về kiểu trigger"
 
@@ -8576,9 +8597,9 @@ msgstr "Trường có tên \"%1$s\" không chính xác hoặc giá trị �
 msgid "Incorrect fields for sysmap."
 msgstr "Các trường đối với sysmap không chính xác."
 
-#: include/classes/setup/CSetupWizard.php:740
-#: include/classes/setup/CSetupWizard.php:744
-#: include/classes/setup/CSetupWizard.php:748
+#: include/classes/setup/CSetupWizard.php:938
+#: include/classes/setup/CSetupWizard.php:942
+#: include/classes/setup/CSetupWizard.php:946
 #, c-format
 msgid "Incorrect file path for \"%1$s\": %2$s."
 msgstr ""
@@ -8752,9 +8773,9 @@ msgstr "Phạm vi cổng không chính xác."
 msgid "Incorrect regular expression \"%1$s\": \"%2$s\""
 msgstr "Biểu thức chính quy \"%1$s\" không chính xác: \"%2$s\""
 
-#: include/classes/server/CZabbixServer.php:493
-#: include/classes/server/CZabbixServer.php:535
-#: include/classes/server/CZabbixServer.php:542
+#: include/classes/server/CZabbixServer.php:509
+#: include/classes/server/CZabbixServer.php:551
+#: include/classes/server/CZabbixServer.php:558
 #, c-format
 msgid "Incorrect response received from Zabbix server \"%1$s\"."
 msgstr "Đáp ứng không chính xác nhận được từ máy chủ Zabbix  \"%1$s\"."
@@ -9173,7 +9194,7 @@ msgstr ""
 #: app/views/monitoring.widget.actionlog.view.php:39
 #: app/views/monitoring.widget.problems.view.php:57
 #: include/actions.inc.php:1827 include/actions.inc.php:1921
-#: include/blocks.inc.php:728 include/classes/screens/CScreenProblem.php:862
+#: include/blocks.inc.php:576 include/classes/screens/CScreenProblem.php:862
 #: include/classes/screens/CScreenProblem.php:886
 #: include/views/administration.auditacts.list.php:69
 #: include/views/configuration.graph.list.php:141
@@ -9193,11 +9214,11 @@ msgstr "Thông tin"
 msgid "Information"
 msgstr "Thông tin"
 
-#: include/classes/data/CItemData.php:1169
+#: include/classes/data/CItemData.php:1172
 msgid "Information about a file. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1025
+#: include/classes/data/CItemData.php:1028
 msgid "Information about a service. Returns integer with param as state, startup; string - with param as displayname, path, user; text - with param as description; Specifically for state: 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service; Specifically for startup: 0 - automatic, 1 - automatic delayed, 2 - manual, 3 - disabled, 4 - unknown"
 msgstr "Thông tin về một dịch vụ. Trả về số nguyên với tham số là trạng thái, khởi động; string - với tham số là tên hiển thị, đường dẫn, người dùng; text - với tham số như mô tả; Cụ thể cho trạng thái: 0 - đang chạy, 1 - tạm dừng, 2 - bắt đầu chờ xử lý, 3 - tạm dừng chờ xử lý, 4 - tiếp tục chờ xử lý, 5 - dừng chờ xử lý, 6 - dừng, 7 - không xác định, 255 - không có dịch vụ; Cụ thể khởi động: 0 - tự động, 1 - tự động bị trì hoãn, 2 - thủ công, 3 - bị vô hiệu hóa, 4 - không xác định"
 
@@ -9247,12 +9268,12 @@ msgstr "Chèn"
 msgid "Insert expression"
 msgstr "Chèn biểu thức"
 
-#: include/classes/setup/CSetupWizard.php:69
-#: include/classes/setup/CSetupWizard.php:705
+#: include/classes/setup/CSetupWizard.php:74
+#: include/classes/setup/CSetupWizard.php:877
 msgid "Install"
 msgstr "Cài đặt"
 
-#: setup.php:174
+#: setup.php:172
 msgid "Installation"
 msgstr "Cài đặt"
 
@@ -9772,7 +9793,7 @@ msgstr "Nó không thể tìm kiếm theo mật khẩu người dùng."
 msgid "Italian (it_IT)"
 msgstr "Italian (it_IT)"
 
-#: app/controllers/CControllerAuditLogList.php:225
+#: app/controllers/CControllerAuditLogList.php:226
 #: app/views/popup.massupdate.item.php:492 app/views/popup.triggerexpr.php:99
 #: app/views/popup.triggerwizard.php:92
 #: include/classes/screens/CScreenHistory.php:268
@@ -9854,7 +9875,7 @@ msgstr "Item không được lựa chọn"
 msgid "Item pre-processing is missing parameters: %1$s"
 msgstr "Item chuẩn bị xử lí bị thiếu tham số: %1$s"
 
-#: app/controllers/CControllerAuditLogList.php:226
+#: app/controllers/CControllerAuditLogList.php:227
 #: app/views/popup.lldoperation.php:51 app/views/popup.massupdate.item.php:492
 #: include/classes/widgets/forms/CWidgetFormGraphPrototype.php:48
 #: include/forms.inc.php:892
@@ -10225,41 +10246,45 @@ msgctxt "page navigation"
 msgid "Last"
 msgstr "Giá trị cuối cùng"
 
-#: include/func.inc.php:2596
+#: include/func.inc.php:2453
 #, c-format
 msgid "Last %1$d day"
 msgid_plural "Last %1$d days"
 msgstr[0] "%1$d ngày cuối cùng"
 
-#: include/func.inc.php:2590
+#: include/func.inc.php:2447
 #, c-format
 msgid "Last %1$d hour"
 msgid_plural "Last %1$d hours"
 msgstr[0] "%1$d giờ cuối cùng"
 
-#: include/func.inc.php:2583
+#: include/func.inc.php:2440
 #, c-format
 msgid "Last %1$d minute"
 msgid_plural "Last %1$d minutes"
 msgstr[0] "%1$d phút cuối cùng"
 
-#: include/func.inc.php:2599
+#: include/func.inc.php:2456
 #, c-format
 msgid "Last %1$d month"
 msgid_plural "Last %1$d months"
 msgstr[0] "%1$d tháng cuối cùng"
 
-#: include/func.inc.php:2576
+#: include/func.inc.php:2433
 #, c-format
 msgid "Last %1$d second"
 msgid_plural "Last %1$d seconds"
 msgstr[0] "%1$d giây cuối cùng"
 
-#: include/func.inc.php:2602
+#: include/func.inc.php:2459
 #, c-format
 msgid "Last %1$d year"
 msgid_plural "Last %1$d years"
 msgstr[0] "%1$d năm cuối cùng"
+
+#: app/partials/administration.ha.nodes.php:28
+msgid "Last access"
+msgstr ""
 
 #: app/views/administration.token.list.php:143
 #: app/views/administration.user.token.list.php:99
@@ -10379,7 +10404,7 @@ msgstr "Lịch sử"
 msgid "Length"
 msgstr ""
 
-#: setup.php:197
+#: setup.php:195
 msgid "Licensed under"
 msgstr ""
 
@@ -10483,31 +10508,31 @@ msgstr "Liên kết"
 msgid "List is empty"
 msgstr "Danh sách rỗng"
 
-#: include/classes/data/CItemData.php:1137
+#: include/classes/data/CItemData.php:1140
 msgid "List of block devices and their type. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1045
+#: include/classes/data/CItemData.php:1048
 msgid "List of detected CPUs/CPU cores. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1201
+#: include/classes/data/CItemData.php:1204
 msgid "List of mounted filesystems and their types. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1205
+#: include/classes/data/CItemData.php:1208
 msgid "List of mounted filesystems, their types, disk space and inode statistics. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:933
+#: include/classes/data/CItemData.php:936
 msgid "List of network interfaces. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1001
+#: include/classes/data/CItemData.php:1004
 msgid "List of object instances of Windows performance counters, discovered using object names in English. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:997
+#: include/classes/data/CItemData.php:1000
 msgid "List of object instances of Windows performance counters. Returns JSON"
 msgstr ""
 
@@ -10521,19 +10546,19 @@ msgstr "Danh sách chia sẻ nhóm người dùng"
 msgid "List of user shares"
 msgstr "Danh sách chia sẻ người dùng"
 
-#: include/classes/data/CItemData.php:1085
+#: include/classes/data/CItemData.php:1088
 msgid "Listing of MAC addresses. Returns string"
 msgstr "Danh sách địa chỉ MAC. Trả về kiểu string"
 
-#: include/classes/data/CItemData.php:1081
+#: include/classes/data/CItemData.php:1084
 msgid "Listing of PCI or USB devices. Returns text"
 msgstr "Danh sách các thiết bị PCI hoặc USB. Trả về kiểu text"
 
-#: include/classes/data/CItemData.php:1109
+#: include/classes/data/CItemData.php:1112
 msgid "Listing of installed packages. Returns text"
 msgstr "Danh sách các gói được cài đặt. Trả về kiểu text"
 
-#: include/classes/data/CItemData.php:1029
+#: include/classes/data/CItemData.php:1032
 msgid "Listing of services. Returns 0 - if empty; text - list of services separated by a newline"
 msgstr "Danh sách dịch vụ. Trả về không - nếu trống; text - danh sách các dịch vụ được phân tách bởi một dòng mới"
 
@@ -10541,7 +10566,7 @@ msgstr "Danh sách dịch vụ. Trả về không - nếu trống; text - danh s
 msgid "Lithuanian (lt_LT)"
 msgstr "Lithuanian (lt_LT)"
 
-#: include/classes/data/CItemData.php:1581
+#: include/classes/data/CItemData.php:1584
 msgid "Loading time of full web page (in seconds). Returns float"
 msgstr "Thời gian tải của trang web đầy đủ (tính bằng giây). Trả về kiểu float"
 
@@ -10578,11 +10603,11 @@ msgstr "Vị trí kinh độ"
 msgid "Log"
 msgstr "Log"
 
-#: include/classes/data/CItemData.php:909
+#: include/classes/data/CItemData.php:912
 msgid "Log file monitoring with log rotation support. Returns log"
 msgstr "Giám sát tệp tin log với hỗ trợ quay vòng log. Trả về log"
 
-#: include/classes/data/CItemData.php:901
+#: include/classes/data/CItemData.php:904
 msgid "Log file monitoring. Returns log"
 msgstr "Giám sát tệp tin log. Trả về kiểu log"
 
@@ -10656,11 +10681,11 @@ msgstr "Địa chỉ MAC B"
 msgid "MD2"
 msgstr "MD2"
 
-#: include/classes/data/CItemData.php:1173
+#: include/classes/data/CItemData.php:1176
 msgid "MD5 checksum of file. Returns character string (MD5 hash of the file)"
 msgstr "Tổng kiểm tra MD5 của tập tin. Trả về chuỗi ký tự (MD5 của tệp)"
 
-#: app/controllers/CControllerAuditLogList.php:227
+#: app/controllers/CControllerAuditLogList.php:228
 #: app/partials/hostmacros.inherited.list.html.php:48
 #: app/partials/hostmacros.list.html.php:35
 #: app/partials/massupdate.macros.tab.php:29
@@ -10709,7 +10734,7 @@ msgstr "Bộ lọc chính"
 msgid "Main navigation"
 msgstr "Điều hướng chính"
 
-#: app/controllers/CControllerAuditLogList.php:228
+#: app/controllers/CControllerAuditLogList.php:229
 #: include/classes/helpers/CMenuHelper.php:165
 #: include/classes/helpers/CRoleHelper.php:360
 #: include/views/configuration.maintenance.edit.php:259
@@ -10814,7 +10839,7 @@ msgstr ""
 msgid "Manually closed"
 msgstr "Hướng dẫn bị đóng"
 
-#: app/controllers/CControllerAuditLogList.php:229
+#: app/controllers/CControllerAuditLogList.php:230
 #: include/classes/widgets/CWidgetConfig.php:54
 #: include/classes/widgets/forms/CWidgetFormMap.php:41
 #: include/classes/widgets/forms/CWidgetFormMap.php:70 include/maps.inc.php:27
@@ -11009,15 +11034,15 @@ msgstr ""
 msgid "Max period for time selector"
 msgstr ""
 
-#: include/classes/data/CItemData.php:885
+#: include/classes/data/CItemData.php:888
 msgid "Maximum number of opened files supported by OS. Returns integer"
 msgstr "Số lượng tệp mở tối đa được hỗ trợ bởi HĐH. Trả về kiểu integer"
 
-#: include/classes/data/CItemData.php:889
+#: include/classes/data/CItemData.php:892
 msgid "Maximum number of processes supported by OS. Returns integer"
 msgstr "Số lượng tiến trình tối thiểu được hỗ trợ bởi HĐH. Trả về kiểu integer"
 
-#: include/blocks.inc.php:632
+#: app/partials/administration.system.info.php:142
 #, c-format
 msgid "Maximum required %1$s database version is %2$s."
 msgstr ""
@@ -11051,7 +11076,7 @@ msgstr "Tháng 5"
 msgid "Media"
 msgstr "Media"
 
-#: app/controllers/CControllerAuditLogList.php:230
+#: app/controllers/CControllerAuditLogList.php:231
 #: app/views/administration.mediatype.edit.php:270 report4.php:96
 msgid "Media type"
 msgstr "Loại phương tiện"
@@ -11124,11 +11149,11 @@ msgstr "Thành viên"
 msgid "Memory limit: %1$s"
 msgstr "Giới hạn bộ nhớ: %1$s"
 
-#: include/classes/data/CItemData.php:1217
+#: include/classes/data/CItemData.php:1220
 msgid "Memory size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Kích thước bộ nhớ theo byte hoặc theo tỷ lệ phần trăm từ tổng số. Trả về kiểu integer cho byte; kiểu float tỷ lệ phần trăm"
 
-#: include/classes/data/CItemData.php:1009
+#: include/classes/data/CItemData.php:1012
 msgid "Memory used by process in bytes. Returns integer"
 msgstr "Bộ nhớ đã sử dụng bởi tiến trình theo byte. Trả về kiểu integer"
 
@@ -11215,7 +11240,7 @@ msgstr "Tối thiểu"
 msgid "Minimum password length"
 msgstr ""
 
-#: include/blocks.inc.php:626
+#: app/partials/administration.system.info.php:136
 #, c-format
 msgid "Minimum required %1$s database version is %2$s."
 msgstr ""
@@ -11314,7 +11339,7 @@ msgstr "Chế độ"
 msgid "Model"
 msgstr "Mô hình"
 
-#: app/controllers/CControllerAuditLogList.php:231
+#: app/controllers/CControllerAuditLogList.php:232
 #: app/views/administration.module.edit.php:52
 msgid "Module"
 msgstr ""
@@ -11508,6 +11533,7 @@ msgstr "NTLM"
 #: app/controllers/CControllerPopupTriggerWizard.php:134
 #: app/controllers/CControllerPopupValueMapUpdate.php:63
 #: app/controllers/CControllerPopupValueMapUpdate.php:70
+#: app/partials/administration.ha.nodes.php:28
 #: app/partials/configuration.filter.items.php:91
 #: app/partials/configuration.host.edit.html.php:177
 #: app/partials/configuration.host.edit.html.php:216
@@ -11679,7 +11705,7 @@ msgstr ""
 msgid "Network discovery data storage period"
 msgstr "Chu kì lưu trữ dữ liệu khám phá mạng"
 
-#: include/classes/data/CItemData.php:941
+#: include/classes/data/CItemData.php:944
 msgid "Network interface list (includes interface type, status, IPv4 address, description). Returns text"
 msgstr "Danh sách interface (bao gồm loại interface, trạng thái, địa chỉ IPv4, mô tả). Trả về kiểu text"
 
@@ -11721,7 +11747,7 @@ msgstr ""
 msgid "Network timeout for script execution"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1513
+#: include/classes/data/CItemData.php:1516
 msgid "Network utilization (combined transmit-rates and receive-rates) during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance"
 msgstr ""
 
@@ -11795,12 +11821,14 @@ msgstr "Trigger mới"
 msgid "Next page"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:142
-#: include/classes/setup/CSetupWizard.php:430
-#: include/classes/setup/CSetupWizard.php:567
+#: include/classes/setup/CSetupWizard.php:331
+#: include/classes/setup/CSetupWizard.php:589
+#: include/classes/setup/CSetupWizard.php:741
 msgid "Next step"
 msgstr "Bước tiếp theo"
 
+#: app/partials/administration.system.info.php:35
+#: app/partials/administration.system.info.php:122
 #: app/partials/configuration.filter.items.php:195
 #: app/partials/configuration.filter.items.php:202
 #: app/partials/configuration.filter.items.php:211
@@ -11815,8 +11843,7 @@ msgstr "Bước tiếp theo"
 #: app/views/popup.massupdate.item.php:337
 #: app/views/popup.massupdate.item.php:379
 #: app/views/popup.massupdate.trigger.php:64 include/actions.inc.php:33
-#: include/blocks.inc.php:532 include/blocks.inc.php:610
-#: include/blocks.inc.php:855 include/blocks.inc.php:859
+#: include/blocks.inc.php:703 include/blocks.inc.php:707
 #: include/classes/screens/CScreenProblem.php:1099
 #: include/classes/screens/CScreenProblem.php:1103
 #: include/classes/screens/CScreenProblem.php:1245 include/events.inc.php:198
@@ -12089,7 +12116,8 @@ msgstr ""
 #: app/controllers/CControllerWidgetIteratorGraphPrototypeView.php:305
 #: app/controllers/CControllerWidgetMapView.php:70
 #: app/controllers/CControllerWidgetPlainTextView.php:88
-#: app/views/monitoring.widget.graph.view.php:42 disc_prototypes.php:748
+#: app/views/monitoring.widget.graph.view.php:42
+#: app/views/monitoring.widget.systeminfo.view.php:45 disc_prototypes.php:748
 #: host_discovery.php:808 hostinventoriesoverview.php:73
 #: include/classes/api/services/CAction.php:1582
 #: include/classes/api/services/CAction.php:1863
@@ -12429,52 +12457,52 @@ msgstr "Tháng 11"
 msgid "November"
 msgstr "Tháng 11"
 
-#: include/classes/data/CItemData.php:1057
+#: include/classes/data/CItemData.php:1060
 msgid "Number of CPUs. Returns integer"
 msgstr "Số lượng CPU. Trả về kiểu integer"
 
-#: include/classes/data/CItemData.php:1297
+#: include/classes/data/CItemData.php:1300
 msgid "Number of available DS paths, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - Datastore name, <partitionid> - internal id of physical device from vmware.hv.datastore.discovery"
 msgstr ""
 
-#: include/classes/data/CItemData.php:893
+#: include/classes/data/CItemData.php:896
 msgid "Number of currently open file descriptors. Returns integer"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1629
+#: include/classes/data/CItemData.php:1632
 msgid "Number of enabled items on the host."
 msgstr "Số lượng item kích hoạt trên máy chủ."
 
-#: include/blocks.inc.php:536
+#: app/partials/administration.system.info.php:40
 msgid "Number of hosts (enabled/disabled)"
 msgstr ""
 
-#: include/blocks.inc.php:549
+#: app/partials/administration.system.info.php:55
 msgid "Number of items (enabled/disabled/not supported)"
 msgstr "Số lượng item (Kích hoạt/vô hiệu hóa/không hỗ trợ)"
 
-#: include/classes/data/CItemData.php:1653
+#: include/classes/data/CItemData.php:1656
 msgid "Number of items in Zabbix database."
 msgstr "Số lượng item trong cơ sở dữ liệu Zabbix."
 
-#: include/classes/data/CItemData.php:1681
+#: include/classes/data/CItemData.php:1684
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr "Số lượng itrm trong lịch sử proxy mà chưa được gửi đến máy chủ"
 
-#: include/classes/data/CItemData.php:1685
+#: include/classes/data/CItemData.php:1688
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
 msgstr "Số lượng item trong hàng đợi mà đang bị trễ từ giây thứ, bao gồm."
 
-#: include/classes/data/CItemData.php:1597
-#: include/classes/data/CItemData.php:1697
+#: include/classes/data/CItemData.php:1600
+#: include/classes/data/CItemData.php:1700
 msgid "Number of items in the queue which are delayed in Zabbix server or proxy by \"from\" till \"to\" seconds, inclusive."
 msgstr ""
 
-#: include/classes/data/CItemData.php:1649
+#: include/classes/data/CItemData.php:1652
 msgid "Number of monitored hosts"
 msgstr "Số lượng host được giám sát"
 
-#: include/classes/data/CItemData.php:929
+#: include/classes/data/CItemData.php:932
 msgid "Number of out-of-window collisions. Returns integer"
 msgstr "Số xung đột ngoài window. Trả về kiểu integer"
 
@@ -12486,15 +12514,15 @@ msgstr "Số lượng vấn đề"
 msgid "Number of problems and expand most critical one"
 msgstr "Số lượng vấn đề và mở rộng nghiêm trọng nhất"
 
-#: include/classes/data/CItemData.php:1329
+#: include/classes/data/CItemData.php:1332
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Số lượng lõi bộ xử lý trên VMware hypervisor, <url> - Dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/data/CItemData.php:1333
+#: include/classes/data/CItemData.php:1336
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Số lượng nhánh bộ xử lý trên VMware hypervisor, <url> - Dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/data/CItemData.php:1417
+#: include/classes/data/CItemData.php:1420
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Số lượng bộ xử lý trên máy ảo VMware, <url> - Dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
@@ -12511,67 +12539,67 @@ msgstr "Số trạng thái thay đổi"
 msgid "Number of steps"
 msgstr "Số bước"
 
-#: include/blocks.inc.php:545
+#: app/partials/administration.system.info.php:50
 msgid "Number of templates"
 msgstr ""
 
-#: include/blocks.inc.php:560
+#: app/partials/administration.system.info.php:67
 msgid "Number of triggers (enabled/disabled [problem/ok])"
 msgstr "Số lượng trigger (Kích hoạt/vô hiệu hóa [Problem/ok]"
 
-#: include/classes/data/CItemData.php:1717
+#: include/classes/data/CItemData.php:1720
 msgid "Number of triggers in Zabbix database."
 msgstr "Số lượng trigger trong cơ sở dữ liệu Zabbix."
 
-#: include/classes/data/CItemData.php:1657
+#: include/classes/data/CItemData.php:1660
 msgid "Number of unsupported items in Zabbix database."
 msgstr "Số lượng item không được hỗ trợ trong cơ sở dữ liệu Zabbix."
 
-#: include/classes/data/CItemData.php:1633
+#: include/classes/data/CItemData.php:1636
 msgid "Number of unsupported items on the host."
 msgstr "Số lượng item không được hỗ trợ trên máy chủ."
 
-#: include/blocks.inc.php:572
+#: app/partials/administration.system.info.php:84
 msgid "Number of users (online)"
 msgstr "Số lượng người dùng (trực tuyến)"
 
-#: include/classes/data/CItemData.php:1133
+#: include/classes/data/CItemData.php:1136
 msgid "Number of users logged in. Returns integer"
 msgstr "Số lượng người dùng đăng nhập được. Trả về kiểu integer"
 
-#: include/classes/data/CItemData.php:1609
+#: include/classes/data/CItemData.php:1612
 msgid "Number of values stored in table HISTORY."
 msgstr "Số lượng giá trị được lưu trữ trong bảng HISTORY."
 
-#: include/classes/data/CItemData.php:1613
+#: include/classes/data/CItemData.php:1616
 msgid "Number of values stored in table HISTORY_LOG."
 msgstr "Số lượng giá trị được lưu trữ trong bảng HISTORY_LOG."
 
-#: include/classes/data/CItemData.php:1617
+#: include/classes/data/CItemData.php:1620
 msgid "Number of values stored in table HISTORY_STR."
 msgstr "Số lượng giá trị được lưu trữ trong bảng HISTORY_STR."
 
-#: include/classes/data/CItemData.php:1621
+#: include/classes/data/CItemData.php:1624
 msgid "Number of values stored in table HISTORY_TEXT."
 msgstr "Số lượng giá trị được lưu trữ trong bảng HISTORY_TEXT."
 
-#: include/classes/data/CItemData.php:1625
+#: include/classes/data/CItemData.php:1628
 msgid "Number of values stored in table HISTORY_UINT."
 msgstr "Số lượng giá trị được lưu trữ trong bảng HISTORY_UNIT."
 
-#: include/classes/data/CItemData.php:1709
+#: include/classes/data/CItemData.php:1712
 msgid "Number of values stored in table TRENDS."
 msgstr "Số lượng giá trị được lưu trữ trong bảng TRENDS."
 
-#: include/classes/data/CItemData.php:1713
+#: include/classes/data/CItemData.php:1716
 msgid "Number of values stored in table TRENDS_UINT."
 msgstr "Số lượng giá trị được lưu trữ trong bảng TRENDS_UNIT."
 
-#: include/classes/data/CItemData.php:1401
+#: include/classes/data/CItemData.php:1404
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Số lượng máy ảo trên VMware hypervisor, <url> - dịch vụ VMware URl, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/data/CItemData.php:1209
+#: include/classes/data/CItemData.php:1212
 msgid "Number or percentage of inodes. Returns integer for number; float for percentage"
 msgstr "Số lượng hoặc tỷ lệ phần trăm của các nút. Trả về integer cho số; foat cho tỷ lệ phần trăm"
 
@@ -12680,7 +12708,7 @@ msgstr "Off"
 #: app/views/js/popup.massupdate.js.php:415
 #: app/views/js/popup.mediatypetest.edit.js.php:114
 #: app/views/js/popup.scriptexec.js.php:53
-#: app/views/js/reports.auditlog.list.js.php:157
+#: app/views/js/reports.auditlog.list.js.php:158
 #: app/views/monitoring.widget.web.view.php:30
 #: include/views/configuration.triggers.list.php:94
 #: include/views/js/common.item.edit.js.php:204
@@ -12738,7 +12766,7 @@ msgstr "Chỉ có Zabbix agent, SNMPv1, SNMPv2 và SNMPv3 có thể được t�
 msgid "Only administrators can set map owner."
 msgstr "Chỉ quản trị viên mới có thể đặt chủ sở hữu sơ đồ."
 
-#: include/blocks.inc.php:550
+#: app/partials/administration.system.info.php:56
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "Chỉ các item được gán đến host đã kích hoạt mới được tính"
 
@@ -12784,7 +12812,7 @@ msgstr "Chỉ Siêu Admin mới có thể đăht chủ sở hữu bang điều k
 msgid "Only super admins can set report owner."
 msgstr ""
 
-#: include/blocks.inc.php:561
+#: app/partials/administration.system.info.php:68
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Chỉ các trigger được gán đến các host đã kích hoạt và tùy thuộc vào các item đã kích hoạt mới được tính"
 
@@ -12792,7 +12820,7 @@ msgstr "Chỉ các trigger được gán đến các host đã kích hoa�
 msgid "Opera"
 msgstr "Opera"
 
-#: include/classes/data/CItemData.php:1105
+#: include/classes/data/CItemData.php:1108
 msgid "Operating system information. Returns string"
 msgstr "Thông tin hệ điều hành. Trả về kiểu string"
 
@@ -12821,7 +12849,7 @@ msgstr "Thao tác không có nhóm để hoạt động."
 msgid "Operation has no template to operate."
 msgstr "Thao tác không có template để hoạt động."
 
-#: app/views/monitoring.widget.problems.view.php:64 include/blocks.inc.php:731
+#: app/views/monitoring.widget.problems.view.php:64 include/blocks.inc.php:579
 #: include/classes/screens/CScreenProblem.php:890
 #: include/classes/screens/CScreenProblem.php:1160 include/events.inc.php:184
 #: include/views/configuration.trigger.prototype.edit.php:84
@@ -12980,7 +13008,7 @@ msgstr "Các tham số khác"
 msgid "Others"
 msgstr "Khác"
 
-#: include/classes/data/CItemData.php:945
+#: include/classes/data/CItemData.php:948
 msgid "Outgoing traffic statistics on network interface. Returns integer"
 msgstr "Thống kê lưu lượng truy cập đi trên interface. Trả về kiểu integer"
 
@@ -13267,7 +13295,8 @@ msgctxt "page navigation"
 msgid "Pager"
 msgstr ""
 
-#: app/views/administration.mediatype.edit.php:103 include/blocks.inc.php:525
+#: app/partials/administration.system.info.php:30
+#: app/views/administration.mediatype.edit.php:103
 msgid "Parameter"
 msgstr "Tham số"
 
@@ -13360,7 +13389,7 @@ msgstr "Thụ động"
 #: app/views/popup.massupdate.item.php:175
 #: app/views/popup.massupdate.item.php:199 disc_prototypes.php:218
 #: host_discovery.php:191 httpconf.php:74
-#: include/classes/setup/CSetupWizard.php:364
+#: include/classes/setup/CSetupWizard.php:527
 #: include/views/configuration.host.discovery.edit.php:413
 #: include/views/configuration.host.discovery.edit.php:554
 #: include/views/configuration.host.discovery.edit.php:593
@@ -13431,7 +13460,7 @@ msgstr "Tạm dừng hoạt động cho các vấn đề bị hạn chế"
 msgid "Peak memory usage: %1$s"
 msgstr "Cách sử dụng bộ nhớ lúc cao điểm: %1$s"
 
-#: include/classes/data/CItemData.php:1413
+#: include/classes/data/CItemData.php:1416
 msgid "Percent of time the virtual machine is unable to run because it is contending for access to the physical CPU(s), <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
@@ -13439,11 +13468,11 @@ msgstr ""
 msgid "Percentage"
 msgstr "Phần trăm"
 
-#: include/classes/data/CItemData.php:1497
+#: include/classes/data/CItemData.php:1500
 msgid "Percentage of host physical memory that has been consumed, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1421
+#: include/classes/data/CItemData.php:1424
 msgid "Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance"
 msgstr ""
 
@@ -13455,7 +13484,7 @@ msgstr "Đường phần trăm (trái)"
 msgid "Percentile line (right)"
 msgstr "Đường phần trăm (phải)"
 
-#: include/classes/data/CItemData.php:921
+#: include/classes/data/CItemData.php:924
 msgid "Performs a DNS query. Returns character string with the required type of information"
 msgstr "Thực hiện một truy vấn DNS. Trả về chuỗi ký tự với loại thông tin cần thiết"
 
@@ -13515,7 +13544,7 @@ msgid "Placing algorithm"
 msgstr "Đặt thuật toán"
 
 #: app/views/administration.mediatype.edit.php:208
-#: include/classes/setup/CSetupWizard.php:330
+#: include/classes/setup/CSetupWizard.php:498
 #: include/classes/widgets/CWidgetConfig.php:56
 msgid "Plain text"
 msgstr "Văn bản gốc"
@@ -13529,7 +13558,7 @@ msgstr "Phát"
 msgid "Play sound"
 msgstr "Phát âm thanh"
 
-#: include/classes/setup/CSetupWizard.php:567
+#: include/classes/setup/CSetupWizard.php:741
 #, c-format
 msgid "Please check configuration parameters. If all is correct, press \"%1$s\" button, or \"%2$s\" button to change configuration parameters."
 msgstr "Vui lòng kiểm tra các thông số cấu hình. Nếu tất cả đều chính xác, nhấn nút \"%1$s\" hoặc nút \"%2$s\" để thay đổi các tham số cấu hình."
@@ -13542,18 +13571,14 @@ msgstr ""
 msgid "Please confirm that you want to remove all value mappings."
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:430
+#: include/classes/setup/CSetupWizard.php:589
 #, c-format
 msgid "Please create database manually, and set the configuration parameters for connection to this database. Press \"%1$s\" button when done."
 msgstr "Vui lòng tạo cơ sở dữ liệu theo cách thủ công và đặt các tham số cấu hình để kết nối với cơ sở dữ liệu này. Nhấn nút \"%1$s\" khi hoàn tất."
 
-#: include/classes/setup/CSetupWizard.php:888
+#: include/classes/setup/CSetupWizard.php:177
 msgid "Please enable \"allow_url_fopen\" directive."
 msgstr ""
-
-#: include/classes/setup/CSetupWizard.php:458
-msgid "Please enter the host name or host IP address and port number of the Zabbix server, as well as the name of the installation (optional)."
-msgstr "Vui lòng nhập tên máy chủ hoặc địa chỉ IP máy chủ và số cổng của máy chủ Zabbix, cũng như tên cài đặt (tùy chọn)."
 
 #: jsLoader.php:241
 msgid "Please select two elements"
@@ -13595,9 +13620,8 @@ msgstr "Gắn linh kiện vào trường host còn lại"
 #: app/views/administration.proxy.edit.php:49
 #: app/views/administration.script.edit.php:162
 #: app/views/configuration.host.list.php:118
-#: app/views/popup.itemtestedit.view.php:112
-#: include/classes/setup/CSetupWizard.php:445 include/hosts.inc.php:1228
-#: include/views/inventory.host.view.php:81 setup.php:62
+#: app/views/popup.itemtestedit.view.php:112 include/hosts.inc.php:1228
+#: include/views/inventory.host.view.php:81
 msgid "Port"
 msgstr "Cổng"
 
@@ -13625,7 +13649,7 @@ msgstr "Trường gửi"
 msgid "Post type"
 msgstr "Loại thư"
 
-#: include/classes/data/CItemData.php:1377
+#: include/classes/data/CItemData.php:1380
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
 msgstr ""
 
@@ -13633,8 +13657,8 @@ msgstr ""
 msgid "Power value"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:65
-#: include/classes/setup/CSetupWizard.php:565
+#: include/classes/setup/CSetupWizard.php:70
+#: include/classes/setup/CSetupWizard.php:739
 msgid "Pre-installation summary"
 msgstr "Tóm tắt chuẩn bị cài đặt"
 
@@ -13679,7 +13703,7 @@ msgid "Previous day"
 msgstr ""
 
 #: app/partials/scheduledreport.formgrid.html.php:88
-#: app/partials/scheduledreport.table.html.php:58 include/func.inc.php:2546
+#: app/partials/scheduledreport.table.html.php:58 include/func.inc.php:2403
 msgid "Previous month"
 msgstr "quay lại tháng trước"
 
@@ -13693,12 +13717,12 @@ msgid "Previous value"
 msgstr ""
 
 #: app/partials/scheduledreport.formgrid.html.php:87
-#: app/partials/scheduledreport.table.html.php:57 include/func.inc.php:2545
+#: app/partials/scheduledreport.table.html.php:57 include/func.inc.php:2402
 msgid "Previous week"
 msgstr "Quay lại tuần trước"
 
 #: app/partials/scheduledreport.formgrid.html.php:89
-#: app/partials/scheduledreport.table.html.php:59 include/func.inc.php:2547
+#: app/partials/scheduledreport.table.html.php:59 include/func.inc.php:2404
 msgid "Previous year"
 msgstr "Quay lại năm trước"
 
@@ -13767,7 +13791,7 @@ msgstr "Cấp đặc quyền"
 #: app/views/monitoring.service.list.php:84
 #: app/views/monitoring.widget.problems.view.php:60
 #: app/views/popup.acknowledge.edit.php:33
-#: app/views/popup.mediatype.message.php:49 include/blocks.inc.php:730
+#: app/views/popup.mediatype.message.php:49 include/blocks.inc.php:578
 #: include/classes/helpers/CMediatypeHelper.php:48
 #: include/classes/screens/CScreenProblem.php:865
 #: include/classes/screens/CScreenProblem.php:888
@@ -13861,7 +13885,7 @@ msgstr "Các vấn đề"
 msgid "Problems by severity"
 msgstr "Vấn đề nghiêm trọng"
 
-#: include/classes/data/CItemData.php:1005
+#: include/classes/data/CItemData.php:1008
 msgid "Process CPU utilization percentage. Returns float"
 msgstr ""
 
@@ -13907,7 +13931,7 @@ msgstr "URL \"%1$s\" được cung cấp không hợp lệ"
 msgid "Proxies"
 msgstr "Proxies"
 
-#: app/controllers/CControllerAuditLogList.php:232
+#: app/controllers/CControllerAuditLogList.php:233
 #: app/views/administration.proxy.edit.php:89
 #: app/views/administration.proxy.edit.php:142
 #: app/views/administration.queue.details.php:49
@@ -14100,7 +14124,7 @@ msgstr ""
 msgid "Read-write access to services with tag"
 msgstr ""
 
-#: include/classes/data/CItemData.php:913
+#: include/classes/data/CItemData.php:916
 msgid "Reads modbus data. Returns various types"
 msgstr ""
 
@@ -14202,7 +14226,7 @@ msgstr ""
 msgid "Regular"
 msgstr "Chính quy"
 
-#: app/controllers/CControllerAuditLogList.php:233
+#: app/controllers/CControllerAuditLogList.php:234
 #: app/views/popup.lldoverride.php:101 include/items.inc.php:1803
 #: include/views/configuration.host.discovery.edit.php:742
 msgid "Regular expression"
@@ -14531,7 +14555,7 @@ msgstr "Yêu cầu gửi thành công"
 msgid "Request type"
 msgstr "Yêu cầu kiểu"
 
-#: include/classes/setup/CSetupWizard.php:237
+#: include/classes/setup/CSetupWizard.php:409
 #: include/views/configuration.httpconf.edit.php:205
 msgid "Required"
 msgstr "yêu cầu"
@@ -14544,11 +14568,11 @@ msgstr "Quyền truy cập host được yêu cầu"
 msgid "Required performance (vps)"
 msgstr "Hiệu năng cần thiết (vps)"
 
-#: include/classes/data/CItemData.php:1693
+#: include/classes/data/CItemData.php:1696
 msgid "Required performance of the Zabbix server, in new values per second expected."
 msgstr "Hiệu năng cần thiết của máy chủ Zabbix, trong các giá trị mới được dự tính trên mỗi giây."
 
-#: include/blocks.inc.php:576
+#: app/partials/administration.system.info.php:91
 msgid "Required server performance, new values per second"
 msgstr "Hiệu năng cần thiết của máy chủ, các giá trị mới trên mỗi giây"
 
@@ -14698,7 +14722,7 @@ msgstr ""
 msgid "Retrieve mode"
 msgstr "Lấy lại chế độ"
 
-#: include/classes/data/CItemData.php:1161
+#: include/classes/data/CItemData.php:1164
 msgid "Retrieving contents of a file. Returns text"
 msgstr "Chỉ lấy nội dùng 1 tệp tin. Trả về kiểu text"
 
@@ -14706,60 +14730,60 @@ msgstr "Chỉ lấy nội dùng 1 tệp tin. Trả về kiểu text"
 msgid "Retry"
 msgstr "Thử lại"
 
-#: include/classes/data/CItemData.php:873
+#: include/classes/data/CItemData.php:876
 msgid "Return a JSON array with LLD macros describing the MBean objects or their attributes. Can be used for LLD."
 msgstr ""
 
-#: include/classes/data/CItemData.php:877
+#: include/classes/data/CItemData.php:880
 msgid "Return a JSON array with MBean objects or their attributes. Compared to jmx.discovery it does not define LLD macros. Can be used for LLD."
 msgstr ""
 
-#: include/classes/data/CItemData.php:849
+#: include/classes/data/CItemData.php:852
 msgid "Return first column of the first row of the SQL query result."
 msgstr "Trả về cột đầu tiên của hàng đầu tiên của kết quả truy vấn SQL."
 
-#: include/classes/data/CItemData.php:881
+#: include/classes/data/CItemData.php:884
 msgid "Return value of an attribute of MBean object."
 msgstr "Trả về giá trị của một thuộc tính của đối tượng MBean."
 
-#: include/classes/data/CItemData.php:1181
+#: include/classes/data/CItemData.php:1184
 msgid "Returns 4-digit string containing octal number with Unix permissions"
 msgstr ""
 
-#: include/classes/data/CItemData.php:865
+#: include/classes/data/CItemData.php:868
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
 msgstr "Trả về thời gian đáp ứng ICMP ping trong vài giây. Ví dụ: 0.02"
 
-#: include/classes/data/CItemData.php:1645
+#: include/classes/data/CItemData.php:1648
 msgid "Returns a JSON array describing the host network interfaces configured in Zabbix. Can be used for LLD."
 msgstr ""
 
-#: include/classes/data/CItemData.php:1601
-#: include/classes/data/CItemData.php:1701
+#: include/classes/data/CItemData.php:1604
+#: include/classes/data/CItemData.php:1704
 msgid "Returns a JSON object containing Zabbix server or proxy internal metrics."
 msgstr ""
 
-#: include/classes/data/CItemData.php:1641
+#: include/classes/data/CItemData.php:1644
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx."
 msgstr "Trả về tính sẵn sàng của một loại hình cụ thể của kiểm tra trên máy chủ. Giá trị của item này tương ứng với các biểu tượng có sẵn trên danh sách host. Các loại hợp lệ là: agent, snmp, ipmi, jmx."
 
-#: include/classes/data/CItemData.php:1637
+#: include/classes/data/CItemData.php:1640
 msgid "Returns current maintenance status of the host."
 msgstr "Trả về trạng thái bảo trì hiện tại của máy chủ."
 
-#: include/classes/data/CItemData.php:1661
+#: include/classes/data/CItemData.php:1664
 msgid "Returns information associated with Zabbix Java gateway. Valid params are: ping, version."
 msgstr "Trả về thông tin liên quan đến Zabbiz Java gateway. Các tham số hợp lệ là: ping, version."
 
-#: include/classes/data/CItemData.php:969
+#: include/classes/data/CItemData.php:972
 msgid "Returns number of TCP sockets that match parameters. Returns integer"
 msgstr ""
 
-#: include/classes/data/CItemData.php:985
+#: include/classes/data/CItemData.php:988
 msgid "Returns number of UDP sockets that match parameters. Returns integer"
 msgstr ""
 
-#: include/classes/data/CItemData.php:861
+#: include/classes/data/CItemData.php:864
 msgid "Returns percentage of lost ICMP ping packets."
 msgstr "Trả về tỉ lệ mất gói tin ping ICMP."
 
@@ -14836,7 +14860,7 @@ msgstr ""
 msgid "Run script \"%1$s\" on hosts"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1093
+#: include/classes/data/CItemData.php:1096
 msgid "Run specified command on the host. Returns text result of the command; 1 - with mode as nowait (regardless of command result)"
 msgstr "Chạy lệnh được chỉ định trên máy chủ. Trả về kết quả văn bản của lệnh; 1 - với chế độ như bây giờ (bất kể kết quả lệnh)"
 
@@ -15090,7 +15114,7 @@ msgstr ""
 msgid "Save changes"
 msgstr "Lưu thay đổi"
 
-#: include/classes/setup/CSetupWizard.php:685
+#: include/classes/setup/CSetupWizard.php:857
 #, c-format
 msgid "Save it as \"%1$s\""
 msgstr "Lưu thành \"%1$s\""
@@ -15115,7 +15139,7 @@ msgstr "Lịch trình"
 msgid "Scheduled check"
 msgstr "Kiểm tra lịch trình"
 
-#: app/controllers/CControllerAuditLogList.php:235
+#: app/controllers/CControllerAuditLogList.php:236
 #: app/views/reports.scheduledreport.edit.php:57
 msgid "Scheduled report"
 msgstr ""
@@ -15179,7 +15203,7 @@ msgctxt "selected problems"
 msgid "Scope"
 msgstr "Phạm vi"
 
-#: app/controllers/CControllerAuditLogList.php:236
+#: app/controllers/CControllerAuditLogList.php:237
 #: app/views/administration.mediatype.edit.php:217
 #: app/views/administration.script.edit.php:115
 #: app/views/administration.script.edit.php:185
@@ -15451,7 +15475,7 @@ msgstr "Máy chủ (proxy)"
 msgid "Server time"
 msgstr "thời gian máy chủ"
 
-#: app/controllers/CControllerAuditLogList.php:224
+#: app/controllers/CControllerAuditLogList.php:225
 #: app/views/monitoring.service.list.edit.php:112
 #: app/views/popup.mediatype.message.php:58
 #: app/views/popup.service.edit.php:286 app/views/popup.service.edit.php:344
@@ -15573,7 +15597,7 @@ msgstr "Các dịch vụ tạo thành một quan hệ phụ thuộc vòng 
 msgid "Services updated"
 msgstr ""
 
-#: include/classes/core/ZBase.php:241 include/classes/core/ZBase.php:468
+#: include/classes/core/ZBase.php:244 include/classes/core/ZBase.php:471
 msgid "Session initialization error."
 msgstr ""
 
@@ -15632,7 +15656,9 @@ msgstr "Cài đặt giao thức LDAP thất bại."
 msgid "Setting LDAP referrals to \"Off\" failed."
 msgstr "Cài đặt LDAP tham chiếu đến \"Off\" thất bại."
 
-#: app/controllers/CControllerAuditLogList.php:237
+#: app/controllers/CControllerAuditLogList.php:238
+#: include/classes/setup/CSetupWizard.php:66
+#: include/classes/setup/CSetupWizard.php:624
 msgid "Settings"
 msgstr ""
 
@@ -15721,6 +15747,7 @@ msgstr "Rút ngắn"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:108
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:180
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:252
+#: include/classes/widgets/forms/CWidgetFormSystemInfo.php:30
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:33
 #: include/views/js/monitoring.sysmaps.js.php:100 report2.php:546
 msgid "Show"
@@ -15930,7 +15957,7 @@ msgstr "Site quốc gia / tỉnh"
 msgid "Size"
 msgstr "Kích thước"
 
-#: include/classes/server/CZabbixServer.php:514
+#: include/classes/server/CZabbixServer.php:530
 #, c-format
 msgid "Size of the response received from Zabbix server \"%1$s\" exceeds the allowed size of %2$s bytes. This value can be increased in the ZBX_SOCKET_BYTES_LIMIT constant in include/defines.inc.php."
 msgstr "Kích thước của các đáp ứng nhận được từ máy chủ Zabbix \"%1$s\" vượt quá kích thước cho phép của %2$s byte. Giá trị này có thể được tăng lên trong các hằng số ZBX_SOCKET_BYTES_LIMIT trong include/defines.inc.php."
@@ -15976,7 +16003,7 @@ msgstr "Phần mềm ứng dụng D"
 msgid "Software application E"
 msgstr "Phần mềm ứng dụng E"
 
-#: include/classes/data/CItemData.php:1101
+#: include/classes/data/CItemData.php:1104
 msgid "Software architecture information. Returns string"
 msgstr "Thông tin kiến trúc phần mềm. Trả về kiểu string"
 
@@ -16047,6 +16074,10 @@ msgstr "Staircase"
 msgid "Standard items"
 msgstr "Các item chuẩn"
 
+#: app/partials/administration.ha.nodes.php:45
+msgid "Standby"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:630
 #: app/controllers/CControllerPopupTriggerExpr.php:748
 msgid "Start"
@@ -16079,7 +16110,7 @@ msgstr ""
 msgid "Starting TLS failed."
 msgstr "TLS Bắt đầu thất bại."
 
-#: include/classes/data/CItemData.php:1605
+#: include/classes/data/CItemData.php:1608
 msgid "Startup time of Zabbix server, Unix timestamp."
 msgstr "Thời gian bắt đầu khởi động của của máy chủ Zabbix, Unix timestamp."
 
@@ -16097,13 +16128,14 @@ msgctxt "history source selection method"
 msgid "Static"
 msgstr "Tĩnh"
 
-#: include/classes/data/CItemData.php:1741
+#: include/classes/data/CItemData.php:1744
 msgid "Statistics and availability of Zabbix write cache. Cache - one of values (modes: all, float, uint, str, log, text, not supported), history (modes: pfree, free, total, used, pused), index (modes: pfree, free, total, used, pused), trend (modes: pfree, free, total, used, pused)."
 msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:179
 #: app/controllers/CControllerPopupGeneric.php:193
 #: app/controllers/CControllerPopupGeneric.php:235
+#: app/partials/administration.ha.nodes.php:28
 #: app/partials/configuration.filter.items.php:184
 #: app/partials/monitoring.host.filter.php:125
 #: app/partials/monitoring.host.view.html.php:34
@@ -16260,6 +16292,10 @@ msgstr ""
 msgid "Stop slideshow"
 msgstr ""
 
+#: app/partials/administration.ha.nodes.php:40
+msgid "Stopped"
+msgstr ""
+
 #: app/views/popup.lldoperation.php:191 app/views/popup.lldoperation.php:212
 #: app/views/popup.massupdate.item.php:295
 #: app/views/popup.massupdate.item.php:311
@@ -16270,12 +16306,12 @@ msgstr ""
 msgid "Storage period"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:328
+#: include/classes/setup/CSetupWizard.php:496
 msgid "Store credentials in"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:500
-#: include/classes/setup/CSetupWizard.php:501
+#: include/classes/setup/CSetupWizard.php:642
+#: include/classes/setup/CSetupWizard.php:643
 msgid "Stored in HashiCorp Vault secret"
 msgstr ""
 
@@ -16341,7 +16377,7 @@ msgstr "Kiểm nghiệm thành công"
 msgid "Success message"
 msgstr "Tin chắn thành công"
 
-#: include/classes/data/CItemData.php:949
+#: include/classes/data/CItemData.php:952
 msgid "Sum of incoming and outgoing traffic statistics on network interface. Returns integer"
 msgstr "Tổng số thống kê lưu lượng đến và đi trên interface. Trả về kiểu integer"
 
@@ -16367,15 +16403,15 @@ msgstr "Hỗ trợ"
 msgid "Suppressed till: %1$s"
 msgstr "Bị nén cho đến khi: %1$s"
 
-#: include/classes/data/CItemData.php:1113
+#: include/classes/data/CItemData.php:1116
 msgid "Swap in (from device into memory) statistics. Returns integer"
 msgstr "Trao đổi thống kê (từ thiết bị vào bộ nhớ). Trả về kiểu integer"
 
-#: include/classes/data/CItemData.php:1117
+#: include/classes/data/CItemData.php:1120
 msgid "Swap out (from memory onto device) statistics. Returns integer"
 msgstr "Trao đổi thống kê (từ bộ nhớ vào thiết bị). Trả về kiểu integer"
 
-#: include/classes/data/CItemData.php:1121
+#: include/classes/data/CItemData.php:1124
 msgid "Swap space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Hoán đổi kích thước không gian theo byte hoặc theo tỷ lệ phần trăm từ tổng số. Trả về kiểu integer cho byte; float cho tỷ lệ phần trăm"
 
@@ -16391,7 +16427,7 @@ msgstr "Chuyển đổi phương pháp xác nhận sẽ thiết laoapj la�
 msgid "System"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1041
+#: include/classes/data/CItemData.php:1044
 msgid "System boot time. Returns integer (Unix timestamp)"
 msgstr "Thời gian khởi động hệ thống. Trả về kiểu integer (đơn vị dấu thời gian)"
 
@@ -16410,26 +16446,30 @@ msgstr "Xảy ra lỗi hệ thống. Vui lòng liên hệ với quản trị vi�
 msgid "System error."
 msgstr "Lỗi hệ thống."
 
-#: include/classes/data/CItemData.php:1069
+#: include/classes/data/CItemData.php:1072
 msgid "System host name. Returns string"
 msgstr "Tên máy chủ hệ thống. Trả về kiểu string"
 
-#: app/controllers/CControllerReportStatus.php:39
-#: app/views/report.status.php:29 include/classes/helpers/CMenuHelper.php:103
+#: app/controllers/CControllerReportStatus.php:42
+#: app/views/report.status.php:30 include/classes/helpers/CMenuHelper.php:103
 #: include/classes/helpers/CRoleHelper.php:329
 #: include/classes/widgets/CWidgetConfig.php:61
 msgid "System information"
 msgstr "Thông tin hệ thống"
 
-#: include/classes/data/CItemData.php:1097
+#: include/classes/data/CItemData.php:1100
 msgid "System statistics. Returns integer or float"
 msgstr "Thống kê hệ thống. Trả về kiểu integer hoặc float"
 
-#: include/classes/data/CItemData.php:1089
+#: include/classes/widgets/forms/CWidgetFormSystemInfo.php:31
+msgid "System stats"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1092
 msgid "System time. Returns integer with type as UTC; string - with type as local"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1129
+#: include/classes/data/CItemData.php:1132
 msgid "System uptime in seconds. Returns integer"
 msgstr "Thời gian chạy hệ thống tính bằng giây. Trả về kiểu integer"
 
@@ -16532,7 +16572,7 @@ msgstr "Thẻ giá trị"
 #: app/views/popup.massupdate.trigger.php:75
 #: app/views/popup.massupdate.trigger.php:150
 #: app/views/popup.service.edit.php:263 app/views/popup.service.edit.php:346
-#: include/blocks.inc.php:735 include/classes/screens/CScreenHttpTest.php:117
+#: include/blocks.inc.php:583 include/classes/screens/CScreenHttpTest.php:117
 #: include/classes/screens/CScreenProblem.php:839
 #: include/classes/screens/CScreenProblem.php:895
 #: include/classes/screens/CScreenProblem.php:1164
@@ -16588,7 +16628,7 @@ msgstr "Kiểu Target"
 msgid "Telnet"
 msgstr "Telnet"
 
-#: app/controllers/CControllerAuditLogList.php:238
+#: app/controllers/CControllerAuditLogList.php:239
 #: app/views/administration.mediatype.edit.php:280
 #: app/views/popup.massupdate.template.php:147 app/views/search.php:278
 #: include/actions.inc.php:49 include/forms.inc.php:529
@@ -16633,7 +16673,7 @@ msgstr ""
 msgid "Template cannot be linked to another template more than once even through other templates."
 msgstr "Template không thể liên kết được đến template khác nhiều hơn một lần thậm chí thông qua các template khác."
 
-#: app/controllers/CControllerAuditLogList.php:239
+#: app/controllers/CControllerAuditLogList.php:240
 msgid "Template dashboard"
 msgstr ""
 
@@ -16818,11 +16858,11 @@ msgstr "Phương thức \"%1$s.%2$s\" phải được gọi ngoại trừ tham s
 msgid "The Zabbix database version does not match current requirements. Your database version: %1$s. Required version: %2$s. Please contact your system administrator."
 msgstr ""
 
-#: include/classes/data/CItemData.php:1533
+#: include/classes/data/CItemData.php:1536
 msgid "The average time a read from the virtual disk takes, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1537
+#: include/classes/data/CItemData.php:1540
 msgid "The average time a write to the virtual disk takes, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
 msgstr ""
 
@@ -16886,7 +16926,7 @@ msgstr "Item không được phát hiện nữa và sẽ bị xóa trong %
 msgid "The item is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "Item này không được khám phá nữa và sẽ bị xóa trong lần xử lý khám phá tiếp theo."
 
-#: include/classes/data/CItemData.php:1013
+#: include/classes/data/CItemData.php:1016
 msgid "The number of processes. Returns integer"
 msgstr "Số lượng các tiến trình. Trả về kiểu integer"
 
@@ -16921,7 +16961,7 @@ msgstr ""
 msgid "Theme"
 msgstr "Giao diện"
 
-#: include/func.inc.php:2544
+#: include/func.inc.php:2401
 msgid "This day last week"
 msgstr "Ngày cuối tuần"
 
@@ -16934,11 +16974,11 @@ msgstr ""
 msgid "This is the test message from Zabbix"
 msgstr ""
 
-#: include/func.inc.php:2552
+#: include/func.inc.php:2409
 msgid "This month"
 msgstr "Tháng này"
 
-#: include/func.inc.php:2553
+#: include/func.inc.php:2410
 msgid "This month so far"
 msgstr "Tháng này đến nay"
 
@@ -16947,19 +16987,19 @@ msgstr "Tháng này đến nay"
 msgid "This type of information may not match the key."
 msgstr ""
 
-#: include/func.inc.php:2550
+#: include/func.inc.php:2407
 msgid "This week"
 msgstr "Tuần này"
 
-#: include/func.inc.php:2551
+#: include/func.inc.php:2408
 msgid "This week so far"
 msgstr "Tuần này cho đến nay"
 
-#: include/func.inc.php:2554
+#: include/func.inc.php:2411
 msgid "This year"
 msgstr "Năm này"
 
-#: include/func.inc.php:2555
+#: include/func.inc.php:2412
 msgid "This year so far"
 msgstr "Năm này cho đến nay"
 
@@ -16996,7 +17036,7 @@ msgstr "Cho tới"
 #: app/views/reports.auditlog.list.php:89 include/actions.inc.php:1700
 #: include/actions.inc.php:1754 include/actions.inc.php:1827
 #: include/actions.inc.php:1921 include/actions.inc.php:1976
-#: include/blocks.inc.php:710 include/classes/screens/CScreenProblem.php:816
+#: include/blocks.inc.php:558 include/classes/screens/CScreenProblem.php:816
 #: include/classes/screens/CScreenProblem.php:1155
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:31
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:32
@@ -17007,7 +17047,7 @@ msgstr "Cho tới"
 msgid "Time"
 msgstr "Thời gian"
 
-#: include/classes/data/CItemData.php:1673
+#: include/classes/data/CItemData.php:1676
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
 msgstr "Thời gian một quy trình Zabbix cụ thể hoặc một nhóm các quy trình (được xác định bởi <type> và <mode>) được chi tiêu theo <state> theo tỷ lệ phần trăm."
 
@@ -17020,7 +17060,7 @@ msgstr ""
 msgid "Time filter default period"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1677
+#: include/classes/data/CItemData.php:1680
 msgid "Time of proxy last access. Name - proxy name. Valid params are: lastaccess - Unix timestamp, delay - seconds."
 msgstr ""
 
@@ -17081,11 +17121,11 @@ msgstr "To"
 msgid "To set a host interface select a single item type for all items"
 msgstr "Để thiết lập một host interface chọn một kiểu item duy nhất cho tất cả các item"
 
-#: include/classes/screens/CScreenProblem.php:701 include/func.inc.php:2548
+#: include/classes/screens/CScreenProblem.php:701 include/func.inc.php:2405
 msgid "Today"
 msgstr "Hôm nay"
 
-#: include/func.inc.php:2549
+#: include/func.inc.php:2406
 msgid "Today so far"
 msgstr "Hôm nay"
 
@@ -17117,7 +17157,7 @@ msgstr "Tổng thời gian tìm kiếm: %1$s"
 msgid "Total SQL time: %1$s"
 msgstr "Tổng thời gian SQL: %1$s"
 
-#: include/classes/data/CItemData.php:1453
+#: include/classes/data/CItemData.php:1456
 msgid "Total time elapsed, in seconds, since last operating system boot-up, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
@@ -17138,11 +17178,11 @@ msgstr ""
 msgid "Transaction has not been closed. Aborting..."
 msgstr "Giao dịch chưa được đóng lại. Đang hủy bỏ..."
 
-#: include/classes/data/CItemData.php:841
+#: include/classes/data/CItemData.php:844
 msgid "Transform SQL query result into a JSON array for low-level discovery."
 msgstr ""
 
-#: include/classes/data/CItemData.php:845
+#: include/classes/data/CItemData.php:848
 msgid "Transform SQL query result into a JSON array."
 msgstr ""
 
@@ -17173,7 +17213,7 @@ msgctxt "missing data function"
 msgid "Treat as 0"
 msgstr "Coi là 0"
 
-#: include/classes/data/CItemData.php:1705
+#: include/classes/data/CItemData.php:1708
 msgid "Trend function cache statistics. Valid parameters are: all, hits, phits, misses, pmisses, items, pitems and requests."
 msgstr ""
 
@@ -17194,7 +17234,7 @@ msgstr "Khuynh hướng chu kỳ lưu trữ dữ liệu"
 msgid "Trends"
 msgstr "Các khuynh hướng "
 
-#: app/controllers/CControllerAuditLogList.php:240
+#: app/controllers/CControllerAuditLogList.php:241
 #: app/controllers/CControllerPopupTriggerWizard.php:282
 #: app/views/popup.massupdate.trigger.php:149 include/actions.inc.php:46
 #: include/classes/graphdraw/CLineGraphDraw.php:472 include/events.inc.php:256
@@ -17297,7 +17337,7 @@ msgstr "Tên trigger"
 msgid "Trigger overview"
 msgstr "Tổng quan các trigger"
 
-#: app/controllers/CControllerAuditLogList.php:241
+#: app/controllers/CControllerAuditLogList.php:242
 #: app/views/popup.lldoperation.php:52
 #: app/views/popup.massupdate.trigger.php:149
 #: include/views/configuration.trigger.prototype.edit.php:548
@@ -17600,11 +17640,11 @@ msgstr ""
 msgid "Ukrainian (uk_UA)"
 msgstr "Ukrainian (uk_UA)"
 
-#: include/classes/core/CConfigFile.php:249
+#: include/classes/core/CConfigFile.php:252
 msgid "Unable to change configuration file permissions to 0600."
 msgstr ""
 
-#: include/classes/core/CConfigFile.php:258
+#: include/classes/core/CConfigFile.php:261
 msgid "Unable to create the configuration file."
 msgstr "Không thể tạo tập tin cấu hình."
 
@@ -17619,7 +17659,7 @@ msgstr ""
 msgid "Unable to load authentication API parameters."
 msgstr ""
 
-#: include/classes/core/CConfigFile.php:184
+#: include/classes/core/CConfigFile.php:187
 msgid "Unable to load database credentials from Vault."
 msgstr ""
 
@@ -17627,15 +17667,15 @@ msgstr ""
 msgid "Unable to load housekeeping API parameters."
 msgstr ""
 
-#: include/classes/helpers/CSettingsHelper.php:108
+#: include/classes/helpers/CSettingsHelper.php:109
 msgid "Unable to load settings API parameters."
 msgstr ""
 
-#: include/classes/core/CConfigFile.php:254
+#: include/classes/core/CConfigFile.php:257
 msgid "Unable to overwrite the existing configuration file."
 msgstr "Không thể ghi đè lên tệp cấu hình hiện có."
 
-#: include/blocks.inc.php:638
+#: app/partials/administration.system.info.php:148
 msgid "Unable to retrieve database version."
 msgstr ""
 
@@ -17669,6 +17709,10 @@ msgstr "Các sự kiện GIẢI QUYẾT chưa được xác nhận"
 msgid "Unacknowledged only"
 msgstr "Chỉ không được báo nhận"
 
+#: app/partials/administration.ha.nodes.php:56
+msgid "Unavailable"
+msgstr ""
+
 #: app/views/administration.user.list.php:249
 msgid "Unblock"
 msgstr "Bỏ chặn"
@@ -17677,7 +17721,7 @@ msgstr "Bỏ chặn"
 msgid "Unblock selected users?"
 msgstr "Bỏ chặn các người dùng được lựa chọn?"
 
-#: include/classes/core/ZBase.php:571
+#: include/classes/core/ZBase.php:574
 #, c-format
 msgid "Unexpected response for action %1$s."
 msgstr ""
@@ -17943,7 +17987,7 @@ msgstr "Cập nhật thao tác"
 msgid "Update problem"
 msgstr "Cập nhật vấn đề"
 
-#: app/controllers/CControllerAuditLogList.php:362
+#: app/controllers/CControllerAuditLogList.php:363
 #: app/controllers/CControllerPopupImportCompare.php:160
 msgid "Updated"
 msgstr ""
@@ -17967,7 +18011,7 @@ msgstr "Các bản đồ ở mức cao hơn"
 msgid "Uptime"
 msgstr "Thời gian chạy"
 
-#: include/classes/data/CItemData.php:1721
+#: include/classes/data/CItemData.php:1724
 msgid "Uptime of Zabbix server process in seconds."
 msgstr "Thời gian hoạt động của tiến trình máy chủ Zabbix trong vài giây."
 
@@ -17996,7 +18040,7 @@ msgstr ""
 msgid "Used in actions"
 msgstr "Sử dùng trong các action"
 
-#: app/controllers/CControllerAuditLogList.php:242
+#: app/controllers/CControllerAuditLogList.php:243
 #: app/partials/js/scheduledreport.subscription.js.php:78
 #: app/partials/popup.operations.php:105
 #: app/views/administration.token.edit.php:50
@@ -18005,7 +18049,7 @@ msgstr "Sử dùng trong các action"
 #: app/views/administration.user.edit.php:284
 #: app/views/reports.auditlog.list.php:90 httpconf.php:65
 #: include/actions.inc.php:1700 include/actions.inc.php:1754
-#: include/actions.inc.php:1976 include/classes/setup/CSetupWizard.php:358
+#: include/actions.inc.php:1976 include/classes/setup/CSetupWizard.php:522
 #: include/hosts.inc.php:61 include/users.inc.php:52
 #: include/views/configuration.httpconf.edit.php:165
 msgid "User"
@@ -18082,7 +18126,7 @@ msgid "User deleted"
 msgid_plural "Users deleted"
 msgstr[0] "Người dùng đã bị xóa"
 
-#: app/controllers/CControllerAuditLogList.php:243
+#: app/controllers/CControllerAuditLogList.php:244
 #: app/partials/js/scheduledreport.subscription.js.php:83
 #: app/partials/popup.operations.php:85
 #: app/views/administration.script.edit.php:241
@@ -18189,7 +18233,7 @@ msgstr "Mật khẩu người dùng"
 msgid "User profile"
 msgstr "Hồ sơ người dùng"
 
-#: app/controllers/CControllerAuditLogList.php:244
+#: app/controllers/CControllerAuditLogList.php:245
 #: app/views/administration.user.list.php:109
 #: app/views/administration.userrole.edit.php:385
 #: app/views/administration.userrole.edit.php:387
@@ -18295,8 +18339,8 @@ msgstr "Tên người dùng"
 msgid "Username and password"
 msgstr "Tên đăng nhập và mật khẩu"
 
-#: include/classes/setup/CSetupWizard.php:600
-#: include/classes/setup/CSetupWizard.php:906
+#: include/classes/setup/CSetupWizard.php:194
+#: include/classes/setup/CSetupWizard.php:774
 msgid "Username and password must be stored in Vault secret keys \"username\" and \"password\"."
 msgstr ""
 
@@ -18322,240 +18366,240 @@ msgstr ""
 msgid "Users"
 msgstr "Các người dùng"
 
-#: include/classes/data/CItemData.php:1737
+#: include/classes/data/CItemData.php:1740
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "Thống kê bộ nhớ VMware. Các chế độ hợp lệ: total, free, pfree, used và pused."
 
-#: include/classes/data/CItemData.php:1225
+#: include/classes/data/CItemData.php:1228
 msgid "VMware cluster performance counter, <url> - VMware service URL, <id> - VMware cluster id, <path> - performance counter path, <instance> - performance counter instance"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1233
+#: include/classes/data/CItemData.php:1236
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
 msgstr "Trạng thái VMware cluster, <url> - Dịch vụ VMware URL, <name> - Tên VMware cluster"
 
-#: include/classes/data/CItemData.php:1257
+#: include/classes/data/CItemData.php:1260
 msgid "VMware datacenters and their IDs. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1249
-#: include/classes/data/CItemData.php:1305
+#: include/classes/data/CItemData.php:1252
+#: include/classes/data/CItemData.php:1308
 msgid "VMware datastore capacity statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Thống kê dung lượng kho dữ liệu VMware theo byte hoặc theo tỷ lệ phần trăm trên tổng số. Trả về kiểu integer cho byte; float cho tỷ lệ phần trăm"
 
-#: include/classes/data/CItemData.php:1241
+#: include/classes/data/CItemData.php:1244
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1245
+#: include/classes/data/CItemData.php:1248
 msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1253
+#: include/classes/data/CItemData.php:1256
 msgid "VMware datastore write statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1261
+#: include/classes/data/CItemData.php:1264
 msgid "VMware event log, <url> - VMware service URL, <mode> - all (default), skip - skip processing of older data"
 msgstr "Log sự kiện VMware, <url> - URL dịch vụ VMware, <mode> - tất cả (mặc định), bỏ qua - bỏ qua xử lý dữ liệu cũ hơn"
 
-#: include/classes/data/CItemData.php:1345
+#: include/classes/data/CItemData.php:1348
 msgid "VMware hypervisor BIOS UUID, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1385
+#: include/classes/data/CItemData.php:1388
 msgid "VMware hypervisor HW vendor state sensors, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1357
+#: include/classes/data/CItemData.php:1360
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Kích thước bộ nhớ VMware hypervisor thừa ra, <url> - Dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/data/CItemData.php:1269
+#: include/classes/data/CItemData.php:1272
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Tên VMware hypervisor cluster, <url> - Dịch vụ VMware hypervisor cluster VMware URL, <uuid> - Tên host VMware hypervisor"
 
-#: include/classes/data/CItemData.php:1285
+#: include/classes/data/CItemData.php:1288
 msgid "VMware hypervisor datacenter name, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns string"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1301
+#: include/classes/data/CItemData.php:1304
 msgid "VMware hypervisor datastore read statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "Kho dữ liệu đọc số liệu thống kê VMware hypervisor, <url> - Dịch vụ VMware URL, <uuid> - Tên host VMware hypervisor, <datastore> - tên kho dữ liệu, <mode> - độ trễ"
 
-#: include/classes/data/CItemData.php:1309
+#: include/classes/data/CItemData.php:1312
 msgid "VMware hypervisor datastore write statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "Kho dữ liệu ghi số liệu thống kê VMware hypervisor, <url> - Dịch vụ VMware URL, <uuid> - Tên host VMware hypervisor, <datastore> - tên kho dữ liệu, <mode> - độ trễ"
 
-#: include/classes/data/CItemData.php:1293
+#: include/classes/data/CItemData.php:1296
 msgid "VMware hypervisor datastores list, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1381
+#: include/classes/data/CItemData.php:1384
 msgid "VMware hypervisor health state rollup sensor, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1341
+#: include/classes/data/CItemData.php:1344
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Mô hình VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/data/CItemData.php:1317
+#: include/classes/data/CItemData.php:1320
 msgid "VMware hypervisor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Tên VMware hypervisor, <url> - Dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/data/CItemData.php:1365
+#: include/classes/data/CItemData.php:1368
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "Thống kê mạng đầu vào VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor, <mode> - bps"
 
-#: include/classes/data/CItemData.php:1369
+#: include/classes/data/CItemData.php:1372
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "Thống kê mạng đầu vào VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor, <mode> - bps"
 
-#: include/classes/data/CItemData.php:1373
+#: include/classes/data/CItemData.php:1376
 msgid "VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "Theo dõi hiệu suất VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor , <path> - đường dẫn theo dõi hiệu suất, <instance> - đếm số lần hiệu suất"
 
-#: include/classes/data/CItemData.php:1321
+#: include/classes/data/CItemData.php:1324
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Tần số bộ xử lý VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/data/CItemData.php:1325
+#: include/classes/data/CItemData.php:1328
 msgid "VMware hypervisor processor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Mô hình bộ xử lý VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/data/CItemData.php:1277
+#: include/classes/data/CItemData.php:1280
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Cách sử dụng bộ xử lý VMware hypervisor đơn vị là Hz, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/data/CItemData.php:1389
+#: include/classes/data/CItemData.php:1392
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Trạng thái VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/data/CItemData.php:1337
+#: include/classes/data/CItemData.php:1340
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Kích thước bộ nhớ tổng VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/data/CItemData.php:1393
+#: include/classes/data/CItemData.php:1396
 msgid "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Thời gian chạy VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/data/CItemData.php:1361
+#: include/classes/data/CItemData.php:1364
 msgid "VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Kích thước bộ nhớ đã sử dụng VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/data/CItemData.php:1349
+#: include/classes/data/CItemData.php:1352
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Tên nhà sản xuất VMware hypervisor, <url> - Dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/data/CItemData.php:1397
+#: include/classes/data/CItemData.php:1400
 msgid "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Phiên bản VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/data/CItemData.php:1265
+#: include/classes/data/CItemData.php:1268
 msgid "VMware service full name, <url> - VMware service URL"
 msgstr "tên đầy đù của dịch vụ VMware hypervisor VMware, <url> - dịch vụ VMware URL"
 
-#: include/classes/data/CItemData.php:1405
+#: include/classes/data/CItemData.php:1408
 msgid "VMware service version, <url> - VMware service URL"
 msgstr "Phiên bản dịch vụ VMware, <url> - dịch vụ VMware URL"
 
-#: include/classes/data/CItemData.php:1461
+#: include/classes/data/CItemData.php:1464
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Kích thước bộ nhớ máy ảo VMware bị thừa ra, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/data/CItemData.php:1525
+#: include/classes/data/CItemData.php:1528
 msgid "VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Không gian lưu trữ máy ảo VMware được thống nhất, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/data/CItemData.php:1465
+#: include/classes/data/CItemData.php:1468
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Kích thước bộ nhớ máy ảo VMware được nén lại, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/data/CItemData.php:1441
+#: include/classes/data/CItemData.php:1444
 msgid "VMware virtual machine datacenter name, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns string"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1561
+#: include/classes/data/CItemData.php:1564
 msgid "VMware virtual machine disk device read statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "Thiết bị đĩa máy ảo VMware đọc số liệu thống kê, <url> - Dịch vụ VMware URL, <uuid> - tên host máy ảo VMware, <instance> - Số thiết bị đĩa, <mode> - bps/ops - bytes/số lần thao tác trên giây"
 
-#: include/classes/data/CItemData.php:1565
+#: include/classes/data/CItemData.php:1568
 msgid "VMware virtual machine disk device write statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "Thiết bị đĩa máy ảo VMware ghi số liệu thống kê, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware, <instance> - Số thiết bị đĩa, <mode> - bps/ops - bytes/ số lần thao tác trên giây "
 
-#: include/classes/data/CItemData.php:1573
+#: include/classes/data/CItemData.php:1576
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
 msgstr "Hệ thống tập tin máy ảo thống kê VMware, <url> - dịch vụ VMware URL, <uuid> -  tên host máy ảo VMware, <fsname> - tên hệ thống tập tin, <mode> -  total/free/used/pfree/pused"
 
-#: include/classes/data/CItemData.php:1485
+#: include/classes/data/CItemData.php:1488
 msgid "VMware virtual machine guest memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Cách sử dụng bộ nhớ máy ảo VMware của khách, <url> - dịch vụ VMware URL, <uuid> - Tên host máy ảo VMware"
 
-#: include/classes/data/CItemData.php:1489
+#: include/classes/data/CItemData.php:1492
 msgid "VMware virtual machine host memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Cách sử dụng bộ nhớ máy ảo VMware của host, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/data/CItemData.php:1457
+#: include/classes/data/CItemData.php:1460
 msgid "VMware virtual machine hypervisor name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Tên máy ảo VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/data/CItemData.php:1409
+#: include/classes/data/CItemData.php:1412
 msgid "VMware virtual machine name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Tên máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/data/CItemData.php:1505
+#: include/classes/data/CItemData.php:1508
 msgid "VMware virtual machine network interface input statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "Thống kê interface mạng đầu vào máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware, <instance> - số lượng interface, <mode> - bps/pps - bytes/số lượng gói tin trên giây"
 
-#: include/classes/data/CItemData.php:1509
+#: include/classes/data/CItemData.php:1512
 msgid "VMware virtual machine network interface output statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "Thống kê interface mạng đầu ra máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên host máy áo VMware, <instance> - số lượng interface, <mode> - bps/pps - bytes/số lượng gói tin trên giây"
 
-#: include/classes/data/CItemData.php:1517
+#: include/classes/data/CItemData.php:1520
 msgid "VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "Hiệu suất truy cập máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware, <path> - đường dẫn hiệu suất truy cập, <instance> - Số lượng hiệu suất truy cập"
 
-#: include/classes/data/CItemData.php:1521
+#: include/classes/data/CItemData.php:1524
 msgid "VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Tình trạng nguồn của máy ảo VMware, <url> - dich vụ VMware URL, <uuid> - Tên host máy ảo VMware"
 
-#: include/classes/data/CItemData.php:1473
+#: include/classes/data/CItemData.php:1476
 msgid "VMware virtual machine private memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Kích thước bộ nhớ riêng của máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/data/CItemData.php:1425
+#: include/classes/data/CItemData.php:1428
 msgid "VMware virtual machine processor ready time ms, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Bộ xử lý máy ảo VMware thời gian sẵn sàng ms, <url> - URL dịch vụ VMware, <uuid> - Tên máy chủ máy ảo VMware"
 
-#: include/classes/data/CItemData.php:1437
+#: include/classes/data/CItemData.php:1440
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Cách sử dụng bộ xử lý máy ảo VMware đơn vị Hz, <url> - Dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/data/CItemData.php:1477
+#: include/classes/data/CItemData.php:1480
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Kích thước bộ nhớ chia sẻ của máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/data/CItemData.php:1481
+#: include/classes/data/CItemData.php:1484
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Kích thước bộ nhớ máy ảo VMware được trao đổi, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/data/CItemData.php:1493
+#: include/classes/data/CItemData.php:1496
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Kích thước bộ nhớ tổng của máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/data/CItemData.php:1541
+#: include/classes/data/CItemData.php:1544
 msgid "VMware virtual machine uncommitted storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Không gian lưu trữ máy ảo VMware không được thống nhất, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/data/CItemData.php:1545
+#: include/classes/data/CItemData.php:1548
 msgid "VMware virtual machine unshared storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Không gian lưu trữ máy ảo VMware không được chia sẻ, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/data/CItemData.php:1553
+#: include/classes/data/CItemData.php:1556
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Thời gian hoạt động của máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/data/CItemData.php:1353
+#: include/classes/data/CItemData.php:1356
 msgid "VVMware hypervisor maintenance status, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns 0 - not in maintenance; 1 - in maintenance"
 msgstr ""
 
@@ -18580,6 +18624,7 @@ msgstr ""
 #: app/controllers/CControllerPopupValueMapUpdate.php:117
 #: app/controllers/CControllerPopupValueMapUpdate.php:124
 #: app/controllers/CControllerPopupValueMapUpdate.php:136
+#: app/partials/administration.system.info.php:30
 #: app/partials/configuration.tags.tab.php:40
 #: app/partials/configuration.valuemap.php:32
 #: app/partials/hostmacros.list.html.php:36
@@ -18607,7 +18652,7 @@ msgstr ""
 #: app/views/popup.massupdate.trigger.php:84
 #: app/views/popup.service.edit.php:65 app/views/popup.service.edit.php:271
 #: app/views/popup.testtriggerexpr.php:31 app/views/popup.valuemap.edit.php:51
-#: include/blocks.inc.php:525 include/classes/graphdraw/CPieGraphDraw.php:309
+#: include/classes/graphdraw/CPieGraphDraw.php:309
 #: include/classes/screens/CScreenHistory.php:279
 #: include/classes/screens/CScreenHistory.php:393
 #: include/views/configuration.host.discovery.edit.php:133
@@ -18652,11 +18697,11 @@ msgstr "Giá trị \"%1$s\" là không hợp lệ đối với tham số 
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is %4$d characters."
 msgstr "Giá trị \"%1$s\" là quá dài đối với trường \"%2$s\" - %3$d ký tự. Chiều dài cho phép là %4$d ký tự."
 
-#: include/classes/data/CItemData.php:1729
+#: include/classes/data/CItemData.php:1732
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
 msgstr "Giá trị có hiệu lực của cache. các tham số hợp lệ là: requests, hits and misses."
 
-#: include/classes/data/CItemData.php:1725
+#: include/classes/data/CItemData.php:1728
 msgid "Value cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "Thống kê giá trị của cache. Các chế độ hợp lệ là: total, free, pfree, used and pused."
 
@@ -18664,7 +18709,7 @@ msgstr "Thống kê giá trị của cache. Các chế độ hợp lệ l
 msgid "Value cannot be empty."
 msgstr ""
 
-#: app/controllers/CControllerAuditLogList.php:245
+#: app/controllers/CControllerAuditLogList.php:246
 msgid "Value map"
 msgstr "Giá trị bản đồ"
 
@@ -18693,15 +18738,15 @@ msgstr "Lập giá trị bản đồ"
 msgid "Value mappings"
 msgstr "Giá trị sơ đồ"
 
-#: include/classes/data/CItemData.php:917
+#: include/classes/data/CItemData.php:920
 msgid "Value of MQTT topic. Format of returned data depends on the topic content. If wildcards are used, returns topic values in JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:993
+#: include/classes/data/CItemData.php:996
 msgid "Value of any Windows performance counter in English. Returns integer, float, string or text (depending on the request)"
 msgstr ""
 
-#: include/classes/data/CItemData.php:989
+#: include/classes/data/CItemData.php:992
 msgid "Value of any Windows performance counter. Returns integer, float, string or text (depending on the request)"
 msgstr "Giá trị của bất kỳ bộ đếm hiệu suất Windows. Trả về integer, float, string hoặc text (tùy theo yêu cầu)"
 
@@ -18742,22 +18787,22 @@ msgstr "Các giá trị không có tên không được cho phép trong các tr�
 msgid "Variables"
 msgstr "Biến"
 
-#: include/classes/data/CItemData.php:1017
+#: include/classes/data/CItemData.php:1020
 msgid "Various information about specific process(es). Returns float"
 msgstr "Thông tin khác nhau về quá trình cụ thể. Trả về kiểu float"
 
-#: include/classes/setup/CSetupWizard.php:335
-#: include/classes/setup/CSetupWizard.php:519
+#: include/classes/setup/CSetupWizard.php:502
+#: include/classes/setup/CSetupWizard.php:682
 msgid "Vault API endpoint"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:350
-#: include/classes/setup/CSetupWizard.php:525
+#: include/classes/setup/CSetupWizard.php:515
+#: include/classes/setup/CSetupWizard.php:690
 msgid "Vault authentication token"
 msgstr ""
 
-#: include/classes/core/ZBase.php:228
-#: include/classes/setup/CSetupWizard.php:902 include/config.inc.php:53
+#: include/classes/core/ZBase.php:231
+#: include/classes/setup/CSetupWizard.php:191 include/config.inc.php:53
 msgid "Vault connection failed."
 msgstr ""
 
@@ -18765,8 +18810,8 @@ msgstr ""
 msgid "Vault secret"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:342
-#: include/classes/setup/CSetupWizard.php:522
+#: include/classes/setup/CSetupWizard.php:508
+#: include/classes/setup/CSetupWizard.php:686
 msgid "Vault secret path"
 msgstr ""
 
@@ -18778,7 +18823,7 @@ msgstr "Nhà sản xuất"
 msgid "Verbose"
 msgstr "Chi tiết"
 
-#: include/classes/setup/CSetupWizard.php:382
+#: include/classes/setup/CSetupWizard.php:546
 msgid "Verify database certificate"
 msgstr ""
 
@@ -18787,11 +18832,11 @@ msgstr ""
 msgid "Version"
 msgstr ""
 
-#: include/classes/data/CItemData.php:837
+#: include/classes/data/CItemData.php:840
 msgid "Version of Zabbix agent. Returns string"
 msgstr "Phiên bản của Zabbix agent. Trả về kiểu string"
 
-#: include/classes/data/CItemData.php:1733
+#: include/classes/data/CItemData.php:1736
 msgid "Version of Zabbix server or proxy"
 msgstr ""
 
@@ -18820,7 +18865,7 @@ msgstr ""
 msgid "View as"
 msgstr "Xem"
 
-#: include/classes/data/CItemData.php:1221
+#: include/classes/data/CItemData.php:1224
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Kích thước không gian ảo tính bằng byte hoặc theo tỷ lệ phần trăm từ tổng số. Trả về integer cho byte; float cho tỷ lệ phần trăm"
 
@@ -18853,7 +18898,7 @@ msgstr "W"
 msgid "Warning"
 msgstr "Cảnh báo"
 
-#: include/classes/setup/CSetupWizard.php:249
+#: include/classes/setup/CSetupWizard.php:421
 msgctxt "setup"
 msgid "Warning"
 msgstr "Cảnh báo"
@@ -18862,7 +18907,7 @@ msgstr "Cảnh báo"
 msgid "Warning message"
 msgstr ""
 
-#: include/blocks.inc.php:649
+#: app/partials/administration.system.info.php:159
 #, c-format
 msgid "Warning! Unsupported %1$s database server version. Should be at least (%2$s)"
 msgstr ""
@@ -18895,7 +18940,7 @@ msgstr "Web"
 msgid "Web monitoring"
 msgstr "Web monitoring"
 
-#: app/controllers/CControllerAuditLogList.php:234
+#: app/controllers/CControllerAuditLogList.php:235
 msgid "Web scenario"
 msgstr "Web scenario"
 
@@ -18965,11 +19010,11 @@ msgstr "Hàng tuần"
 msgid "Weight"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:45
+#: include/classes/setup/CSetupWizard.php:54
 msgid "Welcome"
 msgstr "Chào mừng"
 
-#: include/classes/setup/CSetupWizard.php:181
+#: include/classes/setup/CSetupWizard.php:353
 msgid "Welcome to"
 msgstr "Chào mừng đến với"
 
@@ -19235,6 +19280,7 @@ msgstr "Năm"
 msgid "Yearly"
 msgstr "Hàng năm"
 
+#: app/partials/administration.system.info.php:35
 #: app/partials/configuration.filter.items.php:194
 #: app/partials/configuration.filter.items.php:201
 #: app/partials/configuration.filter.items.php:210
@@ -19248,8 +19294,8 @@ msgstr "Hàng năm"
 #: app/views/popup.massupdate.item.php:336
 #: app/views/popup.massupdate.item.php:378
 #: app/views/popup.massupdate.trigger.php:65 include/actions.inc.php:32
-#: include/blocks.inc.php:532 include/blocks.inc.php:855
-#: include/blocks.inc.php:859 include/classes/screens/CScreenProblem.php:1099
+#: include/blocks.inc.php:703 include/blocks.inc.php:707
+#: include/classes/screens/CScreenProblem.php:1099
 #: include/classes/screens/CScreenProblem.php:1103
 #: include/classes/screens/CScreenProblem.php:1245 include/events.inc.php:198
 #: include/events.inc.php:202 include/events.inc.php:392
@@ -19270,7 +19316,7 @@ msgstr "Hàng năm"
 msgid "Yes"
 msgstr "Yes"
 
-#: include/classes/screens/CScreenProblem.php:709 include/func.inc.php:2542
+#: include/classes/screens/CScreenProblem.php:709 include/func.inc.php:2399
 msgid "Yesterday"
 msgstr "hôm qua"
 
@@ -19281,7 +19327,7 @@ msgstr "Bạn vừa đăng nhập vào \"%1$s\"."
 
 #: app/views/administration.gui.edit.php:66
 #: app/views/administration.user.edit.php:233
-#: include/classes/setup/CSetupWizard.php:219
+#: include/classes/setup/CSetupWizard.php:391
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "Bạn không thể chọn một số trong các ngôn ngữ, bởi vì địa chỉ của chúng không được cài đặt trên web máy chủ."
 
@@ -19299,6 +19345,7 @@ msgid "You did not specify targets for action operation global script \"%1$s\"."
 msgstr ""
 
 #: include/classes/api/services/CAuditLog.php:73
+#: include/classes/api/services/CHaNode.php:45
 #: include/classes/api/services/CHost.php:848
 #: include/classes/api/services/CHost.php:913
 #: include/classes/api/services/CMaintenance.php:535
@@ -19375,11 +19422,10 @@ msgid "Zabbix login form"
 msgstr "Mẫu đăng nhập zabbix"
 
 #: app/views/administration.script.edit.php:125
-#: include/classes/setup/CSetupWizard.php:556
 msgid "Zabbix server"
 msgstr "Máy chủ Zabbix"
 
-#: include/classes/server/CZabbixServer.php:584
+#: include/classes/server/CZabbixServer.php:600
 #, c-format
 msgid ""
 "Zabbix server \"%1$s\" cannot be reached. Possible reasons:\n"
@@ -19391,26 +19437,18 @@ msgstr ""
 msgid "Zabbix server (proxy)"
 msgstr "Máy chủ zabbix (proxy)"
 
-#: include/classes/setup/CSetupWizard.php:57
-#: include/classes/setup/CSetupWizard.php:456
-msgid "Zabbix server details"
-msgstr "Chi tiết máy chủ zabbix"
-
-#: jsrpc.php:82
+#: jsrpc.php:91
 msgid "Zabbix server is not running: the information displayed may not be current."
 msgstr "Máy chủ Zabbix đang không hoạt động: Thông tin được hiển thị có thể không tồn tại."
 
-#: include/blocks.inc.php:531
+#: app/partials/administration.system.info.php:34
 msgid "Zabbix server is running"
 msgstr "Máy chủ Zabbix đang hoạt động"
 
-#: include/classes/setup/CSetupWizard.php:560
+#: include/classes/setup/CSetupWizard.php:602
+#: include/classes/setup/CSetupWizard.php:733
 msgid "Zabbix server name"
 msgstr "Tên máy chủ Zabbix"
-
-#: include/classes/setup/CSetupWizard.php:557
-msgid "Zabbix server port"
-msgstr "Cổng máy chủ Zabbix"
 
 #: include/items.inc.php:92
 msgid "Zabbix trapper"
@@ -20002,7 +20040,7 @@ msgstr "Ngày"
 #: app/controllers/CControllerMapView.php:123
 #: app/partials/js/configuration.valuemap.js.php:156
 #: app/views/popup.generic.php:599 app/views/popup.valuemap.edit.php:83
-#: include/classes/setup/CSetupWizard.php:497
+#: include/classes/setup/CSetupWizard.php:639
 #: include/classes/widgets/CWidgetHelper.php:69
 msgid "default"
 msgstr "Mặc định"
@@ -20797,7 +20835,7 @@ msgstr "Khác"
 msgid "output"
 msgstr "đầu ra"
 
-#: include/classes/setup/CSetupWizard.php:344
+#: include/classes/setup/CSetupWizard.php:510
 msgid "path/to/secret"
 msgstr ""
 

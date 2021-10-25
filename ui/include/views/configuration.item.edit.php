@@ -450,7 +450,7 @@ $item_tab
 				DB::getFieldLength('items', 'http_proxy')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]')
-			->disableAutocomplete(),
+			->disableAutocomplete()
 		))->setId('js-item-http-proxy-field')
 	])
 	// Append ITEM_TYPE_HTTPAGENT HTTP authentication to form list.
@@ -951,7 +951,7 @@ else {
 	$item_tab->addItem([
 		(new CLabel(_('Populates host inventory field'), $host_inventory_select->getFocusableElementId()))
 			->setId('js-item-inventory-link-label'),
-		(new CFormField($host_inventory_select))->setId('js-item-inventory-link-field'),
+		(new CFormField($host_inventory_select))->setId('js-item-inventory-link-field')
 	]);
 }
 
