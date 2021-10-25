@@ -19,7 +19,7 @@ A......... [ZBX-20079] fixed web scenarios import / export error when authentica
 .........T [ZBX-19920] changed setup instruction in README of the "IIS by Zabbix agent" template (mchudinov)
 .........T [ZBX-19237] changed condition in SQL request of pgsql.connections.sum.waiting item in DB PostgreSQL template to exclude rows with idle state (mchudinov)
 .........T [ZBX-20019] fixed README file in Oracle by Zabbix Agent 2 template (vkhaliev)
-.........T [ZBX-19622] fixed interface operstate valuemap in the linux templates (afayantsev)
+.........T [ZBX-19760] fixed interface operstate valuemap in the linux templates (afayantsev)
 ...G...... [ZBXNEXT-6708] fixed 3rd parameter for Zabbix agent 2 web.certificate.get plugin (esneiders)
 ...G...... [ZBX-20008] removed curl and ldap linkage from agent2 (yurii)
 .........T [ZBX-20017] added new metrics, fixed update intervals in the "F5 Big-IP" template (abakaldin)
@@ -1113,7 +1113,7 @@ A......... [ZBX-20079] fixed web scenarios import / export error when authentica
 .........T [ZBX-19920] changed setup instruction in README of the "IIS by Zabbix agent" template (mchudinov)
 .........T [ZBX-19237] changed condition in SQL request of pgsql.connections.sum.waiting item in DB PostgreSQL template to exclude rows with idle state (mchudinov)
 .........T [ZBX-20019] fixed README file in Oracle by Zabbix Agent 2 template (vkhaliev)
-.........T [ZBX-19622] fixed interface operstate valuemap in the linux templates (afayantsev)
+.........T [ZBX-19760] fixed interface operstate valuemap in the linux templates (afayantsev)
 ...G...... [ZBXNEXT-6708] fixed 3rd parameter for Zabbix agent 2 web.certificate.get plugin (esneiders)
 .........T [ZBX-20017] added new metrics, fixed update intervals in the "F5 Big-IP" template (abakaldin)
 
