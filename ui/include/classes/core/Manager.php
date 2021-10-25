@@ -61,9 +61,9 @@ class Manager extends CRegistryFactory {
 
 			if ($dbversion_status !== '') {
 				$dbversion_status = json_decode($dbversion_status, true);
-				$use_pk = (array_key_exists('history_pk', $dbversion_status) && $dbversion_status['history_pk'] == 1);
+				$pk_used = (array_key_exists('history_pk', $dbversion_status) && $dbversion_status['history_pk'] == 1);
 
-				$instance->setUsePrimaryKeys($use_pk);
+				$instance->setUsePrimaryKeys($pk_used);
 			}
 		}
 

@@ -124,6 +124,14 @@ if (!$data['system_info']['float_double_precision']) {
 	]);
 }
 
+if (!$data['system_info']['history_pk']) {
+	$info_table->addRow([
+		_('Database history tables use primary key'),
+		(new CSpan(_('No')))->addClass(ZBX_STYLE_RED),
+		''
+	]);
+}
+
 // Check DB version.
 if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
 	foreach ($data['system_info']['dbversion_status'] as $dbversion) {

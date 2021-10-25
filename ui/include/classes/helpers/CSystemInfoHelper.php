@@ -44,6 +44,18 @@ class CSystemInfoHelper {
 		$db_backend = DB::getDbBackend();
 		$data['encoding_warning'] = $db_backend->checkEncoding() ? '' : $db_backend->getWarning();
 
+		$dbversion_status = CSettingsHelper::getGlobal(CSettingsHelper::DBVERSION_STATUS);
+
+		if ($dbversion_status !== '') {
+			$dbversion_status = json_decode($dbversion_status, true);
+			$pk_used = (array_key_exists('history_pk', $dbversion_status) && $dbversion_status['history_pk'] == 1);
+
+			$data['history_pk'] = $pk_used;
+		}
+		else {
+			$dbversion_status = [];
+		}
+
 		$ha_cluster_enabled = false;
 
 		$ha_nodes = API::getApiService('hanode')->get([
@@ -88,8 +100,7 @@ class CSystemInfoHelper {
 		$requirements[] = $setup->checkSslFiles();
 		$data['requirements'] = $requirements;
 
-		$db_version_status = CSettingsHelper::getGlobal(CSettingsHelper::DBVERSION_STATUS);
-		$data['dbversion_status'] = $db_version_status === '' ? [] : json_decode($db_version_status);
+		$data['dbversion_status'] = $dbversion_status;
 
 		return $data;
 	}
