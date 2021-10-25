@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-22 19:56+0300\n"
+"POT-Creation-Date: 2021-10-25 12:27+0300\n"
 "PO-Revision-Date: 2018-09-24 07:57+0300\n"
 "Last-Translator: Lukáš <iam@lukasmaly.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -156,7 +156,7 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: include/func.inc.php:2625
+#: include/func.inc.php:2482
 #, c-format
 msgid "%1$s hour"
 msgid_plural "%1$s hours"
@@ -186,7 +186,7 @@ msgstr[2] "%1$s zpráv"
 #: include/classes/widgets/CWidgetConfig.php:285
 #: include/classes/widgets/CWidgetConfig.php:286
 #: include/classes/widgets/CWidgetConfig.php:287
-#: include/classes/widgets/CWidgetConfig.php:288 include/func.inc.php:2631
+#: include/classes/widgets/CWidgetConfig.php:288 include/func.inc.php:2488
 #: jsLoader.php:150 jsLoader.php:151 jsLoader.php:152 jsLoader.php:153
 #, c-format
 msgid "%1$s minute"
@@ -238,7 +238,7 @@ msgstr[2] "Zůstává %1$s pokusů"
 
 #: app/views/administration.user.edit.php:671
 #: include/classes/widgets/CWidgetConfig.php:283
-#: include/classes/widgets/CWidgetConfig.php:284 include/func.inc.php:2638
+#: include/classes/widgets/CWidgetConfig.php:284 include/func.inc.php:2495
 #: jsLoader.php:148 jsLoader.php:149
 #, c-format
 msgid "%1$s second"
@@ -321,7 +321,7 @@ msgstr "(Skupiny mohou vytvářet jen super administrátoři)"
 msgid "(no proxy)"
 msgstr "(bez proxy)"
 
-#: include/classes/setup/CSetupWizard.php:311
+#: include/classes/setup/CSetupWizard.php:480
 msgid "0 - use default port"
 msgstr "0 - použit předvolený port"
 
@@ -505,7 +505,7 @@ msgstr ""
 
 #: app/views/hintbox.eventlist.php:76
 #: app/views/monitoring.widget.problems.view.php:66
-#: include/actions.inc.php:161 include/blocks.inc.php:733
+#: include/actions.inc.php:161 include/blocks.inc.php:581
 #: include/classes/screens/CScreenProblem.php:868
 #: include/classes/screens/CScreenProblem.php:893
 #: include/classes/screens/CScreenProblem.php:1162 include/events.inc.php:290
@@ -628,7 +628,7 @@ msgstr ""
 msgid "Action added"
 msgstr "Akce byla přidána"
 
-#: include/classes/core/ZBase.php:497
+#: include/classes/core/ZBase.php:500
 #, c-format
 msgid "Action class %1$s must extend %2$s class."
 msgstr ""
@@ -671,7 +671,7 @@ msgstr "Akce byla aktualizována"
 #: app/views/administration.mediatype.edit.php:281
 #: app/views/configuration.discovery.edit.php:78
 #: app/views/monitoring.dashboard.view.php:114
-#: app/views/monitoring.widget.problems.view.php:67 include/blocks.inc.php:734
+#: app/views/monitoring.widget.problems.view.php:67 include/blocks.inc.php:582
 #: include/classes/helpers/CMenuHelper.php:168
 #: include/classes/helpers/CRoleHelper.php:361
 #: include/classes/screens/CScreenProblem.php:869
@@ -685,6 +685,7 @@ msgstr "Akce byla aktualizována"
 msgid "Actions"
 msgstr "Akce"
 
+#: app/partials/administration.ha.nodes.php:50
 #: app/views/administration.proxy.edit.php:72
 #: app/views/administration.proxy.list.php:54
 #: app/views/administration.proxy.list.php:163
@@ -963,7 +964,7 @@ msgstr ""
 msgid "Add widget"
 msgstr "Přidat widget"
 
-#: app/controllers/CControllerAuditLogList.php:354
+#: app/controllers/CControllerAuditLogList.php:355
 #: app/controllers/CControllerPopupImportCompare.php:161
 msgid "Added"
 msgstr ""
@@ -980,6 +981,10 @@ msgstr ""
 
 #: app/views/popup.service.edit.php:161
 msgid "Additional rules"
+msgstr ""
+
+#: app/partials/administration.ha.nodes.php:28
+msgid "Address"
 msgstr ""
 
 #: include/hosts.inc.php:63 include/users.inc.php:53
@@ -1013,7 +1018,7 @@ msgstr "Stáří méně než"
 msgid "Agent"
 msgstr "Agent"
 
-#: include/classes/data/CItemData.php:833
+#: include/classes/data/CItemData.php:836
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
 msgstr "Kontrola dostupnosti agenta. Vrátí nic - nedostupný, 1 - dostupný"
 
@@ -1021,11 +1026,11 @@ msgstr "Kontrola dostupnosti agenta. Vrátí nic - nedostupný, 1 - dostupný"
 msgid "Agent encryption"
 msgstr "Agent šifrování"
 
-#: include/classes/data/CItemData.php:825
+#: include/classes/data/CItemData.php:828
 msgid "Agent host metadata. Returns string"
 msgstr ""
 
-#: include/classes/data/CItemData.php:829
+#: include/classes/data/CItemData.php:832
 msgid "Agent host name. Returns string"
 msgstr "Jméno hosta. Vrátí řetězec"
 
@@ -1145,15 +1150,15 @@ msgstr "Povolení hosté"
 msgid "Allowed methods"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:682
+#: include/classes/setup/CSetupWizard.php:854
 msgid "Alternatively, you can install it manually:"
 msgstr "Eventuálně to můžete nainstalovat manuálně:"
 
-#: include/classes/data/CItemData.php:1449
+#: include/classes/data/CItemData.php:1452
 msgid "Amount of guest physical memory that is swapped out to the swap space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1469
+#: include/classes/data/CItemData.php:1472
 msgid "Amount of host physical memory consumed for backing up guest physical memory pages, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
@@ -1567,11 +1572,11 @@ msgstr "Dostupný"
 msgid "Average"
 msgstr "Střední"
 
-#: include/classes/data/CItemData.php:1529
+#: include/classes/data/CItemData.php:1532
 msgid "Average number of outstanding read requests to the virtual disk during the collection interval , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1549
+#: include/classes/data/CItemData.php:1552
 msgid "Average number of outstanding write requests to the virtual disk during the collection interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
 msgstr ""
 
@@ -1583,8 +1588,8 @@ msgstr ""
 msgid "Axes"
 msgstr "Osy"
 
-#: include/classes/setup/CSetupWizard.php:148
-#: include/classes/setup/CSetupWizard.php:567
+#: include/classes/setup/CSetupWizard.php:322
+#: include/classes/setup/CSetupWizard.php:741
 msgid "Back"
 msgstr "Zpět"
 
@@ -1642,7 +1647,7 @@ msgstr ""
 msgid "Blocked"
 msgstr "Blokovaný"
 
-#: include/classes/core/ZBase.php:355
+#: include/classes/core/ZBase.php:358
 msgid "Blue"
 msgstr "Modrá"
 
@@ -1732,31 +1737,31 @@ msgstr "CERT"
 msgid "CLOSING"
 msgstr "ZÁVĚREČNÝ"
 
-#: include/classes/data/CItemData.php:1077
+#: include/classes/data/CItemData.php:1080
 msgid "CPU information. Returns string or integer"
 msgstr "CPU informace. Vráti řetězec nebo celé číslo"
 
-#: include/classes/data/CItemData.php:1053
+#: include/classes/data/CItemData.php:1056
 msgid "CPU load. Returns float"
 msgstr "CPU load. Vrátí desetinné číslo"
 
-#: include/classes/data/CItemData.php:1429
+#: include/classes/data/CItemData.php:1432
 msgid "CPU time spent waiting for swap-in, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1281
+#: include/classes/data/CItemData.php:1284
 msgid "CPU usage as a percentage during the interval depends on power management or HT, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1273
+#: include/classes/data/CItemData.php:1276
 msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1433
+#: include/classes/data/CItemData.php:1436
 msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1065
+#: include/classes/data/CItemData.php:1068
 msgid "CPU utilization percentage. Returns float"
 msgstr ""
 
@@ -1817,7 +1822,7 @@ msgstr "Odvolat"
 #: app/views/monitoring.dashboard.view.php:141
 #: app/views/popup.import.compare.php:162
 #: include/classes/html/CButtonCancel.php:25
-#: include/classes/setup/CSetupWizard.php:130 jsLoader.php:177
+#: include/classes/setup/CSetupWizard.php:310 jsLoader.php:177
 #: jsLoader.php:187 jsLoader.php:301 jsLoader.php:373
 msgid "Cancel"
 msgstr "Zrušit"
@@ -2047,7 +2052,7 @@ msgstr "Nelze uzavřít problém: %1$s."
 msgid "Cannot connect to LDAP server."
 msgstr "Nelze se připojit na LDAP server."
 
-#: include/classes/setup/CSetupWizard.php:420
+#: include/classes/setup/CSetupWizard.php:579
 msgid "Cannot connect to the database."
 msgstr "Není možné se připojit k databázi."
 
@@ -2122,7 +2127,7 @@ msgstr ""
 msgid "Cannot create service \"%1$s\": %2$s."
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:678
+#: include/classes/setup/CSetupWizard.php:850
 msgid "Cannot create the configuration file."
 msgstr "Není možné vytvořit konfigurační soubor."
 
@@ -2778,7 +2783,7 @@ msgid "Cannot link template."
 msgstr "Není možné nalinkovat šablonu."
 
 #: app/controllers/CControllerModuleEdit.php:106
-#: include/classes/core/ZBase.php:665
+#: include/classes/core/ZBase.php:668
 #, c-format
 msgid "Cannot load module at: %1$s."
 msgid_plural "Cannot load modules at: %1$s."
@@ -2843,7 +2848,7 @@ msgstr "Nelze číst XML: %1$s."
 msgid "Cannot read YAML: %1$s."
 msgstr ""
 
-#: include/classes/server/CZabbixServer.php:527
+#: include/classes/server/CZabbixServer.php:543
 #, c-format
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
 msgstr "Není možné číst odpověď, zkontrolujte spojení se Zabbix serverem \"%1$s\"."
@@ -2862,7 +2867,7 @@ msgstr "Není možné uložit pravidlo nálezu bez kontroly."
 msgid "Cannot save widget \"%1$s\"."
 msgstr "Nepodařilo se uložit widget \"%1$s\"."
 
-#: include/classes/server/CZabbixServer.php:468
+#: include/classes/server/CZabbixServer.php:484
 #, c-format
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr "Není možné poslat příkaz, zkontrolujte spojení se Zabbix serverem \"%1$s\"."
@@ -3286,11 +3291,11 @@ msgstr ""
 msgid "Catalan (ca_ES)"
 msgstr "Katalánština (ca_ES)"
 
-#: include/classes/data/CItemData.php:1037
+#: include/classes/data/CItemData.php:1040
 msgid "Catches all SNMP traps that match regex. If regexp is unspecified, catches any trap."
 msgstr "Všechny zachycené SNMP trapy odpovídají regex. Pokud regexp je nespecifikovaný, zachytí se jakýkoliv trap."
 
-#: include/classes/data/CItemData.php:1033
+#: include/classes/data/CItemData.php:1036
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
 msgstr "Všechny zachycené SNMP trapy, které nebyly chyceny z snmptrap[] items."
 
@@ -3376,7 +3381,7 @@ msgstr ""
 msgid "Chassis"
 msgstr "Šasí"
 
-#: include/classes/data/CItemData.php:1073
+#: include/classes/data/CItemData.php:1076
 msgid "Chassis information. Returns string"
 msgstr "Informace o šasi. Vráti řetězec"
 
@@ -3405,8 +3410,8 @@ msgstr "Zkontrolovat chybu použitím regulárního výrazu"
 msgid "Check for not supported value"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:49
-#: include/classes/setup/CSetupWizard.php:279
+#: include/classes/setup/CSetupWizard.php:58
+#: include/classes/setup/CSetupWizard.php:451
 msgid "Check of pre-requisites"
 msgstr "Kontrola předpokladů"
 
@@ -3425,43 +3430,43 @@ msgstr "Typ kontroly"
 msgid "Checks"
 msgstr "Kontroly"
 
-#: include/classes/data/CItemData.php:925
+#: include/classes/data/CItemData.php:928
 msgid "Checks if DNS service is up. Returns 0 - DNS is down (server did not respond or DNS resolution failed); 1 - DNS is up"
 msgstr "Kontrola DNS. Vráti 0 - DNS je nedostupné (server neodpovídá nebo DNS překlad selhal), 1 - DNS je dostupné"
 
-#: include/classes/data/CItemData.php:1165
+#: include/classes/data/CItemData.php:1168
 msgid "Checks if file exists. Returns 0 - not found; 1 - file of the specified type exists"
 msgstr ""
 
-#: include/classes/data/CItemData.php:857
+#: include/classes/data/CItemData.php:860
 msgid "Checks if host is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful."
 msgstr ""
 
-#: include/classes/data/CItemData.php:957
+#: include/classes/data/CItemData.php:960
 msgid "Checks if it is possible to make TCP connection to specified port. Returns 0 - cannot connect; 1 - can connect"
 msgstr "Kontrola úspěšného TCP spojení na zadaný port. Vráti 0 - neúspěšné, 1 - úspěšné"
 
-#: include/classes/data/CItemData.php:965
+#: include/classes/data/CItemData.php:968
 msgid "Checks if service is running and accepting TCP connections. Returns 0 - service is down; 1 - service is running"
 msgstr "Zkontroluje jestli služba běží a akceptuje TCP spojení. Odpověď 0 - služba je nedostupná; 1 - služba je dostupná"
 
-#: include/classes/data/CItemData.php:981
+#: include/classes/data/CItemData.php:984
 msgid "Checks if service is running and responding to UDP requests. Returns 0 - service is down; 1 - service is running"
 msgstr "Zkontroluje jestli služba běží a akceptuje UDP spojení. Odpověď 0 - služba je nedostupná; 1 - služba je dostupná"
 
-#: include/classes/data/CItemData.php:953
+#: include/classes/data/CItemData.php:956
 msgid "Checks if this TCP port is in LISTEN state. Returns 0 - it is not in LISTEN state; 1 - it is in LISTEN state"
 msgstr "Zkontroluje, zda TCP port je v LISTEN stavu. Odpověď 0 - Není v LISTEN stavu; 1 - je v LISTEN stavu"
 
-#: include/classes/data/CItemData.php:973
+#: include/classes/data/CItemData.php:976
 msgid "Checks if this UDP port is in LISTEN state. Returns 0 - it is not in LISTEN state; 1 - it is in LISTEN state"
 msgstr "Zkontroluje, zda UDP port je v LISTEN stavu. Odpověď 0 - Není v LISTEN stavu; 1 - je v LISTEN stavu"
 
-#: include/classes/data/CItemData.php:961
+#: include/classes/data/CItemData.php:964
 msgid "Checks performance of TCP service. Returns 0 - service is down; seconds - the number of seconds spent while connecting to the service"
 msgstr "Zkontroluje výkonnost služby TCP. Odpověď 0 - služba je nedostupná; sekundy - číslo je rovno počtu sekund strávených při připojování se ke službě"
 
-#: include/classes/data/CItemData.php:977
+#: include/classes/data/CItemData.php:980
 msgid "Checks performance of UDP service. Returns 0 - service is down; seconds - the number of seconds spent waiting for response from the service"
 msgstr "Zkontroluje výkonnost služby UDP. Odpověď 0 - služba je nedostupná; sekundy - číslo je rovno počtu sekund strávených při připojování se ke službě"
 
@@ -3490,7 +3495,7 @@ msgstr "Kruhový odkaz v šablonách: %1$s."
 msgid "Circular template linkage is not allowed."
 msgstr "Kruhové odkazování šablon není povolené."
 
-#: include/classes/core/ZBase.php:491
+#: include/classes/core/ZBase.php:494
 #, c-format
 msgid "Class %1$s not found for action %2$s."
 msgstr ""
@@ -3723,11 +3728,11 @@ msgstr "Podmínky"
 msgid "Configuration"
 msgstr "Nastavení"
 
-#: include/classes/data/CItemData.php:1689
+#: include/classes/data/CItemData.php:1692
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "Nastavení cache statistik. Cache - buffer (mod: pfree, total, used, free)."
 
-#: include/classes/setup/CSetupWizard.php:700
+#: include/classes/setup/CSetupWizard.php:872
 #, c-format
 msgid "Configuration file \"%1$s\" created."
 msgstr "Konfigurační soubor \"%1$s\" vytvořený."
@@ -3880,8 +3885,8 @@ msgstr "Nastavení monitorování web prezentací"
 msgid "Configuration updated"
 msgstr "Nastavení bylo aktualizováno"
 
-#: include/classes/setup/CSetupWizard.php:53
-#: include/classes/setup/CSetupWizard.php:428
+#: include/classes/setup/CSetupWizard.php:62
+#: include/classes/setup/CSetupWizard.php:587
 msgid "Configure DB connection"
 msgstr "Nastavení DB připojení"
 
@@ -3889,7 +3894,7 @@ msgstr "Nastavení DB připojení"
 msgid "Confirmation text"
 msgstr "Potvrzující text"
 
-#: include/classes/setup/CSetupWizard.php:698
+#: include/classes/setup/CSetupWizard.php:870
 msgid "Congratulations! You have successfully installed Zabbix frontend."
 msgstr "Gratulace! Právě jste úspěšně nainstalovali Zabbix frontend."
 
@@ -3914,12 +3919,12 @@ msgstr "Bezpečnost připojení"
 msgid "Connection timeout"
 msgstr ""
 
-#: include/classes/server/CZabbixServer.php:481
+#: include/classes/server/CZabbixServer.php:497
 #, c-format
 msgid "Connection timeout of %1$s seconds exceeded when connecting to Zabbix server \"%2$s\"."
 msgstr "Časový limit připojení %1$s sekund vypršel při připojení k Zabbix serveru \"%2$s\"."
 
-#: include/classes/server/CZabbixServer.php:592
+#: include/classes/server/CZabbixServer.php:608
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%1$s\" failed. Possible reasons:\n"
@@ -3927,7 +3932,7 @@ msgid ""
 "2. Incorrect DNS server configuration.\n"
 msgstr ""
 
-#: include/classes/server/CZabbixServer.php:580
+#: include/classes/server/CZabbixServer.php:596
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%1$s\" refused. Possible reasons:\n"
@@ -3937,7 +3942,7 @@ msgid ""
 "4. Firewall is blocking TCP connection.\n"
 msgstr ""
 
-#: include/classes/server/CZabbixServer.php:588
+#: include/classes/server/CZabbixServer.php:604
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%1$s\" timed out. Possible reasons:\n"
@@ -3945,7 +3950,7 @@ msgid ""
 "2. Firewall is blocking TCP connection.\n"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:373
+#: include/classes/setup/CSetupWizard.php:538
 msgid "Connection will not be encrypted because it uses a socket file (on Unix) or shared memory (Windows)."
 msgstr ""
 
@@ -4143,27 +4148,27 @@ msgstr "Korelace aktualizována"
 msgid "Count"
 msgstr "Počet"
 
-#: include/classes/data/CItemData.php:1061
+#: include/classes/data/CItemData.php:1064
 msgid "Count of context switches. Returns integer"
 msgstr "Počet kontextových přepnutí. Vráti celé číslo"
 
-#: include/classes/data/CItemData.php:1149
+#: include/classes/data/CItemData.php:1152
 msgid "Count of directory entries, recursively. Returns integer"
 msgstr "Počet vstupů do adresáře, rekurzivně. V celých číslech"
 
-#: include/classes/data/CItemData.php:905
+#: include/classes/data/CItemData.php:908
 msgid "Count of matched lines in log file monitoring with log rotation support. Returns integer"
 msgstr "Počet spárovaných řádků v monitorovaném log souboru s podporou rotace logu. Vrací celé číslo"
 
-#: include/classes/data/CItemData.php:897
+#: include/classes/data/CItemData.php:900
 msgid "Count of matched lines in log file monitoring. Returns integer"
 msgstr "Počet spárovaných řádků v monitorovaném log souboru. Vrací celé číslo"
 
-#: include/classes/data/CItemData.php:1665
+#: include/classes/data/CItemData.php:1668
 msgid "Count of values enqueued in the low-level discovery processing queue."
 msgstr ""
 
-#: include/classes/data/CItemData.php:1669
+#: include/classes/data/CItemData.php:1672
 msgid "Count of values enqueued in the preprocessing queue."
 msgstr ""
 
@@ -4426,7 +4431,7 @@ msgstr "Aktuální host"
 msgid "Current user"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:237
+#: include/classes/setup/CSetupWizard.php:409
 msgid "Current value"
 msgstr "Aktuální hodnota"
 
@@ -4522,7 +4527,7 @@ msgstr "Jméno DNS"
 msgid "Daily"
 msgstr "Denně"
 
-#: include/classes/core/ZBase.php:356
+#: include/classes/core/ZBase.php:359
 msgid "Dark"
 msgstr "Tmavý"
 
@@ -4635,16 +4640,16 @@ msgstr "Data set"
 msgid "Data storage period"
 msgstr "Doba ukládání dat"
 
-#: include/classes/setup/CSetupWizard.php:388
-#: include/classes/setup/CSetupWizard.php:534
-#: include/classes/setup/CSetupWizard.php:740
+#: include/classes/setup/CSetupWizard.php:551
+#: include/classes/setup/CSetupWizard.php:703
+#: include/classes/setup/CSetupWizard.php:938
 msgid "Database TLS CA file"
 msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:668
-#: include/classes/setup/CSetupWizard.php:400
-#: include/classes/setup/CSetupWizard.php:540
-#: include/classes/setup/CSetupWizard.php:748
+#: include/classes/setup/CSetupWizard.php:561
+#: include/classes/setup/CSetupWizard.php:711
+#: include/classes/setup/CSetupWizard.php:946
 msgid "Database TLS certificate file"
 msgstr ""
 
@@ -4652,32 +4657,32 @@ msgstr ""
 msgid "Database TLS certificate files must be read-only"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:412
-#: include/classes/setup/CSetupWizard.php:548
+#: include/classes/setup/CSetupWizard.php:571
+#: include/classes/setup/CSetupWizard.php:721
 msgid "Database TLS cipher list"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:370
-#: include/classes/setup/CSetupWizard.php:530
+#: include/classes/setup/CSetupWizard.php:534
+#: include/classes/setup/CSetupWizard.php:696
 msgid "Database TLS encryption"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:394
-#: include/classes/setup/CSetupWizard.php:537
-#: include/classes/setup/CSetupWizard.php:744
+#: include/classes/setup/CSetupWizard.php:556
+#: include/classes/setup/CSetupWizard.php:707
+#: include/classes/setup/CSetupWizard.php:942
 msgid "Database TLS key file"
 msgstr ""
 
-#: include/blocks.inc.php:609
-msgid "Database history tables upgraded"
+#: app/partials/administration.system.info.php:121
+msgid "Database history $info_tables upgraded"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:302
+#: include/classes/setup/CSetupWizard.php:472
 msgid "Database host"
 msgstr "Databázový server"
 
-#: include/classes/setup/CSetupWizard.php:406
-#: include/classes/setup/CSetupWizard.php:543
+#: include/classes/setup/CSetupWizard.php:566
+#: include/classes/setup/CSetupWizard.php:715
 msgid "Database host verification"
 msgstr ""
 
@@ -4685,35 +4690,35 @@ msgstr ""
 msgid "Database monitor"
 msgstr "Monitor databáze"
 
-#: include/classes/setup/CSetupWizard.php:314
-#: include/classes/setup/CSetupWizard.php:510 setup.php:45
+#: include/classes/setup/CSetupWizard.php:482
+#: include/classes/setup/CSetupWizard.php:660 setup.php:45
 msgid "Database name"
 msgstr "Jméno databáze"
 
-#: include/classes/setup/CSetupWizard.php:512
+#: include/classes/setup/CSetupWizard.php:668
 msgid "Database password"
 msgstr "Heslo databáze"
 
-#: include/classes/setup/CSetupWizard.php:307
-#: include/classes/setup/CSetupWizard.php:509 setup.php:44
+#: include/classes/setup/CSetupWizard.php:476
+#: include/classes/setup/CSetupWizard.php:656 setup.php:44
 msgid "Database port"
 msgstr "Port databáze"
 
-#: include/classes/setup/CSetupWizard.php:319
-#: include/classes/setup/CSetupWizard.php:514
+#: include/classes/setup/CSetupWizard.php:486
+#: include/classes/setup/CSetupWizard.php:674
 msgid "Database schema"
 msgstr "Databázové schéma"
 
-#: include/classes/setup/CSetupWizard.php:508
+#: include/classes/setup/CSetupWizard.php:652
 msgid "Database server"
 msgstr "Databázový server"
 
-#: include/classes/setup/CSetupWizard.php:294
-#: include/classes/setup/CSetupWizard.php:495
+#: include/classes/setup/CSetupWizard.php:465
+#: include/classes/setup/CSetupWizard.php:635
 msgid "Database type"
 msgstr "Typ databáze"
 
-#: include/classes/setup/CSetupWizard.php:511
+#: include/classes/setup/CSetupWizard.php:664
 msgid "Database user"
 msgstr "Databázový uživatel"
 
@@ -4746,7 +4751,7 @@ msgstr ""
 msgid "Day"
 msgstr "Den"
 
-#: include/func.inc.php:2543
+#: include/func.inc.php:2400
 msgid "Day before yesterday"
 msgstr "Předevčírem"
 
@@ -4828,7 +4833,7 @@ msgid "Default host inventory mode"
 msgstr "Defaultní mód inventář hostitele"
 
 #: app/views/administration.gui.edit.php:70
-#: include/classes/setup/CSetupWizard.php:227
+#: include/classes/setup/CSetupWizard.php:399
 msgid "Default language"
 msgstr ""
 
@@ -4849,12 +4854,12 @@ msgid "Default page display period"
 msgstr ""
 
 #: app/views/administration.gui.edit.php:82
-#: include/classes/setup/CSetupWizard.php:476
+#: include/classes/setup/CSetupWizard.php:614
 msgid "Default theme"
 msgstr "Výchozí téma"
 
 #: app/views/administration.gui.edit.php:75
-#: include/classes/setup/CSetupWizard.php:469
+#: include/classes/setup/CSetupWizard.php:607
 msgid "Default time zone"
 msgstr ""
 
@@ -5195,7 +5200,7 @@ msgstr "Smazat spouštěč?"
 msgid "Delete web scenario?"
 msgstr "Smazat web scénář?"
 
-#: app/controllers/CControllerAuditLogList.php:357
+#: app/controllers/CControllerAuditLogList.php:358
 msgid "Deleted"
 msgstr ""
 
@@ -5258,7 +5263,7 @@ msgstr "Závisí na"
 msgid "Deployment status"
 msgstr "Stav nasazení"
 
-#: app/controllers/CControllerAuditLogList.php:285
+#: app/controllers/CControllerAuditLogList.php:286
 #: app/partials/configuration.host.edit.html.php:147
 #: app/partials/hostmacros.list.html.php:37
 #: app/partials/massupdate.macros.tab.php:29
@@ -5290,11 +5295,12 @@ msgstr "Stav nasazení"
 msgid "Description"
 msgstr "Popis"
 
+#: app/partials/administration.system.info.php:30
 #: app/views/administration.mediatype.list.php:82
-#: app/views/js/reports.auditlog.list.js.php:152
+#: app/views/js/reports.auditlog.list.js.php:153
 #: app/views/reports.auditlog.list.php:96
-#: app/views/reports.auditlog.list.php:129 include/blocks.inc.php:525
-#: include/func.inc.php:1601 include/views/configuration.action.edit.php:175
+#: app/views/reports.auditlog.list.php:129 include/func.inc.php:1601
+#: include/views/configuration.action.edit.php:175
 #: include/views/configuration.action.edit.php:179
 #: include/views/configuration.action.edit.php:322
 #: include/views/configuration.action.edit.php:410
@@ -5310,7 +5316,7 @@ msgstr "Detaily web scénáře"
 msgid "Device"
 msgstr "Zařízení"
 
-#: include/classes/data/CItemData.php:1049
+#: include/classes/data/CItemData.php:1052
 msgid "Device interrupts. Returns integer"
 msgstr "Přerušení zařízení. Vráti celé číslo"
 
@@ -5326,7 +5332,7 @@ msgstr ""
 msgid "Directory"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1153
+#: include/classes/data/CItemData.php:1156
 msgid "Directory size (in bytes). Returns integer"
 msgstr "Velikost adresáře (v bajtech). Vrací celé číslo"
 
@@ -5426,6 +5432,7 @@ msgstr "Zakázat vybrané spouštěče?"
 msgid "Disable selected web scenarios?"
 msgstr "Zakázat označené scénáře?"
 
+#: app/partials/administration.system.info.php:180
 #: app/partials/configuration.filter.items.php:188
 #: app/partials/configuration.host.edit.html.php:363
 #: app/partials/monitoring.host.filter.php:129
@@ -5557,35 +5564,35 @@ msgstr "Objevovací seznam"
 msgid "Discovery object"
 msgstr "Objekt objevování"
 
-#: include/classes/data/CItemData.php:1229
+#: include/classes/data/CItemData.php:1232
 msgid "Discovery of VMware clusters, <url> - VMware service URL. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1237
+#: include/classes/data/CItemData.php:1240
 msgid "Discovery of VMware datastores, <url> - VMware service URL. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1289
+#: include/classes/data/CItemData.php:1292
 msgid "Discovery of VMware hypervisor datastores, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1313
+#: include/classes/data/CItemData.php:1316
 msgid "Discovery of VMware hypervisors, <url> - VMware service URL. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1557
+#: include/classes/data/CItemData.php:1560
 msgid "Discovery of VMware virtual machine disk devices, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1569
+#: include/classes/data/CItemData.php:1572
 msgid "Discovery of VMware virtual machine file systems, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1501
+#: include/classes/data/CItemData.php:1504
 msgid "Discovery of VMware virtual machine network interfaces, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1445
+#: include/classes/data/CItemData.php:1448
 msgid "Discovery of VMware virtual machines, <url> - VMware service URL. Returns JSON"
 msgstr ""
 
@@ -5676,15 +5683,15 @@ msgstr "Pravidla nálezu byla smazána"
 msgid "Discovery status"
 msgstr "Stav nálezu"
 
-#: include/classes/data/CItemData.php:1141
+#: include/classes/data/CItemData.php:1144
 msgid "Disk read statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps"
 msgstr "Čítače statistiky disku. Vrátí celé číslo pro položky v sektorech, operacích, bytech nebo desetinné číslo pro položky v sps, ops, bsp"
 
-#: include/classes/data/CItemData.php:1213
+#: include/classes/data/CItemData.php:1216
 msgid "Disk space in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Volné místo na disku v bytech nebo v procentech. Vráti celé číslo pro byty nebo desetinné číslo pro procenta"
 
-#: include/classes/data/CItemData.php:1145
+#: include/classes/data/CItemData.php:1148
 msgid "Disk write statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps"
 msgstr "Zapisovaní statistiky disku. Vráti celé číslo pro položky v sektorech, operacích, bytech nebo desetinné číslo pro položky v sps, ops, bsp"
 
@@ -5801,7 +5808,7 @@ msgstr "Nedostupné"
 msgid "Download image"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:684
+#: include/classes/setup/CSetupWizard.php:856
 msgid "Download the configuration file"
 msgstr "Stáhnout konfigurační soubor"
 
@@ -5865,7 +5872,7 @@ msgid "Duplicate userid \"%1$s\" in users for map \"%2$s\"."
 msgstr "Duplicitní userid \"%1$s\" u uživatele mapy \"%2$s\"."
 
 #: app/views/hintbox.eventlist.php:75
-#: app/views/monitoring.widget.problems.view.php:65 include/blocks.inc.php:732
+#: app/views/monitoring.widget.problems.view.php:65 include/blocks.inc.php:580
 #: include/classes/screens/CScreenProblem.php:867
 #: include/classes/screens/CScreenProblem.php:892
 #: include/classes/screens/CScreenProblem.php:1161 include/events.inc.php:289
@@ -6176,6 +6183,7 @@ msgstr "Povolit označené scénáře?"
 msgid "Enable trapping"
 msgstr "Zapnout pasti"
 
+#: app/partials/administration.system.info.php:173
 #: app/partials/configuration.filter.items.php:187
 #: app/partials/configuration.host.edit.html.php:165
 #: app/partials/monitoring.host.filter.php:128
@@ -6306,7 +6314,7 @@ msgstr "Chyba ve vyhledávacím požadavku nad tabulkou \"%1$s\"."
 msgid "Error message"
 msgstr "Chybná zpráva"
 
-#: include/blocks.inc.php:643
+#: app/partials/administration.system.info.php:153
 #, c-format
 msgid "Error! Unable to start Zabbix server due to unsupported %1$s database server version. Must be at least (%2$s)"
 msgstr ""
@@ -6362,7 +6370,7 @@ msgstr ""
 msgid "Event list [previous 20]"
 msgstr "Seznam událostí [posledních 20]"
 
-#: include/classes/data/CItemData.php:853
+#: include/classes/data/CItemData.php:856
 msgid "Event log monitoring. Returns log"
 msgstr "Monitoring logu událostí. Vráti log"
 
@@ -6426,11 +6434,11 @@ msgstr "Vyloučit skupiny hostů"
 msgid "Execute"
 msgstr "Vykonat"
 
-#: include/classes/data/CItemData.php:1593
+#: include/classes/data/CItemData.php:1596
 msgid "Execute WMI query and return the JSON document with all selected objects"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1589
+#: include/classes/data/CItemData.php:1592
 msgid "Execute WMI query and return the first selected object. Returns integer, float, string or text (depending on the request)"
 msgstr "Spustí WMI dotaz a vrátí první vybraný objekt. Vráti celé, desetinné číslo, řetězec nebo text (závisí od dotazu)"
 
@@ -6614,9 +6622,15 @@ msgstr "NEPRAVDA"
 msgid "FTP"
 msgstr "FTP"
 
-#: include/classes/setup/CSetupWizard.php:253
+#: include/classes/setup/CSetupWizard.php:425
 msgid "Fail"
 msgstr "Selhalo"
+
+#: app/partials/administration.ha.nodes.php:75
+#: app/partials/administration.system.info.php:174
+#, c-format
+msgid "Fail-over delay: %1$s"
+msgstr ""
 
 #: app/views/monitoring.widget.web.view.php:30 include/actions.inc.php:2139
 #: include/views/administration.auditacts.list.php:88
@@ -6752,7 +6766,7 @@ msgstr "Pole \"%1$s\" musí chybět."
 msgid "Field \"host\" is mandatory."
 msgstr "Pole \"host\" je vyžadované."
 
-#: include/classes/data/CItemData.php:1157
+#: include/classes/data/CItemData.php:1160
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256"
 msgstr ""
 
@@ -6765,15 +6779,15 @@ msgstr ""
 msgid "File is too big, max upload size is %1$s bytes."
 msgstr "Soubor je příliš velký, maximální velikost je %1$s bytů."
 
-#: include/classes/data/CItemData.php:1177
+#: include/classes/data/CItemData.php:1180
 msgid "File owner information. Returns string"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1193
+#: include/classes/data/CItemData.php:1196
 msgid "File size in bytes (default) or in newlines. Returns integer"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1197
+#: include/classes/data/CItemData.php:1200
 msgid "File time information. Returns integer (Unix timestamp)"
 msgstr "Informace o čase souboru. Vráti celé číslo (Unix timestamp)"
 
@@ -6851,19 +6865,19 @@ msgstr ""
 msgid "Filters"
 msgstr "Filtry"
 
-#: include/classes/data/CItemData.php:1189
+#: include/classes/data/CItemData.php:1192
 msgid "Find string in a file. Returns 0 - match not found; 1 - found"
 msgstr "Najdi řetězec v souboru. Vráti 0 - nenalezený, 1 - nalezený"
 
-#: include/classes/data/CItemData.php:1185
+#: include/classes/data/CItemData.php:1188
 msgid "Find string in a file. Returns the line containing the matched string, or as specified by the optional output parameter"
 msgstr "Najdi řetězec v souboru. Vráti řádek obsahující vybraný řetězec nebo výstup definovaný ve volitelném výstupním parametru"
 
-#: include/classes/data/CItemData.php:1585
+#: include/classes/data/CItemData.php:1588
 msgid "Find string on a web page. Returns the matched string, or as specified by the optional output parameter"
 msgstr "Najdi řetězec ve web stránce. Vráti vybraný řetězec nebo výstup definovaný ve volitelném výstupním parametru"
 
-#: include/classes/setup/CSetupWizard.php:145
+#: include/classes/setup/CSetupWizard.php:334
 msgid "Finish"
 msgstr "Dokončit"
 
@@ -7019,11 +7033,6 @@ msgstr "GUI"
 msgid "GUI access disabled."
 msgstr "GUI přístup vypnut."
 
-#: include/classes/setup/CSetupWizard.php:61
-#: include/classes/setup/CSetupWizard.php:485
-msgid "GUI settings"
-msgstr ""
-
 #: include/classes/helpers/CMenuHelper.php:221
 #: include/classes/helpers/CRoleHelper.php:379
 msgid "General"
@@ -7047,7 +7056,7 @@ msgstr "Gruzínsky (ka_GE)"
 msgid "German (de_DE)"
 msgstr "Německy (de_DE)"
 
-#: include/classes/data/CItemData.php:1577
+#: include/classes/data/CItemData.php:1580
 msgid "Get content of web page. Returns web page source as text"
 msgstr "Získat obsah web stránky. Vrátí zdrojový kód web stránky jako text"
 
@@ -7446,11 +7455,11 @@ msgstr "Hardware"
 msgid "Hardware (Full details)"
 msgstr "Hardware (podrobně)"
 
-#: include/classes/data/CItemData.php:1021
+#: include/classes/data/CItemData.php:1024
 msgid "Hardware sensor reading. Returns float"
 msgstr "Čtení hardwarového senzoru. Vrátí desetinné číslo"
 
-#: include/classes/setup/CSetupWizard.php:331
+#: include/classes/setup/CSetupWizard.php:499
 msgid "HashiCorp Vault"
 msgstr ""
 
@@ -7525,11 +7534,24 @@ msgstr "Hierarchie"
 msgid "High"
 msgstr "Závažný"
 
-#: include/classes/core/ZBase.php:358
+#: app/partials/administration.system.info.php:172
+#: app/partials/administration.system.info.php:179
+msgid "High availability cluster"
+msgstr ""
+
+#: app/controllers/CControllerAuditLogList.php:218
+msgid "High availability node"
+msgstr ""
+
+#: include/classes/widgets/forms/CWidgetFormSystemInfo.php:32
+msgid "High availability nodes"
+msgstr ""
+
+#: include/classes/core/ZBase.php:361
 msgid "High-contrast dark"
 msgstr "Vysoký tmavý kontrast"
 
-#: include/classes/core/ZBase.php:357
+#: include/classes/core/ZBase.php:360
 msgid "High-contrast light"
 msgstr "Vysoký světlý kontrast"
 
@@ -7609,7 +7631,7 @@ msgstr "Vodorovný"
 msgid "Horizontal align"
 msgstr "Vodorovné zarovnání"
 
-#: app/controllers/CControllerAuditLogList.php:218
+#: app/controllers/CControllerAuditLogList.php:219
 #: app/partials/configuration.host.edit.html.php:527
 #: app/partials/monitoring.latest.view.html.php:40
 #: app/partials/popup.operations.php:175
@@ -7620,12 +7642,11 @@ msgstr "Vodorovné zarovnání"
 #: app/views/monitoring.widget.problems.view.php:58
 #: app/views/popup.generic.php:81 app/views/popup.host.edit.php:97
 #: app/views/popup.massupdate.host.php:290 app/views/search.php:33
-#: include/actions.inc.php:50 include/blocks.inc.php:729
+#: include/actions.inc.php:50 include/blocks.inc.php:577
 #: include/classes/screens/CScreenHttpTest.php:112
 #: include/classes/screens/CScreenProblem.php:863
 #: include/classes/screens/CScreenProblem.php:887
 #: include/classes/screens/CScreenProblem.php:1158
-#: include/classes/setup/CSetupWizard.php:440
 #: include/classes/widgets/forms/CWidgetFormProblems.php:206
 #: include/classes/widgets/forms/CWidgetFormProblems.php:207
 #: include/hostgroups.inc.php:248 include/maps.inc.php:24
@@ -7717,7 +7738,7 @@ msgstr[0] "Host povolen"
 msgstr[1] "Hosty povoleny"
 msgstr[2] "Hosty povoleny"
 
-#: app/controllers/CControllerAuditLogList.php:219
+#: app/controllers/CControllerAuditLogList.php:220
 #: app/partials/administration.usergroup.grouprights.html.php:29
 #: app/partials/administration.usergroup.tagfilters.html.php:29
 #: app/partials/popup.operations.php:183
@@ -7850,7 +7871,7 @@ msgstr "Název hosta"
 msgid "Host networks"
 msgstr "Sítě hosta"
 
-#: app/controllers/CControllerAuditLogList.php:220
+#: app/controllers/CControllerAuditLogList.php:221
 #: app/views/popup.lldoperation.php:54
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:168
 msgid "Host prototype"
@@ -8007,7 +8028,7 @@ msgstr "Hosty byly aktualizovány"
 msgid "Hours"
 msgstr "Hodin"
 
-#: app/controllers/CControllerAuditLogList.php:221
+#: app/controllers/CControllerAuditLogList.php:222
 #: app/views/administration.housekeeping.edit.php:29
 #: app/views/administration.housekeeping.edit.php:184
 #: include/classes/helpers/CMenuHelper.php:227 include/html.inc.php:884
@@ -8094,7 +8115,7 @@ msgstr "IPMI rozhraní"
 msgid "IPMI sensor"
 msgstr "IPMI senzor"
 
-#: include/classes/data/CItemData.php:869
+#: include/classes/data/CItemData.php:872
 msgid "IPMI sensor IDs and other sensor-related parameters. Returns JSON."
 msgstr ""
 
@@ -8151,7 +8172,7 @@ msgstr "Mapová ikona byla odstraněna"
 msgid "Icon map updated"
 msgstr "Mapová ikona byla aktualizována"
 
-#: app/controllers/CControllerAuditLogList.php:222
+#: app/controllers/CControllerAuditLogList.php:223
 #: app/views/administration.iconmap.edit.php:29
 #: app/views/administration.iconmap.list.php:27
 #: include/classes/helpers/CMenuHelper.php:234 include/html.inc.php:887
@@ -8186,7 +8207,7 @@ msgstr ""
 msgid "Identical namespace (%1$s) is used by modules located at %2$s."
 msgstr ""
 
-#: include/classes/data/CItemData.php:1125
+#: include/classes/data/CItemData.php:1128
 msgid "Identification of the system. Returns string"
 msgstr "Identifikace systému. Vrací řetězec"
 
@@ -8264,7 +8285,7 @@ msgstr ""
 msgid "Ignore this service"
 msgstr ""
 
-#: app/controllers/CControllerAuditLogList.php:223
+#: app/controllers/CControllerAuditLogList.php:224
 #: app/views/administration.image.edit.php:60
 #: app/views/administration.image.edit.php:66 image.php:26
 #: include/classes/helpers/CMapHelper.php:227 include/maps.inc.php:28
@@ -8446,7 +8467,7 @@ msgstr ""
 msgid "Include subgroups"
 msgstr "Zahrnují podskupiny"
 
-#: include/classes/data/CItemData.php:937
+#: include/classes/data/CItemData.php:940
 msgid "Incoming traffic statistics on network interface. Returns integer"
 msgstr "Statistika příchozího provozu na síťovém rozhraní. Vráti celé číslo"
 
@@ -8750,9 +8771,9 @@ msgstr "Neplatné jméno pole \"%1$s\" nebo hodnota údaje pro tabulku \"%2$s\".
 msgid "Incorrect fields for sysmap."
 msgstr "Neplatné pole pro sysmap."
 
-#: include/classes/setup/CSetupWizard.php:740
-#: include/classes/setup/CSetupWizard.php:744
-#: include/classes/setup/CSetupWizard.php:748
+#: include/classes/setup/CSetupWizard.php:938
+#: include/classes/setup/CSetupWizard.php:942
+#: include/classes/setup/CSetupWizard.php:946
 #, c-format
 msgid "Incorrect file path for \"%1$s\": %2$s."
 msgstr ""
@@ -8926,9 +8947,9 @@ msgstr "Neplatný rozsah portů."
 msgid "Incorrect regular expression \"%1$s\": \"%2$s\""
 msgstr "Neplatný regulární výraz \"%1$s\": \"%2$s\""
 
-#: include/classes/server/CZabbixServer.php:493
-#: include/classes/server/CZabbixServer.php:535
-#: include/classes/server/CZabbixServer.php:542
+#: include/classes/server/CZabbixServer.php:509
+#: include/classes/server/CZabbixServer.php:551
+#: include/classes/server/CZabbixServer.php:558
 #, c-format
 msgid "Incorrect response received from Zabbix server \"%1$s\"."
 msgstr "Neplatná odpověď přijatá od Zabbix serveru \"%1$s\"."
@@ -9347,7 +9368,7 @@ msgstr ""
 #: app/views/monitoring.widget.actionlog.view.php:39
 #: app/views/monitoring.widget.problems.view.php:57
 #: include/actions.inc.php:1827 include/actions.inc.php:1921
-#: include/blocks.inc.php:728 include/classes/screens/CScreenProblem.php:862
+#: include/blocks.inc.php:576 include/classes/screens/CScreenProblem.php:862
 #: include/classes/screens/CScreenProblem.php:886
 #: include/views/administration.auditacts.list.php:69
 #: include/views/configuration.graph.list.php:141
@@ -9367,11 +9388,11 @@ msgstr "Info"
 msgid "Information"
 msgstr "Informace"
 
-#: include/classes/data/CItemData.php:1169
+#: include/classes/data/CItemData.php:1172
 msgid "Information about a file. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1025
+#: include/classes/data/CItemData.php:1028
 msgid "Information about a service. Returns integer with param as state, startup; string - with param as displayname, path, user; text - with param as description; Specifically for state: 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service; Specifically for startup: 0 - automatic, 1 - automatic delayed, 2 - manual, 3 - disabled, 4 - unknown"
 msgstr "Informace o službě. Vrací celé číslo s parametrem jako status, startup; řetězec - s parametrem jako displayname, cesta, uživatel; text - s parametrem jako description; Speciálně pro status: 0 - běží, 1 - pauza, 2 - start čeká, 3 - pauza čeká, 4 - pokračovat čeká, 5 - stop čeká, 6 - zastavena, 7 - neznámý, 255 - žádná služba; Speciálně pro startup: 0 - automaticky, 1 - automaticky zpožděný, 2 - manuální, 3 - zakázána, 4 - neznámý"
 
@@ -9421,12 +9442,12 @@ msgstr "Vložit"
 msgid "Insert expression"
 msgstr "Vložit výraz"
 
-#: include/classes/setup/CSetupWizard.php:69
-#: include/classes/setup/CSetupWizard.php:705
+#: include/classes/setup/CSetupWizard.php:74
+#: include/classes/setup/CSetupWizard.php:877
 msgid "Install"
 msgstr "Instalovat"
 
-#: setup.php:174
+#: setup.php:172
 msgid "Installation"
 msgstr "Instalace"
 
@@ -9946,7 +9967,7 @@ msgstr "Není možné najít uživatelské heslo."
 msgid "Italian (it_IT)"
 msgstr "Italsky (it_IT)"
 
-#: app/controllers/CControllerAuditLogList.php:225
+#: app/controllers/CControllerAuditLogList.php:226
 #: app/views/popup.massupdate.item.php:492 app/views/popup.triggerexpr.php:99
 #: app/views/popup.triggerwizard.php:92
 #: include/classes/screens/CScreenHistory.php:268
@@ -10034,7 +10055,7 @@ msgstr "Položka nevybraná"
 msgid "Item pre-processing is missing parameters: %1$s"
 msgstr "Při uvádění položky do procesu chybí parametry: %1$s"
 
-#: app/controllers/CControllerAuditLogList.php:226
+#: app/controllers/CControllerAuditLogList.php:227
 #: app/views/popup.lldoperation.php:51 app/views/popup.massupdate.item.php:492
 #: include/classes/widgets/forms/CWidgetFormGraphPrototype.php:48
 #: include/forms.inc.php:892
@@ -10407,7 +10428,7 @@ msgctxt "page navigation"
 msgid "Last"
 msgstr "Poslední"
 
-#: include/func.inc.php:2596
+#: include/func.inc.php:2453
 #, c-format
 msgid "Last %1$d day"
 msgid_plural "Last %1$d days"
@@ -10415,7 +10436,7 @@ msgstr[0] "Poslední %1$d den"
 msgstr[1] "Posledních %1$d dnů"
 msgstr[2] "Posledních %1$d dnů"
 
-#: include/func.inc.php:2590
+#: include/func.inc.php:2447
 #, c-format
 msgid "Last %1$d hour"
 msgid_plural "Last %1$d hours"
@@ -10423,7 +10444,7 @@ msgstr[0] "Poslední %1$d hodinu"
 msgstr[1] "Posledních %1$d hodin"
 msgstr[2] "Posledních %1$d hodin"
 
-#: include/func.inc.php:2583
+#: include/func.inc.php:2440
 #, c-format
 msgid "Last %1$d minute"
 msgid_plural "Last %1$d minutes"
@@ -10431,7 +10452,7 @@ msgstr[0] "Poslední %1$d minutu"
 msgstr[1] "Posledních %1$d minut"
 msgstr[2] "Posledních %1$d minut"
 
-#: include/func.inc.php:2599
+#: include/func.inc.php:2456
 #, c-format
 msgid "Last %1$d month"
 msgid_plural "Last %1$d months"
@@ -10439,7 +10460,7 @@ msgstr[0] "Poslední %1$d měsíc"
 msgstr[1] "Posledních %1$d měsíců"
 msgstr[2] "Posledních %1$d měsíců"
 
-#: include/func.inc.php:2576
+#: include/func.inc.php:2433
 #, c-format
 msgid "Last %1$d second"
 msgid_plural "Last %1$d seconds"
@@ -10447,13 +10468,17 @@ msgstr[0] "Poslední %1$d sekundu"
 msgstr[1] "Posledních %1$d sekund"
 msgstr[2] "Posledních %1$d sekund"
 
-#: include/func.inc.php:2602
+#: include/func.inc.php:2459
 #, c-format
 msgid "Last %1$d year"
 msgid_plural "Last %1$d years"
 msgstr[0] "Poslední %1$d rok"
 msgstr[1] "Posledních %1$d let"
 msgstr[2] "Posledních %1$d let"
+
+#: app/partials/administration.ha.nodes.php:28
+msgid "Last access"
+msgstr ""
 
 #: app/views/administration.token.list.php:143
 #: app/views/administration.user.token.list.php:99
@@ -10573,7 +10598,7 @@ msgstr "Legenda"
 msgid "Length"
 msgstr ""
 
-#: setup.php:197
+#: setup.php:195
 msgid "Licensed under"
 msgstr ""
 
@@ -10677,31 +10702,31 @@ msgstr "Propojení"
 msgid "List is empty"
 msgstr "Seznam je prázdný"
 
-#: include/classes/data/CItemData.php:1137
+#: include/classes/data/CItemData.php:1140
 msgid "List of block devices and their type. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1045
+#: include/classes/data/CItemData.php:1048
 msgid "List of detected CPUs/CPU cores. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1201
+#: include/classes/data/CItemData.php:1204
 msgid "List of mounted filesystems and their types. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1205
+#: include/classes/data/CItemData.php:1208
 msgid "List of mounted filesystems, their types, disk space and inode statistics. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:933
+#: include/classes/data/CItemData.php:936
 msgid "List of network interfaces. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1001
+#: include/classes/data/CItemData.php:1004
 msgid "List of object instances of Windows performance counters, discovered using object names in English. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:997
+#: include/classes/data/CItemData.php:1000
 msgid "List of object instances of Windows performance counters. Returns JSON"
 msgstr ""
 
@@ -10715,19 +10740,19 @@ msgstr "Seznam skupinových sdílení"
 msgid "List of user shares"
 msgstr "Seznam uživatelských sdílení"
 
-#: include/classes/data/CItemData.php:1085
+#: include/classes/data/CItemData.php:1088
 msgid "Listing of MAC addresses. Returns string"
 msgstr "Seznam MAC adres. Vráti řetězec"
 
-#: include/classes/data/CItemData.php:1081
+#: include/classes/data/CItemData.php:1084
 msgid "Listing of PCI or USB devices. Returns text"
 msgstr "Seznam PCI a USB zařízení. Vráti text"
 
-#: include/classes/data/CItemData.php:1109
+#: include/classes/data/CItemData.php:1112
 msgid "Listing of installed packages. Returns text"
 msgstr "Seznam nainstalovaných balíčků. Vráti text"
 
-#: include/classes/data/CItemData.php:1029
+#: include/classes/data/CItemData.php:1032
 msgid "Listing of services. Returns 0 - if empty; text - list of services separated by a newline"
 msgstr "Seznam služeb. Vráti 0 - když nejsou žádné služby nebo text - seznam služeb oddělených novým řádkem"
 
@@ -10735,7 +10760,7 @@ msgstr "Seznam služeb. Vráti 0 - když nejsou žádné služby nebo text - sez
 msgid "Lithuanian (lt_LT)"
 msgstr "Litevsky (lt_LT)"
 
-#: include/classes/data/CItemData.php:1581
+#: include/classes/data/CItemData.php:1584
 msgid "Loading time of full web page (in seconds). Returns float"
 msgstr "Načítání celé web stránky (v sekundách). Vrátí desetinné číslo"
 
@@ -10772,11 +10797,11 @@ msgstr "Zeměpisná délka umístění"
 msgid "Log"
 msgstr "Log"
 
-#: include/classes/data/CItemData.php:909
+#: include/classes/data/CItemData.php:912
 msgid "Log file monitoring with log rotation support. Returns log"
 msgstr "Log monitoring s podporou rotování log souborů. Vráti log"
 
-#: include/classes/data/CItemData.php:901
+#: include/classes/data/CItemData.php:904
 msgid "Log file monitoring. Returns log"
 msgstr "Log monitoring. Vrátí log"
 
@@ -10850,11 +10875,11 @@ msgstr "MAC adresa B"
 msgid "MD2"
 msgstr "MD2"
 
-#: include/classes/data/CItemData.php:1173
+#: include/classes/data/CItemData.php:1176
 msgid "MD5 checksum of file. Returns character string (MD5 hash of the file)"
 msgstr "MD5 kontrolní součet souboru. Vráti řetězec (MD5 hash souboru)"
 
-#: app/controllers/CControllerAuditLogList.php:227
+#: app/controllers/CControllerAuditLogList.php:228
 #: app/partials/hostmacros.inherited.list.html.php:48
 #: app/partials/hostmacros.list.html.php:35
 #: app/partials/massupdate.macros.tab.php:29
@@ -10903,7 +10928,7 @@ msgstr "Hlavní filtr"
 msgid "Main navigation"
 msgstr "Hlavní navigace"
 
-#: app/controllers/CControllerAuditLogList.php:228
+#: app/controllers/CControllerAuditLogList.php:229
 #: include/classes/helpers/CMenuHelper.php:165
 #: include/classes/helpers/CRoleHelper.php:360
 #: include/views/configuration.maintenance.edit.php:259
@@ -11008,7 +11033,7 @@ msgstr ""
 msgid "Manually closed"
 msgstr "Manuál zavřen"
 
-#: app/controllers/CControllerAuditLogList.php:229
+#: app/controllers/CControllerAuditLogList.php:230
 #: include/classes/widgets/CWidgetConfig.php:54
 #: include/classes/widgets/forms/CWidgetFormMap.php:41
 #: include/classes/widgets/forms/CWidgetFormMap.php:70 include/maps.inc.php:27
@@ -11203,15 +11228,15 @@ msgstr ""
 msgid "Max period for time selector"
 msgstr ""
 
-#: include/classes/data/CItemData.php:885
+#: include/classes/data/CItemData.php:888
 msgid "Maximum number of opened files supported by OS. Returns integer"
 msgstr "Maximální počet otevřených souborů podporovaný OS. Vráti celé číslo"
 
-#: include/classes/data/CItemData.php:889
+#: include/classes/data/CItemData.php:892
 msgid "Maximum number of processes supported by OS. Returns integer"
 msgstr "Maximální počet procesů podporovaný OS. Vráti celé číslo"
 
-#: include/blocks.inc.php:632
+#: app/partials/administration.system.info.php:142
 #, c-format
 msgid "Maximum required %1$s database version is %2$s."
 msgstr ""
@@ -11247,7 +11272,7 @@ msgstr "Květen"
 msgid "Media"
 msgstr "Média"
 
-#: app/controllers/CControllerAuditLogList.php:230
+#: app/controllers/CControllerAuditLogList.php:231
 #: app/views/administration.mediatype.edit.php:270 report4.php:96
 msgid "Media type"
 msgstr "Typ média"
@@ -11326,11 +11351,11 @@ msgstr "Členové"
 msgid "Memory limit: %1$s"
 msgstr "Limit paměti: %1$s"
 
-#: include/classes/data/CItemData.php:1217
+#: include/classes/data/CItemData.php:1220
 msgid "Memory size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Velikost paměti v bytech nebo v procentech. Vráti celé číslo pro byty nebo desetinné číslo pro procenta"
 
-#: include/classes/data/CItemData.php:1009
+#: include/classes/data/CItemData.php:1012
 msgid "Memory used by process in bytes. Returns integer"
 msgstr "Paměť použitá procesem v bytech. Vráti celé číslo"
 
@@ -11417,7 +11442,7 @@ msgstr "Min"
 msgid "Minimum password length"
 msgstr ""
 
-#: include/blocks.inc.php:626
+#: app/partials/administration.system.info.php:136
 #, c-format
 msgid "Minimum required %1$s database version is %2$s."
 msgstr ""
@@ -11518,7 +11543,7 @@ msgstr "Mód"
 msgid "Model"
 msgstr "Model"
 
-#: app/controllers/CControllerAuditLogList.php:231
+#: app/controllers/CControllerAuditLogList.php:232
 #: app/views/administration.module.edit.php:52
 msgid "Module"
 msgstr ""
@@ -11720,6 +11745,7 @@ msgstr "NTLM"
 #: app/controllers/CControllerPopupTriggerWizard.php:134
 #: app/controllers/CControllerPopupValueMapUpdate.php:63
 #: app/controllers/CControllerPopupValueMapUpdate.php:70
+#: app/partials/administration.ha.nodes.php:28
 #: app/partials/configuration.filter.items.php:91
 #: app/partials/configuration.host.edit.html.php:177
 #: app/partials/configuration.host.edit.html.php:216
@@ -11891,7 +11917,7 @@ msgstr ""
 msgid "Network discovery data storage period"
 msgstr "Perioda ukládání dat pro zjišťování sítě"
 
-#: include/classes/data/CItemData.php:941
+#: include/classes/data/CItemData.php:944
 msgid "Network interface list (includes interface type, status, IPv4 address, description). Returns text"
 msgstr "Seznam síťových rozhraní (zahrnuje typ rozhraní, status, IPv4 adresu, popis). Vráti text"
 
@@ -11933,7 +11959,7 @@ msgstr ""
 msgid "Network timeout for script execution"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1513
+#: include/classes/data/CItemData.php:1516
 msgid "Network utilization (combined transmit-rates and receive-rates) during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance"
 msgstr ""
 
@@ -12007,12 +12033,14 @@ msgstr "Nové spouštěče"
 msgid "Next page"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:142
-#: include/classes/setup/CSetupWizard.php:430
-#: include/classes/setup/CSetupWizard.php:567
+#: include/classes/setup/CSetupWizard.php:331
+#: include/classes/setup/CSetupWizard.php:589
+#: include/classes/setup/CSetupWizard.php:741
 msgid "Next step"
 msgstr "Další krok"
 
+#: app/partials/administration.system.info.php:35
+#: app/partials/administration.system.info.php:122
 #: app/partials/configuration.filter.items.php:195
 #: app/partials/configuration.filter.items.php:202
 #: app/partials/configuration.filter.items.php:211
@@ -12027,8 +12055,7 @@ msgstr "Další krok"
 #: app/views/popup.massupdate.item.php:337
 #: app/views/popup.massupdate.item.php:379
 #: app/views/popup.massupdate.trigger.php:64 include/actions.inc.php:33
-#: include/blocks.inc.php:532 include/blocks.inc.php:610
-#: include/blocks.inc.php:855 include/blocks.inc.php:859
+#: include/blocks.inc.php:703 include/blocks.inc.php:707
 #: include/classes/screens/CScreenProblem.php:1099
 #: include/classes/screens/CScreenProblem.php:1103
 #: include/classes/screens/CScreenProblem.php:1245 include/events.inc.php:198
@@ -12301,7 +12328,8 @@ msgstr ""
 #: app/controllers/CControllerWidgetIteratorGraphPrototypeView.php:305
 #: app/controllers/CControllerWidgetMapView.php:70
 #: app/controllers/CControllerWidgetPlainTextView.php:88
-#: app/views/monitoring.widget.graph.view.php:42 disc_prototypes.php:748
+#: app/views/monitoring.widget.graph.view.php:42
+#: app/views/monitoring.widget.systeminfo.view.php:45 disc_prototypes.php:748
 #: host_discovery.php:808 hostinventoriesoverview.php:73
 #: include/classes/api/services/CAction.php:1582
 #: include/classes/api/services/CAction.php:1863
@@ -12641,52 +12669,52 @@ msgstr "Lis"
 msgid "November"
 msgstr "Listopad"
 
-#: include/classes/data/CItemData.php:1057
+#: include/classes/data/CItemData.php:1060
 msgid "Number of CPUs. Returns integer"
 msgstr "Počet procesorů. Vráti celé číslo"
 
-#: include/classes/data/CItemData.php:1297
+#: include/classes/data/CItemData.php:1300
 msgid "Number of available DS paths, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - Datastore name, <partitionid> - internal id of physical device from vmware.hv.datastore.discovery"
 msgstr ""
 
-#: include/classes/data/CItemData.php:893
+#: include/classes/data/CItemData.php:896
 msgid "Number of currently open file descriptors. Returns integer"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1629
+#: include/classes/data/CItemData.php:1632
 msgid "Number of enabled items on the host."
 msgstr "Počet povolených položek na hostitele."
 
-#: include/blocks.inc.php:536
+#: app/partials/administration.system.info.php:40
 msgid "Number of hosts (enabled/disabled)"
 msgstr ""
 
-#: include/blocks.inc.php:549
+#: app/partials/administration.system.info.php:55
 msgid "Number of items (enabled/disabled/not supported)"
 msgstr "Počet položek (povolených/zakázaných/nepodporovaných)"
 
-#: include/classes/data/CItemData.php:1653
+#: include/classes/data/CItemData.php:1656
 msgid "Number of items in Zabbix database."
 msgstr "Počet položek v Zabbix databázi."
 
-#: include/classes/data/CItemData.php:1681
+#: include/classes/data/CItemData.php:1684
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr "Počet položek v historii proxy, které ještě nebyli odeslané serveru"
 
-#: include/classes/data/CItemData.php:1685
+#: include/classes/data/CItemData.php:1688
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
 msgstr "Počet položek ve frontě, které jsou zpožděné od do sekund včetně."
 
-#: include/classes/data/CItemData.php:1597
-#: include/classes/data/CItemData.php:1697
+#: include/classes/data/CItemData.php:1600
+#: include/classes/data/CItemData.php:1700
 msgid "Number of items in the queue which are delayed in Zabbix server or proxy by \"from\" till \"to\" seconds, inclusive."
 msgstr "Počet položek v řadě, které jsou zpožděny Zabbix serverem nebo proxy pomocí \"od\" \"do\" vteřin, zahrnuje."
 
-#: include/classes/data/CItemData.php:1649
+#: include/classes/data/CItemData.php:1652
 msgid "Number of monitored hosts"
 msgstr "Počet monitorovaných hostů"
 
-#: include/classes/data/CItemData.php:929
+#: include/classes/data/CItemData.php:932
 msgid "Number of out-of-window collisions. Returns integer"
 msgstr "Počet out-of-window kolízí. Vráti celé číslo"
 
@@ -12698,15 +12726,15 @@ msgstr "Počet problémů"
 msgid "Number of problems and expand most critical one"
 msgstr "Počet problémů a rozvedení toho nejkritičtějšího"
 
-#: include/classes/data/CItemData.php:1329
+#: include/classes/data/CItemData.php:1332
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Počet procesorových jader na VMware, <url> - URL VMware služby, <uuid> - VMware host jméno"
 
-#: include/classes/data/CItemData.php:1333
+#: include/classes/data/CItemData.php:1336
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Počet procesorových vláken na VMware, <url> - URL VMware služby, <uuid> - VMware host jméno"
 
-#: include/classes/data/CItemData.php:1417
+#: include/classes/data/CItemData.php:1420
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Počet procesorů na virtuálním stroji VMware, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
 
@@ -12723,67 +12751,67 @@ msgstr "Počet změn stavu"
 msgid "Number of steps"
 msgstr "Počet kroků"
 
-#: include/blocks.inc.php:545
+#: app/partials/administration.system.info.php:50
 msgid "Number of templates"
 msgstr ""
 
-#: include/blocks.inc.php:560
+#: app/partials/administration.system.info.php:67
 msgid "Number of triggers (enabled/disabled [problem/ok])"
 msgstr "Počet spouštěčů (povolených/zakázaných [problémových/ok])"
 
-#: include/classes/data/CItemData.php:1717
+#: include/classes/data/CItemData.php:1720
 msgid "Number of triggers in Zabbix database."
 msgstr "Počet spouštěčů v Zabbix databázi."
 
-#: include/classes/data/CItemData.php:1657
+#: include/classes/data/CItemData.php:1660
 msgid "Number of unsupported items in Zabbix database."
 msgstr "Počet nepodporovaných položek v Zabbix databázi."
 
-#: include/classes/data/CItemData.php:1633
+#: include/classes/data/CItemData.php:1636
 msgid "Number of unsupported items on the host."
 msgstr "Počet nepodporovaných položek na hostitele."
 
-#: include/blocks.inc.php:572
+#: app/partials/administration.system.info.php:84
 msgid "Number of users (online)"
 msgstr "Počet uživatelů (přihlášených)"
 
-#: include/classes/data/CItemData.php:1133
+#: include/classes/data/CItemData.php:1136
 msgid "Number of users logged in. Returns integer"
 msgstr "Počet přihlášení uživatelů. Návratová hodnota celé číslo"
 
-#: include/classes/data/CItemData.php:1609
+#: include/classes/data/CItemData.php:1612
 msgid "Number of values stored in table HISTORY."
 msgstr "Počet hodnot uložených v tabulce HISTORY."
 
-#: include/classes/data/CItemData.php:1613
+#: include/classes/data/CItemData.php:1616
 msgid "Number of values stored in table HISTORY_LOG."
 msgstr "Počet hodnot uložených v tabulce HISTORY_LOG."
 
-#: include/classes/data/CItemData.php:1617
+#: include/classes/data/CItemData.php:1620
 msgid "Number of values stored in table HISTORY_STR."
 msgstr "Počet hodnot uložených v tabulce HISTORY_STR."
 
-#: include/classes/data/CItemData.php:1621
+#: include/classes/data/CItemData.php:1624
 msgid "Number of values stored in table HISTORY_TEXT."
 msgstr "Počet hodnot uložených v tabulce HISTORY_TEXT."
 
-#: include/classes/data/CItemData.php:1625
+#: include/classes/data/CItemData.php:1628
 msgid "Number of values stored in table HISTORY_UINT."
 msgstr "Počet hodnot uložených v tabulce HISTORY_UINT."
 
-#: include/classes/data/CItemData.php:1709
+#: include/classes/data/CItemData.php:1712
 msgid "Number of values stored in table TRENDS."
 msgstr "Počet hodnot uložených v tabulce TRENDS."
 
-#: include/classes/data/CItemData.php:1713
+#: include/classes/data/CItemData.php:1716
 msgid "Number of values stored in table TRENDS_UINT."
 msgstr "Počet hodnot uložených v tabulce TRENDS_UINT."
 
-#: include/classes/data/CItemData.php:1401
+#: include/classes/data/CItemData.php:1404
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Počet virtuálních serverů na VMware hypervizorovi, <url> - URL VMware služby, <uuid> - VMware hypervizor host jméno"
 
-#: include/classes/data/CItemData.php:1209
+#: include/classes/data/CItemData.php:1212
 msgid "Number or percentage of inodes. Returns integer for number; float for percentage"
 msgstr "Počet nebo procentní podíl uzlů. Návratová hodnota celé číslo pro počet; plovoucí číslo pro procento"
 
@@ -12892,7 +12920,7 @@ msgstr "Vypnuté"
 #: app/views/js/popup.massupdate.js.php:415
 #: app/views/js/popup.mediatypetest.edit.js.php:114
 #: app/views/js/popup.scriptexec.js.php:53
-#: app/views/js/reports.auditlog.list.js.php:157
+#: app/views/js/reports.auditlog.list.js.php:158
 #: app/views/monitoring.widget.web.view.php:30
 #: include/views/configuration.triggers.list.php:94
 #: include/views/js/common.item.edit.js.php:204
@@ -12950,7 +12978,7 @@ msgstr "Jen kontroly typu Zabbix agent, SNMPv1, SNMPv2 nebo SNMPv3 mohou být un
 msgid "Only administrators can set map owner."
 msgstr "Pouze administrátoři mohou nastavit vlastníka mapy."
 
-#: include/blocks.inc.php:550
+#: app/partials/administration.system.info.php:56
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "Počítány jsou pouze položky přiřazené k povoleným hostitelům"
 
@@ -12998,7 +13026,7 @@ msgstr "Pouze super administrátoři mohou ustanovit vlastníka dashboardu."
 msgid "Only super admins can set report owner."
 msgstr ""
 
-#: include/blocks.inc.php:561
+#: app/partials/administration.system.info.php:68
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Počítány jsou pouze spouštěče přiřazené k povoleným hostitelům a závisející na povolených položkách"
 
@@ -13006,7 +13034,7 @@ msgstr "Počítány jsou pouze spouštěče přiřazené k povoleným hostitelů
 msgid "Opera"
 msgstr "Opera"
 
-#: include/classes/data/CItemData.php:1105
+#: include/classes/data/CItemData.php:1108
 msgid "Operating system information. Returns string"
 msgstr "Informace operačního systému. Návratová hodnota řetězec"
 
@@ -13035,7 +13063,7 @@ msgstr "Operace nemá skupinu na vykonání."
 msgid "Operation has no template to operate."
 msgstr "Operace nemá šablonu na vykonání."
 
-#: app/views/monitoring.widget.problems.view.php:64 include/blocks.inc.php:731
+#: app/views/monitoring.widget.problems.view.php:64 include/blocks.inc.php:579
 #: include/classes/screens/CScreenProblem.php:890
 #: include/classes/screens/CScreenProblem.php:1160 include/events.inc.php:184
 #: include/views/configuration.trigger.prototype.edit.php:84
@@ -13194,7 +13222,7 @@ msgstr "Další parametry"
 msgid "Others"
 msgstr "Další"
 
-#: include/classes/data/CItemData.php:945
+#: include/classes/data/CItemData.php:948
 msgid "Outgoing traffic statistics on network interface. Returns integer"
 msgstr "Odchozí statistiky provozu na síťovém rozhraní. Návratová hodnota celé číslo"
 
@@ -13481,7 +13509,8 @@ msgctxt "page navigation"
 msgid "Pager"
 msgstr ""
 
-#: app/views/administration.mediatype.edit.php:103 include/blocks.inc.php:525
+#: app/partials/administration.system.info.php:30
+#: app/views/administration.mediatype.edit.php:103
 msgid "Parameter"
 msgstr "Parametr"
 
@@ -13574,7 +13603,7 @@ msgstr "Pasivní"
 #: app/views/popup.massupdate.item.php:175
 #: app/views/popup.massupdate.item.php:199 disc_prototypes.php:218
 #: host_discovery.php:191 httpconf.php:74
-#: include/classes/setup/CSetupWizard.php:364
+#: include/classes/setup/CSetupWizard.php:527
 #: include/views/configuration.host.discovery.edit.php:413
 #: include/views/configuration.host.discovery.edit.php:554
 #: include/views/configuration.host.discovery.edit.php:593
@@ -13645,7 +13674,7 @@ msgstr "Přerušené operace pro potlačené problémy"
 msgid "Peak memory usage: %1$s"
 msgstr "Vrchol využití paměti: %1$s"
 
-#: include/classes/data/CItemData.php:1413
+#: include/classes/data/CItemData.php:1416
 msgid "Percent of time the virtual machine is unable to run because it is contending for access to the physical CPU(s), <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
@@ -13653,11 +13682,11 @@ msgstr ""
 msgid "Percentage"
 msgstr "Procento"
 
-#: include/classes/data/CItemData.php:1497
+#: include/classes/data/CItemData.php:1500
 msgid "Percentage of host physical memory that has been consumed, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1421
+#: include/classes/data/CItemData.php:1424
 msgid "Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance"
 msgstr ""
 
@@ -13669,7 +13698,7 @@ msgstr "Procentuální čára (vlevo)"
 msgid "Percentile line (right)"
 msgstr "Procentuální čára (vpravo)"
 
-#: include/classes/data/CItemData.php:921
+#: include/classes/data/CItemData.php:924
 msgid "Performs a DNS query. Returns character string with the required type of information"
 msgstr "Vykonat DNS dotaz. Vrátí řetězec s požadovaným typem informace"
 
@@ -13729,7 +13758,7 @@ msgid "Placing algorithm"
 msgstr "Algoritmus umísťování"
 
 #: app/views/administration.mediatype.edit.php:208
-#: include/classes/setup/CSetupWizard.php:330
+#: include/classes/setup/CSetupWizard.php:498
 #: include/classes/widgets/CWidgetConfig.php:56
 msgid "Plain text"
 msgstr "Prostý text"
@@ -13743,7 +13772,7 @@ msgstr "Přehrát"
 msgid "Play sound"
 msgstr "Přehrávat zvuk"
 
-#: include/classes/setup/CSetupWizard.php:567
+#: include/classes/setup/CSetupWizard.php:741
 #, c-format
 msgid "Please check configuration parameters. If all is correct, press \"%1$s\" button, or \"%2$s\" button to change configuration parameters."
 msgstr "Zkontrolujte konfigurační parametry. Je-li vše v pořádku, stiskni \"%1$s\" tlačítko, nebo \"%2$s\" tlačítko pro změnu konfiguračních parametrů."
@@ -13756,18 +13785,14 @@ msgstr ""
 msgid "Please confirm that you want to remove all value mappings."
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:430
+#: include/classes/setup/CSetupWizard.php:589
 #, c-format
 msgid "Please create database manually, and set the configuration parameters for connection to this database. Press \"%1$s\" button when done."
 msgstr "Prosím, vytvořit databázi ručně, a nastav konfigurační parametry pro připojení k této databázi. Stiskni \"%1$s\" tlačítko pokud jsi to udělal."
 
-#: include/classes/setup/CSetupWizard.php:888
+#: include/classes/setup/CSetupWizard.php:177
 msgid "Please enable \"allow_url_fopen\" directive."
 msgstr ""
-
-#: include/classes/setup/CSetupWizard.php:458
-msgid "Please enter the host name or host IP address and port number of the Zabbix server, as well as the name of the installation (optional)."
-msgstr "Prosím, zadej název hostitele nebo host IP addresu a číslo portu Zabbix serveru, stejně jako jméno instalace (volitelné)."
 
 #: jsLoader.php:241
 msgid "Please select two elements"
@@ -13809,9 +13834,8 @@ msgstr "Vyplň pole host inventáře"
 #: app/views/administration.proxy.edit.php:49
 #: app/views/administration.script.edit.php:162
 #: app/views/configuration.host.list.php:118
-#: app/views/popup.itemtestedit.view.php:112
-#: include/classes/setup/CSetupWizard.php:445 include/hosts.inc.php:1228
-#: include/views/inventory.host.view.php:81 setup.php:62
+#: app/views/popup.itemtestedit.view.php:112 include/hosts.inc.php:1228
+#: include/views/inventory.host.view.php:81
 msgid "Port"
 msgstr "Port"
 
@@ -13839,7 +13863,7 @@ msgstr "Pole zpráv"
 msgid "Post type"
 msgstr "Typ zprávy"
 
-#: include/classes/data/CItemData.php:1377
+#: include/classes/data/CItemData.php:1380
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
 msgstr ""
 
@@ -13847,8 +13871,8 @@ msgstr ""
 msgid "Power value"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:65
-#: include/classes/setup/CSetupWizard.php:565
+#: include/classes/setup/CSetupWizard.php:70
+#: include/classes/setup/CSetupWizard.php:739
 msgid "Pre-installation summary"
 msgstr "Shrnutí před instalací"
 
@@ -13893,7 +13917,7 @@ msgid "Previous day"
 msgstr ""
 
 #: app/partials/scheduledreport.formgrid.html.php:88
-#: app/partials/scheduledreport.table.html.php:58 include/func.inc.php:2546
+#: app/partials/scheduledreport.table.html.php:58 include/func.inc.php:2403
 msgid "Previous month"
 msgstr "Předchozí měsíc"
 
@@ -13907,12 +13931,12 @@ msgid "Previous value"
 msgstr "Předchozí hodnota"
 
 #: app/partials/scheduledreport.formgrid.html.php:87
-#: app/partials/scheduledreport.table.html.php:57 include/func.inc.php:2545
+#: app/partials/scheduledreport.table.html.php:57 include/func.inc.php:2402
 msgid "Previous week"
 msgstr "Předchozí týden"
 
 #: app/partials/scheduledreport.formgrid.html.php:89
-#: app/partials/scheduledreport.table.html.php:59 include/func.inc.php:2547
+#: app/partials/scheduledreport.table.html.php:59 include/func.inc.php:2404
 msgid "Previous year"
 msgstr "Předchozí rok"
 
@@ -13981,7 +14005,7 @@ msgstr "Úroveň oprávnění"
 #: app/views/monitoring.service.list.php:84
 #: app/views/monitoring.widget.problems.view.php:60
 #: app/views/popup.acknowledge.edit.php:33
-#: app/views/popup.mediatype.message.php:49 include/blocks.inc.php:730
+#: app/views/popup.mediatype.message.php:49 include/blocks.inc.php:578
 #: include/classes/helpers/CMediatypeHelper.php:48
 #: include/classes/screens/CScreenProblem.php:865
 #: include/classes/screens/CScreenProblem.php:888
@@ -14075,7 +14099,7 @@ msgstr "Problémy"
 msgid "Problems by severity"
 msgstr "Problémy dle závažnosti"
 
-#: include/classes/data/CItemData.php:1005
+#: include/classes/data/CItemData.php:1008
 msgid "Process CPU utilization percentage. Returns float"
 msgstr ""
 
@@ -14121,7 +14145,7 @@ msgstr "Poskytnuté URL \"%1$s\" je neplatné."
 msgid "Proxies"
 msgstr "Proxy"
 
-#: app/controllers/CControllerAuditLogList.php:232
+#: app/controllers/CControllerAuditLogList.php:233
 #: app/views/administration.proxy.edit.php:89
 #: app/views/administration.proxy.edit.php:142
 #: app/views/administration.queue.details.php:49
@@ -14316,7 +14340,7 @@ msgstr ""
 msgid "Read-write access to services with tag"
 msgstr ""
 
-#: include/classes/data/CItemData.php:913
+#: include/classes/data/CItemData.php:916
 msgid "Reads modbus data. Returns various types"
 msgstr ""
 
@@ -14418,7 +14442,7 @@ msgstr ""
 msgid "Regular"
 msgstr "Normální"
 
-#: app/controllers/CControllerAuditLogList.php:233
+#: app/controllers/CControllerAuditLogList.php:234
 #: app/views/popup.lldoverride.php:101 include/items.inc.php:1803
 #: include/views/configuration.host.discovery.edit.php:742
 msgid "Regular expression"
@@ -14749,7 +14773,7 @@ msgstr "Požadavek byl úspěšně poslán"
 msgid "Request type"
 msgstr "Typ dotazu"
 
-#: include/classes/setup/CSetupWizard.php:237
+#: include/classes/setup/CSetupWizard.php:409
 #: include/views/configuration.httpconf.edit.php:205
 msgid "Required"
 msgstr "Vyžadováno"
@@ -14762,11 +14786,11 @@ msgstr "Požadované oprávnění na hosta"
 msgid "Required performance (vps)"
 msgstr "Požadovaný výkon (hodnoty/sekundu)"
 
-#: include/classes/data/CItemData.php:1693
+#: include/classes/data/CItemData.php:1696
 msgid "Required performance of the Zabbix server, in new values per second expected."
 msgstr "Požadovaný výkon Zabbix serveru, očekávaná hodnota v nových údajích za sekundu."
 
-#: include/blocks.inc.php:576
+#: app/partials/administration.system.info.php:91
 msgid "Required server performance, new values per second"
 msgstr "Požadovaný výkon serveru - nové hodnoty za sekundu"
 
@@ -14916,7 +14940,7 @@ msgstr ""
 msgid "Retrieve mode"
 msgstr "Režim načítání"
 
-#: include/classes/data/CItemData.php:1161
+#: include/classes/data/CItemData.php:1164
 msgid "Retrieving contents of a file. Returns text"
 msgstr "Načítání obsahu souboru. Návratová hodnota text"
 
@@ -14924,60 +14948,60 @@ msgstr "Načítání obsahu souboru. Návratová hodnota text"
 msgid "Retry"
 msgstr "Znovu zkusit"
 
-#: include/classes/data/CItemData.php:873
+#: include/classes/data/CItemData.php:876
 msgid "Return a JSON array with LLD macros describing the MBean objects or their attributes. Can be used for LLD."
 msgstr ""
 
-#: include/classes/data/CItemData.php:877
+#: include/classes/data/CItemData.php:880
 msgid "Return a JSON array with MBean objects or their attributes. Compared to jmx.discovery it does not define LLD macros. Can be used for LLD."
 msgstr ""
 
-#: include/classes/data/CItemData.php:849
+#: include/classes/data/CItemData.php:852
 msgid "Return first column of the first row of the SQL query result."
 msgstr "Vrátí první sloupec z prvního řádku výsledku dotazu SQL."
 
-#: include/classes/data/CItemData.php:881
+#: include/classes/data/CItemData.php:884
 msgid "Return value of an attribute of MBean object."
 msgstr "Navrať hodnotu atributu objektu MBean."
 
-#: include/classes/data/CItemData.php:1181
+#: include/classes/data/CItemData.php:1184
 msgid "Returns 4-digit string containing octal number with Unix permissions"
 msgstr ""
 
-#: include/classes/data/CItemData.php:865
+#: include/classes/data/CItemData.php:868
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
 msgstr "Vráti ICMP ping čas v sekundách. Příklad: 0.02"
 
-#: include/classes/data/CItemData.php:1645
+#: include/classes/data/CItemData.php:1648
 msgid "Returns a JSON array describing the host network interfaces configured in Zabbix. Can be used for LLD."
 msgstr ""
 
-#: include/classes/data/CItemData.php:1601
-#: include/classes/data/CItemData.php:1701
+#: include/classes/data/CItemData.php:1604
+#: include/classes/data/CItemData.php:1704
 msgid "Returns a JSON object containing Zabbix server or proxy internal metrics."
 msgstr "Vrátí JSON objekt obsahující Zabbix server nebo interní metriky proxy."
 
-#: include/classes/data/CItemData.php:1641
+#: include/classes/data/CItemData.php:1644
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx."
 msgstr "Vráti dostupnost konkrétního typu kontroly na hostu. Hodnoty položky odpovídají ikonám dostupnosti v seznamu hostů. Platné typy jsou: agent, snmp, ipmi, jmx."
 
-#: include/classes/data/CItemData.php:1637
+#: include/classes/data/CItemData.php:1640
 msgid "Returns current maintenance status of the host."
 msgstr "Vrátí aktuální stav odstávky pro hosta."
 
-#: include/classes/data/CItemData.php:1661
+#: include/classes/data/CItemData.php:1664
 msgid "Returns information associated with Zabbix Java gateway. Valid params are: ping, version."
 msgstr "Vrátí informace příslušné k Zabbix Java gateway. Platné parametry jsou: ping, version."
 
-#: include/classes/data/CItemData.php:969
+#: include/classes/data/CItemData.php:972
 msgid "Returns number of TCP sockets that match parameters. Returns integer"
 msgstr ""
 
-#: include/classes/data/CItemData.php:985
+#: include/classes/data/CItemData.php:988
 msgid "Returns number of UDP sockets that match parameters. Returns integer"
 msgstr ""
 
-#: include/classes/data/CItemData.php:861
+#: include/classes/data/CItemData.php:864
 msgid "Returns percentage of lost ICMP ping packets."
 msgstr "Vrátí procento ztracených ICMP ping paketů."
 
@@ -15054,7 +15078,7 @@ msgstr ""
 msgid "Run script \"%1$s\" on hosts"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1093
+#: include/classes/data/CItemData.php:1096
 msgid "Run specified command on the host. Returns text result of the command; 1 - with mode as nowait (regardless of command result)"
 msgstr "Spustí specifikovaný příkaz na hostovi. Vráti text jako výsledek spuštění. 1 - s nowait módem (bez řekání na výstup z příkazu)"
 
@@ -15308,7 +15332,7 @@ msgstr ""
 msgid "Save changes"
 msgstr "Ulož změny"
 
-#: include/classes/setup/CSetupWizard.php:685
+#: include/classes/setup/CSetupWizard.php:857
 #, c-format
 msgid "Save it as \"%1$s\""
 msgstr "Uložte jej jako \"%1$s\""
@@ -15333,7 +15357,7 @@ msgstr "Termín"
 msgid "Scheduled check"
 msgstr "Naplánovaná kontrola"
 
-#: app/controllers/CControllerAuditLogList.php:235
+#: app/controllers/CControllerAuditLogList.php:236
 #: app/views/reports.scheduledreport.edit.php:57
 msgid "Scheduled report"
 msgstr ""
@@ -15403,7 +15427,7 @@ msgctxt "selected problems"
 msgid "Scope"
 msgstr "Rozsah"
 
-#: app/controllers/CControllerAuditLogList.php:236
+#: app/controllers/CControllerAuditLogList.php:237
 #: app/views/administration.mediatype.edit.php:217
 #: app/views/administration.script.edit.php:115
 #: app/views/administration.script.edit.php:185
@@ -15677,7 +15701,7 @@ msgstr "Server (proxy)"
 msgid "Server time"
 msgstr "Čas na serveru"
 
-#: app/controllers/CControllerAuditLogList.php:224
+#: app/controllers/CControllerAuditLogList.php:225
 #: app/views/monitoring.service.list.edit.php:112
 #: app/views/popup.mediatype.message.php:58
 #: app/views/popup.service.edit.php:286 app/views/popup.service.edit.php:344
@@ -15801,7 +15825,7 @@ msgstr "Služby tvoří kruhovou závislost."
 msgid "Services updated"
 msgstr ""
 
-#: include/classes/core/ZBase.php:241 include/classes/core/ZBase.php:468
+#: include/classes/core/ZBase.php:244 include/classes/core/ZBase.php:471
 msgid "Session initialization error."
 msgstr ""
 
@@ -15860,7 +15884,9 @@ msgstr "Nastavení LDAP protokolu selhalo."
 msgid "Setting LDAP referrals to \"Off\" failed."
 msgstr "Nastavení LDAP doporučení na \"Off\" selhalo."
 
-#: app/controllers/CControllerAuditLogList.php:237
+#: app/controllers/CControllerAuditLogList.php:238
+#: include/classes/setup/CSetupWizard.php:66
+#: include/classes/setup/CSetupWizard.php:624
 msgid "Settings"
 msgstr ""
 
@@ -15949,6 +15975,7 @@ msgstr "Zkrácený"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:108
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:180
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:252
+#: include/classes/widgets/forms/CWidgetFormSystemInfo.php:30
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:33
 #: include/views/js/monitoring.sysmaps.js.php:100 report2.php:546
 msgid "Show"
@@ -16158,7 +16185,7 @@ msgstr "Umístění stát / provincie"
 msgid "Size"
 msgstr "Velikost"
 
-#: include/classes/server/CZabbixServer.php:514
+#: include/classes/server/CZabbixServer.php:530
 #, c-format
 msgid "Size of the response received from Zabbix server \"%1$s\" exceeds the allowed size of %2$s bytes. This value can be increased in the ZBX_SOCKET_BYTES_LIMIT constant in include/defines.inc.php."
 msgstr "Velikost odpovědi přijaté od Zabbix serveru \"%1$s\" dosáhla povolené velikosti %2$s bytů. Tuto povolenou hodnotu můžete zvýšit nastavením ZBX_SOCKET_BYTES_LIMIT v include/defines.inc.php."
@@ -16204,7 +16231,7 @@ msgstr "Software aplikace D"
 msgid "Software application E"
 msgstr "Software aplikace E"
 
-#: include/classes/data/CItemData.php:1101
+#: include/classes/data/CItemData.php:1104
 msgid "Software architecture information. Returns string"
 msgstr "Software architektura. Vrátí řetězec"
 
@@ -16275,6 +16302,10 @@ msgstr "Schodiště"
 msgid "Standard items"
 msgstr "Standardní položky"
 
+#: app/partials/administration.ha.nodes.php:45
+msgid "Standby"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:630
 #: app/controllers/CControllerPopupTriggerExpr.php:748
 msgid "Start"
@@ -16307,7 +16338,7 @@ msgstr ""
 msgid "Starting TLS failed."
 msgstr "Spuštění TLS selhalo."
 
-#: include/classes/data/CItemData.php:1605
+#: include/classes/data/CItemData.php:1608
 msgid "Startup time of Zabbix server, Unix timestamp."
 msgstr "Čas startu Zabbix serveru, Unix timestamp."
 
@@ -16325,13 +16356,14 @@ msgctxt "history source selection method"
 msgid "Static"
 msgstr "Statický"
 
-#: include/classes/data/CItemData.php:1741
+#: include/classes/data/CItemData.php:1744
 msgid "Statistics and availability of Zabbix write cache. Cache - one of values (modes: all, float, uint, str, log, text, not supported), history (modes: pfree, free, total, used, pused), index (modes: pfree, free, total, used, pused), trend (modes: pfree, free, total, used, pused)."
 msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:179
 #: app/controllers/CControllerPopupGeneric.php:193
 #: app/controllers/CControllerPopupGeneric.php:235
+#: app/partials/administration.ha.nodes.php:28
 #: app/partials/configuration.filter.items.php:184
 #: app/partials/monitoring.host.filter.php:125
 #: app/partials/monitoring.host.view.html.php:34
@@ -16488,6 +16520,10 @@ msgstr ""
 msgid "Stop slideshow"
 msgstr ""
 
+#: app/partials/administration.ha.nodes.php:40
+msgid "Stopped"
+msgstr ""
+
 #: app/views/popup.lldoperation.php:191 app/views/popup.lldoperation.php:212
 #: app/views/popup.massupdate.item.php:295
 #: app/views/popup.massupdate.item.php:311
@@ -16498,12 +16534,12 @@ msgstr ""
 msgid "Storage period"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:328
+#: include/classes/setup/CSetupWizard.php:496
 msgid "Store credentials in"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:500
-#: include/classes/setup/CSetupWizard.php:501
+#: include/classes/setup/CSetupWizard.php:642
+#: include/classes/setup/CSetupWizard.php:643
 msgid "Stored in HashiCorp Vault secret"
 msgstr ""
 
@@ -16569,7 +16605,7 @@ msgstr "Úspěšný audit"
 msgid "Success message"
 msgstr "Zpráva úspěšná"
 
-#: include/classes/data/CItemData.php:949
+#: include/classes/data/CItemData.php:952
 msgid "Sum of incoming and outgoing traffic statistics on network interface. Returns integer"
 msgstr "Součet příchozích a odchozích statistik provozu na síťové rozhraní. Návratová hodnota celé číslo"
 
@@ -16595,15 +16631,15 @@ msgstr "Podpora"
 msgid "Suppressed till: %1$s"
 msgstr "Potlačeno do: %1$s"
 
-#: include/classes/data/CItemData.php:1113
+#: include/classes/data/CItemData.php:1116
 msgid "Swap in (from device into memory) statistics. Returns integer"
 msgstr "Swap in (ze zařízení do paměti) statistika. Návratová hodnota celé číslo"
 
-#: include/classes/data/CItemData.php:1117
+#: include/classes/data/CItemData.php:1120
 msgid "Swap out (from memory onto device) statistics. Returns integer"
 msgstr "Swap our (ze zařízení do paměti) statistika. Návratová hodnota celé číslo"
 
-#: include/classes/data/CItemData.php:1121
+#: include/classes/data/CItemData.php:1124
 msgid "Swap space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Swap velikost prostoru v bytech nebo v procentech z celkového počtu. Návratová hodnota celé číslo, pro byty; float pro procento"
 
@@ -16619,7 +16655,7 @@ msgstr "Přepnutí autentizační metody způsobí ukončení všech sezení mim
 msgid "System"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1041
+#: include/classes/data/CItemData.php:1044
 msgid "System boot time. Returns integer (Unix timestamp)"
 msgstr "Doba nastartování systému. Návratová hodnota celé číslo (Unix timestamp)"
 
@@ -16638,26 +16674,30 @@ msgstr "Nastala chyba systému. Kontaktujte prosím administrátora Zabbixu."
 msgid "System error."
 msgstr "Sytémová chyba."
 
-#: include/classes/data/CItemData.php:1069
+#: include/classes/data/CItemData.php:1072
 msgid "System host name. Returns string"
 msgstr "Název hostitelského systému. Návratová hodnota string"
 
-#: app/controllers/CControllerReportStatus.php:39
-#: app/views/report.status.php:29 include/classes/helpers/CMenuHelper.php:103
+#: app/controllers/CControllerReportStatus.php:42
+#: app/views/report.status.php:30 include/classes/helpers/CMenuHelper.php:103
 #: include/classes/helpers/CRoleHelper.php:329
 #: include/classes/widgets/CWidgetConfig.php:61
 msgid "System information"
 msgstr "Informace systému"
 
-#: include/classes/data/CItemData.php:1097
+#: include/classes/data/CItemData.php:1100
 msgid "System statistics. Returns integer or float"
 msgstr "Systémové statistiky. Návratová hodnota celé číslo nebo plovoucí"
 
-#: include/classes/data/CItemData.php:1089
+#: include/classes/widgets/forms/CWidgetFormSystemInfo.php:31
+msgid "System stats"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1092
 msgid "System time. Returns integer with type as UTC; string - with type as local"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1129
+#: include/classes/data/CItemData.php:1132
 msgid "System uptime in seconds. Returns integer"
 msgstr "Systém uptime v sekundách. Vráti celé číslo"
 
@@ -16760,7 +16800,7 @@ msgstr "Hodnota značky"
 #: app/views/popup.massupdate.trigger.php:75
 #: app/views/popup.massupdate.trigger.php:150
 #: app/views/popup.service.edit.php:263 app/views/popup.service.edit.php:346
-#: include/blocks.inc.php:735 include/classes/screens/CScreenHttpTest.php:117
+#: include/blocks.inc.php:583 include/classes/screens/CScreenHttpTest.php:117
 #: include/classes/screens/CScreenProblem.php:839
 #: include/classes/screens/CScreenProblem.php:895
 #: include/classes/screens/CScreenProblem.php:1164
@@ -16816,7 +16856,7 @@ msgstr "Typ cíle"
 msgid "Telnet"
 msgstr "Telnet"
 
-#: app/controllers/CControllerAuditLogList.php:238
+#: app/controllers/CControllerAuditLogList.php:239
 #: app/views/administration.mediatype.edit.php:280
 #: app/views/popup.massupdate.template.php:147 app/views/search.php:278
 #: include/actions.inc.php:49 include/forms.inc.php:529
@@ -16861,7 +16901,7 @@ msgstr ""
 msgid "Template cannot be linked to another template more than once even through other templates."
 msgstr "Šablona nemůže být připojená k jiné šabloně víc jak jednou, včetně propojení přes jiné šablony."
 
-#: app/controllers/CControllerAuditLogList.php:239
+#: app/controllers/CControllerAuditLogList.php:240
 msgid "Template dashboard"
 msgstr ""
 
@@ -17046,11 +17086,11 @@ msgstr "\"%1$s.%2$s\" metoda musí být nazvána bez \"auth\" parametru."
 msgid "The Zabbix database version does not match current requirements. Your database version: %1$s. Required version: %2$s. Please contact your system administrator."
 msgstr ""
 
-#: include/classes/data/CItemData.php:1533
+#: include/classes/data/CItemData.php:1536
 msgid "The average time a read from the virtual disk takes, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1537
+#: include/classes/data/CItemData.php:1540
 msgid "The average time a write to the virtual disk takes, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
 msgstr ""
 
@@ -17118,7 +17158,7 @@ msgstr "Položka již není objevená a bude zmazaná v %1$s (%2$s na %3$s)."
 msgid "The item is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "Položka již není objevovaná a bude smazána při dalším objevování."
 
-#: include/classes/data/CItemData.php:1013
+#: include/classes/data/CItemData.php:1016
 msgid "The number of processes. Returns integer"
 msgstr "Počet procesů. Vráti celé číslo"
 
@@ -17153,7 +17193,7 @@ msgstr ""
 msgid "Theme"
 msgstr "Téma"
 
-#: include/func.inc.php:2544
+#: include/func.inc.php:2401
 msgid "This day last week"
 msgstr "Tento den v minulém týdnu"
 
@@ -17166,11 +17206,11 @@ msgstr ""
 msgid "This is the test message from Zabbix"
 msgstr "Toto je nová testovací zpráva ze Zabbixu"
 
-#: include/func.inc.php:2552
+#: include/func.inc.php:2409
 msgid "This month"
 msgstr "Tento měsíc"
 
-#: include/func.inc.php:2553
+#: include/func.inc.php:2410
 msgid "This month so far"
 msgstr "Prozatím tento měsíc"
 
@@ -17179,19 +17219,19 @@ msgstr "Prozatím tento měsíc"
 msgid "This type of information may not match the key."
 msgstr ""
 
-#: include/func.inc.php:2550
+#: include/func.inc.php:2407
 msgid "This week"
 msgstr "Tento týden"
 
-#: include/func.inc.php:2551
+#: include/func.inc.php:2408
 msgid "This week so far"
 msgstr "Prozatím tento týden"
 
-#: include/func.inc.php:2554
+#: include/func.inc.php:2411
 msgid "This year"
 msgstr "Tento rok"
 
-#: include/func.inc.php:2555
+#: include/func.inc.php:2412
 msgid "This year so far"
 msgstr "Prozatím tento rok"
 
@@ -17228,7 +17268,7 @@ msgstr "Do"
 #: app/views/reports.auditlog.list.php:89 include/actions.inc.php:1700
 #: include/actions.inc.php:1754 include/actions.inc.php:1827
 #: include/actions.inc.php:1921 include/actions.inc.php:1976
-#: include/blocks.inc.php:710 include/classes/screens/CScreenProblem.php:816
+#: include/blocks.inc.php:558 include/classes/screens/CScreenProblem.php:816
 #: include/classes/screens/CScreenProblem.php:1155
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:31
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:32
@@ -17239,7 +17279,7 @@ msgstr "Do"
 msgid "Time"
 msgstr "Čas"
 
-#: include/classes/data/CItemData.php:1673
+#: include/classes/data/CItemData.php:1676
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
 msgstr "Podíl doby konkrétního procesu či skupiny procesů Zabbixu (identifikovaná pomocí <type> a <mode>) čerpaný v <state> v procentech."
 
@@ -17252,7 +17292,7 @@ msgstr ""
 msgid "Time filter default period"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1677
+#: include/classes/data/CItemData.php:1680
 msgid "Time of proxy last access. Name - proxy name. Valid params are: lastaccess - Unix timestamp, delay - seconds."
 msgstr ""
 
@@ -17313,11 +17353,11 @@ msgstr "Do"
 msgid "To set a host interface select a single item type for all items"
 msgstr "Na nastavení rozhraní hosta označte jeden typ položky pro všechny položky"
 
-#: include/classes/screens/CScreenProblem.php:701 include/func.inc.php:2548
+#: include/classes/screens/CScreenProblem.php:701 include/func.inc.php:2405
 msgid "Today"
 msgstr "Dnes"
 
-#: include/func.inc.php:2549
+#: include/func.inc.php:2406
 msgid "Today so far"
 msgstr "Dnes prozatím"
 
@@ -17349,7 +17389,7 @@ msgstr "Celková doba Elasticsearch: %1$s"
 msgid "Total SQL time: %1$s"
 msgstr "Celkový čas SQL: %1$s"
 
-#: include/classes/data/CItemData.php:1453
+#: include/classes/data/CItemData.php:1456
 msgid "Total time elapsed, in seconds, since last operating system boot-up, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
@@ -17370,11 +17410,11 @@ msgstr ""
 msgid "Transaction has not been closed. Aborting..."
 msgstr "Operace nebyla ukončená. Ukončuji ji..."
 
-#: include/classes/data/CItemData.php:841
+#: include/classes/data/CItemData.php:844
 msgid "Transform SQL query result into a JSON array for low-level discovery."
 msgstr ""
 
-#: include/classes/data/CItemData.php:845
+#: include/classes/data/CItemData.php:848
 msgid "Transform SQL query result into a JSON array."
 msgstr ""
 
@@ -17405,7 +17445,7 @@ msgctxt "missing data function"
 msgid "Treat as 0"
 msgstr "Zacházet jako s 0"
 
-#: include/classes/data/CItemData.php:1705
+#: include/classes/data/CItemData.php:1708
 msgid "Trend function cache statistics. Valid parameters are: all, hits, phits, misses, pmisses, items, pitems and requests."
 msgstr ""
 
@@ -17426,7 +17466,7 @@ msgstr "Perioda uložení trendů"
 msgid "Trends"
 msgstr "Trendy"
 
-#: app/controllers/CControllerAuditLogList.php:240
+#: app/controllers/CControllerAuditLogList.php:241
 #: app/controllers/CControllerPopupTriggerWizard.php:282
 #: app/views/popup.massupdate.trigger.php:149 include/actions.inc.php:46
 #: include/classes/graphdraw/CLineGraphDraw.php:472 include/events.inc.php:256
@@ -17535,7 +17575,7 @@ msgstr "Jméno spouštěče"
 msgid "Trigger overview"
 msgstr "Přehled spouštěčů"
 
-#: app/controllers/CControllerAuditLogList.php:241
+#: app/controllers/CControllerAuditLogList.php:242
 #: app/views/popup.lldoperation.php:52
 #: app/views/popup.massupdate.trigger.php:149
 #: include/views/configuration.trigger.prototype.edit.php:548
@@ -17840,11 +17880,11 @@ msgstr ""
 msgid "Ukrainian (uk_UA)"
 msgstr "Ukrajinsky (uk_UA)"
 
-#: include/classes/core/CConfigFile.php:249
+#: include/classes/core/CConfigFile.php:252
 msgid "Unable to change configuration file permissions to 0600."
 msgstr ""
 
-#: include/classes/core/CConfigFile.php:258
+#: include/classes/core/CConfigFile.php:261
 msgid "Unable to create the configuration file."
 msgstr "Nelze vytvořit konfigurační soubor."
 
@@ -17859,7 +17899,7 @@ msgstr ""
 msgid "Unable to load authentication API parameters."
 msgstr ""
 
-#: include/classes/core/CConfigFile.php:184
+#: include/classes/core/CConfigFile.php:187
 msgid "Unable to load database credentials from Vault."
 msgstr ""
 
@@ -17867,15 +17907,15 @@ msgstr ""
 msgid "Unable to load housekeeping API parameters."
 msgstr ""
 
-#: include/classes/helpers/CSettingsHelper.php:108
+#: include/classes/helpers/CSettingsHelper.php:109
 msgid "Unable to load settings API parameters."
 msgstr ""
 
-#: include/classes/core/CConfigFile.php:254
+#: include/classes/core/CConfigFile.php:257
 msgid "Unable to overwrite the existing configuration file."
 msgstr "Nelze přepsat existující konfigurační soubor."
 
-#: include/blocks.inc.php:638
+#: app/partials/administration.system.info.php:148
 msgid "Unable to retrieve database version."
 msgstr ""
 
@@ -17909,6 +17949,10 @@ msgstr "Nepotvrzené VYŘEŠENÉ události"
 msgid "Unacknowledged only"
 msgstr "Pouze nepotvrzené"
 
+#: app/partials/administration.ha.nodes.php:56
+msgid "Unavailable"
+msgstr ""
+
 #: app/views/administration.user.list.php:249
 msgid "Unblock"
 msgstr "Odblokovat"
@@ -17917,7 +17961,7 @@ msgstr "Odblokovat"
 msgid "Unblock selected users?"
 msgstr "Odblokovat vybrané uživatele?"
 
-#: include/classes/core/ZBase.php:571
+#: include/classes/core/ZBase.php:574
 #, c-format
 msgid "Unexpected response for action %1$s."
 msgstr ""
@@ -18185,7 +18229,7 @@ msgstr "Aktualizace činností"
 msgid "Update problem"
 msgstr "Problém aktualizace"
 
-#: app/controllers/CControllerAuditLogList.php:362
+#: app/controllers/CControllerAuditLogList.php:363
 #: app/controllers/CControllerPopupImportCompare.php:160
 msgid "Updated"
 msgstr ""
@@ -18209,7 +18253,7 @@ msgstr "Mapa nejvyšší úrovně"
 msgid "Uptime"
 msgstr "Doba provozu"
 
-#: include/classes/data/CItemData.php:1721
+#: include/classes/data/CItemData.php:1724
 msgid "Uptime of Zabbix server process in seconds."
 msgstr "Doba provozu Zabbix server procesů v sekundách."
 
@@ -18238,7 +18282,7 @@ msgstr ""
 msgid "Used in actions"
 msgstr "Používané v akcích"
 
-#: app/controllers/CControllerAuditLogList.php:242
+#: app/controllers/CControllerAuditLogList.php:243
 #: app/partials/js/scheduledreport.subscription.js.php:78
 #: app/partials/popup.operations.php:105
 #: app/views/administration.token.edit.php:50
@@ -18247,7 +18291,7 @@ msgstr "Používané v akcích"
 #: app/views/administration.user.edit.php:284
 #: app/views/reports.auditlog.list.php:90 httpconf.php:65
 #: include/actions.inc.php:1700 include/actions.inc.php:1754
-#: include/actions.inc.php:1976 include/classes/setup/CSetupWizard.php:358
+#: include/actions.inc.php:1976 include/classes/setup/CSetupWizard.php:522
 #: include/hosts.inc.php:61 include/users.inc.php:52
 #: include/views/configuration.httpconf.edit.php:165
 msgid "User"
@@ -18326,7 +18370,7 @@ msgstr[0] "Uživatel byl smazán"
 msgstr[1] ""
 msgstr[2] ""
 
-#: app/controllers/CControllerAuditLogList.php:243
+#: app/controllers/CControllerAuditLogList.php:244
 #: app/partials/js/scheduledreport.subscription.js.php:83
 #: app/partials/popup.operations.php:85
 #: app/views/administration.script.edit.php:241
@@ -18437,7 +18481,7 @@ msgstr "Heslo uživatele"
 msgid "User profile"
 msgstr "Profil uživatele"
 
-#: app/controllers/CControllerAuditLogList.php:244
+#: app/controllers/CControllerAuditLogList.php:245
 #: app/views/administration.user.list.php:109
 #: app/views/administration.userrole.edit.php:385
 #: app/views/administration.userrole.edit.php:387
@@ -18547,8 +18591,8 @@ msgstr "Uživatelské jméno"
 msgid "Username and password"
 msgstr "Jméno uživatele a heslo"
 
-#: include/classes/setup/CSetupWizard.php:600
-#: include/classes/setup/CSetupWizard.php:906
+#: include/classes/setup/CSetupWizard.php:194
+#: include/classes/setup/CSetupWizard.php:774
 msgid "Username and password must be stored in Vault secret keys \"username\" and \"password\"."
 msgstr ""
 
@@ -18574,240 +18618,240 @@ msgstr ""
 msgid "Users"
 msgstr "Uživatelé"
 
-#: include/classes/data/CItemData.php:1737
+#: include/classes/data/CItemData.php:1740
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "VMware statistiky cache. Platné módy jsou: total, free, pfree, used a pused."
 
-#: include/classes/data/CItemData.php:1225
+#: include/classes/data/CItemData.php:1228
 msgid "VMware cluster performance counter, <url> - VMware service URL, <id> - VMware cluster id, <path> - performance counter path, <instance> - performance counter instance"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1233
+#: include/classes/data/CItemData.php:1236
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
 msgstr "VMware stav klastru, <url> - URL VMware služby, <name> - VMware jméno klastru"
 
-#: include/classes/data/CItemData.php:1257
+#: include/classes/data/CItemData.php:1260
 msgid "VMware datacenters and their IDs. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1249
-#: include/classes/data/CItemData.php:1305
+#: include/classes/data/CItemData.php:1252
+#: include/classes/data/CItemData.php:1308
 msgid "VMware datastore capacity statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "VMware statistika datového úložiště kapacity v bytech nebo v procentech z celkového počtu. Vrací celé číslo, v bytech; float v procentech"
 
-#: include/classes/data/CItemData.php:1241
+#: include/classes/data/CItemData.php:1244
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1245
+#: include/classes/data/CItemData.php:1248
 msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1253
+#: include/classes/data/CItemData.php:1256
 msgid "VMware datastore write statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1261
+#: include/classes/data/CItemData.php:1264
 msgid "VMware event log, <url> - VMware service URL, <mode> - all (default), skip - skip processing of older data"
 msgstr "VMware event log, <url> - VMware service URL, <mode> - vše (výchozí), přeskočit - přeskočit zpracování starších dat"
 
-#: include/classes/data/CItemData.php:1345
+#: include/classes/data/CItemData.php:1348
 msgid "VMware hypervisor BIOS UUID, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1385
+#: include/classes/data/CItemData.php:1388
 msgid "VMware hypervisor HW vendor state sensors, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1357
+#: include/classes/data/CItemData.php:1360
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware velikost balloned paměti, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
 
-#: include/classes/data/CItemData.php:1269
+#: include/classes/data/CItemData.php:1272
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware klastr jméno, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
 
-#: include/classes/data/CItemData.php:1285
+#: include/classes/data/CItemData.php:1288
 msgid "VMware hypervisor datacenter name, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns string"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1301
+#: include/classes/data/CItemData.php:1304
 msgid "VMware hypervisor datastore read statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "VMware statistika čtení datastore, <url> - URL VMware služby, <uuid> - VMware jméno hosta, <datastore> - jméno datastore , <mode> - latence"
 
-#: include/classes/data/CItemData.php:1309
+#: include/classes/data/CItemData.php:1312
 msgid "VMware hypervisor datastore write statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "VMware statistika zápisů datastore, <url> - URL VMware služby, <uuid> - VMware jméno hosta, <datastore> - jméno datastore, <mode> - latence"
 
-#: include/classes/data/CItemData.php:1293
+#: include/classes/data/CItemData.php:1296
 msgid "VMware hypervisor datastores list, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1381
+#: include/classes/data/CItemData.php:1384
 msgid "VMware hypervisor health state rollup sensor, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1341
+#: include/classes/data/CItemData.php:1344
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware model, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
 
-#: include/classes/data/CItemData.php:1317
+#: include/classes/data/CItemData.php:1320
 msgid "VMware hypervisor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware jméno, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
 
-#: include/classes/data/CItemData.php:1365
+#: include/classes/data/CItemData.php:1368
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "VMware vstupní síťové statistiky, <url> - URL VMware služby, <uuid> - VMware jméno hosta, <mode> - bps"
 
-#: include/classes/data/CItemData.php:1369
+#: include/classes/data/CItemData.php:1372
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "VMware výstupní síťové statistiky, <url> - URL VMware služby, <uuid> - VMware jméno hosta, <mode> - bps"
 
-#: include/classes/data/CItemData.php:1373
+#: include/classes/data/CItemData.php:1376
 msgid "VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "VMware performance counter, <url> - VMware servisní URL, <uuid> - VMware jméno hosta, <path> - performance counter cesta, <instance> - performance counter instance"
 
-#: include/classes/data/CItemData.php:1321
+#: include/classes/data/CItemData.php:1324
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware frekvence procesoru, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
 
-#: include/classes/data/CItemData.php:1325
+#: include/classes/data/CItemData.php:1328
 msgid "VMware hypervisor processor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware model procesoru, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
 
-#: include/classes/data/CItemData.php:1277
+#: include/classes/data/CItemData.php:1280
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware využití procesoru v Hz, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
 
-#: include/classes/data/CItemData.php:1389
+#: include/classes/data/CItemData.php:1392
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware status, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
 
-#: include/classes/data/CItemData.php:1337
+#: include/classes/data/CItemData.php:1340
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware celková velikost paměti, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
 
-#: include/classes/data/CItemData.php:1393
+#: include/classes/data/CItemData.php:1396
 msgid "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware provozní čas, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
 
-#: include/classes/data/CItemData.php:1361
+#: include/classes/data/CItemData.php:1364
 msgid "VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware velikost použité paměti, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
 
-#: include/classes/data/CItemData.php:1349
+#: include/classes/data/CItemData.php:1352
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware jméno výrobce, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
 
-#: include/classes/data/CItemData.php:1397
+#: include/classes/data/CItemData.php:1400
 msgid "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware verze, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
 
-#: include/classes/data/CItemData.php:1265
+#: include/classes/data/CItemData.php:1268
 msgid "VMware service full name, <url> - VMware service URL"
 msgstr "VMware plné jméno služby, <url> - URL VMware služby"
 
-#: include/classes/data/CItemData.php:1405
+#: include/classes/data/CItemData.php:1408
 msgid "VMware service version, <url> - VMware service URL"
 msgstr "VMware verze, <url> - URL VMware služby"
 
-#: include/classes/data/CItemData.php:1461
+#: include/classes/data/CItemData.php:1464
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware velikost balloned paměti virtuálního stroje <url> - URL VMware služby, <uuid> - VMware jméno hosta virtuálního stroje"
 
-#: include/classes/data/CItemData.php:1525
+#: include/classes/data/CItemData.php:1528
 msgid "VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware použitý úložný prostor virtuálním strojem, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
 
-#: include/classes/data/CItemData.php:1465
+#: include/classes/data/CItemData.php:1468
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware velikost komprimované paměti virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
 
-#: include/classes/data/CItemData.php:1441
+#: include/classes/data/CItemData.php:1444
 msgid "VMware virtual machine datacenter name, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns string"
 msgstr ""
 
-#: include/classes/data/CItemData.php:1561
+#: include/classes/data/CItemData.php:1564
 msgid "VMware virtual machine disk device read statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "VMware statistika čtení disků virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje, <instance> - instance disku, <mode> - bps/ops - bytes/operations za sekundu"
 
-#: include/classes/data/CItemData.php:1565
+#: include/classes/data/CItemData.php:1568
 msgid "VMware virtual machine disk device write statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "VMware statistika zápisů disků virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje, <instance> - instance disku, <mode> - bps/ops - bytes/operations za sekundu"
 
-#: include/classes/data/CItemData.php:1573
+#: include/classes/data/CItemData.php:1576
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
 msgstr "VMware statistika souborového systému virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje, <fsname> - jméno souborového systému, <mode> - total/free/used/pfree/pused"
 
-#: include/classes/data/CItemData.php:1485
+#: include/classes/data/CItemData.php:1488
 msgid "VMware virtual machine guest memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware využití hostitelské paměti virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
 
-#: include/classes/data/CItemData.php:1489
+#: include/classes/data/CItemData.php:1492
 msgid "VMware virtual machine host memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware využití hostovy paměti virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
 
-#: include/classes/data/CItemData.php:1457
+#: include/classes/data/CItemData.php:1460
 msgid "VMware virtual machine hypervisor name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware jméno hypervizor virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
 
-#: include/classes/data/CItemData.php:1409
+#: include/classes/data/CItemData.php:1412
 msgid "VMware virtual machine name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware jméno virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
 
-#: include/classes/data/CItemData.php:1505
+#: include/classes/data/CItemData.php:1508
 msgid "VMware virtual machine network interface input statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "VMware statistika vstupů síťového rozhraní virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje, <instance> - síťové rozhraní, <mode> - bps/pps - bytes/packets za sekundu"
 
-#: include/classes/data/CItemData.php:1509
+#: include/classes/data/CItemData.php:1512
 msgid "VMware virtual machine network interface output statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "VMware statistika výstupů síťového rozhraní virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje, <instance> - síťové rozhraní, <mode> - bps/pps - bytes/packets za sekundu"
 
-#: include/classes/data/CItemData.php:1517
+#: include/classes/data/CItemData.php:1520
 msgid "VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "VMware VM performance counter, <url> - VMware service URL, <uuid> - VMware VM jméno hosta, <path> - performance counter cesta, <instance> - performance counter instance"
 
-#: include/classes/data/CItemData.php:1521
+#: include/classes/data/CItemData.php:1524
 msgid "VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware stav napájení virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
 
-#: include/classes/data/CItemData.php:1473
+#: include/classes/data/CItemData.php:1476
 msgid "VMware virtual machine private memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware velikost privátní paměti virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
 
-#: include/classes/data/CItemData.php:1425
+#: include/classes/data/CItemData.php:1428
 msgid "VMware virtual machine processor ready time ms, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware virtuální stroj, čas připravenosti procesoru ms <url> - VMware URL služby, <uuid> - VMware jméno virtuálního hostitele"
 
-#: include/classes/data/CItemData.php:1437
+#: include/classes/data/CItemData.php:1440
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware využití procesoru virtuálního stroje v Hz, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
 
-#: include/classes/data/CItemData.php:1477
+#: include/classes/data/CItemData.php:1480
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware velikost zdílené paměti virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
 
-#: include/classes/data/CItemData.php:1481
+#: include/classes/data/CItemData.php:1484
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware velikost swapovací paměti virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
 
-#: include/classes/data/CItemData.php:1493
+#: include/classes/data/CItemData.php:1496
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware celková velikost paměti virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
 
-#: include/classes/data/CItemData.php:1541
+#: include/classes/data/CItemData.php:1544
 msgid "VMware virtual machine uncommitted storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware nevyužitý prostor virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
 
-#: include/classes/data/CItemData.php:1545
+#: include/classes/data/CItemData.php:1548
 msgid "VMware virtual machine unshared storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware nezdílený prostor virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
 
-#: include/classes/data/CItemData.php:1553
+#: include/classes/data/CItemData.php:1556
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware čas provozu virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
 
-#: include/classes/data/CItemData.php:1353
+#: include/classes/data/CItemData.php:1356
 msgid "VVMware hypervisor maintenance status, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns 0 - not in maintenance; 1 - in maintenance"
 msgstr ""
 
@@ -18832,6 +18876,7 @@ msgstr "Validace"
 #: app/controllers/CControllerPopupValueMapUpdate.php:117
 #: app/controllers/CControllerPopupValueMapUpdate.php:124
 #: app/controllers/CControllerPopupValueMapUpdate.php:136
+#: app/partials/administration.system.info.php:30
 #: app/partials/configuration.tags.tab.php:40
 #: app/partials/configuration.valuemap.php:32
 #: app/partials/hostmacros.list.html.php:36
@@ -18859,7 +18904,7 @@ msgstr "Validace"
 #: app/views/popup.massupdate.trigger.php:84
 #: app/views/popup.service.edit.php:65 app/views/popup.service.edit.php:271
 #: app/views/popup.testtriggerexpr.php:31 app/views/popup.valuemap.edit.php:51
-#: include/blocks.inc.php:525 include/classes/graphdraw/CPieGraphDraw.php:309
+#: include/classes/graphdraw/CPieGraphDraw.php:309
 #: include/classes/screens/CScreenHistory.php:279
 #: include/classes/screens/CScreenHistory.php:393
 #: include/views/configuration.host.discovery.edit.php:133
@@ -18904,11 +18949,11 @@ msgstr "Hodnota \"%1$s\" je neplatná pro parametr \"grid_show\". Možnosti: \"%
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is %4$d characters."
 msgstr "Hodnota \"%1$s\" je příliš dlouhá pro pole \"%2$s\" - %3$d znaků. Povolená délka je do %4$d znaků."
 
-#: include/classes/data/CItemData.php:1729
+#: include/classes/data/CItemData.php:1732
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
 msgstr "Využití cache hodnot. Platné parametry jsou: requests, hits a misses."
 
-#: include/classes/data/CItemData.php:1725
+#: include/classes/data/CItemData.php:1728
 msgid "Value cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "Statistiky cache hodnot. Platné mody jsou: total, free, pfree, used a pused."
 
@@ -18916,7 +18961,7 @@ msgstr "Statistiky cache hodnot. Platné mody jsou: total, free, pfree, used a p
 msgid "Value cannot be empty."
 msgstr ""
 
-#: app/controllers/CControllerAuditLogList.php:245
+#: app/controllers/CControllerAuditLogList.php:246
 msgid "Value map"
 msgstr "Mapa hodnot"
 
@@ -18945,15 +18990,15 @@ msgstr "Mapování hodnot"
 msgid "Value mappings"
 msgstr "Mapování hodnot"
 
-#: include/classes/data/CItemData.php:917
+#: include/classes/data/CItemData.php:920
 msgid "Value of MQTT topic. Format of returned data depends on the topic content. If wildcards are used, returns topic values in JSON"
 msgstr ""
 
-#: include/classes/data/CItemData.php:993
+#: include/classes/data/CItemData.php:996
 msgid "Value of any Windows performance counter in English. Returns integer, float, string or text (depending on the request)"
 msgstr ""
 
-#: include/classes/data/CItemData.php:989
+#: include/classes/data/CItemData.php:992
 msgid "Value of any Windows performance counter. Returns integer, float, string or text (depending on the request)"
 msgstr "Hodnota Windows čítače výkonu. Vráti celé, desetinné číslo, řetězec nebo text (závisí na dotazu)"
 
@@ -18994,22 +19039,22 @@ msgstr "Hodnotám bez názvů není povoleno tvořit pole."
 msgid "Variables"
 msgstr "Proměnné"
 
-#: include/classes/data/CItemData.php:1017
+#: include/classes/data/CItemData.php:1020
 msgid "Various information about specific process(es). Returns float"
 msgstr "Různé informace o specifickém(ých) procesu(ech). Navracejí se float"
 
-#: include/classes/setup/CSetupWizard.php:335
-#: include/classes/setup/CSetupWizard.php:519
+#: include/classes/setup/CSetupWizard.php:502
+#: include/classes/setup/CSetupWizard.php:682
 msgid "Vault API endpoint"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:350
-#: include/classes/setup/CSetupWizard.php:525
+#: include/classes/setup/CSetupWizard.php:515
+#: include/classes/setup/CSetupWizard.php:690
 msgid "Vault authentication token"
 msgstr ""
 
-#: include/classes/core/ZBase.php:228
-#: include/classes/setup/CSetupWizard.php:902 include/config.inc.php:53
+#: include/classes/core/ZBase.php:231
+#: include/classes/setup/CSetupWizard.php:191 include/config.inc.php:53
 msgid "Vault connection failed."
 msgstr ""
 
@@ -19017,8 +19062,8 @@ msgstr ""
 msgid "Vault secret"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:342
-#: include/classes/setup/CSetupWizard.php:522
+#: include/classes/setup/CSetupWizard.php:508
+#: include/classes/setup/CSetupWizard.php:686
 msgid "Vault secret path"
 msgstr ""
 
@@ -19030,7 +19075,7 @@ msgstr "Výrobce"
 msgid "Verbose"
 msgstr "Upovídaný"
 
-#: include/classes/setup/CSetupWizard.php:382
+#: include/classes/setup/CSetupWizard.php:546
 msgid "Verify database certificate"
 msgstr ""
 
@@ -19039,11 +19084,11 @@ msgstr ""
 msgid "Version"
 msgstr ""
 
-#: include/classes/data/CItemData.php:837
+#: include/classes/data/CItemData.php:840
 msgid "Version of Zabbix agent. Returns string"
 msgstr "Verze Zabbix agenta. Vráti řetězec"
 
-#: include/classes/data/CItemData.php:1733
+#: include/classes/data/CItemData.php:1736
 msgid "Version of Zabbix server or proxy"
 msgstr ""
 
@@ -19072,7 +19117,7 @@ msgstr ""
 msgid "View as"
 msgstr "Pohled jako"
 
-#: include/classes/data/CItemData.php:1221
+#: include/classes/data/CItemData.php:1224
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Virtuální velikost prostoru v bytech nebo v procentech z celkového počtu. Vrací celé číslo v bytech; float v procentech"
 
@@ -19105,7 +19150,7 @@ msgstr "St"
 msgid "Warning"
 msgstr "Upozornění"
 
-#: include/classes/setup/CSetupWizard.php:249
+#: include/classes/setup/CSetupWizard.php:421
 msgctxt "setup"
 msgid "Warning"
 msgstr "Varování"
@@ -19114,7 +19159,7 @@ msgstr "Varování"
 msgid "Warning message"
 msgstr ""
 
-#: include/blocks.inc.php:649
+#: app/partials/administration.system.info.php:159
 #, c-format
 msgid "Warning! Unsupported %1$s database server version. Should be at least (%2$s)"
 msgstr ""
@@ -19147,7 +19192,7 @@ msgstr "Web"
 msgid "Web monitoring"
 msgstr "Sledování webů"
 
-#: app/controllers/CControllerAuditLogList.php:234
+#: app/controllers/CControllerAuditLogList.php:235
 msgid "Web scenario"
 msgstr "Web scénář"
 
@@ -19221,11 +19266,11 @@ msgstr "Týdně"
 msgid "Weight"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:45
+#: include/classes/setup/CSetupWizard.php:54
 msgid "Welcome"
 msgstr "Vítejte"
 
-#: include/classes/setup/CSetupWizard.php:181
+#: include/classes/setup/CSetupWizard.php:353
 msgid "Welcome to"
 msgstr "Vítejte v"
 
@@ -19491,6 +19536,7 @@ msgstr "Rok"
 msgid "Yearly"
 msgstr "Ročně"
 
+#: app/partials/administration.system.info.php:35
 #: app/partials/configuration.filter.items.php:194
 #: app/partials/configuration.filter.items.php:201
 #: app/partials/configuration.filter.items.php:210
@@ -19504,8 +19550,8 @@ msgstr "Ročně"
 #: app/views/popup.massupdate.item.php:336
 #: app/views/popup.massupdate.item.php:378
 #: app/views/popup.massupdate.trigger.php:65 include/actions.inc.php:32
-#: include/blocks.inc.php:532 include/blocks.inc.php:855
-#: include/blocks.inc.php:859 include/classes/screens/CScreenProblem.php:1099
+#: include/blocks.inc.php:703 include/blocks.inc.php:707
+#: include/classes/screens/CScreenProblem.php:1099
 #: include/classes/screens/CScreenProblem.php:1103
 #: include/classes/screens/CScreenProblem.php:1245 include/events.inc.php:198
 #: include/events.inc.php:202 include/events.inc.php:392
@@ -19526,7 +19572,7 @@ msgstr "Ročně"
 msgid "Yes"
 msgstr "Ano"
 
-#: include/classes/screens/CScreenProblem.php:709 include/func.inc.php:2542
+#: include/classes/screens/CScreenProblem.php:709 include/func.inc.php:2399
 msgid "Yesterday"
 msgstr "Včera"
 
@@ -19537,7 +19583,7 @@ msgstr "Jste přihlášeni jako \"%1$s\"."
 
 #: app/views/administration.gui.edit.php:66
 #: app/views/administration.user.edit.php:233
-#: include/classes/setup/CSetupWizard.php:219
+#: include/classes/setup/CSetupWizard.php:391
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "Nemůžete si vybrat některé jazyky protože locales pro ně nejsou nainstalované na web serveru."
 
@@ -19555,6 +19601,7 @@ msgid "You did not specify targets for action operation global script \"%1$s\"."
 msgstr ""
 
 #: include/classes/api/services/CAuditLog.php:73
+#: include/classes/api/services/CHaNode.php:45
 #: include/classes/api/services/CHost.php:848
 #: include/classes/api/services/CHost.php:913
 #: include/classes/api/services/CMaintenance.php:535
@@ -19631,11 +19678,10 @@ msgid "Zabbix login form"
 msgstr "Přihlašovací formulář Zabbixu"
 
 #: app/views/administration.script.edit.php:125
-#: include/classes/setup/CSetupWizard.php:556
 msgid "Zabbix server"
 msgstr "Zabbix server"
 
-#: include/classes/server/CZabbixServer.php:584
+#: include/classes/server/CZabbixServer.php:600
 #, c-format
 msgid ""
 "Zabbix server \"%1$s\" cannot be reached. Possible reasons:\n"
@@ -19647,26 +19693,18 @@ msgstr ""
 msgid "Zabbix server (proxy)"
 msgstr "Zabbix server (proxy)"
 
-#: include/classes/setup/CSetupWizard.php:57
-#: include/classes/setup/CSetupWizard.php:456
-msgid "Zabbix server details"
-msgstr "Podrobnosti Zabbix serveru"
-
-#: jsrpc.php:82
+#: jsrpc.php:91
 msgid "Zabbix server is not running: the information displayed may not be current."
 msgstr "Zabbix server není v provozu: zobrazované informace nemusí být aktuální."
 
-#: include/blocks.inc.php:531
+#: app/partials/administration.system.info.php:34
 msgid "Zabbix server is running"
 msgstr "Zabbix server běží"
 
-#: include/classes/setup/CSetupWizard.php:560
+#: include/classes/setup/CSetupWizard.php:602
+#: include/classes/setup/CSetupWizard.php:733
 msgid "Zabbix server name"
 msgstr "Zabbix server jméno"
-
-#: include/classes/setup/CSetupWizard.php:557
-msgid "Zabbix server port"
-msgstr "Port Zabbix serveru"
 
 #: include/items.inc.php:92
 msgid "Zabbix trapper"
@@ -20258,7 +20296,7 @@ msgstr "dní"
 #: app/controllers/CControllerMapView.php:123
 #: app/partials/js/configuration.valuemap.js.php:156
 #: app/views/popup.generic.php:599 app/views/popup.valuemap.edit.php:83
-#: include/classes/setup/CSetupWizard.php:497
+#: include/classes/setup/CSetupWizard.php:639
 #: include/classes/widgets/CWidgetHelper.php:69
 msgid "default"
 msgstr "výchozí"
@@ -21053,7 +21091,7 @@ msgstr "jiný"
 msgid "output"
 msgstr "výstup"
 
-#: include/classes/setup/CSetupWizard.php:344
+#: include/classes/setup/CSetupWizard.php:510
 msgid "path/to/secret"
 msgstr ""
 

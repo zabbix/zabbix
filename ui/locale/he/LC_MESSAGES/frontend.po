@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-22 19:56+0300\n"
-"PO-Revision-Date: 2021-10-17 14:01+0300\n"
+"POT-Creation-Date: 2021-10-25 12:27+0300\n"
+"PO-Revision-Date: 2021-10-23 19:03+0300\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
-"X-POOTLE-MTIME: 1634472067.000000\n"
+"X-POOTLE-MTIME: 1635008625.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:142
@@ -150,7 +150,7 @@ msgid_plural "%1$s hosts in maintenance"
 msgstr[0] "מארח אחד במצב תחזוקה"
 msgstr[1] "%1$s מארחים במצב תחזוקה"
 
-#: include/func.inc.php:2625
+#: include/func.inc.php:2482
 #, c-format
 msgid "%1$s hour"
 msgid_plural "%1$s hours"
@@ -177,7 +177,7 @@ msgstr[1] "%1$s הודעות"
 #: include/classes/widgets/CWidgetConfig.php:285
 #: include/classes/widgets/CWidgetConfig.php:286
 #: include/classes/widgets/CWidgetConfig.php:287
-#: include/classes/widgets/CWidgetConfig.php:288 include/func.inc.php:2631
+#: include/classes/widgets/CWidgetConfig.php:288 include/func.inc.php:2488
 #: jsLoader.php:150 jsLoader.php:151 jsLoader.php:152 jsLoader.php:153
 #, c-format
 msgid "%1$s minute"
@@ -224,7 +224,7 @@ msgstr[1] "נותרו %1$s ניסיונות"
 
 #: app/views/administration.user.edit.php:671
 #: include/classes/widgets/CWidgetConfig.php:283
-#: include/classes/widgets/CWidgetConfig.php:284 include/func.inc.php:2638
+#: include/classes/widgets/CWidgetConfig.php:284 include/func.inc.php:2495
 #: jsLoader.php:148 jsLoader.php:149
 #, c-format
 msgid "%1$s second"
@@ -303,7 +303,7 @@ msgstr "(רק מנהלי על יכולים ליצור קבוצות)"
 msgid "(no proxy)"
 msgstr "(אין מתווך)"
 
-#: include/classes/setup/CSetupWizard.php:311
+#: include/classes/setup/CSetupWizard.php:480
 msgid "0 - use default port"
 msgstr "0 - שימוש בפתחת בררת המחדל"
 
@@ -484,7 +484,7 @@ msgstr "גישה לשירותים"
 
 #: app/views/hintbox.eventlist.php:76
 #: app/views/monitoring.widget.problems.view.php:66
-#: include/actions.inc.php:161 include/blocks.inc.php:733
+#: include/actions.inc.php:161 include/blocks.inc.php:581
 #: include/classes/screens/CScreenProblem.php:868
 #: include/classes/screens/CScreenProblem.php:893
 #: include/classes/screens/CScreenProblem.php:1162 include/events.inc.php:290
@@ -607,7 +607,7 @@ msgstr "המשימה „%2$s” אינה זמינה לתפקיד משתמש „%
 msgid "Action added"
 msgstr "נוספה משימה"
 
-#: include/classes/core/ZBase.php:497
+#: include/classes/core/ZBase.php:500
 #, c-format
 msgid "Action class %1$s must extend %2$s class."
 msgstr "מחלקת הפעולה %1$s חייבת להרחיב את המחלקה %2$s."
@@ -648,7 +648,7 @@ msgstr "המשימה עודכנה"
 #: app/views/administration.mediatype.edit.php:281
 #: app/views/configuration.discovery.edit.php:78
 #: app/views/monitoring.dashboard.view.php:114
-#: app/views/monitoring.widget.problems.view.php:67 include/blocks.inc.php:734
+#: app/views/monitoring.widget.problems.view.php:67 include/blocks.inc.php:582
 #: include/classes/helpers/CMenuHelper.php:168
 #: include/classes/helpers/CRoleHelper.php:361
 #: include/classes/screens/CScreenProblem.php:869
@@ -662,6 +662,7 @@ msgstr "המשימה עודכנה"
 msgid "Actions"
 msgstr "פעולות"
 
+#: app/partials/administration.ha.nodes.php:50
 #: app/views/administration.proxy.edit.php:72
 #: app/views/administration.proxy.list.php:54
 #: app/views/administration.proxy.list.php:163
@@ -940,7 +941,7 @@ msgstr "הוספת קבוצת משתמשים"
 msgid "Add widget"
 msgstr "הוספת וידג׳ט"
 
-#: app/controllers/CControllerAuditLogList.php:354
+#: app/controllers/CControllerAuditLogList.php:355
 #: app/controllers/CControllerPopupImportCompare.php:161
 msgid "Added"
 msgstr "נוסף"
@@ -958,6 +959,10 @@ msgstr "כלל נוסף"
 #: app/views/popup.service.edit.php:161
 msgid "Additional rules"
 msgstr "כללים נוספים"
+
+#: app/partials/administration.ha.nodes.php:28
+msgid "Address"
+msgstr ""
 
 #: include/hosts.inc.php:63 include/users.inc.php:53
 msgid "Admin"
@@ -990,7 +995,7 @@ msgstr "הגיל קטן מ־"
 msgid "Agent"
 msgstr "סוכן"
 
-#: include/classes/data/CItemData.php:833
+#: include/classes/data/CItemData.php:836
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
 msgstr "בדיקת זמינות סוכן. מחזירה כלום - לא זמין; 1 - זמין"
 
@@ -998,11 +1003,11 @@ msgstr "בדיקת זמינות סוכן. מחזירה כלום - לא זמין;
 msgid "Agent encryption"
 msgstr "הצפנת סוכן"
 
-#: include/classes/data/CItemData.php:825
+#: include/classes/data/CItemData.php:828
 msgid "Agent host metadata. Returns string"
 msgstr "נתונים על סוכן המארח. מחזירה מחרוזת"
 
-#: include/classes/data/CItemData.php:829
+#: include/classes/data/CItemData.php:832
 msgid "Agent host name. Returns string"
 msgstr "שם המארח של הסוכן. מחזירה מחרוזת"
 
@@ -1122,15 +1127,15 @@ msgstr "מארחים מורשים"
 msgid "Allowed methods"
 msgstr "שיטות מורשות"
 
-#: include/classes/setup/CSetupWizard.php:682
+#: include/classes/setup/CSetupWizard.php:854
 msgid "Alternatively, you can install it manually:"
 msgstr "לחלופין, ניתן להתקין ידנית:"
 
-#: include/classes/data/CItemData.php:1449
+#: include/classes/data/CItemData.php:1452
 msgid "Amount of guest physical memory that is swapped out to the swap space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "כמות הזיכרון הפיזי של האורח שהוחלף בשטח ההחלפה, <url> - כתובת שירות ה־VMware,‏ <uuid> - שם המארח של המכונה הווירטואלית ב־VMware"
 
-#: include/classes/data/CItemData.php:1469
+#: include/classes/data/CItemData.php:1472
 msgid "Amount of host physical memory consumed for backing up guest physical memory pages, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "כמות הזיכרון הפיזי שנצרך לטובת גיבוי עמודי הזיכרון הפיזי של המערכת האורחת, <url> - כתובת שירות ה־VMware,‏ <uuid> - שם מארח של המכונה הווירטואלית ב־VMware"
 
@@ -1542,11 +1547,11 @@ msgstr "זמין"
 msgid "Average"
 msgstr "ממוצע"
 
-#: include/classes/data/CItemData.php:1529
+#: include/classes/data/CItemData.php:1532
 msgid "Average number of outstanding read requests to the virtual disk during the collection interval , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
 msgstr "מספר ממוצע של בקשות קריאה ממתינות לכונן הווירטואלי במשך מקטע האיסוף, <url> - כתובת שירות VMware,‏ <uuid> - שם המארח של המכונה הווירטואלית ב־VMware,‏ <instance> - מופע של התקן כונן"
 
-#: include/classes/data/CItemData.php:1549
+#: include/classes/data/CItemData.php:1552
 msgid "Average number of outstanding write requests to the virtual disk during the collection interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
 msgstr "מספר ממוצע של בקשות כתיבה ממתינות לכונן הווירטואלי במשך מקטע האיסוף, <url> - כתובת שירות VMware,‏ <uuid> - שם המארח של המכונה הווירטואלית ב־VMware,‏ <instance> - מופע של התקן כונן"
 
@@ -1558,8 +1563,8 @@ msgstr "מומלץ להימנע מססמאות שקל לנחש"
 msgid "Axes"
 msgstr "צירים"
 
-#: include/classes/setup/CSetupWizard.php:148
-#: include/classes/setup/CSetupWizard.php:567
+#: include/classes/setup/CSetupWizard.php:322
+#: include/classes/setup/CSetupWizard.php:741
 msgid "Back"
 msgstr "חזרה"
 
@@ -1617,7 +1622,7 @@ msgstr "פונקציות על סיביות"
 msgid "Blocked"
 msgstr "חסום"
 
-#: include/classes/core/ZBase.php:355
+#: include/classes/core/ZBase.php:358
 msgid "Blue"
 msgstr "כחול"
 
@@ -1707,31 +1712,31 @@ msgstr "CERT"
 msgid "CLOSING"
 msgstr "בסגירה"
 
-#: include/classes/data/CItemData.php:1077
+#: include/classes/data/CItemData.php:1080
 msgid "CPU information. Returns string or integer"
 msgstr "פרטי מעבד. מחזירה מחרוזת או מספר שלם וחיובי"
 
-#: include/classes/data/CItemData.php:1053
+#: include/classes/data/CItemData.php:1056
 msgid "CPU load. Returns float"
 msgstr "עומס על המעבד. מחזירה שבר עשרוני"
 
-#: include/classes/data/CItemData.php:1429
+#: include/classes/data/CItemData.php:1432
 msgid "CPU time spent waiting for swap-in, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance"
 msgstr "זמן המעבד שהושקע בהמתנה לכניסה לזיכרון ההחלפה,<url> - כתובת שירות VMware,‏ <uuid> - שם המארח של המכונה הווירטואלית ב־VMware,‏ <instance> - מופע של מעבד"
 
-#: include/classes/data/CItemData.php:1281
+#: include/classes/data/CItemData.php:1284
 msgid "CPU usage as a percentage during the interval depends on power management or HT, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "ניצולת מעבד כאחוז במשך זמן מסוים כתלות בניהול צריכת החשמל או המתח הגבוה, <url> - כתובת שירות ה־VMware,‏ <uuid> - שם מארח ה־hypervisor של VMware"
 
-#: include/classes/data/CItemData.php:1273
+#: include/classes/data/CItemData.php:1276
 msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "ניצולת המעבד כאחוז בטווח זמן, <url> - כתובת שירות ה־VMware,‏ <uuid> - שם מארח ה־hypervisor של ה־VMware"
 
-#: include/classes/data/CItemData.php:1433
+#: include/classes/data/CItemData.php:1436
 msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "ניצולת המעבד כאחוז בטווח זמן, <url> - כתובת שירות ה־VMware,‏ <uuid> - שם מארח המכונה הווירטואלית ב־VMware"
 
-#: include/classes/data/CItemData.php:1065
+#: include/classes/data/CItemData.php:1068
 msgid "CPU utilization percentage. Returns float"
 msgstr "אחוז ניצולת מעבד. מחזירה שבר עשרוני (float)"
 
@@ -1792,7 +1797,7 @@ msgstr "קריאה"
 #: app/views/monitoring.dashboard.view.php:141
 #: app/views/popup.import.compare.php:162
 #: include/classes/html/CButtonCancel.php:25
-#: include/classes/setup/CSetupWizard.php:130 jsLoader.php:177
+#: include/classes/setup/CSetupWizard.php:310 jsLoader.php:177
 #: jsLoader.php:187 jsLoader.php:301 jsLoader.php:373
 msgid "Cancel"
 msgstr "ביטול"
@@ -2021,7 +2026,7 @@ msgstr "לא ניתן לסגור את התקלה: %1$s."
 msgid "Cannot connect to LDAP server."
 msgstr "לא ניתן להתחבר אל שרת ה־LDAP."
 
-#: include/classes/setup/CSetupWizard.php:420
+#: include/classes/setup/CSetupWizard.php:579
 msgid "Cannot connect to the database."
 msgstr "לא ניתן להתחבר למסד הנתונים."
 
@@ -2093,7 +2098,7 @@ msgstr "לא ניתן ליצור דוח מתוזמן"
 msgid "Cannot create service \"%1$s\": %2$s."
 msgstr "לא ניתן ליצור את השירות „%1$s”:‏ %2$s."
 
-#: include/classes/setup/CSetupWizard.php:678
+#: include/classes/setup/CSetupWizard.php:850
 msgid "Cannot create the configuration file."
 msgstr "לא ניתן ליצור קובץ תצורה."
 
@@ -2706,7 +2711,7 @@ msgid "Cannot link template."
 msgstr "לא ניתן לקשר תבנית."
 
 #: app/controllers/CControllerModuleEdit.php:106
-#: include/classes/core/ZBase.php:665
+#: include/classes/core/ZBase.php:668
 #, c-format
 msgid "Cannot load module at: %1$s."
 msgid_plural "Cannot load modules at: %1$s."
@@ -2770,7 +2775,7 @@ msgstr "לא ניתן לקרוא XML:‏ %1$s."
 msgid "Cannot read YAML: %1$s."
 msgstr "לא ניתן לקרוא YAML‏: %1$s."
 
-#: include/classes/server/CZabbixServer.php:527
+#: include/classes/server/CZabbixServer.php:543
 #, c-format
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
 msgstr "לא ניתן לקרוא את התגובה, יש לבדוק את החיבור לשרת ה־Zabbix‏ „%1$s”."
@@ -2789,7 +2794,7 @@ msgstr "לא ניתן לשמור את כלל הגילוי ללא בדיקות."
 msgid "Cannot save widget \"%1$s\"."
 msgstr "לא ניתן לשמור את הווידג׳ט „%1$s”."
 
-#: include/classes/server/CZabbixServer.php:468
+#: include/classes/server/CZabbixServer.php:484
 #, c-format
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr "לא ניתן לשלוח פקודה, נא לבדוק את החיבור לשרת ה־Zabbix‏ „%1$s“."
@@ -3207,11 +3212,11 @@ msgstr "כניסה בשם תלוי רישיות"
 msgid "Catalan (ca_ES)"
 msgstr "קטלאנית (ca_ES)"
 
-#: include/classes/data/CItemData.php:1037
+#: include/classes/data/CItemData.php:1040
 msgid "Catches all SNMP traps that match regex. If regexp is unspecified, catches any trap."
 msgstr "תופסת את כל מלכודות ה־SNMP שתואמות לביטוי רגולרי. אם לא צוין ביטוי רגולרי, כל המלכודות תיתפסנה."
 
-#: include/classes/data/CItemData.php:1033
+#: include/classes/data/CItemData.php:1036
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
 msgstr "תופסת את כל מלכודות ה־SNMP שלא נתפסו על ידי פריטי snmptrap[]‎ כלשהם."
 
@@ -3297,7 +3302,7 @@ msgstr "תווים"
 msgid "Chassis"
 msgstr "מארז"
 
-#: include/classes/data/CItemData.php:1073
+#: include/classes/data/CItemData.php:1076
 msgid "Chassis information. Returns string"
 msgstr "פרטי מארז. מחזירה מחרוזת"
 
@@ -3326,8 +3331,8 @@ msgstr "בדיקה לאיתור שגיאות בעזרת ביטויים רגול�
 msgid "Check for not supported value"
 msgstr "בדיקת האם הערך נתמך"
 
-#: include/classes/setup/CSetupWizard.php:49
-#: include/classes/setup/CSetupWizard.php:279
+#: include/classes/setup/CSetupWizard.php:58
+#: include/classes/setup/CSetupWizard.php:451
 msgid "Check of pre-requisites"
 msgstr "בדיקת דרישות הקדם"
 
@@ -3346,43 +3351,43 @@ msgstr "סוג הבדיקה"
 msgid "Checks"
 msgstr "בדיקות"
 
-#: include/classes/data/CItemData.php:925
+#: include/classes/data/CItemData.php:928
 msgid "Checks if DNS service is up. Returns 0 - DNS is down (server did not respond or DNS resolution failed); 1 - DNS is up"
 msgstr "בודקת אם שירות ה־DNS פעיל. מחזירה 0 - ה־DNS כבוי (השרת לא הגיב או שפענוח ה־DNS נכשל); 1- ה־DNS פעיל"
 
-#: include/classes/data/CItemData.php:1165
+#: include/classes/data/CItemData.php:1168
 msgid "Checks if file exists. Returns 0 - not found; 1 - file of the specified type exists"
 msgstr "בודקת אם קובץ קיים. מחזירה 0 - לא נמצא, 1 - הקובץ מהסוג שצוין קיים"
 
-#: include/classes/data/CItemData.php:857
+#: include/classes/data/CItemData.php:860
 msgid "Checks if host is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful."
 msgstr "בודקת אם מארח נגיש באמצעות פינג ICMP.‏ 0 - פינג ICMP כשל. 1- פינג ICMP צלח."
 
-#: include/classes/data/CItemData.php:957
+#: include/classes/data/CItemData.php:960
 msgid "Checks if it is possible to make TCP connection to specified port. Returns 0 - cannot connect; 1 - can connect"
 msgstr "בודקת אם אפשר לקיים חיבור TCP לפתחה מסוימת. מחזירה 0 - לא ניתן להתחבר; 1 - ניתן להתחבר"
 
-#: include/classes/data/CItemData.php:965
+#: include/classes/data/CItemData.php:968
 msgid "Checks if service is running and accepting TCP connections. Returns 0 - service is down; 1 - service is running"
 msgstr "בודקת אם שירות פעיל ומקבל חיבורי TCP. מחזירה 0 - השירות מושבת; 1 - השירות פעיל"
 
-#: include/classes/data/CItemData.php:981
+#: include/classes/data/CItemData.php:984
 msgid "Checks if service is running and responding to UDP requests. Returns 0 - service is down; 1 - service is running"
 msgstr "בודקת אם שירות פעיל ומגיב לחיבורי UDP. מחזירה 0 - השירות מושבת; 1 - השירות פעיל"
 
-#: include/classes/data/CItemData.php:953
+#: include/classes/data/CItemData.php:956
 msgid "Checks if this TCP port is in LISTEN state. Returns 0 - it is not in LISTEN state; 1 - it is in LISTEN state"
 msgstr "בודקת אם פתחת ה־TCP הזו היא במצב האזנה. מחזירה 0 - אינה במצב האזנה; 1 - היא במצב האזנה"
 
-#: include/classes/data/CItemData.php:973
+#: include/classes/data/CItemData.php:976
 msgid "Checks if this UDP port is in LISTEN state. Returns 0 - it is not in LISTEN state; 1 - it is in LISTEN state"
 msgstr "בודקת אם פתחת ה־UDP הזו היא במצב האזנה. מחזירה 0 - אינה במצב האזנה; 1 - היא במצב האזנה"
 
-#: include/classes/data/CItemData.php:961
+#: include/classes/data/CItemData.php:964
 msgid "Checks performance of TCP service. Returns 0 - service is down; seconds - the number of seconds spent while connecting to the service"
 msgstr "בודקת ביצועים של שירות TCP. מחזירה 0 - השירות כבוי; שניות - מספר השניות שלקח להתחבר לשירות"
 
-#: include/classes/data/CItemData.php:977
+#: include/classes/data/CItemData.php:980
 msgid "Checks performance of UDP service. Returns 0 - service is down; seconds - the number of seconds spent waiting for response from the service"
 msgstr "בודקת ביצועים של שירות UDP. מחזירה 0 - השירות כבוי; שניות - מספר השניות שלקח להתחבר לשירות"
 
@@ -3411,7 +3416,7 @@ msgstr "הפנייה מעגלית בתבניות: %1$s."
 msgid "Circular template linkage is not allowed."
 msgstr "קישור תבניות מעגלי אסור."
 
-#: include/classes/core/ZBase.php:491
+#: include/classes/core/ZBase.php:494
 #, c-format
 msgid "Class %1$s not found for action %2$s."
 msgstr "המחלקה %1$s לא נמצאה לפעולה %2$s."
@@ -3644,11 +3649,11 @@ msgstr "תנאים"
 msgid "Configuration"
 msgstr "הגדרות"
 
-#: include/classes/data/CItemData.php:1689
+#: include/classes/data/CItemData.php:1692
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "הגדרות זיכרון מטמון לסטטיסטיקה. זיכרון מטמון - buffer (מצבים: pfree,‏ total,‏ used,‏ free)."
 
-#: include/classes/setup/CSetupWizard.php:700
+#: include/classes/setup/CSetupWizard.php:872
 #, c-format
 msgid "Configuration file \"%1$s\" created."
 msgstr "קובץ ההגדרות „%1$s“ נוצר."
@@ -3689,7 +3694,7 @@ msgstr "הגדרת תרשימים"
 
 #: app/controllers/CControllerHostEdit.php:263
 msgid "Configuration of host"
-msgstr ""
+msgstr "הגדרת מארח"
 
 #: hostgroups.php:25
 msgid "Configuration of host groups"
@@ -3801,8 +3806,8 @@ msgstr "הגדרת ניטור רשת"
 msgid "Configuration updated"
 msgstr "ההגדרות עודכנו"
 
-#: include/classes/setup/CSetupWizard.php:53
-#: include/classes/setup/CSetupWizard.php:428
+#: include/classes/setup/CSetupWizard.php:62
+#: include/classes/setup/CSetupWizard.php:587
 msgid "Configure DB connection"
 msgstr "הגדרת חיבור למסד הנתונים"
 
@@ -3810,7 +3815,7 @@ msgstr "הגדרת חיבור למסד הנתונים"
 msgid "Confirmation text"
 msgstr "טקסט אימות"
 
-#: include/classes/setup/CSetupWizard.php:698
+#: include/classes/setup/CSetupWizard.php:870
 msgid "Congratulations! You have successfully installed Zabbix frontend."
 msgstr "ברכותינו! התקנת בהצלחה את מנשק המשתמש של Zabbix."
 
@@ -3835,12 +3840,12 @@ msgstr "אבטחת חיבור"
 msgid "Connection timeout"
 msgstr "תום זמן ההמתנה לחיבור"
 
-#: include/classes/server/CZabbixServer.php:481
+#: include/classes/server/CZabbixServer.php:497
 #, c-format
 msgid "Connection timeout of %1$s seconds exceeded when connecting to Zabbix server \"%2$s\"."
 msgstr "תוקף זמן החיבור על סך %1$s שניות חרג בעת החיבור לשרת ה־Zabbix‏ „%2$s”."
 
-#: include/classes/server/CZabbixServer.php:592
+#: include/classes/server/CZabbixServer.php:608
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%1$s\" failed. Possible reasons:\n"
@@ -3851,7 +3856,7 @@ msgstr ""
 "1. ה־IP/DNS של השרת תחת „zabbix.conf.php” שגוי;\n"
 "2. הגדרות שרת ה־DNS שגויות.\n"
 
-#: include/classes/server/CZabbixServer.php:580
+#: include/classes/server/CZabbixServer.php:596
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%1$s\" refused. Possible reasons:\n"
@@ -3866,7 +3871,7 @@ msgstr ""
 "3. סוכן שרת ה־Zabbix לא פועל;\n"
 "4. חומת האש חוסמת חיבורי TCP.\n"
 
-#: include/classes/server/CZabbixServer.php:588
+#: include/classes/server/CZabbixServer.php:604
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%1$s\" timed out. Possible reasons:\n"
@@ -3877,7 +3882,7 @@ msgstr ""
 "1. ה־IP/DNS של השרת שגוי ב־„zabbix.conf.php”;\n"
 "2. חומת האש חוסמת חיבורי TCP.\n"
 
-#: include/classes/setup/CSetupWizard.php:373
+#: include/classes/setup/CSetupWizard.php:538
 msgid "Connection will not be encrypted because it uses a socket file (on Unix) or shared memory (Windows)."
 msgstr "החיבור לא יוצפן כיוון שהוא משתמש בקובץ שקע (ביוניקס) או בזיכרון שיתופי (Windows)."
 
@@ -4071,27 +4076,27 @@ msgstr "יחס עודכן"
 msgid "Count"
 msgstr "ספירה"
 
-#: include/classes/data/CItemData.php:1061
+#: include/classes/data/CItemData.php:1064
 msgid "Count of context switches. Returns integer"
 msgstr "ספירת החלפות ההקשר. מחזירה מספר שלם וחיובי"
 
-#: include/classes/data/CItemData.php:1149
+#: include/classes/data/CItemData.php:1152
 msgid "Count of directory entries, recursively. Returns integer"
 msgstr "ספירת רשומות תיקיות באופן רקורסיבי. מחזירה מספר שלם"
 
-#: include/classes/data/CItemData.php:905
+#: include/classes/data/CItemData.php:908
 msgid "Count of matched lines in log file monitoring with log rotation support. Returns integer"
 msgstr "מספר השורות שתואמות בקובץ היומן שבמעקב עם תמיכה בגלגול יומנים. מחזירה מספר שלם וחיובי"
 
-#: include/classes/data/CItemData.php:897
+#: include/classes/data/CItemData.php:900
 msgid "Count of matched lines in log file monitoring. Returns integer"
 msgstr "מספר השורות שתואמות בקובץ היומן שבמעקב. מחזירה מספר שלם וחיובי"
 
-#: include/classes/data/CItemData.php:1665
+#: include/classes/data/CItemData.php:1668
 msgid "Count of values enqueued in the low-level discovery processing queue."
 msgstr "ספירת הערכים שממתינים בתור לעיבוד הגילוי ברמה נמוכה."
 
-#: include/classes/data/CItemData.php:1669
+#: include/classes/data/CItemData.php:1672
 msgid "Count of values enqueued in the preprocessing queue."
 msgstr "ספירת הערכים שממתינים בתור העיבוד המקדים."
 
@@ -4354,7 +4359,7 @@ msgstr "מארח נוכחי"
 msgid "Current user"
 msgstr "משתמש נוכחי"
 
-#: include/classes/setup/CSetupWizard.php:237
+#: include/classes/setup/CSetupWizard.php:409
 msgid "Current value"
 msgstr "ערך נוכחי"
 
@@ -4450,7 +4455,7 @@ msgstr "שם DNS"
 msgid "Daily"
 msgstr "יומי"
 
-#: include/classes/core/ZBase.php:356
+#: include/classes/core/ZBase.php:359
 msgid "Dark"
 msgstr "כהה"
 
@@ -4562,16 +4567,16 @@ msgstr "ערכת נתונים"
 msgid "Data storage period"
 msgstr "תקופת אחסון נתונים"
 
-#: include/classes/setup/CSetupWizard.php:388
-#: include/classes/setup/CSetupWizard.php:534
-#: include/classes/setup/CSetupWizard.php:740
+#: include/classes/setup/CSetupWizard.php:551
+#: include/classes/setup/CSetupWizard.php:703
+#: include/classes/setup/CSetupWizard.php:938
 msgid "Database TLS CA file"
 msgstr "קובץ CA ל־TLS של מסד הנתונים"
 
 #: include/classes/setup/CFrontendSetup.php:668
-#: include/classes/setup/CSetupWizard.php:400
-#: include/classes/setup/CSetupWizard.php:540
-#: include/classes/setup/CSetupWizard.php:748
+#: include/classes/setup/CSetupWizard.php:561
+#: include/classes/setup/CSetupWizard.php:711
+#: include/classes/setup/CSetupWizard.php:946
 msgid "Database TLS certificate file"
 msgstr "קובץ אישור ל־TLS של מסד הנתונים"
 
@@ -4579,32 +4584,32 @@ msgstr "קובץ אישור ל־TLS של מסד הנתונים"
 msgid "Database TLS certificate files must be read-only"
 msgstr "קובצי האישורים ל־TLS של מסד הנתונים חייבים להיות לקריאה בלבד"
 
-#: include/classes/setup/CSetupWizard.php:412
-#: include/classes/setup/CSetupWizard.php:548
+#: include/classes/setup/CSetupWizard.php:571
+#: include/classes/setup/CSetupWizard.php:721
 msgid "Database TLS cipher list"
 msgstr "רשימת צפנים ל־TLS של מסד הנתונים"
 
-#: include/classes/setup/CSetupWizard.php:370
-#: include/classes/setup/CSetupWizard.php:530
+#: include/classes/setup/CSetupWizard.php:534
+#: include/classes/setup/CSetupWizard.php:696
 msgid "Database TLS encryption"
 msgstr "הצפנת TLS של מסד הנתונים"
 
-#: include/classes/setup/CSetupWizard.php:394
-#: include/classes/setup/CSetupWizard.php:537
-#: include/classes/setup/CSetupWizard.php:744
+#: include/classes/setup/CSetupWizard.php:556
+#: include/classes/setup/CSetupWizard.php:707
+#: include/classes/setup/CSetupWizard.php:942
 msgid "Database TLS key file"
 msgstr "קובץ מפתח TLS של מסד הנתונים"
 
-#: include/blocks.inc.php:609
-msgid "Database history tables upgraded"
-msgstr "טבלאות ההיסטוריה של מסד הנתונים שודרגו"
+#: app/partials/administration.system.info.php:121
+msgid "Database history $info_tables upgraded"
+msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:302
+#: include/classes/setup/CSetupWizard.php:472
 msgid "Database host"
 msgstr "מארח מסד נתונים"
 
-#: include/classes/setup/CSetupWizard.php:406
-#: include/classes/setup/CSetupWizard.php:543
+#: include/classes/setup/CSetupWizard.php:566
+#: include/classes/setup/CSetupWizard.php:715
 msgid "Database host verification"
 msgstr "אימות מארח מסד נתונים"
 
@@ -4612,35 +4617,35 @@ msgstr "אימות מארח מסד נתונים"
 msgid "Database monitor"
 msgstr "מנטר מסד נתונים"
 
-#: include/classes/setup/CSetupWizard.php:314
-#: include/classes/setup/CSetupWizard.php:510 setup.php:45
+#: include/classes/setup/CSetupWizard.php:482
+#: include/classes/setup/CSetupWizard.php:660 setup.php:45
 msgid "Database name"
 msgstr "שם מסד הנתונים"
 
-#: include/classes/setup/CSetupWizard.php:512
+#: include/classes/setup/CSetupWizard.php:668
 msgid "Database password"
 msgstr "ססמת מסד הנתונים"
 
-#: include/classes/setup/CSetupWizard.php:307
-#: include/classes/setup/CSetupWizard.php:509 setup.php:44
+#: include/classes/setup/CSetupWizard.php:476
+#: include/classes/setup/CSetupWizard.php:656 setup.php:44
 msgid "Database port"
 msgstr "פתחת מסד הנתונים"
 
-#: include/classes/setup/CSetupWizard.php:319
-#: include/classes/setup/CSetupWizard.php:514
+#: include/classes/setup/CSetupWizard.php:486
+#: include/classes/setup/CSetupWizard.php:674
 msgid "Database schema"
 msgstr "סכמת מסד הנתונים"
 
-#: include/classes/setup/CSetupWizard.php:508
+#: include/classes/setup/CSetupWizard.php:652
 msgid "Database server"
 msgstr "שרת מסד הנתונים"
 
-#: include/classes/setup/CSetupWizard.php:294
-#: include/classes/setup/CSetupWizard.php:495
+#: include/classes/setup/CSetupWizard.php:465
+#: include/classes/setup/CSetupWizard.php:635
 msgid "Database type"
 msgstr "סוג מסד הנתונים"
 
-#: include/classes/setup/CSetupWizard.php:511
+#: include/classes/setup/CSetupWizard.php:664
 msgid "Database user"
 msgstr "שם המשתמש במסד הנתונים"
 
@@ -4673,7 +4678,7 @@ msgstr "פונקציות תאריך ושעה"
 msgid "Day"
 msgstr "יום"
 
-#: include/func.inc.php:2543
+#: include/func.inc.php:2400
 msgid "Day before yesterday"
 msgstr "יום שלפני אתמול"
 
@@ -4755,7 +4760,7 @@ msgid "Default host inventory mode"
 msgstr "מצב מאגר כבררת מחדל למארחים"
 
 #: app/views/administration.gui.edit.php:70
-#: include/classes/setup/CSetupWizard.php:227
+#: include/classes/setup/CSetupWizard.php:399
 msgid "Default language"
 msgstr "שפת בררת המחדל"
 
@@ -4776,12 +4781,12 @@ msgid "Default page display period"
 msgstr "משך כבררת מחדל להצגת עמוד"
 
 #: app/views/administration.gui.edit.php:82
-#: include/classes/setup/CSetupWizard.php:476
+#: include/classes/setup/CSetupWizard.php:614
 msgid "Default theme"
 msgstr "ערכת בררת מחדל"
 
 #: app/views/administration.gui.edit.php:75
-#: include/classes/setup/CSetupWizard.php:469
+#: include/classes/setup/CSetupWizard.php:607
 msgid "Default time zone"
 msgstr "אזור זמן בררת המחדל"
 
@@ -5122,7 +5127,7 @@ msgstr "למחוק הקפצה?"
 msgid "Delete web scenario?"
 msgstr "למחוק תרחיש רשת?"
 
-#: app/controllers/CControllerAuditLogList.php:357
+#: app/controllers/CControllerAuditLogList.php:358
 msgid "Deleted"
 msgstr "נמחק"
 
@@ -5185,7 +5190,7 @@ msgstr "תלוי ב־"
 msgid "Deployment status"
 msgstr "מצב הטמעה"
 
-#: app/controllers/CControllerAuditLogList.php:285
+#: app/controllers/CControllerAuditLogList.php:286
 #: app/partials/configuration.host.edit.html.php:147
 #: app/partials/hostmacros.list.html.php:37
 #: app/partials/massupdate.macros.tab.php:29
@@ -5217,11 +5222,12 @@ msgstr "מצב הטמעה"
 msgid "Description"
 msgstr "תיאור"
 
+#: app/partials/administration.system.info.php:30
 #: app/views/administration.mediatype.list.php:82
-#: app/views/js/reports.auditlog.list.js.php:152
+#: app/views/js/reports.auditlog.list.js.php:153
 #: app/views/reports.auditlog.list.php:96
-#: app/views/reports.auditlog.list.php:129 include/blocks.inc.php:525
-#: include/func.inc.php:1601 include/views/configuration.action.edit.php:175
+#: app/views/reports.auditlog.list.php:129 include/func.inc.php:1601
+#: include/views/configuration.action.edit.php:175
 #: include/views/configuration.action.edit.php:179
 #: include/views/configuration.action.edit.php:322
 #: include/views/configuration.action.edit.php:410
@@ -5237,7 +5243,7 @@ msgstr "פרטי תרחיש רשת"
 msgid "Device"
 msgstr "התקן"
 
-#: include/classes/data/CItemData.php:1049
+#: include/classes/data/CItemData.php:1052
 msgid "Device interrupts. Returns integer"
 msgstr "פסיקות התקן. מחזירה מספר שלם וחיובי"
 
@@ -5253,7 +5259,7 @@ msgstr "תקציר"
 msgid "Directory"
 msgstr "תיקייה"
 
-#: include/classes/data/CItemData.php:1153
+#: include/classes/data/CItemData.php:1156
 msgid "Directory size (in bytes). Returns integer"
 msgstr "גודל תיקייה (בבתים). מחזירה מספר שלם"
 
@@ -5353,6 +5359,7 @@ msgstr "להשבית את ההקפצות הנבחרות?"
 msgid "Disable selected web scenarios?"
 msgstr "להשבית את תרחישי הרשת הנבחרים?"
 
+#: app/partials/administration.system.info.php:180
 #: app/partials/configuration.filter.items.php:188
 #: app/partials/configuration.host.edit.html.php:363
 #: app/partials/monitoring.host.filter.php:129
@@ -5484,35 +5491,35 @@ msgstr "רשימת גילוי"
 msgid "Discovery object"
 msgstr "פריט גילוי"
 
-#: include/classes/data/CItemData.php:1229
+#: include/classes/data/CItemData.php:1232
 msgid "Discovery of VMware clusters, <url> - VMware service URL. Returns JSON"
 msgstr "גילוי קלאסטרים של VMware,‏ <url> כתובת שירות VMWare. מחזירה JSON"
 
-#: include/classes/data/CItemData.php:1237
+#: include/classes/data/CItemData.php:1240
 msgid "Discovery of VMware datastores, <url> - VMware service URL. Returns JSON"
 msgstr "גילוי מאגרי נתונים של VMware,‏ <url> כתובת שירות VMWare. מחזירה JSON"
 
-#: include/classes/data/CItemData.php:1289
+#: include/classes/data/CItemData.php:1292
 msgid "Discovery of VMware hypervisor datastores, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr "גילוי מאגרי נתונים של hypervisor VMWare,‏ <url> - כתובת שירות VMware,‏ <uuid> - שם מארח ה־VMware hypervisor. מחזירה JSON"
 
-#: include/classes/data/CItemData.php:1313
+#: include/classes/data/CItemData.php:1316
 msgid "Discovery of VMware hypervisors, <url> - VMware service URL. Returns JSON"
 msgstr "גילוי hypervisors של VMware,‏ <url> - כתובת שירות VMware. מחזירה JSON"
 
-#: include/classes/data/CItemData.php:1557
+#: include/classes/data/CItemData.php:1560
 msgid "Discovery of VMware virtual machine disk devices, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
 msgstr "גילוי התקני כוננים של מכונות וירטואליות של VMware.‏ <url> - כתובת שירות VMware,‏ <uuid> שם מארח של מכונה וירטואלית ב־VMWare. מחזירה JSON"
 
-#: include/classes/data/CItemData.php:1569
+#: include/classes/data/CItemData.php:1572
 msgid "Discovery of VMware virtual machine file systems, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
 msgstr "גילוי מערכות קבצים של מכונות וירטואליות של VMware.‏‏ <url> - כתובת שירות VMware,‏ <uuid> שם מארח של מכונה וירטואלית ב־VMWare. מחזירה JSON"
 
-#: include/classes/data/CItemData.php:1501
+#: include/classes/data/CItemData.php:1504
 msgid "Discovery of VMware virtual machine network interfaces, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
-msgstr ""
+msgstr "גילוי מנשקי רשת של מכונות וירטואליות ב־VMware,‏ <url> - כתובת שירות ה־VMware,‏ <uuid> - שם מארח ה־VMware hypervisor. מחזירה JSON"
 
-#: include/classes/data/CItemData.php:1445
+#: include/classes/data/CItemData.php:1448
 msgid "Discovery of VMware virtual machines, <url> - VMware service URL. Returns JSON"
 msgstr "גילוי מכונות וירטואליות של VMware.‏ <url> - כתובת שירות VMware. מחזירה JSON"
 
@@ -5599,15 +5606,15 @@ msgstr "כללי גלוי נמחקו"
 msgid "Discovery status"
 msgstr "מצב הגילוי"
 
-#: include/classes/data/CItemData.php:1141
+#: include/classes/data/CItemData.php:1144
 msgid "Disk read statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps"
 msgstr "סטטיסטיקת קריאה מהכונן. מחזירה מספר שלם וחיובי עם סוג בתצורת מקטעים, פעולות, בתים; שבר עשרוני עבור הסוגים sps,‏ ops,‏ bps"
 
-#: include/classes/data/CItemData.php:1213
+#: include/classes/data/CItemData.php:1216
 msgid "Disk space in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "מקום בכונן בבתים באחוזים מתוך הכלל. מחזירה מספר שלם וחיובי עבור בתים; שבר עשרוני עבור אחוזים"
 
-#: include/classes/data/CItemData.php:1145
+#: include/classes/data/CItemData.php:1148
 msgid "Disk write statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps"
 msgstr "סטטיסטיקת כתיבה לכונן. מחזירה מספר שלם וחיובי עם סוג בתצורת מקטעים, פעולות, בתים; שבר עשרוני עבור הסוגים sps,‏ ops,‏ bps"
 
@@ -5724,7 +5731,7 @@ msgstr "למטה"
 msgid "Download image"
 msgstr "הורדת תמונה"
 
-#: include/classes/setup/CSetupWizard.php:684
+#: include/classes/setup/CSetupWizard.php:856
 msgid "Download the configuration file"
 msgstr "הורדת קובץ ההגדרות"
 
@@ -5788,7 +5795,7 @@ msgid "Duplicate userid \"%1$s\" in users for map \"%2$s\"."
 msgstr "userid משוכפל „%1$s” במשתמשים עבור המפה „%2$s”."
 
 #: app/views/hintbox.eventlist.php:75
-#: app/views/monitoring.widget.problems.view.php:65 include/blocks.inc.php:732
+#: app/views/monitoring.widget.problems.view.php:65 include/blocks.inc.php:580
 #: include/classes/screens/CScreenProblem.php:867
 #: include/classes/screens/CScreenProblem.php:892
 #: include/classes/screens/CScreenProblem.php:1161 include/events.inc.php:289
@@ -6099,6 +6106,7 @@ msgstr "להפעיל את תרחישי הרשת הנבחרים?"
 msgid "Enable trapping"
 msgstr "הפעלת לכידה"
 
+#: app/partials/administration.system.info.php:173
 #: app/partials/configuration.filter.items.php:187
 #: app/partials/configuration.host.edit.html.php:165
 #: app/partials/monitoring.host.filter.php:128
@@ -6229,7 +6237,7 @@ msgstr "שגיאה בבקשת החיפוש בטבלה „%1$s“."
 msgid "Error message"
 msgstr "הודעת שגיאה"
 
-#: include/blocks.inc.php:643
+#: app/partials/administration.system.info.php:153
 #, c-format
 msgid "Error! Unable to start Zabbix server due to unsupported %1$s database server version. Must be at least (%2$s)"
 msgstr "שגיאה! לא ניתן להפעיל את שרת ה־Zabbix עקב גרסת מסד נתונים %1$s שאינה נתמכת. חייבת להיות לפחות (%2$s)"
@@ -6285,7 +6293,7 @@ msgstr "האירוע לא קיבל הכרה"
 msgid "Event list [previous 20]"
 msgstr "רשימת אירועים [20 הקודמים]"
 
-#: include/classes/data/CItemData.php:853
+#: include/classes/data/CItemData.php:856
 msgid "Event log monitoring. Returns log"
 msgstr "ניטור יומן אירועים. מחזירה יומן אירועים"
 
@@ -6348,11 +6356,11 @@ msgstr "הדרת קבוצות מארחים"
 msgid "Execute"
 msgstr "הרצה"
 
-#: include/classes/data/CItemData.php:1593
+#: include/classes/data/CItemData.php:1596
 msgid "Execute WMI query and return the JSON document with all selected objects"
 msgstr "הרצת שאילתת WMI והחזרת מסמך ה־JSON עם כל הפריטים הנבחרים"
 
-#: include/classes/data/CItemData.php:1589
+#: include/classes/data/CItemData.php:1592
 msgid "Execute WMI query and return the first selected object. Returns integer, float, string or text (depending on the request)"
 msgstr "הפעלת שאילתת WMI והחזרת הפריט הראשון שנבחר. מחזירה מספר שלם וחיובי, שבר עשרוני, מחרוזת או טקסט (תלוי בבקשה)"
 
@@ -6536,9 +6544,15 @@ msgstr "שקר"
 msgid "FTP"
 msgstr "FTP"
 
-#: include/classes/setup/CSetupWizard.php:253
+#: include/classes/setup/CSetupWizard.php:425
 msgid "Fail"
 msgstr "כשל"
+
+#: app/partials/administration.ha.nodes.php:75
+#: app/partials/administration.system.info.php:174
+#, c-format
+msgid "Fail-over delay: %1$s"
+msgstr ""
 
 #: app/views/monitoring.widget.web.view.php:30 include/actions.inc.php:2139
 #: include/views/administration.auditacts.list.php:88
@@ -6674,7 +6688,7 @@ msgstr "השדה „%1$s” ודאי חסר."
 msgid "Field \"host\" is mandatory."
 msgstr "השדה „host” (מארח) הוא בגדר חובה."
 
-#: include/classes/data/CItemData.php:1157
+#: include/classes/data/CItemData.php:1160
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256"
 msgstr "מחרוזת אימות קובץ, מחושבת על ידי האלגוריתם cksum מבית יוניקס. מחזירה מספר שלם וחיובי עבור crc32 (בררת מחדל) ומחרוזת עבור md5,‏ sha256"
 
@@ -6687,15 +6701,15 @@ msgstr "הקובץ ריק"
 msgid "File is too big, max upload size is %1$s bytes."
 msgstr "הקובץ גדול מדי, גודל ההעלאה המרבי הוא %1$s בתים."
 
-#: include/classes/data/CItemData.php:1177
+#: include/classes/data/CItemData.php:1180
 msgid "File owner information. Returns string"
 msgstr "פרטי בעלות על קובץ. מחזירה מחרוזת"
 
-#: include/classes/data/CItemData.php:1193
+#: include/classes/data/CItemData.php:1196
 msgid "File size in bytes (default) or in newlines. Returns integer"
 msgstr "גודל קובץ בבתים (בררת מחדל) או בשורות חדשות. מחזירה מספר שלם וחיובי"
 
-#: include/classes/data/CItemData.php:1197
+#: include/classes/data/CItemData.php:1200
 msgid "File time information. Returns integer (Unix timestamp)"
 msgstr "פרטי זמן על הקובץ. מחזירה מספר שלם וחיובי (חותמת זמן יוניקס)"
 
@@ -6773,19 +6787,19 @@ msgstr "סינון תוצאות"
 msgid "Filters"
 msgstr "מסננים"
 
-#: include/classes/data/CItemData.php:1189
+#: include/classes/data/CItemData.php:1192
 msgid "Find string in a file. Returns 0 - match not found; 1 - found"
 msgstr "חיפוש מחרוזת בקובץ. מחזירה 0 - לא נמצאה התאמה; 1 - נמצאה"
 
-#: include/classes/data/CItemData.php:1185
+#: include/classes/data/CItemData.php:1188
 msgid "Find string in a file. Returns the line containing the matched string, or as specified by the optional output parameter"
 msgstr "חיפוש מחרוזת בקובץ. מחזירה שורה שמכילה את המחרוזת שנמצאה, או שצוינה על ידי פרמטר הפלט כרשות"
 
-#: include/classes/data/CItemData.php:1585
+#: include/classes/data/CItemData.php:1588
 msgid "Find string on a web page. Returns the matched string, or as specified by the optional output parameter"
 msgstr "חיפוש מחרוזת באתר. מחזירה את המחרוזת שנמצאה או כפי שצוין על ידי פרמטר הפלט כרשות"
 
-#: include/classes/setup/CSetupWizard.php:145
+#: include/classes/setup/CSetupWizard.php:334
 msgid "Finish"
 msgstr "סיום"
 
@@ -6941,11 +6955,6 @@ msgstr "מנשק משתמש"
 msgid "GUI access disabled."
 msgstr "הגישה למנשק המשתמש מושבתת."
 
-#: include/classes/setup/CSetupWizard.php:61
-#: include/classes/setup/CSetupWizard.php:485
-msgid "GUI settings"
-msgstr "הגדרות מנשק משתמש"
-
 #: include/classes/helpers/CMenuHelper.php:221
 #: include/classes/helpers/CRoleHelper.php:379
 msgid "General"
@@ -6969,7 +6978,7 @@ msgstr "גאורגית (ka_GE)"
 msgid "German (de_DE)"
 msgstr "גרמנית (de_DE)"
 
-#: include/classes/data/CItemData.php:1577
+#: include/classes/data/CItemData.php:1580
 msgid "Get content of web page. Returns web page source as text"
 msgstr "קבלת תוכן של עמוד באינטרנט. מחזירה את מקור העמוד כטקסט"
 
@@ -7366,11 +7375,11 @@ msgstr "חומרה"
 msgid "Hardware (Full details)"
 msgstr "חומרה (פרטים מלאים)"
 
-#: include/classes/data/CItemData.php:1021
+#: include/classes/data/CItemData.php:1024
 msgid "Hardware sensor reading. Returns float"
 msgstr "קריאת חיישן חומרה. מחזירה שבר עשרוני"
 
-#: include/classes/setup/CSetupWizard.php:331
+#: include/classes/setup/CSetupWizard.php:499
 msgid "HashiCorp Vault"
 msgstr "Vault מבית HashiCorp"
 
@@ -7445,11 +7454,24 @@ msgstr "היררכיה"
 msgid "High"
 msgstr "גבוהה"
 
-#: include/classes/core/ZBase.php:358
+#: app/partials/administration.system.info.php:172
+#: app/partials/administration.system.info.php:179
+msgid "High availability cluster"
+msgstr ""
+
+#: app/controllers/CControllerAuditLogList.php:218
+msgid "High availability node"
+msgstr ""
+
+#: include/classes/widgets/forms/CWidgetFormSystemInfo.php:32
+msgid "High availability nodes"
+msgstr ""
+
+#: include/classes/core/ZBase.php:361
 msgid "High-contrast dark"
 msgstr "כהה בניגודיות גבוהה"
 
-#: include/classes/core/ZBase.php:357
+#: include/classes/core/ZBase.php:360
 msgid "High-contrast light"
 msgstr "בהיר בניגודיות גבוהה"
 
@@ -7529,7 +7551,7 @@ msgstr "אופקי"
 msgid "Horizontal align"
 msgstr "יישור אופקי"
 
-#: app/controllers/CControllerAuditLogList.php:218
+#: app/controllers/CControllerAuditLogList.php:219
 #: app/partials/configuration.host.edit.html.php:527
 #: app/partials/monitoring.latest.view.html.php:40
 #: app/partials/popup.operations.php:175
@@ -7540,12 +7562,11 @@ msgstr "יישור אופקי"
 #: app/views/monitoring.widget.problems.view.php:58
 #: app/views/popup.generic.php:81 app/views/popup.host.edit.php:97
 #: app/views/popup.massupdate.host.php:290 app/views/search.php:33
-#: include/actions.inc.php:50 include/blocks.inc.php:729
+#: include/actions.inc.php:50 include/blocks.inc.php:577
 #: include/classes/screens/CScreenHttpTest.php:112
 #: include/classes/screens/CScreenProblem.php:863
 #: include/classes/screens/CScreenProblem.php:887
 #: include/classes/screens/CScreenProblem.php:1158
-#: include/classes/setup/CSetupWizard.php:440
 #: include/classes/widgets/forms/CWidgetFormProblems.php:206
 #: include/classes/widgets/forms/CWidgetFormProblems.php:207
 #: include/hostgroups.inc.php:248 include/maps.inc.php:24
@@ -7634,7 +7655,7 @@ msgid_plural "Hosts enabled"
 msgstr[0] "מארח מופעל"
 msgstr[1] "מארחים מופעלים"
 
-#: app/controllers/CControllerAuditLogList.php:219
+#: app/controllers/CControllerAuditLogList.php:220
 #: app/partials/administration.usergroup.grouprights.html.php:29
 #: app/partials/administration.usergroup.tagfilters.html.php:29
 #: app/partials/popup.operations.php:183
@@ -7767,7 +7788,7 @@ msgstr "שם מארח"
 msgid "Host networks"
 msgstr "רשתות המארח"
 
-#: app/controllers/CControllerAuditLogList.php:220
+#: app/controllers/CControllerAuditLogList.php:221
 #: app/views/popup.lldoperation.php:54
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:168
 msgid "Host prototype"
@@ -7923,7 +7944,7 @@ msgstr "המארחים עודכנו"
 msgid "Hours"
 msgstr "שעות"
 
-#: app/controllers/CControllerAuditLogList.php:221
+#: app/controllers/CControllerAuditLogList.php:222
 #: app/views/administration.housekeeping.edit.php:29
 #: app/views/administration.housekeeping.edit.php:184
 #: include/classes/helpers/CMenuHelper.php:227 include/html.inc.php:884
@@ -8010,7 +8031,7 @@ msgstr "מנשקי IPMI"
 msgid "IPMI sensor"
 msgstr "חיישן IPMI"
 
-#: include/classes/data/CItemData.php:869
+#: include/classes/data/CItemData.php:872
 msgid "IPMI sensor IDs and other sensor-related parameters. Returns JSON."
 msgstr "מזהי חיישני IPMI ומשתנים נוספים שקשורים בחיישנים. מחזירה JSON."
 
@@ -8067,7 +8088,7 @@ msgstr "מפת הסמלים נמחקה"
 msgid "Icon map updated"
 msgstr "מפת הסמלים עודכנה"
 
-#: app/controllers/CControllerAuditLogList.php:222
+#: app/controllers/CControllerAuditLogList.php:223
 #: app/views/administration.iconmap.edit.php:29
 #: app/views/administration.iconmap.list.php:27
 #: include/classes/helpers/CMenuHelper.php:234 include/html.inc.php:887
@@ -8102,7 +8123,7 @@ msgstr "פעולות זהות משמשות את המודולים תחת %1$s."
 msgid "Identical namespace (%1$s) is used by modules located at %2$s."
 msgstr "מרחב שם זהה (%1$s) משמש את המודולים תחת %2$s."
 
-#: include/classes/data/CItemData.php:1125
+#: include/classes/data/CItemData.php:1128
 msgid "Identification of the system. Returns string"
 msgstr "זיהוי המערכת. מחזירה מחרוזת"
 
@@ -8178,7 +8199,7 @@ msgstr "חריגות למידור מסגרות פנימיות (Iframes)"
 msgid "Ignore this service"
 msgstr "התעלמות מהשירות הזה"
 
-#: app/controllers/CControllerAuditLogList.php:223
+#: app/controllers/CControllerAuditLogList.php:224
 #: app/views/administration.image.edit.php:60
 #: app/views/administration.image.edit.php:66 image.php:26
 #: include/classes/helpers/CMapHelper.php:227 include/maps.inc.php:28
@@ -8360,7 +8381,7 @@ msgstr "לכלול את רשומת תפריט האירוע"
 msgid "Include subgroups"
 msgstr "לכלול תת־קבוצות"
 
-#: include/classes/data/CItemData.php:937
+#: include/classes/data/CItemData.php:940
 msgid "Incoming traffic statistics on network interface. Returns integer"
 msgstr "סטטיסטיקת תעבורה נכנסת על מנשק רשת. מחזירה מספר שלם וחיובי"
 
@@ -8664,9 +8685,9 @@ msgstr "שם או ערך שגוי לשדה „%1$s” בביטוי where בטב�
 msgid "Incorrect fields for sysmap."
 msgstr "שדות שגויים למערכת המפות."
 
-#: include/classes/setup/CSetupWizard.php:740
-#: include/classes/setup/CSetupWizard.php:744
-#: include/classes/setup/CSetupWizard.php:748
+#: include/classes/setup/CSetupWizard.php:938
+#: include/classes/setup/CSetupWizard.php:942
+#: include/classes/setup/CSetupWizard.php:946
 #, c-format
 msgid "Incorrect file path for \"%1$s\": %2$s."
 msgstr "נתיב הקובץ של „%1$s” שגוי: %2$s."
@@ -8840,9 +8861,9 @@ msgstr "טווח הפתחות שגוי."
 msgid "Incorrect regular expression \"%1$s\": \"%2$s\""
 msgstr "הביטוי הרגולרי „%1$s” שגוי: „%2$s”"
 
-#: include/classes/server/CZabbixServer.php:493
-#: include/classes/server/CZabbixServer.php:535
-#: include/classes/server/CZabbixServer.php:542
+#: include/classes/server/CZabbixServer.php:509
+#: include/classes/server/CZabbixServer.php:551
+#: include/classes/server/CZabbixServer.php:558
 #, c-format
 msgid "Incorrect response received from Zabbix server \"%1$s\"."
 msgstr "התקבלה תגובה שגויה משרת ה־Zabbix‏ „%1$s”."
@@ -9261,7 +9282,7 @@ msgstr "אינסוף"
 #: app/views/monitoring.widget.actionlog.view.php:39
 #: app/views/monitoring.widget.problems.view.php:57
 #: include/actions.inc.php:1827 include/actions.inc.php:1921
-#: include/blocks.inc.php:728 include/classes/screens/CScreenProblem.php:862
+#: include/blocks.inc.php:576 include/classes/screens/CScreenProblem.php:862
 #: include/classes/screens/CScreenProblem.php:886
 #: include/views/administration.auditacts.list.php:69
 #: include/views/configuration.graph.list.php:141
@@ -9281,11 +9302,11 @@ msgstr "מידע"
 msgid "Information"
 msgstr "מידע"
 
-#: include/classes/data/CItemData.php:1169
+#: include/classes/data/CItemData.php:1172
 msgid "Information about a file. Returns JSON"
 msgstr "מידע על קובץ. מחזירה JSON"
 
-#: include/classes/data/CItemData.php:1025
+#: include/classes/data/CItemData.php:1028
 msgid "Information about a service. Returns integer with param as state, startup; string - with param as displayname, path, user; text - with param as description; Specifically for state: 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service; Specifically for startup: 0 - automatic, 1 - automatic delayed, 2 - manual, 3 - disabled, 4 - unknown"
 msgstr "מידע על שירות. מחזירה מספר שלם וחיובי עם פרמטר בתור מצב, התחלה; מחרוזת - עם פרמטר בתור שם תצוגה, path,‏ user; טקסט - עם פרמטר בתור תיאור; במיוחד עבור מצב: 0 - פעיל, 1 - מושהה, 2 - ההפעלה בהמתנה, 3 - השהיה בהמתנה, 4 - המשך בהמתנה, 5 - עצירה בהמתנה, 6 - נעצר, 7 - לא ידוע, 255 - אין כזה שירות; במיוחד עבור התחלה: 0 - אוטומטית, 1 - אוטומטית עם המתנה, 2 - ידנית, 3 - מושבתת, 4 - לא ידועה"
 
@@ -9335,12 +9356,12 @@ msgstr "הוספה"
 msgid "Insert expression"
 msgstr "הוספת ביטוי"
 
-#: include/classes/setup/CSetupWizard.php:69
-#: include/classes/setup/CSetupWizard.php:705
+#: include/classes/setup/CSetupWizard.php:74
+#: include/classes/setup/CSetupWizard.php:877
 msgid "Install"
 msgstr "התקנה"
 
-#: setup.php:174
+#: setup.php:172
 msgid "Installation"
 msgstr "התקנה"
 
@@ -9860,7 +9881,7 @@ msgstr "אי אפשר לחפש לפי ססמת משתמש."
 msgid "Italian (it_IT)"
 msgstr "איטלקית (it_IT)"
 
-#: app/controllers/CControllerAuditLogList.php:225
+#: app/controllers/CControllerAuditLogList.php:226
 #: app/views/popup.massupdate.item.php:492 app/views/popup.triggerexpr.php:99
 #: app/views/popup.triggerwizard.php:92
 #: include/classes/screens/CScreenHistory.php:268
@@ -9945,7 +9966,7 @@ msgstr "לא נבחר פריט"
 msgid "Item pre-processing is missing parameters: %1$s"
 msgstr "חסרים פרמטרים בעיבוד הטרומי של הפריט: %1$s"
 
-#: app/controllers/CControllerAuditLogList.php:226
+#: app/controllers/CControllerAuditLogList.php:227
 #: app/views/popup.lldoperation.php:51 app/views/popup.massupdate.item.php:492
 #: include/classes/widgets/forms/CWidgetFormGraphPrototype.php:48
 #: include/forms.inc.php:892
@@ -10317,47 +10338,51 @@ msgctxt "page navigation"
 msgid "Last"
 msgstr "אחרון"
 
-#: include/func.inc.php:2596
+#: include/func.inc.php:2453
 #, c-format
 msgid "Last %1$d day"
 msgid_plural "Last %1$d days"
 msgstr[0] "ביום האחרון"
 msgstr[1] "ב־%1$d הימים האחרונים"
 
-#: include/func.inc.php:2590
+#: include/func.inc.php:2447
 #, c-format
 msgid "Last %1$d hour"
 msgid_plural "Last %1$d hours"
 msgstr[0] "בשעה האחרונה"
 msgstr[1] "ב־%1$d השעות האחרונות"
 
-#: include/func.inc.php:2583
+#: include/func.inc.php:2440
 #, c-format
 msgid "Last %1$d minute"
 msgid_plural "Last %1$d minutes"
 msgstr[0] "בדקה האחרונה"
 msgstr[1] "ב־%1$d הדקות האחרונות"
 
-#: include/func.inc.php:2599
+#: include/func.inc.php:2456
 #, c-format
 msgid "Last %1$d month"
 msgid_plural "Last %1$d months"
 msgstr[0] "בחודש האחרון"
 msgstr[1] "ב־%1$d החודשים האחרונים"
 
-#: include/func.inc.php:2576
+#: include/func.inc.php:2433
 #, c-format
 msgid "Last %1$d second"
 msgid_plural "Last %1$d seconds"
 msgstr[0] "בשנייה האחרונה"
 msgstr[1] "ב־%1$d השניות האחרונות"
 
-#: include/func.inc.php:2602
+#: include/func.inc.php:2459
 #, c-format
 msgid "Last %1$d year"
 msgid_plural "Last %1$d years"
 msgstr[0] "בשנה האחרונה"
 msgstr[1] "ב־%1$d השנים האחרונות"
+
+#: app/partials/administration.ha.nodes.php:28
+msgid "Last access"
+msgstr ""
 
 #: app/views/administration.token.list.php:143
 #: app/views/administration.user.token.list.php:99
@@ -10477,7 +10502,7 @@ msgstr "מקרא"
 msgid "Length"
 msgstr "אורך"
 
-#: setup.php:197
+#: setup.php:195
 msgid "Licensed under"
 msgstr "כפוף לרישיון"
 
@@ -10581,31 +10606,31 @@ msgstr "קישורים"
 msgid "List is empty"
 msgstr "הרשימה ריקה"
 
-#: include/classes/data/CItemData.php:1137
+#: include/classes/data/CItemData.php:1140
 msgid "List of block devices and their type. Returns JSON"
 msgstr "רשימה של התקני אחסון והסוג שלהם. מחזירה JSON"
 
-#: include/classes/data/CItemData.php:1045
+#: include/classes/data/CItemData.php:1048
 msgid "List of detected CPUs/CPU cores. Returns JSON"
 msgstr "רשימה של המעבדים/ליבות המעבדים שזוהו. מחזירה JSON"
 
-#: include/classes/data/CItemData.php:1201
+#: include/classes/data/CItemData.php:1204
 msgid "List of mounted filesystems and their types. Returns JSON"
 msgstr "רשימה של מערכות הקבצים המעוגנות והסוג שלהן. מחזירה JSON"
 
-#: include/classes/data/CItemData.php:1205
+#: include/classes/data/CItemData.php:1208
 msgid "List of mounted filesystems, their types, disk space and inode statistics. Returns JSON"
 msgstr "רשימה של מערכות קבצים מעוגנות, הסוג שלהן, השטח בכונן וסטטיסטיקת inodes. מחזירה JSON"
 
-#: include/classes/data/CItemData.php:933
+#: include/classes/data/CItemData.php:936
 msgid "List of network interfaces. Returns JSON"
 msgstr "רשימת מנשקי הרשת. מחזירה JSON"
 
-#: include/classes/data/CItemData.php:1001
+#: include/classes/data/CItemData.php:1004
 msgid "List of object instances of Windows performance counters, discovered using object names in English. Returns JSON"
 msgstr "רשימת מופעי פריטים של מוני ביצועים של Windows, התגלו דרך שמות הפריטים באנגלית. מחזירה JSON"
 
-#: include/classes/data/CItemData.php:997
+#: include/classes/data/CItemData.php:1000
 msgid "List of object instances of Windows performance counters. Returns JSON"
 msgstr "רשימת מופעי פריטים של מוני ביצועים של Windows. מחזירה JSON"
 
@@ -10619,19 +10644,19 @@ msgstr "הצגת שיתופי קבוצות משתמשים"
 msgid "List of user shares"
 msgstr "הצגת שיתופי משתמשים"
 
-#: include/classes/data/CItemData.php:1085
+#: include/classes/data/CItemData.php:1088
 msgid "Listing of MAC addresses. Returns string"
 msgstr "רשימת כתובת MAC (חומרה). מחזירה מחרוזת"
 
-#: include/classes/data/CItemData.php:1081
+#: include/classes/data/CItemData.php:1084
 msgid "Listing of PCI or USB devices. Returns text"
 msgstr "רשימת התקני PCI או USB. מחזירה טקסט"
 
-#: include/classes/data/CItemData.php:1109
+#: include/classes/data/CItemData.php:1112
 msgid "Listing of installed packages. Returns text"
 msgstr "רשימת חבילות מותקנות. מחזירה טקסט"
 
-#: include/classes/data/CItemData.php:1029
+#: include/classes/data/CItemData.php:1032
 msgid "Listing of services. Returns 0 - if empty; text - list of services separated by a newline"
 msgstr "רשימת שירותים. מחזירה 0 - אם ריקה; טקסט - רשימה של שירותים שמופרדים בסימן של שורה חדשה"
 
@@ -10639,7 +10664,7 @@ msgstr "רשימת שירותים. מחזירה 0 - אם ריקה; טקסט - ר
 msgid "Lithuanian (lt_LT)"
 msgstr "ליטאית (lt_LT)"
 
-#: include/classes/data/CItemData.php:1581
+#: include/classes/data/CItemData.php:1584
 msgid "Loading time of full web page (in seconds). Returns float"
 msgstr "זמן הטעינה של עמוד אינטרנט במלואו (בשניות). מחזירה שבר עשרוני"
 
@@ -10676,11 +10701,11 @@ msgstr "קו גובה של המיקום"
 msgid "Log"
 msgstr "יומן"
 
-#: include/classes/data/CItemData.php:909
+#: include/classes/data/CItemData.php:912
 msgid "Log file monitoring with log rotation support. Returns log"
 msgstr "מעקב אחר קובצי יומן עם תמיכה בגלגול קובצי יומן. מחזירה יומן"
 
-#: include/classes/data/CItemData.php:901
+#: include/classes/data/CItemData.php:904
 msgid "Log file monitoring. Returns log"
 msgstr "מעקב אחר קובץ יומן. מחזירה יומן"
 
@@ -10754,11 +10779,11 @@ msgstr "כתובת MAC ב׳"
 msgid "MD2"
 msgstr "MD2"
 
-#: include/classes/data/CItemData.php:1173
+#: include/classes/data/CItemData.php:1176
 msgid "MD5 checksum of file. Returns character string (MD5 hash of the file)"
 msgstr "בדיקת סכום MD5 על קובץ. מחזירה מחרוזת תווים (גיבוב ה־MD5 של הקובץ)"
 
-#: app/controllers/CControllerAuditLogList.php:227
+#: app/controllers/CControllerAuditLogList.php:228
 #: app/partials/hostmacros.inherited.list.html.php:48
 #: app/partials/hostmacros.list.html.php:35
 #: app/partials/massupdate.macros.tab.php:29
@@ -10807,7 +10832,7 @@ msgstr "מסנן ראשי"
 msgid "Main navigation"
 msgstr "ניווט ראשי"
 
-#: app/controllers/CControllerAuditLogList.php:228
+#: app/controllers/CControllerAuditLogList.php:229
 #: include/classes/helpers/CMenuHelper.php:165
 #: include/classes/helpers/CRoleHelper.php:360
 #: include/views/configuration.maintenance.edit.php:259
@@ -10912,7 +10937,7 @@ msgstr "פעולת מארח ידנית"
 msgid "Manually closed"
 msgstr "נסגר ידנית"
 
-#: app/controllers/CControllerAuditLogList.php:229
+#: app/controllers/CControllerAuditLogList.php:230
 #: include/classes/widgets/CWidgetConfig.php:54
 #: include/classes/widgets/forms/CWidgetFormMap.php:41
 #: include/classes/widgets/forms/CWidgetFormMap.php:70 include/maps.inc.php:27
@@ -11107,15 +11132,15 @@ msgstr "מספר עמודות ושורות מרבי בטבלאות סקירה"
 msgid "Max period for time selector"
 msgstr "הטווח המרבי לבורר זמן"
 
-#: include/classes/data/CItemData.php:885
+#: include/classes/data/CItemData.php:888
 msgid "Maximum number of opened files supported by OS. Returns integer"
 msgstr "מספר הקבצים הפתוחים המרבי שנתמך על ידי מערכת ההפעלה. מחזירה מספר שלם וחיובי"
 
-#: include/classes/data/CItemData.php:889
+#: include/classes/data/CItemData.php:892
 msgid "Maximum number of processes supported by OS. Returns integer"
 msgstr "מספר התהליכים המרבי שנתמך על ידי מערכת ההפעלה. מחזירה מספר שלם וחיובי"
 
-#: include/blocks.inc.php:632
+#: app/partials/administration.system.info.php:142
 #, c-format
 msgid "Maximum required %1$s database version is %2$s."
 msgstr "גרסת מסד הנתונים %1$s העדכנית ביותר הנדרשת היא %2$s."
@@ -11150,7 +11175,7 @@ msgstr "מאי"
 msgid "Media"
 msgstr "מדיה"
 
-#: app/controllers/CControllerAuditLogList.php:230
+#: app/controllers/CControllerAuditLogList.php:231
 #: app/views/administration.mediatype.edit.php:270 report4.php:96
 msgid "Media type"
 msgstr "סוג המדיה"
@@ -11226,11 +11251,11 @@ msgstr "חברים"
 msgid "Memory limit: %1$s"
 msgstr "מגבלת זיכרון: %1$s"
 
-#: include/classes/data/CItemData.php:1217
+#: include/classes/data/CItemData.php:1220
 msgid "Memory size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "גודל הזיכרון בבתים או באחוזים מהכלל. מחזירה מספר שלם וחיובי עבור בתים; שבר עשרוני עבור אחוזים"
 
-#: include/classes/data/CItemData.php:1009
+#: include/classes/data/CItemData.php:1012
 msgid "Memory used by process in bytes. Returns integer"
 msgstr "הזיכרון שמנוצל על ידי תהליך בבתים. מחזירה מספר שלם"
 
@@ -11317,7 +11342,7 @@ msgstr "מזערי"
 msgid "Minimum password length"
 msgstr "אורך ססמה מזערי"
 
-#: include/blocks.inc.php:626
+#: app/partials/administration.system.info.php:136
 #, c-format
 msgid "Minimum required %1$s database version is %2$s."
 msgstr "גרסת מסד הנתונים %1$s הישנה ביותר הנדרשת היא %2$s."
@@ -11417,7 +11442,7 @@ msgstr "מצב"
 msgid "Model"
 msgstr "דגם"
 
-#: app/controllers/CControllerAuditLogList.php:231
+#: app/controllers/CControllerAuditLogList.php:232
 #: app/views/administration.module.edit.php:52
 msgid "Module"
 msgstr "מודול"
@@ -11615,6 +11640,7 @@ msgstr "NTLM"
 #: app/controllers/CControllerPopupTriggerWizard.php:134
 #: app/controllers/CControllerPopupValueMapUpdate.php:63
 #: app/controllers/CControllerPopupValueMapUpdate.php:70
+#: app/partials/administration.ha.nodes.php:28
 #: app/partials/configuration.filter.items.php:91
 #: app/partials/configuration.host.edit.html.php:177
 #: app/partials/configuration.host.edit.html.php:216
@@ -11786,7 +11812,7 @@ msgstr "מרחב שם"
 msgid "Network discovery data storage period"
 msgstr "תקופת אחסון נתוני גילוי רשת"
 
-#: include/classes/data/CItemData.php:941
+#: include/classes/data/CItemData.php:944
 msgid "Network interface list (includes interface type, status, IPv4 address, description). Returns text"
 msgstr "רשימת מנשקי רשת (לרבות סוג המנשק, מצב, כתובת Pv4, תיאור). מחזירה טקסט"
 
@@ -11828,7 +11854,7 @@ msgstr "שגיאת תום זמן המתנה לבדיקת דוח מתוזמן"
 msgid "Network timeout for script execution"
 msgstr "תום זמן המתנה לרשת להפעלת סקריפט"
 
-#: include/classes/data/CItemData.php:1513
+#: include/classes/data/CItemData.php:1516
 msgid "Network utilization (combined transmit-rates and receive-rates) during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance"
 msgstr "ניצולת תעבורת רשת (שילוב בין מהירות שליחה לקבלה) במשך זמן מסוים, <url> - כתובת שירות ה־VMware,‏ <uuid> - שם מארח ה־hypervisor של VMware,‏ <instance> - כרטיס רשת מסוים"
 
@@ -11871,7 +11897,7 @@ msgstr "ערך חדש לתגית אירועים"
 
 #: app/views/configuration.host.edit.php:65 app/views/popup.host.edit.php:97
 msgid "New host"
-msgstr ""
+msgstr "מארח חדש"
 
 #: app/controllers/CControllerPopupLldOperation.php:351
 msgid "New operation"
@@ -11902,12 +11928,14 @@ msgstr "הקפצות חדשות"
 msgid "Next page"
 msgstr "העמוד הבא"
 
-#: include/classes/setup/CSetupWizard.php:142
-#: include/classes/setup/CSetupWizard.php:430
-#: include/classes/setup/CSetupWizard.php:567
+#: include/classes/setup/CSetupWizard.php:331
+#: include/classes/setup/CSetupWizard.php:589
+#: include/classes/setup/CSetupWizard.php:741
 msgid "Next step"
 msgstr "השלב הבא"
 
+#: app/partials/administration.system.info.php:35
+#: app/partials/administration.system.info.php:122
 #: app/partials/configuration.filter.items.php:195
 #: app/partials/configuration.filter.items.php:202
 #: app/partials/configuration.filter.items.php:211
@@ -11922,8 +11950,7 @@ msgstr "השלב הבא"
 #: app/views/popup.massupdate.item.php:337
 #: app/views/popup.massupdate.item.php:379
 #: app/views/popup.massupdate.trigger.php:64 include/actions.inc.php:33
-#: include/blocks.inc.php:532 include/blocks.inc.php:610
-#: include/blocks.inc.php:855 include/blocks.inc.php:859
+#: include/blocks.inc.php:703 include/blocks.inc.php:707
 #: include/classes/screens/CScreenProblem.php:1099
 #: include/classes/screens/CScreenProblem.php:1103
 #: include/classes/screens/CScreenProblem.php:1245 include/events.inc.php:198
@@ -12196,7 +12223,8 @@ msgstr "אין הרשאות לקרוא ל־„%1$s.%2$s”."
 #: app/controllers/CControllerWidgetIteratorGraphPrototypeView.php:305
 #: app/controllers/CControllerWidgetMapView.php:70
 #: app/controllers/CControllerWidgetPlainTextView.php:88
-#: app/views/monitoring.widget.graph.view.php:42 disc_prototypes.php:748
+#: app/views/monitoring.widget.graph.view.php:42
+#: app/views/monitoring.widget.systeminfo.view.php:45 disc_prototypes.php:748
 #: host_discovery.php:808 hostinventoriesoverview.php:73
 #: include/classes/api/services/CAction.php:1582
 #: include/classes/api/services/CAction.php:1863
@@ -12536,52 +12564,52 @@ msgstr "נוב׳"
 msgid "November"
 msgstr "נובמבר"
 
-#: include/classes/data/CItemData.php:1057
+#: include/classes/data/CItemData.php:1060
 msgid "Number of CPUs. Returns integer"
 msgstr "מספר המעבדים. מחזירה מספר שלם וחיובי"
 
-#: include/classes/data/CItemData.php:1297
+#: include/classes/data/CItemData.php:1300
 msgid "Number of available DS paths, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - Datastore name, <partitionid> - internal id of physical device from vmware.hv.datastore.discovery"
 msgstr "מספר נתיבי מאגרי נתונים, <url> - כתובת שירות ה־VMware,‏<uuid> - שם המארח של ה־hypervisor של VMware,‏ <datastore> - שם מאגר הנתונים, <partitionid> - המזהה הפנימי של ההתקן הפיזי מתוך vmware.hv.datastore.discovery"
 
-#: include/classes/data/CItemData.php:893
+#: include/classes/data/CItemData.php:896
 msgid "Number of currently open file descriptors. Returns integer"
 msgstr "מספר עם מתארי הקבצים (file descriptors) הפתוחים. מחזירה מספר שלם וחיובי"
 
-#: include/classes/data/CItemData.php:1629
+#: include/classes/data/CItemData.php:1632
 msgid "Number of enabled items on the host."
 msgstr "מספר הפריטים הפעילים על המארח."
 
-#: include/blocks.inc.php:536
+#: app/partials/administration.system.info.php:40
 msgid "Number of hosts (enabled/disabled)"
 msgstr "מספר המארחים (מופעל/כבוי)"
 
-#: include/blocks.inc.php:549
+#: app/partials/administration.system.info.php:55
 msgid "Number of items (enabled/disabled/not supported)"
 msgstr "מספר פריטים (פעילים/מושבתים/לא נתמכים)"
 
-#: include/classes/data/CItemData.php:1653
+#: include/classes/data/CItemData.php:1656
 msgid "Number of items in Zabbix database."
 msgstr "מספר הפריטים במסד הנתונים של Zabbix."
 
-#: include/classes/data/CItemData.php:1681
+#: include/classes/data/CItemData.php:1684
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr "מספר הפריטים בהיסטוריה של המתווך שלא נשלחו עדיין לשרת"
 
-#: include/classes/data/CItemData.php:1685
+#: include/classes/data/CItemData.php:1688
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
 msgstr "מספר הפריטים בתור שהושהו למשך תקופת שניות מ־ עד, כולל."
 
-#: include/classes/data/CItemData.php:1597
-#: include/classes/data/CItemData.php:1697
+#: include/classes/data/CItemData.php:1600
+#: include/classes/data/CItemData.php:1700
 msgid "Number of items in the queue which are delayed in Zabbix server or proxy by \"from\" till \"to\" seconds, inclusive."
 msgstr "מספר הפריטים שמעוכבים בתור בשרת או במתווך ה־Zabbix לפי „מ־” ועד „עד”, כולל."
 
-#: include/classes/data/CItemData.php:1649
+#: include/classes/data/CItemData.php:1652
 msgid "Number of monitored hosts"
 msgstr "מספר המארחים בפיקוח"
 
-#: include/classes/data/CItemData.php:929
+#: include/classes/data/CItemData.php:932
 msgid "Number of out-of-window collisions. Returns integer"
 msgstr "מספר התנגשויות out-of-window (מחוץ למסגרת). מחזירה מספר שלם"
 
@@ -12593,15 +12621,15 @@ msgstr "מספר תקלות"
 msgid "Number of problems and expand most critical one"
 msgstr "מספר תקלות והרחבה של הקריטית ביותר"
 
-#: include/classes/data/CItemData.php:1329
+#: include/classes/data/CItemData.php:1332
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "מספר ליבות המעבד ב־Hypervisor של VMware,‏ <url> - כתובת השירות של VMware,‏ <uuid> - שם המארח של ה־Hypervisor של VMware"
 
-#: include/classes/data/CItemData.php:1333
+#: include/classes/data/CItemData.php:1336
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "מספר תהליכי המעבד ב־Hypervisor של VMware,‏ <url> - כתובת השירות של VMware,‏ <uuid> - שם המארח של ה־Hypervisor של VMware"
 
-#: include/classes/data/CItemData.php:1417
+#: include/classes/data/CItemData.php:1420
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "מספר המעבדים במכונה וירטואלית של VMware,‏ <url> - כתובת השירות של VMware,‏ <uuid> - שם המכונה הווירטואלית של VMware"
 
@@ -12618,67 +12646,67 @@ msgstr "מספר שינויי המצב"
 msgid "Number of steps"
 msgstr "מספר השלבים"
 
-#: include/blocks.inc.php:545
+#: app/partials/administration.system.info.php:50
 msgid "Number of templates"
 msgstr "מספר התבניות"
 
-#: include/blocks.inc.php:560
+#: app/partials/administration.system.info.php:67
 msgid "Number of triggers (enabled/disabled [problem/ok])"
 msgstr "מספר ההקפצות (פעיל/מושבת [תקלה/תקין])"
 
-#: include/classes/data/CItemData.php:1717
+#: include/classes/data/CItemData.php:1720
 msgid "Number of triggers in Zabbix database."
 msgstr "מספר ההקפצות במסד הנתונים של Zabbix."
 
-#: include/classes/data/CItemData.php:1657
+#: include/classes/data/CItemData.php:1660
 msgid "Number of unsupported items in Zabbix database."
 msgstr "מספר הפריטים שאינם נתמכים במסד הנתונים של Zabbix."
 
-#: include/classes/data/CItemData.php:1633
+#: include/classes/data/CItemData.php:1636
 msgid "Number of unsupported items on the host."
 msgstr "מספר הפריטים שאינם נתמכים במארח."
 
-#: include/blocks.inc.php:572
+#: app/partials/administration.system.info.php:84
 msgid "Number of users (online)"
 msgstr "מספר המשתמשים (מקוונים)"
 
-#: include/classes/data/CItemData.php:1133
+#: include/classes/data/CItemData.php:1136
 msgid "Number of users logged in. Returns integer"
 msgstr "מספר המשתמשים שנכנסו למערכת. מחזירה מספר שלם וחיובי"
 
-#: include/classes/data/CItemData.php:1609
+#: include/classes/data/CItemData.php:1612
 msgid "Number of values stored in table HISTORY."
 msgstr "מספר הערכים המאוחסנים בטבלה HISTORY."
 
-#: include/classes/data/CItemData.php:1613
+#: include/classes/data/CItemData.php:1616
 msgid "Number of values stored in table HISTORY_LOG."
 msgstr "מספר הערכים המאוחסנים בטבלה HISTORY_LOG."
 
-#: include/classes/data/CItemData.php:1617
+#: include/classes/data/CItemData.php:1620
 msgid "Number of values stored in table HISTORY_STR."
 msgstr "מספר הערכים המאוחסנים בטבלה HISTORY_STR."
 
-#: include/classes/data/CItemData.php:1621
+#: include/classes/data/CItemData.php:1624
 msgid "Number of values stored in table HISTORY_TEXT."
 msgstr "מספר הערכים המאוחסנים בטבלה HISTORY_TEXT."
 
-#: include/classes/data/CItemData.php:1625
+#: include/classes/data/CItemData.php:1628
 msgid "Number of values stored in table HISTORY_UINT."
 msgstr "מספר הערכים המאוחסנים בטבלה HISTORY_UINT."
 
-#: include/classes/data/CItemData.php:1709
+#: include/classes/data/CItemData.php:1712
 msgid "Number of values stored in table TRENDS."
 msgstr "מספר הערכים המאוחסנים בטבלה TRENDS."
 
-#: include/classes/data/CItemData.php:1713
+#: include/classes/data/CItemData.php:1716
 msgid "Number of values stored in table TRENDS_UINT."
 msgstr "מספר הערכים המאוחסנים בטבלה TRENDS_UINT."
 
-#: include/classes/data/CItemData.php:1401
+#: include/classes/data/CItemData.php:1404
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "מספר המכונות הווירטואליות ב־Hypervisor של VMware,‏ <url> - כתובת שירות ה־VMware,‏ <uuid> - שם מארח ה־Hypervisor"
 
-#: include/classes/data/CItemData.php:1209
+#: include/classes/data/CItemData.php:1212
 msgid "Number or percentage of inodes. Returns integer for number; float for percentage"
 msgstr "מספר אחוזי ה־inodes. מחזירה מספר שלם וחיובי עבור מספר, שבר עשרוני עבור אחוז"
 
@@ -12787,7 +12815,7 @@ msgstr "כבוי"
 #: app/views/js/popup.massupdate.js.php:415
 #: app/views/js/popup.mediatypetest.edit.js.php:114
 #: app/views/js/popup.scriptexec.js.php:53
-#: app/views/js/reports.auditlog.list.js.php:157
+#: app/views/js/reports.auditlog.list.js.php:158
 #: app/views/monitoring.widget.web.view.php:30
 #: include/views/configuration.triggers.list.php:94
 #: include/views/js/common.item.edit.js.php:204
@@ -12845,7 +12873,7 @@ msgstr "רק בדיקות של סוכן Zabbix,‏ SNMPv1,‏ SNMPv2 ו־SNMPv3 
 msgid "Only administrators can set map owner."
 msgstr "רק מנהלים יכולים להגדיר בעלות על מפה."
 
-#: include/blocks.inc.php:550
+#: app/partials/administration.system.info.php:56
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "רק פריטים שהוקצו למארחים פעילים נספרים"
 
@@ -12892,7 +12920,7 @@ msgstr "רק מנהלי על יכולים להגדיר בעלות על לוח מ
 msgid "Only super admins can set report owner."
 msgstr "רק מנהלי על יכולים להגדיר בעלות על דוח."
 
-#: include/blocks.inc.php:561
+#: app/partials/administration.system.info.php:68
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "רק הקפצות שמוקצות למארחים מופעלים שתלויות בפריטים פעילים נספרות"
 
@@ -12900,7 +12928,7 @@ msgstr "רק הקפצות שמוקצות למארחים מופעלים שתלו�
 msgid "Opera"
 msgstr "Opera"
 
-#: include/classes/data/CItemData.php:1105
+#: include/classes/data/CItemData.php:1108
 msgid "Operating system information. Returns string"
 msgstr "פרטים על מערכת ההפעלה. מחזירה מחרוזת"
 
@@ -12929,7 +12957,7 @@ msgstr "לפעולה אין קבוצה לביצוע."
 msgid "Operation has no template to operate."
 msgstr "לפעולה אין תבנית לפעילות."
 
-#: app/views/monitoring.widget.problems.view.php:64 include/blocks.inc.php:731
+#: app/views/monitoring.widget.problems.view.php:64 include/blocks.inc.php:579
 #: include/classes/screens/CScreenProblem.php:890
 #: include/classes/screens/CScreenProblem.php:1160 include/events.inc.php:184
 #: include/views/configuration.trigger.prototype.edit.php:84
@@ -13088,7 +13116,7 @@ msgstr "פרמטרים אחרים"
 msgid "Others"
 msgstr "אחרים"
 
-#: include/classes/data/CItemData.php:945
+#: include/classes/data/CItemData.php:948
 msgid "Outgoing traffic statistics on network interface. Returns integer"
 msgstr "סטטיסטיקת תעבורה יוצאת במנשק רשת. מחזירה מספר שלם ועשרוני"
 
@@ -13375,7 +13403,8 @@ msgctxt "page navigation"
 msgid "Pager"
 msgstr "נווט"
 
-#: app/views/administration.mediatype.edit.php:103 include/blocks.inc.php:525
+#: app/partials/administration.system.info.php:30
+#: app/views/administration.mediatype.edit.php:103
 msgid "Parameter"
 msgstr "פרמטר"
 
@@ -13468,7 +13497,7 @@ msgstr "פאסיבי"
 #: app/views/popup.massupdate.item.php:175
 #: app/views/popup.massupdate.item.php:199 disc_prototypes.php:218
 #: host_discovery.php:191 httpconf.php:74
-#: include/classes/setup/CSetupWizard.php:364
+#: include/classes/setup/CSetupWizard.php:527
 #: include/views/configuration.host.discovery.edit.php:413
 #: include/views/configuration.host.discovery.edit.php:554
 #: include/views/configuration.host.discovery.edit.php:593
@@ -13539,7 +13568,7 @@ msgstr "השהיית פעולות לתקלות מוסתרות"
 msgid "Peak memory usage: %1$s"
 msgstr "השימוש המרבי בזיכרון: %1$s"
 
-#: include/classes/data/CItemData.php:1413
+#: include/classes/data/CItemData.php:1416
 msgid "Percent of time the virtual machine is unable to run because it is contending for access to the physical CPU(s), <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "אחוז הזמן שמכונה וירטואלית לא יכולה לרוץ כי היא מתחרה על גישה למעבדים פיזיים, <url> - כתובת שירות VMware,‏ <uuid> - שם מארח של מכונה וירטואלית ב־VMware"
 
@@ -13547,11 +13576,11 @@ msgstr "אחוז הזמן שמכונה וירטואלית לא יכולה לרו
 msgid "Percentage"
 msgstr "אחוז"
 
-#: include/classes/data/CItemData.php:1497
+#: include/classes/data/CItemData.php:1500
 msgid "Percentage of host physical memory that has been consumed, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "אחוז הזיכרון הפיזי של המארח שנצרך, <url> - כתובת שירות ה־VMware,‏ <uuid> - שם מארח מכונה וירטואלית ב־VMware"
 
-#: include/classes/data/CItemData.php:1421
+#: include/classes/data/CItemData.php:1424
 msgid "Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance"
 msgstr "אחוז הזמן שהמכונה הווירטואלית הייתה מכונה אך לא קיבלה משבצת זמן לרוץ על המעבד הפיזי, <url> - כתובת שירות ה־VMware,‏ <uuid> - שם מארח מכונה וירטואלית ב־VMware,‏ <instance> - מס׳ מעבד"
 
@@ -13563,7 +13592,7 @@ msgstr "קו אחוזון (שמאל)"
 msgid "Percentile line (right)"
 msgstr "קו אחוזון (ימין)"
 
-#: include/classes/data/CItemData.php:921
+#: include/classes/data/CItemData.php:924
 msgid "Performs a DNS query. Returns character string with the required type of information"
 msgstr "ביצוע שאילתת DNS. מחזירה מחרוזת תווים עם סוג המידע הנדרש"
 
@@ -13623,7 +13652,7 @@ msgid "Placing algorithm"
 msgstr "אלגוריתם הצבה"
 
 #: app/views/administration.mediatype.edit.php:208
-#: include/classes/setup/CSetupWizard.php:330
+#: include/classes/setup/CSetupWizard.php:498
 #: include/classes/widgets/CWidgetConfig.php:56
 msgid "Plain text"
 msgstr "טקסט פשוט"
@@ -13637,7 +13666,7 @@ msgstr "ניגון"
 msgid "Play sound"
 msgstr "ניגון צליל"
 
-#: include/classes/setup/CSetupWizard.php:567
+#: include/classes/setup/CSetupWizard.php:741
 #, c-format
 msgid "Please check configuration parameters. If all is correct, press \"%1$s\" button, or \"%2$s\" button to change configuration parameters."
 msgstr "נא לבדוק את משתני התצורה. אם כולם נכונים, יש ללחוץ על הכפתור „%1$s” או לחלופין על הכפתור „%2$s” כדי לשנות משתני תצורה."
@@ -13650,18 +13679,14 @@ msgstr "נא לאשר שברצונך להסיר את כל תסריטי המאק�
 msgid "Please confirm that you want to remove all value mappings."
 msgstr "נא לאשר שברצונך להסיר את כל מיפויי הערכים."
 
-#: include/classes/setup/CSetupWizard.php:430
+#: include/classes/setup/CSetupWizard.php:589
 #, c-format
 msgid "Please create database manually, and set the configuration parameters for connection to this database. Press \"%1$s\" button when done."
 msgstr "נא ליצור מסד נתונים ידנית ולהגדיר את משתני התצורה לחיבור למסד הנתונים הזה. יש ללחוץ על הכפתור „%1$s” לאחר סיום הפעולה."
 
-#: include/classes/setup/CSetupWizard.php:888
+#: include/classes/setup/CSetupWizard.php:177
 msgid "Please enable \"allow_url_fopen\" directive."
 msgstr "נא להפעיל את ההנחיה „allow_url_fopen” (לאפשר פתיחת קישורים)."
-
-#: include/classes/setup/CSetupWizard.php:458
-msgid "Please enter the host name or host IP address and port number of the Zabbix server, as well as the name of the installation (optional)."
-msgstr "נא להזין את שם המארח או את כתובת ה־IP ומספר הפתחה של שרת ה־Zabbix כמו גם את שם ההתקנה (רשות)."
 
 #: jsLoader.php:241
 msgid "Please select two elements"
@@ -13703,9 +13728,8 @@ msgstr "ממלא שדה במאגר המארח"
 #: app/views/administration.proxy.edit.php:49
 #: app/views/administration.script.edit.php:162
 #: app/views/configuration.host.list.php:118
-#: app/views/popup.itemtestedit.view.php:112
-#: include/classes/setup/CSetupWizard.php:445 include/hosts.inc.php:1228
-#: include/views/inventory.host.view.php:81 setup.php:62
+#: app/views/popup.itemtestedit.view.php:112 include/hosts.inc.php:1228
+#: include/views/inventory.host.view.php:81
 msgid "Port"
 msgstr "פתחה"
 
@@ -13733,7 +13757,7 @@ msgstr "שדות Post"
 msgid "Post type"
 msgstr "סוג Post"
 
-#: include/classes/data/CItemData.php:1377
+#: include/classes/data/CItemData.php:1380
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
 msgstr "ניצולת חשמל , <url> - כתובת שירות ה־VMware,‏ <uuid> - שם המארח של ה־VMware hypervisor,‏ <max> - ניצולת החשמל המרבית המותרת"
 
@@ -13741,8 +13765,8 @@ msgstr "ניצולת חשמל , <url> - כתובת שירות ה־VMware,‏ <uu
 msgid "Power value"
 msgstr "ערך חזקה"
 
-#: include/classes/setup/CSetupWizard.php:65
-#: include/classes/setup/CSetupWizard.php:565
+#: include/classes/setup/CSetupWizard.php:70
+#: include/classes/setup/CSetupWizard.php:739
 msgid "Pre-installation summary"
 msgstr "תקציר טרום התקנה"
 
@@ -13787,7 +13811,7 @@ msgid "Previous day"
 msgstr "היום הקודם"
 
 #: app/partials/scheduledreport.formgrid.html.php:88
-#: app/partials/scheduledreport.table.html.php:58 include/func.inc.php:2546
+#: app/partials/scheduledreport.table.html.php:58 include/func.inc.php:2403
 msgid "Previous month"
 msgstr "החודש הקודם"
 
@@ -13801,12 +13825,12 @@ msgid "Previous value"
 msgstr "ערך קודם"
 
 #: app/partials/scheduledreport.formgrid.html.php:87
-#: app/partials/scheduledreport.table.html.php:57 include/func.inc.php:2545
+#: app/partials/scheduledreport.table.html.php:57 include/func.inc.php:2402
 msgid "Previous week"
 msgstr "שבוע שעבר"
 
 #: app/partials/scheduledreport.formgrid.html.php:89
-#: app/partials/scheduledreport.table.html.php:59 include/func.inc.php:2547
+#: app/partials/scheduledreport.table.html.php:59 include/func.inc.php:2404
 msgid "Previous year"
 msgstr "שנה שעברה"
 
@@ -13875,7 +13899,7 @@ msgstr "רמת ההרשאות"
 #: app/views/monitoring.service.list.php:84
 #: app/views/monitoring.widget.problems.view.php:60
 #: app/views/popup.acknowledge.edit.php:33
-#: app/views/popup.mediatype.message.php:49 include/blocks.inc.php:730
+#: app/views/popup.mediatype.message.php:49 include/blocks.inc.php:578
 #: include/classes/helpers/CMediatypeHelper.php:48
 #: include/classes/screens/CScreenProblem.php:865
 #: include/classes/screens/CScreenProblem.php:888
@@ -13969,7 +13993,7 @@ msgstr "תקלות"
 msgid "Problems by severity"
 msgstr "תקלות לפי חומרה"
 
-#: include/classes/data/CItemData.php:1005
+#: include/classes/data/CItemData.php:1008
 msgid "Process CPU utilization percentage. Returns float"
 msgstr "אחוז ניצולת מעבד של תהליך. מחזירה שבר עשרוני (float)"
 
@@ -14015,7 +14039,7 @@ msgstr "הכתובת שסופקה „%1$s” שגויה."
 msgid "Proxies"
 msgstr "מתווכים"
 
-#: app/controllers/CControllerAuditLogList.php:232
+#: app/controllers/CControllerAuditLogList.php:233
 #: app/views/administration.proxy.edit.php:89
 #: app/views/administration.proxy.edit.php:142
 #: app/views/administration.queue.details.php:49
@@ -14209,7 +14233,7 @@ msgstr "גישה לקריאה-כתיבה לשירותים"
 msgid "Read-write access to services with tag"
 msgstr "גישה לקריאה-כתיבה לשירותים עם תגית"
 
-#: include/classes/data/CItemData.php:913
+#: include/classes/data/CItemData.php:916
 msgid "Reads modbus data. Returns various types"
 msgstr "קוראת נתוני modbus. מחזירה מגוון סוגים"
 
@@ -14311,7 +14335,7 @@ msgstr "לייצר את אסימון ה־API הנבחר מחדש? האסימון
 msgid "Regular"
 msgstr "רגיל"
 
-#: app/controllers/CControllerAuditLogList.php:233
+#: app/controllers/CControllerAuditLogList.php:234
 #: app/views/popup.lldoverride.php:101 include/items.inc.php:1803
 #: include/views/configuration.host.discovery.edit.php:742
 msgid "Regular expression"
@@ -14641,7 +14665,7 @@ msgstr "הבקשה נשלחה בהצלחה"
 msgid "Request type"
 msgstr "סוג בקשה"
 
-#: include/classes/setup/CSetupWizard.php:237
+#: include/classes/setup/CSetupWizard.php:409
 #: include/views/configuration.httpconf.edit.php:205
 msgid "Required"
 msgstr "נדרש"
@@ -14654,11 +14678,11 @@ msgstr "הרשאות מארח נדרשות"
 msgid "Required performance (vps)"
 msgstr "ביצועים נדרשים (ערכים לשנייה)"
 
-#: include/classes/data/CItemData.php:1693
+#: include/classes/data/CItemData.php:1696
 msgid "Required performance of the Zabbix server, in new values per second expected."
 msgstr "ביצועים נדרשים משרת ה־Zabbix, בציפייה לערכים חדשים בשנייה."
 
-#: include/blocks.inc.php:576
+#: app/partials/administration.system.info.php:91
 msgid "Required server performance, new values per second"
 msgstr "דרישות שרת נדרשות, ערכים חדשים לשנייה"
 
@@ -14808,7 +14832,7 @@ msgstr "חלה תוצאה עם מפת ערכים"
 msgid "Retrieve mode"
 msgstr "מצב קבלה"
 
-#: include/classes/data/CItemData.php:1161
+#: include/classes/data/CItemData.php:1164
 msgid "Retrieving contents of a file. Returns text"
 msgstr "קבלת תוכן של קובץ. מחזירה טקסט"
 
@@ -14816,60 +14840,60 @@ msgstr "קבלת תוכן של קובץ. מחזירה טקסט"
 msgid "Retry"
 msgstr "ניסיון חוזר"
 
-#: include/classes/data/CItemData.php:873
+#: include/classes/data/CItemData.php:876
 msgid "Return a JSON array with LLD macros describing the MBean objects or their attributes. Can be used for LLD."
 msgstr "מחזירה מערך JSON עם רכיבי MBean או המאפיינים שלהם. ניתן להשתמש לטובת גילוי ברמה נמוכה."
 
-#: include/classes/data/CItemData.php:877
+#: include/classes/data/CItemData.php:880
 msgid "Return a JSON array with MBean objects or their attributes. Compared to jmx.discovery it does not define LLD macros. Can be used for LLD."
 msgstr "מחזירה מערך JSON עם רכיבי MBean או המאפיינים שלהם. בהשוואה ל־jmx.discovery לא מוגדרים תסריטי מאקרו של גילוי ברמה נמוכה. ניתן להשתמש לטובת גילוי ברמה נמוכה."
 
-#: include/classes/data/CItemData.php:849
+#: include/classes/data/CItemData.php:852
 msgid "Return first column of the first row of the SQL query result."
 msgstr "החזרת העמודה הראשונה של השורה הראשונה מתוצאת שאילתת ה־SQL."
 
-#: include/classes/data/CItemData.php:881
+#: include/classes/data/CItemData.php:884
 msgid "Return value of an attribute of MBean object."
 msgstr "מחזירה ערך של מאפיין של רכיב MBean."
 
-#: include/classes/data/CItemData.php:1181
+#: include/classes/data/CItemData.php:1184
 msgid "Returns 4-digit string containing octal number with Unix permissions"
 msgstr "מחזירה מחרוזת באורך 4 ספרות שמכילה מספר אוקטלי (בסיס 8) עם הרשאות יוניקס"
 
-#: include/classes/data/CItemData.php:865
+#: include/classes/data/CItemData.php:868
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
 msgstr "מחזירה תגובת ping מסוג ICMP בשניות. למשל: 0.02"
 
-#: include/classes/data/CItemData.php:1645
+#: include/classes/data/CItemData.php:1648
 msgid "Returns a JSON array describing the host network interfaces configured in Zabbix. Can be used for LLD."
 msgstr "מזירה מערך JSON שמתאר את מנשקי הרשת של המארח שמוגדרים ב־Zabbix. ניתן להשתמש בזה לגילוי ברמה נמוכה."
 
-#: include/classes/data/CItemData.php:1601
-#: include/classes/data/CItemData.php:1701
+#: include/classes/data/CItemData.php:1604
+#: include/classes/data/CItemData.php:1704
 msgid "Returns a JSON object containing Zabbix server or proxy internal metrics."
 msgstr "מחזירה עצם JSON שמכיל מדדים פנימיים של שרת או מתווך Zabbix."
 
-#: include/classes/data/CItemData.php:1641
+#: include/classes/data/CItemData.php:1644
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx."
 msgstr "מחזירה זמינות של סוג מסוים של בדיקות על המארח. הערך של הפריט הזה תואם לסמלי הזמינות ברשימת המארחים. הסוגים הזמינים הם: agent,‏ snmp,‏ ipmi,‏ jmx."
 
-#: include/classes/data/CItemData.php:1637
+#: include/classes/data/CItemData.php:1640
 msgid "Returns current maintenance status of the host."
 msgstr "מחזירה את מצב התחזוקה הנוכחי של המארח."
 
-#: include/classes/data/CItemData.php:1661
+#: include/classes/data/CItemData.php:1664
 msgid "Returns information associated with Zabbix Java gateway. Valid params are: ping, version."
 msgstr "מחזירה מידע הקשור בשער הגישה ל־Zabbix ב־Java. הפרמטרים האפשריים הם: ping,‏ version."
 
-#: include/classes/data/CItemData.php:969
+#: include/classes/data/CItemData.php:972
 msgid "Returns number of TCP sockets that match parameters. Returns integer"
 msgstr "מחזירה את מספר שקעי ה־TCP שתואמים למשתנים. מחזירה מספר שלם וחיובי"
 
-#: include/classes/data/CItemData.php:985
+#: include/classes/data/CItemData.php:988
 msgid "Returns number of UDP sockets that match parameters. Returns integer"
 msgstr "מחזירה את מספר שקעי ה־UDP שתואמים למשתנים. מחזירה מספר שלם וחיובי"
 
-#: include/classes/data/CItemData.php:861
+#: include/classes/data/CItemData.php:864
 msgid "Returns percentage of lost ICMP ping packets."
 msgstr "מחזירה אחוזים של מנות נתונים מסוג ping ב־ICMP שאבדו."
 
@@ -14946,7 +14970,7 @@ msgstr "להריץ את הסקריפט „%1$s” על קבוצות מארחים
 msgid "Run script \"%1$s\" on hosts"
 msgstr "להריץ את הסקריפט „%1$s” על מארחים"
 
-#: include/classes/data/CItemData.php:1093
+#: include/classes/data/CItemData.php:1096
 msgid "Run specified command on the host. Returns text result of the command; 1 - with mode as nowait (regardless of command result)"
 msgstr "הרצת פקודה מסוימת על המארח. מחזירה את פלט הטקסט של הפקודה; 1 - עם מצב בתור nowait (ללא תלות בתוצאות הפקודה)"
 
@@ -15200,7 +15224,7 @@ msgstr "שמירה בשם"
 msgid "Save changes"
 msgstr "שמירת השינויים"
 
-#: include/classes/setup/CSetupWizard.php:685
+#: include/classes/setup/CSetupWizard.php:857
 #, c-format
 msgid "Save it as \"%1$s\""
 msgstr "שמירה בתור „%1$s“"
@@ -15225,7 +15249,7 @@ msgstr "תזמון"
 msgid "Scheduled check"
 msgstr "בדיקה מתוזמנת"
 
-#: app/controllers/CControllerAuditLogList.php:235
+#: app/controllers/CControllerAuditLogList.php:236
 #: app/views/reports.scheduledreport.edit.php:57
 msgid "Scheduled report"
 msgstr "דוח מתוזמן"
@@ -15292,7 +15316,7 @@ msgctxt "selected problems"
 msgid "Scope"
 msgstr "היקף"
 
-#: app/controllers/CControllerAuditLogList.php:236
+#: app/controllers/CControllerAuditLogList.php:237
 #: app/views/administration.mediatype.edit.php:217
 #: app/views/administration.script.edit.php:115
 #: app/views/administration.script.edit.php:185
@@ -15565,7 +15589,7 @@ msgstr "שרת (מתווך)"
 msgid "Server time"
 msgstr "זמן השרת"
 
-#: app/controllers/CControllerAuditLogList.php:224
+#: app/controllers/CControllerAuditLogList.php:225
 #: app/views/monitoring.service.list.edit.php:112
 #: app/views/popup.mediatype.message.php:58
 #: app/views/popup.service.edit.php:286 app/views/popup.service.edit.php:344
@@ -15687,7 +15711,7 @@ msgstr "שירותים מתלות מעגלית."
 msgid "Services updated"
 msgstr "שירותים עודכנו"
 
-#: include/classes/core/ZBase.php:241 include/classes/core/ZBase.php:468
+#: include/classes/core/ZBase.php:244 include/classes/core/ZBase.php:471
 msgid "Session initialization error."
 msgstr "שגיאת אתחול הפעלה."
 
@@ -15746,7 +15770,9 @@ msgstr "הגדרת פרוטוקול ה־LDAP נכשלה."
 msgid "Setting LDAP referrals to \"Off\" failed."
 msgstr "הגדרת ההפניות ב־LDAP ל„כבוי” נכשלה."
 
-#: app/controllers/CControllerAuditLogList.php:237
+#: app/controllers/CControllerAuditLogList.php:238
+#: include/classes/setup/CSetupWizard.php:66
+#: include/classes/setup/CSetupWizard.php:624
 msgid "Settings"
 msgstr "הגדרות"
 
@@ -15835,6 +15861,7 @@ msgstr "מקוצר"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:108
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:180
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:252
+#: include/classes/widgets/forms/CWidgetFormSystemInfo.php:30
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:33
 #: include/views/js/monitoring.sysmaps.js.php:100 report2.php:546
 msgid "Show"
@@ -16044,7 +16071,7 @@ msgstr "מדינה / מחוז של האתר"
 msgid "Size"
 msgstr "גודל"
 
-#: include/classes/server/CZabbixServer.php:514
+#: include/classes/server/CZabbixServer.php:530
 #, c-format
 msgid "Size of the response received from Zabbix server \"%1$s\" exceeds the allowed size of %2$s bytes. This value can be increased in the ZBX_SOCKET_BYTES_LIMIT constant in include/defines.inc.php."
 msgstr "גודל התגובה שהתקבל משרת ה־Zabbix‏ „%1$s” חורג מהגודל המותר על סך %2$s בתים. ניתן להגדיל את הערך הזה על ידי שינוי הקבוע ZBX_SOCKET_BYTES_LIMIT בתוך include/defines.inc.php."
@@ -16090,7 +16117,7 @@ msgstr "תכנית ד׳"
 msgid "Software application E"
 msgstr "תכנית ה"
 
-#: include/classes/data/CItemData.php:1101
+#: include/classes/data/CItemData.php:1104
 msgid "Software architecture information. Returns string"
 msgstr "פרטי אריטקטורת תכנה. מחזירה מחרוזת"
 
@@ -16161,6 +16188,10 @@ msgstr "גרם מדרגות"
 msgid "Standard items"
 msgstr "פריטים רגילים"
 
+#: app/partials/administration.ha.nodes.php:45
+msgid "Standby"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:630
 #: app/controllers/CControllerPopupTriggerExpr.php:748
 msgid "Start"
@@ -16193,7 +16224,7 @@ msgstr "שעת התחלה"
 msgid "Starting TLS failed."
 msgstr "הפעלת TLS נכשלה."
 
-#: include/classes/data/CItemData.php:1605
+#: include/classes/data/CItemData.php:1608
 msgid "Startup time of Zabbix server, Unix timestamp."
 msgstr "מועד ההפעלה של שרת ה־Zabbix, חותמת זמן יוניקס."
 
@@ -16211,13 +16242,14 @@ msgctxt "history source selection method"
 msgid "Static"
 msgstr "סטטית"
 
-#: include/classes/data/CItemData.php:1741
+#: include/classes/data/CItemData.php:1744
 msgid "Statistics and availability of Zabbix write cache. Cache - one of values (modes: all, float, uint, str, log, text, not supported), history (modes: pfree, free, total, used, pused), index (modes: pfree, free, total, used, pused), trend (modes: pfree, free, total, used, pused)."
 msgstr "סטטיסטיקה וזמינות זיכרון מטמון הכתיבה של Zabbix. זיכרון מטמון - אחד מבין values (מצבים: all,‏ float,‏ uint,‏ str,‏ log,‏ text,‏ not supported), history (מצבים: pfree,‏ free,‏ total,‏ used,‏ pused), index (מצבים: pfree,‏ free,‏ total,‏ used,‏ pused) ו־trend (מצבים: pfree,‏ free,‏ total,‏ used,‏ pused)."
 
 #: app/controllers/CControllerPopupGeneric.php:179
 #: app/controllers/CControllerPopupGeneric.php:193
 #: app/controllers/CControllerPopupGeneric.php:235
+#: app/partials/administration.ha.nodes.php:28
 #: app/partials/configuration.filter.items.php:184
 #: app/partials/monitoring.host.filter.php:125
 #: app/partials/monitoring.host.view.html.php:34
@@ -16374,6 +16406,10 @@ msgstr "להפסיק עיבוד"
 msgid "Stop slideshow"
 msgstr "לעצור מצגת"
 
+#: app/partials/administration.ha.nodes.php:40
+msgid "Stopped"
+msgstr ""
+
 #: app/views/popup.lldoperation.php:191 app/views/popup.lldoperation.php:212
 #: app/views/popup.massupdate.item.php:295
 #: app/views/popup.massupdate.item.php:311
@@ -16384,12 +16420,12 @@ msgstr "לעצור מצגת"
 msgid "Storage period"
 msgstr "תקופת אחסון"
 
-#: include/classes/setup/CSetupWizard.php:328
+#: include/classes/setup/CSetupWizard.php:496
 msgid "Store credentials in"
 msgstr "אחסון פרטי הגישה תחת"
 
-#: include/classes/setup/CSetupWizard.php:500
-#: include/classes/setup/CSetupWizard.php:501
+#: include/classes/setup/CSetupWizard.php:642
+#: include/classes/setup/CSetupWizard.php:643
 msgid "Stored in HashiCorp Vault secret"
 msgstr "מאוחסן בסוד בכספת (Vault) מבית HashiCorp"
 
@@ -16455,7 +16491,7 @@ msgstr "הצלחה בפיקוח"
 msgid "Success message"
 msgstr "הודעת הצלחה"
 
-#: include/classes/data/CItemData.php:949
+#: include/classes/data/CItemData.php:952
 msgid "Sum of incoming and outgoing traffic statistics on network interface. Returns integer"
 msgstr "סכום של תעבורת נתונים נכנסת ויוצאת על מנשק רשת. מחזירה מספר שלם"
 
@@ -16481,15 +16517,15 @@ msgstr "תמיכה"
 msgid "Suppressed till: %1$s"
 msgstr "מוסתרת עד: %1$s"
 
-#: include/classes/data/CItemData.php:1113
+#: include/classes/data/CItemData.php:1116
 msgid "Swap in (from device into memory) statistics. Returns integer"
 msgstr "סטטיסטיקת תעבורה נכנסת לתחלופה (מההתקן לזיכרון). מחזירה ערך שלם וחיובי"
 
-#: include/classes/data/CItemData.php:1117
+#: include/classes/data/CItemData.php:1120
 msgid "Swap out (from memory onto device) statistics. Returns integer"
 msgstr "סטטיסטיקת תעבורה יוצאת מהתחלופה (מהזיכרון להתקן). מחזירה ערך שלם וחיובי"
 
-#: include/classes/data/CItemData.php:1121
+#: include/classes/data/CItemData.php:1124
 msgid "Swap space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "גודל נפח זיכרון התחלופה בבתים או באחוזים מהכלל. מחזירה מספר שלם וחיובי לבתים, שבר עשרוני לאחוזים"
 
@@ -16505,7 +16541,7 @@ msgstr "החלפת שיטת אימות תאפס את הכול פרט להפעל�
 msgid "System"
 msgstr "מערכת"
 
-#: include/classes/data/CItemData.php:1041
+#: include/classes/data/CItemData.php:1044
 msgid "System boot time. Returns integer (Unix timestamp)"
 msgstr "מועד העליה של המערכת. מחזירה מספר שלם וחיובי (חותמת זמן של Unix)"
 
@@ -16524,26 +16560,30 @@ msgstr "אירעה שגיאת מערכת. נא ליצור קשר עם מנהלי
 msgid "System error."
 msgstr "שגיאת מערכת."
 
-#: include/classes/data/CItemData.php:1069
+#: include/classes/data/CItemData.php:1072
 msgid "System host name. Returns string"
 msgstr "שם המארח של המערכת. מחזירה מחרוזת"
 
-#: app/controllers/CControllerReportStatus.php:39
-#: app/views/report.status.php:29 include/classes/helpers/CMenuHelper.php:103
+#: app/controllers/CControllerReportStatus.php:42
+#: app/views/report.status.php:30 include/classes/helpers/CMenuHelper.php:103
 #: include/classes/helpers/CRoleHelper.php:329
 #: include/classes/widgets/CWidgetConfig.php:61
 msgid "System information"
 msgstr "פרטי מערכת"
 
-#: include/classes/data/CItemData.php:1097
+#: include/classes/data/CItemData.php:1100
 msgid "System statistics. Returns integer or float"
 msgstr "סטטיסטיקת מערכת. מחזירה מספר שלם וחיובי או שבר עשרוני"
 
-#: include/classes/data/CItemData.php:1089
+#: include/classes/widgets/forms/CWidgetFormSystemInfo.php:31
+msgid "System stats"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1092
 msgid "System time. Returns integer with type as UTC; string - with type as local"
 msgstr "שעת המערכת. מחזירה מספר שלם וחיובי עם סוג UTC, מחרוזת - כשהסוג הוא מקומי"
 
-#: include/classes/data/CItemData.php:1129
+#: include/classes/data/CItemData.php:1132
 msgid "System uptime in seconds. Returns integer"
 msgstr "זמן הפעילות של המערכת בשניות. מחזירה מספר שלם וחיובי"
 
@@ -16646,7 +16686,7 @@ msgstr "ערך תגית"
 #: app/views/popup.massupdate.trigger.php:75
 #: app/views/popup.massupdate.trigger.php:150
 #: app/views/popup.service.edit.php:263 app/views/popup.service.edit.php:346
-#: include/blocks.inc.php:735 include/classes/screens/CScreenHttpTest.php:117
+#: include/blocks.inc.php:583 include/classes/screens/CScreenHttpTest.php:117
 #: include/classes/screens/CScreenProblem.php:839
 #: include/classes/screens/CScreenProblem.php:895
 #: include/classes/screens/CScreenProblem.php:1164
@@ -16702,7 +16742,7 @@ msgstr "סוג היעד"
 msgid "Telnet"
 msgstr "Telnet"
 
-#: app/controllers/CControllerAuditLogList.php:238
+#: app/controllers/CControllerAuditLogList.php:239
 #: app/views/administration.mediatype.edit.php:280
 #: app/views/popup.massupdate.template.php:147 app/views/search.php:278
 #: include/actions.inc.php:49 include/forms.inc.php:529
@@ -16747,7 +16787,7 @@ msgstr "מאפייני תבנית ומארח שמתקבלים בירושה דר�
 msgid "Template cannot be linked to another template more than once even through other templates."
 msgstr "אי אפשר לקשר תבנית אחת לתבנית אחרת יותר מפעם אחת אפילו דרך תבניות אחרות."
 
-#: app/controllers/CControllerAuditLogList.php:239
+#: app/controllers/CControllerAuditLogList.php:240
 msgid "Template dashboard"
 msgstr "תבנית של לוח מחוונים"
 
@@ -16932,11 +16972,11 @@ msgstr "לשיטה „%1$s.%2$s” יש לקרוא ללא המשתנה „auth�
 msgid "The Zabbix database version does not match current requirements. Your database version: %1$s. Required version: %2$s. Please contact your system administrator."
 msgstr "גרסת מסד הנתונים של Zabbix אינה תואמת לדרישות הנוכחיות. גרסת מסד הנתונים שלך: %1$s. גרסה נדרשת: %2$s. נא ליצור קשר עם הנהלת המערכת שלך."
 
-#: include/classes/data/CItemData.php:1533
+#: include/classes/data/CItemData.php:1536
 msgid "The average time a read from the virtual disk takes, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
 msgstr "הזמן שלוקח לקרוא מהכונן הווירטואלי, <url> - כתובת שירות ה־VMware,‏ <uuid> שם מארח המכונה הווירטואלית ב־VMware,‏ <instance> - מופע התקן הכונן"
 
-#: include/classes/data/CItemData.php:1537
+#: include/classes/data/CItemData.php:1540
 msgid "The average time a write to the virtual disk takes, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
 msgstr "משך זמן בממוצע לכתיבה לכונן הווירטואלי, <url> - כתובת שירות ה־VMware,‏ <uuid> שם מארח המכונה הווירטואלית ב־VMware,‏ <instance> - מופע התקן הכונן"
 
@@ -17002,7 +17042,7 @@ msgstr "הפריט לא מתגלה עוד והוא יימחק בעוד %1$s (%2$
 msgid "The item is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "הפריט לא יתגלה עוד ויימחק בפעם הבאה שיתבצע עיבוד של כלל גילוי."
 
-#: include/classes/data/CItemData.php:1013
+#: include/classes/data/CItemData.php:1016
 msgid "The number of processes. Returns integer"
 msgstr "מספר התהליכים. מחזירה מספר שלם וחיובי"
 
@@ -17037,7 +17077,7 @@ msgstr "ההקפצה לא מתגלה עוד ותימחק בפעם הבאה שכ�
 msgid "Theme"
 msgstr "ערכת עיצוב"
 
-#: include/func.inc.php:2544
+#: include/func.inc.php:2401
 msgid "This day last week"
 msgstr "היום הזה בשבוע שעבר"
 
@@ -17050,32 +17090,32 @@ msgstr "השדה הזה מתמלא אוטומטית בפריט „%1$s”."
 msgid "This is the test message from Zabbix"
 msgstr "זו הודעת הבדיקה מ־Zabbix"
 
-#: include/func.inc.php:2552
+#: include/func.inc.php:2409
 msgid "This month"
 msgstr "החודש"
 
-#: include/func.inc.php:2553
+#: include/func.inc.php:2410
 msgid "This month so far"
 msgstr "החודש הזה עד כה"
 
 #: include/views/configuration.item.edit.php:124
 #: include/views/configuration.item.prototype.edit.php:109
 msgid "This type of information may not match the key."
-msgstr ""
+msgstr "סוג המידע הזה כנראה שלא תואם למפתח."
 
-#: include/func.inc.php:2550
+#: include/func.inc.php:2407
 msgid "This week"
 msgstr "השבוע"
 
-#: include/func.inc.php:2551
+#: include/func.inc.php:2408
 msgid "This week so far"
 msgstr "השבוע הזה עד כה"
 
-#: include/func.inc.php:2554
+#: include/func.inc.php:2411
 msgid "This year"
 msgstr "השנה"
 
-#: include/func.inc.php:2555
+#: include/func.inc.php:2412
 msgid "This year so far"
 msgstr "השנה הזו עד כה"
 
@@ -17112,7 +17152,7 @@ msgstr "עד"
 #: app/views/reports.auditlog.list.php:89 include/actions.inc.php:1700
 #: include/actions.inc.php:1754 include/actions.inc.php:1827
 #: include/actions.inc.php:1921 include/actions.inc.php:1976
-#: include/blocks.inc.php:710 include/classes/screens/CScreenProblem.php:816
+#: include/blocks.inc.php:558 include/classes/screens/CScreenProblem.php:816
 #: include/classes/screens/CScreenProblem.php:1155
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:31
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:32
@@ -17123,7 +17163,7 @@ msgstr "עד"
 msgid "Time"
 msgstr "שעה"
 
-#: include/classes/data/CItemData.php:1673
+#: include/classes/data/CItemData.php:1676
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
 msgstr "הזמן שתהליך או קבוצת תהליכים של Zabbix (מזוהים ב־<type>וב־<mode>) היו במצב <state> באחוזים."
 
@@ -17136,7 +17176,7 @@ msgstr "זמן שחלף:"
 msgid "Time filter default period"
 msgstr "משך הזמן כבררת המחדל של מסנן הזמן"
 
-#: include/classes/data/CItemData.php:1677
+#: include/classes/data/CItemData.php:1680
 msgid "Time of proxy last access. Name - proxy name. Valid params are: lastaccess - Unix timestamp, delay - seconds."
 msgstr "זמן הגישה האחרונה למתווך. שם - שם המתווך. משתנים תקפים הם: lastaccess - חותמת זמן יוניקס, delay - בשניות."
 
@@ -17197,11 +17237,11 @@ msgstr "עד"
 msgid "To set a host interface select a single item type for all items"
 msgstr "כדי להגדיר מנשק מארח יש לבחור בסוג פריט אחד לכל הפריטים"
 
-#: include/classes/screens/CScreenProblem.php:701 include/func.inc.php:2548
+#: include/classes/screens/CScreenProblem.php:701 include/func.inc.php:2405
 msgid "Today"
 msgstr "היום"
 
-#: include/func.inc.php:2549
+#: include/func.inc.php:2406
 msgid "Today so far"
 msgstr "היום עד כה"
 
@@ -17233,7 +17273,7 @@ msgstr "זמן ה־Elasticsearch הכולל: %1$s"
 msgid "Total SQL time: %1$s"
 msgstr "זמן ה־SQL הכללי: %1$s"
 
-#: include/classes/data/CItemData.php:1453
+#: include/classes/data/CItemData.php:1456
 msgid "Total time elapsed, in seconds, since last operating system boot-up, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "סך כל הזמן שעבר, בשניות, מאשר העלייה האחרונה של מערכת ההפעלה, <url> - כתובת שירות ה־VMware,‏ <uuid> - שם מארח המכונה הווירטואלית ב־VMware"
 
@@ -17254,11 +17294,11 @@ msgstr "מעקב"
 msgid "Transaction has not been closed. Aborting..."
 msgstr "ההעברה לא נסגרה. מתבצע ביטול…"
 
-#: include/classes/data/CItemData.php:841
+#: include/classes/data/CItemData.php:844
 msgid "Transform SQL query result into a JSON array for low-level discovery."
 msgstr "התמרת תוצאת שאילתת SQL לכדי מערך JSON לטובת גילוי ברמה נמוכה."
 
-#: include/classes/data/CItemData.php:845
+#: include/classes/data/CItemData.php:848
 msgid "Transform SQL query result into a JSON array."
 msgstr "התמרת תוצאת שאילתת SQL לכדי מערך JSON."
 
@@ -17289,7 +17329,7 @@ msgctxt "missing data function"
 msgid "Treat as 0"
 msgstr "להתייחס כ־0"
 
-#: include/classes/data/CItemData.php:1705
+#: include/classes/data/CItemData.php:1708
 msgid "Trend function cache statistics. Valid parameters are: all, hits, phits, misses, pmisses, items, pitems and requests."
 msgstr "סטטיסטיקת זיכרון מטמון פונקציית מגמה. המשתנים התקפים הם: all,‏ hits,‏ phits,‏ misses,‏ pmisses,‏ items,‏ pitems ו־requests."
 
@@ -17310,7 +17350,7 @@ msgstr "תקופת אחסון מגמות"
 msgid "Trends"
 msgstr "מגמות"
 
-#: app/controllers/CControllerAuditLogList.php:240
+#: app/controllers/CControllerAuditLogList.php:241
 #: app/controllers/CControllerPopupTriggerWizard.php:282
 #: app/views/popup.massupdate.trigger.php:149 include/actions.inc.php:46
 #: include/classes/graphdraw/CLineGraphDraw.php:472 include/events.inc.php:256
@@ -17416,7 +17456,7 @@ msgstr "שם ההקפצה"
 msgid "Trigger overview"
 msgstr "סקירת הקפצה"
 
-#: app/controllers/CControllerAuditLogList.php:241
+#: app/controllers/CControllerAuditLogList.php:242
 #: app/views/popup.lldoperation.php:52
 #: app/views/popup.massupdate.trigger.php:149
 #: include/views/configuration.trigger.prototype.edit.php:548
@@ -17720,11 +17760,11 @@ msgstr "אמור להיות UUIDv4"
 msgid "Ukrainian (uk_UA)"
 msgstr "אוקראינית (uk_UA)"
 
-#: include/classes/core/CConfigFile.php:249
+#: include/classes/core/CConfigFile.php:252
 msgid "Unable to change configuration file permissions to 0600."
 msgstr "לא ניתן לשנות את הרשאות קובץ ההגדרות ל־0600."
 
-#: include/classes/core/CConfigFile.php:258
+#: include/classes/core/CConfigFile.php:261
 msgid "Unable to create the configuration file."
 msgstr "לא ניתן ליצור את קובץ התצורה."
 
@@ -17739,7 +17779,7 @@ msgstr "לא ניתן לאתר את גרסת מסד הנתונים הנוכחי�
 msgid "Unable to load authentication API parameters."
 msgstr "לא ניתן לטעון את משתני האימות של ה־API."
 
-#: include/classes/core/CConfigFile.php:184
+#: include/classes/core/CConfigFile.php:187
 msgid "Unable to load database credentials from Vault."
 msgstr "לא ניתן לטעון את פרטי הגישה למסד הנתונים מהכספת."
 
@@ -17747,15 +17787,15 @@ msgstr "לא ניתן לטעון את פרטי הגישה למסד הנתוני�
 msgid "Unable to load housekeeping API parameters."
 msgstr "לא ניתן לטעון משתני API של סדר וניקיון."
 
-#: include/classes/helpers/CSettingsHelper.php:108
+#: include/classes/helpers/CSettingsHelper.php:109
 msgid "Unable to load settings API parameters."
 msgstr "לא ניתן לטעון את משתני API ההגדרות."
 
-#: include/classes/core/CConfigFile.php:254
+#: include/classes/core/CConfigFile.php:257
 msgid "Unable to overwrite the existing configuration file."
 msgstr "לא ניתן לשכתב על קובץ התצורה הקיים."
 
-#: include/blocks.inc.php:638
+#: app/partials/administration.system.info.php:148
 msgid "Unable to retrieve database version."
 msgstr "לא ניתן לקבל את גרסת מסד הנתונים."
 
@@ -17789,6 +17829,10 @@ msgstr "אירועים שנפתרו ואינם מוכרים"
 msgid "Unacknowledged only"
 msgstr "ללא הכרה בלבד"
 
+#: app/partials/administration.ha.nodes.php:56
+msgid "Unavailable"
+msgstr ""
+
 #: app/views/administration.user.list.php:249
 msgid "Unblock"
 msgstr "שחרור"
@@ -17797,7 +17841,7 @@ msgstr "שחרור"
 msgid "Unblock selected users?"
 msgstr "לשחרר את המשתמשים הנבחרים?"
 
-#: include/classes/core/ZBase.php:571
+#: include/classes/core/ZBase.php:574
 #, c-format
 msgid "Unexpected response for action %1$s."
 msgstr "תגובה לא צפויה לפעולה %1$s."
@@ -18064,7 +18108,7 @@ msgstr "עדכון פעולות"
 msgid "Update problem"
 msgstr "עדכון תקלה"
 
-#: app/controllers/CControllerAuditLogList.php:362
+#: app/controllers/CControllerAuditLogList.php:363
 #: app/controllers/CControllerPopupImportCompare.php:160
 msgid "Updated"
 msgstr "מעודכן"
@@ -18088,7 +18132,7 @@ msgstr "מפות ברמות עליונות"
 msgid "Uptime"
 msgstr "זמן פעילות"
 
-#: include/classes/data/CItemData.php:1721
+#: include/classes/data/CItemData.php:1724
 msgid "Uptime of Zabbix server process in seconds."
 msgstr "זמן פעילות של שרת ה־Zabbix בשניות."
 
@@ -18117,7 +18161,7 @@ msgstr "להשתמש במידור מסגרות פנימיות (Iframes)"
 msgid "Used in actions"
 msgstr "בשימוש בפעולות"
 
-#: app/controllers/CControllerAuditLogList.php:242
+#: app/controllers/CControllerAuditLogList.php:243
 #: app/partials/js/scheduledreport.subscription.js.php:78
 #: app/partials/popup.operations.php:105
 #: app/views/administration.token.edit.php:50
@@ -18126,7 +18170,7 @@ msgstr "בשימוש בפעולות"
 #: app/views/administration.user.edit.php:284
 #: app/views/reports.auditlog.list.php:90 httpconf.php:65
 #: include/actions.inc.php:1700 include/actions.inc.php:1754
-#: include/actions.inc.php:1976 include/classes/setup/CSetupWizard.php:358
+#: include/actions.inc.php:1976 include/classes/setup/CSetupWizard.php:522
 #: include/hosts.inc.php:61 include/users.inc.php:52
 #: include/views/configuration.httpconf.edit.php:165
 msgid "User"
@@ -18204,7 +18248,7 @@ msgid_plural "Users deleted"
 msgstr[0] "משתמש נמחק"
 msgstr[1] "משתמשים נמחקו"
 
-#: app/controllers/CControllerAuditLogList.php:243
+#: app/controllers/CControllerAuditLogList.php:244
 #: app/partials/js/scheduledreport.subscription.js.php:83
 #: app/partials/popup.operations.php:85
 #: app/views/administration.script.edit.php:241
@@ -18313,7 +18357,7 @@ msgstr "ססמת המשתמש"
 msgid "User profile"
 msgstr "פרופיל משתמש"
 
-#: app/controllers/CControllerAuditLogList.php:244
+#: app/controllers/CControllerAuditLogList.php:245
 #: app/views/administration.user.list.php:109
 #: app/views/administration.userrole.edit.php:385
 #: app/views/administration.userrole.edit.php:387
@@ -18421,8 +18465,8 @@ msgstr "שם משתמש"
 msgid "Username and password"
 msgstr "שם משתמש וססמה"
 
-#: include/classes/setup/CSetupWizard.php:600
-#: include/classes/setup/CSetupWizard.php:906
+#: include/classes/setup/CSetupWizard.php:194
+#: include/classes/setup/CSetupWizard.php:774
 msgid "Username and password must be stored in Vault secret keys \"username\" and \"password\"."
 msgstr "יש לאחסן את שם המשתמש והססמה במפתחות הסודיים של הכספת „username” ו־„password” (שם משתמש וססמה)."
 
@@ -18448,242 +18492,242 @@ msgstr "מאפיין שם משתמש"
 msgid "Users"
 msgstr "משתמשים"
 
-#: include/classes/data/CItemData.php:1737
+#: include/classes/data/CItemData.php:1740
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "סטטיסטיקת זיכרון מטמון של VMware. המצבים האפשריים הם: total,‏ free,‏ pfree,‏ used ו־pused."
 
-#: include/classes/data/CItemData.php:1225
+#: include/classes/data/CItemData.php:1228
 msgid "VMware cluster performance counter, <url> - VMware service URL, <id> - VMware cluster id, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "מודד ביצועי קלאסטר VMware,‏ <url> - כתובת שירות VMware,‏ <id> - מזהה קלאסטר VMware,‏ <path> - נתיב מודד ביצועים, <instance> - מופע של מודד ביצועים"
 
-#: include/classes/data/CItemData.php:1233
+#: include/classes/data/CItemData.php:1236
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
 msgstr "מצב קלאסטר VMware,‏ <url> - כתובת שירות VMware,‏ <name> - שם קלאסטר VMware"
 
-#: include/classes/data/CItemData.php:1257
+#: include/classes/data/CItemData.php:1260
 msgid "VMware datacenters and their IDs. Returns JSON"
 msgstr "חוות (datacenters) של VMware והמזהים שלהם. מחזירה JSON"
 
-#: include/classes/data/CItemData.php:1249
-#: include/classes/data/CItemData.php:1305
+#: include/classes/data/CItemData.php:1252
+#: include/classes/data/CItemData.php:1308
 msgid "VMware datastore capacity statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "סטטיסטיקת נפח מאגר הנתונים של VMWare בבתים או באחוזים מהכלל. מחזירה מספר שלם לבתים, שבר עשרוני לאחוזים"
 
-#: include/classes/data/CItemData.php:1241
+#: include/classes/data/CItemData.php:1244
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
 msgstr "רשימת מאגרי הנתונים של ה־Hypervisors של VMware,‏ <url> - כתובת שירות ה־VMware,‏ <datastore> - שם מאגר הנתונים"
 
-#: include/classes/data/CItemData.php:1245
+#: include/classes/data/CItemData.php:1248
 msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
 msgstr "סטטיסטיקת קריאה ממאגרי נתונים של VMware,‏ <url> - כתובת שירות ה־VMware,‏ <datastore> - שם מאגר הנתונים, <mode>‏ - latency/maxlatency - ממוצע או מקסימום"
 
-#: include/classes/data/CItemData.php:1253
+#: include/classes/data/CItemData.php:1256
 msgid "VMware datastore write statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
 msgstr "סטטיסטיקת כתיבה למאגרי נתונים של VMware,‏ <url> - כתובת שירות ה־VMware,‏ <datastore> - שם מאגר הנתונים, <mode>‏ - latency/maxlatency - ממוצע או מקסימום"
 
-#: include/classes/data/CItemData.php:1261
+#: include/classes/data/CItemData.php:1264
 msgid "VMware event log, <url> - VMware service URL, <mode> - all (default), skip - skip processing of older data"
 msgstr "יומן אירועים של VMware,‏ <url> - כתובת שירות VMware,‏ <mode>‏ - all (הכול - בררת מחדל), skip - לדלג על נתונים ישנים"
 
-#: include/classes/data/CItemData.php:1345
+#: include/classes/data/CItemData.php:1348
 msgid "VMware hypervisor BIOS UUID, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "המזהה הייחודי של ה־BIOS של ה־hypervisor של VMware‏, <url> - כתובת שירות VMware,‏ <uuid> - שם המארח של ה־VMware hypervisor"
 
-#: include/classes/data/CItemData.php:1385
+#: include/classes/data/CItemData.php:1388
 msgid "VMware hypervisor HW vendor state sensors, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
-msgstr ""
+msgstr "חיישני מצב יצרן חומרה של VMware hypervisor,‏ <url> - כתובת שירות ה־VMware,‏ <uuid> - שם מארח ה־VMware hypervisor. מחזירה JSON"
 
-#: include/classes/data/CItemData.php:1357
+#: include/classes/data/CItemData.php:1360
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "גודל הזיכרון המנופח של ה־Hypervisor של VMware,‏ <url> - כתובת שירות VMware,‏ <uuid> - שם מארח ה־Hypervisor של VMware"
 
-#: include/classes/data/CItemData.php:1269
+#: include/classes/data/CItemData.php:1272
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "שם הקלאסטר של ה־hypervisor מבית VMware,‏ <url> - כתובת שירות ה־VMware,‏ <uuid> - שם מארח ה־hypervisor מבית VMware"
 
-#: include/classes/data/CItemData.php:1285
+#: include/classes/data/CItemData.php:1288
 msgid "VMware hypervisor datacenter name, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns string"
 msgstr "שם חווה (datacenter) של VMware hypervisor,‏ <url> - כתובת שירות VMware,‏ <uuid> שם מארח של hypervisor של VMWare. מחזירה מחרוזת"
 
-#: include/classes/data/CItemData.php:1301
+#: include/classes/data/CItemData.php:1304
 msgid "VMware hypervisor datastore read statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "סטטיסטיקת הקריאה ממאגר הנתונים של ה־Hypervisor של VMware,‏ <url> - כתובת שירות VMware,‏ <uuid> - שם מארח ה־Hypervisor של VMware,‏ <datastore> - שם מאגר הנתונים, <mode> - עיכוב"
 
-#: include/classes/data/CItemData.php:1309
+#: include/classes/data/CItemData.php:1312
 msgid "VMware hypervisor datastore write statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "סטטיסטיקת הכתיבה למאגר הנתונים של ה־Hypervisor של VMware,‏ <url> - כתובת שירות VMware,‏ <uuid> - שם מארח ה־Hypervisor של VMware,‏ <datastore> - שם מאגר הנתונים, <mode> - עיכוב"
 
-#: include/classes/data/CItemData.php:1293
+#: include/classes/data/CItemData.php:1296
 msgid "VMware hypervisor datastores list, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "רשימת מאגרי הנתונים של ה־Hypervisor של VMware,‏ <url> - כתובת שירות ה־VMware,‏ <uuid> - שם מארח ה־Hypervisor של VMware"
 
-#: include/classes/data/CItemData.php:1381
+#: include/classes/data/CItemData.php:1384
 msgid "VMware hypervisor health state rollup sensor, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
 msgstr "מצב בריאות חיישן rollup של VMware hypervisor,‏ <url> - כתובת שירות VMware,‏ <uuid> - שם מארח של מכונה וירטואלית ב־VMware. מחזירה 0 - אפור, 1 - ירוק, 2 - צהוב, 3 - אדום"
 
-#: include/classes/data/CItemData.php:1341
+#: include/classes/data/CItemData.php:1344
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "דגם hypervisor של VMware,‏ <url> כתובת שירות ה־VMware,‏ <uuid> - שם מארח ה־hypervisor מבית VMware"
 
-#: include/classes/data/CItemData.php:1317
+#: include/classes/data/CItemData.php:1320
 msgid "VMware hypervisor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "שם ה־hypervisor של VMware,‏ <url> כתובת שירות ה־VMware,‏ <uuid> - שם מארח ה־hypervisor מבית VMware"
 
-#: include/classes/data/CItemData.php:1365
+#: include/classes/data/CItemData.php:1368
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "סטטיסטיקת קלט הרשת של ה־hypervisor של VMware,‏ <url> כתובת שירות ה־VMware,‏ <uuid> - שם מארח ה־hypervisor מבית VMware,‏ <mode>‏ - bps/בתים לשנייה"
 
-#: include/classes/data/CItemData.php:1369
+#: include/classes/data/CItemData.php:1372
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "סטטיסטיקת פלט הרשת של ה־hypervisor של VMware,‏ <url> כתובת שירות ה־VMware,‏ <uuid> - שם מארח ה־hypervisor מבית VMware,‏ <mode>‏ - bps/בתים לשנייה"
 
-#: include/classes/data/CItemData.php:1373
+#: include/classes/data/CItemData.php:1376
 msgid "VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "מודד הביצועים של ה־hypervisor של VMware,‏ <url> כתובת שירות ה־VMware,‏ <uuid> - שם מארח ה־hypervisor מבית VMware,‏ <path> - נתיב מודד ביצועים, <instance> - מופע מודד ביצועים"
 
-#: include/classes/data/CItemData.php:1321
+#: include/classes/data/CItemData.php:1324
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "תדירות מעבד ה־hypervisor של VMware,‏ <url> כתובת שירות ה־VMware,‏ <uuid> - שם מארח ה־hypervisor מבית VMware"
 
-#: include/classes/data/CItemData.php:1325
+#: include/classes/data/CItemData.php:1328
 msgid "VMware hypervisor processor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "דגם מעבד של ה־hypervisor מבית VMware,‏ <url> כתובת שירות ה־VMware,‏ <uuid> - שם מארח ה־hypervisor מבית VMware"
 
-#: include/classes/data/CItemData.php:1277
+#: include/classes/data/CItemData.php:1280
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "ניצול תהליך hypervisor של VMware בהרץ,‏ <url> כתובת שירות ה־VMware,‏ <uuid> - שם מארח ה־hypervisor מבית VMware"
 
-#: include/classes/data/CItemData.php:1389
+#: include/classes/data/CItemData.php:1392
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "מצב ה־hypervisor של VMware,‏ <url> כתובת שירות ה־VMware,‏ <uuid> - שם מארח ה־hypervisor מבית VMware"
 
-#: include/classes/data/CItemData.php:1337
+#: include/classes/data/CItemData.php:1340
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "סך כל גודל הזיכרון ב־hypervisor של VMware,‏ <url> כתובת שירות ה־VMware,‏ <uuid> - שם מארח ה־hypervisor מבית VMware"
 
-#: include/classes/data/CItemData.php:1393
+#: include/classes/data/CItemData.php:1396
 msgid "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "זמן פעולה של ה־hypervisor של VMware,‏ <url> כתובת שירות ה־VMware,‏ <uuid> - שם מארח ה־hypervisor מבית VMware"
 
-#: include/classes/data/CItemData.php:1361
+#: include/classes/data/CItemData.php:1364
 msgid "VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "הזיכרון המנוצל ב־hypervisor של VMware,‏ <url> כתובת שירות ה־VMware,‏ <uuid> - שם מארח ה־hypervisor מבית VMware"
 
-#: include/classes/data/CItemData.php:1349
+#: include/classes/data/CItemData.php:1352
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "שם יצרן ה־hypervisor של VMware,‏ <url> כתובת שירות ה־VMware,‏ <uuid> - שם מארח ה־hypervisor מבית VMware"
 
-#: include/classes/data/CItemData.php:1397
+#: include/classes/data/CItemData.php:1400
 msgid "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "גרסת hypervisor של VMware,‏ <url> כתובת שירות ה־VMware,‏ <uuid> - שם מארח ה־hypervisor מבית VMware"
 
-#: include/classes/data/CItemData.php:1265
+#: include/classes/data/CItemData.php:1268
 msgid "VMware service full name, <url> - VMware service URL"
 msgstr "שם מלא של שירות ה־VMware,‏ <url> - כתובת שירות ה־VMware"
 
-#: include/classes/data/CItemData.php:1405
+#: include/classes/data/CItemData.php:1408
 msgid "VMware service version, <url> - VMware service URL"
 msgstr "גרסת שירות ה־VMware,‏ <url> - כתובת שירות ה־VMware"
 
-#: include/classes/data/CItemData.php:1461
+#: include/classes/data/CItemData.php:1464
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "גודל הזיכרון המיותר המיועד להחזרה למארח במכונה וירטואלית ב־VMware,‏ <url> כתובת שירות ה־VMware,‏ <uuid> שם המארח של המכונה הווירטואלית ב־VMware"
 
-#: include/classes/data/CItemData.php:1525
+#: include/classes/data/CItemData.php:1528
 msgid "VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "שטח האחסון הבלתי מוקצה במכונה וירטואלית ב־VMware,‏ <url> כתובת שירות ה־VMware,‏ <uuid> שם המארח של המכונה הווירטואלית ב־VMware"
 
-#: include/classes/data/CItemData.php:1465
+#: include/classes/data/CItemData.php:1468
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "גודל זיכרון דחוס של מכונה וירטואלית ב־VMware,‏ <url> כתובת שירות ה־VMware,‏ <uuid> שם המארח של המכונה הווירטואלית ב־VMware"
 
-#: include/classes/data/CItemData.php:1441
+#: include/classes/data/CItemData.php:1444
 msgid "VMware virtual machine datacenter name, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns string"
 msgstr "שם של חוות (datacenter) של מכונה וירטואליתVMware,‏ <url> - כתובת שירותVMware,‏ <uuid> - שם מארח המכונה הווירטואלית ב־VMware. מחזירה מחרוזת"
 
-#: include/classes/data/CItemData.php:1561
+#: include/classes/data/CItemData.php:1564
 msgid "VMware virtual machine disk device read statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "סטטיסטיקת קריאה מהתקן כונן של מכונה וירטואלית ב־VMware,‏ <url> - כתובת שירות VMware,‏ <uuid> - שם המארח של המכונה הווירטואלית ב־VMware,‏ <instance> - מופע של התקן כונן, <mode> - ‏(bps/‏ops) בתים / פעולות לשנייה"
 
-#: include/classes/data/CItemData.php:1565
+#: include/classes/data/CItemData.php:1568
 msgid "VMware virtual machine disk device write statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "סטטיסטיקת כתיבה להתקן כונן של מכונה וירטואלית של VMware,‏ <url> - כתובת שירות ה־VMware,‏ <uuid> - שם מארח המכונה הווירטואלית ב־VMware,‏ <instance> - מופע של התקן כונן, <mode>‏ - bps/ops - בתים/פעולות לשנייה"
 
-#: include/classes/data/CItemData.php:1573
+#: include/classes/data/CItemData.php:1576
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
 msgstr "סטטיסטיקת מערכת קבצים של המכונה הווירטואלית ב־VMware,‏ <url> - כתובת שירות VMware,‏ <uuid> - שם מארח של מכונה וירטואלית ב־VMware,‏ <fsname> - שם מערכת הקבצים, <mode>‏ - total/free/used/pfree/pused (סך הכול/פנוי/מנוצל/אחוזים פנויים/אחוזים מנוצלים)"
 
-#: include/classes/data/CItemData.php:1485
+#: include/classes/data/CItemData.php:1488
 msgid "VMware virtual machine guest memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "ניצולת זיכרון של אורח במכונה וירטואלית ב־VMware,‏ <url> - כתובת שירות VMware,‏ <uuid> - שם מארח של מכונה וירטואלית ב־VMware"
 
-#: include/classes/data/CItemData.php:1489
+#: include/classes/data/CItemData.php:1492
 msgid "VMware virtual machine host memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "ניצולת זיכרון של מארח מכונות וירטואליות ב־VMware,‏ <url> - כתובת שירות VMware,‏ <uuid> - שם מארח של מכונה וירטואלית ב־VMware"
 
-#: include/classes/data/CItemData.php:1457
+#: include/classes/data/CItemData.php:1460
 msgid "VMware virtual machine hypervisor name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "שם ה־hypervisor של מכונה וירטואלית ב־VMware,‏ <url> כתובת שירות ה־VMware,‏ <uuid> - שם מארח ה־hypervisor מבית VMware"
 
-#: include/classes/data/CItemData.php:1409
+#: include/classes/data/CItemData.php:1412
 msgid "VMware virtual machine name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "שם מכונה וירטואלית ב־VMware,‏ <url> - כתובת שירות ה־VMware,‏ <uuid> - מכונה וירטואלית ב־VMware"
 
-#: include/classes/data/CItemData.php:1505
+#: include/classes/data/CItemData.php:1508
 msgid "VMware virtual machine network interface input statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "סטטיסטיקת קלט מנשק רשת של מכונה וירטואלית ב־VMware,‏ <url> - כתובת שירות ה־VMware,‏ <uuid> - מכונה וירטואלית ב־VMware,‏ <instance> - מופע של מנשק רשת, <mode>‏ - bps/pps - בתים/חבילות לשנייה"
 
-#: include/classes/data/CItemData.php:1509
+#: include/classes/data/CItemData.php:1512
 msgid "VMware virtual machine network interface output statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "סטטיסטיקת פלט מנשק רשת של מכונה וירטואלית ב־VMware,‏ <url> - כתובת שירות ה־VMware,‏ <uuid> - מכונה וירטואלית ב־VMware,‏ <instance> - מופע של מנשק רשת, <mode>‏ - bps/pps - בתים/חבילות לשנייה"
 
-#: include/classes/data/CItemData.php:1517
+#: include/classes/data/CItemData.php:1520
 msgid "VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "מדד ביצועים למכונה וירטואלית של VMware,‏ <url> - כתובת שירות ה־VMware,‏ <uuid> - שם מארח המכונה הווירטואלית ב־VMware,‏ <path> - נתיב מדד הביצועים, <instance> - מופע מדד הביצועים"
 
-#: include/classes/data/CItemData.php:1521
+#: include/classes/data/CItemData.php:1524
 msgid "VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "מצב ההפעלה של מכונה וירטואלית ב־VMware,‏ <url> - כתובת שירות ה־VMware,‏ <uuid> - שם המארח של המכונה הווירטואלית ב־VMware"
 
-#: include/classes/data/CItemData.php:1473
+#: include/classes/data/CItemData.php:1476
 msgid "VMware virtual machine private memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "גודל זיכרון פרטי של מכונה וירטואלית ב־VMware,‏ <url> - כתובת שירות ה־VMware,‏ <uuid> - שם המארח של המכונה הווירטואלית ב־VMware"
 
-#: include/classes/data/CItemData.php:1425
+#: include/classes/data/CItemData.php:1428
 msgid "VMware virtual machine processor ready time ms, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "זמן במילישניות של זמן המתנת מעבד במכונה וירטואלית ב־VMware,‏ <url> - כתובת שירות ה־VMware,‏ <uuid> - שם המארח של המכונה הווירטואלית ב־VMware"
 
-#: include/classes/data/CItemData.php:1437
+#: include/classes/data/CItemData.php:1440
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "ניצולת מעבד במכונה וירטואלית של VMWare בהרץ (Hz), <url> - כתובת שירות ה־VMware,‏ <uuid> - שם המארח של המכונה הווירטואלית ב־VMware"
 
-#: include/classes/data/CItemData.php:1477
+#: include/classes/data/CItemData.php:1480
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "גודל זיכרון שיתופי במכונה וירטואלית של VMware,‏ <url> - כתובת שירות ה־VMware,‏ <uuid> - שם המארח של המכונה הווירטואלית ב־VMware"
 
-#: include/classes/data/CItemData.php:1481
+#: include/classes/data/CItemData.php:1484
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "גודל זיכרון החלפה במכונה וירטואלית של VMware,‏ <url> - כתובת שירות ה־VMware,‏ <uuid> - שם המארח של המכונה הווירטואלית ב־VMware"
 
-#: include/classes/data/CItemData.php:1493
+#: include/classes/data/CItemData.php:1496
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "גודל זיכרון כולל במכונה וירטואלית של VMware,‏ <url> - כתובת שירות ה־VMware,‏ <uuid> - שם המארח של המכונה הווירטואלית ב־VMware"
 
-#: include/classes/data/CItemData.php:1541
+#: include/classes/data/CItemData.php:1544
 msgid "VMware virtual machine uncommitted storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "נפח אחסון בלתי מוקצה במכונה וירטואלית של VMware,‏ <url> - כתובת שירות ה־VMware,‏ <uuid> - שם המארח של המכונה הווירטואלית ב־VMware"
 
-#: include/classes/data/CItemData.php:1545
+#: include/classes/data/CItemData.php:1548
 msgid "VMware virtual machine unshared storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "נפח אחסון בלתי משותף במכונה וירטואלית של VMware,‏ <url> - כתובת שירות ה־VMware,‏ <uuid> - שם המארח של המכונה הווירטואלית ב־VMware"
 
-#: include/classes/data/CItemData.php:1553
+#: include/classes/data/CItemData.php:1556
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "זמן הפעילות של מכונה וירטואלית של VMware,‏ <url> - כתובת שירות ה־VMware,‏ <uuid> - שם המארח של המכונה הווירטואלית ב־VMware"
 
-#: include/classes/data/CItemData.php:1353
+#: include/classes/data/CItemData.php:1356
 msgid "VVMware hypervisor maintenance status, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns 0 - not in maintenance; 1 - in maintenance"
-msgstr ""
+msgstr "מצב תחזוקת VMware hypervisor,‏ <url> - כתובת שירות ה־VMware,‏ <uuid> - שם מארח ה־VMware hypervisor. מחזירה 0 - לא במצב תחזוקה, 1 - במצב תחזוקה"
 
 #: app/views/administration.miscconfig.edit.php:104
 msgid "Valid URI schemes"
@@ -18706,6 +18750,7 @@ msgstr "אימות"
 #: app/controllers/CControllerPopupValueMapUpdate.php:117
 #: app/controllers/CControllerPopupValueMapUpdate.php:124
 #: app/controllers/CControllerPopupValueMapUpdate.php:136
+#: app/partials/administration.system.info.php:30
 #: app/partials/configuration.tags.tab.php:40
 #: app/partials/configuration.valuemap.php:32
 #: app/partials/hostmacros.list.html.php:36
@@ -18733,7 +18778,7 @@ msgstr "אימות"
 #: app/views/popup.massupdate.trigger.php:84
 #: app/views/popup.service.edit.php:65 app/views/popup.service.edit.php:271
 #: app/views/popup.testtriggerexpr.php:31 app/views/popup.valuemap.edit.php:51
-#: include/blocks.inc.php:525 include/classes/graphdraw/CPieGraphDraw.php:309
+#: include/classes/graphdraw/CPieGraphDraw.php:309
 #: include/classes/screens/CScreenHistory.php:279
 #: include/classes/screens/CScreenHistory.php:393
 #: include/views/configuration.host.discovery.edit.php:133
@@ -18778,11 +18823,11 @@ msgstr "הערך %1$s הוא שגוי עבור המשתנה „grid_show” (ה�
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is %4$d characters."
 msgstr "הערך %1$s\" ארוך מדי לשדה „%2$s”‏ - %3$d תווים. האורך המותר הוא %4$d תווים."
 
-#: include/classes/data/CItemData.php:1729
+#: include/classes/data/CItemData.php:1732
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
 msgstr "יעילות זכרון המטמון של הערכים. המשתנים האפשריים הם: requests,‏ hits ו־misses (בקשות, פגיעות והחמצות בהתאמה)."
 
-#: include/classes/data/CItemData.php:1725
+#: include/classes/data/CItemData.php:1728
 msgid "Value cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "סטטיסטיקת זכרון המטמון של הערכים. המשתנים האפשריים הם: total,‏ free,‏ pfree,‏ used ו־pused (סך הכול, פנוי, אחוז פנוי, מנוצל ואחוז מנוצל בהתאמה)."
 
@@ -18790,7 +18835,7 @@ msgstr "סטטיסטיקת זכרון המטמון של הערכים. המשתנ
 msgid "Value cannot be empty."
 msgstr "הערך לא יכול להיות ריק."
 
-#: app/controllers/CControllerAuditLogList.php:245
+#: app/controllers/CControllerAuditLogList.php:246
 msgid "Value map"
 msgstr "מפת ערכים"
 
@@ -18819,15 +18864,15 @@ msgstr "מיפוי ערכים"
 msgid "Value mappings"
 msgstr "מיפויי ערכים"
 
-#: include/classes/data/CItemData.php:917
+#: include/classes/data/CItemData.php:920
 msgid "Value of MQTT topic. Format of returned data depends on the topic content. If wildcards are used, returns topic values in JSON"
 msgstr "ערך של נושא MQTT. תצורת הנתונים המוחזרים תלוי התוכן הנושא. אם נעשה שימוש בתווי הכללה, מחזירה את ערכי הנושא ב־JSON"
 
-#: include/classes/data/CItemData.php:993
+#: include/classes/data/CItemData.php:996
 msgid "Value of any Windows performance counter in English. Returns integer, float, string or text (depending on the request)"
 msgstr "ערך של כל מונה ביצועים של Windows באנגלית. מחזירה מספר שלם, שבר עשרוני, מחרוזת או טקסט (בהתאם לבקשה)"
 
-#: include/classes/data/CItemData.php:989
+#: include/classes/data/CItemData.php:992
 msgid "Value of any Windows performance counter. Returns integer, float, string or text (depending on the request)"
 msgstr "ערך של מונה ביצועים כלשהו של Windows. מחזירה מספר שלם, שבר עשרוני, מחרוזת או טקסט (בהתאם לבקשה)"
 
@@ -18868,22 +18913,22 @@ msgstr "בשדות הטופס אסור להשתמש בערכים ללא שמות
 msgid "Variables"
 msgstr "משתנים"
 
-#: include/classes/data/CItemData.php:1017
+#: include/classes/data/CItemData.php:1020
 msgid "Various information about specific process(es). Returns float"
 msgstr "מידע מגוון על תהליך/ים מסוים/ים. מחזירה שבר עשרוני"
 
-#: include/classes/setup/CSetupWizard.php:335
-#: include/classes/setup/CSetupWizard.php:519
+#: include/classes/setup/CSetupWizard.php:502
+#: include/classes/setup/CSetupWizard.php:682
 msgid "Vault API endpoint"
 msgstr "נקודת הגישה ל־API של הכספת"
 
-#: include/classes/setup/CSetupWizard.php:350
-#: include/classes/setup/CSetupWizard.php:525
+#: include/classes/setup/CSetupWizard.php:515
+#: include/classes/setup/CSetupWizard.php:690
 msgid "Vault authentication token"
 msgstr "אסימון אימות כספת"
 
-#: include/classes/core/ZBase.php:228
-#: include/classes/setup/CSetupWizard.php:902 include/config.inc.php:53
+#: include/classes/core/ZBase.php:231
+#: include/classes/setup/CSetupWizard.php:191 include/config.inc.php:53
 msgid "Vault connection failed."
 msgstr "החיבור לכספת נכשל."
 
@@ -18891,8 +18936,8 @@ msgstr "החיבור לכספת נכשל."
 msgid "Vault secret"
 msgstr "סוד לכספת"
 
-#: include/classes/setup/CSetupWizard.php:342
-#: include/classes/setup/CSetupWizard.php:522
+#: include/classes/setup/CSetupWizard.php:508
+#: include/classes/setup/CSetupWizard.php:686
 msgid "Vault secret path"
 msgstr "נתיב סודי לכספת"
 
@@ -18904,7 +18949,7 @@ msgstr "יצרן"
 msgid "Verbose"
 msgstr "מפורט"
 
-#: include/classes/setup/CSetupWizard.php:382
+#: include/classes/setup/CSetupWizard.php:546
 msgid "Verify database certificate"
 msgstr "אימות אישור מסד נתונים"
 
@@ -18913,11 +18958,11 @@ msgstr "אימות אישור מסד נתונים"
 msgid "Version"
 msgstr "גרסה"
 
-#: include/classes/data/CItemData.php:837
+#: include/classes/data/CItemData.php:840
 msgid "Version of Zabbix agent. Returns string"
 msgstr "גרסת שרת Zabbix. מחזירה מחרוזת"
 
-#: include/classes/data/CItemData.php:1733
+#: include/classes/data/CItemData.php:1736
 msgid "Version of Zabbix server or proxy"
 msgstr "גרסת שרת ה־Zabbix או המתווך"
 
@@ -18946,7 +18991,7 @@ msgstr "תצוגה"
 msgid "View as"
 msgstr "הצגה בתור"
 
-#: include/classes/data/CItemData.php:1221
+#: include/classes/data/CItemData.php:1224
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "גודל נפח וירטואלי באחוזים מהכלל. מחזירה מספר שלם לבתים, שבר עשרוני לאחוזים"
 
@@ -18979,7 +19024,7 @@ msgstr "ד׳"
 msgid "Warning"
 msgstr "אזהרה"
 
-#: include/classes/setup/CSetupWizard.php:249
+#: include/classes/setup/CSetupWizard.php:421
 msgctxt "setup"
 msgid "Warning"
 msgstr "אזהרה"
@@ -18988,7 +19033,7 @@ msgstr "אזהרה"
 msgid "Warning message"
 msgstr "הודעת אזהרה"
 
-#: include/blocks.inc.php:649
+#: app/partials/administration.system.info.php:159
 #, c-format
 msgid "Warning! Unsupported %1$s database server version. Should be at least (%2$s)"
 msgstr "אזהרה! גרסת שרת מסד נתונים %1$s אינה נתמכת. עליה להיות לפחות (%2$s)"
@@ -19021,7 +19066,7 @@ msgstr "אינטרנט"
 msgid "Web monitoring"
 msgstr "מעקב אחר עמוד אינטרנט"
 
-#: app/controllers/CControllerAuditLogList.php:234
+#: app/controllers/CControllerAuditLogList.php:235
 msgid "Web scenario"
 msgstr "תרחיש אינטרנט"
 
@@ -19093,11 +19138,11 @@ msgstr "שבועי"
 msgid "Weight"
 msgstr "משקל"
 
-#: include/classes/setup/CSetupWizard.php:45
+#: include/classes/setup/CSetupWizard.php:54
 msgid "Welcome"
 msgstr "ברוך בואך"
 
-#: include/classes/setup/CSetupWizard.php:181
+#: include/classes/setup/CSetupWizard.php:353
 msgid "Welcome to"
 msgstr "ברוך בואך אל"
 
@@ -19363,6 +19408,7 @@ msgstr "שנה"
 msgid "Yearly"
 msgstr "שנתי"
 
+#: app/partials/administration.system.info.php:35
 #: app/partials/configuration.filter.items.php:194
 #: app/partials/configuration.filter.items.php:201
 #: app/partials/configuration.filter.items.php:210
@@ -19376,8 +19422,8 @@ msgstr "שנתי"
 #: app/views/popup.massupdate.item.php:336
 #: app/views/popup.massupdate.item.php:378
 #: app/views/popup.massupdate.trigger.php:65 include/actions.inc.php:32
-#: include/blocks.inc.php:532 include/blocks.inc.php:855
-#: include/blocks.inc.php:859 include/classes/screens/CScreenProblem.php:1099
+#: include/blocks.inc.php:703 include/blocks.inc.php:707
+#: include/classes/screens/CScreenProblem.php:1099
 #: include/classes/screens/CScreenProblem.php:1103
 #: include/classes/screens/CScreenProblem.php:1245 include/events.inc.php:198
 #: include/events.inc.php:202 include/events.inc.php:392
@@ -19398,7 +19444,7 @@ msgstr "שנתי"
 msgid "Yes"
 msgstr "כן"
 
-#: include/classes/screens/CScreenProblem.php:709 include/func.inc.php:2542
+#: include/classes/screens/CScreenProblem.php:709 include/func.inc.php:2399
 msgid "Yesterday"
 msgstr "אתמול"
 
@@ -19409,7 +19455,7 @@ msgstr "נכנסת בשם „%1$s“."
 
 #: app/views/administration.gui.edit.php:66
 #: app/views/administration.user.edit.php:233
-#: include/classes/setup/CSetupWizard.php:219
+#: include/classes/setup/CSetupWizard.php:391
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "אין לך אפשרות לבחור בחלק מהשפות כיוון שההגדרות עבורן אינן מותקנות בשרת."
 
@@ -19427,6 +19473,7 @@ msgid "You did not specify targets for action operation global script \"%1$s\"."
 msgstr "לא ציינת יעדים לסקריפט גלובלי לפעילויות פעולות „%1$s”."
 
 #: include/classes/api/services/CAuditLog.php:73
+#: include/classes/api/services/CHaNode.php:45
 #: include/classes/api/services/CHost.php:848
 #: include/classes/api/services/CHost.php:913
 #: include/classes/api/services/CMaintenance.php:535
@@ -19503,11 +19550,10 @@ msgid "Zabbix login form"
 msgstr "טופס כניסה ל־Zabbix"
 
 #: app/views/administration.script.edit.php:125
-#: include/classes/setup/CSetupWizard.php:556
 msgid "Zabbix server"
 msgstr "שרת Zabbix"
 
-#: include/classes/server/CZabbixServer.php:584
+#: include/classes/server/CZabbixServer.php:600
 #, c-format
 msgid ""
 "Zabbix server \"%1$s\" cannot be reached. Possible reasons:\n"
@@ -19522,26 +19568,18 @@ msgstr ""
 msgid "Zabbix server (proxy)"
 msgstr "שרת Zabbix (מתווך)"
 
-#: include/classes/setup/CSetupWizard.php:57
-#: include/classes/setup/CSetupWizard.php:456
-msgid "Zabbix server details"
-msgstr "פרטי שרת ה־Zabbix"
-
-#: jsrpc.php:82
+#: jsrpc.php:91
 msgid "Zabbix server is not running: the information displayed may not be current."
 msgstr "שרת ה־Zabbix אינו פעיל: יכול להיות שהמידע המוצג אינו עדכני."
 
-#: include/blocks.inc.php:531
+#: app/partials/administration.system.info.php:34
 msgid "Zabbix server is running"
 msgstr "שרת ה־Zabbix פעיל"
 
-#: include/classes/setup/CSetupWizard.php:560
+#: include/classes/setup/CSetupWizard.php:602
+#: include/classes/setup/CSetupWizard.php:733
 msgid "Zabbix server name"
 msgstr "שם שרת ה־Zabbix"
-
-#: include/classes/setup/CSetupWizard.php:557
-msgid "Zabbix server port"
-msgstr "פתחת שרת ה־Zabbix"
 
 #: include/items.inc.php:92
 msgid "Zabbix trapper"
@@ -20133,7 +20171,7 @@ msgstr "ימים"
 #: app/controllers/CControllerMapView.php:123
 #: app/partials/js/configuration.valuemap.js.php:156
 #: app/views/popup.generic.php:599 app/views/popup.valuemap.edit.php:83
-#: include/classes/setup/CSetupWizard.php:497
+#: include/classes/setup/CSetupWizard.php:639
 #: include/classes/widgets/CWidgetHelper.php:69
 msgid "default"
 msgstr "בררת מחדל"
@@ -20928,7 +20966,7 @@ msgstr "אחר"
 msgid "output"
 msgstr "פלט"
 
-#: include/classes/setup/CSetupWizard.php:344
+#: include/classes/setup/CSetupWizard.php:510
 msgid "path/to/secret"
 msgstr "נתיב/אל/סוד"
 
