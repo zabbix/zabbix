@@ -3383,6 +3383,19 @@ class CAction extends CApiService {
 			}
 		}
 
+		if ($operationids['opcommand_hst']) {
+			$options = [
+				'output' => ['opcommand_hstid', 'operationid', 'hostid'],
+				'filter' => ['operationid' => array_keys($operationids['opcommand_hst'])]
+			];
+			$db_opcommand_hsts = DBselect(DB::makeSql('opcommand_hst', $options));
+
+			while ($db_opcommand_hst = DBfetch($db_opcommand_hsts)) {
+				$db_opdata[$db_opcommand_hst['operationid']]['opcommand_hst'][$db_opcommand_hst['opcommand_hstid']] =
+					array_diff_key($db_opcommand_hst, array_flip(['operationid']));
+			}
+		}
+
 		if ($operationids['opgroup']) {
 			$options = [
 				'output' => ['opgroupid', 'operationid', 'groupid'],
