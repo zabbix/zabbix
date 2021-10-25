@@ -150,7 +150,9 @@ if (hasRequest('add') || hasRequest('update')) {
 				}
 			}
 			elseif ($operation_group === 'recovery_operations') {
-				unset($operation['opmessage']['mediatypeid']);
+				if ($operation['operationtype'] != OPERATION_TYPE_MESSAGE) {
+					unset($operation['opmessage']['mediatypeid']);
+				}
 
 				if ($operation['operationtype'] == OPERATION_TYPE_COMMAND) {
 					unset($operation['opmessage']);
