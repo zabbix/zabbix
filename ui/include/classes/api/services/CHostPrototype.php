@@ -1925,7 +1925,7 @@ class CHostPrototype extends CHostBase {
 																['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
 										]]
 								]],
-								['else' => true, 'type' => API_OBJECT, 'fields' => []]
+								['else' => true, 'type' => API_UNEXPECTED]
 				]]
 			]],
 			['else' => true, 'type' => API_OBJECT, 'fields' => []]
