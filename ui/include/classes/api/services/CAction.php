@@ -688,7 +688,7 @@ class CAction extends CApiService {
 		$upd_actions = [];
 
 		foreach ($actions as &$action) {
-			if (!array_key_exists('filter', $action)) {
+			if (!array_key_exists('filter', $action) || !array_key_exists('conditions', $action['filter'])) {
 				continue;
 			}
 
