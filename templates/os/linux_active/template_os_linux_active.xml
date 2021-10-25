@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-10-21T06:23:05Z</date>
+   <date>2021-10-25T13:39:34Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -1806,7 +1806,7 @@ and {Template Module Linux network interfaces by Zabbix agent active:net.if.out[
             </macro>
             <macro>
                <macro>{$NET.IF.IFNAME.NOT_MATCHES}</macro>
-               <value>(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9a-z]+$|docker[0-9]+|br-[a-z0-9]{12})</value>
+               <value>(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9A-z]+$|docker[0-9]+|br-[a-z0-9]{12})</value>
                <description>Filter out loopbacks, nulls, docker veth links and docker0 bridge by default</description>
             </macro>
          </macros>
