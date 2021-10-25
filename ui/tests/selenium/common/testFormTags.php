@@ -736,7 +736,33 @@ class testFormTags extends CWebTest {
 		$this->query('link', $this->clone_name)->waitUntilClickable()->one()->click();
 
 		// Get tags of object.
-		$form = $this->query('xpath://main/form')->asForm()->waitUntilPresent()->one();
+		switch ($object) {
+			case 'trigger':
+				$form_selector = 'id:triggers-form';
+				break;
+
+			case 'item':
+				$form_selector = 'id:item-form';
+				break;
+
+			case 'web scenario':
+				$form_selector = 'id:http-form';
+				break;
+
+			case 'host prototype':
+				$form_selector = 'id:host-prototype-form';
+				break;
+
+			case 'item prototype':
+				$form_selector = 'id:item-prototype-form';
+				break;
+
+			case 'trigger prototype':
+				$form_selector = 'id:triggers-prototype-form';
+				break;
+			}
+
+		$form = $this->query($form_selector)->asForm()->waitUntilPresent()->one();
 		$form->selectTab('Tags');
 		$element = $this->query('id:tags-table')->asMultifieldTable()->one();
 		$tags = $element->getValue();
@@ -749,9 +775,10 @@ class testFormTags extends CWebTest {
 			$form = $this->query('id:host-form')->asForm()->waitUntilPresent()->one();
 		}
 
-		$form->fill([$parent.' name' => $new_name]);
+		$template_form = $this->query('id:templates-form')->asForm()->waitUntilPresent()->one();
+		$template_form->fill([$parent.' name' => $new_name]);
 		$this->query('button:Full clone')->one()->click();
-		$form->submit();
+		$template_form->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, $parent.' added');
 
