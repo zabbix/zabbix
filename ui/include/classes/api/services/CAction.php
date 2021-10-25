@@ -2414,7 +2414,7 @@ class CAction extends CApiService {
 		self::addAffectedObjects($actions, $db_actions);
 
 		self::checkFilter($actions);
-		self::checkOperations($actions, 'update', $db_actions);
+		self::checkOperations($actions, $db_actions);
 
 		self::checkMediatypesPermissions($actions);
 		self::checkScriptsPermissions($actions);
@@ -3190,7 +3190,11 @@ class CAction extends CApiService {
 				}
 			}
 
-			foreach (array_intersect_key(array_flip(self::OPERATION_GROUPS), $action) as $operation_group) {
+			if (!array_intersect_key(array_flip(self::OPERATION_GROUPS), $action)) {
+				continue;
+			}
+
+			foreach (self::OPERATION_GROUPS as $operation_group) {
 				$actionids['operations'][$action['actionid']] = true;
 				$db_actions[$action['actionid']][$operation_group] = [];
 			}
