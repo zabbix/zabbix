@@ -1309,8 +1309,7 @@ class CHostPrototype extends CHostBase {
 	 */
 	private static function checkMainInterfaces(array $host_prototypes): void {
 		foreach ($host_prototypes as $host_prototype) {
-			if ($host_prototype['custom_interfaces'] == HOST_PROT_INTERFACES_INHERIT
-					|| !array_key_exists('interfaces', $host_prototype)) {
+			if ($host_prototype['custom_interfaces'] != HOST_PROT_INTERFACES_CUSTOM) {
 				continue;
 			}
 
@@ -1318,17 +1317,12 @@ class CHostPrototype extends CHostBase {
 
 			foreach ($host_prototype['interfaces'] as $interface) {
 				if (!array_key_exists($interface['type'], $interface_types)) {
-					$interface_types[$interface['type']] = ['main' => 0, 'all' => 0];
+					$interface_types[$interface['type']] = [INTERFACE_PRIMARY => 0, INTERFACE_SECONDARY => 0];
 				}
 
-				if ($interface['main'] == INTERFACE_PRIMARY) {
-					$interface_types[$interface['type']]['main']++;
-				}
-				else {
-					$interface_types[$interface['type']]['all']++;
-				}
+				$interface_types[$interface['type']][$interface['main']]++;
 
-				if ($interface_types[$interface['type']]['main'] > 1) {
+				if ($interface_types[$interface['type']][INTERFACE_PRIMARY] > 1) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_('Host prototype cannot have more than one default interface of the same type.')
 					);
@@ -1336,7 +1330,7 @@ class CHostPrototype extends CHostBase {
 			}
 
 			foreach ($interface_types as $type => $counters) {
-				if ($counters['all'] && !$counters['main']) {
+				if ($counters[INTERFACE_SECONDARY] > 0 && $counters[INTERFACE_PRIMARY] == 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No default interface for "%1$s" type on "%2$s".',
 						hostInterfaceTypeNumToName($type), $host_prototype['name']
 					));
