@@ -111,16 +111,21 @@ class CWidgetHelper {
 	 * Creates label linked to the field.
 	 *
 	 * @param CWidgetField $field
+	 * @param mixed        $hint
 	 *
 	 * @return CLabel
 	 */
-	public static function getLabel($field) {
+	public static function getLabel($field, $hint = null) {
 		if ($field instanceof CWidgetFieldSelect) {
 			return (new CLabel($field->getLabel(), 'label-'.$field->getName()))
 				->setAsteriskMark(self::isAriaRequired($field));
 		}
 
-		return (new CLabel($field->getLabel(), $field->getName()))
+		$help_icon = ($hint !== null)
+			? makeHelpIcon($hint)
+			: null;
+
+		return (new CLabel([$field->getLabel(), $help_icon], $field->getName()))
 			->setAsteriskMark(self::isAriaRequired($field));
 	}
 
@@ -137,6 +142,18 @@ class CWidgetHelper {
 			->addOptions(CSelect::createOptionsFromArray($field->getValues()))
 			->setDisabled($field->getFlags() & CWidgetField::FLAG_DISABLED)
 			->setAriaRequired(self::isAriaRequired($field));
+	}
+
+	/**
+	 * @param CWidgetFieldTextArea $field
+	 *
+	 * @return CTextBox
+	 */
+	public static function getTextArea($field) {
+		return (new CTextArea($field->getName(), $field->getValue()))
+			->setAriaRequired(self::isAriaRequired($field))
+			->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
+			->setWidth($field->getWidth());
 	}
 
 	/**
@@ -216,6 +233,16 @@ class CWidgetHelper {
 			->setLabel($field->getCaption())
 			->onChange($field->getAction())
 		];
+	}
+
+	/**
+	 * @param CWidgetFieldColor $field
+	 *
+	 * @return CColor
+	 */
+	public static function getColor($field) {
+		// appendColorPickerJs(false), because the script reponsible for it is in witget.item.form.view.
+		return (new CColor($field->getName(), $field->getValue()))->appendColorPickerJs(false);
 	}
 
 	/**
@@ -447,12 +474,18 @@ class CWidgetHelper {
 
 	/**
 	 * @param CWidgetFieldCheckBoxList $field
-	 * @param array                    $list  Option list array.
+	 * @param array                    $list        Option list array.
+	 * @param array                    $class_list  List of additional CSS classes.
 	 *
 	 * @return CList
 	 */
-	public static function getCheckBoxList($field, array $list) {
+	public static function getCheckBoxList($field, array $list, array $class_list = []) {
 		$checkbox_list = (new CList())->addClass(ZBX_STYLE_LIST_CHECK_RADIO);
+		if ($class_list) {
+			foreach ($class_list as $class) {
+				$checkbox_list->addClass($class);
+			}
+		}
 
 		foreach ($list as $key => $label) {
 			$checkbox_list->addItem(

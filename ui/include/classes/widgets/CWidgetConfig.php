@@ -48,6 +48,7 @@ class CWidgetConfig {
 			WIDGET_DISCOVERY			=> _('Discovery status'),
 			WIDGET_FAV_GRAPHS			=> _('Favorite graphs'),
 			WIDGET_FAV_MAPS				=> _('Favorite maps'),
+			WIDGET_ITEM					=> _('Item'),
 			WIDGET_GRAPH				=> _('Graph (classic)'),
 			WIDGET_GRAPH_PROTOTYPE		=> _('Graph prototype'),
 			WIDGET_HOST_AVAIL			=> _('Host availability'),
@@ -89,6 +90,7 @@ class CWidgetConfig {
 			WIDGET_DISCOVERY			=> 'CWidget',
 			WIDGET_FAV_GRAPHS			=> 'CWidget',
 			WIDGET_FAV_MAPS				=> 'CWidget',
+			WIDGET_ITEM					=> 'CWidget',
 			WIDGET_GRAPH				=> 'CWidgetGraph',
 			WIDGET_GRAPH_PROTOTYPE		=> 'CWidgetGraphPrototype',
 			WIDGET_HOST_AVAIL			=> 'CWidget',
@@ -156,6 +158,7 @@ class CWidgetConfig {
 			WIDGET_DISCOVERY			=> ['width' => 6,	'height' => 3],
 			WIDGET_FAV_GRAPHS			=> ['width' => 4,	'height' => 3],
 			WIDGET_FAV_MAPS				=> ['width' => 4,	'height' => 3],
+			WIDGET_ITEM					=> ['width' => 6,	'height' => 3],
 			WIDGET_GRAPH				=> ['width' => 12,	'height' => 5],
 			WIDGET_GRAPH_PROTOTYPE		=> ['width' => 16,	'height' => 5],
 			WIDGET_HOST_AVAIL			=> ['width' => 6,	'height' => 3],
@@ -250,6 +253,7 @@ class CWidgetConfig {
 			case WIDGET_GRAPH:
 			case WIDGET_GRAPH_PROTOTYPE:
 			case WIDGET_PLAIN_TEXT:
+			case WIDGET_ITEM:
 			case WIDGET_PROBLEM_HOSTS:
 			case WIDGET_PROBLEMS:
 			case WIDGET_PROBLEMS_BY_SV:
@@ -466,6 +470,9 @@ class CWidgetConfig {
 
 			case WIDGET_WEB:
 				return new CWidgetFormWeb($data, $templateid);
+
+			case WIDGET_ITEM:
+				return new CWidgetFormItem($data, $templateid);
 
 			default:
 				return new CWidgetForm($data, $templateid, $type);

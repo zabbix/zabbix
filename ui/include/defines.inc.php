@@ -1474,6 +1474,7 @@ define('WIDGET_SYSTEM_INFO',		'systeminfo');
 define('WIDGET_TRIG_OVER',			'trigover');
 define('WIDGET_URL',				'url');
 define('WIDGET_WEB',				'web');
+define('WIDGET_ITEM',				'item');
 
 // sysmap widget source types
 define('WIDGET_SYSMAP_SOURCETYPE_MAP',	1);
@@ -1498,6 +1499,12 @@ define('WIDGET_SEARCH_TEMPLATES',		'search_templates');
 // dashboard widget dynamic state
 define('WIDGET_SIMPLE_ITEM',	0);
 define('WIDGET_DYNAMIC_ITEM',	1);
+
+// item widget blocks
+define('WIDGET_ITEM_SHOW_DESCRIPTION',		1);
+define('WIDGET_ITEM_SHOW_VALUE',			2);
+define('WIDGET_ITEM_SHOW_TIME',				3);
+define('WIDGET_ITEM_SHOW_CHANGE_INDICATOR',	4);
 
 // widget defaults
 define('ZBX_WIDGET_ROWS', 20);

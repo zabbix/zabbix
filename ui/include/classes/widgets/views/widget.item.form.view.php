@@ -1,0 +1,170 @@
+<?php
+/*
+** Zabbix
+** Copyright (C) 2001-2021 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+**/
+
+
+/**
+ * Single item widget.
+ */
+$fields = $data['dialogue']['fields'];
+
+$form = CWidgetHelper::createForm();
+
+$rf_rate_field = ($data['templateid'] === null) ? $fields['rf_rate'] : null;
+
+$form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dialogue']['type'],
+	$data['dialogue']['view_mode'], $data['known_widget_types'], $rf_rate_field
+);
+
+$scripts = [];
+
+if (array_key_exists('itemid', $fields)) {
+	$field_itemid = CWidgetHelper::getItem($fields['itemid'], $data['captions']['ms']['items']['itemid'],
+		$form->getName()
+	);
+	$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['itemid']), $field_itemid);
+	$scripts[] = $field_itemid->getPostJS();
+}
+
+$form_list->addRow(
+	CWidgetHelper::getLabel($fields['show']),
+	CWidgetHelper::getCheckBoxList($fields['show'], [
+		WIDGET_ITEM_SHOW_DESCRIPTION => _('Description'),
+		WIDGET_ITEM_SHOW_VALUE => _('Value'),
+		WIDGET_ITEM_SHOW_TIME => _('Time'),
+		WIDGET_ITEM_SHOW_CHANGE_INDICATOR => _('Change indicator')
+	], [ZBX_STYLE_COLUMNS, ZBX_STYLE_COLUMNS_2])
+);
+
+$form_list->addRow(CWidgetHelper::getLabel($fields['adv_conf']), CWidgetHelper::getCheckBox($fields['adv_conf']));
+
+$form_list
+	->addRow(
+		CWidgetHelper::getLabel($fields['description'], [
+				_('Supported macros:'),
+				(new CList([
+					'{HOST.*}',
+					'{ITEM.*}',
+					'{INVENTORY.*}',
+					_('User macros')
+				]))->addClass(ZBX_STYLE_LIST_DASHED)
+			]),
+		(new CDiv([
+			(new CDiv(CWidgetHelper::getTextArea($fields['description'])))->addClass('form-field'),
+			CWidgetHelper::getLabel($fields['desc_h_pos']),
+			(new CDiv(CWidgetHelper::getRadioButtonList($fields['desc_h_pos'])))->addClass('form-field'),
+			CWidgetHelper::getLabel($fields['desc_size']),
+			(new CDiv([CWidgetHelper::getIntegerBox($fields['desc_size']), '%']))->addClass('form-field'),
+			CWidgetHelper::getLabel($fields['desc_v_pos']),
+			(new CDiv(CWidgetHelper::getRadioButtonList($fields['desc_v_pos'])))->addClass('form-field'),
+			CWidgetHelper::getLabel($fields['desc_bold']),
+			(new CDiv(CWidgetHelper::getCheckBox($fields['desc_bold'])))->addClass('form-field'),
+			CWidgetHelper::getLabel($fields['desc_color']),
+			(new CDiv(CWidgetHelper::getColor($fields['desc_color'])))->addClass('form-field')
+		]))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->addClass('dashboard-widget-single-item')
+			->addClass('field-group-description'),
+		'description-row'
+	)
+	->addRow(
+		new CLabel(_('Value')),
+		(new CDiv([
+			CWidgetHelper::getLabel($fields['decimal_places']),
+			(new CDiv(CWidgetHelper::getIntegerBox($fields['decimal_places'])))->addClass('form-field'),
+			CWidgetHelper::getLabel($fields['decimal_size']),
+			(new CDiv([CWidgetHelper::getIntegerBox($fields['decimal_size']), '%']))->addClass('form-field'),
+			new CTag('hr'),
+			CWidgetHelper::getLabel($fields['value_h_pos']),
+			(new CDiv(CWidgetHelper::getRadioButtonList($fields['value_h_pos'])))->addClass('form-field'),
+			CWidgetHelper::getLabel($fields['value_v_pos']),
+			(new CDiv(CWidgetHelper::getRadioButtonList($fields['value_v_pos'])))->addClass('form-field'),
+			CWidgetHelper::getLabel($fields['value_size']),
+			(new CDiv([CWidgetHelper::getIntegerBox($fields['value_size']), '%']))->addClass('form-field'),
+			CWidgetHelper::getLabel($fields['value_bold']),
+			(new CDiv(CWidgetHelper::getCheckBox($fields['value_bold'])))->addClass('form-field'),
+			CWidgetHelper::getLabel($fields['value_color']),
+			(new CDiv(CWidgetHelper::getColor($fields['value_color'])))->addClass('form-field'),
+			new CTag('hr'),
+			new CDiv(CWidgetHelper::getCheckBox($fields['units_show'])),
+			CWidgetHelper::getLabel($fields['units']),
+			(new CDiv(CWidgetHelper::getTextBox($fields['units'])))->addClass('form-field'),
+			CWidgetHelper::getLabel($fields['units_pos']),
+			(new CDiv(CWidgetHelper::getSelect($fields['units_pos'])))->addClass('form-field'),
+			CWidgetHelper::getLabel($fields['units_size']),
+			(new CDiv([CWidgetHelper::getIntegerBox($fields['units_size']), '%']))->addClass('form-field'),
+			CWidgetHelper::getLabel($fields['units_bold']),
+			(new CDiv(CWidgetHelper::getCheckBox($fields['units_bold'])))->addClass('form-field'),
+			CWidgetHelper::getLabel($fields['units_color']),
+			(new CDiv(CWidgetHelper::getColor($fields['units_color'])))->addClass('form-field'),
+		]))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->addClass('dashboard-widget-single-item')
+			->addClass('field-group-value'),
+		'value-row'
+	)
+	->addRow(
+		new CLabel(_('Time')),
+		(new CDiv([
+			CWidgetHelper::getLabel($fields['time_h_pos']),
+			(new CDiv(CWidgetHelper::getRadioButtonList($fields['time_h_pos'])))->addClass('form-field'),
+			CWidgetHelper::getLabel($fields['time_size']),
+			(new CDiv([CWidgetHelper::getIntegerBox($fields['time_size']), '%']))->addClass('form-field'),
+			CWidgetHelper::getLabel($fields['time_v_pos']),
+			(new CDiv(CWidgetHelper::getRadioButtonList($fields['time_v_pos'])))->addClass('form-field'),
+			CWidgetHelper::getLabel($fields['time_bold']),
+			(new CDiv(CWidgetHelper::getCheckBox($fields['time_bold'])))->addClass('form-field'),
+			CWidgetHelper::getLabel($fields['time_color']),
+			(new CDiv(CWidgetHelper::getColor($fields['time_color'])))->addClass('form-field')
+		]))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->addClass('dashboard-widget-single-item')
+			->addClass('field-group-time'),
+		'time-row'
+	)
+	->addRow(
+		new CLabel(_('Change indicator')),
+		(new CDiv([
+			'up',
+			(new CDiv(CWidgetHelper::getColor($fields['up_color'])))->addClass('form-field'),
+			'down',
+			(new CDiv(CWidgetHelper::getColor($fields['down_color'])))->addClass('form-field'),
+			'up/down',
+			(new CDiv(CWidgetHelper::getColor($fields['updown_color'])))->addClass('form-field')
+		]))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->addClass('dashboard-widget-single-item')
+			->addClass('field-group-change-indicator'),
+		'change-indicator-row'
+	)
+	->addRow(
+		CWidgetHelper::getLabel($fields['bg_color']),
+		(new CDiv(CWidgetHelper::getColor($fields['bg_color'])))->addClass('form-field')
+	);
+
+$form->addItem($form_list);
+
+// Append color picker to widget body instead of whole HTML body.
+$scripts[] = '$(".input-color-picker input", $(".overlay-dialogue-body"))'.
+	'.colorpicker({appendTo: ".overlay-dialogue-body"});';
+
+return [
+	'form' => $form,
+	'scripts' => $scripts
+];
