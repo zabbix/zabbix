@@ -768,17 +768,12 @@ class testFormTags extends CWebTest {
 		$tags = $element->getValue();
 
 		// Navigate to host or template for full cloning.
-		$name = ($parent === 'Host') ? $this->host : $this->template;
-		$this->query('link', $name)->waitUntilClickable()->one()->click();
-
-		if ($parent === 'Host') {
-			$form = $this->query('id:host-form')->asForm()->waitUntilPresent()->one();
-		}
-
-		$template_form = $this->query('id:templates-form')->asForm()->waitUntilPresent()->one();
-		$template_form->fill([$parent.' name' => $new_name]);
+		$this->query('link', ($parent === 'Host') ? $this->host : $this->template)->waitUntilClickable()->one()->click();
+		$host_form = $this->query('id', ($parent === 'Host') ? 'host-form' : 'templates-form')->asForm()
+				->waitUntilPresent()->one();
+		$host_form->fill([$parent.' name' => $new_name]);
 		$this->query('button:Full clone')->one()->click();
-		$template_form->submit();
+		$host_form->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, $parent.' added');
 
