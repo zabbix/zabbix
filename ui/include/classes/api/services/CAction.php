@@ -570,8 +570,8 @@ class CAction extends CApiService {
 		}
 		unset($action);
 
-		self::updateFilter($actions, __FUNCTION__);
-		self::updateOperations($actions, __FUNCTION__);
+		self::updateFilter($actions);
+		self::updateOperations($actions);
 
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_ACTION, $actions);
 
@@ -612,8 +612,8 @@ class CAction extends CApiService {
 			DB::update('actions', $upd_actions);
 		}
 
-		self::updateFilter($actions, __FUNCTION__, $db_actions);
-		self::updateOperations($actions, __FUNCTION__, $db_actions);
+		self::updateFilter($actions, $db_actions);
+		self::updateOperations($actions, $db_actions);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_ACTION, $actions, $db_actions);
 
@@ -622,10 +622,11 @@ class CAction extends CApiService {
 
 	/**
 	 * @param array      $actions
-	 * @param string     $method
 	 * @param array|null $db_actions
 	 */
-	private static function updateFilter(array &$actions, string $method, array $db_actions = null): void {
+	private static function updateFilter(array &$actions, array $db_actions = null): void {
+		$is_update = ($db_actions !== null);
+
 		$ins_conditions = [];
 		$upd_conditions = [];
 		$del_conditionids = [];
@@ -635,7 +636,7 @@ class CAction extends CApiService {
 				continue;
 			}
 
-			$db_conditions = ($method === 'update') ? $db_actions[$action['actionid']]['filter']['conditions'] : [];
+			$db_conditions = $is_update ? $db_actions[$action['actionid']]['filter']['conditions'] : [];
 
 			foreach ($action['filter']['conditions'] as &$condition) {
 				$db_condition = current(
@@ -704,7 +705,7 @@ class CAction extends CApiService {
 				)
 				: '';
 
-			$db_formula = ($method === 'update') ? $db_actions[$action['actionid']]['filter']['formula'] : '';
+			$db_formula = $is_update ? $db_actions[$action['actionid']]['filter']['formula'] : '';
 
 			if ($action['filter']['formula'] !== $db_formula) {
 				$upd_actions[] = [
@@ -722,10 +723,11 @@ class CAction extends CApiService {
 
 	/**
 	 * @param array      $actions
-	 * @param string     $method
 	 * @param array|null $db_actions
 	 */
-	private static function updateOperations(array &$actions, string $method, array $db_actions = null): void {
+	private static function updateOperations(array &$actions, array $db_actions = null): void {
+		$is_update = ($db_actions !== null);
+
 		$ins_operations = [];
 		$upd_operations = [];
 		$del_operationids = [];
@@ -736,7 +738,7 @@ class CAction extends CApiService {
 					continue;
 				}
 
-				$db_operations = ($method === 'update') ? $db_actions[$action['actionid']][$operation_group] : [];
+				$db_operations = $is_update ? $db_actions[$action['actionid']][$operation_group] : [];
 
 				foreach ($action[$operation_group] as &$operation) {
 					$db_operation = current(
@@ -830,7 +832,7 @@ class CAction extends CApiService {
 						$operation['operationid'] = array_shift($operationids);
 					}
 
-					if ($method === 'update') {
+					if ($is_update) {
 						$db_operations = $db_actions[$action['actionid']][$operation_group];
 						$db_operation = array_key_exists($operation['operationid'], $db_operations)
 							? $db_operations[$operation['operationid']]
@@ -841,7 +843,7 @@ class CAction extends CApiService {
 					}
 
 					if (array_key_exists('opconditions', $operation)) {
-						$db_opconditions = ($method === 'update' && array_key_exists('opconditions', $db_operation))
+						$db_opconditions = ($is_update && array_key_exists('opconditions', $db_operation))
 							? array_column($db_operation['opconditions'], null, 'value')
 							: [];
 
@@ -874,8 +876,7 @@ class CAction extends CApiService {
 					switch ($operation['operationtype']) {
 						case OPERATION_TYPE_MESSAGE:
 							if (array_key_exists('opmessage_grp', $operation)) {
-								$db_opmessage_grps = ($method === 'update'
-										&& array_key_exists('opmessage_grp', $db_operation))
+								$db_opmessage_grps = ($is_update && array_key_exists('opmessage_grp', $db_operation))
 									? array_column($db_operation['opmessage_grp'], null, 'usrgrpid')
 									: [];
 
@@ -898,8 +899,7 @@ class CAction extends CApiService {
 							}
 
 							if (array_key_exists('opmessage_usr', $operation)) {
-								$db_opmessage_usrs = ($method === 'update'
-										&& array_key_exists('opmessage_usr', $db_operation))
+								$db_opmessage_usrs = ($is_update && array_key_exists('opmessage_usr', $db_operation))
 									? array_column($db_operation['opmessage_usr'], null, 'userid')
 									: [];
 
@@ -924,7 +924,7 @@ class CAction extends CApiService {
 
 						case OPERATION_TYPE_RECOVERY_MESSAGE:
 						case OPERATION_TYPE_ACK_MESSAGE:
-							if ($method === 'update' && array_key_exists('opmessage', $db_operation)) {
+							if ($is_update && array_key_exists('opmessage', $db_operation)) {
 								$upd_opmessage = DB::getUpdatedValues('opmessage', $operation['opmessage'],
 									$db_operation['opmessage']
 								);
@@ -943,7 +943,7 @@ class CAction extends CApiService {
 							break;
 
 						case OPERATION_TYPE_COMMAND:
-							if ($method === 'update' && array_key_exists('opcommand', $db_operation)) {
+							if ($is_update && array_key_exists('opcommand', $db_operation)) {
 								$upd_opcommand = DB::getUpdatedValues('opcommand', $operation['opcommand'],
 									$db_operation['opcommand']
 								);
@@ -961,8 +961,7 @@ class CAction extends CApiService {
 							}
 
 							if (array_key_exists('opcommand_grp', $operation)) {
-								$db_opcommand_grps = ($method === 'update'
-										&& array_key_exists('opcommand_grp', $db_operation))
+								$db_opcommand_grps = ($is_update && array_key_exists('opcommand_grp', $db_operation))
 									? array_column($db_operation['opcommand_grp'], null, 'groupid')
 									: [];
 
@@ -985,8 +984,7 @@ class CAction extends CApiService {
 							}
 
 							if (array_key_exists('opcommand_hst', $operation)) {
-								$db_opcommand_hsts = ($method === 'update'
-										&& array_key_exists('opcommand_hst', $db_operation))
+								$db_opcommand_hsts = ($is_update && array_key_exists('opcommand_hst', $db_operation))
 									? array_column($db_operation['opcommand_hst'], null, 'hostid')
 									: [];
 
@@ -1011,7 +1009,7 @@ class CAction extends CApiService {
 
 						case OPERATION_TYPE_GROUP_ADD:
 						case OPERATION_TYPE_GROUP_REMOVE:
-							$db_opgroups = ($method === 'update' && array_key_exists('opgroup', $db_operation))
+							$db_opgroups = ($is_update && array_key_exists('opgroup', $db_operation))
 								? array_column($db_operation['opgroup'], null, 'groupid')
 								: [];
 
@@ -1032,7 +1030,7 @@ class CAction extends CApiService {
 
 						case OPERATION_TYPE_TEMPLATE_ADD:
 						case OPERATION_TYPE_TEMPLATE_REMOVE:
-							$db_optemplates = ($method === 'update' && array_key_exists('optemplate', $db_operation))
+							$db_optemplates = ($is_update && array_key_exists('optemplate', $db_operation))
 								? array_column($db_operation['optemplate'], null, 'templateid')
 								: [];
 
@@ -1054,7 +1052,7 @@ class CAction extends CApiService {
 							break;
 
 						case OPERATION_TYPE_HOST_INVENTORY:
-							if ($method === 'update' && array_key_exists('opinventory', $db_operation)) {
+							if ($is_update && array_key_exists('opinventory', $db_operation)) {
 								$upd_opinventory = DB::getUpdatedValues('opinventory', $operation['opinventory'],
 									$db_operation['opinventory']
 								);
@@ -1286,7 +1284,7 @@ class CAction extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private function validateDelete(array &$actionids, array &$db_actions = null): void {
+	private function validateDelete(array &$actionids, ?array &$db_actions): void {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $actionids, '/', $error)) {
@@ -1834,7 +1832,7 @@ class CAction extends CApiService {
 	 *
 	 * @param array        $update_operations                 An array of update operations.
 	 * @param string       $update_operations[<operationid>]  Operation ID.
-	 * @param array|string $update_options                    An array of options from request, or "extend".
+	 * @param array|string $update_options                    An array of output options from request, or "extend".
 	 *
 	 * @return array
 	 */
@@ -2314,7 +2312,7 @@ class CAction extends CApiService {
 
 		self::checkDuplicates($actions);
 		self::checkFilter($actions);
-		self::checkOperations($actions, 'create');
+		self::checkOperations($actions);
 
 		self::checkMediatypesPermissions($actions);
 		self::checkScriptsPermissions($actions);
@@ -2525,22 +2523,23 @@ class CAction extends CApiService {
 
 	/**
 	 * @param array      $actions
-	 * @param string     $method
 	 * @param array|null $db_actions
 	 *
 	 * @throws APIException
 	 */
-	private static function checkOperations(array &$actions, string $method, array $db_actions = null): void {
+	private static function checkOperations(array &$actions, array $db_actions = null): void {
+		$is_update = ($db_actions !== null);
+
 		foreach ($actions as &$action) {
-			if ($method === 'create') {
-				$db_action = [];
-			}
-			else {
-				if (!array_intersect_key($action, array_flip(self::OPERATION_GROUPS))) {
+			if ($is_update) {
+				if (!array_intersect_key(array_flip(self::OPERATION_GROUPS), $action)) {
 					continue;
 				}
 
 				$db_action = $db_actions[$action['actionid']];
+			}
+			else {
+				$db_action = [];
 			}
 
 			$operations = array_intersect_key($action + $db_action, array_flip(self::OPERATION_GROUPS));
@@ -3191,15 +3190,7 @@ class CAction extends CApiService {
 				}
 			}
 
-			$operation_groups = array_intersect_key(self::OPERATION_GROUPS,
-				getAllowedOperations($action['eventsource'])
-			);
-
-			if (!array_intersect_key($action, array_flip($operation_groups))) {
-				continue;
-			}
-
-			foreach ($operation_groups as $operation_group) {
+			foreach (array_intersect_key(array_flip(self::OPERATION_GROUPS), $action) as $operation_group) {
 				$actionids['operations'][$action['actionid']] = true;
 				$db_actions[$action['actionid']][$operation_group] = [];
 			}
