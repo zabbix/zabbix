@@ -47,12 +47,18 @@
 #define AUDIT_RESOURCE_ITEM_PROTOTYPE		36
 #define AUDIT_RESOURCE_HOST_PROTOTYPE		37
 
+#define AUDIT_RESOURCE_SETTINGS			40
+
+#define AUDIT_RESOURCE_HA_NODE			47
+
 #define AUDIT_HOST_ID		1
 #define AUDIT_HOSTGRP_ID	2
 #define AUDIT_ITEM_ID		3
 #define AUDIT_TRIGGER_ID	4
 #define AUDIT_GRAPH_ID		5
 #define AUDIT_HTTPTEST_ID	6
+#define AUDIT_HA_NODE_ID	7
+#define AUDIT_CONFIG_ID		8
 
 #define RETURN_IF_AUDIT_OFF()					\
 	if (ZBX_AUDITLOG_ENABLED != zbx_get_audit_mode())	\
@@ -64,16 +70,20 @@ zbx_hashset_t	*zbx_get_audit_hashset(void);
 typedef struct zbx_audit_entry
 {
 	zbx_uint64_t	id;
+	char		*cuid;
 	int		id_table;
 	char		*name;
 	struct zbx_json	details_json;
 	int		audit_action;
 	int		resource_type;
 	char		audit_cuid[CUID_LEN];
-} zbx_audit_entry_t;
+}
+zbx_audit_entry_t;
 
 zbx_audit_entry_t	*zbx_audit_entry_init(zbx_uint64_t id, const int id_table, const char *name, int audit_action,
 		int resource_type);
+zbx_audit_entry_t	*zbx_audit_entry_init_cuid(const char *cuid, const int id_table,const char *name,
+		int audit_action, int resource_type);
 
 int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_execute_on,
 		const char *script_command_orig, zbx_uint64_t hostid, const char *hostname, zbx_uint64_t eventid,
@@ -81,7 +91,9 @@ int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_e
 		const char *output, const char *error);
 
 void	zbx_audit_init(int audit_mode_set);
+void	zbx_audit_clean(void);
 void	zbx_audit_flush(void);
+int	zbx_audit_flush_once(void);
 void	zbx_audit_update_json_append_string(const zbx_uint64_t id, const int id_table, const char *audit_op,
 		const char *key, const char *value, const char *table, const char *field);
 void	zbx_audit_update_json_append_string_secret(const zbx_uint64_t id, const int id_table, const char *audit_op,
@@ -103,4 +115,9 @@ void	zbx_audit_update_json_update_int(const zbx_uint64_t id, const int id_table,
 void	zbx_audit_update_json_update_double(const zbx_uint64_t id, const int id_table, const char *key,
 		double value_old, double value_new);
 void	zbx_audit_update_json_delete(const zbx_uint64_t id, const int id_table, const char *audit_op, const char *key);
+
+zbx_audit_entry_t	*zbx_audit_get_entry(zbx_uint64_t id, const char *cuid, int id_table);
+void	zbx_audit_entry_append_int(zbx_audit_entry_t *entry, int audit_op, const char *key, ...);
+void	zbx_audit_entry_append_string(zbx_audit_entry_t *entry, int audit_op, const char *key, ...);
+
 #endif	/* ZABBIX_AUDIT_H */
