@@ -125,7 +125,7 @@ require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingItem.php';
 require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingItemPrototype.php';
 require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingTest.php';
-require_once dirname(__FILE__).'/testFormSetup.php';
+//require_once dirname(__FILE__).'/testFormSetup.php';
 require_once dirname(__FILE__).'/testFormSysmap.php';
 require_once dirname(__FILE__).'/testFormTabIndicators.php';
 require_once dirname(__FILE__).'/tags/testFormTagsHost.php';
@@ -298,7 +298,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormPreprocessingItemPrototype');
 		$suite->addTestSuite('testFormPreprocessingLowLevelDiscovery');
 		$suite->addTestSuite('testFormPreprocessingTest');
-		$suite->addTestSuite('testFormSetup');
+//		$suite->addTestSuite('testFormSetup');
 		$suite->addTestSuite('testFormSysmap');
 		$suite->addTestSuite('testFormTabIndicators');
 		$suite->addTestSuite('testFormTagsHost');

@@ -135,6 +135,7 @@ class CControllerServiceListEditRefresh extends CControllerServiceListGeneral {
 			'output' => ['serviceid', 'name', 'status', 'goodsla', 'showsla', 'readonly'],
 			'selectParents' => $filter['filter_set'] ? ['serviceid', 'name'] : null,
 			'selectChildren' => API_OUTPUT_COUNT,
+			'selectProblemTags' => API_OUTPUT_COUNT,
 			'selectProblemEvents' => ['eventid', 'severity', 'name'],
 			'selectTags' => ['tag', 'value'],
 			'serviceids' => $db_serviceids,

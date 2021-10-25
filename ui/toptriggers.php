@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/include/triggers.inc.php';
 
 $page['title'] = _('100 busiest triggers');
 $page['file'] = 'toptriggers.php';
-$page['scripts'] = ['multiselect.js', 'class.calendar.js', 'gtlc.js'];
+$page['scripts'] = ['class.calendar.js', 'gtlc.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 

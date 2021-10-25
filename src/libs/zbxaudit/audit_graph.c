@@ -52,6 +52,7 @@ void	zbx_audit_graph_create_entry(int audit_action, zbx_uint64_t graphid, const 
 	resource_type = graph_flag_to_resource_type(flags);
 
 	local_audit_graph_entry.id = graphid;
+	local_audit_graph_entry.cuid = NULL;
 	local_audit_graph_entry.id_table = AUDIT_GRAPH_ID;
 
 	found_audit_graph_entry = (zbx_audit_entry_t**)zbx_hashset_search(zbx_get_audit_hashset(),

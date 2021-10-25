@@ -26,9 +26,7 @@ require_once dirname(__FILE__).'/include/triggers.inc.php';
 
 $page['title'] = _('Configuration of actions');
 $page['file'] = 'actionconf.php';
-$page['scripts'] = ['multiselect.js', 'textareaflexible.js', 'popup.condition.common.js', 'popup.operation.common.js',
-	'class.tab-indicators.js'
-];
+$page['scripts'] = ['popup.condition.common.js', 'popup.operation.common.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 // VAR							TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION

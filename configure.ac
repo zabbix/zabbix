@@ -2085,6 +2085,7 @@ AC_OUTPUT([
 	src/libs/zbxaudit/Makefile
 	src/libs/zbxservice/Makefile
 	src/libs/zbxxml/Makefile
+	src/libs/zbxha/Makefile
 	src/zabbix_agent/Makefile
 	src/zabbix_agent/logfiles/Makefile
 	src/zabbix_get/Makefile
@@ -2095,6 +2096,7 @@ AC_OUTPUT([
 	src/zabbix_server/dbsyncer/Makefile
 	src/zabbix_server/dbconfig/Makefile
 	src/zabbix_server/discoverer/Makefile
+	src/zabbix_server/ha/Makefile
 	src/zabbix_server/housekeeper/Makefile
 	src/zabbix_server/httppoller/Makefile
 	src/zabbix_server/pinger/Makefile

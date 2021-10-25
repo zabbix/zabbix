@@ -33,7 +33,7 @@ class CMessageBehavior extends CBehavior {
 	 * @param string, array		$details	reference array or string values of which should be present in message details
 	 */
 	public function assertMessage($expected, $title = null, $details = null) {
-		$message = CMessageElement::find()->one();
+		$message = CMessageElement::find()->waitUntilVisible()->one();
 
 		$this->test->assertTrue(($expected === TEST_GOOD) ? $message->isGood() : $message->isBad());
 		if ($title !== null) {
