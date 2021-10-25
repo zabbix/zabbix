@@ -1085,7 +1085,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'expected' => TEST_GOOD,
 					'name' => 'Checksum of $1',
 					'key' => 'vfs.file.cksum[/sbin/shutdown]',
-					'dbName' => 'Checksum of /sbin/shutdown',
+					'dbName' => 'Checksum of $1',
 					'dbCheck' => true,
 					'formCheck' =>true
 				]
