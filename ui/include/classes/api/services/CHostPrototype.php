@@ -442,7 +442,7 @@ class CHostPrototype extends CHostBase {
 				]],
 				'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')]
 			]],
-			'inventory_mode' =>		['type' => API_INT32, 'in' => implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC]), 'default' => HOST_INVENTORY_DISABLED]
+			'inventory_mode' =>		['type' => API_INT32, 'in' => implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC])]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $host_prototypes, '/', $error)) {
@@ -1689,20 +1689,22 @@ class CHostPrototype extends CHostBase {
 				continue;
 			}
 
-			$db_host_prototype = ($method === 'update')
-				? $db_host_prototypes[$host_prototype['hostid']]
-				: [];
+			$db_inventory_mode = ($method === 'update')
+				? $db_host_prototypes[$host_prototype['hostid']]['inventory_mode']
+				: HOST_INVENTORY_DISABLED;
+
+			if ($host_prototype['inventory_mode'] == $db_inventory_mode) {
+				continue;
+			}
 
 			if ($host_prototype['inventory_mode'] == HOST_INVENTORY_DISABLED) {
 				$del_hostids[] = $host_prototype['hostid'];
 			}
-			elseif ($method === 'update' && $db_host_prototype['inventory_mode'] != HOST_INVENTORY_DISABLED) {
-				if ($host_prototype['inventory_mode'] != $db_host_prototype['inventory_mode']) {
-					$upd_inventories = [
-						'values' =>['inventory_mode' => $host_prototype['inventory_mode']],
-						'where' => ['hostid' => $host_prototype['hostid']]
-					];
-				}
+			elseif ($db_inventory_mode != HOST_INVENTORY_DISABLED) {
+				$upd_inventories = [
+					'values' =>['inventory_mode' => $host_prototype['inventory_mode']],
+					'where' => ['hostid' => $host_prototype['hostid']]
+				];
 			}
 			else {
 				$ins_inventories[] = [
