@@ -2796,6 +2796,12 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 1024,
 				'default' => ''
+			],
+			'ha_failover_delay' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '1m'
 			]
 		]
 	],
@@ -5116,6 +5122,11 @@ return [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20
+			],
+			'resource_cuid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_CUID,
+				'length' => 25
 			],
 			'resourcename' => [
 				'null' => false,
@@ -8700,6 +8711,52 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
+			]
+		]
+	],
+	'ha_node' => [
+		'key' => 'ha_nodeid',
+		'fields' => [
+			'ha_nodeid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CUID,
+				'length' => 25
+			],
+			'name' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'address' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'port' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '10051'
+			],
+			'lastaccess' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'status' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'ha_sessionid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CUID,
+				'length' => 25,
+				'default' => ''
 			]
 		]
 	],

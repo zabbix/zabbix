@@ -17,20 +17,20 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_SERVERCOMMS_H
-#define ZABBIX_SERVERCOMMS_H
+#ifndef ZABBIX_AUDIT_HA_H
+#define ZABBIX_AUDIT_HA_H
 
-extern char	*CONFIG_SOURCE_IP;
-extern char	*CONFIG_SERVER;
-extern int	CONFIG_SERVER_PORT;
-extern char	*CONFIG_HOSTNAME;
+#define ZBX_AUDIT_HA_NODE	"hanode"
+#define ZBX_AUDIT_HA_NODEID	ZBX_AUDIT_HA_NODE ".ha_nodeid"
+#define ZBX_AUDIT_HA_NAME	ZBX_AUDIT_HA_NODE ".name"
+#define ZBX_AUDIT_HA_STATUS	ZBX_AUDIT_HA_NODE ".status"
+#define ZBX_AUDIT_HA_ADDRESS	ZBX_AUDIT_HA_NODE ".address"
+#define ZBX_AUDIT_HA_PORT	ZBX_AUDIT_HA_NODE ".port"
 
-#include "comms.h"
-
-int	connect_to_server(zbx_socket_t *sock, int timeout, int retry_interval);
-void	disconnect_server(zbx_socket_t *sock);
-
-int	get_data_from_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved, char **error);
-int	put_data_to_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved, char **error);
+void	zbx_audit_ha_create_entry(int audit_action, const char *nodeid, const char *name);
+void	zbx_audit_ha_add_create_fields(const char *nodeid, const char *name, int status);
+void	zbx_audit_ha_update_field_string(const char *nodeid, const char *key, const char *old_value,
+		const char *new_value);
+void	zbx_audit_ha_update_field_int(const char *nodeid, const char *key, int old_value, int new_value);
 
 #endif

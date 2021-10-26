@@ -5,7 +5,7 @@
 
 html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var,
 b,
-strong, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, .table-forms .tfoot-buttons, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary,
+strong, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary,
 time, mark, audio, video {
   margin: 0;
   padding: 0;
@@ -378,12 +378,17 @@ main {
   position: relative;
   min-width: 1200px;
   padding: 10px; }
+  main > .container:not(:first-of-type) {
+    margin-top: 10px; }
 
 footer {
   margin-top: auto; }
 
 output {
   display: block; }
+
+.container {
+  background: #000000; }
 
 header {
   display: flex;
@@ -1008,6 +1013,10 @@ footer {
       border-bottom: 1px solid #333333; }
       .dashboard-grid-widget-content .list-table tbody tr:last-child th.list-table-footer, .dashboard-grid-widget-content .list-table tbody tr:last-child td.list-table-footer {
         border-bottom: 0; }
+    .dashboard-grid-widget-content .list-table.sticky-footer {
+      margin-bottom: -8px; }
+      .dashboard-grid-widget-content .list-table.sticky-footer tfoot {
+        bottom: -8px; }
   .dashboard-grid-widget-content .debug-output {
     max-height: none;
     border-color: #333333; }
@@ -1033,6 +1042,10 @@ footer {
     margin-top: 0;
     height: 100%;
     padding-top: 8px; }
+    .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-content .list-table.sticky-footer {
+      margin-bottom: 0; }
+      .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-content .list-table.sticky-footer tfoot {
+        bottom: 0; }
   .dashboard-grid-widget.dashboard-grid-widget-hidden-header.dashboard-grid-widget-focus .dashboard-grid-widget-head {
     height: 2rem;
     margin-top: -2rem;
@@ -2657,6 +2670,9 @@ form.is-loading {
     border-bottom: 1px solid #333333;
     line-height: 18px;
     vertical-align: top; }
+    .list-table tbody th.table-info,
+    .list-table td.table-info {
+      color: #cacaca; }
   .list-table tbody th {
     text-align: left; }
   .list-table .vertical_rotation_inner {
@@ -2672,6 +2688,21 @@ form.is-loading {
   .list-table .list-table-actions {
     text-align: right;
     white-space: nowrap; }
+  .list-table.sticky-header thead {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: #000000; }
+  .list-table.sticky-footer tbody tr:last-of-type td, .list-table.sticky-footer tbody tr:last-of-type th {
+    border-bottom: none; }
+  .list-table.sticky-footer tfoot {
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
+    background: #000000; }
+    .list-table.sticky-footer tfoot tr:first-of-type td, .list-table.sticky-footer tfoot tr:first-of-type th {
+      border-top: 2px solid #262626;
+      border-bottom: 0; }
 
 .table-paging {
   text-align: center;
@@ -3102,9 +3133,11 @@ form.is-loading {
     text-align: left; }
     .table-forms th:last-child {
       padding: 0; }
-  .table-forms tfoot .table-forms-td-right, .table-forms .tfoot-buttons .table-forms-td-right {
+  .table-forms tfoot .table-forms-td-right,
+  .table-forms .tfoot-buttons .table-forms-td-right {
     padding-top: 5px; }
-  .table-forms tfoot button, .table-forms .tfoot-buttons button {
+  .table-forms tfoot button,
+  .table-forms .tfoot-buttons button {
     margin: 0 10px 0 0; }
   .table-forms td {
     position: relative; }
@@ -4332,7 +4365,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     z-index: 20; }
     .multilineinput-modal .multilineinput-textarea::-webkit-scrollbar {
       height: 9px; }
-  .multilineinput-modal .multilineinput-symbols-remaining {
+  .multilineinput-modal .multilineinput-char-count {
     color: #cacaca;
     float: left;
     line-height: 24px; }

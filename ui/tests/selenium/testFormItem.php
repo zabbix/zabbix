@@ -358,11 +358,12 @@ class testFormItem extends CLegacyWebTest {
 
 		$this->zbxTestCheckTitle('Configuration of items');
 		$this->zbxTestCheckHeader('Items');
+		$form = $this->query('id:item-form')->asForm()->waitUntilVisible()->one();
 
 		if (isset($templateid)) {
 			$this->zbxTestTextPresent('Parent items');
 			if (isset($data['hostTemplate'])) {
-				$this->zbxTestAssertElementPresentXpath("//*[@id='itemFormList']/li[1]/div[2]/a[text()='".$data['hostTemplate']."']");
+				$this->assertTrue($form->query('link', $data['hostTemplate'])->exists());
 			}
 		}
 		else {
@@ -372,7 +373,6 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Name');
 		$this->zbxTestAssertVisibleId('name');
 		$this->zbxTestAssertAttribute("//input[@id='name']", 'maxlength', 255);
-		$this->zbxTestAssertAttribute("//input[@id='name']", 'size', 20);
 		$this->zbxTestAssertAttribute("//input[@id='name']", 'autofocus');
 		if (isset($templateid)) {
 			$this->zbxTestAssertAttribute("//input[@id='name']", 'readonly');
@@ -415,7 +415,6 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Key');
 		$this->zbxTestAssertVisibleId('key');
 		$this->zbxTestAssertAttribute("//input[@id='key']", 'maxlength', 2048);
-		$this->zbxTestAssertAttribute("//input[@id='key']", 'size', 20);
 		if (!isset($templateid)) {
 			$this->zbxTestAssertElementPresentId('keyButton');
 		}
@@ -529,7 +528,6 @@ class testFormItem extends CLegacyWebTest {
 			$this->zbxTestTextPresent('IPMI sensor');
 			$this->zbxTestAssertVisibleId('ipmi_sensor');
 			$this->zbxTestAssertAttribute("//input[@id='ipmi_sensor']", 'maxlength', 128);
-			$this->zbxTestAssertAttribute("//input[@id='ipmi_sensor']", 'size', 20);
 		}
 		else {
 			$this->zbxTestTextNotVisible('IPMI sensor');
@@ -550,7 +548,6 @@ class testFormItem extends CLegacyWebTest {
 			$this->zbxTestTextPresent('User name');
 			$this->zbxTestAssertVisibleId('username');
 			$this->zbxTestAssertAttribute("//input[@id='username']", 'maxlength', 64);
-			$this->zbxTestAssertAttribute("//input[@id='username']", 'size', 20);
 
 			if (isset($authtype) && $authtype == 'Public key') {
 				$this->zbxTestTextPresent('Key passphrase');
@@ -560,7 +557,6 @@ class testFormItem extends CLegacyWebTest {
 			}
 			$this->zbxTestAssertVisibleId('password');
 			$this->zbxTestAssertAttribute("//input[@id='password']", 'maxlength', 64);
-			$this->zbxTestAssertAttribute("//input[@id='password']", 'size', 20);
 		}
 		else {
 			$this->zbxTestTextNotVisible(['User name', 'Password', 'Key passphrase']);
@@ -572,12 +568,10 @@ class testFormItem extends CLegacyWebTest {
 			$this->zbxTestTextPresent('Public key file');
 			$this->zbxTestAssertVisibleId('publickey');
 			$this->zbxTestAssertAttribute("//input[@id='publickey']", 'maxlength', 64);
-			$this->zbxTestAssertAttribute("//input[@id='publickey']", 'size', 20);
 
 			$this->zbxTestTextPresent('Private key file');
 			$this->zbxTestAssertVisibleId('privatekey');
 			$this->zbxTestAssertAttribute("//input[@id='privatekey']", 'maxlength', 64);
-			$this->zbxTestAssertAttribute("//input[@id='privatekey']", 'size', 20);
 		}
 		else {
 			$this->zbxTestTextNotVisible('Public key file');
@@ -591,7 +585,6 @@ class testFormItem extends CLegacyWebTest {
 			$this->zbxTestTextPresent('SNMP OID');
 			$this->zbxTestAssertVisibleId('snmp_oid');
 			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'maxlength', 512);
-			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'size', 20);
 			if (!isset($itemid)) {
 				$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'placeholder', '[IF-MIB::]ifInOctets.1');
 			}
@@ -617,7 +610,6 @@ class testFormItem extends CLegacyWebTest {
 				$this->zbxTestTextPresent('Update interval');
 				$this->zbxTestAssertVisibleId('delay');
 				$this->zbxTestAssertAttribute("//input[@id='delay']", 'maxlength', 255);
-				$this->zbxTestAssertAttribute("//input[@id='delay']", 'size', 20);
 				if (!isset($itemid)) {
 					$this->zbxTestAssertElementValue('delay', '1m');
 				}
@@ -661,7 +653,6 @@ class testFormItem extends CLegacyWebTest {
 			$this->zbxTestTextPresent('Units');
 			$this->zbxTestAssertVisibleId('units');
 			$this->zbxTestAssertAttribute("//input[@id='units']", 'maxlength', 255);
-			$this->zbxTestAssertAttribute("//input[@id='units']", 'size', 20);
 			if(isset($templateid)) {
 				$this->zbxTestAssertAttribute("//input[@id='units']", 'readonly');
 			}
@@ -688,12 +679,10 @@ class testFormItem extends CLegacyWebTest {
 			$this->zbxTestTextPresent(['Flexible', 'Scheduling', 'Update interval']);
 			$this->zbxTestAssertVisibleId('delay_flex_0_delay');
 			$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_delay']", 'maxlength', 255);
-			$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_delay']", 'size', 20);
 			$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_delay']", 'placeholder', '50s');
 
 			$this->zbxTestAssertVisibleId('delay_flex_0_period');
 			$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_period']", 'maxlength', 255);
-			$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_period']", 'size', 20);
 			$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_period']", 'placeholder', '1-7,00:00-24:00');
 			$this->zbxTestAssertVisibleId('interval_add');
 		}
@@ -704,7 +693,6 @@ class testFormItem extends CLegacyWebTest {
 		if (!isset($itemid)) {
 			$this->zbxTestAssertElementValue('history', '90d');
 		}
-		$this->zbxTestAssertAttribute("//input[@id='history']", 'size', 20);
 
 		if ($value_type == 'Numeric (unsigned)' || $value_type == 'Numeric (float)') {
 			$this->zbxTestTextPresent('Trend storage period');
@@ -713,7 +701,6 @@ class testFormItem extends CLegacyWebTest {
 			if (!isset($itemid)) {
 				$this->zbxTestAssertElementValue('trends', '365d');
 			}
-			$this->zbxTestAssertAttribute("//input[@id='trends']", 'size', 20);
 		}
 		else {
 			$this->zbxTestTextNotVisible('Trend storage period');
@@ -781,14 +768,13 @@ class testFormItem extends CLegacyWebTest {
 			}
 		}
 		else {
-			$this->assertFalse($this->query('xpath://label[text()="Value mapping"]/../..')->one()->isDisplayed());
+			$this->assertFalse($this->query('xpath://label[text()="Value mapping"]')->one()->isDisplayed());
 		}
 
 		if ($type == 'Zabbix trapper') {
 			$this->zbxTestTextPresent('Allowed hosts');
 			$this->zbxTestAssertVisibleId('trapper_hosts');
 			$this->zbxTestAssertAttribute("//input[@id='trapper_hosts']", 'maxlength', 255);
-			$this->zbxTestAssertAttribute("//input[@id='trapper_hosts']", 'size', 20);
 		}
 		else {
 			$this->zbxTestTextNotVisible('Allowed hosts');
@@ -799,7 +785,6 @@ class testFormItem extends CLegacyWebTest {
 			$this->zbxTestTextPresent('Log time format');
 			$this->zbxTestAssertVisibleId('logtimefmt');
 			$this->zbxTestAssertAttribute("//input[@id='logtimefmt']", 'maxlength', 64);
-			$this->zbxTestAssertAttribute("//input[@id='logtimefmt']", 'size', 20);
 		}
 		else {
 			$this->zbxTestTextNotVisible('Log time format');
@@ -1945,9 +1930,11 @@ class testFormItem extends CLegacyWebTest {
 		if (CTestArrayHelper::get($data, 'type') === 'Zabbix agent (active)'
 				&& substr(CTestArrayHelper::get($data, 'key'), 0, 8) === 'mqtt.get') {
 			$this->zbxTestTextNotVisible('Update interval');
-			$this->zbxTestAssertNotVisibleId('row_delay');
+			$this->zbxTestAssertNotVisibleId('js-item-delay-label');
+			$this->zbxTestAssertNotVisibleId('js-item-delay-field');
 			$this->zbxTestTextNotVisible('Custom intervals');
-			$this->zbxTestAssertNotVisibleId('row_flex_intervals');
+			$this->zbxTestAssertNotVisibleId('js-item-flex-intervals-label');
+			$this->zbxTestAssertNotVisibleId('js-item-flex-intervals-field');
 		}
 
 		$itemFlexFlag = true;
@@ -2075,15 +2062,19 @@ class testFormItem extends CLegacyWebTest {
 					// Check hidden update and custom interval for mqtt.get key.
 					if (substr(CTestArrayHelper::get($data, 'key'), 0, 8) === 'mqtt.get') {
 						$this->zbxTestTextNotVisible('Update interval');
-						$this->zbxTestAssertNotVisibleId('row_delay');
+						$this->zbxTestAssertNotVisibleId('js-item-delay-label');
+						$this->zbxTestAssertNotVisibleId('js-item-delay-field');
 						$this->zbxTestTextNotVisible('Custom intervals');
-						$this->zbxTestAssertNotVisibleId('row_flex_intervals');
+						$this->zbxTestAssertNotVisibleId('js-item-flex-intervals-label');
+						$this->zbxTestAssertNotVisibleId('js-item-flex-intervals-field');
 					}
 					else {
 						$this->zbxTestTextVisible('Update interval');
-						$this->zbxTestAssertVisibleId('row_delay');
+						$this->zbxTestAssertVisibleId('js-item-delay-label');
+						$this->zbxTestAssertVisibleId('js-item-delay-field');
 						$this->zbxTestTextVisible('Custom intervals');
-						$this->zbxTestAssertVisibleId('row_flex_intervals');
+						$this->zbxTestAssertVisibleId('js-item-flex-intervals-label');
+						$this->zbxTestAssertVisibleId('js-item-flex-intervals-field');
 					}
 					break;
 				default:

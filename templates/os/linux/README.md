@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 
 ## Setup
 
@@ -64,7 +64,7 @@ Please report any issues with the template at https://support.zabbix.com
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 
 ## Setup
 
@@ -123,7 +123,7 @@ Please report any issues with the template at https://support.zabbix.com
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 
 ## Setup
 
@@ -176,7 +176,7 @@ Please report any issues with the template at https://support.zabbix.com
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 
 ## Setup
 
@@ -233,7 +233,7 @@ Please report any issues with the template at https://support.zabbix.com
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 
 ## Setup
 
@@ -250,7 +250,7 @@ No specific Zabbix configuration is required.
 |{$IF.ERRORS.WARN} |<p>-</p> |`2` |
 |{$IFCONTROL} |<p>-</p> |`1` |
 |{$NET.IF.IFNAME.MATCHES} |<p>-</p> |`^.*$` |
-|{$NET.IF.IFNAME.NOT_MATCHES} |<p>Filter out loopbacks, nulls, docker veth links and docker0 bridge by default</p> |`(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9a-z]+$|docker[0-9]+|br-[a-z0-9]{12})` |
+|{$NET.IF.IFNAME.NOT_MATCHES} |<p>Filter out loopbacks, nulls, docker veth links and docker0 bridge by default</p> |`(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9A-z]+$|docker[0-9]+|br-[a-z0-9]{12})` |
 
 ## Template links
 
@@ -360,7 +360,7 @@ Please report any issues with the template at https://support.zabbix.com
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 New official Linux template. Requires agent of Zabbix 3.0.14, 3.4.5 and 4.0.0 or newer.
 
 ## Setup

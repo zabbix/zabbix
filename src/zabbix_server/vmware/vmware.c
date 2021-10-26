@@ -2039,7 +2039,8 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_URL, service->url)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_TIMEOUT,
 					(long)CONFIG_VMWARE_TIMEOUT)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYHOST, 0L)))
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYHOST, 0L)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = ZBX_CURLOPT_ACCEPT_ENCODING, "")))
 	{
 		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
 		goto out;
@@ -6619,11 +6620,16 @@ out:
 void	zbx_vmware_destroy(void)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	if (NULL != vmware_mem)
+	{
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
-	zbx_hashset_destroy(&vmware->strpool);
-	zbx_hashset_destroy(&evt_msg_strpool);
+		zbx_hashset_destroy(&vmware->strpool);
+		zbx_hashset_destroy(&evt_msg_strpool);
 #endif
-	zbx_mutex_destroy(&vmware_lock);
+		zbx_mem_destroy(vmware_mem);
+		vmware_mem = NULL;
+		zbx_mutex_destroy(&vmware_lock);
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

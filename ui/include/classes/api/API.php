@@ -221,6 +221,13 @@ class API {
 	}
 
 	/**
+	 * @return CHaNode
+	 */
+	public static function HaNode() {
+		return self::getApi('hanode');
+	}
+
+	/**
 	 * @return CHistory
 	 */
 	public static function History() {
