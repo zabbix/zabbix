@@ -363,7 +363,7 @@ class testFormItem extends CLegacyWebTest {
 		if (isset($templateid)) {
 			$this->zbxTestTextPresent('Parent items');
 			if (isset($data['hostTemplate'])) {
-				$this->assertTrue($form->query('link:Inheritance test template')->exists());
+				$this->assertTrue($form->query('link', $data['hostTemplate'])->exists());
 			}
 		}
 		else {
