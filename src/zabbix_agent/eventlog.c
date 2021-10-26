@@ -751,7 +751,7 @@ static int	zbx_parse_eventlog_message6(const wchar_t *wsource, EVT_HANDLE *rende
 
 		size = require;
 		renderedContent = (EVT_VARIANT *)zbx_malloc(NULL, size);
-	
+
 		if (TRUE != EvtRender(*render_context, *event_bookmark, EvtRenderEventValues, size, renderedContent,
 				&require, &bookmarkedCount))
 		{
