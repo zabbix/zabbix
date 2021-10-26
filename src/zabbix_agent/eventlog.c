@@ -28,7 +28,6 @@
 #include <delayimp.h>
 #include <sddl.h>
 
-#define	DEFAULT_EVENT_CONTENT_SIZE	256
 #define MAX_NAME			256
 
 static const wchar_t	*RENDER_ITEMS[] = {
