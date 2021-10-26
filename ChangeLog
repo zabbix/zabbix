@@ -8,6 +8,9 @@ New features:
 .......PS. [ZBXNEXT-6644] added support for vmware key named 'vmware.hv.maintenance' (MVekslers)
 
 Bug fixes:
+..F....... [ZBX-18975] fixed item value being truncated in item test form (agriscenko)
+..F....... [ZBX-20124] fixed incorrect number of days in the error message when the display period is exceeded (Sasha)
+..F....... [ZBX-20123] fixed svg graph widgets not displaying data for certain time periods (averza)
 .........T [ZBX-19958] fixed macro with regular expression for interfaces discovery in OS linux template (vkhaliev)
 ........S. [ZBX-20065] fixed count() function gt,ge,lt,le operations (dgoloscapov, wiper)
 ..F....... [ZBX-18611] fixed division by zero error due to small graph size when using gradient lines (Ivo)
