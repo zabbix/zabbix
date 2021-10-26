@@ -3,6 +3,9 @@ Changes for 6.0.0alpha6
 New features:
 
 Bug fixes:
+..F....... [ZBX-18975] fixed item value being truncated in item test form (agriscenko)
+..F....... [ZBX-20124] fixed incorrect number of days in the error message when the display period is exceeded (Sasha)
+..F....... [ZBX-20123] fixed svg graph widgets not displaying data for certain time periods (averza)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.0alpha5
