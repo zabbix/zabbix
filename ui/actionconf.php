@@ -213,7 +213,7 @@ if (hasRequest('add') || hasRequest('update')) {
 		'evaltype' => getRequest('evaltype')
 	];
 
-	if (count($filter['conditions'])) {
+	if ($filter['conditions']) {
 		if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
 			if (count($filter['conditions']) > 1) {
 				$filter['formula'] = getRequest('formula');
