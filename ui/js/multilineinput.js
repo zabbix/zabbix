@@ -121,7 +121,7 @@
 
 		if ('maxlength' in obj.options) {
 			$textarea.attr('maxlength', obj.options.maxlength);
-			$footer.html(sprintf(t('S_N_CHARS_REMAINING'), '<span>0</span>'));
+			$footer.html(sprintf(t('S_N_CHAR_COUNT_REMAINING'), '<span>0</span>'));
 		}
 		else {
 			$footer.html(sprintf(t('S_N_CHAR_COUNT'), '<span>0</span>'));
