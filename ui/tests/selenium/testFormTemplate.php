@@ -192,12 +192,13 @@ class testFormTemplate extends CLegacyWebTest {
 			$filter->submit();
 
 			$name = CTestArrayHelper::get($data, 'visible_name', $data['name']);
-			// Check if template name present on page, if not, check on second page.
-			if (!$this->query('link', $name)->one(false)->isValid()) {
-				$this->query('xpath://div[@class="table-paging"]//span[@class="arrow-right"]/..')->one()->click();
-				$this->zbxTestWaitForPageToLoad();
-			}
-			$this->zbxTestClickLinkTextWait($name);
+
+			// Filter necessary Template name.
+			$form = $this->query('name:zbx_filter')->waitUntilVisible()->one();
+			$form->fill(['Name' => $name]);
+			$this->query('button:Apply')->one()->waitUntilClickable()->click();
+			$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
+					->getColumn('Name')->query('link', $name)->one()->click();
 
 			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('template_name'));
 			$this->zbxTestAssertElementValue('template_name', $data['name']);
