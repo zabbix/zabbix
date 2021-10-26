@@ -194,7 +194,7 @@ class testFormTemplate extends CLegacyWebTest {
 			$name = CTestArrayHelper::get($data, 'visible_name', $data['name']);
 
 			// Filter necessary Template name.
-			$form = $this->query('name:zbx_filter')->waitUntilVisible()->one();
+			$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
 			$form->fill(['Name' => $name]);
 			$this->query('button:Apply')->one()->waitUntilClickable()->click();
 			$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
