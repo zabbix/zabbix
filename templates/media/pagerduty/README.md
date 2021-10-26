@@ -10,38 +10,46 @@
 * ***Once the trigger is resolved, a resolving event will be sent to the PagerDuty service to resolve the alert and associated incident on that service.***
 # Requirements
 1. PagerDuty integrations with Zabbix require Events API v2 key. If you do not have permission to create Event API v2 key, please reach out to an Admin or Account Owner within your organization to help you configure the integration.
-2. PagerDuty webhook integration works with Zabbix version 4.4 or higher.
+2. PagerDuty webhook integration works with Zabbix version 5.0 or higher.
 # Support
 * If you need help use [forum](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/393216-discussion-thread-for-official-integration-with-pagerduty) 
 * If you have encountered a bug, please report it using [Zabbix Jira bug tracker](https://support.zabbix.com/).
 # Description
-This guide describes how to integrate your Zabbix 4.4 installation with PagerDuty using the Zabbix webhook feature. This guide will provide instructions on setting up a media type, a user and an action in Zabbix.
+This guide describes how to integrate your Zabbix 5.0 installation with PagerDuty using the Zabbix webhook feature. This guide will provide instructions on setting up a media type, a user and an action in Zabbix.
 
 ## In PagerDuty
 
-1\. From the **Configuration** menu, select **Services.**
+* From the **Service** menu, select **Service Directory**.
 
-2\. On your Services page:
+* On your Services page:
 
-*   If you are creating a new service for your integration, click **+New Service**.
+    *   If you are creating a new service for your integration, click **+New Service**.
 
-[![](images/tn_1.png?raw=true)](images/1.png)
+    [![](images/tn_1.png?raw=true)](images/1.png)
 
-* If you are adding your integration to an existing service, click the name of the service you want to add the integration to. Then click the **Integrations** tab and click the **+New Integration** button.
+    *   Set name and description for new service.
 
-[![](images/tn_2.png?raw=true)](images/2.png)
+    [![](images/tn_1.1.png?raw=true)](images/1.png)
 
-3\. Select **Use our API directly** and **Events API v2** from the **Integration Type** menu and enter an **Integration Name**. If you are creating a new service for your integration, in General Settings, enter a **Name** for your new service.
+    *   Assign required an Escalation Policy.
 
-4\. Click the **Add Service** or **Add Integration** button to save your new integration. You will be redirected to the Integrations page for your service.
+    [![](images/tn_1.2.png?raw=true)](images/1.png)
 
-[![](images/tn_3.png?raw=true)](images/3.png)
+    *  Select Alert Grouping.
 
-[![](images/tn_4.png?raw=true)](images/4.png)
+    [![](images/tn_1.3.png?raw=true)](images/1.png)
 
-5\. Copy the **Integration Key** for your new integration:
+    *  In integration section select Zabbix Webhook using search field and click **Create service**.
 
-[![](images/tn_5.png?raw=true)](images/5.png)
+    [![](images/tn_1.4.png?raw=true)](images/1.png)
+
+* If you are adding your integration to an existing service, click the name of the service you want to add the integration to. Then click the **Integrations** tab and click the **+Add an Integration** button, select Zabbix Webhook using search field and click **Add**.
+
+    [![](images/tn_2.png?raw=true)](images/2.png)
+
+* After successfully added integration use **Integration Key** from it in **token** macros for PagerDuty zabbix media type.
+
+    [![](images/tn_3.png?raw=true)](images/2.png)
 
 ## In Zabbix
 
@@ -110,4 +118,4 @@ For more information, use the [Zabbix](https://www.zabbix.com/documentation/5.0/
 
 # Supported Versions
 
-Zabbix 4.4, PagerDuty Events API v2.
+Zabbix 5.0, PagerDuty Events API v2.
