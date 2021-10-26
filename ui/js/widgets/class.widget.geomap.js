@@ -274,9 +274,10 @@ class CWidgetGeoMap extends CWidget {
 	 * @param {string} filter
 	 */
 	updateFilter(filter) {
-		updateUserProfileString('web.dashboard.widget.geomap.severity_filter', filter, [this._widgetid]).always(() => {
-			this._startUpdating();
-		});
+		updateUserProfile('web.dashboard.widget.geomap.severity_filter', filter, [this._widgetid], PROFILE_TYPE_STR)
+			.always(() => {
+				this._startUpdating();
+			});
 	}
 
 	/**
@@ -289,7 +290,7 @@ class CWidgetGeoMap extends CWidget {
 		const zoom = this._map.getZoom();
 		const view = `${ll.lat},${ll.lng},${zoom}`;
 
-		updateUserProfileString('web.dashboard.widget.geomap.default_view', view, [this._widgetid]);
+		updateUserProfile('web.dashboard.widget.geomap.default_view', view, [this._widgetid], PROFILE_TYPE_STR);
 		this._map.setDefaultView(ll, zoom);
 		this._map.navigateHomeControl.show();
 	}

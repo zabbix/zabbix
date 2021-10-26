@@ -23,6 +23,9 @@
 // Sync with SASS variable: $ui-transition-duration.
 const UI_TRANSITION_DURATION = 300;
 
+const PROFILE_TYPE_INT = 2;
+const PROFILE_TYPE_STR = 3;
+
 // Array indexOf method for javascript<1.6 compatibility
 if (!Array.prototype.indexOf) {
 	Array.prototype.indexOf = function (searchElement) {
@@ -656,31 +659,20 @@ function rm4favorites(object, objectid) {
  * Toggles filter state and updates title and icons accordingly.
  *
  * @param {string} 	idx					User profile index
- * @param {string} 	value_int			Integer value
+ * @param {string} 	value				Value
  * @param {object} 	idx2				An array of IDs
+ * @param {integer} profile_type		Profile type
  */
-function updateUserProfile(idx, value_int, idx2) {
-	return sendAjaxData('zabbix.php?action=profile.update', {
-		data: {
-			idx: idx,
-			value_int: value_int,
-			idx2: idx2
-		}
-	});
-}
+function updateUserProfile(idx, value, idx2, profile_type = PROFILE_TYPE_INT) {
+	const value_fields = {
+		[PROFILE_TYPE_INT]: 'value_int',
+		[PROFILE_TYPE_STR]: 'value_str'
+	};
 
-/**
- * Toggles filter state and updates title and icons accordingly.
- *
- * @param {string} 	idx					User profile index
- * @param {string} 	value_str			String value
- * @param {object} 	idx2				An array of IDs
- */
-function updateUserProfileString(idx, value_str, idx2) {
 	return sendAjaxData('zabbix.php?action=profile.update', {
 		data: {
 			idx: idx,
-			value_str: value_str,
+			[value_fields[profile_type]]: value,
 			idx2: idx2
 		}
 	});
