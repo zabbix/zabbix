@@ -3572,7 +3572,7 @@ z-select[disabled] button,
     z-index: 20; }
     .multilineinput-modal .multilineinput-textarea::-webkit-scrollbar {
       height: 9px; }
-  .multilineinput-modal .multilineinput-symbols-remaining {
+  .multilineinput-modal .multilineinput-char-count {
     color: #333333;
     float: left;
     line-height: 24px; }
