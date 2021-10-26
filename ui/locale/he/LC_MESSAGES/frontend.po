@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-25 12:27+0300\n"
-"PO-Revision-Date: 2021-10-23 19:03+0300\n"
+"POT-Creation-Date: 2021-10-26 16:13+0300\n"
+"PO-Revision-Date: 2021-10-26 08:17+0300\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
-"X-POOTLE-MTIME: 1635008625.000000\n"
+"X-POOTLE-MTIME: 1635229055.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:142
@@ -93,7 +93,7 @@ msgid_plural "%1$d days"
 msgstr[0] "יום אחד"
 msgstr[1] "%1$d ימים"
 
-#: jsLoader.php:316
+#: jsLoader.php:317
 #, c-format
 msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
@@ -134,6 +134,16 @@ msgid "%1$s action"
 msgid_plural "%1$s actions"
 msgstr[0] "משימה אחת"
 msgstr[1] "%1$s משימות"
+
+#: jsLoader.php:298
+#, c-format
+msgid "%1$s characters"
+msgstr ""
+
+#: jsLoader.php:299
+#, c-format
+msgid "%1$s characters remaining"
+msgstr ""
 
 #: app/views/popup.acknowledge.edit.php:60
 #: app/views/popup.acknowledge.edit.php:65
@@ -192,7 +202,7 @@ msgid_plural "%1$s of %2$s elements in problem state"
 msgstr[0] "%1$s מתוך רכיב %2$s נמצא במצב תקלה"
 msgstr[1] "%1$s מתוך %2$s רכיבים נמצאים במצב תקלה"
 
-#: jsLoader.php:317
+#: jsLoader.php:318
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s preselected, use down,up arrow keys and enter to select"
@@ -232,11 +242,6 @@ msgid_plural "%1$s seconds"
 msgstr[0] "שנייה אחת"
 msgstr[1] "%1$s שניות"
 
-#: jsLoader.php:298
-#, c-format
-msgid "%1$s symbols remaining"
-msgstr "נותרו %1$s סמלים"
-
 #: include/maps.inc.php:368 include/maps.inc.php:371 include/maps.inc.php:378
 #: include/maps.inc.php:383
 #, c-format
@@ -252,13 +257,13 @@ msgctxt "screen reader"
 msgid "%1$s, Severity, %2$s"
 msgstr "%1$s, דרגת חומרה, %2$s"
 
-#: jsLoader.php:311
+#: jsLoader.php:312
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, read only"
 msgstr "%1$s, קריאה בלבד"
 
-#: jsLoader.php:354
+#: jsLoader.php:355
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, selected"
@@ -491,7 +496,7 @@ msgstr "גישה לשירותים"
 msgid "Ack"
 msgstr "מוכר"
 
-#: app/views/popup.acknowledge.edit.php:83 jsLoader.php:321
+#: app/views/popup.acknowledge.edit.php:83 jsLoader.php:322
 msgid "Acknowledge"
 msgstr "הכרה"
 
@@ -657,7 +662,7 @@ msgstr "המשימה עודכנה"
 #: include/classes/screens/CScreenProblem.php:1224 include/events.inc.php:291
 #: include/forms.inc.php:1222 include/views/configuration.action.edit.php:28
 #: include/views/monitoring.sysmap.list.php:69 jsLoader.php:126
-#: jsLoader.php:154 jsLoader.php:169 jsLoader.php:183 jsLoader.php:320
+#: jsLoader.php:154 jsLoader.php:169 jsLoader.php:183 jsLoader.php:321
 #: tr_events.php:184
 msgid "Actions"
 msgstr "פעולות"
@@ -889,7 +894,7 @@ msgstr "הוספת מעקף חדש"
 msgid "Add page"
 msgstr "הוספת עמוד"
 
-#: app/views/js/popup.service.edit.js.php:539 jsLoader.php:385
+#: app/views/js/popup.service.edit.js.php:539 jsLoader.php:386
 msgid "Add parent services"
 msgstr "הוספת שירותים הורים"
 
@@ -946,7 +951,7 @@ msgstr "הוספת וידג׳ט"
 msgid "Added"
 msgstr "נוסף"
 
-#: jsLoader.php:309
+#: jsLoader.php:310
 #, c-format
 msgctxt "screen reader"
 msgid "Added, %1$s"
@@ -962,7 +967,7 @@ msgstr "כללים נוספים"
 
 #: app/partials/administration.ha.nodes.php:28
 msgid "Address"
-msgstr ""
+msgstr "כתובת"
 
 #: include/hosts.inc.php:63 include/users.inc.php:53
 msgid "Admin"
@@ -1058,7 +1063,7 @@ msgstr "יישור רכיבים במפה"
 #: app/views/reports.scheduledreport.list.php:54
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:122
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:178
-#: include/views/monitoring.sysmap.edit.php:261 jsLoader.php:377
+#: include/views/monitoring.sysmap.edit.php:261 jsLoader.php:378
 msgid "All"
 msgstr "הכול"
 
@@ -1214,7 +1219,7 @@ msgstr "שגיאת יישום."
 #: include/views/js/monitoring.sysmaps.js.php:604
 #: include/views/js/monitoring.sysmaps.js.php:709
 #: include/views/js/monitoring.sysmaps.js.php:815 jsLoader.php:176
-#: jsLoader.php:300
+#: jsLoader.php:301
 msgid "Apply"
 msgstr "החלה"
 
@@ -1798,7 +1803,7 @@ msgstr "קריאה"
 #: app/views/popup.import.compare.php:162
 #: include/classes/html/CButtonCancel.php:25
 #: include/classes/setup/CSetupWizard.php:310 jsLoader.php:177
-#: jsLoader.php:187 jsLoader.php:301 jsLoader.php:373
+#: jsLoader.php:187 jsLoader.php:302 jsLoader.php:374
 msgid "Cancel"
 msgstr "ביטול"
 
@@ -1971,7 +1976,7 @@ msgstr "לא ניתן להוסיף תרחיש רשת"
 msgid "Cannot add widget: not enough free space on the dashboard."
 msgstr "לא ניתן להוסיף וידג׳ט: אין מספיק מקום פנוי בלוח המחוונים."
 
-#: jsLoader.php:312
+#: jsLoader.php:313
 msgctxt "screen reader"
 msgid "Cannot be removed"
 msgstr "לא ניתן להסיר"
@@ -3441,7 +3446,7 @@ msgstr "פינוי בעת ניתוק"
 msgid "Click and drag to desired size."
 msgstr "יש לגרור לגודל הרצוי."
 
-#: jsLoader.php:299
+#: jsLoader.php:300
 msgid "Click to view or edit"
 msgstr "יש ללחוץ כדי לצפות או לערוך"
 
@@ -3472,7 +3477,7 @@ msgstr "שעון"
 #: include/views/configuration.template.edit.php:238
 #: include/views/configuration.trigger.prototype.edit.php:655
 #: include/views/configuration.triggers.edit.php:648
-#: include/views/monitoring.sysmap.edit.php:421 jsLoader.php:323
+#: include/views/monitoring.sysmap.edit.php:421 jsLoader.php:324
 msgid "Clone"
 msgstr "שכפול"
 
@@ -3484,7 +3489,7 @@ msgstr "שכפול"
 #: include/views/js/monitoring.sysmaps.js.php:611
 #: include/views/js/monitoring.sysmaps.js.php:716
 #: include/views/js/monitoring.sysmaps.js.php:819 jsLoader.php:188
-#: jsLoader.php:267 jsLoader.php:284 jsLoader.php:366
+#: jsLoader.php:267 jsLoader.php:284 jsLoader.php:367
 msgid "Close"
 msgstr "סגירה"
 
@@ -3645,7 +3650,7 @@ msgstr "תנאים"
 #: app/views/search.php:40 app/views/search.php:198 app/views/search.php:279
 #: include/classes/helpers/CMenuHelper.php:212
 #: include/classes/helpers/CRoleHelper.php:282
-#: include/views/inventory.host.view.php:222 jsLoader.php:322
+#: include/views/inventory.host.view.php:222 jsLoader.php:323
 msgid "Configuration"
 msgstr "הגדרות"
 
@@ -4134,11 +4139,11 @@ msgstr "יצירת יחס"
 msgid "Create dashboard"
 msgstr "יצירת לוח מחוונים"
 
-#: jsLoader.php:327
+#: jsLoader.php:328
 msgid "Create dependent discovery rule"
 msgstr "יצירת כלל גילוי תלוי"
 
-#: jsLoader.php:326
+#: jsLoader.php:327
 msgid "Create dependent item"
 msgstr "יצירת פריט תלוי"
 
@@ -4256,7 +4261,7 @@ msgstr "יצירת מפה"
 msgid "Create media type"
 msgstr "יצירת סוג מדיה"
 
-#: app/views/popup.import.php:130 jsLoader.php:324
+#: app/views/popup.import.php:130 jsLoader.php:325
 msgid "Create new"
 msgstr "יצירת חדש"
 
@@ -4280,7 +4285,7 @@ msgstr "יצירת שירות"
 msgid "Create template"
 msgstr "יצירת תבנית"
 
-#: include/views/configuration.triggers.list.php:149 jsLoader.php:325
+#: include/views/configuration.triggers.list.php:149 jsLoader.php:326
 msgid "Create trigger"
 msgstr "יצירת הקפצה"
 
@@ -4530,7 +4535,7 @@ msgstr "לוח מחוונים עם המזהה „%1$s” אינו זמין."
 #: include/html.inc.php:371 include/views/configuration.template.list.php:121
 #: include/views/configuration.template.list.php:234
 #: include/views/inventory.host.view.php:170
-#: include/views/inventory.host.view.php:174 jsLoader.php:328
+#: include/views/inventory.host.view.php:174 jsLoader.php:329
 msgid "Dashboards"
 msgstr "לוחות מחוונים"
 
@@ -4602,7 +4607,7 @@ msgstr "קובץ מפתח TLS של מסד הנתונים"
 
 #: app/partials/administration.system.info.php:121
 msgid "Database history $info_tables upgraded"
-msgstr ""
+msgstr "היסטוריית מסד הנתונים ‎$info_tables שודרגה"
 
 #: include/classes/setup/CSetupWizard.php:472
 msgid "Database host"
@@ -4697,7 +4702,7 @@ msgstr "יום בשבוע"
 msgid "Days"
 msgstr "ימים"
 
-#: app/controllers/CControllerPopupMediatypeTestSend.php:172 jsLoader.php:357
+#: app/controllers/CControllerPopupMediatypeTestSend.php:172 jsLoader.php:358
 msgid "Debug"
 msgstr "ניפוי שגיאות"
 
@@ -4849,7 +4854,7 @@ msgstr "בהשהיה של"
 #: include/views/configuration.trigger.prototype.list.php:207
 #: include/views/configuration.triggers.list.php:350
 #: include/views/monitoring.sysmap.list.php:110 jsLoader.php:130
-#: jsLoader.php:156 jsLoader.php:329
+#: jsLoader.php:156 jsLoader.php:330
 msgid "Delete"
 msgstr "מחיקה"
 
@@ -4878,7 +4883,7 @@ msgstr "למחוק את המשימה הנוכחית?"
 msgid "Delete current correlation?"
 msgstr "למחוק את היחס הנוכחי?"
 
-#: jsLoader.php:330
+#: jsLoader.php:331
 msgid "Delete dashboard?"
 msgstr "למחוק את לוח המחוונים?"
 
@@ -5639,7 +5644,7 @@ msgstr "הצגת תרשים מוערם"
 #: app/views/js/popup.service.edit.js.php:484 app/views/search.php:187
 #: app/views/search.php:272 app/views/search.php:371
 #: include/actions.inc.php:1724 include/actions.inc.php:1796
-#: include/classes/helpers/CPagerHelper.php:147 jsLoader.php:369
+#: include/classes/helpers/CPagerHelper.php:147 jsLoader.php:370
 #, c-format
 msgid "Displaying %1$s of %2$s found"
 msgstr "מוצגים %1$s מתוך %2$s שנמצאו"
@@ -5671,7 +5676,7 @@ msgstr "לא לשמור היסטוריה"
 msgid "Do not keep trends"
 msgstr "לא לשמור מגמות"
 
-#: jsLoader.php:196 jsLoader.php:331
+#: jsLoader.php:196 jsLoader.php:332
 msgid "Do you wish to replace the conditional expression?"
 msgstr "להחליף את הביטוי המותנה?"
 
@@ -5865,7 +5870,7 @@ msgstr "עריכת פעולה"
 msgid "Edit tree element"
 msgstr "עריכת רכיב בעץ"
 
-#: jsLoader.php:332
+#: jsLoader.php:333
 msgid "Edit trigger"
 msgstr "עריכת הקפצה"
 
@@ -6986,7 +6991,7 @@ msgstr "קבלת תוכן של עמוד באינטרנט. מחזירה את מק
 msgid "Get value"
 msgstr "קבלת ערך"
 
-#: app/views/js/popup.itemtestedit.view.js.php:505
+#: app/views/js/popup.itemtestedit.view.js.php:503
 #: app/views/popup.itemtestedit.view.php:432
 msgid "Get value and test"
 msgstr "קבלת ערך ובדיקה"
@@ -7014,7 +7019,7 @@ msgstr "ערך גלובלי"
 msgid "Go back to %1$s"
 msgstr "חזרה אל %1$s"
 
-#: jsLoader.php:337
+#: jsLoader.php:338
 msgid "Go to"
 msgstr "מעבר אל"
 
@@ -7224,7 +7229,7 @@ msgstr "תרשים בשם „%1$s” כבר קיים בתרשימים או בא�
 #: include/views/inventory.host.view.php:160
 #: include/views/inventory.host.view.php:168
 #: include/views/inventory.host.view.php:194
-#: include/views/inventory.host.view.php:217 jsLoader.php:338
+#: include/views/inventory.host.view.php:217 jsLoader.php:339
 msgid "Graphs"
 msgstr "תרשימים"
 
@@ -7427,7 +7432,7 @@ msgstr "הקסדצימלי לעשרוני"
 msgid "Hidden"
 msgstr "מוסתר"
 
-#: jsLoader.php:358
+#: jsLoader.php:359
 msgid "Hide debug"
 msgstr "הסתרת ניפוי שגיאות"
 
@@ -7492,7 +7497,7 @@ msgstr "הדגשת שורה שלמה"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:49
 #: include/forms.inc.php:550 include/views/configuration.item.list.php:89
 #: include/views/configuration.item.prototype.list.php:62 items.php:259
-#: jsLoader.php:339
+#: jsLoader.php:340
 msgid "History"
 msgstr "היסטוריה"
 
@@ -7581,7 +7586,7 @@ msgstr "יישור אופקי"
 #: include/views/inventory.host.view.php:214
 #: include/views/js/monitoring.sysmaps.js.php:92
 #: include/views/js/monitoring.sysmaps.js.php:161
-#: include/views/reports.toptriggers.php:86 jsLoader.php:235 jsLoader.php:340
+#: include/views/reports.toptriggers.php:86 jsLoader.php:235 jsLoader.php:341
 #: report2.php:507
 msgid "Host"
 msgid_plural "Hosts"
@@ -9352,7 +9357,7 @@ msgid "Insert"
 msgstr "הוספה"
 
 #: include/views/configuration.trigger.prototype.edit.php:136
-#: include/views/configuration.triggers.edit.php:162 jsLoader.php:333
+#: include/views/configuration.triggers.edit.php:162 jsLoader.php:334
 msgid "Insert expression"
 msgstr "הוספת ביטוי"
 
@@ -9840,7 +9845,7 @@ msgstr "פרק הזמן שגוי."
 #: app/views/popup.massupdate.host.php:301
 #: include/classes/helpers/CMenuHelper.php:94
 #: include/classes/helpers/CRoleHelper.php:277
-#: include/views/configuration.host.prototype.edit.php:363 jsLoader.php:341
+#: include/views/configuration.host.prototype.edit.php:363 jsLoader.php:342
 msgid "Inventory"
 msgstr "מאגר"
 
@@ -10030,7 +10035,7 @@ msgstr "אבות הטיפוס של הפריט עודכנו"
 msgid "Item tags"
 msgstr "תגיות פריט"
 
-#: jsLoader.php:363
+#: jsLoader.php:364
 msgid "Item type does not use interface"
 msgstr "סוג הפריט אינו משתמש במנשק"
 
@@ -10395,11 +10400,11 @@ msgstr "גישה אחרונה ב־"
 msgid "Last check"
 msgstr "הבדיקה האחרונה"
 
-#: jsLoader.php:344
+#: jsLoader.php:345
 msgid "Last hour graph"
 msgstr "תרשים של השעה האחרונה"
 
-#: jsLoader.php:345
+#: jsLoader.php:346
 msgid "Last month graph"
 msgstr "תרשים של החודש שעבר"
 
@@ -10437,7 +10442,7 @@ msgstr "נשלח לאחרונה"
 msgid "Last value"
 msgstr "ערך אחרון"
 
-#: jsLoader.php:346
+#: jsLoader.php:347
 msgid "Last week graph"
 msgstr "תרשים השבוע שעבר"
 
@@ -10450,11 +10455,11 @@ msgstr "תרשים השבוע שעבר"
 #: include/classes/helpers/CMenuHelper.php:52
 #: include/classes/helpers/CRoleHelper.php:309
 #: include/views/inventory.host.view.php:145
-#: include/views/inventory.host.view.php:151 jsLoader.php:342
+#: include/views/inventory.host.view.php:151 jsLoader.php:343
 msgid "Latest data"
 msgstr "נתונים עדכניים"
 
-#: jsLoader.php:343
+#: jsLoader.php:344
 msgid "Latest values"
 msgstr "ערכים אחרונים"
 
@@ -11546,11 +11551,11 @@ msgstr "חודש"
 msgid "Monthly"
 msgstr "חודשי"
 
-#: include/classes/html/CMultiSelect.php:83 jsLoader.php:305
+#: include/classes/html/CMultiSelect.php:83 jsLoader.php:306
 msgid "More matches found..."
 msgstr "נמצאו תוצאות נוספות…"
 
-#: jsLoader.php:315
+#: jsLoader.php:316
 #, c-format
 msgctxt "screen reader"
 msgid "More than %1$d matches for %2$s found"
@@ -12112,7 +12117,7 @@ msgstr "אין תמונה"
 #: app/views/popup.massupdate.item.php:67
 #: include/views/configuration.host.discovery.edit.php:519
 #: include/views/configuration.item.edit.php:600
-#: include/views/configuration.item.prototype.edit.php:585 jsLoader.php:362
+#: include/views/configuration.item.prototype.edit.php:585 jsLoader.php:363
 msgid "No interface found"
 msgstr "לא נמצא מנשק"
 
@@ -12146,7 +12151,7 @@ msgstr "לא נמצאו מאקרואים."
 msgid "No maps added."
 msgstr "לא נוספו מפות."
 
-#: include/classes/html/CMultiSelect.php:82 jsLoader.php:304
+#: include/classes/html/CMultiSelect.php:82 jsLoader.php:305
 msgid "No matches found"
 msgstr "לא נמצאו התאמות"
 
@@ -12819,7 +12824,7 @@ msgstr "כבוי"
 #: app/views/monitoring.widget.web.view.php:30
 #: include/views/configuration.triggers.list.php:94
 #: include/views/js/common.item.edit.js.php:204
-#: include/views/js/configuration.httpconf.edit.js.php:103 jsLoader.php:374
+#: include/views/js/configuration.httpconf.edit.js.php:103 jsLoader.php:375
 #: report2.php:507
 msgid "Ok"
 msgstr "בסדר"
@@ -13985,7 +13990,7 @@ msgstr "עדכון תקלה"
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:35
 #: include/classes/widgets/views/widget.svggraph.form.view.php:296
 #: include/views/inventory.host.view.php:153
-#: include/views/inventory.host.view.php:158 jsLoader.php:347 report2.php:507
+#: include/views/inventory.host.view.php:158 jsLoader.php:348 report2.php:507
 msgid "Problems"
 msgstr "תקלות"
 
@@ -14558,7 +14563,7 @@ msgstr "הסרה, %1$s"
 msgid "Removed"
 msgstr "הוסר"
 
-#: jsLoader.php:310
+#: jsLoader.php:311
 #, c-format
 msgctxt "screen reader"
 msgid "Removed, %1$s"
@@ -15373,7 +15378,7 @@ msgstr "הסקריפט עודכן"
 #: app/views/administration.script.edit.php:30
 #: app/views/administration.script.list.php:31
 #: include/classes/helpers/CMenuHelper.php:286
-#: include/classes/helpers/CRoleHelper.php:386 jsLoader.php:348
+#: include/classes/helpers/CRoleHelper.php:386 jsLoader.php:349
 msgid "Scripts"
 msgstr "סקריפטים"
 
@@ -15452,7 +15457,7 @@ msgstr "שם אבטחה"
 #: include/views/configuration.item.edit.php:104
 #: include/views/configuration.item.prototype.edit.php:89
 #: include/views/configuration.item.prototype.edit.php:528
-#: include/views/js/monitoring.sysmaps.js.php:216 jsLoader.php:308
+#: include/views/js/monitoring.sysmaps.js.php:216 jsLoader.php:309
 msgid "Select"
 msgstr "בחירה"
 
@@ -15488,13 +15493,13 @@ msgstr "רכיבים שנבחרו"
 msgid "Selected items only"
 msgstr "פריטים נבחרים בלבד"
 
-#: jsLoader.php:313
+#: jsLoader.php:314
 #, c-format
 msgctxt "screen reader"
 msgid "Selected, %1$s in position %2$d of %3$d"
 msgstr "נבחר, %1$s במיקום %2$d מתוך %3$d"
 
-#: jsLoader.php:314
+#: jsLoader.php:315
 #, c-format
 msgctxt "screen reader"
 msgid "Selected, %1$s, read only, in position %2$d of %3$d"
@@ -15741,7 +15746,7 @@ msgstr "הגדרת תאריך ושעת תפוגה"
 msgid "Set host inventory mode"
 msgstr "הגדרת מצב מלאי למארח"
 
-#: include/classes/html/CInputSecret.php:80 jsLoader.php:380
+#: include/classes/html/CInputSecret.php:80 jsLoader.php:381
 msgid "Set new value"
 msgstr "הגדרת ערך חדש"
 
@@ -15837,7 +15842,7 @@ msgstr "צורה"
 msgid "Shared"
 msgstr "משותף"
 
-#: include/views/monitoring.sysmap.edit.php:414 jsLoader.php:334
+#: include/views/monitoring.sysmap.edit.php:414 jsLoader.php:335
 msgid "Sharing"
 msgstr "שיתוף"
 
@@ -16471,7 +16476,7 @@ msgctxt "encryption certificate"
 msgid "Subject"
 msgstr "נושא"
 
-#: jsLoader.php:349
+#: jsLoader.php:350
 msgid "Submap"
 msgstr "תת־מפה"
 
@@ -16884,7 +16889,7 @@ msgstr "תבניות עודכנו"
 #: app/views/administration.authentication.edit.php:339
 #: app/views/administration.mediatype.list.php:140
 #: app/views/administration.regex.edit.php:140
-#: app/views/js/popup.itemtestedit.view.js.php:573
+#: app/views/js/popup.itemtestedit.view.js.php:571
 #: app/views/popup.itemtestedit.view.php:432
 #: app/views/popup.mediatypetest.edit.php:99
 #: app/views/popup.testtriggerexpr.php:124 include/forms.inc.php:1457
@@ -17233,7 +17238,7 @@ msgstr "חותמת זמן"
 msgid "To"
 msgstr "עד"
 
-#: jsLoader.php:361
+#: jsLoader.php:362
 msgid "To set a host interface select a single item type for all items"
 msgstr "כדי להגדיר מנשק מארח יש לבחור בסוג פריט אחד לכל הפריטים"
 
@@ -17358,7 +17363,7 @@ msgstr "מגמות"
 #: include/views/configuration.triggers.edit.php:571
 #: include/views/js/monitoring.sysmaps.js.php:94
 #: include/views/js/monitoring.sysmaps.js.php:792
-#: include/views/reports.toptriggers.php:86 jsLoader.php:237 jsLoader.php:350
+#: include/views/reports.toptriggers.php:86 jsLoader.php:237 jsLoader.php:351
 msgid "Trigger"
 msgstr "הקפצה"
 
@@ -17529,11 +17534,11 @@ msgstr "אבות טיפוס של הקפצות עודכנו"
 msgid "Trigger severity"
 msgstr "חומרת הקפצה"
 
-#: jsLoader.php:335
+#: jsLoader.php:336
 msgid "Trigger status \"OK\""
 msgstr "מצב ההקפצה הוא „תקין“"
 
-#: jsLoader.php:336
+#: jsLoader.php:337
 msgid "Trigger status \"Problem\""
 msgstr "מצב ההקפצה הוא „תקלה”"
 
@@ -17701,7 +17706,7 @@ msgstr "לא ידוע"
 #: include/views/configuration.trigger.prototype.edit.php:530
 #: include/views/configuration.triggers.edit.php:557
 #: include/views/js/monitoring.sysmaps.js.php:314
-#: include/views/monitoring.sysmap.edit.php:278 items.php:156 jsLoader.php:351
+#: include/views/monitoring.sysmap.edit.php:278 items.php:156 jsLoader.php:352
 msgid "URL"
 msgstr "כתובת"
 
@@ -17747,7 +17752,7 @@ msgid "URL should have both \"name\" and \"url\" fields for map \"%1$s\"."
 msgstr "לכתובת אמורים להיות שני השדות: „name” ו־„url” (שם וכתובת) עבור המפה „%1$s”."
 
 #: include/views/js/monitoring.sysmaps.js.php:311
-#: include/views/monitoring.sysmap.edit.php:311 jsLoader.php:352
+#: include/views/monitoring.sysmap.edit.php:311 jsLoader.php:353
 msgid "URLs"
 msgstr "כתובות"
 
@@ -19054,7 +19059,7 @@ msgstr "אנו מתנצלים, כמות הרכיבים המרבית האפשרי
 #: include/views/inventory.host.view.php:138
 #: include/views/inventory.host.view.php:143
 #: include/views/inventory.host.view.php:206
-#: include/views/inventory.host.view.php:219 jsLoader.php:353
+#: include/views/inventory.host.view.php:219 jsLoader.php:354
 msgid "Web"
 msgstr "אינטרנט"
 
@@ -20635,7 +20640,7 @@ msgstr "כלל גילוי ברמה נמוכה"
 msgid "ltrim() - Remove specified characters from the beginning of a string"
 msgstr "ltrim()‎ - מסירה תווים מסוימים מהתחלה של מחרוזת"
 
-#: include/func.inc.php:581 jsLoader.php:120 jsLoader.php:195 jsLoader.php:370
+#: include/func.inc.php:581 jsLoader.php:120 jsLoader.php:195 jsLoader.php:371
 msgctxt "minute short"
 msgid "m"
 msgstr "m"
@@ -20835,7 +20840,7 @@ msgstr "n-d H:i"
 msgid "name"
 msgstr "שם"
 
-#: include/classes/html/CMultiSelect.php:85 jsLoader.php:307
+#: include/classes/html/CMultiSelect.php:85 jsLoader.php:308
 msgid "new"
 msgstr "חדש"
 
@@ -20970,7 +20975,7 @@ msgstr "פלט"
 msgid "path/to/secret"
 msgstr "נתיב/אל/סוד"
 
-#: include/classes/html/CMacroValue.php:139 jsLoader.php:381
+#: include/classes/html/CMacroValue.php:139 jsLoader.php:382
 msgid "path/to/secret:key"
 msgstr "נתיב/אל/סוד:מפתח"
 
@@ -21373,7 +21378,7 @@ msgid "truncate() - Truncates a value to decimal places"
 msgstr "truncate()‎ - קוצץ ערך למקומות עשרוניים"
 
 #: app/partials/layout.htmlpage.aside.php:74
-#: include/classes/html/CMultiSelect.php:84 jsLoader.php:306
+#: include/classes/html/CMultiSelect.php:84 jsLoader.php:307
 msgid "type here to search"
 msgstr "יש להקליד כאן כדי לחפש"
 
@@ -21495,7 +21500,7 @@ msgstr "אמור להיות מזהה באותיות גדולות"
 #: app/views/administration.userrole.edit.php:172
 #: app/views/administration.userrole.edit.php:213
 #: app/views/js/popup.itemtestedit.view.js.php:446
-#: app/views/js/popup.itemtestedit.view.js.php:457
+#: app/views/js/popup.itemtestedit.view.js.php:456
 #: app/views/js/popup.valuemap.edit.js.php:29
 #: app/views/js/popup.valuemap.edit.js.php:30
 #: app/views/js/popup.valuemap.edit.js.php:31
@@ -21521,7 +21526,7 @@ msgstr "אמור להיות מזהה באותיות גדולות"
 #: include/views/js/configuration.httpconf.edit.js.php:73
 #: include/views/js/configuration.maintenance.edit.js.php:37
 #: include/views/js/configuration.maintenance.edit.js.php:61
-#: include/views/js/item.preprocessing.js.php:420 jsLoader.php:382
+#: include/views/js/item.preprocessing.js.php:420 jsLoader.php:383
 msgid "value"
 msgstr "ערך"
 
