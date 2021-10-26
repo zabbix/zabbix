@@ -645,7 +645,7 @@ class CAction extends CApiService {
 						}
 
 						return $condition['conditiontype'] == $db_condition['conditiontype']
-							&& $condition['value'] === $db_condition['value'];
+							&& $condition['value'] == $db_condition['value'];
 					})
 				);
 
