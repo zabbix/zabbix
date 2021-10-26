@@ -28,7 +28,8 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 @import "layout/form-grid";
 
 @import "components/buttons";
-@import "components/dashboard";
+@import "components/dashboard/dashboard";
+@import "components/dashboard/widget-item";
 @import "components/diff";
 @import "components/form-search";
 @import "components/inline-filter";
