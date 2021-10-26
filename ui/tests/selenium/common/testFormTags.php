@@ -311,7 +311,7 @@ class testFormTags extends CWebTest {
 			$this->page->removeFocus();
 			$this->page->updateViewport();
 			$screenshot_area = $this->query('id:tags-table')->one();
-			$this->assertScreenshot($screenshot_area, $data['name']);
+			$this->assertScreenshot($screenshot_area, $data['name'].''.$object);
 		}
 
 		$form->submit();
