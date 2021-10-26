@@ -185,7 +185,7 @@
 						label_after: '}',
 						grow: 'auto',
 						rows: 0,
-						maxlength: <?= (int) DB::getFieldLength('item_preproc', 'params') ?>
+						maxlength: <?= DB::getFieldLength('item_preproc', 'params') ?>
 					});
 
 				case '<?= ZBX_PREPROC_PROMETHEUS_PATTERN ?>':
