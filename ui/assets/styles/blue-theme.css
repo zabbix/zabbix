@@ -5139,27 +5139,28 @@ td[class] + td.disaster-bg {
 
 .input-color-picker {
   position: relative;
-  display: inline-block; }
+  display: inline-block;
+  vertical-align: middle;
+  min-width: 24px;
+  min-height: 24px; }
   .input-color-picker div {
     position: absolute;
-    top: 2px;
     left: 2px;
+    top: 2px;
     width: 18px;
     height: 18px;
     border: 1px solid #acbbc2;
     background: url("../img/icon-sprite.svg?20200407") no-repeat -323px -411px;
     cursor: pointer; }
-  .input-color-picker input[readonly],
-  .input-color-picker input:disabled {
-    color: #acbbc2 !important; }
-    .input-color-picker input[readonly] + div,
-    .input-color-picker input:disabled + div {
-      cursor: default; }
   .input-color-picker input:disabled + div {
+    cursor: default;
     background: #acbbc2 !important;
     border: 1px solid #acbbc2; }
   .input-color-picker input[type="text"] {
     padding-left: 25px; }
+
+.color-picker-controls {
+  margin-bottom: 5px; }
 
 @keyframes is-loading-kf {
   to {
@@ -5536,8 +5537,8 @@ svg {
   .columns-wrapper.columns-3 > div,
   .columns-wrapper.columns-3 > li {
     display: block;
-    flex: 0 0 33.33333%;
-    max-width: 33.33333%; }
+    flex: 0 0 33.3333333333%;
+    max-width: 33.3333333333%; }
   .columns-wrapper .column-5 {
     flex: 0 0 5%;
     max-width: 5%; }
@@ -6087,8 +6088,8 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
     border-radius: 50%;
     background: #0275b8; }
   .range-control.range-control-focus .range-control-thumb {
-    margin-top: -6.66667px;
-    margin-left: -6.66667px;
+    margin-top: -6.6666666667px;
+    margin-left: -6.6666666667px;
     background: #0275b8;
     border: 2px solid #0395ea; }
   .range-control.range-control-focus .range-control-progress {
@@ -6438,7 +6439,7 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
 #itemsTable .table-col-y-axis-side {
   width: 85px; }
 #itemsTable .table-col-colour {
-  width: 105px; }
+  width: 55px; }
 #itemsTable .table-col-action {
   width: 55px; }
 

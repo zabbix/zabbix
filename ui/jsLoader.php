@@ -350,7 +350,8 @@ $tranStrings = [
 		'Item type does not use interface' => _('Item type does not use interface')
 	],
 	'colorpicker.js' => [
-		'S_CLOSE' => _('Close')
+		'S_CLOSE' => _('Close'),
+		'Use default' => _('Use default')
 	],
 	'class.csvggraph.js' => [
 		'S_DISPLAYING_FOUND' => _('Displaying %1$s of %2$s found'),

@@ -4269,11 +4269,14 @@ td.inactive-bg {
 .input-color-picker {
 	position: relative;
 	display: inline-block;
+	vertical-align: middle;
+	min-width: 24px;
+	min-height: 24px;
 
 	div {
 		position: absolute;
-		top: 2px;
 		left: 2px;
+		top: 2px;
 		width: 18px;
 		height: 18px;
 		border: 1px solid $form-border-color;
@@ -4281,16 +4284,8 @@ td.inactive-bg {
 		cursor: pointer;
 	}
 
-	input[readonly],
-	input:disabled {
-		color: $form-disabled-font-color !important;
-
-		+ div {
-			cursor: default;
-		}
-	}
-
 	input:disabled + div {
+		cursor: default;
 		background: $form-disabled-font-color !important;
 		border: 1px solid $form-disabled-font-color;
 	}
@@ -4298,6 +4293,10 @@ td.inactive-bg {
 	input[type="text"] {
 		padding-left: 25px;
 	}
+}
+
+.color-picker-controls {
+	margin-bottom: 5px;
 }
 
 // Preloader.
@@ -6174,7 +6173,7 @@ $range-input-width: 31px;
 	.table-col-function { width: 85px; }
 	.table-col-draw-style { width: 85px; }
 	.table-col-y-axis-side { width: 85px; }
-	.table-col-colour { width: 105px; }
+	.table-col-colour { width: 55px; }
 	.table-col-action { width: 55px; }
 }
 

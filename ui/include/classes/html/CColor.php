@@ -21,13 +21,12 @@
 
 class CColor extends CDiv {
 
-	const MAX_LENGTH = 6;
-
 	private $name;
 	private $value;
 	private $is_enabled = true;
 	private $is_required = false;
 	private $append_color_picker_js = true;
+	private $default_color;
 	private $input_id;
 
 	/**
@@ -54,6 +53,19 @@ class CColor extends CDiv {
 	 */
 	public function setEnabled($is_enabled = true) {
 		$this->is_enabled = $is_enabled;
+
+		return $this;
+	}
+
+	/**
+	 * Set default color.
+	 *
+	 * @param string $default_color  Default color.
+	 *
+	 * @return CColor
+	 */
+	public function setDefaultColor(string $default_color) {
+		$this->default_color = $default_color;
 
 		return $this;
 	}
@@ -86,6 +98,19 @@ class CColor extends CDiv {
 	}
 
 	/**
+	 * Make coloricker initialization javascript.
+	 *
+	 * @return string
+	 */
+	protected function getInitJavascript(): string {
+		$options = [
+			'default_color' => $this->default_color
+		];
+
+		return 'jQuery("#'.$this->name.'").colorpicker('.json_encode(array_filter($options)).');';
+	}
+
+	/**
 	 * Gets string representation of widget HTML content.
 	 *
 	 * @param bool $destroy
@@ -95,11 +120,7 @@ class CColor extends CDiv {
 	public function toString($destroy = true) {
 		$this->cleanItems();
 
-		$input = (new CTextBox($this->name, $this->value))
-			->setWidth(ZBX_TEXTAREA_COLOR_WIDTH)
-			->setAttribute('maxlength', self::MAX_LENGTH)
-			->setEnabled($this->is_enabled)
-			->setAriaRequired($this->is_required);
+		$input = (new CInput('hidden', $this->name, $this->value))->setEnabled($this->is_enabled);
 
 		if ($this->input_id !== null) {
 			$input->setId($this->input_id);
@@ -109,7 +130,7 @@ class CColor extends CDiv {
 
 		$this->addClass(ZBX_STYLE_INPUT_COLOR_PICKER);
 
-		$init_script = $this->append_color_picker_js ? get_js('jQuery("#'.$this->name.'").colorpicker()') : '';
+		$init_script = $this->append_color_picker_js ? get_js($this->getInitJavascript()) : '';
 
 		return parent::toString($destroy).$init_script;
 	}
