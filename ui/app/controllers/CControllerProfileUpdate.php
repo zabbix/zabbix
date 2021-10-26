@@ -125,18 +125,18 @@ class CControllerProfileUpdate extends CController {
 
 	protected function doAction() {
 		$idx = $this->getInput('idx');
-		$value_int = $this->getInput('value_int', 0);
-		$value_str = $this->getInput('value_str', '');
 
 		DBstart();
 		switch ($idx) {
 			case 'web.dashboard.widget.geomap.default_view':
+				$value_str = $this->getInput('value_str');
 				foreach ($this->getInput('idx2') as $idx2) {
 					CProfile::update($idx, $value_str, PROFILE_TYPE_STR, $idx2);
 				}
 				break;
 
 			case 'web.dashboard.widget.geomap.severity_filter':
+				$value_str = $this->getInput('value_str');
 				if ($value_str === '') { // default value
 					CProfile::delete($idx, $this->getInput('idx2'));
 				}
@@ -148,6 +148,7 @@ class CControllerProfileUpdate extends CController {
 				break;
 
 			case !!preg_match('/web.dashboard.widget.navtree.item-\d+.toggle/', $this->getInput('idx')):
+				$value_int = $this->getInput('value_int');
 				if ($value_int == 1) { // default value
 					CProfile::delete($idx, $this->getInput('idx2'));
 				}
@@ -159,20 +160,24 @@ class CControllerProfileUpdate extends CController {
 				break;
 
 			case 'web.dashboard.widget.navtree.item.selected':
+				$value_int = $this->getInput('value_int');
 				foreach ($this->getInput('idx2') as $idx2) {
 					CProfile::update($idx, $value_int, PROFILE_TYPE_INT, $idx2);
 				}
 				break;
 
 			case 'web.layout.mode':
+				$value_int = $this->getInput('value_int');
 				CViewHelper::saveLayoutMode($value_int);
 				break;
 
 			case 'web.sidebar.mode':
+				$value_int = $this->getInput('value_int');
 				CViewHelper::saveSidebarMode($value_int);
 				break;
 
 			default:
+				$value_int = $this->getInput('value_int');
 				if ($value_int == 1) { // default value
 					CProfile::delete($idx);
 				}
