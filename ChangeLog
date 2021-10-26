@@ -8,6 +8,7 @@ New features:
 .......PS. [ZBXNEXT-6644] added support for vmware key named 'vmware.hv.maintenance' (MVekslers)
 
 Bug fixes:
+..F....... [ZBX-18975] fixed item value being truncated in item test form (agriscenko)
 .........T [ZBX-19958] fixed macro with regular expression for interfaces discovery in OS linux template (vkhaliev)
 ........S. [ZBX-20065] fixed count() function gt,ge,lt,le operations (dgoloscapov, wiper)
 ..F....... [ZBX-18611] fixed division by zero error due to small graph size when using gradient lines (Ivo)
