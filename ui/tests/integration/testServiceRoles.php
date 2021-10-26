@@ -718,9 +718,6 @@ class testServiceRoles extends CIntegrationTest {
 			]
 		]);
 
-		$response = $this->call('user.logout', []);
-		$this->authorize('John', 'Doe123123');
-
 		$response = $this->call('service.update', [
 			'serviceid' => self::$child1_1_serviceid,
 			'goodsla' => 33.3
@@ -728,10 +725,7 @@ class testServiceRoles extends CIntegrationTest {
 		$this->assertArrayHasKey('serviceids', $response['result']);
 		$this->assertCount(1, $response['result']['serviceids']);
 
-		$response = $this->call('user.logout', []);
-
 		// Read enabled, write disabled
-		$this->authorize(PHPUNIT_LOGIN_NAME, PHPUNIT_LOGIN_PWD);
 		$response = $this->call('role.update', [
 			'roleid' => self::$roleid,
 			"rules" => [
