@@ -213,33 +213,35 @@ if (hasRequest('add') || hasRequest('update')) {
 		'evaltype' => getRequest('evaltype')
 	];
 
-	if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-		if (count($filter['conditions']) > 1) {
-			$filter['formula'] = getRequest('formula');
+	if (count($filter['conditions'])) {
+		if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+			if (count($filter['conditions']) > 1) {
+				$filter['formula'] = getRequest('formula');
+			}
+			else {
+				// if only one or no conditions are left, reset the evaltype to "and/or" and clear the formula
+				$filter['formula'] = '';
+				$filter['evaltype'] = CONDITION_EVAL_TYPE_AND_OR;
+			}
 		}
-		else {
-			// if only one or no conditions are left, reset the evaltype to "and/or" and clear the formula
-			$filter['formula'] = '';
-			$filter['evaltype'] = CONDITION_EVAL_TYPE_AND_OR;
+
+		foreach ($filter['conditions'] as &$condition) {
+			if ($filter['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+				unset($condition['formulaid']);
+			}
+
+			if ($condition['conditiontype'] == CONDITION_TYPE_SUPPRESSED) {
+				unset($condition['value']);
+			}
+
+			if ($condition['conditiontype'] != CONDITION_TYPE_EVENT_TAG_VALUE) {
+				unset($condition['value2']);
+			}
 		}
+		unset($condition);
+
+		$action['filter'] = $filter;
 	}
-
-	foreach ($filter['conditions'] as &$condition) {
-		if ($filter['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
-			unset($condition['formulaid']);
-		}
-
-		if ($condition['conditiontype'] == CONDITION_TYPE_SUPPRESSED) {
-			unset($condition['value']);
-		}
-
-		if ($condition['conditiontype'] != CONDITION_TYPE_EVENT_TAG_VALUE) {
-			unset($condition['value2']);
-		}
-	}
-	unset($condition);
-
-	$action['filter'] = $filter;
 
 	if (in_array($eventsource, [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
 		$action['esc_period'] = getRequest('esc_period', DB::getDefault('actions', 'esc_period'));

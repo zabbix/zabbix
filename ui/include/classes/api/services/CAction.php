@@ -556,11 +556,10 @@ class CAction extends CApiService {
 		$ins_actions = [];
 
 		foreach ($actions as $action) {
-			if (!array_key_exists('filter', $action)) {
-				continue;
-			}
-
-			$ins_actions[] = $action + ['evaltype' => $action['filter']['evaltype']];
+			$ins_actions[] = $action + ['evaltype' => array_key_exists('filter', $action)
+					? $action['filter']['evaltype']
+					: CONDITION_EVAL_TYPE_AND_OR
+			];
 		}
 
 		$actionids = DB::insert('actions', $ins_actions);
