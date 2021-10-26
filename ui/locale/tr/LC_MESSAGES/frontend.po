@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-25 12:27+0300\n"
+"POT-Creation-Date: 2021-10-26 16:13+0300\n"
 "PO-Revision-Date: 2021-03-19 18:15+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix translation team\n"
@@ -94,7 +94,7 @@ msgid_plural "%1$d days"
 msgstr[0] "%1$d gün"
 msgstr[1] "%1$d gün"
 
-#: jsLoader.php:316
+#: jsLoader.php:317
 #, c-format
 msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
@@ -135,6 +135,16 @@ msgid "%1$s action"
 msgid_plural "%1$s actions"
 msgstr[0] ""
 msgstr[1] ""
+
+#: jsLoader.php:298
+#, c-format
+msgid "%1$s characters"
+msgstr ""
+
+#: jsLoader.php:299
+#, c-format
+msgid "%1$s characters remaining"
+msgstr ""
 
 #: app/views/popup.acknowledge.edit.php:60
 #: app/views/popup.acknowledge.edit.php:65
@@ -193,7 +203,7 @@ msgid_plural "%1$s of %2$s elements in problem state"
 msgstr[0] ""
 msgstr[1] ""
 
-#: jsLoader.php:317
+#: jsLoader.php:318
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s preselected, use down,up arrow keys and enter to select"
@@ -233,11 +243,6 @@ msgid_plural "%1$s seconds"
 msgstr[0] "%1$s saniye"
 msgstr[1] "%1$s saniye"
 
-#: jsLoader.php:298
-#, c-format
-msgid "%1$s symbols remaining"
-msgstr ""
-
 #: include/maps.inc.php:368 include/maps.inc.php:371 include/maps.inc.php:378
 #: include/maps.inc.php:383
 #, c-format
@@ -253,13 +258,13 @@ msgctxt "screen reader"
 msgid "%1$s, Severity, %2$s"
 msgstr ""
 
-#: jsLoader.php:311
+#: jsLoader.php:312
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, read only"
 msgstr ""
 
-#: jsLoader.php:354
+#: jsLoader.php:355
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, selected"
@@ -494,7 +499,7 @@ msgstr ""
 msgid "Ack"
 msgstr "Onay"
 
-#: app/views/popup.acknowledge.edit.php:83 jsLoader.php:321
+#: app/views/popup.acknowledge.edit.php:83 jsLoader.php:322
 msgid "Acknowledge"
 msgstr "Onay"
 
@@ -660,7 +665,7 @@ msgstr "Eylem güncellendi"
 #: include/classes/screens/CScreenProblem.php:1224 include/events.inc.php:291
 #: include/forms.inc.php:1222 include/views/configuration.action.edit.php:28
 #: include/views/monitoring.sysmap.list.php:69 jsLoader.php:126
-#: jsLoader.php:154 jsLoader.php:169 jsLoader.php:183 jsLoader.php:320
+#: jsLoader.php:154 jsLoader.php:169 jsLoader.php:183 jsLoader.php:321
 #: tr_events.php:184
 msgid "Actions"
 msgstr "Eylemler"
@@ -892,7 +897,7 @@ msgstr ""
 msgid "Add page"
 msgstr ""
 
-#: app/views/js/popup.service.edit.js.php:539 jsLoader.php:385
+#: app/views/js/popup.service.edit.js.php:539 jsLoader.php:386
 msgid "Add parent services"
 msgstr ""
 
@@ -949,7 +954,7 @@ msgstr "Parçacık ekle"
 msgid "Added"
 msgstr ""
 
-#: jsLoader.php:309
+#: jsLoader.php:310
 #, c-format
 msgctxt "screen reader"
 msgid "Added, %1$s"
@@ -1061,7 +1066,7 @@ msgstr ""
 #: app/views/reports.scheduledreport.list.php:54
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:122
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:178
-#: include/views/monitoring.sysmap.edit.php:261 jsLoader.php:377
+#: include/views/monitoring.sysmap.edit.php:261 jsLoader.php:378
 msgid "All"
 msgstr "Tümü"
 
@@ -1217,7 +1222,7 @@ msgstr "Uygulama hatası."
 #: include/views/js/monitoring.sysmaps.js.php:604
 #: include/views/js/monitoring.sysmaps.js.php:709
 #: include/views/js/monitoring.sysmaps.js.php:815 jsLoader.php:176
-#: jsLoader.php:300
+#: jsLoader.php:301
 msgid "Apply"
 msgstr "Uygula"
 
@@ -1800,7 +1805,7 @@ msgstr "Geri çağırma"
 #: app/views/popup.import.compare.php:162
 #: include/classes/html/CButtonCancel.php:25
 #: include/classes/setup/CSetupWizard.php:310 jsLoader.php:177
-#: jsLoader.php:187 jsLoader.php:301 jsLoader.php:373
+#: jsLoader.php:187 jsLoader.php:302 jsLoader.php:374
 msgid "Cancel"
 msgstr "İptal"
 
@@ -1973,7 +1978,7 @@ msgstr "Web senaryosu eklenemiyor"
 msgid "Cannot add widget: not enough free space on the dashboard."
 msgstr ""
 
-#: jsLoader.php:312
+#: jsLoader.php:313
 msgctxt "screen reader"
 msgid "Cannot be removed"
 msgstr ""
@@ -3446,7 +3451,7 @@ msgstr "Bağlantı kaldırılırken temizle"
 msgid "Click and drag to desired size."
 msgstr ""
 
-#: jsLoader.php:299
+#: jsLoader.php:300
 msgid "Click to view or edit"
 msgstr ""
 
@@ -3477,7 +3482,7 @@ msgstr "Saat"
 #: include/views/configuration.template.edit.php:238
 #: include/views/configuration.trigger.prototype.edit.php:655
 #: include/views/configuration.triggers.edit.php:648
-#: include/views/monitoring.sysmap.edit.php:421 jsLoader.php:323
+#: include/views/monitoring.sysmap.edit.php:421 jsLoader.php:324
 msgid "Clone"
 msgstr "Klonla"
 
@@ -3489,7 +3494,7 @@ msgstr "Klonla"
 #: include/views/js/monitoring.sysmaps.js.php:611
 #: include/views/js/monitoring.sysmaps.js.php:716
 #: include/views/js/monitoring.sysmaps.js.php:819 jsLoader.php:188
-#: jsLoader.php:267 jsLoader.php:284 jsLoader.php:366
+#: jsLoader.php:267 jsLoader.php:284 jsLoader.php:367
 msgid "Close"
 msgstr "Kapat"
 
@@ -3650,7 +3655,7 @@ msgstr "Koşullar"
 #: app/views/search.php:40 app/views/search.php:198 app/views/search.php:279
 #: include/classes/helpers/CMenuHelper.php:212
 #: include/classes/helpers/CRoleHelper.php:282
-#: include/views/inventory.host.view.php:222 jsLoader.php:322
+#: include/views/inventory.host.view.php:222 jsLoader.php:323
 msgid "Configuration"
 msgstr "Yapılandırma"
 
@@ -4129,11 +4134,11 @@ msgstr "Korelasyon oluştur"
 msgid "Create dashboard"
 msgstr "Pano oluştur"
 
-#: jsLoader.php:327
+#: jsLoader.php:328
 msgid "Create dependent discovery rule"
 msgstr ""
 
-#: jsLoader.php:326
+#: jsLoader.php:327
 msgid "Create dependent item"
 msgstr "Bağımlı öğe oluştur"
 
@@ -4251,7 +4256,7 @@ msgstr "Harita oluştur"
 msgid "Create media type"
 msgstr "Medya türü oluştur"
 
-#: app/views/popup.import.php:130 jsLoader.php:324
+#: app/views/popup.import.php:130 jsLoader.php:325
 msgid "Create new"
 msgstr "Yeni oluştur"
 
@@ -4275,7 +4280,7 @@ msgstr ""
 msgid "Create template"
 msgstr "Şablon oluştur"
 
-#: include/views/configuration.triggers.list.php:149 jsLoader.php:325
+#: include/views/configuration.triggers.list.php:149 jsLoader.php:326
 msgid "Create trigger"
 msgstr "Tetikleyici oluştur"
 
@@ -4525,7 +4530,7 @@ msgstr ""
 #: include/html.inc.php:371 include/views/configuration.template.list.php:121
 #: include/views/configuration.template.list.php:234
 #: include/views/inventory.host.view.php:170
-#: include/views/inventory.host.view.php:174 jsLoader.php:328
+#: include/views/inventory.host.view.php:174 jsLoader.php:329
 msgid "Dashboards"
 msgstr "Panolar"
 
@@ -4692,7 +4697,7 @@ msgstr "Haftanın günü"
 msgid "Days"
 msgstr "Günler"
 
-#: app/controllers/CControllerPopupMediatypeTestSend.php:172 jsLoader.php:357
+#: app/controllers/CControllerPopupMediatypeTestSend.php:172 jsLoader.php:358
 msgid "Debug"
 msgstr "Hata Ayıklama"
 
@@ -4844,7 +4849,7 @@ msgstr "Gecikmenin yapıldığı"
 #: include/views/configuration.trigger.prototype.list.php:207
 #: include/views/configuration.triggers.list.php:350
 #: include/views/monitoring.sysmap.list.php:110 jsLoader.php:130
-#: jsLoader.php:156 jsLoader.php:329
+#: jsLoader.php:156 jsLoader.php:330
 msgid "Delete"
 msgstr "Sil"
 
@@ -4873,7 +4878,7 @@ msgstr "Şu anki eylem silinsin mi?"
 msgid "Delete current correlation?"
 msgstr "Mevcut korelasyon silinsin mi?"
 
-#: jsLoader.php:330
+#: jsLoader.php:331
 msgid "Delete dashboard?"
 msgstr "Pano silinsin mi?"
 
@@ -5635,7 +5640,7 @@ msgstr "Yığılmış grafik göster"
 #: app/views/js/popup.service.edit.js.php:484 app/views/search.php:187
 #: app/views/search.php:272 app/views/search.php:371
 #: include/actions.inc.php:1724 include/actions.inc.php:1796
-#: include/classes/helpers/CPagerHelper.php:147 jsLoader.php:369
+#: include/classes/helpers/CPagerHelper.php:147 jsLoader.php:370
 #, c-format
 msgid "Displaying %1$s of %2$s found"
 msgstr "%2$s bulunandan %1$s kadarı gösteriliyor"
@@ -5667,7 +5672,7 @@ msgstr ""
 msgid "Do not keep trends"
 msgstr ""
 
-#: jsLoader.php:196 jsLoader.php:331
+#: jsLoader.php:196 jsLoader.php:332
 msgid "Do you wish to replace the conditional expression?"
 msgstr "Koşulsal ifadeyi değiştirmek ister misiniz?"
 
@@ -5861,7 +5866,7 @@ msgstr ""
 msgid "Edit tree element"
 msgstr "Ağaç öğesini düzenle"
 
-#: jsLoader.php:332
+#: jsLoader.php:333
 msgid "Edit trigger"
 msgstr "Tetikleyiciyi düzenle"
 
@@ -6982,7 +6987,7 @@ msgstr "Web sayfasının içeriğini al. Web sayfası kaynağını metin olarak 
 msgid "Get value"
 msgstr ""
 
-#: app/views/js/popup.itemtestedit.view.js.php:505
+#: app/views/js/popup.itemtestedit.view.js.php:503
 #: app/views/popup.itemtestedit.view.php:432
 msgid "Get value and test"
 msgstr ""
@@ -7010,7 +7015,7 @@ msgstr "Genel değer"
 msgid "Go back to %1$s"
 msgstr "Dönüş yap: %1$s"
 
-#: jsLoader.php:337
+#: jsLoader.php:338
 msgid "Go to"
 msgstr "Buraya git"
 
@@ -7220,7 +7225,7 @@ msgstr "\"%1$s\" adlı grafik, grafikler veya grafik prototipleri içinde haliha
 #: include/views/inventory.host.view.php:160
 #: include/views/inventory.host.view.php:168
 #: include/views/inventory.host.view.php:194
-#: include/views/inventory.host.view.php:217 jsLoader.php:338
+#: include/views/inventory.host.view.php:217 jsLoader.php:339
 msgid "Graphs"
 msgstr "Grafikler"
 
@@ -7423,7 +7428,7 @@ msgstr "Onaltılıktan ondalığa"
 msgid "Hidden"
 msgstr "Gizli"
 
-#: jsLoader.php:358
+#: jsLoader.php:359
 msgid "Hide debug"
 msgstr "Hata ayıklamayı gizle"
 
@@ -7488,7 +7493,7 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:49
 #: include/forms.inc.php:550 include/views/configuration.item.list.php:89
 #: include/views/configuration.item.prototype.list.php:62 items.php:259
-#: jsLoader.php:339
+#: jsLoader.php:340
 msgid "History"
 msgstr "Geçmiş"
 
@@ -7577,7 +7582,7 @@ msgstr "Yatay hizalama"
 #: include/views/inventory.host.view.php:214
 #: include/views/js/monitoring.sysmaps.js.php:92
 #: include/views/js/monitoring.sysmaps.js.php:161
-#: include/views/reports.toptriggers.php:86 jsLoader.php:235 jsLoader.php:340
+#: include/views/reports.toptriggers.php:86 jsLoader.php:235 jsLoader.php:341
 #: report2.php:507
 msgid "Host"
 msgid_plural "Hosts"
@@ -9348,7 +9353,7 @@ msgid "Insert"
 msgstr "Ekle"
 
 #: include/views/configuration.trigger.prototype.edit.php:136
-#: include/views/configuration.triggers.edit.php:162 jsLoader.php:333
+#: include/views/configuration.triggers.edit.php:162 jsLoader.php:334
 msgid "Insert expression"
 msgstr "İfade ekle"
 
@@ -9836,7 +9841,7 @@ msgstr "Geçersiz zaman periyodu."
 #: app/views/popup.massupdate.host.php:301
 #: include/classes/helpers/CMenuHelper.php:94
 #: include/classes/helpers/CRoleHelper.php:277
-#: include/views/configuration.host.prototype.edit.php:363 jsLoader.php:341
+#: include/views/configuration.host.prototype.edit.php:363 jsLoader.php:342
 msgid "Inventory"
 msgstr "Envanter"
 
@@ -10026,7 +10031,7 @@ msgstr ""
 msgid "Item tags"
 msgstr ""
 
-#: jsLoader.php:363
+#: jsLoader.php:364
 msgid "Item type does not use interface"
 msgstr ""
 
@@ -10391,11 +10396,11 @@ msgstr ""
 msgid "Last check"
 msgstr "Son kontrol"
 
-#: jsLoader.php:344
+#: jsLoader.php:345
 msgid "Last hour graph"
 msgstr "Son saat grafiği"
 
-#: jsLoader.php:345
+#: jsLoader.php:346
 msgid "Last month graph"
 msgstr "Son ayın grafiği"
 
@@ -10433,7 +10438,7 @@ msgstr ""
 msgid "Last value"
 msgstr "Son değer"
 
-#: jsLoader.php:346
+#: jsLoader.php:347
 msgid "Last week graph"
 msgstr "Son haftanın grafiği"
 
@@ -10446,11 +10451,11 @@ msgstr "Son haftanın grafiği"
 #: include/classes/helpers/CMenuHelper.php:52
 #: include/classes/helpers/CRoleHelper.php:309
 #: include/views/inventory.host.view.php:145
-#: include/views/inventory.host.view.php:151 jsLoader.php:342
+#: include/views/inventory.host.view.php:151 jsLoader.php:343
 msgid "Latest data"
 msgstr "En Son Veriler"
 
-#: jsLoader.php:343
+#: jsLoader.php:344
 msgid "Latest values"
 msgstr "En son değerler"
 
@@ -11542,11 +11547,11 @@ msgstr "Ay"
 msgid "Monthly"
 msgstr "Aylık"
 
-#: include/classes/html/CMultiSelect.php:83 jsLoader.php:305
+#: include/classes/html/CMultiSelect.php:83 jsLoader.php:306
 msgid "More matches found..."
 msgstr "Daha çok eşleşen bulundu..."
 
-#: jsLoader.php:315
+#: jsLoader.php:316
 #, c-format
 msgctxt "screen reader"
 msgid "More than %1$d matches for %2$s found"
@@ -12108,7 +12113,7 @@ msgstr "Resim yok"
 #: app/views/popup.massupdate.item.php:67
 #: include/views/configuration.host.discovery.edit.php:519
 #: include/views/configuration.item.edit.php:600
-#: include/views/configuration.item.prototype.edit.php:585 jsLoader.php:362
+#: include/views/configuration.item.prototype.edit.php:585 jsLoader.php:363
 msgid "No interface found"
 msgstr "Hiçbir arabirim bulunamadı"
 
@@ -12142,7 +12147,7 @@ msgstr "Hiçbir makro bulunmadı."
 msgid "No maps added."
 msgstr "Hiçbir harita eklenmemiş."
 
-#: include/classes/html/CMultiSelect.php:82 jsLoader.php:304
+#: include/classes/html/CMultiSelect.php:82 jsLoader.php:305
 msgid "No matches found"
 msgstr "Hiçbir eşleşen bulunmadı"
 
@@ -12815,7 +12820,7 @@ msgstr "Kapalı"
 #: app/views/monitoring.widget.web.view.php:30
 #: include/views/configuration.triggers.list.php:94
 #: include/views/js/common.item.edit.js.php:204
-#: include/views/js/configuration.httpconf.edit.js.php:103 jsLoader.php:374
+#: include/views/js/configuration.httpconf.edit.js.php:103 jsLoader.php:375
 #: report2.php:507
 msgid "Ok"
 msgstr "Tamam"
@@ -13981,7 +13986,7 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:35
 #: include/classes/widgets/views/widget.svggraph.form.view.php:296
 #: include/views/inventory.host.view.php:153
-#: include/views/inventory.host.view.php:158 jsLoader.php:347 report2.php:507
+#: include/views/inventory.host.view.php:158 jsLoader.php:348 report2.php:507
 msgid "Problems"
 msgstr "Problemler"
 
@@ -14554,7 +14559,7 @@ msgstr ""
 msgid "Removed"
 msgstr ""
 
-#: jsLoader.php:310
+#: jsLoader.php:311
 #, c-format
 msgctxt "screen reader"
 msgid "Removed, %1$s"
@@ -15369,7 +15374,7 @@ msgstr "Betik güncellendi"
 #: app/views/administration.script.edit.php:30
 #: app/views/administration.script.list.php:31
 #: include/classes/helpers/CMenuHelper.php:286
-#: include/classes/helpers/CRoleHelper.php:386 jsLoader.php:348
+#: include/classes/helpers/CRoleHelper.php:386 jsLoader.php:349
 msgid "Scripts"
 msgstr "Betikler"
 
@@ -15448,7 +15453,7 @@ msgstr "Güvenlik adı"
 #: include/views/configuration.item.edit.php:104
 #: include/views/configuration.item.prototype.edit.php:89
 #: include/views/configuration.item.prototype.edit.php:528
-#: include/views/js/monitoring.sysmaps.js.php:216 jsLoader.php:308
+#: include/views/js/monitoring.sysmaps.js.php:216 jsLoader.php:309
 msgid "Select"
 msgstr "Seç"
 
@@ -15484,13 +15489,13 @@ msgstr "Seçilen öğeler"
 msgid "Selected items only"
 msgstr ""
 
-#: jsLoader.php:313
+#: jsLoader.php:314
 #, c-format
 msgctxt "screen reader"
 msgid "Selected, %1$s in position %2$d of %3$d"
 msgstr ""
 
-#: jsLoader.php:314
+#: jsLoader.php:315
 #, c-format
 msgctxt "screen reader"
 msgid "Selected, %1$s, read only, in position %2$d of %3$d"
@@ -15738,7 +15743,7 @@ msgstr ""
 msgid "Set host inventory mode"
 msgstr "Ana makine envanter kipini ayarla"
 
-#: include/classes/html/CInputSecret.php:80 jsLoader.php:380
+#: include/classes/html/CInputSecret.php:80 jsLoader.php:381
 msgid "Set new value"
 msgstr ""
 
@@ -15834,7 +15839,7 @@ msgstr "Şekil"
 msgid "Shared"
 msgstr ""
 
-#: include/views/monitoring.sysmap.edit.php:414 jsLoader.php:334
+#: include/views/monitoring.sysmap.edit.php:414 jsLoader.php:335
 msgid "Sharing"
 msgstr "Paylaşım"
 
@@ -16469,7 +16474,7 @@ msgctxt "encryption certificate"
 msgid "Subject"
 msgstr "Konu"
 
-#: jsLoader.php:349
+#: jsLoader.php:350
 msgid "Submap"
 msgstr "Altharita"
 
@@ -16882,7 +16887,7 @@ msgstr ""
 #: app/views/administration.authentication.edit.php:339
 #: app/views/administration.mediatype.list.php:140
 #: app/views/administration.regex.edit.php:140
-#: app/views/js/popup.itemtestedit.view.js.php:573
+#: app/views/js/popup.itemtestedit.view.js.php:571
 #: app/views/popup.itemtestedit.view.php:432
 #: app/views/popup.mediatypetest.edit.php:99
 #: app/views/popup.testtriggerexpr.php:124 include/forms.inc.php:1457
@@ -17231,7 +17236,7 @@ msgstr "Zaman damgası"
 msgid "To"
 msgstr "Kime"
 
-#: jsLoader.php:361
+#: jsLoader.php:362
 msgid "To set a host interface select a single item type for all items"
 msgstr "Ana makine arayüzü ayarlamak için tüm öğeler için tek bir öğe türü seçin"
 
@@ -17356,7 +17361,7 @@ msgstr "Yönelimler"
 #: include/views/configuration.triggers.edit.php:571
 #: include/views/js/monitoring.sysmaps.js.php:94
 #: include/views/js/monitoring.sysmaps.js.php:792
-#: include/views/reports.toptriggers.php:86 jsLoader.php:237 jsLoader.php:350
+#: include/views/reports.toptriggers.php:86 jsLoader.php:237 jsLoader.php:351
 msgid "Trigger"
 msgstr "Tetikleyici"
 
@@ -17527,11 +17532,11 @@ msgstr "Tetikleyici prototipleri güncellendi"
 msgid "Trigger severity"
 msgstr "Tetikleyici önem derecesi"
 
-#: jsLoader.php:335
+#: jsLoader.php:336
 msgid "Trigger status \"OK\""
 msgstr "Tetikleyici durumu \"TAMAM\""
 
-#: jsLoader.php:336
+#: jsLoader.php:337
 msgid "Trigger status \"Problem\""
 msgstr "Tetikleyici durumu \"Problem\""
 
@@ -17699,7 +17704,7 @@ msgstr "BİLİNMEYEN"
 #: include/views/configuration.trigger.prototype.edit.php:530
 #: include/views/configuration.triggers.edit.php:557
 #: include/views/js/monitoring.sysmaps.js.php:314
-#: include/views/monitoring.sysmap.edit.php:278 items.php:156 jsLoader.php:351
+#: include/views/monitoring.sysmap.edit.php:278 items.php:156 jsLoader.php:352
 msgid "URL"
 msgstr "URL"
 
@@ -17745,7 +17750,7 @@ msgid "URL should have both \"name\" and \"url\" fields for map \"%1$s\"."
 msgstr "URL, \"%1$s\" haritası için hem \"name\" hem de \"url\" alanlarına sahip olmalıdır."
 
 #: include/views/js/monitoring.sysmaps.js.php:311
-#: include/views/monitoring.sysmap.edit.php:311 jsLoader.php:352
+#: include/views/monitoring.sysmap.edit.php:311 jsLoader.php:353
 msgid "URLs"
 msgstr "URL'ler"
 
@@ -19052,7 +19057,7 @@ msgstr "Özür dileriz, hatırlamak için olası maksimum eleman sayısına ula�
 #: include/views/inventory.host.view.php:138
 #: include/views/inventory.host.view.php:143
 #: include/views/inventory.host.view.php:206
-#: include/views/inventory.host.view.php:219 jsLoader.php:353
+#: include/views/inventory.host.view.php:219 jsLoader.php:354
 msgid "Web"
 msgstr "Web"
 
@@ -20630,7 +20635,7 @@ msgstr "düşük seviye keşif kuralı"
 msgid "ltrim() - Remove specified characters from the beginning of a string"
 msgstr ""
 
-#: include/func.inc.php:581 jsLoader.php:120 jsLoader.php:195 jsLoader.php:370
+#: include/func.inc.php:581 jsLoader.php:120 jsLoader.php:195 jsLoader.php:371
 msgctxt "minute short"
 msgid "m"
 msgstr "dk"
@@ -20830,7 +20835,7 @@ msgstr ""
 msgid "name"
 msgstr "ad"
 
-#: include/classes/html/CMultiSelect.php:85 jsLoader.php:307
+#: include/classes/html/CMultiSelect.php:85 jsLoader.php:308
 msgid "new"
 msgstr "yeni"
 
@@ -20965,7 +20970,7 @@ msgstr "çıktı"
 msgid "path/to/secret"
 msgstr ""
 
-#: include/classes/html/CMacroValue.php:139 jsLoader.php:381
+#: include/classes/html/CMacroValue.php:139 jsLoader.php:382
 msgid "path/to/secret:key"
 msgstr ""
 
@@ -21368,7 +21373,7 @@ msgid "truncate() - Truncates a value to decimal places"
 msgstr ""
 
 #: app/partials/layout.htmlpage.aside.php:74
-#: include/classes/html/CMultiSelect.php:84 jsLoader.php:306
+#: include/classes/html/CMultiSelect.php:84 jsLoader.php:307
 msgid "type here to search"
 msgstr "aramak için buraya yazın"
 
@@ -21490,7 +21495,7 @@ msgstr ""
 #: app/views/administration.userrole.edit.php:172
 #: app/views/administration.userrole.edit.php:213
 #: app/views/js/popup.itemtestedit.view.js.php:446
-#: app/views/js/popup.itemtestedit.view.js.php:457
+#: app/views/js/popup.itemtestedit.view.js.php:456
 #: app/views/js/popup.valuemap.edit.js.php:29
 #: app/views/js/popup.valuemap.edit.js.php:30
 #: app/views/js/popup.valuemap.edit.js.php:31
@@ -21516,7 +21521,7 @@ msgstr ""
 #: include/views/js/configuration.httpconf.edit.js.php:73
 #: include/views/js/configuration.maintenance.edit.js.php:37
 #: include/views/js/configuration.maintenance.edit.js.php:61
-#: include/views/js/item.preprocessing.js.php:420 jsLoader.php:382
+#: include/views/js/item.preprocessing.js.php:420 jsLoader.php:383
 msgid "value"
 msgstr "değer"
 
