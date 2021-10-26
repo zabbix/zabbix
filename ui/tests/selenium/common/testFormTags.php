@@ -720,7 +720,7 @@ class testFormTags extends CWebTest {
 		if ($data['name'] === 'With tags' || $data['name'] === 'Long tag name and value') {
 			$this->page->removeFocus();
 			$screenshot_area = $this->query('id:tags-table')->one();
-			$this->assertScreenshot($screenshot_area, $data['name']);
+			$this->assertScreenshot($screenshot_area, $data['name'].' '.$object);
 		}
 	}
 
