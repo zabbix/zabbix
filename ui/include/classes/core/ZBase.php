@@ -692,7 +692,7 @@ class ZBase {
 		}
 
 		$ha_nodes = API::getApiService('hanode')->get([
-			'output' => ['address', 'port'],
+			'output' => ['address', 'port', 'status'],
 			'sortfield' => 'lastaccess',
 			'sortorder' => 'DESC'
 		], false);
