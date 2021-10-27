@@ -1,1 +1,1 @@
-.......... [ZBXNEXT-6677] added cpu percent item for "Template App Docker" template (afayantsev)
+...G.....T [ZBXNEXT-6677] added cpu percent field to docker.container_stats key for docker plugin in Zabbix agent 2 and docker template (afayantsev, esneiders)
