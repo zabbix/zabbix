@@ -5139,7 +5139,8 @@ a.link-action {
   display: inline-block;
   vertical-align: middle;
   min-width: 24px;
-  min-height: 24px; }
+  min-height: 22px;
+  top: -1px; }
   .input-color-picker div {
     position: absolute;
     left: 2px;

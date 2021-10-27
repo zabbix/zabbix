@@ -67,11 +67,17 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 			color = $.trim(color).toUpperCase();
 
 			$overlay_input.val(color);
-			$overlay_colorbox.css({
-				'color': '#' + color,
-				'background': '#' + color
-			})
-			.attr('title', '#' + color);
+
+			if (color.length) {
+				$overlay_colorbox
+					.css({'color': '#' + color, 'background': '#' + color})
+					.attr('title', '#' + color);
+			}
+			else {
+				$overlay_colorbox
+					.css({'color': '', 'background': ''})
+					.attr('title', t('Use default'));
+			}
 		},
 
 		/**
@@ -151,9 +157,7 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 						'title': t('Use default')
 					})
 					.html(t('Use default'))
-					.on('click', function () {
-						setColorHandler($(this).data('color'));
-					});
+					.on('click', () => setColorHandler(''));
 
 				options = $.extend(defaults, options || {});
 				overlay = $('<div class="overlay-dialogue" id="color_picker"/>')
@@ -217,10 +221,8 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 					'display': 'block'
 				});
 
-				if (input.data('default_color')) {
-					$button_use_default
-						.data('color', input.data('default_color'))
-						.show();
+				if (input.data('use_default')) {
+					$button_use_default.show();
 				}
 				else {
 					$button_use_default.hide();
@@ -311,7 +313,7 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 				.insertAfter(element);
 
 			$(element)
-				.data('default_color', (options && 'default_color' in options) ? options.default_color : null)
+				.data('use_default', (options && 'use_default' in options))
 				.change(function () {
 					/**
 					 * Id attribute value of input element can be changed dynamically, for example when row with

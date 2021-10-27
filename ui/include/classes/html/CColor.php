@@ -26,8 +26,14 @@ class CColor extends CDiv {
 	private $is_enabled = true;
 	private $is_required = false;
 	private $append_color_picker_js = true;
-	private $default_color;
 	private $input_id;
+
+	/**
+	 * Either "Use default" is enabled.
+	 *
+	 * @var bool
+	 */
+	private $use_default;
 
 	/**
 	 * Creates a color picker form element.
@@ -58,14 +64,12 @@ class CColor extends CDiv {
 	}
 
 	/**
-	 * Set default color.
-	 *
-	 * @param string $default_color  Default color.
-	 *
+	 * Enable default color button.
+
 	 * @return CColor
 	 */
-	public function setDefaultColor(string $default_color) {
-		$this->default_color = $default_color;
+	public function enableUseDefault() {
+		$this->use_default = true;
 
 		return $this;
 	}
@@ -104,7 +108,7 @@ class CColor extends CDiv {
 	 */
 	protected function getInitJavascript(): string {
 		$options = [
-			'default_color' => $this->default_color
+			'use_default' => $this->use_default
 		];
 
 		return 'jQuery("#'.$this->name.'").colorpicker('.json_encode(array_filter($options)).');';
