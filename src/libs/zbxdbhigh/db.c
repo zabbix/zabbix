@@ -153,35 +153,6 @@ void	zbx_db_validate_config(void)
 }
 #endif
 
-#ifndef HAVE_SQLITE3
-int	DBpk_exists(const char *table_name)
-{
-	DB_RESULT	result;
-	int		ret;
-
-#if defined(HAVE_MYSQL)
-	result = DBselect(
-			"show index from %s"
-			" where key_name='PRIMARY'",
-			table_name);
-#elif defined(HAVE_ORACLE)
-	result = DBselect(
-			"select 1 from user_constraints where constraint_type='P' and table_name='%s'",
-			table_name);
-#elif defined(HAVE_POSTGRESQL)
-	result = DBselect(
-			"select constraint_name from information_schema.table_constraints where table_name='%s' and "
-			"constraint_type = 'PRIMARY KEY'",
-			table_name);
-#endif
-	ret = (NULL == DBfetch(result) ? FAIL : SUCCEED);
-
-	DBfree_result(result);
-
-	return ret;
-}
-#endif
-
 /******************************************************************************
  *                                                                            *
  * Function: DBinit_autoincrement_options                                     *
@@ -2335,6 +2306,34 @@ int	DBindex_exists(const char *table_name, const char *index_name)
 
 	return ret;
 }
+
+int	DBpk_exists(const char *table_name)
+{
+	DB_RESULT	result;
+	int		ret;
+
+#if defined(HAVE_MYSQL)
+	result = DBselect(
+			"show index from %s"
+			" where key_name='PRIMARY'",
+			table_name);
+#elif defined(HAVE_ORACLE)
+	result = DBselect(
+			"select 1 from user_constraints where constraint_type='P' and table_name='%s'",
+			table_name);
+#elif defined(HAVE_POSTGRESQL)
+	result = DBselect(
+			"select constraint_name from information_schema.table_constraints where table_name='%s' and "
+			"constraint_type = 'PRIMARY KEY'",
+			table_name);
+#endif
+	ret = (NULL == DBfetch(result) ? FAIL : SUCCEED);
+
+	DBfree_result(result);
+
+	return ret;
+}
+
 #endif
 
 /******************************************************************************
