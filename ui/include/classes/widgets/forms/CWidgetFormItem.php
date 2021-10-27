@@ -71,11 +71,11 @@ class CWidgetFormItem extends CWidgetForm {
 
 		// description horizontal position
 		$field_desc_h_pos = (new CWidgetFieldRadioButtonList('desc_h_pos', _('Horizontal position'), [
-			1 => _('Left'),
-			0 => _('Center'),
-			2 => _('Right')
+			WIDGET_ITEM_POS_LEFT => _('Left'),
+			WIDGET_ITEM_POS_CENTER => _('Center'),
+			WIDGET_ITEM_POS_RIGHT => _('Right')
 		]))
-			->setDefault(0)
+			->setDefault(WIDGET_ITEM_POS_CENTER)
 			->setModern(true);
 
 		if (array_key_exists('desc_h_pos', $this->data)) {
@@ -86,11 +86,11 @@ class CWidgetFormItem extends CWidgetForm {
 
 		// description vertical position
 		$field_desc_v_pos = (new CWidgetFieldRadioButtonList('desc_v_pos', _('Vertical position'), [
-			1 => _('Top'),
-			0 => _('Middle'),
-			2 => _('Bottom')
+			WIDGET_ITEM_POS_TOP => _('Top'),
+			WIDGET_ITEM_POS_MIDDLE => _('Middle'),
+			WIDGET_ITEM_POS_BOTTOM => _('Bottom')
 		]))
-			->setDefault(0)
+			->setDefault(WIDGET_ITEM_POS_BOTTOM)
 			->setModern(true);
 
 		if (array_key_exists('desc_v_pos', $this->data)) {
@@ -100,7 +100,9 @@ class CWidgetFormItem extends CWidgetForm {
 		$this->fields[$field_desc_v_pos->getName()] = $field_desc_v_pos;
 
 		// description size
-		$field_desc_size = (new CWidgetFieldIntegerBox('desc_size', _('Size'), 1, 100))->setDefault(5);
+		$field_desc_size = (new CWidgetFieldIntegerBox('desc_size', _('Size'), WIDGET_ITEM_PERCENT_MIN,
+			WIDGET_ITEM_PERCENT_MAX
+		))->setDefault(5);
 
 		if (array_key_exists('desc_size', $this->data)) {
 			$field_desc_size->setValue($this->data['desc_size']);
@@ -109,7 +111,7 @@ class CWidgetFormItem extends CWidgetForm {
 		$this->fields[$field_desc_size->getName()] = $field_desc_size;
 
 		// description bold
-		$field_desc_bold = (new CWidgetFieldCheckBox('desc_bold', _('Bold')))->setDefault(1);
+		$field_desc_bold = (new CWidgetFieldCheckBox('desc_bold', _('Bold')))->setDefault(0);
 
 		if (array_key_exists('desc_bold', $this->data)) {
 			$field_desc_bold->setValue($this->data['desc_bold']);
@@ -118,7 +120,7 @@ class CWidgetFormItem extends CWidgetForm {
 		$this->fields[$field_desc_bold->getName()] = $field_desc_bold;
 
 		// description color
-		$field_desc_color = (new CWidgetFieldColor('desc_color', _('Color')))->setDefault('FFEEAA');
+		$field_desc_color = (new CWidgetFieldColor('desc_color', _('Color')))->setDefault('');
 
 		if (array_key_exists('desc_color', $this->data)) {
 			$field_desc_color->setValue($this->data['desc_color']);
@@ -127,7 +129,7 @@ class CWidgetFormItem extends CWidgetForm {
 		$this->fields[$field_desc_color->getName()] = $field_desc_color;
 
 		// value decimal places
-		$field_decimal_places = (new CWidgetFieldIntegerBox('decimal_places', _('Decimal places'), 0, 6))
+		$field_decimal_places = (new CWidgetFieldIntegerBox('decimal_places', _('Decimal places'), 0, 10))
 			->setDefault(2);
 
 		if (array_key_exists('decimal_places', $this->data)) {
@@ -137,7 +139,9 @@ class CWidgetFormItem extends CWidgetForm {
 		$this->fields[$field_decimal_places->getName()] = $field_decimal_places;
 
 		// value decimal size
-		$field_decimal_size = (new CWidgetFieldIntegerBox('decimal_size', _('Size'), 1, 100))->setDefault(15);
+		$field_decimal_size = (new CWidgetFieldIntegerBox('decimal_size', _('Size'), WIDGET_ITEM_PERCENT_MIN,
+			WIDGET_ITEM_PERCENT_MAX
+		))->setDefault(15);
 
 		if (array_key_exists('decimal_size', $this->data)) {
 			$field_decimal_size->setValue($this->data['decimal_size']);
@@ -147,11 +151,11 @@ class CWidgetFormItem extends CWidgetForm {
 
 		// value horizontal position
 		$field_value_h_pos = (new CWidgetFieldRadioButtonList('value_h_pos', _('Horizontal position'), [
-			1 => _('Left'),
-			0 => _('Center'),
-			2 => _('Right')
+			WIDGET_ITEM_POS_LEFT => _('Left'),
+			WIDGET_ITEM_POS_CENTER => _('Center'),
+			WIDGET_ITEM_POS_RIGHT => _('Right')
 		]))
-			->setDefault(0)
+			->setDefault(WIDGET_ITEM_POS_CENTER)
 			->setModern(true);
 
 		if (array_key_exists('value_h_pos', $this->data)) {
@@ -162,11 +166,11 @@ class CWidgetFormItem extends CWidgetForm {
 
 		// value vertical position
 		$field_value_v_pos = (new CWidgetFieldRadioButtonList('value_v_pos', _('Vertical position'), [
-			1 => _('Top'),
-			0 => _('Middle'),
-			2 => _('Bottom')
+			WIDGET_ITEM_POS_TOP => _('Top'),
+			WIDGET_ITEM_POS_MIDDLE => _('Middle'),
+			WIDGET_ITEM_POS_BOTTOM => _('Bottom')
 		]))
-			->setDefault(0)
+			->setDefault(WIDGET_ITEM_POS_MIDDLE)
 			->setModern(true);
 
 		if (array_key_exists('value_v_pos', $this->data)) {
@@ -176,7 +180,9 @@ class CWidgetFormItem extends CWidgetForm {
 		$this->fields[$field_value_v_pos->getName()] = $field_value_v_pos;
 
 		// value size
-		$field_value_size = (new CWidgetFieldIntegerBox('value_size', _('Size'), 1, 100))->setDefault(25);
+		$field_value_size = (new CWidgetFieldIntegerBox('value_size', _('Size'), WIDGET_ITEM_PERCENT_MIN,
+			WIDGET_ITEM_PERCENT_MAX
+		))->setDefault(25);
 
 		if (array_key_exists('value_size', $this->data)) {
 			$field_value_size->setValue($this->data['value_size']);
@@ -194,7 +200,7 @@ class CWidgetFormItem extends CWidgetForm {
 		$this->fields[$field_value_bold->getName()] = $field_value_bold;
 
 		// value color
-		$field_value_color = (new CWidgetFieldColor('value_color', _('Color')))->setDefault('FFEEAA');
+		$field_value_color = (new CWidgetFieldColor('value_color', _('Color')))->setDefault('');
 
 		if (array_key_exists('value_color', $this->data)) {
 			$field_value_color->setValue($this->data['value_color']);
@@ -222,12 +228,12 @@ class CWidgetFormItem extends CWidgetForm {
 
 		// units position
 		$field_units_pos = (new CWidgetFieldSelect('units_pos', _('Position'), [
-			0 => _('Before value'),
-			2 => _('Above value'),
-			3 => _('After value'),
-			4 => _('Below value'),
+			WIDGET_ITEM_POS_BEFORE => _('Before value'),
+			WIDGET_ITEM_POS_ABOVE => _('Above value'),
+			WIDGET_ITEM_POS_AFTER => _('After value'),
+			WIDGET_ITEM_POS_BELOW => _('Below value')
 		]))
-			->setDefault(3);
+			->setDefault(WIDGET_ITEM_POS_AFTER);
 
 		if (array_key_exists('units_pos', $this->data)) {
 			$field_units_pos->setValue($this->data['units_pos']);
@@ -236,7 +242,9 @@ class CWidgetFormItem extends CWidgetForm {
 		$this->fields[$field_units_pos->getName()] = $field_units_pos;
 
 		// units size
-		$field_units_size = (new CWidgetFieldIntegerBox('units_size', _('Size'), 1, 100))->setDefault(20);
+		$field_units_size = (new CWidgetFieldIntegerBox('units_size', _('Size'), WIDGET_ITEM_PERCENT_MIN,
+			WIDGET_ITEM_PERCENT_MAX
+		))->setDefault(20);
 
 		if (array_key_exists('units_size', $this->data)) {
 			$field_units_size->setValue($this->data['units_size']);
@@ -254,7 +262,7 @@ class CWidgetFormItem extends CWidgetForm {
 		$this->fields[$field_units_bold->getName()] = $field_units_bold;
 
 		// units color
-		$field_units_color = (new CWidgetFieldColor('units_color', _('Color')))->setDefault('FFEEAA');
+		$field_units_color = (new CWidgetFieldColor('units_color', _('Color')))->setDefault('');
 
 		if (array_key_exists('units_color', $this->data)) {
 			$field_units_color->setValue($this->data['units_color']);
@@ -264,11 +272,11 @@ class CWidgetFormItem extends CWidgetForm {
 
 		// time horizontal position
 		$field_time_h_pos = (new CWidgetFieldRadioButtonList('time_h_pos', _('Horizontal position'), [
-			1 => _('Left'),
-			0 => _('Center'),
-			2 => _('Right')
+			WIDGET_ITEM_POS_LEFT => _('Left'),
+			WIDGET_ITEM_POS_CENTER => _('Center'),
+			WIDGET_ITEM_POS_RIGHT => _('Right')
 		]))
-			->setDefault(0)
+			->setDefault(WIDGET_ITEM_POS_CENTER)
 			->setModern(true);
 
 		if (array_key_exists('time_h_pos', $this->data)) {
@@ -279,11 +287,11 @@ class CWidgetFormItem extends CWidgetForm {
 
 		// time vertical position
 		$field_time_v_pos = (new CWidgetFieldRadioButtonList('time_v_pos', _('Vertical position'), [
-			1 => _('Top'),
-			0 => _('Middle'),
-			2 => _('Bottom')
+			WIDGET_ITEM_POS_TOP => _('Top'),
+			WIDGET_ITEM_POS_MIDDLE => _('Middle'),
+			WIDGET_ITEM_POS_BOTTOM => _('Bottom')
 		]))
-			->setDefault(0)
+			->setDefault(WIDGET_ITEM_POS_TOP)
 			->setModern(true);
 
 		if (array_key_exists('time_v_pos', $this->data)) {
@@ -293,7 +301,9 @@ class CWidgetFormItem extends CWidgetForm {
 		$this->fields[$field_time_v_pos->getName()] = $field_time_v_pos;
 
 		// time size
-		$field_time_size = (new CWidgetFieldIntegerBox('time_size', _('Size'), 1, 100))->setDefault(5);
+		$field_time_size = (new CWidgetFieldIntegerBox('time_size', _('Size'), WIDGET_ITEM_PERCENT_MIN,
+			WIDGET_ITEM_PERCENT_MAX
+		))->setDefault(5);
 
 		if (array_key_exists('time_size', $this->data)) {
 			$field_time_size->setValue($this->data['time_size']);
@@ -302,7 +312,7 @@ class CWidgetFormItem extends CWidgetForm {
 		$this->fields[$field_time_size->getName()] = $field_time_size;
 
 		// time bold
-		$field_time_bold = (new CWidgetFieldCheckBox('time_bold', _('Bold')))->setDefault(1);
+		$field_time_bold = (new CWidgetFieldCheckBox('time_bold', _('Bold')))->setDefault(0);
 
 		if (array_key_exists('time_bold', $this->data)) {
 			$field_time_bold->setValue($this->data['time_bold']);
@@ -311,7 +321,7 @@ class CWidgetFormItem extends CWidgetForm {
 		$this->fields[$field_time_bold->getName()] = $field_time_bold;
 
 		// time color
-		$field_time_color = (new CWidgetFieldColor('time_color', _('Color')))->setDefault('FFEEAA');
+		$field_time_color = (new CWidgetFieldColor('time_color', _('Color')))->setDefault('');
 
 		if (array_key_exists('time_color', $this->data)) {
 			$field_time_color->setValue($this->data['time_color']);
@@ -320,7 +330,7 @@ class CWidgetFormItem extends CWidgetForm {
 		$this->fields[$field_time_color->getName()] = $field_time_color;
 
 		// change indicator up arrow color
-		$field_up_color = (new CWidgetFieldColor('up_color', ''))->setDefault('00FF00');
+		$field_up_color = (new CWidgetFieldColor('up_color', ''))->setDefault('');
 
 		if (array_key_exists('up_color', $this->data)) {
 			$field_up_color->setValue($this->data['up_color']);
@@ -329,7 +339,7 @@ class CWidgetFormItem extends CWidgetForm {
 		$this->fields[$field_up_color->getName()] = $field_up_color;
 
 		// change indicator down arrow color
-		$field_down_color = (new CWidgetFieldColor('down_color', ''))->setDefault('FF0000');
+		$field_down_color = (new CWidgetFieldColor('down_color', ''))->setDefault('');
 
 		if (array_key_exists('down_color', $this->data)) {
 			$field_down_color->setValue($this->data['down_color']);
@@ -338,7 +348,7 @@ class CWidgetFormItem extends CWidgetForm {
 		$this->fields[$field_down_color->getName()] = $field_down_color;
 
 		// change indicator up/down arrow color
-		$field_updown_color = (new CWidgetFieldColor('updown_color', ''))->setDefault('00FF00');
+		$field_updown_color = (new CWidgetFieldColor('updown_color', ''))->setDefault('');
 
 		if (array_key_exists('updown_color', $this->data)) {
 			$field_updown_color->setValue($this->data['updown_color']);
@@ -347,12 +357,40 @@ class CWidgetFormItem extends CWidgetForm {
 		$this->fields[$field_updown_color->getName()] = $field_updown_color;
 
 		// background color
-		$field_bg_color = (new CWidgetFieldColor('bg_color', _('Background color')))->setDefault('FFEEAA');
+		$field_bg_color = (new CWidgetFieldColor('bg_color', _('Background color')))->setDefault('');
 
 		if (array_key_exists('bg_color', $this->data)) {
 			$field_bg_color->setValue($this->data['bg_color']);
 		}
 
 		$this->fields[$field_bg_color->getName()] = $field_bg_color;
+	}
+
+	/**
+	 * Validate form fields.
+	 *
+	 * @param bool $strict  Enables more strict validation of the form fields.
+	 *                      Must be enabled for validation of input parameters in the widget configuration form.
+	 *
+	 * @return array
+	 */
+	public function validate($strict = false) {
+		$errors = parent::validate($strict);
+
+		// Check if one of the objects (description, value or time) occupies same space.
+		if ($this->fields['desc_h_pos']->getValue() == $this->fields['value_h_pos']->getValue()
+				&& $this->fields['desc_v_pos']->getValue() == $this->fields['value_v_pos']->getValue()) {
+			$errors[] = _('Description and value cannot occupy same space.');
+		}
+		elseif ($this->fields['desc_h_pos']->getValue() == $this->fields['time_h_pos']->getValue()
+				&& $this->fields['desc_v_pos']->getValue() == $this->fields['time_v_pos']->getValue()) {
+			$errors[] = _('Description and time cannot occupy same space.');
+		}
+		elseif ($this->fields['value_h_pos']->getValue() == $this->fields['time_h_pos']->getValue()
+				&& $this->fields['value_v_pos']->getValue() == $this->fields['time_v_pos']->getValue()) {
+			$errors[] = _('Value and time cannot occupy same space.');
+		}
+
+		return $errors;
 	}
 }

@@ -1479,6 +1479,23 @@ define('WIDGET_URL',				'url');
 define('WIDGET_WEB',				'web');
 define('WIDGET_ITEM',				'item');
 
+// item widget object positions
+define('WIDGET_ITEM_POS_CENTER',	0);
+define('WIDGET_ITEM_POS_LEFT',		1);
+define('WIDGET_ITEM_POS_RIGHT',		2);
+
+define('WIDGET_ITEM_POS_MIDDLE',	0);
+define('WIDGET_ITEM_POS_TOP',		1);
+define('WIDGET_ITEM_POS_BOTTOM',	2);
+
+define('WIDGET_ITEM_POS_BEFORE',	0);
+define('WIDGET_ITEM_POS_ABOVE',		1);
+define('WIDGET_ITEM_POS_AFTER',		2);
+define('WIDGET_ITEM_POS_BELOW',		3);
+
+define('WIDGET_ITEM_PERCENT_MIN', 1);
+define('WIDGET_ITEM_PERCENT_MAX', 100);
+
 // sysmap widget source types
 define('WIDGET_SYSMAP_SOURCETYPE_MAP',	1);
 define('WIDGET_SYSMAP_SOURCETYPE_FILTER',	2);
@@ -1960,6 +1977,7 @@ define('ZBX_STYLE_PROBLEM_ICON_LIST_ITEM' , 'problem-icon-list-item');
 define('ZBX_STYLE_ZABBIX_LOGO', 'zabbix-logo');
 define('ZBX_STYLE_ZABBIX_SIDEBAR_LOGO', 'zabbix-sidebar-logo');
 define('ZBX_STYLE_ZABBIX_SIDEBAR_LOGO_COMPACT', 'zabbix-sidebar-logo-compact');
+define('ZBX_STYLE_WIDGET_ITEM_LABEL', 'widget-item-label');
 
 // HTML column layout.
 define('ZBX_STYLE_COLUMNS', 'columns-wrapper');

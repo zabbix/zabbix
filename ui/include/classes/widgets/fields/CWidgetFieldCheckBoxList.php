@@ -25,6 +25,7 @@ class CWidgetFieldCheckBoxList extends CWidgetField {
 		parent::__construct($name, $label);
 
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32);
+		$this->setDefault([]);
 		$this->setValidationRules(['type' => API_INTS32]);
 	}
 

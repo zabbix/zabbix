@@ -56,7 +56,7 @@ $form_list->addRow(CWidgetHelper::getLabel($fields['adv_conf']), CWidgetHelper::
 
 $form_list
 	->addRow(
-		CWidgetHelper::getLabel($fields['description'], [
+		CWidgetHelper::getLabel($fields['description'], ZBX_STYLE_WIDGET_ITEM_LABEL, [
 				_('Supported macros:'),
 				(new CList([
 					'{HOST.*}',
@@ -89,7 +89,7 @@ $form_list
 		'description-row'
 	)
 	->addRow(
-		new CLabel(_('Value')),
+		(new CLabel(_('Value')))->addClass(ZBX_STYLE_WIDGET_ITEM_LABEL),
 		(new CDiv([
 			CWidgetHelper::getLabel($fields['decimal_places']),
 			(new CDiv(CWidgetHelper::getIntegerBox($fields['decimal_places'])))->addClass('form-field'),
@@ -138,7 +138,7 @@ $form_list
 		'value-row'
 	)
 	->addRow(
-		new CLabel(_('Time')),
+		(new CLabel(_('Time')))->addCLass(ZBX_STYLE_WIDGET_ITEM_LABEL),
 		(new CDiv([
 			CWidgetHelper::getLabel($fields['time_h_pos']),
 			(new CDiv(CWidgetHelper::getRadioButtonList($fields['time_h_pos'])))->addClass('form-field'),
@@ -158,7 +158,7 @@ $form_list
 		'time-row'
 	)
 	->addRow(
-		new CLabel(_('Change indicator')),
+		(new CLabel(_('Change indicator')))->addClass(ZBX_STYLE_WIDGET_ITEM_LABEL),
 		(new CDiv([
 			'up',
 			(new CDiv(CWidgetHelper::getColor($fields['up_color'])))->addClass('form-field'),
