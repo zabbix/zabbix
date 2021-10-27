@@ -2319,12 +2319,17 @@ int	DBpk_exists(const char *table_name)
 			table_name);
 #elif defined(HAVE_ORACLE)
 	result = DBselect(
-			"select 1 from user_constraints where constraint_type='P' and table_name='%s'",
+			"select 1"
+			" from user_constraints"
+			" where constraint_type='P'"
+				" and table_name='%s'",
 			table_name);
 #elif defined(HAVE_POSTGRESQL)
 	result = DBselect(
-			"select constraint_name from information_schema.table_constraints where table_name='%s' and "
-			"constraint_type = 'PRIMARY KEY'",
+			"select 1"
+			" from information_schema.table_constraints"
+			" where table_name='%s'"
+				" and constraint_type = 'PRIMARY KEY'",
 			table_name);
 #endif
 	ret = (NULL == DBfetch(result) ? FAIL : SUCCEED);
