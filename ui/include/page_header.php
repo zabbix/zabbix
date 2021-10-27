@@ -138,8 +138,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 			$pageHeader->addStyle(getTriggerStatusCss());
 
 			// perform Zabbix server check only for standard pages
-			if ($is_standard_page && CSettingsHelper::get(CSettingsHelper::SERVER_CHECK_INTERVAL) && !empty($ZBX_SERVER)
-					&& !empty($ZBX_SERVER_PORT)) {
+			if ($is_standard_page && CSettingsHelper::get(CSettingsHelper::SERVER_CHECK_INTERVAL)) {
 				$page['scripts'][] = 'servercheck.js';
 			}
 		}

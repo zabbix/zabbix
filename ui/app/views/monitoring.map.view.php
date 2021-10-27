@@ -92,3 +92,9 @@ $web_layout_mode = $this->getLayoutMode();
 			)
 	)
 	->show();
+
+(new CScriptTag('
+	view.init();
+'))
+	->setOnDocumentReady()
+	->show();

@@ -400,6 +400,14 @@
 				}
 			}
 		}
+
+		&.sticky-footer {
+			margin-bottom: -8px;
+
+			tfoot {
+				bottom: -8px;
+			}
+		}
 	}
 
 	.debug-output {
@@ -436,6 +444,16 @@
 			margin-top: 0;
 			height: 100%;
 			padding-top: 8px;
+
+			.list-table {
+				&.sticky-footer {
+					margin-bottom: 0;
+
+					tfoot {
+						bottom: 0;
+					}
+				}
+			}
 		}
 
 		&.dashboard-grid-widget-focus {

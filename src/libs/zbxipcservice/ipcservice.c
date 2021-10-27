@@ -1654,8 +1654,8 @@ void	zbx_ipc_service_close(zbx_ipc_service_t *service)
  * Purpose: receives ipc message from a connected client                      *
  *                                                                            *
  * Parameters: service - [IN] the IPC service                                 *
- *             timeout - [IN] the timeout in seconds, 0 is used for           *
- *                            nonblocking call and ZBX_IPC_WAIT_FOREVER is    *
+ *             timeout - [IN] the timeout. (0,0) is used for nonblocking call *
+ *                            and (ZBX_IPC_WAIT_FOREVER, *) is                *
  *                            used for blocking call without timeout          *
  *             client  - [OUT] the client that sent the message or            *
  *                             NULL if there are no messages and the          *
@@ -1675,18 +1675,18 @@ void	zbx_ipc_service_close(zbx_ipc_service_t *service)
  *               ZBX_IPC_RECV_TIMEOUT   - returned after timeout expired      *
  *                                                                            *
  ******************************************************************************/
-int	zbx_ipc_service_recv(zbx_ipc_service_t *service, int timeout, zbx_ipc_client_t **client,
+int	zbx_ipc_service_recv(zbx_ipc_service_t *service, const zbx_timespec_t *timeout, zbx_ipc_client_t **client,
 		zbx_ipc_message_t **message)
 {
 	int	ret, flags;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() timeout:%d", __func__, timeout);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() timeout:%d.%03d", __func__, timeout->sec, timeout->ns / 1000000);
 
-	if (timeout != 0 && SUCCEED == zbx_queue_ptr_empty(&service->clients_recv))
+	if ((0 != timeout->sec || 0 != timeout->ns) && SUCCEED == zbx_queue_ptr_empty(&service->clients_recv))
 	{
-		if (ZBX_IPC_WAIT_FOREVER != timeout)
+		if (ZBX_IPC_WAIT_FOREVER != timeout->sec)
 		{
-			struct timeval	tv = {timeout, 0};
+			struct timeval	tv = {timeout->sec, timeout->ns / 1000};
 			evtimer_add(service->ev_timer, &tv);
 		}
 		flags = EVLOOP_ONCE;
@@ -1989,7 +1989,8 @@ int	zbx_ipc_async_socket_recv(zbx_ipc_async_socket_t *asocket, int timeout, zbx_
 	else
 		flags = EVLOOP_NONBLOCK;
 
-	asocket->state = ZBX_IPC_ASYNC_SOCKET_STATE_NONE;
+	/* do only single event base loop if timeout is not set */
+	asocket->state = (0 != timeout ? ZBX_IPC_ASYNC_SOCKET_STATE_NONE : ZBX_IPC_ASYNC_SOCKET_STATE_TIMEOUT);
 
 	do
 	{

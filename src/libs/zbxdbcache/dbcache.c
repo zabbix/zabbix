@@ -3271,6 +3271,10 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 		{
 			if (0 != history_num)
 			{
+				const ZBX_DC_HISTORY	*phistory = NULL;
+				const ZBX_DC_TREND	*ptrends = NULL;
+				int			history_num_loc = 0, trends_num_loc = 0;
+
 				DCmodule_prepare_history(history, history_num, history_float, &history_float_num,
 						history_integer, &history_integer_num, history_string,
 						&history_string_num, history_text, &history_text_num, history_log,
@@ -3279,13 +3283,6 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 				DCmodule_sync_history(history_float_num, history_integer_num, history_string_num,
 						history_text_num, history_log_num, history_float, history_integer,
 						history_string, history_text, history_log);
-			}
-
-			if (0 != history_num)
-			{
-				const ZBX_DC_HISTORY	*phistory = NULL;
-				const ZBX_DC_TREND	*ptrends = NULL;
-				int			history_num_loc = 0, trends_num_loc = 0;
 
 				if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_HISTORY))
 				{
@@ -4528,6 +4525,12 @@ int	init_database_cache(char **error)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	if (NULL != cache)
+	{
+		ret = SUCCEED;
+		goto out;
+	}
+
 	if (SUCCEED != (ret = zbx_mutex_create(&cache_lock, ZBX_MUTEX_CACHE, error)))
 		goto out;
 
@@ -4615,19 +4618,29 @@ static void	DCsync_all(void)
  * Author: Alexei Vladishev, Alexander Vladishev                              *
  *                                                                            *
  ******************************************************************************/
-void	free_database_cache(void)
+void	free_database_cache(int sync)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	DCsync_all();
+	if (ZBX_SYNC_ALL == sync)
+		DCsync_all();
 
 	cache = NULL;
+
+	zbx_mem_destroy(hc_mem);
+	hc_mem = NULL;
+	zbx_mem_destroy(hc_index_mem);
+	hc_index_mem = NULL;
 
 	zbx_mutex_destroy(&cache_lock);
 	zbx_mutex_destroy(&cache_ids_lock);
 
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	{
+		zbx_mem_destroy(trend_mem);
+		trend_mem = NULL;
 		zbx_mutex_destroy(&trends_lock);
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

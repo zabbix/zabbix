@@ -669,6 +669,10 @@ form {
 		border-bottom: 1px solid $table-border-color;
 		line-height: 18px;
 		vertical-align: top;
+
+		&.table-info {
+			color: $font-alt-color;
+		}
 	}
 
 	tbody th {
@@ -694,6 +698,39 @@ form {
 	.list-table-actions {
 		text-align: right;
 		white-space: nowrap;
+	}
+
+	&.sticky-header {
+		thead {
+			position: sticky;
+			top: 0;
+			z-index: 1;
+			background: $ui-bg-color;
+		}
+	}
+
+	&.sticky-footer {
+		tbody {
+			tr:last-of-type {
+				td, th {
+					border-bottom: none;
+				}
+			}
+		}
+
+		tfoot {
+			position: sticky;
+			bottom: 0;
+			z-index: 1;
+			background: $ui-bg-color;
+
+			tr:first-of-type {
+				td, th {
+					border-top: 2px solid darken($table-border-color, 5%);
+					border-bottom: 0;
+				}
+			}
+		}
 	}
 }
 
@@ -1332,7 +1369,8 @@ form {
 		}
 	}
 
-	tfoot {
+	tfoot,
+	.tfoot-buttons {
 		.table-forms-td-right {
 			padding-top: 5px;
 		}
@@ -1340,10 +1378,6 @@ form {
 		button {
 			margin: 0 10px 0 0;
 		}
-	}
-
-	.tfoot-buttons {
-		@extend tfoot;
 	}
 
 	td {
@@ -3102,6 +3136,19 @@ $form-icon-btn: (
 		margin: 0 0 10px;
 	}
 
+	.form-grid {
+		// 100px label column width for use in popup forms.
+		grid-template-columns: minmax(100px, max-content) auto;
+
+		&.form-grid-1-1 {
+			grid-template-columns: repeat(2, minmax(100px, max-content) auto);
+		}
+
+		&.form-grid-3-1 {
+			grid-template-columns: minmax(100px, max-content) 3fr max-content auto;
+		}
+	}
+
 	.list-table {
 		white-space: normal;
 		border: 0;
@@ -3271,7 +3318,7 @@ $form-icon-btn: (
 		}
 	}
 
-	.multilineinput-symbols-remaining {
+	.multilineinput-char-count {
 		color: $font-alt-color;
 		float: left;
 		line-height: 24px;
@@ -5711,10 +5758,9 @@ $range-input-width: 31px;
 
 // Input group
 
-.input-group {
+.macro-input-group {
 	position: relative;
 	display: flex;
-	flex-wrap: wrap;
 	align-items: stretch;
 	width: 100%;
 
@@ -6087,6 +6133,7 @@ $range-input-width: 31px;
 
 		&[data-type] .interface-cell-details {
 			display: none;
+			grid-column: 1/-1;
 		}
 
 		.interface-cell {
@@ -6349,6 +6396,20 @@ z-select,
 			content: '\2013';
 			float: left;
 			margin-left: -1em;
+		}
+	}
+}
+
+.overlay-dialogue #host-form {
+	#tagsFormList,
+	#macrosFormList,
+	#valuemap-formlist {
+		.table-forms-td-left {
+			display: none;
+		}
+
+		.table-forms-td-right {
+			width: 100%;
 		}
 	}
 }

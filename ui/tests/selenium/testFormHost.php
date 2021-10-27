@@ -24,6 +24,7 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
  * @backup hosts
+ *
  * @onBefore prepareUpdateData
  */
 class testFormHost extends CWebTest {
@@ -193,8 +194,12 @@ class testFormHost extends CWebTest {
 	}
 
 	public function testFormHost_Layout() {
-		$this->page->login()->open('hosts.php?form=update&hostid='.self::$hostids['testFormHost with items']);
-		$form = $this->query('id:hosts-form')->asForm()->one()->waitUntilVisible();
+		$hostname = 'testFormHost with items';
+		$this->page->login()->open('zabbix.php?action=host.list')->waitUntilReady();
+		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $hostname)->getColumn('Name')
+				->query('link', $hostname)->waitUntilClickable()->one()->click();
+		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
+
 		// Check tabs available in the form
 		$tabs = ['Host', 'Templates', 'IPMI', 'Tags', 'Macros', 'Inventory', 'Encryption', 'Value mapping'];
 		$this->assertEquals(count($tabs), $form->query('xpath:.//li[@role="tab"]')->all()->count());
@@ -224,23 +229,30 @@ class testFormHost extends CWebTest {
 
 		// Click the "expand" icon (in the 0th column) for the SNMP interface (1th row).
 		$interfaces_form->getRow(1)->getColumn(0)->query('tag:button')->one()->click();
-		$snmp_form = $interfaces_form->getRow(1)->query('xpath://ul[@class="table-forms"]')->asForm(['normalized' => true])->one();
+		$snmp_form = $interfaces_form->getRow(1)->query('xpath:.//div[@class="form-grid"]')->one()->parents()
+				->asForm(['normalized' => true])->one();
 		$data = [
-			'SNMPv1' => ['SNMP version', 'SNMP community', 'Use bulk requests'],
-			'SNMPv2' => ['SNMP version', 'SNMP community', 'Use bulk requests'],
-			'SNMPv3' => ['SNMP version', 'Context name', 'Security name', 'Security level', 'Use bulk requests'],
+			'SNMPv1' => ['SNMP version', 'SNMP community'],
+			'SNMPv2' => ['SNMP version', 'SNMP community'],
+			'SNMPv3' => ['SNMP version', 'Context name', 'Security name', 'Security level'],
 			'authNoPriv' => ['SNMP version', 'Context name', 'Security name', 'Security level',
-				'Authentication protocol', 'Authentication passphrase', 'Use bulk requests'
+				'Authentication protocol', 'Authentication passphrase'
 			]
 		];
 
 		// The SNMP interface has specific fields depending on the SNMP version and protocol.
 		foreach ($data as $field => $labels) {
 			$select = ($field === 'authNoPriv') ? 'Security level' : 'SNMP version';
-			$form->fill([$select => $field]);
+			$snmp_form->fill([$select => $field]);
 			$this->assertEquals($labels, array_values($snmp_form->getLabels()
 					->filter(new CElementFilter(CElementFilter::VISIBLE))->asText()));
+			$this->assertFalse($snmp_form->query('xpath:.//label[text()="Use bulk requests"]')->one()
+					->asCheckbox()->isChecked());
 		}
+
+		// Close host form popup to avoid unexpected alert in further cases.
+		COverlayDialogElement::find()->one()->close();
+		COverlayDialogElement::ensureNotPresent();
 	}
 
 	public static function getCreateData() {
@@ -249,7 +261,7 @@ class testFormHost extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'error' => ['Field "groups" is mandatory.', 'Incorrect value for field "Host name": cannot be empty.']
+					'error' => ['Incorrect value for field "host": cannot be empty.', 'Field "groups" is mandatory.']
 				]
 			],
 			[
@@ -258,7 +270,7 @@ class testFormHost extends CWebTest {
 					'host_fields' => [
 						'Groups' => 'Zabbix servers'
 					],
-					'error' => 'Incorrect value for field "Host name": cannot be empty.'
+					'error' => 'Incorrect value for field "host": cannot be empty.'
 				]
 			],
 			[
@@ -727,8 +739,9 @@ class testFormHost extends CWebTest {
 			$interface_old_hash = CDBHelper::getHash($this->interface_snmp_sql);
 		}
 
-		$this->page->login()->open('hosts.php?form=create');
-		$form = $this->query('id:hosts-form')->asForm()->one()->waitUntilVisible();
+		$this->page->login()->open('zabbix.php?action=host.list')->waitUntilReady();
+		$this->query('button:Create host')->one()->waitUntilClickable()->click();
+		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
 
 		// Set name for field "Default".
@@ -744,9 +757,9 @@ class testFormHost extends CWebTest {
 
 				// Check host fields.
 				$host = CTestArrayHelper::get($data, 'host_fields.Visible name', $data['host_fields']['Host name']);
-				$this->query('link', $host)->waitUntilClickable()->one()->click();
-				$this->page->waitUntilReady();
-				$form->invalidate();
+				$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $host)
+						->getColumn('Name')->query('link', $host)->waitUntilClickable()->one()->click();
+				$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
 				$form->checkValue($data['host_fields']);
 
 				foreach ($interfaces as &$interface) {
@@ -767,17 +780,19 @@ class testFormHost extends CWebTest {
 				$this->assertDatabaseFields($data);
 
 				// Check interfaces field values.
-				$form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => $names])->checkValue($data['interfaces']);
+				$form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => $names])
+						->checkValue($data['interfaces']);
 				break;
 
 			case TEST_BAD:
 				$this->assertEquals($old_hash, CDBHelper::getHash($this->hosts_sql));
 				$this->assertEquals($interface_old_hash, CDBHelper::getHash($this->interface_snmp_sql));
-
-				$error_title = CTestArrayHelper::get($data, 'error_title', 'Page received incorrect data');
-				$this->assertMessage(TEST_BAD, $error_title, $data['error']);
+				$this->assertMessage(TEST_BAD, CTestArrayHelper::get($data, 'error_title', 'Cannot add host'), $data['error']);
 				break;
 		}
+
+		COverlayDialogElement::find()->one()->close();
+		COverlayDialogElement::ensureNotPresent();
 	}
 
 	public static function getUpdateData() {
@@ -808,7 +823,7 @@ class testFormHost extends CWebTest {
 							'index' => 0
 						]
 					],
-					'error' => ['Field "groups" is mandatory.', 'Incorrect value for field "Host name": cannot be empty.'
+					'error' => ['Field "groups" is mandatory.', 'Incorrect value for field "host": cannot be empty.'
 					]
 				]
 			],
@@ -819,7 +834,7 @@ class testFormHost extends CWebTest {
 						'Host name' => '',
 						'Groups' => ''
 					],
-					'error' => ['Field "groups" is mandatory.', 'Incorrect value for field "Host name": cannot be empty.']
+					'error' => ['Field "groups" is mandatory.', 'Incorrect value for field "host": cannot be empty.']
 				]
 			],
 			[
@@ -828,7 +843,7 @@ class testFormHost extends CWebTest {
 					'host_fields' => [
 						'Host name' => ''
 					],
-					'error' => 'Incorrect value for field "Host name": cannot be empty.'
+					'error' => 'Incorrect value for field "host": cannot be empty.'
 				]
 			],
 			[
@@ -1340,8 +1355,11 @@ class testFormHost extends CWebTest {
 			]
 		];
 
-		$this->page->login()->open('hosts.php?form=update&hostid='.self::$hostids['testFormHost_Update']);
-		$form = $this->query('id:hosts-form')->asForm()->one()->waitUntilVisible();
+		$hostname = 'testFormHost_Update Visible name';
+		$this->page->login()->open('zabbix.php?action=host.list')->waitUntilReady();
+		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $hostname)->getColumn('Name')
+				->query('link', $hostname)->waitUntilClickable()->one()->click();
+		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
 
 		// Set name for field "Default".
@@ -1360,9 +1378,9 @@ class testFormHost extends CWebTest {
 				else {
 					$host = CTestArrayHelper::get($data, 'host_fields.Visible name', 'testFormHost_Update Visible name');
 				}
-				$this->query('link', $host)->waitUntilClickable()->one()->forceClick();
-				$this->page->waitUntilReady();
-				$form->invalidate();
+				$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $host)
+						->getColumn('Name')->query('link', $host)->waitUntilClickable()->one()->click();
+				$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 
 				// Update or add new source data from host data.
 				foreach (CTestArrayHelper::get($data, 'host_fields', []) as $key => $value) {
@@ -1439,17 +1457,21 @@ class testFormHost extends CWebTest {
 				$this->assertDatabaseFields($source);
 
 				// Check interfaces field values.
-				$form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => $names])->checkValue($source['interfaces']);
+				$form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => $names])
+						->checkValue($source['interfaces']);
 				break;
 
 			case TEST_BAD:
 				$this->assertEquals($host_old_hash, CDBHelper::getHash($this->hosts_sql));
 				$this->assertEquals($interface_old_hash, CDBHelper::getHash($this->interface_snmp_sql));
 
-				$error_title = CTestArrayHelper::get($data, 'error_title', 'Page received incorrect data');
+				$error_title = CTestArrayHelper::get($data, 'error_title', 'Cannot update host');
 				$this->assertMessage(TEST_BAD, $error_title, $data['error']);
 				break;
 		}
+
+		COverlayDialogElement::find()->one()->close();
+		COverlayDialogElement::ensureNotPresent();
 	}
 
 	/**
@@ -1493,12 +1515,22 @@ class testFormHost extends CWebTest {
 	 * Update the host without any changes and check host and interfaces hashes.
 	 */
 	public function testFormHost_SimpleUpdate() {
+		$host = 'testFormHost_Update';
 		$host_old_hash = CDBHelper::getHash($this->hosts_sql);
 		$interface_old_hash = CDBHelper::getHash($this->interface_snmp_sql);
 
-		$this->page->login()->open('hosts.php?form=update&hostid='.self::$hostids['testFormHost_Update']);
+		$this->page->login()->open('zabbix.php?action=host.list')->waitUntilReady();
+		$this->query('button:Reset')->one()->click();
+		$filter = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+		$filter->fill(['Name' => $host]);
+		$filter->query('button:Apply')->one()->waitUntilClickable()->click();
+
+		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $host, true)
+				->getColumn('Name')->query('tag:a')->waitUntilClickable()->one()->click();
+		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
+
 		$this->page->waitUntilReady();
-		$this->query('button:Update')->waitUntilClickable()->one()->click();
+		$form->submit();
 		$this->assertMessage(TEST_GOOD, 'Host updated');
 
 		$this->assertEquals($host_old_hash, CDBHelper::getHash($this->hosts_sql));
@@ -1517,25 +1549,25 @@ class testFormHost extends CWebTest {
 			[
 				[
 					'host_fields' => [
-						'Host name' => microtime().' clone with interface changes'
-					],
-					'interfaces' => [
-						[
-							'action' => USER_ACTION_ADD,
-							'type' => 'SNMP',
-							'ip' => '127.1.1.1',
-							'dns' => '',
-							'Connect to' => 'IP',
-							'port' => '122',
-							'SNMP version' => 'SNMPv3',
-							'Context name' => 'zabbix',
-							'Security name' => 'selenium',
-							'Security level' => 'authPriv',
-							'Authentication protocol' => 'SHA256',
-							'Authentication passphrase' => 'test123',
-							'Privacy protocol' => 'AES256',
-							'Privacy passphrase' => '456test',
-							'Use bulk requests' => false
+						'Host name' => microtime().' clone with interface changes',
+						'Interfaces' => [
+							[
+								'action' => USER_ACTION_ADD,
+								'type' => 'SNMP',
+								'ip' => '127.3.3.3',
+								'dns' => '',
+								'Connect to' => 'IP',
+								'port' => '122',
+								'SNMP version' => 'SNMPv3',
+								'Context name' => 'zabbix',
+								'Security name' => 'selenium',
+								'Security level' => 'authPriv',
+								'Authentication protocol' => 'SHA256',
+								'Authentication passphrase' => 'test123',
+								'Privacy protocol' => 'AES256',
+								'Privacy passphrase' => '456test',
+								'Use bulk requests' => false
+							]
 						]
 					]
 				]
@@ -1574,30 +1606,36 @@ class testFormHost extends CWebTest {
 	private function cloneHost($data, $full_clone = false) {
 		$name = 'testFormHost with items';
 		$type = $full_clone ? 'Full clone' : 'Clone';
-		$this->page->login()->open('hosts.php?form=update&hostid='.self::$hostids[$name]);
 
-		$form = $this->query('id:hosts-form')->asForm()->one()->waitUntilVisible();
-		$form->setFilter(new CElementFilter(CElementFilter::VISIBLE));
+		$this->page->login()->open('zabbix.php?action=host.list')->waitUntilReady();
+		$this->query('button:Reset')->one()->click();
+		$filter = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+		$filter->fill(['Name' => $name]);
+		$filter->query('button:Apply')->waitUntilClickable()->one()->click();
+
+		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
+				->getColumn('Name')->query('tag:a')->waitUntilClickable()->one()->click();
+		$form = COverlayDialogElement::find()->asForm()->waitUntilVisible()->one();
+
 		// Get values from form.
 		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
 		$original = $form->getFields()->asValues();
-		// Get values from interface fields.
-		$container_names = ['1' => 'default'];
-		$interfaces_form = $form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => $container_names]);
-		$interfaces_form->fill(CTestArrayHelper::get($data, 'interfaces', []));
-		$original_interfaces = $interfaces_form->getValue();
 
 		// Clone host.
 		$this->query('button', $type)->waitUntilClickable()->one()->click();
-		$form->submit();
+		$cloned_form = COverlayDialogElement::find()->asForm()->waitUntilPresent()->one();
+		$cloned_form->submit();
+		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Host added');
+		$this->query('button:Reset')->one()->click();
 
 		// Check the values of the original host with the cloned host.
 		$this->query('link', $data['host_fields']['Host name'])->waitUntilClickable()->one()->forceClick();
-		$cloned_form = $form;
-		$form->invalidate();
-		$cloned_form->checkValue($original);
-		$cloned_form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => $container_names])->checkValue($original_interfaces);
+		$saved_form = COverlayDialogElement::find()->asForm()->waitUntilReady()->one();
+		$saved_form->checkValue($original);
+
+		COverlayDialogElement::find()->one()->close();
+		COverlayDialogElement::ensureNotPresent();
 	}
 
 	public static function getСancelData() {
@@ -1652,36 +1690,45 @@ class testFormHost extends CWebTest {
 		];
 
 		if ($data['action'] === 'Add') {
-			$this->page->login()->open('hosts.php?form=create');
+			$this->page->login()->open('zabbix.php?action=host.list')->waitUntilReady();
+			$this->query('button:Create host')->one()->waitUntilClickable()->click();
 		}
 		else {
-			$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($name));
-			$this->page->login()->open('hosts.php?form=update&hostid='.$hostid);
+			$this->page->login()->open('zabbix.php?action=host.list')->waitUntilReady();
+			$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)->getColumn('Name')
+					->query('link', $name)->waitUntilClickable()->one()->click();
 		}
 
 		// Change the host data to make sure that the changes are not saved to the database after cancellation.
-		$form = $this->query('id:hosts-form')->asForm()->one()->waitUntilVisible();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$form = $dialog->asForm();
 		$form->fill(['Host name' => $new_name]);
 		$interfaces_form = $form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => ['1' => 'default']]);
 		$interfaces_form->fill($interface);
 
 		if (in_array($data['action'], ['Clone', 'Full clone', 'Delete'])) {
-			$this->query('button', $data['action'])->one()->click();
+			$dialog->query('button', $data['action'])->one()->click();
 		}
 		if ($data['action'] === 'Delete') {
 			$this->page->dismissAlert();
 		}
 
+		$this->page->waitUntilReady();
+
 		// Check that the host creation page is open after cloning or full cloning.
 		if ($data['action'] === 'Clone' || $data['action'] === 'Full clone') {
-			$this->assertEquals(PHPUNIT_URL.'hosts.php', $this->page->getCurrentUrl());
-			$this->assertFalse($this->query('xpath:.//ul['.CXPathHelper::fromClass('filter-breadcrumb').']')->one(false)->isValid());
-			$this->assertFalse($this->query('button', ['Update', 'Clone', 'Full clone', 'Delete'])->one(false)->isValid());
-			$this->assertTrue($this->query('id', ['add', 'cancel'])->one(false)->isValid());
+			$dialog->invalidate();
+			$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($name));
+			$action = ($data['action'] === 'Clone') ? 'clone' : 'full_clone';
+			$expected_url = PHPUNIT_URL.'zabbix.php?action=host.edit&hostid='.$id.'&'.$action.'=1';
+
+			$this->assertEquals($expected_url, $this->page->getCurrentUrl());
+			$this->assertFalse($dialog->query('xpath:.//ul['.CXPathHelper::fromClass('filter-breadcrumb').']')->one(false)->isValid());
+			$this->assertFalse($dialog->query('button', ['Update', 'Clone', 'Full clone', 'Delete'])->one(false)->isValid());
+			$this->assertTrue($dialog->query('button', ['Add', 'Cancel'])->one(false)->isValid());
 		}
 
-		$this->page->waitUntilReady();
-		$this->query('button:Cancel')->waitUntilClickable()->one()->click();
+		$dialog->query('button:Cancel')->waitUntilClickable()->one()->click();
 
 		// Check invariability of host data in the database.
 		$this->assertEquals($host_old_hash, CDBHelper::getHash($this->hosts_sql));
@@ -1701,7 +1748,8 @@ class testFormHost extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Host for suppression',
-					'error' => 'Cannot delete host because maintenance "Maintenance for suppression test" must contain at least one host or host group.'
+					'error' => 'Cannot delete host because maintenance "Maintenance for suppression test"'.
+							' must contain at least one host or host group.'
 				]
 			]
 		];
@@ -1721,9 +1769,13 @@ class testFormHost extends CWebTest {
 			$ids = array_column($interfaceids, 'interfaceid');
 		}
 
-		$this->page->login()->open('hosts.php?form=update&hostid='.$hostid);
-		$this->query('button:Delete')->waitUntilClickable()->one()->click();
+		$this->page->login()->open('zabbix.php?action=host.list')->waitUntilReady();
+		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $data['name'])
+				->getColumn('Name')->query('link', $data['name'])->waitUntilClickable()->one()->click();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$dialog->query('button:Delete')->waitUntilClickable()->one()->click();
 		$this->page->acceptAlert();
+		$this->page->waitUntilReady();
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
