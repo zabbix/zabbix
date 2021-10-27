@@ -526,10 +526,10 @@ class testDashboardPages extends CWebTest {
 
 		$next_page = $this->query(self::NEXT_BUTTON)->one();
 		while ($next_page->isClickable()) {
-			$next_page->waitUntilReady()->click();
-			$this->query("xpath://ul[@class='sortable-list']//span[@title=".CXPathHelper::escapeQuotes($title).
-					"]/following-sibling::button[@title='Actions']")->waitUntilVisible();
+			$next_page->click();
 		}
+//		$this->query("xpath://ul[@class='sortable-list']//span[@title=".CXPathHelper::escapeQuotes($title).
+//				"]/following-sibling::button[@title='Actions']")->waitUntilVisible();
 
 		$index = (array_key_exists('duplicate', $data)) ? 2 : 1;
 		$this->selectPageAction($title, 'Properties', $index);
