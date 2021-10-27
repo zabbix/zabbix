@@ -1509,7 +1509,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 				/* more results? 0 = yes (keep looping), -1 = no, >0 = error */
 				if (0 < (status = mysql_next_result(conn)))
 				{
-					if ER_DUP_ENTRY == mysql_errno(conn))
+					if (ER_DUP_ENTRY == mysql_errno(conn))
 						errcode = ERR_Z3008;
 					else
 						errcode = ERR_Z3005;
