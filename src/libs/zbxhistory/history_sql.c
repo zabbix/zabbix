@@ -303,7 +303,7 @@ static void	db_insert_rows_to_values(zbx_db_insert_t *insert, zbx_vector_ptr_t *
 {
 	int	i;
 
-	for (int i = 0; i < insert->rows.values_num; i++) {
+	for (i = 0; i < insert->rows.values_num; i++) {
 		zbx_db_value_t	*dbv = insert->rows.values[i];
 
 		db_history_value_t *hist_value = (db_history_value_t *)zbx_malloc(NULL, sizeof(db_history_value_t));
@@ -319,10 +319,11 @@ static void	sql_writer_reinsert_duplicates()
 {
 	zbx_db_history_dupl_data_t	data;
 	int				i;
+	size_t				j;
 	char				*select_uint = NULL, *select_flt = NULL, *select_str = NULL,
 					*select_log = NULL, *select_text = NULL;
 
-	void				*tables[][5] = {
+	void				*history_tables[][5] = {
 		{&select_flt,	&data.rows_flt,		&data.dup_rows_flt,	"history",	data.tbl_flt},
 		{&select_uint,	&data.rows_uint,	&data.dup_rows_uint,	"history_uint",	data.tbl_uint},
 		{&select_str,	&data.rows_str,		&data.dup_rows_str,	"history_str",	data.tbl_str},
@@ -365,7 +366,7 @@ static void	sql_writer_reinsert_duplicates()
 		}
 	}
 
-	for (i = 0; i < ARRSIZE(tables); i++)
+	for (j = 0; j < ARRSIZE(history_tables); j++)
 	{
 		char			**select;
 		zbx_vector_ptr_t	*rows;
@@ -373,11 +374,11 @@ static void	sql_writer_reinsert_duplicates()
 		const char		*table_name;
 		const ZBX_TABLE		*tbl;
 
-		select = tables[i][0];
-		rows = tables[i][1];
-		dup_rows = tables[i][2];
-		table_name = tables[i][3];
-		tbl = tables[i][4];
+		select = history_tables[j][0];
+		rows = history_tables[j][1];
+		dup_rows = history_tables[j][2];
+		table_name = history_tables[j][3];
+		tbl = history_tables[j][4];
 
 		create_dupl_selects(select, rows, table_name);
 
@@ -387,6 +388,8 @@ static void	sql_writer_reinsert_duplicates()
 		select_duplicate_values(*select, dup_rows);
 		remove_duplicate_values(dup_rows, tbl);
 	}
+
+	destroy_history_dupl_data(&data);
 
 	zbx_free(select_uint);
 	zbx_free(select_log);
