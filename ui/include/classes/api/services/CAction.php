@@ -783,43 +783,6 @@ class CAction extends CApiService {
 			$operationids = DB::insert('operations', $ins_operations);
 		}
 
-		// operation conditions
-		$ins_opconditions = [];
-		$upd_opconditions = [];
-		$del_opconditionids = [];
-
-		// messages
-		$ins_opmessages = [];
-		$upd_opmessages = [];
-
-		$ins_opmessage_grps = [];
-		$del_opmessage_grpids = [];
-
-		$ins_opmessage_usrs = [];
-		$del_opmessage_usrids = [];
-
-		// commands
-		$ins_opcommands = [];
-		$upd_opcommands = [];
-
-		$ins_opcommand_grps = [];
-		$del_opcommand_grpids = [];
-
-		$ins_opcommand_hsts = [];
-		$del_opcommand_hstids = [];
-
-		// groups
-		$ins_opgroups = [];
-		$del_opgroupids = [];
-
-		// templates
-		$ins_optemplates = [];
-		$del_optemplateids = [];
-
-		// inventory
-		$ins_opinventories = [];
-		$upd_opinventories = [];
-
 		foreach ($actions as &$action) {
 			foreach (self::OPERATION_GROUPS as $operation_group) {
 				if (!array_key_exists($operation_group, $action)) {
@@ -830,52 +793,152 @@ class CAction extends CApiService {
 					if (!array_key_exists('operationid', $operation)) {
 						$operation['operationid'] = array_shift($operationids);
 					}
+				}
+				unset($operation);
+			}
+		}
+		unset($action);
 
-					if ($is_update) {
-						$db_operations = $db_actions[$action['actionid']][$operation_group];
-						$db_operation = array_key_exists($operation['operationid'], $db_operations)
-							? $db_operations[$operation['operationid']]
-							: [];
+		self::updateOperationConditions($actions, $db_actions);
+		self::updateOperationMessages($actions, $db_actions);
+		self::updateOperationCommands($actions, $db_actions);
+		self::updateOperationGroups($actions, $db_actions);
+		self::updateOperationTemplates($actions, $db_actions);
+		self::updateOperationInventories($actions, $db_actions);
+	}
+
+	/**
+	 * @param array      $actions
+	 * @param array|null $db_actions
+	 */
+	private static function updateOperationConditions(array &$actions, array $db_actions = null): void {
+		$is_update = ($db_actions !== null);
+
+		$ins_opconditions = [];
+		$upd_opconditions = [];
+		$del_opconditionids = [];
+
+		foreach ($actions as &$action) {
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
+					continue;
+				}
+
+				$db_operations = $is_update ? $db_actions[$action['actionid']][$operation_group] : [];
+
+				foreach ($action[$operation_group] as &$operation) {
+					if (!array_key_exists('opconditions', $operation)) {
+						continue;
 					}
-					else {
-						$db_operation = [];
-					}
 
-					if (array_key_exists('opconditions', $operation)) {
-						$db_opconditions = ($is_update && array_key_exists('opconditions', $db_operation))
-							? array_column($db_operation['opconditions'], null, 'value')
-							: [];
+					$db_operation = array_key_exists($operation['operationid'], $db_operations)
+						? $db_operations[$operation['operationid']]
+						: [];
 
-						foreach ($operation['opconditions'] as &$opcondition) {
-							if (array_key_exists($opcondition['value'], $db_opconditions)) {
-								$db_opcondition = $db_opconditions[$opcondition['value']];
-								$opcondition['opconditionid'] = $db_opcondition['opconditionid'];
-								unset($db_opconditions[$opcondition['value']]);
+					$db_opconditions = array_key_exists('opconditions', $db_operation)
+						? array_column($db_operation['opconditions'], null, 'value')
+						: [];
 
-								$upd_opcondition = DB::getUpdatedValues('opconditions', $opcondition, $db_opcondition);
+					foreach ($operation['opconditions'] as &$opcondition) {
+						if (array_key_exists($opcondition['value'], $db_opconditions)) {
+							$db_opcondition = $db_opconditions[$opcondition['value']];
 
-								if ($upd_opcondition) {
-									$upd_opconditions[] = [
-										'values' => $upd_opcondition,
-										'where' => ['operationid' => $operation['operationid']]
-									];
-								}
-							}
-							else {
-								$ins_opconditions[] = ['operationid' => $operation['operationid']] + $opcondition;
+							$opcondition['opconditionid'] = $db_opcondition['opconditionid'];
+							unset($db_opconditions[$opcondition['value']]);
+
+							$upd_opcondition = DB::getUpdatedValues('opconditions', $opcondition, $db_opcondition);
+
+							if ($upd_opcondition) {
+								$upd_opconditions[] = [
+									'values' => $upd_opcondition,
+									'where' => ['operationid' => $operation['operationid']]
+								];
 							}
 						}
-						unset($opcondition);
-
-						$del_opconditionids = array_merge($del_opconditionids,
-							array_column($db_opconditions, 'opconditionid')
-						);
+						else {
+							$ins_opconditions[] = ['operationid' => $operation['operationid']] + $opcondition;
+						}
 					}
+					unset($opcondition);
+
+					$del_opconditionids = array_merge($del_opconditionids,
+						array_column($db_opconditions, 'opconditionid')
+					);
+				}
+				unset($operation);
+			}
+		}
+		unset($action);
+
+		if ($del_opconditionids) {
+			DB::delete('opconditions', ['opconditionid' => $del_opconditionids]);
+		}
+
+		if ($upd_opconditions) {
+			DB::update('opconditions', $upd_opconditions);
+		}
+
+		if ($ins_opconditions) {
+			$opconditionids = DB::insert('opconditions', $ins_opconditions);
+		}
+
+		foreach ($actions as &$action) {
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
+					continue;
+				}
+
+				foreach ($action[$operation_group] as &$operation) {
+					if (!array_key_exists('opconditions', $operation)) {
+						continue;
+					}
+
+					foreach ($operation['opconditions'] as &$opcondition) {
+						if (!array_key_exists('opconditionid', $opcondition)) {
+							$opcondition['opconditionid'] = array_shift($opconditionids);
+						}
+					}
+					unset($opcondition);
+				}
+				unset($operation);
+			}
+		}
+		unset($action);
+	}
+
+	/**
+	 * @param array      $actions
+	 * @param array|null $db_actions
+	 */
+	private static function updateOperationMessages(array &$actions, array $db_actions = null): void {
+		$is_update = ($db_actions !== null);
+
+		$ins_opmessages = [];
+		$upd_opmessages = [];
+
+		$ins_opmessage_grps = [];
+		$del_opmessage_grpids = [];
+
+		$ins_opmessage_usrs = [];
+		$del_opmessage_usrids = [];
+
+		foreach ($actions as &$action) {
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
+					continue;
+				}
+
+				$db_operations = $is_update ? $db_actions[$action['actionid']][$operation_group] : [];
+
+				foreach ($action[$operation_group] as &$operation) {
+					$db_operation = array_key_exists($operation['operationid'], $db_operations)
+						? $db_operations[$operation['operationid']]
+						: [];
 
 					switch ($operation['operationtype']) {
 						case OPERATION_TYPE_MESSAGE:
 							if (array_key_exists('opmessage_grp', $operation)) {
-								$db_opmessage_grps = ($is_update && array_key_exists('opmessage_grp', $db_operation))
+								$db_opmessage_grps = array_key_exists('opmessage_grp', $db_operation)
 									? array_column($db_operation['opmessage_grp'], null, 'usrgrpid')
 									: [];
 
@@ -898,7 +961,7 @@ class CAction extends CApiService {
 							}
 
 							if (array_key_exists('opmessage_usr', $operation)) {
-								$db_opmessage_usrs = ($is_update && array_key_exists('opmessage_usr', $db_operation))
+								$db_opmessage_usrs = array_key_exists('opmessage_usr', $db_operation)
 									? array_column($db_operation['opmessage_usr'], null, 'userid')
 									: [];
 
@@ -923,7 +986,7 @@ class CAction extends CApiService {
 
 						case OPERATION_TYPE_RECOVERY_MESSAGE:
 						case OPERATION_TYPE_ACK_MESSAGE:
-							if ($is_update && array_key_exists('opmessage', $db_operation)) {
+							if (array_key_exists('opmessage', $db_operation)) {
 								$upd_opmessage = DB::getUpdatedValues('opmessage', $operation['opmessage'],
 									$db_operation['opmessage']
 								);
@@ -940,162 +1003,12 @@ class CAction extends CApiService {
 									['operationid' => $operation['operationid']] + $operation['opmessage'];
 							}
 							break;
-
-						case OPERATION_TYPE_COMMAND:
-							if ($is_update && array_key_exists('opcommand', $db_operation)) {
-								$upd_opcommand = DB::getUpdatedValues('opcommand', $operation['opcommand'],
-									$db_operation['opcommand']
-								);
-
-								if ($upd_opcommand) {
-									$upd_opcommands[] = [
-										'values' => $upd_opcommand,
-										'where' => ['operationid' => $operation['operationid']]
-									];
-								}
-							}
-							else {
-								$ins_opcommands[] =
-									['operationid' => $operation['operationid']] + $operation['opcommand'];
-							}
-
-							if (array_key_exists('opcommand_grp', $operation)) {
-								$db_opcommand_grps = ($is_update && array_key_exists('opcommand_grp', $db_operation))
-									? array_column($db_operation['opcommand_grp'], null, 'groupid')
-									: [];
-
-								foreach ($operation['opcommand_grp'] as &$opcommand_grp) {
-									if (array_key_exists($opcommand_grp['groupid'], $db_opcommand_grps)) {
-										$db_opcommand_grp = $db_opcommand_grps[$opcommand_grp['groupid']];
-										$opcommand_grp['opcommand_grpid'] = $db_opcommand_grp['opcommand_grpid'];
-										unset($db_opcommand_grps[$opcommand_grp['groupid']]);
-									}
-									else {
-										$ins_opcommand_grps[] =
-											['operationid' => $operation['operationid']] + $opcommand_grp;
-									}
-								}
-								unset($opcommand_grp);
-
-								$del_opcommand_grpids = array_merge($del_opcommand_grpids,
-									array_column($db_opcommand_grps, 'opcommand_grpid')
-								);
-							}
-
-							if (array_key_exists('opcommand_hst', $operation)) {
-								$db_opcommand_hsts = ($is_update && array_key_exists('opcommand_hst', $db_operation))
-									? array_column($db_operation['opcommand_hst'], null, 'hostid')
-									: [];
-
-								foreach ($operation['opcommand_hst'] as &$opcommand_hst) {
-									if (array_key_exists($opcommand_hst['hostid'], $db_opcommand_hsts)) {
-										$db_opcommand_hst = $db_opcommand_hsts[$opcommand_hst['hostid']];
-										$opcommand_hst['opcommand_hstid'] = $db_opcommand_hst['opcommand_hstid'];
-										unset($db_opcommand_hsts[$opcommand_hst['hostid']]);
-									}
-									else {
-										$ins_opcommand_hsts[] =
-											['operationid' => $operation['operationid']] + $opcommand_hst;
-									}
-								}
-								unset($opcommand_hst);
-
-								$del_opcommand_hstids = array_merge($del_opcommand_hstids,
-									array_column($db_opcommand_hsts, 'opcommand_hstid')
-								);
-							}
-							break;
-
-						case OPERATION_TYPE_GROUP_ADD:
-						case OPERATION_TYPE_GROUP_REMOVE:
-							$db_opgroups = ($is_update && array_key_exists('opgroup', $db_operation))
-								? array_column($db_operation['opgroup'], null, 'groupid')
-								: [];
-
-							foreach ($operation['opgroup'] as &$opgroup) {
-								if (array_key_exists($opgroup['groupid'], $db_opgroups)) {
-									$db_opgroup = $db_opgroups[$opgroup['groupid']];
-									$opgroup['opgroupid'] = $db_opgroup['opgroupid'];
-									unset($db_opgroups[$opgroup['groupid']]);
-								}
-								else {
-									$ins_opgroups[] = ['operationid' => $operation['operationid']] + $opgroup;
-								}
-							}
-							unset($opgroup);
-
-							$del_opgroupids = array_merge($del_opgroupids, array_column($db_opgroups, 'opgroupid'));
-							break;
-
-						case OPERATION_TYPE_TEMPLATE_ADD:
-						case OPERATION_TYPE_TEMPLATE_REMOVE:
-							$db_optemplates = ($is_update && array_key_exists('optemplate', $db_operation))
-								? array_column($db_operation['optemplate'], null, 'templateid')
-								: [];
-
-							foreach ($operation['optemplate'] as &$optemplate) {
-								if (array_key_exists($optemplate['templateid'], $db_optemplates)) {
-									$db_optemplate = $db_optemplates[$optemplate['templateid']];
-									$optemplate['optemplateid'] = $db_optemplate['optemplateid'];
-									unset($db_optemplates[$optemplate['templateid']]);
-								}
-								else {
-									$ins_optemplates[] = ['operationid' => $operation['operationid']] + $optemplate;
-								}
-							}
-							unset($optemplate);
-
-							$del_optemplateids = array_merge($del_optemplateids,
-								array_column($db_optemplates, 'optemplateid')
-							);
-							break;
-
-						case OPERATION_TYPE_HOST_INVENTORY:
-							if ($is_update && array_key_exists('opinventory', $db_operation)) {
-								$upd_opinventory = DB::getUpdatedValues('opinventory', $operation['opinventory'],
-									$db_operation['opinventory']
-								);
-
-								if ($upd_opinventory) {
-									$upd_opinventories[] = [
-										'values' => $upd_opinventory,
-										'where' => ['operationid' => $operation['operationid']]
-									];
-								}
-							}
-							else {
-								$ins_opinventories[] =
-									['operationid' => $operation['operationid']] + $operation['opinventory'];
-							}
-							break;
 					}
 				}
 				unset($operation);
 			}
 		}
 		unset($action);
-
-		// operation conditions
-		if ($del_opconditionids) {
-			DB::delete('opconditions', ['opconditionid' => $del_opconditionids]);
-		}
-
-		if ($upd_opconditions) {
-			DB::update('opconditions', $upd_opconditions);
-		}
-
-		if ($ins_opconditions) {
-			$opconditionids = DB::insert('opconditions', $ins_opconditions);
-		}
-
-		// messages
-		if ($del_opmessage_grpids) {
-			DB::delete('opmessage_grp', ['opmessage_grpid' => $del_opmessage_grpids]);
-		}
-
-		if ($del_opmessage_usrids) {
-			DB::delete('opmessage_usr', ['opmessage_usrid' => $del_opmessage_usrids]);
-		}
 
 		if ($upd_opmessages) {
 			DB::update('opmessage', $upd_opmessages);
@@ -1105,15 +1018,154 @@ class CAction extends CApiService {
 			DB::insert('opmessage', $ins_opmessages, false);
 		}
 
+		if ($del_opmessage_grpids) {
+			DB::delete('opmessage_grp', ['opmessage_grpid' => $del_opmessage_grpids]);
+		}
+
 		if ($ins_opmessage_grps) {
 			$opmessage_grpids = DB::insert('opmessage_grp', $ins_opmessage_grps);
+		}
+
+		if ($del_opmessage_usrids) {
+			DB::delete('opmessage_usr', ['opmessage_usrid' => $del_opmessage_usrids]);
 		}
 
 		if ($ins_opmessage_usrs) {
 			$opmessage_usrids = DB::insert('opmessage_usr', $ins_opmessage_usrs);
 		}
 
-		// commands
+		foreach ($actions as &$action) {
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
+					continue;
+				}
+
+				foreach ($action[$operation_group] as &$operation) {
+					if (array_key_exists('opmessage_grp', $operation)) {
+						foreach ($operation['opmessage_grp'] as &$opmessage_grp) {
+							if (!array_key_exists('opmessage_grpid', $opmessage_grp)) {
+								$opmessage_grp['opmessage_grpid'] = array_shift($opmessage_grpids);
+							}
+						}
+						unset($opmessage_grp);
+					}
+
+					if (array_key_exists('opmessage_usr', $operation)) {
+						foreach ($operation['opmessage_usr'] as &$opmessage_usr) {
+							if (!array_key_exists('opmessage_usrid', $opmessage_usr)) {
+								$opmessage_usr['opmessage_usrid'] = array_shift($opmessage_usrids);
+							}
+						}
+						unset($opmessage_usr);
+					}
+				}
+				unset($operation);
+			}
+		}
+		unset($action);
+	}
+
+	/**
+	 * @param array      $actions
+	 * @param array|null $db_actions
+	 */
+	private static function updateOperationCommands(array &$actions, array $db_actions = null): void {
+		$is_update = ($db_actions !== null);
+
+		$ins_opcommands = [];
+		$upd_opcommands = [];
+
+		$ins_opcommand_grps = [];
+		$del_opcommand_grpids = [];
+
+		$ins_opcommand_hsts = [];
+		$del_opcommand_hstids = [];
+
+		foreach ($actions as &$action) {
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
+					continue;
+				}
+
+				$db_operations = $is_update ? $db_actions[$action['actionid']][$operation_group] : [];
+
+				foreach ($action[$operation_group] as &$operation) {
+					if ($operation['operationtype'] != OPERATION_TYPE_COMMAND) {
+						continue;
+					}
+
+					$db_operation = array_key_exists($operation['operationid'], $db_operations)
+						? $db_operations[$operation['operationid']]
+						: [];
+
+					if (array_key_exists('opcommand', $db_operation)) {
+						$upd_opcommand = DB::getUpdatedValues('opcommand', $operation['opcommand'],
+							$db_operation['opcommand']
+						);
+
+						if ($upd_opcommand) {
+							$upd_opcommands[] = [
+								'values' => $upd_opcommand,
+								'where' => ['operationid' => $operation['operationid']]
+							];
+						}
+					}
+					else {
+						$ins_opcommands[] =
+							['operationid' => $operation['operationid']] + $operation['opcommand'];
+					}
+
+					if (array_key_exists('opcommand_grp', $operation)) {
+						$db_opcommand_grps = array_key_exists('opcommand_grp', $db_operation)
+							? array_column($db_operation['opcommand_grp'], null, 'groupid')
+							: [];
+
+						foreach ($operation['opcommand_grp'] as &$opcommand_grp) {
+							if (array_key_exists($opcommand_grp['groupid'], $db_opcommand_grps)) {
+								$db_opcommand_grp = $db_opcommand_grps[$opcommand_grp['groupid']];
+								$opcommand_grp['opcommand_grpid'] = $db_opcommand_grp['opcommand_grpid'];
+								unset($db_opcommand_grps[$opcommand_grp['groupid']]);
+							}
+							else {
+								$ins_opcommand_grps[] =
+									['operationid' => $operation['operationid']] + $opcommand_grp;
+							}
+						}
+						unset($opcommand_grp);
+
+						$del_opcommand_grpids = array_merge($del_opcommand_grpids,
+							array_column($db_opcommand_grps, 'opcommand_grpid')
+						);
+					}
+
+					if (array_key_exists('opcommand_hst', $operation)) {
+						$db_opcommand_hsts = array_key_exists('opcommand_hst', $db_operation)
+							? array_column($db_operation['opcommand_hst'], null, 'hostid')
+							: [];
+
+						foreach ($operation['opcommand_hst'] as &$opcommand_hst) {
+							if (array_key_exists($opcommand_hst['hostid'], $db_opcommand_hsts)) {
+								$db_opcommand_hst = $db_opcommand_hsts[$opcommand_hst['hostid']];
+								$opcommand_hst['opcommand_hstid'] = $db_opcommand_hst['opcommand_hstid'];
+								unset($db_opcommand_hsts[$opcommand_hst['hostid']]);
+							}
+							else {
+								$ins_opcommand_hsts[] =
+									['operationid' => $operation['operationid']] + $opcommand_hst;
+							}
+						}
+						unset($opcommand_hst);
+
+						$del_opcommand_hstids = array_merge($del_opcommand_hstids,
+							array_column($db_opcommand_hsts, 'opcommand_hstid')
+						);
+					}
+				}
+				unset($operation);
+			}
+		}
+		unset($action);
+
 		if ($del_opcommand_grpids) {
 			DB::delete('opcommand_grp', ['opcommand_grpid' => $del_opcommand_grpids]);
 		}
@@ -1138,33 +1190,6 @@ class CAction extends CApiService {
 			$opcommand_hstids = DB::insert('opcommand_hst', $ins_opcommand_hsts);
 		}
 
-		// groups
-		if ($del_opgroupids) {
-			DB::delete('opgroup', ['opgroupid' => $del_opgroupids]);
-		}
-
-		if ($ins_opgroups) {
-			$opgroupids = DB::insert('opgroup', $ins_opgroups);
-		}
-
-		// templates
-		if ($del_optemplateids) {
-			DB::delete('optemplate', ['optemplateid' => $del_opgroupids]);
-		}
-
-		if ($ins_optemplates) {
-			$optemplateids = DB::insert('optemplate', $ins_optemplates);
-		}
-
-		// inventory
-		if ($upd_opinventories) {
-			DB::update('opinventory', $upd_opinventories);
-		}
-
-		if ($ins_opinventories) {
-			DB::insert('opinventory', $ins_opinventories, false);
-		}
-
 		foreach ($actions as &$action) {
 			foreach (self::OPERATION_GROUPS as $operation_group) {
 				if (!array_key_exists($operation_group, $action)) {
@@ -1172,33 +1197,6 @@ class CAction extends CApiService {
 				}
 
 				foreach ($action[$operation_group] as &$operation) {
-					if (array_key_exists('opconditions', $operation)) {
-						foreach ($operation['opconditions'] as &$opcondition) {
-							if (!array_key_exists('opconditionid', $opcondition)) {
-								$opcondition['opconditionid'] = array_shift($opconditionids);
-							}
-						}
-						unset($opcondition);
-					}
-
-					if (array_key_exists('opmessage_grp', $operation)) {
-						foreach ($operation['opmessage_grp'] as &$opmessage_grp) {
-							if (!array_key_exists('opmessage_grpid', $opmessage_grp)) {
-								$opmessage_grp['opmessage_grpid'] = array_shift($opmessage_grpids);
-							}
-						}
-						unset($opmessage_grp);
-					}
-
-					if (array_key_exists('opmessage_usr', $operation)) {
-						foreach ($operation['opmessage_usr'] as &$opmessage_usr) {
-							if (!array_key_exists('opmessage_usrid', $opmessage_usr)) {
-								$opmessage_usr['opmessage_usrid'] = array_shift($opmessage_usrids);
-							}
-						}
-						unset($opmessage_usr);
-					}
-
 					if (array_key_exists('opcommand_grp', $operation)) {
 						foreach ($operation['opcommand_grp'] as &$opcommand_grp) {
 							if (!array_key_exists('opcommand_grpid', $opcommand_grp)) {
@@ -1216,29 +1214,237 @@ class CAction extends CApiService {
 						}
 						unset($opcommand_hst);
 					}
+				}
+				unset($operation);
+			}
+		}
+		unset($action);
+	}
 
-					if (array_key_exists('opgroup', $operation)) {
-						foreach ($operation['opgroup'] as &$opgroup) {
-							if (!array_key_exists('opgroupid', $opgroup)) {
-								$opgroup['opgroupid'] = array_shift($opgroupids);
-							}
-						}
-						unset($opgroup);
+	/**
+	 * @param array      $actions
+	 * @param array|null $db_actions
+	 */
+	private static function updateOperationGroups(array &$actions, array $db_actions = null): void {
+		$is_update = ($db_actions !== null);
+
+		$ins_opgroups = [];
+		$del_opgroupids = [];
+
+		foreach ($actions as &$action) {
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
+					continue;
+				}
+
+				$db_operations = $is_update ? $db_actions[$action['actionid']][$operation_group] : [];
+
+				foreach ($action[$operation_group] as &$operation) {
+					if (!array_key_exists('opgroup', $operation)
+							|| ($operation['operationtype'] != OPERATION_TYPE_GROUP_ADD
+								&& $operation['operationtype'] != OPERATION_TYPE_GROUP_REMOVE)) {
+						continue;
 					}
 
-					if (array_key_exists('optemplate', $operation)) {
-						foreach ($operation['optemplate'] as &$optemplate) {
-							if (!array_key_exists('optemplateid', $optemplate)) {
-								$optemplate['optemplateid'] = array_shift($optemplateids);
-							}
+					$db_operation = array_key_exists($operation['operationid'], $db_operations)
+						? $db_operations[$operation['operationid']]
+						: [];
+
+					$db_opgroups = array_key_exists('opgroup', $db_operation)
+						? array_column($db_operation['opgroup'], null, 'groupid')
+						: [];
+
+					foreach ($operation['opgroup'] as &$opgroup) {
+						if (array_key_exists($opgroup['groupid'], $db_opgroups)) {
+							$db_opgroup = $db_opgroups[$opgroup['groupid']];
+							$opgroup['opgroupid'] = $db_opgroup['opgroupid'];
+							unset($db_opgroups[$opgroup['groupid']]);
 						}
-						unset($optemplate);
+						else {
+							$ins_opgroups[] = ['operationid' => $operation['operationid']] + $opgroup;
+						}
+					}
+					unset($opgroup);
+
+					$del_opgroupids = array_merge($del_opgroupids, array_column($db_opgroups, 'opgroupid'));
+				}
+				unset($operation);
+			}
+		}
+		unset($action);
+
+		if ($del_opgroupids) {
+			DB::delete('opgroup', ['opgroupid' => $del_opgroupids]);
+		}
+
+		if ($ins_opgroups) {
+			$opgroupids = DB::insert('opgroup', $ins_opgroups);
+		}
+
+		foreach ($actions as &$action) {
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
+					continue;
+				}
+
+				foreach ($action[$operation_group] as &$operation) {
+					if (!array_key_exists('opgroup', $operation)) {
+						continue;
+					}
+
+					foreach ($operation['opgroup'] as &$opgroup) {
+						if (!array_key_exists('opgroupid', $opgroup)) {
+							$opgroup['opgroupid'] = array_shift($opgroupids);
+						}
+					}
+					unset($opgroup);
+				}
+				unset($operation);
+			}
+		}
+		unset($action);
+	}
+
+	/**
+	 * @param array      $actions
+	 * @param array|null $db_actions
+	 */
+	private static function updateOperationTemplates(array &$actions, array $db_actions = null): void {
+		$is_update = ($db_actions !== null);
+
+		$ins_optemplates = [];
+		$del_optemplateids = [];
+
+		foreach ($actions as &$action) {
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
+					continue;
+				}
+
+				$db_operations = $is_update ? $db_actions[$action['actionid']][$operation_group] : [];
+
+				foreach ($action[$operation_group] as &$operation) {
+					if (array_key_exists('optemplate', $operation)
+							|| ($operation['operationtype'] != OPERATION_TYPE_TEMPLATE_ADD
+								&& $operation['operationtype'] != OPERATION_TYPE_TEMPLATE_REMOVE)) {
+						continue;
+					}
+
+					$db_operation = array_key_exists($operation['operationid'], $db_operations)
+						? $db_operations[$operation['operationid']]
+						: [];
+
+					$db_optemplates = array_key_exists('optemplate', $db_operation)
+						? array_column($db_operation['optemplate'], null, 'templateid')
+						: [];
+
+					foreach ($operation['optemplate'] as &$optemplate) {
+						if (array_key_exists($optemplate['templateid'], $db_optemplates)) {
+							$db_optemplate = $db_optemplates[$optemplate['templateid']];
+							$optemplate['optemplateid'] = $db_optemplate['optemplateid'];
+							unset($db_optemplates[$optemplate['templateid']]);
+						}
+						else {
+							$ins_optemplates[] = ['operationid' => $operation['operationid']] + $optemplate;
+						}
+					}
+					unset($optemplate);
+
+					$del_optemplateids = array_merge($del_optemplateids, array_column($db_optemplates, 'optemplateid'));
+				}
+				unset($operation);
+			}
+		}
+		unset($action);
+
+		if ($del_optemplateids) {
+			DB::delete('optemplate', ['optemplateid' => $del_optemplateids]);
+		}
+
+		if ($ins_optemplates) {
+			$optemplateids = DB::insert('optemplate', $ins_optemplates);
+		}
+
+		foreach ($actions as &$action) {
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
+					continue;
+				}
+
+				foreach ($action[$operation_group] as &$operation) {
+					if (!array_key_exists('optemplate', $operation)) {
+						continue;
+					}
+
+					foreach ($operation['optemplate'] as &$optemplate) {
+						if (!array_key_exists('optemplateid', $optemplate)) {
+							$optemplate['optemplateid'] = array_shift($optemplateids);
+						}
+					}
+					unset($optemplate);
+				}
+				unset($operation);
+			}
+		}
+		unset($action);
+	}
+
+	/**
+	 * @param array      $actions
+	 * @param array|null $db_actions
+	 */
+	private static function updateOperationInventories(array &$actions, array $db_actions = null): void {
+		$is_update = ($db_actions !== null);
+
+		$ins_opinventories = [];
+		$upd_opinventories = [];
+
+		foreach ($actions as &$action) {
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
+					continue;
+				}
+
+				$db_operations = $is_update ? $db_actions[$action['actionid']][$operation_group] : [];
+
+				foreach ($action[$operation_group] as &$operation) {
+					if ($operation['operationtype'] != OPERATION_TYPE_HOST_INVENTORY) {
+						continue;
+					}
+
+					$db_operation = array_key_exists($operation['operationid'], $db_operations)
+						? $db_operations[$operation['operationid']]
+						: [];
+
+					if (array_key_exists('opinventory', $db_operation)) {
+						$upd_opinventory = DB::getUpdatedValues('opinventory', $operation['opinventory'],
+							$db_operation['opinventory']
+						);
+
+						if ($upd_opinventory) {
+							$upd_opinventories[] = [
+								'values' => $upd_opinventory,
+								'where' => ['operationid' => $operation['operationid']]
+							];
+						}
+					}
+					else {
+						$ins_opinventories[] =
+							['operationid' => $operation['operationid']] + $operation['opinventory'];
 					}
 				}
 				unset($operation);
 			}
 		}
 		unset($action);
+
+		if ($upd_opinventories) {
+			DB::update('opinventory', $upd_opinventories);
+		}
+
+		if ($ins_opinventories) {
+			DB::insert('opinventory', $ins_opinventories, false);
+		}
 	}
 
 	/**
