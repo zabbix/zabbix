@@ -120,7 +120,6 @@ static zbx_err_codes_t last_db_errcode;
 static void	zbx_db_errlog(zbx_err_codes_t zbx_errno, int db_errno, const char *db_error, const char *context)
 {
 	char	*s;
-	int	log_lvl = LOG_LEVEL_ERR;
 
 	last_db_errcode = zbx_errno;
 
@@ -156,13 +155,12 @@ static void	zbx_db_errlog(zbx_err_codes_t zbx_errno, int db_errno, const char *d
 			break;
 		case ERR_Z3008:
 			s = zbx_dsprintf(NULL, "query failed due to primary key constraint: [%d] %s", db_errno, last_db_strerror);
-			log_lvl = LOG_LEVEL_DEBUG;
 			break;
 		default:
 			s = zbx_strdup(NULL, "unknown error");
 	}
 
-	zabbix_log(log_lvl, "[Z%04d] %s", (int)zbx_errno, s);
+	zabbix_log(LOG_LEVEL_ERR, "[Z%04d] %s", (int)zbx_errno, s);
 
 	zbx_free(s);
 }
