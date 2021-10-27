@@ -205,10 +205,9 @@ abstract class CHostGeneral extends CHostBase {
 	 * Update table "hosts_groups" and populate hosts.groups by "hostgroupid" property.
 	 *
 	 * @param array      $hosts
-	 * @param string     $method
 	 * @param array|null $db_hosts
 	 */
-	protected function updateGroups(array &$hosts, string $method, array $db_hosts = null): void {
+	protected function updateGroups(array &$hosts, array $db_hosts = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
 
 		$ins_hosts_groups = [];
@@ -219,7 +218,7 @@ abstract class CHostGeneral extends CHostBase {
 				continue;
 			}
 
-			$db_groups = ($method === 'update')
+			$db_groups = ($db_hosts !== null)
 				? array_column($db_hosts[$host[$id_field_name]]['groups'], null, 'groupid')
 				: [];
 
@@ -266,10 +265,9 @@ abstract class CHostGeneral extends CHostBase {
 
 	/**
 	 * @param array      $hosts
-	 * @param string     $method
 	 * @param array|null $db_hosts
 	 */
-	protected function updateTagsNew(array &$hosts, string $method, array $db_hosts = null): void {
+	protected function updateTagsNew(array &$hosts, array $db_hosts = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
 
 		$ins_tags = [];
@@ -280,7 +278,7 @@ abstract class CHostGeneral extends CHostBase {
 				continue;
 			}
 
-			$db_tags = ($method === 'update')
+			$db_tags = ($db_hosts !== null)
 				? $db_hosts[$host[$id_field_name]]['tags']
 				: [];
 
@@ -330,10 +328,9 @@ abstract class CHostGeneral extends CHostBase {
 
 	/**
 	 * @param array      $hosts
-	 * @param string     $method
 	 * @param array|null $db_hosts
 	 */
-	protected function updateMacros(array &$hosts, string $method, array $db_hosts = null): void {
+	protected function updateMacros(array &$hosts, array $db_hosts = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
 
 		$ins_hostmacros = [];
@@ -345,7 +342,7 @@ abstract class CHostGeneral extends CHostBase {
 				continue;
 			}
 
-			$db_macros = ($method === 'update')
+			$db_macros = ($db_hosts !== null)
 				? array_column($db_hosts[$host[$id_field_name]]['macros'], null, 'macro')
 				: [];
 
@@ -402,13 +399,12 @@ abstract class CHostGeneral extends CHostBase {
 	}
 
 	/**
-	 * Change elements of linked or unliked templates on target hosts or templates.
+	 * Change objects of linked or unliked templates on target hosts or templates.
 	 *
 	 * @param array      $hosts
-	 * @param string     $method
 	 * @param array|null $db_hosts
 	 */
-	protected function updateTemplatesElements(array $hosts, string $method, array $db_hosts = null): void {
+	protected function updateTemplatesObjects(array $hosts, array $db_hosts = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
 
 		$ins_links = [];
@@ -416,7 +412,7 @@ abstract class CHostGeneral extends CHostBase {
 
 		foreach ($hosts as $host) {
 			if (array_key_exists('templates', $host)) {
-				$db_templates = ($method === 'update') ? $db_hosts[$host[$id_field_name]]['templates'] : [];
+				$db_templates = ($db_hosts !== null) ? $db_hosts[$host[$id_field_name]]['templates'] : [];
 
 				foreach ($host['templates'] as $template) {
 					if (!array_key_exists($template['hosttemplateid'], $db_templates)) {
@@ -445,7 +441,7 @@ abstract class CHostGeneral extends CHostBase {
 				}
 			}
 
-			self::deleteTemplatesElements($templateids, array_keys($hostids));
+			self::deleteTemplatesObjects($templateids, array_keys($hostids));
 		}
 
 		while ($ins_links) {
@@ -461,31 +457,27 @@ abstract class CHostGeneral extends CHostBase {
 				}
 			}
 
-			self::addTemplatesElements($templateids, array_keys($hostids));
+			self::addTemplatesObjects($templateids, array_keys($hostids));
 		}
 	}
 
 	/**
-	 * Delete elements of given templates from given hosts or templates.
-	 *
-	 * @static
+	 * Delete objects of given templates from given hosts or templates.
 	 *
 	 * @param array $templateids
 	 * @param array $hostids
 	 */
-	private static function deleteTemplatesElements(array $templateids, array $hostids): void {
+	private static function deleteTemplatesObjects(array $templateids, array $hostids): void {
 
 	}
 
 	/**
-	 * Add elements of given templates to given hosts or templates.
-	 *
-	 * @static
+	 * Add objects of given templates to given hosts or templates.
 	 *
 	 * @param array $templateids
 	 * @param array $hostids
 	 */
-	private static function addTemplatesElements(array $templateids, array $hostids): void {
+	private static function addTemplatesObjects(array $templateids, array $hostids): void {
 		// TODO: Modify parameters of syncTemplates methods when complete audit log will be implementing for hosts.
 		$link_request = [
 			'templateids' => $templateids,
@@ -1468,7 +1460,7 @@ abstract class CHostGeneral extends CHostBase {
 				$db_hosts[$host[$id_field_name]]['groups'] = [];
 			}
 
-			if (array_key_exists('templates', $host)) {
+			if (array_key_exists('templates', $host) || array_key_exists('templates_clear', $host)) {
 				$hostids['templates'][] = $host[$id_field_name];
 				$db_hosts[$host[$id_field_name]]['templates'] = [];
 			}

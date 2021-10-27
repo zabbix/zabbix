@@ -344,13 +344,13 @@ class CTemplate extends CHostGeneral {
 		}
 		unset($template);
 
-		$this->checkTemplatesLinks($templates, __FUNCTION__);
+		$this->checkTemplatesLinks($templates);
 
-		$this->updateGroups($templates, __FUNCTION__);
-		$this->updateTagsNew($templates, __FUNCTION__);
-		$this->updateHostMacrosNew($templates, __FUNCTION__);
-		$this->updateTemplates($templates, __FUNCTION__);
-		$this->updateTemplatesElements($templates, __FUNCTION__);
+		$this->updateGroups($templates);
+		$this->updateTagsNew($templates);
+		$this->updateMacros($templates);
+		$this->updateTemplates($templates);
+		$this->updateTemplatesElements($templates);
 
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_TEMPLATE, $templates);
 
@@ -403,8 +403,6 @@ class CTemplate extends CHostGeneral {
 	/**
 	 * Check that no duplicate UUID is being added. Add UUID to all templates, if it doesn't exist.
 	 *
-	 * @static
-	 *
 	 * @param array $templates_to_create
 	 *
 	 * @throws APIException
@@ -455,11 +453,11 @@ class CTemplate extends CHostGeneral {
 			DB::update('hosts', $upd_templates);
 		}
 
-		$this->updateGroups($templates, __FUNCTION__, $db_templates);
-		$this->updateTagsNew($templates, __FUNCTION__, $db_templates);
-		$this->updateMacros($templates, __FUNCTION__, $db_templates);
-		$this->updateTemplates($templates, __FUNCTION__, $db_templates);
-		$this->updateTemplatesElements($templates, __FUNCTION__, $db_templates);
+		$this->updateGroups($templates, $db_templates);
+		$this->updateTagsNew($templates, $db_templates);
+		$this->updateMacros($templates, $db_templates);
+		$this->updateTemplates($templates, $db_templates);
+		$this->updateTemplatesObjects($templates, $db_templates);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_TEMPLATE, $templates, $db_templates);
 
@@ -474,25 +472,25 @@ class CTemplate extends CHostGeneral {
 	 */
 	protected function validateUpdate(array &$templates, array &$db_templates = null) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['templateid'], ['host'], ['name']], 'fields' => [
-			'templateid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
-			'host' =>			['type' => API_H_NAME, 'length' => DB::getFieldLength('hosts', 'host')],
-			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'name')],
-			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'description')],
-			'groups' =>			['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
-				'groupid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
+			'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
+			'host' =>				['type' => API_H_NAME, 'length' => DB::getFieldLength('hosts', 'host')],
+			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'name')],
+			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'description')],
+			'groups' =>				['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
+				'groupid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
-			'templates' =>		['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
-				'templateid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
+			'templates' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
+				'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
-			'templates_clear' =>		['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
-				'templateid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
+			'templates_clear' =>	['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
+				'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
-			'tags' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['tag', 'value']], 'fields' => [
-				'tag' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('host_tag', 'tag')],
-				'value' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('host_tag', 'value'), 'default' => DB::getDefault('host_tag', 'value')]
+			'tags' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['tag', 'value']], 'fields' => [
+				'tag' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('host_tag', 'tag')],
+				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('host_tag', 'value'), 'default' => DB::getDefault('host_tag', 'value')]
 			]],
-			'macros' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['macro']], 'fields' => [
-				'macro' =>			['type' => API_USER_MACRO, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hostmacro', 'macro')],
+			'macros' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['macro']], 'fields' => [
+				'macro' =>				['type' => API_USER_MACRO, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hostmacro', 'macro')],
 			]]
 		]];
 
@@ -516,7 +514,7 @@ class CTemplate extends CHostGeneral {
 		$this->checkDuplicates($templates, $db_templates);
 		$this->checkGroups($templates, $db_templates);
 		$this->checkTemplates($templates, $db_templates);
-		$this->checkTemplatesLinks($templates, __FUNCTION__, $db_templates);
+		$this->checkTemplatesLinks($templates, $db_templates);
 		$this->checkUpdateMacros($templates, $db_templates);
 	}
 
