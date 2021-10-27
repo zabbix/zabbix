@@ -24,6 +24,8 @@ require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 /**
  * @backup sessions
+ *
+ * @backupConfig
  */
 class testFormSetup extends CWebTest {
 
@@ -762,19 +764,6 @@ class testFormSetup extends CWebTest {
 		// Cancel setup form update
 		$this->query('button:Cancel')->one()->click();
 		$this->assertContains('zabbix.php?action=dashboard.view', $this->page->getCurrentURL());
-	}
-
-	public function testFormSetup_restoreServerConfig() {
-		// Open the last section of the setup form.
-		$this->openSpecifiedSection('Zabbix server details');
-		// Restore Zabbix server name field value.
-		$form = $this->query('xpath://form')->asForm()->one();
-		$form->getField('Name')->fill('TEST_SERVER_NAME');
-		$this->query('button:Next step')->one()->click();
-		$this->query('button:Next step')->one()->click();
-		// Need to wait for 3s for php cache to reload and for zabbix server parameter the changes to take place.
-		sleep(3);
-		$this->query('button:Finish')->one()->click();
 	}
 
 	/**
