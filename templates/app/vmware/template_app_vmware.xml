@@ -1131,6 +1131,7 @@ Template tooling version used: 0.38</description>
                <name>VMware: Number of bytes received</name>
                <type>SIMPLE</type>
                <key>vmware.hv.network.in[{$VMWARE.URL},{HOST.HOST},bps]</key>
+               <delay>1m</delay>
                <history>7d</history>
                <units>Bps</units>
                <username>{$VMWARE.USERNAME}</username>
