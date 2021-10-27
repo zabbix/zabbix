@@ -388,7 +388,7 @@ class testDashboardPages extends CWebTest {
 			$query_pageid = 'SELECT dashboard_pageid FROM dashboard_page WHERE dashboardid=';
 			$query_widgets = 'SELECT type, name, x, y, width, height, view_mode FROM widget WHERE dashboard_pageid=';
 			$query_widgetid = 'SELECT widgetid FROM widget WHERE dashboard_pageid=';
- 			$query_widgetfields = 'SELECT type, name, value_int, value_str, value_groupid FROM widget_field WHERE widgetid=';
+			$query_widgetfields = 'SELECT type, name, value_int, value_str, value_groupid FROM widget_field WHERE widgetid=';
 			$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid_copy)->waitUntilReady();
 			$dashboard = CDashboardElement::find()->one();
 
