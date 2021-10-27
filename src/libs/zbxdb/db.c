@@ -113,9 +113,14 @@ static zbx_mutex_t		sqlite_access = ZBX_MUTEX_NULL;
 static void	OCI_DBclean_result(DB_RESULT result);
 #endif
 
+static zbx_err_codes_t last_db_errcode;
+
 static void	zbx_db_errlog(zbx_err_codes_t zbx_errno, int db_errno, const char *db_error, const char *context)
 {
 	char	*s;
+	int	log_lvl = LOG_LEVEL_ERR;
+
+	last_db_errcode = zbx_errno;
 
 	if (NULL != db_error)
 		last_db_strerror = zbx_strdup(last_db_strerror, db_error);
@@ -147,11 +152,15 @@ static void	zbx_db_errlog(zbx_err_codes_t zbx_errno, int db_errno, const char *d
 		case ERR_Z3007:
 			s = zbx_dsprintf(NULL, "query failed: [%d] %s", db_errno, last_db_strerror);
 			break;
+		case ERR_Z3008:
+			s = zbx_dsprintf(NULL, "query failed due to primary key constraint: [%d] %s", db_errno, last_db_strerror);
+			log_lvl = LOG_LEVEL_DEBUG;
+			break;
 		default:
 			s = zbx_strdup(NULL, "unknown error");
 	}
 
-	zabbix_log(LOG_LEVEL_ERR, "[Z%04d] %s", (int)zbx_errno, s);
+	zabbix_log(log_lvl, "[Z%04d] %s", (int)zbx_errno, s);
 
 	zbx_free(s);
 }
@@ -165,10 +174,23 @@ static void	zbx_db_errlog(zbx_err_codes_t zbx_errno, int db_errno, const char *d
  * Return value: last database error message                                  *
  *                                                                            *
  ******************************************************************************/
-
 const char	*zbx_db_last_strerr(void)
 {
 	return last_db_strerror;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_last_errcode                                              *
+ *                                                                            *
+ * Purpose: get last error code returned by database                          *
+ *                                                                            *
+ * Return value: last database error code                                     *
+ *                                                                            *
+ ******************************************************************************/
+zbx_err_codes_t	zbx_db_last_errcode(void)
+{
+	return last_db_errcode;
 }
 
 #if defined(HAVE_ORACLE)
@@ -1457,9 +1479,16 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	}
 	else
 	{
+		zbx_err_codes_t	errcode;
+
 		if (0 != mysql_query(conn, sql))
 		{
-			zbx_db_errlog(ERR_Z3005, mysql_errno(conn), mysql_error(conn), sql);
+			if (ER_DUP_ENTRY == mysql_errno(conn))
+				errcode = ERR_Z3008;
+			else
+				errcode = ERR_Z3005;
+
+			zbx_db_errlog(errcode, mysql_errno(conn), mysql_error(conn), sql);
 
 			ret = (SUCCEED == is_recoverable_mysql_error() ? ZBX_DB_DOWN : ZBX_DB_FAIL);
 		}
@@ -1480,7 +1509,12 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 				/* more results? 0 = yes (keep looping), -1 = no, >0 = error */
 				if (0 < (status = mysql_next_result(conn)))
 				{
-					zbx_db_errlog(ERR_Z3005, mysql_errno(conn), mysql_error(conn), sql);
+					if ER_DUP_ENTRY == mysql_errno(conn))
+						errcode = ERR_Z3008;
+					else
+						errcode = ERR_Z3005;
+
+					zbx_db_errlog(errcode, mysql_errno(conn), mysql_error(conn), sql);
 					ret = (SUCCEED == is_recoverable_mysql_error() ? ZBX_DB_DOWN : ZBX_DB_FAIL);
 				}
 			}
@@ -1497,7 +1531,9 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	}
 
 	if (OCI_SUCCESS != err)
-		ret = OCI_handle_sql_error(ERR_Z3005, err, sql);
+	{
+		ret = OCI_handle_sql_error((err == 1 ? ERR_Z3008 : ERR_Z3005), err, sql);
+	}
 
 #elif defined(HAVE_POSTGRESQL)
 	result = PQexec(conn,sql);
@@ -1510,7 +1546,12 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	else if (PGRES_COMMAND_OK != PQresultStatus(result))
 	{
 		zbx_postgresql_error(&error, result);
-		zbx_db_errlog(ERR_Z3005, 0, error, sql);
+
+		if (NULL != strstr(error, "duplicate key"))
+			zbx_db_errlog(ERR_Z3005, 0, error, sql);
+		else
+			zbx_db_errlog(ERR_Z3008, 0, error, sql);
+
 		zbx_free(error);
 
 		ret = (SUCCEED == is_recoverable_postgresql_error(conn, result) ? ZBX_DB_DOWN : ZBX_DB_FAIL);
@@ -2522,6 +2563,7 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 
 	zbx_json_addstring(json, "min_version", info->friendly_min_version, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(json, "max_version", info->friendly_max_version, ZBX_JSON_TYPE_STRING);
+	zbx_json_addint64(json, "history_pk", info->history_pk);
 
 	if (NULL != info->friendly_min_supported_version)
 	{
