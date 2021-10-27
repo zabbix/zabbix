@@ -98,6 +98,8 @@ static zbx_oracle_db_handle_t	oracle;
 
 static ub4	OCI_DBserver_status(void);
 
+#define ORA_ERR_DUPL_ENTRY	-1
+
 #elif defined(HAVE_POSTGRESQL)
 static PGconn			*conn = NULL;
 static unsigned int		ZBX_PG_BYTEAOID = 0;
@@ -1411,8 +1413,9 @@ int	zbx_db_statement_execute(int iters)
 	}
 
 	if (OCI_SUCCESS != (err = zbx_oracle_statement_execute(iters, &nrows)))
-		ret = OCI_handle_sql_error(ERR_Z3007, err, NULL);
-	else
+	{
+		ret = OCI_handle_sql_error((err == ORA_ERR_DUPL_ENTRY ? ERR_Z3008 : ERR_Z3007), err, NULL);
+	} else
 		ret = (int)nrows;
 
 	if (ZBX_DB_FAIL == ret && 0 < txn_level)
@@ -1532,7 +1535,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 
 	if (OCI_SUCCESS != err)
 	{
-		ret = OCI_handle_sql_error((err == 1 ? ERR_Z3008 : ERR_Z3005), err, sql);
+		ret = OCI_handle_sql_error((err == ORA_ERR_DUPL_ENTRY ? ERR_Z3008 : ERR_Z3005), err, sql);
 	}
 
 #elif defined(HAVE_POSTGRESQL)
@@ -1547,7 +1550,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	{
 		zbx_postgresql_error(&error, result);
 
-		if (NULL != strstr(error, "duplicate key"))
+		if (NULL == strstr(error, "duplicate key"))
 			zbx_db_errlog(ERR_Z3005, 0, error, sql);
 		else
 			zbx_db_errlog(ERR_Z3008, 0, error, sql);
