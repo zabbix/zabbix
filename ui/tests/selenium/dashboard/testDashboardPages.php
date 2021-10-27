@@ -171,13 +171,24 @@ class testDashboardPages extends CWebTest {
 								'view_mode' => 0
 							],
 							[
-								'name' => 'First page clock 2',
-								'type' => 'clock',
-								'x' => 6,
-								'y' => 5,
-								'width' => 5,
-								'height' => 5,
-								'view_mode' => 0
+								'type' => 'graph',
+								'name' => 'Graph (classic) widget',
+								'x' => 5,
+								'y' => 4,
+								'width' => 8,
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => 0,
+										'name' => 'source_type',
+										'value' => 1
+									],
+									[
+										'type' => 4,
+										'name' => 'itemid',
+										'value' => 40041
+									]
+								]
 							]
 						]
 					]
@@ -324,7 +335,7 @@ class testDashboardPages extends CWebTest {
 
 		// Check popup-menu options.
 		$this->query('id:dashboard-add')->one()->click();
-		$add_menu = $this->query('xpath://ul[@role="menu"]')->asPopupMenu()->one();
+		$add_menu = CPopupMenuElement::find()->one()->waitUntilVisible();
 
 		// Check add page form.
 		$add_menu->select('Add page');
@@ -376,6 +387,8 @@ class testDashboardPages extends CWebTest {
 		foreach ([self::$dashboardid_copy, self::$dashboardid_paste] as $dashboardid) {
 			$query_pageid = 'SELECT dashboard_pageid FROM dashboard_page WHERE dashboardid=';
 			$query_widgets = 'SELECT type, name, x, y, width, height, view_mode FROM widget WHERE dashboard_pageid=';
+			$query_widgetid = 'SELECT widgetid FROM widget WHERE dashboard_pageid=';
+ 			$query_widgetfields = 'SELECT type, name, value_int, value_str, value_groupid FROM widget_field WHERE widgetid=';
 			$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid_copy)->waitUntilReady();
 			$dashboard = CDashboardElement::find()->one();
 
@@ -385,6 +398,8 @@ class testDashboardPages extends CWebTest {
 			$this->selectPageAction('first_page_copy', 'Copy');
 			$first_pageid = CDBHelper::getValue($query_pageid.zbx_dbstr(self::$dashboardid_copy).' ORDER BY dashboard_pageid DESC');
 			$first_page_widgets = CDBHelper::getHash($query_widgets.zbx_dbstr($first_pageid));
+			$graph_widgetid = CDBHelper::getValue($query_widgetid.zbx_dbstr($first_pageid).' ORDER BY widgetid DESC');
+			$widgetfield_hash = CDBHelper::getHash($query_widgetfields.zbx_dbstr($graph_widgetid));
 
 			// Open another dashboard to paste copied page.
 			if ($dashboardid === self::$dashboardid_paste) {
@@ -396,7 +411,7 @@ class testDashboardPages extends CWebTest {
 			// Save dashboard page names before copy and paste page.
 			$titles_before = $this->getPagesTitles();
 			$this->query('id:dashboard-add')->one()->click();
-			$this->query('xpath://ul[@role="menu"]')->asPopupMenu()->one()->select('Paste page');
+			CPopupMenuElement::find()->one()->waitUntilVisible()->select('Paste page');
 			$dashboard->waitUntilReady();
 
 			// Copied page added.
@@ -410,6 +425,8 @@ class testDashboardPages extends CWebTest {
 			// Check and compare widgets of copied page.
 			$pasted_pageid = CDBHelper::getValue($query_pageid.zbx_dbstr($dashboardid).' ORDER BY dashboard_pageid DESC');
 			$this->assertEquals($first_page_widgets, CDBHelper::getHash($query_widgets.zbx_dbstr($pasted_pageid)));
+			$pasted_graph_widgetid = CDBHelper::getValue($query_widgetid.zbx_dbstr($pasted_pageid).' ORDER BY widgetid DESC');
+			$this->assertEquals($widgetfield_hash, CDBHelper::getHash($query_widgetfields.zbx_dbstr($pasted_graph_widgetid)));
 		}
 	}
 
@@ -511,8 +528,7 @@ class testDashboardPages extends CWebTest {
 		while ($next_page->isClickable()) {
 			$next_page->waitUntilReady()->click();
 			$this->query("xpath://ul[@class='sortable-list']//span[@title=".CXPathHelper::escapeQuotes($title).
-					']/following-sibling::button[@title="Actions"]')->waitUntilVisible();
-			$this->page->waitUntilReady();
+					"]/following-sibling::button[@title='Actions']")->waitUntilVisible();
 		}
 
 		$index = (array_key_exists('duplicate', $data)) ? 2 : 1;
@@ -547,18 +563,20 @@ class testDashboardPages extends CWebTest {
 
 		// Check selected page.
 		$this->assertEquals('long_name_to_check_navigation_1', $this->
-				query('xpath://li/div[@class="selected-tab"]')->one()->getText());
+				query('xpath://li/div[@class="selected-tab"]')->one()->getText()
+		);
 
 		// Navigate on dashboard.
 		foreach ([$next_page, $previous_page] as $navigation) {
 			while ($navigation->isClickable()) {
-				$navigation->waitUntilReady()->click();
+				$navigation->click();
 			}
 			if ($navigation === $next_page) {
 				$this->assertTrue($next_page->isEnabled(false));
 				$this->assertTrue($previous_page->isEnabled());
 				$this->assertEquals('long_name_to_check_navigation_8', $this->
-						query('xpath://li/div[@class="selected-tab"]')->one()->getText());
+						query('xpath://li/div[@class="selected-tab"]')->one()->getText()
+				);
 			}
 		}
 
@@ -586,7 +604,7 @@ class testDashboardPages extends CWebTest {
 
 		// Check that Delete option is disabled when one page left.
 		$this->openPageMenu('Page 1');
-		$page_menu = $this->query('xpath://ul[@role="menu"]')->asPopupMenu()->one();
+		$page_menu = CPopupMenuElement::find()->one()->waitUntilVisible();
 		$this->assertTrue($page_menu->query('xpath:.//a[@aria-label="Actions, Delete"]')->one()->isEnabled(false));
 		$dashboard->save();
 		$this->assertEquals(['Page 1'], $this->getPagesTitles());
@@ -655,12 +673,12 @@ class testDashboardPages extends CWebTest {
 		}
 
 		// Control panel screenshot - start/stop/next/previous.
-//		$this->page->removeFocus();
-//		foreach (['Stop', 'Start'] as $status) {
-//			$screenshot_area = $this->query('xpath://ul[@class="header-kioskmode-controls"]')->waitUntilVisible()->one();
-//			$this->assertScreenshot($screenshot_area, $status);
-//			$this->query('xpath://button[@title="'.$status.' slideshow"]')->one()->click();
-//		}
+		$this->page->removeFocus();
+		foreach (['Stop', 'Start'] as $status) {
+			$screenshot_area = $this->query('xpath://ul[@class="header-kioskmode-controls"]')->waitUntilVisible()->one();
+			$this->assertScreenshot($screenshot_area, $status);
+			$this->query('xpath://button[@title="'.$status.' slideshow"]')->one()->click();
+		}
 
 		// Check that returned from kiosk view.
 		$this->query('xpath://button[@title="Normal view"]')->one()->click();
@@ -760,7 +778,7 @@ class testDashboardPages extends CWebTest {
 		$this->assertEquals('Dashboard page properties', $page_dialog->getTitle());
 		$this->assertEquals(['Name', 'Page display period'], $page_form->getLabels()->asText());
 		$this->assertEquals(['Default (30 seconds)', '10 seconds', '30 seconds', '1 minute', '2 minutes', '10 minutes',
-				'30 minutes', '1 hour'],$page_form->query('name:display_period')->asZDropdown()->one()->getOptions()->asText()
+				'30 minutes', '1 hour'], $page_form->query('name:display_period')->asZDropdown()->one()->getOptions()->asText()
 		);
 		$page_dialog->query('button:Cancel')->one()->click();
 	}

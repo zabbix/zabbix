@@ -96,9 +96,12 @@ class testPageDashboard extends CLegacyWebTest {
 		);
 
 		// Check available display periods.
+		$properties_form->checkValue(['Default page display period' => '30 seconds', 'Name' => 'New dashboard']);
+		$this->assertEquals('255', $properties_form->query('id:name')->one()->getAttribute('maxlength'));
 		$this->assertEquals(['10 seconds', '30 seconds', '1 minute', '2 minutes', '10 minutes', '30 minutes', '1 hour'],
 				$properties_form->query('name:display_period')->asZDropdown()->one()->getOptions()->asText()
 		);
+
 		$properties_form->fill(['Name' => 'Dashboard creation']);
 		$properties_form->submit();
 		$this->page->waitUntilReady();
@@ -106,8 +109,10 @@ class testPageDashboard extends CLegacyWebTest {
 
 		// Check popup-menu options.
 		$this->query('id:dashboard-add')->one()->click();
-		$add_menu = $this->query('xpath://ul[@role="menu"]')->asPopupMenu()->one();
-		$this->assertEquals(['Add widget', 'Add page', 'Paste widget', 'Paste page'], $add_menu->getItems()->asText());
+		$add_menu = CPopupMenuElement::find()->one()->waitUntilVisible();
+		foreach (['Add widget' => true, 'Add page' => true, 'Paste widget' => false, 'Paste page'=> false] as $item => $enabled) {
+			$this->assertTrue($add_menu->getItem($item)->isEnabled($enabled));
+		}
 		$dashboard->cancelEditing();
 	}
 
