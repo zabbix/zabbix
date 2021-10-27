@@ -373,6 +373,7 @@ class CTest extends PHPUnit_Framework_TestCase {
 
 		if ($this->case_backup_config) {
 			CConfigHelper::restoreConfig();
+			$this->case_backup_config = false;
 		}
 
 		if ($this->case_backup !== null) {
@@ -406,6 +407,7 @@ class CTest extends PHPUnit_Framework_TestCase {
 
 		if (self::$suite_backup_config) {
 			CConfigHelper::restoreConfig();
+			self::$suite_backup_config = false;
 		}
 
 		if (self::$suite_backup === null && self::$case_backup_once === null && !self::$suite_callbacks['afterOnce']
