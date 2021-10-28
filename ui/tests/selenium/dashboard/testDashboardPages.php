@@ -693,7 +693,7 @@ class testDashboardPages extends CWebTest {
 		$dashboard->edit();
 		foreach (['10 seconds', '30 seconds', '1 minute', '2 minutes', '10 minutes', '30 minutes', '1 hour'] as $default) {
 			$this->query('id:dashboard-config')->one()->click();
-			$properties = COverlayDialogElement::find()->waitUntilVisible()->one();
+			$properties = COverlayDialogElement::find()->waitUntilReady()->one();
 			$properties->query('name:dashboard_properties_form')->asForm()->one()->fill(['Default page display period' => $default]);
 			$properties->query('button:Apply')->one()->click();
 			$dashboard->waitUntilReady();
