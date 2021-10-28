@@ -21,11 +21,12 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $this->includeJsFile('administration.geomaps.edit.js.php');
 
-$hintbox_geomaps_tile_url = makeHelpIcon([
+$hintbox_tile_url = makeHelpIcon([
 	_('The URL template is used to load and display the tile layer on geographical maps.'),
 	BR(),
 	BR(),
@@ -53,11 +54,11 @@ $hintbox_geomaps_tile_url = makeHelpIcon([
 	]))->addClass(ZBX_STYLE_LIST_DASHED)
 ]);
 
-$hintbox_geomaps_attribution = makeHelpIcon(
+$hintbox_attribution = makeHelpIcon(
 	_('Tile provider attribution data displayed in a small text box on the map.')
 );
 
-$hintbox_geomaps_max_zoom = makeHelpIcon(_('Maximum zoom level of the map.'));
+$hintbox_max_zoom = makeHelpIcon(_('Maximum zoom level of the map.'));
 
 $form_grid = (new CFormGrid())
 	->addItem([
@@ -73,7 +74,7 @@ $form_grid = (new CFormGrid())
 		)
 	])
 	->addItem([
-		(new CLabel([_('Tile URL'), $hintbox_geomaps_tile_url], 'geomaps_tile_url'))->setAsteriskMark(),
+		(new CLabel([_('Tile URL'), $hintbox_tile_url], 'geomaps_tile_url'))->setAsteriskMark(),
 		new CFormField(
 			(new CTextBox('geomaps_tile_url', $data['geomaps_tile_url'], false,
 				DB::getFieldLength('config', 'geomaps_tile_url'))
@@ -84,7 +85,7 @@ $form_grid = (new CFormGrid())
 		)
 	])
 	->addItem([
-		new CLabel([_('Attribution'), $hintbox_geomaps_attribution], 'geomaps_attribution'),
+		new CLabel([_('Attribution'), $hintbox_attribution], 'geomaps_attribution'),
 		new CFormField(
 			(new CTextArea('geomaps_attribution', $data['geomaps_attribution']))
 				->addClass(ZBX_STYLE_MONOSPACE_FONT)
@@ -94,7 +95,7 @@ $form_grid = (new CFormGrid())
 		)
 	])
 	->addItem([
-		(new CLabel([_('Max zoom level'), $hintbox_geomaps_max_zoom], 'geomaps_max_zoom'))->setAsteriskMark(),
+		(new CLabel([_('Max zoom level'), $hintbox_max_zoom], 'geomaps_max_zoom'))->setAsteriskMark(),
 		new CFormField(
 			(new CTextBox('geomaps_max_zoom', $data['geomaps_max_zoom'], false,
 				DB::getFieldLength('config', 'geomaps_max_zoom'))
@@ -131,7 +132,7 @@ $form = (new CForm())
 (new CScriptTag(
 	'view.init('. json_encode([
 		'tile_providers' => $data['tile_providers']
-	], JSON_FORCE_OBJECT).');'
+	]).');'
 ))
 	->setOnDocumentReady()
 	->show();
