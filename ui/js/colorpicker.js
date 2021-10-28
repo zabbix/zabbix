@@ -68,15 +68,23 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 
 			$overlay_input.val(color);
 
-			if (color.length) {
+			if (input.data('use_default') && color.length == 0) {
+				$overlay_colorbox
+					.css({'color': '', 'background': ''})
+					.attr('title', t('Use default'))
+					.addClass('use-default');
+			}
+			else if (/^[0-9A-F]{6}$/i.test(color)) {
 				$overlay_colorbox
 					.css({'color': '#' + color, 'background': '#' + color})
-					.attr('title', '#' + color);
+					.attr('title', '#' + color)
+					.removeClass('use-default');
 			}
 			else {
 				$overlay_colorbox
 					.css({'color': '', 'background': ''})
-					.attr('title', t('Use default'));
+					.attr('title', t('Use default'))
+					.removeClass('use-default');
 			}
 		},
 
@@ -149,7 +157,8 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 						}
 					});
 
-				$overlay_colorbox = $('<div/>');
+				$overlay_colorbox = $('<div/>', {'data-use-default': t('D')});
+
 				$button_use_default = $('<button/>', {
 						'type': 'button',
 						'class': 'btn-alt',
@@ -241,14 +250,26 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 			 * @param string color    Desired hex color.
 			 */
 			set_color: function(color) {
-				var color = $.trim(color).toUpperCase(),
-					background = /[0-9A-F]{6}/.test(color) ? '#' + color : '';
+				color = $.trim(color).toUpperCase();
 
-				colorbox.css({
-					'color': background,
-					'background': background,
-				})
-				.attr('title', background);
+				if (input.data('use_default') && color.length == 0) {
+					colorbox
+						.css({'color': '', 'background': ''})
+						.attr('title', t('Use default'))
+						.addClass('use-default');
+				}
+				else if (/^[0-9A-F]{6}$/i.test(color)) {
+					colorbox
+						.css({'color': '#' + color, 'background': '#' + color})
+						.attr('title', '#' + color)
+						.removeClass('use-default');
+				}
+				else {
+					colorbox
+						.css({'color': '', 'background': ''})
+						.attr('title', t('Use default'))
+						.removeClass('use-default');
+				}
 
 				input.val(color);
 			},
@@ -301,7 +322,8 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 			$('<div/>')
 				.attr({
 					'id': 'lbl_' + id,
-					'title': element.value ? '#' + element.value : ''
+					'title': element.value ? '#' + element.value : '',
+					'data-use-default': t('D')
 				})
 				.on('click', (event) => {
 					/**

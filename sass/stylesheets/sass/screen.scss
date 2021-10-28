@@ -4314,28 +4314,36 @@ td.inactive-bg {
 }
 
 .input-color-picker {
-	position: relative;
 	display: inline-block;
 	vertical-align: middle;
-	min-width: 24px;
-	min-height: 22px;
-	top: -1px;
+	margin-top: -1px;
 
 	div {
-		position: absolute;
-		left: 2px;
-		top: 2px;
 		width: 18px;
 		height: 18px;
-		border: 1px solid $form-border-color;
 		background: url($sprite-path) no-repeat -323px -411px;
+		border: 2px solid $form-border-color;
 		cursor: pointer;
+	}
+
+	div.use-default {
+		background: none;
+		position: relative;
+
+		&::after {
+			content: attr(data-use-default);
+			position: absolute;
+			text-align: center;
+			line-height: 18px;
+			right: 0;
+			left: 0;
+		}
 	}
 
 	input:disabled + div {
 		cursor: default;
 		background: $form-disabled-font-color !important;
-		border: 1px solid $form-disabled-font-color;
+		border-color: $form-disabled-font-color;
 	}
 
 	input[type="text"] {
@@ -4345,6 +4353,19 @@ td.inactive-bg {
 
 .color-picker-controls {
 	margin-bottom: 5px;
+
+	.input-color-picker {
+		position: relative;
+		cursor: default;
+		margin-top: -2px;
+
+		div {
+			position: absolute;
+			border-width: 1px;
+			left: 2px;
+			top: 2px;
+		}
+	}
 }
 
 // Preloader.

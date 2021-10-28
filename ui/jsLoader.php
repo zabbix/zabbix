@@ -364,6 +364,7 @@ $translate_strings = [
 		'Item type does not use interface' => _('Item type does not use interface')
 	],
 	'colorpicker.js' => [
+		'D' => _x('D', 'Default color option'),
 		'S_CLOSE' => _('Close'),
 		'Use default' => _('Use default')
 	],
