@@ -202,16 +202,14 @@ class testExpandExpressionMacros extends CWebTest {
 	 * Function for waiting loader ring.
 	 */
 	private function waitUntilGraphIsLoaded() {
-		$query = $this->query('xpath://div[contains(@class,"is-loading")]/img');
-
 		try {
-			return $query->waitUntilPresent()->one();
+			$this->query('xpath://div[contains(@class,"is-loading")]/img')->waitUntilPresent();
 		}
 		catch (\Exception $ex) {
 			// Code is not missing here.
 		}
 
-		return $query->waitUntilPresent()->one();
+		return $this->query('xpath://div[not(contains(@class,"is-loading"))]/img')->waitUntilPresent()->one();
 	}
 
 	public function prepareMapsData() {
