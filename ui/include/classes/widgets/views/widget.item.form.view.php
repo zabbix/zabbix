@@ -82,7 +82,7 @@ $form_list
 			CWidgetHelper::getLabel($fields['desc_bold']),
 			(new CDiv(CWidgetHelper::getCheckBox($fields['desc_bold'])))->addClass('form-field'),
 			CWidgetHelper::getLabel($fields['desc_color'])->addClass('offset-3'),
-			(new CDiv(CWidgetHelper::getColor($fields['desc_color'])))->addClass('form-field')
+			(new CDiv(CWidgetHelper::getColor($fields['desc_color'], true)))->addClass('form-field')
 		]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->addClass('field-group-description'),
@@ -109,7 +109,7 @@ $form_list
 			CWidgetHelper::getLabel($fields['value_bold']),
 			(new CDiv(CWidgetHelper::getCheckBox($fields['value_bold'])))->addClass('form-field'),
 			CWidgetHelper::getLabel($fields['value_color'])->addClass('offset-3'),
-			(new CDiv(CWidgetHelper::getColor($fields['value_color'])))->addClass('form-field'),
+			(new CDiv(CWidgetHelper::getColor($fields['value_color'], true)))->addClass('form-field'),
 			new CTag('hr'),
 			(new CDiv([
 				CWidgetHelper::getCheckBox($fields['units_show']),
@@ -131,7 +131,7 @@ $form_list
 			CWidgetHelper::getLabel($fields['units_bold'])->addClass('offset-3'),
 			(new CDiv(CWidgetHelper::getCheckBox($fields['units_bold'])))->addClass('form-field'),
 			CWidgetHelper::getLabel($fields['units_color'])->addClass('offset-3'),
-			(new CDiv(CWidgetHelper::getColor($fields['units_color'])))->addClass('form-field')
+			(new CDiv(CWidgetHelper::getColor($fields['units_color'], true)))->addClass('form-field')
 		]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->addClass('field-group-value'),
@@ -151,7 +151,7 @@ $form_list
 			CWidgetHelper::getLabel($fields['time_bold']),
 			(new CDiv(CWidgetHelper::getCheckBox($fields['time_bold'])))->addClass('form-field'),
 			CWidgetHelper::getLabel($fields['time_color'])->addClass('offset-3'),
-			(new CDiv(CWidgetHelper::getColor($fields['time_color'])))->addClass('form-field')
+			(new CDiv(CWidgetHelper::getColor($fields['time_color'], true)))->addClass('form-field')
 		]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->addClass('field-group-time'),
@@ -161,11 +161,11 @@ $form_list
 		(new CLabel(_('Change indicator')))->addClass(ZBX_STYLE_WIDGET_ITEM_LABEL),
 		(new CDiv([
 			'up',
-			(new CDiv(CWidgetHelper::getColor($fields['up_color'])))->addClass('form-field'),
+			(new CDiv(CWidgetHelper::getColor($fields['up_color'], true)))->addClass('form-field'),
 			'down',
-			(new CDiv(CWidgetHelper::getColor($fields['down_color'])))->addClass('form-field'),
+			(new CDiv(CWidgetHelper::getColor($fields['down_color'], true)))->addClass('form-field'),
 			'up/down',
-			(new CDiv(CWidgetHelper::getColor($fields['updown_color'])))->addClass('form-field')
+			(new CDiv(CWidgetHelper::getColor($fields['updown_color'], true)))->addClass('form-field')
 		]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->addClass('field-group-change-indicator'),
@@ -173,14 +173,74 @@ $form_list
 	)
 	->addRow(
 		CWidgetHelper::getLabel($fields['bg_color']),
-		(new CDiv(CWidgetHelper::getColor($fields['bg_color'])))->addClass('form-field')
+		(new CDiv(CWidgetHelper::getColor($fields['bg_color'], true)))->addClass('form-field'),
+		'bg-color-row'
 	);
 
 $form->addItem($form_list);
 
-// Append color picker to widget body instead of whole HTML body.
+// Append color picker to widget body instead of whole HTML body. Process checkboxes and form block visibility.
 $scripts[] = '$(".input-color-picker input", $(".overlay-dialogue-body"))'.
-	'.colorpicker({appendTo: ".overlay-dialogue-body"});';
+	'.colorpicker({appendTo: ".overlay-dialogue-body"});'.
+
+	'var $show = $(\'input[id^="show_"]\').not("#show_header");'.
+
+	'$("#adv_conf").change(function() {'.
+		'if (this.checked) {'.
+			'for (var i = 0; i < $show.length; i++) {'.
+				'$($show[i]).trigger("change");'.
+			'}'.
+
+			'$("#bg-color-row").show();'.
+		'}'.
+		'else {'.
+			'$("#description-row, #value-row, #time-row, #change-indicator-row, #bg-color-row").hide();'.
+		'}'.
+	'});'.
+
+	'for (var i = 0; i < $show.length; i++) {'.
+		'$($show[i]).change(function() {'.
+			'switch($(this).val()) {'.
+				'case "'.WIDGET_ITEM_SHOW_DESCRIPTION.'":'.
+					'if ($("#adv_conf").prop("checked")) {'.
+						'$("#description-row").toggle(this.checked);'.
+					'}'.
+					'break;'.
+
+					'case "'.WIDGET_ITEM_SHOW_VALUE.'":'.
+					'if ($("#adv_conf").prop("checked")) {'.
+						'$("#value-row").toggle(this.checked);'.
+					'}'.
+					'break;'.
+
+				'case "'.WIDGET_ITEM_SHOW_TIME.'":'.
+					'if ($("#adv_conf").prop("checked")) {'.
+						'$("#time-row").toggle(this.checked);'.
+					'}'.
+					'break;'.
+
+				'case "'.WIDGET_ITEM_SHOW_CHANGE_INDICATOR.'":'.
+					'if ($("#adv_conf").prop("checked")) {'.
+						'$("#change-indicator-row").toggle(this.checked);'.
+					'}'.
+					'break;'.
+			'}'.
+		'});'.
+
+		'$($show[i]).trigger("change");'.
+	'}'.
+
+	'$("#adv_conf").trigger("change");'.
+
+	'$("#units_show").change(function() {'.
+		'$("#units").prop("readonly", !this.checked);'.
+		'$("#units_pos").prop("readonly", !this.checked);'.
+		'$("#units_size").prop("readonly", !this.checked);'.
+		'$("#units_bold").prop("readonly", !this.checked);'.
+		'$("#units_color").prop("readonly", !this.checked);'.
+	'});'.
+
+	'$("#units_show").trigger("change")';
 
 return [
 	'form' => $form,
