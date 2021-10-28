@@ -27,75 +27,22 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
  */
 class testExpandExpressionMacros extends CWebTest {
 
-	/**
-	 * The id of the hostgroup for hosts with items and graph.
-	 *
-	 * @var integer
-	 */
-	protected static $hostgroupid;
-
-	/**
-	 * The id of the host for macro with last function.
-	 *
-	 * @var integer
-	 */
-	protected static $last_hostid;
-
-	/**
-	 * The id of the host for macro with avg function.
-	 *
-	 * @var integer
-	 */
-	protected static $avg_hostid;
-
-	/**
-	 * The id of the host for macro with min function.
-	 *
-	 * @var integer
-	 */
-	protected static $min_hostid;
-
-	/**
-	 * The id of the host for macro with max function.
-	 *
-	 * @var integer
-	 */
-	protected static $max_hostid;
-
-	/**
-	 * The id of the item on $last_hostid.
-	 *
-	 * @var integer
-	 */
-	protected static $last_itemid;
-
-	/**
-	 * The id of the item on $avg_hostid.
-	 *
-	 * @var integer
-	 */
-	protected static $avg_itemid;
-
-	/**
-	 * The id of the item on $min_hostid.
-	 *
-	 * @var integer
-	 */
-	protected static $min_itemid;
-
-	/**
-	 * The id of the item on $max_hostid.
-	 *
-	 * @var integer
-	 */
-	protected static $max_itemid;
-
-	/**
-	 * The id of the map with expanded expression macros.
-	 *
-	 * @var integer
-	 */
-	protected static $mapid;
+		protected static $data = [
+			'hostgroupid',
+			'hostids' => [
+				'last',
+				'avg',
+				'min',
+				'max'
+			],
+			'itemids' => [
+				'last',
+				'avg',
+				'min',
+				'max'
+			],
+			'mapid'
+		];
 
 	public function prepareItemsData() {
 		// Create hostgroup for hosts with items and graphs.
@@ -105,124 +52,83 @@ class testExpandExpressionMacros extends CWebTest {
 			]
 		]);
 		$this->assertArrayHasKey('groupids', $hostgroups);
-		self::$hostgroupid = $hostgroups['groupids'][0];
+		self::$data['hostgroupid'] = $hostgroups['groupids'][0];
 
 		// Create hosts for items and graphs.
-		$hosts = CDataHelper::call('host.create', [
-			[
-				'host' => 'Host for expression macro Last',
+		$hosts_data = [];
+		foreach (['Last', 'Avg', 'Min', 'Max'] as $type) {
+			$hosts_data[] = [
+				'host' => 'Host for expression macro '.$type,
 				'groups' => [
-					['groupid' => self::$hostgroupid]
+					['groupid' => self::$data['hostgroupid']]
 				]
-			],
-			[
-				'host' => 'Host for expression macro Avg',
-				'groups' => [
-					['groupid' => self::$hostgroupid]
-				]
-			],
-			[
-				'host' => 'Host for expression macro Min',
-				'groups' => [
-					['groupid' => self::$hostgroupid]
-				]
-			],
-			[
-				'host' => 'Host for expression macro Max',
-				'groups' => [
-					['groupid' => self::$hostgroupid]
-				]
-			]
-		]);
+			];
+		}
+
+		$hosts = CDataHelper::call('host.create', $hosts_data);
 		$this->assertArrayHasKey('hostids', $hosts);
-		self::$last_hostid = $hosts['hostids'][0];
-		self::$avg_hostid = $hosts['hostids'][1];
-		self::$min_hostid = $hosts['hostids'][2];
-		self::$max_hostid = $hosts['hostids'][3];
+
+		$hostids = CDataHelper::getIds('host');
+		self::$data['hostids']['last'] = $hostids['Host for expression macro Last'];
+		self::$data['hostids']['avg'] = $hostids['Host for expression macro Avg'];
+		self::$data['hostids']['min'] = $hostids['Host for expression macro Min'];
+		self::$data['hostids']['max'] = $hostids['Host for expression macro Max'];
 
 		// Create items on previously created hosts.
-		$items = CDataHelper::call('item.create', [
-			[
-				'hostid' => self::$last_hostid,
+		$items_data = [];
+		foreach ($hostids as $hostid) {
+			$items_data[] = [
+				'hostid' => $hostid,
 				'name' => 'trapper',
 				'key_' => 'trapper',
 				'type' => 2,
 				'value_type' => 0
-			],
-			[
-				'hostid' => self::$avg_hostid,
-				'name' => 'trapper',
-				'key_' => 'trapper',
-				'type' => 2,
-				'value_type' => 0
-			],
-			[
-				'hostid' => self::$min_hostid,
-				'name' => 'trapper',
-				'key_' => 'trapper',
-				'type' => 2,
-				'value_type' => 0
-			],
-			[
-				'hostid' => self::$max_hostid,
-				'name' => 'trapper',
-				'key_' => 'trapper',
-				'type' => 2,
-				'value_type' => 0
-			]
-		]);
-		self::$last_itemid = $items['itemids'][0];
-		self::$avg_itemid = $items['itemids'][1];
-		self::$min_itemid = $items['itemids'][2];
-		self::$max_itemid = $items['itemids'][3];
+			];
+		}
+
+		$items = CDataHelper::call('item.create', $items_data);
+
+		self::$data['itemids']['last'] = $items['itemids'][0];
+		self::$data['itemids']['avg'] = $items['itemids'][1];
+		self::$data['itemids']['min'] = $items['itemids'][2];
+		self::$data['itemids']['max'] = $items['itemids'][3];
 
 		// Create graphs with expression macros in names.
-		CDataHelper::call('graph.create', [
+		$prepared_graphs = [
 			[
 				'name' => 'Last trapper value: {?last(/Host for expression macro Last/trapper)}',
-				'width' => 900,
-				'height' => 200,
-				'gitems' => [
-					[
-						'itemid' => self::$last_itemid,
-						'color'=> '00AA00'
-					]
-				]
+				'itemid' => self::$data['itemids']['last']
 			],
 			[
 				'name' => 'Avg trapper value: {?avg(/{HOST.HOST}/trapper,1h)}',
-				'width' => 900,
-				'height' => 200,
-				'gitems' => [
-					[
-						'itemid' => self::$avg_itemid,
-						'color'=> '00AA00'
-					]
-				]
+				'itemid' => self::$data['itemids']['avg']
 			],
 			[
 				'name' => 'Max trapper value: {?max(/Host for expression macro Min/trapper,1w)}',
-				'width' => 900,
-				'height' => 200,
-				'gitems' => [
-					[
-						'itemid' => self::$min_itemid,
-						'color'=> '00AA00'
-					]
-				]
+				'itemid' => self::$data['itemids']['min']
 			],
 			[
 				'name' => 'Min trapper value: {?min(/{HOST.HOST}/trapper,1d)}',
+				'itemid' => self::$data['itemids']['max']
+			]
+		];
+
+		$graphs_data = [];
+		foreach ($prepared_graphs as $graph) {
+			$graphs_data[] = [
+				'name' => $graph['name'],
 				'width' => 900,
 				'height' => 200,
 				'gitems' => [
 					[
-						'itemid' => self::$max_itemid,
+						'itemid' => $graph['itemid'],
 						'color'=> '00AA00'
 					]
 				]
-			]
-		]);
+			];
+		}
+
+		CDataHelper::call('graph.create', $graphs_data);
 	}
 
 	public function getGraphData() {
@@ -255,17 +161,17 @@ class testExpandExpressionMacros extends CWebTest {
 		$time = time() - 100;
 		$last_time = time();
 
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$last_itemid.", ".$time.", 2, 0)");
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$last_itemid.", ".$last_time.", 4, 0)");
+		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$data['itemids']['last'].", ".$time.", 2, 0)");
+		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$data['itemids']['last'].", ".$last_time.", 4, 0)");
 
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$avg_itemid.", ".$time.", 3, 0)");
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$avg_itemid.", ".$last_time.", 5, 0)");
+		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$data['itemids']['avg'].", ".$time.", 3, 0)");
+		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$data['itemids']['avg'].", ".$last_time.", 5, 0)");
 
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$min_itemid.", ".$time.", 1, 0)");
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$min_itemid.", ".$last_time.", 3, 0)");
+		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$data['itemids']['min'].", ".$time.", 1, 0)");
+		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$data['itemids']['min'].", ".$last_time.", 3, 0)");
 
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$max_itemid.", ".$time.", 7, 0)");
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$max_itemid.", ".$last_time.", 2, 0)");
+		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$data['itemids']['max'].", ".$time.", 7, 0)");
+		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$data['itemids']['max'].", ".$last_time.", 2, 0)");
 	}
 
 	/**
@@ -274,7 +180,7 @@ class testExpandExpressionMacros extends CWebTest {
 	 * @dataProvider getGraphData
 	 */
 	public function testExpandExpressionMacros_Graph($data) {
-		$this->page->login()->open('zabbix.php?action=host.view&groupids%5B%5D='.self::$hostgroupid)
+		$this->page->login()->open('zabbix.php?action=host.view&groupids%5B%5D='.self::$data['hostgroupid'])
 				->waitUntilReady();
 		$table = $this->query('xpath://form[@name="host_view"]/table[@class="list-table"]')->asTable()
 				->waitUntilReady()->one();
@@ -296,14 +202,16 @@ class testExpandExpressionMacros extends CWebTest {
 	 * Function for waiting loader ring.
 	 */
 	private function waitUntilGraphIsLoaded() {
+		$query = $this->query('xpath://div[contains(@class,"is-loading")]/img');
+
 		try {
-			$this->query('xpath://div[contains(@class,"is-loading")]/img')->waitUntilPresent();
+			return $query->waitUntilPresent()->one();
 		}
 		catch (\Exception $ex) {
 			// Code is not missing here.
 		}
 
-		return $this->query('xpath://div[not(contains(@class,"is-loading"))]/img')->waitUntilPresent()->one();
+		return $query->waitUntilPresent()->one();
 	}
 
 	public function prepareMapsData() {
@@ -319,7 +227,7 @@ class testExpandExpressionMacros extends CWebTest {
 					[
 						'selementid' => '20',
 						'elements' => [
-							['hostid' => self::$avg_hostid]
+							['hostid' => self::$data['hostids']['avg']]
 						],
 						'elementtype' => 0,
 						'iconid_off' => '151',
@@ -340,7 +248,7 @@ class testExpandExpressionMacros extends CWebTest {
 					[
 						'selementid' => '22',
 						'elements' => [
-							['hostid' => self::$min_hostid]
+							['hostid' => self::$data['hostids']['min']]
 						],
 						'elementtype' => 0,
 						'iconid_off' => '151',
@@ -361,7 +269,7 @@ class testExpandExpressionMacros extends CWebTest {
 			]
 		]);
 		$this->assertArrayHasKey('sysmapids', $maps);
-		self::$mapid = $maps['sysmapids'][0];
+		self::$data['mapid'] = $maps['sysmapids'][0];
 	}
 
 	/**
@@ -369,7 +277,7 @@ class testExpandExpressionMacros extends CWebTest {
 	 */
 	public function testExpandExpressionMacros_Map() {
 		// Open map in view mode.
-		$this->page->login()->open('zabbix.php?action=map.view&sysmapid='.self::$mapid)->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=map.view&sysmapid='.self::$data['mapid'])->waitUntilReady();
 		$map_image = $this->query('xpath://div[@id="flickerfreescreen_mapimg"]/div/*[name()="svg"]')
 				->waitUntilPresent()->one();
 		$covered_region = [
@@ -405,20 +313,20 @@ class testExpandExpressionMacros extends CWebTest {
 	public static function clearData() {
 		// Delete Hosts.
 		CDataHelper::call('host.delete', [
-				self::$last_hostid,
-				self::$avg_hostid,
-				self::$max_hostid,
-				self::$min_hostid
+				self::$data['hostids']['last'],
+				self::$data['hostids']['avg'],
+				self::$data['hostids']['min'],
+				self::$data['hostids']['max']
 		]);
 
 		// Delete Host group.
 		CDataHelper::call('hostgroup.delete', [
-				self::$hostgroupid
+				self::$data['hostgroupid']
 		]);
 
 		// Delete Maps.
 		CDataHelper::call('map.delete', [
-				self::$mapid
+				self::$data['mapid']
 		]);
 	}
 }
