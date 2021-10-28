@@ -27,8 +27,8 @@ class CControllerGeomapsUpdate extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'geomaps_tile_provider'		=> 'required|db config.geomaps_tile_provider',
-			'geomaps_tile_url'			=> 'required|db config.geomaps_tile_url|not_empty',
-			'geomaps_max_zoom'			=> 'required|db config.geomaps_max_zoom|ge 0|le 99999',
+			'geomaps_tile_url'			=> 'required|not_empty|db config.geomaps_tile_url',
+			'geomaps_max_zoom'			=> 'required|not_empty|db config.geomaps_max_zoom|ge 0|le 99999',
 			'geomaps_attribution'		=> 'db config.geomaps_attribution'
 		];
 
