@@ -203,7 +203,7 @@ zabbix_export:
                 try {
                     var channel_event_tags = JSON.parse(params.event_tags);
                 } catch (error) {
-                    throw 'Can't process event tags: ' + error;
+                    throw 'Cannot process event tags: ' + error;
                 }
         
                 if (Array.isArray(channel_event_tags)) {
@@ -239,7 +239,7 @@ zabbix_export:
                 try {
                     var channel_event_tags = JSON.parse(params.event_tags);
                 } catch (error) {
-                    throw 'Can't process event tags: ' + error;
+                    throw 'Cannot process event tags: ' + error;
                 }
         
                 if (Array.isArray(channel_event_tags)) {
