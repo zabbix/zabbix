@@ -98,6 +98,8 @@ static zbx_oracle_db_handle_t	oracle;
 
 static ub4	OCI_DBserver_status(void);
 
+#define ORA_ERR_DUPL_ENTRY	-1
+
 #elif defined(HAVE_POSTGRESQL)
 static PGconn			*conn = NULL;
 static unsigned int		ZBX_PG_BYTEAOID = 0;
@@ -118,7 +120,6 @@ static zbx_err_codes_t last_db_errcode;
 static void	zbx_db_errlog(zbx_err_codes_t zbx_errno, int db_errno, const char *db_error, const char *context)
 {
 	char	*s;
-	int	log_lvl = LOG_LEVEL_ERR;
 
 	last_db_errcode = zbx_errno;
 
@@ -154,13 +155,12 @@ static void	zbx_db_errlog(zbx_err_codes_t zbx_errno, int db_errno, const char *d
 			break;
 		case ERR_Z3008:
 			s = zbx_dsprintf(NULL, "query failed due to primary key constraint: [%d] %s", db_errno, last_db_strerror);
-			log_lvl = LOG_LEVEL_DEBUG;
 			break;
 		default:
 			s = zbx_strdup(NULL, "unknown error");
 	}
 
-	zabbix_log(log_lvl, "[Z%04d] %s", (int)zbx_errno, s);
+	zabbix_log(LOG_LEVEL_ERR, "[Z%04d] %s", (int)zbx_errno, s);
 
 	zbx_free(s);
 }
@@ -1411,7 +1411,7 @@ int	zbx_db_statement_execute(int iters)
 	}
 
 	if (OCI_SUCCESS != (err = zbx_oracle_statement_execute(iters, &nrows)))
-		ret = OCI_handle_sql_error(ERR_Z3007, err, NULL);
+		ret = OCI_handle_sql_error((err == ORA_ERR_DUPL_ENTRY ? ERR_Z3008 : ERR_Z3007), err, NULL);
 	else
 		ret = (int)nrows;
 
@@ -1483,11 +1483,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 
 		if (0 != mysql_query(conn, sql))
 		{
-			if (ER_DUP_ENTRY == mysql_errno(conn))
-				errcode = ERR_Z3008;
-			else
-				errcode = ERR_Z3005;
-
+			errcode = (ER_DUP_ENTRY == mysql_errno(conn) ? ERR_Z3008 : ERR_Z3005);
 			zbx_db_errlog(errcode, mysql_errno(conn), mysql_error(conn), sql);
 
 			ret = (SUCCEED == is_recoverable_mysql_error() ? ZBX_DB_DOWN : ZBX_DB_FAIL);
@@ -1509,12 +1505,9 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 				/* more results? 0 = yes (keep looping), -1 = no, >0 = error */
 				if (0 < (status = mysql_next_result(conn)))
 				{
-					if (ER_DUP_ENTRY == mysql_errno(conn))
-						errcode = ERR_Z3008;
-					else
-						errcode = ERR_Z3005;
-
+					errcode = (ER_DUP_ENTRY == mysql_errno(conn) ? ERR_Z3008 : ERR_Z3005);
 					zbx_db_errlog(errcode, mysql_errno(conn), mysql_error(conn), sql);
+
 					ret = (SUCCEED == is_recoverable_mysql_error() ? ZBX_DB_DOWN : ZBX_DB_FAIL);
 				}
 			}
@@ -1531,9 +1524,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	}
 
 	if (OCI_SUCCESS != err)
-	{
-		ret = OCI_handle_sql_error((err == 1 ? ERR_Z3008 : ERR_Z3005), err, sql);
-	}
+		ret = OCI_handle_sql_error((err == ORA_ERR_DUPL_ENTRY ? ERR_Z3008 : ERR_Z3005), err, sql);
 
 #elif defined(HAVE_POSTGRESQL)
 	result = PQexec(conn,sql);
@@ -1546,12 +1537,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	else if (PGRES_COMMAND_OK != PQresultStatus(result))
 	{
 		zbx_postgresql_error(&error, result);
-
-		if (NULL != strstr(error, "duplicate key"))
-			zbx_db_errlog(ERR_Z3005, 0, error, sql);
-		else
-			zbx_db_errlog(ERR_Z3008, 0, error, sql);
-
+		zbx_db_errlog((NULL != strstr(error, "duplicate key") ? ERR_Z3008 : ERR_Z3005), 0, error, sql);
 		zbx_free(error);
 
 		ret = (SUCCEED == is_recoverable_postgresql_error(conn, result) ? ZBX_DB_DOWN : ZBX_DB_FAIL);

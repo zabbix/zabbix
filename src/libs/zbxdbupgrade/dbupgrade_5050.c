@@ -906,6 +906,14 @@ static int	DBpatch_5050086(void)
 	return DBcreate_index("auditlog", "auditlog_3", "resourcetype,resourceid", 0);
 }
 
+static int	DBpatch_5050087(void)
+{
+	if (ZBX_DB_OK > DBexecute("alter table dbversion add primary key (mandatory,optional)"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(5050)
@@ -987,5 +995,6 @@ DBPATCH_ADD(5050083, 0, 1)
 DBPATCH_ADD(5050084, 0, 1)
 DBPATCH_ADD(5050085, 0, 1)
 DBPATCH_ADD(5050086, 0, 1)
+DBPATCH_ADD(5050087, 0, 1)
 
 DBPATCH_END()

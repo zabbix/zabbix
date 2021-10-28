@@ -1093,7 +1093,7 @@ static void	zbx_main_sigusr_handler(int flags)
 	zbx_rtc_command = flags;
 }
 
-static void	zbx_check_db(int history_pk_enabled)
+static void	zbx_check_db(void)
 {
 	struct zbx_db_version_info_t	db_version_info;
 	struct zbx_json			db_version_json;
@@ -1137,8 +1137,6 @@ static void	zbx_check_db(int history_pk_enabled)
 		}
 	}
 
-	db_version_info.history_pk = history_pk_enabled;
-
 	if(SUCCEED == result && (SUCCEED != DBcheck_capabilities(db_version_info.current_version) ||
 			SUCCEED != DBcheck_version()))
 	{
@@ -1151,6 +1149,16 @@ static void	zbx_check_db(int history_pk_enabled)
 	{
 		zbx_json_initarray(&db_version_json, ZBX_JSON_STAT_BUF_LEN);
 		zbx_db_version_json_create(&db_version_json, &db_version_info);
+
+		if (SUCCEED == DBpk_exists("history"))
+		{
+			db_version_info.history_pk = 1;
+		}
+		else
+		{
+			db_version_info.history_pk = 0;
+			zabbix_log(LOG_LEVEL_WARNING, "database could be upgraded to use primary keys in history tables");
+		}
 
 		if (SUCCEED == result)
 			zbx_history_check_version(&db_version_json);
@@ -1530,7 +1538,7 @@ static void	server_teardown(zbx_socket_t *listen_sock)
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
 	char		*error = NULL;
-	int		i, db_type, ret, history_pk;
+	int		i, db_type, ret;
 	zbx_socket_t	listen_sock;
 	time_t		standby_warning_time;
 
@@ -1671,19 +1679,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		return FAIL;
 	}
 
-	if (SUCCEED == DBpk_exists("history"))
-	{
-		history_pk = 1;
-	}
-	else
-	{
-		history_pk = 0;
-		zabbix_log(LOG_LEVEL_WARNING, "database could be upgraded to use primary keys in history tables");
-	}
-
-
-
-	zbx_check_db(history_pk);
+	zbx_check_db();
 
 	DBcheck_character_set();
 
