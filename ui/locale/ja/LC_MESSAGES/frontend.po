@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-10-26 16:06+0300\n"
-"PO-Revision-Date: 2021-10-06 11:37+0300\n"
+"PO-Revision-Date: 2021-10-27 12:44+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1633513068.000000\n"
+"X-POOTLE-MTIME: 1635331459.000000\n"
 
 #: include/classes/items/CHelpItems.php:1081
 msgid "\tThe average time a read from the virtual disk takes , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
@@ -131,12 +131,12 @@ msgstr[0] "アクション%1$s件"
 #: jsLoader.php:288
 #, c-format
 msgid "%1$s characters"
-msgstr ""
+msgstr "%1$s文字"
 
 #: jsLoader.php:289
 #, c-format
 msgid "%1$s characters remaining"
-msgstr ""
+msgstr "あと%1$s文字"
 
 #: app/views/popup.acknowledge.edit.php:60
 #: app/views/popup.acknowledge.edit.php:65
@@ -18415,7 +18415,7 @@ msgstr "VMwareハイパーバイザーのBIOS uuid、<url> - VMwareサービスU
 
 #: include/classes/items/CHelpItems.php:929
 msgid "VMware hypervisor HW vendor state sensors, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
-msgstr ""
+msgstr "VMwareハイパーバイザーHWベンダーの状態センサー、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名。JSONで返す"
 
 #: include/classes/items/CHelpItems.php:905
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18447,7 +18447,7 @@ msgstr "VMwareハイパーバイザーの稼働状態ロールアップセンサ
 
 #: include/classes/items/CHelpItems.php:901
 msgid "VMware hypervisor maintenance status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "VMwareハイパーバイザーのメンテナンス状態、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名"
 
 #: include/classes/items/CHelpItems.php:889
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
