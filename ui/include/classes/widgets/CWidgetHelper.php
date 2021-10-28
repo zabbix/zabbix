@@ -243,9 +243,13 @@ class CWidgetHelper {
 	 *
 	 * @return CColor
 	 */
-	public static function getColor($field) {
+	public static function getColor($field, $default = false) {
 		// appendColorPickerJs(false), because the script reponsible for it is in witget.item.form.view.
-		return (new CColor($field->getName(), $field->getValue()))->appendColorPickerJs(false);
+		$color_picker = (new CColor($field->getName(), $field->getValue()))->appendColorPickerJs(false);
+		if ($default) {
+			$color_picker->enableUseDefault();
+		}
+		return $color_picker;
 	}
 
 	/**

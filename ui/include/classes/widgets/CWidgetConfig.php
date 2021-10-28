@@ -226,6 +226,7 @@ class CWidgetConfig {
 					case WIDGET_CLOCK:
 					case WIDGET_GRAPH:
 					case WIDGET_GRAPH_PROTOTYPE:
+					case WIDGET_ITEM:
 					case WIDGET_PLAIN_TEXT:
 					case WIDGET_URL:
 						return true;
