@@ -3482,7 +3482,6 @@ static void	history_to_dbl_vector(const zbx_history_record_t *v, int n, unsigned
  * Parameters: value      - [OUT] the function return value                   *
  *             item       - [IN] item (performance metric)                    *
  *             parameters - [IN] mode, increases, decreases or all changes    *
- *             error      - [OUT] the error message if function failed        *
  *             ts         - [IN] the function execution time                  *
  *             error      - [OUT] the error message if function failed        *
  *                                                                            *
