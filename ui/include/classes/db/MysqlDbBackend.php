@@ -196,6 +196,17 @@ class MysqlDbBackend extends DbBackend {
 	 * @return bool
 	 */
 	public function init() {
+		$db_encoding = DBselect('SHOW VARIABLES LIKE "character_set_database"');
+		if ($db_encoding && is_array($values = DBfetch($db_encoding)) && isset($values['Value']))
+		{
+			$encoding = strtolower($values['Value']);
+			if ($encoding == 'utf8mb4')
+			{
+				DBexecute('SET NAMES utf8mb4');
+				return;
+			}
+		}
+
 		DBexecute('SET NAMES utf8');
 	}
 }
