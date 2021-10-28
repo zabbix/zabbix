@@ -3630,7 +3630,6 @@ static int	evaluate_CHANGECOUNT(zbx_variant_t *value, DC_ITEM *item, const char 
 
 	else
 		*error = zbx_strdup(*error, "not enough data");
-
 out:
 	zbx_history_record_vector_destroy(&values, item->value_type);
 
