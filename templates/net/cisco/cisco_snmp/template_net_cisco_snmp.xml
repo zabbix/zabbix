@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-10-20T11:08:12Z</date>
+   <date>2021-10-28T09:18:34Z</date>
    <groups>
       <group>
          <name>Templates/Modules</name>
@@ -19,7 +19,7 @@
 MIBs used:&#13;
 CISCO-ENVMON-MIB&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -86,7 +86,6 @@ Template tooling version used: 0.38</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>PSU Discovery</name>
@@ -137,7 +136,6 @@ Template tooling version used: 0.38</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature Discovery</name>
@@ -194,7 +192,6 @@ The current measurement of the test point being instrumented.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template Module Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"{#SNMPVALUE}"}&#13;
@@ -309,7 +306,7 @@ or&#13;
 MIBs used:&#13;
 CISCO-MEMORY-POOL-MIB&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -386,7 +383,6 @@ Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-managemen
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>{#SNMPVALUE}: Memory utilization</name>
@@ -421,7 +417,7 @@ Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-managemen
 MIBs used:&#13;
 CISCO-PROCESS-MIB&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -477,7 +473,6 @@ Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-managemen
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>{#SNMPVALUE}: CPU utilization</name>
@@ -512,7 +507,7 @@ Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-managemen
 MIBs used:&#13;
 CISCO-PROCESS-MIB&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -564,7 +559,6 @@ Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-managemen
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>#{#SNMPINDEX}: CPU utilization</name>
@@ -600,7 +594,7 @@ MIBs used:&#13;
 ENTITY-MIB&#13;
 SNMPv2-MIB&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -722,7 +716,7 @@ Template tooling version used: 0.38</description>
                      </condition>
                      <condition>
                         <macro>{#ENT_CLASS}</macro>
-                        <value>[^3]</value>
+                        <value>^3$</value>
                         <formulaid>A</formulaid>
                      </condition>
                   </conditions>
@@ -760,7 +754,6 @@ Template tooling version used: 0.38</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
          </discovery_rules>
       </template>
@@ -772,7 +765,7 @@ Template tooling version used: 0.38</description>
 MIBs used:&#13;
 OLD-CISCO-CPU-MIB&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -824,7 +817,7 @@ Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-managemen
          <name>Template Net Cisco IOS prior to 12.0_3_T SNMP</name>
          <description>Cisco IOS Software releases prior to 12.0(3)T&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <templates>
             <template>
                <name>Template Module Cisco CISCO-ENVMON-MIB SNMP</name>
@@ -859,7 +852,7 @@ Known Issues:&#13;
   Version: IOS for example: 12.1(22)EA11, 15.4(3)M2&#13;
   Device: C2911, C7600&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <templates>
             <template>
                <name>Template Module Cisco CISCO-ENVMON-MIB SNMP</name>
@@ -894,7 +887,7 @@ Template tooling version used: 0.38</description>
          <name>Template Net Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP</name>
          <description>Cisco IOS Software releases later to 12.0(3)T and prior to 12.2(3.5)&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <templates>
             <template>
                <name>Template Module Cisco CISCO-ENVMON-MIB SNMP</name>
