@@ -25,11 +25,6 @@
 #include "zbxhistory.h"
 #include "history.h"
 
-#define DB_HISTORY_FIELD_ITEMID_INDEX	0
-#define DB_HISTORY_FIELD_CLOCK_INDEX	1
-#define DB_HISTORY_FIELD_NS_INDEX	3
-#define DB_HISTORY_LOG_FIELD_NS_INDEX	7
-
 typedef struct
 {
 	unsigned char		initialized;
@@ -92,22 +87,6 @@ static zbx_vc_history_table_t	vc_history_tables[] = {
 	{"history_uint", "value", row2value_ui64},
 	{"history_text", "value", row2value_str}
 };
-
-typedef struct
-{
-	zbx_uint64_t		itemid;
-	int			clock;
-	int			ns;
-}
-db_history_value_t;
-
-typedef struct
-{
-	ZBX_TABLE 		*tbl_flt, *tbl_uint, *tbl_str, *tbl_log, *tbl_text;
-	zbx_vector_ptr_t	rows_uint, rows_flt, rows_str, rows_log, rows_text;
-	zbx_vector_ptr_t	dup_rows_uint, dup_rows_flt, dup_rows_str, dup_rows_log, dup_rows_text;
-}
-zbx_db_history_dupl_data_t;
 
 /******************************************************************************************************************
  *                                                                                                                *
@@ -172,235 +151,9 @@ static void	sql_writer_add_dbinsert(zbx_db_insert_t *db_insert)
 	zbx_vector_ptr_append(&writer.dbinserts, db_insert);
 }
 
-static void	create_dupl_selects(char **sql, zbx_vector_ptr_t *hist_values, const char *table)
-{
-	int	i;
-	size_t		sql_alloc = 0, sql_offset = 0;
-
-	for (i = 0; i < hist_values->values_num; i++)
-	{
-		db_history_value_t *val = hist_values->values[i];
-
-		if (*sql == NULL)
-		{
-			zbx_snprintf_alloc(sql, &sql_alloc, &sql_offset, "select itemid,clock,ns from %s where (itemid="
-					ZBX_FS_UI64 " and clock=%i and ns=%i)", table, val->itemid, val->clock, val->ns);
-		}
-		else
-		{
-			zbx_snprintf_alloc(sql, &sql_alloc, &sql_offset, " or (itemid=" ZBX_FS_UI64 " and clock=%i and"
-					" ns=%i)", val->itemid, val->clock, val->ns);
-		}
-	}
-}
-
-static int	history_value_compare_func(const void *d1, const void *d2)
-{
-	const zbx_db_value_t		*h1 = *(const zbx_db_value_t **)d1;
-	const db_history_value_t	*h2 = *(const db_history_value_t **)d2;
-
-	ZBX_RETURN_IF_NOT_EQUAL(h2->itemid, h1[0].ui64);
-	ZBX_RETURN_IF_NOT_EQUAL(h2->clock, h1[1].i32);
-	ZBX_RETURN_IF_NOT_EQUAL(h2->ns, h1[3].i32);
-
-	return 0;
-}
-
-static void	init_history_dupl_data(zbx_db_history_dupl_data_t *data)
-{
-	data->tbl_flt = (ZBX_TABLE *)DBget_table("history");
-	data->tbl_uint = (ZBX_TABLE *)DBget_table("history_uint");
-	data->tbl_str = (ZBX_TABLE *)DBget_table("history_str");
-	data->tbl_log = (ZBX_TABLE *)DBget_table("history_log");
-	data->tbl_text = (ZBX_TABLE *)DBget_table("history_text");
-
-	zbx_vector_ptr_create(&data->rows_uint);
-	zbx_vector_ptr_create(&data->rows_flt);
-	zbx_vector_ptr_create(&data->rows_str);
-	zbx_vector_ptr_create(&data->rows_log);
-	zbx_vector_ptr_create(&data->rows_text);
-
-	zbx_vector_ptr_create(&data->dup_rows_uint);
-	zbx_vector_ptr_create(&data->dup_rows_flt);
-	zbx_vector_ptr_create(&data->dup_rows_str);
-	zbx_vector_ptr_create(&data->dup_rows_log);
-	zbx_vector_ptr_create(&data->dup_rows_text);
-}
-
-static void	destroy_history_dupl_data(zbx_db_history_dupl_data_t *data)
-{
-	zbx_vector_ptr_clear_ext(&data->rows_uint, (zbx_clean_func_t)zbx_ptr_free);
-	zbx_vector_ptr_clear_ext(&data->rows_flt, (zbx_clean_func_t)zbx_ptr_free);
-	zbx_vector_ptr_clear_ext(&data->rows_str, (zbx_clean_func_t)zbx_ptr_free);
-	zbx_vector_ptr_clear_ext(&data->rows_log, (zbx_clean_func_t)zbx_ptr_free);
-	zbx_vector_ptr_clear_ext(&data->rows_text, (zbx_clean_func_t)zbx_ptr_free);
-
-	zbx_vector_ptr_clear_ext(&data->dup_rows_uint, (zbx_clean_func_t)zbx_ptr_free);
-	zbx_vector_ptr_clear_ext(&data->dup_rows_flt, (zbx_clean_func_t)zbx_ptr_free);
-	zbx_vector_ptr_clear_ext(&data->dup_rows_str, (zbx_clean_func_t)zbx_ptr_free);
-	zbx_vector_ptr_clear_ext(&data->dup_rows_log, (zbx_clean_func_t)zbx_ptr_free);
-	zbx_vector_ptr_clear_ext(&data->dup_rows_text, (zbx_clean_func_t)zbx_ptr_free);
-
-	zbx_vector_ptr_destroy(&data->rows_uint);
-	zbx_vector_ptr_destroy(&data->rows_flt);
-	zbx_vector_ptr_destroy(&data->rows_str);
-	zbx_vector_ptr_destroy(&data->rows_log);
-	zbx_vector_ptr_destroy(&data->rows_text);
-
-	zbx_vector_ptr_destroy(&data->dup_rows_uint);
-	zbx_vector_ptr_destroy(&data->dup_rows_flt);
-	zbx_vector_ptr_destroy(&data->dup_rows_str);
-	zbx_vector_ptr_destroy(&data->dup_rows_log);
-	zbx_vector_ptr_destroy(&data->dup_rows_text);
-}
-
-static void	remove_duplicate_values(zbx_vector_ptr_t *duplicates, const ZBX_TABLE *tbl)
-{
-	int	i, j, idx;
-
-	for (i = 0; i < duplicates->values_num; i++)
-	{
-		db_history_value_t *dup_val = duplicates->values[i];
-		for (j = 0; j < writer.dbinserts.values_num; j++)
-		{
-			zbx_db_insert_t	*db_insert;
-
-			db_insert = (zbx_db_insert_t *)writer.dbinserts.values[j];
-
-			if (db_insert->table != tbl)
-				continue;
-
-			if (SUCCEED == (idx = zbx_vector_ptr_search(&db_insert->rows, dup_val,
-					history_value_compare_func)))
-			{
-				zbx_vector_ptr_remove(&db_insert->rows, idx);
-			}
-		}
-	}
-}
-
-static void	select_duplicate_values(char *sql, zbx_vector_ptr_t *duplicates)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-
-	result = DBselect("%s", sql);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		db_history_value_t *hist_value = (db_history_value_t *)zbx_malloc(NULL, sizeof(db_history_value_t));
-		ZBX_STR2UINT64(hist_value->itemid, row[0]);
-		hist_value->clock = atoi(row[1]);
-		hist_value->ns = atoi(row[2]);
-
-		zbx_vector_ptr_append(duplicates, hist_value);
-	}
-	DBfree_result(result);
-}
-
-static void	db_insert_rows_to_values(zbx_db_insert_t *insert, zbx_vector_ptr_t *rows, const int itemid_idx,
-		const int clock_idx, const int ns_idx)
-{
-	int	i;
-
-	for (i = 0; i < insert->rows.values_num; i++) {
-		zbx_db_value_t	*dbv = insert->rows.values[i];
-
-		db_history_value_t *hist_value = (db_history_value_t *)zbx_malloc(NULL, sizeof(db_history_value_t));
-		hist_value->itemid = dbv[itemid_idx].ui64;
-		hist_value->clock = dbv[clock_idx].i32;
-		hist_value->ns = dbv[ns_idx].i32;
-
-		zbx_vector_ptr_append(rows, hist_value);
-	}
-}
-
-static void	sql_writer_reinsert_duplicates()
-{
-	zbx_db_history_dupl_data_t	data;
-	int				i;
-	size_t				j;
-	char				*select_uint = NULL, *select_flt = NULL, *select_str = NULL,
-					*select_log = NULL, *select_text = NULL;
-
-	void				*history_tables[][5] = {
-		{&select_flt,	&data.rows_flt,		&data.dup_rows_flt,	"history",	data.tbl_flt},
-		{&select_uint,	&data.rows_uint,	&data.dup_rows_uint,	"history_uint",	data.tbl_uint},
-		{&select_str,	&data.rows_str,		&data.dup_rows_str,	"history_str",	data.tbl_str},
-		{&select_log,	&data.rows_log,		&data.dup_rows_log,	"history_log",	data.tbl_log},
-		{&select_text,	&data.rows_text,	&data.dup_rows_text,	"history_text",	data.tbl_text},
-	};
-
-	init_history_dupl_data(&data);
-
-	for (i = 0; i < writer.dbinserts.values_num; i++)
-	{
-		zbx_db_insert_t		*db_insert;
-
-		db_insert = (zbx_db_insert_t *)writer.dbinserts.values[i];
-
-		if (db_insert->table == data.tbl_uint)
-		{
-			db_insert_rows_to_values(db_insert, &data.rows_uint, DB_HISTORY_FIELD_ITEMID_INDEX,
-					DB_HISTORY_FIELD_CLOCK_INDEX, DB_HISTORY_FIELD_NS_INDEX);
-		}
-		else if (db_insert->table == data.tbl_flt)
-		{
-			db_insert_rows_to_values(db_insert, &data.rows_flt, DB_HISTORY_FIELD_ITEMID_INDEX,
-					DB_HISTORY_FIELD_CLOCK_INDEX, DB_HISTORY_FIELD_NS_INDEX);
-		}
-		else if (db_insert->table == data.tbl_str)
-		{
-			db_insert_rows_to_values(db_insert, &data.rows_str, DB_HISTORY_FIELD_ITEMID_INDEX,
-					DB_HISTORY_FIELD_CLOCK_INDEX, DB_HISTORY_FIELD_NS_INDEX);
-		}
-		else if (db_insert->table == data.tbl_log)
-		{
-			db_insert_rows_to_values(db_insert, &data.rows_log, DB_HISTORY_FIELD_ITEMID_INDEX,
-					DB_HISTORY_FIELD_CLOCK_INDEX, DB_HISTORY_LOG_FIELD_NS_INDEX);
-		}
-		else if (db_insert->table == data.tbl_text)
-		{
-			db_insert_rows_to_values(db_insert, &data.rows_text, DB_HISTORY_FIELD_ITEMID_INDEX,
-					DB_HISTORY_FIELD_CLOCK_INDEX, DB_HISTORY_FIELD_NS_INDEX);
-		}
-	}
-
-	for (j = 0; j < ARRSIZE(history_tables); j++)
-	{
-		char			**select;
-		zbx_vector_ptr_t	*rows;
-		zbx_vector_ptr_t	*dup_rows;
-		const char		*table_name;
-		const ZBX_TABLE		*tbl;
-
-		select = history_tables[j][0];
-		rows = history_tables[j][1];
-		dup_rows = history_tables[j][2];
-		table_name = history_tables[j][3];
-		tbl = history_tables[j][4];
-
-		create_dupl_selects(select, rows, table_name);
-
-		if (NULL == *select)
-			continue;
-
-		select_duplicate_values(*select, dup_rows);
-		remove_duplicate_values(dup_rows, tbl);
-	}
-
-	destroy_history_dupl_data(&data);
-
-	zbx_free(select_uint);
-	zbx_free(select_log);
-	zbx_free(select_text);
-	zbx_free(select_str);
-	zbx_free(select_flt);
-}
-
 /************************************************************************************
  *                                                                                  *
- * Function: sql_writer_flush                                                       *
+ * Function: sql_writer_flush_commit                                                *
  *                                                                                  *
  * Purpose: commits bulk insert data to be flushed into database                    *
  *                                                                                  *
@@ -440,15 +193,14 @@ static int	sql_writer_flush(void)
 
 	sql_writer_flush_commit(&txn_error);
 
-	if (ZBX_DB_FAIL == txn_error && zbx_db_last_errcode() == ERR_Z3008)
-	{
-		sql_writer_reinsert_duplicates();
-		sql_writer_flush_commit(&txn_error);
-	}
-
 	sql_writer_release();
 
-	return ZBX_DB_OK == txn_error ? SUCCEED : FAIL;
+	if (ZBX_DB_OK == txn_error)
+		return SUCCEED;
+	else if (ZBX_DB_FAIL == txn_error && zbx_db_last_errcode() == ERR_Z3008)
+		return HIST_DUP_REJECTED;
+	else
+		return FAIL;
 }
 
 /******************************************************************************************************************
