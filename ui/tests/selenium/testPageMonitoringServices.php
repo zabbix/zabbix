@@ -778,9 +778,11 @@ class testPageMonitoringServices extends CWebTest {
 			if (CTestArrayHelper::get($data['Tags'], 'Source')) {
 				$filter_form->getField('id:filter_tag_source')->asSegmentedRadio()->fill($data['Tags']['Source']);
 			}
+
 			if (CTestArrayHelper::get($data['Tags'], 'Evaluation')) {
 				$filter_form->getField('id:filter_evaltype')->asSegmentedRadio()->fill($data['Tags']['Evaluation']);
 			}
+
 			$filter_form->getField('id:filter-tags')->asMultifieldTable()->fill(CTestArrayHelper::get($data, 'Tags.tags'));
 		}
 
