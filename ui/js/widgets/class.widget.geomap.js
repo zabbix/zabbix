@@ -90,7 +90,7 @@ class CWidgetGeoMap extends CWidget {
 		// Initialize map and load tile layer.
 		this._map = L.map(this._unique_id).setView(latLng, config.center.zoom);
 		L.tileLayer(config.tile_url, {
-			minZoom: 1,
+			minZoom: 0,
 			maxZoom: parseInt(config.max_zoom, 10),
 			minNativeZoom: 1,
 			maxNativeZoom: parseInt(config.max_zoom, 10),
