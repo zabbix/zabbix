@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-26 16:13+0300\n"
+"POT-Creation-Date: 2021-10-28 10:30+0300\n"
 "PO-Revision-Date: 2016-05-11 02:08+0300\n"
 "Last-Translator: 岂几 <tom3000@126.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -550,7 +550,7 @@ msgstr "确认已解决的事件"
 #: include/views/configuration.host.discovery.edit.php:134
 #: include/views/configuration.host.discovery.edit.php:632
 #: include/views/configuration.host.discovery.edit.php:742
-#: include/views/configuration.host.discovery.edit.php:911
+#: include/views/configuration.host.discovery.edit.php:914
 #: include/views/configuration.host.prototype.edit.php:240
 #: include/views/configuration.httpconf.edit.php:209
 #: include/views/configuration.item.edit.php:193
@@ -772,8 +772,8 @@ msgstr "启用直到"
 #: include/views/configuration.host.discovery.edit.php:668
 #: include/views/configuration.host.discovery.edit.php:816
 #: include/views/configuration.host.discovery.edit.php:890
-#: include/views/configuration.host.discovery.edit.php:916
-#: include/views/configuration.host.discovery.edit.php:971
+#: include/views/configuration.host.discovery.edit.php:919
+#: include/views/configuration.host.discovery.edit.php:981
 #: include/views/configuration.hostgroups.edit.php:55
 #: include/views/configuration.host.prototype.edit.php:110
 #: include/views/configuration.host.prototype.edit.php:189
@@ -3402,7 +3402,7 @@ msgstr "时钟"
 #: app/views/popup.service.edit.php:388
 #: include/views/configuration.action.edit.php:493
 #: include/views/configuration.graph.edit.php:510
-#: include/views/configuration.host.discovery.edit.php:950
+#: include/views/configuration.host.discovery.edit.php:960
 #: include/views/configuration.hostgroups.edit.php:62
 #: include/views/configuration.host.prototype.edit.php:424
 #: include/views/configuration.httpconf.edit.php:254
@@ -4809,7 +4809,7 @@ msgid "Delete dashboard?"
 msgstr "你确定要删除仪表盘？"
 
 #: app/views/configuration.discovery.edit.php:159
-#: include/views/configuration.host.discovery.edit.php:962
+#: include/views/configuration.host.discovery.edit.php:972
 msgid "Delete discovery rule?"
 msgstr "删除发现规则?"
 
@@ -6287,7 +6287,7 @@ msgstr ""
 msgid "Execute WMI query and return the first selected object. Returns integer, float, string or text (depending on the request)"
 msgstr "执行 WMI 查询返回第一个对象。返回整形、浮点、字符串或者文本内容"
 
-#: include/views/configuration.host.discovery.edit.php:953
+#: include/views/configuration.host.discovery.edit.php:963
 #: include/views/configuration.host.discovery.list.php:329
 #: include/views/configuration.item.edit.php:1018
 #: include/views/configuration.item.list.php:301
@@ -6706,7 +6706,7 @@ msgstr ""
 
 #: app/views/popup.lldoverride.php:183
 #: include/views/configuration.host.discovery.edit.php:822
-#: include/views/configuration.host.discovery.edit.php:941
+#: include/views/configuration.host.discovery.edit.php:951
 msgid "Filters"
 msgstr "过滤器"
 
@@ -10217,8 +10217,8 @@ msgstr ""
 msgid "LLD macro"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:896
-#: include/views/configuration.host.discovery.edit.php:940
+#: include/views/configuration.host.discovery.edit.php:897
+#: include/views/configuration.host.discovery.edit.php:950
 msgid "LLD macros"
 msgstr ""
 
@@ -11640,7 +11640,7 @@ msgstr "NTLM"
 #: include/views/configuration.host.discovery.edit.php:132
 #: include/views/configuration.host.discovery.edit.php:175
 #: include/views/configuration.host.discovery.edit.php:319
-#: include/views/configuration.host.discovery.edit.php:909
+#: include/views/configuration.host.discovery.edit.php:912
 #: include/views/configuration.host.discovery.list.php:100
 #: include/views/configuration.host.discovery.list.php:193
 #: include/views/configuration.hostgroups.list.php:46
@@ -13053,8 +13053,8 @@ msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:402
 #: include/classes/widgets/views/widget.svggraph.form.view.php:297
-#: include/views/configuration.host.discovery.edit.php:925
-#: include/views/configuration.host.discovery.edit.php:942
+#: include/views/configuration.host.discovery.edit.php:929
+#: include/views/configuration.host.discovery.edit.php:952
 msgid "Overrides"
 msgstr "覆盖"
 
@@ -13675,7 +13675,7 @@ msgid "Prediction functions"
 msgstr ""
 
 #: app/views/popup.massupdate.item.php:494
-#: include/views/configuration.host.discovery.edit.php:933
+#: include/views/configuration.host.discovery.edit.php:939
 #: include/views/configuration.item.edit.php:987
 #: include/views/configuration.item.prototype.edit.php:871
 msgid "Preprocessing"
@@ -13683,7 +13683,7 @@ msgstr "进程"
 
 #: app/views/popup.itemtestedit.view.php:354
 #: app/views/popup.massupdate.item.php:210
-#: include/views/configuration.host.discovery.edit.php:935
+#: include/views/configuration.host.discovery.edit.php:943
 #: include/views/configuration.item.edit.php:991
 #: include/views/configuration.item.prototype.edit.php:875
 msgid "Preprocessing steps"
@@ -16292,7 +16292,7 @@ msgid "Stop"
 msgstr "停止"
 
 #: app/views/popup.lldoverride.php:57
-#: include/views/configuration.host.discovery.edit.php:910
+#: include/views/configuration.host.discovery.edit.php:913
 msgid "Stop processing"
 msgstr ""
 
@@ -16785,8 +16785,8 @@ msgstr ""
 #: app/views/popup.itemtestedit.view.php:432
 #: app/views/popup.mediatypetest.edit.php:99
 #: app/views/popup.testtriggerexpr.php:124 include/forms.inc.php:1457
-#: include/views/configuration.host.discovery.edit.php:960
-#: include/views/configuration.host.discovery.edit.php:972
+#: include/views/configuration.host.discovery.edit.php:970
+#: include/views/configuration.host.discovery.edit.php:982
 #: include/views/configuration.item.edit.php:1025
 #: include/views/configuration.item.edit.php:1046
 #: include/views/configuration.item.prototype.edit.php:902
@@ -17954,7 +17954,7 @@ msgstr "上"
 #: include/classes/html/CTabFilter.php:94
 #: include/views/configuration.action.edit.php:492
 #: include/views/configuration.graph.edit.php:494
-#: include/views/configuration.host.discovery.edit.php:967
+#: include/views/configuration.host.discovery.edit.php:977
 #: include/views/configuration.hostgroups.edit.php:61
 #: include/views/configuration.host.prototype.edit.php:422
 #: include/views/configuration.httpconf.edit.php:271
