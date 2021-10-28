@@ -533,7 +533,7 @@ class testDashboardPages extends CWebTest {
 
 		$index = (array_key_exists('duplicate', $data)) ? 2 : 1;
 		$this->selectPageAction($title, 'Properties', $index);
-		COverlayDialogElement::find()->waitUntilVisible()->one();
+		COverlayDialogElement::find()->waitUntilReady()->one();
 		$page_form = $page_dialog->query('name:dashboard_page_properties_form')->asForm()->one();
 		$page_form->checkValue(['Name' => $title, 'Page display period' => $data['fields']['Page display period']]);
 	}
@@ -620,14 +620,14 @@ class testDashboardPages extends CWebTest {
 		$dashboard->edit();
 		$this->assertEquals(['Page 1'], $this->getPagesTitles());
 		$this->selectPageAction('Page 1', 'Properties');
-		$page_dialog = COverlayDialogElement::find()->waitUntilVisible()->one();
+		$page_dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$page_dialog->query('name:dashboard_page_properties_form')->asForm()->one()->checkValue(['Name' => '']);
 		$page_dialog->query('button:Cancel')->one()->click();
 
 		// Check popup-menu options and add page with name.
 		foreach(['not_page_number', ''] as $page_name) {
 			$dashboard->addPage();
-			COverlayDialogElement::find()->waitUntilVisible()->one();
+			COverlayDialogElement::find()->waitUntilReady()->one();
 
 			if ($page_name === 'not_page_number') {
 				$page_dialog->query('name:dashboard_page_properties_form')->asForm()->one()->fill(['Name' => 'not_page_number']);
@@ -701,7 +701,7 @@ class testDashboardPages extends CWebTest {
 			// Check that default time for page changed in edit mode and after dashboard save.
 			foreach([true, false] as $save_dashboard) {
 				$this->selectPageAction('Page 1', 'Properties');
-				$page_dialog = COverlayDialogElement::find()->waitUntilVisible()->one();
+				$page_dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 				$page_dialog->query('name:dashboard_page_properties_form')->asForm()->one()
 						->checkValue(['Page display period' => 'Default ('.$default.')']);
 				$page_dialog->query('button:Cancel')->one()->click();
@@ -772,7 +772,7 @@ class testDashboardPages extends CWebTest {
 	 * Checks dashboard page properties.
 	 */
 	private function checkPageProperties() {
-		$page_dialog = COverlayDialogElement::find()->waitUntilVisible()->one();
+		$page_dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$page_form = $page_dialog->query('name:dashboard_page_properties_form')->asForm()->one();
 		$this->assertEquals('255', $page_form->query('id:name')->one()->getAttribute('maxlength'));
 		$this->assertEquals('Dashboard page properties', $page_dialog->getTitle());
