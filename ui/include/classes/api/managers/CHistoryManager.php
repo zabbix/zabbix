@@ -24,7 +24,7 @@
  */
 class CHistoryManager {
 
-	private $use_primary_keys = false;
+	private $primary_keys_enabled = false;
 
 	/**
 	 * Whether to enable optimizations that make use of PRIMARY KEY (itemid, clock, ns) on the history tables.
@@ -33,8 +33,8 @@ class CHistoryManager {
 	 *
 	 * @return CHistoryManager
 	 */
-	public function setUsePrimaryKeys(bool $enabled) {
-		$this->use_primary_keys = $enabled;
+	public function setPrimaryKeysEnabled(bool $enabled = true) {
+		$this->primary_keys_enabled = $enabled;
 
 		return $this;
 	}
@@ -119,7 +119,12 @@ class CHistoryManager {
 		}
 
 		if (array_key_exists(ZBX_HISTORY_SOURCE_SQL, $grouped_items)) {
-			$results += $this->getLastValuesFromSql($grouped_items[ZBX_HISTORY_SOURCE_SQL], $limit, $period);
+			if ($this->primary_keys_enabled) {
+				$results += $this->getLastValuesFromSqlWithPk($grouped_items[ZBX_HISTORY_SOURCE_SQL], $limit, $period);
+			}
+			else {
+				$results += $this->getLastValuesFromSql($grouped_items[ZBX_HISTORY_SOURCE_SQL], $limit, $period);
+			}
 		}
 
 		return $results;
@@ -236,6 +241,7 @@ class CHistoryManager {
 		if ($limit == 1) {
 			foreach ($items_by_type as $value_type => $items) {
 				$history_table = self::getTableName($value_type);
+
 				$max_clock_per_item = DBselect(
 					'SELECT h.itemid, MAX(h.clock) AS clock'.
 					' FROM '.$history_table.' h'.
@@ -295,10 +301,6 @@ class CHistoryManager {
 	 * @see CHistoryManager::getLastValues
 	 */
 	private function getLastValuesFromSql($items, $limit, $period) {
-		if ($this->use_primary_keys) {
-			return $this->getLastValuesFromSqlWithPk($items, $limit, $period);
-		}
-
 		$results = [];
 
 		if ($period) {
@@ -416,11 +418,9 @@ class CHistoryManager {
 				return $this->getValueAtFromElasticsearch($item, $clock, $ns);
 
 			default:
-				if ($this->use_primary_keys) {
-					return $this->getValueAtFromSqlWithPk($item, $clock, $ns);
-				}
-
-				return $this->getValueAtFromSql($item, $clock, $ns);
+				return $this->primary_keys_enabled
+					? $this->getValueAtFromSqlWithPk($item, $clock, $ns)
+					: $this->getValueAtFromSql($item, $clock, $ns);
 		}
 	}
 

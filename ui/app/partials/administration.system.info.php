@@ -139,7 +139,7 @@ if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
 			continue;
 		}
 
-		switch ($dbversion->flag) {
+		switch ($dbversion['flag']) {
 			case DB_VERSION_LOWER_THAN_MINIMUM:
 				$error = _s('Minimum required %1$s database version is %2$s.', $dbversion['database'],
 					$dbversion['min_version']
