@@ -128,6 +128,7 @@ class CControllerProfileUpdate extends CController {
 
 		DBstart();
 		switch ($idx) {
+			// PROFILE_TYPE_STR
 			case 'web.dashboard.widget.geomap.default_view':
 				$value_str = $this->getInput('value_str');
 				foreach ($this->getInput('idx2') as $idx2) {
@@ -147,6 +148,7 @@ class CControllerProfileUpdate extends CController {
 				}
 				break;
 
+			// PROFILE_TYPE_INT
 			case !!preg_match('/web.dashboard.widget.navtree.item-\d+.toggle/', $this->getInput('idx')):
 				$value_int = $this->getInput('value_int');
 				if ($value_int == 1) { // default value
