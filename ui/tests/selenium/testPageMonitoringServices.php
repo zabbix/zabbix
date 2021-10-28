@@ -83,12 +83,12 @@ class testPageMonitoringServices extends CWebTest {
 				'sortorder' => 4,
 				'tags' => [
 					[
-						'tag' => 'test123',
+						'tag' => 'test',
 						'value' => 'test456'
 					],
 					[
-						'tag' => 'test',
-						'value' => 'test789'
+						'tag' => 'problem',
+						'value' => 'true'
 					]
 				]
 			],
@@ -161,6 +161,13 @@ class testPageMonitoringServices extends CWebTest {
 				'showsla' => 1,
 				'goodsla' => 99.99,
 				'sortorder' => 14,
+				'problem_tags' => [
+					[
+						'tag' => 'tag1',
+						'operator' => 0,
+						'value' => 'value1'
+					]
+				]
 			],
 			[
 				'name' => 'Server for mass delete 3',
@@ -168,6 +175,13 @@ class testPageMonitoringServices extends CWebTest {
 				'showsla' => 1,
 				'goodsla' => 99.99,
 				'sortorder' => 15,
+				'problem_tags' => [
+					[
+						'tag' => 'tag2',
+						'operator' => 0,
+						'value' => 'value2'
+					]
+				]
 			],
 			[
 				'name' => 'Server for mass update 1',
@@ -340,242 +354,398 @@ class testPageMonitoringServices extends CWebTest {
 		}
 	}
 
-	public static function getFilterData() {
+	public static function getFilterEditData() {
 		return [
-			// "And/Or" and "Or" checks.
+			// Tags source: Service.
 			[
 				[
-					'evaluation_type' => 'And/Or',
-					'tags' => [
-						[
-							'name' => 'test',
-							'operator' => 'Contains',
-							'value' => 'test123'
-						],
+					'Tags' => [
+						'Source' => 'Service',
+						'tags' => [
+							[
+								'index' => 0,
+								'action' => USER_ACTION_UPDATE,
+								'tag' => 'problem',
+								'operator' => 'Contains',
+								'value' => 'true'
+							]
+						]
 					],
 					'result' => [
-						'Name' => 'Server 3 1'
+						'Server 4'
 					]
 				]
 			],
+			// Tags source: Problem.
 			[
 				[
-					'evaluation_type' => 'Or',
-					'tags' => [
-						[
-							'name' => 'test',
-							'operator' => 'Contains',
-							'value' => 'test123'
-						],
+					'Tags' => [
+						'Source' => 'Problem',
+						'tags' => [
+							[
+								'index' => 0,
+								'action' => USER_ACTION_UPDATE,
+								'tag' => 'problem',
+								'operator' => 'Contains',
+								'value' => 'true'
+							]
+						]
 					],
 					'result' => [
-						'Name' => 'Server 3 1'
+						'Server 5'
 					]
 				]
 			],
+			// Tags source: Problem and Evaluation: Or.
 			[
 				[
-					'evaluation_type' => 'And/Or',
-					'tags' => [
-						[
-							'name' => 'test',
-							'operator' => 'Exists',
-						],
+					'Tags' => [
+						'Source' => 'Problem',
+						'Evaluation' => 'Or',
+						'tags' => [
+							[
+								'index' => 0,
+								'action' => USER_ACTION_UPDATE,
+								'tag' => 'problem',
+								'operator' => 'Contains',
+								'value' => 'true'
+							],
+							[
+								'tag' => 'test',
+								'operator' => 'Exists'
+							]
+						]
 					],
 					'result' => [
-						'Name' => 'Server 3 1'
+						'Server 5'
 					]
 				]
 			],
+			// Only services without children checkbox.
 			[
 				[
-					'evaluation_type' => 'And/Or',
-					'tags' => [
-						[
-							'name' => 'test',
-							'operator' => 'Equals',
-							'value' => 'test123'
-						],
+					'filter' => [
+						'Name' => 'delete',
+						'Only services without children' => true,
 					],
 					'result' => [
-						'Name' => 'Server 3 1'
+						'Server 6 for delete by checkbox',
+						'Server 7 for delete by action button',
+						'Server for mass delete 1',
+						'Server for mass delete 2',
+						'Server for mass delete 3'
 					]
 				]
 			],
+			// Only services without problem tags checkbox.
 			[
 				[
-					'evaluation_type' => 'And/Or',
-					'tags' => [
-						[
-							'name' => 'test',
-							'operator' => 'Does not exist',
-						],
+					'filter' => [
+						'Name' => 'Server for mass delete',
+						'Only services without problem tags' => true,
 					],
 					'result' => [
-						'Name' => 'Server 1',
-						'Name' => 'Server 2 1',
-						'Name' => 'Server 6 for delete by checkbox',
-						'Name' => 'Server 7 for delete by action button',
-						'Name' => 'Server 8 parent with child for delete child 1',
-						'Name' => 'Server 9 parent with child for delete parent 1',
-						'Name' => 'Server 10 child for Server 8',
-						'Name' => 'Server 11 child for Server 9',
-						'Name' => 'Server for mass delete 1',
-						'Name' => 'Server for mass delete 2',
-						'Name' => 'Server for mass delete 3',
-						'Name' => 'Server for mass update 1',
-						'Name' => 'Server for mass update 2',
-						'Name' => 'Server for mass update 3',
-						'Name' => 'Server with problem'
-					]
-				]
-			],
-			[
-				[
-					'evaluation_type' => 'And/Or',
-					'tags' => [
-						[
-							'name' => 'test',
-							'operator' => 'Does not equal',
-							'value' => 'test123'
-						],
-					],
-					'result' => [
-						'Name' => 'Server 4',
-						'Name' => 'Server 5',
-					]
-				]
-			],
-			[
-				[
-					'evaluation_type' => 'And/Or',
-					'tags' => [
-						[
-							'name' => 'test',
-							'operator' => 'Contains',
-							'value' => 'test123'
-						],
-					],
-					'result' => [
-						'Name' => 'Server 3 1'
-					]
-				]
-			],
-			[
-				[
-					'evaluation_type' => 'Or',
-					'tags' => [
-						[
-							'name' => 'test',
-							'operator' => 'Contains',
-							'value' => 'test123'
-						],
-					],
-					'result' => [
-						'Name' => 'Server 3 1'
-					]
-				]
-			],
-			[
-				[
-					'evaluation_type' => 'Or',
-					'tags' => [
-						[
-							'name' => 'test',
-							'operator' => 'Exists',
-						],
-					],
-					'result' => [
-						'Name' => 'Server 3 1'
-					]
-				]
-			],
-			[
-				[
-					'evaluation_type' => 'Or',
-					'tags' => [
-						[
-							'name' => 'test',
-							'operator' => 'Equals',
-							'value' => 'test123'
-						],
-					],
-					'result' => [
-						'Name' => 'Server 3 1'
-					]
-				],
-			],
-			[
-				[
-					'evaluation_type' => 'Or',
-					'tags' => [
-						[
-							'name' => 'test',
-							'operator' => 'Does not exist',
-						],
-					],
-					'result' => [
-						'Name' => 'Server 4',
-						'Name' => 'Server 5',
-					]
-				]
-			],
-			[
-				[
-					'evaluation_type' => 'Or',
-					'tags' => [
-						[
-							'name' => 'test',
-							'operator' => 'Does not equal',
-							'value' => 'test123'
-						],
-					],
-					'result' => [
-						'Name' => 'Server 4',
-						'Name' => 'Server 5',
-					]
-				]
-			],
-			[
-				[
-					'children' => [
-						'id:filter_without_children'
-					],
-					'result' => [
-						'Name' => 'Server 1',
-						'Name' => 'Server 4',
-						'Name' => 'Server 5'
-					]
-				]
-			],
-			[
-				[
-					'problem' => [
-						'id:filter_without_problem_tags'
-					],
-					'result' => [
-						'Name' => 'Server 1',
-						'Name' => 'Server 2',
-						'Name' => 'Server 3',
-						'Name' => 'Server 4'
-					]
-				]
-			],
-			[
-				[
-					'status' => [
-						'id:filter_status_2'
-					],
-					'result' => [
-						'Name' => 'Server with problem',
+						'Server for mass delete 1'
 					]
 				]
 			]
 		];
 	}
 
+	public static function getFilterCommonData() {
+		return [
+			// Only Name filtering.
+			[
+				[
+					'filter' => [
+						'Name' => 'Server for mass delete',
+					],
+					'result' => [
+						'Server for mass delete 1',
+						'Server for mass delete 2',
+						'Server for mass delete 3'
+					]
+				]
+			],
+			// Name and Status: Any.
+			[
+				[
+					'filter' => [
+						'Name' => 'with',
+						'Status' => 'Any'
+					],
+					'result' => [
+						'Server 8 parent with child for delete child 1',
+						'Server 9 parent with child for delete parent 1',
+						'Server with problem'
+					]
+				]
+			],
+			// Name and Status: OK.
+			[
+				[
+					'filter' => [
+						'Name' => 'with',
+						'Status' => 'OK'
+					],
+					'result' => [
+						'Server 8 parent with child for delete child 1',
+						'Server 9 parent with child for delete parent 1'
+					]
+				]
+			],
+			// Name and Status: Problem fields.
+			[
+				[
+					'filter' => [
+						'Name' => 'with',
+						'Status' => 'Problem'
+					],
+					'result' => [
+						'Server with problem'
+					]
+				]
+			],
+			// Evaluation: And/Or.
+			[
+				[
+					'Tags' => [
+						'Evaluation' => 'And/Or',
+						'tags' => [
+							[
+								'index' => 0,
+								'action' => USER_ACTION_UPDATE,
+								'tag' => 'problem',
+								'operator' => 'Contains',
+								'value' => 'true'
+							],
+							[
+								'tag' => 'test',
+								'operator' => 'Exists'
+							]
+						]
+					],
+					'result' => [
+						'Server 4'
+					]
+				]
+			],
+			// Evaluation: Or, Operators: Contains, Exists.
+			[
+				[
+					'Tags' => [
+						'Evaluation' => 'Or',
+						'tags' => [
+							[
+								'index' => 0,
+								'action' => USER_ACTION_UPDATE,
+								'tag' => 'problem',
+								'operator' => 'Contains',
+								'value' => 'true'
+							],
+							[
+								'tag' => 'test',
+								'operator' => 'Exists'
+							]
+						]
+					],
+					'result' => [
+						'Server 3 1',
+						'Server 4'
+					]
+				]
+			]
+			// Operator: Equals.
+			// Operator: Does not exist, etc.
+//			[
+//				[
+//					'evaluation_type' => 'And/Or',
+//					'tags' => [
+//						[
+//							'name' => 'test',
+//							'operator' => 'Equals',
+//							'value' => 'test123'
+//						],
+//					],
+//					'result' => [
+//						'Name' => 'Server 3 1'
+//					]
+//				]
+//			],
+//			[
+//				[
+//					'evaluation_type' => 'And/Or',
+//					'tags' => [
+//						[
+//							'name' => 'test',
+//							'operator' => 'Does not exist',
+//						],
+//					],
+//					'result' => [
+//						'Name' => 'Server 1',
+//						'Name' => 'Server 2 1',
+//						'Name' => 'Server 6 for delete by checkbox',
+//						'Name' => 'Server 7 for delete by action button',
+//						'Name' => 'Server 8 parent with child for delete child 1',
+//						'Name' => 'Server 9 parent with child for delete parent 1',
+//						'Name' => 'Server 10 child for Server 8',
+//						'Name' => 'Server 11 child for Server 9',
+//						'Name' => 'Server for mass delete 1',
+//						'Name' => 'Server for mass delete 2',
+//						'Name' => 'Server for mass delete 3',
+//						'Name' => 'Server for mass update 1',
+//						'Name' => 'Server for mass update 2',
+//						'Name' => 'Server for mass update 3',
+//						'Name' => 'Server with problem'
+//					]
+//				]
+//			],
+//			[
+//				[
+//					'evaluation_type' => 'And/Or',
+//					'tags' => [
+//						[
+//							'name' => 'test',
+//							'operator' => 'Does not equal',
+//							'value' => 'test123'
+//						],
+//					],
+//					'result' => [
+//						'Name' => 'Server 4',
+//						'Name' => 'Server 5',
+//					]
+//				]
+//			],
+//			[
+//				[
+//					'evaluation_type' => 'And/Or',
+//					'tags' => [
+//						[
+//							'name' => 'test',
+//							'operator' => 'Contains',
+//							'value' => 'test123'
+//						],
+//					],
+//					'result' => [
+//						'Name' => 'Server 3 1'
+//					]
+//				]
+//			],
+//			[
+//				[
+//					'evaluation_type' => 'Or',
+//					'tags' => [
+//						[
+//							'name' => 'test',
+//							'operator' => 'Contains',
+//							'value' => 'test123'
+//						],
+//					],
+//					'result' => [
+//						'Name' => 'Server 3 1'
+//					]
+//				]
+//			],
+//			[
+//				[
+//					'evaluation_type' => 'Or',
+//					'tags' => [
+//						[
+//							'name' => 'test',
+//							'operator' => 'Exists',
+//						],
+//					],
+//					'result' => [
+//						'Name' => 'Server 3 1'
+//					]
+//				]
+//			],
+//			[
+//				[
+//					'evaluation_type' => 'Or',
+//					'tags' => [
+//						[
+//							'name' => 'test',
+//							'operator' => 'Equals',
+//							'value' => 'test123'
+//						],
+//					],
+//					'result' => [
+//						'Name' => 'Server 3 1'
+//					]
+//				],
+//			],
+//			[
+//				[
+//					'evaluation_type' => 'Or',
+//					'tags' => [
+//						[
+//							'name' => 'test',
+//							'operator' => 'Does not exist',
+//						],
+//					],
+//					'result' => [
+//						'Name' => 'Server 4',
+//						'Name' => 'Server 5',
+//					]
+//				]
+//			],
+//			[
+//				[
+//					'evaluation_type' => 'Or',
+//					'tags' => [
+//						[
+//							'name' => 'test',
+//							'operator' => 'Does not equal',
+//							'value' => 'test123'
+//						],
+//					],
+//					'result' => [
+//						'Name' => 'Server 4',
+//						'Name' => 'Server 5',
+//					]
+//				]
+//			],
+//			[
+//				[
+//					'children' => [
+//						'id:filter_without_children'
+//					],
+//					'result' => [
+//						'Name' => 'Server 1',
+//						'Name' => 'Server 4',
+//						'Name' => 'Server 5'
+//					]
+//				]
+//			],
+//			[
+//				[
+//					'problem' => [
+//						'id:filter_without_problem_tags'
+//					],
+//					'result' => [
+//						'Name' => 'Server 1',
+//						'Name' => 'Server 2',
+//						'Name' => 'Server 3',
+//						'Name' => 'Server 4'
+//					]
+//				]
+//			],
+//			[
+//				[
+//					'status' => [
+//						'id:filter_status_2'
+//					],
+//					'result' => [
+//						'Name' => 'Server with problem',
+//					]
+//				]
+//			]
+		];
+	}
+
 	/**
-	 * @dataProvider getFilterData
+	 * @dataProvider getFilterCommonData
 	 */
 	public function testPageMonitoringServices_FilterView($data)
 	{
@@ -583,119 +753,52 @@ class testPageMonitoringServices extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider getFilterData
+	 * @dataProvider getFilterEditData
+	 * @dataProvider getFilterCommonData
 	 */
 	public function testPageMonitoringServices_FilterEdit($data)
 	{
 		$this->checkFiltering($data, self::EDIT);
 	}
 
-	private function checkFiltering($data, $edit = false)
-	{
-		if ($edit === false) {
-			$this->page->login()->open('zabbix.php?action=service.list');
-		}
-		else {
-			$this->page->login()->open('zabbix.php?action=service.list.edit');
-		}
+	private function checkFiltering($data, $edit = false){
+		$this->page->login()->open(($edit === false) ? 'zabbix.php?action=service.list' :
+				'zabbix.php?action=service.list.edit'
+		);
+		$filter_form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 
-		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
+		// Reset filter in case if some filtering remained before ongoing test case.
+		$filter_form->query('button:Reset')->one()->click();
 
-		// Check filter collapse/expand.
-		foreach (['true', 'false'] as $status) {
-			$filter_tab = $this->query('xpath://a[contains(@class, "filter-trigger")]')->one();
-			$filter_tab->parents('xpath:/li[@aria-expanded="'.$status.'"]')->one()->click();
-		}
+		// Fill filter form with data.
+		$filter_form->fill(CTestArrayHelper::get($data, 'filter'));
 
-		$filter_form = $this->query('name:zbx_filter')->asFluidForm()->one();
-		if ($edit === false) {
-			// Check filter fields.
-			$this->assertEquals(['Name', 'Status', 'Tags'], $filter_form->getLabels()->asText());
-		}
-		else {
-			$this->assertEquals(['Name', 'Status', 'Only services without children', 'Only services without problem tags', 'Tags'], $filter_form->getLabels()->asText());
-
-			$filter_form->query('id:filter_without_children')->asCheckbox()->one()->isChecked(false);
-			$filter_form->query('id:filter_without_problem_tags')->asCheckbox()->one()->isChecked(false);
-		}
-
-		foreach (['Any', 'OK', 'Problem'] as $show_tag) {
-			$this->assertTrue($filter_form->query('xpath://ul[@id="filter_status"]/li/label[text()="'.$show_tag.'"]')->exists());
-		};
-
-		foreach (['And/Or', 'Or'] as $show_tag) {
-			$this->assertTrue($filter_form->query('xpath://ul[@id="filter_evaltype"]/li/label[text()="'.$show_tag.'"]')->exists());
-		};
-
-		// Check filter buttons.
-		foreach (['Apply', 'Reset'] as $button) {
-			$this->assertTrue($filter_form->query('button', $button)->exists());
-		}
-
-		if (array_key_exists('evaluation_type', $data)) {
-			$form->fill(['id:filter_evaltype' => $data['evaluation_type']]);
-			$this->setTags($data['tags']);
-			$form->submit();
-			$this->page->waitUntilReady();
-
-			// Check filtered result.
-			$filtering = $this->getTableResult('Name');
-			$filtering = array_values($filtering);
-			$this->assertTableDataColumn($filtering, 'Name');
-
-			// Reset filter due to not influence further tests.
-			$form->query('button:Reset')->one()->click();
-		}
-
-		// Filter by name
-		$form->fill(['id:filter_name' => 'Server 3']);
-		$form->submit();
-		$this->assertEquals(['Server 3 1'], $this->getTableData());
-
-		// Reset filter due to not influence further tests.
-		$form->query('button:Reset')->one()->click();
-
-		if (array_key_exists('status', $data)) {
-			$form->fill(['id:filter_status' => 'Problem']);
-			$form->submit();
-
-			$filtering = $this->getTableResult('Name');
-			$filtering = array_values($filtering);
-			$this->assertTableDataColumn($filtering, 'Name');
-		}
-
-		if($edit) {
-
-			if (array_key_exists('children', $data)) {
-				$this->query($data['children'])->asCheckbox()->one()->check();
+		// If data contains Tags fill them separataly, because tags form is more complicated.
+		if (CTestArrayHelper::get($data, 'Tags')) {
+			if (CTestArrayHelper::get($data['Tags'], 'Source')) {
+				$filter_form->getField('id:filter_tag_source')->asSegmentedRadio()->fill($data['Tags']['Source']);
 			}
-
-			if (array_key_exists('problem', $data)) {
-				$this->query($data['problem'])->asCheckbox()->one()->check();
+			if (CTestArrayHelper::get($data['Tags'], 'Evaluation')) {
+				$filter_form->getField('id:filter_evaltype')->asSegmentedRadio()->fill($data['Tags']['Evaluation']);
 			}
-
-			$form->submit();
-			$this->page->waitUntilReady();
-
-			// Check filtered result.
-
-			if (array_key_exists('children', $data)) {
-				$filtering = $this->getTableResult('Name');
-				$filtering = array_values($filtering);
-				$this->assertTableDataColumn($filtering, 'Name');
-			}
-
-			if (array_key_exists('problem', $data)) {
-				$filtering = $this->getTableResult('Name');
-				$filtering = array_values($filtering);
-				$this->assertTableDataColumn($filtering, 'Name');
-			}
-
-
-			// Reset filter due to not influence further tests.
-			$form->query('button:Reset')->one()->click();
+			$filter_form->getField('id:filter-tags')->asMultifieldTable()->fill(CTestArrayHelper::get($data, 'Tags.tags'));
 		}
 
+		$filter_form->submit();
+		$this->page->waitUntilReady();
+
+		// Check filtered result.
+		$this->assertTableDataColumn($data['result'], 'Name');
+
+		// Here code for checking breadcrumbs should be.
+		/*
+		 *
+		 *
+		 *
+		 */
+
+		// Reset filter due to not interfere next tests.s
+		$filter_form->query('button:Reset')->one()->click();
 	}
 
 	public function testPageMonitoringServices_ResetButton() {
