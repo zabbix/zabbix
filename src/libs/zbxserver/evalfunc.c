@@ -3453,6 +3453,197 @@ static void	history_to_dbl_vector(const zbx_history_record_t *v, int n, unsigned
 	}
 }
 
+#define CHANGECOUNT_UI64(op)								\
+	for (i = 0; i < values.values_num - 1; i++)					\
+	{										\
+		if (values.values[i + 1].value.ui64 op values.values[i].value.ui64)	\
+			count++;							\
+	}										\
+
+#define CHANGECOUNT_DBL(op, epsi_op)							\
+	for (i = 0; i < values.values_num - 1; i++)					\
+	{										\
+		if (values.values[i + 1].value.dbl op					\
+				(values.values[i].value.dbl epsi_op ZBX_DOUBLE_EPSILON))\
+			count++;							\
+	}										\
+
+/* flags for evaluate_CHANGECOUNT() */
+#define CHANGE_ALL	0
+#define CHANGE_INC	1
+#define CHANGE_DEC	2
+
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_CHANGECOUNT                                             *
+ *                                                                            *
+ * Purpose: evaluate function 'changecount' for the item                      *
+ *                                                                            *
+ * Parameters: value      - [OUT] the function return value                   *
+ *             item       - [IN] item (performance metric)                    *
+ *             parameters - [IN] mode, increases, decreases or all changes    *
+ *             error      - [OUT] the error message if function failed        *
+ *             ts         - [IN] the function execution time                  *
+ *             error      - [OUT] the error message if function failed        *
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	evaluate_CHANGECOUNT(zbx_variant_t *value, DC_ITEM *item, const char *parameters,
+		const zbx_timespec_t *ts, char **error)
+{
+
+	int				arg1, i, nparams, time_shift, ret = FAIL, seconds = 0, nvalues = 0, mode = CHANGE_ALL;
+	char				*arg2 = NULL;
+	zbx_value_type_t		arg1_type;
+	zbx_vector_history_record_t	values;
+	zbx_timespec_t			ts_end = *ts;
+	zbx_uint64_t			count = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_history_record_vector_create(&values);
+
+	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type &&
+			ITEM_VALUE_TYPE_STR != item->value_type)
+	{
+		*error = zbx_strdup(*error, "invalid value type");
+		goto out;
+	}
+
+	nparams = num_param(parameters);
+
+	if (1 > nparams || 2 < nparams)
+	{
+		*error = zbx_strdup(*error, "invalid number of parameters");
+		goto out;
+	}
+
+	if (SUCCEED != get_function_parameter_hist_range(ts->sec, parameters, 1, &arg1, &arg1_type, &time_shift) ||
+			ZBX_VALUE_NONE == arg1_type)
+	{
+		*error = zbx_strdup(*error, "invalid second parameter");
+		goto out;
+	}
+
+	if (1 < nparams && (SUCCEED != get_function_parameter_str(parameters, 2, &arg2)))
+	{
+		*error = zbx_strdup(*error, "invalid third parameter");
+		goto out;
+	}
+
+	if (NULL == arg2 || '\0' == *arg2 || (0 == strcmp("all", arg2)))
+		mode = CHANGE_ALL;
+	else if (0 == strcmp("dec", arg2))
+		mode = CHANGE_DEC;
+	else if (0 == strcmp("inc", arg2))
+		mode = CHANGE_INC;
+	else
+	{
+		*error = zbx_strdup(*error, "invalid third parameter");
+		goto out;
+	}
+
+	ts_end.sec -= time_shift;
+
+	switch (arg1_type)
+	{
+		case ZBX_VALUE_SECONDS:
+			seconds = arg1;
+			break;
+		case ZBX_VALUE_NVALUES:
+			nvalues = arg1;
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+	}
+
+	if (SUCCEED != zbx_vc_get_values(item->itemid, item->value_type, &values, seconds, nvalues, &ts_end))
+	{
+		*error = zbx_strdup(*error, "cannot get values from value cache");
+		goto out;
+	}
+
+	if (1 < values.values_num)
+	{
+		if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
+		{
+			if (CHANGE_ALL == mode)
+			{
+				CHANGECOUNT_UI64(!=);
+			}
+
+			else if (CHANGE_INC == mode)
+			{
+				CHANGECOUNT_UI64(<);
+			}
+
+			else if (CHANGE_DEC == mode)
+			{
+				CHANGECOUNT_UI64(>);
+			}
+
+		}
+
+		else if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
+		{
+			if (CHANGE_ALL == mode)
+			{
+				for (i = 0; i < values.values_num - 1; i++)
+				{
+					if (SUCCEED != zbx_double_compare(values.values[i + 1].value.dbl, values.values[i].value.dbl))
+					{
+						count++;
+					}
+				}
+			}
+
+			else if (CHANGE_INC == mode)
+			{
+				CHANGECOUNT_DBL(<, -);
+			}
+
+			else if (CHANGE_DEC == mode)
+			{
+				CHANGECOUNT_DBL(>, +);
+			}
+
+		}
+
+		else if (ITEM_VALUE_TYPE_STR == item->value_type)
+		{
+			for (i = 0; i < values.values_num - 1; i++)
+			{
+				if (0 != strcmp(values.values[i + 1].value.str, values.values[i].value.str))
+					count++;
+			}
+		}
+
+		else
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+		}
+
+		ret = SUCCEED;
+		zbx_variant_set_ui64(value, count);
+	}
+
+	else
+		*error = zbx_strdup(*error, "not enough data");
+
+out:
+	zbx_history_record_vector_destroy(&values, item->value_type);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+#undef CHANGE_ALL
+#undef CHANGE_INC
+#undef CHANGE_DEC
+
 /******************************************************************************
  *                                                                            *
  * Function: evaluate_statistical_func                                        *
@@ -3654,6 +3845,10 @@ int	evaluate_function2(zbx_variant_t *value, DC_ITEM *item, const char *function
 	else if (0 == strcmp(function, "rate"))
 	{
 		ret = evaluate_RATE(value, item, parameter, ts, error);
+	}
+	else if (0 == strcmp(function, "changecount"))
+	{
+		ret = evaluate_CHANGECOUNT(value, item, parameter, ts, error);
 	}
 	else
 	{
