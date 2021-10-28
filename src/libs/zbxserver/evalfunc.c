@@ -3533,11 +3533,17 @@ static int	evaluate_CHANGECOUNT(zbx_variant_t *value, DC_ITEM *item, const char 
 	}
 
 	if (NULL == arg2 || '\0' == *arg2 || (0 == strcmp("all", arg2)))
+	{
 		mode = CHANGE_ALL;
+	}
 	else if (0 == strcmp("dec", arg2))
+	{
 		mode = CHANGE_DEC;
+	}
 	else if (0 == strcmp("inc", arg2))
+	{
 		mode = CHANGE_INC;
+	}
 	else
 	{
 		*error = zbx_strdup(*error, "invalid third parameter");
@@ -3592,9 +3598,7 @@ static int	evaluate_CHANGECOUNT(zbx_variant_t *value, DC_ITEM *item, const char 
 				for (i = 0; i < values.values_num - 1; i++)
 				{
 					if (SUCCEED != zbx_double_compare(values.values[i + 1].value.dbl, values.values[i].value.dbl))
-					{
 						count++;
-					}
 				}
 			}
 
