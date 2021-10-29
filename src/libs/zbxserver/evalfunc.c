@@ -3553,6 +3553,9 @@ static int	evaluate_CHANGECOUNT(zbx_variant_t *value, DC_ITEM *item, const char 
 		case ZBX_VALUE_NVALUES:
 			nvalues = arg1;
 			break;
+		case ZBX_VALUE_NONE:
+			*error = zbx_strdup(*error, "invalid second parameter");
+			goto out;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 	}
