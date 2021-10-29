@@ -1318,7 +1318,6 @@ static int	get_dir_names(const char *filename, char **basename, char **dirname, 
 	*dirname = zbx_dsprintf(NULL, "%s", ptr2);
 	zbx_free(ptr2);
 
-
 	return SUCCEED;
 }
 
