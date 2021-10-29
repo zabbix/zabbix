@@ -2232,15 +2232,9 @@ static void	vc_flag_duplicates(zbx_vector_ptr_t *history, zbx_vector_ptr_t *dupl
 
 		if (FAIL != (idx_cached = zbx_vector_ptr_search(history, dupl_value, history_value_compare_func)))
 		{
-			ZBX_DC_HISTORY	*cached_value = history->values[idx_cached];
+			ZBX_DC_HISTORY	*cached_value = (ZBX_DC_HISTORY *)history->values[idx_cached];
 
-			if (cached_value->value_type == ITEM_VALUE_TYPE_LOG ||
-					cached_value->value_type == ITEM_VALUE_TYPE_STR ||
-					cached_value->value_type == ITEM_VALUE_TYPE_TEXT)
-			{
-				dc_history_clean_value(cached_value);
-			}
-
+			dc_history_clean_value(cached_value);
 			cached_value->flags |= ZBX_DC_FLAGS_NOT_FOR_HISTORY;
 		}
 	}
@@ -2274,7 +2268,7 @@ static void	db_fetch_duplicates(zbx_history_dupl_select_t *query, unsigned char 
 	zbx_free(query->sql);
 }
 
-void	remove_history_duplicates(zbx_vector_ptr_t *history)
+static void	remove_history_duplicates(zbx_vector_ptr_t *history)
 {
 	int				i;
 	zbx_history_dupl_select_t	select_flt = {.table_name = "history"},
@@ -2363,10 +2357,10 @@ static int	add_history(ZBX_DC_HISTORY *history, int history_num, zbx_vector_ptr_
  ******************************************************************************/
 static int	DBmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 {
-	int			i, ret, ret_flush = 0;
+	int			ret, ret_flush = 0;
 	zbx_vector_ptr_t	history_values;
 
-	zabbix_log(3, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_ptr_create(&history_values);
 	zbx_vector_ptr_reserve(&history_values, history_num);
