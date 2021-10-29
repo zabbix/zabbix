@@ -3858,3 +3858,29 @@ int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, unsigne
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_md5buf2str                                                   *
+ *                                                                            *
+ * Purpose: get a textual representation of md5 sum                           *
+ *                                                                            *
+ * Parameters:                                                                *
+ *          md5 - [IN] buffer with md5 sum                                    *
+ *          str - [OUT] preallocated string with a text representation of md5 *
+ *                     sum. String size must be at least 33 bytes.            *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_md5buf2str(const md5_byte_t *md5, char *str)
+{
+	const char	*hex = "0123456789abcdef";
+	char		*p = str;
+	int		i;
+
+	for (i = 0; i < MD5_DIGEST_SIZE; i++)
+	{
+		*p++ = hex[md5[i] >> 4];
+		*p++ = hex[md5[i] & 15];
+	}
+
+	*p = '\0';
+}

@@ -448,26 +448,25 @@ static int	set_use_ino_by_fs_type(const char *path, int *use_ino, char **err_msg
  ******************************************************************************/
 static void	print_logfile_list(const struct st_logfile *logfiles, int logfiles_num)
 {
-	int	i;
-
-	for (i = 0; i < logfiles_num; i++)
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "   nr:%d filename:'%s' mtime:%d size:" ZBX_FS_UI64 " processed_size:"
-				ZBX_FS_UI64 " seq:%d copy_of:%d incomplete:%d dev:" ZBX_FS_UI64 " ino_hi:" ZBX_FS_UI64
-				" ino_lo:" ZBX_FS_UI64 " first_block_size:%d"
-				" first_block_md5:%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
-				i, logfiles[i].filename, logfiles[i].mtime, logfiles[i].size,
-				logfiles[i].processed_size, logfiles[i].seq, logfiles[i].copy_of,
-				logfiles[i].incomplete, logfiles[i].dev, logfiles[i].ino_hi, logfiles[i].ino_lo,
-				logfiles[i].first_block_size, logfiles[i].first_block_md5[0],
-				logfiles[i].first_block_md5[1], logfiles[i].first_block_md5[2],
-				logfiles[i].first_block_md5[3], logfiles[i].first_block_md5[4],
-				logfiles[i].first_block_md5[5], logfiles[i].first_block_md5[6],
-				logfiles[i].first_block_md5[7], logfiles[i].first_block_md5[8],
-				logfiles[i].first_block_md5[9], logfiles[i].first_block_md5[10],
-				logfiles[i].first_block_md5[11], logfiles[i].first_block_md5[12],
-				logfiles[i].first_block_md5[13], logfiles[i].first_block_md5[14],
-				logfiles[i].first_block_md5[15]);
+		int	i;
+
+		for (i = 0; i < logfiles_num; i++)
+		{
+			char	first_buf[33];			/* for MD5 sum representation with hex-digits: */
+								/* 2 * 16 bytes + '\0' */
+			zbx_md5buf2str(logfiles[i].first_block_md5, first_buf);
+
+			zabbix_log(LOG_LEVEL_DEBUG, "   nr:%d filename:'%s' mtime:%d size:" ZBX_FS_UI64
+					" processed_size:" ZBX_FS_UI64 " seq:%d copy_of:%d incomplete:%d dev:"
+					ZBX_FS_UI64 " ino_hi:" ZBX_FS_UI64 " ino_lo:" ZBX_FS_UI64
+					" first_block_size:%d first_block_md5:%s", i,
+					logfiles[i].filename, logfiles[i].mtime, logfiles[i].size,
+					logfiles[i].processed_size, logfiles[i].seq, logfiles[i].copy_of,
+					logfiles[i].incomplete, logfiles[i].dev, logfiles[i].ino_hi,
+					logfiles[i].ino_lo, logfiles[i].first_block_size, first_buf);
+		}
 	}
 }
 
@@ -535,6 +534,8 @@ static int	open_file_helper(const char *pathname, char **err_msg)
  * Parameters: fd       - [IN] file descriptor to close                       *
  *             pathname - [IN] pathname of file, used for error reporting     *
  *             err_msg  - [IN/OUT] error message why file could not be closed *
+ *                             unless an earlier error has been already       *
+ *                             reported                                       *
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
@@ -544,7 +545,8 @@ static int	close_file_helper(int fd, const char *pathname, char **err_msg)
 	if (0 == close(fd))
 		return SUCCEED;
 
-	*err_msg = zbx_dsprintf(*err_msg, "Cannot close file \"%s\": %s", pathname, zbx_strerror(errno));
+	if (NULL == *err_msg)
+		*err_msg = zbx_dsprintf(NULL, "Cannot close file \"%s\": %s", pathname, zbx_strerror(errno));
 
 	return FAIL;
 }
@@ -795,7 +797,7 @@ static int	is_same_file_logrt(const struct st_logfile *old_file, const struct st
 		/* has not been changed yet.                                     */
 		/* If the size has not changed on the next check, then we assume */
 		/* that some tampering was done and to be safe we will treat it  */
-		/* as a different file.                                          */
+		/* as a different file unless "noreread" option is specified.    */
 		if (0 == old_file->retry)
 		{
 			if (ZBX_LOG_ROTATION_NO_REREAD != options)
@@ -1346,7 +1348,7 @@ static int	find_old2new(const char * const old2new, int num_new, int i_old)
 static void	add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num, const char *filename,
 		zbx_stat_t *st)
 {
-	int	i = 0, cmp = 0;
+	int	i = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s' mtime:%d size:" ZBX_FS_UI64, __func__, filename,
 			(int)st->st_mtime, (zbx_uint64_t)st->st_size);
@@ -1384,7 +1386,9 @@ static void	add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 
 		if (st->st_mtime == (*logfiles)[i].mtime)
 		{
-			if (0 > (cmp = strcmp(filename, (*logfiles)[i].filename)))
+			int	cmp = strcmp(filename, (*logfiles)[i].filename);
+
+			if (0 > cmp)
 				continue;	/* (2) sort by descending name */
 
 			if (0 == cmp)
@@ -1414,7 +1418,7 @@ static void	add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 	(*logfiles)[i].retry = 0;
 	(*logfiles)[i].incomplete = 0;
 	(*logfiles)[i].copy_of = -1;
-#if !defined(_WINDOWS) && !defined(__MINGW32__)
+#if !defined(_WINDOWS) && !defined(__MINGW32__)		/* on MS Windows these attributes are not initialized here */
 	(*logfiles)[i].dev = (zbx_uint64_t)st->st_dev;
 	(*logfiles)[i].ino_lo = (zbx_uint64_t)st->st_ino;
 	(*logfiles)[i].ino_hi = 0;
@@ -1535,14 +1539,12 @@ static int	pick_logfiles(const char *directory, int mtime, const zbx_regexp_t *r
 {
 #if defined(_WINDOWS) || defined(__MINGW32__)
 	int			ret = FAIL;
-	char			*find_path = NULL, *file_name_utf8;
-	wchar_t			*find_wpath = NULL;
 	intptr_t		find_handle;
 	struct _wfinddata_t	find_data;
 
 	/* "open" Windows directory */
-	find_path = zbx_dsprintf(find_path, "%s*", directory);
-	find_wpath = zbx_utf8_to_unicode(find_path);
+	char	*find_path = zbx_dsprintf(NULL, "%s*", directory);
+	wchar_t	*find_wpath = zbx_utf8_to_unicode(find_path);
 
 	if (-1 == (find_handle = _wfindfirst(find_wpath, &find_data)))
 	{
@@ -1558,7 +1560,8 @@ static int	pick_logfiles(const char *directory, int mtime, const zbx_regexp_t *r
 
 	do
 	{
-		file_name_utf8 = zbx_unicode_to_utf8(find_data.name);
+		char	*file_name_utf8 = zbx_unicode_to_utf8(find_data.name);
+
 		pick_logfile(directory, file_name_utf8, mtime, re, logfiles, logfiles_alloc, logfiles_num);
 		zbx_free(file_name_utf8);
 	}
@@ -1591,9 +1594,7 @@ clean:
 	*use_ino = 1;
 
 	while (NULL != (d_ent = readdir(dir)))
-	{
 		pick_logfile(directory, d_ent->d_name, mtime, re, logfiles, logfiles_alloc, logfiles_num);
-	}
 
 	if (-1 == closedir(dir))
 	{
@@ -1916,7 +1917,6 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 #define BUF_SIZE	(256 * ZBX_KIBIBYTE)	/* The longest encodings use 4 bytes for every character. To send */
 						/* up to 64 k characters to Zabbix server a 256 kB buffer might be */
 						/* required. */
-
 	if (NULL == buf)
 		buf = (char *)zbx_malloc(buf, (size_t)(BUF_SIZE + 1));
 
