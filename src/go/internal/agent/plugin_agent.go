@@ -110,6 +110,8 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return 1, nil
 	case "agent.version":
 		return version.Long(), nil
+	case "agent.variant":
+		return 2, nil
 	}
 
 	return nil, fmt.Errorf("Not implemented: %s", key)
@@ -120,5 +122,6 @@ func init() {
 		"agent.hostname", "Returns Hostname from agent configuration.",
 		"agent.hostmetadata", "Returns string with agent host metadata.",
 		"agent.ping", "Returns agent availability check result.",
+		"agent.variant", "Returns agent variant.",
 		"agent.version", "Version of Zabbix agent.")
 }
