@@ -2356,9 +2356,7 @@ static int	DBmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 	zbx_vector_ptr_create(&history_values);
 	zbx_vector_ptr_reserve(&history_values, history_num);
 
-	ret = add_history(history, history_num, &history_values);
-
-	if (ret == HIST_DUP_REJECTED)
+	if (HIST_DUP_REJECTED == (ret = add_history(history, history_num, &history_values)))
 	{
 		remove_history_duplicates(history, history_num);
 		zbx_vector_ptr_clear(&history_values);

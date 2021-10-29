@@ -2583,14 +2583,12 @@ void	zbx_vc_reset(void)
 int	zbx_vc_add_values(zbx_vector_ptr_t *history)
 {
 	zbx_vc_item_t		*item;
-	int 			i, add_val_ret;
+	int 			i, ret;
 	ZBX_DC_HISTORY		*h;
 	time_t			expire_timestamp;
 
-	add_val_ret = zbx_history_add_values(history);
-
-	if (SUCCEED != add_val_ret)
-		return add_val_ret;
+	if (SUCCEED != (ret = zbx_history_add_values(history)))
+		return ret;
 
 	if (ZBX_VC_DISABLED == vc_state)
 		return SUCCEED;
