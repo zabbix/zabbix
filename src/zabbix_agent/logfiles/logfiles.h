@@ -48,8 +48,8 @@ struct	st_logfile
 	zbx_uint64_t	ino_hi;		/* Microsoft Windows: nFileIndexHigh or FileId.HighPart */
 	zbx_uint64_t	size;		/* st_size from stat() */
 	zbx_uint64_t	processed_size;	/* how far the Zabbix agent has analyzed the file */
-	int		first_block_size;	/* size of the initial part of file for which the md5 sum is */
-						/* calculated (in first_block_md5) */
+	int		md5_block_size;	/* size of the first and last blocks of file for which the md5 sum is */
+					/* calculated (in 'first_block_md5') */
 	md5_byte_t	first_block_md5[MD5_DIGEST_SIZE];	/* md5 sum of the initial part of the file */
 };
 
