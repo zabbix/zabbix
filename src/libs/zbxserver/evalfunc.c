@@ -3504,13 +3504,6 @@ static int	evaluate_CHANGECOUNT(zbx_variant_t *value, DC_ITEM *item, const char 
 
 	zbx_history_record_vector_create(&values);
 
-	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type &&
-			ITEM_VALUE_TYPE_STR != item->value_type)
-	{
-		*error = zbx_strdup(*error, "invalid value type");
-		goto out;
-	}
-
 	nparams = num_param(parameters);
 
 	if (1 > nparams || 2 < nparams)
@@ -3614,7 +3607,7 @@ static int	evaluate_CHANGECOUNT(zbx_variant_t *value, DC_ITEM *item, const char 
 
 		}
 
-		else if (ITEM_VALUE_TYPE_STR == item->value_type)
+		else if (ITEM_VALUE_TYPE_STR == item->value_type || ITEM_VALUE_TYPE_TEXT == item->value_type)
 		{
 			for (i = 0; i < values.values_num - 1; i++)
 			{
@@ -3623,9 +3616,21 @@ static int	evaluate_CHANGECOUNT(zbx_variant_t *value, DC_ITEM *item, const char 
 			}
 		}
 
+		else if (ITEM_VALUE_TYPE_LOG == item->value_type)
+		{
+			for (i = 0; i < values.values_num - 1; i++)
+			{
+				if (0 != strcmp(values.values[i + 1].value.log->value, values.values[i].value.log->value))
+				{
+					count++;
+				}
+			}
+		}
+
 		else
 		{
-			THIS_SHOULD_NEVER_HAPPEN;
+			*error = zbx_strdup(*error, "invalid value type");
+			goto out;
 		}
 
 		ret = SUCCEED;
