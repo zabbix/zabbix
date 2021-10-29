@@ -25,6 +25,7 @@ import (
 	"fmt"
 	"os"
 	"os/user"
+	"path/filepath"
 	"strconv"
 	"syscall"
 	"time"
@@ -44,6 +45,14 @@ func getFileInfo(info *os.FileInfo, name string) (fileinfo *fileInfo, err error)
 	if stat == nil {
 		return nil, fmt.Errorf("Cannot obtain %s permission information.", name)
 	}
+
+	fi.Pathname, err = filepath.Abs(name)
+	if err != nil {
+		return nil, fmt.Errorf("Cannot obtain %s path name.", name)
+	}
+
+	fi.Basename = filepath.Base(name)
+	fi.Dirname = filepath.Dir(name)
 
 	fi.Permissions = mode2str(stat.Mode)
 

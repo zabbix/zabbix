@@ -44,6 +44,7 @@ func checkMetrics(s scheduler.Scheduler) {
 		`vfs.file.get[c:\windows\win.ini]`,
 		`vfs.dir.size[c:\windows]`,
 		`vfs.dir.count[c:\windows]`,
+		`vfs.dir.get[c:\windows]`,
 		`net.dns[,zabbix.com]`,
 		`net.dns.record[,zabbix.com]`,
 		`net.tcp.dns[,zabbix.com]`,

@@ -30,6 +30,7 @@ OBJS = \
 	$(OUTPUTDIR)\algodefs.o \
 	$(OUTPUTDIR)\sysinfo_system.o \
 	$(OUTPUTDIR)\sysinfo_dns.o \
+	$(OUTPUTDIR)\sysinfo_file.o \
 	$(OUTPUTDIR)\sysinfo_dir.o \
 	$(OUTPUTDIR)\eventlog.o \
 	$(TARGETDIR)\resource.syso
