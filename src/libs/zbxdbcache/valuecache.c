@@ -2579,15 +2579,15 @@ void	zbx_vc_reset(void)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_vc_add_values(zbx_vector_ptr_t *history)
+int	zbx_vc_add_values(zbx_vector_ptr_t *history, int *ret_flush)
 {
 	zbx_vc_item_t		*item;
 	int			i, ret;
 	ZBX_DC_HISTORY		*h;
 	time_t			expire_timestamp;
 
-	if (SUCCEED != (ret = zbx_history_add_values(history)))
-		return ret;
+	if (SUCCEED != zbx_history_add_values(history, ret_flush))
+		return FAIL;
 
 	if (ZBX_VC_DISABLED == vc_state)
 		return SUCCEED;

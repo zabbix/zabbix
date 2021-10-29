@@ -158,7 +158,7 @@ static void	sql_writer_add_dbinsert(zbx_db_insert_t *db_insert)
  * Purpose: flushes bulk insert data into database                                  *
  *                                                                                  *
  ************************************************************************************/
-static int	sql_writer_flush(void)
+static int	sql_writer_flush(int *ret_flush)
 {
 	int	i, txn_error;
 
@@ -182,11 +182,16 @@ static int	sql_writer_flush(void)
 	sql_writer_release();
 
 	if (ZBX_DB_OK == txn_error)
-		return FLUSH_SUCCEED;
-	else if (ZBX_DB_FAIL == txn_error && zbx_db_last_errcode() == ERR_Z3008)
-		return FLUSH_DUPL_REJECTED;
+	{
+		return SUCCEED;
+	}
 	else
-		return FLUSH_FAIL;
+	{
+		if (ZBX_DB_FAIL == txn_error && zbx_db_last_errcode() == ERR_Z3008)
+			*ret_flush |= FLUSH_DUPL_REJECTED;
+
+		return FAIL;
+	}
 }
 
 /******************************************************************************************************************
@@ -702,11 +707,11 @@ static int	sql_add_values(zbx_history_iface_t *hist, const zbx_vector_ptr_t *his
  *           unrecoverable error occurs                                             *
  *                                                                                  *
  ************************************************************************************/
-static int	sql_flush(zbx_history_iface_t *hist)
+static int	sql_flush(zbx_history_iface_t *hist, int *ret_flush)
 {
 	ZBX_UNUSED(hist);
 
-	return sql_writer_flush();
+	return sql_writer_flush(ret_flush);
 }
 
 /************************************************************************************

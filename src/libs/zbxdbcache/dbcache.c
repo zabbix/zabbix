@@ -2331,7 +2331,7 @@ void	remove_history_duplicates(zbx_vector_ptr_t *history)
 	zbx_vector_ptr_destroy(&duplicates);
 }
 
-static int	add_history(ZBX_DC_HISTORY *history, int history_num, zbx_vector_ptr_t *history_values)
+static int	add_history(ZBX_DC_HISTORY *history, int history_num, zbx_vector_ptr_t *history_values, int *ret_flush)
 {
 	int	i, ret = SUCCEED;
 
@@ -2346,7 +2346,7 @@ static int	add_history(ZBX_DC_HISTORY *history, int history_num, zbx_vector_ptr_
 	}
 
 	if (0 != history_values->values_num)
-		ret = zbx_vc_add_values(history_values);
+		ret = zbx_vc_add_values(history_values, ret_flush);
 
 	return ret;
 }
@@ -2363,19 +2363,21 @@ static int	add_history(ZBX_DC_HISTORY *history, int history_num, zbx_vector_ptr_
  ******************************************************************************/
 static int	DBmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 {
-	int			i, ret;
+	int			i, ret, ret_flush = 0;
 	zbx_vector_ptr_t	history_values;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zabbix_log(3, "In %s()", __func__);
 
 	zbx_vector_ptr_create(&history_values);
 	zbx_vector_ptr_reserve(&history_values, history_num);
 
-	if (FLUSH_DUPL_REJECTED == (ret = add_history(history, history_num, &history_values)))
+	if (FAIL == (ret = add_history(history, history_num, &history_values, &ret_flush)) &&
+			FLUSH_DUPL_REJECTED == ret_flush)
 	{
 		remove_history_duplicates(&history_values);
 		zbx_vector_ptr_clear(&history_values);
-		ret = add_history(history, history_num, &history_values);
+		ret_flush = 0;
+		ret = add_history(history, history_num, &history_values, &ret_flush);
 	}
 
 	zbx_vector_ptr_destroy(&history_values);
