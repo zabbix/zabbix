@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-28 10:30+0300\n"
+"POT-Creation-Date: 2021-10-29 19:55+0300\n"
 "PO-Revision-Date: 2014-06-04 11:22+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zetosoftware.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -3924,7 +3924,7 @@ msgstr "Limit czasu połączenia"
 msgid "Connection timeout of %1$s seconds exceeded when connecting to Zabbix server \"%2$s\"."
 msgstr "Podczas próby połączenia do serwera Zabbix \"%2$s\" przekroczono maksymalny czas połączenia %1$s sekund."
 
-#: include/classes/server/CZabbixServer.php:608
+#: include/classes/server/CZabbixServer.php:609
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%1$s\" failed. Possible reasons:\n"
@@ -3935,7 +3935,7 @@ msgstr ""
 "1. Nieprawidłowy serwer IP/DNS w pliku \"zabbix.conf.php\";\n"
 "2. Nieprawidłowa konfiguracja serwera DNS.\n"
 
-#: include/classes/server/CZabbixServer.php:596
+#: include/classes/server/CZabbixServer.php:597
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%1$s\" refused. Possible reasons:\n"
@@ -3950,7 +3950,7 @@ msgstr ""
 "3. Proces Zabbix nie został uruchomiony;\n"
 "4. Zapora sieciowa blokuje połączenia TCP.\n"
 
-#: include/classes/server/CZabbixServer.php:604
+#: include/classes/server/CZabbixServer.php:605
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%1$s\" timed out. Possible reasons:\n"
@@ -3960,6 +3960,10 @@ msgstr ""
 "Upłynął limit czasu połączenia z serwerem \"%1$s\" . Możliwe przyczyny:\n"
 "1. Nieprawidłowy serwer IP/DNS w pliku \"zabbix.conf.php\";\n"
 "4. Zapora sieciowa blokuje połączenia TCP.\n"
+
+#: include/classes/server/CZabbixServer.php:590
+msgid "Connection to Zabbix server failed. Incorrect configuration."
+msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:538
 msgid "Connection will not be encrypted because it uses a socket file (on Unix) or shared memory (Windows)."
@@ -19690,7 +19694,7 @@ msgstr "Formularz logowania Zabbix"
 msgid "Zabbix server"
 msgstr "Serwer Zabbix"
 
-#: include/classes/server/CZabbixServer.php:600
+#: include/classes/server/CZabbixServer.php:601
 #, c-format
 msgid ""
 "Zabbix server \"%1$s\" cannot be reached. Possible reasons:\n"
