@@ -1148,7 +1148,6 @@ static void	zbx_check_db(void)
 	if(SUCCEED == DBfield_exists("config", "dbversion_status"))
 	{
 		zbx_json_initarray(&db_version_json, ZBX_JSON_STAT_BUF_LEN);
-		zbx_db_version_json_create(&db_version_json, &db_version_info);
 
 		if (SUCCEED == DBpk_exists("history"))
 		{
@@ -1159,6 +1158,8 @@ static void	zbx_check_db(void)
 			db_version_info.history_pk = 0;
 			zabbix_log(LOG_LEVEL_WARNING, "database could be upgraded to use primary keys in history tables");
 		}
+
+		zbx_db_version_json_create(&db_version_json, &db_version_info);
 
 		if (SUCCEED == result)
 			zbx_history_check_version(&db_version_json);
