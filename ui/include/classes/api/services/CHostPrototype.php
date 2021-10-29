@@ -438,7 +438,7 @@ class CHostPrototype extends CHostBase {
 				'type' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT]), 'default' => ZBX_MACRO_TYPE_TEXT],
 				'value' =>				['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
 											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')],
-											['if' => ['field' => 'type', 'in' => ZBX_MACRO_TYPE_VAULT], 'type' => API_VAULT_SECRET, 'length' => DB::getFieldLength('hostmacro', 'value')]
+											['else' => true, 'type' => API_VAULT_SECRET, 'length' => DB::getFieldLength('hostmacro', 'value')]
 				]],
 				'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')]
 			]],
@@ -541,7 +541,7 @@ class CHostPrototype extends CHostBase {
 				'value' =>				['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'type', 'in' => ZBX_MACRO_TYPE_TEXT], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hostmacro', 'value')],
 											['if' => ['field' => 'type', 'in' => ZBX_MACRO_TYPE_SECRET], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')],
-											['if' => ['field' => 'type', 'in' => ZBX_MACRO_TYPE_VAULT], 'type' => API_VAULT_SECRET, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hostmacro', 'value')]
+											['else' => true, 'type' => API_VAULT_SECRET, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hostmacro', 'value')]
 				]],
 				'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')]
 			]],
