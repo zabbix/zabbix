@@ -42,8 +42,8 @@ class CWidgetFormItem extends CWidgetForm {
 		$field_show = (new CWidgetFieldCheckBoxList('show', _('Show')))
 			->setDefault([WIDGET_ITEM_SHOW_DESCRIPTION, WIDGET_ITEM_SHOW_VALUE, WIDGET_ITEM_SHOW_TIME,
 				WIDGET_ITEM_SHOW_CHANGE_INDICATOR
-			]
-		);
+			])
+			->setFlags(CWidgetField::FLAG_LABEL_ASTERISK);
 
 		if (array_key_exists('show', $this->data)) {
 			$field_show->setValue($this->data['show']);
@@ -120,7 +120,7 @@ class CWidgetFormItem extends CWidgetForm {
 		$this->fields[$field_desc_bold->getName()] = $field_desc_bold;
 
 		// description color
-		$field_desc_color = (new CWidgetFieldColor('desc_color', _('Color')))->setDefault('');
+		$field_desc_color = (new CWidgetFieldColor('desc_color', _('Color')));
 
 		if (array_key_exists('desc_color', $this->data)) {
 			$field_desc_color->setValue($this->data['desc_color']);
@@ -200,7 +200,7 @@ class CWidgetFormItem extends CWidgetForm {
 		$this->fields[$field_value_bold->getName()] = $field_value_bold;
 
 		// value color
-		$field_value_color = (new CWidgetFieldColor('value_color', _('Color')))->setDefault('');
+		$field_value_color = (new CWidgetFieldColor('value_color', _('Color')));
 
 		if (array_key_exists('value_color', $this->data)) {
 			$field_value_color->setValue($this->data['value_color']);
@@ -262,7 +262,7 @@ class CWidgetFormItem extends CWidgetForm {
 		$this->fields[$field_units_bold->getName()] = $field_units_bold;
 
 		// units color
-		$field_units_color = (new CWidgetFieldColor('units_color', _('Color')))->setDefault('');
+		$field_units_color = (new CWidgetFieldColor('units_color', _('Color')));
 
 		if (array_key_exists('units_color', $this->data)) {
 			$field_units_color->setValue($this->data['units_color']);
@@ -321,7 +321,7 @@ class CWidgetFormItem extends CWidgetForm {
 		$this->fields[$field_time_bold->getName()] = $field_time_bold;
 
 		// time color
-		$field_time_color = (new CWidgetFieldColor('time_color', _('Color')))->setDefault('');
+		$field_time_color = (new CWidgetFieldColor('time_color', _('Color')));
 
 		if (array_key_exists('time_color', $this->data)) {
 			$field_time_color->setValue($this->data['time_color']);
@@ -330,7 +330,7 @@ class CWidgetFormItem extends CWidgetForm {
 		$this->fields[$field_time_color->getName()] = $field_time_color;
 
 		// change indicator up arrow color
-		$field_up_color = (new CWidgetFieldColor('up_color', ''))->setDefault('');
+		$field_up_color = (new CWidgetFieldColor('up_color', ''));
 
 		if (array_key_exists('up_color', $this->data)) {
 			$field_up_color->setValue($this->data['up_color']);
@@ -339,7 +339,7 @@ class CWidgetFormItem extends CWidgetForm {
 		$this->fields[$field_up_color->getName()] = $field_up_color;
 
 		// change indicator down arrow color
-		$field_down_color = (new CWidgetFieldColor('down_color', ''))->setDefault('');
+		$field_down_color = (new CWidgetFieldColor('down_color', ''));
 
 		if (array_key_exists('down_color', $this->data)) {
 			$field_down_color->setValue($this->data['down_color']);
@@ -348,7 +348,7 @@ class CWidgetFormItem extends CWidgetForm {
 		$this->fields[$field_down_color->getName()] = $field_down_color;
 
 		// change indicator up/down arrow color
-		$field_updown_color = (new CWidgetFieldColor('updown_color', ''))->setDefault('');
+		$field_updown_color = (new CWidgetFieldColor('updown_color', ''));
 
 		if (array_key_exists('updown_color', $this->data)) {
 			$field_updown_color->setValue($this->data['updown_color']);
@@ -357,7 +357,7 @@ class CWidgetFormItem extends CWidgetForm {
 		$this->fields[$field_updown_color->getName()] = $field_updown_color;
 
 		// background color
-		$field_bg_color = (new CWidgetFieldColor('bg_color', _('Background color')))->setDefault('');
+		$field_bg_color = (new CWidgetFieldColor('bg_color', _('Background color')));
 
 		if (array_key_exists('bg_color', $this->data)) {
 			$field_bg_color->setValue($this->data['bg_color']);

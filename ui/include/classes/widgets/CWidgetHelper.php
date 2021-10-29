@@ -240,13 +240,14 @@ class CWidgetHelper {
 
 	/**
 	 * @param CWidgetFieldColor $field
+	 * @param bool              $use_default  Tell the Color picker whether to use Default color feature or not.
 	 *
 	 * @return CColor
 	 */
-	public static function getColor($field, $default = false) {
-		// appendColorPickerJs(false), because the script reponsible for it is in witget.item.form.view.
+	public static function getColor($field, $use_default = false) {
+		// appendColorPickerJs(false), because the script reponsible for it is in widget.item.form.view.
 		$color_picker = (new CColor($field->getName(), $field->getValue()))->appendColorPickerJs(false);
-		if ($default) {
+		if ($use_default) {
 			$color_picker->enableUseDefault();
 		}
 		return $color_picker;

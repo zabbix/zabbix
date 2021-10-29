@@ -181,7 +181,7 @@ $form->addItem($form_list);
 
 // Append color picker to widget body instead of whole HTML body. Process checkboxes and form block visibility.
 $scripts[] = '$(".input-color-picker input", $(".overlay-dialogue-body"))'.
-	'.colorpicker({appendTo: ".overlay-dialogue-body"});'.
+	'.colorpicker({appendTo: ".overlay-dialogue-body", use_default: true});'.
 
 	'var $show = $(\'input[id^="show_"]\').not("#show_header");'.
 
@@ -199,6 +199,26 @@ $scripts[] = '$(".input-color-picker input", $(".overlay-dialogue-body"))'.
 	'});'.
 
 	'for (var i = 0; i < $show.length; i++) {'.
+		// If this is last checked checkbox, prevent unchecking it.
+		'$($show[i]).click(function(e) {'.
+			'var checked = false;'.
+
+			// On click event current checkbox state before the click is in reverse.
+			'if (!this.checked) {'.
+				'for (var j = 0; j < $show.length; j++) {'.
+					'if ($show[j].id !== this.id) {'.
+						'checked = checked || $show[j].checked;'.
+					'}'.
+				'}'.
+
+				'if (!checked) {'.
+					'e.preventDefault();'.
+
+					'return false;'.
+				'}'.
+			'}'.
+		'});'.
+
 		'$($show[i]).change(function() {'.
 			'switch($(this).val()) {'.
 				'case "'.WIDGET_ITEM_SHOW_DESCRIPTION.'":'.
@@ -207,7 +227,7 @@ $scripts[] = '$(".input-color-picker input", $(".overlay-dialogue-body"))'.
 					'}'.
 					'break;'.
 
-					'case "'.WIDGET_ITEM_SHOW_VALUE.'":'.
+				'case "'.WIDGET_ITEM_SHOW_VALUE.'":'.
 					'if ($("#adv_conf").prop("checked")) {'.
 						'$("#value-row").toggle(this.checked);'.
 					'}'.
