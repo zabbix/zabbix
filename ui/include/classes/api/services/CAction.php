@@ -709,9 +709,9 @@ class CAction extends CApiService {
 			$action['filter']['formula'] = ($action['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION)
 				? CConditionHelper::replaceLetterIds($action['filter']['formula'],
 					array_column(
-						($is_update && !array_key_exists('conditions', $action['filter']))
-							? $db_actions[$action['actionid']]['filter']['conditions']
-							: $action['filter']['conditions'],
+						array_key_exists('conditions', $action['filter'])
+							? $action['filter']['conditions']
+							: ($is_update ? $db_actions[$action['actionid']]['filter']['conditions'] : []),
 						'conditionid', 'formulaid'
 					)
 				)
@@ -2704,9 +2704,9 @@ class CAction extends CApiService {
 
 				$constants = array_column($condition_formula_parser->constants, 'value', 'value');
 
-				$conditions = ($is_update && !array_key_exists('conditions', $action['filter']))
-					? $db_actions[$action['actionid']]['filter']['conditions']
-					: $action['filter']['conditions'];
+				$conditions = array_key_exists('conditions', $action['filter'])
+					? $action['filter']['conditions']
+					: ($is_update ? $db_actions[$action['actionid']]['filter']['conditions'] : []);
 
 				if (count($conditions) != count($constants)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
