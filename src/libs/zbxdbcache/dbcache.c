@@ -2208,23 +2208,40 @@ typedef struct
 }
 zbx_history_dupl_select_t;
 
-static void	vc_flag_duplicates(ZBX_DC_HISTORY *history, int history_num, zbx_vector_ptr_t *duplicates)
+static int	history_value_compare_func(const void *d1, const void *d2)
 {
-	int	i, j;
+	const ZBX_DC_HISTORY	*i1 = *(const ZBX_DC_HISTORY **)d1;
+	const ZBX_DC_HISTORY	*i2 = *(const ZBX_DC_HISTORY **)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(i1->value_type, i2->value_type);
+	ZBX_RETURN_IF_NOT_EQUAL(i1->itemid, i2->itemid);
+	ZBX_RETURN_IF_NOT_EQUAL(i1->ts.sec, i2->ts.sec);
+	ZBX_RETURN_IF_NOT_EQUAL(i1->ts.ns, i2->ts.ns);
+
+	return 0;
+}
+
+static void	vc_flag_duplicates(zbx_vector_ptr_t *history, zbx_vector_ptr_t *duplicates)
+{
+	int	i;
 
 	for (i = 0; i < duplicates->values_num; i++)
 	{
-		ZBX_DC_HISTORY *hd = duplicates->values[i];
+		ZBX_DC_HISTORY	*dupl_value = duplicates->values[i];
+		int		idx_cached;
 
-		for (j = 0; j < history_num; j++)
+		if (FAIL != (idx_cached = zbx_vector_ptr_search(history, dupl_value, history_value_compare_func)))
 		{
-			ZBX_DC_HISTORY *h = &history[j];
+			ZBX_DC_HISTORY	*cached_value = history->values[idx_cached];
 
-			if (h->value_type != hd->value_type)
-				continue;
+			if (cached_value->value_type == ITEM_VALUE_TYPE_LOG ||
+					cached_value->value_type == ITEM_VALUE_TYPE_STR ||
+					cached_value->value_type == ITEM_VALUE_TYPE_TEXT)
+			{
+				dc_history_clean_value(cached_value);
+			}
 
-			if (hd->itemid == h->itemid && hd->ts.sec == h->ts.sec && hd->ts.ns == h->ts.ns)
-				h->flags |= ZBX_DC_FLAGS_NOT_FOR_HISTORY;
+			cached_value->flags |= ZBX_DC_FLAGS_NOT_FOR_HISTORY;
 		}
 	}
 }
@@ -2257,7 +2274,7 @@ static void	db_fetch_duplicates(zbx_history_dupl_select_t *query, unsigned char 
 	zbx_free(query->sql);
 }
 
-void	remove_history_duplicates(ZBX_DC_HISTORY *history, int history_num)
+void	remove_history_duplicates(zbx_vector_ptr_t *history)
 {
 	int				i;
 	zbx_history_dupl_select_t	select_flt = {.table_name = "history"},
@@ -2269,14 +2286,11 @@ void	remove_history_duplicates(ZBX_DC_HISTORY *history, int history_num)
 
 	zbx_vector_ptr_create(&duplicates);
 
-	for (i = 0; i < history_num; i++)
+	for (i = 0; i < history->values_num; i++)
 	{
-		ZBX_DC_HISTORY			*h = &history[i];
+		ZBX_DC_HISTORY			*h = history->values[i];
 		zbx_history_dupl_select_t	*select_ptr;
 		char				*separator = " or";
-
-		if (0 != (ZBX_DC_FLAGS_NOT_FOR_HISTORY & h->flags))
-			continue;
 
 		if (h->value_type == ITEM_VALUE_TYPE_FLOAT)
 			select_ptr = &select_flt;
@@ -2311,7 +2325,7 @@ void	remove_history_duplicates(ZBX_DC_HISTORY *history, int history_num)
 	db_fetch_duplicates(&select_log, ITEM_VALUE_TYPE_LOG, &duplicates);
 	db_fetch_duplicates(&select_text, ITEM_VALUE_TYPE_TEXT, &duplicates);
 
-	vc_flag_duplicates(history, history_num, &duplicates);
+	vc_flag_duplicates(history, &duplicates);
 
 	zbx_vector_ptr_clear_ext(&duplicates, (zbx_clean_func_t)zbx_ptr_free);
 	zbx_vector_ptr_destroy(&duplicates);
@@ -2359,7 +2373,7 @@ static int	DBmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 	if (HIST_DUP_REJECTED == (ret = add_history(history, history_num, &history_values)))
 	{
-		remove_history_duplicates(history, history_num);
+		remove_history_duplicates(&history_values);
 		zbx_vector_ptr_clear(&history_values);
 		ret = add_history(history, history_num, &history_values);
 	}
