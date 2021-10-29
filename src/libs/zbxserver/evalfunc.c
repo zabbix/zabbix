@@ -3621,9 +3621,7 @@ static int	evaluate_CHANGECOUNT(zbx_variant_t *value, DC_ITEM *item, const char 
 			for (i = 0; i < values.values_num - 1; i++)
 			{
 				if (0 != strcmp(values.values[i + 1].value.log->value, values.values[i].value.log->value))
-				{
 					count++;
-				}
 			}
 		}
 
