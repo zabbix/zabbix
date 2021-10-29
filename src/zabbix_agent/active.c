@@ -50,6 +50,10 @@ static ZBX_THREAD_LOCAL zbx_vector_ptr_t	regexps;
 static ZBX_THREAD_LOCAL char			*session_token;
 static ZBX_THREAD_LOCAL zbx_uint64_t		last_valueid = 0;
 
+#ifndef _WINDOWS
+static volatile sig_atomic_t	need_update_userparam = 0;
+#endif
+
 static void	init_active_metrics(void)
 {
 	size_t	sz;
@@ -1254,6 +1258,14 @@ static void	update_schedule(int delta)
 	buffer.lastsent += delta;
 }
 
+#ifndef _WINDOWS
+static void	zbx_active_checks_sigusr_handler(int flags)
+{
+	if (ZBX_RTC_USER_PARAMETERS_RELOAD == ZBX_RTC_GET_MSG(flags))
+		need_update_userparam = 1;
+}
+#endif
+
 ZBX_THREAD_ENTRY(active_checks_thread, args)
 {
 	ZBX_THREAD_ACTIVECHK_ARGS activechk_args;
@@ -1283,8 +1295,21 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 #endif
 	init_active_metrics();
 
+#ifndef _WINDOWS
+	zbx_set_sigusr_handler(zbx_active_checks_sigusr_handler);
+#endif
+
 	while (ZBX_IS_RUNNING())
 	{
+#ifndef _WINDOWS
+		if (1 == need_update_userparam)
+		{
+			zbx_setproctitle("active checks #%d [reloading user parameters]", process_num);
+			reload_user_parameters();
+			need_update_userparam = 0;
+		}
+#endif
+
 		zbx_update_env(zbx_time());
 
 		if ((now = time(NULL)) >= nextsend)

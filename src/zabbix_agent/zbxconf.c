@@ -230,6 +230,43 @@ void	load_perf_counters(const char **def_lines, const char **eng_lines)
 			break;
 	}
 }
+#else
+/******************************************************************************
+ *                                                                            *
+ * Function: load_config_user_params                                          *
+ *                                                                            *
+ * Purpose: load user parameters from configuration file                      *
+ *                                                                            *
+ ******************************************************************************/
+static void	load_config_user_params(void)
+{
+	struct cfg_line	cfg[] =
+	{
+		/* PARAMETER,			VAR,					TYPE,
+			MANDATORY,	MIN,			MAX */
+		{"UserParameter",		&CONFIG_USER_PARAMETERS,		TYPE_MULTISTRING,
+			PARM_OPT,	0,			0},
+		{NULL}
+	};
+
+	parse_cfg_file(CONFIG_FILE, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_NOT_STRICT);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: reload_user_parameters                                           *
+ *                                                                            *
+ * Purpose: reload user parameters                                            *
+ *                                                                            *
+ ******************************************************************************/
+void	reload_user_parameters(void)
+{
+	remove_user_parameters();
+	zbx_strarr_init(&CONFIG_USER_PARAMETERS);
+	load_config_user_params();
+	load_user_parameters(CONFIG_USER_PARAMETERS);
+	zbx_strarr_free(CONFIG_USER_PARAMETERS);
+}
 #endif	/* _WINDOWS */
 
 #ifdef _AIX

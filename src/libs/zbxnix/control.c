@@ -231,6 +231,12 @@ int	parse_rtc_options(const char *opt, unsigned char program_type, int *message)
 		scope = 0;
 		data = 0;
 	}
+	else if (0 != (program_type & (ZBX_PROGRAM_TYPE_AGENTD)) && 0 == strcmp(opt, ZBX_USER_PARAMETERS_RELOAD))
+	{
+		command = ZBX_RTC_USER_PARAMETERS_RELOAD;
+		scope = 0;
+		data = 0;
+	}
 	else
 	{
 		zbx_error("invalid runtime control option: %s", opt);

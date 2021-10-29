@@ -187,6 +187,7 @@ const char	*help_message[] = {
 	"  -R --runtime-control runtime-option   Perform administrative functions",
 	"",
 	"    Runtime control options:",
+	"      " ZBX_USER_PARAMETERS_RELOAD "       Reload user parameters from the configuration file",
 	"      " ZBX_LOG_LEVEL_INCREASE "=target  Increase log level, affects all processes if",
 	"                                 target is not specified",
 	"      " ZBX_LOG_LEVEL_DECREASE "=target  Decrease log level, affects all processes if",
@@ -1113,6 +1114,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 #endif
+
+	load_user_parameters(CONFIG_USER_PARAMETERS);
+
 	if (0 != CONFIG_PASSIVE_FORKS)
 	{
 		if (FAIL == zbx_tcp_listen(&listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT))
@@ -1451,7 +1455,6 @@ int	main(int argc, char **argv)
 		default:
 			zbx_load_config(ZBX_CFG_FILE_REQUIRED, &t);
 			set_user_parameter_dir(CONFIG_USER_PARAMETER_DIR);
-			load_user_parameters(CONFIG_USER_PARAMETERS);
 			load_aliases(CONFIG_ALIASES);
 			break;
 	}

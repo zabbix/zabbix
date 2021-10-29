@@ -216,6 +216,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result);
 
 void	set_user_parameter_dir(const char *path);
 int	add_user_parameter(const char *itemkey, char *command, char *error, size_t max_error_len);
+void	remove_user_parameters(void);
 int	add_user_module(const char *key, int (*function)(void));
 void	test_parameters(void);
 void	test_parameter(const char *key);
