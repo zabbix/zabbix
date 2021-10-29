@@ -2290,9 +2290,9 @@ static void	remove_history_duplicates(zbx_vector_ptr_t *history)
 	zbx_vector_ptr_append_array(&history_index, history->values, history->values_num);
 	zbx_vector_ptr_sort(&history_index, history_value_compare_func);
 
-	for (i = 0; i < history->values_num; i++)
+	for (i = 0; i < history_index.values_num; i++)
 	{
-		ZBX_DC_HISTORY			*h = history->values[i];
+		ZBX_DC_HISTORY			*h = history_index.values[i];
 		zbx_history_dupl_select_t	*select_ptr;
 		char				*separator = " or";
 
