@@ -23,6 +23,27 @@ class CControllerWidgetGeoMapView extends CControllerWidget {
 
 	const NO_PROBLEMS_MARKER_COLOR = '#009900';
 
+	/**
+	 * Widget id.
+	 *
+	 * @param string
+	 */
+	protected $widgetid;
+
+	/**
+	 * Widget fields.
+	 *
+	 * @param array
+	 */
+	protected $fields;
+
+	/**
+	 * Global geomap configuration.
+	 *
+	 * @param array
+	 */
+	protected $geomap_config;
+
 	public function __construct() {
 		parent::__construct();
 
@@ -37,6 +58,9 @@ class CControllerWidgetGeoMapView extends CControllerWidget {
 	}
 
 	protected function doAction() {
+		$this->widgetid = $this->getInput('widgetid', 0);
+		$this->fields = $this->getForm()->getFieldsData();
+
 		$data = [
 			'name' => $this->getInput('name', $this->getDefaultName()),
 			'hosts' => self::convertToRFC7946($this->getHosts()),
@@ -47,9 +71,10 @@ class CControllerWidgetGeoMapView extends CControllerWidget {
 		];
 
 		if ($this->getInput('initial_load', 0)) {
+			$this->geomap_config = self::getMapConfig();
 			[$center, $view_set] = $this->getMapCenter();
 
-			$data['config'] = self::getMapConfig() + [
+			$data['config'] = $this->geomap_config + [
 				'center' => $center,
 				'view_set' => $view_set,
 				'filter' => $this->getUserProfileFilter(),
@@ -85,16 +110,15 @@ class CControllerWidgetGeoMapView extends CControllerWidget {
 	 * @return array
 	 */
 	protected function getHosts(): array {
-		$fields = $this->getForm()->getFieldsData();
-		$filter_groupids = $fields['groupids'] ? getSubGroups($fields['groupids']) : null;
+		$filter_groupids = $this->fields['groupids'] ? getSubGroups($this->fields['groupids']) : null;
 
 		$hosts = API::Host()->get([
 			'output' => ['hostid', 'name'],
 			'selectInventory' => ['location_lat', 'location_lon'],
 			'groupids' => $filter_groupids,
-			'hostids' => $fields['hostids'] ? $fields['hostids'] : null,
-			'evaltype' => $fields['evaltype'],
-			'tags' => $fields['tags'],
+			'hostids' => $this->fields['hostids'] ? $this->fields['hostids'] : null,
+			'evaltype' => $this->fields['evaltype'],
+			'tags' => $this->fields['tags'],
 			'filter' => [
 				'inventory_mode' => [HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC]
 			],
@@ -145,8 +169,7 @@ class CControllerWidgetGeoMapView extends CControllerWidget {
 		}
 
 		// Filter hosts by severity filter.
-		$widgetid = $this->getInput('widgetid', 0);
-		$severity_filter = CProfile::get('web.dashboard.widget.geomap.severity_filter', '', $widgetid);
+		$severity_filter = CProfile::get('web.dashboard.widget.geomap.severity_filter', '', $this->widgetid);
 		$severity_filter = $severity_filter ? array_flip(explode(',', $severity_filter)) : [];
 
 		if ($severity_filter && count($severity_filter) != 7) {
@@ -157,8 +180,9 @@ class CControllerWidgetGeoMapView extends CControllerWidget {
 			});
 		}
 
-		$hosts = array_map(function ($host) use ($problems_by_host) {
-			return $host + ['problems' => array_key_exists($host['hostid'], $problems_by_host)
+		$result_hosts = [];
+		foreach ($hosts as $host) {
+			$problems = array_key_exists($host['hostid'], $problems_by_host)
 				? $problems_by_host[$host['hostid']]
 				: [
 					TRIGGER_SEVERITY_DISASTER => 0,
@@ -167,11 +191,12 @@ class CControllerWidgetGeoMapView extends CControllerWidget {
 					TRIGGER_SEVERITY_WARNING => 0,
 					TRIGGER_SEVERITY_INFORMATION => 0,
 					TRIGGER_SEVERITY_NOT_CLASSIFIED => 0
-				]
-			];
-		}, $hosts);
+				];
 
-		return $hosts;
+			$result_hosts[] = $host + ['problems' => $problems];
+		}
+
+		return $result_hosts;
 	}
 
 	/**
@@ -180,30 +205,24 @@ class CControllerWidgetGeoMapView extends CControllerWidget {
 	 * @return array
 	 */
 	protected function getMapCenter(): array {
-		$widgetid = $this->getInput('widgetid', 0);
-		$fields = $this->getForm()->getFieldsData();
 		$geoloc_parser = new CGeomapCoordinatesParser();
 
-		$max_zoom = (CSettingsHelper::get(CSettingsHelper::GEOMAPS_TILE_PROVIDER) !== '')
-			? getTileProviders()[CSettingsHelper::get(CSettingsHelper::GEOMAPS_TILE_PROVIDER)]['geomaps_max_zoom']
-			: CSettingsHelper::get(CSettingsHelper::GEOMAPS_MAX_ZOOM);
+		$user_default_view = CProfile::get('web.dashboard.widget.geomap.default_view', '', $this->widgetid);
+		if ($user_default_view !== '' && $geoloc_parser->parse($user_default_view) == CParser::PARSE_SUCCESS) {
+			return [$geoloc_parser->result, true];
+		}
+
+		if (array_key_exists('default_view', $this->fields)
+				&& $this->fields['default_view'] !== ''
+				&& $geoloc_parser->parse($this->fields['default_view']) == CParser::PARSE_SUCCESS) {
+			return [$geoloc_parser->result + ['zoom' => ceil($this->geomap_config['max_zoom'] / 2)], true];
+		}
 
 		$defaults = [
 			'latitude' => 0,
 			'longitude' => 0,
 			'zoom' => 1
 		];
-
-		$user_default_view = CProfile::get('web.dashboard.widget.geomap.default_view', '', $widgetid);
-		if ($user_default_view !== '' && $geoloc_parser->parse($user_default_view) == CParser::PARSE_SUCCESS) {
-			return [$geoloc_parser->result, true];
-		}
-
-		if (array_key_exists('default_view', $fields)
-				&& $fields['default_view'] !== ''
-				&& $geoloc_parser->parse($fields['default_view']) == CParser::PARSE_SUCCESS) {
-			return [$geoloc_parser->result + ['zoom' => ceil($max_zoom / 2)], true];
-		}
 
 		return [$defaults, false];
 	}
@@ -237,10 +256,8 @@ class CControllerWidgetGeoMapView extends CControllerWidget {
 	}
 
 	protected function getUserProfileFilter(): array {
-		$widgetid = $this->getInput('widgetid', 0);
-
 		return [
-			'severity' => CProfile::get('web.dashboard.widget.geomap.severity_filter', [], $widgetid)
+			'severity' => CProfile::get('web.dashboard.widget.geomap.severity_filter', [], $this->widgetid)
 		];
 	}
 
@@ -254,12 +271,13 @@ class CControllerWidgetGeoMapView extends CControllerWidget {
 	 * @return array
 	 */
 	protected static function convertToRFC7946(array $hosts) : array {
-		$hosts = array_values(array_map(function ($host) {
+		$geo_json = [];
+		foreach ($hosts as $host) {
 			$problems = array_filter($host['problems']);
 			$severities = array_keys($problems);
 			$top_severity = reset($severities);
 
-			return [
+			$geo_json[] = [
 				'type' => 'Feature',
 				'geometry' => [
 					'type' => 'Point',
@@ -276,8 +294,8 @@ class CControllerWidgetGeoMapView extends CControllerWidget {
 					'problems' => $problems
 				]
 			];
-		}, $hosts));
+		}
 
-		return $hosts;
+		return $geo_json;
 	}
 }

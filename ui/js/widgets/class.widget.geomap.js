@@ -18,15 +18,14 @@
 **/
 
 
-const SEVERITY_NO_PROBLEMS = -1;
-const SEVERITY_NOT_CLASSIFIED = 0;
-const SEVERITY_INFORMATION = 1;
-const SEVERITY_WARNING = 2;
-const SEVERITY_AVERAGE = 3;
-const SEVERITY_HIGH = 4;
-const SEVERITY_DISASTER = 5;
-
 class CWidgetGeoMap extends CWidget {
+	static SEVERITY_NO_PROBLEMS = -1;
+	static SEVERITY_NOT_CLASSIFIED = 0;
+	static SEVERITY_INFORMATION = 1;
+	static SEVERITY_WARNING = 2;
+	static SEVERITY_AVERAGE = 3;
+	static SEVERITY_HIGH = 4;
+	static SEVERITY_DISASTER = 5;
 
 	_init() {
 		super._init();
@@ -94,7 +93,8 @@ class CWidgetGeoMap extends CWidget {
 
 	_initMap(config) {
 		const latLng = new L.latLng([config.center.latitude, config.center.longitude]);
-		this._view_set = ('view_set' in config && config.view_set);
+
+		this._view_set = config.view_set;
 
 		// Initialize map and load tile layer.
 		this._map = L.map(this._unique_id).setView(latLng, config.center.zoom);
@@ -132,7 +132,9 @@ class CWidgetGeoMap extends CWidget {
 
 		// Navigate home btn.
 		this._map.navigateHomeControl = L.control.navigateHomeBtn({position: 'topleft'}).addTo(this._map);
-		this._view_set && this._map.navigateHomeControl.show();
+		if (this._view_set) {
+			this._map.navigateHomeControl.show();
+		}
 
 		// Add event listeners.
 		this._map.getContainer().addEventListener('click', (e) => {
@@ -366,12 +368,12 @@ class CWidgetGeoMap extends CWidget {
 				rows += `
 					<tr>
 						<td class="nowrap">${makeHostBtn(host).outerHTML}</td>
-						${makeDataCell(host, SEVERITY_DISASTER)}
-						${makeDataCell(host, SEVERITY_HIGH)}
-						${makeDataCell(host, SEVERITY_AVERAGE)}
-						${makeDataCell(host, SEVERITY_WARNING)}
-						${makeDataCell(host, SEVERITY_INFORMATION)}
-						${makeDataCell(host, SEVERITY_NOT_CLASSIFIED)}
+						${makeDataCell(host, CWidgetGeoMap.SEVERITY_DISASTER)}
+						${makeDataCell(host, CWidgetGeoMap.SEVERITY_HIGH)}
+						${makeDataCell(host, CWidgetGeoMap.SEVERITY_AVERAGE)}
+						${makeDataCell(host, CWidgetGeoMap.SEVERITY_WARNING)}
+						${makeDataCell(host, CWidgetGeoMap.SEVERITY_INFORMATION)}
+						${makeDataCell(host, CWidgetGeoMap.SEVERITY_NOT_CLASSIFIED)}
 					</tr>`;
 			});
 
@@ -383,12 +385,12 @@ class CWidgetGeoMap extends CWidget {
 			<thead>
 			<tr>
 				<th>${t('Host')}</th>
-				<th>${this._severity_levels.get(SEVERITY_DISASTER).abbr}</th>
-				<th>${this._severity_levels.get(SEVERITY_HIGH).abbr}</th>
-				<th>${this._severity_levels.get(SEVERITY_AVERAGE).abbr}</th>
-				<th>${this._severity_levels.get(SEVERITY_WARNING).abbr}</th>
-				<th>${this._severity_levels.get(SEVERITY_INFORMATION).abbr}</th>
-				<th>${this._severity_levels.get(SEVERITY_NOT_CLASSIFIED).abbr}</th>
+				<th>${this._severity_levels.get(CWidgetGeoMap.SEVERITY_DISASTER).abbr}</th>
+				<th>${this._severity_levels.get(CWidgetGeoMap.SEVERITY_HIGH).abbr}</th>
+				<th>${this._severity_levels.get(CWidgetGeoMap.SEVERITY_AVERAGE).abbr}</th>
+				<th>${this._severity_levels.get(CWidgetGeoMap.SEVERITY_WARNING).abbr}</th>
+				<th>${this._severity_levels.get(CWidgetGeoMap.SEVERITY_INFORMATION).abbr}</th>
+				<th>${this._severity_levels.get(CWidgetGeoMap.SEVERITY_NOT_CLASSIFIED).abbr}</th>
 			</th>
 			</thead>
 			<tbody>${makeTableRows()}</tbody>
@@ -407,45 +409,45 @@ class CWidgetGeoMap extends CWidget {
 	 * @param {object} severity_colors
 	 */
 	initSeverities(severity_colors) {
-		this._severity_levels.set(SEVERITY_NO_PROBLEMS, {
+		this._severity_levels.set(CWidgetGeoMap.SEVERITY_NO_PROBLEMS, {
 			name: t('No problems'),
-			color: severity_colors[SEVERITY_NO_PROBLEMS]
+			color: severity_colors[CWidgetGeoMap.SEVERITY_NO_PROBLEMS]
 		});
-		this._severity_levels.set(SEVERITY_NOT_CLASSIFIED, {
+		this._severity_levels.set(CWidgetGeoMap.SEVERITY_NOT_CLASSIFIED, {
 			name: t('Not classified'),
 			abbr: t('N'),
 			class: 'na-bg',
-			color: severity_colors[SEVERITY_NOT_CLASSIFIED]
+			color: severity_colors[CWidgetGeoMap.SEVERITY_NOT_CLASSIFIED]
 		});
-		this._severity_levels.set(SEVERITY_INFORMATION, {
+		this._severity_levels.set(CWidgetGeoMap.SEVERITY_INFORMATION, {
 			name: t('Information'),
 			abbr: t('I'),
 			class: 'info-bg',
-			color: severity_colors[SEVERITY_INFORMATION]
+			color: severity_colors[CWidgetGeoMap.SEVERITY_INFORMATION]
 		});
-		this._severity_levels.set(SEVERITY_WARNING, {
+		this._severity_levels.set(CWidgetGeoMap.SEVERITY_WARNING, {
 			name: t('Warning'),
 			abbr: t('W'),
 			class: 'warning-bg',
-			color: severity_colors[SEVERITY_WARNING]
+			color: severity_colors[CWidgetGeoMap.SEVERITY_WARNING]
 		});
-		this._severity_levels.set(SEVERITY_AVERAGE, {
+		this._severity_levels.set(CWidgetGeoMap.SEVERITY_AVERAGE, {
 			name: t('Average'),
 			abbr: t('A'),
 			class: 'average-bg',
-			color: severity_colors[SEVERITY_AVERAGE]
+			color: severity_colors[CWidgetGeoMap.SEVERITY_AVERAGE]
 		});
-		this._severity_levels.set(SEVERITY_HIGH, {
+		this._severity_levels.set(CWidgetGeoMap.SEVERITY_HIGH, {
 			name: t('High'),
 			abbr: t('H'),
 			class: 'high-bg',
-			color: severity_colors[SEVERITY_HIGH]
+			color: severity_colors[CWidgetGeoMap.SEVERITY_HIGH]
 		});
-		this._severity_levels.set(SEVERITY_DISASTER, {
+		this._severity_levels.set(CWidgetGeoMap.SEVERITY_DISASTER, {
 			name: t('Disaster'),
 			abbr: t('D'),
 			class: 'disaster-bg',
-			color: severity_colors[SEVERITY_DISASTER]
+			color: severity_colors[CWidgetGeoMap.SEVERITY_DISASTER]
 		});
 
 		for (const severity in severity_colors) {
