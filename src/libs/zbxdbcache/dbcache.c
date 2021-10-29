@@ -2218,7 +2218,7 @@ static void	vc_flag_duplicates(ZBX_DC_HISTORY *history, int history_num, zbx_vec
 
 		for (j = 0; j < history_num; j++)
 		{
-			ZBX_DC_HISTORY *h = &history[i];
+			ZBX_DC_HISTORY *h = &history[j];
 
 			if (h->value_type != hd->value_type)
 				continue;
