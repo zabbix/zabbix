@@ -2202,18 +2202,11 @@ static void	DBmass_proxy_update_items(zbx_vector_ptr_t *item_diff)
 
 typedef struct
 {
+	char	*table_name;
 	char	*sql;
 	size_t	sql_alloc, sql_offset;
-	char	*table_name;
 }
 zbx_history_dupl_select_t;
-
-static void	init_history_dupl_select(zbx_history_dupl_select_t *s, char *table_name)
-{
-	s->sql = NULL;
-	s->sql_alloc = s->sql_offset = 0;
-	s->table_name = table_name;
-}
 
 static void	vc_flag_duplicates(ZBX_DC_HISTORY *history, int history_num, zbx_vector_ptr_t *duplicates)
 {
@@ -2236,8 +2229,8 @@ static void	vc_flag_duplicates(ZBX_DC_HISTORY *history, int history_num, zbx_vec
 	}
 }
 
-static void	db_fetch_duplicates(zbx_history_dupl_select_t *query, ZBX_DC_HISTORY *history, int history_num,
-		unsigned char value_type, zbx_vector_ptr_t *duplicates)
+static void	db_fetch_duplicates(zbx_history_dupl_select_t *query, unsigned char value_type,
+		zbx_vector_ptr_t *duplicates)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -2249,7 +2242,7 @@ static void	db_fetch_duplicates(zbx_history_dupl_select_t *query, ZBX_DC_HISTORY
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_DC_HISTORY *d = (ZBX_DC_HISTORY *)zbx_malloc(NULL, sizeof(ZBX_DC_HISTORY));
+		ZBX_DC_HISTORY	*d = (ZBX_DC_HISTORY *)zbx_malloc(NULL, sizeof(ZBX_DC_HISTORY));
 
 		ZBX_STR2UINT64(d->itemid, row[0]);
 		d->ts.sec = atoi(row[1]);
@@ -2267,15 +2260,12 @@ static void	db_fetch_duplicates(zbx_history_dupl_select_t *query, ZBX_DC_HISTORY
 void	remove_history_duplicates(ZBX_DC_HISTORY *history, int history_num)
 {
 	int				i;
-	zbx_history_dupl_select_t	select_flt, select_uint, select_str, select_log, select_text;
+	zbx_history_dupl_select_t	select_flt = {.table_name = "history"},
+					select_uint = {.table_name = "history_uint"},
+					select_str = {.table_name = "history_str"},
+					select_log = {.table_name = "history_log"},
+					select_text = {.table_name = "history_text"};
 	zbx_vector_ptr_t		duplicates;
-
-	init_history_dupl_select(&select_flt, "history");
-	init_history_dupl_select(&select_uint, "history_uint");
-	init_history_dupl_select(&select_str, "history_str");
-	init_history_dupl_select(&select_log, "history_log");
-	init_history_dupl_select(&select_text, "history_text");
-
 
 	zbx_vector_ptr_create(&duplicates);
 
@@ -2314,11 +2304,11 @@ void	remove_history_duplicates(ZBX_DC_HISTORY *history, int history_num)
 		}
 	}
 
-	db_fetch_duplicates(&select_flt, history, history_num, ITEM_VALUE_TYPE_FLOAT, &duplicates);
-	db_fetch_duplicates(&select_uint, history, history_num, ITEM_VALUE_TYPE_UINT64, &duplicates);
-	db_fetch_duplicates(&select_str, history, history_num, ITEM_VALUE_TYPE_STR, &duplicates);
-	db_fetch_duplicates(&select_log, history, history_num, ITEM_VALUE_TYPE_LOG, &duplicates);
-	db_fetch_duplicates(&select_text, history, history_num, ITEM_VALUE_TYPE_TEXT, &duplicates);
+	db_fetch_duplicates(&select_flt, ITEM_VALUE_TYPE_FLOAT, &duplicates);
+	db_fetch_duplicates(&select_uint, ITEM_VALUE_TYPE_UINT64, &duplicates);
+	db_fetch_duplicates(&select_str, ITEM_VALUE_TYPE_STR, &duplicates);
+	db_fetch_duplicates(&select_log, ITEM_VALUE_TYPE_LOG, &duplicates);
+	db_fetch_duplicates(&select_text, ITEM_VALUE_TYPE_TEXT, &duplicates);
 
 	vc_flag_duplicates(history, history_num, &duplicates);
 
