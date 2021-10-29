@@ -117,12 +117,15 @@ int	zbx_history_add_values(const zbx_vector_ptr_t *history, int *ret_flush)
 		zbx_history_iface_t	*writer = &history_ifaces[i];
 
 		if (0 != (flags & (1 << i)))
-			ret = writer->flush(writer, ret_flush);
+		{
+			if (FLUSH_DUPL_REJECTED == (*ret_flush = writer->flush(writer)))
+				break;
+		}
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
-	return (0 == *ret_flush ? SUCCEED : FAIL);
+	return (FLUSH_SUCCEED == *ret_flush ? SUCCEED : FAIL);
 }
 
 /************************************************************************************
