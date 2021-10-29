@@ -45,32 +45,32 @@
 			};
 
 			document.querySelector('[name="geomaps_tile_provider"]')
-				.addEventListener('change', this.events.tileProviderChange.bind(this));
+				.addEventListener('change', this.events.tileProviderChange);
 		},
 
 		events: {
 			tileProviderChange(e) {
 				if (e.target.value !== '') {
-					this.tile_url.readOnly = true;
-					this.attribution.readOnly = true;
-					this.max_zoom.readOnly = true;
-					this.tile_url.tabIndex = -1;
-					this.attribution.tabIndex = -1;
-					this.max_zoom.tabIndex = -1;
+					view.tile_url.readOnly = true;
+					view.attribution.readOnly = true;
+					view.max_zoom.readOnly = true;
+					view.tile_url.tabIndex = -1;
+					view.attribution.tabIndex = -1;
+					view.max_zoom.tabIndex = -1;
 				}
 				else {
-					this.tile_url.readOnly = false;
-					this.attribution.readOnly = false;
-					this.max_zoom.readOnly = false;
-					this.tile_url.removeAttribute('tabIndex');
-					this.attribution.removeAttribute('tabIndex');
-					this.max_zoom.removeAttribute('tabIndex');
+					view.tile_url.readOnly = false;
+					view.attribution.readOnly = false;
+					view.max_zoom.readOnly = false;
+					view.tile_url.removeAttribute('tabIndex');
+					view.attribution.removeAttribute('tabIndex');
+					view.max_zoom.removeAttribute('tabIndex');
 				}
 
-				const data = this.tile_providers[e.target.value] || this.defaults;
-				this.tile_url.value = data.geomaps_tile_url;
-				this.attribution.value = data.geomaps_attribution;
-				this.max_zoom.value = data.geomaps_max_zoom;
+				const data = view.tile_providers[e.target.value] || view.defaults;
+				view.tile_url.value = data.geomaps_tile_url;
+				view.attribution.value = data.geomaps_attribution;
+				view.max_zoom.value = data.geomaps_max_zoom;
 			}
 		}
 	};
