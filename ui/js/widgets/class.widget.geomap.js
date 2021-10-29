@@ -49,10 +49,19 @@ class CWidgetGeoMap extends CWidget {
 	_processUpdateResponse(response) {
 		super._processUpdateResponse(response);
 
-		('config' in response.geomap) && this._initMap(response.geomap.config);
-		('hosts' in response.geomap) && this._addMarkers(response.geomap.hosts);
+		if ('config' in response.geomap) {
+			this._initMap(response.geomap.config);
+		}
+
+		this._addMarkers(response.geomap.hosts);
 
 		this._initial_load = false;
+	}
+
+	updateProperties({name, view_mode, fields, configuration}) {
+		this._initial_load = true;
+
+		super.updateProperties({name, view_mode, fields, configuration});
 	}
 
 	_setContents({name, body, messages, info, debug}) {
