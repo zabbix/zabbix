@@ -63,6 +63,11 @@ final class CHistFunctionData {
 		'change' => [
 			['rules' => [['type' => 'query']]]
 		],
+		'changecount' => [
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]],
+			['rules' => [['type' => 'regexp', 'pattern' => '/^(inc|dec|all)$/']], 'required' => false]
+		],
 		'count' => [
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]],
@@ -340,6 +345,7 @@ final class CHistFunctionData {
 		'bucket_percentile' => self::ITEM_VALUE_TYPES_NUM,
 		'bucket_rate_foreach' => self::ITEM_VALUE_TYPES_NUM,
 		'change' => self::ITEM_VALUE_TYPES_ALL,
+		'changecount' => self::ITEM_VALUE_TYPES_NUM,
 		'count' => self::ITEM_VALUE_TYPES_ALL,
 		'count_foreach' => self::ITEM_VALUE_TYPES_ALL,
 		'countunique' => self::ITEM_VALUE_TYPES_ALL,
