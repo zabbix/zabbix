@@ -153,14 +153,19 @@ static void	sql_writer_add_dbinsert(zbx_db_insert_t *db_insert)
 
 /************************************************************************************
  *                                                                                  *
- * Function: sql_writer_flush_commit                                                *
+ * Function: sql_writer_flush                                                       *
  *                                                                                  *
- * Purpose: commits bulk insert data to be flushed into database                    *
+ * Purpose: flushes bulk insert data into database                                  *
  *                                                                                  *
  ************************************************************************************/
-static void	sql_writer_flush_commit(int *txn_error)
+static int	sql_writer_flush(void)
 {
-	int	i;
+	int	i, txn_error;
+
+	/* The writer might be uninitialized only if the history */
+	/* was already flushed. In that case, return SUCCEED */
+	if (0 == writer.initialized)
+		return SUCCEED;
 
 	do
 	{
@@ -172,26 +177,7 @@ static void	sql_writer_flush_commit(int *txn_error)
 			zbx_db_insert_execute(db_insert);
 		}
 	}
-	while (ZBX_DB_DOWN == (*txn_error = DBcommit()));
-}
-
-/************************************************************************************
- *                                                                                  *
- * Function: sql_writer_flush                                                       *
- *                                                                                  *
- * Purpose: flushes bulk insert data into database                                  *
- *                                                                                  *
- ************************************************************************************/
-static int	sql_writer_flush(void)
-{
-	int	txn_error;
-
-	/* The writer might be uninitialized only if the history */
-	/* was already flushed. In that case, return SUCCEED */
-	if (0 == writer.initialized)
-		return SUCCEED;
-
-	sql_writer_flush_commit(&txn_error);
+	while (ZBX_DB_DOWN == (txn_error = DBcommit()));
 
 	sql_writer_release();
 

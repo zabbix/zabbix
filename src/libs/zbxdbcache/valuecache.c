@@ -291,7 +291,6 @@ static size_t	vch_item_free_chunk(zbx_vc_item_t *item, zbx_vc_chunk_t *chunk);
 static int	vch_item_add_values_at_tail(zbx_vc_item_t *item, const zbx_history_record_t *values, int values_num);
 static void	vch_item_clean_cache(zbx_vc_item_t *item);
 
-
 /*********************************************************************************
  *                                                                               *
  * Function: vc_db_read_values_by_time                                           *
@@ -2583,7 +2582,7 @@ void	zbx_vc_reset(void)
 int	zbx_vc_add_values(zbx_vector_ptr_t *history)
 {
 	zbx_vc_item_t		*item;
-	int 			i, ret;
+	int			i, ret;
 	ZBX_DC_HISTORY		*h;
 	time_t			expire_timestamp;
 
