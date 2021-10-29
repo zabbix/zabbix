@@ -1649,9 +1649,7 @@ class CHostPrototype extends CHostBase {
 			$db_templates = ($method === 'update')
 				? array_column($db_host_prototypes[$host_prototype['hostid']]['templates'], null, 'templateid')
 				: [];
-			$db_templateids = ($method === 'update')
-				? array_column($db_host_prototypes[$host_prototype['hostid']]['templates'], 'templateid')
-				: [];
+			$db_templateids = array_keys($db_templates);
 
 			foreach ($host_prototype['templates'] as &$template) {
 				if (array_key_exists($template['templateid'], $db_templates)) {
