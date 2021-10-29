@@ -688,11 +688,13 @@ class CAudit {
 	/**
 	 * Return the paths to nested object properties from the paths of passing object.
 	 *
-	 * @param array $object
+	 * @param array      $object
+	 * @param array|null $check_object
 	 *
 	 * @return array
 	 */
-	private static function getNestedObjectsPaths(array $object): array {
+	private static function getNestedObjectsPaths(array $object, array $check_object = null): array {
+		$checked_paths = [];
 		$paths = [];
 
 		foreach ($object as $path => $foo) {
@@ -700,10 +702,36 @@ class CAudit {
 				continue;
 			}
 
-			$object_path = self::getLastObjectPath($path);
+			$nested_object_path = self::getLastObjectPath($path);
 
-			if (!in_array($object_path, $paths)) {
-				$paths[] = $object_path;
+			if ($check_object !== null) {
+				$is_found = false;
+				$object_path = preg_replace('/\[[0-9]+\]/', '', $nested_object_path);
+
+				if (!array_key_exists($object_path, $checked_paths)) {
+					foreach ($check_object as $check_path => $foo) {
+						if (!self::isNestedObjectProperty($check_path)) {
+							continue;
+						}
+
+						$checked_object_path = preg_replace('/\[[0-9]+\]/', '', self::getLastObjectPath($check_path));
+
+						if ($object_path === $checked_object_path) {
+							$is_found = true;
+							break;
+						}
+					}
+
+					$checked_paths[$object_path] = $is_found;
+				}
+
+				if (!$checked_paths[$object_path]) {
+					continue;
+				}
+			}
+
+			if (!in_array($nested_object_path, $paths)) {
+				$paths[] = $nested_object_path;
 			}
 		}
 
@@ -755,9 +783,8 @@ class CAudit {
 	 */
 	private static function handleUpdate(int $resource, array $object, array $db_object): array {
 		$result = [];
-		$full_object = $object + $db_object;
 		$nested_objects_paths = self::getNestedObjectsPaths($object);
-		$db_nested_objects_paths = self::getNestedObjectsPaths($db_object);
+		$db_nested_objects_paths = self::getNestedObjectsPaths($db_object, $object);
 
 		foreach ($db_nested_objects_paths as $path) {
 			if (!in_array($path, $nested_objects_paths)) {
@@ -800,7 +827,7 @@ class CAudit {
 				else {
 					$result[$path] = [
 						self::DETAILS_ACTION_UPDATE,
-						self::isValueToMask($resource, $path, $full_object) ? ZBX_SECRET_MASK : $value,
+						self::isValueToMask($resource, $path, $object) ? ZBX_SECRET_MASK : $value,
 						self::isValueToMask($resource, $path, $db_object) ? ZBX_SECRET_MASK : $db_value
 					];
 				}

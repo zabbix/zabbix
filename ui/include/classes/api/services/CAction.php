@@ -697,10 +697,23 @@ class CAction extends CApiService {
 				}
 			}
 			unset($condition);
+		}
+		unset($action);
+
+		// Update formula.
+		foreach ($actions as &$action) {
+			if (!array_key_exists('filter', $action)) {
+				continue;
+			}
 
 			$action['filter']['formula'] = ($action['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION)
 				? CConditionHelper::replaceLetterIds($action['filter']['formula'],
-					array_column($action['filter']['conditions'], 'conditionid', 'formulaid')
+					array_column(
+						($is_update && !array_key_exists('conditions', $action['filter']))
+							? $db_actions[$action['actionid']]['filter']['conditions']
+							: $action['filter']['conditions'],
+						'conditionid', 'formulaid'
+					)
 				)
 				: '';
 
@@ -1324,7 +1337,7 @@ class CAction extends CApiService {
 				$db_operations = $is_update ? $db_actions[$action['actionid']][$operation_group] : [];
 
 				foreach ($action[$operation_group] as &$operation) {
-					if (array_key_exists('optemplate', $operation)
+					if (!array_key_exists('optemplate', $operation)
 							|| ($operation['operationtype'] != OPERATION_TYPE_TEMPLATE_ADD
 								&& $operation['operationtype'] != OPERATION_TYPE_TEMPLATE_REMOVE)) {
 						continue;
@@ -2618,7 +2631,7 @@ class CAction extends CApiService {
 
 		self::addAffectedObjects($actions, $db_actions);
 
-		self::checkFilter($actions);
+		self::checkFilter($actions, $db_actions);
 		self::checkOperations($actions, $db_actions);
 
 		self::checkMediatypesPermissions($actions);
@@ -2668,16 +2681,19 @@ class CAction extends CApiService {
 	}
 
 	/**
-	 * @param array $actions
+	 * @param array      $actions
+	 * @param array|null $db_actions
 	 *
 	 * @throws APIException
 	 */
-	private static function checkFilter(array $actions): void {
+	private static function checkFilter(array $actions, array $db_actions = null): void {
+		$is_update = ($db_actions !== null);
+
 		$condition_formula_parser = new CConditionFormula();
 		$ip_range_parser = new CIPRangeParser(['v6' => ZBX_HAVE_IPV6, 'dns' => false, 'max_ipv4_cidr' => 30]);
 
 		foreach ($actions as $i => $action) {
-			if (!array_key_exists('filter', $action) || !array_key_exists('conditions', $action['filter'])) {
+			if (!array_key_exists('filter', $action)) {
 				continue;
 			}
 
@@ -2688,38 +2704,52 @@ class CAction extends CApiService {
 
 				$constants = array_column($condition_formula_parser->constants, 'value', 'value');
 
-				if (count($action['filter']['conditions']) != count($constants)) {
+				$conditions = ($is_update && !array_key_exists('conditions', $action['filter']))
+					? $db_actions[$action['actionid']]['filter']['conditions']
+					: $action['filter']['conditions'];
+
+				if (count($conditions) != count($constants)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Invalid parameter "%1$s": %2$s.', $path.'/conditions', _('incorrect number of conditions'))
 					);
 				}
+
+				foreach ($conditions as $j => $condition) {
+					if (!array_key_exists($condition['formulaid'], $constants)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+							$path.'/conditions/'.($j + 1).'/formulaid', _('an identifier is not defined in the formula')
+						));
+					}
+				}
 			}
 
-			foreach ($action['filter']['conditions'] as $j => $condition) {
-				if ($action['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION
-						&& !array_key_exists($condition['formulaid'], $constants)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-						$path.'/conditions/'.($j + 1).'/formulaid', _('an identifier is not defined in the formula')
-					));
-				}
-
-				if ($condition['conditiontype'] == CONDITION_TYPE_DHOST_IP) {
-					if (!$ip_range_parser->parse($condition['value'])) {
+			if (array_key_exists('conditions', $action['filter'])) {
+				foreach ($action['filter']['conditions'] as $j => $condition) {
+					if ($action['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION
+							&& !array_key_exists($condition['formulaid'], $constants)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-							$path.'/conditions/'.($j + 1).'/value', $ip_range_parser->getError()
+							$path.'/conditions/'.($j + 1).'/formulaid', _('an identifier is not defined in the formula')
 						));
 					}
-				}
-				elseif ($condition['conditiontype'] == CONDITION_TYPE_DVALUE) {
-					if ($condition['operator'] == CONDITION_OPERATOR_EQUAL
-							|| $condition['operator'] == CONDITION_OPERATOR_NOT_EQUAL) {
-						continue;
-					}
 
-					if ($condition['value'] === '') {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-							$path.'/conditions/'.($j + 1).'/value', _('cannot be empty')
-						));
+					if ($condition['conditiontype'] == CONDITION_TYPE_DHOST_IP) {
+						if (!$ip_range_parser->parse($condition['value'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+								$path.'/conditions/'.($j + 1).'/value', $ip_range_parser->getError()
+							));
+						}
+					}
+					elseif ($condition['conditiontype'] == CONDITION_TYPE_DVALUE) {
+						if ($condition['operator'] == CONDITION_OPERATOR_EQUAL
+								|| $condition['operator'] == CONDITION_OPERATOR_NOT_EQUAL) {
+							continue;
+						}
+
+						if ($condition['value'] === '') {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+								$path.'/conditions/'.($j + 1).'/value', _('cannot be empty')
+							));
+						}
 					}
 				}
 			}
@@ -3388,11 +3418,7 @@ class CAction extends CApiService {
 			if (array_key_exists('filter', $action)) {
 				$actionids['filter'][] = $action['actionid'];
 				$db_actions[$action['actionid']]['filter'] = [];
-
-				if (array_key_exists('conditions', $action['filter'])) {
-					$actionids['conditions'][] = $action['actionid'];
-					$db_actions[$action['actionid']]['filter']['conditions'] = [];
-				}
+				$db_actions[$action['actionid']]['filter']['conditions'] = [];
 			}
 
 			if (!array_intersect_key(array_flip(self::OPERATION_GROUPS), $action)) {
@@ -3416,32 +3442,30 @@ class CAction extends CApiService {
 				$db_actions[$db_filter['actionid']]['filter'] += array_diff_key($db_filter, array_flip(['actionid']));
 			}
 
-			if ($actionids['conditions']) {
-				$options = [
-					'output' => ['conditionid', 'actionid', 'conditiontype', 'operator', 'value', 'value2'],
-					'filter' => ['actionid' => $actionids['conditions']]
-				];
-				$db_conditions = DBselect(DB::makeSql('conditions', $options));
+			$options = [
+				'output' => ['conditionid', 'actionid', 'conditiontype', 'operator', 'value', 'value2'],
+				'filter' => ['actionid' => $actionids['filter']]
+			];
+			$db_conditions = DBselect(DB::makeSql('conditions', $options));
 
-				while ($db_condition = DBfetch($db_conditions)) {
-					$db_actions[$db_condition['actionid']]['filter']['conditions'][$db_condition['conditionid']] =
-						array_diff_key($db_condition, array_flip(['actionid']));
-				}
-
-				foreach ($db_actions as &$db_action) {
-					if ($db_action['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-						$formula = $db_action['filter']['formula'];
-
-						$formulaids = CConditionHelper::getFormulaIds($formula);
-
-						foreach ($db_action['filter']['conditions'] as &$db_condition) {
-							$db_condition['formulaid'] = $formulaids[$db_condition['conditionid']];
-						}
-						unset($db_condition);
-					}
-				}
-				unset($db_action);
+			while ($db_condition = DBfetch($db_conditions)) {
+				$db_actions[$db_condition['actionid']]['filter']['conditions'][$db_condition['conditionid']] =
+					array_diff_key($db_condition, array_flip(['actionid']));
 			}
+
+			foreach ($db_actions as &$db_action) {
+				if ($db_action['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+					$formula = $db_action['filter']['formula'];
+
+					$formulaids = CConditionHelper::getFormulaIds($formula);
+
+					foreach ($db_action['filter']['conditions'] as &$db_condition) {
+						$db_condition['formulaid'] = $formulaids[$db_condition['conditionid']];
+					}
+					unset($db_condition);
+				}
+			}
+			unset($db_action);
 		}
 
 		if (!$actionids['operations']) {
