@@ -37,7 +37,6 @@ struct	st_logfile
 {
 	char		*filename;
 	int		mtime;		/* st_mtime from stat() */
-	int		md5size;	/* size of the initial part for which the md5 sum is calculated */
 	int		seq;		/* number in processing order */
 	int		retry;
 	int		incomplete;	/* 0 - the last record ends with a newline, 1 - the last record contains */
@@ -49,7 +48,9 @@ struct	st_logfile
 	zbx_uint64_t	ino_hi;		/* Microsoft Windows: nFileIndexHigh or FileId.HighPart */
 	zbx_uint64_t	size;		/* st_size from stat() */
 	zbx_uint64_t	processed_size;	/* how far the Zabbix agent has analyzed the file */
-	md5_byte_t	md5buf[MD5_DIGEST_SIZE];	/* md5 sum of the initial part of the file */
+	int		first_block_size;	/* size of the initial part of file for which the md5 sum is */
+						/* calculated (in first_block_md5) */
+	md5_byte_t	first_block_md5[MD5_DIGEST_SIZE];	/* md5 sum of the initial part of the file */
 };
 
 typedef int 	(*zbx_process_value_func_t)(const char *server, unsigned short port, const char *host,

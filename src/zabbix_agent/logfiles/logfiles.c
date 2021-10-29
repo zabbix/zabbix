@@ -452,17 +452,20 @@ static void	print_logfile_list(const struct st_logfile *logfiles, int logfiles_n
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "   nr:%d filename:'%s' mtime:%d size:" ZBX_FS_UI64 " processed_size:"
 				ZBX_FS_UI64 " seq:%d copy_of:%d incomplete:%d dev:" ZBX_FS_UI64 " ino_hi:" ZBX_FS_UI64
-				" ino_lo:" ZBX_FS_UI64
-				" md5size:%d md5buf:%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
+				" ino_lo:" ZBX_FS_UI64 " first_block_size:%d"
+				" first_block_md5:%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
 				i, logfiles[i].filename, logfiles[i].mtime, logfiles[i].size,
 				logfiles[i].processed_size, logfiles[i].seq, logfiles[i].copy_of,
 				logfiles[i].incomplete, logfiles[i].dev, logfiles[i].ino_hi, logfiles[i].ino_lo,
-				logfiles[i].md5size, logfiles[i].md5buf[0], logfiles[i].md5buf[1],
-				logfiles[i].md5buf[2], logfiles[i].md5buf[3], logfiles[i].md5buf[4],
-				logfiles[i].md5buf[5], logfiles[i].md5buf[6], logfiles[i].md5buf[7],
-				logfiles[i].md5buf[8], logfiles[i].md5buf[9], logfiles[i].md5buf[10],
-				logfiles[i].md5buf[11], logfiles[i].md5buf[12], logfiles[i].md5buf[13],
-				logfiles[i].md5buf[14], logfiles[i].md5buf[15]);
+				logfiles[i].first_block_size, logfiles[i].first_block_md5[0],
+				logfiles[i].first_block_md5[1], logfiles[i].first_block_md5[2],
+				logfiles[i].first_block_md5[3], logfiles[i].first_block_md5[4],
+				logfiles[i].first_block_md5[5], logfiles[i].first_block_md5[6],
+				logfiles[i].first_block_md5[7], logfiles[i].first_block_md5[8],
+				logfiles[i].first_block_md5[9], logfiles[i].first_block_md5[10],
+				logfiles[i].first_block_md5[11], logfiles[i].first_block_md5[12],
+				logfiles[i].first_block_md5[13], logfiles[i].first_block_md5[14],
+				logfiles[i].first_block_md5[15]);
 	}
 }
 
@@ -619,7 +622,7 @@ static int	is_same_file_logcpt(const struct st_logfile *old_file, const struct s
 	if (old_file->mtime > new_file->mtime)
 		return ZBX_SAME_FILE_NO;
 
-	if (-1 == old_file->md5size || -1 == new_file->md5size)
+	if (-1 == old_file->first_block_size || -1 == new_file->first_block_size)
 	{
 		/* Cannot compare MD5 sums. Assume two different files - reporting twice is better than skipping. */
 		return ZBX_SAME_FILE_NO;
@@ -627,24 +630,24 @@ static int	is_same_file_logcpt(const struct st_logfile *old_file, const struct s
 
 	is_same_place = compare_file_places(old_file, new_file, use_ino);
 
-	if (old_file->md5size == new_file->md5size)
+	if (old_file->first_block_size == new_file->first_block_size)
 	{
-		return examine_md5_and_place(old_file->md5buf, new_file->md5buf, sizeof(new_file->md5buf),
-				is_same_place);
+		return examine_md5_and_place(old_file->first_block_md5, new_file->first_block_md5,
+				sizeof(new_file->first_block_md5), is_same_place);
 	}
 
-	if (0 == old_file->md5size || 0 == new_file->md5size)
+	if (0 == old_file->first_block_size || 0 == new_file->first_block_size)
 		return ZBX_SAME_FILE_NO;
 
 	/* MD5 sums have been calculated from initial blocks of different sizes */
 
-	if (old_file->md5size < new_file->md5size)
+	if (old_file->first_block_size < new_file->first_block_size)
 	{
 		if (-1 == (f = open_file_helper(new_file->filename, err_msg)))
 			return ZBX_SAME_FILE_ERROR;
 
-		if (SUCCEED == file_start_md5(f, old_file->md5size, md5tmp, new_file->filename, err_msg))
-			ret = examine_md5_and_place(old_file->md5buf, md5tmp, sizeof(md5tmp), is_same_place);
+		if (SUCCEED == file_start_md5(f, old_file->first_block_size, md5tmp, new_file->filename, err_msg))
+			ret = examine_md5_and_place(old_file->first_block_md5, md5tmp, sizeof(md5tmp), is_same_place);
 		else
 			ret = ZBX_SAME_FILE_ERROR;
 
@@ -658,10 +661,10 @@ static int	is_same_file_logcpt(const struct st_logfile *old_file, const struct s
 		return ret;
 	}
 
-	/* old_file->md5size > new_file->md5size. */
+	/* old_file->first_block_size > new_file->first_block_size. */
 
-	/* Now it is necessary to read the first 'new_file->md5size' bytes of */
-	/* the old file to calculate MD5 sum to compare. Unfortunately we     */
+	/* Now it is necessary to read the first 'new_file->first_block_size' bytes */
+	/* of the old file to calculate MD5 sum to compare. Unfortunately we  */
 	/* cannot reliably use 'old_file->filename' to open the file because: */
 	/*    - being from the old list it might be no longer available,      */
 	/*    - it can have a different name in the new file list;            */
@@ -670,7 +673,7 @@ static int	is_same_file_logcpt(const struct st_logfile *old_file, const struct s
 
 	for (i = 0; i < num_new; i++)
 	{
-		if ((zbx_uint64_t)new_file->md5size > new_files[i].size)
+		if ((zbx_uint64_t)new_file->first_block_size > new_files[i].size)
 			continue;
 
 		if (0 == strcmp(old_file->filename, new_file->filename) ||
@@ -683,9 +686,9 @@ static int	is_same_file_logcpt(const struct st_logfile *old_file, const struct s
 		if (-1 == (f = open_file_helper(new_files[i].filename, err_msg)))
 			return ZBX_SAME_FILE_ERROR;
 
-		if (SUCCEED == file_start_md5(f, new_file->md5size, md5tmp, new_files[i].filename, err_msg))
+		if (SUCCEED == file_start_md5(f, new_file->first_block_size, md5tmp, new_files[i].filename, err_msg))
 		{
-			ret = examine_md5_and_place(new_file->md5buf, md5tmp, sizeof(md5tmp),
+			ret = examine_md5_and_place(new_file->first_block_md5, md5tmp, sizeof(md5tmp),
 					compare_file_places(old_file, new_files + i, use_ino));
 
 			if (ZBX_SAME_FILE_YES == ret || ZBX_SAME_FILE_COPY == ret)
@@ -712,9 +715,9 @@ static int	is_same_file_logcpt(const struct st_logfile *old_file, const struct s
 		if (-1 == (f = open_file_helper(old_file->filename, err_msg)))
 			return ZBX_SAME_FILE_NO;	/* not an error if it is no longer available */
 
-		if (SUCCEED == file_start_md5(f, new_file->md5size, md5tmp, old_file->filename, err_msg))
+		if (SUCCEED == file_start_md5(f, new_file->first_block_size, md5tmp, old_file->filename, err_msg))
 		{
-			ret = examine_md5_and_place(new_file->md5buf, md5tmp, sizeof(md5tmp),
+			ret = examine_md5_and_place(new_file->first_block_md5, md5tmp, sizeof(md5tmp),
 					compare_file_places(old_file, new_file, use_ino));
 		}
 		else
@@ -816,27 +819,30 @@ static int	is_same_file_logrt(const struct st_logfile *old_file, const struct st
 		return ZBX_SAME_FILE_NO;
 	}
 
-	if (-1 == old_file->md5size || -1 == new_file->md5size)
+	if (-1 == old_file->first_block_size || -1 == new_file->first_block_size)
 	{
 		/* Cannot compare MD5 sums. Assume two different files - reporting twice is better than skipping. */
 		return ZBX_SAME_FILE_NO;
 	}
 
-	if (old_file->md5size > new_file->md5size)
+	if (old_file->first_block_size > new_file->first_block_size)
 	{
 		/* file initial block size from which MD5 sum is calculated cannot decrease */
 		return ZBX_SAME_FILE_NO;
 	}
 
-	if (old_file->md5size == new_file->md5size)
+	if (old_file->first_block_size == new_file->first_block_size)
 	{
-		if (0 != memcmp(old_file->md5buf, new_file->md5buf, sizeof(new_file->md5buf)))	/* MD5 sums differ */
+		if (0 != memcmp(old_file->first_block_md5, new_file->first_block_md5,
+				sizeof(new_file->first_block_md5)))	/* MD5 sums differ */
+		{
 			return ZBX_SAME_FILE_NO;
+		}
 
 		return ZBX_SAME_FILE_YES;
 	}
 
-	if (0 < old_file->md5size)
+	if (0 < old_file->first_block_size)
 	{
 		/* MD5 for the old file has been calculated from a smaller block than for the new file */
 
@@ -846,9 +852,9 @@ static int	is_same_file_logrt(const struct st_logfile *old_file, const struct st
 		if (-1 == (f = open_file_helper(new_file->filename, err_msg)))
 			return ZBX_SAME_FILE_ERROR;
 
-		if (SUCCEED == file_start_md5(f, old_file->md5size, md5tmp, new_file->filename, err_msg))
+		if (SUCCEED == file_start_md5(f, old_file->first_block_size, md5tmp, new_file->filename, err_msg))
 		{
-			ret = (0 == memcmp(old_file->md5buf, &md5tmp, sizeof(md5tmp))) ? ZBX_SAME_FILE_YES :
+			ret = (0 == memcmp(old_file->first_block_md5, &md5tmp, sizeof(md5tmp))) ? ZBX_SAME_FILE_YES :
 					ZBX_SAME_FILE_NO;
 		}
 		else
@@ -1402,8 +1408,8 @@ static void	add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 
 	(*logfiles)[i].filename = zbx_strdup(NULL, filename);
 	(*logfiles)[i].mtime = (int)st->st_mtime;
-	(*logfiles)[i].md5size = -1;
 	(*logfiles)[i].seq = 0;
+	(*logfiles)[i].retry = 0;
 	(*logfiles)[i].incomplete = 0;
 	(*logfiles)[i].copy_of = -1;
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
@@ -1413,7 +1419,7 @@ static void	add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 #endif
 	(*logfiles)[i].size = (zbx_uint64_t)st->st_size;
 	(*logfiles)[i].processed_size = 0;
-	(*logfiles)[i].retry = 0;
+	(*logfiles)[i].first_block_size = -1;
 
 	++(*logfiles_num);
 out:
@@ -1662,9 +1668,9 @@ static int	fill_file_details(struct st_logfile **logfiles, int logfiles_num, cha
 		if (-1 == (f = open_file_helper(p->filename, err_msg)))
 			return FAIL;
 
-		p->md5size = (zbx_uint64_t)MAX_LEN_MD5 > p->size ? (int)p->size : MAX_LEN_MD5;
+		p->first_block_size = (zbx_uint64_t)MAX_LEN_MD5 > p->size ? (int)p->size : MAX_LEN_MD5;
 
-		if (SUCCEED != (ret = file_start_md5(f, p->md5size, p->md5buf, p->filename, err_msg)))
+		if (SUCCEED != (ret = file_start_md5(f, p->first_block_size, p->first_block_md5, p->filename, err_msg)))
 			goto clean;
 #if defined(_WINDOWS) || defined(__MINGW32__)
 		ret = file_id(f, use_ino, &p->dev, &p->ino_lo, &p->ino_hi, p->filename, err_msg);
@@ -2378,12 +2384,12 @@ static void	ensure_order_if_mtimes_equal(const struct st_logfile *logfiles_old, 
 
 static int	files_start_with_same_md5(const struct st_logfile *log1, const struct st_logfile *log2)
 {
-	if (-1 == log1->md5size || -1 == log2->md5size)
+	if (-1 == log1->first_block_size || -1 == log2->first_block_size)
 		return FAIL;
 
-	if (log1->md5size == log2->md5size)	/* this works for empty files, too */
+	if (log1->first_block_size == log2->first_block_size)	/* this works for empty files, too */
 	{
-		if (0 == memcmp(log1->md5buf, log2->md5buf, sizeof(log1->md5buf)))
+		if (0 == memcmp(log1->first_block_md5, log2->first_block_md5, sizeof(log1->first_block_md5)))
 			return SUCCEED;
 		else
 			return FAIL;
@@ -2391,14 +2397,14 @@ static int	files_start_with_same_md5(const struct st_logfile *log1, const struct
 
 	/* we have MD5 sums, but they are calculated from blocks of different sizes */
 
-	if (0 < log1->md5size && 0 < log2->md5size)
+	if (0 < log1->first_block_size && 0 < log2->first_block_size)
 	{
 		const struct st_logfile	*file_smaller, *file_larger;
 		int			fd, ret = FAIL;
 		char			*err_msg = NULL;		/* required, but not used */
 		md5_byte_t		md5tmp[MD5_DIGEST_SIZE];
 
-		if (log1->md5size < log2->md5size)
+		if (log1->first_block_size < log2->first_block_size)
 		{
 			file_smaller = log1;
 			file_larger = log2;
@@ -2412,9 +2418,9 @@ static int	files_start_with_same_md5(const struct st_logfile *log1, const struct
 		if (-1 == (fd = zbx_open(file_larger->filename, O_RDONLY)))
 			return FAIL;
 
-		if (SUCCEED == file_start_md5(fd, file_smaller->md5size, md5tmp, "", &err_msg))
+		if (SUCCEED == file_start_md5(fd, file_smaller->first_block_size, md5tmp, "", &err_msg))
 		{
-			if (0 == memcmp(file_smaller->md5buf, md5tmp, sizeof(md5tmp)))
+			if (0 == memcmp(file_smaller->first_block_md5, md5tmp, sizeof(md5tmp)))
 				ret = SUCCEED;
 		}
 
