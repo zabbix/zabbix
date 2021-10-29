@@ -590,8 +590,12 @@ static int	ha_check_cluster_config(zbx_ha_info_t *info, zbx_vector_ha_node_t *no
 			return FAIL;
 		}
 
-		if (ZBX_NODE_STATUS_ACTIVE == nodes->values[i]->status)
+		/* immediately switch to active mode if there is no other node that can take over */
+		if (ZBX_NODE_STATUS_ACTIVE == nodes->values[i]->status ||
+				ZBX_NODE_STATUS_STANDBY == nodes->values[i]->status)
+		{
 			*activate = FAIL;
+		}
 	}
 
 	return SUCCEED;
@@ -1799,7 +1803,15 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 		if (ZBX_NODE_STATUS_ERROR == info.ha_status)
 			goto pause;
 		else
-			nextcheck = ZBX_HA_POLL_PERIOD;
+		{
+			/* Server could be automatically restarted while it experienced some issues and crashed. */
+			/* If that happens, delay the next database check for twice of poll period time to       */
+			/* ensure that the same node does not take over after recovery.                          */
+			if (ZBX_NODE_STATUS_STANDBY == info.ha_status)
+				nextcheck = ZBX_HA_POLL_PERIOD * 2;
+			else
+				nextcheck = ZBX_HA_POLL_PERIOD;
+		}
 	}
 	else
 	{
