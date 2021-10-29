@@ -2273,6 +2273,7 @@ void	remove_history_duplicates(ZBX_DC_HISTORY *history, int history_num)
 	{
 		ZBX_DC_HISTORY			*h = &history[i];
 		zbx_history_dupl_select_t	*select_ptr;
+		char				*separator = " or";
 
 		if (0 != (ZBX_DC_FLAGS_NOT_FOR_HISTORY & h->flags))
 			continue;
@@ -2295,15 +2296,13 @@ void	remove_history_duplicates(ZBX_DC_HISTORY *history, int history_num)
 			zbx_snprintf_alloc(&select_ptr->sql, &select_ptr->sql_alloc, &select_ptr->sql_offset,
 					"select itemid,clock,ns"
 					" from %s"
-					" where (itemid=" ZBX_FS_UI64 " and clock=%d and ns=%d)",
-					select_ptr->table_name, h->itemid, h->ts.sec, h->ts.ns);
+					" where", select_ptr->table_name);
+			separator = "";
 		}
-		else
-		{
-			zbx_snprintf_alloc(&select_ptr->sql, &select_ptr->sql_alloc, &select_ptr->sql_offset,
-					" or (itemid=" ZBX_FS_UI64 " and clock=%d and ns=%d)", h->itemid, h->ts.sec,
-					h->ts.ns);
-		}
+
+		zbx_snprintf_alloc(&select_ptr->sql, &select_ptr->sql_alloc, &select_ptr->sql_offset,
+				"%s (itemid=" ZBX_FS_UI64 " and clock=%d and ns=%d)", separator , h->itemid,
+				h->ts.sec, h->ts.ns);
 	}
 
 	db_fetch_duplicates(&select_flt, ITEM_VALUE_TYPE_FLOAT, &duplicates);
