@@ -121,8 +121,7 @@ class CControllerWidgetGeoMapView extends CControllerWidget {
 		// Get problems.
 		$problems = API::Problem()->get([
 			'output' => ['objectid', 'severity'],
-			'selectHosts' => [],
-			'hostids' => array_keys($hosts),
+			'selectHosts' => ['hostid'],
 			'objectids' => array_keys($triggers)
 		]);
 
