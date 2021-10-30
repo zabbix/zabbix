@@ -91,11 +91,11 @@ class testItemRate extends CIntegrationTest {
 	private static $scenarios = [
 		[
 			'api_request' => [
-				'output' => ['value'],
+				'output' => ['value']
 			],
 			'expected_result' => [
 				[
-					'value' => '1',
+					'value' => '1'
 				]
 			],
 			'expected_error' => false,
@@ -108,11 +108,11 @@ class testItemRate extends CIntegrationTest {
 		],
 		[
 			'api_request' => [
-				'output' => ['value'],
+				'output' => ['value']
 			],
 			'expected_result' => [
 				[
-					'value' => '2',
+					'value' => '2'
 				]
 			],
 			'expected_error' => false,
@@ -125,11 +125,11 @@ class testItemRate extends CIntegrationTest {
 		],
 		[
 			'api_request' => [
-				'output' => ['value'],
+				'output' => ['value']
 			],
 			'expected_result' => [
 				[
-					'value' => '32',
+					'value' => '32'
 				]
 			],
 			'expected_error' => false,
@@ -142,11 +142,11 @@ class testItemRate extends CIntegrationTest {
 		],
 		[
 			'api_request' => [
-				'output' => ['value'],
+				'output' => ['value']
 			],
 			'expected_result' => [
 				[
-					'value' => '0.9',
+					'value' => '0.9'
 				]
 			],
 			'expected_error' => false,
@@ -159,11 +159,11 @@ class testItemRate extends CIntegrationTest {
 		],
 		[
 			'api_request' => [
-				'output' => ['value'],
+				'output' => ['value']
 			],
 			'expected_result' => [
 				[
-					'value' => '0.1',
+					'value' => '0.1'
 				]
 			],
 			'expected_error' => false,
@@ -176,11 +176,11 @@ class testItemRate extends CIntegrationTest {
 		],
 		[
 			'api_request' => [
-				'output' => ['value'],
+				'output' => ['value']
 			],
 			'expected_result' => [
 				[
-					'value' => '0.9',
+					'value' => '0.9'
 				]
 			],
 			'expected_error' => false,
@@ -193,11 +193,11 @@ class testItemRate extends CIntegrationTest {
 		],
 		[
 			'api_request' => [
-				'output' => ['value'],
+				'output' => ['value']
 			],
 			'expected_result' => [
 				[
-					'value' => '32',
+					'value' => '32'
 				]
 			],
 			'expected_error' => false,
@@ -229,7 +229,7 @@ class testItemRate extends CIntegrationTest {
 				'delay' => 1,
 				'item_num' => 0
 			]
-		],
+		]
 	];
 
 	/**
