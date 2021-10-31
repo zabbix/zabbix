@@ -399,33 +399,76 @@ abstract class CHostGeneral extends CHostBase {
 	}
 
 	/**
-	 * Change objects of linked or unliked templates on target hosts or templates.
+	 * Update table "hosts_templates" and change objects of linked or unliked templates on target hosts or templates.
 	 *
 	 * @param array      $hosts
 	 * @param array|null $db_hosts
 	 */
-	protected function updateTemplatesObjects(array $hosts, array $db_hosts = null): void {
+	protected function updateTemplates(array $hosts, array $db_hosts = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
+
+		parent::updateTemplates($hosts, $db_hosts);
 
 		$ins_links = [];
 		$del_links = [];
+		$del_links_clear = [];
 
 		foreach ($hosts as $host) {
-			if (array_key_exists('templates', $host)) {
-				$db_templates = ($db_hosts !== null) ? $db_hosts[$host[$id_field_name]]['templates'] : [];
+			if (!array_key_exists('templates', $host) && !array_key_exists('templates_clear', $host)) {
+				continue;
+			}
 
+			$db_templates = ($db_hosts !== null) ? $db_hosts[$host[$id_field_name]]['templates'] : [];
+
+			if (array_key_exists('templates', $host)) {
 				foreach ($host['templates'] as $template) {
-					if (!array_key_exists($template['hosttemplateid'], $db_templates)) {
+					if (array_key_exists($template['templateid'], $db_templates)) {
+						unset($db_templates);
+					}
+					else {
 						$ins_links[$template['templateid']][$host[$id_field_name]] = true;
 					}
 				}
-			}
 
-			if (array_key_exists('templates_clear', $host)) {
-				foreach ($host['templates'] as $template) {
-					$del_links[$template['templateid']][$host[$id_field_name]] = true;
+				if (array_key_exists('templates_clear', $host)) {
+					$templates_clear = array_column($host['templates_clear'], null, 'templateid');
+
+					foreach ($db_templates as $del_template) {
+						if (array_key_exists($del_template['templateid'], $templates_clear)) {
+							$del_links_clear[$del_template['templateid']][$host[$id_field_name]] = true;
+						}
+						else {
+							$del_links[$del_template['templateid']][$host[$id_field_name]] = true;
+						}
+					}
+				}
+				else {
+					foreach ($db_templates as $del_template) {
+						$del_links[$del_template['templateid']][$host[$id_field_name]] = true;
+					}
 				}
 			}
+			elseif (array_key_exists('templates_clear', $host)) {
+				foreach ($host['templates'] as $template) {
+					$del_links_clear[$template['templateid']][$host[$id_field_name]] = true;
+				}
+			}
+		}
+
+		while ($del_links_clear) {
+			$templateid = key($del_links_clear);
+			$hostids = reset($del_links_clear);
+			$templateids = [$templateid];
+			unset($del_links_clear[$templateid]);
+
+			foreach ($del_links_clear as $templateid => $_hostids) {
+				if ($_hostids === $hostids) {
+					$templateids[] = $templateid;
+					unset($del_links[$templateid]);
+				}
+			}
+
+			self::unlinkTemplatesObjects($templateids, array_keys($hostids), true);
 		}
 
 		while ($del_links) {
@@ -441,7 +484,7 @@ abstract class CHostGeneral extends CHostBase {
 				}
 			}
 
-			self::deleteTemplatesObjects($templateids, array_keys($hostids));
+			self::unlinkTemplatesObjects($templateids, array_keys($hostids));
 		}
 
 		while ($ins_links) {
@@ -457,18 +500,335 @@ abstract class CHostGeneral extends CHostBase {
 				}
 			}
 
-			self::addTemplatesObjects($templateids, array_keys($hostids));
+			self::linkTemplatesObjects($templateids, array_keys($hostids));
 		}
 	}
 
 	/**
-	 * Delete objects of given templates from given hosts or templates.
+	 * Unlink or clear objects of given templates from given hosts or templates.
 	 *
-	 * @param array $templateids
-	 * @param array $hostids
+	 * @param array      $templateids
+	 * @param array|null $hostids
+	 * @param bool       $clear
 	 */
-	private static function deleteTemplatesObjects(array $templateids, array $hostids): void {
+	protected static function unlinkTemplatesObjects(array $templateids, array $hostids = null, bool $clear = false): void {
+		$flags = ($clear)
+			? [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE]
+			: [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_PROTOTYPE];
 
+		// triggers
+		$db_triggers = DBselect(
+			'SELECT DISTINCT f.triggerid'.
+			' FROM functions f,items i'.
+			' WHERE f.itemid=i.itemid'.
+				' AND '.dbConditionInt('i.hostid', $templateids)
+		);
+
+		$tpl_triggerids = DBfetchColumn($db_triggers, 'triggerid');
+		$upd_triggers = [
+			ZBX_FLAG_DISCOVERY_NORMAL => [],
+			ZBX_FLAG_DISCOVERY_PROTOTYPE => []
+		];
+
+		if ($tpl_triggerids) {
+			$sql_distinct = ($hostids !== null) ? ' DISTINCT' : '';
+			$sql_from = ($hostids !== null) ? ',functions f,items i' : '';
+			$sql_where = ($hostids !== null)
+				? ' AND t.triggerid=f.triggerid'.
+					' AND f.itemid=i.itemid'.
+					' AND '.dbConditionInt('i.hostid', $hostids)
+				: '';
+
+			$db_triggers = DBSelect(
+				'SELECT'.$sql_distinct.' t.triggerid,t.flags'.
+				' FROM triggers t'.$sql_from.
+				' WHERE '.dbConditionInt('t.templateid', $tpl_triggerids).
+					' AND '.dbConditionInt('t.flags', $flags).
+					$sql_where
+			);
+
+			while ($db_trigger = DBfetch($db_triggers)) {
+				if ($clear) {
+					$upd_triggers[$db_trigger['flags']][$db_trigger['triggerid']] = true;
+				}
+				else {
+					$upd_triggers[$db_trigger['flags']][$db_trigger['triggerid']] = [
+						'values' => ['templateid' => 0],
+						'where' => ['triggerid' => $db_trigger['triggerid']]
+					];
+				}
+			}
+
+			if (!$clear && ($upd_triggers[ZBX_FLAG_DISCOVERY_NORMAL] || $upd_triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE])) {
+				$db_triggers = DBselect(
+					'SELECT DISTINCT t.triggerid,t.flags'.
+					' FROM triggers t,functions f,items i,hosts h'.
+					' WHERE t.triggerid=f.triggerid'.
+						' AND f.itemid=i.itemid'.
+						' AND i.hostid=h.hostid'.
+						' AND h.status='.HOST_STATUS_TEMPLATE.
+						' AND '.dbConditionInt('t.triggerid', array_keys(
+							$upd_triggers[ZBX_FLAG_DISCOVERY_NORMAL] + $upd_triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE]
+						))
+				);
+
+				while ($db_trigger = DBfetch($db_triggers)) {
+					$upd_triggers[$db_trigger['flags']][$db_trigger['triggerid']]['values']['uuid'] = generateUuidV4();
+				}
+			}
+		}
+
+		if ($upd_triggers[ZBX_FLAG_DISCOVERY_NORMAL]) {
+			if ($clear) {
+				CTriggerManager::delete(array_keys($upd_triggers[ZBX_FLAG_DISCOVERY_NORMAL]));
+			}
+			else {
+				DB::update('triggers', $upd_triggers[ZBX_FLAG_DISCOVERY_NORMAL]);
+			}
+		}
+
+		if ($upd_triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE]) {
+			if ($clear) {
+				CTriggerPrototypeManager::delete(array_keys($upd_triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE]));
+			}
+			else {
+				DB::update('triggers', $upd_triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
+			}
+		}
+
+		// graphs
+		$db_tpl_graphs = DBselect(
+			'SELECT DISTINCT g.graphid'.
+			' FROM graphs g,graphs_items gi,items i'.
+			' WHERE g.graphid=gi.graphid'.
+				' AND gi.itemid=i.itemid'.
+				' AND '.dbConditionInt('i.hostid', $templateids).
+				' AND '.dbConditionInt('g.flags', $flags)
+		);
+
+		$tpl_graphids = [];
+
+		while ($db_tpl_graph = DBfetch($db_tpl_graphs)) {
+			$tpl_graphids[] = $db_tpl_graph['graphid'];
+		}
+
+		if ($tpl_graphids) {
+			$upd_graphs = [
+				ZBX_FLAG_DISCOVERY_NORMAL => [],
+				ZBX_FLAG_DISCOVERY_PROTOTYPE => []
+			];
+
+			$sql = ($hostids !== null)
+				? 'SELECT DISTINCT g.graphid,g.flags'.
+					' FROM graphs g,graphs_items gi,items i'.
+					' WHERE g.graphid=gi.graphid'.
+						' AND gi.itemid=i.itemid'.
+						' AND '.dbConditionInt('g.templateid', $tpl_graphids).
+						' AND '.dbConditionInt('i.hostid', $hostids)
+				: 'SELECT g.graphid,g.flags'.
+					' FROM graphs g'.
+					' WHERE '.dbConditionInt('g.templateid', $tpl_graphids);
+
+			$db_graphs = DBSelect($sql);
+
+			while ($db_graph = DBfetch($db_graphs)) {
+				if ($clear) {
+					$upd_graphs[$db_graph['flags']][$db_graph['graphid']] = true;
+				}
+				else {
+					$upd_graphs[$db_graph['flags']][$db_graph['graphid']] = [
+						'values' => ['templateid' => 0],
+						'where' => ['graphid' => $db_graph['graphid']]
+					];
+				}
+			}
+
+			if (!$clear && ($upd_graphs[ZBX_FLAG_DISCOVERY_NORMAL] || $upd_graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE])) {
+				$db_graphs = DBselect(
+					'SELECT DISTINCT g.graphid,g.flags'.
+					' FROM graphs g,graphs_items gi,items i,hosts h'.
+					' WHERE g.graphid=gi.graphid'.
+						' AND gi.itemid=i.itemid'.
+						' AND i.hostid=h.hostid'.
+						' AND h.status='.HOST_STATUS_TEMPLATE.
+						' AND '.dbConditionInt('g.graphid', array_keys(
+							$upd_graphs[ZBX_FLAG_DISCOVERY_NORMAL] + $upd_graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]
+						))
+				);
+
+				while ($db_graph = DBfetch($db_graphs)) {
+					$upd_graphs[$db_graph['flags']][$db_graph['graphid']]['values']['uuid'] = generateUuidV4();
+				}
+			}
+
+			if ($upd_graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]) {
+				if ($clear) {
+					CGraphPrototypeManager::delete(array_keys($upd_graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]));
+				}
+				else {
+					DB::update('graphs', $upd_graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
+				}
+			}
+
+			if ($upd_graphs[ZBX_FLAG_DISCOVERY_NORMAL]) {
+				if ($clear) {
+					CGraphManager::delete(array_keys($upd_graphs[ZBX_FLAG_DISCOVERY_NORMAL]));
+				}
+				else {
+					DB::update('graphs', $upd_graphs[ZBX_FLAG_DISCOVERY_NORMAL]);
+				}
+			}
+		}
+
+		// items, discovery rules
+		$upd_items = [
+			ZBX_FLAG_DISCOVERY_NORMAL => [],
+			ZBX_FLAG_DISCOVERY_RULE => [],
+			ZBX_FLAG_DISCOVERY_PROTOTYPE => []
+		];
+
+		$sqlFrom = ' items i1,items i2,hosts h';
+		$sqlWhere = ' i2.itemid=i1.templateid'.
+			' AND '.dbConditionInt('i2.hostid', $templateids).
+			' AND '.dbConditionInt('i1.flags', $flags).
+			' AND h.hostid=i1.hostid';
+
+		if (!is_null($hostids)) {
+			$sqlWhere .= ' AND '.dbConditionInt('i1.hostid', $hostids);
+		}
+		$sql = 'SELECT DISTINCT i1.itemid,i1.flags,h.status as host_status,i1.type'.
+			' FROM '.$sqlFrom.
+			' WHERE '.$sqlWhere;
+
+		$dbItems = DBSelect($sql);
+
+		while ($item = DBfetch($dbItems)) {
+			if ($clear) {
+				$upd_items[$item['flags']][$item['itemid']] = true;
+			}
+			else {
+				$upd_item = ['templateid' => 0];
+				if ($item['host_status'] == HOST_STATUS_TEMPLATE && $item['type'] != ITEM_TYPE_HTTPTEST) {
+					$upd_item['uuid'] = generateUuidV4();
+				}
+				if ($item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL || $item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+					$upd_item['valuemapid'] = 0;
+				}
+
+				$upd_items[$item['flags']][$item['itemid']] = [
+					'values' => $upd_item,
+					'where' => ['itemid' => $item['itemid']]
+				];
+			}
+		}
+
+		if ($upd_items[ZBX_FLAG_DISCOVERY_RULE]) {
+			if ($clear) {
+				CDiscoveryRuleManager::delete(array_keys($upd_items[ZBX_FLAG_DISCOVERY_RULE]));
+			}
+			else {
+				DB::update('items', $upd_items[ZBX_FLAG_DISCOVERY_RULE]);
+			}
+		}
+
+		if ($upd_items[ZBX_FLAG_DISCOVERY_NORMAL]) {
+			if ($clear) {
+				CItemManager::delete(array_keys($upd_items[ZBX_FLAG_DISCOVERY_NORMAL]));
+			}
+			else {
+				DB::update('items', $upd_items[ZBX_FLAG_DISCOVERY_NORMAL]);
+			}
+		}
+
+		if ($upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]) {
+			if ($clear) {
+				CItemPrototypeManager::delete(array_keys($upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]));
+			}
+			else {
+				DB::update('items', $upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
+			}
+		}
+
+		// host prototypes
+		if (!$clear && $upd_items[ZBX_FLAG_DISCOVERY_RULE]) {
+			$host_prototypes = DBSelect(
+				'SELECT DISTINCT h.hostid,h3.status as host_status'.
+				' FROM hosts h'.
+					' INNER JOIN host_discovery hd ON h.hostid=hd.hostid'.
+					' INNER JOIN hosts h2 ON h.templateid=h2.hostid'.
+					' INNER JOIN host_discovery hd2 ON h.hostid=hd.hostid'.
+					' INNER JOIN items i ON hd.parent_itemid=i.itemid'.
+					' INNER JOIN hosts h3 ON i.hostid=h3.hostid'.
+				' WHERE '.dbConditionInt('hd.parent_itemid', array_keys($upd_items[ZBX_FLAG_DISCOVERY_RULE]))
+			);
+
+			$upd_host_prototypes = [];
+
+			while ($host_prototype = DBfetch($host_prototypes)) {
+				$upd_host_prototype = ['templateid' => 0];
+				if ($host_prototype['host_status'] == HOST_STATUS_TEMPLATE) {
+					$upd_host_prototype['uuid'] = generateUuidV4();
+				}
+
+				$upd_host_prototypes[$host_prototype['hostid']] = [
+					'values' => $upd_host_prototype,
+					'where' => ['hostid' => $host_prototype['hostid']]
+				];
+			}
+
+			if ($upd_host_prototypes) {
+				DB::update('hosts', $upd_host_prototypes);
+				DB::update('group_prototype', [
+					'values' => ['templateid' => 0],
+					'where' => ['hostid' => array_keys($upd_host_prototypes)]
+				]);
+			}
+		}
+
+		// http tests
+		$upd_httptests = [];
+
+		$sqlWhere = '';
+		if ($hostids !== null) {
+			$sqlWhere = ' AND '.dbConditionInt('ht1.hostid', $hostids);
+		}
+		$sql = 'SELECT DISTINCT ht1.httptestid,h.status as host_status'.
+				' FROM httptest ht1,httptest ht2,hosts h'.
+				' WHERE ht1.templateid=ht2.httptestid'.
+					' AND ht1.hostid=h.hostid'.
+					' AND '.dbConditionInt('ht2.hostid', $templateids).
+				$sqlWhere;
+
+		$httptests = DBSelect($sql);
+
+		while ($httptest = DBfetch($httptests)) {
+			if ($clear) {
+				$upd_httptests[$httptest['httptestid']] = true;
+			}
+			else {
+				$upd_httptest = ['templateid' => 0];
+				if ($httptest['host_status'] == HOST_STATUS_TEMPLATE) {
+					$upd_httptest['uuid'] = generateUuidV4();
+				}
+
+				$upd_httptests[$httptest['httptestid']] = [
+					'values' => $upd_httptest,
+					'where' => ['httptestid' => $httptest['httptestid']]
+				];
+			}
+		}
+
+		if ($upd_httptests) {
+			if ($clear) {
+				$result = API::HttpTest()->delete(array_keys($upd_httptests), true);
+				if (!$result) {
+					self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear Web scenarios.'));
+				}
+			}
+			else {
+				DB::update('httptest', $upd_httptests);
+			}
+		}
 	}
 
 	/**
@@ -477,7 +837,7 @@ abstract class CHostGeneral extends CHostBase {
 	 * @param array $templateids
 	 * @param array $hostids
 	 */
-	private static function addTemplatesObjects(array $templateids, array $hostids): void {
+	private static function linkTemplatesObjects(array $templateids, array $hostids): void {
 		// TODO: Modify parameters of syncTemplates methods when complete audit log will be implementing for hosts.
 		$link_request = [
 			'templateids' => $templateids,

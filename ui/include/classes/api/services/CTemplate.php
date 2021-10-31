@@ -350,7 +350,6 @@ class CTemplate extends CHostGeneral {
 		$this->updateTagsNew($templates);
 		$this->updateMacros($templates);
 		$this->updateTemplates($templates);
-		$this->updateTemplatesElements($templates);
 
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_TEMPLATE, $templates);
 
@@ -457,7 +456,6 @@ class CTemplate extends CHostGeneral {
 		$this->updateTagsNew($templates, $db_templates);
 		$this->updateMacros($templates, $db_templates);
 		$this->updateTemplates($templates, $db_templates);
-		$this->updateTemplatesObjects($templates, $db_templates);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_TEMPLATE, $templates, $db_templates);
 
@@ -527,22 +525,9 @@ class CTemplate extends CHostGeneral {
 	 * @return array
 	 */
 	public function delete(array $templateids) {
-		if (empty($templateids)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
-		}
+		$this->validateDelete($templateids, $db_templates);
 
-		$db_templates = $this->get([
-			'output' => ['templateid', 'name'],
-			'templateids' => $templateids,
-			'editable' => true,
-			'preservekeys' => true
-		]);
-
-		if (array_diff_key(array_flip($templateids), $db_templates)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-		}
-
-		API::Template()->unlink($templateids, null, true);
+		self::unlinkTemplatesObjects($templateids, null, true);
 
 		// delete the discovery rules first
 		$del_rules = API::DiscoveryRule()->get([
@@ -712,9 +697,59 @@ class CTemplate extends CHostGeneral {
 			info(_s('Deleted: Template "%1$s".', $db_template['name']));
 		}
 
-		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_TEMPLATE, $db_templates);
+		$this->addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_TEMPLATE, $db_templates);
 
 		return ['templateids' => $templateids];
+	}
+
+	/**
+	 * @param array      $templateids
+	 * @param array|null $db_templates
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	private function validateDelete(array $templateids, array &$db_templates = null): void {
+		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+
+		if (!CApiInputValidator::validate($api_input_rules, $templateids, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$db_templates = $this->get([
+			'output' => ['templateid', 'name'],
+			'templateids' => $templateids,
+			'editable' => true,
+			'preservekeys' => true
+		]);
+
+		if (count($db_templates) != count($templateids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		$all_upd_templates = [];
+		$del_templates = [];
+		$del_templates_clear = [];
+		$result = DBselect(
+			'SELECT ht.hostid,ht.templateid AS del_templateid,htt.templateid'.
+			' FROM hosts_templates ht, hosts_templates htt'.
+			' WHERE htt.hostid=ht.hostid'.
+				' AND htt.templateid!=ht.templateid'.
+				' AND '.dbConditionInt('ht.templateid', $templateids)
+		);
+
+		while ($row = DBfetch($result)) {
+			$all_upd_templates[$row['templateid']] = true;
+			$del_templates[$row['del_templateid']][$row['hostid']][$row['templateid']] = '';
+			$del_templates_clear[$row['del_templateid']][$row['hostid']] =
+				array_search($row['del_templateid'], $templateids);
+		}
+
+		if ($del_templates) {
+			$this->checkTriggerDependenciesOfUpdTemplates(array_keys($all_upd_templates), $del_templates,
+				$del_templates_clear, ''
+			);
+			$this->checkTriggerExpressionsOfDelTemplates($del_templates, $del_templates_clear, '');
+		}
 	}
 
 	/**
