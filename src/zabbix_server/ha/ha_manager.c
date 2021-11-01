@@ -590,8 +590,12 @@ static int	ha_check_cluster_config(zbx_ha_info_t *info, zbx_vector_ha_node_t *no
 			return FAIL;
 		}
 
-		if (ZBX_NODE_STATUS_ACTIVE == nodes->values[i]->status)
+		/* immediately switch to active mode if there is no other node that can take over */
+		if (ZBX_NODE_STATUS_ACTIVE == nodes->values[i]->status ||
+				ZBX_NODE_STATUS_STANDBY == nodes->values[i]->status)
+		{
 			*activate = FAIL;
+		}
 	}
 
 	return SUCCEED;
@@ -719,13 +723,13 @@ out:
 		ha_db_commit(info);
 	else
 		ha_db_rollback(info);
-finish:
+
 	if (ZBX_NODE_STATUS_ERROR != info->ha_status)
 	{
 		if (ZBX_DB_OK <= info->db_status)
 			info->ha_nodeid = nodeid;
 	}
-
+finish:
 	zbx_vector_ha_node_clear_ext(&nodes, zbx_ha_node_free);
 	zbx_vector_ha_node_destroy(&nodes);
 
@@ -833,13 +837,13 @@ out:
 		ha_db_commit(info);
 	else
 		ha_db_rollback(info);
-finish:
+
 	if (ZBX_NODE_STATUS_ERROR != info->ha_status)
 	{
 		if (ZBX_DB_OK <= info->db_status)
 			info->ha_status = ha_status;
 	}
-
+finish:
 	zbx_vector_ha_node_clear_ext(&nodes, zbx_ha_node_free);
 	zbx_vector_ha_node_destroy(&nodes);
 
@@ -1064,13 +1068,12 @@ out:
 	else
 		ha_db_rollback(info);
 
-finish:
 	if (ZBX_NODE_STATUS_ERROR != info->ha_status)
 	{
 		if (ZBX_DB_OK <= info->db_status)
 			info->ha_status = ha_status;
 	}
-
+finish:
 	zbx_vector_ha_node_clear_ext(&nodes, zbx_ha_node_free);
 	zbx_vector_ha_node_destroy(&nodes);
 
@@ -1798,16 +1801,14 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 
 		if (ZBX_NODE_STATUS_ERROR == info.ha_status)
 			goto pause;
-		else
-			nextcheck = ZBX_HA_POLL_PERIOD;
 	}
-	else
-	{
-		/* Server switches to standby mode when database is offline for <failover delay> - <poll period> */
-		/* seconds. If that happens, delay the next database check for twice of poll period time to      */
-		/* ensure that the same node does not take over after recovery.                                  */
-		nextcheck = ZBX_HA_POLL_PERIOD * 2;
-	}
+
+	nextcheck = ZBX_HA_POLL_PERIOD;
+
+	/* double the initial database check delay in standby mode to avoid the same node becoming active */
+	/* immediately after switching to standby mode or crashing and being restarted                    */
+	if (ZBX_NODE_STATUS_STANDBY == info.ha_status)
+		nextcheck *= 2;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "HA manager started in %s mode", zbx_ha_status_str(info.ha_status));
 
