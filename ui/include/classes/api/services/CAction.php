@@ -677,7 +677,7 @@ class CAction extends CApiService {
 		}
 		unset($action);
 
-		if ($del_conditionids) {sdii($del_conditionids);
+		if ($del_conditionids) {
 			DB::delete('conditions', ['conditionid' => $del_conditionids]);
 		}
 
