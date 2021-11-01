@@ -22,7 +22,7 @@ define('ZABBIX_VERSION',		'6.0.0alpha6');
 define('ZABBIX_API_VERSION',	'6.0.0');
 define('ZABBIX_EXPORT_VERSION',	'6.0');
 
-define('ZABBIX_DB_VERSION',		5050086);
+define('ZABBIX_DB_VERSION',		5050087);
 
 define('DB_VERSION_SUPPORTED',				0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',		1);
@@ -1178,7 +1178,6 @@ define('ZBX_FUNCTION_TYPE_MATH',		4);
 define('ZBX_FUNCTION_TYPE_OPERATOR',	5);
 define('ZBX_FUNCTION_TYPE_PREDICTION',	6);
 define('ZBX_FUNCTION_TYPE_STRING',		7);
-
 /**
  * @deprecated use either a literal space " " or a non-breakable space "&nbsp;" instead
  */
