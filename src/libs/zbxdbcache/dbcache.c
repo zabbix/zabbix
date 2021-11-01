@@ -2383,7 +2383,6 @@ static int	DBmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 	{
 		remove_history_duplicates(&history_values);
 		zbx_vector_ptr_clear(&history_values);
-		ret_flush = 0;
 		ret = add_history(history, history_num, &history_values, &ret_flush);
 	}
 
