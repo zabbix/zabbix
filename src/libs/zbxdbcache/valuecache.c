@@ -2582,7 +2582,7 @@ void	zbx_vc_reset(void)
 int	zbx_vc_add_values(zbx_vector_ptr_t *history, int *ret_flush)
 {
 	zbx_vc_item_t		*item;
-	int			i, ret;
+	int			i;
 	ZBX_DC_HISTORY		*h;
 	time_t			expire_timestamp;
 
