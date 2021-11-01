@@ -729,7 +729,6 @@ out:
 		if (ZBX_DB_OK <= info->db_status)
 			info->ha_nodeid = nodeid;
 	}
-
 finish:
 	zbx_vector_ha_node_clear_ext(&nodes, zbx_ha_node_free);
 	zbx_vector_ha_node_destroy(&nodes);
