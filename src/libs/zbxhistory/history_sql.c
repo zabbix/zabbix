@@ -187,7 +187,7 @@ static int	sql_writer_flush(void)
 	}
 	else
 	{
-		if (ZBX_DB_FAIL == txn_error && zbx_db_last_errcode() == ERR_Z3008)
+		if (ZBX_DB_FAIL == txn_error && ERR_Z3008 == zbx_db_last_errcode())
 			return FLUSH_DUPL_REJECTED;
 
 		return FLUSH_FAIL;
