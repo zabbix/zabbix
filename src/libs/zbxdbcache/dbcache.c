@@ -2370,7 +2370,7 @@ static int	add_history(ZBX_DC_HISTORY *history, int history_num, zbx_vector_ptr_
  ******************************************************************************/
 static int	DBmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 {
-	int			ret, ret_flush = FLUSH_SUCCEED;
+	int			ret, ret_flush = FLUSH_SUCCEED, num;
 	zbx_vector_ptr_t	history_values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -2381,9 +2381,12 @@ static int	DBmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 	if (FAIL == (ret = add_history(history, history_num, &history_values, &ret_flush)) &&
 			FLUSH_DUPL_REJECTED == ret_flush)
 	{
+		num = history_values.values_num;
 		remove_history_duplicates(&history_values);
 		zbx_vector_ptr_clear(&history_values);
-		ret = add_history(history, history_num, &history_values, &ret_flush);
+
+		if (SUCCEED == (ret = add_history(history, history_num, &history_values, &ret_flush)))
+			zabbix_log(LOG_LEVEL_WARNING, "skipped %d duplicates", num - history_values.values_num);
 	}
 
 	zbx_vector_ptr_destroy(&history_values);
