@@ -446,13 +446,7 @@ static zbx_ha_node_t	*ha_find_node_by_name(zbx_vector_ha_node_t *nodes, const ch
  ******************************************************************************/
 static void	ha_get_external_address(char **address, unsigned short *port)
 {
-	if (NULL != CONFIG_NODE_ADDRESS)
-		(void)parse_serveractive_element(CONFIG_NODE_ADDRESS, address, port, 0);
-	else
-		*address = zbx_strdup(NULL, "localhost");
-
-	if (0 == *port)
-		*port = 10051;
+	(void)parse_serveractive_element(CONFIG_NODE_ADDRESS, address, port, 10051);
 }
 
 /******************************************************************************

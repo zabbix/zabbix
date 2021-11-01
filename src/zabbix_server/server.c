@@ -605,6 +605,9 @@ static void	zbx_set_defaults(void)
 
 	if (0 != CONFIG_REPORTWRITER_FORKS)
 		CONFIG_REPORTMANAGER_FORKS = 1;
+
+	if (NULL == CONFIG_NODE_ADDRESS)
+		CONFIG_NODE_ADDRESS = zbx_strdup(CONFIG_NODE_ADDRESS, "localhost");
 }
 
 /******************************************************************************
@@ -618,8 +621,9 @@ static void	zbx_set_defaults(void)
  ******************************************************************************/
 static void	zbx_validate_config(ZBX_TASK_EX *task)
 {
-	char	*ch_error;
-	int	err = 0;
+	char		*ch_error, *address = NULL;
+	int		err = 0;
+	unsigned short	port;
 
 	if (0 == CONFIG_UNREACHABLE_POLLER_FORKS && 0 != CONFIG_POLLER_FORKS + CONFIG_JAVAPOLLER_FORKS)
 	{
@@ -661,11 +665,20 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
-	if (SUCCEED != 	zbx_validate_export_type(CONFIG_EXPORT_TYPE, NULL))
+	if (SUCCEED != zbx_validate_export_type(CONFIG_EXPORT_TYPE, NULL))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid \"ExportType\" configuration parameter: %s", CONFIG_EXPORT_TYPE);
 		err = 1;
 	}
+
+	if (FAIL == parse_serveractive_element(CONFIG_NODE_ADDRESS, &address, &port, 10051))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "invalid \"NodeAddress\" configuration parameter: address \"%s\""
+				" is invalid", CONFIG_NODE_ADDRESS);
+		err = 1;
+	}
+	zbx_free(address);
+
 #if !defined(HAVE_IPV6)
 	err |= (FAIL == check_cfg_feature_str("Fping6Location", CONFIG_FPING6_LOCATION, "IPv6 support"));
 #endif
@@ -954,7 +967,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			INT_MAX},
 		{"HANodeName",			&CONFIG_HA_NODE_NAME,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"NodeAddress",		&CONFIG_NODE_ADDRESS,		TYPE_STRING,
+		{"NodeAddress",			&CONFIG_NODE_ADDRESS,		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{NULL}
 	};
