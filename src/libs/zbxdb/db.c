@@ -1536,8 +1536,16 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	}
 	else if (PGRES_COMMAND_OK != PQresultStatus(result))
 	{
+		zbx_err_codes_t	errcode;
+
 		zbx_postgresql_error(&error, result);
-		zbx_db_errlog((NULL != strstr(error, "duplicate key") ? ERR_Z3008 : ERR_Z3005), 0, error, sql);
+
+		if (0 == zbx_strcmp_null(PQresultErrorField(result, PG_DIAG_SQLSTATE), "23505"))
+			errcode = ERR_Z3008;
+		else
+			errcode = ERR_Z3005;
+
+		zbx_db_errlog(errcode, 0, error, sql);
 		zbx_free(error);
 
 		ret = (SUCCEED == is_recoverable_postgresql_error(conn, result) ? ZBX_DB_DOWN : ZBX_DB_FAIL);
