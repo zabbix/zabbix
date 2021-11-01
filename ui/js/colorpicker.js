@@ -133,10 +133,8 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 			 * Initialization of colorpicker overlay.
 			 *
 			 * @param object         options
-			 * @param array          options.palette   Array of arrays. Every nested array contains hex color for one
-			 *                                         cell.
+			 * @param array          options.palette   Every nested array contains hex color for one cell.
 			 * @param string|object  options.appendTo  Target element where overlay should be appended.
-			 * @param function       options.onUpdate  Callback function to execute once color has changed.
 			 */
 			init: function(options) {
 				const $close = $('<button type="button" class="overlay-close-btn" title="' + t('S_CLOSE') + '"/>')
@@ -310,6 +308,13 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 			methods.init(options);
 		}
 
+		/*
+		 * Initialization of each separate colorpicker element.
+		 *
+		 * @param {object}    options
+		 * @param {bool}      options.use_default  Target element where overlay should be appended.
+		 * @param {callable}  options.onUpdate     Callback function to execute once color has changed.
+		 */
 		return this.each(function (_, element) {
 			const id = $(element).attr('id');
 			const callback = (options && 'onUpdate' in options) ? options.onUpdate : null;

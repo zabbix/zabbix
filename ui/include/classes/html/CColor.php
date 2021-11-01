@@ -36,6 +36,13 @@ class CColor extends CDiv {
 	private $use_default;
 
 	/**
+	 * jQuery wrapper element selector to append color-picker overlay.
+	 *
+	 * @var string
+	 */
+	private $wrapper_append_to;
+
+	/**
 	 * Creates a color picker form element.
 	 *
 	 * @param string $name        Color picker field name.
@@ -75,6 +82,19 @@ class CColor extends CDiv {
 	}
 
 	/**
+	 * Set overlay wrapper selector.
+	 *
+	 * @param string $wrapper_selector  Wrapper selector to append colorpicker overlay.
+	 *
+	 * @return CColor
+	 */
+	public function setOverlayWrapper(string $wrapper_selector) {
+		$this->wrapper_append_to = $wrapper_selector;
+
+		return $this;
+	}
+
+	/**
 	 * Set or reset element 'aria-required' attribute.
 	 *
 	 * @param bool $is_required
@@ -94,8 +114,7 @@ class CColor extends CDiv {
 	 *
 	 * @return CColor
 	 */
-	public function appendColorPickerJs($append = true)
-	{
+	public function appendColorPickerJs($append = true) {
 		$this->append_color_picker_js = $append;
 
 		return $this;
@@ -108,7 +127,8 @@ class CColor extends CDiv {
 	 */
 	protected function getInitJavascript(): string {
 		$options = [
-			'use_default' => $this->use_default
+			'use_default' => $this->use_default,
+			'appendTo' => $this->wrapper_append_to
 		];
 
 		return 'jQuery("#'.$this->name.'").colorpicker('.json_encode(array_filter($options)).');';
