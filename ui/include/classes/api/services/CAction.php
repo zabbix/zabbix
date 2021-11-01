@@ -644,6 +644,11 @@ class CAction extends CApiService {
 							return $condition['conditiontype'] == $db_condition['conditiontype'];
 						}
 
+						if ($condition['conditiontype'] == CONDITION_TYPE_EVENT_TAG_VALUE) {
+							return $condition['conditiontype'] == $db_condition['conditiontype']
+								&& $condition['value2'] === $db_condition['value2'];
+						}
+
 						return $condition['conditiontype'] == $db_condition['conditiontype']
 							&& $condition['value'] == $db_condition['value'];
 					})
@@ -672,7 +677,7 @@ class CAction extends CApiService {
 		}
 		unset($action);
 
-		if ($del_conditionids) {
+		if ($del_conditionids) {sdii($del_conditionids);
 			DB::delete('conditions', ['conditionid' => $del_conditionids]);
 		}
 
