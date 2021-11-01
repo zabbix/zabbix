@@ -3493,7 +3493,8 @@ static int	evaluate_CHANGECOUNT(zbx_variant_t *value, DC_ITEM *item, const char 
 		const zbx_timespec_t *ts, char **error)
 {
 
-	int				arg1, i, nparams, time_shift, ret = FAIL, seconds = 0, nvalues = 0, mode = CHANGE_ALL;
+	int				arg1, i, nparams, time_shift, ret = FAIL, seconds = 0, nvalues = 0;
+	int				mode = CHANGE_ALL;
 	char				*arg2 = NULL;
 	zbx_value_type_t		arg1_type;
 	zbx_vector_history_record_t	values;
@@ -3566,80 +3567,71 @@ static int	evaluate_CHANGECOUNT(zbx_variant_t *value, DC_ITEM *item, const char 
 		goto out;
 	}
 
-	if (1 < values.values_num)
+	if (2 > values.values_num)
 	{
-		if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
-		{
-			if (CHANGE_ALL == mode)
-			{
-				CHANGECOUNT_UI64(!=);
-			}
-
-			else if (CHANGE_INC == mode)
-			{
-				CHANGECOUNT_UI64(<);
-			}
-
-			else if (CHANGE_DEC == mode)
-			{
-				CHANGECOUNT_UI64(>);
-			}
-
-		}
-
-		else if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
-		{
-			if (CHANGE_ALL == mode)
-			{
-				for (i = 0; i < values.values_num - 1; i++)
-				{
-					if (SUCCEED != zbx_double_compare(values.values[i + 1].value.dbl, values.values[i].value.dbl))
-						count++;
-				}
-			}
-
-			else if (CHANGE_INC == mode)
-			{
-				CHANGECOUNT_DBL(<, -);
-			}
-
-			else if (CHANGE_DEC == mode)
-			{
-				CHANGECOUNT_DBL(>, +);
-			}
-
-		}
-
-		else if (ITEM_VALUE_TYPE_STR == item->value_type || ITEM_VALUE_TYPE_TEXT == item->value_type)
-		{
-			for (i = 0; i < values.values_num - 1; i++)
-			{
-				if (0 != strcmp(values.values[i + 1].value.str, values.values[i].value.str))
-					count++;
-			}
-		}
-
-		else if (ITEM_VALUE_TYPE_LOG == item->value_type)
-		{
-			for (i = 0; i < values.values_num - 1; i++)
-			{
-				if (0 != strcmp(values.values[i + 1].value.log->value, values.values[i].value.log->value))
-					count++;
-			}
-		}
-
-		else
-		{
-			*error = zbx_strdup(*error, "invalid value type");
-			goto out;
-		}
-
-		ret = SUCCEED;
-		zbx_variant_set_ui64(value, count);
+		*error = zbx_strdup(*error, "not enough data");
+		goto out;
 	}
 
+	if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
+	{
+		if (CHANGE_ALL == mode)
+		{
+			CHANGECOUNT_UI64(!=);
+		}
+		else if (CHANGE_INC == mode)
+		{
+			CHANGECOUNT_UI64(<);
+		}
+		else if (CHANGE_DEC == mode)
+		{
+			CHANGECOUNT_UI64(>);
+		}
+	}
+	else if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
+	{
+		if (CHANGE_ALL == mode)
+		{
+			for (i = 0; i < values.values_num - 1; i++)
+			{
+				if (SUCCEED != zbx_double_compare(values.values[i + 1].value.dbl,
+							values.values[i].value.dbl))
+					count++;
+			}
+		}
+		else if (CHANGE_INC == mode)
+		{
+			CHANGECOUNT_DBL(<, -);
+		}
+		else if (CHANGE_DEC == mode)
+		{
+			CHANGECOUNT_DBL(>, +);
+		}
+	}
+	else if (ITEM_VALUE_TYPE_STR == item->value_type || ITEM_VALUE_TYPE_TEXT == item->value_type)
+	{
+		for (i = 0; i < values.values_num - 1; i++)
+		{
+			if (0 != strcmp(values.values[i + 1].value.str, values.values[i].value.str))
+				count++;
+		}
+	}
+	else if (ITEM_VALUE_TYPE_LOG == item->value_type)
+	{
+		for (i = 0; i < values.values_num - 1; i++)
+		{
+			if (0 != strcmp(values.values[i + 1].value.log->value, values.values[i].value.log->value))
+				count++;
+		}
+	}
 	else
-		*error = zbx_strdup(*error, "not enough data");
+	{
+		*error = zbx_strdup(*error, "invalid value type");
+		goto out;
+	}
+
+	ret = SUCCEED;
+	zbx_variant_set_ui64(value, count);
 out:
 	zbx_history_record_vector_destroy(&values, item->value_type);
 
