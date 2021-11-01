@@ -51,6 +51,8 @@ struct	st_logfile
 	int		md5_block_size;	/* size of the first and last blocks of file for which the md5 sum is */
 					/* calculated (in 'first_block_md5') */
 	md5_byte_t	first_block_md5[MD5_DIGEST_SIZE];	/* md5 sum of the initial part of the file */
+	zbx_uint64_t	last_block_offset;		/* position of the last block from the beginning of file */
+	md5_byte_t	last_block_md5[MD5_DIGEST_SIZE];	/* md5 sum of the last block */
 };
 
 typedef int 	(*zbx_process_value_func_t)(const char *server, unsigned short port, const char *host,
