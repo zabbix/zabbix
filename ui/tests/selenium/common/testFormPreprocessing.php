@@ -1652,6 +1652,34 @@ abstract class testFormPreprocessing extends CWebTest {
 					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
 				]
 			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Item Prometeus wrong first parameter =!',
+						'Key' => 'wrong-second-parameter-equals-exlamation'
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus pattern', 'parameter_1' => '{label_name=!"name"}']
+
+					],
+					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Item Prometeus wrong first parameter ~!',
+						'Key' => 'wrong-second-parameter-tilda-exclamation'
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus pattern', 'parameter_1' => '{label_name~!"name"}']
+
+					],
+					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+				]
+			],
 			// Successful Prometheus pattern creation.
 			[
 				[
@@ -1801,6 +1829,30 @@ abstract class testFormPreprocessing extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
+						'Name' => 'Item Prometeus label operator !=',
+						'Key' => 'prometeus-label-operator-exclamation-equals'
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus pattern', 'parameter_1' => '{label_name!="name"}']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item Prometeus label operator !~',
+						'Key' => 'prometeus-label-operator-exclamation-tilda'
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus pattern', 'parameter_1' => '{label_name!~"name"}']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
 						'Name' => 'Item Prometeus slashes in pattern',
 						'Key' => 'prometeus-slashes-pattern'
 					],
@@ -1886,14 +1938,24 @@ abstract class testFormPreprocessing extends CWebTest {
 
 	/**
 	 * Add item and preprocessing steps.
+	 *
+	 *
 	 */
-	protected function addItemWithPreprocessing($data) {
+	protected function addItemWithPreprocessing($data, $lld = false) {
 		$this->page->login()->open($this->link);
 		$this->query('button:'.$this->button)->waitUntilPresent()->one()->click();
 		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 		$form->fill($data['fields']);
 		$form->selectTab('Preprocessing');
+
+		// Check that 'Type of information' field is not visible before first step is added.
+		$this->assertFalse($form->query('xpath:.//div[@id="item_preproc_list"]/label[text()="Type of information"]')
+				->one(false)->isVisible());
 		$this->addPreprocessingSteps($data['preprocessing']);
+
+		// Check that 'Type of information' field is visible after steps are added, but not for LLD.
+		$this->assertTrue($form->query('xpath:.//div[@id="item_preproc_list"]/label[text()="Type of information"]')
+				->one(false)->isVisible(!$lld));
 
 		return $form;
 	}
@@ -1901,13 +1963,13 @@ abstract class testFormPreprocessing extends CWebTest {
 	/**
 	 * Check creating items, item prototypes or LLD rules with preprocessing steps.
 	 */
-	protected function checkCreate($data) {
+	protected function checkCreate($data, $lld = false) {
 		if ($data['expected'] === TEST_BAD) {
 			$sql_items = 'SELECT * FROM items ORDER BY itemid';
 			$old_hash = CDBHelper::getHash($sql_items);
 		}
 
-		$form = $this->addItemWithPreprocessing($data);
+		$form = $this->addItemWithPreprocessing($data, $lld);
 		$form->submit();
 		$this->page->waitUntilReady();
 
@@ -1994,8 +2056,8 @@ abstract class testFormPreprocessing extends CWebTest {
 	/**
 	 * Check spaces in preprocessing steps.
 	 */
-	protected function checkTrailingSpaces($data) {
-		$form = $this->addItemWithPreprocessing($data);
+	protected function checkTrailingSpaces($data, $lld = false) {
+		$form = $this->addItemWithPreprocessing($data, $lld);
 		$form->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, $this->success_message);
@@ -2202,7 +2264,7 @@ abstract class testFormPreprocessing extends CWebTest {
 	 * Check "Custom on fail" fields and checkbox state.
 	 */
 	public function checkCustomOnFail($data, $lld = null) {
-		$form = $this->addItemWithPreprocessing($data);
+		$form = $this->addItemWithPreprocessing($data, $lld);
 		$steps = $this->getPreprocessingSteps();
 
 		foreach ($data['preprocessing'] as $i => $options) {
@@ -2525,9 +2587,9 @@ abstract class testFormPreprocessing extends CWebTest {
 	 * @param array		$data		data provider
 	 * @param string	$host_link	URL of host configuration
 	 */
-	protected function checkPreprocessingInheritance($data, $host_link) {
+	protected function checkPreprocessingInheritance($data, $host_link, $lld = false) {
 		// Create item on template.
-		$form = $this->addItemWithPreprocessing($data);
+		$form = $this->addItemWithPreprocessing($data, $lld);
 		$form->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, $this->success_message);
