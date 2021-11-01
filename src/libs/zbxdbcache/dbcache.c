@@ -2370,7 +2370,7 @@ static int	add_history(ZBX_DC_HISTORY *history, int history_num, zbx_vector_ptr_
  ******************************************************************************/
 static int	DBmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 {
-	int			ret, ret_flush = 0;
+	int			ret, ret_flush = FLUSH_SUCCEED;
 	zbx_vector_ptr_t	history_values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
