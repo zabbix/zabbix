@@ -1258,9 +1258,8 @@ class CAction extends CApiService {
 				$db_operations = $is_update ? $db_actions[$action['actionid']][$operation_group] : [];
 
 				foreach ($action[$operation_group] as &$operation) {
-					if (!array_key_exists('opgroup', $operation)
-							|| ($operation['operationtype'] != OPERATION_TYPE_GROUP_ADD
-								&& $operation['operationtype'] != OPERATION_TYPE_GROUP_REMOVE)) {
+					// Proceed only if operation type is OPERATION_TYPE_GROUP_ADD or OPERATION_TYPE_GROUP_REMOVE.
+					if (!array_key_exists('opgroup', $operation)) {
 						continue;
 					}
 
@@ -1342,9 +1341,8 @@ class CAction extends CApiService {
 				$db_operations = $is_update ? $db_actions[$action['actionid']][$operation_group] : [];
 
 				foreach ($action[$operation_group] as &$operation) {
-					if (!array_key_exists('optemplate', $operation)
-							|| ($operation['operationtype'] != OPERATION_TYPE_TEMPLATE_ADD
-								&& $operation['operationtype'] != OPERATION_TYPE_TEMPLATE_REMOVE)) {
+					// Proceed only if operation type is OPERATION_TYPE_TEMPLATE_ADD or OPERATION_TYPE_TEMPLATE_REMOVE.
+					if (!array_key_exists('optemplate', $operation)) {
 						continue;
 					}
 
@@ -1411,13 +1409,13 @@ class CAction extends CApiService {
 	 * @param array      $actions
 	 * @param array|null $db_actions
 	 */
-	private static function updateOperationInventories(array &$actions, array $db_actions = null): void {
+	private static function updateOperationInventories(array $actions, array $db_actions = null): void {
 		$is_update = ($db_actions !== null);
 
 		$ins_opinventories = [];
 		$upd_opinventories = [];
 
-		foreach ($actions as &$action) {
+		foreach ($actions as $action) {
 			foreach (self::OPERATION_GROUPS as $operation_group) {
 				if (!array_key_exists($operation_group, $action)) {
 					continue;
@@ -1425,7 +1423,7 @@ class CAction extends CApiService {
 
 				$db_operations = $is_update ? $db_actions[$action['actionid']][$operation_group] : [];
 
-				foreach ($action[$operation_group] as &$operation) {
+				foreach ($action[$operation_group] as $operation) {
 					if ($operation['operationtype'] != OPERATION_TYPE_HOST_INVENTORY) {
 						continue;
 					}
@@ -1451,10 +1449,8 @@ class CAction extends CApiService {
 							['operationid' => $operation['operationid']] + $operation['opinventory'];
 					}
 				}
-				unset($operation);
 			}
 		}
-		unset($action);
 
 		if ($upd_opinventories) {
 			DB::update('opinventory', $upd_opinventories);
@@ -2980,7 +2976,7 @@ class CAction extends CApiService {
 
 				foreach ($action[$operation_group] as $operation) {
 					if ($operation['operationtype'] == OPERATION_TYPE_COMMAND
-							&& $action['eventsource'] != EVENT_SOURCE_SERVICE
+							// Service actions do not support "opcommand_grp".
 							&& array_key_exists('opcommand_grp', $operation)) {
 						$groupids = array_merge($groupids, array_column($operation['opcommand_grp'], 'groupid'));
 					}
@@ -3030,6 +3026,10 @@ class CAction extends CApiService {
 				}
 			}
 
+			if ($action['eventsource'] == EVENT_SOURCE_SERVICE) {
+				continue;
+			}
+
 			foreach (self::OPERATION_GROUPS as $operation_group) {
 				if (!array_key_exists($operation_group, $action)) {
 					continue;
@@ -3037,7 +3037,6 @@ class CAction extends CApiService {
 
 				foreach ($action[$operation_group] as $operation) {
 					if ($operation['operationtype'] == OPERATION_TYPE_COMMAND
-							&& $action['eventsource'] != EVENT_SOURCE_SERVICE
 							&& array_key_exists('opcommand_hst', $operation)) {
 						foreach ($operation['opcommand_hst'] as $opcommand_hst) {
 							if ($opcommand_hst['hostid'] != 0) {
@@ -3417,7 +3416,7 @@ class CAction extends CApiService {
 	 * @param array|null $db_actions
 	 */
 	private static function addAffectedObjects(array $actions, array &$db_actions = null): void {
-		$actionids = ['filter' => [], 'conditions' => [], 'operations' => []];
+		$actionids = ['filter' => [], 'operations' => []];
 
 		foreach ($actions as $action) {
 			if (array_key_exists('filter', $action)) {
@@ -3430,8 +3429,9 @@ class CAction extends CApiService {
 				continue;
 			}
 
+			$actionids['operations'][] = $action['actionid'];
+
 			foreach (self::OPERATION_GROUPS as $operation_group) {
-				$actionids['operations'][$action['actionid']] = true;
 				$db_actions[$action['actionid']][$operation_group] = [];
 			}
 		}
@@ -3488,7 +3488,7 @@ class CAction extends CApiService {
 				' LEFT JOIN opmessage m ON m.operationid=o.operationid'.
 				' LEFT JOIN opcommand c ON c.operationid=o.operationid'.
 				' LEFT JOIN opinventory i ON i.operationid=o.operationid'.
-			' WHERE '.dbConditionId('o.actionid', array_keys($actionids['operations']))
+			' WHERE '.dbConditionId('o.actionid', $actionids['operations'])
 		);
 
 		while ($db_operation = DBfetch($db_operations)) {
