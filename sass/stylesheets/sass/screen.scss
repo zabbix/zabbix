@@ -4322,7 +4322,8 @@ td.inactive-bg {
 		width: 18px;
 		height: 18px;
 		background: url($sprite-path) no-repeat -323px -411px;
-		border: 2px solid $form-border-color;
+		border: 1px solid $form-border-color;
+		margin: 1px;
 		cursor: pointer;
 	}
 
@@ -4362,6 +4363,7 @@ td.inactive-bg {
 		div {
 			position: absolute;
 			border-width: 1px;
+			margin: 0px;
 			left: 2px;
 			top: 2px;
 		}

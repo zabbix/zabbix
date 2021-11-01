@@ -5187,7 +5187,8 @@ td[class] + td.disaster-bg {
     width: 18px;
     height: 18px;
     background: url("../img/icon-sprite.svg?20200407") no-repeat -323px -411px;
-    border: 2px solid #acbbc2;
+    border: 1px solid #acbbc2;
+    margin: 1px;
     cursor: pointer; }
   .input-color-picker div.use-default {
     background: none;
@@ -5215,6 +5216,7 @@ td[class] + td.disaster-bg {
     .color-picker-controls .input-color-picker div {
       position: absolute;
       border-width: 1px;
+      margin: 0px;
       left: 2px;
       top: 2px; }
 
