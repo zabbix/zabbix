@@ -2334,8 +2334,8 @@ int	DBpk_exists(const char *table_name)
 			"select 1"
 			" from information_schema.table_constraints"
 			" where table_name='%s'"
-				" and constraint_type = 'PRIMARY KEY'"
-				" and constraint_schema = '%s'",
+				" and constraint_type='PRIMARY KEY'"
+				" and constraint_schema='%s'",
 			table_name, zbx_db_get_schema_esc());
 #endif
 	ret = (NULL == DBfetch(result) ? FAIL : SUCCEED);
