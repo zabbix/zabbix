@@ -65,6 +65,16 @@ class CActionCondValidator extends CValidator {
 				if (zbx_empty($condition['value']) || $condition['value'] == 0) {
 					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
 				}
+				elseif (is_array($condition['value'])) {
+					foreach ($condition['value'] as $value) {
+						if (zbx_empty($value) || $value == 0) {
+							$this->setError(
+								_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty'))
+							);
+							break;
+						}
+					}
+				}
 				break;
 
 			case CONDITION_TYPE_DCHECK:
