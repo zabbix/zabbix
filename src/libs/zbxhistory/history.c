@@ -102,6 +102,8 @@ int	zbx_history_add_values(const zbx_vector_ptr_t *history, int *ret_flush)
 {
 	int	i, flags = 0, ret = SUCCEED;
 
+	*ret_flush = FLUSH_SUCCEED;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	for (i = 0; i < ITEM_VALUE_TYPE_MAX; i++)
