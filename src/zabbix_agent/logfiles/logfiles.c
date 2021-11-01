@@ -2387,7 +2387,27 @@ static void	ensure_order_if_mtimes_equal(const struct st_logfile *logfiles_old, 
 	}
 }
 
-static int	files_start_with_same_md5(const struct st_logfile *log1, const struct st_logfile *log2)
+/******************************************************************************
+ *                                                                            *
+ * Function: files_have_same_blocks_md5                                       *
+ *                                                                            *
+ * Purpose: compare MD5 sums of first and last blocks between 2 files. If MD5 *
+ *          sums have been calculated for blocks of different sizes or        *
+ *          offsets then open the log file with larger size of blocks and get *
+ *          MD5 for the smaller size                                          *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     log1 - [IN] log file 1 attributes                                      *
+ *     log2 - [IN] log file 2 attributes                                      *
+ *                                                                            *
+ * Return value: SUCCEED or FAIL                                              *
+ *                                                                            *
+ * Comments: Use this function to compare log files from the 'new' file list. *
+ *           DO NOT use it with a file which belongs to the 'old' list (the   *
+ *           old file name now could point to different file)                 *
+ *                                                                            *
+ ******************************************************************************/
+static int	files_have_same_blocks_md5(const struct st_logfile *log1, const struct st_logfile *log2)
 {
 	if (-1 == log1->md5_block_size || -1 == log2->md5_block_size)
 		return FAIL;
@@ -2449,7 +2469,7 @@ static void	handle_multiple_copies(struct st_logfile *logfiles, int logfiles_num
 
 	for (j = i + 1; j < logfiles_num; j++)
 	{
-		if (SUCCEED == files_start_with_same_md5(logfiles + i, logfiles + j))
+		if (SUCCEED == files_have_same_blocks_md5(logfiles + i, logfiles + j))
 		{
 			/* logfiles[i] and logfiles[j] are original and copy (or vice versa). */
 			/* If logfiles[i] has been at least partially processed then transfer its */
@@ -2497,7 +2517,7 @@ static void	delay_update_if_copies(struct st_logfile *logfiles, int logfiles_num
 			if (0 == logfiles[j].size)
 				continue;
 
-			if (SUCCEED == files_start_with_same_md5(logfiles + i, logfiles + j))
+			if (SUCCEED == files_have_same_blocks_md5(logfiles + i, logfiles + j))
 			{
 				int	more_processed;
 
@@ -2540,7 +2560,7 @@ static zbx_uint64_t	max_processed_size_in_copies(const struct st_logfile *logfil
 
 	for (j = 0; j < logfiles_num; j++)
 	{
-		if (i != j && SUCCEED == files_start_with_same_md5(logfiles + i, logfiles + j))
+		if (i != j && SUCCEED == files_have_same_blocks_md5(logfiles + i, logfiles + j))
 		{
 			/* logfiles[i] and logfiles[j] are original and copy (or vice versa). */
 			if (max_processed < logfiles[j].processed_size)
