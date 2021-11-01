@@ -1802,24 +1802,14 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 
 		if (ZBX_NODE_STATUS_ERROR == info.ha_status)
 			goto pause;
-		else
-		{
-			/* Server could be automatically restarted while it experienced some issues and crashed. */
-			/* If that happens, delay the next database check for twice of poll period time to       */
-			/* ensure that the same node does not take over after recovery.                          */
-			if (ZBX_NODE_STATUS_STANDBY == info.ha_status)
-				nextcheck = ZBX_HA_POLL_PERIOD * 2;
-			else
-				nextcheck = ZBX_HA_POLL_PERIOD;
-		}
 	}
-	else
-	{
-		/* Server switches to standby mode when database is offline for <failover delay> - <poll period> */
-		/* seconds. If that happens, delay the next database check for twice of poll period time to      */
-		/* ensure that the same node does not take over after recovery.                                  */
-		nextcheck = ZBX_HA_POLL_PERIOD * 2;
-	}
+
+	nextcheck = ZBX_HA_POLL_PERIOD;
+
+	/* double the initial database check delay in standby mode to avoid the same node becoming active */
+	/* immediately after switching to standby mode or crashing and being restarted                    */
+	if (ZBX_NODE_STATUS_STANDBY == info.ha_status)
+		nextcheck *= 2;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "HA manager started in %s mode", zbx_ha_status_str(info.ha_status));
 
