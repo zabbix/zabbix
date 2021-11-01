@@ -230,4 +230,6 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 #	define ZBX_DB_TIMESTAMP()	"(cast(sys_extract_utc(systimestamp) as date) - date'1970-01-01') * 86400"
 #endif
 
+void zbx_db_set_character_set(const char *char_set);
+
 #endif

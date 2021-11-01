@@ -2449,12 +2449,14 @@ void	DBcheck_character_set(void)
 		{
 			good_charsets = ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8;
 			good_collations = ZBX_SUPPORTED_DB_COLLATION_UTF8;
+			zbx_db_set_character_set("utf8");
 		}
 		else if (SUCCEED == str_in_list(ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB4, char_set,
 				ZBX_DB_STRLIST_DELIM))
 		{
 			good_charsets = ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB4;
 			good_collations = ZBX_SUPPORTED_DB_COLLATION_UTF8MB4;
+			zbx_db_set_character_set("utf8mb4");
 		}
 		else
 		{
