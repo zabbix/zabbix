@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-10-21T10:49:29Z'
+  date: '2021-10-27T15:33:54Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -672,7 +672,7 @@ zabbix_export:
           name: 'System description'
           type: ZABBIX_ACTIVE
           key: system.uname
-          delay: 1h
+          delay: 15m
           history: 2w
           trends: '0'
           value_type: CHAR
