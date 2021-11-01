@@ -1939,6 +1939,10 @@ abstract class testFormPreprocessing extends CWebTest {
 	/**
 	 * Add item and preprocessing steps.
 	 *
+	 * @param array   $data    data provider
+	 * @param boolean $lld     true if item is lld, false if item or item prototype
+	 *
+	 * @return CFormElement|CGridFormElement
 	 *
 	 */
 	protected function addItemWithPreprocessing($data, $lld = false) {
