@@ -29,6 +29,7 @@ final class CHistFunctionData {
 	public const PERIOD_MODE_SEC_ONLY = 2;
 	public const PERIOD_MODE_NUM_ONLY = 3;
 	public const PERIOD_MODE_TREND = 4;
+	public const PERIOD_MODE_SEC_LONG = 5;
 
 	/**
 	 * Known history functions along with definition of parameters.
@@ -223,6 +224,16 @@ final class CHistFunctionData {
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_TREND]]]
 		],
+		'trendbaselinedev' => [
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC_LONG]]],
+			['rules' => [['type' => 'time', 'with_year' => true]]],
+		],
+		'trendbaselinewma' => [
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC_LONG]]],
+			['rules' => [['type' => 'time', 'with_year' => true]]],
+		],
 		'trendcount' => [
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_TREND]]]
@@ -373,6 +384,8 @@ final class CHistFunctionData {
 		'sumofsquares' => self::ITEM_VALUE_TYPES_NUM,
 		'timeleft' => self::ITEM_VALUE_TYPES_NUM,
 		'trendavg' => self::ITEM_VALUE_TYPES_NUM,
+		'trendbaselinedev' => self::ITEM_VALUE_TYPES_NUM,
+		'trendbaselinewma' => self::ITEM_VALUE_TYPES_NUM,
 		'trendcount' => self::ITEM_VALUE_TYPES_NUM,
 		'trendmax' => self::ITEM_VALUE_TYPES_NUM,
 		'trendmin' => self::ITEM_VALUE_TYPES_NUM,

@@ -112,7 +112,8 @@ $function_types = [
 	ZBX_FUNCTION_TYPE_MATH => _('Mathematical functions'),
 	ZBX_FUNCTION_TYPE_OPERATOR => _('Operator functions'),
 	ZBX_FUNCTION_TYPE_PREDICTION => _('Prediction functions'),
-	ZBX_FUNCTION_TYPE_STRING => _('String functions')
+	ZBX_FUNCTION_TYPE_STRING => _('String functions'),
+	ZBX_FUNCTION_TYPE_BASELINE => _('Baseline functions')
 ];
 
 $functions_by_group = [];

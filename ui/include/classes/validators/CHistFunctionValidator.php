@@ -334,11 +334,12 @@ class CHistFunctionValidator extends CValidator {
 
 			case CHistFunctionData::PERIOD_MODE_SEC:
 			case CHistFunctionData::PERIOD_MODE_SEC_ONLY:
+			case CHistFunctionData::PERIOD_MODE_SEC_LONG:
 				if ($mode == CHistFunctionData::PERIOD_MODE_SEC_ONLY && $time_shift !== '') {
 					return false;
 				}
 
-				$sec = timeUnitToSeconds($sec_num);
+				$sec = timeUnitToSeconds($sec_num, ($mode == CHistFunctionData::PERIOD_MODE_SEC_LONG));
 
 				if ($sec !== null) {
 					return ($sec > 0 && $sec <= ZBX_MAX_INT32);
