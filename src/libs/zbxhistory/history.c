@@ -100,7 +100,7 @@ void	zbx_history_destroy(void)
  ************************************************************************************/
 int	zbx_history_add_values(const zbx_vector_ptr_t *history, int *ret_flush)
 {
-	int	i, flags = 0, ret = SUCCEED;
+	int	i, flags = 0;
 
 	*ret_flush = FLUSH_SUCCEED;
 
