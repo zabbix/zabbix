@@ -2971,7 +2971,7 @@ return [
 			'name' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 16,
+				'length' => 12,
 				'default' => ''
 			],
 			'parameter' => [

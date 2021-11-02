@@ -906,14 +906,6 @@ static int	DBpatch_5050086(void)
 	return DBcreate_index("auditlog", "auditlog_3", "resourcetype,resourceid", 0);
 }
 
-static int	DBpatch_5050087(void)
-{
-	const ZBX_FIELD	field = {"name", "", NULL, NULL, 16, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
-	const ZBX_FIELD	old_field = {"name", "", NULL, NULL, 12, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
-
-	return DBmodify_field_type("functions", &field, &old_field);
-}
-
 #endif
 
 DBPATCH_START(5050)
@@ -995,6 +987,5 @@ DBPATCH_ADD(5050083, 0, 1)
 DBPATCH_ADD(5050084, 0, 1)
 DBPATCH_ADD(5050085, 0, 1)
 DBPATCH_ADD(5050086, 0, 1)
-DBPATCH_ADD(5050087, 0, 1)
 
 DBPATCH_END()
