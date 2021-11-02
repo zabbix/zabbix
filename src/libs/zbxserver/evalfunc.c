@@ -3468,6 +3468,14 @@ static void	history_to_dbl_vector(const zbx_history_record_t *v, int n, unsigned
 			count++;							\
 	}										\
 
+#define CHANGECOUNT_STR(type)						\
+	for (i = 0; i < values.values_num - 1; i++)			\
+	{								\
+		if (0 != strcmp(values.values[i + 1].value.type,	\
+					values.values[i].value.type))	\
+			count++;					\
+	}								\
+
 /* flags for evaluate_CHANGECOUNT() */
 #define CHANGE_ALL	0
 #define CHANGE_INC	1
@@ -3506,7 +3514,6 @@ static int	evaluate_CHANGECOUNT(zbx_variant_t *value, DC_ITEM *item, const char 
 	zbx_history_record_vector_create(&values);
 
 	nparams = num_param(parameters);
-
 	if (1 > nparams || 2 < nparams)
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
@@ -3610,19 +3617,11 @@ static int	evaluate_CHANGECOUNT(zbx_variant_t *value, DC_ITEM *item, const char 
 	}
 	else if (ITEM_VALUE_TYPE_STR == item->value_type || ITEM_VALUE_TYPE_TEXT == item->value_type)
 	{
-		for (i = 0; i < values.values_num - 1; i++)
-		{
-			if (0 != strcmp(values.values[i + 1].value.str, values.values[i].value.str))
-				count++;
-		}
+		CHANGECOUNT_STR(str);
 	}
 	else if (ITEM_VALUE_TYPE_LOG == item->value_type)
 	{
-		for (i = 0; i < values.values_num - 1; i++)
-		{
-			if (0 != strcmp(values.values[i + 1].value.log->value, values.values[i].value.log->value))
-				count++;
-		}
+		CHANGECOUNT_STR(log->value);
 	}
 	else
 	{
