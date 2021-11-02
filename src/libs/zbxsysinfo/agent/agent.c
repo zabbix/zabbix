@@ -32,8 +32,8 @@ ZBX_METRIC	parameters_agent[] =
 {
 	{"agent.hostname",	0,		AGENT_HOSTNAME,	NULL},
 	{"agent.ping",		0,		AGENT_PING,	NULL},
-	{"agent.version",	0,		AGENT_VERSION,	NULL},
 	{"agent.variant",	0,		AGENT_VARIANT,	NULL},
+	{"agent.version",	0,		AGENT_VERSION,	NULL},
 	{NULL}
 };
 

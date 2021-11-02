@@ -25,8 +25,8 @@ func checkMetrics(s scheduler.Scheduler) {
 	metrics := []string{
 		`agent.hostname`,
 		`agent.ping`,
-		`agent.version`,
 		`agent.variant`,
+		`agent.version`,
 		`system.localtime[utc]`,
 		`system.run[echo test]`,
 		`web.page.get[localhost,,80]`,
