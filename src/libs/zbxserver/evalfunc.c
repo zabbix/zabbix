@@ -3633,6 +3633,7 @@ static int	evaluate_CHANGECOUNT(zbx_variant_t *value, DC_ITEM *item, const char 
 	ret = SUCCEED;
 	zbx_variant_set_ui64(value, count);
 out:
+	zbx_free(arg2);
 	zbx_history_record_vector_destroy(&values, item->value_type);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
