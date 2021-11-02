@@ -4016,4 +4016,96 @@ in:
 out:
   return: FAIL
   value: 0
+---
+test case: Evaluate changecount() with wrong count of arguments
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 0.00001
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 0.00002
+      ts: 2021-03-27 10:01:02.000000000 +00:00
+    - value: 0.00003
+      ts: 2021-03-27 10:01:03.000000000 +00:00
+    - value: 0.00004
+      ts: 2021-03-27 10:01:04.000000000 +00:00
+    - value: 0.00003
+      ts: 2017-01-10 10:01:05.000000000 +00:00
+  time: 2017-01-10 10:01:05.000000000 +00:00
+  function: changecount
+  params: '#5,"inc","strict"'
+out:
+  return: FAIL
+  value: 0
+---
+test case: Evaluate changecount() without arguments
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 0.00001
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 0.00002
+      ts: 2021-03-27 10:01:02.000000000 +00:00
+    - value: 0.00003
+      ts: 2021-03-27 10:01:03.000000000 +00:00
+    - value: 0.00004
+      ts: 2021-03-27 10:01:04.000000000 +00:00
+    - value: 0.00003
+      ts: 2017-01-10 10:01:05.000000000 +00:00
+  time: 2017-01-10 10:01:05.000000000 +00:00
+  function: changecount
+  params: ''
+out:
+  return: FAIL
+  value: 0
+---
+test case: Evaluate changecount() with wrong first argument
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 0.00001
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 0.00002
+      ts: 2021-03-27 10:01:02.000000000 +00:00
+    - value: 0.00003
+      ts: 2021-03-27 10:01:03.000000000 +00:00
+    - value: 0.00004
+      ts: 2021-03-27 10:01:04.000000000 +00:00
+    - value: 0.00003
+      ts: 2017-01-10 10:01:05.000000000 +00:00
+  time: 2017-01-10 10:01:05.000000000 +00:00
+  function: changecount
+  params: '"inc"'
+out:
+  return: FAIL
+  value: 0
+---
+test case: Evaluate changecount() with wrong second argument
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 0.00001
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 0.00002
+      ts: 2021-03-27 10:01:02.000000000 +00:00
+    - value: 0.00003
+      ts: 2021-03-27 10:01:03.000000000 +00:00
+    - value: 0.00004
+      ts: 2021-03-27 10:01:04.000000000 +00:00
+    - value: 0.00003
+      ts: 2017-01-10 10:01:05.000000000 +00:00
+  time: 2017-01-10 10:01:05.000000000 +00:00
+  function: changecount
+  params: '#20,"strict"'
+out:
+  return: FAIL
+  value: 0
 ...
