@@ -3434,27 +3434,33 @@ int	zbx_evaluate_RATE(zbx_variant_t *value, DC_ITEM *item, const char *parameter
 	return evaluate_RATE(value, item, parameters, ts, error);
 }
 
-#define CHANGECOUNT_UI64(op)								\
-	for (i = 0; i < values.values_num - 1; i++)					\
-	{										\
-		if (values.values[i + 1].value.ui64 op values.values[i].value.ui64)	\
-			count++;							\
-	}										\
+#define LAST(v, type) v.values[i].value.type
+#define PREV(v, type) v.values[i + 1].value.type
 
-#define CHANGECOUNT_DBL(op, epsi_op)							\
-	for (i = 0; i < values.values_num - 1; i++)					\
-	{										\
-		if (values.values[i + 1].value.dbl op					\
-				(values.values[i].value.dbl epsi_op ZBX_DOUBLE_EPSILON))\
-			count++;							\
-	}										\
+#define CHANGECOUNT_DBL(op, epsi_op)									\
+	for (i = 0; i < values.values_num - 1; i++)							\
+	{												\
+		if ((SUCCEED != zbx_double_compare(PREV(values, dbl), LAST(values, dbl)) &&		\
+				PREV(values, dbl) op (LAST(values, dbl) epsi_op ZBX_DOUBLE_EPSILON)))	\
+		{											\
+			count++;									\
+		}											\
+	}												\
+
+#define CHANGECOUNT_UI64(op)						\
+	for (i = 0; i < values.values_num - 1; i++)			\
+	{								\
+		if (PREV(values, ui64) op LAST(values, ui64))		\
+			count++;					\
+	}								\
 
 #define CHANGECOUNT_STR(type)						\
 	for (i = 0; i < values.values_num - 1; i++)			\
 	{								\
-		if (0 != strcmp(values.values[i + 1].value.type,	\
-					values.values[i].value.type))	\
+		if (0 != strcmp(PREV(values, type), LAST(values, type)))\
+		{							\
 			count++;					\
+		}							\
 	}								\
 
 /* flags for evaluate_CHANGECOUNT() */
@@ -3581,8 +3587,7 @@ static int	evaluate_CHANGECOUNT(zbx_variant_t *value, DC_ITEM *item, const char 
 		{
 			for (i = 0; i < values.values_num - 1; i++)
 			{
-				if (SUCCEED != zbx_double_compare(values.values[i + 1].value.dbl,
-							values.values[i].value.dbl))
+				if (SUCCEED != zbx_double_compare(PREV(values, dbl), LAST(values, dbl)))
 				{
 					count++;
 				}
@@ -3625,6 +3630,8 @@ out:
 #undef CHANGE_ALL
 #undef CHANGE_INC
 #undef CHANGE_DEC
+#undef PREV
+#undef LAST
 
 static void	history_to_dbl_vector(const zbx_history_record_t *v, int n, unsigned char value_type,
 		zbx_vector_dbl_t *values)
