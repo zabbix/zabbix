@@ -3583,7 +3583,9 @@ static int	evaluate_CHANGECOUNT(zbx_variant_t *value, DC_ITEM *item, const char 
 			{
 				if (SUCCEED != zbx_double_compare(values.values[i + 1].value.dbl,
 							values.values[i].value.dbl))
+				{
 					count++;
+				}
 			}
 		}
 		else if (CHANGE_INC == mode)
