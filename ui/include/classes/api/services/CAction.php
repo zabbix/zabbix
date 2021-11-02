@@ -2726,13 +2726,6 @@ class CAction extends CApiService {
 
 			if (array_key_exists('conditions', $action['filter'])) {
 				foreach ($action['filter']['conditions'] as $j => $condition) {
-					if ($action['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION
-							&& !array_key_exists($condition['formulaid'], $constants)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-							$path.'/conditions/'.($j + 1).'/formulaid', _('an identifier is not defined in the formula')
-						));
-					}
-
 					if ($condition['conditiontype'] == CONDITION_TYPE_DHOST_IP) {
 						if (!$ip_range_parser->parse($condition['value'])) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
