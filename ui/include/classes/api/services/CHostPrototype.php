@@ -1403,39 +1403,35 @@ class CHostPrototype extends CHostBase {
 
 			if ($host_prototype['custom_interfaces'] == HOST_PROT_INTERFACES_INHERIT) {
 				$host_prototype['interfaces'] = [];
-				$del_interfaceids = array_merge($del_interfaceids, array_keys($db_interfaces));
-				continue;
 			}
 
 			if (!array_key_exists('interfaces', $host_prototype)) {
 				continue;
 			}
 
-			if ($host_prototype['interfaces']) {
-				foreach ($host_prototype['interfaces'] as &$interface) {
-					$index = self::compareInterface($interface, $db_interfaces);
-					if ($index != -1) {
-						$interface['interfaceid'] = $db_interfaces[$index]['interfaceid'];
+			foreach ($host_prototype['interfaces'] as &$interface) {
+				$index = self::compareInterface($interface, $db_interfaces);
+				if ($index != -1) {
+					$interface['interfaceid'] = $db_interfaces[$index]['interfaceid'];
 
-						$upd_interface = DB::getUpdatedValues('interface', $interface, $db_interfaces[$index]);
+					$upd_interface = DB::getUpdatedValues('interface', $interface, $db_interfaces[$index]);
 
-						if ($upd_interface) {
-							$upd_interfaces[] = [
-								'values' => $upd_interface,
-								'where' => ['interfaceid' => $interface['interfaceid']]
-							];
-						}
-
-						unset($db_interfaces[$index]);
+					if ($upd_interface) {
+						$upd_interfaces[] = [
+							'values' => $upd_interface,
+							'where' => ['interfaceid' => $interface['interfaceid']]
+						];
 					}
-					else {
-						$ins_interfaces[] = ['hostid' => $host_prototype['hostid']] + $interface;
-					}
+
+					unset($db_interfaces[$index]);
 				}
-				unset($interface);
+				else {
+					$ins_interfaces[] = ['hostid' => $host_prototype['hostid']] + $interface;
+				}
 			}
+			unset($interface);
 
-			$del_interfaceids = array_merge($del_interfaceids, array_column($db_interfaces, 'interfaceid'));
+			$del_interfaceids = array_merge($del_interfaceids, array_keys($db_interfaces));
 		}
 		unset($host_prototype);
 
@@ -1453,8 +1449,7 @@ class CHostPrototype extends CHostBase {
 			$interfaceids = DB::insert('interface', $ins_interfaces);
 
 			foreach ($host_prototypes as &$host_prototype) {
-				if ($host_prototype['custom_interfaces'] == HOST_PROT_INTERFACES_INHERIT
-						|| !array_key_exists('interfaces', $host_prototype)) {
+				if (!array_key_exists('interfaces', $host_prototype)) {
 					continue;
 				}
 
@@ -1493,7 +1488,7 @@ class CHostPrototype extends CHostBase {
 
 		foreach ($db_interfaces as $index => $db_interface) {
 			foreach ($interface_fields as $field) {
-				if (array_key_exists($field, $host_interface) && ($host_interface[$field] != $db_interface[$field])) {
+				if (array_key_exists($field, $host_interface) && $host_interface[$field] != $db_interface[$field]) {
 					continue 2;
 				}
 			}
@@ -1501,7 +1496,7 @@ class CHostPrototype extends CHostBase {
 			if ($host_interface['type'] == INTERFACE_TYPE_SNMP) {
 				foreach ($snmp_fields as $field) {
 					if (array_key_exists($field, $host_interface['details'])
-							&& ($host_interface['details'][$field] != $db_interface['details'][$field])) {
+							&& $host_interface['details'][$field] != $db_interface['details'][$field]) {
 						continue 2;
 					}
 				}
