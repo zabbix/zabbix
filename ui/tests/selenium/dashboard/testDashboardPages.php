@@ -528,8 +528,6 @@ class testDashboardPages extends CWebTest {
 		while ($next_page->isClickable()) {
 			$next_page->click();
 		}
-//		$this->query("xpath://ul[@class='sortable-list']//span[@title=".CXPathHelper::escapeQuotes($title).
-//				"]/following-sibling::button[@title='Actions']")->waitUntilVisible();
 
 		$index = (array_key_exists('duplicate', $data)) ? 2 : 1;
 		$this->selectPageAction($title, 'Properties', $index);
@@ -562,9 +560,7 @@ class testDashboardPages extends CWebTest {
 		$previous_page = $this->query(self::PREVIOUS_BUTTON)->one();
 
 		// Check selected page.
-		$this->assertEquals('long_name_to_check_navigation_1', $this->
-				query('xpath://li/div[@class="selected-tab"]')->one()->getText()
-		);
+		$this->assertEquals('long_name_to_check_navigation_1', $this->query('xpath://li/div[@class="selected-tab"]')->one()->getText());
 
 		// Navigate on dashboard.
 		foreach ([$next_page, $previous_page] as $navigation) {
@@ -574,8 +570,8 @@ class testDashboardPages extends CWebTest {
 			if ($navigation === $next_page) {
 				$this->assertTrue($next_page->isEnabled(false));
 				$this->assertTrue($previous_page->isEnabled());
-				$this->assertEquals('long_name_to_check_navigation_8', $this->
-						query('xpath://li/div[@class="selected-tab"]')->one()->getText()
+				$this->assertEquals('long_name_to_check_navigation_8',
+						$this->query('xpath://li/div[@class="selected-tab"]')->one()->getText()
 				);
 			}
 		}
