@@ -3441,7 +3441,7 @@ int	zbx_evaluate_RATE(zbx_variant_t *value, DC_ITEM *item, const char *parameter
 	for (i = 0; i < values.values_num - 1; i++)							\
 	{												\
 		if (SUCCEED != zbx_double_compare(PREV(values, dbl), LAST(values, dbl)) &&		\
-				PREV(values, dbl) op (LAST(values, dbl)))				\
+				PREV(values, dbl) op LAST(values, dbl))					\
 		{											\
 			count++;									\
 		}											\
