@@ -127,7 +127,7 @@ class CControllerWidgetGeoMapView extends CControllerWidget {
 		]);
 
 		$hosts = array_filter($hosts, function ($host) {
-			return ($host['inventory']['location_lat'] !== '' && $host['inventory']['location_lon'] !== '');
+			return (is_numeric($host['inventory']['location_lat']) && is_numeric($host['inventory']['location_lon']));
 		});
 
 		// Get triggers.
