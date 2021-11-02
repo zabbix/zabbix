@@ -38,9 +38,9 @@ ZBX_METRIC	parameters_agent[] =
 	{"agent.hostname",	0,		AGENT_HOSTNAME,		NULL},
 	{"agent.hostmetadata",	0,		AGENT_HOSTMETADATA,	NULL},
 	{"agent.ping",		0,		AGENT_PING,		NULL},
+	{"agent.variant",	0,		AGENT_VARIANT,		NULL},
 	{"agent.version",	0,		AGENT_VERSION,		NULL},
 	{"modbus.get",		CF_HAVEPARAMS,	MODBUS_GET,		"tcp://127.0.0.1"},
-	{"agent.variant",	0,		AGENT_VARIANT,		NULL},
 	{NULL}
 };
 

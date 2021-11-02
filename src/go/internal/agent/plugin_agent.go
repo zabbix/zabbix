@@ -108,10 +108,10 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 			Options.HostMetadata, Options.HostMetadataItem, 255, LocalChecksClientID)
 	case "agent.ping":
 		return 1, nil
-	case "agent.version":
-		return version.Long(), nil
 	case "agent.variant":
 		return 2, nil
+	case "agent.version":
+		return version.Long(), nil
 	}
 
 	return nil, fmt.Errorf("Not implemented: %s", key)
