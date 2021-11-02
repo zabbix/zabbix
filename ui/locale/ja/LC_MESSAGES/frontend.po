@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-26 16:13+0300\n"
-"PO-Revision-Date: 2021-10-21 11:10+0300\n"
+"POT-Creation-Date: 2021-10-29 19:55+0300\n"
+"PO-Revision-Date: 2021-10-27 12:44+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1634807426.000000\n"
+"X-POOTLE-MTIME: 1635331497.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:142
@@ -136,12 +136,12 @@ msgstr[0] "アクション%1$s件"
 #: jsLoader.php:298
 #, c-format
 msgid "%1$s characters"
-msgstr ""
+msgstr "%1$s文字"
 
 #: jsLoader.php:299
 #, c-format
 msgid "%1$s characters remaining"
-msgstr ""
+msgstr "あと%1$s文字"
 
 #: app/views/popup.acknowledge.edit.php:60
 #: app/views/popup.acknowledge.edit.php:65
@@ -544,7 +544,7 @@ msgstr "確認済の解決済イベント"
 #: include/views/configuration.host.discovery.edit.php:134
 #: include/views/configuration.host.discovery.edit.php:632
 #: include/views/configuration.host.discovery.edit.php:742
-#: include/views/configuration.host.discovery.edit.php:911
+#: include/views/configuration.host.discovery.edit.php:914
 #: include/views/configuration.host.prototype.edit.php:240
 #: include/views/configuration.httpconf.edit.php:209
 #: include/views/configuration.item.edit.php:193
@@ -766,8 +766,8 @@ msgstr "設定有効期間の終了日時"
 #: include/views/configuration.host.discovery.edit.php:668
 #: include/views/configuration.host.discovery.edit.php:816
 #: include/views/configuration.host.discovery.edit.php:890
-#: include/views/configuration.host.discovery.edit.php:916
-#: include/views/configuration.host.discovery.edit.php:971
+#: include/views/configuration.host.discovery.edit.php:919
+#: include/views/configuration.host.discovery.edit.php:981
 #: include/views/configuration.hostgroups.edit.php:55
 #: include/views/configuration.host.prototype.edit.php:110
 #: include/views/configuration.host.prototype.edit.php:189
@@ -946,7 +946,7 @@ msgstr "追加のルール"
 
 #: app/partials/administration.ha.nodes.php:28
 msgid "Address"
-msgstr ""
+msgstr "アドレス"
 
 #: include/hosts.inc.php:63 include/users.inc.php:53
 msgid "Admin"
@@ -3393,7 +3393,7 @@ msgstr "時刻"
 #: app/views/popup.service.edit.php:388
 #: include/views/configuration.action.edit.php:493
 #: include/views/configuration.graph.edit.php:510
-#: include/views/configuration.host.discovery.edit.php:950
+#: include/views/configuration.host.discovery.edit.php:960
 #: include/views/configuration.hostgroups.edit.php:62
 #: include/views/configuration.host.prototype.edit.php:424
 #: include/views/configuration.httpconf.edit.php:254
@@ -3625,7 +3625,7 @@ msgstr "グラフの設定"
 
 #: app/controllers/CControllerHostEdit.php:263
 msgid "Configuration of host"
-msgstr ""
+msgstr "ホストの設定"
 
 #: hostgroups.php:25
 msgid "Configuration of host groups"
@@ -3776,7 +3776,7 @@ msgstr "接続タイムアウト"
 msgid "Connection timeout of %1$s seconds exceeded when connecting to Zabbix server \"%2$s\"."
 msgstr "Zabbixサーバー\"%2$s\"への接続中に%1$s秒を超える接続タイムアウトが発生しました。"
 
-#: include/classes/server/CZabbixServer.php:608
+#: include/classes/server/CZabbixServer.php:609
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%1$s\" failed. Possible reasons:\n"
@@ -3787,7 +3787,7 @@ msgstr ""
 "1. \"zabbix.conf.php\"に設定されたサーバーのIP/DNSが正しくない。\n"
 "2. DNSサーバーの設定が正しくない。\n"
 
-#: include/classes/server/CZabbixServer.php:596
+#: include/classes/server/CZabbixServer.php:597
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%1$s\" refused. Possible reasons:\n"
@@ -3802,7 +3802,7 @@ msgstr ""
 "3. Zabbixサーバーのプロセスが起動していない。\n"
 "4. FirewallによってTCPでの接続がブロックされている。\n"
 
-#: include/classes/server/CZabbixServer.php:604
+#: include/classes/server/CZabbixServer.php:605
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%1$s\" timed out. Possible reasons:\n"
@@ -3812,6 +3812,10 @@ msgstr ""
 "Zabbixサーバー\"%1$s\"への接続でタイムアウトが発生しました。以下の原因が考えられます：\n"
 "1. \"zabbix.conf.php\"に設定されたIP/DNSが正しくない。\n"
 "2. FirewallによってTCPでの接続がブロックされている。\n"
+
+#: include/classes/server/CZabbixServer.php:590
+msgid "Connection to Zabbix server failed. Incorrect configuration."
+msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:538
 msgid "Connection will not be encrypted because it uses a socket file (on Unix) or shared memory (Windows)."
@@ -4529,7 +4533,7 @@ msgstr "データベースのTLSキーファイル"
 
 #: app/partials/administration.system.info.php:121
 msgid "Database history $info_tables upgraded"
-msgstr ""
+msgstr "データベースのヒストリ $info_tables のアップグレード"
 
 #: include/classes/setup/CSetupWizard.php:472
 msgid "Database host"
@@ -4810,7 +4814,7 @@ msgid "Delete dashboard?"
 msgstr "ダッシュボードを削除しますか？"
 
 #: app/views/configuration.discovery.edit.php:159
-#: include/views/configuration.host.discovery.edit.php:962
+#: include/views/configuration.host.discovery.edit.php:972
 msgid "Delete discovery rule?"
 msgstr "ディスカバリルールを削除しますか？"
 
@@ -5444,7 +5448,7 @@ msgstr "VMware仮想マシンのファイルシステムのディスカバリ、
 
 #: include/classes/data/CItemData.php:1504
 msgid "Discovery of VMware virtual machine network interfaces, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
-msgstr ""
+msgstr "VMware仮想マシンのネットワークインターフェースのディスカバリ、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名。JSONで返す"
 
 #: include/classes/data/CItemData.php:1448
 msgid "Discovery of VMware virtual machines, <url> - VMware service URL. Returns JSON"
@@ -6287,7 +6291,7 @@ msgstr "WMIクエリを実行して選択したすべてのオブジェクトを
 msgid "Execute WMI query and return the first selected object. Returns integer, float, string or text (depending on the request)"
 msgstr "WMIクエリを実行して最初の検索結果を返す。リクエストに応じて整数値、浮動小数点値、文字列値、テキスト値を返す。"
 
-#: include/views/configuration.host.discovery.edit.php:953
+#: include/views/configuration.host.discovery.edit.php:963
 #: include/views/configuration.host.discovery.list.php:329
 #: include/views/configuration.item.edit.php:1018
 #: include/views/configuration.item.list.php:301
@@ -6475,7 +6479,7 @@ msgstr "失敗"
 #: app/partials/administration.system.info.php:174
 #, c-format
 msgid "Fail-over delay: %1$s"
-msgstr ""
+msgstr "フェールオーバーの遅延： %1$s"
 
 #: app/views/monitoring.widget.web.view.php:30 include/actions.inc.php:2139
 #: include/views/administration.auditacts.list.php:88
@@ -6706,7 +6710,7 @@ msgstr "フィルター結果"
 
 #: app/views/popup.lldoverride.php:183
 #: include/views/configuration.host.discovery.edit.php:822
-#: include/views/configuration.host.discovery.edit.php:941
+#: include/views/configuration.host.discovery.edit.php:951
 msgid "Filters"
 msgstr "フィルター"
 
@@ -7378,15 +7382,15 @@ msgstr "重度の障害"
 #: app/partials/administration.system.info.php:172
 #: app/partials/administration.system.info.php:179
 msgid "High availability cluster"
-msgstr ""
+msgstr "HAクラスター"
 
 #: app/controllers/CControllerAuditLogList.php:218
 msgid "High availability node"
-msgstr ""
+msgstr "HAノード"
 
 #: include/classes/widgets/forms/CWidgetFormSystemInfo.php:32
 msgid "High availability nodes"
-msgstr ""
+msgstr "HAノード"
 
 #: include/classes/core/ZBase.php:361
 msgid "High-contrast dark"
@@ -10214,8 +10218,8 @@ msgstr "LF"
 msgid "LLD macro"
 msgstr "LLDマクロ"
 
-#: include/views/configuration.host.discovery.edit.php:896
-#: include/views/configuration.host.discovery.edit.php:940
+#: include/views/configuration.host.discovery.edit.php:897
+#: include/views/configuration.host.discovery.edit.php:950
 msgid "LLD macros"
 msgstr "LLDマクロ"
 
@@ -10287,7 +10291,7 @@ msgstr[0] "最新の%1$d年間"
 
 #: app/partials/administration.ha.nodes.php:28
 msgid "Last access"
-msgstr ""
+msgstr "最終アクセスからの時間"
 
 #: app/views/administration.token.list.php:143
 #: app/views/administration.user.token.list.php:99
@@ -11636,7 +11640,7 @@ msgstr "NTLM"
 #: include/views/configuration.host.discovery.edit.php:132
 #: include/views/configuration.host.discovery.edit.php:175
 #: include/views/configuration.host.discovery.edit.php:319
-#: include/views/configuration.host.discovery.edit.php:909
+#: include/views/configuration.host.discovery.edit.php:912
 #: include/views/configuration.host.discovery.list.php:100
 #: include/views/configuration.host.discovery.list.php:193
 #: include/views/configuration.hostgroups.list.php:46
@@ -11793,7 +11797,7 @@ msgstr "新しいイベントタグの値"
 
 #: app/views/configuration.host.edit.php:65 app/views/popup.host.edit.php:97
 msgid "New host"
-msgstr ""
+msgstr "新しいホストの作成"
 
 #: app/controllers/CControllerPopupLldOperation.php:351
 msgid "New operation"
@@ -13049,8 +13053,8 @@ msgstr "\"%1$s\"という名前の上書きはすでに存在します。"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:402
 #: include/classes/widgets/views/widget.svggraph.form.view.php:297
-#: include/views/configuration.host.discovery.edit.php:925
-#: include/views/configuration.host.discovery.edit.php:942
+#: include/views/configuration.host.discovery.edit.php:929
+#: include/views/configuration.host.discovery.edit.php:952
 msgid "Overrides"
 msgstr "オーバーライド"
 
@@ -13670,7 +13674,7 @@ msgid "Prediction functions"
 msgstr "予測関数"
 
 #: app/views/popup.massupdate.item.php:494
-#: include/views/configuration.host.discovery.edit.php:933
+#: include/views/configuration.host.discovery.edit.php:939
 #: include/views/configuration.item.edit.php:987
 #: include/views/configuration.item.prototype.edit.php:871
 msgid "Preprocessing"
@@ -13678,7 +13682,7 @@ msgstr "保存前処理"
 
 #: app/views/popup.itemtestedit.view.php:354
 #: app/views/popup.massupdate.item.php:210
-#: include/views/configuration.host.discovery.edit.php:935
+#: include/views/configuration.host.discovery.edit.php:943
 #: include/views/configuration.item.edit.php:991
 #: include/views/configuration.item.prototype.edit.php:875
 msgid "Preprocessing steps"
@@ -16078,7 +16082,7 @@ msgstr "標準のアイテム"
 
 #: app/partials/administration.ha.nodes.php:45
 msgid "Standby"
-msgstr ""
+msgstr "スタンバイ"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:630
 #: app/controllers/CControllerPopupTriggerExpr.php:748
@@ -16283,7 +16287,7 @@ msgid "Stop"
 msgstr "停止"
 
 #: app/views/popup.lldoverride.php:57
-#: include/views/configuration.host.discovery.edit.php:910
+#: include/views/configuration.host.discovery.edit.php:913
 msgid "Stop processing"
 msgstr "処理の停止"
 
@@ -16296,7 +16300,7 @@ msgstr "スライドショーの停止"
 
 #: app/partials/administration.ha.nodes.php:40
 msgid "Stopped"
-msgstr ""
+msgstr "停止中"
 
 #: app/views/popup.lldoperation.php:191 app/views/popup.lldoperation.php:212
 #: app/views/popup.massupdate.item.php:295
@@ -16465,7 +16469,7 @@ msgstr "システム統計値。整数値または浮動小数点値を返す。
 
 #: include/classes/widgets/forms/CWidgetFormSystemInfo.php:31
 msgid "System stats"
-msgstr ""
+msgstr "システムステータス"
 
 #: include/classes/data/CItemData.php:1092
 msgid "System time. Returns integer with type as UTC; string - with type as local"
@@ -16776,8 +16780,8 @@ msgstr "テンプレートを更新しました"
 #: app/views/popup.itemtestedit.view.php:432
 #: app/views/popup.mediatypetest.edit.php:99
 #: app/views/popup.testtriggerexpr.php:124 include/forms.inc.php:1457
-#: include/views/configuration.host.discovery.edit.php:960
-#: include/views/configuration.host.discovery.edit.php:972
+#: include/views/configuration.host.discovery.edit.php:970
+#: include/views/configuration.host.discovery.edit.php:982
 #: include/views/configuration.item.edit.php:1025
 #: include/views/configuration.item.edit.php:1046
 #: include/views/configuration.item.prototype.edit.php:902
@@ -16987,7 +16991,7 @@ msgstr "今月(現在まで)"
 #: include/views/configuration.item.edit.php:124
 #: include/views/configuration.item.prototype.edit.php:109
 msgid "This type of information may not match the key."
-msgstr ""
+msgstr "このデータ型はアイテムキーと合ってません。"
 
 #: include/func.inc.php:2407
 msgid "This week"
@@ -17713,7 +17717,7 @@ msgstr "未確認のみ"
 
 #: app/partials/administration.ha.nodes.php:56
 msgid "Unavailable"
-msgstr ""
+msgstr "利用不可"
 
 #: app/views/administration.user.list.php:249
 msgid "Unblock"
@@ -17944,7 +17948,7 @@ msgstr "Up"
 #: include/classes/html/CTabFilter.php:94
 #: include/views/configuration.action.edit.php:492
 #: include/views/configuration.graph.edit.php:494
-#: include/views/configuration.host.discovery.edit.php:967
+#: include/views/configuration.host.discovery.edit.php:977
 #: include/views/configuration.hostgroups.edit.php:61
 #: include/views/configuration.host.prototype.edit.php:422
 #: include/views/configuration.httpconf.edit.php:271
@@ -18411,7 +18415,7 @@ msgstr "VMwareハイパーバイザーBIOSのUUID、<url> - VMwareサービスUR
 
 #: include/classes/data/CItemData.php:1388
 msgid "VMware hypervisor HW vendor state sensors, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
-msgstr ""
+msgstr "VMwareハイパーバイザーHWベンダーの状態センサー、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名。JSONで返す"
 
 #: include/classes/data/CItemData.php:1360
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18603,7 +18607,7 @@ msgstr "VMware仮想マシンの稼働秒数、<url> - VMwareサービスURL、<
 
 #: include/classes/data/CItemData.php:1356
 msgid "VVMware hypervisor maintenance status, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns 0 - not in maintenance; 1 - in maintenance"
-msgstr ""
+msgstr "VMwareハイパーバイザーのメンテナンス状態、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名、メンテナンス中でなければ「0」、メンテナンス中なら「1」を返す"
 
 #: app/views/administration.miscconfig.edit.php:104
 msgid "Valid URI schemes"
@@ -19427,7 +19431,7 @@ msgstr "Zabbixのログイン画面"
 msgid "Zabbix server"
 msgstr "Zabbixサーバー"
 
-#: include/classes/server/CZabbixServer.php:600
+#: include/classes/server/CZabbixServer.php:601
 #, c-format
 msgid ""
 "Zabbix server \"%1$s\" cannot be reached. Possible reasons:\n"

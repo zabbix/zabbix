@@ -697,17 +697,29 @@ class ZBase {
 			return;
 		}
 
-		$active_node = API::getApiService('hanode')->get([
-			'output' => ['address', 'port'],
-			'filter' => ['status' => ZBX_NODE_STATUS_ACTIVE],
+		$ha_nodes = API::getApiService('hanode')->get([
+			'output' => ['address', 'port', 'status'],
 			'sortfield' => 'lastaccess',
-			'sortorder' => 'DESC',
-			'limit' => 1
+			'sortorder' => 'DESC'
 		], false);
 
-		if ($active_node) {
-			$ZBX_SERVER = $active_node[0]['address'];
-			$ZBX_SERVER_PORT = $active_node[0]['port'];
+		$active_node = null;
+
+		if (count($ha_nodes) == 1) {
+			$active_node = $ha_nodes[0];
+		}
+		else {
+			foreach ($ha_nodes as $node) {
+				if ($node['status'] == ZBX_NODE_STATUS_ACTIVE) {
+					$active_node = $node;
+					break;
+				}
+			}
+		}
+
+		if ($active_node !== null) {
+			$ZBX_SERVER = $active_node['address'];
+			$ZBX_SERVER_PORT = $active_node['port'];
 		}
 	}
 }

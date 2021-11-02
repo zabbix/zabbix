@@ -2244,6 +2244,12 @@ static	int	vmware_service_get_contents(CURL *easyhandle, char **version, char **
 	*fullname = zbx_xml_read_doc_value(doc, ZBX_XPATH_VMWARE_ABOUT("fullName"));
 	zbx_xml_free_doc(doc);
 
+	if (NULL == *version)
+	{
+		*error = zbx_strdup(*error, "VMware Virtual Center is not ready.");
+		return FAIL;
+	}
+
 	return SUCCEED;
 
 #	undef ZBX_POST_VMWARE_CONTENTS

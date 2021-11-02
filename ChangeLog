@@ -1,8 +1,11 @@
 Changes for 6.0.0alpha6
 
 New features:
+.........T [ZBXNEXT-7001] added support High availability cluster in Zabbix server health/Remote Zabbix server health template (abakaldin)
 
 Bug fixes:
+..F....... [ZBX-20132] fixed item type mismatch warning not getting removed for non-matching key (jfreibergs)
+..F....... [ZBX-20125] fixed invalid argument error in trigger test (ashubin)
 ..F....... [ZBX-18975] fixed item value being truncated in item test form (agriscenko)
 ..F....... [ZBX-20124] fixed incorrect number of days in the error message when the display period is exceeded (Sasha)
 ..F....... [ZBX-20123] fixed svg graph widgets not displaying data for certain time periods (averza)
@@ -182,6 +185,18 @@ A.F....... [ZBXNEXT-6528,ZBXNEXT-6669] moved auditlog calls from frontend sectio
 
 Bug fixes:
 .........T [ZBX-19395] changed version in links of the templates and the media (mchudinov)
+
+--------------------------------------------------------------------------------
+Changes for 5.4.8rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.4.7
+
+5.4.7rc1 was released as 5.4.7 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.4.7rc1

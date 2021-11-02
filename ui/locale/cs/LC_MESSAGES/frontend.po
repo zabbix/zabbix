@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-26 16:13+0300\n"
+"POT-Creation-Date: 2021-10-29 19:55+0300\n"
 "PO-Revision-Date: 2018-09-24 07:57+0300\n"
 "Last-Translator: Lukáš <iam@lukasmaly.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -584,7 +584,7 @@ msgstr "Potvrzené VYŘEŠENÉ události"
 #: include/views/configuration.host.discovery.edit.php:134
 #: include/views/configuration.host.discovery.edit.php:632
 #: include/views/configuration.host.discovery.edit.php:742
-#: include/views/configuration.host.discovery.edit.php:911
+#: include/views/configuration.host.discovery.edit.php:914
 #: include/views/configuration.host.prototype.edit.php:240
 #: include/views/configuration.httpconf.edit.php:209
 #: include/views/configuration.item.edit.php:193
@@ -810,8 +810,8 @@ msgstr "Aktivní do"
 #: include/views/configuration.host.discovery.edit.php:668
 #: include/views/configuration.host.discovery.edit.php:816
 #: include/views/configuration.host.discovery.edit.php:890
-#: include/views/configuration.host.discovery.edit.php:916
-#: include/views/configuration.host.discovery.edit.php:971
+#: include/views/configuration.host.discovery.edit.php:919
+#: include/views/configuration.host.discovery.edit.php:981
 #: include/views/configuration.hostgroups.edit.php:55
 #: include/views/configuration.host.prototype.edit.php:110
 #: include/views/configuration.host.prototype.edit.php:189
@@ -3546,7 +3546,7 @@ msgstr "Hodiny"
 #: app/views/popup.service.edit.php:388
 #: include/views/configuration.action.edit.php:493
 #: include/views/configuration.graph.edit.php:510
-#: include/views/configuration.host.discovery.edit.php:950
+#: include/views/configuration.host.discovery.edit.php:960
 #: include/views/configuration.hostgroups.edit.php:62
 #: include/views/configuration.host.prototype.edit.php:424
 #: include/views/configuration.httpconf.edit.php:254
@@ -3929,7 +3929,7 @@ msgstr ""
 msgid "Connection timeout of %1$s seconds exceeded when connecting to Zabbix server \"%2$s\"."
 msgstr "Časový limit připojení %1$s sekund vypršel při připojení k Zabbix serveru \"%2$s\"."
 
-#: include/classes/server/CZabbixServer.php:608
+#: include/classes/server/CZabbixServer.php:609
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%1$s\" failed. Possible reasons:\n"
@@ -3937,7 +3937,7 @@ msgid ""
 "2. Incorrect DNS server configuration.\n"
 msgstr ""
 
-#: include/classes/server/CZabbixServer.php:596
+#: include/classes/server/CZabbixServer.php:597
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%1$s\" refused. Possible reasons:\n"
@@ -3947,12 +3947,16 @@ msgid ""
 "4. Firewall is blocking TCP connection.\n"
 msgstr ""
 
-#: include/classes/server/CZabbixServer.php:604
+#: include/classes/server/CZabbixServer.php:605
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%1$s\" timed out. Possible reasons:\n"
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
 "2. Firewall is blocking TCP connection.\n"
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:590
+msgid "Connection to Zabbix server failed. Incorrect configuration."
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:538
@@ -4961,7 +4965,7 @@ msgid "Delete dashboard?"
 msgstr "Smazat dashboard?"
 
 #: app/views/configuration.discovery.edit.php:159
-#: include/views/configuration.host.discovery.edit.php:962
+#: include/views/configuration.host.discovery.edit.php:972
 msgid "Delete discovery rule?"
 msgstr "Smazat objevovací pravidlo?"
 
@@ -6447,7 +6451,7 @@ msgstr ""
 msgid "Execute WMI query and return the first selected object. Returns integer, float, string or text (depending on the request)"
 msgstr "Spustí WMI dotaz a vrátí první vybraný objekt. Vráti celé, desetinné číslo, řetězec nebo text (závisí od dotazu)"
 
-#: include/views/configuration.host.discovery.edit.php:953
+#: include/views/configuration.host.discovery.edit.php:963
 #: include/views/configuration.host.discovery.list.php:329
 #: include/views/configuration.item.edit.php:1018
 #: include/views/configuration.item.list.php:301
@@ -6866,7 +6870,7 @@ msgstr ""
 
 #: app/views/popup.lldoverride.php:183
 #: include/views/configuration.host.discovery.edit.php:822
-#: include/views/configuration.host.discovery.edit.php:941
+#: include/views/configuration.host.discovery.edit.php:951
 msgid "Filters"
 msgstr "Filtry"
 
@@ -10398,8 +10402,8 @@ msgstr ""
 msgid "LLD macro"
 msgstr "LLD makro"
 
-#: include/views/configuration.host.discovery.edit.php:896
-#: include/views/configuration.host.discovery.edit.php:940
+#: include/views/configuration.host.discovery.edit.php:897
+#: include/views/configuration.host.discovery.edit.php:950
 msgid "LLD macros"
 msgstr "LLD makra"
 
@@ -11850,7 +11854,7 @@ msgstr "NTLM"
 #: include/views/configuration.host.discovery.edit.php:132
 #: include/views/configuration.host.discovery.edit.php:175
 #: include/views/configuration.host.discovery.edit.php:319
-#: include/views/configuration.host.discovery.edit.php:909
+#: include/views/configuration.host.discovery.edit.php:912
 #: include/views/configuration.host.discovery.list.php:100
 #: include/views/configuration.host.discovery.list.php:193
 #: include/views/configuration.hostgroups.list.php:46
@@ -13265,8 +13269,8 @@ msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:402
 #: include/classes/widgets/views/widget.svggraph.form.view.php:297
-#: include/views/configuration.host.discovery.edit.php:925
-#: include/views/configuration.host.discovery.edit.php:942
+#: include/views/configuration.host.discovery.edit.php:929
+#: include/views/configuration.host.discovery.edit.php:952
 msgid "Overrides"
 msgstr "Přepisování"
 
@@ -13886,7 +13890,7 @@ msgid "Prediction functions"
 msgstr ""
 
 #: app/views/popup.massupdate.item.php:494
-#: include/views/configuration.host.discovery.edit.php:933
+#: include/views/configuration.host.discovery.edit.php:939
 #: include/views/configuration.item.edit.php:987
 #: include/views/configuration.item.prototype.edit.php:871
 msgid "Preprocessing"
@@ -13894,7 +13898,7 @@ msgstr "Předzpracování"
 
 #: app/views/popup.itemtestedit.view.php:354
 #: app/views/popup.massupdate.item.php:210
-#: include/views/configuration.host.discovery.edit.php:935
+#: include/views/configuration.host.discovery.edit.php:943
 #: include/views/configuration.item.edit.php:991
 #: include/views/configuration.item.prototype.edit.php:875
 msgid "Preprocessing steps"
@@ -16514,7 +16518,7 @@ msgid "Stop"
 msgstr "Zastavit"
 
 #: app/views/popup.lldoverride.php:57
-#: include/views/configuration.host.discovery.edit.php:910
+#: include/views/configuration.host.discovery.edit.php:913
 msgid "Stop processing"
 msgstr ""
 
@@ -17007,8 +17011,8 @@ msgstr "Šablony aktualizovány"
 #: app/views/popup.itemtestedit.view.php:432
 #: app/views/popup.mediatypetest.edit.php:99
 #: app/views/popup.testtriggerexpr.php:124 include/forms.inc.php:1457
-#: include/views/configuration.host.discovery.edit.php:960
-#: include/views/configuration.host.discovery.edit.php:972
+#: include/views/configuration.host.discovery.edit.php:970
+#: include/views/configuration.host.discovery.edit.php:982
 #: include/views/configuration.item.edit.php:1025
 #: include/views/configuration.item.edit.php:1046
 #: include/views/configuration.item.prototype.edit.php:902
@@ -18189,7 +18193,7 @@ msgstr "Dostupný"
 #: include/classes/html/CTabFilter.php:94
 #: include/views/configuration.action.edit.php:492
 #: include/views/configuration.graph.edit.php:494
-#: include/views/configuration.host.discovery.edit.php:967
+#: include/views/configuration.host.discovery.edit.php:977
 #: include/views/configuration.hostgroups.edit.php:61
 #: include/views/configuration.host.prototype.edit.php:422
 #: include/views/configuration.httpconf.edit.php:271
@@ -19686,7 +19690,7 @@ msgstr "Přihlašovací formulář Zabbixu"
 msgid "Zabbix server"
 msgstr "Zabbix server"
 
-#: include/classes/server/CZabbixServer.php:600
+#: include/classes/server/CZabbixServer.php:601
 #, c-format
 msgid ""
 "Zabbix server \"%1$s\" cannot be reached. Possible reasons:\n"
