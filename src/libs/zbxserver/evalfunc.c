@@ -3434,25 +3434,6 @@ int	zbx_evaluate_RATE(zbx_variant_t *value, DC_ITEM *item, const char *parameter
 	return evaluate_RATE(value, item, parameters, ts, error);
 }
 
-static void	history_to_dbl_vector(const zbx_history_record_t *v, int n, unsigned char value_type,
-		zbx_vector_dbl_t *values)
-{
-	int	i;
-
-	zbx_vector_dbl_reserve(values, (size_t)n);
-
-	if (ITEM_VALUE_TYPE_FLOAT == value_type)
-	{
-		for (i = 0; i < n; i++)
-			zbx_vector_dbl_append(values, v[i].value.dbl);
-	}
-	else
-	{
-		for (i = 0; i < n; i++)
-			zbx_vector_dbl_append(values, (double)v[i].value.ui64);
-	}
-}
-
 #define CHANGECOUNT_UI64(op)								\
 	for (i = 0; i < values.values_num - 1; i++)					\
 	{										\
@@ -3500,7 +3481,6 @@ static void	history_to_dbl_vector(const zbx_history_record_t *v, int n, unsigned
 static int	evaluate_CHANGECOUNT(zbx_variant_t *value, DC_ITEM *item, const char *parameters,
 		const zbx_timespec_t *ts, char **error)
 {
-
 	int				arg1, i, nparams, time_shift, ret = FAIL, seconds = 0, nvalues = 0;
 	int				mode = CHANGE_ALL;
 	char				*arg2 = NULL;
@@ -3643,6 +3623,25 @@ out:
 #undef CHANGE_ALL
 #undef CHANGE_INC
 #undef CHANGE_DEC
+
+static void	history_to_dbl_vector(const zbx_history_record_t *v, int n, unsigned char value_type,
+		zbx_vector_dbl_t *values)
+{
+	int	i;
+
+	zbx_vector_dbl_reserve(values, (size_t)n);
+
+	if (ITEM_VALUE_TYPE_FLOAT == value_type)
+	{
+		for (i = 0; i < n; i++)
+			zbx_vector_dbl_append(values, v[i].value.dbl);
+	}
+	else
+	{
+		for (i = 0; i < n; i++)
+			zbx_vector_dbl_append(values, (double)v[i].value.ui64);
+	}
+}
 
 /******************************************************************************
  *                                                                            *
