@@ -3437,11 +3437,11 @@ int	zbx_evaluate_RATE(zbx_variant_t *value, DC_ITEM *item, const char *parameter
 #define LAST(v, type) v.values[i].value.type
 #define PREV(v, type) v.values[i + 1].value.type
 
-#define CHANGECOUNT_DBL(op, epsi_op)									\
+#define CHANGECOUNT_DBL(op)										\
 	for (i = 0; i < values.values_num - 1; i++)							\
 	{												\
-		if ((SUCCEED != zbx_double_compare(PREV(values, dbl), LAST(values, dbl)) &&		\
-				PREV(values, dbl) op (LAST(values, dbl) epsi_op ZBX_DOUBLE_EPSILON)))	\
+		if (SUCCEED != zbx_double_compare(PREV(values, dbl), LAST(values, dbl))) &&		\
+				(PREV(values, dbl) op LAST(values, dbl))				\
 		{											\
 			count++;									\
 		}											\
@@ -3595,11 +3595,11 @@ static int	evaluate_CHANGECOUNT(zbx_variant_t *value, DC_ITEM *item, const char 
 		}
 		else if (CHANGE_INC == mode)
 		{
-			CHANGECOUNT_DBL(<, -);
+			CHANGECOUNT_DBL(<);
 		}
 		else if (CHANGE_DEC == mode)
 		{
-			CHANGECOUNT_DBL(>, +);
+			CHANGECOUNT_DBL(>);
 		}
 	}
 	else if (ITEM_VALUE_TYPE_STR == item->value_type || ITEM_VALUE_TYPE_TEXT == item->value_type)
