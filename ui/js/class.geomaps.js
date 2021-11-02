@@ -83,6 +83,7 @@ L.Control.severityFilterFilterControl = L.Control.extend({
 
 		L.DomEvent.on(btn, 'click', () => {this.bar.classList.toggle('collapsed')});
 		L.DomEvent.on(btn, 'dblclick', (e) => {L.DomEvent.stopPropagation(e)});
+		L.DomEvent.on(this.bar, 'dblclick', (e) => {L.DomEvent.stopPropagation(e)});
 		L.DomEvent.on(div, 'change', () => {
 			map.updateFilter([...this.bar.querySelectorAll('input[type="checkbox"]:checked')].map(n => n.value));
 		});
