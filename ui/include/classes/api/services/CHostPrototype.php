@@ -937,41 +937,59 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
+	 * @param array $host_prototypeids
+	 */
+	public static function deleteForce(array $host_prototypeids): void {
+		$host_prototypeids = array_merge($host_prototypeids, self::getChildIds($host_prototypeids));
+
+		// Lock host prototypes before delete to prevent server from adding new LLD hosts.
+		$db_host_prototypes = DBfetchArray(DBselect(
+			'SELECT hostid,host'.
+			' FROM hosts h'.
+			' WHERE '.dbConditionId('h.hostid', $host_prototypeids).
+			' FOR UPDATE'
+		));
+
+		$db_hosts = DB::select('host_discovery', [
+			'output' => [],
+			'filter' => [
+				'parent_hostid' => $host_prototypeids
+			],
+			'preservekeys' => true
+		]);
+
+		if ($db_hosts) {
+			API::Host()->delete(array_keys($db_hosts), true);
+		}
+
+		$db_group_prototypes = DB::select('group_prototype', [
+			'output' => [],
+			'filter' => [
+				'hostid' => $host_prototypeids
+			],
+			'preservekeys' => true
+		]);
+
+		if ($db_group_prototypes) {
+			self::deleteGroupPrototypes(array_keys($db_group_prototypes));
+		}
+
+		DB::delete('hosts', ['hostid' => $host_prototypeids]);
+
+		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_HOST_PROTOTYPE, $db_host_prototypes);
+	}
+
+	/**
 	 * Delete host prototypes.
 	 *
 	 * @param array $host_prototypeids
-	 * @param bool  $nopermissions     if set to true, permission and template checks will be skipped
 	 *
 	 * @return array
 	 */
-	public function delete(array $host_prototypeids, bool $nopermissions = false): array {
-		$this->validateDelete($host_prototypeids, $db_host_prototypes, $nopermissions);
+	public function delete(array $host_prototypeids): array {
+		$this->validateDelete($host_prototypeids);
 
-		$db_discovery = DB::select('host_discovery', [
-			'output' => ['hostid'],
-			'filter' => [
-				'parent_hostid' => array_column($db_host_prototypes, 'hostid')
-			]
-		]);
-
-		if ($db_discovery) {
-			API::Host()->delete(array_column($db_discovery, 'hostid'), true);
-		}
-
-		$db_groups = DB::select('group_prototype', [
-			'output' => ['group_prototypeid'],
-			'filter' => [
-				'hostid' => array_column($db_host_prototypes, 'hostid')
-			]
-		]);
-
-		if ($db_groups) {
-			$this->deleteGroupPrototypes(array_column($db_groups, 'group_prototypeid'));
-		}
-
-		DB::delete($this->tableName(), ['hostid' => array_column($db_host_prototypes, 'hostid')]);
-
-		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_HOST_PROTOTYPE, $db_host_prototypes);
+		self::deleteForce($host_prototypeids);
 
 		return ['hostids' => array_column($db_host_prototypes, 'hostid')];
 	}
@@ -979,48 +997,39 @@ class CHostPrototype extends CHostBase {
 	/**
 	 * Validates the input parameters for the delete() method.
 	 *
-	 * @param array      $host_prototypeids
-	 * @param array|null $db_host_prototypes
-	 * @param bool       $nopermissions
+	 * @param array $host_prototypeids
 	 *
 	 * @throws APIException  if the input is invalid
 	 */
-	private function validateDelete(array $host_prototypeids, array &$db_host_prototypes = null, bool $nopermissions)
-			: void {
+	private function validateDelete(array &$host_prototypeids) : void {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $host_prototypeids, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$host_prototypeids = array_merge($host_prototypeids, self::getChildIds($host_prototypeids));
+		$count = $this->get([
+			'countOutput' => true,
+			'hostids' => $host_prototypeids,
+			'editable' => true
+		]);
 
-		// Lock host prototypes before delete to prevent server from adding new LLD hosts.
-		DBselect(
-			'SELECT NULL'.
+		if ($count != count($host_prototypeids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_('No permissions to referred object or it does not exist!')
+			);
+		}
+
+		$db_host_prototype = DBfetch(DBSelect(
+			'SELECT h.hostid'.
 			' FROM hosts h'.
-			' WHERE '.dbConditionInt('h.hostid', $host_prototypeids).
-			' FOR UPDATE'
-		);
+			' WHERE h.templateid>0'.
+				' AND '.dbConditionInt('h.hostid', $host_prototypeids),
+			1
+		));
 
-		if (!$nopermissions) {
-			$db_host_prototypes = $this->get([
-				'output' => ['hostid', 'host', 'templateid'],
-				'hostids' => $host_prototypeids,
-				'editable' => true
-			]);
-
-			if (count($db_host_prototypes) != count($host_prototypeids)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-
-			foreach ($db_host_prototypes as $db_host_prototype) {
-				if ($db_host_prototype['templateid'] != 0) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('Cannot delete templated host prototype.'));
-				}
-			}
+		if ($db_host_prototype) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete templated host prototype.'));
 		}
 	}
 

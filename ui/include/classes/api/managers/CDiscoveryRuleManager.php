@@ -66,7 +66,7 @@ class CDiscoveryRuleManager {
 			' WHERE '.dbConditionInt('hd.parent_itemid', $ruleids)
 		), 'hostid');
 		if ($host_prototypeids) {
-			API::HostPrototype()->delete($host_prototypeids, true);
+			CHostPrototype::deleteForce($host_prototypeids);
 		}
 
 		// Delete LLD rules.
