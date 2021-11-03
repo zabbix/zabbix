@@ -556,10 +556,11 @@ class CAction extends CApiService {
 		$ins_actions = [];
 
 		foreach ($actions as $action) {
-			$ins_actions[] = $action + ['evaltype' => array_key_exists('filter', $action)
-					? $action['filter']['evaltype']
-					: CONDITION_EVAL_TYPE_AND_OR
-			];
+			if (array_key_exists('filter', $action)) {
+				$action['evaltype'] = $action['filter']['evaltype'];
+			}
+
+			$ins_actions[] = $action;
 		}
 
 		$actionids = DB::insert('actions', $ins_actions);
@@ -689,8 +690,6 @@ class CAction extends CApiService {
 			$conditionids = DB::insert('conditions', $ins_conditions);
 		}
 
-		$upd_actions = [];
-
 		foreach ($actions as &$action) {
 			if (!array_key_exists('filter', $action) || !array_key_exists('conditions', $action['filter'])) {
 				continue;
@@ -706,6 +705,8 @@ class CAction extends CApiService {
 		unset($action);
 
 		// Update formula.
+		$upd_actions = [];
+
 		foreach ($actions as &$action) {
 			if (!array_key_exists('filter', $action)) {
 				continue;
@@ -713,12 +714,7 @@ class CAction extends CApiService {
 
 			$action['filter']['formula'] = ($action['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION)
 				? CConditionHelper::replaceLetterIds($action['filter']['formula'],
-					array_column(
-						array_key_exists('conditions', $action['filter'])
-							? $action['filter']['conditions']
-							: ($is_update ? $db_actions[$action['actionid']]['filter']['conditions'] : []),
-						'conditionid', 'formulaid'
-					)
+					array_column($action['filter']['conditions'], 'conditionid', 'formulaid')
 				)
 				: '';
 
@@ -2327,7 +2323,7 @@ class CAction extends CApiService {
 								['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'conditions' =>	['type' => API_MULTIPLE, 'rules' => [
-								['if' => ['field' => 'evaltype', 'in' => CONDITION_EVAL_TYPE_EXPRESSION], 'type' => API_OBJECTS, 'uniq' => [['formulaid']], 'fields' => [
+								['if' => ['field' => 'evaltype', 'in' => CONDITION_EVAL_TYPE_EXPRESSION], 'type' => API_OBJECTS, 'flags' => API_REQUIRED, 'uniq' => [['formulaid']], 'fields' => [
 									'formulaid' =>	['type' => API_COND_FORMULAID, 'flags' => API_REQUIRED]
 								] + $condition_fields],
 								['else' => true, 'type' => API_OBJECTS, 'fields' => $condition_fields]
@@ -2632,7 +2628,7 @@ class CAction extends CApiService {
 
 		self::addAffectedObjects($actions, $db_actions);
 
-		self::checkFilter($actions, $db_actions);
+		self::checkFilter($actions);
 		self::checkOperations($actions, $db_actions);
 
 		self::checkMediatypesPermissions($actions);
@@ -2682,14 +2678,11 @@ class CAction extends CApiService {
 	}
 
 	/**
-	 * @param array      $actions
-	 * @param array|null $db_actions
+	 * @param array $actions
 	 *
 	 * @throws APIException
 	 */
-	private static function checkFilter(array $actions, array $db_actions = null): void {
-		$is_update = ($db_actions !== null);
-
+	private static function checkFilter(array $actions): void {
 		$condition_formula_parser = new CConditionFormula();
 		$ip_range_parser = new CIPRangeParser(['v6' => ZBX_HAVE_IPV6, 'dns' => false, 'max_ipv4_cidr' => 30]);
 
@@ -2705,17 +2698,13 @@ class CAction extends CApiService {
 
 				$constants = array_column($condition_formula_parser->constants, 'value', 'value');
 
-				$conditions = array_key_exists('conditions', $action['filter'])
-					? $action['filter']['conditions']
-					: ($is_update ? $db_actions[$action['actionid']]['filter']['conditions'] : []);
-
-				if (count($conditions) != count($constants)) {
+				if (count($action['filter']['conditions']) != count($constants)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Invalid parameter "%1$s": %2$s.', $path.'/conditions', _('incorrect number of conditions'))
 					);
 				}
 
-				foreach ($conditions as $j => $condition) {
+				foreach ($action['filter']['conditions'] as $j => $condition) {
 					if (!array_key_exists($condition['formulaid'], $constants)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
 							$path.'/conditions/'.($j + 1).'/formulaid', _('an identifier is not defined in the formula')
