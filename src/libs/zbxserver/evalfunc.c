@@ -3487,8 +3487,7 @@ int	zbx_evaluate_RATE(zbx_variant_t *value, DC_ITEM *item, const char *parameter
 static int	evaluate_CHANGECOUNT(zbx_variant_t *value, DC_ITEM *item, const char *parameters,
 		const zbx_timespec_t *ts, char **error)
 {
-	int				arg1, i, nparams, time_shift, ret = FAIL, seconds = 0, nvalues = 0;
-	int				mode;
+	int				arg1, i, nparams, time_shift, mode, ret = FAIL, seconds = 0, nvalues = 0;
 	char				*arg2 = NULL;
 	zbx_value_type_t		arg1_type;
 	zbx_vector_history_record_t	values;
