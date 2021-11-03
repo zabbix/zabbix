@@ -47,7 +47,7 @@ class testAgentItems extends CIntegrationTest {
 	const TEST_DIR_DIR1_NAME = self::TEST_DIR_NAME.'/'.self::TEST_DIR1_NAME;
 	const TEST_DIR_FILE_NAME = self::TEST_DIR_NAME.'/'.self::TEST_FILE_BASE_NAME;
 	const TEST_DIR_LINK_NAME = self::TEST_DIR_DIR1_NAME.'/'.self::TEST_LINK_BASE_NAME;
-	
+
 	const TEST_MOD_TIMESTAMP = 1617019149;
 	const AGENT_METADATA = 'zabbixtestagent';
 
@@ -610,7 +610,7 @@ class testAgentItems extends CIntegrationTest {
 		if (!file_exists(self::TEST_DIR_NAME)) {
 			$this->assertTrue(@mkdir(self::TEST_DIR_NAME)!==false);
 		}
-		
+
 		if (!file_exists(self::TEST_DIR_DIR1_NAME)) {
 			$this->assertTrue(@mkdir(self::TEST_DIR_DIR1_NAME)!==false);
 		}
@@ -873,7 +873,7 @@ class testAgentItems extends CIntegrationTest {
 	public static function arrcmpr(array $array, array $cmpr, string $key) {
 		foreach ($array as $array_key => $array_value) {
 			self::assertArrayHasKey($array_key, $cmpr, 'Array key "'.$array_key.'" is missing in '.$key);
-			
+
 			if (is_array($array_value)) {
 				if (!is_array($cmpr[$array_key])) {
 					self::fail('Wrong element type in '.$key);
