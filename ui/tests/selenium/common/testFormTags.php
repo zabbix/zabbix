@@ -311,7 +311,7 @@ class testFormTags extends CWebTest {
 			$this->page->removeFocus();
 			$this->page->updateViewport();
 			$screenshot_area = $this->query('id:tags-table')->one();
-			$this->assertScreenshot($screenshot_area, $data['name']);
+			$this->assertScreenshot($screenshot_area, $data['name'].' '.$object);
 		}
 
 		$form->submit();
@@ -720,7 +720,7 @@ class testFormTags extends CWebTest {
 		if ($data['name'] === 'With tags' || $data['name'] === 'Long tag name and value') {
 			$this->page->removeFocus();
 			$screenshot_area = $this->query('id:tags-table')->one();
-			$this->assertScreenshot($screenshot_area, $data['name']);
+			$this->assertScreenshot($screenshot_area, $data['name'].' '.$object);
 		}
 	}
 
@@ -736,22 +736,44 @@ class testFormTags extends CWebTest {
 		$this->query('link', $this->clone_name)->waitUntilClickable()->one()->click();
 
 		// Get tags of object.
-		$form = $this->query('xpath://main/form')->asForm()->waitUntilPresent()->one();
+		switch ($object) {
+			case 'trigger':
+				$form_selector = 'id:triggers-form';
+				break;
+
+			case 'item':
+				$form_selector = 'id:item-form';
+				break;
+
+			case 'web scenario':
+				$form_selector = 'id:http-form';
+				break;
+
+			case 'host prototype':
+				$form_selector = 'id:host-prototype-form';
+				break;
+
+			case 'item prototype':
+				$form_selector = 'id:item-prototype-form';
+				break;
+
+			case 'trigger prototype':
+				$form_selector = 'id:triggers-prototype-form';
+				break;
+			}
+
+		$form = $this->query($form_selector)->asForm()->waitUntilPresent()->one();
 		$form->selectTab('Tags');
 		$element = $this->query('id:tags-table')->asMultifieldTable()->one();
 		$tags = $element->getValue();
 
 		// Navigate to host or template for full cloning.
-		$name = ($parent === 'Host') ? $this->host : $this->template;
-		$this->query('link', $name)->waitUntilClickable()->one()->click();
-
-		if ($parent === 'Host') {
-			$form = $this->query('id:host-form')->asForm()->waitUntilPresent()->one();
-		}
-
-		$form->fill([$parent.' name' => $new_name]);
+		$this->query('link', ($parent === 'Host') ? $this->host : $this->template)->waitUntilClickable()->one()->click();
+		$host_form = $this->query('id', ($parent === 'Host') ? 'host-form' : 'templates-form')->asForm()
+				->waitUntilPresent()->one();
+		$host_form->fill([$parent.' name' => $new_name]);
 		$this->query('button:Full clone')->one()->click();
-		$form->submit();
+		$host_form->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, $parent.' added');
 

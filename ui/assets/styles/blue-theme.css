@@ -4401,7 +4401,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     z-index: 20; }
     .multilineinput-modal .multilineinput-textarea::-webkit-scrollbar {
       height: 9px; }
-  .multilineinput-modal .multilineinput-symbols-remaining {
+  .multilineinput-modal .multilineinput-char-count {
     color: #768d99;
     float: left;
     line-height: 24px; }

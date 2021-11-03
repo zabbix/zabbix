@@ -363,7 +363,7 @@ class testFormItem extends CLegacyWebTest {
 		if (isset($templateid)) {
 			$this->zbxTestTextPresent('Parent items');
 			if (isset($data['hostTemplate'])) {
-				$this->assertTrue($form->query('link:Inheritance test template')->exists());
+				$this->assertTrue($form->query('link', $data['hostTemplate'])->exists());
 			}
 		}
 		else {
@@ -976,7 +976,6 @@ class testFormItem extends CLegacyWebTest {
 					'expected' => TEST_GOOD,
 					'name' => 'Checksum of $1',
 					'key' => 'vfs.file.cksum[/sbin/shutdown]',
-					'dbName' => 'Checksum of /sbin/shutdown',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
@@ -2034,13 +2033,7 @@ class testFormItem extends CLegacyWebTest {
 			}
 		}
 		if (isset($data['formCheck'])) {
-			if (isset ($data['dbName'])) {
-				$dbName = $data['dbName'];
-			}
-			else {
-				$dbName = $name;
-			}
-			$this->zbxTestClickXpath("//form[@name='items']//a[text()='$dbName']");
+			$this->zbxTestClickXpath("//form[@name='items']//a[text()='$name']");
 			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('name'));
 			$this->zbxTestAssertElementValue('name', $name);
 			$this->zbxTestAssertElementValue('key', $key);
