@@ -1591,6 +1591,232 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	}
 
 	/**
+	 * Resolve single item widget description macros.
+	 *
+	 * @param array  $items                    Array of items.
+	 * @param string $items[n]['key_']         Required if user macros are present.
+	 * @param string $items[n]['hostid']       Required if interface macros or user macros are present.
+	 * @param string $items[n]['interfaceid']  Required if interface macros are present.
+	 * @param string $items[n]['itemid']       Required if item macros are present to get value from history.
+	 * @param string $items[n]['value_type']   Required if item macros are present to get value from history.
+	 * @param string $items[n]['name']         Field to resolve. Required.
+	 *
+	 * @return array                           Returns array of items with macros resolved.
+	 */
+	public function resolveWidgetItemNames(array $items) {
+		$types = [
+			'macros' => [
+				// To do: possibly add or remove {HOST.DESCRIPTION}
+				'host' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}'],
+				'interface' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+				// To do: possibly add or remove {ITEM.DESCRIPTION}, {ITEM.DESCRIPTION.ORIG}, {ITEM.ID}, {ITEM.KEY}, {ITEM.KEY.ORIG}, {ITEM.NAME}, {ITEM.NAME.ORIG}, {ITEM.STATE}, {ITEM.VALUETYPE}
+				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}'],
+				'inventory' => array_keys(self::getSupportedHostInventoryMacrosMap()),
+			],
+			'usermacros' => true
+		];
+
+		$macro_values = [];
+		$usermacros = [];
+		$itemids = [];
+		$host_macros = false;
+		$interface_macros = false;
+		$inventory_macros = false;
+		$item_macros = false;
+
+		$texts = array_column($items, 'name');
+
+		$matched_macros = self::extractMacros($texts, $types);
+
+		foreach ($items as $key => $item) {
+			if ($matched_macros['macros']['host']) {
+				$host_macros = true;
+				$itemids[$item['itemid']] = true;
+
+				foreach ($matched_macros['macros']['host'] as $macro) {
+					$macro_values[$key][$macro] = UNRESOLVED_MACRO_STRING;
+				}
+			}
+
+			if ($matched_macros['macros']['interface']) {
+				$interface_macros = true;
+
+				foreach ($matched_macros['macros']['interface'] as $macro) {
+					$macro_values[$key][$macro] = UNRESOLVED_MACRO_STRING;
+				}
+			}
+
+			if ($matched_macros['macros']['item']) {
+				$item_macros = true;
+
+				foreach ($matched_macros['macros']['item'] as $macro) {
+					$macro_values[$key][$macro] = UNRESOLVED_MACRO_STRING;
+				}
+			}
+
+			if ($matched_macros['macros']['inventory']) {
+				$inventory_macros = true;
+				$hosts[$item['hostid']][$key] = true;
+
+				foreach ($matched_macros['macros']['inventory'] as $macro) {
+					$macro_values[$key][$macro] = UNRESOLVED_MACRO_STRING;
+				}
+			}
+
+			if ($matched_macros['usermacros']) {
+				$usermacros[$key] = ['hostids' => [$item['hostid']], 'macros' => $matched_macros['usermacros']];
+			}
+		}
+
+		if ($interface_macros) {
+			$hostids = [];
+
+			foreach ($macro_values as $key => $macros) {
+				if (array_key_exists('{HOST.IP}', $macros) || array_key_exists('{IPADDRESS}', $macros)
+						|| array_key_exists('{HOST.DNS}', $macros) || array_key_exists('{HOST.CONN}', $macros)
+						|| array_key_exists('{HOST.PORT}', $macros)) {
+					$hostids[$items[$key]['hostid']] = true;
+				}
+			}
+
+			$interfaces = [];
+			$interfaces_by_priority = [];
+
+			if ($hostids) {
+				$interfaces = DBfetchArray(DBselect(
+					'SELECT i.hostid,i.interfaceid,i.ip,i.dns,i.useip,i.port,i.type,i.main'.
+					' FROM interface i'.
+					' WHERE i.main='.INTERFACE_PRIMARY.
+						' AND '.dbConditionInt('i.hostid', array_keys($hostids)).
+						' AND '.dbConditionInt('i.type', self::interfacePriorities)
+				));
+
+				$interfaces = CMacrosResolverHelper::resolveHostInterfaces($interfaces);
+				$interfaces = zbx_toHash($interfaces, 'interfaceid');
+
+				// Items with no interfaces must collect interface data from host.
+				foreach ($interfaces as $interface) {
+					$hostid = $interface['hostid'];
+					$priority = self::interfacePriorities[$interface['type']];
+
+					if (!array_key_exists($hostid, $interfaces_by_priority)
+							|| $priority > self::interfacePriorities[$interfaces_by_priority[$hostid]['type']]) {
+						$interfaces_by_priority[$hostid] = $interface;
+					}
+				}
+			}
+		}
+
+		if ($host_macros) {
+			$db_items = API::Item()->get([
+				'output' => [],
+				'selectHosts' => ['hostid', 'host', 'name'],
+				'itemids' => array_keys($itemids),
+				'webitems' => true,
+				'filter' => ['flags' => null],
+				'preservekeys' => true
+			]);
+		}
+
+		foreach ($macro_values as $key => &$macros) {
+			$itemid = $items[$key]['itemid'];
+			$interface = null;
+
+			if ($interface_macros) {
+				if ($items[$key]['interfaceid'] != 0 && array_key_exists($items[$key]['interfaceid'], $interfaces)) {
+					$interface = $interfaces[$item[$key]['interfaceid']];
+				}
+				elseif (array_key_exists($items[$key]['hostid'], $interfaces_by_priority)) {
+					$interface = $interfaces_by_priority[$items[$key]['hostid']];
+				}
+			}
+
+			foreach ($macros as $macro => &$value) {
+				if ($host_macros) {
+					switch ($macro) {
+						case '{HOST.NAME}':
+							$value = $db_items[$itemid]['hosts'][0]['name'];
+							continue 2;
+
+						case '{HOST.ID}':
+							$value = $items[$key]['hostid'];
+							continue 2;
+
+						case '{HOST.HOST}':
+						case '{HOSTNAME}': // deprecated
+							$value = $db_items[$itemid]['hosts'][0]['host'];
+							continue 2;
+					}
+				}
+
+				if ($interface_macros && $interface !== null) {
+					switch ($macro) {
+						case '{HOST.IP}':
+						case '{IPADDRESS}': // deprecated
+							$value = $interface['ip'];
+							continue 2;
+
+						case '{HOST.DNS}':
+							$value = $interface['dns'];
+							continue 2;
+
+						case '{HOST.CONN}':
+							$value = $interface['useip'] ? $interface['ip'] : $interface['dns'];
+							continue 2;
+
+						case '{HOST.PORT}':
+							$value = $interface['port'];
+							continue 2;
+					}
+				}
+
+				if ($item_macros) {
+					switch ($macro) {
+						// Since this value does not depend on trigger or event, then both macros act the same.
+						case '{ITEM.VALUE}':
+						case '{ITEM.LASTVALUE}':
+							$history = Manager::History()->getLastValues([$items[$key]], 1, timeUnitToSeconds(
+								CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD)
+							));
+
+							if (array_key_exists($itemid, $history)) {
+								$value = $history[$itemid][0]['value'];
+							}
+							continue 2;
+					}
+				}
+			}
+			unset($value);
+		}
+		unset($macros);
+
+		if ($inventory_macros) {
+			$macro_values = self::getInventoryMacrosByHostId($hosts, $macro_values);
+		}
+
+		foreach ($this->getUserMacros($usermacros) as $key => $usermacros_data) {
+			$macro_values[$key] = array_key_exists($key, $macro_values)
+				? array_merge($macro_values[$key], $usermacros_data['macros'])
+				: $usermacros_data['macros'];
+		}
+
+		$types = $this->transformToPositionTypes($types);
+
+		// Replace macros to value.
+		foreach ($macro_values as $key => $macros) {
+			$matched_macros = $this->getMacroPositions($items[$key]['name'], $types);
+
+			foreach (array_reverse($matched_macros, true) as $pos => $macro) {
+				$items[$key]['name'] = substr_replace($items[$key]['name'],
+					$macro_values[$items[$key]['itemid']][$macro], $pos, strlen($macro)
+				);
+			}
+		}
+
+		return $items;
+	}
+
+	/**
 	 * Resolve item delay macros, item history and item trend macros.
 	 *
 	 * @param array  $data

@@ -568,6 +568,27 @@ class CMacrosResolverHelper {
 	}
 
 	/**
+	 * Resolve single item widget description macros.
+	 *
+	 * @static
+	 *
+	 * @param array  $items                    Array of items.
+	 * @param string $items[n]['key_']         Required if user macros are present.
+	 * @param string $items[n]['hostid']       Required if interface macros or user macros are present.
+	 * @param string $items[n]['interfaceid']  Required if interface macros are present.
+	 * @param string $items[n]['itemid']       Required if item macros are present to get value from history.
+	 * @param string $items[n]['value_type']   Required if item macros are present to get value from history.
+	 * @param string $items[n]['name']         Field to resolve. Required.
+	 *
+	 * @return array                           Returns array of items with macros resolved.
+	 */
+	public static function resolveWidgetItemNames(array $items) {
+		self::init();
+
+		return self::$macrosResolver->resolveWidgetItemNames($items);
+	}
+
+	/**
 	 * Expand functional macros in given map link labels.
 	 *
 	 * @param array  $links

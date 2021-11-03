@@ -21,7 +21,10 @@
 
 /**
  * Single item widget.
+ *
+ * @var CView $this
  */
+
 $fields = $data['dialogue']['fields'];
 
 $form = CWidgetHelper::createForm();

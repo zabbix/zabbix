@@ -294,6 +294,7 @@ class CRouter {
 		'widget.favmaps.view'						=> ['CControllerWidgetFavMapsView',						'layout.widget',		'monitoring.widget.favmaps.view'],
 		'widget.graph.view'							=> ['CControllerWidgetGraphView',						'layout.widget',		'monitoring.widget.graph.view'],
 		'widget.graphprototype.view'				=> ['CControllerWidgetIteratorGraphPrototypeView',		'layout.json',			null],
+		'widget.item.view'							=> ['CControllerWidgetItemView',						'layout.widget',		'monitoring.widget.item.view'],
 		'widget.hostavail.view'						=> ['CControllerWidgetHostAvailView',					'layout.widget',		'monitoring.widget.hostavail.view'],
 		'widget.map.view'							=> ['CControllerWidgetMapView',							'layout.widget',		'monitoring.widget.map.view'],
 		'widget.navtree.item.edit'					=> ['CControllerWidgetNavTreeItemEdit',					'layout.json',			'monitoring.widget.navtreeitem.edit'],

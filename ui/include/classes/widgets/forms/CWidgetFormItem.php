@@ -30,7 +30,10 @@ class CWidgetFormItem extends CWidgetForm {
 		// item field
 		$field_item = (new CWidgetFieldMsItem('itemid', _('Item'), $templateid))
 			->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
-			->setMultiple(false);
+			->setMultiple(false)
+			->setFilterParameter('value_types', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_UINT64,
+				ITEM_VALUE_TYPE_TEXT
+			]);
 
 		if (array_key_exists('itemid', $this->data)) {
 			$field_item->setValue($this->data['itemid']);
