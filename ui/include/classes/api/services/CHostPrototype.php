@@ -1003,17 +1003,17 @@ class CHostPrototype extends CHostBase {
 			' FOR UPDATE'
 		);
 
-		$db_host_prototypes = $this->get([
-			'output' => ['hostid', 'host'],
-			'hostids' => $host_prototypeids,
-			'editable' => true
-		]);
-
-		if (count($db_host_prototypes) != count($host_prototypeids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
-
 		if (!$nopermissions) {
+			$db_host_prototypes = $this->get([
+				'output' => ['hostid', 'host'],
+				'hostids' => $host_prototypeids,
+				'editable' => true
+			]);
+
+			if (count($db_host_prototypes) != count($host_prototypeids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+			}
+
 			self::checkNotInherited($host_prototypeids);
 		}
 	}
