@@ -2457,8 +2457,8 @@ void	DBcheck_character_set(void)
 		if (SUCCEED != str_in_list(ZBX_SUPPORTED_DB_COLLATION, collation, ZBX_DB_STRLIST_DELIM))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Zabbix supports only \"%s\" collation(s)."
-					" Database \"%s\" has default collation \"%s\"",
-					ZBX_SUPPORTED_DB_COLLATION, CONFIG_DBNAME, collation);
+					" Database \"%s\" has default collation \"%s\"", ZBX_SUPPORTED_DB_COLLATION,
+					CONFIG_DBNAME, collation);
 		}
 	}
 
