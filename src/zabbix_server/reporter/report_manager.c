@@ -2392,8 +2392,9 @@ ZBX_THREAD_ENTRY(report_manager_thread, args)
 	zbx_ipc_client_t	*client;
 	zbx_ipc_message_t	*message;
 	double			time_stat, time_idle = 0, time_now, sec, time_sync, time_flush_sessions, time_flush;
-	int			ret, delay, processed_num = 0, created_num = 0;
+	int			ret, processed_num = 0, created_num = 0;
 	zbx_rm_t		manager;
+	zbx_timespec_t		timeout;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -2461,11 +2462,24 @@ ZBX_THREAD_ENTRY(report_manager_thread, args)
 		processed_num += rm_process_jobs(&manager);
 
 		sec = zbx_time();
-		delay = (sec - time_now > 0.5 ? 0 : 1);
+
+		if (sec - time_now >= 1)
+		{
+			timeout.sec = 0;
+			timeout.ns = 0;
+		}
+		else
+		{
+			double	delay = 1 - (sec - time_now);
+
+			timeout.sec = (int)delay;
+			timeout.ns = (int)(delay * 1000000000) % 1000000000;
+		}
+
 		time_now = sec;
 
 		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
-		ret = zbx_ipc_service_recv(&manager.ipc, delay, &client, &message);
+		ret = zbx_ipc_service_recv(&manager.ipc, &timeout, &client, &message);
 		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 		sec = zbx_time();

@@ -1080,14 +1080,23 @@ class testFormScheduledReport extends CWebTest {
 		// Get field values from form.
 		$form->fill($data['fields']);
 		$expected_values = $form->getFields()->asValues();
+
 		// If the "Repeat on" field isn't visible due to weekly cycle, then all weekdays will be selected and still received.
 		if (CTestArrayHelper::get($data, 'fields.Cycle', 'Weekly') !== 'Weekly') {
 			$expected_values['Repeat on'] = ['Friday', 'Monday', 'Saturday', 'Sunday', 'Thursday', 'Tuesday', 'Wednesday'];
 		}
 
+		// Start time is complex element, so needs to be checked separately.
+		unset($expected_values['Start time']);
+		foreach (['hours', 'minutes'] as $value) {
+			$expected_start_time[$value] = $form->query('id', $value)->waitUntilVisible()->one()->getValue();
+		}
+
 		$this->fillSubscriptions($data);
+
 		// Get values from subscriptions table.
 		$expected_subscriptions = $form->getField('Subscriptions')->asTable()->index();
+
 		// Sort new subscriber users alphabetically by 'Recipient'.
 		if (array_key_exists('Subscriptions', $data)) {
 			array_multisort(array_column($expected_subscriptions, 'Recipient'), SORT_ASC, $expected_subscriptions);
@@ -1102,7 +1111,15 @@ class testFormScheduledReport extends CWebTest {
 				zbx_dbstr($data['fields']['Name']).', '.zbx_dbstr(self::TEST_REPORT_NAME).')'));
 		$this->query('link', $data['fields']['Name'])->waitUntilClickable()->one()->click();
 		$form->invalidate();
+
+		// Check Start time fields separately.
+		foreach (['hours', 'minutes'] as $value) {
+			$start_time[$value] = $form->query('id', $value)->waitUntilVisible()->one()->getValue();
+		}
+		$this->assertEquals($expected_start_time, $start_time);
+
 		$form->checkValue($expected_values);
+
 		$actual_subscriptions = $form->getField('Subscriptions')->asTable()->index();
 		$this->assertEquals($expected_subscriptions, $actual_subscriptions);
 	}

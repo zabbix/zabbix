@@ -1528,7 +1528,7 @@ class CRole extends CApiService {
 	 * @throws APIException
 	 */
 	private static function getEnabledModuleIds(): array {
-		$modules = API::Module()->get([
+		$modules = API::getApiService('module')->get([
 			'output' => [],
 			'filter' => [
 				'status' => MODULE_STATUS_ENABLED

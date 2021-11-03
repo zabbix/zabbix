@@ -447,7 +447,10 @@ zbx_graph_yaxis_types_t;
 #define ZBX_LOG_LEVEL_DECREASE		"log_level_decrease"
 #define ZBX_SNMP_CACHE_RELOAD		"snmp_cache_reload"
 #define ZBX_DIAGINFO			"diaginfo"
-#define ZBX_TRIGGER_HOUSEKEEPER_EXECUTE	"trigger_housekeeper_execute"
+#define ZBX_TRIGGER_HOUSEKEEPER_EXECUTE "trigger_housekeeper_execute"
+#define ZBX_HA_STATUS			"ha_status"
+#define ZBX_HA_REMOVE_NODE		"ha_remove_node"
+#define ZBX_HA_SET_FAILOVER_DELAY	"ha_set_failover_delay"
 #define ZBX_USER_PARAMETERS_RELOAD	"userparameter_reload"
 
 /* value for not supported items */
@@ -567,8 +570,16 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_REPORTWRITER		34
 #define ZBX_PROCESS_TYPE_SERVICEMAN		35
 #define ZBX_PROCESS_TYPE_PROBLEMHOUSEKEEPER	36
-#define ZBX_PROCESS_TYPE_COUNT		37	/* number of process types */
-#define ZBX_PROCESS_TYPE_UNKNOWN	255
+#define ZBX_PROCESS_TYPE_COUNT			37	/* number of process types */
+
+/* special processes that are not present worker list */
+#define ZBX_PROCESS_TYPE_EXT_FIRST		126
+#define ZBX_PROCESS_TYPE_HA_MANAGER		126
+#define ZBX_PROCESS_TYPE_MAIN			127
+#define ZBX_PROCESS_TYPE_EXT_LAST		127
+
+#define ZBX_PROCESS_TYPE_UNKNOWN		255
+
 const char	*get_process_type_string(unsigned char proc_type);
 int		get_process_type_by_name(const char *proc_type_str);
 
@@ -976,7 +987,10 @@ zbx_task_t;
 #define ZBX_RTC_SECRETS_RELOAD			11
 #define ZBX_RTC_SERVICE_CACHE_RELOAD		12
 #define ZBX_RTC_TRIGGER_HOUSEKEEPER_EXECUTE	13
-#define ZBX_RTC_USER_PARAMETERS_RELOAD		14
+#define ZBX_RTC_HA_STATUS			14
+#define ZBX_RTC_HA_REMOVE_NODE			15
+#define ZBX_RTC_HA_SET_FAILOVER_DELAY		16
+#define ZBX_RTC_USER_PARAMETERS_RELOAD		17
 
 typedef enum
 {
@@ -994,7 +1008,7 @@ zbx_httptest_auth_t;
 typedef struct
 {
 	zbx_task_t	task;
-	int		flags;
+	unsigned int	flags;
 	int		data;
 }
 ZBX_TASK_EX;
@@ -1357,6 +1371,7 @@ void	find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, s
 int	zbx_read(int fd, char *buf, size_t count, const char *encoding);
 int	zbx_is_regular_file(const char *path);
 char	*zbx_fgets(char *buffer, int size, FILE *fp);
+int	zbx_write_all(int fd, const char *buf, size_t n);
 
 int	MAIN_ZABBIX_ENTRY(int flags);
 

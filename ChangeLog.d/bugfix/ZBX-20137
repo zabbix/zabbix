@@ -1,0 +1,1 @@
+........S. [ZBX-20137] fixed HA node not to become active after restart if there is another node that can take over (vso)

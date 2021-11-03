@@ -25,7 +25,6 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Host inventory overview');
 $page['file'] = 'hostinventoriesoverview.php';
-$page['scripts'] = ['multiselect.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 

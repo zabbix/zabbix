@@ -23,6 +23,7 @@
  * Class to log audit records.
  */
 class CAudit {
+
 	/**
 	 * Audit actions.
 	 *
@@ -79,6 +80,7 @@ class CAudit {
 	public const RESOURCE_USER_ROLE = 44;
 	public const RESOURCE_AUTH_TOKEN = 45;
 	public const RESOURCE_SCHEDULED_REPORT = 46;
+	public const RESOURCE_HA_NODE = 47;
 
 	/**
 	 * Audit details actions.
@@ -113,6 +115,7 @@ class CAudit {
 		self::RESOURCE_ICON_MAP => 'icon_map',
 		self::RESOURCE_IMAGE => 'images',
 		self::RESOURCE_ITEM => 'items',
+		self::RESOURCE_IT_SERVICE => 'services',
 		self::RESOURCE_MACRO => 'globalmacro',
 		self::RESOURCE_MEDIA_TYPE => 'media_type',
 		self::RESOURCE_MODULE => 'module',
@@ -153,6 +156,7 @@ class CAudit {
 		self::RESOURCE_ICON_MAP => 'name',
 		self::RESOURCE_IMAGE => 'name',
 		self::RESOURCE_ITEM => 'name',
+		self::RESOURCE_IT_SERVICE => 'name',
 		self::RESOURCE_MACRO => 'macro',
 		self::RESOURCE_MEDIA_TYPE => 'name',
 		self::RESOURCE_MODULE => 'id',
@@ -183,6 +187,7 @@ class CAudit {
 		self::RESOURCE_ICON_MAP => 'iconmap',
 		self::RESOURCE_IMAGE => 'image',
 		self::RESOURCE_ITEM => 'item',
+		self::RESOURCE_IT_SERVICE => 'service',
 		self::RESOURCE_MACRO => 'usermacro',
 		self::RESOURCE_MEDIA_TYPE => 'mediatype',
 		self::RESOURCE_MODULE => 'module',
@@ -242,6 +247,12 @@ class CAudit {
 		'regexp.expressions' => 'expressions',
 		'report.users' => 'report_user',
 		'report.user_groups' => 'report_usrgrp',
+		'service.children' => 'services_links',
+		'service.parents' => 'services_links',
+		'service.problem_tags' => 'service_problem_tag',
+		'service.status_rules' => 'service_status_rule',
+		'service.tags' => 'service_tag',
+		'service.times' => 'services_times',
 		'script.parameters' => 'script_param',
 		'templatedashboard.pages' => 'dashboard_page',
 		'templatedashboard.pages.widgets' => 'widget',
@@ -277,6 +288,12 @@ class CAudit {
 		'report.users' => 'reportuserid',
 		'report.user_groups' => 'reportusrgrpid',
 		'script.parameters' => 'script_paramid',
+		'service.children' => 'linkid',
+		'service.parents' => 'linkid',
+		'service.problem_tags' => 'service_problem_tagid',
+		'service.status_rules' => 'service_status_ruleid',
+		'service.tags' => 'servicetagid',
+		'service.times' => 'timeid',
 		'templatedashboard.pages' => 'dashboard_pageid',
 		'templatedashboard.pages.widgets' => 'widgetid',
 		'templatedashboard.pages.widgets.fields' => 'widget_fieldid',

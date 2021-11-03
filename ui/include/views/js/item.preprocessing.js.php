@@ -185,7 +185,7 @@
 						label_after: '}',
 						grow: 'auto',
 						rows: 0,
-						maxlength: <?= (int) DB::getFieldLength('item_preproc', 'params') ?>
+						maxlength: <?= DB::getFieldLength('item_preproc', 'params') ?>
 					});
 
 				case '<?= ZBX_PREPROC_PROMETHEUS_PATTERN ?>':
@@ -285,6 +285,8 @@
 			opacity: 0.6
 		});
 
+		const change_event = new CustomEvent('item.preprocessing.change');
+
 		$preprocessing
 			.on('click', '.element-table-add', function() {
 				var preproc_row_tmpl = new Template($('#preprocessing-steps-tmpl').html()),
@@ -312,6 +314,7 @@
 						.removeClass('<?= ZBX_STYLE_DISABLED ?>');
 				}
 
+				$preprocessing[0].dispatchEvent(change_event);
 				updateTypeOptionsAvailability();
 				step_index++;
 			})
@@ -346,6 +349,7 @@
 						.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').addClass('<?= ZBX_STYLE_DISABLED ?>');
 				}
 
+				$preprocessing[0].dispatchEvent(change_event);
 				updateTypeOptionsAvailability();
 			})
 			.on('change', 'z-select[name*="type"]', function() {

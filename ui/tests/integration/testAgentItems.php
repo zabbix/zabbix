@@ -20,9 +20,6 @@
 
 require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 
-define('COMPARE_AVERAGE', 0);
-define('COMPARE_LAST', 1);
-
 define('JSON_COMPARE_LEFT', 1);
 define('JSON_COMPARE_RIGHT', 2);
 define('JSON_COMPARE_BOTH', 3);
@@ -33,6 +30,9 @@ define('JSON_COMPARE_BOTH', 3);
  * @backup history
  */
 class testAgentItems extends CIntegrationTest {
+
+	const COMPARE_AVERAGE = 0;
+	const COMPARE_LAST = 1;
 
 	const TEST_FILE_NAME = '/tmp/test_file';
 	const TEST_LINK_NAME = '/tmp/test_link';
@@ -49,7 +49,7 @@ class testAgentItems extends CIntegrationTest {
 			'type' => ITEM_TYPE_ZABBIX,
 			'component' => self::COMPONENT_AGENT,
 			'valueType' => ITEM_VALUE_TYPE_TEXT,
-			'result_exec' => 'stat -c \'%U\' '.self::TEST_FILE_NAME,
+			'result_exec' => 'stat -c \'%U\' '.self::TEST_FILE_NAME
 		],
 		[
 			'key' => 'vfs.file.owner['.self::TEST_FILE_NAME.',group,id]',
@@ -610,7 +610,7 @@ class testAgentItems extends CIntegrationTest {
 
 			case ITEM_VALUE_TYPE_FLOAT:
 			case ITEM_VALUE_TYPE_UINT64:
-				if (CTestArrayHelper::get($item, 'compareType', COMPARE_LAST) === COMPARE_AVERAGE) {
+				if (CTestArrayHelper::get($item, 'compareType', self::COMPARE_LAST) === self::COMPARE_AVERAGE) {
 					$value = 0;
 					$records = count($values);
 

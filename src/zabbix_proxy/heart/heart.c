@@ -24,13 +24,19 @@
 #include "zbxself.h"
 
 #include "heart.h"
-#include "../servercomms.h"
 #include "zbxcrypto.h"
 #include "zbxcompress.h"
+#include "comms.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
+
+extern zbx_vector_ptr_t	zbx_addrs;
+extern char		*CONFIG_HOSTNAME;
+extern char		*CONFIG_SOURCE_IP;
+extern int		CONFIG_TIMEOUT;
+extern unsigned int	configured_tls_connect_mode;
 
 /******************************************************************************
  *                                                                            *
@@ -39,11 +45,11 @@ extern ZBX_THREAD_LOCAL int		server_num, process_num;
  ******************************************************************************/
 static int	send_heartbeat(void)
 {
-	zbx_socket_t	sock;
-	struct zbx_json	j;
-	int		ret = SUCCEED;
-	char		*error = NULL, *buffer = NULL;
-	size_t		buffer_size, reserved;
+	zbx_socket_t		sock;
+	struct zbx_json		j;
+	int			ret = SUCCEED;
+	char			*error = NULL, *buffer = NULL;
+	size_t			buffer_size, reserved;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In send_heartbeat()");
 
@@ -60,8 +66,11 @@ static int	send_heartbeat(void)
 
 	reserved = j.buffer_size;
 
-	if (FAIL == (ret = connect_to_server(&sock, CONFIG_HEARTBEAT_FREQUENCY, 0))) /* do not retry */
+	if (FAIL == (ret = connect_to_server(&sock, CONFIG_SOURCE_IP, &zbx_addrs, CONFIG_HEARTBEAT_FREQUENCY,
+			CONFIG_TIMEOUT, configured_tls_connect_mode, 0, LOG_LEVEL_DEBUG))) /* do not retry */
+	{
 		goto clean;
+	}
 
 	if (SUCCEED != (ret = put_data_to_server(&sock, &buffer, buffer_size, reserved, &error)))
 	{

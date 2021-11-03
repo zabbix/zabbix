@@ -23,7 +23,6 @@
  * @var CView $this
  */
 
-$this->addJsFile('multiselect.js');
 $this->addJsFile('class.calendar.js');
 
 $this->includeJsFile('administration.token.edit.js.php');

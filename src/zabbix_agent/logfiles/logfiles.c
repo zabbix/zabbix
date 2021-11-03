@@ -1890,7 +1890,7 @@ static char	*buf_find_newline(char *p, char **p_next, const char *p_end, const c
 static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec,
 		int *incomplete, char **err_msg, const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern,
 		const char *output_template, int *p_count, int *s_count, zbx_process_value_func_t process_value,
-		const char *server, unsigned short port, const char *hostname, const char *key,
+		zbx_vector_ptr_t *addrs, const char *hostname, const char *key,
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent)
 {
 	static ZBX_THREAD_LOCAL char	*buf = NULL;
@@ -1999,8 +1999,8 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 								pattern, ZBX_CASE_SENSITIVE, output_template,
 								&item_value)))
 						{
-							if (SUCCEED == (send_err = process_value(server, port,
-									hostname, key, item_value, ITEM_STATE_NORMAL,
+							if (SUCCEED == (send_err = process_value(addrs, hostname, key,
+									item_value, ITEM_STATE_NORMAL,
 									&lastlogsize1, mtime, NULL, NULL, NULL, NULL,
 									flags | ZBX_METRIC_FLAG_PERSISTENT)))
 							{
@@ -2093,8 +2093,8 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 								pattern, ZBX_CASE_SENSITIVE, output_template,
 								&item_value)))
 						{
-							if (SUCCEED == (send_err = process_value(server, port,
-									hostname, key, item_value, ITEM_STATE_NORMAL,
+							if (SUCCEED == (send_err = process_value(addrs, hostname, key,
+									item_value, ITEM_STATE_NORMAL,
 									&lastlogsize1, mtime, NULL, NULL, NULL, NULL,
 									flags | ZBX_METRIC_FLAG_PERSISTENT)))
 							{
@@ -2240,7 +2240,7 @@ static int	process_log(unsigned char flags, const char *filename, zbx_uint64_t *
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, unsigned char *skip_old_data, int *big_rec,
 		int *incomplete, char **err_msg, const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern,
 		const char *output_template, int *p_count, int *s_count, zbx_process_value_func_t process_value,
-		const char *server, unsigned short port, const char *hostname, const char *key,
+		zbx_vector_ptr_t *addrs, const char *hostname, const char *key,
 		zbx_uint64_t *processed_bytes, zbx_uint64_t seek_offset)
 {
 	int	f, ret = FAIL;
@@ -2257,7 +2257,7 @@ static int	process_log(unsigned char flags, const char *filename, zbx_uint64_t *
 		*skip_old_data = 0;
 
 		if (SUCCEED == (ret = zbx_read2(f, flags, lastlogsize, mtime, big_rec, incomplete, err_msg, encoding,
-				regexps, pattern, output_template, p_count, s_count, process_value, server, port,
+				regexps, pattern, output_template, p_count, s_count, process_value, addrs,
 				hostname, key, lastlogsize_sent, mtime_sent)))
 		{
 			*processed_bytes = *lastlogsize - seek_offset;
@@ -3068,7 +3068,7 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 		int *use_ino, char **err_msg, struct st_logfile **logfiles_old, const int *logfiles_num_old,
 		struct st_logfile **logfiles_new, int *logfiles_num_new, const char *encoding,
 		zbx_vector_ptr_t *regexps, const char *pattern, const char *output_template, int *p_count, int *s_count,
-		zbx_process_value_func_t process_value, const char *server, unsigned short port, const char *hostname,
+		zbx_process_value_func_t process_value, zbx_vector_ptr_t *addrs, const char *hostname,
 		const char *key, int *jumped, float max_delay, double *start_time, zbx_uint64_t *processed_bytes,
 		zbx_log_rotation_options_t rotation_type)
 {
@@ -3275,7 +3275,7 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 				ret = process_log(flags, logfiles[i].filename, lastlogsize, mtime, lastlogsize_sent,
 						mtime_sent, skip_old_data, big_rec, &logfiles[i].incomplete, err_msg,
 						encoding, regexps, pattern, output_template, p_count, s_count,
-						process_value, server, port, hostname, key, &processed_bytes_tmp,
+						process_value, addrs, hostname, key, &processed_bytes_tmp,
 						seek_offset);
 
 				/* process_log() advances 'lastlogsize' only on success therefore */
@@ -3513,7 +3513,7 @@ err:
  *           comments.                                                        *
  *                                                                            *
  ******************************************************************************/
-int	process_log_check(char *server, unsigned short port, zbx_vector_ptr_t *regexps, ZBX_ACTIVE_METRIC *metric,
+int	process_log_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *regexps, ZBX_ACTIVE_METRIC *metric,
 		zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent, int *mtime_sent,
 		char **error)
 {
@@ -3649,7 +3649,7 @@ int	process_log_check(char *server, unsigned short port, zbx_vector_ptr_t *regex
 	ret = process_logrt(metric->flags, filename, &metric->lastlogsize, &metric->mtime, lastlogsize_sent, mtime_sent,
 			&metric->skip_old_data, &metric->big_rec, &metric->use_ino, error, &metric->logfiles,
 			&metric->logfiles_num, &logfiles_new, &logfiles_num_new, encoding, regexps, regexp,
-			output_template, &p_count, &s_count, process_value_cb, server, port, CONFIG_HOSTNAME,
+			output_template, &p_count, &s_count, process_value_cb, addrs, CONFIG_HOSTNAME,
 			metric->key_orig, &jumped, max_delay, &metric->start_time, &metric->processed_bytes,
 			rotation_type);
 
@@ -3677,7 +3677,7 @@ int	process_log_check(char *server, unsigned short port, zbx_vector_ptr_t *regex
 
 			zbx_snprintf(buf, sizeof(buf), "%d", match_count);
 
-			if (SUCCEED == process_value_cb(server, port, CONFIG_HOSTNAME, metric->key_orig, buf,
+			if (SUCCEED == process_value_cb(addrs, CONFIG_HOSTNAME, metric->key_orig, buf,
 					ITEM_STATE_NORMAL, &metric->lastlogsize, &metric->mtime, NULL, NULL, NULL, NULL,
 					metric->flags | ZBX_METRIC_FLAG_PERSISTENT) || 0 != jumped)
 			{

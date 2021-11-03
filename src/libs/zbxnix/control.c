@@ -237,6 +237,49 @@ int	parse_rtc_options(const char *opt, unsigned char program_type, int *message)
 		scope = 0;
 		data = 0;
 	}
+	else if (0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER)) && 0 == strcmp(opt, ZBX_HA_STATUS))
+	{
+		command = ZBX_RTC_HA_STATUS;
+		scope = 0;
+		data = 0;
+	}
+	else if (0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER)) &&
+			0 == strncmp(opt, ZBX_HA_REMOVE_NODE, ZBX_CONST_STRLEN(ZBX_HA_REMOVE_NODE)))
+	{
+		command = ZBX_RTC_HA_REMOVE_NODE;
+		scope = 0;
+		if ('=' != opt[ZBX_CONST_STRLEN(ZBX_HA_REMOVE_NODE)] ||
+				SUCCEED != is_uint32(opt + ZBX_CONST_STRLEN(ZBX_HA_REMOVE_NODE) + 1, &data))
+		{
+			zbx_error("invalid HA node number: %s\n", opt);
+			return FAIL;
+		}
+	}
+	else if (0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER)) &&
+			0 == strncmp(opt, ZBX_HA_SET_FAILOVER_DELAY, ZBX_CONST_STRLEN(ZBX_HA_SET_FAILOVER_DELAY)))
+	{
+		int	delay;
+
+		if ('=' == opt[ZBX_CONST_STRLEN(ZBX_HA_SET_FAILOVER_DELAY)] &&
+				SUCCEED == is_time_suffix(opt + ZBX_CONST_STRLEN(ZBX_HA_SET_FAILOVER_DELAY) + 1, &delay,
+				ZBX_LENGTH_UNLIMITED))
+		{
+			if (delay < 10 || delay > 15 * SEC_PER_MIN)
+			{
+				zbx_error("failover delay must be in range from 10s to 15m");
+				return FAIL;
+			}
+
+			command = ZBX_RTC_HA_SET_FAILOVER_DELAY;
+			scope = 0;
+			data = (unsigned int)delay;
+		}
+		else
+		{
+			zbx_error("invalid HA failover delay value: %s\n", opt);
+			return FAIL;
+		}
+	}
 	else
 	{
 		zbx_error("invalid runtime control option: %s", opt);

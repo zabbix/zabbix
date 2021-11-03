@@ -946,12 +946,14 @@ static int	DBpatch_2010101(void)
 
 			if (1 != num_param(param))
 			{
-				if (FAIL == quote_key_param(&param, 0))
+				if (FAIL == (ret = quote_key_param(&param, 0)))
+				{
 					error_message = zbx_dsprintf(error_message, "unique description"
 							" \"%s\" contains invalid symbols and cannot be quoted", param);
+				}
 			}
 
-			if (FAIL == (ret = quote_key_param(&dsn, 0)))
+			if (SUCCEED == ret && FAIL == (ret = quote_key_param(&dsn, 0)))
 			{
 				error_message = zbx_dsprintf(error_message, "data source name"
 						" \"%s\" contains invalid symbols and cannot be quoted", dsn);
