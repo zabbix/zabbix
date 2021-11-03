@@ -550,9 +550,10 @@ class CAudit {
 		foreach ($db_object as $db_key => &$db_value) {
 			if (is_string($db_key) && !array_key_exists($db_key, $object)) {
 				unset($db_object[$db_key]);
+				continue;
 			}
 
-			if (is_int($db_key) || !is_array($db_value) || !array_key_exists($db_key, $object)) {
+			if (is_int($db_key) || !is_array($db_value)) {
 				continue;
 			}
 
