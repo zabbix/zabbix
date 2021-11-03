@@ -1005,16 +1005,22 @@ class CHostPrototype extends CHostBase {
 
 		if (!$nopermissions) {
 			$db_host_prototypes = $this->get([
-				'output' => ['hostid', 'host'],
+				'output' => ['hostid', 'host', 'templateid'],
 				'hostids' => $host_prototypeids,
 				'editable' => true
 			]);
 
 			if (count($db_host_prototypes) != count($host_prototypeids)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
 			}
 
-			self::checkNotInherited($host_prototypeids);
+			foreach ($db_host_prototypes as $db_host_prototype) {
+				if ($db_host_prototype['templateid'] != 0) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _('Cannot delete templated host prototype.'));
+				}
+			}
 		}
 	}
 
@@ -1289,21 +1295,6 @@ class CHostPrototype extends CHostBase {
 					_('No permissions to referred object or it does not exist!')
 				);
 			}
-		}
-	}
-
-	/**
-	 * Checks if the given host prototypes are not inherited from a template.
-	 *
-	 * @param array $host_prototypeids
-	 *
-	 * @throws APIException  if at least one host prototype is inherited
-	 */
-	private static function checkNotInherited(array $host_prototypeids): void {
-		$host_prototype = DBfetch(DBSelect('SELECT h.hostid FROM hosts h WHERE h.templateid>0 AND '.dbConditionInt('h.hostid', $host_prototypeids), 1));
-
-		if ($host_prototype) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Cannot delete templated host prototype.'));
 		}
 	}
 
