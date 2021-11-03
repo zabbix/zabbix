@@ -53,13 +53,23 @@ class CWidgetFieldLatLng extends CWidgetField {
 		$this->setDefault('');
 	}
 
-	public function setHelpText(string $help_text) {
+	/**
+	 * Set text for an icon with question mark and text in the hint box.
+	 *
+	 * @param string|array|CTag $help_text
+	 *
+	 * @return $this
+	 */
+	public function setHelpText($help_text) {
 		$this->help_text = $help_text;
 
 		return $this;
 	}
 
-	public function getHelpText(): string {
+	/**
+	 * Returns help text.
+	 */
+	public function getHelpText() {
 		return $this->help_text;
 	}
 
