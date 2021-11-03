@@ -1030,22 +1030,23 @@ class CHostPrototype extends CHostBase {
 	 * @return array
 	 */
 	private static function getChildIds(array $host_prototypeids): array {
-		$parent_host_prototypeids = $host_prototypeids;
-		$child_hostprototypeids = [];
+		$child_host_prototypeids = [];
 
 		do {
-			$db_childs = DB::select('hosts', [
-				'output' => ['hostid'],
+			$db_host_prototypes = DB::select('hosts', [
+				'output' => [],
 				'filter' => [
-					'templateid' => $parent_host_prototypeids
-				]
+					'templateid' => $host_prototypeids
+				],
+				'preservekeys' => true
 			]);
 
-			$parent_host_prototypeids = array_column($db_childs, 'hostid');
-			$child_hostprototypeids = array_merge($child_hostprototypeids, array_column($db_childs, 'hostid'));
-		} while ($parent_host_prototypeids);
+			$host_prototypeids = array_keys($db_host_prototypes);
+			$child_host_prototypeids += $db_host_prototypes;
+		}
+		while ($host_prototypeids);
 
-		return $child_hostprototypeids;
+		return array_keys($child_host_prototypeids);
 	}
 
 	/**
