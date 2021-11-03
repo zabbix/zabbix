@@ -345,7 +345,7 @@ final class CHistFunctionData {
 		'bucket_percentile' => self::ITEM_VALUE_TYPES_NUM,
 		'bucket_rate_foreach' => self::ITEM_VALUE_TYPES_NUM,
 		'change' => self::ITEM_VALUE_TYPES_ALL,
-		'changecount' => self::ITEM_VALUE_TYPES_NUM,
+		'changecount' => self::ITEM_VALUE_TYPES_ALL,
 		'count' => self::ITEM_VALUE_TYPES_ALL,
 		'count_foreach' => self::ITEM_VALUE_TYPES_ALL,
 		'countunique' => self::ITEM_VALUE_TYPES_ALL,
