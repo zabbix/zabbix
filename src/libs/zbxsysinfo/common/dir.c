@@ -852,7 +852,7 @@ int	VFS_DIR_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 														\
 		if (SUCCEED != zbx_vfs_file_info((const char*)path, &j, 1, &error))				\
 		{												\
-			zabbix_log(LOG_LEVEL_INFORMATION, "%s() cannot process directory entry '%s': %s",	\
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot process directory entry '%s': %s",		\
 					__func__, path, error);							\
 			zbx_free(error);									\
 		}												\
