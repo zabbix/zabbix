@@ -71,3 +71,17 @@
 		}
 	}
 }
+
+// SVG arrow styles.
+
+.svg-arrow-up {
+	fill: $arrow-fill-up;
+}
+
+.svg-arrow-down {
+	fill: $arrow-fill-down;
+}
+
+.svg-arrow-up-down {
+	fill: $arrow-fill-up-down;
+}

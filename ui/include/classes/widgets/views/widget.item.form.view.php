@@ -160,11 +160,19 @@ $form_list
 	->addRow(
 		(new CLabel(_('Change indicator')))->addClass(ZBX_STYLE_WIDGET_ITEM_LABEL),
 		(new CDiv([
-			'up',
+			(new CSvgArrow(['up' => true, 'fill_color' => $fields['up_color']->getValue()]))
+				->setId('change-indicator-up')
+				->setSize(14, 20),
 			(new CDiv(CWidgetHelper::getColor($fields['up_color'], true)))->addClass('form-field'),
-			'down',
+
+			(new CSvgArrow(['down' => true, 'fill_color' => $fields['down_color']->getValue()]))
+				->setId('change-indicator-down')
+				->setSize(14, 20),
 			(new CDiv(CWidgetHelper::getColor($fields['down_color'], true)))->addClass('form-field'),
-			'up/down',
+
+			(new CSvgArrow(['up' => true, 'down' => true, 'fill_color' => $fields['updown_color']->getValue()]))
+				->setId('change-indicator-updown')
+				->setSize(14, 20),
 			(new CDiv(CWidgetHelper::getColor($fields['updown_color'], true)))->addClass('form-field')
 		]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
@@ -180,8 +188,22 @@ $form_list
 $form->addItem($form_list);
 
 // Append color picker to widget body instead of whole HTML body. Process checkboxes and form block visibility.
-$scripts[] = '$(".input-color-picker input", $(".overlay-dialogue-body"))'.
-	'.colorpicker({appendTo: ".overlay-dialogue-body", use_default: true});'.
+$scripts[] =
+	'window.setIndicatorColor = function (color) {'.
+		'const indicator_ids = '.json_encode([
+			'up_color' => 'change-indicator-up',
+			'down_color' => 'change-indicator-down',
+			'updown_color' => 'change-indicator-updown'
+		]).';'.
+
+		'if (this.name in indicator_ids) {'.
+			'const indicator = document.getElementById(indicator_ids[this.name]);'.
+			'indicator.querySelector("polygon").style.fill = "#" + color;'.
+		'}'.
+	'};'.
+
+	'$(".input-color-picker input", $(".overlay-dialogue-body"))'.
+		'.colorpicker({appendTo: ".overlay-dialogue-body", use_default: true, onUpdate: window.setIndicatorColor});'.
 
 	'var $show = $(\'input[id^="show_"]\').not("#show_header");'.
 

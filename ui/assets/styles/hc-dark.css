@@ -1436,6 +1436,15 @@ footer {
 .dashboard-grid-widget-item .table-forms .table-forms-td-left label.widget-item-label {
   margin-top: 6px; }
 
+.svg-arrow-up {
+  fill: #3DC51D; }
+
+.svg-arrow-down {
+  fill: #FC5A5A; }
+
+.svg-arrow-up-down {
+  fill: #3DC51D; }
+
 .diff {
   padding: 4px;
   background: #111111; }
