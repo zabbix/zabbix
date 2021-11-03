@@ -872,7 +872,7 @@ static void	db_trigger_explain_expression(const zbx_eval_context_t *ctx, char **
 	for (i = 0; i < local_ctx.stack.values_num; i++)
 	{
 		zbx_eval_token_t	*token = &local_ctx.stack.values[i];
-		char			*value;
+		char			*value = NULL;
 		zbx_uint64_t		functionid;
 
 		if (ZBX_EVAL_TOKEN_FUNCTIONID != token->type)
