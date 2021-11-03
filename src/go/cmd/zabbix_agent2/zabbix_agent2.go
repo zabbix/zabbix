@@ -48,6 +48,10 @@ import (
 	"zabbix.com/pkg/zbxlib"
 )
 
+type AgentUserParamOption struct {
+	UserParameter []string `conf:"optional"`
+}
+
 const remoteCommandSendingTimeout = time.Second
 
 var manager *scheduler.Manager
@@ -102,6 +106,25 @@ func processHelpCommand(c *remotecontrol.Client) (err error) {
 	return c.Reply(help)
 }
 
+func processUserParamReloadCommand(c *remotecontrol.Client) (err error) {
+	var message string
+	var userparams AgentUserParamOption
+
+	if err = conf.LoadUserParams(&userparams); err != nil {
+		message = fmt.Sprintf("Cannot load user parameters: %s", err)
+		return c.Reply(message)
+	}
+
+	agent.Options.UserParameter = userparams.UserParameter
+	manager.QueryUserParams()
+
+	message = "Reloaded user parameters"
+	log.Infof(message)
+	err = c.Reply(message)
+
+	return
+}
+
 func processRemoteCommand(c *remotecontrol.Client) (err error) {
 	params := strings.Fields(c.Request())
 	switch len(params) {
@@ -123,6 +146,8 @@ func processRemoteCommand(c *remotecontrol.Client) (err error) {
 		err = processMetricsCommand(c)
 	case "version":
 		err = processVersionCommand(c)
+	case "userparameter_reload":
+		err = processUserParamReloadCommand(c)
 	default:
 		return errors.New("Unknown command")
 	}
@@ -335,7 +360,7 @@ func main() {
 			fatalExit("failed to load key access rules", err)
 		}
 
-		if err = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters,
+		if _, err = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters,
 			agent.Options.UserParameterDir); err != nil {
 			fatalExit("cannot initialize user parameters", err)
 		}
@@ -451,7 +476,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters,
+	if _, err = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters,
 		agent.Options.UserParameterDir); err != nil {
 		fatalExit("cannot initialize user parameters", err)
 	}

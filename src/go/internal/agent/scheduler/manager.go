@@ -72,12 +72,18 @@ type queryRequest struct {
 	sink    chan string
 }
 
+// queryRequestUserParams contains status user parameters query request.
+type queryRequestUserParams struct {
+	sink chan string
+}
+
 type Scheduler interface {
 	UpdateTasks(clientID uint64, writer plugin.ResultWriter, expressions []*glexpr.Expression,
 		requests []*plugin.Request)
 	FinishTask(task performer)
 	PerformTask(key string, timeout time.Duration, clientID uint64) (result string, err error)
 	Query(command string) (status string)
+	QueryUserParams() (status string)
 }
 
 // cleanupClient performs deactivation of plugins the client is not using anymore.
@@ -242,6 +248,49 @@ func (m *Manager) processQueue(now time.Time) {
 	}
 }
 
+// processUserParamQueue processes queued user parameters plugins/tasks
+func (m *Manager) processUserParamQueue(now time.Time) {
+	seconds := now.Unix()
+	for p := m.pluginQueue.Peek(); p != nil; p = m.pluginQueue.Peek() {
+		if task := p.peekTask(); task != nil {
+			if task.getScheduled().Unix() > seconds && p.usrprm == 0 {
+				break
+			}
+
+			heap.Pop(&m.pluginQueue)
+			if !p.hasCapacity() {
+				// plugin has no free capacity for the next task, keep the plugin out of queue
+				// until active tasks finishes and the required capacity is released
+				if p.usrprm == 1 {
+					m.pluginQueue.Remove(p)
+				}
+				continue
+			}
+
+			// take the task out of plugin tasks queue and perform it
+			m.activeTasksNum++
+			p.reserveCapacity(p.popTask())
+			task.perform(m)
+
+			// if the plugin has capacity for the next task put it back into plugin queue
+			if !p.hasCapacity() && p.usrprm == 0 {
+				continue
+			} else if p.usrprm == 1 {
+				m.pluginQueue.Remove(p)
+			} else {
+				heap.Push(&m.pluginQueue, p)
+			}
+		} else {
+			// plugins with empty task queue should not be in Manager queue
+			if p.usrprm == 1 {
+				m.pluginQueue.Remove(p)
+			} else {
+				heap.Pop(&m.pluginQueue)
+			}
+		}
+	}
+}
+
 // processFinishRequest handles finished tasks
 func (m *Manager) processFinishRequest(task performer) {
 	m.activeTasksNum--
@@ -368,6 +417,29 @@ run:
 				} else {
 					v.sink <- response
 				}
+			case *queryRequestUserParams:
+				var keys []string
+				var rerr error
+
+				m.processUserParamQueue(time.Now())
+				plugin.ClearUserParamMetrics()
+
+				for i, plg := range m.plugins {
+					if plg.usrprm == 1 {
+						delete(m.plugins, i)
+					}
+				}
+
+				if keys, rerr = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters, agent.Options.UserParameterDir); rerr != nil {
+					log.Warningf("cannot reload user parameters")
+					continue
+				}
+
+				for _, key := range keys {
+					m.addUserParamsPlugin(key)
+				}
+
+				v.sink <- "ok"
 			}
 		}
 	}
@@ -426,6 +498,7 @@ func (m *Manager) init() {
 				usedCapacity: 0,
 				index:        -1,
 				refcount:     0,
+				usrprm:       metric.UsrPrm,
 			}
 
 			interfaces := ""
@@ -522,6 +595,12 @@ func (m *Manager) Query(command string) (status string) {
 	return <-request.sink
 }
 
+func (m *Manager) QueryUserParams() (status string) {
+	request := &queryRequestUserParams{sink: make(chan string)}
+	m.input <- request
+	return <-request.sink
+}
+
 func (m *Manager) validatePlugins(options *agent.AgentOptions) (err error) {
 	for _, p := range plugin.Plugins {
 		if c, ok := p.(plugin.Configurator); ok {
@@ -545,4 +624,28 @@ func NewManager(options *agent.AgentOptions) (mannager *Manager, err error) {
 		return
 	}
 	return &m, m.configure(options)
+}
+
+func (m *Manager) addUserParamsPlugin(key string) {
+	var metric *plugin.Metric
+
+	for _, metric = range plugin.Metrics {
+		if metric.Key == key {
+			break
+		}
+	}
+
+	capacity := metric.Plugin.Capacity()
+
+	pagent := &pluginAgent{
+		impl:         metric.Plugin,
+		tasks:        make(performerHeap, 0),
+		maxCapacity:  capacity,
+		usedCapacity: 0,
+		index:        -1,
+		refcount:     0,
+		usrprm:       metric.UsrPrm,
+	}
+
+	m.plugins[key] = pagent
 }
