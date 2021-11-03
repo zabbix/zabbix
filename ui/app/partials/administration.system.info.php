@@ -124,7 +124,7 @@ if (!$data['system_info']['float_double_precision']) {
 	]);
 }
 
-if (!$data['system_info']['history_pk']) {
+if (array_key_exists('history_pk', $data['system_info']) && !$data['system_info']['history_pk']) {
 	$info_table->addRow([
 		_('Database history tables use primary key'),
 		(new CSpan(_('No')))->addClass(ZBX_STYLE_RED),

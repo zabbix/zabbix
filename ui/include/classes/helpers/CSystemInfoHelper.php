@@ -48,9 +48,10 @@ class CSystemInfoHelper {
 
 		if ($dbversion_status !== '') {
 			$dbversion_status = json_decode($dbversion_status, true);
-			$history_pk = (array_key_exists('history_pk', $dbversion_status) && $dbversion_status['history_pk'] == 1);
 
-			$data['history_pk'] = $history_pk;
+			if (array_key_exists('history_pk', $dbversion_status)) {
+				$data['history_pk'] = ($dbversion_status['history_pk'] == 1);
+			}
 		}
 		else {
 			$dbversion_status = [];
