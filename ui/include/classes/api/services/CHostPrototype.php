@@ -1014,7 +1014,6 @@ class CHostPrototype extends CHostBase {
 		}
 
 		if (!$nopermissions) {
-			self::checkHostPrototypePermissions($host_prototypeids);
 			self::checkNotInherited($host_prototypeids);
 		}
 	}
