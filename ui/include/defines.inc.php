@@ -59,6 +59,8 @@ define('ZBX_MAX_DATE',		ZBX_MAX_INT32); // 19 Jan 2038 03:14:07 UTC
 define('ZBX_MIN_TIMESHIFT',	-788400000); // Min valid timeshift value in seconds (25 years).
 define('ZBX_MAX_TIMESHIFT',	788400000); // Max valid timeshift value in seconds (25 years).
 
+define('ZBX_GEOMAP_MAX_ZOOM', 30); // Max zoom level for geomap.
+
 define('ZBX_MAX_GRAPHS_PER_PAGE', 20);
 
 // Date and time format separators must be synced with setSDateFromOuterObj() in class.calendar.js.
