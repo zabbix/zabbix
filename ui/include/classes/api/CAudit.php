@@ -531,9 +531,36 @@ class CAudit {
 				return self::handleAdd($resource, $details);
 
 			case self::ACTION_UPDATE:
-				$db_details = self::convertKeysToPaths($api_name, array_intersect_key($db_object, $object));
+				$db_details = self::convertKeysToPaths($api_name, self::intersectObjects($db_object, $object));
+
 				return self::handleUpdate($resource, $details, $db_details);
 		}
+	}
+
+	/**
+	 * Computes the intersection of $db_object and $object using keys for comparison.
+	 * Recursively removes $db_object properties if they are not present in $object.
+	 *
+	 * @param array $db_object
+	 * @param array $object
+	 *
+	 * @return array
+	 */
+	private static function intersectObjects(array $db_object, array $object): array {
+		foreach ($db_object as $db_key => &$db_value) {
+			if (is_string($db_key) && !array_key_exists($db_key, $object)) {
+				unset($db_object[$db_key]);
+			}
+
+			if (is_int($db_key) || !is_array($db_value) || !array_key_exists($db_key, $object)) {
+				continue;
+			}
+
+			$db_value = self::intersectObjects($db_value, $object[$db_key]);
+		}
+		unset($db_value);
+
+		return $db_object;
 	}
 
 	/**
@@ -688,13 +715,11 @@ class CAudit {
 	/**
 	 * Return the paths to nested object properties from the paths of passing object.
 	 *
-	 * @param array      $object
-	 * @param array|null $check_object
+	 * @param array $object
 	 *
 	 * @return array
 	 */
-	private static function getNestedObjectsPaths(array $object, array $check_object = null): array {
-		$checked_paths = [];
+	private static function getNestedObjectsPaths(array $object): array {
 		$paths = [];
 
 		foreach ($object as $path => $foo) {
@@ -702,36 +727,10 @@ class CAudit {
 				continue;
 			}
 
-			$nested_object_path = self::getLastObjectPath($path);
+			$object_path = self::getLastObjectPath($path);
 
-			if ($check_object !== null) {
-				$is_found = false;
-				$object_path = preg_replace('/\[[0-9]+\]/', '', $nested_object_path);
-
-				if (!array_key_exists($object_path, $checked_paths)) {
-					foreach ($check_object as $check_path => $foo) {
-						if (!self::isNestedObjectProperty($check_path)) {
-							continue;
-						}
-
-						$checked_object_path = preg_replace('/\[[0-9]+\]/', '', self::getLastObjectPath($check_path));
-
-						if ($object_path === $checked_object_path) {
-							$is_found = true;
-							break;
-						}
-					}
-
-					$checked_paths[$object_path] = $is_found;
-				}
-
-				if (!$checked_paths[$object_path]) {
-					continue;
-				}
-			}
-
-			if (!in_array($nested_object_path, $paths)) {
-				$paths[] = $nested_object_path;
+			if (!in_array($object_path, $paths)) {
+				$paths[] = $object_path;
 			}
 		}
 
@@ -784,7 +783,7 @@ class CAudit {
 	private static function handleUpdate(int $resource, array $object, array $db_object): array {
 		$result = [];
 		$nested_objects_paths = self::getNestedObjectsPaths($object);
-		$db_nested_objects_paths = self::getNestedObjectsPaths($db_object, $object);
+		$db_nested_objects_paths = self::getNestedObjectsPaths($db_object);
 
 		foreach ($db_nested_objects_paths as $path) {
 			if (!in_array($path, $nested_objects_paths)) {
