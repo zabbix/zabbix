@@ -1030,16 +1030,16 @@ class CControllerPopupTriggerExpr extends CController {
 				'allowed_types' => $this->allowedTypesNumeric,
 				'operators' => $this->operators
 			],
-			'trendbaselinedev' => [
+			'baselinedev' => [
 				'types' => [ZBX_FUNCTION_TYPE_HISTORY, ZBX_FUNCTION_TYPE_BASELINE],
-				'description' => _('trendbaselinedev() - Returns the number of deviations between data periods in seasons and the last data period'),
+				'description' => _('baselinedev() - Returns the number of deviations between data periods in seasons and the last data period'),
 				'params' => $this->period_seasons,
 				'allowed_types' => $this->allowedTypesNumeric,
 				'operators' => $this->operators
 			],
-			'trendbaselinewma' => [
+			'baselinewma' => [
 				'types' => [ZBX_FUNCTION_TYPE_HISTORY, ZBX_FUNCTION_TYPE_BASELINE],
-				'description' => _('trendbaselinewma() - Calculates baseline by averaging data periods in seasons'),
+				'description' => _('baselinewma() - Calculates baseline by averaging data periods in seasons'),
 				'params' => $this->period_seasons,
 				'allowed_types' => $this->allowedTypesNumeric,
 				'operators' => $this->operators

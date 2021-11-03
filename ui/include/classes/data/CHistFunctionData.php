@@ -224,12 +224,12 @@ final class CHistFunctionData {
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_TREND]]]
 		],
-		'trendbaselinedev' => [
+		'baselinedev' => [
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC_LONG]]],
 			['rules' => [['type' => 'time', 'with_year' => true]]],
 		],
-		'trendbaselinewma' => [
+		'baselinewma' => [
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC_LONG]]],
 			['rules' => [['type' => 'time', 'with_year' => true]]],
@@ -384,8 +384,8 @@ final class CHistFunctionData {
 		'sumofsquares' => self::ITEM_VALUE_TYPES_NUM,
 		'timeleft' => self::ITEM_VALUE_TYPES_NUM,
 		'trendavg' => self::ITEM_VALUE_TYPES_NUM,
-		'trendbaselinedev' => self::ITEM_VALUE_TYPES_NUM,
-		'trendbaselinewma' => self::ITEM_VALUE_TYPES_NUM,
+		'baselinedev' => self::ITEM_VALUE_TYPES_NUM,
+		'baselinewma' => self::ITEM_VALUE_TYPES_NUM,
 		'trendcount' => self::ITEM_VALUE_TYPES_NUM,
 		'trendmax' => self::ITEM_VALUE_TYPES_NUM,
 		'trendmin' => self::ITEM_VALUE_TYPES_NUM,
