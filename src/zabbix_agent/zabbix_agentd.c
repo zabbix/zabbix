@@ -969,7 +969,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 	zbx_strarr_init(&CONFIG_PERF_COUNTERS);
 	zbx_strarr_init(&CONFIG_PERF_COUNTERS_EN);
 #endif
-	parse_cfg_file(CONFIG_FILE, cfg, requirement, ZBX_CFG_STRICT);
+	parse_cfg_file(CONFIG_FILE, cfg, requirement, ZBX_CFG_STRICT, ZBX_CFG_EXIT_FAILURE);
 
 	finalize_key_access_rules_configuration();
 
@@ -1115,7 +1115,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	}
 #endif
 
-	load_user_parameters(CONFIG_USER_PARAMETERS);
+	if (FAIL == load_user_parameters(CONFIG_USER_PARAMETERS, &error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot load user parameters: %s", error);
+		zbx_free(error);
+		zbx_free_service_resources(FAIL);
+		exit(EXIT_FAILURE);
+	}
 
 	if (0 != CONFIG_PASSIVE_FORKS)
 	{
@@ -1317,9 +1323,9 @@ void	zbx_on_exit(int ret)
 int	main(int argc, char **argv)
 {
 	ZBX_TASK_EX	t = {ZBX_TASK_START};
+	char		*error = NULL;
 #ifdef _WINDOWS
 	int		ret;
-	char		*error;
 
 	/* Provide, so our process handles errors instead of the system itself. */
 	/* Attention!!! */
@@ -1418,7 +1424,14 @@ int	main(int argc, char **argv)
 			}
 #endif
 			set_user_parameter_dir(CONFIG_USER_PARAMETER_DIR);
-			load_user_parameters(CONFIG_USER_PARAMETERS);
+
+			if (FAIL == load_user_parameters(CONFIG_USER_PARAMETERS, &error))
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "cannot load user parameters: %s", error);
+				zbx_free(error);
+				exit(EXIT_FAILURE);
+			}
+
 			load_aliases(CONFIG_ALIASES);
 			zbx_free_config();
 			if (ZBX_TASK_TEST_METRIC == t.task)

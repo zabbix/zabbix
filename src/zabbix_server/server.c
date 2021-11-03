@@ -946,7 +946,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 	/* initialize multistrings */
 	zbx_strarr_init(&CONFIG_LOAD_MODULE);
 
-	parse_cfg_file(CONFIG_FILE, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_STRICT);
+	parse_cfg_file(CONFIG_FILE, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_STRICT, ZBX_CFG_EXIT_FAILURE);
 
 	zbx_set_defaults();
 

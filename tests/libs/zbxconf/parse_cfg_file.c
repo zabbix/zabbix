@@ -229,7 +229,7 @@ void	zbx_mock_test_entry(void **state)
 	cfg = zbx_realloc(cfg, (parameter_count + 1) * sizeof(struct cfg_line));
 	cfg[parameter_count].parameter = NULL;
 
-	parse_cfg_file(cfg_file, cfg, ZBX_CFG_FILE_REQUIRED, strict);
+	parse_cfg_file(cfg_file, cfg, ZBX_CFG_FILE_REQUIRED, strict, ZBX_CFG_EXIT_FAILURE);
 
 	if (ZBX_MOCK_NO_EXIT_CODE != (error = zbx_mock_exit_code(&exit_code)))
 	{

@@ -59,7 +59,7 @@ extern char	*CONFIG_TLS_PSK_IDENTITY;
 extern char	*CONFIG_TLS_PSK_FILE;
 
 void	load_aliases(char **lines);
-void	load_user_parameters(char **lines);
+int	load_user_parameters(char **lines, char **err);
 int	load_key_access_rule(const char *value, const struct cfg_line *cfg);
 void	reload_user_parameters(void);
 #ifdef _WINDOWS
