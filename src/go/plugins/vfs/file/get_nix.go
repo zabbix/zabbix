@@ -59,6 +59,9 @@ func getFileInfo(info *os.FileInfo, name string) (fileinfo *fileInfo, err error)
 	u := strconv.FormatUint(uint64(stat.Uid), 10)
 	if usr, er := user.LookupId(u); er == nil {
 		fi.User = &usr.Username
+	} else {
+		username := fmt.Sprintf("%d", stat.Uid)
+		fi.User = &username
 	}
 
 	fi.Uid = stat.Uid
@@ -66,6 +69,9 @@ func getFileInfo(info *os.FileInfo, name string) (fileinfo *fileInfo, err error)
 	g := strconv.FormatUint(uint64(stat.Gid), 10)
 	if group, er := user.LookupGroupId(g); er == nil {
 		fi.Group = &group.Name
+	} else {
+		groupname := fmt.Sprintf("%d", stat.Gid)
+		fi.Group = &groupname
 	}
 
 	fi.Gid = stat.Gid

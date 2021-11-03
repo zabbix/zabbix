@@ -1523,18 +1523,6 @@ int	zbx_vfs_file_info(const char *filename, struct zbx_json *j, int array, char 
 		goto err;
 	}
 
-	if (NULL == (pwd = getpwuid(buf.st_uid)))
-	{
-		*error = zbx_strdup(NULL, "Cannot obtain user name.");
-		goto err;
-	}
-
-	if (NULL == (grp = getgrgid(buf.st_gid)))
-	{
-		*error = zbx_strdup(NULL, "Cannot obtain group name.");
-		goto err;
-	}
-
 	if (SUCCEED != zbx_get_file_time(filename, 1, &file_time))
 	{
 		*error = zbx_dsprintf(NULL, "Cannot obtain file information: %s", zbx_strerror(errno));
@@ -1554,10 +1542,16 @@ int	zbx_vfs_file_info(const char *filename, struct zbx_json *j, int array, char 
 	zbx_json_addstring(j, ZBX_SYSINFO_FILE_TAG_TYPE, type, ZBX_JSON_TYPE_STRING);
 
 	/* user */
-	zbx_json_addstring(j, ZBX_SYSINFO_FILE_TAG_USER, pwd->pw_name, ZBX_JSON_TYPE_STRING);
+	if (NULL == (pwd = getpwuid(buf.st_uid)))
+		zbx_json_adduint64(j, ZBX_SYSINFO_FILE_TAG_USER, (zbx_uint64_t)buf.st_uid);
+	else
+		zbx_json_addstring(j, ZBX_SYSINFO_FILE_TAG_USER, pwd->pw_name, ZBX_JSON_TYPE_STRING);
 
 	/* group */
-	zbx_json_addstring(j, ZBX_SYSINFO_FILE_TAG_GROUP, grp->gr_name, ZBX_JSON_TYPE_STRING);
+	if (NULL == (grp = getgrgid(buf.st_gid)))
+		zbx_json_adduint64(j, ZBX_SYSINFO_FILE_TAG_GROUP, (zbx_uint64_t)buf.st_gid);
+	else
+		zbx_json_addstring(j, ZBX_SYSINFO_FILE_TAG_GROUP, grp->gr_name, ZBX_JSON_TYPE_STRING);
 
 	/* permissions */
 	tmp = get_file_permissions(&buf);
