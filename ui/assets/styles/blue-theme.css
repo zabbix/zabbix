@@ -1433,6 +1433,8 @@ footer {
       width: 100%; }
 .dashboard-grid-widget-item .field-group-change-indicator {
   grid-template-columns: repeat(3, max-content 96px); }
+.dashboard-grid-widget-item .field-group-change-indicator .input-color-picker {
+  display: block; }
 .dashboard-grid-widget-item .table-forms .table-forms-td-left label.widget-item-label {
   margin-top: 6px; }
 
@@ -5190,8 +5192,7 @@ td[class] + td.disaster-bg {
 
 .input-color-picker {
   display: inline-block;
-  vertical-align: middle;
-  margin-top: -1px; }
+  vertical-align: middle; }
   .input-color-picker div {
     width: 18px;
     height: 18px;

@@ -63,6 +63,10 @@
 		grid-template-columns: repeat(3, max-content 96px);
 	}
 
+	.field-group-change-indicator .input-color-picker {
+		display: block;
+	}
+
 	.table-forms {
 		.table-forms-td-left {
 			label.widget-item-label {

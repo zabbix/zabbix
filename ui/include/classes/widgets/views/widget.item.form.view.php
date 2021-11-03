@@ -198,7 +198,7 @@ $scripts[] =
 
 		'if (this.name in indicator_ids) {'.
 			'const indicator = document.getElementById(indicator_ids[this.name]);'.
-			'indicator.querySelector("polygon").style.fill = "#" + color;'.
+			'indicator.querySelector("polygon").style.fill = (color !== "") ? "#" + color : "";'.
 		'}'.
 	'};'.
 
