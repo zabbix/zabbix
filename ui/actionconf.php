@@ -219,8 +219,7 @@ if (hasRequest('add') || hasRequest('update')) {
 				$filter['formula'] = getRequest('formula');
 			}
 			else {
-				// if only one or no conditions are left, reset the evaltype to "and/or" and clear the formula
-				$filter['formula'] = '';
+				// If only one or no conditions are left, reset the evaltype to "and/or".
 				$filter['evaltype'] = CONDITION_EVAL_TYPE_AND_OR;
 			}
 		}
