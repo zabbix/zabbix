@@ -1644,6 +1644,7 @@ function get_item_function_info(string $expr) {
 		'avg' => $rules['numeric_as_float'],
 		'change' => $rules['numeric'] + $rules['string_as_0or1'],
 		'count' => $rules['numeric_as_uint'] + $rules['string_as_uint'],
+		'changecount' => $rules['integer'],
 		'countunique' => $rules['numeric_as_uint'] + $rules['string_as_uint'],
 		'find' => $rules['numeric_as_0or1'] + $rules['string_as_0or1'],
 		'first' => $rules['numeric'] + $rules['string'],
