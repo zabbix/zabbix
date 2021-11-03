@@ -35,11 +35,9 @@
 #elif defined(HAVE_MYSQL)
 #	define ZBX_DB_STRLIST_DELIM		','
 #	define ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8	"utf8,utf8mb3"
-#	define ZBX_SUPPORTED_DB_COLLATION_UTF8		"utf8_bin,utf8mb3_bin"
 #	define ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB4 	"utf8mb4"
-#	define ZBX_SUPPORTED_DB_COLLATION_UTF8MB4	"utf8mb4_bin"
-#	define ZBX_SUPPORTED_DB_CHARACTER_SET	ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8 "," ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB4
-#	define ZBX_SUPPORTED_DB_COLLATION	ZBX_SUPPORTED_DB_COLLATION_UTF8 "," ZBX_SUPPORTED_DB_COLLATION_UTF8MB4
+#	define ZBX_SUPPORTED_DB_CHARACTER_SET		ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8 "," ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB4
+#	define ZBX_SUPPORTED_DB_COLLATION		"utf8_bin,utf8mb3_bin,utf8mb4_bin"
 #endif
 
 typedef struct
@@ -2424,8 +2422,6 @@ void	DBcheck_character_set(void)
 	char		*database_name_esc, *charset_list, *collation_list;
 	DB_RESULT	result;
 	DB_ROW		row;
-	const char	*good_charsets = ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8;
-	const char	*good_collations = ZBX_SUPPORTED_DB_COLLATION_UTF8;
 
 	database_name_esc = DBdyn_escape_string(CONFIG_DBNAME);
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
@@ -2443,49 +2439,33 @@ void	DBcheck_character_set(void)
 	{
 		char	*char_set = row[0];
 		char	*collation = row[1];
-		int	char_set_is_good = SUCCEED;
 
 		if (SUCCEED == str_in_list(ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8, char_set, ZBX_DB_STRLIST_DELIM))
 		{
-			good_charsets = ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8;
-			good_collations = ZBX_SUPPORTED_DB_COLLATION_UTF8;
 			zbx_db_set_character_set("utf8");
 		}
 		else if (SUCCEED == str_in_list(ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB4, char_set,
 				ZBX_DB_STRLIST_DELIM))
 		{
-			good_charsets = ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB4;
-			good_collations = ZBX_SUPPORTED_DB_COLLATION_UTF8MB4;
 			zbx_db_set_character_set("utf8mb4");
 		}
 		else
 		{
-			char_set_is_good = FAIL;
 			zbx_warn_char_set(CONFIG_DBNAME, char_set);
 		}
 
-		if (SUCCEED != str_in_list(good_collations, collation, ZBX_DB_STRLIST_DELIM))
+		if (SUCCEED != str_in_list(ZBX_SUPPORTED_DB_COLLATION, collation, ZBX_DB_STRLIST_DELIM))
 		{
-			if(char_set_is_good)
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "Zabbix supports only \"%s\" collation(s)"
-						" when \"%s\" character set is used."
-						" Database \"%s\" has default collation \"%s\"",
-						good_collations, char_set, CONFIG_DBNAME, collation);
-			}
-			else
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "Zabbix supports only \"%s\" collation(s)."
-						" Database \"%s\" has default collation \"%s\"",
-						good_collations, CONFIG_DBNAME, collation);
-			}
+			zabbix_log(LOG_LEVEL_WARNING, "Zabbix supports only \"%s\" collation(s)."
+					" Database \"%s\" has default collation \"%s\"",
+					ZBX_SUPPORTED_DB_COLLATION, CONFIG_DBNAME, collation);
 		}
 	}
 
 	DBfree_result(result);
 
-	charset_list = db_strlist_quote(good_charsets, ZBX_DB_STRLIST_DELIM);
-	collation_list = db_strlist_quote(good_collations, ZBX_DB_STRLIST_DELIM);
+	charset_list = db_strlist_quote(ZBX_SUPPORTED_DB_CHARACTER_SET, ZBX_DB_STRLIST_DELIM);
+	collation_list = db_strlist_quote(ZBX_SUPPORTED_DB_COLLATION, ZBX_DB_STRLIST_DELIM);
 
 	result = DBselect(
 			"select count(*)"
@@ -2507,7 +2487,8 @@ void	DBcheck_character_set(void)
 		zabbix_log(LOG_LEVEL_WARNING, "character set name or collation name that is not supported by Zabbix"
 				" found in %s column(s) of database \"%s\"", row[0], CONFIG_DBNAME);
 		zabbix_log(LOG_LEVEL_WARNING, "only character set(s) \"%s\" and corresponding collation(s) \"%s\""
-				" should be used in database", good_charsets, good_collations);
+				" should be used in database", ZBX_SUPPORTED_DB_CHARACTER_SET,
+				ZBX_SUPPORTED_DB_COLLATION);
 	}
 
 	DBfree_result(result);
