@@ -24,6 +24,10 @@ define('JSON_COMPARE_LEFT', 1);
 define('JSON_COMPARE_RIGHT', 2);
 define('JSON_COMPARE_BOTH', 3);
 
+define('JSON_ARRAY_COMPARE_LEFT', 4);
+define('JSON_ARRAY_COMPARE_RIGHT', 5);
+define('JSON_ARRAY_COMPARE_BOTH', 6);
+
 /**
  * Test suite for agents metric collection.
  *
@@ -34,8 +38,16 @@ class testAgentItems extends CIntegrationTest {
 	const COMPARE_AVERAGE = 0;
 	const COMPARE_LAST = 1;
 
-	const TEST_FILE_NAME = '/tmp/test_file';
-	const TEST_LINK_NAME = '/tmp/test_link';
+	const TEST_FILE_BASE_NAME = 'test_file';
+	const TEST_LINK_BASE_NAME = 'test_link';
+	const TEST_FILE_NAME = '/tmp/'.self::TEST_FILE_BASE_NAME;
+	const TEST_LINK_NAME = '/tmp/'.self::TEST_LINK_BASE_NAME;
+	const TEST_DIR_NAME = '/tmp/dir';
+	const TEST_DIR1_NAME = 'dir1';
+	const TEST_DIR_DIR1_NAME = self::TEST_DIR_NAME.'/'.self::TEST_DIR1_NAME;
+	const TEST_DIR_FILE_NAME = self::TEST_DIR_NAME.'/'.self::TEST_FILE_BASE_NAME;
+	const TEST_DIR_LINK_NAME = self::TEST_DIR_DIR1_NAME.'/'.self::TEST_LINK_BASE_NAME;
+	
 	const TEST_MOD_TIMESTAMP = 1617019149;
 	const AGENT_METADATA = 'zabbixtestagent';
 
@@ -359,6 +371,162 @@ class testAgentItems extends CIntegrationTest {
 			'component' => self::COMPONENT_AGENT2,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
 			'result_exec' => 'netstat -au --numeric-hosts -4 | grep ssh | wc -l'
+		],
+		[
+			'key' => 'vfs.dir.get['.self::TEST_DIR_NAME.']',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'json' => JSON_ARRAY_COMPARE_LEFT,
+			'fields_exec' => [
+					'permissions',
+					'user',
+					'group',
+					'uid',
+					'gid',
+					'access',
+					'change'
+				],
+			'result' => [
+				[
+					'basename' => self::TEST_FILE_BASE_NAME,
+					'pathname' =>  self::TEST_DIR_FILE_NAME,
+					'dirname' => self::TEST_DIR_NAME,
+					'type' => 'file',
+					'permissions' => 'stat -c \'%a\' '.self::TEST_DIR_FILE_NAME,
+					'user' => 'stat -c \'%U\' '.self::TEST_DIR_FILE_NAME,
+					'group' => 'stat -c \'%G\' '.self::TEST_DIR_FILE_NAME,
+					'uid' => 'stat -c \'%u\' '.self::TEST_DIR_FILE_NAME,
+					'gid' => 'stat -c \'%g\' '.self::TEST_DIR_FILE_NAME,
+					'size' => 27,
+					'time' => [
+						'modify' => '2021-03-29T14:59:09+0300'
+					],
+					'timestamp' => [
+						'access' => 'stat -c \'%X\' '.self::TEST_DIR_FILE_NAME,
+						'modify' => self::TEST_MOD_TIMESTAMP,
+						'change' => 'stat -c \'%Z\' '.self::TEST_DIR_FILE_NAME
+					]
+				],
+				[
+					'basename' => self::TEST_DIR1_NAME,
+					'pathname' =>  self::TEST_DIR_DIR1_NAME,
+					'dirname' => self::TEST_DIR_NAME,
+					'type' => 'dir',
+					'permissions' => 'stat -c \'%a\' '.self::TEST_DIR_DIR1_NAME,
+					'user' => 'stat -c \'%U\' '.self::TEST_DIR_DIR1_NAME,
+					'group' => 'stat -c \'%G\' '.self::TEST_DIR_DIR1_NAME,
+					'uid' => 'stat -c \'%u\' '.self::TEST_DIR_DIR1_NAME,
+					'gid' => 'stat -c \'%g\' '.self::TEST_DIR_DIR1_NAME,
+					'size' => 4096,
+					'time' => [
+						'modify' => '2021-03-29T14:59:09+0300'
+					],
+					'timestamp' => [
+						'access' => 'stat -c \'%X\' '.self::TEST_DIR_DIR1_NAME,
+						'modify' => self::TEST_MOD_TIMESTAMP,
+						'change' => 'stat -c \'%Z\' '.self::TEST_DIR_DIR1_NAME
+					]
+				],
+				[
+					'basename' => self::TEST_FILE_BASE_NAME,
+					'pathname' =>  self::TEST_DIR_FILE_NAME,
+					'dirname' => self::TEST_DIR_NAME,
+					'type' => 'sym',
+					'permissions' => 'stat -c \'%a\' '.self::TEST_DIR_LINK_NAME,
+					'user' => 'stat -c \'%U\' '.self::TEST_DIR_LINK_NAME,
+					'group' => 'stat -c \'%G\' '.self::TEST_DIR_LINK_NAME,
+					'uid' => 'stat -c \'%u\' '.self::TEST_DIR_LINK_NAME,
+					'gid' => 'stat -c \'%g\' '.self::TEST_DIR_LINK_NAME,
+					'size' => 18,
+					'time' => [
+						'modify' => '2021-03-29T14:59:09+0300'
+					],
+					'timestamp' => [
+						'access' => 'stat -c \'%X\' '.self::TEST_DIR_LINK_NAME,
+						'modify' => self::TEST_MOD_TIMESTAMP,
+						'change' => 'stat -c \'%Z\' '.self::TEST_DIR_LINK_NAME
+					]
+				]
+			]
+		],
+		[
+			'key' => 'vfs.dir.get['.self::TEST_DIR_NAME.']',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT2,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'json' => JSON_ARRAY_COMPARE_LEFT,
+			'fields_exec' => [
+					'permissions',
+					'user',
+					'group',
+					'uid',
+					'gid',
+					'access',
+					'change'
+				],
+			'result' => [
+				[
+					'basename' => self::TEST_FILE_BASE_NAME,
+					'pathname' =>  self::TEST_DIR_FILE_NAME,
+					'dirname' => self::TEST_DIR_NAME,
+					'type' => 'file',
+					'permissions' => 'stat -c \'%a\' '.self::TEST_DIR_FILE_NAME,
+					'user' => 'stat -c \'%U\' '.self::TEST_DIR_FILE_NAME,
+					'group' => 'stat -c \'%G\' '.self::TEST_DIR_FILE_NAME,
+					'uid' => 'stat -c \'%u\' '.self::TEST_DIR_FILE_NAME,
+					'gid' => 'stat -c \'%g\' '.self::TEST_DIR_FILE_NAME,
+					'size' => 27,
+					'time' => [
+						'modify' => '2021-03-29T14:59:09+0300'
+					],
+					'timestamp' => [
+						'access' => 'stat -c \'%X\' '.self::TEST_DIR_FILE_NAME,
+						'modify' => self::TEST_MOD_TIMESTAMP,
+						'change' => 'stat -c \'%Z\' '.self::TEST_DIR_FILE_NAME
+					]
+				],
+				[
+					'basename' => self::TEST_DIR1_NAME,
+					'pathname' =>  self::TEST_DIR_DIR1_NAME,
+					'dirname' => self::TEST_DIR_NAME,
+					'type' => 'dir',
+					'permissions' => 'stat -c \'%a\' '.self::TEST_DIR_DIR1_NAME,
+					'user' => 'stat -c \'%U\' '.self::TEST_DIR_DIR1_NAME,
+					'group' => 'stat -c \'%G\' '.self::TEST_DIR_DIR1_NAME,
+					'uid' => 'stat -c \'%u\' '.self::TEST_DIR_DIR1_NAME,
+					'gid' => 'stat -c \'%g\' '.self::TEST_DIR_DIR1_NAME,
+					'size' => 4096,
+					'time' => [
+						'modify' => '2021-03-29T14:59:09+0300'
+					],
+					'timestamp' => [
+						'access' => 'stat -c \'%X\' '.self::TEST_DIR_DIR1_NAME,
+						'modify' => self::TEST_MOD_TIMESTAMP,
+						'change' => 'stat -c \'%Z\' '.self::TEST_DIR_DIR1_NAME
+					]
+				],
+				[
+					'basename' => self::TEST_FILE_BASE_NAME,
+					'pathname' =>  self::TEST_DIR_FILE_NAME,
+					'dirname' => self::TEST_DIR_NAME,
+					'type' => 'sym',
+					'permissions' => 'stat -c \'%a\' '.self::TEST_DIR_LINK_NAME,
+					'user' => 'stat -c \'%U\' '.self::TEST_DIR_LINK_NAME,
+					'group' => 'stat -c \'%G\' '.self::TEST_DIR_LINK_NAME,
+					'uid' => 'stat -c \'%u\' '.self::TEST_DIR_LINK_NAME,
+					'gid' => 'stat -c \'%g\' '.self::TEST_DIR_LINK_NAME,
+					'size' => 18,
+					'time' => [
+						'modify' => '2021-03-29T14:59:09+0300'
+					],
+					'timestamp' => [
+						'access' => 'stat -c \'%X\' '.self::TEST_DIR_LINK_NAME,
+						'modify' => self::TEST_MOD_TIMESTAMP,
+						'change' => 'stat -c \'%Z\' '.self::TEST_DIR_LINK_NAME
+					]
+				]
+			]
 		]
 	];
 
@@ -438,15 +606,31 @@ class testAgentItems extends CIntegrationTest {
 			self::$itemids[$value['component'].':'.$name] = $itemids[$i];
 		}
 
+		// Create test directories
+		if (!file_exists(self::TEST_DIR_NAME)) {
+			$this->assertTrue(@mkdir(self::TEST_DIR_NAME)!==false);
+		}
+		
+		if (!file_exists(self::TEST_DIR_DIR1_NAME)) {
+			$this->assertTrue(@mkdir(self::TEST_DIR_DIR1_NAME)!==false);
+		}
+		$this->assertTrue(@touch(self::TEST_DIR_DIR1_NAME, self::TEST_MOD_TIMESTAMP) !== false);
+
 		// Write test file
 		$this->assertTrue(@file_put_contents(self::TEST_FILE_NAME, "1st line\n2nd line\n3rd line\n") !== false);
 		$this->assertTrue(@touch(self::TEST_FILE_NAME, self::TEST_MOD_TIMESTAMP) !== false);
+		$this->assertTrue(@file_put_contents(self::TEST_DIR_FILE_NAME, "1st line\n2nd line\n3rd line\n") !== false);
+		$this->assertTrue(@touch(self::TEST_DIR_FILE_NAME, self::TEST_MOD_TIMESTAMP) !== false);
 
 		// Write test symlink
 		if (!file_exists(self::TEST_LINK_NAME)) {
 			$this->assertTrue(@symlink(self::TEST_FILE_NAME, self::TEST_LINK_NAME) !== false);
 		}
 		$this->assertTrue(@shell_exec('touch -h -a -m -t 202103291459.09 '.self::TEST_LINK_NAME) !== false);
+		if (!file_exists(self::TEST_DIR_LINK_NAME)) {
+			$this->assertTrue(@symlink(self::TEST_DIR_FILE_NAME, self::TEST_DIR_LINK_NAME) !== false);
+		}
+		$this->assertTrue(@shell_exec('touch -h -a -m -t 202103291459.09 '.self::TEST_DIR_LINK_NAME) !== false);
 
 		return true;
 	}
@@ -580,7 +764,7 @@ class testAgentItems extends CIntegrationTest {
 
 		switch ($item['valueType']) {
 			case ITEM_VALUE_TYPE_TEXT:
-				if (array_key_exists('json', $item) && $item['json'] === 1)
+				if (array_key_exists('json', $item))
 				{
 					$jsonval = json_decode(end($values), true);
 
@@ -589,6 +773,14 @@ class testAgentItems extends CIntegrationTest {
 						$this->arrcmpr($item['result'], $jsonval, $item['key']);
 					} elseif ($item['json'] === JSON_COMPARE_RIGHT) {
 						$this->arrcmpr($jsonval, $item['result'], $item['key']);
+					} elseif ($item['json'] === JSON_ARRAY_COMPARE_LEFT) {
+						foreach ($item['result'] as $result_key => $result_value) {
+							$this->arrcmpr($result_value, $jsonval[$result_key], $item['key']);
+						}
+					} elseif ($item['json'] === JSON_ARRAY_COMPARE_RIGHT) {
+						foreach ($jsonval as $jsonval_key => $jsonval_value) {
+							$this->arrcmpr($jsonval_value, $item['result'][$jsonval_key], $item['key']);
+						}
 					}
 				} else {
 					$actual = end($values);
@@ -681,7 +873,7 @@ class testAgentItems extends CIntegrationTest {
 	public static function arrcmpr(array $array, array $cmpr, string $key) {
 		foreach ($array as $array_key => $array_value) {
 			self::assertArrayHasKey($array_key, $cmpr, 'Array key "'.$array_key.'" is missing in '.$key);
-
+			
 			if (is_array($array_value)) {
 				if (!is_array($cmpr[$array_key])) {
 					self::fail('Wrong element type in '.$key);
