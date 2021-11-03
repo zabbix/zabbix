@@ -40,9 +40,7 @@ static pid_t			ha_pid = ZBX_THREAD_ERROR;
 static zbx_ipc_async_socket_t	ha_socket;
 
 extern char	*CONFIG_HA_NODE_NAME;
-extern char	*CONFIG_EXTERNAL_ADDRESS;
-extern char	*CONFIG_LISTEN_IP;
-extern int	CONFIG_LISTEN_PORT;
+extern char	*CONFIG_NODE_ADDRESS;
 
 extern zbx_cuid_t	ha_sessionid;
 
@@ -448,27 +446,7 @@ static zbx_ha_node_t	*ha_find_node_by_name(zbx_vector_ha_node_t *nodes, const ch
  ******************************************************************************/
 static void	ha_get_external_address(char **address, unsigned short *port)
 {
-	if (NULL != CONFIG_EXTERNAL_ADDRESS)
-		(void)parse_serveractive_element(CONFIG_EXTERNAL_ADDRESS, address, port, 0);
-
-	if (NULL == *address)
-	{
-		if (NULL != CONFIG_LISTEN_IP)
-		{
-			char	*tmp;
-
-			zbx_strsplit(CONFIG_LISTEN_IP, ',', address, &tmp);
-			zbx_free(tmp);
-
-			if (0 == strcmp(*address, "0.0.0.0") || 0 == strcmp(*address, "::"))
-				*address = zbx_strdup(*address, "localhost");
-		}
-		else
-			*address = zbx_strdup(NULL, "localhost");
-	}
-
-	if (0 == *port)
-		*port = (unsigned short)CONFIG_LISTEN_PORT;
+	(void)parse_serveractive_element(CONFIG_NODE_ADDRESS, address, port, 10051);
 }
 
 /******************************************************************************
@@ -628,7 +606,8 @@ static int	ha_db_get_time(zbx_ha_info_t *info, int *db_time)
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s db_time:%d", __func__, zbx_result_string(ret), *db_time);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s db_time:%d", __func__, zbx_result_string(ret),
+			SUCCEED == ret ? *db_time : -1);
 
 	return ret;
 }
