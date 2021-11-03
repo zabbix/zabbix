@@ -1954,12 +1954,14 @@ abstract class testFormPreprocessing extends CWebTest {
 
 		// Check that 'Type of information' field is not visible before first step is added.
 		$this->assertFalse($form->query('xpath:.//div[@id="item_preproc_list"]/label[text()="Type of information"]')
-				->one(false)->isVisible());
+				->one(false)->isVisible()
+		);
 		$this->addPreprocessingSteps($data['preprocessing']);
 
 		// Check that 'Type of information' field is visible after steps are added, but not for LLD.
 		$this->assertTrue($form->query('xpath:.//div[@id="item_preproc_list"]/label[text()="Type of information"]')
-				->one(false)->isVisible(!$lld));
+				->one(false)->isVisible(!$lld)
+		);
 
 		return $form;
 	}
