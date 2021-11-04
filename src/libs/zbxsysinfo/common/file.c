@@ -25,10 +25,16 @@
 #include "log.h"
 #include "dir.h"
 #include "sha256crypt.h"
+#include "mutexs.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #include "aclapi.h"
 #include "sddl.h"
+#else
+zbx_mutex_t	fileinfo_lock = ZBX_MUTEX_NULL;
+
+#define LOCK_FILEINFO	zbx_mutex_lock(fileinfo_lock)
+#define UNLOCK_FILEINFO	zbx_mutex_unlock(fileinfo_lock)
 #endif
 
 #define ZBX_MAX_DB_FILE_SIZE	64 * ZBX_KIBIBYTE	/* files larger than 64 KB cannot be stored in the database */
@@ -1327,7 +1333,7 @@ int	zbx_vfs_file_info(const char *filename, struct zbx_json *j, int array, char 
 	int			ret = FAIL;
 	DWORD			file_attributes, acc_sz = 0, dmn_sz = 0;
 	wchar_t			*wpath = NULL, *sid_string = NULL, *acc_name = NULL, *dmn_name = NULL;
-	char			*tmp, *acc_ut8, *dmn_ut8, *type = NULL, *basename = NULL, *dirname = NULL,
+	char			*tmp, *type = NULL, *basename = NULL, *dirname = NULL,
 				*pathname = NULL, *user = NULL, *sidbuf = NULL;
 	PSID			sid = NULL;
 	PSECURITY_DESCRIPTOR	sec = NULL;
@@ -1391,6 +1397,8 @@ int	zbx_vfs_file_info(const char *filename, struct zbx_json *j, int array, char 
 	if (TRUE == LookupAccountSid(NULL, sid, acc_name, (LPDWORD)&acc_sz, dmn_name, (LPDWORD)&dmn_sz,
 			&acc_type))
 	{
+		char	*acc_ut8, *dmn_ut8;
+
 		acc_ut8 = zbx_unicode_to_utf8(acc_name);
 		dmn_ut8 = zbx_unicode_to_utf8(dmn_name);
 
@@ -1487,6 +1495,28 @@ err:
 	return ret;
 }
 #else /* not _WINDOWS or __MINGW32__ */
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_init_fileinfo                                                *
+ *                                                                            *
+ * Purpose: create file info mutex                                            *
+ *                                                                            *
+ * Parameters: error      - [OUT] error message in case of failure            *
+ *                                                                            *
+ * Return value: SUCCEED - file info mutex created successfully               *
+ *               FAIL    - failed to create file info mutex                   *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_init_fileinfo(char **error)
+{
+	return zbx_mutex_create(&fileinfo_lock, ZBX_MUTEX_FILEINFO, error);
+}
+
+void	zbx_deinit_fileinfo(void)
+{
+	zbx_mutex_destroy(&fileinfo_lock);
+}
+
 int	zbx_vfs_file_info(const char *filename, struct zbx_json *j, int array, char **error)
 {
 	int		ret = FAIL;
@@ -1541,17 +1571,31 @@ int	zbx_vfs_file_info(const char *filename, struct zbx_json *j, int array, char 
 	/* type */
 	zbx_json_addstring(j, ZBX_SYSINFO_FILE_TAG_TYPE, type, ZBX_JSON_TYPE_STRING);
 
+	LOCK_FILEINFO;
+
 	/* user */
 	if (NULL == (pwd = getpwuid(buf.st_uid)))
-		zbx_json_adduint64(j, ZBX_SYSINFO_FILE_TAG_USER, (zbx_uint64_t)buf.st_uid);
+	{
+		char	buffer[MAX_ID_LEN];
+
+		zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64, (zbx_uint64_t)buf.st_uid);
+		zbx_json_addstring(j, ZBX_SYSINFO_FILE_TAG_USER, buffer, ZBX_JSON_TYPE_STRING);
+	}
 	else
 		zbx_json_addstring(j, ZBX_SYSINFO_FILE_TAG_USER, pwd->pw_name, ZBX_JSON_TYPE_STRING);
 
 	/* group */
 	if (NULL == (grp = getgrgid(buf.st_gid)))
-		zbx_json_adduint64(j, ZBX_SYSINFO_FILE_TAG_GROUP, (zbx_uint64_t)buf.st_gid);
+	{
+		char	buffer[MAX_ID_LEN];
+
+		zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64, (zbx_uint64_t)buf.st_gid);
+		zbx_json_addstring(j, ZBX_SYSINFO_FILE_TAG_GROUP, buffer, ZBX_JSON_TYPE_STRING);
+	}
 	else
 		zbx_json_addstring(j, ZBX_SYSINFO_FILE_TAG_GROUP, grp->gr_name, ZBX_JSON_TYPE_STRING);
+
+	UNLOCK_FILEINFO;
 
 	/* permissions */
 	tmp = get_file_permissions(&buf);

@@ -398,5 +398,10 @@ zbx_uint32_t get_thread_global_mutex_flag(void);
 int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *hostname);
 #endif
 
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+int	zbx_init_fileinfo(char **error);
+void	zbx_deinit_fileinfo(void);
+#endif
+
 #endif
 
