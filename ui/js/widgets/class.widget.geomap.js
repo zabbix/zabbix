@@ -141,6 +141,9 @@ class CWidgetGeoMap extends CWidget {
 			this._map.navigateHomeControl.show();
 		}
 
+		// Workaround to prevent dashboard jumping to make map completely visible.
+		this._map.getContainer().focus = () => {};
+
 		// Add event listeners.
 		this._map.getContainer().addEventListener('click', (e) => {
 			if (e.target.classList.contains('leaflet-container')) {
