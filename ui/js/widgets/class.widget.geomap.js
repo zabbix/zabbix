@@ -332,6 +332,7 @@ class CWidgetGeoMap extends CWidget {
 			const latLng = new L.latLng([this._home_coords.initial.latitude, this._home_coords.initial.longitude]);
 			this._map.setDefaultView(latLng, this._home_coords.initial.zoom);
 			this._map.navigateHomeControl.setTitle(t('Navigate to initial view'));
+			this._map.setView(latLng, this._home_coords.initial.zoom);
 		}
 		else {
 			this._map.navigateHomeControl.hide();
