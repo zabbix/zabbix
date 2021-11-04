@@ -72,11 +72,8 @@ class CControllerWidgetGeoMapView extends CControllerWidget {
 
 		if ($this->getInput('initial_load', 0)) {
 			$this->geomap_config = self::getMapConfig();
-			[$center, $view_set] = $this->getMapCenter();
 
-			$data['config'] = $this->geomap_config + [
-				'center' => $center,
-				'view_set' => $view_set,
+			$data['config'] = $this->geomap_config + $this->getMapCenter() + [
 				'filter' => $this->getUserProfileFilter(),
 				'colors' => self::getSeveritySettings()
 			];
@@ -200,22 +197,29 @@ class CControllerWidgetGeoMapView extends CControllerWidget {
 	}
 
 	/**
-	 * Get initial map center point, zoom level and state if widget has set default view.
+	 * Get initial map center point, zoom level and coordinates to center when clicking on navigate home button.
 	 *
 	 * @return array
 	 */
 	protected function getMapCenter(): array {
 		$geoloc_parser = new CGeomapCoordinatesParser();
+		$home_coords = [];
+		$center = [];
 
 		$user_default_view = CProfile::get('web.dashboard.widget.geomap.default_view', '', $this->widgetid);
 		if ($user_default_view !== '' && $geoloc_parser->parse($user_default_view) == CParser::PARSE_SUCCESS) {
-			return [$geoloc_parser->result, true];
+			$home_coords['default'] = true;
+			$center = $geoloc_parser->result;
 		}
 
 		if (array_key_exists('default_view', $this->fields)
 				&& $this->fields['default_view'] !== ''
 				&& $geoloc_parser->parse($this->fields['default_view']) == CParser::PARSE_SUCCESS) {
-			return [$geoloc_parser->result + ['zoom' => ceil($this->geomap_config['max_zoom'] / 2)], true];
+			$initial_view = $geoloc_parser->result + ['zoom' => ceil($this->geomap_config['max_zoom'] / 2)];
+			$home_coords['initial'] = $initial_view;
+			if (!$center) {
+				$center = $home_coords['initial'];
+			}
 		}
 
 		$defaults = [
@@ -224,7 +228,10 @@ class CControllerWidgetGeoMapView extends CControllerWidget {
 			'zoom' => 1
 		];
 
-		return [$defaults, false];
+		return [
+			'center' => $center ? $center : $defaults,
+			'home_coords' => $home_coords
+		];
 	}
 
 	/**

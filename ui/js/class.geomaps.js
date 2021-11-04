@@ -136,6 +136,10 @@ L.Control.navigateToDefaultViewControl = L.Control.extend({
 
 	show: function() {
 		this._div.style.visibility = 'visible';
+	},
+
+	hide: function() {
+		this._div.style.visibility = 'hidden';
 	}
 });
 

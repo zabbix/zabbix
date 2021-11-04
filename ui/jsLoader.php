@@ -170,6 +170,7 @@ $translate_strings = [
 	'class.widget.geomap.js' => [
 		'Actions' => _('Actions'),
 		'Set this view as default' => _('Set this view as default'),
+		'Reset to initial view' => _('Reset to initial view'),
 		'No problems' => _('No problems'),
 		'Not classified' => _('Not classified'),
 		'Information' => _('Information'),

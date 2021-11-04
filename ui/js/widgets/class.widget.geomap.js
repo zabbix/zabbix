@@ -33,7 +33,7 @@ class CWidgetGeoMap extends CWidget {
 		this._map = null;
 		this._icons = {};
 		this._initial_load = true;
-		this._view_set = false;
+		this._home_coords = {};
 		this._severity_levels = new Map();
 	}
 
@@ -94,7 +94,7 @@ class CWidgetGeoMap extends CWidget {
 	_initMap(config) {
 		const latLng = new L.latLng([config.center.latitude, config.center.longitude]);
 
-		this._view_set = config.view_set;
+		this._home_coords = config.home_coords;
 
 		// Initialize map and load tile layer.
 		this._map = L.map(this._unique_id).setView(latLng, config.center.zoom);
@@ -132,7 +132,7 @@ class CWidgetGeoMap extends CWidget {
 
 		// Navigate home btn.
 		this._map.navigateHomeControl = L.control.navigateHomeBtn({position: 'topleft'}).addTo(this._map);
-		if (this._view_set) {
+		if (Object.keys(this._home_coords).length > 0) {
 			this._map.navigateHomeControl.show();
 		}
 
@@ -209,6 +209,10 @@ class CWidgetGeoMap extends CWidget {
 					items: [{
 						label: t('Set this view as default'),
 						clickCallback: this.updateDefaultView.bind(this)
+					}, {
+						label: t('Reset to initial view'),
+						clickCallback: this.unsetDefaultView.bind(this),
+						disabled: !('default' in this._home_coords)
 					}]
 				}];
 
@@ -303,7 +307,28 @@ class CWidgetGeoMap extends CWidget {
 
 		updateUserProfile('web.dashboard.widget.geomap.default_view', view, [this._widgetid], PROFILE_TYPE_STR);
 		this._map.setDefaultView(ll, zoom);
+		this._home_coords['default'] = true;
 		this._map.navigateHomeControl.show();
+	}
+
+	/**
+	 * Unset default view.
+	 *
+	 * @returns {undefined}
+	 */
+	unsetDefaultView() {
+		updateUserProfile('web.dashboard.widget.geomap.default_view', '', [this._widgetid], PROFILE_TYPE_STR)
+			.always(() => {
+				delete this._home_coords.default;
+			});
+
+		if ('initial' in this._home_coords) {
+			const latLng = new L.latLng([this._home_coords.initial.latitude, this._home_coords.initial.longitude]);
+			this._map.setDefaultView(latLng, this._home_coords.initial.zoom);
+		}
+		else {
+			this._map.navigateHomeControl.hide();
+		}
 	}
 
 	/**
