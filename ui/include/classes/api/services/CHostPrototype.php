@@ -920,12 +920,6 @@ class CHostPrototype extends CHostBase {
 		$hostPrototypes = $this->getHostMacros($hostPrototypes);
 
 		foreach ($hostPrototypes as &$hostPrototype) {
-			// merge group links into group prototypes
-			foreach ($hostPrototype['groupLinks'] as $group) {
-				$hostPrototype['groupPrototypes'][] = $group;
-			}
-			unset($hostPrototype['groupLinks']);
-
 			// the ID of the discovery rule must be passed in the "ruleid" parameter
 			$hostPrototype['ruleid'] = $hostPrototype['discoveryRule']['itemid'];
 			unset($hostPrototype['discoveryRule']);
