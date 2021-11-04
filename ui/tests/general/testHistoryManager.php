@@ -24,6 +24,11 @@ require_once __DIR__.'/../../include/classes/api/managers/CHistoryManager.php';
 require_once __DIR__.'/../../include/classes/core/CRegistryFactory.php';
 require_once __DIR__.'/../../include/classes/core/Manager.php';
 require_once __DIR__.'/../../include/classes/helpers/CArrayHelper.php';
+require_once __DIR__.'/../../include/classes/api/API.php';
+require_once __DIR__.'/../../include/classes/api/CApiServiceFactory.php';
+require_once __DIR__.'/../../include/classes/validators/CApiInputValidator.php';
+require_once __DIR__.'/../../include/classes/api/services/CSettings.php';
+require_once __DIR__.'/../../include/classes/helpers/CConfigGeneralHelper.php';
 require_once __DIR__.'/../../include/classes/helpers/CSettingsHelper.php';
 
 /**
@@ -146,6 +151,9 @@ class testHistoryManager extends CTest {
 	 */
 	public function test($items, $history, $limit, $expected_result) {
 		DB::insertBatch('history_uint', $history, false);
+
+		API::setWrapper(null);
+		API::setApiServiceFactory(new CApiServiceFactory());
 
 		$values = Manager::History()
 			->setPrimaryKeysEnabled(false)

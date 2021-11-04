@@ -245,7 +245,7 @@ class CHistoryManager {
 				$max_clock_per_item = DBselect(
 					'SELECT h.itemid, MAX(h.clock) AS clock'.
 					' FROM '.$history_table.' h'.
-					' WHERE '.dbConditionId('h.itemid', $items).
+					' WHERE '.dbConditionId('h.itemid', array_column($items, 'itemid')).
 						($period ? ' AND h.clock > '.$period : '').
 					' GROUP BY h.itemid'
 				);
