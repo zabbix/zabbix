@@ -991,7 +991,7 @@ class CHostPrototype extends CHostBase {
 
 		self::deleteForce($host_prototypeids);
 
-		return ['hostids' => array_column($db_host_prototypes, 'hostid')];
+		return ['hostids' => $host_prototypeids];
 	}
 
 	/**
