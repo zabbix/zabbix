@@ -28,7 +28,7 @@ $output = [
 	'name' => $data['name'],
 	'body' =>
 		(new CDiv())
-			->addStyle('height: 100%;')
+			->addStyle('height: 100%; z-index: 2;')
 			->setId($data['unique_id'])
 			->toString(),
 	'geomap' => array_intersect_key($data, array_flip(['config', 'hosts']))
