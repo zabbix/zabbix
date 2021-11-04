@@ -1010,9 +1010,7 @@ class CHostPrototype extends CHostBase {
 		]);
 
 		if ($count != count($host_prototypeids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS,
-				_('No permissions to referred object or it does not exist!')
-			);
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		$db_host_prototype = DBfetch(DBSelect(
