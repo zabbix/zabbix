@@ -19,11 +19,12 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CTest.php';
-require_once dirname(__FILE__).'/../../include/classes/api/managers/CHistoryManager.php';
-require_once dirname(__FILE__).'/../../include/classes/core/CRegistryFactory.php';
-require_once dirname(__FILE__).'/../../include/classes/core/Manager.php';
-require_once dirname(__FILE__).'/../../include/classes/helpers/CArrayHelper.php';
+require_once __DIR__.'/../include/CTest.php';
+require_once __DIR__.'/../../include/classes/api/managers/CHistoryManager.php';
+require_once __DIR__.'/../../include/classes/core/CRegistryFactory.php';
+require_once __DIR__.'/../../include/classes/core/Manager.php';
+require_once __DIR__.'/../../include/classes/helpers/CArrayHelper.php';
+require_once __DIR__.'/../../include/classes/helpers/CSettingsHelper.php';
 
 /**
  * @backup history_uint
