@@ -593,6 +593,7 @@ class CHostPrototype extends CHostBase {
 	 */
 	protected function updateReal(array &$host_prototypes, array $db_host_prototypes): void {
 		$upd_host_prototypes = [];
+
 		// save the host prototypes
 		foreach ($host_prototypes as $host_prototype) {
 			$upd_host_prototype = DB::getUpdatedValues('hosts', $host_prototype,
