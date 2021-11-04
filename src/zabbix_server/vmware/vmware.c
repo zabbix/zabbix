@@ -2389,6 +2389,8 @@ static int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL 
 			unit = ZBX_VMWARE_UNIT_TERABYTES;					\
 		else if (0 == strcmp("watt",val))						\
 			unit = ZBX_VMWARE_UNIT_WATT;						\
+		else if (0 == strcmp("celsius",val))						\
+			unit = ZBX_VMWARE_UNIT_CELSIUS;						\
 		else										\
 			unit = ZBX_VMWARE_UNIT_UNDEFINED
 
