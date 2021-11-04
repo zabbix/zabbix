@@ -626,7 +626,7 @@ class testAgentItems extends CIntegrationTest {
 			$this->assertTrue(@symlink(self::TEST_DIR_FILE_NAME, self::TEST_DIR_LINK_NAME));
 		}
 		$this->assertTrue(@exec('touch -h -a -m -t 202103291459.09 '.self::TEST_DIR_LINK_NAME) !== false);
-		
+
 		$this->assertTrue(@touch(self::TEST_DIR_DIR1_NAME, self::TEST_MOD_TIMESTAMP));
 
 		return true;
