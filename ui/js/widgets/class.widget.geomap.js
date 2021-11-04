@@ -133,6 +133,11 @@ class CWidgetGeoMap extends CWidget {
 		// Navigate home btn.
 		this._map.navigateHomeControl = L.control.navigateHomeBtn({position: 'topleft'}).addTo(this._map);
 		if (Object.keys(this._home_coords).length > 0) {
+			const home_btn_title = ('default' in this._home_coords)
+				? t('Navigate to default view')
+				: t('Navigate to initial view');
+
+			this._map.navigateHomeControl.setTitle(home_btn_title);
 			this._map.navigateHomeControl.show();
 		}
 
@@ -309,6 +314,7 @@ class CWidgetGeoMap extends CWidget {
 		this._map.setDefaultView(ll, zoom);
 		this._home_coords['default'] = true;
 		this._map.navigateHomeControl.show();
+		this._map.navigateHomeControl.setTitle(t('Navigate to default view'));
 	}
 
 	/**
@@ -325,6 +331,7 @@ class CWidgetGeoMap extends CWidget {
 		if ('initial' in this._home_coords) {
 			const latLng = new L.latLng([this._home_coords.initial.latitude, this._home_coords.initial.longitude]);
 			this._map.setDefaultView(latLng, this._home_coords.initial.zoom);
+			this._map.navigateHomeControl.setTitle(t('Navigate to initial view'));
 		}
 		else {
 			this._map.navigateHomeControl.hide();

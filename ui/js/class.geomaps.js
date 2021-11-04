@@ -109,29 +109,32 @@ L.control.severityFilter = function(opts) {
 
 
 /**
- * Leaflet extension to provide "Navigate to default view" button in "Geomap" widget.
+ * Leaflet extension to provide "Navigate home" button in "Geomap" widget.
  *
  * @type L.Control
  */
-L.Control.navigateToDefaultViewControl = L.Control.extend({
+L.Control.navigateHomeControl = L.Control.extend({
 
 	_div: null,
 
 	onAdd: function(map) {
 		this._div = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
-		const btn = L.DomUtil.create('a', 'navigate-home-button', this._div);
+		this._btn = L.DomUtil.create('a', 'navigate-home-button', this._div);
 
-		btn.ariaLabel = t('Navigate to default view');
-		btn.title = t('Navigate to default view');
-		btn.role = 'button';
-		btn.href = '#';
+		this._btn.role = 'button';
+		this._btn.href = '#';
 
-		L.DomEvent.on(btn, 'click', () => {map.setView(map._center.latLng, map._center.zoom)});
-		L.DomEvent.on(btn, 'dblclick', (e) => {L.DomEvent.stopPropagation(e)});
+		L.DomEvent.on(this._btn, 'click', () => {map.setView(map._center.latLng, map._center.zoom)});
+		L.DomEvent.on(this._btn, 'dblclick', (e) => {L.DomEvent.stopPropagation(e)});
 
 		this._div.style.visibility = 'hidden';
 
 		return this._div;
+	},
+
+	setTitle: function(title) {
+		this._btn.ariaLabel = title;
+		this._btn.title = title;
 	},
 
 	show: function() {
@@ -144,12 +147,12 @@ L.Control.navigateToDefaultViewControl = L.Control.extend({
 });
 
 /**
- * Factory function for L.Control.navigateToDefaultViewControl.
+ * Factory function for L.Control.navigateHomeControl.
  *
  * @param {object} opts
  *
- * @return {L.control.navigateToDefaultViewControl}
+ * @return {L.control.navigateHomeControl}
  */
 L.control.navigateHomeBtn = function(opts) {
-	return new L.Control.navigateToDefaultViewControl(opts);
+	return new L.Control.navigateHomeControl(opts);
 };

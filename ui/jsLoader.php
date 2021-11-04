@@ -149,8 +149,7 @@ $translate_strings = [
 		'Release to create a widget.' => _('Release to create a widget.')
 	],
 	'class.geomaps.js' => [
-		'Severity filter' => _('Severity filter'),
-		'Navigate to default view' => _('Navigate to default view')
+		'Severity filter' => _('Severity filter')
 	],
 	'class.widget.js' => [
 		'10 seconds' => _n('%1$s second', '%1$s seconds', 10),
@@ -184,7 +183,9 @@ $translate_strings = [
 		'A' => _x('A', 'abbreviation of severity level'),
 		'W' => _x('W', 'abbreviation of severity level'),
 		'I' => _x('I', 'abbreviation of severity level'),
-		'N' => _x('N', 'abbreviation of severity level')
+		'N' => _x('N', 'abbreviation of severity level'),
+		'Navigate to default view' => _('Navigate to default view'),
+		'Navigate to initial view' => _('Navigate to initial view')
 	],
 	'class.widget.iterator.js' => [
 		'Next page' => _s('Next page'),
