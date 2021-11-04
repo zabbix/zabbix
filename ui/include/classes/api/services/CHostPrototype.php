@@ -686,7 +686,7 @@ class CHostPrototype extends CHostBase {
 			}
 		}
 
-		return $this->inherit($host_prototypes, $hostids, $db_host_prototypes);
+		return $this->inherit($host_prototypes, null, $db_host_prototypes);
 	}
 
 
