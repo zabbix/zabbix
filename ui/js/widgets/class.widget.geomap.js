@@ -127,7 +127,8 @@ class CWidgetGeoMap extends CWidget {
 		this._map.severityFilterControl = L.control.severityFilter({
 			position: 'topright',
 			checked: config.filter.severity,
-			severity_levels: this._severity_levels
+			severity_levels: this._severity_levels,
+			disabled: !this._widgetid
 		}).addTo(this._map);
 
 		// Navigate home btn.
@@ -216,7 +217,8 @@ class CWidgetGeoMap extends CWidget {
 					label: t('Actions'),
 					items: [{
 						label: t('Set this view as default'),
-						clickCallback: this.updateDefaultView.bind(this)
+						clickCallback: this.updateDefaultView.bind(this),
+						disabled: !this._widgetid
 					}, {
 						label: t('Reset to initial view'),
 						clickCallback: this.unsetDefaultView.bind(this),

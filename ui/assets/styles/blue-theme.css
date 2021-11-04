@@ -6603,3 +6603,10 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 
 .marker-cluster span {
   line-height: 30px; }
+
+.leaflet-control.disabled {
+  background-color: #ffffff;
+  opacity: 1; }
+  .leaflet-control.disabled .geomap-filter-button {
+    cursor: default;
+    opacity: .4; }

@@ -52,9 +52,10 @@ L.Control.severityFilterFilterControl = L.Control.extend({
 	_severity_levels: null,
 	_filter_checked: [],
 
-	initialize: function({checked, severity_levels}) {
+	initialize: function({checked, severity_levels, disabled}) {
 		this._filter_checked = checked;
 		this._severity_levels = severity_levels;
+		this._disabled = disabled;
 	},
 
 	onAdd: function(map) {
@@ -67,26 +68,32 @@ L.Control.severityFilterFilterControl = L.Control.extend({
 		btn.role = 'button';
 		btn.href = '#';
 
-		for (const [severity, prop] of this._severity_levels) {
-			const li = L.DomUtil.create('li', '', this.bar);
-			const chbox = L.DomUtil.create('input', '', li);
-			const label = L.DomUtil.create('label', '', li);
-			const span = L.DomUtil.create('span', '', label);
-			const caption = L.DomUtil.create('label', '', li);
+		if (!this._disabled) {
+			for (const [severity, prop] of this._severity_levels) {
+				const li = L.DomUtil.create('li', '', this.bar);
+				const chbox = L.DomUtil.create('input', '', li);
+				const label = L.DomUtil.create('label', '', li);
+				const span = L.DomUtil.create('span', '', label);
+				const caption = L.DomUtil.create('label', '', li);
 
-			caption.innerHTML = prop.name;
-			chbox.checked = this._filter_checked.includes(severity.toString(10));
-			chbox.classList.add('checkbox-radio');
-			chbox.type = 'checkbox';
-			chbox.value = severity;
+				caption.innerHTML = prop.name;
+				chbox.checked = this._filter_checked.includes(severity.toString(10));
+				chbox.classList.add('checkbox-radio');
+				chbox.type = 'checkbox';
+				chbox.value = severity;
+			}
+
+			L.DomEvent.on(btn, 'click', () => {this.bar.classList.toggle('collapsed')});
+			L.DomEvent.on(this.bar, 'dblclick', (e) => {L.DomEvent.stopPropagation(e)});
+			L.DomEvent.on(div, 'change', () => {
+				map.updateFilter([...this.bar.querySelectorAll('input[type="checkbox"]:checked')].map(n => n.value));
+			});
+		}
+		else {
+			div.classList.add('disabled');
 		}
 
-		L.DomEvent.on(btn, 'click', () => {this.bar.classList.toggle('collapsed')});
 		L.DomEvent.on(btn, 'dblclick', (e) => {L.DomEvent.stopPropagation(e)});
-		L.DomEvent.on(this.bar, 'dblclick', (e) => {L.DomEvent.stopPropagation(e)});
-		L.DomEvent.on(div, 'change', () => {
-			map.updateFilter([...this.bar.querySelectorAll('input[type="checkbox"]:checked')].map(n => n.value));
-		});
 
 		return div;
 	},
