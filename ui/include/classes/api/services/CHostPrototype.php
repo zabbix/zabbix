@@ -398,7 +398,7 @@ class CHostPrototype extends CHostBase {
 		self::validateCreate($host_prototypes);
 
 		$this->createReal($host_prototypes);
-		$this->inherit($host_prototypes, null, []);
+		$this->inherit($host_prototypes);
 
 		return ['hostids' => array_column($host_prototypes, 'hostid')];
 	}
@@ -500,7 +500,7 @@ class CHostPrototype extends CHostBase {
 		$this->validateUpdate($host_prototypes, $db_host_prototypes);
 
 		$this->updateReal($host_prototypes, $db_host_prototypes);
-		$this->inherit($host_prototypes, null, $db_host_prototypes);
+		$this->inherit($host_prototypes);
 
 		return ['hostids' => array_column($host_prototypes, 'hostid')];
 	}
@@ -630,22 +630,19 @@ class CHostPrototype extends CHostBase {
 	/**
 	 * Updates the children of the host prototypes on the given hosts and propagates the inheritance to the child hosts.
 	 *
-	 * @param array      $host_prototypes      array of host prototypes to inherit
-	 * @param array|null $hostids              array of hosts to inherit to; if set to null, the children will be updated
-	 *                                         on all child hosts
-	 * @param array|null $db_host_prototypes
-	 *
-	 * @return bool
+	 * @param array      $host_prototypes  array of host prototypes to inherit
+	 * @param array|null $hostids          array of hosts to inherit to; if set to null, the children will be updated
+	 *                                     on all child hosts
 	 */
-	protected function inherit(array $host_prototypes, array $hostids = null, array $db_host_prototypes = null): bool {
+	protected function inherit(array $host_prototypes, array $hostids = null): void {
 		if (!$host_prototypes) {
-			return true;
+			return;
 		}
 
 		// prepare the child host prototypes
 		$new_host_prototypes = $this->prepareInheritedObjects($host_prototypes, $hostids);
 		if (!$new_host_prototypes) {
-			return true;
+			return;
 		}
 
 		$ins_host_prototypes = [];
@@ -665,7 +662,7 @@ class CHostPrototype extends CHostBase {
 		}
 
 		if ($upd_host_prototypes) {
-			$upd_host_prototypes = $this->updateReal($upd_host_prototypes, $db_host_prototypes);
+			$upd_host_prototypes = $this->updateReal($upd_host_prototypes);
 		}
 
 		$host_prototypes = array_merge($upd_host_prototypes, $ins_host_prototypes);
@@ -686,7 +683,7 @@ class CHostPrototype extends CHostBase {
 			}
 		}
 
-		return $this->inherit($host_prototypes, null, $db_host_prototypes);
+		$this->inherit($host_prototypes);
 	}
 
 	/**
