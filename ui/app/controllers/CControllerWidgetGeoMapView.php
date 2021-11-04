@@ -167,7 +167,7 @@ class CControllerWidgetGeoMapView extends CControllerWidget {
 
 		// Filter hosts by severity filter.
 		$severity_filter = CProfile::get('web.dashboard.widget.geomap.severity_filter', '', $this->widgetid);
-		$severity_filter = $severity_filter ? array_flip(explode(',', $severity_filter)) : [];
+		$severity_filter = ($severity_filter !== '') ? array_flip(explode(',', $severity_filter)) : [];
 
 		if ($severity_filter && count($severity_filter) != 7) {
 			$hosts = array_filter($hosts, function ($host) use ($severity_filter, $problems_by_host) {
