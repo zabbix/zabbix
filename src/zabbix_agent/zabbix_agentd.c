@@ -1016,14 +1016,14 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
  ******************************************************************************/
 static void	zbx_free_config(void)
 {
-	zbx_strarr_free(CONFIG_ALIASES);
-	zbx_strarr_free(CONFIG_USER_PARAMETERS);
+	zbx_strarr_free(&CONFIG_ALIASES);
+	zbx_strarr_free(&CONFIG_USER_PARAMETERS);
 #ifndef _WINDOWS
-	zbx_strarr_free(CONFIG_LOAD_MODULE);
+	zbx_strarr_free(&CONFIG_LOAD_MODULE);
 #endif
 #ifdef _WINDOWS
-	zbx_strarr_free(CONFIG_PERF_COUNTERS);
-	zbx_strarr_free(CONFIG_PERF_COUNTERS_EN);
+	zbx_strarr_free(&CONFIG_PERF_COUNTERS);
+	zbx_strarr_free(&CONFIG_PERF_COUNTERS_EN);
 #endif
 }
 

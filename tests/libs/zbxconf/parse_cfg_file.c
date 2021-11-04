@@ -357,7 +357,7 @@ void	zbx_mock_test_entry(void **state)
 		switch (cfg[i].type)
 		{
 			case TYPE_MULTISTRING:
-				zbx_strarr_free(*(char ***)cfg[i].variable);
+				zbx_strarr_free((char ***)cfg[i].variable);
 				zbx_free(cfg[i].variable);
 				zbx_free(expected_values[i]);
 				break;

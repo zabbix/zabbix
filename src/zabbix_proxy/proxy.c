@@ -945,7 +945,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
  ******************************************************************************/
 static void	zbx_free_config(void)
 {
-	zbx_strarr_free(CONFIG_LOAD_MODULE);
+	zbx_strarr_free(&CONFIG_LOAD_MODULE);
 }
 
 /******************************************************************************

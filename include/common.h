@@ -1154,7 +1154,7 @@ int	str_n_in_list(const char *list, const char *value, size_t len, char delimite
 char	*str_linefeed(const char *src, size_t maxline, const char *delim);
 void	zbx_strarr_init(char ***arr);
 void	zbx_strarr_add(char ***arr, const char *entry);
-void	zbx_strarr_free(char **arr);
+void	zbx_strarr_free(char ***arr);
 
 #if defined(__GNUC__) || defined(__clang__)
 #	define __zbx_attr_format_printf(idx1, idx2) __attribute__((__format__(__printf__, (idx1), (idx2))))

@@ -283,9 +283,8 @@ void	reload_user_parameters(void)
 		zabbix_log(LOG_LEVEL_ERR, "cannot reload user parameters, stopped at: %s", error);
 		zbx_free(error);
 	}
-
 out:
-	zbx_strarr_free(CONFIG_USER_PARAMETERS);
+	zbx_strarr_free(&CONFIG_USER_PARAMETERS);
 }
 #endif	/* _WINDOWS */
 
