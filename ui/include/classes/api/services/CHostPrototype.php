@@ -689,7 +689,6 @@ class CHostPrototype extends CHostBase {
 		return $this->inherit($host_prototypes, null, $db_host_prototypes);
 	}
 
-
 	/**
 	 * Prepares and returns an array of child host prototypes, inherited from host prototypes $host_prototypes
 	 * on the given hosts.
@@ -894,41 +893,34 @@ class CHostPrototype extends CHostBase {
 	 * Inherits all host prototypes from the templates given in "templateids" to hosts or templates given in "hostids".
 	 *
 	 * @param array $data
-	 *
-	 * @return bool
 	 */
-	public function syncTemplates(array $data) {
-		$data['templateids'] = zbx_toArray($data['templateids']);
-		$data['hostids'] = zbx_toArray($data['hostids']);
-
-		$discoveryRules = API::DiscoveryRule()->get([
+	public function syncTemplates(array $data): void {
+		$db_discovery_rules = API::DiscoveryRule()->get([
 			'output' => ['itemid'],
 			'hostids' => $data['templateids']
 		]);
-		$hostPrototypes = $this->get([
-			'discoveryids' => zbx_objectValues($discoveryRules, 'itemid'),
-			'preservekeys' => true,
-			'output' => API_OUTPUT_EXTEND,
-			'selectGroupLinks' => API_OUTPUT_EXTEND,
-			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
+
+		$db_host_prototypes = $this->get([
+			'output' => ['host', 'name', 'custom_interfaces', 'status', 'discover', 'inventory_mode'],
+			'selectGroupLinks' => ['groupid'],
+			'selectGroupPrototypes' => ['name'],
 			'selectTags' => ['tag', 'value'],
 			'selectTemplates' => ['templateid'],
 			'selectDiscoveryRule' => ['itemid'],
-			'selectInterfaces' => ['main', 'type', 'useip', 'ip', 'dns', 'port', 'details']
+			'selectInterfaces' => ['main', 'type', 'useip', 'ip', 'dns', 'port', 'details'],
+			'discoveryids' => array_column($db_discovery_rules, 'itemid'),
+			'preservekeys' => true
 		]);
 
-		$hostPrototypes = $this->getHostMacros($hostPrototypes);
+		$db_host_prototypes = $this->getHostMacros($db_host_prototypes);
 
-		foreach ($hostPrototypes as &$hostPrototype) {
-			// the ID of the discovery rule must be passed in the "ruleid" parameter
-			$hostPrototype['ruleid'] = $hostPrototype['discoveryRule']['itemid'];
-			unset($hostPrototype['discoveryRule']);
+		foreach ($db_host_prototypes as &$db_host_prototype) {
+			$db_host_prototype['ruleid'] = $db_host_prototype['discoveryRule']['itemid'];
+			unset($db_host_prototype['discoveryRule']);
 		}
-		unset($hostPrototype);
+		unset($db_host_prototype);
 
-		$this->inherit($hostPrototypes, $data['hostids']);
-
-		return true;
+		$this->inherit($db_host_prototypes, $data['hostids']);
 	}
 
 	/**
