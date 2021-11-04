@@ -6482,7 +6482,7 @@ z-select,
 }
 .leaflet-control {
 	&.disabled {
-		background-color: $ui-bg-color;
+		background-color: #ffffff;
 		opacity: 1;
 
 		.geomap-filter-button {

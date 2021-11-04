@@ -6560,7 +6560,7 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   line-height: 30px; }
 
 .leaflet-control.disabled {
-  background-color: #000000;
+  background-color: #ffffff;
   opacity: 1; }
   .leaflet-control.disabled .geomap-filter-button {
     cursor: default;
