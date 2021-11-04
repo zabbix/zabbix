@@ -1360,16 +1360,17 @@ class CHostPrototype extends CHostBase {
 		DBselect(
 			'SELECT NULL'.
 			' FROM group_prototype gp'.
-			' WHERE '.dbConditionInt('gp.group_prototypeid', $group_prototypeids).
+			' WHERE '.dbConditionId('gp.group_prototypeid', $group_prototypeids).
 			' FOR UPDATE'
 		);
 
 		$child_group_prototypeids = DB::select('group_prototype', [
-			'output' => ['group_prototypeid'],
-			'filter' => ['templateid' => $group_prototypeids]
+			'output' => [],
+			'filter' => ['templateid' => $group_prototypeids],
+			'preservekeys' => true
 		]);
 		if ($child_group_prototypeids) {
-			self::deleteGroupPrototypes(array_column($child_group_prototypeids, 'group_prototypeid'));
+			self::deleteGroupPrototypes(array_keys($child_group_prototypeids));
 		}
 
 		$host_groups = DB::select('group_discovery', [
