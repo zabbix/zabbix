@@ -1259,6 +1259,8 @@ static char	*get_print_time(time_t st_raw)
 #define VFS_FILE_ADD_TIME(time, tag)						\
 	do									\
 	{									\
+		char	*tmp;							\
+										\
 		if (0 < time)							\
 		{								\
 			tmp = get_print_time((time_t)time);			\
@@ -1333,7 +1335,7 @@ int	zbx_vfs_file_info(const char *filename, struct zbx_json *j, int array, char 
 	int			ret = FAIL;
 	DWORD			file_attributes, acc_sz = 0, dmn_sz = 0;
 	wchar_t			*wpath = NULL, *sid_string = NULL, *acc_name = NULL, *dmn_name = NULL;
-	char			*tmp, *type = NULL, *basename = NULL, *dirname = NULL,
+	char			*type = NULL, *basename = NULL, *dirname = NULL,
 				*pathname = NULL, *user = NULL, *sidbuf = NULL;
 	PSID			sid = NULL;
 	PSECURITY_DESCRIPTOR	sec = NULL;
@@ -1520,7 +1522,7 @@ void	zbx_deinit_fileinfo(void)
 int	zbx_vfs_file_info(const char *filename, struct zbx_json *j, int array, char **error)
 {
 	int		ret = FAIL;
-	char		*tmp = NULL, *type = NULL, *basename = NULL, *dirname = NULL, *pathname = NULL;
+	char		*permissions, *type = NULL, *basename = NULL, *dirname = NULL, *pathname = NULL;
 	zbx_file_time_t	file_time;
 	zbx_stat_t	buf;
 	struct group	*grp;
@@ -1598,9 +1600,9 @@ int	zbx_vfs_file_info(const char *filename, struct zbx_json *j, int array, char 
 	UNLOCK_FILEINFO;
 
 	/* permissions */
-	tmp = get_file_permissions(&buf);
-	zbx_json_addstring(j, ZBX_SYSINFO_FILE_TAG_PERMISSIONS, tmp, ZBX_JSON_TYPE_STRING);
-	zbx_free(tmp);
+	permissions = get_file_permissions(&buf);
+	zbx_json_addstring(j, ZBX_SYSINFO_FILE_TAG_PERMISSIONS, permissions, ZBX_JSON_TYPE_STRING);
+	zbx_free(permissions);
 
 	/* uid */
 	zbx_json_adduint64(j, ZBX_SYSINFO_FILE_TAG_UID, (zbx_uint64_t)buf.st_uid);

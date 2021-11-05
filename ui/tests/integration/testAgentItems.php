@@ -780,7 +780,12 @@ class testAgentItems extends CIntegrationTest {
 						}
 					} elseif ($item['json'] === JSON_ARRAY_COMPARE_RIGHT) {
 						foreach ($jsonval as $jsonval_key => $jsonval_value) {
-							$this->arrcmpr($jsonval_value, $item['result'][$jsonval_key], $item['key']);
+							$found = false;
+							foreach ($item['result'] as $result_key => $result_value)
+							{
+								$found = $found || $this->arrfind($jsonval_value, $result_value);
+							}
+							self::assertEquals($found, true, 'Value (jsonval_key: '.$jsonval_key.') is not found for '.$item['key']);
 						}
 					}
 				} else {
