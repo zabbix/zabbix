@@ -22,7 +22,7 @@ define('ZABBIX_VERSION',		'6.0.0alpha6');
 define('ZABBIX_API_VERSION',	'6.0.0');
 define('ZABBIX_EXPORT_VERSION',	'6.0');
 
-define('ZABBIX_DB_VERSION',		5050098);
+define('ZABBIX_DB_VERSION',		5050103);
 
 define('DB_VERSION_SUPPORTED',				0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',		1);
@@ -58,6 +58,8 @@ define('ZBX_FLOAT_MAX', PHP_FLOAT_MAX);
 define('ZBX_MAX_DATE',		ZBX_MAX_INT32); // 19 Jan 2038 03:14:07 UTC
 define('ZBX_MIN_TIMESHIFT',	-788400000); // Min valid timeshift value in seconds (25 years).
 define('ZBX_MAX_TIMESHIFT',	788400000); // Max valid timeshift value in seconds (25 years).
+
+define('ZBX_GEOMAP_MAX_ZOOM', 30); // Max zoom level for geomap.
 
 define('ZBX_MAX_GRAPHS_PER_PAGE', 20);
 
@@ -1352,6 +1354,7 @@ define('API_COND_FORMULA',			49);
 define('API_COND_FORMULAID',		50);
 define('API_UNEXPECTED',			51);
 define('API_INT32_RANGES',			52);
+define('API_LAT_LNG_ZOOM',			53);
 
 // flags
 define('API_REQUIRED',					0x00001);
@@ -1467,6 +1470,7 @@ define('WIDGET_DATA_OVER',			'dataover');
 define('WIDGET_DISCOVERY',			'discovery');
 define('WIDGET_FAV_GRAPHS',			'favgraphs');
 define('WIDGET_FAV_MAPS',			'favmaps');
+define('WIDGET_GEOMAP',				'geomap');
 define('WIDGET_SVG_GRAPH',			'svggraph');
 define('WIDGET_GRAPH',				'graph');
 define('WIDGET_GRAPH_PROTOTYPE',	'graphprototype');

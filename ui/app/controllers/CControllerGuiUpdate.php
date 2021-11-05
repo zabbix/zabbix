@@ -68,7 +68,7 @@ class CControllerGuiUpdate extends CController {
 	}
 
 	protected function doAction() {
-		$settings =  [
+		$settings = [
 			CSettingsHelper::DEFAULT_THEME => $this->getInput('default_theme'),
 			CSettingsHelper::DEFAULT_TIMEZONE => $this->getInput('default_timezone'),
 			CSettingsHelper::SEARCH_LIMIT => $this->getInput('search_limit'),

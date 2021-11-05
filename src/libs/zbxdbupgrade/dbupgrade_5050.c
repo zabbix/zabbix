@@ -908,6 +908,45 @@ static int	DBpatch_5050086(void)
 
 static int	DBpatch_5050088(void)
 {
+	const ZBX_FIELD	field = {"geomaps_tile_provider", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_5050089(void)
+{
+	const ZBX_FIELD	field = {"geomaps_tile_url", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_5050090(void)
+{
+	const ZBX_FIELD	field = {"geomaps_max_zoom", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_5050091(void)
+{
+	const ZBX_FIELD	field = {"geomaps_attribution", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_5050092(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update config set geomaps_tile_provider='OpenStreetMap.Mapnik'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5050093(void)
+{
 	const ZBX_TABLE	table =
 			{"dbversion", "dbversionid", 0,
 				{
@@ -931,7 +970,7 @@ static int	DBpatch_5050088(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_5050089(void)
+static int	DBpatch_5050094(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_PROXY))
 		return SUCCEED;
@@ -939,7 +978,7 @@ static int	DBpatch_5050089(void)
 	return DBdrop_table("history");
 }
 
-static int	DBpatch_5050090(void)
+static int	DBpatch_5050095(void)
 {
 	const ZBX_TABLE	table =
 			{"history", "itemid,clock,ns", 0,
@@ -959,7 +998,7 @@ static int	DBpatch_5050090(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_5050091(void)
+static int	DBpatch_5050096(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_PROXY))
 		return SUCCEED;
@@ -967,7 +1006,7 @@ static int	DBpatch_5050091(void)
 	return DBdrop_table("history_uint");
 }
 
-static int	DBpatch_5050092(void)
+static int	DBpatch_5050097(void)
 {
 	const ZBX_TABLE	table =
 			{"history_uint", "itemid,clock,ns", 0,
@@ -987,7 +1026,7 @@ static int	DBpatch_5050092(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_5050093(void)
+static int	DBpatch_5050098(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_PROXY))
 		return SUCCEED;
@@ -995,7 +1034,7 @@ static int	DBpatch_5050093(void)
 	return DBdrop_table("history_str");
 }
 
-static int	DBpatch_5050094(void)
+static int	DBpatch_5050099(void)
 {
 	const ZBX_TABLE	table =
 			{"history_str", "itemid,clock,ns", 0,
@@ -1015,7 +1054,7 @@ static int	DBpatch_5050094(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_5050095(void)
+static int	DBpatch_5050100(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_PROXY))
 		return SUCCEED;
@@ -1023,7 +1062,7 @@ static int	DBpatch_5050095(void)
 	return DBdrop_table("history_log");
 }
 
-static int	DBpatch_5050096(void)
+static int	DBpatch_5050101(void)
 {
 	const ZBX_TABLE	table =
 			{"history_log", "itemid,clock,ns", 0,
@@ -1047,7 +1086,7 @@ static int	DBpatch_5050096(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_5050097(void)
+static int	DBpatch_5050102(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_PROXY))
 		return SUCCEED;
@@ -1055,7 +1094,7 @@ static int	DBpatch_5050097(void)
 	return DBdrop_table("history_text");
 }
 
-static int	DBpatch_5050098(void)
+static int	DBpatch_5050103(void)
 {
 	const ZBX_TABLE	table =
 			{"history_text", "itemid,clock,ns", 0,
@@ -1074,7 +1113,6 @@ static int	DBpatch_5050098(void)
 
 	return DBcreate_table(&table);
 }
-
 #endif
 
 DBPATCH_START(5050)
@@ -1167,5 +1205,10 @@ DBPATCH_ADD(5050095, 0, 1)
 DBPATCH_ADD(5050096, 0, 1)
 DBPATCH_ADD(5050097, 0, 1)
 DBPATCH_ADD(5050098, 0, 1)
+DBPATCH_ADD(5050099, 0, 1)
+DBPATCH_ADD(5050100, 0, 1)
+DBPATCH_ADD(5050101, 0, 1)
+DBPATCH_ADD(5050102, 0, 1)
+DBPATCH_ADD(5050103, 0, 1)
 
 DBPATCH_END()
