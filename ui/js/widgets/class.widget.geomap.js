@@ -302,7 +302,9 @@ class CWidgetGeoMap extends CWidget {
 	updateFilter(filter) {
 		updateUserProfile('web.dashboard.widget.geomap.severity_filter', filter, [this._widgetid], PROFILE_TYPE_STR)
 			.always(() => {
-				this._startUpdating();
+				if (this._state === WIDGET_STATE_ACTIVE) {
+					this._startUpdating();
+				}
 			});
 	}
 
