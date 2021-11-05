@@ -22,6 +22,7 @@ package file
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"syscall"
 	"time"
 
@@ -43,6 +44,14 @@ func getFileInfo(info *os.FileInfo, path string) (fileinfo *fileInfo, err error)
 	if !sd.IsValid() {
 		return nil, fmt.Errorf("Cannot obtain %s information: Invalid security descriptor.", path)
 	}
+
+	fi.Pathname, err = filepath.Abs(path)
+	if err != nil {
+		return nil, fmt.Errorf("Cannot obtain %s path name.", path)
+	}
+
+	fi.Basename = filepath.Base(path)
+	fi.Dirname = filepath.Dir(path)
 
 	sdOwner, _, err := sd.Owner()
 	if err != nil {

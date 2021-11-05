@@ -91,6 +91,7 @@ final class CItemData {
 			'vfs.dev.read[<device>,<type>,<mode>]',
 			'vfs.dev.write[<device>,<type>,<mode>]',
 			'vfs.dir.count[dir,<regex_incl>,<regex_excl>,<types_incl>,<types_excl>,<max_depth>,<min_size>,<max_size>,<min_age>,<max_age>,<regex_excl_dir>]',
+			'vfs.dir.get[dir,<regex_incl>,<regex_excl>,<types_incl>,<types_excl>,<max_depth>,<min_size>,<max_size>,<min_age>,<max_age>,<regex_excl_dir>]',
 			'vfs.dir.size[dir,<regex_incl>,<regex_excl>,<mode>,<max_depth>,<regex_excl_dir>]',
 			'vfs.file.cksum[file,<mode>]',
 			'vfs.file.contents[file,<encoding>]',
@@ -189,6 +190,7 @@ final class CItemData {
 			'vfs.dev.read[<device>,<type>,<mode>]',
 			'vfs.dev.write[<device>,<type>,<mode>]',
 			'vfs.dir.count[dir,<regex_incl>,<regex_excl>,<types_incl>,<types_excl>,<max_depth>,<min_size>,<max_size>,<min_age>,<max_age>,<regex_excl_dir>]',
+			'vfs.dir.get[dir,<regex_incl>,<regex_excl>,<types_incl>,<types_excl>,<max_depth>,<min_size>,<max_size>,<min_age>,<max_age>,<regex_excl_dir>]',
 			'vfs.dir.size[dir,<regex_incl>,<regex_excl>,<mode>,<max_depth>,<regex_excl_dir>]',
 			'vfs.file.cksum[file,<mode>]',
 			'vfs.file.contents[file,<encoding>]',
@@ -1157,6 +1159,10 @@ final class CItemData {
 			'vfs.dir.count[dir,<regex_incl>,<regex_excl>,<types_incl>,<types_excl>,<max_depth>,<min_size>,<max_size>,<min_age>,<max_age>,<regex_excl_dir>]' => [
 				'description' => _('Count of directory entries, recursively. Returns integer'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
+			],
+			'vfs.dir.get[dir,<regex_incl>,<regex_excl>,<types_incl>,<types_excl>,<max_depth>,<min_size>,<max_size>,<min_age>,<max_age>,<regex_excl_dir>]' => [
+				'description' => _('List of directory entries, recursively. Returns JSON'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'vfs.dir.size[dir,<regex_incl>,<regex_excl>,<mode>,<max_depth>,<regex_excl_dir>]' => [
 				'description' => _('Directory size (in bytes). Returns integer'),
