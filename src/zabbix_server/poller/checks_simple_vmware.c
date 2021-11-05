@@ -315,6 +315,7 @@ static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service,
 		case ZBX_VMWARE_UNIT_NUMBER:
 		case ZBX_VMWARE_UNIT_SECOND:
 		case ZBX_VMWARE_UNIT_WATT:
+		case ZBX_VMWARE_UNIT_CELSIUS:
 			SET_UI64_RESULT(result, perfvalue->value);
 			break;
 		default:
