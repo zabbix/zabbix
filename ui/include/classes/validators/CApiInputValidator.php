@@ -1221,7 +1221,7 @@ class CApiInputValidator {
 
 			if (array_key_exists($field_name, $data)) {
 				$subpath = ($path === '/' ? $path : $path.'/').$field_name;
-				if (!self::validateData($field_rule, $data[$field_name], $subpath, $error, $data)) {
+				if (!self::validateData($field_rule, $data[$field_name], $subpath, $error)) {
 					return false;
 				}
 				if ($flags & API_DEPRECATED) {
