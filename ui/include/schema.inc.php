@@ -4534,7 +4534,7 @@ return [
 		]
 	],
 	'history' => [
-		'key' => '',
+		'key' => 'itemid,clock,ns',
 		'fields' => [
 			'itemid' => [
 				'null' => false,
@@ -4563,7 +4563,7 @@ return [
 		]
 	],
 	'history_uint' => [
-		'key' => '',
+		'key' => 'itemid,clock,ns',
 		'fields' => [
 			'itemid' => [
 				'null' => false,
@@ -4593,7 +4593,7 @@ return [
 		]
 	],
 	'history_str' => [
-		'key' => '',
+		'key' => 'itemid,clock,ns',
 		'fields' => [
 			'itemid' => [
 				'null' => false,
@@ -4623,7 +4623,7 @@ return [
 		]
 	],
 	'history_log' => [
-		'key' => '',
+		'key' => 'itemid,clock,ns',
 		'fields' => [
 			'itemid' => [
 				'null' => false,
@@ -4676,7 +4676,7 @@ return [
 		]
 	],
 	'history_text' => [
-		'key' => '',
+		'key' => 'itemid,clock,ns',
 		'fields' => [
 			'itemid' => [
 				'null' => false,
@@ -8737,7 +8737,7 @@ return [
 		]
 	],
 	'dbversion' => [
-		'key' => '',
+		'key' => 'mandatory,optional',
 		'fields' => [
 			'mandatory' => [
 				'null' => false,

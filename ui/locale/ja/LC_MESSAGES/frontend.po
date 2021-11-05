@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-28 10:30+0300\n"
+"POT-Creation-Date: 2021-10-29 19:55+0300\n"
 "PO-Revision-Date: 2021-10-27 12:44+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -3776,7 +3776,7 @@ msgstr "接続タイムアウト"
 msgid "Connection timeout of %1$s seconds exceeded when connecting to Zabbix server \"%2$s\"."
 msgstr "Zabbixサーバー\"%2$s\"への接続中に%1$s秒を超える接続タイムアウトが発生しました。"
 
-#: include/classes/server/CZabbixServer.php:608
+#: include/classes/server/CZabbixServer.php:609
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%1$s\" failed. Possible reasons:\n"
@@ -3787,7 +3787,7 @@ msgstr ""
 "1. \"zabbix.conf.php\"に設定されたサーバーのIP/DNSが正しくない。\n"
 "2. DNSサーバーの設定が正しくない。\n"
 
-#: include/classes/server/CZabbixServer.php:596
+#: include/classes/server/CZabbixServer.php:597
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%1$s\" refused. Possible reasons:\n"
@@ -3802,7 +3802,7 @@ msgstr ""
 "3. Zabbixサーバーのプロセスが起動していない。\n"
 "4. FirewallによってTCPでの接続がブロックされている。\n"
 
-#: include/classes/server/CZabbixServer.php:604
+#: include/classes/server/CZabbixServer.php:605
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%1$s\" timed out. Possible reasons:\n"
@@ -3812,6 +3812,10 @@ msgstr ""
 "Zabbixサーバー\"%1$s\"への接続でタイムアウトが発生しました。以下の原因が考えられます：\n"
 "1. \"zabbix.conf.php\"に設定されたIP/DNSが正しくない。\n"
 "2. FirewallによってTCPでの接続がブロックされている。\n"
+
+#: include/classes/server/CZabbixServer.php:590
+msgid "Connection to Zabbix server failed. Incorrect configuration."
+msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:538
 msgid "Connection will not be encrypted because it uses a socket file (on Unix) or shared memory (Windows)."
@@ -19427,7 +19431,7 @@ msgstr "Zabbixのログイン画面"
 msgid "Zabbix server"
 msgstr "Zabbixサーバー"
 
-#: include/classes/server/CZabbixServer.php:600
+#: include/classes/server/CZabbixServer.php:601
 #, c-format
 msgid ""
 "Zabbix server \"%1$s\" cannot be reached. Possible reasons:\n"

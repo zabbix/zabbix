@@ -337,7 +337,7 @@ char	*CONFIG_TLS_PSK_FILE		= NULL;
 #endif
 
 char	*CONFIG_HA_NODE_NAME		= NULL;
-char	*CONFIG_EXTERNAL_ADDRESS	= NULL;
+char	*CONFIG_NODE_ADDRESS	= NULL;
 
 static char	*CONFIG_SOCKET_PATH	= NULL;
 
@@ -605,6 +605,9 @@ static void	zbx_set_defaults(void)
 
 	if (0 != CONFIG_REPORTWRITER_FORKS)
 		CONFIG_REPORTMANAGER_FORKS = 1;
+
+	if (NULL == CONFIG_NODE_ADDRESS)
+		CONFIG_NODE_ADDRESS = zbx_strdup(CONFIG_NODE_ADDRESS, "localhost");
 }
 
 /******************************************************************************
@@ -618,8 +621,9 @@ static void	zbx_set_defaults(void)
  ******************************************************************************/
 static void	zbx_validate_config(ZBX_TASK_EX *task)
 {
-	char	*ch_error;
-	int	err = 0;
+	char		*ch_error, *address = NULL;
+	int		err = 0;
+	unsigned short	port;
 
 	if (0 == CONFIG_UNREACHABLE_POLLER_FORKS && 0 != CONFIG_POLLER_FORKS + CONFIG_JAVAPOLLER_FORKS)
 	{
@@ -661,11 +665,21 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
-	if (SUCCEED != 	zbx_validate_export_type(CONFIG_EXPORT_TYPE, NULL))
+	if (SUCCEED != zbx_validate_export_type(CONFIG_EXPORT_TYPE, NULL))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid \"ExportType\" configuration parameter: %s", CONFIG_EXPORT_TYPE);
 		err = 1;
 	}
+
+	if (FAIL == parse_serveractive_element(CONFIG_NODE_ADDRESS, &address, &port, 10051) ||
+			(FAIL == is_supported_ip(address) && FAIL == zbx_validate_hostname(address)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "invalid \"NodeAddress\" configuration parameter: address \"%s\""
+				" is invalid", CONFIG_NODE_ADDRESS);
+		err = 1;
+	}
+	zbx_free(address);
+
 #if !defined(HAVE_IPV6)
 	err |= (FAIL == check_cfg_feature_str("Fping6Location", CONFIG_FPING6_LOCATION, "IPv6 support"));
 #endif
@@ -954,7 +968,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			INT_MAX},
 		{"HANodeName",			&CONFIG_HA_NODE_NAME,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"ExternalAddress",		&CONFIG_EXTERNAL_ADDRESS,		TYPE_STRING,
+		{"NodeAddress",			&CONFIG_NODE_ADDRESS,		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{NULL}
 	};
@@ -1148,6 +1162,17 @@ static void	zbx_check_db(void)
 	if(SUCCEED == DBfield_exists("config", "dbversion_status"))
 	{
 		zbx_json_initarray(&db_version_json, ZBX_JSON_STAT_BUF_LEN);
+
+		if (SUCCEED == DBpk_exists("history"))
+		{
+			db_version_info.history_pk = 1;
+		}
+		else
+		{
+			db_version_info.history_pk = 0;
+			zabbix_log(LOG_LEVEL_WARNING, "database could be upgraded to use primary keys in history tables");
+		}
+
 		zbx_db_version_json_create(&db_version_json, &db_version_info);
 
 		if (SUCCEED == result)

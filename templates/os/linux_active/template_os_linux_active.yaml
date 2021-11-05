@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-10-21T10:37:04Z'
+  date: '2021-10-27T15:21:13Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -1126,7 +1126,7 @@ zabbix_export:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 12h
           tags:
             -
               tag: Application
@@ -1232,7 +1232,7 @@ zabbix_export:
           name: 'System description'
           type: ZABBIX_ACTIVE
           key: system.uname
-          delay: 1h
+          delay: 15m
           history: 2w
           trends: '0'
           value_type: CHAR
@@ -1241,7 +1241,7 @@ zabbix_export:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1d
+                - 12h
           tags:
             -
               tag: Application
@@ -1774,7 +1774,7 @@ zabbix_export:
           value: '^.*$'
         -
           macro: '{$NET.IF.IFNAME.NOT_MATCHES}'
-          value: '(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9a-z]+$|docker[0-9]+|br-[a-z0-9]{12})'
+          value: '(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9A-z]+$|docker[0-9]+|br-[a-z0-9]{12})'
           description: 'Filter out loopbacks, nulls, docker veth links and docker0 bridge by default'
       dashboards:
         -
