@@ -1471,7 +1471,7 @@ class testFormAction extends CLegacyWebTest {
 			foreach ($data['conditions'] as $condition) {
 				$action_form->query('xpath:.//table[@id="conditionTable"]//button[text()="Add"]')->one()->click();
 
-				COverlayDialogElement::find()->waitUntilVisible()->one();
+				COverlayDialogElement::find()->waitUntilReady()->one();
 				$condition_form = $this->query('id:popup.condition')->asForm()->one();
 				$condition_form->fill($condition);
 				$condition_form->submit();
@@ -1484,7 +1484,7 @@ class testFormAction extends CLegacyWebTest {
 			foreach ($data['operations'] as $operation) {
 				$action_form->query('xpath:.//table[@id="op-table"]//button[text()="Add"]')->one()->click();
 
-				COverlayDialogElement::find()->waitUntilVisible()->one();
+				COverlayDialogElement::find()->waitUntilReady()->one();
 				$operation_form = $this->query('id:popup.operation')->asForm()->one();
 
 				if ($data['eventsource'] !== EVENT_SOURCE_INTERNAL) {
