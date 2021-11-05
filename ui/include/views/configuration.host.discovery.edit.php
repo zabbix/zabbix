@@ -829,7 +829,7 @@ $condition_tab->addItem([
 /*
  * LLD Macro tab.
  */
-$lld_macro_paths_form_list = new CFormList();
+$lld_macro_tab = new CFormGrid();
 
 $lld_macro_paths_table = (new CTable())
 	->setId('lld_macro_paths')
@@ -893,14 +893,17 @@ $lld_macro_paths_table->setFooter((new CCol(
 		->setEnabled(!$templated)
 ))->setColSpan(3));
 
-$lld_macro_paths_form_list->addRow(_('LLD macros'),
-	(new CDiv($lld_macro_paths_table))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-);
+$lld_macro_tab->addItem([
+	new CLabel(_('LLD macros')),
+	new CFormField(
+		(new CDiv($lld_macro_paths_table))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+	)
+]);
 
 // Overrides tab.
-$overrides_form_list = new CFormList();
+$overrides_tab = new CFormGrid();
 $overrides_list = (new CTable())
 	->addClass('lld-overrides-table')
 	->setHeader([
@@ -922,24 +925,31 @@ $overrides_list = (new CTable())
 		))
 	);
 
-$overrides_form_list->addRow(_('Overrides'),
-	(new CDiv($overrides_list))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-);
+$overrides_tab->addItem([
+	new CLabel(_('Overrides')),
+	new CFormField(
+		(new CDiv($overrides_list))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+	)
+]);
 
 // Append tabs to form.
 $tab = (new CTabView())
 	->addTab('itemTab', $data['caption'], $item_tab)
 	->addTab('preprocTab', _('Preprocessing'),
-		(new CFormList('item_preproc_list'))
-			->addRow(_('Preprocessing steps'),
-				getItemPreprocessing($form, $data['preprocessing'], $data['limited'], $data['preprocessing_types'])
-			),
+		(new CFormGrid())
+			->setId('item_preproc_list')
+			->addItem([
+				new CLabel(_('Preprocessing steps')),
+				new CFormField(
+					getItemPreprocessing($form, $data['preprocessing'], $data['limited'], $data['preprocessing_types'])
+				)
+			]),
 		TAB_INDICATOR_PREPROCESSING
 	)
-	->addTab('lldMacroTab', _('LLD macros'), $lld_macro_paths_form_list, TAB_INDICATOR_LLD_MACROS)
+	->addTab('lldMacroTab', _('LLD macros'), $lld_macro_tab, TAB_INDICATOR_LLD_MACROS)
 	->addTab('macroTab', _('Filters'), $condition_tab, TAB_INDICATOR_FILTERS)
-	->addTab('overridesTab', _('Overrides'), $overrides_form_list, TAB_INDICATOR_OVERRIDES);
+	->addTab('overridesTab', _('Overrides'), $overrides_tab, TAB_INDICATOR_OVERRIDES);
 
 if (!hasRequest('form_refresh')) {
 	$tab->setSelected(0);

@@ -508,22 +508,22 @@ INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (1132, 1002, 'dependent.item.proto.1.2.2.2'  , 18, 'dependent.item.proto.1.2.2.2'  , 1, '90d', 0, 1124, 1032, '', '', '', '',        2);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (1133, 1002, 'item.proto.1'                  ,  2, 'item.proto.1'                  , 1, '90d', 0, NULL, 1033, '', '', '', '',        2);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type,          status, master_itemid, templateid, params, description, posts, headers, lifetime, flags) VALUES (1134, 1002, 'dependent.discovery.rule.1.1'  , 18, 'dependent.discovery.rule.1.1'  , 4,        0, 1101, NULL, '', '', '', '', '30d', 1);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5101, 1117, 1118);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5102, 1117, 1119);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5103, 1117, 1120);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5104, 1117, 1121);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5105, 1117, 1122);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5106, 1117, 1123);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5107, 1117, 1124);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5108, 1117, 1125);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5109, 1117, 1126);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5110, 1117, 1127);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5111, 1117, 1128);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5112, 1117, 1129);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5113, 1117, 1130);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5114, 1117, 1131);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5115, 1117, 1132);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5116, 1117, 1133);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (51010, 1117, 1118);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (51020, 1117, 1119);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (51030, 1117, 1120);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (51040, 1117, 1121);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (51050, 1117, 1122);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (51060, 1117, 1123);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (51070, 1117, 1124);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (51080, 1117, 1125);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (51090, 1117, 1126);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (51100, 1117, 1127);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (51110, 1117, 1128);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (51120, 1117, 1129);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (51130, 1117, 1130);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (51140, 1117, 1131);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (51150, 1117, 1132);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (51160, 1117, 1133);
 
 -- dependent items: dependent.items.template.1.2
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (1003, 'dependent.items.template.1.2', 'dependent.items.template.1.2', 3, '');
@@ -563,22 +563,22 @@ INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (1232, 1003, 'dependent.item.proto.1.2.2.2'  , 18, 'dependent.item.proto.1.2.2.2'  , 1, '90d', 0, 1224, 1032, '', '', '', '',        2);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (1233, 1003, 'item.proto.1'                  ,  2, 'item.proto.1'                  , 1, '90d', 0, NULL, 1033, '', '', '', '',        2);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type,          status, master_itemid, templateid, params, description, posts, headers, lifetime, flags) VALUES (1234, 1003, 'dependent.discovery.rule.1.1'  , 18, 'dependent.discovery.rule.1.1'  , 4,        0, 1201, NULL, '', '', '', '', '30d', 1);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5201, 1217, 1218);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5202, 1217, 1219);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5203, 1217, 1220);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5204, 1217, 1221);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5205, 1217, 1222);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5206, 1217, 1223);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5207, 1217, 1224);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5208, 1217, 1225);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5209, 1217, 1226);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5210, 1217, 1227);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5211, 1217, 1228);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5212, 1217, 1229);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5213, 1217, 1230);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5214, 1217, 1231);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5215, 1217, 1232);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5216, 1217, 1233);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (52010, 1217, 1218);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (52020, 1217, 1219);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (52030, 1217, 1220);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (52040, 1217, 1221);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (52050, 1217, 1222);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (52060, 1217, 1223);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (52070, 1217, 1224);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (52080, 1217, 1225);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (52090, 1217, 1226);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (52100, 1217, 1227);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (52110, 1217, 1228);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (52120, 1217, 1229);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (52130, 1217, 1230);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (52140, 1217, 1231);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (52150, 1217, 1232);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (52160, 1217, 1233);
 
 -- dependent items: dependent.items.host.1
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (1004, 'dependent.items.host.1', 'dependent.items.host.1', 0, '');
@@ -619,22 +619,22 @@ INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (1332, 1004, 'dependent.item.proto.1.2.2.2'  , 18, 'dependent.item.proto.1.2.2.2'  , 1, '90d', 0, 1324, 1132, '', '', '', '',        2);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (1333, 1004, 'item.proto.1'                  ,  2, 'item.proto.1'                  , 1, '90d', 0, NULL, 1133, '', '', '', '',        2);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type,          status, master_itemid, templateid, params, description, posts, headers, lifetime, flags) VALUES (1334, 1004, 'dependent.discovery.rule.1.1'  , 18, 'dependent.discovery.rule.1.1'  , 4,        0, 1301, NULL, '', '', '', '', '30d', 1);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5301, 1317, 1318);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5302, 1317, 1319);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5303, 1317, 1320);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5304, 1317, 1321);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5305, 1317, 1322);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5306, 1317, 1323);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5307, 1317, 1324);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5308, 1317, 1325);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5309, 1317, 1326);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5310, 1317, 1327);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5311, 1317, 1328);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5312, 1317, 1329);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5313, 1317, 1330);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5314, 1317, 1331);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5315, 1317, 1332);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5316, 1317, 1333);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (53010, 1317, 1318);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (53020, 1317, 1319);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (53030, 1317, 1320);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (53040, 1317, 1321);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (53050, 1317, 1322);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (53060, 1317, 1323);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (53070, 1317, 1324);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (53080, 1317, 1325);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (53090, 1317, 1326);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (53100, 1317, 1327);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (53110, 1317, 1328);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (53120, 1317, 1329);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (53130, 1317, 1330);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (53140, 1317, 1331);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (53150, 1317, 1332);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (53160, 1317, 1333);
 
 -- dependent items: dependent.items.template.2
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (1005, 'dependent.items.template.2', 'dependent.items.template.2', 3, '');
@@ -660,9 +660,9 @@ INSERT INTO items (itemid, hostid, name, type, key_, value_type,          status
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (1603, 1007, 'dependent.item.proto.1.1.1'    , 18, 'dependent.item.proto.1.1.1'    , 1, '90d', 0, 1601, NULL, '', '', '', '',        2);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (1604, 1007, 'dependent.item.proto.1.1.1.1'  , 18, 'dependent.item.proto.1.1.1.1'  , 1, '90d', 0, 1603, NULL, '', '', '', '',        2);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (1605, 1007, 'dependent.item.proto.1.1.1.1.1', 18, 'dependent.item.proto.1.1.1.1.1', 1, '90d', 0, 1604, NULL, '', '', '', '',        2);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5601, 1602, 1603);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5602, 1602, 1604);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5603, 1602, 1605);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (56010, 1602, 1603);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (56020, 1602, 1604);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (56030, 1602, 1605);
 
 -- dependent items: dependent.items.template.4
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (1008, 'dependent.items.template.4', 'dependent.items.template.4', 3, '');
@@ -698,9 +698,9 @@ INSERT INTO items (itemid, hostid, name, type, key_, value_type,          status
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (2004, 1011, 'item.proto.3'                  , 18, 'item.proto.3'                  , 1, '90d', 0, 2002, NULL, '', '', '', '',        2);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (2005, 1011, 'item.proto.4'                  , 18, 'item.proto.4'                  , 1, '90d', 0, 2004, NULL, '', '', '', '',        2);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (2006, 1011, 'item.proto.5'                  , 18, 'item.proto.5'                  , 1, '90d', 0, 2005, NULL, '', '', '', '',        2);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6001, 2003, 2004);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6002, 2003, 2005);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6003, 2003, 2006);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (60010, 2003, 2004);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (60020, 2003, 2005);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (60030, 2003, 2006);
 
 -- dependent items: dependent.items.template.6
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (1012, 'dependent.items.template.6', 'dependent.items.template.6', 3, '');
@@ -708,8 +708,8 @@ INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (1012, 1012, 1002
 INSERT INTO items (itemid, hostid, name, type, key_, value_type,          status,                templateid, params, description, posts, headers, lifetime, flags) VALUES (2101, 1012, 'discovery.rule.1'              ,  2, 'discovery.rule.1'              , 4,        0,       NULL, '', '', '', '', '30d', 1);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (2102, 1012, 'item.proto.1'                  ,  2, 'item.proto.1'                  , 1, '90d', 0, NULL, NULL, '', '', '', '',        2);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (2103, 1012, 'item.proto.2'                  ,  2, 'item.proto.2'                  , 1, '90d', 0, NULL, NULL, '', '', '', '',        2);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6101, 2101, 2102);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6102, 2101, 2103);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (61010, 2101, 2102);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (61020, 2101, 2103);
 
 -- dependent items: dependent.items.host.6
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (1013, 'dependent.items.host.6', 'dependent.items.host.6', 0, '');
@@ -722,11 +722,11 @@ INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (2204, 1013, 'item.proto.3'                  , 18, 'item.proto.3'                  , 1, '90d', 0, 2203, NULL, '', '', '', '',        2);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (2205, 1013, 'item.proto.4'                  , 18, 'item.proto.4'                  , 1, '90d', 0, 2204, NULL, '', '', '', '',        2);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (2206, 1013, 'item.proto.5'                  , 18, 'item.proto.5'                  , 1, '90d', 0, 2205, NULL, '', '', '', '',        2);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6201, 2201, 2202);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6202, 2201, 2203);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6203, 2201, 2204);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6204, 2201, 2205);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6205, 2201, 2206);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (62010, 2201, 2202);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (62020, 2201, 2203);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (62030, 2201, 2204);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (62040, 2201, 2205);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (62050, 2201, 2206);
 
 -- dependent items: dependent.items.host.7
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (1014, 'dependent.items.host.7', 'dependent.items.host.7', 0, '');
@@ -737,10 +737,10 @@ INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (2303, 1014, 'net.if.in[{$IFNAME}]'          , 18, 'net.ifi.in[{#IFNAME}]'         , 1, '90d', 0, 2302, NULL, '', '', '', '',        2);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (2304, 1014, 'net.if[eth0]'                  ,  2, 'net.if[eth0]'                  , 1, '90d', 0, NULL, NULL, '', '', '', '',        4);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (2305, 1014, 'net.if.in[eth0]'               , 18, 'net.ifi.in[eth0]'              , 1, '90d', 0, 2304, NULL, '', '', '', '',        4);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6301, 2301, 2302);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6302, 2301, 2303);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6303, 2302, 2304);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6304, 2303, 2305);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (63010, 2301, 2302);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (63020, 2301, 2303);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (63030, 2302, 2304);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (63040, 2303, 2305);
 
 -- dependent items: dependent.items.host.8
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (1015, 'dependent.items.host.8', 'dependent.items.host.8', 0, '');
@@ -755,10 +755,10 @@ INSERT INTO items (itemid, hostid, name, type, key_, value_type,          status
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (2407, 1015, 'master.item.proto.2'           ,  2, 'master.item.proto.2'           , 1, '90d', 0, NULL, NULL, '', '', '', '',        2);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (2408, 1015, 'dependent.item.proto.2.1'      , 18, 'dependent.item.proto.2.1'      , 1, '90d', 0, 2407, NULL, '', '', '', '',        2);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type,          status, master_itemid, templateid, params, description, posts, headers, lifetime, flags) VALUES (2409, 1015, 'dependent.discovery.rule.1.1'  , 18, 'dependent.discovery.rule.1.1'  , 4,        0, 2401, NULL, '', '', '', '', '30d', 1);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6401, 2403, 2404);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6402, 2403, 2405);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6403, 2406, 2407);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (6404, 2406, 2408);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (64010, 2403, 2404);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (64020, 2403, 2405);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (64030, 2406, 2407);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (64040, 2406, 2408);
 
 -- dependent items: dependent.items.host.9
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (1016, 'dependent.items.host.9', 'dependent.items.host.9', 0, '');

@@ -475,7 +475,7 @@ function validateTimeSelectorPeriod($from, $to) {
 	}
 	elseif ($period > $max_period) {
 		error(_n('Maximum time period to display is %1$s day.',
-			'Maximum time period to display is %1$s days.', (int) ($max_period / SEC_PER_DAY)
+			'Maximum time period to display is %1$s days.', (int) round($max_period / SEC_PER_DAY)
 		));
 
 		invalid_url();

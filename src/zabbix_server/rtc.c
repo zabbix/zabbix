@@ -122,7 +122,8 @@ static void	rtc_ha_status(void)
 				continue;
 			}
 
-			zabbix_log(LOG_LEVEL_INFORMATION, "  %2d. " ZBX_HA_REPORT_FMT, index++, id, name,
+			zabbix_log(LOG_LEVEL_INFORMATION, "  %2d. " ZBX_HA_REPORT_FMT, index++, id,
+					'\0' != *name ? name : "<standalone server>",
 					address, zbx_ha_status_str(status), zbx_age2str(lastaccess_age));
 		}
 	}
