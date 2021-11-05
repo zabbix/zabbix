@@ -8761,8 +8761,13 @@ return [
 		]
 	],
 	'dbversion' => [
-		'key' => 'mandatory,optional',
+		'key' => 'dbversionid',
 		'fields' => [
+			'dbversionid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 1
+			],
 			'mandatory' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
