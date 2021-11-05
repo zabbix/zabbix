@@ -39,7 +39,14 @@ L.Map.include({
 
 	updateFilter: function(filter_data) {
 		this.getContainer().dispatchEvent(new CustomEvent('filter', {detail: filter_data}));
-	}
+	},
+
+	elmntCounter: (function() {
+		let static = 0;
+		return function() {
+			return ++static;
+		}
+	})()
 });
 
 /**
@@ -73,14 +80,16 @@ L.Control.severityFilterFilterControl = L.Control.extend({
 				const li = L.DomUtil.create('li', '', this.bar);
 				const chbox = L.DomUtil.create('input', '', li);
 				const label = L.DomUtil.create('label', '', li);
-				const span = L.DomUtil.create('span', '', label);
-				const caption = L.DomUtil.create('label', '', li);
+				const span = L.DomUtil.create('span', '');
+				const chBoxId = 'filter_severity_' + map.elmntCounter();
 
-				caption.innerHTML = prop.name;
+				label.append(span, document.createTextNode(prop.name));
 				chbox.checked = this._filter_checked.includes(severity.toString(10));
 				chbox.classList.add('checkbox-radio');
 				chbox.type = 'checkbox';
 				chbox.value = severity;
+				chbox.id = chBoxId;
+				label.htmlFor = chBoxId;
 			}
 
 			L.DomEvent.on(btn, 'click', () => {this.bar.classList.toggle('collapsed')});
