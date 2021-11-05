@@ -1,1 +1,1 @@
-.......PS. [ZBX-18944] Upped field limits (ssimonenko)
+.......PS. [ZBX-18944] fixed the fields size for LLD validation of triggers.description and item_preproc.params (ssimonenko)
