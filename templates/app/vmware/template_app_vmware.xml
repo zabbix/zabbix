@@ -1131,7 +1131,7 @@ Template tooling version used: 0.38</description>
                <name>VMware: Number of bytes received</name>
                <type>SIMPLE</type>
                <key>vmware.hv.network.in[{$VMWARE.URL},{HOST.HOST},bps]</key>
-               <delay>{$VMWARE_PERF_INTERVAL}</delay>
+               <delay>1m</delay>
                <history>7d</history>
                <units>Bps</units>
                <username>{$VMWARE.USERNAME}</username>
@@ -1147,7 +1147,7 @@ Template tooling version used: 0.38</description>
                <name>VMware: Number of bytes transmitted</name>
                <type>SIMPLE</type>
                <key>vmware.hv.network.out[{$VMWARE.URL},{HOST.HOST},bps]</key>
-               <delay>{$VMWARE_PERF_INTERVAL}</delay>
+               <delay>1m</delay>
                <history>7d</history>
                <units>Bps</units>
                <username>{$VMWARE.USERNAME}</username>
@@ -1317,7 +1317,7 @@ Template tooling version used: 0.38</description>
                      <name>VMware: Average read latency of the datastore {#DATASTORE}</name>
                      <type>SIMPLE</type>
                      <key>vmware.hv.datastore.read[{$VMWARE.URL},{HOST.HOST},{#DATASTORE},latency]</key>
-                     <delay>{$VMWARE_PERF_INTERVAL}</delay>
+                     <delay>1m</delay>
                      <history>7d</history>
                      <username>{$VMWARE.USERNAME}</username>
                      <password>{$VMWARE.PASSWORD}</password>
@@ -1365,7 +1365,7 @@ Template tooling version used: 0.38</description>
                      <name>VMware: Average write latency of the datastore {#DATASTORE}</name>
                      <type>SIMPLE</type>
                      <key>vmware.hv.datastore.write[{$VMWARE.URL},{HOST.HOST},{#DATASTORE},latency]</key>
-                     <delay>{$VMWARE_PERF_INTERVAL}</delay>
+                     <delay>1m</delay>
                      <history>7d</history>
                      <username>{$VMWARE.USERNAME}</username>
                      <password>{$VMWARE.PASSWORD}</password>

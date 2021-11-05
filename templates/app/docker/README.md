@@ -96,6 +96,7 @@ There are no template links in this template.
 |Docker |Image {#NAME}: Size |<p>-</p> |DEPENDENT |docker.image.size["{#ID}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.Id == "{#ID}")].Size.first()`</p> |
 |Docker |Container {#NAME}: Get stats |<p>Get container stats based on resource usage</p> |ZABBIX_PASSIVE |docker.container_stats["{#NAME}"] |
 |Docker |Container {#NAME}: CPU total usage per second |<p>-</p> |DEPENDENT |docker.container_stats.cpu_usage.total.rate["{#NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.cpu_stats.cpu_usage.total_usage`</p><p>- CHANGE_PER_SECOND<p>- MULTIPLIER: `1.0E-9`</p> |
+|Docker |Container {#NAME}: CPU percent usage |<p>-</p> |DEPENDENT |docker.container_stats.cpu_pct_usage["{#NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.cpu_stats.cpu_usage.percent_usage`</p> |
 |Docker |Container {#NAME}: CPU kernelmode usage per second |<p>-</p> |DEPENDENT |docker.container_stats.cpu_usage.kernel.rate["{#NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.cpu_stats.cpu_usage.usage_in_kernelmode`</p><p>- CHANGE_PER_SECOND<p>- MULTIPLIER: `1.0E-9`</p> |
 |Docker |Container {#NAME}: CPU usermode usage per second |<p>-</p> |DEPENDENT |docker.container_stats.cpu_usage.user.rate["{#NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.cpu_stats.cpu_usage.usage_in_usermode`</p><p>- CHANGE_PER_SECOND<p>- MULTIPLIER: `1.0E-9`</p> |
 |Docker |Container {#NAME}: Online CPUs |<p>-</p> |DEPENDENT |docker.container_stats.online_cpus["{#NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.cpu_stats.online_cpus`</p> |

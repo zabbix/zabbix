@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-10-22T09:59:03Z</date>
+   <date>2021-10-27T14:45:15Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -1032,7 +1032,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1h</params>
+                     <params>12h</params>
                   </step>
                </preprocessing>
                <triggers>
@@ -1143,7 +1143,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
             <item>
                <name>System description</name>
                <key>system.uname</key>
-               <delay>1h</delay>
+               <delay>15m</delay>
                <history>2w</history>
                <trends>0</trends>
                <value_type>CHAR</value_type>
@@ -1156,7 +1156,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <params>12h</params>
                   </step>
                </preprocessing>
             </item>

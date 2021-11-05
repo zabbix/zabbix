@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-03-16T08:47:30Z</date>
+   <date>2021-10-27T14:33:35Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -21,7 +21,7 @@ ENTITY-STATE-MIB&#13;
 ENTITY-MIB&#13;
 IF-MIB&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Network devices</name>
@@ -147,7 +147,7 @@ Template tooling version used: 0.38</description>
                <history>2w</history>
                <trends>0</trends>
                <value_type>LOG</value_type>
-               <description>Item is used to collect all SNMP traps unmatched by other snmptrap items</description>
+               <description>The item is used to collect all SNMP traps unmatched by other snmptrap items</description>
                <applications>
                   <application>
                      <name>General</name>
@@ -160,7 +160,7 @@ Template tooling version used: 0.38</description>
                <type>SNMP_AGENT</type>
                <snmp_oid>1.3.6.1.2.1.1.4.0</snmp_oid>
                <key>system.contact[sysContact.0]</key>
-               <delay>1h</delay>
+               <delay>15m</delay>
                <history>2w</history>
                <trends>0</trends>
                <value_type>CHAR</value_type>
@@ -175,7 +175,7 @@ The textual identification of the contact person for this managed node, together
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <params>12h</params>
                   </step>
                </preprocessing>
             </item>
@@ -216,7 +216,7 @@ Implementations may approximate this one minute smoothing period if necessary.</
                <type>SNMP_AGENT</type>
                <snmp_oid>1.3.6.1.2.1.1.1.0</snmp_oid>
                <key>system.descr[sysDescr.0]</key>
-               <delay>1h</delay>
+               <delay>15m</delay>
                <history>2w</history>
                <trends>0</trends>
                <value_type>CHAR</value_type>
@@ -232,7 +232,7 @@ networking software.</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <params>12h</params>
                   </step>
                </preprocessing>
             </item>
@@ -256,7 +256,7 @@ The physical location of this node (e.g., `telephone closet, 3rd floor').  If th
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1h</params>
+                     <params>12h</params>
                   </step>
                </preprocessing>
             </item>
@@ -280,7 +280,7 @@ An administratively-assigned name for this managed node.By convention, this is t
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1h</params>
+                     <params>12h</params>
                   </step>
                </preprocessing>
                <triggers>
@@ -312,7 +312,7 @@ The vendor's authoritative identification of the network management subsystem co
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1h</params>
+                     <params>12h</params>
                   </step>
                </preprocessing>
             </item>
@@ -359,6 +359,11 @@ The time (in hundredths of a second) since the network management portion of the
                <type>INTERNAL</type>
                <key>zabbix[host,snmp,available]</key>
                <history>7d</history>
+               <description>Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.&#13;
+Possible value:&#13;
+0 - not available&#13;
+1 - available&#13;
+2 - unknown</description>
                <applications>
                   <application>
                      <name>Status</name>
@@ -456,7 +461,6 @@ The time (in hundredths of a second) since the network management portion of the
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -527,7 +531,6 @@ The operational status of the sensor {#SENSOR_INFO}</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>JAVASCRIPT</type>
@@ -862,7 +865,6 @@ through updating the syntax of the IANAifType textual convention.</description>
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template Net Mellanox SNMP:net.if.speed[ifHighSpeed.{#SNMPINDEX}].change()}&lt;0 and {Template Net Mellanox SNMP:net.if.speed[ifHighSpeed.{#SNMPINDEX}].last()}&gt;0&#13;
@@ -899,7 +901,7 @@ and&#13;
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                      <recovery_expression>{Template Net Mellanox SNMP:net.if.in[ifHCInOctets.{#SNMPINDEX}].avg(15m)}&lt;(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Template Net Mellanox SNMP:net.if.speed[ifHighSpeed.{#SNMPINDEX}].last()} and&#13;
 {Template Net Mellanox SNMP:net.if.out[ifHCOutOctets.{#SNMPINDEX}].avg(15m)}&lt;(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Template Net Mellanox SNMP:net.if.speed[ifHighSpeed.{#SNMPINDEX}].last()}</recovery_expression>
-                     <name>Interface {#IFNAME}({#IFALIAS}): High bandwidth usage ( &gt; {$IF.UTIL.MAX:"{#IFNAME}"}% )</name>
+                     <name>Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (&gt;{$IF.UTIL.MAX:"{#IFNAME}"}%)</name>
                      <opdata>In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}</opdata>
                      <priority>WARNING</priority>
                      <description>The network interface utilization is close to its estimated maximum bandwidth.</description>
@@ -918,7 +920,7 @@ or {Template Net Mellanox SNMP:net.if.out.errors[ifOutErrors.{#SNMPINDEX}].min(5
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                      <recovery_expression>{Template Net Mellanox SNMP:net.if.in.errors[ifInErrors.{#SNMPINDEX}].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8&#13;
 and {Template Net Mellanox SNMP:net.if.out.errors[ifOutErrors.{#SNMPINDEX}].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8</recovery_expression>
-                     <name>Interface {#IFNAME}({#IFALIAS}): High error rate ( &gt; {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)</name>
+                     <name>Interface {#IFNAME}({#IFALIAS}): High error rate (&gt;{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)</name>
                      <opdata>errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}</opdata>
                      <priority>WARNING</priority>
                      <description>Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold</description>
@@ -1044,7 +1046,6 @@ and {Template Net Mellanox SNMP:net.if.out.errors[ifOutErrors.{#SNMPINDEX}].max(
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -1141,7 +1142,6 @@ entPhySensorScale, and entPhySensorPrecision objects must also be examined.</des
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template Net Mellanox SNMP:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP.MAX.WARN:"{#SENSOR_INFO}"}&#13;
@@ -1272,7 +1272,6 @@ The amount of the storage represented by this entry that is allocated, in units 
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template Net Mellanox SNMP:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].last()}&gt;{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and&#13;
@@ -1438,14 +1437,13 @@ The amount of the storage represented by this entry that is allocated, in units 
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{min(5m)}&gt;{$MEMORY.UTIL.MAX}</expression>
-                           <name>{#MEMNAME}: High memory utilization ( &gt;{$MEMORY.UTIL.MAX}% for 5m)</name>
+                           <name>{#MEMNAME}: High memory utilization (&gt;{$MEMORY.UTIL.MAX}% for 5m)</name>
                            <priority>AVERAGE</priority>
                            <description>The system is running out of free memory.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>{#MEMNAME}: Memory utilization</name>
@@ -1762,6 +1760,23 @@ The amount of the storage represented by this entry that is allocated, in units 
    </graphs>
    <value_maps>
       <value_map>
+         <name>ENTITY-SENSORS-MIB::EntitySensorStatus</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>ok</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>unavailable</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>nonoperational</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
          <name>ENTITY-STATE-MIB::EntityOperState</name>
          <mappings>
             <mapping>
@@ -1779,23 +1794,6 @@ The amount of the storage represented by this entry that is allocated, in units 
             <mapping>
                <value>4</value>
                <newvalue>testing</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>ENTITY-SENSORS-MIB::EntitySensorStatus</name>
-         <mappings>
-            <mapping>
-               <value>1</value>
-               <newvalue>ok</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>unavailable</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>nonoperational</newvalue>
             </mapping>
          </mappings>
       </value_map>
@@ -2982,6 +2980,19 @@ The amount of the storage represented by this entry that is allocated, in units 
          </mappings>
       </value_map>
       <value_map>
+         <name>Service state</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Down</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>Up</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
          <name>zabbix.host.available</name>
          <mappings>
             <mapping>
@@ -2995,19 +3006,6 @@ The amount of the storage represented by this entry that is allocated, in units 
             <mapping>
                <value>2</value>
                <newvalue>unknown</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>Service state</name>
-         <mappings>
-            <mapping>
-               <value>0</value>
-               <newvalue>Down</newvalue>
-            </mapping>
-            <mapping>
-               <value>1</value>
-               <newvalue>Up</newvalue>
             </mapping>
          </mappings>
       </value_map>

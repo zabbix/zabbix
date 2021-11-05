@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-10-21T06:23:07Z</date>
+   <date>2021-10-27T14:48:16Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -548,7 +548,7 @@ and are waiting to be executed.</description>
                <name>System description</name>
                <type>ZABBIX_ACTIVE</type>
                <key>system.uname</key>
-               <delay>1h</delay>
+               <delay>15m</delay>
                <history>2w</history>
                <trends>0</trends>
                <value_type>CHAR</value_type>
