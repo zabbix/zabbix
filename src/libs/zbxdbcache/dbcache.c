@@ -2200,6 +2200,164 @@ static void	DBmass_proxy_update_items(zbx_vector_ptr_t *item_diff)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+typedef struct
+{
+	char	*table_name;
+	char	*sql;
+	size_t	sql_alloc, sql_offset;
+}
+zbx_history_dupl_select_t;
+
+static int	history_value_compare_func(const void *d1, const void *d2)
+{
+	const ZBX_DC_HISTORY	*i1 = *(const ZBX_DC_HISTORY **)d1;
+	const ZBX_DC_HISTORY	*i2 = *(const ZBX_DC_HISTORY **)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(i1->itemid, i2->itemid);
+	ZBX_RETURN_IF_NOT_EQUAL(i1->value_type, i2->value_type);
+	ZBX_RETURN_IF_NOT_EQUAL(i1->ts.sec, i2->ts.sec);
+	ZBX_RETURN_IF_NOT_EQUAL(i1->ts.ns, i2->ts.ns);
+
+	return 0;
+}
+
+static void	vc_flag_duplicates(zbx_vector_ptr_t *history_index, zbx_vector_ptr_t *duplicates)
+{
+	int	i;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	for (i = 0; i < duplicates->values_num; i++)
+	{
+		int	idx_cached;
+
+		if (FAIL != (idx_cached = zbx_vector_ptr_bsearch(history_index, duplicates->values[i],
+				history_value_compare_func)))
+		{
+			ZBX_DC_HISTORY	*cached_value = (ZBX_DC_HISTORY *)history_index->values[idx_cached];
+
+			dc_history_clean_value(cached_value);
+			cached_value->flags |= ZBX_DC_FLAGS_NOT_FOR_HISTORY;
+		}
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+static void	db_fetch_duplicates(zbx_history_dupl_select_t *query, unsigned char value_type,
+		zbx_vector_ptr_t *duplicates)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	if (NULL == query->sql)
+		return;
+
+	result = DBselect("%s", query->sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_DC_HISTORY	*d = (ZBX_DC_HISTORY *)zbx_malloc(NULL, sizeof(ZBX_DC_HISTORY));
+
+		ZBX_STR2UINT64(d->itemid, row[0]);
+		d->ts.sec = atoi(row[1]);
+		d->ts.ns = atoi(row[2]);
+
+		d->value_type = value_type;
+
+		zbx_vector_ptr_append(duplicates, d);
+	}
+	DBfree_result(result);
+
+	zbx_free(query->sql);
+}
+
+static void	remove_history_duplicates(zbx_vector_ptr_t *history)
+{
+	int				i;
+	zbx_history_dupl_select_t	select_flt = {.table_name = "history"},
+					select_uint = {.table_name = "history_uint"},
+					select_str = {.table_name = "history_str"},
+					select_log = {.table_name = "history_log"},
+					select_text = {.table_name = "history_text"};
+	zbx_vector_ptr_t		duplicates, history_index;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_ptr_create(&duplicates);
+	zbx_vector_ptr_create(&history_index);
+
+	zbx_vector_ptr_append_array(&history_index, history->values, history->values_num);
+	zbx_vector_ptr_sort(&history_index, history_value_compare_func);
+
+	for (i = 0; i < history_index.values_num; i++)
+	{
+		ZBX_DC_HISTORY			*h = history_index.values[i];
+		zbx_history_dupl_select_t	*select_ptr;
+		char				*separator = " or";
+
+		if (h->value_type == ITEM_VALUE_TYPE_FLOAT)
+			select_ptr = &select_flt;
+		else if (h->value_type == ITEM_VALUE_TYPE_UINT64)
+			select_ptr = &select_uint;
+		else if (h->value_type == ITEM_VALUE_TYPE_STR)
+			select_ptr = &select_str;
+		else if (h->value_type == ITEM_VALUE_TYPE_LOG)
+			select_ptr = &select_log;
+		else if (h->value_type == ITEM_VALUE_TYPE_TEXT)
+			select_ptr = &select_text;
+		else
+			continue;
+
+		if (NULL == select_ptr->sql)
+		{
+			zbx_snprintf_alloc(&select_ptr->sql, &select_ptr->sql_alloc, &select_ptr->sql_offset,
+					"select itemid,clock,ns"
+					" from %s"
+					" where", select_ptr->table_name);
+			separator = "";
+		}
+
+		zbx_snprintf_alloc(&select_ptr->sql, &select_ptr->sql_alloc, &select_ptr->sql_offset,
+				"%s (itemid=" ZBX_FS_UI64 " and clock=%d and ns=%d)", separator , h->itemid,
+				h->ts.sec, h->ts.ns);
+	}
+
+	db_fetch_duplicates(&select_flt, ITEM_VALUE_TYPE_FLOAT, &duplicates);
+	db_fetch_duplicates(&select_uint, ITEM_VALUE_TYPE_UINT64, &duplicates);
+	db_fetch_duplicates(&select_str, ITEM_VALUE_TYPE_STR, &duplicates);
+	db_fetch_duplicates(&select_log, ITEM_VALUE_TYPE_LOG, &duplicates);
+	db_fetch_duplicates(&select_text, ITEM_VALUE_TYPE_TEXT, &duplicates);
+
+	vc_flag_duplicates(&history_index, &duplicates);
+
+	zbx_vector_ptr_clear_ext(&duplicates, (zbx_clean_func_t)zbx_ptr_free);
+	zbx_vector_ptr_destroy(&duplicates);
+	zbx_vector_ptr_destroy(&history_index);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+static int	add_history(ZBX_DC_HISTORY *history, int history_num, zbx_vector_ptr_t *history_values, int *ret_flush)
+{
+	int	i, ret = SUCCEED;
+
+	for (i = 0; i < history_num; i++)
+	{
+		ZBX_DC_HISTORY	*h = &history[i];
+
+		if (0 != (ZBX_DC_FLAGS_NOT_FOR_HISTORY & h->flags))
+			continue;
+
+		zbx_vector_ptr_append(history_values, h);
+	}
+
+	if (0 != history_values->values_num)
+		ret = zbx_vc_add_values(history_values, ret_flush);
+
+	return ret;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: DBmass_add_history                                               *
@@ -2212,7 +2370,7 @@ static void	DBmass_proxy_update_items(zbx_vector_ptr_t *item_diff)
  ******************************************************************************/
 static int	DBmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 {
-	int			i, ret = SUCCEED;
+	int			ret, ret_flush = FLUSH_SUCCEED, num;
 	zbx_vector_ptr_t	history_values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -2220,18 +2378,16 @@ static int	DBmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 	zbx_vector_ptr_create(&history_values);
 	zbx_vector_ptr_reserve(&history_values, history_num);
 
-	for (i = 0; i < history_num; i++)
+	if (FAIL == (ret = add_history(history, history_num, &history_values, &ret_flush)) &&
+			FLUSH_DUPL_REJECTED == ret_flush)
 	{
-		ZBX_DC_HISTORY	*h = &history[i];
+		num = history_values.values_num;
+		remove_history_duplicates(&history_values);
+		zbx_vector_ptr_clear(&history_values);
 
-		if (0 != (ZBX_DC_FLAGS_NOT_FOR_HISTORY & h->flags))
-			continue;
-
-		zbx_vector_ptr_append(&history_values, h);
+		if (SUCCEED == (ret = add_history(history, history_num, &history_values, &ret_flush)))
+			zabbix_log(LOG_LEVEL_WARNING, "skipped %d duplicates", num - history_values.values_num);
 	}
-
-	if (0 != history_values.values_num)
-		ret = zbx_vc_add_values(&history_values);
 
 	zbx_vector_ptr_destroy(&history_values);
 

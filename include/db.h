@@ -692,6 +692,7 @@ int	DBtable_exists(const char *table_name);
 int	DBfield_exists(const char *table_name, const char *field_name);
 #ifndef HAVE_SQLITE3
 int	DBindex_exists(const char *table_name, const char *index_name);
+int	DBpk_exists(const char *table_name);
 #endif
 
 int	DBprepare_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids, char **sql,
