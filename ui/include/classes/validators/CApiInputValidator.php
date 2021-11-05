@@ -64,11 +64,10 @@ class CApiInputValidator {
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
-	 * @param array  $parent_data
 	 *
 	 * @return bool
 	 */
-	private static function validateData($rule, &$data, $path, &$error, array $parent_data = null) {
+	private static function validateData($rule, &$data, $path, &$error) {
 		switch ($rule['type']) {
 			case API_CALC_FORMULA:
 				return self::validateCalcFormula($rule, $data, $path, $error);
@@ -1140,7 +1139,7 @@ class CApiInputValidator {
 	/**
 	 * Object validator.
 	 *
-	 * @param array  $rul
+	 * @param array  $rule
 	 * @param int    $rule['flags']                                   (optional) API_ALLOW_NULL
 	 * @param array  $rule['fields']
 	 * @param int    $rule['fields'][<field_name>]['flags']           (optional) API_REQUIRED, API_DEPRECATED,
@@ -1269,7 +1268,8 @@ class CApiInputValidator {
 			return self::validateData($rules, $data, $path, $error)
 				&& self::validateDataUniqueness($rules, $data, $path, $error);
 		}
-		elseif (is_string($data)) {
+
+		if (is_string($data)) {
 			$in = ($flags & API_ALLOW_COUNT) ? implode(',', [API_OUTPUT_EXTEND, API_OUTPUT_COUNT]) : API_OUTPUT_EXTEND;
 
 			return self::validateData(['type' => API_STRING_UTF8, 'in' => $in], $data, $path, $error);
