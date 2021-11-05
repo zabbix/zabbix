@@ -8766,7 +8766,7 @@ return [
 			'dbversionid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
-				'length' => 1
+				'length' => 20
 			],
 			'mandatory' => [
 				'null' => false,
