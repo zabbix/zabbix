@@ -221,6 +221,9 @@ class CApiInputValidator {
 
 			case API_EXEC_PARAMS:
 				return self::validateExecParams($rule, $data, $path, $error);
+
+			case API_LAT_LNG_ZOOM:
+				return self::validateLatLngZoom($rule, $data, $path, $error);
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
@@ -287,6 +290,7 @@ class CApiInputValidator {
 			case API_IMAGE:
 			case API_EXEC_PARAMS:
 			case API_UNEXPECTED:
+			case API_LAT_LNG_ZOOM:
 				return true;
 
 			case API_OBJECT:
@@ -2768,6 +2772,48 @@ class CApiInputValidator {
 
 		if ($data !== '' && mb_substr($data, -1) !== "\n") {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('the last new line feed is missing'));
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Check if input value matches one of following formats:
+	 *  - <latitude>,<longitude>,<zoom>
+	 *  - <latitude>,<longitude>
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['length']  (optional)
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateLatLngZoom(array $rule, &$data, string $path, string &$error): bool {
+		if ($data === '') {
+			return true;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		$geoloc_parser = new CGeomapCoordinatesParser();
+
+		if ($geoloc_parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+				_('geographical coordinates (values of comma separated latitude and longitude) are expected')
+			);
+			return false;
+		}
+
+		$max_zoom = CSettingsHelper::get(CSettingsHelper::GEOMAPS_MAX_ZOOM);
+		if (array_key_exists('zoom', $geoloc_parser->result) && $geoloc_parser->result['zoom'] > $max_zoom) {
+			$error = _s('Invalid zoomparameter "%1$s": %2$s.', $path,
+				_s('zoom level must be between "%1$s" and "%2$s"', 0, $max_zoom)
+			);
 			return false;
 		}
 
