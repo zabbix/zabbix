@@ -36,7 +36,9 @@ class testPageReportsSystemInformation extends testSystemInformation {
 	 * @onBefore prepareHANodeData
 	 */
 	public function testPageReportsSystemInformation_checkEnabledHA() {
-		$this->checkEnabledHACluster();
+		$skip_fields = $this->checkEnabledHACluster();
+
+		$this->assertScreenshotExcept(null, $skip_fields, 'report_with_ha');
 	}
 
 	/**

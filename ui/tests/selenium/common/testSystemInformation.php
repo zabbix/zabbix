@@ -112,6 +112,8 @@ class testSystemInformation extends CWebTest {
 	 * @onBefore prepareHANodeData
 	 *
 	 * @param array $dashboardid	id of the dashboard that the widgets are located in
+	 *
+	 * @return array
 	 */
 	public function checkEnabledHACluster($dashboardid = null) {
 		$url = (!$dashboardid) ? 'zabbix.php?action=report.status' : 'zabbix.php?action=dashboard.view&dashboardid='.$dashboardid;
@@ -172,14 +174,9 @@ class testSystemInformation extends CWebTest {
 		$this->assertEquals($DB['SERVER'].':'.$DB['PORT'], $server_address->getText());
 		$skip_fields[] = $server_address;
 
+		// Hide the footer as it contains zabbix version.
 		if (!$dashboardid) {
 			$skip_fields[] = $this->query('xpath://footer')->one();
-			$screenshot_name = 'report_with_ha';
-			$area = null;
-		}
-		else {
-			$screenshot_name = 'widgets_with_ha';
-			$area = $dashboard;
 		}
 
 		// Check and hide the text of messages as they contain ip addresses of the current host.
@@ -195,7 +192,7 @@ class testSystemInformation extends CWebTest {
 			$skip_fields[] = $message;
 		}
 
-		$this->assertScreenshotExcept($area, $skip_fields, $screenshot_name);
+		return $skip_fields;
 	}
 
 	/**

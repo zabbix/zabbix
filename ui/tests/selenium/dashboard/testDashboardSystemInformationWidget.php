@@ -160,7 +160,8 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 	 * @onBefore prepareHANodeData
 	 */
 	public function testDashboardSystemInformationWidget_checkEnabledHA() {
-		$this->checkEnabledHACluster(self::$dashboardid);
+		$skip_fields = $this->checkEnabledHACluster(self::$dashboardid);
+		$this->assertScreenshotExcept(CDashboardElement::find()->one(), $skip_fields, 'widgets_with_ha');
 	}
 
 	/**
