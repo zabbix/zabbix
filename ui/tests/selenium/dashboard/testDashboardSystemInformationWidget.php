@@ -171,7 +171,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 	 *
 	 * @onBefore changeFailoverDelay
 	 */
-	public function testPageReportsSystemInformation_checkServerStatus() {
+	public function testDashboardSystemInformationWidget_checkServerStatus() {
 		$this->checkServerStatusAfterFailover(self::$dashboardid);
 	}
 
@@ -199,7 +199,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 	 *
 	 * @dataProvider getUserData
 	 */
-	public function testPageReportsSystemInformation_checkHAPermissions($data) {
+	public function testDashboardSystemInformationWidget_checkHAPermissions($data) {
 		$this->page->userLogin($data['user'], $data['password']);
 		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
 

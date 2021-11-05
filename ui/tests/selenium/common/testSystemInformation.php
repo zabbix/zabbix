@@ -109,8 +109,6 @@ class testSystemInformation extends CWebTest {
 	/**
 	 * Function that checks how a running HA cluster info is displayed in system information widget or report.
 	 *
-	 * @onBefore prepareHANodeData
-	 *
 	 * @param array $dashboardid	id of the dashboard that the widgets are located in
 	 *
 	 * @return array
@@ -197,10 +195,6 @@ class testSystemInformation extends CWebTest {
 
 	/**
 	 * Function checks that zabbix server status is updated after failover delay passes and frontend config is re-validated.
-	 *
-	 * @depends testPageReportsSystemInformation_populatedHANodeTable
-	 *
-	 * @onBefore changeFailoverDelay
 	 */
 	public function checkServerStatusAfterFailover($dashboardid = null) {
 		$url = (!$dashboardid) ? 'zabbix.php?action=report.status' : 'zabbix.php?action=dashboard.view&dashboardid='.$dashboardid;
