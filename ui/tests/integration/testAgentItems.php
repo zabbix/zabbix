@@ -771,7 +771,12 @@ class testAgentItems extends CIntegrationTest {
 						$this->arrcmpr($jsonval, $item['result'], $item['key']);
 					} elseif ($item['json'] === JSON_ARRAY_COMPARE_LEFT) {
 						foreach ($item['result'] as $result_key => $result_value) {
-							$this->arrcmpr($result_value, $jsonval[$result_key], $item['key']);
+							$found = false;
+							foreach ($jsonval as $jsonval_key => $jsonval_value)
+							{
+								$found = $found || $this->arrfind($result_value, $jsonval_value);
+							}
+							self::assertEquals($found, true, 'Value (result_key: '.$result_key.') is not found for '.$item['key']);
 						}
 					} elseif ($item['json'] === JSON_ARRAY_COMPARE_RIGHT) {
 						foreach ($jsonval as $jsonval_key => $jsonval_value) {
@@ -884,6 +889,40 @@ class testAgentItems extends CIntegrationTest {
 				self::assertEquals($array_value, $cmpr[$array_key], 'Value (array key: '.$array_key.') is not expected for '.$key);
 			}
 		}
+	}
+	
+	/**
+	 * Find arrays fields.
+	 *
+	 * @static
+	 *
+	 * @param array $array  array with mandatory fields
+	 * @param array $cmpr_array	array to find object in
+	 * @param string $key	item key
+	 */
+	public static function arrfind(array $array, array $cmpr) {
+		foreach ($array as $array_key => $array_value) {
+			if(!array_key_exists($array_key, $cmpr)){
+				return false;
+			}
+
+			if (is_array($array_value)) {
+				if (!is_array($cmpr[$array_key])) {
+					return false;
+				}
+
+				self::arrfind($array_value, $cmpr[$array_key]);
+			} else {
+				if (is_array($cmpr[$array_key])) {
+					return false;
+				}
+
+				if ($array_value != $cmpr[$array_key]){
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 
 	/**
