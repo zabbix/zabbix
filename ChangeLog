@@ -3594,6 +3594,8 @@ Changes for 4.0.36rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-19926] fixed Zabbix agent crashing when reading event log on Windows Server 2022 (vso)
+.......PS. [ZBX-20032] fixed server crash when restarting monitored vmware vc (MVekslers)
 ........S. [ZBX-19872] removed redundant escaping in XML data of HTTP agent POST request (asestakovs)
 
 --------------------------------------------------------------------------------
