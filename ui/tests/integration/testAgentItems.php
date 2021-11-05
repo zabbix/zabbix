@@ -890,7 +890,7 @@ class testAgentItems extends CIntegrationTest {
 			}
 		}
 	}
-	
+
 	/**
 	 * Find arrays fields.
 	 *
