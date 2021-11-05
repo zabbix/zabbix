@@ -120,7 +120,11 @@ class CWidgetHelper {
 				->setAsteriskMark(self::isAriaRequired($field));
 		}
 
-		return (new CLabel($field->getLabel(), $field->getName()))
+		$help_icon = property_exists($field, 'help_text')
+			? makeHelpIcon($field->getHelpText())
+			: null;
+
+		return (new CLabel([$field->getLabel(), $help_icon], $field->getName()))
 			->setAsteriskMark(self::isAriaRequired($field));
 	}
 
@@ -148,6 +152,17 @@ class CWidgetHelper {
 		return (new CTextBox($field->getName(), $field->getValue()))
 			->setAriaRequired(self::isAriaRequired($field))
 			->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
+			->setAttribute('placeholder', $field->getPlaceholder())
+			->setWidth($field->getWidth());
+	}
+
+	/**
+	 * @param CWidgetFieldLatLng $field
+	 *
+	 * @return CTextBox
+	 */
+	public static function getLatLngZoomBox($field) {
+		return (new CTextBox($field->getName(), $field->getValue()))
 			->setAttribute('placeholder', $field->getPlaceholder())
 			->setWidth($field->getWidth());
 	}
