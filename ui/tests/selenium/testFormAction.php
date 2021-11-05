@@ -99,7 +99,6 @@ class testFormAction extends CLegacyWebTest {
 						'esc_period' => 0,
 						'esc_step_from' => 1,
 						'esc_step_to' => 1,
-						'evaltype' => 0,
 						'opmessage' => [
 							'default_msg' => 1,
 							'mediatypeid' => 0
@@ -117,8 +116,7 @@ class testFormAction extends CLegacyWebTest {
 						'opmessage' => [
 							'default_msg' => 0,
 							'subject' => 'Subject',
-							'message' => 'Message',
-							'mediatypeid' => 0
+							'message' => 'Message'
 						]
 					]
 				],
@@ -1451,7 +1449,7 @@ class testFormAction extends CLegacyWebTest {
 					'esc_period' => '666',
 					'error_title' => 'Cannot add action',
 					'errors' => [
-						'Action "No operations action" no operations defined.'
+						'No operations defined for action "No operations action".'
 					]
 				]
 			]

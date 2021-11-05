@@ -96,6 +96,7 @@ int	zbx_db_txn_level(void);
 int	zbx_db_txn_error(void);
 int	zbx_db_txn_end_error(void);
 const char	*zbx_db_last_strerr(void);
+zbx_err_codes_t	zbx_db_last_errcode(void);
 
 #ifdef HAVE_POSTGRESQL
 int	zbx_tsdb_get_version(void);
@@ -210,6 +211,8 @@ struct zbx_db_version_info_t
 	const char		*friendly_min_supported_version;
 
 	zbx_db_version_status_t	flag;
+
+	int			history_pk;
 };
 
 void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info);

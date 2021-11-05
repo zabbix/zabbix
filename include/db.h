@@ -78,7 +78,7 @@ struct	_DC_TRIGGER;
 
 #define TRIGGER_OPDATA_LEN		255
 #define TRIGGER_URL_LEN			255
-#define TRIGGER_DESCRIPTION_LEN		255
+#define TRIGGER_DESCRIPTION_LEN		2048
 #define TRIGGER_EXPRESSION_LEN		2048
 #define TRIGGER_EXPRESSION_LEN_MAX	(TRIGGER_EXPRESSION_LEN + 1)
 #if defined(HAVE_ORACLE)
@@ -205,7 +205,7 @@ struct	_DC_TRIGGER;
 
 #define PROXY_DHISTORY_VALUE_LEN	255
 
-#define ITEM_PREPROC_PARAMS_LEN		255
+#define ITEM_PREPROC_PARAMS_LEN		65535
 
 #define EVENT_NAME_LEN			2048
 
@@ -692,6 +692,7 @@ int	DBtable_exists(const char *table_name);
 int	DBfield_exists(const char *table_name, const char *field_name);
 #ifndef HAVE_SQLITE3
 int	DBindex_exists(const char *table_name, const char *index_name);
+int	DBpk_exists(const char *table_name);
 #endif
 
 int	DBprepare_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids, char **sql,

@@ -908,33 +908,41 @@ static int	DBpatch_5050086(void)
 
 static int	DBpatch_5050087(void)
 {
-	const ZBX_FIELD	field = {"geomaps_tile_provider", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	if (ZBX_DB_OK > DBexecute("alter table dbversion add primary key (mandatory,optional)"))
+		return FAIL;
 
-	return DBadd_field("config", &field);
+	return SUCCEED;
 }
 
 static int	DBpatch_5050088(void)
 {
-	const ZBX_FIELD	field = {"geomaps_tile_url", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"geomaps_tile_provider", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
 static int	DBpatch_5050089(void)
 {
-	const ZBX_FIELD	field = {"geomaps_max_zoom", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"geomaps_tile_url", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
 static int	DBpatch_5050090(void)
 {
-	const ZBX_FIELD	field = {"geomaps_attribution", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"geomaps_max_zoom", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
 static int	DBpatch_5050091(void)
+{
+	const ZBX_FIELD	field = {"geomaps_attribution", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_5050092(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -1031,5 +1039,6 @@ DBPATCH_ADD(5050088, 0, 1)
 DBPATCH_ADD(5050089, 0, 1)
 DBPATCH_ADD(5050090, 0, 1)
 DBPATCH_ADD(5050091, 0, 1)
+DBPATCH_ADD(5050092, 0, 1)
 
 DBPATCH_END()
