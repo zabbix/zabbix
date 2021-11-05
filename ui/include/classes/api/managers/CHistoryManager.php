@@ -213,7 +213,7 @@ class CHistoryManager {
 	}
 
 	/**
-	 * SQL specific implementation of getLastValues that makes use primary key existence in history tables.
+	 * SQL specific implementation of getLastValues that makes use of primary key existence in history tables.
 	 *
 	 * @see CHistoryManager::getLastValues
 	 * @return array  Of itemid => [up to $limit values].
@@ -494,7 +494,7 @@ class CHistoryManager {
 	}
 
 	/**
-	 * Implementation that uses existance of primary key on history tables.
+	 * Implementation that uses existence of primary key in history tables.
 	 * @see CHistoryManager->getValueAtFromSql()
 	 *
 	 * @param string $item['itemid']
