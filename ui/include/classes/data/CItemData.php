@@ -29,6 +29,7 @@ final class CItemData {
 			'agent.hostmetadata',
 			'agent.hostname',
 			'agent.ping',
+			'agent.variant',
 			'agent.version',
 			'kernel.maxfiles',
 			'kernel.maxproc',
@@ -121,6 +122,7 @@ final class CItemData {
 			'agent.hostmetadata',
 			'agent.hostname',
 			'agent.ping',
+			'agent.variant',
 			'agent.version',
 			'eventlog[name,<regexp>,<severity>,<source>,<eventid>,<maxlines>,<mode>]',
 			'kernel.maxfiles',
@@ -836,6 +838,10 @@ final class CItemData {
 			],
 			'agent.ping' => [
 				'description' => _('Agent availability check. Returns nothing - unavailable; 1 - available'),
+				'value_type' => ITEM_VALUE_TYPE_UINT64
+			],
+			'agent.variant' => [
+				'description' => _('Agent variant check. Returns 1 - for Zabbix agent; 2 - for Zabbix agent 2'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'agent.version' => [
