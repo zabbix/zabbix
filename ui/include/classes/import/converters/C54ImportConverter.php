@@ -34,6 +34,180 @@ class C54ImportConverter extends CConverter {
 	public function convert(array $data): array {
 		$data['zabbix_export']['version'] = '6.0';
 
+		if (array_key_exists('hosts', $data['zabbix_export'])) {
+			$data['zabbix_export']['hosts'] = self::convertHosts($data['zabbix_export']['hosts']);
+		}
+
+		if (array_key_exists('templates', $data['zabbix_export'])) {
+			$data['zabbix_export']['templates'] = self::convertTemplates($data['zabbix_export']['templates']);
+		}
+
+		if (array_key_exists('graphs', $data['zabbix_export'])) {
+			$data['zabbix_export']['graphs'] = self::convertGraphs($data['zabbix_export']['graphs']);
+		}
+
+		if (array_key_exists('maps', $data['zabbix_export'])) {
+			$data['zabbix_export']['maps'] = self::convertMaps($data['zabbix_export']['maps']);
+		}
+
+		if (array_key_exists('media_types', $data['zabbix_export'])) {
+			$data['zabbix_export']['media_types'] = self::convertMediaTypes($data['zabbix_export']['media_types']);
+		}
+
 		return $data;
+	}
+
+	/**
+	 * Convert function macros "{host:key.func(<param>)}" to expression macros "{?func(/host/key<, param>)}".
+	 *
+	 * @static
+	 *
+	 * @param string $text
+	 *
+	 * @return string
+	 */
+	private static function convertFunctionMacros(string $text): string {
+		return (new C54SimpleMacroConverter())->convert($text);
+	}
+
+	/**
+	 * Convert hosts.
+	 *
+	 * @static
+	 *
+	 * @param array $hosts
+	 *
+	 * @return array
+	 */
+	private static function convertHosts(array $hosts): array {
+		foreach ($hosts as &$host) {
+			if (array_key_exists('discovery_rules', $host)) {
+				$host['discovery_rules'] = self::convertDiscoveryRules($host['discovery_rules']);
+			}
+		}
+		unset($host);
+
+		return $hosts;
+	}
+
+	/**
+	 * Convert templates.
+	 *
+	 * @static
+	 *
+	 * @param array $templates
+	 *
+	 * @return array
+	 */
+	private static function convertTemplates(array $templates): array {
+		foreach ($templates as &$template) {
+			if (array_key_exists('discovery_rules', $template)) {
+				$template['discovery_rules'] = self::convertDiscoveryRules($template['discovery_rules']);
+			}
+		}
+		unset($template);
+
+		return $templates;
+	}
+
+	/**
+	 * Convert discover rules.
+	 *
+	 * @param array $discovery_rules
+	 *
+	 * @return array
+	 */
+	private static function convertDiscoveryRules(array $discovery_rules): array {
+		foreach ($discovery_rules as &$discovery_rule) {
+			if (array_key_exists('graph_prototypes', $discovery_rule)) {
+				$discovery_rule['graph_prototypes'] = self::convertGraphs($discovery_rule['graph_prototypes']);
+			}
+		}
+		unset($discovery_rule);
+
+		return $discovery_rules;
+	}
+
+	/**
+	 * Convert graphs.
+	 *
+	 * @static
+	 *
+	 * @param array $graphs
+	 *
+	 * @return array
+	 */
+	private static function convertGraphs(array $graphs): array {
+		foreach ($graphs as &$graph) {
+			$graph['name'] = self::convertFunctionMacros($graph['name']);
+		}
+		unset($graph);
+
+		return $graphs;
+	}
+
+	/**
+	 * Convert maps.
+	 *
+	 * @static
+	 *
+	 * @param array $maps
+	 *
+	 * @return array
+	 */
+	private static function convertMaps(array $maps): array {
+		foreach ($maps as &$map) {
+			$map['label_string_host'] = self::convertFunctionMacros($map['label_string_host']);
+			$map['label_string_map'] = self::convertFunctionMacros($map['label_string_map']);
+			$map['label_string_trigger'] = self::convertFunctionMacros($map['label_string_trigger']);
+			$map['label_string_hostgroup'] = self::convertFunctionMacros($map['label_string_hostgroup']);
+			$map['label_string_image'] = self::convertFunctionMacros($map['label_string_image']);
+
+			foreach ($map['selements'] as &$selement) {
+				$selement['label'] = self::convertFunctionMacros($selement['label']);
+			}
+			unset($selement);
+
+			foreach ($map['shapes'] as &$shape) {
+				$shape['text'] = self::convertFunctionMacros($shape['text']);
+			}
+			unset($shape);
+
+			foreach ($map['links'] as &$link) {
+				$link['label'] = self::convertFunctionMacros($link['label']);
+			}
+			unset($link);
+		}
+		unset($map);
+
+		return $maps;
+	}
+
+	/**
+	 * Convert media types.
+	 *
+	 * @static
+	 *
+	 * @param array $media_types
+	 *
+	 * @return array
+	 */
+	private static function convertMediaTypes(array $media_types): array {
+		foreach ($media_types as &$media_type) {
+			if (array_key_exists('message_templates', $media_type)) {
+				foreach ($media_type['message_templates'] as &$message_template) {
+					if (array_key_exists('subject', $message_template)) {
+						$message_template['subject'] = self::convertFunctionMacros($message_template['subject']);
+					}
+					if (array_key_exists('message', $message_template)) {
+						$message_template['message'] = self::convertFunctionMacros($message_template['message']);
+					}
+				}
+				unset($message_template);
+			}
+		}
+		unset($media_type);
+
+		return $media_types;
 	}
 }

@@ -27,8 +27,9 @@
 #include "dbcache.h"
 
 extern int		CONFIG_CONFSYNCER_FREQUENCY;
-extern unsigned char	process_type, program_type;
-extern int		server_num, process_num;
+extern ZBX_THREAD_LOCAL unsigned char	process_type;
+extern unsigned char			program_type;
+extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 static volatile sig_atomic_t	secrets_reload;
 

@@ -106,7 +106,7 @@ foreach ($data['groups'] as $group) {
 		$problematic_count = (new CLinkAction($group['hosts_problematic_count']))
 			->setHint(makeProblemHostsHintBox($group['hosts_problematic_list'], $data, $url_host))
 			->setAttribute('aria-label', _xs('%1$s, Severity, %2$s', 'screen reader',
-				$group['hosts_problematic_count'], getSeverityName($group['highest_severity'])
+				$group['hosts_problematic_count'], CSeverityHelper::getName((int) $group['highest_severity'])
 			));
 	}
 
@@ -114,7 +114,8 @@ foreach ($data['groups'] as $group) {
 	switch ($data['filter']['ext_ack']) {
 		case EXTACK_OPTION_ALL:
 			if ($group['hosts_problematic_count'] != 0) {
-				$group_row[] = (new CCol($problematic_count))->addClass(getSeverityStyle($group['highest_severity']));
+				$group_row[] = (new CCol($problematic_count))
+					->addClass(CSeverityHelper::getStyle((int) $group['highest_severity']));
 			}
 			else {
 				$group_row[] = '';
@@ -125,7 +126,7 @@ foreach ($data['groups'] as $group) {
 			if ($group['hosts_problematic_count'] != 0) {
 				$unack_span = ($last_unack_count !== null) ? [$last_unack_count, ' '._('of').' '] : null;
 				$group_row[] = (new CCol([$unack_span, $problematic_count]))
-					->addClass(getSeverityStyle($group['highest_severity']));
+					->addClass(CSeverityHelper::getStyle((int) $group['highest_severity']));
 			}
 			else {
 				$group_row[] = '';
@@ -134,7 +135,8 @@ foreach ($data['groups'] as $group) {
 
 		case EXTACK_OPTION_UNACK:
 			if ($group['hosts_problematic_unack_count'] != 0) {
-				$group_row[] = (new CCol($last_unack_count))->addClass(getSeverityStyle($group['highest_severity']));
+				$group_row[] = (new CCol($last_unack_count))
+					->addClass(CSeverityHelper::getStyle((int) $group['highest_severity']));
 			}
 			else {
 				$group_row[] = '';

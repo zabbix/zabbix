@@ -57,6 +57,9 @@ function local_showHeader(array $data): void {
 		'javascript' => [
 			'files' => $data['javascript']['files']
 		],
+		'stylesheet' => [
+			'files' => $data['stylesheet']['files']
+		],
 		'page' => [
 			'title' => $data['page']['title']
 		],
@@ -105,5 +108,9 @@ echo $data['main_block'];
 makeServerStatusOutput()->show();
 
 local_showFooter($data);
+
+require_once 'include/views/js/common.init.js.php';
+
+insertPagePostJs();
 
 echo '</div></body></html>';

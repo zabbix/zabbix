@@ -616,7 +616,7 @@ class CItemPrototype extends CItemGeneral {
 
 		CItemPrototypeManager::delete($itemids);
 
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM_PROTOTYPE, $db_items);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_ITEM_PROTOTYPE, $db_items);
 
 		return ['prototypeids' => $itemids];
 	}

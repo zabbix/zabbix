@@ -249,14 +249,14 @@ class CUserMacro extends CApiService {
 	public function createGlobal(array $globalmacros) {
 		$this->validateCreateGlobal($globalmacros);
 
-		$globalmacroids = DB::insertBatch('globalmacro', $globalmacros);
+		$globalmacroids = DB::insert('globalmacro', $globalmacros);
 
 		foreach ($globalmacros as $index => &$globalmacro) {
 			$globalmacro['globalmacroid'] = $globalmacroids[$index];
 		}
 		unset($globalmacro);
 
-		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MACRO, $globalmacros);
+		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_MACRO, $globalmacros);
 
 		return ['globalmacroids' => $globalmacroids];
 	}
@@ -267,16 +267,12 @@ class CUserMacro extends CApiService {
 	 * @throws APIException if the input is invalid.
 	 */
 	private function validateCreateGlobal(array &$globalmacros) {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-		}
-
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['macro']], 'fields' => [
 			'macro' =>			['type' => API_USER_MACRO, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('globalmacro', 'macro')],
 			'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT]), 'default' => ZBX_MACRO_TYPE_TEXT],
 			'value' =>			['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
 									['if' => ['field' => 'type', 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('globalmacro', 'value')],
-									['if' => ['field' => 'type', 'in' => implode(',', [ZBX_MACRO_TYPE_VAULT])], 'type' => API_VAULT_SECRET, 'length' => DB::getFieldLength('globalmacro', 'value')]
+									['if' => ['field' => 'type', 'in' => ZBX_MACRO_TYPE_VAULT], 'type' => API_VAULT_SECRET, 'length' => DB::getFieldLength('globalmacro', 'value')]
 			]],
 			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('globalmacro', 'description')]
 		]];
@@ -315,7 +311,7 @@ class CUserMacro extends CApiService {
 			DB::update('globalmacro', $upd_globalmacros);
 		}
 
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MACRO, $globalmacros, $db_globalmacros);
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_MACRO, $globalmacros, $db_globalmacros);
 
 		return ['globalmacroids' => array_column($globalmacros, 'globalmacroid')];
 	}
@@ -327,10 +323,6 @@ class CUserMacro extends CApiService {
 	 * @throws APIException if the input is invalid
 	 */
 	private function validateUpdateGlobal(array &$globalmacros, array &$db_globalmacros = null) {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-		}
-
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['globalmacroid'], ['macro']], 'fields' => [
 			'globalmacroid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 			'macro' =>			['type' => API_USER_MACRO, 'length' => DB::getFieldLength('globalmacro', 'macro')],
@@ -405,13 +397,12 @@ class CUserMacro extends CApiService {
 			return;
 		}
 
-		$db_globalmacros = DB::select('globalmacro', [
-			'output' => ['macro']
-		]);
-
 		$db_macros = [];
 
-		foreach ($db_globalmacros as $db_globalmacro) {
+		$options = ['output' => ['macro']];
+		$db_globalmacros = DBselect(DB::makeSql('globalmacro', $options));
+
+		while ($db_globalmacro = DBfetch($db_globalmacros)) {
 			$db_macros[CApiInputValidator::trimMacro($db_globalmacro['macro'])] = true;
 		}
 
@@ -432,7 +423,7 @@ class CUserMacro extends CApiService {
 
 		DB::delete('globalmacro', ['globalmacroid' => $globalmacroids]);
 
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MACRO, $db_globalmacros);
+		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_MACRO, $db_globalmacros);
 
 		return ['globalmacroids' => $globalmacroids];
 	}
@@ -443,10 +434,6 @@ class CUserMacro extends CApiService {
 	 * @throws APIException if the input is invalid.
 	 */
 	private function validateDeleteGlobal(array &$globalmacroids, array &$db_globalmacros = null) {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-		}
-
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $globalmacroids, '/', $error)) {
@@ -1097,7 +1084,7 @@ class CUserMacro extends CApiService {
 		return $result;
 	}
 
-	protected function unsetExtraFields(array $objects, array $fields, $output) {
+	protected function unsetExtraFields(array $objects, array $fields, $output = []) {
 		foreach ($objects as &$object) {
 			if ($object['type'] == ZBX_MACRO_TYPE_SECRET) {
 				unset($object['value']);

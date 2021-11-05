@@ -31,8 +31,6 @@ class CTemplateDashboard extends CDashboardGeneral {
 		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
 	];
 
-	protected const AUDIT_RESOURCE = AUDIT_RESOURCE_TEMPLATE_DASHBOARD;
-
 	/**
 	 * @param array $options
 	 *
@@ -203,7 +201,7 @@ class CTemplateDashboard extends CDashboardGeneral {
 
 		$this->updatePages($dashboards);
 
-		$this->addAuditBulk(AUDIT_ACTION_ADD, self::AUDIT_RESOURCE, $dashboards);
+		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_TEMPLATE_DASHBOARD, $dashboards);
 
 		return ['dashboardids' => $dashboardids];
 	}
@@ -235,7 +233,7 @@ class CTemplateDashboard extends CDashboardGeneral {
 
 		$this->updatePages($dashboards, $db_dashboards);
 
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, self::AUDIT_RESOURCE, $dashboards, $db_dashboards);
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_TEMPLATE_DASHBOARD, $dashboards, $db_dashboards);
 
 		return ['dashboardids' => array_column($dashboards, 'dashboardid')];
 	}

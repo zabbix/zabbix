@@ -61,7 +61,7 @@ zabbix_export:
                         Jira.params.url += '/';
                     }
         
-                    Jira.params.url += 'rest/servicedeskapi/latest/';
+                    Jira.params.url += 'rest/servicedeskapi/';
                 }
             },
         

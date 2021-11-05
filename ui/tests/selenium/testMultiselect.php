@@ -26,41 +26,35 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
 class testMultiselect extends CWebTest {
 
 	public function testMultiselect_SuggestExisting() {
-		$this->checkSuggest('zabbix.php?action=problem.view', 'zbx_filter',
+		$this->checkSuggest('zabbix.php?action=problem.view&filter_reset=1', 'zbx_filter',
 			'Host groups', 'z', 'multiselect-suggest'
 		);
 	}
 
 	public function testMultiselect_SuggestNoMatches() {
-		$this->checkSuggest('zabbix.php?action=problem.view','zbx_filter',
+		$this->checkSuggest('zabbix.php?action=problem.view&filter_reset=1','zbx_filter',
 			'Host groups', 'QQQ', 'multiselect-matches'
 		);
 	}
 
 	public function testMultiselect_SuggestCreateNew() {
-		$this->checkSuggest((new CUrl('zabbix.php'))
-			->setArgument('action', 'host.create')
-			->getUrl(),
-			'hostsForm', 'Groups', 'QQQwww', 'multiselect-suggest'
-		);
+		$this->checkSuggest('zabbix.php?action=host.edit','host-form', 'Groups', 'QQQwww', 'multiselect-suggest');
 	}
 
 	public function checkSuggest($link, $query, $name, $string, $class) {
 		$this->page->login()->open($link)->waitUntilReady();
 		$this->page->updateViewport();
-		$form = $this->query('name:'.$query)->asForm()->one();
-		$field = $form->getField($name);
+		$field = $this->query('name:'.$query)->asForm()->one()->getField($name);
 		$element = $field->query('tag:input')->one();
 		$element->type($string);
 		$this->query('class', $class)->waitUntilVisible();
 
-		$this->assertScreenshotExcept($element->parents('class:table-forms')->one(),
-			[$element], $string
-		);
+		$this->assertScreenshotExcept($element->parents('class', (($query === 'host-form') ? 'form-grid' : 'table-forms'))
+				->one(), [$element], $string);
 	}
 
 	public function testMultiselect_NotSuggestAlreadySelected() {
-		$this->page->login()->open('zabbix.php?action=problem.view')->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1')->waitUntilReady();
 		$this->page->updateViewport();
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$field = $form->getField('Host groups');

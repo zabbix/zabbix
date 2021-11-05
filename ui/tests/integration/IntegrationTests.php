@@ -27,6 +27,13 @@ require_once dirname(__FILE__).'/testValuemaps.php';
 require_once dirname(__FILE__).'/testTriggerLinking.php';
 require_once dirname(__FILE__).'/testGraphLinking.php';
 require_once dirname(__FILE__).'/testEscalations.php';
+require_once dirname(__FILE__).'/testComplexServiceStatus.php';
+require_once dirname(__FILE__).'/testServiceRoles.php';
+require_once dirname(__FILE__).'/testExpressionMacros.php';
+require_once dirname(__FILE__).'/testExpressionTriggerMacros.php';
+require_once dirname(__FILE__).'/testAgentItems.php';
+require_once dirname(__FILE__).'/testItemRate.php';
+require_once dirname(__FILE__).'/testHistoryValueDuplicates.php';
 
 class IntegrationTests {
 	public static function suite() {
@@ -40,6 +47,13 @@ class IntegrationTests {
 		$suite->addTestSuite('testTriggerLinking');
 		$suite->addTestSuite('testGraphLinking');
 		$suite->addTestSuite('testEscalations');
+		$suite->addTestSuite('testComplexServiceStatus');
+		$suite->addTestSuite('testServiceRoles');
+		$suite->addTestSuite('testExpressionMacros');
+		$suite->addTestSuite('testExpressionTriggerMacros');
+		$suite->addTestSuite('testAgentItems');
+		$suite->addTestSuite('testItemRate');
+		$suite->addTestSuite('testHistoryValueDuplicates');
 
 		return $suite;
 	}

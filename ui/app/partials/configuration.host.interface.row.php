@@ -70,76 +70,129 @@
 			(new CSimpleButton(_('Remove')))->addClass(ZBX_STYLE_BTN_LINK . ' ' . ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE)
 		))->addClass(ZBX_STYLE_HOST_INTERFACE_CELL . ' ' . ZBX_STYLE_HOST_INTERFACE_CELL_ACTION),
 		(new CDiv(
-			(new CFormList('snmp_details_#{iface.interfaceid}'))
-				->cleanItems()
-				->addRow((new CLabel(_('SNMP version'), 'label_interfaces_#{iface.interfaceid}_details_version'))
+			(new CFormGrid())
+				->setId('snmp_details_#{iface.interfaceid}')
+				->addItem([
+					(new CLabel(_('SNMP version'), 'label_interfaces_#{iface.interfaceid}_details_version'))
 						->setAsteriskMark(),
-					(new CSelect('interfaces[#{iface.interfaceid}][details][version]'))
-						->addOptions(CSelect::createOptionsFromArray([
-							SNMP_V1 => _('SNMPv1'),
-							SNMP_V2C => _('SNMPv2'),
-							SNMP_V3 => _('SNMPv3')
-						]))
-						->setValue(SNMP_V2C)
-						->setFocusableElementId('label_interfaces_#{iface.interfaceid}_details_version')
-						->setId('interfaces_#{iface.interfaceid}_details_version'),
-					'row_snmp_version_#{iface.interfaceid}'
-				)
-				->addRow(
-					(new CLabel(_('SNMP community'), 'interfaces[#{iface.interfaceid}][details][community]'))->setAsteriskMark(),
-					(new CTextBox('interfaces[#{iface.interfaceid}][details][community]', '#{iface.details.community}', false, DB::getFieldLength('interface_snmp', 'community')))
-						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-						->setAriaRequired(),
-					'row_snmp_community_#{iface.interfaceid}'
-				)
-				->addRow(new CLabel(_('Context name'), 'interfaces[#{iface.interfaceid}][details][contextname]'),
-					(new CTextBox('interfaces[#{iface.interfaceid}][details][contextname]', '#{iface.details.contextname}', false, DB::getFieldLength('interface_snmp', 'contextname')))
-						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-					'row_snmpv3_contextname_#{iface.interfaceid}'
-				)
-				->addRow(new CLabel(_('Security name'), 'interfaces[#{iface.interfaceid}][details][securityname]'),
-					(new CTextBox('interfaces[#{iface.interfaceid}][details][securityname]', '#{iface.details.securityname}', false, DB::getFieldLength('interface_snmp', 'securityname')))
-						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-					'row_snmpv3_securityname_#{iface.interfaceid}'
-				)
-				->addRow(new CLabel(_('Security level'), 'label_interfaces_#{iface.interfaceid}_details_securitylevel'),
-					(new CSelect('interfaces[#{iface.interfaceid}][details][securitylevel]'))
-						->addOptions(CSelect::createOptionsFromArray([
-							ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV => 'noAuthNoPriv',
-							ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => 'authNoPriv',
-							ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV => 'authPriv'
-						]))
-						->setValue(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV)
-						->setFocusableElementId('label_interfaces_#{iface.interfaceid}_details_securitylevel')
-						->setId('interfaces_#{iface.interfaceid}_details_securitylevel'),
-					'row_snmpv3_securitylevel_#{iface.interfaceid}'
-				)
-				->addRow(new CLabel(_('Authentication protocol'), 'label-authprotocol-#{iface.interfaceid}'),
-					(new CSelect('interfaces[#{iface.interfaceid}][details][authprotocol]'))
-						->setFocusableElementId('label-authprotocol-#{iface.interfaceid}')
-						->addOptions(CSelect::createOptionsFromArray(getSnmpV3AuthProtocols())),
-					'row_snmpv3_authprotocol_#{iface.interfaceid}'
-				)
-				->addRow(new CLabel(_('Authentication passphrase'), 'interfaces[#{iface.interfaceid}][details][authpassphrase]'),
-					(new CTextBox('interfaces[#{iface.interfaceid}][details][authpassphrase]', '#{iface.details.authpassphrase}', false, DB::getFieldLength('interface_snmp', 'authpassphrase')))
-						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-						->disableAutocomplete(),
-					'row_snmpv3_authpassphrase_#{iface.interfaceid}'
-				)
-				->addRow(new CLabel(_('Privacy protocol'), 'label-privprotocol-#{iface.interfaceid}'),
-					(new CSelect('interfaces[#{iface.interfaceid}][details][privprotocol]'))
-						->setFocusableElementId('label-privprotocol-#{iface.interfaceid}')
-						->addOptions(CSelect::createOptionsFromArray(getSnmpV3PrivProtocols())),
-					'row_snmpv3_privprotocol_#{iface.interfaceid}'
-				)
-				->addRow(new CLabel(_('Privacy passphrase'), 'interfaces[#{iface.interfaceid}][details][privpassphrase]'),
-					(new CTextBox('interfaces[#{iface.interfaceid}][details][privpassphrase]', '#{iface.details.privpassphrase}', false, DB::getFieldLength('interface_snmp', 'privpassphrase')))
-						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-						->disableAutocomplete(),
-					'row_snmpv3_privpassphrase_#{iface.interfaceid}'
-				)
-				->addRow('', (new CCheckBox('interfaces[#{iface.interfaceid}][details][bulk]', SNMP_BULK_ENABLED))->setLabel(_('Use bulk requests'), 'interfaces[#{iface.interfaceid}][details][bulk]'),
-					'row_snmp_bulk_#{iface.interfaceid}'
+					new CFormField(
+						(new CSelect('interfaces[#{iface.interfaceid}][details][version]'))
+							->addOptions(CSelect::createOptionsFromArray([
+								SNMP_V1 => _('SNMPv1'),
+								SNMP_V2C => _('SNMPv2'),
+								SNMP_V3 => _('SNMPv3')
+							]))
+							->setValue(SNMP_V2C)
+							->setFocusableElementId('label_interfaces_#{iface.interfaceid}_details_version')
+							->setId('interfaces_#{iface.interfaceid}_details_version')
+					)
+				])
+				->addItem([
+					(new CLabel(_('SNMP community'), 'interfaces[#{iface.interfaceid}][details][community]'))
+						->setId('snmp_community_label_#{iface.interfaceid}')
+						->setAsteriskMark(),
+					(new CFormField(
+						(new CTextBox('interfaces[#{iface.interfaceid}][details][community]', '#{iface.details.community}',
+								false, DB::getFieldLength('interface_snmp', 'community')
+						))
+							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+							->setAriaRequired()
+					))
+						->setId('snmp_community_field_#{iface.interfaceid}')
+				])
+				->addItem([
+					(new CLabel(_('Context name'), 'interfaces[#{iface.interfaceid}][details][contextname]'))
+						->setId('snmpv3_contextname_label_#{iface.interfaceid}'),
+					(new CFormField(
+						(new CTextBox('interfaces[#{iface.interfaceid}][details][contextname]',
+								'#{iface.details.contextname}', false, DB::getFieldLength('interface_snmp', 'contextname')
+						))
+							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					))
+						->setId('snmpv3_contextname_field_#{iface.interfaceid}')
+				])
+				->addItem([
+					(new CLabel(_('Security name'), 'interfaces[#{iface.interfaceid}][details][securityname]'))
+						->setId('snmpv3_securityname_label_#{iface.interfaceid}'),
+					(new CFormField(
+						(new CTextBox('interfaces[#{iface.interfaceid}][details][securityname]',
+								'#{iface.details.securityname}', false,
+								DB::getFieldLength('interface_snmp', 'securityname')
+						))
+							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					))
+						->setId('snmpv3_securityname_field_#{iface.interfaceid}')
+				])
+				->addItem([
+					(new CLabel(_('Security level'), 'label_interfaces_#{iface.interfaceid}_details_securitylevel'))
+						->setId('snmpv3_securitylevel_label_#{iface.interfaceid}'),
+					(new CFormField(
+						(new CSelect('interfaces[#{iface.interfaceid}][details][securitylevel]'))
+							->addOptions(CSelect::createOptionsFromArray([
+								ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV => 'noAuthNoPriv',
+								ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => 'authNoPriv',
+								ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV => 'authPriv'
+							]))
+							->setValue(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV)
+							->setFocusableElementId('label_interfaces_#{iface.interfaceid}_details_securitylevel')
+							->setId('interfaces_#{iface.interfaceid}_details_securitylevel')
+					))
+						->setId('snmpv3_securitylevel_field_#{iface.interfaceid}')
+				])
+				->addItem([
+					(new CLabel(_('Authentication protocol'), 'label-authprotocol-#{iface.interfaceid}'))
+						->setId('snmpv3_authprotocol_label_#{iface.interfaceid}'),
+					(new CFormField(
+						(new CSelect('interfaces[#{iface.interfaceid}][details][authprotocol]'))
+							->setFocusableElementId('label-authprotocol-#{iface.interfaceid}')
+							->addOptions(CSelect::createOptionsFromArray(getSnmpV3AuthProtocols()))
+							->setId('interfaces_#{iface.interfaceid}_details_authprotocol')
+					))
+						->setId('snmpv3_authprotocol_field_#{iface.interfaceid}')
+				])
+				->addItem([
+					(new CLabel(_('Authentication passphrase'),
+							'interfaces[#{iface.interfaceid}][details][authpassphrase]'
+					))
+						->setId('snmpv3_authpassphrase_label_#{iface.interfaceid}'),
+					(new CFormField(
+						(new CTextBox('interfaces[#{iface.interfaceid}][details][authpassphrase]',
+								'#{iface.details.authpassphrase}', false,
+								DB::getFieldLength('interface_snmp', 'authpassphrase')
+						))
+							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+							->disableAutocomplete()
+					))
+						->setId('snmpv3_authpassphrase_field_#{iface.interfaceid}')
+				])
+				->addItem([
+					(new CLabel(_('Privacy protocol'), 'label-privprotocol-#{iface.interfaceid}'))
+						->setId('snmpv3_privprotocol_label_#{iface.interfaceid}'),
+					(new CFormField(
+						(new CSelect('interfaces[#{iface.interfaceid}][details][privprotocol]'))
+							->setFocusableElementId('label-privprotocol-#{iface.interfaceid}')
+							->addOptions(CSelect::createOptionsFromArray(getSnmpV3PrivProtocols()))
+					))
+						->setId('snmpv3_privprotocol_field_#{iface.interfaceid}')
+				])
+				->addItem([
+					(new CLabel(_('Privacy passphrase'), 'interfaces[#{iface.interfaceid}][details][privpassphrase]'))
+						->setId('snmpv3_privpassphrase_label_#{iface.interfaceid}'),
+					(new CFormField(
+						(new CTextBox('interfaces[#{iface.interfaceid}][details][privpassphrase]',
+								'#{iface.details.privpassphrase}', false,
+							DB::getFieldLength('interface_snmp', 'privpassphrase')
+						))
+							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+							->disableAutocomplete()
+					))
+						->setId('snmpv3_privpassphrase_field_#{iface.interfaceid}')
+				])
+				->addItem(
+					new CFormField(
+						(new CCheckBox('interfaces[#{iface.interfaceid}][details][bulk]', SNMP_BULK_ENABLED))
+							->setLabel(_('Use bulk requests'))
+					)
 				)
 		))
 			->addClass(ZBX_STYLE_HOST_INTERFACE_CELL . ' ' . ZBX_STYLE_HOST_INTERFACE_CELL_DETAILS . ' ' . ZBX_STYLE_LIST_ACCORDION_ITEM_BODY)

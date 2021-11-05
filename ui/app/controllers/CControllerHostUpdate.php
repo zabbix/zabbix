@@ -25,9 +25,20 @@
 class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 
 	protected function checkInput(): bool {
-		$fields = ['hostid' => 'required|db hosts.hostid'] + self::getValidationFields();
+		$ret = $this->validateInput(['hostid' => 'required|db hosts.hostid'] + self::getValidationFields());
 
-		return parent::checkInputFields($fields);
+		if (!$ret) {
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'title' => _('Cannot update host'),
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])])
+			);
+		}
+
+		return $ret;
 	}
 
 	protected function checkPermissions(): bool {
@@ -45,7 +56,7 @@ class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 		]);
 
 		if (!$this->host) {
-			access_deny(ACCESS_DENY_OBJECT);
+			return false;
 		}
 
 		$this->host = $this->host[0];
@@ -54,84 +65,92 @@ class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 	}
 
 	protected function doAction(): void {
+		$result = false;
+
+		try {
+			DBstart();
+
+			$inventory_enabled = false;
+			if ($this->getInput('inventory_mode', $this->host['inventory_mode']) != HOST_INVENTORY_DISABLED) {
+				$inventory_enabled = true;
+			}
+
+			$host = [
+				'hostid' => $this->host['hostid'],
+				'host' => $this->getInput('host', $this->host['host']),
+				'name' => $this->getInput('visiblename', $this->host['name']),
+				'status' => $this->getInput('status', $this->host['status']),
+				'proxy_hostid' => $this->getInput('proxy_hostid', $this->host['proxy_hostid']),
+				'groups' => $this->processHostGroups($this->getInput('groups', [])),
+				'interfaces' => $this->processHostInterfaces($this->getInput('interfaces', [])),
+				'tags' => $this->processTags($this->getInput('tags', [])),
+				'templates' => $this->processTemplates([
+					$this->getInput('add_templates', []), $this->getInput('templates', [])
+				]),
+				'templates_clear' => zbx_toObject($this->getInput('clear_templates', []), 'templateid'),
+				'macros' => $this->processUserMacros($this->getInput('macros', [])),
+				'inventory' => $inventory_enabled ? $this->getInput('host_inventory', []) : [],
+				'tls_connect' => $this->getInput('tls_connect', $this->host['tls_connect']),
+				'tls_accept' => $this->getInput('tls_accept', $this->host['tls_accept'])
+			];
+
+			$host_properties = [
+				'description', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'tls_subject',
+				'tls_issuer', 'inventory_mode'
+			];
+
+			foreach ($host_properties as $prop) {
+				if (!array_key_exists($prop, $this->host) || $this->getInput($prop, '') !== $this->host[$prop]) {
+					$host[$prop] = $this->getInput($prop, '');
+				}
+			}
+
+			$this->getInputs($host, ['tls_psk_identity', 'tls_psk']);
+
+			if ($host['tls_connect'] != HOST_ENCRYPTION_PSK && !($host['tls_accept'] & HOST_ENCRYPTION_PSK)) {
+				unset($host['tls_psk'], $host['tls_psk_identity']);
+			}
+
+			if ($host['tls_connect'] != HOST_ENCRYPTION_CERTIFICATE
+					&& !($host['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE)) {
+				unset($host['tls_issuer'], $host['tls_subject']);
+			}
+
+			if ($this->host['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+				$host = array_intersect_key($host, array_flip(['hostid', 'status', 'inventory', 'description']));
+			}
+
+			$hostids = API::Host()->update($host);
+
+			if ($hostids === false || !$this->processValueMaps($this->getInput('valuemaps', []))) {
+				throw new Exception();
+			}
+
+			$result = DBend(true);
+		}
+		catch (Exception $e) {
+			DBend(false);
+		}
+
 		$output = [];
-		$host = [
-			'hostid' => $this->host['hostid'],
-			'host' => $this->getInput('host', $this->host['host']),
-			'name' => $this->getInput('visiblename', $this->host['name']),
-			'status' => $this->getInput('status', $this->host['status']),
-			'proxy_hostid' => $this->getInput('proxy_hostid', $this->host['proxy_hostid']),
-			'groups' => $this->processHostGroups($this->getInput('groups', [])),
-			'interfaces' => $this->processHostInterfaces($this->getInput('interfaces', [])),
-			'tags' => $this->processTags($this->getInput('tags', [])),
-			'templates' => $this->processTemplates([
-				$this->getInput('add_templates', []), $this->getInput('templates', [])
-			]),
-			'clear_templates' => zbx_toObject($this->getInput('clear_templates', []), 'templateid'),
-			'macros' => $this->processUserMacros($this->getInput('macros', [])),
-			'inventory' => ($this->getInput('inventory_mode', $this->host['inventory_mode']) != HOST_INVENTORY_DISABLED)
-				? $this->getInput('host_inventory', [])
-				: [],
-			'tls_connect' => $this->getInput('tls_connect', $this->host['tls_connect']),
-			'tls_accept' => $this->getInput('tls_accept', $this->host['tls_accept'])
-		];
 
-		$host_properties = [
-			'description', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'tls_subject',
-			'tls_issuer', 'inventory_mode'
-		];
+		if ($result) {
+			$success = ['title' => _('Host updated')];
 
-		foreach ($host_properties as $prop) {
-			if (!array_key_exists($prop, $this->host) || $this->getInput($prop, '') !== $this->host[$prop]) {
-				$host[$prop] = $this->getInput($prop, '');
-			}
-		}
-
-		$this->getInputs($host, ['tls_psk_identity', 'tls_psk']);
-
-		if ($host['tls_connect'] != HOST_ENCRYPTION_PSK && !($host['tls_accept'] & HOST_ENCRYPTION_PSK)) {
-			unset($host['tls_psk'], $host['tls_psk_identity']);
-		}
-
-		if ($host['tls_connect'] != HOST_ENCRYPTION_CERTIFICATE
-				&& !($host['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE)) {
-			unset($host['tls_issuer'], $host['tls_subject']);
-		}
-
-		if ($this->host['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-			$host = array_intersect_key($host, array_flip(['hostid', 'status', 'inventory', 'description']));
-		}
-
-		$hostids = API::Host()->update($host);
-
-		if ($hostids !== false && $this->processValueMaps($this->getInput('valuemaps', []))) {
-			$messages = get_and_clear_messages();
-			$details = [];
-
-			foreach ($messages as $message) {
-				$details[] = $message['message'];
+			if ($messages = get_and_clear_messages()) {
+				$success['messages'] = array_column($messages, 'message');
 			}
 
-			ob_start();
-			uncheckTableRows('hosts');
-
-			$output = [
-				'message' => makeMessageBox(ZBX_STYLE_MSG_GOOD, $messages, _('Host updated'), true, false)->toString(),
-				'title' => _('Host updated'),
-				'details' => $details,
-				'script_inline' => ob_get_clean()
+			$output['success'] = $success;
+		}
+		else {
+			$output['error'] = [
+				'title' => _('Cannot update host'),
+				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
 		}
 
-		if (!$output && ($messages = getMessages()) !== null) {
-			$output = ['errors' => $messages->toString()];
-		}
-
-		$response = $output
-			? (new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
-			: new CControllerResponseFatal();
-
-		$this->setResponse($response);
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 
 	/**

@@ -1368,7 +1368,7 @@ function getItemDataOverviewCell(array $item, ?array $trigger = null): CCol {
 	$value = UNKNOWN_VALUE;
 
 	if ($trigger && $trigger['value'] == TRIGGER_VALUE_TRUE) {
-		$css = getSeverityStyle($trigger['priority']);
+		$css = CSeverityHelper::getStyle((int) $trigger['priority']);
 
 		if ($trigger['problem']['acknowledged'] == 1) {
 			$ack = [' ', (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN)];

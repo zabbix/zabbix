@@ -32,7 +32,6 @@ int	zbx_trends_parse_nextcheck(time_t from, const char *period_shift, time_t *ne
 
 int	zbx_trends_eval_avg(const char *table, zbx_uint64_t itemid, int start, int end, double *value, char **error);
 int	zbx_trends_eval_count(const char *table, zbx_uint64_t itemid, int start, int end, double *value, char **error);
-int	zbx_trends_eval_delta(const char *table, zbx_uint64_t itemid, int start, int end, double *value, char **error);
 int	zbx_trends_eval_max(const char *table, zbx_uint64_t itemid, int start, int end, double *value, char **error);
 int	zbx_trends_eval_min(const char *table, zbx_uint64_t itemid, int start, int end, double *value, char **error);
 int	zbx_trends_eval_sum(const char *table, zbx_uint64_t itemid, int start, int end, double *value, char **error);
@@ -48,6 +47,7 @@ typedef struct
 zbx_tfc_stats_t;
 
 int	zbx_tfc_init(char **error);
+void	zbx_tfc_destroy(void);
 int	zbx_tfc_get_stats(zbx_tfc_stats_t *stats, char **error);
 void	zbx_tfc_invalidate_trends(ZBX_DC_TREND *trends, int trends_num);
 

@@ -190,7 +190,6 @@ function checkAll(form_name, chkMain, shkName) {
 
 	chkbxRange.checkObjectAll(shkName, value);
 	chkbxRange.update(shkName);
-	chkbxRange.saveSessionStorage(shkName);
 
 	return true;
 }
@@ -336,14 +335,15 @@ function getPosition(obj) {
 function PopUp(action, options, dialogueid, trigger_elmnt) {
 	var overlay = overlays_stack.getById(dialogueid);
 	if (!overlay) {
-		var wide_popup_actions = ['popup.generic', 'dashboard.share.edit', 'dashboard.page.properties.edit',
+		var wide_popup_actions = ['popup.generic', 'popup.dashboard.share.edit', 'dashboard.page.properties.edit',
 				'dashboard.properties.edit', 'dashboard.widget.edit', 'popup.media', 'popup.lldoperation',
 				'popup.lldoverride', 'popup.preproctest.edit', 'popup.triggerexpr', 'popup.httpstep',
-				'popup.testtriggerexpr', 'popup.triggerwizard', 'popup.host.edit'
+				'popup.testtriggerexpr', 'popup.triggerwizard'
 			],
 			medium_popup_actions = ['popup.maintenance.period', 'popup.condition.actions', 'popup.condition.operations',
 				'popup.condition.event.corr', 'popup.discovery.check', 'popup.mediatypetest.edit',
-				'popup.mediatype.message', 'popup.scriptexec', 'popup.scheduledreport.test', 'popup.service.edit'
+				'popup.mediatype.message', 'popup.host.edit', 'popup.scriptexec', 'popup.scheduledreport.test',
+				'popup.service.edit'
 			],
 			static_popup_actions = ['popup.massupdate.template', 'popup.massupdate.host', 'popup.massupdate.trigger',
 				'popup.massupdate.triggerprototype', 'popup.massupdate.service'
@@ -383,11 +383,6 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 					content: resp.errors
 				});
 			}
-			else if (typeof resp.error !== 'undefined') {
-				overlay.setProperties({
-					content: resp.error
-				});
-			}
 			else {
 				var buttons = resp.buttons !== null ? resp.buttons : [];
 
@@ -405,7 +400,7 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 					default:
 						buttons.push({
 							'title': t('Cancel'),
-							'class': 'btn-alt',
+							'class': 'btn-alt js-cancel',
 							'cancel': true,
 							'action': (typeof resp.cancel_action !== 'undefined') ? resp.cancel_action : function() {}
 						});
@@ -434,7 +429,7 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 /**
  * Open "Update problem" dialog and manage URL change.
  *
- * @param {array}  options
+ * @param {Object}  options
  * @param {array}  options['eventids']  Eventids to update.
  * @param {object} trigger_elmnt        (optional) UI element which was clicked to open overlay dialogue.
  *
@@ -816,6 +811,63 @@ function redirect(uri, method, needle, invert_needle, add_sid, allow_empty) {
 	return false;
 }
 
+/**
+ * Send parameters to given url using natural HTML form submission.
+ *
+ * @param {string} url
+ * @param {Object} params
+ * @param {boolean} allow_empty
+ *
+ * @return {boolean}
+ */
+function post(url, params) {
+	function addVars(post_form, name, value) {
+		if (Array.isArray(value)) {
+			for (let i = 0; i < value.length; i++) {
+				addVars(post_form, `${name}[]`, value[i]);
+			}
+		}
+		else if (typeof value === 'object' && value !== null) {
+			for (const [key, _value] of Object.entries(value)) {
+				addVars(post_form, `${name}[${key}]`, _value);
+			}
+		}
+		else {
+			addVar(post_form, name, value);
+		}
+	}
+
+	function addVar(post_form, name, value) {
+		const is_multiline = /\r|\n/.exec(value);
+		let input;
+
+		if (is_multiline) {
+			input = document.createElement('textarea');
+		}
+		else {
+			input = document.createElement('input');
+			input.type = 'hidden';
+		}
+
+		input.name = name;
+		input.value = value;
+		post_form.appendChild(input);
+	}
+
+	const dom_body = document.getElementsByTagName('body')[0];
+	const post_form = document.createElement('form');
+	post_form.setAttribute('action', url);
+	post_form.setAttribute('method', 'post');
+	post_form.style.display = 'none';
+
+	for (const [key, value] of Object.entries(params)) {
+		addVars(post_form, key, value);
+	}
+
+	dom_body.appendChild(post_form);
+	post_form.submit();
+}
+
 function showHide(obj) {
 	if (jQuery(obj).is(':hidden')) {
 		jQuery(obj).css('display', 'block');
@@ -974,7 +1026,7 @@ Function.prototype.bindAsEventListener = function (context) {
 function openMassupdatePopup(elem, popup_name, data = {}) {
 	const form = elem.closest('form');
 
-	data['ids'] = [...form.querySelectorAll('tbody input:checked')].map((input) => input.value);
+	data.ids = chkbxRange.getSelectedIds();
 
 	switch (popup_name) {
 		case 'popup.massupdate.item':
@@ -995,4 +1047,29 @@ function openMassupdatePopup(elem, popup_name, data = {}) {
 	}
 
 	return PopUp(popup_name, data, null, elem);
+}
+
+/**
+ * Clears session storage from markers of checked table rows.
+ * Or keeps only accessible IDs in the list of checked rows.
+ *
+ * @param {string}       page
+ * @param {array|Object} keepids
+ */
+function uncheckTableRows(page, keepids = []) {
+	// This key only works for new MVC pages.
+	const key = (page === '') ? 'cb_zabbix' : 'cb_zabbix_'+page;
+
+	if (keepids.length) {
+		// If keepids will not have same key as value, it will create mess, when new checkbox will be checked.
+		let keepids_formatted = {};
+		for (const id of Object.values(keepids)) {
+			keepids_formatted[id] = id;
+		}
+
+		sessionStorage.setItem(key, JSON.stringify(keepids_formatted));
+	}
+	else {
+		sessionStorage.removeItem(key);
+	}
 }

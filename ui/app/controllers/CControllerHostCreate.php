@@ -25,109 +25,120 @@
 class CControllerHostCreate extends CControllerHostUpdateGeneral {
 
 	protected function checkInput(): bool {
-		$fields = ['host' => 'required|db hosts.host|not_empty'] + self::getValidationFields();
+		$ret = $this->validateInput(self::getValidationFields());
 
-		return parent::checkInputFields($fields);
+		if (!$ret) {
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'title' => _('Cannot add host'),
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])])
+			);
+		}
+
+		return $ret;
 	}
 
 	protected function checkPermissions(): bool {
-		$ret = $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
+		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)) {
+			return false;
+		}
 
-		if ($ret && $this->hasInput('clone_hostid')) {
+		if ($this->hasInput('clone_hostid') && $this->hasInput('full_clone')) {
 			$hosts = API::Host()->get([
 				'output' => [],
 				'hostids' => $this->getInput('clone_hostid')
 			]);
 
 			if (!$hosts) {
-				access_deny(ACCESS_DENY_OBJECT);
+				return false;
 			}
 		}
 
-		return $ret;
+		return true;
 	}
 
 	protected function doAction(): void {
-		$output = [];
-		$host = array_filter([
-			'status' => $this->getInput('status', HOST_STATUS_NOT_MONITORED),
-			'proxy_hostid' => $this->getInput('proxy_hostid', 0),
-			'groups' => $this->processHostGroups($this->getInput('groups', [])),
-			'interfaces' => $this->processHostInterfaces($this->getInput('interfaces', [])),
-			'tags' => $this->processTags($this->getInput('tags', [])),
-			'templates' => $this->processTemplates([
-				$this->getInput('add_templates', []), $this->getInput('templates', [])
-			]),
-			'macros' => $this->processUserMacros($this->getInput('macros', [])),
-			'inventory' => ($this->getInput('inventory_mode', HOST_INVENTORY_DISABLED) != HOST_INVENTORY_DISABLED)
-				? $this->getInput('host_inventory', [])
-				: [],
-			'tls_connect' => $this->getInput('tls_connect', HOST_ENCRYPTION_NONE),
-			'tls_accept' => $this->getInput('tls_accept', HOST_ENCRYPTION_NONE)
-		]);
+		$result = false;
 
-		$this->getInputs($host, [
-			'host', 'visiblename', 'description', 'status', 'proxy_hostid', 'ipmi_authtype', 'ipmi_privilege',
-			'ipmi_username', 'ipmi_password', 'tls_subject', 'tls_issuer', 'tls_psk_identity', 'tls_psk',
-			'inventory_mode'
-		]);
+		try {
+			DBstart();
 
-		if ($host['tls_connect'] != HOST_ENCRYPTION_PSK && !($host['tls_accept'] & HOST_ENCRYPTION_PSK)) {
-			unset($host['tls_psk'], $host['tls_psk_identity']);
-		}
+			$host = [
+				'status' => $this->getInput('status', HOST_STATUS_NOT_MONITORED),
+				'proxy_hostid' => $this->getInput('proxy_hostid', 0),
+				'groups' => $this->processHostGroups($this->getInput('groups', [])),
+				'interfaces' => $this->processHostInterfaces($this->getInput('interfaces', [])),
+				'tags' => $this->processTags($this->getInput('tags', [])),
+				'templates' => $this->processTemplates([
+					$this->getInput('add_templates', []), $this->getInput('templates', [])
+				]),
+				'macros' => $this->processUserMacros($this->getInput('macros', [])),
+				'inventory' => ($this->getInput('inventory_mode', HOST_INVENTORY_DISABLED) != HOST_INVENTORY_DISABLED)
+					? $this->getInput('host_inventory', [])
+					: [],
+				'tls_connect' => $this->getInput('tls_connect', HOST_ENCRYPTION_NONE),
+				'tls_accept' => $this->getInput('tls_accept', HOST_ENCRYPTION_NONE)
+			];
 
-		if ($host['tls_connect'] != HOST_ENCRYPTION_CERTIFICATE
-				&& !($host['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE)) {
-			unset($host['tls_issuer'], $host['tls_subject']);
-		}
+			$this->getInputs($host, [
+				'host', 'visiblename', 'description', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
+				'ipmi_password', 'tls_subject', 'tls_issuer', 'tls_psk_identity', 'tls_psk', 'inventory_mode'
+			]);
 
-		$host = CArrayHelper::renameKeys($host, ['visiblename' => 'name']);
-
-		$full_clone = $this->hasInput('full_clone');
-		$src_hostid = $this->getInput('clone_hostid', '');
-
-		if ($src_hostid) {
-			$host = $this->extendHostCloneEncryption($host, $src_hostid);
-		}
-
-		$hostids = API::Host()->create($host);
-
-		if ($hostids !== false && $this->createValueMaps($hostids['hostids'][0], $this->getInput('valuemaps', []),
-					$this->hasInput('full_clone') || $this->hasInput('clone')
-				) && (!$full_clone || $this->copyFromCloneSourceHost($src_hostid, $hostids['hostids'][0]))) {
-			$messages = get_and_clear_messages();
-			$details = [];
-
-			foreach ($messages as $message) {
-				$details[] = $message['message'];
+			if ($host['tls_connect'] != HOST_ENCRYPTION_PSK && !($host['tls_accept'] & HOST_ENCRYPTION_PSK)) {
+				unset($host['tls_psk'], $host['tls_psk_identity']);
 			}
 
-			ob_start();
-			uncheckTableRows('hosts');
+			if ($host['tls_connect'] != HOST_ENCRYPTION_CERTIFICATE
+					&& !($host['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE)) {
+				unset($host['tls_issuer'], $host['tls_subject']);
+			}
 
-			$output = [
-				'message' => makeMessageBox(ZBX_STYLE_MSG_GOOD, $messages, _('Host added'), true, false)->toString(),
-				'title' => _('Host added'),
-				'details' => $details,
-				'script_inline' => ob_get_clean()
+			$host = CArrayHelper::renameKeys($host, ['visiblename' => 'name']);
+
+			$full_clone = $this->hasInput('full_clone');
+			$src_hostid = $this->getInput('clone_hostid', '');
+
+			if ($src_hostid) {
+				$host = $this->extendHostCloneEncryption($host, $src_hostid);
+			}
+
+			$hostids = API::Host()->create($host);
+
+			if ($hostids === false
+					|| !$this->createValueMaps($hostids['hostids'][0])
+					|| ($full_clone && !$this->copyFromCloneSourceHost($src_hostid, $hostids['hostids'][0]))) {
+				throw new Exception();
+			}
+
+			$result = DBend(true);
+		}
+		catch (Exception $e) {
+			DBend(false);
+		}
+
+		$output = [];
+
+		if ($result) {
+			$success = ['title' => _('Host added')];
+
+			if ($messages = get_and_clear_messages()) {
+				$success['messages'] = array_column($messages, 'message');
+			}
+
+			$output['success'] = $success;
+		}
+		else {
+			$output['error'] = [
+				'title' => _('Cannot add host'),
+				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
 		}
 
-		if (!$output) {
-			if (($messages = getMessages()) !== null) {
-				$output = ['errors' => $messages->toString()];
-			}
-
-			if ($hostids !== false) {
-				API::Host()->delete([$hostids['hostids'][0]]);
-			}
-		}
-
-		$response = $output
-			? (new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
-			: new CControllerResponseFatal();
-
-		$this->setResponse($response);
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 
 	/**
@@ -162,22 +173,18 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 	 * Create valuemaps.
 	 *
 	 * @param string $hostid      Target hostid.
-	 * @param array  $valuemaps   Submitted value maps.
-	 * @param bool   $clone_mode  Whether to cleanup existing ids.
 	 *
 	 * @return bool
 	 */
-	private function createValueMaps(string $hostid, array $valuemaps, $clone_mode = false): bool {
-		foreach($valuemaps as $key => $valuemap) {
-			if ($clone_mode) {
-				unset($valuemap['valuemapid']);
-			}
+	private function createValueMaps(string $hostid): bool {
+		$valuemaps = $this->getInput('valuemaps', []);
 
+		foreach ($valuemaps as $key => $valuemap) {
+			unset($valuemap['valuemapid']);
 			$valuemaps[$key] = $valuemap + ['hostid' => $hostid];
 		}
 
 		if ($valuemaps && !API::ValueMap()->create($valuemaps)) {
-			CMessageHelper::addError(_s('Could not process "%1$s".', _('Value mapping')));
 			return false;
 		}
 

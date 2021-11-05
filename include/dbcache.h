@@ -208,15 +208,6 @@ DC_FUNCTION;
 
 typedef struct
 {
-	char	*tag;
-	char	*value;
-}
-zbx_tag_t;
-
-ZBX_PTR_VECTOR_DECL(tags, zbx_tag_t*)
-
-typedef struct
-{
 	zbx_uint64_t	hostid;
 	zbx_uint64_t	itemid;
 	zbx_tag_t	tag;
@@ -617,8 +608,12 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned
 void	dc_flush_history(void);
 void	zbx_sync_history_cache(int *values_num, int *triggers_num, int *more);
 void	zbx_log_sync_history_cache_progress(void);
+
+#define ZBX_SYNC_NONE	0
+#define ZBX_SYNC_ALL	1
+
 int	init_database_cache(char **error);
-void	free_database_cache(void);
+void	free_database_cache(int);
 
 #define ZBX_STATS_HISTORY_COUNTER	0
 #define ZBX_STATS_HISTORY_FLOAT_COUNTER	1
@@ -698,6 +693,7 @@ void	DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids);
 void	DCconfig_unlock_all_triggers(void);
 void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
 		const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs, int itemids_num);
+int	DCconfig_trigger_exists(zbx_uint64_t triggerid);
 void	DCfree_triggers(zbx_vector_ptr_t *triggers);
 void	DCconfig_update_interface_snmp_stats(zbx_uint64_t interfaceid, int max_snmp_succeed, int min_snmp_fail);
 int	DCconfig_get_suggested_snmp_vars(zbx_uint64_t interfaceid, int *bulk);
@@ -816,6 +812,7 @@ unsigned int	DCget_internal_action_count(void);
 #define ZBX_DISCOVERY_GROUPID_UNDEFINED	0
 void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags);
 void	zbx_config_clean(zbx_config_t *cfg);
+void	zbx_config_get_hk_mode(unsigned char *history_mode, unsigned char *trends_mode);
 
 int	DCset_interfaces_availability(zbx_vector_availability_ptr_t *availabilities);
 
@@ -877,7 +874,6 @@ typedef struct
 }
 zbx_hc_item_t;
 
-void	zbx_free_tag(zbx_tag_t *tag);
 void	zbx_free_item_tag(zbx_item_tag_t *item_tag);
 
 int	zbx_dc_get_active_proxy_by_name(const char *name, DC_PROXY *proxy, char **error);
@@ -979,6 +975,8 @@ void	zbx_dc_maintenance_reset_update_flag(int timer);
 int	zbx_dc_maintenance_check_update_flag(int timer);
 int	zbx_dc_maintenance_check_update_flags(void);
 
+int	zbx_dc_maintenance_has_tags(void);
+
 typedef struct
 {
 	char	*lld_macro;
@@ -1001,7 +999,6 @@ unsigned char	zbx_dc_set_macro_env(unsigned char env);
 const char	*zbx_dc_get_instanceid(void);
 
 char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t hostid);
-char	*zbx_dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t hostid);
 int	zbx_dc_expand_user_macros_len(const char *text, size_t text_len, zbx_uint64_t *hostids, int hostids_num,
 		char **value, char **error);
 
@@ -1041,4 +1038,10 @@ int	zbx_hc_check_proxy(zbx_uint64_t proxyid);
 
 void	zbx_dc_eval_expand_user_macros(zbx_eval_context_t *ctx);
 
+void	zbx_db_trigger_explain_expression(const DB_TRIGGER *trigger, char **expression,
+		int (*eval_func_cb)(zbx_variant_t *, DC_ITEM *, const char *, const char *, const zbx_timespec_t *,
+		char **), int recovery);
+void	zbx_db_trigger_get_function_value(const DB_TRIGGER *trigger, int index, char **value,
+		int (*eval_func_cb)(zbx_variant_t *, DC_ITEM *, const char *, const char *, const zbx_timespec_t *,
+		char **), int recovery);
 #endif

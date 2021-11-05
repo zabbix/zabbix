@@ -21,7 +21,10 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
+
+$this->includeJsFile('search.js.php');
 
 $widgets = [];
 
@@ -44,7 +47,6 @@ $table = (new CTableInfo())
 
 foreach ($data['hosts'] as $hostid => $host) {
 	$interface = reset($host['interfaces']);
-	$link = 'hostid='.$hostid;
 	$visible_name = make_decoration($host['name'], $data['search']);
 
 	$name_link = ($host['editable'] && $data['allowed_ui_conf_hosts'])
@@ -52,7 +54,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 			->setArgument('action', 'host.edit')
 			->setArgument('hostid', $hostid)
 		))
-			->addClass(ZBX_STYLE_ZABBIX_HOST_POPUPEDIT)
+			->onClick('view.editHost(event, '.json_encode($host['hostid']).')')
 		: new CSpan($visible_name);
 
 	if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
@@ -373,8 +375,4 @@ if ($data['admin']) {
 (new CWidget())
 	->setTitle(_('Search').': '.$data['search'])
 	->addItem(new CDiv($widgets))
-	->show();
-
-(new CScriptTag('host_popup.init();'))
-	->setOnDocumentReady()
 	->show();

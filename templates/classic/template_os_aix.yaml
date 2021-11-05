@@ -541,7 +541,7 @@ zabbix_export:
         -
           uuid: 4771d6d33c2247d6843198152a7065a8
           name: 'Checksum of /etc/passwd'
-          key: 'vfs.file.cksum[/etc/passwd]'
+          key: 'vfs.file.cksum[/etc/passwd,sha256]'
           delay: 1h
           history: 1w
           tags:
@@ -551,7 +551,7 @@ zabbix_export:
           triggers:
             -
               uuid: c75ee957fd6c43b2aba9919d5e1af4a1
-              expression: 'last(/AIX/vfs.file.cksum[/etc/passwd],#1)<>last(/AIX/vfs.file.cksum[/etc/passwd],#2)'
+              expression: 'last(/AIX/vfs.file.cksum[/etc/passwd,sha256],#1)<>last(/AIX/vfs.file.cksum[/etc/passwd,sha256],#2)'
               name: '/etc/passwd has been changed on {HOST.NAME}'
               priority: WARNING
         -

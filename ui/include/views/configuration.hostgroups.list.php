@@ -23,6 +23,8 @@
  * @var CView $this
  */
 
+$this->includeJsFile('configuration.hostgroups.list.js.php');
+
 $widget = (new CWidget())
 	->setTitle(_('Host groups'))
 	->setControls((new CTag('nav', true, (new CList())
@@ -123,7 +125,9 @@ foreach ($this->data['groups'] as $group) {
 			$host_output = (new CLink($host['name'], (new CUrl('zabbix.php'))
 				->setArgument('action', 'host.edit')
 				->setArgument('hostid', $host['hostid'])
-			))->addClass(ZBX_STYLE_LINK_ALT);
+			))
+				->onClick('view.editHost(event, '.json_encode($host['hostid']).')')
+				->addClass(ZBX_STYLE_LINK_ALT);
 		}
 		else {
 			$host_output = new CSpan($host['name']);

@@ -23,6 +23,9 @@
 // Sync with SASS variable: $ui-transition-duration.
 const UI_TRANSITION_DURATION = 300;
 
+const PROFILE_TYPE_INT = 2;
+const PROFILE_TYPE_STR = 3;
+
 // Array indexOf method for javascript<1.6 compatibility
 if (!Array.prototype.indexOf) {
 	Array.prototype.indexOf = function (searchElement) {
@@ -358,19 +361,26 @@ var hintBox = {
 		}
 	},
 
+	getHintboxAction: function(hint_type) {
+		switch (hint_type) {
+			case 'eventlist':
+				return 'hintbox.eventlist';
+
+			case 'eventactions':
+				return 'hintbox.actionlist';
+		}
+	},
+
 	preloadHint: function(e, $target) {
 		var url = new Curl('zabbix.php'),
 			data = $target.data('hintbox-preload');
 
-		url.setArgument('action', 'hint.box');
-		url.setArgument('type', data.type);
+		url.setArgument('action', hintBox.getHintboxAction(data.type));
 
 		var xhr = jQuery.ajax({
 			url: url.getUrl(),
 			method: 'POST',
-			data: {
-				data: data.data
-			},
+			data: data.data,
 			dataType: 'json'
 		});
 
@@ -649,14 +659,20 @@ function rm4favorites(object, objectid) {
  * Toggles filter state and updates title and icons accordingly.
  *
  * @param {string} 	idx					User profile index
- * @param {string} 	value_int			Integer value
+ * @param {string} 	value				Value
  * @param {object} 	idx2				An array of IDs
+ * @param {integer} profile_type		Profile type
  */
-function updateUserProfile(idx, value_int, idx2) {
+function updateUserProfile(idx, value, idx2, profile_type = PROFILE_TYPE_INT) {
+	const value_fields = {
+		[PROFILE_TYPE_INT]: 'value_int',
+		[PROFILE_TYPE_STR]: 'value_str'
+	};
+
 	return sendAjaxData('zabbix.php?action=profile.update', {
 		data: {
 			idx: idx,
-			value_int: value_int,
+			[value_fields[profile_type]]: value,
 			idx2: idx2
 		}
 	});

@@ -29,10 +29,11 @@
 #include "dbsyncer.h"
 #include "export.h"
 
-extern int		CONFIG_HISTSYNCER_FREQUENCY;
-extern unsigned char	process_type, program_type;
-extern int		server_num, process_num;
-static sigset_t		orig_mask;
+extern int				CONFIG_HISTSYNCER_FREQUENCY;
+extern ZBX_THREAD_LOCAL unsigned char	process_type;
+extern unsigned char			program_type;
+extern ZBX_THREAD_LOCAL int		server_num, process_num;
+static sigset_t				orig_mask;
 
 /******************************************************************************
  *                                                                            *

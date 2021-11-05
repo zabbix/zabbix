@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:42Z'
+  version: '6.0'
+  date: '2021-09-03T05:58:49Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -25,7 +25,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.39
       groups:
         -
           name: Templates/Databases
@@ -1386,7 +1386,7 @@ zabbix_export:
             -
               uuid: 3c22a74a94d641389b57a6013ddd10cb
               expression: 'min(/MSSQL by ODBC/mssql.scan_to_search,15m) > 0.001'
-              name: 'MSSQL: Index and table scans are often than index searches for 15m'
+              name: 'MSSQL: Number of index and table scans exceeds index searches in the last 15m'
               priority: WARNING
               description: 'Index searches are preferable to index and table scans. For OLTP applications, optimize for more index searches and less scans (preferably, 1 full scan for every 1000 index searches). Index and table scans are expensive I/O operations.'
         -
@@ -1655,7 +1655,7 @@ zabbix_export:
             -
               uuid: aa10f863608a494281f41e12f0d2b1a5
               expression: 'last(/MSSQL by ODBC/mssql.uptime)<10m'
-              name: 'MSSQL: has been restarted (uptime < 10m)'
+              name: 'MSSQL: Service has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'

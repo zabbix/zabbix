@@ -68,7 +68,17 @@ function Overlay(type, dialogueid) {
 	this.$dialogue.append(this.$dialogue.$body);
 	this.$dialogue.append(this.$dialogue.$footer);
 
-	this.center_dialog_function = this.centerDialog.bind(this);
+	this.center_dialog_animation_frame = null;
+	this.center_dialog_function = () => {
+		if (this.center_dialog_animation_frame !== null) {
+			cancelAnimationFrame(this.center_dialog_animation_frame);
+		}
+
+		this.center_dialog_animation_frame = requestAnimationFrame(() => {
+			this.center_dialog_animation_frame = null;
+			this.centerDialog();
+		});
+	};
 
 	var body_mutation_observer = window.MutationObserver || window.WebKitMutationObserver;
 	this.body_mutation_observer = new body_mutation_observer(this.center_dialog_function);
@@ -185,20 +195,27 @@ Overlay.prototype.containFocus = function() {
 };
 
 /**
- * Sets dialogue in loading sate.
+ * Sets dialogue in loading state.
  */
 Overlay.prototype.setLoading = function() {
-	this.$dialogue.$body.addClass('is-loading');
+	this.$dialogue.$body.addClass('is-loading is-loading-fadein');
 	this.$dialogue.$controls.find('z-select, button').prop('disabled', true);
-	this.$btn_submit && this.$btn_submit.prop('disabled', true);
+
+	this.$dialogue.$footer.find('button:not(.js-cancel)').each(function() {
+		$(this).prop('disabled', true);
+	});
 };
 
 /**
- * Sets dialogue in idle sate.
+ * Sets dialogue in idle state.
  */
 Overlay.prototype.unsetLoading = function() {
-	this.$dialogue.$body.removeClass('is-loading');
-	this.$btn_submit && this.$btn_submit.removeClass('is-loading').prop('disabled', false);
+	this.$dialogue.$body.removeClass('is-loading is-loading-fadein');
+	this.$dialogue.$footer.find('button:not(.js-cancel)').each(function() {
+		if ($(this).data('disabled') !== true) {
+			$(this).removeClass('is-loading').prop('disabled', false);
+		}
+	});
 };
 
 /**
@@ -247,6 +264,10 @@ Overlay.prototype.unmount = function() {
 
 	this.body_mutation_observer.disconnect();
 
+	if (this.center_dialog_animation_frame !== null) {
+		cancelAnimationFrame(this.center_dialog_animation_frame);
+	}
+
 	var $wrapper = jQuery('.wrapper');
 
 	if (!jQuery('[data-dialogueid]').length) {
@@ -269,7 +290,14 @@ Overlay.prototype.mount = function() {
 	this.$backdrop.appendTo($wrapper);
 	this.$dialogue.appendTo($wrapper);
 
-	this.body_mutation_observer.observe(this.$dialogue[0], {childList: true, subtree: true});
+	for (const dialog_part of ['$header', '$controls', '$body', '$footer']) {
+		this.body_mutation_observer.observe(this.$dialogue[dialog_part][0], {
+			childList: true,
+			subtree: true,
+			attributeFilter: ['style', 'class']
+		});
+	}
+
 	this.centerDialog();
 
 	jQuery.subscribe('debug.click', this.center_dialog_function);
@@ -292,8 +320,13 @@ Overlay.prototype.makeButton = function(obj) {
 			return;
 		}
 
-		if (obj.isSubmit && this.$btn_submit) {
-			this.$btn_submit.blur().addClass('is-loading');
+		if (!('cancel' in obj) || !obj.cancel) {
+			$(e.target)
+				.blur()
+				.addClass('is-loading')
+				.prop('disabled', true)
+				.siblings(':not(.js-cancel)')
+					.prop('disabled', true);
 		}
 
 		if (obj.action && obj.action(this) !== false) {
@@ -312,7 +345,9 @@ Overlay.prototype.makeButton = function(obj) {
 	}
 
 	if (obj.enabled === false) {
-		$button.prop('disabled', true);
+		$button
+			.prop('disabled', true)
+			.data('disabled', true);
 	}
 
 	return $button;

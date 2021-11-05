@@ -231,7 +231,7 @@ class testToken extends CAPITest {
 						'userid' => 1
 					]
 				],
-				'expected_error' => 'Invalid parameter "/3": value (name, userid)=(the-same-1, 1) already exists.'
+				'expected_error' => 'Invalid parameter "/3": value (userid, name)=(1, the-same-1) already exists.'
 			],
 			[
 				'tokens' => [
@@ -1175,27 +1175,27 @@ class testToken extends CAPITest {
 
 	private function countAuditActions(int $action): int {
 		return count(DB::select('auditlog', ['output' => [], 'filter' => [
-				'resourcetype' => AUDIT_RESOURCE_AUTH_TOKEN,
+				'resourcetype' => 45 /* CAudit::RESOURCE_AUTH_TOKEN */,
 				'action' => $action
 		]]));
 	}
 
 	public function testToken_auditlogs(): void {
-		$add_records = $this->countAuditActions(AUDIT_ACTION_ADD);
-		$update_records = $this->countAuditActions(AUDIT_ACTION_UPDATE);
-		$delete_records = $this->countAuditActions(AUDIT_ACTION_DELETE);
+		$add_records = $this->countAuditActions(0 /* CAudit::ACTION_ADD */);
+		$update_records = $this->countAuditActions(1 /* CAudit::ACTION_UPDATE */);
+		$delete_records = $this->countAuditActions(2 /* CAudit::ACTION_DELETE */);
 
 		['result' => ['tokenids' => [$new_id]]] = $this->call('token.create', ['name' => 'audit 1']);
-		$this->assertEquals($add_records + 1, $this->countAuditActions(AUDIT_ACTION_ADD));
+		$this->assertEquals($add_records + 1, $this->countAuditActions(0 /* CAudit::ACTION_ADD */));
 
 		$this->call('token.update', ['tokenid' => $new_id, 'name' => 'audit 2']);
-		$this->assertEquals($update_records + 1, $this->countAuditActions(AUDIT_ACTION_UPDATE));
+		$this->assertEquals($update_records + 1, $this->countAuditActions(1 /* CAudit::ACTION_UPDATE */));
 
 		$this->call('token.generate', [$new_id]);
-		$this->assertEquals($update_records + 2, $this->countAuditActions(AUDIT_ACTION_UPDATE));
+		$this->assertEquals($update_records + 2, $this->countAuditActions(1 /* CAudit::ACTION_UPDATE */));
 
 		$this->call('token.delete', [$new_id]);
-		$this->assertEquals($delete_records + 1, $this->countAuditActions(AUDIT_ACTION_DELETE));
+		$this->assertEquals($delete_records + 1, $this->countAuditActions(2 /* CAudit::ACTION_DELETE */));
 	}
 
 	public function testToken_deleteTokenCreator(): void {

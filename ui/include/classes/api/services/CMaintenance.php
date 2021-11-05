@@ -476,7 +476,7 @@ class CMaintenance extends CApiService {
 			DB::insert('maintenance_tag', $ins_tags);
 		}
 
-		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MAINTENANCE, $maintenances);
+		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_MAINTENANCE, $maintenances);
 
 		return ['maintenanceids' => $maintenanceids];
 	}
@@ -857,7 +857,7 @@ class CMaintenance extends CApiService {
 
 		$this->updateTags($maintenances, $db_maintenances);
 
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MAINTENANCE, $maintenances, $db_maintenances);
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_MAINTENANCE, $maintenances, $db_maintenances);
 
 		return ['maintenanceids' => $maintenanceids];
 	}
@@ -1000,7 +1000,7 @@ class CMaintenance extends CApiService {
 		DB::delete('maintenances_groups', $midCond);
 		DB::delete('maintenances', $midCond);
 
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MAINTENANCE, $db_maintenances);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_MAINTENANCE, $db_maintenances);
 
 		return ['maintenanceids' => $maintenanceids];
 	}

@@ -94,3 +94,7 @@ $web_layout_mode = $this->getLayoutMode();
 	)
 	->addItem($data['screen_view'])
 	->show();
+
+(new CScriptTag('view.init();'))
+	->setOnDocumentReady()
+	->show();

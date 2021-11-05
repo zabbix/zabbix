@@ -305,6 +305,7 @@ ZABBIX.apps.map = (function($) {
 							favobj: 'sysmap',
 							action: 'expand',
 							sysmapid: this.sysmapid,
+							name: this.data.name,
 							source: JSON.stringify(post)
 						},
 						success: function(data) {
@@ -383,12 +384,6 @@ ZABBIX.apps.map = (function($) {
 					}, this);
 
 					shape['text'] = this.shapes[key].getLabel();
-
-					if (this.data.expand_macros === '1' && typeof(shape['text']) === 'string' && shape['text'] !== '') {
-						// Additional macro that is supported in shapes is {MAP.NAME}
-						shape['text'] = shape['text'].replace(/\{MAP\.NAME\}/g, this.data.name);
-					}
-
 					shapes.push(shape);
 				}, this);
 

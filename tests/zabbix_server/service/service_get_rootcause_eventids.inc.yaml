@@ -1,0 +1,169 @@
+# algorithm:
+#   MIN - ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE (2)
+#   MAX - ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL (1)
+#   OK  - ZBX_SERVICE_STATUS_CALC_SET_OK (0)
+#
+# propagation rule:
+#    KEEP     - ZBX_SERVICE_STATUS_PROPAGATION_AS_IS
+#    INCREASE - ZBX_SERVICE_STATUS_PROPAGATION_INCREASE
+#    DECREASE - ZBX_SERVICE_STATUS_PROPAGATION_DECREASE
+#    IGNORE   - ZBX_SERVICE_STATUS_PROPAGATION_IGNORE
+#    SET      - ZBX_SERVICE_STATUS_PROPAGATION_FIXED
+#
+# status calculation rule:
+#    N_GE  - ZBX_SERVICE_STATUS_RULE_TYPE_N_GE
+#    NP_GE - ZBX_SERVICE_STATUS_RULE_TYPE_NP_GE
+#    N_LT  - ZBX_SERVICE_STATUS_RULE_TYPE_N_L
+#    NP_LT - ZBX_SERVICE_STATUS_RULE_TYPE_NP_L
+#    W_GE  - ZBX_SERVICE_STATUS_RULE_TYPE_W_GE
+#    WP_GE - ZBX_SERVICE_STATUS_RULE_TYPE_WP_GE
+#    W_LT  - ZBX_SERVICE_STATUS_RULE_TYPE_W_L
+#    WP_LT - ZBX_SERVICE_STATUS_RULE_TYPE_WP_L
+#
+#    limit - limit_status
+#    value - limit_value
+#    status - new_status
+#
+
+---
+- name: S0
+  status: -1
+- name: S1
+  status: 2
+  events: 
+  - {"id":1, "severity":0}
+  - {"id":2, "severity":1}
+  - {"id":3, "severity":2}
+- name: S2
+  status: 3
+  events: 
+  - {"id":2, "severity":1}
+  - {"id":3, "severity":2}
+  - {"id":4, "severity":3}
+- name: S3
+  status: 3
+  algorithm: MIN
+  children: [S0, S1, S2]
+- name: S4
+  status: 3
+  algorithm: MAX
+  children: [S1, S2]
+- name: S5
+  status: -1
+  algorithm: MAX
+  children: [S0, S1, S2]
+- name: S6
+  status: 5
+  events: 
+  - {"id":5, "severity":5}
+- name: S7
+  status: 5
+  algorithm: MIN
+  children: [S5, S6]
+- name: S8
+  status: 4
+  algorithm: OK
+  rules:
+  - {"type": N_GE, "limit":3, "value":2, "status":4}
+  children: [S9, S10, S11, S12]
+- name: S9
+  status: 1
+  algorithm: MIN
+  events: 
+  - {"id":6, "severity":1}
+- name: S10
+  status: 2
+  algorithm: MIN
+  events: 
+  - {"id":12, "severity":2}
+- name: S11
+  status: 3
+  algorithm: MIN
+  children: [S13, S14, S15]
+- name: S13
+  status: -1
+- name: S14
+  status: 1
+  algorithm: MIN
+  events: 
+  - {"id":7, "severity":1}
+- name: S15
+  status: 3
+  algorithm: MIN
+  events: 
+  - {"id":8, "severity":3}
+- name: S12
+  status: 4
+  algorithm: MAX
+  children: [S16, S17, S18]
+- name: S16
+  status: 1
+  algorithm: MIN
+  events: 
+  - {"id":9, "severity":1}
+- name: S17
+  status: 2
+  algorithm: MIN
+  events: 
+  - {"id":10, "severity":2}
+- name: S18
+  status: 4
+  algorithm: MIN
+  events: 
+  - {"id":11, "severity":4}
+- name: S19
+  status: 4
+  algorithm: OK
+  rules:
+  - {"type": WP_GE, "limit":1, "value":50, "status":4}
+  children: [S20, S21, S22]
+- name: S20
+  status: 4
+  algorithm: MIN
+  weight: 0
+  events: 
+  - {"id":13, "severity":4}
+- name: S21
+  status: 3
+  algorithm: MIN
+  weight: 50
+  events: 
+  - {"id":14, "severity":3}
+- name: S22
+  status: 2
+  algorithm: MIN
+  weight: 50
+  events: 
+  - {"id":15, "severity":2}
+- name: S23
+  status: 5
+  algorithm: OK
+  rules:
+  - {"type": N_GE, "limit":3, "value":2, "status":5}
+  - {"type": WP_GE, "limit":2, "value":50, "status":5}
+  children: [S24, S25, S26, S27]
+- name: S24
+  status: 3
+  algorithm: MIN
+  weight: 0
+  events: 
+  - {"id":16, "severity":3}
+- name: S25
+  status: 4
+  algorithm: MIN
+  weight: 50
+  events: 
+  - {"id":17, "severity":4}
+- name: S26
+  status: 2
+  algorithm: MIN
+  weight: 50
+  events: 
+  - {"id":18, "severity":2}
+- name: S27
+  status: 1
+  algorithm: MIN
+  weight: 50
+  events: 
+  - {"id":19, "severity":1}
+...

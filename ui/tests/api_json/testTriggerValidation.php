@@ -292,7 +292,7 @@ class testTriggerValidation extends CAPITest {
 				],
 				'expected_error' => 'Incorrect value for field "recovery_expression": cannot be empty.'
 			],
-			'Trigger with invalid recovery exporession #1' => [
+			'Trigger with invalid recovery expression #1' => [
 				'triggers' => [
 					[
 						'description' => 'Trigger with expected recovery exporession',
@@ -303,7 +303,7 @@ class testTriggerValidation extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/recovery_expression": a character string is expected.'
 			],
-			'Trigger with invalid recovery exporession #2' => [
+			'Trigger with invalid recovery expression #2' => [
 				'triggers' => [
 					[
 						'description' => 'Trigger with expected recovery exporession',

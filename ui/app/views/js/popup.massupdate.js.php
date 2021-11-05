@@ -69,13 +69,13 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 	$(obj.querySelector('#tbl_macros')).dynamicRows({template: '#macro-row-tmpl'});
 	$(obj.querySelector('#tbl_macros'))
 		.on('afteradd.dynamicRows', () => {
-			$('.input-group', $(obj.querySelector('#tbl_macros'))).macroValue();
+			$('.macro-input-group', $(obj.querySelector('#tbl_macros'))).macroValue();
 			$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', $(obj.querySelector('#tbl_macros'))).textareaFlexible();
 			obj.querySelector('#macro_add').scrollIntoView({block: 'nearest'});
 		});
 
 	$(obj.querySelector('#tbl_macros'))
-		.find('.input-group')
+		.find('.macro-input-group')
 		.macroValue();
 
 	$(obj.querySelector('#tbl_macros'))

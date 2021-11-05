@@ -390,7 +390,7 @@ zabbix_export:
         -
           uuid: 2bb327cd5f8c49d9b680142825b9c030
           name: 'Checksum of /etc/passwd'
-          key: 'vfs.file.cksum[/etc/passwd]'
+          key: 'vfs.file.cksum[/etc/passwd,sha256]'
           delay: 1h
           history: 1w
           tags:
@@ -400,7 +400,7 @@ zabbix_export:
           triggers:
             -
               uuid: 27b4e5de411949a4befa7171a2af6441
-              expression: 'last(/FreeBSD/vfs.file.cksum[/etc/passwd],#1)<>last(/FreeBSD/vfs.file.cksum[/etc/passwd],#2)'
+              expression: 'last(/FreeBSD/vfs.file.cksum[/etc/passwd,sha256],#1)<>last(/FreeBSD/vfs.file.cksum[/etc/passwd,sha256],#2)'
               name: '/etc/passwd has been changed on {HOST.NAME}'
               priority: WARNING
         -

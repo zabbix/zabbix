@@ -25,9 +25,8 @@
 ?>
 
 <script>
-	function initializeView(host, dashboard, widget_defaults, time_period, web_layout_mode) {
-
-		const init = () => {
+	const view = {
+		init({host, dashboard, widget_defaults, time_period, web_layout_mode}) {
 			timeControl.refreshPage = false;
 
 			ZABBIX.Dashboard = new CDashboard(document.querySelector('.<?= ZBX_STYLE_DASHBOARD ?>'), {
@@ -83,18 +82,16 @@
 			ZABBIX.Dashboard.activate();
 
 			if (web_layout_mode == <?= ZBX_LAYOUT_NORMAL ?>) {
-				document.getElementById('dashboardid').addEventListener('change', events.dashboardChange);
+				document.getElementById('dashboardid').addEventListener('change', this.events.dashboardChange);
 			}
 
 			jqBlink.blink();
-		};
+		},
 
-		const events = {
-			dashboardChange: (e) => {
+		events: {
+			dashboardChange(e) {
 				e.target.closest('form').submit();
 			}
-		};
-
-		init();
+		}
 	}
 </script>

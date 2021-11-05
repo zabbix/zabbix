@@ -23,13 +23,20 @@ class CControllerHostMassDelete extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'ids'       => 'required|array_db hosts.hostid'
+			'hostids' => 'required|array_db hosts.hostid'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'title' => CMessageHelper::getTitle(),
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])])
+			);
 		}
 
 		return $ret;
@@ -41,39 +48,37 @@ class CControllerHostMassDelete extends CController {
 
 	protected function doAction(): void {
 		$output = [];
-		$hostids = $this->getInput('ids');
-
+		$hostids = $this->getInput('hostids');
 		$result = API::Host()->delete($hostids);
 
-		ob_start();
-
-		if ($result) {
-			uncheckTableRows('hosts');
-		}
-		else {
+		if (!$result) {
 			$hostids = API::Host()->get([
 				'output' => [],
 				'hostids' => $hostids,
 				'editable' => true
 			]);
 
-			uncheckTableRows('hosts', array_column($hostids, 'hostid'));
+			$output['keepids'] = array_column($hostids, 'hostid');
 		}
 
 		if ($result) {
-			$output += [
-				'message' => makeMessageBox(ZBX_STYLE_MSG_GOOD, [], _('Host deleted'), true, false)->toString(),
-				'title' => _('Host deleted')
-			];
+			$success = ['title' => _('Host deleted')];
+
+			if ($messages = get_and_clear_messages()) {
+				$success['messages'] = array_column($messages, 'message');
+			}
+
+			$output['success'] = $success;
 		}
 		else {
 			CMessageHelper::setErrorTitle(_('Cannot delete host'));
-			$messages = getMessages();
-			$output += ['errors' => $messages->toString()];
+
+			$output['error'] = [
+				'title' => CMessageHelper::getTitle(),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
 		}
 
-		$output['script_inline'] = ob_get_clean();
-
-		$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 }

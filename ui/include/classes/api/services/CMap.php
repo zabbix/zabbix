@@ -1843,7 +1843,7 @@ class CMap extends CMapElement {
 			$this->createShapes($shapes);
 		}
 
-		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MAP, $maps);
+		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_MAP, $maps);
 
 		return ['sysmapids' => $sysmapids];
 	}
@@ -2301,7 +2301,7 @@ class CMap extends CMapElement {
 			$this->updateLinkTriggers($link_triggers_to_update);
 		}
 
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MAP, $maps, $db_maps);
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_MAP, $maps, $db_maps);
 
 		return ['sysmapids' => $sysmapids];
 	}
@@ -2331,7 +2331,7 @@ class CMap extends CMapElement {
 		]);
 		DB::delete('sysmaps', ['sysmapid' => $sysmapids]);
 
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MAP, $db_maps);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_MAP, $db_maps);
 
 		return ['sysmapids' => $sysmapids];
 	}

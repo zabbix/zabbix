@@ -21,37 +21,55 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
-$cancel_button = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))->setArgument('action', 'host.list')));
+$this->includeJsFile('configuration.host.edit.js.php');
+
+$cancel_button = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))->setArgument('action', 'host.list')))
+	->addClass('js-cancel');
 
 $data += [
 	'form_name' => 'host-form',
-	'buttons' => ((int) $data['hostid'] === 0)
+	'buttons' => ($data['hostid'] == 0)
 		? [
-			new CSubmit('add', _('Add')),
+			(new CSubmit('add', _('Add')))
+				->removeAttribute('id'),
 			$cancel_button
 		]
 		: [
-			new CSubmit('update', _('Update')),
-			new CButton('clone', _('Clone')),
-			new CButton('full_clone', _('Full clone')),
-			(new CButton('delete', _('Delete')))
-				->onClick('return confirm('.json_encode(_('Delete selected host?')).')
-					? host_edit.deleteHost()
-					: false')
-				->setAttribute('data-redirect', (new CUrl('zabbix.php'))
-					->setArgument('action', 'host.massdelete')
-					->setArgument('ids', [$data['hostid']])
-					->setArgumentSID()
-					->getUrl()
-				)
-				->addClass(ZBX_STYLE_BTN_ALT),
+			(new CSubmit('update', _('Update')))
+				->removeAttribute('id'),
+			(new CSimpleButton(_('Clone')))
+				->onClick('view.clone();')
+				->removeAttribute('id'),
+			(new CSimpleButton(_('Full clone')))
+				->onClick('view.fullClone();')
+				->removeAttribute('id'),
+			(new CSimpleButton(_('Delete')))
+				->setAttribute('confirm', _('Delete selected host?'))
+				->onClick('view.delete('.json_encode($data['hostid']).', this);')
+				->removeAttribute('id'),
 			$cancel_button
 		]
 ];
 
+if ($data['warning']) {
+	CMessageHelper::addWarning($data['warning']);
+	show_messages();
+
+	$data['warning'] = null;
+}
+
 (new CWidget())
-	->setTitle(_('Host'))
+	->setTitle(($data['hostid'] == 0) ? _('New host') : _('Host'))
 	->addItem(new CPartial('configuration.host.edit.html', $data))
+	->show();
+
+(new CScriptTag('view.init('.json_encode([
+		'form_name' => $data['form_name'],
+		'host_interfaces' => $data['host']['interfaces'],
+		'host_is_discovered' => ($data['host']['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
+	]).');'))
+	->setOnDocumentReady()
 	->show();

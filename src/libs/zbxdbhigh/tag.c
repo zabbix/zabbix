@@ -22,8 +22,28 @@
 #include "log.h"
 #include "../zbxalgo/vectorimpl.h"
 
+zbx_db_tag_t	*zbx_db_tag_create(const char *tag_tag, const char *tag_value)
+{
+	zbx_db_tag_t	*tag;
+
+	tag = (zbx_db_tag_t *)zbx_malloc(NULL, sizeof(zbx_db_tag_t));
+	tag->flags = ZBX_FLAG_DB_TAG_UNSET;
+	tag->tag = zbx_strdup(NULL, tag_tag);
+	tag->value = zbx_strdup(NULL, tag_value);
+	tag->tag_orig = NULL;
+	tag->value_orig = NULL;
+
+	return tag;
+}
+
 void	zbx_db_tag_free(zbx_db_tag_t *tag)
 {
+	if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_TAG))
+		zbx_free(tag->tag_orig);
+
+	if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_VALUE))
+		zbx_free(tag->value_orig);
+
 	zbx_free(tag->tag);
 	zbx_free(tag->value);
 	zbx_free(tag);
@@ -31,14 +51,24 @@ void	zbx_db_tag_free(zbx_db_tag_t *tag)
 
 int	zbx_db_tag_compare_func(const void *d1, const void *d2)
 {
-	const zbx_db_tag_t	*tag1 = *(const zbx_db_tag_t **)d1;
-	const zbx_db_tag_t	*tag2 = *(const zbx_db_tag_t **)d2;
+	const zbx_db_tag_t	* const tag1 = *(const zbx_db_tag_t * const *)d1;
+	const zbx_db_tag_t	* const tag2 = *(const zbx_db_tag_t * const *)d2;
 	int			ret;
 
 	if (0 != (ret = strcmp(tag1->tag, tag2->tag)))
 		return ret;
 
 	return strcmp(tag1->value, tag2->value);
+}
+
+int	zbx_db_tag_compare_func_template(const void *d1, const void *d2)
+{
+	const zbx_db_tag_t	* const it1 = *(const zbx_db_tag_t * const *)d1;
+	const zbx_db_tag_t	* const it2 = *(const zbx_db_tag_t * const *)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(it1->tag, it2->tag);
+
+	return 0;
 }
 
 ZBX_PTR_VECTOR_IMPL(db_tag_ptr, zbx_db_tag_t *)

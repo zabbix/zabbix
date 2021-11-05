@@ -239,7 +239,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 	public function testPageLowLevelDiscovery_CheckNow($data) {
 		$context = array_key_exists('template', $data) ? '&context=template' : '&context=host';
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$data['hostid'].$context);
-		// Enabe all LLDs, so Check now can be send successfully.
+		// Enable all LLDs, so Check now can be send successfully.
 		$this->massChangeStatus('Enable');
 		$this->selectTableRows($data['names'], 'Name', $this->selector);
 
@@ -256,6 +256,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 			$this->query('button:Execute now')->one()->click();
 			$this->assertMessage($data['expected'], $data['message'], CTestArrayHelper::get($data, 'details'));
 		}
+		$this->page->logout();
 	}
 
 	/**
@@ -278,10 +279,10 @@ class testPageLowLevelDiscovery extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Host groups' => 'Templates/Server hardware'
+						'Host groups' => 'Templates/Databases'
 					],
 					'context' => 'template',
-					'rows' => 40
+					'rows' => 84
 				]
 			],
 			[
@@ -393,13 +394,15 @@ class testPageLowLevelDiscovery extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Key' => 'array.cache.discovery'
+						'Key' => 'array.cache.discovery',
+						'Type' => 'HTTP agent'
 					],
 					'context' => 'template',
 					'expected' => [
-						'Array Controller Cache Discovery',
-						'Array Controller Cache Discovery',
-						'Array Controller Cache Discovery'
+						'Array controller cache discovery',
+						'Array controller cache discovery',
+						'Array controller cache discovery',
+						'Array controller cache discovery'
 					]
 				]
 			],
@@ -485,7 +488,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Name' => 'try'
+						'Name' => 'empty try'
 					],
 					'expected' => []
 				]

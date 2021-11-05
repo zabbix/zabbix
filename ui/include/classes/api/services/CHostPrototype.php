@@ -370,7 +370,7 @@ class CHostPrototype extends CHostBase {
 		$this->createReal($host_prototypes);
 		$this->inherit($host_prototypes);
 
-		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_PROTOTYPE, $host_prototypes);
+		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_HOST_PROTOTYPE, $host_prototypes);
 
 		return ['hostids' => zbx_objectValues($host_prototypes, 'hostid')];
 	}
@@ -679,7 +679,9 @@ class CHostPrototype extends CHostBase {
 		}
 		unset($db_host_prototype);
 
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST_PROTOTYPE, $host_prototypes, $db_host_prototypes);
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_HOST_PROTOTYPE, $host_prototypes,
+			$db_host_prototypes
+		);
 
 		return ['hostids' => zbx_objectValues($host_prototypes, 'hostid')];
 	}
@@ -1865,7 +1867,7 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * Compare two interface. Retun true if they are same, return false otherwise.
+	 * Compare two interface. Return true if they are same, return false otherwise.
 	 *
 	 * @param array $host_interface
 	 * @param array $db_interface

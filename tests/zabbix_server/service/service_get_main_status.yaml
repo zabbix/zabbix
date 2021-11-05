@@ -1,0 +1,83 @@
+---
+test case: Most critical of services (ok,1-4)
+include: &include service_get_main_status.inc.yaml
+in:
+  services: *include
+  service: A1
+out:
+  status: 4
+---
+test case: Most critical of services (4-1,ok)
+include: &include service_get_main_status.inc.yaml
+in:
+  services: *include
+  service: A2
+out:
+  status: 4
+---
+test case: Most critical of all services (ok,4-1)
+include: &include service_get_main_status.inc.yaml
+in:
+  services: *include
+  service: A3
+out:
+  status: -1
+---
+test case: Most critical of all services (1-4,ok)
+include: &include service_get_main_status.inc.yaml
+in:
+  services: *include
+  service: A4
+out:
+  status: -1
+---
+test case: Most critical of services (1-3)
+include: &include service_get_main_status.inc.yaml
+in:
+  services: *include
+  service: A5
+out:
+  status: 3
+---
+test case: Most critical of services (3-1)
+include: &include service_get_main_status.inc.yaml
+in:
+  services: *include
+  service: A6
+out:
+  status: 3
+---
+test case: Most critical of all services (1-3)
+include: &include service_get_main_status.inc.yaml
+in:
+  services: *include
+  service: A7
+out:
+  status: 3
+---
+test case: Most critical of all services (3-1)
+include: &include service_get_main_status.inc.yaml
+in:
+  services: *include
+  service: A8
+out:
+  status: 3
+---
+test case: Status OK (ok,1-4)
+include: &include service_get_main_status.inc.yaml
+in:
+  services: *include
+  service: A9
+out:
+  status: -1
+---
+test case: Status OK (1-4)
+include: &include service_get_main_status.inc.yaml
+in:
+  services: *include
+  service: A10
+out:
+  status: -1
+...
+
+

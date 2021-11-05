@@ -27,6 +27,7 @@ func checkMetrics(s scheduler.Scheduler) {
 	metrics := []string{
 		`agent.hostname`,
 		`agent.ping`,
+		`agent.variant`,
 		`agent.version`,
 		`system.localtime[utc]`,
 		`system.run[echo test]`,
@@ -46,6 +47,7 @@ func checkMetrics(s scheduler.Scheduler) {
 		`vfs.file.get[/etc/passwd]`,
 		`vfs.dir.size[/var/log]`,
 		`vfs.dir.count[/var/log]`,
+		`vfs.dir.get[/var/log]`,
 		`net.dns[,zabbix.com]`,
 		`net.dns.record[,zabbix.com]`,
 		`net.tcp.dns[,zabbix.com]`,

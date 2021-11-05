@@ -33,13 +33,6 @@ class CControllerHostEdit extends CController {
 	 */
 	protected $host;
 
-	/**
-	 * Clone hostid.
-	 *
-	 * @var ?string
-	 */
-	protected $clone_hostid;
-
 	protected function init() {
 		$this->disableSIDValidation();
 	}
@@ -72,6 +65,7 @@ class CControllerHostEdit extends CController {
 									]),
 			'ipmi_username'		=> 'db hosts.ipmi_username',
 			'ipmi_password'		=> 'db hosts.ipmi_password',
+			'show_inherited_macros' => 'in 0,1',
 			'tls_connect'		=> 'db hosts.tls_connect|in '.implode(',', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK,
 										HOST_ENCRYPTION_CERTIFICATE
 									]),
@@ -79,6 +73,8 @@ class CControllerHostEdit extends CController {
 										(0 | HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE),
 			'tls_subject'		=> 'db hosts.tls_subject',
 			'tls_issuer'		=> 'db hosts.tls_issuer',
+			'tls_psk_identity'	=> 'db hosts.tls_psk_identity',
+			'tls_psk'			=> 'db hosts.tls_psk',
 			'inventory_mode'	=> 'db host_inventory.inventory_mode|in '.implode(',', [HOST_INVENTORY_DISABLED,
 										HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC
 									]),
@@ -115,16 +111,30 @@ class CControllerHostEdit extends CController {
 		}
 
 		if ($this->hasInput('hostid')) {
-			if ($this->hasInput('full_clone') || $this->hasInput('clone')) {
-				$this->clone_hostid = $this->getInput('hostid');
-				$this->host = [['hostid' => null]];
-			}
-			else {
-				$data['tableTitles'] = getHostInventories();
-				$data['tableTitles'] = zbx_toHash($data['tableTitles'], 'db_field');
-				$inventoryFields = array_keys($data['tableTitles']);
+			$hosts = API::Host()->get([
+				'output' => [],
+				'hostids' => $this->getInput('hostid'),
+				'editable' => true,
+				'limit' => 1
+			]);
 
-				$this->host = API::Host()->get([
+			if (!$hosts) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	protected function doAction(): void {
+		$clone_hostid = null;
+
+		if ($this->hasInput('hostid')) {
+			if ($this->hasInput('full_clone') || $this->hasInput('clone')) {
+				$clone_hostid = $this->getInput('hostid');
+				$this->host = ['hostid' => null];
+			} else {
+				$hosts = API::Host()->get([
 					'output' => ['hostid', 'host', 'name', 'status', 'description', 'proxy_hostid', 'ipmi_authtype',
 						'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'tls_connect', 'tls_accept', 'tls_issuer',
 						'tls_subject', 'flags', 'inventory_mode'
@@ -132,49 +142,55 @@ class CControllerHostEdit extends CController {
 					'selectDiscoveryRule' => ['itemid', 'name', 'parent_hostid'],
 					'selectGroups' => ['groupid'],
 					'selectHostDiscovery' => ['parent_hostid'],
-					'selectInterfaces' => ['interfaceid', 'type', 'available', 'error', 'details', 'ip', 'dns', 'port',
-						'useip'
+					'selectInterfaces' => ['interfaceid', 'type', 'main', 'available', 'error', 'details', 'ip', 'dns',
+						'port', 'useip'
 					],
-					'selectInventory' => $inventoryFields,
+					'selectInventory' => array_column(getHostInventories(), 'db_field'),
 					'selectMacros' => ['hostmacroid', 'macro', 'value', 'description', 'type'],
 					'selectParentTemplates' => ['templateid', 'name'],
 					'selectTags' => ['tag', 'value'],
 					'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
-					'hostids' => $this->getInput('hostid'),
-					'editable' => true
+					'hostids' => $this->getInput('hostid')
 				]);
-			}
 
-			if (!$this->host) {
-				return false;
+				$this->host = $hosts[0];
 			}
-
-			$this->host = $this->host[0];
 		}
 
-		return true;
-	}
+		if (array_key_exists('interfaces', (array) $this->host) && $this->host['interfaces']) {
+			$interface_items = API::HostInterface()->get([
+				'output' => [],
+				'selectItems' => API_OUTPUT_COUNT,
+				'hostids' => [$this->host['hostid']],
+				'preservekeys' => true
+			]);
 
-	protected function doAction(): void {
+			foreach ($this->host['interfaces'] as &$interface) {
+				if (!array_key_exists($interface['interfaceid'], $interface_items)) {
+					continue;
+				}
+
+				$interface['items'] = $interface_items[$interface['interfaceid']]['items'];
+			}
+			unset($interface);
+		}
+
 		$this->host = (array) $this->host + $this->getInputValues() + $this->getHostDefaultValues();
 
 		$data = [
 			'form_action' => $this->host['hostid'] ? 'host.update' : 'host.create',
 			'hostid' => $this->host['hostid'],
 			'full_clone' => $this->hasInput('full_clone') ? 1 : null,
-			'clone_hostid' => $this->clone_hostid,
+			'clone_hostid' => $clone_hostid,
 			'host' => $this->host,
+			'is_psk_edit' => $this->hasInput('tls_psk_identity') && $this->hasInput('tls_psk'),
+			'show_inherited_macros' => $this->getInput('show_inherited_macros', 0),
 			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
+			'warning' => null,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
 		];
-
-		if ($this->getAction() === 'popup.host.edit' && ($messages = getMessages()) !== null) {
-			$data['warnings'] = $messages
-				->addClass(ZBX_STYLE_MSG_WARNING)
-				->toString();
-		}
 
 		// Rename fields according names of host edit form.
 		$data['host'] = CArrayHelper::renameKeys($data['host'], [
@@ -191,18 +207,53 @@ class CControllerHostEdit extends CController {
 			$data['host']['tags'][] = ['tag' => '', 'value' => ''];
 		}
 		else {
-			foreach($data['host']['tags'] as &$tag) {
+			foreach ($data['host']['tags'] as &$tag) {
 				if (!array_key_exists('value', $tag)) {
 					$tag['value'] = '';
 				}
-			};
+			}
 			unset($tag);
 
 			CArrayHelper::sort($data['host']['tags'], ['tag', 'value']);
 		}
 
+		$data['host']['macros'] = array_values(order_macros($data['host']['macros'], 'macro'));
+
+		if (!$data['host']['macros'] && $data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
+			$data['host']['macros'][] = [
+				'type' => ZBX_MACRO_TYPE_TEXT,
+				'macro' => '',
+				'value' => '',
+				'description' => ''
+			];
+		}
+
+		// Reset Secret text macros and set warning for cloned host.
+		if ($data['host']['hostid'] === null) {
+			foreach ($data['host']['macros'] as &$macro) {
+				if ($macro['type'] == ZBX_MACRO_TYPE_SECRET && !array_key_exists('value', $macro)) {
+					$macro = [
+						'type' => ZBX_MACRO_TYPE_TEXT,
+						'value' => ''
+					] + $macro;
+
+					$data['warning'] = _('The cloned host contains user defined macros with type "Secret text". The value and type of these macros were reset.');
+				}
+			}
+			unset($macro);
+		}
+
+		order_result($data['host']['valuemaps'], 'name');
+		$data['host']['valuemaps'] = array_values($data['host']['valuemaps']);
+
+		if ($this->hasInput('groupids')) {
+			$data['groupids'] = $this->getInput('groupids', []);
+		}
+
 		// Extend data for view.
-		$this->extendHostGroups($data['groups_ms']);
+		$data['groups_ms'] = $this->hostGroupsForMultiselect($data['host']['groups']);
+		unset($data['groups']);
+
 		$this->extendLinkedTemplates($data['editable_templates']);
 		$this->extendDiscoveryRule($data['editable_discovery_rules']);
 		$this->extendProxies($data['proxies']);
@@ -216,12 +267,19 @@ class CControllerHostEdit extends CController {
 	/**
 	 * Function to prepare data for host group multiselect.
 	 *
-	 * @param array $groups_ms
+	 * @param array $groups
 	 *
-	 * @return void
+	 * @return array
 	 */
-	protected function extendHostGroups(?array &$groups_ms): void {
-		$groupids = array_column($this->host['groups'], 'groupid');
+	protected function hostGroupsForMultiselect(array $groups): array {
+		$groupids = [];
+		foreach ($groups as $group) {
+			if (array_key_exists('new', $group)) {
+				continue;
+			}
+
+			$groupids[] = $group['groupid'];
+		}
 
 		// Select all accessible host groups.
 		$groups_all = $groupids
@@ -243,15 +301,28 @@ class CControllerHostEdit extends CController {
 			: [];
 
 		$groups_ms = [];
-		foreach ($groupids as $groupid) {
-			$groups_ms[] = [
-				'id' => $groupid,
-				'name' => $groups_all[$groupid]['name'],
-				'disabled' => (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) && !array_key_exists($groupid, $groups_rw)
-			];
+		foreach ($groups as $group) {
+			if (array_key_exists('new', $group)) {
+				$groups_ms[] = [
+					'id' => $group['new'],
+					'name' => $group['new'].' ('._x('new', 'new element in multiselect').')',
+					'isNew' => true
+				];
+			}
+			elseif (array_key_exists($group['groupid'], $groups_all)) {
+				$groups_ms[] = [
+					'id' => $group['groupid'],
+					'name' => $groups_all[$group['groupid']]['name'],
+					'disabled' => (CWebUser::getType() != USER_TYPE_SUPER_ADMIN)
+						&& !array_key_exists($group['groupid'], $groups_rw
+					)
+				];
+			}
 		}
 
 		CArrayHelper::sort($groups_ms, ['name']);
+
+		return $groups_ms;
 	}
 
 	/**
@@ -360,15 +431,23 @@ class CControllerHostEdit extends CController {
 		$inputs = [];
 
 		if ($this->hasInput('clone') || $this->hasInput('full_clone')) {
-			$inputs['groups'] = zbx_toObject($this->getInput('groups', []), 'groupid');
+			$inputs['groups'] = [];
+			foreach ($this->getInput('groups', []) as $group) {
+				if (is_array($group) && array_key_exists('new', $group)) {
+					$inputs['groups'][$group['new']] = $group;
+				}
+				else {
+					$inputs['groups'][$group] = ['groupid' => $group];
+				}
+			}
 
 			$inputs['name'] = $this->getInput('visiblename', '');
 			$inputs['inventory'] = $this->getInput('host_inventory', []);
 
 			$this->getInputs($inputs, [
 				'host', 'description', 'status', 'proxy_hostid', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
-				'ipmi_password', 'tls_connect', 'tls_accept', 'tls_subject', 'tls_issuer', 'tags', 'inventory_mode',
-				'host_inventory'
+				'ipmi_password', 'tls_connect', 'tls_accept', 'tls_subject', 'tls_issuer', 'tls_psk_identity',
+				'tls_psk', 'tags', 'inventory_mode', 'host_inventory'
 			]);
 
 			$field_add_templates = $this->getInput('add_templates', []);
@@ -379,25 +458,21 @@ class CControllerHostEdit extends CController {
 				'preservekeys' => true
 			]);
 
-			$secrets_reset = false;
-			$inputs['macros'] = array_map(function ($macro) use (&$secrets_reset) {
+			// Remove inherited macros data.
+			$macros = cleanInheritedMacros($this->getInput('macros', []));
+
+			// Remove empty new macro lines.
+			$macros = array_filter($macros, function ($macro) {
+				$keys = array_flip(['hostmacroid', 'macro', 'value', 'description']);
+
+				return (bool) array_filter(array_intersect_key($macro, $keys));
+			});
+
+			$inputs['macros'] = array_map(function ($macro) {
 				unset($macro['hostmacroid']);
 
-				if ($macro['type'] == ZBX_MACRO_TYPE_SECRET) {
-					$secrets_reset = true;
-					$macro = ['value' => '', 'type' => ZBX_MACRO_TYPE_TEXT] + $macro;
-				}
-
-				$macro = $macro + ['description' => ''];
-
-				return $macro;
-			}, $this->getInput('macros', []));
-
-			if ($secrets_reset) {
-				CMessageHelper::addError(
-					_('The cloned host contains user defined macros with type "Secret text". The value and type of these macros were reset.'),
-				);
-			}
+				return $macro + ['description' => ''];
+			}, $macros);
 
 			$inputs['valuemaps'] = array_map(function ($valuemap) {
 				unset($valuemap['valuemapid']);
@@ -405,11 +480,16 @@ class CControllerHostEdit extends CController {
 				return $valuemap;
 			}, $this->getInput('valuemaps', []));
 
-			$inputs['interfaces'] = array_map(function ($interface) {
-				unset($interface['interfaceid']);
+			$main_interfaces = $this->getInput('mainInterfaces', []);
+			$inputs['interfaces'] = $this->getInput('interfaces', []);
 
-				return $interface;
-			}, $this->getInput('interfaces', []));
+			foreach($inputs['interfaces'] as &$interface) {
+				$interface['main'] = (in_array($interface['interfaceid'], $main_interfaces))
+					? INTERFACE_PRIMARY
+					: INTERFACE_SECONDARY;
+				unset($interface['interfaceid'], $interface['items']);
+			}
+			unset($interface);
 
 			$inputs['parentTemplates'] = array_intersect_key($linked_templates, array_flip($field_templates));
 			$inputs['add_templates'] = array_map(function ($tmpl) {
@@ -448,6 +528,8 @@ class CControllerHostEdit extends CController {
 			'tls_accept' => HOST_ENCRYPTION_NONE,
 			'tls_issuer' => '',
 			'tls_subject' => '',
+			'tls_psk_identity' => '',
+			'tls_psk' => '',
 			'tags' => [],
 			'groups' => [],
 			'parentTemplates' => [],

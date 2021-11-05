@@ -365,7 +365,7 @@ zabbix_export:
         -
           uuid: 5dd55b892d1b4828bfc570d6bf48251d
           name: 'Checksum of /etc/passwd'
-          key: 'vfs.file.cksum[/etc/passwd]'
+          key: 'vfs.file.cksum[/etc/passwd,sha256]'
           delay: 1h
           history: 1w
           tags:
@@ -375,7 +375,7 @@ zabbix_export:
           triggers:
             -
               uuid: 50e5be0acabb41658ec82772d9ec234e
-              expression: 'last(/Solaris/vfs.file.cksum[/etc/passwd],#1)<>last(/Solaris/vfs.file.cksum[/etc/passwd],#2)'
+              expression: 'last(/Solaris/vfs.file.cksum[/etc/passwd,sha256],#1)<>last(/Solaris/vfs.file.cksum[/etc/passwd,sha256],#2)'
               name: '/etc/passwd has been changed on {HOST.NAME}'
               priority: WARNING
         -

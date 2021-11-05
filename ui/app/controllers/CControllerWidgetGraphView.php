@@ -179,9 +179,8 @@ class CControllerWidgetGraphView extends CControllerWidget {
 					$new_dynamic = getSameGraphItemsForHost($graph['gitems'], $dynamic_hostid, false);
 
 					if ($new_dynamic) {
-						// Add destination host data required by CMacrosResolver::resolveGraphPositionalMacros().
+						// Add destination host data required by CMacrosResolver::resolveGraphNames().
 						foreach ($new_dynamic as &$item) {
-							$item['hostid'] = $host['hostid'];
 							$item['host'] = $host['host'];
 						}
 						unset($item);

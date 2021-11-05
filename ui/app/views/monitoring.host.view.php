@@ -30,14 +30,16 @@ $this->addJsFile('class.tabfilter.js');
 $this->addJsFile('class.tabfilteritem.js');
 $this->addJsFile('class.tagfilteritem.js');
 
+$this->includeJsFile('monitoring.host.view.js.php');
+
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
 $nav_items = new CList();
 
 if ($data['can_create_hosts']) {
-	$nav_items->addItem((new CSimpleButton(_('Create host')))
-		->addClass(ZBX_STYLE_ZABBIX_HOST_POPUPCREATE)
-		->setAttribute('data-hostgroups', json_encode($data['filter_groupids']))
+	$nav_items->addItem(
+		(new CSimpleButton(_('Create host')))
+			->onClick('view.createHost()')
 	);
 }
 
@@ -76,10 +78,13 @@ $widget->addItem((new CForm())
 
 $widget->show();
 
-$this->includeJsFile('monitoring.host.view.js.php', $data);
-
 (new CScriptTag('
-	host_page.start();
+	view.init('.json_encode([
+		'filter_options' => $data['filter_options'],
+		'refresh_url' => $data['refresh_url'],
+		'refresh_interval' => $data['refresh_interval'],
+		'applied_filter_groupids' => $data['filter_groupids']
+	]).');
 '))
 	->setOnDocumentReady()
 	->show();

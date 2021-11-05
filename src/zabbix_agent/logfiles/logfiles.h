@@ -52,7 +52,7 @@ struct	st_logfile
 	md5_byte_t	md5buf[MD5_DIGEST_SIZE];	/* md5 sum of the initial part of the file */
 };
 
-typedef int 	(*zbx_process_value_func_t)(const char *server, unsigned short port, const char *host,
+typedef int 	(*zbx_process_value_func_t)(zbx_vector_ptr_t *addrs, const char *host,
 		const char *key, const char *value, unsigned char state, zbx_uint64_t *lastlogsize, int *mtime,
 		unsigned long *timestamp, const char *source, unsigned short *severity,
 		unsigned long *logeventid, unsigned char flags);
@@ -64,11 +64,11 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 		int *use_ino, char **err_msg, struct st_logfile **logfiles_old, const int *logfiles_num_old,
 		struct st_logfile **logfiles_new, int *logfiles_num_new, const char *encoding,
 		zbx_vector_ptr_t *regexps, const char *pattern, const char *output_template, int *p_count, int *s_count,
-		zbx_process_value_func_t process_value, const char *server, unsigned short port, const char *hostname,
+		zbx_process_value_func_t process_value, zbx_vector_ptr_t *addrs, const char *hostname,
 		const char *key, int *jumped, float max_delay, double *start_time, zbx_uint64_t *processed_bytes,
 		zbx_log_rotation_options_t rotation_type);
 
-int	process_log_check(char *server, unsigned short port, zbx_vector_ptr_t *regexps, ZBX_ACTIVE_METRIC *metric,
+int	process_log_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *regexps, ZBX_ACTIVE_METRIC *metric,
 		zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent, int *mtime_sent,
 		char **error);
 

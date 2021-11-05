@@ -101,14 +101,14 @@ trait CastableTrait {
 	}
 
 	/**
-	 * Cast object to Fluid form element.
+	 * Cast object to Grid form element.
 	 *
 	 * @param array $options    additional casting options
 	 *
-	 * @return CFluidFormElement
+	 * @return CGridFormElement
 	 */
-	public function asFluidForm($options = []) {
-		return $this->cast(CFluidFormElement::class, $options);
+	public function asGridForm($options = []) {
+		return $this->cast(CGridFormElement::class, $options);
 	}
 
 	/**
@@ -307,5 +307,16 @@ trait CastableTrait {
 	 */
 	public function asFilterTab($options = []) {
 		return $this->cast(CFilterTabElement::class, $options);
+	}
+
+	/**
+	 * Cast object to MainMenu element.
+	 *
+	 * @param array $options    additional casting options
+	 *
+	 * @return CMainMenuElement
+	 */
+	public function asMainMenu($options = []) {
+		return $this->cast(CMainMenuElement::class, $options);
 	}
 }

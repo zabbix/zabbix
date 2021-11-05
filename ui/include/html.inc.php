@@ -175,10 +175,6 @@ function get_icon($type, $params = []) {
 			}
 
 			return $icon;
-
-		case 'overviewhelp':
-			return (new CRedirectButton(SPACE, null))
-				->addClass(ZBX_STYLE_BTN_INFO);
 	}
 }
 
@@ -866,6 +862,10 @@ function getAdministrationGeneralSubmenu() {
 		->setArgument('action', 'trigdisplay.edit')
 		->getUrl();
 
+	$geomap_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'geomaps.edit')
+		->getUrl();
+
 	$modules_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'module.list')
 		->getUrl();
@@ -892,6 +892,7 @@ function getAdministrationGeneralSubmenu() {
 				$regex_url          => _('Regular expressions'),
 				$macros_url         => _('Macros'),
 				$trigdisplay_url    => _('Trigger displaying options'),
+				$geomap_url			=> _('Geographical maps'),
 				$modules_url        => _('Modules'),
 				$tokens_url         => $can_access_tokens ? _('API tokens') : null,
 				$miscconfig_url     => _('Other')
@@ -981,14 +982,21 @@ function makeSuppressedProblemIcon(array $icon_data) {
  * Renders an action icon.
  *
  * @param array  $icon_data
- * @param string $icon_data[icon]  Icon style.
- * @param array  $icon_data[hint]  Hintbox content (optional).
- * @param int    $icon_data[num]   Number displayed over the icon (optional).
+ * @param string $icon_data[icon]    Icon style.
+ * @param array  $icon_data[hint]    Hintbox content (optional).
+ * @param bool   $icon_data[button]  Use button element (optional).
+ * @param int    $icon_data[num]     Number displayed over the icon (optional).
  *
- * @return CSpan
+ * @return CTag  Returns CSpan or CButton depending on boolean $icon_data['button'] parameter
  */
-function makeActionIcon(array $icon_data) {
-	$icon = (new CSpan())->addClass($icon_data['icon']);
+function makeActionIcon(array $icon_data): CTag {
+
+	if (array_key_exists('button', $icon_data) && $icon_data['button']) {
+		$icon = (new CButton(null))->addClass($icon_data['icon']);
+	}
+	else {
+		$icon = (new CSpan())->addClass($icon_data['icon']);
+	}
 
 	if (array_key_exists('num', $icon_data)) {
 		if ($icon_data['num'] > 99) {

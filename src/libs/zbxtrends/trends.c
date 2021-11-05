@@ -622,26 +622,6 @@ int	zbx_trends_eval_count(const char *table, zbx_uint64_t itemid, int start, int
 	return SUCCEED;
 }
 
-int	zbx_trends_eval_delta(const char *table, zbx_uint64_t itemid, int start, int end, double *value, char **error)
-{
-	zbx_trend_state_t	state;
-
-	if (FAIL == zbx_tfc_get_value(itemid, start, end, ZBX_TREND_FUNCTION_DELTA, value, &state))
-	{
-		state = trends_eval(table, itemid, start, end, "value_max-value_min", "max(value_max)-min(value_min)",
-				value);
-		zbx_tfc_put_value(itemid, start, end, ZBX_TREND_FUNCTION_DELTA, *value, state);
-	}
-
-	if (ZBX_TREND_STATE_NORMAL == state)
-		return SUCCEED;
-
-	if (NULL != error)
-		*error = zbx_strdup(*error, trends_errors[state]);
-
-	return FAIL;
-}
-
 int	zbx_trends_eval_max(const char *table, zbx_uint64_t itemid, int start, int end, double *value, char **error)
 {
 	zbx_trend_state_t	state;

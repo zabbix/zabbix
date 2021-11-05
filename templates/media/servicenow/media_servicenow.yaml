@@ -227,6 +227,7 @@ zabbix_export:
         
             data.short_description = params.alert_subject;
             data.description = params.alert_message;
+            data.comments = params.alert_message;
         
             if (typeof params['urgency_for_' + severities[params.event_nseverity].name] !== 'undefined') {
                 data.urgency = params['urgency_for_' + severities[params.event_nseverity].name];
@@ -242,7 +243,6 @@ zabbix_export:
                 delete data.description;
                 delete data.urgency;
                 ServiceNow.params.url += '/' + params.servicenow_sys_id;
-                data.comments = params.alert_message;
             }
         
             var response = ServiceNow.request(method, data);

@@ -24,6 +24,21 @@
  */
 class CHistoryManager {
 
+	private $primary_keys_enabled = false;
+
+	/**
+	 * Whether to enable optimizations that make use of PRIMARY KEY (itemid, clock, ns) on the history tables.
+	 *
+	 * @param bool $enabled
+	 *
+	 * @return CHistoryManager
+	 */
+	public function setPrimaryKeysEnabled(bool $enabled = true) {
+		$this->primary_keys_enabled = $enabled;
+
+		return $this;
+	}
+
 	/**
 	 * Returns a subset of $items having history data within the $period of time.
 	 *
@@ -104,7 +119,12 @@ class CHistoryManager {
 		}
 
 		if (array_key_exists(ZBX_HISTORY_SOURCE_SQL, $grouped_items)) {
-			$results += $this->getLastValuesFromSql($grouped_items[ZBX_HISTORY_SOURCE_SQL], $limit, $period);
+			if ($this->primary_keys_enabled) {
+				$results += $this->getLastValuesFromSqlWithPk($grouped_items[ZBX_HISTORY_SOURCE_SQL], $limit, $period);
+			}
+			else {
+				$results += $this->getLastValuesFromSql($grouped_items[ZBX_HISTORY_SOURCE_SQL], $limit, $period);
+			}
 		}
 
 		return $results;
@@ -185,6 +205,89 @@ class CHistoryManager {
 					}
 
 					$results[$item['key']][] = $row['_source'];
+				}
+			}
+		}
+
+		return $results;
+	}
+
+	/**
+	 * SQL specific implementation of getLastValues that makes use of primary key existence in history tables.
+	 *
+	 * @see CHistoryManager::getLastValues
+	 * @return array  Of itemid => [up to $limit values].
+	 */
+	private function getLastValuesFromSqlWithPk(array $items, int $limit, ?int $period): array {
+		$results = [];
+
+		if ($period) {
+			$period = time() - $period;
+		}
+
+		$items_by_type = [];
+
+		foreach ($items as $key => $item) {
+			$value_type = $item['value_type'];
+
+			if (!array_key_exists($value_type, $items_by_type)) {
+				$items_by_type[$value_type] = [];
+			}
+
+			$items_by_type[$value_type][] = $item;
+			unset($items[$key]);
+		}
+
+		if ($limit == 1) {
+			foreach ($items_by_type as $value_type => $items) {
+				$history_table = self::getTableName($value_type);
+
+				$max_clock_per_item = DBselect(
+					'SELECT h.itemid, MAX(h.clock) AS clock'.
+					' FROM '.$history_table.' h'.
+					' WHERE '.dbConditionId('h.itemid', array_column($items, 'itemid')).
+						($period ? ' AND h.clock > '.$period : '').
+					' GROUP BY h.itemid'
+				);
+
+				while ($itemid_clock = DBfetch($max_clock_per_item, false)) {
+					$db_value = DBfetchArray(DBselect(
+						'SELECT *'.
+						' FROM '.$history_table.' h'.
+						' WHERE h.itemid='.zbx_dbstr($itemid_clock['itemid']).
+							' AND h.clock='.zbx_dbstr($itemid_clock['clock']).
+						' ORDER BY h.ns DESC',
+						$limit
+					));
+
+					if ($db_value) {
+						$results[$itemid_clock['itemid']] = $db_value;
+					}
+				}
+			}
+		}
+		else {
+			foreach ($items_by_type as $value_type => $items) {
+				$history_table = self::getTableName($value_type);
+
+				foreach ($items as $item) {
+					$db_values = DBselect('SELECT *'.
+						' FROM '.$history_table.' h'.
+						' WHERE h.itemid='.zbx_dbstr($item['itemid']).
+							($period ? ' AND h.clock > '.$period : '').
+						' ORDER BY h.clock DESC, h.ns DESC',
+						$limit
+					);
+
+					$values = [];
+
+					while ($db_value = DBfetch($db_values, false)) {
+						$values[] = $db_value;
+					}
+
+					if ($values) {
+						$results[$item['itemid']] = $values;
+					}
 				}
 			}
 		}
@@ -315,7 +418,9 @@ class CHistoryManager {
 				return $this->getValueAtFromElasticsearch($item, $clock, $ns);
 
 			default:
-				return $this->getValueAtFromSql($item, $clock, $ns);
+				return $this->primary_keys_enabled
+					? $this->getValueAtFromSqlWithPk($item, $clock, $ns)
+					: $this->getValueAtFromSql($item, $clock, $ns);
 		}
 	}
 
@@ -383,6 +488,46 @@ class CHistoryManager {
 			if (count($result) === 1 && is_array($result[0]) && array_key_exists('value', $result[0])) {
 				return $result[0];
 			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Implementation that uses existence of primary key in history tables.
+	 * @see CHistoryManager->getValueAtFromSql()
+	 *
+	 * @param string $item['itemid']
+	 * @param int    $item['value_type']
+	 * @param int    $clock
+	 * @param int    $ns
+	 *
+	 * @return array|null  Item data at specified time of first data before specified time. null if data is not found.
+	 */
+	private function getValueAtFromSqlWithPk(array $item, $clock, $ns): ?array {
+		$history_table = self::getTableName($item['value_type']);
+
+		$sql = 'SELECT *'.
+			' FROM '.$history_table.
+			' WHERE itemid='.zbx_dbstr($item['itemid']).
+				' AND clock='.zbx_dbstr($clock).
+				' AND ns<='.zbx_dbstr($ns).
+			' ORDER BY ns DESC';
+
+		if (($row = DBfetch(DBselect($sql, 1))) !== false) {
+			return $row;
+		}
+
+		$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
+		$sql = 'SELECT *'.
+			' FROM '.$history_table.
+			' WHERE itemid='.zbx_dbstr($item['itemid']).
+				' AND clock<'.zbx_dbstr($clock).
+				($history_period ? ' AND clock >= '.zbx_dbstr($clock - $history_period) : '').
+			' ORDER BY clock DESC, ns DESC';
+
+		if (($row = DBfetch(DBselect($sql, 1))) !== false) {
+			return $row;
 		}
 
 		return null;

@@ -25,32 +25,148 @@
 ?>
 
 <script type="text/x-jquery-tmpl" id="filter-tag-row-tmpl">
-	<?= CTagFilterFieldHelper::getTemplate(); ?>
+	<?= CTagFilterFieldHelper::getTemplate() ?>
 </script>
 
-<script type="text/javascript">
-	jQuery(function($) {
-		$('#filter-tags')
-			.dynamicRows({template: '#filter-tag-row-tmpl'})
-			.on('afteradd.dynamicRows', function() {
-				var rows = this.querySelectorAll('.form_row');
-				new CTagFilterItem(rows[rows.length - 1]);
+<script>
+	const view = {
+		applied_filter_groupids: [],
+
+		init({applied_filter_groupids}) {
+			this.applied_filter_groupids = applied_filter_groupids;
+
+			this.initFilter();
+		},
+
+		initFilter() {
+			$('#filter-tags')
+				.dynamicRows({template: '#filter-tag-row-tmpl'})
+				.on('afteradd.dynamicRows', function () {
+					const rows = this.querySelectorAll('.form_row');
+					new CTagFilterItem(rows[rows.length - 1]);
+				});
+
+			// Init existing fields once loaded.
+			document.querySelectorAll('#filter-tags .form_row').forEach(row => {
+				new CTagFilterItem(row);
 			});
 
-		// Init existing fields once loaded.
-		document.querySelectorAll('#filter-tags .form_row').forEach(row => {
-			new CTagFilterItem(row);
-		});
+			$('#filter_monitored_by').on('change', function() {
+				const filter_monitored_by = $('input[name=filter_monitored_by]:checked').val();
 
-		$('#filter_monitored_by').on('change', function() {
-			var filter_monitored_by = $('input[name=filter_monitored_by]:checked').val();
+				if (filter_monitored_by == <?= ZBX_MONITORED_BY_PROXY ?>) {
+					$('#filter_proxyids_').multiSelect('enable');
+				}
+				else {
+					$('#filter_proxyids_').multiSelect('disable');
+				}
+			});
+		},
 
-			if (filter_monitored_by == <?= ZBX_MONITORED_BY_PROXY ?>) {
-				$('#filter_proxyids_').multiSelect('enable');
+		createHost() {
+			const host_data = this.applied_filter_groupids
+				? {groupids: this.applied_filter_groupids}
+				: {};
+
+			this.openHostPopup(host_data);
+		},
+
+		editHost(e, hostid) {
+			e.preventDefault();
+			const host_data = {hostid};
+
+			this.openHostPopup(host_data);
+		},
+
+		openHostPopup(host_data) {
+			const original_url = location.href;
+
+			const overlay = PopUp('popup.host.edit', host_data, 'host_edit', document.activeElement);
+
+			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostDelete, {once: true});
+			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+				history.replaceState({}, '', original_url);
+			}, {once: true});
+		},
+
+		massDeleteHosts(button) {
+			const confirm_text = button.getAttribute('confirm');
+			if (!confirm(confirm_text)) {
+				return;
 			}
-			else {
-				$('#filter_proxyids_').multiSelect('disable');
+
+			button.classList.add('is-loading');
+
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'host.massdelete');
+
+			fetch(curl.getUrl(), {
+				method: 'POST',
+				headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
+				body: urlEncodeData({hostids: chkbxRange.getSelectedIds()})
+			})
+				.then((response) => response.json())
+				.then((response) => {
+					const keepids = ('keepids' in response) ? response.keepids : [];
+
+					if ('error' in response) {
+						postMessageError(response.error.title);
+						postMessageDetails('error', response.error.messages);
+					}
+					else if('success' in response) {
+						postMessageOk(response.success.title);
+
+						if ('messages' in response.success) {
+							postMessageDetails('success', response.success.messages);
+						}
+					}
+
+					uncheckTableRows('hosts', keepids);
+					location.href = location.href;
+				})
+				.catch(() => {
+					const title = <?= json_encode(_('Unexpected server error.')) ?>;
+					const message_box = makeMessageBox('bad', [], title)[0];
+
+					clearMessages();
+					addMessage(message_box);
+				})
+				.finally(() => {
+					button.classList.remove('is-loading');
+				});
+		},
+
+		events: {
+			hostSuccess(e) {
+				const data = e.detail;
+
+				if ('success' in data) {
+					postMessageOk(data.success.title);
+
+					if ('messages' in data.success) {
+						postMessageDetails('success', data.success.messages);
+					}
+				}
+
+				location.href = location.href;
+			},
+
+			hostDelete(e) {
+				const data = e.detail;
+
+				if ('success' in data) {
+					postMessageOk(data.success.title);
+
+					if ('messages' in data.success) {
+						postMessageDetails('success', data.success.messages);
+					}
+				}
+
+				uncheckTableRows('hosts');
+				location.href = location.href;
 			}
-		});
-	});
+		}
+	};
 </script>

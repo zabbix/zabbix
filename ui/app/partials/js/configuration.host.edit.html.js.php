@@ -22,101 +22,106 @@
 /**
  * @var CView $this
  */
-
-$host_is_discovered = ($data['host']['flags'] == ZBX_FLAG_DISCOVERY_CREATED);
-$linked_templates = $host_is_discovered
-	? array_column($data['host']['parentTemplates'], 'templateid')
-	: [];
 ?>
-<?php if (!$host_is_discovered): ?>
-	<script type="text/x-jquery-tmpl" id="macro-row-tmpl-inherited">
-		<?= (new CRow([
-				(new CCol([
-					(new CTextAreaFlexible('macros[#{rowNum}][macro]', '', ['add_post_js' => false]))
-						->addClass('macro')
-						->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
-						->setAttribute('placeholder', '{$MACRO}'),
-					new CInput('hidden', 'macros[#{rowNum}][inherited_type]', ZBX_PROPERTY_OWN)
-				]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-				(new CCol(
-					new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false)
-				))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-				(new CCol(
-					(new CButton('macros[#{rowNum}][remove]', _('Remove')))
-						->addClass(ZBX_STYLE_BTN_LINK)
-						->addClass('element-table-remove')
-				))->addClass(ZBX_STYLE_NOWRAP),
-				[
-					new CCol(
-						(new CDiv())
-							->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
-							->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-					),
-					new CCol(),
-					new CCol(
-						(new CDiv())
-							->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
-							->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-					)
-				]
-			]))
-				->addClass('form_row')
-				->toString().
-			(new CRow([
-				(new CCol(
-					(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
-						->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
-						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-						->setAttribute('placeholder', _('description'))
-				))
-					->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)
-					->setColSpan(7)
-			]))
-				->addClass('form_row')
-				->toString()
-		?>
-	</script>
 
-	<script type="text/x-jquery-tmpl" id="macro-row-tmpl">
-		<?= (new CRow([
-				(new CCol([
-					(new CTextAreaFlexible('macros[#{rowNum}][macro]', '', ['add_post_js' => false]))
-						->addClass('macro')
-						->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
-						->setAttribute('placeholder', '{$MACRO}')
-				]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-				(new CCol(
-					new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false)
-				))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-				(new CCol(
-					(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
-						->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
-						->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-						->setAttribute('placeholder', _('description'))
-				))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-				(new CCol(
-					(new CButton('macros[#{rowNum}][remove]', _('Remove')))
-						->addClass(ZBX_STYLE_BTN_LINK)
-						->addClass('element-table-remove')
-				))->addClass(ZBX_STYLE_NOWRAP)
-			]))
-				->addClass('form_row')
-				->toString()
-		?>
-	</script>
-<?php endif ?>
+<script type="text/x-jquery-tmpl" id="macro-row-tmpl-inherited">
+	<?= (new CRow([
+			(new CCol([
+				(new CTextAreaFlexible('macros[#{rowNum}][macro]', '', ['add_post_js' => false]))
+					->addClass('macro')
+					->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
+					->setAttribute('placeholder', '{$MACRO}'),
+				new CInput('hidden', 'macros[#{rowNum}][inherited_type]', ZBX_PROPERTY_OWN)
+			]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+			(new CCol(
+				new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false)
+			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+			(new CCol(
+				(new CButton('macros[#{rowNum}][remove]', _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('element-table-remove')
+			))->addClass(ZBX_STYLE_NOWRAP),
+			[
+				new CCol(
+					(new CDiv())
+						->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+						->setAdaptiveWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+				),
+				new CCol(),
+				new CCol(
+					(new CDiv())
+						->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+						->setAdaptiveWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+				)
+			]
+		]))
+			->addClass('form_row')
+			->toString().
+		(new CRow([
+			(new CCol(
+				(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
+					->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setAttribute('placeholder', _('description'))
+			))
+				->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)
+				->setColSpan(7)
+		]))
+			->addClass('form_row')
+			->toString()
+	?>
+</script>
+
+<script type="text/x-jquery-tmpl" id="macro-row-tmpl">
+	<?= (new CRow([
+			(new CCol([
+				(new CTextAreaFlexible('macros[#{rowNum}][macro]', '', ['add_post_js' => false]))
+					->addClass('macro')
+					->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
+					->setAttribute('placeholder', '{$MACRO}')
+			]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+			(new CCol(
+				new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false)
+			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+			(new CCol(
+				(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
+					->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
+					->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+					->setAttribute('placeholder', _('description'))
+			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+			(new CCol(
+				(new CButton('macros[#{rowNum}][remove]', _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('element-table-remove')
+			))->addClass(ZBX_STYLE_NOWRAP)
+		]))
+			->addClass('form_row')
+			->toString()
+	?>
+</script>
+
+<script type="text/x-jquery-tmpl" id="host-interface-row-tmpl">
+	<?= (new CPartial('configuration.host.interface.row'))->getOutput() ?>
+</script>
 
 <script>
 	'use strict';
 
-	var host_edit = {
+	window.host_edit = {
+		form_name: null,
+		form: null,
+		macros_initialized: false,
+		macros_templateids: null,
+
 		/**
 		 * Host form setup.
 		 */
-		init() {
-			this.initHostTab();
-			this.initTemplatesTab();
-			this.initMacrosTab();
+		init({form_name, host_interfaces, host_is_discovered}) {
+			this.form_name = form_name;
+			this.form = document.getElementById(form_name);
+
+			this.initHostTab(host_interfaces, host_is_discovered);
+			this.initMacrosTab(host_is_discovered);
 			this.initInventoryTab();
 			this.initEncryptionTab();
 		},
@@ -124,63 +129,62 @@ $linked_templates = $host_is_discovered
 		/**
 		 * Sets up visible name placeholder synchronization.
 		 */
-		initHostTab() {
+		initHostTab(host_interfaces, host_is_discovered) {
 			const host_field = document.getElementById('host');
 
-			'input paste'.split(' ').forEach((event_type) => {
+			['input', 'paste'].forEach((event_type) => {
 				host_field.addEventListener(event_type, (e) => this.setVisibleNamePlaceholder(e.target.value));
 			});
 			this.setVisibleNamePlaceholder(host_field.value);
-		},
 
+			this.initHostInterfaces(host_interfaces, host_is_discovered);
+		},
 
 		/**
 		 * Updates visible name placeholder.
-		 * @param {string} placeholder Text to display as default host alias.
+		 *
+		 * @param {string} placeholder  Text to display as default host alias.
 		 */
 		setVisibleNamePlaceholder(placeholder) {
 			document.getElementById('visiblename').placeholder = placeholder;
 		},
 
-		/**
-		 * Sets up template element functionality.
-		 */
-		initTemplatesTab() {
-			document.getElementById('linked-template').addEventListener('click', (e) => {
-				const element = e.target;
+		initHostInterfaces(host_interfaces, host_is_discovered) {
+			const host_interface_row_tmpl = document.getElementById('host-interface-row-tmpl').innerHTML;
 
-				if (element.classList.contains('js-tmpl-unlink')) {
-					if (typeof element.dataset.templateid === 'undefined') {
-						return;
-					}
+			window.hostInterfaceManager = new HostInterfaceManager(host_interfaces, host_interface_row_tmpl);
 
-					element.closest('tr').remove();
-					this.resetNewTemplatesField();
-				}
-				else if (element.classList.contains('js-tmpl-unlink-and-clear')) {
-					if (typeof element.dataset.templateid === 'undefined') {
-						return;
-					}
+			hostInterfaceManager.render();
 
-					var clear_tmpl = document.createElement('input');
-					clear_tmpl.setAttribute('type', 'hidden');
-					clear_tmpl.setAttribute('name', 'clear_templates[]');
-					clear_tmpl.setAttribute('value', element.dataset.templateid);
-					element.form.appendChild(clear_tmpl);
+			if (host_is_discovered) {
+				hostInterfaceManager.makeReadonly();
+			}
+		},
 
-					element.closest('tr').remove();
-					this.resetNewTemplatesField();
-				}
-			});
+		// Templates tab functions.
+
+		unlinkTemplate(button) {
+			button.closest('tr').remove();
+			this.resetNewTemplatesField();
+		},
+
+		unlinkAndClearTemplate(button, templateid) {
+			const clear_tmpl = document.createElement('input');
+			clear_tmpl.type = 'hidden';
+			clear_tmpl.name = 'clear_templates[]';
+			clear_tmpl.value = templateid;
+			button.form.appendChild(clear_tmpl);
+
+			this.unlinkTemplate(button);
 		},
 
 		/**
 		 * Replaces template multiselect with a copy that has disabled templates updated.
 		 */
 		resetNewTemplatesField() {
-			var $old_multiselect = $('#add_templates_'),
-				$new_multiselect = $('<div>'),
-				data = $old_multiselect.multiSelect('getData');
+			const $old_multiselect = $('#add_templates_');
+			const $new_multiselect = $('<div>');
+			const data = $old_multiselect.multiSelect('getData');
 
 			$('#add_templates_').parent().html($new_multiselect);
 
@@ -196,109 +200,38 @@ $linked_templates = $host_is_discovered
 						parameters: {
 							srctbl: 'templates',
 							srcfld1: 'hostid',
-							dstfrm: '<?= $data['form_name'] ?>',
+							dstfrm: this.form_name,
 							dstfld1: 'add_templates_',
 							multiselect: '1',
-							disableids: this.getAssignedTemplates()
+							disableids: this.getLinkedTemplates()
 						}
 					}
 				});
 		},
 
 		/**
-		 * Collects ids of currently active (linked + new) templates.
+		 * Helper to get linked template IDs as an array.
 		 *
-		 * @return {array} Templateids.
+		 * @return {array}  Templateids.
 		 */
-		getAssignedTemplates() {
+		getLinkedTemplates() {
 			const linked_templateids = [];
 
-			document.querySelectorAll('[name="templates[]').forEach((input) => {
+			this.form.querySelectorAll('[name^="templates["').forEach((input) => {
 				linked_templateids.push(input.value);
 			});
 
-			return linked_templateids.concat(this.getNewlyAddedTemplates());
-		},
-
-		/**
-		 * Set up of macros functionality.
-		 */
-		initMacrosTab() {
-			const $show_inherited_macros = $('input[name="show_inherited_macros"]');
-
-			this.macros_manager = new HostMacrosManager(<?= json_encode([
-				'properties' => [
-					'readonly' => $host_is_discovered
-				],
-				'defines' => [
-					'ZBX_STYLE_TEXTAREA_FLEXIBLE' => ZBX_STYLE_TEXTAREA_FLEXIBLE,
-					'ZBX_PROPERTY_OWN' => ZBX_PROPERTY_OWN,
-					'ZBX_MACRO_TYPE_TEXT' => ZBX_MACRO_TYPE_TEXT,
-					'ZBX_MACRO_TYPE_SECRET' => ZBX_MACRO_TYPE_SECRET,
-					'ZBX_MACRO_TYPE_VAULT' => ZBX_MACRO_TYPE_VAULT,
-					'ZBX_STYLE_ICON_TEXT' => ZBX_STYLE_ICON_TEXT,
-					'ZBX_STYLE_ICON_INVISIBLE' => ZBX_STYLE_ICON_INVISIBLE,
-					'ZBX_STYLE_ICON_SECRET_TEXT' => ZBX_STYLE_ICON_SECRET_TEXT
-				]
-			]) ?>);
-
-			$('#tabs').on('tabscreate tabsactivate', (e, ui) => {
-				var panel = (e.type === 'tabscreate') ? ui.panel : ui.newPanel;
-
-				if (panel.attr('id') === 'macros-tab') {
-					let macros_initialized = (panel.data('macros_initialized') || false);
-
-					// Please note that macro initialization must take place once and only when the tab is visible.
-					if (e.type === 'tabsactivate') {
-						let panel_templateids = panel.data('templateids') || [],
-							templateids = this.getAssignedTemplates();
-
-						if (panel_templateids.xor(templateids).length > 0) {
-							panel.data('templateids', templateids);
-							this.macros_manager.load($show_inherited_macros.filter(':checked').val(),
-								templateids
-							);
-							panel.data('macros_initialized', true);
-						}
-					}
-
-					if (macros_initialized) {
-						return;
-					}
-
-					// Initialize macros.
-					<?php if ($host_is_discovered): ?>
-						$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', '#tbl_macros').textareaFlexible();
-					<?php else: ?>
-						this.macros_manager.initMacroTable($show_inherited_macros.filter(':checked').val());
-					<?php endif ?>
-
-					panel.data('macros_initialized', true);
-				}
-			});
-
-			$show_inherited_macros.on('change', (e) => {
-				if (e.target.name !== 'show_inherited_macros') {
-					return;
-				}
-
-				this.macros_manager.load(e.target.value, this.getAssignedTemplates());
-				this.updateEncryptionFields();
-			});
+			return linked_templateids;
 		},
 
 		/**
 		 * Helper to get added template IDs as an array.
 		 *
-		 * @return {array}
-		*/
-		getNewlyAddedTemplates() {
-			let $template_multiselect = $('#add_templates_'),
+		 * @return {array}  Templateids.
+		 */
+		getNewTemplates() {
+			const $template_multiselect = $('#add_templates_'),
 				templateids = [];
-
-			if (typeof $template_multiselect.data('multiSelect') === 'undefined') {
-				return templateids;
-			}
 
 			// Readonly forms don't have multiselect.
 			if ($template_multiselect.length) {
@@ -308,6 +241,72 @@ $linked_templates = $host_is_discovered
 			}
 
 			return templateids;
+		},
+
+		/**
+		 * Collects ids of currently active (linked + new) templates.
+		 *
+		 * @return {array}  Templateids.
+		 */
+		getAllTemplates() {
+			return this.getLinkedTemplates().concat(this.getNewTemplates());
+		},
+
+		/**
+		 * Set up of macros functionality.
+		 */
+		initMacrosTab(host_is_discovered) {
+			const $show_inherited_macros = $('input[name="show_inherited_macros"]');
+
+			this.macros_manager = new HostMacrosManager({
+				'readonly': host_is_discovered
+			});
+
+			$('#host-tabs').on('tabscreate tabsactivate', (e, ui) => {
+				const panel = (e.type === 'tabscreate') ? ui.panel : ui.newPanel;
+				const show_inherited_macros = $show_inherited_macros.filter(':checked').val() == 1;
+
+				if (panel.attr('id') === 'macros-tab') {
+					// Please note that macro initialization must take place once and only when the tab is visible.
+					if (e.type === 'tabsactivate') {
+						const templateids = this.getAllTemplates();
+
+						// First time always load inherited macros.
+						if (this.macros_templateids === null) {
+							this.macros_templateids = templateids;
+
+							if (show_inherited_macros) {
+								this.macros_manager.load(show_inherited_macros, templateids);
+								this.macros_initialized = true;
+							}
+						}
+						// Other times load inherited macros only if templates changed.
+						else if (show_inherited_macros && this.macros_templateids.xor(templateids).length > 0) {
+							this.macros_templateids = templateids;
+							this.macros_manager.load(show_inherited_macros, templateids);
+						}
+					}
+
+					if (this.macros_initialized) {
+						return;
+					}
+
+					// Initialize macros.
+					if (host_is_discovered) {
+						$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', '#tbl_macros').textareaFlexible();
+					}
+					else {
+						this.macros_manager.initMacroTable(show_inherited_macros);
+					}
+
+					this.macros_initialized = true;
+				}
+			});
+
+			$show_inherited_macros.on('change', function() {
+				host_edit.macros_manager.load(this.value == 1, host_edit.getAllTemplates());
+				host_edit.updateEncryptionFields();
+			});
 		},
 
 		/**
@@ -409,300 +408,78 @@ $linked_templates = $host_is_discovered
 		},
 
 		/**
-		 * Posts hosts form to backend, triggers formSubmitted event on PopUp.
+		 * Normalize field values.
 		 *
-		 * @param {HTMLFormElement} form Host form.
+		 * @param {Object} fields  Fields from host form.
+		 *
+		 * @return {Object}        Processed fields from host form.
 		 */
-		submit(form) {
-			var fields = getFormFields(form),
-				curl = new Curl(form.getAttribute('action'));
-
-			// Trim text fields.
-			fields.host = fields.host.trim();
-			fields.visiblename = fields.visiblename.trim();
-			fields.description = fields.description.trim();
-
+		preprocessFormFields(fields) {
+			this.trimFields(fields);
 			fields.status = fields.status || <?= HOST_STATUS_NOT_MONITORED ?>;
-			fields.output = <?= json_encode(PAGE_TYPE_JS) ?>;
 
 			if (document.querySelector('#change_psk')) {
 				delete fields.tls_psk_identity;
 				delete fields.tls_psk;
 			}
-
-			// Groups are not extracted properly by getFormFields.
-			fields.groups = [];
-			form.querySelectorAll('[name^="groups[]"]').forEach((group) => {
-				fields.groups.push((group.name === 'groups[][new]') ? {'new': group.value} : group.value);
-			});
-
-			fetch(curl.getUrl(), {
-				method: 'POST',
-				headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
-				body: urlEncodeData(fields)
-			})
-				.then((response) => form.dispatchEvent(new CustomEvent('formSubmitted', {detail: response})));
-		},
-
-		/**
-		 * Handles current host deletion.
-		 */
-		deleteHost() {
-			const original_curl = new Curl(host_popup.original_url);
-
-			if (basename(original_curl.getPath()) === 'hostinventories.php') {
-				original_curl.unsetArgument('hostid');
-				original_curl.unsetArgument('sid');
-				host_popup.original_url = original_curl.getUrl();
-			}
-
-			return hosts_delete(document.getElementById('<?= $data['form_name'] ?>'));
-		},
-
-		/**
-		 * Collect fields & values to transfer to a host clone.
-		 *
-		 * @param {HTMLFormElement} form Cloneable host form.
-		 *
-		 * @return {object}             Fields/values to populate for clone form.
-		 */
-		getCloneData(form) {
-			var fields = getFormFields(form);
-
-			// Groups are not extracted properly by getFormFields.
-			fields.groups = [];
-			form.querySelectorAll('[name^="groups[]"]').forEach(group => {
-				fields.groups.push(group.value);
-			});
-
-			if (document.querySelector('#change_psk')) {
-				delete fields.tls_psk_identity;
-				delete fields.tls_psk;
-			}
-
-			delete fields.action;
-			delete fields.sid;
 
 			return fields;
+		},
+
+		trimFields(fields) {
+			const fields_to_trim = ['host', 'visiblename', 'description', 'ipmi_username', 'ipmi_password',
+				'tls_subject', 'tls_issuer', 'tls_psk_identity', 'tls_psk'];
+			for (const field of fields_to_trim) {
+				if (field in fields) {
+					fields[field] = fields[field].trim();
+				}
+			}
+
+			if ('interfaces' in fields) {
+				for (const key in fields.interfaces) {
+					const host_interface = fields.interfaces[key];
+					host_interface.ip = host_interface.ip.trim();
+					host_interface.dns = host_interface.dns.trim();
+					host_interface.port = host_interface.port.trim();
+
+					if ('details' in host_interface) {
+						const details = host_interface.details;
+						details.authpassphrase = details.authpassphrase.trim();
+						details.community = details.community.trim();
+						details.contextname = details.contextname.trim();
+						details.privpassphrase = details.privpassphrase.trim();
+						details.securityname = details.securityname.trim();
+					}
+				}
+			}
+
+			if ('macros' in fields) {
+				for (const key in fields.macros) {
+					const macro = fields.macros[key];
+					macro.macro = macro.macro.trim();
+
+					if ('value' in macro) {
+						macro.value = macro.value.trim();
+					}
+					if ('description' in macro) {
+						macro.description = macro.description.trim();
+					}
+				}
+			}
+
+			if ('host_inventory' in fields) {
+				for (const key in fields.host_inventory) {
+					fields.host_inventory[key] = fields.host_inventory[key].trim();
+				}
+			}
+
+			if ('tags' in fields) {
+				for (const key in fields.tags) {
+					const tag = fields.tags[key];
+					tag.tag = tag.tag.trim();
+					tag.value = tag.value.trim();
+				}
+			}
 		}
 	};
-
-	<?php if (array_key_exists('popup_form', $data)): ?>
-		/**
-		 * In-popup listeners and set up, called when we are sure the popup HTML has been populated.
-		 */
-		function setupHostPopup() {
-			document.getElementById('<?= $data['form_name'] ?>').addEventListener('formSubmitted', (e) =>
-				handle_hostaction_response(e.detail, e.target)
-			);
-
-			$('#tabs').on('tabsactivate change', () => {
-				const overlay = overlays_stack.end();
-
-				if (overlay.hasOwnProperty('centerDialog')) {
-					overlays_stack.end().centerDialog();
-				}
-			});
-
-			var clone_button = document.querySelector('.js-clone-host'),
-				full_clone_button = document.querySelector('.js-full-clone-host');
-
-			/**
-			* Supplies a handler for in-popup clone button click with according action.
-			*
-			* @param {string} operation_type Either 'clone' or 'full_clone'.
-			*
-			* @return {callable}             Click handler.
-			*/
-			function popupCloneHandler(operation_type) {
-				return function() {
-					var $form = overlays_stack.end().$dialogue.find('form'),
-						curl = curl = new Curl(null, false);
-
-					curl.setArgument(operation_type, 1);
-
-					let params = {...host_edit.getCloneData($form[0])};
-					params[operation_type] = 1;
-
-					PopUp('popup.host.edit', params, 'host_edit');
-					history.replaceState({}, '', curl.getUrl());
-				};
-			}
-
-			if (clone_button) {
-				clone_button.addEventListener('click', popupCloneHandler('clone'));
-			}
-
-			if (full_clone_button) {
-				full_clone_button.addEventListener('click', popupCloneHandler('full_clone'));
-			};
-
-			window.addEventListener('popstate', () => {
-				const overlay = overlays_stack.end();
-
-				if (overlay) {
-					overlayDialogueDestroy(overlay.dialogueid);
-				}
-			}, {once: true});
-		}
-	<?php endif; ?>
-
-	jQuery(document).ready(function() {
-		'use strict';
-
-		<?php if (array_key_exists('warnings', $data)): ?>
-			jQuery(<?= json_encode($data['warnings']) ?>).insertBefore(overlays_stack.end().$dialogue.find('form'));
-		<?php endif; ?>
-
-		jQuery('#tls_connect, #tls_in_psk, #tls_in_cert').change(function() {
-			// If certificate is selected or checked.
-			if (jQuery('input[name=tls_connect]:checked').val() == <?= HOST_ENCRYPTION_CERTIFICATE ?>
-					|| jQuery('#tls_in_cert').is(':checked')) {
-				jQuery('#tls_issuer, #tls_subject').closest('li').show();
-			}
-			else {
-				jQuery('#tls_issuer, #tls_subject').closest('li').hide();
-			}
-
-			// If PSK is selected or checked.
-			if (jQuery('input[name=tls_connect]:checked').val() == <?= HOST_ENCRYPTION_PSK ?>
-					|| jQuery('#tls_in_psk').is(':checked')) {
-				jQuery('#tls_psk, #tls_psk_identity, .tls_psk').closest('li').show();
-			}
-			else {
-				jQuery('#tls_psk, #tls_psk_identity, .tls_psk').closest('li').hide();
-			}
-		});
-
-		// radio button of inventory modes was clicked
-		jQuery('input[name=inventory_mode]').click(function() {
-			// action depending on which button was clicked
-			var inventoryFields = jQuery('#inventorylist :input:gt(2)');
-
-			switch (jQuery(this).val()) {
-				case '<?= HOST_INVENTORY_DISABLED ?>':
-					inventoryFields.prop('disabled', true);
-					jQuery('.populating_item').hide();
-					break;
-				case '<?= HOST_INVENTORY_MANUAL ?>':
-					inventoryFields.prop('disabled', false);
-					jQuery('.populating_item').hide();
-					break;
-				case '<?= HOST_INVENTORY_AUTOMATIC ?>':
-					inventoryFields.prop('disabled', false);
-					inventoryFields.filter('.linked_to_item').prop('disabled', true);
-					jQuery('.populating_item').show();
-					break;
-			}
-		});
-
-		// Refresh field visibility on document load.
-		if ((jQuery('#tls_accept').val() & <?= HOST_ENCRYPTION_NONE ?>) == <?= HOST_ENCRYPTION_NONE ?>) {
-			jQuery('#tls_in_none').prop('checked', true);
-		}
-		if ((jQuery('#tls_accept').val() & <?= HOST_ENCRYPTION_PSK ?>) == <?= HOST_ENCRYPTION_PSK ?>) {
-			jQuery('#tls_in_psk').prop('checked', true);
-		}
-		if ((jQuery('#tls_accept').val() & <?= HOST_ENCRYPTION_CERTIFICATE ?>) == <?= HOST_ENCRYPTION_CERTIFICATE ?>) {
-			jQuery('#tls_in_cert').prop('checked', true);
-		}
-
-		jQuery('input[name=tls_connect]').trigger('change');
-
-		window.hostInterfaceManager = new HostInterfaceManager(
-			<?= json_encode($data['host']['interfaces']) ?>,
-			<?= json_encode([
-				'interface_types' => [
-					'AGENT' => INTERFACE_TYPE_AGENT,
-					'SNMP' => INTERFACE_TYPE_SNMP,
-					'JMX' => INTERFACE_TYPE_JMX,
-					'IPMI' => INTERFACE_TYPE_IPMI
-				],
-				'interface_properties' => [
-					'SNMP_V1' => SNMP_V1,
-					'SNMP_V2C' => SNMP_V2C,
-					'SNMP_V3' => SNMP_V3,
-					'BULK_ENABLED' => SNMP_BULK_ENABLED,
-					'INTERFACE_PRIMARY' => INTERFACE_PRIMARY,
-					'INTERFACE_SECONDARY' => INTERFACE_SECONDARY,
-					'INTERFACE_USE_IP' => INTERFACE_USE_IP,
-					'SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV' => ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,
-					'SNMPV3_SECURITYLEVEL_AUTHNOPRIV' => ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,
-					'SNMPV3_SECURITYLEVEL_AUTHNOPRIV' => ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV,
-					'SNMPV3_AUTHPROTOCOL_MD5' => ITEM_SNMPV3_AUTHPROTOCOL_MD5,
-					'SNMPV3_PRIVPROTOCOL_DES' => ITEM_SNMPV3_PRIVPROTOCOL_DES
-				],
-				'styles' => [
-					'ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE' => ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE,
-					'ZBX_STYLE_HOST_INTERFACE_CONTAINER' => ZBX_STYLE_HOST_INTERFACE_CONTAINER,
-					'ZBX_STYLE_HOST_INTERFACE_CONTAINER_HEADER' => ZBX_STYLE_HOST_INTERFACE_CONTAINER_HEADER,
-					'ZBX_STYLE_HOST_INTERFACE_CELL_DETAILS' => ZBX_STYLE_HOST_INTERFACE_CELL_DETAILS,
-					'ZBX_STYLE_HOST_INTERFACE_BTN_MAIN_INTERFACE' => ZBX_STYLE_HOST_INTERFACE_BTN_MAIN_INTERFACE,
-					'ZBX_STYLE_HOST_INTERFACE_CELL_USEIP' => ZBX_STYLE_HOST_INTERFACE_CELL_USEIP,
-					'ZBX_STYLE_HOST_INTERFACE_BTN_TOGGLE' => ZBX_STYLE_HOST_INTERFACE_BTN_TOGGLE,
-					'ZBX_STYLE_LIST_ACCORDION_ITEM' => ZBX_STYLE_LIST_ACCORDION_ITEM,
-					'ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED' => ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED,
-					'ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND' => ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND,
-					'ZBX_STYLE_HOST_INTERFACE_ROW' => ZBX_STYLE_HOST_INTERFACE_ROW,
-					'ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE' => ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE,
-				],
-				'templates' => [
-					'interface_row' => (new CPartial('configuration.host.interface.row'))->getOutput(),
-					'no_interface_msg' => (new CDiv(_('No interfaces are defined.')))
-						->addClass(ZBX_STYLE_GREY)
-						->toString()
-				]
-			]) ?>
-		);
-
-		hostInterfaceManager.render();
-
-		<?php if ($host_is_discovered): ?>
-			hostInterfaceManager.makeReadonly();
-		<?php endif; ?>
-
-		<?php if (!array_key_exists('popup_form', $data)): ?>
-			const form = document.getElementById('<?= $data['form_name'] ?>');
-
-			form.addEventListener('formSubmitted', (e) => handle_hostaction_response(e.detail, e.target));
-			form.addEventListener('submit', (e) => {
-				e.preventDefault();
-				host_edit.submit(e.target);
-			});
-
-			var clone_button = document.getElementById('clone'),
-				full_clone_button = document.getElementById('full_clone');
-
-			/**
-			* Supplies a handler for in-page clone button click with according action.
-			*
-			* @param {string} operation_type Either 'clone' or 'full_clone'.
-			*
-			* @return {callable}             Click handler.
-			*/
-			function inlineCloneHandler(operation_type) {
-				return function() {
-					var curl = new Curl('zabbix.php', false),
-						fields = host_edit.getCloneData(form);
-
-					curl.setArgument('action', 'host.edit');
-					curl.setArgument(operation_type, 1);
-
-					for (const [k, v] of Object.entries(fields)) {
-						curl.setArgument(k, v);
-					}
-
-					redirect(curl.getUrl(), 'post');
-				};
-			}
-
-			if (clone_button) {
-				clone_button.addEventListener('click', inlineCloneHandler('clone'));
-			}
-
-			if (full_clone_button) {
-				full_clone_button.addEventListener('click', inlineCloneHandler('full_clone'));
-			}
-		<?php endif; ?>
-	});
 </script>

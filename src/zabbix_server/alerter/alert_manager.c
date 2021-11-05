@@ -59,8 +59,9 @@
 
 #define ZBX_MEDIA_CONTENT_TYPE_DEFAULT	255
 
-extern unsigned char	process_type, program_type;
-extern int		server_num, process_num;
+extern ZBX_THREAD_LOCAL unsigned char	process_type;
+extern unsigned char			program_type;
+extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 extern int	CONFIG_ALERTER_FORKS;
 extern char	*CONFIG_ALERT_SCRIPTS_PATH;
@@ -502,7 +503,7 @@ static void	am_update_mediatype(zbx_am_t *manager, zbx_uint64_t mediatypeid, uns
  * Parameters: manager   - [IN] the alert manager                             *
  *             mediatype - [IN] the media type                                *
  *                                                                            *
- * Comments: The media tyep is inserted into queue only if it was not already *
+ * Comments: The media type is inserted into queue only if it was not already *
  *           queued and if the number of media type alerts being processed    *
  *           not reached the limit.                                           *
  *           If media type is already queued only its location in the queue   *
@@ -2354,6 +2355,7 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 	int			ret, sent_num = 0, failed_num = 0, now, time_watchdog = 0, time_ping = 0,
 				time_mediatype = 0;
 	double			time_stat, time_idle = 0, time_now, sec;
+	zbx_timespec_t		timeout = {1, 0};
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -2438,7 +2440,7 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 		}
 
 		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
-		ret = zbx_ipc_service_recv(&manager.ipc, 1, &client, &message);
+		ret = zbx_ipc_service_recv(&manager.ipc, &timeout, &client, &message);
 		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 		sec = zbx_time();

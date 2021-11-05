@@ -200,6 +200,19 @@ class CSelect extends CTag {
 	}
 
 	/**
+	 * Set custom template for selected option.
+	 *
+	 * @param string $template
+	 *
+	 * @return self
+	 */
+	public function setSelectedOptionTemplate(string $template) {
+		$this->setAttribute('selected-option-template', $template);
+
+		return $this;
+	}
+
+	/**
 	 * @deprecated
 	 *
 	 * @param string $onchange

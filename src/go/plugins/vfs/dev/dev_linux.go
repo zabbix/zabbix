@@ -41,6 +41,8 @@ const (
 	sysBlkdevLocation = "/sys/dev/block/"
 	devtypePrefix     = "DEVTYPE="
 	diskstatLocation  = "/proc/diskstats"
+	devTypeRom        = 5
+	devTypeRomString  = "rom"
 )
 
 type devRecord struct {
@@ -61,23 +63,48 @@ func (p *Plugin) getDiscovery() (out string, err error) {
 
 	devs := make([]*devRecord, 0)
 	for _, entry := range entries {
-		if stat, tmperr := os.Stat(devLocation + entry.Name()); tmperr == nil {
+		bypass := 0
+		devname := devLocation + entry.Name()
+		if stat, tmperr := os.Stat(devname); tmperr == nil {
 			if stat.Mode()&os.ModeType == os.ModeDevice {
 				dev := &devRecord{Name: entry.Name()}
 				if sysfs {
 					rdev := stat.Sys().(*syscall.Stat_t).Rdev
-					filename := fmt.Sprintf("%s%d:%d/uevent", sysBlkdevLocation, unix.Major(rdev), unix.Minor(rdev))
-					if file, tmperr := os.Open(filename); tmperr == nil {
-						scanner := bufio.NewScanner(file)
-						for scanner.Scan() {
-							if strings.HasPrefix(scanner.Text(), devtypePrefix) {
-								dev.Type = scanner.Text()[len(devtypePrefix):]
+					dirname := fmt.Sprintf("%s%d:%d/", sysBlkdevLocation, unix.Major(rdev), unix.Minor(rdev))
+
+					if lstat, tmperr := os.Lstat(devname); tmperr == nil {
+						filename := dirname + "/device/type"
+						if file, tmperr := os.Open(filename); tmperr == nil {
+							var devtype int
+
+							if _, tmperr = fmt.Fscanf(file, "%d\n", &devtype); tmperr == nil {
+								if devtype == devTypeRom {
+									dev.Type = devTypeRomString
+									if lstat.Mode()&os.ModeSymlink != 0 {
+										bypass = 1
+									}
+								}
 							}
+							file.Close()
 						}
-						file.Close()
+					}
+
+					if dev.Type == "" {
+						filename := dirname + "uevent"
+						if file, tmperr := os.Open(filename); tmperr == nil {
+							scanner := bufio.NewScanner(file)
+							for scanner.Scan() {
+								if strings.HasPrefix(scanner.Text(), devtypePrefix) {
+									dev.Type = scanner.Text()[len(devtypePrefix):]
+								}
+							}
+							file.Close()
+						}
 					}
 				}
-				devs = append(devs, dev)
+				if bypass == 0 {
+					devs = append(devs, dev)
+				}
 			}
 		}
 	}

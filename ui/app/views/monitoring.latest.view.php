@@ -114,10 +114,12 @@ $widget->addItem(new CPartial('monitoring.latest.view.html', array_intersect_key
 
 $widget->show();
 
-// Initialize page refresh.
 (new CScriptTag('
-	latest_page.start();
-	host_popup.init();
+	view.init('.json_encode([
+		'refresh_url' => $data['refresh_url'],
+		'refresh_data' => $data['refresh_data'],
+		'refresh_interval' => $data['refresh_interval']
+	]).');
 '))
 	->setOnDocumentReady()
 	->show();

@@ -42,8 +42,7 @@ $table->setHeader([
 $interface_types = [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI];
 
 foreach ($data['hosts'] as $hostid => $host) {
-	$host_name = (new CLinkAction($host['name']))
-		->setMenuPopup(CMenuPopupHelper::getHost($hostid));
+	$host_name = (new CLinkAction($host['name']))->setMenuPopup(CMenuPopupHelper::getHost($hostid));
 
 	$interface = null;
 	if ($host['interfaces']) {
@@ -70,8 +69,8 @@ foreach ($data['hosts'] as $hostid => $host) {
 
 			$problems_div->addItem((new CSpan($count))
 				->addClass(ZBX_STYLE_PROBLEM_ICON_LIST_ITEM)
-				->addClass(getSeverityStatusStyle($severity))
-				->setAttribute('title', getSeverityName($severity))
+				->addClass(CSeverityHelper::getStatusStyle($severity))
+				->setAttribute('title', CSeverityHelper::getName($severity))
 			);
 		}
 	}

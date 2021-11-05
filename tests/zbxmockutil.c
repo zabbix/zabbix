@@ -287,6 +287,22 @@ double	zbx_mock_get_object_member_float(zbx_mock_handle_t object, const char *na
 	return member;
 }
 
+int	zbx_mock_get_object_member_int(zbx_mock_handle_t object, const char *name)
+{
+	zbx_mock_error_t	err;
+	zbx_mock_handle_t	handle;
+	int			member;
+
+	if (ZBX_MOCK_SUCCESS != (err = zbx_mock_object_member(object, name, &handle)) ||
+			ZBX_MOCK_SUCCESS != (err = zbx_mock_int(handle, &member)))
+	{
+		fail_msg("Cannot read object member \"%s\": %s", name, zbx_mock_error_string(err));
+	}
+
+	return member;
+}
+
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_mock_str_to_return_code                                      *

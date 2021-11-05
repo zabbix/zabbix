@@ -95,7 +95,7 @@ class CControllerUserList extends CController {
 			]),
 			'filter_usrgrpid' => $filter_usrgrpid,
 			'sessions' => [],
-			'allowed_ui_user_grpups' => $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_USER_GROUPS)
+			'allowed_ui_user_groups' => $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_USER_GROUPS)
 		];
 
 		$data['filter']['roles'] = $filter['roles']

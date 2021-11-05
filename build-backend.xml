@@ -50,6 +50,10 @@
 			<arg line="-I/usr/include"/>
 			<arg line="-I/usr/local/include"/>
 			<arg line="-I./include"/>
+			<!-- Exclude Duktape library from checking -->
+			<arg line="-isrc/libs/zbxembed/duk_config.h"/>
+			<arg line="-isrc/libs/zbxembed/duktape.c"/>
+			<arg line="-isrc/libs/zbxembed/duktape.h"/>
 			<arg line="--suppress=variableScope:*"/>
 			<arg line="--suppress=ConfigurationNotChecked:*"/>
 			<arg line="--inconclusive"/>
@@ -337,6 +341,20 @@
 			<dirset dir="." includes="zabbix-*"/>
 		</move>
 		<ant antfile="../build-backend.xml" dir="sources" target="build-dist" inheritAll="true" inheritRefs="true"/>
+	</target>
+
+	<target name="agent2-tests">
+		<!-- Create, build & test agent2 -->
+		<exec executable="./bootstrap.sh" failonerror="on"/>
+		<exec executable="./configure" failonerror="on">
+			<arg line="--quiet"/>
+			<arg line="--enable-agent2"/>
+		</exec>
+		<exec executable="make" failonerror="on">
+			<arg line="-s"/>
+			<arg line="-j5"/>
+			<arg line="check"/>
+		</exec>
 	</target>
 
 	<target name="build" depends="make-dist"/>

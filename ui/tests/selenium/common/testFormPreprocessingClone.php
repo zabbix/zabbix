@@ -203,8 +203,6 @@ class testFormPreprocessingClone extends CWebTest {
 	 * Add preprocessing steps to LLD.
 	 */
 	public function prepareLLDPreprocessing() {
-		CDataHelper::setSessionId(null);
-
 		CDataHelper::call('discoveryrule.update', [
 			'itemid' => $this->lldid,
 			'preprocessing' => $this->getLLDPreprocessing()
@@ -215,8 +213,6 @@ class testFormPreprocessingClone extends CWebTest {
 	 * Add preprocessing steps to item.
 	 */
 	public function prepareItemPreprocessing() {
-		CDataHelper::setSessionId(null);
-
 		CDataHelper::call('item.update', [
 			'itemid' => $this->itemid,
 			'preprocessing' => $this->getItemPreprocessing()
@@ -227,8 +223,6 @@ class testFormPreprocessingClone extends CWebTest {
 	 * Add preprocessing steps to item prototype.
 	 */
 	public function prepareItemPrototypePreprocessing() {
-		CDataHelper::setSessionId(null);
-
 		CDataHelper::call('itemprototype.update', [
 			'itemid' => $this->item_prototypeid,
 			'preprocessing' => $this->getItemPreprocessing()
@@ -268,12 +262,15 @@ class testFormPreprocessingClone extends CWebTest {
 				$this->lldid.'&context='.$context.'&itemid='.$this->item_prototypeid);
 
 		// Open host or template and make a full clone of it.
-		$url = ($template) ? 'templates.php?form=update&templateid=' : 'hosts.php?form=update&hostid=';
+		$url = ($template) ? 'templates.php?form=update&templateid=' : 'zabbix.php?action=host.edit&hostid=';
 		$this->page->open($url.$this->hostid);
 		$this->query('button:Full clone')->waitUntilClickable()->one()->click();
 
 		// Fill cloned host or template form and save it.
-		$form = $this->query('name', ($template) ? 'templatesForm' : 'hostsForm')->asForm()->waitUntilPresent()->one();
+		$form = ($template)
+			? $this->query('name:templatesForm')->asForm()->waitUntilPresent()->one()
+			: $this->query('id:host-form')->asForm()->waitUntilPresent()->one();
+
 		$new_host_name = 'Cloned host name'.time();
 		$form->fill([($template) ? 'Template name' : 'Host name' => $new_host_name]);
 		$form->submit();

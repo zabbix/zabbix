@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -21,26 +21,12 @@
 
 class CSeverity extends CRadioButtonList {
 	/**
-	 * Options array.
-	 *
-	 * string $options['name']   HTML element name.
-	 * int    $options['value']  Default selected value, default TRIGGER_SEVERITY_NOT_CLASSIFIED.
-	 * bool   $options['all']    Is option 'All' available, default false.
-	 * @property array
+	 * @param string   $name     HTML element name.
+	 * @param int|null $value    Default selected value, default TRIGGER_SEVERITY_NOT_CLASSIFIED.
+	 * @param bool     $enabled  If set to false, radio buttons (severities) are marked as disabled.
 	 */
-	private $options = [
-		'all'	=> false,
-		'value' => TRIGGER_SEVERITY_NOT_CLASSIFIED
-	];
-
-	/**
-	 * @param array $options    Array of options.
-	 * @param bool  $enabled    If set to false, radio buttons (severities) are marked as disabled.
-	 */
-	public function __construct(array $options = [], $enabled = true) {
-		$this->options = $options + $this->options;
-
-		parent::__construct($this->options['name'], $this->options['value']);
+	public function __construct(string $name, ?int $value = TRIGGER_SEVERITY_NOT_CLASSIFIED, bool $enabled = true) {
+		parent::__construct($name, $value);
 
 		$this->setModern(true);
 		$this->setEnabled($enabled);
@@ -49,14 +35,14 @@ class CSeverity extends CRadioButtonList {
 	/**
 	 * Add value.
 	 *
-	 * @param string $label      Input element label.
-	 * @param string $value      Input element value.
-	 * @param string $class      List item class name.
-	 * @param string $on_change  Javascript handler for onchange event.
+	 * @param string $label           Input element label.
+	 * @param string|int $value       Input element value.
+	 * @param string|null $class      List item class name.
+	 * @param string|null $on_change  Javascript handler for onchange event.
 	 *
 	 * @return CSeverity
 	 */
-	public function addValue($label, $value, $class = null, $on_change = null) {
+	public function addValue($label, $value, $class = null, $on_change = null): self {
 		$this->values[] = [
 			'name' => $label,
 			'value' => $value,
@@ -68,12 +54,8 @@ class CSeverity extends CRadioButtonList {
 		return $this;
 	}
 
-	public function toString($destroy = true) {
-		if ($this->options['all']) {
-			$this->addValue(_('all'), -1);
-		}
-
-		foreach (getSeverities() as $severity) {
+	public function toString($destroy = true): string {
+		foreach (CSeverityHelper::getSeverities() as $severity) {
 			$this->addValue($severity['name'], $severity['value'], $severity['style']);
 		}
 

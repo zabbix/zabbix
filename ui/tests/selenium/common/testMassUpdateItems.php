@@ -73,8 +73,6 @@ class testMassUpdateItems extends CWebTest{
 	 * Add interface to host.
 	 */
 	public function prepareInterfaceData() {
-		CDataHelper::setSessionId(null);
-
 		CDataHelper::call('hostinterface.create', [
 			[
 				'hostid' => self::HOSTID,
@@ -1417,8 +1415,6 @@ class testMassUpdateItems extends CWebTest{
 	 * Add items with preprocessing for mass updating.
 	 */
 	public function prepareItemPreprocessingData() {
-		CDataHelper::setSessionId(null);
-
 		CDataHelper::call('item.create', [
 			[
 				'hostid' => self::HOSTID,
@@ -1722,7 +1718,7 @@ class testMassUpdateItems extends CWebTest{
 							]
 						]
 					],
-					'details' => 'Invalid parameter "/1/tags/1/tag": cannot be empty.'
+					'details' => 'Invalid parameter "/1/tags/2/tag": cannot be empty.'
 				]
 			],
 			// TODO: Uncomment this case when ZBX-19263 is fixed.

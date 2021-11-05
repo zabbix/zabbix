@@ -23,15 +23,20 @@
  * Controller to update dashboard
  */
 class CControllerDashboardShareUpdate extends CController {
-	const EMPTY_USER = 'empty_user';
-	const EMPTY_GROUP = 'empty_group';
+
+	public const EMPTY_USER = 'empty_user';
+	public const EMPTY_GROUP = 'empty_group';
+
+	protected function init() {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
 
 	protected function checkInput() {
 		$fields = [
-			'dashboardid' => 'required|db dashboard.dashboardid',
-			'private' => 'db dashboard.private|in 0,1',
-			'users' => 'array',
-			'userGroups' => 'array'
+			'dashboardid' =>	'required|db dashboard.dashboardid',
+			'private' =>		'db dashboard.private|in 0,1',
+			'users' =>			'array',
+			'userGroups' =>		'array'
 		];
 
 		$ret = $this->validateInput($fields);

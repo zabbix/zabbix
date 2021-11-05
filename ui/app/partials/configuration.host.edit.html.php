@@ -21,6 +21,7 @@
 
 /**
  * @var CPartial $this
+ * @var array    $data
  */
 
 $this->includeJsFile('configuration.host.edit.html.js.php');
@@ -30,11 +31,14 @@ $host_is_discovered = ($data['host']['flags'] == ZBX_FLAG_DISCOVERY_CREATED);
 $host_form = (new CForm())
 	->setId($data['form_name'])
 	->setName($data['form_name'])
-	->addVar('action', $data['form_action'])
+	->setAction((new CUrl('zabbix.php'))
+		->setArgument('action', $data['form_action'])
+		->getUrl()
+	)
 	->addVar('hostid', $data['hostid'])
 	->addVar('clone_hostid', $data['clone_hostid'])
 	->addVar('full_clone', $data['full_clone'])
-	->addItem((new CInput('submit'))->addStyle('display: none;'));
+	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
 // Host tab.
 $discovered_by = null;
@@ -57,51 +61,29 @@ if ($host_is_discovered) {
 	}
 
 	$discovered_by = [new CLabel(_('Discovered by')), new CFormField($discovery_rule)];
-
-	$agent_interfaces = (new CDiv())
-		->setId('agentInterfaces')
-		->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
-		->setAttribute('data-type', 'agent');
-
-	$snmp_interfaces = (new CDiv())
-		->setId('SNMPInterfaces')
-		->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER.' '.ZBX_STYLE_LIST_VERTICAL_ACCORDION)
-		->setAttribute('data-type', 'snmp');
-
-	$jmx_interfaces = (new CDiv())
-		->setId('JMXInterfaces')
-		->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
-		->setAttribute('data-type', 'jmx');
-
-	$ipmi_interfaces = (new CDiv())
-		->setId('IPMIInterfaces')
-		->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
-		->setAttribute('data-type', 'ipmi');
 }
-else {
-	$agent_interfaces = (new CDiv())
-		->setId('agentInterfaces')
-		->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
-		->setAttribute('data-type', 'agent');
 
-	$snmp_interfaces = (new CDiv())
-		->setId('SNMPInterfaces')
-		->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER.' '.ZBX_STYLE_LIST_VERTICAL_ACCORDION)
-		->setAttribute('data-type', 'snmp');
+$agent_interfaces = (new CDiv())
+	->setId('agentInterfaces')
+	->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
+	->setAttribute('data-type', 'agent');
 
-	$jmx_interfaces = (new CDiv())
-		->setId('JMXInterfaces')
-		->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
-		->setAttribute('data-type', 'jmx');
+$snmp_interfaces = (new CDiv())
+	->setId('SNMPInterfaces')
+	->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER.' '.ZBX_STYLE_LIST_VERTICAL_ACCORDION)
+	->setAttribute('data-type', 'snmp');
 
-	$ipmi_interfaces = (new CDiv())
-		->setId('IPMIInterfaces')
-		->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
-		->setAttribute('data-type', 'ipmi');
-}
+$jmx_interfaces = (new CDiv())
+	->setId('JMXInterfaces')
+	->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
+	->setAttribute('data-type', 'jmx');
+
+$ipmi_interfaces = (new CDiv())
+	->setId('IPMIInterfaces')
+	->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
+	->setAttribute('data-type', 'ipmi');
 
 $host_tab = (new CFormGrid())
-	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED)
 	->addItem($discovered_by)
 	->addItem([
 		(new CLabel(_('Host name'), 'host'))->setAsteriskMark(),
@@ -148,7 +130,7 @@ $host_tab = (new CFormGrid())
 			new CDiv([renderInterfaceHeaders(), $agent_interfaces, $snmp_interfaces, $jmx_interfaces, $ipmi_interfaces]),
 			(!$host_is_discovered)
 				? new CDiv(
-					(new CButton('', _('Add')))
+					(new CButton(null, _('Add')))
 						->addClass(ZBX_STYLE_BTN_LINK)
 						->setMenuPopup([
 							'type' => 'submenu',
@@ -180,7 +162,7 @@ $host_tab = (new CFormGrid())
 		)
 	])
 	->addItem([
-		_('Enabled'),
+		new CLabel(_('Enabled'), 'status'),
 		new CFormField(
 			(new CCheckBox('status', HOST_STATUS_MONITORED))
 				->setChecked($data['host']['status'] == HOST_STATUS_MONITORED)
@@ -188,11 +170,12 @@ $host_tab = (new CFormGrid())
 	]);
 
 // Templates tab.
-$templates_tab = (new CFormGrid())->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED);
+$templates_tab = new CFormGrid();
 
 if ($host_is_discovered) {
 	$linked_template_table = (new CTable())
 		->setHeader([_('Name')])
+		->addClass(ZBX_STYLE_TABLE_FORMS)
 		->setId('linked-template')
 		->addStyle('width: 100%;');
 
@@ -209,10 +192,14 @@ if ($host_is_discovered) {
 			$template_link = new CSpan($template['name']);
 		}
 
-		$linked_template_table->addRow([
-			$template_link,
-			(new CVar('templates[' . $template['templateid'] . ']', $template['templateid']))->removeId()
-		]);
+		$linked_template_table->addRow(
+			(new CCol([
+				$template_link,
+				(new CVar('templates[' . $template['templateid'] . ']', $template['templateid']))->removeId()
+			]))
+				->addClass(ZBX_STYLE_WORDWRAP)
+				->addStyle('max-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		);
 	}
 
 	$templates_tab->addItem([
@@ -227,6 +214,7 @@ if ($host_is_discovered) {
 else {
 	$linked_template_table = (new CTable())
 		->setHeader([_('Name'), _('Action')])
+		->addClass(ZBX_STYLE_TABLE_FORMS)
 		->setId('linked-template')
 		->setAttribute('style', 'width: 100%;');
 
@@ -244,18 +232,22 @@ else {
 		}
 
 		$linked_template_table->addRow([
-			[
+			(new CCol([
 				$template_link,
 				(new CVar('templates[]', $template['templateid']))->removeId()
-			],
+			]))
+				->addClass(ZBX_STYLE_WORDWRAP)
+				->addStyle('max-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
 			(new CCol(
 				new CHorList([
 					(new CSimpleButton(_('Unlink')))
-						->addClass('js-tmpl-unlink ' . ZBX_STYLE_BTN_LINK)
-						->setAttribute('data-templateid', $template['templateid']),
-					(new CSimpleButton(_('Unlink and clear')))
-						->addClass('js-tmpl-unlink-and-clear ' . ZBX_STYLE_BTN_LINK)
-						->setAttribute('data-templateid', $template['templateid'])
+						->onClick('host_edit.unlinkTemplate(this)')
+						->addClass(ZBX_STYLE_BTN_LINK),
+					$data['clone_hostid'] === null
+						? (new CSimpleButton(_('Unlink and clear')))
+							->onClick('host_edit.unlinkAndClearTemplate(this, '.json_encode($template['templateid']).')')
+							->addClass(ZBX_STYLE_BTN_LINK)
+						: null
 				])
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]);
@@ -315,7 +307,6 @@ else {
 }
 
 $ipmi_tab = (new CFormGrid())
-	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED)
 	->addItem([
 		new CLabel(_('Authentication algorithm'), 'ipmi_authtype'),
 		new CFormField($ipmi_authtype_select)
@@ -342,35 +333,29 @@ $ipmi_tab = (new CFormGrid())
 	]);
 
 // Tags tab.
-$tags_tab = (new CFormGrid())
-	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED)
-	->addItem(new CPartial('configuration.tags.tab', [
-		'source' => 'host',
-		'tags' => $data['host']['tags'],
-		'readonly' => $host_is_discovered
-	]));
+$tags_tab = new CPartial('configuration.tags.tab', [
+	'source' => 'host',
+	'tags' => $data['host']['tags'],
+	'readonly' => $host_is_discovered,
+	'tabs_id' => 'host-tabs'
+]);
 
 // Macros tab.
-$macros_tab = (new CFormGrid())
-	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED)
-	->addItem(
-		(new CFormList('macrosFormList'))
-			->addRow(null, (new CRadioButtonList('show_inherited_macros', 0))
-				->addValue(_('Host macros'), 0)
-				->addValue(_('Inherited and host macros'), 1)
-				->setModern(true)
-			)
-			->addRow(null,
-				new CPartial('hostmacros.list.html', [
-					'macros' => $data['host']['macros'],
-					'readonly' => $host_is_discovered
-				]), 'macros_container'
-			)
+$macros_tab = (new CFormList('macrosFormList'))
+	->addRow(null, (new CRadioButtonList('show_inherited_macros', (int) $data['show_inherited_macros']))
+		->addValue(_('Host macros'), 0)
+		->addValue(_('Inherited and host macros'), 1)
+		->setModern(true)
+	)
+	->addRow(null,
+		new CPartial('hostmacros.list.html', [
+			'macros' => $data['host']['macros'],
+			'readonly' => $host_is_discovered
+		]), 'macros_container'
 	);
 
 // Inventory tab.
 $inventory_tab = (new CFormGrid())
-	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED)
 	->addItem([
 		null,
 		new CFormField([
@@ -444,7 +429,6 @@ $tls_accept = (int) $data['host']['tls_accept'];
 $is_psk_set = ($data['host']['tls_connect'] == HOST_ENCRYPTION_PSK || $tls_accept & HOST_ENCRYPTION_PSK);
 
 $encryption_tab = (new CFormGrid())
-	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED)
 	->addItem([
 		new CLabel(_('Connections to host')),
 		new CFormField(
@@ -459,30 +443,26 @@ $encryption_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Connections from host')),
 		new CFormField([
-			(new CList())
-				->addItem(
-					(new CCheckBox('tls_in_none'))
-						->setChecked(($tls_accept & HOST_ENCRYPTION_NONE))
-						->setLabel(_('No encryption'))
-						->setEnabled(!$host_is_discovered)
-				)
-				->addItem(
-					(new CCheckBox('tls_in_psk'))
-						->setChecked(($tls_accept & HOST_ENCRYPTION_PSK))
-						->setLabel(_('PSK'))
-						->setEnabled(!$host_is_discovered)
-				)
-				->addItem(
-					(new CCheckBox('tls_in_cert'))
-						->setChecked(($tls_accept & HOST_ENCRYPTION_CERTIFICATE))
-						->setLabel(_('Certificate'))
-						->setEnabled(!$host_is_discovered)
-				),
+			(new CList([
+				(new CCheckBox('tls_in_none'))
+					->setChecked(($tls_accept & HOST_ENCRYPTION_NONE))
+					->setLabel(_('No encryption'))
+					->setEnabled(!$host_is_discovered),
+				(new CCheckBox('tls_in_psk'))
+					->setChecked(($tls_accept & HOST_ENCRYPTION_PSK))
+					->setLabel(_('PSK'))
+					->setEnabled(!$host_is_discovered),
+				(new CCheckBox('tls_in_cert'))
+					->setChecked(($tls_accept & HOST_ENCRYPTION_CERTIFICATE))
+					->setLabel(_('Certificate'))
+					->setEnabled(!$host_is_discovered)
+			]))
+				->addClass(ZBX_STYLE_LIST_CHECK_RADIO),
 			new CInput('hidden', 'tls_accept', $tls_accept)
 		])
 	])
 	->addItem(
-		(($data['hostid'] || $data['clone_hostid']) && $is_psk_set)
+		($is_psk_set && !$data['is_psk_edit'] && ($data['hostid'] || $data['clone_hostid']))
 		? [
 			(new CLabel(_('PSK'), 'change_psk'))->setAsteriskMark(),
 			new CFormField(
@@ -497,7 +477,9 @@ $encryption_tab = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('PSK identity'), 'tls_psk_identity'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('tls_psk_identity', '', false, DB::getFieldLength('hosts', 'tls_psk_identity')))
+			(new CTextBox('tls_psk_identity', $data['host']['tls_psk_identity'], false,
+				DB::getFieldLength('hosts', 'tls_psk_identity')
+			))
 				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 				->setAriaRequired()
 		)
@@ -505,7 +487,7 @@ $encryption_tab = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('PSK'), 'tls_psk'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('tls_psk', '', false, DB::getFieldLength('hosts', 'tls_psk')))
+			(new CTextBox('tls_psk', $data['host']['tls_psk'], false, DB::getFieldLength('hosts', 'tls_psk')))
 				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 				->setAriaRequired()
 				->disableAutocomplete()
@@ -530,20 +512,17 @@ $encryption_tab = (new CFormGrid())
 
 // Value mapping tab.
 if (!$host_is_discovered) {
-	$value_mapping_tab = (new CFormGrid())
-		->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED)
-		->addItem((new CFormList('valuemap-formlist'))
-			->addRow(null, new CPartial('configuration.valuemap', [
-				'source' => 'host',
-				'valuemaps' => $data['host']['valuemaps'],
-				'readonly' => $host_is_discovered,
-				'form' => 'host'
-			]))
-		);
+	$value_mapping_tab = (new CFormList('valuemap-formlist'))
+		->addRow(null, new CPartial('configuration.valuemap', [
+			'source' => 'host',
+			'valuemaps' => $data['host']['valuemaps'],
+			'readonly' => $host_is_discovered,
+			'form' => 'host'
+		]));
 }
 
 // main output
-$tabs = (new CTabView())
+$tabs = (new CTabView(['id' => 'host-tabs']))
 	->setSelected(0)
 	->addTab('host-tab', _('Host'), $host_tab)
 	->addTab('template-tab', _('Templates'), $templates_tab, TAB_INDICATOR_LINKED_TEMPLATE)
@@ -551,7 +530,7 @@ $tabs = (new CTabView())
 	->addTab('tags-tab', _('Tags'), $tags_tab, TAB_INDICATOR_TAGS)
 	->addTab('macros-tab', _('Macros'), $macros_tab, TAB_INDICATOR_MACROS)
 	->addTab('inventory-tab', _('Inventory'), $inventory_tab, TAB_INDICATOR_INVENTORY)
-	->addTab('encryption-tab', _('Encryption'), $encryption_tab, TAB_INDICATOR_ENCRYPTION);;
+	->addTab('encryption-tab', _('Encryption'), $encryption_tab, TAB_INDICATOR_ENCRYPTION);
 
 if (!$host_is_discovered) {
 	$tabs->addTab('valuemap-tab', _('Value mapping'), $value_mapping_tab, TAB_INDICATOR_VALUEMAPS);
@@ -567,11 +546,6 @@ if (array_key_exists('buttons', $data)) {
 }
 
 $host_form
+	->addItem($data['warning'])
 	->addItem($tabs)
-	->show();
-
-(new CScriptTag(
-	'host_edit.init()'
-))
-	->setOnDocumentReady()
 	->show();

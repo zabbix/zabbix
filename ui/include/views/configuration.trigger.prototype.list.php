@@ -176,7 +176,7 @@ foreach ($data['triggers'] as $trigger) {
 
 	$triggersTable->addRow([
 		$checkBox,
-		getSeverityCell($trigger['priority']),
+		CSeverityHelper::makeSeverityCell((int) $trigger['priority']),
 		$description,
 		$trigger['opdata'],
 		(new CDiv($expression))->addClass(ZBX_STYLE_WORDWRAP),

@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../../include/items.inc.php';
 use Facebook\WebDriver\WebDriverBy;
 
 /**
- * @backup httptest
+ * @backup httptest, profiles
  */
 class testFormWeb extends CLegacyWebTest {
 
@@ -178,15 +178,24 @@ class testFormWeb extends CLegacyWebTest {
 	public function testFormWeb_CheckLayout($data) {
 		if (isset($data['template'])) {
 			$this->zbxTestLogin('templates.php');
+
+			// If the template is not present on this page anymore - check on next page.
+			for ($i = 0; $i < 2; $i++) {
+				if ($this->query('link', $data['template'])->one(false)->isValid() === true) {
+					break;
+				}
+				$this->query('xpath://div[@class="table-paging"]//span[@class="arrow-right"]/..')->one()->click();
+				$this->page->waitUntilReady();
+			}
+
 			$this->zbxTestClickLinkTextWait($data['template']);
+			$this->zbxTestClickLinkTextWait('Web scenarios');
 		}
 
 		if (isset($data['host'])) {
 			$this->zbxTestLogin(self::HOST_LIST_PAGE);
-			$this->zbxTestClickLinkTextWait($data['host']);
+			$this->filterEntriesAndOpenWeb($data['host']);
 		}
-
-		$this->zbxTestClickLinkTextWait('Web scenarios');
 
 		$this->zbxTestCheckTitle('Configuration of web monitoring');
 		$this->zbxTestCheckHeader('Web monitoring');
@@ -382,8 +391,7 @@ class testFormWeb extends CLegacyWebTest {
 		$oldHashItems = CDBHelper::getHash($sqlItems);
 
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
-		$this->zbxTestClickLinkTextWait($this->host);
-		$this->zbxTestClickLinkTextWait('Web scenarios');
+		$this->filterEntriesAndOpenWeb($this->host);
 		$this->zbxTestClickLinkTextWait($name);
 		$this->zbxTestClickWait('update');
 
@@ -1361,11 +1369,9 @@ class testFormWeb extends CLegacyWebTest {
 	 */
 	public function testFormWeb_SimpleCreate($data) {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
-		$this->zbxTestClickLinkTextWait($this->host);
-		$this->zbxTestClickLinkTextWait('Web scenarios');
+		$this->filterEntriesAndOpenWeb($this->host);
 
 		$this->zbxTestCheckTitle('Configuration of web monitoring');
-
 		$this->zbxTestContentControlButtonClickTextWait('Create web scenario');
 		$this->zbxTestCheckTitle('Configuration of web monitoring');
 		$this->zbxTestCheckHeader('Web monitoring');
@@ -1515,7 +1521,6 @@ class testFormWeb extends CLegacyWebTest {
 					$this->zbxTestTextPresent($step);
 				}
 			}
-			$this->zbxTestClickLinkTextWait($this->host);
 			$this->zbxTestClickLinkTextWait('Web scenarios');
 			$this->zbxTestCheckHeader('Web monitoring');
 			$this->zbxTestTextPresent($name);
@@ -1549,5 +1554,19 @@ class testFormWeb extends CLegacyWebTest {
 				"step.httptestid = test.httptestid ".
 				"WHERE test.name = '".$name."' AND step.name = '".$step."'"));
 		}
+	}
+
+	/**
+	 * Function for filtering necessary hosts and opening their Web scenarios.
+	 *
+	 * @param string    $host    name of a host where web scenarios are opened
+	 */
+	private function filterEntriesAndOpenWeb($host) {
+		$this->query('button:Reset')->one()->click();
+		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+		$form->fill(['Name' => $host]);
+		$this->query('button:Apply')->one()->waitUntilClickable()->click();
+		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $host)
+				->getColumn('Web')->query('link:Web')->one()->click();
 	}
 }

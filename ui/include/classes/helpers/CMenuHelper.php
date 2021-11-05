@@ -48,15 +48,6 @@ class CMenuHelper {
 						'httpdetails.php', 'host.dashboard.view'
 					])
 				: null,
-			CWebUser::checkAccess(CRoleHelper::UI_MONITORING_OVERVIEW)
-				? (new CMenuItem(_('Overview')))
-					->setSubMenu(new CMenu([
-						(new CMenuItem(_('Trigger overview')))
-							->setUrl((new CUrl('overview.php'))->setArgument('type', 0), 'overview.php?type=0'),
-						(new CMenuItem(_('Data overview')))
-							->setUrl((new CUrl('overview.php'))->setArgument('type', 1), 'overview.php?type=1')
-					]))
-				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA)
 				? (new CMenuItem(_('Latest data')))
 					->setAction('latest.view')
@@ -250,6 +241,8 @@ class CMenuHelper {
 							->setAction('macros.edit'),
 						(new CMenuItem(_('Trigger displaying options')))
 							->setAction('trigdisplay.edit'),
+						(new CMenuItem(_('Geographical maps')))
+							->setAction('geomaps.edit'),
 						(new CMenuItem(_('Modules')))
 							->setAction('module.list')
 							->setAliases(['module.edit', 'module.scan']),
@@ -331,19 +324,20 @@ class CMenuHelper {
 		$menu = new CMenu();
 
 		if (!CBrandHelper::isRebranded()) {
+			$lang = CWebUser::getLang();
 			$menu
 				->add(
 					(new CMenuItem(_('Support')))
 						->setIcon('icon-support')
-						->setUrl(new CUrl(getSupportUrl(CWebUser::getLang())))
+						->setUrl(new CUrl(getSupportUrl($lang)))
 						->setTitle(_('Zabbix Technical Support'))
 						->setTarget('_blank')
 				)
 				->add(
-					(new CMenuItem(_('Share')))
-						->setIcon('icon-share')
-						->setUrl(new Curl('https://share.zabbix.com/'))
-						->setTitle(_('Zabbix Share'))
+					(new CMenuItem(_('Integrations')))
+						->setIcon('icon-integrations')
+						->setUrl(new CUrl(getIntegrationsUrl($lang)))
+						->setTitle(_('Zabbix Integrations'))
 						->setTarget('_blank')
 				);
 		}

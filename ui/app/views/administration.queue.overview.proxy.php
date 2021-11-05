@@ -66,17 +66,17 @@ foreach ($data['proxies'] as $proxyid => $proxy) {
 	$table->addRow([
 		$proxy['host'],
 		($proxy_queue['delay5'] == 0) ? 0 : (new CCol($proxy_queue['delay5']))
-			->addClass(getSeverityStyle(TRIGGER_SEVERITY_NOT_CLASSIFIED)),
+			->addClass(CSeverityHelper::getStyle(TRIGGER_SEVERITY_NOT_CLASSIFIED)),
 		($proxy_queue['delay10'] == 0) ? 0 : (new CCol($proxy_queue['delay10']))
-			->addClass(getSeverityStyle(TRIGGER_SEVERITY_INFORMATION)),
+			->addClass(CSeverityHelper::getStyle(TRIGGER_SEVERITY_INFORMATION)),
 		($proxy_queue['delay30'] == 0) ? 0 : (new CCol($proxy_queue['delay30']))
-			->addClass(getSeverityStyle(TRIGGER_SEVERITY_WARNING)),
+			->addClass(CSeverityHelper::getStyle(TRIGGER_SEVERITY_WARNING)),
 		($proxy_queue['delay60'] == 0) ? 0 : (new CCol($proxy_queue['delay60']))
-			->addClass(getSeverityStyle(TRIGGER_SEVERITY_AVERAGE)),
+			->addClass(CSeverityHelper::getStyle(TRIGGER_SEVERITY_AVERAGE)),
 		($proxy_queue['delay300'] == 0) ? 0 : (new CCol($proxy_queue['delay300']))
-			->addClass(getSeverityStyle(TRIGGER_SEVERITY_HIGH)),
+			->addClass(CSeverityHelper::getStyle(TRIGGER_SEVERITY_HIGH)),
 		($proxy_queue['delay600'] == 0) ? 0 : (new CCol($proxy_queue['delay600']))
-			->addClass(getSeverityStyle(TRIGGER_SEVERITY_DISASTER))
+			->addClass(CSeverityHelper::getStyle(TRIGGER_SEVERITY_DISASTER))
 	]);
 }
 

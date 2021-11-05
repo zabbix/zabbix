@@ -21,42 +21,62 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $data['form_name'] = 'host-form';
-$data['popup_form'] = true;
+$popup_url = (new CUrl('zabbix.php'))
+	->setArgument('action', 'host.edit');
 
 if ($data['hostid'] == 0) {
+	if (array_key_exists('groupids', $data) && $data['groupids']) {
+		$popup_url->setArgument('groupids', $data['groupids']);
+	}
+	elseif ($data['clone_hostid'] !== null) {
+		$popup_url->setArgument('hostid', $data['clone_hostid']);
+
+		if ($data['full_clone'] === 1) {
+			$popup_url->setArgument('full_clone', 1);
+		}
+		else {
+			$popup_url->setArgument('clone', 1);
+		}
+	}
+
 	$buttons = [
 		[
 			'title' => _('Add'),
 			'class' => '',
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'host_edit.submit(document.getElementById("'.$data['form_name'].'"));'
+			'action' => 'host_edit_popup.submit();'
 		]
 	];
 }
 else {
+	$popup_url->setArgument('hostid', $data['hostid']);
+
 	$buttons = [
 		[
 			'title' => _('Update'),
 			'class' => '',
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'host_edit.submit(document.getElementById("'.$data['form_name'].'"));'
+			'action' => 'host_edit_popup.submit();'
 		],
 		[
 			'title' => _('Clone'),
-			'class' => 'btn-alt js-clone-host',
+			'class' => 'btn-alt',
 			'keepOpen' => true,
-			'isSubmit' => false
+			'isSubmit' => false,
+			'action' => 'host_edit_popup.clone();'
 		],
 		[
 			'title' => _('Full clone'),
-			'class' => 'btn-alt js-full-clone-host',
+			'class' => 'btn-alt',
 			'keepOpen' => true,
-			'isSubmit' => false
+			'isSubmit' => false,
+			'action' => 'host_edit_popup.fullClone();'
 		],
 		[
 			'title' => _('Delete'),
@@ -64,15 +84,26 @@ else {
 			'class' => 'btn-alt',
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'host_edit.deleteHost();'
+			'action' => 'host_edit_popup.delete('.json_encode($data['hostid']).');'
 		]
 	];
+}
+
+if ($data['warning']) {
+	$data['warning'] = makeMessageBox(ZBX_STYLE_MSG_WARNING, [['message' => $data['warning']]]);
 }
 
 $output = [
 	'header' => ($data['hostid'] == 0) ? _('New host') : _('Host'),
 	'body' => (new CPartial('configuration.host.edit.html', $data))->getOutput(),
-	'script_inline' => getPagePostJs().';setupHostPopup();',
+	'script_inline' => getPagePostJs().
+		$this->readJsFile('popup.host.edit.js.php').
+		'host_edit_popup.init('.json_encode([
+			'popup_url' => $popup_url->getUrl(),
+			'form_name' => $data['form_name'],
+			'host_interfaces' => $data['host']['interfaces'],
+			'host_is_discovered' => ($data['host']['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
+		]).');',
 	'buttons' => $buttons
 ];
 

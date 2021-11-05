@@ -192,12 +192,7 @@ class testFormTemplate extends CLegacyWebTest {
 			$filter->submit();
 
 			$name = CTestArrayHelper::get($data, 'visible_name', $data['name']);
-			// Check if template name present on page, if not, check on second page.
-			if (!$this->query('link', $name)->one(false)->isValid()) {
-				$this->query('xpath://div[@class="table-paging"]//span[@class="arrow-right"]/..')->one()->click();
-				$this->zbxTestWaitForPageToLoad();
-			}
-			$this->zbxTestClickLinkTextWait($name);
+			$this->filterAndOpenTemplate($name);
 
 			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('template_name'));
 			$this->zbxTestAssertElementValue('template_name', $data['name']);
@@ -226,11 +221,7 @@ class testFormTemplate extends CLegacyWebTest {
 		$new_template_name = 'Changed template name';
 
 		$this->zbxTestLogin('templates.php');
-		$this->query('button:Reset')->one()->click();
-		$this->zbxTestWaitForPageToLoad();
-		$this->query('xpath://div[@class="table-paging"]//span[@class="arrow-right"]/..')->one()->click();
-		$this->zbxTestWaitForPageToLoad();
-		$this->zbxTestClickLinkTextWait($this->template_edit_name);
+		$this->filterAndOpenTemplate($this->template_edit_name);
 		$this->zbxTestInputTypeOverwrite('template_name', $new_template_name);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Template updated');
@@ -240,15 +231,9 @@ class testFormTemplate extends CLegacyWebTest {
 
 	public function testFormTemplate_CloneTemplate() {
 		$cloned_template_name = 'Cloned template';
+
 		$this->zbxTestLogin('templates.php?page=1');
-		$this->query('button:Reset')->one()->click();
-		// Check if template name present on page, if not, check on second page.
-		if ($this->query('link', $this->template_clone)->one(false)->isValid() === false) {
-			$this->query('xpath://div[@class="table-paging"]//span[@class="arrow-right"]/..')->one()->click();
-			$this->zbxTestWaitForPageToLoad();
-		}
-		$this->zbxTestAssertElementPresentId('filter_name');
-		$this->zbxTestDoubleClickLinkText($this->template_clone, 'template_name');
+		$this->filterAndOpenTemplate($this->template_clone);
 		$this->zbxTestClickWait('clone');
 		$this->zbxTestInputTypeOverwrite('template_name', $cloned_template_name);
 		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
@@ -263,14 +248,9 @@ class testFormTemplate extends CLegacyWebTest {
 
 	public function testFormTemplate_FullCloneTemplate() {
 		$cloned_template_name = 'Full cloned template';
+
 		$this->zbxTestLogin('templates.php?page=2');
-		$this->query('button:Reset')->one()->click();
-		// Check if template name present on page, if not, check on second page.
-		if ($this->query('link', $this->template_clone)->one(false)->isValid() === false) {
-			$this->query('xpath://div[@class="table-paging"]//span[@class="arrow-right"]/..')->one()->click();
-			$this->zbxTestWaitForPageToLoad();
-		}
-		$this->zbxTestClickLinkTextWait($this->template_clone);
+		$this->filterAndOpenTemplate($this->template_clone);
 		$this->zbxTestClickWait('full_clone');
 		$this->zbxTestInputTypeOverwrite('template_name', $cloned_template_name);
 		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
@@ -287,8 +267,7 @@ class testFormTemplate extends CLegacyWebTest {
 		$template = CDBHelper::getRow("select hostid from hosts where host like '".$this->template."'");
 
 		$this->zbxTestLogin('templates.php?page=1');
-		$this->query('button:Reset')->one()->click();
-		$this->zbxTestClickLinkTextWait($this->template);
+		$this->filterAndOpenTemplate($this->template);
 		$this->zbxTestClickWait('delete');
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Template deleted');
@@ -299,9 +278,8 @@ class testFormTemplate extends CLegacyWebTest {
 
 	public function testFormTemplate_DeleteAndClearTemplate() {
 		$template = CDBHelper::getRow("select hostid from hosts where host like '".$this->template_full_delete."'");
-		$this->zbxTestLogin('templates.php?page=1');
-		$this->query('button:Reset')->one()->click();
-		$this->zbxTestClickLinkTextWait($this->template_full_delete);
+		$this->zbxTestLogin('templates.php');
+		$this->filterAndOpenTemplate($this->template_full_delete);
 		$this->zbxTestClickWait('delete_and_clear');
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Template deleted');
@@ -311,5 +289,20 @@ class testFormTemplate extends CLegacyWebTest {
 		$this->assertEquals(0, CDBHelper::getCount("SELECT triggerid FROM triggers WHERE templateid='".$template['hostid']."'"));
 		$this->assertEquals(0, CDBHelper::getCount("SELECT hostgroupid FROM hosts_groups WHERE hostid='".$template['hostid']."'"));
 		$this->assertEquals(0, CDBHelper::getCount("SELECT httptestid FROM httptest WHERE hostid='".$template['hostid']."'"));
+	}
+
+	/**
+	 * Function for filtering necessary template and opening its form.
+	 *
+	 * @param string    name    name of a template
+	 */
+	public function filterAndOpenTemplate($name) {
+		$this->query('button:Reset')->one()->click();
+		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
+		$form->fill(['Name' => $name]);
+		$this->query('button:Apply')->one()->waitUntilClickable()->click();
+		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
+				->getColumn('Name')->query('link', $name)->one()->click();
+		$this->page->waitUntilReady();
 	}
 }

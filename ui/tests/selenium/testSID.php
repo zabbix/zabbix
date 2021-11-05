@@ -24,6 +24,9 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
  * @backup token
+ *
+ * @dataSource ScheduledReports
+ *
  * @onBefore prepareTokenData
  */
 class testSID extends CWebTest {
@@ -147,7 +150,7 @@ class testSID extends CWebTest {
 
 			// Host mass update.
 			[['link' => 'zabbix.php?form_refresh=1&action=popup.massupdate.host&ids%5B0%5D=50011&ids%5B1%5D=50012&'.
-					'tls_accept=0&update=1&location_url='.urlencode(self::HOST_LIST_PAGE).'&visible%5Bstatus%5D=1&status=1']],
+					'tls_accept=0&update=1&location_url=hosts.php&visible%5Bstatus%5D=1&status=1']],
 
 			// Item mass update.
 			[['link' => 'zabbix.php?form_refresh=1&ids%5B0%5D=99086&ids%5B1%5D=99091&action=popup.massupdate.item&'.
@@ -387,8 +390,10 @@ class testSID extends CWebTest {
 
 			// Authentication update.
 			[['link' => 'zabbix.php?form_refresh=3&action=authentication.update&db_authentication_type=0&'.
-					'authentication_type=0&http_auth_enabled=1&http_login_form=0&http_strip_domains=&'.
-					'http_case_sensitive=1&ldap_configured=0&change_bind_password=1&saml_auth_enabled=0&update=Update']],
+					'authentication_type=0&passwd_min_length=8&passwd_check_rules%5B%5D=1&passwd_check_rules%5B%5D=2&'.
+					'passwd_check_rules%5B%5D=4&passwd_check_rules%5B%5D=8&http_auth_enabled=1&http_login_form=0&'.
+					'http_strip_domains=&http_case_sensitive=1&ldap_configured=0&change_bind_password=1&'.
+					'saml_auth_enabled=0&update=Update']],
 
 			// Media type create.
 			[['link' => 'zabbix.php?form_refresh=1&form=1&mediatypeid=0&status=1&name=1111&type=0&'.
@@ -463,8 +468,7 @@ class testSID extends CWebTest {
 					'uniqueness_criteria=-1&host_source=1&name_source=0&status=1&action=discovery.update']],
 
 			// Export.
-			[['link' => 'zabbix.php?action=export.hosts&format=yaml&backurl='.
-					urlencode(self::HOST_LIST_PAGE).'&form_refresh=1&hosts%5B50011%5D=50011']],
+			[['link' => 'zabbix.php?action=export.hosts&format=yaml&backurl=hosts.php&form_refresh=1&hosts%5B50011%5D=50011']],
 
 			// Favourite create.
 			[['link' => 'zabbix.php?action=favourite.create&object=screenid&objectid=200021']],
@@ -473,142 +477,47 @@ class testSID extends CWebTest {
 			[['link' => 'zabbix.php?action=favourite.delete&object=screenid&objectid=200021']],
 
 			// Host creation.
-			[
-				[
-					'incorrect_request' => true,
-					'link' => (new CUrl('zabbix.php'))
-						->setArgument('action', 'host.create')
-						->setArgument('form_refresh', 1)
-						->setArgument('flags', 0)
-						->setArgument('tls_connect', 1)
-						->setArgument('tls_accept', 1)
-						->setArgument('host', 1111)
-						->setArgument('visiblename', '')
-						->setArgument('groups[][new]', 111)
-						->setArgument('interfaces[1][items]','')
-						->setArgument('interfaces[1][locked]','')
-						->setArgument('interfaces[1][isNew]', 'true')
-						->setArgument('interfaces[1][interfaceid]', 1)
-						->setArgument('interfaces[1][type]', 1)
-						->setArgument('interfaces[1][ip]','=127.0.0.1')
-						->setArgument('interfaces[1][dns]','')
-						->setArgument('interfaces[1][useip]', 1)
-						->setArgument('interfaces[1][port]', 10050)
-						->setArgument('mainInterfaces[1]', 1)
-						->setArgument('description', '')
-						->setArgument('proxy_hostid', 0)
-						->setArgument('status', 0)
-						->setArgument('ipmi_authtype', -1)
-						->setArgument('ipmi_privilege', 2)
-						->setArgument('ipmi_username', '')
-						->setArgument('ipmi_password', '')
-						->setArgument('tags[0][tag]', '')
-						->setArgument('tags[0][value]', '')
-						->setArgument('show_inherited_macros', 0)
-						->setArgument('macros[0][macro]', '')
-						->setArgument('macros[0][value]', '')
-						->setArgument('macros[0][type]', 0)
-						->setArgument('macros[0][description]', '')
-						->setArgument('inventory_mode', -1)
-						->setArgument('tls_connect', 1)
-						->setArgument('tls_in_none', 1)
-						->setArgument('tls_psk_identity', '')
-						->setArgument('tls_psk', '')
-						->setArgument('tls_issuer', '')
-						->setArgument('tls_subject', '')
-						->setArgument('add', 'Add')
-						->getUrl()
-				]
-			],
+			[[
+				'link' => 'zabbix.php?action=host.create&flags=0&tls_connect=1&tls_accept=1&host=1111&visiblename=&'.
+						'groups%5B%5D%5Bnew%5D=111&interfaces%5B1%5D%5Bitems%5D=&interfaces%5B1%5D%5Blocked%5D=&'.
+						'interfaces%5B1%5D%5BisNew%5D=true&interfaces%5B1%5D%5Binterfaceid%5D=1&interfaces%5B1%5D%5Btype%5D=1&'.
+						'interfaces%5B1%5D%5Bip%5D=127.0.0.1&interfaces%5B1%5D%5Bdns%5D=&interfaces%5B1%5D%5Buseip%5D=1&'.
+						'interfaces%5B1%5D%5Bport%5D=10050&mainInterfaces%5B1%5D=1&description=&proxy_hostid=0&status=0&'.
+						'ipmi_authtype=-1&ipmi_privilege=2&ipmi_username=&ipmi_password=&tags%5B0%5D%5Btag%5D=&'.
+						'tags%5B0%5D%5Bvalue%5D=&show_inherited_macros=0&macros%5B0%5D%5Bmacro%5D=&macros%5B0%5D%5Bvalue%5D=&'.
+						'macros%5B0%5D%5Btype%5D=0&macros%5B0%5D%5Bdescription%5D=&inventory_mode=-1&tls_connect=1&'.
+						'tls_in_none=1&tls_psk_identity=&tls_psk=&tls_issuer=&tls_subject='
+			]],
 
 			// Host update.
-			[
-				[
-					'incorrect_request' => true,
-					'link' => (new CUrl('zabbix.php'))
-						->setArgument('action', 'host.update')
-						->setArgument('form_refresh', 1)
-						->setArgument('flags', 0)
-						->setArgument('tls_connect', 1)
-						->setArgument('tls_accept', 1)
-						->setArgument('psk_edit_mode', 1)
-						->setArgument('hostid', 99452)
-						->setArgument('host', 11111111)
-						->setArgument('visiblename', '')
-						->setArgument('groups[]', 50020)
-						->setArgument('interfaces[55079][items]', 'false')
-						->setArgument('interfaces[55079][isNew]', '')
-						->setArgument('interfaces[55079][interfaceid]', 55079)
-						->setArgument('interfaces[55079][type]', 1)
-						->setArgument('interfaces[55079][ip]', '127.0.0.1')
-						->setArgument('interfaces[55079][dns]', '')
-						->setArgument('interfaces[55079][useip]', 1)
-						->setArgument('interfaces[55079][port]', 10050)
-						->setArgument('mainInterfaces[1]', 55079)
-						->setArgument('description', '')
-						->setArgument('proxy_hostid', 0)
-						->setArgument('status', 0)
-						->setArgument('ipmi_authtype', -1)
-						->setArgument('ipmi_privilege', 2)
-						->setArgument('ipmi_username', '')
-						->setArgument('ipmi_password', '')
-						->setArgument('tags[0][tag]', '')
-						->setArgument('tags[0][value]', '')
-						->setArgument('show_inherited_macros', 0)
-						->setArgument('macros[0][macro]', '')
-						->setArgument('macros[0][value]', '')
-						->setArgument('macros[0][type]', 0)
-						->setArgument('macros[0][description]', '')
-						->setArgument('inventory_mode', -1)
-						->setArgument('tls_connect', 1)
-						->setArgument('tls_in_none', 1)
-						->setArgument('tls_psk_identity', '')
-						->setArgument('tls_psk', '')
-						->setArgument('tls_issuer', '')
-						->setArgument('tls_subject', '')
-						->setArgument('update', 'Update')
-						->getUrl()
-				]
-			],
+			[[
+				'link' => 'zabbix.php?action=host.update&form=update&flags=0&tls_connect=1&tls_accept=1&psk_edit_mode=1&'.
+						'hostid=99452&host=11111111&visiblename=&groups%5B%5D=50020&interfaces%5B55079%5D%5Bitems%5D=false&'.
+						'interfaces%5B55079%5D%5BisNew%5D=&interfaces%5B55079%5D%5Binterfaceid%5D=55079&interfaces'.
+						'%5B55079%5D%5Btype%5D=1&interfaces%5B55079%5D%5Bip%5D=127.0.0.1&interfaces%5B55079%5D%5Bdns%5D=&'.
+						'interfaces%5B55079%5D%5Buseip%5D=1&interfaces%5B55079%5D%5Bport%5D=10050&mainInterfaces%5B1%5D=55079&'.
+						'description=&proxy_hostid=0&status=0&ipmi_authtype=-1&ipmi_privilege=2&ipmi_username=&ipmi_password=&'.
+						'tags%5B0%5D%5Btag%5D=&tags%5B0%5D%5Bvalue%5D=&show_inherited_macros=0&macros%5B0%5D%5Bmacro%5D=&'.
+						'macros%5B0%5D%5Bvalue%5D=&macros%5B0%5D%5Btype%5D=0&macros%5B0%5D%5Bdescription%5D=&inventory_mode=-1&'.
+						'tls_connect=1&tls_in_none=1&tls_psk_identity=&tls_psk=&tls_issuer=&tls_subject='
+			]],
 
 			// Host delete.
-			[
-				[
-					'incorrect_request' => true,
-					'link' => (new CUrl('zabbix.php'))
-						->setArgument('action', 'host.massdelete')
-						->setArgument('ids', [99452])
-						->getUrl()
-				]
-			],
+			[[
+				'link' => 'zabbix.php?action=host.massdelete&hostids%5B0%5D=99452'
+			]],
 
 			// Host disable.
-			[
-				[
-					'incorrect_request' => true,
-					'link' => (new CUrl('zabbix.php'))
-						->setArgument('action', 'popup.massupdate.host')
-						->setArgument('ids[0]', 50011)
-						->setArgument('status', HOST_STATUS_NOT_MONITORED)
-						->setArgument('update', 1)
-						->setArgument('return_to', 'hosts')
-						->getUrl()
-				]
-			],
+			[[
+				'link' => 'zabbix.php?action=popup.massupdate.host&visible%5Bstatus%5D=1&update=1&backurl='.
+					'zabbix.php%3Faction%3Dhost.list&status=1'
+			]],
 
 			// Host enable.
-			[
-				[
-					'incorrect_request' => true,
-					'link' => (new CUrl('zabbix.php'))
-						->setArgument('action', 'popup.massupdate.host')
-						->setArgument('ids[0]', 50011)
-						->setArgument('status', HOST_STATUS_MONITORED)
-						->setArgument('update', 1)
-						->setArgument('return_to', 'hosts')
-						->getUrl()
-				]
-			],
+			[[
+				'link' => 'zabbix.php?action=popup.massupdate.host&visible%5Bstatus%5D=1&update=1&backurl='.
+					'zabbix.php%3Faction%3Dhost.list&status=0'
+			]],
 
 			// Notifications get.
 			[['link' => 'zabbix.php?action=notifications.get&known_eventids%5B%5D=126']],
@@ -755,16 +664,11 @@ class testSID extends CWebTest {
 	public function testSID_Links($data) {
 		foreach ([$data['link'], $data['link'].'&sid=test111116666666'] as $link) {
 			$this->page->login()->open($link)->waitUntilReady();
-			if (array_key_exists('incorrect_request', $data)) {
-				$this->assertMessage(TEST_BAD, 'Zabbix has received an incorrect request.', 'Operation cannot be'.
-						' performed due to unauthorized request.');
-			}
-			else {
-				$this->assertMessage(TEST_BAD, 'Access denied', 'You are logged in as "Admin". You have no permissions '.
-						'to access this page.');
-				$this->query('button:Go to "Dashboard"')->one()->waitUntilClickable()->click();
-				$this->assertContains('zabbix.php?action=dashboard', $this->page->getCurrentUrl());
-			}
+
+			$this->assertMessage(TEST_BAD, 'Access denied', 'You are logged in as "Admin". You have no permissions to access this page.');
+			$this->query('button:Go to "Dashboard"')->one()->waitUntilClickable()->click();
+
+			$this->assertContains('zabbix.php?action=dashboard', $this->page->getCurrentUrl());
 		}
 	}
 
@@ -822,9 +726,8 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM hosts',
-					'link' => (new CUrl('zabbix.php'))
-						->setArgument('action', 'host.create')
-						->getUrl()
+					'server_error' => true,
+					'link' => 'zabbix.php?action=host.edit'
 				]
 			],
 
@@ -832,10 +735,8 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM hosts',
-					'link' => (new CUrl('zabbix.php'))
-						->setArgument('action', 'host.edit')
-						->setArgument('hostid', 10084)
-						->getUrl()
+					'server_error' => true,
+					'link' => 'zabbix.php?action=host.edit&hostid=99062'
 				]
 			],
 
@@ -1281,24 +1182,32 @@ class testSID extends CWebTest {
 	 */
 	public function testSID_ElementRemove($data) {
 		$hash_before = CDBHelper::getHash($data['db']);
-		$this->page->login()->open((!str_contains($data['link'], 'tokenid')) ? $data['link'] : $data['link'].self::$token_id)
-				->waitUntilReady();
+		$url = (!str_contains($data['link'], 'tokenid') ? $data['link'] : $data['link'].self::$token_id);
+		$this->page->login()->open($url)->waitUntilReady();
 		$this->query('xpath://input[@name="sid"]')->one()->delete();
 		$this->query(($this->query('button:Update')->exists()) ? 'button:Update' : 'xpath://button[text()="Add" and'.
 				' @type="submit"]')->waitUntilClickable()->one()->click();
 
-		if(array_key_exists('incorrect_request', $data)) {
-			$this->assertMessage(TEST_BAD, 'Access denied', 'You are logged in as "Admin". You have no permissions to '.
-					'access this page.');
+		if (CTestArrayHelper::get($data, 'incorrect_request')) {
+			$message = 'Access denied';
+			$details = 'You are logged in as "Admin". You have no permissions to access this page.';
+		}
+		elseif (CTestArrayHelper::get($data, 'server_error')) {
+			$message = 'Unexpected server error.';
+			$details = null;
+		}
+		else {
+			$message = 'Zabbix has received an incorrect request.';
+			$details = 'Operation cannot be performed due to unauthorized request.';
+		}
+		$this->assertMessage(TEST_BAD, $message, $details);
+
+		if (CTestArrayHelper::get($data, 'incorrect_request'))  {
 			$this->query('button:Go to "Dashboard"')->one()->waitUntilClickable()->click();
 			$this->page->waitUntilReady();
 			$this->assertContains('zabbix.php?action=dashboard', $this->page->getCurrentUrl());
 		}
-		else {
-			$this->assertMessage(TEST_BAD, 'Zabbix has received an incorrect request.', 'Operation cannot be'.
-					' performed due to unauthorized request.');
 
 		$this->assertEquals($hash_before, CDBHelper::getHash($data['db']));
-		}
 	}
 }

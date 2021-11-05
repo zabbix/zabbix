@@ -1,0 +1,291 @@
+---
+test case: At least 4 services with severity 1+ (true)
+include: &include service_get_rule_status.inc.yaml
+in:
+  services: *include
+  service: S1
+  rule: 0
+out:
+  status: 5
+---
+test case: At least 3 services with severity 2+ (false)
+include: &include service_get_rule_status.inc.yaml
+in:
+  services: *include
+  service: S1
+  rule: 1
+out:
+  status: -1
+---
+test case: At least 1 services with severity 3+ (false)
+include: &include service_get_rule_status.inc.yaml
+in:
+  services: *include
+  service: S1
+  rule: 2
+out:
+  status: -1
+---
+test case: At least 7 services with severity 0+ (false)
+include: &include service_get_rule_status.inc.yaml
+in:
+  services: *include
+  service: S1
+  rule: 3
+out:
+  status: -1
+---
+test case: At least 50% services with severity 1+ (true)
+include: &include service_get_rule_status.inc.yaml
+in:
+  services: *include
+  service: S1
+  rule: 4
+out:
+  status: 5
+---
+test case: At least 50% services with severity 2+ (false)
+include: &include service_get_rule_status.inc.yaml
+in:
+  services: *include
+  service: S1
+  rule: 5
+out:
+  status: -1
+---
+test case: At least 1% services with severity 3+ (false)
+include: &include service_get_rule_status.inc.yaml
+in:
+  services: *include
+  service: S1
+  rule: 6
+out:
+  status: -1
+---
+test case: At least 100% services with severity 0+ (false)
+include: &include service_get_rule_status.inc.yaml
+in:
+  services: *include
+  service: S1
+  rule: 7
+out:
+  status: 5
+---
+test case: Less than 2 services with severity 0- (false)
+include: &include service_get_rule_status.inc.yaml
+in:
+  services: *include
+  service: S1
+  rule: 8
+out:
+  status: -1
+---
+test case: Less than 3 services with severity 0- (true)
+include: &include service_get_rule_status.inc.yaml
+in:
+  services: *include
+  service: S1
+  rule: 9
+out:
+  status: 5
+---
+test case: Less than 6 services with severity 2- (false)
+include: &include service_get_rule_status.inc.yaml
+in:
+  services: *include
+  service: S1
+  rule: 10
+out:
+  status: -1
+---
+test case: Less than 7 services with severity 2- (true)
+include: &include service_get_rule_status.inc.yaml
+in:
+  services: *include
+  service: S1
+  rule: 11
+out:
+  status: 5
+---
+test case: Less than 50% services with severity 0- (true)
+include: &include service_get_rule_status.inc.yaml
+in:
+  services: *include
+  service: S1
+  rule: 12
+out:
+  status: 5
+---
+test case: Less than 50% services with severity 1- (false)
+include: &include service_get_rule_status.inc.yaml
+in:
+  services: *include
+  service: S1
+  rule: 13
+out:
+  status: -1
+---
+test case: Less than 100% services with severity 1- (true)
+include: &include service_get_rule_status.inc.yaml
+in:
+  services: *include
+  service: S1
+  rule: 14
+out:
+  status: 5
+---
+test case: Less than 100% services with severity 2- (false)
+include: &include service_get_rule_status.inc.yaml
+in:
+  services: *include
+  service: S1
+  rule: 15
+out:
+  status: -1
+---
+test case: At least 150 weight of services with severity 1+ (true)
+include: &include service_get_rule_status.inc.yaml
+in:
+  services: *include
+  service: S1
+  rule: 16
+out:
+  status: 5
+---
+test case: At least 150 weight of services with severity 2+ (false)
+include: &include service_get_rule_status.inc.yaml
+in:
+  services: *include
+  service: S1
+  rule: 17
+out:
+  status: -1
+---
+test case: At least 1 weight of services with severity 3+ (false)
+include: &include service_get_rule_status.inc.yaml
+in:
+  services: *include
+  service: S1
+  rule: 18
+out:
+  status: -1
+---
+test case: At least 301 weight of services with severity 0+ (false)
+include: &include service_get_rule_status.inc.yaml
+in:
+  services: *include
+  service: S1
+  rule: 19
+out:
+  status: -1
+---
+test case: At least 50% weight of services with severity 1+ (true)
+include: &include service_get_rule_status.inc.yaml
+in:
+  services: *include
+  service: S1
+  rule: 20
+out:
+  status: 5
+---
+test case: At least 50% weight of services with severity 2+ (false)
+include: &include service_get_rule_status.inc.yaml
+in:
+  services: *include
+  service: S1
+  rule: 21
+out:
+  status: -1
+---
+test case: At least 1% weight of services with severity 3+ (false)
+include: &include service_get_rule_status.inc.yaml
+in:
+  services: *include
+  service: S1
+  rule: 22
+out:
+  status: -1
+---
+test case: At least 100% weight of services with severity 0+ (true)
+include: &include service_get_rule_status.inc.yaml
+in:
+  services: *include
+  service: S1
+  rule: 23
+out:
+  status: 5
+---
+test case: Less than 100 weight of services with severity 0- (false)
+include: &include service_get_rule_status.inc.yaml
+in:
+  services: *include
+  service: S1
+  rule: 24
+out:
+  status: -1
+---
+test case: Less than 101 weight of services with severity 0- (true)
+include: &include service_get_rule_status.inc.yaml
+in:
+  services: *include
+  service: S1
+  rule: 25
+out:
+  status: 5
+---
+test case: Less than 300 weight of services with severity 2- (false)
+include: &include service_get_rule_status.inc.yaml
+in:
+  services: *include
+  service: S1
+  rule: 26
+out:
+  status: -1
+---
+test case: Less than 301 weight of services with severity 2- (true)
+include: &include service_get_rule_status.inc.yaml
+in:
+  services: *include
+  service: S1
+  rule: 27
+out:
+  status: 5
+---
+test case: Less than 50% weight of services with severity 0- (true)
+include: &include service_get_rule_status.inc.yaml
+in:
+  services: *include
+  service: S1
+  rule: 28
+out:
+  status: 5
+---
+test case: Less than 50% weight of services with severity 1- (false)
+include: &include service_get_rule_status.inc.yaml
+in:
+  services: *include
+  service: S1
+  rule: 29
+out:
+  status: -1
+---
+test case: Less than 100% weight of services with severity 1- (true)
+include: &include service_get_rule_status.inc.yaml
+in:
+  services: *include
+  service: S1
+  rule: 30
+out:
+  status: 5
+---
+test case: Less than 100% weight of services with severity 2- (false)
+include: &include service_get_rule_status.inc.yaml
+in:
+  services: *include
+  service: S1
+  rule: 31
+out:
+  status: -1
+...
+
+

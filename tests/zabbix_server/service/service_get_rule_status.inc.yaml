@@ -1,0 +1,54 @@
+---
+- name: S1
+  status: -1
+  algorithm: OK
+  children: [A0, B0, A1, B1, A2, B2]
+  rules:
+  - {"type": N_GE, "limit":1, "value":4, "status":5}
+  - {"type": N_GE, "limit":2, "value":3, "status":5}
+  - {"type": N_GE, "limit":3, "value":1, "status":5}
+  - {"type": N_GE, "limit":0, "value":7, "status":5}
+  - {"type": NP_GE, "limit":1, "value":50, "status":5}
+  - {"type": NP_GE, "limit":2, "value":50, "status":5}
+  - {"type": NP_GE, "limit":3, "value":1, "status":5}
+  - {"type": NP_GE, "limit":0, "value":100, "status":5}
+  - {"type": N_LT, "limit":0, "value":2, "status":5}
+  - {"type": N_LT, "limit":0, "value":3, "status":5}
+  - {"type": N_LT, "limit":2, "value":6, "status":5}
+  - {"type": N_LT, "limit":2, "value":7, "status":5}
+  - {"type": NP_LT, "limit":0, "value":50, "status":5}
+  - {"type": NP_LT, "limit":1, "value":50, "status":5}
+  - {"type": NP_LT, "limit":1, "value":100, "status":5}
+  - {"type": NP_LT, "limit":2, "value":100, "status":5}
+  - {"type": W_GE, "limit":1, "value":150, "status":5}
+  - {"type": W_GE, "limit":2, "value":150, "status":5}
+  - {"type": W_GE, "limit":3, "value":1, "status":5}
+  - {"type": W_GE, "limit":0, "value":301, "status":5}
+  - {"type": WP_GE, "limit":1, "value":50, "status":5}
+  - {"type": WP_GE, "limit":2, "value":50, "status":5}
+  - {"type": WP_GE, "limit":3, "value":1, "status":5}
+  - {"type": WP_GE, "limit":0, "value":100, "status":5}
+  - {"type": W_LT, "limit":0, "value":100, "status":5}
+  - {"type": W_LT, "limit":0, "value":101, "status":5}
+  - {"type": W_LT, "limit":2, "value":300, "status":5}
+  - {"type": W_LT, "limit":2, "value":301, "status":5}
+  - {"type": WP_LT, "limit":0, "value":50, "status":5}
+  - {"type": WP_LT, "limit":1, "value":50, "status":5}
+  - {"type": WP_LT, "limit":1, "value":100, "status":5}
+  - {"type": WP_LT, "limit":2, "value":100, "status":5}
+- name: A0
+  status: 0
+- name: B0
+  status: 0
+  weight: 100
+- name: A1
+  status: 1
+- name: B1
+  status: 1
+  weight: 100
+- name: A2
+  status: 2
+- name: B2
+  status: 2
+  weight: 100
+...

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -24,8 +24,14 @@
  */
 abstract class CControllerHostUpdateGeneral extends CController {
 
-	protected static function getValidationFields() {
+	/**
+	 * Common host field validation rules.
+	 *
+	 * @return array
+	 */
+	protected static function getValidationFields(): array {
 		return [
+			'host'				=> 'required|db hosts.host|not_empty',
 			'visiblename'		=> 'db hosts.name',
 			'description'		=> 'db hosts.description',
 			'status'			=> 'required|db hosts.status|in '.implode(',', [HOST_STATUS_MONITORED,
@@ -63,33 +69,9 @@ abstract class CControllerHostUpdateGeneral extends CController {
 			'host_inventory'	=> 'array',
 			'macros'			=> 'array',
 			'valuemaps'			=> 'array',
-			'clone'				=> 'in 1',
 			'full_clone'		=> 'in 1',
 			'clone_hostid'		=> 'db hosts.hostid'
 		];
-	}
-
-	/**
-	 * Validate input parameters.
-	 *
-	 * @param array $fields Input validation rules.
-	 *
-	 * @return bool Validation successful.
-	 */
-	protected function checkInputFields(array $fields): bool {
-		$ret = $this->validateInput($fields);
-
-		if (!$ret) {
-			$output = [];
-
-			if (($messages = getMessages()) !== null) {
-				$output['errors'] = $messages->toString();
-			}
-
-			$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());
-		}
-
-		return $ret;
 	}
 
 	/**
@@ -164,6 +146,8 @@ abstract class CControllerHostUpdateGeneral extends CController {
 	 *
 	 * @param array $groups Submitted groups.
 	 *
+	 * @throws Exception
+	 *
 	 * @return array Groups for assigning to host.
 	 */
 	protected function processHostGroups(array $groups): array {
@@ -178,10 +162,11 @@ abstract class CControllerHostUpdateGeneral extends CController {
 
 		if ($new_groups) {
 			$new_groupid = API::HostGroup()->create($new_groups);
-
-			if ($new_groupid) {
-				$groups = array_merge($groups, $new_groupid['groupids']);
+			if (!$new_groupid) {
+				throw new Exception();
 			}
+
+			$groups = array_merge($groups, $new_groupid['groupids']);
 		}
 
 		return zbx_toObject($groups, 'groupid');

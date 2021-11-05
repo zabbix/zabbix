@@ -46,13 +46,13 @@
 					new CCol(
 						(new CDiv())
 							->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
-							->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+							->setAdaptiveWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 					),
 					new CCol(),
 					new CCol(
 						(new CDiv())
 							->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
-							->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+							->setAdaptiveWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 					)
 				]
 			]))
@@ -103,13 +103,11 @@
 	/**
 	 * Collects IDs selected in "Add templates" multiselect.
 	 *
-	 * @param {jQuery} $ms  jQuery object of multiselect.
-	 *
 	 * @returns {array|getAddTemplates.templateids}
 	 */
-	function getAddTemplates($ms) {
-		var $ms = $('#add_templates_'),
-			templateids = [];
+	function getAddTemplates() {
+		const $ms = $('#add_templates_');
+		let templateids = [];
 
 		// Readonly forms don't have multiselect.
 		if ($ms.length) {
@@ -133,19 +131,8 @@
 			.trigger('input');
 
 		window.macros_manager = new HostMacrosManager(<?= json_encode([
-			'properties' => [
-				'readonly' => $data['readonly']
-			],
-			'defines' => [
-				'ZBX_STYLE_TEXTAREA_FLEXIBLE' => ZBX_STYLE_TEXTAREA_FLEXIBLE,
-				'ZBX_PROPERTY_OWN' => ZBX_PROPERTY_OWN,
-				'ZBX_MACRO_TYPE_TEXT' => ZBX_MACRO_TYPE_TEXT,
-				'ZBX_MACRO_TYPE_SECRET' => ZBX_MACRO_TYPE_SECRET,
-				'ZBX_MACRO_TYPE_VAULT' => ZBX_MACRO_TYPE_VAULT,
-				'ZBX_STYLE_ICON_TEXT' => ZBX_STYLE_ICON_TEXT,
-				'ZBX_STYLE_ICON_INVISIBLE' => ZBX_STYLE_ICON_INVISIBLE,
-				'ZBX_STYLE_ICON_SECRET_TEXT' => ZBX_STYLE_ICON_SECRET_TEXT
-			]
+			'readonly' => $data['readonly'],
+			'parent_hostid' =>  array_key_exists('parent_hostid', $data) ? $data['parent_hostid'] : null
 		]) ?>);
 
 		$('#tabs').on('tabscreate tabsactivate', function(event, ui) {
@@ -161,7 +148,9 @@
 
 					if (panel_templateids.xor(templateids).length > 0) {
 						panel.data('templateids', templateids);
-						window.macros_manager.load($show_inherited_macros.val(), linked_templateids.concat(templateids));
+						window.macros_manager.load($show_inherited_macros.val() == 1,
+							linked_templateids.concat(templateids)
+						);
 						panel.data('macros_initialized', true);
 					}
 				}
@@ -174,7 +163,7 @@
 				<?php if ($data['readonly']): ?>
 					$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', '#tbl_macros').textareaFlexible();
 				<?php else: ?>
-					window.macros_manager.initMacroTable($('#tbl_macros'), $('input[name="show_inherited_macros"]:checked').val() == 1);
+					window.macros_manager.initMacroTable($('input[name="show_inherited_macros"]:checked').val() == 1);
 				<?php endif ?>
 
 				panel.data('macros_initialized', true);
@@ -187,7 +176,7 @@
 			}
 
 			let templateids = linked_templateids.concat(getAddTemplates());
-			window.macros_manager.load($(this).val(), templateids);
+			window.macros_manager.load($(this).val() == 1, templateids);
 		});
 	});
 </script>

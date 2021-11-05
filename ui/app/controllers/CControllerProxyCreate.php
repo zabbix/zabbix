@@ -23,29 +23,29 @@ class CControllerProxyCreate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'host' =>			'db       hosts.host',
-			'status' =>			'db       hosts.status     |in '.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE,
-			'dns' =>			'db       interface.dns',
-			'ip' =>				'db       interface.ip',
-			'useip' =>			'db       interface.useip  |in 0,1',
-			'port' =>			'db       interface.port',
-			'proxy_address' =>	'db       hosts.proxy_address',
-			'description' =>	'db       hosts.description',
-			'tls_connect' => 	'db       hosts.tls_connect    |in '.HOST_ENCRYPTION_NONE.','.HOST_ENCRYPTION_PSK.','.
+			'host' =>				'db hosts.host',
+			'status' =>				'db hosts.status|in '.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE,
+			'dns' =>				'db interface.dns',
+			'ip' =>					'db interface.ip',
+			'useip' =>				'db interface.useip|in 0,1',
+			'port' =>				'db interface.port',
+			'proxy_address' =>		'db hosts.proxy_address',
+			'description' =>		'db hosts.description',
+			'tls_connect' =>		'db hosts.tls_connect|in '.HOST_ENCRYPTION_NONE.','.HOST_ENCRYPTION_PSK.','.
 				HOST_ENCRYPTION_CERTIFICATE,
-			'tls_accept' => 	'db       hosts.tls_accept     |in 0,'.HOST_ENCRYPTION_NONE.','.HOST_ENCRYPTION_PSK.','.
+			'tls_accept' =>			'db hosts.tls_accept|in 0,'.HOST_ENCRYPTION_NONE.','.HOST_ENCRYPTION_PSK.','.
 				(HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK).','.
 				HOST_ENCRYPTION_CERTIFICATE.','.
 				(HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_CERTIFICATE).','.
 				(HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE).','.
 				(HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE),
-			'tls_psk' =>		'db       hosts.tls_psk',
-			'tls_psk_identity'=>'db       hosts.tls_psk_identity',
-			'psk_edit_mode' =>	'in 0,1',
-			'tls_issuer' => 	'db       hosts.tls_issuer',
-			'tls_subject' => 	'db       hosts.tls_subject',
-			'clone_proxyid' =>	'db       hosts.hostid',
-			'form_refresh' =>	'int32'
+			'tls_psk' =>			'db hosts.tls_psk',
+			'tls_psk_identity' =>	'db hosts.tls_psk_identity',
+			'psk_edit_mode' =>		'in 0,1',
+			'tls_issuer' =>			'db hosts.tls_issuer',
+			'tls_subject' =>		'db hosts.tls_subject',
+			'clone_proxyid' =>		'db hosts.hostid',
+			'form_refresh' =>		'int32'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -74,7 +74,12 @@ class CControllerProxyCreate extends CController {
 	protected function doAction() {
 		$proxy = [];
 
-		if ($this->hasInput('clone_proxyid')) {
+		$this->getInputs($proxy, ['host', 'status', 'description', 'tls_connect', 'tls_accept', 'tls_issuer',
+			'tls_subject', 'tls_psk_identity', 'tls_psk'
+		]);
+
+		if ($this->hasInput('clone_proxyid') && (array_key_exists('tls_connect', $proxy)
+					&& $proxy['tls_connect'] == HOST_ENCRYPTION_PSK)) {
 			$clone_proxies = API::Proxy()->get([
 				'output' => ['tls_psk_identity', 'tls_psk'],
 				'proxyids' => $this->getInput('clone_proxyid'),
@@ -85,10 +90,6 @@ class CControllerProxyCreate extends CController {
 			$proxy['tls_psk_identity'] = $clone_proxy['tls_psk_identity'];
 			$proxy['tls_psk'] = $clone_proxy['tls_psk'];
 		}
-
-		$this->getInputs($proxy, ['host', 'status', 'description', 'tls_connect', 'tls_accept', 'tls_issuer',
-			'tls_subject', 'tls_psk_identity', 'tls_psk'
-		]);
 
 		if ($this->getInput('status', HOST_STATUS_PROXY_ACTIVE) == HOST_STATUS_PROXY_PASSIVE) {
 			$proxy['interface'] = [];

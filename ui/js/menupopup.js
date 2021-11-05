@@ -226,20 +226,22 @@ function getMenuPopupHost(options, trigger_elmnt) {
 
 		if (options.allowed_ui_conf_hosts) {
 			var config = {
-				label: t('Configuration')
+				label: t('Configuration'),
+				disabled: !options.isWriteable
 			};
 
 			if (options.isWriteable) {
-				var config_url = new Curl('zabbix.php', false);
-
+				const config_url = new Curl('zabbix.php', false);
 				config_url.setArgument('action', 'host.edit');
 				config_url.setArgument('hostid', options.hostid);
-
-				config.class = ZBX_STYLE_ZABBIX_HOST_POPUPEDIT;
 				config.url = config_url.getUrl();
-			}
-			else {
-				config.disabled = true;
+
+				config.clickCallback = function (e) {
+					e.preventDefault();
+					jQuery(this).closest('.menu-popup').menuPopup('close', null);
+
+					view.editHost(options.hostid);
+				};
 			}
 
 			items.push(config);
@@ -498,7 +500,7 @@ function getMenuPopupDashboard(options, trigger_elmnt) {
 					clickCallback: function () {
 						jQuery(this).closest('.menu-popup').menuPopup('close', null);
 
-						PopUp('dashboard.share.edit', popup_options, 'dashboard_share', trigger_elmnt);
+						PopUp('popup.dashboard.share.edit', popup_options, 'dashboard_share_edit', trigger_elmnt);
 					},
 					disabled: !options.editable
 				},
@@ -1118,6 +1120,7 @@ jQuery(function($) {
 							? document.querySelector('.wrapper').clientWidth
 							: document.querySelector('.wrapper').clientWidth - data.element.width;
 
+						pos.top = Math.max(0, pos.top);
 						pos.left = Math.max(0, Math.min(max_left, pos.left));
 
 						data.element.element[0].style.top = `${pos.top}px`;
@@ -1155,11 +1158,6 @@ jQuery(function($) {
 
 			// Position the menu (before hiding).
 			$menu_popup.position(options.position);
-
-			// Fix menu showing out of viewport in case of many Scripts etc.
-			if (parseInt($menu_popup.css('top'), 10) < 0) {
-				$menu_popup.css('top', 0);
-			}
 
 			// Hide all action menu sub-levels, including the topmost, for fade effect to work.
 			$menu_popup.add('.menu-popup', $menu_popup).hide();

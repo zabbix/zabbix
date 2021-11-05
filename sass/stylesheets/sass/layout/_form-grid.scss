@@ -7,11 +7,6 @@
 	// 15% label column width for use in standalone forms.
 	grid-template-columns: minmax(15%, max-content) auto;
 
-	// 100px label column width for use in popup forms.
-	&.label-width-fixed {
-		grid-template-columns: minmax(100px, max-content) auto;
-	}
-
 	// True label column width for use in filter forms.
 	&.label-width-true {
 		grid-template-columns: max-content auto;
@@ -47,6 +42,10 @@
 		);
 
 		@each $offset, $value in $offsets {
+			// Dynamically generated classes:
+			//  .offset-1
+			//  .offset-2
+			//  .offset-3
 			&.offset-#{$offset} {
 				grid-column-start: $value !important;
 			}
@@ -59,14 +58,14 @@
 		td {
 			padding: 0 5px 5px 0;
 		}
+
+		.list-check-radio {
+			line-height: $body-line-height;
+		}
 	}
 
 	&.form-grid-1-1 {
 		grid-template-columns: repeat(2, minmax(15%, max-content) auto);
-
-		&.label-width-fixed {
-			grid-template-columns: repeat(2, minmax(100px, max-content) auto);
-		}
 
 		&.label-width-true {
 			grid-template-columns: repeat(2, max-content auto);
@@ -75,10 +74,6 @@
 
 	&.form-grid-3-1 {
 		grid-template-columns: minmax(15%, max-content) 3fr max-content auto;
-
-		&.label-width-fixed {
-			grid-template-columns: minmax(100px, max-content) 3fr max-content auto;
-		}
 
 		&.label-width-true {
 			grid-template-columns: max-content auto 3fr max-content auto;
@@ -94,6 +89,7 @@
 	}
 
 	.table-forms-separator {
+		display: inline-flex;
 		line-height: 1.4;
 
 		td {

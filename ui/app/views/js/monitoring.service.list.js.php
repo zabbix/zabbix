@@ -29,7 +29,7 @@
 </script>
 
 <script>
-	const service_list = {
+	const view = {
 		serviceid: null,
 		mode_switch_url: null,
 		refresh_url: null,

@@ -246,7 +246,7 @@ zabbix_export:
         -
           uuid: 6df0d9e8694d45dfa11e433d8de7be41
           name: 'Checksum of /etc/passwd'
-          key: 'vfs.file.cksum[/etc/passwd]'
+          key: 'vfs.file.cksum[/etc/passwd,sha256]'
           delay: 1h
           history: 1w
           tags:
@@ -256,7 +256,7 @@ zabbix_export:
           triggers:
             -
               uuid: 39cfe50a3d2a46ad9a53b9ec7443ec18
-              expression: 'last(/macOS/vfs.file.cksum[/etc/passwd],#1)<>last(/macOS/vfs.file.cksum[/etc/passwd],#2)'
+              expression: 'last(/macOS/vfs.file.cksum[/etc/passwd,sha256],#1)<>last(/macOS/vfs.file.cksum[/etc/passwd,sha256],#2)'
               name: '/etc/passwd has been changed on {HOST.NAME}'
               priority: WARNING
         -

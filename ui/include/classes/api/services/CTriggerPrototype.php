@@ -483,7 +483,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 		CTriggerPrototypeManager::delete($triggerids);
 
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER_PROTOTYPE, $db_triggers);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_TRIGGER_PROTOTYPE, $db_triggers);
 
 		return ['triggerids' => $triggerids];
 	}

@@ -60,9 +60,9 @@ type Manager struct {
 
 // updateRequest contains list of metrics monitored by a client and additional client configuration data.
 type updateRequest struct {
-	clientID uint64
-	sink     plugin.ResultWriter
-	requests []*plugin.Request
+	clientID    uint64
+	sink        plugin.ResultWriter
+	requests    []*plugin.Request
 	expressions []*glexpr.Expression
 }
 
@@ -97,7 +97,7 @@ func (m *Manager) cleanupClient(c *client, now time.Time) {
 		for deactivate := true; deactivate; {
 			deactivate = false
 			for _, t := range p.tasks {
-				if t.isRecurring() {
+				if t.isActive() && t.isRecurring() {
 					t.deactivate()
 					// deactivation can change tasks ordering, so repeat the iteration if task was deactivated
 					deactivate = true
@@ -459,12 +459,12 @@ func (m *Manager) Stop() {
 	m.input <- nil
 }
 
-func (m *Manager) UpdateTasks(clientID uint64, writer plugin.ResultWriter, 
+func (m *Manager) UpdateTasks(clientID uint64, writer plugin.ResultWriter,
 	expressions []*glexpr.Expression, requests []*plugin.Request) {
 
 	m.input <- &updateRequest{clientID: clientID,
-		sink:     writer,
-		requests: requests,
+		sink:        writer,
+		requests:    requests,
 		expressions: expressions,
 	}
 }

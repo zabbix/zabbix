@@ -109,10 +109,10 @@ $triggersFormList
 
 if ($discovered_trigger) {
 	$triggersFormList->addVar('priority', (int) $data['priority']);
-	$severity = new CSeverity(['name' => 'priority_names', 'value' => (int) $data['priority']], false);
+	$severity = new CSeverity('priority_names', (int) $data['priority'], false);
 }
 else {
-	$severity = new CSeverity(['name' => 'priority', 'value' => (int) $data['priority']]);
+	$severity = new CSeverity('priority', (int) $data['priority']);
 }
 
 $triggersFormList->addRow(_('Severity'), $severity);
@@ -575,7 +575,8 @@ $triggersTab->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab
 		'source' => 'trigger',
 		'tags' => $data['tags'],
 		'show_inherited_tags' => $data['show_inherited_tags'],
-		'readonly' => $discovered_trigger
+		'readonly' => $discovered_trigger,
+		'tabs_id' => 'tabs'
 	]),
 	TAB_INDICATOR_TAGS
 );

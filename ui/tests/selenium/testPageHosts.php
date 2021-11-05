@@ -124,7 +124,8 @@ class testPageHosts extends CLegacyWebTest {
 
 		$this->zbxTestTextPresent($name);
 		$this->zbxTestClickLinkText($name);
-		$this->zbxTestClickWait('update');
+		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+		$form->submit();
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
 		$this->zbxTestTextPresent($name);
@@ -148,7 +149,7 @@ class testPageHosts extends CLegacyWebTest {
 		$this->query('button:Reset')->one()->click();
 
 		$this->zbxTestCheckboxSelect('all_hosts');
-		$this->zbxTestClickButton('disable-hosts');
+		$this->zbxTestClickButtonText('Disable');
 		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of hosts');
@@ -172,7 +173,7 @@ class testPageHosts extends CLegacyWebTest {
 		$this->query('button:Reset')->one()->click();
 
 		$this->zbxTestCheckboxSelect('ids_'.$hostid);
-		$this->zbxTestClickButton('disable-hosts');
+		$this->zbxTestClickButtonText('Disable');
 		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of hosts');
@@ -195,7 +196,7 @@ class testPageHosts extends CLegacyWebTest {
 		$this->query('button:Reset')->one()->click();
 
 		$this->zbxTestCheckboxSelect('ids_'.$hostid);
-		$this->zbxTestClickButton('enable-hosts');
+		$this->zbxTestClickButtonText('Enable');
 		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of hosts');
@@ -213,7 +214,7 @@ class testPageHosts extends CLegacyWebTest {
 		$this->query('button:Reset')->one()->click();
 
 		$this->zbxTestCheckboxSelect('all_hosts');
-		$this->zbxTestClickButton('enable-hosts');
+		$this->zbxTestClickButtonText('Enable');
 		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of hosts');
@@ -683,14 +684,14 @@ class testPageHosts extends CLegacyWebTest {
 	 * @dataProvider getFilterByTagsData
 	 */
 	public function testPageHosts_FilterByTags($data) {
-		$this->page->login()->open(urlencode((new CUrl('zabbix.php'))
+		$this->page->login()->open((new CUrl('zabbix.php'))
 			->setArgument('action', 'host.list')
 			->setArgument('filter_groups[]', 4)
 			->setArgument('filter_host', 'host')
 			->setArgument('filter_port', 10051)
 			->setArgument('filter_set', 1)
 			->getUrl()
-		));
+		);
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$form->fill(['id:filter_evaltype' => $data['evaluation_type']]);
 		$this->setTags($data['tags']);

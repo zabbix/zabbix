@@ -78,7 +78,7 @@ struct	_DC_TRIGGER;
 
 #define TRIGGER_OPDATA_LEN		255
 #define TRIGGER_URL_LEN			255
-#define TRIGGER_DESCRIPTION_LEN		255
+#define TRIGGER_DESCRIPTION_LEN		2048
 #define TRIGGER_EXPRESSION_LEN		2048
 #define TRIGGER_EXPRESSION_LEN_MAX	(TRIGGER_EXPRESSION_LEN + 1)
 #if defined(HAVE_ORACLE)
@@ -205,7 +205,7 @@ struct	_DC_TRIGGER;
 
 #define PROXY_DHISTORY_VALUE_LEN	255
 
-#define ITEM_PREPROC_PARAMS_LEN		255
+#define ITEM_PREPROC_PARAMS_LEN		65535
 
 #define EVENT_NAME_LEN			2048
 
@@ -243,7 +243,6 @@ struct	_DC_TRIGGER;
 			'\0' != *str ? "<>'" : "",		\
 			'\0' != *str ? str   : " is not null",	\
 			'\0' != *str ? "'"   : ""
-
 #else
 #	define	DBbegin_multiple_update(sql, sql_alloc, sql_offset)	do {} while (0)
 #	define	DBend_multiple_update(sql, sql_alloc, sql_offset)	do {} while (0)
@@ -345,6 +344,7 @@ typedef struct
 	char			*name;
 	zbx_vector_uint64_t	eventids;
 	zbx_vector_ptr_t	events;
+	zbx_vector_tags_t	service_tags;
 }
 DB_SERVICE;
 
@@ -545,9 +545,9 @@ const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname);
 #define DBget_maxid(table)	DBget_maxid_num(table, 1)
 zbx_uint64_t	DBget_maxid_num(const char *tablename, int num);
 
-zbx_uint32_t	DBextract_version(struct zbx_json *json);
-void		DBflush_version_requirements(const char *version);
-int		DBcheck_capabilities(zbx_uint32_t db_version);
+void	DBextract_version_info(struct zbx_db_version_info_t *version_info);
+void	DBflush_version_requirements(const char *version);
+int	DBcheck_capabilities(zbx_uint32_t db_version);
 
 #ifdef HAVE_POSTGRESQL
 char	*zbx_db_get_schema_esc(void);
@@ -625,13 +625,15 @@ void	DBdelete_sysmaps_hosts_by_hostid(zbx_uint64_t hostid);
 int	DBadd_graph_item_to_linked_hosts(int gitemid, int hostid);
 
 int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids, char **error);
-int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *del_templateids, char **error);
+int	DBdelete_template_elements(zbx_uint64_t hostid, const char *hostname, zbx_vector_uint64_t *del_templateids,
+		char **error);
 
 void	DBdelete_items(zbx_vector_uint64_t *itemids);
 void	DBdelete_graphs(zbx_vector_uint64_t *graphids);
 void	DBdelete_triggers(zbx_vector_uint64_t *triggerids);
-void	DBdelete_hosts(zbx_vector_uint64_t *hostids);
-void	DBdelete_hosts_with_prototypes(zbx_vector_uint64_t *hostids);
+
+void	DBdelete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *hostnames);
+void	DBdelete_hosts_with_prototypes(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *hostnames);
 
 void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
 		const zbx_uint64_t *values, const int num);
@@ -690,6 +692,7 @@ int	DBtable_exists(const char *table_name);
 int	DBfield_exists(const char *table_name, const char *field_name);
 #ifndef HAVE_SQLITE3
 int	DBindex_exists(const char *table_name, const char *index_name);
+int	DBpk_exists(const char *table_name);
 #endif
 
 int	DBprepare_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids, char **sql,
@@ -882,8 +885,11 @@ int	zbx_db_check_instanceid(void);
 typedef struct
 {
 	zbx_uint64_t	tagid;
+	char		*tag_orig;
 	char		*tag;
+	char		*value_orig;
 	char		*value;
+#define ZBX_FLAG_DB_TAG_UNSET			__UINT64_C(0x00000000)
 #define ZBX_FLAG_DB_TAG_UPDATE_TAG		__UINT64_C(0x00000001)
 #define ZBX_FLAG_DB_TAG_UPDATE_VALUE		__UINT64_C(0x00000002)
 #define ZBX_FLAG_DB_TAG_REMOVE			__UINT64_C(0x80000000)
@@ -892,8 +898,10 @@ typedef struct
 }
 zbx_db_tag_t;
 
-void	zbx_db_tag_free(zbx_db_tag_t *tag);
-int	zbx_db_tag_compare_func(const void *d1, const void *d2);
+zbx_db_tag_t	*zbx_db_tag_create(const char *tag_tag, const char *tag_value);
+void		zbx_db_tag_free(zbx_db_tag_t *tag);
+int		zbx_db_tag_compare_func(const void *d1, const void *d2);
+int		zbx_db_tag_compare_func_template(const void *d1, const void *d2);
 
 ZBX_PTR_VECTOR_DECL(db_tag_ptr, zbx_db_tag_t *)
 
@@ -938,5 +946,7 @@ int	zbx_db_trigger_get_all_hostids(const DB_TRIGGER *trigger, const zbx_vector_u
 int	zbx_db_trigger_get_constant(const DB_TRIGGER *trigger, int index, char **out);
 int	zbx_db_trigger_get_itemid(const DB_TRIGGER *trigger, int index, zbx_uint64_t *itemid);
 void	zbx_db_trigger_get_itemids(const DB_TRIGGER *trigger, zbx_vector_uint64_t *itemids);
+
+int	DBselect_ids_names(const char *sql, zbx_vector_uint64_t *ids, zbx_vector_str_t *names);
 
 #endif

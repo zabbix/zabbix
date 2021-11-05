@@ -18,7 +18,7 @@
 **/
 
 
-jQuery(function($) {
+(function($) {
 	var ZBX_STYLE_CLASS = 'multiselect-control';
 	const MS_ACTION_POPUP = 0;
 	const MS_ACTION_AUTOSUGGEST = 1;
@@ -1217,4 +1217,4 @@ jQuery(function($) {
 			? ms.options.limit + objectSize(ms.values.selected) + ms.options.excludeids.length + 1
 			: null;
 	}
-});
+})(jQuery);
