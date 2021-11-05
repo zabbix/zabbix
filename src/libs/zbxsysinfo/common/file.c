@@ -25,16 +25,10 @@
 #include "log.h"
 #include "dir.h"
 #include "sha256crypt.h"
-#include "mutexs.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #include "aclapi.h"
 #include "sddl.h"
-#else
-zbx_mutex_t	fileinfo_lock = ZBX_MUTEX_NULL;
-
-#define LOCK_FILEINFO	zbx_mutex_lock(fileinfo_lock)
-#define UNLOCK_FILEINFO	zbx_mutex_unlock(fileinfo_lock)
 #endif
 
 #define ZBX_MAX_DB_FILE_SIZE	64 * ZBX_KIBIBYTE	/* files larger than 64 KB cannot be stored in the database */
@@ -1497,28 +1491,6 @@ err:
 	return ret;
 }
 #else /* not _WINDOWS or __MINGW32__ */
-/******************************************************************************
- *                                                                            *
- * Function: zbx_init_fileinfo                                                *
- *                                                                            *
- * Purpose: create file info mutex                                            *
- *                                                                            *
- * Parameters: error      - [OUT] error message in case of failure            *
- *                                                                            *
- * Return value: SUCCEED - file info mutex created successfully               *
- *               FAIL    - failed to create file info mutex                   *
- *                                                                            *
- ******************************************************************************/
-int	zbx_init_fileinfo(char **error)
-{
-	return zbx_mutex_create(&fileinfo_lock, ZBX_MUTEX_FILEINFO, error);
-}
-
-void	zbx_deinit_fileinfo(void)
-{
-	zbx_mutex_destroy(&fileinfo_lock);
-}
-
 int	zbx_vfs_file_info(const char *filename, struct zbx_json *j, int array, char **error)
 {
 	int		ret = FAIL;
@@ -1573,8 +1545,6 @@ int	zbx_vfs_file_info(const char *filename, struct zbx_json *j, int array, char 
 	/* type */
 	zbx_json_addstring(j, ZBX_SYSINFO_FILE_TAG_TYPE, type, ZBX_JSON_TYPE_STRING);
 
-	LOCK_FILEINFO;
-
 	/* user */
 	if (NULL == (pwd = getpwuid(buf.st_uid)))
 	{
@@ -1596,8 +1566,6 @@ int	zbx_vfs_file_info(const char *filename, struct zbx_json *j, int array, char 
 	}
 	else
 		zbx_json_addstring(j, ZBX_SYSINFO_FILE_TAG_GROUP, grp->gr_name, ZBX_JSON_TYPE_STRING);
-
-	UNLOCK_FILEINFO;
 
 	/* permissions */
 	permissions = get_file_permissions(&buf);

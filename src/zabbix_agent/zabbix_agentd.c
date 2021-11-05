@@ -1138,16 +1138,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-#if !defined(_WINDOWS) && !defined(__MINGW32__)
-	if (SUCCEED != zbx_init_fileinfo(&error))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize file info: %s", error);
-		zbx_free(error);
-		zbx_free_service_resources(FAIL);
-		exit(EXIT_FAILURE);
-	}
-#endif
-
 	if (SUCCEED != init_collector_data(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize collector: %s", error);
@@ -1296,9 +1286,6 @@ void	zbx_free_service_resources(int ret)
 	alias_list_free();
 	free_collector_data();
 	zbx_deinit_modbus();
-#if !defined(_WINDOWS) && !defined(__MINGW32__)
-	zbx_deinit_fileinfo();
-#endif
 #ifdef _WINDOWS
 	free_perf_collector();
 	zbx_co_uninitialize();
