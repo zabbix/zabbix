@@ -185,21 +185,21 @@ class testFormMonitoringServices extends CWebTest {
 			'Advanced configuration'
 		];
 
-		$form = $this->query('id:service-form')->asFluidForm()->one()->waitUntilReady();
+		$form = $this->query('id:service-form')->asForm()->one()->waitUntilReady();
 
 		// Check tabs available in the form
 		$tabs = ['Service', 'SLA', 'Tags', 'Child services'];
-		$this->assertEquals(count($tabs), $form->query('xpath:./'.'/li[@role="tab"]')->all()->count());
+		$this->assertEquals(count($tabs), $form->query("xpath:.//li[@role='tab']")->all()->count());
 
 		foreach ($tabs as $tab) {
-			$this->assertTrue($form->query('xpath:./'.'/li[@role="tab"]/'.'/a[text()='.CXPathHelper::escapeQuotes($tab).
+			$this->assertTrue($form->query("xpath:.//li[@role='tab']//a[text()=".CXPathHelper::escapeQuotes($tab).
 					']')->one()->isValid());
 		}
 
 		// Check layout at Service tab
 		$service_tab = $form->query('id:service-tab')->one();
 		foreach ($service_tabs_labels as $label) {
-			$this->assertTrue($service_tab->query('xpath:./'.'/label[text()='.CXPathHelper::escapeQuotes($label).']')
+			$this->assertTrue($service_tab->query("xpath:.//label[text()=".CXPathHelper::escapeQuotes($label).']')
 					->one(false)->isValid());
 		}
 
@@ -341,7 +341,7 @@ class testFormMonitoringServices extends CWebTest {
 
 		// Enter and submit filtering data
 		$childs_dialog->query('id:services-filter-name')->one()->fill('Parent1');
-		$childs_dialog->query('button:Apply')->one()->waitUntilClickable()->click();
+		$childs_dialog->query('button:Filter')->one()->waitUntilClickable()->click();
 
 		$childs_dialog->invalidate();
 		$childs_dialog->waitUntilReady();
@@ -625,7 +625,7 @@ class testFormMonitoringServices extends CWebTest {
 					],
 					'childs' => [
 						'Child services' => [
-							'Service' => 'Update service',
+							'Service' => 'Child4',
 							'Status calculation rule' => 'Most critical if all children have problems',
 							'Problem tags' => '',
 							'Action' => 'Remove'
@@ -637,14 +637,7 @@ class testFormMonitoringServices extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Name' => 'Service dublicate',
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'Service dublicate',
+						'Name' => 'Child1',
 					],
 					'dublicate' => true
 				]
@@ -655,7 +648,8 @@ class testFormMonitoringServices extends CWebTest {
 					'fields' => [
 						'Name' => 'With parent',
 						'Parent services' => 'Parent1'
-					]
+					],
+					'update_dublicate' => true
 				]
 			]
 		];
@@ -697,9 +691,9 @@ class testFormMonitoringServices extends CWebTest {
 		// Open service form depending on create or update scenario.
 		$this->page->login()->open('zabbix.php?action=service.list.edit');
 		if ($update) {
-			$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
+			$table = $this->query('class:list-table')->asTable()->waitUntilVisible()->one();
 			// Find in table previously defined service name.
-			$table->findRow('Name', self::$update_service)->query('xpath:.//button[@title="Edit"]')
+			$table->findRow('Name', self::$update_service, true)->query('xpath:.//button[@title="Edit"]')
 					->waitUntilClickable()->one()->click();
 		}
 		else {
@@ -707,7 +701,7 @@ class testFormMonitoringServices extends CWebTest {
 		}
 
 		COverlayDialogElement::find()->one()->waitUntilReady();
-		$form = $this->query('id:service-form')->asFluidForm()->one()->waitUntilReady();
+		$form = $this->query('id:service-form')->asForm()->one()->waitUntilReady();
 
 		if (array_key_exists('sla', $data)) {
 			$form->selectTab('SLA');
@@ -723,7 +717,7 @@ class testFormMonitoringServices extends CWebTest {
 				$service->query('button:Add')->waitUntilClickable()->one()->click();
 				// Find second dialog and work with it, because now there is multi-layer dialogs.
 				$service_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
-				$service_form = $service_dialog->query('id:service-time-form')->waitUntilReady()->one()->asFluidForm();
+				$service_form = $service_dialog->query('id:service-time-form')->waitUntilReady()->one()->asForm();
 
 				// Check default values in popup
 				$this->assertEquals('Uptime', $service_form->query('id:service-time-type-focusable')->one()->getText());
@@ -763,10 +757,10 @@ class testFormMonitoringServices extends CWebTest {
 			$service = $form->getFieldContainer('Child services');
 			$service->query('button:Add')->waitUntilClickable()->one()->click();
 			$childs_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
-			$childs_dialog->query('css:div[data-dialogueid="services"] table.list-table td input')->asCheckbox()->one()->click();
-			$childs_dialog->query('css:div[data-dialogueid="services"] div.overlay-dialogue-footer button')->one()->click();
-
-			$this->assertTableData([$data['childs']['Child services']], 'css: form#service-form div#child-services-tab table#children');
+			$table = $childs_dialog->query('class:list-table')->asTable()->waitUntilVisible()->one();
+			$table->findRow('Name', $data['childs']['Child services']['Service'])->select();
+			$childs_dialog->query('button:Select')->waitUntilClickable()->one()->click();
+			$this->assertTableData([$data['childs']['Child services']], 'id:children');
 		}
 
 		// Return to tab Service for filling it.
@@ -792,11 +786,12 @@ class testFormMonitoringServices extends CWebTest {
 			$count = (array_key_exists('dublicate', $data)) ? 2 : 1;
 			$this->assertEquals($count, CDBHelper::getCount('SELECT * FROM services WHERE name='.
 					CXPathHelper::escapeQuotes($data['fields']['Name']))
-			);
+				);
 
 			if ($update) {
 				// In update scenario check that old name actually changed.
-				$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services WHERE name='.
+				$expected_count = (array_key_exists('update_dublicate', $data)) ? 1 : 0;
+				$this->assertEquals($expected_count, CDBHelper::getCount('SELECT * FROM services WHERE name='.
 						CXPathHelper::escapeQuotes(self::$update_service))
 				);
 				// In update scenario we need to rewrite name for updating service in order to update the same service in next case.
@@ -818,7 +813,7 @@ class testFormMonitoringServices extends CWebTest {
 
 				$this->assertEquals($data['fields']['Name'].' '.count($data['childs']),
 						$row->getColumn('Name')->getText()
-				);
+					);
 
 				$row->query('xpath:.//button[@title="Edit"]')->waitUntilClickable()->one()->click();
 				$form->selectTab('Child services');
@@ -830,7 +825,7 @@ class testFormMonitoringServices extends CWebTest {
 			}
 
 			COverlayDialogElement::find()->one()->waitUntilReady();
-			$form = $this->query('id:service-form')->asFluidForm()->one()->waitUntilReady();
+			$form = $this->query('id:service-form')->asForm()->one()->waitUntilReady();
 
 			// Check that fields in frontend are the same as in data provider.
 			if (array_key_exists('sla', $data)) {
@@ -931,7 +926,7 @@ class testFormMonitoringServices extends CWebTest {
 		$table->findRow('Name', $data['parent'], true)->query('xpath:.//button[@title="Add child service"]')
 				->waitUntilClickable()->one()->click();
 		COverlayDialogElement::find()->one()->waitUntilReady();
-		$form = $this->query('id:service-form')->asFluidForm()->one()->waitUntilReady();
+		$form = $this->query('id:service-form')->asForm()->one()->waitUntilReady();
 		$form->fill($data['fields']);
 
 		// Go to child services tab and add child there to create circular dependency.
@@ -969,7 +964,7 @@ class testFormMonitoringServices extends CWebTest {
 			$table->findRow('Name', $data['fields']['Name'])->query('xpath:.//button[@title="Edit"]')
 					->waitUntilClickable()->one()->click();
 			COverlayDialogElement::find()->one()->waitUntilReady();
-			$form = $this->query('id:service-form')->asFluidForm()->one()->waitUntilReady();
+			$form = $this->query('id:service-form')->asForm()->one()->waitUntilReady();
 			// Check that all form fields were saved correctly.
 			$form->checkValue($data['fields']);
 			// Check parent field separately, because it was not present in data[fields] array.
@@ -994,7 +989,7 @@ class testFormMonitoringServices extends CWebTest {
 		$this->query('id:tab_info')->one()->waitUntilVisible()->query('xpath:.//button[contains(@class, "btn-edit")]')
 				->one()->waitUntilClickable()->click();
 		COverlayDialogElement::find()->one()->waitUntilReady();
-		$form = $this->query('id:service-form')->asFluidForm()->one()->waitUntilReady();
+		$form = $this->query('id:service-form')->asForm()->one()->waitUntilReady();
 		$form->selectTab('Child services');
 		// Go to Childs tab and find row by particular Service name in Childs table.
 		$service_table = $form->getFieldContainer('Child services')->asTable();
@@ -1002,8 +997,8 @@ class testFormMonitoringServices extends CWebTest {
 				->waitUntilClickable()->one()->click();
 		// Make sure that Name disappeared right after removing.
 		// This is not ideal implementation, maybe it was possible to work with it as with table row, but xpath was faster to write.
-		$this->assertFalse($service_table->query("xpath:.//table[@id=\"children\"]//td[contains(text(),".
-				CXPathHelper::escapeQuotes($child).")]")->exists());
+		$this->assertFalse($service_table->query("xpath:.//table[@id='children']//td[contains(text(),".
+				CXPathHelper::escapeQuotes($child).')]')->exists());
 		$form->submit();
 		// Again, checking success or fail message is mandatory every time when it appears.
 		$this->assertMessage(TEST_GOOD, 'Service updated');
@@ -1025,17 +1020,13 @@ class testFormMonitoringServices extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=service.list.edit');
 		$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
-
 		$table->findRow('Name', $parent, true)->query('link', $parent)->waitUntilClickable()->one()->click();
-
 		$this->page->waitUntilReady();
-
 		$table->findRow('Name', $child, true)->query('xpath:.//button[contains(@class, "btn-edit")]')
 		->one()->waitUntilClickable()->click();
 
 		COverlayDialogElement::find()->one()->waitUntilReady();
-		$form = $this->query('id:service-form')->asFluidForm()->one()->waitUntilReady();
-
+		$form = $this->query('id:service-form')->asForm()->one()->waitUntilReady();
 		$parent_services = $form->getField('Parent services')->asMultiselect()->clear();
 		$form->submit();
 
