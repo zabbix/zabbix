@@ -195,7 +195,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 	/**
 	 * Function checks that only super-admin users can view HA cluster data.
 	 *
-	 * @depends testPageReportsSystemInformation_checkServerStatus
+	 * @depends testDashboardSystemInformationWidget_checkServerStatus
 	 *
 	 * @dataProvider getUserData
 	 */
