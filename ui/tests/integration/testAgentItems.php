@@ -359,6 +359,20 @@ class testAgentItems extends CIntegrationTest {
 			'component' => self::COMPONENT_AGENT2,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
 			'result_exec' => 'netstat -au --numeric-hosts -4 | grep ssh | wc -l'
+		],
+		[
+			'key' => 'agent.variant',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT,
+			'valueType' => ITEM_VALUE_TYPE_UINT64,
+			'result' => 1
+		],
+		[
+			'key' => 'agent.variant',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT2,
+			'valueType' => ITEM_VALUE_TYPE_UINT64,
+			'result' => 2
 		]
 	];
 
