@@ -512,8 +512,7 @@ class CApiService {
 		}
 		// custom output
 		elseif (is_array($options['output'])) {
-			// the pk fields must always be included for the API to work properly
-			$sqlParts['select'] = explode(',', $pkFieldId);
+			$sqlParts['select'] = [];
 
 			foreach ($options['output'] as $field) {
 				if ($this->hasField($field, $tableName)) {
@@ -521,7 +520,8 @@ class CApiService {
 				}
 			}
 
-			$sqlParts['select'] = array_unique($sqlParts['select']);
+			// the pk fields must always be included for the API to work properly
+			$sqlParts['select'] = array_unique(array_merge($sqlParts['select'], explode(',', $pkFieldId)));
 		}
 		// extended output
 		elseif ($options['output'] == API_OUTPUT_EXTEND) {
