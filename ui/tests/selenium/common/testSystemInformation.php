@@ -182,6 +182,19 @@ class testSystemInformation extends CWebTest {
 			$area = $dashboard;
 		}
 
+		// Check and hide the text of messages as they contain ip addresses of the current host.
+		$error_text = [
+			'Connection to Zabbix server "'.$DB['SERVER'].'" failed. Possible reasons:',
+			'1. Incorrect server IP/DNS in the "zabbix.conf.php";',
+			'2. Incorrect DNS server configuration.',
+			'Failed to parse address "'.$DB['SERVER'].'"'
+		];
+		$messages = CMessageElement::find()->all();
+		foreach ($messages as $message) {
+			$this->assertEquals($error_text, $message->getLines()->asText());
+			$skip_fields[] = $message;
+		}
+
 		$this->assertScreenshotExcept($area, $skip_fields, $screenshot_name);
 	}
 
