@@ -1137,7 +1137,10 @@ static int	vfs_dir_info(AGENT_REQUEST *request, AGENT_RESULT *result, int count_
 			if (0 == strcmp(entry->d_name, ".") || 0 == strcmp(entry->d_name, ".."))
 				continue;
 
-			path = zbx_dsprintf(NULL, "%s/%s", item->path, entry->d_name);
+			if (0 == strcmp(item->path, "/"))
+				path = zbx_dsprintf(NULL, "%s%s", item->path, entry->d_name);
+			else
+				path = zbx_dsprintf(NULL, "%s/%s", item->path, entry->d_name);
 
 			if (0 == lstat(path, &status))
 			{
