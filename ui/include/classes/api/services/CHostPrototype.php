@@ -699,191 +699,220 @@ class CHostPrototype extends CHostBase {
 	 */
 	protected function prepareInheritedObjects(array $host_prototypes, array $hostIds = null) {
 		// Fetch the related discovery rules with their hosts.
-		$discoveryRules = API::DiscoveryRule()->get([
-			'output' => ['itemid', 'hostid'],
-			'selectHosts' => ['hostid'],
-			'itemids' => array_column($host_prototypes, 'ruleid'),
-			'templated' => true,
-			'nopermissions' => true,
-			'preservekeys' => true
-		]);
+		$discovery_rules = DBfetchArrayAssoc(DBselect(
+			'SELECT i.itemid,i.hostid'.
+			' FROM items i,hosts h'.
+			' WHERE i.hostid=h.hostid'.
+				' AND '.dbConditionId('i.itemid', array_keys(array_column($host_prototypes, null, 'ruleid'))).
+				' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_RULE]).
+				' AND '.dbConditionInt('h.status', [HOST_STATUS_TEMPLATE])
+		), 'itemid');
+
+		if (!$discovery_rules) {
+			return [];
+		}
 
 		// Remove host prototypes which don't belong to templates, so they cannot be inherited.
-		$host_prototypes = array_filter($host_prototypes, function ($host_prototype) use ($discoveryRules) {
-			return array_key_exists($host_prototype['ruleid'], $discoveryRules);
+		$host_prototypes = array_filter($host_prototypes, function ($host_prototype) use ($discovery_rules) {
+			return array_key_exists($host_prototype['ruleid'], $discovery_rules);
 		});
 
 		// Fetch all child hosts to inherit to. Do not inherit host prototypes on discovered hosts.
-		$chdHosts = API::Host()->get([
-			'output' => ['hostid', 'host', 'status'],
+		$chd_hosts = API::Host()->get([
+			'output' => ['hostid'],
 			'selectParentTemplates' => ['templateid'],
-			'templateids' => zbx_objectValues($discoveryRules, 'hostid'),
+			'templateids' => array_keys(array_column($discovery_rules, null, 'hostid')),
 			'hostids' => $hostIds,
-			'nopermissions' => true,
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 			'templated_hosts' => true,
-			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
+			'nopermissions' => true
 		]);
-		if (empty($chdHosts)) {
+
+		if (!$chd_hosts) {
 			return [];
 		}
 
 		// Fetch the child discovery rules.
-		$childDiscoveryRules = API::DiscoveryRule()->get([
-			'output' => ['itemid', 'templateid', 'hostid'],
-			'preservekeys' => true,
+		$chd_discovery_rules = API::DiscoveryRule()->get([
+			'output' => ['itemid', 'templateid', 'hostid', 'name'],
 			'filter' => [
-				'templateid' => array_keys($discoveryRules)
-			]
+				'templateid' => array_keys($discovery_rules)
+			],
+			'nopermissions' => true,
+			'preservekeys' => true
 		]);
+
+		foreach ($chd_discovery_rules as &$chd_discovery_rule) {
+			$chd_discovery_rule['hostPrototypes'] = [];
+		}
+		unset($chd_discovery_rule);
 
 		/*
 		 * Fetch child host prototypes and group them by discovery rule. "selectInterfaces" is not required, because
 		 * all child are rewritten when updating parents.
 		 */
-		$childHostPrototypes = API::HostPrototype()->get([
+		$chd_host_prototypes = API::HostPrototype()->get([
 			'output' => ['hostid', 'host', 'templateid'],
-			'selectGroupLinks' => API_OUTPUT_EXTEND,
-			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
+			'selectGroupLinks' => ['group_prototypeid', 'groupid', 'templateid'],
+			'selectGroupPrototypes' => ['group_prototypeid', 'name', 'templateid'],
 			'selectDiscoveryRule' => ['itemid'],
-			'discoveryids' => zbx_objectValues($childDiscoveryRules, 'itemid')
+			'discoveryids' => array_keys($chd_discovery_rules)
 		]);
-		foreach ($childDiscoveryRules as &$childDiscoveryRule) {
-			$childDiscoveryRule['hostPrototypes'] = [];
-		}
-		unset($childDiscoveryRule);
-		foreach ($childHostPrototypes as $childHostPrototype) {
-			$discoveryRuleId = $childHostPrototype['discoveryRule']['itemid'];
-			unset($childHostPrototype['discoveryRule']);
 
-			$childDiscoveryRules[$discoveryRuleId]['hostPrototypes'][] = $childHostPrototype;
+		foreach ($chd_host_prototypes as $chd_host_prototype) {
+			$ruleid = $chd_host_prototype['discoveryRule']['itemid'];
+			unset($chd_host_prototype['discoveryRule']);
+
+			$chd_discovery_rules[$ruleid]['hostPrototypes'][] = $chd_host_prototype;
 		}
 
-		// match each discovery that the parent host prototypes belong to to the child discovery rule for each host
-		$discoveryRuleChildren = [];
-		foreach ($childDiscoveryRules as $childRule) {
-			$discoveryRuleChildren[$childRule['templateid']][$childRule['hostid']] = $childRule['itemid'];
+		// Match each discovery that the parent host prototypes belong to to the child discovery rule for each host.
+		$discovery_rule_links = [];
+		foreach ($chd_discovery_rules as $chd_discovery_rule) {
+			$discovery_rule_links[$chd_discovery_rule['templateid']][$chd_discovery_rule['hostid']]
+				= $chd_discovery_rule['itemid'];
 		}
 
-		$newHostPrototypes = [];
-		foreach ($chdHosts as $host) {
-			$hostId = $host['hostid'];
+		$new_host_prototypes = [];
 
-			// skip items not from parent templates of current host
-			$templateIds = zbx_toHash($host['parentTemplates'], 'templateid');
-			$parentHostPrototypes = [];
-			foreach ($host_prototypes as $inum => $parentHostPrototype) {
-				$parentTemplateId = $discoveryRules[$parentHostPrototype['ruleid']]['hostid'];
+		foreach ($chd_hosts as $chd_host) {
+			$hostid = $chd_host['hostid'];
+			$templateids = array_column($chd_host['parentTemplates'], null, 'templateid');
 
-				if (isset($templateIds[$parentTemplateId])) {
-					$parentHostPrototypes[$inum] = $parentHostPrototype;
+			// Skip items not from parent templates of current host.
+			$parent_host_prototypes = [];
+			foreach ($host_prototypes as $inum => $host_prototype) {
+				$templateid = $discovery_rules[$host_prototype['ruleid']]['hostid'];
+
+				if (array_key_exists($templateid, $templateids)) {
+					$parent_host_prototypes[$inum] = $host_prototype;
 				}
 			}
 
-			foreach ($parentHostPrototypes as $parentHostPrototype) {
-				$childDiscoveryRuleId = $discoveryRuleChildren[$parentHostPrototype['ruleid']][$hostId];
-				$exHostPrototype = null;
+			foreach ($parent_host_prototypes as $parent_host_prototype) {
+				$chd_discovery_ruleid = $discovery_rule_links[$parent_host_prototype['ruleid']][$hostid];
+				$chd_discovery_rule = $chd_discovery_rules[$chd_discovery_ruleid];
+				$ex_host_prototypes = $chd_discovery_rule['hostPrototypes'];
+				$ex_host_prototype = null;
 
-				// check if the child discovery rule already has host prototypes
-				$exHostPrototypes = $childDiscoveryRules[$childDiscoveryRuleId]['hostPrototypes'];
-				if ($exHostPrototypes) {
-					$exHostPrototypesHosts = zbx_toHash($exHostPrototypes, 'host');
-					$exHostPrototypesTemplateIds = zbx_toHash($exHostPrototypes, 'templateid');
+				// Check if the child discovery rule already has host prototypes.
+				if ($ex_host_prototypes) {
+					$ex_host_prototypes_by_host = array_column($ex_host_prototypes, null, 'host');
+					$ex_host_prototypes_by_templateid = array_column($ex_host_prototypes, null, 'templateid');
 
-					// look for an already created inherited host prototype
-					// if one exists - update it
-					if (isset($exHostPrototypesTemplateIds[$parentHostPrototype['hostid']])) {
-						$exHostPrototype = $exHostPrototypesTemplateIds[$parentHostPrototype['hostid']];
+					// Look for an already created inherited host prototype. If one exists - update it.
+					if (array_key_exists($parent_host_prototype['hostid'], $ex_host_prototypes_by_templateid)) {
+						$ex_host_prototype = $ex_host_prototypes_by_templateid[$parent_host_prototype['hostid']];
 
-						// check if there's a host prototype on the target host with the same host name but from a different template
-						// or no template
-						if (isset($exHostPrototypesHosts[$parentHostPrototype['host']])
-							&& !idcmp($exHostPrototypesHosts[$parentHostPrototype['host']]['templateid'], $parentHostPrototype['hostid'])) {
-
-							$discoveryRule = DBfetch(DBselect('SELECT i.name FROM items i WHERE i.itemid='.zbx_dbstr($exHostPrototype['discoveryRule']['itemid'])));
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host prototype "%1$s" already exists on "%2$s".', $parentHostPrototype['host'], $discoveryRule['name']));
+						// Check if there's a host prototype on the target host with the same host name.
+						if (array_key_exists($parent_host_prototype['host'], $ex_host_prototypes_by_host)
+								&& bccomp($ex_host_prototypes_by_host[$parent_host_prototype['host']]['hostid'],
+									$ex_host_prototype['hostid']) != 0) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Host prototype "%1$s" already exists on "%2$s".', $parent_host_prototype['host'],
+									$chd_discovery_rule['name']
+								)
+							);
 						}
 					}
 
-					// look for a host prototype with the same host name
-					// if one exists - convert it to an inherited host prototype
-					if (isset($exHostPrototypesHosts[$parentHostPrototype['host']])) {
-						$exHostPrototype = $exHostPrototypesHosts[$parentHostPrototype['host']];
-
-						// check that this host prototype is not inherited from a different template
-						if ($exHostPrototype['templateid'] > 0 && !idcmp($exHostPrototype['templateid'], $parentHostPrototype['hostid'])) {
-							$discoveryRule = DBfetch(DBselect('SELECT i.name FROM items i WHERE i.itemid='.zbx_dbstr($exHostPrototype['discoveryRule']['itemid'])));
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host prototype "%1$s" already exists on "%2$s", inherited from another template.', $parentHostPrototype['host'], $discoveryRule['name']));
-						}
+					// Look for a host prototype with the same host name. If one exists - convert it to an inherited
+					// host prototype.
+					if ($ex_host_prototype === null
+							&& array_key_exists($parent_host_prototype['host'], $ex_host_prototypes_by_host)) {
+						$ex_host_prototype = $ex_host_prototypes_by_host[$parent_host_prototype['host']];
 					}
 				}
 
 				// copy host prototype
-				$newHostPrototype = $parentHostPrototype;
-				$newHostPrototype['uuid'] = '';
-				$newHostPrototype['ruleid'] = $discoveryRuleChildren[$parentHostPrototype['ruleid']][$hostId];
-				$newHostPrototype['templateid'] = $parentHostPrototype['hostid'];
+				$new_host_prototype = $parent_host_prototype;
+				$new_host_prototype['uuid'] = '';
+				$new_host_prototype['ruleid'] = $chd_discovery_ruleid;
+				$new_host_prototype['templateid'] = $parent_host_prototype['hostid'];
 
-				if (array_key_exists('macros', $newHostPrototype)) {
-					foreach ($newHostPrototype['macros'] as &$hostmacro) {
+				if (array_key_exists('macros', $new_host_prototype)) {
+					foreach ($new_host_prototype['macros'] as &$hostmacro) {
 						unset($hostmacro['hostmacroid']);
 					}
 					unset($hostmacro);
 				}
 
-				// update an existing inherited host prototype
-				if ($exHostPrototype) {
-					// look for existing group prototypes to update
-					$exGroupPrototypesByTemplateId = zbx_toHash($exHostPrototype['groupPrototypes'], 'templateid');
-					$exGroupPrototypesByName = zbx_toHash($exHostPrototype['groupPrototypes'], 'name');
-					$exGroupPrototypesByGroupId = zbx_toHash($exHostPrototype['groupLinks'], 'groupid');
+				// Update an existing inherited host prototype.
+				if ($ex_host_prototype) {
+					// Look for existing group prototypes to update.
+					$ex_gproto_by_templateid = array_column($ex_host_prototype['groupPrototypes'], null, 'templateid');
+					$ex_gproto_by_name = array_column($ex_host_prototype['groupPrototypes'], null, 'name');
 
-					// look for a group prototype that can be updated
-					foreach ($newHostPrototype['groupPrototypes'] as &$groupPrototype) {
-						// updated an inherited item prototype by templateid
-						if (isset($exGroupPrototypesByTemplateId[$groupPrototype['group_prototypeid']])) {
-							$groupPrototype['group_prototypeid'] = $exGroupPrototypesByTemplateId[$groupPrototype['group_prototypeid']]['group_prototypeid'];
+					// Look for a group prototype that can be updated.
+					foreach ($new_host_prototype['groupPrototypes'] as &$group_prototype) {
+						// Update an inherited group prototype by templateid.
+						if (array_key_exists($group_prototype['group_prototypeid'], $ex_gproto_by_templateid)) {
+							$group_prototype['group_prototypeid']
+								= $ex_gproto_by_templateid[$group_prototype['group_prototypeid']]['group_prototypeid'];
 						}
-						// updated an inherited item prototype by name
-						elseif (isset($groupPrototype['name']) && !zbx_empty($groupPrototype['name'])
-								&& isset($exGroupPrototypesByName[$groupPrototype['name']])) {
-
-							$groupPrototype['templateid'] = $groupPrototype['group_prototypeid'];
-							$groupPrototype['group_prototypeid'] = $exGroupPrototypesByName[$groupPrototype['name']]['group_prototypeid'];
+						// Update an inherited group prototype by name.
+						elseif (array_key_exists($group_prototype['name'], $ex_gproto_by_name)) {
+							$group_prototype['templateid'] = $group_prototype['group_prototypeid'];
+							$group_prototype['group_prototypeid']
+								= $ex_gproto_by_name[$group_prototype['name']]['group_prototypeid'];
 						}
-						// updated an inherited item prototype by group ID
-						elseif (isset($groupPrototype['groupid']) && $groupPrototype['groupid']
-								&& isset($exGroupPrototypesByGroupId[$groupPrototype['groupid']])) {
-
-							$groupPrototype['templateid'] = $groupPrototype['group_prototypeid'];
-							$groupPrototype['group_prototypeid'] = $exGroupPrototypesByGroupId[$groupPrototype['groupid']]['group_prototypeid'];
-						}
-						// create a new child group prototype
+						// Create a new child group prototype.
 						else {
-							$groupPrototype['templateid'] = $groupPrototype['group_prototypeid'];
-							unset($groupPrototype['group_prototypeid']);
+							$group_prototype['templateid'] = $group_prototype['group_prototypeid'];
+							unset($group_prototype['group_prototypeid']);
 						}
-
-						unset($groupPrototype['hostid']);
 					}
-					unset($groupPrototype);
+					unset($group_prototype);
 
-					$newHostPrototype['hostid'] = $exHostPrototype['hostid'];
+					// Look for existing group links to update.
+					$ex_glink_by_templateid = array_column($ex_host_prototype['groupLinks'], null, 'templateid');
+					$ex_glink_by_groupid = array_column($ex_host_prototype['groupLinks'], null, 'groupid');
+
+					// Look for a group link that can be updated.
+					foreach ($new_host_prototype['groupLinks'] as &$group_link) {
+						// Update an inherited group link by templateid.
+						if (array_key_exists($group_link['group_prototypeid'], $ex_glink_by_templateid)) {
+							$group_link['group_prototypeid']
+								= $ex_glink_by_templateid[$group_link['group_prototypeid']]['group_prototypeid'];
+						}
+						// Update an inherited group link by groupid.
+						elseif (array_key_exists($group_link['groupid'], $ex_glink_by_groupid)) {
+							$group_link['templateid'] = $group_link['group_prototypeid'];
+							$group_link['group_prototypeid']
+								= $ex_glink_by_groupid[$group_link['groupid']]['group_prototypeid'];
+						}
+						// Create a new child group link.
+						else {
+							$group_link['templateid'] = $group_link['group_prototypeid'];
+							unset($group_link['group_prototypeid']);
+						}
+					}
+					unset($group_link);
+
+					$new_host_prototype['hostid'] = $ex_host_prototype['hostid'];
 				}
 				// create a new inherited host prototype
 				else {
-					foreach ($newHostPrototype['groupPrototypes'] as &$groupPrototype) {
-						$groupPrototype['templateid'] = $groupPrototype['group_prototypeid'];
-						unset($groupPrototype['group_prototypeid'], $groupPrototype['hostid']);
+					foreach ($new_host_prototype['groupPrototypes'] as &$group_prototype) {
+						$group_prototype['templateid'] = $group_prototype['group_prototypeid'];
+						unset($group_prototype['group_prototypeid']);
 					}
-					unset($groupPrototype);
+					unset($group_prototype);
 
-					unset($newHostPrototype['hostid']);
+					foreach ($new_host_prototype['groupLinks'] as &$group_link) {
+						$group_link['templateid'] = $group_link['group_prototypeid'];
+						unset($group_link['group_prototypeid']);
+					}
+					unset($group_link);
+
+					unset($new_host_prototype['hostid']);
 				}
-				$newHostPrototypes[] = $newHostPrototype;
+
+				$new_host_prototypes[] = $new_host_prototype;
 			}
 		}
 
-		return $newHostPrototypes;
+		return $new_host_prototypes;
 	}
 
 	/**
