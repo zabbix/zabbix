@@ -2416,7 +2416,7 @@ class CAction extends CApiService {
 							'opconditions' =>	['type' => API_OBJECTS, 'uniq' => [['value']], 'fields' => [
 								'conditiontype' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => CONDITION_TYPE_EVENT_ACKNOWLEDGED],
 								'value' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => implode(',', [EVENT_NOT_ACKNOWLEDGED, EVENT_ACKNOWLEDGED]), 'length' => DB::getFieldLength('opconditions', 'value')],
-								'operator' =>		['type' => API_INT32, 'in' => CONDITION_OPERATOR_EQUAL],
+								'operator' =>		['type' => API_INT32, 'in' => CONDITION_OPERATOR_EQUAL]
 							]]
 						] + $common_fields;
 
