@@ -62,6 +62,6 @@ int	VFS_DIR_COUNT(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_DIR_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 int	zbx_etypes_to_mask(const char *etypes, AGENT_RESULT *result);
-int	zbx_vfs_file_info(const char *filename, struct zbx_json *j, int add_name, char **error);
+int	zbx_vfs_file_info(const char *filename, struct zbx_json *j, int array, char **error);
 
 #endif /* ZABBIX_SYSINFO_COMMON_DIR_H */
