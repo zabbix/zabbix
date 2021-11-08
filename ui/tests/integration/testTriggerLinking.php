@@ -80,7 +80,7 @@ class testTriggerLinking extends CIntegrationTest {
 	{
 		$response = $this->call('action.create', [
 			'name' => 'create_host',
-			'eventsource' => 2,
+			'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
 			'status' => 0,
 			'operations' => [
 				[
