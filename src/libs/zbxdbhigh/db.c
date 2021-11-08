@@ -2308,6 +2308,45 @@ int	DBindex_exists(const char *table_name, const char *index_name)
 
 	return ret;
 }
+
+int	DBpk_exists(const char *table_name)
+{
+	DB_RESULT	result;
+	int		ret;
+
+#if defined(HAVE_MYSQL)
+	result = DBselect(
+			"show index from %s"
+			" where key_name='PRIMARY'",
+			table_name);
+#elif defined(HAVE_ORACLE)
+	char		*name_u;
+
+	name_u = zbx_strdup(NULL, table_name);
+	zbx_strupper(name_u);
+	result = DBselect(
+			"select 1"
+			" from user_constraints"
+			" where constraint_type='P'"
+				" and table_name='%s'",
+			name_u);
+	zbx_free(name_u);
+#elif defined(HAVE_POSTGRESQL)
+	result = DBselect(
+			"select 1"
+			" from information_schema.table_constraints"
+			" where table_name='%s'"
+				" and constraint_type='PRIMARY KEY'"
+				" and constraint_schema='%s'",
+			table_name, zbx_db_get_schema_esc());
+#endif
+	ret = (NULL == DBfetch(result) ? FAIL : SUCCEED);
+
+	DBfree_result(result);
+
+	return ret;
+}
+
 #endif
 
 /******************************************************************************

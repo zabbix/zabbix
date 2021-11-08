@@ -794,6 +794,90 @@ class CApiInputValidatorTest extends TestCase {
 				'Invalid parameter "/output/2": value (55) already exists.'
 			],
 			[
+				['type' => API_INT32_RANGES],
+				null,
+				'/1/int32_ranges',
+				'Invalid parameter "/1/int32_ranges": a character string is expected.'
+			],
+			[
+				['type' => API_INT32_RANGES],
+				[],
+				'/1/int32_ranges',
+				'Invalid parameter "/1/int32_ranges": a character string is expected.'
+			],
+			[
+				['type' => API_INT32_RANGES],
+				'',
+				'/1/int32_ranges',
+				''
+			],
+			[
+				['type' => API_INT32_RANGES, 'flags' => API_NOT_EMPTY],
+				'',
+				'/1/int32_ranges',
+				'Invalid parameter "/1/int32_ranges": cannot be empty.'
+			],
+			[
+				['type' => API_INT32_RANGES],
+				'123',
+				'/1/int32_ranges',
+				'123'
+			],
+			[
+				['type' => API_INT32_RANGES],
+				'-123',
+				'/1/int32_ranges',
+				'-123'
+			],
+			[
+				['type' => API_INT32_RANGES],
+				'123.00',
+				'/1/int32_ranges',
+				'Invalid parameter "/1/int32_ranges": invalid range expression.'
+			],
+			[
+				['type' => API_INT32_RANGES, 'length' => 5],
+				'12-34',
+				'/1/int32_ranges',
+				'12-34'
+			],
+			[
+				['type' => API_INT32_RANGES, 'length' => 5],
+				'12-345',
+				'/1/int32_ranges',
+				'Invalid parameter "/1/int32_ranges": value is too long.'
+			],
+			[
+				['type' => API_INT32_RANGES],
+				'10-20,30-40',
+				'/1/int32_ranges',
+				'10-20,30-40'
+			],
+			[
+				['type' => API_INT32_RANGES],
+				'10.00-20.00',
+				'/1/int32_ranges',
+				'Invalid parameter "/1/int32_ranges": invalid range expression.'
+			],
+			[
+				['type' => API_INT32_RANGES],
+				'{$MACRO},30-40',
+				'/1/int32_ranges',
+				'Invalid parameter "/1/int32_ranges": invalid range expression.'
+			],
+			[
+				['type' => API_INT32_RANGES, 'in' => '0:50'],
+				'10-20,30-40',
+				'/1/int32_ranges',
+				'10-20,30-40'
+			],
+			[
+				['type' => API_INT32_RANGES, 'in' => '20:30'],
+				'10-20,30-40',
+				'/1/int32_ranges',
+				'Invalid parameter "/1/int32_ranges": value must be one of 20-30.'
+			],
+			[
 				['type' => API_UINT64],
 				0,
 				'/1/int',
@@ -3793,6 +3877,12 @@ class CApiInputValidatorTest extends TestCase {
 				''
 			],
 			[
+				['type' => API_IP_RANGES, 'flags' => API_NOT_EMPTY],
+				'',
+				'/1/ip_range',
+				'Invalid parameter "/1/ip_range": cannot be empty.'
+			],
+			[
 				['type' => API_IP_RANGES],
 				[],
 				'/1/ip_range',
@@ -3839,6 +3929,30 @@ class CApiInputValidatorTest extends TestCase {
 				'192.168.3.5,192.168.6.240',
 				'/1/ip_range',
 				'192.168.3.5,192.168.6.240'
+			],
+			[
+				['type' => API_IP_RANGES],
+				'www.example.com',
+				'/1/ip_range',
+				'Invalid parameter "/1/ip_range": invalid address range "www.example.com".'
+			],
+			[
+				['type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS],
+				'www.example.com',
+				'/1/ip_range',
+				'www.example.com'
+			],
+			[
+				['type' => API_IP_RANGES],
+				'192.168.3.5,192.168.6.1-240',
+				'/1/ip_range',
+				'Invalid parameter "/1/ip_range": invalid address range "192.168.6.1-240".'
+			],
+			[
+				['type' => API_IP_RANGES, 'flags' => API_ALLOW_RANGE],
+				'192.168.3.5,192.168.6.1-240',
+				'/1/ip_range',
+				'192.168.3.5,192.168.6.1-240'
 			],
 			[
 				['type' => API_DNS],

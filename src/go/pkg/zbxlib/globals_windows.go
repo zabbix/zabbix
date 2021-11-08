@@ -42,8 +42,14 @@ package zbxlib
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/zbxregexp.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/algodefs.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/logfiles.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/json.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/json_parser.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/jsonpath.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sha256crypt.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/variant.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo_system.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo_dns.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo_file.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo_dir.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/eventlog.o
 #cgo openssl LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/tls_version.o

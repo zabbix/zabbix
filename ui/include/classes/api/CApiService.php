@@ -162,10 +162,6 @@ class CApiService {
 		if ($tableName) {
 			$schema = $this->getTableSchema($tableName);
 
-			if (strpos($schema['key'], ',') !== false) {
-				throw new Exception('Composite private keys are not supported in this API version.');
-			}
-
 			return $schema['key'];
 		}
 
@@ -493,14 +489,19 @@ class CApiService {
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		// If table do not have a primary key, use COUNT(*) to select number of rows.
 		$pk = $this->pk($tableName);
-		$pkFieldId = $this->fieldId($pk, $tableAlias);
+
+		$pk_fields = explode(',', $pk);
+
+		foreach($pk_fields as $key => $field) {
+			$pk_fields[$key] = $this->fieldId($field, $tableAlias);
+		}
+
+		$pkFieldId = implode(',', $pk_fields);
 
 		// count
 		if (array_key_exists('countOutput', $options) && $options['countOutput']
 				&& !$this->requiresPostSqlFiltering($options)) {
-			$sqlParts['select'] = ($pk !== '')
-				? ['COUNT(DISTINCT '.$pkFieldId.') AS rowscount']
-				: ['COUNT(*) AS rowscount'];
+			$sqlParts['select'] = ['COUNT(*) AS rowscount'];
 
 			// select columns used by group count
 			if (array_key_exists('groupCount', $options) && $options['groupCount']) {
@@ -511,15 +512,16 @@ class CApiService {
 		}
 		// custom output
 		elseif (is_array($options['output'])) {
-			// the pk field must always be included for the API to work properly
-			$sqlParts['select'] = ($pk !== '') ? [$pkFieldId] : [];
+			$sqlParts['select'] = [];
+
 			foreach ($options['output'] as $field) {
 				if ($this->hasField($field, $tableName)) {
 					$sqlParts['select'][] = $this->fieldId($field, $tableAlias);
 				}
 			}
 
-			$sqlParts['select'] = array_unique($sqlParts['select']);
+			// the pk fields must always be included for the API to work properly
+			$sqlParts['select'] = array_unique(array_merge($sqlParts['select'], explode(',', $pkFieldId)));
 		}
 		// extended output
 		elseif ($options['output'] == API_OUTPUT_EXTEND) {

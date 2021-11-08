@@ -1,1 +1,0 @@
-...G...... [ZBX-19912] fixed mysql.db.size, mysql.replication.get_slave_status and pgsql.custom.query items for Zabbix agent 2 (esneiders)

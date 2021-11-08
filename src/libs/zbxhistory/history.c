@@ -98,9 +98,11 @@ void	zbx_history_destroy(void)
  * Comments: add history values to the configured storage backends                  *
  *                                                                                  *
  ************************************************************************************/
-int	zbx_history_add_values(const zbx_vector_ptr_t *history)
+int	zbx_history_add_values(const zbx_vector_ptr_t *history, int *ret_flush)
 {
-	int	i, flags = 0, ret = SUCCEED;
+	int	i, flags = 0;
+
+	*ret_flush = FLUSH_SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -117,12 +119,15 @@ int	zbx_history_add_values(const zbx_vector_ptr_t *history)
 		zbx_history_iface_t	*writer = &history_ifaces[i];
 
 		if (0 != (flags & (1 << i)))
-			ret = writer->flush(writer);
+		{
+			if (FLUSH_DUPL_REJECTED == (*ret_flush = writer->flush(writer)))
+				break;
+		}
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
-	return ret;
+	return (FLUSH_SUCCEED == *ret_flush ? SUCCEED : FAIL);
 }
 
 /************************************************************************************

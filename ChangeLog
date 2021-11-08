@@ -1,9 +1,30 @@
 Changes for 6.0.0alpha6
 
 New features:
+..F.....S. [ZBXNEXT-6921] introduced support of primary keys for history tables (dgoloscapov, jfreibergs, vso)
+...G...... [ZBXNEXT-712] added new item vfs.dir.get[] for Agent and Agent2 (akozlovs)
+A.F.I..... [ZBXNEXT-6945] implemented geographical map widget (miks)
+...G...... [ZBXNEXT-6651] added new item agent.variant for Agent and Agent2 (agriscenko, akozlovs)
+A.F....... [ZBXNEXT-6470,ZBXNEXT-6920] implemented audit logging of action API object (agriscenko)
+..F.....S. [ZBXNEXT-6950] implemented changecount() trigger function (miks, ssimonenko)
+...G.....T [ZBXNEXT-6677] added cpu percent field to docker.container_stats key for docker plugin in Zabbix agent 2 and docker template (afayantsev, esneiders)
+.........T [ZBXNEXT-7014] updated README for a newer version of PagerDuty (abiba)
 .........T [ZBXNEXT-7001] added support High availability cluster in Zabbix server health/Remote Zabbix server health template (abakaldin)
 
 Bug fixes:
+.......PS. [ZBX-20097] added celsius support to vmware unitInfo (asestakovs)
+.......PS. [ZBX-18944] fixed the fields size for LLD validation of triggers.description and item_preproc.params (ssimonenko)
+.......PS. [ZBX-20085] fixed build on Solaris; thanks to Yuuki Enomoto for the patch (vso)
+..F....... [ZBX-20158] added label to standalone server and fixed issue caused by setup step skew (ashubin, jfreibergs, wiper)
+...G...... [ZBX-19926] fixed Zabbix agent crashing when reading event log on Windows Server 2022 (vso)
+........S. [ZBX-20139] renamed ExternalAddress to NodeAddress and removed ListenIP/Port dependency (wiper)
+.........T [ZBX-20080] fixed error message (abiba)
+........S. [ZBX-20137] fixed HA node not to become active after restart if there is another node that can take over (vso)
+.........T [ZBX-20003] fixed update and discard intervals in generic snmp and some other templates (vkhaliev)
+.......PS. [ZBX-20032] fixed server crash when restarting monitored vmware vc (MVekslers)
+...G...... [ZBX-19912] fixed mysql.db.size, mysql.replication.get_slave_status and pgsql.custom.query items for Zabbix agent 2 (esneiders)
+.........T [ZBX-19963] fixed macro with regular expression for serial numbers discovery in cisco template (vkhaliev)
+.........T [ZBX-19958] fixed macro with regular expression for interfaces discovery in OS linux templates (vkhaliev)
 ..F....... [ZBX-20132] fixed item type mismatch warning not getting removed for non-matching key (jfreibergs)
 ..F....... [ZBX-20125] fixed invalid argument error in trigger test (ashubin)
 ..F....... [ZBX-18975] fixed item value being truncated in item test form (agriscenko)
@@ -190,8 +211,20 @@ Bug fixes:
 Changes for 5.4.8rc1
 
 New features:
+...G...... [ZBXNEXT-6651] added new item agent.variant for Agent and Agent2 (agriscenko, akozlovs)
+...G.....T [ZBXNEXT-6677] added cpu percent field to docker.container_stats key for docker plugin in Zabbix agent 2 and docker template (afayantsev, esneiders)
+.........T [ZBXNEXT-7014] updated README for a newer version of PagerDuty (abiba)
 
 Bug fixes:
+.......PS. [ZBX-20097] added celsius support to vmware unitInfo (asestakovs)
+.......PS. [ZBX-20085] fixed build on Solaris; thanks to Yuuki Enomoto for the patch (vso)
+...G...... [ZBX-19926] fixed Zabbix agent crashing when reading event log on Windows Server 2022 (vso)
+.........T [ZBX-20080] fixed error message (abiba)
+.........T [ZBX-20003] fixed update and discard intervals in generic snmp and some other templates (vkhaliev)
+.......PS. [ZBX-20032] fixed server crash when restarting monitored vmware vc (MVekslers)
+...G...... [ZBX-19912] fixed mysql.db.size, mysql.replication.get_slave_status and pgsql.custom.query items for Zabbix agent 2 (esneiders)
+.........T [ZBX-19963] fixed macro with regular expression for serial numbers discovery in cisco template (vkhaliev)
+.........T [ZBX-19958] fixed macro with regular expression for interfaces discovery in OS linux templates (vkhaliev)
 
 --------------------------------------------------------------------------------
 Changes for 5.4.7
@@ -1299,6 +1332,9 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.18rc1
 
 New features:
+...G...... [ZBXNEXT-6651] added new item agent.variant for Agent and Agent2 (agriscenko, akozlovs)
+...G.....T [ZBXNEXT-6677] added cpu percent field to docker.container_stats key for docker plugin in Zabbix agent 2 and docker template (afayantsev, esneiders)
+.........T [ZBXNEXT-7014] updated README for a newer version of PagerDuty (abiba)
 .......PS. [ZBXNEXT-2475] added handling of compressed content to web monitoring (akozlovs)
 ...G...... [ZBXNEXT-6782] added new parameters for system.hostname (dgoloscapov)
 ...G...... [ZBXNEXT-6677] added cpu percent field to docker.container_stats key for docker plugin in Zabbix agent 2 (esneiders)
@@ -1306,6 +1342,14 @@ New features:
 .......PS. [ZBXNEXT-6644] added support for vmware key named 'vmware.hv.maintenance' (MVekslers)
 
 Bug fixes:
+...G...... [ZBX-19926] fixed Zabbix agent crashing when reading event log on Windows Server 2022 (vso)
+.........T [ZBX-20080] fixed error message (abiba)
+.........T [ZBX-20003] fixed update and discard intervals in generic snmp and some other templates (vkhaliev)
+.........T [ZBX-18787] removed undefined macro (abiba)
+.......PS. [ZBX-20032] fixed server crash when restarting monitored vmware vc (MVekslers)
+.........T [ZBX-19963] fixed macro with regular expression for serial numbers discovery in cisco template (vkhaliev)
+...G...... [ZBX-19912] fixed mysql.db.size, mysql.replication.get_slave_status and pgsql.custom.query items for Zabbix agent 2 (esneiders)
+.........T [ZBX-19958] fixed macro with regular expression for interfaces discovery in OS linux templates (vkhaliev)
 ..F....... [ZBX-18975] fixed item value being truncated in item test form (agriscenko)
 .........T [ZBX-19958] fixed macro with regular expression for interfaces discovery in OS linux template (vkhaliev)
 ........S. [ZBX-20065] fixed count() function gt,ge,lt,le operations (dgoloscapov, wiper)
@@ -3594,6 +3638,8 @@ Changes for 4.0.36rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-19926] fixed Zabbix agent crashing when reading event log on Windows Server 2022 (vso)
+.......PS. [ZBX-20032] fixed server crash when restarting monitored vmware vc (MVekslers)
 ........S. [ZBX-19872] removed redundant escaping in XML data of HTTP agent POST request (asestakovs)
 
 --------------------------------------------------------------------------------

@@ -862,6 +862,10 @@ function getAdministrationGeneralSubmenu() {
 		->setArgument('action', 'trigdisplay.edit')
 		->getUrl();
 
+	$geomap_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'geomaps.edit')
+		->getUrl();
+
 	$modules_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'module.list')
 		->getUrl();
@@ -888,6 +892,7 @@ function getAdministrationGeneralSubmenu() {
 				$regex_url          => _('Regular expressions'),
 				$macros_url         => _('Macros'),
 				$trigdisplay_url    => _('Trigger displaying options'),
+				$geomap_url			=> _('Geographical maps'),
 				$modules_url        => _('Modules'),
 				$tokens_url         => $can_access_tokens ? _('API tokens') : null,
 				$miscconfig_url     => _('Other')

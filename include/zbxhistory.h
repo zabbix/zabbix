@@ -54,11 +54,15 @@ void	zbx_history_value2variant(const history_value_t *value, unsigned char value
 int	zbx_history_init(char **error);
 void	zbx_history_destroy(void);
 
-int	zbx_history_add_values(const zbx_vector_ptr_t *history);
+int	zbx_history_add_values(const zbx_vector_ptr_t *history, int *ret_flush);
 int	zbx_history_get_values(zbx_uint64_t itemid, int value_type, int start, int count, int end,
 		zbx_vector_history_record_t *values);
 
 int	zbx_history_requires_trends(int value_type);
 void	zbx_history_check_version(struct zbx_json *json);
+
+#define FLUSH_SUCCEED		0
+#define FLUSH_FAIL		-1
+#define FLUSH_DUPL_REJECTED	-2
 
 #endif
