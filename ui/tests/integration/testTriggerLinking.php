@@ -82,10 +82,8 @@ class testTriggerLinking extends CIntegrationTest {
 			'name' => 'create_host',
 			'eventsource' => 2,
 			'status' => 0,
-			'host' => self::HOST_NAME,
 			'operations' => [
 				[
-					'actionid' => 1,
 					'operationtype' => 2
 				]
 			]
@@ -108,7 +106,6 @@ class testTriggerLinking extends CIntegrationTest {
 			'status' => 0,
 			'operations' => [
 				[
-					'actionid' => 12,
 					'operationtype' => 6,
 					'optemplate' =>
 					$templateids_for_api_call
