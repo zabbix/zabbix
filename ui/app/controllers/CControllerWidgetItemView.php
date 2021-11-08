@@ -42,6 +42,8 @@ class CControllerWidgetItemView extends CControllerWidget {
 		$value = '';
 		$change_indicator = [];
 		$time = '';
+		$units = '';
+		$decimals = '';
 
 		$options = [
 			'output' => [],
@@ -107,14 +109,12 @@ class CControllerWidgetItemView extends CControllerWidget {
 						$value_type = $items_with_values[$fields['itemid'][0]]['value_type'];
 
 						// Override item units if needed.
-						if ($fields['units_show'] == 1) {
-							$units = ($fields['units'] === '')
-								? $items_with_values[$fields['itemid'][0]]['units']
-								: $fields['units'];
-						}
+						$units = ($fields['units'] === '')
+							? $items_with_values[$fields['itemid'][0]]['units']
+							: $fields['units'];
 					}
 
-					// Time chan be shown independently.
+					// Time can be shown independently.
 					if (array_key_exists(WIDGET_ITEM_SHOW_TIME, $show)) {
 						$time = date(ZBX_FULL_DATE_TIME, $history[$fields['itemid'][0]][0]['clock']);
 					}
@@ -122,13 +122,37 @@ class CControllerWidgetItemView extends CControllerWidget {
 					switch ($value_type) {
 						case ITEM_VALUE_TYPE_FLOAT:
 						case ITEM_VALUE_TYPE_UINT64:
-							// Apply unit conversion if it is set in options.
-							if ($fields['units_show'] == 1) {
-								$value = convertUnits([
-									'value' => $last_value,
-									'units' => $units,
-									'decimals' => $fields['decimal_places']
-								]);
+							// Apply unit conversion always because it will also convert values to scientific notation.
+							$value = convertUnits([
+								'value' => $last_value,
+								'units' => $units,
+								'decimals' => $fields['decimal_places']
+							]);
+
+							/*
+							 * Perform splitting units and value only if conversion actually happened. In case there is
+							 * a thousands separator space, find the last space that could be the units separator.
+							 */
+							if ($value != $last_value) {
+								$pos = strrpos($value, ' ');
+
+								if ($pos !== false) {
+									$units = substr($value, $pos + 1);
+									$value = substr($value, 0, $pos);
+								}
+							}
+
+							/*
+							 * Regardless of unit conversion, separate the decimals from value. In case of scientific
+							 * notation, use the whole string after decimal separator.
+							 */
+							$numeric_formatting = localeconv();
+							$pos = strrpos($value, $numeric_formatting['decimal_point']);
+
+							if ($pos !== false) {
+								// Include the dot as part of decimal, so it can be shown in different font size.
+								$decimals = substr($value, $pos);
+								$value = substr($value, 0, $pos);
 							}
 
 							if ($items_with_values[$fields['itemid'][0]]['valuemap']) {
@@ -169,6 +193,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 							);
 
 							if ($mapping !== false) {
+								// To do: same as in latest data, but could be that original value should not be shown.
 								$value = $mapping.' ('.$value.')';
 							}
 
@@ -218,15 +243,90 @@ class CControllerWidgetItemView extends CControllerWidget {
 			}
 		}
 		else {
-			// show no permissions in widget un viss, stopeejas exit taalaak neiet
 			$error = _('No permissions to referred object or it does not exist!');
+		}
+
+		// Calculate what to show.
+		$data = ['widget_config' => $fields];
+
+		if (array_key_exists(WIDGET_ITEM_SHOW_DESCRIPTION, $show)) {
+			$data['description'] = $description;
+		}
+
+		if (array_key_exists(WIDGET_ITEM_SHOW_VALUE, $show)) {
+			$data['value'] = $value;
+			$data['value_type'] = $value_type;
+
+			if (in_array($value_type, [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
+				$data['decimals'] = $decimals;
+			}
+
+			if ($fields['units_show']) {
+				$data['units'] = $units;
+				$data['units_pos'] = $fields['units_pos'];
+			}
+		}
+
+		if (array_key_exists(WIDGET_ITEM_SHOW_TIME, $show)) {
+			$data['time'] = $time;
+		}
+
+		if (array_key_exists(WIDGET_ITEM_SHOW_CHANGE_INDICATOR, $show)) {
+			$data['change_indicator'] = $change_indicator;
+		}
+
+		// To do: set blocks into rows in the correct order.
+		$rows_data = [];
+
+		$rows_count = 1;
+
+		// Calculate how many rows to show.
+		if (array_key_exists(WIDGET_ITEM_SHOW_DESCRIPTION, $show) && array_key_exists(WIDGET_ITEM_SHOW_VALUE, $show)
+				&& array_key_exists(WIDGET_ITEM_SHOW_TIME, $show)) {
+			if (($fields['desc_v_pos'] != $fields['time_v_pos'] || $fields['value_v_pos'] != $fields['time_v_pos'])
+					&& $fields['desc_v_pos'] == $fields['value_v_pos']) {
+				// Description and value are on same line, but description and time or value and time are on not.
+				$rows_count++;
+			}
+			elseif (($fields['desc_v_pos'] != $fields['value_v_pos'] || $fields['value_v_pos'] != $fields['time_v_pos'])
+					&& $fields['desc_v_pos'] == $fields['time_v_pos']) {
+				// Description and time are on same line, but description and value or value or time are not.
+				$rows_count++;
+			}
+			elseif (($fields['desc_v_pos'] != $fields['value_v_pos'] || $fields['desc_v_pos'] != $fields['time_v_pos'])
+					&& $fields['value_v_pos'] == $fields['time_v_pos']) {
+				// Value and time are on same line, but description and value or description and time are not.
+				$rows_count++;
+			}
+			elseif ($fields['desc_v_pos'] != $fields['time_v_pos'] && $fields['value_v_pos'] != $fields['time_v_pos']
+					&& $fields['desc_v_pos'] != $fields['value_v_pos']) {
+				// Each block is on a separate line.
+				$rows_count += 2;
+			}
+		}
+		elseif (array_key_exists(WIDGET_ITEM_SHOW_DESCRIPTION, $show) && array_key_exists(WIDGET_ITEM_SHOW_VALUE, $show)) {
+			if ($fields['desc_v_pos'] != $fields['value_v_pos']) {
+				// Description and value are not on same line.
+				$rows_count++;
+			}
+		}
+		elseif (array_key_exists(WIDGET_ITEM_SHOW_DESCRIPTION, $show) && array_key_exists(WIDGET_ITEM_SHOW_TIME, $show)) {
+			if ($fields['desc_v_pos'] != $fields['time_v_pos']) {
+				// Description and time are not on same line.
+				$rows_count++;
+			}
+		}
+		elseif (array_key_exists(WIDGET_ITEM_SHOW_VALUE, $show) && array_key_exists(WIDGET_ITEM_SHOW_TIME, $show)) {
+			if ($fields['value_v_pos'] != $fields['time_v_pos']) {
+				// Value and time are not on same line.
+				$rows_count++;
+			}
 		}
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultName()),
-			'data' => ['description' => $description, 'value' => $value, 'time' => $time,
-				'change_indicator' => $change_indicator
-			],
+			// To do: replace with $rows_data when complete.
+			'data' => $data,
 			'error' => $error,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

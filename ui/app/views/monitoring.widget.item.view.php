@@ -27,7 +27,12 @@ if ($data['error'] !== '') {
 	$body = (new CTableInfo())->setNoDataMessage($data['error']);
 }
 else {
-	$body = new CDiv($data);
+	$body = (new CDiv($data))
+		->addStyle('width: 100%; height: 100%;');
+
+	if ($data['data']['widget_config']['bg_color'] !== '') {
+		$body->addStyle('background-color: #'.$data['data']['widget_config']['bg_color']);
+	}
 }
 
 $output = [
