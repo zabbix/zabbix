@@ -84,7 +84,7 @@ class testTriggerLinking extends CIntegrationTest {
 			'status' => 0,
 			'operations' => [
 				[
-					'operationtype' => OPERATION_TYPE_HOST_ADD
+					'operationtype' => 2
 				]
 			]
 		]
@@ -102,11 +102,11 @@ class testTriggerLinking extends CIntegrationTest {
 		}
 		$response = $this->call('action.create', [
 			'name' => 'link_templates',
-			'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
+			'eventsource' => 2,
 			'status' => 0,
 			'operations' => [
 				[
-					'operationtype' => OPERATION_TYPE_TEMPLATE_ADD,
+					'operationtype' => 6,
 					'optemplate' =>
 					$templateids_for_api_call
 				]
