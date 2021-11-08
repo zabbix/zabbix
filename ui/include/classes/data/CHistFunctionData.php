@@ -29,7 +29,6 @@ final class CHistFunctionData {
 	public const PERIOD_MODE_SEC_ONLY = 2;
 	public const PERIOD_MODE_NUM_ONLY = 3;
 	public const PERIOD_MODE_TREND = 4;
-	public const PERIOD_MODE_SEC_LONG = 5;
 
 	/**
 	 * Known history functions along with definition of parameters.
@@ -226,12 +225,12 @@ final class CHistFunctionData {
 		],
 		'baselinedev' => [
 			['rules' => [['type' => 'query']]],
-			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC_LONG]]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC, 'with_year' => true]]],
 			['rules' => [['type' => 'time', 'with_year' => true]]],
 		],
 		'baselinewma' => [
 			['rules' => [['type' => 'query']]],
-			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC_LONG]]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC, 'with_year' => true]]],
 			['rules' => [['type' => 'time', 'with_year' => true]]],
 		],
 		'trendcount' => [
