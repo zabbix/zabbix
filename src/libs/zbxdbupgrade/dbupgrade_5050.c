@@ -1113,6 +1113,29 @@ static int	DBpatch_5050103(void)
 
 	return DBcreate_table(&table);
 }
+
+static int	DBpatch_5050104(void)
+{
+#ifdef HAVE_MYSQL
+	if(ZBX_DB_OK > DBexecute("alter table config modify dbversion_status text default '' not null"))
+		return FAIL;
+#endif
+
+#ifdef HAVE_POSTGRESQL
+	if(ZBX_DB_OK > DBexecute("alter table config alter column dbversion_status type text"))
+		return FAIL;
+#endif
+
+#ifdef HAVE_ORACLE
+	if(ZBX_DB_OK > DBexecute("alter table config drop column dbversion_status"))
+		return FAIL;
+
+	if(ZBX_DB_OK > DBexecute("alter table config add dbversion_status nclob"))
+		return FAIL;
+#endif
+
+	return SUCCEED;
+}
 #endif
 
 DBPATCH_START(5050)
@@ -1210,5 +1233,6 @@ DBPATCH_ADD(5050100, 0, 1)
 DBPATCH_ADD(5050101, 0, 1)
 DBPATCH_ADD(5050102, 0, 1)
 DBPATCH_ADD(5050103, 0, 1)
+DBPATCH_ADD(5050104, 0, 1)
 
 DBPATCH_END()
