@@ -229,7 +229,7 @@ class testServiceRoles extends CIntegrationTest {
 				'evaltype' => 0,
 				'conditions' => [
 					[
-						'conditiontype' => 27,
+						'conditiontype' => CONDITION_TYPE_SERVICE,
 						'operator' => 0,
 						'value' => self::$child1_1_serviceid,
 					]
