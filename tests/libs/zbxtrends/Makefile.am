@@ -1,6 +1,7 @@
 if SERVER
 SERVER_tests = \
-	zbx_trends_parse_range
+	zbx_trends_parse_range \
+	zbx_baseline_season_diff
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -40,5 +41,19 @@ zbx_trends_parse_range_LDFLAGS = @SERVER_LDFLAGS@ \
 	-Wl,--wrap=DBis_null
 
 zbx_trends_parse_range_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+
+zbx_baseline_season_diff_SOURCES = \
+	zbx_baseline_season_diff.c \
+	$(COMMON_SRC_FILES)
+
+zbx_baseline_season_diff_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_baseline_season_diff_LDADD += @SERVER_LIBS@
+
+zbx_baseline_season_diff_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_baseline_season_diff_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 endif

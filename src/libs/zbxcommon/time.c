@@ -452,10 +452,6 @@ int	zbx_get_week_number(const struct tm *tm)
 	int	days;
 	char	timebuf[1024];
 
-	 if (strftime(timebuf, sizeof timebuf, "%V", tm) != 0) {
-	    printf("Week number is: %s\n", timebuf);
-	  }
-
 	if (0 > (days = get_week_days(tm->tm_yday, tm->tm_wday)))
 	{
 		int	d = tm->tm_yday + 365;
