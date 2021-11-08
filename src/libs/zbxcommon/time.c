@@ -434,3 +434,48 @@ const char	*zbx_timespec_str(const zbx_timespec_t *ts)
 
 	return str;
 }
+
+static	int	get_week_days(int yday, int wday)
+{
+	return yday - (yday - wday + 382) % 7 + 3;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_get_week_number                                              *
+ *                                                                            *
+ * Purpose: get ISO 8061 week number (1-53)                                   *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_get_week_number(const struct tm *tm)
+{
+	int	days;
+	char	timebuf[1024];
+
+	 if (strftime(timebuf, sizeof timebuf, "%V", tm) != 0) {
+	    printf("Week number is: %s\n", timebuf);
+	  }
+
+	if (0 > (days = get_week_days(tm->tm_yday, tm->tm_wday)))
+	{
+		int	d = tm->tm_yday + 365;
+
+		if (SUCCEED == zbx_is_leap_year(tm->tm_year + 1899))
+			d++;
+
+		days = get_week_days(d, tm->tm_wday);
+	}
+	else
+	{
+		int days_next, d;
+
+		d = tm->tm_yday - 365;
+		if (SUCCEED == zbx_is_leap_year(tm->tm_year + 1900))
+			d--;
+
+		if (0 <= (days_next = get_week_days(d, tm->tm_wday)))
+			days = days_next;
+	}
+
+	return days / 7 + 1;
+}

@@ -314,13 +314,13 @@ double	zbx_current_time(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: is_leap_year                                                     *
+ * Function: zbx_is_leap_year                                                 *
  *                                                                            *
  * Return value:  SUCCEED - year is a leap year                               *
  *                FAIL    - year is not a leap year                           *
  *                                                                            *
  ******************************************************************************/
-static int	is_leap_year(int year)
+int	zbx_is_leap_year(int year)
 {
 	return 0 == year % 4 && (0 != year % 100 || 0 == year % 400) ? SUCCEED : FAIL;
 }
@@ -410,10 +410,10 @@ long	zbx_get_timezone_offset(time_t t, struct tm *tm)
 			(tm->tm_min - tm_utc.tm_min) * SEC_PER_MIN;	/* assuming seconds are equal */
 
 	while (tm->tm_year > tm_utc.tm_year)
-		offset += (SUCCEED == is_leap_year(tm_utc.tm_year++) ? SEC_PER_YEAR + SEC_PER_DAY : SEC_PER_YEAR);
+		offset += (SUCCEED == zbx_is_leap_year(tm_utc.tm_year++) ? SEC_PER_YEAR + SEC_PER_DAY : SEC_PER_YEAR);
 
 	while (tm->tm_year < tm_utc.tm_year)
-		offset -= (SUCCEED == is_leap_year(--tm_utc.tm_year) ? SEC_PER_YEAR + SEC_PER_DAY : SEC_PER_YEAR);
+		offset -= (SUCCEED == zbx_is_leap_year(--tm_utc.tm_year) ? SEC_PER_YEAR + SEC_PER_DAY : SEC_PER_YEAR);
 #endif
 
 	return offset;
@@ -529,7 +529,7 @@ int	zbx_day_in_month(int year, int mon)
 	static const unsigned char	month[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
 	if (1 <= mon && mon <= 12)	/* add one day in February of a leap year */
-		return month[mon - 1] + (2 == mon && SUCCEED == is_leap_year(year) ? 1 : 0);
+		return month[mon - 1] + (2 == mon && SUCCEED == zbx_is_leap_year(year) ? 1 : 0);
 
 	return 30;
 }

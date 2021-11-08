@@ -1189,6 +1189,7 @@ void	zbx_setproctitle(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 double		zbx_time(void);
 void		zbx_timespec(zbx_timespec_t *ts);
 double		zbx_current_time(void);
+int		zbx_is_leap_year(int year);
 void		zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz);
 long		zbx_get_timezone_offset(time_t t, struct tm *tm);
 struct tm	*zbx_localtime(const time_t *time, const char *tz);
@@ -1709,6 +1710,8 @@ void	zbx_tm_round_up(struct tm *tm, zbx_time_unit_t base);
 void	zbx_tm_round_down(struct tm *tm, zbx_time_unit_t base);
 
 const char	*zbx_timespec_str(const zbx_timespec_t *ts);
+
+int	zbx_get_week_number(const struct tm *tm);
 
 zbx_time_unit_t	zbx_tm_str_to_unit(const char *text);
 int	zbx_tm_parse_period(const char *period, size_t *len, int *multiplier, zbx_time_unit_t *base, char **error);
