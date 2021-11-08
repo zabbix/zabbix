@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-11-05 20:05+0200\n"
-"PO-Revision-Date: 2021-10-31 15:15+0300\n"
+"PO-Revision-Date: 2021-11-07 13:25+0300\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
-"X-POOTLE-MTIME: 1635686122.000000\n"
+"X-POOTLE-MTIME: 1636284327.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:142
@@ -379,7 +379,7 @@ msgstr "<תת־תפריט/תת־תפריט/…>"
 #: jsLoader.php:183
 msgctxt "abbreviation of severity level"
 msgid "A"
-msgstr ""
+msgstr "מ"
 
 #: include/classes/widgets/CWidgetHelper.php:797
 msgid "ADD OVERRIDE"
@@ -1018,7 +1018,7 @@ msgstr "מנשקי הסוכן"
 
 #: include/classes/data/CItemData.php:844
 msgid "Agent variant check. Returns 1 - for Zabbix agent; 2 - for Zabbix agent 2"
-msgstr ""
+msgstr "בדיקת הגוון סוכן. מחזירה 1 - לסוכן Zabbix,‏ 2 - לסוכן Zabbix 2"
 
 #: include/classes/widgets/CWidgetHelper.php:1163
 msgid "Aggregate"
@@ -1388,7 +1388,7 @@ msgstr "ניסיונות"
 
 #: app/views/administration.geomaps.edit.php:88
 msgid "Attribution"
-msgstr ""
+msgstr "יחוס"
 
 #: app/views/administration.housekeeping.edit.php:178
 #: include/classes/helpers/CMenuHelper.php:119
@@ -3557,7 +3557,7 @@ msgstr "תוצאה משולבת"
 
 #: include/classes/widgets/forms/CWidgetFormGeoMap.php:77
 msgid "Comma separated center coordinates to display when the widget is initially loaded."
-msgstr ""
+msgstr "נקודות ציון, מופרדות בפסיקים, של מרכז התצוגה עם טעינת הווידג׳ט לראשונה."
 
 #: app/views/administration.script.edit.php:173 include/actions.inc.php:1943
 #: include/views/administration.auditacts.list.php:103
@@ -4436,7 +4436,7 @@ msgstr "צ׳כית (cs_CZ)"
 #: jsLoader.php:181
 msgctxt "abbreviation of severity level"
 msgid "D"
-msgstr ""
+msgstr "א"
 
 #: include/classes/import/validators/C10XmlValidator.php:321
 msgctxt "XML date format"
@@ -4613,7 +4613,7 @@ msgstr "היסטוריית מסד הנתונים ‎$info_tables שודרגה"
 
 #: app/partials/administration.system.info.php:129
 msgid "Database history tables use primary key"
-msgstr ""
+msgstr "טבלאות היסטוריה במסד הנתונים משתמשות במפתח עיקרי"
 
 #: include/classes/setup/CSetupWizard.php:472
 msgid "Database host"
@@ -6326,7 +6326,7 @@ msgstr "כל שבוע/שבועות"
 
 #: app/views/administration.geomaps.edit.php:33
 msgid "Example"
-msgstr ""
+msgstr "דוגמה"
 
 #: app/views/administration.miscconfig.edit.php:36
 msgid "Example: https://localhost/zabbix/ui/"
@@ -6969,11 +6969,11 @@ msgstr "נוצר תוך %1$s שניות"
 #: app/views/administration.geomaps.edit.php:127
 #: include/classes/helpers/CMenuHelper.php:244 include/html.inc.php:895
 msgid "Geographical maps"
-msgstr ""
+msgstr "מפות גאוגרפיות"
 
 #: include/classes/widgets/CWidgetConfig.php:51
 msgid "Geomap"
-msgstr ""
+msgstr "מפות גאוגרפיות"
 
 #: include/locales.inc.php:55
 msgid "Georgian (ka_GE)"
@@ -7323,7 +7323,7 @@ msgstr "משתמש אורח"
 #: jsLoader.php:182
 msgctxt "abbreviation of severity level"
 msgid "H"
-msgstr ""
+msgstr "ג"
 
 #: include/translateDefines.inc.php:35
 msgid "H:i"
@@ -7970,7 +7970,7 @@ msgstr "הונגרית (hu_HU)"
 #: jsLoader.php:185
 msgctxt "abbreviation of severity level"
 msgid "I"
-msgstr ""
+msgstr "ד"
 
 #: app/partials/massupdate.macros.tab.php:111
 msgid "I confirm to remove all macros"
@@ -9288,11 +9288,11 @@ msgstr "פריטים שהתקבלו בירושה"
 
 #: include/classes/widgets/forms/CWidgetFormGeoMap.php:75
 msgid "Initial view"
-msgstr ""
+msgstr "תצוגה ראשונית"
 
 #: include/classes/widgets/forms/CWidgetFormGeoMap.php:79
 msgid "Initial view is ignored if the default view is set."
-msgstr ""
+msgstr "תצוגה ראשונית לא תוצג אם מוגדרת תצוגת בררת מחדל."
 
 #: app/views/popup.triggerexpr.php:239
 msgid "Insert"
@@ -9794,7 +9794,7 @@ msgstr "פרק הזמן שגוי."
 #: include/classes/validators/CApiInputValidator.php:2814
 #, c-format
 msgid "Invalid zoomparameter \"%1$s\": %2$s."
-msgstr ""
+msgstr "משתנה תקריב „%1$s” שגוי: %2$s."
 
 #: app/partials/configuration.host.edit.html.php:532
 #: app/views/popup.massupdate.host.php:301
@@ -10576,7 +10576,7 @@ msgstr "רשימה של המעבדים/ליבות המעבדים שזוהו. מ�
 
 #: include/classes/data/CItemData.php:1164
 msgid "List of directory entries, recursively. Returns JSON"
-msgstr ""
+msgstr "הצגת רשומות התיקייה, באופן נסוג. מחזירה JSON"
 
 #: include/classes/data/CItemData.php:1216
 msgid "List of mounted filesystems and their types. Returns JSON"
@@ -11098,7 +11098,7 @@ msgstr "הטווח המרבי לבורר זמן"
 
 #: app/views/administration.geomaps.edit.php:98
 msgid "Max zoom level"
-msgstr ""
+msgstr "רמת תקריב מרבית"
 
 #: include/classes/data/CItemData.php:896
 msgid "Maximum number of opened files supported by OS. Returns integer"
@@ -11130,7 +11130,7 @@ msgstr "חרגת מהאורך הכללי המרבי המותר לכתובת דו
 
 #: app/views/administration.geomaps.edit.php:61
 msgid "Maximum zoom level of the map."
-msgstr ""
+msgstr "רמת התקריב המרבית של המפה."
 
 #: include/func.inc.php:104 include/func.inc.php:241 jsLoader.php:235
 msgid "May"
@@ -11575,7 +11575,7 @@ msgstr "כ"
 #: jsLoader.php:186
 msgctxt "abbreviation of severity level"
 msgid "N"
-msgstr ""
+msgstr "ל"
 
 #: include/classes/helpers/CServiceHelper.php:42
 #: include/classes/helpers/CServiceHelper.php:52
@@ -11787,11 +11787,11 @@ msgstr "מרחב שם"
 
 #: jsLoader.php:187
 msgid "Navigate to default view"
-msgstr ""
+msgstr "ניווט לתצוגת בררת מחדל"
 
 #: jsLoader.php:188
 msgid "Navigate to initial view"
-msgstr ""
+msgstr "ניווט לתצוגה הראשונית"
 
 #: app/views/administration.housekeeping.edit.php:76
 msgid "Network discovery data storage period"
@@ -12358,7 +12358,7 @@ msgstr "לא צוין מפתח פרטי."
 
 #: jsLoader.php:173
 msgid "No problems"
-msgstr ""
+msgstr "איו תקלות"
 
 #: app/views/configuration.discovery.edit.php:54
 msgid "No proxy"
@@ -14733,7 +14733,7 @@ msgstr "איפוס לבררות המחדל"
 
 #: jsLoader.php:172
 msgid "Reset to initial view"
-msgstr ""
+msgstr "איפוס לתצוגה הראשונית"
 
 #: jsLoader.php:291
 msgid "Resolved"
@@ -15759,7 +15759,7 @@ msgstr "הגדרת מצב לתקין"
 
 #: jsLoader.php:171
 msgid "Set this view as default"
-msgstr ""
+msgstr "הגדרת התצוגה הזאת כבררת מחדל"
 
 #: app/views/js/popup.itemtestedit.view.js.php:365 include/forms.inc.php:1416
 #: include/views/js/item.preprocessing.js.php:67
@@ -15832,7 +15832,7 @@ msgstr "דרגת החומרה הונמכה"
 
 #: jsLoader.php:152
 msgid "Severity filter"
-msgstr ""
+msgstr "מסנן דרגת חומרה"
 
 #: include/actions.inc.php:1780
 msgctxt "screen reader"
@@ -17159,15 +17159,15 @@ msgstr "יום חמישי"
 
 #: app/views/administration.geomaps.edit.php:77
 msgid "Tile URL"
-msgstr ""
+msgstr "כתובת אריחים"
 
 #: app/views/administration.geomaps.edit.php:65
 msgid "Tile provider"
-msgstr ""
+msgstr "ספק אריחים"
 
 #: app/views/administration.geomaps.edit.php:58
 msgid "Tile provider attribution data displayed in a small text box on the map."
-msgstr ""
+msgstr "נתוני יחוס ספק האריחים מופיעים בתיבת טקסט קטנה על המפה."
 
 #: app/views/popup.service.time.edit.php:90
 #: app/views/popup.service.time.edit.php:141 report4.php:191
@@ -19045,7 +19045,7 @@ msgstr "ד׳"
 #: jsLoader.php:184
 msgctxt "abbreviation of severity level"
 msgid "W"
-msgstr ""
+msgstr "ז"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:172
 #: app/views/administration.trigdisplay.edit.php:118
@@ -19851,7 +19851,7 @@ msgstr "אות לטינית גדולה וקטנה"
 
 #: app/views/administration.geomaps.edit.php:47
 msgid "and"
-msgstr ""
+msgstr "וגם"
 
 #: include/views/monitoring.history.php:186
 msgid "as Blue"
@@ -21108,11 +21108,11 @@ msgstr "החלפה"
 
 #: app/views/administration.geomaps.edit.php:48
 msgid "represent tile coordinates;"
-msgstr ""
+msgstr "מייצג את נקודות הציון של האריח."
 
 #: app/views/administration.geomaps.edit.php:40
 msgid "represents one of the available subdomains;"
-msgstr ""
+msgstr "מייצג את אחת מתת־התחומים הזמינים."
 
 #: app/views/administration.geomaps.edit.php:44
 msgid "represents zoom level parameter in the URL;"
@@ -21243,7 +21243,7 @@ msgstr "sqrt()‎ - שורש ריבועי של ערך"
 
 #: app/partials/administration.ha.nodes.php:63
 msgid "standalone server"
-msgstr ""
+msgstr "שרת עצמאי"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:966
 msgid "stddevpop() - Population standard deviation"
@@ -21752,4 +21752,4 @@ msgstr "y"
 #: include/classes/validators/CApiInputValidator.php:2815
 #, c-format
 msgid "zoom level must be between \"%1$s\" and \"%2$s\""
-msgstr ""
+msgstr "רמת התקריב צריכה להיות בין „%1$s” לבין „%2$s”"
