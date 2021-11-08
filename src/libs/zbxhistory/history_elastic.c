@@ -1121,6 +1121,7 @@ out:
 	db_version_info.friendly_min_supported_version = NULL;
 	db_version_info.flag = zbx_db_version_check(db_version_info.database, version, ZBX_ELASTIC_MIN_VERSION,
 			ZBX_DBVERSION_UNDEFINED, ZBX_DBVERSION_UNDEFINED);
+	db_version_info.history_pk = 0;
 
 	zbx_db_version_json_create(json, &db_version_info);
 	ZBX_ELASTIC_SVERSION = version;
