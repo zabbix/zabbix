@@ -438,6 +438,26 @@ class CApiService {
 		return ($count > 1 ? ' DISTINCT' : '');
 	}
 
+	protected function createDistinctCountPart($pk_fields) {
+		global $DB;
+
+		switch ($DB['TYPE']) {
+			case ZBX_DB_POSTGRESQL:
+				$distinct_sql = 'COUNT(DISTINCT ('.$pk_fields.'))';
+				break;
+			case ZBX_DB_ORACLE:
+				$distinct_sql = 'COUNTDISTINCT('.$pk_fields.')';
+				break;
+			case ZBX_DB_MYSQL:
+			default:
+				$distinct_sql = 'COUNT(DISTINCT '.$pk_fields.')';
+				break;
+		}
+
+
+		return $distinct_sql;
+	}
+
 	/**
 	 * Creates a SELECT SQL query from the given SQL parts array.
 	 *
@@ -501,7 +521,7 @@ class CApiService {
 		// count
 		if (array_key_exists('countOutput', $options) && $options['countOutput']
 				&& !$this->requiresPostSqlFiltering($options)) {
-			$sqlParts['select'] = ['COUNT(*) AS rowscount'];
+			$sqlParts['select'] = [$this->createDistinctCountPart($pkFieldId).' AS rowscount'];
 
 			// select columns used by group count
 			if (array_key_exists('groupCount', $options) && $options['groupCount']) {
