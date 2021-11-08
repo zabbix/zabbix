@@ -136,18 +136,24 @@ class CApiService {
 	}
 
 	/**
-	 * Prepends the table alias to the given field name. If no $tableAlias is given,
+	 * Prepends the table alias to the given field name (comma-separated if multiple). If no $tableAlias is given,
 	 * the alias of the current table will be used.
 	 *
-	 * @param string $fieldName
-	 * @param string $tableAlias
+	 * @param string $field_names  On several comma-joined fields.
+	 * @param string $table_alias
 	 *
 	 * @return string
 	 */
-	protected function fieldId($fieldName, $tableAlias = null) {
-		$tableAlias = $tableAlias ? $tableAlias : $this->tableAlias();
+	protected function fieldId(string $field_names, $table_alias = null): string {
+		$table_alias = $table_alias ? $table_alias : $this->tableAlias();
 
-		return $tableAlias.'.'.$fieldName;
+		$field_names = explode(',', $field_names);
+
+		foreach($field_names as $key => $field) {
+			$field_names[$key] = $table_alias.'.'.$field;
+		}
+
+		return implode(',', $field_names);
 	}
 
 	/**
@@ -438,16 +444,26 @@ class CApiService {
 		return ($count > 1 ? ' DISTINCT' : '');
 	}
 
-	protected function createDistinctCountPart($pk_fields) {
+
+	/**
+	 * DB-engine speficic syntax for count on possibly compound distinct primary key set.
+	 *
+	 * @param string $pk_fields  On on several (comma-separated) primary key fields.
+	 *
+	 * @return string
+	 */
+	protected function createCountDistinctPart(string $pk_fields): string {
 		global $DB;
 
 		switch ($DB['TYPE']) {
 			case ZBX_DB_POSTGRESQL:
 				$distinct_sql = 'COUNT(DISTINCT ('.$pk_fields.'))';
 				break;
+
 			case ZBX_DB_ORACLE:
-				$distinct_sql = 'COUNTDISTINCT('.$pk_fields.')';
+				$distinct_sql = 'COUNT(DISTINCT '.str_replace(',', ' || \';\' || ', $pk_fields).')';
 				break;
+
 			case ZBX_DB_MYSQL:
 			default:
 				$distinct_sql = 'COUNT(DISTINCT '.$pk_fields.')';
@@ -488,7 +504,11 @@ class CApiService {
 		$sqlGroup = empty($sqlParts['group']) ? '' : ' GROUP BY '.implode(',', array_unique($sqlParts['group']));
 		$sqlOrder = empty($sqlParts['order']) ? '' : ' ORDER BY '.implode(',', array_unique($sqlParts['order']));
 
-		return 'SELECT'.self::dbDistinct($sqlParts).' '.$sqlSelect.
+		$sql_distinct = (strpos($sqlSelect, 'rowscount') === false)
+			? self::dbDistinct($sqlParts)
+			: '';
+
+		return 'SELECT'.$sql_distinct.' '.$sqlSelect.
 				' FROM '.$sqlFrom.
 				$sql_left_join.
 				$sqlWhere.
@@ -507,23 +527,13 @@ class CApiService {
 	 * @return array		The resulting SQL parts array
 	 */
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		// If table do not have a primary key, use COUNT(*) to select number of rows.
-		$pk = $this->pk($tableName);
+		$pk_fields = $this->fieldId($this->pk($tableName), $tableAlias);
 
-		$pk_fields = explode(',', $pk);
-
-		foreach($pk_fields as $key => $field) {
-			$pk_fields[$key] = $this->fieldId($field, $tableAlias);
-		}
-
-		$pkFieldId = implode(',', $pk_fields);
-
-		// count
 		if (array_key_exists('countOutput', $options) && $options['countOutput']
 				&& !$this->requiresPostSqlFiltering($options)) {
-			$sqlParts['select'] = [$this->createDistinctCountPart($pkFieldId).' AS rowscount'];
+			$sqlParts['select'] = [$this->createCountDistinctPart($pk_fields).' AS rowscount'];
 
-			// select columns used by group count
+			// Select columns used by group count.
 			if (array_key_exists('groupCount', $options) && $options['groupCount']) {
 				foreach ($sqlParts['group'] as $fields) {
 					$sqlParts['select'][] = $fields;
@@ -540,8 +550,8 @@ class CApiService {
 				}
 			}
 
-			// the pk fields must always be included for the API to work properly
-			$sqlParts['select'] = array_unique(array_merge($sqlParts['select'], explode(',', $pkFieldId)));
+			// The PK fields must always be included for the API to work properly.
+			$sqlParts['select'] = array_unique(array_merge($sqlParts['select'], explode(',', $pk_fields)));
 		}
 		// extended output
 		elseif ($options['output'] == API_OUTPUT_EXTEND) {
