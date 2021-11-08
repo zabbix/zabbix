@@ -444,36 +444,6 @@ class CApiService {
 		return ($count > 1 ? ' DISTINCT' : '');
 	}
 
-
-	/**
-	 * DB-engine speficic syntax for count on possibly compound distinct primary key set.
-	 *
-	 * @param string $pk_fields  On on several (comma-separated) primary key fields.
-	 *
-	 * @return string
-	 */
-	protected function createCountDistinctPart(string $pk_fields): string {
-		global $DB;
-
-		switch ($DB['TYPE']) {
-			case ZBX_DB_POSTGRESQL:
-				$distinct_sql = 'COUNT(DISTINCT ('.$pk_fields.'))';
-				break;
-
-			case ZBX_DB_ORACLE:
-				$distinct_sql = 'COUNT(DISTINCT '.str_replace(',', ' || \';\' || ', $pk_fields).')';
-				break;
-
-			case ZBX_DB_MYSQL:
-			default:
-				$distinct_sql = 'COUNT(DISTINCT '.$pk_fields.')';
-				break;
-		}
-
-
-		return $distinct_sql;
-	}
-
 	/**
 	 * Creates a SELECT SQL query from the given SQL parts array.
 	 *
@@ -504,9 +474,9 @@ class CApiService {
 		$sqlGroup = empty($sqlParts['group']) ? '' : ' GROUP BY '.implode(',', array_unique($sqlParts['group']));
 		$sqlOrder = empty($sqlParts['order']) ? '' : ' ORDER BY '.implode(',', array_unique($sqlParts['order']));
 
-		$sql_distinct = (strpos($sqlSelect, 'rowscount') === false)
-			? self::dbDistinct($sqlParts)
-			: '';
+		$sql_distinct = (array_key_exists('is_count_query', $sqlParts) && $sqlParts['is_count_query'])
+			? ''
+			: self::dbDistinct($sqlParts);
 
 		return 'SELECT'.$sql_distinct.' '.$sqlSelect.
 				' FROM '.$sqlFrom.
@@ -531,7 +501,14 @@ class CApiService {
 
 		if (array_key_exists('countOutput', $options) && $options['countOutput']
 				&& !$this->requiresPostSqlFiltering($options)) {
-			$sqlParts['select'] = [$this->createCountDistinctPart($pk_fields).' AS rowscount'];
+
+			$sqlParts['is_count_query'] = true;
+
+			$sqlParts['select'] = [
+				(substr_count($pk_fields, ',') > 0)
+					? 'COUNT(*) AS rowscount'
+					: 'COUNT('.DB::addDistinct($pk_fields).') AS rowscount'
+			];
 
 			// Select columns used by group count.
 			if (array_key_exists('groupCount', $options) && $options['groupCount']) {
