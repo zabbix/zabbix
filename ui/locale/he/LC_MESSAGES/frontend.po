@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-11-05 19:58+0200\n"
-"PO-Revision-Date: 2021-11-04 11:12+0300\n"
+"PO-Revision-Date: 2021-11-07 10:00+0300\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
-"X-POOTLE-MTIME: 1636017123.000000\n"
+"X-POOTLE-MTIME: 1636272038.000000\n"
 
 #: include/classes/items/CHelpItems.php:1089
 msgid "\tThe average time a read from the virtual disk takes , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
@@ -987,7 +987,7 @@ msgstr "מנשקי הסוכן"
 #: include/classes/items/CHelpItems.php:73
 #: include/classes/items/CHelpItems.php:407
 msgid "Agent variant check. Returns 1 - for Zabbix agent; 2 - for Zabbix agent 2"
-msgstr ""
+msgstr "בדיקת הגוון סוכן. מחזירה 1 - לסוכן Zabbix,‏ 2 - לסוכן Zabbix 2"
 
 #: include/classes/widgets/CWidgetHelper.php:1148
 msgid "Aggregate"
