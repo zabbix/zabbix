@@ -1479,13 +1479,13 @@ define('WIDGET_URL',				'url');
 define('WIDGET_WEB',				'web');
 define('WIDGET_ITEM',				'item');
 
-// item widget object positions
-define('WIDGET_ITEM_POS_CENTER',	0);
-define('WIDGET_ITEM_POS_LEFT',		1);
+// Item widget object positions.
+define('WIDGET_ITEM_POS_LEFT',		0);
+define('WIDGET_ITEM_POS_CENTER',	1);
 define('WIDGET_ITEM_POS_RIGHT',		2);
 
-define('WIDGET_ITEM_POS_MIDDLE',	0);
-define('WIDGET_ITEM_POS_TOP',		1);
+define('WIDGET_ITEM_POS_TOP',		0);
+define('WIDGET_ITEM_POS_MIDDLE',	1);
 define('WIDGET_ITEM_POS_BOTTOM',	2);
 
 define('WIDGET_ITEM_POS_BEFORE',	0);

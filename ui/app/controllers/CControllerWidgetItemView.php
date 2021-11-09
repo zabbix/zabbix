@@ -246,91 +246,207 @@ class CControllerWidgetItemView extends CControllerWidget {
 			$error = _('No permissions to referred object or it does not exist!');
 		}
 
-		// Calculate what to show.
-		$data = ['widget_config' => $fields];
+		// Calculate what to show and where.
+		$data = [];
 
 		if (array_key_exists(WIDGET_ITEM_SHOW_DESCRIPTION, $show)) {
-			$data['description'] = $description;
+			$classes = ['description', self::trVPos($fields['desc_v_pos']), self::trHPos($fields['desc_h_pos'])];
+			if ($fields['desc_bold'] == 1) {
+				$classes[] = 'bold';
+			}
+
+			$data[$fields['desc_v_pos']][$fields['desc_h_pos']] = [
+				'data' => $description,
+				'classes' => $classes,
+				'styles' => [
+					'color' => '#'.$fields['desc_color'],
+					'--item-font' => number_format($fields['desc_size'] / 100, 2)
+				]
+			];
 		}
 
 		if (array_key_exists(WIDGET_ITEM_SHOW_VALUE, $show)) {
-			$data['value'] = $value;
-			$data['value_type'] = $value_type;
+			$classes = ['item-value', self::trVPos($fields['value_v_pos']), self::trHPos($fields['value_h_pos'])];
+
+			$data[$fields['value_v_pos']][$fields['value_h_pos']] = [
+				'data' => [],
+				'classes' => $classes
+			];
+
+			if ($fields['units_show'] == 1 && $units !== '') {
+				$units_classes = ['units', self::trUPos($fields['units_pos'])];
+				if ($fields['units_bold'] == 1) {
+					$units_classes[] = 'bold';
+				}
+
+				if (in_array($fields['units_pos'], [WIDGET_ITEM_POS_BEFORE, WIDGET_ITEM_POS_ABOVE])) {
+					$data[$fields['value_v_pos']][$fields['value_h_pos']]['data'][] = [
+						'data' => $units,
+						'classes' => $units_classes
+					];
+				}
+			}
+
+			$classes = ['value'];
+			if ($fields['value_bold'] == 1) {
+				$classes[] = 'bold';
+			}
+
+			$data[$fields['value_v_pos']][$fields['value_h_pos']]['data'][] = [
+				'data' => $value,
+				'value_type' => $value_type,
+				'classes' => $classes,
+				'styles' => [
+					'color' => '#'.$fields['value_color'],
+					'--item-font' => number_format($fields['value_size'] / 100, 2)
+				]
+			];
 
 			if (in_array($value_type, [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
-				$data['decimals'] = $decimals;
+				$classes = ['decimals'];
+				if ($fields['value_bold'] == 1) {
+					$classes[] = 'bold';
+				}
+
+				$data[$fields['value_v_pos']][$fields['value_h_pos']]['data'][] = [
+					'data' => $decimals,
+					'classes' => $classes,
+					'styles' => [
+						'color' => '#'.$fields['value_color'],
+						'--item-font' => number_format($fields['decimal_size'] / 100, 2)
+					]
+				];
 			}
 
-			if ($fields['units_show']) {
-				$data['units'] = $units;
-				$data['units_pos'] = $fields['units_pos'];
+			if (array_key_exists(WIDGET_ITEM_SHOW_CHANGE_INDICATOR, $show) && $change_indicator) {
+				$data[$fields['value_v_pos']][$fields['value_h_pos']]['data'][] = [
+					'data' => $change_indicator,
+					'classes' => ['change-indicator'],
+					'styles' => [
+						'--item-font' => number_format($fields['value_size'] / 100, 2)
+					]
+				];
 			}
+
+			if ($fields['units_show'] == 1 && $units !== ''
+					&& in_array($fields['units_pos'], [WIDGET_ITEM_POS_AFTER, WIDGET_ITEM_POS_BELOW])) {
+				$data[$fields['value_v_pos']][$fields['value_h_pos']]['data'][] = [
+					'data' => $units,
+					'classes' => $units_classes
+				];
+			}
+		}
+		elseif (array_key_exists(WIDGET_ITEM_SHOW_CHANGE_INDICATOR, $show) && $change_indicator) {
+			// Show only change indicator without value, but do get the position of value where it should be.
+			$classes = ['item-value', self::trVPos($fields['value_v_pos']), self::trHPos($fields['value_h_pos'])];
+
+			$data[$fields['value_v_pos']][$fields['value_h_pos']] = [
+				'data' => [[
+					'data' => $change_indicator,
+					'classes' => ['change-indicator'],
+					'styles' => [
+						'--item-font' => number_format($fields['value_size'] / 100, 2)
+					]
+				]],
+				'classes' => $classes
+			];
 		}
 
 		if (array_key_exists(WIDGET_ITEM_SHOW_TIME, $show)) {
-			$data['time'] = $time;
+			$classes = ['time', self::trVPos($fields['time_v_pos']), self::trHPos($fields['time_h_pos'])];
+			if ($fields['time_bold'] == 1) {
+				$classes[] = 'bold';
+			}
+
+			$data[$fields['time_v_pos']][$fields['time_h_pos']] = [
+				'data' => $time,
+				'classes' => $classes,
+				'styles' => [
+					'color' => '#'.$fields['time_color'],
+					'--item-font' => number_format($fields['time_size'] / 100, 2)
+				]
+			];
 		}
 
-		if (array_key_exists(WIDGET_ITEM_SHOW_CHANGE_INDICATOR, $show)) {
-			$data['change_indicator'] = $change_indicator;
-		}
-
-		// To do: set blocks into rows in the correct order.
-		$rows_data = [];
-
-		$rows_count = 1;
-
-		// Calculate how many rows to show.
-		if (array_key_exists(WIDGET_ITEM_SHOW_DESCRIPTION, $show) && array_key_exists(WIDGET_ITEM_SHOW_VALUE, $show)
-				&& array_key_exists(WIDGET_ITEM_SHOW_TIME, $show)) {
-			if (($fields['desc_v_pos'] != $fields['time_v_pos'] || $fields['value_v_pos'] != $fields['time_v_pos'])
-					&& $fields['desc_v_pos'] == $fields['value_v_pos']) {
-				// Description and value are on same line, but description and time or value and time are on not.
-				$rows_count++;
-			}
-			elseif (($fields['desc_v_pos'] != $fields['value_v_pos'] || $fields['value_v_pos'] != $fields['time_v_pos'])
-					&& $fields['desc_v_pos'] == $fields['time_v_pos']) {
-				// Description and time are on same line, but description and value or value or time are not.
-				$rows_count++;
-			}
-			elseif (($fields['desc_v_pos'] != $fields['value_v_pos'] || $fields['desc_v_pos'] != $fields['time_v_pos'])
-					&& $fields['value_v_pos'] == $fields['time_v_pos']) {
-				// Value and time are on same line, but description and value or description and time are not.
-				$rows_count++;
-			}
-			elseif ($fields['desc_v_pos'] != $fields['time_v_pos'] && $fields['value_v_pos'] != $fields['time_v_pos']
-					&& $fields['desc_v_pos'] != $fields['value_v_pos']) {
-				// Each block is on a separate line.
-				$rows_count += 2;
-			}
-		}
-		elseif (array_key_exists(WIDGET_ITEM_SHOW_DESCRIPTION, $show) && array_key_exists(WIDGET_ITEM_SHOW_VALUE, $show)) {
-			if ($fields['desc_v_pos'] != $fields['value_v_pos']) {
-				// Description and value are not on same line.
-				$rows_count++;
-			}
-		}
-		elseif (array_key_exists(WIDGET_ITEM_SHOW_DESCRIPTION, $show) && array_key_exists(WIDGET_ITEM_SHOW_TIME, $show)) {
-			if ($fields['desc_v_pos'] != $fields['time_v_pos']) {
-				// Description and time are not on same line.
-				$rows_count++;
-			}
-		}
-		elseif (array_key_exists(WIDGET_ITEM_SHOW_VALUE, $show) && array_key_exists(WIDGET_ITEM_SHOW_TIME, $show)) {
-			if ($fields['value_v_pos'] != $fields['time_v_pos']) {
-				// Value and time are not on same line.
-				$rows_count++;
-			}
-		}
+		// To do: sort $data by vertical and horizontal position keys -> data[vertical_pos][horizontal_pos]
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultName()),
-			// To do: replace with $rows_data when complete.
 			'data' => $data,
 			'error' => $error,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
 		]));
+	}
+
+	/**
+	 * Translate horizontal posittion to CSS class.
+	 *
+	 * @static
+	 *
+	 * @param int $pos  Position of element.
+	 *
+	 * @return string
+	 */
+	private static function trHPos(int $pos): string {
+		switch ($pos) {
+			case WIDGET_ITEM_POS_LEFT:
+				return 'left';
+
+			case WIDGET_ITEM_POS_CENTER:
+				return 'center';
+
+			case WIDGET_ITEM_POS_RIGHT:
+				return 'right';
+		}
+	}
+
+	/**
+	 * Translate vertical posittion to CSS class.
+	 *
+	 * @static
+	 *
+	 * @param int $pos  Position of element.
+	 *
+	 * @return string
+	 */
+	private static function trVPos(int $pos): string {
+		switch ($pos) {
+			case WIDGET_ITEM_POS_TOP:
+				return 'top';
+
+			case WIDGET_ITEM_POS_MIDDLE:
+				return 'middle';
+
+			case WIDGET_ITEM_POS_BOTTOM:
+				return 'bottom';
+
+		}
+	}
+
+	/**
+	 * Translate units posittion to CSS class.
+	 *
+	 * @static
+	 *
+	 * @param int $pos  Position of element.
+	 *
+	 * @return string
+	 */
+	private static function trUPos(int $pos): string {
+		switch ($pos) {
+			case WIDGET_ITEM_POS_ABOVE:
+				return 'top';
+
+			case WIDGET_ITEM_POS_BEFORE:
+				return 'left';
+
+			case WIDGET_ITEM_POS_AFTER:
+				return 'right';
+
+			case WIDGET_ITEM_POS_BELOW:
+				return 'bottom';
+		}
 	}
 }
