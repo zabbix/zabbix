@@ -25,7 +25,6 @@
 #include "zbxself.h"
 
 #include "proxyconfig.h"
-#include "../servercomms.h"
 #include "zbxcrypto.h"
 #include "zbxcompress.h"
 
@@ -34,6 +33,11 @@
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
+
+extern zbx_vector_ptr_t	zbx_addrs;
+extern char		*CONFIG_HOSTNAME;
+extern char		*CONFIG_SOURCE_IP;
+extern unsigned int	configured_tls_connect_mode;
 
 static void	zbx_proxyconfig_sigusr_handler(int flags)
 {
@@ -56,11 +60,11 @@ static void	zbx_proxyconfig_sigusr_handler(int flags)
  ******************************************************************************/
 static void	process_configuration_sync(size_t *data_size)
 {
-	zbx_socket_t	sock;
-	struct		zbx_json_parse jp;
-	char		value[16], *error = NULL, *buffer = NULL;
-	size_t		buffer_size, reserved;
-	struct zbx_json	j;
+	zbx_socket_t		sock;
+	struct	zbx_json_parse	jp;
+	char			value[16], *error = NULL, *buffer = NULL;
+	size_t			buffer_size, reserved;
+	struct zbx_json		j;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -81,8 +85,11 @@ static void	process_configuration_sync(size_t *data_size)
 	reserved = j.buffer_size;
 	zbx_json_free(&j);
 
-	if (FAIL == connect_to_server(&sock, 600, CONFIG_PROXYCONFIG_RETRY))	/* retry till have a connection */
+	if (FAIL == connect_to_server(&sock,CONFIG_SOURCE_IP, &zbx_addrs, 600, CONFIG_TIMEOUT,
+			configured_tls_connect_mode, CONFIG_PROXYCONFIG_RETRY, LOG_LEVEL_WARNING))	/* retry till have a connection */
+	{
 		goto out;
+	}
 
 	if (SUCCEED != get_data_from_server(&sock, &buffer, buffer_size, reserved, &error))
 	{

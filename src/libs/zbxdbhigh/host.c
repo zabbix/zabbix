@@ -466,7 +466,6 @@ static int	validate_inventory_links(zbx_uint64_t hostid, const zbx_vector_uint64
 		char *error, size_t max_error_len)
 {
 	DB_RESULT	result;
-	DB_ROW		row;
 	char		*sql = NULL;
 	size_t		sql_alloc = 512, sql_offset;
 	int		ret = SUCCEED;
@@ -489,7 +488,7 @@ static int	validate_inventory_links(zbx_uint64_t hostid, const zbx_vector_uint64
 
 	result = DBselectN(sql, 1);
 
-	if (NULL != (row = DBfetch(result)))
+	if (NULL != DBfetch(result))
 	{
 		ret = FAIL;
 		zbx_strlcpy(error, "two items cannot populate one host inventory field", max_error_len);
@@ -524,7 +523,7 @@ static int	validate_inventory_links(zbx_uint64_t hostid, const zbx_vector_uint64
 
 	result = DBselectN(sql, 1);
 
-	if (NULL != (row = DBfetch(result)))
+	if (NULL != DBfetch(result))
 	{
 		ret = FAIL;
 		zbx_strlcpy(error, "two items cannot populate one host inventory field", max_error_len);
@@ -3066,7 +3065,7 @@ static void	DBhost_prototypes_tags_make(zbx_vector_ptr_t *host_prototypes, zbx_v
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_vector_uint64_t	hostids;
 	zbx_uint64_t		hostid, tagid;
-	zbx_host_prototype_t	*host_prototype;
+	zbx_host_prototype_t	*host_prototype = NULL;
 	zbx_db_tag_t		*tag;
 	int			i;
 
@@ -3077,11 +3076,7 @@ static void	DBhost_prototypes_tags_make(zbx_vector_ptr_t *host_prototypes, zbx_v
 	/* get template host prototype tags that must be added to host prototypes */
 
 	for (i = 0; i < host_prototypes->values_num; i++)
-	{
-		host_prototype = (zbx_host_prototype_t *)host_prototypes->values[i];
-
-		zbx_vector_uint64_append(&hostids, host_prototype->templateid);
-	}
+		zbx_vector_uint64_append(&hostids, ((zbx_host_prototype_t *)host_prototypes->values[i])->templateid);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select hostid,tag,value"
@@ -3091,7 +3086,6 @@ static void	DBhost_prototypes_tags_make(zbx_vector_ptr_t *host_prototypes, zbx_v
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by hostid");
 
 	result = DBselect("%s", sql);
-	host_prototype = NULL;
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -3108,7 +3102,6 @@ static void	DBhost_prototypes_tags_make(zbx_vector_ptr_t *host_prototypes, zbx_v
 
 			host_prototype = (zbx_host_prototype_t *)host_prototypes->values[i];
 		}
-
 
 		tag = zbx_db_tag_create(row[1], row[2]);
 		tag->tagid = 0;
@@ -3133,7 +3126,8 @@ static void	DBhost_prototypes_tags_make(zbx_vector_ptr_t *host_prototypes, zbx_v
 	/* replace existing tags with the new tags */
 	if (0 != hostids.values_num)
 	{
-		int	tag_index = 0;
+		int			tag_index = 0;
+		zbx_host_prototype_t	*host_prototype_local = NULL;
 
 		zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
@@ -3144,48 +3138,49 @@ static void	DBhost_prototypes_tags_make(zbx_vector_ptr_t *host_prototypes, zbx_v
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by hostid");
 		result = DBselect("%s", sql);
 
-		host_prototype = NULL;
-
 		while (NULL != (row = DBfetch(result)))
 		{
 			ZBX_STR2UINT64(tagid, row[0]);
 			ZBX_STR2UINT64(hostid, row[1]);
 
-			if (NULL == host_prototype || host_prototype->hostid != hostid)
+			if (NULL == host_prototype_local || host_prototype_local->hostid != hostid)
 			{
 				tag_index = 0;
 
 				for (i = 0; i < host_prototypes->values_num; i++)
 				{
-					host_prototype = (zbx_host_prototype_t *)host_prototypes->values[i];
+					host_prototype_local = (zbx_host_prototype_t *)host_prototypes->values[i];
 
-					if (host_prototype->hostid == hostid)
+					if (host_prototype_local->hostid == hostid)
 						break;
 				}
 
-				if (NULL != host_prototype && host_prototype->hostid != hostid)
+				if (NULL != host_prototype_local && host_prototype_local->hostid != hostid)
 				{
 					THIS_SHOULD_NEVER_HAPPEN;
 					continue;
 				}
 			}
 
-			if (tag_index < host_prototype->tags.values_num)
+			if (NULL == host_prototype_local)
+				continue;
+
+			if (tag_index < host_prototype_local->tags.values_num)
 			{
-				host_prototype->tags.values[tag_index]->tagid = tagid;
-				host_prototype->tags.values[tag_index]->flags |= ZBX_FLAG_DB_TAG_UPDATE_TAG |
+				host_prototype_local->tags.values[tag_index]->tagid = tagid;
+				host_prototype_local->tags.values[tag_index]->flags |= ZBX_FLAG_DB_TAG_UPDATE_TAG |
 						ZBX_FLAG_DB_TAG_UPDATE_VALUE;
 
-				host_prototype->tags.values[tag_index]->tag_orig = zbx_strdup(NULL, row[2]);
-				host_prototype->tags.values[tag_index]->value_orig = zbx_strdup(NULL, row[3]);
+				host_prototype_local->tags.values[tag_index]->tag_orig = zbx_strdup(NULL, row[2]);
+				host_prototype_local->tags.values[tag_index]->value_orig = zbx_strdup(NULL, row[3]);
 			}
 			else
 			{
 				zbx_vector_uint64_append(del_tagids, tagid);
 
-				zbx_audit_host_prototype_create_entry(AUDIT_ACTION_UPDATE, host_prototype->hostid,
-						host_prototype->host);
-				zbx_audit_host_prototype_update_json_delete_tag(host_prototype->hostid, tagid);
+				zbx_audit_host_prototype_create_entry(AUDIT_ACTION_UPDATE, host_prototype_local->hostid,
+						host_prototype_local->host);
+				zbx_audit_host_prototype_update_json_delete_tag(host_prototype_local->hostid, tagid);
 			}
 
 			tag_index++;
@@ -5330,9 +5325,10 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 
 			zbx_audit_httptest_update_json_add_data(httptest->httptestid, httptest->templateid,
 					httptest->name, httptest->delay, (int)httptest->status, httptest->agent,
-					(int)httptest->authentication, httptest->http_user, httptest->http_proxy,
-					httptest->retries, httptest->ssl_cert_file, httptest->ssl_key_file,
-					httptest->verify_peer, httptest->verify_host, hostid);
+					(int)httptest->authentication, httptest->http_user, httptest->http_password,
+					httptest->http_proxy, httptest->retries, httptest->ssl_cert_file,
+					httptest->ssl_key_file, httptest->ssl_key_password, httptest->verify_peer,
+					httptest->verify_host, hostid);
 
 			for (j = 0; j < httptest->httpsteps.values_num; j++)
 			{
@@ -5416,8 +5412,9 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 			d = ",";										\
 			zbx_free(str_esc);									\
 														\
-			zbx_audit_httptest_update_json_update_##field(httptest->httptestid,			\
-				ZBX_MACRO_SECRET_MASK, ZBX_MACRO_SECRET_MASK);					\
+			zbx_audit_httptest_update_json_update_##field(httptest->httptestid, 			\
+					(0 == strcmp("", httptest->field##_orig) ? "" :ZBX_MACRO_SECRET_MASK),	\
+					(0 == strcmp("", httptest->field) ? "" : ZBX_MACRO_SECRET_MASK));	\
 		}
 
 #define PREPARE_UPDATE_HTTPTEST_INT(FLAG, field)								\

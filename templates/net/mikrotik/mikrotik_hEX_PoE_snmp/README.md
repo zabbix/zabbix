@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 The template for monitoring Ethernet router MikroTik hEX PoE.
 
 5x Gigabit Ethernet with PoE output for four ports, SFP, USB, 800MHz CPU, 128MB RAM, RouterOS L4

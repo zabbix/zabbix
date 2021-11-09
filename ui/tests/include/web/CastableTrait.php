@@ -101,14 +101,14 @@ trait CastableTrait {
 	}
 
 	/**
-	 * Cast object to Fluid form element.
+	 * Cast object to Grid form element.
 	 *
 	 * @param array $options    additional casting options
 	 *
-	 * @return CFluidFormElement
+	 * @return CGridFormElement
 	 */
-	public function asFluidForm($options = []) {
-		return $this->cast(CFluidFormElement::class, $options);
+	public function asGridForm($options = []) {
+		return $this->cast(CGridFormElement::class, $options);
 	}
 
 	/**

@@ -27,7 +27,6 @@ if ($data['uncheck']) {
 	uncheckTableRows('token');
 }
 
-$this->addJsFile('multiselect.js');
 $this->includeJsFile('administration.token.list.js.php');
 
 $filter = (new CFilter())

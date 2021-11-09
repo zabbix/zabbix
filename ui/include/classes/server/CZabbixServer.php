@@ -126,11 +126,11 @@ class CZabbixServer {
 	/**
 	 * Class constructor.
 	 *
-	 * @param string $host
-	 * @param int $port
-	 * @param int $connect_timeout
-	 * @param int $timeout
-	 * @param int $totalBytesLimit
+	 * @param string|null $host
+	 * @param int|null    $port
+	 * @param int         $connect_timeout
+	 * @param int         $timeout
+	 * @param int         $totalBytesLimit
 	 */
 	public function __construct($host, $port, $connect_timeout, $timeout, $totalBytesLimit) {
 		$this->host = $host;
@@ -368,6 +368,21 @@ class CZabbixServer {
 	 * @return bool
 	 */
 	public function isRunning($sid) {
+		$active_node = API::getApiService('hanode')->get([
+			'output' => ['address', 'port', 'lastaccess'],
+			'filter' => ['status' => ZBX_NODE_STATUS_ACTIVE],
+			'sortfield' => 'lastaccess',
+			'sortorder' => 'DESC',
+			'limit' => 1
+		], false);
+
+		if ($active_node && $active_node[0]['address'] === $this->host && $active_node[0]['port'] == $this->port) {
+			if ((time() - $active_node[0]['lastaccess']) <
+					timeUnitToSeconds(CSettingsHelper::getGlobal(CSettingsHelper::HA_FAILOVER_DELAY))) {
+				return true;
+			}
+		}
+
 		$response = $this->request([
 			'request' => 'status.get',
 			'type' => 'ping',
@@ -379,6 +394,7 @@ class CZabbixServer {
 		}
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => []];
+
 		return CApiInputValidator::validate($api_input_rules, $response, '/', $this->error);
 	}
 
@@ -570,7 +586,8 @@ class CZabbixServer {
 	 */
 	protected function connect() {
 		if (!$this->socket) {
-			if (!$this->host || !$this->port) {
+			if ($this->host === null || $this->port === null) {
+				$this->error = _('Connection to Zabbix server failed. Incorrect configuration.');
 				return false;
 			}
 

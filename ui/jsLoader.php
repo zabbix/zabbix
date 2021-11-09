@@ -28,7 +28,7 @@ setupLocale(array_key_exists('lang', $_GET) ? (string) $_GET['lang'] : 'en_GB');
 require_once dirname(__FILE__).'/include/js.inc.php';
 
 // available scripts 'scriptFileName' => 'path relative to js/'
-$availableJScripts = [
+$available_js_cripts = [
 	'common.js' => '',
 	'class.dashboard.js' => '',
 	'class.dashboard.page.js' => '',
@@ -36,6 +36,7 @@ $availableJScripts = [
 	'class.widget.js' => 'widgets/',
 	'class.widget.iterator.js' => 'widgets/',
 	'class.widget.clock.js' => 'widgets/',
+	'class.widget.geomap.js' => 'widgets/',
 	'class.widget.graph.js' => 'widgets/',
 	'class.widget.graph-prototype.js' => 'widgets/',
 	'class.widget.map.js' => 'widgets/',
@@ -45,6 +46,8 @@ $availableJScripts = [
 	'class.widget.problemsbysv.js' => 'widgets/',
 	'class.widget.svggraph.js' => 'widgets/',
 	'class.widget.trigerover.js' => 'widgets/',
+	'hostinterfacemanager.js' => '',
+	'hostmacrosmanager.js' => '',
 	'menupopup.js' => '',
 	'gtlc.js' => '',
 	'functions.js' => '',
@@ -63,6 +66,8 @@ $availableJScripts = [
 	// vendors
 	'jquery.js' => 'vendors/',
 	'jquery-ui.js' => 'vendors/',
+	'leaflet.js' => 'vendors/Leaflet/Leaflet/',
+	'leaflet.markercluster.js' => 'vendors/Leaflet/Leaflet.markercluster/',
 	// classes
 	'component.z-select.js' => '',
 	'class.base-component.js' => '',
@@ -71,6 +76,7 @@ $availableJScripts = [
 	'class.cdate.js' => '',
 	'class.cdebug.js' => '',
 	'class.cmap.js' => '',
+	'class.geomaps.js' => '',
 	'class.localstorage.js' => '',
 	'class.menu.js' => '',
 	'class.menu-item.js' => '',
@@ -109,12 +115,11 @@ $availableJScripts = [
 	'report2.js' => 'pages/',
 	'report4.js' => 'pages/',
 	'setup.js' => 'pages/',
-	'monitoring.overview.js' => 'pages/',
 	'popup.condition.common.js' => 'pages/',
 	'popup.operation.common.js' => 'pages/'
 ];
 
-$tranStrings = [
+$translate_strings = [
 	'gtlc.js' => [
 		'S_MINUTE_SHORT' => _x('m', 'minute short')
 	],
@@ -143,6 +148,9 @@ $tranStrings = [
 		'Click and drag to desired size.' => _('Click and drag to desired size.'),
 		'Release to create a widget.' => _('Release to create a widget.')
 	],
+	'class.geomaps.js' => [
+		'Severity filter' => _('Severity filter')
+	],
 	'class.widget.js' => [
 		'10 seconds' => _n('%1$s second', '%1$s seconds', 10),
 		'30 seconds' => _n('%1$s second', '%1$s seconds', 30),
@@ -157,6 +165,27 @@ $tranStrings = [
 		'No refresh' => _('No refresh'),
 		'Paste' => _s('Paste'),
 		'Refresh interval' => _s('Refresh interval')
+	],
+	'class.widget.geomap.js' => [
+		'Actions' => _('Actions'),
+		'Set this view as default' => _('Set this view as default'),
+		'Reset to initial view' => _('Reset to initial view'),
+		'No problems' => _('No problems'),
+		'Not classified' => _('Not classified'),
+		'Information' => _('Information'),
+		'Warning' => _('Warning'),
+		'Average' => _('Average'),
+		'High' => _('High'),
+		'Disaster' => _('Disaster'),
+		'Host' => _('Host'),
+		'D' => _x('D', 'abbreviation of severity level'),
+		'H' => _x('H', 'abbreviation of severity level'),
+		'A' => _x('A', 'abbreviation of severity level'),
+		'W' => _x('W', 'abbreviation of severity level'),
+		'I' => _x('I', 'abbreviation of severity level'),
+		'N' => _x('N', 'abbreviation of severity level'),
+		'Navigate to default view' => _('Navigate to default view'),
+		'Navigate to initial view' => _('Navigate to initial view')
 	],
 	'class.widget.iterator.js' => [
 		'Next page' => _s('Next page'),
@@ -282,8 +311,20 @@ $tranStrings = [
 		'S_COLLAPSE' => _('Collapse'),
 		'S_CLOSE' => _('Close')
 	],
+	'hostinterfacemanager.js' => [
+		'Agent' => _('Agent'),
+		'SNMP' => _('SNMP'),
+		'JMX' => _('JMX'),
+		'IPMI' => _('IPMI'),
+		'No interfaces are defined.' => _('No interfaces are defined.')
+	],
+	'hostmacrosmanager.js' => [
+		'Change' => _x('Change', 'verb'),
+		'Remove' => _('Remove')
+	],
 	'multilineinput.js' => [
-		'S_N_SYMBOLS_REMAINING' => _('%1$s symbols remaining'),
+		'S_N_CHAR_COUNT' => _('%1$s characters'),
+		'S_N_CHAR_COUNT_REMAINING' => _('%1$s characters remaining'),
 		'S_CLICK_TO_VIEW_OR_EDIT' => _('Click to view or edit'),
 		'S_APPLY' => _('Apply'),
 		'S_CANCEL' => _('Cancel')
@@ -376,7 +417,6 @@ $tranStrings = [
 
 $js = '';
 if (empty($_GET['files'])) {
-
 	$files = [
 		'jquery.js',
 		'jquery-ui.js',
@@ -401,6 +441,15 @@ if (empty($_GET['files'])) {
 		'chkbxrange.js',
 		'functions.js',
 		'menupopup.js',
+		'inputsecret.js',
+		'macrovalue.js',
+		'multiselect.js',
+		'class.cverticalaccordion.js',
+		'class.cviewswitcher.js',
+		'class.tab-indicators.js',
+		'hostinterfacemanager.js',
+		'hostmacrosmanager.js',
+		'textareaflexible.js',
 		'init.js'
 	];
 
@@ -414,7 +463,7 @@ if (empty($_GET['files'])) {
 	}
 
 	// load frontend messaging only for some pages
-	if (isset($_GET['showGuiMessaging']) && $_GET['showGuiMessaging']) {
+	if (array_key_exists('showGuiMessaging', $_GET) && $_GET['showGuiMessaging']) {
 		$files[] = 'class.browsertab.js';
 		$files[] = 'class.notification.collection.js';
 		$files[] = 'class.notifications.audio.js';
@@ -429,20 +478,20 @@ else {
 }
 
 $js .= 'if (typeof(locale) === "undefined") { var locale = {}; }'."\n";
+
 foreach ($files as $file) {
-	if (isset($tranStrings[$file])) {
-		foreach ($tranStrings[$file] as $origStr => $str) {
-			$js .= 'locale[\'' . $origStr . '\'] = ' . zbx_jsvalue($str) . ';';
+	if (array_key_exists($file, $translate_strings)) {
+		foreach ($translate_strings[$file] as $origStr => $str) {
+			$js .= 'locale[\''.$origStr.'\'] = '.json_encode($str).';';
 		}
 	}
 }
 
 foreach ($files as $file) {
-	if (isset($availableJScripts[$file])) {
-		$js .= file_get_contents('js/'.$availableJScripts[$file].$file)."\n";
+	if (array_key_exists($file, $available_js_cripts)) {
+		$js .= file_get_contents('js/'.$available_js_cripts[$file].$file)."\n";
 	}
 }
-
 
 $etag = md5($js);
 /**

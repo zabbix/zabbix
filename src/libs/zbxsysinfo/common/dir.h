@@ -21,6 +21,7 @@
 #define ZABBIX_SYSINFO_COMMON_DIR_H
 
 #include "sysinfo.h"
+#include "zbxjson.h"
 
 #define DISK_BLOCK_SIZE			512	/* 512-byte blocks */
 
@@ -58,7 +59,9 @@ typedef struct
 
 int	VFS_DIR_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_DIR_COUNT(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	VFS_DIR_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 int	zbx_etypes_to_mask(const char *etypes, AGENT_RESULT *result);
+int	zbx_vfs_file_info(const char *filename, struct zbx_json *j, int array, char **error);
 
 #endif /* ZABBIX_SYSINFO_COMMON_DIR_H */

@@ -18,11 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'6.0.0alpha5');
+define('ZABBIX_VERSION',		'6.0.0alpha6');
 define('ZABBIX_API_VERSION',	'6.0.0');
 define('ZABBIX_EXPORT_VERSION',	'6.0');
 
-define('ZABBIX_DB_VERSION',		5050072);
+define('ZABBIX_DB_VERSION',		5050103);
 
 define('DB_VERSION_SUPPORTED',				0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',		1);
@@ -58,6 +58,8 @@ define('ZBX_FLOAT_MAX', PHP_FLOAT_MAX);
 define('ZBX_MAX_DATE',		ZBX_MAX_INT32); // 19 Jan 2038 03:14:07 UTC
 define('ZBX_MIN_TIMESHIFT',	-788400000); // Min valid timeshift value in seconds (25 years).
 define('ZBX_MAX_TIMESHIFT',	788400000); // Max valid timeshift value in seconds (25 years).
+
+define('ZBX_GEOMAP_MAX_ZOOM', 30); // Max zoom level for geomap.
 
 define('ZBX_MAX_GRAPHS_PER_PAGE', 20);
 
@@ -1006,6 +1008,10 @@ define('EVENT_OBJECT_ITEM',				4);
 define('EVENT_OBJECT_LLDRULE',			5);
 define('EVENT_OBJECT_SERVICE',			6);
 
+// System information widget constants.
+define('ZBX_SYSTEM_INFO_SERVER_STATS',	0);
+define('ZBX_SYSTEM_INFO_HAC_STATUS',	1);
+
 // Problem and event tag constants.
 define('TAG_EVAL_TYPE_AND_OR',		0);
 define('TAG_EVAL_TYPE_OR',			2);
@@ -1347,23 +1353,27 @@ define('API_EXEC_PARAMS',			48);
 define('API_COND_FORMULA',			49);
 define('API_COND_FORMULAID',		50);
 define('API_UNEXPECTED',			51);
+define('API_INT32_RANGES',			52);
+define('API_LAT_LNG_ZOOM',			53);
 
 // flags
-define('API_REQUIRED',					0x0001);
-define('API_NOT_EMPTY',					0x0002);
-define('API_ALLOW_NULL',				0x0004);
-define('API_NORMALIZE',					0x0008);
-define('API_DEPRECATED',				0x0010);
-define('API_ALLOW_USER_MACRO',			0x0020);
-define('API_ALLOW_COUNT',				0x0040);
-define('API_ALLOW_LLD_MACRO',			0x0080);
-define('API_REQUIRED_LLD_MACRO',		0x0100);
-define('API_TIME_UNIT_WITH_YEAR',		0x0200);
-define('API_ALLOW_EVENT_TAGS_MACRO',	0x0400);
-define('API_PRESERVE_KEYS',				0x0800);
-define('API_ALLOW_MACRO',				0x1000);
-define('API_ALLOW_GLOBAL_REGEX',		0x2000);
-define('API_ALLOW_UNEXPECTED',			0x4000);
+define('API_REQUIRED',					0x00001);
+define('API_NOT_EMPTY',					0x00002);
+define('API_ALLOW_NULL',				0x00004);
+define('API_NORMALIZE',					0x00008);
+define('API_DEPRECATED',				0x00010);
+define('API_ALLOW_USER_MACRO',			0x00020);
+define('API_ALLOW_COUNT',				0x00040);
+define('API_ALLOW_LLD_MACRO',			0x00080);
+define('API_REQUIRED_LLD_MACRO',		0x00100);
+define('API_TIME_UNIT_WITH_YEAR',		0x00200);
+define('API_ALLOW_EVENT_TAGS_MACRO',	0x00400);
+define('API_PRESERVE_KEYS',				0x00800);
+define('API_ALLOW_MACRO',				0x01000);
+define('API_ALLOW_GLOBAL_REGEX',		0x02000);
+define('API_ALLOW_UNEXPECTED',			0x04000);
+define('API_ALLOW_DNS',					0x08000);
+define('API_ALLOW_RANGE',				0x10000);
 
 // JSON error codes.
 if (!defined('JSON_ERROR_NONE')) {
@@ -1443,9 +1453,6 @@ define('ZBX_TEXTAREA_STANDARD_ROWS',			7);
 // decoration borders
 define('ZBX_HOST_INTERFACE_WIDTH',				750);
 
-// overviews help
-define('ZBX_OVERVIEW_HELP_MIN_WIDTH',			125);
-
 // Helper buttons that allow selected objects to be added, replaced or removed.
 define('ZBX_ACTION_ADD',		0);
 define('ZBX_ACTION_REPLACE',	1);
@@ -1463,6 +1470,7 @@ define('WIDGET_DATA_OVER',			'dataover');
 define('WIDGET_DISCOVERY',			'discovery');
 define('WIDGET_FAV_GRAPHS',			'favgraphs');
 define('WIDGET_FAV_MAPS',			'favmaps');
+define('WIDGET_GEOMAP',				'geomap');
 define('WIDGET_SVG_GRAPH',			'svggraph');
 define('WIDGET_GRAPH',				'graph');
 define('WIDGET_GRAPH_PROTOTYPE',	'graphprototype');
@@ -1804,6 +1812,7 @@ define('ZBX_STYLE_INLINE_FILTER_FOOTER', 'inline-filter-footer');
 define('ZBX_STYLE_INLINE_FILTER_STATS', 'inline-filter-stats');
 define('ZBX_STYLE_INPUT_COLOR_PICKER', 'input-color-picker');
 define('ZBX_STYLE_LAYOUT_KIOSKMODE', 'layout-kioskmode');
+define('ZBX_STYLE_CONTAINER', 'container');
 define('ZBX_STYLE_LAYOUT_WRAPPER', 'wrapper');
 define('ZBX_STYLE_LEFT', 'left');
 define('ZBX_STYLE_LINK_ACTION', 'link-action');
@@ -1813,6 +1822,8 @@ define('ZBX_STYLE_LIST_DASHED', 'list-dashed');
 define('ZBX_STYLE_LIST_TABLE', 'list-table');
 define('ZBX_STYLE_LIST_TABLE_ACTIONS', 'list-table-actions');
 define('ZBX_STYLE_LIST_TABLE_FOOTER', 'list-table-footer');
+define('ZBX_STYLE_LIST_TABLE_STICKY_HEADER', 'sticky-header');
+define('ZBX_STYLE_LIST_TABLE_STICKY_FOOTER', 'sticky-footer');
 define('ZBX_STYLE_LIST_VERTICAL_ACCORDION', 'list-vertical-accordion');
 define('ZBX_STYLE_LIST_ACCORDION_FOOT', 'list-accordion-foot');
 define('ZBX_STYLE_LIST_ACCORDION_ITEM', 'list-accordion-item');
@@ -1838,9 +1849,6 @@ define('ZBX_STYLE_MSG_DETAILS', 'msg-details');
 define('ZBX_STYLE_MSG_DETAILS_BORDER', 'msg-details-border');
 define('ZBX_STYLE_NA_BG', 'na-bg');
 define('ZBX_STYLE_NORMAL_BG', 'normal-bg');
-define('ZBX_STYLE_NOTIF_BODY', 'notif-body');
-define('ZBX_STYLE_NOTIF_INDIC', 'notif-indic');
-define('ZBX_STYLE_NOTIF_INDIC_CONTAINER', 'notif-indic-container');
 define('ZBX_STYLE_NOTHING_TO_SHOW', 'nothing-to-show');
 define('ZBX_STYLE_NOWRAP', 'nowrap');
 define('ZBX_STYLE_WORDWRAP', 'wordwrap');
@@ -2052,6 +2060,12 @@ define('ZBX_ROLE_RULE_API_WILDCARD_ALIAS',		'*.*');
 
 // Allows to set "rel" tag value "noreferer" when setting target="_blank".
 define('ZBX_NOREFERER', true);
+
+// High availability server node states.
+define('ZBX_NODE_STATUS_STANDBY',		0);
+define('ZBX_NODE_STATUS_STOPPED',		1);
+define('ZBX_NODE_STATUS_UNAVAILABLE',	2);
+define('ZBX_NODE_STATUS_ACTIVE',		3);
 
 // init $_REQUEST
 ini_set('variables_order', 'GP');

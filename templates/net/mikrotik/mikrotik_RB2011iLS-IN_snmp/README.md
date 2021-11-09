@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 The template for monitoring Ethernet router MikroTik RB2011iLS-IN.
 
 Desktop metal case, 5xEthernet, 5xGigabit Ethernet, SFP cage, PoE out on port 10, 600MHz CPU, 64MB RAM, RouterOS L4

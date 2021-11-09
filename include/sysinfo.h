@@ -361,6 +361,9 @@ zbx_mpoint_t;
 #define ZBX_SYSINFO_TAG_PUSED			"pused"
 
 #define ZBX_SYSINFO_FILE_TAG_TYPE		"type"
+#define ZBX_SYSINFO_FILE_TAG_BASENAME		"basename"
+#define ZBX_SYSINFO_FILE_TAG_PATHNAME		"pathname"
+#define ZBX_SYSINFO_FILE_TAG_DIRNAME		"dirname"
 #define ZBX_SYSINFO_FILE_TAG_USER		"user"
 #define ZBX_SYSINFO_FILE_TAG_GROUP		"group"
 #define ZBX_SYSINFO_FILE_TAG_PERMISSIONS	"permissions"
@@ -391,4 +394,9 @@ void	zbx_mpoints_free(zbx_mpoint_t *mpoint);
 zbx_uint32_t get_thread_global_mutex_flag(void);
 #endif
 
+#ifndef _WINDOWS
+int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *hostname);
 #endif
+
+#endif
+

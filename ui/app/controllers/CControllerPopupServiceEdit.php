@@ -176,9 +176,7 @@ class CControllerPopupServiceEdit extends CController {
 			unset($service_time);
 
 			$data = [
-				'title' => _('Service'),
 				'serviceid' => $this->service['serviceid'],
-				'form_action' => 'service.update',
 				'form' => [
 					'name' => $this->service['name'],
 					'parents' => $parents,
@@ -213,9 +211,7 @@ class CControllerPopupServiceEdit extends CController {
 		}
 		else {
 			$data = [
-				'title' => _('New service'),
 				'serviceid' => null,
-				'form_action' => 'service.create',
 				'form' => [
 					'name' => $defaults['name'],
 					'parents' => $parents,

@@ -5,7 +5,7 @@
 
 html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var,
 b,
-strong, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, .table-forms .tfoot-buttons, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary,
+strong, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary,
 time, mark, audio, video {
   margin: 0;
   padding: 0;
@@ -378,12 +378,17 @@ main {
   position: relative;
   min-width: 1200px;
   padding: 10px; }
+  main > .container:not(:first-of-type) {
+    margin-top: 10px; }
 
 footer {
   margin-top: auto; }
 
 output {
   display: block; }
+
+.container {
+  background: #ffffff; }
 
 header {
   display: flex;
@@ -641,8 +646,6 @@ footer {
   row-gap: 10px;
   column-gap: 10px;
   grid-template-columns: minmax(15%, max-content) auto; }
-  .form-grid.label-width-fixed {
-    grid-template-columns: minmax(100px, max-content) auto; }
   .form-grid.label-width-true {
     grid-template-columns: max-content auto; }
   .form-grid > label {
@@ -667,16 +670,14 @@ footer {
     width: 100%; }
   .form-grid .form-field td {
     padding: 0 5px 5px 0; }
+  .form-grid .form-field .list-check-radio {
+    line-height: 1.4em; }
   .form-grid.form-grid-1-1 {
     grid-template-columns: repeat(2, minmax(15%, max-content) auto); }
-    .form-grid.form-grid-1-1.label-width-fixed {
-      grid-template-columns: repeat(2, minmax(100px, max-content) auto); }
     .form-grid.form-grid-1-1.label-width-true {
       grid-template-columns: repeat(2, max-content auto); }
   .form-grid.form-grid-3-1 {
     grid-template-columns: minmax(15%, max-content) 3fr max-content auto; }
-    .form-grid.form-grid-3-1.label-width-fixed {
-      grid-template-columns: minmax(100px, max-content) 3fr max-content auto; }
     .form-grid.form-grid-3-1.label-width-true {
       grid-template-columns: max-content auto 3fr max-content auto; }
   .form-grid.form-grid-1-1 .form-field:not(.field-fluid), .form-grid.form-grid-3-1 .form-field:not(.field-fluid) {
@@ -1012,6 +1013,10 @@ footer {
       border-bottom: 1px solid #ebeef0; }
       .dashboard-grid-widget-content .list-table tbody tr:last-child th.list-table-footer, .dashboard-grid-widget-content .list-table tbody tr:last-child td.list-table-footer {
         border-bottom: 0; }
+    .dashboard-grid-widget-content .list-table.sticky-footer {
+      margin-bottom: -8px; }
+      .dashboard-grid-widget-content .list-table.sticky-footer tfoot {
+        bottom: -8px; }
   .dashboard-grid-widget-content .debug-output {
     max-height: none;
     border-color: #ebeef0; }
@@ -1037,6 +1042,10 @@ footer {
     margin-top: 0;
     height: 100%;
     padding-top: 8px; }
+    .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-content .list-table.sticky-footer {
+      margin-bottom: 0; }
+      .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-content .list-table.sticky-footer tfoot {
+        bottom: 0; }
   .dashboard-grid-widget.dashboard-grid-widget-hidden-header.dashboard-grid-widget-focus .dashboard-grid-widget-head {
     height: 2rem;
     margin-top: -2rem;
@@ -2697,6 +2706,9 @@ form.is-loading {
     border-bottom: 1px solid #ebeef0;
     line-height: 18px;
     vertical-align: top; }
+    .list-table tbody th.table-info,
+    .list-table td.table-info {
+      color: #768d99; }
   .list-table tbody th {
     text-align: left; }
   .list-table .vertical_rotation_inner {
@@ -2712,6 +2724,21 @@ form.is-loading {
   .list-table .list-table-actions {
     text-align: right;
     white-space: nowrap; }
+  .list-table.sticky-header thead {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: #ffffff; }
+  .list-table.sticky-footer tbody tr:last-of-type td, .list-table.sticky-footer tbody tr:last-of-type th {
+    border-bottom: none; }
+  .list-table.sticky-footer tfoot {
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
+    background: #ffffff; }
+    .list-table.sticky-footer tfoot tr:first-of-type td, .list-table.sticky-footer tfoot tr:first-of-type th {
+      border-top: 2px solid #dce2e5;
+      border-bottom: 0; }
 
 .table-paging {
   text-align: center;
@@ -3142,9 +3169,11 @@ form.is-loading {
     text-align: left; }
     .table-forms th:last-child {
       padding: 0; }
-  .table-forms tfoot .table-forms-td-right, .table-forms .tfoot-buttons .table-forms-td-right {
+  .table-forms tfoot .table-forms-td-right,
+  .table-forms .tfoot-buttons .table-forms-td-right {
     padding-top: 5px; }
-  .table-forms tfoot button, .table-forms .tfoot-buttons button {
+  .table-forms tfoot button,
+  .table-forms .tfoot-buttons button {
     margin: 0 10px 0 0; }
   .table-forms td {
     position: relative; }
@@ -3872,7 +3901,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .radio-list-control input[type="radio"][disabled] + label, z-select[disabled] button,
 .z-select[disabled] button, z-select[readonly] button,
 .z-select[readonly] button, .multiselect[aria-disabled], input[disabled], input[readonly], textarea[disabled], textarea[readonly], select option[disabled], select[disabled], select[readonly], .checkbox-radio[readonly] span,
-.checkbox-radio[readonly] + label span, .checkbox-radio[disabled] + label span, .input-group button.btn-dropdown-toggle:disabled {
+.checkbox-radio[readonly] + label span, .checkbox-radio[disabled] + label span, .macro-input-group button.btn-dropdown-toggle:disabled {
   color: #acbbc2;
   background-color: #ebebeb !important;
   border-color: #ccd5d9; }
@@ -4267,6 +4296,12 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     top: 0;
     z-index: 4;
     margin: 0 0 10px; }
+  .overlay-dialogue .form-grid {
+    grid-template-columns: minmax(100px, max-content) auto; }
+    .overlay-dialogue .form-grid.form-grid-1-1 {
+      grid-template-columns: repeat(2, minmax(100px, max-content) auto); }
+    .overlay-dialogue .form-grid.form-grid-3-1 {
+      grid-template-columns: minmax(100px, max-content) 3fr max-content auto; }
   .overlay-dialogue .list-table {
     white-space: normal;
     border: 0; }
@@ -4366,7 +4401,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     z-index: 20; }
     .multilineinput-modal .multilineinput-textarea::-webkit-scrollbar {
       height: 9px; }
-  .multilineinput-modal .multilineinput-symbols-remaining {
+  .multilineinput-modal .multilineinput-char-count {
     color: #768d99;
     float: left;
     line-height: 24px; }
@@ -4558,15 +4593,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     float: left;
     margin-top: 20px;
     background: url("../img/icon-sprite.svg?20200407") no-repeat -11px -587px; }
-
-.notif-indic-container {
-  border-top: 1px solid #ebeef0;
-  margin: 0 0 0 -19px;
-  padding: 14px 0 0; }
-  .notif-indic-container .notif-indic {
-    float: none;
-    display: inline-block;
-    margin: 0 2px 0 0; }
 
 .dashed-border td {
   border: 1px dashed #ebeef0; }
@@ -6135,30 +6161,29 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
 .host-avail-widget .host-avail-total {
   background: transparent; }
 
-.input-group {
+.macro-input-group {
   position: relative;
   display: flex;
-  flex-wrap: wrap;
   align-items: stretch;
   width: 100%; }
-  .input-group * {
+  .macro-input-group * {
     box-sizing: border-box; }
-  .input-group input,
-  .input-group textarea {
+  .macro-input-group input,
+  .macro-input-group textarea {
     flex: 1;
     border-right: 0; }
-    .input-group input:focus + .btn-undo, .input-group input:active + .btn-undo,
-    .input-group textarea:focus + .btn-undo,
-    .input-group textarea:active + .btn-undo {
+    .macro-input-group input:focus + .btn-undo, .macro-input-group input:active + .btn-undo,
+    .macro-input-group textarea:focus + .btn-undo,
+    .macro-input-group textarea:active + .btn-undo {
       border-top-color: #02659f;
       border-bottom-color: #02659f; }
-  .input-group button {
+  .macro-input-group button {
     position: relative; }
-    .input-group button.btn-change {
+    .macro-input-group button.btn-change {
       border-radius: 0; }
-      .input-group button.btn-change:disabled {
+      .macro-input-group button.btn-change:disabled {
         display: none; }
-    .input-group button.btn-undo {
+    .macro-input-group button.btn-undo {
       display: none;
       width: 24px;
       border-left: 0;
@@ -6168,7 +6193,7 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
       border-radius: 0;
       background-color: #ffffff;
       transition: border-color .2s ease-out, box-shadow .2s ease-out; }
-      .input-group button.btn-undo::before {
+      .macro-input-group button.btn-undo::before {
         position: absolute;
         top: 0;
         left: 0;
@@ -6177,18 +6202,18 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
         height: 22px;
         content: '';
         background: url("../img/icon-sprite.svg?20200407") no-repeat -119px -474px; }
-      .input-group button.btn-undo.is-focused {
+      .macro-input-group button.btn-undo.is-focused {
         border-top: 1px solid #02659f;
         border-bottom: 1px solid #02659f; }
-      .input-group button.btn-undo:hover, .input-group button.btn-undo:focus, .input-group button.btn-undo:active {
+      .macro-input-group button.btn-undo:hover, .macro-input-group button.btn-undo:focus, .macro-input-group button.btn-undo:active {
         border-top: 1px solid #02659f;
         border-bottom: 1px solid #02659f;
         color: #ffffff;
         background-color: #02659f;
         border-color: #02659f; }
-        .input-group button.btn-undo:hover::before, .input-group button.btn-undo:focus::before, .input-group button.btn-undo:active::before {
+        .macro-input-group button.btn-undo:hover::before, .macro-input-group button.btn-undo:focus::before, .macro-input-group button.btn-undo:active::before {
           background-position: -431px -474px; }
-    .input-group button.btn-dropdown-toggle {
+    .macro-input-group button.btn-dropdown-toggle {
       border-color: #02659f;
       border-top-left-radius: 0;
       border-bottom-left-radius: 0; }
@@ -6351,7 +6376,8 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
     .interface-container .interface-row:not(:first-of-type) {
       margin-top: 5px; }
     .interface-container .interface-row[data-type] .interface-cell-details {
-      display: none; }
+      display: none;
+      grid-column: 1/-1; }
     .interface-container .interface-row .interface-cell {
       align-self: center; }
       .interface-container .interface-row .interface-cell .interface-btn-toggle {
@@ -6513,6 +6539,15 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
     float: left;
     margin-left: -1em; }
 
+.overlay-dialogue #host-form #tagsFormList .table-forms-td-left,
+.overlay-dialogue #host-form #macrosFormList .table-forms-td-left,
+.overlay-dialogue #host-form #valuemap-formlist .table-forms-td-left {
+  display: none; }
+.overlay-dialogue #host-form #tagsFormList .table-forms-td-right,
+.overlay-dialogue #host-form #macrosFormList .table-forms-td-right,
+.overlay-dialogue #host-form #valuemap-formlist .table-forms-td-right {
+  width: 100%; }
+
 .audit-details-popup-wrapper {
   margin: 5px 10px; }
   .audit-details-popup-wrapper .audit-details-popup-textarea {
@@ -6524,3 +6559,54 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   justify-content: space-between; }
   .audit-details-wrapper .audit-show-details-btn-wrapper {
     margin: 0 5px 0 5px; }
+
+.geomap-filter-button,
+.navigate-home-button {
+  background-image: url("../img/icon-sprite.svg");
+  background-repeat: no-repeat; }
+
+.geomap-filter-button {
+  background-position: -243px -543px !important; }
+
+.navigate-home-button {
+  background-position: -117px -506px !important; }
+
+.geomap-filter {
+  border: 2px solid rgba(223, 228, 231, 0.4);
+  background-color: #ffffff;
+  padding: 10px 30px 5px 10px;
+  position: absolute;
+  margin-right: -2px;
+  margin-top: 5px;
+  display: none;
+  right: 0; }
+
+.geomap-filter.collapsed {
+  display: table; }
+
+.geomap-filter li {
+  width: calc(100% + 20px); }
+
+.geomap-filter label {
+  white-space: nowrap; }
+
+.marker-cluster {
+  background: none; }
+
+.marker-cluster div {
+  text-align: center;
+  border-radius: 50%;
+  margin-left: 5px;
+  margin-top: 5px;
+  height: 30px;
+  width: 30px; }
+
+.marker-cluster span {
+  line-height: 30px; }
+
+.leaflet-control.disabled {
+  background-color: #ffffff;
+  opacity: 1; }
+  .leaflet-control.disabled .geomap-filter-button {
+    cursor: default;
+    opacity: .4; }

@@ -357,8 +357,10 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 #define ZBX_VMWARE_HVPROP_VERSION			13
 #define ZBX_VMWARE_HVPROP_NAME				14
 #define ZBX_VMWARE_HVPROP_STATUS			15
+#define ZBX_VMWARE_HVPROP_MAINTENANCE			16
+#define ZBX_VMWARE_HVPROP_SENSOR			17
 
-#define ZBX_VMWARE_HVPROPS_NUM				16
+#define ZBX_VMWARE_HVPROPS_NUM				18
 
 /* virtual machine properties */
 #define ZBX_VMWARE_VMPROP_CPU_NUM			0
@@ -413,6 +415,7 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 #define ZBX_VMWARE_UNIT_SECOND			11
 #define ZBX_VMWARE_UNIT_TERABYTES		12
 #define ZBX_VMWARE_UNIT_WATT			13
+#define ZBX_VMWARE_UNIT_CELSIUS			14
 
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
 

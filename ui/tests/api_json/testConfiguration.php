@@ -860,21 +860,21 @@ class testConfiguration extends CAPITest {
 								</groups>
 								</zabbix_export>',
 				'sql' => 'select * from hstgrp where name=\'API host group xml import as non Super Admin\'',
-				'expected_error' => 'Only Super Admins can create host groups.'
+				'expected_error' => 'No permissions to call "hostgroup.create".'
 			],
 			[
 				'format' => 'json',
 				'parameter' => 'groups',
 				'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-09T12:29:57Z","groups":[{"name":"API host group json import as non Super Admin"}]}}',
 				'sql' => 'select * from hstgrp where name=\'API host group json import as non Super Admin\'',
-				'expected_error' => 'Only Super Admins can create host groups.'
+				'expected_error' => 'No permissions to call "hostgroup.create".'
 			],
 			[
 				'format' => 'yaml',
 				'parameter' => 'groups',
 				'source' => "---\nzabbix_export:\n  version: \"4.0\"\n  date: \"2020-08-03T12:41:17Z\"\n  groups:\n  - name: API host group yaml import as non Super Admin\n...\n",
 				'sql' => 'select * from hstgrp where name=\'API host group yaml import as non Super Admin\'',
-				'expected_error' => 'Only Super Admins can create host groups.'
+				'expected_error' => 'No permissions to call "hostgroup.create".'
 			]
 		];
 	}

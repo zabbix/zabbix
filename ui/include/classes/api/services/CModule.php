@@ -114,6 +114,12 @@ class CModule extends CApiService {
 	 * @return array
 	 */
 	public function create(array $modules): array {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('No permissions to call "%1$s.%2$s".', 'module', __FUNCTION__)
+			);
+		}
+
 		self::validateCreate($modules);
 
 		$moduleids = DB::insert('module', $modules);
@@ -161,6 +167,12 @@ class CModule extends CApiService {
 	 * @return array
 	 */
 	public function update(array $modules): array {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('No permissions to call "%1$s.%2$s".', 'module', __FUNCTION__)
+			);
+		}
+
 		self::validateUpdate($modules, $db_modules);
 
 		$upd_modules = [];
@@ -230,6 +242,12 @@ class CModule extends CApiService {
 	 * @return array
 	 */
 	public function delete(array $moduleids): array {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('No permissions to call "%1$s.%2$s".', 'module', __FUNCTION__)
+			);
+		}
+
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $moduleids, '/', $error)) {

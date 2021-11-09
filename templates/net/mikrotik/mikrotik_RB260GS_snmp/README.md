@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 The template for monitoring Switch MikroTik RB260GS.
 
 5x Gigabit Ethernet Smart Switch, SFP cage, plastic case, SwOS

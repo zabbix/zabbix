@@ -26,7 +26,6 @@
 $this->addJsFile('gtlc.js');
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('layout.mode.js');
-$this->addJsFile('multiselect.js');
 
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();

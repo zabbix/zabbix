@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:02Z'
+  version: '6.0'
+  date: '2021-10-28T08:23:59Z'
   groups:
     -
       uuid: 3dcd5bbe90534f9e8eb5c2d53756af63
@@ -19,7 +19,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/420730-discussion-thread-for-official-zabbix-template-apc-ups
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.39
       groups:
         -
           name: Templates/Power
@@ -48,7 +48,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Status
+              tag: Application
+              value: Status
           triggers:
             -
               uuid: 8ab182b26a0443539a1a114767d8acd7
@@ -76,7 +77,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Status
+              tag: Application
+              value: Status
         -
           uuid: 7a887ae254b04b19bac605bb36141767
           name: 'Battery last replace date'
@@ -101,7 +103,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Status
+              tag: Application
+              value: Status
         -
           uuid: 8f4351d23be04a3abee1e6edb746a9ec
           name: 'Battery replace indicator'
@@ -121,7 +124,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Status
+              tag: Application
+              value: Status
           triggers:
             -
               uuid: ab0db1327cf04a9c9a9ee757f0869603
@@ -153,7 +157,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Status
+              tag: Application
+              value: Status
         -
           uuid: a631704123c2498aa8ce973e36c13698
           name: 'Battery status'
@@ -179,7 +184,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Status
+              tag: Application
+              value: Status
           triggers:
             -
               uuid: c8787a09c2ea4aeb977b868ae0a3218b
@@ -217,7 +223,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Status
+              tag: Application
+              value: Status
           triggers:
             -
               uuid: e2debe06675d4d4584b60b768633887b
@@ -248,7 +255,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Status
+              tag: Application
+              value: Status
         -
           uuid: 0a12f157ae844129a35084b5ab0a8eab
           name: 'Input fail cause'
@@ -291,7 +299,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Status
+              tag: Application
+              value: Status
         -
           uuid: 0ceb5a6d71f440fcbd2da06b0cc1bbb3
           name: 'Input frequency'
@@ -315,7 +324,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Status
+              tag: Application
+              value: Status
           triggers:
             -
               uuid: b29cd7e33c1e4e16b10fe436c1f7e6d6
@@ -346,7 +356,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Status
+              tag: Application
+              value: Status
           triggers:
             -
               uuid: d38f2151f0eb486e8d44b72a2e361a5f
@@ -377,7 +388,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Status
+              tag: Application
+              value: Status
         -
           uuid: cd7b2c1b12df4fd19f37485aa380b295
           name: 'Output load'
@@ -402,7 +414,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Status
+              tag: Application
+              value: Status
           triggers:
             -
               uuid: 57197c601f8a433d8ccdcb040d047f6f
@@ -436,7 +449,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Status
+              tag: Application
+              value: Status
           triggers:
             -
               uuid: e9289d8f4e124097990e2af98e916368
@@ -516,7 +530,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Status
+              tag: Application
+              value: Status
         -
           uuid: d08fb7e3fae84d2cbae64ab9771ffcdc
           name: 'SNMP traps (fallback)'
@@ -525,18 +540,19 @@ zabbix_export:
           history: 2w
           trends: '0'
           value_type: LOG
-          description: 'Item is used to collect all SNMP traps unmatched by other snmptrap items'
+          description: 'The item is used to collect all SNMP traps unmatched by other snmptrap items'
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
             -
-              tag: General
+              tag: Application
+              value: General
         -
           uuid: da60acc731a64257a90512b5c70d1e92
           name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
-          delay: 1h
+          delay: 15m
           history: 2w
           trends: '0'
           value_type: CHAR
@@ -550,17 +566,18 @@ zabbix_export:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1d
+                - 12h
           tags:
             -
-              tag: General
+              tag: Application
+              value: General
         -
           uuid: 01302a36cafd421c90d746f785c83f3f
           name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
-          delay: 1h
+          delay: 15m
           history: 2w
           trends: '0'
           value_type: CHAR
@@ -573,10 +590,11 @@ zabbix_export:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1d
+                - 12h
           tags:
             -
-              tag: General
+              tag: Application
+              value: General
         -
           uuid: d0351d1bc1dc4f1b853fe64d456b3570
           name: 'System location'
@@ -599,7 +617,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: General
+              tag: Application
+              value: General
         -
           uuid: 866889bb71e949c18520bf8fefd3e7ea
           name: Model
@@ -620,7 +639,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: General
+              tag: Application
+              value: General
         -
           uuid: 482bec6573f249abbb721f2ec90def3b
           name: 'System name'
@@ -644,7 +664,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: General
+              tag: Application
+              value: General
           triggers:
             -
               uuid: b13b087b9828426aac82a281071ceb8b
@@ -678,7 +699,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: General
+              tag: Application
+              value: General
         -
           uuid: 269ce166bb904fa8b11fc2fdf1f67d76
           name: 'Serial number'
@@ -702,7 +724,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: General
+              tag: Application
+              value: General
         -
           uuid: 336ef2166914449fafa13ab08fe7c7a1
           name: Uptime
@@ -724,7 +747,8 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Status
+              tag: Application
+              value: Status
           triggers:
             -
               uuid: 87ebd137f2744ae6879d6fd9d51314ef
@@ -743,6 +767,12 @@ zabbix_export:
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
+          description: |
+            Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.
+            Possible value:
+            0 - not available
+            1 - available
+            2 - unknown
           valuemap:
             name: zabbix.host.available
           preprocessing:
@@ -752,7 +782,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Status
+              tag: Application
+              value: Status
           triggers:
             -
               uuid: 53263bf0536d479785b45883b9b7ab21
@@ -791,7 +822,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Status
+                  tag: Application
+                  value: Status
         -
           uuid: b4a8277fdf6f4e76a641690aaf6e7faa
           name: 'External battery packs discovery'
@@ -828,7 +860,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Status
+                  tag: Application
+                  value: Status
             -
               uuid: 2e7f6a940840406cb17bb1af20936326
               name: '{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery pack cartridge health'
@@ -855,7 +888,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Status
+                  tag: Application
+                  value: Status
               trigger_prototypes:
                 -
                   uuid: c1eefbeeb0d146c3bea5cae929d0c30b
@@ -903,7 +937,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Status
+                  tag: Application
+                  value: Status
               trigger_prototypes:
                 -
                   uuid: 28b8fb69a85549288cf0e26b9ca0a2cf
@@ -948,7 +983,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Status
+                  tag: Application
+                  value: Status
               trigger_prototypes:
                 -
                   uuid: fa007fcfbe7c499d8f97a808991f2800
@@ -976,7 +1012,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: General
+                  tag: Application
+                  value: General
         -
           uuid: 59467725274d4dba8e839d167cabe693
           name: 'External sensor port 1 discovery'
@@ -1007,7 +1044,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Status
+                  tag: Application
+                  value: Status
             -
               uuid: 137fdf42e0ab476e86e7b0b3bc87d5cc
               name: '{#EXTERNAL_SENSOR1_NAME}: Sensor alarm status'
@@ -1031,7 +1069,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Status
+                  tag: Application
+                  value: Status
               trigger_prototypes:
                 -
                   uuid: 175c1def62ac412eb5f9ef015a9b8ac3
@@ -1071,7 +1110,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Status
+                  tag: Application
+                  value: Status
           overrides:
             -
               name: Temp
@@ -1119,7 +1159,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Status
+                  tag: Application
+                  value: Status
             -
               uuid: e10189271da445a494d274d99269ab75
               name: '{#EXTERNAL_SENSOR2_NAME}: Sensor alarm status'
@@ -1143,7 +1184,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Status
+                  tag: Application
+                  value: Status
               trigger_prototypes:
                 -
                   uuid: 5e937c991aa146fe98c1a4f868be6b70
@@ -1183,7 +1225,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Status
+                  tag: Application
+                  value: Status
           overrides:
             -
               name: Temp
@@ -1234,7 +1277,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Status
+                  tag: Application
+                  value: Status
             -
               uuid: 1baaad88e9064b92b453fb2c1c7d73d5
               name: '{#PHASEINDEX}: Phase input voltage'
@@ -1255,7 +1299,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Status
+                  tag: Application
+                  value: Status
               trigger_prototypes:
                 -
                   uuid: 971301abf4d6457da125fd7ebd903728
@@ -1297,7 +1342,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Status
+                  tag: Application
+                  value: Status
             -
               uuid: 6d1812674e5646f8acf2ea47acf05a6d
               name: '{#PHASEINDEX}: Phase output load, %'
@@ -1319,7 +1365,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Status
+                  tag: Application
+                  value: Status
             -
               uuid: 3c0573d586b24e53aeebb6c44b907bbd
               name: '{#PHASEINDEX}: Phase output voltage'
@@ -1340,7 +1387,8 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Status
+                  tag: Application
+                  value: Status
               trigger_prototypes:
                 -
                   uuid: d7167a129de146d19218edb85c82c69b

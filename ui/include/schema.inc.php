@@ -2772,6 +2772,36 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '1'
+			],
+			'ha_failover_delay' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '1m'
+			],
+			'geomaps_tile_provider' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'geomaps_tile_url' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 1024,
+				'default' => ''
+			],
+			'geomaps_max_zoom' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'geomaps_attribution' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 1024,
+				'default' => ''
 			]
 		]
 	],
@@ -4528,7 +4558,7 @@ return [
 		]
 	],
 	'history' => [
-		'key' => '',
+		'key' => 'itemid,clock,ns',
 		'fields' => [
 			'itemid' => [
 				'null' => false,
@@ -4557,7 +4587,7 @@ return [
 		]
 	],
 	'history_uint' => [
-		'key' => '',
+		'key' => 'itemid,clock,ns',
 		'fields' => [
 			'itemid' => [
 				'null' => false,
@@ -4587,7 +4617,7 @@ return [
 		]
 	],
 	'history_str' => [
-		'key' => '',
+		'key' => 'itemid,clock,ns',
 		'fields' => [
 			'itemid' => [
 				'null' => false,
@@ -4617,7 +4647,7 @@ return [
 		]
 	],
 	'history_log' => [
-		'key' => '',
+		'key' => 'itemid,clock,ns',
 		'fields' => [
 			'itemid' => [
 				'null' => false,
@@ -4670,7 +4700,7 @@ return [
 		]
 	],
 	'history_text' => [
-		'key' => '',
+		'key' => 'itemid,clock,ns',
 		'fields' => [
 			'itemid' => [
 				'null' => false,
@@ -5092,6 +5122,11 @@ return [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20
+			],
+			'resource_cuid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_CUID,
+				'length' => 25
 			],
 			'resourcename' => [
 				'null' => false,
@@ -8679,9 +8714,60 @@ return [
 			]
 		]
 	],
-	'dbversion' => [
-		'key' => '',
+	'ha_node' => [
+		'key' => 'ha_nodeid',
 		'fields' => [
+			'ha_nodeid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CUID,
+				'length' => 25
+			],
+			'name' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'address' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'port' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '10051'
+			],
+			'lastaccess' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'status' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'ha_sessionid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CUID,
+				'length' => 25,
+				'default' => ''
+			]
+		]
+	],
+	'dbversion' => [
+		'key' => 'dbversionid',
+		'fields' => [
+			'dbversionid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			],
 			'mandatory' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,

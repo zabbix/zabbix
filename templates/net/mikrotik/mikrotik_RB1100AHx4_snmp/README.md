@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 The template for monitoring Ethernet router MikroTik RB1100AHx4.
 
 Powerful 1U rackmount router with 13x Gigabit Ethernet ports

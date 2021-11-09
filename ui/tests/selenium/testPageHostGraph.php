@@ -63,8 +63,11 @@ class testPageHostGraph extends CLegacyWebTest {
 		$filter->getField('Hosts')->fill($host_name);
 		$filter->submit();
 		$breadcrumbs = [
-			'hosts.php' => 'All hosts',
-			'hosts.php?form=update&hostid='.$hostid => $host_name,
+			self::HOST_LIST_PAGE => 'All hosts',
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'host.edit')
+				->setArgument('hostid', $hostid)
+				->getUrl() => $host_name,
 			'items.php?filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host' => 'Items',
 			'triggers.php?filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host' => 'Triggers',
 			'graphs.php?filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host' => 'Graphs',

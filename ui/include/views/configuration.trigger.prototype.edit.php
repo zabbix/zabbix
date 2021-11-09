@@ -552,7 +552,8 @@ $triggersTab->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab
 		'source' => 'trigger_prototype',
 		'tags' => $data['tags'],
 		'show_inherited_tags' => $data['show_inherited_tags'],
-		'readonly' => false
+		'readonly' => false,
+		'tabs_id' => 'tabs'
 	]), TAB_INDICATOR_TAGS
 );
 

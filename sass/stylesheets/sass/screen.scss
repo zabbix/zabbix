@@ -668,6 +668,10 @@ form {
 		border-bottom: 1px solid $table-border-color;
 		line-height: 18px;
 		vertical-align: top;
+
+		&.table-info {
+			color: $font-alt-color;
+		}
 	}
 
 	tbody th {
@@ -693,6 +697,39 @@ form {
 	.list-table-actions {
 		text-align: right;
 		white-space: nowrap;
+	}
+
+	&.sticky-header {
+		thead {
+			position: sticky;
+			top: 0;
+			z-index: 1;
+			background: $ui-bg-color;
+		}
+	}
+
+	&.sticky-footer {
+		tbody {
+			tr:last-of-type {
+				td, th {
+					border-bottom: none;
+				}
+			}
+		}
+
+		tfoot {
+			position: sticky;
+			bottom: 0;
+			z-index: 1;
+			background: $ui-bg-color;
+
+			tr:first-of-type {
+				td, th {
+					border-top: 2px solid darken($table-border-color, 5%);
+					border-bottom: 0;
+				}
+			}
+		}
 	}
 }
 
@@ -1331,7 +1368,8 @@ form {
 		}
 	}
 
-	tfoot {
+	tfoot,
+	.tfoot-buttons {
 		.table-forms-td-right {
 			padding-top: 5px;
 		}
@@ -1339,10 +1377,6 @@ form {
 		button {
 			margin: 0 10px 0 0;
 		}
-	}
-
-	.tfoot-buttons {
-		@extend tfoot;
 	}
 
 	td {
@@ -3101,6 +3135,19 @@ $form-icon-btn: (
 		margin: 0 0 10px;
 	}
 
+	.form-grid {
+		// 100px label column width for use in popup forms.
+		grid-template-columns: minmax(100px, max-content) auto;
+
+		&.form-grid-1-1 {
+			grid-template-columns: repeat(2, minmax(100px, max-content) auto);
+		}
+
+		&.form-grid-3-1 {
+			grid-template-columns: minmax(100px, max-content) 3fr max-content auto;
+		}
+	}
+
 	.list-table {
 		white-space: normal;
 		border: 0;
@@ -3270,7 +3317,7 @@ $form-icon-btn: (
 		}
 	}
 
-	.multilineinput-symbols-remaining {
+	.multilineinput-char-count {
 		color: $font-alt-color;
 		float: left;
 		line-height: 24px;
@@ -3524,7 +3571,6 @@ $form-icon-btn: (
 			}
 		}
 	}
-
 }
 
 .notif-body {
@@ -3566,19 +3612,6 @@ $form-icon-btn: (
 		float: left;
 		margin-top: 20px;
 		background: url($sprite-path) no-repeat -11px -587px;
-	}
-
-}
-
-.notif-indic-container {
-	border-top: 1px solid $table-border-color;
-	margin: 0 0 0 -19px;
-	padding: 14px 0 0;
-
-	.notif-indic {
-		float: none;
-		display: inline-block;
-		margin: 0 2px 0 0;
 	}
 }
 
@@ -5725,10 +5758,9 @@ $range-input-width: 31px;
 
 // Input group
 
-.input-group {
+.macro-input-group {
 	position: relative;
 	display: flex;
-	flex-wrap: wrap;
 	align-items: stretch;
 	width: 100%;
 
@@ -6101,6 +6133,7 @@ $range-input-width: 31px;
 
 		&[data-type] .interface-cell-details {
 			display: none;
+			grid-column: 1/-1;
 		}
 
 		.interface-cell {
@@ -6367,6 +6400,20 @@ z-select,
 	}
 }
 
+.overlay-dialogue #host-form {
+	#tagsFormList,
+	#macrosFormList,
+	#valuemap-formlist {
+		.table-forms-td-left {
+			display: none;
+		}
+
+		.table-forms-td-right {
+			width: 100%;
+		}
+	}
+}
+
 // Report -> Audit details styles.
 
 .audit-details-popup-wrapper {
@@ -6384,5 +6431,63 @@ z-select,
 
 	.audit-show-details-btn-wrapper {
 		margin: 0 5px 0 5px;
+	}
+}
+
+// Geomap widget.
+.geomap-filter-button,
+.navigate-home-button {
+	background-image: url('../img/icon-sprite.svg');
+	background-repeat: no-repeat;
+}
+.geomap-filter-button {
+	background-position: -243px -543px !important;
+}
+.navigate-home-button {
+	background-position: -117px -506px !important;
+}
+.geomap-filter {
+	border: 2px solid rgba($ui-border-color, .4);
+	background-color: $ui-bg-color;
+	padding: 10px 30px 5px 10px;
+	position: absolute;
+	margin-right: -2px;
+	margin-top: 5px;
+	display: none;
+	right: 0;
+}
+.geomap-filter.collapsed {
+	display: table;
+}
+.geomap-filter li {
+	width: calc(100% + 20px);
+}
+.geomap-filter label {
+	white-space: nowrap;
+}
+
+.marker-cluster {
+	background: none;
+}
+.marker-cluster div {
+	text-align: center;
+	border-radius: 50%;
+	margin-left: 5px;
+	margin-top: 5px;
+	height: 30px;
+	width: 30px;
+}
+.marker-cluster span {
+	line-height: 30px;
+}
+.leaflet-control {
+	&.disabled {
+		background-color: #ffffff;
+		opacity: 1;
+
+		.geomap-filter-button {
+			cursor: default;
+			opacity: .4;
+		}
 	}
 }

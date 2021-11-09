@@ -98,6 +98,8 @@ static zbx_oracle_db_handle_t	oracle;
 
 static ub4	OCI_DBserver_status(void);
 
+#define ORA_ERR_UNIQ_CONSTRAINT	-1
+
 #elif defined(HAVE_POSTGRESQL)
 static PGconn			*conn = NULL;
 static unsigned int		ZBX_PG_BYTEAOID = 0;
@@ -113,9 +115,13 @@ static zbx_mutex_t		sqlite_access = ZBX_MUTEX_NULL;
 static void	OCI_DBclean_result(DB_RESULT result);
 #endif
 
+static zbx_err_codes_t last_db_errcode;
+
 static void	zbx_db_errlog(zbx_err_codes_t zbx_errno, int db_errno, const char *db_error, const char *context)
 {
 	char	*s;
+
+	last_db_errcode = zbx_errno;
 
 	if (NULL != db_error)
 		last_db_strerror = zbx_strdup(last_db_strerror, db_error);
@@ -147,6 +153,9 @@ static void	zbx_db_errlog(zbx_err_codes_t zbx_errno, int db_errno, const char *d
 		case ERR_Z3007:
 			s = zbx_dsprintf(NULL, "query failed: [%d] %s", db_errno, last_db_strerror);
 			break;
+		case ERR_Z3008:
+			s = zbx_dsprintf(NULL, "query failed due to primary key constraint: [%d] %s", db_errno, last_db_strerror);
+			break;
 		default:
 			s = zbx_strdup(NULL, "unknown error");
 	}
@@ -165,10 +174,23 @@ static void	zbx_db_errlog(zbx_err_codes_t zbx_errno, int db_errno, const char *d
  * Return value: last database error message                                  *
  *                                                                            *
  ******************************************************************************/
-
 const char	*zbx_db_last_strerr(void)
 {
 	return last_db_strerror;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_last_errcode                                              *
+ *                                                                            *
+ * Purpose: get last error code returned by database                          *
+ *                                                                            *
+ * Return value: last database error code                                     *
+ *                                                                            *
+ ******************************************************************************/
+zbx_err_codes_t	zbx_db_last_errcode(void)
+{
+	return last_db_errcode;
 }
 
 #if defined(HAVE_ORACLE)
@@ -1389,7 +1411,7 @@ int	zbx_db_statement_execute(int iters)
 	}
 
 	if (OCI_SUCCESS != (err = zbx_oracle_statement_execute(iters, &nrows)))
-		ret = OCI_handle_sql_error(ERR_Z3007, err, NULL);
+		ret = OCI_handle_sql_error((ORA_ERR_UNIQ_CONSTRAINT == err ? ERR_Z3008 : ERR_Z3007), err, NULL);
 	else
 		ret = (int)nrows;
 
@@ -1421,7 +1443,6 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	int	ret = ZBX_DB_OK;
 	double	sec = 0;
 #if defined(HAVE_MYSQL)
-	int		status;
 #elif defined(HAVE_ORACLE)
 	sword		err = OCI_SUCCESS;
 #elif defined(HAVE_POSTGRESQL)
@@ -1442,7 +1463,8 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 
 	if (ZBX_DB_OK != txn_error)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "ignoring query [txnlev:%d] [%s] within failed transaction", txn_level, sql);
+		zabbix_log(LOG_LEVEL_DEBUG, "ignoring query [txnlev:%d] [%s] within failed transaction", txn_level,
+				sql);
 		ret = ZBX_DB_FAIL;
 		goto clean;
 	}
@@ -1457,14 +1479,19 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	}
 	else
 	{
-		if (0 != (status = mysql_query(conn, sql)))
+		zbx_err_codes_t	errcode;
+
+		if (0 != mysql_query(conn, sql))
 		{
-			zbx_db_errlog(ERR_Z3005, mysql_errno(conn), mysql_error(conn), sql);
+			errcode = (ER_DUP_ENTRY == mysql_errno(conn) ? ERR_Z3008 : ERR_Z3005);
+			zbx_db_errlog(errcode, mysql_errno(conn), mysql_error(conn), sql);
 
 			ret = (SUCCEED == is_recoverable_mysql_error() ? ZBX_DB_DOWN : ZBX_DB_FAIL);
 		}
 		else
 		{
+			int	status;
+
 			do
 			{
 				if (0 != mysql_field_count(conn))
@@ -1478,7 +1505,9 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 				/* more results? 0 = yes (keep looping), -1 = no, >0 = error */
 				if (0 < (status = mysql_next_result(conn)))
 				{
-					zbx_db_errlog(ERR_Z3005, mysql_errno(conn), mysql_error(conn), sql);
+					errcode = (ER_DUP_ENTRY == mysql_errno(conn) ? ERR_Z3008 : ERR_Z3005);
+					zbx_db_errlog(errcode, mysql_errno(conn), mysql_error(conn), sql);
+
 					ret = (SUCCEED == is_recoverable_mysql_error() ? ZBX_DB_DOWN : ZBX_DB_FAIL);
 				}
 			}
@@ -1495,7 +1524,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	}
 
 	if (OCI_SUCCESS != err)
-		ret = OCI_handle_sql_error(ERR_Z3005, err, sql);
+		ret = OCI_handle_sql_error((err == ORA_ERR_UNIQ_CONSTRAINT ? ERR_Z3008 : ERR_Z3005), err, sql);
 
 #elif defined(HAVE_POSTGRESQL)
 	result = PQexec(conn,sql);
@@ -1507,8 +1536,16 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	}
 	else if (PGRES_COMMAND_OK != PQresultStatus(result))
 	{
+		zbx_err_codes_t	errcode;
+
 		zbx_postgresql_error(&error, result);
-		zbx_db_errlog(ERR_Z3005, 0, error, sql);
+
+		if (0 == zbx_strcmp_null(PQresultErrorField(result, PG_DIAG_SQLSTATE), "23505"))
+			errcode = ERR_Z3008;
+		else
+			errcode = ERR_Z3005;
+
+		zbx_db_errlog(errcode, 0, error, sql);
 		zbx_free(error);
 
 		ret = (SUCCEED == is_recoverable_postgresql_error(conn, result) ? ZBX_DB_DOWN : ZBX_DB_FAIL);
@@ -1589,6 +1626,8 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 #if defined(HAVE_ORACLE)
 	sword		err = OCI_SUCCESS;
 	ub4		prefetch_rows = 200, counter;
+
+	ZBX_UNUSED(counter);
 #elif defined(HAVE_POSTGRESQL)
 	char		*error = NULL;
 #elif defined(HAVE_SQLITE3)
@@ -2518,6 +2557,7 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 
 	zbx_json_addstring(json, "min_version", info->friendly_min_version, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(json, "max_version", info->friendly_max_version, ZBX_JSON_TYPE_STRING);
+	zbx_json_addint64(json, "history_pk", info->history_pk);
 
 	if (NULL != info->friendly_min_supported_version)
 	{

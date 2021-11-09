@@ -22,7 +22,6 @@ require_once dirname(__FILE__).'/testGeneric.php';
 require_once dirname(__FILE__).'/testGraphAxis.php';
 require_once dirname(__FILE__).'/testPageDashboard.php';
 require_once dirname(__FILE__).'/testPageDashboardWidgets.php';
-require_once dirname(__FILE__).'/testPageOverview.php';
 require_once dirname(__FILE__).'/testPageLatestData.php';
 require_once dirname(__FILE__).'/testPageWeb.php';
 require_once dirname(__FILE__).'/testPageProblems.php';
@@ -89,7 +88,6 @@ require_once dirname(__FILE__).'/testFormAdministrationGeneralMacros.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralOtherParams.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralRegexp.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralTrigDisplOptions.php';
-require_once dirname(__FILE__).'/testFormAdministrationGeneralInstallation.php';
 require_once dirname(__FILE__).'/testFormAdministrationMediaTypes.php';
 require_once dirname(__FILE__).'/testFormAdministrationMediaTypeMessageTemplates.php';
 require_once dirname(__FILE__).'/testFormAdministrationMediaTypeWebhook.php';
@@ -233,7 +231,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageMassUpdateItemPrototypes');
 		$suite->addTestSuite('testPageMonitoringHosts');
 		$suite->addTestSuite('testPageNetworkDiscovery');
-		$suite->addTestSuite('testPageOverview');
 /*
 		$suite->addTestSuite('testPageQueueDetails');
 		$suite->addTestSuite('testPageQueueOverview');
@@ -264,7 +261,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormAdministrationGeneralOtherParams');
 		$suite->addTestSuite('testFormAdministrationGeneralRegexp');
 		$suite->addTestSuite('testFormAdministrationGeneralTrigDisplOptions');
-		$suite->addTestSuite('testFormAdministrationGeneralInstallation');
 		$suite->addTestSuite('testFormAdministrationMediaTypes');
 		$suite->addTestSuite('testFormAdministrationMediaTypeMessageTemplates');
 		$suite->addTestSuite('testFormAdministrationMediaTypeWebhook');

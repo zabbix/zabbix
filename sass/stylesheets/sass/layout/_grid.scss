@@ -44,6 +44,10 @@ main {
 	position: relative;
 	min-width: 1200px;
 	padding: 10px;
+
+	> .container:not(:first-of-type) {
+		margin-top: 10px;
+	}
 }
 
 footer {
@@ -52,4 +56,8 @@ footer {
 
 output {
 	display: block;
+}
+
+.container {
+	background: $ui-bg-color;
 }

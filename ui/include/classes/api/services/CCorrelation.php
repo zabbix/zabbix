@@ -128,6 +128,12 @@ class CCorrelation extends CApiService {
 	 * @return array
 	 */
 	public function create($correlations) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('No permissions to call "%1$s.%2$s".', 'correlation', __FUNCTION__)
+			);
+		}
+
 		self::validateCreate($correlations);
 
 		$ins_correlations = [];
@@ -403,6 +409,12 @@ class CCorrelation extends CApiService {
 	 * @return array
 	 */
 	public function update(array $correlations): array {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('No permissions to call "%1$s.%2$s".', 'correlation', __FUNCTION__)
+			);
+		}
+
 		self::validateUpdate($correlations, $db_correlations);
 
 		$upd_correlations = [];
@@ -443,6 +455,12 @@ class CCorrelation extends CApiService {
 	 * @return array
 	 */
 	public function delete(array $correlationids): array {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('No permissions to call "%1$s.%2$s".', 'correlation', __FUNCTION__)
+			);
+		}
+
 		self::validateDelete($correlationids, $db_correlations);
 
 		DB::delete('correlation', ['correlationid' => $correlationids]);

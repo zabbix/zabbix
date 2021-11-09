@@ -19,7 +19,6 @@
 
 
 var globalAllObjForViewSwitcher = {};
-
 var CViewSwitcher = function(objId, objAction, confData, disableDDItems) {
 	this.mainObj = document.getElementById(objId);
 	this.objAction = objAction;
@@ -68,22 +67,35 @@ CViewSwitcher.prototype = {
 	rebuildView: function(e) {
 		var myValue = this.objValue(this.mainObj);
 
-		// enable previously disabled dropdown items
+		// Enable previously disabled dropdown items.
 		if (this.disableDDItems && this.disableDDItems[this.lastValue]) {
 			for (var DDi in this.disableDDItems[this.lastValue]) {
+				if (jQuery('#' + DDi).length == 0) {
+					continue;
+				}
+
 				jQuery('#' + DDi).get(0).getOptions().map((opt) => opt.disabled = false);
 			}
 		}
 
-		// disable dropdown items
+		// Disable dropdown items.
 		if (this.disableDDItems && this.disableDDItems[myValue]) {
 			for (var DDi in this.disableDDItems[myValue]) {
 				var DD = jQuery('#' + DDi);
 
+				if (DD.length == 0) {
+					continue;
+				}
+
 				for (var Oi in this.disableDDItems[myValue][DDi]) {
+					if (DD.get(0).getOptionByValue(this.disableDDItems[myValue][DDi][Oi]) === null) {
+						continue;
+					}
+
 					DD.get(0).getOptionByValue(this.disableDDItems[myValue][DDi][Oi]).disabled = true;
 				}
-				// if selected option unavailable set to first available
+
+				// If selected option unavailable set to first available.
 				if (DD.get(0).getOptionByValue(DD.val()).disabled) {
 					for (let opt of DD.get(0).getOptions()) {
 						if (!opt.disabled) {
@@ -91,6 +103,7 @@ CViewSwitcher.prototype = {
 							break;
 						}
 					}
+
 					DD.trigger(this.objAction);
 				}
 			}
