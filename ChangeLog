@@ -12,6 +12,7 @@ A.F....... [ZBXNEXT-6470,ZBXNEXT-6920] implemented audit logging of action API o
 .........T [ZBXNEXT-7001] added support High availability cluster in Zabbix server health/Remote Zabbix server health template (abakaldin)
 
 Bug fixes:
+A......... [ZBX-20186] fixed incorrect count of result rows reported by API (jfreibergs)
 .......PS. [ZBX-20097] added celsius support to vmware unitInfo (asestakovs)
 .......PS. [ZBX-18944] fixed the fields size for LLD validation of triggers.description and item_preproc.params (ssimonenko)
 .......PS. [ZBX-20085] fixed build on Solaris; thanks to Yuuki Enomoto for the patch (vso)
