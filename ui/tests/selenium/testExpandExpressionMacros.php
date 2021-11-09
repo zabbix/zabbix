@@ -30,16 +30,16 @@ class testExpandExpressionMacros extends CWebTest {
 		protected static $data = [
 			'hostgroupid',
 			'hostids' => [
-				'last',
-				'avg',
-				'min',
-				'max'
+				'last' => null,
+				'avg' => null,
+				'min' => null,
+				'max' => null
 			],
 			'itemids' => [
-				'last',
-				'avg',
-				'min',
-				'max'
+				'last' => null,
+				'avg' => null,
+				'min' => null,
+				'max' => null
 			],
 			'mapid'
 		];
@@ -161,17 +161,25 @@ class testExpandExpressionMacros extends CWebTest {
 		$time = time() - 100;
 		$last_time = time();
 
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$data['itemids']['last'].", ".$time.", 2, 0)");
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$data['itemids']['last'].", ".$last_time.", 4, 0)");
+		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".zbx_dbstr(self::$data['itemids']['last']).
+				", ".zbx_dbstr($time).", 2, 0)");
+		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".zbx_dbstr(self::$data['itemids']['last']).
+				", ".$last_time.", 4, 0)");
 
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$data['itemids']['avg'].", ".$time.", 3, 0)");
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$data['itemids']['avg'].", ".$last_time.", 5, 0)");
+		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".zbx_dbstr(self::$data['itemids']['avg']).
+				", ".zbx_dbstr($time).", 3, 0)");
+		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".zbx_dbstr(self::$data['itemids']['avg']).
+				", ".zbx_dbstr($last_time).", 5, 0)");
 
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$data['itemids']['min'].", ".$time.", 1, 0)");
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$data['itemids']['min'].", ".$last_time.", 3, 0)");
+		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".zbx_dbstr(self::$data['itemids']['min']).
+				", ".zbx_dbstr($time).", 1, 0)");
+		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".zbx_dbstr(self::$data['itemids']['min']).
+				", ".zbx_dbstr($last_time).", 3, 0)");
 
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$data['itemids']['max'].", ".$time.", 7, 0)");
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".self::$data['itemids']['max'].", ".$last_time.", 2, 0)");
+		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".zbx_dbstr(self::$data['itemids']['max']).
+				", ".zbx_dbstr($time).", 7, 0)");
+		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".zbx_dbstr(self::$data['itemids']['max']).
+				", ".zbx_dbstr($last_time).", 2, 0)");
 	}
 
 	/**
@@ -223,44 +231,44 @@ class testExpandExpressionMacros extends CWebTest {
 				'selements' =>  [
 					// Host 'Host for expression macro Avg'.
 					[
-						'selementid' => '20',
+						'selementid' => 20,
 						'elements' => [
 							['hostid' => self::$data['hostids']['avg']]
 						],
 						'elementtype' => 0,
-						'iconid_off' => '151',
+						'iconid_off' => 151,
 						'label' => '{?avg(/{HOST.HOST}/trapper,1h)}',
-						'x' => '139',
-						'y' => '27'
+						'x' => 139,
+						'y' => 27
 					],
 					// Image.
 					[
-						'selementid' => '21',
+						'selementid' => 21,
 						'elementtype' => 4,
-						'iconid_off' => '6',
+						'iconid_off' => 6,
 						'label' => '{?last(/Host for expression macro Last/trapper)}',
-						'x' => '250',
-						'y' => '350'
+						'x' => 250,
+						'y' => 350
 					],
 					// Host 'Host for expression macro Min'.
 					[
-						'selementid' => '22',
+						'selementid' => 22,
 						'elements' => [
 							['hostid' => self::$data['hostids']['min']]
 						],
 						'elementtype' => 0,
-						'iconid_off' => '151',
+						'iconid_off' => 151,
 						'label' => '{?min(/{HOST.HOST}/trapper,1d)}',
-						'x' => '89',
-						'y' => '377',
-						'iconid_off' => '141'
+						'x' => 89,
+						'y' => 377,
+						'iconid_off' => 141
 					],
 				],
 				'links' => [
 					// Link between 'Host for expression macro Avg' and 'Host for expression macro Min'.
 					[
-						'selementid1' => '20',
-						'selementid2' => '22',
+						'selementid1' => 20,
+						'selementid2' => 22,
 						'label' => '{?max(/Host for expression macro Max/trapper,1w)}',
 					]
 				]
