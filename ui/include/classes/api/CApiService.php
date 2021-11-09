@@ -414,13 +414,17 @@ class CApiService {
 	}
 
 	/**
-	 * Returns DISTINCT modifier for sql statements with multiple joins.
+	 * Returns DISTINCT modifier for sql statements with multiple joins and without aggregations.
 	 *
 	 * @param array $sql_parts  An SQL parts array.
 	 *
 	 * @return string
 	 */
 	protected static function dbDistinct(array $sql_parts) {
+		if (preg_grep('/^COUNT\(/', $sql_parts['select'])) {
+			return '';
+		}
+
 		$count = count($sql_parts['from']);
 
 		if ($count == 1 && array_key_exists('left_join', $sql_parts)) {
