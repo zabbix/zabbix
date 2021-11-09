@@ -201,7 +201,7 @@ class testExpandExpressionMacros extends CWebTest {
 			'x' => 78,
 			'y' => 33,
 			'width' => 1144,
-			'height' => 297
+			'height' => 305
 		];
 		$this->assertScreenshotExcept($this->waitUntilGraphIsLoaded(), $covered_region, $data['host_name']);
 	}
