@@ -32,7 +32,8 @@ class CNumberParser extends CParser {
 	private $options = [
 		'with_minus' => true,
 		'with_float' => true,
-		'with_suffix' => false
+		'with_suffix' => false,
+		'with_year' => false
 	];
 
 	/**
@@ -54,7 +55,7 @@ class CNumberParser extends CParser {
 	 *
 	 * @var string
 	 */
-	private static $suffixes = ZBX_TIME_SUFFIXES.ZBX_BYTE_SUFFIXES;
+	private $suffixes = ZBX_BYTE_SUFFIXES;
 
 	/**
 	 * Suffix multiplier table for value calculation.
@@ -65,6 +66,7 @@ class CNumberParser extends CParser {
 
 	public function __construct(array $options = []) {
 		$this->options = array_replace($this->options, array_intersect_key($options, $this->options));
+		$this->suffixes .= $this->options['with_year'] ? ZBX_TIME_SUFFIXES_WITH_YEAR : ZBX_TIME_SUFFIXES;
 	}
 
 	/**
@@ -87,7 +89,7 @@ class CNumberParser extends CParser {
 
 		$pattern = $this->options['with_float'] ? ZBX_PREG_NUMBER : ZBX_PREG_INT;
 		$pattern = $this->options['with_suffix']
-			? '/^'.$pattern.'(?<suffix>['.self::$suffixes.'])?/'
+			? '/^'.$pattern.'(?<suffix>['.$this->suffixes.'])?/'
 			: '/^'.$pattern.'/';
 
 		if (!preg_match($pattern, $fragment, $matches)) {

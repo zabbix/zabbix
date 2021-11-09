@@ -103,7 +103,8 @@ class CHistFunctionParser extends CParser {
 		}
 		$this->number_parser = new CNumberParser([
 			'with_minus' => true,
-			'with_suffix' => true
+			'with_suffix' => true,
+			'with_year' => true
 		]);
 	}
 

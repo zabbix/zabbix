@@ -64,7 +64,9 @@ class CHistFunctionValidator extends CValidator {
 			_('invalid second parameter in function "%1$s"'),
 			_('invalid third parameter in function "%1$s"'),
 			_('invalid fourth parameter in function "%1$s"'),
-			_('invalid fifth parameter in function "%1$s"')
+			_('invalid fifth parameter in function "%1$s"'),
+			_('invalid sixth parameter in function "%1$s"'),
+			_('invalid seventh parameter in function "%1$s"')
 		];
 
 		if (!array_key_exists($token['data']['function'], $this->options['parameters'])) {

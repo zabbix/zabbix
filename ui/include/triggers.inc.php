@@ -1671,6 +1671,7 @@ function get_item_function_info(string $expr) {
 		'trendcount' => $rules['numeric'],
 		'trendmax' => $rules['numeric'],
 		'trendmin' => $rules['numeric'],
+		'trendstl' => $rules['numeric'],
 		'trendsum' => $rules['numeric'],
 		'varpop' => $rules['numeric_as_float'],
 		'varsamp' => $rules['numeric_as_float']
