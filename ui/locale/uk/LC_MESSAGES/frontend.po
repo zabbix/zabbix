@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-05 20:05+0200\n"
+"POT-Creation-Date: 2021-11-09 16:59+0200\n"
 "PO-Revision-Date: 2016-02-09 16:27+0300\n"
 "Last-Translator: Oleksii <oleksii.zagorskyi@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -7590,7 +7590,7 @@ msgstr "Історія"
 msgid "History and trends compression"
 msgstr ""
 
-#: include/classes/api/services/CHistory.php:359
+#: include/classes/api/services/CHistory.php:353
 msgid "History cleanup is not supported if compression is enabled"
 msgstr ""
 
@@ -12339,7 +12339,7 @@ msgstr ""
 #: include/classes/api/services/CGraphPrototype.php:369
 #: include/classes/api/services/CGraphPrototype.php:457
 #: include/classes/api/services/CGraphPrototype.php:519
-#: include/classes/api/services/CHistory.php:371
+#: include/classes/api/services/CHistory.php:365
 #: include/classes/api/services/CHostBase.php:56
 #: include/classes/api/services/CHostBase.php:533
 #: include/classes/api/services/CHostGeneral.php:66
@@ -16260,7 +16260,7 @@ msgstr "Сортування записів за"
 msgid "Sort order (0->999)"
 msgstr "Порядок сортування (0->999)"
 
-#: include/classes/api/CApiService.php:588
+#: include/classes/api/CApiService.php:592
 #, c-format
 msgid "Sorting by field \"%1$s\" not allowed."
 msgstr "Сортування по полю \"%1$s\" не дозволено."

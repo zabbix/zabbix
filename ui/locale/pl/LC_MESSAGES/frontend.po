@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-05 20:05+0200\n"
+"POT-Creation-Date: 2021-11-09 16:59+0200\n"
 "PO-Revision-Date: 2014-06-04 11:22+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zetosoftware.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -7594,7 +7594,7 @@ msgstr "Historia"
 msgid "History and trends compression"
 msgstr "Kompresja historii i zmian"
 
-#: include/classes/api/services/CHistory.php:359
+#: include/classes/api/services/CHistory.php:353
 msgid "History cleanup is not supported if compression is enabled"
 msgstr "Czyszczenie historii nie jest wspierane jeśli kompresja jest włączona"
 
@@ -12343,7 +12343,7 @@ msgstr "Brak uprawnień do wywołania \"%1$s.%2$s\"."
 #: include/classes/api/services/CGraphPrototype.php:369
 #: include/classes/api/services/CGraphPrototype.php:457
 #: include/classes/api/services/CGraphPrototype.php:519
-#: include/classes/api/services/CHistory.php:371
+#: include/classes/api/services/CHistory.php:365
 #: include/classes/api/services/CHostBase.php:56
 #: include/classes/api/services/CHostBase.php:533
 #: include/classes/api/services/CHostGeneral.php:66
@@ -16264,7 +16264,7 @@ msgstr "Sortuj pozycje wg"
 msgid "Sort order (0->999)"
 msgstr "Porządek sortowania (0->999)"
 
-#: include/classes/api/CApiService.php:588
+#: include/classes/api/CApiService.php:592
 #, c-format
 msgid "Sorting by field \"%1$s\" not allowed."
 msgstr "Sortowanie według pola \"%1$s\" jest zabronione."
