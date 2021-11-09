@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-05 20:05+0200\n"
-"PO-Revision-Date: 2021-10-27 12:44+0300\n"
+"POT-Creation-Date: 2021-11-09 16:59+0200\n"
+"PO-Revision-Date: 2021-11-08 13:50+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1635331497.000000\n"
+"X-POOTLE-MTIME: 1636372253.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:142
@@ -997,7 +997,7 @@ msgstr "エージェントのインターフェース"
 
 #: include/classes/data/CItemData.php:844
 msgid "Agent variant check. Returns 1 - for Zabbix agent; 2 - for Zabbix agent 2"
-msgstr ""
+msgstr "エージェント種別チェック。返却値は1 - Zabbixエージェント；2 - Zabbixエージェント2"
 
 #: include/classes/widgets/CWidgetHelper.php:1163
 msgid "Aggregate"
@@ -7426,7 +7426,7 @@ msgstr "ヒストリ"
 msgid "History and trends compression"
 msgstr "ヒストリとトレンドの圧縮"
 
-#: include/classes/api/services/CHistory.php:359
+#: include/classes/api/services/CHistory.php:353
 msgid "History cleanup is not supported if compression is enabled"
 msgstr "圧縮が有効になっているのでヒストリのクリーンアップはサポートされません"
 
@@ -12125,7 +12125,7 @@ msgstr "\"%1$s.%2$s\"を呼び出す権限がありません。"
 #: include/classes/api/services/CGraphPrototype.php:369
 #: include/classes/api/services/CGraphPrototype.php:457
 #: include/classes/api/services/CGraphPrototype.php:519
-#: include/classes/api/services/CHistory.php:371
+#: include/classes/api/services/CHistory.php:365
 #: include/classes/api/services/CHostBase.php:56
 #: include/classes/api/services/CHostBase.php:533
 #: include/classes/api/services/CHostGeneral.php:66
@@ -16029,7 +16029,7 @@ msgstr "次による項目のソート"
 msgid "Sort order (0->999)"
 msgstr "ソート順(0->999)"
 
-#: include/classes/api/CApiService.php:588
+#: include/classes/api/CApiService.php:592
 #, c-format
 msgid "Sorting by field \"%1$s\" not allowed."
 msgstr "フィールド\"%1$s\"による並べ替えは許可されていません。"
