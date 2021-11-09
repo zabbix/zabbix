@@ -24,6 +24,7 @@ require_once dirname(__FILE__).'/../../include/defines.inc.php';
 require_once dirname(__FILE__).'/../../include/hosts.inc.php';
 
 require_once dirname(__FILE__).'/helpers/CDBHelper.php';
+require_once dirname(__FILE__).'/helpers/CConfigHelper.php';
 require_once dirname(__FILE__).'/helpers/CAPIHelper.php';
 require_once dirname(__FILE__).'/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/helpers/CExceptionHelper.php';
@@ -45,14 +46,16 @@ class CTest extends PHPUnit_Framework_TestCase {
 	protected $case_backup = null;
 	// Table that should be backed up at the test case level once (for multiple case executions).
 	protected static $case_backup_once = null;
+	// zabbix.conf.php should be backed up at the test suite level.
+	protected static $suite_backup_config = false;
+	// zabbix.conf.php should be backed up at the test case level.
+	protected $case_backup_config = false;
 	// Name of the last executed test.
 	protected static $last_test_case = null;
 	// Test case data key.
 	protected $data_key = null;
 	// Lists of test case data set keys.
 	protected static $test_data_sets = [];
-	// List of backups to be performed.
-	protected $backup = [];
 	// Test case annotations.
 	protected $annotations = null;
 	// Test case warnings.
@@ -217,6 +220,13 @@ class CTest extends PHPUnit_Framework_TestCase {
 			CDBHelper::backupTables(self::$suite_backup);
 		}
 
+		$suite_backup_config = $this->getAnnotationTokensByName($class_annotations, 'backupConfig');
+
+		if ($suite_backup_config) {
+			self::$suite_backup_config = true;
+			CConfigHelper::backupConfig();
+		}
+
 		self::$skip_suite = false;
 
 		// Callbacks to be performed before test suite execution.
@@ -245,7 +255,6 @@ class CTest extends PHPUnit_Framework_TestCase {
 		static $suite = null;
 		$class_name = get_class($this);
 		$case_name = $this->getName(false);
-		$this->backup = [];
 		self::$warnings = [];
 
 		// Clear contents of error log.
@@ -295,6 +304,13 @@ class CTest extends PHPUnit_Framework_TestCase {
 			if ($case_backup) {
 				$this->case_backup = $case_backup;
 				CDBHelper::backupTables($this->case_backup);
+			}
+
+			$case_backup_config = $this->getAnnotationTokensByName($method_annotations, 'backupConfig');
+
+			if ($case_backup_config) {
+				$this->case_backup_config = true;
+				CConfigHelper::backupConfig();
 			}
 
 			if (self::$last_test_case !== $case_name) {
@@ -355,6 +371,11 @@ class CTest extends PHPUnit_Framework_TestCase {
 	public function onAfterTestCase() {
 		$errors = @file_get_contents(PHPUNIT_ERROR_LOG);
 
+		if ($this->case_backup_config) {
+			CConfigHelper::restoreConfig();
+			$this->case_backup_config = false;
+		}
+
 		if ($this->case_backup !== null) {
 			CDBHelper::restoreTables();
 		}
@@ -383,6 +404,11 @@ class CTest extends PHPUnit_Framework_TestCase {
 	 */
 	public static function onAfterTestSuite() {
 		global $DB;
+
+		if (self::$suite_backup_config) {
+			CConfigHelper::restoreConfig();
+			self::$suite_backup_config = false;
+		}
 
 		if (self::$suite_backup === null && self::$case_backup_once === null && !self::$suite_callbacks['afterOnce']
 				&& !self::$suite_callbacks['after']) {

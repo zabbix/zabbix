@@ -548,7 +548,7 @@ and are waiting to be executed.</description>
                <name>System description</name>
                <type>ZABBIX_ACTIVE</type>
                <key>system.uname</key>
-               <delay>1h</delay>
+               <delay>15m</delay>
                <history>2w</history>
                <trends>0</trends>
                <value_type>CHAR</value_type>

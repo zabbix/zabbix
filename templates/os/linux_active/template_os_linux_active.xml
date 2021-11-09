@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-10-21T06:23:05Z</date>
+   <date>2021-10-27T14:45:15Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -1061,7 +1061,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1h</params>
+                     <params>12h</params>
                   </step>
                </preprocessing>
                <triggers>
@@ -1177,7 +1177,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <name>System description</name>
                <type>ZABBIX_ACTIVE</type>
                <key>system.uname</key>
-               <delay>1h</delay>
+               <delay>15m</delay>
                <history>2w</history>
                <trends>0</trends>
                <value_type>CHAR</value_type>
@@ -1190,7 +1190,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <params>12h</params>
                   </step>
                </preprocessing>
             </item>
@@ -1806,7 +1806,7 @@ and {Template Module Linux network interfaces by Zabbix agent active:net.if.out[
             </macro>
             <macro>
                <macro>{$NET.IF.IFNAME.NOT_MATCHES}</macro>
-               <value>(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9a-z]+$|docker[0-9]+|br-[a-z0-9]{12})</value>
+               <value>(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9A-z]+$|docker[0-9]+|br-[a-z0-9]{12})</value>
                <description>Filter out loopbacks, nulls, docker veth links and docker0 bridge by default</description>
             </macro>
          </macros>

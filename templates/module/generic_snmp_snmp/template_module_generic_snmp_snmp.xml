@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-06-05T01:27:48Z</date>
+   <date>2021-10-25T11:29:56Z</date>
    <groups>
       <group>
          <name>Templates/Modules</name>
@@ -16,7 +16,7 @@
 MIBs used:&#13;
 SNMPv2-MIB&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.39</description>
          <templates>
             <template>
                <name>Template Module ICMP Ping</name>
@@ -43,7 +43,7 @@ Template tooling version used: 0.36</description>
                <history>2w</history>
                <trends>0</trends>
                <value_type>LOG</value_type>
-               <description>Item is used to collect all SNMP traps unmatched by other snmptrap items</description>
+               <description>The item is used to collect all SNMP traps unmatched by other snmptrap items</description>
                <applications>
                   <application>
                      <name>General</name>
@@ -56,7 +56,7 @@ Template tooling version used: 0.36</description>
                <type>SNMP_AGENT</type>
                <snmp_oid>1.3.6.1.2.1.1.4.0</snmp_oid>
                <key>system.contact[sysContact.0]</key>
-               <delay>1h</delay>
+               <delay>15m</delay>
                <history>2w</history>
                <trends>0</trends>
                <value_type>CHAR</value_type>
@@ -71,7 +71,7 @@ The textual identification of the contact person for this managed node, together
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <params>12h</params>
                   </step>
                </preprocessing>
             </item>
@@ -80,7 +80,7 @@ The textual identification of the contact person for this managed node, together
                <type>SNMP_AGENT</type>
                <snmp_oid>1.3.6.1.2.1.1.1.0</snmp_oid>
                <key>system.descr[sysDescr.0]</key>
-               <delay>1h</delay>
+               <delay>15m</delay>
                <history>2w</history>
                <trends>0</trends>
                <value_type>CHAR</value_type>
@@ -96,7 +96,7 @@ networking software.</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <params>12h</params>
                   </step>
                </preprocessing>
             </item>
@@ -105,7 +105,7 @@ networking software.</description>
                <type>SNMP_AGENT</type>
                <snmp_oid>1.3.6.1.2.1.1.6.0</snmp_oid>
                <key>system.location[sysLocation.0]</key>
-               <delay>1h</delay>
+               <delay>15m</delay>
                <history>2w</history>
                <trends>0</trends>
                <value_type>CHAR</value_type>
@@ -120,7 +120,7 @@ The physical location of this node (e.g., `telephone closet, 3rd floor').  If th
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1h</params>
+                     <params>12h</params>
                   </step>
                </preprocessing>
             </item>
@@ -129,7 +129,7 @@ The physical location of this node (e.g., `telephone closet, 3rd floor').  If th
                <type>SNMP_AGENT</type>
                <snmp_oid>1.3.6.1.2.1.1.5.0</snmp_oid>
                <key>system.name</key>
-               <delay>1h</delay>
+               <delay>15m</delay>
                <history>2w</history>
                <trends>0</trends>
                <value_type>CHAR</value_type>
@@ -144,7 +144,7 @@ An administratively-assigned name for this managed node.By convention, this is t
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1h</params>
+                     <params>12h</params>
                   </step>
                </preprocessing>
                <triggers>
@@ -176,7 +176,7 @@ The vendor's authoritative identification of the network management subsystem co
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1h</params>
+                     <params>12h</params>
                   </step>
                </preprocessing>
             </item>
@@ -223,6 +223,11 @@ The time (in hundredths of a second) since the network management portion of the
                <type>INTERNAL</type>
                <key>zabbix[host,snmp,available]</key>
                <history>7d</history>
+               <description>Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.&#13;
+Possible value:&#13;
+0 - not available&#13;
+1 - available&#13;
+2 - unknown</description>
                <applications>
                   <application>
                      <name>Status</name>

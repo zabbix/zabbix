@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-05-11T18:40:35Z</date>
+   <date>2021-10-26T15:23:48Z</date>
    <groups>
       <group>
          <name>Templates/Server hardware</name>
@@ -24,7 +24,7 @@ IF-MIB&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/418396-discussion-thread-for-official-zabbix-templates-for-cisco&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Server hardware</name>
@@ -68,10 +68,9 @@ Template tooling version used: 0.38</description>
                <type>SNMP_AGENT</type>
                <snmp_oid>1.3.6.1.2.1.1.4.0</snmp_oid>
                <key>cisco.ucs.contact[sysContact.0]</key>
-               <delay>1h</delay>
+               <delay>15m</delay>
                <history>2w</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: SNMPv2-MIB&#13;
 The textual identification of the contact person for this managed&#13;
@@ -86,7 +85,7 @@ information is known, the value is the zero-length string.</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <params>12h</params>
                   </step>
                </preprocessing>
             </item>
@@ -95,10 +94,9 @@ information is known, the value is the zero-length string.</description>
                <type>SNMP_AGENT</type>
                <snmp_oid>1.3.6.1.2.1.1.1.0</snmp_oid>
                <key>cisco.ucs.descr[sysDescr.0]</key>
-               <delay>1h</delay>
+               <delay>15m</delay>
                <history>2w</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: SNMPv2-MIB&#13;
 A textual description of the entity. This value should&#13;
@@ -112,7 +110,7 @@ networking software.</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <params>12h</params>
                   </step>
                </preprocessing>
             </item>
@@ -124,7 +122,6 @@ networking software.</description>
                <delay>15m</delay>
                <history>2w</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: SNMPv2-MIB&#13;
 The physical location of this node (e.g., `telephone closet,&#13;
@@ -138,7 +135,7 @@ The physical location of this node (e.g., `telephone closet,&#13;
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1h</params>
+                     <params>12h</params>
                   </step>
                </preprocessing>
             </item>
@@ -150,7 +147,6 @@ The physical location of this node (e.g., `telephone closet,&#13;
                <delay>15m</delay>
                <history>2w</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: SNMPv2-MIB&#13;
 An administratively-assigned name for this managed node.By&#13;
@@ -165,7 +161,7 @@ the value is the zero-length string.</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1h</params>
+                     <params>12h</params>
                   </step>
                </preprocessing>
                <triggers>
@@ -186,7 +182,6 @@ the value is the zero-length string.</description>
                <delay>15m</delay>
                <history>2w</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>MIB: SNMPv2-MIB&#13;
 The vendor's authoritative identification of the network management&#13;
@@ -203,7 +198,7 @@ to its 'Fred Router'.</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1h</params>
+                     <params>12h</params>
                   </step>
                </preprocessing>
             </item>
@@ -215,7 +210,6 @@ to its 'Fred Router'.</description>
                <delay>30s</delay>
                <history>2w</history>
                <trends>0d</trends>
-               <status>ENABLED</status>
                <units>uptime</units>
                <description>MIB: SNMPv2-MIB&#13;
 The time in seconds since the network management&#13;
@@ -253,9 +247,8 @@ portion of the system was last re-initialized.</description>
                <key>snmptrap.fallback</key>
                <history>2w</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>LOG</value_type>
-               <description>Item is used to collect all SNMP traps unmatched by other snmptrap items</description>
+               <description>The item is used to collect all SNMP traps unmatched by other snmptrap items</description>
                <applications>
                   <application>
                      <name>General</name>
@@ -268,7 +261,6 @@ portion of the system was last re-initialized.</description>
                <type>INTERNAL</type>
                <key>zabbix[host,snmp,available]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.&#13;
 Possible value:&#13;
 0 - not available&#13;
@@ -315,7 +307,6 @@ Possible value:&#13;
                      <key>cisco.ucs.hw.diskarray.cache.battery.status[cucsStorageRaidBatteryOperability.{#SNMPINDEX}]</key>
                      <history>1w</history>
                      <trends>0d</trends>
-                     <status>ENABLED</status>
                      <description>MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB</description>
                      <applications>
                         <application>
@@ -355,7 +346,6 @@ Possible value:&#13;
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Array controller discovery</name>
@@ -372,7 +362,6 @@ Possible value:&#13;
                      <key>cisco.ucs.hw.diskarray.model[cucsStorageControllerModel.{#SNMPINDEX}]</key>
                      <delay>1d</delay>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB</description>
                      <applications>
@@ -394,7 +383,6 @@ Possible value:&#13;
                      <key>cisco.ucs.hw.diskarray.status[cucsStorageControllerOperState.{#SNMPINDEX}]</key>
                      <history>1w</history>
                      <trends>0d</trends>
-                     <status>ENABLED</status>
                      <description>MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB&#13;
 Cisco UCS storage:RaidBattery:operability managed object property.</description>
                      <applications>
@@ -452,7 +440,6 @@ Cisco UCS storage:RaidBattery:operability managed object property.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>FAN discovery</name>
@@ -469,7 +456,6 @@ Cisco UCS storage:RaidBattery:operability managed object property.</description>
                      <delay>3m</delay>
                      <history>2w</history>
                      <trends>0d</trends>
-                     <status>ENABLED</status>
                      <description>MIB: CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB&#13;
 Cisco UCS equipment:Fan:operState managed object property</description>
                      <applications>
@@ -510,7 +496,6 @@ Cisco UCS equipment:Fan:operState managed object property</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Network interface discovery</name>
@@ -599,7 +584,6 @@ Cisco UCS equipment:Fan:operState managed object property</description>
                      <delay>1h</delay>
                      <history>7d</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>MIB: IF-MIB&#13;
 A textual string containing information about the&#13;
@@ -625,7 +609,6 @@ interface hardware/software.</description>
                      <key>cisco.ucs.if.in.broadcast[ifHCInBroadcastPkts.{#SNMPINDEX}]</key>
                      <delay>3m</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>MIB: IF-MIB&#13;
 The number of packets, delivered by this sub-layer to a&#13;
 higher (sub-)layer, which were addressed to a broadcast&#13;
@@ -654,7 +637,6 @@ times as indicated by the value of ifCounterDiscontinuityTime.</description>
                      <key>cisco.ucs.if.in.discards[ifInDiscards.{#SNMPINDEX}]</key>
                      <delay>3m</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>MIB: IF-MIB&#13;
 The number of inbound packets which were chosen to be discarded&#13;
 even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.&#13;
@@ -680,7 +662,6 @@ and at other times as indicated by the value of ifCounterDiscontinuityTime.</des
                      <key>cisco.ucs.if.in.errors[ifInErrors.{#SNMPINDEX}]</key>
                      <delay>3m</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>MIB: IF-MIB&#13;
 For packet-oriented interfaces, the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.</description>
                      <application_prototypes>
@@ -702,7 +683,6 @@ For packet-oriented interfaces, the number of inbound packets that contained err
                      <key>cisco.ucs.if.in.multicast[ifHCInMulticastPkts.{#SNMPINDEX}]</key>
                      <delay>3m</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>MIB: IF-MIB&#13;
 The number of packets, delivered by this sub-layer to a&#13;
 higher (sub-)layer, which were addressed to a multicast&#13;
@@ -732,7 +712,6 @@ times as indicated by the value of ifCounterDiscontinuityTime.</description>
                      <key>cisco.ucs.if.in[ifHCInOctets.{#SNMPINDEX}]</key>
                      <delay>3m</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>bps</units>
                      <description>MIB: IF-MIB&#13;
 The total number of octets received on the interface, including framing characters. This object is a 64-bit version of ifInOctets. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.</description>
@@ -759,7 +738,6 @@ The total number of octets received on the interface, including framing characte
                      <key>cisco.ucs.if.out.broadcast[ifHCOutBroadcastPkts.{#SNMPINDEX}]</key>
                      <delay>3m</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>MIB: IF-MIB&#13;
 The total number of packets that higher-level protocols&#13;
 requested be transmitted, and which were addressed to a&#13;
@@ -789,7 +767,6 @@ times as indicated by the value of ifCounterDiscontinuityTime.</description>
                      <key>cisco.ucs.if.out.discards[ifOutDiscards.{#SNMPINDEX}]</key>
                      <delay>3m</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>MIB: IF-MIB&#13;
 The number of outbound packets which were chosen to be discarded&#13;
 even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.&#13;
@@ -815,7 +792,6 @@ and at other times as indicated by the value of ifCounterDiscontinuityTime.</des
                      <key>cisco.ucs.if.out.errors[ifOutErrors.{#SNMPINDEX}]</key>
                      <delay>3m</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>MIB: IF-MIB&#13;
 For packet-oriented interfaces, the number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of outbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.</description>
                      <application_prototypes>
@@ -837,7 +813,6 @@ For packet-oriented interfaces, the number of outbound packets that contained er
                      <key>cisco.ucs.if.out.multicast[ifHCOutMulticastPkts.{#SNMPINDEX}]</key>
                      <delay>3m</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <description>MIB: IF-MIB&#13;
 The total number of packets that higher-level protocols&#13;
 requested be transmitted, and which were addressed to a&#13;
@@ -868,7 +843,6 @@ times as indicated by the value of ifCounterDiscontinuityTime.</description>
                      <key>cisco.ucs.if.out[ifHCOutOctets.{#SNMPINDEX}]</key>
                      <delay>3m</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>bps</units>
                      <description>MIB: IF-MIB&#13;
 The total number of octets transmitted out of the interface, including framing characters. This object is a 64-bit version of ifOutOctets.Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.</description>
@@ -896,7 +870,6 @@ The total number of octets transmitted out of the interface, including framing c
                      <delay>5m</delay>
                      <history>7d</history>
                      <trends>0d</trends>
-                     <status>ENABLED</status>
                      <units>bps</units>
                      <description>MIB: IF-MIB&#13;
 An estimate of the interface's current bandwidth in units of 1,000,000 bits per second. If this object reports a value of `n' then the speed of the interface is somewhere in the range of `n-500,000' to`n+499,999'.  For interfaces which do not vary in bandwidth or for those where no accurate estimation can be made, this object should contain the nominal bandwidth. For a sub-layer which has no concept of bandwidth, this object should be zero.</description>
@@ -923,7 +896,6 @@ An estimate of the interface's current bandwidth in units of 1,000,000 bits per 
                      <key>cisco.ucs.if.status[ifOperStatus.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <description>MIB: IF-MIB&#13;
 The current operational state of the interface.&#13;
 - The testing(3) state indicates that no operational packet scan be passed&#13;
@@ -972,7 +944,6 @@ WARNING: if closed manually - won't fire again on next poll, because of .diff.</
                      <delay>1h</delay>
                      <history>7d</history>
                      <trends>0d</trends>
-                     <status>ENABLED</status>
                      <description>MIB: IF-MIB&#13;
 The type of interface.&#13;
 Additional values for ifType are assigned by the Internet Assigned NumbersAuthority (IANA),&#13;
@@ -993,7 +964,6 @@ through updating the syntax of the IANAifType textual convention.</description>
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template Server Cisco UCS Manager SNMP:cisco.ucs.if.in.errors[ifInErrors.{#SNMPINDEX}].min(5m)}&gt;{$IF.ERRORS.WARN:"{#IFNAME}"}&#13;
@@ -1108,7 +1078,6 @@ return JSON.stringify(result);
                      <delay>1h</delay>
                      <history>2w</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB&#13;
 Cisco UCS storage:LocalDisk:deviceType managed object property. Actually returns 'HDD' or 'SSD'.</description>
@@ -1135,7 +1104,6 @@ Cisco UCS storage:LocalDisk:deviceType managed object property. Actually returns
                      <delay>1h</delay>
                      <history>2w</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB&#13;
 Cisco UCS storage:LocalDisk:model managed object property.</description>
@@ -1158,7 +1126,6 @@ Cisco UCS storage:LocalDisk:model managed object property.</description>
                      <key>cisco.ucs.hw.physicaldisk.serialnumber[cucsStorageLocalDiskSerial.{#SNMPINDEX}]</key>
                      <delay>1h</delay>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB&#13;
 Cisco UCS storage:LocalDisk:serial managed object property. Actually returns part number code.</description>
@@ -1191,7 +1158,6 @@ Cisco UCS storage:LocalDisk:serial managed object property. Actually returns par
                      <delay>1h</delay>
                      <history>2w</history>
                      <trends>0d</trends>
-                     <status>ENABLED</status>
                      <units>B</units>
                      <description>MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB&#13;
 Cisco UCS storage:LocalDisk:size managed object property. In MB.</description>
@@ -1218,7 +1184,6 @@ Cisco UCS storage:LocalDisk:size managed object property. In MB.</description>
                      <key>cisco.ucs.hw.physicaldisk.status[cucsStorageLocalDiskDiskState.{#SNMPINDEX}]</key>
                      <delay>3m</delay>
                      <trends>0d</trends>
-                     <status>ENABLED</status>
                      <description>MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB&#13;
 Cisco UCS storage:LocalDisk:diskState managed object property.</description>
                      <applications>
@@ -1237,13 +1202,6 @@ Cisco UCS storage:LocalDisk:diskState managed object property.</description>
                      </preprocessing>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{last()}={$DISK.STATUS.FAIL:"failed"}</expression>
-                           <name>{#DISK_LOCATION}: Physical disk failed</name>
-                           <opdata>Current status: {ITEM.LASTVALUE1}</opdata>
-                           <priority>HIGH</priority>
-                           <description>Please check physical disk for warnings or errors</description>
-                        </trigger_prototype>
-                        <trigger_prototype>
                            <expression>{last()}={$DISK.STATUS.CRIT:"bad"} or {last()}={$DISK.STATUS.CRIT:"predictiveFailure"}</expression>
                            <name>{#DISK_LOCATION}: Physical disk error</name>
                            <opdata>Current status: {ITEM.LASTVALUE1}</opdata>
@@ -1256,10 +1214,16 @@ Cisco UCS storage:LocalDisk:diskState managed object property.</description>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{last()}={$DISK.STATUS.FAIL:"failed"}</expression>
+                           <name>{#DISK_LOCATION}: Physical disk failed</name>
+                           <opdata>Current status: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                           <description>Please check physical disk for warnings or errors</description>
+                        </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>PSU discovery</name>
@@ -1276,7 +1240,6 @@ Cisco UCS storage:LocalDisk:diskState managed object property.</description>
                      <delay>3m</delay>
                      <history>2w</history>
                      <trends>0d</trends>
-                     <status>ENABLED</status>
                      <description>MIB: CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB&#13;
 Cisco UCS equipment:Psu:operState managed object property</description>
                      <applications>
@@ -1317,7 +1280,6 @@ Cisco UCS equipment:Psu:operState managed object property</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature CPU discovery</name>
@@ -1332,7 +1294,6 @@ Cisco UCS equipment:Psu:operState managed object property</description>
                      <snmp_oid>1.3.6.1.4.1.9.9.719.1.41.2.1.10.{#SNMPINDEX}</snmp_oid>
                      <key>cisco.ucs.sensor.temp.value[cucsProcessorEnvStatsTemperature.{#SNMPINDEX}]</key>
                      <delay>3m</delay>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>°C</units>
                      <description>MIB: CISCO-UNIFIED-COMPUTING-PROCESSOR-MIB&#13;
@@ -1350,6 +1311,15 @@ Cisco UCS processor:EnvStats:temperature managed object property</description>
                      </preprocessing>
                      <trigger_prototypes>
                         <trigger_prototype>
+                           <expression>{avg(5m)}&gt;{$TEMP.MAX.CRIT:"CPU"}</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>{max(5m)}&lt;{$TEMP.MAX.CRIT:"CPU"}-3</recovery_expression>
+                           <name>{#SENSOR_LOCATION}: Temperature is above critical threshold: &gt;{$TEMP.MAX.CRIT:"CPU"}</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
                            <expression>{avg(5m)}&gt;{$TEMP.MAX.WARN:"CPU"}</expression>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{max(5m)}&lt;{$TEMP.MAX.WARN:"CPU"}-3</recovery_expression>
@@ -1365,19 +1335,9 @@ Cisco UCS processor:EnvStats:temperature managed object property</description>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
-                        <trigger_prototype>
-                           <expression>{avg(5m)}&gt;{$TEMP.MAX.CRIT:"CPU"}</expression>
-                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                           <recovery_expression>{max(5m)}&lt;{$TEMP.MAX.CRIT:"CPU"}-3</recovery_expression>
-                           <name>{#SENSOR_LOCATION}: Temperature is above critical threshold: &gt;{$TEMP.MAX.CRIT:"CPU"}</name>
-                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                           <priority>HIGH</priority>
-                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
-                        </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature discovery</name>
@@ -1392,7 +1352,6 @@ Cisco UCS processor:EnvStats:temperature managed object property</description>
                      <snmp_oid>1.3.6.1.4.1.9.9.719.1.9.44.1.13.{#SNMPINDEX}</snmp_oid>
                      <key>cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}]</key>
                      <delay>3m</delay>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>°C</units>
                      <description>MIB: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB&#13;
@@ -1409,6 +1368,15 @@ Cisco UCS compute:RackUnitMbTempStats:ioh1Temp managed object property</descript
                         </step>
                      </preprocessing>
                      <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{avg(5m)}&gt;{$TEMP.MAX.CRIT:"Ambient"}</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>{max(5m)}&lt;{$TEMP.MAX.CRIT:"Ambient"}-3</recovery_expression>
+                           <name>{#SENSOR_LOCATION}.IOH: Temperature is above critical threshold: &gt;{$TEMP.MAX.CRIT:"Ambient"}</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                        </trigger_prototype>
                         <trigger_prototype>
                            <expression>{avg(5m)}&gt;{$TEMP.MAX.WARN:"Ambient"}</expression>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
@@ -1440,15 +1408,6 @@ Cisco UCS compute:RackUnitMbTempStats:ioh1Temp managed object property</descript
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
-                        <trigger_prototype>
-                           <expression>{avg(5m)}&gt;{$TEMP.MAX.CRIT:"Ambient"}</expression>
-                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                           <recovery_expression>{max(5m)}&lt;{$TEMP.MAX.CRIT:"Ambient"}-3</recovery_expression>
-                           <name>{#SENSOR_LOCATION}.IOH: Temperature is above critical threshold: &gt;{$TEMP.MAX.CRIT:"Ambient"}</name>
-                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                           <priority>HIGH</priority>
-                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
-                        </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
@@ -1457,7 +1416,6 @@ Cisco UCS compute:RackUnitMbTempStats:ioh1Temp managed object property</descript
                      <snmp_oid>1.3.6.1.4.1.9.9.719.1.9.44.1.4.{#SNMPINDEX}</snmp_oid>
                      <key>cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}]</key>
                      <delay>3m</delay>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>°C</units>
                      <description>MIB: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB&#13;
@@ -1474,6 +1432,15 @@ Temperature readings of testpoint: {#SENSOR_LOCATION}.Ambient</description>
                         </step>
                      </preprocessing>
                      <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{avg(5m)}&gt;{$TEMP.MAX.CRIT:"Ambient"}</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>{max(5m)}&lt;{$TEMP.MAX.CRIT:"Ambient"}-3</recovery_expression>
+                           <name>{#SENSOR_LOCATION}.Ambient: Temperature is above critical threshold: &gt;{$TEMP.MAX.CRIT:"Ambient"}</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                        </trigger_prototype>
                         <trigger_prototype>
                            <expression>{avg(5m)}&gt;{$TEMP.MAX.WARN:"Ambient"}</expression>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
@@ -1505,15 +1472,6 @@ Temperature readings of testpoint: {#SENSOR_LOCATION}.Ambient</description>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
-                        <trigger_prototype>
-                           <expression>{avg(5m)}&gt;{$TEMP.MAX.CRIT:"Ambient"}</expression>
-                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                           <recovery_expression>{max(5m)}&lt;{$TEMP.MAX.CRIT:"Ambient"}-3</recovery_expression>
-                           <name>{#SENSOR_LOCATION}.Ambient: Temperature is above critical threshold: &gt;{$TEMP.MAX.CRIT:"Ambient"}</name>
-                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                           <priority>HIGH</priority>
-                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
-                        </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
@@ -1522,7 +1480,6 @@ Temperature readings of testpoint: {#SENSOR_LOCATION}.Ambient</description>
                      <snmp_oid>1.3.6.1.4.1.9.9.719.1.9.44.1.8.{#SNMPINDEX}</snmp_oid>
                      <key>cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}]</key>
                      <delay>3m</delay>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>°C</units>
                      <description>MIB: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB&#13;
@@ -1539,6 +1496,15 @@ Cisco UCS compute:RackUnitMbTempStats:frontTemp managed object property</descrip
                         </step>
                      </preprocessing>
                      <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{avg(5m)}&gt;{$TEMP.MAX.CRIT:"Ambient"}</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>{max(5m)}&lt;{$TEMP.MAX.CRIT:"Ambient"}-3</recovery_expression>
+                           <name>{#SENSOR_LOCATION}.Front: Temperature is above critical threshold: &gt;{$TEMP.MAX.CRIT:"Ambient"}</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                        </trigger_prototype>
                         <trigger_prototype>
                            <expression>{avg(5m)}&gt;{$TEMP.MAX.WARN:"Ambient"}</expression>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
@@ -1570,15 +1536,6 @@ Cisco UCS compute:RackUnitMbTempStats:frontTemp managed object property</descrip
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
-                        <trigger_prototype>
-                           <expression>{avg(5m)}&gt;{$TEMP.MAX.CRIT:"Ambient"}</expression>
-                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                           <recovery_expression>{max(5m)}&lt;{$TEMP.MAX.CRIT:"Ambient"}-3</recovery_expression>
-                           <name>{#SENSOR_LOCATION}.Front: Temperature is above critical threshold: &gt;{$TEMP.MAX.CRIT:"Ambient"}</name>
-                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                           <priority>HIGH</priority>
-                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
-                        </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
@@ -1587,7 +1544,6 @@ Cisco UCS compute:RackUnitMbTempStats:frontTemp managed object property</descrip
                      <snmp_oid>1.3.6.1.4.1.9.9.719.1.9.44.1.21.{#SNMPINDEX}</snmp_oid>
                      <key>cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}]</key>
                      <delay>3m</delay>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>°C</units>
                      <description>MIB: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB&#13;
@@ -1604,6 +1560,15 @@ Cisco UCS compute:RackUnitMbTempStats:rearTemp managed object property</descript
                         </step>
                      </preprocessing>
                      <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{avg(5m)}&gt;{$TEMP.MAX.CRIT:"Ambient"}</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>{max(5m)}&lt;{$TEMP.MAX.CRIT:"Ambient"}-3</recovery_expression>
+                           <name>{#SENSOR_LOCATION}.Rear: Temperature is above critical threshold: &gt;{$TEMP.MAX.CRIT:"Ambient"}</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                        </trigger_prototype>
                         <trigger_prototype>
                            <expression>{avg(5m)}&gt;{$TEMP.MAX.WARN:"Ambient"}</expression>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
@@ -1635,19 +1600,9 @@ Cisco UCS compute:RackUnitMbTempStats:rearTemp managed object property</descript
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
-                        <trigger_prototype>
-                           <expression>{avg(5m)}&gt;{$TEMP.MAX.CRIT:"Ambient"}</expression>
-                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                           <recovery_expression>{max(5m)}&lt;{$TEMP.MAX.CRIT:"Ambient"}-3</recovery_expression>
-                           <name>{#SENSOR_LOCATION}.Rear: Temperature is above critical threshold: &gt;{$TEMP.MAX.CRIT:"Ambient"}</name>
-                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                           <priority>HIGH</priority>
-                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
-                        </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Unit discovery</name>
@@ -1664,7 +1619,6 @@ Cisco UCS compute:RackUnitMbTempStats:rearTemp managed object property</descript
                      <delay>1h</delay>
                      <history>2w</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>MIB: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB&#13;
 Cisco UCS compute:RackUnit:model managed object property</description>
@@ -1688,7 +1642,6 @@ Cisco UCS compute:RackUnit:model managed object property</description>
                      <delay>1h</delay>
                      <history>2w</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>MIB: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB&#13;
 Cisco UCS compute:RackUnit:serial managed object property</description>
@@ -1721,7 +1674,6 @@ Cisco UCS compute:RackUnit:serial managed object property</description>
                      <delay>30s</delay>
                      <history>2w</history>
                      <trends>0d</trends>
-                     <status>ENABLED</status>
                      <description>MIB: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB&#13;
 Cisco UCS compute:RackUnit:operState managed object property</description>
                      <applications>
@@ -1762,7 +1714,6 @@ Cisco UCS compute:RackUnit:operState managed object property</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Virtual disk discovery</name>
@@ -1779,7 +1730,6 @@ Cisco UCS compute:RackUnit:operState managed object property</description>
                      <key>cisco.ucs.hw.virtualdisk.layout[cucsStorageLocalLunType.{#SNMPINDEX}]</key>
                      <delay>1h</delay>
                      <history>2w</history>
-                     <status>ENABLED</status>
                      <description>MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB&#13;
 Cisco UCS storage:LocalLun:type managed object property</description>
                      <applications>
@@ -1805,7 +1755,6 @@ Cisco UCS storage:LocalLun:type managed object property</description>
                      <delay>1h</delay>
                      <history>2w</history>
                      <trends>0d</trends>
-                     <status>ENABLED</status>
                      <units>B</units>
                      <description>MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB&#13;
 Cisco UCS storage:LocalLun:size managed object property in MB.</description>
@@ -1835,7 +1784,6 @@ Cisco UCS storage:LocalLun:size managed object property in MB.</description>
                      <key>cisco.ucs.hw.virtualdisk.status[cucsStorageLocalLunPresence.{#SNMPINDEX}]</key>
                      <delay>3m</delay>
                      <history>2w</history>
-                     <status>ENABLED</status>
                      <description>MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB&#13;
 Cisco UCS storage:LocalLun:presence managed object property</description>
                      <applications>
@@ -1863,7 +1811,6 @@ Cisco UCS storage:LocalLun:presence managed object property</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
          </discovery_rules>
          <macros>
@@ -2229,6 +2176,91 @@ Cisco UCS storage:LocalLun:presence managed object property</description>
          </mappings>
       </value_map>
       <value_map>
+         <name>CISCO-UNIFIED-COMPUTING-TC-MIB::CucsEquipmentPresence</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>empty</newvalue>
+            </mapping>
+            <mapping>
+               <value>10</value>
+               <newvalue>equipped</newvalue>
+            </mapping>
+            <mapping>
+               <value>11</value>
+               <newvalue>missing</newvalue>
+            </mapping>
+            <mapping>
+               <value>12</value>
+               <newvalue>mismatch</newvalue>
+            </mapping>
+            <mapping>
+               <value>13</value>
+               <newvalue>equippedNotPrimary</newvalue>
+            </mapping>
+            <mapping>
+               <value>14</value>
+               <newvalue>equippedSlave</newvalue>
+            </mapping>
+            <mapping>
+               <value>15</value>
+               <newvalue>mismatchSlave</newvalue>
+            </mapping>
+            <mapping>
+               <value>16</value>
+               <newvalue>missingSlave</newvalue>
+            </mapping>
+            <mapping>
+               <value>20</value>
+               <newvalue>equippedIdentityUnestablishable</newvalue>
+            </mapping>
+            <mapping>
+               <value>21</value>
+               <newvalue>mismatchIdentityUnestablishable</newvalue>
+            </mapping>
+            <mapping>
+               <value>22</value>
+               <newvalue>equippedWithMalformedFru</newvalue>
+            </mapping>
+            <mapping>
+               <value>30</value>
+               <newvalue>inaccessible</newvalue>
+            </mapping>
+            <mapping>
+               <value>40</value>
+               <newvalue>unauthorized</newvalue>
+            </mapping>
+            <mapping>
+               <value>100</value>
+               <newvalue>notSupported</newvalue>
+            </mapping>
+            <mapping>
+               <value>101</value>
+               <newvalue>equippedUnsupported</newvalue>
+            </mapping>
+            <mapping>
+               <value>102</value>
+               <newvalue>equippedDiscNotStarted</newvalue>
+            </mapping>
+            <mapping>
+               <value>103</value>
+               <newvalue>equippedDiscInProgress</newvalue>
+            </mapping>
+            <mapping>
+               <value>104</value>
+               <newvalue>equippedDiscError</newvalue>
+            </mapping>
+            <mapping>
+               <value>105</value>
+               <newvalue>equippedDiscUnknown</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
          <name>CISCO-UNIFIED-COMPUTING-TC-MIB::CucsLsOperState</name>
          <mappings>
             <mapping>
@@ -2366,6 +2398,51 @@ Cisco UCS storage:LocalLun:presence managed object property</description>
          </mappings>
       </value_map>
       <value_map>
+         <name>CISCO-UNIFIED-COMPUTING-TC-MIB::CucsStorageLunType</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>unspecified</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>simple</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>mirror</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>stripe</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>raid</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>stripeParity</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>stripeDualParity</newvalue>
+            </mapping>
+            <mapping>
+               <value>7</value>
+               <newvalue>mirrorStripe</newvalue>
+            </mapping>
+            <mapping>
+               <value>8</value>
+               <newvalue>stripeParityStripe</newvalue>
+            </mapping>
+            <mapping>
+               <value>9</value>
+               <newvalue>stripeDualParityStripe</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
          <name>CISCO-UNIFIED-COMPUTING-TC-MIB::CucsStoragePDriveStatus</name>
          <mappings>
             <mapping>
@@ -2439,136 +2516,6 @@ Cisco UCS storage:LocalLun:presence managed object property</description>
             <mapping>
                <value>17</value>
                <newvalue>lockedForeignConfiguration</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>CISCO-UNIFIED-COMPUTING-TC-MIB::CucsStorageLunType</name>
-         <mappings>
-            <mapping>
-               <value>0</value>
-               <newvalue>unspecified</newvalue>
-            </mapping>
-            <mapping>
-               <value>1</value>
-               <newvalue>simple</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>mirror</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>stripe</newvalue>
-            </mapping>
-            <mapping>
-               <value>4</value>
-               <newvalue>raid</newvalue>
-            </mapping>
-            <mapping>
-               <value>5</value>
-               <newvalue>stripeParity</newvalue>
-            </mapping>
-            <mapping>
-               <value>6</value>
-               <newvalue>stripeDualParity</newvalue>
-            </mapping>
-            <mapping>
-               <value>7</value>
-               <newvalue>mirrorStripe</newvalue>
-            </mapping>
-            <mapping>
-               <value>8</value>
-               <newvalue>stripeParityStripe</newvalue>
-            </mapping>
-            <mapping>
-               <value>9</value>
-               <newvalue>stripeDualParityStripe</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>CISCO-UNIFIED-COMPUTING-TC-MIB::CucsEquipmentPresence</name>
-         <mappings>
-            <mapping>
-               <value>0</value>
-               <newvalue>unknown</newvalue>
-            </mapping>
-            <mapping>
-               <value>1</value>
-               <newvalue>empty</newvalue>
-            </mapping>
-            <mapping>
-               <value>10</value>
-               <newvalue>equipped</newvalue>
-            </mapping>
-            <mapping>
-               <value>11</value>
-               <newvalue>missing</newvalue>
-            </mapping>
-            <mapping>
-               <value>12</value>
-               <newvalue>mismatch</newvalue>
-            </mapping>
-            <mapping>
-               <value>13</value>
-               <newvalue>equippedNotPrimary</newvalue>
-            </mapping>
-            <mapping>
-               <value>14</value>
-               <newvalue>equippedSlave</newvalue>
-            </mapping>
-            <mapping>
-               <value>15</value>
-               <newvalue>mismatchSlave</newvalue>
-            </mapping>
-            <mapping>
-               <value>16</value>
-               <newvalue>missingSlave</newvalue>
-            </mapping>
-            <mapping>
-               <value>20</value>
-               <newvalue>equippedIdentityUnestablishable</newvalue>
-            </mapping>
-            <mapping>
-               <value>21</value>
-               <newvalue>mismatchIdentityUnestablishable</newvalue>
-            </mapping>
-            <mapping>
-               <value>22</value>
-               <newvalue>equippedWithMalformedFru</newvalue>
-            </mapping>
-            <mapping>
-               <value>30</value>
-               <newvalue>inaccessible</newvalue>
-            </mapping>
-            <mapping>
-               <value>40</value>
-               <newvalue>unauthorized</newvalue>
-            </mapping>
-            <mapping>
-               <value>100</value>
-               <newvalue>notSupported</newvalue>
-            </mapping>
-            <mapping>
-               <value>101</value>
-               <newvalue>equippedUnsupported</newvalue>
-            </mapping>
-            <mapping>
-               <value>102</value>
-               <newvalue>equippedDiscNotStarted</newvalue>
-            </mapping>
-            <mapping>
-               <value>103</value>
-               <newvalue>equippedDiscInProgress</newvalue>
-            </mapping>
-            <mapping>
-               <value>104</value>
-               <newvalue>equippedDiscError</newvalue>
-            </mapping>
-            <mapping>
-               <value>105</value>
-               <newvalue>equippedDiscUnknown</newvalue>
             </mapping>
          </mappings>
       </value_map>
