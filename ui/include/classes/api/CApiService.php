@@ -414,13 +414,17 @@ class CApiService {
 	}
 
 	/**
-	 * Returns DISTINCT modifier for sql statements with multiple joins.
+	 * Returns DISTINCT modifier for sql statements with multiple joins and without aggregations.
 	 *
 	 * @param array $sql_parts  An SQL parts array.
 	 *
 	 * @return string
 	 */
 	protected static function dbDistinct(array $sql_parts) {
+		if (preg_grep('/^COUNT\(/', $sql_parts['select'])) {
+			return '';
+		}
+
 		$count = count($sql_parts['from']);
 
 		if ($count == 1 && array_key_exists('left_join', $sql_parts)) {
@@ -487,23 +491,24 @@ class CApiService {
 	 * @return array		The resulting SQL parts array
 	 */
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		// If table do not have a primary key, use COUNT(*) to select number of rows.
 		$pk = $this->pk($tableName);
+		$pk_composite = (strpos($pk, ',') !== false);
 
-		$pk_fields = explode(',', $pk);
-
-		foreach($pk_fields as $key => $field) {
-			$pk_fields[$key] = $this->fieldId($field, $tableAlias);
-		}
-
-		$pkFieldId = implode(',', $pk_fields);
-
-		// count
 		if (array_key_exists('countOutput', $options) && $options['countOutput']
 				&& !$this->requiresPostSqlFiltering($options)) {
-			$sqlParts['select'] = ['COUNT(*) AS rowscount'];
 
-			// select columns used by group count
+			$has_joins = (count($sqlParts['from']) > 1
+					|| (array_key_exists('left_join', $sqlParts) && $sqlParts['left_join']));
+
+			if ($pk_composite && $has_joins) {
+				throw new Exception('Joins with composite primary keys are not supported in this API version.');
+			}
+
+			$sqlParts['select'] = $has_joins
+				? ['COUNT(DISTINCT '.$this->fieldId($pk, $tableAlias).') AS rowscount']
+				: ['COUNT(*) AS rowscount'];
+
+			// Select columns used by group count.
 			if (array_key_exists('groupCount', $options) && $options['groupCount']) {
 				foreach ($sqlParts['group'] as $fields) {
 					$sqlParts['select'][] = $fields;
@@ -512,7 +517,7 @@ class CApiService {
 		}
 		// custom output
 		elseif (is_array($options['output'])) {
-			$sqlParts['select'] = [];
+			$sqlParts['select'] = $pk_composite ? [] : [$this->fieldId($pk, $tableAlias)];
 
 			foreach ($options['output'] as $field) {
 				if ($this->hasField($field, $tableName)) {
@@ -520,8 +525,7 @@ class CApiService {
 				}
 			}
 
-			// the pk fields must always be included for the API to work properly
-			$sqlParts['select'] = array_unique(array_merge($sqlParts['select'], explode(',', $pkFieldId)));
+			$sqlParts['select'] = array_unique($sqlParts['select']);
 		}
 		// extended output
 		elseif ($options['output'] == API_OUTPUT_EXTEND) {
