@@ -1,1 +1,1 @@
-.........T [ZBX-20150] fixed markdown parsing (abiba)
+.........T [ZBX-20150] fixed special characters escaping in markdown parsing of the Telegram media type (abiba)
