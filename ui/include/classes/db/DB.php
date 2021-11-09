@@ -1353,32 +1353,4 @@ class DB {
 
 		return $sql_parts;
 	}
-
-	/**
-	 * DB-engine speficic syntax for DISTINCT on possibly compound primary key set.
-	 *
-	 * @param string $pk_fields  One or several (comma-separated) primary key fields.
-	 *
-	 * @return string
-	 */
-	public static function addDistinct(string $pk_fields): string {
-		global $DB;
-
-		switch ($DB['TYPE']) {
-			case ZBX_DB_POSTGRESQL:
-				$distinct_sql = 'DISTINCT('.$pk_fields.')';
-				break;
-
-			case ZBX_DB_ORACLE:
-				$distinct_sql = 'DISTINCT '.str_replace(',', ' || \';\' || ', $pk_fields);
-				break;
-
-			case ZBX_DB_MYSQL:
-			default:
-				$distinct_sql = 'DISTINCT '.$pk_fields;
-				break;
-		}
-
-		return $distinct_sql;
-	}
 }

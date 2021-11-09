@@ -497,17 +497,22 @@ class CApiService {
 	 * @return array		The resulting SQL parts array
 	 */
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		$pk_fields = $this->fieldId($this->pk($tableName), $tableAlias);
+		$pk_field = $this->fieldId($this->pk($tableName), $tableAlias);
 
 		if (array_key_exists('countOutput', $options) && $options['countOutput']
 				&& !$this->requiresPostSqlFiltering($options)) {
 
 			$sqlParts['is_count_query'] = true;
+			$pk_is_multi_field = (substr_count($pk_field, ',') > 0);
+
+			if ($pk_is_multi_field && array_key_exists('left_join', $sqlParts) && count($sqlParts['left_join']) > 0) {
+				throw new Exception('Joins with composite primary keys are not supported in this API version.');
+			}
 
 			$sqlParts['select'] = [
-				(substr_count($pk_fields, ',') > 0)
+				$pk_is_multi_field
 					? 'COUNT(*) AS rowscount'
-					: 'COUNT('.DB::addDistinct($pk_fields).') AS rowscount'
+					: 'COUNT(DISTINCT '.$pk_field.') AS rowscount'
 			];
 
 			// Select columns used by group count.
@@ -528,7 +533,7 @@ class CApiService {
 			}
 
 			// The PK fields must always be included for the API to work properly.
-			$sqlParts['select'] = array_unique(array_merge($sqlParts['select'], explode(',', $pk_fields)));
+			$sqlParts['select'] = array_unique(array_merge($sqlParts['select'], explode(',', $pk_field)));
 		}
 		// extended output
 		elseif ($options['output'] == API_OUTPUT_EXTEND) {
