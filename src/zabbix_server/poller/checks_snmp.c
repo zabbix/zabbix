@@ -568,11 +568,13 @@ static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err
 
 				switch (item->snmpv3_privprotocol)
 				{
+#ifdef HAVE_NETSNMP_SESSION_DES
 					case ITEM_SNMPV3_PRIVPROTOCOL_DES:
 						/* set the privacy protocol to DES */
 						session.securityPrivProto = usmDESPrivProtocol;
 						session.securityPrivProtoLen = USM_PRIV_PROTO_DES_LEN;
 						break;
+#endif
 					case ITEM_SNMPV3_PRIVPROTOCOL_AES:
 						/* set the privacy protocol to AES */
 						session.securityPrivProto = usmAESPrivProtocol;
