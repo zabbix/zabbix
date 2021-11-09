@@ -397,6 +397,10 @@ void	zbx_tm_round_down(struct tm *tm, zbx_time_unit_t base)
 			tm->tm_min = 0;
 			tm->tm_sec = 0;
 			break;
+		case ZBX_TIME_UNIT_ISOYEAR:
+			zbx_tm_round_down(tm, ZBX_TIME_UNIT_WEEK);
+			zbx_tm_sub(tm, zbx_get_week_number(tm) - 1, ZBX_TIME_UNIT_WEEK);
+			break;
 		case ZBX_TIME_UNIT_YEAR:
 			tm->tm_mon = 0;
 			ZBX_FALLTHROUGH;
@@ -450,7 +454,6 @@ static	int	get_week_days(int yday, int wday)
 int	zbx_get_week_number(const struct tm *tm)
 {
 	int	days;
-	char	timebuf[1024];
 
 	if (0 > (days = get_week_days(tm->tm_yday, tm->tm_wday)))
 	{

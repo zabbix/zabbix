@@ -61,7 +61,7 @@ typedef struct
 zbx_tm_diff_t;
 
 void	zbx_baseline_season_diff(const struct tm *season, zbx_time_unit_t season_unit, const struct tm *period,
-		zbx_time_unit_t period_unit, zbx_tm_diff_t *diff);
-
+		zbx_tm_diff_t *diff);
+int	zbx_baseline_season_get(const struct tm *period, zbx_time_unit_t season_unit, struct tm *season);
 
 #endif

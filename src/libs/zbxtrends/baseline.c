@@ -40,14 +40,13 @@ static void	baseline_season_diff(const struct tm *first, const struct tm *second
 }
 
 void	zbx_baseline_season_diff(const struct tm *season, zbx_time_unit_t season_unit, const struct tm *period,
-		zbx_time_unit_t period_unit, zbx_tm_diff_t *diff)
+		zbx_tm_diff_t *diff)
 {
-	if (ZBX_TIME_UNIT_WEEK == period_unit)
+	if (ZBX_TIME_UNIT_ISOYEAR == season_unit)
 	{
 		struct tm	tm = *period;
 
-		diff->months = 0;
-		diff->weeks = ZBX_TIME_UNIT_YEAR == season_unit ? zbx_get_week_number(period) : 0;
+		diff->weeks = zbx_get_week_number(period);
 
 		zbx_tm_round_down(&tm, ZBX_TIME_UNIT_WEEK);
 		baseline_season_diff(&tm, period, diff);
@@ -58,3 +57,42 @@ void	zbx_baseline_season_diff(const struct tm *season, zbx_time_unit_t season_un
 		baseline_season_diff(season, period, diff);
 	}
 }
+
+void	zbx_baseline_season_add(const struct tm *season, zbx_time_unit_t season_unit, const zbx_tm_diff_t *diff,
+		struct tm *period)
+{
+	*period = *season;
+
+	if (ZBX_TIME_UNIT_ISOYEAR == season_unit)
+	{
+
+	}
+}
+
+int	zbx_baseline_season_get(const struct tm *period, zbx_time_unit_t season_unit, struct tm *season)
+{
+	if (ZBX_TIME_UNIT_ISOYEAR == season_unit)
+	{
+		struct tm	tm = *period;
+		int		week_num;
+		time_t		season_start;
+
+		week_num = zbx_get_week_number(period);
+		zbx_tm_round_down(season, ZBX_TIME_UNIT_WEEK);
+
+		if (-1 == (season_start = mktime(&tm)))
+			return FAIL;
+
+		season_start -= SEC_PER_WEEK * (week_num - 1);
+		*season = *localtime(&season_start);
+	}
+	else
+	{
+		*season = *period;
+		zbx_tm_round_down(season, season_unit);
+	}
+
+	return SUCCEED;
+}
+
+

@@ -36,6 +36,8 @@ static zbx_time_unit_t	mock_get_time_unit(const char *path)
 	{
 		case 'w':
 			return ZBX_TIME_UNIT_WEEK;
+		case 'Y':
+			return ZBX_TIME_UNIT_ISOYEAR;
 		case 'y':
 			return ZBX_TIME_UNIT_YEAR;
 		case 'm':
@@ -68,7 +70,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_timespec_t	ts;
 	struct tm	tm_season, tm_period;
 	time_t		time_tmp;
-	zbx_time_unit_t	season_unit, period_unit;
+	zbx_time_unit_t	season_unit;
 	zbx_tm_diff_t	diff;
 
 	ZBX_UNUSED(state);
@@ -90,9 +92,8 @@ void	zbx_mock_test_entry(void **state)
 
 	time_tmp = (time_t)ts.sec;
 	tm_period = *localtime(&time_tmp);
-	period_unit = mock_get_time_unit("in.period.unit");
 
-	zbx_baseline_season_diff(&tm_season, season_unit, &tm_period, period_unit, &diff);
+	zbx_baseline_season_diff(&tm_season, season_unit, &tm_period, &diff);
 
 	zbx_mock_assert_int_eq("weeks from season start", mock_get_int("out.weeks"), diff.weeks);
 	zbx_mock_assert_int_eq("months from season start", mock_get_int("out.months"), diff.months);

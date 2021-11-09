@@ -3969,9 +3969,11 @@ static int	dc_function_calculate_nextcheck(const zbx_trigger_timer_t *timer, tim
 		time_t		nextcheck;
 		int		offsets[ZBX_TIME_UNIT_COUNT] = {0, 0, 0, SEC_PER_MIN * 10,
 				SEC_PER_HOUR + SEC_PER_MIN * 10, SEC_PER_HOUR + SEC_PER_MIN * 10,
-				SEC_PER_HOUR + SEC_PER_MIN * 10, SEC_PER_HOUR + SEC_PER_MIN * 10};
+				SEC_PER_HOUR + SEC_PER_MIN * 10, SEC_PER_HOUR + SEC_PER_MIN * 10,
+				SEC_PER_HOUR + SEC_PER_MIN * 10};
 		int		periods[ZBX_TIME_UNIT_COUNT] = {0, 0, 0, SEC_PER_MIN * 10, SEC_PER_HOUR,
-				SEC_PER_HOUR * 11, SEC_PER_DAY - SEC_PER_HOUR, SEC_PER_DAY - SEC_PER_HOUR};
+				SEC_PER_HOUR * 11, SEC_PER_DAY - SEC_PER_HOUR, SEC_PER_DAY - SEC_PER_HOUR,
+				SEC_PER_DAY - SEC_PER_HOUR};
 
 		if (ZBX_TIME_UNIT_HOUR == timer->trend_base)
 		{
