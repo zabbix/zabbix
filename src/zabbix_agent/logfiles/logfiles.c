@@ -3277,9 +3277,9 @@ static int	update_new_list_from_old(zbx_log_rotation_options_t rotation_type, st
  * Comments: Supposed to be thread-safe, see pick_logfiles() comments.        *
  *                                                                            *
  ******************************************************************************/
-int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastlogsize, int *mtime,
+static int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastlogsize, int *mtime,
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, unsigned char *skip_old_data, int *big_rec,
-		int *use_ino, char **err_msg, struct st_logfile **logfiles_old, const int *logfiles_num_old,
+		int *use_ino, char **err_msg, struct st_logfile **logfiles_old, int logfiles_num_old,
 		struct st_logfile **logfiles_new, int *logfiles_num_new, const char *encoding,
 		zbx_vector_ptr_t *regexps, const char *pattern, const char *output_template, int *p_count, int *s_count,
 		zbx_process_value_func_t process_value, const char *server, unsigned short port, const char *hostname,
@@ -3308,7 +3308,7 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 				zabbix_log(LOG_LEVEL_DEBUG, "%s(): no files, setting skip_old_data to 0", __func__);
 			}
 
-			if (0 != (ZBX_METRIC_FLAG_LOG_LOGRT & flags) && 0 == *logfiles_num_old)
+			if (0 != (ZBX_METRIC_FLAG_LOG_LOGRT & flags) && 0 == logfiles_num_old)
 			{
 				/* Both the old and the new log file lists are empty. That means the agent has not */
 				/* seen any log files for this logrt[] item since started. If log files appear later */
@@ -3345,8 +3345,8 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 	else
 		start_idx = 0;
 
-	if (0 < *logfiles_num_old && 0 < logfiles_num && SUCCEED != update_new_list_from_old(rotation_type,
-			*logfiles_old, *logfiles_num_old, logfiles, logfiles_num, *use_ino, &seq, &start_idx,
+	if (0 < logfiles_num_old && 0 < logfiles_num && SUCCEED != update_new_list_from_old(rotation_type,
+			*logfiles_old, logfiles_num_old, logfiles, logfiles_num, *use_ino, &seq, &start_idx,
 			lastlogsize, err_msg))
 	{
 		destroy_logfile_list(&logfiles, &logfiles_alloc, &logfiles_num);
@@ -3360,7 +3360,7 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() old file list:", __func__);
 		if (NULL != *logfiles_old)
-			print_logfile_list(*logfiles_old, *logfiles_num_old);
+			print_logfile_list(*logfiles_old, logfiles_num_old);
 		else
 			zabbix_log(LOG_LEVEL_DEBUG, "   file list empty");
 
@@ -3862,7 +3862,7 @@ int	process_log_check(char *server, unsigned short port, zbx_vector_ptr_t *regex
 
 	ret = process_logrt(metric->flags, filename, &metric->lastlogsize, &metric->mtime, lastlogsize_sent, mtime_sent,
 			&metric->skip_old_data, &metric->big_rec, &metric->use_ino, error, &metric->logfiles,
-			&metric->logfiles_num, &logfiles_new, &logfiles_num_new, encoding, regexps, regexp,
+			metric->logfiles_num, &logfiles_new, &logfiles_num_new, encoding, regexps, regexp,
 			output_template, &p_count, &s_count, process_value_cb, server, port, CONFIG_HOSTNAME,
 			metric->key_orig, &jumped, max_delay, &metric->start_time, &metric->processed_bytes,
 			rotation_type);
