@@ -262,14 +262,14 @@ class testExpandExpressionMacros extends CWebTest {
 						'x' => 89,
 						'y' => 377,
 						'iconid_off' => 141
-					],
+					]
 				],
 				'links' => [
 					// Link between 'Host for expression macro Avg' and 'Host for expression macro Min'.
 					[
 						'selementid1' => 20,
 						'selementid2' => 22,
-						'label' => '{?max(/Host for expression macro Max/trapper,1w)}',
+						'label' => '{?max(/Host for expression macro Max/trapper,1w)}'
 					]
 				]
 			]
