@@ -23,7 +23,7 @@ static void	tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base);
 static void	tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base);
 
 static int	time_unit_seconds[ZBX_TIME_UNIT_COUNT] = {0, 1, SEC_PER_MIN, SEC_PER_HOUR, SEC_PER_DAY, SEC_PER_WEEK, 0,
-		0};
+		0, 0};
 
 zbx_time_unit_t	zbx_tm_str_to_unit(const char *text)
 {
@@ -297,7 +297,21 @@ static void	tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base)
  ******************************************************************************/
 void	zbx_tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base)
 {
-	if (ZBX_TIME_UNIT_MONTH == base || ZBX_TIME_UNIT_YEAR == base)
+	if (ZBX_TIME_UNIT_ISOYEAR == base)
+	{
+		int	week_num, total_weeks;
+
+		week_num = zbx_get_week_number(tm);
+
+		/* use zbx_tm_sub instead of tm_sub to force weekday recalculation */
+		zbx_tm_sub(tm, week_num, ZBX_TIME_UNIT_WEEK);
+
+		total_weeks = zbx_get_week_number(tm);
+		if (week_num > total_weeks)
+			week_num--;
+		tm_sub(tm, zbx_get_week_number(tm) - week_num, ZBX_TIME_UNIT_WEEK);
+	}
+	else if (ZBX_TIME_UNIT_MONTH == base || ZBX_TIME_UNIT_YEAR == base)
 		tm_sub(tm, multiplier, base);
 
 	tm_add_seconds(tm, -multiplier * time_unit_seconds[base]);

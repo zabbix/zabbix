@@ -47,9 +47,7 @@ void	zbx_mock_test_entry(void **state)
 	if (ZBX_MOCK_SUCCESS != zbx_strtime_to_timespec(zbx_mock_get_parameter_string("out.time"), &ts_out))
 		fail_msg("Invalid output time format");
 
-	unit = zbx_mock_get_parameter_string("in.base");
-
-	if ('i' == *unit)
+	if ('i' == *(unit = zbx_mock_get_parameter_string("in.base")))
 	{
 		base = ZBX_TIME_UNIT_ISOYEAR;
 	}

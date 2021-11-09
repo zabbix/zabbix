@@ -206,4 +206,28 @@ in:
   param: 1s
 out:
   time: 2020-10-25 02:59:59 +03:00
+---
+test case: 2021-11-09 03:00:00 +02:00 - 1i
+in:
+  timezone: :Europe/Riga
+  time: 2021-11-09 03:00:00 +02:00
+  param: 1i
+out:
+  time: 2020-11-03 03:00:00 +02:00
+---
+test case: 2020-12-30 03:00:00 +02:00 - 1i
+in:
+  timezone: :Europe/Riga
+  time: 2020-12-30 03:00:00 +02:00
+  param: 1i
+out:
+  time: 2019-12-25 03:00:00 +02:00
+---
+test case: 2021-01-04 03:00:00 +02:00 - 1i
+in:
+  timezone: :Europe/Riga
+  time: 2021-01-04 03:00:00 +02:00
+  param: 1i
+out:
+  time: 2019-12-30 03:00:00 +02:00
 ...
