@@ -217,16 +217,16 @@ class JMXItemChecker extends ItemChecker
 			logger.trace("attributeName:'{}'", realAttributeName);
 			logger.trace("fieldNames:'{}'", fieldNames);
 
-			Object dataObject = mbsc.getAttribute(objectName, realAttributeName);
-
-			if (dataObject instanceof TabularData)
-			{
-				logger.trace("'{}' contains tabular data", attributeName);
-				return getTabularData((TabularData)dataObject).toString();
-			}
-
 			try
 			{
+				Object dataObject = mbsc.getAttribute(objectName, realAttributeName);
+
+				if (dataObject instanceof TabularData)
+				{
+					logger.trace("'{}' contains tabular data", attributeName);
+					return getTabularData((TabularData)dataObject).toString();
+				}
+
 				return getPrimitiveAttributeValue(dataObject, fieldNames);
 			}
 			catch (InstanceNotFoundException e)
