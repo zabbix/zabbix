@@ -136,24 +136,18 @@ class CApiService {
 	}
 
 	/**
-	 * Prepends the table alias to the given field name (comma-separated if multiple). If no $tableAlias is given,
+	 * Prepends the table alias to the given field name. If no $tableAlias is given,
 	 * the alias of the current table will be used.
 	 *
-	 * @param string $field_names  On several comma-joined fields.
-	 * @param string $table_alias
+	 * @param string $fieldName
+	 * @param string $tableAlias
 	 *
 	 * @return string
 	 */
-	protected function fieldId(string $field_names, $table_alias = null): string {
-		$table_alias = $table_alias ? $table_alias : $this->tableAlias();
+	protected function fieldId($fieldName, $tableAlias = null) {
+		$tableAlias = $tableAlias ? $tableAlias : $this->tableAlias();
 
-		$field_names = explode(',', $field_names);
-
-		foreach($field_names as $key => $field) {
-			$field_names[$key] = $table_alias.'.'.$field;
-		}
-
-		return implode(',', $field_names);
+		return $tableAlias.'.'.$fieldName;
 	}
 
 	/**
@@ -474,11 +468,7 @@ class CApiService {
 		$sqlGroup = empty($sqlParts['group']) ? '' : ' GROUP BY '.implode(',', array_unique($sqlParts['group']));
 		$sqlOrder = empty($sqlParts['order']) ? '' : ' ORDER BY '.implode(',', array_unique($sqlParts['order']));
 
-		$sql_distinct = (array_key_exists('is_count_query', $sqlParts) && $sqlParts['is_count_query'])
-			? ''
-			: self::dbDistinct($sqlParts);
-
-		return 'SELECT'.$sql_distinct.' '.$sqlSelect.
+		return 'SELECT'.self::dbDistinct($sqlParts).' '.$sqlSelect.
 				' FROM '.$sqlFrom.
 				$sql_left_join.
 				$sqlWhere.
@@ -497,23 +487,22 @@ class CApiService {
 	 * @return array		The resulting SQL parts array
 	 */
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		$pk_field = $this->fieldId($this->pk($tableName), $tableAlias);
+		$pk = $this->pk($tableName);
+		$pk_composite = (strpos($pk, ',') !== false);
 
 		if (array_key_exists('countOutput', $options) && $options['countOutput']
 				&& !$this->requiresPostSqlFiltering($options)) {
 
-			$sqlParts['is_count_query'] = true;
-			$pk_is_multi_field = (substr_count($pk_field, ',') > 0);
+			$has_joins = (count($sqlParts['from']) > 1
+					|| (array_key_exists('left_join', $sqlParts) && $sqlParts['left_join']));
 
-			if ($pk_is_multi_field && array_key_exists('left_join', $sqlParts) && count($sqlParts['left_join']) > 0) {
+			if ($pk_composite && $has_joins) {
 				throw new Exception('Joins with composite primary keys are not supported in this API version.');
 			}
 
-			$sqlParts['select'] = [
-				$pk_is_multi_field
-					? 'COUNT(*) AS rowscount'
-					: 'COUNT(DISTINCT '.$pk_field.') AS rowscount'
-			];
+			$sqlParts['select'] = $has_joins
+				? ['COUNT(DISTINCT '.$this->fieldId($pk, $tableAlias).') AS rowscount']
+				: ['COUNT(*) AS rowscount'];
 
 			// Select columns used by group count.
 			if (array_key_exists('groupCount', $options) && $options['groupCount']) {
@@ -524,7 +513,7 @@ class CApiService {
 		}
 		// custom output
 		elseif (is_array($options['output'])) {
-			$sqlParts['select'] = [];
+			$sqlParts['select'] = $pk_composite ? [] : [$this->fieldId($pk, $tableAlias)];
 
 			foreach ($options['output'] as $field) {
 				if ($this->hasField($field, $tableName)) {
@@ -532,8 +521,7 @@ class CApiService {
 				}
 			}
 
-			// The PK fields must always be included for the API to work properly.
-			$sqlParts['select'] = array_unique(array_merge($sqlParts['select'], explode(',', $pk_field)));
+			$sqlParts['select'] = array_unique($sqlParts['select']);
 		}
 		// extended output
 		elseif ($options['output'] == API_OUTPUT_EXTEND) {
