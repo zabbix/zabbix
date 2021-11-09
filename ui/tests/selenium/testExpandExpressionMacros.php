@@ -198,10 +198,10 @@ class testExpandExpressionMacros extends CWebTest {
 		// TODO: This sleep is added here because of DEV-1908.
 		sleep(1);
 		$covered_region = [
-			'x' => 80,
+			'x' => 78,
 			'y' => 33,
 			'width' => 1144,
-			'height' => 282
+			'height' => 291
 		];
 		$this->assertScreenshotExcept($this->waitUntilGraphIsLoaded(), $covered_region, $data['host_name']);
 	}
@@ -287,7 +287,7 @@ class testExpandExpressionMacros extends CWebTest {
 		$map_image = $this->query('xpath://div[@id="flickerfreescreen_mapimg"]/div/*[name()="svg"]')
 				->waitUntilPresent()->one();
 		$covered_region = [
-			'x' => 410,
+			'x' => 390,
 			'y' => 484,
 			'width' => 82,
 			'height' => 13
