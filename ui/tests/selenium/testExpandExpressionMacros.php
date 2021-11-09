@@ -201,7 +201,7 @@ class testExpandExpressionMacros extends CWebTest {
 			'x' => 78,
 			'y' => 33,
 			'width' => 1144,
-			'height' => 291
+			'height' => 297
 		];
 		$this->assertScreenshotExcept($this->waitUntilGraphIsLoaded(), $covered_region, $data['host_name']);
 	}
@@ -287,9 +287,9 @@ class testExpandExpressionMacros extends CWebTest {
 		$map_image = $this->query('xpath://div[@id="flickerfreescreen_mapimg"]/div/*[name()="svg"]')
 				->waitUntilPresent()->one();
 		$covered_region = [
-			'x' => 390,
+			'x' => 365,
 			'y' => 484,
-			'width' => 82,
+			'width' => 105,
 			'height' => 13
 		];
 		$this->assertScreenshotExcept($map_image, $covered_region, 'Map with expression macros');
