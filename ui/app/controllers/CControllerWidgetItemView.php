@@ -381,10 +381,13 @@ class CControllerWidgetItemView extends CControllerWidget {
 			];
 		}
 
-		// Sort data in order - top, middle, bottom and left, center, right.
-		foreach ($data as $row) {
+		// Sort data in order - left, center, right.
+		foreach ($data as &$row) {
 			ksort($row);
 		}
+		unset($row);
+
+		// Sort data in order - top, middle, bottom.
 		ksort($data);
 
 		$data['bg_color'] = $fields['bg_color'];
