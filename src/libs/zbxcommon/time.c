@@ -193,7 +193,15 @@ static void	tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base)
 void	zbx_tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base)
 {
 	if (ZBX_TIME_UNIT_MONTH == base || ZBX_TIME_UNIT_YEAR == base)
+	{
+		int	days_max;
+
 		tm_add(tm, multiplier, base);
+
+		days_max = zbx_day_in_month(tm->tm_year + 1900, tm->tm_mon + 1);
+		if (tm->tm_mday  > days_max)
+			tm->tm_mday = days_max;
+	}
 
 	tm_add_seconds(tm, multiplier * time_unit_seconds[base]);
 
@@ -273,7 +281,9 @@ static void	tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base)
 				neg_to_pos_wrap(&tm->tm_mon, 12);
 				if (0 != tm->tm_mon)
 					shift++;
+
 				tm_sub(tm, shift, ZBX_TIME_UNIT_YEAR);
+
 			}
 			return;
 		case ZBX_TIME_UNIT_YEAR:
@@ -312,7 +322,15 @@ void	zbx_tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base)
 		tm_sub(tm, zbx_get_week_number(tm) - week_num, ZBX_TIME_UNIT_WEEK);
 	}
 	else if (ZBX_TIME_UNIT_MONTH == base || ZBX_TIME_UNIT_YEAR == base)
+	{
+		int	days_max;
+
 		tm_sub(tm, multiplier, base);
+
+		days_max = zbx_day_in_month(tm->tm_year + 1900, tm->tm_mon + 1);
+		if (tm->tm_mday  > days_max)
+			tm->tm_mday = days_max;
+	}
 
 	tm_add_seconds(tm, -multiplier * time_unit_seconds[base]);
 
