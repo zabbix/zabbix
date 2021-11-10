@@ -60,19 +60,20 @@ $form_list->addRow(CWidgetHelper::getLabel($fields['adv_conf']), CWidgetHelper::
 $form_list
 	->addRow(
 		CWidgetHelper::getLabel($fields['description'], ZBX_STYLE_WIDGET_ITEM_LABEL, [
-				_('Supported macros:'),
-				(new CList([
-					'{HOST.*}',
-					'{ITEM.*}',
-					'{INVENTORY.*}',
-					_('User macros')
-				]))->addClass(ZBX_STYLE_LIST_DASHED)
-			]),
+			_('Supported macros:'),
+			(new CList([
+				'{HOST.*}',
+				'{ITEM.*}',
+				'{INVENTORY.*}',
+				_('User macros')
+			]))->addClass(ZBX_STYLE_LIST_DASHED)
+		]),
 		(new CDiv([
 			(new CDiv(
 				CWidgetHelper::getTextArea($fields['description'])
 					->setAttribute('style', '')
 					->setAdaptiveWidth(ZBX_TEXTAREA_BIG_WIDTH)
+					->setAttribute('maxlength', DB::getFieldLength('widget_field', 'value_str'))
 			))->addClass('form-field'),
 			CWidgetHelper::getLabel($fields['desc_h_pos']),
 			(new CDiv(CWidgetHelper::getRadioButtonList($fields['desc_h_pos'])))->addClass('form-field'),
