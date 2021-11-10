@@ -3515,12 +3515,17 @@ static int	vmware_service_hv_get_multipath_data(const zbx_vmware_service_t *serv
 
 	zbx_vector_str_clear_ext(&scsi_luns, zbx_str_free);
 	hvid_esc = xml_escape_dyn(hvid);
-	tmp = zbx_dsprintf(tmp, ZBX_POST_HV_MP_DETAILS,
-			vmware_service_objects[service->type].property_collector, scsi_req, hvid_esc);
+
+	if (ZBX_VMWARE_TYPE_UNKNOWN != service->type)
+	{
+		tmp = zbx_dsprintf(tmp, ZBX_POST_HV_MP_DETAILS,
+				vmware_service_objects[service->type].property_collector, scsi_req, hvid_esc);
+
+		ret = zbx_soap_post(__func__, easyhandle, tmp, xdoc, error);
+	}
+
 	zbx_free(hvid_esc);
 	zbx_free(scsi_req);
-
-	ret = zbx_soap_post(__func__, easyhandle, tmp, xdoc, error);
 out:
 	zbx_free(tmp);
 	zbx_vector_str_destroy(&scsi_luns);
