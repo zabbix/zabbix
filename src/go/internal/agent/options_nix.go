@@ -63,6 +63,8 @@ type AgentOptions struct {
 	TLSServerCertIssuer    string   `conf:"optional"`
 	TLSServerCertSubject   string   `conf:"optional"`
 	ExternalPlugins        []string `conf:"optional"`
+	ExternalPluginTimeout  int      `conf:"optional,range=1:30"`
+	ExternalPluginsSocket  string   `conf:"optional"`
 
 	AllowKey interface{} `conf:"optional"`
 	DenyKey  interface{} `conf:"optional"`

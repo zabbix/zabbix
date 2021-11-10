@@ -41,7 +41,7 @@ type UserParameterPlugin struct {
 	plugin.Base
 	parameters           map[string]*parameterInfo
 	unsafeUserParameters int
-	userParameterDir    string
+	userParameterDir     string
 }
 
 var userParameter UserParameterPlugin

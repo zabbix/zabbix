@@ -321,7 +321,8 @@ func main() {
 		fatalExit("cannot initialize logger", err)
 	}
 
-	if err = external.RegisterDynamicPlugins(agent.Options.ExternalPlugins, time.Duration(agent.Options.Timeout)); err != nil {
+	go startExternalErrListener()
+	if err = external.InitExternalPlugins(&agent.Options); err != nil {
 		fatalExit("cannot register external plugins", err)
 	}
 
@@ -573,7 +574,13 @@ func main() {
 	if foregroundFlag && agent.Options.LogType != "console" {
 		fmt.Println(farewell)
 	}
+
 	waitServiceClose()
+}
+
+func startExternalErrListener() {
+	err := external.ErrListener()
+	fatalExit("external plugin failed", err)
 }
 
 func fatalExit(message string, err error) {

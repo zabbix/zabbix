@@ -17,49 +17,19 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugin
+package main
 
-import (
-	"zabbix.com/pkg/log"
-)
+import "zabbix.com/external"
 
-type Accessor interface {
-	Init(name string)
-	Name() string
-	Capacity() int
-	SetCapacity(capactity int)
-	IsExternal() bool
-}
+func main() {
+	h, err := external.NewHandler(impl.Name())
+	if err != nil {
+		return
+	}
+	impl.Logger = &h
 
-type Base struct {
-	log.Logger
-	name     string
-	capacity int
-	external bool
-}
-
-func (b *Base) Init(name string) {
-	b.Logger = log.New(name)
-	b.name = name
-	b.capacity = DefaultCapacity
-}
-
-func (b *Base) Name() string {
-	return b.name
-}
-
-func (b *Base) Capacity() int {
-	return b.capacity
-}
-
-func (b *Base) SetCapacity(capacity int) {
-	b.capacity = capacity
-}
-
-func (b *Base) IsExternal() bool {
-	return b.external
-}
-
-func (b *Base) SetExternal(isExternal bool) {
-	b.external = isExternal
+	err = h.Execute()
+	if err != nil {
+		return
+	}
 }

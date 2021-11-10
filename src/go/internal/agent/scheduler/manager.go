@@ -462,21 +462,6 @@ func (m *Manager) Stop() {
 	m.input <- nil
 }
 
-// func (m *Manager) StartExternal() {
-// 	for _, path := range m.externalPlugins {
-// 		m.externalPluginCmds = append(m.externalPluginCmds, external.Start(path))
-// 	}
-// }
-
-// func (m *Manager) StopExternal() {
-// 	for _, cmd := range m.externalPluginCmds {
-// 		if err := cmd.Process.Kill(); err != nil {
-// 			log.Critf("failed to kill external plugin: %s", err.Error())
-// 		}
-// 		// external.Stop(path)
-// 	}
-// }
-
 func (m *Manager) UpdateTasks(clientID uint64, writer plugin.ResultWriter,
 	expressions []*glexpr.Expression, requests []*plugin.Request) {
 
@@ -542,7 +527,7 @@ func (m *Manager) Query(command string) (status string) {
 
 func (m *Manager) validatePlugins(options *agent.AgentOptions) (err error) {
 	for _, p := range plugin.Plugins {
-		if c, ok := p.(plugin.Configurator); ok {
+		if c, ok := p.(plugin.Configurator); ok && !p.IsExternal() {
 			if err = c.Validate(options.Plugins[p.Name()]); err != nil {
 				return fmt.Errorf("invalid plugin %s configuration: %s", p.Name(), err)
 			}
@@ -559,7 +544,6 @@ func (m *Manager) configure(options *agent.AgentOptions) (err error) {
 func NewManager(options *agent.AgentOptions) (mannager *Manager, err error) {
 	var m Manager
 	m.init()
-	m.externalPlugins = options.ExternalPlugins
 	if err = m.validatePlugins(options); err != nil {
 		return
 	}

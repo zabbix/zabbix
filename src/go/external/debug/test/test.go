@@ -19,18 +19,22 @@
 
 package main
 
-import "zabbix.com/pkg/plugin"
+import (
+	"zabbix.com/pkg/plugin"
+)
 
-var impl Plugin
-
+// Plugin -
 type Plugin struct {
 	plugin.Base
 }
 
+var impl Plugin
+
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	return "Test success", nil
+	p.Debugf("export %s%v", key, params)
+	return "debug empty test response", nil
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, "Dynamic", "external.test", "External exporter Test.")
+	plugin.RegisterMetrics(&impl, "DebugExternalEmpty", "debug.external.test", "Returns test string.")
 }

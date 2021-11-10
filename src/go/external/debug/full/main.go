@@ -17,28 +17,22 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package shared
+package main
 
-const (
-	Export = iota
-	Metrics
-	Start
-	Stop
-	Watcher
-
-	Response = iota
-	Request
-	Error
+import (
+	"zabbix.com/external"
 )
 
-type Plugin struct {
-	Command   int
-	Params    []string
-	RespType  int
-	Supported int
-	Value     interface{}
-	ErrMsg    string
-	Name      string
-	Key       string
-	Error     error
+func main() {
+	h, err := external.NewHandler(impl.Name())
+	if err != nil {
+		return
+	}
+
+	impl.Logger = &h
+
+	err = h.Execute()
+	if err != nil {
+		return
+	}
 }

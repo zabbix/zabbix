@@ -123,3 +123,10 @@ func ClearRegistry() {
 	Metrics = make(map[string]*Metric)
 	Plugins = make(map[string]Accessor)
 }
+
+func GetByName(name string) (acc Accessor, err error) {
+	if p, ok := Plugins[name]; ok {
+		return p, nil
+	}
+	return nil, UnsupportedMetricError
+}

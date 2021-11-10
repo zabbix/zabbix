@@ -20,197 +20,445 @@
 package external
 
 import (
-	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
-	"log"
+	"io"
+	"net"
+	"os"
 	"os/exec"
-	"path/filepath"
+	"strconv"
+	"strings"
+	"sync"
 	"time"
 
-	"zabbix.com/pkg/conf"
-	"zabbix.com/pkg/shared"
+	"zabbix.com/internal/agent"
+	"zabbix.com/pkg/log"
+	"zabbix.com/pkg/plugin/shared"
 
-	"github.com/go-zeromq/zmq4"
 	"zabbix.com/pkg/plugin"
-	"zabbix.com/pkg/zbxerr"
 )
 
 // Plugin -
+type externaltHandler struct {
+	socketBasePath string
+	registerChan   map[uint32]chan shared.RegisterResponse
+	validateChan   map[uint32]chan shared.ValidateResponse
+	exportChan     map[uint32]chan shared.ExportResponse
+	collectChan    map[uint32]chan shared.CollectResponse
+	periodChan     map[uint32]chan shared.PeriodResponse
+	logChan        chan shared.LogRequest
+	errChan        chan error
+	timeout        time.Duration
+}
+
 type Plugin struct {
 	plugin.Base
-	options      Options
-	Type         int
-	responseChan chan interface{}
-	errChan      chan string
-	Params       []string
-	Cmd          *exec.Cmd
-	Path         string
+	Path           string
+	Socket         string
+	Params         []string
+	Interfaces     uint32
+	initial        bool
+	conn           net.Conn
+	listener       net.Listener
+	globalOptions  *plugin.GlobalOptions
+	privateOptions interface{}
+	startWg        sync.WaitGroup
 }
 
-// Options -
-type Options struct {
-	Timeout int
-	Plugins []string
+var handler externaltHandler
+
+func init() {
+	handler.errChan = make(chan error)
+	handler.logChan = make(chan shared.LogRequest)
+	handler.registerChan = make(map[uint32]chan shared.RegisterResponse)
+	handler.validateChan = make(map[uint32]chan shared.ValidateResponse)
+	handler.exportChan = make(map[uint32]chan shared.ExportResponse)
+	handler.collectChan = make(map[uint32]chan shared.CollectResponse)
+	handler.periodChan = make(map[uint32]chan shared.PeriodResponse)
 }
 
-var impl Plugin
+func InitExternalPlugins(options *agent.AgentOptions) error {
+	setConfigValues(options.ExternalPluginsSocket)
 
-var pluginPaths map[string]string
+	go startLogListener()
 
-func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
-	if err := conf.Unmarshal(options, &p.options); err != nil {
-		p.Errf("cannot unmarshal configuration options: %s", err)
-	}
-
-	if p.options.Timeout == 0 {
-		p.options.Timeout = global.Timeout
-	}
-}
-
-// Validate -
-func (p *Plugin) Validate(options interface{}) error { return nil }
-
-// Export -
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	p.responseChan = make(chan interface{})
-
-	req := zmq4.NewReq(context.Background())
-	sendRequest(pluginPaths[key], shared.Export, params, req)
-	defer req.Close()
-
-	go p.listen(req)
-
-	select {
-	case result = <-p.responseChan:
-		return
-	case errMsg := <-p.errChan:
-		return nil, zbxerr.New(errMsg)
-	case <-time.After(time.Duration(p.options.Timeout) * time.Second):
-		return nil, zbxerr.ErrorCannotFetchData
-	}
-}
-
-func (p *Plugin) listen(req zmq4.Socket) {
-	for {
-		msg, err := req.Recv()
-		if err != nil {
-			log.Fatalf("could not recv response: %v", err)
-			p.errChan <- err.Error()
-			return
-		}
-
-		var resp shared.Plugin
-
-		if err := json.Unmarshal(msg.Bytes(), &resp); err != nil {
-			p.errChan <- err.Error()
-			return
-		}
-
-		switch resp.RespType {
-		case shared.Response:
-			p.responseChan <- resp.Value
-			return
-		case shared.Request:
-			fmt.Printf("Request: %v", resp.Value)
-		case shared.Error:
-			p.errChan <- resp.ErrMsg
-			return
-		default:
-			p.errChan <- fmt.Sprintf("unknown response type:%x", resp.RespType)
-		}
-	}
-}
-
-func RegisterDynamicPlugins(paths []string, timeout time.Duration) error {
-	for _, p := range paths {
-
-		// cmd := Start(p)
-		cmd := exec.Command(p)
-		cmd.Start()
-		accessor, name, err := getPlugin(p)
-		if err != nil {
-			return err
-		}
-
-		for i := 0; i < len(accessor.Params); i += 2 {
-			pluginPaths[accessor.Params[i]] = p
-		}
-
+	for _, p := range options.ExternalPlugins {
+		accessor := &Plugin{}
 		accessor.Path = p
+		accessor.SetExternal(true)
 
-		plugin.RegisterMetrics(&accessor, name, accessor.Params...)
-		err = cmd.Process.Kill()
+		name, err := accessor.initExternalPlugin(options)
 		if err != nil {
 			return err
 		}
+
+		plugin.RegisterMetrics(accessor, name, accessor.Params...)
 	}
 
 	return nil
 }
 
-func init() {
-	pluginPaths = make(map[string]string)
+func ErrListener() (err error) {
+	err = <-handler.errChan
+	return
 }
 
+func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+	req := shared.CreateExportRequest(key, params)
+	handler.exportChan[req.Id] = make(chan shared.ExportResponse)
+
+	err = shared.Write(p.conn, req)
+	if err != nil {
+		handler.errChan <- err
+		return
+	}
+
+	select {
+	case response := <-handler.exportChan[req.Id]:
+		if response.Error != "" {
+			err = errors.New(response.Error)
+			break
+		}
+		result = response.Value
+	case <-time.After(handler.timeout):
+		handler.errChan <- errors.New("failed to receive Export response")
+	}
+
+	return
+}
+
+// func (p *Plugin) Collect() (err error) {
+// 	if !shared.ImplementsCollector(p.Interfaces) {
+// 		return nil
+// 	}
+
+// 	req := shared.CreateCollectRequest()
+// 	handler.collectChan[req.Id] = make(chan shared.CollectResponse)
+
+// 	err = shared.Write(p.conn, req)
+// 	if err != nil {
+// 		handler.errChan <- err
+// 		return
+// 	}
+
+// 	select {
+// 	case response := <-handler.collectChan[req.Id]:
+// 		if response.Error != "" {
+// 			err = errors.New(response.Error)
+// 		}
+// 	case <-time.After(handler.timeout):
+// 		handler.errChan <- errors.New("failed to receive Collect response")
+// 	}
+
+// 	return
+// }
+
+// func (p *Plugin) Period() int {
+// 	if !shared.ImplementsCollector(p.Interfaces) {
+// 		return 0
+// 	}
+
+// 	req := shared.CreatePeriodRequest()
+// 	handler.periodChan[req.Id] = make(chan shared.PeriodResponse)
+
+// 	err := shared.Write(p.conn, req)
+// 	if err != nil {
+// 		handler.errChan <- err
+// 		return 0
+// 	}
+
+// 	select {
+// 	case response := <-handler.periodChan[req.Id]:
+// 		return response.Period
+// 	case <-time.After(handler.timeout):
+// 		handler.errChan <- errors.New("failed to receive Export response")
+// 	}
+
+// 	return 0
+// }
+
 func (p *Plugin) Start() {
-	p.Cmd = exec.Command(p.Path)
-	//TODO: log err ?
-	p.Cmd.Start()
+	err := exec.Command(p.Path, p.Socket, strconv.FormatBool(p.initial)).Start()
+	if err != nil {
+		handler.errChan <- fmt.Errorf("failed to start external plugin %s, %s", p.Path, err.Error())
+		return
+	}
+
+	if err := os.RemoveAll(p.Socket); err != nil {
+		handler.errChan <- fmt.Errorf("failed to drop external plugin %s socket, with path %s, %s", p.Path, p.Socket, err.Error())
+		return
+	}
+
+	p.listener, err = net.Listen("unix", p.Socket)
+	if err != nil {
+		handler.errChan <- fmt.Errorf("failed to listen on external plugin %s socket path %s, %s", p.Path, p.Socket, err.Error())
+		return
+	}
+
+	p.conn, err = getConnection(p.listener, handler.timeout)
+	if err != nil {
+		handler.errChan <- fmt.Errorf("failed to create connection with external plugin %s, %s", p.Path, err.Error())
+		return
+	}
+
+	go startPluginListener(p.conn)
+
+	if !p.initial {
+		if shared.ImplementsConfigurator(p.Interfaces) {
+			err := shared.Write(p.conn, shared.CreateConfigurateRequest(p.globalOptions, p.privateOptions))
+			if err != nil {
+				handler.errChan <- fmt.Errorf("failed to configurate external plugin %s, %s", p.Path, err.Error())
+			}
+		}
+		return
+	}
+
+	p.startWg.Done()
 }
 
 func (p *Plugin) Stop() {
-	//TODO: log err ?
-	p.Cmd.Process.Kill()
-}
-
-func getPlugin(path string) (Plugin, string, error) {
-	req := zmq4.NewReq(context.Background())
-	defer req.Close()
-
-	if err := sendRequest(path, shared.Metrics, nil, req); err != nil {
-		return Plugin{}, "", err
-	}
-
-	msg, err := req.Recv()
+	err := shared.Write(p.conn, shared.CreateTerminateRequest())
 	if err != nil {
-		return Plugin{}, "", err
+		handler.errChan <- fmt.Errorf("failed to send stop request to external plugin %s, %s", p.Path, err.Error())
+		return
 	}
 
-	var resp shared.Plugin
-	if err := json.Unmarshal(msg.Bytes(), &resp); err != nil {
-		return Plugin{}, "", err
+	err = p.listener.Close()
+	if err != nil {
+		handler.errChan <- fmt.Errorf("failed to close listener for external plugin %s, %s", p.Path, err.Error())
+		return
 	}
 
-	switch resp.RespType {
-	case shared.Metrics:
-		var p Plugin
-		p.Type = resp.Supported
-		p.Params = resp.Params
-		p.SetCapacity(1)
-
-		return p, resp.Name, err
-	default:
-		return Plugin{}, "", fmt.Errorf("unknown response type:%x", resp.RespType)
+	if err := os.RemoveAll(p.Socket); err != nil {
+		handler.errChan <- fmt.Errorf("failed to drop external plugin %s socket, with path %s, %s", p.Path, p.Socket, err.Error())
+		return
 	}
 }
 
-func sendRequest(path string, command int, params []string, sock zmq4.Socket) error {
-	err := sock.Dial(fmt.Sprintf("ipc:///tmp/%s.sock", filepath.Base(path)))
-	if err != nil {
-		return err
+func setConfigValues(sockBasePath string) {
+	if sockBasePath == "" {
+		sockBasePath = "/tmp/plugins/"
+
+	} else if !strings.HasSuffix(sockBasePath, "/") {
+		sockBasePath += "/"
 	}
 
-	reqData := shared.Plugin{Command: command, Params: params}
-	reqBytes, err := json.Marshal(reqData)
-	if err != nil {
-		return err
+	handler.socketBasePath = sockBasePath
+
+	if agent.Options.ExternalPluginTimeout == 0 {
+		handler.timeout = time.Second * time.Duration(agent.Options.Timeout)
+		return
 	}
 
-	err = sock.Send(zmq4.NewMsg(reqBytes))
+	handler.timeout = time.Second * time.Duration(agent.Options.ExternalPluginTimeout)
+}
+
+func (p *Plugin) initExternalPlugin(options *agent.AgentOptions) (name string, err error) {
+	p.initial = true
+	p.createSocket(handler.socketBasePath)
+	p.startWg.Add(1)
+	p.Start()
+	p.startWg.Wait()
+
+	var resp shared.RegisterResponse
+	resp, err = register(p.conn)
 	if err != nil {
-		return err
+		return
 	}
 
-	return nil
+	if resp.Error != "" {
+		p.Stop()
+		handler.errChan <- errors.New(resp.Error)
+	}
+
+	name = resp.Name
+
+	p.Interfaces = resp.Interfaces
+	p.Params = resp.Metrics
+
+	if shared.ImplementsConfigurator(p.Interfaces) {
+		if err = validate(p.conn, options.Plugins[name]); err != nil {
+			return
+		}
+	}
+
+	p.Stop()
+	p.initial = false
+	return
+}
+
+func (p *Plugin) createSocket(socketBasePath string) {
+	p.Socket = fmt.Sprintf("%s%d", socketBasePath, time.Now().UnixNano())
+}
+
+func logMessage(req shared.LogRequest) {
+	switch req.Severity {
+	case log.Info:
+		log.Infof(req.Message)
+	case log.Crit:
+		log.Critf(req.Message)
+	case log.Err:
+		log.Errf(req.Message)
+	case log.Warning:
+		log.Warningf(req.Message)
+	case log.Debug:
+		log.Debugf(req.Message)
+	case log.Trace:
+		log.Tracef(req.Message)
+	}
+}
+
+func register(conn net.Conn) (response shared.RegisterResponse, err error) {
+	req := shared.CreateRegisterRequest()
+	handler.registerChan[req.Id] = make(chan shared.RegisterResponse)
+
+	err = shared.Write(conn, req)
+	if err != nil {
+		return shared.RegisterResponse{}, err
+	}
+
+	select {
+	case response = <-handler.registerChan[req.Id]:
+		return
+	case <-time.After(handler.timeout):
+		return shared.RegisterResponse{}, fmt.Errorf("failed to receive register response")
+	}
+}
+
+func validate(conn net.Conn, options interface{}) (err error) {
+	req := shared.CreateValidateRequest(options)
+	handler.validateChan[req.Id] = make(chan shared.ValidateResponse)
+
+	err = shared.Write(conn, req)
+	if err != nil {
+		return
+	}
+
+	select {
+	case response := <-handler.validateChan[req.Id]:
+		if response.Error != "" {
+			return errors.New(response.Error)
+		}
+
+		return
+	case <-time.After(handler.timeout):
+		return fmt.Errorf("failed to receive register response for p")
+	}
+}
+
+func startPluginListener(conn net.Conn) {
+	for {
+		t, data, err := shared.Read(conn)
+		if err != nil {
+			if err == io.EOF {
+				return
+			}
+
+			handler.errChan <- err
+		}
+
+		go handleRequest(t, data)
+	}
+}
+
+func startLogListener() {
+	for log := range handler.logChan {
+		logMessage(log)
+	}
+}
+
+func handleRequest(t uint32, data []byte) {
+	switch t {
+	case shared.RegisterResponseType:
+		var resp shared.RegisterResponse
+		err := json.Unmarshal(data, &resp)
+		if err != nil {
+			handler.errChan <- err
+			return
+		}
+
+		handler.registerChan[resp.Id] <- resp
+		close(handler.registerChan[resp.Id])
+		return
+	case shared.ValidateResponseType:
+		var resp shared.ValidateResponse
+		err := json.Unmarshal(data, &resp)
+		if err != nil {
+			handler.errChan <- err
+			return
+		}
+
+		handler.validateChan[resp.Id] <- resp
+		close(handler.validateChan[resp.Id])
+		return
+	case shared.ExportResponseType:
+		var resp shared.ExportResponse
+		err := json.Unmarshal(data, &resp)
+		if err != nil {
+			handler.errChan <- err
+			return
+		}
+
+		handler.exportChan[resp.Id] <- resp
+		close(handler.exportChan[resp.Id])
+		return
+	// case shared.CollectorResponseType:
+	// 	var resp shared.CollectResponse
+	// 	err := json.Unmarshal(data, &resp)
+	// 	if err != nil {
+	// 		handler.errChan <- err
+	// 		return
+	// 	}
+
+	// 	handler.collectChan[resp.Id] <- resp
+	// 	close(handler.collectChan[resp.Id])
+	// 	return
+	// case shared.PeriodResponseType:
+	// 	var resp shared.PeriodResponse
+	// 	err := json.Unmarshal(data, &resp)
+	// 	if err != nil {
+	// 		handler.errChan <- err
+	// 		return
+	// 	}
+
+	// 	handler.periodChan[resp.Id] <- resp
+	// 	close(handler.periodChan[resp.Id])
+	// 	return
+	case shared.LogRequestType:
+		var req shared.LogRequest
+		err := json.Unmarshal(data, &req)
+		if err != nil {
+			handler.errChan <- err
+			return
+		}
+
+		handler.logChan <- req
+		return
+	}
+}
+
+func getConnection(listener net.Listener, timeout time.Duration) (conn net.Conn, err error) {
+	connChan := make(chan net.Conn)
+	errChan := make(chan error)
+
+	go listen(listener, connChan, errChan)
+
+	select {
+	case conn = <-connChan:
+	case err = <-errChan:
+	case <-time.After(timeout):
+		err = fmt.Errorf("failed to get connection within the time limit %d", timeout)
+	}
+
+	return
+}
+
+func listen(listener net.Listener, ch chan<- net.Conn, errCh chan<- error) {
+	conn, err := listener.Accept()
+	if err != nil {
+		errCh <- err
+	}
+
+	ch <- conn
 }
