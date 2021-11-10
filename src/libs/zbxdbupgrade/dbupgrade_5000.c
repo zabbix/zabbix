@@ -116,6 +116,12 @@ static int	DBpatch_5000004(void)
 	return ret;
 }
 
+static int	DBpatch_5000005(void)
+{
+	return DBcreate_index("alerts", "alerts_8", "acknowledgeid", 0);
+}
+
+
 #endif
 
 DBPATCH_START(5000)
@@ -127,5 +133,6 @@ DBPATCH_ADD(5000001, 0, 0)
 DBPATCH_ADD(5000002, 0, 0)
 DBPATCH_ADD(5000003, 0, 0)
 DBPATCH_ADD(5000004, 0, 0)
+DBPATCH_ADD(5000005, 0, 0)
 
 DBPATCH_END()
