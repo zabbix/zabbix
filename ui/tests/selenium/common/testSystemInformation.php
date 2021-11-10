@@ -20,12 +20,20 @@
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 class testSystemInformation extends CWebTest {
 
 	public static $timestamp;
 	public static $update_timestamp;
 	const FAILOVER_DELAY = 7;
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
 
 	/**
 	 * Function inserts HA cluster data into ha_node table.
@@ -93,8 +101,7 @@ class testSystemInformation extends CWebTest {
 
 		// Update zebbix frontend config to make sure that the address of the active node is shown correctly in tests.
 		$file_name = dirname(__FILE__).'/../../../conf/zabbix.conf.php';
-		$config = file_get_contents($file_name);
-		$config = strtr($config, ['$ZBX_SERVER ' => '// $ZBX_SERVER ', '$ZBX_SERVER_PORT' => '// $ZBX_SERVER_PORT']);
+		$config = strtr(file_get_contents($file_name), ['$ZBX_SERVER ' => '// $ZBX_SERVER ', '$ZBX_SERVER_PORT' => '// $ZBX_SERVER_PORT']);
 		file_put_contents($file_name, $config);
 
 		// Get the time when config is updated - it is needed to know how long to wait until upbate of zabbix server status.
@@ -109,7 +116,7 @@ class testSystemInformation extends CWebTest {
 	/**
 	 * Function that checks how a running HA cluster info is displayed in system information widget or report.
 	 *
-	 * @param array $dashboardid	id of the dashboard that the widgets are located in
+	 * @param integer $dashboardid	id of the dashboard that the widgets are located in.
 	 *
 	 * @return array
 	 */
@@ -119,7 +126,7 @@ class testSystemInformation extends CWebTest {
 		sleep((int) ini_get('opcache.revalidate_freq') + 1);
 		$this->page->login()->open($url);
 
-		// Not waiting for page to load to minimise the posibility of difference between the time in report and in constant.
+		// Not waiting for page to load to minimise the possibility of difference between the time in report and in constant.
 		$current_time = time();
 		$this->page->waitUntilReady();
 
@@ -143,7 +150,10 @@ class testSystemInformation extends CWebTest {
 		];
 		$skip_fields = [];
 
-		// Compare lastaccess as time difference for each node and exclude corresponding element from screenshot.
+		/**
+		 * The below foreach cycle compares lastaccess as time difference for each node in the widget or part of report
+		 * that displays the list of nodes and excludes corresponding element from screenshot.
+		 */
 		foreach ($nodes as $name => $lastaccess_db) {
 			$row = $nodes_table->findRow('Name', $name);
 			$last_seen = $row->getColumn('Last access');
@@ -155,12 +165,12 @@ class testSystemInformation extends CWebTest {
 			 *  This is required because a second might have passed from defining $current_time and loading the page.
 			 */
 			if ($lastaccess_expected !== $lastaccess_actual) {
-				$this->assertEquals(convertUnitsS($current_time - $lastaccess_db -1), $lastaccess_actual);
+				$this->assertEquals(convertUnitsS($current_time - $lastaccess_db - 1), $lastaccess_actual);
 			}
 
 			$skip_fields[] = $last_seen;
 
-			// Check Zabbix server address and port.
+			// Check Zabbix server address and port for each record in the HA cluster nodes table.
 			if ($name === 'Active node') {
 				global $DB;
 				$skip_fields[] = $row->getColumn('Address');
@@ -168,16 +178,19 @@ class testSystemInformation extends CWebTest {
 			}
 		}
 
-		// Check and hide the active zabbix server address in System stats part of the report.
+		/**
+		 * Check and hide the active zabbix server address in widget that is working in System stats mode or in the part
+		 * of the report that displays the overall system statistics.
+		 */
 		$this->assertEquals($DB['SERVER'].':'.$DB['PORT'], $server_address->getText());
 		$skip_fields[] = $server_address;
 
-		// Hide the footer as it contains zabbix version.
+		// Hide the footer of the report as it contains zabbix version.
 		if (!$dashboardid) {
 			$skip_fields[] = $this->query('xpath://footer')->one();
 		}
 
-		// Check and hide the text of messages as they contain ip addresses of the current host.
+		// Check and hide the text of messages, because they contain ip addresses of the current host.
 		$error_text = [
 			'Connection to Zabbix server "'.$DB['SERVER'].'" failed. Possible reasons:',
 			'1. Incorrect server IP/DNS in the "zabbix.conf.php";',
@@ -186,7 +199,7 @@ class testSystemInformation extends CWebTest {
 		];
 		$messages = CMessageElement::find()->all();
 		foreach ($messages as $message) {
-			$this->assertEquals($error_text, $message->getLines()->asText());
+			$this->assertMessage(TEST_BAD, null, $error_text);
 			$skip_fields[] = $message;
 		}
 
@@ -195,6 +208,8 @@ class testSystemInformation extends CWebTest {
 
 	/**
 	 * Function checks that zabbix server status is updated after failover delay passes and frontend config is re-validated.
+	 *
+	 * @param integer $dashboardid	id of the dashboard that the widgets are located in.
 	 */
 	public function checkServerStatusAfterFailover($dashboardid = null) {
 		$url = (!$dashboardid) ? 'zabbix.php?action=report.status' : 'zabbix.php?action=dashboard.view&dashboardid='.$dashboardid;
@@ -204,9 +219,9 @@ class testSystemInformation extends CWebTest {
 		// Check that before failover delay passes frontend thinks that zabbix server is running.
 		$this->assertEquals('Yes', $table->findRow('Parameter', 'Zabbix server is running')->getColumn(0)->getText());
 
-		// Wait for failover delay to pass
+		// Wait for failover delay to pass.
 		while(time() <= self::$update_timestamp + self::FAILOVER_DELAY) {
-			// Code is not missing here
+			// Code is not missing here.
 		}
 
 		// Check that after failover delay passes frontend re-validates zabbix server status.

@@ -19,7 +19,6 @@
 **/
 
 require_once dirname(__FILE__).'/../common/testSystemInformation.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
  * @backup dashboard, ha_node, config
@@ -32,13 +31,6 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 
 	public static $dashboardid;				// Deshboard for checking widget content with enabled and disabled HA cluster.
 	public static $widgets_dashboardid;		// Dashboard for checking creation and update of system information widgets.
-
-	/**
-	 * Attach MessageBehavior to the test.
-	 */
-	public function getBehaviors() {
-		return [CMessageBehavior::class];
-	}
 
 	/**
 	 * Function creates dashboards with widgets for test and defines the corresponding dashboard IDs.
@@ -127,7 +119,10 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 	public function testDashboardSystemInformationWidget_Create() {
 		$widgets = [
 			[
-				'fields' => ['Name' => 'Widget with default Show']
+				'fields' => [
+					'Name' => 'Widget with default Show',
+					'Refresh interval' => '2 minutes'
+				]
 			],
 			[
 				'fields' => ['Show' => 'High availability nodes']
@@ -142,14 +137,17 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 				'old_name' => 'System stats view',
 				'fields' => [
 					'Name' => 'Updated to HA nodes view',
-					'Show' => 'High availability nodes'
-				]
+					'Show' => 'High availability nodes',
+					'Refresh interval' => '30 seconds'
+				],
+				'not_last' => true
 			],
 			[
 				'old_name' => 'HA nodes view',
 				'fields' => [
 					'Name' => 'Updated to Sysem Info view',
-					'Show' => 'System stats'
+					'Show' => 'System stats',
+					'Refresh interval' => '10 minutes'
 				]
 			]
 		];
@@ -220,12 +218,13 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 	 * @param string $action	operation to be performed with the widget
 	 */
 	private function executeWidgetAction($widgets, $action) {
+		$page_name = ($action === 'update') ? 'Page for updating widgets' : 'Page for creating widgets';
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$widgets_dashboardid);
 		$dashboard = CDashboardElement::find()->one()->waitUntilReady();
 		$dashboard->edit();
 		// Open the corresponding dashboard page in case of update.
 		if ($action === 'update') {
-			$this->query('xpath://span[@title="Page for updating widgets"]')->one()->click();
+			$this->query('xpath://span[@title='.zbx_dbstr($page_name).']')->one()->click();
 		}
 
 		// Execute the required operation for both widgets.
@@ -243,10 +242,43 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 		// Save the dashboard and check info displayed by the widgets.
 		$dashboard->save();
 		if ($action === 'update') {
-			$this->query('xpath://span[@title="Page for updating widgets"]')->waitUntilClickable()->one()->click();
+			$this->query('xpath://span[@title='.zbx_dbstr($page_name).']')->waitUntilClickable()->one()->click();
 		}
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 		$this->assertScreenshot($dashboard, $action.'_widgets');
+
+		foreach ($widgets as $widget_data) {
+			// Check widget refresh interval.
+			$refresh_interval = CTestArrayHelper::get($widget_data['fields'], 'Refresh interval', '15 minutes');
+			$widget = $dashboard->getWidget(CTestArrayHelper::get($widget_data['fields'], 'Name', 'System information'));
+			$this->assertEquals($refresh_interval, $widget->getRefreshInterval());
+
+			// Check that widget with the corresponding name is present in DB.
+			$widget_sql = 'SELECT count(widgetid) FROM widget WHERE type="systeminfo" AND dashboard_pageid in '
+					.'(SELECT dashboard_pageid from dashboard_page WHERE name='.zbx_dbstr($page_name).') '
+					.'AND name='.zbx_dbstr(CTestArrayHelper::get($widget_data['fields'], 'Name', ''));
+			$this->assertEquals('1', CDBHelper::getValue($widget_sql));
+
+			// Check field values when opening widget config and exit edit mode.
+			$field_values = [
+				'Type' => 'System information',
+				'Name' => '',
+				'Refresh interval' => 'Default (15 minutes)',
+				'Show' => 'System stats'
+			];
+			foreach ($widget_data['fields'] as $field => $value) {
+				$field_values[$field] = $value;
+			}
+			$form = $widget->edit()->asForm();
+			$this->assertEquals($field_values, $form->getFields()->asValues());
+			$form->submit();
+			$dashboard->cancelEditing();
+
+			// Reopen the corresponding Dashboard page if more updated widgets need to be checked.
+			if ($action === 'update' && CTestArrayHelper::get($widget_data, 'not_last')) {
+				$this->query('xpath://span[@title='.zbx_dbstr($page_name).']')->waitUntilClickable()->one()->click();
+			}
+		}
 	}
 }

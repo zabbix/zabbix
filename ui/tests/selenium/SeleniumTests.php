@@ -64,11 +64,6 @@ require_once dirname(__FILE__).'/testPageQueueDetails.php';
 require_once dirname(__FILE__).'/testPageQueueOverview.php';
 require_once dirname(__FILE__).'/testPageQueueOverviewByProxy.php';
 */
-require_once dirname(__FILE__).'/testPageReportsActionLog.php';
-require_once dirname(__FILE__).'/testPageReportsAudit.php';
-require_once dirname(__FILE__).'/testPageReportsNotifications.php';
-require_once dirname(__FILE__).'/testPageReportsSystemInformation.php';
-require_once dirname(__FILE__).'/testPageReportsTriggerTop.php';
 require_once dirname(__FILE__).'/testPageSearch.php';
 require_once dirname(__FILE__).'/testPageStatusOfZabbix.php';
 require_once dirname(__FILE__).'/testPageTemplates.php';
@@ -183,9 +178,14 @@ require_once dirname(__FILE__).'/dashboard/testDashboardProblemsBySeverityWidget
 require_once dirname(__FILE__).'/dashboard/testDashboardSystemInformationWidget.php';
 require_once dirname(__FILE__).'/dashboard/testFormTemplateDashboards.php';
 require_once dirname(__FILE__).'/dashboard/testPageTemplateDashboards.php';
-require_once dirname(__FILE__).'/scheduledReports/testFormScheduledReport.php';
-require_once dirname(__FILE__).'/scheduledReports/testPageScheduledReport.php';
-require_once dirname(__FILE__).'/scheduledReports/testScheduledReportPermissions.php';
+require_once dirname(__FILE__).'/reports/testPageReportsActionLog.php';
+require_once dirname(__FILE__).'/reports/testPageReportsAudit.php';
+require_once dirname(__FILE__).'/reports/testPageReportsNotifications.php';
+require_once dirname(__FILE__).'/reports/testPageReportsSystemInformation.php';
+require_once dirname(__FILE__).'/reports/testPageReportsTriggerTop.php';
+require_once dirname(__FILE__).'/reports/testFormScheduledReport.php';
+require_once dirname(__FILE__).'/reports/testPageScheduledReport.php';
+require_once dirname(__FILE__).'/reports/testScheduledReportPermissions.php';
 require_once dirname(__FILE__).'/testSID.php';
 
 class SeleniumTests {
