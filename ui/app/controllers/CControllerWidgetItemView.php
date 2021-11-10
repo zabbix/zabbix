@@ -110,7 +110,9 @@ class CControllerWidgetItemView extends CControllerWidget {
 
 						// Override item units if needed.
 						$units = ($fields['units'] === '')
-							? $items_with_values[$fields['itemid'][0]]['units']
+							? ($fields['units_show'] == 1)
+								? $items_with_values[$fields['itemid'][0]]['units']
+								: ''
 							: $fields['units'];
 					}
 
@@ -255,13 +257,15 @@ class CControllerWidgetItemView extends CControllerWidget {
 				$classes[] = 'bold';
 			}
 
+			$styles = ['--item-font' => number_format($fields['desc_size'] / 100, 2)];
+			if ($fields['desc_color'] !== '') {
+				$styles['color'] = '#'.$fields['desc_color'];
+			}
+
 			$data[$fields['desc_v_pos']][$fields['desc_h_pos']] = [
 				'data' => $description,
 				'classes' => $classes,
-				'styles' => [
-					'color' => '#'.$fields['desc_color'],
-					'--item-font' => number_format($fields['desc_size'] / 100, 2)
-				]
+				'styles' => $styles
 			];
 		}
 
@@ -279,10 +283,16 @@ class CControllerWidgetItemView extends CControllerWidget {
 					$units_classes[] = 'bold';
 				}
 
+				$units_styles = ['--item-font' => number_format($fields['units_size'] / 100, 2)];
+				if ($fields['units_color'] !== '') {
+					$units_styles['color'] = '#'.$fields['units_color'];
+				}
+
 				if (in_array($fields['units_pos'], [WIDGET_ITEM_POS_BEFORE, WIDGET_ITEM_POS_ABOVE])) {
 					$data[$fields['value_v_pos']][$fields['value_h_pos']]['data'][] = [
 						'data' => $units,
-						'classes' => $units_classes
+						'classes' => $units_classes,
+						'styles' => $units_styles
 					];
 				}
 			}
@@ -292,29 +302,33 @@ class CControllerWidgetItemView extends CControllerWidget {
 				$classes[] = 'bold';
 			}
 
+			$styles = ['--item-font' => number_format($fields['value_size'] / 100, 2)];
+			if ($fields['value_color'] !== '') {
+				$styles['color'] = '#'.$fields['value_color'];
+			}
+
 			$data[$fields['value_v_pos']][$fields['value_h_pos']]['data'][] = [
 				'data' => $value,
 				'value_type' => $value_type,
 				'classes' => $classes,
-				'styles' => [
-					'color' => '#'.$fields['value_color'],
-					'--item-font' => number_format($fields['value_size'] / 100, 2)
-				]
+				'styles' => $styles
 			];
 
-			if (in_array($value_type, [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
+			if ($decimals !== '' && in_array($value_type, [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
 				$classes = ['decimals'];
 				if ($fields['value_bold'] == 1) {
 					$classes[] = 'bold';
 				}
 
+				$styles = ['--item-font' => number_format($fields['decimal_size'] / 100, 2)];
+				if ($fields['value_color'] !== '') {
+					$styles['color'] = '#'.$fields['value_color'];
+				}
+
 				$data[$fields['value_v_pos']][$fields['value_h_pos']]['data'][] = [
 					'data' => $decimals,
 					'classes' => $classes,
-					'styles' => [
-						'color' => '#'.$fields['value_color'],
-						'--item-font' => number_format($fields['decimal_size'] / 100, 2)
-					]
+					'styles' => $styles
 				];
 			}
 
@@ -322,9 +336,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 				$data[$fields['value_v_pos']][$fields['value_h_pos']]['data'][] = [
 					'data' => $change_indicator,
 					'classes' => ['change-indicator'],
-					'styles' => [
-						'--item-font' => number_format($fields['value_size'] / 100, 2)
-					]
+					'styles' => ['--item-font' => number_format($fields['value_size'] / 100, 2)]
 				];
 			}
 
@@ -332,7 +344,8 @@ class CControllerWidgetItemView extends CControllerWidget {
 					&& in_array($fields['units_pos'], [WIDGET_ITEM_POS_AFTER, WIDGET_ITEM_POS_BELOW])) {
 				$data[$fields['value_v_pos']][$fields['value_h_pos']]['data'][] = [
 					'data' => $units,
-					'classes' => $units_classes
+					'classes' => $units_classes,
+					'styles' => $units_styles
 				];
 			}
 		}
@@ -344,9 +357,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 				'data' => [[
 					'data' => $change_indicator,
 					'classes' => ['change-indicator'],
-					'styles' => [
-						'--item-font' => number_format($fields['value_size'] / 100, 2)
-					]
+					'styles' => ['--item-font' => number_format($fields['value_size'] / 100, 2)]
 				]],
 				'classes' => $classes
 			];
@@ -358,17 +369,25 @@ class CControllerWidgetItemView extends CControllerWidget {
 				$classes[] = 'bold';
 			}
 
+			$styles = ['--item-font' => number_format($fields['time_size'] / 100, 2)];
+			if ($fields['time_color'] !== '') {
+				$styles['color'] = '#'.$fields['time_color'];
+			}
+
 			$data[$fields['time_v_pos']][$fields['time_h_pos']] = [
 				'data' => $time,
 				'classes' => $classes,
-				'styles' => [
-					'color' => '#'.$fields['time_color'],
-					'--item-font' => number_format($fields['time_size'] / 100, 2)
-				]
+				'styles' => $styles
 			];
 		}
 
-		// To do: sort $data by vertical and horizontal position keys -> data[vertical_pos][horizontal_pos]
+		// Sort data in order - top, middle, bottom and left, center, right.
+		foreach ($data as $row) {
+			ksort($row);
+		}
+		ksort($data);
+
+		$data['bg_color'] = $fields['bg_color'];
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultName()),
