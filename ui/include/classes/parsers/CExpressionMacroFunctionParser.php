@@ -38,7 +38,12 @@ class CExpressionMacroFunctionParser extends CParser {
 	 * Set up necessary parsers.
 	 */
 	public function __construct() {
-		$this->expression_macro_parser = new CExpressionMacroParser();
+		$this->expression_macro_parser = new CExpressionMacroParser([
+			'usermacros' => true,
+			'lldmacros' => true,
+			'host_macro_n' => true,
+			'empty_host' => true
+		]);
 		$this->function_parser = new C10FunctionParser();
 	}
 

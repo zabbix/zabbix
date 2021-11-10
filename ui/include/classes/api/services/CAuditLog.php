@@ -76,8 +76,9 @@ class CAuditLog extends CApiService {
 		$result = [];
 		$fields = array_keys($this->getTableSchema($this->tableName())['fields']);
 		$actions = [
-			CAudit::ACTION_ADD, CAudit::ACTION_UPDATE, CAudit::ACTION_DELETE, CAudit::ACTION_LOGIN,
-			CAudit::ACTION_LOGOUT, CAudit::ACTION_EXECUTE
+			CAudit::ACTION_ADD, CAudit::ACTION_UPDATE, CAudit::ACTION_DELETE, CAudit::ACTION_LOGOUT,
+			CAudit::ACTION_EXECUTE, CAudit::ACTION_LOGIN_SUCCESS, CAudit::ACTION_LOGIN_FAILED,
+			CAudit::ACTION_HISTORY_CLEAR
 		];
 		$resourcetype = [
 			CAudit::RESOURCE_ACTION, CAudit::RESOURCE_AUTHENTICATION, CAudit::RESOURCE_AUTH_TOKEN,
@@ -91,7 +92,7 @@ class CAuditLog extends CApiService {
 			CAudit::RESOURCE_SCHEDULED_REPORT, CAudit::RESOURCE_SCRIPT, CAudit::RESOURCE_SETTINGS,
 			CAudit::RESOURCE_TEMPLATE, CAudit::RESOURCE_TEMPLATE_DASHBOARD, CAudit::RESOURCE_TRIGGER,
 			CAudit::RESOURCE_TRIGGER_PROTOTYPE, CAudit::RESOURCE_USER, CAudit::RESOURCE_USER_GROUP,
-			CAudit::RESOURCE_USER_ROLE, CAudit::RESOURCE_VALUE_MAP
+			CAudit::RESOURCE_USER_ROLE, CAudit::RESOURCE_VALUE_MAP, CAudit::RESOURCE_HA_NODE
 		];
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [

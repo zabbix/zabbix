@@ -112,15 +112,10 @@ class CSeverityHelper {
 	 * Get severity color from configuration.
 	 *
 	 * @param int $severity
-	 * @param int $value
 	 *
 	 * @return string|null
 	 */
-	public static function getColor(int $severity, int $value = TRIGGER_VALUE_TRUE): ?string {
-		if ($value == TRIGGER_VALUE_FALSE) {
-			return 'AAFFAA';
-		}
-
+	public static function getColor(int $severity): ?string {
 		switch ($severity) {
 			case TRIGGER_SEVERITY_DISASTER:
 				return CSettingsHelper::get(CSettingsHelper::SEVERITY_COLOR_5);

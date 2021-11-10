@@ -19,15 +19,13 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/regexp.inc.php';
-
 class CControllerRegExCreate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'name'         => 'required | string | not_empty | db regexps.name',
-			'test_string'  => 'string | db regexps.test_string',
-			'expressions'  => 'required | array',
+			'name'         => 'required|string|not_empty|db regexps.name',
+			'test_string'  => 'string|db regexps.test_string',
+			'expressions'  => 'required|array',
 			'form_refresh' => ''
 		];
 
@@ -58,27 +56,11 @@ class CControllerRegExCreate extends CController {
 	}
 
 	protected function doAction() {
-		/** @var array $expressions */
-		$expressions = $this->getInput('expressions', []);
-
-		foreach ($expressions as &$expression) {
-			if (!array_key_exists('case_sensitive', $expression)) {
-				$expression['case_sensitive'] = 0;
-			}
-		}
-		unset($expression);
-
-		DBstart();
-		$result = addRegexp([
-			'name'        => $this->getInput('name'),
-			'test_string' => $this->getInput('test_string')
-		], $expressions);
-
-		// if ($result) {
-		// 	add_audit(AUDIT_ACTION_ADD, AUDIT_RESOURCE_REGEXP, _('Name').NAME_DELIMITER.$this->getInput('name'));
-		// }
-
-		$result = DBend($result);
+		$result = API::Regexp()->create([
+			'name' => $this->getInput('name'),
+			'test_string' => $this->getInput('test_string', ''),
+			'expressions' => $this->getInput('expressions')
+		]);
 
 		if ($result) {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))->setArgument('action', 'regex.list'));

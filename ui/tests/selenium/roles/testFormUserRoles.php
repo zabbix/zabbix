@@ -119,7 +119,7 @@ class testFormUserRoles extends CWebTest {
 						'User type' => 'User'
 					],
 					'message_header' => 'Cannot create user role',
-					'message_details' => 'User role with name "User role" already exists.'
+					'message_details' => 'User role "User role" already exists.'
 				]
 			],
 			[
@@ -130,7 +130,7 @@ class testFormUserRoles extends CWebTest {
 						'User type' => 'Admin'
 					],
 					'message_header' => 'Cannot create user role',
-					'message_details' => 'User role with name "Admin role" already exists.'
+					'message_details' => 'User role "Admin role" already exists.'
 				]
 			],
 			[
@@ -141,7 +141,7 @@ class testFormUserRoles extends CWebTest {
 						'User type' => 'Super admin'
 					],
 					'message_header' => 'Cannot create user role',
-					'message_details' => 'User role with name "Super admin role" already exists.'
+					'message_details' => 'User role "Super admin role" already exists.'
 				]
 			],
 			// Empty name field.
@@ -224,7 +224,7 @@ class testFormUserRoles extends CWebTest {
 						'Reports' => []
 					],
 					'message_header' => 'Cannot create user role',
-					'message_details' => 'At least one UI element must be checked.'
+					'message_details' => 'At least one UI element must be enabled for user role "user_ui_checked_out".'
 				]
 			],
 			[
@@ -239,7 +239,7 @@ class testFormUserRoles extends CWebTest {
 						'Configuration' => []
 					],
 					'message_header' => 'Cannot create user role',
-					'message_details' => 'At least one UI element must be checked.'
+					'message_details' => 'At least one UI element must be enabled for user role "admin_ui_checked_out".'
 				]
 			],
 			[
@@ -255,7 +255,7 @@ class testFormUserRoles extends CWebTest {
 						'Administration' => []
 					],
 					'message_header' => 'Cannot create user role',
-					'message_details' => 'At least one UI element must be checked.'
+					'message_details' => 'At least one UI element must be enabled for user role "super_admin_ui_checked_out".'
 				]
 			],
 			// Remove everything.
@@ -282,7 +282,7 @@ class testFormUserRoles extends CWebTest {
 						'Default access to new actions' => false
 					],
 					'message_header' => 'Cannot create user role',
-					'message_details' => 'At least one UI element must be checked.'
+					'message_details' => 'At least one UI element must be enabled for user role "user_everything_removed".'
 				]
 			],
 			[
@@ -311,7 +311,7 @@ class testFormUserRoles extends CWebTest {
 						'Default access to new actions' => false
 					],
 					'message_header' => 'Cannot create user role',
-					'message_details' => 'At least one UI element must be checked.'
+					'message_details' => 'At least one UI element must be enabled for user role "admin_everything_removed".'
 				]
 			],
 			[
@@ -341,7 +341,7 @@ class testFormUserRoles extends CWebTest {
 						'Default access to new actions' => false
 					],
 					'message_header' => 'Cannot create user role',
-					'message_details' => 'At least one UI element must be checked.'
+					'message_details' => 'At least one UI element must be enabled for user role "super_admin_everything_removed".'
 				]
 			],
 			// Special symbols in the name.
@@ -626,7 +626,7 @@ class testFormUserRoles extends CWebTest {
 						'User type' => 'Super admin',
 						'Default access to new modules' => false,
 						'API methods' => 'Deny list',
-						'Monitoring' => ['Overview', 'Maps'],
+						'Monitoring' => ['Maps'],
 						'Reports' => [],
 						'Create and edit dashboards' => false
 					],
@@ -649,9 +649,9 @@ class testFormUserRoles extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=userrole.edit&roleid=1');
 		$this->page->assertTitle('Configuration of user roles');
 		$this->page->assertHeader('User roles');
-		$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
+		$form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
 		$this->assertEquals(255, $form->getField('Name')->getAttribute('maxlength'));
-		$this->assertEquals($roles, $this->query('class:js-userrole-usertype')->one()->asZDropdown()->getOptions()->asText());
+		$this->assertEquals($roles, $this->query('id:user-type')->one()->asZDropdown()->getOptions()->asText());
 
 		// Unchecking API, button and radio button becomes disabled.
 		$form->fill(['Enabled' => false]);
@@ -667,11 +667,11 @@ class testFormUserRoles extends CWebTest {
 		$this->page->removeFocus();
 		$screenshot_area = $this->query('id:user_role_tab')->one();
 		foreach ($roles as $role) {
-			$this->query('class:js-userrole-usertype')->one()->asZDropdown()->select($role);
+			$this->query('id:user-type')->one()->asZDropdown()->select($role);
 			$this->assertScreenshotExcept($screenshot_area, ['query' => 'xpath://input[@id="name"]'], $role);
 
 			// List of API requests.
-			$this->query('button:Select')->one()->click();
+			$this->query('xpath://div[@id="api_methods_"]/following::button[text()="Select"]')->one()->click();
 			$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
 			$this->assertScreenshot($this->query('xpath://div[@role="dialog"]')->one(), $role.'api');
 			$overlay->close();
@@ -727,7 +727,7 @@ class testFormUserRoles extends CWebTest {
 						'Name' => 'User role '
 					],
 					'message_header' => 'Cannot update user role',
-					'message_details' => 'User role with name "User role" already exists.'
+					'message_details' => 'User role "User role" already exists.'
 				]
 			],
 			// All UI elements disabled.
@@ -740,7 +740,7 @@ class testFormUserRoles extends CWebTest {
 						'Reports' => []
 					],
 					'message_header' => 'Cannot update user role',
-					'message_details' => 'At least one UI element must be checked.'
+					'message_details' => 'At least one UI element must be enabled for user role "role_for_update".'
 				]
 			],
 			// Change name.
@@ -848,7 +848,7 @@ class testFormUserRoles extends CWebTest {
 
 	public function testFormUserRoles_Clone() {
 		$this->page->login()->open('zabbix.php?action=userrole.edit&roleid=2');
-		$form = $this->query('id:userrole-form')->waitUntilReady()->asFluidForm()->one();
+		$form = $this->query('id:userrole-form')->waitUntilReady()->asForm()->one();
 		$values = $form->getFields()->asValues();
 		$role_name = $values['Name'];
 		$this->query('button:Clone')->one()->click();
@@ -883,8 +883,7 @@ class testFormUserRoles extends CWebTest {
 			$this->page->acceptAlert();
 			$this->page->waitUntilReady();
 			if ($role === 'Admin role') {
-				$this->assertMessage(TEST_BAD, 'Cannot delete user role', 'The role "Admin role" is assigned to'.
-						' at least one user and cannot be deleted.');
+				$this->assertMessage(TEST_BAD, 'Cannot delete user role', 'Cannot delete assigned user role "Admin role".');
 				$this->assertEquals($hash_before, CDBHelper::getHash(self::ROLE_SQL));
 			}
 			else {
@@ -898,7 +897,7 @@ class testFormUserRoles extends CWebTest {
 		foreach(['userrole.edit', 'userrole.edit&roleid=2'] as $link) {
 			$hash_before = CDBHelper::getHash(self::ROLE_SQL);
 			$this->page->login()->open('zabbix.php?action='.$link);
-			$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
+			$form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
 			$form->fill(['Name' => 'cancellation_name_user']);
 			$this->query('button:Cancel')->one()->click();
 			$this->assertEquals($hash_before, CDBHelper::getHash(self::ROLE_SQL));
@@ -912,7 +911,7 @@ class testFormUserRoles extends CWebTest {
 		$this->page->userLogin('super_role_check', 'test5678');
 		$this->page->open('zabbix.php?action=userrole.list')->waitUntilReady();
 		$this->query('link:super_role')->one()->click();
-		$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
+		$form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
 		$this->assertEquals('User cannot change the user type of own role.',
 				$this->query('xpath://input[@id="type"]/following::span')->one()->getText()
 		);
@@ -927,7 +926,7 @@ class testFormUserRoles extends CWebTest {
 		foreach ([true, false] as $enable_modules) {
 			$modules = ['4th Module', '5th Module'];
 			$this->page->open('zabbix.php?action=userrole.edit&roleid=2')->waitUntilReady();
-			$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
+			$form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
 			if ($enable_modules === true) {
 				$this->assertTrue($form->query('xpath://label[text()="No enabled modules found."]')->one()->isDisplayed());
 				$this->page->open('zabbix.php?action=module.list')->waitUntilReady();
@@ -960,11 +959,11 @@ class testFormUserRoles extends CWebTest {
 				$hash_before = CDBHelper::getHash(self::ROLE_SQL);
 			}
 		}
-		$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
+		$form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
 		$form->fill($data['fields']);
 
 		if (array_key_exists('api_methods', $data)) {
-			$this->query('class:multiselect-control')->asMultiselect()->one()->fill($data['api_methods']);
+			$this->query('xpath:(//div[@class="multiselect-control"])[3]')->asMultiselect()->one()->fill($data['api_methods']);
 		}
 		$form->submit();
 
@@ -989,7 +988,7 @@ class testFormUserRoles extends CWebTest {
 				$this->page->login()->open('zabbix.php?action=userrole.edit&roleid='.$id);
 			}
 
-			$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
+			$form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
 
 			if (array_key_exists('space', $data)) {
 				$data['fields']['Name'] = trim($data['fields']['Name']);
@@ -997,7 +996,7 @@ class testFormUserRoles extends CWebTest {
 			$form->checkValue($data['fields']);
 
 			if (array_key_exists('api_methods', $data)) {
-				$api_methods = $this->query('class:multiselect-control')->asMultiselect()->one()->getValue();
+				$api_methods = $this->query('xpath:(//div[@class="multiselect-control"])[3]')->asMultiselect()->one()->getValue();
 				rsort($api_methods);
 				$this->assertEquals($data['api_methods'], $api_methods);
 			}

@@ -21,7 +21,10 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
+
+$this->includeJsFile('search.js.php');
 
 $widgets = [];
 
@@ -44,14 +47,14 @@ $table = (new CTableInfo())
 
 foreach ($data['hosts'] as $hostid => $host) {
 	$interface = reset($host['interfaces']);
-	$link = 'hostid='.$hostid;
 	$visible_name = make_decoration($host['name'], $data['search']);
 
 	$name_link = ($host['editable'] && $data['allowed_ui_conf_hosts'])
-		? new CLink($visible_name, (new CUrl('hosts.php'))
-			->setArgument('form', 'update')
+		? (new CLink($visible_name, (new CUrl('zabbix.php'))
+			->setArgument('action', 'host.edit')
 			->setArgument('hostid', $hostid)
-		)
+		))
+			->onClick('view.editHost(event, '.json_encode($host['hostid']).')')
 		: new CSpan($visible_name);
 
 	if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
@@ -207,7 +210,8 @@ foreach ($data['groups'] as $groupid => $group) {
 
 	if ($data['admin']) {
 		$hosts_link = ($group['editable'] && $data['allowed_ui_conf_hosts'] && $group['hosts'])
-			? [new CLink(_('Hosts'), (new CUrl('hosts.php'))
+			? [new CLink(_('Hosts'), (new CUrl('zabbix.php'))
+				->setArgument('action', 'host.list')
 				->setArgument('filter_set', '1')
 				->setArgument('filter_groups', [$groupid])
 			), CViewHelper::showNum($group['hosts'])]

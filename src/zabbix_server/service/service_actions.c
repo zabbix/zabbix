@@ -176,10 +176,10 @@ static const char	*service_update_match_condition(const zbx_service_update_t *up
  ******************************************************************************/
 static int	service_update_match_action(const zbx_service_update_t *update, const zbx_service_action_t *action)
 {
-	int		pos = 0, last_pos = 0, index;
+	int		index;
+	size_t		pos = 0, last_pos = 0, expr_alloc = 0, expr_offset = 0;
 	char		*expr = NULL, error[256];
 	const char	*value;
-	size_t		expr_alloc = 0, expr_offset = 0;
 	zbx_token_t	token;
 	zbx_uint64_t	id;
 	double		res;
@@ -187,7 +187,7 @@ static int	service_update_match_action(const zbx_service_update_t *update, const
 	if (0 == action->conditions.values_num)
 		return SUCCEED;
 
-	for (; SUCCEED == zbx_token_find(action->formula, pos, &token, ZBX_TOKEN_SEARCH_FUNCTIONID); pos++)
+	for (; SUCCEED == zbx_token_find(action->formula, (int)pos, &token, ZBX_TOKEN_SEARCH_FUNCTIONID); pos++)
 	{
 		switch (token.type)
 		{

@@ -20,15 +20,8 @@
 #ifndef ZABBIX_EVALFUNC_H
 #define ZABBIX_EVALFUNC_H
 
-typedef enum
-{
-	ZBX_FORMAT_RAW,
-	ZBX_FORMAT_HUMAN
-}
-zbx_output_format_t;
-
-int	evaluate_macro_function(char **result, const char *host, const char *key, const char *function,
-		const char *parameter, zbx_output_format_t format);
 int	zbx_evaluatable_for_notsupported(const char *fn);
+int	zbx_evaluate_RATE(zbx_variant_t *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
+		char **error);
 
 #endif

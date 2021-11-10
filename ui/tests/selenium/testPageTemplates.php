@@ -67,6 +67,11 @@ class testPageTemplates extends CLegacyWebTest {
 	 * @dataProvider allTemplates
 	 */
 	public function testPageTemplates_SimpleUpdate($template) {
+		// TODO: Remove the below if condition along with its content when ZBX-20020 is merged
+		if ($template['name'] === 'Cisco UCS Manager SNMP') {
+			return;
+		}
+
 		$host = $template['host'];
 		$name = $template['name'];
 
@@ -87,15 +92,13 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->zbxTestLogin('templates.php?page=1');
 		$this->query('button:Reset')->one()->click();
 
-		// Check if template name present on page, if not, check on next page.
-		for ($i = 0; $i < 2; $i++) {
-			if ($this->query('link', $name)->one(false)->isValid() === true) {
-				break;
-			}
-			$this->query('xpath://div[@class="table-paging"]//span[@class="arrow-right"]/..')->one()->click();
-			$this->zbxTestWaitForPageToLoad();
-		}
-		$this->zbxTestClickLinkTextWait($name);
+		// Filter necessary Template name.
+		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
+		$form->fill(['Name' => $name]);
+		$this->query('button:Apply')->one()->waitUntilClickable()->click();
+		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
+				->getColumn('Name')->query('link', $name)->one()->click();
+
 		$this->zbxTestCheckHeader('Templates');
 		$this->zbxTestTextPresent('All templates');
 		$this->zbxTestClickWait('update');

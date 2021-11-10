@@ -46,9 +46,11 @@ class CControllerPopupMassupdateService extends CController {
 		return $ret;
 	}
 
+	/**
+	 * @throws APIException
+	 */
 	protected function checkPermissions(): bool {
-		if (!$this->checkAccess(CRoleHelper::UI_MONITORING_SERVICES)
-				|| !$this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SERVICES)) {
+		if (!$this->checkAccess(CRoleHelper::UI_MONITORING_SERVICES)) {
 			return false;
 		}
 
@@ -60,7 +62,6 @@ class CControllerPopupMassupdateService extends CController {
 
 	protected function doAction(): void {
 		if ($this->hasInput('update')) {
-			$output = [];
 			$serviceids = $this->getInput('ids', []);
 			$visible = $this->getInput('visible', []);
 			$tags = array_filter($this->getInput('tags', []),

@@ -34,6 +34,8 @@ class CExpressionValidatorTest extends TestCase {
 			['min(avg_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
 			['sum(avg_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
 
+			['histogram_quantile(1, bucket_rate_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
+
 			['avg(count_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
 			['count(count_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
 			['max(count_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
@@ -88,6 +90,8 @@ class CExpressionValidatorTest extends TestCase {
 
 			// Unknown function in trigger expression.
 			['avg_foreach(/host/key)', [], ['rc' => false, 'error' => 'unknown function "avg_foreach"']],
+			['bucket_percentile(/host/key)', [], ['rc' => false, 'error' => 'unknown function "bucket_percentile"']],
+			['bucket_rate_foreach(/host/key)', [], ['rc' => false, 'error' => 'unknown function "bucket_rate_foreach"']],
 			['count_foreach(/host/key)', [], ['rc' => false, 'error' => 'unknown function "count_foreach"']],
 			['exists_foreach(/host/key)', [], ['rc' => false, 'error' => 'unknown function "exists_foreach"']],
 			['item_count(/host/key)', [], ['rc' => false, 'error' => 'unknown function "item_count"']],
@@ -98,6 +102,7 @@ class CExpressionValidatorTest extends TestCase {
 
 			// Not aggregated.
 			['avg_foreach(/host/key, 1)', ['calculated' => true], ['rc' => false, 'error' => 'incorrect usage of function "avg_foreach"']],
+			['bucket_rate_foreach(/host/key, 1)', ['calculated' => true], ['rc' => false, 'error' => 'incorrect usage of function "bucket_rate_foreach"']],
 			['count_foreach(/host/key, 1)', ['calculated' => true], ['rc' => false, 'error' => 'incorrect usage of function "count_foreach"']],
 			['exists_foreach(/host/key)', ['calculated' => true], ['rc' => false, 'error' => 'incorrect usage of function "exists_foreach"']],
 			['last_foreach(/host/key, 1)', ['calculated' => true], ['rc' => false, 'error' => 'incorrect usage of function "last_foreach"']],
@@ -139,7 +144,9 @@ class CExpressionValidatorTest extends TestCase {
 			['foo(/host/item)', [], ['rc' => false, 'error' => 'unknown function "foo"']],
 			['abs(/host/item)', [], ['rc' => false, 'error' => 'incorrect usage of function "abs"']],
 			['foo(1, 2, 3)', [], ['rc' => false, 'error' => 'unknown function "foo"']],
-			['change(1, 2, 3)', [], ['rc' => false, 'error' => 'incorrect usage of function "change"']]
+			['change(1, 2, 3)', [], ['rc' => false, 'error' => 'incorrect usage of function "change"']],
+			['count(123)', [], ['rc' => false, 'error' => 'incorrect usage of function "count"']],
+			['avg(bucket_rate_foreach(/host/*, 1))', ['calculated' => true], ['rc' => false, 'error' => 'incorrect usage of function "bucket_rate_foreach"']]
 		];
 	}
 

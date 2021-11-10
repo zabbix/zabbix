@@ -231,7 +231,7 @@ class testToken extends CAPITest {
 						'userid' => 1
 					]
 				],
-				'expected_error' => 'Invalid parameter "/3": value (name, userid)=(the-same-1, 1) already exists.'
+				'expected_error' => 'Invalid parameter "/3": value (userid, name)=(1, the-same-1) already exists.'
 			],
 			[
 				'tokens' => [

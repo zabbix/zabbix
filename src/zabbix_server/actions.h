@@ -31,6 +31,8 @@ typedef struct
 	zbx_uint64_t	eventid;
 	zbx_uint64_t	acknowledgeid;
 	zbx_uint64_t	taskid;
+	int		old_severity;
+	int		new_severity;
 }
 zbx_ack_task_t;
 

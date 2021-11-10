@@ -30,6 +30,6 @@ class function_DBclose extends CTest {
 	public function test_DBcloseOfClosedDatabase() {
 		DBconnect($error);
 		DBclose();
-		$this->assertFalse(DBclose(), 'Chuck Norris: DBclose() must return False if the datbase is already closed');
+		$this->assertFalse(DBclose(), 'Chuck Norris: DBclose() must return False if the database is already closed');
 	}
 }

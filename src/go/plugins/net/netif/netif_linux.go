@@ -127,7 +127,7 @@ func (p *Plugin) getDevDiscovery() (netInterfaces []msgIfDiscovery, err error) {
 	for sLines := bufio.NewScanner(f); sLines.Scan(); {
 		dev := strings.Split(sLines.Text(), ":")
 		if len(dev) > 1 {
-			netInterfaces = append(netInterfaces, msgIfDiscovery{strings.TrimSpace(dev[0])})
+			netInterfaces = append(netInterfaces, msgIfDiscovery{strings.TrimSpace(dev[0]), nil})
 		}
 	}
 

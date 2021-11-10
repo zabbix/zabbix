@@ -162,10 +162,6 @@ class CApiService {
 		if ($tableName) {
 			$schema = $this->getTableSchema($tableName);
 
-			if (strpos($schema['key'], ',') !== false) {
-				throw new Exception('Composite private keys are not supported in this API version.');
-			}
-
 			return $schema['key'];
 		}
 
@@ -418,13 +414,17 @@ class CApiService {
 	}
 
 	/**
-	 * Returns DISTINCT modifier for sql statements with multiple joins.
+	 * Returns DISTINCT modifier for sql statements with multiple joins and without aggregations.
 	 *
 	 * @param array $sql_parts  An SQL parts array.
 	 *
 	 * @return string
 	 */
 	protected static function dbDistinct(array $sql_parts) {
+		if (preg_grep('/^COUNT\(/', $sql_parts['select'])) {
+			return '';
+		}
+
 		$count = count($sql_parts['from']);
 
 		if ($count == 1 && array_key_exists('left_join', $sql_parts)) {
@@ -491,18 +491,24 @@ class CApiService {
 	 * @return array		The resulting SQL parts array
 	 */
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		// If table do not have a primary key, use COUNT(*) to select number of rows.
 		$pk = $this->pk($tableName);
-		$pkFieldId = $this->fieldId($pk, $tableAlias);
+		$pk_composite = (strpos($pk, ',') !== false);
 
-		// count
 		if (array_key_exists('countOutput', $options) && $options['countOutput']
 				&& !$this->requiresPostSqlFiltering($options)) {
-			$sqlParts['select'] = ($pk !== '')
-				? ['COUNT(DISTINCT '.$pkFieldId.') AS rowscount']
+
+			$has_joins = (count($sqlParts['from']) > 1
+					|| (array_key_exists('left_join', $sqlParts) && $sqlParts['left_join']));
+
+			if ($pk_composite && $has_joins) {
+				throw new Exception('Joins with composite primary keys are not supported in this API version.');
+			}
+
+			$sqlParts['select'] = $has_joins
+				? ['COUNT(DISTINCT '.$this->fieldId($pk, $tableAlias).') AS rowscount']
 				: ['COUNT(*) AS rowscount'];
 
-			// select columns used by group count
+			// Select columns used by group count.
 			if (array_key_exists('groupCount', $options) && $options['groupCount']) {
 				foreach ($sqlParts['group'] as $fields) {
 					$sqlParts['select'][] = $fields;
@@ -511,8 +517,8 @@ class CApiService {
 		}
 		// custom output
 		elseif (is_array($options['output'])) {
-			// the pk field must always be included for the API to work properly
-			$sqlParts['select'] = ($pk !== '') ? [$pkFieldId] : [];
+			$sqlParts['select'] = $pk_composite ? [] : [$this->fieldId($pk, $tableAlias)];
+
 			foreach ($options['output'] as $field) {
 				if ($this->hasField($field, $tableName)) {
 					$sqlParts['select'][] = $this->fieldId($field, $tableAlias);
@@ -1134,24 +1140,6 @@ class CApiService {
 	}
 
 	/**
-	 * Add simple audit record.
-	 *
-	 * @param int    $action        AUDIT_ACTION_*
-	 * @param int    $resourcetype  AUDIT_RESOURCE_*
-	 * @param string $details
-	 * @param string $userid
-	 * @param string $ip
-	 */
-	// protected function addAuditDetails($action, $resourcetype, $details = '', $userid = null, $ip = null) {
-	// 	if ($userid === null) {
-	// 		$userid = self::$userData['userid'];
-	// 		$ip = self::$userData['userip'];
-	// 	}
-
-	// 	CAudit::addDetails($userid, $ip, $action, $resourcetype, $details);
-	// }
-
-	/**
 	 * Legacy method to add audit log records.
 	 *
 	 * @param int   $action        CAudit::ACTION_*
@@ -1168,15 +1156,32 @@ class CApiService {
 	/**
 	 * Add audit log records.
 	 *
-	 * @param int   $resource     CAudit::RESOURCE_*
 	 * @param int   $action       CAudit::ACTION_*
-	 * @param array $objects
-	 * @param array $objects_old
+	 * @param int   $resource     CAudit::RESOURCE_*
+	 * @param array $objects      (optional)
+	 * @param array $objects_old  (optional)
 	 */
-	protected function addAuditLog(int $action, int $resource, array $objects, array $objects_old = null): void {
+	protected static function addAuditLog(int $action, int $resource, array $objects = [],
+			array $objects_old = []): void {
 		CAudit::log(self::$userData['userid'], self::$userData['userip'], self::$userData['username'], $action,
 			$resource, $objects, $objects_old
 		);
+	}
+
+	/**
+	 * Add audit log records on behalf of the given user.
+	 *
+	 * @param string|null $userid
+	 * @param string      $ip
+	 * @param string      $username
+	 * @param int         $action       CAudit::ACTION_*
+	 * @param int         $resource     CAudit::RESOURCE_*
+	 * @param array       $objects      (optional)
+	 * @param array       $objects_old  (optional)
+	 */
+	protected static function addAuditLogByUser(?string $userid, string $ip, string $username, int $action,
+			int $resource, array $objects = [], array $objects_old = []): void {
+		CAudit::log($userid, $ip, $username, $action, $resource, $objects, $objects_old);
 	}
 
 	/**
@@ -1187,6 +1192,8 @@ class CApiService {
 	 * @param string $rule_name  Rule name.
 	 *
 	 * @return bool  Returns true if user has access to specified rule, and false otherwise.
+	 *
+	 * @throws Exception
 	 */
 	protected static function checkAccess(string $rule_name): bool {
 		return (self::$userData && CRoleHelper::checkAccess($rule_name, self::$userData['roleid']));

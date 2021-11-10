@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:04:22Z'
+  version: '6.0'
+  date: '2021-09-09T08:49:53Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -10,6 +10,10 @@ zabbix_export:
       uuid: 399bd1ee587245ecac6f39beaa99886f
       template: 'PostgreSQL by user parameters'
       name: 'PostgreSQL by user parameters'
+      description: |
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384190-%C2%A0discussion-thread-for-official-zabbix-template-db-postgresql
+        
+        Template tooling version used: 0.39
       groups:
         -
           name: Templates/Databases
@@ -66,7 +70,7 @@ zabbix_export:
               value: PostgreSQL
         -
           uuid: 77e1eb202a6346ce9df0f1bb2c078688
-          name: "Bgwriter:\_Buffers backend fsync per second"
+          name: 'Bgwriter: Buffers backend fsync per second'
           type: DEPENDENT
           key: pgsql.bgwriter.buffers_backend_fsync.rate
           delay: '0'
@@ -209,7 +213,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.checkpoint_write_time
+                - $.checkpoint_sync_time
             -
               type: MULTIPLIER
               parameters:
@@ -226,7 +230,7 @@ zabbix_export:
               value: PostgreSQL
         -
           uuid: b5e5f463978c46dd9401963f48ea72eb
-          name: "Bgwriter:\_Checkpoint write time"
+          name: 'Bgwriter: Checkpoint write time'
           type: DEPENDENT
           key: pgsql.bgwriter.checkpoint_write_time
           delay: '0'
@@ -539,7 +543,7 @@ zabbix_export:
             -
               type: REGEX
               parameters:
-                - 'Time:\s(\d+\.\d+)\sms'
+                - 'Time:\s+(\d+\.\d+)\s+ms'
                 - \1
             -
               type: MULTIPLIER
@@ -948,7 +952,7 @@ zabbix_export:
                 -
                   uuid: 3b51f02258bd4e02829f04ca016dd01d
                   expression: 'min(/PostgreSQL by user parameters/pgsql.dbstat.conflicts.rate["{#DBNAME}"],5m) > {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"}'
-                  name: 'Database {#DBNAME}: Too many recovery conflicts (over {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"} in 5m)'
+                  name: 'DB {#DBNAME}: Too many recovery conflicts (over {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: AVERAGE
                   description: |
                     The primary and standby servers are in many ways loosely connected. Actions on the primary will have an effect on the standby. As a result, there is potential for negative interactions or conflicts between them.
@@ -981,7 +985,7 @@ zabbix_export:
                 -
                   uuid: 3bee63fa04d94586937e22aafab9bdd8
                   expression: 'min(/PostgreSQL by user parameters/pgsql.dbstat.deadlocks.rate["{#DBNAME}"],5m) > {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"}'
-                  name: 'Database {#DBNAME}: Deadlock occurred (over {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"} in 5m)'
+                  name: 'DB {#DBNAME}: Deadlock occurred (over {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: HIGH
             -
               uuid: d235ead54c8b41f9a91398c75383e5d7
@@ -1248,7 +1252,7 @@ zabbix_export:
                 -
                   uuid: 709df9c1e29a4ff68a3de9423ff7ae58
                   expression: 'last(/PostgreSQL by user parameters/pgsql.frozenxid.prc_before_stop["{#DBNAME}"])<{$PG.FROZENXID_PCT_STOP.MIN.HIGH:"{#DBNAME}"}'
-                  name: 'Database {#DBNAME}: VACUUM FREEZE is required to prevent wraparound (frozen XID less then {$PG.FROZENXID_PCT_STOP.MIN.HIGH:"{#DBNAME}"} %)'
+                  name: 'DB {#DBNAME}: VACUUM FREEZE is required to prevent wraparound (frozen XID less then {$PG.FROZENXID_PCT_STOP.MIN.HIGH:"{#DBNAME}"} %)'
                   priority: AVERAGE
                   description: |
                     Preventing Transaction ID Wraparound Failures
@@ -1287,7 +1291,7 @@ zabbix_export:
                 -
                   uuid: ef7d3c9866df44aa9b378e7f125a34de
                   expression: 'min(/PostgreSQL by user parameters/pgsql.locks.total["{#DBNAME}"],5m)>{$PG.LOCKS.MAX.WARN:"{#DBNAME}"}'
-                  name: 'Database {#DBNAME}: Number of locks is too high (over {$PG.LOCKS.MAX.WARN:"{#DBNAME}"} in 5m)'
+                  name: 'DB {#DBNAME}: Number of locks is too high (over {$PG.LOCKS.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: WARNING
             -
               uuid: 939ab05c71ed4be9979662203ebba980
@@ -1371,7 +1375,7 @@ zabbix_export:
                 -
                   uuid: facc8f6976664da4ad5567d270f0f311
                   expression: 'min(/PostgreSQL by user parameters/pgsql.queries.query.slow_count["{#DBNAME}"],5m)>{$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"}'
-                  name: 'Database {#DBNAME}: Too many slow queries (over {$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"} in 5m)'
+                  name: 'DB {#DBNAME}: Too many slow queries (over {$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: WARNING
             -
               uuid: 044cc16d0a2f46b28d88eff86c33b30b
@@ -1538,13 +1542,13 @@ zabbix_export:
               ymin_type_1: FIXED
               graph_items:
                 -
-                  color: 66BB6A
+                  color: 1A7C11
                   item:
                     host: 'PostgreSQL by user parameters'
                     key: 'pgsql.dbstat.blks_hit.rate["{#DBNAME}"]'
                 -
                   sortorder: '1'
-                  color: 42A5F5
+                  color: 2774A4
                   item:
                     host: 'PostgreSQL by user parameters'
                     key: 'pgsql.dbstat.blks_read.rate["{#DBNAME}"]'
@@ -1554,7 +1558,7 @@ zabbix_export:
               ymin_type_1: FIXED
               graph_items:
                 -
-                  color: 66BB6A
+                  color: 1A7C11
                   item:
                     host: 'PostgreSQL by user parameters'
                     key: 'pgsql.db.size["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}","{#DBNAME}"]'
@@ -1571,13 +1575,13 @@ zabbix_export:
                     key: 'pgsql.dbstat.xact_commit.rate["{#DBNAME}"]'
                 -
                   sortorder: '1'
-                  color: F63100
+                  color: 2774A4
                   item:
                     host: 'PostgreSQL by user parameters'
                     key: 'pgsql.dbstat.conflicts.rate["{#DBNAME}"]'
                 -
                   sortorder: '2'
-                  color: 2774A4
+                  color: F63100
                   item:
                     host: 'PostgreSQL by user parameters'
                     key: 'pgsql.dbstat.deadlocks.rate["{#DBNAME}"]'
@@ -1593,7 +1597,7 @@ zabbix_export:
               ymin_type_1: FIXED
               graph_items:
                 -
-                  color: EC407A
+                  color: 1A7C11
                   item:
                     host: 'PostgreSQL by user parameters'
                     key: 'pgsql.locks.total["{#DBNAME}"]'
@@ -1603,21 +1607,21 @@ zabbix_export:
               ymin_type_1: FIXED
               graph_items:
                 -
-                  color: 4CAF50
+                  color: 1A7C11
                   yaxisside: RIGHT
                   item:
                     host: 'PostgreSQL by user parameters'
                     key: 'pgsql.queries.mro.time_max["{#DBNAME}"]'
                 -
                   sortorder: '1'
-                  color: 03A9F4
+                  color: 2774A4
                   yaxisside: RIGHT
                   item:
                     host: 'PostgreSQL by user parameters'
                     key: 'pgsql.queries.query.time_max["{#DBNAME}"]'
                 -
                   sortorder: '2'
-                  color: 9C27B0
+                  color: F63100
                   yaxisside: RIGHT
                   item:
                     host: 'PostgreSQL by user parameters'
@@ -1625,21 +1629,21 @@ zabbix_export:
                 -
                   sortorder: '3'
                   drawtype: GRADIENT_LINE
-                  color: 81C784
+                  color: A54F10
                   item:
                     host: 'PostgreSQL by user parameters'
                     key: 'pgsql.queries.mro.time_sum["{#DBNAME}"]'
                 -
                   sortorder: '4'
                   drawtype: GRADIENT_LINE
-                  color: 90CAF9
+                  color: FC6EA3
                   item:
                     host: 'PostgreSQL by user parameters'
                     key: 'pgsql.queries.query.time_sum["{#DBNAME}"]'
                 -
                   sortorder: '5'
                   drawtype: GRADIENT_LINE
-                  color: CE93D8
+                  color: 6C59DC
                   item:
                     host: 'PostgreSQL by user parameters'
                     key: 'pgsql.queries.tx.time_sum["{#DBNAME}"]'
@@ -1655,13 +1659,13 @@ zabbix_export:
                     key: 'pgsql.queries.mro.slow_count["{#DBNAME}"]'
                 -
                   sortorder: '1'
-                  color: F63100
+                  color: 2774A4
                   item:
                     host: 'PostgreSQL by user parameters'
                     key: 'pgsql.queries.query.slow_count["{#DBNAME}"]'
                 -
                   sortorder: '2'
-                  color: 2774A4
+                  color: F63100
                   item:
                     host: 'PostgreSQL by user parameters'
                     key: 'pgsql.queries.tx.slow_count["{#DBNAME}"]'
@@ -1671,13 +1675,13 @@ zabbix_export:
               graph_items:
                 -
                   drawtype: GRADIENT_LINE
-                  color: 66BB6A
+                  color: 1A7C11
                   item:
                     host: 'PostgreSQL by user parameters'
                     key: 'pgsql.dbstat.temp_bytes.rate["{#DBNAME}"]'
                 -
                   sortorder: '1'
-                  color: 42A5F5
+                  color: 2774A4
                   yaxisside: RIGHT
                   item:
                     host: 'PostgreSQL by user parameters'
@@ -1694,13 +1698,13 @@ zabbix_export:
                     key: 'pgsql.dbstat.tup_deleted.rate["{#DBNAME}"]'
                 -
                   sortorder: '1'
-                  color: F63100
+                  color: 2774A4
                   item:
                     host: 'PostgreSQL by user parameters'
                     key: 'pgsql.dbstat.tup_fetched.rate["{#DBNAME}"]'
                 -
                   sortorder: '2'
-                  color: 2774A4
+                  color: F63100
                   item:
                     host: 'PostgreSQL by user parameters'
                     key: 'pgsql.dbstat.tup_inserted.rate["{#DBNAME}"]'
@@ -1790,8 +1794,12 @@ zabbix_export:
                 -
                   type: GRAPH_PROTOTYPE
                   width: '12'
-                  height: '6'
+                  height: '12'
                   fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
                     -
                       type: INTEGER
                       name: columns
@@ -1799,11 +1807,7 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: rows
-                      value: '1'
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '2'
+                      value: '3'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -1814,8 +1818,12 @@ zabbix_export:
                   type: GRAPH_PROTOTYPE
                   x: '12'
                   width: '12'
-                  height: '6'
+                  height: '12'
                   fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
                     -
                       type: INTEGER
                       name: columns
@@ -1823,11 +1831,7 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: rows
-                      value: '1'
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '2'
+                      value: '3'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -1836,10 +1840,14 @@ zabbix_export:
                         host: 'PostgreSQL by user parameters'
                 -
                   type: GRAPH_PROTOTYPE
-                  'y': '6'
+                  'y': '12'
                   width: '12'
-                  height: '6'
+                  height: '12'
                   fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
                     -
                       type: INTEGER
                       name: columns
@@ -1847,11 +1855,7 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: rows
-                      value: '1'
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '2'
+                      value: '3'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -1861,10 +1865,14 @@ zabbix_export:
                 -
                   type: GRAPH_PROTOTYPE
                   x: '12'
-                  'y': '6'
+                  'y': '12'
                   width: '12'
-                  height: '6'
+                  height: '12'
                   fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
                     -
                       type: INTEGER
                       name: columns
@@ -1872,11 +1880,7 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: rows
-                      value: '1'
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '2'
+                      value: '3'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -1885,10 +1889,14 @@ zabbix_export:
                         host: 'PostgreSQL by user parameters'
                 -
                   type: GRAPH_PROTOTYPE
-                  'y': '12'
+                  'y': '24'
                   width: '12'
-                  height: '6'
+                  height: '12'
                   fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
                     -
                       type: INTEGER
                       name: columns
@@ -1896,11 +1904,7 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: rows
-                      value: '1'
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '2'
+                      value: '3'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -1910,10 +1914,14 @@ zabbix_export:
                 -
                   type: GRAPH_PROTOTYPE
                   x: '12'
-                  'y': '12'
+                  'y': '24'
                   width: '12'
-                  height: '6'
+                  height: '12'
                   fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
                     -
                       type: INTEGER
                       name: columns
@@ -1921,11 +1929,7 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: rows
-                      value: '1'
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '2'
+                      value: '3'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -1934,10 +1938,14 @@ zabbix_export:
                         host: 'PostgreSQL by user parameters'
                 -
                   type: GRAPH_PROTOTYPE
-                  'y': '18'
+                  'y': '36'
                   width: '12'
-                  height: '6'
+                  height: '12'
                   fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
                     -
                       type: INTEGER
                       name: columns
@@ -1945,11 +1953,7 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: rows
-                      value: '1'
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '2'
+                      value: '3'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -1959,10 +1963,14 @@ zabbix_export:
                 -
                   type: GRAPH_PROTOTYPE
                   x: '12'
-                  'y': '18'
+                  'y': '36'
                   width: '12'
-                  height: '6'
+                  height: '12'
                   fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
                     -
                       type: INTEGER
                       name: columns
@@ -1970,11 +1978,7 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: rows
-                      value: '1'
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '2'
+                      value: '3'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -1990,7 +1994,7 @@ zabbix_export:
                 -
                   type: GRAPH_CLASSIC
                   width: '12'
-                  height: '6'
+                  height: '5'
                   fields:
                     -
                       type: INTEGER
@@ -2006,7 +2010,7 @@ zabbix_export:
                   type: GRAPH_CLASSIC
                   x: '12'
                   width: '12'
-                  height: '6'
+                  height: '5'
                   fields:
                     -
                       type: INTEGER
@@ -2020,9 +2024,9 @@ zabbix_export:
                         host: 'PostgreSQL by user parameters'
                 -
                   type: GRAPH_CLASSIC
-                  'y': '6'
+                  'y': '5'
                   width: '12'
-                  height: '6'
+                  height: '5'
                   fields:
                     -
                       type: INTEGER
@@ -2037,9 +2041,9 @@ zabbix_export:
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
-                  'y': '6'
+                  'y': '5'
                   width: '12'
-                  height: '6'
+                  height: '5'
                   fields:
                     -
                       type: INTEGER
@@ -2053,9 +2057,9 @@ zabbix_export:
                         host: 'PostgreSQL by user parameters'
                 -
                   type: GRAPH_CLASSIC
-                  'y': '12'
+                  'y': '10'
                   width: '12'
-                  height: '6'
+                  height: '5'
                   fields:
                     -
                       type: INTEGER
@@ -2070,9 +2074,9 @@ zabbix_export:
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
-                  'y': '12'
+                  'y': '10'
                   width: '12'
-                  height: '6'
+                  height: '5'
                   fields:
                     -
                       type: INTEGER
@@ -2086,9 +2090,9 @@ zabbix_export:
                         host: 'PostgreSQL by user parameters'
                 -
                   type: GRAPH_CLASSIC
-                  'y': '18'
+                  'y': '15'
                   width: '12'
-                  height: '6'
+                  height: '5'
                   fields:
                     -
                       type: INTEGER
@@ -2103,9 +2107,9 @@ zabbix_export:
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
-                  'y': '18'
+                  'y': '15'
                   width: '12'
-                  height: '6'
+                  height: '5'
                   fields:
                     -
                       type: INTEGER
@@ -2165,14 +2169,14 @@ zabbix_export:
             key: pgsql.bgwriter.buffers_alloc.rate
         -
           sortorder: '1'
-          color: F63100
+          color: 2774A4
           yaxisside: RIGHT
           item:
             host: 'PostgreSQL by user parameters'
             key: pgsql.bgwriter.buffers_clean.rate
         -
           sortorder: '2'
-          color: 2774A4
+          color: F63100
           yaxisside: RIGHT
           item:
             host: 'PostgreSQL by user parameters'
@@ -2208,13 +2212,13 @@ zabbix_export:
             key: pgsql.bgwriter.checkpoints_timed.rate
         -
           sortorder: '1'
-          color: F63100
+          color: 2774A4
           item:
             host: 'PostgreSQL by user parameters'
             key: pgsql.bgwriter.checkpoints_req.rate
         -
           sortorder: '2'
-          color: 2774A4
+          color: F63100
           yaxisside: RIGHT
           item:
             host: 'PostgreSQL by user parameters'
@@ -2233,41 +2237,41 @@ zabbix_export:
       graph_items:
         -
           drawtype: GRADIENT_LINE
-          color: C8E6C9
+          color: 1A7C11
           yaxisside: RIGHT
           item:
             host: 'PostgreSQL by user parameters'
             key: pgsql.connections.sum.total
         -
           sortorder: '1'
-          color: 6C59DC
+          color: 2774A4
           item:
             host: 'PostgreSQL by user parameters'
             key: pgsql.connections.sum.total_pct
         -
           sortorder: '2'
-          color: 1A7C11
+          color: F63100
           yaxisside: RIGHT
           item:
             host: 'PostgreSQL by user parameters'
             key: pgsql.connections.sum.active
         -
           sortorder: '3'
-          color: F63100
+          color: A54F10
           yaxisside: RIGHT
           item:
             host: 'PostgreSQL by user parameters'
             key: pgsql.connections.sum.idle
         -
           sortorder: '4'
-          color: 2774A4
+          color: FC6EA3
           yaxisside: RIGHT
           item:
             host: 'PostgreSQL by user parameters'
             key: pgsql.connections.sum.idle_in_transaction
         -
           sortorder: '5'
-          color: A54F10
+          color: 6C59DC
           yaxisside: RIGHT
           item:
             host: 'PostgreSQL by user parameters'
@@ -2286,13 +2290,13 @@ zabbix_export:
       graph_items:
         -
           drawtype: GRADIENT_LINE
-          color: A5D6A7
+          color: 1A7C11
           item:
             host: 'PostgreSQL by user parameters'
             key: 'pgsql.ping["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
         -
           sortorder: '1'
-          color: 039BE5
+          color: 2774A4
           yaxisside: RIGHT
           item:
             host: 'PostgreSQL by user parameters'
@@ -2303,7 +2307,7 @@ zabbix_export:
       ymin_type_1: FIXED
       graph_items:
         -
-          color: 42A5F5
+          color: 1A7C11
           item:
             host: 'PostgreSQL by user parameters'
             key: 'pgsql.replication.lag.sec["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
@@ -2320,14 +2324,14 @@ zabbix_export:
             key: pgsql.transactions.active
         -
           sortorder: '1'
-          color: F63100
+          color: 2774A4
           yaxisside: RIGHT
           item:
             host: 'PostgreSQL by user parameters'
             key: pgsql.transactions.idle
         -
           sortorder: '2'
-          color: 2774A4
+          color: F63100
           yaxisside: RIGHT
           item:
             host: 'PostgreSQL by user parameters'
@@ -2346,13 +2350,13 @@ zabbix_export:
       ymin_type_1: FIXED
       graph_items:
         -
-          color: 66BB6A
+          color: 1A7C11
           item:
             host: 'PostgreSQL by user parameters'
             key: 'pgsql.uptime["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.DB}"]'
         -
           sortorder: '1'
-          color: 03A9F4
+          color: 2774A4
           yaxisside: RIGHT
           item:
             host: 'PostgreSQL by user parameters'
@@ -2363,13 +2367,13 @@ zabbix_export:
       ymin_type_1: FIXED
       graph_items:
         -
-          color: 29B6F6
+          color: 1A7C11
           item:
             host: 'PostgreSQL by user parameters'
             key: pgsql.wal.write
         -
           sortorder: '1'
-          color: AB47BC
+          color: 2774A4
           yaxisside: RIGHT
           item:
             host: 'PostgreSQL by user parameters'

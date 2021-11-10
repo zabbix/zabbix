@@ -32,6 +32,12 @@ $form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dia
 	$data['dialogue']['view_mode'], $data['known_widget_types'], $rf_rate_field
 );
 
+// Toggle systems stats or HAC node list.
+$form_list->addRow(
+	CWidgetHelper::getLabel($fields['info_type']),
+	CWidgetHelper::getRadioButtonList($fields['info_type'])
+);
+
 $form->addItem($form_list);
 
 return [

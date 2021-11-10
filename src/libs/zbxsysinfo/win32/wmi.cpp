@@ -124,7 +124,7 @@ extern "C" void	zbx_co_uninitialize()
  *             error       - [OUT] the error description                      *
  *                                                                            *
  * Return value: SYSINFO_RET_OK   - wmi_values contains the retrieved value   *
- *               SYSINFO_RET_FAIL - retreiving WMI value failed               *
+ *               SYSINFO_RET_FAIL - retrieving WMI value failed               *
  *                                                                            *
  * Comments: one value is the value from the first property of the first      *
  *           instance from search result                                      *
@@ -146,18 +146,18 @@ extern "C" static int	parse_first_first(IEnumWbemClassObject *pEnumerator, doubl
 	if (WBEM_S_TIMEDOUT == hres)
 	{
 		*error = zbx_strdup(*error, "WMI query timeout.");
-		goto out;
+		goto out2;
 	}
 
 	if (FAILED(hres) || 0 == uReturn)
-		goto out;
+		goto out2;
 
 	hres = pclsObj->BeginEnumeration(WBEM_FLAG_NONSYSTEM_ONLY);
 
 	if (FAILED(hres))
 	{
 		*error = zbx_strdup(*error, "Cannot start WMI query result enumeration.");
-		goto out;
+		goto out1;
 	}
 
 	vtProp = (VARIANT*) zbx_malloc(NULL, sizeof(VARIANT));
@@ -168,7 +168,7 @@ extern "C" static int	parse_first_first(IEnumWbemClassObject *pEnumerator, doubl
 	{
 		*error = zbx_strdup(*error, "Cannot parse WMI result field.");
 		zbx_free(vtProp);
-		goto out;
+		goto out1;
 	}
 
 	pclsObj->EndEnumeration();
@@ -176,7 +176,7 @@ extern "C" static int	parse_first_first(IEnumWbemClassObject *pEnumerator, doubl
 	if (hres == WBEM_S_NO_MORE_DATA || VT_EMPTY == V_VT(vtProp) || VT_NULL == V_VT(vtProp))
 	{
 		zbx_free(vtProp);
-		goto out;
+		goto out1;
 	}
 	else
 		ret = SYSINFO_RET_OK;
@@ -187,10 +187,9 @@ extern "C" static int	parse_first_first(IEnumWbemClassObject *pEnumerator, doubl
 	zbx_vector_wmi_prop_create(inst_val);
 	zbx_vector_wmi_prop_append(inst_val, prop);
 	zbx_vector_wmi_instance_append(wmi_values, inst_val);
-out:
-	if (0 != pclsObj)
-		pclsObj->Release();
-
+out1:
+	pclsObj->Release();
+out2:	
 	return ret;
 }
 
@@ -206,7 +205,7 @@ out:
  *             error       - [OUT] the error description                      *
  *                                                                            *
  * Return value: SYSINFO_RET_OK   - wmi_values contains the retrieved values  *
- *               SYSINFO_RET_FAIL - retreiving WMI value failed               *
+ *               SYSINFO_RET_FAIL - retrieving WMI value failed               *
  *                                                                            *
  ******************************************************************************/
 extern "C" static int	parse_all(IEnumWbemClassObject *pEnumerator, double timeout,
@@ -439,7 +438,7 @@ out:
  *             result  - [OUT] one value of property from WMI Class           *
  *                                                                            *
  * Return value: SYSINFO_RET_OK   - result contains the retrieved WMI value   *
- *               SYSINFO_RET_FAIL - retreiving WMI value failed               *
+ *               SYSINFO_RET_FAIL - retrieving WMI value failed               *
  *                                                                            *
  ******************************************************************************/
 extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)

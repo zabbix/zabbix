@@ -597,6 +597,7 @@ ZBX_THREAD_ENTRY(lld_manager_thread, args)
 	zbx_lld_manager_t	manager;
 	zbx_uint64_t		processed_num = 0;
 	int			ret;
+	zbx_timespec_t		timeout = {1, 0};
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -640,7 +641,7 @@ ZBX_THREAD_ENTRY(lld_manager_thread, args)
 		}
 
 		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
-		ret = zbx_ipc_service_recv(&lld_service, 1, &client, &message);
+		ret = zbx_ipc_service_recv(&lld_service, &timeout, &client, &message);
 		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 		sec = zbx_time();

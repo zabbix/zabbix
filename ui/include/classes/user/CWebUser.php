@@ -131,6 +131,8 @@ class CWebUser {
 	 * @param string $rule_name  Rule name.
 	 *
 	 * @return bool  Returns true if user has access to specified rule, false - otherwise.
+	 *
+	 * @throws Exception
 	 */
 	public static function checkAccess(string $rule_name): bool {
 		if (empty(self::$data) || self::$data['roleid'] == 0) {

@@ -124,6 +124,22 @@ func (p *mockRunnerPlugin) Stop() {
 	p.call("$stop")
 }
 
+type mockPassiveRunnerPlugin struct {
+	plugin.Base
+	mockPlugin
+}
+
+func (p *mockPassiveRunnerPlugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+	return
+}
+func (p *mockPassiveRunnerPlugin) Start() {
+	p.call("$start")
+}
+
+func (p *mockPassiveRunnerPlugin) Stop() {
+	p.call("$stop")
+}
+
 type watchTracker interface {
 	watched() []*plugin.Request
 }
@@ -136,7 +152,6 @@ type mockWatcherPlugin struct {
 
 func (p *mockWatcherPlugin) Watch(requests []*plugin.Request, ctx plugin.ContextProvider) {
 	p.call("$watch")
-	log.Debugf("WATCH %s %v", p.Name(), requests)
 	p.requests = requests
 }
 
@@ -283,6 +298,23 @@ func (m *mockManager) mockTasks() {
 				}
 				p.enqueueTask(mockTask)
 				m.clients[index[t]].exporters[t.item.itemid] = mockTask
+			case *directExporterTask:
+				mockTask := &mockExporterTask{
+					exporterTask: exporterTask{
+						taskBase: taskBase{
+							plugin:    task.getPlugin(),
+							scheduled: getNextcheck(t.item.delay, m.now).Add(priorityExporterTaskNs),
+							index:     -1,
+							active:    task.isActive(),
+							recurring: true,
+						},
+						item:   t.item,
+						client: t.client,
+						meta:   t.meta,
+					},
+					sink: m.sink,
+				}
+				p.enqueueTask(mockTask)
 			case *starterTask:
 				mockTask := &mockStarterTask{
 					taskBase: taskBase{
@@ -1227,7 +1259,6 @@ func TestRunner(t *testing.T) {
 	manager.mockTasks()
 	manager.iterate(t, 1)
 	manager.checkPluginTimeline(t, plugins, calls, 1)
-
 }
 
 func checkWatchRequests(t *testing.T, p plugin.Accessor, requests []*plugin.Request) {
@@ -1622,7 +1653,7 @@ func TestPassiveRunner(t *testing.T) {
 	plugin.ClearRegistry()
 	plugins := make([]plugin.Accessor, 3)
 	for i := range plugins {
-		plugins[i] = &mockRunnerPlugin{Base: plugin.Base{}, mockPlugin: mockPlugin{now: &manager.now}}
+		plugins[i] = &mockPassiveRunnerPlugin{Base: plugin.Base{}, mockPlugin: mockPlugin{now: &manager.now}}
 		name := fmt.Sprintf("debug%d", i+1)
 		plugin.RegisterMetrics(plugins[i], name, name, "Debug.")
 	}
@@ -1642,7 +1673,7 @@ func TestPassiveRunner(t *testing.T) {
 
 	var cache resultCacheMock
 	update := updateRequest{
-		clientID: 0,
+		clientID: agent.PassiveChecksClientID,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}

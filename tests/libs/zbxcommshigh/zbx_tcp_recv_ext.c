@@ -33,7 +33,7 @@ void	zbx_mock_test_entry(void **state)
 	char		*buffer;
 	zbx_socket_t	s;
 	ssize_t		received;
-	int		expected_ret;
+	int		expected_ret, offset = ZBX_TCP_HEADER_DATALEN_LEN;
 
 	ZBX_UNUSED(state);
 
@@ -41,7 +41,7 @@ void	zbx_mock_test_entry(void **state)
 			zbx_tcp_connect(&s, NULL, "127.0.0.1", 10050, 0, ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL));
 
 	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
-	received = zbx_tcp_recv_ext(&s, 0);
+	received = zbx_tcp_recv_ext(&s, 0, ZBX_TCP_LARGE);
 
 	if (FAIL == expected_ret)
 	{
@@ -58,7 +58,10 @@ void	zbx_mock_test_entry(void **state)
 
 	buffer = zbx_yaml_assemble_binary_sequence("out.fragments", received);
 
-	if (0 != memcmp(buffer + ZBX_TCP_HEADER_DATALEN_LEN, s.buffer, received - ZBX_TCP_HEADER_DATALEN_LEN))
+	if (0 != (ZBX_TCP_LARGE & s.protocol))
+		offset += 8;
+
+	if (0 != memcmp(buffer + offset, s.buffer, received - offset))
 		fail_msg("Received message mismatch expected");
 
 	zbx_tcp_close(&s);

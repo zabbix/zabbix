@@ -20,6 +20,8 @@ package resultcache
 
 import (
 	"encoding/json"
+	"errors"
+	"reflect"
 	"sync/atomic"
 	"time"
 
@@ -65,17 +67,21 @@ func (c *MemoryCache) upload(u Uploader) (err error) {
 	if timeout > 60 {
 		timeout = 60
 	}
-	if err = u.Write(data, time.Duration(timeout)*time.Second); err != nil {
-		if c.lastError == nil || err.Error() != c.lastError.Error() {
-			c.Warningf("history upload to [%s] started to fail: %s %s", u.Addr(), u.Hostname(), err)
-			c.lastError = err
+	if errs := u.Write(data, time.Duration(timeout)*time.Second); errs != nil {
+		if !reflect.DeepEqual(errs, c.lastErrors) {
+			for i := 0; i < len(errs); i++ {
+				c.Warningf("%s", errs[i])
+			}
+			c.Warningf("history upload to [%s] [%s] started to fail", u.Addr(), u.Hostname())
+			c.lastErrors = errs
 		}
-		return
+
+		return errors.New("history upload failed")
 	}
 
-	if c.lastError != nil {
-		c.Warningf("history upload to [%s %s] is working again", u.Addr(), u.Hostname())
-		c.lastError = nil
+	if c.lastErrors != nil {
+		c.Warningf("history upload to [%s] [%s] is working again", u.Addr(), u.Hostname())
+		c.lastErrors = nil
 	}
 
 	// clear results slice to ensure that the data is garbage collected

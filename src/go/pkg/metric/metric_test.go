@@ -182,7 +182,9 @@ func TestMetric_EvalParams(t *testing.T) {
 					"Session1": {URI: "localhost", User: "user", Password: "password"},
 				},
 			},
-			want:      map[string]string{"URI": "localhost", "User": "user", "Password": "password", "Param1": "15"},
+			want: map[string]string{
+				"URI": "localhost", "User": "user", "Password": "password", "Param1": "15", "sessionName": "Session1",
+			},
 			wantErr:   false,
 			wantPanic: false,
 		},

@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 if (array_key_exists('error', $data)) {
@@ -31,12 +32,16 @@ if (array_key_exists('error', $data)) {
 
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');
+$this->addJsFile('leaflet.js');
+$this->addJsFile('leaflet.markercluster.js');
 $this->addJsFile('class.dashboard.js');
 $this->addJsFile('class.dashboard.page.js');
 $this->addJsFile('class.dashboard.widget.placeholder.js');
+$this->addJsFile('class.geomaps.js');
 $this->addJsFile('class.widget.js');
 $this->addJsFile('class.widget.iterator.js');
 $this->addJsFile('class.widget.clock.js');
+$this->addJsFile('class.widget.geomap.js');
 $this->addJsFile('class.widget.graph.js');
 $this->addJsFile('class.widget.graph-prototype.js');
 $this->addJsFile('class.widget.map.js');
@@ -47,21 +52,20 @@ $this->addJsFile('class.widget.problemsbysv.js');
 $this->addJsFile('class.widget.svggraph.js');
 $this->addJsFile('class.widget.trigerover.js');
 $this->addJsFile('class.calendar.js');
-$this->addJsFile('multiselect.js');
 $this->addJsFile('layout.mode.js');
 $this->addJsFile('class.coverride.js');
-$this->addJsFile('class.cverticalaccordion.js');
 $this->addJsFile('class.crangecontrol.js');
 $this->addJsFile('colorpicker.js');
 $this->addJsFile('class.csvggraph.js');
 $this->addJsFile('class.cnavtree.js');
 $this->addJsFile('class.svg.canvas.js');
 $this->addJsFile('class.svg.map.js');
-$this->addJsFile('class.tab-indicators.js');
 $this->addJsFile('class.tagfilteritem.js');
 $this->addJsFile('class.sortable.js');
 
 $this->includeJsFile('monitoring.dashboard.view.js.php');
+
+$this->addCssFile('assets/styles/vendors/Leaflet/Leaflet/leaflet.css');
 
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();

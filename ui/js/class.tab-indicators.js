@@ -33,8 +33,9 @@ const TAB_INDICATOR_UPDATE_EVENT = 'tab-indicator-update';
  */
 class TabIndicators {
 
-	constructor() {
+	constructor(tabs_id = 'tabs') {
 		try {
+			this.tabs_id = tabs_id;
 			this.form = this.getForm();
 			this.activateIndicators();
 		} catch (error) {
@@ -49,7 +50,7 @@ class TabIndicators {
 	 */
 	getForm() {
 		const TEMPLATE = document.querySelector('#templates-form');
-		const HOST = document.querySelector('#hosts-form');
+		const HOST = document.querySelector('#host-form');
 		const AUTHENTICATION = document.querySelector('#authentication-form');
 		const HOST_PROTOTYPE = document.querySelector('#host-prototype-form');
 		const ITEM = document.querySelector('#item-form');
@@ -113,9 +114,7 @@ class TabIndicators {
 	 * Activate tab indicators.
 	 */
 	activateIndicators() {
-		const tabs = this.form.querySelectorAll('#tabs a');
-
-		Object.values(tabs).map((element) => {
+		for (const element of this.form.querySelectorAll('#' + this.tabs_id + ' a')) {
 			const indicator_item = this.getIndicatorItem(this.getIndicatorNameByElement(element));
 
 			if (indicator_item instanceof TabIndicatorItem) {
@@ -123,7 +122,7 @@ class TabIndicators {
 					.addAttributes(element)
 					.initObserver(element);
 			}
-		});
+		}
 	}
 
 	/**
@@ -136,7 +135,7 @@ class TabIndicators {
 	getIndicatorNameByElement(element) {
 		const attr = element.getAttribute('js-indicator');
 
-		if (attr) {
+		if (attr !== null) {
 			return attr
 				.split('-')
 				.map((value) => value[0].toUpperCase() + value.slice(1))
@@ -323,27 +322,18 @@ class MacrosTabIndicatorItem extends TabIndicatorItem {
 	 */
 	initObserver(element) {
 		const target_node = document.querySelector('#tbl_macros');
-		const observer_options = {
-			childList: true,
-			attributes: true,
-			attributeFilter: ['value', 'style'], // Use style because textarea don't have value attribute.
-			subtree: true
-		};
 
-		const observer_callback = (mutationList, _observer) => {
-			mutationList.forEach((mutation) => {
-				switch (mutation.type) {
-					case 'childList':
-					case 'attributes':
-						this.addAttributes(element);
-						break;
-				}
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes(element);
 			});
-		};
 
-		if (target_node) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node, observer_options);
+			observer.observe(target_node, {
+				childList: true,
+				attributes: true,
+				attributeFilter: ['value', 'style'], // Use style because textarea don't have value attribute.
+				subtree: true
+			});
 		}
 	}
 }
@@ -355,47 +345,51 @@ class LinkedTemplateTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		const target_node = document.querySelector('#linked-template');
-		const multiselect_node = document.querySelector('#add_templates_');
 		let count = 0;
+		const target_node = document.querySelector('#linked-template');
 
-		// Count saved templates.
-		if (target_node) {
+		if (target_node !== null) {
 			count += target_node
 				.querySelectorAll('tbody tr')
 				.length;
 		}
 
-		// Count new templates in multiselect.
-		if (multiselect_node) {
+		const multiselect_node = document.querySelector('#add_templates_');
+
+		if (multiselect_node !== null) {
 			count += multiselect_node
 				.querySelectorAll('.selected li')
 				.length;
 		}
 
-		return isNaN(count) ? 0 : count;
+		return count;
 	}
 
 	initObserver(element) {
-		const target_node = document.querySelector('#add_templates_ .multiselect-list');
-		const observer_options = {
-			childList: true,
-			subtree: true
-		};
+		const linked_node = document.querySelector('#linked-template');
 
-		const observer_callback = (mutationList, _observer) => {
-			mutationList.forEach((mutation) => {
-				switch (mutation.type) {
-					case 'childList':
-						this.addAttributes(element);
-						break;
-				}
+		if (linked_node !== null) {
+			const linked_observer = new MutationObserver(() => {
+				this.addAttributes(element)
 			});
-		};
 
-		if (target_node) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node, observer_options);
+			linked_observer.observe(linked_node, {
+				childList: true,
+				subtree: true
+			});
+		}
+
+		const multiselect_node = document.querySelector('#add_templates_');
+
+		if (multiselect_node !== null) {
+			const multiselect_observer = new MutationObserver(() => {
+				this.addAttributes(element)
+			});
+
+			multiselect_observer.observe(multiselect_node.parentNode, {
+				childList: true,
+				subtree: true
+			});
 		}
 	}
 }
@@ -414,27 +408,18 @@ class TagsTabIndicatorItem extends TabIndicatorItem {
 
 	initObserver(element) {
 		const target_node = document.querySelector('#tags-table');
-		const observer_options = {
-			childList: true,
-			attributes: true,
-			attributeFilter: ['value', 'style'], // Use style because textarea don't have value attribute.
-			subtree: true
-		};
 
-		const observer_callback = (mutationList, _observer) => {
-			mutationList.forEach((mutation) => {
-				switch (mutation.type) {
-					case 'childList':
-					case 'attributes':
-						this.addAttributes(element);
-						break;
-				}
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes(element);
 			});
-		};
 
-		if (target_node) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node, observer_options);
+			observer.observe(target_node, {
+				childList: true,
+				attributes: true,
+				attributeFilter: ['value', 'style'], // Use style because textarea don't have value attribute.
+				subtree: true
+			});
 		}
 	}
 }
@@ -448,7 +433,7 @@ class HttpTabIndicatorItem extends TabIndicatorItem {
 	getValue() {
 		const element = document.querySelector('#http_auth_enabled');
 
-		if (element) {
+		if (element !== null) {
 			return element.checked;
 		}
 
@@ -458,7 +443,7 @@ class HttpTabIndicatorItem extends TabIndicatorItem {
 	initObserver(element) {
 		const target_node = document.querySelector('#http_auth_enabled');
 
-		if (target_node) {
+		if (target_node !== null) {
 			target_node.addEventListener('click', () => {
 				this.addAttributes(element);
 			});
@@ -475,7 +460,7 @@ class LdapTabIndicatorItem extends TabIndicatorItem {
 	getValue() {
 		const element = document.querySelector('#ldap_configured');
 
-		if (element) {
+		if (element !== null) {
 			return element.checked;
 		}
 
@@ -485,7 +470,7 @@ class LdapTabIndicatorItem extends TabIndicatorItem {
 	initObserver(element) {
 		const target_node = document.querySelector('#ldap_configured');
 
-		if (target_node) {
+		if (target_node !== null) {
 			target_node.addEventListener('click', () => {
 				this.addAttributes(element);
 			});
@@ -502,7 +487,7 @@ class SamlTabIndicatorItem extends TabIndicatorItem {
 	getValue() {
 		const element = document.querySelector('#saml_auth_enabled');
 
-		if (element) {
+		if (element !== null) {
 			return element.checked;
 		}
 
@@ -512,7 +497,7 @@ class SamlTabIndicatorItem extends TabIndicatorItem {
 	initObserver(element) {
 		const target_node = document.querySelector('#saml_auth_enabled');
 
-		if (target_node) {
+		if (target_node !== null) {
 			target_node.addEventListener('click', () => {
 				this.addAttributes(element);
 			});
@@ -529,7 +514,7 @@ class InventoryTabIndicatorItem extends TabIndicatorItem {
 	getValue() {
 		const element = document.querySelector('[name=inventory_mode]:checked');
 
-		if (element) {
+		if (element !== null) {
 			return (element.value === '0' || element.value === '1');
 		}
 
@@ -537,11 +522,11 @@ class InventoryTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		[...document.querySelectorAll('[name=inventory_mode]')].map((value) => {
-			value.addEventListener('click', () => {
+		for (const input of document.querySelectorAll('[name=inventory_mode]')) {
+			input.addEventListener('click', () => {
 				this.addAttributes(element);
 			});
-		});
+		}
 	}
 }
 
@@ -554,7 +539,7 @@ class EncryptionTabIndicatorItem extends TabIndicatorItem {
 	getValue() {
 		const tls_connect = document.querySelector('[name=tls_connect]:checked');
 
-		if (tls_connect && (tls_connect.value === '2' || tls_connect.value === '4')) {
+		if (tls_connect !== null && (tls_connect.value === '2' || tls_connect.value === '4')) {
 			return true;
 		}
 
@@ -566,22 +551,23 @@ class EncryptionTabIndicatorItem extends TabIndicatorItem {
 
 	initObserver(element) {
 		const tls_in_psk_node = document.querySelector('[name=tls_in_psk]');
-		const tls_in_cert_node = document.querySelector('[name=tls_in_cert]');
 
-		[...document.querySelectorAll('[name=tls_connect]')].map((value) =>
-			value.addEventListener('click', () => {
-				this.addAttributes(element);
-			})
-		);
-
-		if (tls_in_psk_node) {
+		if (tls_in_psk_node !== null) {
 			tls_in_psk_node.addEventListener('click', () => {
 				this.addAttributes(element);
 			});
 		}
 
-		if (tls_in_cert_node) {
+		const tls_in_cert_node = document.querySelector('[name=tls_in_cert]');
+
+		if (tls_in_cert_node !== null) {
 			tls_in_cert_node.addEventListener('click', () => {
+				this.addAttributes(element);
+			});
+		}
+
+		for (const input of document.querySelectorAll('[name=tls_connect]')) {
+			input.addEventListener('click', () => {
 				this.addAttributes(element);
 			});
 		}
@@ -602,24 +588,16 @@ class GroupsTabIndicatorItem extends TabIndicatorItem {
 
 	initObserver(element) {
 		const target_node = document.querySelector('#group_links_ .multiselect-list');
-		const observer_options = {
-			childList: true,
-			subtree: true
-		};
 
-		const observer_callback = (mutationList, _observer) => {
-			mutationList.forEach((mutation) => {
-				switch (mutation.type) {
-					case 'childList':
-						this.addAttributes(element);
-						break;
-				}
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes(element);
 			});
-		};
 
-		if (target_node) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node, observer_options);
+			observer.observe(target_node, {
+				childList: true,
+				subtree: true
+			});
 		}
 	}
 }
@@ -638,24 +616,16 @@ class PreprocessingTabIndicatorItem extends TabIndicatorItem {
 
 	initObserver(element) {
 		const target_node = document.querySelector('#preprocessing');
-		const observer_options = {
-			childList: true,
-			subtree: true
-		};
 
-		const observer_callback = (mutationList, _observer) => {
-			mutationList.forEach((mutation) => {
-				switch (mutation.type) {
-					case 'childList':
-						this.addAttributes(element);
-						break;
-				}
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes(element);
 			});
-		};
 
-		if (target_node) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node, observer_options);
+			observer.observe(target_node, {
+				childList: true,
+				subtree: true
+			});
 		}
 	}
 }
@@ -674,24 +644,16 @@ class DependencyTabIndicatorItem extends TabIndicatorItem {
 
 	initObserver(element) {
 		const target_node = document.querySelector('#dependency-table tbody');
-		const observer_options = {
-			childList: true,
-			subtree: true
-		};
 
-		const observer_callback = (mutationList, _observer) => {
-			mutationList.forEach((mutation) => {
-				switch (mutation.type) {
-					case 'childList':
-						this.addAttributes(element);
-						break;
-				}
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes(element);
 			});
-		};
 
-		if (target_node) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node, observer_options);
+			observer.observe(target_node, {
+				childList: true,
+				subtree: true
+			});
 		}
 	}
 }
@@ -710,27 +672,18 @@ class LldMacrosTabIndicatorItem extends TabIndicatorItem {
 
 	initObserver(element) {
 		const target_node = document.querySelector('#lld_macro_paths');
-		const observer_options = {
-			childList: true,
-			attributes: true,
-			attributeFilter: ['value', 'style'], // Use style because textarea don't have value attribute.
-			subtree: true
-		};
 
-		const observer_callback = (mutationList, _observer) => {
-			mutationList.forEach((mutation) => {
-				switch (mutation.type) {
-					case 'childList':
-					case 'attributes':
-						this.addAttributes(element);
-						break;
-				}
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes(element);
 			});
-		};
 
-		if (target_node) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node, observer_options);
+			observer.observe(target_node, {
+				childList: true,
+				attributes: true,
+				attributeFilter: ['value', 'style'], // Use style because textarea don't have value attribute.
+				subtree: true
+			});
 		}
 	}
 }
@@ -749,27 +702,18 @@ class FiltersTabIndicatorItem extends TabIndicatorItem {
 
 	initObserver(element) {
 		const target_node = document.querySelector('#conditions');
-		const observer_options = {
-			childList: true,
-			attributes: true,
-			attributeFilter: ['value'],
-			subtree: true
-		};
 
-		const observer_callback = (mutationList, _observer) => {
-			mutationList.forEach((mutation) => {
-				switch (mutation.type) {
-					case 'childList':
-					case 'attributes':
-						this.addAttributes(element);
-						break;
-				}
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes(element);
 			});
-		};
 
-		if (target_node) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node, observer_options);
+			observer.observe(target_node, {
+				childList: true,
+				attributes: true,
+				attributeFilter: ['value'],
+				subtree: true
+			});
 		}
 	}
 }
@@ -788,24 +732,16 @@ class OverridesTabIndicatorItem extends TabIndicatorItem {
 
 	initObserver(element) {
 		const target_node = document.querySelector('.lld-overrides-table tbody');
-		const observer_options = {
-			childList: true,
-			subtree: true
-		};
 
-		const observer_callback = (mutationList, _observer) => {
-			mutationList.forEach((mutation) => {
-				switch (mutation.type) {
-					case 'childList':
-						this.addAttributes(element);
-						break;
-				}
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes(element);
 			});
-		};
 
-		if (target_node) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node, observer_options);
+			observer.observe(target_node, {
+				childList: true,
+				subtree: true
+			});
 		}
 	}
 }
@@ -824,24 +760,16 @@ class StepsTabIndicatorItem extends TabIndicatorItem {
 
 	initObserver(element) {
 		const target_node = document.querySelector('.httpconf-steps-dynamic-row tbody');
-		const observer_options = {
-			childList: true,
-			subtree: true
-		};
 
-		const observer_callback = (mutationList, _observer) => {
-			mutationList.forEach((mutation) => {
-				switch (mutation.type) {
-					case 'childList':
-						this.addAttributes(element);
-						break;
-				}
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes(element);
 			});
-		};
 
-		if (target_node) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node, observer_options);
+			observer.observe(target_node, {
+				childList: true,
+				subtree: true
+			});
 		}
 	}
 }
@@ -869,23 +797,23 @@ class HttpAuthTabIndicatorItem extends TabIndicatorItem {
 	initObserver(element) {
 		const auth_node = document.querySelector('#authentication');
 
-		if (auth_node) {
+		if (auth_node !== null) {
 			auth_node.addEventListener('change', () => {
 				this.addAttributes(element);
 			});
 		}
 
-		[...document.querySelectorAll('#verify_peer, #verify_host')].map((value) => {
-			value.addEventListener('click', () => {
+		for (const input of document.querySelectorAll('#verify_peer, #verify_host')) {
+			input.addEventListener('click', () => {
 				this.addAttributes(element);
 			});
-		});
+		}
 
-		[...document.querySelectorAll('#ssl_cert_file, #ssl_key_file, #ssl_key_password')].map((value) => {
-			value.addEventListener('change', () => {
+		for (const input of document.querySelectorAll('#ssl_cert_file, #ssl_key_file, #ssl_key_password')) {
+			input.addEventListener('change', () => {
 				this.addAttributes(element);
 			});
-		});
+		}
 	}
 }
 
@@ -901,9 +829,11 @@ class OperationsTabIndicatorItem extends TabIndicatorItem {
 		count += document
 			.querySelectorAll('#op-table tbody tr:not(:last-child)')
 			.length;
+
 		count += document
 			.querySelectorAll('#rec-table tbody tr:not(:last-child)')
 			.length;
+
 		count += document
 			.querySelectorAll('#upd-table tbody tr:not(:last-child)')
 			.length;
@@ -913,36 +843,42 @@ class OperationsTabIndicatorItem extends TabIndicatorItem {
 
 	initObserver(element) {
 		const target_node_op = document.querySelector('#op-table tbody');
-		const target_node_rec = document.querySelector('#rec-table tbody');
-		const target_node_upd = document.querySelector('#upd-table tbody');
-		const observer_options = {
-			childList: true,
-			subtree: true
-		};
 
-		const observer_callback = (mutationList, _observer) => {
-			mutationList.forEach((mutation) => {
-				switch (mutation.type) {
-					case 'childList':
-						this.addAttributes(element);
-						break;
-				}
+		if (target_node_op !== null) {
+			const observer_op = new MutationObserver(() => {
+				this.addAttributes(element);
 			});
-		};
 
-		if (target_node_op) {
-			const observer_op = new MutationObserver(observer_callback);
-			observer_op.observe(target_node_op, observer_options);
+			observer_op.observe(target_node_op, {
+				childList: true,
+				subtree: true
+			});
 		}
 
-		if (target_node_rec) {
-			const observer_rec = new MutationObserver(observer_callback);
-			observer_rec.observe(target_node_rec, observer_options);
+		const target_node_rec = document.querySelector('#rec-table tbody');
+
+		if (target_node_rec !== null) {
+			const observer_rec = new MutationObserver(() => {
+				this.addAttributes(element);
+			});
+
+			observer_rec.observe(target_node_rec, {
+				childList: true,
+				subtree: true
+			});
 		}
 
-		if (target_node_upd) {
-			const observer_upd = new MutationObserver(observer_callback);
-			observer_upd.observe(target_node_upd, observer_options);
+		const target_node_upd = document.querySelector('#upd-table tbody');
+
+		if (target_node_upd !== null) {
+			const observer_upd = new MutationObserver(() => {
+				this.addAttributes(element);
+			});
+
+			observer_upd.observe(target_node_upd, {
+				childList: true,
+				subtree: true
+			});
 		}
 	}
 }
@@ -966,7 +902,7 @@ class SlaTabIndicatorItem extends TabIndicatorItem {
 	initObserver(element) {
 		const target_node = document.querySelector('#showsla');
 
-		if (target_node) {
+		if (target_node !== null) {
 			target_node.addEventListener('click', () => {
 				this.addAttributes(element);
 			});
@@ -982,30 +918,23 @@ class ChildServicesTabIndicatorItem extends TabIndicatorItem {
 
 	getValue() {
 		return document
-			.querySelectorAll('#children tbody tr')
-			.length;
+			.querySelector('#children')
+			.dataset
+			.tabIndicator;
 	}
 
 	initObserver(element) {
-		const target_node = document.querySelector('#children tbody');
-		const observer_options = {
-			childList: true,
-			subtree: true
-		};
+		const target_node = document.querySelector('#children');
 
-		const observer_callback = (mutationList, _observer) => {
-			mutationList.forEach((mutation) => {
-				switch (mutation.type) {
-					case 'childList':
-						this.addAttributes(element);
-						break;
-				}
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes(element);
 			});
-		};
 
-		if (target_node) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node, observer_options);
+			observer.observe(target_node, {
+				attributes: true,
+				attributeFilter: ['data-tab-indicator']
+			});
 		}
 	}
 }
@@ -1024,24 +953,16 @@ class TimeTabIndicatorItem extends TabIndicatorItem {
 
 	initObserver(element) {
 		const target_node = document.querySelector('#time-table tbody');
-		const observer_options = {
-			childList: true,
-			subtree: true
-		};
 
-		const observer_callback = (mutationList, _observer) => {
-			mutationList.forEach((mutation) => {
-				switch (mutation.type) {
-					case 'childList':
-						this.addAttributes(element);
-						break;
-				}
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes(element);
 			});
-		};
 
-		if (target_node) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node, observer_options);
+			observer.observe(target_node, {
+				childList: true,
+				subtree: true
+			});
 		}
 	}
 }
@@ -1059,7 +980,6 @@ class TagFilterTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		// This event triggered in app/views/js/administration.usergroup.edit.js.php:179
 		document.addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
 			this.addAttributes(element);
 		});
@@ -1073,31 +993,21 @@ class MediaTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		return document
-			.querySelectorAll('#media-table tbody tr')
-			.length;
+		return document.querySelectorAll('#media-table tbody tr').length;
 	}
 
 	initObserver(element) {
 		const target_node = document.querySelector('#media-table tbody');
-		const observer_options = {
-			childList: true,
-			subtree: true
-		};
 
-		const observer_callback = (mutationList, _observer) => {
-			mutationList.forEach((mutation) => {
-				switch (mutation.type) {
-					case 'childList':
-						this.addAttributes(element);
-						break;
-				}
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes(element);
 			});
-		};
 
-		if (target_node) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node, observer_options);
+			observer.observe(target_node, {
+				childList: true,
+				subtree: true
+			});
 		}
 	}
 }
@@ -1116,24 +1026,16 @@ class MessageTemplateTabIndicatorItem extends TabIndicatorItem {
 
 	initObserver(element) {
 		const target_node = document.querySelector('#message-templates tbody');
-		const observer_options = {
-			childList: true,
-			subtree: true
-		};
 
-		const observer_callback = (mutationList, _observer) => {
-			mutationList.forEach((mutation) => {
-				switch (mutation.type) {
-					case 'childList':
-						this.addAttributes(element);
-						break;
-				}
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes(element);
 			});
-		};
 
-		if (target_node) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node, observer_options);
+			observer.observe(target_node, {
+				childList: true,
+				subtree: true
+			});
 		}
 	}
 }
@@ -1147,7 +1049,7 @@ class FrontendMessageTabIndicatorItem extends TabIndicatorItem {
 	getValue() {
 		const element = document.querySelector('#messages_enabled');
 
-		if (element) {
+		if (element !== null) {
 			return element.checked;
 		}
 
@@ -1157,7 +1059,7 @@ class FrontendMessageTabIndicatorItem extends TabIndicatorItem {
 	initObserver(element) {
 		const target_node = document.querySelector('#messages_enabled');
 
-		if (target_node) {
+		if (target_node !== null) {
 			target_node.addEventListener('click', () => {
 				this.addAttributes(element);
 			});
@@ -1174,7 +1076,7 @@ class SharingTabIndicatorItem extends TabIndicatorItem {
 	getValue() {
 		const element = document.querySelector("[name='private']:checked");
 
-		if (element && element.value > 0) {
+		if (element !== null && element.value > 0) {
 			return true;
 		}
 
@@ -1183,37 +1085,36 @@ class SharingTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		[...document.querySelectorAll('[name=private]')].map((value) => {
-			value.addEventListener('click', () => {
+		for (const input of document.querySelectorAll('[name=private]')) {
+			input.addEventListener('click', () => {
 				this.addAttributes(element);
 			});
-		});
-
-		const target_node_group = document.querySelector('#user-group-share-table tbody');
-		const target_node_user = document.querySelector('#user-share-table tbody');
-		const observer_options = {
-			childList: true,
-			subtree: true
-		};
-
-		const observer_callback = (mutationList, _observer) => {
-			mutationList.forEach((mutation) => {
-				switch (mutation.type) {
-					case 'childList':
-						this.addAttributes(element);
-						break;
-				}
-			});
-		};
-
-		if (target_node_group) {
-			const observer_group = new MutationObserver(observer_callback);
-			observer_group.observe(target_node_group, observer_options);
 		}
 
-		if (target_node_user) {
-			const observer_user = new MutationObserver(observer_callback);
-			observer_user.observe(target_node_user, observer_options);
+		const target_node_group = document.querySelector('#user-group-share-table tbody');
+
+		if (target_node_group !== null) {
+			const observer_group = new MutationObserver(() => {
+				this.addAttributes(element);
+			});
+
+			observer_group.observe(target_node_group, {
+				childList: true,
+				subtree: true
+			});
+		}
+
+		const target_node_user = document.querySelector('#user-share-table tbody');
+
+		if (target_node_user !== null) {
+			const observer_user = new MutationObserver(() => {
+				this.addAttributes(element);
+			});
+
+			observer_user.observe(target_node_user, {
+				childList: true,
+				subtree: true
+			});
 		}
 	}
 }
@@ -1232,24 +1133,16 @@ class GraphDatasetTabIndicatorItem extends TabIndicatorItem {
 
 	initObserver(element) {
 		const target_node = document.querySelector('#data_sets');
-		const observer_options = {
-			childList: true,
-			subtree: true
-		};
 
-		const observer_callback = (mutationList, _observer) => {
-			mutationList.forEach((mutation) => {
-				switch (mutation.type) {
-					case 'childList':
-						this.addAttributes(element);
-						break;
-				}
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes(element);
 			});
-		};
 
-		if (target_node) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node, observer_options);
+			observer.observe(target_node, {
+				childList: true,
+				subtree: true
+			});
 		}
 	}
 }
@@ -1263,7 +1156,7 @@ class GraphOptionsTabIndicatorItem extends TabIndicatorItem {
 	getValue() {
 		const element = document.querySelector("[name='source']:checked");
 
-		if (element) {
+		if (element !== null) {
 			return element.value > 0;
 		}
 
@@ -1271,11 +1164,11 @@ class GraphOptionsTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		[...document.querySelectorAll("[name='source']")].map((value) => {
-			value.addEventListener('click', () => {
+		for (const input of document.querySelectorAll("[name='source']")) {
+			input.addEventListener('click', () => {
 				this.addAttributes(element);
 			});
-		});
+		}
 	}
 }
 
@@ -1288,7 +1181,7 @@ class GraphTimeTabIndicatorItem extends TabIndicatorItem {
 	getValue() {
 		const element = document.querySelector('#graph_time');
 
-		if (element) {
+		if (element !== null) {
 			return element.checked;
 		}
 
@@ -1298,7 +1191,7 @@ class GraphTimeTabIndicatorItem extends TabIndicatorItem {
 	initObserver(element) {
 		const target_node = document.querySelector('#graph_time');
 
-		if (target_node) {
+		if (target_node !== null) {
 			target_node.addEventListener('click', () => {
 				this.addAttributes(element);
 			});
@@ -1315,7 +1208,7 @@ class GraphLegendTabIndicatorItem extends TabIndicatorItem {
 	getValue() {
 		const element = document.querySelector('#legend');
 
-		if (element) {
+		if (element !== null) {
 			return element.checked;
 		}
 
@@ -1325,7 +1218,7 @@ class GraphLegendTabIndicatorItem extends TabIndicatorItem {
 	initObserver(element) {
 		const target_node = document.querySelector('#legend');
 
-		if (target_node) {
+		if (target_node !== null) {
 			target_node.addEventListener('click', () => {
 				this.addAttributes(element);
 			});
@@ -1342,7 +1235,7 @@ class GraphProblemsTabIndicatorItem extends TabIndicatorItem {
 	getValue() {
 		const element = document.querySelector('#show_problems');
 
-		if (element) {
+		if (element !== null) {
 			return element.checked;
 		}
 
@@ -1352,7 +1245,7 @@ class GraphProblemsTabIndicatorItem extends TabIndicatorItem {
 	initObserver(element) {
 		const target_node = document.querySelector('#show_problems');
 
-		if (target_node) {
+		if (target_node !== null) {
 			target_node.addEventListener('click', () => {
 				this.addAttributes(element);
 			});
@@ -1374,24 +1267,16 @@ class GraphOverridesTabIndicatorItem extends TabIndicatorItem {
 
 	initObserver(element) {
 		const target_node = document.querySelector('.overrides-list');
-		const observer_options = {
-			childList: true,
-			subtree: true
-		};
 
-		const observer_callback = (mutationList, _observer) => {
-			mutationList.forEach((mutation) => {
-				switch (mutation.type) {
-					case 'childList':
-						this.addAttributes(element);
-						break;
-				}
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes(element);
 			});
-		};
 
-		if (target_node) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node, observer_options);
+			observer.observe(target_node, {
+				childList: true,
+				subtree: true
+			});
 		}
 	}
 }
@@ -1409,7 +1294,6 @@ class PermissionsTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver(element) {
-		// This event triggered in app/views/js/administration.usergroup.edit.js.php:164
 		document.addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
 			this.addAttributes(element);
 		});
@@ -1430,24 +1314,16 @@ class ValuemapsTabIndicatorItem extends TabIndicatorItem {
 
 	initObserver(element) {
 		const target_node = document.querySelector('#valuemap-table');
-		const observer_options = {
-			childList: true,
-			subtree: true
-		};
 
-		const observer_callback = (mutationList, _observer) => {
-			mutationList.forEach((mutation) => {
-				switch (mutation.type) {
-					case 'childList':
-						this.addAttributes(element);
-						break;
-				}
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes(element);
 			});
-		};
 
-		if (target_node) {
-			const observer = new MutationObserver(observer_callback);
-			observer.observe(target_node, observer_options);
+			observer.observe(target_node, {
+				childList: true,
+				subtree: true
+			});
 		}
 	}
 }

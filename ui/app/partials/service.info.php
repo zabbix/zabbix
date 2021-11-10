@@ -52,6 +52,7 @@ while ($parent = array_shift($data['service']['parents'])) {
 						->addClass(ZBX_STYLE_BTN_EDIT)
 						->addClass('js-edit-service')
 						->setAttribute('data-serviceid', $data['service']['serviceid'])
+						->setEnabled(!$data['service']['readonly'])
 					: null
 			))->addClass(ZBX_STYLE_SERVICE_ACTIONS)
 		]),

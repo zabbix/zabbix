@@ -55,7 +55,7 @@ trait MacrosTrait {
 				],
 				$value_column => [
 					'name' => 'value',
-					'selector' => 'xpath:./div[contains(@class, "input-group")]',
+					'selector' => 'xpath:./div[contains(@class, "macro-input-group")]',
 					'class' => 'CInputGroupElement'
 				],
 				'Description' => [

@@ -237,6 +237,12 @@ $toc-title-bg-color: #4f4f4f;
 			}
 		}
 	}
+
+	&.sticky-footer {
+		tfoot tr:first-of-type td {
+			border-color: lighten($table-border-color, 3%);
+		}
+	}
 }
 
 .dashboard-navigation-tabs {

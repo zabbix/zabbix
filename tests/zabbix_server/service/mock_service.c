@@ -200,7 +200,7 @@ void	mock_init_service_cache(const char *path)
 					rule->type = ZBX_SERVICE_STATUS_RULE_TYPE_W_L;
 				else if (0 == strcmp(value, "WP_LT"))
 					rule->type = ZBX_SERVICE_STATUS_RULE_TYPE_WP_L;
-				else if (0 == strcmp(value, "NP_GE"))
+				else
 					fail_msg("unsupported service '%s' rule type '%s'", service->name, value);
 				rule->limit_status = zbx_mock_get_object_member_int(hrule, "limit");
 				rule->limit_value = zbx_mock_get_object_member_int(hrule, "value");
@@ -316,5 +316,61 @@ void	mock_destroy_service_cache(void)
 	zbx_hashset_destroy(&cache.services);
 }
 
+/* function stubs to cut off library dependencies */
+
+zbx_uint64_t	__wrap_DCget_nextid(const char *table_name, int num)
+{
+	ZBX_UNUSED(table_name);
+	ZBX_UNUSED(num);
+
+	return 0;
+}
+
+void	*__wrap_zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
+		const zbx_timespec_t *timespec, int value, const char *trigger_description,
+		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
+		unsigned char trigger_type, const zbx_vector_ptr_t *trigger_tags,
+		unsigned char trigger_correlation_mode, const char *trigger_correlation_tag,
+		unsigned char trigger_value, const char *trigger_opdata, const char *event_name, const char *error)
+{
+	ZBX_UNUSED(source);
+	ZBX_UNUSED(object);
+	ZBX_UNUSED(objectid);
+	ZBX_UNUSED(timespec);
+	ZBX_UNUSED(value);
+	ZBX_UNUSED(trigger_description);
+	ZBX_UNUSED(trigger_expression);
+	ZBX_UNUSED(trigger_recovery_expression);
+	ZBX_UNUSED(trigger_priority);
+	ZBX_UNUSED(trigger_type);
+	ZBX_UNUSED(trigger_tags);
+	ZBX_UNUSED(trigger_correlation_mode);
+	ZBX_UNUSED(trigger_correlation_tag);
+	ZBX_UNUSED(trigger_value);
+	ZBX_UNUSED(trigger_opdata);
+	ZBX_UNUSED(event_name);
+	ZBX_UNUSED(error);
+
+	return NULL;
+}
+
+int	__wrap_zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock)
+{
+	ZBX_UNUSED(trigger_diff);
+	ZBX_UNUSED(triggerids_lock);
+
+	return 0;
+}
+
+void	__wrap_zbx_clean_events(void)
+{
+}
+
+int	__wrap_zbx_interface_availability_is_set(const void *ia)
+{
+	ZBX_UNUSED(ia);
+
+	return FAIL;
+}
 
 

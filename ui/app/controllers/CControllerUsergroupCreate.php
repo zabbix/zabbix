@@ -67,10 +67,11 @@ class CControllerUsergroupCreate extends CController {
 
 	protected function doAction() {
 		$user_group = [
+			'users' => zbx_toObject($this->getInput('userids', []), 'userid'),
 			'rights' => []
 		];
 
-		$this->getInputs($user_group, ['name', 'users_status', 'gui_access', 'debug_mode', 'userids', 'tag_filters']);
+		$this->getInputs($user_group, ['name', 'users_status', 'gui_access', 'debug_mode', 'tag_filters']);
 
 		$group_rights = applyHostGroupRights($this->getInput('group_rights', []));
 

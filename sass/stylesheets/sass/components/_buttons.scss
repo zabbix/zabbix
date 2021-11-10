@@ -80,6 +80,16 @@
 	}
 }
 
+.btn-add,
+.btn-edit,
+.btn-remove {
+	&[disabled],
+	&[disabled]:hover {
+		background-color: transparent;
+		opacity: .25;
+	}
+}
+
 .overlay-close-btn {
 	@extend %btn-icon;
 	@extend %btn-remove-icon;

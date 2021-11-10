@@ -204,7 +204,7 @@ void	zbx_tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base)
  *                                                                            *
  * Function: neg_to_pos_wrap                                                  *
  *                                                                            *
- * Purpose: convert negative number to postive by wrapping around the base    *
+ * Purpose: convert negative number to positive by wrapping around the base   *
  *                                                                            *
  * Parameter: value - [IN/OUT] the value to convert                           *
  *            base  - [IN] the wrap base                                      *
