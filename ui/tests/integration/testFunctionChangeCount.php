@@ -254,7 +254,7 @@ class testFunctionChangeCount extends CIntegrationTest {
 
 		$this->assertArrayHasKey('error', $response['result'][0]);
 		$this->assertContains('not enough data', $response['result'][0]['error']);
-	
+
 		return true;
 	}
 
@@ -337,7 +337,7 @@ class testFunctionChangeCount extends CIntegrationTest {
 	public function testFunctionChangeCount_Get_DblExplicitAll() {
 		return $this->checkTriggerValue(self::$items['item_dbl']['triggers']['some_equal']);
 	}
-	
+
 	public function testFunctionChangeCount_Send_DblInc() {
 		return $this->sendValues('item_dbl', [0.0001, 0.0002, 0.0003, 0.0004, 0.0004]);
 	}
