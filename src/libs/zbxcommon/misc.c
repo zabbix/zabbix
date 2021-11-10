@@ -3884,3 +3884,54 @@ void	zbx_md5buf2str(const md5_byte_t *md5, char *str)
 
 	*p = '\0';
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_hex2bin                                                      *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *     convert ASCII hex digit string to a binary representation (byte        *
+ *     string)                                                                *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     p_hex   - [IN] null-terminated input string                            *
+ *     buf     - [OUT] output buffer                                          *
+ *     buf_len - [IN] output buffer size                                      *
+ *                                                                            *
+ * Return value:                                                              *
+ *     Number of bytes written into 'buf' on successful conversion.           *
+ *     -1 - an error occurred.                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *     In case of error incomplete useless data may be written into 'buf'.    *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_hex2bin(const unsigned char *p_hex, unsigned char *buf, int buf_len)
+{
+	unsigned char	*q = buf;
+	int		len = 0;
+
+	while ('\0' != *p_hex)
+	{
+		if (0 != isxdigit(*p_hex) && 0 != isxdigit(*(p_hex + 1)) && buf_len > len)
+		{
+			unsigned char	hi = *p_hex & 0x0f;
+			unsigned char	lo;
+
+			if ('9' < *p_hex++)
+				hi += (unsigned char)9;
+
+			lo = *p_hex & 0x0f;
+
+			if ('9' < *p_hex++)
+				lo += (unsigned char)9;
+
+			*q++ = (unsigned char)(hi << 4 | lo);
+			len++;
+		}
+		else
+			return -1;
+	}
+
+	return len;
+}
