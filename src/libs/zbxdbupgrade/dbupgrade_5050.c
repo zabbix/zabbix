@@ -1121,6 +1121,23 @@ static int	DBpatch_5050104(void)
 
 	return DBmodify_field_type("config", &new_field, &old_field);
 }
+
+static int	DBpatch_5050105(void)
+{
+	if(SUCCEED != DBrename_index("items", "items_1", "items_9", "hostid,key_(764)", 0))
+		return FAIL;
+
+	if(SUCCEED != DBrename_index("items", "items_8", "items_10", "key_(768)", 0))
+		return FAIL;
+
+	if(SUCCEED != DBrename_index("items", "items_9", "items_1", "hostid,key_(764)", 0))
+		return FAIL;
+
+	if(SUCCEED != DBrename_index("items", "items_10", "items_8", "key_(768)", 0))
+		return FAIL;
+
+	return SUCCEED;
+}
 #endif
 
 DBPATCH_START(5050)
@@ -1218,6 +1235,7 @@ DBPATCH_ADD(5050100, 0, 1)
 DBPATCH_ADD(5050101, 0, 1)
 DBPATCH_ADD(5050102, 0, 1)
 DBPATCH_ADD(5050103, 0, 1)
-DBPATCH_ADD(5050104, 0, 1)
+DBPATCH_ADD(5050104, 0, 0)
+DBPATCH_ADD(5050105, 0, 0)
 
 DBPATCH_END()
