@@ -252,12 +252,12 @@ class CControllerWidgetItemView extends CControllerWidget {
 		$data = [];
 
 		if (array_key_exists(WIDGET_ITEM_SHOW_DESCRIPTION, $show)) {
-			$classes = ['description', self::trVPos($fields['desc_v_pos']), self::trHPos($fields['desc_h_pos'])];
+			$classes = ['item-description', self::trVPos($fields['desc_v_pos']), self::trHPos($fields['desc_h_pos'])];
 			if ($fields['desc_bold'] == 1) {
 				$classes[] = 'bold';
 			}
 
-			$styles = ['--item-font' => number_format($fields['desc_size'] / 100, 2)];
+			$styles = ['--widget-item-font' => number_format($fields['desc_size'] / 100, 2)];
 			if ($fields['desc_color'] !== '') {
 				$styles['color'] = '#'.$fields['desc_color'];
 			}
@@ -283,7 +283,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 					$units_classes[] = 'bold';
 				}
 
-				$units_styles = ['--item-font' => number_format($fields['units_size'] / 100, 2)];
+				$units_styles = ['--widget-item-font' => number_format($fields['units_size'] / 100, 2)];
 				if ($fields['units_color'] !== '') {
 					$units_styles['color'] = '#'.$fields['units_color'];
 				}
@@ -302,7 +302,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 				$classes[] = 'bold';
 			}
 
-			$styles = ['--item-font' => number_format($fields['value_size'] / 100, 2)];
+			$styles = ['--widget-item-font' => number_format($fields['value_size'] / 100, 2)];
 			if ($fields['value_color'] !== '') {
 				$styles['color'] = '#'.$fields['value_color'];
 			}
@@ -320,7 +320,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 					$classes[] = 'bold';
 				}
 
-				$styles = ['--item-font' => number_format($fields['decimal_size'] / 100, 2)];
+				$styles = ['--widget-item-font' => number_format($fields['decimal_size'] / 100, 2)];
 				if ($fields['value_color'] !== '') {
 					$styles['color'] = '#'.$fields['value_color'];
 				}
@@ -336,7 +336,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 				$data[$fields['value_v_pos']][$fields['value_h_pos']]['data'][] = [
 					'data' => $change_indicator,
 					'classes' => ['change-indicator'],
-					'styles' => ['--item-font' => number_format($fields['value_size'] / 100, 2)]
+					'styles' => ['--widget-item-font' => number_format($fields['value_size'] / 100, 2)]
 				];
 			}
 
@@ -357,19 +357,19 @@ class CControllerWidgetItemView extends CControllerWidget {
 				'data' => [[
 					'data' => $change_indicator,
 					'classes' => ['change-indicator'],
-					'styles' => ['--item-font' => number_format($fields['value_size'] / 100, 2)]
+					'styles' => ['--widget-item-font' => number_format($fields['value_size'] / 100, 2)]
 				]],
 				'classes' => $classes
 			];
 		}
 
 		if (array_key_exists(WIDGET_ITEM_SHOW_TIME, $show)) {
-			$classes = ['time', self::trVPos($fields['time_v_pos']), self::trHPos($fields['time_h_pos'])];
+			$classes = ['item-time', self::trVPos($fields['time_v_pos']), self::trHPos($fields['time_h_pos'])];
 			if ($fields['time_bold'] == 1) {
 				$classes[] = 'bold';
 			}
 
-			$styles = ['--item-font' => number_format($fields['time_size'] / 100, 2)];
+			$styles = ['--widget-item-font' => number_format($fields['time_size'] / 100, 2)];
 			if ($fields['time_color'] !== '') {
 				$styles['color'] = '#'.$fields['time_color'];
 			}

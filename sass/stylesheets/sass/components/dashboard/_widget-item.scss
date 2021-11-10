@@ -1,5 +1,6 @@
-.dashboard-grid-widget-item {
+// Widget configuration.
 
+form.dashboard-grid-widget-item {
 	.field-group-description,
 	.field-group-value,
 	.field-group-time,
@@ -76,16 +77,83 @@
 	}
 }
 
-// SVG arrow styles.
+// Widget view.
 
-.svg-arrow-up {
-	fill: $arrow-fill-up;
-}
+div.dashboard-grid-widget-item {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
 
-.svg-arrow-down {
-	fill: $arrow-fill-down;
-}
+	> div,
+	.item-description,
+	.item-value,
+	.item-time {
+		display: flex;
+		justify-content: space-between;
+		flex-grow: 1;
+	}
 
-.svg-arrow-up-down {
-	fill: $arrow-fill-up-down;
+	.item-description,
+	.item-value,
+	.item-time {
+		//background: rgba(0, 255, 0, .15);
+		padding: 5px;
+	}
+
+	.left {
+		justify-content: flex-start;
+	}
+
+	.center {
+		justify-content: center;
+	}
+
+	.right {
+		justify-content: flex-end;
+	}
+
+	.top {
+		align-self: flex-start;
+	}
+
+	.middle {
+		align-self: center;
+	}
+
+	.bottom {
+		align-self: flex-end;
+	}
+
+	.bold {
+		font-weight: bold;
+	}
+
+	.item-description,
+	.value,
+	.decimals,
+	.units,
+	.item-time {
+		font-size: calc(var(--widget-height) * var(--widget-item-font));
+		line-height: $body-line-height;
+	}
+
+	.item-value {
+		align-items: baseline;
+	}
+
+	.svg-arrow {
+		height: calc(var(--widget-height) * var(--widget-item-font));
+	}
+
+	.svg-arrow-up {
+		fill: $arrow-fill-up;
+	}
+
+	.svg-arrow-down {
+		fill: $arrow-fill-down;
+	}
+
+	.svg-arrow-up-down {
+		fill: $arrow-fill-up-down;
+	}
 }

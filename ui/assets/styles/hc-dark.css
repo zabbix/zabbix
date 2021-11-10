@@ -1380,72 +1380,110 @@ footer {
 .wrapper.layout-kioskmode .dashboard-navigation {
   display: none; }
 
-.dashboard-grid-widget-item .field-group-description,
-.dashboard-grid-widget-item .field-group-value,
-.dashboard-grid-widget-item .field-group-time,
-.dashboard-grid-widget-item .field-group-change-indicator {
+form.dashboard-grid-widget-item .field-group-description,
+form.dashboard-grid-widget-item .field-group-value,
+form.dashboard-grid-widget-item .field-group-time,
+form.dashboard-grid-widget-item .field-group-change-indicator {
   display: grid;
   grid-template-columns: minmax(100px, max-content) 3fr max-content auto;
   align-items: center;
   column-gap: 10px;
   row-gap: 5px; }
-  .dashboard-grid-widget-item .field-group-description label,
-  .dashboard-grid-widget-item .field-group-value label,
-  .dashboard-grid-widget-item .field-group-time label,
-  .dashboard-grid-widget-item .field-group-change-indicator label {
+  form.dashboard-grid-widget-item .field-group-description label,
+  form.dashboard-grid-widget-item .field-group-value label,
+  form.dashboard-grid-widget-item .field-group-time label,
+  form.dashboard-grid-widget-item .field-group-change-indicator label {
     text-align: right; }
-  .dashboard-grid-widget-item .field-group-description hr,
-  .dashboard-grid-widget-item .field-group-value hr,
-  .dashboard-grid-widget-item .field-group-time hr,
-  .dashboard-grid-widget-item .field-group-change-indicator hr {
+  form.dashboard-grid-widget-item .field-group-description hr,
+  form.dashboard-grid-widget-item .field-group-value hr,
+  form.dashboard-grid-widget-item .field-group-time hr,
+  form.dashboard-grid-widget-item .field-group-change-indicator hr {
     grid-column: 1 / -1;
     margin: 0;
     width: 100%;
     border: solid #333333;
     border-width: 1px 0 0 0; }
-  .dashboard-grid-widget-item .field-group-description .field-fluid,
-  .dashboard-grid-widget-item .field-group-value .field-fluid,
-  .dashboard-grid-widget-item .field-group-time .field-fluid,
-  .dashboard-grid-widget-item .field-group-change-indicator .field-fluid {
+  form.dashboard-grid-widget-item .field-group-description .field-fluid,
+  form.dashboard-grid-widget-item .field-group-value .field-fluid,
+  form.dashboard-grid-widget-item .field-group-time .field-fluid,
+  form.dashboard-grid-widget-item .field-group-change-indicator .field-fluid {
     grid-column: 2 / -1; }
-  .dashboard-grid-widget-item .field-group-description .offset-3,
-  .dashboard-grid-widget-item .field-group-value .offset-3,
-  .dashboard-grid-widget-item .field-group-time .offset-3,
-  .dashboard-grid-widget-item .field-group-change-indicator .offset-3 {
+  form.dashboard-grid-widget-item .field-group-description .offset-3,
+  form.dashboard-grid-widget-item .field-group-value .offset-3,
+  form.dashboard-grid-widget-item .field-group-time .offset-3,
+  form.dashboard-grid-widget-item .field-group-change-indicator .offset-3 {
     grid-column-start: 3; }
-  .dashboard-grid-widget-item .field-group-description .field-size input,
-  .dashboard-grid-widget-item .field-group-value .field-size input,
-  .dashboard-grid-widget-item .field-group-time .field-size input,
-  .dashboard-grid-widget-item .field-group-change-indicator .field-size input {
+  form.dashboard-grid-widget-item .field-group-description .field-size input,
+  form.dashboard-grid-widget-item .field-group-value .field-size input,
+  form.dashboard-grid-widget-item .field-group-time .field-size input,
+  form.dashboard-grid-widget-item .field-group-change-indicator .field-size input {
     margin-right: 5px; }
-  .dashboard-grid-widget-item .field-group-description .form-field,
-  .dashboard-grid-widget-item .field-group-value .form-field,
-  .dashboard-grid-widget-item .field-group-time .form-field,
-  .dashboard-grid-widget-item .field-group-change-indicator .form-field {
+  form.dashboard-grid-widget-item .field-group-description .form-field,
+  form.dashboard-grid-widget-item .field-group-value .form-field,
+  form.dashboard-grid-widget-item .field-group-time .form-field,
+  form.dashboard-grid-widget-item .field-group-change-indicator .form-field {
     line-height: 24px; }
-.dashboard-grid-widget-item .field-group-description .form-field:nth-child(1) {
+form.dashboard-grid-widget-item .field-group-description .form-field:nth-child(1) {
   grid-column: 1 / -1; }
-.dashboard-grid-widget-item .field-group-value {
+form.dashboard-grid-widget-item .field-group-value {
   grid-template-columns: minmax(100px, max-content) 3fr max-content auto; }
-  .dashboard-grid-widget-item .field-group-value .units-show {
+  form.dashboard-grid-widget-item .field-group-value .units-show {
     display: flex; }
-    .dashboard-grid-widget-item .field-group-value .units-show label[for='units'] {
+    form.dashboard-grid-widget-item .field-group-value .units-show label[for='units'] {
       width: 100%; }
-.dashboard-grid-widget-item .field-group-change-indicator {
+form.dashboard-grid-widget-item .field-group-change-indicator {
   grid-template-columns: repeat(3, max-content 96px); }
-.dashboard-grid-widget-item .field-group-change-indicator .input-color-picker {
+form.dashboard-grid-widget-item .field-group-change-indicator .input-color-picker {
   display: block; }
-.dashboard-grid-widget-item .table-forms .table-forms-td-left label.widget-item-label {
+form.dashboard-grid-widget-item .table-forms .table-forms-td-left label.widget-item-label {
   margin-top: 6px; }
 
-.svg-arrow-up {
-  fill: #3DC51D; }
-
-.svg-arrow-down {
-  fill: #FC5A5A; }
-
-.svg-arrow-up-down {
-  fill: #3DC51D; }
+div.dashboard-grid-widget-item {
+  display: flex;
+  flex-direction: column;
+  height: 100%; }
+  div.dashboard-grid-widget-item > div,
+  div.dashboard-grid-widget-item .item-description,
+  div.dashboard-grid-widget-item .item-value,
+  div.dashboard-grid-widget-item .item-time {
+    display: flex;
+    justify-content: space-between;
+    flex-grow: 1; }
+  div.dashboard-grid-widget-item .item-description,
+  div.dashboard-grid-widget-item .item-value,
+  div.dashboard-grid-widget-item .item-time {
+    padding: 5px; }
+  div.dashboard-grid-widget-item .left {
+    justify-content: flex-start; }
+  div.dashboard-grid-widget-item .center {
+    justify-content: center; }
+  div.dashboard-grid-widget-item .right {
+    justify-content: flex-end; }
+  div.dashboard-grid-widget-item .top {
+    align-self: flex-start; }
+  div.dashboard-grid-widget-item .middle {
+    align-self: center; }
+  div.dashboard-grid-widget-item .bottom {
+    align-self: flex-end; }
+  div.dashboard-grid-widget-item .bold {
+    font-weight: bold; }
+  div.dashboard-grid-widget-item .item-description,
+  div.dashboard-grid-widget-item .value,
+  div.dashboard-grid-widget-item .decimals,
+  div.dashboard-grid-widget-item .units,
+  div.dashboard-grid-widget-item .item-time {
+    font-size: calc(var(--widget-height) * var(--widget-item-font));
+    line-height: 1.4em; }
+  div.dashboard-grid-widget-item .item-value {
+    align-items: baseline; }
+  div.dashboard-grid-widget-item .svg-arrow {
+    height: calc(var(--widget-height) * var(--widget-item-font)); }
+  div.dashboard-grid-widget-item .svg-arrow-up {
+    fill: #3DC51D; }
+  div.dashboard-grid-widget-item .svg-arrow-down {
+    fill: #FC5A5A; }
+  div.dashboard-grid-widget-item .svg-arrow-up-down {
+    fill: #3DC51D; }
 
 .diff {
   padding: 4px;

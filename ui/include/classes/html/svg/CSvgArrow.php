@@ -24,6 +24,7 @@
  */
 class CSvgArrow extends CSvg {
 
+	const ZBX_STYLE_ARROW = 'svg-arrow';
 	const ZBX_STYLE_ARROW_UP = 'svg-arrow-up';
 	const ZBX_STYLE_ARROW_DOWN = 'svg-arrow-down';
 	const ZBX_STYLE_ARROW_UP_DOWN = 'svg-arrow-up-down';
@@ -57,15 +58,16 @@ class CSvgArrow extends CSvg {
 			'fill_color' => null
 		];
 
-		$class = '';
+		$this->addClass(self::ZBX_STYLE_ARROW);
+
 		if ($this->options['up'] && $this->options['down']) {
-			$class = self::ZBX_STYLE_ARROW_UP_DOWN;
+			$this->addClass(self::ZBX_STYLE_ARROW_UP_DOWN);
 		}
 		elseif ($this->options['up']) {
-			$class = self::ZBX_STYLE_ARROW_UP;
+			$this->addClass(self::ZBX_STYLE_ARROW_UP);
 		}
 		elseif ($this->options['down']) {
-			$class = self::ZBX_STYLE_ARROW_DOWN;
+			$this->addClass(self::ZBX_STYLE_ARROW_DOWN);
 		}
 
 		$fill_color = $this->options['fill_color']
@@ -75,9 +77,7 @@ class CSvgArrow extends CSvg {
 		$this
 			->setAttribute('viewBox', $this->viewbox)
 			->addItem(
-				(new CSvgPolygon($this->drawArrow()))
-					->addStyle($fill_color)
-					->addClass($class)
+				(new CSvgPolygon($this->drawArrow()))->addStyle($fill_color)
 			);
 	}
 
