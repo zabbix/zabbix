@@ -3556,7 +3556,62 @@ static int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t
 	*logfiles_num_new = logfiles_num;
 
 	if (0 < logfiles_num)
+	{
+		/* Try to update MD5 sums of initial blocks if they were calculated for small blocks. */
+		/* Log file processing has been done. Errors can be ignored here. */
+		char	*err_tmp = NULL;
+		int	k;
+
+		ret = SUCCEED;
+
+		for (k = 0; k < logfiles_num; k++)
+		{
+			if (MAX_LEN_MD5 > logfiles[k].md5_block_size &&
+					logfiles[k].size > (zbx_uint64_t)logfiles[k].md5_block_size)
+			{
+				int		f, new_md5_block_size = (int)MIN(MAX_LEN_MD5, logfiles[k].size);
+				size_t		new_last_block_offset;
+				md5_byte_t	new_first_block_md5[MD5_DIGEST_SIZE],
+						new_last_block_md5[MD5_DIGEST_SIZE];
+
+				if (-1 == (f = zbx_open(logfiles[k].filename, O_RDONLY)))
+					continue;
+
+				if (SUCCEED != (ret = file_part_md5(f, 0, new_md5_block_size, new_first_block_md5,
+						logfiles[k].filename, &err_tmp)))
+				{
+					zbx_free(err_tmp);
+					goto clean;
+				}
+
+				if (0 < (new_last_block_offset = logfiles[k].size - (size_t)new_md5_block_size))
+				{
+					if (SUCCEED != (ret = file_part_md5(f, new_last_block_offset,
+							new_md5_block_size, new_last_block_md5, logfiles[k].filename,
+							&err_tmp)))
+					{
+						zbx_free(err_tmp);
+						goto clean;
+					}
+				}
+				else	/* file is small, set the last block MD5 equal to the first block's one */
+					memcpy(new_last_block_md5, new_first_block_md5, sizeof(new_last_block_md5));
+
+				logfiles[k].md5_block_size = new_md5_block_size;
+				logfiles[k].last_block_offset = new_last_block_offset;
+
+				memcpy(logfiles[k].first_block_md5, new_first_block_md5,
+						sizeof(logfiles[k].first_block_md5));
+				memcpy(logfiles[k].last_block_md5, new_last_block_md5,
+						sizeof(logfiles[k].last_block_md5));
+clean:
+				if (0 != close(f))
+					continue;
+			}
+		}
+
 		*logfiles_new = logfiles;
+	}
 out:
 	if (0.0f != max_delay)
 	{
