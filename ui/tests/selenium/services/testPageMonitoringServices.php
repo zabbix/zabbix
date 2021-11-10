@@ -556,193 +556,193 @@ class testPageMonitoringServices extends CWebTest {
 						'Server 4'
 					]
 				]
-			]
+			],
 			// Operator: Equals.
 			// Operator: Does not exist, etc.
-//			[
-//				[
-//					'evaluation_type' => 'And/Or',
-//					'tags' => [
-//						[
-//							'name' => 'test',
-//							'operator' => 'Equals',
-//							'value' => 'test123'
-//						],
-//					],
-//					'result' => [
-//						'Name' => 'Server 3 1'
-//					]
-//				]
-//			],
-//			[
-//				[
-//					'evaluation_type' => 'And/Or',
-//					'tags' => [
-//						[
-//							'name' => 'test',
-//							'operator' => 'Does not exist',
-//						],
-//					],
-//					'result' => [
-//						'Name' => 'Server 1',
-//						'Name' => 'Server 2 1',
-//						'Name' => 'Server 6 for delete by checkbox',
-//						'Name' => 'Server 7 for delete by action button',
-//						'Name' => 'Server 8 parent with child for delete child 1',
-//						'Name' => 'Server 9 parent with child for delete parent 1',
-//						'Name' => 'Server 10 child for Server 8',
-//						'Name' => 'Server 11 child for Server 9',
-//						'Name' => 'Server for mass delete 1',
-//						'Name' => 'Server for mass delete 2',
-//						'Name' => 'Server for mass delete 3',
-//						'Name' => 'Server for mass update 1',
-//						'Name' => 'Server for mass update 2',
-//						'Name' => 'Server for mass update 3',
-//						'Name' => 'Server with problem'
-//					]
-//				]
-//			],
-//			[
-//				[
-//					'evaluation_type' => 'And/Or',
-//					'tags' => [
-//						[
-//							'name' => 'test',
-//							'operator' => 'Does not equal',
-//							'value' => 'test123'
-//						],
-//					],
-//					'result' => [
-//						'Name' => 'Server 4',
-//						'Name' => 'Server 5',
-//					]
-//				]
-//			],
-//			[
-//				[
-//					'evaluation_type' => 'And/Or',
-//					'tags' => [
-//						[
-//							'name' => 'test',
-//							'operator' => 'Contains',
-//							'value' => 'test123'
-//						],
-//					],
-//					'result' => [
-//						'Name' => 'Server 3 1'
-//					]
-//				]
-//			],
-//			[
-//				[
-//					'evaluation_type' => 'Or',
-//					'tags' => [
-//						[
-//							'name' => 'test',
-//							'operator' => 'Contains',
-//							'value' => 'test123'
-//						],
-//					],
-//					'result' => [
-//						'Name' => 'Server 3 1'
-//					]
-//				]
-//			],
-//			[
-//				[
-//					'evaluation_type' => 'Or',
-//					'tags' => [
-//						[
-//							'name' => 'test',
-//							'operator' => 'Exists',
-//						],
-//					],
-//					'result' => [
-//						'Name' => 'Server 3 1'
-//					]
-//				]
-//			],
-//			[
-//				[
-//					'evaluation_type' => 'Or',
-//					'tags' => [
-//						[
-//							'name' => 'test',
-//							'operator' => 'Equals',
-//							'value' => 'test123'
-//						],
-//					],
-//					'result' => [
-//						'Name' => 'Server 3 1'
-//					]
-//				],
-//			],
-//			[
-//				[
-//					'evaluation_type' => 'Or',
-//					'tags' => [
-//						[
-//							'name' => 'test',
-//							'operator' => 'Does not exist',
-//						],
-//					],
-//					'result' => [
-//						'Name' => 'Server 4',
-//						'Name' => 'Server 5',
-//					]
-//				]
-//			],
-//			[
-//				[
-//					'evaluation_type' => 'Or',
-//					'tags' => [
-//						[
-//							'name' => 'test',
-//							'operator' => 'Does not equal',
-//							'value' => 'test123'
-//						],
-//					],
-//					'result' => [
-//						'Name' => 'Server 4',
-//						'Name' => 'Server 5',
-//					]
-//				]
-//			],
-//			[
-//				[
-//					'children' => [
-//						'id:filter_without_children'
-//					],
-//					'result' => [
-//						'Name' => 'Server 1',
-//						'Name' => 'Server 4',
-//						'Name' => 'Server 5'
-//					]
-//				]
-//			],
-//			[
-//				[
-//					'problem' => [
-//						'id:filter_without_problem_tags'
-//					],
-//					'result' => [
-//						'Name' => 'Server 1',
-//						'Name' => 'Server 2',
-//						'Name' => 'Server 3',
-//						'Name' => 'Server 4'
-//					]
-//				]
-//			],
-//			[
-//				[
-//					'status' => [
-//						'id:filter_status_2'
-//					],
-//					'result' => [
-//						'Name' => 'Server with problem',
-//					]
-//				]
-//			]
+			[
+				[
+					'evaluation_type' => 'And/Or',
+					'tags' => [
+						[
+							'name' => 'test',
+							'operator' => 'Equals',
+							'value' => 'test123'
+						],
+					],
+					'result' => [
+						'Name' => 'Server 3 1'
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'And/Or',
+					'tags' => [
+						[
+							'name' => 'test',
+							'operator' => 'Does not exist',
+						],
+					],
+					'result' => [
+						'Name' => 'Server 1',
+						'Name' => 'Server 2 1',
+						'Name' => 'Server 6 for delete by checkbox',
+						'Name' => 'Server 7 for delete by action button',
+						'Name' => 'Server 8 parent with child for delete child 1',
+						'Name' => 'Server 9 parent with child for delete parent 1',
+						'Name' => 'Server 10 child for Server 8',
+						'Name' => 'Server 11 child for Server 9',
+						'Name' => 'Server for mass delete 1',
+						'Name' => 'Server for mass delete 2',
+						'Name' => 'Server for mass delete 3',
+						'Name' => 'Server for mass update 1',
+						'Name' => 'Server for mass update 2',
+						'Name' => 'Server for mass update 3',
+						'Name' => 'Server with problem'
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'And/Or',
+					'tags' => [
+						[
+							'name' => 'test',
+							'operator' => 'Does not equal',
+							'value' => 'test123'
+						],
+					],
+					'result' => [
+						'Name' => 'Server 4',
+						'Name' => 'Server 5',
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'And/Or',
+					'tags' => [
+						[
+							'name' => 'test',
+							'operator' => 'Contains',
+							'value' => 'test123'
+						],
+					],
+					'result' => [
+						'Name' => 'Server 3 1'
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'Or',
+					'tags' => [
+						[
+							'name' => 'test',
+							'operator' => 'Contains',
+							'value' => 'test123'
+						],
+					],
+					'result' => [
+						'Name' => 'Server 3 1'
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'Or',
+					'tags' => [
+						[
+							'name' => 'test',
+							'operator' => 'Exists',
+						],
+					],
+					'result' => [
+						'Name' => 'Server 3 1'
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'Or',
+					'tags' => [
+						[
+							'name' => 'test',
+							'operator' => 'Equals',
+							'value' => 'test123'
+						],
+					],
+					'result' => [
+						'Name' => 'Server 3 1'
+					]
+				],
+			],
+			[
+				[
+					'evaluation_type' => 'Or',
+					'tags' => [
+						[
+							'name' => 'test',
+							'operator' => 'Does not exist',
+						],
+					],
+					'result' => [
+						'Name' => 'Server 4',
+						'Name' => 'Server 5',
+					]
+				]
+			],
+			[
+				[
+					'evaluation_type' => 'Or',
+					'tags' => [
+						[
+							'name' => 'test',
+							'operator' => 'Does not equal',
+							'value' => 'test123'
+						],
+					],
+					'result' => [
+						'Name' => 'Server 4',
+						'Name' => 'Server 5',
+					]
+				]
+			],
+			[
+				[
+					'children' => [
+						'id:filter_without_children'
+					],
+					'result' => [
+						'Name' => 'Server 1',
+						'Name' => 'Server 4',
+						'Name' => 'Server 5'
+					]
+				]
+			],
+			[
+				[
+					'problem' => [
+						'id:filter_without_problem_tags'
+					],
+					'result' => [
+						'Name' => 'Server 1',
+						'Name' => 'Server 2',
+						'Name' => 'Server 3',
+						'Name' => 'Server 4'
+					]
+				]
+			],
+			[
+				[
+					'status' => [
+						'id:filter_status_2'
+					],
+					'result' => [
+						'Name' => 'Server with problem',
+					]
+				]
+			]
 		];
 	}
 
@@ -801,6 +801,9 @@ class testPageMonitoringServices extends CWebTest {
 		 *
 		 */
 
+		// If we will put breadcrumbs here, other cases will broke
+		// In this case, lot of code should be rewritten
+
 		// Reset filter due to not interfere next tests.s
 		$filter_form->query('button:Reset')->one()->click();
 	}
@@ -813,8 +816,7 @@ class testPageMonitoringServices extends CWebTest {
 		// Check table contents before filtering.
 		$start_rows_count = $table->getRows()->count();
 		$this->assertTableStats($start_rows_count);
-		$start_contents = $this->getTableData();
-
+		$start_contents = array_values($this->getTableResult('Name'));
 		// Filling fields with needed services info.
 		$form->fill(['id:filter_name' => 'Server 3']);
 		$form->submit();
@@ -824,13 +826,13 @@ class testPageMonitoringServices extends CWebTest {
 		$this->assertTableStats(1);
 
 		// Checking that filtered service matches expected.
-		$this->assertEquals(['Server 3 1'], $this->getTableData());
+		$this->assertEquals(['Server 3 1'], array_values($this->getTableResult('Name')));
 
 		// After pressing reset button, check that previous services are displayed again.
 		$form->query('button:Reset')->one()->click();
 		$this->assertEquals($start_rows_count, $table->getRows()->count());
 		$this->assertTableStats($table->getRows()->count());
-		$this->assertEquals($start_contents, $this->getTableData());
+		$this->assertEquals($start_contents, array_values($this->getTableResult('Name')));
 	}
 
 	public function testPageMonitoringServices_MassUpdate()
@@ -868,45 +870,7 @@ class testPageMonitoringServices extends CWebTest {
 
 		$this->assertMessage(TEST_GOOD, 'Services updated');
 
-		$expectedData = [
-			'Server for mass update 1' => [
-				'' => '',
-				'Status' => 'OK',
-				'Root cause' => '',
-				'SLA' => '99.9900',
-				'Tags' => 'added_tag_1: added_tag_1',
-				'' => ''
-			],
-			'Server for mass update 2' => [
-				'' => '',
-				'Status' => 'OK',
-				'Root cause' => '',
-				'SLA' => '99.9900',
-				'Tags' => 'added_tag_1: added_tag_1',
-				'' => ''
-			],
-			'Server for mass update 3' => [
-				'' => '',
-				'Status' => 'OK',
-				'Root cause' => '',
-				'SLA' => '99.9900',
-				'Tags' => 'added_tag_1: added_tag_1',
-				'' => ''
-			]
-		];
-
-		$table = $this->query('class:list-table')->asTable()->one();
-		$data = $table->index('Name');
-
-		foreach ($expectedData as $name => $fields) {
-			// Get table row by service name.
-			$row = $data[$name];
-
-			// Check the value in table.
-			foreach ($fields as $column => $value) {
-				$this->assertEquals($value, $row[$column]);
-			}
-		}
+		$this->assertTableDataColumn(array_values($this->getTableResult('Name')), 'Name');
 	}
 
 	public function testPageMonitoringServices_DeleteByActionButton()
@@ -989,21 +953,7 @@ class testPageMonitoringServices extends CWebTest {
 		$this->page->waitUntilReady();
 
 		$this->assertEquals('Filter results', $this->query('xpath://ul[@class="breadcrumbs"]/li[2]')->one()->getText());
-	}
-
-	/**
-	 * Return table data by Name
-	 *
-	 * @return array
-	 */
-	private function getTableData() {
-		$result = [];
-
-		foreach ($this->query($this->selector)->asTable()->one()->getRows() as $row) {
-			$result[] = $row->getColumn('Name')->getText();
-		}
-
-		return $result;
+		$form->query('button:Reset')->one()->click();
 	}
 
 	private function deleteService($serviceName, $parent = true, $child = false, $checkbox = true)
