@@ -21,13 +21,14 @@
 #include "logfiles.h"
 #include "log.h"
 #include "sysinfo.h"
+#include "persistent_state.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #	include "symbols.h"
 #	include "zbxtypes.h"	/* ssize_t */
 #endif /* _WINDOWS */
 
-#define MAX_LEN_MD5	512	/* maximum size of the initial part of the file to calculate MD5 sum for */
+#define MAX_LEN_MD5	512	/* maximum size of the first and the last blocks of the file to calculate MD5 sum for */
 
 #define ZBX_SAME_FILE_ERROR	-1
 #define ZBX_SAME_FILE_NO	0
@@ -1796,9 +1797,9 @@ static int	compile_filename_regexp(const char *filename_regexp, zbx_regexp_t **r
  *                                                                            *
  ******************************************************************************/
 #if defined(_WINDOWS) || defined(__MINGW32__)
-static int	fill_file_details(struct st_logfile **logfiles, int logfiles_num, int use_ino, char **err_msg)
+static int	fill_file_details(struct st_logfile *logfiles, int logfiles_num, int use_ino, char **err_msg)
 #else
-static int	fill_file_details(struct st_logfile **logfiles, int logfiles_num, char **err_msg)
+static int	fill_file_details(struct st_logfile *logfiles, int logfiles_num, char **err_msg)
 #endif
 {
 	int	i, ret = SUCCEED;
@@ -1809,7 +1810,7 @@ static int	fill_file_details(struct st_logfile **logfiles, int logfiles_num, cha
 	for (i = 0; i < logfiles_num; i++)
 	{
 		int			f;
-		struct st_logfile	*p = *logfiles + i;
+		struct st_logfile	*p = logfiles + i;
 
 		if (-1 == (f = open_file_helper(p->filename, err_msg)))
 			return FAIL;
@@ -1961,12 +1962,17 @@ clean1:
 			goto clean;
 	}
 	else
+	{
 		THIS_SHOULD_NEVER_HAPPEN;
+		*err_msg = zbx_dsprintf(*err_msg, "%s(): internal error: invalid flags:%hhu", __func__, flags);
+		ret = FAIL;
+		goto clean;
+	}
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
-	ret = fill_file_details(logfiles, *logfiles_num, *use_ino, err_msg);
+	ret = fill_file_details(*logfiles, *logfiles_num, *use_ino, err_msg);
 #else
-	ret = fill_file_details(logfiles, *logfiles_num, err_msg);
+	ret = fill_file_details(*logfiles, *logfiles_num, err_msg);
 #endif
 clean:
 	if ((FAIL == ret || ZBX_NO_FILE_ERROR == ret) && NULL != *logfiles)
@@ -2068,11 +2074,12 @@ static int	zbx_match_log_rec(const zbx_vector_ptr_t *regexps, const char *value,
  * Comments: Thread-safe                                                      *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec,
-		int *incomplete, char **err_msg, const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern,
+static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zbx_uint64_t *lastlogsize,
+		const int *mtime, int *big_rec, const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern,
 		const char *output_template, int *p_count, int *s_count, zbx_process_value_func_t process_value,
 		const char *server, unsigned short port, const char *hostname, const char *key,
-		zbx_uint64_t *lastlogsize_sent, int *mtime_sent)
+		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, const char *persistent_file_name,
+		zbx_vector_pre_persistent_t *prep_vec, char **err_msg)
 {
 	static ZBX_THREAD_LOCAL char	*buf = NULL;
 
@@ -2082,6 +2089,9 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 	size_t				szbyte;
 	zbx_offset_t			offset;
 	const int			is_count_item = (0 != (ZBX_METRIC_FLAG_LOG_COUNT & flags)) ? 1 : 0;
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+	int				prep_vec_idx = -1;	/* index in 'prep_vec' vector */
+#endif
 	zbx_uint64_t			processed_size;
 
 #define BUF_SIZE	(256 * ZBX_KIBIBYTE)	/* The longest encodings use 4 bytes for every character. To send */
@@ -2132,7 +2142,7 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 		if (NULL == (p_nl = buf_find_newline(p, &p_next, p_end, cr, lf, szbyte)))
 		{
 			if (p_end > p)
-				*incomplete = 1;
+				logfile->incomplete = 1;
 
 			if (BUF_SIZE > nbytes)
 			{
@@ -2171,7 +2181,26 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 
 					processed_size = (size_t)offset + (size_t)nbytes;
 					send_err = FAIL;
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+					if (NULL != persistent_file_name)
+					{
+						/* Prepare 'prep_vec' element even if the current record won't match. */
+						/* Its mtime and lastlogsize could be sent to server later as */
+						/* metadata update, then a persistent file should be written. */
+						/* 'prep_vec' can be emptied at any call to process_value() which */
+						/* calls send_buffer(), so be ready to reinitialize. */
+						if (-1 == prep_vec_idx || 0 == prep_vec->values_num)
+						{
+							prep_vec_idx = zbx_find_or_create_prep_vec_element(prep_vec,
+									key, persistent_file_name);
+							zbx_init_prep_vec_data(logfile,
+									prep_vec->values + prep_vec_idx);
+						}
 
+						zbx_update_prep_vec_data(logfile, processed_size,
+								prep_vec->values + prep_vec_idx);
+					}
+#endif
 					if (ZBX_REGEXP_MATCH == (regexp_ret = zbx_match_log_rec(regexps, value, pattern,
 							(0 == is_count_item) ? output_template : NULL,
 							(0 == is_count_item) ? &item_value : NULL, err_msg)))
@@ -2238,7 +2267,7 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 		{
 			/* the "newline" was found, so there is at least one complete record */
 			/* (or trailing part of a large record) in the buffer */
-			*incomplete = 0;
+			logfile->incomplete = 0;
 
 			for (;;)
 			{
@@ -2263,7 +2292,26 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 
 					processed_size = (size_t)offset + (size_t)(p_next - buf);
 					send_err = FAIL;
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+					if (NULL != persistent_file_name)
+					{
+						/* Prepare 'prep_vec' element even if the current record won't match. */
+						/* Its mtime and lastlogsize could be sent to server later as */
+						/* metadata update, then a persistent file should be written. */
+						/* 'prep_vec' can be emptied at any call to process_value() which */
+						/* calls send_buffer(), so be ready to reinitialize. */
+						if (-1 == prep_vec_idx || 0 == prep_vec->values_num)
+						{
+							prep_vec_idx = zbx_find_or_create_prep_vec_element(prep_vec,
+									key, persistent_file_name);
+							zbx_init_prep_vec_data(logfile,
+									prep_vec->values + prep_vec_idx);
+						}
 
+						zbx_update_prep_vec_data(logfile, processed_size,
+								prep_vec->values + prep_vec_idx);
+					}
+#endif
 					if (ZBX_REGEXP_MATCH == (regexp_ret = zbx_match_log_rec(regexps, value, pattern,
 							(0 == is_count_item) ? output_template : NULL,
 							(0 == is_count_item) ? &item_value : NULL, err_msg)))
@@ -2333,7 +2381,7 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 					/* There are no complete records in the buffer. */
 					/* Try to read more data from this position if available. */
 					if (p_end > p)
-						*incomplete = 1;
+						logfile->incomplete = 1;
 
 					if ((zbx_offset_t)-1 == zbx_lseek(fd, *lastlogsize, SEEK_SET))
 					{
@@ -2346,7 +2394,7 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 						break;
 				}
 				else
-					*incomplete = 0;
+					logfile->incomplete = 0;
 			}
 		}
 	}
@@ -2366,7 +2414,7 @@ out:
  * Parameters:                                                                *
  *     flags           - [IN] bit flags with item type: log, logrt, log.count *
  *                       or logrt.count                                       *
- *     filename        - [IN] logfile name                                    *
+ *     logfile         - [IN/OUT] logfile attributes                          *
  *     lastlogsize     - [IN/OUT] offset from the beginning of the file       *
  *     mtime           - [IN/OUT] file modification time for reporting to     *
  *                       server                                               *
@@ -2376,11 +2424,6 @@ out:
  *                       jump to the end                                      *
  *     big_rec         - [IN/OUT] state variable to remember whether a long   *
  *                       record is being processed                            *
- *     incomplete      - [OUT] 0 - the last record ended with a newline,      *
- *                       1 - there was no newline at the end of the last      *
- *                       record.                                              *
- *     err_msg         - [IN/OUT] error message why an item became            *
- *                       NOTSUPPORTED                                         *
  *     encoding        - [IN] text string describing encoding.                *
  *                       See function find_cr_lf_szbyte() for supported       *
  *                       encodings.                                           *
@@ -2398,6 +2441,11 @@ out:
  *     key             - [IN] item key the data belongs to                    *
  *     processed_bytes - [OUT] number of processed bytes in logfile           *
  *     seek_offset     - [IN] position to seek in file                        *
+ *     persistent_file_name - [IN] name of file for saving persistent data    *
+ *     prep_vec        - [IN/OUT] vector with data for writing into           *
+ *                                persistent files                            *
+ *     err_msg         - [IN/OUT] error message why an item became            *
+ *                       NOTSUPPORTED                                         *
  *                                                                            *
  * Return value: returns SUCCEED on successful reading,                       *
  *               FAIL on other cases                                          *
@@ -2410,19 +2458,21 @@ out:
  *           Thread-safe                                                      *
  *                                                                            *
  ******************************************************************************/
-static int	process_log(unsigned char flags, const char *filename, zbx_uint64_t *lastlogsize, int *mtime,
+static int	process_log(unsigned char flags, struct st_logfile *logfile, zbx_uint64_t *lastlogsize, int *mtime,
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, unsigned char *skip_old_data, int *big_rec,
-		int *incomplete, char **err_msg, const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern,
-		const char *output_template, int *p_count, int *s_count, zbx_process_value_func_t process_value,
-		const char *server, unsigned short port, const char *hostname, const char *key,
-		zbx_uint64_t *processed_bytes, zbx_uint64_t seek_offset)
+		const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern, const char *output_template,
+		int *p_count, int *s_count, zbx_process_value_func_t process_value, const char *server,
+		unsigned short port, const char *hostname, const char *key, zbx_uint64_t *processed_bytes,
+		zbx_uint64_t seek_offset, const char *persistent_file_name, zbx_vector_pre_persistent_t *prep_vec,
+		char **err_msg)
 {
 	int	f, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime:%d seek_offset:"
-			ZBX_FS_UI64, __func__, filename, *lastlogsize, NULL != mtime ? *mtime : 0, seek_offset);
+			ZBX_FS_UI64, __func__, logfile->filename, *lastlogsize, NULL != mtime ? *mtime : 0,
+			seek_offset);
 
-	if (-1 == (f = open_file_helper(filename, err_msg)))
+	if (-1 == (f = open_file_helper(logfile->filename, err_msg)))
 		goto out;
 
 	if ((zbx_offset_t)-1 != zbx_lseek(f, seek_offset, SEEK_SET))
@@ -2430,9 +2480,9 @@ static int	process_log(unsigned char flags, const char *filename, zbx_uint64_t *
 		*lastlogsize = seek_offset;
 		*skip_old_data = 0;
 
-		if (SUCCEED == (ret = zbx_read2(f, flags, lastlogsize, mtime, big_rec, incomplete, err_msg, encoding,
-				regexps, pattern, output_template, p_count, s_count, process_value, server, port,
-				hostname, key, lastlogsize_sent, mtime_sent)))
+		if (SUCCEED == (ret = zbx_read2(f, flags, logfile, lastlogsize, mtime, big_rec, encoding, regexps,
+				pattern, output_template, p_count, s_count, process_value, server, port, hostname, key,
+				lastlogsize_sent, mtime_sent, persistent_file_name, prep_vec, err_msg)))
 		{
 			*processed_bytes = *lastlogsize - seek_offset;
 		}
@@ -2440,14 +2490,14 @@ static int	process_log(unsigned char flags, const char *filename, zbx_uint64_t *
 	else
 	{
 		*err_msg = zbx_dsprintf(*err_msg, "Cannot set position to " ZBX_FS_UI64 " in file \"%s\": %s",
-				seek_offset, filename, zbx_strerror(errno));
+				seek_offset, logfile->filename, zbx_strerror(errno));
 	}
 
-	if (SUCCEED != close_file_helper(f, filename, err_msg))
+	if (SUCCEED != close_file_helper(f, logfile->filename, err_msg))
 		ret = FAIL;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime:%d ret:%s"
-			" processed_bytes:" ZBX_FS_UI64, __func__, filename, *lastlogsize,
+			" processed_bytes:" ZBX_FS_UI64, __func__, logfile->filename, *lastlogsize,
 			NULL != mtime ? *mtime : 0, zbx_result_string(ret),
 			SUCCEED == ret ? *processed_bytes : (zbx_uint64_t)0);
 
@@ -3271,6 +3321,9 @@ static int	update_new_list_from_old(zbx_log_rotation_options_t rotation_type, st
  *     start_time       - [IN/OUT] start time of check                        *
  *     processed_bytes  - [IN/OUT] number of bytes processed                  *
  *     rotation_type    - [IN] simple rotation or copy/truncate rotation      *
+ *     persistent_file_name - [IN] name of file for saving persistent data    *
+ *     prep_vec         - [IN/OUT] vector with data for writing into          *
+ *                                 persistent files                           *
  *                                                                            *
  * Return value: returns SUCCEED on successful reading,                       *
  *               FAIL on other cases                                          *
@@ -3285,7 +3338,8 @@ static int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t
 		zbx_vector_ptr_t *regexps, const char *pattern, const char *output_template, int *p_count, int *s_count,
 		zbx_process_value_func_t process_value, const char *server, unsigned short port, const char *hostname,
 		const char *key, int *jumped, float max_delay, double *start_time, zbx_uint64_t *processed_bytes,
-		zbx_log_rotation_options_t rotation_type)
+		zbx_log_rotation_options_t rotation_type, const char *persistent_file_name,
+		zbx_vector_pre_persistent_t *prep_vec)
 {
 	int			i, start_idx, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, seq = 1,
 				from_first_file = 1, last_processed, limit_reached = 0, res;
@@ -3487,11 +3541,11 @@ static int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t
 
 			if (0 != process_this_file)
 			{
-				ret = process_log(flags, logfiles[i].filename, lastlogsize, mtime, lastlogsize_sent,
-						mtime_sent, skip_old_data, big_rec, &logfiles[i].incomplete, err_msg,
-						encoding, regexps, pattern, output_template, p_count, s_count,
-						process_value, server, port, hostname, key, &processed_bytes_tmp,
-						seek_offset);
+				ret = process_log(flags, logfiles + i, lastlogsize, mtime, lastlogsize_sent,
+						mtime_sent, skip_old_data, big_rec, encoding, regexps, pattern,
+						output_template, p_count, s_count, process_value, server, port,
+						hostname, key, &processed_bytes_tmp, seek_offset, persistent_file_name,
+						prep_vec, err_msg);
 
 				/* process_log() advances 'lastlogsize' only on success therefore */
 				/* we do not check for errors here */
@@ -3643,9 +3697,9 @@ static int	check_number_of_parameters(unsigned char flags, const AGENT_REQUEST *
 	}
 
 	if (0 != (ZBX_METRIC_FLAG_LOG_COUNT & flags))
-		max_parameter_num = 7;	/* log.count or logrt.count */
+		max_parameter_num = 8;	/* log.count or logrt.count */
 	else
-		max_parameter_num = 8;	/* log or logrt */
+		max_parameter_num = 9;	/* log or logrt */
 
 	if (max_parameter_num < parameter_num)
 	{
@@ -3772,6 +3826,48 @@ err:
 	return FAIL;
 }
 
+static int	init_persistent_dir_parameter(const char *server, unsigned short port, const char *item_key,
+		int is_count_item, const AGENT_REQUEST *request, char **persistent_file_name, char **error)
+{
+	/* <persistent_dir> is parameter 8 for log[], logrt[], but parameter 7 for log.count[], logrt.count[] */
+	/* (here counting starts from 0) */
+
+	const int	persistent_dir_param_nr = (0 == is_count_item) ? 8 : 7;
+	char		*persistent_dir, *persistent_serv_dir;
+
+	if (NULL == (persistent_dir = get_rparam(request, persistent_dir_param_nr)) || '\0' == *persistent_dir)
+		return SUCCEED;
+
+#if defined(_WINDOWS) || defined(__MINGW32__)
+	*error = zbx_dsprintf(*error, "The %s parameter (persistent directory) is not supported on Microsoft Windows.",
+			(8 == persistent_dir_param_nr) ? "ninth" : "eighth");
+	return FAIL;
+#else
+	if (NULL != *persistent_file_name)	/* name is set, so all preparation has been done earlier */
+		return SUCCEED;
+
+	/* set up directory for persistent file */
+
+	if (SUCCEED != is_ascii_string(persistent_dir))		/* reject non-ASCII directory name */
+	{
+		*error = zbx_dsprintf(*error, "Invalid %s parameter. It contains non-ASCII characters.",
+				(8 == persistent_dir_param_nr) ? "ninth" : "eighth");
+		return FAIL;
+	}
+
+	if (NULL == (persistent_serv_dir = zbx_create_persistent_server_directory(persistent_dir, server, port, error)))
+		return FAIL;
+
+	*persistent_file_name = zbx_make_persistent_file_name(persistent_serv_dir, item_key);
+
+	zbx_free(persistent_serv_dir);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s(): set persistent_file_name:[%s]", __func__, *persistent_file_name);
+
+	return SUCCEED;
+#endif
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: process_log_check                                                *
@@ -3785,7 +3881,7 @@ err:
  ******************************************************************************/
 int	process_log_check(char *server, unsigned short port, zbx_vector_ptr_t *regexps, ZBX_ACTIVE_METRIC *metric,
 		zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent, int *mtime_sent,
-		char **error)
+		char **error, zbx_vector_pre_persistent_t *prep_vec)
 {
 	AGENT_REQUEST			request;
 	const char			*filename, *regexp, *encoding, *skip, *output_template;
@@ -3805,10 +3901,10 @@ int	process_log_check(char *server, unsigned short port, zbx_vector_ptr_t *regex
 	init_request(&request);
 
 	/* Expected parameters by item: */
-	/* log        [file,       <regexp>,<encoding>,<maxlines>,    <mode>,<output>,<maxdelay>, <options>] 8 params */
-	/* log.count  [file,       <regexp>,<encoding>,<maxproclines>,<mode>,         <maxdelay>, <options>] 7 params */
-	/* logrt      [file_regexp,<regexp>,<encoding>,<maxlines>,    <mode>,<output>,<maxdelay>, <options>] 8 params */
-	/* logrt.count[file_regexp,<regexp>,<encoding>,<maxproclines>,<mode>,         <maxdelay>, <options>] 7 params */
+	/* log        [file,       <regexp>,<encoding>,<maxlines>,    <mode>,<output>,<maxdelay>, <options>,<persistent_dir>] 9 params */
+	/* log.count  [file,       <regexp>,<encoding>,<maxproclines>,<mode>,         <maxdelay>, <options>,<persistent_dir>] 8 params */
+	/* logrt      [file_regexp,<regexp>,<encoding>,<maxlines>,    <mode>,<output>,<maxdelay>, <options>,<persistent_dir>] 9 params */
+	/* logrt.count[file_regexp,<regexp>,<encoding>,<maxproclines>,<mode>,         <maxdelay>, <options>,<persistent_dir>] 8 params */
 
 	if (SUCCEED != parse_item_key(metric->key, &request))
 	{
@@ -3880,6 +3976,13 @@ int	process_log_check(char *server, unsigned short port, zbx_vector_ptr_t *regex
 	if (SUCCEED != init_rotation_type(metric->flags, &request, &rotation_type, error))
 		goto out;
 
+	/* parameter 'persistent_dir' */
+	if (SUCCEED != init_persistent_dir_parameter(server, port, metric->key, is_count_item, &request,
+			&metric->persistent_file_name, error))
+	{
+		goto out;
+	}
+
 	/* jumping over fast growing log files is not supported with 'copytruncate' */
 	if (ZBX_LOG_ROTATION_LOGCPT == rotation_type && 0.0f != max_delay)
 	{
@@ -3916,12 +4019,61 @@ int	process_log_check(char *server, unsigned short port, zbx_vector_ptr_t *regex
 		/* not be sent to server. */
 	}
 
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+	if (0 != (ZBX_METRIC_FLAG_NEW & metric->flags) && NULL != metric->persistent_file_name)
+	{
+		/* try to restore state from persistent file */
+		char	*err_msg = NULL;
+		char	buf[MAX_STRING_LEN];
+
+		if (SUCCEED == zbx_read_persistent_file(metric->persistent_file_name, buf, sizeof(buf), &err_msg))
+		{
+			zbx_uint64_t	processed_size_tmp = 0;
+			int		mtime_tmp = 0;
+
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): item \"%s\": persistent file \"%s\" found, data:[%s]",
+					__func__, metric->key, metric->persistent_file_name, buf);
+
+			if (SUCCEED == zbx_restore_file_details(buf, &metric->logfiles, &metric->logfiles_num,
+					&processed_size_tmp, &mtime_tmp, &err_msg))
+			{
+				if (0 == metric->logfiles_num)	/* only metadata was found */
+				{
+					if (metric->lastlogsize != processed_size_tmp || metric->mtime != mtime_tmp)
+					{
+						zabbix_log(LOG_LEVEL_DEBUG, "%s(): item \"%s\": overriding mtime:"
+								" %d -> %d lastlogsize: " ZBX_FS_UI64 " -> " ZBX_FS_UI64
+								" from persistent file", __func__, metric->key,
+								metric->mtime, mtime_tmp, metric->lastlogsize,
+								processed_size_tmp);
+					}
+
+					metric->lastlogsize = processed_size_tmp;
+					metric->mtime = mtime_tmp;
+				}
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "%s(): item \"%s\": persistent file \"%s\" restore error:"
+						" %s", __func__, metric->key, metric->persistent_file_name, err_msg);
+				zbx_free(err_msg);
+			}
+		}
+		else
+		{
+			/* persistent file errors are not fatal */
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): item \"%s\": persistent file [%s] does not exist or error:"
+					" %s", __func__, metric->key, metric->persistent_file_name, err_msg);
+			zbx_free(err_msg);
+		}
+	}
+#endif
 	ret = process_logrt(metric->flags, filename, &metric->lastlogsize, &metric->mtime, lastlogsize_sent, mtime_sent,
 			&metric->skip_old_data, &metric->big_rec, &metric->use_ino, error, &metric->logfiles,
 			metric->logfiles_num, &logfiles_new, &logfiles_num_new, encoding, regexps, regexp,
 			output_template, &p_count, &s_count, process_value_cb, server, port, CONFIG_HOSTNAME,
 			metric->key_orig, &jumped, max_delay, &metric->start_time, &metric->processed_bytes,
-			rotation_type);
+			rotation_type, metric->persistent_file_name, prep_vec);
 
 	if (0 == is_count_item && NULL != logfiles_new)
 	{
