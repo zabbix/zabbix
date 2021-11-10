@@ -96,7 +96,6 @@ static int	DBpatch_5000003(void)
 	return ret;
 }
 
-
 static int	DBpatch_5000004(void)
 {
 	DB_RESULT		result;
@@ -120,7 +119,6 @@ static int	DBpatch_5000005(void)
 {
 	return DBcreate_index("alerts", "alerts_8", "acknowledgeid", 0);
 }
-
 
 #endif
 
