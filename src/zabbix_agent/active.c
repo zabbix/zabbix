@@ -58,7 +58,7 @@ static void	init_active_metrics(void)
 	if (NULL == buffer.data)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "buffer: first allocation for %d elements", CONFIG_BUFFER_SIZE);
-		sz = CONFIG_BUFFER_SIZE * sizeof(ZBX_ACTIVE_BUFFER_ELEMENT);
+		sz = (size_t)CONFIG_BUFFER_SIZE * sizeof(ZBX_ACTIVE_BUFFER_ELEMENT);
 		buffer.data = (ZBX_ACTIVE_BUFFER_ELEMENT *)zbx_malloc(buffer.data, sz);
 		memset(buffer.data, 0, sz);
 		buffer.count = 0;
@@ -624,7 +624,7 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 	}
 
 	if (ZBX_DEFAULT_AGENT_PORT != CONFIG_LISTEN_PORT)
-		zbx_json_adduint64(&json, ZBX_PROTO_TAG_PORT, CONFIG_LISTEN_PORT);
+		zbx_json_adduint64(&json, ZBX_PROTO_TAG_PORT, (zbx_uint64_t)CONFIG_LISTEN_PORT);
 
 	switch (configured_tls_connect_mode)
 	{
@@ -978,7 +978,7 @@ static int	process_value(const char *server, unsigned short port, const char *ho
 		}
 	}
 
-	/* do not sent data from buffer if host/key are the same as previous unless buffer is full already */
+	/* do not send data from buffer if host/key are the same as previous unless buffer is full already */
 	if (0 < buffer.count)
 	{
 		el = &buffer.data[buffer.count - 1];
@@ -1035,7 +1035,7 @@ static int	process_value(const char *server, unsigned short port, const char *ho
 			zbx_free(el->source);
 		}
 
-		sz = (CONFIG_BUFFER_SIZE - i - 1) * sizeof(ZBX_ACTIVE_BUFFER_ELEMENT);
+		sz = (size_t)(CONFIG_BUFFER_SIZE - i - 1) * sizeof(ZBX_ACTIVE_BUFFER_ELEMENT);
 		memmove(&buffer.data[i], &buffer.data[i + 1], sz);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "buffer full: new element %d", buffer.count - 1);
@@ -1222,9 +1222,7 @@ static void	process_active_checks(char *server, unsigned short port)
 		{
 			if (0 == metric->error_count)
 			{
-				unsigned char	old_state;
-
-				old_state = metric->state;
+				unsigned char	old_state = metric->state;
 
 				if (ITEM_STATE_NOTSUPPORTED == metric->state)
 				{

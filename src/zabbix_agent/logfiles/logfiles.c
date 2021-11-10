@@ -722,8 +722,7 @@ clean1:
 		if (-1 == (f = open_file_helper(new_files[i].filename, err_msg)))
 			return ZBX_SAME_FILE_ERROR;
 
-		if (SUCCEED != file_part_md5(f, 0, new_file->md5_block_size, md5tmp, new_files[i].filename,
-				err_msg))
+		if (SUCCEED != file_part_md5(f, 0, new_file->md5_block_size, md5tmp, new_files[i].filename, err_msg))
 		{
 			ret = ZBX_SAME_FILE_ERROR;
 			goto clean2;
@@ -1833,7 +1832,7 @@ static int	fill_file_details(struct st_logfile **logfiles, int logfiles_num, cha
 				goto clean;
 			}
 		}
-		else	/* file is small, set the last block equal to the first block */
+		else	/* file is small, set the last block MD5 equal to the first block's one */
 			memcpy(p->last_block_md5, p->first_block_md5, sizeof(p->last_block_md5));
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
@@ -1941,6 +1940,8 @@ static int	make_logfile_list(unsigned char flags, const char *filename, int mtim
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "insufficient access rights (no \"execute\" permission) "
 						"to directory \"%s\": %s", directory, zbx_strerror(errno));
+				/* No access could be a transient condition if file rotation is manipulating */
+				/* directories. Therefore 'ret' is not set to FAIL or ZBX_NO_FILE_ERROR here. */
 			}
 			else
 			{
