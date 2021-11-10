@@ -101,6 +101,7 @@ func InitExternalPlugins(options *agent.AgentOptions) error {
 
 func ErrListener() (err error) {
 	err = <-handler.errChan
+
 	return
 }
 
@@ -111,6 +112,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	err = shared.Write(p.conn, req)
 	if err != nil {
 		handler.errChan <- err
+
 		return
 	}
 
@@ -118,6 +120,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	case response := <-handler.exportChan[req.Id]:
 		if response.Error != "" {
 			err = errors.New(response.Error)
+
 			break
 		}
 		result = response.Value
@@ -182,23 +185,31 @@ func (p *Plugin) Start() {
 	err := exec.Command(p.Path, p.Socket, strconv.FormatBool(p.initial)).Start()
 	if err != nil {
 		handler.errChan <- fmt.Errorf("failed to start external plugin %s, %s", p.Path, err.Error())
+
 		return
 	}
 
 	if err := os.RemoveAll(p.Socket); err != nil {
-		handler.errChan <- fmt.Errorf("failed to drop external plugin %s socket, with path %s, %s", p.Path, p.Socket, err.Error())
+		handler.errChan <- fmt.Errorf(
+			"failed to drop external plugin %s socket, with path %s, %s", p.Path, p.Socket, err.Error(),
+		)
+
 		return
 	}
 
 	p.listener, err = net.Listen("unix", p.Socket)
 	if err != nil {
-		handler.errChan <- fmt.Errorf("failed to listen on external plugin %s socket path %s, %s", p.Path, p.Socket, err.Error())
+		handler.errChan <- fmt.Errorf(
+			"failed to listen on external plugin %s socket path %s, %s", p.Path, p.Socket, err.Error(),
+		)
+
 		return
 	}
 
 	p.conn, err = getConnection(p.listener, handler.timeout)
 	if err != nil {
 		handler.errChan <- fmt.Errorf("failed to create connection with external plugin %s, %s", p.Path, err.Error())
+
 		return
 	}
 
@@ -208,9 +219,10 @@ func (p *Plugin) Start() {
 		if shared.ImplementsConfigurator(p.Interfaces) {
 			err := shared.Write(p.conn, shared.CreateConfigurateRequest(p.globalOptions, p.privateOptions))
 			if err != nil {
-				handler.errChan <- fmt.Errorf("failed to configurate external plugin %s, %s", p.Path, err.Error())
+				handler.errChan <- fmt.Errorf("failed to configure external plugin %s, %s", p.Path, err.Error())
 			}
 		}
+
 		return
 	}
 
@@ -221,17 +233,22 @@ func (p *Plugin) Stop() {
 	err := shared.Write(p.conn, shared.CreateTerminateRequest())
 	if err != nil {
 		handler.errChan <- fmt.Errorf("failed to send stop request to external plugin %s, %s", p.Path, err.Error())
+
 		return
 	}
 
 	err = p.listener.Close()
 	if err != nil {
 		handler.errChan <- fmt.Errorf("failed to close listener for external plugin %s, %s", p.Path, err.Error())
+
 		return
 	}
 
 	if err := os.RemoveAll(p.Socket); err != nil {
-		handler.errChan <- fmt.Errorf("failed to drop external plugin %s socket, with path %s, %s", p.Path, p.Socket, err.Error())
+		handler.errChan <- fmt.Errorf(
+			"failed to drop external plugin %s socket, with path %s, %s", p.Path, p.Socket, err.Error(),
+		)
+
 		return
 	}
 }
@@ -239,7 +256,6 @@ func (p *Plugin) Stop() {
 func setConfigValues(sockBasePath string) {
 	if sockBasePath == "" {
 		sockBasePath = "/tmp/plugins/"
-
 	} else if !strings.HasSuffix(sockBasePath, "/") {
 		sockBasePath += "/"
 	}
@@ -248,6 +264,7 @@ func setConfigValues(sockBasePath string) {
 
 	if agent.Options.ExternalPluginTimeout == 0 {
 		handler.timeout = time.Second * time.Duration(agent.Options.Timeout)
+
 		return
 	}
 
@@ -285,6 +302,7 @@ func (p *Plugin) initExternalPlugin(options *agent.AgentOptions) (name string, e
 
 	p.Stop()
 	p.initial = false
+
 	return
 }
 
@@ -351,7 +369,7 @@ func startPluginListener(conn net.Conn) {
 	for {
 		t, data, err := shared.Read(conn)
 		if err != nil {
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				return
 			}
 
@@ -375,33 +393,39 @@ func handleRequest(t uint32, data []byte) {
 		err := json.Unmarshal(data, &resp)
 		if err != nil {
 			handler.errChan <- err
+
 			return
 		}
 
 		handler.registerChan[resp.Id] <- resp
 		close(handler.registerChan[resp.Id])
+
 		return
 	case shared.ValidateResponseType:
 		var resp shared.ValidateResponse
 		err := json.Unmarshal(data, &resp)
 		if err != nil {
 			handler.errChan <- err
+
 			return
 		}
 
 		handler.validateChan[resp.Id] <- resp
 		close(handler.validateChan[resp.Id])
+
 		return
 	case shared.ExportResponseType:
 		var resp shared.ExportResponse
 		err := json.Unmarshal(data, &resp)
 		if err != nil {
 			handler.errChan <- err
+
 			return
 		}
 
 		handler.exportChan[resp.Id] <- resp
 		close(handler.exportChan[resp.Id])
+
 		return
 	// case shared.CollectorResponseType:
 	// 	var resp shared.CollectResponse
@@ -430,10 +454,12 @@ func handleRequest(t uint32, data []byte) {
 		err := json.Unmarshal(data, &req)
 		if err != nil {
 			handler.errChan <- err
+
 			return
 		}
 
 		handler.logChan <- req
+
 		return
 	}
 }

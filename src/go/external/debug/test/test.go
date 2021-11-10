@@ -32,6 +32,7 @@ var impl Plugin
 
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	p.Debugf("export %s%v", key, params)
+
 	return "debug empty test response", nil
 }
 

@@ -43,7 +43,7 @@ func (ctx emptyCtx) GlobalRegexp() plugin.RegexpMatcher {
 
 type emptyMatcher struct{}
 
-func (em emptyMatcher) Match(value string, pattern string, mode int, output_template *string) (match bool, output string) {
+func (em emptyMatcher) Match(value string, pattern string, mode int, output_template *string) (bool, string) {
 	return false, ""
 }
 

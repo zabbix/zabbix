@@ -24,7 +24,6 @@ import (
 	"errors"
 	"fmt"
 	"math"
-	"os/exec"
 	"sort"
 	"time"
 
@@ -56,9 +55,7 @@ type Manager struct {
 	// number of active tasks (running in their own goroutines)
 	activeTasksNum int
 	// number of seconds left on shutdown timer
-	shutdownSeconds    int
-	externalPlugins    []string
-	externalPluginCmds []*exec.Cmd
+	shutdownSeconds int
 }
 
 // updateRequest contains list of metrics monitored by a client and additional client configuration data.

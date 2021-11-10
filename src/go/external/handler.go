@@ -54,7 +54,6 @@ func NewHandler(name string) (h handler, err error) {
 	h.name = name
 
 	if len(os.Args) < 2 {
-		//TODO somehow write error? log maybe to agent
 		return
 	}
 
@@ -67,27 +66,11 @@ func NewHandler(name string) (h handler, err error) {
 
 	h.registerStart, err = strconv.ParseBool(os.Args[2])
 	if err != nil {
-		//TODO somehow write error? log maybe to agent
 		return
 	}
 
 	return
 }
-
-// func (h *handler) SetListener() (err error) {
-// 	if err = os.RemoveAll(h.socket); err != nil {
-// 		h.Infof(err.Error())
-// 		return
-// 	}
-
-// 	h.listener, err = net.Listen("unix", h.socket)
-// 	if err != nil {
-// 		h.Infof(err.Error())
-// 		return
-// 	}
-
-// 	return nil
-// }
 
 func (h *handler) Execute() error {
 	err := h.setConnection(h.socket, 3*time.Second)

@@ -31,7 +31,7 @@ type Options struct {
 // Plugin -
 type Plugin struct {
 	plugin.Base
-	counter int
+	// counter int
 	options Options
 }
 
@@ -39,6 +39,7 @@ var impl Plugin
 
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	p.Debugf("export %s%v", key, params)
+
 	return "debug full test response", nil
 }
 
