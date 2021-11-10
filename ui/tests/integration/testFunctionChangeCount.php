@@ -254,7 +254,7 @@ class testFunctionChangeCount extends CIntegrationTest {
 
 		$this->assertArrayHasKey('error', $response['result'][0]);
 		$this->assertContains('not enough data', $response['result'][0]['error']);
-		
+	
 		return true;
 	}
 
@@ -293,7 +293,7 @@ class testFunctionChangeCount extends CIntegrationTest {
 	public function testFunctionChangeCount_Get_Ui64Inc() {
 		return $this->checkTriggerValue(self::$items['item_ui64']['triggers']['inc']);
 	}
-	
+
 	public function testFunctionChangeCount_Send_Ui64Dec() {
 		return $this->sendValues('item_ui64', [7, 92, 67, 96, 44]);
 	}
@@ -337,7 +337,6 @@ class testFunctionChangeCount extends CIntegrationTest {
 	public function testFunctionChangeCount_Get_DblExplicitAll() {
 		return $this->checkTriggerValue(self::$items['item_dbl']['triggers']['some_equal']);
 	}
-
 	
 	public function testFunctionChangeCount_Send_DblInc() {
 		return $this->sendValues('item_dbl', [0.0001, 0.0002, 0.0003, 0.0004, 0.0004]);
@@ -382,6 +381,5 @@ class testFunctionChangeCount extends CIntegrationTest {
 	public function testFunctionChangeCount_Get_StrSomeEqual() {
 		return $this->checkTriggerValue(self::$items['item_str']['triggers']['some_equal']);
 	}
-
 }
 
