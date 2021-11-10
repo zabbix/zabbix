@@ -35,7 +35,7 @@ class testFormMonitoringServices extends CWebTest {
 
 	// This is first service name for updating scenario.
 	private static $update_service = 'Update service';
-	// These ids are needed to check service linking in delete childs scenario.
+	// These ids are needed to check service linking in delete child's scenario.
 	private static $parentid;
 	private static $childid;
 	private static $parentid_2;
@@ -169,7 +169,7 @@ class testFormMonitoringServices extends CWebTest {
 	 * Check Service create form layout
 	 */
 	public function testFormMonitoringServices_Layout() {
-		// Here we fistly open default view mode and then clikc Edit swith, to check switcher.
+		// Here we firstly open default view mode and then click Edit switch, to check switcher.
 		// In next scenarios we open service.list.edit, because it is faster and no need to check switcher second time.
 		$hintbox = 'Status calculation rule and additional rules are only applicable if child services exist.';
 
@@ -245,9 +245,9 @@ class testFormMonitoringServices extends CWebTest {
 		$form->selectTab('SLA');
 		$sla_tab = $form->query('id:sla-tab')->one();
 
-		// Check SLA tab lables
-		$sla_tab_lables = ['SLA', 'Service times'];
-		foreach ($sla_tab_lables as $label) {
+		// Check SLA tab labels
+		$sla_tab_labels = ['SLA', 'Service times'];
+		foreach ($sla_tab_labels as $label) {
 			$this->assertTrue($form->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($label).']')->one(false)->isValid());
 		}
 
@@ -268,7 +268,7 @@ class testFormMonitoringServices extends CWebTest {
 		// Check layout at Tags tab
 		$form->selectTab('Tags');
 
-		// Check Tags tab lables
+		// Check Tags tab labels
 		$this->assertTrue($form->query('id:tags-tab')->one()
 				->query('xpath:.//label[text()="Tags"]')->one()->isValid());
 
@@ -279,7 +279,7 @@ class testFormMonitoringServices extends CWebTest {
 		// Check layout at Child services tab
 		$form->selectTab('Child services');
 
-		// Check Tags tab lables
+		// Check Tags tab labels
 		$this->assertTrue($form->query('id:child-services-tab')->one()
 				->query('xpath:.//label[text()="Child services"]')->one()->isValid());
 
@@ -1004,7 +1004,7 @@ class testFormMonitoringServices extends CWebTest {
 		COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $this->query('id:service-form')->asForm()->one()->waitUntilReady();
 		$form->selectTab('Child services');
-		// Go to Childs tab and find row by particular Service name in Childs table.
+		// Go to "Childs" tab and find row by particular Service name in Childs table.
 		$service_table = $form->getFieldContainer('Child services')->asTable();
 		$service_table->findRow('Service', $child, true)->query('button:Remove')
 				->waitUntilClickable()->one()->click();
