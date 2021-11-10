@@ -1116,8 +1116,8 @@ static int	DBpatch_5050103(void)
 
 static int	DBpatch_5050104(void)
 {
-	const ZBX_FIELD old_field = {"dbversion_status", "", NULL, NULL, 1024, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
-	const ZBX_FIELD new_field = {"dbversion_status", "", NULL, NULL, 2048, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD old_field = {"dbversion_status", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD new_field = {"dbversion_status", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("config", &new_field, &old_field);
 }
