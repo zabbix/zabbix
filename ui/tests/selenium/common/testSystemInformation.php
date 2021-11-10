@@ -104,7 +104,7 @@ class testSystemInformation extends CWebTest {
 		$config = strtr(file_get_contents($file_name), ['$ZBX_SERVER ' => '// $ZBX_SERVER ', '$ZBX_SERVER_PORT' => '// $ZBX_SERVER_PORT']);
 		file_put_contents($file_name, $config);
 
-		// Get the time when config is updated - it is needed to know how long to wait until upbate of zabbix server status.
+		// Get the time when config is updated - it is needed to know how long to wait until update of zabbix server status.
 		self::$update_timestamp = time();
 	}
 

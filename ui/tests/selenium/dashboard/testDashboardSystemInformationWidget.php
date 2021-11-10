@@ -29,7 +29,7 @@ require_once dirname(__FILE__).'/../common/testSystemInformation.php';
  */
 class testDashboardSystemInformationWidget extends testSystemInformation {
 
-	public static $dashboardid;				// Deshboard for checking widget content with enabled and disabled HA cluster.
+	public static $dashboardid;				// Dashboard for checking widget content with enabled and disabled HA cluster.
 	public static $widgets_dashboardid;		// Dashboard for checking creation and update of system information widgets.
 
 	/**
