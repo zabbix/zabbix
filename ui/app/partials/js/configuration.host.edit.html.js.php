@@ -112,6 +112,7 @@
 		form: null,
 		macros_initialized: false,
 		macros_templateids: null,
+		template_excluder: null,
 
 		/**
 		 * Host form setup.
@@ -124,6 +125,13 @@
 			this.initMacrosTab(host_is_discovered);
 			this.initInventoryTab();
 			this.initEncryptionTab();
+
+			this.template_excluder = new CMultiselectEntryExcluder(
+				'add_templates_',
+				['templates', 'add_templates', 'clear_templates']
+			);
+
+			new CMultiselectEntryExcluder('groups_', ['groups']);
 		},
 
 		/**
@@ -162,10 +170,8 @@
 		},
 
 		// Templates tab functions.
-
 		unlinkTemplate(button) {
 			button.closest('tr').remove();
-			this.resetNewTemplatesField();
 		},
 
 		unlinkAndClearTemplate(button, templateid) {
@@ -176,80 +182,6 @@
 			button.form.appendChild(clear_tmpl);
 
 			this.unlinkTemplate(button);
-		},
-
-		/**
-		 * Replaces template multiselect with a copy that has disabled templates updated.
-		 */
-		resetNewTemplatesField() {
-			const $old_multiselect = $('#add_templates_');
-			const $new_multiselect = $('<div>');
-			const data = $old_multiselect.multiSelect('getData');
-
-			$('#add_templates_').parent().html($new_multiselect);
-
-			$new_multiselect
-				.addClass('multiselect active')
-				.css('width', '<?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px')
-				.attr('id', 'add_templates_')
-				.multiSelectHelper({
-					object_name: 'templates',
-					name: 'add_templates[]',
-					data: data,
-					popup: {
-						parameters: {
-							srctbl: 'templates',
-							srcfld1: 'hostid',
-							dstfrm: this.form_name,
-							dstfld1: 'add_templates_',
-							multiselect: '1',
-							disableids: this.getLinkedTemplates()
-						}
-					}
-				});
-		},
-
-		/**
-		 * Helper to get linked template IDs as an array.
-		 *
-		 * @return {array}  Templateids.
-		 */
-		getLinkedTemplates() {
-			const linked_templateids = [];
-
-			this.form.querySelectorAll('[name^="templates["').forEach((input) => {
-				linked_templateids.push(input.value);
-			});
-
-			return linked_templateids;
-		},
-
-		/**
-		 * Helper to get added template IDs as an array.
-		 *
-		 * @return {array}  Templateids.
-		 */
-		getNewTemplates() {
-			const $template_multiselect = $('#add_templates_'),
-				templateids = [];
-
-			// Readonly forms don't have multiselect.
-			if ($template_multiselect.length) {
-				$template_multiselect.multiSelect('getData').forEach(template => {
-					templateids.push(template.id);
-				});
-			}
-
-			return templateids;
-		},
-
-		/**
-		 * Collects ids of currently active (linked + new) templates.
-		 *
-		 * @return {array}  Templateids.
-		 */
-		getAllTemplates() {
-			return this.getLinkedTemplates().concat(this.getNewTemplates());
 		},
 
 		/**
@@ -269,7 +201,7 @@
 				if (panel.attr('id') === 'macros-tab') {
 					// Please note that macro initialization must take place once and only when the tab is visible.
 					if (e.type === 'tabsactivate') {
-						const templateids = this.getAllTemplates();
+						const templateids = this.template_excluder.getEntryIds();
 
 						// First time always load inherited macros.
 						if (this.macros_templateids === null) {
@@ -304,7 +236,7 @@
 			});
 
 			$show_inherited_macros.on('change', function() {
-				host_edit.macros_manager.load(this.value == 1, host_edit.getAllTemplates());
+				host_edit.macros_manager.load(this.value == 1, this.template_excluder.getEntryIds());
 				host_edit.updateEncryptionFields();
 			});
 		},

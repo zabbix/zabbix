@@ -178,5 +178,8 @@
 			let templateids = linked_templateids.concat(getAddTemplates());
 			window.macros_manager.load($(this).val() == 1, templateids);
 		});
+
+		new CMultiselectEntryExcluder('add_templates_', ['templates', 'add_templates', 'clear_templates']);
+		new CMultiselectEntryExcluder('group_links_', ['group_links']);
 	});
 </script>

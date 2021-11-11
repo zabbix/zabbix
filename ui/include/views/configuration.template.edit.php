@@ -23,7 +23,7 @@
  * @var CView $this
  */
 
-require_once dirname(__FILE__).'/js/common.template.edit.js.php';
+require_once __DIR__.'/js/common.template.edit.js.php';
 
 $widget = (new CWidget())->setTitle(_('Templates'));
 
@@ -236,5 +236,6 @@ else {
 
 $form->addItem($tabs);
 $widget->addItem($form);
+$widget->addItem(new CPartial('js/common.multiselect.entry.excluder.js'));
 
 $widget->show();

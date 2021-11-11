@@ -24,6 +24,7 @@
  * @var array    $data
  */
 
+$this->includeJsFile('common.multiselect.entry.excluder.js.php');
 $this->includeJsFile('configuration.host.edit.html.js.php');
 
 $host_is_discovered = ($data['host']['flags'] == ZBX_FLAG_DISCOVERY_CREATED);
