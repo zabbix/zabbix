@@ -38,6 +38,10 @@
 #	include "common/common.h"
 #endif
 
+#ifdef WITH_HTTP_METRICS
+#	include "common/http_metrics.h"
+#endif
+
 #ifdef WITH_SIMPLE_METRICS
 #	include "simple/simple.h"
 #endif
@@ -234,6 +238,17 @@ void	init_metrics(void)
 	for (i = 0; NULL != parameters_common_local[i].key; i++)
 	{
 		if (SUCCEED != add_metric_local(&parameters_common_local[i], error, sizeof(error)))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot add item key: %s", error);
+			exit(EXIT_FAILURE);
+		}
+	}
+#endif
+
+#ifdef WITH_HTTP_METRICS
+	for (i = 0; NULL != parameters_common_http[i].key; i++)
+	{
+		if (SUCCEED != add_metric(&parameters_common_http[i], error, sizeof(error)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot add item key: %s", error);
 			exit(EXIT_FAILURE);
@@ -2062,3 +2077,51 @@ void	zbx_mpoints_free(zbx_mpoint_t *mpoint)
 {
 	zbx_free(mpoint);
 }
+
+#ifndef _WINDOWS
+int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *hostname)
+{
+	char	*type, *transform;
+
+	type = get_rparam(request, 0);
+	transform = get_rparam(request, 1);
+
+	if (NULL != type && '\0' != *type && 0 != strcmp(type, "host"))
+	{
+		if (0 == strcmp(type, "shorthost"))
+		{
+			char	*dot;
+
+			if (NULL != (dot = strchr(hostname, '.')))
+				*dot = '\0';
+		}
+		else if (0 == strcmp(type, "netbios"))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "NetBIOS is not supported on the current platform."));
+			return FAIL;
+		}
+		else
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
+			return FAIL;
+		}
+	}
+
+	if (NULL != transform && '\0' != *transform && 0 != strcmp(transform, "none"))
+	{
+		if (0 == strcmp(transform, "lower"))
+		{
+			zbx_strlower(hostname);
+		}
+		else
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+			return FAIL;
+		}
+	}
+
+	SET_STR_RESULT(result, hostname);
+
+	return SUCCEED;
+}
+#endif

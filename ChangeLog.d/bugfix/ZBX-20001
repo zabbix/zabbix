@@ -1,1 +1,0 @@
-....I..PS. [ZBX-20001] fixed crash and invalid bytecode error being generated on big-sendian systems when javascript is used; upgraded duktape to version 2.6 (vso)

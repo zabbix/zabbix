@@ -29,28 +29,29 @@
 		function hostPage() {
 			let filter_options = <?= json_encode($data['filter_options']) ?>;
 
-			this.refresh_url = '<?= $data['refresh_url'] ?>';
+			this.refresh_url = new Curl('<?= $data['refresh_url'] ?>', false);
 			this.refresh_interval = <?= $data['refresh_interval'] ?>;
 			this.running = false;
 			this.timeout = null;
 			this.deferred = null;
 
+			const url = new Curl('zabbix.php', false);
+			url.setArgument('action', 'host.view.refresh');
+			this.refresh_simple_url = url.getUrl();
+
 			if (filter_options) {
 				this.refresh_counters = this.createCountersRefresh(1);
 				this.filter = new CTabFilter($('#monitoring_hosts_filter')[0], filter_options);
 				this.filter.on(TABFILTER_EVENT_URLSET, (ev) => {
-					let url = new Curl('', false);
+					this.refresh_url = new Curl('', false);
 
-					url.setArgument('action', 'host.view.refresh');
-					this.refresh_url = url.getUrl();
 					this.unscheduleRefresh();
 					this.refresh();
 
 					var filter_item = this.filter._active_item;
 
 					if (this.filter._active_item.hasCounter()) {
-						$.post('zabbix.php', {
-							action: 'host.view.refresh',
+						$.post(this.refresh_simple_url, {
 							filter_counters: 1,
 							counter_index: filter_item._index
 						}).done((json) => {
@@ -73,8 +74,7 @@
 				return setTimeout(() => this.getFiltersCounters(), timeout);
 			},
 			getFiltersCounters: function() {
-				return $.post('zabbix.php', {
-						action: 'host.view.refresh',
+				return $.post(this.refresh_simple_url, {
 						filter_counters: 1
 					}).done((json) => {
 						if (json.filter_counters) {
@@ -98,7 +98,23 @@
 			refresh: function() {
 				this.setLoading();
 
-				this.deferred = $.getJSON(this.refresh_url);
+				const params = this.refresh_url.getArgumentsObject();
+				const exclude = ['action', 'filter_src', 'filter_show_counter', 'filter_custom_time', 'filter_name'];
+				const post_data = Object.keys(params)
+					.filter(key => !exclude.includes(key))
+					.reduce((post_data, key) => {
+						post_data[key] = (typeof params[key] === 'object')
+							? [...params[key]].filter(i => i)
+							: params[key];
+						return post_data;
+					}, {});
+
+				this.deferred = $.ajax({
+					url: this.refresh_simple_url,
+					data: post_data,
+					type: 'post',
+					dataType: 'json'
+				});
 
 				return this.bindDataEvents(this.deferred);
 			},

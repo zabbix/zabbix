@@ -171,11 +171,12 @@ static size_t	xml_escape_xpath_stringsize(const char *string)
 
 /**********************************************************************************
  *                                                                                *
- * Function: xml_escape_xpath_insstring                                           *
+ * Function: xml_escape_xpath_string                                              *
  *                                                                                *
  * Purpose: replace " symbol in string with ""                                    *
  *                                                                                *
- * Parameters: string - [IN/OUT] the string to update                             *
+ * Parameters: string - [IN] the xpath string to escape                           *
+ *             p      - [OUT] the result string                                   *
  *                                                                                *
  **********************************************************************************/
 static void xml_escape_xpath_string(char *p, const char *string)
@@ -380,7 +381,7 @@ static void	xml_to_vector(xmlNode *xml_node, zbx_vector_xml_node_ptr_t *nodes)
 		node = (zbx_xml_node_t *)zbx_malloc(NULL, sizeof(zbx_xml_node_t));
 
 		if (NULL != xml_node->name)
-			node->name = zbx_strdup(NULL, (char *)xml_node->name);
+			node->name = zbx_strdup(NULL, (const char *)xml_node->name);
 		else
 			node->name = NULL;
 
@@ -396,13 +397,13 @@ static void	xml_to_vector(xmlNode *xml_node, zbx_vector_xml_node_ptr_t *nodes)
 				if (NULL == (value = xmlNodeGetContent(xml_node)))
 					break;
 
-				node->value = zbx_strdup(NULL, (char *)value);
+				node->value = zbx_strdup(NULL, (const char *)value);
 				xmlFree(value);
 				break;
 			case XML_CDATA_SECTION_NODE:
 				if (NULL == (value = xmlNodeGetContent(xml_node)))
 					break;
-				node->value = zbx_strdup(NULL, (char *)value);
+				node->value = zbx_strdup(NULL, (const char *)value);
 				node->name = zbx_strdup(node->name, XML_CDATA_NAME);
 				xmlFree(value);
 				break;
@@ -421,7 +422,7 @@ static void	xml_to_vector(xmlNode *xml_node, zbx_vector_xml_node_ptr_t *nodes)
 					if (NULL != (value = xmlGetProp(xml_node, attr->name)))
 					{
 						zbx_vector_str_append(&node->attributes, zbx_strdup(NULL,
-								(char *)value));
+								(const char *)value));
 						xmlFree(value);
 					}
 					else
@@ -704,12 +705,9 @@ int	zbx_xml_to_json(char *xml_data, char **jstr, char **errmsg)
 	*errmsg = zbx_dsprintf(*errmsg, "Zabbix was compiled without libxml2 support");
 	return FAIL;
 #else
-	struct zbx_json			json;
 	xmlDoc				*doc = NULL;
 	xmlNode				*node;
 	int				ret = FAIL;
-	zbx_vector_xml_node_ptr_t	nodes;
-	char				*out;
 
 	if (FAIL == zbx_open_xml(xml_data, XML_PARSE_NOBLANKS, -1, (void **)&doc, (void **)&node, errmsg))
 	{
@@ -720,6 +718,39 @@ int	zbx_xml_to_json(char *xml_data, char **jstr, char **errmsg)
 			goto clean;
 	}
 
+	ret = zbx_xmlnode_to_json((void *)node, jstr);
+clean:
+	xmlFreeDoc(doc);
+exit:
+	return ret;
+#endif /* HAVE_LIBXML2 */
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_xmlnode_to_json                                              *
+ *                                                                            *
+ * Purpose: convert XML format value to JSON format                           *
+ *                                                                            *
+ * Parameters: xml_node - [IN] the XML data to process                        *
+ *             jstr     - [OUT] the JSON output                               *
+ *                                                                            *
+ * Return value: SUCCEED - the value was processed successfully               *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_xmlnode_to_json(void *xml_node, char **jstr)
+{
+#ifndef HAVE_LIBXML2
+	ZBX_UNUSED(xml_node);
+	ZBX_UNUSED(jstr);
+	return FAIL;
+#else
+	struct zbx_json			json;
+	zbx_vector_xml_node_ptr_t	nodes;
+	char				*out;
+	xmlNode				*node = (xmlNode*)xml_node;
+
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
 	zbx_vector_xml_node_ptr_create(&nodes);
@@ -727,15 +758,11 @@ int	zbx_xml_to_json(char *xml_data, char **jstr, char **errmsg)
 	xml_to_vector(node, &nodes);
 	vector_to_json(&nodes, &json, &out);
 	*jstr = zbx_strdup(*jstr, json.buffer);
-	ret = SUCCEED;
 
 	zbx_vector_xml_node_ptr_clear_ext(&nodes, zbx_xml_node_free);
 	zbx_vector_xml_node_ptr_destroy(&nodes);
 	zbx_json_free(&json);
-clean:
-	xmlFreeDoc(doc);
-exit:
-	return ret;
+	return SUCCEED;
 #endif /* HAVE_LIBXML2 */
 }
 

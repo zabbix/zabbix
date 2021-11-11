@@ -22,12 +22,19 @@
 
 ZBX_METRIC	parameter_hostname =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
-	{"system.hostname",     0,              SYSTEM_HOSTNAME,        NULL};
+	{"system.hostname",     CF_HAVEPARAMS,  SYSTEM_HOSTNAME,        NULL};
 
 int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	*hostname;
-	long 	hostbufsize = 0;
+	int		rc;
+	char		*hostname;
+	long 		hostbufsize = 0;
+
+	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		return SYSINFO_RET_FAIL;
+	}
 
 #ifdef _SC_HOST_NAME_MAX
 	hostbufsize = sysconf(_SC_HOST_NAME_MAX) + 1;
@@ -44,7 +51,8 @@ int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	SET_STR_RESULT(result, hostname);
+	if (FAIL == (rc = hostname_handle_params(request, result, hostname)))
+		zbx_free(hostname);
 
-	return SYSINFO_RET_OK;
+	return rc;
 }
