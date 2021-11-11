@@ -255,9 +255,9 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 			$this->assertEquals($refresh_interval, $widget->getRefreshInterval());
 
 			// Check that widget with the corresponding name is present in DB.
-			$widget_sql = 'SELECT count(widgetid) FROM widget WHERE type="systeminfo" AND dashboard_pageid in '
-					.'(SELECT dashboard_pageid from dashboard_page WHERE name='.zbx_dbstr($page_name).') '
-					.'AND name='.zbx_dbstr(CTestArrayHelper::get($widget_data['fields'], 'Name', ''));
+			$widget_sql = 'SELECT count(widgetid) FROM widget WHERE type="systeminfo" AND dashboard_pageid in'.
+					' (SELECT dashboard_pageid from dashboard_page WHERE name='.zbx_dbstr($page_name).')'.
+					' AND name='.zbx_dbstr(CTestArrayHelper::get($widget_data['fields'], 'Name', ''));
 			$this->assertEquals('1', CDBHelper::getValue($widget_sql));
 
 			// Check field values when opening widget config and exit edit mode.
