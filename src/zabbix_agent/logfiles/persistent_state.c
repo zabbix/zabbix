@@ -384,13 +384,14 @@ char	*zbx_make_persistent_file_name(const char *persistent_server_dir, const cha
 static int	zbx_write_persistent_file(const char *filename, const char *data, char **error)
 {
 	FILE	*fp;
-	size_t	sz;
+	size_t	sz, alloc_bytes = 0, offset = 0;
+	int	ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s(): filename:[%s] data:[%s]", __func__, filename, data);
 
 	if (NULL == (fp = fopen(filename, "w")))
 	{
-		*error = zbx_dsprintf(*error, "cannot open file: %s", zbx_strerror(errno));
+		zbx_snprintf_alloc(error, &alloc_bytes, &offset, "cannot open file: %s", zbx_strerror(errno));
 		return FAIL;
 	}
 
@@ -398,18 +399,18 @@ static int	zbx_write_persistent_file(const char *filename, const char *data, cha
 
 	if (sz != fwrite(data, 1, sz, fp))
 	{
-		*error = zbx_dsprintf(*error, "cannot write to file: %s", zbx_strerror(errno));
-		fclose(fp);
-		return FAIL;
+		zbx_snprintf_alloc(error, &alloc_bytes, &offset, "cannot write to file: %s", zbx_strerror(errno));
+		ret = FAIL;
 	}
 
 	if (0 != fclose(fp))
 	{
-		*error = zbx_dsprintf(*error, "cannot close file: %s", zbx_strerror(errno));
-		return FAIL;
+		zbx_snprintf_alloc(error, &alloc_bytes, &offset, "%scannot close file: %s",
+				(FAIL == ret) ? "; ": "" , zbx_strerror(errno));
+		ret = FAIL;
 	}
 
-	return SUCCEED;
+	return ret;
 }
 
 /******************************************************************************
