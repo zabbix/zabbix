@@ -77,7 +77,7 @@ static int	baseline_get_isoyear_data(zbx_uint64_t itemid, const char *table, tim
 
 	for (i = 0; i < season_num; i++)
 	{
-		if (i <= skip)
+		if (skip <= i)
 		{
 			if (FAIL == zbx_trends_eval_avg(table, itemid, start, end, &value_dbl, error))
 				return FAIL;
@@ -94,9 +94,11 @@ static int	baseline_get_isoyear_data(zbx_uint64_t itemid, const char *table, tim
 		}
 
 		tm_start = tm_end;
+		/* add an hour to get real end timestamp rather than last trend hour */
+		zbx_tm_add(&tm_start, 1, ZBX_TIME_UNIT_HOUR);
 		zbx_tm_sub(&tm_start, period_num, period_unit);
 
-		if (-1 == (end = (int)mktime(&tm_start)))
+		if (-1 == (start = (int)mktime(&tm_start)))
 		{
 			*error = zbx_dsprintf(*error, "cannot convert data period start time: %s", zbx_strerror(errno));
 			return FAIL;

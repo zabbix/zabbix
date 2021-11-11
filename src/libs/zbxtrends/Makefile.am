@@ -11,4 +11,4 @@ libzbxtrends_a_SOURCES = \
 	cache.c
 	
 libzbxtrends_baseline_a_SOURCES = \
-	baseline.c	
+	baseline.c
