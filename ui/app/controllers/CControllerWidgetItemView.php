@@ -101,18 +101,16 @@ class CControllerWidgetItemView extends CControllerWidget {
 
 				if (array_key_exists($fields['itemid'][0], $history)
 						&& array_key_exists(0, $history[$fields['itemid'][0]])) {
-					// Process value only if needs to be shown.
-					if (array_key_exists(WIDGET_ITEM_SHOW_VALUE, $show)) {
-						$last_value = $history[$fields['itemid'][0]][0]['value'];
+					// Get values regarless of show status, since change indicator can be shown independetly.
+					$last_value = $history[$fields['itemid'][0]][0]['value'];
 
-						// The view will determine when to show ellipsis for text values.
-						$value_type = $items_with_values[$fields['itemid'][0]]['value_type'];
+					// The view will determine when to show ellipsis for text values.
+					$value_type = $items_with_values[$fields['itemid'][0]]['value_type'];
 
-						// Override item units if needed.
+					// Override item units if needed.
+					if (array_key_exists(WIDGET_ITEM_SHOW_VALUE, $show) && $fields['units_show'] == 1) {
 						$units = ($fields['units'] === '')
-							? ($fields['units_show'] == 1)
-								? $items_with_values[$fields['itemid'][0]]['units']
-								: ''
+							? $items_with_values[$fields['itemid'][0]]['units']
 							: $fields['units'];
 					}
 
@@ -189,6 +187,8 @@ class CControllerWidgetItemView extends CControllerWidget {
 
 						case ITEM_VALUE_TYPE_STR:
 						case ITEM_VALUE_TYPE_TEXT:
+							$value = $last_value;
+
 							// Apply value mapping to string type values (same as in Latest Data).
 							$mapping = CValueMapHelper::getMappedValue($value_type, $value,
 								$items_with_values[$fields['itemid'][0]]['valuemap']
