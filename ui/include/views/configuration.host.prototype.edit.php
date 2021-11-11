@@ -441,6 +441,5 @@ else {
 
 $form->addItem($tabs);
 $widget->addItem($form);
-$widget->addItem(new CPartial('js/common.multiselect.entry.excluder.js'));
 
 $widget->show();
