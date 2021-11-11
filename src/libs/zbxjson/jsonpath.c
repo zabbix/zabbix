@@ -1596,6 +1596,8 @@ static void	jsonpath_set_expression_error(zbx_jsonpath_expression_t *expression)
 
 	if (NULL != text)
 		zbx_set_json_strerror("invalid compiled expression: %s", text);
+	else
+		THIS_SHOULD_NEVER_HAPPEN;
 
 	zbx_free(text);
 }
