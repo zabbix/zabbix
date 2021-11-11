@@ -237,6 +237,11 @@ class CControllerWidgetItemView extends CControllerWidget {
 				$classes[] = 'bold';
 			}
 
+			if (strpos($description, "\n") !== false) {
+				$classes[] = 'multiline';
+				$description = nl2br($description);
+			}
+
 			$styles = ['--widget-item-font' => number_format($fields['desc_size'] / 100, 2)];
 			if ($fields['desc_color'] !== '') {
 				$styles['color'] = '#'.$fields['desc_color'];
