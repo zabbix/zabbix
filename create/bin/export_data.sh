@@ -53,6 +53,7 @@ for tbl_line in `grep "^TABLE.*${dbflag}" "${schema}"`; do
 		fld_line=${fld_line#*|}		# <field_name>
 		field_type=${fld_line%%|*}
 		fld_line=${fld_line#*|}		# <field_type>
+		default_val=${fld_line%%|*}
 		fld_line=${fld_line#*|}		# <default>
 		fld_line=${fld_line#*|}		# <not_null>
 		flags=${fld_line%%|*}
@@ -64,7 +65,9 @@ for tbl_line in `grep "^TABLE.*${dbflag}" "${schema}"`; do
 
 		if [[ "$flags" =~ ZBX_NODATA ]]; then
 			if [[ "$field_type" =~ ^t_(shorttext|text|longtext)$ ]]; then
-				fields="${fields}${delim} '' as ${field}"
+				[[ -n "$default_val" ]] || default_val="''"
+
+				fields="${fields}${delim} $default_val as ${field}"
 			else
 				continue
 			fi
