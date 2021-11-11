@@ -449,15 +449,13 @@ static int	set_use_ino_by_fs_type(const char *path, int *use_ino, char **err_msg
  ******************************************************************************/
 static void	print_logfile_list(const struct st_logfile *logfiles, int logfiles_num)
 {
-#define MD5_PRINT_BUF_LEN	33	/* for MD5 sum representation with hex-digits: 2 * 16 bytes + '\0' */
-
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
 		int	i;
 
 		for (i = 0; i < logfiles_num; i++)
 		{
-			char	first_buf[MD5_PRINT_BUF_LEN], last_buf[MD5_PRINT_BUF_LEN];
+			char	first_buf[ZBX_MD5_PRINT_BUF_LEN], last_buf[ZBX_MD5_PRINT_BUF_LEN];
 
 			zbx_md5buf2str(logfiles[i].first_block_md5, first_buf);
 			zbx_md5buf2str(logfiles[i].last_block_md5, last_buf);
@@ -472,7 +470,6 @@ static void	print_logfile_list(const struct st_logfile *logfiles, int logfiles_n
 					logfiles[i].md5_block_size, first_buf, logfiles[i].last_block_offset, last_buf);
 		}
 	}
-#undef MD5_PRINT_BUF_LEN
 }
 
 /******************************************************************************

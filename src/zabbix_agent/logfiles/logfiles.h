@@ -25,6 +25,8 @@
 #include "../metrics.h"
 #include "persistent_state.h"
 
+#define ZBX_MD5_PRINT_BUF_LEN	((MD5_DIGEST_SIZE) * 2 + 1)	/* for MD5 sum representation with hex-digits */
+
 typedef enum
 {
 	ZBX_LOG_ROTATION_LOGRT = 0,	/* pure rotation model */

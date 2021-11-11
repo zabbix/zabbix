@@ -507,8 +507,7 @@ void	zbx_write_persistent_files(zbx_vector_pre_persistent_t *prep_vec)
 
 		if (NULL != prep_vec->values[i].filename)
 		{
-			char	buf[33];	/* for MD5 sum representation with */
-						/* hex-digits: 2 * 16 bytes + '\0' */
+			char	buf[ZBX_MD5_PRINT_BUF_LEN];
 
 			zbx_json_adduint64(&json, ZBX_PERSIST_TAG_SEQ, (zbx_uint64_t)prep_vec->values[i].seq);
 			zbx_json_adduint64(&json, ZBX_PERSIST_TAG_INCOMPLETE,

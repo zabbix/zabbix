@@ -3866,8 +3866,9 @@ int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, unsigne
  *                                                                            *
  * Parameters:                                                                *
  *          md5 - [IN] buffer with md5 sum                                    *
- *          str - [OUT] preallocated string with a text representation of md5 *
- *                     sum. String size must be at least 33 bytes.            *
+ *          str - [OUT] preallocated string with a text representation of MD5 *
+ *                     sum. String size must be at least                      *
+ *                     ZBX_MD5_PRINT_BUF_LEN bytes.                           *
  *                                                                            *
  ******************************************************************************/
 void	zbx_md5buf2str(const md5_byte_t *md5, char *str)
