@@ -537,9 +537,7 @@ void	zbx_write_persistent_files(zbx_vector_pre_persistent_t *prep_vec)
 
 		zbx_json_close(&json);
 
-		zbx_write_persistent_file(prep_vec->values[i].persistent_file_name, json.buffer, &error);
-
-		if (NULL != error)
+		if (SUCCEED != zbx_write_persistent_file(prep_vec->values[i].persistent_file_name, json.buffer, &error))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot write persistent file \"%s\": %s",
 					prep_vec->values[i].persistent_file_name, error);
@@ -602,11 +600,11 @@ void	zbx_remove_from_persistent_inactive_list(zbx_vector_persistent_inactive_t *
 		return;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s(): removed element %d with key '%s'", __func__, idx, key);
-
 	zbx_free(inactive_vec->values[idx].key_orig);
 	zbx_free(inactive_vec->values[idx].persistent_file_name);
 	zbx_vector_persistent_inactive_remove(inactive_vec, idx);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s(): removed element %d with key '%s'", __func__, idx, key);
 }
 
 void	zbx_remove_inactive_persistent_files(zbx_vector_persistent_inactive_t *inactive_vec)
