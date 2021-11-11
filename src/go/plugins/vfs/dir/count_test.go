@@ -101,13 +101,13 @@ func Test_getAllMode(t *testing.T) {
 		want map[fs.FileMode]bool
 	}{
 		{"new", map[fs.FileMode]bool{
-			modeFile:          true,
-			fs.ModeDir:        true,
-			fs.ModeSymlink:    true,
-			fs.ModeSocket:     true,
-			fs.ModeDevice:     true,
-			fs.ModeCharDevice: true,
-			fs.ModeNamedPipe:  true,
+			regularFile:                       true,
+			fs.ModeDir:                        true,
+			fs.ModeSymlink:                    true,
+			fs.ModeSocket:                     true,
+			fs.ModeDevice:                     true,
+			fs.ModeCharDevice + fs.ModeDevice: true,
+			fs.ModeNamedPipe:                  true,
 		}},
 	}
 	for _, tt := range tests {

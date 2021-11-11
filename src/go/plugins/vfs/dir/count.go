@@ -47,7 +47,9 @@ const (
 	tenthParam
 	eleventhParam
 
-	modeFile = 0
+	regularFile = 0
+
+	unlimitedDepth = -1
 
 	kilobyteType = 'K'
 	megabyteType = 'M'
@@ -77,19 +79,19 @@ type Plugin struct {
 type countParams struct {
 	path          string
 	minSize       string
-	parsedMinSize int64
 	maxSize       string
-	parsedMaxSize int64
 	minAge        string
-	parsedMinAge  time.Time
 	maxAge        string
-	parsedMaxAge  time.Time
 	maxDepth      int
+	parsedMinSize int64
+	parsedMaxSize int64
+	parsedMinAge  time.Time
+	parsedMaxAge  time.Time
 	typesInclude  map[fs.FileMode]bool
 	typesExclude  map[fs.FileMode]bool
 	regExclude    *regexp.Regexp
-	dirRegExclude *regexp.Regexp
 	regInclude    *regexp.Regexp
+	dirRegExclude *regexp.Regexp
 }
 
 var impl Plugin
@@ -180,7 +182,7 @@ func (cp *countParams) skipPath(path string, length int, err error) (bool, error
 	}
 
 	currentLength := len(strings.SplitAfter(path, string(filepath.Separator)))
-	if cp.maxDepth > 0 && currentLength-length > cp.maxDepth {
+	if cp.maxDepth > unlimitedDepth && currentLength-length > cp.maxDepth {
 		return true, fs.SkipDir
 	}
 
@@ -204,12 +206,11 @@ func (cp *countParams) skipRegex(d fs.DirEntry) (bool, error) {
 }
 
 func (cp *countParams) skipType(d fs.DirEntry) bool {
-
-	if len(cp.typesInclude) > 1 && !cp.typesInclude[d.Type()] {
+	if len(cp.typesInclude) > 0 && !isTypeMatch(cp.typesInclude, d.Type()) {
 		return true
 	}
 
-	if len(cp.typesExclude) > 1 && cp.typesExclude[d.Type()] {
+	if len(cp.typesExclude) > 0 && isTypeMatch(cp.typesExclude, d.Type()) {
 		return true
 	}
 
@@ -234,11 +235,11 @@ func (cp *countParams) skipInfo(d fs.DirEntry) (bool, error) {
 		}
 	}
 
-	if !i.ModTime().After(cp.parsedMinAge) {
+	if cp.minAge != "" && i.ModTime().After(cp.parsedMinAge) {
 		return true, nil
 	}
 
-	if i.ModTime().Before(cp.parsedMaxAge) {
+	if cp.maxAge != "" && i.ModTime().Before(cp.parsedMaxAge) {
 		return true, nil
 	}
 
@@ -301,6 +302,18 @@ func (cp *countParams) setMinParams() (err error) {
 	}
 
 	return
+}
+
+func isTypeMatch(in map[fs.FileMode]bool, fm fs.FileMode) bool {
+	if in[regularFile] && fm.IsRegular() {
+		return true
+	}
+
+	if in[fm.Type()] {
+		return true
+	}
+
+	return false
 }
 
 func getParams(params []string) (out countParams, err error) {
@@ -381,6 +394,14 @@ func getParams(params []string) (out countParams, err error) {
 		fallthrough
 	case firstParam:
 		out.path = params[0]
+		if out.path == "" {
+			err = zbxerr.New("Invalid first parameter.")
+		}
+
+		if !strings.HasSuffix(out.path, string(filepath.Separator)) {
+			out.path += string(filepath.Separator)
+		}
+
 	case emptyParam:
 		err = zbxerr.ErrorTooFewParameters
 
@@ -390,7 +411,6 @@ func getParams(params []string) (out countParams, err error) {
 
 		return
 	}
-	fmt.Println("incl", out.typesInclude)
 
 	return
 }
@@ -430,7 +450,7 @@ func parseType(in string, exclude bool) (out map[fs.FileMode]bool, err error) {
 func setIndividualType(m map[fs.FileMode]bool, t string) (map[fs.FileMode]bool, error) {
 	switch t {
 	case "file":
-		m[modeFile] = true
+		m[regularFile] = true
 	case "dir":
 		m[fs.ModeDir] = true
 	case "sym":
@@ -440,12 +460,12 @@ func setIndividualType(m map[fs.FileMode]bool, t string) (map[fs.FileMode]bool, 
 	case "bdev":
 		m[fs.ModeDevice] = true
 	case "cdev":
-		m[fs.ModeCharDevice] = true
+		m[fs.ModeDevice+fs.ModeCharDevice] = true
 	case "fifo":
 		m[fs.ModeNamedPipe] = true
 	case "dev":
 		m[fs.ModeDevice] = true
-		m[fs.ModeCharDevice] = true
+		m[fs.ModeDevice+fs.ModeCharDevice] = true
 	default:
 		return nil, fmt.Errorf("invalid type: %s", t)
 	}
@@ -463,12 +483,12 @@ func getEmptyType(exclude bool) map[fs.FileMode]bool {
 
 func getAllMode() map[fs.FileMode]bool {
 	out := make(map[fs.FileMode]bool)
-	out[modeFile] = true
+	out[regularFile] = true
 	out[fs.ModeDir] = true
 	out[fs.ModeSymlink] = true
 	out[fs.ModeSocket] = true
 	out[fs.ModeDevice] = true
-	out[fs.ModeCharDevice] = true
+	out[fs.ModeCharDevice+fs.ModeDevice] = true
 	out[fs.ModeNamedPipe] = true
 
 	return out
