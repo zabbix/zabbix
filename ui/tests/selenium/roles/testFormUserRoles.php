@@ -685,7 +685,10 @@ class testFormUserRoles extends CWebTest {
 			// User role.
 			[
 				[
-					'name' => 'user_api',
+					'fields' => [
+						'Name' => 'user_api',
+						'User type' => 'User'
+					],
 					'api_list' => [
 						'action.get', 'alert.get', 'configuration.export', 'configuration.import', 'configuration.importcompare',
 						'correlation.get', 'dashboard.create', 'dashboard.delete', 'dashboard.get', 'dashboard.update',
@@ -699,14 +702,16 @@ class testFormUserRoles extends CWebTest {
 						'templatedashboard.get', 'token.create', 'token.delete', 'token.generate', 'token.get',
 						'token.update', 'trend.get', 'trigger.get', 'triggerprototype.get',
 						'user.get', 'user.logout', 'user.update', 'usergroup.get', 'usermacro.get', 'valuemap.get'
-					],
-					'type' => 'User'
+					]
 				]
 			],
 			// Admin role.
 			[
 				[
-					'name' => 'admin_api',
+					'fields' => [
+						'Name' => 'admin_api',
+						'User type' => 'Admin'
+					],
 					'api_list' => [
 						'action.create', 'action.delete', 'action.get', 'action.update', 'alert.get', 'configuration.export',
 						'configuration.import', 'configuration.importcompare', 'correlation.get', 'dashboard.create', 'dashboard.delete',
@@ -733,14 +738,16 @@ class testFormUserRoles extends CWebTest {
 						'triggerprototype.update', 'user.get', 'user.logout', 'user.update', 'usergroup.get', 'usermacro.create',
 						'usermacro.delete', 'usermacro.get', 'usermacro.update', 'valuemap.create', 'valuemap.delete', 'valuemap.get',
 						'valuemap.update'
-					],
-					'type' => 'Admin'
+					]
 				]
 			],
 			// Super Admin role.
 			[
 				[
-					'name' => 'super_admin_api',
+					'fields' => [
+						'Name' => 'super_admin_api',
+						'User type' => 'Super admin'
+					],
 					'api_list' => [
 						'action.create', 'action.delete', 'action.get', 'action.update', 'alert.get', 'auditlog.get',
 						'authentication.get', 'authentication.update', 'autoregistration.get', 'autoregistration.update',
@@ -780,8 +787,7 @@ class testFormUserRoles extends CWebTest {
 						'usergroup.delete', 'usergroup.get', 'usergroup.update', 'usermacro.create', 'usermacro.createglobal',
 						'usermacro.delete', 'usermacro.deleteglobal', 'usermacro.get', 'usermacro.update', 'usermacro.updateglobal',
 						'valuemap.create', 'valuemap.delete', 'valuemap.get', 'valuemap.update'
-					],
-					'type' => 'Super admin'
+					]
 				]
 			]
 		];
@@ -795,23 +801,23 @@ class testFormUserRoles extends CWebTest {
 	public function testFormUserRoles_ApiList($data) {
 		$this->page->login()->open('zabbix.php?action=userrole.edit');
 		$form = $this->query('id:userrole-form')->waitUntilPresent()->asGridForm()->one();
-		$form->fill(['Name' => $data['name']]);
-		$this->query('id:user-type')->one()->asZDropdown()->select($data['type']);
+		$form->fill($data['fields']);
 		$this->query('xpath://div[@id="api_methods_"]/../div/button')->one()->click();
 		$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
 		$this->assertTableDataColumn($data['api_list']);
 		$overlay->query('id:all_records')->asCheckbox()->one()->check();
-		$overlay->query('xpath://div[@class="overlay-dialogue-footer"]/button[text()="Select"]')->one()->click();
+		$overlay->query('button:Select')->one()->click();
 
-		// API request checked and disabled.
+		// Open the list of API methods and check a that random method is selected and disabled.
 		$this->query('xpath://div[@id="api_methods_"]/../div/button')->one()->click();
-		COverlayDialogElement::find()->one()->waitUntilReady();
-		$this->assertTrue($overlay->query('id:item_action.get')->one()->isAttributePresent(['checked', 'disabled']));
+		$overlay->waitUntilReady();
+		$method = $data['api_list'][array_rand($data['api_list'])];
+		$this->assertTrue($overlay->query('name:item['.$method.']')->one()->isAttributePresent(['checked', 'disabled']));
 		$overlay->close();
 
 		$form->submit();
 		$sql_api = 'SELECT * FROM role_rule WHERE type=1 and roleid in (SELECT roleid FROM role WHERE name='
-				.zbx_dbstr($data['name']).')'.' ORDER BY value_str ASC';
+				.zbx_dbstr($data['fields']['Name']).')'.' ORDER BY value_str ASC';
 		$role_rules = CDBHelper::getColumn($sql_api, 'value_str');
 		$this->assertEquals($data['api_list'], $role_rules);
 	}
