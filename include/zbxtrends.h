@@ -51,17 +51,7 @@ void	zbx_tfc_destroy(void);
 int	zbx_tfc_get_stats(zbx_tfc_stats_t *stats, char **error);
 void	zbx_tfc_invalidate_trends(ZBX_DC_TREND *trends, int trends_num);
 
-typedef struct
-{
-	int	weeks;
-	int	months;
-	int	days;
-	int	hours;
-}
-zbx_tm_diff_t;
-
-void	zbx_baseline_season_diff(const struct tm *season, zbx_time_unit_t season_unit, const struct tm *period,
-		zbx_tm_diff_t *diff);
-int	zbx_baseline_season_get(const struct tm *period, zbx_time_unit_t season_unit, struct tm *season);
+int	zbx_baseline_get_data(zbx_uint64_t itemid, unsigned char value_type, time_t now, const char *period,
+		const char *seasons, int skip, zbx_vector_dbl_t *values, char **error);
 
 #endif

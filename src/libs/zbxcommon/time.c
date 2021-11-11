@@ -281,9 +281,7 @@ static void	tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base)
 				neg_to_pos_wrap(&tm->tm_mon, 12);
 				if (0 != tm->tm_mon)
 					shift++;
-
 				tm_sub(tm, shift, ZBX_TIME_UNIT_YEAR);
-
 			}
 			return;
 		case ZBX_TIME_UNIT_YEAR:
