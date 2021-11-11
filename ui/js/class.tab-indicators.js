@@ -49,7 +49,6 @@ class TabIndicators {
 	 * @return {HTMLElement} Main form
 	 */
 	getForm() {
-		const TEMPLATE = document.querySelector('#templates-form');
 		const HOST = document.querySelector('#host-form');
 		const AUTHENTICATION = document.querySelector('#authentication-form');
 		const HOST_PROTOTYPE = document.querySelector('#host-prototype-form');
@@ -69,8 +68,6 @@ class TabIndicators {
 		const GRAPH = document.querySelector('#widget-dialogue-form');
 
 		switch (true) {
-			case !!TEMPLATE:
-				return TEMPLATE;
 			case !!HOST:
 				return HOST;
 			case !!AUTHENTICATION:
@@ -173,8 +170,6 @@ class TabIndicatorFactory {
 		switch (name) {
 			case 'Macros':
 				return new MacrosTabIndicatorItem;
-			case 'LinkedTemplate':
-				return new LinkedTemplateTabIndicatorItem;
 			case 'Tags':
 				return new TagsTabIndicatorItem;
 			case 'Http':
@@ -187,8 +182,6 @@ class TabIndicatorFactory {
 				return new InventoryTabIndicatorItem;
 			case 'Encryption':
 				return new EncryptionTabIndicatorItem;
-			case 'Groups':
-				return new GroupsTabIndicatorItem;
 			case 'Preprocessing':
 				return new PreprocessingTabIndicatorItem;
 			case 'Dependency':
@@ -332,62 +325,6 @@ class MacrosTabIndicatorItem extends TabIndicatorItem {
 				childList: true,
 				attributes: true,
 				attributeFilter: ['value', 'style'], // Use style because textarea don't have value attribute.
-				subtree: true
-			});
-		}
-	}
-}
-
-class LinkedTemplateTabIndicatorItem extends TabIndicatorItem {
-
-	constructor() {
-		super(TAB_INDICATOR_TYPE_COUNT);
-	}
-
-	getValue() {
-		let count = 0;
-		const target_node = document.querySelector('#linked-template');
-
-		if (target_node !== null) {
-			count += target_node
-				.querySelectorAll('tbody tr')
-				.length;
-		}
-
-		const multiselect_node = document.querySelector('#add_templates_');
-
-		if (multiselect_node !== null) {
-			count += multiselect_node
-				.querySelectorAll('.selected li')
-				.length;
-		}
-
-		return count;
-	}
-
-	initObserver(element) {
-		const linked_node = document.querySelector('#linked-template');
-
-		if (linked_node !== null) {
-			const linked_observer = new MutationObserver(() => {
-				this.addAttributes(element)
-			});
-
-			linked_observer.observe(linked_node, {
-				childList: true,
-				subtree: true
-			});
-		}
-
-		const multiselect_node = document.querySelector('#add_templates_');
-
-		if (multiselect_node !== null) {
-			const multiselect_observer = new MutationObserver(() => {
-				this.addAttributes(element)
-			});
-
-			multiselect_observer.observe(multiselect_node.parentNode, {
-				childList: true,
 				subtree: true
 			});
 		}
@@ -569,34 +506,6 @@ class EncryptionTabIndicatorItem extends TabIndicatorItem {
 		for (const input of document.querySelectorAll('[name=tls_connect]')) {
 			input.addEventListener('click', () => {
 				this.addAttributes(element);
-			});
-		}
-	}
-}
-
-class GroupsTabIndicatorItem extends TabIndicatorItem {
-
-	constructor() {
-		super(TAB_INDICATOR_TYPE_COUNT);
-	}
-
-	getValue() {
-		return document
-			.querySelectorAll('#group_links_ .multiselect-list li')
-			.length;
-	}
-
-	initObserver(element) {
-		const target_node = document.querySelector('#group_links_ .multiselect-list');
-
-		if (target_node !== null) {
-			const observer = new MutationObserver(() => {
-				this.addAttributes(element);
-			});
-
-			observer.observe(target_node, {
-				childList: true,
-				subtree: true
 			});
 		}
 	}

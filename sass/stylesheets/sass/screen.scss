@@ -1333,6 +1333,16 @@ form {
 	}
 }
 
+.grid-templates-container {
+	background-color: $ui-bg-color;
+	border: 1px solid $ui-border-color;
+	padding: 5px;
+
+	> table {
+		margin-bottom: 5px;
+	}
+}
+
 .form-btns {
 	button {
 		margin: 10px 6px 5px;

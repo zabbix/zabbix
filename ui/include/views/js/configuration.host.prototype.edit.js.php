@@ -171,10 +171,10 @@
 			document.getElementById('custom_interfaces'),
 			document.getElementById('interface-add'),
 			<?= json_encode([
-				'parent_is_template' => $parentHost['status'] == HOST_STATUS_TEMPLATE,
-				'is_templated' => $hostPrototype['templateid'] != 0,
-				'inherited_interfaces' => array_values($parentHost['interfaces']),
-				'custom_interfaces' => array_values($hostPrototype['interfaces'])
+				'parent_is_template' => $data['parent_host']['status'] == HOST_STATUS_TEMPLATE,
+				'is_templated' => ($data['host_prototype']['templateid'] != 0),
+				'inherited_interfaces' => array_values($data['parent_host']['interfaces']),
+				'custom_interfaces' => array_values($data['host_prototype']['interfaces'])
 			]) ?>
 		);
 
@@ -188,17 +188,17 @@
 			jQuery(this).closest('.form_row').remove();
 		});
 
-		<?php if (!$hostPrototype['groupPrototypes']): ?>
+		<?php if (!$data['host_prototype']['groupPrototypes']): ?>
 			addGroupPrototypeRow({'name': '', 'group_prototypeid': ''});
 		<?php endif ?>
-		<?php foreach ($hostPrototype['groupPrototypes'] as $i => $groupPrototype): ?>
+		<?php foreach ($data['host_prototype']['groupPrototypes'] as $i => $groupPrototype): ?>
 			addGroupPrototypeRow(<?= json_encode([
 				'name' => $groupPrototype['name'],
 				'group_prototypeid' => isset($groupPrototype['group_prototypeid']) ? $groupPrototype['group_prototypeid'] : null
 			]) ?>);
 		<?php endforeach ?>
 
-		<?php if ($hostPrototype['templateid']): ?>
+		<?php if ($data['host_prototype']['templateid']): ?>
 			jQuery('#tbl_group_prototypes').find('input').prop('readonly', true);
 			jQuery('#tbl_group_prototypes').find('button').prop('disabled', true);
 		<?php endif ?>

@@ -3163,6 +3163,13 @@ form.is-loading {
   .table-forms-container > .ui-tabs-nav, .browser-warning-container > .ui-tabs-nav {
     margin: -10px -10px 10px; }
 
+.grid-templates-container {
+  background-color: #2b2b2b;
+  border: 1px solid #303030;
+  padding: 5px; }
+  .grid-templates-container > table {
+    margin-bottom: 5px; }
+
 .form-btns button {
   margin: 10px 6px 5px; }
 

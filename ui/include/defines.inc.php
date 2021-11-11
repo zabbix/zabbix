@@ -1424,6 +1424,7 @@ define('ZBX_LIST_MODE_VIEW', 0);
 define('ZBX_LIST_MODE_EDIT', 1);
 
 // input fields
+define('ZBX_GRID_TEMPLATES_WIDTH',				509);
 define('ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH',		218);
 define('ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH',	218);
 define('ZBX_TEXTAREA_MACRO_WIDTH',				250);
@@ -1604,14 +1605,12 @@ define('ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION', 2);
 
 // Tab indicator names.
 define('TAB_INDICATOR_MACROS', 'macros');
-define('TAB_INDICATOR_LINKED_TEMPLATE', 'linked-template');
 define('TAB_INDICATOR_TAGS', 'tags');
 define('TAB_INDICATOR_AUTH_HTTP', 'http');
 define('TAB_INDICATOR_AUTH_LDAP', 'ldap');
 define('TAB_INDICATOR_AUTH_SAML', 'saml');
 define('TAB_INDICATOR_INVENTORY', 'inventory');
 define('TAB_INDICATOR_ENCRYPTION', 'encryption');
-define('TAB_INDICATOR_GROUPS', 'groups');
 define('TAB_INDICATOR_PREPROCESSING', 'preprocessing');
 define('TAB_INDICATOR_DEPENDENCY', 'dependency');
 define('TAB_INDICATOR_LLD_MACROS', 'lld-macros');
@@ -1770,6 +1769,7 @@ define('ZBX_STYLE_GRAPH_WRAPPER', 'graph-wrapper');
 define('ZBX_STYLE_GREEN', 'green');
 define('ZBX_STYLE_GREEN_BG', 'green-bg');
 define('ZBX_STYLE_GREY', 'grey');
+define('ZBX_STYLE_GRID_TEMPLATES_CONTAINER', 'grid-templates-container');
 define('ZBX_STYLE_TEAL', 'teal');
 define('ZBX_STYLE_HEADER_TITLE', 'header-title');
 define('ZBX_STYLE_HEADER_CONTROLS', 'header-controls');

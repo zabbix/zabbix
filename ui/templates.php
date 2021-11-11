@@ -643,6 +643,29 @@ if (hasRequest('form')) {
 		'add_templates' => array_map('strval', array_keys($data['add_templates']))
 	];
 
+	$data['template_name'] = getRequest('template_name', '');
+	$data['visible_name'] = getRequest('visiblename', '');
+
+	$templateids = getRequest('templates', []);
+	$clear_templates = getRequest('clear_templates', []);
+
+	if ($data['templateid'] != 0 && !hasRequest('form_refresh')) {
+		$data['template_name'] = $data['dbTemplate']['host'];
+		$data['visible_name'] = $data['dbTemplate']['name'];
+
+		// Display empty visible name if equal to host name.
+		if ($data['visible_name'] === $data['template_name']) {
+			$data['visible_name'] = '';
+		}
+
+		$templateids = $data['original_templates'];
+	}
+
+	$clear_templates = array_intersect($clear_templates, array_keys($data['original_templates']));
+	$clear_templates = array_diff($clear_templates, array_keys($templateids));
+
+	$data['clear_templates'] = $clear_templates;
+
 	$view = new CView('configuration.template.edit', $data);
 }
 else {
