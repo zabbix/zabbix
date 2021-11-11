@@ -1336,9 +1336,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @param string $items[n]['itemid']
 	 * @param string $items[n]['hostid']
 	 * @param string $items[n]['name']
-	 * @param string $items[n]['key_']				item key (optional)
-	 *												but is (mandatory) if macros exist and "key_expanded" is not present
-	 * @param string $items[n]['key_expanded']		expanded item key (optional)
 	 *
 	 * @return array
 	 */
@@ -1556,7 +1553,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	}
 
 	/**
-	 * Resolve macros in item description.
+	 * Resolve item description macros to "description_expanded" field.
 	 *
 	 * @param array  $items
 	 * @param string $items[n]['hostid']
@@ -1565,6 +1562,11 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @return array
 	 */
 	public function resolveItemDescriptions(array $items): array {
+		foreach ($items as &$item) {
+			$item['description_expanded'] = $item['description'];
+		}
+		unset($item);
+
 		$types = ['usermacros' => true];
 		$macro_values = [];
 		$usermacros = [];
@@ -1584,7 +1586,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		}
 
 		foreach ($macro_values as $key => $macro_value) {
-			$items[$key]['description'] = strtr($items[$key]['description'], $macro_value);
+			$items[$key]['description_expanded'] = strtr($items[$key]['description'], $macro_value);
 		}
 
 		return $items;
@@ -1593,74 +1595,78 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	/**
 	 * Resolve single item widget description macros.
 	 *
-	 * @param array  $items                    Array of items.
-	 * @param string $items[n]['key_']         Required if user macros are present.
-	 * @param string $items[n]['hostid']       Required if interface macros or user macros are present.
-	 * @param string $items[n]['interfaceid']  Required if interface macros are present.
-	 * @param string $items[n]['itemid']       Required if item macros are present to get value from history.
-	 * @param string $items[n]['value_type']   Required if item macros are present to get value from history.
-	 * @param string $items[n]['name']         Field to resolve. Required.
+	 * @param array  $items
+	 * @param string $items[n]['hostid']
+	 * @param string $items[n]['itemid']
+	 * @param string $items[n]['name']    Field to resolve. Required.
 	 *
-	 * @return array                           Returns array of items with macros resolved.
+	 * @return array                      Returns array of items with macros resolved.
 	 */
 	public function resolveWidgetItemNames(array $items) {
 		$types = [
 			'macros' => [
-				// To do: possibly add or remove {HOST.DESCRIPTION}
-				'host' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}'],
+				'host' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}', '{HOST.DESCRIPTION}'],
 				'interface' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
-				// To do: possibly add or remove {ITEM.DESCRIPTION}, {ITEM.DESCRIPTION.ORIG}, {ITEM.ID}, {ITEM.KEY}, {ITEM.KEY.ORIG}, {ITEM.NAME}, {ITEM.NAME.ORIG}, {ITEM.STATE}, {ITEM.VALUETYPE}
-				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}'],
+				'item' => ['{ITEM.DESCRIPTION}', '{ITEM.DESCRIPTION.ORIG}', '{ITEM.ID}', '{ITEM.KEY}',
+					'{ITEM.KEY.ORIG}', '{ITEM.NAME}', '{ITEM.NAME.ORIG}', '{ITEM.STATE}', '{ITEM.VALUETYPE}'
+				],
+				'item_value' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}', '{ITEM.LOG.DATE}', '{ITEM.LOG.TIME}',
+					'{ITEM.LOG.AGE}', '{ITEM.LOG.SOURCE}', '{ITEM.LOG.SEVERITY}', '{ITEM.LOG.NSEVERITY}',
+					'{ITEM.LOG.EVENTID}'
+				],
 				'inventory' => array_keys(self::getSupportedHostInventoryMacrosMap()),
+			],
+			'macro_funcs' => [
+				'item_value' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}']
 			],
 			'usermacros' => true
 		];
 
 		$macro_values = [];
+		$macros = ['host' => [], 'interface' => [], 'item' => [], 'item_value' => [], 'inventory' => []];
 		$usermacros = [];
-		$itemids = [];
-		$host_macros = false;
-		$interface_macros = false;
-		$inventory_macros = false;
-		$item_macros = false;
-
-		$texts = array_column($items, 'name');
-
-		$matched_macros = self::extractMacros($texts, $types);
 
 		foreach ($items as $key => $item) {
-			if ($matched_macros['macros']['host']) {
-				$host_macros = true;
-				$itemids[$item['itemid']] = true;
+			$matched_macros = self::extractMacros([$item['name']], $types);
 
-				foreach ($matched_macros['macros']['host'] as $macro) {
-					$macro_values[$key][$macro] = UNRESOLVED_MACRO_STRING;
+			foreach ($matched_macros['macros']['host'] as $token) {
+				if ($token === '{HOST.ID}') {
+					$macro_values[$key][$token] = $item['hostid'];
+				}
+				else {
+					$macro_values[$key][$token] = UNRESOLVED_MACRO_STRING;
+					$macros['host'][$item['hostid']][$key] = true;
 				}
 			}
 
-			if ($matched_macros['macros']['interface']) {
-				$interface_macros = true;
+			foreach ($matched_macros['macros']['interface'] as $token) {
+				$macro_values[$key][$token] = UNRESOLVED_MACRO_STRING;
+				$macros['interface'][$item['itemid']][$key] = true;
+			}
 
-				foreach ($matched_macros['macros']['interface'] as $macro) {
-					$macro_values[$key][$macro] = UNRESOLVED_MACRO_STRING;
+			foreach ($matched_macros['macros']['item'] as $token) {
+				if ($token === '{ITEM.ID}') {
+					$macro_values[$key][$token] = $item['itemid'];
+				}
+				else {
+					$macro_values[$key][$token] = UNRESOLVED_MACRO_STRING;
+					$macros['item'][$item['itemid']][$key] = true;
 				}
 			}
 
-			if ($matched_macros['macros']['item']) {
-				$item_macros = true;
-
-				foreach ($matched_macros['macros']['item'] as $macro) {
-					$macro_values[$key][$macro] = UNRESOLVED_MACRO_STRING;
-				}
+			foreach ($matched_macros['macros']['item_value'] as $token) {
+				$macro_values[$key][$token] = UNRESOLVED_MACRO_STRING;
+				$macros['item_value'][$item['itemid']][$key][$token] = ['macro' => substr($token, 1, -1)];
 			}
 
-			if ($matched_macros['macros']['inventory']) {
-				$inventory_macros = true;
-				$hosts[$item['hostid']][$key] = true;
+			foreach ($matched_macros['macro_funcs']['item_value'] as $token => $data) {
+				$macro_values[$key][$token] = UNRESOLVED_MACRO_STRING;
+				$macros['item_value'][$item['itemid']][$key][$token] = $data;
+			}
 
-				foreach ($matched_macros['macros']['inventory'] as $macro) {
-					$macro_values[$key][$macro] = UNRESOLVED_MACRO_STRING;
-				}
+			foreach ($matched_macros['macros']['inventory'] as $token) {
+				$macro_values[$key][$token] = UNRESOLVED_MACRO_STRING;
+				$macros['inventory'][$item['hostid']][$key] = true;
 			}
 
 			if ($matched_macros['usermacros']) {
@@ -1668,131 +1674,11 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 		}
 
-		if ($interface_macros) {
-			$hostids = [];
-
-			foreach ($macro_values as $key => $macros) {
-				if (array_key_exists('{HOST.IP}', $macros) || array_key_exists('{IPADDRESS}', $macros)
-						|| array_key_exists('{HOST.DNS}', $macros) || array_key_exists('{HOST.CONN}', $macros)
-						|| array_key_exists('{HOST.PORT}', $macros)) {
-					$hostids[$items[$key]['hostid']] = true;
-				}
-			}
-
-			$interfaces = [];
-			$interfaces_by_priority = [];
-
-			if ($hostids) {
-				$interfaces = DBfetchArray(DBselect(
-					'SELECT i.hostid,i.interfaceid,i.ip,i.dns,i.useip,i.port,i.type,i.main'.
-					' FROM interface i'.
-					' WHERE i.main='.INTERFACE_PRIMARY.
-						' AND '.dbConditionInt('i.hostid', array_keys($hostids)).
-						' AND '.dbConditionInt('i.type', self::interfacePriorities)
-				));
-
-				$interfaces = CMacrosResolverHelper::resolveHostInterfaces($interfaces);
-				$interfaces = zbx_toHash($interfaces, 'interfaceid');
-
-				// Items with no interfaces must collect interface data from host.
-				foreach ($interfaces as $interface) {
-					$hostid = $interface['hostid'];
-					$priority = self::interfacePriorities[$interface['type']];
-
-					if (!array_key_exists($hostid, $interfaces_by_priority)
-							|| $priority > self::interfacePriorities[$interfaces_by_priority[$hostid]['type']]) {
-						$interfaces_by_priority[$hostid] = $interface;
-					}
-				}
-			}
-		}
-
-		if ($host_macros) {
-			$db_items = API::Item()->get([
-				'output' => [],
-				'selectHosts' => ['hostid', 'host', 'name'],
-				'itemids' => array_keys($itemids),
-				'webitems' => true,
-				'filter' => ['flags' => null],
-				'preservekeys' => true
-			]);
-		}
-
-		foreach ($macro_values as $key => &$macros) {
-			$itemid = $items[$key]['itemid'];
-			$interface = null;
-
-			if ($interface_macros) {
-				if ($items[$key]['interfaceid'] != 0 && array_key_exists($items[$key]['interfaceid'], $interfaces)) {
-					$interface = $interfaces[$item[$key]['interfaceid']];
-				}
-				elseif (array_key_exists($items[$key]['hostid'], $interfaces_by_priority)) {
-					$interface = $interfaces_by_priority[$items[$key]['hostid']];
-				}
-			}
-
-			foreach ($macros as $macro => &$value) {
-				if ($host_macros) {
-					switch ($macro) {
-						case '{HOST.NAME}':
-							$value = $db_items[$itemid]['hosts'][0]['name'];
-							continue 2;
-
-						case '{HOST.ID}':
-							$value = $items[$key]['hostid'];
-							continue 2;
-
-						case '{HOST.HOST}':
-						case '{HOSTNAME}': // deprecated
-							$value = $db_items[$itemid]['hosts'][0]['host'];
-							continue 2;
-					}
-				}
-
-				if ($interface_macros && $interface !== null) {
-					switch ($macro) {
-						case '{HOST.IP}':
-						case '{IPADDRESS}': // deprecated
-							$value = $interface['ip'];
-							continue 2;
-
-						case '{HOST.DNS}':
-							$value = $interface['dns'];
-							continue 2;
-
-						case '{HOST.CONN}':
-							$value = $interface['useip'] ? $interface['ip'] : $interface['dns'];
-							continue 2;
-
-						case '{HOST.PORT}':
-							$value = $interface['port'];
-							continue 2;
-					}
-				}
-
-				if ($item_macros) {
-					switch ($macro) {
-						// Since this value does not depend on trigger or event, then both macros act the same.
-						case '{ITEM.VALUE}':
-						case '{ITEM.LASTVALUE}':
-							$history = Manager::History()->getLastValues([$items[$key]], 1, timeUnitToSeconds(
-								CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD)
-							));
-
-							if (array_key_exists($itemid, $history)) {
-								$value = $history[$itemid][0]['value'];
-							}
-							continue 2;
-					}
-				}
-			}
-			unset($value);
-		}
-		unset($macros);
-
-		if ($inventory_macros) {
-			$macro_values = self::getInventoryMacrosByHostId($hosts, $macro_values);
-		}
+		$macro_values = self::getHostMacrosByHostId($macros['host'], $macro_values);
+		$macro_values = self::getInterfaceMacrosByItemId($macros['interface'], $macro_values);
+		$macro_values = self::getItemMacrosByItemid($macros['item'], $macro_values);
+		$macro_values = self::getItemValueMacrosByItemid($macros['item_value'], $macro_values);
+		$macro_values = self::getInventoryMacrosByHostId($macros['inventory'], $macro_values);
 
 		foreach ($this->getUserMacros($usermacros) as $key => $usermacros_data) {
 			$macro_values[$key] = array_key_exists($key, $macro_values)
@@ -1800,18 +1686,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				: $usermacros_data['macros'];
 		}
 
-		$types = $this->transformToPositionTypes($types);
-
-		// Replace macros to value.
-		foreach ($macro_values as $key => $macros) {
-			$matched_macros = $this->getMacroPositions($items[$key]['name'], $types);
-
-			foreach (array_reverse($matched_macros, true) as $pos => $macro) {
-				$items[$key]['name'] = substr_replace($items[$key]['name'],
-					$macro_values[$items[$key]['itemid']][$macro], $pos, strlen($macro)
-				);
-			}
+		foreach ($items as $key => &$item) {
+			$item['name'] = strtr($item['name'], $macro_values[$key]);
 		}
+		unset($item);
 
 		return $items;
 	}

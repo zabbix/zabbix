@@ -68,14 +68,8 @@ class CControllerWidgetItemView extends CControllerWidget {
 				$options['output'][] = 'name';
 			}
 
-			/*
-			 * If name or description contains user macros, we need item "key_" and "hostid" to resolve them. If it
-			 * contains HOST.IP, DNS etc macros, we need "hostid" and "interfaceid". In case of ITEM.* macros, we need
-			 * "itemid" and "value_type" to get value from history.
-			 */
-			$options['output'] = array_merge($options['output'], ['key_', 'hostid', 'interfaceid', 'itemid',
-				'value_type'
-			]);
+			// If description contains user macros, we need "itemid" and "hostid" to resolve them.
+			$options['output'] = array_merge($options['output'], ['itemid', 'hostid']);
 		}
 
 		if (array_key_exists(WIDGET_ITEM_SHOW_VALUE, $show)) {
