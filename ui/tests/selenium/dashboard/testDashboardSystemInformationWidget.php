@@ -163,7 +163,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 	}
 
 	/**
-	 * Function checks that zabbix server status is updated after failover delay passes and frontend config is re-validated.
+	 * Function checks that Zabbix server status is updated after failover delay passes and frontend config is re-validated.
 	 *
 	 * @depends testDashboardSystemInformationWidget_checkEnabledHA
 	 *

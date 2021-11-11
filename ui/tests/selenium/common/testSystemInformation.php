@@ -99,12 +99,12 @@ class testSystemInformation extends CWebTest {
 			);
 		}
 
-		// Update zebbix frontend config to make sure that the address of the active node is shown correctly in tests.
+		// Update Zabbix frontend config to make sure that the address of the active node is shown correctly in tests.
 		$file_name = dirname(__FILE__).'/../../../conf/zabbix.conf.php';
 		$config = strtr(file_get_contents($file_name), ['$ZBX_SERVER ' => '// $ZBX_SERVER ', '$ZBX_SERVER_PORT' => '// $ZBX_SERVER_PORT']);
 		file_put_contents($file_name, $config);
 
-		// Get the time when config is updated - it is needed to know how long to wait until update of zabbix server status.
+		// Get the time when config is updated - it is needed to know how long to wait until update of Zabbix server status.
 		self::$update_timestamp = time();
 	}
 
@@ -179,13 +179,13 @@ class testSystemInformation extends CWebTest {
 		}
 
 		/**
-		 * Check and hide the active zabbix server address in widget that is working in System stats mode or in the part
+		 * Check and hide the active Zabbix server address in widget that is working in System stats mode or in the part
 		 * of the report that displays the overall system statistics.
 		 */
 		$this->assertEquals($DB['SERVER'].':'.$DB['PORT'], $server_address->getText());
 		$skip_fields[] = $server_address;
 
-		// Hide the footer of the report as it contains zabbix version.
+		// Hide the footer of the report as it contains Zabbix version.
 		if (!$dashboardid) {
 			$skip_fields[] = $this->query('xpath://footer')->one();
 		}
@@ -207,7 +207,7 @@ class testSystemInformation extends CWebTest {
 	}
 
 	/**
-	 * Function checks that zabbix server status is updated after failover delay passes and frontend config is re-validated.
+	 * Function checks that Zabbix server status is updated after failover delay passes and frontend config is re-validated.
 	 *
 	 * @param integer $dashboardid	id of the dashboard that the widgets are located in.
 	 */
@@ -216,7 +216,7 @@ class testSystemInformation extends CWebTest {
 		$this->page->login()->open($url)->waitUntilReady();
 		$table = $this->query('xpath://table[@class="list-table sticky-header"]')->asTable()->waitUntilVisible()->one();
 
-		// Check that before failover delay passes frontend thinks that zabbix server is running.
+		// Check that before failover delay passes frontend thinks that Zabbix server is running.
 		$this->assertEquals('Yes', $table->findRow('Parameter', 'Zabbix server is running')->getColumn(0)->getText());
 
 		// Wait for failover delay to pass.
@@ -224,7 +224,7 @@ class testSystemInformation extends CWebTest {
 			// Code is not missing here.
 		}
 
-		// Check that after failover delay passes frontend re-validates zabbix server status.
+		// Check that after failover delay passes frontend re-validates Zabbix server status.
 		$this->page->refresh();
 		$this->assertEquals('No', $table->findRow('Parameter', 'Zabbix server is running')->getColumn(0)->getText());
 	}
