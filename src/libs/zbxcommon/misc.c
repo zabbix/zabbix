@@ -3830,7 +3830,7 @@ void	zbx_update_env(double time_now)
  *                                                                            *
  * Function: zbx_dc_get_agent_item_nextcheck                                  *
  *                                                                            *
- * Purpose: calculate item nextcheck for zabix agent type items               *
+ * Purpose: calculate item nextcheck for Zabbix agent type items              *
  *                                                                            *
  ******************************************************************************/
 int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, unsigned char state, int now,
