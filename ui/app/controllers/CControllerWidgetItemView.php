@@ -330,7 +330,9 @@ class CControllerWidgetItemView extends CControllerWidget {
 				$data[$fields['value_v_pos']][$fields['value_h_pos']]['data'][] = [
 					'data' => $change_indicator,
 					'classes' => ['change-indicator'],
-					'styles' => ['--widget-item-font' => number_format($fields['value_size'] / 100, 2)]
+					'styles' => [
+						'--widget-item-font' => number_format(max($fields['value_size'], $fields['decimal_size']) / 100, 2)
+					]
 				];
 			}
 

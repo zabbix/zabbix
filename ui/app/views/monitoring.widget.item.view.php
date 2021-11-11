@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 if ($data['error'] !== '') {
@@ -29,75 +30,78 @@ if ($data['error'] !== '') {
 else {
 	$items = [];
 
-	foreach ($data['data'] as $key => $row) {
-		// Background color is not a content block.
-		if ($key !== 'bg_color') {
-			$items[$key] = new CDiv();
+	foreach ([WIDGET_ITEM_POS_TOP, WIDGET_ITEM_POS_MIDDLE, WIDGET_ITEM_POS_BOTTOM] as $key) {
+		$items[$key] = new CDiv();
 
-			foreach ($row as $column) {
-				if (is_array($column['data'])) {
-					// Value block that consists of other blocks.
-					$main = new CDiv();
+		if (!array_key_exists($key, $data['data'])) {
+			continue;
+		}
 
-					if ($column['classes']) {
-						foreach ($column['classes'] as $class) {
-							$main->addClass($class);
-						}
+		$row = $data['data'][$key];
+
+		foreach ($row as $column) {
+			if (is_array($column['data'])) {
+				// Value block that consists of other blocks.
+				$main = new CDiv();
+
+				if ($column['classes']) {
+					foreach ($column['classes'] as $class) {
+						$main->addClass($class);
 					}
-
-					foreach ($column['data'] as $cell) {
-						if ($cell['classes'] && in_array('change-indicator', $cell['classes'])) {
-							$item = new CDiv(new CSvgArrow($cell['data']));
-						}
-						else {
-							// Other blocks: value, decimals and units.
-							$item = new CDiv($cell['data']);
-						}
-
-						if ($cell['classes']) {
-							foreach ($cell['classes'] as $class) {
-								$item->addClass($class);
-							}
-						}
-
-						if ($cell['styles']) {
-							$cnt = count($cell['styles']);
-							$i = 0;
-
-							foreach ($cell['styles'] as $style => $value) {
-								$item->addStyle($style.': '.$value.(($i + 1) != $cnt ? '; ' : ''));
-								$i++;
-							}
-						}
-
-						// To do: use $cell['value_type'] variable to truncate string blocks. Either CSS class or style.
-						$main->addItem($item);
-					}
-
-					$items[$key]->addItem($main);
 				}
-				else {
-					// Individual blocks like description and time.
-					$item = new CDiv($column['data']);
 
-					if ($column['classes']) {
-						foreach ($column['classes'] as $class) {
+				foreach ($column['data'] as $cell) {
+					if ($cell['classes'] && in_array('change-indicator', $cell['classes'])) {
+						$item = new CDiv(new CSvgArrow($cell['data']));
+					}
+					else {
+						// Other blocks: value, decimals and units.
+						$item = new CDiv($cell['data']);
+					}
+
+					if ($cell['classes']) {
+						foreach ($cell['classes'] as $class) {
 							$item->addClass($class);
 						}
 					}
 
-					if ($column['styles']) {
-						$cnt = count($column['styles']);
+					if ($cell['styles']) {
+						$cnt = count($cell['styles']);
 						$i = 0;
 
-						foreach ($column['styles'] as $style => $value) {
+						foreach ($cell['styles'] as $style => $value) {
 							$item->addStyle($style.': '.$value.(($i + 1) != $cnt ? '; ' : ''));
 							$i++;
 						}
 					}
 
-					$items[$key]->addItem($item);
+					// To do: use $cell['value_type'] variable to truncate string blocks. Either CSS class or style.
+					$main->addItem($item);
 				}
+
+				$items[$key]->addItem($main);
+			}
+			else {
+				// Individual blocks like description and time.
+				$item = new CDiv($column['data']);
+
+				if ($column['classes']) {
+					foreach ($column['classes'] as $class) {
+						$item->addClass($class);
+					}
+				}
+
+				if ($column['styles']) {
+					$cnt = count($column['styles']);
+					$i = 0;
+
+					foreach ($column['styles'] as $style => $value) {
+						$item->addStyle($style.': '.$value.(($i + 1) != $cnt ? '; ' : ''));
+						$i++;
+					}
+				}
+
+				$items[$key]->addItem($item);
 			}
 		}
 	}
