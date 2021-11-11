@@ -326,6 +326,7 @@ char	*zbx_create_persistent_server_directory(const char *base_path, const char *
 	if (SUCCEED != create_persistent_directory(server_dir_name, &err_msg))
 	{
 		*error = zbx_dsprintf(*error, "cannot create directory \"%s\": %s", server_dir_name, err_msg);
+		zbx_free(server_dir_name);
 		zbx_free(err_msg);
 		return NULL;
 	}
@@ -333,6 +334,7 @@ char	*zbx_create_persistent_server_directory(const char *base_path, const char *
 	if (0 != access(server_dir_name, R_OK | W_OK | X_OK))
 	{
 		*error = zbx_dsprintf(*error, "insufficient access rights to directory \"%s\"", server_dir_name);
+		zbx_free(server_dir_name);
 		return NULL;
 	}
 
