@@ -3632,6 +3632,102 @@ out:
 #undef PREV
 #undef LAST
 
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_BASELINE                                                *
+ *                                                                            *
+ * Purpose: evaluate baseline* functions for the item                         *
+ *                                                                            *
+ * Parameters: value      - [OUT] the function result                         *
+ *             item       - [IN] item (performance metric)                    *
+ *             func       - [IN] the baseline function to evaluate            *
+ *                               (wma, dev)                                   *
+ *             parameters - [IN] function parameters                          *
+ *             ts         - [IN] the historical time when function must be    *
+ *                               evaluated                                    *
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	evaluate_BASELINE(zbx_variant_t *value, DC_ITEM *item, const char *func, const char *parameters,
+		const zbx_timespec_t *ts, char **error)
+{
+	int			ret = FAIL;
+	char			*period = NULL, *seasons = NULL;
+	zbx_vector_dbl_t	values;
+	double			value_dbl;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_dbl_create(&values);
+
+	if (2 != num_param(parameters))
+	{
+		*error = zbx_strdup(*error, "invalid number of parameters");
+		goto out;
+	}
+
+	if (SUCCEED != get_function_parameter_str(parameters, 1, &period))
+	{
+		*error = zbx_strdup(*error, "invalid second parameter");
+		goto out;
+	}
+
+	if (SUCCEED != get_function_parameter_str(parameters, 2, &seasons))
+	{
+		*error = zbx_strdup(*error, "invalid second parameter");
+		goto out;
+	}
+
+	if (0 == strcmp(func, "wma"))
+	{
+		int	i;
+
+		if (SUCCEED != zbx_baseline_get_data(item->itemid, item->value_type, ts->sec, period, seasons, 1,
+				&values, error))
+		{
+			goto out;
+		}
+
+		value_dbl = 0;
+
+		for (i = 0; i < values.values_num; i++)
+			value_dbl += values.values[i] * (values.values_num - i);
+
+		value_dbl /= values.values_num * (values.values_num + 1) / 2;
+	}
+	else if (0 == strcmp(func, "dev"))
+	{
+		if (SUCCEED != zbx_baseline_get_data(item->itemid, item->value_type, ts->sec, period, seasons, 0,
+				&values, error))
+		{
+			goto out;
+		}
+
+		if (SUCCEED != zbx_eval_calc_stddevpop(&values, &value_dbl, error))
+			goto out;
+	}
+	else
+	{
+		*error = zbx_strdup(*error, "unknown baseline function");
+		goto out;
+	}
+
+	zbx_variant_set_dbl(value, value_dbl);
+
+	ret = SUCCEED;
+out:
+	zbx_free(seasons);
+	zbx_free(period);
+
+	zbx_vector_dbl_destroy(&values);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
 static void	history_to_dbl_vector(const zbx_history_record_t *v, int n, unsigned char value_type,
 		zbx_vector_dbl_t *values)
 {
@@ -3857,6 +3953,10 @@ int	evaluate_function2(zbx_variant_t *value, DC_ITEM *item, const char *function
 	{
 		ret = evaluate_CHANGECOUNT(value, item, parameter, ts, error);
 	}
+	else if (0 == strncmp(function, "baseline", 8))
+	{
+		ret = evaluate_BASELINE(value, item, function + 8, parameter, ts, error);
+	}
 	else
 	{
 		*error = zbx_strdup(*error, "function is not supported");
@@ -3892,7 +3992,8 @@ int	zbx_is_trigger_function(const char *name, size_t len)
 			"pi", "e", "expm1", "atan2", "first", "kurtosis", "mad", "skewness", "stddevpop", "stddevsamp",
 			"sumofsquares", "varpop", "varsamp", "ascii", "bitlength", "char", "concat", "insert", "lcase",
 			"left", "ltrim", "bytelength", "repeat", "replace", "right", "rtrim", "mid", "trim", "between",
-			"in", "bitor", "bitxor", "bitnot", "bitlshift", "bitrshift", NULL};
+			"in", "bitor", "bitxor", "bitnot", "bitlshift", "bitrshift", "baselinewma", "baselinedev",
+			NULL};
 	char	**ptr;
 
 	for (ptr = functions; NULL != *ptr; ptr++)

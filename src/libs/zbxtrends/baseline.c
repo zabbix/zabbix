@@ -21,6 +21,27 @@
 #include "zbxtrends.h"
 #include "log.h"
 
+/******************************************************************************
+ *                                                                            *
+ * Function: baseline_get_common_data                                         *
+ *                                                                            *
+ * Purpose: get baseline data for common period/season combinations           *
+ *                                                                            *
+ * Parameters: itemid      - [IN] the item identifier                         *
+ *             table       - [IN] the trends table name                       *
+ *             now         - [IN] the current timestmap                       *
+ *             period      - [IN] the data period                             *
+ *             season_num  - [IN] the number of seasons                       *
+ *             season_unit - [IN] the season time unit                        *
+ *             skip        - [IN] how many data periods to skip               *
+ *             values      - [OUT] the average data period value in each      *
+ *                                 season                                     *
+ *             error       - [OUT] the error message if parsing failed        *
+ *                                                                            *
+ * Return value: SUCCEED - data were retrieved successfully                   *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	baseline_get_common_data(zbx_uint64_t itemid, const char *table, time_t now, const char *period,
 		int season_num, zbx_time_unit_t season_unit, int skip, zbx_vector_dbl_t *values, char **error)
 {
@@ -56,6 +77,26 @@ static int	baseline_get_common_data(zbx_uint64_t itemid, const char *table, time
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: baseline_get_isoyear_data                                        *
+ *                                                                            *
+ * Purpose: get baseline data for week based periods in a year                *
+ *                                                                            *
+ * Parameters: itemid     - [IN] the item identifier                          *
+ *             table      - [IN] the trends table name                        *
+ *             now        - [IN] the current timestmap                        *
+ *             period     - [IN] the data period                              *
+ *             season_num - [IN] the number of seasons                        *
+ *             skip       - [IN] how many data periods to skip                *
+ *             values     - [OUT] the average data period value in each       *
+ *                                season                                      *
+ *             error      - [OUT] the error message if parsing failed         *
+ *                                                                            *
+ * Return value: SUCCEED - data were retrieved successfully                   *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	baseline_get_isoyear_data(zbx_uint64_t itemid, const char *table, time_t now, const char *period,
 		int season_num, int skip, zbx_vector_dbl_t *values, char **error)
 {
@@ -108,6 +149,31 @@ static int	baseline_get_isoyear_data(zbx_uint64_t itemid, const char *table, tim
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_baseline_get_data                                            *
+ *                                                                            *
+ * Purpose: get baseline data for the specified period                        *
+ *                                                                            *
+ * Parameters: itemid     - [IN] the item identifier                          *
+ *             value_type - [IN] the item value type                          *
+ *             now        - [IN] the current timestmap                        *
+ *             period     - [IN] the data period                              *
+ *             seasons    - [IN] the seasons                                  *
+ *             skip       - [IN] how many data periods to skip                *
+ *             values     - [OUT] the average data period value in each       *
+ *                                season                                      *
+ *             error      - [OUT] the error message if parsing failed         *
+ *                                                                            *
+ * Return value: SUCCEED - data were retrieved successfully                   *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: By default the first period is included in the data. So the      *
+ *           returned vector contains data for this period + data from        *
+ *           seasons. To retrieve only data from seasons use pass 1 to skip   *
+ *           parameter.                                                       *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_baseline_get_data(zbx_uint64_t itemid, unsigned char value_type, time_t now, const char *period,
 		const char *seasons, int skip, zbx_vector_dbl_t *values, char **error)
 {
@@ -133,7 +199,10 @@ int	zbx_baseline_get_data(zbx_uint64_t itemid, unsigned char value_type, time_t 
 		return FAIL;
 
 	if (FAIL == zbx_tm_parse_period(seasons, &len, &season_num, &season_unit, error))
+	{
+		*error = zbx_strdup(*error, "invalid seasons parameter");
 		return FAIL;
+	}
 
 	if (ZBX_TIME_UNIT_MONTH == season_unit && ZBX_TIME_UNIT_WEEK == period_unit)
 	{
