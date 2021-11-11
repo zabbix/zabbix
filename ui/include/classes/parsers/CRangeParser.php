@@ -67,7 +67,7 @@ class CRangeParser extends CParser {
 	 * lldmacros    Allow lldmacros in ranges.
 	 * with_minus   Allow negative ranges.
 	 * with_float   Allow float number ranges.
-	 * with_suffix  Allow number ranges with suffix, supported suffixes see CNumberParser::$suffixes.
+	 * with_suffix  Allow number ranges with size and time suffix, supported suffixes see CNumberParser::$suffixes.
 	 *
 	 * @var array
 	 */
@@ -87,7 +87,8 @@ class CRangeParser extends CParser {
 		$this->number_parser = new CNumberParser([
 			'with_minus' => $this->options['with_minus'],
 			'with_float' => $this->options['with_float'],
-			'with_suffix' => $this->options['with_suffix']
+			'with_size_suffix' => $this->options['with_suffix'],
+			'with_time_suffix' => $this->options['with_suffix']
 		]);
 
 		if ($this->options['usermacros']) {

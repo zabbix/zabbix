@@ -225,9 +225,11 @@ class CHistFunctionValidator extends CValidator {
 					break;
 
 				case 'number':
-					$with_suffix = array_key_exists('with_suffix', $rule) && $rule['with_suffix'];
-
-					$parser = new CNumberParser(['with_minus' => true, 'with_suffix' => $with_suffix]);
+					$with_suffix = (array_key_exists('with_suffix', $rule) && $rule['with_suffix']);
+					$parser = new CNumberParser([
+						'with_size_suffix' => $with_suffix,
+						'with_time_suffix' => $with_suffix
+					]);
 
 					if ($parser->parse($param_match_unquoted) != CParser::PARSE_SUCCESS) {
 						return false;
@@ -250,13 +252,20 @@ class CHistFunctionValidator extends CValidator {
 					break;
 
 				case 'time':
-					$with_year = array_key_exists('with_year', $rule) && $rule['with_year'];
+					$parser = new CNumberParser([
+						'with_time_suffix' => true,
+						'with_year' => (array_key_exists('with_year', $rule) && $rule['with_year'])
+					]);
+
+					if ($parser->parse($param_match_unquoted) != CParser::PARSE_SUCCESS) {
+						return false;
+					}
+
+					$sec = $parser->calcValue();
 					$min = array_key_exists('min', $rule) ? $rule['min'] : ZBX_MIN_INT32;
 					$max = array_key_exists('max', $rule) ? $rule['max'] : ZBX_MAX_INT32;
 
-					$sec = timeUnitToSeconds($param_match_unquoted, $with_year);
-
-					if ($sec === null || $sec < $min || $sec > $max) {
+					if ($sec < $min || $sec > $max) {
 						return false;
 					}
 
