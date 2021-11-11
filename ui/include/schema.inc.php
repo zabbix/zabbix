@@ -2745,8 +2745,7 @@ return [
 			],
 			'dbversion_status' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 1024,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => ''
 			],
 			'hk_events_service' => [
