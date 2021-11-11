@@ -335,15 +335,15 @@ class testDashboardPages extends CWebTest {
 
 		// Check popup-menu options.
 		$this->query('id:dashboard-add')->one()->click();
-		$add_menu = CPopupMenuElement::find()->one()->waitUntilVisible();
+		$add_menu = CPopupMenuElement::find()->waitUntilVisible()->one();
 
 		// Check add page form.
 		$add_menu->select('Add page');
 		$this->checkPageProperties();
 
 		// Check page popup-menu options in edit mode.
-		$this->openPageMenu('Page 1');
-		$page_menu = CPopupMenuElement::find()->one()->waitUntilVisible();
+		$this->getPageMenu('Page 1');
+		$page_menu = CPopupMenuElement::find()->waitUntilVisible()->one();
 		$page_menu->hasTitles('ACTIONS');
 		$page_popup_items = [
 			'Copy' => true,
@@ -371,7 +371,7 @@ class testDashboardPages extends CWebTest {
 		}
 
 		// Check page popup-menu options in created dashboard.
-		$this->openPageMenu('First_page_name');
+		$this->getPageMenu('First_page_name');
 		$page_menu->hasTitles('ACTIONS');
 		$this->assertEquals(['Copy', 'Properties'], $page_menu->getItems()->asText());
 
@@ -384,11 +384,12 @@ class testDashboardPages extends CWebTest {
 	 * Copy dashboard page to same dashboard and another one.
 	 */
 	public function testDashboardPages_CopyPastePage() {
+		$query_pageid = 'SELECT dashboard_pageid FROM dashboard_page WHERE dashboardid=';
+		$query_widgets = 'SELECT type, name, x, y, width, height, view_mode FROM widget WHERE dashboard_pageid=';
+		$query_widgetid = 'SELECT widgetid FROM widget WHERE dashboard_pageid=';
+		$query_widgetfields = 'SELECT type, name, value_int, value_str, value_groupid FROM widget_field WHERE widgetid=';
+
 		foreach ([self::$dashboardid_copy, self::$dashboardid_paste] as $dashboardid) {
-			$query_pageid = 'SELECT dashboard_pageid FROM dashboard_page WHERE dashboardid=';
-			$query_widgets = 'SELECT type, name, x, y, width, height, view_mode FROM widget WHERE dashboard_pageid=';
-			$query_widgetid = 'SELECT widgetid FROM widget WHERE dashboard_pageid=';
-			$query_widgetfields = 'SELECT type, name, value_int, value_str, value_groupid FROM widget_field WHERE widgetid=';
 			$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid_copy)->waitUntilReady();
 			$dashboard = CDashboardElement::find()->one();
 
@@ -411,11 +412,11 @@ class testDashboardPages extends CWebTest {
 			// Save dashboard page names before copy and paste page.
 			$titles_before = $this->getPagesTitles();
 			$this->query('id:dashboard-add')->one()->click();
-			CPopupMenuElement::find()->one()->waitUntilVisible()->select('Paste page');
+			CPopupMenuElement::find()->waitUntilVisible()->one()->select('Paste page');
 			$dashboard->waitUntilReady();
 
 			// Copied page added.
-			array_push($titles_before, 'first_page_copy');
+			$titles_before[] = 'first_page_copy';
 
 			// Assert that new page added.
 			$this->assertEquals($titles_before, $this->getPagesTitles());
@@ -541,14 +542,14 @@ class testDashboardPages extends CWebTest {
 	 */
 	public function testDashboardPages_MaximumPageError() {
 		$sql = 'SELECT * FROM dashboard_page WHERE dashboardid ='.zbx_dbstr(self::$dashboardid_50_pages);
-		$hash_before = CDBHelper::getHash($sql);
+		$hash = CDBHelper::getHash($sql);
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid_50_pages)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 		$dashboard->edit()->addPage();
 		$this->assertMessage(TEST_BAD, 'Cannot add dashboard page: maximum number of 50 dashboard pages has been added.');
 		$dashboard->save();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
-		$this->assertEquals(CDBHelper::getHash($sql), $hash_before);
+		$this->assertEquals(CDBHelper::getHash($sql), $hash);
 	}
 
 	/**
@@ -567,6 +568,7 @@ class testDashboardPages extends CWebTest {
 			while ($navigation->isClickable()) {
 				$navigation->click();
 			}
+
 			if ($navigation === $next_page) {
 				$this->assertTrue($next_page->isEnabled(false));
 				$this->assertTrue($previous_page->isEnabled());
@@ -599,8 +601,8 @@ class testDashboardPages extends CWebTest {
 		$this->assertEquals(['Page 1'], $this->getPagesTitles());
 
 		// Check that Delete option is disabled when one page left.
-		$this->openPageMenu('Page 1');
-		$page_menu = CPopupMenuElement::find()->one()->waitUntilVisible();
+		$this->getPageMenu('Page 1');
+		$page_menu = CPopupMenuElement::find()->waitUntilVisible()->one();
 		$this->assertTrue($page_menu->query('xpath:.//a[@aria-label="Actions, Delete"]')->one()->isEnabled(false));
 		$dashboard->save();
 		$this->assertEquals(['Page 1'], $this->getPagesTitles());
@@ -625,11 +627,12 @@ class testDashboardPages extends CWebTest {
 			$dashboard->addPage();
 			COverlayDialogElement::find()->waitUntilReady()->one();
 
+			$form = $page_dialog->query('name:dashboard_page_properties_form')->asForm()->one();
 			if ($page_name === 'not_page_number') {
-				$page_dialog->query('name:dashboard_page_properties_form')->asForm()->one()->fill(['Name' => 'not_page_number']);
+				$form->fill(['Name' => 'not_page_number']);
 			}
 			else {
-				$page_dialog->query('name:dashboard_page_properties_form')->asForm()->one()->checkValue(['Name' => '']);
+				$form->checkValue(['Name' => '']);
 			}
 
 			$page_dialog->query('button:Apply')->one()->click();
@@ -664,7 +667,7 @@ class testDashboardPages extends CWebTest {
 			foreach ($widget_name as $widget) {
 				$this->assertEquals($widget.' page kiosk', $dashboard->getWidgets()->last()->getHeaderText());
 				$this->query('xpath://button[contains(@class, '.CXPathHelper::escapeQuotes($direction).')]')
-						->one()->click()->waitUntilReady();
+						->one()->click();
 			}
 		}
 
@@ -717,7 +720,7 @@ class testDashboardPages extends CWebTest {
 	 * @param string $page_name		page name where to open menu
 	 * @param integer $index		number of page that has duplicated name
 	 */
-	private function openPageMenu($page_name, $index = 1) {
+	private function getPageMenu($page_name, $index = 1) {
 		$selector = '//ul[@class="sortable-list"]//span[@title='.CXPathHelper::escapeQuotes($page_name);
 
 		$value = $this->query('xpath:('.$selector.']/../../div)['.$index.']')->one()->getAttribute('class');
@@ -749,8 +752,8 @@ class testDashboardPages extends CWebTest {
 	 * @param integer $index		number of page that has duplicated name
 	 */
 	private function selectPageAction($page_name, $menu_item, $index = 1) {
-		$this->openPageMenu($page_name, $index);
-		CPopupMenuElement::find()->one()->waitUntilVisible()->select($menu_item);
+		$this->getPageMenu($page_name, $index);
+		CPopupMenuElement::find()->waitUntilVisible()->one()->select($menu_item);
 	}
 
 	/**
