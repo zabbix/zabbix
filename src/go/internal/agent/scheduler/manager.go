@@ -253,7 +253,7 @@ func (m *Manager) processUserParamQueue(now time.Time) {
 	seconds := now.Unix()
 	for p := m.pluginQueue.Peek(); p != nil; p = m.pluginQueue.Peek() {
 		if task := p.peekTask(); task != nil {
-			if task.getScheduled().Unix() > seconds && p.usrprm == 0 {
+			if task.getScheduled().Unix() > seconds && !p.usrprm {
 				break
 			}
 
@@ -261,7 +261,7 @@ func (m *Manager) processUserParamQueue(now time.Time) {
 			if !p.hasCapacity() {
 				// plugin has no free capacity for the next task, keep the plugin out of queue
 				// until active tasks finishes and the required capacity is released
-				if p.usrprm == 1 {
+				if p.usrprm {
 					m.pluginQueue.Remove(p)
 				}
 				continue
@@ -273,16 +273,16 @@ func (m *Manager) processUserParamQueue(now time.Time) {
 			task.perform(m)
 
 			// if the plugin has capacity for the next task put it back into plugin queue
-			if !p.hasCapacity() && p.usrprm == 0 {
+			if !p.hasCapacity() && !p.usrprm {
 				continue
-			} else if p.usrprm == 1 {
+			} else if p.usrprm {
 				m.pluginQueue.Remove(p)
 			} else {
 				heap.Push(&m.pluginQueue, p)
 			}
 		} else {
 			// plugins with empty task queue should not be in Manager queue
-			if p.usrprm == 1 {
+			if p.usrprm {
 				m.pluginQueue.Remove(p)
 			} else {
 				heap.Pop(&m.pluginQueue)
@@ -425,12 +425,13 @@ run:
 				plugin.ClearUserParamMetrics()
 
 				for i, plg := range m.plugins {
-					if plg.usrprm == 1 {
+					if plg.usrprm {
 						delete(m.plugins, i)
 					}
 				}
 
-				if keys, rerr = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters, agent.Options.UserParameterDir); rerr != nil {
+				if keys, rerr = agent.InitUserParameterPlugin(agent.Options.UserParameter,
+					agent.Options.UnsafeUserParameters, agent.Options.UserParameterDir); rerr != nil {
 					log.Warningf("cannot reload user parameters")
 					continue
 				}

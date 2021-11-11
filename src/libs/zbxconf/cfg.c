@@ -208,6 +208,7 @@ trim:
  *             cfg     - pointer to configuration parameter structure         *
  *             level   - a level of included file                             *
  *             strict  - treat unknown parameters as error                    *
+ *             noexit  - on error return FAIL instead of EXIT_FAILURE         *
  *                                                                            *
  * Return value: SUCCEED - parsed successfully                                *
  *               FAIL - error processing directory                            *

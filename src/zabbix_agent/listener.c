@@ -41,7 +41,7 @@ extern ZBX_THREAD_LOCAL int		server_num, process_num;
 #include "../libs/zbxcrypto/tls_tcp_active.h"
 
 #ifndef _WINDOWS
-static volatile sig_atomic_t	need_update_userparam = 0;
+static volatile sig_atomic_t	need_update_userparam;
 #endif
 
 static void	process_listener(zbx_socket_t *s)

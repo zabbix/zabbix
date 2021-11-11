@@ -51,7 +51,7 @@ static ZBX_THREAD_LOCAL char			*session_token;
 static ZBX_THREAD_LOCAL zbx_uint64_t		last_valueid = 0;
 
 #ifndef _WINDOWS
-static volatile sig_atomic_t	need_update_userparam = 0;
+static volatile sig_atomic_t	need_update_userparam;
 #endif
 
 static void	init_active_metrics(void)
