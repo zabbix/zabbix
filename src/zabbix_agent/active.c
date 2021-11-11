@@ -933,6 +933,8 @@ out:
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 		zbx_write_persistent_files(prep_vec);
 		zbx_clean_pre_persistent_elements(prep_vec);
+#else
+		ZBX_UNUSED(prep_vec);
 #endif
 		/* free buffer */
 		for (i = 0; i < buffer.count; i++)

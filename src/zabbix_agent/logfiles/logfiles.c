@@ -2203,6 +2203,9 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 						zbx_update_prep_vec_data(logfile, processed_size,
 								prep_vec->values + prep_vec_idx);
 					}
+#else
+					ZBX_UNUSED(persistent_file_name);
+					ZBX_UNUSED(prep_vec);
 #endif
 					if (ZBX_REGEXP_MATCH == (regexp_ret = zbx_match_log_rec(regexps, value, pattern,
 							(0 == is_count_item) ? output_template : NULL,
@@ -3836,12 +3839,20 @@ static int	init_persistent_dir_parameter(const char *server, unsigned short port
 	/* (here counting starts from 0) */
 
 	const int	persistent_dir_param_nr = (0 == is_count_item) ? 8 : 7;
-	char		*persistent_dir, *persistent_serv_dir;
+	char		*persistent_dir;
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+	char		*persistent_serv_dir;
+#endif
 
 	if (NULL == (persistent_dir = get_rparam(request, persistent_dir_param_nr)) || '\0' == *persistent_dir)
 		return SUCCEED;
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
+	ZBX_UNUSED(server);
+	ZBX_UNUSED(port);
+	ZBX_UNUSED(item_key);
+	ZBX_UNUSED(persistent_file_name);
+
 	*error = zbx_dsprintf(*error, "The %s parameter (persistent directory) is not supported on Microsoft Windows.",
 			(8 == persistent_dir_param_nr) ? "ninth" : "eighth");
 	return FAIL;
