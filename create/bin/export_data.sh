@@ -47,20 +47,30 @@ for tbl_line in `grep "^TABLE.*${dbflag}" "${schema}"`; do
 	refs=()
 	depth=()
 
-	for fld_line in `sed -n "/^TABLE|${table}|/,/^$/ p" "${schema}" | grep "^FIELD" | grep -v "ZBX_NODATA" | sed 's/[ \t]//g'`; do
+	for fld_line in `sed -n "/^TABLE|${table}|/,/^$/ p" "${schema}" | grep "^FIELD" | sed 's/[ \t]//g'`; do
 		fld_line=${fld_line#*|}		# FIELD
 		field=${fld_line%%|*}
 		fld_line=${fld_line#*|}		# <field_name>
+		field_type=${fld_line%%|*}
 		fld_line=${fld_line#*|}		# <field_type>
 		fld_line=${fld_line#*|}		# <default>
 		fld_line=${fld_line#*|}		# <not_null>
+		flags=${fld_line%%|*}
 		fld_line=${fld_line#*|}		# <flags>
 		fld_line=${fld_line#*|}		# <index #>
 		ref_table=${fld_line%%|*}
 		fld_line=${fld_line#*|}		# <ref_table>
 		ref_field=${fld_line%%|*}
 
-		fields="${fields}${delim}replace(replace(replace(${field},'|','&pipe;'),'\r\n','&eol;'),'\n','&bsn;') as ${field}"
+		if [[ "$flags" =~ ZBX_NODATA ]]; then
+			if [[ "$field_type" =~ ^t_(shorttext|text|longtext)$ ]]; then
+				fields="${fields}${delim} '' as ${field}"
+			else
+				continue
+			fi
+		else
+			fields="${fields}${delim}replace(replace(replace(${field},'|','&pipe;'),'\r\n','&eol;'),'\n','&bsn;') as ${field}"
+		fi
 		delim=','
 
 		if [[ ${ref_table} == ${table} ]]; then
