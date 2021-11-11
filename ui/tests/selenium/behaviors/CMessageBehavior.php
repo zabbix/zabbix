@@ -40,11 +40,11 @@ class CMessageBehavior extends CBehavior {
 		}
 		elseif ($expected === TEST_BAD) {
 			$message->isBad();
-		} 
+		}
 		else {
 			$message->isWarning();
 		}
-		
+
 		if ($title !== null) {
 			$this->test->assertEquals($title, $message->getTitle(), 'Message title and the expected title do not match.');
 		}

@@ -48,7 +48,7 @@ class CMessageElement extends CElement {
 	public function isBad() {
 		return in_array('msg-bad', explode(' ', $this->getAttribute('class')));
 	}
-	
+
 	/**
 	 * Check if message is warning.
 	 *
@@ -57,7 +57,7 @@ class CMessageElement extends CElement {
 	public function isWarning() {
 		return in_array('msg-warning', explode(' ', $this->getAttribute('class')));
 	}
-	
+
 
 	/**
 	 * Get message title.
