@@ -3166,9 +3166,14 @@ form.is-loading {
 .grid-templates-container {
   background-color: #2b2b2b;
   border: 1px solid #303030;
-  padding: 5px; }
-  .grid-templates-container > table {
-    margin-bottom: 5px; }
+  padding: 5px;
+  display: inline-block; }
+  .grid-templates-container > table.table-forms {
+    margin-bottom: 5px;
+    display: inline-table;
+    width: 443px; }
+  .grid-templates-container > table tr > *:last-child {
+    min-width: 1%; }
 
 .form-btns button {
   margin: 10px 6px 5px; }

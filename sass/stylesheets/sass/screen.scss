@@ -1337,9 +1337,16 @@ form {
 	background-color: $ui-bg-color;
 	border: 1px solid $ui-border-color;
 	padding: 5px;
+	display: inline-block;
 
-	> table {
+	> table.table-forms {
 		margin-bottom: 5px;
+		display: inline-table;
+		width: 443px;
+	}
+
+	> table tr > *:last-child {
+		min-width: 1%;
 	}
 }
 

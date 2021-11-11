@@ -62,13 +62,13 @@ $template_tab = (new CFormList('hostlist'))
 		(new CTextBox('visiblename', $data['visible_name'], false, 128))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 
-$template_field_items = [];
+$templates_field_items = [];
 
 if ($data['linked_templates']) {
 	$linked_templates= (new CTable())
 		->setId('linked-template')
-		->setHeader([_('Name'), _('Action')])
-		->addStyle('width: 100%;');
+		->addClass(ZBX_STYLE_TABLE_FORMS)
+		->setHeader([_('Name'), _('Action')]);
 
 	foreach ($data['linked_templates'] as $template) {
 		$linked_templates->addItem(
@@ -117,10 +117,10 @@ if ($data['linked_templates']) {
 		], null, 'conditions_'.$template['templateid']);
 	}
 
-	$template_field_items[] = $linked_templates;
+	$templates_field_items[] = $linked_templates;
 }
 
-$template_field_items[] = (new CMultiSelect([
+$templates_field_items[] = (new CMultiSelect([
 	'name' => 'add_templates[]',
 	'object_name' => 'templates',
 	'data' => $data['add_templates'],
@@ -135,16 +135,15 @@ $template_field_items[] = (new CMultiSelect([
 			'disableids' => array_column($data['linked_templates'], 'templateid')
 		]
 	]
-]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+]))->setWidth($templates_field_items ? ZBX_TEXTAREA_STANDARD_WIDTH_WRAPPED : ZBX_TEXTAREA_STANDARD_WIDTH);
 
 $template_tab
 	->addRow(
 		new CLabel(_('Templates')),
-		(count($template_field_items) > 1)
-			? (new CDiv($template_field_items))
+		(count($templates_field_items) > 1)
+			? (new CDiv($templates_field_items))
 				->addClass(ZBX_STYLE_GRID_TEMPLATES_CONTAINER)
-				->setWidth(ZBX_GRID_TEMPLATES_WIDTH)
-			: $template_field_items
+			: $templates_field_items
 	)
 	->addRow((new CLabel(_('Groups'), 'groups__ms'))->setAsteriskMark(),
 		(new CMultiSelect([

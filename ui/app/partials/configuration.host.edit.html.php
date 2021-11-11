@@ -109,8 +109,7 @@ if ($host_is_discovered) {
 		$linked_templates = (new CTable())
 			->setHeader([_('Name')])
 			->addClass(ZBX_STYLE_TABLE_FORMS)
-			->setId('linked-template')
-			->addStyle('width: 100%;');
+			->setId('linked-template');
 
 		foreach ($data['host']['parentTemplates'] as $template) {
 			if ($data['allowed_ui_conf_templates']
@@ -143,8 +142,7 @@ else {
 		$linked_templates = (new CTable())
 			->setHeader([_('Name'), _('Action')])
 			->addClass(ZBX_STYLE_TABLE_FORMS)
-			->setId('linked-template')
-			->setAttribute('style', 'width: 100%;');
+			->setId('linked-template');
 
 		foreach ($data['host']['parentTemplates'] as $template) {
 			if ($data['allowed_ui_conf_templates']
@@ -202,7 +200,7 @@ else {
 				'disableids' => array_column($data['host']['parentTemplates'], 'templateid')
 			]
 		]
-	]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+	]))->setWidth($templates_field_items ? ZBX_TEXTAREA_STANDARD_WIDTH_WRAPPED : ZBX_TEXTAREA_STANDARD_WIDTH);
 }
 
 $host_tab
@@ -212,7 +210,6 @@ $host_tab
 			(count($templates_field_items) > 1)
 				? (new CDiv($templates_field_items))
 					->addClass(ZBX_STYLE_GRID_TEMPLATES_CONTAINER)
-					->setWidth(ZBX_GRID_TEMPLATES_WIDTH)
 				: $templates_field_items
 		))
 	])
@@ -231,7 +228,8 @@ $host_tab
 						'srcfld1' => 'groupid',
 						'dstfrm' => $host_form->getName(),
 						'dstfld1' => 'groups_',
-						'editable' => true
+						'editable' => true,
+						'disableids' => array_column($data['groups_ms'], 'id')
 					]
 				]
 			]))

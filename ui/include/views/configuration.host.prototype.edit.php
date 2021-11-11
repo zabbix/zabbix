@@ -84,8 +84,8 @@ $templates_field_items = [];
 if ($host_prototype['templateid']) {
 	if ($host_prototype['templates']) {
 		$linked_templates = (new CTable())
+			->addClass(ZBX_STYLE_TABLE_FORMS)
 			->setId('linked-template')
-			->setAttribute('style', 'width: 100%;')
 			->setHeader([_('Name')]);
 
 		foreach ($host_prototype['templates'] as $template) {
@@ -120,8 +120,8 @@ if ($host_prototype['templateid']) {
 else {
 	if ($host_prototype['templates']) {
 		$linked_templates = (new CTable())
+			->addClass(ZBX_STYLE_TABLE_FORMS)
 			->setId('linked-template')
-			->setAttribute('style', 'width: 100%;')
 			->setHeader([_('Name'), _('Action')]);
 
 		foreach ($host_prototype['templates'] as $template) {
@@ -172,7 +172,7 @@ else {
 				'disableids' => array_column($host_prototype['templates'], 'templateid')
 			]
 		]
-	]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+	]))->setWidth($templates_field_items ? ZBX_TEXTAREA_STANDARD_WIDTH_WRAPPED : ZBX_TEXTAREA_STANDARD_WIDTH);
 }
 
 $host_tab
@@ -180,7 +180,6 @@ $host_tab
 		(count($templates_field_items) > 1)
 			? (new CDiv($templates_field_items))
 				->addClass(ZBX_STYLE_GRID_TEMPLATES_CONTAINER)
-				->setWidth(ZBX_GRID_TEMPLATES_WIDTH)
 			: $templates_field_items
 	);
 

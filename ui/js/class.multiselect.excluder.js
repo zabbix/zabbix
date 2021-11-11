@@ -77,4 +77,4 @@ class CMultiselectEntryExcluder {
 
 		return templateids;
 	}
-};
+}

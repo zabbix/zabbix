@@ -180,6 +180,14 @@
 		});
 
 		new CMultiselectEntryExcluder('add_templates_', ['templates', 'add_templates', 'clear_templates']);
-		new CMultiselectEntryExcluder('group_links_', ['group_links']);
+
+		if (document.getElementById('groups_') !== null) {
+			// Template groups
+			new CMultiselectEntryExcluder('groups_', ['groups']);
+		}
+		else if (document.getElementById('group_links_') !== null) {
+			// Host prototype groups
+			new CMultiselectEntryExcluder('group_links_', ['group_links']);
+		}
 	});
 </script>
