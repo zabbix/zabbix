@@ -51,36 +51,23 @@ class CControllerWidgetItemView extends CControllerWidget {
 			'itemids' => $fields['itemid'],
 			'webitems' => true,
 			'filter' => [
-				'status' => [ITEM_STATUS_ACTIVE],
-				// Log items are not supported.
-				'value_type' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_UINT64,
-					ITEM_VALUE_TYPE_TEXT
-				]
+				'status' => [ITEM_STATUS_ACTIVE]
 			],
 			'preservekeys' => true
 		];
 
 		$show = array_flip($fields['show']);
 
-		// If there is a need to show description and description is not overridden, select it from item.
-		if (array_key_exists(WIDGET_ITEM_SHOW_DESCRIPTION, $show)) {
-			if ($fields['description'] === '') {
-				$options['output'][] = 'name';
-			}
+		// Regardless of value showing, we need this for history data and change indicator.
+		$options['output'] = ['value_type'];
 
-			// If description contains user macros, we need "itemid" and "hostid" to resolve them.
+		// If description contains user macros, we need "itemid" and "hostid" to resolve them.
+		if (array_key_exists(WIDGET_ITEM_SHOW_DESCRIPTION, $show)) {
 			$options['output'] = array_merge($options['output'], ['itemid', 'hostid']);
 		}
 
-		if (array_key_exists(WIDGET_ITEM_SHOW_VALUE, $show)) {
-			// In case description is not shown, we still need value_type for history data.
-			if (!in_array('value_type', $options['output'])) {
-				$options['output'][] = 'value_type';
-			}
-
-			if ($fields['units_show'] == 1) {
-				$options['output'][] = 'units';
-			}
+		if (array_key_exists(WIDGET_ITEM_SHOW_VALUE, $show) && $fields['units_show'] == 1) {
+			$options['output'][] = 'units';
 		}
 
 		$items = API::Item()->get($options);
@@ -181,6 +168,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 
 						case ITEM_VALUE_TYPE_STR:
 						case ITEM_VALUE_TYPE_TEXT:
+						case ITEM_VALUE_TYPE_LOG:
 							$value = $last_value;
 
 							// Apply value mapping to string type values (same as in Latest Data).
@@ -225,9 +213,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 			 */
 			if (array_key_exists(WIDGET_ITEM_SHOW_DESCRIPTION, $show)) {
 				// Overwrite item name with the custom description.
-				if ($fields['description'] !== '') {
-					$items[$fields['itemid'][0]]['name'] = $fields['description'];
-				}
+				$items[$fields['itemid'][0]]['name'] = $fields['description'];
 
 				// Do not resolve macros if using template dashboard. Template dashboards only have edit mode.
 				if ($this->getContext() === CWidgetConfig::CONTEXT_DASHBOARD) {
