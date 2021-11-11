@@ -1124,12 +1124,20 @@ static int	DBpatch_5050104(void)
 
 static int	DBpatch_5050105(void)
 {
+#ifdef HAVE_MYSQL
 	return DBdrop_foreign_key("items", 1);
+#else
+	return SUCCEED;
+#endif
 }
 
 static int	DBpatch_5050106(void)
 {
+#ifdef HAVE_MYSQL
 	return DBdrop_index("items", "items_1");
+#else
+	return SUCCEED;
+#endif
 }
 
 static int	DBpatch_5050107(void)
@@ -1137,20 +1145,28 @@ static int	DBpatch_5050107(void)
 #ifdef HAVE_MYSQL
 	return DBcreate_index("items", "items_1", "hostid,key_(764)", 0);
 #else
-	return DBcreate_index("items", "items_1", "hostid,key_", 0);
+	return SUCCEED;
 #endif
 }
 
 static int	DBpatch_5050108(void)
 {
+#ifdef HAVE_MYSQL
 	const ZBX_FIELD	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("items", 1, &field);
+#else
+	return SUCCEED;
+#endif
 }
 
 static int	DBpatch_5050109(void)
 {
+#ifdef HAVE_MYSQL
 	return DBdrop_index("items", "items_8");
+#else
+	return SUCCEED;
+#endif
 }
 
 static int	DBpatch_5050110(void)
@@ -1158,7 +1174,7 @@ static int	DBpatch_5050110(void)
 #ifdef HAVE_MYSQL
 	return DBcreate_index("items", "items_8", "key_(768)", 0);
 #else
-	return DBcreate_index("items", "items_8", "key_", 0);
+	return SUCCEED;
 #endif
 }
 
