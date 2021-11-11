@@ -332,7 +332,7 @@ class CWidgetFormItem extends CWidgetForm {
 		$this->fields[$field_time_color->getName()] = $field_time_color;
 
 		// change indicator up arrow color
-		$field_up_color = (new CWidgetFieldColor('up_color', ''));
+		$field_up_color = (new CWidgetFieldColor('up_color', _('Change indicator')));
 
 		if (array_key_exists('up_color', $this->data)) {
 			$field_up_color->setValue($this->data['up_color']);
@@ -341,7 +341,7 @@ class CWidgetFormItem extends CWidgetForm {
 		$this->fields[$field_up_color->getName()] = $field_up_color;
 
 		// change indicator down arrow color
-		$field_down_color = (new CWidgetFieldColor('down_color', ''));
+		$field_down_color = (new CWidgetFieldColor('down_color', _('Change indicator')));
 
 		if (array_key_exists('down_color', $this->data)) {
 			$field_down_color->setValue($this->data['down_color']);
@@ -350,7 +350,7 @@ class CWidgetFormItem extends CWidgetForm {
 		$this->fields[$field_down_color->getName()] = $field_down_color;
 
 		// change indicator up/down arrow color
-		$field_updown_color = (new CWidgetFieldColor('updown_color', ''));
+		$field_updown_color = (new CWidgetFieldColor('updown_color', _('Change indicator')));
 
 		if (array_key_exists('updown_color', $this->data)) {
 			$field_updown_color->setValue($this->data['updown_color']);
