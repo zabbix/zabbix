@@ -800,16 +800,17 @@ class testFormUserRoles extends CWebTest {
 	 */
 	public function testFormUserRoles_ApiList($data) {
 		$this->page->login()->open('zabbix.php?action=userrole.edit');
+		$selector = 'xpath://div[@id="api_methods_"]/following::button[text()="Select"]';
 		$form = $this->query('id:userrole-form')->waitUntilPresent()->asGridForm()->one();
 		$form->fill($data['fields']);
-		$this->query('xpath://div[@id="api_methods_"]/../div/button')->one()->click();
+		$this->query($selector)->one()->click();
 		$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
 		$this->assertTableDataColumn($data['api_list']);
 		$overlay->query('id:all_records')->asCheckbox()->one()->check();
 		$overlay->query('button:Select')->one()->click();
 
-		// Open the list of API methods and check a that random method is selected and disabled.
-		$this->query('xpath://div[@id="api_methods_"]/../div/button')->one()->click();
+		// Open the list of API methods and check that random method is selected and disabled.
+		$this->query($selector)->one()->click();
 		$overlay->waitUntilReady();
 		$method = $data['api_list'][array_rand($data['api_list'])];
 		$this->assertTrue($overlay->query('name:item['.$method.']')->one()->isAttributePresent(['checked', 'disabled']));
