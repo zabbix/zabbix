@@ -138,6 +138,26 @@ div.dashboard-grid-widget-item {
 
 	.item-value {
 		align-items: baseline;
+		flex-wrap: wrap;
+
+		.units {
+			&.left {
+				margin-right: .3em;
+			}
+
+			&.right {
+				margin-left: .3em;
+			}
+
+			&.top {
+				margin-bottom: .3em;
+			}
+
+			&.top,
+			&.bottom {
+				flex: 0 0 100%;
+			}
+		}
 	}
 
 	.item-description,

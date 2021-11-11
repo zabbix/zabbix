@@ -1475,7 +1475,16 @@ div.dashboard-grid-widget-item {
   div.dashboard-grid-widget-item .bold {
     font-weight: bold; }
   div.dashboard-grid-widget-item .item-value {
-    align-items: baseline; }
+    align-items: baseline;
+    flex-wrap: wrap; }
+    div.dashboard-grid-widget-item .item-value .units.left {
+      margin-right: .3em; }
+    div.dashboard-grid-widget-item .item-value .units.right {
+      margin-left: .3em; }
+    div.dashboard-grid-widget-item .item-value .units.top {
+      margin-bottom: .3em; }
+    div.dashboard-grid-widget-item .item-value .units.top, div.dashboard-grid-widget-item .item-value .units.bottom {
+      flex: 0 0 100%; }
   div.dashboard-grid-widget-item .item-description,
   div.dashboard-grid-widget-item .value,
   div.dashboard-grid-widget-item .decimals,
