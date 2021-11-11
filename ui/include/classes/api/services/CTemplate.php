@@ -487,8 +487,12 @@ class CTemplate extends CHostGeneral {
 				'tag' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('host_tag', 'tag')],
 				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('host_tag', 'value'), 'default' => DB::getDefault('host_tag', 'value')]
 			]],
-			'macros' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['macro']], 'fields' => [
-				'macro' =>				['type' => API_USER_MACRO, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hostmacro', 'macro')],
+			'macros' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['hostmacroid']], 'fields' => [
+				'hostmacroid' =>		['type' => API_ID],
+				'macro' =>				['type' => API_USER_MACRO, 'length' => DB::getFieldLength('hostmacro', 'macro')],
+				'type' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT])],
+				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')],
+				'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')]
 			]]
 		]];
 
@@ -513,7 +517,7 @@ class CTemplate extends CHostGeneral {
 		$this->checkGroups($templates, $db_templates);
 		$this->checkTemplates($templates, $db_templates);
 		$this->checkTemplatesLinks($templates, $db_templates);
-		$this->checkUpdateMacros($templates, $db_templates);
+		$templates = $this->validateHostMacros($templates, $db_templates);
 	}
 
 	/**
@@ -716,7 +720,7 @@ class CTemplate extends CHostGeneral {
 		}
 
 		$db_templates = $this->get([
-			'output' => ['templateid', 'name'],
+			'output' => ['templateid', 'host', 'name'],
 			'templateids' => $templateids,
 			'editable' => true,
 			'preservekeys' => true

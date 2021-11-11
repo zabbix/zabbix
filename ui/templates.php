@@ -116,13 +116,9 @@ foreach ($tags as $key => $tag) {
 // Remove inherited macros data (actions: 'add', 'update' and 'form').
 $macros = cleanInheritedMacros(getRequest('macros', []));
 
-$macros = array_map(function($macro) {
-	return array_diff_key($macro, array_flip(['hostmacroid']));
-}, $macros);
-
 // Remove empty new macro lines.
 $macros = array_filter($macros, function($macro) {
-	$keys = array_flip(['macro', 'value', 'description']);
+	$keys = array_flip(['hostmacroid', 'macro', 'value', 'description']);
 
 	return (bool) array_filter(array_intersect_key($macro, $keys));
 });
@@ -185,6 +181,10 @@ elseif (hasRequest('templateid') && (hasRequest('clone') || hasRequest('full_clo
 
 		warning(_('The cloned template contains user defined macros with type "Secret text". The value and type of these macros were reset.'));
 	}
+
+	$macros = array_map(function($macro) {
+		return array_diff_key($macro, array_flip(['hostmacroid']));
+	}, $macros);
 
 	if (hasRequest('clone')) {
 		unset($_REQUEST['templateid']);

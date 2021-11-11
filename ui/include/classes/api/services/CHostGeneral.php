@@ -148,60 +148,6 @@ abstract class CHostGeneral extends CHostBase {
 	}
 
 	/**
-	 * Check macros for host.update, template.update and hostprototype.update methods.
-	 *
-	 * @param array  $hosts
-	 * @param array  $db_hosts
-	 *
-	 * @throws APIException if input of host macros data is invalid.
-	 */
-	protected function checkUpdateMacros(array &$hosts, array $db_hosts): void {
-		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
-
-		foreach ($hosts as $i1 => &$host) {
-			if (!array_key_exists('macros', $host)) {
-				continue;
-			}
-
-			$db_macros = array_column($db_hosts[$host[$id_field_name]]['macros'], null, 'macro');
-			$path = '/'.($i1 + 1).'/macros';
-
-			foreach ($host['macros'] as $i2 => &$macro) {
-				if (array_key_exists($macro['macro'], $db_macros)) {
-					$type_default = $db_macros[$macro['macro']]['type'];
-					$value_flags = 0x00;
-				}
-				else {
-					$type_default = ZBX_MACRO_TYPE_TEXT;
-					$value_flags = API_REQUIRED;
-				}
-
-				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-					'macro' =>			['type' => API_USER_MACRO],
-					'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT]), 'default' => $type_default],
-					'value' =>			['type' => API_MULTIPLE, 'flags' => $value_flags, 'rules' => [
-											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_MACRO_TYPE_VAULT])], 'type' => API_VAULT_SECRET, 'length' => DB::getFieldLength('hostmacro', 'value')],
-											['else' => true, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')]
-					]],
-					'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')]
-				]];
-
-				if (!CApiInputValidator::validate($api_input_rules, $macro, $path.'/'.($i2 + 1), $error)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-				}
-
-				if (array_key_exists($macro['macro'], $db_macros)
-						&& $macro['type'] != $db_macros[$macro['macro']]['type']
-						&& $db_macros[$macro['macro']]['type'] == ZBX_MACRO_TYPE_SECRET) {
-					$macro += ['value' => ''];
-				}
-			}
-			unset($macro);
-		}
-		unset($host);
-	}
-
-	/**
 	 * Update table "hosts_groups" and populate hosts.groups by "hostgroupid" property.
 	 *
 	 * @param array      $hosts
@@ -404,7 +350,7 @@ abstract class CHostGeneral extends CHostBase {
 	 * @param array      $hosts
 	 * @param array|null $db_hosts
 	 */
-	protected function updateTemplates(array $hosts, array $db_hosts = null): void {
+	protected function updateTemplates(array &$hosts, array $db_hosts = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
 
 		parent::updateTemplates($hosts, $db_hosts);
@@ -1865,7 +1811,7 @@ abstract class CHostGeneral extends CHostBase {
 		if ($hostids['templates']) {
 			$db_templates = API::Template()->get([
 				'output' => [],
-				$id_field_name.'s' => $hostids['templates'],
+				'hostids' => $hostids['templates'],
 				'preservekeys' => true
 			]);
 

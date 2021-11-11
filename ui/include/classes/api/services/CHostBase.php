@@ -145,7 +145,7 @@ abstract class CHostBase extends CApiService {
 					if (array_key_exists($template['templateid'], $db_templates)) {
 						$all_upd_templateids[] = $template['templateid'];
 						$upd_templates[$template['templateid']] = $i2;
-						unset($db_templates['templateid']);
+						unset($db_templates[$template['templateid']]);
 					}
 					else {
 						$ins_templates[$template['templateid']][$host[$id_field_name]][$i1][$i2] = $templateids;
@@ -160,7 +160,7 @@ abstract class CHostBase extends CApiService {
 					$del_links[$db_template['templateid']][$host[$id_field_name]] = true;
 
 					if (($this instanceof CHost || $this instanceof CTemplate) && $upd_templates) {
-						$del_templates[$db_template['templateid']][$host[$id_field_name]][$i1] = $upd_templates;
+						$del_templates[$db_template['templateid']][$i1] = $upd_templates;
 					}
 				}
 
@@ -185,7 +185,7 @@ abstract class CHostBase extends CApiService {
 					$del_links = [$template['templateid']][$host[$id_field_name]];
 
 					if (($this instanceof CHost || $this instanceof CTemplate) && $upd_templates) {
-						$del_templates[$template['templateid']][$host[$id_field_name]][$i1] = $upd_templates;
+						$del_templates[$template['templateid']][$i1] = $upd_templates;
 						$del_templates_clear[$template['templateid']][$i1] = $i2;
 					}
 				}
@@ -205,7 +205,7 @@ abstract class CHostBase extends CApiService {
 			}
 
 			if ($check_double_linkage) {
-				self::checkDoubleLinkageNew($ins_templates, $del_links);
+				// self::checkDoubleLinkageNew($ins_templates, $del_links);
 			}
 
 			$this->checkTriggerDependenciesOfInsTemplates($ins_templates);
@@ -233,8 +233,8 @@ abstract class CHostBase extends CApiService {
 			' WHERE f.itemid=i.itemid'.
 				' AND td.triggerid_up=f.triggerid'.
 				' AND ff.triggerid=td.triggerid_down'.
-				' AND ii.itemid=df.itemid'.
-				' AND '.dbConditionInt('i.hosid', array_keys($del_templates)).
+				' AND ii.itemid=ff.itemid'.
+				' AND '.dbConditionInt('i.hostid', array_keys($del_templates)).
 				' AND '.dbConditionInt('ii.hostid', $all_upd_templateids)
 		);
 
@@ -348,7 +348,7 @@ abstract class CHostBase extends CApiService {
 								: _('cannot be unlinked without template "%1$s" from host "%2$s" due to expression of trigger "%3$s"');
 
 							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $path,
-								self::getFormattedTriggerError($error, $row['hostid'], $row['triggerid_down'],
+								self::getFormattedTriggerError($error, $row['hostid'], $row['triggerid'],
 									$objects[0]['host']
 								)
 							));
@@ -374,7 +374,7 @@ abstract class CHostBase extends CApiService {
 	/**
 	 * Searches for circular linkages.
 	 *
-	 * @param array $ins_links[<templateid>][<hostid>]
+	 * @param array $ins_links[<templateid>][<hostid>][<host index>][<template index>]
 	 * @param array $del_links[<templateid>][<hostid>]
 	 */
 	private static function checkCircularLinkageNew(array $ins_links, array $del_links): void {
@@ -408,8 +408,47 @@ abstract class CHostBase extends CApiService {
 		while ($_templateids);
 
 		foreach ($templateids as $templateid) {
-			self::checkTemplateCircularLinkage($ins_links, $templateid, $ins_links[$templateid]);
+			foreach ($ins_links[$templateid] as $hostid => $i1_i2_templateids) {
+				if (array_key_exists($hostid, $ins_links)
+						&& self::circularLinkageExists($ins_links, $templateid, $ins_links[$hostid], $hostid)) {
+					$i1 = key($i1_i2_templateids);
+					$i2 = key($i1_i2_templateids[$i1]);
+
+					$path = '/'.($i1 + 1).'/templates';
+
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+						$path.'/'.($i2 + 1).'/templateid', _('cannot be linked due to circular linkage')
+					));
+				}
+			}
 		}
+	}
+
+	/**
+	 * Searches for circular linkages for specific template.
+	 *
+	 * @param array  $links[<templateid>][<hostid>]  The list of linkages.
+	 * @param string $templateid                     ID of the template to check circular linkages.
+	 * @param array  $hostids[<hostid>]
+	 * @param string $prev_hostid                    ID of the host used in previous iteration. Used to avoid infinite
+	 *                                               recursion in case when checked template does not have circular
+	 *                                               linkage, but the other template, linked to the same host, have it.
+	 *
+	 * @return bool
+	 */
+	private static function circularLinkageExists(array $links, string $templateid, array $hostids,
+			string $prev_hostid): bool {
+		if (array_key_exists($templateid, $hostids)) {
+			return true;
+		}
+
+		foreach ($hostids as $hostid => $foo) {
+			if (array_key_exists($hostid, $links) && !array_key_exists($prev_hostid, $links[$hostid])) {
+				return self::circularLinkageExists($links, $templateid, $links[$hostid], $hostid);
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -576,7 +615,7 @@ abstract class CHostBase extends CApiService {
 				$templateids = $i1_i2_templateids[$i1][$i2];
 				$path = '/'.($i1 + 1).'/templates';
 
-				if (bccomp($row['hostid'], $hostid) == 1 && $this instanceof CTemplate) {
+				if (bccomp($row['hostid'], $hostid) == 0 && $this instanceof CTemplate) {
 					$triggers = DB::select('triggers', [
 						'output' => ['description'],
 						'triggerids' => $row['triggerid_down']
@@ -628,15 +667,12 @@ abstract class CHostBase extends CApiService {
 
 					$triggers = DB::select('triggers', [
 						'output' => ['description'],
-						'triggerids' => [$row['triggerid_up'], $row['trigger_down']],
-						'preservekeys' => true
+						'triggerids' => $row['triggerid_down']
 					]);
 
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
 						$path.'/'.($i2 + 1).'/templateid',
-						_s('cannot be linked due to template trigger "%1$s" dependency on trigger "%2$s"',
-							$triggers[$row['trigger_down']]['description'], $triggers[$row['trigger_up']]['description']
-						)
+						_s('cannot be linked due to dependency of trigger "%1$s"', $triggers[0]['description'])
 					));
 				}
 			}
@@ -652,7 +688,7 @@ abstract class CHostBase extends CApiService {
 	 */
 	private function checkTriggerExpressionsOfInsTemplates(array $ins_templates): void {
 		$result = DBselect(
-			'SELECT DISTINCT i.hostid AS ins_templateid,f.triggerid,i.hostid'.
+			'SELECT DISTINCT i.hostid AS ins_templateid,f.triggerid,ii.hostid'.
 			' FROM items i,functions f,functions ff,items ii,hosts h'.
 			' WHERE f.itemid=i.itemid'.
 				' AND ff.triggerid=f.triggerid'.
@@ -669,7 +705,7 @@ abstract class CHostBase extends CApiService {
 				$templateids = $i1_i2_templateids[$i1][$i2];
 				$path = '/'.($i1 + 1).'/templates';
 
-				if (bccomp($row['hostid'], $hostid) == 1 && $this instanceof CTemplate) {
+				if (bccomp($row['hostid'], $hostid) == 0 && $this instanceof CTemplate) {
 					$triggers = DB::select('triggers', [
 						'output' => ['description'],
 						'triggerids' => $row['triggerid']
