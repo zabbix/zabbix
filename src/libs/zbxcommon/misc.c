@@ -3919,12 +3919,12 @@ int	zbx_hex2bin(const unsigned char *p_hex, unsigned char *buf, int buf_len)
 			unsigned char	lo;
 
 			if ('9' < *p_hex++)
-				hi += (unsigned char)9;
+				hi = (unsigned char)(hi + 9u);
 
 			lo = *p_hex & 0x0f;
 
 			if ('9' < *p_hex++)
-				lo += (unsigned char)9;
+				lo = (unsigned char)(lo + 9u);
 
 			*q++ = (unsigned char)(hi << 4 | lo);
 			len++;
