@@ -46,7 +46,7 @@ class CDateTimeHelper {
 	 * @return string
 	 */
 	public static function getUTCOffset($timezone) {
-		$offset = (strtotime('today 12:00 am UTC') - strtotime('today 12:00 am '.$timezone));
+		$offset = (strtotime('now UTC') - strtotime('now '.$timezone));
 		$sign = $offset >= 0 ? '+' : '-';
 		$offset = abs($offset);
 

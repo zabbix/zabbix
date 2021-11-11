@@ -69,6 +69,10 @@ class CHelpItems {
 					'description' => _('Agent availability check. Returns nothing - unavailable; 1 - available')
 				],
 				[
+					'key' => 'agent.variant',
+					'description' => _('Agent variant check. Returns 1 - for Zabbix agent; 2 - for Zabbix agent 2')
+				],
+				[
 					'key' => 'agent.version',
 					'description' => _('Version of Zabbix agent. Returns string')
 				],
@@ -397,6 +401,10 @@ class CHelpItems {
 				[
 					'key' => 'agent.ping',
 					'description' => _('Agent availability check. Returns nothing - unavailable; 1 - available')
+				],
+				[
+					'key' => 'agent.variant',
+					'description' => _('Agent variant check. Returns 1 - for Zabbix agent; 2 - for Zabbix agent 2')
 				],
 				[
 					'key' => 'agent.version',
