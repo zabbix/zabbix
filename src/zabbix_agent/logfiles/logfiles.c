@@ -902,7 +902,7 @@ static int	is_same_file_logrt(const struct st_logfile *old_file, const struct st
 		/* familiar with their applications and log file rotation can    */
 		/* know which scenario takes place with which log file.          */
 		/* Most users would choose "noreread" option (it is not enabled  */
-		/* by default!) to handle it as the the same log file without no */
+		/* by default!) to handle it as the same log file without no     */
 		/* new records to report.                                        */
 		/* Some users might want to handle it as a new log file (it is   */
 		/* the default setting) (e.g. for log*.count[] purpose).         */
