@@ -1060,8 +1060,6 @@ class CMacrosResolverGeneral {
 				continue;
 			}
 
-			$value = $history[$itemid][0]['value'];
-
 			foreach ($keys as $key => $tokens) {
 				foreach ($tokens as $token => $data) {
 					switch ($data['macro']) {
@@ -1079,7 +1077,9 @@ class CMacrosResolverGeneral {
 								$ci = ($data['function'] === 'iregsub') ? 'i' : '';
 
 								set_error_handler(function ($errno, $errstr) {});
-								$rc = preg_match('/'.$data['parameters'][0].'/'.$ci, $value, $matches);
+								$rc = preg_match('/'.$data['parameters'][0].'/'.$ci, $history[$itemid][0]['value'],
+									$matches
+								);
 								restore_error_handler();
 
 								if ($rc === false) {
@@ -1097,7 +1097,7 @@ class CMacrosResolverGeneral {
 								}
 							}
 							else {
-								$macro_value = formatHistoryValue($value, $db_items[$itemid]);
+								$macro_value = formatHistoryValue($history[$itemid][0]['value'], $db_items[$itemid]);
 							}
 
 							$macro_values[$key][$token] = $macro_value;
@@ -1110,32 +1110,32 @@ class CMacrosResolverGeneral {
 
 					switch ($data['macro']) {
 						case 'ITEM.LOG.DATE':
-							$macro_values[$key][$token] = date('Y.m.d', $history[$function['itemid']][0]['timestamp']);
+							$macro_values[$key][$token] = date('Y.m.d', $history[$itemid][0]['timestamp']);
 							break;
 
 						case 'ITEM.LOG.TIME':
-							$macro_values[$key][$token] = date('H:i:s', $history[$function['itemid']][0]['timestamp']);
+							$macro_values[$key][$token] = date('H:i:s', $history[$itemid][0]['timestamp']);
 							break;
 
 						case 'ITEM.LOG.AGE':
-							$macro_values[$key][$token] = zbx_date2age($history[$function['itemid']][0]['timestamp']);
+							$macro_values[$key][$token] = zbx_date2age($history[$itemid][0]['timestamp']);
 							break;
 
 						case 'ITEM.LOG.SOURCE':
-							$macro_values[$key][$token] = $history[$function['itemid']][0]['source'];
+							$macro_values[$key][$token] = $history[$itemid][0]['source'];
 							break;
 
 						case 'ITEM.LOG.SEVERITY':
 							$macro_values[$key][$token]
-								= CSeverityHelper::getName((int) $history[$function['itemid']][0]['severity']);
+								= CSeverityHelper::getName((int) $history[$itemid][0]['severity']);
 							break;
 
 						case 'ITEM.LOG.NSEVERITY':
-							$macro_values[$key][$token] = $history[$function['itemid']][0]['severity'];
+							$macro_values[$key][$token] = $history[$itemid][0]['severity'];
 							break;
 
 						case 'ITEM.LOG.EVENTID':
-							$macro_values[$key][$token] = $history[$function['itemid']][0]['logeventid'];
+							$macro_values[$key][$token] = $history[$itemid][0]['logeventid'];
 							break;
 					}
 				}
