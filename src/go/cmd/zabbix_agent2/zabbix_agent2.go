@@ -116,9 +116,13 @@ func processUserParamReloadCommand(c *remotecontrol.Client) (err error) {
 	}
 
 	agent.Options.UserParameter = userparams.UserParameter
-	manager.QueryUserParams()
 
-	message = "Reloaded user parameters"
+	if res := manager.QueryUserParams(); res != "ok" {
+		message = "Failed to reload user parameters"
+	} else {
+		message = "Reloaded user parameters"
+	}
+
 	log.Infof(message)
 	err = c.Reply(message)
 

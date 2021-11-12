@@ -414,6 +414,7 @@ run:
 				if keys, rerr = agent.InitUserParameterPlugin(agent.Options.UserParameter,
 					agent.Options.UnsafeUserParameters, agent.Options.UserParameterDir); rerr != nil {
 					log.Warningf("cannot reload user parameters")
+					v.sink <- "err"
 					continue
 				}
 
