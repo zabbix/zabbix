@@ -23,6 +23,5 @@ func getMetrics() []string {
 	return []string{
 		"net.dns", "Checks if DNS service is up.",
 		"net.dns.record", "Performs DNS query.",
-		"vfs.dir.size", "Directory size (in bytes).",
 	}
 }

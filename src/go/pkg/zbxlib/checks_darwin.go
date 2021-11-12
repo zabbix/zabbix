@@ -74,10 +74,6 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 		return unsafe.Pointer(C.NET_UDP_LISTEN)
 	case "system.cpu.load":
 		return unsafe.Pointer(C.SYSTEM_CPU_LOAD)
-	case "vfs.dir.count":
-		return unsafe.Pointer(C.VFS_DIR_COUNT)
-	case "vfs.dir.size":
-		return unsafe.Pointer(C.VFS_DIR_SIZE)
 	case "vfs.fs.discovery":
 		return unsafe.Pointer(C.VFS_FS_DISCOVERY)
 	case "vfs.fs.inode":

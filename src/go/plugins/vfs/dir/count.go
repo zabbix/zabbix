@@ -23,7 +23,6 @@ import (
 	"fmt"
 	"io/fs"
 	"path/filepath"
-	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -77,44 +76,17 @@ type Plugin struct {
 }
 
 type countParams struct {
-	path          string
+	common
 	minSize       string
 	maxSize       string
 	minAge        string
 	maxAge        string
-	maxDepth      int
 	parsedMinSize int64
 	parsedMaxSize int64
 	parsedMinAge  time.Time
 	parsedMaxAge  time.Time
 	typesInclude  map[fs.FileMode]bool
 	typesExclude  map[fs.FileMode]bool
-	regExclude    *regexp.Regexp
-	regInclude    *regexp.Regexp
-	dirRegExclude *regexp.Regexp
-}
-
-var impl Plugin
-
-//Export -
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	switch key {
-	case "vfs.dir.count":
-		return p.exportCount(params)
-	default:
-		return nil, zbxerr.ErrorUnsupportedMetric
-	}
-
-	return nil, nil
-}
-
-func (p *Plugin) exportCount(params []string) (result interface{}, err error) {
-	cp, err := getParams(params)
-	if err != nil {
-		return
-	}
-
-	return cp.getDirCount()
 }
 
 func (cp *countParams) getDirCount() (int, error) {
@@ -129,7 +101,15 @@ func (cp *countParams) getDirCount() (int, error) {
 
 	err = filepath.WalkDir(cp.path,
 		func(p string, d fs.DirEntry, err error) error {
-			s, err := cp.skip(p, length, d, err)
+			if err != nil {
+				return err
+			}
+
+			if p == cp.path {
+				return nil
+			}
+
+			s, err := cp.skip(p, length, d)
 			if s {
 				return err
 			}
@@ -146,10 +126,10 @@ func (cp *countParams) getDirCount() (int, error) {
 	return count, nil
 }
 
-func (cp *countParams) skip(path string, length int, d fs.DirEntry, err error) (bool, error) {
+func (cp *countParams) skip(path string, length int, d fs.DirEntry) (bool, error) {
 	var s bool
 
-	s, err = cp.skipPath(path, length, err)
+	s, err := cp.skipPath(path, length)
 	if s {
 		return true, err
 	}
@@ -167,39 +147,6 @@ func (cp *countParams) skip(path string, length int, d fs.DirEntry, err error) (
 	s, err = cp.skipInfo(d)
 	if s {
 		return true, err
-	}
-
-	return false, nil
-}
-
-func (cp *countParams) skipPath(path string, length int, err error) (bool, error) {
-	if err != nil {
-		return true, err
-	}
-
-	if path == cp.path {
-		return true, nil
-	}
-
-	currentLength := len(strings.SplitAfter(path, string(filepath.Separator)))
-	if cp.maxDepth > unlimitedDepth && currentLength-length > cp.maxDepth {
-		return true, fs.SkipDir
-	}
-
-	return false, nil
-}
-
-func (cp *countParams) skipRegex(d fs.DirEntry) (bool, error) {
-	if cp.regInclude != nil && !cp.regInclude.Match([]byte(d.Name())) {
-		return true, nil
-	}
-
-	if cp.regExclude != nil && cp.regExclude.Match([]byte(d.Name())) {
-		return true, nil
-	}
-
-	if cp.dirRegExclude != nil && d.IsDir() && cp.dirRegExclude.Match([]byte(d.Name())) {
-		return true, fs.SkipDir
 	}
 
 	return false, nil
@@ -316,7 +263,7 @@ func isTypeMatch(in map[fs.FileMode]bool, fm fs.FileMode) bool {
 	return false
 }
 
-func getParams(params []string) (out countParams, err error) {
+func getCountParams(params []string) (out countParams, err error) {
 	out.maxDepth = -1
 
 	switch len(params) {
@@ -413,14 +360,6 @@ func getParams(params []string) (out countParams, err error) {
 	}
 
 	return
-}
-
-func parseReg(in string) (*regexp.Regexp, error) {
-	if in == "" {
-		return nil, nil
-	}
-
-	return regexp.Compile(in)
 }
 
 func parseType(in string, exclude bool) (out map[fs.FileMode]bool, err error) {
@@ -554,9 +493,4 @@ func parseTime(in string) (time.Duration, error) {
 	}
 
 	return time.Duration(t) * time.Second, nil
-}
-
-func init() {
-	plugin.RegisterMetrics(&impl, "VFSDir",
-		"vfs.dir.count", "Directory entry count.")
 }

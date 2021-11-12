@@ -1,0 +1,216 @@
+/*
+** Zabbix
+** Copyright (C) 2001-2021 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
+package dir
+
+import (
+	"fmt"
+	"io/fs"
+	"os"
+	"path/filepath"
+	"strconv"
+	"strings"
+	"syscall"
+
+	"zabbix.com/pkg/zbxerr"
+)
+
+const (
+	diskBlockSize = 512
+)
+
+type sizeParams struct {
+	common
+	diskMode bool
+}
+
+func (sp *sizeParams) getDirSize() (int64, error) {
+	var parentSize int64
+	var dirSize int64
+
+	length := len(strings.SplitAfter(sp.path, string(filepath.Separator)))
+
+	err := filepath.WalkDir(sp.path,
+		func(p string, d fs.DirEntry, err error) error {
+			if err != nil {
+				return err
+			}
+
+			if p == sp.path {
+				parentSize, err = sp.getParentSize(d)
+				if err != nil {
+					return err
+				}
+
+				return nil
+			}
+
+			s, err := sp.skip(p, length, d)
+			if s {
+				return err
+			}
+
+			fi, err := d.Info()
+			if err != nil {
+				return err
+			}
+
+			tmpSize, err := sp.getSize(fi)
+			if err != nil {
+				return err
+			}
+
+			dirSize += tmpSize
+
+			return nil
+		})
+
+	if err != nil {
+		return 0, zbxerr.ErrorCannotParseResult.Wrap(err)
+	}
+
+	return parentSize + dirSize, nil
+}
+
+func (sp *sizeParams) getParentSize(dir fs.DirEntry) (int64, error) {
+	var parentSize int64
+
+	stat, err := os.Stat(sp.path)
+	if err != nil {
+		return 0, err
+	}
+
+	s, err := sp.skipRegex(dir)
+	if err != nil {
+		return 0, err
+	}
+
+	if s {
+		return 0, nil
+	}
+
+	parentSize, err = sp.getSize(stat)
+	if err != nil {
+		return 0, err
+	}
+
+	return parentSize, nil
+}
+
+func (sp *sizeParams) getSize(fs fs.FileInfo) (int64, error) {
+	sys, ok := fs.Sys().(*syscall.Stat_t)
+	if !ok {
+		return 0, fmt.Errorf("failed to read %s file size", fs.Name())
+	}
+
+	if !sp.diskMode {
+		return sys.Size, nil
+	}
+
+	return sys.Blocks * diskBlockSize, nil
+}
+
+func (sp *sizeParams) skip(path string, length int, d fs.DirEntry) (bool, error) {
+	s, err := sp.skipPath(path, length)
+	if s {
+		return true, err
+	}
+
+	s, err = sp.skipRegex(d)
+	if s {
+		return true, err
+	}
+
+	return false, nil
+}
+
+func getSizeParams(params []string) (out sizeParams, err error) {
+	out.maxDepth = -1
+
+	switch len(params) {
+	case sixthParam:
+		out.dirRegExclude, err = parseReg(params[5])
+		if err != nil {
+			err = zbxerr.New("Invalid sixth parameter.").Wrap(err)
+			return
+		}
+
+		fallthrough
+	case fifthParam:
+		if params[4] != "" {
+			out.maxDepth, err = strconv.Atoi(params[4])
+			if err != nil {
+				err = zbxerr.New("Invalid fifth parameter.").Wrap(err)
+				return
+			}
+		}
+
+		fallthrough
+	case fourthParam:
+		switch params[3] {
+		case "apparent":
+			out.diskMode = false
+		case "disk":
+			out.diskMode = true
+		case "":
+		default:
+			err = zbxerr.New("Invalid fourth parameter.").Wrap(err)
+			return
+		}
+
+		fallthrough
+	case thirdParam:
+		out.regExclude, err = parseReg(params[2])
+		if err != nil {
+			err = zbxerr.New("Invalid third parameter.").Wrap(err)
+
+			return
+		}
+
+		fallthrough
+	case secondParam:
+		out.regInclude, err = parseReg(params[1])
+		if err != nil {
+			err = zbxerr.New("Invalid second parameter.").Wrap(err)
+
+			return
+		}
+
+		fallthrough
+	case firstParam:
+		out.path = params[0]
+		if out.path == "" {
+			err = zbxerr.New("Invalid first parameter.")
+		}
+
+		if !strings.HasSuffix(out.path, string(filepath.Separator)) {
+			out.path += string(filepath.Separator)
+		}
+
+	case emptyParam:
+		err = zbxerr.ErrorTooFewParameters
+
+		return
+	default:
+		err = zbxerr.ErrorTooManyParameters
+
+		return
+	}
+	return
+}
