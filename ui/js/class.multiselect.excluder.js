@@ -35,25 +35,25 @@ class CMultiselectEntryExcluder {
 		this.ms = document.getElementById(id);
 		this.$ms = $(this.ms);
 
-		this.updateDisabledTemplates = function() {
-			const templateids = this.getEntryIds();
-			const ms_params = this.$ms.data('multiSelect');
+		this.updateDisabledEntries = function() {
+			const entryids = this.getEntryIds();
+			const ms_parameters = this.$ms.data('multiSelect');
 
-			const link = new Curl(ms_params.options.url, false);
-			link.setArgument('disabledids', templateids);
+			const link = new Curl(ms_parameters.options.url, false);
+			link.setArgument('disabledids', entryids);
 
-			ms_params.options.url = link.getUrl();
-			ms_params.options.popup.parameters.disableids = templateids;
+			ms_parameters.options.url = link.getUrl();
+			ms_parameters.options.popup.parameters.disableids = entryids;
 
-			this.$ms.data('multiSelect', ms_params);
+			this.$ms.data('multiSelect', ms_parameters);
 		}
 
 		this.ms.addEventListener('multiselect.item.removed', (e) => {
-			this.updateDisabledTemplates();
+			this.updateDisabledEntries();
 		});
 
 		this.ms.addEventListener('multiselect.item.added', (e) => {
-			this.updateDisabledTemplates();
+			this.updateDisabledEntries();
 		});
 
 		this.input_selector = inputs.map((name) => {
@@ -64,17 +64,17 @@ class CMultiselectEntryExcluder {
 	/**
 	 * Helper to get all multiselect entry (e.g. linked, added, to clear templates) IDs as an array.
 	 *
-	 * @return {array}  Templateids.
+	 * @return {array}
 	 */
 	getEntryIds() {
-		const templateids = [];
+		const entryids = [];
 
 		this.ms.closest('form')
 			.querySelectorAll(this.input_selector)
 				.forEach((input) => {
-					templateids.push(input.value);
+					entryids.push(input.value);
 				});
 
-		return templateids;
+		return entryids;
 	}
 }
