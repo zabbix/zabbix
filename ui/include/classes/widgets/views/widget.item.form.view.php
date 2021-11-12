@@ -37,13 +37,11 @@ $form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dia
 
 $scripts = [];
 
-if (array_key_exists('itemid', $fields)) {
-	$field_itemid = CWidgetHelper::getItem($fields['itemid'], $data['captions']['ms']['items']['itemid'],
-		$form->getName()
-	);
-	$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['itemid']), $field_itemid);
-	$scripts[] = $field_itemid->getPostJS();
-}
+$field_itemid = CWidgetHelper::getItem($fields['itemid'], $data['captions']['ms']['items']['itemid'],
+	$form->getName()
+);
+$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['itemid']), $field_itemid);
+$scripts[] = $field_itemid->getPostJS();
 
 $form_list->addRow(
 	CWidgetHelper::getLabel($fields['show']),
