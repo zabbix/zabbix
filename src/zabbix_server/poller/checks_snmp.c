@@ -592,6 +592,8 @@ static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err
 #endif
 					case ITEM_SNMPV3_PRIVPROTOCOL_AES128:
 						/* set the privacy protocol to AES128 */
+					case ITEM_SNMPV3_PRIVPROTOCOL_AES:
+						/* set the privacy protocol to AES */
 						session.securityPrivProto = usmAESPrivProtocol;
 						session.securityPrivProtoLen = USM_PRIV_PROTO_AES_LEN;
 						break;
