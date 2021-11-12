@@ -178,9 +178,11 @@ int	zbx_baseline_get_data(zbx_uint64_t itemid, unsigned char value_type, time_t 
 		const char *seasons, int skip, zbx_vector_dbl_t *values, char **error)
 {
 	zbx_time_unit_t	period_unit, season_unit;
-	int		season_num, ret;
+	int		season_num, ret = FAIL;
 	size_t		len;
 	const char	*table;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	switch (value_type)
 	{
@@ -192,22 +194,22 @@ int	zbx_baseline_get_data(zbx_uint64_t itemid, unsigned char value_type, time_t 
 			break;
 		default:
 			*error = zbx_strdup(*error, "unsupported value type");
-			return FAIL;
+			goto out;
 	}
 
 	if (FAIL == zbx_trends_parse_base(period, &period_unit, error))
-		return FAIL;
+		goto out;
 
 	if (FAIL == zbx_tm_parse_period(seasons, &len, &season_num, &season_unit, error))
 	{
 		*error = zbx_strdup(*error, "invalid seasons parameter");
-		return FAIL;
+		goto out;
 	}
 
 	if (ZBX_TIME_UNIT_MONTH == season_unit && ZBX_TIME_UNIT_WEEK == period_unit)
 	{
 		*error = zbx_strdup(*error, "weekly data periods cannot be used with month seasons");
-		return FAIL;
+		goto out;
 	}
 
 	/* include the data period which might be skipped because of 'skip' parameter */
@@ -217,6 +219,8 @@ int	zbx_baseline_get_data(zbx_uint64_t itemid, unsigned char value_type, time_t 
 		ret = baseline_get_isoyear_data(itemid, table, now, period, season_num, skip, values, error);
 	else
 		ret = baseline_get_common_data(itemid, table, now, period, season_num, season_unit, skip, values, error);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s", __func__, zbx_result_string(ret), ZBX_NULL2EMPTY_STR(*error));
 
 	return ret;
 }

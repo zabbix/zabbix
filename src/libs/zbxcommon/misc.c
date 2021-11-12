@@ -3571,6 +3571,9 @@ zbx_function_type_t	zbx_get_function_type(const char *func)
 	if (0 == strncmp(func, "trend", 5))
 		return ZBX_FUNCTION_TYPE_TRENDS;
 
+	if (0 == strncmp(func, "baseline", 8))
+		return ZBX_FUNCTION_TYPE_TRENDS;
+
 	if (0 == strcmp(func, "nodata"))
 		return ZBX_FUNCTION_TYPE_TIMER;
 
