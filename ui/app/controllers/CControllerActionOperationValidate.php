@@ -113,7 +113,7 @@ class CControllerActionOperationValidate extends CController {
 				}
 				// break; is not missing here
 
-			case OPERATION_TYPE_ACK_MESSAGE:
+			case OPERATION_TYPE_UPDATE_MESSAGE:
 				$message = array_key_exists('opmessage', $operation) ? $operation['opmessage'] : [];
 
 				if (array_key_exists('default_msg', $message)
