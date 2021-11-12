@@ -195,9 +195,6 @@ class testFunctionChangeCount extends CIntegrationTest {
 		// Create triggers
 		foreach (self::$items as &$item) {
 			foreach ($item['triggers'] as &$trigger) {
-				if (array_key_exists('expected_error', $trigger)) {
-					continue;
-				}
 				$response = $this->call('trigger.create', [
 					[
 						'description' => self::FUNC_NAME.'('.$trigger['params'].')',
