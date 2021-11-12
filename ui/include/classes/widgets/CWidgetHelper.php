@@ -156,7 +156,7 @@ class CWidgetHelper {
 		return (new CTextArea($field->getName(), $field->getValue()))
 			->setAriaRequired(self::isAriaRequired($field))
 			->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
-			->setWidth($field->getWidth());
+			->setAdaptiveWidth($field->getWidth());
 	}
 
 	/**

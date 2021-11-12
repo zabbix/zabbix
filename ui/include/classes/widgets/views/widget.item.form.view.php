@@ -71,8 +71,6 @@ $form_list
 		(new CDiv([
 			(new CDiv(
 				CWidgetHelper::getTextArea($fields['description'])
-					->setAttribute('style', '')
-					->setAdaptiveWidth(ZBX_TEXTAREA_BIG_WIDTH)
 					->setAttribute('maxlength', DB::getFieldLength('widget_field', 'value_str'))
 			))->addClass('form-field'),
 			CWidgetHelper::getLabel($fields['desc_h_pos']),

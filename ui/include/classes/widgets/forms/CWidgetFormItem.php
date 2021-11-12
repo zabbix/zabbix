@@ -63,7 +63,8 @@ class CWidgetFormItem extends CWidgetForm {
 		// description textarea field
 		$field_desc = (new CWidgetFieldTextArea('description', _('Description')))
 			->setDefault('{ITEM.NAME}')
-			->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK);
+			->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH - 38);
 
 		if (array_key_exists('description', $this->data)) {
 			$field_desc->setValue($this->data['description']);
