@@ -248,46 +248,27 @@ func (m *Manager) processQueue(now time.Time) {
 	}
 }
 
-// processUserParamQueue processes queued user parameters plugins/tasks
-func (m *Manager) processUserParamQueue(now time.Time) {
-	seconds := now.Unix()
+// processAndFlushUserParamQueue processes queued user parameters plugins/tasks and/or removes them
+func (m *Manager) processAndFlushUserParamQueue() {
 	for p := m.pluginQueue.Peek(); p != nil; p = m.pluginQueue.Peek() {
-		if task := p.peekTask(); task != nil {
-			if task.getScheduled().Unix() > seconds && !p.usrprm {
-				break
-			}
+		if !p.usrprm {
+			heap.Pop(&m.pluginQueue)
+			continue
+		}
 
+		if task := p.peekTask(); task != nil {
 			heap.Pop(&m.pluginQueue)
 			if !p.hasCapacity() {
-				// plugin has no free capacity for the next task, keep the plugin out of queue
-				// until active tasks finishes and the required capacity is released
-				if p.usrprm {
-					m.pluginQueue.Remove(p)
-				}
+				m.pluginQueue.Remove(p)
 				continue
 			}
 
-			// take the task out of plugin tasks queue and perform it
 			m.activeTasksNum++
 			p.reserveCapacity(p.popTask())
 			task.perform(m)
-
-			// if the plugin has capacity for the next task put it back into plugin queue
-			if !p.hasCapacity() && !p.usrprm {
-				continue
-			} else if p.usrprm {
-				m.pluginQueue.Remove(p)
-			} else {
-				heap.Push(&m.pluginQueue, p)
-			}
-		} else {
-			// plugins with empty task queue should not be in Manager queue
-			if p.usrprm {
-				m.pluginQueue.Remove(p)
-			} else {
-				heap.Pop(&m.pluginQueue)
-			}
 		}
+
+		m.pluginQueue.Remove(p)
 	}
 }
 
@@ -421,7 +402,7 @@ run:
 				var keys []string
 				var rerr error
 
-				m.processUserParamQueue(time.Now())
+				m.processAndFlushUserParamQueue()
 				plugin.ClearUserParamMetrics()
 
 				for i, plg := range m.plugins {
