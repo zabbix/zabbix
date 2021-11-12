@@ -203,7 +203,7 @@ class testFunctionChangeCount extends CIntegrationTest {
 						'description' => self::FUNC_NAME.'('.$trigger['params'].')',
 						'expression' => self::FUNC_NAME.'(/'.self::HOST_NAME.'/'.$item['key'].','.$trigger['params'].')='.$trigger['expected_result']
 					]
-				]);
+				], $error = (array_key_exists('expected_error', $trigger)));
 				// Check for scenarios when trigger creation must fail
 				if (array_key_exists('expected_error', $trigger)) {
 					$this->assertArrayHasKey('error', $response);
