@@ -53,7 +53,6 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->filterEntriesAndOpenObjects($this->hostName, 'Name', $this->hostName);
 		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
-		$form->selectTab('Templates');
 		$this->zbxTestClickButtonMultiselect('add_templates_');
 		$this->zbxTestLaunchOverlayDialog('Templates');
 		COverlayDialogElement::find()->all()->last()->setDataContext('Templates');
@@ -179,7 +178,6 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->filterEntriesAndOpenObjects($this->hostName, 'Name', $this->hostName);
 		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
-		$form->selectTab('Templates');
 		$table = $form->query('id:linked-template')->asTable()->one()->waitUntilVisible();
 		$table->findRow('Name', $template)
 				->getColumn('Action')->query('button:Unlink and clear')->one()->click();

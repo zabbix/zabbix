@@ -47,8 +47,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$this->zbxTestClickLinkTextWait($this->host_for_template);
 
 		$dialog = COverlayDialogElement::find()->asForm()->waitUntilReady()->one();
-		$dialog->selectTab('Templates');
-		$dialog->fill(['Link new templates' => 'Linux by Zabbix agent']);
+		$dialog->fill(['Templates' => 'Linux by Zabbix agent']);
 
 		$this->zbxTestTextPresent('Linux by Zabbix agent');
 		$dialog->submit();
@@ -79,7 +78,6 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$this->zbxTestClickLinkTextWait($this->host_for_template);
 
 		$dialog = COverlayDialogElement::find()->asForm()->waitUntilReady()->one();
-		$dialog->selectTab('Templates');
 
 		// Clicks button named "Unlink" next to a template by name.
 		$this->assertTrue($dialog->query('link', $template)->exists());
@@ -109,8 +107,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$this->zbxTestClickLinkTextWait($this->host_for_template);
 
 		$form = $this->query('name:host-form')->asForm()->waitUntilReady()->one();
-		$form->selectTab('Templates');
-		$form->fill(['Link new templates' => 'Linux by Zabbix agent']);
+		$form->fill(['Templates' => 'Linux by Zabbix agent']);
 
 		$this->zbxTestTextPresent('Linux by Zabbix agent');
 		$form->submit();
@@ -141,7 +138,6 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$this->zbxTestClickLinkTextWait($this->host_for_template);
 
 		$dialog = COverlayDialogElement::find()->asForm()->waitUntilReady()->one();
-		$dialog->selectTab('Templates');
 
 		// Clicks button named "Unlink and clear" next to a template by name.
 		$this->assertTrue($dialog->query('link', $template)->exists());
