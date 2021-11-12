@@ -586,6 +586,9 @@ class ZBase {
 				'javascript' => [
 					'files' => []
 				],
+				'stylesheet' => [
+					'files' => []
+				],
 				'web_layout_mode' => ZBX_LAYOUT_NORMAL,
 				'config' => [
 					'server_check_interval' => CSettingsHelper::get(CSettingsHelper::SERVER_CHECK_INTERVAL),
@@ -600,6 +603,9 @@ class ZBase {
 					'main_block' => $view->getOutput(),
 					'javascript' => [
 						'files' => $view->getJsFiles()
+					],
+					'stylesheet' => [
+						'files' => $view->getCssFiles()
 					],
 					'web_layout_mode' => $view->getLayoutMode()
 				]);
@@ -691,17 +697,29 @@ class ZBase {
 			return;
 		}
 
-		$active_node = API::getApiService('hanode')->get([
-			'output' => ['address', 'port'],
-			'filter' => ['status' => ZBX_NODE_STATUS_ACTIVE],
+		$ha_nodes = API::getApiService('hanode')->get([
+			'output' => ['address', 'port', 'status'],
 			'sortfield' => 'lastaccess',
-			'sortorder' => 'DESC',
-			'limit' => 1
+			'sortorder' => 'DESC'
 		], false);
 
-		if ($active_node) {
-			$ZBX_SERVER = $active_node[0]['address'];
-			$ZBX_SERVER_PORT = $active_node[0]['port'];
+		$active_node = null;
+
+		if (count($ha_nodes) == 1) {
+			$active_node = $ha_nodes[0];
+		}
+		else {
+			foreach ($ha_nodes as $node) {
+				if ($node['status'] == ZBX_NODE_STATUS_ACTIVE) {
+					$active_node = $node;
+					break;
+				}
+			}
+		}
+
+		if ($active_node !== null) {
+			$ZBX_SERVER = $active_node['address'];
+			$ZBX_SERVER_PORT = $active_node['port'];
 		}
 	}
 }

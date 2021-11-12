@@ -83,13 +83,11 @@ class testGraphLinking extends CIntegrationTest {
 	{
 		$response = $this->call('action.create', [
 			'name' => 'create_host',
-			'eventsource' => 2,
+			'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
 			'status' => 0,
-			'host' => self::HOST_NAME,
 			'operations' => [
 				[
-					'actionid' => 1,
-					'operationtype' => 2
+					'operationtype' => OPERATION_TYPE_HOST_ADD
 				]
 			]
 		]);
@@ -105,12 +103,11 @@ class testGraphLinking extends CIntegrationTest {
 		}
 		$response = $this->call('action.create', [
 			'name' => 'link_templates',
-			'eventsource' => 2,
+			'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
 			'status' => 0,
 			'operations' => [
 				[
-					'actionid' => 12,
-					'operationtype' => 6,
+					'operationtype' => OPERATION_TYPE_TEMPLATE_ADD,
 					'optemplate' =>
 					$templateids_for_api_call
 				]

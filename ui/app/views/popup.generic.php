@@ -369,7 +369,8 @@ switch ($data['popup_type']) {
 
 				$action = 'popup_generic.setPopupOpenerFieldValues('.json_encode([
 					$options['dstfld1'] => $d_check[$options['srcfld1']]
-				]).')';
+				]).');';
+
 				$action .= $options['srcfld2']
 					? 'popup_generic.setPopupOpenerFieldValues('.json_encode([$options['dstfld2'] => $name]).');'
 					: '';

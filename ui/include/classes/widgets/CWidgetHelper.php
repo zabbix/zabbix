@@ -173,6 +173,17 @@ class CWidgetHelper {
 	}
 
 	/**
+	 * @param CWidgetFieldLatLng $field
+	 *
+	 * @return CTextBox
+	 */
+	public static function getLatLngZoomBox($field) {
+		return (new CTextBox($field->getName(), $field->getValue()))
+			->setAttribute('placeholder', $field->getPlaceholder())
+			->setWidth($field->getWidth());
+	}
+
+	/**
 	 * @param CWidgetFieldUrl $field
 	 *
 	 * @return CTextBox

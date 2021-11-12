@@ -64,11 +64,10 @@ class CApiInputValidator {
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
-	 * @param array  $parent_data
 	 *
 	 * @return bool
 	 */
-	private static function validateData($rule, &$data, $path, &$error, array $parent_data = null) {
+	private static function validateData($rule, &$data, $path, &$error) {
 		switch ($rule['type']) {
 			case API_CALC_FORMULA:
 				return self::validateCalcFormula($rule, $data, $path, $error);
@@ -93,6 +92,9 @@ class CApiInputValidator {
 
 			case API_INTS32:
 				return self::validateInts32($rule, $data, $path, $error);
+
+			case API_INT32_RANGES:
+				return self::validateInt32Ranges($rule, $data, $path, $error);
 
 			case API_UINT64:
 				return self::validateUInt64($rule, $data, $path, $error);
@@ -219,6 +221,9 @@ class CApiInputValidator {
 
 			case API_EXEC_PARAMS:
 				return self::validateExecParams($rule, $data, $path, $error);
+
+			case API_LAT_LNG_ZOOM:
+				return self::validateLatLngZoom($rule, $data, $path, $error);
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
@@ -245,6 +250,7 @@ class CApiInputValidator {
 			case API_COND_FORMULAID:
 			case API_STRING_UTF8:
 			case API_INT32:
+			case API_INT32_RANGES:
 			case API_UINT64:
 			case API_UINTS64:
 			case API_FLOAT:
@@ -284,6 +290,7 @@ class CApiInputValidator {
 			case API_IMAGE:
 			case API_EXEC_PARAMS:
 			case API_UNEXPECTED:
+			case API_LAT_LNG_ZOOM:
 				return true;
 
 			case API_OBJECT:
@@ -990,6 +997,57 @@ class CApiInputValidator {
 	}
 
 	/**
+	 * Validate integer ranges.
+	 * Example:
+	 *   0-100,200,300-400
+	 *
+	 * @static
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY
+	 * @param int    $rule['length']  (optional)
+	 * @param string $rule['in']      (optional) A comma-delimited character string, for example: '0,60:900'
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateInt32Ranges(array $rule, &$data, string $path, string &$error): bool {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8($flags, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if ($data === '') {
+			return true;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		$parser = new CRangesParser(['with_minus' => true]);
+
+		if ($parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid range expression'));
+			return false;
+		}
+
+		foreach ($parser->getRanges() as $ranges) {
+			foreach ($ranges as $range) {
+				if (!self::checkInt32In($rule, $range, $path, $error)) {
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
+	/**
 	 * Identifier validator.
 	 *
 	 * @param array  $rule
@@ -1089,7 +1147,7 @@ class CApiInputValidator {
 	/**
 	 * Object validator.
 	 *
-	 * @param array  $rul
+	 * @param array  $rule
 	 * @param int    $rule['flags']                                   (optional) API_ALLOW_NULL
 	 * @param array  $rule['fields']
 	 * @param int    $rule['fields'][<field_name>]['flags']           (optional) API_REQUIRED, API_DEPRECATED,
@@ -1171,7 +1229,7 @@ class CApiInputValidator {
 
 			if (array_key_exists($field_name, $data)) {
 				$subpath = ($path === '/' ? $path : $path.'/').$field_name;
-				if (!self::validateData($field_rule, $data[$field_name], $subpath, $error, $data)) {
+				if (!self::validateData($field_rule, $data[$field_name], $subpath, $error)) {
 					return false;
 				}
 				if ($flags & API_DEPRECATED) {
@@ -1218,7 +1276,8 @@ class CApiInputValidator {
 			return self::validateData($rules, $data, $path, $error)
 				&& self::validateDataUniqueness($rules, $data, $path, $error);
 		}
-		elseif (is_string($data)) {
+
+		if (is_string($data)) {
 			$in = ($flags & API_ALLOW_COUNT) ? implode(',', [API_OUTPUT_EXTEND, API_OUTPUT_COUNT]) : API_OUTPUT_EXTEND;
 
 			return self::validateData(['type' => API_STRING_UTF8, 'in' => $in], $data, $path, $error);
@@ -2172,9 +2231,10 @@ class CApiInputValidator {
 	/**
 	 * Validate IP ranges. Multiple IPs separated by comma character.
 	 * Example:
-	 *   127.0.0.1,192.168.3.2
+	 *   127.0.0.1,192.168.1.1-254,192.168.2.1-100,192.168.3.0/24
 	 *
 	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_DNS, API_ALLOW_RANGE
 	 * @param int    $rule['length']  (optional)
 	 * @param mixed  $data
 	 * @param string $path
@@ -2183,7 +2243,9 @@ class CApiInputValidator {
 	 * @return bool
 	 */
 	private static function validateIpRanges($rule, &$data, $path, &$error) {
-		if (self::checkStringUtf8(0, $data, $path, $error) === false) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8($flags, $data, $path, $error) === false) {
 			return false;
 		}
 
@@ -2196,7 +2258,11 @@ class CApiInputValidator {
 			return false;
 		}
 
-		$ip_range_parser = new CIPRangeParser(['v6' => ZBX_HAVE_IPV6, 'ranges' => false]);
+		$ip_range_parser = new CIPRangeParser([
+			'v6' => ZBX_HAVE_IPV6,
+			'dns' => ($flags & API_ALLOW_DNS),
+			'ranges' => ($flags & API_ALLOW_RANGE)
+		]);
 
 		if (!$ip_range_parser->parse($data)) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $ip_range_parser->getError());
@@ -2710,6 +2776,48 @@ class CApiInputValidator {
 
 		if ($data !== '' && mb_substr($data, -1) !== "\n") {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('the last new line feed is missing'));
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Check if input value matches one of following formats:
+	 *  - <latitude>,<longitude>,<zoom>
+	 *  - <latitude>,<longitude>
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['length']  (optional)
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateLatLngZoom(array $rule, &$data, string $path, string &$error): bool {
+		if ($data === '') {
+			return true;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		$geoloc_parser = new CGeomapCoordinatesParser();
+
+		if ($geoloc_parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+				_('geographical coordinates (values of comma separated latitude and longitude) are expected')
+			);
+			return false;
+		}
+
+		$max_zoom = CSettingsHelper::get(CSettingsHelper::GEOMAPS_MAX_ZOOM);
+		if (array_key_exists('zoom', $geoloc_parser->result) && $geoloc_parser->result['zoom'] > $max_zoom) {
+			$error = _s('Invalid zoomparameter "%1$s": %2$s.', $path,
+				_s('zoom level must be between "%1$s" and "%2$s"', 0, $max_zoom)
+			);
 			return false;
 		}
 

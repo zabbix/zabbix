@@ -326,7 +326,7 @@
 			}
 			else {
 				const matches = Object.entries(this.key_type_suggestions).filter(([key_name, value_type]) => {
-					key_name.startsWith(this.last_lookup);
+					return key_name.startsWith(this.last_lookup);
 				});
 
 				if (matches.length > 0) {
@@ -339,6 +339,7 @@
 			}
 
 			if (this.inferred_type === null) {
+				this.item_tab_type_field.dispatchEvent(new CustomEvent('change'));
 				return;
 			}
 
