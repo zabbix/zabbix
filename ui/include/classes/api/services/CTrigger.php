@@ -687,7 +687,7 @@ class CTrigger extends CTriggerGeneral {
 			: ['editable' => true];
 
 		$triggers = $this->get([
-			'output' => ['triggerid', 'description', 'flags'],
+			'output' => ['triggerid', 'description', 'templateid', 'flags'],
 			'triggerids' => $triggerids,
 			'preservekeys' => true
 		] + $permission_check);
@@ -697,6 +697,12 @@ class CTrigger extends CTriggerGeneral {
 		}
 
 		foreach ($triggers as $trigger) {
+			if ($trigger['templateid'] && !$inherited) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Cannot update dependencies of inherited trigger "%1$s"',
+					$trigger['description']
+				));
+			}
+
 			if ($trigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Cannot update "%2$s" for a discovered trigger "%1$s".',
 					$trigger['description'], 'dependencies'
@@ -812,7 +818,7 @@ class CTrigger extends CTriggerGeneral {
 			: ['editable' => true];
 
 		$triggers = $this->get([
-			'output' => ['triggerid', 'description', 'flags'],
+			'output' => ['triggerid', 'description', 'templateid', 'flags'],
 			'triggerids' => $triggerids,
 			'preservekeys' => true
 		] + $permission_check);
@@ -826,6 +832,12 @@ class CTrigger extends CTriggerGeneral {
 		}
 
 		foreach ($triggers as $trigger) {
+			if ($trigger['templateid'] && !$inherited) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Cannot update dependencies of inherited trigger "%1$s"',
+					$trigger['description']
+				));
+			}
+
 			if ($trigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Cannot update "%2$s" for a discovered trigger "%1$s".',
 					$trigger['description'], 'dependencies'
