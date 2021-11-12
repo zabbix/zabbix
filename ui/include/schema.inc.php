@@ -2745,8 +2745,7 @@ return [
 			],
 			'dbversion_status' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 1024,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => ''
 			],
 			'hk_events_service' => [
@@ -2773,6 +2772,12 @@ return [
 				'length' => 10,
 				'default' => '1'
 			],
+			'ha_failover_delay' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '1m'
+			],
 			'geomaps_tile_provider' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
@@ -2796,12 +2801,6 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 1024,
 				'default' => ''
-			],
-			'ha_failover_delay' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 32,
-				'default' => '1m'
 			]
 		]
 	],

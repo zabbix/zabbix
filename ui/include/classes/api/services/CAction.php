@@ -999,7 +999,7 @@ class CAction extends CApiService {
 							// break; is not missing here
 
 						case OPERATION_TYPE_RECOVERY_MESSAGE:
-						case OPERATION_TYPE_ACK_MESSAGE:
+						case OPERATION_TYPE_UPDATE_MESSAGE:
 							if (array_key_exists('opmessage', $db_operation)) {
 								$upd_opmessage = DB::getUpdatedValues('opmessage', $operation['opmessage'],
 									$db_operation['opmessage']
@@ -2057,10 +2057,12 @@ class CAction extends CApiService {
 		$opcommands = [];
 
 		foreach ($update_operations as $operationid => &$update_operation) {
-			unset($update_operation['esc_period'], $update_operation['esc_step_from'], $update_operation['esc_step_to']);
+			unset($update_operation['esc_period'], $update_operation['esc_step_from'],
+				$update_operation['esc_step_to']
+			);
 
 			switch ($update_operation['operationtype']) {
-				case OPERATION_TYPE_ACK_MESSAGE:
+				case OPERATION_TYPE_UPDATE_MESSAGE:
 					$opmessages[] = $operationid;
 					break;
 				case OPERATION_TYPE_MESSAGE:
@@ -2361,7 +2363,7 @@ class CAction extends CApiService {
 		];
 		$all_opmessage_fields = [
 			'opmessage' =>		['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'operationtype', 'in' => implode(',', [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_ACK_MESSAGE])], 'type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => $opmessage_fields + [
+									['if' => ['field' => 'operationtype', 'in' => implode(',', [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_UPDATE_MESSAGE])], 'type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => $opmessage_fields + [
 										'mediatypeid' =>	['type' => API_ID]
 									]],
 									['if' => ['field' => 'operationtype', 'in' => OPERATION_TYPE_RECOVERY_MESSAGE], 'type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => $opmessage_fields],
@@ -2416,7 +2418,7 @@ class CAction extends CApiService {
 							'opconditions' =>	['type' => API_OBJECTS, 'uniq' => [['value']], 'fields' => [
 								'conditiontype' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => CONDITION_TYPE_EVENT_ACKNOWLEDGED],
 								'value' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => implode(',', [EVENT_NOT_ACKNOWLEDGED, EVENT_ACKNOWLEDGED]), 'length' => DB::getFieldLength('opconditions', 'value')],
-								'operator' =>		['type' => API_INT32, 'in' => CONDITION_OPERATOR_EQUAL],
+								'operator' =>		['type' => API_INT32, 'in' => CONDITION_OPERATOR_EQUAL]
 							]]
 						] + $common_fields;
 
@@ -2861,7 +2863,7 @@ class CAction extends CApiService {
 
 				foreach ($action[$operation_group] as $operation) {
 					if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE
-							|| $operation['operationtype'] == OPERATION_TYPE_ACK_MESSAGE) {
+							|| $operation['operationtype'] == OPERATION_TYPE_UPDATE_MESSAGE) {
 						if (array_key_exists('mediatypeid', $operation)
 								&& $operation['opmessage']['mediatypeid'] != 0) {
 							$mediatypeids[$operation['opmessage']['mediatypeid']] = true;
@@ -3498,7 +3500,7 @@ class CAction extends CApiService {
 			switch ($db_operation['operationtype']) {
 				case OPERATION_TYPE_MESSAGE:
 				case OPERATION_TYPE_RECOVERY_MESSAGE:
-				case OPERATION_TYPE_ACK_MESSAGE:
+				case OPERATION_TYPE_UPDATE_MESSAGE:
 					$operation['opmessage'] = [
 						'default_msg' => $db_operation['default_msg'],
 						'subject' => $db_operation['subject'],

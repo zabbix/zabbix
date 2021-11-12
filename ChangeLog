@@ -1,3 +1,17 @@
+Changes for 6.0.0alpha7
+
+New features:
+..F....PS. [ZBXNEXT-3706] added support for utf8mb4 encoding with utf8mb4_bin collation on mysql and mariadb (miks, yurii)
+
+Bug fixes:
+........S. [ZBX-20177] added acnowledgeid index for alerts table (ssimonenko)
+.....J.... [ZBX-19587] fixed Zabbix Java gateway error message when object or attribute is not found (vso)
+....I...S. [ZBX-20176] fixed trigger not being calculated for first value when item changes state to supported; fixed build failure when DES is disabled in Net-SNMP; fixed tests on big-endian systems (vso)
+.........T [ZBX-20150] fixed special characters escaping in markdown parsing of the Telegram media type (abiba)
+A......... [ZBX-19888] fixed selectUpdateOperations option not accepting "extend" value in Actions API (averza)
+A......... [ZBX-20200] fixed PHP runtime errors when updating media type (Sasha)
+
+--------------------------------------------------------------------------------
 Changes for 6.0.0alpha6
 
 New features:
@@ -12,6 +26,7 @@ A.F....... [ZBXNEXT-6470,ZBXNEXT-6920] implemented audit logging of action API o
 .........T [ZBXNEXT-7001] added support High availability cluster in Zabbix server health/Remote Zabbix server health template (abakaldin)
 
 Bug fixes:
+A......... [ZBX-20186] fixed incorrect count of result rows reported by API (jfreibergs)
 .......PS. [ZBX-20097] added celsius support to vmware unitInfo (asestakovs)
 .......PS. [ZBX-18944] fixed the fields size for LLD validation of triggers.description and item_preproc.params (ssimonenko)
 .......PS. [ZBX-20085] fixed build on Solaris; thanks to Yuuki Enomoto for the patch (vso)
@@ -216,6 +231,10 @@ New features:
 .........T [ZBXNEXT-7014] updated README for a newer version of PagerDuty (abiba)
 
 Bug fixes:
+........S. [ZBX-20177] added acknowledgeid index for alerts table (ssimonenko)
+.....J.... [ZBX-19587] fixed Zabbix Java gateway error message when object or attribute is not found (vso)
+....I...S. [ZBX-20176] fixed trigger not being calculated for first value when item changes state to supported; fixed build failure when DES is disabled in Net-SNMP; fixed tests on big-endian systems (vso)
+.........T [ZBX-20150] fixed special characters escaping in markdown parsing of the Telegram media type (abiba)
 .......PS. [ZBX-20097] added celsius support to vmware unitInfo (asestakovs)
 .......PS. [ZBX-20085] fixed build on Solaris; thanks to Yuuki Enomoto for the patch (vso)
 ...G...... [ZBX-19926] fixed Zabbix agent crashing when reading event log on Windows Server 2022 (vso)
@@ -1342,6 +1361,10 @@ New features:
 .......PS. [ZBXNEXT-6644] added support for vmware key named 'vmware.hv.maintenance' (MVekslers)
 
 Bug fixes:
+........S. [ZBX-20177] added acknowledgeid index for alerts table (ssimonenko)
+.....J.... [ZBX-19587] fixed Zabbix Java gateway error message when object or attribute is not found (vso)
+....I...S. [ZBX-20176] fixed trigger not being calculated for first value when item changes state to supported; fixed build failure when DES is disabled in Net-SNMP; fixed tests on big-endian systems (vso)
+.........T [ZBX-20150] fixed special characters escaping in markdown parsing of the Telegram media type (abiba)
 ...G...... [ZBX-19926] fixed Zabbix agent crashing when reading event log on Windows Server 2022 (vso)
 .........T [ZBX-20080] fixed error message (abiba)
 .........T [ZBX-20003] fixed update and discard intervals in generic snmp and some other templates (vkhaliev)

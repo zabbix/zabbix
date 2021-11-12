@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-05 20:05+0200\n"
+"POT-Creation-Date: 2021-11-12 19:55+0200\n"
 "PO-Revision-Date: 2013-08-07 16:41+0300\n"
 "Last-Translator: open-future <patrik@open-future.be>\n"
 "Language-Team: NL\n"
@@ -597,7 +597,7 @@ msgstr ""
 msgid "Action"
 msgstr "Actie"
 
-#: include/classes/api/services/CAction.php:2676
+#: include/classes/api/services/CAction.php:2678
 #, c-format
 msgid "Action \"%1$s\" already exists."
 msgstr "Actie \"%1$s\" bestaat reeds."
@@ -2889,7 +2889,7 @@ msgstr "Kan sjabloon niet ontkoppelen."
 msgid "Cannot unlink trigger \"%1$s\", it has items from template that is left linked to host."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2624
+#: include/classes/api/services/CAction.php:2626
 #, c-format
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
 msgstr "Kan \"%1$s\" niet bijwerken voor actie \"%2$s\"."
@@ -7506,7 +7506,7 @@ msgstr "Geschiedenis"
 msgid "History and trends compression"
 msgstr ""
 
-#: include/classes/api/services/CHistory.php:359
+#: include/classes/api/services/CHistory.php:353
 msgid "History cleanup is not supported if compression is enabled"
 msgstr ""
 
@@ -8471,7 +8471,7 @@ msgstr ""
 msgid "Incorrect action condition discovery check."
 msgstr "Verkeerde actie, conditie discovery controleren."
 
-#: include/classes/api/services/CAction.php:3308
+#: include/classes/api/services/CAction.php:3310
 msgid "Incorrect action condition discovery check. Discovery check does not exist or you have no access to it."
 msgstr "Verkeerde actie, conditie discovery controleren. Discovery controle bestaat niet of u heeft geen toegang.Verkeerde actie, conditie discovery controleren. Discovery controle bestaat niet of u heeft geen toegang.Verkeerde actie, conditie discovery controleren. Discovery controle bestaat niet of u heeft geen toegang.Verkeerde actie, conditie discovery controleren. Discovery controle bestaat niet of u heeft geen toegang."
 
@@ -8479,7 +8479,7 @@ msgstr "Verkeerde actie, conditie discovery controleren. Discovery controle best
 msgid "Incorrect action condition discovery object."
 msgstr "Verkeerde actie conditie discovery object."
 
-#: include/classes/api/services/CAction.php:3267
+#: include/classes/api/services/CAction.php:3269
 msgid "Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it."
 msgstr "Verkeerde actie conditie discovery regel. Discovery regel bestaat niet of u hebt er geen toegang toe."
 
@@ -8491,15 +8491,15 @@ msgstr "Verkeerde actie conditie discovery status."
 msgid "Incorrect action condition event type."
 msgstr "Verkeerde actie conditie type gebeurtenis."
 
-#: include/classes/api/services/CAction.php:2987
+#: include/classes/api/services/CAction.php:2989
 msgid "Incorrect action condition or operation host group. Host group does not exist or you have no access to it."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:3047
+#: include/classes/api/services/CAction.php:3049
 msgid "Incorrect action condition or operation host. Host does not exist or you have no access to it."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:3185
+#: include/classes/api/services/CAction.php:3187
 msgid "Incorrect action condition or operation template. Template does not exist or you have no access to it."
 msgstr ""
 
@@ -8508,11 +8508,11 @@ msgstr ""
 msgid "Incorrect action condition port \"%1$s\"."
 msgstr "Verkeerde actie voorwaarde poort \"%1$s\"."
 
-#: include/classes/api/services/CAction.php:3349
+#: include/classes/api/services/CAction.php:3351
 msgid "Incorrect action condition proxy. Proxy does not exist or you have no access to it."
 msgstr "Verkeerde actie voorwaarde proxy. Proxy bestaat niet of u hebt geen toegang.Verkeerde actie voorwaarde proxy. Proxy bestaat niet of u hebt geen toegang.Verkeerde actie voorwaarde proxy. Proxy bestaat niet of u hebt geen toegang.Verkeerde actie voorwaarde proxy. Proxy bestaat niet of u hebt geen toegang."
 
-#: include/classes/api/services/CAction.php:3389
+#: include/classes/api/services/CAction.php:3391
 msgid "Incorrect action condition service. Service does not exist or you have no access to it."
 msgstr ""
 
@@ -8520,7 +8520,7 @@ msgstr ""
 msgid "Incorrect action condition trigger severity."
 msgstr "Verkeerde actie voorwaarde trigger gevoeligheid."
 
-#: include/classes/api/services/CAction.php:3226
+#: include/classes/api/services/CAction.php:3228
 msgid "Incorrect action condition trigger. Trigger does not exist or you have no access to it."
 msgstr "Verkeerde actie voorwaarde trigger. Trigger bestaat niet of u hebt geen toegang.Verkeerde actie voorwaarde trigger. Trigger bestaat niet of u hebt geen toegang.Verkeerde actie voorwaarde trigger. Trigger bestaat niet of u hebt geen toegang.Verkeerde actie voorwaarde trigger. Trigger bestaat niet of u hebt geen toegang."
 
@@ -8530,11 +8530,11 @@ msgstr "Verkeerd type actie voorwaarde."
 
 #: app/controllers/CControllerActionOperationValidate.php:83
 #: app/controllers/CControllerActionOperationValidate.php:89
-#: include/classes/api/services/CAction.php:2812
+#: include/classes/api/services/CAction.php:2814
 msgid "Incorrect action operation escalation step values."
 msgstr "Verkeerde actie bediening escalatie stap waarden."
 
-#: include/classes/api/services/CAction.php:2887
+#: include/classes/api/services/CAction.php:2889
 msgid "Incorrect action operation media type. Media type does not exist or you have no access to it."
 msgstr ""
 
@@ -8543,11 +8543,11 @@ msgstr ""
 msgid "Incorrect action operation type \"%1$s\" for event source \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:3133
+#: include/classes/api/services/CAction.php:3135
 msgid "Incorrect action operation user group. User group does not exist or you have no access to it."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:3090
+#: include/classes/api/services/CAction.php:3092
 msgid "Incorrect action operation user. User does not exist or you have no access to it."
 msgstr ""
 
@@ -9504,10 +9504,10 @@ msgstr "Ongeldige werkwijze parameters."
 #: app/controllers/CControllerDashboardUpdate.php:200
 #: app/controllers/CControllerDashboardUpdate.php:212
 #: app/controllers/CControllerPopupHttpStep.php:100
-#: include/classes/api/services/CAction.php:2703
-#: include/classes/api/services/CAction.php:2709
-#: include/classes/api/services/CAction.php:2720
-#: include/classes/api/services/CAction.php:2732
+#: include/classes/api/services/CAction.php:2705
+#: include/classes/api/services/CAction.php:2711
+#: include/classes/api/services/CAction.php:2722
+#: include/classes/api/services/CAction.php:2734
 #: include/classes/api/services/CAutoregistration.php:157
 #: include/classes/api/services/CAutoregistration.php:163
 #: include/classes/api/services/CAutoregistration.php:170
@@ -12126,7 +12126,7 @@ msgstr "Geen overeenkomsten gevonden."
 msgid "No new modules discovered"
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2767
+#: include/classes/api/services/CAction.php:2769
 #, c-format
 msgid "No operations defined for action \"%1$s\"."
 msgstr ""
@@ -12204,7 +12204,7 @@ msgstr ""
 #: app/views/monitoring.widget.systeminfo.view.php:45 disc_prototypes.php:748
 #: host_discovery.php:808 hostinventoriesoverview.php:73
 #: include/classes/api/services/CAction.php:1516
-#: include/classes/api/services/CAction.php:2569
+#: include/classes/api/services/CAction.php:2571
 #: include/classes/api/services/CConfiguration.php:78
 #: include/classes/api/services/CCorrelation.php:497
 #: include/classes/api/services/CCorrelation.php:653
@@ -12232,7 +12232,7 @@ msgstr ""
 #: include/classes/api/services/CGraphPrototype.php:369
 #: include/classes/api/services/CGraphPrototype.php:457
 #: include/classes/api/services/CGraphPrototype.php:519
-#: include/classes/api/services/CHistory.php:371
+#: include/classes/api/services/CHistory.php:365
 #: include/classes/api/services/CHostBase.php:56
 #: include/classes/api/services/CHostBase.php:533
 #: include/classes/api/services/CHostGeneral.php:66
@@ -12367,7 +12367,7 @@ msgid "No public key file specified."
 msgstr ""
 
 #: app/controllers/CControllerActionOperationValidate.php:110
-#: include/classes/api/services/CAction.php:2824
+#: include/classes/api/services/CAction.php:2826
 msgid "No recipients specified for action operation message."
 msgstr ""
 
@@ -12388,7 +12388,7 @@ msgid "No target selected."
 msgstr "Geen doel geselecteerd."
 
 #: app/controllers/CControllerActionOperationValidate.php:142
-#: include/classes/api/services/CAction.php:2835
+#: include/classes/api/services/CAction.php:2837
 msgid "No targets specified for action operation global script."
 msgstr ""
 
@@ -12922,7 +12922,7 @@ msgstr ""
 msgid "Operation"
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2793
+#: include/classes/api/services/CAction.php:2795
 #, c-format
 msgid "Operation \"%1$s\" already exists for action \"%2$s\"."
 msgstr ""
@@ -13425,7 +13425,7 @@ msgid "Parameters"
 msgstr ""
 
 #: app/controllers/CControllerActionOperationValidate.php:76
-#: include/classes/api/services/CAction.php:2805
+#: include/classes/api/services/CAction.php:2807
 msgid "Parameters \"esc_step_from\" and \"esc_step_to\" must be set together."
 msgstr ""
 
@@ -16145,7 +16145,7 @@ msgstr ""
 msgid "Sort order (0->999)"
 msgstr "Sorteer orde (0->999)"
 
-#: include/classes/api/CApiService.php:588
+#: include/classes/api/CApiService.php:592
 #, c-format
 msgid "Sorting by field \"%1$s\" not allowed."
 msgstr ""
@@ -16168,7 +16168,7 @@ msgstr "Spanish (es_ES)"
 msgid "Specified role was not found."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2930
+#: include/classes/api/services/CAction.php:2932
 msgid "Specified script does not exist or you do not have rights on it for action operation command."
 msgstr ""
 
@@ -19828,7 +19828,7 @@ msgstr ""
 msgid "an explicit time is expected"
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2710
+#: include/classes/api/services/CAction.php:2712
 #: include/classes/api/services/CCorrelation.php:730
 msgid "an identifier is not defined in the formula"
 msgstr ""
@@ -20005,7 +20005,7 @@ msgstr ""
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:41
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:47
 #: app/controllers/CControllerUserUpdateGeneral.php:111
-#: include/classes/api/services/CAction.php:2733
+#: include/classes/api/services/CAction.php:2735
 #: include/classes/api/services/CAutoregistration.php:163
 #: include/classes/api/services/CDiscoveryRule.php:1989
 #: include/classes/api/services/CDRule.php:210
@@ -20466,7 +20466,7 @@ msgstr ""
 msgid "incorrect expression starting from \"%1$s\""
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2703
+#: include/classes/api/services/CAction.php:2705
 #: include/classes/api/services/CCorrelation.php:723
 msgid "incorrect number of conditions"
 msgstr ""

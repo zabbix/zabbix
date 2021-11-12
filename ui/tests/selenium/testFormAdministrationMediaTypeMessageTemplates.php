@@ -903,7 +903,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 					$form->submit();
 					break;
 				case 'Add':
-					$templates_list->query('button:Add')->one()->click();
+					$templates_list->query('button:Add')->waitUntilClickable()->one()->click();
 					$form = $this->query('id:mediatype_message_form')->waitUntilVisible()->asForm()->one();
 					unset($template['action']);
 					$form->fill($template);
