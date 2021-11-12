@@ -209,14 +209,11 @@ $scripts[] =
 	'$(".input-color-picker input", $(".overlay-dialogue-body"))'.
 		'.colorpicker({appendTo: ".overlay-dialogue-body", use_default: true, onUpdate: window.setIndicatorColor});'.
 
-	'var $show = $(\'input[id^="show_"]\').not("#show_header");'.
+	'var $show = $(\'input[id^="show_"]\', "#widget-dialogue-form").not("#show_header");'.
 
 	'$("#adv_conf").change(function() {'.
 		'if (this.checked) {'.
-			'for (var i = 0; i < $show.length; i++) {'.
-				'$($show[i]).trigger("change");'.
-			'}'.
-
+			'$($show).trigger("change");'.
 			'$("#bg-color-row").show();'.
 		'}'.
 		'else {'.
@@ -224,69 +221,44 @@ $scripts[] =
 		'}'.
 	'});'.
 
-	'for (var i = 0; i < $show.length; i++) {'.
-		// If this is last checked checkbox, prevent unchecking it.
-		'$($show[i]).click(function(e) {'.
-			'var checked = false;'.
+	// Prevent unchecking last "Show" checkbox.
+	'$show.on("click", () => Boolean($show.filter(":checked").length));'.
 
-			// On click event current checkbox state before the click is in reverse.
-			'if (!this.checked) {'.
-				'for (var j = 0; j < $show.length; j++) {'.
-					'if ($show[j].id !== this.id) {'.
-						'checked = checked || $show[j].checked;'.
-					'}'.
+	'$($show).change(function() {'.
+		'switch($(this).val()) {'.
+			'case "'.WIDGET_ITEM_SHOW_DESCRIPTION.'":'.
+				'if ($("#adv_conf").prop("checked")) {'.
+					'$("#description-row").toggle(this.checked);'.
 				'}'.
+				'break;'.
 
-				'if (!checked) {'.
-					'e.preventDefault();'.
-
-					'return false;'.
+			'case "'.WIDGET_ITEM_SHOW_VALUE.'":'.
+				'if ($("#adv_conf").prop("checked")) {'.
+					'$("#value-row").toggle(this.checked);'.
 				'}'.
-			'}'.
-		'});'.
+				'break;'.
 
-		'$($show[i]).change(function() {'.
-			'switch($(this).val()) {'.
-				'case "'.WIDGET_ITEM_SHOW_DESCRIPTION.'":'.
-					'if ($("#adv_conf").prop("checked")) {'.
-						'$("#description-row").toggle(this.checked);'.
-					'}'.
-					'break;'.
+			'case "'.WIDGET_ITEM_SHOW_TIME.'":'.
+				'if ($("#adv_conf").prop("checked")) {'.
+					'$("#time-row").toggle(this.checked);'.
+				'}'.
+				'break;'.
 
-				'case "'.WIDGET_ITEM_SHOW_VALUE.'":'.
-					'if ($("#adv_conf").prop("checked")) {'.
-						'$("#value-row").toggle(this.checked);'.
-					'}'.
-					'break;'.
-
-				'case "'.WIDGET_ITEM_SHOW_TIME.'":'.
-					'if ($("#adv_conf").prop("checked")) {'.
-						'$("#time-row").toggle(this.checked);'.
-					'}'.
-					'break;'.
-
-				'case "'.WIDGET_ITEM_SHOW_CHANGE_INDICATOR.'":'.
-					'if ($("#adv_conf").prop("checked")) {'.
-						'$("#change-indicator-row").toggle(this.checked);'.
-					'}'.
-					'break;'.
-			'}'.
-		'});'.
-
-		'$($show[i]).trigger("change");'.
-	'}'.
+			'case "'.WIDGET_ITEM_SHOW_CHANGE_INDICATOR.'":'.
+				'if ($("#adv_conf").prop("checked")) {'.
+					'$("#change-indicator-row").toggle(this.checked);'.
+				'}'.
+				'break;'.
+		'}'.
+	'});'.
 
 	'$("#adv_conf").trigger("change");'.
 
 	'$("#units_show").change(function() {'.
-		'$("#units").prop("readonly", !this.checked);'.
-		'$("#units_pos").prop("readonly", !this.checked);'.
-		'$("#units_size").prop("readonly", !this.checked);'.
-		'$("#units_bold").prop("readonly", !this.checked);'.
-		'$("#units_color").prop("readonly", !this.checked);'.
+		'$("#units, #units_pos, #units_size, #units_bold, #units_color").prop("readonly", !this.checked);'.
 	'});'.
 
-	'$("#units_show").trigger("change")';
+	'$("#units_show").trigger("change");';
 
 return [
 	'form' => $form,
