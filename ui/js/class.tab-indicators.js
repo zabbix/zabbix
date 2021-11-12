@@ -49,6 +49,7 @@ class TabIndicators {
 	 * @return {HTMLElement} Main form
 	 */
 	getForm() {
+		const TEMPLATE = document.querySelector('#templates-form');
 		const HOST = document.querySelector('#host-form');
 		const AUTHENTICATION = document.querySelector('#authentication-form');
 		const HOST_PROTOTYPE = document.querySelector('#host-prototype-form');
@@ -68,6 +69,8 @@ class TabIndicators {
 		const GRAPH = document.querySelector('#widget-dialogue-form');
 
 		switch (true) {
+			case !!TEMPLATE:
+				return TEMPLATE;
 			case !!HOST:
 				return HOST;
 			case !!AUTHENTICATION:
