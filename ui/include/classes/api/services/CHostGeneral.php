@@ -395,7 +395,7 @@ abstract class CHostGeneral extends CHostBase {
 				}
 			}
 			elseif (array_key_exists('templates_clear', $host)) {
-				foreach ($host['templates'] as $template) {
+				foreach ($host['templates_clear'] as $template) {
 					$del_links_clear[$template['templateid']][$host[$id_field_name]] = true;
 				}
 			}

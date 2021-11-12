@@ -255,6 +255,7 @@ class CAudit {
 		'template.macros' => 'hostmacro',
 		'template.tags' => 'host_tag',
 		'template.templates' => 'hosts_templates',
+		'template.templates_clear' => 'hosts_templates',
 		'templatedashboard.pages' => 'dashboard_page',
 		'templatedashboard.pages.widgets' => 'widget',
 		'templatedashboard.pages.widgets.fields' => 'widget_field',
@@ -293,6 +294,7 @@ class CAudit {
 		'template.macros' => 'hostmacroid',
 		'template.tags' => 'hosttagid',
 		'template.templates' => 'hosttemplateid',
+		'template.templates_clear' => 'hosttemplateid',
 		'templatedashboard.pages' => 'dashboard_pageid',
 		'templatedashboard.pages.widgets' => 'widgetid',
 		'templatedashboard.pages.widgets.fields' => 'widget_fieldid',
@@ -326,6 +328,11 @@ class CAudit {
 	 * @var array
 	 */
 	private const BLOB_FIELDS = ['image.image'];
+
+	/**
+	 * Array of paths that can only contain a data to delete.
+	 */
+	private const DELETE_ONLY_FIELDS = ['template.templates_clear'];
 
 	/**
 	 * Add audit records.
@@ -709,9 +716,26 @@ class CAudit {
 			}
 		}
 
-		foreach ($nested_objects_paths as $path) {
-			if (!in_array($path, $db_nested_objects_paths)) {
-				$result[$path] = [self::DETAILS_ACTION_ADD];
+		foreach ($nested_objects_paths as $real_path) {
+			if (!in_array($real_path, $db_nested_objects_paths)) {
+				$path = $real_path;
+
+				if (strpos($real_path, '[') !== false) {
+					$path = preg_replace('/\[[0-9]+\]/', '', $real_path);
+				}
+
+				if (in_array($path, self::DELETE_ONLY_FIELDS)) {
+					$result[$real_path] = [self::DETAILS_ACTION_DELETE];
+
+					foreach ($object as $object_path => $value) {
+						if (substr($object_path, 0, strlen($real_path)) === $real_path) {
+							unset($object[$object_path]);
+						}
+					}
+				}
+				else {
+					$result[$real_path] = [self::DETAILS_ACTION_ADD];
+				}
 			}
 		}
 

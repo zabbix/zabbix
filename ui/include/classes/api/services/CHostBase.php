@@ -182,7 +182,7 @@ abstract class CHostBase extends CApiService {
 				}
 
 				foreach ($host['templates_clear'] as $i2 => $template) {
-					$del_links = [$template['templateid']][$host[$id_field_name]];
+					$del_links[$template['templateid']][$host[$id_field_name]] = true;
 
 					if (($this instanceof CHost || $this instanceof CTemplate) && $upd_templates) {
 						$del_templates[$template['templateid']][$i1] = $upd_templates;
@@ -205,7 +205,7 @@ abstract class CHostBase extends CApiService {
 			}
 
 			if ($check_double_linkage) {
-				// self::checkDoubleLinkageNew($ins_templates, $del_links);
+				self::checkDoubleLinkageNew($ins_templates, $del_links);
 			}
 
 			$this->checkTriggerDependenciesOfInsTemplates($ins_templates);
@@ -378,17 +378,17 @@ abstract class CHostBase extends CApiService {
 	 * @param array $del_links[<templateid>][<hostid>]
 	 */
 	private static function checkCircularLinkageNew(array $ins_links, array $del_links): void {
+		$links = [];
 		$templateids = array_keys($ins_links);
-		$_templateids = $templateids;
 
 		do {
 			$result = DBselect(
 				'SELECT ht.templateid,ht.hostid'.
 				' FROM hosts_templates ht'.
-				' WHERE '.dbConditionId('ht.hostid', $_templateids)
+				' WHERE '.dbConditionId('ht.hostid', $templateids)
 			);
 
-			$_templateids = [];
+			$templateids = [];
 
 			while ($row = DBfetch($result)) {
 				if (array_key_exists($row['templateid'], $del_links)
@@ -396,29 +396,60 @@ abstract class CHostBase extends CApiService {
 					continue;
 				}
 
-				if (!array_key_exists($row['templateid'], $ins_links)) {
-					$_templateids[$row['templateid']] = true;
+				if (!array_key_exists($row['templateid'], $links)) {
+					$templateids[$row['templateid']] = true;
 				}
 
-				$ins_links[$row['templateid']][$row['hostid']] = true;
+				$links[$row['templateid']][$row['hostid']] = true;
 			}
 
-			$_templateids = array_keys($_templateids);
+			$templateids = array_keys($templateids);
 		}
-		while ($_templateids);
+		while ($templateids);
 
-		foreach ($templateids as $templateid) {
-			foreach ($ins_links[$templateid] as $hostid => $i1_i2_templateids) {
-				if (array_key_exists($hostid, $ins_links)
-						&& self::circularLinkageExists($ins_links, $templateid, $ins_links[$hostid], $hostid)) {
-					$i1 = key($i1_i2_templateids);
-					$i2 = key($i1_i2_templateids[$i1]);
+		foreach ($ins_links as $templateid => $hostids) {
+			if (array_key_exists($templateid, $links)) {
+				$links[$templateid] += $hostids;
+			}
+			else {
+				$links[$templateid] = $ins_links[$templateid];
+			}
+		}
 
-					$path = '/'.($i1 + 1).'/templates';
+		foreach ($ins_links as $templateid => $hostids) {
+			foreach ($hostids as $hostid => $i1_i2_templateids) {
+				if (array_key_exists($hostid, $links)){
+					$links_path = [$hostid => true];
 
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-						$path.'/'.($i2 + 1).'/templateid', _('cannot be linked due to circular linkage')
-					));
+					if (self::circularLinkageExists($links, $templateid, $links[$hostid], $links_path)) {
+						$i1 = key($i1_i2_templateids);
+						$i2 = key($i1_i2_templateids[$i1]);
+
+						$path = '/'.($i1 + 1).'/templates';
+
+						$template_name = '';
+						$options = [
+							'output' => ['hostid', 'host'],
+							'hostids' => array_keys($links_path + [$templateid => true]),
+							'preservekeys' => true
+						];
+						$templates = DBselect(DB::makeSql('hosts', $options));
+
+						while ($template = DBfetch($templates)) {
+							if (bccomp($template['hostid'], $templateid) == 0) {
+								$template_name = '"'.$template['host'].'"';
+							}
+							else {
+								$links_path[$template['hostid']] = '"'.$template['host'].'"';
+							}
+						}
+
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+							$path.'/'.($i2 + 1).'/templateid', _s('cannot be linked due to circular linkage (%1$s)',
+								$template_name.' -> '.implode(' -> ', $links_path).' -> '.$template_name
+							)
+						));
+					}
 				}
 			}
 		}
@@ -430,21 +461,27 @@ abstract class CHostBase extends CApiService {
 	 * @param array  $links[<templateid>][<hostid>]  The list of linkages.
 	 * @param string $templateid                     ID of the template to check circular linkages.
 	 * @param array  $hostids[<hostid>]
-	 * @param string $prev_hostid                    ID of the host used in previous iteration. Used to avoid infinite
-	 *                                               recursion in case when checked template does not have circular
-	 *                                               linkage, but the other template, linked to the same host, have it.
+	 * @param array  $links_path                     The path of circular linkage. Collected during the checks.
 	 *
 	 * @return bool
 	 */
 	private static function circularLinkageExists(array $links, string $templateid, array $hostids,
-			string $prev_hostid): bool {
+			array &$links_path): bool {
 		if (array_key_exists($templateid, $hostids)) {
 			return true;
 		}
 
+		$_links_path = $links_path;
+
 		foreach ($hostids as $hostid => $foo) {
-			if (array_key_exists($hostid, $links) && !array_key_exists($prev_hostid, $links[$hostid])) {
-				return self::circularLinkageExists($links, $templateid, $links[$hostid], $hostid);
+			if (array_key_exists($hostid, $links)) {
+				$links_path = $_links_path;
+				$hostid_links = array_diff_key($links[$hostid], $links_path);
+
+				if ($hostid_links) {
+					$links_path[$hostid] = true;
+					return self::circularLinkageExists($links, $templateid, $hostid_links, $links_path);
+				}
 			}
 		}
 
@@ -798,14 +835,29 @@ abstract class CHostBase extends CApiService {
 				}
 				unset($template);
 
+				$templates_clear_indexes = [];
+
+				if (array_key_exists('templates_clear', $host)) {
+					foreach ($host['templates_clear'] as $index => $template) {
+						$templates_clear_indexes[$template['templateid']] = $index;
+					}
+				}
+
 				foreach ($db_templates as $del_template) {
 					$del_hosttemplateids[] = $del_template['hosttemplateid'];
+
+					if (array_key_exists($del_template['templateid'], $templates_clear_indexes)) {
+						$index = $templates_clear_indexes[$del_template['templateid']];
+						$host['templates_clear'][$index]['hosttemplateid'] = $del_template['hosttemplateid'];
+					}
 				}
 			}
 			elseif (array_key_exists('templates_clear', $host)) {
-				foreach ($host['templates_clear'] as $template) {
-					$del_hosttemplateids[] = $db_templates[$template['template']]['hosttemplateid'];
+				foreach ($host['templates_clear'] as &$template) {
+					$template['hosttemplateid'] = $db_templates[$template['templateid']]['hosttemplateid'];
+					$del_hosttemplateids[] = $db_templates[$template['templateid']]['hosttemplateid'];
 				}
+				unset($template);
 			}
 		}
 		unset($host);
