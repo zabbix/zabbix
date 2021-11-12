@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-09 16:59+0200\n"
+"POT-Creation-Date: 2021-11-12 19:55+0200\n"
 "PO-Revision-Date: 2021-11-08 13:50+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -575,7 +575,7 @@ msgstr "確認済の解決済イベント"
 msgid "Action"
 msgstr "アクション"
 
-#: include/classes/api/services/CAction.php:2676
+#: include/classes/api/services/CAction.php:2678
 #, c-format
 msgid "Action \"%1$s\" already exists."
 msgstr "アクション\"%1$s\"はすでに存在しています。"
@@ -2817,7 +2817,7 @@ msgstr "テンプレートのリンクを削除できません。"
 msgid "Cannot unlink trigger \"%1$s\", it has items from template that is left linked to host."
 msgstr "トリガー\"%1$s\"のリンクを削除できません。ホストにリンクされたテンプレートのアイテムを使用しています。"
 
-#: include/classes/api/services/CAction.php:2624
+#: include/classes/api/services/CAction.php:2626
 #, c-format
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
 msgstr "アクション\"%2$s\"の\"%1$s\"を更新できません。"
@@ -8384,7 +8384,7 @@ msgstr "Vaultのトークンが正しくありません。"
 msgid "Incorrect action condition discovery check."
 msgstr "アクションの実行条件のディスカバリチェックの値が正しくありません。"
 
-#: include/classes/api/services/CAction.php:3308
+#: include/classes/api/services/CAction.php:3310
 msgid "Incorrect action condition discovery check. Discovery check does not exist or you have no access to it."
 msgstr "アクションの実行条件のディスカバリチェックの値が正しくありません。ディスカバリチェックが存在しないか、権限がありません。"
 
@@ -8392,7 +8392,7 @@ msgstr "アクションの実行条件のディスカバリチェックの値が
 msgid "Incorrect action condition discovery object."
 msgstr "アクションの実行条件のディスカバリオブジェクトが正しくありません。"
 
-#: include/classes/api/services/CAction.php:3267
+#: include/classes/api/services/CAction.php:3269
 msgid "Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it."
 msgstr "アクションの実行条件のディスカバリルールが正しくありません。ディスカバリルールが存在しないか、権限がありません"
 
@@ -8404,15 +8404,15 @@ msgstr "アクションの実行条件のディスカバリのステータスの
 msgid "Incorrect action condition event type."
 msgstr "アクションの実行条件のイベントタイプが正しくありません。"
 
-#: include/classes/api/services/CAction.php:2987
+#: include/classes/api/services/CAction.php:2989
 msgid "Incorrect action condition or operation host group. Host group does not exist or you have no access to it."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:3047
+#: include/classes/api/services/CAction.php:3049
 msgid "Incorrect action condition or operation host. Host does not exist or you have no access to it."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:3185
+#: include/classes/api/services/CAction.php:3187
 msgid "Incorrect action condition or operation template. Template does not exist or you have no access to it."
 msgstr ""
 
@@ -8421,11 +8421,11 @@ msgstr ""
 msgid "Incorrect action condition port \"%1$s\"."
 msgstr "アクションの実行条件のポート\"%1$s\"が正しくありません。"
 
-#: include/classes/api/services/CAction.php:3349
+#: include/classes/api/services/CAction.php:3351
 msgid "Incorrect action condition proxy. Proxy does not exist or you have no access to it."
 msgstr "アクションの実行条件のプロキシ設定が正しくありません。プロキシが存在しないか、アクセス権がありません。"
 
-#: include/classes/api/services/CAction.php:3389
+#: include/classes/api/services/CAction.php:3391
 msgid "Incorrect action condition service. Service does not exist or you have no access to it."
 msgstr ""
 
@@ -8433,7 +8433,7 @@ msgstr ""
 msgid "Incorrect action condition trigger severity."
 msgstr "アクションの実行条件のトリガーの深刻度が正しくありません。"
 
-#: include/classes/api/services/CAction.php:3226
+#: include/classes/api/services/CAction.php:3228
 msgid "Incorrect action condition trigger. Trigger does not exist or you have no access to it."
 msgstr "アクションの実行条件のトリガーの値が正しくありません。トリガーが存在しないか、アクセス権がありません。"
 
@@ -8443,11 +8443,11 @@ msgstr "アクションの実行条件のタイプの値が正しくありませ
 
 #: app/controllers/CControllerActionOperationValidate.php:83
 #: app/controllers/CControllerActionOperationValidate.php:89
-#: include/classes/api/services/CAction.php:2812
+#: include/classes/api/services/CAction.php:2814
 msgid "Incorrect action operation escalation step values."
 msgstr "実行するアクションのエスカレーションステップの値が正しくありません。"
 
-#: include/classes/api/services/CAction.php:2887
+#: include/classes/api/services/CAction.php:2889
 msgid "Incorrect action operation media type. Media type does not exist or you have no access to it."
 msgstr ""
 
@@ -8456,11 +8456,11 @@ msgstr ""
 msgid "Incorrect action operation type \"%1$s\" for event source \"%2$s\"."
 msgstr "イベントのソース\"%2$s\"のために実行するアクションのタイプ\"%1$s\"が正しくありません。"
 
-#: include/classes/api/services/CAction.php:3133
+#: include/classes/api/services/CAction.php:3135
 msgid "Incorrect action operation user group. User group does not exist or you have no access to it."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:3090
+#: include/classes/api/services/CAction.php:3092
 msgid "Incorrect action operation user. User does not exist or you have no access to it."
 msgstr ""
 
@@ -9417,10 +9417,10 @@ msgstr "メソッドのパラメータが正しくありません。"
 #: app/controllers/CControllerDashboardUpdate.php:200
 #: app/controllers/CControllerDashboardUpdate.php:212
 #: app/controllers/CControllerPopupHttpStep.php:100
-#: include/classes/api/services/CAction.php:2703
-#: include/classes/api/services/CAction.php:2709
-#: include/classes/api/services/CAction.php:2720
-#: include/classes/api/services/CAction.php:2732
+#: include/classes/api/services/CAction.php:2705
+#: include/classes/api/services/CAction.php:2711
+#: include/classes/api/services/CAction.php:2722
+#: include/classes/api/services/CAction.php:2734
 #: include/classes/api/services/CAutoregistration.php:157
 #: include/classes/api/services/CAutoregistration.php:163
 #: include/classes/api/services/CAutoregistration.php:170
@@ -12019,7 +12019,7 @@ msgstr "条件に一致するデータはありません"
 msgid "No new modules discovered"
 msgstr "新しいモジュールは見つかりませんでした"
 
-#: include/classes/api/services/CAction.php:2767
+#: include/classes/api/services/CAction.php:2769
 #, c-format
 msgid "No operations defined for action \"%1$s\"."
 msgstr ""
@@ -12097,7 +12097,7 @@ msgstr "\"%1$s.%2$s\"を呼び出す権限がありません。"
 #: app/views/monitoring.widget.systeminfo.view.php:45 disc_prototypes.php:748
 #: host_discovery.php:808 hostinventoriesoverview.php:73
 #: include/classes/api/services/CAction.php:1516
-#: include/classes/api/services/CAction.php:2569
+#: include/classes/api/services/CAction.php:2571
 #: include/classes/api/services/CConfiguration.php:78
 #: include/classes/api/services/CCorrelation.php:497
 #: include/classes/api/services/CCorrelation.php:653
@@ -12260,7 +12260,7 @@ msgid "No public key file specified."
 msgstr "公開鍵ファイルが設定されていません。"
 
 #: app/controllers/CControllerActionOperationValidate.php:110
-#: include/classes/api/services/CAction.php:2824
+#: include/classes/api/services/CAction.php:2826
 msgid "No recipients specified for action operation message."
 msgstr ""
 
@@ -12281,7 +12281,7 @@ msgid "No target selected."
 msgstr "何も選択されていません。"
 
 #: app/controllers/CControllerActionOperationValidate.php:142
-#: include/classes/api/services/CAction.php:2835
+#: include/classes/api/services/CAction.php:2837
 msgid "No targets specified for action operation global script."
 msgstr ""
 
@@ -12814,7 +12814,7 @@ msgstr "OS情報。文字列値を返す。"
 msgid "Operation"
 msgstr "処理内容"
 
-#: include/classes/api/services/CAction.php:2793
+#: include/classes/api/services/CAction.php:2795
 #, c-format
 msgid "Operation \"%1$s\" already exists for action \"%2$s\"."
 msgstr ""
@@ -13317,7 +13317,7 @@ msgid "Parameters"
 msgstr "パラメータ"
 
 #: app/controllers/CControllerActionOperationValidate.php:76
-#: include/classes/api/services/CAction.php:2805
+#: include/classes/api/services/CAction.php:2807
 msgid "Parameters \"esc_step_from\" and \"esc_step_to\" must be set together."
 msgstr ""
 
@@ -16052,7 +16052,7 @@ msgstr "スペイン語(es_ES)"
 msgid "Specified role was not found."
 msgstr "指定された役割が存在しません。"
 
-#: include/classes/api/services/CAction.php:2930
+#: include/classes/api/services/CAction.php:2932
 msgid "Specified script does not exist or you do not have rights on it for action operation command."
 msgstr "実行するアクションのコマンドで指定されたスクリプトが存在しないか、権限がありません。"
 
@@ -19701,7 +19701,7 @@ msgstr "16進文字列で指定してください"
 msgid "an explicit time is expected"
 msgstr "具体的な時間を指定してください"
 
-#: include/classes/api/services/CAction.php:2710
+#: include/classes/api/services/CAction.php:2712
 #: include/classes/api/services/CCorrelation.php:730
 msgid "an identifier is not defined in the formula"
 msgstr "識別子は式で定義されていません"
@@ -19878,7 +19878,7 @@ msgstr "変更できません"
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:41
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:47
 #: app/controllers/CControllerUserUpdateGeneral.php:111
-#: include/classes/api/services/CAction.php:2733
+#: include/classes/api/services/CAction.php:2735
 #: include/classes/api/services/CAutoregistration.php:163
 #: include/classes/api/services/CDiscoveryRule.php:1989
 #: include/classes/api/services/CDRule.php:210
@@ -20339,7 +20339,7 @@ msgstr "要素の数が正しくありません"
 msgid "incorrect expression starting from \"%1$s\""
 msgstr "\"%1$s\"から始まる条件式が正しくありません"
 
-#: include/classes/api/services/CAction.php:2703
+#: include/classes/api/services/CAction.php:2705
 #: include/classes/api/services/CCorrelation.php:723
 msgid "incorrect number of conditions"
 msgstr "条件の数が正しくありません"
