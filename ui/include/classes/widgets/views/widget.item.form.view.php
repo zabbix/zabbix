@@ -255,7 +255,7 @@ $scripts[] =
 	'$("#adv_conf").trigger("change");'.
 
 	'$("#units_show").change(function() {'.
-		'$("#units, #units_pos, #units_size, #units_bold, #units_color").prop("readonly", !this.checked);'.
+		'$("#units, #units_pos, #units_size, #units_bold, #units_color").prop("disabled", !this.checked);'.
 	'});'.
 
 	'$("#units_show").trigger("change");';

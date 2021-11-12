@@ -407,7 +407,7 @@ class CApiInputValidator {
 	 * Color validator.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_NULL
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -416,6 +416,10 @@ class CApiInputValidator {
 	 */
 	private static function validateColor($rule, &$data, $path, &$error) {
 		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (($flags & API_ALLOW_NULL) && $data === null) {
+			return true;
+		}
 
 		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
 			return false;
