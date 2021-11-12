@@ -230,24 +230,28 @@ $scripts[] =
 				'if ($("#adv_conf").prop("checked")) {'.
 					'$("#description-row").toggle(this.checked);'.
 				'}'.
+				'$("#description-row").find("input, textarea").prop("disabled", !this.checked);'.
 				'break;'.
 
 			'case "'.WIDGET_ITEM_SHOW_VALUE.'":'.
 				'if ($("#adv_conf").prop("checked")) {'.
 					'$("#value-row").toggle(this.checked);'.
 				'}'.
+				'$("#value-row").find("input").prop("disabled", !this.checked);'.
 				'break;'.
 
 			'case "'.WIDGET_ITEM_SHOW_TIME.'":'.
 				'if ($("#adv_conf").prop("checked")) {'.
 					'$("#time-row").toggle(this.checked);'.
 				'}'.
+				'$("#time-row").find("input").prop("disabled", !this.checked);'.
 				'break;'.
 
 			'case "'.WIDGET_ITEM_SHOW_CHANGE_INDICATOR.'":'.
 				'if ($("#adv_conf").prop("checked")) {'.
 					'$("#change-indicator-row").toggle(this.checked);'.
 				'}'.
+				'$("#change-indicator-row").find("input").prop("disabled", !this.checked);'.
 				'break;'.
 		'}'.
 	'});'.
