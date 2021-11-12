@@ -51,6 +51,8 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 			});
 		})
 	});
+
+	new CMultiselectEntryExcluder('groups_', ['groups']);
 })();
 <?php endif ?>
 
@@ -144,6 +146,15 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 	});
 
 	mass_action_tpls.dispatchEvent(new CustomEvent('change', {}));
+
+	if (document.getElementById('templates_') !== null) {
+		// Updating host.
+		new CMultiselectEntryExcluder('templates_', ['templates']);
+	}
+	else if (document.getElementById('linked_templates_')) {
+		// Updating template.
+		new CMultiselectEntryExcluder('linked_templates_', ['linked_templates']);
+	}
 })();
 
 // Inventory mode.

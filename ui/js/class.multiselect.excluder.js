@@ -33,6 +33,12 @@ class CMultiselectEntryExcluder {
 	 */
 	constructor(id, inputs) {
 		this.ms = document.getElementById(id);
+
+		if (this.ms === null) {
+			this.updateDisabledEntries = function() {};
+			return this;
+		}
+
 		this.$ms = $(this.ms);
 
 		this.updateDisabledEntries = function() {
@@ -68,6 +74,10 @@ class CMultiselectEntryExcluder {
 	 */
 	getEntryIds() {
 		const entryids = [];
+
+		if (this.ms === null) {
+			return entryids;
+		}
 
 		this.ms.closest('form')
 			.querySelectorAll(this.input_selector)

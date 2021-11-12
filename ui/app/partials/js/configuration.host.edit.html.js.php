@@ -122,16 +122,13 @@
 			this.form = document.getElementById(form_name);
 
 			this.initHostTab(host_interfaces, host_is_discovered);
+
+			this.template_excluder = new CMultiselectEntryExcluder('add_templates_', ['templates', 'add_templates']);
+			new CMultiselectEntryExcluder('groups_', ['groups']);
+
 			this.initMacrosTab(host_is_discovered);
 			this.initInventoryTab();
 			this.initEncryptionTab();
-
-			this.template_excluder = new CMultiselectEntryExcluder(
-				'add_templates_',
-				['templates', 'add_templates', 'clear_templates']
-			);
-
-			new CMultiselectEntryExcluder('groups_', ['groups']);
 		},
 
 		/**
@@ -172,6 +169,8 @@
 		// Templates tab functions.
 		unlinkTemplate(button) {
 			button.closest('tr').remove();
+
+			this.template_excluder.updateDisabledEntries();
 		},
 
 		unlinkAndClearTemplate(button, templateid) {
@@ -196,12 +195,12 @@
 
 			$('#host-tabs').on('tabscreate tabsactivate', (e, ui) => {
 				const panel = (e.type === 'tabscreate') ? ui.panel : ui.newPanel;
-				const show_inherited_macros = $show_inherited_macros.filter(':checked').val() == 1;
+				const show_inherited_macros = ($show_inherited_macros.filter(':checked').val() == 1);
 
 				if (panel.attr('id') === 'macros-tab') {
 					// Please note that macro initialization must take place once and only when the tab is visible.
 					if (e.type === 'tabsactivate') {
-						const templateids = this.template_excluder.getEntryIds();
+						const templateids = host_edit.template_excluder.getEntryIds();
 
 						// First time always load inherited macros.
 						if (this.macros_templateids === null) {
@@ -236,7 +235,7 @@
 			});
 
 			$show_inherited_macros.on('change', function() {
-				host_edit.macros_manager.load(this.value == 1, this.template_excluder.getEntryIds());
+				host_edit.macros_manager.load(this.value == 1, host_edit.template_excluder.getEntryIds());
 				host_edit.updateEncryptionFields();
 			});
 		},
