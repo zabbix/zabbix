@@ -178,9 +178,15 @@ class CControllerWidgetItemView extends CControllerWidget {
 							);
 
 							if ($mapping !== false) {
-								// To do: same as in latest data, but could be that original value should not be shown.
+								// Currently it is same as in latest data with orignal value in parenthesis.
 								$value = $mapping.' ('.$value.')';
 							}
+
+							/*
+							 * Even though \n does not affect HTML and would be shown in one line anyway, it is still
+							 * better to process this and convert to empty space.
+							 */
+							$value = str_replace("\n", " ", $value);
 
 							if (array_key_exists(1, $history[$fields['itemid'][0]])
 									&& array_key_exists(WIDGET_ITEM_SHOW_CHANGE_INDICATOR, $show)) {
