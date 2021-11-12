@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -23,6 +24,20 @@
  * Single item widget form.
  */
 class CWidgetFormItem extends CWidgetForm {
+
+	/**
+	 * Minimum value of percentage.
+	 *
+	 * @var int
+	 */
+	private const WIDGET_ITEM_PERCENT_MIN = 1;
+
+	/**
+	 * Maximum value of percentage.
+	 *
+	 * @var int
+	 */
+	private const WIDGET_ITEM_PERCENT_MAX = 100;
 
 	public function __construct($data, $templateid) {
 		parent::__construct($data, $templateid, WIDGET_ITEM);
@@ -103,8 +118,8 @@ class CWidgetFormItem extends CWidgetForm {
 		$this->fields[$field_desc_v_pos->getName()] = $field_desc_v_pos;
 
 		// description size
-		$field_desc_size = (new CWidgetFieldIntegerBox('desc_size', _('Size'), WIDGET_ITEM_PERCENT_MIN,
-			WIDGET_ITEM_PERCENT_MAX
+		$field_desc_size = (new CWidgetFieldIntegerBox('desc_size', _('Size'), self::WIDGET_ITEM_PERCENT_MIN,
+			self::WIDGET_ITEM_PERCENT_MAX
 		))->setDefault(5);
 
 		if (array_key_exists('desc_size', $this->data)) {
@@ -142,8 +157,8 @@ class CWidgetFormItem extends CWidgetForm {
 		$this->fields[$field_decimal_places->getName()] = $field_decimal_places;
 
 		// value decimal size
-		$field_decimal_size = (new CWidgetFieldIntegerBox('decimal_size', _('Size'), WIDGET_ITEM_PERCENT_MIN,
-			WIDGET_ITEM_PERCENT_MAX
+		$field_decimal_size = (new CWidgetFieldIntegerBox('decimal_size', _('Size'), self::WIDGET_ITEM_PERCENT_MIN,
+			self::WIDGET_ITEM_PERCENT_MAX
 		))->setDefault(15);
 
 		if (array_key_exists('decimal_size', $this->data)) {
@@ -183,8 +198,8 @@ class CWidgetFormItem extends CWidgetForm {
 		$this->fields[$field_value_v_pos->getName()] = $field_value_v_pos;
 
 		// value size
-		$field_value_size = (new CWidgetFieldIntegerBox('value_size', _('Size'), WIDGET_ITEM_PERCENT_MIN,
-			WIDGET_ITEM_PERCENT_MAX
+		$field_value_size = (new CWidgetFieldIntegerBox('value_size', _('Size'), self::WIDGET_ITEM_PERCENT_MIN,
+			self::WIDGET_ITEM_PERCENT_MAX
 		))->setDefault(25);
 
 		if (array_key_exists('value_size', $this->data)) {
@@ -245,8 +260,8 @@ class CWidgetFormItem extends CWidgetForm {
 		$this->fields[$field_units_pos->getName()] = $field_units_pos;
 
 		// units size
-		$field_units_size = (new CWidgetFieldIntegerBox('units_size', _('Size'), WIDGET_ITEM_PERCENT_MIN,
-			WIDGET_ITEM_PERCENT_MAX
+		$field_units_size = (new CWidgetFieldIntegerBox('units_size', _('Size'), self::WIDGET_ITEM_PERCENT_MIN,
+			self::WIDGET_ITEM_PERCENT_MAX
 		))->setDefault(20);
 
 		if (array_key_exists('units_size', $this->data)) {
@@ -304,8 +319,8 @@ class CWidgetFormItem extends CWidgetForm {
 		$this->fields[$field_time_v_pos->getName()] = $field_time_v_pos;
 
 		// time size
-		$field_time_size = (new CWidgetFieldIntegerBox('time_size', _('Size'), WIDGET_ITEM_PERCENT_MIN,
-			WIDGET_ITEM_PERCENT_MAX
+		$field_time_size = (new CWidgetFieldIntegerBox('time_size', _('Size'), self::WIDGET_ITEM_PERCENT_MIN,
+			self::WIDGET_ITEM_PERCENT_MAX
 		))->setDefault(5);
 
 		if (array_key_exists('time_size', $this->data)) {

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -43,19 +44,17 @@ $field_itemid = CWidgetHelper::getItem($fields['itemid'], $data['captions']['ms'
 $form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['itemid']), $field_itemid);
 $scripts[] = $field_itemid->getPostJS();
 
-$form_list->addRow(
-	CWidgetHelper::getLabel($fields['show']),
-	CWidgetHelper::getCheckBoxList($fields['show'], [
-		WIDGET_ITEM_SHOW_DESCRIPTION => _('Description'),
-		WIDGET_ITEM_SHOW_VALUE => _('Value'),
-		WIDGET_ITEM_SHOW_TIME => _('Time'),
-		WIDGET_ITEM_SHOW_CHANGE_INDICATOR => _('Change indicator')
-	], [ZBX_STYLE_COLUMNS, ZBX_STYLE_COLUMNS_2])
-);
-
-$form_list->addRow(CWidgetHelper::getLabel($fields['adv_conf']), CWidgetHelper::getCheckBox($fields['adv_conf']));
-
 $form_list
+	->addRow(
+		CWidgetHelper::getLabel($fields['show']),
+		CWidgetHelper::getCheckBoxList($fields['show'], [
+			WIDGET_ITEM_SHOW_DESCRIPTION => _('Description'),
+			WIDGET_ITEM_SHOW_VALUE => _('Value'),
+			WIDGET_ITEM_SHOW_TIME => _('Time'),
+			WIDGET_ITEM_SHOW_CHANGE_INDICATOR => _('Change indicator')
+		], [ZBX_STYLE_COLUMNS, ZBX_STYLE_COLUMNS_2])
+	)
+	->addRow(CWidgetHelper::getLabel($fields['adv_conf']), CWidgetHelper::getCheckBox($fields['adv_conf']))
 	->addRow(
 		CWidgetHelper::getLabel($fields['description'], ZBX_STYLE_WIDGET_ITEM_LABEL, [
 			_('Supported macros:'),
@@ -71,16 +70,21 @@ $form_list
 				CWidgetHelper::getTextArea($fields['description'])
 					->setAttribute('maxlength', DB::getFieldLength('widget_field', 'value_str'))
 			))->addClass('form-field'),
+
 			CWidgetHelper::getLabel($fields['desc_h_pos']),
 			(new CDiv(CWidgetHelper::getRadioButtonList($fields['desc_h_pos'])))->addClass('form-field'),
+
 			CWidgetHelper::getLabel($fields['desc_size']),
 			(new CDiv([CWidgetHelper::getIntegerBox($fields['desc_size']), '%']))
 				->addClass('form-field')
 				->addClass('field-size'),
+
 			CWidgetHelper::getLabel($fields['desc_v_pos']),
 			(new CDiv(CWidgetHelper::getRadioButtonList($fields['desc_v_pos'])))->addClass('form-field'),
+
 			CWidgetHelper::getLabel($fields['desc_bold']),
 			(new CDiv(CWidgetHelper::getCheckBox($fields['desc_bold'])))->addClass('form-field'),
+
 			CWidgetHelper::getLabel($fields['desc_color'])->addClass('offset-3'),
 			(new CDiv(CWidgetHelper::getColor($fields['desc_color'], true)))->addClass('form-field')
 		]))
@@ -93,28 +97,40 @@ $form_list
 		(new CDiv([
 			CWidgetHelper::getLabel($fields['decimal_places']),
 			(new CDiv(CWidgetHelper::getIntegerBox($fields['decimal_places'])))->addClass('form-field'),
+
 			CWidgetHelper::getLabel($fields['decimal_size']),
 			(new CDiv([CWidgetHelper::getIntegerBox($fields['decimal_size']), '%']))
 				->addClass('form-field')
 				->addClass('field-size'),
+
+			// Divide decimals and value.
 			new CTag('hr'),
+
 			CWidgetHelper::getLabel($fields['value_h_pos']),
 			(new CDiv(CWidgetHelper::getRadioButtonList($fields['value_h_pos'])))->addClass('form-field'),
+
 			CWidgetHelper::getLabel($fields['value_size']),
 			(new CDiv([CWidgetHelper::getIntegerBox($fields['value_size']), '%']))
 				->addClass('form-field')
 				->addClass('field-size'),
+
 			CWidgetHelper::getLabel($fields['value_v_pos']),
 			(new CDiv(CWidgetHelper::getRadioButtonList($fields['value_v_pos'])))->addClass('form-field'),
+
 			CWidgetHelper::getLabel($fields['value_bold']),
 			(new CDiv(CWidgetHelper::getCheckBox($fields['value_bold'])))->addClass('form-field'),
+
 			CWidgetHelper::getLabel($fields['value_color'])->addClass('offset-3'),
 			(new CDiv(CWidgetHelper::getColor($fields['value_color'], true)))->addClass('form-field'),
+
+			// Divide value and units.
 			new CTag('hr'),
+
 			(new CDiv([
 				CWidgetHelper::getCheckBox($fields['units_show']),
 				CWidgetHelper::getLabel($fields['units'])
 			]))->addClass('units-show'),
+
 			(new CDiv(
 				CWidgetHelper::getTextBox($fields['units'])
 					->setAttribute('style', '')
@@ -122,14 +138,18 @@ $form_list
 			))
 				->addClass('form-field')
 				->addClass('field-fluid'),
+
 			CWidgetHelper::getLabel($fields['units_pos']),
 			(new CDiv(CWidgetHelper::getSelect($fields['units_pos'])))->addClass('form-field'),
+
 			CWidgetHelper::getLabel($fields['units_size']),
 			(new CDiv([CWidgetHelper::getIntegerBox($fields['units_size']), '%']))
 				->addClass('form-field')
 				->addClass('field-size'),
+
 			CWidgetHelper::getLabel($fields['units_bold'])->addClass('offset-3'),
 			(new CDiv(CWidgetHelper::getCheckBox($fields['units_bold'])))->addClass('form-field'),
+
 			CWidgetHelper::getLabel($fields['units_color'])->addClass('offset-3'),
 			(new CDiv(CWidgetHelper::getColor($fields['units_color'], true)))->addClass('form-field')
 		]))
@@ -142,14 +162,18 @@ $form_list
 		(new CDiv([
 			CWidgetHelper::getLabel($fields['time_h_pos']),
 			(new CDiv(CWidgetHelper::getRadioButtonList($fields['time_h_pos'])))->addClass('form-field'),
+
 			CWidgetHelper::getLabel($fields['time_size']),
 			(new CDiv([CWidgetHelper::getIntegerBox($fields['time_size']), '%']))
 				->addClass('form-field')
 				->addClass('field-size'),
+
 			CWidgetHelper::getLabel($fields['time_v_pos']),
 			(new CDiv(CWidgetHelper::getRadioButtonList($fields['time_v_pos'])))->addClass('form-field'),
+
 			CWidgetHelper::getLabel($fields['time_bold']),
 			(new CDiv(CWidgetHelper::getCheckBox($fields['time_bold'])))->addClass('form-field'),
+
 			CWidgetHelper::getLabel($fields['time_color'])->addClass('offset-3'),
 			(new CDiv(CWidgetHelper::getColor($fields['time_color'], true)))->addClass('form-field')
 		]))

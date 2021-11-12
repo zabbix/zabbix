@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -322,7 +323,9 @@ class CControllerWidgetItemView extends CControllerWidget {
 					'data' => $change_indicator,
 					'classes' => ['change-indicator'],
 					'styles' => [
-						'--widget-item-font' => number_format(max($fields['value_size'], $fields['decimal_size']) / 100, 2)
+						'--widget-item-font' => number_format(
+							max($fields['value_size'], $fields['decimal_size']) / 100, 2
+						)
 					]
 				];
 			}
@@ -368,13 +371,13 @@ class CControllerWidgetItemView extends CControllerWidget {
 			];
 		}
 
-		// Sort data in order - left, center, right.
+		// Sort data column blocks in order - left, center, right.
 		foreach ($data as &$row) {
 			ksort($row);
 		}
 		unset($row);
 
-		// Sort data in order - top, middle, bottom.
+		// Sort data row blocks in order - top, middle, bottom.
 		ksort($data);
 
 		$data['bg_color'] = $fields['bg_color'];

@@ -1493,9 +1493,6 @@ define('WIDGET_ITEM_POS_ABOVE',		1);
 define('WIDGET_ITEM_POS_AFTER',		2);
 define('WIDGET_ITEM_POS_BELOW',		3);
 
-define('WIDGET_ITEM_PERCENT_MIN', 1);
-define('WIDGET_ITEM_PERCENT_MAX', 100);
-
 // sysmap widget source types
 define('WIDGET_SYSMAP_SOURCETYPE_MAP',	1);
 define('WIDGET_SYSMAP_SOURCETYPE_FILTER',	2);
