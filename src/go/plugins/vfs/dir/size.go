@@ -148,6 +148,7 @@ func getSizeParams(params []string) (out sizeParams, err error) {
 		out.dirRegExclude, err = parseReg(params[5])
 		if err != nil {
 			err = zbxerr.New("Invalid sixth parameter.").Wrap(err)
+
 			return
 		}
 
@@ -157,6 +158,7 @@ func getSizeParams(params []string) (out sizeParams, err error) {
 			out.maxDepth, err = strconv.Atoi(params[4])
 			if err != nil {
 				err = zbxerr.New("Invalid fifth parameter.").Wrap(err)
+
 				return
 			}
 		}
@@ -171,6 +173,7 @@ func getSizeParams(params []string) (out sizeParams, err error) {
 		case "":
 		default:
 			err = zbxerr.New("Invalid fourth parameter.").Wrap(err)
+
 			return
 		}
 
@@ -212,5 +215,6 @@ func getSizeParams(params []string) (out sizeParams, err error) {
 
 		return
 	}
+
 	return
 }
