@@ -41,6 +41,18 @@ else {
 
 		foreach ($row as $column) {
 			if (is_array($column['data'])) {
+				$value_block = false;
+
+				// Check if this is simply array of descriptions or value block.
+				foreach ($column['data'] as $cell) {
+					if (is_array($cell)) {
+						$value_block = true;
+						break;
+					}
+				}
+			}
+
+			if (is_array($column['data']) && $value_block) {
 				// Value block that consists of other blocks.
 				$main = new CDiv();
 

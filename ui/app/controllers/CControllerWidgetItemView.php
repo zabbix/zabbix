@@ -239,7 +239,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 
 			if (strpos($description, "\n") !== false) {
 				$classes[] = 'multiline';
-				$description = nl2br($description);
+				$description = zbx_nl2br($description);
 			}
 
 			$styles = ['--widget-item-font' => number_format($fields['desc_size'] / 100, 2)];
