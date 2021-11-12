@@ -1,0 +1,97 @@
+<?php
+/*
+** Zabbix
+** Copyright (C) 2001-2021 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
+require_once dirname(__FILE__).'/../common/testFormHost.php';
+
+/**
+ * @backup hosts
+ *
+ * @onBefore prepareUpdateData
+ */
+class testFormHostConfiguration extends testFormHost {
+
+	public $link = 'zabbix.php?action=host.list';
+	public $create_link = null;
+
+	public function testFormHostConfiguration_Layout() {
+		$this->checkHostLayout($this->link);
+	}
+
+	/**
+	 * @dataProvider getCreateData
+	 */
+	public function testFormHostConfiguration_Create($data) {
+		$this->checkHostCreate($data, $this->link);
+	}
+
+	/**
+	 * @backup hosts
+	 *
+	 * @dataProvider getUpdateData
+	 */
+	public function testFormHostConfiguration_Update($data) {
+		$this->checkHostUpdate($data, $this->link);
+	}
+
+	/**
+	 * Update the host without any changes and check host and interfaces hashes.
+	 */
+	public function testFormHostConfiguration_SimpleUpdate() {
+		$this->checkHostSimpleUpdate($this->link);
+	}
+
+	/**
+	 * @dataProvider getCloneData
+	 */
+	public function testFormHostConfiguration_Clone($data) {
+		$full_clone = false;
+		$this->cloneHost($data, $this->link, $full_clone);
+
+		// Check that items aren't cloned from original host.
+		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($data['host_fields']['Host name']));
+		$this->assertEquals(0, CDBHelper::getCount('SELECT null FROM items WHERE hostid='.$hostid));
+	}
+
+	/**
+	 * @dataProvider getCloneData
+	 */
+	public function testFormHostConfiguration_FullClone($data) {
+		$full_clone = true;
+		$this->cloneHost($data, $this->link, $full_clone);
+
+		// Check that items cloned from original host.
+		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($data['host_fields']['Host name']));
+		$this->assertEquals(3, CDBHelper::getCount('SELECT null FROM items WHERE hostid='.$hostid));
+	}
+
+	/**
+	 * @dataProvider getСancelData
+	 */
+	public function testFormHostConfiguration_Cancel($data) {
+		$this->checkCancel($data, $this->link, $this->create_link);
+	}
+
+	/**
+	 * @dataProvider getDeleteData
+	 */
+	public function testFormHostConfiguration_Delete($data) {
+		$this->checkDelete($data, $this->link);
+	}
+}
