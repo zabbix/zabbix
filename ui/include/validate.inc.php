@@ -168,7 +168,7 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 		}
 	}
 	elseif ($type == T_ZBX_DBL) {
-		$number_parser = new CNumberParser([]);
+		$number_parser = new CNumberParser();
 
 		if ($number_parser->parse($var) != CParser::PARSE_SUCCESS) {
 			$error = true;

@@ -1052,7 +1052,7 @@ class CControllerPopupTriggerExpr extends CController {
 						'A' => true
 					],
 					'detect_period' => [
-						'C' => _('Detect period'),
+						'C' => _('Detection period'),
 						'T' => T_ZBX_STR,
 						'A' => true
 					],

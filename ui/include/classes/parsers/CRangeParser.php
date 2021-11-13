@@ -67,7 +67,7 @@ class CRangeParser extends CParser {
 	 * lldmacros    Allow lldmacros in ranges.
 	 * with_minus   Allow negative ranges.
 	 * with_float   Allow float number ranges.
-	 * with_suffix  Allow number ranges with size and time suffix, supported suffixes see CNumberParser::$suffixes.
+	 * with_suffix  Allow number ranges with size and time suffixes.
 	 *
 	 * @var array
 	 */
