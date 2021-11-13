@@ -333,7 +333,14 @@ char	*zbx_create_persistent_server_directory(const char *base_path, const char *
 
 	if (0 != access(server_dir_name, R_OK | W_OK | X_OK))
 	{
-		*error = zbx_dsprintf(*error, "insufficient access rights to directory \"%s\"", server_dir_name);
+		if (NULL != server_dir_name)	/* only to silence GCC warning "directive argument is null" */
+		{
+			*error = zbx_dsprintf(*error, "insufficient access rights to directory \"%s\"",
+					server_dir_name);
+		}
+		else
+			THIS_SHOULD_NEVER_HAPPEN;
+
 		zbx_free(server_dir_name);
 		return NULL;
 	}
