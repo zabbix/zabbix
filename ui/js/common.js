@@ -326,49 +326,22 @@ function getPosition(obj) {
  * Opens popup content in overlay dialogue.
  *
  * @param {string} action          Popup controller related action.
+ * @param {string} dialogue_class  CSS class, usually based on .modal-popup and .modal-popup-{size}.
  * @param {array|object}  options  (optional) Array with key/value pairs that will be used as query for popup request.
  * @param {string} dialogueid      (optional) id of overlay dialogue.
  * @param {object} trigger_elmnt   (optional) UI element which was clicked to open overlay dialogue.
  *
  * @returns {Overlay}
  */
-function PopUp(action, options, dialogueid, trigger_elmnt) {
+function PopUp(action, dialogue_class, options, dialogueid, trigger_elmnt) {
 	var overlay = overlays_stack.getById(dialogueid);
+
 	if (!overlay) {
-		var wide_popup_actions = ['popup.generic', 'popup.dashboard.share.edit', 'dashboard.page.properties.edit',
-				'dashboard.properties.edit', 'dashboard.widget.edit', 'popup.media', 'popup.lldoperation',
-				'popup.lldoverride', 'popup.preproctest.edit', 'popup.triggerexpr', 'popup.httpstep',
-				'popup.testtriggerexpr', 'popup.triggerwizard'
-			],
-			medium_popup_actions = ['popup.maintenance.period', 'popup.condition.actions', 'popup.condition.operations',
-				'popup.condition.event.corr', 'popup.discovery.check', 'popup.mediatypetest.edit',
-				'popup.mediatype.message', 'popup.host.edit', 'popup.scriptexec', 'popup.scheduledreport.test',
-				'popup.service.edit'
-			],
-			static_popup_actions = ['popup.massupdate.template', 'popup.massupdate.host', 'popup.massupdate.trigger',
-				'popup.massupdate.triggerprototype', 'popup.massupdate.service'
-			],
-			preprocessing_popup_actions = ['popup.massupdate.item', 'popup.massupdate.itemprototype'],
-			dialogue_class = '';
-
-		if (wide_popup_actions.indexOf(action) !== -1) {
-			dialogue_class = ' modal-popup-generic';
-		}
-		else if (medium_popup_actions.indexOf(action) !== -1) {
-			dialogue_class = ' modal-popup-medium';
-		}
-		else if (static_popup_actions.indexOf(action) !== -1) {
-			dialogue_class = ' modal-popup-static';
-		}
-		else if (preprocessing_popup_actions.indexOf(action) !== -1) {
-			dialogue_class = ' modal-popup-preprocessing';
-		}
-
 		overlay = overlayDialogue({
 			'dialogueid': dialogueid,
 			'title': '',
 			'content': jQuery('<div>', {'height': '68px', class: 'is-loading'}),
-			'class': 'modal-popup' + dialogue_class,
+			'class': dialogue_class,
 			'buttons': [],
 			'element': trigger_elmnt,
 			'type': 'popup'
@@ -436,7 +409,7 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
  * @returns {Overlay}
  */
 function acknowledgePopUp(options, trigger_elmnt) {
-	var overlay = PopUp('popup.acknowledge.edit', options, null, trigger_elmnt),
+	var overlay = PopUp('popup.acknowledge.edit', 'modal-popup', options, null, trigger_elmnt),
 		backurl = location.href;
 
 	overlay.trigger_parents = $(trigger_elmnt).parents();
@@ -567,7 +540,8 @@ function removeFromOverlaysStack(dialogueid, return_focus) {
  * @param {string} action	(optional) action value that is used in CRouter. Default value is 'popup.generic'.
  */
 function reloadPopup(form, action) {
-	var dialogueid = jQuery(form).closest('[data-dialogueid]').attr('data-dialogueid'),
+	var dialogueid = jQuery(form).closest('[data-dialogueid]').prop('data-dialogueid'),
+		dialogue_class = jQuery(form).closest('[data-dialogueid]').prop('class'),
 		action = action || 'popup.generic',
 		options = {};
 
@@ -575,7 +549,7 @@ function reloadPopup(form, action) {
 		options[this.name] = this.value;
 	});
 
-	PopUp(action, options, dialogueid);
+	PopUp(action, dialogue_class, options, dialogueid);
 }
 
 /**
@@ -1023,7 +997,7 @@ Function.prototype.bindAsEventListener = function (context) {
 	};
 };
 
-function openMassupdatePopup(elem, popup_name, data = {}) {
+function openMassupdatePopup(elem, popup_name, dialogue_class, data = {}) {
 	const form = elem.closest('form');
 
 	data.ids = chkbxRange.getSelectedIds();
@@ -1046,7 +1020,7 @@ function openMassupdatePopup(elem, popup_name, data = {}) {
 			break;
 	}
 
-	return PopUp(popup_name, data, null, elem);
+	return PopUp(popup_name, dialogue_class, data, null, elem);
 }
 
 /**

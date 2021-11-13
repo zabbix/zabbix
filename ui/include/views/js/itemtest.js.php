@@ -276,7 +276,7 @@
 			delete cached_values.interface_details;
 		}
 
-		PopUp('popup.itemtest.edit', jQuery.extend(item_properties, {
+		PopUp('popup.itemtest.edit', 'modal-popup', jQuery.extend(item_properties, {
 			steps: getPreprocessingSteps(step_nums),
 			hostid: <?= $data['hostid'] ?>,
 			test_type: <?= $data['preprocessing_test_type'] ?>,

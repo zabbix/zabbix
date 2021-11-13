@@ -40,7 +40,7 @@ window.service_time_edit_popup = {
 	},
 
 	typeChange(e) {
-		PopUp('popup.service.time.edit', getFormFields(this.form), 'service_time_edit', e.target);
+		PopUp('popup.service.time.edit', 'modal-popup', getFormFields(this.form), 'service_time_edit', e.target);
 	},
 
 	submit() {

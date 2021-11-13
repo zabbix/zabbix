@@ -501,6 +501,7 @@ function overlayDialogueDestroy(dialogueid) {
  *
  * @param {object} params                                   Modal window params.
  * @param {string} params.title                             Modal window title.
+ * @param {string} params.class                             Modal window CSS class, ofthen based on .modal-popup*.
  * @param {object} params.content                           Window content.
  * @param {object} params.footer                           	Window footer content.
  * @param {object} params.controls                          Window controls.
@@ -563,7 +564,7 @@ function executeScript(scriptid, confirmation, trigger_elmnt, hostid = null, eve
 		}
 
 		if (Object.keys(popup_options).length === 2) {
-			PopUp('popup.scriptexec', popup_options, null, trigger_elmnt);
+			PopUp('popup.scriptexec', 'modal-popup modal-popup-medium', popup_options, null, trigger_elmnt);
 		}
 	};
 

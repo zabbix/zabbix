@@ -101,7 +101,7 @@
 						popup_options.usrgrpids = Array.from(usrgrpids);
 					}
 
-					PopUp('popup.scheduledreport.subscription.edit', popup_options, null, event.target);
+					PopUp('popup.scheduledreport.subscription.edit', 'modal-popup', popup_options, null, event.target);
 				});
 			}
 			else {
@@ -244,7 +244,7 @@
 					userids: Array.from(userids)
 				};
 
-				PopUp('popup.scheduledreport.subscription.edit', popup_options, null, event.target);
+				PopUp('popup.scheduledreport.subscription.edit', 'modal-popup', popup_options, null, event.target);
 			});
 		}
 
@@ -261,7 +261,7 @@
 					usrgrpids: Array.from(usrgrpids)
 				};
 
-				PopUp('popup.scheduledreport.subscription.edit', popup_options, null, event.target);
+				PopUp('popup.scheduledreport.subscription.edit', 'modal-popup', popup_options, null, event.target);
 			});
 		}
 	}

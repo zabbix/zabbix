@@ -97,7 +97,7 @@ function validateConditionPopup(overlay) {
 }
 
 function selectServices() {
-	const overlay = PopUp('popup.services', {
+	const overlay = PopUp('popup.services', 'modal-popup', {
 		title: t('Add parent services'),
 	}, 'services', document.activeElement);
 

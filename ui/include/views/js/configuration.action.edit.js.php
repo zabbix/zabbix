@@ -348,7 +348,7 @@
 	 * @param {Node} return_focus
 	 */
 	OperationViewMessage.prototype.showUserPopup = function(return_focus) {
-		PopUp('popup.generic', {
+		PopUp('popup.generic', 'modal-popup modal-popup-generic', {
 			'srctbl': 'users',
 			'srcfld1': 'userid',
 			'srcfld2': 'fullname',
@@ -362,7 +362,7 @@
 	 * @param {Node} return_focus
 	 */
 	OperationViewMessage.prototype.showUserGroupPopup = function(return_focus) {
-		PopUp('popup.generic', {
+		PopUp('popup.generic', 'modal-popup modal-popup-generic', {
 			'srctbl': 'usrgrp',
 			'srcfld1': 'usrgrpid',
 			'srcfld2': 'name',
@@ -832,7 +832,7 @@
 	 * @param {Node} return_focus
 	 */
 	OperationViewCondition.prototype.showConditionsPopup = function(return_focus) {
-		PopUp('popup.condition.operations', {
+		PopUp('popup.condition.operations', 'modal-popup modal-popup-medium', {
 			'type': operation_details.ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION,
 			'source': operation_details.EVENT_SOURCE_TRIGGERS
 		}, null, return_focus);

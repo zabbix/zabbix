@@ -330,8 +330,8 @@ window.service_edit_popup = {
 			popup_params = {row_index};
 		}
 
-		const overlay = PopUp('popup.service.statusrule.edit', popup_params, 'service_status_rule_edit',
-			document.activeElement
+		const overlay = PopUp('popup.service.statusrule.edit', 'modal-popup',
+			popup_params, 'service_status_rule_edit', document.activeElement
 		);
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
@@ -369,7 +369,9 @@ window.service_edit_popup = {
 			popup_params = {row_index};
 		}
 
-		const overlay = PopUp('popup.service.time.edit', popup_params, 'service_time_edit', document.activeElement);
+		const overlay = PopUp('popup.service.time.edit', 'modal-popup',
+			popup_params, 'service_time_edit', document.activeElement
+		);
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 			if (row !== null) {
@@ -505,7 +507,7 @@ window.service_edit_popup = {
 			exclude_serviceids.push(input.value);
 		}
 
-		const overlay = PopUp('popup.services', {
+		const overlay = PopUp('popup.services', 'modal-popup', {
 			title: <?= json_encode(_('Add child services')) ?>,
 			exclude_serviceids
 		}, 'services', document.activeElement);
@@ -535,7 +537,7 @@ window.service_edit_popup = {
 			exclude_serviceids.push(service.id);
 		}
 
-		const overlay = PopUp('popup.services', {
+		const overlay = PopUp('popup.services', 'modal-popup', {
 			title: <?= json_encode(_('Add parent services')) ?>,
 			exclude_serviceids
 		}, 'services', document.activeElement);

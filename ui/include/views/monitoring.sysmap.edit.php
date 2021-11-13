@@ -323,7 +323,7 @@ $user_group_shares_table = (new CTable())
 	->setAttribute('style', 'width: 100%;');
 
 $add_user_group_btn = ([(new CButton(null, _('Add')))
-	->onClick('return PopUp("popup.generic",'.
+	->onClick('return PopUp("popup.generic", "modal-popup",'.
 		json_encode([
 			'srctbl' => 'usrgrp',
 			'srcfld1' => 'usrgrpid',
@@ -360,7 +360,7 @@ $user_shares_table = (new CTable())
 	->setAttribute('style', 'width: 100%;');
 
 $add_user_btn = ([(new CButton(null, _('Add')))
-	->onClick('return PopUp("popup.generic",'.
+	->onClick('return PopUp("popup.generic", "modal-popup",'.
 		json_encode([
 			'srctbl' => 'users',
 			'srcfld1' => 'userid',

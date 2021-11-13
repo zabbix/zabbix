@@ -48,7 +48,7 @@ window.popup_generic = {
 				const groups = jQuery(this).multiSelect('getData').map(i => i.id);
 				const options = groups.length ? {groupid: groups[0]} : {filter_groupid_rst: 1, groupid: []};
 
-				PopUp(e.data.overlay.action, {...e.data.overlay.options, ...options}, e.data.overlay.dialogueid);
+				PopUp(e.data.overlay.action, 'modal-popup', {...e.data.overlay.options, ...options}, e.data.overlay.dialogueid);
 			});
 		});
 	},
@@ -61,7 +61,7 @@ window.popup_generic = {
 				const hosts = jQuery(this).multiSelect('getData').map(i => i.id);
 				const options = hosts.length ? {hostid: hosts[0]} : {filter_hostid_rst: 1, hostid: []};
 
-				PopUp(e.data.overlay.action, {...e.data.overlay.options, ...options}, e.data.overlay.dialogueid);
+				PopUp(e.data.overlay.action, 'modal-popup', {...e.data.overlay.options, ...options}, e.data.overlay.dialogueid);
 			});
 		});
 	},

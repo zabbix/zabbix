@@ -326,7 +326,7 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 		let valuemap_table = elm.closest('table');
 
 		valuemap_table.querySelectorAll('[name$="[name]"]').forEach((elm) => disable_names.push(elm.value));
-		PopUp('popup.generic', {
+		PopUp('popup.generic', 'modal-popup modal-popup-generic', {
 			srctbl: 'valuemaps',
 			srcfld1: 'valuemapid',
 			disable_names: disable_names,

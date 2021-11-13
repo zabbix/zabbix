@@ -307,7 +307,9 @@ $button_list += [
 	'item.masscopyto' => ['name' => _('Copy')],
 	'popup.massupdate.item' => [
 		'content' => (new CButton('', _('Mass update')))
-			->onClick("return openMassupdatePopup(this, 'popup.massupdate.item');")
+			->onClick("return ".
+				"openMassupdatePopup(this, 'popup.massupdate.item', 'modal-popup modal-popup-preprocessing');"
+			)
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->removeAttribute('id')
 	],

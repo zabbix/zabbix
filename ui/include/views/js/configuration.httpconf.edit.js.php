@@ -778,7 +778,7 @@
 	 * @param {Node} refocus  A node to set focus to, when popup is closed.
 	 */
 	Step.prototype.open = function(no, refocus) {
-		return PopUp('popup.httpstep', {
+		return PopUp('popup.httpstep', 'modal-popup modal-popup-generic', {
 			no:               no,
 			httpstepid:       this.data.httpstepid,
 			templated:        httpconf.templated,

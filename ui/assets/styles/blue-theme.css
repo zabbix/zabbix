@@ -4283,6 +4283,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     .overlay-dialogue.modal-popup.modal-popup-fullscreen {
       width: calc(100vw - 40px);
       max-width: calc(100vw - 40px); }
+    .overlay-dialogue.modal-popup.host-edit {
+      width: 1024px; }
   .overlay-dialogue .hintbox-wrap {
     overflow: auto;
     max-height: 240px;

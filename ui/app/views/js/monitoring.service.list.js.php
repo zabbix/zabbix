@@ -98,7 +98,9 @@
 					}
 				}
 				else if (e.target.classList.contains('js-massupdate-service')) {
-					openMassupdatePopup(e.target, 'popup.massupdate.service', {location_url: this.back_url});
+					openMassupdatePopup(e.target, 'popup.massupdate.service', 'modal-popup modal-popup-static',
+						{location_url: this.back_url}
+					);
 				}
 			});
 		},
@@ -112,7 +114,9 @@
 		edit(options = {}) {
 			this.pauseRefresh();
 
-			const overlay = PopUp('popup.service.edit', options, 'service_edit', document.activeElement);
+			const overlay = PopUp('popup.service.edit', 'modal-popup modal-popup-medium',
+				options, 'service_edit', document.activeElement
+			);
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 				postMessageOk(e.detail.title);

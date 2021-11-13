@@ -434,16 +434,23 @@
 						var popup_options = ms.options.popup.parameters;
 
 						if (ms.options.popup.filter_preselect_fields) {
-							popup_options = jQuery.extend(popup_options, getFilterPreselectField($obj, MS_ACTION_POPUP));
+							popup_options = jQuery.extend(
+								popup_options,
+								getFilterPreselectField($obj, MS_ACTION_POPUP)
+							);
 						}
 
-						if (typeof popup_options['disable_selected'] !== 'undefined' && popup_options['disable_selected']) {
+						if (typeof popup_options['disable_selected'] !== 'undefined'
+									&& popup_options['disable_selected']) {
 							popup_options['disableids'] = Object.keys(ms.values.selected);
 						}
 
-						// Click used instead focus because in patternselect listen only click.
+						// Click used instead focus because in patternselect only click is listened for.
 						$('input[type="text"]', $obj).click();
-						return PopUp('popup.generic', popup_options, null, event.target);
+
+						return PopUp('popup.generic', 'modal-popup modal-popup-generic',
+							popup_options, null, event.target
+						);
 					});
 				}
 

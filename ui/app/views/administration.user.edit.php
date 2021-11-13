@@ -354,7 +354,9 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 					new CHorList([
 						(new CButton(null, _('Edit')))
 							->addClass(ZBX_STYLE_BTN_LINK)
-							->onClick('return PopUp("popup.media",'.json_encode($popup_options).', null, this);'),
+							->onClick('return PopUp("popup.media", "modal-popup", '.
+								json_encode($popup_options).', null, this);'
+							),
 						(new CButton(null, _('Remove')))
 							->addClass(ZBX_STYLE_BTN_LINK)
 							->onClick('javascript: removeMedia('.$index.');')
@@ -368,7 +370,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 		(new CDiv([
 			$media_table_info,
 			(new CButton(null, _('Add')))
-				->onClick('return PopUp("popup.media",'.
+				->onClick('return PopUp("popup.media", "modal-popup", '.
 					json_encode([
 						'dstfrm' => $user_form->getName()
 					]).', null, this);'

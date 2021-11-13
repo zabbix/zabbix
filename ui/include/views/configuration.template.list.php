@@ -96,7 +96,7 @@ $widget = (new CWidget())
 			)
 			->addItem(
 				(new CButton('form', _('Import')))
-					->onClick('return PopUp("popup.import", {rules_preset: "template"}, null, this);')
+					->onClick('return PopUp("popup.import", "modal-popup", {rules_preset: "template"}, null, this);')
 					->removeId()
 			)
 		))->setAttribute('aria-label', _('Content controls'))
@@ -277,7 +277,7 @@ $form->addItem([
 			],
 			'popup.massupdate.template' => [
 				'content' => (new CButton('', _('Mass update')))
-					->onClick("return openMassupdatePopup(this, 'popup.massupdate.template');")
+					->onClick("return openMassupdatePopup(this, 'popup.massupdate.template', 'modal-popup modal-popup-static');")
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->removeAttribute('id')
 			],

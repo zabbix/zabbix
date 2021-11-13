@@ -421,7 +421,7 @@
 				popup_options['hostid'] = graphs.hostid;
 			}
 
-			var nameLink = 'PopUp("popup.generic",'
+			var nameLink = 'PopUp("popup.generic", "modal-popup",'
 				+ 'jQuery.extend('+ JSON.stringify(popup_options) +',getOnlyHostParam()), null, this);';
 			jQuery('#items_' + i + '_name').attr('onclick', nameLink);
 		}

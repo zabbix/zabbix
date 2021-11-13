@@ -261,7 +261,7 @@
 
 			switch ($btn.data('action')) {
 				case 'add':
-					PopUp('popup.discovery.check', {}, null, $btn);
+					PopUp('popup.discovery.check', 'modal-popup modal-popup-medium', {}, null, $btn);
 					break;
 
 				case 'edit':
@@ -280,7 +280,7 @@
 						}
 					});
 
-					PopUp('popup.discovery.check', params, null, $btn);
+					PopUp('popup.discovery.check', 'modal-popup modal-popup-medium', params, null, $btn);
 					break;
 			}
 		});

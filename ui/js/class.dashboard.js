@@ -934,7 +934,9 @@ class CDashboard extends CBaseComponent {
 			auto_start: this._data.auto_start
 		};
 
-		PopUp('dashboard.properties.edit', properties, 'dashboard_properties', document.activeElement);
+		PopUp('dashboard.properties.edit', 'modal-popup modal-popup-generic',
+			properties, 'dashboard_properties', document.activeElement
+		);
 	}
 
 	applyProperties() {
@@ -1000,7 +1002,9 @@ class CDashboard extends CBaseComponent {
 	editDashboardPageProperties(properties = {}) {
 		properties.dashboard_display_period = this._data.display_period;
 
-		PopUp('dashboard.page.properties.edit', properties, 'dashboard_page_properties', document.activeElement);
+		PopUp('dashboard.page.properties.edit', 'modal-popup modal-popup-generic',
+			properties, 'dashboard_page_properties', document.activeElement
+		);
 	}
 
 	applyDashboardPageProperties() {
@@ -1084,7 +1088,7 @@ class CDashboard extends CBaseComponent {
 	}
 
 	editWidgetProperties(properties = {}, {new_widget_pos = null} = {}) {
-		const overlay = PopUp('dashboard.widget.edit', {
+		const overlay = PopUp('dashboard.widget.edit', 'modal-popup modal-popup-generic', {
 			templateid: this._data.templateid ?? undefined,
 			...properties
 		}, 'widget_properties', document.activeElement);

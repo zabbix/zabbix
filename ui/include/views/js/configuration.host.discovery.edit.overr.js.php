@@ -712,7 +712,7 @@ insert_javascript_for_visibilitybox();
 	 * @param {object} refocus  A node to set focus to, when popup is closed.
 	 */
 	Override.prototype.open = function(no, refocus) {
-		return PopUp('popup.lldoverride', {
+		return PopUp('popup.lldoverride', 'modal-popup modal-popup-generic', {
 			no:                 no,
 			templated:          lldoverrides.templated,
 			name:               this.data.name,
@@ -1023,7 +1023,7 @@ insert_javascript_for_visibilitybox();
 			}
 		}.bind(this));
 
-		return PopUp('popup.lldoperation', params, null, refocus);
+		return PopUp('popup.lldoperation', 'modal-popup modal-popup-generic',  params, null, refocus);
 	};
 
 	/**

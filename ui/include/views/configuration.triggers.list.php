@@ -343,7 +343,9 @@ $triggers_form->addItem([
 			'trigger.masscopyto' => ['name' => _('Copy')],
 			'popup.massupdate.trigger' => [
 				'content' => (new CButton('', _('Mass update')))
-					->onClick("return openMassupdatePopup(this, 'popup.massupdate.trigger');")
+					->onClick("return ".
+						"openMassupdatePopup(this, 'popup.massupdate.trigger', 'modal-popup modal-popup-static');"
+					)
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->removeAttribute('id')
 			],

@@ -150,7 +150,7 @@ class CTabFilterItem extends CBaseComponent {
 		}
 
 		this.updateUnsavedState();
-		return PopUp('popup.tabfilter.edit', {...defaults, ...params}, 'tabfilter_dialogue', edit_elm);
+		return PopUp('popup.tabfilter.edit', 'modal-popup', {...defaults, ...params}, 'tabfilter_dialogue', edit_elm);
 	}
 
 	/**

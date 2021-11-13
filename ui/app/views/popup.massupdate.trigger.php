@@ -100,7 +100,7 @@ $dependencies_table = (new CTable())
 $bttn_prototype = '';
 if ($data['prototype']) {
 	$bttn_prototype = (new CButton('add_dep_trigger_prototype', _('Add prototype')))
-	->onClick('return PopUp("popup.generic",'.
+	->onClick('return PopUp("popup.generic", "modal-popup",'.
 		json_encode([
 			'srctbl' => 'trigger_prototypes',
 			'srcfld1' => 'triggerid',
@@ -123,7 +123,7 @@ $dependencies_form_list->addRow(
 		$dependencies_table,
 		new CHorList([
 			(new CButton('btn1', _('Add')))
-				->onClick('return PopUp("popup.generic",'.
+				->onClick('return PopUp("popup.generic", "modal-popup",'.
 					json_encode([
 						'srctbl' => 'triggers',
 						'srcfld1' => 'triggerid',

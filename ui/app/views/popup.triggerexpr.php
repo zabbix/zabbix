@@ -75,14 +75,14 @@ if ($data['item_required']) {
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CButton('select', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
-			->onClick('return PopUp("popup.generic",'.json_encode($popup_options).', null, this);')
+			->onClick('return PopUp("popup.generic", "modal-popup", '.json_encode($popup_options).', null, this);')
 	];
 
 	if ($data['parent_discoveryid'] !== '') {
 		$item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 		$item[] = (new CButton('select', _('Select prototype')))
 			->addClass(ZBX_STYLE_BTN_GREY)
-			->onClick('return PopUp("popup.generic",'.
+			->onClick('return PopUp("popup.generic", "modal-popup",'.
 				json_encode([
 					'srctbl' => 'item_prototypes',
 					'srcfld1' => 'itemid',

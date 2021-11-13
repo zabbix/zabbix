@@ -154,7 +154,9 @@
 					popup_options[elem.id] = elem.value.trim();
 				});
 
-				PopUp('popup.scheduledreport.test', popup_options, null, event.target);
+				PopUp('popup.scheduledreport.test', 'modal-popup modal-popup-medium',
+					popup_options, null, event.target
+				);
 			});
 		}
 	});

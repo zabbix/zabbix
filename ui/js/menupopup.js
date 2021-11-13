@@ -500,7 +500,9 @@ function getMenuPopupDashboard(options, trigger_elmnt) {
 					clickCallback: function () {
 						jQuery(this).closest('.menu-popup').menuPopup('close', null);
 
-						PopUp('popup.dashboard.share.edit', popup_options, 'dashboard_share_edit', trigger_elmnt);
+						PopUp('popup.dashboard.share.edit', 'modal-popup modal-popup-generic',
+							popup_options, 'dashboard_share_edit', trigger_elmnt
+						);
 					},
 					disabled: !options.editable
 				},
@@ -537,7 +539,7 @@ function getMenuPopupDashboard(options, trigger_elmnt) {
 				clickCallback: function () {
 					jQuery(this).closest('.menu-popup').menuPopup('close', null);
 
-					PopUp('popup.scheduledreport.list', popup_options, null, trigger_elmnt);
+					PopUp('popup.scheduledreport.list', 'modal-popup', popup_options, null, trigger_elmnt);
 				},
 				disabled: !options.has_related_reports
 			}
@@ -549,7 +551,7 @@ function getMenuPopupDashboard(options, trigger_elmnt) {
 				clickCallback: function () {
 					jQuery(this).closest('.menu-popup').menuPopup('close', null);
 
-					PopUp('popup.scheduledreport.edit', popup_options, null, trigger_elmnt);
+					PopUp('popup.scheduledreport.edit', 'modal-popup', popup_options, null, trigger_elmnt);
 				}
 			});
 		}
@@ -702,7 +704,7 @@ function getMenuPopupItem(options, trigger_elmnt) {
 			clickCallback: function() {
 				jQuery(this).closest('.menu-popup').menuPopup('close', null);
 
-				return PopUp('popup.triggerwizard', {
+				return PopUp('popup.triggerwizard', 'modal-popup modal-popup-generic', {
 					itemid: options.itemid
 				}, null, trigger_elmnt);
 			}
@@ -722,7 +724,7 @@ function getMenuPopupItem(options, trigger_elmnt) {
 					clickCallback: function() {
 						jQuery(this).closest('.menu-popup-top').menuPopup('close', null);
 
-						return PopUp('popup.triggerwizard', {
+						return PopUp('popup.triggerwizard', 'modal-popup modal-popup-generic', {
 							itemid: options.itemid,
 							triggerid: trigger.triggerid
 						}, null, trigger_elmnt);

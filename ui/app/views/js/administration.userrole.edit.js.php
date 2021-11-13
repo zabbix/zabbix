@@ -202,7 +202,7 @@
 				exclude_serviceids.push(service.id);
 			}
 
-			const overlay = PopUp('popup.services', {
+			const overlay = PopUp('popup.services', 'modal-popup', {
 				title: <?= json_encode(_('Add services')) ?>,
 				exclude_serviceids
 			}, 'services', document.activeElement);

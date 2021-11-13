@@ -421,7 +421,7 @@ if ($data['single_host_selected']) {
 		$master_item[] = (new CButton('button', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->removeId()
-			->onClick('return PopUp("popup.generic",'.
+			->onClick('return PopUp("popup.generic", "modal-popup", '.
 				json_encode([
 					'srctbl' => 'items',
 					'srcfld1' => 'itemid',
@@ -439,7 +439,7 @@ if ($data['single_host_selected']) {
 		$master_item[] = (new CButton('button', _('Select prototype')))
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->removeId()
-			->onClick('return PopUp("popup.generic",'.
+			->onClick('return PopUp("popup.generic", "modal-popup",'.
 				json_encode([
 					'srctbl' => 'item_prototypes',
 					'srcfld1' => 'itemid',

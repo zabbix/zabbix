@@ -34,7 +34,7 @@ $table_user_groups = (new CTable())
 		(new CRow(
 			(new CCol(
 				(new CButton(null, _('Add')))
-					->onClick('return PopUp("popup.generic",'.
+					->onClick('return PopUp("popup.generic", "modal-popup", '.
 						json_encode([
 							'srctbl' => 'usrgrp',
 							'srcfld1' => 'usrgrpid',
@@ -55,7 +55,7 @@ $table_users = (new CTable())
 		(new CRow(
 			(new CCol(
 				(new CButton(null, _('Add')))
-					->onClick('return PopUp("popup.generic",'.
+					->onClick('return PopUp("popup.generic", "modal-popup", '.
 						json_encode([
 							'srctbl' => 'users',
 							'srcfld1' => 'userid',

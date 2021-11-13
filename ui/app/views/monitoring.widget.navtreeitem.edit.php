@@ -47,7 +47,7 @@ $form_list = (new CFormList())
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CButton('select', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
-			->onClick('return PopUp("popup.generic",'.
+			->onClick('return PopUp("popup.generic", "modal-popup", '.
 				json_encode([
 					'srctbl' => 'sysmaps',
 					'srcfld1' => 'sysmapid',

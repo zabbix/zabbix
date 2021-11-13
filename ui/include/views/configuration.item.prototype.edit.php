@@ -88,7 +88,7 @@ if (!$readonly) {
 	$key_controls[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 	$key_controls[] = (new CButton('keyButton', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("popup.generic",jQuery.extend('.
+		->onClick('return PopUp("popup.generic", "modal-popup", jQuery.extend('.
 			json_encode([
 				'srctbl' => 'help_items',
 				'srcfld1' => 'key',
@@ -528,7 +528,7 @@ if (!$readonly) {
 	$master_item[] = (new CButton('button', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->removeId()
-		->onClick('return PopUp("popup.generic",'.
+		->onClick('return PopUp("popup.generic", "modal-popup",'.
 			json_encode([
 				'srctbl' => 'items',
 				'srcfld1' => 'itemid',
@@ -546,7 +546,7 @@ if (!$readonly) {
 	$master_item[] = (new CButton('button', _('Select prototype')))
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->removeId()
-		->onClick('return PopUp("popup.generic",'.
+		->onClick('return PopUp("popup.generic", "modal-popup",'.
 			json_encode([
 				'srctbl' => 'item_prototypes',
 				'srcfld1' => 'itemid',

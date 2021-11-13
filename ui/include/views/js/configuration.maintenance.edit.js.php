@@ -92,7 +92,7 @@
 						}
 					});
 
-					PopUp("popup.maintenance.period", params, null, btn);
+					PopUp("popup.maintenance.period", 'modal-popup modal-popup-medium', params, null, btn);
 					break;
 
 				case 'add':
@@ -108,7 +108,7 @@
 						index: index + 1
 					}
 
-					PopUp("popup.maintenance.period", params, null, btn);
+					PopUp("popup.maintenance.period", 'modal-popup modal-popup-medium', params, null, btn);
 					break;
 			}
 		});

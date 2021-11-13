@@ -215,7 +215,7 @@ function createFontSelect(string $name): CSelect {
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 						(new CButton(null, _('Select')))
 							->addClass(ZBX_STYLE_BTN_GREY)
-							->onClick('return PopUp("popup.generic",jQuery.extend('.
+							->onClick('return PopUp("popup.generic", "modal-popup", jQuery.extend('.
 								json_encode([
 									'srctbl' => 'sysmaps',
 									'srcfld1' => 'sysmapid',
@@ -794,7 +794,7 @@ function createFontSelect(string $name): CSelect {
 								->setId('linkTriggerscontainer'),
 							(new CButton(null, _('Add')))
 								->addClass(ZBX_STYLE_BTN_LINK)
-								->onClick('return PopUp("popup.generic",'.
+								->onClick('return PopUp("popup.generic", "modal-popup",'.
 									json_encode([
 										'srctbl' => 'triggers',
 										'srcfld1' => 'triggerid',
