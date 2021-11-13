@@ -3699,7 +3699,7 @@ static int	evaluate_BASELINE(zbx_variant_t *value, DC_ITEM *item, const char *fu
 	}
 	else if (0 == strcmp(func, "dev"))
 	{
-		double			value_dev, value_avg = 0;
+		double			value_period, value_dev, value_avg = 0;
 		zbx_vector_dbl_t	baseline;
 		int			i;
 
@@ -3710,22 +3710,17 @@ static int	evaluate_BASELINE(zbx_variant_t *value, DC_ITEM *item, const char *fu
 		}
 
 		/* first value is data period, the rest are baseline */
-		zbx_vector_dbl_create(&baseline);
-		zbx_vector_dbl_append_array(&baseline, values.values + 1, values.values_num - 1);
+		value_period = values.values[0];
+		zbx_vector_dbl_remove(&baseline, 0);
 
-		if (SUCCEED != zbx_eval_calc_stddevpop(&baseline, &value_dev, error))
-		{
-			zbx_vector_dbl_destroy(&baseline);
+		if (SUCCEED != zbx_eval_calc_stddevpop(&values, &value_dev, error))
 			goto out;
-		}
 
-		for (i = 0; i < baseline.values_num; i++)
-			value_avg += baseline.values[i];
-		value_avg /= baseline.values_num;
+		for (i = 0; i < values.values_num; i++)
+			value_avg += values.values[i];
+		value_avg /= values.values_num;
 
-		zbx_vector_dbl_destroy(&baseline);
-
-		value_dbl = fabs(values.values[0] - value_avg) / value_dev;
+		value_dbl = fabs(value_period - value_avg) / value_dev;
 	}
 	else
 	{
