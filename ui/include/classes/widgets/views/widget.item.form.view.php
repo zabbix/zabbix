@@ -232,7 +232,7 @@ $scripts[] =
 
 	'$("#adv_conf").change(function() {'.
 		'if (this.checked) {'.
-			'$($show).trigger("change");'.
+			'$show.trigger("change");'.
 			'$("#bg-color-row").show();'.
 		'}'.
 		'else {'.
@@ -243,7 +243,7 @@ $scripts[] =
 	// Prevent unchecking last "Show" checkbox.
 	'$show.on("click", () => Boolean($show.filter(":checked").length));'.
 
-	'$($show).change(function() {'.
+	'$show.change(function() {'.
 		'switch($(this).val()) {'.
 			'case "'.WIDGET_ITEM_SHOW_DESCRIPTION.'":'.
 				'if ($("#adv_conf").prop("checked")) {'.
