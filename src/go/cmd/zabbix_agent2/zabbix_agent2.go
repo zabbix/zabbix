@@ -107,22 +107,23 @@ func processHelpCommand(c *remotecontrol.Client) (err error) {
 }
 
 func processUserParamReloadCommand(c *remotecontrol.Client) (err error) {
-	var message string
 	var userparams AgentUserParamOption
 
 	if err = conf.LoadUserParams(&userparams); err != nil {
-		message = fmt.Sprintf("Cannot load user parameters: %s", err)
-		return c.Reply(message)
+		err = fmt.Errorf("Cannot load user parameters: %s", err)
+		log.Infof(err.Error())
+		return
 	}
 
 	agent.Options.UserParameter = userparams.UserParameter
 
 	if res := manager.QueryUserParams(); res != "ok" {
-		message = "Failed to reload user parameters"
-	} else {
-		message = "Reloaded user parameters"
+		err = fmt.Errorf("Failed to reload user parameters: %s", res)
+		log.Infof(err.Error())
+		return
 	}
 
+	message := "User parameters reloaded"
 	log.Infof(message)
 	err = c.Reply(message)
 

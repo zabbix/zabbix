@@ -414,7 +414,7 @@ run:
 
 				if keys, rerr = agent.InitUserParameterPlugin(agent.Options.UserParameter,
 					agent.Options.UnsafeUserParameters, agent.Options.UserParameterDir); rerr != nil {
-					v.sink <- "cannot process user parameters request: " + err.Error()
+					v.sink <- "cannot process user parameters request: " + rerr.Error()
 					continue
 				}
 
