@@ -3699,14 +3699,32 @@ static int	evaluate_BASELINE(zbx_variant_t *value, DC_ITEM *item, const char *fu
 	}
 	else if (0 == strcmp(func, "dev"))
 	{
+		double			value_dev, value_avg = 0;
+		zbx_vector_dbl_t	baseline;
+		int			i;
+
 		if (SUCCEED != zbx_baseline_get_data(item->itemid, item->value_type, ts->sec, period, seasons, 0,
 				&values, error))
 		{
 			goto out;
 		}
 
-		if (SUCCEED != zbx_eval_calc_stddevpop(&values, &value_dbl, error))
+		/* first value is data period, the rest are baseline */
+		zbx_vector_dbl_create(&baseline);
+		zbx_vector_dbl_append_array(&baseline, values.values + 1, values.values_num - 1);
+
+		if (SUCCEED != zbx_eval_calc_stddevpop(&baseline, &value_dev, error))
+		{
+			zbx_vector_dbl_destroy(&baseline);
 			goto out;
+		}
+
+		for (i = 0; i < baseline.values_num; i++)
+			value_avg += baseline.values[i];
+
+		zbx_vector_dbl_destroy(&baseline);
+
+		value_dbl = fabs(values.values[0] - value_avg) / value_dev;
 	}
 	else
 	{
