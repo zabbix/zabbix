@@ -3721,6 +3721,7 @@ static int	evaluate_BASELINE(zbx_variant_t *value, DC_ITEM *item, const char *fu
 
 		for (i = 0; i < baseline.values_num; i++)
 			value_avg += baseline.values[i];
+		value_avg /= baseline.values_num;
 
 		zbx_vector_dbl_destroy(&baseline);
 
