@@ -249,7 +249,8 @@ func (m *Manager) processQueue(now time.Time) {
 }
 
 // processAndFlushUserParamQueue processes queued user parameters plugins/tasks and/or removes them
-func (m *Manager) processAndFlushUserParamQueue() {
+func (m *Manager) processAndFlushUserParamQueue(now time.Time) {
+	seconds := now.Unix()
 	for p := m.pluginQueue.Peek(); p != nil; p = m.pluginQueue.Peek() {
 		if !p.usrprm {
 			heap.Pop(&m.pluginQueue)
@@ -258,7 +259,7 @@ func (m *Manager) processAndFlushUserParamQueue() {
 
 		if task := p.peekTask(); task != nil {
 			heap.Pop(&m.pluginQueue)
-			if !p.hasCapacity() {
+			if !p.hasCapacity() || task.getScheduled().Unix() > seconds {
 				m.pluginQueue.Remove(p)
 				continue
 			}
@@ -402,19 +403,18 @@ run:
 				var keys []string
 				var rerr error
 
-				m.processAndFlushUserParamQueue()
+				m.processAndFlushUserParamQueue(time.Now())
 				plugin.ClearUserParamMetrics()
 
-				for i, plg := range m.plugins {
+				for k, plg := range m.plugins {
 					if plg.usrprm {
-						delete(m.plugins, i)
+						delete(m.plugins, k)
 					}
 				}
 
 				if keys, rerr = agent.InitUserParameterPlugin(agent.Options.UserParameter,
 					agent.Options.UnsafeUserParameters, agent.Options.UserParameterDir); rerr != nil {
-					log.Warningf("cannot reload user parameters")
-					v.sink <- "err"
+					v.sink <- "cannot process user parameters request: " + err.Error()
 					continue
 				}
 

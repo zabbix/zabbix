@@ -134,9 +134,9 @@ func ClearRegistry() {
 }
 
 func ClearUserParamMetrics() {
-	for i, _ := range Metrics {
-		if Metrics[i].UsrPrm {
-			delete(Metrics, i)
+	for k, _ := range Metrics {
+		if Metrics[k].UsrPrm {
+			delete(Metrics, k)
 		}
 	}
 }
