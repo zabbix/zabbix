@@ -135,14 +135,13 @@ $templates_field_items[] = (new CMultiSelect([
 			'disableids' => array_column($data['linked_templates'], 'templateid')
 		]
 	]
-]))->setWidth($templates_field_items ? ZBX_TEXTAREA_STANDARD_WIDTH_WRAPPED : ZBX_TEXTAREA_STANDARD_WIDTH);
+]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
 $template_tab
 	->addRow(
 		new CLabel(_('Templates')),
 		(count($templates_field_items) > 1)
-			? (new CDiv($templates_field_items))
-				->addClass(ZBX_STYLE_GRID_TEMPLATES_CONTAINER)
+			? (new CDiv($templates_field_items))->addClass('grid-templates-container')
 			: $templates_field_items
 	)
 	->addRow((new CLabel(_('Groups'), 'groups__ms'))->setAsteriskMark(),

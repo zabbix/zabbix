@@ -1334,19 +1334,17 @@ form {
 }
 
 .grid-templates-container {
-	background-color: $ui-bg-color;
-	border: 1px solid $ui-border-color;
-	padding: 5px;
 	display: inline-block;
 
 	> table.table-forms {
 		margin-bottom: 5px;
 		display: inline-table;
-		width: 443px;
+		width: 453px;
 	}
 
-	> table tr > *:last-child {
+	> table.table-forms tr > *:last-child {
 		min-width: 1%;
+		padding-right: 5px;
 	}
 }
 

@@ -3117,16 +3117,14 @@ form.is-loading {
     margin: -10px -10px 10px; }
 
 .grid-templates-container {
-  background-color: #000000;
-  border: 1px solid #444444;
-  padding: 5px;
   display: inline-block; }
   .grid-templates-container > table.table-forms {
     margin-bottom: 5px;
     display: inline-table;
-    width: 443px; }
-  .grid-templates-container > table tr > *:last-child {
-    min-width: 1%; }
+    width: 453px; }
+  .grid-templates-container > table.table-forms tr > *:last-child {
+    min-width: 1%;
+    padding-right: 5px; }
 
 .form-btns button {
   margin: 10px 6px 5px; }

@@ -200,7 +200,7 @@ else {
 				'disableids' => array_column($data['host']['parentTemplates'], 'templateid')
 			]
 		]
-	]))->setWidth($templates_field_items ? ZBX_TEXTAREA_STANDARD_WIDTH_WRAPPED : ZBX_TEXTAREA_STANDARD_WIDTH);
+	]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 }
 
 $host_tab
@@ -208,8 +208,7 @@ $host_tab
 		new CLabel(_('Templates')),
 		(new CFormField(
 			(count($templates_field_items) > 1)
-				? (new CDiv($templates_field_items))
-					->addClass(ZBX_STYLE_GRID_TEMPLATES_CONTAINER)
+				? (new CDiv($templates_field_items))->addClass('grid-templates-container')
 				: $templates_field_items
 		))
 	])

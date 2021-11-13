@@ -108,12 +108,6 @@ if ($host_prototype['templateid']) {
 			$linked_templates->addRow([$template_link]);
 		}
 
-		$host_tab->addRow(_('Templates'),
-			(new CDiv($linked_templates))
-				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-		);
-
 		$templates_field_items[] = $linked_templates;
 	}
 }
@@ -172,14 +166,13 @@ else {
 				'disableids' => array_column($host_prototype['templates'], 'templateid')
 			]
 		]
-	]))->setWidth($templates_field_items ? ZBX_TEXTAREA_STANDARD_WIDTH_WRAPPED : ZBX_TEXTAREA_STANDARD_WIDTH);
+	]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 }
 
 $host_tab
 	->addRow(_('Templates'),
 		(count($templates_field_items) > 1)
-			? (new CDiv($templates_field_items))
-				->addClass(ZBX_STYLE_GRID_TEMPLATES_CONTAINER)
+			? (new CDiv($templates_field_items))->addClass('grid-templates-container')
 			: $templates_field_items
 	);
 
