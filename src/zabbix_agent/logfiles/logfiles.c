@@ -696,7 +696,7 @@ clean1:
 		return ret;
 	}
 
-	/* old_file->md5_block_size > new_file->md5_block_size */
+	/* Remaining case: old_file->md5_block_size > new_file->md5_block_size */
 
 	/* Now it is necessary to read the first 'new_file->md5_block_size' bytes */
 	/* of the old file to calculate MD5 sum to compare. Unfortunately we  */
