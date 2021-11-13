@@ -935,10 +935,10 @@ class CTrigger extends CTriggerGeneral {
 						}
 					}
 				}
-				$this->deleteDependencies($childTriggers);
+				$this->deleteDependencies($childTriggers, true);
 
 				if ($newDependencies) {
-					$this->addDependencies($newDependencies);
+					$this->addDependencies($newDependencies, true);
 				}
 			}
 		}

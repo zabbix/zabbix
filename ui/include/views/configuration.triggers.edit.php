@@ -587,7 +587,7 @@ $dependenciesFormList = new CFormList('dependenciesFormList');
 $dependenciesTable = (new CTable())
 	->setId('dependency-table')
 	->setAttribute('style', 'width: 100%;')
-	->setHeader([_('Name'), $discovered_trigger ? null : _('Action')]);
+	->setHeader([_('Name'), $readonly ? null : _('Action')]);
 
 foreach ($data['db_dependencies'] as $dependency) {
 	$triggersForm->addVar('dependencies[]', $dependency['triggerid'], 'dependencies_'.$dependency['triggerid']);
@@ -605,7 +605,7 @@ foreach ($data['db_dependencies'] as $dependency) {
 					->setArgument('context', $data['context'])
 			))->setTarget('_blank'),
 			(new CCol(
-				$discovered_trigger
+				$readonly
 					? null
 					: (new CButton('remove', _('Remove')))
 						->onClick('javascript: removeDependency("'.$dependency['triggerid'].'");')
@@ -619,7 +619,7 @@ foreach ($data['db_dependencies'] as $dependency) {
 $dependenciesFormList->addRow(_('Dependencies'),
 	(new CDiv([
 		$dependenciesTable,
-		$discovered_trigger
+		$readonly
 			? null
 			: (new CButton('bnt1', _('Add')))
 				->onClick('return PopUp("popup.generic",'.
