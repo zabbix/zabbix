@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-09 16:59+0200\n"
+"POT-Creation-Date: 2021-11-12 19:55+0200\n"
 "PO-Revision-Date: 2021-11-05 14:43+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -615,7 +615,7 @@ msgstr "Подтвержденные РЕШЕННЫЕ события"
 msgid "Action"
 msgstr "Действие"
 
-#: include/classes/api/services/CAction.php:2676
+#: include/classes/api/services/CAction.php:2678
 #, c-format
 msgid "Action \"%1$s\" already exists."
 msgstr "Действие \"%1$s\" уже существует."
@@ -2957,7 +2957,7 @@ msgstr "Не удалось отсоединить шаблон."
 msgid "Cannot unlink trigger \"%1$s\", it has items from template that is left linked to host."
 msgstr "Не удалось отсоединить триггер \"%1$s\", у него имеются элементы данных с шаблона, который остается присоединённым к узлу сети."
 
-#: include/classes/api/services/CAction.php:2624
+#: include/classes/api/services/CAction.php:2626
 #, c-format
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
 msgstr "Не удалось обновить \"%1$s\" для действия \"%2$s\"."
@@ -8566,7 +8566,7 @@ msgstr "Некорректный токен Vault."
 msgid "Incorrect action condition discovery check."
 msgstr "Некорректная проверка обнаружения в условии действия."
 
-#: include/classes/api/services/CAction.php:3308
+#: include/classes/api/services/CAction.php:3310
 msgid "Incorrect action condition discovery check. Discovery check does not exist or you have no access to it."
 msgstr "Некорректная проверка обнаружения в условии действия. Проверка обнаружения не существует или у вас нет прав доступа к ней."
 
@@ -8574,7 +8574,7 @@ msgstr "Некорректная проверка обнаружения в ус
 msgid "Incorrect action condition discovery object."
 msgstr "Некорректный объект обнаружения в условии действия."
 
-#: include/classes/api/services/CAction.php:3267
+#: include/classes/api/services/CAction.php:3269
 msgid "Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it."
 msgstr "Некорректное правило обнаружения в условии действия. Правило обнаружения не существует или у вас нет прав доступа к нему."
 
@@ -8586,15 +8586,15 @@ msgstr "Некорректное состояние обнаружения в у
 msgid "Incorrect action condition event type."
 msgstr "Некорректный тип события в условии действия."
 
-#: include/classes/api/services/CAction.php:2987
+#: include/classes/api/services/CAction.php:2989
 msgid "Incorrect action condition or operation host group. Host group does not exist or you have no access to it."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:3047
+#: include/classes/api/services/CAction.php:3049
 msgid "Incorrect action condition or operation host. Host does not exist or you have no access to it."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:3185
+#: include/classes/api/services/CAction.php:3187
 msgid "Incorrect action condition or operation template. Template does not exist or you have no access to it."
 msgstr ""
 
@@ -8603,11 +8603,11 @@ msgstr ""
 msgid "Incorrect action condition port \"%1$s\"."
 msgstr "Некорректный порт \"%1$s\" в условии действия."
 
-#: include/classes/api/services/CAction.php:3349
+#: include/classes/api/services/CAction.php:3351
 msgid "Incorrect action condition proxy. Proxy does not exist or you have no access to it."
 msgstr "Некорректный прокси в условии действия. Прокси не существует или у вас нет прав доступа к нему."
 
-#: include/classes/api/services/CAction.php:3389
+#: include/classes/api/services/CAction.php:3391
 msgid "Incorrect action condition service. Service does not exist or you have no access to it."
 msgstr ""
 
@@ -8615,7 +8615,7 @@ msgstr ""
 msgid "Incorrect action condition trigger severity."
 msgstr "Некорректная важность триггера в условии действия."
 
-#: include/classes/api/services/CAction.php:3226
+#: include/classes/api/services/CAction.php:3228
 msgid "Incorrect action condition trigger. Trigger does not exist or you have no access to it."
 msgstr "Некорректный триггер в условии действия. Триггер не существует или у вас нет прав доступа к нему."
 
@@ -8625,11 +8625,11 @@ msgstr "Некорректный тип условия действия."
 
 #: app/controllers/CControllerActionOperationValidate.php:83
 #: app/controllers/CControllerActionOperationValidate.php:89
-#: include/classes/api/services/CAction.php:2812
+#: include/classes/api/services/CAction.php:2814
 msgid "Incorrect action operation escalation step values."
 msgstr "Некорректные значения шага эскалации для операции действия."
 
-#: include/classes/api/services/CAction.php:2887
+#: include/classes/api/services/CAction.php:2889
 msgid "Incorrect action operation media type. Media type does not exist or you have no access to it."
 msgstr ""
 
@@ -8638,11 +8638,11 @@ msgstr ""
 msgid "Incorrect action operation type \"%1$s\" for event source \"%2$s\"."
 msgstr "Некорректный тип операции действия \"%1$s\" для источника событий \"%2$s\"."
 
-#: include/classes/api/services/CAction.php:3133
+#: include/classes/api/services/CAction.php:3135
 msgid "Incorrect action operation user group. User group does not exist or you have no access to it."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:3090
+#: include/classes/api/services/CAction.php:3092
 msgid "Incorrect action operation user. User does not exist or you have no access to it."
 msgstr ""
 
@@ -9599,10 +9599,10 @@ msgstr "Ошибочные параметры метода."
 #: app/controllers/CControllerDashboardUpdate.php:200
 #: app/controllers/CControllerDashboardUpdate.php:212
 #: app/controllers/CControllerPopupHttpStep.php:100
-#: include/classes/api/services/CAction.php:2703
-#: include/classes/api/services/CAction.php:2709
-#: include/classes/api/services/CAction.php:2720
-#: include/classes/api/services/CAction.php:2732
+#: include/classes/api/services/CAction.php:2705
+#: include/classes/api/services/CAction.php:2711
+#: include/classes/api/services/CAction.php:2722
+#: include/classes/api/services/CAction.php:2734
 #: include/classes/api/services/CAutoregistration.php:157
 #: include/classes/api/services/CAutoregistration.php:163
 #: include/classes/api/services/CAutoregistration.php:170
@@ -12239,7 +12239,7 @@ msgstr "Совпадения не найдены"
 msgid "No new modules discovered"
 msgstr "Новые модули не обнаружены"
 
-#: include/classes/api/services/CAction.php:2767
+#: include/classes/api/services/CAction.php:2769
 #, c-format
 msgid "No operations defined for action \"%1$s\"."
 msgstr ""
@@ -12317,7 +12317,7 @@ msgstr "Нет прав доступа на вызов \"%1$s.%2$s\"."
 #: app/views/monitoring.widget.systeminfo.view.php:45 disc_prototypes.php:748
 #: host_discovery.php:808 hostinventoriesoverview.php:73
 #: include/classes/api/services/CAction.php:1516
-#: include/classes/api/services/CAction.php:2569
+#: include/classes/api/services/CAction.php:2571
 #: include/classes/api/services/CConfiguration.php:78
 #: include/classes/api/services/CCorrelation.php:497
 #: include/classes/api/services/CCorrelation.php:653
@@ -12480,7 +12480,7 @@ msgid "No public key file specified."
 msgstr "Файл публичного ключа не указан."
 
 #: app/controllers/CControllerActionOperationValidate.php:110
-#: include/classes/api/services/CAction.php:2824
+#: include/classes/api/services/CAction.php:2826
 msgid "No recipients specified for action operation message."
 msgstr ""
 
@@ -12501,7 +12501,7 @@ msgid "No target selected."
 msgstr "Цель не выбрана."
 
 #: app/controllers/CControllerActionOperationValidate.php:142
-#: include/classes/api/services/CAction.php:2835
+#: include/classes/api/services/CAction.php:2837
 msgid "No targets specified for action operation global script."
 msgstr ""
 
@@ -13036,7 +13036,7 @@ msgstr "Информация об операционной системе. Во�
 msgid "Operation"
 msgstr "Операция"
 
-#: include/classes/api/services/CAction.php:2793
+#: include/classes/api/services/CAction.php:2795
 #, c-format
 msgid "Operation \"%1$s\" already exists for action \"%2$s\"."
 msgstr ""
@@ -13539,7 +13539,7 @@ msgid "Parameters"
 msgstr "Параметры"
 
 #: app/controllers/CControllerActionOperationValidate.php:76
-#: include/classes/api/services/CAction.php:2805
+#: include/classes/api/services/CAction.php:2807
 msgid "Parameters \"esc_step_from\" and \"esc_step_to\" must be set together."
 msgstr ""
 
@@ -16288,7 +16288,7 @@ msgstr "Испанский (es_ES)"
 msgid "Specified role was not found."
 msgstr "Указанная роль не найдена."
 
-#: include/classes/api/services/CAction.php:2930
+#: include/classes/api/services/CAction.php:2932
 msgid "Specified script does not exist or you do not have rights on it for action operation command."
 msgstr "Указанный скрипт не существует или вы не имеете к нему прав доступа в команде операции действия."
 
@@ -19962,7 +19962,7 @@ msgstr "ожидается четное количество шестнадца�
 msgid "an explicit time is expected"
 msgstr "ожидается время указанное явно"
 
-#: include/classes/api/services/CAction.php:2710
+#: include/classes/api/services/CAction.php:2712
 #: include/classes/api/services/CCorrelation.php:730
 msgid "an identifier is not defined in the formula"
 msgstr "идентификатор не задан в формуле"
@@ -20139,7 +20139,7 @@ msgstr "нельзя изменить"
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:41
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:47
 #: app/controllers/CControllerUserUpdateGeneral.php:111
-#: include/classes/api/services/CAction.php:2733
+#: include/classes/api/services/CAction.php:2735
 #: include/classes/api/services/CAutoregistration.php:163
 #: include/classes/api/services/CDiscoveryRule.php:1989
 #: include/classes/api/services/CDRule.php:210
@@ -20600,7 +20600,7 @@ msgstr "некорректное количество элементов"
 msgid "incorrect expression starting from \"%1$s\""
 msgstr "некорректное выражение начиная с \"%1$s\""
 
-#: include/classes/api/services/CAction.php:2703
+#: include/classes/api/services/CAction.php:2705
 #: include/classes/api/services/CCorrelation.php:723
 msgid "incorrect number of conditions"
 msgstr ""
