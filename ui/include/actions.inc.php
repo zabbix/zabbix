@@ -861,7 +861,7 @@ function getActionOperationDescriptions(int $eventsource, array $actions, int $t
 						break;
 
 					case OPERATION_TYPE_RECOVERY_MESSAGE:
-					case OPERATION_TYPE_ACK_MESSAGE:
+					case OPERATION_TYPE_UPDATE_MESSAGE:
 						$result[$i][$j][] = bold(_('Notify all involved'));
 						break;
 				}
@@ -964,7 +964,7 @@ function getAllowedOperations($eventsource) {
 			ACTION_UPDATE_OPERATION => [
 				OPERATION_TYPE_MESSAGE,
 				OPERATION_TYPE_COMMAND,
-				OPERATION_TYPE_ACK_MESSAGE
+				OPERATION_TYPE_UPDATE_MESSAGE
 			]
 		];
 	}
@@ -1036,7 +1036,7 @@ function operation_type2str($type) {
 		OPERATION_TYPE_TEMPLATE_REMOVE => _('Unlink from template'),
 		OPERATION_TYPE_HOST_INVENTORY => _('Set host inventory mode'),
 		OPERATION_TYPE_RECOVERY_MESSAGE => _('Notify all involved'),
-		OPERATION_TYPE_ACK_MESSAGE => _('Notify all involved')
+		OPERATION_TYPE_UPDATE_MESSAGE => _('Notify all involved')
 	];
 
 	if (is_null($type)) {

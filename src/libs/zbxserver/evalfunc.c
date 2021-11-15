@@ -1326,27 +1326,27 @@ static void	count_one_dbl(int *count, int op, double value, double pattern)
 	switch (op)
 	{
 		case OP_EQ:
-			if (value > pattern - ZBX_DOUBLE_EPSILON && value < pattern + ZBX_DOUBLE_EPSILON)
+			if (SUCCEED == zbx_double_compare(value, pattern))
 				(*count)++;
 			break;
 		case OP_NE:
-			if (!(value > pattern - ZBX_DOUBLE_EPSILON && value < pattern + ZBX_DOUBLE_EPSILON))
+			if (FAIL == zbx_double_compare(value, pattern))
 				(*count)++;
 			break;
 		case OP_GT:
-			if (value >= pattern + ZBX_DOUBLE_EPSILON)
+			if (value - pattern > ZBX_DOUBLE_EPSILON)
 				(*count)++;
 			break;
 		case OP_GE:
-			if (value > pattern - ZBX_DOUBLE_EPSILON)
+			if (value - pattern >= -ZBX_DOUBLE_EPSILON)
 				(*count)++;
 			break;
 		case OP_LT:
-			if (value <= pattern - ZBX_DOUBLE_EPSILON)
+			if (pattern - value > ZBX_DOUBLE_EPSILON)
 				(*count)++;
 			break;
 		case OP_LE:
-			if (value < pattern + ZBX_DOUBLE_EPSILON)
+			if (pattern - value >= -ZBX_DOUBLE_EPSILON)
 				(*count)++;
 	}
 }
@@ -3434,6 +3434,201 @@ int	zbx_evaluate_RATE(zbx_variant_t *value, DC_ITEM *item, const char *parameter
 	return evaluate_RATE(value, item, parameters, ts, error);
 }
 
+#define LAST(v, type) v.values[i].value.type
+#define PREV(v, type) v.values[i + 1].value.type
+
+#define CHANGECOUNT_DBL(op)										\
+	for (i = 0; i < values.values_num - 1; i++)							\
+	{												\
+		if (SUCCEED != zbx_double_compare(PREV(values, dbl), LAST(values, dbl)) &&		\
+				PREV(values, dbl) op LAST(values, dbl))					\
+		{											\
+			count++;									\
+		}											\
+	}												\
+
+#define CHANGECOUNT_UI64(op)						\
+	for (i = 0; i < values.values_num - 1; i++)			\
+	{								\
+		if (PREV(values, ui64) op LAST(values, ui64))		\
+			count++;					\
+	}								\
+
+#define CHANGECOUNT_STR(type)						\
+	for (i = 0; i < values.values_num - 1; i++)			\
+	{								\
+		if (0 != strcmp(PREV(values, type), LAST(values, type)))\
+		{							\
+			count++;					\
+		}							\
+	}								\
+
+/* flags for evaluate_CHANGECOUNT() */
+#define CHANGE_ALL	0
+#define CHANGE_INC	1
+#define CHANGE_DEC	2
+
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_CHANGECOUNT                                             *
+ *                                                                            *
+ * Purpose: evaluate function 'changecount' for the item                      *
+ *                                                                            *
+ * Parameters: value      - [OUT] the function return value                   *
+ *             item       - [IN] item (performance metric)                    *
+ *             parameters - [IN] mode, increases, decreases or all changes    *
+ *             ts         - [IN] the function execution time                  *
+ *             error      - [OUT] the error message if function failed        *
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	evaluate_CHANGECOUNT(zbx_variant_t *value, DC_ITEM *item, const char *parameters,
+		const zbx_timespec_t *ts, char **error)
+{
+	int				arg1, i, nparams, time_shift, mode, ret = FAIL, seconds = 0, nvalues = 0;
+	char				*arg2 = NULL;
+	zbx_value_type_t		arg1_type;
+	zbx_vector_history_record_t	values;
+	zbx_timespec_t			ts_end = *ts;
+	zbx_uint64_t			count = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_history_record_vector_create(&values);
+
+	nparams = num_param(parameters);
+	if (1 > nparams || 2 < nparams)
+	{
+		*error = zbx_strdup(*error, "invalid number of parameters");
+		goto out;
+	}
+
+	if (SUCCEED != get_function_parameter_hist_range(ts->sec, parameters, 1, &arg1, &arg1_type, &time_shift) ||
+			ZBX_VALUE_NONE == arg1_type)
+	{
+		*error = zbx_strdup(*error, "invalid second parameter");
+		goto out;
+	}
+
+	if (1 < nparams && (SUCCEED != get_function_parameter_str(parameters, 2, &arg2)))
+	{
+		*error = zbx_strdup(*error, "invalid third parameter");
+		goto out;
+	}
+
+	if (NULL == arg2 || '\0' == *arg2 || (0 == strcmp("all", arg2)))
+	{
+		mode = CHANGE_ALL;
+	}
+	else if (0 == strcmp("dec", arg2))
+	{
+		mode = CHANGE_DEC;
+	}
+	else if (0 == strcmp("inc", arg2))
+	{
+		mode = CHANGE_INC;
+	}
+	else
+	{
+		*error = zbx_strdup(*error, "invalid third parameter");
+		goto out;
+	}
+
+	ts_end.sec -= time_shift;
+
+	switch (arg1_type)
+	{
+		case ZBX_VALUE_SECONDS:
+			seconds = arg1;
+			break;
+		case ZBX_VALUE_NVALUES:
+			nvalues = arg1;
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+	}
+
+	if (SUCCEED != zbx_vc_get_values(item->itemid, item->value_type, &values, seconds, nvalues, &ts_end))
+	{
+		*error = zbx_strdup(*error, "cannot get values from value cache");
+		goto out;
+	}
+
+	if (2 > values.values_num)
+	{
+		*error = zbx_strdup(*error, "not enough data");
+		goto out;
+	}
+
+	if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
+	{
+		if (CHANGE_ALL == mode)
+		{
+			CHANGECOUNT_UI64(!=);
+		}
+		else if (CHANGE_INC == mode)
+		{
+			CHANGECOUNT_UI64(<);
+		}
+		else if (CHANGE_DEC == mode)
+		{
+			CHANGECOUNT_UI64(>);
+		}
+	}
+	else if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
+	{
+		if (CHANGE_ALL == mode)
+		{
+			for (i = 0; i < values.values_num - 1; i++)
+			{
+				if (SUCCEED != zbx_double_compare(PREV(values, dbl), LAST(values, dbl)))
+				{
+					count++;
+				}
+			}
+		}
+		else if (CHANGE_INC == mode)
+		{
+			CHANGECOUNT_DBL(<);
+		}
+		else if (CHANGE_DEC == mode)
+		{
+			CHANGECOUNT_DBL(>);
+		}
+	}
+	else if (ITEM_VALUE_TYPE_STR == item->value_type || ITEM_VALUE_TYPE_TEXT == item->value_type)
+	{
+		CHANGECOUNT_STR(str);
+	}
+	else if (ITEM_VALUE_TYPE_LOG == item->value_type)
+	{
+		CHANGECOUNT_STR(log->value);
+	}
+	else
+	{
+		*error = zbx_strdup(*error, "invalid value type");
+		goto out;
+	}
+
+	ret = SUCCEED;
+	zbx_variant_set_ui64(value, count);
+out:
+	zbx_free(arg2);
+	zbx_history_record_vector_destroy(&values, item->value_type);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+#undef CHANGE_ALL
+#undef CHANGE_INC
+#undef CHANGE_DEC
+#undef PREV
+#undef LAST
+
 static void	history_to_dbl_vector(const zbx_history_record_t *v, int n, unsigned char value_type,
 		zbx_vector_dbl_t *values)
 {
@@ -3654,6 +3849,10 @@ int	evaluate_function2(zbx_variant_t *value, DC_ITEM *item, const char *function
 	else if (0 == strcmp(function, "rate"))
 	{
 		ret = evaluate_RATE(value, item, parameter, ts, error);
+	}
+	else if (0 == strcmp(function, "changecount"))
+	{
+		ret = evaluate_CHANGECOUNT(value, item, parameter, ts, error);
 	}
 	else
 	{

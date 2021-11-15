@@ -23,6 +23,7 @@
  * Class to log audit records.
  */
 class CAudit {
+
 	/**
 	 * Audit actions.
 	 *
@@ -79,6 +80,7 @@ class CAudit {
 	public const RESOURCE_USER_ROLE = 44;
 	public const RESOURCE_AUTH_TOKEN = 45;
 	public const RESOURCE_SCHEDULED_REPORT = 46;
+	public const RESOURCE_HA_NODE = 47;
 
 	/**
 	 * Audit details actions.
@@ -103,6 +105,7 @@ class CAudit {
 	 * @var array
 	 */
 	private const TABLE_NAMES = [
+		self::RESOURCE_ACTION => 'actions',
 		self::RESOURCE_AUTHENTICATION => 'config',
 		self::RESOURCE_AUTH_TOKEN => 'token',
 		self::RESOURCE_AUTOREGISTRATION => 'config',
@@ -114,6 +117,7 @@ class CAudit {
 		self::RESOURCE_ICON_MAP => 'icon_map',
 		self::RESOURCE_IMAGE => 'images',
 		self::RESOURCE_ITEM => 'items',
+		self::RESOURCE_IT_SERVICE => 'services',
 		self::RESOURCE_MACRO => 'globalmacro',
 		self::RESOURCE_MEDIA_TYPE => 'media_type',
 		self::RESOURCE_MODULE => 'module',
@@ -144,6 +148,7 @@ class CAudit {
 	 * @var array
 	 */
 	private const FIELD_NAMES = [
+		self::RESOURCE_ACTION => 'name',
 		self::RESOURCE_AUTHENTICATION => null,
 		self::RESOURCE_AUTH_TOKEN => 'name',
 		self::RESOURCE_AUTOREGISTRATION => null,
@@ -155,6 +160,7 @@ class CAudit {
 		self::RESOURCE_ICON_MAP => 'name',
 		self::RESOURCE_IMAGE => 'name',
 		self::RESOURCE_ITEM => 'name',
+		self::RESOURCE_IT_SERVICE => 'name',
 		self::RESOURCE_MACRO => 'macro',
 		self::RESOURCE_MEDIA_TYPE => 'name',
 		self::RESOURCE_MODULE => 'id',
@@ -175,6 +181,7 @@ class CAudit {
 	 * @var array
 	 */
 	private const API_NAMES = [
+		self::RESOURCE_ACTION => 'action',
 		self::RESOURCE_AUTHENTICATION => 'authentication',
 		self::RESOURCE_AUTH_TOKEN => 'token',
 		self::RESOURCE_AUTOREGISTRATION => 'autoregistration',
@@ -186,6 +193,7 @@ class CAudit {
 		self::RESOURCE_ICON_MAP => 'iconmap',
 		self::RESOURCE_IMAGE => 'image',
 		self::RESOURCE_ITEM => 'item',
+		self::RESOURCE_IT_SERVICE => 'service',
 		self::RESOURCE_MACRO => 'usermacro',
 		self::RESOURCE_MEDIA_TYPE => 'mediatype',
 		self::RESOURCE_MODULE => 'module',
@@ -231,6 +239,33 @@ class CAudit {
 	 * @var array
 	 */
 	private const NESTED_OBJECTS_TABLE_NAMES = [
+		'action.filter' => 'actions',
+		'action.filter.conditions' => 'conditions',
+		'action.operations' => 'operations',
+		'action.operations.opconditions' => 'opconditions',
+		'action.operations.opmessage' => 'opmessage',
+		'action.operations.opmessage_grp' => 'opmessage_grp',
+		'action.operations.opmessage_usr' => 'opmessage_usr',
+		'action.operations.opcommand' => 'opcommand',
+		'action.operations.opcommand_grp' => 'opcommand_grp',
+		'action.operations.opcommand_hst' => 'opcommand_hst',
+		'action.operations.opgroup' => 'opgroup',
+		'action.operations.optemplate' => 'optemplate',
+		'action.operations.opinventory' => 'opinventory',
+		'action.recovery_operations' => 'operations',
+		'action.recovery_operations.opmessage' => 'opmessage',
+		'action.recovery_operations.opmessage_grp' => 'opmessage_grp',
+		'action.recovery_operations.opmessage_usr' => 'opmessage_usr',
+		'action.recovery_operations.opcommand' => 'opcommand',
+		'action.recovery_operations.opcommand_grp' => 'opcommand_grp',
+		'action.recovery_operations.opcommand_hst' => 'opcommand_hst',
+		'action.update_operations' => 'operations',
+		'action.update_operations.opmessage' => 'opmessage',
+		'action.update_operations.opmessage_grp' => 'opmessage_grp',
+		'action.update_operations.opmessage_usr' => 'opmessage_usr',
+		'action.update_operations.opcommand' => 'opcommand',
+		'action.update_operations.opcommand_grp' => 'opcommand_grp',
+		'action.update_operations.opcommand_hst' => 'opcommand_hst',
 		'correlation.filter' => 'correlation',
 		'correlation.filter.conditions' => 'corr_condition',
 		'correlation.operations' => 'corr_operation',
@@ -256,6 +291,12 @@ class CAudit {
 		'regexp.expressions' => 'expressions',
 		'report.users' => 'report_user',
 		'report.user_groups' => 'report_usrgrp',
+		'service.children' => 'services_links',
+		'service.parents' => 'services_links',
+		'service.problem_tags' => 'service_problem_tag',
+		'service.status_rules' => 'service_status_rule',
+		'service.tags' => 'service_tag',
+		'service.times' => 'services_times',
 		'script.parameters' => 'script_param',
 		'templatedashboard.pages' => 'dashboard_page',
 		'templatedashboard.pages.widgets' => 'widget',
@@ -274,6 +315,25 @@ class CAudit {
 	 * @var array
 	 */
 	private const NESTED_OBJECTS_IDS = [
+		'action.filter.conditions' => 'conditionid',
+		'action.operations' => 'operationid',
+		'action.operations.opconditions' => 'opconditionid',
+		'action.operations.opmessage_grp' => 'opmessage_grpid',
+		'action.operations.opmessage_usr' => 'opmessage_usrid',
+		'action.operations.opcommand_grp' => 'opcommand_grpid',
+		'action.operations.opcommand_hst' => 'opcommand_hstid',
+		'action.operations.opgroup' => 'opgroupid',
+		'action.operations.optemplate' => 'optemplateid',
+		'action.recovery_operations' => 'operationid',
+		'action.recovery_operations.opmessage_grp' => 'opmessage_grpid',
+		'action.recovery_operations.opmessage_usr' => 'opmessage_usrid',
+		'action.recovery_operations.opcommand_grp' => 'opcommand_grpid',
+		'action.recovery_operations.opcommand_hst' => 'opcommand_hstid',
+		'action.update_operations' => 'operationid',
+		'action.update_operations.opmessage_grp' => 'opmessage_grpid',
+		'action.update_operations.opmessage_usr' => 'opmessage_usrid',
+		'action.update_operations.opcommand_grp' => 'opcommand_grpid',
+		'action.update_operations.opcommand_hst' => 'opcommand_hstid',
 		'correlation.filter.conditions' => 'corr_conditionid',
 		'correlation.operations' => 'corr_operationid',
 		'dashboard.users' => 'dashboard_userid',
@@ -297,6 +357,12 @@ class CAudit {
 		'report.users' => 'reportuserid',
 		'report.user_groups' => 'reportusrgrpid',
 		'script.parameters' => 'script_paramid',
+		'service.children' => 'linkid',
+		'service.parents' => 'linkid',
+		'service.problem_tags' => 'service_problem_tagid',
+		'service.status_rules' => 'service_status_ruleid',
+		'service.tags' => 'servicetagid',
+		'service.times' => 'timeid',
 		'templatedashboard.pages' => 'dashboard_pageid',
 		'templatedashboard.pages.widgets' => 'widgetid',
 		'templatedashboard.pages.widgets.fields' => 'widget_fieldid',
@@ -314,6 +380,13 @@ class CAudit {
 	 * @var array
 	 */
 	private const NESTED_SINGLE_OBJECTS_IDS = [
+		'action.operations.opmessage' => 'operationid',
+		'action.operations.opcommand' => 'operationid',
+		'action.operations.opinventory' => 'operationid',
+		'action.recovery_operations.opmessage' => 'operationid',
+		'action.recovery_operations.opcommand' => 'operationid',
+		'action.update_operations.opmessage' => 'operationid',
+		'action.update_operations.opcommand' => 'operationid',
 		'proxy.interface' => 'interfaceid'
 	];
 
@@ -478,9 +551,37 @@ class CAudit {
 				return self::handleAdd($resource, $details);
 
 			case self::ACTION_UPDATE:
-				$db_details = self::convertKeysToPaths($api_name, array_intersect_key($db_object, $object));
+				$db_details = self::convertKeysToPaths($api_name, self::intersectObjects($db_object, $object));
+
 				return self::handleUpdate($resource, $details, $db_details);
 		}
+	}
+
+	/**
+	 * Computes the intersection of $db_object and $object using keys for comparison.
+	 * Recursively removes $db_object properties if they are not present in $object.
+	 *
+	 * @param array $db_object
+	 * @param array $object
+	 *
+	 * @return array
+	 */
+	private static function intersectObjects(array $db_object, array $object): array {
+		foreach ($db_object as $db_key => &$db_value) {
+			if (is_string($db_key) && !array_key_exists($db_key, $object)) {
+				unset($db_object[$db_key]);
+				continue;
+			}
+
+			if (is_int($db_key) || !is_array($db_value)) {
+				continue;
+			}
+
+			$db_value = self::intersectObjects($db_value, $object[$db_key]);
+		}
+		unset($db_value);
+
+		return $db_object;
 	}
 
 	/**
@@ -702,7 +803,6 @@ class CAudit {
 	 */
 	private static function handleUpdate(int $resource, array $object, array $db_object): array {
 		$result = [];
-		$full_object = $object + $db_object;
 		$nested_objects_paths = self::getNestedObjectsPaths($object);
 		$db_nested_objects_paths = self::getNestedObjectsPaths($db_object);
 
@@ -747,7 +847,7 @@ class CAudit {
 				else {
 					$result[$path] = [
 						self::DETAILS_ACTION_UPDATE,
-						self::isValueToMask($resource, $path, $full_object) ? ZBX_SECRET_MASK : $value,
+						self::isValueToMask($resource, $path, $object) ? ZBX_SECRET_MASK : $value,
 						self::isValueToMask($resource, $path, $db_object) ? ZBX_SECRET_MASK : $db_value
 					];
 				}

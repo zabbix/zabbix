@@ -331,7 +331,7 @@ static void	zbx_socket_free(zbx_socket_t *s)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_socket_timeout_set(zbx_socket_t *s, int timeout)
+void	zbx_socket_timeout_set(zbx_socket_t *s, int timeout)
 {
 	s->timeout = timeout;
 #ifdef _WINDOWS
@@ -1399,6 +1399,14 @@ out:
 	return ret;
 }
 #endif	/* HAVE_IPV6 */
+
+void	zbx_tcp_unlisten(zbx_socket_t *s)
+{
+	int	i;
+
+	for (i = 0; i < s->num_socks; i++)
+		zbx_socket_close(s->sockets[i]);
+}
 
 /******************************************************************************
  *                                                                            *

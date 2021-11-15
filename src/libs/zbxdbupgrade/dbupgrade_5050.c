@@ -60,6 +60,7 @@ static int	DBpatch_5050003(void)
 {
 	return DBcreate_index("service_problem_tag", "service_problem_tag_1", "serviceid", 0);
 }
+
 static int	DBpatch_5050004(void)
 {
 	const ZBX_TABLE	table =
@@ -361,50 +362,6 @@ static int	DBpatch_5050034(void)
 	const ZBX_FIELD	field = {"default_lang", "en_US", NULL, NULL, 5, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBset_default("config", &field);
-}
-
-static int	DBpatch_5050035(void)
-{
-	return DBdrop_table("auditlog");
-}
-
-static int	DBpatch_5050036(void)
-{
-	const ZBX_TABLE table =
-		{"auditlog", "auditid", 0,
-			{
-				{"auditid", NULL, NULL, NULL, 0, ZBX_TYPE_CUID, ZBX_NOTNULL, 0},
-				{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
-				{"username", "", NULL, NULL, 100, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-				{"ip", "", NULL, NULL, 39, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"action", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-				{"resourcetype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-				{"resourceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-				{"resourcename", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"recordsetid", NULL, NULL, NULL, 0, ZBX_TYPE_CUID, ZBX_NOTNULL, 0},
-				{"details", "", NULL, NULL, 0, ZBX_TYPE_LONGTEXT, ZBX_NOTNULL, 0},
-				{0}
-			},
-			NULL
-		};
-
-	return DBcreate_table(&table);
-}
-
-static int	DBpatch_5050037(void)
-{
-	return DBcreate_index("auditlog", "auditlog_1", "userid,clock", 0);
-}
-
-static int	DBpatch_5050038(void)
-{
-	return DBcreate_index("auditlog", "auditlog_2", "clock", 0);
-}
-
-static int	DBpatch_5050039(void)
-{
-	return DBcreate_index("auditlog", "auditlog_3", "resourcetype,resourceid", 0);
 }
 
 static int	DBpatch_5050040(void)
@@ -785,13 +742,6 @@ static int	DBpatch_5050068(void)
 	return ret;
 }
 
-static int	DBpatch_5050069(void)
-{
-	const ZBX_FIELD	field = {"resourceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
-
-	return DBdrop_not_null("auditlog", &field);
-}
-
 static int	DBpatch_5050070(void)
 {
 	const ZBX_FIELD	old_field = {"params", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
@@ -874,6 +824,367 @@ static int	DBpatch_5050077(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_5050078(void)
+{
+	const ZBX_FIELD	field = {"ha_failover_delay", "1m", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_5050079(void)
+{
+	const ZBX_TABLE	table =
+			{"ha_node", "ha_nodeid", 0,
+				{
+					{"ha_nodeid", NULL, NULL, NULL, 0, ZBX_TYPE_CUID, ZBX_NOTNULL, 0},
+					{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"address", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"port", "10051", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"lastaccess", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"ha_sessionid", "", NULL, NULL, 0, ZBX_TYPE_CUID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5050080(void)
+{
+	return DBcreate_index("ha_node", "ha_node_1", "name", 1);
+}
+
+static int	DBpatch_5050081(void)
+{
+	return DBcreate_index("ha_node", "ha_node_2", "status,lastaccess", 0);
+}
+
+static int	DBpatch_5050082(void)
+{
+	return DBdrop_table("auditlog");
+}
+
+static int	DBpatch_5050083(void)
+{
+	const ZBX_TABLE table =
+		{"auditlog", "auditid", 0,
+			{
+				{"auditid", NULL, NULL, NULL, 0, ZBX_TYPE_CUID, ZBX_NOTNULL, 0},
+				{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+				{"username", "", NULL, NULL, 100, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"ip", "", NULL, NULL, 39, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"action", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"resourcetype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"resourceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+				{"resource_cuid", NULL, NULL, NULL, 0, ZBX_TYPE_CUID, 0, 0},
+				{"resourcename", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"recordsetid", NULL, NULL, NULL, 0, ZBX_TYPE_CUID, ZBX_NOTNULL, 0},
+				{"details", "", NULL, NULL, 0, ZBX_TYPE_LONGTEXT, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5050084(void)
+{
+	return DBcreate_index("auditlog", "auditlog_1", "userid,clock", 0);
+}
+
+static int	DBpatch_5050085(void)
+{
+	return DBcreate_index("auditlog", "auditlog_2", "clock", 0);
+}
+
+static int	DBpatch_5050086(void)
+{
+	return DBcreate_index("auditlog", "auditlog_3", "resourcetype,resourceid", 0);
+}
+
+static int	DBpatch_5050088(void)
+{
+	const ZBX_FIELD	field = {"geomaps_tile_provider", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_5050089(void)
+{
+	const ZBX_FIELD	field = {"geomaps_tile_url", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_5050090(void)
+{
+	const ZBX_FIELD	field = {"geomaps_max_zoom", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_5050091(void)
+{
+	const ZBX_FIELD	field = {"geomaps_attribution", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_5050092(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update config set geomaps_tile_provider='OpenStreetMap.Mapnik'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5050093(void)
+{
+	const ZBX_TABLE	table =
+			{"dbversion", "dbversionid", 0,
+				{
+					{"dbversionid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"mandatory", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"optional", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{NULL}
+				},
+				NULL
+			};
+
+	if (FAIL == DBdrop_table("dbversion"))
+		return FAIL;
+
+	if (FAIL == DBcreate_table(&table))
+		return FAIL;
+
+	if (ZBX_DB_OK > DBexecute("insert into dbversion (dbversionid,mandatory,optional) values (1,0,0)"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5050094(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_PROXY))
+		return SUCCEED;
+
+	return DBdrop_table("history");
+}
+
+static int	DBpatch_5050095(void)
+{
+	const ZBX_TABLE	table =
+			{"history", "itemid,clock,ns", 0,
+				{
+					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"value", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0},
+					{"ns", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{NULL}
+				},
+				NULL
+			};
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_PROXY))
+		return SUCCEED;
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5050096(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_PROXY))
+		return SUCCEED;
+
+	return DBdrop_table("history_uint");
+}
+
+static int	DBpatch_5050097(void)
+{
+	const ZBX_TABLE	table =
+			{"history_uint", "itemid,clock,ns", 0,
+				{
+					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"value", "0", NULL, NULL, 0, ZBX_TYPE_UINT, ZBX_NOTNULL, 0},
+					{"ns", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{NULL}
+				},
+				NULL
+			};
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_PROXY))
+		return SUCCEED;
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5050098(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_PROXY))
+		return SUCCEED;
+
+	return DBdrop_table("history_str");
+}
+
+static int	DBpatch_5050099(void)
+{
+	const ZBX_TABLE	table =
+			{"history_str", "itemid,clock,ns", 0,
+				{
+					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"ns", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{NULL}
+				},
+				NULL
+			};
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_PROXY))
+		return SUCCEED;
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5050100(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_PROXY))
+		return SUCCEED;
+
+	return DBdrop_table("history_log");
+}
+
+static int	DBpatch_5050101(void)
+{
+	const ZBX_TABLE	table =
+			{"history_log", "itemid,clock,ns", 0,
+				{
+					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"timestamp", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"source", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"severity", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0},
+					{"logeventid", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"ns", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{NULL}
+				},
+				NULL
+			};
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_PROXY))
+		return SUCCEED;
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5050102(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_PROXY))
+		return SUCCEED;
+
+	return DBdrop_table("history_text");
+}
+
+static int	DBpatch_5050103(void)
+{
+	const ZBX_TABLE	table =
+			{"history_text", "itemid,clock,ns", 0,
+				{
+					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0},
+					{"ns", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{NULL}
+				},
+				NULL
+			};
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_PROXY))
+		return SUCCEED;
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5050104(void)
+{
+	const ZBX_FIELD old_field = {"dbversion_status", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD new_field = {"dbversion_status", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("config", &new_field, &old_field);
+}
+
+static int	DBpatch_5050105(void)
+{
+#ifdef HAVE_MYSQL
+	return DBdrop_foreign_key("items", 1);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_5050106(void)
+{
+#ifdef HAVE_MYSQL
+	return DBdrop_index("items", "items_1");
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_5050107(void)
+{
+#ifdef HAVE_MYSQL
+	return DBcreate_index("items", "items_1", "hostid,key_(764)", 0);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_5050108(void)
+{
+#ifdef HAVE_MYSQL
+	const ZBX_FIELD	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("items", 1, &field);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_5050109(void)
+{
+#ifdef HAVE_MYSQL
+	return DBdrop_index("items", "items_8");
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_5050110(void)
+{
+#ifdef HAVE_MYSQL
+	return DBcreate_index("items", "items_8", "key_(768)", 0);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_5050111(void)
+{
+	if (FAIL != DBindex_exists("alerts", "alerts_8"))
+		return SUCCEED;
+
+	return DBcreate_index("alerts", "alerts_8", "acknowledgeid", 0);
+}
 #endif
 
 DBPATCH_START(5050)
@@ -909,11 +1220,6 @@ DBPATCH_ADD(5050031, 0, 1)
 DBPATCH_ADD(5050032, 0, 1)
 DBPATCH_ADD(5050033, 0, 1)
 DBPATCH_ADD(5050034, 0, 1)
-DBPATCH_ADD(5050035, 0, 1)
-DBPATCH_ADD(5050036, 0, 1)
-DBPATCH_ADD(5050037, 0, 1)
-DBPATCH_ADD(5050038, 0, 1)
-DBPATCH_ADD(5050039, 0, 1)
 DBPATCH_ADD(5050040, 0, 1)
 DBPATCH_ADD(5050041, 0, 1)
 DBPATCH_ADD(5050042, 0, 1)
@@ -943,7 +1249,6 @@ DBPATCH_ADD(5050065, 0, 1)
 DBPATCH_ADD(5050066, 0, 1)
 DBPATCH_ADD(5050067, 0, 1)
 DBPATCH_ADD(5050068, 0, 1)
-DBPATCH_ADD(5050069, 0, 1)
 DBPATCH_ADD(5050070, 0, 1)
 DBPATCH_ADD(5050071, 0, 1)
 DBPATCH_ADD(5050072, 0, 1)
@@ -952,5 +1257,38 @@ DBPATCH_ADD(5050074, 0, 1)
 DBPATCH_ADD(5050075, 0, 1)
 DBPATCH_ADD(5050076, 0, 1)
 DBPATCH_ADD(5050077, 0, 1)
+DBPATCH_ADD(5050078, 0, 1)
+DBPATCH_ADD(5050079, 0, 1)
+DBPATCH_ADD(5050080, 0, 1)
+DBPATCH_ADD(5050081, 0, 1)
+DBPATCH_ADD(5050082, 0, 1)
+DBPATCH_ADD(5050083, 0, 1)
+DBPATCH_ADD(5050084, 0, 1)
+DBPATCH_ADD(5050085, 0, 1)
+DBPATCH_ADD(5050086, 0, 1)
+DBPATCH_ADD(5050088, 0, 1)
+DBPATCH_ADD(5050089, 0, 1)
+DBPATCH_ADD(5050090, 0, 1)
+DBPATCH_ADD(5050091, 0, 1)
+DBPATCH_ADD(5050092, 0, 1)
+DBPATCH_ADD(5050093, 0, 1)
+DBPATCH_ADD(5050094, 0, 1)
+DBPATCH_ADD(5050095, 0, 1)
+DBPATCH_ADD(5050096, 0, 1)
+DBPATCH_ADD(5050097, 0, 1)
+DBPATCH_ADD(5050098, 0, 1)
+DBPATCH_ADD(5050099, 0, 1)
+DBPATCH_ADD(5050100, 0, 1)
+DBPATCH_ADD(5050101, 0, 1)
+DBPATCH_ADD(5050102, 0, 1)
+DBPATCH_ADD(5050103, 0, 1)
+DBPATCH_ADD(5050104, 0, 1)
+DBPATCH_ADD(5050105, 0, 1)
+DBPATCH_ADD(5050106, 0, 1)
+DBPATCH_ADD(5050107, 0, 1)
+DBPATCH_ADD(5050108, 0, 1)
+DBPATCH_ADD(5050109, 0, 1)
+DBPATCH_ADD(5050110, 0, 1)
+DBPATCH_ADD(5050111, 0, 1)
 
 DBPATCH_END()

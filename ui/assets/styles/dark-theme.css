@@ -18,7 +18,7 @@
 
 html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var,
 b,
-strong, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, .table-forms .tfoot-buttons, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary,
+strong, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary,
 time, mark, audio, video {
   margin: 0;
   padding: 0;
@@ -391,12 +391,17 @@ main {
   position: relative;
   min-width: 1200px;
   padding: 10px; }
+  main > .container:not(:first-of-type) {
+    margin-top: 10px; }
 
 footer {
   margin-top: auto; }
 
 output {
   display: block; }
+
+.container {
+  background: #2b2b2b; }
 
 header {
   display: flex;
@@ -1021,6 +1026,10 @@ footer {
       border-bottom: 1px solid #383838; }
       .dashboard-grid-widget-content .list-table tbody tr:last-child th.list-table-footer, .dashboard-grid-widget-content .list-table tbody tr:last-child td.list-table-footer {
         border-bottom: 0; }
+    .dashboard-grid-widget-content .list-table.sticky-footer {
+      margin-bottom: -8px; }
+      .dashboard-grid-widget-content .list-table.sticky-footer tfoot {
+        bottom: -8px; }
   .dashboard-grid-widget-content .debug-output {
     max-height: none;
     border-color: #383838; }
@@ -1046,6 +1055,10 @@ footer {
     margin-top: 0;
     height: 100%;
     padding-top: 8px; }
+    .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-content .list-table.sticky-footer {
+      margin-bottom: 0; }
+      .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-content .list-table.sticky-footer tfoot {
+        bottom: 0; }
   .dashboard-grid-widget.dashboard-grid-widget-hidden-header.dashboard-grid-widget-focus .dashboard-grid-widget-head {
     height: 2rem;
     margin-top: -2rem;
@@ -2704,6 +2717,9 @@ form.is-loading {
     border-bottom: 1px solid #383838;
     line-height: 18px;
     vertical-align: top; }
+    .list-table tbody th.table-info,
+    .list-table td.table-info {
+      color: #737373; }
   .list-table tbody th {
     text-align: left; }
   .list-table .vertical_rotation_inner {
@@ -2719,6 +2735,21 @@ form.is-loading {
   .list-table .list-table-actions {
     text-align: right;
     white-space: nowrap; }
+  .list-table.sticky-header thead {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: #2b2b2b; }
+  .list-table.sticky-footer tbody tr:last-of-type td, .list-table.sticky-footer tbody tr:last-of-type th {
+    border-bottom: none; }
+  .list-table.sticky-footer tfoot {
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
+    background: #2b2b2b; }
+    .list-table.sticky-footer tfoot tr:first-of-type td, .list-table.sticky-footer tfoot tr:first-of-type th {
+      border-top: 2px solid #2b2b2b;
+      border-bottom: 0; }
 
 .table-paging {
   text-align: center;
@@ -3149,9 +3180,11 @@ form.is-loading {
     text-align: left; }
     .table-forms th:last-child {
       padding: 0; }
-  .table-forms tfoot .table-forms-td-right, .table-forms .tfoot-buttons .table-forms-td-right {
+  .table-forms tfoot .table-forms-td-right,
+  .table-forms .tfoot-buttons .table-forms-td-right {
     padding-top: 5px; }
-  .table-forms tfoot button, .table-forms .tfoot-buttons button {
+  .table-forms tfoot button,
+  .table-forms .tfoot-buttons button {
     margin: 0 10px 0 0; }
   .table-forms td {
     position: relative; }
@@ -4379,7 +4412,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     z-index: 20; }
     .multilineinput-modal .multilineinput-textarea::-webkit-scrollbar {
       height: 9px; }
-  .multilineinput-modal .multilineinput-symbols-remaining {
+  .multilineinput-modal .multilineinput-char-count {
     color: #737373;
     float: left;
     line-height: 24px; }
@@ -6538,6 +6571,57 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   .audit-details-wrapper .audit-show-details-btn-wrapper {
     margin: 0 5px 0 5px; }
 
+.geomap-filter-button,
+.navigate-home-button {
+  background-image: url("../img/icon-sprite.svg");
+  background-repeat: no-repeat; }
+
+.geomap-filter-button {
+  background-position: -243px -543px !important; }
+
+.navigate-home-button {
+  background-position: -117px -506px !important; }
+
+.geomap-filter {
+  border: 2px solid rgba(48, 48, 48, 0.4);
+  background-color: #2b2b2b;
+  padding: 10px 30px 5px 10px;
+  position: absolute;
+  margin-right: -2px;
+  margin-top: 5px;
+  display: none;
+  right: 0; }
+
+.geomap-filter.collapsed {
+  display: table; }
+
+.geomap-filter li {
+  width: calc(100% + 20px); }
+
+.geomap-filter label {
+  white-space: nowrap; }
+
+.marker-cluster {
+  background: none; }
+
+.marker-cluster div {
+  text-align: center;
+  border-radius: 50%;
+  margin-left: 5px;
+  margin-top: 5px;
+  height: 30px;
+  width: 30px; }
+
+.marker-cluster span {
+  line-height: 30px; }
+
+.leaflet-control.disabled {
+  background-color: #ffffff;
+  opacity: 1; }
+  .leaflet-control.disabled .geomap-filter-button {
+    cursor: default;
+    opacity: .4; }
+
 .sidebar.is-compact:not(.is-opened) .form-search .search-icon {
   opacity: .75; }
 
@@ -6550,6 +6634,8 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 .list-table.compact-view td.na-bg, .list-table.compact-view td.info-bg, .list-table.compact-view td.warning-bg, .list-table.compact-view td.average-bg, .list-table.compact-view td.high-bg, .list-table.compact-view td.disaster-bg {
   color: #000000;
   box-shadow: inset 0 -1px 0 0 rgba(0, 0, 0, 0.1); }
+.list-table.sticky-footer tfoot tr:first-of-type td {
+  border-color: #404040; }
 
 .dashboard-navigation-tabs .csortable > .csortable-item > div, .dashboard-navigation-tabs .csortable-list > .csortable-item > div:hover {
   border: 1px solid transparent; }

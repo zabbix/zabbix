@@ -21,6 +21,7 @@
 
 /**
  * @var CPartial $this
+ * @var array    $data
  */
 
 global $DB, $ZBX_SERVER, $ZBX_SERVER_NAME, $ZBX_SERVER_PORT;
@@ -43,15 +44,15 @@ if (!empty($DB['DB'])) {
 		->addStyle(getTriggerStatusCss());
 
 	// Perform Zabbix server check only for standard pages.
-	if ($data['config']['server_check_interval'] && !empty($ZBX_SERVER) && !empty($ZBX_SERVER_PORT)) {
+	if ($data['config']['server_check_interval']) {
 		$scripts[] = 'servercheck.js';
 	}
 }
 
 // Show GUI messages in pages with menus and in kiosk mode.
 $show_gui_messaging = (!defined('ZBX_PAGE_NO_MENU') || $data['web_layout_mode'] == ZBX_LAYOUT_KIOSKMODE)
-		? intval(!CWebUser::isGuest())
-		: null;
+	? intval(!CWebUser::isGuest())
+	: null;
 
 $pageHeader
 	->addCssFile('assets/styles/'.CHtml::encode($theme).'.css')
@@ -66,6 +67,10 @@ $pageHeader
 		->setArgument('showGuiMessaging', $show_gui_messaging)
 		->getUrl()
 	);
+
+foreach ($data['stylesheet']['files'] as $css_file) {
+	$pageHeader->addCssFile($css_file);
+}
 
 if ($scripts) {
 	$pageHeader->addJsFile((new CUrl('jsLoader.php'))

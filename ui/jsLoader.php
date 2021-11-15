@@ -36,6 +36,7 @@ $available_js_cripts = [
 	'class.widget.js' => 'widgets/',
 	'class.widget.iterator.js' => 'widgets/',
 	'class.widget.clock.js' => 'widgets/',
+	'class.widget.geomap.js' => 'widgets/',
 	'class.widget.graph.js' => 'widgets/',
 	'class.widget.graph-prototype.js' => 'widgets/',
 	'class.widget.map.js' => 'widgets/',
@@ -65,6 +66,8 @@ $available_js_cripts = [
 	// vendors
 	'jquery.js' => 'vendors/',
 	'jquery-ui.js' => 'vendors/',
+	'leaflet.js' => 'vendors/Leaflet/Leaflet/',
+	'leaflet.markercluster.js' => 'vendors/Leaflet/Leaflet.markercluster/',
 	// classes
 	'component.z-select.js' => '',
 	'class.base-component.js' => '',
@@ -73,6 +76,7 @@ $available_js_cripts = [
 	'class.cdate.js' => '',
 	'class.cdebug.js' => '',
 	'class.cmap.js' => '',
+	'class.geomaps.js' => '',
 	'class.localstorage.js' => '',
 	'class.menu.js' => '',
 	'class.menu-item.js' => '',
@@ -144,6 +148,9 @@ $translate_strings = [
 		'Click and drag to desired size.' => _('Click and drag to desired size.'),
 		'Release to create a widget.' => _('Release to create a widget.')
 	],
+	'class.geomaps.js' => [
+		'Severity filter' => _('Severity filter')
+	],
 	'class.widget.js' => [
 		'10 seconds' => _n('%1$s second', '%1$s seconds', 10),
 		'30 seconds' => _n('%1$s second', '%1$s seconds', 30),
@@ -158,6 +165,27 @@ $translate_strings = [
 		'No refresh' => _('No refresh'),
 		'Paste' => _s('Paste'),
 		'Refresh interval' => _s('Refresh interval')
+	],
+	'class.widget.geomap.js' => [
+		'Actions' => _('Actions'),
+		'Set this view as default' => _('Set this view as default'),
+		'Reset to initial view' => _('Reset to initial view'),
+		'No problems' => _('No problems'),
+		'Not classified' => _('Not classified'),
+		'Information' => _('Information'),
+		'Warning' => _('Warning'),
+		'Average' => _('Average'),
+		'High' => _('High'),
+		'Disaster' => _('Disaster'),
+		'Host' => _('Host'),
+		'D' => _x('D', 'abbreviation of severity level'),
+		'H' => _x('H', 'abbreviation of severity level'),
+		'A' => _x('A', 'abbreviation of severity level'),
+		'W' => _x('W', 'abbreviation of severity level'),
+		'I' => _x('I', 'abbreviation of severity level'),
+		'N' => _x('N', 'abbreviation of severity level'),
+		'Navigate to default view' => _('Navigate to default view'),
+		'Navigate to initial view' => _('Navigate to initial view')
 	],
 	'class.widget.iterator.js' => [
 		'Next page' => _s('Next page'),
@@ -295,7 +323,8 @@ $translate_strings = [
 		'Remove' => _('Remove')
 	],
 	'multilineinput.js' => [
-		'S_N_SYMBOLS_REMAINING' => _('%1$s symbols remaining'),
+		'S_N_CHAR_COUNT' => _('%1$s characters'),
+		'S_N_CHAR_COUNT_REMAINING' => _('%1$s characters remaining'),
 		'S_CLICK_TO_VIEW_OR_EDIT' => _('Click to view or edit'),
 		'S_APPLY' => _('Apply'),
 		'S_CANCEL' => _('Cancel')

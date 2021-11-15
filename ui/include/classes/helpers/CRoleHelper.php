@@ -501,10 +501,6 @@ class CRoleHelper {
 
 		foreach (CApiServiceFactory::API_SERVICES as $service => $class_name) {
 			foreach (constant($class_name.'::ACCESS_RULES') as $method => $rules) {
-				if ($method === 'validateoperationsintegrity') {
-					continue;
-				}
-
 				if (array_key_exists('min_user_type', $rules)) {
 					switch ($rules['min_user_type']) {
 						case USER_TYPE_ZABBIX_USER:

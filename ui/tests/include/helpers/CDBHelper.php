@@ -174,6 +174,24 @@ class CDBHelper {
 	}
 
 	/**
+	 * Get all values of database column.
+	 *
+	 * @param type $sql			 query to be executed
+	 * @param type $column		 column name
+	 *
+	 * @return array
+	 */
+	public static function getColumn($sql, $column) {
+		$data = [];
+
+		foreach (CDBHelper::getAll($sql) as $row) {
+			$data[] = $row[$column];
+		}
+
+		return $data;
+	}
+
+	/**
 	 * Get list of all referenced tables sorted by dependency level.
 	 *
 	 * For example: getTables($tables, 'users')
@@ -230,13 +248,13 @@ class CDBHelper {
 
 	/*
 	 * Saves data of the specified table and all dependent tables in temporary storage.
-	 * For example: backupTables('users')
+	 * For example: backupTables(['users'])
 	 */
-	public static function backupTables($top_table) {
+	public static function backupTables(array $top_tables) {
 		global $DB;
 
 		$tables = [];
-		static::getTables($tables, $top_table);
+		static::getTables($tables, $top_tables);
 		self::$backups[] = $tables;
 
 		$suffix = '_tmp'.count(self::$backups);
@@ -254,7 +272,7 @@ class CDBHelper {
 			);
 
 			if ($result_code != 0) {
-				throw new Exception('Failed to backup "'.$top_table.'".');
+				throw new Exception('Failed to backup "'.implode('", "', $top_tables).'".');
 			}
 		}
 		else {

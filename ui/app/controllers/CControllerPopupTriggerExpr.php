@@ -475,6 +475,13 @@ class CControllerPopupTriggerExpr extends CController {
 				'allowed_types' => $this->allowedTypesAny,
 				'operators' => $this->operators
 			],
+			'changecount' => [
+				'types' => [ZBX_FUNCTION_TYPE_HISTORY],
+				'description' => _('changecount() - Number of changes between adjacent values, Mode (all - all changes, inc - only increases, dec - only decreases)'),
+				'params' => $this->param2SecCountMode,
+				'allowed_types' => $this->allowedTypesAny,
+				'operators' => $this->operators
+			],
 			'char' => [
 				'types' => [ZBX_FUNCTION_TYPE_STRING],
 				'description' => _('char() - Returns the character which represents the given ASCII code'),
