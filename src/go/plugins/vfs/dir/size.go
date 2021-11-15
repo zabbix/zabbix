@@ -51,7 +51,7 @@ func (sp *sizeParams) getDirSize() (int64, error) {
 			}
 
 			if p == sp.path {
-				parentSize, err = handleHomeDir(d)
+				parentSize, err = sp.handleHomeDir(d)
 				if err != nil {
 					return err
 				}

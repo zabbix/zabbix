@@ -27,7 +27,7 @@ import (
 	"zabbix.com/pkg/win32"
 )
 
-func handleHomeDir(d fs.DirEntry) (int64, error) {
+func (sp *sizeParams) handleHomeDir(d fs.DirEntry) (int64, error) {
 	// home dir is not counter on windows
 	return 0, nil
 }

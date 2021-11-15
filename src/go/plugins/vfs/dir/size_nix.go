@@ -21,6 +21,12 @@
 
 package dir
 
+import (
+	"fmt"
+	"io/fs"
+	"syscall"
+)
+
 func (sp *sizeParams) getSize(fs fs.FileInfo, path string) (int64, error) {
 	sys, ok := fs.Sys().(*syscall.Stat_t)
 	if !ok {
@@ -38,7 +44,7 @@ func skipDir(d fs.DirEntry) bool {
 	return false
 }
 
-func handleHomeDir(d fs.DirEntry) (int64, error) {
+func (sp *sizeParams) handleHomeDir(d fs.DirEntry) (int64, error) {
 	parentSize, err := sp.getParentSize(d)
 	if err != nil {
 		return 0, err
