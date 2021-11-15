@@ -921,6 +921,7 @@
 	StepEditForm.prototype.errorDialog = function(msg, trigger_elmnt) {
 		overlayDialogue({
 			'title': httpconf.msg.error,
+			'class': 'modal-popup',
 			'content': jQuery('<span>').html(msg),
 			'buttons': [{
 				title: httpconf.msg.ok,

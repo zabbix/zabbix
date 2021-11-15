@@ -129,7 +129,7 @@
 
 		overlayDialogue({
 			'title': obj.options.title,
-			'class': 'multilineinput-modal',
+			'class': 'modal-popup multilineinput-modal',
 			'content': $content,
 			'footer': $footer,
 			'buttons': [

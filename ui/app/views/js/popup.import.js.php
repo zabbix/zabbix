@@ -43,6 +43,7 @@ function isDeleteMissingChecked(import_overlay) {
 
 function confirmSubmit(import_overlay, compare_overlay) {
 	overlayDialogue({
+		class: 'modal-popup',
 		content: jQuery('<span>')
 					.text(<?= json_encode(_('Delete all elements that are not present in the import file?')) ?>),
 		buttons: [
@@ -143,6 +144,7 @@ function submitImportPopup(overlay) {
 function updateWarning(obj, content) {
 	if (jQuery(obj).is(':checked')) {
 		overlayDialogue({
+			class: 'modal-popup',
 			content: jQuery('<span>').text(content),
 			buttons: [
 				{
