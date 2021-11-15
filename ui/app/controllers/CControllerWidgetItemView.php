@@ -249,7 +249,8 @@ class CControllerWidgetItemView extends CControllerWidget {
 			}
 
 			$styles = ['--widget-item-font' => number_format($fields['desc_size'] / 100, 2)];
-			if ($fields['desc_color'] !== '') {
+			// If advanced configuration is off, the color is null. Otherwise if default color is used, it is empty.
+			if ($fields['desc_color'] !== null && $fields['desc_color'] !== '') {
 				$styles['color'] = '#'.$fields['desc_color'];
 			}
 
@@ -294,7 +295,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 			}
 
 			$styles = ['--widget-item-font' => number_format($fields['value_size'] / 100, 2)];
-			if ($fields['value_color'] !== '') {
+			if ($fields['value_color'] !== null && $fields['value_color'] !== '') {
 				$styles['color'] = '#'.$fields['value_color'];
 			}
 
@@ -312,7 +313,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 				}
 
 				$styles = ['--widget-item-font' => number_format($fields['decimal_size'] / 100, 2)];
-				if ($fields['value_color'] !== '') {
+				if ($fields['value_color'] !== null && $fields['value_color'] !== '') {
 					$styles['color'] = '#'.$fields['value_color'];
 				}
 
@@ -365,7 +366,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 			}
 
 			$styles = ['--widget-item-font' => number_format($fields['time_size'] / 100, 2)];
-			if ($fields['time_color'] !== '') {
+			if ($fields['time_color'] !== null && $fields['time_color'] !== '') {
 				$styles['color'] = '#'.$fields['time_color'];
 			}
 
@@ -385,7 +386,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 		// Sort data row blocks in order - top, middle, bottom.
 		ksort($data);
 
-		$data['bg_color'] = $fields['bg_color'];
+		$data['bg_color'] = ($fields['bg_color'] !== null && $fields['bg_color'] !== '') ? $fields['bg_color'] : '';
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultName()),
