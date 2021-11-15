@@ -3720,6 +3720,9 @@ static int	evaluate_BASELINE(zbx_variant_t *value, DC_ITEM *item, const char *fu
 		value_avg /= values.values_num;
 
 		value_dbl = fabs(value_period - value_avg) / value_dev;
+
+		zabbix_log(LOG_LEVEL_TRACE, "fabs(" ZBX_FS_DBL " - " ZBX_FS_DBL ") / " ZBX_FS_DBL " = " ZBX_FS_DBL,
+				value_period, value_avg, value_dev, value_dbl);
 	}
 	else
 	{
