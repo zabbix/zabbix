@@ -574,7 +574,7 @@ function executeScript(scriptid, confirmation, trigger_elmnt, hostid = null, eve
 			'content': jQuery('<span>')
 				.addClass('confirmation-msg')
 				.text(confirmation),
-			'class': 'modal-popup modal-popup-small',
+			'class': 'modal-popup modal-popup-small choice',
 			'buttons': [
 				{
 					'title': t('Cancel'),

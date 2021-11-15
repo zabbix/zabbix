@@ -408,7 +408,7 @@ function submitPopup(overlay) {
 		overlayDialogue({
 			'title': <?= json_encode(_('Warning')) ?>,
 			'type': 'popup',
-			'class': 'modal-popup modal-popup-medium',
+			'class': 'modal-popup modal-popup-medium choice',
 			'content': $('<span>').text(warning_message),
 			'buttons': [
 				{

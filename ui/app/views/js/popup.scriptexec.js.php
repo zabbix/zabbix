@@ -46,7 +46,7 @@ $(document).ready(function() {
 		overlayDialogue({
 			'title': <?= json_encode(_('Script execution log')) ?>,
 			'content': $content,
-			'class': 'modal-popup modal-popup-generic debug-modal',
+			'class': 'modal-popup modal-popup-generic debug-modal choice',
 			'footer': $footer,
 			'buttons': [
 				{

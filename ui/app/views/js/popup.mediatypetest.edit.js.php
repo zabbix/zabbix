@@ -107,7 +107,7 @@ function openLogPopup(opener) {
 	overlayDialogue({
 		'title': <?= json_encode(_('Media type test log')) ?>,
 		'content': $content,
-		'class': 'modal-popup modal-popup-generic debug-modal',
+		'class': 'modal-popup modal-popup-generic debug-modal choice',
 		'footer': $footer,
 		'buttons': [
 			{

@@ -128,7 +128,15 @@ Overlay.prototype.centerDialog = function() {
 
 	this.$dialogue.css('left', position_left);
 
-	var size = {
+	if (this.$dialogue.hasClass('choice')) {
+		this.$dialogue.css('top',
+			this.$dialogue.hasClass('sticked-to-top')
+				? ''
+				: Math.max(0, parseInt((jQuery(window).height() - this.$dialogue.outerHeight(true)) / 2)) + 'px'
+		);
+	}
+
+	const size = {
 		width: this.$dialogue.$body[0].scrollWidth,
 		height: this.$dialogue.$body[0].scrollHeight,
 		left: position_left
