@@ -44,8 +44,6 @@ class CControllerPopupTriggerExpr extends CController {
 	private $period_optional = [];
 	private $period_seasons = [];
 
-	private $baseline_functions = [];
-
 	protected function init() {
 		$this->disableSIDvalidation();
 
@@ -110,7 +108,7 @@ class CControllerPopupTriggerExpr extends CController {
 			'period_shift' => [
 				'C' => _('Period shift'),
 				'T' => T_ZBX_INT,
-				'A' => false
+				'A' => true
 			],
 			'seasons' => [
 				'C' => _('Seasons'),
@@ -1031,14 +1029,14 @@ class CControllerPopupTriggerExpr extends CController {
 				'operators' => $this->operators
 			],
 			'baselinedev' => [
-				'types' => [ZBX_FUNCTION_TYPE_HISTORY, ZBX_FUNCTION_TYPE_BASELINE],
+				'types' => [ZBX_FUNCTION_TYPE_HISTORY],
 				'description' => _('baselinedev() - Returns the number of deviations between data periods in seasons and the last data period'),
 				'params' => $this->period_seasons,
 				'allowed_types' => $this->allowedTypesNumeric,
 				'operators' => $this->operators
 			],
 			'baselinewma' => [
-				'types' => [ZBX_FUNCTION_TYPE_HISTORY, ZBX_FUNCTION_TYPE_BASELINE],
+				'types' => [ZBX_FUNCTION_TYPE_HISTORY],
 				'description' => _('baselinewma() - Calculates baseline by averaging data periods in seasons'),
 				'params' => $this->period_seasons,
 				'allowed_types' => $this->allowedTypesNumeric,
@@ -1115,12 +1113,6 @@ class CControllerPopupTriggerExpr extends CController {
 		];
 
 		CArrayHelper::sort($this->functions, ['description']);
-
-		foreach ($this->functions as $function => $val) {
-			if (in_array(ZBX_FUNCTION_TYPE_BASELINE, $this->functions[$function]['types'])) {
-				$this->baseline_functions[$function] = true;
-			}
-		}
 	}
 
 	protected function checkInput() {
@@ -1508,16 +1500,6 @@ class CControllerPopupTriggerExpr extends CController {
 					if ($expression_parser->parse($data['expression']) == CParser::PARSE_SUCCESS) {
 						if (!$expression_validator->validate($expression_parser->getResult()->getTokens())) {
 							error(_s('Invalid condition: %1$s.', $expression_validator->getError()));
-						}
-
-						if (array_key_exists($function, $this->baseline_functions)
-							&& (timeUnitToSeconds($data['params']['last'], true)
-								> timeUnitToSeconds($data['params']['seasons'], true)
-							)
-						) {
-							error(_s('Incorrect value for field "%1$s": %2$s.', _('Period'),
-								_s('value must be no greater than "%1$s"', _('Seasons'))
-							));
 						}
 					}
 					else {

@@ -225,12 +225,12 @@ final class CHistFunctionData {
 		],
 		'baselinedev' => [
 			['rules' => [['type' => 'query']]],
-			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC, 'with_year' => true]]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_TREND]]],
 			['rules' => [['type' => 'time', 'with_year' => true]]],
 		],
 		'baselinewma' => [
 			['rules' => [['type' => 'query']]],
-			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC, 'with_year' => true]]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_TREND]]],
 			['rules' => [['type' => 'time', 'with_year' => true]]],
 		],
 		'trendcount' => [

@@ -215,10 +215,8 @@ class CHistFunctionValidator extends CValidator {
 						return false;
 					}
 
-					$with_year = array_key_exists('with_year', $rule) && $rule['with_year'];
-
 					if (!self::validatePeriod($param['data']['sec_num'], $param['data']['time_shift'], $rule['mode'],
-							$options, $with_year)) {
+							$options)) {
 						return false;
 					}
 
@@ -310,14 +308,12 @@ class CHistFunctionValidator extends CValidator {
 	 * @param string $time_shift
 	 * @param int    $mode
 	 * @param array  $options
-	 * @param bool   $with_year    Whether period should allow M and y.
 	 *
 	 * @static
 	 *
 	 * @return bool
 	 */
-	private static function validatePeriod(string $sec_num, string $time_shift, int $mode, array $options,
-			$with_year = false): bool {
+	private static function validatePeriod(string $sec_num, string $time_shift, int $mode, array $options): bool {
 		switch ($mode) {
 			case CHistFunctionData::PERIOD_MODE_DEFAULT:
 				if ($sec_num === '' || self::hasMacros($sec_num, $options)) {
@@ -342,7 +338,7 @@ class CHistFunctionValidator extends CValidator {
 					return false;
 				}
 
-				$sec = timeUnitToSeconds($sec_num, $with_year);
+				$sec = timeUnitToSeconds($sec_num);
 
 				if ($sec !== null) {
 					return ($sec > 0 && $sec <= ZBX_MAX_INT32);

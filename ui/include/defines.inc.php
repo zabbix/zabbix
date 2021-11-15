@@ -1178,7 +1178,6 @@ define('ZBX_FUNCTION_TYPE_MATH',		4);
 define('ZBX_FUNCTION_TYPE_OPERATOR',	5);
 define('ZBX_FUNCTION_TYPE_PREDICTION',	6);
 define('ZBX_FUNCTION_TYPE_STRING',		7);
-define('ZBX_FUNCTION_TYPE_BASELINE',	8);
 
 /**
  * @deprecated use either a literal space " " or a non-breakable space "&nbsp;" instead
