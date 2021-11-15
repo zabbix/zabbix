@@ -2125,7 +2125,7 @@ in:
   params: 6m
 out:
   return: SUCCEED
-  value: 40.2281
+  value: 36.723065
 ---
 test case: Evaluate stddevpop(6m) UINT64 26, 12, 16, 56, 112, 24
 in:
