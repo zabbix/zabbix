@@ -29,7 +29,7 @@
 		editHost({hostid}) {
 			const original_url = location.href;
 
-			const overlay = PopUp('popup.host.edit', 'modal-popup host-edit sticked-to-top',
+			const overlay = PopUp('popup.host.edit', 'modal-popup host-edit',
 				{hostid}, 'host_edit', document.activeElement
 			);
 

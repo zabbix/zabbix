@@ -236,7 +236,7 @@
 			clearMessages();
 			const original_url = location.href;
 
-			const overlay = PopUp('popup.host.edit', 'modal-popup host-edit sticked-to-top',
+			const overlay = PopUp('popup.host.edit', 'modal-popup host-edit',
 				host_data, 'host_edit', document.activeElement
 			);
 

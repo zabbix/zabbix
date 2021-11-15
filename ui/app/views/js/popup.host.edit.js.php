@@ -98,7 +98,7 @@ window.host_edit_popup = {
 		options.clone = 1;
 
 		this.removeEventListeners();
-		PopUp('popup.host.edit', 'modal-popup host-edit sticked-to-top', options, 'host_edit');
+		PopUp('popup.host.edit', 'modal-popup host-edit', options, 'host_edit');
 	},
 
 	fullClone() {
@@ -108,7 +108,7 @@ window.host_edit_popup = {
 		options.full_clone = 1;
 
 		this.removeEventListeners();
-		PopUp('popup.host.edit', 'modal-popup host-edit sticked-to-top', options, 'host_edit');
+		PopUp('popup.host.edit', 'modal-popup host-edit', options, 'host_edit');
 	},
 
 	delete(hostid) {

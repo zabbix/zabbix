@@ -4230,7 +4230,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   .overlay-dialogue.sticked-to-top {
     top: 50px; }
   .overlay-dialogue.modal-popup {
-    max-width: 1024px; }
+    max-width: 1024px;
+    top: 50px; }
     .overlay-dialogue.modal-popup.modal-popup-medium {
       min-width: 450px; }
     .overlay-dialogue.modal-popup.modal-popup-small {
