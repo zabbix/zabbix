@@ -70,5 +70,7 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 		cfunc = unsafe.Pointer(C.NET_DNS)
 	case "net.dns.record":
 		cfunc = unsafe.Pointer(C.NET_DNS_RECORD)
+	}
+
 	return
 }

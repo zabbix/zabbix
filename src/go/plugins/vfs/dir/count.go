@@ -92,7 +92,7 @@ type countParams struct {
 func (cp *countParams) getDirCount() (int, error) {
 	var count int
 
-	length := len(strings.SplitAfter(cp.path, string(filepath.Separator)))
+	cp.length = len(strings.SplitAfter(cp.path, string(filepath.Separator)))
 
 	err := cp.setMinMaxParams()
 	if err != nil {
@@ -109,7 +109,7 @@ func (cp *countParams) getDirCount() (int, error) {
 				return nil
 			}
 
-			s, err := cp.skip(p, length, d)
+			s, err := cp.skip(p, d)
 			if s {
 				return err
 			}
@@ -126,10 +126,10 @@ func (cp *countParams) getDirCount() (int, error) {
 	return count, nil
 }
 
-func (cp *countParams) skip(path string, length int, d fs.DirEntry) (bool, error) {
+func (cp *countParams) skip(path string, d fs.DirEntry) (bool, error) {
 	var s bool
 
-	s, err := cp.skipPath(path, length)
+	s, err := cp.skipPath(path)
 	if s {
 		return true, err
 	}

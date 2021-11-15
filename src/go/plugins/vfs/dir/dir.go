@@ -34,6 +34,7 @@ var impl Plugin
 type common struct {
 	path          string
 	maxDepth      int
+	length        int
 	regExclude    *regexp.Regexp
 	regInclude    *regexp.Regexp
 	dirRegExclude *regexp.Regexp
@@ -69,9 +70,9 @@ func (p *Plugin) exportSize(params []string) (result interface{}, err error) {
 	return sp.getDirSize()
 }
 
-func (cp *common) skipPath(path string, length int) (bool, error) {
+func (cp *common) skipPath(path string) (bool, error) {
 	currentLength := len(strings.SplitAfter(path, string(filepath.Separator)))
-	if cp.maxDepth > unlimitedDepth && currentLength-length > cp.maxDepth {
+	if cp.maxDepth > unlimitedDepth && currentLength-cp.length > cp.maxDepth {
 		return true, fs.SkipDir
 	}
 

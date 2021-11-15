@@ -20,13 +20,11 @@
 package dir
 
 import (
-	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
-	"syscall"
 
 	"zabbix.com/pkg/zbxerr"
 )
@@ -44,7 +42,7 @@ func (sp *sizeParams) getDirSize() (int64, error) {
 	var parentSize int64
 	var dirSize int64
 
-	length := len(strings.SplitAfter(sp.path, string(filepath.Separator)))
+	sp.length = len(strings.SplitAfter(sp.path, string(filepath.Separator)))
 
 	err := filepath.WalkDir(sp.path,
 		func(p string, d fs.DirEntry, err error) error {
@@ -53,7 +51,7 @@ func (sp *sizeParams) getDirSize() (int64, error) {
 			}
 
 			if p == sp.path {
-				parentSize, err = sp.getParentSize(d)
+				parentSize, err = handleHomeDir(d)
 				if err != nil {
 					return err
 				}
@@ -61,7 +59,7 @@ func (sp *sizeParams) getDirSize() (int64, error) {
 				return nil
 			}
 
-			s, err := sp.skip(p, length, d)
+			s, err := sp.skip(p, d)
 			if s {
 				return err
 			}
@@ -71,7 +69,7 @@ func (sp *sizeParams) getDirSize() (int64, error) {
 				return err
 			}
 
-			tmpSize, err := sp.getSize(fi)
+			tmpSize, err := sp.getSize(fi, p)
 			if err != nil {
 				return err
 			}
@@ -105,7 +103,7 @@ func (sp *sizeParams) getParentSize(dir fs.DirEntry) (int64, error) {
 		return 0, nil
 	}
 
-	parentSize, err = sp.getSize(stat)
+	parentSize, err = sp.getSize(stat, sp.path)
 	if err != nil {
 		return 0, err
 	}
@@ -113,21 +111,12 @@ func (sp *sizeParams) getParentSize(dir fs.DirEntry) (int64, error) {
 	return parentSize, nil
 }
 
-func (sp *sizeParams) getSize(fs fs.FileInfo) (int64, error) {
-	sys, ok := fs.Sys().(*syscall.Stat_t)
-	if !ok {
-		return 0, fmt.Errorf("failed to read %s file size", fs.Name())
+func (sp *sizeParams) skip(path string, d fs.DirEntry) (bool, error) {
+	if skipDir(d) {
+		return true, nil
 	}
 
-	if !sp.diskMode {
-		return sys.Size, nil
-	}
-
-	return sys.Blocks * diskBlockSize, nil
-}
-
-func (sp *sizeParams) skip(path string, length int, d fs.DirEntry) (bool, error) {
-	s, err := sp.skipPath(path, length)
+	s, err := sp.skipPath(path)
 	if s {
 		return true, err
 	}
