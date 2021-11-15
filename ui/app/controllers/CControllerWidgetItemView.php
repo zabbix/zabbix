@@ -97,7 +97,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 
 					// Time can be shown independently.
 					if (array_key_exists(WIDGET_ITEM_SHOW_TIME, $show)) {
-						$time = date(ZBX_FULL_DATE_TIME, $history[$fields['itemid'][0]][0]['clock']);
+						$time = date(ZBX_FULL_DATE_TIME, (int) $history[$fields['itemid'][0]][0]['clock']);
 					}
 
 					switch ($value_type) {
