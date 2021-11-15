@@ -58,7 +58,6 @@ func init() {
 	getActiveProcessorGroupCount = hKernel32.mustGetProcAddress("GetActiveProcessorGroupCount")
 	getDiskFreeSpaceW = hKernel32.mustGetProcAddress("GetDiskFreeSpaceW")
 	getVolumePathNameW = hKernel32.mustGetProcAddress("GetVolumePathNameW")
-
 }
 
 func GlobalMemoryStatusEx() (m *MEMORYSTATUSEX, err error) {
