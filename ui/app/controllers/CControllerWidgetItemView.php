@@ -82,7 +82,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 
 				if (array_key_exists($fields['itemid'][0], $history)
 						&& array_key_exists(0, $history[$fields['itemid'][0]])) {
-					// Get values regarless of show status, since change indicator can be shown independetly.
+					// Get values regardless of show status, since change indicator can be shown independently.
 					$last_value = $history[$fields['itemid'][0]][0]['value'];
 
 					// The view will determine when to show ellipsis for text values.
@@ -177,7 +177,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 							);
 
 							if ($mapping !== false) {
-								// Currently it is same as in latest data with orignal value in parenthesis.
+								// Currently it is same as in latest data with original value in parenthesis.
 								$value = $mapping.' ('.$value.')';
 							}
 

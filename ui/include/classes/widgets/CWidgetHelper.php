@@ -256,7 +256,7 @@ class CWidgetHelper {
 	 * @return CColor
 	 */
 	public static function getColor($field, $use_default = false) {
-		// appendColorPickerJs(false), because the script reponsible for it is in widget.item.form.view.
+		// appendColorPickerJs(false), because the script responsible for it is in widget.item.form.view.
 		$color_picker = (new CColor($field->getName(), $field->getValue()))->appendColorPickerJs(false);
 		if ($use_default) {
 			$color_picker->enableUseDefault();
