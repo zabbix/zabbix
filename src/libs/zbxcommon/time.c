@@ -199,7 +199,7 @@ void	zbx_tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base)
 		tm_add(tm, multiplier, base);
 
 		days_max = zbx_day_in_month(tm->tm_year + 1900, tm->tm_mon + 1);
-		if (tm->tm_mday  > days_max)
+		if (tm->tm_mday > days_max)
 			tm->tm_mday = days_max;
 	}
 
@@ -326,7 +326,7 @@ void	zbx_tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base)
 		tm_sub(tm, multiplier, base);
 
 		days_max = zbx_day_in_month(tm->tm_year + 1900, tm->tm_mon + 1);
-		if (tm->tm_mday  > days_max)
+		if (tm->tm_mday > days_max)
 			tm->tm_mday = days_max;
 	}
 
