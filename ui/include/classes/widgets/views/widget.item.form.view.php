@@ -231,46 +231,47 @@ $scripts[] =
 	'var $show = $(\'input[id^="show_"]\', "#widget-dialogue-form").not("#show_header");'.
 
 	'$("#adv_conf").change(function() {'.
-		'if (this.checked) {'.
-			'$show.trigger("change");'.
-			'$("#bg-color-row").show();'.
-		'}'.
-		'else {'.
-			'$("#description-row, #value-row, #time-row, #change-indicator-row, #bg-color-row").hide();'.
-		'}'.
+		'$show.trigger("change");'.
+
+		'$("#bg-color-row")'.
+			'.toggle(this.checked)'.
+			'.find("input")'.
+			'.prop("disabled", !this.checked);'.
 	'});'.
 
 	// Prevent unchecking last "Show" checkbox.
 	'$show.on("click", () => Boolean($show.filter(":checked").length));'.
 
 	'$show.change(function() {'.
+		'let adv_conf_checked = $("#adv_conf").prop("checked");'.
+
 		'switch($(this).val()) {'.
 			'case "'.WIDGET_ITEM_SHOW_DESCRIPTION.'":'.
-				'if ($("#adv_conf").prop("checked")) {'.
-					'$("#description-row").toggle(this.checked);'.
-				'}'.
-				'$("#description-row").find("input, textarea").prop("disabled", !this.checked);'.
+				'$("#description-row")'.
+					'.toggle(adv_conf_checked && this.checked)'.
+					'.find("input, textarea")'.
+					'.prop("disabled", !adv_conf_checked || !this.checked);'.
 				'break;'.
 
 			'case "'.WIDGET_ITEM_SHOW_VALUE.'":'.
-				'if ($("#adv_conf").prop("checked")) {'.
-					'$("#value-row").toggle(this.checked);'.
-				'}'.
-				'$("#value-row").find("input").prop("disabled", !this.checked);'.
+				'$("#value-row")'.
+					'.toggle(adv_conf_checked && this.checked)'.
+					'.find("input")'.
+					'.prop("disabled", !adv_conf_checked || !this.checked);'.
 				'break;'.
 
 			'case "'.WIDGET_ITEM_SHOW_TIME.'":'.
-				'if ($("#adv_conf").prop("checked")) {'.
-					'$("#time-row").toggle(this.checked);'.
-				'}'.
-				'$("#time-row").find("input").prop("disabled", !this.checked);'.
+				'$("#time-row")'.
+					'.toggle(adv_conf_checked && this.checked)'.
+					'.find("input")'.
+					'.prop("disabled", !adv_conf_checked || !this.checked);'.
 				'break;'.
 
 			'case "'.WIDGET_ITEM_SHOW_CHANGE_INDICATOR.'":'.
-				'if ($("#adv_conf").prop("checked")) {'.
-					'$("#change-indicator-row").toggle(this.checked);'.
-				'}'.
-				'$("#change-indicator-row").find("input").prop("disabled", !this.checked);'.
+				'$("#change-indicator-row")'.
+					'.toggle(adv_conf_checked && this.checked)'.
+					'.find("input")'.
+					'.prop("disabled", !adv_conf_checked || !this.checked);'.
 				'break;'.
 		'}'.
 	'});'.
