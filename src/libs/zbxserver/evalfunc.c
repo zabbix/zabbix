@@ -3699,9 +3699,8 @@ static int	evaluate_BASELINE(zbx_variant_t *value, DC_ITEM *item, const char *fu
 	}
 	else if (0 == strcmp(func, "dev"))
 	{
-		double			value_period, value_dev, value_avg = 0;
-		zbx_vector_dbl_t	baseline;
-		int			i;
+		double	value_period, value_dev, value_avg = 0;
+		int	i;
 
 		if (SUCCEED != zbx_baseline_get_data(item->itemid, item->value_type, ts->sec, period, seasons, 0,
 				&values, error))
@@ -3711,7 +3710,7 @@ static int	evaluate_BASELINE(zbx_variant_t *value, DC_ITEM *item, const char *fu
 
 		/* first value is data period, the rest are baseline */
 		value_period = values.values[0];
-		zbx_vector_dbl_remove(&baseline, 0);
+		zbx_vector_dbl_remove(&values, 0);
 
 		if (SUCCEED != zbx_eval_calc_stddevpop(&values, &value_dev, error))
 			goto out;
