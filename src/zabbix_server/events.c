@@ -1885,7 +1885,7 @@ static int	trigger_has_non_maintained_host(DB_EVENT *event)
 
 	zbx_hashset_create(&hosts, 10, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	db_trigger_get_hosts(&hosts, &event->trigger);
+	get_hosts_by_expression(&hosts, event->trigger.expression, event->trigger.recovery_expression);
 	zbx_hashset_iter_reset(&hosts, &iter);
 
 	while (NULL != (host = (DC_HOST *)zbx_hashset_iter_next(&iter)))
