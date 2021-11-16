@@ -3616,11 +3616,10 @@ static int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t
 	if (0 < logfiles_num)
 	{
 		/* Try to update MD5 sums of initial blocks if they were calculated for small blocks. */
-		/* Log file processing has been done. Errors can be ignored here. */
+		/* Log file processing has been done. Errors here only prevent updating MD5 sums for */
+		/* a single file but do not affect function return value. */
 		char	*err_tmp = NULL;
 		int	k;
-
-		ret = SUCCEED;
 
 		for (k = 0; k < logfiles_num; k++)
 		{
@@ -3635,8 +3634,8 @@ static int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t
 				if (-1 == (f = zbx_open(logfiles[k].filename, O_RDONLY)))
 					continue;
 
-				if (SUCCEED != (ret = file_part_md5(f, 0, new_md5_block_size, new_first_block_md5,
-						logfiles[k].filename, &err_tmp)))
+				if (SUCCEED != file_part_md5(f, 0, new_md5_block_size, new_first_block_md5,
+						logfiles[k].filename, &err_tmp))
 				{
 					zbx_free(err_tmp);
 					goto clean;
@@ -3644,9 +3643,9 @@ static int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t
 
 				if (0 < (new_last_block_offset = logfiles[k].size - (size_t)new_md5_block_size))
 				{
-					if (SUCCEED != (ret = file_part_md5(f, new_last_block_offset,
+					if (SUCCEED != file_part_md5(f, new_last_block_offset,
 							new_md5_block_size, new_last_block_md5, logfiles[k].filename,
-							&err_tmp)))
+							&err_tmp))
 					{
 						zbx_free(err_tmp);
 						goto clean;
