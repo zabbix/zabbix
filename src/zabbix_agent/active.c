@@ -1243,13 +1243,20 @@ static void	zbx_minimal_init_prep_vec_data(zbx_uint64_t lastlogsize, int mtime, 
 	prep_vec_elem->mtime = mtime;
 }
 
-static void	zbx_minimal_init_prep_vec_element(zbx_vector_pre_persistent_t *prep_vec, const char *key,
-		const char *persistent_file_name, const zbx_uint64_t lastlogsize, const int mtime)
+static void	zbx_fill_prep_vec_element(zbx_vector_pre_persistent_t *prep_vec, const char *key,
+		const char *persistent_file_name, const struct st_logfile *logfile, const zbx_uint64_t lastlogsize,
+		const int mtime)
 {
 	/* index in preparation vector */
 	int	idx = zbx_find_or_create_prep_vec_element(prep_vec, key, persistent_file_name);
 
-	zbx_minimal_init_prep_vec_data(lastlogsize, mtime, prep_vec->values + idx);
+	if (NULL != logfile)
+	{
+		zbx_init_prep_vec_data(logfile, prep_vec->values + idx);
+		zbx_update_prep_vec_data(logfile, logfile->processed_size, prep_vec->values + idx);
+	}
+	else
+		zbx_minimal_init_prep_vec_data(lastlogsize, mtime, prep_vec->values + idx);
 }
 #endif	/* not WINDOWS, not __MINGW32__ */
 
@@ -1316,8 +1323,17 @@ static void	process_active_checks(char *server, unsigned short port)
 			if (0 != ((ZBX_METRIC_FLAG_LOG_LOG | ZBX_METRIC_FLAG_LOG_LOGRT) & metric->flags) &&
 					NULL != metric->persistent_file_name)
 			{
-				zbx_minimal_init_prep_vec_element(&pre_persistent_vec, metric->key_orig,
-						metric->persistent_file_name, metric->lastlogsize, metric->mtime);
+				const struct st_logfile	*logfile = NULL;
+
+				if (0 < metric->logfiles_num)
+				{
+					logfile = find_last_processed_file_in_logfiles_list(metric->logfiles,
+							metric->logfiles_num);
+				}
+
+				zbx_fill_prep_vec_element(&pre_persistent_vec, metric->key_orig,
+						metric->persistent_file_name, logfile, metric->lastlogsize,
+						metric->mtime);
 			}
 #endif
 			process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, perror, ITEM_STATE_NOTSUPPORTED,
@@ -1344,8 +1360,16 @@ static void	process_active_checks(char *server, unsigned short port)
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 					if (NULL != metric->persistent_file_name)
 					{
-						zbx_minimal_init_prep_vec_element(&pre_persistent_vec, metric->key_orig,
-								metric->persistent_file_name, metric->lastlogsize,
+						const struct st_logfile	*logfile = NULL;
+
+						if (0 < metric->logfiles_num)
+						{
+							logfile = find_last_processed_file_in_logfiles_list(
+									metric->logfiles, metric->logfiles_num);
+						}
+
+						zbx_fill_prep_vec_element(&pre_persistent_vec, metric->key_orig,
+								metric->persistent_file_name, logfile, metric->lastlogsize,
 								metric->mtime);
 					}
 #endif

@@ -4172,3 +4172,25 @@ out:
 
 	return ret;
 }
+
+struct st_logfile	*find_last_processed_file_in_logfiles_list(struct st_logfile *logfiles, int logfiles_num)
+{
+	int	i, max_seq = -1, last_file_idx = 0;
+
+	if (1 == logfiles_num)
+		return logfiles;
+
+	/* The last (at least partially) processed file is the one with the maximum 'seq' value. */
+	/* If no one file is processed then return pointer to the list first element. */
+
+	for (i = 0; i < logfiles_num; i++)
+	{
+		if (max_seq < logfiles[i].seq)
+		{
+			max_seq = logfiles[i].seq;
+			last_file_idx = i;
+		}
+	}
+
+	return logfiles + last_file_idx;
+}
