@@ -1831,7 +1831,8 @@ abstract class CHostGeneral extends CHostBase {
 			$db_templates = DBselect(DB::makeSql('hosts_templates', $options));
 
 			while ($db_template = DBfetch($db_templates)) {
-				if (!$accessible_templates || array_key_exists($db_template['templateid'], $accessible_templates)) {
+				if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN
+						|| array_key_exists($db_template['templateid'], $accessible_templates)) {
 					$db_hosts[$db_template['hostid']]['templates'][$db_template['hosttemplateid']] =
 						array_diff_key($db_template, array_flip(['hostid']));
 				}
