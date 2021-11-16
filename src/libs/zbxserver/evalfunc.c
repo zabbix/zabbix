@@ -3654,7 +3654,7 @@ static int	evaluate_BASELINE(zbx_variant_t *value, DC_ITEM *item, const char *fu
 		const zbx_timespec_t *ts, char **error)
 {
 	int			ret = FAIL, season_num;
-	char			*period = NULL, *tmp;
+	char			*period = NULL, *tmp = NULL;
 	zbx_vector_dbl_t	values;
 	double			value_dbl;
 	zbx_time_unit_t		season_unit;
@@ -3684,12 +3684,11 @@ static int	evaluate_BASELINE(zbx_variant_t *value, DC_ITEM *item, const char *fu
 	zbx_free(tmp);
 
 	if (SUCCEED != get_function_parameter_str(parameters, 3, &tmp) ||
-			ZBX_TIME_UNIT_UNKNOWN == (season_unit = zbx_tm_str_to_unit(tmp)))
+			ZBX_TIME_UNIT_HOUR > (season_unit = zbx_tm_str_to_unit(tmp)))
 	{
 		*error = zbx_strdup(*error, "invalid third parameter");
 		goto out;
 	}
-	zbx_free(tmp);
 
 	if (0 == strcmp(func, "wma"))
 	{
@@ -3757,6 +3756,7 @@ static int	evaluate_BASELINE(zbx_variant_t *value, DC_ITEM *item, const char *fu
 
 	ret = SUCCEED;
 out:
+	zbx_free(tmp);
 	zbx_free(period);
 
 	zbx_vector_dbl_destroy(&values);
