@@ -4030,7 +4030,9 @@ int	process_log_check(char *server, unsigned short port, zbx_vector_ptr_t *regex
 	}
 
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
-	if (0 != (ZBX_METRIC_FLAG_NEW & metric->flags) && NULL != metric->persistent_file_name)
+	/* recover state from persistent file only if agent has no already established state */
+	if (0 != (ZBX_METRIC_FLAG_NEW & metric->flags) && NULL != metric->persistent_file_name &&
+			0 == metric->logfiles_num)
 	{
 		/* try to restore state from persistent file */
 		char	*err_msg = NULL;

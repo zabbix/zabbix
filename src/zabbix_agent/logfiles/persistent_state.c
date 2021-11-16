@@ -788,6 +788,16 @@ int	zbx_restore_file_details(const char *str, struct st_logfile **logfiles, int 
 			got_first_block_md5 = 0, got_last_block_offset = 0, got_last_block_md5 = 0, sum;
 	char		tmp[MAX_STRING_LEN];
 
+	if (0 != *logfiles_num || NULL != *logfiles)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		*err_msg = zbx_dsprintf(*err_msg, "%s(): non-empty log file list, logfiles_num:%d",
+				__func__, *logfiles_num);
+		zabbix_log(LOG_LEVEL_WARNING, "%s(): non-empty log file list, logfiles_num:%d",
+				__func__, *logfiles_num);
+		return FAIL;
+	}
+
 	if (SUCCEED != zbx_json_open(str, &jp))
 	{
 		*err_msg = zbx_dsprintf(*err_msg, "cannot parse persistent data: %s", zbx_json_strerror());
