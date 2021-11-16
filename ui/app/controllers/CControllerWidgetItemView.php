@@ -238,7 +238,10 @@ class CControllerWidgetItemView extends CControllerWidget {
 		$data = [];
 
 		if (array_key_exists(WIDGET_ITEM_SHOW_DESCRIPTION, $show)) {
-			$classes = ['item-description', self::trVPos($fields['desc_v_pos']), self::trHPos($fields['desc_h_pos'])];
+			$v = $fields['desc_v_pos'];
+			$h = $fields['desc_h_pos'];
+
+			$classes = ['item-description', self::trVPos($v), self::trHPos($h)];
 			if ($fields['desc_bold'] == 1) {
 				$classes[] = 'bold';
 			}
@@ -254,37 +257,71 @@ class CControllerWidgetItemView extends CControllerWidget {
 				$styles['color'] = '#'.$fields['desc_color'];
 			}
 
-			$data[$fields['desc_v_pos']][$fields['desc_h_pos']] = [
-				'data' => $description,
-				'classes' => $classes,
-				'styles' => $styles
+			$data[$v][$h] = [
+				'item_description' => [
+					// Description can be array or string.
+					'data' => $description,
+					'classes' => $classes,
+					'styles' => $styles
+				]
 			];
 		}
 
 		if (array_key_exists(WIDGET_ITEM_SHOW_VALUE, $show)) {
-			$classes = ['item-value', self::trVPos($fields['value_v_pos']), self::trHPos($fields['value_h_pos'])];
+			$v = $fields['value_v_pos'];
+			$h = $fields['value_h_pos'];
 
-			$data[$fields['value_v_pos']][$fields['value_h_pos']] = [
-				'data' => [],
-				'classes' => $classes
+			// Wrap value, decimals, change indicator and units in "item-value" DIV.
+			$classes = ['item-value', self::trVPos($v), self::trHPos($h)];
+
+			$data[$v][$h] = [
+				'item_value' => [
+					'item_value_content' => [
+						'data' => [],
+						'classes' => ['item-value-content']
+					],
+					'classes' => $classes
+				]
 			];
 
 			if ($fields['units_show'] == 1 && $units !== '') {
-				$units_classes = ['units', self::trUPos($fields['units_pos'])];
+				// Append "data" either before or after the wrapper if above or below value. Otherwise units are inside.
+				if ($fields['units_pos'] == WIDGET_ITEM_POS_ABOVE) {
+					$data[$v][$h]['item_value'] = [
+						'data' => []
+					] + $data[$v][$h]['item_value'];
+				}
+				elseif ($fields['units_pos'] == WIDGET_ITEM_POS_BELOW) {
+					$data[$v][$h]['item_value']['data'] = [];
+				}
+
+				$units_classes = ['units'];
 				if ($fields['units_bold'] == 1) {
 					$units_classes[] = 'bold';
 				}
 
 				$units_styles = ['--widget-item-font' => number_format($fields['units_size'] / 100, 2)];
+				// No need to check for null, since displaying units depend on value checkbox.
 				if ($fields['units_color'] !== '') {
 					$units_styles['color'] = '#'.$fields['units_color'];
 				}
 
-				if (in_array($fields['units_pos'], [WIDGET_ITEM_POS_BEFORE, WIDGET_ITEM_POS_ABOVE])) {
-					$data[$fields['value_v_pos']][$fields['value_h_pos']]['data'][] = [
-						'data' => $units,
-						'classes' => $units_classes,
-						'styles' => $units_styles
+				if ($fields['units_pos'] == WIDGET_ITEM_POS_BEFORE) {
+					$data[$v][$h]['item_value']['item_value_content']['data'][] = [
+						'units' => [
+							'data' => $units,
+							'classes' => $units_classes,
+							'styles' => $units_styles
+						]
+					];
+				}
+				elseif ($fields['units_pos'] == WIDGET_ITEM_POS_ABOVE) {
+					$data[$v][$h]['item_value']['data'][] = [
+						'units' => [
+							'data' => $units,
+							'classes' => $units_classes,
+							'styles' => $units_styles
+						]
 					];
 				}
 			}
@@ -299,11 +336,13 @@ class CControllerWidgetItemView extends CControllerWidget {
 				$styles['color'] = '#'.$fields['value_color'];
 			}
 
-			$data[$fields['value_v_pos']][$fields['value_h_pos']]['data'][] = [
-				'data' => $value,
-				'value_type' => $value_type,
-				'classes' => $classes,
-				'styles' => $styles
+			$data[$v][$h]['item_value']['item_value_content']['data'][] = [
+				'value' => [
+					'data' => $value,
+					'value_type' => $value_type,
+					'classes' => $classes,
+					'styles' => $styles
+				]
 			];
 
 			if ($decimals !== '' && in_array($value_type, [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
@@ -317,50 +356,79 @@ class CControllerWidgetItemView extends CControllerWidget {
 					$styles['color'] = '#'.$fields['value_color'];
 				}
 
-				$data[$fields['value_v_pos']][$fields['value_h_pos']]['data'][] = [
-					'data' => $decimals,
-					'classes' => $classes,
-					'styles' => $styles
-				];
-			}
-
-			if (array_key_exists(WIDGET_ITEM_SHOW_CHANGE_INDICATOR, $show) && $change_indicator) {
-				$data[$fields['value_v_pos']][$fields['value_h_pos']]['data'][] = [
-					'data' => $change_indicator,
-					'classes' => ['change-indicator'],
-					'styles' => [
-						'--widget-item-font' => number_format(
-							max($fields['value_size'], $fields['decimal_size']) / 100, 2
-						)
+				$data[$v][$h]['item_value']['item_value_content']['data'][] = [
+					'decimals' => [
+						'data' => $decimals,
+						'classes' => $classes,
+						'styles' => $styles
 					]
 				];
 			}
 
-			if ($fields['units_show'] == 1 && $units !== ''
-					&& in_array($fields['units_pos'], [WIDGET_ITEM_POS_AFTER, WIDGET_ITEM_POS_BELOW])) {
-				$data[$fields['value_v_pos']][$fields['value_h_pos']]['data'][] = [
-					'data' => $units,
-					'classes' => $units_classes,
-					'styles' => $units_styles
+			if (array_key_exists(WIDGET_ITEM_SHOW_CHANGE_INDICATOR, $show) && $change_indicator) {
+				$data[$v][$h]['item_value']['item_value_content']['data'][] = [
+					'change_indicator' => [
+						'data' => $change_indicator,
+						'classes' => ['change-indicator'],
+						'styles' => [
+							'--widget-item-font' => number_format(
+								max($fields['value_size'], $fields['decimal_size']) / 100, 2
+							)
+						]
+					]
 				];
+			}
+
+			if ($fields['units_show'] == 1 && $units !== '') {
+				if ($fields['units_pos'] == WIDGET_ITEM_POS_AFTER) {
+					$data[$v][$h]['item_value']['item_value_content']['data'][] = [
+						'units' => [
+							'data' => $units,
+							'classes' => $units_classes,
+							'styles' => $units_styles
+						]
+					];
+				}
+				elseif ($fields['units_pos'] == WIDGET_ITEM_POS_BELOW) {
+					$data[$v][$h]['item_value']['data'][] = [
+						'units' => [
+							'data' => $units,
+							'classes' => $units_classes,
+							'styles' => $units_styles
+						]
+					];
+				}
 			}
 		}
 		elseif (array_key_exists(WIDGET_ITEM_SHOW_CHANGE_INDICATOR, $show) && $change_indicator) {
-			// Show only change indicator without value, but do get the position of value where it should be.
-			$classes = ['item-value', self::trVPos($fields['value_v_pos']), self::trHPos($fields['value_h_pos'])];
+			$v = $fields['value_v_pos'];
+			$h = $fields['value_h_pos'];
 
-			$data[$fields['value_v_pos']][$fields['value_h_pos']] = [
-				'data' => [[
-					'data' => $change_indicator,
-					'classes' => ['change-indicator'],
-					'styles' => ['--widget-item-font' => number_format($fields['value_size'] / 100, 2)]
-				]],
-				'classes' => $classes
+			// Show only change indicator without value, but do get the position of value where it should be.
+			$classes = ['item-value', self::trVPos($v), self::trHPos($h)];
+
+			$data[$v][$h] = [
+				'item_value' => [
+					'item_value_content' => [
+						'data' => [[
+							'change_indicator' => [
+								'data' => $change_indicator,
+								'classes' => ['change-indicator'],
+								'styles' => ['--widget-item-font' => number_format($fields['value_size'] / 100, 2)]
+							]
+						]],
+						'classes' => ['item-value-content']
+					],
+					'classes' => $classes
+				]
 			];
 		}
 
 		if (array_key_exists(WIDGET_ITEM_SHOW_TIME, $show)) {
-			$classes = ['item-time', self::trVPos($fields['time_v_pos']), self::trHPos($fields['time_h_pos'])];
+			$v = $fields['time_v_pos'];
+			$h = $fields['time_h_pos'];
+
+			$classes = ['item-time', self::trVPos($v), self::trHPos($h)];
 			if ($fields['time_bold'] == 1) {
 				$classes[] = 'bold';
 			}
@@ -370,10 +438,12 @@ class CControllerWidgetItemView extends CControllerWidget {
 				$styles['color'] = '#'.$fields['time_color'];
 			}
 
-			$data[$fields['time_v_pos']][$fields['time_h_pos']] = [
-				'data' => $time,
-				'classes' => $classes,
-				'styles' => $styles
+			$data[$v][$h] = [
+				'item_time' => [
+					'data' => $time,
+					'classes' => $classes,
+					'styles' => $styles
+				]
 			];
 		}
 
@@ -440,31 +510,6 @@ class CControllerWidgetItemView extends CControllerWidget {
 			case WIDGET_ITEM_POS_BOTTOM:
 				return 'bottom';
 
-		}
-	}
-
-	/**
-	 * Translate units posittion to CSS class.
-	 *
-	 * @static
-	 *
-	 * @param int $pos  Position of element.
-	 *
-	 * @return string
-	 */
-	private static function trUPos(int $pos): string {
-		switch ($pos) {
-			case WIDGET_ITEM_POS_ABOVE:
-				return 'top';
-
-			case WIDGET_ITEM_POS_BEFORE:
-				return 'left';
-
-			case WIDGET_ITEM_POS_AFTER:
-				return 'right';
-
-			case WIDGET_ITEM_POS_BELOW:
-				return 'bottom';
 		}
 	}
 }
