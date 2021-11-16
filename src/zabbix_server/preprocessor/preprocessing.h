@@ -39,6 +39,12 @@
 #define ZBX_IPC_PREPROCESSOR_TOP_ITEMS			9
 #define ZBX_IPC_PREPROCESSOR_TOP_ITEMS_RESULT		10
 #define ZBX_IPC_PREPROCESSOR_TOP_OLDEST_PREPROC_ITEMS	11
+#define ZBX_IPC_PREPROCESSOR_DEP_REQUEST		12
+#define ZBX_IPC_PREPROCESSOR_DEP_REQUEST_CONT		13
+#define ZBX_IPC_PREPROCESSOR_DEP_NEXT			14
+#define ZBX_IPC_PREPROCESSOR_DEP_RESULT			15
+#define ZBX_IPC_PREPROCESSOR_DEP_RESULT_CONT		16
+#define ZBX_IPC_PREPROCESSOR_DEP_ERROR			17
 
 typedef struct {
 	AGENT_RESULT	*result;
@@ -58,6 +64,31 @@ typedef struct
 	unsigned char		state;		 /* item state */
 }
 zbx_preproc_item_value_t;
+
+
+/* dependent item batch preprocessing request */
+typedef struct
+{
+	zbx_uint64_t		itemid;
+	unsigned char		flags;
+	unsigned char		value_type;
+	zbx_preproc_op_t	*steps;
+	int			steps_num;
+	zbx_vector_ptr_t	history;
+}
+zbx_preproc_dep_t;
+
+/* dependent item preprocessing result */
+typedef struct
+{
+	zbx_uint64_t		itemid;
+	unsigned char		flags;
+	unsigned char		value_type;
+	zbx_variant_t		value;
+	char			*error;
+	zbx_vector_ptr_t	history;
+}
+zbx_preproc_dep_result_t;
 
 zbx_uint32_t	zbx_preprocessor_pack_task(unsigned char **data, zbx_uint64_t itemid, unsigned char value_type,
 		zbx_timespec_t *ts, zbx_variant_t *value, const zbx_vector_ptr_t *history,
@@ -95,5 +126,22 @@ zbx_uint32_t	zbx_preprocessor_pack_top_items_result(unsigned char **data, zbx_pr
 		int items_num);
 
 void	zbx_preprocessor_unpack_top_result(zbx_vector_ptr_t *items, const unsigned char *data);
+
+void	zbx_preprocessor_free_deps(zbx_preproc_dep_t *deps, int deps_num);
+void	zbx_preprocessor_pack_dep_request(const zbx_variant_t *value, const zbx_timespec_t *ts,
+		const zbx_preproc_dep_t *deps, int deps_num, zbx_vector_ptr_t *messages);
+void	zbx_preprocessor_unpack_dep_task(zbx_timespec_t *ts, zbx_variant_t *value, int *total_num,
+		zbx_preproc_dep_t **deps, int *deps_num, const unsigned char *data);
+void	zbx_preprocessor_unpack_dep_task_cont(zbx_preproc_dep_t *deps, int *deps_num, const unsigned char *data);
+
+void	zbx_preprocessor_free_dep_results(zbx_preproc_dep_result_t *results, int results_num);
+int	zbx_preprocessor_pack_dep_result(const zbx_preproc_dep_result_t *results, int results_num,
+		zbx_vector_ptr_t *messages);
+
+void	zbx_preprocessor_unpack_dep_result(int *total_num, int *results_num, zbx_preproc_dep_result_t **results,
+		const unsigned char *data);
+void	zbx_preprocessor_unpack_dep_result_cont(int *results_num, zbx_preproc_dep_result_t *results,
+		const unsigned char *data);
+int	zbx_preprocessor_pack_dep_error(const char *error, zbx_vector_ptr_t *messages);
 
 #endif /* ZABBIX_PREPROCESSING_H */

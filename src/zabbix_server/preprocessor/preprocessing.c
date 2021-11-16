@@ -47,6 +47,89 @@ zbx_packed_field_t;
 static zbx_ipc_message_t	cached_message;
 static int			cached_values;
 
+
+static zbx_uint32_t	fields_calc_size(zbx_packed_field_t *fields, int fields_num)
+{
+	zbx_uint32_t	data_size = 0, field_size;
+	int		i;
+
+	for (i = 0; i < fields_num; i++)
+	{
+		if (PACKED_FIELD_STRING == fields[i].type)
+		{
+			field_size = (NULL != fields[i].value) ? (zbx_uint32_t)strlen((const char *)fields[i].value) + 1 : 0;
+			fields[i].size = (zbx_uint32_t)field_size;
+			field_size += sizeof(zbx_uint32_t);
+		}
+		else
+			field_size = fields[i].size;
+
+		if (UINT32_MAX - field_size < data_size)
+			return 0;
+
+		data_size += field_size;
+	}
+
+	return data_size;
+}
+
+static int	message_pack_fields(zbx_ipc_message_t *message, const zbx_packed_field_t *fields,
+		int fields_num, zbx_uint32_t fields_size)
+{
+	unsigned char	*offset;
+	int		i;
+
+	if (UINT32_MAX - message->size < fields_size)
+		return FAIL;
+
+	message->size += fields_size;
+	message->data = (unsigned char *)zbx_realloc(message->data, message->size);
+	offset = message->data + (message->size - fields_size);
+
+	for (i = 0; i < fields_num; i++)
+	{
+		/* data packing */
+		if (PACKED_FIELD_STRING == fields[i].type)
+		{
+			memcpy(offset, &fields[i].size, sizeof(zbx_uint32_t));
+			offset += sizeof(zbx_uint32_t);
+			if (0 != fields[i].size)
+				memcpy(offset, fields[i].value, fields[i].size);
+		}
+		else
+			memcpy(offset, fields[i].value, fields[i].size);
+
+		offset += fields[i].size;
+
+		{
+			char	buf[32];
+
+			if (PACKED_FIELD_STRING != fields[i].type)
+			{
+				switch (fields[i].size)
+				{
+					case 1:
+						zbx_snprintf(buf, sizeof(buf), "%d", *(unsigned char *)fields[i].value);
+						break;
+					case 4:
+						zbx_snprintf(buf, sizeof(buf), "%d", *(int *)fields[i].value);
+						break;
+					case 8:
+						zbx_snprintf(buf, sizeof(buf), ZBX_FS_UI64, *(zbx_uint64_t *)fields[i].value);
+						break;
+					default:
+						zbx_strlcpy(buf, "unknown", sizeof(buf));
+						break;
+				}
+			}
+			else
+				zbx_strlcpy(buf, ZBX_NULL2EMPTY_STR(fields[i].value), sizeof(buf));
+		}
+	}
+
+	return SUCCEED;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: message_pack_data                                                *
@@ -64,61 +147,15 @@ static int			cached_values;
  ******************************************************************************/
 static zbx_uint32_t	message_pack_data(zbx_ipc_message_t *message, zbx_packed_field_t *fields, int count)
 {
-	int 			i;
-	zbx_uint32_t		data_size = 0;
-	zbx_uint64_t		field_size;
-	unsigned char		*offset = NULL;
-	const zbx_uint64_t	max_uint32 = ~(zbx_uint32_t)0;
+	zbx_uint32_t	data_size = 0;
+
+	if (0 == (data_size = fields_calc_size(fields, count)))
+		return 0;
 
 	if (NULL != message)
 	{
-		/* recursive call to calculate required buffer size */
-		data_size = message_pack_data(NULL, fields, count);
-
-		if (0 == data_size || max_uint32 - message->size < data_size)
+		if (SUCCEED != message_pack_fields(message, fields, count, data_size))
 			return 0;
-
-		message->size += data_size;
-		message->data = (unsigned char *)zbx_realloc(message->data, message->size);
-		offset = message->data + (message->size - data_size);
-	}
-
-	for (i = 0; i < count; i++)
-	{
-		field_size = fields[i].size;
-		if (NULL != offset)
-		{
-			/* data packing */
-			if (PACKED_FIELD_STRING == fields[i].type)
-			{
-				zbx_uint32_t	field_size_uint32 = (zbx_uint32_t)field_size;
-
-				memcpy(offset, &field_size_uint32, sizeof(zbx_uint32_t));
-				if (0 != field_size && NULL != fields[i].value)
-					memcpy(offset + sizeof(zbx_uint32_t), fields[i].value, field_size);
-				field_size += sizeof(zbx_uint32_t);
-			}
-			else
-				memcpy(offset, fields[i].value, field_size);
-
-			offset += field_size;
-		}
-		else
-		{
-			/* size calculation */
-			if (PACKED_FIELD_STRING == fields[i].type)
-			{
-				field_size = (NULL != fields[i].value) ? strlen((const char *)fields[i].value) + 1 : 0;
-				fields[i].size = (zbx_uint32_t)field_size;
-
-				field_size += sizeof(zbx_uint32_t);
-			}
-
-			if (field_size + data_size > max_uint32)
-				return 0;
-
-			data_size += (zbx_uint32_t)field_size;
-		}
 	}
 
 	return data_size;
@@ -517,6 +554,139 @@ zbx_uint32_t	zbx_preprocessor_pack_task(unsigned char **data, zbx_uint64_t itemi
 
 /******************************************************************************
  *                                                                            *
+ * Function: preprocessor_append_packed_message                               *
+ *                                                                            *
+ * Purpose: pack fields into serialized message                               *
+ *                                                                            *
+ * Parameters: fields      - [IN] the fields to pack                          *
+ *             fields_num  - [IN] the number of fields                        *
+ *             fields_size - [IN] the size of packed field data               *
+ *             messages    - [OUT] the message queue                          *
+ *                                                                            *
+ * Return value: SUCCEED - the message was added successfully                 *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	preprocessor_append_packed_message(const zbx_packed_field_t *fields, int fields_num,
+		zbx_uint32_t fields_size, zbx_uint32_t base_code, zbx_vector_ptr_t *messages)
+{
+	zbx_ipc_message_t	*message;
+
+	message = (zbx_ipc_message_t *)zbx_malloc(NULL, sizeof(zbx_ipc_message_t));
+	zbx_ipc_message_init(message);
+	zbx_vector_ptr_append(messages, message);
+
+	if (SUCCEED != message_pack_fields(message, fields, fields_num, fields_size))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		zbx_vector_ptr_clear_ext(messages, (zbx_clean_func_t)zbx_ipc_message_free);
+		return FAIL;
+	}
+
+	if (1 == messages->values_num)
+		message->code = base_code;
+	else
+		message->code = base_code + 1;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_preprocessor_pack_dep_request                                *
+ *                                                                            *
+ * Purpose: pack dependent item preprocessing fields into messages for        *
+ *          sending to worker                                                 *
+ *                                                                            *
+ * Parameters: value    - [IN] the master item value                          *
+ *             ts       - [IN] the master item value timestamp                *
+ *             deps     - [IN] the dependent item data                        *
+ *             deps_num - [IN] the number of dependent items                  *
+ *             messages - [IN] the message queue                              *
+ *                                                                            *
+ * Return value: SUCCEED - the message was added successfully                 *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_preprocessor_pack_dep_request(const zbx_variant_t *value, const zbx_timespec_t *ts,
+		const zbx_preproc_dep_t *deps, int deps_num, zbx_vector_ptr_t *messages)
+{
+	zbx_packed_field_t	*offset, *fields;
+	zbx_uint32_t		size;
+	int			i, fields_num, batch_num, sent_num = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() items:%d", __func__, deps_num);
+
+	fields_num = 6;		/* value (variant) + timestamp (timespec) + total items + batch of items */
+
+	for (i = 0; i < deps_num; i++)
+	{
+		fields_num += 5; 		/* itemid + flags + value_type + ops_num + batch_num */
+		fields_num += deps[i].steps_num * 4;
+		fields_num += deps[i].history.values_num * 5;
+	}
+
+	fields = (zbx_packed_field_t *)zbx_malloc(NULL, fields_num * sizeof(zbx_packed_field_t));
+
+	offset = fields;
+	offset += preprocessor_pack_variant(offset, value);
+	*offset++ = PACKED_FIELD(&ts->sec, sizeof(int));
+	*offset++ = PACKED_FIELD(&ts->ns, sizeof(int));
+	*offset++ = PACKED_FIELD(&deps_num, sizeof(int));
+	*offset++ = PACKED_FIELD(&batch_num, sizeof(int));
+
+	size = fields_calc_size(fields, 6);
+
+	for (i = 0; i < deps_num; i++)
+	{
+		zbx_uint32_t		dep_size;
+		zbx_packed_field_t	*dep = offset;
+		int			dep_num;
+
+		*offset++ = PACKED_FIELD(&deps[i].itemid, sizeof(zbx_uint64_t));
+		*offset++ = PACKED_FIELD(&deps[i].flags, sizeof(unsigned char));
+		*offset++ = PACKED_FIELD(&deps[i].value_type, sizeof(unsigned char));
+
+		offset += preprocessor_pack_steps(offset, deps[i].steps, &deps[i].steps_num);
+		offset += preprocessor_pack_history(offset, &deps[i].history, &deps[i].history.values_num);
+
+		dep_num = offset - dep;
+		dep_size = fields_calc_size(dep, dep_num);
+
+		if (UINT32_MAX - dep_size < size)
+		{
+			batch_num = i - sent_num;
+
+			if (SUCCEED != (preprocessor_append_packed_message(fields, dep - fields, size,
+					ZBX_IPC_PREPROCESSOR_DEP_REQUEST, messages)))
+			{
+				goto out;
+			}
+
+			sent_num = i;
+
+			offset = fields;
+			*offset++ = PACKED_FIELD(&batch_num, sizeof(int));
+			memmove(offset, dep, sizeof(zbx_packed_field_t) * dep_num);
+			offset += dep_num;
+
+			size = fields_calc_size(fields, 1);
+		}
+
+		size += dep_size;
+	}
+
+	batch_num = i - sent_num;
+	(void)preprocessor_append_packed_message(fields, offset - fields, size, ZBX_IPC_PREPROCESSOR_DEP_REQUEST,
+			messages);
+out:
+	zbx_free(fields);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() messages:%d", __func__, messages->values_num);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_preprocessor_pack_result                                     *
  *                                                                            *
  * Purpose: pack preprocessing result data into a single buffer that can be   *
@@ -556,6 +726,150 @@ zbx_uint32_t	zbx_preprocessor_pack_result(unsigned char **data, zbx_variant_t *v
 	zbx_free(fields);
 
 	return size;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_preprocessor_free_dep_results                                *
+ *                                                                            *
+ * Purpose: free dependent item preprocessing response                        *
+ *                                                                            *
+ * Parameters: results     - [OUT] the preprocessing results                  *
+ *             results_num - [IN] the number of preprocessing results         *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_preprocessor_free_dep_results(zbx_preproc_dep_result_t *results, int results_num)
+{
+	int	i;
+
+	for (i = 0; i < results_num; i++)
+	{
+		zbx_variant_clear(&results[i].value);
+		zbx_free(results[i].error);
+		zbx_vector_ptr_clear_ext(&results[i].history, (zbx_clean_func_t)zbx_preproc_op_history_free);
+		zbx_vector_ptr_destroy(&results[i].history);
+	}
+
+	zbx_free(results);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_preprocessor_pack_dep_result                                 *
+ *                                                                            *
+ * Purpose: pack dependent item bulk preprocessing result data into a single  *
+ *          buffer that can be used in IPC                                    *
+ *                                                                            *
+ * Parameters: results     - [IN] the results                                 *
+ *             results_num - [IN] the number of results                       *
+ *             messages    - [OUT] the IPC messages with preprocessing results*
+ *                                                                            *
+ * Return value: size of packed data                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_preprocessor_pack_dep_result(const zbx_preproc_dep_result_t *results, int results_num,
+		zbx_vector_ptr_t *messages)
+{
+	zbx_packed_field_t	*offset, *fields;
+	zbx_uint32_t		size;
+	int			i, fields_num, batch_num, sent_num = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() items:%d", __func__, results_num);
+
+	fields_num = 2;		/* total number of results + batch size*/
+
+	for (i = 0; i < results_num; i++)
+	{
+		fields_num += 7; /* itemid + flags + value_type + value(variant) + error + history_num */
+		fields_num += 5 * results[i].history.values_num;
+	}
+
+	fields = (zbx_packed_field_t *)zbx_malloc(NULL, fields_num * sizeof(zbx_packed_field_t));
+	offset = fields;
+
+	*offset++ = PACKED_FIELD(&results_num, sizeof(int));
+	*offset++ = PACKED_FIELD(&batch_num, sizeof(int));
+
+	size = fields_calc_size(fields, 2);
+
+	for (i = 0; i < results_num; i++)
+	{
+		zbx_uint32_t		dep_size;
+		zbx_packed_field_t	*dep = offset;
+		int			dep_num;
+
+		*offset++ = PACKED_FIELD(&results[i].itemid, sizeof(zbx_uint64_t));
+		*offset++ = PACKED_FIELD(&results[i].flags, sizeof(unsigned char));
+		*offset++ = PACKED_FIELD(&results[i].value_type, sizeof(unsigned char));
+
+		offset += preprocessor_pack_variant(offset, &results[i].value);
+		*offset++ = PACKED_FIELD(results[i].error, 0);
+		offset += preprocessor_pack_history(offset, &results[i].history, &results[i].history.values_num);
+
+		dep_num = offset - dep;
+		dep_size = fields_calc_size(dep, dep_num);
+
+		if (UINT32_MAX - dep_size < size)
+		{
+			batch_num = i - sent_num;
+			if (SUCCEED != (preprocessor_append_packed_message(fields, dep - fields, size,
+					ZBX_IPC_PREPROCESSOR_DEP_RESULT, messages)))
+			{
+				goto out;
+			}
+
+			sent_num = i;
+
+			offset = fields;
+			*offset++ = PACKED_FIELD(&batch_num, sizeof(int));
+			memmove(offset, dep, sizeof(zbx_packed_field_t) * dep_num);
+			offset += dep_num;
+
+			size = fields_calc_size(fields, 1);
+		}
+
+		size += dep_size;
+	}
+
+	batch_num = i - sent_num;
+	(void)preprocessor_append_packed_message(fields, offset - fields, size, ZBX_IPC_PREPROCESSOR_DEP_RESULT,
+			messages);
+out:
+	zbx_free(fields);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() messages:%d", __func__, messages->values_num);
+
+	return messages->values_num;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_preprocessor_pack_dep_error                                  *
+ *                                                                            *
+ * Purpose: pack dependent item bulk preprocessing error result a single      *
+ *          buffer that can be used in IPC                                    *
+ *                                                                            *
+ * Parameters: error    - [IN] the error message                              *
+ *             messages - [OUT] the IPC messages with preprocessing results   *
+ *                                                                            *
+ * Return value: size of packed data                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_preprocessor_pack_dep_error(const char *error, zbx_vector_ptr_t *messages)
+{
+	zbx_packed_field_t	fields[1];
+	zbx_uint32_t		size;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	fields[0] = PACKED_FIELD(error, 0);
+	size = fields_calc_size(fields, 1);
+
+	(void)preprocessor_append_packed_message(fields, 1, size, ZBX_IPC_PREPROCESSOR_DEP_ERROR, messages);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() messages:%d", __func__, messages->values_num);
+
+	return messages->values_num;
 }
 
 /******************************************************************************
@@ -839,6 +1153,117 @@ void	zbx_preprocessor_unpack_task(zbx_uint64_t *itemid, unsigned char *value_typ
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_preprocessor_free_deps                                       *
+ *                                                                            *
+ * Purpose: free dependent item preprocessing request                         *
+ *                                                                            *
+ * Parameters: deps     - [OUT] the dependent items                           *
+ *             deps_num - [IN] the number of dependent items                  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_preprocessor_free_deps(zbx_preproc_dep_t *deps, int deps_num)
+{
+	int	i;
+
+	for (i = 0; i < deps_num; i++)
+	{
+		zbx_free(deps[i].steps);
+		zbx_vector_ptr_clear_ext(&deps[i].history, (zbx_clean_func_t)zbx_preproc_op_history_free);
+		zbx_vector_ptr_destroy(&deps[i].history);
+	}
+
+	zbx_free(deps);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: preprocessor_unpack_dep                                          *
+ *                                                                            *
+ * Purpose: unpack dependent item preprocessing request                       *
+ *                                                                            *
+ * Parameters: data - [IN] serialized dependent item preprocessing data       *
+ *             dep  - [OUT] unpacked dependent item preprocessing data        *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_uint32_t	preprocessor_unpack_dep(const unsigned char *data, zbx_preproc_dep_t *dep)
+{
+	const unsigned char	*offset = data;
+
+	offset += zbx_deserialize_value(offset, &dep->itemid);
+	offset += zbx_deserialize_value(offset, &dep->flags);
+	offset += zbx_deserialize_value(offset, &dep->value_type);
+	offset += preprocessor_unpack_steps(offset, &dep->steps, &dep->steps_num);
+
+	zbx_vector_ptr_create(&dep->history);
+	offset += preprocesser_unpack_history(offset, &dep->history);
+
+	return offset - data;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_preprocessor_unpack_dep_task                                 *
+ *                                                                            *
+ * Purpose: unpack initial dependent item preprocessing request               *
+ *                                                                            *
+ * Parameters: ts        - [OUT] the value timestamp                          *
+ *             value     - [OUT] the master item value                        *
+ *             total_num - [OUT] the total number of dependent items          *
+ *             deps      - [OUT] the dependent items                          *
+ *             deps_num  - [OUT] the number of dependent items in batch       *
+ *             data      - [IN] the data to unpack                            *
+ *                                                                            *
+ * Return value: size of packed data                                          *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_preprocessor_unpack_dep_task(zbx_timespec_t *ts, zbx_variant_t *value, int *total_num,
+		zbx_preproc_dep_t **deps, int *deps_num, const unsigned char *data)
+{
+	const unsigned char	*offset = data;
+	int			i;
+
+	offset += preprocesser_unpack_variant(offset, value);
+	offset += zbx_deserialize_value(offset, &ts->sec);
+	offset += zbx_deserialize_value(offset, &ts->ns);
+
+	offset += zbx_deserialize_value(offset, total_num);
+	offset += zbx_deserialize_value(offset, deps_num);
+	*deps = (zbx_preproc_dep_t *)zbx_malloc(NULL, *total_num * sizeof(zbx_preproc_dep_t));
+
+	for (i = 0; i < *deps_num; i++)
+		offset += preprocessor_unpack_dep(offset, *deps + i);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_preprocessor_unpack_dep_task_cont                            *
+ *                                                                            *
+ * Purpose: unpack following dependent item preprocessing request             *
+ *                                                                            *
+ * Parameters: ts       - [OUT] the value timestamp                           *
+ *             value    - [OUT] the master item value                         *
+ *             deps     - [OUT] the dependent items                           *
+ *             deps_num - [OUT] the number of dependent items                 *
+ *             data     - [IN] the data to unpack                             *
+ *                                                                            *
+ * Return value: size of packed data                                          *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_preprocessor_unpack_dep_task_cont(zbx_preproc_dep_t *deps, int *deps_num, const unsigned char *data)
+{
+	const unsigned char	*offset = data;
+	zbx_uint32_t		i, batch_num;
+
+	offset += zbx_deserialize_value(offset, &batch_num);
+
+	for (i = 0; i < batch_num; i++)
+		offset += preprocessor_unpack_dep(offset, deps + i);
+
+	*deps_num += batch_num;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_preprocessor_unpack_result                                   *
  *                                                                            *
  * Purpose: unpack preprocessing task data from IPC data buffer               *
@@ -861,6 +1286,87 @@ void	zbx_preprocessor_unpack_result(zbx_variant_t *value, zbx_vector_ptr_t *hist
 	(void)zbx_deserialize_str(offset, error, value_len);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: preprocessor_unpack_dep_result                                   *
+ *                                                                            *
+ * Purpose: unpack dependent item preprocessing result                        *
+ *                                                                            *
+ * Parameters: data   - [IN] IPC data buffer                                  *
+ *             result - [OUT] the preprocessing result                        *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_uint32_t	preprocessor_unpack_dep_result(const unsigned char *data, zbx_preproc_dep_result_t *result)
+{
+	const unsigned char	*offset = data;
+	zbx_uint32_t		error_len;
+
+	offset += zbx_deserialize_value(offset, &result->itemid);
+	offset += zbx_deserialize_value(offset, &result->flags);
+	offset += zbx_deserialize_value(offset, &result->value_type);
+	offset += preprocesser_unpack_variant(offset, &result->value);
+	offset += zbx_deserialize_str(offset, &result->error, error_len);
+
+	zbx_vector_ptr_create(&result->history);
+	offset += preprocesser_unpack_history(offset, &result->history);
+
+	return offset - data;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_preprocessor_unpack_dep_result                               *
+ *                                                                            *
+ * Purpose: unpack preprocessing results                                      *
+ *                                                                            *
+ * Parameters: total_num   - [OUT] the total number of results                *
+ *             results_num - [OUT] the number of results in this batch        *
+ *             results     - [OUT] the preprocessing results                  *
+ *             data        - [IN] the data to unpack                          *
+ *                                                                            *
+ * Return value: size of packed data                                          *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_preprocessor_unpack_dep_result(int *total_num, int *results_num, zbx_preproc_dep_result_t **results,
+		const unsigned char *data)
+{
+	const unsigned char	*offset = data;
+	int			i;
+
+	offset += zbx_deserialize_value(offset, total_num);
+	offset += zbx_deserialize_value(offset, results_num);
+	*results = (zbx_preproc_dep_result_t *)zbx_malloc(NULL, *total_num * sizeof(zbx_preproc_dep_result_t));
+
+	for (i = 0; i < *results_num; i++)
+		offset += preprocessor_unpack_dep_result(offset, *results + i);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_preprocessor_unpack_dep_result_cont                          *
+ *                                                                            *
+ * Purpose: unpack following preprocessing results                            *
+ *                                                                            *
+ * Parameters: results_num - [OUT] the number of results in this batch        *
+ *             results     - [OUT] the preprocessing results                  *
+ *             data        - [IN] the data to unpack                          *
+ *                                                                            *
+ * Return value: size of packed data                                          *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_preprocessor_unpack_dep_result_cont(int *results_num, zbx_preproc_dep_result_t *results,
+		const unsigned char *data)
+{
+	const unsigned char	*offset = data;
+	int			i, batch_num;
+
+	offset += zbx_deserialize_value(offset, &batch_num);
+
+	for (i = 0; i < batch_num; i++)
+		preprocessor_unpack_dep_result(offset, results + i);
+
+	*results_num += batch_num;
+}
 /******************************************************************************
  *                                                                            *
  * Function: zbx_preprocessor_unpack_test_result                              *
