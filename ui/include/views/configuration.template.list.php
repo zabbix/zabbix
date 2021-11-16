@@ -277,7 +277,9 @@ $form->addItem([
 			],
 			'popup.massupdate.template' => [
 				'content' => (new CButton('', _('Mass update')))
-					->onClick("return openMassupdatePopup(this, 'popup.massupdate.template', 'modal-popup modal-popup-static');")
+					->onClick("return openMassupdatePopup(this, 'popup.massupdate.template', ".
+						"'modal-popup modal-popup-static');"
+					)
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->removeAttribute('id')
 			],

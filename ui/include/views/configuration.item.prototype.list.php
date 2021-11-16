@@ -194,8 +194,8 @@ $itemForm->addItem([
 			],
 			'popup.massupdate.itemprototype' => [
 				'content' => (new CButton('', _('Mass update')))
-					->onClick("return openMassupdatePopup(this, 'popup.massupdate.itemprototype', 'modal-popup '.
-						'modal-popup-preprocessing');"
+					->onClick("return openMassupdatePopup(this, 'popup.massupdate.itemprototype', ".
+						"'modal-popup modal-popup-preprocessing');"
 					)
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->removeAttribute('id')
