@@ -182,7 +182,9 @@ abstract class CHostGeneral extends CHostBase {
 			}
 			unset($group);
 
-			$del_hostgroupids = array_merge($del_hostgroupids, array_column($db_groups, 'id'));
+			foreach ($db_groups as $del_group) {
+				$del_hostgroupids[] = $del_group['hostgroupid'];
+			}
 		}
 		unset($host);
 
@@ -1787,18 +1789,21 @@ abstract class CHostGeneral extends CHostBase {
 		}
 
 		if ($hostids['groups']) {
-			$db_groups = API::HostGroup()->get([
-				'output' => [],
-				$id_field_name.'s' => $hostids['groups'],
-				'preservekeys' => true
-			]);
+			$filter = ['hostid' => $hostids['groups']];
+
+			if (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
+				$db_groups = API::HostGroup()->get([
+					'output' => [],
+					$id_field_name.'s' => $hostids['groups'],
+					'preservekeys' => true
+				]);
+
+				$filter += ['groupid' => array_keys($db_groups)];
+			}
 
 			$options = [
 				'output' => ['hostgroupid', 'hostid', 'groupid'],
-				'filter' => [
-					'hostid' => $hostids['groups'],
-					'groupid' => array_keys($db_groups)
-				]
+				'filter' => $filter
 			];
 			$db_groups = DBselect(DB::makeSql('hosts_groups', $options));
 
@@ -1809,24 +1814,31 @@ abstract class CHostGeneral extends CHostBase {
 		}
 
 		if ($hostids['templates']) {
-			$db_templates = API::Template()->get([
-				'output' => [],
-				'hostids' => $hostids['templates'],
-				'preservekeys' => true
-			]);
+			$accessible_templates = [];
+
+			if (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
+				$accessible_templates = API::Template()->get([
+					'output' => [],
+					'hostids' => $hostids['templates'],
+					'preservekeys' => true
+				]);
+			}
 
 			$options = [
 				'output' => ['hosttemplateid', 'hostid', 'templateid'],
-				'filter' => [
-					'hostid' => $hostids['templates'],
-					'templateid' => array_keys($db_templates)
-				]
+				'filter' => ['hostid' => $hostids['templates']]
 			];
 			$db_templates = DBselect(DB::makeSql('hosts_templates', $options));
 
 			while ($db_template = DBfetch($db_templates)) {
-				$db_hosts[$db_template['hostid']]['templates'][$db_template['hosttemplateid']] =
-					array_diff_key($db_template, array_flip(['hostid']));
+				if (!$accessible_templates || array_key_exists($db_template['templateid'], $accessible_templates)) {
+					$db_hosts[$db_template['hostid']]['templates'][$db_template['hosttemplateid']] =
+						array_diff_key($db_template, array_flip(['hostid']));
+				}
+				else {
+					$db_hosts[$db_template['hostid']]['nopermissions_templates'][$db_template['hosttemplateid']] =
+						array_diff_key($db_template, array_flip(['hostid']));
+				}
 			}
 		}
 

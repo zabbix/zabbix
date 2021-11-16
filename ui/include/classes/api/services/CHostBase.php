@@ -128,27 +128,34 @@ abstract class CHostBase extends CApiService {
 		$ins_templates = [];
 		$del_links = [];
 		$check_double_linkage = false;
-		$all_upd_templateids = [];
 		$del_templates = [];
-		$del_templates_clear = [];
 
-		foreach ($hosts as $i1 => $host) {
+		foreach ($hosts as $host) {
 			if (array_key_exists('templates', $host)) {
 				$db_templates = ($db_hosts !== null)
 					? array_column($db_hosts[$host[$id_field_name]]['templates'], null, 'templateid')
 					: [];
-				$templates_count = count($host['templates']);
 				$templateids = array_column($host['templates'], 'templateid');
-				$upd_templates = [];
+				$templates_count = count($host['templates']);
+				$upd_templateids = [];
 
-				foreach ($host['templates'] as $i2 => $template) {
+				if ($db_hosts !== null
+						&& array_key_exists('nopermissions_templates', $db_hosts[$host[$id_field_name]])) {
+					foreach ($db_hosts[$host[$id_field_name]]['nopermissions_templates'] as $template) {
+						$templateids[] = $template['templateid'];
+						$templates_count++;
+						$upd_templateids[] = $template['templateid'];
+
+					}
+				}
+
+				foreach ($host['templates'] as $template) {
 					if (array_key_exists($template['templateid'], $db_templates)) {
-						$all_upd_templateids[] = $template['templateid'];
-						$upd_templates[$template['templateid']] = $i2;
+						$upd_templateids[] = $template['templateid'];
 						unset($db_templates[$template['templateid']]);
 					}
 					else {
-						$ins_templates[$template['templateid']][$host[$id_field_name]][$i1][$i2] = $templateids;
+						$ins_templates[$template['templateid']][$host[$id_field_name]] = $templateids;
 
 						if (($this instanceof CTemplate && $db_hosts !== null) || $templates_count > 1) {
 							$check_double_linkage = true;
@@ -159,44 +166,34 @@ abstract class CHostBase extends CApiService {
 				foreach ($db_templates as $db_template) {
 					$del_links[$db_template['templateid']][$host[$id_field_name]] = true;
 
-					if (($this instanceof CHost || $this instanceof CTemplate) && $upd_templates) {
-						$del_templates[$db_template['templateid']][$i1] = $upd_templates;
-					}
-				}
-
-				if (array_key_exists('templates_clear', $host)) {
-					foreach ($host['templates_clear'] as $i2 => $template) {
-						$del_templates_clear[$template['templateid']][$i1] = $i2;
+					if (($this instanceof CHost || $this instanceof CTemplate) && $upd_templateids) {
+						$del_templates[$db_template['templateid']][$host[$id_field_name]] = $upd_templateids;
 					}
 				}
 			}
 			elseif (array_key_exists('templates_clear', $host)) {
 				$templateids = array_column($host['templates_clear'], 'templateid');
-				$upd_templates = [];
+				$upd_templateids = [];
 
 				foreach ($db_hosts[$host[$id_field_name]]['templates'] as $db_template) {
 					if (!in_array($db_template['templateid'], $templateids)) {
-						$all_upd_templateids[] = $db_template['templateid'];
-						$upd_templates[$db_template['templateid']] = '';
+						$upd_templateids[] = $db_template['templateid'];
 					}
 				}
 
-				foreach ($host['templates_clear'] as $i2 => $template) {
+				foreach ($host['templates_clear'] as $template) {
 					$del_links[$template['templateid']][$host[$id_field_name]] = true;
 
-					if (($this instanceof CHost || $this instanceof CTemplate) && $upd_templates) {
-						$del_templates[$template['templateid']][$i1] = $upd_templates;
-						$del_templates_clear[$template['templateid']][$i1] = $i2;
+					if (($this instanceof CHost || $this instanceof CTemplate) && $upd_templateids) {
+						$del_templates[$template['templateid']][$host[$id_field_name]] = $upd_templateids;
 					}
 				}
 			}
 		}
 
 		if ($del_templates) {
-			$this->checkTriggerDependenciesOfUpdTemplates($all_upd_templateids, $del_templates, $del_templates_clear,
-				'templates_clear'
-			);
-			$this->checkTriggerExpressionsOfDelTemplates($del_templates, $del_templates_clear, 'templates_clear');
+			$this->checkTriggerDependenciesOfUpdTemplates($del_templates);
+			$this->checkTriggerExpressionsOfDelTemplates($del_templates);
 		}
 
 		if ($ins_templates) {
@@ -217,16 +214,20 @@ abstract class CHostBase extends CApiService {
 	 * Check whether triggers of existing templates have not dependencies on triggers of unlinked templates on target
 	 * hosts or templates.
 	 *
-	 * @param array  $all_upd_templateids
-	 * @param array  $del_templates
-	 * @param string $del_templates[<templateid>][<host index>][<upd_templateid]  Index of updated template.
-	 * @param array  $del_templates_clear[<templateid>][<host index>]             Index of template.
-	 * @param array  $input_param
+	 * @param array $del_templates
+	 * @param array $del_templates[<templateid>][<hostid>]  Array of IDs of existing templates.
 	 *
 	 * @throws APIException
 	 */
-	protected function checkTriggerDependenciesOfUpdTemplates(array $all_upd_templateids, array $del_templates,
-			array $del_templates_clear, string $input_param): void {
+	protected function checkTriggerDependenciesOfUpdTemplates(array $del_templates): void {
+		$all_upd_templates = [];
+
+		foreach ($del_templates as $hosts) {
+			foreach ($hosts as $hostid => $upd_templateids) {
+				$all_upd_templates += array_flip($upd_templateids);
+			}
+		}
+
 		$result = DBselect(
 			'SELECT DISTINCT i.hostid AS del_templateid,td.triggerid_down,ii.hostid'.
 			' FROM items i,functions f,trigger_depends td,functions ff,items ii'.
@@ -235,59 +236,30 @@ abstract class CHostBase extends CApiService {
 				' AND ff.triggerid=td.triggerid_down'.
 				' AND ii.itemid=ff.itemid'.
 				' AND '.dbConditionInt('i.hostid', array_keys($del_templates)).
-				' AND '.dbConditionInt('ii.hostid', $all_upd_templateids)
+				' AND '.dbConditionInt('ii.hostid', array_keys($all_upd_templates))
 		);
 
 		while ($row = DBfetch($result)) {
-			foreach ($del_templates[$row['del_templateid']] as $i1 =>$upd_templates) {
-				if (array_key_exists($row['hostid'], $upd_templates)) {
-					if (array_key_exists($row['del_templateid'], $del_templates_clear)
-							&& array_key_exists($i1, $del_templates_clear[$row['del_templateid']])) {
-						if ($input_param === 'templates_clear') {
-							$i2 = $del_templates_clear[$row['del_templateid']][$i1];
-							$path = '/'.($i1 + 1).'/templates_clear';
+			foreach ($del_templates[$row['del_templateid']] as $hostid => $upd_templateids) {
+				if (in_array($row['hostid'], $upd_templateids)) {
+					$objects = DB::select('hosts', [
+						'output' => ['host', 'status'],
+						'hostids' => [$row['del_templateid'], $row['hostid'], $hostid],
+						'preservekeys' => true
+					]);
 
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-								$path.'/'.($i2 + 1).'/templateid',
-								self::getFormattedTriggerError(
-									_('cannot be unlinked without template "%1$s" due to dependency of trigger "%2$s"'),
-									$row['hostid'], $row['triggerid_down']
-								)
-							));
-						}
-						else {
-							$objectid = $i1;
-							$i1 = $del_templates_clear[$row['del_templateid']][$objectid];
-							$path = '/'.($i1 + 1);
+					$triggers = DB::select('triggers', [
+						'output' => ['description'],
+						'triggerids' => $row['triggerid_down']
+					]);
 
-							$objects = DB::select('hosts', [
-								'output' => ['host', 'status'],
-								'hostids' => $objectid
-							]);
+					$error = ($objects[$hostid]['status'] == HOST_STATUS_TEMPLATE)
+						? _('Unable to unlink template "%1$s" without template "%2$s" from template "%3$s" due to dependency of trigger "%4$s".')
+						: _('Unable to unlink template "%1$s" without template "%2$s" from host "%3$s" due to dependency of trigger "%4$s".');
 
-							$error = ($objects[0]['status'] == HOST_STATUS_TEMPLATE)
-								? _('cannot be unlinked without template "%1$s" from template "%2$s" due to dependency of trigger "%3$s"')
-								: _('cannot be unlinked without template "%1$s" from host "%2$s" due to dependency of trigger "%3$s"');
-
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $path,
-								self::getFormattedTriggerError($error, $row['hostid'], $row['triggerid_down'],
-									$objects[0]['host']
-								)
-							));
-						}
-					}
-					else {
-						$i2 = $upd_templates[$row['hostid']];
-						$path = '/'.($i1 + 1).'/templates';
-
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-							$path.'/'.($i2 + 1).'/templateid',
-							self::getFormattedTriggerError(
-								_('cannot be linked without template "%1$s" due to dependency of trigger "%2$s"'),
-								$row['del_templateid'], $row['triggerid_down']
-							)
-						));
-					}
+					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $objects[$row['del_templateid']]['host'],
+						$objects[$row['hostid']]['host'], $objects[$hostid]['host'], $triggers[0]['description']
+					));
 				}
 			}
 		}
@@ -296,15 +268,12 @@ abstract class CHostBase extends CApiService {
 	/**
 	 * Check whether all templates of triggers of unlinking templates are unlinked from target hosts or templates.
 	 *
-	 * @param array  $del_templates
-	 * @param string $del_templates[<templateid>][<host index>][<upd_templateid]  Index of updated template.
-	 * @param array  $del_templates_clear[<templateid>][<host index>]             Index of template.
-	 * @param string $input_param
+	 * @param array $del_templates
+	 * @param array $del_templates[<templateid>][<hostid>]  Array of IDs of existing templates.
 	 *
 	 * @throws APIException if not linked template is found.
 	 */
-	protected function checkTriggerExpressionsOfDelTemplates(array $del_templates, array $del_templates_clear,
-			string $input_param): void {
+	protected function checkTriggerExpressionsOfDelTemplates(array $del_templates): void {
 		$result = DBselect(
 			'SELECT DISTINCT i.hostid AS del_templateid,f.triggerid,ii.hostid'.
 			' FROM items i,functions f,functions ff,items ii,hosts h'.
@@ -317,55 +286,26 @@ abstract class CHostBase extends CApiService {
 		);
 
 		while ($row = DBfetch($result)) {
-			foreach ($del_templates[$row['del_templateid']] as $i1 => $upd_templates) {
-				if (array_key_exists($row['hostid'], $upd_templates)) {
-					if (array_key_exists($row['del_templateid'], $del_templates_clear)
-							&& array_key_exists($i1, $del_templates_clear[$row['del_templateid']])) {
-						if ($input_param === 'templates_clear') {
-							$i2 = $del_templates_clear[$row['del_templateid']][$i1];
-							$path = '/'.($i1 + 1).'/templates_clear';
+			foreach ($del_templates[$row['del_templateid']] as $hostid => $upd_templateids) {
+				if (in_array($row['hostid'], $upd_templateids)) {
+					$objects = DB::select('hosts', [
+						'output' => ['host', 'status'],
+						'hostids' => [$row['del_templateid'], $row['hostid'], $hostid],
+						'preservekeys' => true
+					]);
 
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-								$path.'/'.($i2 + 1).'/templateid',
-								self::getFormattedTriggerError(
-									_('cannot be unlinked without template "%1$s" due to expression of trigger "%2$s"'),
-									$row['hostid'], $row['triggerid']
-								)
-							));
-						}
-						else {
-							$objectid = $i1;
-							$i1 = $del_templates_clear[$row['del_templateid']][$objectid];
-							$path = '/'.($i1 + 1);
+					$triggers = DB::select('triggers', [
+						'output' => ['description'],
+						'triggerids' => $row['triggerid']
+					]);
 
-							$objects = DB::select('hosts', [
-								'output' => ['host', 'status'],
-								'hostids' => $objectid
-							]);
+					$error = ($objects[$hostid]['status'] == HOST_STATUS_TEMPLATE)
+						? _('Unable to unlink template "%1$s" without template "%2$s" from template "%3$s" due to expression of trigger "%4$s".')
+						: _('Unable to unlink template "%1$s" without template "%2$s" from host "%3$s" due to expression of trigger "%4$s".');
 
-							$error = ($objects[0]['status'] == HOST_STATUS_TEMPLATE)
-								? _('cannot be unlinked without template "%1$s" from template "%2$s" due to expression of trigger "%3$s"')
-								: _('cannot be unlinked without template "%1$s" from host "%2$s" due to expression of trigger "%3$s"');
-
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $path,
-								self::getFormattedTriggerError($error, $row['hostid'], $row['triggerid'],
-									$objects[0]['host']
-								)
-							));
-						}
-					}
-					else {
-						$i2 = $upd_templates[$row['hostid']];
-						$path = '/'.($i1 + 1).'/templates';
-
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-							$path.'/'.($i2 + 1).'/templateid',
-							self::getFormattedTriggerError(
-								_('cannot be linked without template "%1$s" due to expression of trigger "%2$s"'),
-								$row['del_templateid'], $row['triggerid']
-							)
-						));
-					}
+					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $objects[$row['del_templateid']]['host'],
+						$objects[$row['hostid']]['host'], $objects[$hostid]['host'], $triggers[0]['description']
+					));
 				}
 			}
 		}
@@ -374,7 +314,7 @@ abstract class CHostBase extends CApiService {
 	/**
 	 * Searches for circular linkages.
 	 *
-	 * @param array $ins_links[<templateid>][<hostid>][<host index>][<template index>]
+	 * @param array $ins_links[<templateid>][<hostid>]
 	 * @param array $del_links[<templateid>][<hostid>]
 	 */
 	private static function checkCircularLinkageNew(array $ins_links, array $del_links): void {
@@ -417,16 +357,11 @@ abstract class CHostBase extends CApiService {
 		}
 
 		foreach ($ins_links as $templateid => $hostids) {
-			foreach ($hostids as $hostid => $i1_i2_templateids) {
+			foreach ($hostids as $hostid => $foo) {
 				if (array_key_exists($hostid, $links)){
 					$links_path = [$hostid => true];
 
 					if (self::circularLinkageExists($links, $templateid, $links[$hostid], $links_path)) {
-						$i1 = key($i1_i2_templateids);
-						$i2 = key($i1_i2_templateids[$i1]);
-
-						$path = '/'.($i1 + 1).'/templates';
-
 						$template_name = '';
 						$options = [
 							'output' => ['hostid', 'host'],
@@ -444,10 +379,8 @@ abstract class CHostBase extends CApiService {
 							}
 						}
 
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-							$path.'/'.($i2 + 1).'/templateid', _s('cannot be linked due to circular linkage (%1$s)',
-								$template_name.' -> '.implode(' -> ', $links_path).' -> '.$template_name
-							)
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Circular template linkage is not allowed (%1$s).',
+							$template_name.' -> '.implode(' -> ', $links_path).' -> '.$template_name
 						));
 					}
 				}
@@ -486,27 +419,6 @@ abstract class CHostBase extends CApiService {
 		}
 
 		return false;
-	}
-
-	/**
-	 * Searches for circular linkages for specific template.
-	 *
-	 * @param array  $links[<templateid>][<hostid>]  The list of linkages.
-	 * @param string $templateid                     ID of the template to check circular linkages.
-	 * @param array  $hostids[<hostid>]
-	 *
-	 * @throws APIException if circular linkage is found.
-	 */
-	private static function checkTemplateCircularLinkage(array $links, $templateid, array $hostids): void {
-		if (array_key_exists($templateid, $hostids)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Circular template linkage is not allowed.'));
-		}
-
-		foreach ($hostids as $hostid => $foo) {
-			if (array_key_exists($hostid, $links)) {
-				self::checkTemplateCircularLinkage($links, $templateid, $links[$hostid]);
-			}
-		}
 	}
 
 	/**
@@ -627,8 +539,7 @@ abstract class CHostBase extends CApiService {
 	 * target hosts or templates.
 	 *
 	 * @param array  $ins_templates
-	 * @param string $ins_templates[<templateid>][<hostid>][<host index>][<template index>]  Array of host templates
-	 *                                                                                       IDs.
+	 * @param string $ins_templates[<templateid>][<hostid>]  Array of IDs of templates to replace on target object.
 	 *
 	 * @throws APIException if not linked template is found.
 	 */
@@ -646,33 +557,58 @@ abstract class CHostBase extends CApiService {
 		);
 
 		while ($row = DBfetch($result)) {
-			foreach ($ins_templates[$row['ins_templateid']] as $hostid => $i1_i2_templateids) {
-				$i1 = key($i1_i2_templateids);
-				$i2 = key($i1_i2_templateids[$i1]);
-				$templateids = $i1_i2_templateids[$i1][$i2];
-				$path = '/'.($i1 + 1).'/templates';
-
+			foreach ($ins_templates[$row['ins_templateid']] as $hostid => $templateids) {
 				if (bccomp($row['hostid'], $hostid) == 0 && $this instanceof CTemplate) {
+					$objects = DB::select('hosts', [
+						'output' => ['host', 'status', 'flags'],
+						'hostids' => [$row['ins_templateid'], $hostid],
+						'preservekeys' => true
+					]);
+
 					$triggers = DB::select('triggers', [
 						'output' => ['description'],
 						'triggerids' => $row['triggerid_down']
 					]);
 
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-						$path.'/'.($i2 + 1).'/templateid',
-						_s('cannot be linked due to dependency of trigger "%1$s"',
-							$triggers[0]['description']
-						)
+					if ($objects[$hostid]['status'] == HOST_STATUS_TEMPLATE) {
+						$error = _('Unable to link template "%1$s" to template "%2$s" due to dependency of trigger "%3$s".');
+					}
+					elseif ($objects[$hostid]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+						$error = _('Unable to link template "%1$s" to host prototype "%2$s" due to dependency of trigger "%3$s".');
+					}
+					else {
+						$error = _('Unable to link template "%1$s" to host "%2$s" due to dependency of trigger "%3$s".');
+					}
+
+					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $objects[$row['ins_templateid']]['host'],
+						$objects[$hostid]['host'], $triggers[0]['description']
 					));
 				}
 
 				if (!in_array($row['hostid'], $templateids)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-						$path.'/'.($i2 + 1).'/templateid',
-						self::getFormattedTriggerError(
-							_('cannot be linked without template "%1$s" due to dependency of trigger "%2$s"'),
-							$row['hostid'], $row['triggerid_down']
-						)
+					$objects = DB::select('hosts', [
+						'output' => ['host', 'status', 'flags'],
+						'hostids' => [$row['ins_templateid'], $row['hostid'], $hostid],
+						'preservekeys' => true
+					]);
+
+					$triggers = DB::select('triggers', [
+						'output' => ['description'],
+						'triggerids' => $row['triggerid_down']
+					]);
+
+					if ($objects[$hostid]['status'] == HOST_STATUS_TEMPLATE) {
+						$error = _('Unable to link template "%1$s" without template "%2$s"  to template "%3$s" due to dependency of trigger "%4$s".');
+					}
+					elseif ($objects[$hostid]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+						$error = _('Unable to link template "%1$s" without template "%2$s" to host prototype "%3$s" due to dependency of trigger "%4$s".');
+					}
+					else {
+						$error = _('Unable to link template "%1$s" without template "%2$s" to host "%3$s" due to dependency of trigger "%4$s".');
+					}
+
+					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $objects[$row['ins_templateid']]['host'],
+						$objects[$row['hostid']]['host'], $objects[$hostid]['host'], $triggers[0]['description']
 					));
 				}
 			}
@@ -681,12 +617,14 @@ abstract class CHostBase extends CApiService {
 		if ($this instanceof CTemplate) {
 			$hostids = [];
 
-			foreach ($ins_templates as $hostids_i1_i2_templateids) {
-				$hostids += array_flip(array_keys($hostids_i1_i2_templateids));
+			foreach ($ins_templates as $hostids_templateids) {
+				foreach ($hostids_templateids as $hostid => $templateids) {
+					$hostids[$hostid] = true;
+				}
 			}
 
 			$result = DBselect(
-				'SELECT DISTINCT i.hostid AS ins_templateid,td.triggerid_up,td.triggerid_down,ii.hostid'.
+				'SELECT DISTINCT i.hostid AS ins_templateid,td.triggerid_down,ii.hostid'.
 				' FROM items i,functions f,trigger_depends td,functions ff,items ii'.
 				' WHERE f.itemid=i.itemid'.
 					' AND td.triggerid_up=f.triggerid'.
@@ -698,18 +636,29 @@ abstract class CHostBase extends CApiService {
 
 			while ($row = DBfetch($result)) {
 				if (array_key_exists($row['hostid'], $ins_templates[$row['ins_templateid']])) {
-					$i1 = key($ins_templates[$row['ins_templateid']][$row['hostid']]);
-					$i2 = key($ins_templates[$row['ins_templateid']][$row['hostid']][$i1]);
-					$path = '/'.($i1 + 1).'/templates';
+					$objects = DB::select('hosts', [
+						'output' => ['host', 'status', 'flags'],
+						'hostids' => [$row['ins_templateid'], $row['hostid']],
+						'preservekeys' => true
+					]);
 
 					$triggers = DB::select('triggers', [
 						'output' => ['description'],
 						'triggerids' => $row['triggerid_down']
 					]);
 
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-						$path.'/'.($i2 + 1).'/templateid',
-						_s('cannot be linked due to dependency of trigger "%1$s"', $triggers[0]['description'])
+					if ($objects[$row['hostid']]['status'] == HOST_STATUS_TEMPLATE) {
+						$error = _('Unable to link template "%1$s" to template "%2$s" due to dependency of trigger "%3$s".');
+					}
+					elseif ($objects[$row['hostid']]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+						$error = _('Unable to link template "%1$s" to host prototype "%2$s" due to dependency of trigger "%3$s".');
+					}
+					else {
+						$error = _('Unable to link template "%1$s" to host "%2$s" due to dependency of trigger "%3$s".');
+					}
+
+					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $objects[$row['ins_templateid']]['host'],
+						$objects[$row['hostid']]['host'], $triggers[0]['description']
 					));
 				}
 			}
@@ -719,7 +668,8 @@ abstract class CHostBase extends CApiService {
 	/**
 	 * Check whether all templates of triggers of linking templates are linked to target hosts or templates.
 	 *
-	 * @param array $ins_templates[<templateid>][<hostid>][<host index>][<template index>]  Array of host templates IDs.
+	 * @param array  $ins_templates
+	 * @param string $ins_templates[<templateid>][<hostid>]  Array of IDs of templates to replace on target object.
 	 *
 	 * @throws APIException if not linked template is found.
 	 */
@@ -736,66 +686,61 @@ abstract class CHostBase extends CApiService {
 		);
 
 		while ($row = DBfetch($result)) {
-			foreach ($ins_templates[$row['ins_templateid']] as $hostid => $i1_i2_templateids) {
-				$i1 = key($i1_i2_templateids);
-				$i2 = key($i1_i2_templateids[$i1]);
-				$templateids = $i1_i2_templateids[$i1][$i2];
-				$path = '/'.($i1 + 1).'/templates';
-
+			foreach ($ins_templates[$row['ins_templateid']] as $hostid => $templateids) {
 				if (bccomp($row['hostid'], $hostid) == 0 && $this instanceof CTemplate) {
+					$objects = DB::select('hosts', [
+						'output' => ['host', 'status', 'flags'],
+						'hostids' => [$row['ins_templateid'], $hostid],
+						'preservekeys' => true
+					]);
+
 					$triggers = DB::select('triggers', [
 						'output' => ['description'],
 						'triggerids' => $row['triggerid']
 					]);
 
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-						$path.'/'.($i2 + 1).'/templateid',
-						_s('cannot be linked due to expression of trigger "%1$s"',
-							$triggers[0]['description']
-						)
+					if ($objects[$hostid]['status'] == HOST_STATUS_TEMPLATE) {
+						$error = _('Unable to link template "%1$s" to template "%2$s" due to expression of trigger "%3$s".');
+					}
+					elseif ($objects[$hostid]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+						$error = _('Unable to link template "%1$s" to host prototype "%2$s" due to expression of trigger "%3$s".');
+					}
+					else {
+						$error = _('Unable to link template "%1$s" to host "%2$s" due to expression of trigger "%3$s".');
+					}
+
+					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $objects[$row['ins_templateid']]['host'],
+						$objects[$hostid]['host'], $triggers[0]['description']
 					));
 				}
 
 				if (!in_array($row['hostid'], $templateids)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-						$path.'/'.($i2 + 1).'/templateid',
-						self::getFormattedTriggerError(
-							_('cannot be linked without template "%1$s" due to expression of trigger "%2$s"'),
-							$row['hostid'], $row['triggerid']
-						)
+					$objects = DB::select('hosts', [
+						'output' => ['host', 'status', 'flags'],
+						'hostids' => [$row['ins_templateid'], $row['hostid'], $hostid],
+						'preservekeys' => true
+					]);
+
+					$triggers = DB::select('triggers', [
+						'output' => ['description'],
+						'triggerids' => $row['triggerid']
+					]);
+
+					if ($objects[$hostid]['status'] == HOST_STATUS_TEMPLATE) {
+						$error = _('Unable to link template "%1$s" without template "%2$s"  to template "%3$s" due to expression of trigger "%4$s".');
+					}
+					elseif ($objects[$hostid]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+						$error = _('Unable to link template "%1$s" without template "%2$s" to host prototype "%3$s" due to expression of trigger "%4$s".');
+					}
+					else {
+						$error = _('Unable to link template "%1$s" without template "%2$s" to host "%3$s" due to expression of trigger "%4$s".');
+					}
+
+					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $objects[$row['ins_templateid']]['host'],
+						$objects[$row['hostid']]['host'], $objects[$hostid]['host'], $triggers[0]['description']
 					));
 				}
 			}
-		}
-	}
-
-	/**
-	 * Get formatted trigger error message.
-	 *
-	 * @param string      $error
-	 * @param string      $templateid
-	 * @param string      $triggerid
-	 * @param string|null $host
-	 *
-	 * @return string
-	 */
-	protected static function getFormattedTriggerError(string $error, string $templateid, string $triggerid,
-			string $host = null): string {
-		$templates = DB::select('hosts', [
-			'output' => ['host'],
-			'hostids' => $templateid
-		]);
-
-		$triggers = DB::select('triggers', [
-			'output' => ['description'],
-			'triggerids' => $triggerid
-		]);
-
-		if ($host === null) {
-			return sprintf($error, $templates[0]['host'], $triggers[0]['description']);
-		}
-		else {
-			return sprintf($error, $templates[0]['host'], $host, $triggers[0]['description']);
 		}
 	}
 
@@ -1100,6 +1045,27 @@ abstract class CHostBase extends CApiService {
 
 		foreach ($templateids as $templateid) {
 			self::checkTemplateCircularLinkage($links, $templateid, $links[$templateid]);
+		}
+	}
+
+	/**
+	 * Searches for circular linkages for specific template.
+	 *
+	 * @param array  $links[<templateid>][<hostid>]  The list of linkages.
+	 * @param string $templateid                     ID of the template to check circular linkages.
+	 * @param array  $hostids[<hostid>]
+	 *
+	 * @throws APIException if circular linkage is found.
+	 */
+	private static function checkTemplateCircularLinkage(array $links, $templateid, array $hostids): void {
+		if (array_key_exists($templateid, $hostids)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Circular template linkage is not allowed.'));
+		}
+
+		foreach ($hostids as $hostid => $foo) {
+			if (array_key_exists($hostid, $links)) {
+				self::checkTemplateCircularLinkage($links, $templateid, $links[$hostid]);
+			}
 		}
 	}
 

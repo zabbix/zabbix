@@ -730,9 +730,7 @@ class CTemplate extends CHostGeneral {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$all_upd_templates = [];
 		$del_templates = [];
-		$del_templates_clear = [];
 		$result = DBselect(
 			'SELECT ht.hostid,ht.templateid AS del_templateid,htt.templateid'.
 			' FROM hosts_templates ht, hosts_templates htt'.
@@ -742,17 +740,12 @@ class CTemplate extends CHostGeneral {
 		);
 
 		while ($row = DBfetch($result)) {
-			$all_upd_templates[$row['templateid']] = true;
-			$del_templates[$row['del_templateid']][$row['hostid']][$row['templateid']] = '';
-			$del_templates_clear[$row['del_templateid']][$row['hostid']] =
-				array_search($row['del_templateid'], $templateids);
+			$del_templates[$row['del_templateid']][$row['hostid']][] = $row['templateid'];
 		}
 
 		if ($del_templates) {
-			$this->checkTriggerDependenciesOfUpdTemplates(array_keys($all_upd_templates), $del_templates,
-				$del_templates_clear, ''
-			);
-			$this->checkTriggerExpressionsOfDelTemplates($del_templates, $del_templates_clear, '');
+			$this->checkTriggerDependenciesOfUpdTemplates($del_templates);
+			$this->checkTriggerExpressionsOfDelTemplates($del_templates);
 		}
 	}
 
