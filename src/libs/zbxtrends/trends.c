@@ -676,3 +676,28 @@ int	zbx_trends_eval_sum(const char *table, zbx_uint64_t itemid, int start, int e
 
 	return FAIL;
 }
+
+zbx_trend_state_t	zbx_trends_get_avg(const char *table, zbx_uint64_t itemid, int start, int end, double *value)
+{
+	zbx_trend_state_t	state;
+
+	if (FAIL == zbx_tfc_get_value(itemid, start, end, ZBX_TREND_FUNCTION_AVG, value, &state))
+	{
+		state = trends_eval_avg(table, itemid, start, end, value);
+		zbx_tfc_put_value(itemid, start, end, ZBX_TREND_FUNCTION_AVG, *value, state);
+	}
+
+	return state;
+}
+
+const char	*zbx_trends_error(zbx_trend_state_t state)
+{
+	if (0 > state || state >= ZBX_TREND_STATE_COUNT)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return "unknown trend cache state";
+	}
+
+	return trends_errors[state];
+}
+

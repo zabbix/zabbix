@@ -51,15 +51,13 @@ DB_RESULT	__wrap_DBselect(const char *fmt, ...)
 static	zbx_mock_handle_t	hout;
 static int			iteration;
 
-int	__wrap_zbx_trends_eval_avg(const char *table, zbx_uint64_t itemid, int start, int end, double *value,
-		char **error)
+zbx_trend_state_t	__wrap_zbx_trends_get_avg(const char *table, zbx_uint64_t itemid, int start, int end, double *value)
 {
 	zbx_mock_handle_t	htime;
 	zbx_timespec_t		start_exp, end_exp, start_ret = {start, 0}, end_ret = {end, 0};
 
 	ZBX_UNUSED(table);
 	ZBX_UNUSED(itemid);
-	ZBX_UNUSED(error);
 
 	*value = 0;
 
@@ -77,15 +75,16 @@ int	__wrap_zbx_trends_eval_avg(const char *table, zbx_uint64_t itemid, int start
 	zbx_mock_assert_timespec_eq("start time", &start_exp, &start_ret);
 	zbx_mock_assert_timespec_eq("end time", &end_exp, &end_ret);
 
-	return SUCCEED;
+	return ZBX_TREND_STATE_NORMAL;
 }
 
 void	zbx_mock_test_entry(void **state)
 {
 	zbx_timespec_t		ts;
-	const char		*period, *seasons;
+	const char		*period;
 	char			*error = NULL;
-	int			skip;
+	int			skip, season_num;
+	zbx_time_unit_t		season_unit;
 	zbx_vector_dbl_t	values;
 	zbx_mock_handle_t	handle;
 
@@ -100,15 +99,20 @@ void	zbx_mock_test_entry(void **state)
 		fail_msg("Invalid input time format");
 
 	period = zbx_mock_get_parameter_string("in.period");
-	seasons = zbx_mock_get_parameter_string("in.seasons");
+	season_num = atoi(zbx_mock_get_parameter_string("in.season_num"));
+	season_unit = zbx_tm_str_to_unit(zbx_mock_get_parameter_string("in.season"));
+
 	skip = atoi(zbx_mock_get_parameter_string("in.skip"));
 
 	zbx_vector_dbl_create(&values);
 
 	hout = zbx_mock_get_parameter_handle("out.data");
 
-	if (FAIL == zbx_baseline_get_data(0, ITEM_VALUE_TYPE_FLOAT, ts.sec, period, seasons, skip, &values, &error))
+	if (FAIL == zbx_baseline_get_data(0, ITEM_VALUE_TYPE_FLOAT, ts.sec, period, season_num, season_unit, skip,
+			&values, &error))
+	{
 		fail_msg("failed to get baseline data: %s", error);
+	}
 
 	zbx_vector_dbl_destroy(&values);
 

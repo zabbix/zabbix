@@ -58,7 +58,7 @@ zbx_baseline_get_data_LDFLAGS = @SERVER_LDFLAGS@ \
 	-Wl,--wrap=DBfetch \
 	-Wl,--wrap=DBselect \
 	-Wl,--wrap=DBis_null \
-	-Wl,--wrap=zbx_trends_eval_avg
+	-Wl,--wrap=zbx_trends_get_avg
 
 zbx_baseline_get_data_CFLAGS = $(COMMON_COMPILER_FLAGS)
 

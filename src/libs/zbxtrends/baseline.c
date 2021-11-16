@@ -45,9 +45,9 @@
 static int	baseline_get_common_data(zbx_uint64_t itemid, const char *table, time_t now, const char *period,
 		int season_num, zbx_time_unit_t season_unit, int skip, zbx_vector_dbl_t *values, char **error)
 {
-	int		i, start, end;
-	double		value_dbl;
-	struct tm	tm, tm_now;
+	int			i, start, end;
+	double			value_dbl;
+	struct tm		tm, tm_now;
 
 	tm_now = *localtime(&now);
 
@@ -58,10 +58,20 @@ static int	baseline_get_common_data(zbx_uint64_t itemid, const char *table, time
 
 		if (skip <= i)
 		{
-			if (FAIL == zbx_trends_eval_avg(table, itemid, start, end, &value_dbl, error))
-				return FAIL;
+			zbx_trend_state_t	state;
 
-			zbx_vector_dbl_append(values, value_dbl);
+			state = zbx_trends_get_avg(table, itemid, start, end, &value_dbl);
+
+			if (ZBX_TREND_STATE_NORMAL != state)
+			{
+				if (0 == i || ZBX_TREND_STATE_NODATA != state)
+				{
+					*error = zbx_strdup(NULL, zbx_trends_error(state));
+					return FAIL;
+				}
+			}
+			else
+				zbx_vector_dbl_append(values, value_dbl);
 		}
 
 		tm = tm_now;
@@ -120,10 +130,20 @@ static int	baseline_get_isoyear_data(zbx_uint64_t itemid, const char *table, tim
 	{
 		if (skip <= i)
 		{
-			if (FAIL == zbx_trends_eval_avg(table, itemid, start, end, &value_dbl, error))
-				return FAIL;
+			zbx_trend_state_t	state;
 
-			zbx_vector_dbl_append(values, value_dbl);
+			state = zbx_trends_get_avg(table, itemid, start, end, &value_dbl);
+
+			if (ZBX_TREND_STATE_NORMAL != state)
+			{
+				if (0 == i || ZBX_TREND_STATE_NODATA != state)
+				{
+					*error = zbx_strdup(NULL, zbx_trends_error(state));
+					return FAIL;
+				}
+			}
+			else
+				zbx_vector_dbl_append(values, value_dbl);
 		}
 
 		zbx_tm_sub(&tm_end, 1, ZBX_TIME_UNIT_ISOYEAR);
@@ -175,11 +195,10 @@ static int	baseline_get_isoyear_data(zbx_uint64_t itemid, const char *table, tim
  *                                                                            *
  ******************************************************************************/
 int	zbx_baseline_get_data(zbx_uint64_t itemid, unsigned char value_type, time_t now, const char *period,
-		const char *seasons, int skip, zbx_vector_dbl_t *values, char **error)
+		int season_num, zbx_time_unit_t season_unit, int skip, zbx_vector_dbl_t *values, char **error)
 {
-	zbx_time_unit_t	period_unit, season_unit;
-	int		season_num, ret = FAIL;
-	size_t		len;
+	zbx_time_unit_t	period_unit;
+	int		ret = FAIL;
 	const char	*table;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -199,12 +218,6 @@ int	zbx_baseline_get_data(zbx_uint64_t itemid, unsigned char value_type, time_t 
 
 	if (FAIL == zbx_trends_parse_base(period, &period_unit, error))
 		goto out;
-
-	if (FAIL == zbx_tm_parse_period(seasons, &len, &season_num, &season_unit, error))
-	{
-		*error = zbx_strdup(*error, "invalid seasons parameter");
-		goto out;
-	}
 
 	if (ZBX_TIME_UNIT_MONTH == season_unit && ZBX_TIME_UNIT_WEEK == period_unit)
 	{

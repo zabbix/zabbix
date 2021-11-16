@@ -3653,16 +3653,17 @@ out:
 static int	evaluate_BASELINE(zbx_variant_t *value, DC_ITEM *item, const char *func, const char *parameters,
 		const zbx_timespec_t *ts, char **error)
 {
-	int			ret = FAIL;
-	char			*period = NULL, *seasons = NULL;
+	int			ret = FAIL, season_num;
+	char			*period = NULL, *tmp;
 	zbx_vector_dbl_t	values;
 	double			value_dbl;
+	zbx_time_unit_t		season_unit;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_dbl_create(&values);
 
-	if (2 != num_param(parameters))
+	if (3 != num_param(parameters))
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
@@ -3674,19 +3675,35 @@ static int	evaluate_BASELINE(zbx_variant_t *value, DC_ITEM *item, const char *fu
 		goto out;
 	}
 
-	if (SUCCEED != get_function_parameter_str(parameters, 2, &seasons))
+	if (SUCCEED != get_function_parameter_str(parameters, 2, &tmp) ||
+			0 >= (season_num = atoi(tmp)))
 	{
 		*error = zbx_strdup(*error, "invalid second parameter");
 		goto out;
 	}
+	zbx_free(tmp);
+
+	if (SUCCEED != get_function_parameter_str(parameters, 3, &tmp) ||
+			ZBX_TIME_UNIT_UNKNOWN == (season_unit = zbx_tm_str_to_unit(tmp)))
+	{
+		*error = zbx_strdup(*error, "invalid third parameter");
+		goto out;
+	}
+	zbx_free(tmp);
 
 	if (0 == strcmp(func, "wma"))
 	{
 		int	i;
 
-		if (SUCCEED != zbx_baseline_get_data(item->itemid, item->value_type, ts->sec, period, seasons, 1,
-				&values, error))
+		if (SUCCEED != zbx_baseline_get_data(item->itemid, item->value_type, ts->sec, period, season_num,
+				season_unit, 1, &values, error))
 		{
+			goto out;
+		}
+
+		if (0 == values.values_num)
+		{
+			*error = zbx_strdup(NULL, "not enough data");
 			goto out;
 		}
 
@@ -3702,9 +3719,15 @@ static int	evaluate_BASELINE(zbx_variant_t *value, DC_ITEM *item, const char *fu
 		double	value_period, value_dev, value_avg = 0;
 		int	i;
 
-		if (SUCCEED != zbx_baseline_get_data(item->itemid, item->value_type, ts->sec, period, seasons, 0,
-				&values, error))
+		if (SUCCEED != zbx_baseline_get_data(item->itemid, item->value_type, ts->sec, period, season_num,
+				season_unit, 0, &values, error))
 		{
+			goto out;
+		}
+
+		if (1 >= values.values_num)
+		{
+			*error = zbx_strdup(NULL, "not enough data");
 			goto out;
 		}
 
@@ -3734,7 +3757,6 @@ static int	evaluate_BASELINE(zbx_variant_t *value, DC_ITEM *item, const char *fu
 
 	ret = SUCCEED;
 out:
-	zbx_free(seasons);
 	zbx_free(period);
 
 	zbx_vector_dbl_destroy(&values);
