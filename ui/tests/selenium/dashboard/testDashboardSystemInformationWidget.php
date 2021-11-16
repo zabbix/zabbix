@@ -19,6 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/../common/testSystemInformation.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
  * @backup dashboard, ha_node, config
@@ -31,6 +32,13 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 
 	public static $dashboardid;				// Dashboard for checking widget content with enabled and disabled HA cluster.
 	public static $widgets_dashboardid;		// Dashboard for checking creation and update of system information widgets.
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
 
 	/**
 	 * Function creates dashboards with widgets for test and defines the corresponding dashboard IDs.
@@ -158,8 +166,8 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 	 * @onBefore prepareHANodeData
 	 */
 	public function testDashboardSystemInformationWidget_checkEnabledHA() {
-		$skip_fields = $this->checkEnabledHACluster(self::$dashboardid);
-		$this->assertScreenshotExcept(CDashboardElement::find()->one(), $skip_fields, 'widgets_with_ha');
+		$skip_fields = $this->assertEnabledHACluster(self::$dashboardid);
+		$this->assertScreenshotExcept(CDashboardElement::find()->one(), self::$skip_fields, 'widgets_with_ha');
 	}
 
 	/**
@@ -170,7 +178,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 	 * @onBefore changeFailoverDelay
 	 */
 	public function testDashboardSystemInformationWidget_checkServerStatus() {
-		$this->checkServerStatusAfterFailover(self::$dashboardid);
+		$this->assertServerStatusAfterFailover(self::$dashboardid);
 	}
 
 	public function getUserData() {
@@ -242,7 +250,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 		// Save the dashboard and check info displayed by the widgets.
 		$dashboard->save();
 		if ($action === 'update') {
-			$this->query('xpath://span[@title='.zbx_dbstr($page_name).']')->waitUntilClickable()->one()->click();
+			$this->query('xpath://span[@title='.CXPathHelper::escapeQuotes($page_name).']')->waitUntilClickable()->one()->click();
 		}
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
@@ -255,7 +263,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 			$this->assertEquals($refresh_interval, $widget->getRefreshInterval());
 
 			// Check that widget with the corresponding name is present in DB.
-			$widget_sql = 'SELECT count(widgetid) FROM widget WHERE type="systeminfo" AND dashboard_pageid in'.
+			$widget_sql = 'SELECT count(widgetid) FROM widget WHERE type='.zbx_dbstr('systeminfo').' AND dashboard_pageid IN'.
 					' (SELECT dashboard_pageid from dashboard_page WHERE name='.zbx_dbstr($page_name).')'.
 					' AND name='.zbx_dbstr(CTestArrayHelper::get($widget_data['fields'], 'Name', ''));
 			$this->assertEquals('1', CDBHelper::getValue($widget_sql));
@@ -267,11 +275,10 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 				'Refresh interval' => 'Default (15 minutes)',
 				'Show' => 'System stats'
 			];
-			foreach ($widget_data['fields'] as $field => $value) {
-				$field_values[$field] = $value;
-			}
+			$expected_values = array_merge($field_values, $widget_data['fields']);
+
 			$form = $widget->edit()->asForm();
-			$this->assertEquals($field_values, $form->getFields()->asValues());
+			$this->assertEquals($expected_values, $form->getFields()->asValues());
 			$form->submit();
 			$dashboard->cancelEditing();
 

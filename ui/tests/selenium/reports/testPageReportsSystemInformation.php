@@ -36,9 +36,8 @@ class testPageReportsSystemInformation extends testSystemInformation {
 	 * @onBefore prepareHANodeData
 	 */
 	public function testPageReportsSystemInformation_checkEnabledHA() {
-		$skip_fields = $this->checkEnabledHACluster();
-
-		$this->assertScreenshotExcept(null, $skip_fields, 'report_with_ha');
+		$skip_fields = $this->assertEnabledHACluster();
+		$this->assertScreenshotExcept(null, self::$skip_fields, 'report_with_ha');
 	}
 
 	/**
@@ -49,6 +48,6 @@ class testPageReportsSystemInformation extends testSystemInformation {
 	 * @onBefore changeFailoverDelay
 	 */
 	public function testPageReportsSystemInformation_CheckServerStatus() {
-		$this->checkServerStatusAfterFailover();
+		$this->assertServerStatusAfterFailover();
 	}
 }
