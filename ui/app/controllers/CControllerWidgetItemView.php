@@ -100,7 +100,10 @@ class CControllerWidgetItemView extends CControllerWidget {
 		}
 		else {
 			$items = API::Item()->get($options);
-			$itemid = $fields['itemid'][0];
+
+			if ($fields['itemid']) {
+				$itemid = $fields['itemid'][0];
+			}
 		}
 
 		if ($items) {
@@ -376,7 +379,6 @@ class CControllerWidgetItemView extends CControllerWidget {
 			$data[$v][$h]['item_value']['item_value_content']['data'][] = [
 				'value' => [
 					'data' => $value,
-					'value_type' => $value_type,
 					'classes' => $classes,
 					'styles' => $styles
 				]
