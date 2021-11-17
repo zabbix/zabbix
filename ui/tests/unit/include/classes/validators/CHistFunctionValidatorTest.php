@@ -37,6 +37,39 @@ class CHistFunctionValidatorTest extends TestCase {
 			['min_foreach(/host/key)', [], ['rc' => false, 'error' => 'unknown function "min_foreach"']],
 			['sum_foreach(/host/key)', [], ['rc' => false, 'error' => 'unknown function "sum_foreach"']],
 
+			['trendstl(/host/key)', ['calculated' => true], ['rc' => false, 'error' => 'mandatory parameter is missing in function "trendstl"']],
+			['trendstl(/host/key, 0, 1h, 1)', ['calculated' => true], ['rc' => false, 'error' => 'invalid second parameter in function "trendstl"']],
+			['trendstl(/host/key, 1m:now/h, 1h, 1d)', ['calculated' => true], ['rc' => false, 'error' => 'invalid second parameter in function "trendstl"']],
+			['trendstl(/host/key, #0, 1h, 1)', ['calculated' => true], ['rc' => false, 'error' => 'invalid second parameter in function "trendstl"']],
+			['trendstl(/host/key, 1y, 1h, 1)', ['calculated' => true], ['rc' => false, 'error' => 'invalid second parameter in function "trendstl"']],
+			['trendstl(/host/key, 240h:now/h, 1M, 1d)', [], ['rc' => false, 'error' => 'invalid third parameter in function "trendstl"']],
+			['trendstl(/host/key, 240h:now/h, 1y, 1d)', [], ['rc' => false, 'error' => 'invalid third parameter in function "trendstl"']],
+			['trendstl(/host/key, 1d:now/M-1h, 0, 1)', ['calculated' => true], ['rc' => false, 'error' => 'invalid third parameter in function "trendstl"']],
+			['trendstl(/host/key, 1h:now/h, 1m, 1d)', ['calculated' => true], ['rc' => false, 'error' => 'invalid third parameter in function "trendstl"']],
+			['trendstl(/host/key, 1d:now/M-1h, 1h, 0)', ['calculated' => true], ['rc' => false, 'error' => 'invalid fourth parameter in function "trendstl"']],
+			['trendstl(/host/key, 1d:now/M-1h, 1h, 1d, 0)', ['calculated' => true], ['rc' => false, 'error' => 'invalid fifth parameter in function "trendstl"']],
+			['trendstl(/host/key, 1d:now/M-1w, 1h, 1d, 1, 0)', ['calculated' => true], ['rc' => false, 'error' => 'invalid sixth parameter in function "trendstl"']],
+			['trendstl(/host/key, 1h:now/d, 1h, 1d, 1, "test")', ['calculated' => true], ['rc' => false, 'error' => 'invalid sixth parameter in function "trendstl"']],
+			['trendstl(/host/key, 240h:now/h, 1h, 1d, 1, "mad", 0)', ['calculated' => true], ['rc' => false, 'error' => 'invalid seventh parameter in function "trendstl"']],
+			['trendstl(/host/key)', [], ['rc' => false, 'error' => 'mandatory parameter is missing in function "trendstl"']],
+			['trendstl(/host/key, 0, 1h, 1)', [], ['rc' => false, 'error' => 'invalid second parameter in function "trendstl"']],
+			['trendstl(/host/key, #0, 1h, 1)', [], ['rc' => false, 'error' => 'invalid second parameter in function "trendstl"']],
+			['trendstl(/host/key, 1y, 1h, 1)', [], ['rc' => false, 'error' => 'invalid second parameter in function "trendstl"']],
+			['trendstl(/host/key, 1d:now/M-1h, 0, 1)', [], ['rc' => false, 'error' => 'invalid third parameter in function "trendstl"']],
+			['trendstl(/host/key, 1d:now/M-1h, 1h, 0)', [], ['rc' => false, 'error' => 'invalid fourth parameter in function "trendstl"']],
+			['trendstl(/host/key, 1d:now/M-1h, 1h, 1d, 0)', [], ['rc' => false, 'error' => 'invalid fifth parameter in function "trendstl"']],
+			['trendstl(/host/key, 1d:now/M-1h, 1h, 1h, 1, 0)', [], ['rc' => false, 'error' => 'invalid sixth parameter in function "trendstl"']],
+			['trendstl(/host/key, 1d:now/M-1h, 1h, 1d, 1, "test")', [], ['rc' => false, 'error' => 'invalid sixth parameter in function "trendstl"']],
+			['trendstl(/host/key, 1d:now/M-1h, 1h, 1w, 1, "mad", 0)', [], ['rc' => false, 'error' => 'invalid seventh parameter in function "trendstl"']],
+			['trendstl(/host/key, 240h:now/h, 1h, 1d)', [], ['rc' => true, 'error' => null]],
+			['trendstl(/host/key, 1y:now/h, 1h, 1d)', [], ['rc' => true, 'error' => null]],
+			['trendstl(/host/key, 240h:now/h, 4w, 1d)', [], ['rc' => true, 'error' => null]],
+			['trendstl(/host/key, 240h:now/h, 365d, 1d)', [], ['rc' => true, 'error' => null]],
+			['trendstl(/host/key, {$PERIOD}:{$TIMESHIFT}, 1h, 1d)', ['usermacros' => true], ['rc' => true, 'error' => null]],
+			['trendstl(/host/key, {$PARAM2}, {$MACRO3}, {$MACRO4}, {$MACRO5}, {$MACRO6}, {$MACRO7})', ['usermacros' => true], ['rc' => true, 'error' => null]],
+			['trendstl(/host/key, {#PARAM2}, {#PARAM3}, {#PARAM4}), {#PARAM5}), {#PARAM6}), {#PARAM7})', ['lldmacros' => true], ['rc' => true, 'error' => null]],
+			['trendstl(/host/key, {$PARAM2}, {#PARAM3}, {$PARAM4}), {#PARAM5}), {$PARAM6}), {#PARAM7})', ['lldmacros' => true, 'usermacros' => true], ['rc' => true, 'error' => null]],
+
 			['avg(/host/key)', [], ['rc' => false, 'error' => 'mandatory parameter is missing in function "avg"']],
 			['avg(/host/key,)', [], ['rc' => false, 'error' => 'invalid second parameter in function "avg"']],
 			['avg(/host/key,0)', [], ['rc' => false, 'error' => 'invalid second parameter in function "avg"']],
@@ -85,6 +118,27 @@ class CHistFunctionValidatorTest extends TestCase {
 
 			['change(/host/key)', [], ['rc' => true, 'error' => null]],
 			['change(/host/key,)', [], ['rc' => false, 'error' => 'invalid number of parameters in function "change"']],
+
+			['changecount(/host/key)', [], ['rc' => false, 'error' => 'mandatory parameter is missing in function "changecount"']],
+			['changecount(/host/key,)', [], ['rc' => false, 'error' => 'invalid second parameter in function "changecount"']],
+			['changecount(/host/key,0)', [], ['rc' => false, 'error' => 'invalid second parameter in function "changecount"']],
+			['changecount(/host/key,#0)', [], ['rc' => false, 'error' => 'invalid second parameter in function "changecount"']],
+			['changecount(/host/key,1)', [], ['rc' => true, 'error' => null]],
+			['changecount(/host/key,#1)', [], ['rc' => true, 'error' => null]],
+			['changecount(/host/key,1s)', [], ['rc' => true, 'error' => null]],
+			['changecount(/host/key, 1m)', [], ['rc' => true, 'error' => null]],
+			['changecount(/host/key, 1M)', [], ['rc' => false, 'error' => 'invalid second parameter in function "changecount"']],
+			['changecount(/host/key, 1m:now/h-1h)', [], ['rc' => true, 'error' => null]],
+			['changecount(/host/key, #3:now/h-1h)', [], ['rc' => true, 'error' => null]],
+			['changecount(/host/key, #5:now/M)', [], ['rc' => true, 'error' => null]],
+			['changecount(/host/key, #2147483647)', [], ['rc' => true, 'error' => null]],
+			['changecount(/host/key, 2147483647)', [], ['rc' => true, 'error' => null]],
+			['changecount(/host/key, #256,)', [], ['rc' => true, 'error' => null]],
+			['changecount(/host/key, #256, "")', [], ['rc' => false, 'error' => 'invalid third parameter in function "changecount"']],
+			['changecount(/host/key, #256, "test")', [], ['rc' => false, 'error' => 'invalid third parameter in function "changecount"']],
+			['changecount(/host/key, #256, "inc")', [], ['rc' => true, 'error' => null]],
+			['changecount(/host/key, #256, "dec")', [], ['rc' => true, 'error' => null]],
+			['changecount(/host/key, #256, "all")', [], ['rc' => true, 'error' => null]],
 
 			['count(/host/key)', [], ['rc' => false, 'error' => 'mandatory parameter is missing in function "count"']],
 			['count(/host/key,)', [], ['rc' => false, 'error' => 'invalid second parameter in function "count"']],
@@ -774,6 +828,7 @@ class CHistFunctionValidatorTest extends TestCase {
 			'parameters' => (new CHistFunctionData($options))->getParameters()
 		] + $options);
 		$expression_parser->parse($source);
+		$this->assertNotNull($expression_parser->getResult(), $expression_parser->getError());
 		$tokens = $expression_parser->getResult()->getTokens();
 
 		$this->assertSame(CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION, $tokens[0]['type']);

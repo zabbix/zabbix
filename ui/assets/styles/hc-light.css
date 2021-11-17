@@ -6515,6 +6515,57 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   .audit-details-wrapper .audit-show-details-btn-wrapper {
     margin: 0 5px 0 5px; }
 
+.geomap-filter-button,
+.navigate-home-button {
+  background-image: url("../img/icon-sprite.svg");
+  background-repeat: no-repeat; }
+
+.geomap-filter-button {
+  background-position: -243px -543px !important; }
+
+.navigate-home-button {
+  background-position: -117px -506px !important; }
+
+.geomap-filter {
+  border: 2px solid rgba(159, 159, 159, 0.4);
+  background-color: #ffffff;
+  padding: 10px 30px 5px 10px;
+  position: absolute;
+  margin-right: -2px;
+  margin-top: 5px;
+  display: none;
+  right: 0; }
+
+.geomap-filter.collapsed {
+  display: table; }
+
+.geomap-filter li {
+  width: calc(100% + 20px); }
+
+.geomap-filter label {
+  white-space: nowrap; }
+
+.marker-cluster {
+  background: none; }
+
+.marker-cluster div {
+  text-align: center;
+  border-radius: 50%;
+  margin-left: 5px;
+  margin-top: 5px;
+  height: 30px;
+  width: 30px; }
+
+.marker-cluster span {
+  line-height: 30px; }
+
+.leaflet-control.disabled {
+  background-color: #ffffff;
+  opacity: 1; }
+  .leaflet-control.disabled .geomap-filter-button {
+    cursor: default;
+    opacity: .4; }
+
 .sidebar .logo:focus .sidebar-logo {
   box-shadow: 0 0 0 2px #ffffff; }
 .sidebar button:focus {

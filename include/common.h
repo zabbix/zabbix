@@ -1769,4 +1769,17 @@ zbx_tag_t;
 
 void	zbx_free_tag(zbx_tag_t *tag);
 
+typedef enum
+{
+	ERR_Z3001 = 3001,
+	ERR_Z3002,
+	ERR_Z3003,
+	ERR_Z3004,
+	ERR_Z3005,
+	ERR_Z3006,
+	ERR_Z3007,
+	ERR_Z3008
+}
+zbx_err_codes_t;
+
 #endif

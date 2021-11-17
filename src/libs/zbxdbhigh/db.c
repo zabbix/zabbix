@@ -34,8 +34,10 @@
 #	define ZBX_ORACLE_CESU8_CHARSET "UTF8"
 #elif defined(HAVE_MYSQL)
 #	define ZBX_DB_STRLIST_DELIM		','
-#	define ZBX_SUPPORTED_DB_CHARACTER_SET	"utf8,utf8mb3"
-#	define ZBX_SUPPORTED_DB_COLLATION	"utf8_bin,utf8mb3_bin"
+#	define ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8	"utf8,utf8mb3"
+#	define ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB4 	"utf8mb4"
+#	define ZBX_SUPPORTED_DB_CHARACTER_SET		ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8 "," ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB4
+#	define ZBX_SUPPORTED_DB_COLLATION		"utf8_bin,utf8mb3_bin,utf8mb4_bin"
 #endif
 
 typedef struct
@@ -2306,6 +2308,45 @@ int	DBindex_exists(const char *table_name, const char *index_name)
 
 	return ret;
 }
+
+int	DBpk_exists(const char *table_name)
+{
+	DB_RESULT	result;
+	int		ret;
+
+#if defined(HAVE_MYSQL)
+	result = DBselect(
+			"show index from %s"
+			" where key_name='PRIMARY'",
+			table_name);
+#elif defined(HAVE_ORACLE)
+	char		*name_u;
+
+	name_u = zbx_strdup(NULL, table_name);
+	zbx_strupper(name_u);
+	result = DBselect(
+			"select 1"
+			" from user_constraints"
+			" where constraint_type='P'"
+				" and table_name='%s'",
+			name_u);
+	zbx_free(name_u);
+#elif defined(HAVE_POSTGRESQL)
+	result = DBselect(
+			"select 1"
+			" from information_schema.table_constraints"
+			" where table_name='%s'"
+				" and constraint_type='PRIMARY KEY'"
+				" and constraint_schema='%s'",
+			table_name, zbx_db_get_schema_esc());
+#endif
+	ret = (NULL == DBfetch(result) ? FAIL : SUCCEED);
+
+	DBfree_result(result);
+
+	return ret;
+}
+
 #endif
 
 /******************************************************************************
@@ -2438,8 +2479,19 @@ void	DBcheck_character_set(void)
 		char	*char_set = row[0];
 		char	*collation = row[1];
 
-		if (SUCCEED != str_in_list(ZBX_SUPPORTED_DB_CHARACTER_SET, char_set, ZBX_DB_STRLIST_DELIM))
+		if (SUCCEED == str_in_list(ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8, char_set, ZBX_DB_STRLIST_DELIM))
+		{
+			zbx_db_set_character_set("utf8");
+		}
+		else if (SUCCEED == str_in_list(ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB4, char_set,
+				ZBX_DB_STRLIST_DELIM))
+		{
+			zbx_db_set_character_set("utf8mb4");
+		}
+		else
+		{
 			zbx_warn_char_set(CONFIG_DBNAME, char_set);
+		}
 
 		if (SUCCEED != str_in_list(ZBX_SUPPORTED_DB_COLLATION, collation, ZBX_DB_STRLIST_DELIM))
 		{

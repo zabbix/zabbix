@@ -606,7 +606,8 @@ static int	ha_db_get_time(zbx_ha_info_t *info, int *db_time)
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s db_time:%d", __func__, zbx_result_string(ret), *db_time);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s db_time:%d", __func__, zbx_result_string(ret),
+			SUCCEED == ret ? *db_time : -1);
 
 	return ret;
 }
