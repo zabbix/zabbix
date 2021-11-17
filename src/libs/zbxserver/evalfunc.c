@@ -2805,7 +2805,7 @@ static int	trends_eval_stl(const char *table, zbx_uint64_t itemid, int start, in
 		goto out;
 	}
 
-	neighboring_right_value = values.values[values.values_num].value.dbl;
+	neighboring_right_value = values.values[values.values_num - 1].value.dbl;
 
 	for (i = values.values_num - 2; i >= 0; i--)
 	{
@@ -2936,6 +2936,12 @@ static int	evaluate_TREND(zbx_variant_t *value, DC_ITEM *item, const char *func,
 
 		start_detect_period = end - detect_period;
 		end_detect_period = end;
+
+		if (start_detect_period < start)
+		{
+			*error = zbx_strdup(*error, "evaluation period is not more than detection period");
+			goto out;
+		}
 
 		if (SUCCEED != get_function_parameter_hist_range(ts->sec, parameters, 3, &season, &season_type,
 				&season_shift))

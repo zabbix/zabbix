@@ -3,8 +3,8 @@
 noinst_LIBRARIES = libzbxserver.a libzbxserver_server.a libzbxserver_proxy.a
 
 libzbxserver_a_SOURCES = \
-	evalfunc_common.h \
 	evalfunc_common.c \
+	evalfunc_common.h \
 	evalfunc.c \
 	evalfunc.h \
 	anomalystl.c \

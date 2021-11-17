@@ -58,6 +58,7 @@ out:
 
 	return ret;
 }
+
 int	get_function_parameter_float(const char *parameters, int Nparam, unsigned char flags, double *value)
 {
 	char	*parameter;
@@ -123,7 +124,7 @@ int	get_function_parameter_hist_range(int from, const char *parameters, int Npar
 	char	*parameter = NULL, *shift;
 	int	ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "In %s() parameters:'%s' Nparam:%d", __func__, parameters, Nparam);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() parameters:'%s' Nparam:%d", __func__, parameters, Nparam);
 
 	if (NULL == (parameter = zbx_function_get_param_dyn(parameters, Nparam)))
 		goto out;
@@ -155,27 +156,24 @@ int	get_function_parameter_hist_range(int from, const char *parameters, int Npar
 		struct tm	tm;
 		char		*error = NULL;
 		int		end;
-		long int	tmp;
 
 		if (SUCCEED != zbx_parse_timeshift(from, shift, &tm, &error))
 		{
-			zabbix_log(LOG_LEVEL_INFORMATION, "%s() timeshift error:%s", __func__, error);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() timeshift error:%s", __func__, error);
 			zbx_free(error);
 			goto out;
 		}
 
-		tmp = mktime(&tm);
-
-		if (-1 == (end = (int)tmp))
+		if (-1 == (end = (int)mktime(&tm)))
 		{
-			zabbix_log(LOG_LEVEL_INFORMATION, "%s() invalid timeshift value:%s", __func__,
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() invalid timeshift value:%s", __func__,
 					zbx_strerror(errno));
 			goto out;
 		}
 
 		if (end >= from)
 		{
-			zabbix_log(LOG_LEVEL_INFORMATION, "%s() timeshift produced time in future", __func__);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() timeshift produced time in future", __func__);
 			goto out;
 		}
 
@@ -185,12 +183,12 @@ int	get_function_parameter_hist_range(int from, const char *parameters, int Npar
 		*timeshift = 0;
 
 	ret = SUCCEED;
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s() type:%s value:%d timeshift:%d", __func__, zbx_type_string(*type),
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() type:%s value:%d timeshift:%d", __func__, zbx_type_string(*type),
 			*value, *timeshift);
 out:
 	zbx_free(parameter);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "End of %s():%s", __func__, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
