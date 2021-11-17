@@ -23,6 +23,9 @@
 #include "zbxregexp.h"
 #include "md5.h"
 #include "../metrics.h"
+#include "persistent_state.h"
+
+#define ZBX_MD5_PRINT_BUF_LEN	((MD5_DIGEST_SIZE) * 2 + 1)	/* for MD5 sum representation with hex-digits */
 
 typedef enum
 {
@@ -37,7 +40,6 @@ struct	st_logfile
 {
 	char		*filename;
 	int		mtime;		/* st_mtime from stat() */
-	int		md5size;	/* size of the initial part for which the md5 sum is calculated */
 	int		seq;		/* number in processing order */
 	int		retry;
 	int		incomplete;	/* 0 - the last record ends with a newline, 1 - the last record contains */
@@ -49,27 +51,22 @@ struct	st_logfile
 	zbx_uint64_t	ino_hi;		/* Microsoft Windows: nFileIndexHigh or FileId.HighPart */
 	zbx_uint64_t	size;		/* st_size from stat() */
 	zbx_uint64_t	processed_size;	/* how far the Zabbix agent has analyzed the file */
-	md5_byte_t	md5buf[MD5_DIGEST_SIZE];	/* md5 sum of the initial part of the file */
+	int		md5_block_size;	/* size of the first and last blocks of file for which the md5 sum is */
+					/* calculated (in 'first_block_md5') */
+	md5_byte_t	first_block_md5[MD5_DIGEST_SIZE];	/* md5 sum of the initial part of the file */
+	zbx_uint64_t	last_block_offset;		/* position of the last block from the beginning of file */
+	md5_byte_t	last_block_md5[MD5_DIGEST_SIZE];	/* md5 sum of the last block */
 };
 
 typedef int 	(*zbx_process_value_func_t)(const char *server, unsigned short port, const char *host,
-		const char *key, const char *value, unsigned char state, zbx_uint64_t *lastlogsize, int *mtime,
-		unsigned long *timestamp, const char *source, unsigned short *severity,
-		unsigned long *logeventid, unsigned char flags);
+		const char *key, const char *value, unsigned char state, zbx_uint64_t *lastlogsize, const int *mtime,
+		const unsigned long *timestamp, const char *source, const unsigned short *severity,
+		const unsigned long *logeventid, unsigned char flags);
 
 void	destroy_logfile_list(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num);
 
-int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastlogsize, int *mtime,
-		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, unsigned char *skip_old_data, int *big_rec,
-		int *use_ino, char **err_msg, struct st_logfile **logfiles_old, const int *logfiles_num_old,
-		struct st_logfile **logfiles_new, int *logfiles_num_new, const char *encoding,
-		zbx_vector_ptr_t *regexps, const char *pattern, const char *output_template, int *p_count, int *s_count,
-		zbx_process_value_func_t process_value, const char *server, unsigned short port, const char *hostname,
-		const char *key, int *jumped, float max_delay, double *start_time, zbx_uint64_t *processed_bytes,
-		zbx_log_rotation_options_t rotation_type);
-
 int	process_log_check(char *server, unsigned short port, zbx_vector_ptr_t *regexps, ZBX_ACTIVE_METRIC *metric,
 		zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent, int *mtime_sent,
-		char **error);
-
+		char **error, zbx_vector_pre_persistent_t *prep_vec);
+struct st_logfile	*find_last_processed_file_in_logfiles_list(struct st_logfile *logfiles, int logfiles_num);
 #endif

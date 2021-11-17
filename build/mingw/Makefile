@@ -23,6 +23,7 @@ OBJS = \
 	$(OUTPUTDIR)\sysinfo.o \
 	$(OUTPUTDIR)\vector.o \
 	$(OUTPUTDIR)\zbxregexp.o \
+	$(OUTPUTDIR)\persistent_state.o \
 	$(OUTPUTDIR)\logfiles.o \
 	$(OUTPUTDIR)\file.o \
 	$(OUTPUTDIR)\alias.o \
@@ -134,6 +135,9 @@ $(OUTPUTDIR)\algodefs.o: $(TOPDIR)\src\libs\zbxalgo\algodefs.c
 
 $(OUTPUTDIR)\zbxregexp.o: $(TOPDIR)\src\libs\zbxregexp\zbxregexp.c
 	$(CC) $(CFLAGS) -DUNICODE -DPCRE_STATIC -c $^ -o $@
+
+$(OUTPUTDIR)\persistent_state.o: $(TOPDIR)\src\zabbix_agent\logfiles\persistent_state.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\logfiles.o: $(TOPDIR)\src\zabbix_agent\logfiles\logfiles.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
