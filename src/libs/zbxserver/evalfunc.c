@@ -2947,7 +2947,7 @@ static int	evaluate_TREND(zbx_variant_t *value, DC_ITEM *item, const char *func,
 
 		if (start_detect_period < start)
 		{
-			*error = zbx_strdup(*error, "evaluation period must not exceed detection period");
+			*error = zbx_strdup(*error, "detection period must not exceed evaluation period");
 			goto out;
 		}
 
