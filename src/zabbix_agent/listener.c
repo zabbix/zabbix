@@ -147,7 +147,7 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 		if (1 == need_update_userparam)
 		{
 			zbx_setproctitle("listener #%d [reloading user parameters]", process_num);
-			reload_user_parameters();
+			reload_user_parameters(process_type, process_num);
 			need_update_userparam = 0;
 		}
 #endif

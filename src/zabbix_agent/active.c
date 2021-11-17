@@ -1280,7 +1280,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 		if (1 == need_update_userparam)
 		{
 			zbx_setproctitle("active checks #%d [reloading user parameters]", process_num);
-			reload_user_parameters();
+			reload_user_parameters(process_type, process_num);
 			need_update_userparam = 0;
 		}
 #endif

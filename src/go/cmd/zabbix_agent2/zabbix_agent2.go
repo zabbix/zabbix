@@ -100,6 +100,7 @@ func processHelpCommand(c *remotecontrol.Client) (err error) {
 	help := `Remote control interface, available commands:
 	log_level_increase - Increase log level
 	log_level_decrease - Decrease log level
+	userparameter_reload - Reload user parameters
 	metrics - List available metrics
 	version - Display Agent version
 	help - Display this help message`

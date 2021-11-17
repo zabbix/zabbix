@@ -264,8 +264,11 @@ static int	load_config_user_params(void)
  *                                                                            *
  * Purpose: reload user parameters                                            *
  *                                                                            *
+ * Parameters: process_type - process type                                    *
+ *             process_num - process number                                   *
+ *                                                                            *
  ******************************************************************************/
-void	reload_user_parameters(void)
+void	reload_user_parameters(unsigned char process_type, int process_num)
 {
 	char	*error = NULL;
 
@@ -274,18 +277,21 @@ void	reload_user_parameters(void)
 
 	if (FAIL == load_config_user_params())
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot load user parameters: error processing configuration file");
+		zabbix_log(LOG_LEVEL_ERR, "cannot reload user parameters [%s #%d]: error processing configuration file",
+				get_process_type_string(process_type), process_num);
 		goto out;
 	}
 
 	if (FAIL == load_user_parameters(CONFIG_USER_PARAMETERS, &error))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot reload user parameters, stopped at: %s", error);
+		zabbix_log(LOG_LEVEL_ERR, "cannot reload user parameters [%s #%d], stopped at: %s",
+				get_process_type_string(process_type), process_num, error);
 		zbx_free(error);
 		goto out;
 	}
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "user parameters reloaded");
+	zabbix_log(LOG_LEVEL_INFORMATION, "user parameters reloaded [%s #%d]", get_process_type_string(process_type),
+			process_num);
 out:
 	zbx_strarr_free(&CONFIG_USER_PARAMETERS);
 }
