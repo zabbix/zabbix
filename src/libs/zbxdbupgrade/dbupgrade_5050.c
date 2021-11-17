@@ -1185,6 +1185,122 @@ static int	DBpatch_5050111(void)
 
 	return DBcreate_index("alerts", "alerts_8", "acknowledgeid", 0);
 }
+
+static int	DBpatch_5050112(void)
+{
+	const ZBX_TABLE table =
+		{"sla", "slaid", 0,
+			{
+				{"slaid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+				{"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"slo", "99.9", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0},
+				{"period", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"timezone", "UTC", NULL, NULL, 50, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5050113(void)
+{
+	return DBcreate_index("sla", "sla_1", "name", 1);
+}
+
+static int	DBpatch_5050114(void)
+{
+	const ZBX_TABLE table =
+		{"sla_service_tag", "sla_service_tagid", 0,
+			{
+				{"sla_service_tagid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"slaid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"tag", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"operator", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5050115(void)
+{
+	return DBcreate_index("sla_service_tag", "sla_service_tag_1", "slaid", 0);
+}
+
+static int	DBpatch_5050116(void)
+{
+	const ZBX_FIELD	field = {"slaid", NULL, "sla", "slaid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("sla_service_tag", 1, &field);
+}
+
+static int	DBpatch_5050117(void)
+{
+	const ZBX_TABLE table =
+		{"sla_time", "sla_timeid", 0,
+			{
+				{"sla_timeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"slaid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"from", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"to", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5050118(void)
+{
+	return DBcreate_index("sla_time", "sla_time_1", "slaid", 0);
+}
+
+static int	DBpatch_5050119(void)
+{
+	const ZBX_FIELD	field = {"slaid", NULL, "sla", "slaid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("sla_time", 1, &field);
+}
+
+static int	DBpatch_5050120(void)
+{
+	return DBdrop_table("services_times");
+}
+
+static int	DBpatch_5050121(void)
+{
+	return DBdrop_field("services", "showsla");
+}
+
+static int	DBpatch_5050122(void)
+{
+	return DBdrop_field("services", "goodsla");
+}
+
+static int	DBpatch_5050123(void)
+{
+	const ZBX_FIELD	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("services", &field);
+}
+
+static int	DBpatch_5050124(void)
+{
+	const ZBX_FIELD	field = {"uuid", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("services", &field);
+}
+
 #endif
 
 DBPATCH_START(5050)
@@ -1290,5 +1406,18 @@ DBPATCH_ADD(5050108, 0, 1)
 DBPATCH_ADD(5050109, 0, 1)
 DBPATCH_ADD(5050110, 0, 1)
 DBPATCH_ADD(5050111, 0, 1)
+DBPATCH_ADD(5050112, 0, 1)
+DBPATCH_ADD(5050113, 0, 1)
+DBPATCH_ADD(5050114, 0, 1)
+DBPATCH_ADD(5050115, 0, 1)
+DBPATCH_ADD(5050116, 0, 1)
+DBPATCH_ADD(5050117, 0, 1)
+DBPATCH_ADD(5050118, 0, 1)
+DBPATCH_ADD(5050119, 0, 1)
+DBPATCH_ADD(5050120, 0, 1)
+DBPATCH_ADD(5050121, 0, 1)
+DBPATCH_ADD(5050122, 0, 1)
+DBPATCH_ADD(5050123, 0, 1)
+DBPATCH_ADD(5050124, 0, 1)
 
 DBPATCH_END()
