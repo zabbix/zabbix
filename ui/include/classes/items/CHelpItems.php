@@ -423,19 +423,19 @@ class CHelpItems {
 					'description' => _('Maximum number of processes supported by OS. Returns integer')
 				],
 				[
-					'key' => 'log[file,<regexp>,<encoding>,<maxlines>,<mode>,<output>,<maxdelay>,<options>]',
+					'key' => 'log[file,<regexp>,<encoding>,<maxlines>,<mode>,<output>,<maxdelay>,<options>,<persistent_dir>]',
 					'description' => _('Log file monitoring. Returns log')
 				],
 				[
-					'key' => 'log.count[file,<regexp>,<encoding>,<maxproclines>,<mode>,<maxdelay>,<options>]',
+					'key' => 'log.count[file,<regexp>,<encoding>,<maxproclines>,<mode>,<maxdelay>,<options>,<persistent_dir>]',
 					'description' => _('Count of matched lines in log file monitoring. Returns integer')
 				],
 				[
-					'key' => 'logrt[file_regexp,<regexp>,<encoding>,<maxlines>,<mode>,<output>,<maxdelay>,<options>]',
+					'key' => 'logrt[file_regexp,<regexp>,<encoding>,<maxlines>,<mode>,<output>,<maxdelay>,<options>,<persistent_dir>]',
 					'description' => _('Log file monitoring with log rotation support. Returns log')
 				],
 				[
-					'key' => 'logrt.count[file_regexp,<regexp>,<encoding>,<maxproclines>,<mode>,<maxdelay>,<options>]',
+					'key' => 'logrt.count[file_regexp,<regexp>,<encoding>,<maxproclines>,<mode>,<maxdelay>,<options>,<persistent_dir>]',
 					'description' => _('Count of matched lines in log file monitoring with log rotation support. Returns integer')
 				],
 				[

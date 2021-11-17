@@ -1714,4 +1714,6 @@ char	*zbx_substr_unquote(const char *src, size_t left, size_t right);
 void	zbx_ltrim_utf8(char *str, const char *charlist);
 void	zbx_rtrim_utf8(char *str, const char *charlist);
 
+void	zbx_md5buf2str(const md5_byte_t *md5, char *str);
+int	zbx_hex2bin(const unsigned char *p_hex, unsigned char *buf, int buf_len);
 #endif
