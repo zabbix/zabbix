@@ -148,6 +148,9 @@ class CApiInputValidator {
 			case API_USER_MACRO:
 				return self::validateUserMacro($rule, $data, $path, $error);
 
+			case API_USER_MACROS:
+				return self::validateUserMacros($rule, $data, $path, $error);
+
 			case API_LLD_MACRO:
 				return self::validateLLDMacro($rule, $data, $path, $error);
 
@@ -311,6 +314,7 @@ class CApiInputValidator {
 			case API_STRINGS_UTF8:
 			case API_INTS32:
 			case API_CUIDS:
+			case API_USER_MACROS:
 				return self::validateStringsUniqueness($rule, $data, $path, $error);
 
 			case API_OBJECTS:
@@ -1665,6 +1669,49 @@ class CApiInputValidator {
 	}
 
 	/**
+	 * Array of strings validator.
+	 *
+	 * @param array   $rule
+	 * @param int     $rule['flags']   (optional) API_NORMALIZE
+	 * @param integer $rule['length']  (optional)
+	 * @param mixed   $data
+	 * @param string  $path
+	 * @param string  $error
+	 *
+	 * @return bool
+	 */
+	private static function validateUserMacros(array $rule, &$data, string $path, ?string &$error): bool {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (($flags & API_NORMALIZE) && self::validateUserMacro([], $data, '', $e)) {
+			$data = [$data];
+		}
+		unset($e);
+
+		if (!is_array($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an array is expected'));
+			return false;
+		}
+
+		$data = array_values($data);
+		$rules = ['type' => API_USER_MACRO];
+
+		if (array_key_exists('length', $rule)) {
+			$rules['length'] = $rule['length'];
+		}
+
+		foreach ($data as $index => &$value) {
+			$subpath = ($path === '/' ? $path : $path.'/').($index + 1);
+			if (!self::validateData($rules, $value, $subpath, $error)) {
+				return false;
+			}
+		}
+		unset($value);
+
+		return true;
+	}
+
+	/**
 	 * LLD macro validator.
 	 *
 	 * @param array  $rule
@@ -1863,11 +1910,12 @@ class CApiInputValidator {
 	/**
 	 * Array of ids, int32 or strings uniqueness validator.
 	 *
-	 * @param array  $rule
-	 * @param bool   $rule['uniq']    (optional)
-	 * @param array  $data
-	 * @param string $path
-	 * @param string $error
+	 * @param array   $rule
+	 * @param integer $rule[type]
+	 * @param bool    $rule['uniq']    (optional)
+	 * @param array   $data
+	 * @param string  $path
+	 * @param string  $error
 	 *
 	 * @return bool
 	 */
@@ -1884,14 +1932,18 @@ class CApiInputValidator {
 		$uniq = [];
 
 		foreach ($data as $index => $value) {
-			if (array_key_exists($value, $uniq)) {
+			$uniq_value = ($rule['type'] == API_USER_MACROS)
+				? self::trimMacro($value)
+				: $value;
+
+			if (array_key_exists($uniq_value, $uniq)) {
 				$subpath = ($path === '/' ? $path : $path.'/').($index + 1);
 				$error = _s('Invalid parameter "%1$s": %2$s.', $subpath,
 					_s('value %1$s already exists', '('.$value.')')
 				);
 				return false;
 			}
-			$uniq[$value] = true;
+			$uniq[$uniq_value] = true;
 		}
 
 		return true;

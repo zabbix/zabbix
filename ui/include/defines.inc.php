@@ -1310,6 +1310,7 @@ define('API_INTS32',				12);
 define('API_FLOATS',				13);
 define('API_UINTS64',				14);
 define('API_CUIDS',					44);
+define('API_USER_MACROS',			52);
 // specific types
 define('API_HG_NAME',				15);
 define('API_SCRIPT_MENU_PATH',		16);
