@@ -2181,8 +2181,13 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 
 					processed_size = (size_t)offset + (size_t)nbytes;
 					send_err = FAIL;
+
+					regexp_ret = zbx_match_log_rec(regexps, value, pattern,
+							(0 == is_count_item) ? output_template : NULL,
+							(0 == is_count_item) ? &item_value : NULL, err_msg);
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
-					if (NULL != persistent_file_name)
+					if (NULL != persistent_file_name && (ZBX_REGEXP_MATCH == regexp_ret ||
+							ZBX_REGEXP_NO_MATCH == regexp_ret))
 					{
 						/* Prepare 'prep_vec' element even if the current record won't match. */
 						/* Its mtime and lastlogsize could be sent to server later as */
@@ -2204,9 +2209,7 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 					ZBX_UNUSED(persistent_file_name);
 					ZBX_UNUSED(prep_vec);
 #endif
-					if (ZBX_REGEXP_MATCH == (regexp_ret = zbx_match_log_rec(regexps, value, pattern,
-							(0 == is_count_item) ? output_template : NULL,
-							(0 == is_count_item) ? &item_value : NULL, err_msg)))
+					if (ZBX_REGEXP_MATCH == regexp_ret)
 					{
 						if (0 == is_count_item)		/* log[] or logrt[] */
 						{
@@ -2295,8 +2298,13 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 
 					processed_size = (size_t)offset + (size_t)(p_next - buf);
 					send_err = FAIL;
+
+					regexp_ret = zbx_match_log_rec(regexps, value, pattern,
+							(0 == is_count_item) ? output_template : NULL,
+							(0 == is_count_item) ? &item_value : NULL, err_msg);
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
-					if (NULL != persistent_file_name)
+					if (NULL != persistent_file_name && (ZBX_REGEXP_MATCH == regexp_ret ||
+							ZBX_REGEXP_NO_MATCH == regexp_ret))
 					{
 						/* Prepare 'prep_vec' element even if the current record won't match. */
 						/* Its mtime and lastlogsize could be sent to server later as */
@@ -2315,9 +2323,7 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 								prep_vec->values + prep_vec_idx);
 					}
 #endif
-					if (ZBX_REGEXP_MATCH == (regexp_ret = zbx_match_log_rec(regexps, value, pattern,
-							(0 == is_count_item) ? output_template : NULL,
-							(0 == is_count_item) ? &item_value : NULL, err_msg)))
+					if (ZBX_REGEXP_MATCH == regexp_ret)
 					{
 						if (0 == is_count_item)		/* log[] or logrt[] */
 						{
