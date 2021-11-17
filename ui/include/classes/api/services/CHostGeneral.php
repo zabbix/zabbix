@@ -148,6 +148,87 @@ abstract class CHostGeneral extends CHostBase {
 	}
 
 	/**
+	 * Check templates links for given data of mass API methods.
+	 *
+	 * @param array|null $templateids_link
+	 * @param array      $templateids_unlink
+	 * @param array      $db_hosts
+	 * @param bool       $replace
+	 */
+	protected function massCheckTemplatesLinks(?array $templateids_link, array $templateids_unlink,
+			array $db_hosts, bool $replace = false): void {
+		$ins_templates = [];
+		$del_links = [];
+		$check_double_linkage = false;
+		$del_templates = [];
+
+		foreach ($db_hosts as $hostid => $db_host) {
+			$db_templateids = array_column($db_host['templates'], 'templateid');
+
+			if ($replace && $templateids_link !== null) {
+				$templateids = $templateids_link;
+			}
+			else {
+				$templateids = array_merge(array_diff($db_templateids, $templateids_unlink),
+					array_diff($templateids_link, $db_templateids)
+				);
+			}
+
+			$permitted_templateids = $templateids;
+			$templates_count = count($permitted_templateids);
+			$upd_templateids = [];
+
+			if (array_key_exists('nopermissions_templates', $db_host)) {
+				foreach ($db_host['nopermissions_templates'] as $db_template) {
+					$templateids[] = $db_template['templateid'];
+					$templates_count++;
+					$upd_templateids[] = $db_template['templateid'];
+				}
+			}
+
+			foreach ($permitted_templateids as $templateid) {
+				if (in_array($templateid, $db_templateids)) {
+					$upd_templateids[] = $templateid;
+					unset($db_templateids[$templateid]);
+				}
+				else {
+					$ins_templates[$templateid][$hostid] = $templateids;
+
+					if ($this instanceof CTemplate || $templates_count > 1) {
+						$check_double_linkage = true;
+					}
+				}
+			}
+
+			foreach ($db_templateids as $db_templateid) {
+				$del_links[$db_templateid][$hostid] = true;
+
+				if ($upd_templateids) {
+					$del_templates[$db_templateid][$hostid] = $upd_templateids;
+				}
+			}
+		}
+
+		if ($del_templates) {
+			$this->checkTriggerDependenciesOfUpdTemplates($del_templates);
+			$this->checkTriggerExpressionsOfDelTemplates($del_templates);
+		}
+
+		if ($ins_templates) {
+			if ($this instanceof CTemplate) {
+				self::checkCircularLinkageNew($ins_templates, $del_links);
+			}
+
+			if ($check_double_linkage) {
+				self::checkDoubleLinkageNew($ins_templates, $del_links);
+			}
+
+			$this->checkTriggerDependenciesOfInsTemplates($ins_templates);
+			$this->checkTriggerExpressionsOfInsTemplates($ins_templates);
+		}
+	}
+
+	/**
 	 * Update table "hosts_groups" and populate hosts.groups by "hostgroupid" property.
 	 *
 	 * @param array      $hosts
@@ -1866,6 +1947,98 @@ abstract class CHostGeneral extends CHostBase {
 			while ($db_macro = DBfetch($db_macros)) {
 				$db_hosts[$db_macro['hostid']]['macros'][$db_macro['hostmacroid']] =
 					array_diff_key($db_macro, array_flip(['hostid']));
+			}
+		}
+	}
+
+	/**
+	 * Add the existing groups, macros or templates whether these are affected by the mass methods.
+	 *
+	 * @param string     $objects
+	 * @param array      $objectids
+	 * @param array      $db_hosts
+	 */
+	protected function massAddAffectedObjects(string $objects, array $objectids, array &$db_hosts): void {
+		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
+
+		foreach ($db_hosts as &$db_host) {
+			$db_host[$objects] = [];
+		}
+		unset($db_host);
+
+		if ($objects === 'groups') {
+			$filter = ['hostid' => array_keys($db_hosts)];
+
+			if (!$objectids && self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
+				$db_groups = API::HostGroup()->get([
+					'output' => [],
+					$id_field_name.'s' => array_keys($db_hosts),
+					'preservekeys' => true
+				]);
+
+				$filter += ['groupid' => array_keys($db_groups)];
+			}
+
+			$options = [
+				'output' => ['hostgroupid', 'hostid', 'groupid'],
+				'filter' => $filter
+			];
+			$db_hosts_groups = DBselect(DB::makeSql('hosts_groups', $options));
+
+			while ($link = DBfetch($db_hosts_groups)) {
+				$db_hosts[$link['hostid']]['groups'][$link['hostgroupid']] =
+					array_diff_key($link, array_flip(['hostid']));
+			}
+		}
+
+		if ($objects === 'macros') {
+			$filter = ['hostid' => array_keys($db_hosts)];
+
+			if ($objectids) {
+				$filter += ['macro' => $objectids];
+			}
+
+			$options = [
+				'output' => ['hostmacroid', 'hostid', 'macro', 'value', 'description', 'type'],
+				'filter' => $filter
+			];
+			$db_macros = DBselect(DB::makeSql('hostmacro', $options));
+
+			while ($db_macro = DBfetch($db_macros)) {
+				$db_hosts[$db_macro['hostid']]['macros'][$db_macro['hostmacroid']] =
+					array_diff_key($db_macro, array_flip(['hostid']));
+			}
+		}
+
+		if ($objects === 'templates') {
+			$accessible_templates = [];
+
+			if (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
+				$accessible_templates = API::Template()->get([
+					'output' => [],
+					'hostids' => array_keys($db_hosts),
+					'preservekeys' => true
+				]);
+			}
+
+			$options = [
+				'output' => ['hosttemplateid', 'hostid', 'templateid'],
+				'filter' => [
+					'hostid' => array_keys($db_hosts)
+				]
+			];
+			$db_hosts_templates = DBselect(DB::makeSql('hosts_templates', $options));
+
+			while ($link = DBfetch($db_hosts_templates)) {
+				if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN
+						|| array_key_exists($db_hosts[$id_field_name], $accessible_templates)) {
+					$db_hosts[$link['hostid']]['templates'][$link['hosttemplateid']] =
+						array_diff_key($link, array_flip(['hostid']));
+				}
+				else {
+					$db_hosts[$link['hostid']]['nopermissions_templates'][$link['hosttemplateid']] =
+						array_diff_key($link, array_flip(['hostid']));
+				}
 			}
 		}
 	}

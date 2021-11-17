@@ -49,13 +49,13 @@ abstract class CHostBase extends CApiService {
 				$path_clear = '/'.($i1 + 1).'/templates_clear';
 				$path = '/'.($i1 + 1).'/templates';
 
-				foreach ($host['templates_clear'] as $i2 => $template_clear) {
-					foreach ($host['templates'] as $i3 => $template) {
+				foreach ($host['templates_clear'] as $i2_clear => $template_clear) {
+					foreach ($host['templates'] as $i2 => $template) {
 						if (bccomp($template['templateid'], $template_clear['templateid']) == 0) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-								$path_clear.'/'.($i2 + 1).'/templateid',
+								$path_clear.'/'.($i2_clear + 1).'/templateid',
 								_s('cannot be specified the value of parameter "%1$s"',
-									$path.'/'.($i3 + 1).'/templateid'
+									$path.'/'.($i2 + 1).'/templateid'
 								)
 							));
 						}
@@ -141,11 +141,10 @@ abstract class CHostBase extends CApiService {
 
 				if ($db_hosts !== null
 						&& array_key_exists('nopermissions_templates', $db_hosts[$host[$id_field_name]])) {
-					foreach ($db_hosts[$host[$id_field_name]]['nopermissions_templates'] as $template) {
-						$templateids[] = $template['templateid'];
+					foreach ($db_hosts[$host[$id_field_name]]['nopermissions_templates'] as $db_template) {
+						$templateids[] = $db_template['templateid'];
 						$templates_count++;
-						$upd_templateids[] = $template['templateid'];
-
+						$upd_templateids[] = $db_template['templateid'];
 					}
 				}
 
@@ -317,7 +316,7 @@ abstract class CHostBase extends CApiService {
 	 * @param array $ins_links[<templateid>][<hostid>]
 	 * @param array $del_links[<templateid>][<hostid>]
 	 */
-	private static function checkCircularLinkageNew(array $ins_links, array $del_links): void {
+	protected static function checkCircularLinkageNew(array $ins_links, array $del_links): void {
 		$links = [];
 		$templateids = array_keys($ins_links);
 
@@ -379,7 +378,7 @@ abstract class CHostBase extends CApiService {
 							}
 						}
 
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Circular template linkage is not allowed (%1$s).',
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Circular template linkage (%1$s) is not allowed.',
 							$template_name.' -> '.implode(' -> ', $links_path).' -> '.$template_name
 						));
 					}
@@ -427,7 +426,7 @@ abstract class CHostBase extends CApiService {
 	 * @param array $ins_links[<templateid>][<hostid>]
 	 * @param array $del_links[<templateid>][<hostid>]
 	 */
-	private static function checkDoubleLinkageNew(array $ins_links, array $del_links): void {
+	protected static function checkDoubleLinkageNew(array $ins_links, array $del_links): void {
 		$links = [];
 		$templateids = [];
 		$hostids = [];
@@ -543,7 +542,7 @@ abstract class CHostBase extends CApiService {
 	 *
 	 * @throws APIException if not linked template is found.
 	 */
-	private function checkTriggerDependenciesOfInsTemplates(array $ins_templates): void {
+	protected function checkTriggerDependenciesOfInsTemplates(array $ins_templates): void {
 		$result = DBselect(
 			'SELECT DISTINCT i.hostid AS ins_templateid,td.triggerid_down,ii.hostid'.
 			' FROM items i,functions f,trigger_depends td,functions ff,items ii,hosts h'.
@@ -673,7 +672,7 @@ abstract class CHostBase extends CApiService {
 	 *
 	 * @throws APIException if not linked template is found.
 	 */
-	private function checkTriggerExpressionsOfInsTemplates(array $ins_templates): void {
+	protected function checkTriggerExpressionsOfInsTemplates(array $ins_templates): void {
 		$result = DBselect(
 			'SELECT DISTINCT i.hostid AS ins_templateid,f.triggerid,ii.hostid'.
 			' FROM items i,functions f,functions ff,items ii,hosts h'.

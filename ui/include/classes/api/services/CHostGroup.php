@@ -1329,7 +1329,7 @@ class CHostGroup extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkObjectsWithoutGroups(string $objects, array $db_objects, array $groupids): void {
+	public static function checkObjectsWithoutGroups(string $objects, array $db_objects, array $groupids): void {
 		$hostids = array_keys($db_objects);
 
 		$objectids_with_groups = DBfetchColumn(DBselect(
