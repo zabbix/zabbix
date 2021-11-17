@@ -253,6 +253,7 @@ class CHistFunctionValidator extends CValidator {
 
 				case 'time':
 					$parser = new CNumberParser([
+						'with_float' => false,
 						'with_time_suffix' => true,
 						'with_year' => (array_key_exists('with_year', $rule) && $rule['with_year'])
 					]);
