@@ -243,7 +243,7 @@ final class CHistFunctionData {
 		'trendstl' => [
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_TREND]]],
-			['rules' => [['type' => 'time', 'min' => SEC_PER_HOUR, 'with_year' => true]]],
+			['rules' => [['type' => 'time', 'min' => SEC_PER_HOUR]]],
 			['rules' => [['type' => 'time', 'min' => 1]]],
 			['rules' => [['type' => 'number', 'min' => 1]], 'required' => false],
 			['rules' => [
