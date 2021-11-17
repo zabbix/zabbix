@@ -28,16 +28,15 @@ class CControllerWidgetItemView extends CControllerWidget {
 		$this->setValidationRules([
 			'edit_mode' => 'in 0,1',
 			'name' => 'string',
-			'fields' => 'json'
+			'fields' => 'json',
+			'dynamic_hostid' => 'db hosts.hostid'
 		]);
 	}
 
 	protected function doAction() {
 		$error = '';
 		$fields = $this->getForm()->getFieldsData();
-
 		$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
-
 		$description = '';
 		$value = '';
 		$change_indicator = [];
@@ -45,21 +44,41 @@ class CControllerWidgetItemView extends CControllerWidget {
 		$units = '';
 		$decimals = '';
 
-		$options = [
-			'output' => [],
-			'selectValueMap' => ['mappings'],
-			'itemids' => $fields['itemid'],
-			'webitems' => true,
-			'filter' => [
-				'status' => [ITEM_STATUS_ACTIVE]
-			],
-			'preservekeys' => true
-		];
+		if ($this->hasInput('dynamic_hostid')) {
+			$template_items = API::Item()->get([
+				'output' => ['key_'],
+				'itemids' => $fields['itemid'],
+				'webitems' => true
+			]);
+
+			if ($template_items) {
+				$options = [
+					'output' => ['value_type'],
+					'selectValueMap' => ['mappings'],
+					'hostids' => [$this->getInput('dynamic_hostid')],
+					'webitems' => true,
+					'filter' => [
+						'status' => ITEM_STATUS_ACTIVE,
+						'key_' => $template_items[0]['key_']
+					],
+					'preservekeys' => true
+				];
+			}
+		}
+		else {
+			$options = [
+				'output' => ['value_type'],
+				'selectValueMap' => ['mappings'],
+				'itemids' => $fields['itemid'],
+				'webitems' => true,
+				'filter' => [
+					'status' => ITEM_STATUS_ACTIVE
+				],
+				'preservekeys' => true
+			];
+		}
 
 		$show = array_flip($fields['show']);
-
-		// Regardless of value showing, we need this for history data and change indicator.
-		$options['output'] = ['value_type'];
 
 		// If description contains user macros, we need "itemid" and "hostid" to resolve them.
 		if (array_key_exists(WIDGET_ITEM_SHOW_DESCRIPTION, $show)) {
@@ -70,7 +89,19 @@ class CControllerWidgetItemView extends CControllerWidget {
 			$options['output'][] = 'units';
 		}
 
-		$items = API::Item()->get($options);
+		if ($this->hasInput('dynamic_hostid')) {
+			if ($template_items) {
+				$items = API::Item()->get($options);
+				$itemid = key($items);
+			}
+			else {
+				$items = [];
+			}
+		}
+		else {
+			$items = API::Item()->get($options);
+			$itemid = $fields['itemid'][0];
+		}
 
 		if ($items) {
 			// In case we want to show only value or only time or only change indicator, we need to search history data.
@@ -80,24 +111,24 @@ class CControllerWidgetItemView extends CControllerWidget {
 				// Selecting data from history does not depend on "Show" checkboxes.
 				$history = Manager::History()->getLastValues($items_with_values, 2, $history_period);
 
-				if (array_key_exists($fields['itemid'][0], $history)
-						&& array_key_exists(0, $history[$fields['itemid'][0]])) {
+				if (array_key_exists($itemid, $history)
+						&& array_key_exists(0, $history[$itemid])) {
 					// Get values regardless of show status, since change indicator can be shown independently.
-					$last_value = $history[$fields['itemid'][0]][0]['value'];
+					$last_value = $history[$itemid][0]['value'];
 
 					// The view will determine when to show ellipsis for text values.
-					$value_type = $items_with_values[$fields['itemid'][0]]['value_type'];
+					$value_type = $items_with_values[$itemid]['value_type'];
 
 					// Override item units if needed.
 					if (array_key_exists(WIDGET_ITEM_SHOW_VALUE, $show) && $fields['units_show'] == 1) {
 						$units = ($fields['units'] === '')
-							? $items_with_values[$fields['itemid'][0]]['units']
+							? $items_with_values[$itemid]['units']
 							: $fields['units'];
 					}
 
 					// Time can be shown independently.
 					if (array_key_exists(WIDGET_ITEM_SHOW_TIME, $show)) {
-						$time = date(ZBX_FULL_DATE_TIME, (int) $history[$fields['itemid'][0]][0]['clock']);
+						$time = date(ZBX_FULL_DATE_TIME, (int) $history[$itemid][0]['clock']);
 					}
 
 					switch ($value_type) {
@@ -136,10 +167,10 @@ class CControllerWidgetItemView extends CControllerWidget {
 								$value = substr($value, 0, $pos);
 							}
 
-							if ($items_with_values[$fields['itemid'][0]]['valuemap']) {
+							if ($items_with_values[$itemid]['valuemap']) {
 								// Apply value mapping if it is set in item configuration.
 								$value = CValueMapHelper::applyValueMap($value_type, $value,
-									$items_with_values[$fields['itemid'][0]]['valuemap']
+									$items_with_values[$itemid]['valuemap']
 								);
 
 								// Show of hide change indicator for mapped value.
@@ -149,13 +180,13 @@ class CControllerWidgetItemView extends CControllerWidget {
 									];
 								}
 							}
-							elseif (array_key_exists(1, $history[$fields['itemid'][0]])
+							elseif (array_key_exists(1, $history[$itemid])
 									&& array_key_exists(WIDGET_ITEM_SHOW_CHANGE_INDICATOR, $show)) {
 								/*
 								 * If there is no value mapping and there is more than one value, add up or down change
 								 * indicator. Do not show change indicator if value is the same.
 								 */
-								$prev_value = $history[$fields['itemid'][0]][1]['value'];
+								$prev_value = $history[$itemid][1]['value'];
 
 								if ($last_value > $prev_value) {
 									$change_indicator = ['up' => true, 'fill_color' => $fields['up_color']];
@@ -173,7 +204,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 
 							// Apply value mapping to string type values (same as in Latest Data).
 							$mapping = CValueMapHelper::getMappedValue($value_type, $value,
-								$items_with_values[$fields['itemid'][0]]['valuemap']
+								$items_with_values[$itemid]['valuemap']
 							);
 
 							if ($mapping !== false) {
@@ -187,9 +218,9 @@ class CControllerWidgetItemView extends CControllerWidget {
 							 */
 							$value = str_replace("\n", " ", $value);
 
-							if (array_key_exists(1, $history[$fields['itemid'][0]])
+							if (array_key_exists(1, $history[$itemid])
 									&& array_key_exists(WIDGET_ITEM_SHOW_CHANGE_INDICATOR, $show)) {
-								$prev_value = $history[$fields['itemid'][0]][1]['value'];
+								$prev_value = $history[$itemid][1]['value'];
 
 								if ($last_value !== $prev_value) {
 									$change_indicator = ['up' => true, 'down' => true,
@@ -219,15 +250,17 @@ class CControllerWidgetItemView extends CControllerWidget {
 			 */
 			if (array_key_exists(WIDGET_ITEM_SHOW_DESCRIPTION, $show)) {
 				// Overwrite item name with the custom description.
-				$items[$fields['itemid'][0]]['name'] = $fields['description'];
+				$items[$itemid]['name'] = $fields['description'];
 
 				// Do not resolve macros if using template dashboard. Template dashboards only have edit mode.
-				if ($this->getContext() === CWidgetConfig::CONTEXT_DASHBOARD) {
+				if ($this->getContext() === CWidgetConfig::CONTEXT_DASHBOARD
+						|| $this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
+						&& $this->hasInput('dynamic_hostid')) {
 					$items = CMacrosResolverHelper::resolveWidgetItemNames($items);
 				}
 
 				// All macros in item name are resolved here.
-				$description = $items[$fields['itemid'][0]]['name'];
+				$description = $items[$itemid]['name'];
 			}
 		}
 		else {
