@@ -777,7 +777,7 @@ int	zbx_restore_file_details(const char *str, struct st_logfile **logfiles, int 
 	zbx_uint64_t	ino_lo;
 	zbx_uint64_t	ino_hi;
 	zbx_uint64_t	size;
-	zbx_uint64_t	processed_size_tmp;
+	zbx_uint64_t	processed_size_tmp = 0;
 	int		md5_block_size = 0;
 	md5_byte_t	first_block_md5[MD5_DIGEST_SIZE];
 	zbx_uint64_t	last_block_offset = 0;
