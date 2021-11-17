@@ -1782,4 +1782,6 @@ typedef enum
 }
 zbx_err_codes_t;
 
+void	zbx_md5buf2str(const md5_byte_t *md5, char *str);
+int	zbx_hex2bin(const unsigned char *p_hex, unsigned char *buf, int buf_len);
 #endif
