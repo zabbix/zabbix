@@ -783,6 +783,9 @@ static void	preprocessor_enqueue_dependent_value(zbx_preprocessing_manager_t *ma
 {
 	zbx_variant_t	var;
 
+	if (NULL == value->result_ptr->result || !ISSET_VALUE(value->result_ptr->result))
+		return;
+
 	preprocessing_ar_to_variant(value->result_ptr->result, &var);
 	preprocessor_enqueue_dependent(manager, value->hostid, value->itemid, &var, value->item_value_type, value->ts);
 }
