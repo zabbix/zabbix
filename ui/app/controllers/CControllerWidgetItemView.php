@@ -331,6 +331,10 @@ class CControllerWidgetItemView extends CControllerWidget {
 				$classes[] = 'bold';
 			}
 
+			if ($items && !$items_with_values) {
+				$classes[] = 'item-value-no-data';
+			}
+
 			$styles = ['--widget-item-font' => number_format($fields['value_size'] / 100, 2)];
 			if ($fields['value_color'] !== null && $fields['value_color'] !== '') {
 				$styles['color'] = '#'.$fields['value_color'];
