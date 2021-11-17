@@ -29,7 +29,7 @@
  *                                                                            *
  * Parameters: itemid      - [IN] the item identifier                         *
  *             table       - [IN] the trends table name                       *
- *             now         - [IN] the current timestmap                       *
+ *             now         - [IN] the current timestamp                       *
  *             period      - [IN] the data period                             *
  *             season_num  - [IN] the number of seasons                       *
  *             season_unit - [IN] the season time unit                        *
@@ -95,7 +95,7 @@ static int	baseline_get_common_data(zbx_uint64_t itemid, const char *table, time
  *                                                                            *
  * Parameters: itemid     - [IN] the item identifier                          *
  *             table      - [IN] the trends table name                        *
- *             now        - [IN] the current timestmap                        *
+ *             now        - [IN] the current timestamp                        *
  *             period     - [IN] the data period                              *
  *             season_num - [IN] the number of seasons                        *
  *             skip       - [IN] how many data periods to skip                *
@@ -177,7 +177,7 @@ static int	baseline_get_isoyear_data(zbx_uint64_t itemid, const char *table, tim
  *                                                                            *
  * Parameters: itemid     - [IN] the item identifier                          *
  *             value_type - [IN] the item value type                          *
- *             now        - [IN] the current timestmap                        *
+ *             now        - [IN] the current timestamp                        *
  *             period     - [IN] the data period                              *
  *             seasons    - [IN] the seasons                                  *
  *             skip       - [IN] how many data periods to skip                *
