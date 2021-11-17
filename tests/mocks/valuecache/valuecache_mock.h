@@ -34,8 +34,6 @@ typedef struct
 }
 zbx_vcmock_ds_t;
 
-unsigned char	zbx_mock_str_to_value_type(const char *value_type);
-
 void	zbx_vcmock_ds_init(void);
 void	zbx_vcmock_ds_destroy(void);
 void	zbx_vcmock_ds_dump(void);

@@ -26,8 +26,12 @@
 
 #include "valuecache.h"
 #include "zbxserver.h"
+#include "zbxtrends.h"
 
 #include "mocks/valuecache/valuecache_mock.h"
+
+#include "../../../src/libs/zbxserver/anomalystl.h"
+#include "../../../src/libs/zbxserver/evalfunc_common.h"
 
 int	__wrap_substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
 		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
@@ -35,7 +39,7 @@ int	__wrap_substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *even
 		const DB_SERVICE *service, const char *tz, char **data, int macro_type, char *error,
 		int maxerrlen);
 
-int __wrap_DCget_data_expected_from(zbx_uint64_t itemid, int *seconds);
+int	__wrap_DCget_data_expected_from(zbx_uint64_t itemid, int *seconds);
 
 int	__wrap_substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
 		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
@@ -63,96 +67,121 @@ int	__wrap_substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *even
 	return SUCCEED;
 }
 
-int __wrap_DCget_data_expected_from(zbx_uint64_t itemid, int *seconds)
+int	__wrap_DCget_data_expected_from(zbx_uint64_t itemid, int *seconds)
 {
 	ZBX_UNUSED(itemid);
 	*seconds = zbx_vcmock_get_ts().sec - 600;
+
 	return SUCCEED;
 }
 
 void	zbx_mock_test_entry(void **state)
 {
-	int			err, expected_ret, returned_ret;
-	char			*error = NULL;
-	const char		*function, *params;
-	DC_ITEM			item;
-	zbx_vcmock_ds_item_t	*ds_item;
-	zbx_timespec_t		ts;
-	zbx_mock_handle_t	handle;
-	zbx_variant_t		returned_value;
+	int				start_detect_period, end_detect_period, detect_period_season_shift, err,
+					detect_period, start_evaluate_period, end_evaluate_period, evaluate_seconds = 0,
+					evaluate_nvalues = 0;
+	zbx_uint64_t			deviations_count;
+	double				result;
+	char				*error = NULL, *evaluate_period = NULL;
+	const char			*params, *dev_alg = NULL;
+	DC_ITEM				item;
+	zbx_vcmock_ds_item_t		*ds_item;
+	zbx_timespec_t			ts, ts_evaluate_end;
+	zbx_mock_handle_t		handle;
+	zbx_vector_history_record_t	values_in;
+	zbx_value_type_t		detect_period_season_type;
 
-	ZBX_DOUBLE_EPSILON = 0.000001;
+	/* ZBX_DOUBLE_EPSILON = 0.000001; results into output that is different from python test case output */
+	ZBX_DOUBLE_EPSILON = 0.0001;
+
+	zbx_history_record_vector_create(&values_in);
 
 	err = zbx_vc_init(&error);
 	zbx_mock_assert_result_eq("Value cache initialization failed", SUCCEED, err);
-
 	zbx_vc_enable();
-
 	zbx_vcmock_ds_init();
-
 	memset(&item, 0, sizeof(DC_ITEM));
-
 	ds_item = zbx_vcmock_ds_first_item();
 	item.itemid = ds_item->itemid;
 	item.value_type = ds_item->value_type;
 
-	function = zbx_mock_get_parameter_string("in.function");
-	params = zbx_mock_get_parameter_string("in.params");
-
+	deviations_count = zbx_mock_get_parameter_uint64("in.deviations_count");
+	dev_alg = zbx_mock_get_parameter_string("in.dev_alg");
 	handle = zbx_mock_get_parameter_handle("in");
 	zbx_vcmock_set_time(handle, "time");
 	ts = zbx_vcmock_get_ts();
+	ts_evaluate_end = ts;
 
-	if (SUCCEED != (returned_ret = evaluate_function2(&returned_value, &item, function, params, &ts, &error)))
+	params = zbx_mock_get_parameter_string("in.params");
+
+	if (2 != num_param(params))
 	{
-		printf("evaluate_function returned error: %s\n", error);
-		zbx_free(error);
+		fail_msg("invalid number of parameters");
+		goto out;
+	}
+
+	if (SUCCEED != get_function_parameter_str(params, 1, &evaluate_period))
+	{
+		fail_msg("invalid second parameter");
+		goto out;
+	}
+
+	if (SUCCEED != zbx_trends_parse_range(ts.sec, evaluate_period, &start_evaluate_period, &end_evaluate_period,
+			&error))
+	{
+		fail_msg("failed to parse seconds parameter: %s", error);
+		goto out;
+	}
+
+	ts_evaluate_end.sec = end_evaluate_period;
+	evaluate_seconds = end_evaluate_period - start_evaluate_period;
+
+	if (SUCCEED != get_function_parameter_hist_range(ts.sec, params, 2, &detect_period, &detect_period_season_type,
+			&detect_period_season_shift))
+	{
+		fail_msg("invalid third parameter");
+		goto out;
+	}
+
+	start_detect_period = ts_evaluate_end.sec - detect_period;
+	end_detect_period = ts_evaluate_end.sec;
+
+	if (FAIL == zbx_vc_get_values(item.itemid, item.value_type, &values_in, evaluate_seconds, evaluate_nvalues,
+			&ts_evaluate_end))
+	{
+		fail_msg("cannot get values from value cache");
+		goto out;
 	}
 
 	zbx_vc_flush_stats();
 
-	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
-	zbx_mock_assert_result_eq("return value", expected_ret, returned_ret);
-
-	if (SUCCEED == expected_ret)
+	if (0 >= values_in.values_num)
 	{
-		const char		*expected_value;
-		zbx_uint64_t		expected_ui64;
+		fail_msg("not enough data");
+		goto out;
+	}
+
+	if (SUCCEED != zbx_get_percentage_of_deviations_in_stl_remainder(&values_in, deviations_count, dev_alg,
+			start_detect_period, end_detect_period, &result, &error))
+	{
+		fail_msg("zbx_get_percentage_of_deviations_in_stl_remainder returned error: %s\n", error);
+		zbx_free(error);
+	}
+	else
+	{
+		const char	*expected_value;
 
 		handle = zbx_mock_get_parameter_handle("out.value");
 
 		if (ZBX_MOCK_SUCCESS != (err = zbx_mock_string_ex(handle, &expected_value)))
 			fail_msg("Cannot read output value: %s", zbx_mock_error_string(err));
 
-		switch (returned_value.type)
-		{
-			case ZBX_VARIANT_DBL:
-				zbx_mock_assert_double_eq("function result", atof(expected_value),
-						returned_value.data.dbl);
-				break;
-			case ZBX_VARIANT_UI64:
-				if (SUCCEED != is_uint64(expected_value, &expected_ui64))
-				{
-					fail_msg("function result '" ZBX_FS_UI64
-							"' does not match expected result '%s'",
-							returned_value.data.ui64, expected_value);
-				}
-				zbx_mock_assert_uint64_eq("function result", expected_ui64, returned_value.data.ui64);
-				break;
-			case ZBX_VARIANT_STR:
-				zbx_mock_assert_str_eq("function result", expected_value, returned_value.data.str);
-				break;
-			default:
-				fail_msg("function result '%s' has unexpected type '%s'",
-						zbx_variant_value_desc(&returned_value),
-						zbx_variant_type_desc(&returned_value));
-				break;
-		}
+		zbx_mock_assert_double_eq("function result", atof(expected_value), result);
 	}
-	if (SUCCEED == returned_ret)
-		zbx_variant_clear(&returned_value);
+out:
+	zbx_history_record_vector_destroy(&values_in, item.value_type);
 
 	zbx_vcmock_ds_destroy();
-
+	zbx_free(evaluate_period);
 	ZBX_UNUSED(state);
 }
