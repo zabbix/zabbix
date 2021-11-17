@@ -462,6 +462,7 @@ static void	worker_preprocess_dep_items(zbx_ipc_socket_t *socket, zbx_preproc_de
 	zbx_vector_ptr_t		messages;
 	zbx_preproc_result_t		*step_results;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): items:%d/%d", __func__, request->deps_offset, request->deps_alloc);
 
 	if (request->deps_alloc != request->deps_offset)
 	{
@@ -471,7 +472,7 @@ static void	worker_preprocess_dep_items(zbx_ipc_socket_t *socket, zbx_preproc_de
 			exit(EXIT_FAILURE);
 		}
 
-		return;
+		goto out;
 	}
 
 	step_results = (zbx_preproc_result_t *)zbx_malloc(NULL, step_results_alloc * sizeof(zbx_preproc_result_t));
@@ -555,6 +556,8 @@ static void	worker_preprocess_dep_items(zbx_ipc_socket_t *socket, zbx_preproc_de
 
 	zbx_preprocessor_free_dep_results(results, request->deps_alloc);
 	worker_dep_request_clear(request);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************

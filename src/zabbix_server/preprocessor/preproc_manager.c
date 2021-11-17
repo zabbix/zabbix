@@ -1250,10 +1250,7 @@ static void	preprocessor_add_result(zbx_preprocessing_manager_t *manager, zbx_ip
 	preprocessor_set_request_state_done(manager, request, worker->task);
 
 	if (FAIL != preprocessor_set_variant_result(request, &value, error))
-	{
-		preprocessor_enqueue_dependent(manager, request->value.hostid, request->value.itemid, &value,
-				request->value.item_value_type, request->value.ts);
-	}
+		preprocessor_enqueue_dependent_value(manager, &request->value);
 
 	worker->task = NULL;
 	zbx_variant_clear(&value);
