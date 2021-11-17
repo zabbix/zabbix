@@ -107,14 +107,14 @@ Overlay.prototype.centerDialog = function() {
 	// A fix for IE and Edge to stop popup width flickering when having vertical scrollbar.
 	this.$dialogue.$body.css('overflow-y', body_scroll_height > body_height ? 'scroll' : 'hidden');
 
-	let position_left = parseInt(this.$dialogue.css('left'), 10),
-		size_saved = this.$dialogue.data('size');
+	let	size_saved = this.$dialogue.data('size'),
+		position_left;
 
 	// Allow full width to determine actual width taken by the contents.
 	this.$dialogue.css('left', 0);
 
-	const dialogue_width = this.$dialogue.outerWidth(true),
-		window_width = jQuery(window).width();
+	const dialogue_width = this.$dialogue.outerWidth(true);
+	const window_width = jQuery(window).width();
 
 	// Don't re-center popup on reload with small changes in width. For example: edit dashboard widget.
 	if (typeof size_saved !== 'undefined'
