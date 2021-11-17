@@ -25,12 +25,11 @@ class testSystemInformation extends CWebTest {
 
 	const FAILOVER_DELAY = 8;
 
-	public static $timestamp;
+	public static $active_lastaccess;
 	public static $update_timestamp;
 	public static $standby_lastaccess;
 	public static $stopped_lastaccess;
 	public static $unavailable_lastaccess;
-	public static $active_lastaccess;
 	public static $standalone_lastaccess;
 
 	public static $skip_fields = [];
@@ -40,12 +39,11 @@ class testSystemInformation extends CWebTest {
 	 */
 	public static function prepareHANodeData() {
 		global $DB;
-		self::$timestamp = time();
-		self::$standby_lastaccess = self::$timestamp - 1;
-		self::$stopped_lastaccess = self::$timestamp - 240;
-		self::$unavailable_lastaccess = self::$timestamp - 180105;
-		self::$active_lastaccess = self::$timestamp;
-		self::$standalone_lastaccess = self::$timestamp - 20;
+		self::$active_lastaccess = time();
+		self::$standby_lastaccess = self::$active_lastaccess - 1;
+		self::$stopped_lastaccess = self::$active_lastaccess - 240;
+		self::$unavailable_lastaccess = self::$active_lastaccess - 180105;
+		self::$standalone_lastaccess = self::$active_lastaccess - 20;
 
 		$nodes = [
 			[
@@ -124,6 +122,7 @@ class testSystemInformation extends CWebTest {
 	 */
 	public function assertEnabledHACluster($dashboardid = null) {
 		global $DB;
+		$skip_fields = [];
 		$url = (!$dashboardid) ? 'zabbix.php?action=report.status' : 'zabbix.php?action=dashboard.view&dashboardid='.$dashboardid;
 		// Wait for frontend to get the new config from updated zabbix.conf.php file.
 		sleep((int) ini_get('opcache.revalidate_freq') + 1);

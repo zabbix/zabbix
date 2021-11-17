@@ -275,10 +275,9 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 				'Refresh interval' => 'Default (15 minutes)',
 				'Show' => 'System stats'
 			];
-			$expected_values = array_merge($field_values, $widget_data['fields']);
 
 			$form = $widget->edit()->asForm();
-			$this->assertEquals($expected_values, $form->getFields()->asValues());
+			$this->assertEquals(array_merge($field_values, $widget_data['fields']), $form->getFields()->asValues());
 			$form->submit();
 			$dashboard->cancelEditing();
 
