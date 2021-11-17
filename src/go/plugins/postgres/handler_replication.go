@@ -77,7 +77,7 @@ func replicationHandler(ctx context.Context, conn PostgresClient,
 					CASE
 		  				WHEN NOT pg_is_in_recovery() OR pg_last_wal_receive_lsn() = pg_last_wal_replay_lsn() THEN 0
 		  				ELSE COALESCE(EXTRACT(EPOCH FROM now() - pg_last_xact_replay_timestamp())::integer, 0)
-					END as lag;`
+					END AS lag;`
 	case keyReplicationLagB:
 		row, err := conn.QueryRow(ctx, `SELECT pg_is_in_recovery()`)
 		if err != nil {
@@ -126,9 +126,9 @@ func replicationHandler(ctx context.Context, conn PostgresClient,
 				   FROM (
 						SELECT
 						    application_name,
-							EXTRACT(epoch FROM COALESCE(flush_lag,'0'::interval)) as flush_lag, 
-							EXTRACT(epoch FROM COALESCE(replay_lag,'0'::interval)) as replay_lag,
-							EXTRACT(epoch FROM COALESCE(write_lag, '0'::interval)) as write_lag
+							EXTRACT(epoch FROM COALESCE(flush_lag,'0'::interval)) AS flush_lag, 
+							EXTRACT(epoch FROM COALESCE(replay_lag,'0'::interval)) AS replay_lag,
+							EXTRACT(epoch FROM COALESCE(write_lag, '0'::interval)) AS write_lag
 						FROM pg_stat_replication
 					) T; `
 		row, err := conn.QueryRow(ctx, query)
