@@ -244,7 +244,7 @@ final class CHistFunctionData {
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_TREND]]],
 			['rules' => [['type' => 'time', 'min' => SEC_PER_HOUR]]],
-			['rules' => [['type' => 'time', 'min' => 1]]],
+			['rules' => [['type' => 'time', 'min' => SEC_PER_HOUR]]],
 			['rules' => [['type' => 'number', 'min' => 1]], 'required' => false],
 			['rules' => [
 				['type' => 'regexp', 'pattern' => '/^(mad|stddevpop|stddevsamp)$/']
