@@ -661,7 +661,8 @@ int	zbx_evaluatable_for_notsupported(const char *fn)
  *             value          - [OUT] parameter value (preserved as is if the *
  *                              parameter is optional and empty)              *
  *             type           - [OUT] parameter value type (number of seconds *
- *                              or number of values)                          *
+ *                              or number of values, preserved as is if the   *
+ *                              parameter is optional and empty)              *
  *                                                                            *
  * Return value: SUCCEED - parameter is valid                                 *
  *               FAIL    - otherwise                                          *
@@ -1817,7 +1818,8 @@ static int	evaluate_LAST(zbx_variant_t *value, DC_ITEM *item, const char *parame
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_MIN(zbx_variant_t *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts, char **error)
+static int	evaluate_MIN(zbx_variant_t *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
+		char **error)
 {
 	int				arg1, i, ret = FAIL, seconds = 0, nvalues = 0, time_shift;
 	zbx_value_type_t		arg1_type;
@@ -2922,8 +2924,8 @@ static int	evaluate_TREND(zbx_variant_t *value, DC_ITEM *item, const char *func,
 	else if (0 == strcmp(func, "stl"))
 	{
 		char			*dev_alg = NULL;
-		int			start_detect_period, end_detect_period, season_shift, season,
-					season_processed, detect_period;
+		int			start_detect_period, end_detect_period, season_shift, season, season_processed,
+					detect_period;
 		zbx_uint64_t		deviations, s_window;
 		zbx_value_type_t	season_type;
 
@@ -2931,6 +2933,12 @@ static int	evaluate_TREND(zbx_variant_t *value, DC_ITEM *item, const char *func,
 				&season_shift))
 		{
 			*error = zbx_strdup(*error, "invalid third parameter");
+			goto out;
+		}
+
+		if (ZBX_VALUE_SECONDS != season_type)
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
 			goto out;
 		}
 

@@ -24,6 +24,7 @@
 
 #include "evalfunc_common.h"
 
+/* default values which can be used in zbx_STL() arguments */
 #define STL_DEF_DEVIATIONS	3
 #define S_DEGREE_DEF		0
 #define S_WINDOW_DEF		0
@@ -38,8 +39,8 @@
 #define INNER_DEF		-1
 #define OUTER_DEF		-1
 
-int	zbx_STL(zbx_vector_history_record_t *ts, int freq, int is_robust, int s_window, int s_degree, double t_window, int t_degree,
-		int l_window, int l_degree, int s_jump, int t_jump, int l_jump, int inner, int outer,
+int	zbx_STL(const zbx_vector_history_record_t *ts, int freq, int is_robust, int s_window, int s_degree, double t_window,
+		int t_degree, int l_window, int l_degree, int s_jump, int t_jump, int l_jump, int inner, int outer,
 		zbx_vector_history_record_t *trend, zbx_vector_history_record_t *seasonal,
 		zbx_vector_history_record_t *remainder, char **error);
 

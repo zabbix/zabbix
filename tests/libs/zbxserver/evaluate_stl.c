@@ -177,11 +177,13 @@ void	zbx_mock_test_entry(void **state)
 	if (FAIL == zbx_vc_get_values(item.itemid, item.value_type, &values_in, (int)seconds, nvalues, &ts))
 	{
 		error = zbx_strdup(error, "cannot get values from value cache");
+		printf("%s\n", error);
+		zbx_free(error);
 		goto out;
 	}
 
-	if (SUCCEED != (returned_ret = zbx_STL(&values_in, (int)season, ROBUST_DEF, (int)s_window, S_DEGREE_DEF, T_WINDOW_DEF,
-			T_DEGREE_DEF, L_WINDOW_DEF, L_DEGREE_DEF, S_JUMP_DEF, T_JUMP_DEF, L_JUMP_DEF,
+	if (SUCCEED != (returned_ret = zbx_STL(&values_in, (int)season, ROBUST_DEF, (int)s_window, S_DEGREE_DEF,
+			T_WINDOW_DEF, T_DEGREE_DEF, L_WINDOW_DEF, L_DEGREE_DEF, S_JUMP_DEF, T_JUMP_DEF, L_JUMP_DEF,
 			INNER_DEF, OUTER_DEF, &trend_values_received, &seasonal_values_received,
 			&remainder_values_received, &error)))
 	{

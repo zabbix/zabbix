@@ -31,30 +31,30 @@
 ZBX_PTR_VECTOR_DECL(VV, zbx_vector_history_record_t *)
 ZBX_PTR_VECTOR_IMPL(VV, zbx_vector_history_record_t *)
 
-/******************************************************************************
- *                                                                            *
- * Function: zbx_get_percentage_of_deviations_in_remainder                    *
- *                                                                            *
- * Purpose: finds how many values in stl remainder are outliers               *
- *                                                                            *
- * Parameters:  remainder        - [IN] stl remainder values vector           *
- *              deviations_count - [IN] how much a value can be away from the *
- *                                      (mad, stdevsamp or stdevpop) to get   *
- *                                      counted as an outlier                 *
- *                        devalg - [IN] function (mad, stdevsamp or stdevpop) *
- *                                      to evaluate a single deviation unit   *
- *           detect_period_start - [IN] evaluate number of deviations in      *
- *                                      remainder starting from this time     *
- *                 detect_period - [IN] evaluate number of deviations in      *
- *                                      remainder until this time             *
- *                        result - [OUT] result - double, a percentage how    *
- *                                       many outliers are in remainder       *
- *                         error - [OUT] the error message                    *
- *                                                                            *
- * Return value: SUCCEED - evaluated successfully, value contains new value   *
- *               FAIL - evaluation failed, value contains old value           *
- *                                                                            *
- ******************************************************************************/
+/*******************************************************************************
+ *                                                                             *
+ * Function: zbx_get_percentage_of_deviations_in_remainder                     *
+ *                                                                             *
+ * Purpose: finds how many values in stl remainder are outliers                *
+ *                                                                             *
+ * Parameters:  remainder        - [IN] stl remainder values vector            *
+ *              deviations_count - [IN] how much a value can be away from the  *
+ *                                      (mad, stdevsamp or stdevpop) to get    *
+ *                                      counted as an outlier                  *
+ *                        devalg - [IN] function (mad, stdevsamp or stdevpop)  *
+ *                                      to evaluate a single deviation unit    *
+ *           detect_period_start - [IN] evaluate number of deviations in       *
+ *                                      remainder starting from this time      *
+ *                 detect_period - [IN] evaluate number of deviations in       *
+ *                                      remainder until this time              *
+ *                        result - [OUT] result - double, a percentage how     *
+ *                                       many outliers are in remainder        *
+ *                         error - [OUT] the error message                     *
+ *                                                                             *
+ * Return value: SUCCEED - evaluated successfully, 'result' contains new value *
+ *               FAIL - evaluation failed, 'result' contains old value         *
+ *                                                                             *
+ *******************************************************************************/
 int	zbx_get_percentage_of_deviations_in_stl_remainder(const zbx_vector_history_record_t *remainder,
 		zbx_uint64_t deviations_count, const char* devalg, int detect_period_start, int detect_period_end,
 		double *result, char **error)
@@ -86,6 +86,7 @@ int	zbx_get_percentage_of_deviations_in_stl_remainder(const zbx_vector_history_r
 	}
 	else
 	{
+		*error = zbx_dsprintf(*error, "undefined devalg parameter: \"%s\"", devalg);
 		THIS_SHOULD_NEVER_HAPPEN;
 		goto out;
 	}
@@ -122,15 +123,11 @@ out:
 	return ret;
 }
 
-
 static double	nextodd(double x)
 {
-	double	tmp;
+	x = round(x);
 
-	tmp = round(x);
-	x = (int)tmp;
-
-	if (0 == ((int)x % 2))
+	if (SUCCEED == zbx_double_compare(0, remainder(x, 2.0)))
 		x += 1;
 
 	return x;
@@ -142,9 +139,9 @@ static void	VV_clear(zbx_vector_history_record_t *v)
 	zbx_free(v);
 }
 
-static int	eval_loess_regression_curve(zbx_vector_history_record_t *y, int n, int length, int ideg, int xs,
-		int nleft, int nright, zbx_vector_history_record_t *w, int userw, zbx_vector_history_record_t *rw,
-		double *ret)
+static int	eval_loess_regression_curve(const zbx_vector_history_record_t *y, int n, int length, int ideg, int xs,
+		int nleft, int nright, const zbx_vector_history_record_t *w, int userw,
+		const zbx_vector_history_record_t *rw, double *ret)
 {
 	int			i, ret_status = FAIL, count_mid = 0;
 	double			h;
@@ -286,8 +283,9 @@ static int	eval_loess_regression_curve(zbx_vector_history_record_t *y, int n, in
 	return ret_status;
 }
 
-static void	apply_loess_smoothing(zbx_vector_history_record_t *y, int n, int length, int ideg, int njump, int userw,
-		zbx_vector_history_record_t *rw, zbx_vector_history_record_t *ys, zbx_vector_history_record_t *res)
+static void	apply_loess_smoothing(const zbx_vector_history_record_t *y, int n, int length, int ideg, int njump,
+		int userw, const zbx_vector_history_record_t *rw, zbx_vector_history_record_t *ys,
+		const zbx_vector_history_record_t *res)
 {
 	int	newnj, i, nleft, nright;
 
@@ -432,8 +430,8 @@ static void	apply_loess_smoothing(zbx_vector_history_record_t *y, int n, int len
 	}
 }
 
-static void	combine_smooth(zbx_vector_history_record_t *y, int n, int np, int ns, int isdeg, int nsjump, int userw,
-		zbx_vector_history_record_t *rw, zbx_vector_history_record_t *season,
+static void	combine_smooth(const zbx_vector_history_record_t *y, int n, int np, int ns, int isdeg, int nsjump,
+		int userw, const zbx_vector_history_record_t *rw, zbx_vector_history_record_t *season,
 		zbx_vector_history_record_t *work1, zbx_vector_history_record_t *work2,
 		zbx_vector_history_record_t *work3, zbx_vector_history_record_t *work4)
 {
@@ -509,7 +507,8 @@ static void	combine_smooth(zbx_vector_history_record_t *y, int n, int np, int ns
 	}
 }
 
-static void	eval_moving_average(zbx_vector_history_record_t *x, int n, int length, zbx_vector_history_record_t *ave)
+static void	eval_moving_average(const zbx_vector_history_record_t *x, int n, int length,
+		zbx_vector_history_record_t *ave)
 {
 	int	i, newn;
 	double	v = 0;
@@ -550,8 +549,8 @@ static double	find_stl_median(zbx_vector_history_record_t *v)
 		return v->values[v->values_num / 2].value.dbl;
 }
 
-static	void eval_robustness_weights(zbx_vector_history_record_t *y, int n, zbx_vector_history_record_t *fit,
-		zbx_vector_history_record_t *rw)
+static	void eval_robustness_weights(const zbx_vector_history_record_t *y, int n,
+		const zbx_vector_history_record_t *fit, zbx_vector_history_record_t *rw)
 {
 	int				i;
 	double				med;
@@ -610,7 +609,7 @@ static	void eval_robustness_weights(zbx_vector_history_record_t *y, int n, zbx_v
 	zbx_vector_uint64_destroy(&mid);
 }
 
-static void	step(zbx_vector_history_record_t *y, int n, int np, int ns, int nt, int nl, int isdeg, int itdeg,
+static void	step(const zbx_vector_history_record_t *y, int n, int np, int ns, int nt, int nl, int isdeg, int itdeg,
 		int ildeg, int nsjump, int ntjump, int nljump, int ni, int userw, zbx_vector_history_record_t *rw,
 		zbx_vector_history_record_t *season, zbx_vector_history_record_t *trend, zbx_vector_VV_t *work)
 {
@@ -692,34 +691,30 @@ static void	step(zbx_vector_history_record_t *y, int n, int np, int ns, int nt, 
 	}
 }
 
-
-int	zbx_STL(zbx_vector_history_record_t *values_in, int freq, int is_robust, int s_window, int s_degree,
+int	zbx_STL(const zbx_vector_history_record_t *values_in, int freq, int is_robust, int s_window, int s_degree,
 		double t_window, int t_degree, int l_window, int l_degree, int nsjump, int ntjump, int nljump,
 		int inner, int outer, zbx_vector_history_record_t *trend, zbx_vector_history_record_t *seasonal,
 		zbx_vector_history_record_t *remainder, char **error)
 {
-	int				values_in_len, userw, i, j, ret = FAIL;
+	int				values_in_len, userw, i, ret = FAIL;
 	zbx_vector_history_record_t	weights;
 	zbx_vector_VV_t			work;
 	double				tmp;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_VV_create(&work);
-	zbx_history_record_vector_create(&weights);
-
 	values_in_len = values_in->values_num;
 
 	if (2 > freq)
 	{
-		*error = zbx_dsprintf(*error, "Frequency must be greater than 1, it is: %d", freq);
+		*error = zbx_dsprintf(*error, "Frequency (season/h) must be greater than 1, it is: %d", freq);
 		goto out;
 	}
 
 	if (2 * freq >= values_in_len)
 	{
-		*error = zbx_dsprintf(*error, "STL requires data with the length more than double of frequency. "
-				"Frequency is: %d, number of data entries is: %d", freq, values_in_len);
+		*error = zbx_dsprintf(*error, "STL requires number of data elements more than two times the frequency. "
+				"Frequency (season/h) is: %d, number of data entries is: %d", freq, values_in_len);
 		goto out;
 	}
 
@@ -752,6 +747,7 @@ int	zbx_STL(zbx_vector_history_record_t *values_in, int freq, int is_robust, int
 
 	zbx_vector_history_record_reserve(seasonal, (size_t)values_in_len);
 	zbx_vector_history_record_reserve(trend, (size_t)values_in_len);
+	zbx_history_record_vector_create(&weights);
 	zbx_vector_history_record_reserve(&weights, (size_t)values_in_len);
 	zbx_vector_history_record_reserve(remainder, (size_t)values_in_len);
 
@@ -776,10 +772,12 @@ int	zbx_STL(zbx_vector_history_record_t *values_in, int freq, int is_robust, int
 		zbx_vector_history_record_append_ptr(remainder, &value4);
 	}
 
+	zbx_vector_VV_create(&work);
 	zbx_vector_VV_reserve(&work, (size_t)(values_in_len + 2 * freq));
 
 	for (i = 0; i < work.values_alloc; i++)
 	{
+		int				j;
 		zbx_vector_history_record_t	*work_temp;
 
 		work_temp = (zbx_vector_history_record_t*)zbx_malloc(NULL, sizeof(zbx_vector_history_record_t));
@@ -818,7 +816,7 @@ int	zbx_STL(zbx_vector_history_record_t *values_in, int freq, int is_robust, int
 
 	for (i = 0; i < outer; i++)
 	{
-
+		int				j;
 		zbx_vector_history_record_t	work_0_copy;
 
 		zbx_history_record_vector_create(&work_0_copy);
