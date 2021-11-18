@@ -103,6 +103,7 @@ void	zbx_preproc_cache_clear(zbx_preproc_cache_t *cache)
 		{
 			case ZBX_PREPROC_PROMETHEUS_PATTERN:
 				zbx_prometheus_clear((zbx_prometheus_t *)cache->refs.values[i].impl);
+				zbx_free(cache->refs.values[i].impl);
 		}
 	}
 
