@@ -2977,6 +2977,7 @@ static int	evaluate_TREND(zbx_variant_t *value, DC_ITEM *item, const char *func,
 				(0 != strcmp("stddevsamp", dev_alg))))
 		{
 			*error = zbx_strdup(*error, "invalid sixth parameter");
+			zbx_free(dev_alg);
 			goto out;
 		}
 
