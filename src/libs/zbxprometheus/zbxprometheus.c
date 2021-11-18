@@ -775,6 +775,12 @@ static int	prometheus_filter_init(zbx_prometheus_filter_t *filter, const char *d
 	memset(filter, 0, sizeof(zbx_prometheus_filter_t));
 	zbx_vector_ptr_create(&filter->labels);
 
+	if (NULL == data)
+	{
+		ret = SUCCEED;
+		goto out;
+	}
+
 	pos = skip_spaces(data, pos);
 
 	if (SUCCEED == parse_metric(data, pos, &loc))
@@ -1489,9 +1495,9 @@ out:
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	prometheus_extract_value(zbx_vector_ptr_t *rows, const char *output, char **value, char **error)
+static int	prometheus_extract_value(const zbx_vector_ptr_t *rows, const char *output, char **value, char **error)
 {
-	zbx_prometheus_row_t	*row;
+	const zbx_prometheus_row_t	*row;
 
 	if (0 == rows->values_num)
 	{
@@ -1526,7 +1532,7 @@ static int	prometheus_extract_value(zbx_vector_ptr_t *rows, const char *output, 
 		return FAIL;
 	}
 
-	row = (zbx_prometheus_row_t *)rows->values[0];
+	row = (const zbx_prometheus_row_t *)rows->values[0];
 
 	if ('\0' != *output)
 	{
@@ -1553,6 +1559,166 @@ static int	prometheus_extract_value(zbx_vector_ptr_t *rows, const char *output, 
 		*value = zbx_strdup(NULL, row->value);
 
 	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: prometheus_filter_rows                                           *
+ *                                                                            *
+ * Purpose: get rows matching the filter criteria                             *
+ *                                                                            *
+ * Parameters: prom   - [IN] the prometheus cache                             *
+ *             filter - [IN] the prometheus filter                            *
+ *             rows   - [OUT] the filtered rows                               *
+ *                                                                            *
+ ******************************************************************************/
+static void	prometheus_filter_rows(zbx_prometheus_t *prom, zbx_prometheus_filter_t *filter, zbx_vector_ptr_t *rows)
+{
+	int			i, j, k;
+	zbx_prometheus_row_t	*row;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	for (i = 0; i < prom->rows.values_num; i++)
+	{
+
+		row = (zbx_prometheus_row_t *)prom->rows.values[i];
+
+		if (NULL != filter->metric)
+		{
+			if (SUCCEED != condition_match_key_value(filter->metric, NULL, row->metric))
+				continue;
+		}
+
+		if (0 == row->labels.values_num && 0 != filter->labels.values_num)
+			continue;
+
+		for (j = 0; j < filter->labels.values_num; j++)
+		{
+			zbx_prometheus_condition_t	*condition = filter->labels.values[j];
+
+			for (k = 0; k < row->labels.values_num; k++)
+			{
+				zbx_prometheus_label_t	*label = row->labels.values[k];
+
+				if (SUCCEED == condition_match_key_value(condition, label->name, label->value))
+					break;
+			}
+
+			if (k == row->labels.values_num)
+				break;
+		}
+
+		if (j != filter->labels.values_num)
+			continue;
+
+		if (NULL != filter->value)
+		{
+			if (SUCCEED != condition_match_metric_value(filter->value->pattern, row->value))
+				continue;
+		}
+
+		zbx_vector_ptr_append(rows, row);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows:%d", __func__, rows->values_num);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_prometheus_init                                              *
+ *                                                                            *
+ * Purpose: parse prometheus input and initialize cache                       *
+ *                                                                            *
+ * Parameters: prom  - [IN] the prometheus cache                              *
+ *             data  - [IN] the prometheus data                               *
+ *             error - [OUT] the error message rows                           *
+ *                                                                            *
+ * Return value: SUCCEED - the prometheus data were parsed successfully       *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_prometheus_init(zbx_prometheus_t *prom, const char *data, char **error)
+{
+	zbx_prometheus_filter_t	filter;
+	int			ret = FAIL;
+
+	zbx_vector_ptr_create(&prom->rows);
+
+	if (SUCCEED != prometheus_filter_init(&filter, NULL, error))
+		return FAIL;
+
+	if (FAIL == prometheus_parse_rows(&filter, data, &prom->rows, NULL, error))
+		goto out;
+
+	ret = SUCCEED;
+out:
+	prometheus_filter_clear(&filter);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_prometheus_clear                                             *
+ *                                                                            *
+ * Purpose: free resources allocated by prometheus cache                      *
+ *                                                                            *
+ * Parameters: prom  - [IN] the prometheus cache                              *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_prometheus_clear(zbx_prometheus_t *prom)
+{
+	zbx_vector_ptr_clear_ext(&prom->rows, (zbx_clean_func_t)prometheus_row_free);
+	zbx_vector_ptr_destroy(&prom->rows);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_prometheus_pattern                                           *
+ *                                                                            *
+ * Purpose: extract value from prometheus cache by the specified filter       *
+ *                                                                            *
+ * Parameters: data        - [IN] the prometheus cache                        *
+ *             fitler_data - [IN] the filter in text format                   *
+ *             output      - [IN] the output template                         *
+ *             value       - [OUT] the extracted value                        *
+ *             error       - [OUT] the error message                          *
+ *                                                                            *
+ * Return value: SUCCEED - the value was extracted successfully               *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_prometheus_pattern_ex(zbx_prometheus_t *prom, const char *filter_data, const char *output, char **value,
+		char **error)
+{
+	zbx_prometheus_filter_t	filter;
+	int			ret = FAIL;
+	char			*errmsg = NULL;
+	zbx_vector_ptr_t	rows;
+
+	zbx_vector_ptr_create(&rows);
+
+	if (FAIL == prometheus_filter_init(&filter, filter_data, &errmsg))
+	{
+		*error = zbx_dsprintf(*error, "pattern error: %s", errmsg);
+		zbx_free(errmsg);
+		goto out;
+	}
+
+	prometheus_filter_rows(prom, &filter, &rows);
+
+	if (FAIL == (ret = prometheus_extract_value(&rows, output, value, &errmsg)))
+	{
+		*error = zbx_dsprintf(*error, "data extraction error: %s", errmsg);
+		zbx_free(errmsg);
+	}
+
+	prometheus_filter_clear(&filter);
+out:
+	zbx_vector_ptr_destroy(&rows);
+
+	return ret;
 }
 
 /******************************************************************************

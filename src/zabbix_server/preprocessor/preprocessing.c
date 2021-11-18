@@ -804,6 +804,7 @@ int	zbx_preprocessor_pack_dep_result(const zbx_preproc_dep_result_t *results, in
 
 		offset += preprocessor_pack_variant(offset, &results[i].value);
 		*offset++ = PACKED_FIELD(results[i].error, 0);
+
 		offset += preprocessor_pack_history(offset, &results[i].history, &results[i].history.values_num);
 
 		dep_num = offset - dep;
@@ -837,7 +838,8 @@ int	zbx_preprocessor_pack_dep_result(const zbx_preproc_dep_result_t *results, in
 out:
 	zbx_free(fields);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() messages:%d", __func__, messages->values_num);
+	// WDN
+	zabbix_log(LOG_LEVEL_WARNING, "End of %s() messages:%d", __func__, messages->values_num);
 
 	return messages->values_num;
 }
