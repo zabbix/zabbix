@@ -838,8 +838,7 @@ int	zbx_preprocessor_pack_dep_result(const zbx_preproc_dep_result_t *results, in
 out:
 	zbx_free(fields);
 
-	// WDN
-	zabbix_log(LOG_LEVEL_WARNING, "End of %s() messages:%d", __func__, messages->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() messages:%d", __func__, messages->values_num);
 
 	return messages->values_num;
 }

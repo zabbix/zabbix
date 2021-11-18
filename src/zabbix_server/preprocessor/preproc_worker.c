@@ -466,8 +466,7 @@ static void	worker_preprocess_dep_items(zbx_ipc_socket_t *socket, zbx_preproc_de
 	zbx_preproc_result_t		*step_results;
 	zbx_preproc_cache_t		cache;
 
-	// WDN
-	zabbix_log(LOG_LEVEL_WARNING, "In %s(): items:%d/%d", __func__, request->deps_offset, request->deps_alloc);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): items:%d/%d", __func__, request->deps_offset, request->deps_alloc);
 
 	if (request->deps_alloc != request->deps_offset)
 	{
@@ -566,9 +565,7 @@ static void	worker_preprocess_dep_items(zbx_ipc_socket_t *socket, zbx_preproc_de
 	zbx_preprocessor_free_dep_results(results, request->deps_alloc);
 	worker_dep_request_clear(request);
 out:
-
-	// WDN
-	zabbix_log(LOG_LEVEL_WARNING, "End of %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
