@@ -34,7 +34,6 @@ class testFormHostMonitoring extends testFormHost {
 	public $create_link = null;
 
 	public function testFormHostMonitoring_Layout() {
-
 		$this->checkHostLayout($this->link, self::STANDALONE, self::MONITORING);
 	}
 
