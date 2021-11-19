@@ -198,3 +198,12 @@ div.dashboard-grid-widget-item {
 		fill: $arrow-fill-up-down;
 	}
 }
+
+.dashboard-grid-widget:not(.dashboard-grid-widget-hidden-header) {
+	div.dashboard-grid-widget-item {
+		$widget-container-padding: 8px;
+
+		height: calc(100% + #{$widget-container-padding});
+		margin-bottom: -$widget-container-padding;
+	}
+}

@@ -1511,6 +1511,10 @@ div.dashboard-grid-widget-item {
 .dashboard-grid-widget-item .svg-arrow-up-down {
   fill: #3DC51D; }
 
+.dashboard-grid-widget:not(.dashboard-grid-widget-hidden-header) div.dashboard-grid-widget-item {
+  height: calc(100% + 8px);
+  margin-bottom: -8px; }
+
 .diff {
   padding: 4px;
   background: #ebeef0; }
