@@ -1470,12 +1470,14 @@ div.dashboard-grid-widget-item {
       color: #333333; }
   div.dashboard-grid-widget-item .left {
     justify-content: flex-start;
-    max-width: fit-content; }
+    max-width: max-content;
+    margin-right: auto; }
   div.dashboard-grid-widget-item .center {
     justify-content: center; }
   div.dashboard-grid-widget-item .right {
     justify-content: flex-end;
-    max-width: fit-content; }
+    max-width: max-content;
+    margin-left: auto; }
   div.dashboard-grid-widget-item .top {
     align-self: flex-start; }
   div.dashboard-grid-widget-item .middle {

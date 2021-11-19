@@ -131,7 +131,8 @@ div.dashboard-grid-widget-item {
 
 	.left {
 		justify-content: flex-start;
-		max-width: fit-content;
+		max-width: max-content;
+		margin-right: auto;
 	}
 
 	.center {
@@ -140,7 +141,8 @@ div.dashboard-grid-widget-item {
 
 	.right {
 		justify-content: flex-end;
-		max-width: fit-content;
+		max-width: max-content;
+		margin-left: auto;
 	}
 
 	.top {
