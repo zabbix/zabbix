@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-12 19:55+0200\n"
+"POT-Creation-Date: 2021-11-19 19:55+0200\n"
 "PO-Revision-Date: 2016-02-09 16:27+0300\n"
 "Last-Translator: Oleksii <oleksii.zagorskyi@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -1062,6 +1062,10 @@ msgstr ""
 #: include/actions.inc.php:2106
 msgid "Alert message"
 msgstr "Повідомлення тривоги"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1070
+msgid "Algorithm"
+msgstr ""
 
 #: include/hosts.inc.php:114
 msgid "Alias"
@@ -2779,7 +2783,7 @@ msgstr[0] "Не вдалося імпортувати шаблон \"%1$s\", п�
 msgstr[1] "Не вдалося імпортувати шаблон \"%1$s\", приєднані шаблони \"%2$s\" не існують."
 msgstr[2] "Не вдалося імпортувати шаблон \"%1$s\", приєднані шаблони \"%2$s\" не існують."
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1486
+#: app/controllers/CControllerPopupTriggerExpr.php:1527
 msgid "Cannot insert trigger expression"
 msgstr "Не вдалося вставити вираз тригера"
 
@@ -3379,7 +3383,7 @@ msgstr "Не містить рядок символів"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:728
 #: app/controllers/CControllerPopupTriggerExpr.php:921
-#: app/controllers/CControllerPopupTriggerExpr.php:1052
+#: app/controllers/CControllerPopupTriggerExpr.php:1095
 msgid "Chars"
 msgstr ""
 
@@ -3395,7 +3399,7 @@ msgstr "Інформація про шасі. Повертає текст"
 msgid "Check already exists."
 msgstr "Перевірка вже існує."
 
-#: include/classes/parsers/C10TriggerExpression.php:538
+#: include/classes/parsers/C10TriggerExpression.php:542
 #, c-format
 msgid "Check expression part starting from \"%1$s\"."
 msgstr "Перевірте частину виразу починаючи з \"%1$s\"."
@@ -3683,7 +3687,7 @@ msgstr "Стиснення"
 msgid "Concurrent sessions"
 msgstr "Одночасні сесії"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1509
+#: app/controllers/CControllerPopupTriggerExpr.php:1550
 #: app/views/popup.lldoperation.php:59 app/views/popup.lldoverride.php:195
 #: app/views/popup.service.statusrule.edit.php:48
 msgid "Condition"
@@ -4800,7 +4804,7 @@ msgid "December"
 msgstr "Грудень"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:908
-#: app/controllers/CControllerPopupTriggerExpr.php:1065
+#: app/controllers/CControllerPopupTriggerExpr.php:1108
 msgid "Decimal places"
 msgstr ""
 
@@ -5256,7 +5260,7 @@ msgstr ""
 msgid "Dependencies"
 msgstr "Залежності"
 
-#: include/triggers.inc.php:2397
+#: include/triggers.inc.php:2398
 msgid "Dependent"
 msgstr "Залежність"
 
@@ -5264,7 +5268,7 @@ msgstr "Залежність"
 msgid "Dependent item"
 msgstr "Залежний елемент даних"
 
-#: app/views/popup.generic.php:278 include/triggers.inc.php:2397
+#: app/views/popup.generic.php:278 include/triggers.inc.php:2398
 #: include/views/configuration.trigger.prototype.list.php:92
 #: include/views/configuration.triggers.list.php:238
 msgid "Depends on"
@@ -5322,6 +5326,14 @@ msgstr "Деталі"
 #: httpdetails.php:27 httpdetails.php:185
 msgid "Details of web scenario"
 msgstr "Деталі про веб сценарій"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1055
+msgid "Detection period"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1065
+msgid "Deviations"
+msgstr ""
 
 #: include/actions.inc.php:76
 msgid "Device"
@@ -5478,7 +5490,7 @@ msgstr "Дезактивувати вибрані веб сценарії?"
 #: include/hosts.inc.php:1126 include/html.inc.php:284
 #: include/httptest.inc.php:48 include/items.inc.php:138
 #: include/items.inc.php:141 include/items.inc.php:185
-#: include/maps.inc.php:325 include/triggers.inc.php:1870
+#: include/maps.inc.php:325 include/triggers.inc.php:1871
 #: include/users.inc.php:84 include/views/configuration.action.list.php:77
 #: include/views/configuration.action.list.php:129
 #: include/views/configuration.host.discovery.list.php:167
@@ -6224,7 +6236,7 @@ msgstr "Активувати трапи"
 #: include/html.inc.php:280 include/httptest.inc.php:47
 #: include/items.inc.php:138 include/items.inc.php:141
 #: include/items.inc.php:182 include/triggers.inc.php:999
-#: include/triggers.inc.php:1867
+#: include/triggers.inc.php:1868
 #: include/views/configuration.action.edit.php:147
 #: include/views/configuration.action.list.php:76
 #: include/views/configuration.action.list.php:137
@@ -6319,6 +6331,10 @@ msgstr ""
 #, c-format
 msgid "Error: %1$s"
 msgstr "Помилка: %1$s"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1045
+msgid "Evaluation period"
+msgstr ""
 
 #: include/events.inc.php:180
 msgid "Event"
@@ -8429,7 +8445,7 @@ msgstr ""
 #: app/partials/monitoring.host.view.html.php:89
 #: app/views/configuration.host.list.php:267
 #: include/classes/screens/CScreenProblem.php:386
-#: include/hostgroups.inc.php:293 include/triggers.inc.php:2022
+#: include/hostgroups.inc.php:293 include/triggers.inc.php:2023
 #: include/views/inventory.host.view.php:42
 msgid "Inaccessible maintenance"
 msgstr "Недоступне обслуговування"
@@ -8441,11 +8457,11 @@ msgstr "Недоступна карта мережі"
 
 #: httpconf.php:663 include/graphs.inc.php:274 include/hosts.inc.php:649
 #: include/httptest.inc.php:222 include/items.inc.php:916
-#: include/triggers.inc.php:2161
+#: include/triggers.inc.php:2162
 msgid "Inaccessible template"
 msgstr "Недоступний шаблон"
 
-#: include/triggers.inc.php:2367 include/triggers.inc.php:2375
+#: include/triggers.inc.php:2368 include/triggers.inc.php:2376
 msgid "Inaccessible trigger"
 msgstr "Недоступний тригер"
 
@@ -8936,8 +8952,8 @@ msgstr "Некоректна кількість кроків шаблонног�
 msgid "Incorrect trigger expression"
 msgstr "Некоректний вираз тригера"
 
-#: include/classes/parsers/C10TriggerExpression.php:522
-#: include/classes/parsers/C10TriggerExpression.php:538
+#: include/classes/parsers/C10TriggerExpression.php:526
+#: include/classes/parsers/C10TriggerExpression.php:542
 msgid "Incorrect trigger expression."
 msgstr "Некоректний вираз тригера."
 
@@ -9532,7 +9548,7 @@ msgstr ""
 msgid "Invalid action condition: %1$s."
 msgstr "Неправильна умова дії: %1$s."
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1476
+#: app/controllers/CControllerPopupTriggerExpr.php:1517
 #, c-format
 msgid "Invalid condition: %1$s."
 msgstr ""
@@ -10006,7 +10022,7 @@ msgstr[2] "Елементи даних активовано"
 msgid "Item in \"not supported\" state"
 msgstr "Елемент даних в стані \"не підтримується\""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1469
+#: app/controllers/CControllerPopupTriggerExpr.php:1510
 msgid "Item not selected"
 msgstr "Елемент даних не вибрано"
 
@@ -13714,6 +13730,7 @@ msgid "Period"
 msgstr "Період"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:95
+#: app/controllers/CControllerPopupTriggerExpr.php:1050
 msgid "Period shift"
 msgstr ""
 
@@ -15508,6 +15525,14 @@ msgstr "Шаблон пошуку пустий"
 
 #: app/views/monitoring.charts.view.php:103
 msgid "Search type"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1060
+msgid "Season"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1075
+msgid "Season deviation window"
 msgstr ""
 
 #: include/hosts.inc.php:434
@@ -18037,7 +18062,7 @@ msgstr "Одиниця виміру"
 #: include/items.inc.php:45 include/items.inc.php:110
 #: include/items.inc.php:133 include/items.inc.php:167
 #: include/maintenances.inc.php:33 include/maps.inc.php:39
-#: include/triggers.inc.php:83 include/triggers.inc.php:1867
+#: include/triggers.inc.php:83 include/triggers.inc.php:1868
 #: include/users.inc.php:64 include/users.inc.php:87
 #: include/views/configuration.action.edit.php:233
 #: include/views/configuration.triggers.list.php:77
@@ -18057,7 +18082,7 @@ msgid "Unknown error"
 msgstr "Невідома помилка"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:47
-#: app/controllers/CControllerPopupTriggerExpr.php:1258
+#: app/controllers/CControllerPopupTriggerExpr.php:1301
 #: include/triggers.inc.php:1146
 msgid "Unknown host item, no such item in selected host"
 msgstr "Невідомий елемент даних вузла мережі, немає цього елемента в обраному вузлі"
@@ -20572,11 +20597,11 @@ msgstr ""
 msgid "including subgroups"
 msgstr "включаючи субгрупи"
 
-#: include/classes/parsers/C10TriggerExpression.php:521
+#: include/classes/parsers/C10TriggerExpression.php:525
 msgid "incorrect calculated item formula"
 msgstr ""
 
-#: include/classes/parsers/C10TriggerExpression.php:537
+#: include/classes/parsers/C10TriggerExpression.php:541
 #, c-format
 msgid "incorrect calculated item formula starting from \"%1$s\""
 msgstr ""
@@ -20673,7 +20698,7 @@ msgstr "некоректне ім'я групи вузлів мережі"
 msgid "invalid host name"
 msgstr "некоректне ім'я вузла мережі"
 
-#: include/classes/validators/CHistFunctionValidator.php:80
+#: include/classes/validators/CHistFunctionValidator.php:82
 #: include/classes/validators/CMathFunctionValidator.php:86
 #, c-format
 msgid "invalid number of parameters in function \"%1$s\""
@@ -20693,6 +20718,16 @@ msgstr "помилковий регулярний вираз"
 #: include/classes/validators/CHistFunctionValidator.php:64
 #, c-format
 msgid "invalid second parameter in function \"%1$s\""
+msgstr ""
+
+#: include/classes/validators/CHistFunctionValidator.php:69
+#, c-format
+msgid "invalid seventh parameter in function \"%1$s\""
+msgstr ""
+
+#: include/classes/validators/CHistFunctionValidator.php:68
+#, c-format
+msgid "invalid sixth parameter in function \"%1$s\""
 msgstr ""
 
 #: include/classes/validators/CHistFunctionValidator.php:65
@@ -20832,7 +20867,7 @@ msgstr "макрос(и)"
 msgid "mad() - Median absolute deviation"
 msgstr ""
 
-#: include/classes/validators/CHistFunctionValidator.php:91
+#: include/classes/validators/CHistFunctionValidator.php:93
 #, c-format
 msgid "mandatory parameter is missing in function \"%1$s\""
 msgstr ""
@@ -21520,6 +21555,10 @@ msgid "trendmin() - Minimum value for period T with exact period shift"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1042
+msgid "trendstl() - Anomaly detection for period T"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1085
 msgid "trendsum() - Sum of values of a period T with exact period shift"
 msgstr ""
 
@@ -21545,11 +21584,11 @@ msgstr "прототип тригера неможливо перемістит�
 msgid "trigger with linkages cannot be moved to another template or host"
 msgstr "тригера зв зв'язками неможливо перемістити в другий шаблон або вузел мережі"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1049
+#: app/controllers/CControllerPopupTriggerExpr.php:1092
 msgid "trim() - Remove specified characters from the beginning and the end of a string"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1062
+#: app/controllers/CControllerPopupTriggerExpr.php:1105
 msgid "truncate() - Truncates a value to decimal places"
 msgstr ""
 
@@ -21649,7 +21688,7 @@ msgstr "неочікуване значення \"%1$s\""
 msgid "unknown"
 msgstr "невідомо"
 
-#: include/classes/validators/CHistFunctionValidator.php:71
+#: include/classes/validators/CHistFunctionValidator.php:73
 #: include/classes/validators/CMathFunctionValidator.php:55
 #, c-format
 msgid "unknown function \"%1$s\""
@@ -21850,11 +21889,11 @@ msgstr ""
 msgid "value of third parameter must be one of %1$s"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1075
+#: app/controllers/CControllerPopupTriggerExpr.php:1118
 msgid "varpop() - Population variance"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1082
+#: app/controllers/CControllerPopupTriggerExpr.php:1125
 msgid "varsamp() - Sample variance"
 msgstr ""
 

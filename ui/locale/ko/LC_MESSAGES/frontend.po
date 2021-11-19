@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-12 19:55+0200\n"
+"POT-Creation-Date: 2021-11-19 19:55+0200\n"
 "PO-Revision-Date: 2016-01-22 16:15+0300\n"
 "Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1018,6 +1018,10 @@ msgstr ""
 #: include/actions.inc.php:2106
 msgid "Alert message"
 msgstr "알림 메세지"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1070
+msgid "Algorithm"
+msgstr ""
 
 #: include/hosts.inc.php:114
 msgid "Alias"
@@ -2643,7 +2647,7 @@ msgid "Cannot import template \"%1$s\", linked template \"%2$s\" does not exist.
 msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" do not exist."
 msgstr[0] "템플릿 \"%1$s\"를 가져올 수 없습니다. 링크되어 있는 템플릿 \"%2$s\"가 존재하지 않습니다."
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1486
+#: app/controllers/CControllerPopupTriggerExpr.php:1527
 msgid "Cannot insert trigger expression"
 msgstr "트리거 조건식을 추가할 수 없습니다"
 
@@ -3229,7 +3233,7 @@ msgstr "문자열이 포함되지 않음"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:728
 #: app/controllers/CControllerPopupTriggerExpr.php:921
-#: app/controllers/CControllerPopupTriggerExpr.php:1052
+#: app/controllers/CControllerPopupTriggerExpr.php:1095
 msgid "Chars"
 msgstr ""
 
@@ -3245,7 +3249,7 @@ msgstr "섀시 정보. string 값을 리턴."
 msgid "Check already exists."
 msgstr "이미 존재합니다"
 
-#: include/classes/parsers/C10TriggerExpression.php:538
+#: include/classes/parsers/C10TriggerExpression.php:542
 #, c-format
 msgid "Check expression part starting from \"%1$s\"."
 msgstr "조건식 \"%1$s\" 에서 시작된 부분을 확인해 주십시오."
@@ -3533,7 +3537,7 @@ msgstr "압축"
 msgid "Concurrent sessions"
 msgstr "동시 세션의 숫자"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1509
+#: app/controllers/CControllerPopupTriggerExpr.php:1550
 #: app/views/popup.lldoperation.php:59 app/views/popup.lldoverride.php:195
 #: app/views/popup.service.statusrule.edit.php:48
 msgid "Condition"
@@ -4642,7 +4646,7 @@ msgid "December"
 msgstr "12월"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:908
-#: app/controllers/CControllerPopupTriggerExpr.php:1065
+#: app/controllers/CControllerPopupTriggerExpr.php:1108
 msgid "Decimal places"
 msgstr ""
 
@@ -5098,7 +5102,7 @@ msgstr ""
 msgid "Dependencies"
 msgstr "의존관계"
 
-#: include/triggers.inc.php:2397
+#: include/triggers.inc.php:2398
 msgid "Dependent"
 msgstr "의존처"
 
@@ -5106,7 +5110,7 @@ msgstr "의존처"
 msgid "Dependent item"
 msgstr "의존 아이템"
 
-#: app/views/popup.generic.php:278 include/triggers.inc.php:2397
+#: app/views/popup.generic.php:278 include/triggers.inc.php:2398
 #: include/views/configuration.trigger.prototype.list.php:92
 #: include/views/configuration.triggers.list.php:238
 msgid "Depends on"
@@ -5164,6 +5168,14 @@ msgstr "자세히"
 #: httpdetails.php:27 httpdetails.php:185
 msgid "Details of web scenario"
 msgstr "Web시나리오 세부 내용"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1055
+msgid "Detection period"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1065
+msgid "Deviations"
+msgstr ""
 
 #: include/actions.inc.php:76
 msgid "Device"
@@ -5320,7 +5332,7 @@ msgstr "선택한 Web시나리오를 비활성으로 하시겠습니까?"
 #: include/hosts.inc.php:1126 include/html.inc.php:284
 #: include/httptest.inc.php:48 include/items.inc.php:138
 #: include/items.inc.php:141 include/items.inc.php:185
-#: include/maps.inc.php:325 include/triggers.inc.php:1870
+#: include/maps.inc.php:325 include/triggers.inc.php:1871
 #: include/users.inc.php:84 include/views/configuration.action.list.php:77
 #: include/views/configuration.action.list.php:129
 #: include/views/configuration.host.discovery.list.php:167
@@ -6061,7 +6073,7 @@ msgstr "트래핑의 활성화"
 #: include/html.inc.php:280 include/httptest.inc.php:47
 #: include/items.inc.php:138 include/items.inc.php:141
 #: include/items.inc.php:182 include/triggers.inc.php:999
-#: include/triggers.inc.php:1867
+#: include/triggers.inc.php:1868
 #: include/views/configuration.action.edit.php:147
 #: include/views/configuration.action.list.php:76
 #: include/views/configuration.action.list.php:137
@@ -6156,6 +6168,10 @@ msgstr ""
 #, c-format
 msgid "Error: %1$s"
 msgstr "에러: %1$s"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1045
+msgid "Evaluation period"
+msgstr ""
 
 #: include/events.inc.php:180
 msgid "Event"
@@ -8248,7 +8264,7 @@ msgstr ""
 #: app/partials/monitoring.host.view.html.php:89
 #: app/views/configuration.host.list.php:267
 #: include/classes/screens/CScreenProblem.php:386
-#: include/hostgroups.inc.php:293 include/triggers.inc.php:2022
+#: include/hostgroups.inc.php:293 include/triggers.inc.php:2023
 #: include/views/inventory.host.view.php:42
 msgid "Inaccessible maintenance"
 msgstr ""
@@ -8260,11 +8276,11 @@ msgstr "접근할 수 없는 맵"
 
 #: httpconf.php:663 include/graphs.inc.php:274 include/hosts.inc.php:649
 #: include/httptest.inc.php:222 include/items.inc.php:916
-#: include/triggers.inc.php:2161
+#: include/triggers.inc.php:2162
 msgid "Inaccessible template"
 msgstr "접근할 수 없는 템플릿"
 
-#: include/triggers.inc.php:2367 include/triggers.inc.php:2375
+#: include/triggers.inc.php:2368 include/triggers.inc.php:2376
 msgid "Inaccessible trigger"
 msgstr "접속이 안되는 트리거"
 
@@ -8755,8 +8771,8 @@ msgstr "템플릿의 웹 시나리오의 스텝 카운트가 올바르지 않습
 msgid "Incorrect trigger expression"
 msgstr "잘못된 트리거의 조건식"
 
-#: include/classes/parsers/C10TriggerExpression.php:522
-#: include/classes/parsers/C10TriggerExpression.php:538
+#: include/classes/parsers/C10TriggerExpression.php:526
+#: include/classes/parsers/C10TriggerExpression.php:542
 msgid "Incorrect trigger expression."
 msgstr "트리거조건식이 올바르지 않습니다."
 
@@ -9351,7 +9367,7 @@ msgstr ""
 msgid "Invalid action condition: %1$s."
 msgstr "액션의 실행조건이 올바르지 않습니다 : %1$s."
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1476
+#: app/controllers/CControllerPopupTriggerExpr.php:1517
 #, c-format
 msgid "Invalid condition: %1$s."
 msgstr ""
@@ -9819,7 +9835,7 @@ msgstr[0] "아이템을 활성화 하였습니다"
 msgid "Item in \"not supported\" state"
 msgstr "아이템이 \"습득불가\" 상태"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1469
+#: app/controllers/CControllerPopupTriggerExpr.php:1510
 msgid "Item not selected"
 msgstr "아이템이 선택되어 있지 않습니다"
 
@@ -13493,6 +13509,7 @@ msgid "Period"
 msgstr "기간"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:95
+#: app/controllers/CControllerPopupTriggerExpr.php:1050
 msgid "Period shift"
 msgstr ""
 
@@ -15275,6 +15292,14 @@ msgstr "검색패턴이 공백입니다"
 
 #: app/views/monitoring.charts.view.php:103
 msgid "Search type"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1060
+msgid "Season"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1075
+msgid "Season deviation window"
 msgstr ""
 
 #: include/hosts.inc.php:434
@@ -17790,7 +17815,7 @@ msgstr "단위"
 #: include/items.inc.php:45 include/items.inc.php:110
 #: include/items.inc.php:133 include/items.inc.php:167
 #: include/maintenances.inc.php:33 include/maps.inc.php:39
-#: include/triggers.inc.php:83 include/triggers.inc.php:1867
+#: include/triggers.inc.php:83 include/triggers.inc.php:1868
 #: include/users.inc.php:64 include/users.inc.php:87
 #: include/views/configuration.action.edit.php:233
 #: include/views/configuration.triggers.list.php:77
@@ -17810,7 +17835,7 @@ msgid "Unknown error"
 msgstr "알 수 없는 에러"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:47
-#: app/controllers/CControllerPopupTriggerExpr.php:1258
+#: app/controllers/CControllerPopupTriggerExpr.php:1301
 #: include/triggers.inc.php:1146
 msgid "Unknown host item, no such item in selected host"
 msgstr "알 수 없는 아이템. 선택한 호스트에 그런 아이템은 존재하지 않습니다"
@@ -20310,11 +20335,11 @@ msgstr ""
 msgid "including subgroups"
 msgstr "서브 그룹을 포함"
 
-#: include/classes/parsers/C10TriggerExpression.php:521
+#: include/classes/parsers/C10TriggerExpression.php:525
 msgid "incorrect calculated item formula"
 msgstr ""
 
-#: include/classes/parsers/C10TriggerExpression.php:537
+#: include/classes/parsers/C10TriggerExpression.php:541
 #, c-format
 msgid "incorrect calculated item formula starting from \"%1$s\""
 msgstr ""
@@ -20411,7 +20436,7 @@ msgstr "호스트그룹명이 올바르지 않습니다"
 msgid "invalid host name"
 msgstr "호스트의 이름이 올바르지 않습니다"
 
-#: include/classes/validators/CHistFunctionValidator.php:80
+#: include/classes/validators/CHistFunctionValidator.php:82
 #: include/classes/validators/CMathFunctionValidator.php:86
 #, c-format
 msgid "invalid number of parameters in function \"%1$s\""
@@ -20431,6 +20456,16 @@ msgstr "정규표현식이 올바르지 않습니다"
 #: include/classes/validators/CHistFunctionValidator.php:64
 #, c-format
 msgid "invalid second parameter in function \"%1$s\""
+msgstr ""
+
+#: include/classes/validators/CHistFunctionValidator.php:69
+#, c-format
+msgid "invalid seventh parameter in function \"%1$s\""
+msgstr ""
+
+#: include/classes/validators/CHistFunctionValidator.php:68
+#, c-format
+msgid "invalid sixth parameter in function \"%1$s\""
 msgstr ""
 
 #: include/classes/validators/CHistFunctionValidator.php:65
@@ -20570,7 +20605,7 @@ msgstr "매크로"
 msgid "mad() - Median absolute deviation"
 msgstr ""
 
-#: include/classes/validators/CHistFunctionValidator.php:91
+#: include/classes/validators/CHistFunctionValidator.php:93
 #, c-format
 msgid "mandatory parameter is missing in function \"%1$s\""
 msgstr ""
@@ -21258,6 +21293,10 @@ msgid "trendmin() - Minimum value for period T with exact period shift"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1042
+msgid "trendstl() - Anomaly detection for period T"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1085
 msgid "trendsum() - Sum of values of a period T with exact period shift"
 msgstr ""
 
@@ -21283,11 +21322,11 @@ msgstr "트리거 프로토타입은 다른 템플릿이나 호스트에 이동�
 msgid "trigger with linkages cannot be moved to another template or host"
 msgstr "링크가 있는 트리거는 다른 템플릿이나 호스트로 이동할 수 없습니다"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1049
+#: app/controllers/CControllerPopupTriggerExpr.php:1092
 msgid "trim() - Remove specified characters from the beginning and the end of a string"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1062
+#: app/controllers/CControllerPopupTriggerExpr.php:1105
 msgid "truncate() - Truncates a value to decimal places"
 msgstr ""
 
@@ -21387,7 +21426,7 @@ msgstr "값 \"%1$s\"가 잘못되었습니다"
 msgid "unknown"
 msgstr "불명"
 
-#: include/classes/validators/CHistFunctionValidator.php:71
+#: include/classes/validators/CHistFunctionValidator.php:73
 #: include/classes/validators/CMathFunctionValidator.php:55
 #, c-format
 msgid "unknown function \"%1$s\""
@@ -21584,11 +21623,11 @@ msgstr ""
 msgid "value of third parameter must be one of %1$s"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1075
+#: app/controllers/CControllerPopupTriggerExpr.php:1118
 msgid "varpop() - Population variance"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1082
+#: app/controllers/CControllerPopupTriggerExpr.php:1125
 msgid "varsamp() - Sample variance"
 msgstr ""
 
