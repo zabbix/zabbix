@@ -1479,6 +1479,8 @@ div.dashboard-grid-widget-item {
       display: flex;
       align-items: baseline;
       min-width: 0; }
+    div.dashboard-grid-widget-item .item-value .item-value-no-data {
+      color: #737373; }
   div.dashboard-grid-widget-item .left {
     justify-content: flex-start;
     max-width: fit-content; }

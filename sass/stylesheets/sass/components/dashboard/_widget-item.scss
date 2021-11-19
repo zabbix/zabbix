@@ -123,6 +123,10 @@ div.dashboard-grid-widget-item {
 			align-items: baseline;
 			min-width: 0;
 		}
+
+		.item-value-no-data {
+			color: $font-alt-color;
+		}
 	}
 
 	.left {
