@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-11-05 19:52+0200\n"
-"PO-Revision-Date: 2021-06-15 21:34+0300\n"
+"PO-Revision-Date: 2021-11-13 21:53+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1623785680.000000\n"
+"X-POOTLE-MTIME: 1636833205.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:139
@@ -134,12 +134,12 @@ msgstr[2] "%1$s действий"
 #: jsLoader.php:239
 #, c-format
 msgid "%1$s characters"
-msgstr ""
+msgstr "%1$s символов"
 
 #: jsLoader.php:240
 #, c-format
 msgid "%1$s characters remaining"
-msgstr ""
+msgstr "%1$s символов осталось"
 
 #: app/views/popup.acknowledge.edit.php:59
 #: app/views/popup.acknowledge.edit.php:64
@@ -872,7 +872,7 @@ msgstr "Интерфейсы агента"
 #: include/classes/items/CHelpItems.php:73
 #: include/classes/items/CHelpItems.php:403
 msgid "Agent variant check. Returns 1 - for Zabbix agent; 2 - for Zabbix agent 2"
-msgstr ""
+msgstr "Проверка разновидности агента. Возвращается 1 - для Zabbix агента; 2 - для Zabbix агента 2"
 
 #: include/classes/widgets/CWidgetHelper.php:1150
 msgid "Aggregate"
@@ -18485,7 +18485,7 @@ msgstr "Uuid BIOS гипервизора VMware, <url> - URL службы VMware
 
 #: include/classes/items/CHelpItems.php:923
 msgid "VMware hypervisor HW vendor state sensors, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
-msgstr ""
+msgstr "Датчики состояния производителя HW гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware. Возвращается JSON"
 
 #: include/classes/items/CHelpItems.php:903
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18517,7 +18517,7 @@ msgstr "Состояние агрегированного датчика раб�
 
 #: include/classes/items/CHelpItems.php:899
 msgid "VMware hypervisor maintenance status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "Состояние обслуживания гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
 #: include/classes/items/CHelpItems.php:887
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -19267,7 +19267,7 @@ msgstr "d.m.Y H:i:s"
 
 #: include/translateDefines.inc.php:37
 msgid "Y-n-d"
-msgstr ""
+msgstr "d-n-Y"
 
 #: include/views/js/monitoring.sysmaps.js.php:430
 msgid "Y1"
@@ -20471,11 +20471,11 @@ msgstr "должно содержать по крайней мере один м
 
 #: include/translateDefines.inc.php:38
 msgid "n-d"
-msgstr ""
+msgstr "d-n"
 
 #: include/translateDefines.inc.php:36
 msgid "n-d H:i"
-msgstr ""
+msgstr "d-n H:i"
 
 #: include/views/configuration.host.discovery.edit.php:125
 #: include/views/configuration.host.discovery.edit.php:221
