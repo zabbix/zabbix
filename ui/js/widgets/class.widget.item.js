@@ -25,7 +25,7 @@ class CWidgetItem extends CWidget {
 
 		this._events.resize = () => {
 			const margin = 5;
-			const padding = 5;
+			const padding = 10;
 			const header_height = this._view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER ? 0 : 33;
 
 			this._target.style.setProperty(
