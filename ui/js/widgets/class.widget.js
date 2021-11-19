@@ -655,7 +655,6 @@ class CWidget extends CBaseComponent {
 			this._target.style.top = `${this._cell_height * this._pos.y}px`;
 			this._target.style.width = `${this._cell_width * this._pos.width}%`;
 			this._target.style.height = `${this._cell_height * this._pos.height}px`;
-			this._target.style.setProperty('--widget-height', this._target.style.height);
 		}
 	}
 

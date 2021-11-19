@@ -1398,7 +1398,6 @@ class CDashboardPage extends CBaseComponent {
 				widget_view_container.style.top = 'auto';
 				widget_view_container.style.height = `${resize_pos.height * this._cell_height}px`;
 			}
-			widget_view_container.style.setProperty('--widget-height', widget_view_container.style.height);
 		};
 
 		const getResizeSteps = (source_pos, target_pos) => {

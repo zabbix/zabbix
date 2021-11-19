@@ -31,11 +31,11 @@ else {
 	$items = [];
 
 	foreach ([WIDGET_ITEM_POS_TOP, WIDGET_ITEM_POS_MIDDLE, WIDGET_ITEM_POS_BOTTOM] as $key) {
+		$items[$key] = new CDiv();
+
 		if (!array_key_exists($key, $data['data'])) {
 			continue;
 		}
-
-		$items[$key] = new CDiv();
 
 		$row = $data['data'][$key];
 

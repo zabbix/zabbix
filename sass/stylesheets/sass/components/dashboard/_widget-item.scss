@@ -80,36 +80,54 @@ form.dashboard-grid-widget-item {
 // Widget view.
 
 div.dashboard-grid-widget-item {
+	box-sizing: border-box;
 	display: flex;
 	flex-direction: column;
 	height: 100%;
+	padding: 5px;
+	overflow-x: hidden;
 
-	> div,
-	.item-description,
-	.item-value,
-	.item-time {
+	> div {
 		display: flex;
-		justify-content: space-between;
 		flex: 1 1 calc(100% / 3);
 	}
 
 	.item-description,
 	.item-value,
 	.item-time {
-		padding: 5px;
+		flex: 1 1 auto;
 	}
 
-	.item-description,
-	.value,
-	.item-time {
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
+	.item-value {
+		display: flex;
+		flex-wrap: wrap;
 		min-width: 0;
+
+		> .units {
+			&:first-child,
+			&:last-child {
+				flex: 0 0 100%;
+			}
+
+			&:first-child {
+				margin-bottom: -0.07em;
+			}
+
+			&:last-child {
+				margin-top: -0.07em;
+			}
+		}
+
+		.item-value-content {
+			display: flex;
+			align-items: baseline;
+			min-width: 0;
+		}
 	}
 
 	.left {
 		justify-content: flex-start;
+		max-width: fit-content;
 	}
 
 	.center {
@@ -118,6 +136,7 @@ div.dashboard-grid-widget-item {
 
 	.right {
 		justify-content: flex-end;
+		max-width: fit-content;
 	}
 
 	.top {
@@ -136,28 +155,15 @@ div.dashboard-grid-widget-item {
 		font-weight: bold;
 	}
 
-	.item-value {
-		align-items: baseline;
-		flex-wrap: wrap;
-
-		.units {
-			&.left {
-				margin-right: .3em;
-			}
-
-			&.right {
-				margin-left: .3em;
-			}
-
-			&.top {
-				margin-bottom: .3em;
-			}
-
-			&.top,
-			&.bottom {
-				flex: 0 0 100%;
-			}
-		}
+	.item-description,
+	.item-time,
+	.value,
+	.units {
+		display: block;
+		min-width: .6em;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
 	.item-description,
@@ -165,12 +171,13 @@ div.dashboard-grid-widget-item {
 	.decimals,
 	.units,
 	.item-time {
-		font-size: calc(var(--widget-height) * var(--widget-item-font) / 0.72);
-		line-height: 1;
+		font-size: calc(var(--content-height) * var(--widget-item-font));
+		line-height: 1.14;
 	}
 
 	.svg-arrow {
-		height: calc(var(--widget-height) * var(--widget-item-font));
+		height: calc(var(--content-height) * var(--widget-item-font) * 0.72);
+		margin-left: .3em;
 	}
 }
 

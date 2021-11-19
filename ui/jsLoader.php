@@ -39,6 +39,7 @@ $available_js_cripts = [
 	'class.widget.geomap.js' => 'widgets/',
 	'class.widget.graph.js' => 'widgets/',
 	'class.widget.graph-prototype.js' => 'widgets/',
+	'class.widget.item.js' => 'widgets/',
 	'class.widget.map.js' => 'widgets/',
 	'class.widget.navtree.js' => 'widgets/',
 	'class.widget.paste-placeholder.js' => 'widgets/',
