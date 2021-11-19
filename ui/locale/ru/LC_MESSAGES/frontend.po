@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-11-05 19:58+0200\n"
-"PO-Revision-Date: 2021-06-17 14:02+0300\n"
+"PO-Revision-Date: 2021-11-13 21:56+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1623931354.000000\n"
+"X-POOTLE-MTIME: 1636833416.000000\n"
 
 #: include/classes/items/CHelpItems.php:1089
 msgid "\tThe average time a read from the virtual disk takes , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
@@ -137,12 +137,12 @@ msgstr[2] "%1$s действий"
 #: jsLoader.php:288
 #, c-format
 msgid "%1$s characters"
-msgstr ""
+msgstr "%1$s символов"
 
 #: jsLoader.php:289
 #, c-format
 msgid "%1$s characters remaining"
-msgstr ""
+msgstr "%1$s символов осталось"
 
 #: app/views/popup.acknowledge.edit.php:60
 #: app/views/popup.acknowledge.edit.php:65
@@ -900,7 +900,7 @@ msgstr "Добавить новое замещение"
 #: app/views/js/configuration.dashboard.edit.js.php:197
 #: app/views/js/monitoring.dashboard.view.js.php:307
 msgid "Add page"
-msgstr ""
+msgstr "Добавить страницу"
 
 #: include/classes/helpers/CRoleHelper.php:495
 msgid "Add problem comments"
@@ -1010,7 +1010,7 @@ msgstr "Интерфейсы агента"
 #: include/classes/items/CHelpItems.php:73
 #: include/classes/items/CHelpItems.php:407
 msgid "Agent variant check. Returns 1 - for Zabbix agent; 2 - for Zabbix agent 2"
-msgstr ""
+msgstr "Проверка разновидности агента. Возвращается 1 - для Zabbix агента; 2 - для Zabbix агента 2"
 
 #: include/classes/widgets/CWidgetHelper.php:1148
 msgid "Aggregate"
@@ -6644,7 +6644,7 @@ msgstr "Ошибка при обновлении свойств панели."
 
 #: app/views/js/monitoring.dashboard.view.js.php:452
 msgid "Failed to update dashboard sharing."
-msgstr ""
+msgstr "Ошибка при обновления общего доступа к панели."
 
 #: include/classes/api/services/CTemplate.php:624
 msgid "Failed to update template."
@@ -7154,7 +7154,7 @@ msgstr "График \"%1$s\" уже существует в \"%2$s\" (элем�
 #: include/classes/api/services/CGraphGeneral.php:1129
 #, c-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" as a graph created from graph prototype."
-msgstr ""
+msgstr "График \"%1$s\" уже существует у \"%2$s\", как график созданный из прототипа графиков."
 
 #: include/classes/api/services/CGraphGeneral.php:1032
 #: include/classes/api/services/CGraphGeneral.php:1240
@@ -11327,7 +11327,7 @@ msgstr "Максимальное количество процессов под�
 #: include/blocks.inc.php:632
 #, c-format
 msgid "Maximum required %1$s database version is %2$s."
-msgstr ""
+msgstr "Максимально требуемая версия базы данных %1$s - %2$s."
 
 #: app/controllers/CControllerTimeSelectorUpdate.php:249
 #: include/classes/mvc/CController.php:259
@@ -11539,7 +11539,7 @@ msgstr "Мин"
 #: include/blocks.inc.php:626
 #, c-format
 msgid "Minimum required %1$s database version is %2$s."
-msgstr ""
+msgstr "Минимально требуемая версия %1$s базы данных - %2$s."
 
 #: include/classes/setup/CFrontendSetup.php:124
 #, c-format
@@ -13737,7 +13737,7 @@ msgstr "Вставить"
 #: app/views/js/configuration.dashboard.edit.js.php:212
 #: app/views/js/monitoring.dashboard.view.js.php:322
 msgid "Paste page"
-msgstr ""
+msgstr "Вставить страницу"
 
 #: app/views/js/configuration.dashboard.edit.js.php:205
 #: app/views/js/monitoring.dashboard.view.js.php:315 jsLoader.php:138
@@ -18672,7 +18672,7 @@ msgstr "Uuid BIOS гипервизора VMware, <url> - URL службы VMware
 
 #: include/classes/items/CHelpItems.php:937
 msgid "VMware hypervisor HW vendor state sensors, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
-msgstr ""
+msgstr "Датчики состояния производителя HW гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware. Возвращается JSON"
 
 #: include/classes/items/CHelpItems.php:913
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18704,7 +18704,7 @@ msgstr "Состояние агрегированного датчика раб�
 
 #: include/classes/items/CHelpItems.php:909
 msgid "VMware hypervisor maintenance status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "Состояние обслуживания гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
 #: include/classes/items/CHelpItems.php:897
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -19493,7 +19493,7 @@ msgstr "d.m.Y H:i:s"
 
 #: include/translateDefines.inc.php:37
 msgid "Y-n-d"
-msgstr ""
+msgstr "d-n-Y"
 
 #: include/views/js/monitoring.sysmaps.js.php:446
 msgid "Y1"
@@ -20930,11 +20930,11 @@ msgstr "должно содержать по крайней мере один м
 
 #: include/translateDefines.inc.php:38
 msgid "n-d"
-msgstr ""
+msgstr "d-n"
 
 #: include/translateDefines.inc.php:36
 msgid "n-d H:i"
-msgstr ""
+msgstr "d-n H:i"
 
 #: include/views/configuration.host.discovery.edit.php:182
 #: include/views/configuration.host.discovery.edit.php:320
