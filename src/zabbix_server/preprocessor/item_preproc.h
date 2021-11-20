@@ -22,6 +22,9 @@
 
 #include "dbcache.h"
 #include "preproc.h"
+#include "zbxipcservice.h"
+
+#define ZBX_PREPROC_MAX_PACKET_SIZE	(ZBX_MEBIBYTE * 128)
 
 typedef struct
 {

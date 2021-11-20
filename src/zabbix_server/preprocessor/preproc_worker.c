@@ -64,8 +64,8 @@ zbx_es_t	es_engine;
  ******************************************************************************/
 static void	worker_format_value(const zbx_variant_t *value, char **value_str)
 {
-	int		len, i;
 	const char	*value_desc;
+	size_t		i, len;
 
 	value_desc = zbx_variant_value_desc(value);
 
@@ -317,8 +317,8 @@ static void	worker_preprocess_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 			message->data);
 
 	zbx_variant_copy(&value_start, &value);
-	results = (zbx_preproc_result_t *)zbx_malloc(NULL, sizeof(zbx_preproc_result_t) * steps_num);
-	memset(results, 0, sizeof(zbx_preproc_result_t) * steps_num);
+	results = (zbx_preproc_result_t *)zbx_malloc(NULL, sizeof(zbx_preproc_result_t) * (size_t)steps_num);
+	memset(results, 0, sizeof(zbx_preproc_result_t) * (size_t)steps_num);
 
 	if (FAIL == (ret = worker_item_preproc_execute(NULL, value_type, &value, ts, steps, steps_num, &history_in,
 			&history_out, results, &results_num, &errmsg)) && 0 != results_num)
@@ -401,8 +401,8 @@ static void	worker_test_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t *messa
 	zbx_variant_set_str(&value, value_str);
 	zbx_variant_copy(&value_start, &value);
 
-	results = (zbx_preproc_result_t *)zbx_malloc(NULL, sizeof(zbx_preproc_result_t) * steps_num);
-	memset(results, 0, sizeof(zbx_preproc_result_t) * steps_num);
+	results = (zbx_preproc_result_t *)zbx_malloc(NULL, sizeof(zbx_preproc_result_t) * (size_t)steps_num);
+	memset(results, 0, sizeof(zbx_preproc_result_t) * (size_t)steps_num);
 
 	zbx_item_preproc_test(value_type, &value, &ts, steps, steps_num, &history_in, &history_out, results,
 			&results_num, &error);
@@ -460,11 +460,11 @@ static void	worker_dep_request_clear(zbx_preproc_dep_request_t *request)
  ******************************************************************************/
 static void	worker_preprocess_dep_items(zbx_ipc_socket_t *socket, zbx_preproc_dep_request_t *request)
 {
-	zbx_preproc_dep_result_t	*results;
-	int				i, step_results_alloc = 10;
-	zbx_vector_ptr_t		messages;
-	zbx_preproc_result_t		*step_results;
+	int				i, results_alloc = 10;
+	zbx_preproc_result_t		*results;
 	zbx_preproc_cache_t		cache;
+	zbx_vector_ptr_t		history_out;
+	zbx_preproc_result_buffer_t	buf;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): items:%d/%d", __func__, request->deps_offset, request->deps_alloc);
 
@@ -479,91 +479,75 @@ static void	worker_preprocess_dep_items(zbx_ipc_socket_t *socket, zbx_preproc_de
 		goto out;
 	}
 
-	step_results = (zbx_preproc_result_t *)zbx_malloc(NULL, step_results_alloc * sizeof(zbx_preproc_result_t));
-	results = (zbx_preproc_dep_result_t *)zbx_malloc(NULL, request->deps_alloc * sizeof(zbx_preproc_dep_result_t));
-	memset(results, 0, request->deps_alloc * sizeof(zbx_preproc_dep_result_t));
+	results = (zbx_preproc_result_t *)zbx_malloc(NULL, (size_t)results_alloc * sizeof(zbx_preproc_result_t));
+	zbx_vector_ptr_create(&history_out);
 
+	zbx_preprocessor_result_init(&buf, request->deps_alloc);
 	zbx_preproc_cache_init(&cache);
 
 	for (i = 0; i < request->deps_alloc; i++)
 	{
 		zbx_preproc_dep_t		*dep = request->deps + i;
-		zbx_preproc_dep_result_t	*res = results + i;
-		char				*errmsg = NULL;
+		char				*errmsg = NULL, *error = NULL;
 		int				j, step_results_num, ret;
+		zbx_variant_t			value;
 
-		results[i].itemid = dep->itemid;
-		results[i].flags = dep->flags;
-		results[i].value_type = dep->value_type;
-		zbx_vector_ptr_create(&res->history);
-		zbx_variant_copy(&res->value, &request->value);
+		zbx_variant_copy(&value, &request->value);
 
-		if (dep->steps_num > step_results_alloc)
+		if (dep->steps_num > results_alloc)
 		{
-			step_results_alloc = dep->steps_num * 1.5;
-			step_results = (zbx_preproc_result_t *)zbx_realloc(step_results,
-					step_results_alloc * sizeof(zbx_preproc_result_t));
+			results_alloc = dep->steps_num * 1.5;
+			results = (zbx_preproc_result_t *)zbx_realloc(results,
+					(size_t)results_alloc * sizeof(zbx_preproc_result_t));
 		}
 
 		if (0 != dep->steps_num)
-			memset(step_results, 0, dep->steps_num * sizeof(zbx_preproc_result_t));
+			memset(results, 0, (size_t)dep->steps_num * sizeof(zbx_preproc_result_t));
 
-		if (FAIL == (ret = worker_item_preproc_execute(&cache, dep->value_type, &res->value, &request->ts,
-				dep->steps, dep->steps_num, &dep->history, &res->history, step_results,
+		if (FAIL == (ret = worker_item_preproc_execute(&cache, dep->value_type, &value, &request->ts,
+				dep->steps, dep->steps_num, &dep->history, &history_out, results,
 				&step_results_num, &errmsg)) && 0 != step_results_num)
 		{
-			int action = step_results[step_results_num - 1].action;
+			int action = results[step_results_num - 1].action;
 
 			if (ZBX_PREPROC_FAIL_SET_ERROR != action && ZBX_PREPROC_FAIL_FORCE_ERROR != action)
 			{
-				worker_format_error(&request->value, step_results, step_results_num, errmsg, &res->error);
+				worker_format_error(&request->value, results, step_results_num, errmsg, &error);
 				zbx_free(errmsg);
 			}
 			else
-				res->error = errmsg;
+				error = errmsg;
 		}
 
 		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 		{
 			const char	*result_msg;
 
-			result_msg = (SUCCEED == ret ? zbx_variant_value_desc(&res->value) : res->error);
+			result_msg = (SUCCEED == ret ? zbx_variant_value_desc(&value) : error);
 			zabbix_log(LOG_LEVEL_DEBUG, "%s(): %s", __func__, zbx_variant_value_desc(&request->value));
 			zabbix_log(LOG_LEVEL_DEBUG, "%s: %s %s",__func__, zbx_result_string(ret), result_msg);
 		}
 
+		zbx_preprocessor_result_append(&buf, dep->itemid, dep->flags, dep->value_type, &value, error,
+				&history_out, socket);
+
+		zbx_variant_clear(&value);
+
 		for (j = 0; j < step_results_num; j++)
-			zbx_variant_clear(&step_results[j].value);
+			zbx_variant_clear(&results[j].value);
+
+		zbx_vector_ptr_clear_ext(&history_out, (zbx_clean_func_t)zbx_preproc_op_history_free);
 	}
+
+	zbx_preprocessor_result_flush(&buf, socket);
+	zbx_preprocessor_result_clear(&buf);
 
 	zbx_preproc_cache_clear(&cache);
 
-	zbx_vector_ptr_create(&messages);
+	zbx_free(results);
 
-	if (0 == zbx_preprocessor_pack_dep_result(results, request->deps_alloc, &messages))
-	{
-		zbx_preprocessor_pack_dep_error("cannot preprocess item: the resulting value is too large",
-				&messages);
-	}
-
-	for (i = 0; i < messages.values_num; i++)
-	{
-		zbx_ipc_message_t	*message = (zbx_ipc_message_t *)messages.values[i];
-
-		if (FAIL == zbx_ipc_socket_write(socket, message->code, message->data, message->size))
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "cannot send preprocessing result");
-			exit(EXIT_FAILURE);
-		}
-	}
-
-	zbx_vector_ptr_clear_ext(&messages, (zbx_clean_func_t)zbx_ipc_message_free);
-	zbx_vector_ptr_destroy(&messages);
-
-	zbx_free(step_results);
-
-	zbx_preprocessor_free_dep_results(results, request->deps_alloc);
 	worker_dep_request_clear(request);
+	zbx_vector_ptr_destroy(&history_out);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
