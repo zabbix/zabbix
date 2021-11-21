@@ -107,7 +107,10 @@ func execute(s string, timeout time.Duration, strict bool) (out string, err erro
 }
 
 func ExecuteBackground(s string) error {
-	cmd := exec.Command("cmd", "/C", s)
+	cmd := exec.Command("cmd")
+	cmd.SysProcAttr = &windows.SysProcAttr{
+		CmdLine: fmt.Sprintf(`/C %s`, s),
+	}
 
 	if err := cmd.Start(); err != nil {
 		return fmt.Errorf("Cannot execute command: %s", err)
