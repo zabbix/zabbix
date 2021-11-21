@@ -25,6 +25,7 @@
 #include "dbcache.h"
 #include "preproc.h"
 #include "zbxalgo.h"
+#include "zbxipcservice.h"
 
 #define ZBX_IPC_SERVICE_PREPROCESSING	"preprocessing"
 
@@ -127,9 +128,11 @@ void	zbx_preprocessor_unpack_top_result(zbx_vector_ptr_t *items, const unsigned 
 zbx_uint32_t	zbx_preprocessor_pack_result(unsigned char **data, zbx_variant_t *value,
 		const zbx_vector_ptr_t *history, char *error);
 
+ZBX_PTR_VECTOR_DECL(ipcmsg, zbx_ipc_message_t *)
+
 void	zbx_preprocessor_free_deps(zbx_preproc_dep_t *deps, int deps_num);
 void	zbx_preprocessor_pack_dep_request(const zbx_variant_t *value, const zbx_timespec_t *ts,
-		const zbx_preproc_dep_t *deps, int deps_num, zbx_vector_ptr_t *messages);
+		const zbx_preproc_dep_t *deps, int deps_num, zbx_vector_ipcmsg_t *messages);
 void	zbx_preprocessor_unpack_dep_task(zbx_timespec_t *ts, zbx_variant_t *value, int *total_num,
 		zbx_preproc_dep_t **deps, int *deps_num, const unsigned char *data);
 void	zbx_preprocessor_unpack_dep_task_cont(zbx_preproc_dep_t *deps, int *deps_num, const unsigned char *data);

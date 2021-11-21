@@ -540,18 +540,18 @@ zbx_uint32_t	zbx_preprocessor_pack_task(unsigned char **data, zbx_uint64_t itemi
  *                                                                            *
  ******************************************************************************/
 static int	preprocessor_append_packed_message(const zbx_packed_field_t *fields, int fields_num,
-		zbx_uint32_t fields_size, zbx_uint32_t base_code, zbx_vector_ptr_t *messages)
+		zbx_uint32_t fields_size, zbx_uint32_t base_code, zbx_vector_ipcmsg_t *messages)
 {
 	zbx_ipc_message_t	*message;
 
 	message = (zbx_ipc_message_t *)zbx_malloc(NULL, sizeof(zbx_ipc_message_t));
 	zbx_ipc_message_init(message);
-	zbx_vector_ptr_append(messages, message);
+	zbx_vector_ipcmsg_append(messages, message);
 
 	if (SUCCEED != message_pack_fields(message, fields, fields_num, fields_size))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		zbx_vector_ptr_clear_ext(messages, (zbx_clean_func_t)zbx_ipc_message_free);
+		zbx_vector_ipcmsg_clear_ext(messages, zbx_ipc_message_free);
 		return FAIL;
 	}
 
@@ -581,7 +581,7 @@ static int	preprocessor_append_packed_message(const zbx_packed_field_t *fields, 
  *                                                                            *
  ******************************************************************************/
 void	zbx_preprocessor_pack_dep_request(const zbx_variant_t *value, const zbx_timespec_t *ts,
-		const zbx_preproc_dep_t *deps, int deps_num, zbx_vector_ptr_t *messages)
+		const zbx_preproc_dep_t *deps, int deps_num, zbx_vector_ipcmsg_t *messages)
 {
 	zbx_packed_field_t	*offset, *fields;
 	zbx_uint32_t		size;

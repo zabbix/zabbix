@@ -28,6 +28,7 @@
 #include "zbxserialize.h"
 #include "zbxipcservice.h"
 #include "zbxlld.h"
+#include "../../libs/zbxalgo/vectorimpl.h"
 
 #include "preprocessing.h"
 #include "preproc_manager.h"
@@ -83,6 +84,7 @@ typedef struct preprocessing_request
 }
 zbx_preprocessing_request_t;
 
+ZBX_PTR_VECTOR_IMPL(ipcmsg, zbx_ipc_message_t *)
 
 /* bulk dependent item preprocessing request*/
 typedef struct
@@ -96,7 +98,7 @@ typedef struct
 	zbx_variant_t				value;
 	zbx_timespec_t				ts;
 
-	zbx_vector_ptr_t			messages;	/* IPC messages with dependent item preproc data */
+	zbx_vector_ipcmsg_t			messages;	/* IPC messages with dependent item preproc data */
 
 	zbx_preproc_dep_result_t		*results;
 	int					results_alloc;
@@ -408,9 +410,9 @@ static int	preprocessor_dep_request_next_message(zbx_preprocessing_dep_request_t
 	if (0 == request->messages.values_num)
 		return FAIL;
 
-	*message = *(zbx_ipc_message_t *)request->messages.values[0];
+	*message = *request->messages.values[0];
 	zbx_free(request->messages.values[0]);
-	zbx_vector_ptr_remove(&request->messages, 0);
+	zbx_vector_ipcmsg_remove(&request->messages, 0);
 
 	return SUCCEED;
 }
@@ -654,8 +656,8 @@ static void	preprocessor_free_request(zbx_preprocessing_request_base_t *base)
 			dep_request = (zbx_preprocessing_dep_request_t *)base;
 			zbx_preprocessor_free_dep_results(dep_request->results, dep_request->results_offset);
 			zbx_variant_clear(&dep_request->value);
-			zbx_vector_ptr_clear_ext(&dep_request->messages, (zbx_clean_func_t)zbx_ipc_message_free);
-			zbx_vector_ptr_destroy(&dep_request->messages);
+			zbx_vector_ipcmsg_clear_ext(&dep_request->messages, zbx_ipc_message_free);
+			zbx_vector_ipcmsg_destroy(&dep_request->messages);
 			break;
 	}
 
@@ -1027,7 +1029,7 @@ static void	preprocessor_enqueue_dependent(zbx_preprocessing_manager_t *manager,
 			dep_request->value_type = value_type;
 			dep_request->master_itemid = itemid;
 
-			zbx_vector_ptr_create(&dep_request->messages);
+			zbx_vector_ipcmsg_create(&dep_request->messages);
 
 			dep_request->results = NULL;
 			dep_request->results_alloc = 0;
