@@ -537,6 +537,7 @@ static void	worker_preprocess_dep_items(zbx_ipc_socket_t *socket, zbx_preproc_de
 			zbx_variant_clear(&results[j].value);
 
 		zbx_vector_ptr_clear_ext(&history_out, (zbx_clean_func_t)zbx_preproc_op_history_free);
+		zbx_free(error);
 	}
 
 	zbx_preprocessor_result_flush(&buf, socket);

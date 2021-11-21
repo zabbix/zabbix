@@ -57,15 +57,16 @@ zbx_preprocessing_states_t;
 
 typedef enum
 {
-	ZBX_PREPROC_REQUEST_ITEM,	/* item preprocessing request */
-	ZBX_PREPROC_REQUEST_DEPS	/* dependent item preprocessing request */
+	ZBX_PREPROC_ITEM,	/* item preprocessing request */
+	ZBX_PREPROC_DEPS	/* dependent item preprocessing request */
 }
 zbx_preprocessing_kind_t;
 
-typedef struct
+typedef struct zbx_preprocessing_request_base
 {
-	zbx_preprocessing_kind_t	kind;
-	zbx_preprocessing_states_t	state;
+	zbx_preprocessing_kind_t		kind;
+	zbx_preprocessing_states_t		state;
+	struct zbx_preprocessing_request_base	*pending;	/* the request waiting on this request to complete */
 }
 zbx_preprocessing_request_base_t;
 
@@ -75,7 +76,6 @@ typedef struct preprocessing_request
 {
 	zbx_preprocessing_request_base_t	base;		/* common data for various requests - must be first */
 								/* field preprocessing request structure            */
-	struct preprocessing_request		*pending;	/* the request waiting on this request to complete */
 	zbx_preproc_item_value_t		value;		/* unpacked item value */
 	zbx_preproc_op_t			*steps;		/* preprocessing steps */
 	int					steps_num;	/* number of preprocessing steps */
@@ -114,11 +114,13 @@ typedef struct
 }
 zbx_preprocessing_worker_t;
 
+
 /* item link index */
 typedef struct
 {
-	zbx_uint64_t		itemid;		/* item id */
-	zbx_list_item_t		*queue_item;	/* queued item */
+	zbx_uint64_t			itemid;		/* item id */
+	zbx_preprocessing_kind_t	kind;
+	zbx_list_item_t			*queue_item;	/* queued item */
 }
 zbx_item_link_t;
 
@@ -306,17 +308,33 @@ static zbx_uint32_t	preprocessor_create_task(zbx_preprocessing_manager_t *manage
  *                                                                            *
  ******************************************************************************/
 static	void	preprocessor_set_request_state_done(zbx_preprocessing_manager_t *manager,
-		zbx_preprocessing_request_t *request, const zbx_list_item_t *queue_item)
+		zbx_preprocessing_request_base_t *base, const zbx_list_item_t *queue_item)
 {
-	zbx_item_link_t	*index;
+	zbx_item_link_t			*index, index_local;
+	zbx_preprocessing_request_t	*request;
+	zbx_preprocessing_dep_request_t	*dep_request;
 
-	request->base.state = REQUEST_STATE_DONE;
+	base->state = REQUEST_STATE_DONE;
 
 	/* value processed - the pending value can now be processed */
-	if (NULL != request->pending)
-		request->pending->base.state = REQUEST_STATE_QUEUED;
+	if (NULL != base->pending)
+		base->pending->state = REQUEST_STATE_QUEUED;
 
-	if (NULL != (index = (zbx_item_link_t *)zbx_hashset_search(&manager->linked_items, &request->value.itemid)) &&
+	switch (base->kind)
+	{
+		case ZBX_PREPROC_ITEM:
+			request = (zbx_preprocessing_request_t *)base;
+			index_local.itemid = request->value.itemid;
+			break;
+		case ZBX_PREPROC_DEPS:
+			dep_request = (zbx_preprocessing_dep_request_t *)base;
+			index_local.itemid = dep_request->master_itemid;
+			break;
+	}
+
+	index_local.kind = base->kind;
+
+	if (NULL != (index = (zbx_item_link_t *)zbx_hashset_search(&manager->linked_items, &index_local)) &&
 			queue_item == index->queue_item)
 	{
 		zbx_hashset_remove_direct(&manager->linked_items, index);
@@ -459,7 +477,7 @@ static void	*preprocessor_get_next_task(zbx_preprocessing_manager_t *manager, zb
 
 		switch (base->kind)
 		{
-		case ZBX_PREPROC_REQUEST_DEPS:
+		case ZBX_PREPROC_DEPS:
 			if (0 == preprocessor_create_dep_message(manager, (zbx_preprocessing_dep_request_t *)base))
 			{
 				base->state = REQUEST_STATE_DONE;
@@ -467,7 +485,7 @@ static void	*preprocessor_get_next_task(zbx_preprocessing_manager_t *manager, zb
 			}
 			(void)preprocessor_dep_request_next_message((zbx_preprocessing_dep_request_t *)base, message);
 			break;
-		case ZBX_PREPROC_REQUEST_ITEM:
+		case ZBX_PREPROC_ITEM:
 			request = (zbx_preprocessing_request_t *)base;
 			if (NULL != request->steps && ZBX_PREPROC_VALIDATE_NOT_SUPPORTED == request->steps[0].type)
 				process_notsupported = 1;
@@ -485,7 +503,7 @@ static void	*preprocessor_get_next_task(zbx_preprocessing_manager_t *manager, zb
 					zbx_hashset_remove_direct(&manager->history_cache, vault);
 				}
 
-				preprocessor_set_request_state_done(manager, request, iterator.current);
+				preprocessor_set_request_state_done(manager, base, iterator.current);
 				continue;
 			}
 
@@ -647,12 +665,12 @@ static void	preprocessor_free_request(zbx_preprocessing_request_base_t *base)
 
 	switch (base->kind)
 	{
-		case ZBX_PREPROC_REQUEST_ITEM:
+		case ZBX_PREPROC_ITEM:
 			request = (zbx_preprocessing_request_t *)base;
 			preproc_item_value_clear(&request->value);
 			request_free_steps(request);
 			break;
-		case ZBX_PREPROC_REQUEST_DEPS:
+		case ZBX_PREPROC_DEPS:
 			dep_request = (zbx_preprocessing_dep_request_t *)base;
 			zbx_preprocessor_free_dep_results(dep_request->results, dep_request->results_offset);
 			zbx_variant_clear(&dep_request->value);
@@ -759,13 +777,13 @@ static void	preprocessing_flush_queue(zbx_preprocessing_manager_t *manager)
 
 		switch (base->kind)
 		{
-			case ZBX_PREPROC_REQUEST_ITEM:
+			case ZBX_PREPROC_ITEM:
 				request = (zbx_preprocessing_request_t *)base;
 				preprocessor_flush_value(&request->value);
 				manager->processed_num++;
 				manager->queued_num--;
 				break;
-			case ZBX_PREPROC_REQUEST_DEPS:
+			case ZBX_PREPROC_DEPS:
 				dep_request = (zbx_preprocessing_dep_request_t *)base;
 				preprocessor_flush_dep_results(manager, dep_request);
 				break;
@@ -776,6 +794,36 @@ static void	preprocessing_flush_queue(zbx_preprocessing_manager_t *manager)
 
 		zbx_list_pop(&manager->queue, NULL);
 		preprocessor_free_request(base);
+	}
+}
+
+static void	preproc_link_nodes(zbx_preprocessing_manager_t *manager, zbx_uint64_t itemid,
+		zbx_preprocessing_kind_t kind, zbx_list_item_t *enqueued_at)
+{
+	zbx_item_link_t				*index, index_local;
+	zbx_preprocessing_request_base_t	*request, *linked_request;
+
+	index_local.itemid = itemid;
+	index_local.kind = kind;
+
+	/* existing linked item*/
+	if (NULL != (index = (zbx_item_link_t *)zbx_hashset_search(&manager->linked_items, &index_local)))
+	{
+		linked_request = (zbx_preprocessing_request_base_t *)(enqueued_at->data);
+		request = (zbx_preprocessing_request_base_t *)(index->queue_item->data);
+
+		if (REQUEST_STATE_DONE != request->state)
+		{
+			request->pending = linked_request;
+			linked_request->state = REQUEST_STATE_PENDING;
+		}
+
+		index->queue_item = enqueued_at;
+	}
+	else
+	{
+		index_local.queue_item = enqueued_at;
+		zbx_hashset_insert(&manager->linked_items, &index_local, sizeof(zbx_item_link_t));
 	}
 }
 
@@ -793,46 +841,29 @@ static void	preprocessing_flush_queue(zbx_preprocessing_manager_t *manager)
 static void	preprocessor_link_items(zbx_preprocessing_manager_t *manager, zbx_list_item_t *enqueued_at,
 		zbx_preproc_item_t *item)
 {
-	int				i;
-	zbx_preprocessing_request_t	*request, *linked_request;
-	zbx_item_link_t			*index, index_local;
-	zbx_preproc_op_t		*op;
+	int			i;
+	zbx_preproc_op_t	*op;
 
-	for (i = 0; i < item->preproc_ops_num; i++)
+	/* allow out of order processing for items without dependent items */
+	/* or preprocessing steps requiring serial processing              */
+	if (0 == item->dep_itemids_num)
 	{
-		op = &item->preproc_ops[i];
+		for (i = 0; i < item->preproc_ops_num; i++)
+		{
+			op = &item->preproc_ops[i];
 
-		if (ZBX_PREPROC_DELTA_VALUE == op->type || ZBX_PREPROC_DELTA_SPEED == op->type)
-			break;
+			if (ZBX_PREPROC_DELTA_VALUE == op->type || ZBX_PREPROC_DELTA_SPEED == op->type)
+				break;
 
-		if (ZBX_PREPROC_THROTTLE_VALUE == op->type || ZBX_PREPROC_THROTTLE_TIMED_VALUE == op->type)
-			break;
+			if (ZBX_PREPROC_THROTTLE_VALUE == op->type || ZBX_PREPROC_THROTTLE_TIMED_VALUE == op->type)
+				break;
+		}
+
+		if (i == item->preproc_ops_num)
+			return;
 	}
 
-	if (i != item->preproc_ops_num)
-	{
-		/* existing linked item*/
-		if (NULL != (index = (zbx_item_link_t *)zbx_hashset_search(&manager->linked_items, &item->itemid)))
-		{
-			linked_request = (zbx_preprocessing_request_t *)(enqueued_at->data);
-			request = (zbx_preprocessing_request_t *)(index->queue_item->data);
-
-			if (REQUEST_STATE_DONE != request->base.state)
-			{
-				request->pending = linked_request;
-				linked_request->base.state = REQUEST_STATE_PENDING;
-			}
-
-			index->queue_item = enqueued_at;
-		}
-		else
-		{
-			index_local.itemid = item->itemid;
-			index_local.queue_item = enqueued_at;
-
-			zbx_hashset_insert(&manager->linked_items, &index_local, sizeof(zbx_item_link_t));
-		}
-	}
+	preproc_link_nodes(manager, item->itemid, ZBX_PREPROC_ITEM, enqueued_at);
 }
 
 /******************************************************************************
@@ -907,7 +938,7 @@ static void	preprocessor_enqueue(zbx_preprocessing_manager_t *manager, zbx_prepr
 		state = REQUEST_STATE_QUEUED;
 
 	request = (zbx_preprocessing_request_t *)zbx_malloc(NULL, sizeof(zbx_preprocessing_request_t));
-	request->base.kind = ZBX_PREPROC_REQUEST_ITEM;
+	request->base.kind = ZBX_PREPROC_ITEM;
 	memset(request, 0, sizeof(zbx_preprocessing_request_t));
 	memcpy(&request->value, value, sizeof(zbx_preproc_item_value_t));
 	request->base.state = state;
@@ -1014,10 +1045,12 @@ static void	preprocessor_enqueue_dependent(zbx_preprocessing_manager_t *manager,
 		{
 			zbx_preprocessing_dep_request_t	*dep_request;
 			zbx_variant_t			value;
+			zbx_list_item_t			*enqueued_at;
 
 			dep_request = zbx_malloc(NULL, sizeof(zbx_preprocessing_dep_request_t));
-			dep_request->base.kind = ZBX_PREPROC_REQUEST_DEPS;
+			dep_request->base.kind = ZBX_PREPROC_DEPS;
 			dep_request->base.state = REQUEST_STATE_QUEUED;
+			dep_request->base.pending = NULL;
 			dep_request->hostid = hostid;
 
 			dep_request->ts = NULL != ts ? *ts : (zbx_timespec_t){0, 0};
@@ -1035,7 +1068,9 @@ static void	preprocessor_enqueue_dependent(zbx_preprocessing_manager_t *manager,
 			dep_request->results_alloc = 0;
 			dep_request->results_offset = 0;
 
-			zbx_list_append(&manager->queue, dep_request, NULL);
+			zbx_list_append(&manager->queue, dep_request, &enqueued_at);
+
+			preproc_link_nodes(manager, itemid, ZBX_PREPROC_DEPS, enqueued_at);
 
 			preprocessor_assign_tasks(manager);
 			preprocessing_flush_queue(manager);
@@ -1317,7 +1352,7 @@ static void	preprocessor_add_result(zbx_preprocessing_manager_t *manager, zbx_ip
 		}
 	}
 
-	preprocessor_set_request_state_done(manager, request, worker->task);
+	preprocessor_set_request_state_done(manager, (zbx_preprocessing_request_base_t *)request, worker->task);
 
 	if (FAIL != preprocessor_set_variant_result(request, &value, error))
 		preprocessor_enqueue_dependent_value(manager, &request->value);
@@ -1402,7 +1437,8 @@ static void	preprocessor_finalize_dep_results(zbx_preprocessing_manager_t *manag
 
 	}
 
-	request->base.state = REQUEST_STATE_DONE;
+	preprocessor_set_request_state_done(manager, (zbx_preprocessing_request_base_t *)request,
+			(zbx_list_item_t *)worker->task);
 
 	worker->task = NULL;
 
@@ -1777,6 +1813,25 @@ static void	preprocessor_get_oldest_preproc_items(zbx_preprocessing_manager_t *m
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static zbx_hash_t	preproc_item_link_hash(const void *d)
+{
+	const zbx_item_link_t	*link = (const zbx_item_link_t *)d;
+	zbx_hash_t		hash;
+
+	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&link->itemid);
+	return ZBX_DEFAULT_STRING_HASH_ALGO(&link->kind, 1, hash);
+}
+
+static int	preproc_item_link_compare(const void *d1, const void *d2)
+{
+	const zbx_item_link_t	*l1 = (const zbx_item_link_t *)d1;
+	const zbx_item_link_t	*l2 = (const zbx_item_link_t *)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(l1->itemid, l2->itemid);
+
+	return (int)l1->kind - (int)l2->kind;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: preprocessor_init_manager                                        *
@@ -1799,7 +1854,7 @@ static void	preprocessor_init_manager(zbx_preprocessing_manager_t *manager)
 	zbx_hashset_create_ext(&manager->item_config, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,
 			(zbx_clean_func_t)preproc_item_clear,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
-	zbx_hashset_create(&manager->linked_items, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_hashset_create(&manager->linked_items, 0, preproc_item_link_hash, preproc_item_link_compare);
 	zbx_hashset_create(&manager->history_cache, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 

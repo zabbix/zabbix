@@ -46,10 +46,12 @@
 #define ZBX_IPC_PREPROCESSOR_DEP_RESULT			15
 #define ZBX_IPC_PREPROCESSOR_DEP_RESULT_CONT		16
 
-typedef struct {
+typedef struct
+{
 	AGENT_RESULT	*result;
 	int		refcount;
-}zbx_result_ptr_t;
+}
+zbx_result_ptr_t;
 
 /* item value data used in preprocessing manager */
 typedef struct
