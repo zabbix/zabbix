@@ -21,11 +21,14 @@
 #include "db.h"
 #include "log.h"
 #include "zbxserver.h"
-#include "evalfunc.h"
 #include "zbxregexp.h"
 #include "valuecache.h"
 #include "zbxtrends.h"
 #include "../zbxalgo/vectorimpl.h"
+#include "anomalystl.h"
+
+#include "evalfunc_common.h"
+#include "evalfunc.h"
 
 #define ZBX_VALUEMAP_STRING_LEN	64
 
@@ -53,14 +56,6 @@ typedef enum
 	ZBX_PARAM_MANDATORY
 }
 zbx_param_type_t;
-
-typedef enum
-{
-	ZBX_VALUE_NONE,
-	ZBX_VALUE_SECONDS,
-	ZBX_VALUE_NVALUES
-}
-zbx_value_type_t;
 
 /******************************************************************************
  *                                                                            *
@@ -653,25 +648,9 @@ int	zbx_evaluatable_for_notsupported(const char *fn)
 	return FAIL;
 }
 
-static const char	*zbx_type_string(zbx_value_type_t type)
-{
-	switch (type)
-	{
-		case ZBX_VALUE_NONE:
-			return "none";
-		case ZBX_VALUE_SECONDS:
-			return "sec";
-		case ZBX_VALUE_NVALUES:
-			return "num";
-		default:
-			THIS_SHOULD_NEVER_HAPPEN;
-			return "unknown";
-	}
-}
-
 /******************************************************************************
  *                                                                            *
- * Function: get_function_parameter_int                                       *
+ * Function: get_function_parameter_period                                    *
  *                                                                            *
  * Purpose: get the value of sec|#num trigger function parameter              *
  *                                                                            *
@@ -682,13 +661,14 @@ static const char	*zbx_type_string(zbx_value_type_t type)
  *             value          - [OUT] parameter value (preserved as is if the *
  *                              parameter is optional and empty)              *
  *             type           - [OUT] parameter value type (number of seconds *
- *                              or number of values)                          *
+ *                              or number of values, preserved as is if the   *
+ *                              parameter is optional and empty)              *
  *                                                                            *
  * Return value: SUCCEED - parameter is valid                                 *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	get_function_parameter_int(const char *parameters, int Nparam, zbx_param_type_t parameter_type,
+static int	get_function_parameter_period(const char *parameters, int Nparam, zbx_param_type_t parameter_type,
 		int *value, zbx_value_type_t *type)
 {
 	char	*parameter;
@@ -738,159 +718,6 @@ static int	get_function_parameter_int(const char *parameters, int Nparam, zbx_pa
 
 	zbx_free(parameter);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
-}
-
-static int	get_function_parameter_uint64(const char *parameters, int Nparam, zbx_uint64_t *value)
-{
-	char	*parameter;
-	int	ret = FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() parameters:'%s' Nparam:%d", __func__, parameters, Nparam);
-
-	if (NULL == (parameter = zbx_function_get_param_dyn(parameters, Nparam)))
-		goto out;
-
-	if (SUCCEED == (ret = is_uint64(parameter, value)))
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() value:" ZBX_FS_UI64, __func__, *value);
-
-	zbx_free(parameter);
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
-}
-
-static int	get_function_parameter_float(const char *parameters, int Nparam, unsigned char flags, double *value)
-{
-	char	*parameter;
-	int	ret = FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() parameters:'%s' Nparam:%d", __func__, parameters, Nparam);
-
-	if (NULL == (parameter = zbx_function_get_param_dyn(parameters, Nparam)))
-		goto out;
-
-	if (SUCCEED == (ret = is_double_suffix(parameter, flags)))
-	{
-		*value = str2double(parameter);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() value:" ZBX_FS_DBL, __func__, *value);
-	}
-
-	zbx_free(parameter);
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
-}
-
-static int	get_function_parameter_str(const char *parameters, int Nparam, char **value)
-{
-	int	ret = FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() parameters:'%s' Nparam:%d", __func__, parameters, Nparam);
-
-	if (NULL == (*value = zbx_function_get_param_dyn(parameters, Nparam)))
-		goto out;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() value:'%s'", __func__, *value);
-	ret = SUCCEED;
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: get_function_parameter_hist_range                                *
- *                                                                            *
- * Purpose: get the value of sec|num + timeshift trigger function parameter   *
- *                                                                            *
- * Parameters: from           - [IN] the function calculation time            *
- *             parameters     - [IN] trigger function parameters              *
- *             Nparam         - [IN] specifies which parameter to extract     *
- *             value          - [OUT] parameter value (preserved as is if the *
- *                              parameter is optional and empty)              *
- *             type           - [OUT] parameter value type (number of seconds *
- *                              or number of values)                          *
- *             timeshift      - [OUT] the timeshift value (0 if absent)       *
- *                                                                            *
- * Return value: SUCCEED - parameter is valid                                 *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-static int	get_function_parameter_hist_range(int from, const char *parameters, int Nparam, int *value,
-		zbx_value_type_t *type, int *timeshift)
-{
-	char	*parameter = NULL, *shift;
-	int	ret = FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() parameters:'%s' Nparam:%d", __func__, parameters, Nparam);
-
-	if (NULL == (parameter = zbx_function_get_param_dyn(parameters, Nparam)))
-		goto out;
-
-	if (NULL != (shift = strchr(parameter, ':')))
-		*shift++ = '\0';
-
-	if ('\0' == *parameter)
-	{
-		*value = 0;
-		*type = ZBX_VALUE_NONE;
-	}
-	else if ('#' != *parameter)
-	{
-		if (SUCCEED != is_time_suffix(parameter, value, ZBX_LENGTH_UNLIMITED) || 0 > *value)
-			goto out;
-
-		*type = ZBX_VALUE_SECONDS;
-	}
-	else
-	{
-		if (SUCCEED != is_uint31(parameter + 1, value) || 0 >= *value)
-			goto out;
-		*type = ZBX_VALUE_NVALUES;
-	}
-
-	if (NULL != shift)
-	{
-		struct tm	tm;
-		char		*error = NULL;
-		int		end;
-
-		if (SUCCEED != zbx_parse_timeshift(from, shift, &tm, &error))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() timeshift error:%s", __func__, error);
-			zbx_free(error);
-			goto out;
-		}
-
-		if (-1 == (end = mktime(&tm)))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() invalid timeshift value:%s", __func__, zbx_strerror(errno));
-			goto out;
-		}
-
-		if (end >= from)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() timeshift produced time in future", __func__);
-			goto out;
-		}
-
-		*timeshift = from - end;
-	}
-	else
-		*timeshift = 0;
-
-	ret = SUCCEED;
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() type:%s value:%d timeshift:%d", __func__, zbx_type_string(*type), *value,
-			*timeshift);
-out:
-	zbx_free(parameter);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
@@ -960,8 +787,11 @@ out:
  *                                                                            *
  * Purpose: evaluate function 'logeventid' for the item                       *
  *                                                                            *
- * Parameters: item - item (performance metric)                               *
- *             parameter - regex string for event id matching                 *
+ * Parameters: value      - [OUT] result                                      *
+ *             item       - [IN] item (performance metric)                    *
+ *             parameters - [IN] regex string for event id matching           *
+ *             ts         - [IN] the starting timestamp                       *
+ *             error      - [OUT] the error message                           *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
@@ -1056,8 +886,11 @@ out:
  *                                                                            *
  * Purpose: evaluate function 'logsource' for the item                        *
  *                                                                            *
- * Parameters: item - item (performance metric)                               *
- *             parameter - ignored                                            *
+ * Parameters: value      - [OUT] result                                      *
+ *             item       - [IN] item (performance metric)                    *
+ *             parameters - [IN] ignored                                      *
+ *             ts         - [IN] the starting timestamp                       *
+ *             error      - [OUT] the error message                           *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
@@ -1147,7 +980,11 @@ out:
  *                                                                            *
  * Purpose: evaluate function 'logseverity' for the item                      *
  *                                                                            *
- * Parameters: item - item (performance metric)                               *
+ * Parameters: value      - [OUT] result                                      *
+ *             item       - [IN] item (performance metric)                    *
+ *             parameters - [IN] Nth last value and time shift (optional)     *
+ *             ts         - [IN] the starting timestamp                       *
+ *             error      - [OUT] the error message                           *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
@@ -1188,7 +1025,7 @@ out:
 	return ret;
 }
 
-static int	history_record_float_compare(const zbx_history_record_t *d1, const zbx_history_record_t *d2)
+int	history_record_float_compare(const zbx_history_record_t *d1, const zbx_history_record_t *d2)
 {
 	ZBX_RETURN_IF_NOT_EQUAL(d1->value.dbl, d2->value.dbl);
 
@@ -1393,7 +1230,8 @@ static void	count_one_str(int *count, int op, const char *value, const char *pat
  *                                                                            *
  * Purpose: evaluate functions 'count' and 'find' for the item                *
  *                                                                            *
- * Parameters: item       - [IN] item (performance metric)                    *
+ * Parameters: value      - [OUT] result                                      *
+ *             item       - [IN] item (performance metric)                    *
  *             parameters - [IN] up to three comma-separated fields:          *
  *                            (1) number of seconds/values + timeshift        *
  *                            (2) comparison operator (optional)              *
@@ -1739,14 +1577,19 @@ out:
  *                                                                            *
  * Purpose: evaluate function 'sum' for the item                              *
  *                                                                            *
- * Parameters: item - item (performance metric)                               *
- *             parameters - number of seconds/values and time shift (optional)*
+ * Parameters: value      - [OUT] result                                      *
+ *             item       - [IN] item (performance metric)                    *
+ *             parameters - [IN] number of seconds/values and time shift      *
+ *                               (optional)                                   *
+ *             ts         - [IN] the starting timestamp                       *
+ *             error      - [OUT] the error message                           *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_SUM(zbx_variant_t *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts, char **error)
+static int	evaluate_SUM(zbx_variant_t *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
+		char **error)
 {
 	int				arg1, i, ret = FAIL, seconds = 0, nvalues = 0, time_shift;
 	zbx_value_type_t		arg1_type;
@@ -1828,14 +1671,19 @@ out:
  *                                                                            *
  * Purpose: evaluate function 'avg' for the item                              *
  *                                                                            *
- * Parameters: item - item (performance metric)                               *
- *             parameters - number of seconds/values and time shift (optional)*
+ * Parameters: value      - [OUT] result                                      *
+ *             item       - [IN] item (performance metric)                    *
+ *             parameters - [IN] number of seconds/values and time shift      *
+ *                               (optional)                                   *
+ *             ts         - [IN] the starting timestamp                       *
+ *             error      - [OUT] the error message                           *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_AVG(zbx_variant_t  *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts, char **error)
+static int	evaluate_AVG(zbx_variant_t *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
+		char **error)
 {
 	int				arg1, ret = FAIL, i, seconds = 0, nvalues = 0, time_shift;
 	zbx_value_type_t		arg1_type;
@@ -1924,9 +1772,11 @@ out:
  *                                                                            *
  * Purpose: evaluate function 'last' for the item                             *
  *                                                                            *
- * Parameters: value - dynamic buffer                                         *
- *             item - item (performance metric)                               *
- *             parameters - Nth last value and time shift (optional)          *
+ * Parameters: value      - [OUT] result                                      *
+ *             item       - [IN] item (performance metric)                    *
+ *             parameters - [IN] Nth last value and time shift (optional)     *
+ *             ts         - [IN] the starting timestamp                       *
+ *             error      - [OUT] the error message                           *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
@@ -1957,14 +1807,19 @@ static int	evaluate_LAST(zbx_variant_t *value, DC_ITEM *item, const char *parame
  *                                                                            *
  * Purpose: evaluate function 'min' for the item                              *
  *                                                                            *
- * Parameters: item - item (performance metric)                               *
- *             parameters - number of seconds/values and time shift (optional)*
+ * Parameters: value      - [OUT] result                                      *
+ *             item       - [IN] item (performance metric)                    *
+ *             parameters - [IN] number of seconds/values and time shift      *
+ *                               (optional)                                   *
+ *             ts         - [IN] the starting timestamp                       *
+ *             error      - [OUT] the error message                           *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_MIN(zbx_variant_t *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts, char **error)
+static int	evaluate_MIN(zbx_variant_t *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
+		char **error)
 {
 	int				arg1, i, ret = FAIL, seconds = 0, nvalues = 0, time_shift;
 	zbx_value_type_t		arg1_type;
@@ -2057,14 +1912,19 @@ out:
  *                                                                            *
  * Purpose: evaluate function 'max' for the item                              *
  *                                                                            *
- * Parameters: item - item (performance metric)                               *
- *             parameters - number of seconds/values and time shift (optional)*
+ * Parameters: value      - [OUT]                                             *
+ *             item       - [IN] item (performance metric)                    *
+ *             parameters - [IN] number of seconds/values and time shift      *
+ *                               (optional)                                   *
+ *             ts         - [IN] the starting timestamp                       *
+ *             error      - [OUT] the error message                           *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_MAX(zbx_variant_t *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts, char **error)
+static int	evaluate_MAX(zbx_variant_t *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
+		char **error)
 {
 	int				arg1, ret = FAIL, i, seconds = 0, nvalues = 0, time_shift;
 	zbx_value_type_t		arg1_type;
@@ -2158,9 +2018,12 @@ out:
  *                                                                            *
  * Purpose: evaluate function 'percentile' for the item                       *
  *                                                                            *
- * Parameters: item       - [IN] item (performance metric)                    *
+ * Parameters: value      - [OUT] result                                      *
+ *             item       - [IN] item (performance metric)                    *
  *             parameters - [IN] seconds/values, time shift (optional),       *
  *                               percentage                                   *
+ *             ts         - [IN] the starting timestamp                       *
+ *             error      - [OUT] the error message                           *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in        *
  *                         'value'                                            *
@@ -2264,8 +2127,10 @@ out:
  *                                                                            *
  * Purpose: evaluate function 'nodata' for the item                           *
  *                                                                            *
- * Parameters: item - item (performance metric)                               *
- *             parameter - number of seconds                                  *
+ * Parameters: value      - [OUT] result                                      *
+ *             item       - [IN] item (performance metric)                    *
+ *             parameters - [IN] number of seconds                            *
+ *             error      - [OUT] the error message                           *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
@@ -2290,7 +2155,7 @@ static int	evaluate_NODATA(zbx_variant_t *value, DC_ITEM *item, const char *para
 		goto out;
 	}
 
-	if (SUCCEED != get_function_parameter_int(parameters, 1, ZBX_PARAM_MANDATORY, &arg1, &arg1_type) ||
+	if (SUCCEED != get_function_parameter_period(parameters, 1, ZBX_PARAM_MANDATORY, &arg1, &arg1_type) ||
 			ZBX_VALUE_SECONDS != arg1_type || 0 >= arg1)
 	{
 		*error = zbx_strdup(*error, "invalid second parameter");
@@ -2375,8 +2240,10 @@ out:
  *                                                                            *
  * Purpose: evaluate function 'change' for the item                           *
  *                                                                            *
- * Parameters: item - item (performance metric)                               *
- *             parameter - number of seconds                                  *
+ * Parameters: value      - [OUT] result                                      *
+ *             item       - [IN] item (performance metric)                    *
+ *             ts         - [IN] the starting timestamp                       *
+ *             error      - [OUT] the error message                           *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
@@ -2446,8 +2313,11 @@ out:
  *                                                                            *
  * Purpose: evaluate function 'fuzzytime' for the item                        *
  *                                                                            *
- * Parameters: item - item (performance metric)                               *
- *             parameter - number of seconds                                  *
+ * Parameters: value      - [OUT] result                                      *
+ *             item       - [IN] item (performance metric)                    *
+ *             parameters - [IN] number of seconds                            *
+ *             ts         - [IN] the starting timestamp                       *
+ *             error      - [OUT] the error message                           *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
@@ -2475,7 +2345,8 @@ static int	evaluate_FUZZYTIME(zbx_variant_t *value, DC_ITEM *item, const char *p
 		goto out;
 	}
 
-	if (SUCCEED != get_function_parameter_int(parameters, 1, ZBX_PARAM_MANDATORY, &arg1, &arg1_type) || 0 >= arg1)
+	if (SUCCEED != get_function_parameter_period(parameters, 1, ZBX_PARAM_MANDATORY, &arg1, &arg1_type) ||
+			0 >= arg1)
 	{
 		*error = zbx_strdup(*error, "invalid second parameter");
 		goto out;
@@ -2526,13 +2397,15 @@ out:
  *                                                                            *
  * Purpose: evaluate logical bitwise function 'and' for the item              *
  *                                                                            *
- * Parameters: value - dynamic buffer                                         *
- *             item - item (performance metric)                               *
- *             parameters - to 2 comma-separated fields:                      *
+ * Parameters: value      - [OUT] dynamic buffer,result                       *
+ *             item       - [IN] item (performance metric)                    *
+ *             parameters - [IN] to 2 comma-separated fields:                 *
  *                            (1) same as the 1st parameter for function      *
  *                                evaluate_LAST() (see documentation of       *
  *                                trigger function last()),                   *
  *                            (2) mask to bitwise AND with (mandatory),       *
+ *             ts         - [IN] the starting timestamp                       *
+ *             error      - [OUT] the error message                           *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
@@ -2593,8 +2466,12 @@ clean:
  *                                                                            *
  * Purpose: evaluate function 'forecast' for the item                         *
  *                                                                            *
- * Parameters: item - item (performance metric)                               *
- *             parameters - number of seconds/values and time shift (optional)*
+ * Parameters: value      - [OUT] result                                      *
+ *             item       - [IN] item (performance metric)                    *
+ *             parameters - [IN] number of seconds/values and time shift      *
+ *                               (optional)                                   *
+ *             ts         - [IN] the starting timestamp                       *
+ *             error      - [OUT] the error message                           *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
@@ -2637,7 +2514,7 @@ static int	evaluate_FORECAST(zbx_variant_t *value, DC_ITEM *item, const char *pa
 		goto out;
 	}
 
-	if (SUCCEED != get_function_parameter_int(parameters, 2, ZBX_PARAM_MANDATORY, &time, &time_type) ||
+	if (SUCCEED != get_function_parameter_period(parameters, 2, ZBX_PARAM_MANDATORY, &time, &time_type) ||
 			ZBX_VALUE_SECONDS != time_type)
 	{
 		*error = zbx_strdup(*error, "invalid third parameter");
@@ -2748,8 +2625,12 @@ out:
  *                                                                            *
  * Purpose: evaluate function 'timeleft' for the item                         *
  *                                                                            *
- * Parameters: item - item (performance metric)                               *
- *             parameters - number of seconds/values and time shift (optional)*
+ * Parameters: value      - [OUT] result                                      *
+ *             item       - [IN] item (performance metric)                    *
+ *             parameters - [IN] number of seconds/values and time shift      *
+ *                               (optional)                                   *
+ *             ts         - [IN] the starting timestamp                       *
+ *             error      - [OUT] the error message                           *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
@@ -2886,19 +2767,91 @@ out:
 	return ret;
 }
 
+static int	trends_eval_stl(const char *table, zbx_uint64_t itemid, int start, int end, int start_detect_period,
+		int end_detect_period, int season, zbx_uint64_t deviations, const char *dev_alg, int s_window,
+		double *value, char **error)
+{
+	int				i, period_counter, ret = FAIL;
+	double				tmp_res, neighboring_right_value, neighboring_left_value = ZBX_INFINITY;
+	zbx_vector_history_record_t	values, trend, seasonal, remainder;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_history_record_vector_create(&values);
+	zbx_history_record_vector_create(&trend);
+	zbx_history_record_vector_create(&seasonal);
+	zbx_history_record_vector_create(&remainder);
+
+	for (period_counter = start; period_counter <= end; period_counter += 3600)
+	{
+		zbx_history_record_t	val;
+
+		val.timestamp.sec = period_counter;
+
+		if (FAIL == zbx_trends_eval_avg(table, itemid, period_counter, period_counter, &tmp_res, NULL))
+		{
+			val.value.dbl = neighboring_left_value;
+		}
+		else
+		{
+			val.value.dbl = tmp_res;
+			neighboring_left_value = tmp_res;
+		}
+
+		zbx_vector_history_record_append_ptr(&values, &val);
+	}
+
+	if (ZBX_INFINITY == neighboring_left_value)
+	{
+		*error = zbx_strdup(*error, "all data is empty");
+		goto out;
+	}
+
+	neighboring_right_value = values.values[values.values_num - 1].value.dbl;
+
+	for (i = values.values_num - 2; i >= 0; i--)
+	{
+		if (ZBX_INFINITY == values.values[i].value.dbl)
+			values.values[i].value.dbl = neighboring_right_value;
+		else
+			neighboring_right_value = values.values[i].value.dbl;
+	}
+
+	ret = zbx_STL(&values, season, ROBUST_DEF, s_window, S_DEGREE_DEF, T_WINDOW_DEF, T_DEGREE_DEF, L_WINDOW_DEF,
+			L_DEGREE_DEF, S_JUMP_DEF, T_JUMP_DEF, L_JUMP_DEF, INNER_DEF, OUTER_DEF,
+			&trend, &seasonal, &remainder, error);
+
+	if (SUCCEED == ret)
+	{
+		ret = zbx_get_percentage_of_deviations_in_stl_remainder(&remainder, deviations, dev_alg,
+				start_detect_period, end_detect_period, value, error);
+	}
+out:
+	zbx_history_record_vector_destroy(&trend, ITEM_VALUE_TYPE_FLOAT);
+	zbx_history_record_vector_destroy(&seasonal, ITEM_VALUE_TYPE_FLOAT);
+	zbx_history_record_vector_destroy(&remainder, ITEM_VALUE_TYPE_FLOAT);
+	zbx_history_record_vector_destroy(&values, ITEM_VALUE_TYPE_FLOAT);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: evaluate_TREND                                                   *
  *                                                                            *
  * Purpose: evaluate trend* functions for the item                            *
  *                                                                            *
- * Parameters: value      - [OUT] the function result                         *
+ * Parameters: value      - [OUT] result                                      *
  *             item       - [IN] item (performance metric)                    *
  *             func       - [IN] the trend function to evaluate               *
  *                               (avg, sum, count, delta, max, min)           *
  *             parameters - [IN] function parameters                          *
  *             ts         - [IN] the historical time when function must be    *
  *                               evaluated                                    *
+ *             error      - [OUT] the error message                           *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
@@ -2907,14 +2860,20 @@ out:
 static int	evaluate_TREND(zbx_variant_t *value, DC_ITEM *item, const char *func, const char *parameters,
 		const zbx_timespec_t *ts, char **error)
 {
-	int		ret = FAIL, start, end;
+	int		start, end, ret = FAIL;
 	char		*period = NULL;
 	const char	*table;
 	double		value_dbl;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (1 != num_param(parameters))
+	if (0 != strcmp(func, "stl") && 1 != num_param(parameters))
+	{
+		*error = zbx_strdup(*error, "invalid number of parameters");
+		goto out;
+	}
+
+	if (0 == strcmp(func, "stl") && (3 > num_param(parameters) || 6 < num_param(parameters)))
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
@@ -2962,6 +2921,76 @@ static int	evaluate_TREND(zbx_variant_t *value, DC_ITEM *item, const char *func,
 	{
 		ret = zbx_trends_eval_sum(table, item->itemid, start, end, &value_dbl, error);
 	}
+	else if (0 == strcmp(func, "stl"))
+	{
+		char			*dev_alg = NULL;
+		int			start_detect_period, end_detect_period, season_shift, season, season_processed,
+					detect_period;
+		zbx_uint64_t		deviations, s_window;
+		zbx_value_type_t	season_type;
+
+		if (SUCCEED != get_function_parameter_hist_range(ts->sec, parameters, 2, &detect_period, &season_type,
+				&season_shift))
+		{
+			*error = zbx_strdup(*error, "invalid third parameter");
+			goto out;
+		}
+
+		if (ZBX_VALUE_SECONDS != season_type)
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			goto out;
+		}
+
+		start_detect_period = end - detect_period;
+		end_detect_period = end;
+
+		if (start_detect_period < start)
+		{
+			*error = zbx_strdup(*error, "detection period must not exceed evaluation period");
+			goto out;
+		}
+
+		if (SUCCEED != get_function_parameter_hist_range(ts->sec, parameters, 3, &season, &season_type,
+				&season_shift))
+		{
+			*error = zbx_strdup(*error, "invalid fourth parameter");
+			goto out;
+		}
+
+		ZBX_UNUSED(season_shift);
+
+		if (ZBX_VALUE_SECONDS != season_type)
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			goto out;
+		}
+
+		if (SUCCEED != get_function_parameter_uint64(parameters, 4, &deviations))
+			deviations = STL_DEF_DEVIATIONS;
+
+		if (SUCCEED != get_function_parameter_str(parameters, 5, &dev_alg))
+		{
+			dev_alg = zbx_strdup(NULL, "mad");
+		}
+		else if ((0 != strcmp("mad", dev_alg) && (0 != strcmp("stddevpop", dev_alg)) &&
+				(0 != strcmp("stddevsamp", dev_alg))))
+		{
+			*error = zbx_strdup(*error, "invalid sixth parameter");
+			zbx_free(dev_alg);
+			goto out;
+		}
+
+		if (SUCCEED != get_function_parameter_uint64(parameters, 6, &s_window))
+			s_window = S_WINDOW_DEF;
+
+		season_processed = (int)((double)season / 3600);
+
+		ret = trends_eval_stl(table, item->itemid, start, end, start_detect_period, end_detect_period,
+				(int)season_processed, deviations, dev_alg, (int)s_window, &value_dbl, error);
+
+		zbx_free(dev_alg);
+	}
 	else
 	{
 		*error = zbx_strdup(*error, "unknown trend function");
@@ -2972,7 +3001,6 @@ static int	evaluate_TREND(zbx_variant_t *value, DC_ITEM *item, const char *func,
 		zbx_variant_set_dbl(value, value_dbl);
 out:
 	zbx_free(period);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
@@ -3035,9 +3063,11 @@ static int	validate_params_and_get_data(DC_ITEM *item, const char *parameters, c
  *                                                                            *
  * Purpose: evaluate function 'first' for the item                            *
  *                                                                            *
- * Parameters: value - dynamic buffer                                         *
- *             item - item (performance metric)                               *
- *             parameters - Nth first value and time shift (optional)         *
+ * Parameters: value      - [OUT] result                                      *
+ *             item       - [IN] item (performance metric)                    *
+ *             parameters - [IN] Nth first value and time shift (optional)    *
+ *             ts         - [IN] the starting timestamp                       *
+ *             error      - [OUT] the error message                           *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
@@ -3142,7 +3172,7 @@ out:
  *                                                                            *
  * Purpose: evaluate functions 'monoinc' and 'monodec' for the item           *
  *                                                                            *
- * Parameters: value      - [OUT] the function return value                   *
+ * Parameters: value      - [OUT] result                                      *
  *             item       - [IN] item (performance metric)                    *
  *             parameters - [IN] mode, strict or weak monotonicity            *
  *             ts         - [IN] the function execution time                  *
@@ -3283,7 +3313,7 @@ out:
  *                                                                            *
  * Purpose: evaluate functions 'rate' for the item                            *
  *                                                                            *
- * Parameters: value      - [OUT] the function return value                   *
+ * Parameters: value      - [OUT] result                                      *
  *             item       - [IN] item (performance metric)                    *
  *             parameters - [IN] seconds, time shift (optional)               *
  *             ts         - [IN] the function execution time                  *
@@ -3474,7 +3504,7 @@ int	zbx_evaluate_RATE(zbx_variant_t *value, DC_ITEM *item, const char *parameter
  *                                                                            *
  * Purpose: evaluate function 'changecount' for the item                      *
  *                                                                            *
- * Parameters: value      - [OUT] the function return value                   *
+ * Parameters: value      - [OUT] result                                      *
  *             item       - [IN] item (performance metric)                    *
  *             parameters - [IN] mode, increases, decreases or all changes    *
  *             ts         - [IN] the function execution time                  *
@@ -3546,9 +3576,6 @@ static int	evaluate_CHANGECOUNT(zbx_variant_t *value, DC_ITEM *item, const char 
 		case ZBX_VALUE_NVALUES:
 			nvalues = arg1;
 			break;
-		case ZBX_VALUE_NONE:
-			*error = zbx_strdup(*error, "invalid second parameter");
-			goto out;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 	}
@@ -3713,9 +3740,12 @@ out:
  *                                                                            *
  * Purpose: evaluate function                                                 *
  *                                                                            *
- * Parameters: item      - item to calculate function for                     *
- *             function  - function (for example, 'max')                      *
- *             parameter - parameter of the function                          *
+ * Parameters: value     - [OUT] dynamic buffer, result                       *
+ *             item      - [IN] item to calculate function for                *
+ *             function  - [IN] function (for example, 'max')                 *
+ *             parameter - [IN] parameter of the function                     *
+ *             ts        - [IN] the starting timestamp                        *
+ *             error     - [OUT] the error message                            *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, value contains its value   *
  *               FAIL - evaluation failed                                     *

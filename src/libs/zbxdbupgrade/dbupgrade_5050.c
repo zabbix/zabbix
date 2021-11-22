@@ -1178,6 +1178,13 @@ static int	DBpatch_5050110(void)
 #endif
 }
 
+static int	DBpatch_5050111(void)
+{
+	if (FAIL != DBindex_exists("alerts", "alerts_8"))
+		return SUCCEED;
+
+	return DBcreate_index("alerts", "alerts_8", "acknowledgeid", 0);
+}
 #endif
 
 DBPATCH_START(5050)
@@ -1282,5 +1289,6 @@ DBPATCH_ADD(5050107, 0, 1)
 DBPATCH_ADD(5050108, 0, 1)
 DBPATCH_ADD(5050109, 0, 1)
 DBPATCH_ADD(5050110, 0, 1)
+DBPATCH_ADD(5050111, 0, 1)
 
 DBPATCH_END()
