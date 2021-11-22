@@ -32,6 +32,7 @@ int	zbx_prometheus_validate_label(const char *label);
 typedef struct
 {
 	zbx_vector_ptr_t	rows;
+	zbx_vector_ptr_t	indexes;
 }
 zbx_prometheus_t;
 

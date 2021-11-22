@@ -112,6 +112,22 @@ static int	prometheus_hint_compare(const void *d1, const void *d2)
 	return strcmp(hint1->metric, hint2->metric);
 }
 
+/* indexing support */
+
+typedef struct
+{
+	char			*value;
+	zbx_vector_ptr_t	rows;
+}
+zbx_prometheus_index_t;
+
+typedef struct
+{
+	char		*label;
+	zbx_hashset_t	index;
+}
+zbx_prometheus_label_index_t;
+
 /******************************************************************************
  *                                                                            *
  * Function: str_loc_dup                                                      *
@@ -1567,22 +1583,22 @@ static int	prometheus_extract_value(const zbx_vector_ptr_t *rows, const char *ou
  *                                                                            *
  * Purpose: get rows matching the filter criteria                             *
  *                                                                            *
- * Parameters: prom   - [IN] the prometheus cache                             *
- *             filter - [IN] the prometheus filter                            *
- *             rows   - [OUT] the filtered rows                               *
+ * Parameters: rows     - [IN] the rows to filter                             *
+ *             filter   - [IN] the prometheus filt                            *
+ *             rows_out - [OUT] the filtered rows                             *
  *                                                                            *
  ******************************************************************************/
-static void	prometheus_filter_rows(zbx_prometheus_t *prom, zbx_prometheus_filter_t *filter, zbx_vector_ptr_t *rows)
+static void	prometheus_filter_rows(zbx_vector_ptr_t *rows, zbx_prometheus_filter_t *filter,
+		zbx_vector_ptr_t *rows_out)
 {
 	int			i, j, k;
 	zbx_prometheus_row_t	*row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	for (i = 0; i < prom->rows.values_num; i++)
+	for (i = 0; i < rows->values_num; i++)
 	{
-
-		row = (zbx_prometheus_row_t *)prom->rows.values[i];
+		row = (zbx_prometheus_row_t *)rows->values[i];
 
 		if (NULL != filter->metric)
 		{
@@ -1618,10 +1634,10 @@ static void	prometheus_filter_rows(zbx_prometheus_t *prom, zbx_prometheus_filter
 				continue;
 		}
 
-		zbx_vector_ptr_append(rows, row);
+		zbx_vector_ptr_append(rows_out, row);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows:%d", __func__, rows->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows:%d", __func__, rows_out->values_num);
 }
 
 /******************************************************************************
@@ -1644,6 +1660,7 @@ int	zbx_prometheus_init(zbx_prometheus_t *prom, const char *data, char **error)
 	int			ret = FAIL;
 
 	zbx_vector_ptr_create(&prom->rows);
+	zbx_vector_ptr_create(&prom->indexes);
 
 	if (SUCCEED != prometheus_filter_init(&filter, NULL, error))
 		return FAIL;
@@ -1658,6 +1675,22 @@ out:
 	return ret;
 }
 
+
+static void	prometheus_label_index_free(zbx_prometheus_label_index_t *label_index)
+{
+	zbx_hashset_iter_t	iter;
+	zbx_prometheus_index_t	*index;
+
+	zbx_free(label_index->label);
+
+	zbx_hashset_iter_reset(&label_index->index, &iter);
+	while (NULL != (index = (zbx_prometheus_index_t *)zbx_hashset_iter_next(&iter)))
+		zbx_vector_ptr_destroy(&index->rows);
+
+	zbx_hashset_destroy(&label_index->index);
+	zbx_free(label_index);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_prometheus_clear                                             *
@@ -1669,8 +1702,159 @@ out:
  ******************************************************************************/
 void	zbx_prometheus_clear(zbx_prometheus_t *prom)
 {
+	zbx_vector_ptr_clear_ext(&prom->indexes, (zbx_clean_func_t)prometheus_label_index_free);
+	zbx_vector_ptr_destroy(&prom->indexes);
+
 	zbx_vector_ptr_clear_ext(&prom->rows, (zbx_clean_func_t)prometheus_row_free);
 	zbx_vector_ptr_destroy(&prom->rows);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * row indexing support                                                       *
+ *                                                                            *
+ ******************************************************************************/
+
+static	zbx_prometheus_label_index_t	*prometheus_get_index(zbx_prometheus_t *prom, const char *label)
+{
+	int	i;
+
+	for (i = 0; i < prom->indexes.values_num; i++)
+	{
+		zbx_prometheus_label_index_t	*label_index = (zbx_prometheus_label_index_t *)prom->indexes.values[i];
+
+		if (0 == strcmp(label_index->label, label))
+			return label_index;
+	}
+
+	return NULL;
+}
+
+static void	prometheus_add_index(zbx_prometheus_t *prom, zbx_prometheus_label_index_t *index)
+{
+	zbx_vector_ptr_append(&prom->indexes, index);
+}
+
+static zbx_hash_t	prometheus_index_hash_func(const void *d)
+{
+	const zbx_prometheus_index_t	*index = (const zbx_prometheus_index_t *)d;
+
+	return ZBX_DEFAULT_STRING_HASH_FUNC(index->value);
+}
+
+static int	prometheus_index_compare_func(const void *d1, const void *d2)
+{
+	const zbx_prometheus_index_t	*i1 = (const zbx_prometheus_index_t *)d1;
+	const zbx_prometheus_index_t	*i2 = (const zbx_prometheus_index_t *)d2;
+
+	return strcmp(i1->value, i2->value);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: prometheus_get_row_label                                         *
+ *                                                                            *
+ * Purpose: get label from row by the specified name                          *
+ *                                                                            *
+ * Parameters: row  - [IN] the prometheus row                                 *
+ *             name - [IN] the label name                                     *
+ *                                                                            *
+ * Return value: The prometheus row label or NULL if no labels matched the    *
+ *               specified name.                                              *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_prometheus_label_t	*prometheus_get_row_label(zbx_prometheus_row_t *row, const char *name)
+{
+	int	i;
+
+	for (i = 0; i < row->labels.values_num; i++)
+	{
+		zbx_prometheus_label_t	*label = row->labels.values[i];
+
+		if (0 == strcmp(label->name, name))
+			return label;
+	}
+
+	return NULL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: prometheus_get_indexed_rows_by_label                             *
+ *                                                                            *
+ * Purpose: get rows matching one filter label                                *
+ *                                                                            *
+ * Parameters: prom   - [IN] the prometheus cache                             *
+ *             filter - [IN] the filter                                       *
+ *             rows   - [IN] the rows matching filter label or NULL if there  *
+ *                           are now matching rows                            *
+ *                                                                            *
+ * Return value: SUCCEED - the matched rows were returned successfully        *
+ *               FAIL    - filter does not contain conditions that can be     *
+ *                         indexed.                                           *
+ *                                                                            *
+ * Comments: The rows are indexed by first filter 'label equals' condition.   *
+ *           The index is created automatically when rows for unindexed       *
+ *           label are requested.                                             *
+ *                                                                            *
+ ******************************************************************************/
+static int	prometheus_get_indexed_rows_by_label(zbx_prometheus_t *prom, zbx_prometheus_filter_t *filter,
+		zbx_vector_ptr_t **rows)
+{
+	int				i;
+	zbx_prometheus_condition_t	*condition;
+	zbx_prometheus_label_index_t	*label_index;
+	zbx_prometheus_index_t		*index, index_local;
+
+	for (i = 0; i < filter->labels.values_num; i++)
+	{
+		condition = filter->labels.values[i];
+
+		if (ZBX_PROMETHEUS_CONDITION_OP_EQUAL == condition->op)
+			break;
+	}
+
+	if (i == filter->labels.values_num)
+		return FAIL;
+
+	if (NULL == (label_index = prometheus_get_index(prom, condition->key)))
+	{
+		label_index = (zbx_prometheus_label_index_t *)zbx_malloc(NULL, sizeof(zbx_prometheus_label_index_t));
+
+		label_index->label = zbx_strdup(NULL, condition->key);
+		zbx_hashset_create(&label_index->index, 0, prometheus_index_hash_func, prometheus_index_compare_func);
+		prometheus_add_index(prom, label_index);
+
+		for (i = 0; i < prom->rows.values_num; i++)
+		{
+			zbx_prometheus_row_t	*row = (zbx_prometheus_row_t *)prom->rows.values[i];
+			zbx_prometheus_label_t	*label;
+
+			if (NULL == (label = prometheus_get_row_label(row, label_index->label)))
+				continue;
+
+			index_local.value = label->value;
+
+			if (NULL == (index = (zbx_prometheus_index_t *)zbx_hashset_search(&label_index->index,
+					&index_local)))
+			{
+				index = (zbx_prometheus_index_t *)zbx_hashset_insert(&label_index->index, &index_local,
+						sizeof(index_local));
+				zbx_vector_ptr_create(&index->rows);
+			}
+
+			zbx_vector_ptr_append(&index->rows, row);
+		}
+	}
+
+	index_local.value = condition->pattern;
+
+	if (NULL != (index = (zbx_prometheus_index_t *)zbx_hashset_search(&label_index->index, &index_local)))
+		*rows = &index->rows;
+	else
+		*rows = NULL;
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -1695,7 +1879,7 @@ int	zbx_prometheus_pattern_ex(zbx_prometheus_t *prom, const char *filter_data, c
 	zbx_prometheus_filter_t	filter;
 	int			ret = FAIL;
 	char			*errmsg = NULL;
-	zbx_vector_ptr_t	rows;
+	zbx_vector_ptr_t	rows, *prows;
 
 	zbx_vector_ptr_create(&rows);
 
@@ -1706,7 +1890,10 @@ int	zbx_prometheus_pattern_ex(zbx_prometheus_t *prom, const char *filter_data, c
 		goto out;
 	}
 
-	prometheus_filter_rows(prom, &filter, &rows);
+	if (SUCCEED != prometheus_get_indexed_rows_by_label(prom, &filter, &prows) || NULL == prows)
+		prows = &prom->rows;
+
+	prometheus_filter_rows(prows, &filter, &rows);
 
 	if (FAIL == (ret = prometheus_extract_value(&rows, output, value, &errmsg)))
 	{
