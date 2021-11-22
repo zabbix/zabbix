@@ -139,7 +139,7 @@
 			var panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;
 
 			if (panel.attr('id') === 'macroTab') {
-				let macros_initialized = (panel.data('macros_initialized') || false);
+				const macros_initialized = panel.data('macros_initialized') || false;
 
 				// Please note that macro initialization must take place once and only when the tab is visible.
 				if (event.type === 'tabsactivate') {

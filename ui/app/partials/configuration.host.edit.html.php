@@ -108,8 +108,9 @@ if ($host_is_discovered) {
 	if ($data['host']['parentTemplates']) {
 		$linked_templates = (new CTable())
 			->setHeader([_('Name')])
+			->setId('linked-templates')
 			->addClass(ZBX_STYLE_TABLE_FORMS)
-			->setId('linked-template');
+			->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;');
 
 		foreach ($data['host']['parentTemplates'] as $template) {
 			if ($data['allowed_ui_conf_templates']
@@ -141,8 +142,9 @@ else {
 	if ($data['host']['parentTemplates']) {
 		$linked_templates = (new CTable())
 			->setHeader([_('Name'), _('Action')])
+			->setId('linked-templates')
 			->addClass(ZBX_STYLE_TABLE_FORMS)
-			->setId('linked-template');
+			->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;');
 
 		foreach ($data['host']['parentTemplates'] as $template) {
 			if ($data['allowed_ui_conf_templates']
@@ -208,7 +210,7 @@ $host_tab
 		new CLabel(_('Templates')),
 		(new CFormField(
 			(count($templates_field_items) > 1)
-				? (new CDiv($templates_field_items))->addClass('grid-templates-container')
+				? (new CDiv($templates_field_items))->addClass('linked-templates')
 				: $templates_field_items
 		))
 	])

@@ -1333,21 +1333,6 @@ form {
 	}
 }
 
-.grid-templates-container {
-	display: inline-block;
-
-	> table.table-forms {
-		margin-bottom: 5px;
-		display: inline-table;
-		width: 453px;
-	}
-
-	> table.table-forms tr > *:last-child {
-		min-width: 1%;
-		padding-right: 5px;
-	}
-}
-
 .form-btns {
 	button {
 		margin: 10px 6px 5px;
@@ -6425,6 +6410,22 @@ z-select,
 
 		.table-forms-td-right {
 			width: 100%;
+		}
+	}
+}
+
+.linked-templates {
+	> .table-forms {
+		margin-bottom: 5px;
+		line-height: 24px;
+
+		td, th {
+			padding: 0 5px 0 0;
+
+			&:last-child {
+				width: 0;
+				padding-right: 0;
+			}
 		}
 	}
 }
