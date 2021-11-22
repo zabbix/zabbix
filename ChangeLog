@@ -2310,8 +2310,6 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 --------------------------------------------------------------------------------
 Changes for 4.0.36rc1
 
-New features:
-
 Bug fixes:
 ...G...... [ZBX-19926] fixed Zabbix agent crashing when reading event log on Windows Server 2022 (vso)
 .......PS. [ZBX-20032] fixed server crash when restarting monitored vmware vc (MVekslers)
