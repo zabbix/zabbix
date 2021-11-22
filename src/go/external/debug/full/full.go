@@ -43,17 +43,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	return "debug full test response", nil
 }
 
-// func (p *Plugin) Collect() error {
-// 	p.Debugf("collect")
-// 	p.counter++
-// 	return nil
-// }
-
-// func (p *Plugin) Period() int {
-// 	p.Debugf("period: interval=%d", p.options.Interval)
-// 	return p.options.Interval
-// }
-
 func (p *Plugin) Configure(global *plugin.GlobalOptions, private interface{}) {
 	p.options.Interval = 10
 	if err := conf.Unmarshal(private, &p.options); err != nil {
@@ -63,6 +52,7 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, private interface{}) {
 }
 
 func (p *Plugin) Validate(private interface{}) (err error) {
+	p.Debugf("executing Validate")
 	return
 }
 

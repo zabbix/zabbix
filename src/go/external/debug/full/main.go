@@ -20,19 +20,21 @@
 package main
 
 import (
+	"fmt"
+
 	"zabbix.com/external"
 )
 
 func main() {
 	h, err := external.NewHandler(impl.Name())
 	if err != nil {
-		return
+		panic(fmt.Sprintf("failed to create external plugin handler %s", err.Error()))
 	}
 
 	impl.Logger = &h
 
 	err = h.Execute()
 	if err != nil {
-		return
+		panic(fmt.Sprintf("failed to execute external plugin handler %s", err.Error()))
 	}
 }

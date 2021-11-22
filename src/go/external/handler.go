@@ -21,7 +21,6 @@ package external
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net"
 	"os"
@@ -29,8 +28,12 @@ import (
 	"time"
 
 	"zabbix.com/pkg/plugin"
-	"zabbix.com/pkg/plugin/shared"
+	"zabbix.com/pkg/shared"
 )
+
+const defaultTimeout = 3
+const socketArg = 2
+const startTypeArg = 3
 
 const (
 	Info    = 0
@@ -53,27 +56,28 @@ var supportedVersion map[string]bool
 func NewHandler(name string) (h handler, err error) {
 	h.name = name
 
-	if len(os.Args) < 2 {
-		return
+	if len(os.Args) < socketArg {
+		panic("no socket provided")
 	}
 
 	h.socket = os.Args[1]
 
-	if len(os.Args) < 3 {
+	if len(os.Args) < startTypeArg {
 		h.registerStart = false
+
 		return
 	}
 
 	h.registerStart, err = strconv.ParseBool(os.Args[2])
 	if err != nil {
-		return
+		panic(fmt.Sprintf("failed to parse third parameter %s", err.Error()))
 	}
 
 	return
 }
 
 func (h *handler) Execute() error {
-	err := h.setConnection(h.socket, 3*time.Second)
+	err := h.setConnection(h.socket, defaultTimeout*time.Second)
 	if err != nil {
 		return err
 	}
@@ -103,7 +107,7 @@ func (h *handler) handle() error {
 		return err
 	}
 
-	h.Infof("Plugin %s executing %s", h.name, shared.GetRequestName(reqType))
+	h.Tracef("Plugin %s executing %s", h.name, shared.GetRequestName(reqType))
 
 	switch reqType {
 	case shared.RegisterRequestType:
@@ -128,23 +132,11 @@ func (h *handler) handle() error {
 		if err != nil {
 			return err
 		}
-	// case shared.CollectorRequestType:
-	// 	h.Debugf("got CollectorRequestType")
-	// 	err = h.collect(data)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// case shared.PeriodRequestType:
-	// 	h.Debugf("got PeriodRequestType")
-	// 	err = h.period(data)
-	// 	if err != nil {
-	// 		return err
-	// }
 	default:
 		return fmt.Errorf("unknown request recivied: %d", reqType)
 	}
 
-	h.Infof("Plugin %s executed %s", h.name, shared.GetRequestName(reqType))
+	h.Tracef("Plugin %s executed %s", h.name, shared.GetRequestName(reqType))
 
 	return nil
 }
@@ -185,6 +177,7 @@ func (h *handler) stop() error {
 	}
 
 	p.Stop()
+
 	return nil
 }
 
@@ -193,6 +186,15 @@ func (h *handler) register(data []byte) error {
 	err := json.Unmarshal(data, &req)
 	if err != nil {
 		return err
+	}
+
+	response := createEmptyRegisterResponse(req.Id)
+
+	err = checkVersion(req.Version)
+	if err != nil {
+		response.Error = err.Error()
+
+		return shared.Write(h.connection, response)
 	}
 
 	var metrics []string
@@ -205,14 +207,6 @@ func (h *handler) register(data []byte) error {
 	interfaces, err := h.getInterfaces()
 	if err != nil {
 		return err
-	}
-
-	response := shared.CreateEmptyRegisterResponse(req.Id)
-
-	err = checkVersion(req.Version)
-	if err != nil {
-		response.Error = err.Error()
-		return shared.Write(h.connection, response)
 	}
 
 	response.Name = h.name
@@ -237,7 +231,7 @@ func (h *handler) validate(data []byte) error {
 		return err
 	}
 
-	response := shared.CreateEmptyValidateResponse(req.Id)
+	response := createEmptyValidateResponse(req.Id)
 	acc, err := plugin.GetByName(h.name)
 	if err != nil {
 		return err
@@ -245,8 +239,7 @@ func (h *handler) validate(data []byte) error {
 
 	p, ok := acc.(plugin.Configurator)
 	if !ok {
-		response.Error = "plugin does not implement Configurator interface"
-		return shared.Write(h.connection, response)
+		panic("plugin does not implement Configurator interface")
 	}
 
 	err = p.Validate(req.PrivateOptions)
@@ -271,7 +264,7 @@ func (h *handler) configure(data []byte) error {
 
 	p, ok := acc.(plugin.Configurator)
 	if !ok {
-		return errors.New("plugin does not implement Configurator interface")
+		panic("plugin does not implement Configurator interface")
 	}
 
 	p.Configure(req.GlobalOptions, req.PrivateOptions)
@@ -292,58 +285,11 @@ func (h *handler) export(data []byte) error {
 
 	p, ok := acc.(plugin.Exporter)
 	if !ok {
-		return errors.New("plugin does not implement Exporter interface")
+		panic("plugin does not implement Exporter interface")
 	}
 
-	response := shared.CreateEmptyExportResponse(req.Id)
-	response.Value, err = p.Export(req.Key, req.Params, emptyCtx{})
-	if err != nil {
-		response.Error = err.Error()
-	}
-
-	return shared.Write(h.connection, response)
-}
-
-func (h *handler) period(data []byte) error {
-	var req shared.PeriodRequest
-	err := json.Unmarshal(data, &req)
-	if err != nil {
-		return err
-	}
-
-	acc, err := plugin.GetByName(h.name)
-	if err != nil {
-		return err
-	}
-
-	p, ok := acc.(plugin.Collector)
-	if !ok {
-		return errors.New("plugin does not implement Collector interface")
-	}
-
-	return shared.Write(h.connection, shared.CreatePeriodResponse(req.Id, p.Period()))
-}
-
-func (h *handler) collect(data []byte) error {
-	var req shared.CollectRequest
-	err := json.Unmarshal(data, &req)
-	if err != nil {
-		return err
-	}
-
-	acc, err := plugin.GetByName(h.name)
-	if err != nil {
-		return err
-	}
-
-	p, ok := acc.(plugin.Collector)
-	if !ok {
-		return errors.New("plugin does not implement Collector interface")
-	}
-
-	response := shared.CreateEmptyCollectResponse(req.Id)
-
-	err = p.Collect()
+	response := createEmptyExportResponse(req.Id)
+	response.Value, err = p.Export(req.Key, req.Params, &emptyCtx{})
 	if err != nil {
 		response.Error = err.Error()
 	}
@@ -415,31 +361,62 @@ func (h *handler) getInterfaces() (uint32, error) {
 }
 
 func (h *handler) Tracef(format string, args ...interface{}) {
-	h.sendLog(shared.CreateLogRequest(Trace, fmt.Sprintf(format, args...)))
+	h.sendLog(createLogRequest(Trace, fmt.Sprintf(format, args...)))
 }
 
 func (h *handler) Debugf(format string, args ...interface{}) {
-	h.sendLog(shared.CreateLogRequest(Debug, fmt.Sprintf(format, args...)))
+	h.sendLog(createLogRequest(Debug, fmt.Sprintf(format, args...)))
 }
 
 func (h *handler) Warningf(format string, args ...interface{}) {
-	h.sendLog(shared.CreateLogRequest(Warning, fmt.Sprintf(format, args...)))
+	h.sendLog(createLogRequest(Warning, fmt.Sprintf(format, args...)))
 }
 
 func (h *handler) Infof(format string, args ...interface{}) {
-	h.sendLog(shared.CreateLogRequest(Info, fmt.Sprintf(format, args...)))
+	h.sendLog(createLogRequest(Info, fmt.Sprintf(format, args...)))
 }
 
 func (h *handler) Errf(format string, args ...interface{}) {
-	h.sendLog(shared.CreateLogRequest(Err, fmt.Sprintf(format, args...)))
+	h.sendLog(createLogRequest(Err, fmt.Sprintf(format, args...)))
 }
 
 func (h *handler) Critf(format string, args ...interface{}) {
-	h.sendLog(shared.CreateLogRequest(Crit, fmt.Sprintf(format, args...)))
+	h.sendLog(createLogRequest(Crit, fmt.Sprintf(format, args...)))
+}
+
+func createLogRequest(severity uint32, message string) shared.LogRequest {
+	return shared.LogRequest{
+		Common: shared.Common{
+			Id:   shared.NonRequiredID,
+			Type: shared.LogRequestType,
+		},
+		Severity: severity,
+		Message:  message,
+	}
+}
+
+func createEmptyRegisterResponse(id uint32) shared.RegisterResponse {
+	return shared.RegisterResponse{
+		Common: shared.Common{
+			Id:   id,
+			Type: shared.RegisterResponseType,
+		},
+	}
+}
+
+func createEmptyExportResponse(id uint32) shared.ExportResponse {
+	return shared.ExportResponse{Common: shared.Common{Id: id, Type: shared.ExportResponseType}}
+}
+
+func createEmptyValidateResponse(id uint32) shared.ValidateResponse {
+	return shared.ValidateResponse{Common: shared.Common{Id: id, Type: shared.ValidateResponseType}}
 }
 
 func (h *handler) sendLog(request shared.LogRequest) {
-	shared.Write(h.connection, request)
+	err := shared.Write(h.connection, request)
+	if err != nil {
+		panic(fmt.Sprintf("failed to log message %s", err.Error()))
+	}
 }
 
 func init() {

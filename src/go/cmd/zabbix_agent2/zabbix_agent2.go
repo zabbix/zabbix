@@ -30,7 +30,6 @@ import (
 	"time"
 
 	_ "zabbix.com/plugins"
-	"zabbix.com/plugins/external"
 
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/agent/keyaccess"
@@ -321,10 +320,11 @@ func main() {
 		fatalExit("cannot initialize logger", err)
 	}
 
-	go startExternalErrListener()
-	if err = external.InitExternalPlugins(&agent.Options); err != nil {
+	var socket string
+	if socket, err = initExternalPlugins(&agent.Options); err != nil {
 		fatalExit("cannot register external plugins", err)
 	}
+	defer cleanUpExternal(socket)
 
 	if argTest || argPrint {
 		var level int
@@ -377,6 +377,9 @@ func main() {
 		m.Stop()
 
 		monitor.Wait(monitor.Scheduler)
+
+		cleanUpExternal(socket)
+
 		os.Exit(0)
 	}
 
@@ -578,9 +581,11 @@ func main() {
 	waitServiceClose()
 }
 
-func startExternalErrListener() {
-	err := external.ErrListener()
-	fatalExit("external plugin failed", err)
+func cleanUpExternal(socket string) {
+	err := removeSocket(socket)
+	if err != nil {
+		fatalExit("failed to clean up after external plugins", err)
+	}
 }
 
 func fatalExit(message string, err error) {

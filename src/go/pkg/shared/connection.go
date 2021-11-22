@@ -24,63 +24,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net"
-
-	"zabbix.com/pkg/plugin"
 )
 
 const JSONType = uint32(1)
-
-func CreateRegisterRequest() RegisterRequest {
-	return RegisterRequest{Common{GetID(), RegisterRequestType}, Version}
-}
-
-func CreateTerminateRequest() TerminateRequest {
-	return TerminateRequest{Common{GetID(), TerminateRequestType}}
-}
-
-func CreateExportRequest(key string, params []string) ExportRequest {
-	return ExportRequest{Common{GetID(), ExportRequestType}, key, params}
-}
-
-func CreateCollectRequest() CollectRequest {
-	return CollectRequest{Common{GetID(), CollectorRequestType}}
-}
-
-func CreatePeriodRequest() PeriodRequest {
-	return PeriodRequest{Common{GetID(), PeriodRequestType}}
-}
-
-func CreateConfigurateRequest(pluginOption *plugin.GlobalOptions, privateOptions interface{}) ConfigureRequest {
-	return ConfigureRequest{Common{GetID(), ConfigureRequestType}, pluginOption, privateOptions}
-}
-
-func CreateValidateRequest(options interface{}) ValidateRequest {
-	return ValidateRequest{Common{GetID(), ValidateRequestType}, options}
-}
-
-func CreateLogRequest(severity uint32, message string) LogRequest {
-	return LogRequest{Common{GetID(), LogRequestType}, severity, message}
-}
-
-func CreateEmptyRegisterResponse(id uint32) RegisterResponse {
-	return RegisterResponse{Common{id, RegisterResponseType}, "", []string{}, 0, ""}
-}
-
-func CreateEmptyExportResponse(id uint32) ExportResponse {
-	return ExportResponse{Common{id, ExportResponseType}, nil, ""}
-}
-
-func CreateEmptyValidateResponse(id uint32) ValidateResponse {
-	return ValidateResponse{Common{id, ValidateResponseType}, ""}
-}
-
-func CreateEmptyCollectResponse(id uint32) CollectResponse {
-	return CollectResponse{Common{id, CollectorResponseType}, ""}
-}
-
-func CreatePeriodResponse(id uint32, period int) PeriodResponse {
-	return PeriodResponse{Common{id, PeriodResponseType}, period}
-}
 
 func Read(conn net.Conn) (dataType uint32, requestData []byte, err error) {
 	reqByteType := make([]byte, 4)
@@ -92,6 +38,7 @@ func Read(conn net.Conn) (dataType uint32, requestData []byte, err error) {
 
 	if JSONType != binary.LittleEndian.Uint32(reqByteType) {
 		err = fmt.Errorf("only json data type (%d) supported", JSONType)
+
 		return
 	}
 
@@ -123,7 +70,7 @@ func Write(conn net.Conn, in interface{}) (err error) {
 	}
 
 	dataType := make([]byte, 4)
-	binary.LittleEndian.PutUint32(dataType, uint32(JSONType))
+	binary.LittleEndian.PutUint32(dataType, JSONType)
 
 	dataLen := make([]byte, 4)
 	binary.LittleEndian.PutUint32(dataLen, uint32(len(reqBytes)))

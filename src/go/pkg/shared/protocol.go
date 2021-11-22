@@ -25,6 +25,8 @@ import (
 
 const Version = "1.0"
 
+const NonRequiredID = 0
+
 const (
 	Exporter = iota + 1
 	Configurator
@@ -64,17 +66,6 @@ var toString = map[request]string{
 	CollectorResponseType: "Collector Response",
 	PeriodRequestType:     "Period Request",
 	PeriodResponseType:    "Period Response",
-}
-
-var idCounter uint32
-
-func GetID() uint32 {
-	if idCounter == 4294967295 {
-		idCounter = 0
-	}
-
-	idCounter += 1
-	return idCounter
 }
 
 func GetRequestName(reqType uint32) string {
@@ -151,22 +142,4 @@ type ConfigureRequest struct {
 	Common
 	GlobalOptions  *plugin.GlobalOptions `json:"global_options"`
 	PrivateOptions interface{}           `json:"private_options,omitempty"`
-}
-
-type CollectRequest struct {
-	Common
-}
-
-type CollectResponse struct {
-	Common
-	Error string `json:"error,omitempty"`
-}
-
-type PeriodRequest struct {
-	Common
-}
-
-type PeriodResponse struct {
-	Common
-	Period int `json:"period,omitempty"`
 }
