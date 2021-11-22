@@ -823,10 +823,6 @@
 
 		$('.selected ul', $obj).append($li);
 
-		$obj[0].dispatchEvent(new CustomEvent('multiselect.item.added', {
-			detail: {entry_id: item.id}
-		}));
-
 		cleanSearch($obj);
 	}
 
@@ -845,10 +841,6 @@
 		});
 
 		delete ms.values.selected[id];
-
-		$obj[0].dispatchEvent(new CustomEvent('multiselect.item.removed', {
-			detail: {entry_id: id}
-		}));
 
 		if (!$('.selected li', $obj).length) {
 			addDefaultValue($obj);

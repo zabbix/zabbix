@@ -100,18 +100,27 @@
 <?php endif ?>
 
 <script type="text/javascript">
+	/**
+	 * Collects IDs selected in "Add templates" multiselect.
+	 *
+	 * @returns {array|getAddTemplates.templateids}
+	 */
+	function getAddTemplates() {
+		const $ms = $('#add_templates_');
+		let templateids = [];
+
+		// Readonly forms don't have multiselect.
+		if ($ms.length) {
+			// Collect IDs from Multiselect.
+			$ms.multiSelect('getData').forEach(function(template) {
+				templateids.push(template.id);
+			});
+		}
+
+		return templateids;
+	}
+
 	jQuery(function($) {
-		const template_excluder = new CMultiselectEntryExcluder('add_templates_', ['templates', 'add_templates']);
-
-		if (document.getElementById('groups_') !== null) {
-			// Template groups
-			new CMultiselectEntryExcluder('groups_', ['groups']);
-		}
-		else if (document.getElementById('group_links_') !== null) {
-			// Host prototype groups
-			new CMultiselectEntryExcluder('group_links_', ['group_links']);
-		}
-
 		var $show_inherited_macros = $('input[name="show_inherited_macros"]'),
 			linked_templateids = <?= json_encode($data['macros_tab']['linked_templates']) ?>;
 
@@ -135,13 +144,17 @@
 				// Please note that macro initialization must take place once and only when the tab is visible.
 				if (event.type === 'tabsactivate') {
 					let panel_templateids = panel.data('templateids') || [],
-						templateids = template_excluder.getEntryIds();
+						templateids = getAddTemplates();
 
 					if (panel_templateids.xor(templateids).length > 0) {
 						panel.data('templateids', templateids);
-						panel.data('macros_initialized', true);
 
-						window.macros_manager.load($show_inherited_macros.filter(':checked').val() == 1, templateids);
+						window.macros_manager.load(
+							$show_inherited_macros.filter(':checked').val() == 1,
+							linked_templateids.concat(templateids)
+						);
+
+						panel.data('macros_initialized', true);
 					}
 				}
 
@@ -165,7 +178,7 @@
 				return;
 			}
 
-			window.macros_manager.load($(this).val() == 1, template_excluder.getEntryIds());
+			window.macros_manager.load($(this).val() == 1, linked_templateids.concat(getAddTemplates()));
 		});
 	});
 </script>
