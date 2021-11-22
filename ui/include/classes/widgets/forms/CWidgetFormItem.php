@@ -394,42 +394,35 @@ class CWidgetFormItem extends CWidgetForm {
 	public function validate($strict = false) {
 		$errors = parent::validate($strict);
 
-		$show = array_flip($this->fields['show']->getValue());
-
 		// Check if one of the objects (description, value or time) occupies same space.
-		if (array_key_exists(WIDGET_ITEM_SHOW_DESCRIPTION, $show) && array_key_exists(WIDGET_ITEM_SHOW_VALUE, $show)
-				&& array_key_exists(WIDGET_ITEM_SHOW_TIME, $show)) {
-			if ($this->fields['desc_h_pos']->getValue() == $this->fields['value_h_pos']->getValue()
-					&& $this->fields['desc_v_pos']->getValue() == $this->fields['value_v_pos']->getValue()) {
-				$errors[] = _('Description and value cannot occupy same space.');
+		$fields = [
+			['show' => WIDGET_ITEM_SHOW_DESCRIPTION, 'h_pos' => 'desc_h_pos', 'v_pos' => 'desc_v_pos'],
+			['show' => WIDGET_ITEM_SHOW_VALUE, 'h_pos' => 'value_h_pos', 'v_pos' => 'value_v_pos'],
+			['show' => WIDGET_ITEM_SHOW_TIME, 'h_pos' => 'time_h_pos', 'v_pos' => 'time_v_pos']
+		];
+		$fields_count = count($fields);
+		$show = $this->fields['show']->getValue();
+
+		for ($i = 0; $i < $fields_count - 1; $i++) {
+			if (!in_array($fields[$i]['show'], $show)) {
+				continue;
 			}
-			if ($this->fields['desc_h_pos']->getValue() == $this->fields['time_h_pos']->getValue()
-					&& $this->fields['desc_v_pos']->getValue() == $this->fields['time_v_pos']->getValue()) {
-				$errors[] = _('Description and time cannot occupy same space.');
-			}
-			elseif ($this->fields['value_h_pos']->getValue() == $this->fields['time_h_pos']->getValue()
-					&& $this->fields['value_v_pos']->getValue() == $this->fields['time_v_pos']->getValue()) {
-				$errors[] = _('Value and time cannot occupy same space.');
-			}
-		}
-		elseif (array_key_exists(WIDGET_ITEM_SHOW_DESCRIPTION, $show)
-				&& array_key_exists(WIDGET_ITEM_SHOW_VALUE, $show)) {
-			if ($this->fields['desc_h_pos']->getValue() == $this->fields['value_h_pos']->getValue()
-					&& $this->fields['desc_v_pos']->getValue() == $this->fields['value_v_pos']->getValue()) {
-				$errors[] = _('Description and value cannot occupy same space.');
-			}
-		}
-		elseif (array_key_exists(WIDGET_ITEM_SHOW_DESCRIPTION, $show)
-					&& array_key_exists(WIDGET_ITEM_SHOW_TIME, $show)) {
-			if ($this->fields['desc_h_pos']->getValue() == $this->fields['time_h_pos']->getValue()
-					&& $this->fields['desc_v_pos']->getValue() == $this->fields['time_v_pos']->getValue()) {
-				$errors[] = _('Description and time cannot occupy same space.');
-			}
-		}
-		elseif (array_key_exists(WIDGET_ITEM_SHOW_VALUE, $show) && array_key_exists(WIDGET_ITEM_SHOW_TIME, $show)) {
-			if ($this->fields['value_h_pos']->getValue() == $this->fields['time_h_pos']->getValue()
-					&& $this->fields['value_v_pos']->getValue() == $this->fields['time_v_pos']->getValue()) {
-				$errors[] = _('Value and time cannot occupy same space.');
+
+			$i_h_pos = $this->fields[$fields[$i]['h_pos']]->getValue();
+			$i_v_pos = $this->fields[$fields[$i]['v_pos']]->getValue();
+
+			for ($j = $i + 1; $j < $fields_count; $j++) {
+				if (!in_array($fields[$j]['show'], $show)) {
+					continue;
+				}
+
+				$j_h_pos = $this->fields[$fields[$j]['h_pos']]->getValue();
+				$j_v_pos = $this->fields[$fields[$j]['v_pos']]->getValue();
+
+				if ($i_h_pos == $j_h_pos && $i_v_pos == $j_v_pos) {
+					$errors[] = _('Two or more fields cannot occupy same space.');
+					break 2;
+				}
 			}
 		}
 
