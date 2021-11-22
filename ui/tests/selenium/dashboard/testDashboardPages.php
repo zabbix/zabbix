@@ -325,7 +325,8 @@ class testDashboardPages extends CWebTest {
 		$query_widgetfields = 'SELECT type, name, value_int, value_str, value_groupid FROM widget_field WHERE widgetid=';
 
 		foreach ([self::$ids['Dashboard for copy'], self::$ids['Dashboard for paste']] as $dashboardid) {
-			$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$ids['Dashboard for copy'])->waitUntilReady();
+			$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$ids['Dashboard for copy'])
+					->waitUntilReady();
 			$dashboard = CDashboardElement::find()->one();
 
 			// Save hash and copy first page.
@@ -442,7 +443,8 @@ class testDashboardPages extends CWebTest {
 	 * @dataProvider getCreateData
 	 */
 	public function testDashboardPages_Create($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$ids['Dashboard for page creation'])->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$ids['Dashboard for page creation'])
+				->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 		$dashboard->edit();
 		$dashboard->addPage();
@@ -496,7 +498,8 @@ class testDashboardPages extends CWebTest {
 	 * Switch pages using next/previous arrow buttons.
 	 */
 	public function testDashboardPages_Navigation() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$ids['Dashboard for page navigation'])->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$ids['Dashboard for page navigation'])
+				->waitUntilReady();
 		$next_page = $this->query(self::NEXT_BUTTON)->one();
 		$previous_page = $this->query(self::PREVIOUS_BUTTON)->one();
 
@@ -526,7 +529,8 @@ class testDashboardPages extends CWebTest {
 	 * Delete pages.
 	 */
 	public function testDashboardPages_Delete() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$ids['Dashboard for page delete'])->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$ids['Dashboard for page delete'])
+				->waitUntilReady();
 		$this->assertEquals(['Page 1', 'Page 2', 'Page 3'], $this->getPagesTitles());
 		$dashboard = CDashboardElement::find()->one();
 		$dashboard->edit();
@@ -552,7 +556,8 @@ class testDashboardPages extends CWebTest {
 	 */
 	public function testDashboardPages_EmptyPagesName() {
 		// Check that first page do not has any name.
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$ids['Dashboard for pages empty name'])->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$ids['Dashboard for pages empty name'])
+				->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 		$dashboard->edit();
 		$this->assertEquals(['Page 1'], $this->getPagesTitles());
@@ -591,7 +596,8 @@ class testDashboardPages extends CWebTest {
 	 * @backup profiles
 	 */
 	public function testDashboardPages_KioskMode() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$ids['Dashboard for kiosk'])->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$ids['Dashboard for kiosk'])
+				->waitUntilReady();
 		$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
 		$this->page->waitUntilReady();
 
@@ -626,7 +632,8 @@ class testDashboardPages extends CWebTest {
 
 	// Check default period change for page.
 	public function testDashboardPages_DefaultPeriod() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$ids['Dashboard for page delete'])->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$ids['Dashboard for page delete'])
+				->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 		$dashboard->edit();
 		foreach (['10 seconds', '30 seconds', '1 minute', '2 minutes', '10 minutes', '30 minutes', '1 hour'] as $default) {
