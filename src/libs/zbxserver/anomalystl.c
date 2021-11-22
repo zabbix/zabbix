@@ -56,7 +56,7 @@ ZBX_PTR_VECTOR_IMPL(VV, zbx_vector_history_record_t *)
  *                                                                             *
  *******************************************************************************/
 int	zbx_get_percentage_of_deviations_in_stl_remainder(const zbx_vector_history_record_t *remainder,
-		zbx_uint64_t deviations_count, const char* devalg, int detect_period_start, int detect_period_end,
+		double deviations_count, const char* devalg, int detect_period_start, int detect_period_end,
 		double *result, char **error)
 {
 	int			i, total_values_count = 0, deviations_detected_count = 0, ret = FAIL;
@@ -99,7 +99,7 @@ int	zbx_get_percentage_of_deviations_in_stl_remainder(const zbx_vector_history_r
 	if (SUCCEED != (ret = stat_func(&remainder_values_dbl, &remainder_deviation, error)))
 		goto out;
 
-	deviation_limit = remainder_deviation * (double)deviations_count;
+	deviation_limit = remainder_deviation * deviations_count;
 
 	for (i = 0; i < remainder->values_num; i++)
 	{

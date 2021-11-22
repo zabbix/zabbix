@@ -2748,7 +2748,7 @@ out:
 }
 
 static int	trends_eval_stl(const char *table, zbx_uint64_t itemid, int start, int end, int start_detect_period,
-		int end_detect_period, int season, zbx_uint64_t deviations, const char *dev_alg, int s_window,
+		int end_detect_period, int season, double deviations, const char *dev_alg, int s_window,
 		double *value, char **error)
 {
 	int				i, period_counter, ret = FAIL;
@@ -2906,7 +2906,8 @@ static int	evaluate_TREND(zbx_variant_t *value, DC_ITEM *item, const char *func,
 		char			*dev_alg = NULL;
 		int			start_detect_period, end_detect_period, season_shift, season, season_processed,
 					detect_period, detect_period_shift;
-		zbx_uint64_t		deviations, s_window;
+		double			deviations;
+		zbx_uint64_t		s_window;
 		zbx_value_type_t	detect_period_type, season_type;
 
 		if (SUCCEED != get_function_parameter_hist_range(ts->sec, parameters, 2, &detect_period,
@@ -2948,7 +2949,7 @@ static int	evaluate_TREND(zbx_variant_t *value, DC_ITEM *item, const char *func,
 			goto out;
 		}
 
-		if (SUCCEED != get_function_parameter_uint64(parameters, 4, &deviations))
+		if (SUCCEED != get_function_parameter_float(parameters, 4, ZBX_FLAG_DOUBLE_PLAIN, &deviations))
 			deviations = STL_DEF_DEVIATIONS;
 
 		if (SUCCEED != get_function_parameter_str(parameters, 5, &dev_alg))

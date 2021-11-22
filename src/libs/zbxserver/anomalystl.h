@@ -45,6 +45,6 @@ int	zbx_STL(const zbx_vector_history_record_t *values_in, int freq, int is_robus
 		zbx_vector_history_record_t *remainder, char **error);
 
 int	zbx_get_percentage_of_deviations_in_stl_remainder(const zbx_vector_history_record_t *remainder,
-		zbx_uint64_t deviations_count, const char* devalg, int detect_period_start, int detect_period_end,
+		double deviations_count, const char* devalg, int detect_period_start, int detect_period_end,
 		double *result, char **error);
 #endif
