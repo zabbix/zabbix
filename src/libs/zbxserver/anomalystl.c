@@ -724,11 +724,15 @@ int	zbx_STL(const zbx_vector_history_record_t *values_in, int freq, int is_robus
 	if (S_JUMP_DEF == nsjump)
 		nsjump = (int)(tmp = ceil((double)s_window / 10));
 
+	ZBX_UNUSED(tmp);
+
 	if (T_WINDOW_DEF == t_window)
 		t_window = nextodd(ceil(1.5 * (double)freq / (1 - (1.5 / s_window))));
 
 	if (T_JUMP_DEF == ntjump)
 		ntjump = (int)(tmp = ceil(t_window/10));
+
+	ZBX_UNUSED(tmp);
 
 	if (L_WINDOW_DEF == l_window)
 		l_window = nextodd(freq);
@@ -738,6 +742,8 @@ int	zbx_STL(const zbx_vector_history_record_t *values_in, int freq, int is_robus
 
 	if (L_JUMP_DEF == nljump)
 		nljump = (int)(tmp = ceil((double)l_window / 10));
+
+	ZBX_UNUSED(tmp);
 
 	if (INNER_DEF == inner)
 		inner = (1 == is_robust) ? 1 : 2;
