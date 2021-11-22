@@ -372,16 +372,12 @@ abstract class CHostGeneral extends CHostBase {
 			}
 
 			$db_macros = ($db_hosts !== null)
-				? array_column($db_hosts[$host[$id_field_name]]['macros'], null, 'macro')
+				? $db_hosts[$host[$id_field_name]]['macros']
 				: [];
 
 			foreach ($host['macros'] as &$macro) {
-				if (array_key_exists($macro['macro'], $db_macros)) {
-					$db_macro = $db_macros[$macro['macro']];
-					$macro['hostmacroid'] = $db_macro['hostmacroid'];
-					unset($db_macros[$macro['macro']]);
-
-					$upd_hostmacro = DB::getUpdatedValues('hostmacro', $macro, $db_macro);
+				if (array_key_exists('hostmacroid', $macro)) {
+					$upd_hostmacro = DB::getUpdatedValues('hostmacro', $macro, $db_macros[$macro['hostmacroid']]);
 
 					if ($upd_hostmacro) {
 						$upd_hostmacros[] = [
@@ -389,6 +385,8 @@ abstract class CHostGeneral extends CHostBase {
 							'where' => ['hostmacroid' => $macro['hostmacroid']]
 						];
 					}
+
+					unset($db_macros[$macro['hostmacroid']]);
 				}
 				else {
 					$ins_hostmacros[] = ['hostid' => $host[$id_field_name]] + $macro;
@@ -396,7 +394,7 @@ abstract class CHostGeneral extends CHostBase {
 			}
 			unset($macro);
 
-			$del_hostmacroids = array_merge($del_hostmacroids, array_column($db_macros, 'hostmacroid'));
+			$del_hostmacroids = array_merge($del_hostmacroids, array_keys($db_macros));
 		}
 		unset($host);
 
