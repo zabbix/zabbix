@@ -306,30 +306,6 @@ func (h *handler) terminate() {
 	os.Exit(0)
 }
 
-func (h *handler) setConnection(path string, timeout time.Duration) (err error) {
-	var i int
-
-	for start := time.Now(); ; {
-		if i%5 == 0 {
-			if time.Since(start) > timeout {
-				break
-			}
-		}
-
-		var conn net.Conn
-		conn, err = net.DialTimeout("unix", path, timeout)
-		if err != nil {
-			continue
-		}
-
-		h.connection = conn
-
-		return
-	}
-
-	return
-}
-
 func (h *handler) getInterfaces() (uint32, error) {
 	var interfaces uint32
 	acc, err := plugin.GetByName(h.name)

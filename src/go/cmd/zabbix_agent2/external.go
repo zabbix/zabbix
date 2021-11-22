@@ -109,9 +109,9 @@ func createAccessor(path, socket string, timeout time.Duration, listener net.Lis
 func parseConfig() (socket string, timeout time.Duration) {
 	var sockBasePath string
 	if agent.Options.ExternalPluginsSocket == "" {
-		sockBasePath = "/tmp/plugins/"
-	} else if !strings.HasSuffix(agent.Options.ExternalPluginsSocket, "/") {
-		sockBasePath = agent.Options.ExternalPluginsSocket + "/"
+		sockBasePath = getDefaultSocketPath()
+	} else if !strings.HasSuffix(agent.Options.ExternalPluginsSocket, string(os.PathSeparator)) {
+		sockBasePath = agent.Options.ExternalPluginsSocket + string(os.PathSeparator)
 	}
 
 	socket = createSocket(sockBasePath)
@@ -137,17 +137,4 @@ func removeSocket(socket string) error {
 	}
 
 	return nil
-}
-
-func getListener(socket string) (listener net.Listener, err error) {
-	listener, err = net.Listen("unix", socket)
-	if err != nil {
-		err = fmt.Errorf(
-			"failed to create listener for external plugins with socket path, %s, %s", socket, err.Error(),
-		)
-
-		return
-	}
-
-	return
 }
