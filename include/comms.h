@@ -113,6 +113,7 @@ int	zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsi
 
 #define ZBX_TCP_PROTOCOL		0x01
 #define ZBX_TCP_COMPRESS		0x02
+#define ZBX_TCP_LARGE			0x04
 
 #define ZBX_TCP_SEC_UNENCRYPTED		1		/* do not use encryption with this socket */
 #define ZBX_TCP_SEC_TLS_PSK		2		/* use TLS with pre-shared key (PSK) with this socket */
@@ -123,12 +124,13 @@ int	zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsi
 
 const char	*zbx_tcp_connection_type_name(unsigned int type);
 
-#define zbx_tcp_send(s, d)				zbx_tcp_send_ext((s), (d), strlen(d), ZBX_TCP_PROTOCOL, 0)
-#define zbx_tcp_send_to(s, d, timeout)			zbx_tcp_send_ext((s), (d), strlen(d), ZBX_TCP_PROTOCOL, timeout)
-#define zbx_tcp_send_bytes_to(s, d, len, timeout)	zbx_tcp_send_ext((s), (d), len, ZBX_TCP_PROTOCOL, timeout)
-#define zbx_tcp_send_raw(s, d)				zbx_tcp_send_ext((s), (d), strlen(d), 0, 0)
+#define zbx_tcp_send(s, d)				zbx_tcp_send_ext((s), (d), strlen(d), 0, ZBX_TCP_PROTOCOL, 0)
+#define zbx_tcp_send_to(s, d, timeout)			zbx_tcp_send_ext((s), (d), strlen(d), 0, ZBX_TCP_PROTOCOL, timeout)
+#define zbx_tcp_send_bytes_to(s, d, len, timeout)	zbx_tcp_send_ext((s), (d), len, 0, ZBX_TCP_PROTOCOL, timeout)
+#define zbx_tcp_send_raw(s, d)				zbx_tcp_send_ext((s), (d), strlen(d), 0, 0, 0)
 
-int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, unsigned char flags, int timeout);
+int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, size_t reserved, unsigned char flags,
+		int timeout);
 
 void	zbx_tcp_close(zbx_socket_t *s);
 
@@ -143,11 +145,12 @@ void	zbx_tcp_unaccept(zbx_socket_t *s);
 
 #define ZBX_TCP_READ_UNTIL_CLOSE 0x01
 
-#define	zbx_tcp_recv(s)			SUCCEED_OR_FAIL(zbx_tcp_recv_ext(s, 0))
-#define	zbx_tcp_recv_to(s, timeout)	SUCCEED_OR_FAIL(zbx_tcp_recv_ext(s, timeout))
-#define	zbx_tcp_recv_raw(s)		SUCCEED_OR_FAIL(zbx_tcp_recv_raw_ext(s, 0))
+#define	zbx_tcp_recv(s)				SUCCEED_OR_FAIL(zbx_tcp_recv_ext(s, 0, 0))
+#define	zbx_tcp_recv_large(s)			SUCCEED_OR_FAIL(zbx_tcp_recv_ext(s, 0, ZBX_TCP_LARGE))
+#define	zbx_tcp_recv_to(s, timeout)		SUCCEED_OR_FAIL(zbx_tcp_recv_ext(s, timeout, 0))
+#define	zbx_tcp_recv_raw(s)			SUCCEED_OR_FAIL(zbx_tcp_recv_raw_ext(s, 0))
 
-ssize_t		zbx_tcp_recv_ext(zbx_socket_t *s, int timeout);
+ssize_t		zbx_tcp_recv_ext(zbx_socket_t *s, int timeout, unsigned char flags);
 ssize_t		zbx_tcp_recv_raw_ext(zbx_socket_t *s, int timeout);
 const char	*zbx_tcp_recv_line(zbx_socket_t *s);
 

@@ -1115,6 +1115,7 @@ jQuery(function($) {
 							? document.querySelector('.wrapper').clientWidth
 							: document.querySelector('.wrapper').clientWidth - data.element.width;
 
+						pos.top = Math.max(0, pos.top);
 						pos.left = Math.max(0, Math.min(max_left, pos.left));
 
 						data.element.element[0].style.top = `${pos.top}px`;

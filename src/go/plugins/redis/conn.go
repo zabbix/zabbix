@@ -21,6 +21,7 @@ package redis
 
 import (
 	"context"
+	"errors"
 	"sync"
 	"time"
 
@@ -31,6 +32,8 @@ import (
 )
 
 const hkInterval = 10
+
+var errMasterDown = errors.New("MASTERDOWN Link with MASTER is down and slave-serve-stale-data is set to 'no'.")
 
 type redisClient interface {
 	Query(cmd radix.CmdAction) error
@@ -147,6 +150,12 @@ func (c *ConnManager) create(uri uri.URI) (*RedisConn, error) {
 		// Set name for connection. It will be showed in "client list" output.
 		if err == nil {
 			err = conn.Do(radix.Cmd(nil, "CLIENT", "SETNAME", clientName))
+		}
+
+		// Older redis servers return this as an error and the connection is present,
+		// and redis-cli does not return this error but continues
+		if err != nil && err.Error() == errMasterDown.Error() && conn != nil {
+			return conn, nil
 		}
 
 		return conn, err

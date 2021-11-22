@@ -69,6 +69,10 @@ class CHelpItems {
 					'description' => _('Agent availability check. Returns nothing - unavailable; 1 - available')
 				],
 				[
+					'key' => 'agent.variant',
+					'description' => _('Agent variant check. Returns 1 - for Zabbix agent; 2 - for Zabbix agent 2')
+				],
+				[
 					'key' => 'agent.version',
 					'description' => _('Version of Zabbix agent. Returns string')
 				],
@@ -217,7 +221,7 @@ class CHelpItems {
 					'description' => _('CPU utilisation percentage. Returns float')
 				],
 				[
-					'key' => 'system.hostname[<type>]',
+					'key' => 'system.hostname[<type>,<transform>]',
 					'description' => _('System host name. Returns string')
 				],
 				[
@@ -399,6 +403,10 @@ class CHelpItems {
 					'description' => _('Agent availability check. Returns nothing - unavailable; 1 - available')
 				],
 				[
+					'key' => 'agent.variant',
+					'description' => _('Agent variant check. Returns 1 - for Zabbix agent; 2 - for Zabbix agent 2')
+				],
+				[
 					'key' => 'agent.version',
 					'description' => _('Version of Zabbix agent. Returns string')
 				],
@@ -571,7 +579,7 @@ class CHelpItems {
 					'description' => _('CPU utilisation percentage. Returns float')
 				],
 				[
-					'key' => 'system.hostname[<type>]',
+					'key' => 'system.hostname[<type>,<transform>]',
 					'description' => _('System host name. Returns string')
 				],
 				[
@@ -897,6 +905,10 @@ class CHelpItems {
 					'description' => _('VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name')
 				],
 				[
+					'key' => ' vmware.hv.maintenance[<url>,<uuid>]',
+					'description' => _('VMware hypervisor maintenance status, <url> - VMware service URL, <uuid> - VMware hypervisor host name')
+				],
+				[
 					'key' => 'vmware.hv.memory.size.ballooned[<url>,<uuid>]',
 					'description' => _('VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name')
 				],
@@ -919,6 +931,10 @@ class CHelpItems {
 				[
 					'key' => 'vmware.hv.power[<url>,<uuid>,<max>]',
 					'description' => _('Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage')
+				],
+				[
+					'key' => 'vmware.hv.sensors.get[<url>,<uuid>]',
+					'description' => _('VMware hypervisor HW vendor state sensors, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON')
 				],
 				[
 					'key' => 'vmware.hv.sensor.health.state[<url>,<uuid>]',

@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'5.4.3rc1');
-define('ZABBIX_API_VERSION',	'5.4.3');
+define('ZABBIX_VERSION',		'5.4.8rc1');
+define('ZABBIX_API_VERSION',	'5.4.8');
 define('ZABBIX_EXPORT_VERSION',	'5.4');
 
 define('ZABBIX_DB_VERSION',		5040000);
@@ -147,8 +147,9 @@ define('ZBX_DB_MAX_ID', '9223372036854775807');
 define('ZBX_DB_MAX_INSERTS', 10000);
 
 // Default db and field character set (MYSQL & POSTGRESQL)
-define('ZBX_DB_DEFAULT_CHARSET', 'UTF8');
-define('ZBX_DB_MYSQL_DEFAULT_COLLATION', 'utf8_bin');
+define('ZBX_DB_POSTGRESQL_ALLOWED_CHARSET', 'UTF8');
+define('ZBX_DB_MYSQL_ALLOWED_CHARSETS', ['UTF8', 'UTF8MB3']);
+define('ZBX_DB_MYSQL_ALLOWED_COLLATIONS', ['utf8_bin', 'utf8mb3_bin']);
 
 // Default db defines for Oracle DB
 define('ORACLE_MAX_STRING_SIZE', 4000);
@@ -1382,6 +1383,7 @@ define('API_JSONRPC_ID',			39);
 define('API_DATE',					40);
 define('API_NUMERIC_RANGES',		41);
 define('API_UUID',					42);
+define('API_VAULT_SECRET',			43);
 
 // flags
 define('API_REQUIRED',					0x0001);
@@ -1397,6 +1399,7 @@ define('API_TIME_UNIT_WITH_YEAR',		0x0200);
 define('API_ALLOW_EVENT_TAGS_MACRO',	0x0400);
 define('API_PRESERVE_KEYS',				0x0800);
 define('API_ALLOW_MACRO',				0x1000);
+define('API_ALLOW_GLOBAL_REGEX',		0x2000);
 
 // JSON error codes.
 if (!defined('JSON_ERROR_NONE')) {

@@ -65,8 +65,6 @@ static int	get_flags(const char *path)
 			fail_msg("Cannot read flag #%d: %s", flags_num, zbx_mock_error_string(err));
 		else if (0 == strcmp(flag, "ZBX_TOKEN_JSON"))
 			flags |= ZBX_TOKEN_JSON;
-		else if (0 == strcmp(flag, "ZBX_TOKEN_XML"))
-			flags |= ZBX_TOKEN_XML;
 		else if (0 == strcmp(flag, "ZBX_TOKEN_REGEXP"))
 			flags |= ZBX_TOKEN_REGEXP;
 		else if (0 == strcmp(flag, "ZBX_TOKEN_XPATH"))
@@ -83,8 +81,6 @@ static int	get_flags(const char *path)
 			flags |= ZBX_MACRO_ANY;
 		else if (0 == strcmp(flag, "ZBX_MACRO_JSON"))
 			flags |= ZBX_MACRO_JSON;
-		else if (0 == strcmp(flag, "ZBX_MACRO_XML"))
-			flags |= ZBX_MACRO_XML;
 		else if (0 == strcmp(flag, "ZBX_MACRO_SIMPLE"))
 			flags |= ZBX_MACRO_SIMPLE;
 		else if (0 == strcmp(flag, "ZBX_MACRO_FUNC"))

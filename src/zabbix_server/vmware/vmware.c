@@ -139,6 +139,7 @@ typedef struct
 {
 	char		*path;
 	zbx_uint64_t	id;
+	int		unit;
 }
 zbx_vmware_counter_t;
 
@@ -342,15 +343,20 @@ static zbx_uint64_t	evt_req_chunk_size;
 
 #define ZBX_VM_NONAME_XML	"noname.xml"
 
+#define ZBX_HVPROPMAP_EXT(property, func)								\
+	{property, ZBX_XPATH_PROP_OBJECTS(ZBX_VMWARE_SOAP_HV) ZBX_XPATH_PROP_NAME_NODE(property), func}
 #define ZBX_HVPROPMAP(property)										\
-	{property, ZBX_XPATH_PROP_OBJECTS(ZBX_VMWARE_SOAP_HV) ZBX_XPATH_PROP_NAME_NODE(property)}
+	ZBX_HVPROPMAP_EXT(property, NULL)
 #define ZBX_VMPROPMAP(property)										\
-	{property, ZBX_XPATH_PROP_OBJECTS(ZBX_VMWARE_SOAP_VM) ZBX_XPATH_PROP_NAME_NODE(property)}
+	{property, ZBX_XPATH_PROP_OBJECTS(ZBX_VMWARE_SOAP_VM) ZBX_XPATH_PROP_NAME_NODE(property), NULL}
+
+typedef int	(*nodeprocfunc_t)(void *, char **);
 
 typedef struct
 {
 	const char	*name;
 	const char	*xpath;
+	nodeprocfunc_t	func;
 }
 zbx_vmware_propmap_t;
 
@@ -367,11 +373,14 @@ static zbx_vmware_propmap_t	hv_propmap[] = {
 	ZBX_HVPROPMAP("summary.hardware.vendor"), 		/* ZBX_VMWARE_HVPROP_HW_VENDOR */
 	ZBX_HVPROPMAP("summary.quickStats.overallMemoryUsage"),	/* ZBX_VMWARE_HVPROP_MEMORY_USED */
 	{"runtime.healthSystemRuntime.systemHealthInfo", 	/* ZBX_VMWARE_HVPROP_HEALTH_STATE */
-			ZBX_XPATH_HV_SENSOR_STATUS("VMware Rollup Health State")},
+			ZBX_XPATH_HV_SENSOR_STATUS("VMware Rollup Health State"), NULL},
 	ZBX_HVPROPMAP("summary.quickStats.uptime"),		/* ZBX_VMWARE_HVPROP_UPTIME */
 	ZBX_HVPROPMAP("summary.config.product.version"),	/* ZBX_VMWARE_HVPROP_VERSION */
 	ZBX_HVPROPMAP("summary.config.name"),			/* ZBX_VMWARE_HVPROP_NAME */
-	ZBX_HVPROPMAP("overallStatus")				/* ZBX_VMWARE_HVPROP_STATUS */
+	ZBX_HVPROPMAP("overallStatus"),				/* ZBX_VMWARE_HVPROP_STATUS */
+	ZBX_HVPROPMAP("runtime.inMaintenanceMode"),		/* ZBX_VMWARE_HVPROP_MAINTENANCE */
+	ZBX_HVPROPMAP_EXT("summary.runtime.healthSystemRuntime.systemHealthInfo.numericSensorInfo",
+			zbx_xmlnode_to_json)			/* ZBX_VMWARE_HVPROP_SENSOR */
 };
 
 static zbx_vmware_propmap_t	vm_propmap[] = {
@@ -694,25 +703,26 @@ static int	zbx_soap_post(const char *fn_parent, CURL *easyhandle, const char *re
 	if (NULL != fn_parent)
 		zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", fn_parent, resp->data);
 
-	if (SUCCEED != zbx_xml_try_read_value(resp->data, resp->offset, ZBX_XPATH_FAULTSTRING(), &doc, &val, error))
+	if (SUCCEED == zbx_xml_try_read_value(resp->data, resp->offset, ZBX_XPATH_FAULTSTRING(), &doc, &val, error))
 	{
-		ret = FAIL;
-	}
-	else if (NULL != val)
-	{
-		zbx_free(*error);
-		*error = val;
-		ret = FAIL;
-	}
+		if (NULL != val)
+		{
+			zbx_free(*error);
+			*error = val;
+			ret = FAIL;
+		}
 
-	if (NULL != xdoc)
-	{
-		*xdoc = doc;
+		if (NULL != xdoc)
+		{
+			*xdoc = doc;
+		}
+		else
+		{
+			zbx_xml_free_doc(doc);
+		}
 	}
 	else
-	{
-		zbx_xml_free_doc(doc);
-	}
+		ret = FAIL;
 
 	return ret;
 }
@@ -834,7 +844,12 @@ static char	**xml_read_props(xmlDoc *xdoc, const zbx_vmware_propmap_t *propmap, 
 			{
 				nodeset = xpathObj->nodesetval;
 
-				if (NULL != (val = xmlNodeListGetString(xdoc, nodeset->nodeTab[0]->xmlChildrenNode, 1)))
+				if (NULL != propmap[i].func)
+				{
+					propmap[i].func((void *)nodeset->nodeTab[0], &props[i]);
+				}
+				else if (NULL != (val = xmlNodeListGetString(xdoc,
+						nodeset->nodeTab[0]->xmlChildrenNode, 1)))
 				{
 					props[i] = zbx_strdup(NULL, (const char *)val);
 					xmlFree(val);
@@ -2227,6 +2242,12 @@ static	int	vmware_service_get_contents(CURL *easyhandle, char **version, char **
 	*fullname = zbx_xml_read_doc_value(doc, ZBX_XPATH_VMWARE_ABOUT("fullName"));
 	zbx_xml_free_doc(doc);
 
+	if (NULL == *version)
+	{
+		*error = zbx_strdup(*error, "VMware Virtual Center is not ready.");
+		return FAIL;
+	}
+
 	return SUCCEED;
 
 #	undef ZBX_POST_VMWARE_CONTENTS
@@ -2341,8 +2362,40 @@ static int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL 
 		"</ns0:RetrievePropertiesEx>"							\
 		ZBX_POST_VSPHERE_FOOTER
 
+#	define STR2UNIT(unit, val)								\
+		if (0 == strcmp("joule",val))							\
+			unit = ZBX_VMWARE_UNIT_JOULE;						\
+		else if (0 == strcmp("kiloBytes",val))						\
+			unit = ZBX_VMWARE_UNIT_KILOBYTES;					\
+		else if (0 == strcmp("kiloBytesPerSecond",val))					\
+			unit = ZBX_VMWARE_UNIT_KILOBYTESPERSECOND;				\
+		else if (0 == strcmp("megaBytes",val))						\
+			unit = ZBX_VMWARE_UNIT_MEGABYTES;					\
+		else if (0 == strcmp("megaBytesPerSecond",val))					\
+			unit = ZBX_VMWARE_UNIT_MEGABYTESPERSECOND;				\
+		else if (0 == strcmp("megaHertz",val))						\
+			unit = ZBX_VMWARE_UNIT_MEGAHERTZ;					\
+		else if (0 == strcmp("microsecond",val))					\
+			unit = ZBX_VMWARE_UNIT_MICROSECOND;					\
+		else if (0 == strcmp("millisecond",val))					\
+			unit = ZBX_VMWARE_UNIT_MILLISECOND;					\
+		else if (0 == strcmp("number",val))						\
+			unit = ZBX_VMWARE_UNIT_NUMBER;						\
+		else if (0 == strcmp("percent",val))						\
+			unit = ZBX_VMWARE_UNIT_PERCENT;						\
+		else if (0 == strcmp("second",val))						\
+			unit = ZBX_VMWARE_UNIT_SECOND;						\
+		else if (0 == strcmp("teraBytes",val))						\
+			unit = ZBX_VMWARE_UNIT_TERABYTES;					\
+		else if (0 == strcmp("watt",val))						\
+			unit = ZBX_VMWARE_UNIT_WATT;						\
+		else if (0 == strcmp("celsius",val))						\
+			unit = ZBX_VMWARE_UNIT_CELSIUS;						\
+		else										\
+			unit = ZBX_VMWARE_UNIT_UNDEFINED
+
 	char		tmp[MAX_STRING_LEN], *group = NULL, *key = NULL, *rollup = NULL, *stats = NULL,
-			*counterid = NULL;
+			*counterid = NULL, *unit = NULL;
 	xmlDoc		*doc = NULL;
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
@@ -2388,12 +2441,21 @@ static int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL 
 		rollup = zbx_xml_read_node_value(doc, nodeset->nodeTab[i], "*[local-name()='rollupType']");
 		stats = zbx_xml_read_node_value(doc, nodeset->nodeTab[i], "*[local-name()='statsType']");
 		counterid = zbx_xml_read_node_value(doc, nodeset->nodeTab[i], "*[local-name()='key']");
+		unit = zbx_xml_read_node_value(doc, nodeset->nodeTab[i],
+				"*[local-name()='unitInfo']/*[local-name()='key']");
 
-		if (NULL != group && NULL != key && NULL != rollup && NULL != counterid)
+		if (NULL != group && NULL != key && NULL != rollup && NULL != counterid && NULL != unit)
 		{
 			counter = (zbx_vmware_counter_t *)zbx_malloc(NULL, sizeof(zbx_vmware_counter_t));
 			counter->path = zbx_dsprintf(NULL, "%s/%s[%s]", group, key, rollup);
 			ZBX_STR2UINT64(counter->id, counterid);
+			STR2UNIT(counter->unit, unit);
+
+			if (ZBX_VMWARE_UNIT_UNDEFINED == counter->unit)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "Unknown performance counter " ZBX_FS_UI64
+						" type of unitInfo:%s", counter->id, unit);
+			}
 
 			zbx_vector_ptr_append(counters, counter);
 
@@ -2401,11 +2463,19 @@ static int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL 
 					counter->id);
 		}
 
-		if (NULL != group && NULL != key && NULL != rollup && NULL != counterid && NULL != stats)
+		if (NULL != group && NULL != key && NULL != rollup && NULL != counterid && NULL != stats &&
+				NULL != unit)
 		{
 			counter = (zbx_vmware_counter_t *)zbx_malloc(NULL, sizeof(zbx_vmware_counter_t));
 			counter->path = zbx_dsprintf(NULL, "%s/%s[%s,%s]", group, key, rollup, stats);
 			ZBX_STR2UINT64(counter->id, counterid);
+			STR2UNIT(counter->unit, unit);
+
+			if (ZBX_VMWARE_UNIT_UNDEFINED == counter->unit)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "Unknown performance counter " ZBX_FS_UI64
+						" type of unitInfo:%s", counter->id, unit);
+			}
 
 			zbx_vector_ptr_append(counters, counter);
 
@@ -2418,19 +2488,21 @@ static int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL 
 		zbx_free(rollup);
 		zbx_free(key);
 		zbx_free(group);
+		zbx_free(unit);
 	}
 
 	ret = SUCCEED;
 clean:
-	if (NULL != xpathObj)
-		xmlXPathFreeObject(xpathObj);
-
+	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
 out:
 	zbx_xml_free_doc(doc);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+
+#	undef STR2UNIT
+#	undef ZBX_POST_VMWARE_GET_PERFCOUNTER
 }
 
 /******************************************************************************
@@ -2487,9 +2559,7 @@ static void	vmware_vm_get_nic_devices(zbx_vmware_vm_t *vm, xmlDoc *details)
 		nics++;
 	}
 clean:
-	if (NULL != xpathObj)
-		xmlXPathFreeObject(xpathObj);
-
+	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() found:%d", __func__, nics);
 }
@@ -2606,8 +2676,7 @@ static void	vmware_vm_get_disk_devices(zbx_vmware_vm_t *vm, xmlDoc *details)
 		}
 		while (0);
 
-		if (NULL != xpathObjController)
-			xmlXPathFreeObject(xpathObjController);
+		xmlXPathFreeObject(xpathObjController);
 
 		zbx_free(controllerLabel);
 		zbx_free(scsiCtlrUnitNumber);
@@ -2684,9 +2753,7 @@ static void	vmware_vm_get_file_systems(zbx_vmware_vm_t *vm, xmlDoc *details)
 		zbx_vector_ptr_append(&vm->file_systems, fs);
 	}
 clean:
-	if (NULL != xpathObj)
-		xmlXPathFreeObject(xpathObj);
-
+	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() found:%d", __func__, vm->file_systems.values_num);
 }
@@ -3016,9 +3083,7 @@ static int	vmware_service_get_diskextents_list(xmlDoc *doc, zbx_vector_vmware_di
 
 	ret = SUCCEED;
 out:
-	if (NULL != xpathObj)
-		xmlXPathFreeObject(xpathObj);
-
+	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
 
 	return ret;
@@ -3585,9 +3650,7 @@ static zbx_uint64_t	vmware_hv_get_ds_access(xmlDoc *xdoc, const char *ds_id)
 		zabbix_log(LOG_LEVEL_DEBUG, "Cannot find item 'accessMode' in mountinfo for DS:%s", ds_id);
 
 clean:
-	if (NULL != xpathObj)
-		xmlXPathFreeObject(xpathObj);
-
+	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() mountinfo:" ZBX_FS_UI64, __func__, mi_access);
 
@@ -4548,9 +4611,7 @@ static int	vmware_service_parse_event_data(zbx_vector_ptr_t *events, zbx_uint64_
 
 	zbx_vector_id_xmlnode_destroy(&ids);
 clean:
-	if (NULL != xpathObj)
-		xmlXPathFreeObject(xpathObj);
-
+	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
 	is_clear = is_prop;
 
@@ -4772,9 +4833,7 @@ static int	vmware_service_get_last_event_data(const zbx_vmware_service_t *servic
 
 	ret = SUCCEED;
 clean:
-	if (NULL != xpathObj)
-		xmlXPathFreeObject(xpathObj);
-
+	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
 out:
 	zbx_xml_free_doc(doc);
@@ -5335,7 +5394,7 @@ static void	vmware_service_add_perf_entity(zbx_vmware_service_t *service, const 
 
 		for (i = 0; NULL != counters[i]; i++)
 		{
-			if (SUCCEED == zbx_vmware_service_get_counterid(service, counters[i], &counterid))
+			if (SUCCEED == zbx_vmware_service_get_counterid(service, counters[i], &counterid, NULL))
 				vmware_counters_add_new(&pentity->counters, counterid);
 			else
 				zabbix_log(LOG_LEVEL_DEBUG, "cannot find performance counter %s", counters[i]);
@@ -5818,9 +5877,7 @@ static int	vmware_service_process_perf_entity_data(zbx_vmware_perf_data_t *perfd
 	}
 
 out:
-	if (NULL != xpathObj)
-		xmlXPathFreeObject(xpathObj);
-
+	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() values:%d", __func__, values);
@@ -5879,9 +5936,7 @@ static void	vmware_service_parse_perf_data(zbx_vector_ptr_t *perfdata, xmlDoc *x
 			vmware_free_perfdata(data);
 	}
 clean:
-	if (NULL != xpathObj)
-		xmlXPathFreeObject(xpathObj);
-
+	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -6392,18 +6447,19 @@ out:
  *                                                                            *
  * Function: zbx_vmware_service_get_counterid                                 *
  *                                                                            *
- * Purpose: gets vmware performance counter id by the path                    *
+ * Purpose: gets vmware performance counter id and unit info by the path      *
  *                                                                            *
  * Parameters: service   - [IN] the vmware service                            *
  *             path      - [IN] the path of counter to retrieve in format     *
  *                              <group>/<key>[<rollup type>]                  *
  *             counterid - [OUT] the counter id                               *
+ *             unit      - [OUT] the counter unit info (kilo, mega, % etc)    *
  *                                                                            *
  * Return value: SUCCEED if the counter was found, FAIL otherwise             *
  *                                                                            *
  ******************************************************************************/
 int	zbx_vmware_service_get_counterid(zbx_vmware_service_t *service, const char *path,
-		zbx_uint64_t *counterid)
+		zbx_uint64_t *counterid, int *unit)
 {
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 	zbx_vmware_counter_t	*counter;
@@ -6415,6 +6471,9 @@ int	zbx_vmware_service_get_counterid(zbx_vmware_service_t *service, const char *
 		goto out;
 
 	*counterid = counter->id;
+
+	if (NULL != unit)
+		*unit = counter->unit;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() counterid:" ZBX_FS_UI64, __func__, *counterid);
 
@@ -6880,9 +6939,7 @@ static int	zbx_xml_try_read_value(const char *data, size_t len, const char *xpat
 		xmlFree(val);
 	}
 clean:
-	if (NULL != xpathObj)
-		xmlXPathFreeObject(xpathObj);
-
+	xmlXPathFreeObject(xpathObj);
 	xmlSetStructuredErrorFunc(NULL, NULL);
 	xmlXPathFreeContext(xpathCtx);
 	xmlResetLastError();
@@ -6936,9 +6993,7 @@ static char	*zbx_xml_read_node_value(xmlDoc *doc, xmlNode *node, const char *xpa
 		xmlFree(val);
 	}
 clean:
-	if (NULL != xpathObj)
-		xmlXPathFreeObject(xpathObj);
-
+	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
 
 	return value;
@@ -7049,9 +7104,7 @@ static int	zbx_xml_read_values(xmlDoc *xdoc, const char *xpath, zbx_vector_str_t
 
 	ret = SUCCEED;
 clean:
-	if (NULL != xpathObj)
-		xmlXPathFreeObject(xpathObj);
-
+	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
 out:
 	return ret;

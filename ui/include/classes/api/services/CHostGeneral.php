@@ -845,20 +845,6 @@ abstract class CHostGeneral extends CHostBase {
 			}
 		}
 
-		// adding macros
-		if ($options['selectMacros'] !== null && $options['selectMacros'] != API_OUTPUT_COUNT) {
-			$macros = API::UserMacro()->get([
-				'output' => $this->outputExtend($options['selectMacros'], ['hostid', 'hostmacroid']),
-				'hostids' => $hostids,
-				'preservekeys' => true
-			]);
-
-			$relationMap = $this->createRelationMap($macros, 'hostid', 'hostmacroid');
-
-			$macros = $this->unsetExtraFields($macros, ['hostid', 'hostmacroid'], $options['selectMacros']);
-			$result = $relationMap->mapMany($result, $macros, 'macros', $options['limitSelects']);
-		}
-
 		// adding tags
 		if ($options['selectTags'] !== null && $options['selectTags'] != API_OUTPUT_COUNT) {
 			if ($options['selectTags'] === API_OUTPUT_EXTEND) {

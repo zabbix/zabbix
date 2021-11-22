@@ -58,6 +58,8 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return FirstHostname, nil
 	case "agent.ping":
 		return 1, nil
+	case "agent.variant":
+		return 2, nil
 	case "agent.version":
 		return version.Long(), nil
 	}
@@ -69,5 +71,6 @@ func init() {
 	plugin.RegisterMetrics(&impl, "Agent",
 		"agent.hostname", "Returns Hostname from agent configuration.",
 		"agent.ping", "Returns agent availability check result.",
+		"agent.variant", "Returns agent variant.",
 		"agent.version", "Version of Zabbix agent.")
 }

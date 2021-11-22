@@ -35,6 +35,7 @@ require_once dirname(__FILE__).'/elements/CDropdownElement.php';
 require_once dirname(__FILE__).'/elements/CZDropdownElement.php';
 require_once dirname(__FILE__).'/elements/CCheckboxElement.php';
 require_once dirname(__FILE__).'/elements/COverlayDialogElement.php';
+require_once dirname(__FILE__).'/elements/CMainMenuElement.php';
 require_once dirname(__FILE__).'/elements/CMessageElement.php';
 require_once dirname(__FILE__).'/elements/CMultiselectElement.php';
 require_once dirname(__FILE__).'/elements/CSegmentedRadioElement.php';

@@ -19,10 +19,7 @@
 
 #include "common.h"
 
-#include "cfg.h"
-#include "db.h"
 #include "log.h"
-#include "zbxjson.h"
 
 #include "comms.h"
 #include "servercomms.h"
@@ -119,25 +116,21 @@ void	disconnect_server(zbx_socket_t *sock)
  *               FAIL - an error occurred                                     *
  *                                                                            *
  ******************************************************************************/
-int	get_data_from_server(zbx_socket_t *sock, const char *request, char **error)
+int	get_data_from_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved, char **error)
 {
 	int		ret = FAIL;
-	struct zbx_json	j;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() request:'%s'", __func__, request);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_json_init(&j, 128);
-	zbx_json_addstring(&j, "request", request, ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(&j, "host", CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
-
-	if (SUCCEED != zbx_tcp_send_ext(sock, j.buffer, strlen(j.buffer), ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS, 0))
+	if (SUCCEED != zbx_tcp_send_ext(sock, *buffer, buffer_size, reserved, ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS, 0))
 	{
 		*error = zbx_strdup(*error, zbx_socket_strerror());
 		goto exit;
 	}
 
-	if (SUCCEED != zbx_tcp_recv(sock))
+	zbx_free(*buffer);
+
+	if (SUCCEED != zbx_tcp_recv_large(sock))
 	{
 		*error = zbx_strdup(*error, zbx_socket_strerror());
 		goto exit;
@@ -147,8 +140,6 @@ int	get_data_from_server(zbx_socket_t *sock, const char *request, char **error)
 
 	ret = SUCCEED;
 exit:
-	zbx_json_free(&j);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
@@ -164,17 +155,19 @@ exit:
  *               FAIL - an error occurred                                     *
  *                                                                            *
  ******************************************************************************/
-int	put_data_to_server(zbx_socket_t *sock, struct zbx_json *j, char **error)
+int	put_data_to_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved, char **error)
 {
 	int	ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() datalen:" ZBX_FS_SIZE_T, __func__, (zbx_fs_size_t)j->buffer_size);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() datalen:" ZBX_FS_SIZE_T, __func__, (zbx_fs_size_t)buffer_size);
 
-	if (SUCCEED != zbx_tcp_send_ext(sock, j->buffer, strlen(j->buffer), ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS, 0))
+	if (SUCCEED != zbx_tcp_send_ext(sock, *buffer, buffer_size, reserved, ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS, 0))
 	{
 		*error = zbx_strdup(*error, zbx_socket_strerror());
 		goto out;
 	}
+
+	zbx_free(*buffer);
 
 	if (SUCCEED != zbx_recv_response(sock, 0, error))
 		goto out;

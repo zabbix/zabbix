@@ -120,7 +120,7 @@ func (p *Plugin) exportExists(params []string) (result interface{}, err error) {
 		}
 	}
 
-	if f, err = os.Stat(params[0]); err == nil {
+	if f, err = stdOs.Stat(params[0]); err == nil {
 		if f.Mode().IsRegular() {
 			types.addType(zbxFtFile)
 		} else if f.Mode().IsDir() {

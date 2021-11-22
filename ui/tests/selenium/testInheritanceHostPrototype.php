@@ -586,10 +586,10 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 			$this->assertFalse($this->query('id:macros_'.$i.'_description')->one()->isEnabled());
 		}
 
-		// Check that added macros are written in DB 2 times: for template and for linked host.
-		foreach ($macros as $macro) {
-			$this->assertEquals(2, CDBHelper::getCount('SELECT NULL FROM hostmacro WHERE macro='.zbx_dbstr($macro['macro'])));
-		}
+		$sql = 'SELECT macro,type,value,description FROM hostmacro WHERE hostid=%d ORDER BY hostmacroid';
+		$this->assertSame(CDBHelper::getHash(vsprintf($sql, $template_prototype_id)),
+			CDBHelper::getHash(vsprintf($sql, $host_prototype_id))
+		);
 	}
 
 		public static function getDeleteData() {

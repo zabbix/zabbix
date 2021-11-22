@@ -673,14 +673,6 @@ class CScreenProblem extends CScreenBase {
 			])
 			: [];
 
-		$data['mediatypes'] = $actions['mediatypeids']
-			? API::Mediatype()->get([
-				'output' => ['name', 'maxattempts'],
-				'mediatypeids' => array_keys($actions['mediatypeids']),
-				'preservekeys' => true
-			])
-			: [];
-
 		return $data;
 	}
 
@@ -1129,7 +1121,7 @@ class CScreenProblem extends CScreenBase {
 						? zbx_date2age($problem['clock'], $problem['r_clock'])
 						: zbx_date2age($problem['clock']),
 					$problem_update_link,
-					makeEventActionsIcons($problem['eventid'], $data['actions'], $data['mediatypes'], $data['users']),
+					makeEventActionsIcons($problem['eventid'], $data['actions'], $data['users']),
 					$this->data['filter']['show_tags'] ? $tags[$problem['eventid']] : null
 				]), ($this->data['filter']['highlight_row'] && $value == TRIGGER_VALUE_TRUE)
 					? getSeverityFlhStyle($problem['severity'])

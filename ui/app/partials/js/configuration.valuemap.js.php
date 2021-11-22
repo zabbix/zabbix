@@ -77,7 +77,7 @@ var AddValueMap = class {
 	createNameCell() {
 		const cell = document.createElement('td');
 		const link = document.createElement('a');
-		link.innerHTML = this.data.name;
+		link.innerText = this.data.name;
 		link.classList.add('wordwrap');
 		link.href = 'javascript:void(0);';
 		link.addEventListener('click', (e) => {

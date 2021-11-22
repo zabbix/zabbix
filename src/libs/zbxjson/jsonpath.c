@@ -221,11 +221,10 @@ static zbx_jsonpath_list_node_t	*jsonpath_list_create_node(size_t size)
  ******************************************************************************/
 static void	jsonpath_list_free(zbx_jsonpath_list_node_t *list)
 {
-	zbx_jsonpath_list_node_t	*item = list;
-
 	while (NULL != list)
 	{
-		item = list;
+		zbx_jsonpath_list_node_t	*item = list;
+
 		list = list->next;
 		zbx_free(item);
 	}
@@ -1133,8 +1132,7 @@ static int	jsonpath_parse_indexes(const char *list, zbx_jsonpath_t *jsonpath, co
 	*next = end;
 	ret = SUCCEED;
 out:
-	if (NULL != head)
-		jsonpath_list_free(head);
+	jsonpath_list_free(head);
 
 	return ret;
 }
@@ -1811,15 +1809,25 @@ static int	jsonpath_match_expression(const struct zbx_json_parse *jp_root, const
 						res = 1.0;
 					}
 					else
+					{
 						res = 0.0;
+					}
 					zbx_variant_set_dbl(left, res);
 					zbx_variant_clear(right);
 					stack.values_num--;
 					break;
 				case ZBX_JSONPATH_TOKEN_OP_REGEXP:
-					zbx_variant_convert(left, ZBX_VARIANT_STR);
-					zbx_variant_convert(right, ZBX_VARIANT_STR);
-					ret = jsonpath_regexp_match(left->data.str, right->data.str, &res);
+					if (FAIL == zbx_variant_convert(left, ZBX_VARIANT_STR) ||
+							FAIL == zbx_variant_convert(right, ZBX_VARIANT_STR))
+					{
+						res = 0.0;
+						ret = SUCCEED;
+					}
+					else
+					{
+						ret = jsonpath_regexp_match(left->data.str, right->data.str, &res);
+					}
+
 					zbx_variant_clear(left);
 					zbx_variant_clear(right);
 

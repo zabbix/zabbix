@@ -225,7 +225,7 @@
 }
 
 .dashboard-grid-widget-blocker {
-	position: relative;
+	position: absolute;
 	width: 100%;
 	height: 100%;
 	z-index: 998; // Below the new widget placeholder.

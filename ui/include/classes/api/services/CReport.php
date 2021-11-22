@@ -679,15 +679,15 @@ class CReport extends CApiService {
 		$report_params = [];
 
 		foreach ($reports as $report) {
-			$report_params[$report['reportid']] = [];
-
 			foreach ($params_by_name as $name => $param) {
-				if (array_key_exists($param, $report) && $report[$param] !== '') {
-					$report_params[$report['reportid']][] = [
-						'name' => $name,
-						'value' => $report[$param]
-					];
+				if (!array_key_exists($param, $report)) {
+					continue;
 				}
+
+				$report_params[$report['reportid']][$name] = [
+					'name' => $name,
+					'value' => $report[$param]
+				];
 			}
 		}
 
@@ -707,37 +707,34 @@ class CReport extends CApiService {
 		$del_reportparamids = [];
 
 		foreach ($db_report_params as $db_report_param) {
-			if ($report_params[$db_report_param['reportid']]) {
-				$report_param = array_shift($report_params[$db_report_param['reportid']]);
+			$reportid = $db_report_param['reportid'];
+			$name = $db_report_param['name'];
 
-				$upd_report_param = [];
+			if (array_key_exists($name, $report_params[$reportid])) {
+				$report_param = $report_params[$reportid][$name];
+				unset($report_params[$reportid][$name]);
 
-				foreach (['name', 'value'] as $field_name) {
-					if (array_key_exists($field_name, $report_param)
-							&& $report_param[$field_name] !== $db_report_param[$field_name]) {
-						$upd_report_param[$field_name] = $report_param[$field_name];
+				if ($report_param['value'] === '') {
+					$del_reportparamids[] = $db_report_param['reportparamid'];
+				}
+				else {
+					$upd_report_param = DB::getUpdatedValues('report_param', $report_param, $db_report_param);
+
+					if ($upd_report_param) {
+						$upd_report_params[] = [
+							'values' => $upd_report_param,
+							'where' => ['reportparamid' => $db_report_param['reportparamid']]
+						];
 					}
 				}
-
-				if ($upd_report_param) {
-					$upd_report_params[] = [
-						'values' => $upd_report_param,
-						'where' => ['reportparamid' => $db_report_param['reportparamid']]
-					];
-				}
-			}
-			else {
-				$del_reportparamids[] = $db_report_param['reportparamid'];
 			}
 		}
 
 		foreach ($report_params as $reportid => $report_param) {
 			foreach ($report_param as $param) {
-				$ins_report_params[] = [
-					'reportid' => $reportid,
-					'name' => $param['name'],
-					'value' => $param['value']
-				];
+				if ($param['value'] !== '') {
+					$ins_report_params[] = ['reportid' => $reportid] + $param;
+				}
 			}
 		}
 
@@ -765,7 +762,7 @@ class CReport extends CApiService {
 
 		foreach ($reports as $report) {
 			if (array_key_exists('users', $report)) {
-				$report_users[$report['reportid']] = $report['users'];
+				$report_users[$report['reportid']] = array_column($report['users'], null, 'userid');
 			}
 		}
 
@@ -785,17 +782,11 @@ class CReport extends CApiService {
 		$del_reportuserids = [];
 
 		foreach ($db_report_users as $db_report_user) {
-			if ($report_users[$db_report_user['reportid']]) {
-				$report_user = array_shift($report_users[$db_report_user['reportid']]);
+			if (array_key_exists($db_report_user['userid'], $report_users[$db_report_user['reportid']])) {
+				$report_user = $report_users[$db_report_user['reportid']][$db_report_user['userid']];
+				unset($report_users[$db_report_user['reportid']][$db_report_user['userid']]);
 
-				$upd_report_user = [];
-
-				foreach (['userid', 'access_userid', 'exclude'] as $field_name) {
-					if (array_key_exists($field_name, $report_user)
-							&& $report_user[$field_name] != $db_report_user[$field_name]) {
-						$upd_report_user[$field_name] = $report_user[$field_name];
-					}
-				}
+				$upd_report_user = DB::getUpdatedValues('report_user', $report_user, $db_report_user);
 
 				if ($upd_report_user) {
 					$upd_report_users[] = [
@@ -839,7 +830,7 @@ class CReport extends CApiService {
 
 		foreach ($reports as $report) {
 			if (array_key_exists('user_groups', $report)) {
-				$report_usrgrps[$report['reportid']] = $report['user_groups'];
+				$report_usrgrps[$report['reportid']] = array_column($report['user_groups'], null, 'usrgrpid');
 			}
 		}
 
@@ -859,17 +850,11 @@ class CReport extends CApiService {
 		$del_reportusrgrpids = [];
 
 		foreach ($db_report_usrgrps as $db_report_usrgrp) {
-			if ($report_usrgrps[$db_report_usrgrp['reportid']]) {
-				$report_usrgrp = array_shift($report_usrgrps[$db_report_usrgrp['reportid']]);
+			if (array_key_exists($db_report_usrgrp['usrgrpid'], $report_usrgrps[$db_report_usrgrp['reportid']])) {
+				$report_usrgrp = $report_usrgrps[$db_report_usrgrp['reportid']][$db_report_usrgrp['usrgrpid']];
+				unset($report_usrgrps[$db_report_usrgrp['reportid']][$db_report_usrgrp['usrgrpid']]);
 
-				$upd_report_usrgrp = [];
-
-				foreach (['usrgrpid', 'access_userid'] as $field_name) {
-					if (array_key_exists($field_name, $report_usrgrp)
-							&& $report_usrgrp[$field_name] != $db_report_usrgrp[$field_name]) {
-						$upd_report_usrgrp[$field_name] = $report_usrgrp[$field_name];
-					}
-				}
+				$upd_report_usrgrp = DB::getUpdatedValues('report_usrgrp', $report_usrgrp, $db_report_usrgrp);
 
 				if ($upd_report_usrgrp) {
 					$upd_report_usrgrps[] = [

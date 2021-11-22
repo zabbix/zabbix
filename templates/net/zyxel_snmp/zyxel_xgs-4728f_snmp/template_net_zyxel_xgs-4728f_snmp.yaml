@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-11T15:22:44Z'
+  date: '2021-07-22T14:31:23Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -64,7 +64,7 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.4.0
           key: zyxel.4728f.contact
           delay: 1h
-          history: 2w
+          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -114,7 +114,7 @@ zabbix_export:
           snmp_oid: 'discovery[{#SNMP.ARRAY},.1.3.6.1.4.1.890.1.5.8.46.1]'
           key: zyxel.4728f.fwversion
           delay: 1h
-          history: 2w
+          history: 7d
           trends: '0'
           value_type: CHAR
           description: 'MIB: ZYXEL-XGS4728F-MIB'
@@ -133,6 +133,7 @@ zabbix_export:
                     + '(' + tmpObj["3.0"] + '.' + tmpObj["4.0"] + ')_' 
                     + tmpObj["7.0"] + '.' + tmpObj["6.0"] + '.' + tmpObj["5.0"];
                   return strOut;
+                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -157,7 +158,7 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.6.0
           key: zyxel.4728f.location
           delay: 1h
-          history: 2w
+          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -181,7 +182,7 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.2.2.1.6.1
           key: zyxel.4728f.mac
           delay: 1h
-          history: 2w
+          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -208,7 +209,7 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.1.0
           key: zyxel.4728f.model
           delay: 1h
-          history: 2w
+          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -243,7 +244,7 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.5.0
           key: zyxel.4728f.name
           delay: 1h
-          history: 2w
+          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -268,7 +269,7 @@ zabbix_export:
           snmp_oid: .1.3.6.1.4.1.890.1.5.8.46.1.10.0
           key: zyxel.4728f.serialnumber
           delay: 1h
-          history: 2w
+          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -603,6 +604,7 @@ zabbix_export:
               type: CALCULATED
               key: 'zyxel.4728f.net.if.in.util[{#SNMPINDEX}]'
               history: 7d
+              value_type: FLOAT
               units: '%'
               params: 'last(//zyxel.4728f.net.if.in.traffic[{#SNMPINDEX}]) * (last(//zyxel.4728f.net.if.highspeed[{#SNMPINDEX}]) <> 0) / ( last(//zyxel.4728f.net.if.highspeed[{#SNMPINDEX}]) + (last(//zyxel.4728f.net.if.highspeed[{#SNMPINDEX}]) = 0) ) * 100'
               description: 'Interface utilization percentage'
@@ -613,6 +615,12 @@ zabbix_export:
                     - '0'
                     - '100'
                   error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      return +parseFloat(value).toFixed(0);
+                      
               tags:
                 -
                   tag: Application
@@ -800,6 +808,7 @@ zabbix_export:
               type: CALCULATED
               key: 'zyxel.4728f.net.if.out.util[{#SNMPINDEX}]'
               history: 7d
+              value_type: FLOAT
               units: '%'
               params: 'last(//zyxel.4728f.net.if.out.traffic[{#SNMPINDEX}]) * (last(//zyxel.4728f.net.if.highspeed[{#SNMPINDEX}]) <> 0) / ( last(//zyxel.4728f.net.if.highspeed[{#SNMPINDEX}]) + (last(//zyxel.4728f.net.if.highspeed[{#SNMPINDEX}]) = 0) ) * 100'
               description: 'Interface utilization percentage'
@@ -810,6 +819,12 @@ zabbix_export:
                     - '0'
                     - '100'
                   error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      return +parseFloat(value).toFixed(0);
+                      
               tags:
                 -
                   tag: Application
@@ -909,13 +924,14 @@ zabbix_export:
                     key: 'zyxel.4728f.net.if.in.util[{#SNMPINDEX}]'
           overrides:
             -
-              name: 'Trigger disabled'
+              name: 'Don''t create triggers for matching interface'
               step: '1'
               filter:
                 conditions:
                   -
                     macro: '{#ZYXEL.IF.NAME}'
-                    value: '.*'
+                    value: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
+                    operator: NOT_MATCHES_REGEX
                     formulaid: A
               operations:
                 -
@@ -924,22 +940,6 @@ zabbix_export:
                   value: '.*'
                   status: ENABLED
                   discover: NO_DISCOVER
-            -
-              name: 'Trigger enabled'
-              step: '2'
-              filter:
-                conditions:
-                  -
-                    macro: '{#ZYXEL.IF.NAME}'
-                    value: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
-                    formulaid: A
-              operations:
-                -
-                  operationobject: TRIGGER_PROTOTYPE
-                  operator: REGEXP
-                  value: '.*'
-                  status: ENABLED
-                  discover: DISCOVER
         -
           uuid: 6e0b5b991865448780e042d98168d72c
           name: 'SFP with DDM discovery'
@@ -1032,6 +1032,7 @@ zabbix_export:
                       outArr.push(item)
                   });
                   return JSON.stringify(outArr);
+                  
         -
           uuid: f8112c4b07ed4bb1b918f58dbb9ec294
           name: 'SFP without DDM discovery'
@@ -1277,6 +1278,7 @@ zabbix_export:
                   outArr.push(item)
                   });
                   return JSON.stringify(outArr);
+                  
         -
           uuid: 1fa3870c99d6408dbf78c7f2ad87341d
           name: 'Voltage discovery'
@@ -1342,6 +1344,7 @@ zabbix_export:
                   outArr.push(item)
                   });
                   return JSON.stringify(outArr);
+                  
       macros:
         -
           macro: '{$CPU.UTIL.CRIT}'
@@ -1355,7 +1358,7 @@ zabbix_export:
           description: 'The time interval for SNMP agent availability trigger expression.'
         -
           macro: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
-          value: 'NEED TRIGGERS'
+          value: 'CHANGE_IF_NEEDED'
           description: 'Triggers will be created only for interfaces whose description contains the value of this macro'
         -
           macro: '{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.MATCHES}'

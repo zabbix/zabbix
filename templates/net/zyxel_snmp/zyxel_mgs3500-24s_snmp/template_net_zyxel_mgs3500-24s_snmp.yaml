@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-11T15:21:48Z'
+  date: '2021-07-22T14:30:30Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -66,7 +66,7 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.4.0
           key: zyxel.3500_24s.contact
           delay: 1h
-          history: 2w
+          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -116,7 +116,7 @@ zabbix_export:
           snmp_oid: .1.3.6.1.4.1.890.1.15.3.1.6.0
           key: zyxel.3500_24s.fwversion
           delay: 1h
-          history: 2w
+          history: 7d
           trends: '0'
           value_type: CHAR
           description: 'MIB: ZYXEL-ES-COMMON'
@@ -146,7 +146,7 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.6.0
           key: zyxel.3500_24s.location
           delay: 1h
-          history: 2w
+          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -170,7 +170,7 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.2.2.1.6.1
           key: zyxel.3500_24s.mac
           delay: 1h
-          history: 2w
+          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -218,7 +218,7 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.1.0
           key: zyxel.3500_24s.model
           delay: 1h
-          history: 2w
+          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -253,7 +253,7 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.5.0
           key: zyxel.3500_24s.name
           delay: 1h
-          history: 2w
+          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -278,7 +278,7 @@ zabbix_export:
           snmp_oid: .1.3.6.1.4.1.890.1.15.3.1.12.0
           key: zyxel.3500_24s.serialnumber
           delay: 1h
-          history: 2w
+          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -578,6 +578,7 @@ zabbix_export:
               type: CALCULATED
               key: 'zyxel.3500_24s.net.if.in.util[{#SNMPINDEX}]'
               history: 7d
+              value_type: FLOAT
               units: '%'
               params: 'last(//zyxel.3500_24s.net.if.in.traffic[{#SNMPINDEX}]) * (last(//zyxel.3500_24s.net.if.highspeed[{#SNMPINDEX}]) <> 0) / ( last(//zyxel.3500_24s.net.if.highspeed[{#SNMPINDEX}]) + (last(//zyxel.3500_24s.net.if.highspeed[{#SNMPINDEX}]) = 0) ) * 100'
               description: 'Interface utilization percentage'
@@ -588,6 +589,12 @@ zabbix_export:
                     - '0'
                     - '100'
                   error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      return +parseFloat(value).toFixed(0);
+                      
               tags:
                 -
                   tag: Application
@@ -775,6 +782,7 @@ zabbix_export:
               type: CALCULATED
               key: 'zyxel.3500_24s.net.if.out.util[{#SNMPINDEX}]'
               history: 7d
+              value_type: FLOAT
               units: '%'
               params: 'last(//zyxel.3500_24s.net.if.out.traffic[{#SNMPINDEX}]) * (last(//zyxel.3500_24s.net.if.highspeed[{#SNMPINDEX}]) <> 0) / ( last(//zyxel.3500_24s.net.if.highspeed[{#SNMPINDEX}]) + (last(//zyxel.3500_24s.net.if.highspeed[{#SNMPINDEX}]) = 0) ) * 100'
               description: 'Interface utilization percentage'
@@ -785,6 +793,12 @@ zabbix_export:
                     - '0'
                     - '100'
                   error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      return +parseFloat(value).toFixed(0);
+                      
               tags:
                 -
                   tag: Application
@@ -891,13 +905,14 @@ zabbix_export:
                     key: 'zyxel.3500_24s.net.if.in.util[{#SNMPINDEX}]'
           overrides:
             -
-              name: 'Trigger disabled'
+              name: 'Don''t create triggers for matching interface'
               step: '1'
               filter:
                 conditions:
                   -
                     macro: '{#ZYXEL.IF.NAME}'
-                    value: '.*'
+                    value: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
+                    operator: NOT_MATCHES_REGEX
                     formulaid: A
               operations:
                 -
@@ -906,22 +921,6 @@ zabbix_export:
                   value: '.*'
                   status: ENABLED
                   discover: NO_DISCOVER
-            -
-              name: 'Trigger enabled'
-              step: '2'
-              filter:
-                conditions:
-                  -
-                    macro: '{#ZYXEL.IF.NAME}'
-                    value: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
-                    formulaid: A
-              operations:
-                -
-                  operationobject: TRIGGER_PROTOTYPE
-                  operator: REGEXP
-                  value: '.*'
-                  status: ENABLED
-                  discover: DISCOVER
         -
           uuid: f90783a6170c4802a1833ae25008b618
           name: 'SFP with DDM discovery'
@@ -1014,6 +1013,7 @@ zabbix_export:
                       outArr.push(item)
                   });
                   return JSON.stringify(outArr);
+                  
         -
           uuid: 98536d7e95c145e6ba5d3a5531c570ce
           name: 'SFP without DDM discovery'
@@ -1308,6 +1308,7 @@ zabbix_export:
                   outArr.push(item)
                   });
                   return JSON.stringify(outArr);
+                  
       macros:
         -
           macro: '{$CPU.UTIL.CRIT}'
@@ -1321,7 +1322,7 @@ zabbix_export:
           description: 'The time interval for SNMP agent availability trigger expression.'
         -
           macro: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
-          value: 'NEED TRIGGERS'
+          value: 'CHANGE_IF_NEEDED'
           description: 'Triggers will be created only for interfaces whose description contains the value of this macro'
         -
           macro: '{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.MATCHES}'

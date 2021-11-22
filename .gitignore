@@ -139,6 +139,8 @@ tests/libs/zbxcommon/zbx_function_find
 tests/libs/zbxcommon/zbx_function_get_param_dyn
 tests/libs/zbxcommon/zbx_interval_preproc
 tests/libs/zbxcommon/zbx_json_to_xml
+tests/libs/zbxcommon/zbx_ltrim_utf8
+tests/libs/zbxcommon/zbx_rtrim_utf8
 tests/libs/zbxcommon/zbx_str_extract
 tests/libs/zbxcommon/zbx_token_find
 tests/libs/zbxcommon/zbx_trim_float
@@ -190,6 +192,7 @@ tests/libs/zbxserver/evaluate_function
 tests/libs/zbxserver/get_trigger_expression_constant
 tests/libs/zbxserver/macro_fmttime
 tests/libs/zbxserver/substitute_lld_macros
+tests/libs/zbxserver/valuemaps
 tests/libs/zbxsysinfo/check_key_access_rules
 tests/libs/zbxsysinfo/common/SYSTEM_LOCALTIME
 tests/libs/zbxsysinfo/common/VFS_FILE_EXISTS
@@ -212,6 +215,7 @@ tests/libs/zbxcommon/zbx_tm_sub
 tests/libs/zbxcommon/zbx_tm_round_up
 tests/libs/zbxcommon/zbx_tm_round_down
 tests/libs/zbxtrends/zbx_trends_parse_range
+tests/libs/zbxsysinfo/process_http
 tests/zabbix_server/preprocessor/item_preproc_csv_to_json
 tests/zabbix_server/preprocessor/item_preproc_xpath
 tests/zabbix_server/preprocessor/zbx_item_preproc

@@ -16,7 +16,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-package web
+package webpage
 
 import (
 	"bufio"
@@ -157,7 +157,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, "Web",
+	plugin.RegisterMetrics(&impl, "WebPage",
 		"web.page.get", "Get content of a web page.",
 		"web.page.perf", "Loading time of full web page (in seconds).",
 		"web.page.regexp", "Find string on a web page.")

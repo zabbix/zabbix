@@ -332,7 +332,7 @@ class CFormElement extends CElement {
 	 *
 	 * @return $this
 	 */
-	private function setFieldValue($field, $values) {
+	protected function setFieldValue($field, $values) {
 		$classes = [CMultifieldTableElement::class, CMultiselectElement::class, CCheckboxListElement::class];
 		$element = $this->getField($field);
 
@@ -416,7 +416,7 @@ class CFormElement extends CElement {
 	 *
 	 * @throws Exception
 	 */
-	private function checkFieldValue($field, $values, $raise_exception = true) {
+	protected function checkFieldValue($field, $values, $raise_exception = true) {
 		$classes = [CMultifieldTableElement::class, CMultiselectElement::class, CCheckboxListElement::class];
 		$element = $this->getField($field);
 

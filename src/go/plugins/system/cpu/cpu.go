@@ -178,7 +178,8 @@ func (p *Plugin) getCpuUtil(params []string) (result interface{}, err error) {
 	if cpu.status == cpuStatusOffline {
 		return nil, errors.New("CPU is offline.")
 	}
-	return cpu.counterAverage(counter, period), nil
+
+	return cpu.counterAverage(counter, period, 1), nil
 }
 
 func (p *Plugin) newCpus(num int) (cpus []*cpuUnit) {

@@ -173,6 +173,8 @@ char	*CONFIG_TLS_CIPHER_CMD		= NULL;	/* parameter '--tls-cipher' from zabbix_get
 int	CONFIG_PASSIVE_FORKS		= 0;	/* not used in zabbix_get, just for linking with tls.c */
 int	CONFIG_ACTIVE_FORKS		= 0;	/* not used in zabbix_get, just for linking with tls.c */
 
+int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
+
 /* COMMAND LINE OPTIONS */
 
 /* long options */
@@ -279,7 +281,7 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 	{
 		if (SUCCEED == (ret = zbx_tcp_send(&s, key)))
 		{
-			if (0 < (bytes_received = zbx_tcp_recv_ext(&s, 0)))
+			if (0 < (bytes_received = zbx_tcp_recv_ext(&s, 0, 0)))
 			{
 				if (0 == strcmp(s.buffer, ZBX_NOTSUPPORTED) && sizeof(ZBX_NOTSUPPORTED) < s.read_bytes)
 				{

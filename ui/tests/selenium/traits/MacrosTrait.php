@@ -86,10 +86,22 @@ trait MacrosTrait {
 	/**
 	 * Get input fields of macros.
 	 *
+	 * @param boolean    $with_type    true if type of macros (secret or text) needed to be returned in macros array
+	 *
 	 * @return array
 	 */
-	public function getMacros() {
-		return $this->getMacrosTable()->getValue();
+	public function getMacros($with_type = false) {
+		$values = $this->getMacrosTable()->getValue();
+
+		if ($with_type) {
+			foreach ($values as &$value) {
+				$value['type'] = ($this->getValueField($value['macro'])->getInputType() === CInputGroupElement::TYPE_SECRET)
+						? ZBX_MACRO_TYPE_SECRET : ZBX_MACRO_TYPE_TEXT;
+			}
+			unset($value);
+		}
+
+		return $values;
 	}
 
 	/**
@@ -97,8 +109,20 @@ trait MacrosTrait {
 	 *
 	 * @return $this
 	 */
-	public function removeMacros() {
+	public function removeAllMacros() {
 		return $this->getMacrosTable()->clear();
+	}
+
+	/**
+	 * Remove macro by macro name.
+	 *
+	 * @param array $macros   macros to be removed
+	 */
+	public function removeMacro($macros) {
+		foreach ($macros as $macro) {
+			$this->query('xpath://textarea[text()='.CXPathHelper::escapeQuotes($macro['macro']).
+				']/../..//button[text()="Remove"]')->waitUntilPresent()->one()->click();
+		}
 	}
 
 	/**

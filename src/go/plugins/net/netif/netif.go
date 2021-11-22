@@ -46,5 +46,6 @@ const (
 )
 
 type msgIfDiscovery struct {
-	Ifname string `json:"{#IFNAME}"`
+	Ifname string  `json:"{#IFNAME}"`
+	Ifguid *string `json:"{#IFGUID},omitempty"`
 }

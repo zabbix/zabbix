@@ -18,24 +18,28 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/common/testFormPreprocessing.php';
+require_once dirname(__FILE__).'/../common/testFormPreprocessing.php';
+require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
  *
  * @backup items
  */
-class testFormItemPrototypePreprocessing extends testFormPreprocessing {
+class testFormPreprocessingItemPrototype extends testFormPreprocessing {
 
-	const DISCOVERY_RULE_ID = 133800;			// 'Simple form test host' => 'testFormDiscoveryRule'
-	const TEMPL_DISCOVERY_RULE_ID = 15011;	// 'testInheritanceDiscoveryRule'
-	const HOST_DISCOVERY_RULE_ID	 = 15016;	// 'Template inheritance test host -> testInheritanceDiscoveryRule'
-
-	public $link = 'disc_prototypes.php?context=host&parent_discoveryid='.self::DISCOVERY_RULE_ID;
-	public $ready_link = 'disc_prototypes.php?context=host&form=update&parent_discoveryid='.self::DISCOVERY_RULE_ID.'&itemid=';
+	public $link = 'disc_prototypes.php?context=host&parent_discoveryid='.self::DISCOVERY_RULEID;
+	public $ready_link = 'disc_prototypes.php?form=update&context=host&parent_discoveryid='.self::DISCOVERY_RULEID.'&itemid=';
 	public $button = 'Create item prototype';
 	public $success_message = 'Item prototype added';
 	public $fail_message = 'Cannot add item prototype';
+
+	const DISCOVERY_RULEID			= 133800;	// 'Simple form test host' => 'testFormDiscoveryRule'
+	const TEMPL_INHERITANCE_RULEID	= 15011;	//'testInheritanceDiscoveryRule'
+	const HOST_INHERITANCE_RULEID	= 15016;	// 'Template inheritance test host' -> 'testInheritanceDiscoveryRule'
+	const INHERITED_ITEM_PROTOTYPE	= 15096;	// 'testInheritanceDiscoveryRule' -> 'testInheritanceItemPrototypePreprocessing'
+	const CLONE_RULEID				= 133800;	// 'Host for triggers filtering' -> 'Discovery rule for triggers filtering'
+	const CLONE_ITEM_PROTOTYPEID	= 23804;	// 'Discovery rule for triggers filtering' -> 'Discovered item {#TEST}'
 
 	public function getItemPrototypePrometheusData() {
 		return array_merge($this->getPrometheusData(), [
@@ -96,38 +100,55 @@ class testFormItemPrototypePreprocessing extends testFormPreprocessing {
 	 * @dataProvider getItemPrototypePrometheusData
 	 * @dataProvider getCustomOnFailValidationData
 	 */
-	public function testFormItemPrototypePreprocessing_CreateAllSteps($data) {
+	public function testFormPreprocessingItemPrototype_CreateAllSteps($data) {
 		$this->checkCreate($data);
-	}
-
-	/**
-	 * Check that adding two 'Check for not supported value'
-	 * preprocessing steps is impossible.
-	 */
-	public function testFormItemPrototypePreprocessing_RepeatedNotSupported() {
-		$this->checkRepeatedNotSupported();
-	}
-
-	/**
-	 * @dataProvider getItemCustomOnFailData
-	 */
-	public function testFormItemPrototypePreprocessing_CustomOnFail($data) {
-		$this->checkCustomOnFail($data);
 	}
 
 	/**
 	 * @dataProvider getItemPreprocessingTrailingSpacesData
 	 */
-	public function testFormItemPrototypePreprocessing_TrailingSpaces($data) {
+	public function testFormPreprocessingItemPrototype_TrailingSpaces($data) {
 		$this->checkTrailingSpaces($data);
+	}
+
+	/**
+	 * Add preprocessing steps to item prototype for cloning.
+	 */
+	public function prepareCloneItemPrototypePreprocessing() {
+		CDataHelper::call('itemprototype.update', [
+			'itemid' => self::CLONE_ITEM_PROTOTYPEID,
+			'preprocessing' => self::CLONE_PREPROCESSING
+		]);
+	}
+
+	/**
+	 * @onBefore prepareCloneItemPrototypePreprocessing
+	 */
+	public function testFormPreprocessingItemPrototype_CloneItemPrototype() {
+		$link = 'disc_prototypes.php?form=update&context=host&parent_discoveryid='.self::CLONE_RULEID.
+				'&itemid='.self::CLONE_ITEM_PROTOTYPEID;
+		$this->checkCloneItem($link, 'Item prototype');
+	}
+
+	public function testFormPreprocessingItemPrototype_CloneTemplatedItemPrototype() {
+		$link = 'disc_prototypes.php?form=update&context=host&parent_discoveryid='.self::HOST_INHERITANCE_RULEID.
+				'&itemid='.self::INHERITED_ITEM_PROTOTYPE;
+		$this->checkCloneItem($link, 'Item prototype', $templated = true);
+	}
+
+	/**
+	 * @dataProvider getItemCustomOnFailData
+	 */
+	public function testFormPreprocessingItemPrototype_CustomOnFail($data) {
+		$this->checkCustomOnFail($data);
 	}
 
 	/**
 	 * @dataProvider getItemInheritancePreprocessing
 	 */
-	public function testFormItemPrototypePreprocessing_PreprocessingInheritanceFromTemplate($data) {
-		$this->link = 'disc_prototypes.php?context=template&parent_discoveryid='.self::TEMPL_DISCOVERY_RULE_ID;
-		$host_link = 'disc_prototypes.php?context=host&parent_discoveryid='.self::HOST_DISCOVERY_RULE_ID;
+	public function testFormPreprocessingItemPrototype_PreprocessingInheritanceFromTemplate($data) {
+		$this->link = 'disc_prototypes.php?context=template&parent_discoveryid='.self::TEMPL_INHERITANCE_RULEID;
+		$host_link = 'disc_prototypes.php?context=host&parent_discoveryid='.self::HOST_INHERITANCE_RULEID;
 
 		$this->checkPreprocessingInheritance($data, $host_link);
 	}

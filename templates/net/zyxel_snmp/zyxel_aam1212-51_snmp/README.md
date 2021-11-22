@@ -1,5 +1,5 @@
 
-# AAM1212-51 IES-612 SNMP
+# ZYXEL AAM1212-51 IES-612 SNMP
 
 ## Overview
 
@@ -27,7 +27,7 @@ No specific Zabbix configuration is required.
 |{$SNMP.TIMEOUT} |<p>The time interval for SNMP agent availability trigger expression.</p> |`5m` |
 |{$ZYXEL.ADSL.ATN.MAX} |<p>Type the maximum signal attenuation</p> |`40` |
 |{$ZYXEL.ADSL.SNR.MIN} |<p>Type the minimum signal to noise margin (0-31 dB)</p> |`8` |
-|{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES} |<p>Triggers will be created only for interfaces whose description contains the value of this macro</p> |`NEED TRIGGERS` |
+|{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES} |<p>Triggers will be created only for interfaces whose description contains the value of this macro</p> |`CHANGE_IF_NEEDED` |
 |{$ZYXEL.LLD.FILTER.IF.LINKSTATUS.MATCHES} |<p>Filter of discoverable link types.</p> |`.*` |
 |{$ZYXEL.LLD.FILTER.IF.LINKSTATUS.NOT_MATCHES} |<p>Filter to exclude discovered by link types.</p> |`2` |
 

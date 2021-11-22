@@ -481,7 +481,7 @@ typedef struct
 {
 	zbx_uint64_t	itemid;
 	zbx_uint64_t	master_itemid;
-	struct zbx_json	data;
+	char		*buffer;
 }
 zbx_proxy_item_config_t;
 
@@ -501,10 +501,10 @@ static int	get_proxyconfig_table_items(zbx_uint64_t proxy_hostid, struct zbx_jso
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_hashset_t		proxy_items;
-	struct zbx_json		*jrow;
 	zbx_vector_ptr_t	items;
 	zbx_uint64_t		itemid;
 	zbx_hashset_iter_t	iter;
+	struct zbx_json		json_array;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() proxy_hostid:" ZBX_FS_UI64, __func__, proxy_hostid);
 
@@ -569,6 +569,7 @@ static int	get_proxyconfig_table_items(zbx_uint64_t proxy_hostid, struct zbx_jso
 	}
 
 	zbx_hashset_create(&proxy_items, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_json_initarray(&json_array, 256);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -582,20 +583,26 @@ static int	get_proxyconfig_table_items(zbx_uint64_t proxy_hostid, struct zbx_jso
 			ZBX_STR2UINT64(proxy_item_local.itemid, row[0]);
 			ZBX_STR2UINT64(proxy_item_local.master_itemid, row[fld_master]);
 			proxy_item = zbx_hashset_insert(&proxy_items, &proxy_item_local, sizeof(proxy_item_local));
-			zbx_json_initarray(&proxy_item->data, 256);
-			jrow = &proxy_item->data;
+
+			proxyconfig_add_row(&json_array, row, table);
+
+			proxy_item->buffer = zbx_malloc(NULL, json_array.buffer_size + 1);
+			memcpy(proxy_item->buffer, json_array.buffer, json_array.buffer_size + 1);
+
+			zbx_json_cleanarray(&json_array);
 		}
 		else
 		{
 			ZBX_STR2UINT64(itemid, row[0]);
 			zbx_hashset_insert(itemids, &itemid, sizeof(itemid));
-			zbx_json_addarray(j, NULL);
-			jrow = j;
-		}
 
-		proxyconfig_add_row(jrow, row, table);
-		zbx_json_close(jrow);
+			zbx_json_addarray(j, NULL);
+			proxyconfig_add_row(j, row, table);
+			zbx_json_close(j);
+		}
 	}
+	DBfree_result(result);
+	zbx_json_free(&json_array);
 
 	/* flush cached dependent items */
 
@@ -625,9 +632,9 @@ static int	get_proxyconfig_table_items(zbx_uint64_t proxy_hostid, struct zbx_jso
 			if (NULL != zbx_hashset_search(itemids, &proxy_item->master_itemid))
 			{
 				zbx_hashset_insert(itemids, &proxy_item->itemid, sizeof(itemid));
-				zbx_json_addraw(j, NULL, proxy_item->data.buffer);
+				zbx_json_addraw(j, NULL, proxy_item->buffer);
 			}
-			zbx_json_free(&proxy_item->data);
+			zbx_free(proxy_item->buffer);
 			zbx_hashset_remove_direct(&proxy_items, proxy_item);
 		}
 
@@ -635,9 +642,6 @@ static int	get_proxyconfig_table_items(zbx_uint64_t proxy_hostid, struct zbx_jso
 	}
 	zbx_vector_ptr_destroy(&items);
 	zbx_hashset_destroy(&proxy_items);
-
-	DBfree_result(result);
-
 skip_data:
 	zbx_free(sql);
 
@@ -1851,8 +1855,6 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 		for (f = 1; NULL != (pf = zbx_json_next_value_dyn(&jp_row, pf, &buf, &buf_alloc, &type));
 				f++)
 		{
-			int	field_differ = 1;
-
 			/* parse values for the entry (lines 10-12 in T1) */
 
 			if (f == fields_count)
@@ -1876,8 +1878,8 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 				continue;
 			}
 
-			if (0 == (field_differ = compare_nth_field(fields, recs + p_id_offset->offset, f, buf,
-					(ZBX_JSON_TYPE_NULL == type), &last_n, &last_pos)))
+			if (0 == compare_nth_field(fields, recs + p_id_offset->offset, f, buf,
+					(ZBX_JSON_TYPE_NULL == type), &last_n, &last_pos))
 			{
 				continue;
 			}
@@ -2086,7 +2088,7 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 	}
 	zbx_vector_ptr_destroy(&tables_proxy);
 
-	if (SUCCEED != (ret = DBend(ret)))
+	if (SUCCEED != DBend(ret))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "failed to update local proxy configuration copy: %s",
 				(NULL == error ? "database error" : error));
@@ -2267,14 +2269,13 @@ static void	proxy_get_lastid(const char *table_name, const char *lastidfield, zb
 static void	proxy_set_lastid(const char *table_name, const char *lastidfield, const zbx_uint64_t lastid)
 {
 	DB_RESULT	result;
-	DB_ROW		row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() [%s.%s:" ZBX_FS_UI64 "]", __func__, table_name, lastidfield, lastid);
 
 	result = DBselect("select 1 from ids where table_name='%s' and field_name='%s'",
 			table_name, lastidfield);
 
-	if (NULL == (row = DBfetch(result)))
+	if (NULL == DBfetch(result))
 	{
 		DBexecute("insert into ids (table_name,field_name,nextid) values ('%s','%s'," ZBX_FS_UI64 ")",
 				table_name, lastidfield, lastid);
@@ -4696,7 +4697,6 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	log_client_timediff(LOG_LEVEL_DEBUG, jp, ts);
 	proxy_diff.flags = ZBX_FLAGS_PROXY_DIFF_UNSET;
 	proxy_diff.hostid = proxy->hostid;
 

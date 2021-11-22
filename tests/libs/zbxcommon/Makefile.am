@@ -26,7 +26,9 @@ SERVER_tests = \
 	zbx_tm_sub \
 	zbx_tm_round_up \
 	zbx_tm_round_down \
-	zbx_get_report_nextcheck
+	zbx_get_report_nextcheck \
+	zbx_ltrim_utf8 \
+	zbx_rtrim_utf8
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -64,6 +66,8 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_httpmetrics.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_http.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
 	$(top_srcdir)/src/libs/zbxdbcache/libzbxdbcache.a \
 	$(top_srcdir)/src/libs/zbxmemory/libzbxmemory.a \
@@ -73,6 +77,7 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxsys/libzbxsys.a \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_srcdir)/src/libs/zbxmedia/libzbxmedia.a \
+	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
@@ -481,4 +486,35 @@ zbx_get_report_nextcheck_LDADD += @SERVER_LIBS@
 zbx_get_report_nextcheck_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_get_report_nextcheck_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+# zbx_ltrim_utf8
+
+zbx_ltrim_utf8_SOURCES = \
+	zbx_ltrim_utf8.c \
+	$(COMMON_SRC_FILES)
+
+zbx_ltrim_utf8_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_ltrim_utf8_LDADD += @SERVER_LIBS@
+
+zbx_ltrim_utf8_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_ltrim_utf8_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+# zbx_ltrim_utf8
+
+zbx_rtrim_utf8_SOURCES = \
+	zbx_rtrim_utf8.c \
+	$(COMMON_SRC_FILES)
+
+zbx_rtrim_utf8_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_rtrim_utf8_LDADD += @SERVER_LIBS@
+
+zbx_rtrim_utf8_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_rtrim_utf8_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
 endif

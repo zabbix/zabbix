@@ -35,8 +35,6 @@ class testPageApiTokensAdministrationGeneral extends testPageApiTokens {
 	const DELETE_TOKEN = 'filter-create: future token for filter-create';
 
 	public static function prepareTokenData() {
-		CDataHelper::setSessionId(null);
-
 		self::$timestamp = time() + 172800;
 
 		$responce = CDataHelper::call('token.create', [

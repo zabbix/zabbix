@@ -179,7 +179,9 @@ class CConfigurationImport {
 		$images_refs = [];
 		$maps_refs = [];
 		$template_dashboards_refs = [];
-		$macros_refs = [];
+		$template_macros_refs = [];
+		$host_macros_refs = [];
+		$host_prototype_macros_refs = [];
 		$proxy_refs = [];
 		$host_prototypes_refs = [];
 		$httptests_refs = [];
@@ -198,7 +200,7 @@ class CConfigurationImport {
 
 			if (array_key_exists('macros', $template)) {
 				foreach ($template['macros'] as $macro) {
-					$macros_refs[$template['host']][$macro['macro']] = [];
+					$template_macros_refs[$template['uuid']][] = $macro['macro'];
 				}
 			}
 
@@ -218,7 +220,7 @@ class CConfigurationImport {
 
 			if (array_key_exists('macros', $host)) {
 				foreach ($host['macros'] as $macro) {
-					$macros_refs[$host['host']][$macro['macro']] = [];
+					$host_macros_refs[$host['host']][] = $macro['macro'];
 				}
 			}
 
@@ -326,17 +328,29 @@ class CConfigurationImport {
 				}
 
 				foreach ($discovery_rule['host_prototypes'] as $host_prototype) {
-					$host_prototypes_refs[$host][$discovery_rule['key_']][$host_prototype['host']] =
-						array_key_exists('uuid', $host_prototype)
-							? [
-								'uuid' => $host_prototype['uuid'],
-								'discovery_rule_uuid' => $discovery_rule['uuid']
-							]
-							: [];
+					if (array_key_exists('uuid', $host_prototype)) {
+						$host_prototypes_refs['uuid'][$host][$discovery_rule['uuid']][] = $host_prototype['uuid'];
+					}
+					else {
+						$host_prototypes_refs['host'][$host][$discovery_rule['key_']][] = $host_prototype['host'];
+					}
 
 					foreach ($host_prototype['group_prototypes'] as $group_prototype) {
 						if (isset($group_prototype['group'])) {
 							$groups_refs += [$group_prototype['group']['name'] => []];
+						}
+					}
+
+					if (array_key_exists('macros', $host_prototype)) {
+						foreach ($host_prototype['macros'] as $macro) {
+							if (array_key_exists('uuid', $host_prototype)) {
+								$host_prototype_macros_refs['uuid'][$host][$discovery_rule['key_']]
+									[$host_prototype['uuid']][] = $macro['macro'];
+							}
+							else {
+								$host_prototype_macros_refs['host'][$host][$discovery_rule['key_']]
+									[$host_prototype['host']][] = $macro['macro'];
+							}
 						}
 					}
 
@@ -572,7 +586,9 @@ class CConfigurationImport {
 		$this->referencer->addImages($images_refs);
 		$this->referencer->addMaps($maps_refs);
 		$this->referencer->addTemplateDashboards($template_dashboards_refs);
-		$this->referencer->addMacros($macros_refs);
+		$this->referencer->addTemplateMacros($template_macros_refs);
+		$this->referencer->addHostMacros($host_macros_refs);
+		$this->referencer->addHostPrototypeMacros($host_prototype_macros_refs);
 		$this->referencer->addProxies($proxy_refs);
 		$this->referencer->addHostPrototypes($host_prototypes_refs);
 		$this->referencer->addHttpTests($httptests_refs);
@@ -1236,6 +1252,19 @@ class CConfigurationImport {
 									array_column($host_prototype['groupPrototypes'], 'name')
 								).
 							')';
+						}
+
+						if (array_key_exists('macros', $host_prototype)) {
+							foreach ($host_prototype['macros'] as &$macro) {
+								$hostmacroid = $this->referencer->findHostPrototypeMacroid($host_prototypeid,
+									$macro['macro']
+								);
+
+								if ($hostmacroid !== null) {
+									$macro['hostmacroid'] = $hostmacroid;
+								}
+							}
+							unset($macro);
 						}
 
 						$host_prototype['hostid'] = $host_prototypeid;

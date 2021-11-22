@@ -3048,17 +3048,17 @@ char	*zbx_user_macro_unquote_context_dyn(const char *context, int len)
  * Parameters:                                                                *
  *     context     - [IN] the macro context                                   *
  *     force_quote - [IN] if non zero then context quoting is enforced        *
+ *     error       - [OUT] the error message                                  *
  *                                                                            *
  * Return value:                                                              *
- *     A string containing quoted macro context. This string must be freed by *
- *     the caller.                                                            *
+ *     A string containing quoted macro context on success, NULL on error.    *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote)
+char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote, char **error)
 {
 	int		len, quotes = 0;
 	char		*buffer, *ptr_buffer;
-	const char	*ptr_context = context;
+	const char	*ptr_context = context, *start = context;
 
 	if ('"' == *ptr_context || ' ' == *ptr_context)
 		force_quote = 1;
@@ -3086,6 +3086,13 @@ char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote)
 			*ptr_buffer++ = '\\';
 
 		*ptr_buffer++ = *context++;
+	}
+
+	if ('\\' == *(ptr_buffer - 1))
+	{
+		*error = zbx_dsprintf(*error, "quoted context \"%s\" cannot end with '\\' character", start);
+		zbx_free(buffer);
+		return NULL;
 	}
 
 	*ptr_buffer++ = '"';
@@ -6117,3 +6124,149 @@ char	*zbx_substr(const char *src, size_t left, size_t right)
 
 	return str;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: utf8_chr_next                                                    *
+ *                                                                            *
+ * Purpose: return pointer to the next utf-8 character                        *
+ *                                                                            *
+ * Parameters: str  - [IN] the input string                                   *
+ *                                                                            *
+ * Return value: A pointer to the next utf-8 character.                       *
+ *                                                                            *
+ ******************************************************************************/
+static const char	*utf8_chr_next(const char *str)
+{
+	++str;
+
+	while (0x80 == (0xc0 & (unsigned char)*str))
+		str++;
+
+	return str;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: utf8_chr_prev                                                    *
+ *                                                                            *
+ * Purpose: return pointer to the previous utf-8 character                    *
+ *                                                                            *
+ * Parameters: str   - [IN] the input string                                  *
+ *             start - [IN] the start of the initial string                   *
+ *                                                                            *
+ * Return value: A pointer to the previous utf-8 character.                   *
+ *                                                                            *
+ ******************************************************************************/
+static char	*utf8_chr_prev(char *str, const char *start)
+{
+	do
+	{
+		if (--str < start)
+			return NULL;
+	}
+	while (0x80 == (0xc0 & (unsigned char)*str));
+
+	return str;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: strchr_utf8                                                      *
+ *                                                                            *
+ * Purpose: checks if string contains utf-8 character                         *
+ *                                                                            *
+ * Parameters: seq  - [IN] the input string                                   *
+ *             c    - [IN] the utf-8 character to look for                    *
+ *                                                                            *
+ * Return value: SUCCEED - the string contains the specified character        *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	strchr_utf8(const char *seq, const char *c)
+{
+	size_t	len, c_len;
+
+	if (0 == (c_len = zbx_utf8_char_len(c)))
+		return FAIL;
+
+	if (1 == c_len)
+		return (NULL == strchr(seq, *c) ? FAIL : SUCCEED);
+
+	/* check for broken utf-8 sequence in character */
+	if (c + c_len != utf8_chr_next(c))
+		return FAIL;
+
+	while ('\0' != *seq)
+	{
+		len = (size_t)(utf8_chr_next(seq) - seq);
+
+		if (len == c_len && 0 == memcmp(seq, c, len))
+			return SUCCEED;
+
+		seq += len;
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_ltrim_utf8                                                   *
+ *                                                                            *
+ * Purpose: trim the specified utf-8 characters from the left side of input   *
+ *          string                                                            *
+ *                                                                            *
+ * Parameters: str      - [IN] the input string                               *
+ *             charlist - [IN] the characters to trim                         *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_ltrim_utf8(char *str, const char *charlist)
+{
+	const char	*next;
+
+	for (next = str; '\0' != *next; next = utf8_chr_next(next))
+	{
+		if (SUCCEED != strchr_utf8(charlist, next))
+			break;
+	}
+
+	if (next != str)
+	{
+		size_t	len;
+
+		if (0 != (len = strlen(next)))
+			memmove(str, next, len);
+
+		str[len] = '\0';
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_rtrim_utf8                                                   *
+ *                                                                            *
+ * Purpose: trim the specified utf-8 characters from the right side of input  *
+ *          string                                                            *
+ *                                                                            *
+ * Parameters: str      - [IN] the input string                               *
+ *             charlist - [IN] the characters to trim                         *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_rtrim_utf8(char *str, const char *charlist)
+{
+	char	*prev, *last;
+
+	for (last = str + strlen(str), prev = last; NULL != prev; prev = utf8_chr_prev(prev, str))
+	{
+		if (SUCCEED != strchr_utf8(charlist, prev))
+			break;
+
+		if ((last = prev) <= str)
+			break;
+	}
+
+	*last = '\0';
+}
+
+

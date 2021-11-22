@@ -26,13 +26,6 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 
 		$this->data = self::convertDottedKeys($this->data);
 
-		// API doesn't guarantee fields to be retrieved in same order as stored.
-		foreach (['or', 'ds'] as $field) {
-			if (array_key_exists($field, $this->data)) {
-				ksort($this->data[$field]);
-			}
-		}
-
 		/**
 		 * Data set tab.
 		 *
@@ -449,7 +442,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		}
 		elseif ($period > $max_period) {
 			$errors[] = _n('Maximum time period to display is %1$s day.',
-				'Maximum time period to display is %1$s days.', (int) ($max_period / SEC_PER_DAY)
+				'Maximum time period to display is %1$s days.', (int) round($max_period / SEC_PER_DAY)
 			);
 		}
 

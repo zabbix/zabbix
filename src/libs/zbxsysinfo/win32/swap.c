@@ -152,34 +152,29 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (real_swap_avail > real_swap_total)
 		real_swap_avail = real_swap_total;
 
-	if (0 == real_swap_total && (NULL == mode || 0 != strcmp(mode, "total")))
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot be calculated because swap file size is 0."));
-		return SYSINFO_RET_FAIL;
+		SET_UI64_RESULT(result, real_swap_total);
+	}
+	else if (0 == strcmp(mode, "free"))
+	{
+		SET_UI64_RESULT(result, real_swap_avail);
+	}
+	else if (0 == strcmp(mode, "pfree"))
+	{
+		if (0 == real_swap_total)
+			SET_DBL_RESULT(result, 100.0);
+		else
+			SET_DBL_RESULT(result, (real_swap_avail / (double)real_swap_total) * 100.0);
+	}
+	else if (0 == strcmp(mode, "used"))
+	{
+		SET_UI64_RESULT(result, real_swap_total - real_swap_avail);
 	}
 	else
 	{
-		if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "free"))
-		{
-			SET_UI64_RESULT(result, real_swap_avail);
-		}
-		else if (0 == strcmp(mode, "total"))
-		{
-			SET_UI64_RESULT(result, real_swap_total);
-		}
-		else if (0 == strcmp(mode, "pfree"))
-		{
-			SET_DBL_RESULT(result, (real_swap_avail / (double)real_swap_total) * 100.0);
-		}
-		else if (0 == strcmp(mode, "used"))
-		{
-			SET_UI64_RESULT(result, real_swap_total - real_swap_avail);
-		}
-		else
-		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
-			return SYSINFO_RET_FAIL;
-		}
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		return SYSINFO_RET_FAIL;
 	}
 
 	return SYSINFO_RET_OK;

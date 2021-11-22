@@ -41,7 +41,9 @@ class CImportReferencer {
 	protected $images = [];
 	protected $maps = [];
 	protected $template_dashboards = [];
-	protected $macros = [];
+	protected $template_macros = [];
+	protected $host_macros = [];
+	protected $host_prototype_macros = [];
 	protected $proxies = [];
 	protected $host_prototypes = [];
 	protected $httptests = [];
@@ -58,7 +60,9 @@ class CImportReferencer {
 	protected $db_images;
 	protected $db_maps;
 	protected $db_template_dashboards;
-	protected $db_macros;
+	protected $db_template_macros;
+	protected $db_host_macros;
+	protected $db_host_prototype_macros;
 	protected $db_proxies;
 	protected $db_host_prototypes;
 	protected $db_httptests;
@@ -472,25 +476,60 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Get macro ID by host ID and macro name.
+	 * Get macro ID by template ID and macro name.
 	 *
-	 * @param string $hostid
-	 * @param string $name
+	 * @param string $templateid
+	 * @param string $macro
 	 *
 	 * @return string|null
 	 */
-	public function findMacroid(string $hostid, string $name): ?string {
-		if ($this->db_macros === null) {
-			$this->selectMacros();
+	public function findTemplateMacroid(string $templateid, string $macro): ?string {
+		if ($this->db_template_macros === null) {
+			$this->selectTemplateMacros();
 		}
 
-		foreach ($this->db_macros as $hostmacroid => $macro) {
-			if ($macro['hostid'] === $hostid && $macro['macro'] === $name) {
-				return $hostmacroid;
-			}
+		return (array_key_exists($templateid, $this->db_template_macros)
+				&& array_key_exists($macro, $this->db_template_macros[$templateid]))
+			? $this->db_template_macros[$templateid][$macro]
+			: null;
+	}
+
+	/**
+	 * Get macro ID by host ID and macro name.
+	 *
+	 * @param string $hostid
+	 * @param string $macro
+	 *
+	 * @return string|null
+	 */
+	public function findHostMacroid(string $hostid, string $macro): ?string {
+		if ($this->db_host_macros === null) {
+			$this->selectHostMacros();
 		}
 
-		return null;
+		return (array_key_exists($hostid, $this->db_host_macros)
+				&& array_key_exists($macro, $this->db_host_macros[$hostid]))
+			? $this->db_host_macros[$hostid][$macro]
+			: null;
+	}
+
+	/**
+	 * Get macro ID by host prototype ID and macro name.
+	 *
+	 * @param string $hostid
+	 * @param string $macro
+	 *
+	 * @return string|null
+	 */
+	public function findHostPrototypeMacroid(string $hostid, string $macro): ?string {
+		if ($this->db_host_prototype_macros === null) {
+			$this->selectHostPrototypeMacros();
+		}
+
+		return (array_key_exists($hostid, $this->db_host_prototype_macros)
+				&& array_key_exists($macro, $this->db_host_prototype_macros[$hostid]))
+			? $this->db_host_prototype_macros[$hostid][$macro]
+			: null;
 	}
 
 	/**
@@ -819,12 +858,30 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Add macros names that need association with a database macro ID.
+	 * Add user macro names that need association with a database macro ID.
 	 *
-	 * @param array $macros
+	 * @param array $macros[<template uuid>]  An array of macros by template UUID.
 	 */
-	public function addMacros(array $macros): void {
-		$this->macros = $macros;
+	public function addTemplateMacros(array $macros): void {
+		$this->template_macros = $macros;
+	}
+
+	/**
+	 * Add user macro names that need association with a database macro ID.
+	 *
+	 * @param array $macros[<host name>]  An array of macros by host technical name.
+	 */
+	public function addHostMacros(array $macros): void {
+		$this->host_macros = $macros;
+	}
+
+	/**
+	 * Add user macro names that need association with a database macro ID.
+	 *
+	 * @param array $macros[<host name>]  An array of macros by host technical name.
+	 */
+	public function addHostPrototypeMacros(array $macros): void {
+		$this->host_prototype_macros = $macros;
 	}
 
 	/**
@@ -1238,38 +1295,101 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Select macro ids for previously added macro names.
+	 * Select user macro ids for previously added macro names.
 	 */
-	protected function selectMacros(): void {
-		$this->db_macros = [];
-
-		if (!$this->macros) {
-			return;
-		}
+	protected function selectTemplateMacros(): void {
+		$this->db_template_macros = [];
 
 		$sql_where = [];
 
-		foreach ($this->macros as $host => $macros) {
-			$hostid = $this->findTemplateidOrHostidByHost($host);
-			if ($hostid) {
-				$sql_where[] = '(hm.hostid='.zbx_dbstr($hostid).' AND '
-					.dbConditionString('hm.macro', array_keys($macros)).')';
+		foreach ($this->template_macros as $uuid => $macros) {
+			$sql_where[] = '(h.uuid='.zbx_dbstr($uuid).' AND '.dbConditionString('hm.macro', $macros).')';
+		}
+
+		if ($sql_where) {
+			$db_macros = DBselect(
+				'SELECT hm.hostmacroid,hm.hostid,hm.macro'.
+				' FROM hostmacro hm'.
+					' JOIN hosts h on hm.hostid=h.hostid'.
+				' WHERE '.implode(' OR ', $sql_where)
+			);
+
+			while ($db_macro = DBfetch($db_macros)) {
+				$this->db_template_macros[$db_macro['hostid']][$db_macro['macro']] = $db_macro['hostmacroid'];
+			}
+		}
+
+		$this->template_macros = [];
+	}
+
+	/**
+	 * Select user macro ids for previously added macro names.
+	 */
+	protected function selectHostMacros(): void {
+		$this->db_host_macros = [];
+
+		$sql_where = [];
+
+		foreach ($this->host_macros as $host => $macros) {
+			$sql_where[] = '(h.host='.zbx_dbstr($host).' AND '.dbConditionString('hm.macro', $macros).')';
+		}
+
+		if ($sql_where) {
+			$db_macros = DBselect(
+				'SELECT hm.hostmacroid,hm.hostid,hm.macro'.
+				' FROM hostmacro hm'.
+					' JOIN hosts h on hm.hostid=h.hostid'.
+				' WHERE '.implode(' OR ', $sql_where)
+			);
+
+			while ($db_macro = DBfetch($db_macros)) {
+				$this->db_host_macros[$db_macro['hostid']][$db_macro['macro']] = $db_macro['hostmacroid'];
+			}
+		}
+
+		$this->host_macros = [];
+	}
+
+	/**
+	 * Select user macro ids for previously added macro names.
+	 */
+	protected function selectHostPrototypeMacros(): void {
+		$this->db_host_prototype_macros = [];
+
+		$sql_where = [];
+
+		foreach ($this->host_prototype_macros as $type => $hosts) {
+			foreach ($hosts as $host => $discovery_rules) {
+				foreach ($discovery_rules as $discovery_rule_key => $host_prototypes) {
+					foreach ($host_prototypes as $host_prototype_id => $macros) {
+						$sql_where[] = '('.
+							'h.host='.zbx_dbstr($host).
+							' AND dr.key_='.zbx_dbstr($discovery_rule_key).
+							' AND hp.'.($type === 'uuid' ? 'uuid' : 'host').'='.zbx_dbstr($host_prototype_id).
+							' AND '.dbConditionString('hm.macro', $macros).
+						')';
+					}
+				}
 			}
 		}
 
 		if ($sql_where) {
-			$db_macros = DBselect('SELECT hm.hostmacroid,hm.hostid,hm.macro FROM hostmacro hm'
-				.' WHERE '.implode(' OR ', $sql_where));
+			$db_macros = DBselect(
+				'SELECT hm.hostmacroid,hm.hostid,hm.macro'.
+				' FROM hostmacro hm'.
+					' JOIN hosts hp on hm.hostid=hp.hostid'.
+					' JOIN host_discovery hd on hp.hostid=hd.hostid'.
+					' JOIN items dr on hd.parent_itemid=dr.itemid'.
+					' JOIN hosts h on dr.hostid=h.hostid'.
+				' WHERE '.implode(' OR ', $sql_where)
+			);
 
 			while ($db_macro = DBfetch($db_macros)) {
-				$this->db_macros[$db_macro['hostmacroid']] = [
-					'hostid' => $db_macro['hostid'],
-					'macro' => $db_macro['macro']
-				];
+				$this->db_host_prototype_macros[$db_macro['hostid']][$db_macro['macro']] = $db_macro['hostmacroid'];
 			}
 		}
 
-		$this->macros = [];
+		$this->host_prototype_macros = [];
 	}
 
 	/**
@@ -1297,56 +1417,40 @@ class CImportReferencer {
 	protected function selectHostPrototypes(): void {
 		$this->db_host_prototypes = [];
 
-		if (!$this->host_prototypes) {
-			return;
-		}
-
 		$sql_where = [];
 
-		foreach ($this->host_prototypes as $host => $discovery_rule) {
-			$hostid = $this->findTemplateidOrHostidByHost($host);
-
-			if ($hostid === null) {
-				continue;
-			}
-
-			foreach ($discovery_rule as $discovery_rule_key => $host_prototypes) {
-				if (array_key_exists('uuid', $host_prototypes)) {
-					$discovery_ruleid = $this->findItemidByUuid($host_prototypes[0]['discovery_rule_uuid']);
-
-					if ($discovery_ruleid !== null) {
-						$sql_where[] = '(hd.parent_itemid='.zbx_dbstr($discovery_ruleid).' AND '
-							.dbConditionString('h.uuid', array_column($host_prototypes, 'uuid')).')';
-					}
-				}
-				else {
-					$discovery_ruleid = $this->findItemidByKey($hostid, $discovery_rule_key);
-
-					if ($discovery_ruleid !== null) {
-						$sql_where[] = '(hd.parent_itemid='.zbx_dbstr($discovery_ruleid).' AND '
-							.dbConditionString('h.host', array_keys($host_prototypes)).')';
-					}
+		foreach ($this->host_prototypes as $type => $hosts) {
+			foreach ($hosts as $host => $discovery_rules) {
+				foreach ($discovery_rules as $discovery_rule_id => $host_prototype_ids) {
+					$sql_where[] = '('.
+						'h.host='.zbx_dbstr($host).
+						' AND dr.'.($type === 'uuid' ? 'uuid' : 'key_').'='.zbx_dbstr($discovery_rule_id).
+						' AND '.dbConditionString('hp.'.($type === 'uuid' ? 'uuid' : 'host'), $host_prototype_ids).
+					')';
 				}
 			}
 		}
 
 		if ($sql_where) {
-			$query = DBselect(
-				'SELECT h.host,h.uuid,h.hostid,hd.parent_itemid,i.hostid AS parent_hostid '.
-				' FROM hosts h,host_discovery hd,items i'.
-				' WHERE h.hostid=hd.hostid'.
-					' AND hd.parent_itemid=i.itemid'.
-					' AND ('.implode(' OR ', $sql_where).')'
+			$db_host_prototypes = DBselect(
+				'SELECT hp.host,hp.uuid,hp.hostid,hd.parent_itemid,dr.hostid AS parent_hostid'.
+				' FROM hosts hp'.
+					' JOIN host_discovery hd ON hp.hostid=hd.hostid'.
+					' JOIN items dr ON hd.parent_itemid=dr.itemid'.
+					' JOIN hosts h on dr.hostid=h.hostid'.
+				' WHERE '.implode(' OR ', $sql_where)
 			);
-			while ($host_prototype = DBfetch($query)) {
-				$this->db_host_prototypes[$host_prototype['hostid']] = [
-					'uuid' => $host_prototype['uuid'],
-					'host' => $host_prototype['host'],
-					'parent_hostid' => $host_prototype['parent_hostid'],
-					'discovery_ruleid' => $host_prototype['parent_itemid']
+			while ($db_host_prototype = DBfetch($db_host_prototypes)) {
+				$this->db_host_prototypes[$db_host_prototype['hostid']] = [
+					'uuid' => $db_host_prototype['uuid'],
+					'host' => $db_host_prototype['host'],
+					'parent_hostid' => $db_host_prototype['parent_hostid'],
+					'discovery_ruleid' => $db_host_prototype['parent_itemid']
 				];
 			}
 		}
+
+		$this->host_prototypes = [];
 	}
 
 	/**

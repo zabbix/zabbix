@@ -94,7 +94,7 @@ class CDashboardWidgetPlaceholder extends CBaseComponent {
 				link.textContent = t('Add a new widget');
 				link.href = 'javascript:void(0)';
 
-				link.addEventListener('click', () => this.fire(WIDGET_PLACEHOLDER_EVENT_ADD_NEW_WIDGET));
+				this._target.addEventListener('click', () => this.fire(WIDGET_PLACEHOLDER_EVENT_ADD_NEW_WIDGET));
 
 				this._placeholder_box_label_wrap.appendChild(link);
 

@@ -65,9 +65,9 @@ class MysqlDbBackend extends DbBackend {
 			' WHERE schema_name='.zbx_dbstr($DB['DATABASE'])
 		));
 
-		if ($row && strtoupper($row['db_charset']) != ZBX_DB_DEFAULT_CHARSET) {
+		if ($row && !in_array(strtoupper($row['db_charset']), ZBX_DB_MYSQL_ALLOWED_CHARSETS)) {
 			$this->setWarning(_s('Incorrect default charset for Zabbix database: %1$s.',
-				_s('"%1$s" instead "%2$s"', $row['db_charset'], ZBX_DB_DEFAULT_CHARSET)
+				_s('"%1$s" instead "%2$s"', $row['db_charset'], implode(', ', ZBX_DB_MYSQL_ALLOWED_CHARSETS))
 			));
 			return false;
 		}
@@ -89,8 +89,8 @@ class MysqlDbBackend extends DbBackend {
 				' AND '.dbConditionString('table_name', array_keys(DB::getSchema())).
 				' AND '.dbConditionString('data_type', ['text', 'varchar', 'longtext']).
 				' AND ('.
-					' UPPER(character_set_name)!='.zbx_dbstr(ZBX_DB_DEFAULT_CHARSET).
-					' OR collation_name!='.zbx_dbstr(ZBX_DB_MYSQL_DEFAULT_COLLATION).
+					dbConditionString('UPPER(character_set_name)', ZBX_DB_MYSQL_ALLOWED_CHARSETS, true).
+					' OR '.dbConditionString('collation_name', ZBX_DB_MYSQL_ALLOWED_COLLATIONS, true).
 				')'
 		), 'table_name');
 
@@ -107,9 +107,9 @@ class MysqlDbBackend extends DbBackend {
 	}
 
 	/**
-	* Check if database is using IEEE754 compatible double precision columns.
-	*
-	* @return bool
+	 * Check if database is using IEEE754 compatible double precision columns.
+	 *
+	 * @return bool
 	*/
 	public function isDoubleIEEE754() {
 		global $DB;

@@ -2453,10 +2453,11 @@ class CDiscoveryRule extends CItemGeneral {
 
 		// fetch source items
 		$items = API::Item()->get([
-			'itemids' => $srcItemIds,
 			'output' => ['itemid', 'key_'],
-			'preservekeys' => true,
-			'filter' => ['flags' => null]
+			'webitems' => true,
+			'itemids' => $srcItemIds,
+			'filter' => ['flags' => null],
+			'preservekeys' => true
 		]);
 
 		$srcItems = [];
@@ -2468,12 +2469,13 @@ class CDiscoveryRule extends CItemGeneral {
 
 		// fetch newly cloned items
 		$newItems = API::Item()->get([
+			'output' => ['itemid', 'key_'],
+			'webitems' => true,
 			'hostids' => $dstDiscovery['hostid'],
 			'filter' => [
 				'key_' => $itemKeys,
 				'flags' => null
 			],
-			'output' => ['itemid', 'key_'],
 			'preservekeys' => true
 		]);
 
@@ -2534,6 +2536,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'selectGroupPrototypes' => ['name'],
 			'selectInterfaces' => ['type', 'useip', 'ip', 'dns', 'port', 'main', 'details'],
 			'selectTemplates' => ['templateid'],
+			'selectTags' => ['tag', 'value'],
 			'selectMacros' => ['macro', 'type', 'value', 'description'],
 			'preservekeys' => true
 		]);

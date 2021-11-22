@@ -394,7 +394,11 @@ class CToken extends CApiService {
 			return;
 		}
 
-		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['userid', 'name']]];
+		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['userid', 'name']], 'fields' => [
+			'userid' =>	['type' => API_ID],
+			'name' =>	['type' => API_STRING_UTF8]
+		]];
+
 		if (!CApiInputValidator::validateUniqueness($api_input_rules, $test_tokens, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}

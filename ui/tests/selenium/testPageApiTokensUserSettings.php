@@ -35,8 +35,6 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 	const DELETE_TOKEN = 'Future token for admin';
 
 	public static function prepareTokenData() {
-		CDataHelper::setSessionId(null);
-
 		self::$timestamp = time() + 172800;
 
 		$response = CDataHelper::call('token.create', [

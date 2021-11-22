@@ -241,10 +241,13 @@ class CHostPrototype extends CHostBase {
 				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('host_tag', 'value'), 'default' => DB::getDefault('host_tag', 'value')]
 			]],
 			'macros' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['macro']], 'fields' => [
-				'macro' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-				'value' =>				['type' => API_STRING_UTF8, 'flag' => API_REQUIRED | API_NOT_EMPTY],
-				'type' =>				['type' => API_INT32, 'flag' => API_REQUIRED, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT])],
-				'description' => 		['type' => API_STRING_UTF8]
+				'macro' =>			['type' => API_USER_MACRO, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hostmacro', 'macro')],
+				'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT]), 'default' => ZBX_MACRO_TYPE_TEXT],
+				'value' =>			['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
+										['if' => ['field' => 'type', 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')],
+										['if' => ['field' => 'type', 'in' => implode(',', [ZBX_MACRO_TYPE_VAULT])], 'type' => API_VAULT_SECRET, 'length' => DB::getFieldLength('hostmacro', 'value')]
+				]],
+				'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')]
 			]],
 			'inventory_mode' =>		['type' => API_INT32, 'in' => implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC])]
 		]];
@@ -364,9 +367,7 @@ class CHostPrototype extends CHostBase {
 		}
 		unset($host_prototype);
 
-		$host_prototypes = $this->createReal($host_prototypes);
-		$this->createInterfaces($host_prototypes);
-		$this->createMacros(array_column($host_prototypes, 'macros', 'hostid'));
+		$this->createReal($host_prototypes);
 		$this->inherit($host_prototypes);
 
 		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_PROTOTYPE, $host_prototypes);
@@ -378,10 +379,8 @@ class CHostPrototype extends CHostBase {
 	 * Creates the host prototypes and inherits them to linked hosts and templates.
 	 *
 	 * @param array $hostPrototypes
-	 *
-	 * @return array	an array of host prototypes with host IDs
 	 */
-	protected function createReal(array $hostPrototypes) {
+	protected function createReal(array &$hostPrototypes) {
 		foreach ($hostPrototypes as &$hostPrototype) {
 			$hostPrototype['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
 		}
@@ -457,7 +456,8 @@ class CHostPrototype extends CHostBase {
 			}
 		}
 
-		return $hostPrototypes;
+		$this->createInterfaces($hostPrototypes);
+		$this->createHostMacros($hostPrototypes);
 	}
 
 	/**
@@ -514,12 +514,12 @@ class CHostPrototype extends CHostBase {
 				'tag' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('host_tag', 'tag')],
 				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('host_tag', 'value'), 'default' => DB::getDefault('host_tag', 'value')]
 			]],
-			'macros' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['macro']], 'fields' => [
+			'macros'  =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['hostmacroid']], 'fields' => [
 				'hostmacroid' =>		['type' => API_ID],
-				'macro' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-				'value' =>				['type' => API_STRING_UTF8],
+				'macro' =>				['type' => API_USER_MACRO, 'length' => DB::getFieldLength('hostmacro', 'macro')],
 				'type' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT])],
-				'description' => 		['type' => API_STRING_UTF8]
+				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')],
+				'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')]
 			]],
 			'inventory_mode' =>		['type' => API_INT32, 'in' => implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC])]
 		]];
@@ -534,22 +534,24 @@ class CHostPrototype extends CHostBase {
 			'selectGroupLinks' => ['group_prototypeid', 'groupid'],
 			'selectGroupPrototypes' => ['group_prototypeid', 'name'],
 			'selectInterfaces' => ['type', 'useip', 'ip', 'dns', 'port', 'main', 'details'],
-			'hostids' => zbx_objectValues($host_prototypes, 'hostid'),
+			'hostids' => array_column($host_prototypes, 'hostid'),
 			'editable' => true,
 			'preservekeys' => true
 		]);
+
+		if (count($host_prototypes) != count($db_host_prototypes)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		if (array_column($host_prototypes, 'macros')) {
+			$db_host_prototypes = $this->getHostMacros($db_host_prototypes);
+			$host_prototypes = $this->validateHostMacros($host_prototypes, $db_host_prototypes);
+		}
 
 		$hosts_by_ruleid = [];
 		$names_by_ruleid = [];
 
 		foreach ($host_prototypes as &$host_prototype) {
-			// Check if this host prototype exists.
-			if (!array_key_exists($host_prototype['hostid'], $db_host_prototypes)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-
 			$db_host_prototype = $db_host_prototypes[$host_prototype['hostid']];
 			$host_prototype['ruleid'] = $db_host_prototype['discoveryRule']['itemid'];
 
@@ -563,7 +565,12 @@ class CHostPrototype extends CHostBase {
 		}
 		unset($host_prototype);
 
-		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['ruleid', 'host'], ['ruleid', 'name']]];
+		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['ruleid', 'host'], ['ruleid', 'name']], 'fields' => [
+			'ruleid' =>	['type' => API_ID],
+			'host' =>	['type' => API_H_NAME],
+			'name' =>	['type' => API_STRING_UTF8]
+		]];
+
 		if (!CApiInputValidator::validateUniqueness($api_input_rules, $host_prototypes, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
@@ -659,11 +666,7 @@ class CHostPrototype extends CHostBase {
 		}
 		unset($host_prototype);
 
-		$macros = array_column($host_prototypes, 'macros', 'hostid');
-
-		if ($macros) {
-			$this->updateMacros($macros);
-		}
+		$this->updateHostMacros($host_prototypes, $db_host_prototypes);
 
 		$host_prototypes = $this->updateReal($host_prototypes);
 		$this->updateInterfaces($host_prototypes);
@@ -807,13 +810,11 @@ class CHostPrototype extends CHostBase {
 		}
 
 		// save the new host prototypes
-		if (!zbx_empty($insertHostPrototypes)) {
-			$insertHostPrototypes = $this->createReal($insertHostPrototypes);
-			$this->createInterfaces($insertHostPrototypes);
-			$this->createMacros(array_column($insertHostPrototypes, 'macros', 'hostid'));
+		if ($insertHostPrototypes) {
+			$this->createReal($insertHostPrototypes);
 		}
 
-		if (!zbx_empty($updateHostPrototypes)) {
+		if ($updateHostPrototypes) {
 			$updateHostPrototypes = $this->updateReal($updateHostPrototypes);
 			$this->updateInterfaces($updateHostPrototypes);
 			$macros = array_column($updateHostPrototypes, 'macros', 'hostid');
@@ -847,26 +848,31 @@ class CHostPrototype extends CHostBase {
 
 
 	/**
-	 * Prepares and returns an array of child host prototypes, inherited from host prototypes $hostPrototypes
+	 * Prepares and returns an array of child host prototypes, inherited from host prototypes $host_prototypes
 	 * on the given hosts.
 	 *
 	 * Each host prototype must have the "ruleid" parameter set.
 	 *
-	 * @param array     $hostPrototypes
+	 * @param array     $host_prototypes
 	 * @param array		$hostIds
 	 *
 	 * @return array 	an array of unsaved child host prototypes
 	 */
-	protected function prepareInheritedObjects(array $hostPrototypes, array $hostIds = null) {
+	protected function prepareInheritedObjects(array $host_prototypes, array $hostIds = null) {
 		// Fetch the related discovery rules with their hosts.
 		$discoveryRules = API::DiscoveryRule()->get([
 			'output' => ['itemid', 'hostid'],
 			'selectHosts' => ['hostid'],
-			'itemids' => zbx_objectValues($hostPrototypes, 'ruleid'),
+			'itemids' => array_column($host_prototypes, 'ruleid'),
 			'templated' => true,
 			'nopermissions' => true,
 			'preservekeys' => true
 		]);
+
+		// Remove host prototypes which don't belong to templates, so they cannot be inherited.
+		$host_prototypes = array_filter($host_prototypes, function ($host_prototype) use ($discoveryRules) {
+			return array_key_exists($host_prototype['ruleid'], $discoveryRules);
+		});
 
 		// Fetch all child hosts to inherit to. Do not inherit host prototypes on discovered hosts.
 		$chdHosts = API::Host()->get([
@@ -926,7 +932,7 @@ class CHostPrototype extends CHostBase {
 			// skip items not from parent templates of current host
 			$templateIds = zbx_toHash($host['parentTemplates'], 'templateid');
 			$parentHostPrototypes = [];
-			foreach ($hostPrototypes as $inum => $parentHostPrototype) {
+			foreach ($host_prototypes as $inum => $parentHostPrototype) {
 				$parentTemplateId = $discoveryRules[$parentHostPrototype['ruleid']]['hostid'];
 
 				if (isset($templateIds[$parentTemplateId])) {
@@ -977,6 +983,13 @@ class CHostPrototype extends CHostBase {
 				$newHostPrototype['uuid'] = '';
 				$newHostPrototype['ruleid'] = $discoveryRuleChildren[$parentHostPrototype['ruleid']][$hostId];
 				$newHostPrototype['templateid'] = $parentHostPrototype['hostid'];
+
+				if (array_key_exists('macros', $newHostPrototype)) {
+					foreach ($newHostPrototype['macros'] as &$hostmacro) {
+						unset($hostmacro['hostmacroid']);
+					}
+					unset($hostmacro);
+				}
 
 				// update an existing inherited host prototype
 				if ($exHostPrototype) {
@@ -1055,12 +1068,13 @@ class CHostPrototype extends CHostBase {
 			'output' => API_OUTPUT_EXTEND,
 			'selectGroupLinks' => API_OUTPUT_EXTEND,
 			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
-			'selectMacros' => ['macro', 'type', 'value', 'description'],
 			'selectTags' => ['tag', 'value'],
 			'selectTemplates' => ['templateid'],
 			'selectDiscoveryRule' => ['itemid'],
 			'selectInterfaces' => ['main', 'type', 'useip', 'ip', 'dns', 'port', 'details']
 		]);
+
+		$hostPrototypes = $this->getHostMacros($hostPrototypes);
 
 		foreach ($hostPrototypes as &$hostPrototype) {
 			// merge group links into group prototypes
@@ -1496,19 +1510,6 @@ class CHostPrototype extends CHostBase {
 			}
 		}
 
-		// adding macros
-		if ($options['selectMacros'] !== null && $options['selectMacros'] != API_OUTPUT_COUNT) {
-			$macros = API::UserMacro()->get([
-				'output' => $this->outputExtend($options['selectMacros'], ['hostid', 'hostmacroid']),
-				'hostids' => $hostPrototypeIds,
-				'preservekeys' => true
-			]);
-
-			$relationMap = $this->createRelationMap($macros, 'hostid', 'hostmacroid');
-			$macros = $this->unsetExtraFields($macros, ['hostid', 'hostmacroid'], $options['selectMacros']);
-			$result = $relationMap->mapMany($result, $macros, 'macros');
-		}
-
 		// adding tags
 		if ($options['selectTags'] !== null && $options['selectTags'] !== API_OUTPUT_COUNT) {
 			$tags = API::getApiService()->select('host_tag', [
@@ -1581,73 +1582,57 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * Create host prototype macro with prototype id as key and macros array.
-	 *
-	 * @param array $host_prototype_macro  Array of host prototype macros.
-	 */
-	protected function createMacros(array $host_prototype_macros) {
-		$create = [];
-
-		foreach ($host_prototype_macros as $host_prototypeid => $macros) {
-			foreach ($macros as $macro) {
-				$create[] = ['hostid' => $host_prototypeid] + $macro;
-			}
-		}
-
-		if ($create) {
-			API::UserMacro()->create($create);
-		}
-	}
-
-	/**
 	 * Update host prototype macros, key is host prototype id and value is array of arrays with macro objects.
 	 *
-	 * @param array $macros     Array with macros objects.
+	 * @param array $update_macros  Array with macros objects.
 	 */
-	protected function updateMacros(array $update_macros) {
-		$create = [];
-		$update = [];
-		$db_macros = API::UserMacro()->get([
+	protected function updateMacros(array $update_macros): void {
+		$ins_hostmacros = [];
+		$upd_hostmacros = [];
+
+		$db_hostmacros = DB::select('hostmacro', [
 			'output' => ['hostid', 'macro', 'type', 'value', 'description'],
-			'hostids' => array_keys($update_macros),
+			'filter' => ['hostid' => array_keys($update_macros)],
 			'preservekeys' => true
 		]);
-		$host_macros = array_fill_keys(array_column($db_macros, 'hostid'), []);
+		$host_macros = array_fill_keys(array_keys($update_macros), []);
 
-		foreach ($db_macros as $hostmacroid => $db_macro) {
-			$host_macros[$db_macro['hostid']][$db_macro['macro']] = $hostmacroid;
+		foreach ($db_hostmacros as $hostmacroid => $db_hostmacro) {
+			$host_macros[$db_hostmacro['hostid']][$db_hostmacro['macro']] = $hostmacroid;
 		}
 
-		foreach ($update_macros as $hostid => $macros) {
-			foreach ($macros as $macro) {
-				if (array_key_exists($hostid, $host_macros)
-						&& array_key_exists($macro['macro'], $host_macros[$hostid])) {
-					$hostmacroid = $host_macros[$hostid][$macro['macro']];
-					$diff = array_diff($macro, $db_macros[$hostmacroid]);
-					unset($diff['hostid'], $diff['hostmacroid']);
+		foreach ($update_macros as $hostid => $hostmacros) {
+			foreach ($hostmacros as $hostmacro) {
+				if (array_key_exists($hostmacro['macro'], $host_macros[$hostid])) {
+					$hostmacroid = $host_macros[$hostid][$hostmacro['macro']];
 
-					if ($diff) {
-						$update[] = ['hostmacroid' => $hostmacroid] + $diff;
+					$upd_hostmacro = DB::getUpdatedValues('hostmacro', $hostmacro, $db_hostmacro);
+
+					if ($upd_hostmacro) {
+						$upd_hostmacros[] = [
+							'values' => $upd_hostmacro,
+							'where' => ['hostmacroid' => $hostmacroid]
+						];
 					}
 
-					unset($db_macros[$hostmacroid], $host_macros[$hostid][$macro['macro']]);
+					unset($db_hostmacros[$hostmacroid], $host_macros[$hostid][$hostmacro['macro']]);
 				}
 				else {
-					$create[] = ['hostid' => $hostid] + $macro;
+					$ins_hostmacros[] = ['hostid' => $hostid] + $hostmacro;
 				}
 			}
 		}
 
-		if ($create) {
-			API::UserMacro()->create($create);
+		if ($db_hostmacros) {
+			DB::delete('hostmacro', ['hostmacroid' => array_keys($db_hostmacros)]);
 		}
 
-		if ($update) {
-			API::UserMacro()->update($update);
+		if ($upd_hostmacros) {
+			DB::update('hostmacro', $upd_hostmacros);
 		}
 
-		if ($db_macros) {
-			API::UserMacro()->delete(array_keys($db_macros));
+		if ($ins_hostmacros) {
+			DB::insert('hostmacro', $ins_hostmacros);
 		}
 	}
 

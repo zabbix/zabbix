@@ -65,7 +65,7 @@ func (c *pdhCollector) open(numCpus int, numGroups int) {
 	}
 	// add CPU load counter
 	path := pdh.CounterPath(pdh.ObjectSystem, pdh.CounterProcessorQueue)
-	if c.hCpuLoad, err = win32.PdhAddCounter(c.hQuery, path, 0); err != nil {
+	if c.hCpuLoad, err = win32.PdhAddEnglishCounter(c.hQuery, path, 0); err != nil {
 		c.log.Errf("cannot add performance counter for CPU load statistics: %s", err)
 	}
 
@@ -81,7 +81,7 @@ func (c *pdhCollector) open(numCpus int, numGroups int) {
 	if err != nil {
 		c.log.Errf("cannot make counter path for total CPU utilization: %s", err)
 	}
-	c.hCpuUtil[0], err = win32.PdhAddCounter(c.hQuery, path, 0)
+	c.hCpuUtil[0], err = win32.PdhAddEnglishCounter(c.hQuery, path, 0)
 	if err != nil {
 		c.log.Errf("cannot add performance counter for total CPU utilization: %s", err)
 	}
@@ -104,7 +104,7 @@ func (c *pdhCollector) open(numCpus int, numGroups int) {
 			if err != nil {
 				c.log.Errf("cannot make counter path for CPU#%s utilization: %s", cpe.InstanceName, err)
 			}
-			c.hCpuUtil[index], err = win32.PdhAddCounter(c.hQuery, path, 0)
+			c.hCpuUtil[index], err = win32.PdhAddEnglishCounter(c.hQuery, path, 0)
 			if err != nil {
 				c.log.Errf("cannot add performance counter for CPU#%s utilization: %s", cpe.InstanceName, err)
 			}

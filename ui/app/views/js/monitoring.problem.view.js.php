@@ -29,7 +29,6 @@ if (array_key_exists('filter_options', $data)) { ?>
 		var options = <?= json_encode($data['filter_options']) ?>,
 			filter = new CTabFilter($('#monitoring_problem_filter')[0], options),
 			refresh_interval = <?= $data['refresh_interval'] ?>,
-			refresh_url = '<?= $data['refresh_url'] ?>',
 			refresh_timer,
 			filter_item,
 			filter_counter_fetch,
@@ -38,6 +37,10 @@ if (array_key_exists('filter_options', $data)) { ?>
 				from: options.timeselector.from,
 				to: options.timeselector.to
 			};
+
+		const url = new Curl('zabbix.php', false);
+		url.setArgument('action', 'problem.view.refresh');
+		const refresh_url = url.getUrl();
 
 		/**
 		 * Update on filter changes.
@@ -205,11 +208,7 @@ if (array_key_exists('filter_options', $data)) { ?>
 		$(document).on('submit', '#problem_form', function(e) {
 			e.preventDefault();
 
-			var eventids = $('[id^="eventids_"]:checked', $(this)).map(function() {
-					return $(this).val();
-				}).get();
-
-			acknowledgePopUp({eventids: eventids}, this);
+			acknowledgePopUp({eventids: chkbxRange.selectedIds}, this);
 		});
 	});
 </script>

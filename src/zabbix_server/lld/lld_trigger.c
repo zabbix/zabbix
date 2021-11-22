@@ -1193,7 +1193,7 @@ static int	lld_function_make(const zbx_lld_function_t *function_proto, zbx_vecto
 		zbx_uint64_t itemid, const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macros,
 		char **error)
 {
-	int			i, ret;
+	int			i, ret, function_found = 0;
 	zbx_lld_function_t	*function = NULL;
 	char			*proto_parameter = NULL;
 
@@ -1205,13 +1205,16 @@ static int	lld_function_make(const zbx_lld_function_t *function_proto, zbx_vecto
 			continue;
 
 		if (function->index == function_proto->index)
+		{
+			function_found = 1;
 			break;
+		}
 	}
 
 	if (FAIL == (ret = lld_parameter_make(function_proto->parameter, &proto_parameter, jp_row, lld_macros, error)))
 		goto clean;
 
-	if (i == functions->values_num)
+	if (0 == function_found)
 	{
 		function = (zbx_lld_function_t *)zbx_malloc(NULL, sizeof(zbx_lld_function_t));
 
@@ -1726,6 +1729,8 @@ static void 	lld_trigger_dependency_make(const zbx_lld_trigger_prototype_t *trig
 				}
 				else
 				{
+					int	dependency_found = 0;
+
 					for (j = 0; j < trigger->dependencies.values_num; j++)
 					{
 						dependency = (zbx_lld_dependency_t *)trigger->dependencies.values[j];
@@ -1734,10 +1739,13 @@ static void 	lld_trigger_dependency_make(const zbx_lld_trigger_prototype_t *trig
 							continue;
 
 						if (dependency->triggerid_up == dep_trigger->triggerid)
+						{
+							dependency_found = 1;
 							break;
+						}
 					}
 
-					if (j == trigger->dependencies.values_num)
+					if (0 == dependency_found)
 					{
 						dependency = (zbx_lld_dependency_t *)zbx_malloc(NULL, sizeof(zbx_lld_dependency_t));
 
@@ -2738,8 +2746,6 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 
 	for (i = 0; i < triggers->values_num; i++)
 	{
-		char	*description_esc, *expression_esc, *comments_esc, *url_esc, *value_esc, *opdata_esc,
-			*event_name_esc;
 		int	index;
 
 		trigger = (zbx_lld_trigger_t *)triggers->values[i];
@@ -2779,9 +2785,9 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 				/* further updates will fail, so there is unnecessary overhead, */
 				/* but lld_expression_create() can fail only because of bugs,   */
 				/* so better to leave unoptimized handling of 'impossible'      */
-				/* errors than unnecessary complicate cod                       */
-				DBrollback();
+				/* errors than unnecessary complicate code                      */
 				ret = FAIL;
+				goto cleanup;
 			}
 		}
 
@@ -2789,8 +2795,8 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 		{
 			if (FAIL == lld_expression_create(trigger, &trigger->recovery_expression, &trigger->functions))
 			{
-				DBrollback();
 				ret = FAIL;
+				goto cleanup;
 			}
 		}
 
@@ -2812,6 +2818,8 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 		else if (0 != (trigger->flags & ZBX_FLAG_LLD_TRIGGER_UPDATE))
 		{
 			const char	*d = "";
+			char		*description_esc, *expression_esc, *comments_esc, *url_esc, *value_esc,
+					*opdata_esc, *event_name_esc;
 
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update triggers set ");
 
@@ -3078,39 +3086,47 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 	{
 		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 		DBexecute("%s", sql);
-		zbx_free(sql);
 	}
+cleanup:
+	zbx_free(sql);
 
 	if (0 != new_triggers)
 	{
-		zbx_db_insert_execute(&db_insert);
+		if (ret == SUCCEED)
+			zbx_db_insert_execute(&db_insert);
 		zbx_db_insert_clean(&db_insert);
 
-		zbx_db_insert_execute(&db_insert_tdiscovery);
+		if (ret == SUCCEED)
+			zbx_db_insert_execute(&db_insert_tdiscovery);
 		zbx_db_insert_clean(&db_insert_tdiscovery);
 	}
 
 	if (0 != new_functions)
 	{
-		zbx_db_insert_execute(&db_insert_tfunctions);
+		if (ret == SUCCEED)
+			zbx_db_insert_execute(&db_insert_tfunctions);
 		zbx_db_insert_clean(&db_insert_tfunctions);
 	}
 
 	if (0 != new_dependencies)
 	{
-		zbx_db_insert_execute(&db_insert_tdepends);
+		if (ret == SUCCEED)
+			zbx_db_insert_execute(&db_insert_tdepends);
 		zbx_db_insert_clean(&db_insert_tdepends);
 	}
 
 	if (0 != new_tags)
 	{
-		zbx_db_insert_execute(&db_insert_ttags);
+		if (ret == SUCCEED)
+			zbx_db_insert_execute(&db_insert_ttags);
 		zbx_db_insert_clean(&db_insert_ttags);
 	}
 
-	DBcommit();
+	if (ret == SUCCEED)
+		DBcommit();
+	else
+		DBrollback();
 out:
-
 	zbx_vector_uint64_destroy(&trigger_protoids);
 	zbx_vector_uint64_destroy(&del_triggertagids);
 	zbx_vector_uint64_destroy(&del_triggerdepids);
@@ -3234,7 +3250,7 @@ static void	lld_trigger_cache_add_trigger_node(zbx_hashset_t *cache, zbx_lld_tri
 	trigger_node_local.trigger_ref.triggerid = trigger->triggerid;
 	trigger_node_local.trigger_ref.trigger = trigger;
 
-	if (NULL != (trigger_node = (zbx_lld_trigger_node_t *)zbx_hashset_search(cache, &trigger_node_local)))
+	if (NULL != zbx_hashset_search(cache, &trigger_node_local))
 		return;
 
 	trigger_node = lld_trigger_cache_append(cache, trigger->triggerid, trigger);

@@ -338,15 +338,10 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 		])
 		: [];
 
-	$actions = getEventsActionsIconsData($events, $triggers, $r_events);
+	$actions = getEventsActionsIconsData($events, $triggers);
 	$users = API::User()->get([
 		'output' => ['username', 'name', 'surname'],
 		'userids' => array_keys($actions['userids']),
-		'preservekeys' => true
-	]);
-	$mediatypes = API::Mediatype()->get([
-		'output' => ['name', 'maxattempts'],
-		'mediatypeids' => array_keys($actions['mediatypeids']),
 		'preservekeys' => true
 	]);
 
@@ -412,7 +407,7 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 			zbx_date2age($event['clock']),
 			$duration,
 			$problem_update_link,
-			makeEventActionsIcons($event['eventid'], $actions['data'], $mediatypes, $users)
+			makeEventActionsIcons($event['eventid'], $actions['data'], $users)
 		]);
 	}
 

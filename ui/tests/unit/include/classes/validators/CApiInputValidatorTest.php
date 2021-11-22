@@ -2177,6 +2177,12 @@ class CApiInputValidatorTest extends TestCase {
 				'{$MACRO: "context"}'
 			],
 			[
+				['type' => API_USER_MACRO],
+				'',
+				'/1/macro',
+				'Invalid parameter "/1/macro": cannot be empty.'
+			],
+			[
 				['type' => API_USER_MACRO, 'length' => 18],
 				'{$MACRO: "context"}',
 				'/1/macro',
@@ -2186,19 +2192,19 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_USER_MACRO],
 				'{$MACRo}',
 				'/1/macro',
-				'Invalid parameter "/1/macro": a user macro is expected.'
+				'Invalid parameter "/1/macro": incorrect syntax near "o}".'
 			],
 			[
 				['type' => API_USER_MACRO],
 				'{$MACRO} ',
 				'/1/macro',
-				'Invalid parameter "/1/macro": a user macro is expected.'
+				'Invalid parameter "/1/macro": incorrect syntax near " ".'
 			],
 			[
 				['type' => API_USER_MACRO],
 				'{$MACRO: "context"',
 				'/1/macro',
-				'Invalid parameter "/1/macro": a user macro is expected.'
+				'Invalid parameter "/1/macro": unexpected end of macro.'
 			],
 			[
 				['type' => API_USER_MACRO],
@@ -2406,7 +2412,25 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_REGEX],
 				'@^[a-z$',
 				'/1/expression',
-				'@^[a-z$'
+				'Invalid parameter "/1/expression": invalid regular expression.'
+			],
+			[
+				['type' => API_REGEX],
+				'@[a-z',
+				'/1/expression',
+				'Invalid parameter "/1/expression": invalid regular expression.'
+			],
+			[
+				['type' => API_REGEX],
+				'@[a-z]',
+				'/1/expression',
+				'@[a-z]'
+			],
+			[
+				['type' => API_REGEX, 'flags' => API_ALLOW_GLOBAL_REGEX],
+				'invalid [(regexp])',
+				'/1/expression',
+				'Invalid parameter "/1/expression": invalid regular expression.'
 			],
 			[
 				['type' => API_REGEX],
@@ -2419,6 +2443,18 @@ class CApiInputValidatorTest extends TestCase {
 				'/test/i',
 				'/1/expression',
 				'/test/i'
+			],
+			[
+				['type' => API_REGEX, 'flags' => API_ALLOW_GLOBAL_REGEX],
+				'@valid global regexp name [(regexp])',
+				'/1/expression',
+				'@valid global regexp name [(regexp])'
+			],
+			[
+				['type' => API_REGEX, 'flags' => API_ALLOW_GLOBAL_REGEX],
+				'/valid regexp',
+				'/1/expression',
+				'/valid regexp'
 			],
 			[
 				['type' => API_VARIABLE_NAME, 'length' => 6],
@@ -4071,6 +4107,61 @@ class CApiInputValidatorTest extends TestCase {
 				'1E-5',
 				'/1/numeric',
 				'Invalid parameter "/1/numeric": a number has too many fractional digits.'
+			],
+			[
+				['type' => API_VAULT_SECRET, 'length' => 18],
+				'path/to/secret:key',
+				'/1/secret',
+				'path/to/secret:key'
+			],
+			[
+				['type' => API_VAULT_SECRET, 'length' => 27],
+				'mount%2Fpoint/to/secret:key',
+				'/1/secret',
+				'mount%2Fpoint/to/secret:key'
+			],
+			[
+				['type' => API_VAULT_SECRET, 'length' => 17],
+				'path/to/secret:key',
+				'/1/secret',
+				'Invalid parameter "/1/secret": value is too long.'
+			],
+			[
+				['type' => API_VAULT_SECRET],
+				'/pathtosecret:key',
+				'/1/secret',
+				'Invalid parameter "/1/secret": incorrect syntax near "/pathtosecret:key".'
+			],
+			[
+				['type' => API_VAULT_SECRET],
+				'',
+				'/1/secret',
+				'Invalid parameter "/1/secret": cannot be empty.'
+			],
+			[
+				['type' => API_VAULT_SECRET],
+				true,
+				'/1/secret',
+				'Invalid parameter "/1/secret": a character string is expected.'
+			],
+			[
+				['type' => API_VAULT_SECRET],
+				[],
+				'/1/secret',
+				'Invalid parameter "/1/secret": a character string is expected.'
+			],
+			[
+				['type' => API_VAULT_SECRET],
+				null,
+				'/1/secret',
+				'Invalid parameter "/1/secret": a character string is expected.'
+			],
+			[
+				['type' => API_VAULT_SECRET],
+				// broken UTF-8 byte sequence
+				'{$MACRO: '."\xd1".'ontext}',
+				'/1/secret',
+				'Invalid parameter "/1/secret": invalid byte sequence in UTF-8.'
 			]
 		];
 	}
@@ -4162,7 +4253,11 @@ class CApiInputValidatorTest extends TestCase {
 				'Invalid parameter "/5": value (dashboardid) already exists.'
 			],
 			[
-				['type' => API_OBJECTS, 'uniq' => [['applicationid'], ['hostid', 'name']]],
+				['type' => API_OBJECTS, 'uniq' => [['applicationid'], ['hostid', 'name']], 'fields' => [
+					'applicationid'	=> ['type' => API_ID],
+					'hostid'		=> ['type' => API_ID],
+					'name'			=> ['type' => API_STRING_UTF8]
+				]],
 				[
 					['applicationid' => 1, 'hostid' => 1, 'name' => 'app1'],
 					['applicationid' => 2, 'hostid' => 1, 'name' => 'app2'],
@@ -4190,7 +4285,11 @@ class CApiInputValidatorTest extends TestCase {
 				''
 			],
 			[
-				['type' => API_OBJECTS, 'uniq' => [['applicationid'], ['hostid', 'name']]],
+				['type' => API_OBJECTS, 'uniq' => [['applicationid'], ['hostid', 'name']], 'fields' => [
+					'applicationid'	=> ['type' => API_ID],
+					'hostid'		=> ['type' => API_ID],
+					'name'			=> ['type' => API_STRING_UTF8]
+				]],
 				[
 					['applicationid' => 1, 'hostid' => 1, 'name' => 'app1'],
 					['applicationid' => 2, 'hostid' => 1, 'name' => 'app2'],
@@ -4219,7 +4318,11 @@ class CApiInputValidatorTest extends TestCase {
 				'Invalid parameter "/21": value (hostid, name)=(1, app1) already exists.'
 			],
 			[
-				['type' => API_OBJECTS, 'uniq' => [['applicationid'], ['hostid', 'name']]],
+				['type' => API_OBJECTS, 'uniq' => [['applicationid'], ['hostid', 'name']], 'fields' => [
+					'applicationid'	=> ['type' => API_ID],
+					'hostid'		=> ['type' => API_ID],
+					'name'			=> ['type' => API_STRING_UTF8]
+				]],
 				[
 					['applicationid' => 1, 'hostid' => 1, 'name' => 'app1'],
 					['applicationid' => 2, 'hostid' => 1, 'name' => 'app2'],
@@ -4247,7 +4350,9 @@ class CApiInputValidatorTest extends TestCase {
 				'Invalid parameter "/20": value (applicationid)=(1) already exists.'
 			],
 			[
-				['type' => API_OBJECTS, 'uniq' => [['name']]],
+				['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
+					'name'	=> ['type' => API_STRING_UTF8]
+				]],
 				[
 					['name' => 'app1'],
 					['name' => 'app2'],
@@ -4279,7 +4384,10 @@ class CApiInputValidatorTest extends TestCase {
 				'Invalid parameter "/24": value (name)=(app1) already exists.'
 			],
 			[
-				['type' => API_OBJECTS, 'uniq' => [['hostid', 'name']]],
+				['type' => API_OBJECTS, 'uniq' => [['hostid', 'name']], 'fields' => [
+					'hostid'	=> ['type' => API_ID],
+					'name'		=> ['type' => API_STRING_UTF8]
+				]],
 				[
 					['hostid' => 1, 'name' => 'app1'],
 					['hostid' => 1, 'name' => 'app2'],
@@ -4305,6 +4413,24 @@ class CApiInputValidatorTest extends TestCase {
 				'/',
 				false,
 				'Invalid parameter "/20": value (hostid, name)=(1, app1) already exists.'
+			],
+			[
+				['type' => API_OBJECTS, 'uniq' => [['hostid', 'macro']], 'fields' => [
+					'hostid'	=> ['type' => API_ID],
+					'macro'		=> ['type' => API_USER_MACRO]
+				]],
+				[
+					['hostid' => 1, 'macro' => '{$MACRO: context}'],
+					['hostid' => 1, 'macro' => '{$MACRO}'],
+					['hostid' => 2, 'macro' => '{$MACRO}'],
+					['hostid' => 2, 'macro' => '{$MACRO: context}'],
+					['hostid' => 1, 'macro' => '{$MACRO: "context2"}'],
+					['hostid' => 1, 'macro' => '{$MACRO:regex: context}'],
+					['hostid' => 1, 'macro' => '{$MACRO: "context"}']
+				],
+				'/',
+				false,
+				'Invalid parameter "/7": value (hostid, macro)=(1, {$MACRO: "context"}) already exists.'
 			],
 			[
 				['type' => API_OBJECT, 'fields' => [

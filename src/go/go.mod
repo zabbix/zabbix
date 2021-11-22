@@ -1,6 +1,6 @@
 module zabbix.com
 
-go 1.13
+go 1.16
 
 require (
 	github.com/BurntSushi/locker v0.0.0-20171006230638-a6e239ea1c69
@@ -17,7 +17,7 @@ require (
 	github.com/godbus/dbus v4.1.0+incompatible
 	github.com/godror/godror v0.20.1
 	github.com/jackc/pgx/v4 v4.8.2-0.20200910143026-040df1ccef85
-	github.com/mattn/go-sqlite3 v2.0.3+incompatible
+	github.com/mattn/go-sqlite3 v1.14.8
 	github.com/mediocregopher/radix/v3 v3.5.0
 	github.com/memcachier/mc/v3 v3.0.1
 	github.com/natefinch/npipe v0.0.0-20160621034901-c1b8fa8bdcce

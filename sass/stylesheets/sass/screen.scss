@@ -3340,7 +3340,7 @@ $form-icon-btn: (
 		}
 	}
 
-	.multilineinput-symbols-remaining {
+	.multilineinput-char-count {
 		color: $font-alt-color;
 		float: left;
 		line-height: 24px;
@@ -5526,6 +5526,34 @@ svg {
 		height: 18px;
 		background-image: url($sprite-path);
 		background-repeat: no-repeat;
+	}
+}
+
+button {
+	&.icon-action-command,
+	&.icon-action-close,
+	&.icon-action-msg,
+	&.icon-action-msgs,
+	&.icon-action-severity-up,
+	&.icon-action-severity-down,
+	&.icon-action-severity-changed,
+	&.icon-action-message,
+	&.icon-action-ack,
+	&.icon-problem-generated,
+	&.icon-problem-recovery,
+	&.icon-actions-number-gray,
+	&.icon-actions-number-yellow,
+	&.icon-actions-number-red {
+		background: none;
+		border: none;
+		padding: 0px;
+		margin: 0px;
+		margin-right: 5px;
+		min-height: 0px;
+		&::after {
+			left: 0px;
+			top: 4px;
+		}
 	}
 }
 

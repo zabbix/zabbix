@@ -30,57 +30,59 @@ import (
 )
 
 var testSets = []testSet{
-	{"testKernel01",
+	{
+		"testKernel01_empty",
 		[]testCase{
-			{1, "test_name", "kernel.maxfiles", []string{}, true, uint64(18446744073709551615), reflect.Uint64},
-			{2, "test_name", "kernel.maxproc", []string{}, true, uint64(18446744073709551615), reflect.Uint64},
+			{1, "maxfiles", "kernel.maxfiles", []string{}, true, uint64(18446744073709551615), reflect.Uint64},
+			{2, "maxproc", "kernel.maxproc", []string{}, true, uint64(18446744073709551615), reflect.Uint64},
+			{3, "openfiles", "kernel.openfiles", []string{}, true, uint64(18446744073709551615), reflect.Uint64},
 		},
 		"",
 		"",
 	}, {
-		"testKernel02",
+		"testKernel02_file-max",
 		[]testCase{
-			{1, "test_name", "kernel.maxfiles", []string{}, false, uint64(18446744073709551615), reflect.Uint64},
-			{2, "test_name", "kernel.maxfiles", []string{""}, true, uint64(18446744073709551615), reflect.Uint64},
-			{3, "test_name", "kernel.maxfiles", []string{"param"}, true, uint64(18446744073709551615), reflect.Uint64},
-			{4, "test_name", "wrong.key", []string{}, true, uint64(18446744073709551615), reflect.Uint64},
+			{1, "maxfiles_no_params", "kernel.maxfiles", []string{}, false, uint64(18446744073709551615), reflect.Uint64},
+			{2, "maxfiles_empty_pram_value", "kernel.maxfiles", []string{""}, true, uint64(18446744073709551615), reflect.Uint64},
+			{3, "maxfiles_with_params", "kernel.maxfiles", []string{"param"}, true, uint64(18446744073709551615), reflect.Uint64},
+			{4, "wrong_key", "wrong.key", []string{}, true, uint64(18446744073709551615), reflect.Uint64},
 		},
 		"/proc/sys/fs/file-max",
 		"18446744073709551615\n",
 	}, {
-		"testKernel03",
+		"testKernel03_pid_max",
 		[]testCase{
-			{1, "test_name", "kernel.maxproc", []string{}, false, uint64(18446744073709551615), reflect.Uint64},
-			{2, "test_name", "kernel.maxproc", []string{""}, true, uint64(18446744073709551615), reflect.Uint64},
-			{3, "test_name", "kernel.maxproc", []string{"param"}, true, uint64(18446744073709551615), reflect.Uint64},
+			{1, "maxproc_no_params", "kernel.maxproc", []string{}, false, uint64(18446744073709551615), reflect.Uint64},
+			{2, "maxproc_empty_pram_value", "kernel.maxproc", []string{""}, true, uint64(18446744073709551615), reflect.Uint64},
+			{3, "maxproc_with_params", "kernel.maxproc", []string{"param"}, true, uint64(18446744073709551615), reflect.Uint64},
 		},
 		"/proc/sys/kernel/pid_max",
 		"18446744073709551615\n",
 	}, {
-		"testKernel04",
+		"testKernel04_pid_max_no_new_line",
 		[]testCase{
-			{1, "test_name", "kernel.maxproc", []string{}, false, uint64(18446744073709551615), reflect.Uint64},
+			{1, "maxproc_no_params", "kernel.maxproc", []string{}, false, uint64(18446744073709551615), reflect.Uint64},
 		},
 		"/proc/sys/kernel/pid_max",
 		"18446744073709551615",
 	}, {
-		"testKernel05",
+		"testKernel05_file-max_no_new_line",
 		[]testCase{
-			{1, "test_name", "kernel.maxfiles", []string{}, true, uint64(18446744073709551615), reflect.Uint64},
+			{1, "maxfiles_no_params", "kernel.maxfiles", []string{}, true, uint64(18446744073709551615), reflect.Uint64},
 		},
 		"/proc/sys/fs/file-max",
 		"18446744073709551616",
 	}, {
-		"testKernel06",
+		"testKernel06_pid_max_short_file",
 		[]testCase{
-			{1, "test_name", "kernel.maxproc", []string{}, true, uint64(18446744073709551615), reflect.Uint64},
+			{1, "maxproc_no_params", "kernel.maxproc", []string{}, true, uint64(18446744073709551615), reflect.Uint64},
 		},
 		"/proc/sys/kernel/pid_max",
 		"abc123",
 	}, {
-		"testKernel07",
+		"testKernel07_file-max_empty_file",
 		[]testCase{
-			{1, "test_name", "kernel.maxfiles", []string{}, true, uint64(18446744073709551615), reflect.Uint64},
+			{1, "maxfiles_no_params", "kernel.maxfiles", []string{}, true, uint64(18446744073709551615), reflect.Uint64},
 		},
 		"/proc/sys/fs/file-max",
 		"",

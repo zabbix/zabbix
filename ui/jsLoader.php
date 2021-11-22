@@ -20,31 +20,12 @@
 
 
 // get language translations
-require_once dirname(__FILE__).'/include/gettextwrapper.inc.php';
-require_once dirname(__FILE__).'/include/js.inc.php';
 require_once dirname(__FILE__).'/include/locales.inc.php';
-require_once dirname(__FILE__).'/include/translateDefines.inc.php';
+require_once dirname(__FILE__).'/include/gettextwrapper.inc.php';
 
-// if we must provide language constants on language different from English
-if (isset($_GET['lang'])) {
-	if (function_exists('bindtextdomain')) {
-		// initializing gettext translations depending on language selected by user
-		$locales = zbx_locale_variants($_GET['lang']);
-		foreach ($locales as $locale) {
-			putenv('LC_ALL='.$locale);
-			putenv('LANG='.$locale);
-			putenv('LANGUAGE='.$locale);
-			if (setlocale(LC_ALL, $locale)) {
-				break;
-			}
-		}
-		bindtextdomain('frontend', 'locale');
-		bind_textdomain_codeset('frontend', 'UTF-8');
-		textdomain('frontend');
-	}
-	// numeric Locale to default
-	setlocale(LC_NUMERIC, ['C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252', 'en_GB', 'en_GB.UTF-8']);
-}
+setupLocale(array_key_exists('lang', $_GET) ? (string) $_GET['lang'] : 'en_GB');
+
+require_once dirname(__FILE__).'/include/js.inc.php';
 
 // available scripts 'scriptFileName' => 'path relative to js/'
 $availableJScripts = [
@@ -304,7 +285,8 @@ $tranStrings = [
 		'S_CLOSE' => _('Close')
 	],
 	'multilineinput.js' => [
-		'S_N_SYMBOLS_REMAINING' => _('%1$s symbols remaining'),
+		'S_N_CHAR_COUNT' => _('%1$s characters'),
+		'S_N_CHAR_COUNT_REMAINING' => _('%1$s characters remaining'),
 		'S_CLICK_TO_VIEW_OR_EDIT' => _('Click to view or edit'),
 		'S_APPLY' => _('Apply'),
 		'S_CANCEL' => _('Cancel')
@@ -334,6 +316,7 @@ $tranStrings = [
 		'Create trigger' => _('Create trigger'),
 		'Create dependent item' => _('Create dependent item'),
 		'Create dependent discovery rule' => _('Create dependent discovery rule'),
+		'Dashboards' => _('Dashboards'),
 		'Delete' => _('Delete'),
 		'Delete dashboard?' => _('Delete dashboard?'),
 		'Do you wish to replace the conditional expression?' => _('Do you wish to replace the conditional expression?'),

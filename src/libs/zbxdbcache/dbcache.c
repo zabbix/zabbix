@@ -1997,7 +1997,7 @@ static void	normalize_item_value(const DC_ITEM *item, ZBX_DC_HISTORY *hdata)
  * Comments: Will generate internal events when item state switches.          *
  *                                                                            *
  ******************************************************************************/
-static zbx_item_diff_t	*calculate_item_update(const DC_ITEM *item, const ZBX_DC_HISTORY *h)
+static zbx_item_diff_t	*calculate_item_update(DC_ITEM *item, const ZBX_DC_HISTORY *h)
 {
 	zbx_uint64_t	flags = 0;
 	const char	*item_error = NULL;
@@ -2065,7 +2065,10 @@ static zbx_item_diff_t	*calculate_item_update(const DC_ITEM *item, const ZBX_DC_
 		diff->mtime = h->mtime;
 
 	if (0 != (ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE & flags))
+	{
 		diff->state = h->state;
+		item->state = h->state;
+	}
 
 	if (0 != (ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR & flags))
 		diff->error = item_error;
@@ -2565,7 +2568,7 @@ static void	DBmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
  *                                                                            *
  ******************************************************************************/
 static void	DCmass_prepare_history(ZBX_DC_HISTORY *history, const zbx_vector_uint64_t *itemids,
-		const DC_ITEM *items, const int *errcodes, int history_num, zbx_vector_ptr_t *item_diff,
+		DC_ITEM *items, const int *errcodes, int history_num, zbx_vector_ptr_t *item_diff,
 		zbx_vector_ptr_t *inventory_values, int compression_age, zbx_vector_uint64_pair_t *proxy_subscribtions)
 {
 	static time_t	last_history_discard = 0;
@@ -2579,7 +2582,7 @@ static void	DCmass_prepare_history(ZBX_DC_HISTORY *history, const zbx_vector_uin
 	for (i = 0; i < history_num; i++)
 	{
 		ZBX_DC_HISTORY	*h = &history[i];
-		const DC_ITEM	*item;
+		DC_ITEM		*item;
 		zbx_item_diff_t	*diff;
 		int		index;
 
@@ -2649,6 +2652,7 @@ static void	DCmass_prepare_history(ZBX_DC_HISTORY *history, const zbx_vector_uin
 
 		normalize_item_value(item, h);
 
+		/* calculate item update and update already retrieved item status for trigger calculation */
 		if (NULL != (diff = calculate_item_update(item, h)))
 			zbx_vector_ptr_append(item_diff, diff);
 
@@ -2989,7 +2993,6 @@ static void	sync_proxy_history(int *total_num, int *more)
 
 		zbx_vector_ptr_clear(&history_items);
 		zbx_vector_ptr_clear_ext(&item_diff, zbx_default_mem_free_func);
-		zbx_vector_ptr_destroy(&item_diff);
 
 		/* Exit from sync loop if we have spent too much time here */
 		/* unless we are doing full sync. This is done to allow    */
@@ -2997,6 +3000,7 @@ static void	sync_proxy_history(int *total_num, int *more)
 	}
 	while (ZBX_SYNC_MORE == *more && ZBX_HC_SYNC_TIME_MAX >= time(NULL) - sync_start);
 
+	zbx_vector_ptr_destroy(&item_diff);
 	zbx_vector_ptr_destroy(&history_items);
 }
 
@@ -3269,6 +3273,10 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 		{
 			if (0 != history_num)
 			{
+				const ZBX_DC_HISTORY	*phistory = NULL;
+				const ZBX_DC_TREND	*ptrends = NULL;
+				int			history_num_loc = 0, trends_num_loc = 0;
+
 				DCmodule_prepare_history(history, history_num, history_float, &history_float_num,
 						history_integer, &history_integer_num, history_string,
 						&history_string_num, history_text, &history_text_num, history_log,
@@ -3277,13 +3285,6 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 				DCmodule_sync_history(history_float_num, history_integer_num, history_string_num,
 						history_text_num, history_log_num, history_float, history_integer,
 						history_string, history_text, history_log);
-			}
-
-			if (0 != history_num)
-			{
-				const ZBX_DC_HISTORY	*phistory = NULL;
-				const ZBX_DC_TREND	*ptrends = NULL;
-				int			history_num_loc = 0, trends_num_loc = 0;
 
 				if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_HISTORY))
 				{

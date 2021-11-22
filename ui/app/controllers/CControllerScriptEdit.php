@@ -156,6 +156,10 @@ class CControllerScriptEdit extends CController {
 				$data['menu_path'] = $script['menu_path'];
 				$data['parameters'] = $script['parameters'];
 				$data['actions'] = $script['actions'];
+
+				if ($data['type'] == ZBX_SCRIPT_TYPE_WEBHOOK) {
+					CArrayHelper::sort($data['parameters'], ['name']);
+				}
 			}
 		}
 

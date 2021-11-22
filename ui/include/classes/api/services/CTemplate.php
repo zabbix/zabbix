@@ -326,8 +326,6 @@ class CTemplate extends CHostGeneral {
 	 * @return array
 	 */
 	public function create(array $templates) {
-		$templates = zbx_toArray($templates);
-
 		$this->validateCreate($templates);
 
 		$ins_templates = [];
@@ -345,7 +343,6 @@ class CTemplate extends CHostGeneral {
 
 		$hosts_groups = [];
 		$hosts_tags = [];
-		$hosts_macros = [];
 		$templates_hostids = [];
 		$hostids = [];
 
@@ -364,12 +361,6 @@ class CTemplate extends CHostGeneral {
 			if (array_key_exists('tags', $template)) {
 				foreach (zbx_toArray($template['tags']) as $tag) {
 					$hosts_tags[] = ['hostid' => $template['templateid']] + $tag;
-				}
-			}
-
-			if (array_key_exists('macros', $template)) {
-				foreach (zbx_toArray($template['macros']) as $macro) {
-					$hosts_macros[] = ['hostid' => $template['templateid']] + $macro;
 				}
 			}
 
@@ -394,9 +385,7 @@ class CTemplate extends CHostGeneral {
 			DB::insert('host_tag', $hosts_tags);
 		}
 
-		if ($hosts_macros) {
-			API::UserMacro()->create($hosts_macros);
-		}
+		$this->createHostMacros($templates);
 
 		if ($hostids) {
 			$this->checkHostPermissions(array_keys($hostids));
@@ -431,9 +420,21 @@ class CTemplate extends CHostGeneral {
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateCreate(array &$templates) {
+		$templates = zbx_toArray($templates);
+
+		$macro_rules = ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['macro']], 'fields' => [
+			'macro' =>			['type' => API_USER_MACRO, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hostmacro', 'macro')],
+			'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT]), 'default' => ZBX_MACRO_TYPE_TEXT],
+			'value' =>			['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
+									['if' => ['field' => 'type', 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')],
+									['if' => ['field' => 'type', 'in' => implode(',', [ZBX_MACRO_TYPE_VAULT])], 'type' => API_VAULT_SECRET, 'length' => DB::getFieldLength('hostmacro', 'value')]
+			]],
+			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')]
+		]];
+
 		$groupIds = [];
 
-		foreach ($templates as &$template) {
+		foreach ($templates as $index => &$template) {
 			// check if hosts have at least 1 group
 			if (!isset($template['groups']) || !$template['groups']) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -453,6 +454,13 @@ class CTemplate extends CHostGeneral {
 				}
 
 				$groupIds[$group['groupid']] = $group['groupid'];
+			}
+
+			if (array_key_exists('macros', $template)) {
+				if (!CApiInputValidator::validate($macro_rules, $template['macros'], '/'.($index + 1).'/macros',
+						$error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
 			}
 		}
 		unset($template);
@@ -590,23 +598,14 @@ class CTemplate extends CHostGeneral {
 	 * @return array
 	 */
 	public function update(array $templates) {
-		$templates = zbx_toArray($templates);
+		$this->validateUpdate($templates, $db_templates);
 
-		$this->validateUpdate($templates);
+		$this->updateHostMacros($templates, $db_templates);
 
-		$macros = [];
 		foreach ($templates as &$template) {
-			if (isset($template['macros'])) {
-				$macros[$template['templateid']] = zbx_toArray($template['macros']);
-
-				unset($template['macros']);
-			}
+			unset($template['macros']);
 		}
 		unset($template);
-
-		if ($macros) {
-			API::UserMacro()->replaceMacros($macros);
-		}
 
 		foreach ($templates as $template) {
 			// if visible name is not given or empty it should be set to host name
@@ -628,7 +627,7 @@ class CTemplate extends CHostGeneral {
 
 		$this->updateTags(array_column($templates, 'tags', 'templateid'));
 
-		return ['templateids' => zbx_objectValues($templates, 'templateid')];
+		return ['templateids' => array_column($templates, 'templateid')];
 	}
 
 	/**
@@ -638,16 +637,26 @@ class CTemplate extends CHostGeneral {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateUpdate(array $templates) {
-		$dbTemplates = $this->get([
+	protected function validateUpdate(array &$templates, array &$db_templates = null) {
+		$templates = zbx_toArray($templates);
+
+		$macro_rules = ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['hostmacroid']], 'fields' => [
+			'hostmacroid' =>	['type' => API_ID],
+			'macro' =>			['type' => API_USER_MACRO, 'length' => DB::getFieldLength('hostmacro', 'macro')],
+			'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT])],
+			'value' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')],
+			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')]
+		]];
+
+		$db_templates = $this->get([
 			'output' => ['templateid'],
 			'templateids' => zbx_objectValues($templates, 'templateid'),
 			'editable' => true,
 			'preservekeys' => true
 		]);
 
-		foreach ($templates as $index => $template) {
-			if (!isset($dbTemplates[$template['templateid']])) {
+		foreach ($templates as $index => &$template) {
+			if (!array_key_exists($template['templateid'], $db_templates)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 			}
 
@@ -666,6 +675,19 @@ class CTemplate extends CHostGeneral {
 			if (array_key_exists('tags', $template)) {
 				$this->validateTags($template);
 			}
+
+			if (array_key_exists('macros', $template)) {
+				if (!CApiInputValidator::validate($macro_rules, $template['macros'], '/'.($index + 1).'/macros',
+						$error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+			}
+		}
+		unset($template);
+
+		if (array_column($templates, 'macros')) {
+			$db_templates = $this->getHostMacros($db_templates);
+			$templates = $this->validateHostMacros($templates, $db_templates);
 		}
 	}
 

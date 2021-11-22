@@ -377,7 +377,7 @@ class CTemplateImporter extends CImporter {
 			// If we update template, existing macros should have hostmacroid.
 			if (array_key_exists('macros', $template)) {
 				foreach ($template['macros'] as &$macro) {
-					$hostmacroid = $this->referencer->findMacroid($templateid, $macro['macro']);
+					$hostmacroid = $this->referencer->findTemplateMacroid($templateid, $macro['macro']);
 
 					if ($hostmacroid !== null) {
 						$macro['hostmacroid'] = $hostmacroid;

@@ -92,13 +92,12 @@ class testFormTagsWeb extends testFormTags {
 	 *
 	 * @dataProvider getTagsInheritanceData
 	 */
-//	TODO: uncomment after fix ZBX-19547
-//	public function testFormTagsWeb_InheritedHostTags($data) {
-//		$hostid = CDataHelper::get('EntitiesTags.hostids.'.$this->host);
-//		$this->link = 'httpconf.php?filter_set=1&filter_hostids[0]='.$hostid.'&context=host';
-//		$this->saved_link = 'httpconf.php?form=update&hostid='.$hostid.'&context=host&httptestid=';
-//		$this->checkInheritedTags($data, 'web scenario', 'Host');
-//	}
+	public function testFormTagsWeb_InheritedHostTags($data) {
+		$hostid = CDataHelper::get('EntitiesTags.hostids.'.$this->host);
+		$this->link = 'httpconf.php?filter_set=1&filter_hostids[0]='.$hostid.'&context=host';
+		$this->saved_link = 'httpconf.php?form=update&hostid='.$hostid.'&context=host&httptestid=';
+		$this->checkInheritedTags($data, 'web scenario', 'Host');
+	}
 
 	/**
 	 * Test tags inheritance from template.

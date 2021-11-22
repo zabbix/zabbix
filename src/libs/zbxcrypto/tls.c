@@ -1668,7 +1668,7 @@ static int	zbx_x509_dn_gets(const gnutls_x509_dn_t dn, char *buf, size_t size, c
 {
 #define ZBX_AVA_BUF_SIZE	20	/* hopefully no more than 20 RDNs */
 
-	int			res, i = 0, i_max, ava_dyn_size;
+	int			res, i_max = 0, i = 0, ava_dyn_size = 0;
 	char			*p, *p_end;
 	gnutls_x509_ava_st	*ava, *ava_dyn = NULL;
 	char			oid_str[128];		/* size equal to MAX_OID_SIZE, internally defined in GnuTLS */

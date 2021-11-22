@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-11T15:20:13Z'
+  date: '2021-07-22T14:29:02Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -64,7 +64,7 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.4.0
           key: zyxel.ies6000.contact
           delay: 1h
-          history: 2w
+          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -89,7 +89,7 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.6.0
           key: zyxel.ies6000.location
           delay: 1h
-          history: 2w
+          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -113,7 +113,7 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.2.2.1.6.1
           key: zyxel.ies6000.mac
           delay: 1h
-          history: 2w
+          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -140,7 +140,7 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.1.0
           key: zyxel.ies6000.model
           delay: 1h
-          history: 2w
+          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -175,7 +175,7 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.5.0
           key: zyxel.ies6000.name
           delay: 1h
-          history: 2w
+          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -285,6 +285,7 @@ zabbix_export:
                       outArr.push(item)
                   });
                   return JSON.stringify(outArr);
+                  
         -
           uuid: 1aace4fa8bdc49d28d8785aeadcdc8d4
           name: 'CPU discovery'
@@ -347,6 +348,7 @@ zabbix_export:
                       outArr.push(item)
                   });
                   return JSON.stringify(outArr);
+                  
         -
           uuid: abd64129536e4b43b5718adde7979c18
           name: 'Fan discovery'
@@ -453,6 +455,7 @@ zabbix_export:
                       outArr.push(item)
                   });
                   return JSON.stringify(outArr);
+                  
         -
           uuid: cc124fe17126405f82fd61f248fe1abe
           name: 'ADSL interface discovery'
@@ -1034,15 +1037,17 @@ zabbix_export:
                       outArr.push(item)
                   });
                   return JSON.stringify(outArr);
+                  
           overrides:
             -
-              name: 'Trigger disabled'
+              name: 'Don''t create triggers for matching interface'
               step: '1'
               filter:
                 conditions:
                   -
                     macro: '{#ZYXEL.IF.NAME}'
-                    value: '.*'
+                    value: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
+                    operator: NOT_MATCHES_REGEX
                     formulaid: A
               operations:
                 -
@@ -1051,22 +1056,6 @@ zabbix_export:
                   value: '.*'
                   status: ENABLED
                   discover: NO_DISCOVER
-            -
-              name: 'Trigger enabled'
-              step: '2'
-              filter:
-                conditions:
-                  -
-                    macro: '{#ZYXEL.IF.NAME}'
-                    value: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
-                    formulaid: A
-              operations:
-                -
-                  operationobject: TRIGGER_PROTOTYPE
-                  operator: REGEXP
-                  value: '.*'
-                  status: ENABLED
-                  discover: DISCOVER
         -
           uuid: 8f9073a53cee4e6fb8c36feda5185900
           name: 'Ethernet interface discovery'
@@ -1266,6 +1255,7 @@ zabbix_export:
               type: CALCULATED
               key: 'zyxel.ies6000.net.if.in.util[{#SNMPINDEX}]'
               history: 7d
+              value_type: FLOAT
               units: '%'
               params: 'last(//zyxel.ies6000.net.if.in.traffic[{#SNMPINDEX}]) * (last(//zyxel.ies6000.net.if.highspeed[{#SNMPINDEX}]) <> 0) /( last(//zyxel.ies6000.net.if.highspeed[{#SNMPINDEX}]) + (last(//zyxel.ies6000.net.if.highspeed[{#SNMPINDEX}]) = 0) ) * 100'
               description: 'Interface utilization percentage'
@@ -1276,6 +1266,12 @@ zabbix_export:
                     - '0'
                     - '100'
                   error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      return +parseFloat(value).toFixed(0);
+                      
               tags:
                 -
                   tag: Application
@@ -1327,7 +1323,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: a9aac7e6c66a4a69a77f8c165f9a9d5c
-                  expression: 'last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.net.if.operstatus[{#SNMPINDEX}],#2)'
+                  expression: 'last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.net.if.operstatus[{#SNMPINDEX}])=2 and (last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.net.if.operstatus[{#SNMPINDEX}],#2))=1'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.net.if.operstatus[{#SNMPINDEX}])<>2'
                   name: 'ZYXEL IES-6000: Port {#SNMPINDEX}: Link down'
@@ -1442,6 +1438,7 @@ zabbix_export:
               type: CALCULATED
               key: 'zyxel.ies6000.net.if.out.util[{#SNMPINDEX}]'
               history: 7d
+              value_type: FLOAT
               units: '%'
               params: 'last(//zyxel.ies6000.net.if.out.traffic[{#SNMPINDEX}]) * (last(//zyxel.ies6000.net.if.highspeed[{#SNMPINDEX}]) <> 0) /( last(//zyxel.ies6000.net.if.highspeed[{#SNMPINDEX}]) + (last(//zyxel.ies6000.net.if.highspeed[{#SNMPINDEX}]) = 0) ) * 100'
               description: 'Interface utilization percentage'
@@ -1452,6 +1449,12 @@ zabbix_export:
                     - '0'
                     - '100'
                   error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      return +parseFloat(value).toFixed(0);
+                      
               tags:
                 -
                   tag: Application
@@ -1530,13 +1533,14 @@ zabbix_export:
                     key: 'zyxel.ies6000.net.if.in.util[{#SNMPINDEX}]'
           overrides:
             -
-              name: 'Trigger disabled'
+              name: 'Don''t create triggers for matching interface'
               step: '1'
               filter:
                 conditions:
                   -
                     macro: '{#ZYXEL.IF.NAME}'
-                    value: '.*'
+                    value: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
+                    operator: NOT_MATCHES_REGEX
                     formulaid: A
               operations:
                 -
@@ -1545,22 +1549,6 @@ zabbix_export:
                   value: '.*'
                   status: ENABLED
                   discover: NO_DISCOVER
-            -
-              name: 'Trigger enabled'
-              step: '2'
-              filter:
-                conditions:
-                  -
-                    macro: '{#ZYXEL.IF.NAME}'
-                    value: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
-                    formulaid: A
-              operations:
-                -
-                  operationobject: TRIGGER_PROTOTYPE
-                  operator: REGEXP
-                  value: '.*'
-                  status: ENABLED
-                  discover: DISCOVER
         -
           uuid: 10a176c3da924a95939cd35c0d0be862
           name: 'Slot discovery'
@@ -1577,7 +1565,7 @@ zabbix_export:
                 formulaid: A
               -
                 macro: '{#ZYXEL.SLOTSTATUS}'
-                value: '{$ZYXEL.LLD.FILTER..SLOT.STATUS.NOT_MATCHES}'
+                value: '{$ZYXEL.LLD.FILTER.SLOT.STATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           description: 'The table which contains the slot information in a chassis.'
@@ -1645,6 +1633,7 @@ zabbix_export:
                           if (base2[base2.length - 1 - i] === '1') outArray.push(valueArray[i]);
                       }
                       return outArray.join();
+                      
               tags:
                 -
                   tag: Application
@@ -1997,6 +1986,7 @@ zabbix_export:
                       outArr.push(item);
                   });
                   return JSON.stringify(outArr);
+                  
         -
           uuid: 86ee5ab94e9a49dca526ce6e3d9c95fa
           name: 'Voltage discovery'
@@ -2065,6 +2055,7 @@ zabbix_export:
                       outArr.push(item)
                   });
                   return JSON.stringify(outArr);
+                  
       macros:
         -
           macro: '{$SNMP.TIMEOUT}'
@@ -2079,12 +2070,12 @@ zabbix_export:
           value: '8'
           description: 'Type the minimum signal to noise margin (0-31 dB)'
         -
-          macro: '{$ZYXEL.LLD.FILTER..SLOT.STATUS.NOT_MATCHES}'
+          macro: '{$ZYXEL.LLD.FILTER.SLOT.STATUS.NOT_MATCHES}'
           value: '1'
           description: 'Filter to exclude discovered slots by status.'
         -
           macro: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
-          value: 'NEED TRIGGERS'
+          value: 'CHANGE_IF_NEEDED'
           description: 'Triggers will be created only for interfaces whose description contains the value of this macro'
         -
           macro: '{$ZYXEL.LLD.FILTER.IF.DESC.MATCHES}'

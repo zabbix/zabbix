@@ -693,6 +693,7 @@ void	DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids);
 void	DCconfig_unlock_all_triggers(void);
 void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
 		const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs, int itemids_num);
+int	DCconfig_trigger_exists(zbx_uint64_t triggerid);
 void	DCfree_triggers(zbx_vector_ptr_t *triggers);
 void	DCconfig_update_interface_snmp_stats(zbx_uint64_t interfaceid, int max_snmp_succeed, int min_snmp_fail);
 int	DCconfig_get_suggested_snmp_vars(zbx_uint64_t interfaceid, int *bulk);
@@ -811,6 +812,7 @@ unsigned int	DCget_internal_action_count(void);
 #define ZBX_DISCOVERY_GROUPID_UNDEFINED	0
 void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags);
 void	zbx_config_clean(zbx_config_t *cfg);
+void	zbx_config_get_hk_mode(unsigned char *history_mode, unsigned char *trends_mode);
 
 int	DCset_interfaces_availability(zbx_vector_availability_ptr_t *availabilities);
 
@@ -973,6 +975,8 @@ void	zbx_dc_maintenance_set_update_flags(void);
 void	zbx_dc_maintenance_reset_update_flag(int timer);
 int	zbx_dc_maintenance_check_update_flag(int timer);
 int	zbx_dc_maintenance_check_update_flags(void);
+
+int	zbx_dc_maintenance_has_tags(void);
 
 typedef struct
 {

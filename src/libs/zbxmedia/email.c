@@ -75,7 +75,7 @@ static void	str_base64_encode_rfc2047(const char *src, char **p_base64)
 		/* So, one "encoded-word" can hold up to 63 characters of Base64-encoded string. */
 		/* Encoding 45 bytes produces a 61 byte long Base64-encoded string which meets the limit. */
 		/* Encoding 46 bytes produces a 65 byte long Base64-encoded string which exceeds the limit. */
-		for (p1 = p0, c_len = 0; '\0' != *p1; p1 += c_len)
+		for (p1 = p0; '\0' != *p1; p1 += c_len)
 		{
 			/* an invalid UTF-8 character or length of a string more than 45 bytes */
 			if (0 == (c_len = zbx_utf8_char_len(p1)) || 45 < p1 - p0 + c_len)
@@ -374,7 +374,7 @@ static char	*smtp_prepare_payload(zbx_vector_ptr_t *from_mails, zbx_vector_ptr_t
 	else
 	{
 		zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset,
-				"Content-Type: %s\r\n"
+				"Content-Type: %s; charset=\"UTF-8\"\r\n"
 				"Content-Transfer-Encoding: base64\r\n",
 				ZBX_MEDIA_CONTENT_TYPE_HTML == content_type ? "text/html" : "text/plain");
 	}
@@ -873,7 +873,7 @@ char	*zbx_email_make_body(const char *message, unsigned char content_type,  cons
 
 	zbx_snprintf_alloc(&body, &body_alloc, &body_offset,
 			"--" ZBX_MULTIPART_MIXED_BOUNDARY "\r\n"
-			"Content-Type: %s\r\n"
+			"Content-Type: %s; charset=\"UTF-8\"\r\n"
 			"Content-Transfer-Encoding: base64\r\n"
 			"\r\n"
 			"%s\r\n"

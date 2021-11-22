@@ -296,11 +296,6 @@ function getSystemStatusData(array $filter) {
 				'output' => ['username', 'name', 'surname'],
 				'userids' => array_keys($actions['userids']),
 				'preservekeys' => true
-			]),
-			'mediatypes' => API::MediaType()->get([
-				'output' => ['name', 'maxattempts'],
-				'mediatypeids' => array_keys($actions['mediatypeids']),
-				'preservekeys' => true
 			])
 		];
 
@@ -628,11 +623,15 @@ function make_status_of_zbx() {
 				if ($dbversion->flag != DB_VERSION_SUPPORTED) {
 					switch ($dbversion->flag) {
 						case DB_VERSION_LOWER_THAN_MINIMUM:
-							$error = _s('Minimum required database version is %1$s.', $dbversion->min_version);
+							$error = _s('Minimum required %1$s database version is %2$s.', $dbversion->database,
+								$dbversion->min_version
+							);
 							break;
 
 						case DB_VERSION_HIGHER_THAN_MAXIMUM:
-							$error = _s('Maximum required database version is %1$s.', $dbversion->max_version);
+							$error = _s('Maximum required %1$s database version is %2$s.', $dbversion->database,
+								$dbversion->max_version
+							);
 							break;
 
 						case DB_VERSION_FAILED_TO_RETRIEVE:
@@ -861,9 +860,7 @@ function makeProblemsPopup(array $problems, array $triggers, array $actions, arr
 			($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) ? $opdata : null,
 			zbx_date2age($problem['clock']),
 			$problem_update_link,
-			makeEventActionsIcons($problem['eventid'], $actions['all_actions'], $actions['mediatypes'],
-				$actions['users']
-			),
+			makeEventActionsIcons($problem['eventid'], $actions['all_actions'], $actions['users']),
 			$tags[$problem['eventid']]
 		]));
 	}

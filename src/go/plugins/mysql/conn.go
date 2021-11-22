@@ -21,12 +21,14 @@ package mysql
 
 import (
 	"context"
+	"crypto/tls"
 	"database/sql"
 	"sync"
 	"time"
 
 	"github.com/go-sql-driver/mysql"
 
+	"zabbix.com/pkg/tlsconfig"
 	"zabbix.com/pkg/uri"
 
 	"zabbix.com/pkg/log"
@@ -140,7 +142,7 @@ func (c *ConnManager) housekeeper(ctx context.Context, interval time.Duration) {
 }
 
 // create creates a new connection with given credentials.
-func (c *ConnManager) create(uri uri.URI) (*MyConn, error) {
+func (c *ConnManager) create(uri uri.URI, details tlsconfig.Details) (*MyConn, error) {
 	c.connMutex.Lock()
 	defer c.connMutex.Unlock()
 
@@ -157,6 +159,10 @@ func (c *ConnManager) create(uri uri.URI) (*MyConn, error) {
 	config.Timeout = c.connectTimeout
 	config.ReadTimeout = c.callTimeout
 	config.InterpolateParams = true
+
+	if err := registerTLSConfig(config, details); err != nil {
+		return nil, err
+	}
 
 	connector, err := mysql.NewConnector(config)
 
@@ -176,6 +182,42 @@ func (c *ConnManager) create(uri uri.URI) (*MyConn, error) {
 	return c.connections[uri], nil
 }
 
+func registerTLSConfig(config *mysql.Config, details tlsconfig.Details) error {
+	switch details.TlsConnect {
+	case "required":
+		err := mysql.RegisterTLSConfig(details.SessionName, &tls.Config{InsecureSkipVerify: true})
+		if err != nil {
+			return err
+		}
+	case "verify_ca":
+		conf, err := tlsconfig.CreateConfig(details, true)
+		if err != nil {
+			return err
+		}
+
+		err = mysql.RegisterTLSConfig(details.SessionName, conf)
+		if err != nil {
+			return err
+		}
+	case "verify_full":
+		conf, err := tlsconfig.CreateConfig(details, false)
+		if err != nil {
+			return err
+		}
+
+		err = mysql.RegisterTLSConfig(details.SessionName, conf)
+		if err != nil {
+			return err
+		}
+	default:
+		return nil
+	}
+
+	config.TLSConfig = details.SessionName
+
+	return nil
+}
+
 // get returns a connection with given uri if it exists and also updates lastTimeAccess, otherwise returns nil.
 func (c *ConnManager) get(uri uri.URI) *MyConn {
 	c.connMutex.Lock()
@@ -190,14 +232,14 @@ func (c *ConnManager) get(uri uri.URI) *MyConn {
 }
 
 // GetConnection returns an existing connection or creates a new one.
-func (c *ConnManager) GetConnection(uri uri.URI) (conn *MyConn, err error) {
+func (c *ConnManager) GetConnection(uri uri.URI, details tlsconfig.Details) (conn *MyConn, err error) {
 	c.Lock()
 	defer c.Unlock()
 
 	conn = c.get(uri)
 
 	if conn == nil {
-		conn, err = c.create(uri)
+		conn, err = c.create(uri, details)
 	}
 
 	if err != nil {

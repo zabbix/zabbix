@@ -65,7 +65,7 @@ func counterByType(name string) (counter cpuCounter) {
 	}
 }
 
-func (c *cpuUnit) counterAverage(counter cpuCounter, period historyIndex) (result interface{}) {
+func (c *cpuUnit) counterAverage(counter cpuCounter, period historyIndex, _ int) (result interface{}) {
 	if c.head == c.tail {
 		return
 	}
