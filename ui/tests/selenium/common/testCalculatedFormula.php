@@ -145,7 +145,17 @@ class testCalculatedFormula extends CWebTest {
 			],
 			[
 				[
+					'formula' => 'changecount(/host/key,#5:now-5h)'
+				]
+			],
+			[
+				[
 					'formula' => 'changecount(/host/key,#10)'
+				]
+			],
+			[
+				[
+					'formula' => 'changecount(/host/key,5,)'
 				]
 			],
 			[
@@ -161,26 +171,6 @@ class testCalculatedFormula extends CWebTest {
 			[
 				[
 					'formula' => 'changecount(/host/key,#10,"inc")'
-				]
-			],
-			[
-				[
-					'formula' => 'changecount(/host/key,#5:now-5h,"all")'
-				]
-			],
-			[
-				[
-					'formula' => 'changecount(/host/key,#5:now-5h,"dec")'
-				]
-			],
-			[
-				[
-					'formula' => 'changecount(/host/key,#5:now-5h,"inc")'
-				]
-			],
-			[
-				[
-					'formula' => 'changecount(/host/key,#5:now-5h)'
 				]
 			],
 			[
@@ -992,6 +982,13 @@ class testCalculatedFormula extends CWebTest {
 					'expected' => TEST_BAD,
 					'formula' => 'changecount(/host/key,#5,"all",)',
 					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "changecount".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'changecount(/host/key,7,all)',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "changecount(/host/key,7,all)".'
 				]
 			],
 			[
