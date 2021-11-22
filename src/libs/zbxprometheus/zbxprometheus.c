@@ -99,15 +99,15 @@ zbx_prometheus_hint_t;
 
 static zbx_hash_t	prometheus_hint_hash(const void *d)
 {
-	const zbx_prometheus_hint_t	*hint = (zbx_prometheus_hint_t *)d;
+	const zbx_prometheus_hint_t	*hint = (const zbx_prometheus_hint_t *)d;
 
 	return ZBX_DEFAULT_STRING_HASH_FUNC(hint->metric);
 }
 
 static int	prometheus_hint_compare(const void *d1, const void *d2)
 {
-	const zbx_prometheus_hint_t	*hint1 = (zbx_prometheus_hint_t *)d1;
-	const zbx_prometheus_hint_t	*hint2 = (zbx_prometheus_hint_t *)d2;
+	const zbx_prometheus_hint_t	*hint1 = (const zbx_prometheus_hint_t *)d1;
+	const zbx_prometheus_hint_t	*hint2 = (const zbx_prometheus_hint_t *)d2;
 
 	return strcmp(hint1->metric, hint2->metric);
 }
@@ -341,7 +341,7 @@ static size_t	skip_row(const char *data, size_t pos)
 	if (NULL == (ptr = strchr(data + pos, '\n')))
 		return strlen(data + pos) + pos;
 
-	return ptr - data + 1;
+	return (size_t)(ptr - data + 1);
 }
 
 /******************************************************************************
@@ -372,7 +372,7 @@ static int	parse_metric(const char *data, size_t pos, zbx_strloc_t *loc)
 	}
 
 	loc->l = pos;
-	loc->r = ptr - data - 1;
+	loc->r = (size_t)(ptr - data) - 1;
 
 	return SUCCEED;
 }
@@ -405,7 +405,7 @@ static int	parse_label(const char *data, size_t pos, zbx_strloc_t *loc)
 	}
 
 	loc->l = pos;
-	loc->r = ptr - data - 1;
+	loc->r = (size_t)(ptr - data) - 1;
 
 	return SUCCEED;
 }
@@ -487,7 +487,7 @@ static int	parse_label_value(const char *data, size_t pos, zbx_strloc_t *loc)
 			return FAIL;
 	}
 
-	loc->r = ptr - data;
+	loc->r = (size_t)(ptr - data);
 
 	return SUCCEED;
 }
@@ -577,7 +577,7 @@ static int	parse_metric_value(const char *data, size_t pos, zbx_strloc_t *loc)
 	loc->l = pos;
 
 	len = ZBX_CONST_STRLEN("nan");
-	if (len == str_copy_lowercase(buffer, sizeof(buffer), ptr, len) && 0 == memcmp(buffer, "nan", len))
+	if (len == str_copy_lowercase(buffer, sizeof(buffer), ptr, len) && 0 == memcmp(buffer, "nan", (size_t)len))
 	{
 		loc->r = pos + 2;
 		return SUCCEED;
@@ -587,16 +587,16 @@ static int	parse_metric_value(const char *data, size_t pos, zbx_strloc_t *loc)
 		ptr++;
 
 	len = ZBX_CONST_STRLEN("inf");
-	if (len == str_copy_lowercase(buffer, sizeof(buffer), ptr, len) && 0 == memcmp(buffer, "inf", len))
+	if (len == str_copy_lowercase(buffer, sizeof(buffer), ptr, len) && 0 == memcmp(buffer, "inf", (size_t)len))
 	{
-		loc->r = ptr - data + 2;
+		loc->r = (size_t)(ptr - data) + 2;
 		return SUCCEED;
 	}
 
 	if (FAIL == zbx_number_parse(ptr, &len))
 		return FAIL;
 
-	loc->r = ptr + len - data - 1;
+	loc->r = (size_t)(ptr + len - data) - 1;
 
 	return SUCCEED;
 }
@@ -1141,7 +1141,7 @@ static int	prometheus_parse_row(zbx_prometheus_filter_t *filter, const char *dat
 		if (NULL == (ptr = strchr(data + pos, '\n')))
 			len = strlen(data + pos);
 		else
-			len = ptr - data + pos;
+			len = (size_t)(ptr - data) + pos;
 
 		*error = zbx_dsprintf(*error, "cannot parse text at: %.*s", len, data + pos);
 		goto out;
@@ -1234,7 +1234,7 @@ static int	parse_help(const char *data, size_t pos, zbx_strloc_t *loc_metric, zb
 		}
 	}
 
-	loc_help->r = ptr - data - 1;
+	loc_help->r = (size_t)(ptr - data) - 1;
 
 	return SUCCEED;
 }
@@ -1268,7 +1268,7 @@ static int	parse_type(const char *data, size_t pos, zbx_strloc_t *loc_metric, zb
 		ptr++;
 
 	/* invalid metric type */
-	if (pos == (loc_type->r = ptr - data))
+	if (pos == (loc_type->r = (size_t)(ptr - data)))
 		return FAIL;
 
 	loc_type->r--;
@@ -1385,7 +1385,7 @@ static int	prometheus_parse_hint(zbx_prometheus_filter_t *filter, const char *da
 		const char	*ptr;
 
 		if (NULL != (ptr = strchr(data + pos, '\n')))
-			loc->r = ptr - data - 1;
+			loc->r = (size_t)(ptr - data) - 1;
 		else
 			loc->r = strlen(data + pos) + pos - 1;
 
@@ -1477,7 +1477,7 @@ out:
 		int		len;
 
 		if (NULL != (ptr = strchr(data + pos, '\n')))
-			len = ptr - data - pos;
+			len = (size_t)(ptr - data) - pos;
 		else
 			len = strlen(data + pos);
 
@@ -2005,7 +2005,7 @@ int	zbx_prometheus_to_json(const char *data, const char *filter_data, char **val
 	if (FAIL == prometheus_parse_rows(&filter, data, &rows, &hints, error))
 		goto cleanup;
 
-	zbx_json_initarray(&json, rows.values_num * 100);
+	zbx_json_initarray(&json, (size_t)rows.values_num * 100);
 
 	for (i = 0; i < rows.values_num; i++)
 	{
