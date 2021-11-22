@@ -342,8 +342,7 @@ class testDashboardPages extends CWebTest {
 		$this->checkPageProperties();
 
 		// Check page popup-menu options in edit mode.
-		$this->getPageMenu('Page 1');
-		$page_menu = CPopupMenuElement::find()->waitUntilVisible()->one();
+		$page_menu = $this->getPageMenu('Page 1');
 		$page_menu->hasTitles('ACTIONS');
 		$page_popup_items = [
 			'Copy' => true,
@@ -530,7 +529,7 @@ class testDashboardPages extends CWebTest {
 			$next_page->click();
 		}
 
-		$index = (array_key_exists('duplicate', $data)) ? 2 : 1;
+		$index = CTestArrayHelper::get($data, 'duplicate', false) ? 2 : 1;
 		$this->selectPageAction($title, 'Properties', $index);
 		COverlayDialogElement::find()->waitUntilReady()->one();
 		$page_form = $page_dialog->query('name:dashboard_page_properties_form')->asForm()->one();
@@ -601,8 +600,7 @@ class testDashboardPages extends CWebTest {
 		$this->assertEquals(['Page 1'], $this->getPagesTitles());
 
 		// Check that Delete option is disabled when one page left.
-		$this->getPageMenu('Page 1');
-		$page_menu = CPopupMenuElement::find()->waitUntilVisible()->one();
+		$page_menu = $this->getPageMenu('Page 1');
 		$this->assertTrue($page_menu->query('xpath:.//a[@aria-label="Actions, Delete"]')->one()->isEnabled(false));
 		$dashboard->save();
 		$this->assertEquals(['Page 1'], $this->getPagesTitles());
@@ -728,6 +726,8 @@ class testDashboardPages extends CWebTest {
 			$this->selectPage($page_name, $index);
 		}
 		$this->query('xpath:('.$selector.']/following-sibling::button)['.$index.']')->waitUntilPresent()->one()->click();
+
+		return CPopupMenuElement::find()->waitUntilVisible()->one();
 	}
 
 	/**
@@ -737,10 +737,10 @@ class testDashboardPages extends CWebTest {
 	 * @param integer $index		number of page that has duplicated name
 	 */
 	private function selectPage($page_name, $index = 1) {
-		$selection = '//ul[@class="sortable-list"]//span[@title=';
-		$this->query('xpath:('.$selection.CXPathHelper::escapeQuotes($page_name).'])['.$index.']')
+		$selection = '//ul[@class="sortable-list"]//span[@title='.CXPathHelper::escapeQuotes($page_name);
+		$this->query('xpath:('.$selection.'])['.$index.']')
 				->one()->click()->waitUntilReady();
-		$this->query('xpath:'.$selection.CXPathHelper::escapeQuotes($page_name).']/../../div[@class="selected-tab"]')
+		$this->query('xpath:'.$selection.']/../../div[@class="selected-tab"]')
 				->one()->waitUntilPresent();
 	}
 
@@ -752,8 +752,7 @@ class testDashboardPages extends CWebTest {
 	 * @param integer $index		number of page that has duplicated name
 	 */
 	private function selectPageAction($page_name, $menu_item, $index = 1) {
-		$this->getPageMenu($page_name, $index);
-		CPopupMenuElement::find()->waitUntilVisible()->one()->select($menu_item);
+		$this->getPageMenu($page_name, $index)->select($menu_item);
 	}
 
 	/**
