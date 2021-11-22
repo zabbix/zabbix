@@ -506,7 +506,7 @@ class testDashboardPages extends CWebTest {
 	 * @dataProvider getCreateData
 	 */
 	public function testDashboardPages_Create($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=142')->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid_creation)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 		$dashboard->edit();
 		$dashboard->addPage();
