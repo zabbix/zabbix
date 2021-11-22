@@ -489,6 +489,7 @@ typedef struct
 	unsigned char	pause_suppressed;
 	unsigned char	recovery;
 	unsigned char	status;
+	unsigned char	notify_canceled;
 }
 DB_ACTION;
 
