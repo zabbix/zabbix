@@ -1273,13 +1273,13 @@ static int	DBpatch_5050119(void)
 static int	DBpatch_5050120(void)
 {
 	const ZBX_TABLE table =
-		{"sla_downtime", "sla_downtimeid", 0,
+		{"sla_excluded_downtime", "sla_excluded_downtimeid", 0,
 			{
-				{"sla_downtimeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"sla_excluded_downtimeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 				{"slaid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 				{"from", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 				{"to", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-				{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 				{0}
 			},
 			NULL
@@ -1290,14 +1290,14 @@ static int	DBpatch_5050120(void)
 
 static int	DBpatch_5050121(void)
 {
-	return DBcreate_index("sla_downtime", "sla_downtime_1", "slaid", 0);
+	return DBcreate_index("sla_excluded_downtime", "sla_excluded_downtime_1", "slaid", 0);
 }
 
 static int	DBpatch_5050122(void)
 {
 	const ZBX_FIELD	field = {"slaid", NULL, "sla", "slaid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
 
-	return DBadd_foreign_key("sla_downtime", 1, &field);
+	return DBadd_foreign_key("sla_excluded_downtime", 1, &field);
 }
 
 static int	DBpatch_5050123(void)
