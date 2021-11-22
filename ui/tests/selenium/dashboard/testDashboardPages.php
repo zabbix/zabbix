@@ -506,7 +506,7 @@ class testDashboardPages extends CWebTest {
 	 * @dataProvider getCreateData
 	 */
 	public function testDashboardPages_Create($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid_creation)->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=142')->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 		$dashboard->edit();
 		$dashboard->addPage();
@@ -524,12 +524,13 @@ class testDashboardPages extends CWebTest {
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
+
 		$next_page = $this->query(self::NEXT_BUTTON)->one();
-		if ($next_page->isClickable()) {
-			while ($next_page->isClickable()) {
-				$next_page->click();
-			}
-			$this->query('xpath://div[@class="selected-tab"]/span[@title="'.$data['fields']['Name'].'"]')->one()->waitUntilReady();
+		$tab = $this->query('class:selected-tab')->one();
+		while ($next_page->isClickable()) {
+			$next_page->click();
+			$tab->waitUntilAttributesNotPresent(['class' => 'selected-tab']);
+            $tab->reload();
 		}
 
 		$index = CTestArrayHelper::get($data, 'duplicate', false) ? 2 : 1;
