@@ -42,6 +42,14 @@ class testFormHostConfiguration extends testFormHost {
 	}
 
 	/**
+	 * @dataProvider getValidationUpdateData
+	 *
+	 */
+	public function testFormHostConfiguration_ValidationUpdate($data) {
+		$this->checkHostUpdate($data, $this->link);
+	}
+
+	/**
 	 * @backup hosts
 	 *
 	 * @dataProvider getUpdateData

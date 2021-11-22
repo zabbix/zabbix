@@ -45,6 +45,13 @@ class testFormHostMonitoring extends testFormHost {
 	}
 
 	/**
+	 * @dataProvider getValidationUpdateData
+	 */
+	public function testFormHostMonitoring_ValidationUpdate($data) {
+		$this->checkHostUpdate($data, $this->link, self::STANDALONE, self::MONITORING);
+	}
+
+	/**
 	 * @backup hosts
 	 *
 	 * @dataProvider getUpdateData

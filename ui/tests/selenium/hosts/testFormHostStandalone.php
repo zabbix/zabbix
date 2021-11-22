@@ -44,6 +44,13 @@ class testFormHostStandalone extends testFormHost {
 	}
 
 	/**
+	 * @dataProvider getValidationUpdateData
+	 */
+	public function testFormHostStandalone_ValidationUpdate($data) {
+		$this->checkHostUpdate($data, $this->link, self::STANDALONE);
+	}
+
+	/**
 	 * @backup hosts
 	 *
 	 * @dataProvider getUpdateData

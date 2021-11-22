@@ -832,7 +832,7 @@ class testFormHost extends CWebTest {
 		}
 	}
 
-	public static function getUpdateData() {
+	public static function getValidationUpdateData() {
 		return [
 			// Host form validation.
 			[
@@ -1125,7 +1125,12 @@ class testFormHost extends CWebTest {
 					'error_title' => 'Cannot update host',
 					'error' => 'Incorrect arguments passed to function.'
 				]
-			],
+			]
+		];
+	}
+
+	public static function getUpdateData() {
+		return [
 			// Successful host form update.
 			// Add defualt interface values.
 			[
@@ -1856,10 +1861,12 @@ class testFormHost extends CWebTest {
 	}
 
 	/**
-	 * Test for filtering necessary host on page.
+	 * Function for filtering necessary host on page.
 	 *
 	 * @param boolean   $monitoring    true if Monitoring->Hosts section is being checked, false if other
 	 * @param string	$host          host name to be filtered
+	 *
+	 * @return CFormElement
 	 */
 	public function filterHostAndSelect($monitoring, $host) {
 		$this->query('button:Reset')->one()->click();
