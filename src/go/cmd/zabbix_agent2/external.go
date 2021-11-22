@@ -127,10 +127,6 @@ func parseConfig() (socket string, timeout time.Duration) {
 	return
 }
 
-func createSocket(socketBasePath string) string {
-	return fmt.Sprintf("%s%d", socketBasePath, time.Now().UnixNano())
-}
-
 func removeSocket(socket string) error {
 	if err := os.RemoveAll(socket); err != nil {
 		return fmt.Errorf("failed to drop external plugin socket, with path %s, %s", socket, err.Error())

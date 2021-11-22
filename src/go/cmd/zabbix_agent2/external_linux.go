@@ -22,6 +22,8 @@ package main
 import (
 	"fmt"
 	"net"
+	"os"
+	"time"
 )
 
 func getListener(socket string) (listener net.Listener, err error) {
@@ -44,4 +46,8 @@ func getDefaultSocketPath() string {
 		string(os.PathSeparator),
 		string(os.PathSeparator),
 	)
+}
+
+func createSocket(socketBasePath string) string {
+	return fmt.Sprintf("%s%d.sock", socketBasePath, time.Now().UnixNano())
 }

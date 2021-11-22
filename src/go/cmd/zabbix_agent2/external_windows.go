@@ -42,3 +42,7 @@ func getListener(socket string) (listener net.Listener, err error) {
 func getDefaultSocketPath() string {
 	return "\\\\.\\pipe\\"
 }
+
+func createSocket(socketBasePath string) string {
+	return fmt.Sprintf("%s%d", socketBasePath, time.Now().UnixNano())
+}
