@@ -525,8 +525,11 @@ class testDashboardPages extends CWebTest {
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
 		$next_page = $this->query(self::NEXT_BUTTON)->one();
-		while ($next_page->isClickable()) {
-			$next_page->click();
+		if ($next_page->isClickable()) {
+			while ($next_page->isClickable()) {
+				$next_page->click();
+			}
+			$this->query('xpath://div[@class="selected-tab"]/span[@title="'.$data['fields']['Name'].'"]')->one()->waitUntilReady();
 		}
 
 		$index = CTestArrayHelper::get($data, 'duplicate', false) ? 2 : 1;
