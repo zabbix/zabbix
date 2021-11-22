@@ -530,7 +530,7 @@ class testDashboardPages extends CWebTest {
 		while ($next_page->isClickable()) {
 			$next_page->click();
 			$tab->waitUntilAttributesNotPresent(['class' => 'selected-tab']);
-            $tab->reload();
+			$tab->reload();
 		}
 
 		$index = CTestArrayHelper::get($data, 'duplicate', false) ? 2 : 1;
