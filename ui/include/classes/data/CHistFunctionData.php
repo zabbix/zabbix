@@ -249,7 +249,10 @@ final class CHistFunctionData {
 			['rules' => [
 				['type' => 'regexp', 'pattern' => '/^(mad|stddevpop|stddevsamp)$/']
 			], 'required' => false],
-			['rules' => [['type' => 'number', 'min' => 7]], 'required' => false]
+			['rules' => [
+				['type' => 'regexp', 'pattern' => '/^\d+$/'],
+				['type' => 'number', 'min' => 7]
+			], 'required' => false]
 		],
 		'trendsum' => [
 			['rules' => [['type' => 'query']]],
