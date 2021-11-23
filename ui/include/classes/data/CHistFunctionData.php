@@ -247,14 +247,14 @@ final class CHistFunctionData {
 			['rules' => [['type' => 'time', 'min' => SEC_PER_HOUR]]],
 			['rules' => [
 				['type' => 'regexp', 'pattern' => '/^((\d+(\.\d{0,4})?)|(\.\d{1,4}))$/'],
-				['type' => 'number', 'min' => 1]
+				['type' => 'number', 'min' => 1, 'max' => ZBX_MAX_INT32]
 			], 'required' => false],
 			['rules' => [
 				['type' => 'regexp', 'pattern' => '/^(mad|stddevpop|stddevsamp)$/']
 			], 'required' => false],
 			['rules' => [
 				['type' => 'regexp', 'pattern' => '/^\d+$/'],
-				['type' => 'number', 'min' => 7]
+				['type' => 'number', 'min' => 7, 'max' => ZBX_MAX_INT32]
 			], 'required' => false]
 		],
 		'trendsum' => [
