@@ -18,19 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once 'vendor/autoload.php';
-
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
-
 /**
- * Base class for "Hosts and Problems filter save" function tests.
+ * Base class for Host form tests.
  */
 class testFormHost extends CWebTest {
-
-	use TableTrait;
 
 	/**
 	 * Attach Behaviors to the test.
@@ -75,13 +70,13 @@ class testFormHost extends CWebTest {
 			'ip' => '127.0.0.1',
 			'dns' => '',
 			'Connect to' => 'IP',
-			'port' => '10050'
+			'port' => 10050
 		],
 		'SNMP' => [
 			'ip' => '127.0.0.1',
 			'dns' => '',
 			'Connect to' => 'IP',
-			'port' => '161',
+			'port' => 161,
 			'SNMP version' => 'SNMPv2',
 			'SNMP community' => '{$SNMP_COMMUNITY}',
 			'Use bulk requests' => true
@@ -90,13 +85,13 @@ class testFormHost extends CWebTest {
 			'ip' => '127.0.0.1',
 			'dns' => '',
 			'Connect to' => 'IP',
-			'port' => '12345'
+			'port' => 12345
 		],
 		'IPMI' => [
 			'ip' => '127.0.0.1',
 			'dns' => '',
 			'Connect to' => 'IP',
-			'port' => '623'
+			'port' => 623
 		]
 	];
 
@@ -116,10 +111,10 @@ class testFormHost extends CWebTest {
 				'useip' => 1,
 				'ip' => '127.2.2.2',
 				'dns' => '',
-				'port' => '122',
+				'port' => 122,
 				'details' => [
-					'version' => '1',
-					'bulk' => '0',
+					'version' => 1,
+					'bulk' => 0,
 					'community' => 'zabbix'
 				]
 			],
@@ -129,7 +124,7 @@ class testFormHost extends CWebTest {
 				'useip' => 0,
 				'ip' => '',
 				'dns' => 'selenium.test',
-				'port' => '30053'
+				'port' => 30053
 			],
 			[
 				'type' => 4,
@@ -137,7 +132,7 @@ class testFormHost extends CWebTest {
 				'useip' => 1,
 				'ip' => '127.4.4.4',
 				'dns' => '',
-				'port' => '426'
+				'port' => 426
 			]
 		];
 
@@ -217,8 +212,8 @@ class testFormHost extends CWebTest {
 		$tabs = ['Host', 'Templates', 'IPMI', 'Tags', 'Macros', 'Inventory', 'Encryption', 'Value mapping'];
 		$this->assertEquals(count($tabs), $form->query('xpath:.//li[@role="tab"]')->all()->count());
 		foreach ($tabs as $tab) {
-			$this->assertTrue($form->query("xpath:.//li[@role='tab']//a[text()=".CXPathHelper::escapeQuotes($tab).
-					"]")->one()->isValid()
+			$this->assertTrue($form->query("xpath:.//li[@role='tab']//a[text()=".CXPathHelper::escapeQuotes($tab)."]")
+					->one()->isValid()
 			);
 		}
 
@@ -272,7 +267,6 @@ class testFormHost extends CWebTest {
 		// Close host form popup to avoid unexpected alert in further cases.
 		if (!$standalone) {
 			COverlayDialogElement::find()->one()->close();
-			COverlayDialogElement::ensureNotPresent();
 		}
 	}
 
@@ -816,7 +810,6 @@ class testFormHost extends CWebTest {
 						->checkValue($data['interfaces']);
 
 				COverlayDialogElement::find()->one()->close();
-				COverlayDialogElement::ensureNotPresent();
 				break;
 
 			case TEST_BAD:
@@ -826,7 +819,6 @@ class testFormHost extends CWebTest {
 
 				if (!$standalone) {
 					COverlayDialogElement::find()->one()->close();
-					COverlayDialogElement::ensureNotPresent();
 				}
 				break;
 		}
@@ -1505,7 +1497,6 @@ class testFormHost extends CWebTest {
 						->checkValue($source['interfaces']);
 
 				COverlayDialogElement::find()->one()->close();
-				COverlayDialogElement::ensureNotPresent();
 				break;
 
 			case TEST_BAD:
@@ -1517,7 +1508,6 @@ class testFormHost extends CWebTest {
 
 				if (!$standalone) {
 					COverlayDialogElement::find()->one()->close();
-					COverlayDialogElement::ensureNotPresent();
 				}
 				break;
 		}
@@ -1595,11 +1585,11 @@ class testFormHost extends CWebTest {
 	 *
 	 * @param array     $data		   data provider with fields values
 	 * @param string    $link          direct link for opening host page
-	 * @param type      $full_clone	   True if Full clone false is simple clone
+	 * @param string    $button        Clone or Full clone
 	 * @param boolean   $standalone    false if configuration or monitoring, true if standalone page
 	 * @param boolean   $monitoring    true if Monitoring->Hosts section is being checked, false if other
 	 */
-	public function cloneHost($data, $link, $full_clone = false, $standalone = false, $monitoring = false) {
+	public function cloneHost($data, $link, $button = 'Clone', $standalone = false, $monitoring = false) {
 		$host = 'testFormHost with items';
 		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($host));
 
@@ -1614,7 +1604,7 @@ class testFormHost extends CWebTest {
 		$original = $form->getFields()->asValues();
 
 		// Clone host.
-		$this->query('button', ($full_clone ? 'Full clone' : 'Clone'))->waitUntilClickable()->one()->click();
+		$this->query('button', $button)->waitUntilClickable()->one()->click();
 
 		$cloned_form = (!$standalone)
 			? COverlayDialogElement::find()->asForm()->waitUntilPresent()->one()
@@ -1628,7 +1618,6 @@ class testFormHost extends CWebTest {
 		$this->filterHostAndSelect($monitoring, $data['host_fields']['Host name'])->checkValue($original);
 
 		COverlayDialogElement::find()->one()->close();
-		COverlayDialogElement::ensureNotPresent();
 	}
 
 	/**
@@ -1643,7 +1632,8 @@ class testFormHost extends CWebTest {
 			'status' => 0
 		];
 		$db_host = CDBHelper::getRow('SELECT hostid, host, name, description, status FROM hosts WHERE host='.
-				zbx_dbstr($data['host_fields']['Host name']));
+				zbx_dbstr($data['host_fields']['Host name'])
+		);
 
 		if (CTestArrayHelper::get($data, 'host_fields.Visible name') === "") {
 			$data['host_fields']['Visible name'] = $data['host_fields']['Host name'];
@@ -1707,7 +1697,7 @@ class testFormHost extends CWebTest {
 	 * @param boolean   $standalone    false if configuration or monitoring, true if standalone page
 	 * @param boolean   $monitoring    true if Monitoring->Hosts section is being checked, false if other
 	 */
-	public function checkCancel($data, $link, $create_link, $standalone = false, $monitoring = false) {
+	public function checkCancel($data, $link, $create_link = null, $standalone = false, $monitoring = false) {
 		$host_old_hash = CDBHelper::getHash($this->hosts_sql);
 		$interface_old_hash = CDBHelper::getHash($this->interface_snmp_sql);
 
@@ -1843,7 +1833,7 @@ class testFormHost extends CWebTest {
 				$this->assertMessage(TEST_GOOD, 'Host deleted');
 
 				// Check if all host records have been deleted.
-				$tables=['hosts', 'interface', 'items', 'hostmacro', 'hosts_groups', 'hosts_templates',
+				$tables = ['hosts', 'interface', 'items', 'hostmacro', 'hosts_groups', 'hosts_templates',
 						'maintenances_hosts', 'host_inventory'
 				];
 				foreach ($tables as $table) {
@@ -1872,9 +1862,10 @@ class testFormHost extends CWebTest {
 		$this->query('button:Reset')->one()->click();
 		$this->query('name:zbx_filter')->asForm()->waitUntilReady()->one()->fill(['Name' => $host]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
+		$this->page->waitUntilReady();
 
-		$host_link = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $host)
-				->getColumn('Name')->query('link', $host)->waitUntilClickable();
+		$host_link = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible()
+				->findRow('Name', $host)->getColumn('Name')->query('tag:a')->waitUntilClickable();
 
 		if ($monitoring) {
 			$host_link->asPopupButton()->one()->select('Configuration');
@@ -1883,6 +1874,17 @@ class testFormHost extends CWebTest {
 			$host_link->one()->click();
 		}
 
-		return $form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
+		return COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
+	}
+
+	/**
+	 * Function for selecting and counting items on particular host.
+	 *
+	 * @param boolean   $host     name of host
+	 * @param string	$count    expected items count
+	 */
+	public function assertItemsDBCount($host, $count) {
+		$sql = 'SELECT null FROM items WHERE hostid IN (SELECT hostid FROM hosts WHERE host='.zbx_dbstr($host).')';
+		$this->assertEquals($count, CDBHelper::getCount($sql));
 	}
 }

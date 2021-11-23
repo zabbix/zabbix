@@ -31,7 +31,6 @@ class testFormHostMonitoring extends testFormHost {
 	const STANDALONE = false;
 
 	public $link = 'zabbix.php?action=host.view';
-	public $create_link = null;
 
 	public function testFormHostMonitoring_Layout() {
 		$this->checkHostLayout($this->link, self::STANDALONE, self::MONITORING);
@@ -71,31 +70,27 @@ class testFormHostMonitoring extends testFormHost {
 	 * @dataProvider getCloneData
 	 */
 	public function testFormHostMonitoring_Clone($data) {
-		$full_clone = false;
-		$this->cloneHost($data, $this->link, $full_clone, self::STANDALONE, self::MONITORING);
+		$this->cloneHost($data, $this->link, 'Clone', self::STANDALONE, self::MONITORING);
 
 		// Check that items aren't cloned from original host.
-		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($data['host_fields']['Host name']));
-		$this->assertEquals(0, CDBHelper::getCount('SELECT null FROM items WHERE hostid='.$hostid));
+		$this->assertItemsDBCount($data['host_fields']['Host name'], 0);
 	}
 
 	/**
 	 * @dataProvider getCloneData
 	 */
 	public function testFormHostMonitoring_FullClone($data) {
-		$full_clone = true;
-		$this->cloneHost($data, $this->link, $full_clone, self::STANDALONE, self::MONITORING);
+		$this->cloneHost($data, $this->link, 'Full clone', self::STANDALONE, self::MONITORING);
 
 		// Check that items cloned from original host.
-		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($data['host_fields']['Host name']));
-		$this->assertEquals(3, CDBHelper::getCount('SELECT null FROM items WHERE hostid='.$hostid));
+		$this->assertItemsDBCount($data['host_fields']['Host name'], 3);
 	}
 
 	/**
 	 * @dataProvider getСancelData
 	 */
 	public function testFormHostMonitoring_Cancel($data) {
-		$this->checkCancel($data, $this->link, $this->create_link, self::STANDALONE, self::MONITORING);
+		$this->checkCancel($data, $this->link, null, self::STANDALONE, self::MONITORING);
 	}
 
 	/**
