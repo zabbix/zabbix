@@ -236,7 +236,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 				}
 			}
 			else {
-				$value = _('No data.');
+				$value = _('No data');
 
 				// The value automatically becomes string type, so it can be truncated if necessary.
 				$value_type = ITEM_VALUE_TYPE_TEXT;
