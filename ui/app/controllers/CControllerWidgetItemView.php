@@ -138,24 +138,31 @@ class CControllerWidgetItemView extends CControllerWidget {
 						case ITEM_VALUE_TYPE_FLOAT:
 						case ITEM_VALUE_TYPE_UINT64:
 							// Apply unit conversion always because it will also convert values to scientific notation.
-							$value = convertUnits([
+							$raw_units = convertUnitsRaw([
 								'value' => $last_value,
 								'units' => $units,
 								'decimals' => $fields['decimal_places']
 							]);
+							// Get the converted value (this is not the final value).
+							$value = $raw_units['value'];
 
 							/*
-							 * Perform splitting units and value only if conversion actually happened. In case there is
-							 * a thousands separator space, find the last space that could be the units separator.
+							 * Get the converted units. If resulting units are empty, this could also mean value was
+							 * converted to time.
 							 */
-							if ($value != $last_value) {
-								$pos = strrpos($value, ' ');
+							$units = $raw_units['units'];
 
-								if ($pos !== false) {
-									$units = substr($value, $pos + 1);
-									$value = substr($value, 0, $pos);
-								}
+							/*
+							 * In case there is a numeric value, for example 0.001234 and decimal places are set to 2,
+							 * convertUnitsRaw would return 0.0012, however in this widget we need to show the exact
+							 * number. So we convert the value again which results in 0.
+							 */
+							if ($raw_units['is_numeric']) {
+								$value = self::convertNumeric($value, $fields['decimal_places']);
 							}
+
+							// In order to split the number into value and fraction, we need to convert it to string.
+							$value = (string) $value;
 
 							/*
 							 * Regardless of unit conversion, separate the decimals from value. In case of scientific
@@ -549,6 +556,23 @@ class CControllerWidgetItemView extends CControllerWidget {
 			case WIDGET_ITEM_POS_BOTTOM:
 				return 'bottom';
 
+		}
+	}
+
+	/**
+	 * Convert numeric value using precice decimal points.
+	 *
+	 * @param string $value     Value to convert.
+	 * @param int    $decimals  Numer of decimal places.
+	 *
+	 * @return double|string  Return string if number is very large. Otherwise returns double (float).
+	 */
+	private static function convertNumeric(string $value, int $decimals) {
+		if ($value >= pow(10, ZBX_FLOAT_DIG)) {
+			return sprintf('%.'.ZBX_FLOAT_DIG.'E', $value);
+		}
+		else {
+			return round($value, $decimals);
 		}
 	}
 }
