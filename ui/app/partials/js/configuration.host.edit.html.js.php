@@ -164,8 +164,14 @@
 		// Templates tab functions.
 
 		unlinkTemplate(button) {
+			const linked_templates = button.closest('table');
+
 			button.closest('tr').remove();
 			this.resetNewTemplatesField();
+
+			if (linked_templates.querySelector('tbody:empty') !== null) {
+				linked_templates.remove();
+			}
 		},
 
 		unlinkAndClearTemplate(button, templateid) {
