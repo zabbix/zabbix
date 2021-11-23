@@ -47,18 +47,6 @@ extern int	zbx_log_level;
 		((LOG_LEVEL_INFORMATION != (level) &&	\
 		((level) > zbx_log_level || LOG_LEVEL_EMPTY == (level))) ? FAIL : SUCCEED)
 
-typedef enum
-{
-	ERR_Z3001 = 3001,
-	ERR_Z3002,
-	ERR_Z3003,
-	ERR_Z3004,
-	ERR_Z3005,
-	ERR_Z3006,
-	ERR_Z3007
-}
-zbx_err_codes_t;
-
 #ifdef HAVE___VA_ARGS__
 #	define ZBX_ZABBIX_LOG_CHECK
 #	define zabbix_log(level, ...)									\

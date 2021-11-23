@@ -586,6 +586,9 @@ class ZBase {
 				'javascript' => [
 					'files' => []
 				],
+				'stylesheet' => [
+					'files' => []
+				],
 				'web_layout_mode' => ZBX_LAYOUT_NORMAL,
 				'config' => [
 					'server_check_interval' => CSettingsHelper::get(CSettingsHelper::SERVER_CHECK_INTERVAL),
@@ -600,6 +603,9 @@ class ZBase {
 					'main_block' => $view->getOutput(),
 					'javascript' => [
 						'files' => $view->getJsFiles()
+					],
+					'stylesheet' => [
+						'files' => $view->getCssFiles()
 					],
 					'web_layout_mode' => $view->getLayoutMode()
 				]);

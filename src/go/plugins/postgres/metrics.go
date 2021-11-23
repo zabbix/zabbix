@@ -173,10 +173,10 @@ var (
 			WithValidator(metric.LenValidator{Max: &maxPassLen})
 	paramDatabase = metric.NewConnParam("Database", "Database name to be used for connection.").
 			WithDefault("postgres").WithValidator(metric.LenValidator{Min: &minDBNameLen, Max: &maxDBNameLen})
-	paramTLSConnect  = metric.NewConnParam("TLSConnect", "DB connection encryption type.").WithDefault("").SessionOnly()
-	paramTLSCaFile   = metric.NewConnParam("TLSCAFile", "TLS ca file path.").WithDefault("").SessionOnly()
-	paramTLSCertFile = metric.NewConnParam("TLSCertFile", "TLS cert file path.").WithDefault("").SessionOnly()
-	paramTLSKeyFile  = metric.NewConnParam("TLSKeyFile", "TLS key file path.").WithDefault("").SessionOnly()
+	paramTLSConnect  = metric.NewSessionOnlyParam("TLSConnect", "DB connection encryption type.").WithDefault("")
+	paramTLSCaFile   = metric.NewSessionOnlyParam("TLSCAFile", "TLS ca file path.").WithDefault("")
+	paramTLSCertFile = metric.NewSessionOnlyParam("TLSCertFile", "TLS cert file path.").WithDefault("")
+	paramTLSKeyFile  = metric.NewSessionOnlyParam("TLSKeyFile", "TLS key file path.").WithDefault("")
 )
 
 var metrics = metric.MetricSet{
@@ -201,11 +201,10 @@ var metrics = metric.MetricSet{
 			paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
 
 	keyCustomQuery: metric.New("Returns result of a custom query.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase, paramTLSConnect,
-			paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile,
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase,
 			metric.NewParam("QueryName", "Name of a custom query "+
 				"(must be equal to a name of an SQL file without an extension).").SetRequired(),
-		}, true),
+			paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, true),
 
 	keyDBStat: metric.New("Returns JSON for sum of each type of statistic.",
 		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase, paramTLSConnect,

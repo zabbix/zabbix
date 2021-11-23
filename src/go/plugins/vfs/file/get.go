@@ -53,8 +53,11 @@ type fiTimeStamp struct {
 }
 
 type fileInfo struct {
-	Type string  `json:"type"`
-	User *string `json:"user"`
+	Basename string  `json:"basename"`
+	Pathname string  `json:"pathname"`
+	Dirname  string  `json:"dirname"`
+	Type     string  `json:"type"`
+	User     *string `json:"user"`
 	userInfo
 	Size      int64       `json:"size"`
 	Time      fiTime      `json:"time"`

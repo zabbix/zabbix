@@ -264,10 +264,22 @@ function postMessageError(message) {
 }
 
 function postMessageDetails(type, messages) {
-	cookie.create('system-message-details', btoa(JSON.stringify({
+	const encode = function (string) {
+		const uint8 = new TextEncoder().encode(string);
+
+		let result = '';
+		for (let i = 0; i < uint8.byteLength; i++) {
+			result += String.fromCharCode(uint8[i]);
+		}
+
+		return result;
+	};
+
+	const data = JSON.stringify({
 		type: type,
 		messages: messages
-	})));
+	});
+	cookie.create('system-message-details', btoa(encode(data)));
 }
 
 /**

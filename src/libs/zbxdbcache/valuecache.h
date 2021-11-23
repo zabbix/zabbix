@@ -107,7 +107,7 @@ int	zbx_vc_get_values(zbx_uint64_t itemid, int value_type, zbx_vector_history_re
 
 int	zbx_vc_get_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *ts, zbx_history_record_t *value);
 
-int	zbx_vc_add_values(zbx_vector_ptr_t *history);
+int	zbx_vc_add_values(zbx_vector_ptr_t *history, int *ret_flush);
 
 int	zbx_vc_get_statistics(zbx_vc_stats_t *stats);
 

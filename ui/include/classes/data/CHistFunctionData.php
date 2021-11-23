@@ -63,6 +63,11 @@ final class CHistFunctionData {
 		'change' => [
 			['rules' => [['type' => 'query']]]
 		],
+		'changecount' => [
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]],
+			['rules' => [['type' => 'regexp', 'pattern' => '/^(inc|dec|all)$/']], 'required' => false]
+		],
 		'count' => [
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_DEFAULT]]],
@@ -245,6 +250,17 @@ final class CHistFunctionData {
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_TREND]]]
 		],
+		'trendstl' => [
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_TREND]]],
+			['rules' => [['type' => 'time', 'min' => SEC_PER_HOUR]]],
+			['rules' => [['type' => 'time', 'min' => SEC_PER_HOUR]]],
+			['rules' => [['type' => 'number', 'min' => 1]], 'required' => false],
+			['rules' => [
+				['type' => 'regexp', 'pattern' => '/^(mad|stddevpop|stddevsamp)$/']
+			], 'required' => false],
+			['rules' => [['type' => 'number', 'min' => 7]], 'required' => false]
+		],
 		'trendsum' => [
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_TREND]]]
@@ -350,6 +366,7 @@ final class CHistFunctionData {
 		'bucket_percentile' => self::ITEM_VALUE_TYPES_NUM,
 		'bucket_rate_foreach' => self::ITEM_VALUE_TYPES_NUM,
 		'change' => self::ITEM_VALUE_TYPES_ALL,
+		'changecount' => self::ITEM_VALUE_TYPES_ALL,
 		'count' => self::ITEM_VALUE_TYPES_ALL,
 		'count_foreach' => self::ITEM_VALUE_TYPES_ALL,
 		'countunique' => self::ITEM_VALUE_TYPES_ALL,
@@ -388,6 +405,7 @@ final class CHistFunctionData {
 		'trendcount' => self::ITEM_VALUE_TYPES_NUM,
 		'trendmax' => self::ITEM_VALUE_TYPES_NUM,
 		'trendmin' => self::ITEM_VALUE_TYPES_NUM,
+		'trendstl' => self::ITEM_VALUE_TYPES_NUM,
 		'trendsum' => self::ITEM_VALUE_TYPES_NUM,
 		'varpop' => self::ITEM_VALUE_TYPES_NUM,
 		'varsamp' => self::ITEM_VALUE_TYPES_NUM

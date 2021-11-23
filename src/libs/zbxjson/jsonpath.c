@@ -1593,7 +1593,12 @@ static void	jsonpath_set_expression_error(zbx_jsonpath_expression_t *expression)
 	char	*text;
 
 	text = jsonpath_expression_to_str(expression);
-	zbx_set_json_strerror("invalid compiled expression: %s", text);
+
+	if (NULL != text)
+		zbx_set_json_strerror("invalid compiled expression: %s", text);
+	else
+		THIS_SHOULD_NEVER_HAPPEN;
+
 	zbx_free(text);
 }
 
