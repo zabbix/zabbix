@@ -764,6 +764,8 @@ class CTemplate extends CHostGeneral {
 	public function massAdd(array $data) {
 		$this->validateMassAdd($data, $db_templates);
 
+		$templates = $this->getObjectsByData($data, $db_templates);
+
 
 		$templates = isset($data['templates']) ? zbx_toArray($data['templates']) : [];
 		$templateIds = zbx_objectValues($templates, 'templateid');
@@ -806,6 +808,8 @@ class CTemplate extends CHostGeneral {
 	 */
 	public function massUpdate(array $data) {
 		$this->validateMassUpdate($data, $db_templates);
+
+		$templates = $this->getObjectsByData($data, $db_templates);
 
 		if (!array_key_exists('templates', $data) || !is_array($data['templates'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "%1$s" is mandatory.', 'templates'));
@@ -1110,6 +1114,8 @@ class CTemplate extends CHostGeneral {
 	public function massRemove(array $data) {
 		$this->validateMassRemove($data, $db_templates);
 
+		$templates = $this->getObjectsByData($data, $db_templates);
+
 		$templateids = zbx_toArray($data['templateids']);
 
 		$this->checkPermissions($templateids, _('You do not have permission to perform this operation.'));
@@ -1144,10 +1150,10 @@ class CTemplate extends CHostGeneral {
 			]],
 			'macros' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['macro']], 'fields' => [
 				'macro' =>			['type' => API_USER_MACRO, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hostmacro', 'macro')],
-				'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT])],
+				'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT]), 'default' => ZBX_MACRO_TYPE_TEXT],
 				'value' =>			['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
 										['if' => ['field' => 'type', 'in' => implode(',', [ZBX_MACRO_TYPE_VAULT])], 'type' => API_VAULT_SECRET, 'length' => DB::getFieldLength('hostmacro', 'value')],
-										['else' => true, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')],
+										['else' => true, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')]
 				]],
 				'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')]
 			]],
@@ -1190,7 +1196,30 @@ class CTemplate extends CHostGeneral {
 		}
 
 		if (array_key_exists('macros', $data) && $data['macros']) {
-			$this->massAddAffectedObjects('macros', array_column($data['macros'], 'macro'), $db_templates);
+			$macros = [];
+
+			foreach ($data['macros'] as $macro) {
+				$macros[CApiInputValidator::trimMacro($macro['macro'])] = true;
+			}
+
+			$options = [
+				'output' => ['hostid', 'macro'],
+				'filter' => ['hostid' => array_keys($db_templates)]
+			];
+			$db_macros = DBselect(DB::makeSql('hostmacro', $options));
+
+			while ($db_macro = DBfetch($db_macros)) {
+				if (array_key_exists(CApiInputValidator::trimMacro($db_macro['macro']), $macros)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Macro "%1$s" already exists on "%2$s".', $macro, $db_templates[$db_macro['hostid']]['host'])
+					);
+				}
+			}
+
+			foreach ($db_templates as &$db_template) {
+				$db_template['macros'] = [];
+			}
+			unset($db_host);
 		}
 
 		if (array_key_exists('templates_link', $data) && $data['templates_link']) {
@@ -1210,7 +1239,7 @@ class CTemplate extends CHostGeneral {
 
 			$this->massAddAffectedObjects('templates', [], $db_templates);
 
-			$this->massCheckTemplatesLinks($templateids, [], $db_templates);
+			$this->massCheckTemplatesLinks($templateids, $templateids, $db_templates);
 		}
 	}
 
@@ -1230,10 +1259,10 @@ class CTemplate extends CHostGeneral {
 			]],
 			'macros' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['macro']], 'fields' => [
 				'macro' =>			['type' => API_USER_MACRO, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hostmacro', 'macro')],
-				'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT])],
+				'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT]), 'default' => ZBX_MACRO_TYPE_TEXT],
 				'value' =>			['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
 										['if' => ['field' => 'type', 'in' => implode(',', [ZBX_MACRO_TYPE_VAULT])], 'type' => API_VAULT_SECRET, 'length' => DB::getFieldLength('hostmacro', 'value')],
-										['else' => true, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')],
+										['else' => true, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')]
 				]],
 				'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')]
 			]],
@@ -1265,8 +1294,7 @@ class CTemplate extends CHostGeneral {
 
 			$count = API::HostGroup()->get([
 				'countOutput' => true,
-				'groupids' => $groupids,
-				'editable' => true
+				'groupids' => $groupids
 			]);
 
 			if ($count != count($groupids)) {
@@ -1277,24 +1305,31 @@ class CTemplate extends CHostGeneral {
 
 			$this->massAddAffectedObjects('groups', [], $db_templates);
 
-			$del_groupids = [];
+			$groupids = array_flip($groupids);
+			$edit_groupids = [];
 
 			foreach ($db_templates as $db_template) {
+				$_groupids = $groupids;
+
 				foreach ($db_template['groups'] as $db_group) {
-					if (!in_array($db_group['groupid'], $groupids)) {
-						$del_groupids[$db_group['groupid']] = true;
+					if (array_key_exists($db_group['groupid'], $_groupids)) {
+						unset($_groupids[$db_group['groupid']]);
+					} else {
+						$edit_groupids[$db_group['groupid']] = true;
 					}
 				}
+
+				$edit_groupids += $_groupids;
 			}
 
-			if ($del_groupids) {
+			if ($edit_groupids) {
 				$count = API::HostGroup()->get([
 					'countOutput' => true,
-					'groupids' => array_keys($del_groupids),
+					'groupids' => array_keys($edit_groupids),
 					'editable' => true
 				]);
 
-				if ($count != count($del_groupids)) {
+				if ($count != count($edit_groupids)) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS,
 						_('No permissions to referred object or it does not exist!')
 					);
@@ -1343,8 +1378,7 @@ class CTemplate extends CHostGeneral {
 			if ($templateids) {
 				$count = $this->get([
 					'countOutput' => true,
-					'templateids' => $templateids,
-					'editable' => true
+					'templateids' => $templateids
 				]);
 
 				if ($count != count($templateids)) {
@@ -1356,25 +1390,37 @@ class CTemplate extends CHostGeneral {
 
 			$this->massAddAffectedObjects('templates', [], $db_templates);
 
+			if (array_key_exists('templates_clear', $data)) {
+				$this->massAddAffectedObjects('templates_clear', [], $db_templates);
+			}
+
 			if ($templateids_link !== null) {
-				$del_templateids = [];
+				$templateids = array_flip($templateids);
+				$edit_templateids = [];
 
 				foreach ($db_templates as $db_template) {
 					foreach ($db_template['templates'] as $db_template_link) {
-						if (!in_array($db_template_link['templateid'], $templateids)) {
-							$del_templateids[$db_template_link['templateid']] = true;
+						$_templateids = $templateids;
+
+						if (array_key_exists($db_template_link['templateid'], $_templateids)) {
+							unset($_templateids[$db_template_link['templateid']]);
+						}
+						else {
+							$edit_templateids[$db_template_link['templateid']] = true;
 						}
 					}
+
+					$edit_templateids += $_templateids;
 				}
 
-				if ($del_templateids) {
+				if ($edit_templateids) {
 					$count = $this->get([
 						'countOutput' => true,
-						'templateids' => array_keys($del_templateids),
+						'templateids' => array_keys($edit_templateids),
 						'editable' => true
 					]);
 
-					if ($count != count($del_templateids)) {
+					if ($count != count($edit_templateids)) {
 						self::exception(ZBX_API_ERROR_PERMISSIONS,
 							_('No permissions to referred object or it does not exist!')
 						);
@@ -1463,7 +1509,11 @@ class CTemplate extends CHostGeneral {
 				);
 			}
 
-			$this->massAddAffectedObjects('templates', [], $db_templates);
+			$this->massAddAffectedObjects('templates', $templateids, $db_templates);
+
+			if (array_key_exists('templateids_clear', $data)) {
+				$this->massAddAffectedObjects('templates_clear', [], $db_templates);
+			}
 
 			$this->massCheckTemplatesLinks([], $templateids, $db_templates);
 		}

@@ -1893,10 +1893,10 @@ abstract class CHostGeneral extends CHostBase {
 		}
 
 		if ($hostids['templates']) {
-			$accessible_templates = [];
+			$permitted_templates = [];
 
 			if (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
-				$accessible_templates = API::Template()->get([
+				$permitted_templates = API::Template()->get([
 					'output' => [],
 					'hostids' => $hostids['templates'],
 					'preservekeys' => true
@@ -1911,7 +1911,7 @@ abstract class CHostGeneral extends CHostBase {
 
 			while ($db_template = DBfetch($db_templates)) {
 				if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN
-						|| array_key_exists($db_template['templateid'], $accessible_templates)) {
+						|| array_key_exists($db_template['templateid'], $permitted_templates)) {
 					$db_hosts[$db_template['hostid']]['templates'][$db_template['hosttemplateid']] =
 						array_diff_key($db_template, array_flip(['hostid']));
 				}
@@ -2009,10 +2009,10 @@ abstract class CHostGeneral extends CHostBase {
 		}
 
 		if ($objects === 'templates') {
-			$accessible_templates = [];
+			$permitted_templates = [];
 
-			if (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
-				$accessible_templates = API::Template()->get([
+			if (!$objectids && self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
+				$permitted_templates = API::Template()->get([
 					'output' => [],
 					'hostids' => array_keys($db_hosts),
 					'preservekeys' => true
@@ -2028,16 +2028,131 @@ abstract class CHostGeneral extends CHostBase {
 			$db_hosts_templates = DBselect(DB::makeSql('hosts_templates', $options));
 
 			while ($link = DBfetch($db_hosts_templates)) {
-				if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN
-						|| array_key_exists($db_hosts[$id_field_name], $accessible_templates)) {
-					$db_hosts[$link['hostid']]['templates'][$link['hosttemplateid']] =
-						array_diff_key($link, array_flip(['hostid']));
+				if ($objectids) {
+					if (in_array($link['templateid'], $objectids)) {
+						$db_hosts[$link['hostid']]['templates'][$link['hosttemplateid']] =
+							array_diff_key($link, array_flip(['hostid']));
+					}
+					else {
+						$db_hosts[$link['hostid']]['nopermissions_templates'][$link['hosttemplateid']] =
+							array_diff_key($link, array_flip(['hostid']));
+					}
 				}
 				else {
-					$db_hosts[$link['hostid']]['nopermissions_templates'][$link['hosttemplateid']] =
-						array_diff_key($link, array_flip(['hostid']));
+					if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN
+							|| array_key_exists($db_hosts[$id_field_name], $permitted_templates)) {
+						$db_hosts[$link['hostid']]['templates'][$link['hosttemplateid']] =
+							array_diff_key($link, array_flip(['hostid']));
+					}
+					else {
+						$db_hosts[$link['hostid']]['nopermissions_templates'][$link['hosttemplateid']] =
+							array_diff_key($link, array_flip(['hostid']));
+					}
 				}
 			}
 		}
+	}
+
+	/**
+	 * Get templates or hosts input array based on requested data and database data.
+	 *
+	 * @param array $data
+	 * @param array $db_objects
+	 *
+	 * @return array
+	 */
+	protected function getObjectsByData(array $data, array $db_objects): array {
+		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
+
+		$objects = [];
+
+		foreach ($db_objects as $db_object) {
+			$object = [$id_field_name => $db_object[$id_field_name]];
+
+			if (array_key_exists('groups', $db_object)) {
+				$object['groups'] = [];
+
+				if (array_key_exists('groups', $data)) {
+					$db_groups = array_column($db_object['groups'], null, 'groupid');
+
+					foreach ($data['groups'] as $group) {
+						if (array_key_exists($group['groupid'], $db_groups)) {
+							$object['groups'][] = $db_groups[$group['groupid']];
+						}
+						else {
+							$object['groups'][] = ['groupid' => $group['groupid']];
+						}
+					}
+				}
+			}
+
+			if (array_key_exists('macros', $db_object)) {
+				$object['macros'] = [];
+
+				if (array_key_exists('macros', $data) && is_array(reset($data['macros']))) {
+					$db_macros = [];
+
+					foreach ($db_object['macros'] as $db_macro) {
+						$db_macros[CApiInputValidator::trimMacro($db_macro['macro'])] = $db_macro;
+					}
+
+					foreach ($data['macros'] as $macro) {
+						$trimmed_macro = CApiInputValidator::trimMacro($macro['macro']);
+
+						if (array_key_exists($trimmed_macro, $db_macros)) {
+							$object['macros'][] = $macro + $db_macros[$trimmed_macro];
+						}
+						else {
+							$object['macros'][] = $macro;
+						}
+					}
+				}
+			}
+
+			if (array_key_exists('templates', $db_object)) {
+				$templates = $this instanceof CTemplate ? 'templates_link' : 'templates';
+				$templateids = $this instanceof CTemplate ? 'templateids_link' : 'templateids';
+
+				if (array_key_exists($templates, $data) || array_key_exists($templateids, $data)) {
+					$object['templates'] = [];
+				}
+
+				if (array_key_exists('templates_clear', $data) || array_key_exists('templateids_clear', $data)) {
+					$object['templates_clear'] = [];
+				}
+
+				$db_templates = array_column($db_object['templates'], null, 'templateid');
+
+				if (array_key_exists($templates, $data)) {
+					foreach ($data[$templates] as $template) {
+						if (array_key_exists($template['templateid'], $db_templates)) {
+							$object['templates'][] = $db_templates[$template['templateid']];
+						}
+						else {
+							$object['templates'][] = ['templateid' => $template['templateid']];
+						}
+					}
+				}
+
+				if (array_key_exists('templates_clear', $data)) {
+					foreach ($data['templates_clear'] as $template) {
+						if (array_key_exists($template['templateid'], $db_templates)) {
+							$object['templates_clear'][] = $db_templates[$template['templateid']];
+						}
+					}
+				}
+				elseif (array_key_exists('templateids_clear', $data)) {
+					foreach ($data['templateids_clear'] as $templateid) {
+						if (array_key_exists($templateid, $db_templates)) {
+							$object['templates_clear'][] = $db_templates[$template['templateid']];
+						}
+					}
+				}
+			}
+
+			$objects[] = $object;
+		}
+
+		return $objects;
 	}
 }
