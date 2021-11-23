@@ -1871,10 +1871,18 @@ ZBXJS_LDFLAGS="$ZBXJS_LDFLAGS $LIBCURL_LDFLAGS"
 ZBXJS_LIBS="$ZBXJS_LIBS $LIBCURL_LIBS"
 
 dnl Check for libpcre, used by Zabbix for regular expressions
+dnl if test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes" || test "x$agent2" = "xyes"; then
+dnl 	LIBPCRE_CHECK_CONFIG([no])
+dnl 	if test "x$found_libpcre" != "xyes"; then
+dnl 		AC_MSG_ERROR([Unable to use libpcre (libpcre check failed)])
+dnl 	fi
+dnl fi
+
+dnl Check for libpcre2, used by Zabbix for regular expressions
 if test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes" || test "x$agent2" = "xyes"; then
-	LIBPCRE_CHECK_CONFIG([no])
-	if test "x$found_libpcre" != "xyes"; then
-		AC_MSG_ERROR([Unable to use libpcre (libpcre check failed)])
+	LIBPCRE2_CHECK_CONFIG([no])
+	if test "x$found_libpcre2" != "xyes"; then
+		AC_MSG_ERROR([Unable to use libpcre2 (libpcre2 check failed)])
 	fi
 fi
 
