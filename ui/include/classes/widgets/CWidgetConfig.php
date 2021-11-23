@@ -161,7 +161,7 @@ class CWidgetConfig {
 			WIDGET_FAV_GRAPHS			=> ['width' => 4,	'height' => 3],
 			WIDGET_FAV_MAPS				=> ['width' => 4,	'height' => 3],
 			WIDGET_GEOMAP				=> ['width' => 12,	'height' => 5],
-			WIDGET_ITEM					=> ['width' => 6,	'height' => 3],
+			WIDGET_ITEM					=> ['width' => 4,	'height' => 3],
 			WIDGET_GRAPH				=> ['width' => 12,	'height' => 5],
 			WIDGET_GRAPH_PROTOTYPE		=> ['width' => 16,	'height' => 5],
 			WIDGET_HOST_AVAIL			=> ['width' => 6,	'height' => 3],

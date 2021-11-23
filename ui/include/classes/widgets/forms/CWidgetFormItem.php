@@ -119,7 +119,7 @@ class CWidgetFormItem extends CWidgetForm {
 		// description size
 		$field_desc_size = (new CWidgetFieldIntegerBox('desc_size', _('Size'), self::WIDGET_ITEM_PERCENT_MIN,
 			self::WIDGET_ITEM_PERCENT_MAX
-		))->setDefault(5);
+		))->setDefault(15);
 
 		if (array_key_exists('desc_size', $this->data)) {
 			$field_desc_size->setValue($this->data['desc_size']);
@@ -158,7 +158,7 @@ class CWidgetFormItem extends CWidgetForm {
 		// value decimal size
 		$field_decimal_size = (new CWidgetFieldIntegerBox('decimal_size', _('Size'), self::WIDGET_ITEM_PERCENT_MIN,
 			self::WIDGET_ITEM_PERCENT_MAX
-		))->setDefault(15);
+		))->setDefault(35);
 
 		if (array_key_exists('decimal_size', $this->data)) {
 			$field_decimal_size->setValue($this->data['decimal_size']);
@@ -199,7 +199,7 @@ class CWidgetFormItem extends CWidgetForm {
 		// value size
 		$field_value_size = (new CWidgetFieldIntegerBox('value_size', _('Size'), self::WIDGET_ITEM_PERCENT_MIN,
 			self::WIDGET_ITEM_PERCENT_MAX
-		))->setDefault(25);
+		))->setDefault(45);
 
 		if (array_key_exists('value_size', $this->data)) {
 			$field_value_size->setValue($this->data['value_size']);
@@ -261,7 +261,7 @@ class CWidgetFormItem extends CWidgetForm {
 		// units size
 		$field_units_size = (new CWidgetFieldIntegerBox('units_size', _('Size'), self::WIDGET_ITEM_PERCENT_MIN,
 			self::WIDGET_ITEM_PERCENT_MAX
-		))->setDefault(20);
+		))->setDefault(35);
 
 		if (array_key_exists('units_size', $this->data)) {
 			$field_units_size->setValue($this->data['units_size']);
@@ -320,7 +320,7 @@ class CWidgetFormItem extends CWidgetForm {
 		// time size
 		$field_time_size = (new CWidgetFieldIntegerBox('time_size', _('Size'), self::WIDGET_ITEM_PERCENT_MIN,
 			self::WIDGET_ITEM_PERCENT_MAX
-		))->setDefault(5);
+		))->setDefault(15);
 
 		if (array_key_exists('time_size', $this->data)) {
 			$field_time_size->setValue($this->data['time_size']);
