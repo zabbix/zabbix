@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-12 19:55+0200\n"
-"PO-Revision-Date: 2021-11-05 14:43+0300\n"
+"POT-Creation-Date: 2021-11-19 19:55+0200\n"
+"PO-Revision-Date: 2021-11-13 21:53+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1636116199.000000\n"
+"X-POOTLE-MTIME: 1636833203.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:142
@@ -1041,7 +1041,7 @@ msgstr "Интерфейсы агента"
 
 #: include/classes/data/CItemData.php:844
 msgid "Agent variant check. Returns 1 - for Zabbix agent; 2 - for Zabbix agent 2"
-msgstr ""
+msgstr "Проверка разновидности агента. Возвращается 1 - для Zabbix агента; 2 - для Zabbix агента 2"
 
 #: include/classes/widgets/CWidgetHelper.php:1163
 msgid "Aggregate"
@@ -1062,6 +1062,10 @@ msgstr "Интервал агрегации"
 #: include/actions.inc.php:2106
 msgid "Alert message"
 msgstr "Сообщение оповещения"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1070
+msgid "Algorithm"
+msgstr ""
 
 #: include/hosts.inc.php:114
 msgid "Alias"
@@ -2776,7 +2780,7 @@ msgstr[0] "Не удалось импортировать шаблон \"%1$s\",
 msgstr[1] "Не удалось импортировать шаблон \"%1$s\", соединенные шаблоны \"%2$s\" не существуют."
 msgstr[2] "Не удалось импортировать шаблон \"%1$s\", соединенные шаблоны \"%2$s\" не существуют."
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1486
+#: app/controllers/CControllerPopupTriggerExpr.php:1527
 msgid "Cannot insert trigger expression"
 msgstr "Не удалось вставить выражение триггера"
 
@@ -3376,7 +3380,7 @@ msgstr "Строка символов не включена"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:728
 #: app/controllers/CControllerPopupTriggerExpr.php:921
-#: app/controllers/CControllerPopupTriggerExpr.php:1052
+#: app/controllers/CControllerPopupTriggerExpr.php:1095
 msgid "Chars"
 msgstr "Символы"
 
@@ -3392,7 +3396,7 @@ msgstr "Информация о шасси. Возвращает строку"
 msgid "Check already exists."
 msgstr "Проверка уже существует."
 
-#: include/classes/parsers/C10TriggerExpression.php:538
+#: include/classes/parsers/C10TriggerExpression.php:542
 #, c-format
 msgid "Check expression part starting from \"%1$s\"."
 msgstr "Проверьте часть выражения начиная с \"%1$s\"."
@@ -3680,7 +3684,7 @@ msgstr "Сжатие"
 msgid "Concurrent sessions"
 msgstr "Одновременные сессии"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1509
+#: app/controllers/CControllerPopupTriggerExpr.php:1550
 #: app/views/popup.lldoperation.php:59 app/views/popup.lldoverride.php:195
 #: app/views/popup.service.statusrule.edit.php:48
 msgid "Condition"
@@ -4807,7 +4811,7 @@ msgid "December"
 msgstr "Декабрь"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:908
-#: app/controllers/CControllerPopupTriggerExpr.php:1065
+#: app/controllers/CControllerPopupTriggerExpr.php:1108
 msgid "Decimal places"
 msgstr "Число десятичных знаков"
 
@@ -5263,7 +5267,7 @@ msgstr "Список запретов"
 msgid "Dependencies"
 msgstr "Зависимости"
 
-#: include/triggers.inc.php:2397
+#: include/triggers.inc.php:2398
 msgid "Dependent"
 msgstr "Зависимость"
 
@@ -5271,7 +5275,7 @@ msgstr "Зависимость"
 msgid "Dependent item"
 msgstr "Зависимый элемент данных"
 
-#: app/views/popup.generic.php:278 include/triggers.inc.php:2397
+#: app/views/popup.generic.php:278 include/triggers.inc.php:2398
 #: include/views/configuration.trigger.prototype.list.php:92
 #: include/views/configuration.triggers.list.php:238
 msgid "Depends on"
@@ -5329,6 +5333,14 @@ msgstr "Детали"
 #: httpdetails.php:27 httpdetails.php:185
 msgid "Details of web scenario"
 msgstr "Подробности о веб-сценарии"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1055
+msgid "Detection period"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1065
+msgid "Deviations"
+msgstr ""
 
 #: include/actions.inc.php:76
 msgid "Device"
@@ -5485,7 +5497,7 @@ msgstr "Деактивировать выбранные веб-сценарии?
 #: include/hosts.inc.php:1126 include/html.inc.php:284
 #: include/httptest.inc.php:48 include/items.inc.php:138
 #: include/items.inc.php:141 include/items.inc.php:185
-#: include/maps.inc.php:325 include/triggers.inc.php:1870
+#: include/maps.inc.php:325 include/triggers.inc.php:1871
 #: include/users.inc.php:84 include/views/configuration.action.list.php:77
 #: include/views/configuration.action.list.php:129
 #: include/views/configuration.host.discovery.list.php:167
@@ -6230,7 +6242,7 @@ msgstr "Активировать трапы"
 #: include/html.inc.php:280 include/httptest.inc.php:47
 #: include/items.inc.php:138 include/items.inc.php:141
 #: include/items.inc.php:182 include/triggers.inc.php:999
-#: include/triggers.inc.php:1867
+#: include/triggers.inc.php:1868
 #: include/views/configuration.action.edit.php:147
 #: include/views/configuration.action.list.php:76
 #: include/views/configuration.action.list.php:137
@@ -6325,6 +6337,10 @@ msgstr "Ошибка! Zabbix сервер не может стартовать �
 #, c-format
 msgid "Error: %1$s"
 msgstr "Ошибка: %1$s"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1045
+msgid "Evaluation period"
+msgstr ""
 
 #: include/events.inc.php:180
 msgid "Event"
@@ -8435,7 +8451,7 @@ msgstr "Недоступный прототип элементов данных"
 #: app/partials/monitoring.host.view.html.php:89
 #: app/views/configuration.host.list.php:267
 #: include/classes/screens/CScreenProblem.php:386
-#: include/hostgroups.inc.php:293 include/triggers.inc.php:2022
+#: include/hostgroups.inc.php:293 include/triggers.inc.php:2023
 #: include/views/inventory.host.view.php:42
 msgid "Inaccessible maintenance"
 msgstr "Недоступное обслуживание"
@@ -8447,11 +8463,11 @@ msgstr "Недоступная карта сети"
 
 #: httpconf.php:663 include/graphs.inc.php:274 include/hosts.inc.php:649
 #: include/httptest.inc.php:222 include/items.inc.php:916
-#: include/triggers.inc.php:2161
+#: include/triggers.inc.php:2162
 msgid "Inaccessible template"
 msgstr "Недоступный шаблон"
 
-#: include/triggers.inc.php:2367 include/triggers.inc.php:2375
+#: include/triggers.inc.php:2368 include/triggers.inc.php:2376
 msgid "Inaccessible trigger"
 msgstr "Недоступный триггер"
 
@@ -8942,8 +8958,8 @@ msgstr "Некорректное количество шагов у шаблон
 msgid "Incorrect trigger expression"
 msgstr "Некорректное выражение триггера"
 
-#: include/classes/parsers/C10TriggerExpression.php:522
-#: include/classes/parsers/C10TriggerExpression.php:538
+#: include/classes/parsers/C10TriggerExpression.php:526
+#: include/classes/parsers/C10TriggerExpression.php:542
 msgid "Incorrect trigger expression."
 msgstr "Некорректное выражение триггера."
 
@@ -9538,7 +9554,7 @@ msgstr "Ошибочное содержимое YAML файла."
 msgid "Invalid action condition: %1$s."
 msgstr "Ошибочное условие действия: %1$s."
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1476
+#: app/controllers/CControllerPopupTriggerExpr.php:1517
 #, c-format
 msgid "Invalid condition: %1$s."
 msgstr "Ошибочное условие: %1$s."
@@ -10012,7 +10028,7 @@ msgstr[2] "Элементы данных активированы"
 msgid "Item in \"not supported\" state"
 msgstr "Элемент данных в \"неподдерживаемом\" состоянии"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1469
+#: app/controllers/CControllerPopupTriggerExpr.php:1510
 msgid "Item not selected"
 msgstr "Элемент данных не выбран"
 
@@ -13720,6 +13736,7 @@ msgid "Period"
 msgstr "Период"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:95
+#: app/controllers/CControllerPopupTriggerExpr.php:1050
 msgid "Period shift"
 msgstr "Сдвиг периода"
 
@@ -15515,6 +15532,14 @@ msgstr "Шаблон поиска пустой"
 #: app/views/monitoring.charts.view.php:103
 msgid "Search type"
 msgstr "Тип поиска"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1060
+msgid "Season"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1075
+msgid "Season deviation window"
+msgstr ""
 
 #: include/hosts.inc.php:434
 msgid "Secondary POC cell"
@@ -18042,7 +18067,7 @@ msgstr "Ед. измерения"
 #: include/items.inc.php:45 include/items.inc.php:110
 #: include/items.inc.php:133 include/items.inc.php:167
 #: include/maintenances.inc.php:33 include/maps.inc.php:39
-#: include/triggers.inc.php:83 include/triggers.inc.php:1867
+#: include/triggers.inc.php:83 include/triggers.inc.php:1868
 #: include/users.inc.php:64 include/users.inc.php:87
 #: include/views/configuration.action.edit.php:233
 #: include/views/configuration.triggers.list.php:77
@@ -18062,7 +18087,7 @@ msgid "Unknown error"
 msgstr "Неизвестная ошибка"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:47
-#: app/controllers/CControllerPopupTriggerExpr.php:1258
+#: app/controllers/CControllerPopupTriggerExpr.php:1301
 #: include/triggers.inc.php:1146
 msgid "Unknown host item, no such item in selected host"
 msgstr "Неизвестный элемент данных узла сети, такого элемента данных нет у выбранного узла сети"
@@ -18691,7 +18716,7 @@ msgstr "BIOS UUID гипервизора VMware, <url> - URL службы VMware
 
 #: include/classes/data/CItemData.php:1400
 msgid "VMware hypervisor HW vendor state sensors, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
-msgstr ""
+msgstr "Датчики состояния производителя HW гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware. Возвращается JSON"
 
 #: include/classes/data/CItemData.php:1372
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -20577,11 +20602,11 @@ msgstr "in() - Проверяет равно ли значение одному 
 msgid "including subgroups"
 msgstr "включая подгруппы"
 
-#: include/classes/parsers/C10TriggerExpression.php:521
+#: include/classes/parsers/C10TriggerExpression.php:525
 msgid "incorrect calculated item formula"
 msgstr "некорректная формула вычисления элемента данных"
 
-#: include/classes/parsers/C10TriggerExpression.php:537
+#: include/classes/parsers/C10TriggerExpression.php:541
 #, c-format
 msgid "incorrect calculated item formula starting from \"%1$s\""
 msgstr "некорректное формула вычисления элемента данных начиная с \"%1$s\""
@@ -20678,7 +20703,7 @@ msgstr "ошибочное имя группы узлов сети"
 msgid "invalid host name"
 msgstr "ошибочное имя узла сети"
 
-#: include/classes/validators/CHistFunctionValidator.php:80
+#: include/classes/validators/CHistFunctionValidator.php:82
 #: include/classes/validators/CMathFunctionValidator.php:86
 #, c-format
 msgid "invalid number of parameters in function \"%1$s\""
@@ -20699,6 +20724,16 @@ msgstr "ошибочное регулярное выражение"
 #, c-format
 msgid "invalid second parameter in function \"%1$s\""
 msgstr "недопустимый второй параметр в функции \"%1$s\""
+
+#: include/classes/validators/CHistFunctionValidator.php:69
+#, c-format
+msgid "invalid seventh parameter in function \"%1$s\""
+msgstr ""
+
+#: include/classes/validators/CHistFunctionValidator.php:68
+#, c-format
+msgid "invalid sixth parameter in function \"%1$s\""
+msgstr ""
 
 #: include/classes/validators/CHistFunctionValidator.php:65
 #, c-format
@@ -20837,7 +20872,7 @@ msgstr "макрос(ы)"
 msgid "mad() - Median absolute deviation"
 msgstr "mad() - Абсолютное отклонение среднего"
 
-#: include/classes/validators/CHistFunctionValidator.php:91
+#: include/classes/validators/CHistFunctionValidator.php:93
 #, c-format
 msgid "mandatory parameter is missing in function \"%1$s\""
 msgstr "пропущен обязательный параметр в функции \"%1$s\""
@@ -21525,6 +21560,10 @@ msgid "trendmin() - Minimum value for period T with exact period shift"
 msgstr "trendmin() - Минимальное значение за период Т с точным сдвигом периода"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1042
+msgid "trendstl() - Anomaly detection for period T"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1085
 msgid "trendsum() - Sum of values of a period T with exact period shift"
 msgstr "trendsum() - Сумма значений за период Т с точным сдвигом периода"
 
@@ -21550,11 +21589,11 @@ msgstr "прототип триггера нельзя переместить в
 msgid "trigger with linkages cannot be moved to another template or host"
 msgstr "триггер со связями нельзя переместить в другой шаблон или узел сети"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1049
+#: app/controllers/CControllerPopupTriggerExpr.php:1092
 msgid "trim() - Remove specified characters from the beginning and the end of a string"
 msgstr "trim() - Удаление указанных символов с начала и конца строки"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1062
+#: app/controllers/CControllerPopupTriggerExpr.php:1105
 msgid "truncate() - Truncates a value to decimal places"
 msgstr "truncate() - Усечение значения до десятичных знаков"
 
@@ -21654,7 +21693,7 @@ msgstr "неожиданное значение \"%1$s\""
 msgid "unknown"
 msgstr "неизвестно"
 
-#: include/classes/validators/CHistFunctionValidator.php:71
+#: include/classes/validators/CHistFunctionValidator.php:73
 #: include/classes/validators/CMathFunctionValidator.php:55
 #, c-format
 msgid "unknown function \"%1$s\""
@@ -21855,11 +21894,11 @@ msgstr "значение второго параметра слишком дли
 msgid "value of third parameter must be one of %1$s"
 msgstr "значением третьего параметра должно быть %1$s"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1075
+#: app/controllers/CControllerPopupTriggerExpr.php:1118
 msgid "varpop() - Population variance"
 msgstr "varpop() - Дисперсия генеральной совокупности"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1082
+#: app/controllers/CControllerPopupTriggerExpr.php:1125
 msgid "varsamp() - Sample variance"
 msgstr "varsamp() - Выборочная дисперсия"
 

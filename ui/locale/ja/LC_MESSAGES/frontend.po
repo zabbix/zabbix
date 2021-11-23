@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-12 19:55+0200\n"
-"PO-Revision-Date: 2021-11-08 13:50+0300\n"
+"POT-Creation-Date: 2021-11-19 19:55+0200\n"
+"PO-Revision-Date: 2021-11-15 12:10+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1636372253.000000\n"
+"X-POOTLE-MTIME: 1636971030.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:142
@@ -363,7 +363,7 @@ msgstr "<サブメニュー/サブメニュー/...>"
 #: jsLoader.php:183
 msgctxt "abbreviation of severity level"
 msgid "A"
-msgstr ""
+msgstr "軽"
 
 #: include/classes/widgets/CWidgetHelper.php:797
 msgid "ADD OVERRIDE"
@@ -1019,6 +1019,10 @@ msgstr "アグリゲーション間隔"
 msgid "Alert message"
 msgstr "通知メッセージ"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:1070
+msgid "Algorithm"
+msgstr ""
+
 #: include/hosts.inc.php:114
 msgid "Alias"
 msgstr "エイリアス"
@@ -1365,7 +1369,7 @@ msgstr "試行回数"
 
 #: app/views/administration.geomaps.edit.php:88
 msgid "Attribution"
-msgstr ""
+msgstr "帰属表示"
 
 #: app/views/administration.housekeeping.edit.php:178
 #: include/classes/helpers/CMenuHelper.php:119
@@ -2640,7 +2644,7 @@ msgid "Cannot import template \"%1$s\", linked template \"%2$s\" does not exist.
 msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" do not exist."
 msgstr[0] "テンプレート\"%1$s\"をインポートできません。リンクされているテンプレート\"%2$s\"が存在しません。"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1486
+#: app/controllers/CControllerPopupTriggerExpr.php:1527
 msgid "Cannot insert trigger expression"
 msgstr "トリガー条件式を追加できません"
 
@@ -3226,7 +3230,7 @@ msgstr "文字列が含まれない"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:728
 #: app/controllers/CControllerPopupTriggerExpr.php:921
-#: app/controllers/CControllerPopupTriggerExpr.php:1052
+#: app/controllers/CControllerPopupTriggerExpr.php:1095
 msgid "Chars"
 msgstr "文字"
 
@@ -3242,7 +3246,7 @@ msgstr "シャーシ情報。文字列値を返す。"
 msgid "Check already exists."
 msgstr "すでに存在します。"
 
-#: include/classes/parsers/C10TriggerExpression.php:538
+#: include/classes/parsers/C10TriggerExpression.php:542
 #, c-format
 msgid "Check expression part starting from \"%1$s\"."
 msgstr "条件式の\"%1$s\"から始まる部分を確認してください。"
@@ -3483,7 +3487,7 @@ msgstr "最終結果"
 
 #: include/classes/widgets/forms/CWidgetFormGeoMap.php:77
 msgid "Comma separated center coordinates to display when the widget is initially loaded."
-msgstr ""
+msgstr "ウィジェットが最初に読み込まれた時に表示するためのカンマ区切りの中心座標。"
 
 #: app/views/administration.script.edit.php:173 include/actions.inc.php:1943
 #: include/views/administration.auditacts.list.php:103
@@ -3530,7 +3534,7 @@ msgstr "圧縮"
 msgid "Concurrent sessions"
 msgstr "並列実行数"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1509
+#: app/controllers/CControllerPopupTriggerExpr.php:1550
 #: app/views/popup.lldoperation.php:59 app/views/popup.lldoverride.php:195
 #: app/views/popup.service.statusrule.edit.php:48
 msgid "Condition"
@@ -3807,7 +3811,7 @@ msgstr ""
 
 #: include/classes/server/CZabbixServer.php:590
 msgid "Connection to Zabbix server failed. Incorrect configuration."
-msgstr ""
+msgstr "Zabbixサーバーへの接続に失敗しました。設定が正しくありません。"
 
 #: include/classes/setup/CSetupWizard.php:538
 msgid "Connection will not be encrypted because it uses a socket file (on Unix) or shared memory (Windows)."
@@ -4359,7 +4363,7 @@ msgstr "チェコ語 (cs_CZ)"
 #: jsLoader.php:181
 msgctxt "abbreviation of severity level"
 msgid "D"
-msgstr ""
+msgstr "致"
 
 #: include/classes/import/validators/C10XmlValidator.php:321
 msgctxt "XML date format"
@@ -4535,7 +4539,7 @@ msgstr "データベースのヒストリ $info_tables のアップグレード"
 
 #: app/partials/administration.system.info.php:129
 msgid "Database history tables use primary key"
-msgstr ""
+msgstr "データベースのヒストリテーブルが主キーを使用"
 
 #: include/classes/setup/CSetupWizard.php:472
 msgid "Database host"
@@ -4649,7 +4653,7 @@ msgid "December"
 msgstr "12月"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:908
-#: app/controllers/CControllerPopupTriggerExpr.php:1065
+#: app/controllers/CControllerPopupTriggerExpr.php:1108
 msgid "Decimal places"
 msgstr "小数点以下桁数"
 
@@ -5105,7 +5109,7 @@ msgstr "拒否リスト"
 msgid "Dependencies"
 msgstr "依存関係"
 
-#: include/triggers.inc.php:2397
+#: include/triggers.inc.php:2398
 msgid "Dependent"
 msgstr "依存先"
 
@@ -5113,7 +5117,7 @@ msgstr "依存先"
 msgid "Dependent item"
 msgstr "依存アイテム"
 
-#: app/views/popup.generic.php:278 include/triggers.inc.php:2397
+#: app/views/popup.generic.php:278 include/triggers.inc.php:2398
 #: include/views/configuration.trigger.prototype.list.php:92
 #: include/views/configuration.triggers.list.php:238
 msgid "Depends on"
@@ -5171,6 +5175,14 @@ msgstr "詳細"
 #: httpdetails.php:27 httpdetails.php:185
 msgid "Details of web scenario"
 msgstr "Webシナリオの詳細"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1055
+msgid "Detection period"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1065
+msgid "Deviations"
+msgstr ""
 
 #: include/actions.inc.php:76
 msgid "Device"
@@ -5327,7 +5339,7 @@ msgstr "選択したWebシナリオを無効にしますか？"
 #: include/hosts.inc.php:1126 include/html.inc.php:284
 #: include/httptest.inc.php:48 include/items.inc.php:138
 #: include/items.inc.php:141 include/items.inc.php:185
-#: include/maps.inc.php:325 include/triggers.inc.php:1870
+#: include/maps.inc.php:325 include/triggers.inc.php:1871
 #: include/users.inc.php:84 include/views/configuration.action.list.php:77
 #: include/views/configuration.action.list.php:129
 #: include/views/configuration.host.discovery.list.php:167
@@ -6066,7 +6078,7 @@ msgstr "トラッピングの有効化"
 #: include/html.inc.php:280 include/httptest.inc.php:47
 #: include/items.inc.php:138 include/items.inc.php:141
 #: include/items.inc.php:182 include/triggers.inc.php:999
-#: include/triggers.inc.php:1867
+#: include/triggers.inc.php:1868
 #: include/views/configuration.action.edit.php:147
 #: include/views/configuration.action.list.php:76
 #: include/views/configuration.action.list.php:137
@@ -6162,6 +6174,10 @@ msgstr "エラー！サポートされていないデータベースのバージ
 msgid "Error: %1$s"
 msgstr "エラー: %1$s"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:1045
+msgid "Evaluation period"
+msgstr ""
+
 #: include/events.inc.php:180
 msgid "Event"
 msgstr "イベント"
@@ -6244,7 +6260,7 @@ msgstr "繰返し間隔(週)"
 
 #: app/views/administration.geomaps.edit.php:33
 msgid "Example"
-msgstr ""
+msgstr "例"
 
 #: app/views/administration.miscconfig.edit.php:36
 msgid "Example: https://localhost/zabbix/ui/"
@@ -6887,11 +6903,11 @@ msgstr "Generated in %1$s sec"
 #: app/views/administration.geomaps.edit.php:127
 #: include/classes/helpers/CMenuHelper.php:244 include/html.inc.php:895
 msgid "Geographical maps"
-msgstr ""
+msgstr "地理マップ"
 
 #: include/classes/widgets/CWidgetConfig.php:51
 msgid "Geomap"
-msgstr ""
+msgstr "地理マップ"
 
 #: include/locales.inc.php:55
 msgid "Georgian (ka_GE)"
@@ -7239,7 +7255,7 @@ msgstr "Guestユーザー"
 #: jsLoader.php:182
 msgctxt "abbreviation of severity level"
 msgid "H"
-msgstr ""
+msgstr "重"
 
 #: include/translateDefines.inc.php:35
 msgid "H:i"
@@ -7882,7 +7898,7 @@ msgstr "ハンガリー語 (hu_HU)"
 #: jsLoader.php:185
 msgctxt "abbreviation of severity level"
 msgid "I"
-msgstr ""
+msgstr "情"
 
 #: app/partials/massupdate.macros.tab.php:111
 msgid "I confirm to remove all macros"
@@ -8253,7 +8269,7 @@ msgstr "アクセスできないアイテムのプロトタイプ"
 #: app/partials/monitoring.host.view.html.php:89
 #: app/views/configuration.host.list.php:267
 #: include/classes/screens/CScreenProblem.php:386
-#: include/hostgroups.inc.php:293 include/triggers.inc.php:2022
+#: include/hostgroups.inc.php:293 include/triggers.inc.php:2023
 #: include/views/inventory.host.view.php:42
 msgid "Inaccessible maintenance"
 msgstr "アクセスできないメンテナンス"
@@ -8265,11 +8281,11 @@ msgstr "アクセスできないマップ"
 
 #: httpconf.php:663 include/graphs.inc.php:274 include/hosts.inc.php:649
 #: include/httptest.inc.php:222 include/items.inc.php:916
-#: include/triggers.inc.php:2161
+#: include/triggers.inc.php:2162
 msgid "Inaccessible template"
 msgstr "アクセスできないテンプレート"
 
-#: include/triggers.inc.php:2367 include/triggers.inc.php:2375
+#: include/triggers.inc.php:2368 include/triggers.inc.php:2376
 msgid "Inaccessible trigger"
 msgstr "アクセスできないトリガー"
 
@@ -8406,15 +8422,15 @@ msgstr "アクションの実行条件のイベントタイプが正しくあり
 
 #: include/classes/api/services/CAction.php:2989
 msgid "Incorrect action condition or operation host group. Host group does not exist or you have no access to it."
-msgstr ""
+msgstr "アクションの条件か操作するホストグループが正しくありません。ホストグループが存在しないか、あなたはアクセスできません。"
 
 #: include/classes/api/services/CAction.php:3049
 msgid "Incorrect action condition or operation host. Host does not exist or you have no access to it."
-msgstr ""
+msgstr "アクションの条件か操作するホストが正しくありません。ホストが存在しないか、あなたはアクセスできません。"
 
 #: include/classes/api/services/CAction.php:3187
 msgid "Incorrect action condition or operation template. Template does not exist or you have no access to it."
-msgstr ""
+msgstr "アクションの条件か操作するテンプレートが正しくありません。テンプレートが存在しないか、あなたはアクセスできません。"
 
 #: include/classes/validators/CActionCondValidator.php:131
 #, c-format
@@ -8427,7 +8443,7 @@ msgstr "アクションの実行条件のプロキシ設定が正しくありま
 
 #: include/classes/api/services/CAction.php:3391
 msgid "Incorrect action condition service. Service does not exist or you have no access to it."
-msgstr ""
+msgstr "条件に設定したサービスが正しくありません。サービスが存在しないか、あなたはアクセスできません。"
 
 #: include/classes/validators/CActionCondValidator.php:155
 msgid "Incorrect action condition trigger severity."
@@ -8449,7 +8465,7 @@ msgstr "実行するアクションのエスカレーションステップの値
 
 #: include/classes/api/services/CAction.php:2889
 msgid "Incorrect action operation media type. Media type does not exist or you have no access to it."
-msgstr ""
+msgstr "操作するメディアタイプが正しくありません。メディアタイプが存在しないか、あなたはアクセスできません。"
 
 #: app/controllers/CControllerActionOperationValidate.php:63
 #, c-format
@@ -8458,11 +8474,11 @@ msgstr "イベントのソース\"%2$s\"のために実行するアクション�
 
 #: include/classes/api/services/CAction.php:3135
 msgid "Incorrect action operation user group. User group does not exist or you have no access to it."
-msgstr ""
+msgstr "操作するユーザーグループが正しくありません。ユーザーグループが存在しないか、あなたはアクセスできません。"
 
 #: include/classes/api/services/CAction.php:3092
 msgid "Incorrect action operation user. User does not exist or you have no access to it."
-msgstr ""
+msgstr "操作するユーザーが正しくありません。ユーザーが存在しないか、あなたはアクセスできません。"
 
 #: include/classes/api/services/CDRule.php:206
 #: include/classes/api/services/CDRule.php:348
@@ -8760,8 +8776,8 @@ msgstr "テンプレートのWebシナリオのステップ数が正しくあり
 msgid "Incorrect trigger expression"
 msgstr "間違ったトリガーの条件式"
 
-#: include/classes/parsers/C10TriggerExpression.php:522
-#: include/classes/parsers/C10TriggerExpression.php:538
+#: include/classes/parsers/C10TriggerExpression.php:526
+#: include/classes/parsers/C10TriggerExpression.php:542
 msgid "Incorrect trigger expression."
 msgstr "トリガー条件式が正しくありません。"
 
@@ -9198,11 +9214,11 @@ msgstr "継承したアイテム"
 
 #: include/classes/widgets/forms/CWidgetFormGeoMap.php:75
 msgid "Initial view"
-msgstr ""
+msgstr "初期表示位置"
 
 #: include/classes/widgets/forms/CWidgetFormGeoMap.php:79
 msgid "Initial view is ignored if the default view is set."
-msgstr ""
+msgstr "デフォルト表示が設定されている場合は、初期表示設定は無視されます。"
 
 #: app/views/popup.triggerexpr.php:239
 msgid "Insert"
@@ -9356,7 +9372,7 @@ msgstr "YAMLファイルの内容が正しくありません"
 msgid "Invalid action condition: %1$s."
 msgstr "アクションの実行条件が正しくありません：%1$s。"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1476
+#: app/controllers/CControllerPopupTriggerExpr.php:1517
 #, c-format
 msgid "Invalid condition: %1$s."
 msgstr "条件が正しくありません： %1$s。"
@@ -9704,7 +9720,7 @@ msgstr "期間が正しくありません。"
 #: include/classes/validators/CApiInputValidator.php:2814
 #, c-format
 msgid "Invalid zoomparameter \"%1$s\": %2$s."
-msgstr ""
+msgstr "ズームパラメーター\"%1$s\"が正しくありません：%2$s。"
 
 #: app/partials/configuration.host.edit.html.php:532
 #: app/views/popup.massupdate.host.php:301
@@ -9824,7 +9840,7 @@ msgstr[0] "アイテムを有効にしました"
 msgid "Item in \"not supported\" state"
 msgstr "アイテムが\"取得不可\"の状態"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1469
+#: app/controllers/CControllerPopupTriggerExpr.php:1510
 msgid "Item not selected"
 msgstr "アイテムが選択されていません"
 
@@ -10476,7 +10492,7 @@ msgstr "検出されたCPUコアのリスト。JSONで返す"
 
 #: include/classes/data/CItemData.php:1164
 msgid "List of directory entries, recursively. Returns JSON"
-msgstr ""
+msgstr "再帰的なディレクトリエントリのリスト。JSONで返す"
 
 #: include/classes/data/CItemData.php:1216
 msgid "List of mounted filesystems and their types. Returns JSON"
@@ -10998,7 +11014,7 @@ msgstr "タイムセレクターの最大期間"
 
 #: app/views/administration.geomaps.edit.php:98
 msgid "Max zoom level"
-msgstr ""
+msgstr "最大ズームレベル"
 
 #: include/classes/data/CItemData.php:896
 msgid "Maximum number of opened files supported by OS. Returns integer"
@@ -11029,7 +11045,7 @@ msgstr "ID \"%1$s\"のメディアタイプのメールアドレスが最大長�
 
 #: app/views/administration.geomaps.edit.php:61
 msgid "Maximum zoom level of the map."
-msgstr ""
+msgstr "マップの最大ズームレベル"
 
 #: include/func.inc.php:104 include/func.inc.php:241 jsLoader.php:235
 msgid "May"
@@ -11466,7 +11482,7 @@ msgstr "N"
 #: jsLoader.php:186
 msgctxt "abbreviation of severity level"
 msgid "N"
-msgstr ""
+msgstr "未"
 
 #: include/classes/helpers/CServiceHelper.php:42
 #: include/classes/helpers/CServiceHelper.php:52
@@ -11678,11 +11694,11 @@ msgstr "ネームスペース"
 
 #: jsLoader.php:187
 msgid "Navigate to default view"
-msgstr ""
+msgstr "デフォルト表示へ"
 
 #: jsLoader.php:188
 msgid "Navigate to initial view"
-msgstr ""
+msgstr "初期表示へ"
 
 #: app/views/administration.housekeeping.edit.php:76
 msgid "Network discovery data storage period"
@@ -12022,7 +12038,7 @@ msgstr "新しいモジュールは見つかりませんでした"
 #: include/classes/api/services/CAction.php:2769
 #, c-format
 msgid "No operations defined for action \"%1$s\"."
-msgstr ""
+msgstr "アクション\"%1$s\"に処理が設定されていません。"
 
 #: include/classes/api/services/CUser.php:1550
 #: include/classes/api/services/CUser.php:2054
@@ -12249,7 +12265,7 @@ msgstr "秘密鍵ファイルが設定されていません。"
 
 #: jsLoader.php:173
 msgid "No problems"
-msgstr ""
+msgstr "障害なし"
 
 #: app/views/configuration.discovery.edit.php:54
 msgid "No proxy"
@@ -12262,7 +12278,7 @@ msgstr "公開鍵ファイルが設定されていません。"
 #: app/controllers/CControllerActionOperationValidate.php:110
 #: include/classes/api/services/CAction.php:2826
 msgid "No recipients specified for action operation message."
-msgstr ""
+msgstr "アクションメッセージの受信者が指定されていません。"
 
 #: include/classes/widgets/CWidgetConfig.php:286 jsLoader.php:165
 msgid "No refresh"
@@ -12283,7 +12299,7 @@ msgstr "何も選択されていません。"
 #: app/controllers/CControllerActionOperationValidate.php:142
 #: include/classes/api/services/CAction.php:2837
 msgid "No targets specified for action operation global script."
-msgstr ""
+msgstr "アクション処理のグローバルスクリプトのターゲットが指定されていません。"
 
 #: include/triggers.inc.php:91
 #, c-format
@@ -12817,7 +12833,7 @@ msgstr "処理内容"
 #: include/classes/api/services/CAction.php:2795
 #, c-format
 msgid "Operation \"%1$s\" already exists for action \"%2$s\"."
-msgstr ""
+msgstr "アクション\"%2$s\"内に処理\"%1$s\"がすでに存在しています。"
 
 #: actionconf.php:378
 #, c-format
@@ -13319,7 +13335,7 @@ msgstr "パラメータ"
 #: app/controllers/CControllerActionOperationValidate.php:76
 #: include/classes/api/services/CAction.php:2807
 msgid "Parameters \"esc_step_from\" and \"esc_step_to\" must be set together."
-msgstr ""
+msgstr "パラメーター\"esc_step_from\"と\"esc_step_to\"は一緒に設定してください。"
 
 #: include/views/configuration.host.discovery.edit.php:52
 #: include/views/configuration.host.prototype.edit.php:62
@@ -13498,6 +13514,7 @@ msgid "Period"
 msgstr "期間"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:95
+#: app/controllers/CControllerPopupTriggerExpr.php:1050
 msgid "Period shift"
 msgstr "期間のシフト"
 
@@ -14621,7 +14638,7 @@ msgstr "デフォルトにリセット"
 
 #: jsLoader.php:172
 msgid "Reset to initial view"
-msgstr ""
+msgstr "初期表示にリセット"
 
 #: jsLoader.php:291
 msgid "Resolved"
@@ -15282,6 +15299,14 @@ msgstr "検索パターンが空白です"
 msgid "Search type"
 msgstr "検索タイプ"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:1060
+msgid "Season"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1075
+msgid "Season deviation window"
+msgstr ""
+
 #: include/hosts.inc.php:434
 msgid "Secondary POC cell"
 msgstr "セカンダリPOCセル"
@@ -15642,7 +15667,7 @@ msgstr "ステータスを正常に設定"
 
 #: jsLoader.php:171
 msgid "Set this view as default"
-msgstr ""
+msgstr "この表示をデフォルトにセット"
 
 #: app/views/js/popup.itemtestedit.view.js.php:365 include/forms.inc.php:1416
 #: include/views/js/item.preprocessing.js.php:67
@@ -15715,7 +15740,7 @@ msgstr "深刻度を下げました"
 
 #: jsLoader.php:152
 msgid "Severity filter"
-msgstr ""
+msgstr "深刻度フィルター"
 
 #: include/actions.inc.php:1780
 msgctxt "screen reader"
@@ -16866,7 +16891,7 @@ msgstr "メソッド\"%1$s.%2$s\"は\"auth\"パラメータなしで呼び出し
 
 #: app/views/administration.geomaps.edit.php:30
 msgid "The URL template is used to load and display the tile layer on geographical maps."
-msgstr ""
+msgstr "URLテンプレートは、地理マップ上にタイルレイヤーを読み込んで表示するために使用されます。"
 
 #: include/classes/db/DbBackend.php:130
 #, c-format
@@ -16895,7 +16920,7 @@ msgstr "クローンしたテンプレートは\"隠しテキスト\"タイプ�
 
 #: app/views/administration.geomaps.edit.php:36
 msgid "The following placeholders are supported:"
-msgstr ""
+msgstr "次のプレースホルダーがサポートされています:"
 
 #: include/html.inc.php:688
 #, c-format
@@ -17040,15 +17065,15 @@ msgstr "木曜"
 
 #: app/views/administration.geomaps.edit.php:77
 msgid "Tile URL"
-msgstr ""
+msgstr "タイルURL"
 
 #: app/views/administration.geomaps.edit.php:65
 msgid "Tile provider"
-msgstr ""
+msgstr "タイルプロバイダー"
 
 #: app/views/administration.geomaps.edit.php:58
 msgid "Tile provider attribution data displayed in a small text box on the map."
-msgstr ""
+msgstr "タイルプロバイダーの帰属情報はマップ上の小さなテキストボックスに表示されます。"
 
 #: app/views/popup.service.time.edit.php:90
 #: app/views/popup.service.time.edit.php:141 report4.php:191
@@ -17794,7 +17819,7 @@ msgstr "単位"
 #: include/items.inc.php:45 include/items.inc.php:110
 #: include/items.inc.php:133 include/items.inc.php:167
 #: include/maintenances.inc.php:33 include/maps.inc.php:39
-#: include/triggers.inc.php:83 include/triggers.inc.php:1867
+#: include/triggers.inc.php:83 include/triggers.inc.php:1868
 #: include/users.inc.php:64 include/users.inc.php:87
 #: include/views/configuration.action.edit.php:233
 #: include/views/configuration.triggers.list.php:77
@@ -17814,7 +17839,7 @@ msgid "Unknown error"
 msgstr "不明なエラー"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:47
-#: app/controllers/CControllerPopupTriggerExpr.php:1258
+#: app/controllers/CControllerPopupTriggerExpr.php:1301
 #: include/triggers.inc.php:1146
 msgid "Unknown host item, no such item in selected host"
 msgstr "不明なアイテム。選択したホストにそのようなアイテムは存在しません"
@@ -18916,7 +18941,7 @@ msgstr "W"
 #: jsLoader.php:184
 msgctxt "abbreviation of severity level"
 msgid "W"
-msgstr ""
+msgstr "警"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:172
 #: app/views/administration.trigdisplay.edit.php:118
@@ -19720,7 +19745,7 @@ msgstr "英字の大文字と小文字"
 
 #: app/views/administration.geomaps.edit.php:47
 msgid "and"
-msgstr ""
+msgstr "と"
 
 #: include/views/monitoring.history.php:186
 msgid "as Blue"
@@ -19849,7 +19874,7 @@ msgstr "計算"
 
 #: app/views/administration.geomaps.edit.php:52
 msgid "can be used to add \"@2x\" to the URL to load retina tiles."
-msgstr ""
+msgstr "高精細タイルを読み込むためにURLに\"@2x\"を追加できる。"
 
 #: include/classes/api/services/CItemGeneral.php:229
 msgid "cannot be changed"
@@ -19980,7 +20005,7 @@ msgstr "change() - 最新値と前回値との差分"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:480
 msgid "changecount() - Number of changes between adjacent values, Mode (all - all changes, inc - only increases, dec - only decreases)"
-msgstr ""
+msgstr "changecount() - 隣接する値の間の変更の数、mode (all - すべての変化、inc - 増加のみ、dec - 減少のみ)"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:487
 msgid "char() - Returns the character which represents the given ASCII code"
@@ -20239,7 +20264,7 @@ msgstr "fuzzytime() - アイテムの値(タイムスタンプとして)とZabbi
 
 #: include/classes/validators/CApiInputValidator.php:2807
 msgid "geographical coordinates (values of comma separated latitude and longitude) are expected"
-msgstr ""
+msgstr "地理座標(コンマで区切られた緯度と経度の値)を指定してください"
 
 #: include/views/configuration.item.edit.php:803
 #: include/views/configuration.item.edit.php:808
@@ -20316,11 +20341,11 @@ msgstr "in() - 値がリストアップされた値と同じかチェック (1 -
 msgid "including subgroups"
 msgstr "サブグループを含む"
 
-#: include/classes/parsers/C10TriggerExpression.php:521
+#: include/classes/parsers/C10TriggerExpression.php:525
 msgid "incorrect calculated item formula"
 msgstr "計算アイテムの計算式が正しくありません"
 
-#: include/classes/parsers/C10TriggerExpression.php:537
+#: include/classes/parsers/C10TriggerExpression.php:541
 #, c-format
 msgid "incorrect calculated item formula starting from \"%1$s\""
 msgstr "\"%1$s\"から始まる計算アイテムの計算式が正しくありません"
@@ -20417,7 +20442,7 @@ msgstr "ホストグループ名が正しくありません"
 msgid "invalid host name"
 msgstr "ホスト名が正しくありません"
 
-#: include/classes/validators/CHistFunctionValidator.php:80
+#: include/classes/validators/CHistFunctionValidator.php:82
 #: include/classes/validators/CMathFunctionValidator.php:86
 #, c-format
 msgid "invalid number of parameters in function \"%1$s\""
@@ -20438,6 +20463,16 @@ msgstr "正規表現が正しくありません"
 #, c-format
 msgid "invalid second parameter in function \"%1$s\""
 msgstr "関数\"%1$s\"内の2番目のパラメーターが正しくありません"
+
+#: include/classes/validators/CHistFunctionValidator.php:69
+#, c-format
+msgid "invalid seventh parameter in function \"%1$s\""
+msgstr ""
+
+#: include/classes/validators/CHistFunctionValidator.php:68
+#, c-format
+msgid "invalid sixth parameter in function \"%1$s\""
+msgstr ""
 
 #: include/classes/validators/CHistFunctionValidator.php:65
 #, c-format
@@ -20576,7 +20611,7 @@ msgstr "マクロ"
 msgid "mad() - Median absolute deviation"
 msgstr "mad() - 中央絶対偏差"
 
-#: include/classes/validators/CHistFunctionValidator.php:91
+#: include/classes/validators/CHistFunctionValidator.php:93
 #, c-format
 msgid "mandatory parameter is missing in function \"%1$s\""
 msgstr "関数\"%1$s\"に必須パラメーターがありません"
@@ -20977,15 +21012,15 @@ msgstr "置換文字列"
 
 #: app/views/administration.geomaps.edit.php:48
 msgid "represent tile coordinates;"
-msgstr ""
+msgstr "でタイルの座標;"
 
 #: app/views/administration.geomaps.edit.php:40
 msgid "represents one of the available subdomains;"
-msgstr ""
+msgstr "利用可能なサブドメインの1つ;"
 
 #: app/views/administration.geomaps.edit.php:44
 msgid "represents zoom level parameter in the URL;"
-msgstr ""
+msgstr "URLのズームレベルパラメータ;"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1516
 msgid "right"
@@ -21112,7 +21147,7 @@ msgstr "sqrt() - 値の平方根"
 
 #: app/partials/administration.ha.nodes.php:63
 msgid "standalone server"
-msgstr ""
+msgstr "スタンドアローンサーバー"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:966
 msgid "stddevpop() - Population standard deviation"
@@ -21264,6 +21299,10 @@ msgid "trendmin() - Minimum value for period T with exact period shift"
 msgstr "trendmin() - 期間のシフトを含む期間Tでの最小値"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1042
+msgid "trendstl() - Anomaly detection for period T"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1085
 msgid "trendsum() - Sum of values of a period T with exact period shift"
 msgstr "trendsum() - 期間のシフトを含む期間Tでの合計値"
 
@@ -21289,11 +21328,11 @@ msgstr "トリガーのプロトタイプは他のテンプレートやホスト
 msgid "trigger with linkages cannot be moved to another template or host"
 msgstr "リンクのあるトリガーは他のテンプレートやホストに移動できません"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1049
+#: app/controllers/CControllerPopupTriggerExpr.php:1092
 msgid "trim() - Remove specified characters from the beginning and the end of a string"
 msgstr "trim() - 文字列の先頭から最後までより指定した文字列を削除"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1062
+#: app/controllers/CControllerPopupTriggerExpr.php:1105
 msgid "truncate() - Truncates a value to decimal places"
 msgstr "truncate() - 小数点以下桁数で切り捨て"
 
@@ -21393,7 +21432,7 @@ msgstr "値\"%1$s\"が間違っています。"
 msgid "unknown"
 msgstr "不明"
 
-#: include/classes/validators/CHistFunctionValidator.php:71
+#: include/classes/validators/CHistFunctionValidator.php:73
 #: include/classes/validators/CMathFunctionValidator.php:55
 #, c-format
 msgid "unknown function \"%1$s\""
@@ -21590,11 +21629,11 @@ msgstr "2つめのパラメータの値が長すぎます"
 msgid "value of third parameter must be one of %1$s"
 msgstr "3つめのパラメータの値は%1$sから選んでください"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1075
+#: app/controllers/CControllerPopupTriggerExpr.php:1118
 msgid "varpop() - Population variance"
 msgstr "varpop() - 母分散"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1082
+#: app/controllers/CControllerPopupTriggerExpr.php:1125
 msgid "varsamp() - Sample variance"
 msgstr "varsamp() - サンプル分散"
 
@@ -21619,4 +21658,4 @@ msgstr "y"
 #: include/classes/validators/CApiInputValidator.php:2815
 #, c-format
 msgid "zoom level must be between \"%1$s\" and \"%2$s\""
-msgstr ""
+msgstr "ズームレベルは\"%1$s\"から\"%2$s\"までで指定してください"

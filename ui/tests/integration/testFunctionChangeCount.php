@@ -45,7 +45,7 @@ class testFunctionChangeCount extends CIntegrationTest {
 				// "not enough data" scenario
 				'all_different' => [
 					'params' => '#5',
-					'expected_result' => 4,
+					'expected_result' => 4
 				],
 				// Some values are equal
 				'some_equal' => [
@@ -87,7 +87,7 @@ class testFunctionChangeCount extends CIntegrationTest {
 					'params' => '#20,"strict"',
 					'expected_result' => 0,
 					'expected_error' => true
-				],
+				]
 			]
 		],
 		'item_dbl' => [

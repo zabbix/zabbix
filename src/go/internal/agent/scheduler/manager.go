@@ -72,12 +72,18 @@ type queryRequest struct {
 	sink    chan string
 }
 
+// queryRequestUserParams contains status user parameters query request.
+type queryRequestUserParams struct {
+	sink chan string
+}
+
 type Scheduler interface {
 	UpdateTasks(clientID uint64, writer plugin.ResultWriter, expressions []*glexpr.Expression,
 		requests []*plugin.Request)
 	FinishTask(task performer)
 	PerformTask(key string, timeout time.Duration, clientID uint64) (result string, err error)
 	Query(command string) (status string)
+	QueryUserParams() (status string)
 }
 
 // cleanupClient performs deactivation of plugins the client is not using anymore.
@@ -242,6 +248,31 @@ func (m *Manager) processQueue(now time.Time) {
 	}
 }
 
+// processAndFlushUserParamQueue processes queued user parameters plugins/tasks and/or removes them
+func (m *Manager) processAndFlushUserParamQueue(now time.Time) {
+	seconds := now.Unix()
+	for p := m.pluginQueue.Peek(); p != nil; p = m.pluginQueue.Peek() {
+		if !p.usrprm {
+			heap.Pop(&m.pluginQueue)
+			continue
+		}
+
+		if task := p.peekTask(); task != nil {
+			heap.Pop(&m.pluginQueue)
+			if !p.hasCapacity() || task.getScheduled().Unix() > seconds {
+				m.pluginQueue.Remove(p)
+				continue
+			}
+
+			m.activeTasksNum++
+			p.reserveCapacity(p.popTask())
+			task.perform(m)
+		}
+
+		m.pluginQueue.Remove(p)
+	}
+}
+
 // processFinishRequest handles finished tasks
 func (m *Manager) processFinishRequest(task performer) {
 	m.activeTasksNum--
@@ -368,6 +399,30 @@ run:
 				} else {
 					v.sink <- response
 				}
+			case *queryRequestUserParams:
+				var keys []string
+				var rerr error
+
+				m.processAndFlushUserParamQueue(time.Now())
+				plugin.ClearUserParamMetrics()
+
+				for k, plg := range m.plugins {
+					if plg.usrprm {
+						delete(m.plugins, k)
+					}
+				}
+
+				if keys, rerr = agent.InitUserParameterPlugin(agent.Options.UserParameter,
+					agent.Options.UnsafeUserParameters, agent.Options.UserParameterDir); rerr != nil {
+					v.sink <- "cannot process user parameters request: " + rerr.Error()
+					continue
+				}
+
+				for _, key := range keys {
+					m.addUserParamsPlugin(key)
+				}
+
+				v.sink <- "ok"
 			}
 		}
 	}
@@ -426,6 +481,7 @@ func (m *Manager) init() {
 				usedCapacity: 0,
 				index:        -1,
 				refcount:     0,
+				usrprm:       metric.UsrPrm,
 			}
 
 			interfaces := ""
@@ -522,6 +578,12 @@ func (m *Manager) Query(command string) (status string) {
 	return <-request.sink
 }
 
+func (m *Manager) QueryUserParams() (status string) {
+	request := &queryRequestUserParams{sink: make(chan string)}
+	m.input <- request
+	return <-request.sink
+}
+
 func (m *Manager) validatePlugins(options *agent.AgentOptions) (err error) {
 	for _, p := range plugin.Plugins {
 		if c, ok := p.(plugin.Configurator); ok {
@@ -545,4 +607,28 @@ func NewManager(options *agent.AgentOptions) (mannager *Manager, err error) {
 		return
 	}
 	return &m, m.configure(options)
+}
+
+func (m *Manager) addUserParamsPlugin(key string) {
+	var metric *plugin.Metric
+
+	for _, metric = range plugin.Metrics {
+		if metric.Key == key {
+			break
+		}
+	}
+
+	capacity := metric.Plugin.Capacity()
+
+	pagent := &pluginAgent{
+		impl:         metric.Plugin,
+		tasks:        make(performerHeap, 0),
+		maxCapacity:  capacity,
+		usedCapacity: 0,
+		index:        -1,
+		refcount:     0,
+		usrprm:       metric.UsrPrm,
+	}
+
+	m.plugins[key] = pagent
 }
