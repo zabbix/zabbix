@@ -109,6 +109,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 		if ($items) {
 			// In case we want to show only value or only time or only change indicator, we need to search history data.
 			$items_with_values = Manager::History()->getItemsHavingValues($items, $history_period);
+			$value_type = $items[$itemid]['value_type'];
 
 			if ($items_with_values) {
 				// Selecting data from history does not depend on "Show" checkboxes.
@@ -118,9 +119,6 @@ class CControllerWidgetItemView extends CControllerWidget {
 						&& array_key_exists(0, $history[$itemid])) {
 					// Get values regardless of show status, since change indicator can be shown independently.
 					$last_value = $history[$itemid][0]['value'];
-
-					// The view will determine when to show ellipsis for text values.
-					$value_type = $items_with_values[$itemid]['value_type'];
 
 					// Override item units if needed.
 					if (array_key_exists(WIDGET_ITEM_SHOW_VALUE, $show) && $fields['units_show'] == 1) {
@@ -244,9 +242,6 @@ class CControllerWidgetItemView extends CControllerWidget {
 			}
 			else {
 				$value = _('No data');
-
-				// The value automatically becomes string type, so it can be truncated if necessary.
-				$value_type = ITEM_VALUE_TYPE_TEXT;
 
 				// Since there no value, we can still show time.
 				if (array_key_exists(WIDGET_ITEM_SHOW_TIME, $show)) {
@@ -501,6 +496,17 @@ class CControllerWidgetItemView extends CControllerWidget {
 
 		// Sort data row blocks in order - top, middle, bottom.
 		ksort($data);
+
+		if ($items) {
+			$data['url'] = (new CUrl('history.php'))
+				->setArgument('action', ($value_type == ITEM_VALUE_TYPE_FLOAT || $value_type == ITEM_VALUE_TYPE_UINT64)
+					? HISTORY_GRAPH
+					: HISTORY_VALUES
+				)
+				->setArgument('itemids[]', $itemid)
+				->setArgument('from', $items_with_values ? $time : 'now-1h')
+				->setArgument('to', 'now');
+		}
 
 		$data['bg_color'] = ($fields['bg_color'] !== null && $fields['bg_color'] !== '') ? $fields['bg_color'] : '';
 

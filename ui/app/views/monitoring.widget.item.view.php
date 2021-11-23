@@ -141,7 +141,7 @@ else {
 		}
 	}
 
-	$body = (new CDiv($items))->addClass('dashboard-grid-widget-item');
+	$body = (new CLink($items, $data['data']['url']))->addClass('dashboard-grid-widget-item');
 
 	if ($data['data']['bg_color'] !== '') {
 		$body->addStyle('background-color: #'.$data['data']['bg_color']);
