@@ -106,7 +106,7 @@ if ($host_prototype['templateid']) {
 				$template_link = new CSpan($template['name']);
 			}
 
-			$linked_templates->addRow([$template_link]);
+			$linked_templates->addRow([$template_link->addClass(ZBX_STYLE_WORDWRAP)]);
 		}
 
 		$templates_field_items[] = $linked_templates;
@@ -142,7 +142,7 @@ else {
 			]);
 
 			$linked_templates->addRow([
-				$template_link,
+				$template_link->addClass(ZBX_STYLE_WORDWRAP),
 				(new CCol(
 					(new CSimpleButton(_('Unlink')))
 						->onClick('submitFormWithParam('.implode(', ', $unlink_parameters).');')

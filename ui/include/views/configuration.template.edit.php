@@ -87,6 +87,8 @@ if ($data['linked_templates']) {
 			$template_link = new CSpan($template['name']);
 		}
 
+		$template_link->addClass(ZBX_STYLE_WORDWRAP);
+
 		$clone_mode = ($data['form'] === 'clone' || $data['form'] === 'full_clone');
 
 		$unlink_parameters = array_map('json_encode', [
