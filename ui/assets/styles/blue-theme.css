@@ -1500,10 +1500,10 @@ div.dashboard-grid-widget-item {
   div.dashboard-grid-widget-item .decimals,
   div.dashboard-grid-widget-item .units,
   div.dashboard-grid-widget-item .item-time {
-    font-size: calc(var(--content-height) * var(--widget-item-font));
+    font-size: calc(var(--content-height) * var(--widget-item-font) / 1.14);
     line-height: 1.14; }
   div.dashboard-grid-widget-item .svg-arrow {
-    height: calc(var(--content-height) * var(--widget-item-font) * 0.72);
+    height: calc(var(--content-height) * var(--widget-item-font) * 0.72 / 1.14);
     margin-left: .3em; }
 
 .dashboard-grid-widget-item .svg-arrow-up {

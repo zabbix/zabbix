@@ -80,6 +80,8 @@ form.dashboard-grid-widget-item {
 // Widget view.
 
 div.dashboard-grid-widget-item {
+	$line-height: 1.14;
+
 	box-sizing: border-box;
 	display: flex;
 	flex-direction: column;
@@ -177,12 +179,12 @@ div.dashboard-grid-widget-item {
 	.decimals,
 	.units,
 	.item-time {
-		font-size: calc(var(--content-height) * var(--widget-item-font));
-		line-height: 1.14;
+		font-size: calc(var(--content-height) * var(--widget-item-font) / #{$line-height});
+		line-height: $line-height;
 	}
 
 	.svg-arrow {
-		height: calc(var(--content-height) * var(--widget-item-font) * 0.72);
+		height: calc(var(--content-height) * var(--widget-item-font) * 0.72 / #{$line-height});
 		margin-left: .3em;
 	}
 }
