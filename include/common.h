@@ -722,8 +722,8 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define ACTION_PAUSE_SUPPRESSED_TRUE	1	/* pause escalation for suppressed events */
 
 /* action escalation canceled notification mode */
-#define ACTION_NOTIFY_CANCELED_TRUE	1	/* notify about canceled escalations for action (default) */
-#define ACTION_NOTIFY_CANCELED_FALSE	0	/* do not notify about canceled escalations for action */
+#define ACTION_NOTIFY_IF_CANCELED_TRUE	1	/* notify about canceled escalations for action (default) */
+#define ACTION_NOTIFY_IF_CANCELED_FALSE	0	/* do not notify about canceled escalations for action */
 
 /* max number of retries for alerts */
 #define ALERT_MAX_RETRIES	3

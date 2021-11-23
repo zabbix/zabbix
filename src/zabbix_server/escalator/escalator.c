@@ -2445,7 +2445,7 @@ static void	escalation_cancel(DB_ESCALATION *escalation, const DB_ACTION *action
 
 	/* the cancellation notification can be sent if no objects are deleted and notification is not disabled */
 	if (NULL != action && NULL != event && 0 != event->trigger.triggerid && 0 != escalation->esc_step &&
-			ACTION_NOTIFY_CANCELED_FALSE != action->notify_if_canceled)
+			ACTION_NOTIFY_IF_CANCELED_FALSE != action->notify_if_canceled)
 	{
 		add_sentusers_msg_esc_cancel(&user_msg, action->actionid, event, ZBX_NULL2EMPTY_STR(error),
 				default_timezone, service, roles);
