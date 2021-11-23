@@ -2073,15 +2073,8 @@ abstract class CHostGeneral extends CHostBase {
 				$object['groups'] = [];
 
 				if (array_key_exists('groups', $data)) {
-					$db_groups = array_column($db_object['groups'], null, 'groupid');
-
 					foreach ($data['groups'] as $group) {
-						if (array_key_exists($group['groupid'], $db_groups)) {
-							$object['groups'][] = $db_groups[$group['groupid']];
-						}
-						else {
-							$object['groups'][] = ['groupid' => $group['groupid']];
-						}
+						$object['groups'][] = ['groupid' => $group['groupid']];
 					}
 				}
 			}
@@ -2100,7 +2093,8 @@ abstract class CHostGeneral extends CHostBase {
 						$trimmed_macro = CApiInputValidator::trimMacro($macro['macro']);
 
 						if (array_key_exists($trimmed_macro, $db_macros)) {
-							$object['macros'][] = $macro + $db_macros[$trimmed_macro];
+							$object['macros'][] = ['hostmacroid' => $db_macros[$trimmed_macro]['hostmacroid']] + $macro
+								+ ['description' => DB::getDefault('hostmacro', 'description')];
 						}
 						else {
 							$object['macros'][] = $macro;
@@ -2119,32 +2113,26 @@ abstract class CHostGeneral extends CHostBase {
 
 				if (array_key_exists('templates_clear', $data) || array_key_exists('templateids_clear', $data)) {
 					$object['templates_clear'] = [];
+					$db_templates = array_column($db_object['templates'], null, 'templateid');
 				}
-
-				$db_templates = array_column($db_object['templates'], null, 'templateid');
 
 				if (array_key_exists($templates, $data)) {
 					foreach ($data[$templates] as $template) {
-						if (array_key_exists($template['templateid'], $db_templates)) {
-							$object['templates'][] = $db_templates[$template['templateid']];
-						}
-						else {
-							$object['templates'][] = ['templateid' => $template['templateid']];
-						}
+						$object['templates'][] = ['templateid' => $template['templateid']];
 					}
 				}
 
 				if (array_key_exists('templates_clear', $data)) {
 					foreach ($data['templates_clear'] as $template) {
 						if (array_key_exists($template['templateid'], $db_templates)) {
-							$object['templates_clear'][] = $db_templates[$template['templateid']];
+							$object['templates_clear'][] = ['templateid' => $template['templateid']];
 						}
 					}
 				}
 				elseif (array_key_exists('templateids_clear', $data)) {
 					foreach ($data['templateids_clear'] as $templateid) {
 						if (array_key_exists($templateid, $db_templates)) {
-							$object['templates_clear'][] = $db_templates[$template['templateid']];
+							$object['templates_clear'][] = ['templateid' => $templateid];
 						}
 					}
 				}
