@@ -3737,11 +3737,16 @@ static int	evaluate_BASELINE(zbx_variant_t *value, DC_ITEM *item, const char *fu
 		if (SUCCEED != zbx_eval_calc_stddevpop(&values, &value_dev, error))
 			goto out;
 
-		for (i = 0; i < values.values_num; i++)
-			value_avg += values.values[i];
-		value_avg /= values.values_num;
+		if (ZBX_DOUBLE_EPSILON <= value_dev)
+		{
+			for (i = 0; i < values.values_num; i++)
+				value_avg += values.values[i];
+			value_avg /= values.values_num;
 
-		value_dbl = fabs(value_period - value_avg) / value_dev;
+			value_dbl = fabs(value_period - value_avg) / value_dev;
+		}
+		else
+			value_dbl = 0;
 
 		zabbix_log(LOG_LEVEL_TRACE, "fabs(" ZBX_FS_DBL " - " ZBX_FS_DBL ") / " ZBX_FS_DBL " = " ZBX_FS_DBL,
 				value_period, value_avg, value_dev, value_dbl);
