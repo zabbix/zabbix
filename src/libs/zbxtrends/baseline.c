@@ -225,6 +225,12 @@ int	zbx_baseline_get_data(zbx_uint64_t itemid, unsigned char value_type, time_t 
 		goto out;
 	}
 
+	if (season_unit < period_unit)
+	{
+		*error = zbx_strdup(*error, "season cannot be less than data period base");
+		goto out;
+	}
+
 	/* include the data period which might be skipped because of 'skip' parameter */
 	season_num++;
 
