@@ -688,6 +688,7 @@ class CHistFunctionValidatorTest extends TestCase {
 			['trendstl(/host/key, 1h:now/h, 1m, 1d)', ['calculated' => true], ['rc' => false, 'error' => 'invalid third parameter in function "trendstl"']],
 			['trendstl(/host/key, 1d:now/M-1h, 1h, 0)', ['calculated' => true], ['rc' => false, 'error' => 'invalid fourth parameter in function "trendstl"']],
 			['trendstl(/host/key, 1d:now/M-1h, 1h, 1d, 0.5)', ['calculated' => true], ['rc' => false, 'error' => 'invalid fifth parameter in function "trendstl"']],
+			['trendstl(/host/key, 1d:now/M-1h, 1h, 1d, 1.55555)', ['calculated' => true], ['rc' => false, 'error' => 'invalid fifth parameter in function "trendstl"']],
 			['trendstl(/host/key, 1d:now/M-1h, 1h, 1d, -1)', ['calculated' => true], ['rc' => false, 'error' => 'invalid fifth parameter in function "trendstl"']],
 			['trendstl(/host/key, 1d:now/M-1w, 1h, 1d, 1, 0)', ['calculated' => true], ['rc' => false, 'error' => 'invalid sixth parameter in function "trendstl"']],
 			['trendstl(/host/key, 1h:now/d, 1h, 1d, 1, "test")', ['calculated' => true], ['rc' => false, 'error' => 'invalid sixth parameter in function "trendstl"']],
