@@ -310,8 +310,7 @@ class testFormMonitoringServices extends CWebTest {
 				'Problem tags' => ''
 			]
 		];
-		$table_selector = 'xpath://div[@data-dialogueid="services"]//table[@class="list-table"]';
-		$this->assertTableData($result, $table_selector);
+		$this->assertTableData($result, 'xpath://div[@data-dialogueid="services"]//table[@class="list-table"]');
 
 		// Check filtering reset.
 		$childs_dialog->query('button:Reset')->one()->waitUntilClickable()->click();
@@ -728,7 +727,7 @@ class testFormMonitoringServices extends CWebTest {
 			$count = (array_key_exists('dublicate', $data)) ? 2 : 1;
 			$this->assertEquals($count, CDBHelper::getCount('SELECT * FROM services WHERE name='.
 					CXPathHelper::escapeQuotes($data['fields']['Name']))
-				);
+			);
 
 			if ($update) {
 				// In update scenario check that old name actually changed.
