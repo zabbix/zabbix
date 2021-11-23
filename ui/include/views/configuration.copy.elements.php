@@ -84,3 +84,12 @@ $widget->addItem($form);
 require_once dirname(__FILE__).'/js/configuration.copy.elements.js.php';
 
 $widget->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'form_name' => $form->getName(),
+		'copy_targetids' => $data['copy_targetids']
+	]).');
+'))
+	->setOnDocumentReady()
+	->show();

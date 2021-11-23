@@ -323,3 +323,9 @@ $itemForm->addItem([$itemTable, $data['paging'], new CActionButtonList('action',
 $widget->addItem($itemForm);
 
 $widget->show();
+
+(new CScriptTag('
+	view.init();
+'))
+	->setOnDocumentReady()
+	->show();
