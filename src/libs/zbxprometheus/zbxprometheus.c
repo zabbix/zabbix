@@ -22,6 +22,7 @@
 #include "zbxregexp.h"
 #include "log.h"
 #include "zbxjson.h"
+#include "zbxeval.h"
 #include "zbxprometheus.h"
 
 /* Defines maximum row length to be written in error message in the case of parsing failure */
@@ -1529,18 +1530,77 @@ out:
  *                                                                            *
  * Purpose: extracts value from filtered rows according to output template    *
  *                                                                            *
- * Parameters: filter  - [IN] the prometheus filter                           *
- *             output      - [IN] the output template                         *
- *             value       - [OUT] the extracted value                        *
- *             error       - [OUT] the error message                          *
+ * Parameters: filter   - [IN] the prometheus filter                          *
+ *             function - [IN] the aggregation function (optional)            *
+ *             output   - [IN] the output template                            *
+ *             value    - [OUT] the extracted value                           *
+ *             error    - [OUT] the error message                             *
  *                                                                            *
  * Return value: SUCCEED - the value was extracted successfully               *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	prometheus_extract_value(const zbx_vector_ptr_t *rows, const char *output, char **value, char **error)
+static int	prometheus_extract_value(const zbx_vector_ptr_t *rows, const char *function, const char *output,
+		char **value, char **error)
 {
 	const zbx_prometheus_row_t	*row;
+
+	if (NULL != function)
+	{
+		zbx_vector_dbl_t	values;
+		int			i, ret;
+		double			value_dbl;
+
+		zbx_vector_dbl_create(&values);
+
+		for (i = 0; i < rows->values_num; i++)
+		{
+			row = (const zbx_prometheus_row_t *)rows->values[i];
+
+			value_dbl = atof(row->value);
+			zbx_vector_dbl_append(&values, value_dbl);
+		}
+
+		if (0 == strcmp(function, "avg"))
+		{
+			ret = zbx_eval_calc_avg(&values, &value_dbl, error);
+		}
+		else if (0 == strcmp(function, "min"))
+		{
+			ret = zbx_eval_calc_min(&values, &value_dbl, error);
+		}
+		else if (0 == strcmp(function, "max"))
+		{
+			ret = zbx_eval_calc_max(&values, &value_dbl, error);
+		}
+		else if (0 == strcmp(function, "sum"))
+		{
+			zbx_eval_calc_sum(&values, &value_dbl);
+			ret = SUCCEED;
+		}
+		else if (0 == strcmp(function, "count"))
+		{
+			value_dbl = (double)values.values_num;
+			ret = SUCCEED;
+		}
+		else
+		{
+			*error = zbx_dsprintf(NULL, "unsupported aggregation function \"%s\"", function);
+			ret = FAIL;
+		}
+
+		zbx_vector_dbl_destroy(&values);
+
+		if (SUCCEED == ret)
+		{
+			char	buffer[32];
+
+			zbx_print_double(buffer, sizeof(buffer), value_dbl);
+			*value = zbx_strdup(NULL, buffer);
+		}
+
+		return ret;
+	}
 
 	if (0 == rows->values_num)
 	{
@@ -1908,7 +1968,7 @@ int	zbx_prometheus_pattern_ex(zbx_prometheus_t *prom, const char *filter_data, c
 	char			*errmsg = NULL;
 	zbx_vector_ptr_t	rows, *prows;
 
-	zbx_vector_ptr_create(&rows);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (FAIL == prometheus_filter_init(&filter, filter_data, &errmsg))
 	{
@@ -1917,20 +1977,31 @@ int	zbx_prometheus_pattern_ex(zbx_prometheus_t *prom, const char *filter_data, c
 		goto out;
 	}
 
+	zbx_vector_ptr_create(&rows);
+
+	if (NULL != filter.function && '\0' != *output)
+	{
+		*error = zbx_strdup(NULL, "aggregation function cannot be used with output parameter");
+		zbx_free(errmsg);
+		goto cleanup;
+	}
+
 	if (SUCCEED != prometheus_get_indexed_rows_by_label(prom, &filter, &prows) || NULL == prows)
 		prows = &prom->rows;
 
 	prometheus_filter_rows(prows, &filter, &rows);
 
-	if (FAIL == (ret = prometheus_extract_value(&rows, output, value, &errmsg)))
+	if (FAIL == (ret = prometheus_extract_value(&rows, filter.function, output, value, &errmsg)))
 	{
 		*error = zbx_dsprintf(*error, "data extraction error: %s", errmsg);
 		zbx_free(errmsg);
 	}
 
+cleanup:
 	prometheus_filter_clear(&filter);
-out:
 	zbx_vector_ptr_destroy(&rows);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -1970,10 +2041,17 @@ int	zbx_prometheus_pattern(const char *data, const char *filter_data, const char
 
 	zbx_vector_ptr_create(&rows);
 
+	if (NULL != filter.function && '\0' != *output)
+	{
+		*error = zbx_strdup(NULL, "aggregation function cannot be used with output parameter");
+		zbx_free(errmsg);
+		goto cleanup;
+	}
+
 	if (FAIL == prometheus_parse_rows(&filter, data, &rows, NULL, error))
 		goto cleanup;
 
-	if (FAIL == prometheus_extract_value(&rows, output, value, &errmsg))
+	if (FAIL == prometheus_extract_value(&rows, filter.function, output, value, &errmsg))
 	{
 		*error = zbx_dsprintf(*error, "data extraction error: %s", errmsg);
 		zbx_free(errmsg);
@@ -2022,6 +2100,13 @@ int	zbx_prometheus_to_json(const char *data, const char *filter_data, char **val
 	if (FAIL == prometheus_filter_init(&filter, filter_data, &errmsg))
 	{
 		*error = zbx_dsprintf(*error, "pattern error: %s", errmsg);
+		zbx_free(errmsg);
+		goto out;
+	}
+
+	if (NULL != filter.function)
+	{
+		*error = zbx_strdup(NULL, "aggregation function cannot be used when converting Prometheus data to JSON");
 		zbx_free(errmsg);
 		goto out;
 	}

@@ -664,3 +664,127 @@ err:
 
 	return ret;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_eval_calc_avg                                                *
+ *                                                                            *
+ * Purpose: evaluate function avg                                             *
+ *                                                                            *
+ * Parameters: values - [IN] non-empty vector with input data                 *
+ *             result - [OUT] calculated value                                *
+ *             error  - [OUT] dynamically allocated error message             *
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully                             *
+ *               FAIL - failed to evaluate function (see 'error')             *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_eval_calc_avg(zbx_vector_dbl_t *values, double *result, char **error)
+{
+	if (0 == values->values_num)
+	{
+		*error = zbx_strdup(*error, "not enough data");
+		return FAIL;
+	}
+
+	*result = calc_arithmetic_mean(values);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_eval_calc_min                                                *
+ *                                                                            *
+ * Purpose: evaluate function min                                             *
+ *                                                                            *
+ * Parameters: values - [IN] non-empty vector with input data                 *
+ *             result - [OUT] calculated value                                *
+ *             error  - [OUT] dynamically allocated error message             *
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully                             *
+ *               FAIL - failed to evaluate function (see 'error')             *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_eval_calc_min(zbx_vector_dbl_t *values, double *result, char **error)
+{
+	double	value;
+	int	i;
+
+	if (0 == values->values_num)
+	{
+		*error = zbx_strdup(*error, "not enough data");
+		return FAIL;
+	}
+
+	value = values->values[0];
+
+	for (i = 1; i < values->values_num; i++)
+	{
+		if (values->values[i] < value)
+			value = values->values[i];
+	}
+
+	*result = value;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_eval_calc_max                                                *
+ *                                                                            *
+ * Purpose: evaluate function max                                             *
+ *                                                                            *
+ * Parameters: values - [IN] non-empty vector with input data                 *
+ *             result - [OUT] calculated value                                *
+ *             error  - [OUT] dynamically allocated error message             *
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully                             *
+ *               FAIL - failed to evaluate function (see 'error')             *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_eval_calc_max(zbx_vector_dbl_t *values, double *result, char **error)
+{
+	double	value;
+	int	i;
+
+	if (0 == values->values_num)
+	{
+		*error = zbx_strdup(*error, "not enough data");
+		return FAIL;
+	}
+
+	value = values->values[0];
+
+	for (i = 1; i < values->values_num; i++)
+	{
+		if (values->values[i] > value)
+			value = values->values[i];
+	}
+
+	*result = value;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_eval_calc_sum                                                *
+ *                                                                            *
+ * Purpose: evaluate function sum                                             *
+ *                                                                            *
+ * Parameters: values - [IN] non-empty vector with input data                 *
+ *             result - [OUT] calculated value                                *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_eval_calc_sum(zbx_vector_dbl_t *values, double *result)
+{
+	double	value = 0;
+	int	i;
+
+	for (i = 0; i < values->values_num; i++)
+		value += values->values[i];
+
+	*result = value;
+}
