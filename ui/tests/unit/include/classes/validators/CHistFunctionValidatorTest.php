@@ -812,7 +812,47 @@ class CHistFunctionValidatorTest extends TestCase {
 
 			// Filters.
 			['sum(/host/key?[tag="foo"], 1d)', ['calculated' => true], ['rc' => false, 'error' => 'invalid first parameter in function "sum"']],
-			['sum_foreach(/host/key?[tag="foo"], 1d)', ['calculated' => true, 'aggregating' => true], ['rc' => true, 'error' => null]]
+			['sum_foreach(/host/key?[tag="foo"], 1d)', ['calculated' => true, 'aggregating' => true], ['rc' => true, 'error' => null]],
+
+			['baselinedev(/host/key)', [], ['rc' => false, 'error' => 'mandatory parameter is missing in function "baselinedev"']],
+			['baselinedev(/host/key,)', [], ['rc' => false, 'error' => 'invalid second parameter in function "baselinedev"']],
+			['baselinedev(/host/key, 0)', [], ['rc' => false, 'error' => 'invalid second parameter in function "baselinedev"']],
+			['baselinedev(/host/key, #0)', [], ['rc' => false, 'error' => 'invalid second parameter in function "baselinedev"']],
+			['baselinedev(/host/key, #1)', [], ['rc' => false, 'error' => 'invalid second parameter in function "baselinedev"']],
+			['baselinedev(/host/key, 1)', [], ['rc' => false, 'error' => 'invalid second parameter in function "baselinedev"']],
+			['baselinedev(/host/key, 1h)', [], ['rc' => false, 'error' => 'invalid second parameter in function "baselinedev"']],
+			['baselinedev(/host/key, 1h:now-1h)', [], ['rc' => false, 'error' => 'mandatory parameter is missing in function "baselinedev"']],
+			['baselinedev(/host/key, 1y:now/y,)', [], ['rc' => false, 'error' => 'invalid third parameter in function "baselinedev"']],
+			['baselinedev(/host/key, 1h:now-1h, 1M)', [], ['rc' => true, 'error' => null]],
+			['baselinedev(/host/key, 1d:now-1h, 1y)', [], ['rc' => true, 'error' => null]],
+			['baselinedev(/host/key, 1M:now/M+2M, 1y)', [], ['rc' => true, 'error' => null]],
+			['baselinedev(/host/key, {$PERIOD}:{$TIMESHIFT}, 2y)', ['usermacros' => true], ['rc' => true, 'error' => null]],
+			['baselinedev(/host/key, {$PERIOD}:now-{$TIMESHIFT}, 2y)', ['usermacros' => true], ['rc' => true, 'error' => null]],
+			['baselinedev(/host/key, {$MACRO}, 2y)', ['usermacros' => true], ['rc' => true, 'error' => null]],
+			['baselinedev(/host/key, {$MACRO}, {$MACRO})', ['usermacros' => true], ['rc' => true, 'error' => null]],
+			['baselinedev(/host/key, {#LLDMACRO}, 2y)', ['lldmacros' => true], ['rc' => true, 'error' => null]],
+			['baselinedev(/host/key, {#LLDMACRO}, {$MACRO})', ['lldmacros' => true], ['rc' => false, 'error' => 'invalid third parameter in function "baselinedev"']],
+			['baselinedev(/host/key, {#LLDMACRO}, {$MACRO})', ['lldmacros' => true, 'usermacros' => true], ['rc' => true, 'error' => null]],
+
+			['baselinewma(/host/key)', [], ['rc' => false, 'error' => 'mandatory parameter is missing in function "baselinewma"']],
+			['baselinewma(/host/key,)', [], ['rc' => false, 'error' => 'invalid second parameter in function "baselinewma"']],
+			['baselinewma(/host/key, 0)', [], ['rc' => false, 'error' => 'invalid second parameter in function "baselinewma"']],
+			['baselinewma(/host/key, #0)', [], ['rc' => false, 'error' => 'invalid second parameter in function "baselinewma"']],
+			['baselinewma(/host/key, #1)', [], ['rc' => false, 'error' => 'invalid second parameter in function "baselinewma"']],
+			['baselinewma(/host/key, 1)', [], ['rc' => false, 'error' => 'invalid second parameter in function "baselinewma"']],
+			['baselinewma(/host/key, 1h)', [], ['rc' => false, 'error' => 'invalid second parameter in function "baselinewma"']],
+			['baselinewma(/host/key, 1h:now-1h)', [], ['rc' => false, 'error' => 'mandatory parameter is missing in function "baselinewma"']],
+			['baselinewma(/host/key, 1y:now/y,)', [], ['rc' => false, 'error' => 'invalid third parameter in function "baselinewma"']],
+			['baselinewma(/host/key, 1h:now-1h, 1M)', [], ['rc' => true, 'error' => null]],
+			['baselinewma(/host/key, 1d:now-1h, 1y)', [], ['rc' => true, 'error' => null]],
+			['baselinewma(/host/key, 1M:now/M+2M, 1y)', [], ['rc' => true, 'error' => null]],
+			['baselinewma(/host/key, {$PERIOD}:{$TIMESHIFT}, 2y)', ['usermacros' => true], ['rc' => true, 'error' => null]],
+			['baselinewma(/host/key, {$PERIOD}:now-{$TIMESHIFT}, 2y)', ['usermacros' => true], ['rc' => true, 'error' => null]],
+			['baselinewma(/host/key, {$MACRO}, 2y)', ['usermacros' => true], ['rc' => true, 'error' => null]],
+			['baselinewma(/host/key, {$MACRO}, {$MACRO})', ['usermacros' => true], ['rc' => true, 'error' => null]],
+			['baselinewma(/host/key, {#LLDMACRO}, 2y)', ['lldmacros' => true], ['rc' => true, 'error' => null]],
+			['baselinewma(/host/key, {#LLDMACRO}, {$MACRO})', ['lldmacros' => true], ['rc' => false, 'error' => 'invalid third parameter in function "baselinewma"']],
+			['baselinewma(/host/key, {#LLDMACRO}, {$MACRO})', ['lldmacros' => true, 'usermacros' => true], ['rc' => true, 'error' => null]]
 		];
 	}
 
