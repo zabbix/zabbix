@@ -34,12 +34,14 @@ If you want to specify libpcre2 installation directories:
 AC_HELP_STRING([--with-libpcre2@<:@=DIR@:>@], [use libpcre2 from given base install directory (DIR), default is to search through a number of common places for the libpcre2 files.])],
 		[
 			if test "$withval" = "yes"; then
+				want_libpcre2=yes
 				if test -f /usr/local/include/pcre2.h; then
 					withval="/usr/local"
 				else
 					withval="/usr"
 				fi
 			else
+				want_libpcre2=no
 				_libpcre2_dir_lib="$withval/lib"
 			fi
 			_libpcre2_dir="$withval"

@@ -1870,28 +1870,37 @@ SENDER_LIBS="$SENDER_LIBS $ZLIB_LIBS $LIBPTHREAD_LIBS"
 ZBXJS_LDFLAGS="$ZBXJS_LDFLAGS $LIBCURL_LDFLAGS"
 ZBXJS_LIBS="$ZBXJS_LIBS $LIBCURL_LIBS"
 
-dnl Check for libpcre, used by Zabbix for regular expressions
-dnl if test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes" || test "x$agent2" = "xyes"; then
-dnl 	LIBPCRE_CHECK_CONFIG([no])
-dnl 	if test "x$found_libpcre" != "xyes"; then
-dnl 		AC_MSG_ERROR([Unable to use libpcre (libpcre check failed)])
-dnl 	fi
-dnl fi
+dnl Check for libpcre or libpcre2, used by Zabbix for regular expressions
+LIBPCRE_CHECK_CONFIG([no])
+LIBPCRE2_CHECK_CONFIG([no])
+if test "x$want_libpcre2" = "xyes"; then
+	if test "x$want_libpcre" = "xyes"; then
+		AC_MSG_ERROR([cannot use both pcre and pcre2 at the same time!])
+	fi
 
-dnl Check for libpcre2, used by Zabbix for regular expressions
-if test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes" || test "x$agent2" = "xyes"; then
-	LIBPCRE2_CHECK_CONFIG([no])
 	if test "x$found_libpcre2" != "xyes"; then
 		AC_MSG_ERROR([Unable to use libpcre2 (libpcre2 check failed)])
 	fi
-fi
 
-CFLAGS="$CFLAGS $LIBPCRE_CFLAGS"
-LDFLAGS="$LDFLAGS $LIBPCRE_LDFLAGS"
-if test "x$ARCH" = "xosx"; then
-	LIBS="$LIBPCRE_LIBS $LIBS"
-else
-	LIBS="$LIBS $LIBPCRE_LIBS"
+	CFLAGS="$CFLAGS $LIBPCRE2_CFLAGS"
+	LDFLAGS="$LDFLAGS $LIBPCRE2_LDFLAGS"
+	if test "x$ARCH" = "xosx"; then
+		LIBS="$LIBPCRE2_LIBS $LIBS"
+	else
+		LIBS="$LIBS $LIBPCRE2_LIBS"
+	fi
+elif test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes" || test "x$agent2" = "xyes"; then
+	if test "x$found_libpcre" != "xyes"; then
+		AC_MSG_ERROR([Unable to use libpcre (libpcre check failed)])
+	fi
+
+	CFLAGS="$CFLAGS $LIBPCRE_CFLAGS"
+	LDFLAGS="$LDFLAGS $LIBPCRE_LDFLAGS"
+	if test "x$ARCH" = "xosx"; then
+		LIBS="$LIBPCRE_LIBS $LIBS"
+	else
+		LIBS="$LIBS $LIBPCRE_LIBS"
+	fi
 fi
 
 found_iconv="no"
