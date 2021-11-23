@@ -319,9 +319,8 @@ class CTemplate extends CHostGeneral {
 		$ins_templates = [];
 
 		foreach ($templates as $template) {
-			unset($template['groups'], $template['templates'], $template['hosts'], $template['tags'],
-				$template['macros']
-			);
+			unset($template['groups'], $template['templates'], $template['tags'], $template['macros']);
+
 			$ins_templates[] = $template + ['status' => HOST_STATUS_TEMPLATE];
 		}
 
