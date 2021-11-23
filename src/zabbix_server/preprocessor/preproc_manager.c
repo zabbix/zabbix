@@ -28,7 +28,6 @@
 #include "zbxserialize.h"
 #include "zbxipcservice.h"
 #include "zbxlld.h"
-#include "../../libs/zbxalgo/vectorimpl.h"
 
 #include "preprocessing.h"
 #include "preproc_manager.h"
@@ -83,8 +82,6 @@ typedef struct preprocessing_request
 								/* at the beginning of preprocessing queue */
 }
 zbx_preprocessing_request_t;
-
-ZBX_PTR_VECTOR_IMPL(ipcmsg, zbx_ipc_message_t *)
 
 /* bulk dependent item preprocessing request*/
 typedef struct

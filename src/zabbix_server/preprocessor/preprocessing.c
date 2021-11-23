@@ -28,6 +28,7 @@
 #include "preprocessing.h"
 #include "preproc_history.h"
 #include "item_preproc.h"
+#include "../../libs/zbxalgo/vectorimpl.h"
 
 #define PACKED_FIELD_RAW	0
 #define PACKED_FIELD_STRING	1
@@ -39,6 +40,7 @@
 static zbx_ipc_message_t	cached_message;
 static int			cached_values;
 
+ZBX_PTR_VECTOR_IMPL(ipcmsg, zbx_ipc_message_t *)
 
 static zbx_uint32_t	fields_calc_size(zbx_packed_field_t *fields, int fields_num)
 {

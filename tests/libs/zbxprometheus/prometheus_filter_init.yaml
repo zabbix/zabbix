@@ -402,6 +402,44 @@ out:
   value:
     pattern: inf
     op: ==
+---
+test case: count(cpu{type="intel"} == 1)
+in: 
+  filter: count(cpu{type="intel"} == 1)
+out:
+  return: SUCCEED
+  metric:
+    pattern: cpu
+    op: =
+  value:
+    pattern: 1
+    op: ==
+  labels:
+    - key: type
+      pattern: intel
+      op: =
+  function: count
+---
+test case: count( cpu{type="intel"} == 1 )
+in: 
+  filter: count( cpu{type="intel"} == 1 )
+out:
+  return: SUCCEED
+  metric:
+    pattern: cpu
+    op: =
+  value:
+    pattern: 1
+    op: ==
+  labels:
+    - key: type
+      pattern: intel
+      op: =
+  function: count
+---
+test case: count(cpu{type="intel"} == 1
+in: 
+  filter: count(cpu{type="intel"} == 1
+out:
+  return: FAIL
 ...
-
-

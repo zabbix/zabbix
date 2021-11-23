@@ -55,7 +55,7 @@ static zbx_prometheus_condition_test_t	*prometheus_condition_dup(zbx_prometheus_
 	return test_condition;
 }
 
-int	zbx_prometheus_filter_parse(const char *data, zbx_prometheus_condition_test_t **metric,
+int	zbx_prometheus_filter_parse(const char *data, char **function, zbx_prometheus_condition_test_t **metric,
 		zbx_vector_ptr_t *labels, zbx_prometheus_condition_test_t **value, char **error)
 {
 	zbx_prometheus_filter_t	filter;
@@ -67,6 +67,7 @@ int	zbx_prometheus_filter_parse(const char *data, zbx_prometheus_condition_test_
 		return FAIL;
 	}
 
+	*function = (NULL != filter.function ? zbx_strdup(NULL, filter.function) : NULL);
 	*metric = prometheus_condition_dup(filter.metric);
 	*value = prometheus_condition_dup(filter.value);
 

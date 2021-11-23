@@ -65,6 +65,8 @@ typedef struct
 	zbx_prometheus_condition_t	*value;
 	/* label filters */
 	zbx_vector_ptr_t		labels;
+	/* aggregation function */
+	char				*function;
 }
 zbx_prometheus_filter_t;
 
@@ -658,6 +660,8 @@ static void	prometheus_filter_clear(zbx_prometheus_filter_t *filter)
 
 	zbx_vector_ptr_clear_ext(&filter->labels, (zbx_clean_func_t)prometheus_condition_free);
 	zbx_vector_ptr_destroy(&filter->labels);
+
+	zbx_free(filter->function);
 }
 
 /******************************************************************************
@@ -782,9 +786,10 @@ static int	prometheus_filter_parse_labels(zbx_prometheus_filter_t *filter, const
  ******************************************************************************/
 static int	prometheus_filter_init(zbx_prometheus_filter_t *filter, const char *data, char **error)
 {
-	int		ret = FAIL;
+	int		ret = FAIL, metric_ret;
 	size_t		pos = 0;
 	zbx_strloc_t	loc;
+	char		terminator;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -799,12 +804,22 @@ static int	prometheus_filter_init(zbx_prometheus_filter_t *filter, const char *d
 
 	pos = skip_spaces(data, pos);
 
-	if (SUCCEED == parse_metric(data, pos, &loc))
+	if (SUCCEED == (metric_ret = parse_metric(data, pos, &loc)))
 	{
-		filter->metric = prometheus_condition_create(NULL, str_loc_dup(data, &loc),
-				ZBX_PROMETHEUS_CONDITION_OP_EQUAL);
+		if ('(' == data[loc.r + 1])
+		{
+			filter->function = str_loc_dup(data, &loc);
+			pos = skip_spaces(data, loc.r + 2);
+			metric_ret = parse_metric(data, pos, &loc);
+		}
 
-		pos = skip_spaces(data, loc.r + 1);
+		if (SUCCEED == metric_ret)
+		{
+			filter->metric = prometheus_condition_create(NULL, str_loc_dup(data, &loc),
+					ZBX_PROMETHEUS_CONDITION_OP_EQUAL);
+
+			pos = skip_spaces(data, loc.r + 1);
+		}
 	}
 
 	if ('{' == data[pos])
@@ -817,8 +832,10 @@ static int	prometheus_filter_init(zbx_prometheus_filter_t *filter, const char *d
 
 	pos = skip_spaces(data, pos);
 
+	terminator = (NULL == filter->function ? '\0' : ')');
+
 	/* parse metric value condition */
-	if ('\0' != data[pos])
+	if (data[pos] != terminator)
 	{
 		zbx_strloc_t	loc_op, loc_value;
 
@@ -837,7 +854,7 @@ static int	prometheus_filter_init(zbx_prometheus_filter_t *filter, const char *d
 		}
 
 		pos = skip_spaces(data, loc_value.r + 1);
-		if ('\0' != data[pos])
+		if (data[pos] != terminator)
 		{
 			*error = zbx_dsprintf(*error, "unexpected data after metric comparison value at \"%s\"",
 					data + pos);
@@ -847,6 +864,16 @@ static int	prometheus_filter_init(zbx_prometheus_filter_t *filter, const char *d
 		filter->value = prometheus_condition_create(NULL, str_loc_dup(data, &loc_value),
 				ZBX_PROMETHEUS_CONDITION_OP_EQUAL_VALUE);
 		zbx_strlower(filter->value->pattern);
+	}
+
+	if (')' == terminator)
+	{
+		pos = skip_spaces(data, pos + 1);
+		if ('\0' != data[pos])
+		{
+			*error = zbx_dsprintf(*error, "unexpected data after function end \"%s\"", data + pos);
+			goto out;
+		}
 	}
 
 	ret = SUCCEED;
