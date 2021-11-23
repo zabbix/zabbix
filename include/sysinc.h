@@ -351,11 +351,11 @@
 #	include <math.h>
 #endif
 
-#ifdef HAVE_PCRE_H
+#ifdef USE_PCRE
 #	include <pcre.h>
 #endif
 
-#ifdef HAVE_PCRE2_H
+#ifdef USE_PCRE2
 #	define PCRE2_CODE_UNIT_WIDTH 8
 #	include <pcre2.h>
 #endif

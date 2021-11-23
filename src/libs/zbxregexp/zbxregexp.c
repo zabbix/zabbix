@@ -23,8 +23,13 @@
 
 struct zbx_regexp
 {
+#ifdef USE_PCRE
 	pcre			*pcre_regexp;
 	struct pcre_extra	*extra;
+#endif
+#ifdef USE_PCRE2
+	pcre2_code		*pcre_regexp;
+#endif
 };
 
 /* maps to ovector of pcre_exec() */
@@ -60,6 +65,7 @@ zbx_regmatch_t;
  ******************************************************************************/
 static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp, const char **err_msg_static)
 {
+#ifdef USE_PCRE
 	int			error_offset = -1;
 	pcre			*pcre_regexp;
 	struct pcre_extra	*extra;
@@ -108,6 +114,7 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
 		pcre_free(pcre_regexp);
 
 	return SUCCEED;
+#endif
 }
 
 /*******************************************************
@@ -119,10 +126,12 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
  *******************************************************/
 int	zbx_regexp_compile(const char *pattern, zbx_regexp_t **regexp, const char **err_msg_static)
 {
+#ifdef USE_PCRE
 #ifdef PCRE_NO_AUTO_CAPTURE
 	return regexp_compile(pattern, PCRE_MULTILINE | PCRE_NO_AUTO_CAPTURE, regexp, err_msg_static);
 #else
 	return regexp_compile(pattern, PCRE_MULTILINE, regexp, err_msg_static);
+#endif
 #endif
 }
 
@@ -135,7 +144,9 @@ int	zbx_regexp_compile(const char *pattern, zbx_regexp_t **regexp, const char **
  *******************************************************/
 int	zbx_regexp_compile_ext(const char *pattern, zbx_regexp_t **regexp, int flags, const char **err_msg_static)
 {
+#ifdef USE_PCRE
 	return regexp_compile(pattern, flags, regexp, err_msg_static);
+#endif
 }
 
 /****************************************************************************************************
@@ -200,6 +211,7 @@ static int	regexp_prepare(const char *pattern, int flags, zbx_regexp_t **regexp,
 static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags, int count,
 		zbx_regmatch_t *matches)
 {
+#ifdef USE_PCRE
 #define MATCHES_BUFF_SIZE	(ZBX_REGEXP_GROUPS_MAX * 3)		/* see pcre_exec() in "man pcreapi" why 3 */
 
 	int				result, r;
@@ -267,6 +279,7 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 
 	return result;
 #undef MATCHES_BUFF_SIZE
+#endif
 }
 
 /******************************************************************************
@@ -280,6 +293,7 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
  ******************************************************************************/
 void	zbx_regexp_free(zbx_regexp_t *regexp)
 {
+#ifdef USE_PCRE
 	/* pcre_free_study() was added to the API for release 8.20 while extra was available before */
 #ifdef PCRE_CONFIG_JIT
 	pcre_free_study(regexp->extra);
@@ -288,6 +302,7 @@ void	zbx_regexp_free(zbx_regexp_t *regexp)
 #endif
 	pcre_free(regexp->pcre_regexp);
 	zbx_free(regexp);
+#endif
 }
 
 /******************************************************************************
@@ -362,7 +377,9 @@ static char	*zbx_regexp(const char *string, const char *pattern, int flags, int 
 
 char	*zbx_regexp_match(const char *string, const char *pattern, int *len)
 {
+#ifdef USE_PCRE
 	return zbx_regexp(string, pattern, PCRE_MULTILINE, len);
+#endif
 }
 
 /******************************************************************************
@@ -646,7 +663,9 @@ int	zbx_mregexp_sub_precompiled(const char *string, const zbx_regexp_t *regexp, 
  *********************************************************************************/
 int	zbx_regexp_sub(const char *string, const char *pattern, const char *output_template, char **out)
 {
+#ifdef USE_PCRE
 	return regexp_sub(string, pattern, output_template, PCRE_MULTILINE, out);
+#endif
 }
 
 /*********************************************************************************
@@ -672,7 +691,9 @@ int	zbx_mregexp_sub(const char *string, const char *pattern, const char *output_
  *********************************************************************************/
 int	zbx_iregexp_sub(const char *string, const char *pattern, const char *output_template, char **out)
 {
+#ifdef USE_PCRE
 	return regexp_sub(string, pattern, output_template, PCRE_CASELESS, out);
+#endif
 }
 
 /******************************************************************************
@@ -752,6 +773,7 @@ void	add_regexp_ex(zbx_vector_ptr_t *regexps, const char *name, const char *expr
 static int	regexp_match_ex_regsub(const char *string, const char *pattern, int case_sensitive,
 		const char *output_template, char **output)
 {
+#ifdef USE_PCRE
 	int	regexp_flags = PCRE_MULTILINE, ret = FAIL;
 
 	if (ZBX_IGNORE_CASE == case_sensitive)
@@ -778,6 +800,7 @@ static int	regexp_match_ex_regsub(const char *string, const char *pattern, int c
 	}
 
 	return ret;
+#endif
 }
 
 /**********************************************************************************

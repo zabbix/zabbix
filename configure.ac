@@ -1875,7 +1875,7 @@ LIBPCRE_CHECK_CONFIG([no])
 LIBPCRE2_CHECK_CONFIG([no])
 if test "x$want_libpcre2" = "xyes"; then
 	if test "x$want_libpcre" = "xyes"; then
-		AC_MSG_ERROR([cannot use both pcre and pcre2 at the same time!])
+		AC_MSG_ERROR([Cannot use both pcre and pcre2 at the same time!])
 	fi
 
 	if test "x$found_libpcre2" != "xyes"; then
@@ -1889,6 +1889,8 @@ if test "x$want_libpcre2" = "xyes"; then
 	else
 		LIBS="$LIBS $LIBPCRE2_LIBS"
 	fi
+
+	AC_DEFINE([USE_PCRE2], 1, [Using new pcre2 library])
 elif test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes" || test "x$agent2" = "xyes"; then
 	if test "x$found_libpcre" != "xyes"; then
 		AC_MSG_ERROR([Unable to use libpcre (libpcre check failed)])
@@ -1901,6 +1903,8 @@ elif test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xy
 	else
 		LIBS="$LIBS $LIBPCRE_LIBS"
 	fi
+
+	AC_DEFINE([USE_PCRE], 1, [Using old pcre library])
 fi
 
 found_iconv="no"
