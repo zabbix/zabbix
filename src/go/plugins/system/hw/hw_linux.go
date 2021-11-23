@@ -162,11 +162,11 @@ func updateStartCounter(content []byte, start int) int {
 func getChassisValues(content []byte, flags, start int) (string, int) {
 	var value string
 
-	var magicNumbers = []int{4, 5, 7}
+	var positionNumbers = []int{4, 5, 7}
 	var types = []int{chassisVendor, chassisModel, chassisSerial}
 
 	if content[start] == 1 {
-		for i, nr := range magicNumbers {
+		for i, nr := range positionNumbers {
 			var tmp string
 			tmp, flags = getChassisValue(content, start, nr, flags, types[i])
 			value += " " + tmp
@@ -193,12 +193,6 @@ func getChassisValue(content []byte, start, magicNumber, flags, flag int) (strin
 }
 
 func getParams(params []string) (content []byte, flags, conLength int, err error) {
-	if len(params) > 1 {
-		err = zbxerr.ErrorTooManyParameters
-
-		return
-	}
-
 	if flags, err = getFlags(params); err != nil {
 		return
 	}
