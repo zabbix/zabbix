@@ -119,9 +119,9 @@ abstract class CHostGeneral extends CHostBase {
 			]);
 
 			if ($duplicate) {
-				$error = ($duplicate['status'] == HOST_STATUS_TEMPLATE)
-					? _s('Template with the same name "%1$s" already exists.', $duplicate['host'])
-					: _s('Host with the same name "%1$s" already exists.', $duplicate['host']);
+				$error = ($duplicate[0]['status'] == HOST_STATUS_TEMPLATE)
+					? _s('Template with the same name "%1$s" already exists.', $duplicate[0]['host'])
+					: _s('Host with the same name "%1$s" already exists.', $duplicate[0]['host']);
 
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
@@ -138,9 +138,9 @@ abstract class CHostGeneral extends CHostBase {
 			]);
 
 			if ($duplicate) {
-				$error = ($duplicate['status'] == HOST_STATUS_TEMPLATE)
-					? _s('Template with the same name "%1$s" already exists.', $duplicate['name'])
-					: _s('Host with the same name "%1$s" already exists.', $duplicate['name']);
+				$error = ($duplicate[0]['status'] == HOST_STATUS_TEMPLATE)
+					? _s('Template with the same name "%1$s" already exists.', $duplicate[0]['name'])
+					: _s('Host with the same name "%1$s" already exists.', $duplicate[0]['name']);
 
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
