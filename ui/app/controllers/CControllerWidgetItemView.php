@@ -310,7 +310,11 @@ class CControllerWidgetItemView extends CControllerWidget {
 			$h = $fields['value_h_pos'];
 
 			// Wrap value, decimals, change indicator and units in "item-value" DIV.
-			$classes = ['item-value', self::trVPos($v), self::trHPos($h)];
+			$classes = ['item-value', self::trVPos($v), self::trHPos($h),
+				($value_type == ITEM_VALUE_TYPE_FLOAT || $value_type == ITEM_VALUE_TYPE_UINT64)
+					? 'type-number'
+					: 'type-text'
+			];
 
 			$data[$v][$h] = [
 				'item_value' => [
@@ -386,7 +390,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 				]
 			];
 
-			if ($decimals !== '' && in_array($value_type, [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
+			if ($decimals !== '' && ($value_type == ITEM_VALUE_TYPE_FLOAT || $value_type == ITEM_VALUE_TYPE_UINT64)) {
 				$classes = ['decimals'];
 				if ($fields['value_bold'] == 1) {
 					$classes[] = 'bold';
@@ -445,7 +449,10 @@ class CControllerWidgetItemView extends CControllerWidget {
 			$v = $fields['value_v_pos'];
 			$h = $fields['value_h_pos'];
 
-			// Show only change indicator without value, but do get the position of value where it should be.
+			/*
+			 * Show only change indicator without value, but do get the position of value where it should be. If change
+			 * indicator is alone, it doesn't matter if type is text or number.
+			 */
 			$classes = ['item-value', self::trVPos($v), self::trHPos($h)];
 
 			$data[$v][$h] = [
