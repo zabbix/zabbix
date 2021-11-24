@@ -1851,6 +1851,7 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t *cur
 	if (SUCCEED != res)
 	{
 		zbx_eval_context_t	ctx, ctx_r;
+		zbx_uint64_t		parse_rules = ZBX_EVAL_PARSE_TRIGGER_EXPRESSSION | ZBX_EVAL_COMPOSE_FUNCTIONID;
 
 		*new_triggerid = DBget_maxid("triggers");
 		*cur_triggerid = 0;
@@ -1875,13 +1876,14 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t *cur
 		zbx_free(url_esc);
 		zbx_free(comments_esc);
 
-		if (SUCCEED != (res = zbx_eval_parse_expression(&ctx, expression,
-				ZBX_EVAL_PARSE_TRIGGER_EXPRESSSION | ZBX_EVAL_COMPOSE_FUNCTIONID, error)))
+		if (0 != (flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
+			parse_rules |= ZBX_EVAL_PARSE_LLDMACRO | ZBX_EVAL_COMPOSE_LLD;
+
+		if (SUCCEED != (res = zbx_eval_parse_expression(&ctx, expression, parse_rules, error)))
 			goto out;
 
 		if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == recovery_mode &&
-				(SUCCEED != (res = zbx_eval_parse_expression(&ctx_r, recovery_expression,
-						ZBX_EVAL_PARSE_TRIGGER_EXPRESSSION | ZBX_EVAL_COMPOSE_FUNCTIONID,
+				(SUCCEED != (res = zbx_eval_parse_expression(&ctx_r, recovery_expression, parse_rules,
 						error))))
 		{
 			zbx_eval_clear(&ctx);
