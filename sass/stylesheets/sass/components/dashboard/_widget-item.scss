@@ -79,34 +79,40 @@ form.dashboard-grid-widget-item {
 
 // Widget view.
 
-a.dashboard-grid-widget-item {
+div.dashboard-grid-widget-item {
 	$line-height: 1.14;
 
 	box-sizing: border-box;
-	display: flex;
-	flex-direction: column;
 	height: 100%;
 	padding: 10px;
 	overflow-x: hidden;
-	color: inherit;
 
 	@extend %webkit-scrollbar;
 
-	&:focus,
-	&:hover,
-	&:visited {
-		border: none;
-	}
-
-	> div {
+	a {
+		box-sizing: border-box;
 		display: flex;
-		flex: 1 1 calc(100% / 3);
+		flex-direction: column;
+		height: 100%;
+		color: inherit;
+
+		&:focus,
+		&:hover,
+		&:visited {
+			border: none;
+		}
+
+		> div {
+			display: flex;
+			flex: 1 1 calc(100% / 3);
+		}
 	}
 
 	.item-description,
 	.item-value,
 	.item-time {
 		flex: 1 1 auto;
+		max-width: 100%;
 	}
 
 	.item-value {

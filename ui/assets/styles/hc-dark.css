@@ -1438,76 +1438,80 @@ form.dashboard-grid-widget-item .field-group-change-indicator .input-color-picke
 form.dashboard-grid-widget-item .table-forms .table-forms-td-left label.widget-item-label {
   margin-top: 6px; }
 
-a.dashboard-grid-widget-item {
+div.dashboard-grid-widget-item {
   box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
   height: 100%;
   padding: 10px;
-  overflow-x: hidden;
-  color: inherit; }
-  a.dashboard-grid-widget-item:focus, a.dashboard-grid-widget-item:hover, a.dashboard-grid-widget-item:visited {
-    border: none; }
-  a.dashboard-grid-widget-item > div {
+  overflow-x: hidden; }
+  div.dashboard-grid-widget-item a {
+    box-sizing: border-box;
     display: flex;
-    flex: 1 1 calc(100% / 3); }
-  a.dashboard-grid-widget-item .item-description,
-  a.dashboard-grid-widget-item .item-value,
-  a.dashboard-grid-widget-item .item-time {
-    flex: 1 1 auto; }
-  a.dashboard-grid-widget-item .item-value {
+    flex-direction: column;
+    height: 100%;
+    color: inherit; }
+    div.dashboard-grid-widget-item a:focus, div.dashboard-grid-widget-item a:hover, div.dashboard-grid-widget-item a:visited {
+      border: none; }
+    div.dashboard-grid-widget-item a > div {
+      display: flex;
+      flex: 1 1 calc(100% / 3); }
+  div.dashboard-grid-widget-item .item-description,
+  div.dashboard-grid-widget-item .item-value,
+  div.dashboard-grid-widget-item .item-time {
+    flex: 1 1 auto;
+    max-width: 100%; }
+  div.dashboard-grid-widget-item .item-value {
     display: flex;
     flex-wrap: wrap;
     margin: 0 5px; }
-    a.dashboard-grid-widget-item .item-value > .units:first-child, a.dashboard-grid-widget-item .item-value > .units:last-child {
+    div.dashboard-grid-widget-item .item-value > .units:first-child, div.dashboard-grid-widget-item .item-value > .units:last-child {
       flex: 0 0 100%; }
-    a.dashboard-grid-widget-item .item-value > .units:first-child {
+    div.dashboard-grid-widget-item .item-value > .units:first-child {
       margin-bottom: -0.07em; }
-    a.dashboard-grid-widget-item .item-value > .units:last-child {
+    div.dashboard-grid-widget-item .item-value > .units:last-child {
       margin-top: -0.07em; }
-    a.dashboard-grid-widget-item .item-value.type-text {
+    div.dashboard-grid-widget-item .item-value.type-text {
       min-width: 0; }
-      a.dashboard-grid-widget-item .item-value.type-text .item-value-content {
+      div.dashboard-grid-widget-item .item-value.type-text .item-value-content {
         min-width: 0; }
-  a.dashboard-grid-widget-item .item-value-content {
+  div.dashboard-grid-widget-item .item-value-content {
     display: flex;
     align-items: baseline;
     overflow: hidden; }
-  a.dashboard-grid-widget-item .item-description,
-  a.dashboard-grid-widget-item .item-time,
-  a.dashboard-grid-widget-item .type-text .value {
+  div.dashboard-grid-widget-item .item-description,
+  div.dashboard-grid-widget-item .item-time,
+  div.dashboard-grid-widget-item .type-text .value {
     display: block;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis; }
-  a.dashboard-grid-widget-item .item-description,
-  a.dashboard-grid-widget-item .value,
-  a.dashboard-grid-widget-item .decimals,
-  a.dashboard-grid-widget-item .units,
-  a.dashboard-grid-widget-item .item-time {
+  div.dashboard-grid-widget-item .item-description,
+  div.dashboard-grid-widget-item .value,
+  div.dashboard-grid-widget-item .decimals,
+  div.dashboard-grid-widget-item .units,
+  div.dashboard-grid-widget-item .item-time {
     font-size: calc(var(--content-height) * var(--widget-item-font) / 1.14);
     line-height: 1.14; }
-  a.dashboard-grid-widget-item .svg-arrow {
+  div.dashboard-grid-widget-item .svg-arrow {
     height: calc(var(--content-height) * var(--widget-item-font) * 0.72 / 1.14); }
-  a.dashboard-grid-widget-item .item-value-no-data {
+  div.dashboard-grid-widget-item .item-value-no-data {
     color: #cacaca; }
-  a.dashboard-grid-widget-item .left {
+  div.dashboard-grid-widget-item .left {
     justify-content: flex-start;
     max-width: max-content;
     margin-right: auto; }
-  a.dashboard-grid-widget-item .center {
+  div.dashboard-grid-widget-item .center {
     justify-content: center; }
-  a.dashboard-grid-widget-item .right {
+  div.dashboard-grid-widget-item .right {
     justify-content: flex-end;
     max-width: max-content;
     margin-left: auto; }
-  a.dashboard-grid-widget-item .top {
+  div.dashboard-grid-widget-item .top {
     align-self: flex-start; }
-  a.dashboard-grid-widget-item .middle {
+  div.dashboard-grid-widget-item .middle {
     align-self: center; }
-  a.dashboard-grid-widget-item .bottom {
+  div.dashboard-grid-widget-item .bottom {
     align-self: flex-end; }
-  a.dashboard-grid-widget-item .bold {
+  div.dashboard-grid-widget-item .bold {
     font-weight: bold; }
 
 .dashboard-grid-widget-item .svg-arrow-up {
@@ -5384,19 +5388,23 @@ span.is-loading {
   padding: 10px 0 0;
   text-align: center; }
 
-.dashboard-grid-widget-content::-webkit-scrollbar, a.dashboard-grid-widget-item::-webkit-scrollbar, .msg-details ul::-webkit-scrollbar, z-select button.focusable::-webkit-scrollbar,
-.z-select button.focusable::-webkit-scrollbar, z-select .list::-webkit-scrollbar,
-.z-select .list::-webkit-scrollbar, .multiselect-available::-webkit-scrollbar, textarea::-webkit-scrollbar, select::-webkit-scrollbar, .setup-right-body::-webkit-scrollbar, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar, .overlay-dialogue .maps-container::-webkit-scrollbar, .notif-body::-webkit-scrollbar, .debug-output::-webkit-scrollbar, .overlay-descr::-webkit-scrollbar, .overflow-table::-webkit-scrollbar {
-  width: 9px; }
-.dashboard-grid-widget-content::-webkit-scrollbar-track, a.dashboard-grid-widget-item::-webkit-scrollbar-track, .msg-details ul::-webkit-scrollbar-track, z-select button.focusable::-webkit-scrollbar-track,
-.z-select button.focusable::-webkit-scrollbar-track, z-select .list::-webkit-scrollbar-track,
-.z-select .list::-webkit-scrollbar-track, .multiselect-available::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track, select::-webkit-scrollbar-track, .setup-right-body::-webkit-scrollbar-track, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-track, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-track, .overlay-dialogue .maps-container::-webkit-scrollbar-track, .notif-body::-webkit-scrollbar-track, .debug-output::-webkit-scrollbar-track, .overlay-descr::-webkit-scrollbar-track, .overflow-table::-webkit-scrollbar-track {
-  background-color: #1f1f1f; }
-.dashboard-grid-widget-content::-webkit-scrollbar-thumb, a.dashboard-grid-widget-item::-webkit-scrollbar-thumb, .msg-details ul::-webkit-scrollbar-thumb, z-select button.focusable::-webkit-scrollbar-thumb,
-.z-select button.focusable::-webkit-scrollbar-thumb, z-select .list::-webkit-scrollbar-thumb,
-.z-select .list::-webkit-scrollbar-thumb, .multiselect-available::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, select::-webkit-scrollbar-thumb, .setup-right-body::-webkit-scrollbar-thumb, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-thumb, .overlay-dialogue .maps-container::-webkit-scrollbar-thumb, .notif-body::-webkit-scrollbar-thumb, .debug-output::-webkit-scrollbar-thumb, .overlay-descr::-webkit-scrollbar-thumb, .overflow-table::-webkit-scrollbar-thumb {
-  background-color: #999999;
-  border: 1px solid #4d4d4d; }
+.dashboard-grid-widget-content, div.dashboard-grid-widget-item, .msg-details ul, z-select button.focusable,
+.z-select button.focusable, z-select .list,
+.z-select .list, .multiselect-available, textarea, select, .setup-right-body, .overlay-dialogue.modal .overlay-dialogue-body, .overlay-dialogue .hintbox-wrap, .overlay-dialogue .maps-container, .notif-body, .debug-output, .overlay-descr, .overflow-table {
+  scrollbar-width: thin; }
+  .dashboard-grid-widget-content::-webkit-scrollbar, div.dashboard-grid-widget-item::-webkit-scrollbar, .msg-details ul::-webkit-scrollbar, z-select button.focusable::-webkit-scrollbar,
+  .z-select button.focusable::-webkit-scrollbar, z-select .list::-webkit-scrollbar,
+  .z-select .list::-webkit-scrollbar, .multiselect-available::-webkit-scrollbar, textarea::-webkit-scrollbar, select::-webkit-scrollbar, .setup-right-body::-webkit-scrollbar, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar, .overlay-dialogue .maps-container::-webkit-scrollbar, .notif-body::-webkit-scrollbar, .debug-output::-webkit-scrollbar, .overlay-descr::-webkit-scrollbar, .overflow-table::-webkit-scrollbar {
+    width: 9px; }
+  .dashboard-grid-widget-content::-webkit-scrollbar-track, div.dashboard-grid-widget-item::-webkit-scrollbar-track, .msg-details ul::-webkit-scrollbar-track, z-select button.focusable::-webkit-scrollbar-track,
+  .z-select button.focusable::-webkit-scrollbar-track, z-select .list::-webkit-scrollbar-track,
+  .z-select .list::-webkit-scrollbar-track, .multiselect-available::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track, select::-webkit-scrollbar-track, .setup-right-body::-webkit-scrollbar-track, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-track, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-track, .overlay-dialogue .maps-container::-webkit-scrollbar-track, .notif-body::-webkit-scrollbar-track, .debug-output::-webkit-scrollbar-track, .overlay-descr::-webkit-scrollbar-track, .overflow-table::-webkit-scrollbar-track {
+    background-color: #1f1f1f; }
+  .dashboard-grid-widget-content::-webkit-scrollbar-thumb, div.dashboard-grid-widget-item::-webkit-scrollbar-thumb, .msg-details ul::-webkit-scrollbar-thumb, z-select button.focusable::-webkit-scrollbar-thumb,
+  .z-select button.focusable::-webkit-scrollbar-thumb, z-select .list::-webkit-scrollbar-thumb,
+  .z-select .list::-webkit-scrollbar-thumb, .multiselect-available::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, select::-webkit-scrollbar-thumb, .setup-right-body::-webkit-scrollbar-thumb, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-thumb, .overlay-dialogue .maps-container::-webkit-scrollbar-thumb, .notif-body::-webkit-scrollbar-thumb, .debug-output::-webkit-scrollbar-thumb, .overlay-descr::-webkit-scrollbar-thumb, .overflow-table::-webkit-scrollbar-thumb {
+    background-color: #999999;
+    border: 1px solid #4d4d4d; }
 
 .overflow-table::-webkit-scrollbar {
   height: 9px; }
