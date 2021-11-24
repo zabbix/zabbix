@@ -90,6 +90,8 @@ a.dashboard-grid-widget-item {
 	overflow-x: hidden;
 	color: inherit;
 
+	@extend %webkit-scrollbar;
+
 	&:focus,
 	&:hover,
 	&:visited {
