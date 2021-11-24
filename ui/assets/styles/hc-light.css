@@ -1488,8 +1488,7 @@ a.dashboard-grid-widget-item {
     font-size: calc(var(--content-height) * var(--widget-item-font) / 1.14);
     line-height: 1.14; }
   a.dashboard-grid-widget-item .svg-arrow {
-    height: calc(var(--content-height) * var(--widget-item-font) * 0.72 / 1.14);
-    margin-left: .3em; }
+    height: calc(var(--content-height) * var(--widget-item-font) * 0.72 / 1.14); }
   a.dashboard-grid-widget-item .item-value-no-data {
     color: #333333; }
   a.dashboard-grid-widget-item .left {
