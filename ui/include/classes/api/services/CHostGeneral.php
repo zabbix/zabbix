@@ -261,9 +261,7 @@ abstract class CHostGeneral extends CHostBase {
 			}
 			unset($group);
 
-			foreach ($db_groups as $del_group) {
-				$del_hostgroupids[] = $del_group['hostgroupid'];
-			}
+			$del_hostgroupids = array_merge($del_hostgroupids, array_column($db_groups, 'hostgroupid'));
 		}
 		unset($host);
 
@@ -305,9 +303,7 @@ abstract class CHostGeneral extends CHostBase {
 				continue;
 			}
 
-			$db_tags = ($db_hosts !== null)
-				? $db_hosts[$host[$id_field_name]]['tags']
-				: [];
+			$db_tags = ($db_hosts !== null) ? $db_hosts[$host[$id_field_name]]['tags'] : [];
 
 			$hosttagid_by_tag_value = [];
 			foreach ($db_tags as $db_tag) {
@@ -369,9 +365,7 @@ abstract class CHostGeneral extends CHostBase {
 				continue;
 			}
 
-			$db_macros = ($db_hosts !== null)
-				? $db_hosts[$host[$id_field_name]]['macros']
-				: [];
+			$db_macros = ($db_hosts !== null) ? $db_hosts[$host[$id_field_name]]['macros'] : [];
 
 			foreach ($host['macros'] as &$macro) {
 				if (array_key_exists('hostmacroid', $macro)) {
@@ -455,20 +449,15 @@ abstract class CHostGeneral extends CHostBase {
 					}
 				}
 
-				if (array_key_exists('templates_clear', $host)) {
-					$templates_clear = array_column($host['templates_clear'], null, 'templateid');
+				$templates_clear = array_key_exists('templates_clear', $host)
+					? array_column($host['templates_clear'], null, 'templateid')
+					: [];
 
-					foreach ($db_templates as $del_template) {
-						if (array_key_exists($del_template['templateid'], $templates_clear)) {
-							$del_links_clear[$del_template['templateid']][$host[$id_field_name]] = true;
-						}
-						else {
-							$del_links[$del_template['templateid']][$host[$id_field_name]] = true;
-						}
+				foreach ($db_templates as $del_template) {
+					if (array_key_exists($del_template['templateid'], $templates_clear)) {
+						$del_links_clear[$del_template['templateid']][$host[$id_field_name]] = true;
 					}
-				}
-				else {
-					foreach ($db_templates as $del_template) {
+					else {
 						$del_links[$del_template['templateid']][$host[$id_field_name]] = true;
 					}
 				}
