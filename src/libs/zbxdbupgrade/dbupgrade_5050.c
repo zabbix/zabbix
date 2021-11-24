@@ -1371,11 +1371,7 @@ static int	compare_sla(const void *d1, const void *d2)
 
 	for (i = 0; i < a->services_times.values_num; i++)
 	{
-		ZBX_RETURN_IF_NOT_EQUAL(a->services_times.values[i].type, b->services_times.values[i].type);
-		ZBX_RETURN_IF_NOT_EQUAL(a->services_times.values[i].from, b->services_times.values[i].from);
-		ZBX_RETURN_IF_NOT_EQUAL(a->services_times.values[i].to, b->services_times.values[i].to);
-
-		if (0 != (ret = strcmp(a->services_times.values[i].note, b->services_times.values[i].note)))
+		if (0 != (ret = compare_services_time(&a->services_times.values[i], &b->services_times.values[i])))
 			return ret;
 	}
 
