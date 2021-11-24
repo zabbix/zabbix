@@ -1640,6 +1640,40 @@ static int	DBpatch_5050128(void)
 	return DBdrop_field("services", "goodsla");
 }
 
+static int	DBpatch_5050129(void)
+{
+	int		ret = SUCCEED;
+	char		*uuid, *sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	DB_ROW		row;
+	DB_RESULT	result;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect("select serviceid,name from services");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		uuid = zbx_gen_uuid4(row[1]);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update services set uuid='%s' where serviceid=%s;\n",
+				uuid, row[0]);
+		zbx_free(uuid);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
 #endif
 
 DBPATCH_START(5050)
@@ -1762,5 +1796,6 @@ DBPATCH_ADD(5050125, 0, 1)
 DBPATCH_ADD(5050126, 0, 1)
 DBPATCH_ADD(5050127, 0, 1)
 DBPATCH_ADD(5050128, 0, 1)
+DBPATCH_ADD(5050129, 0, 1)
 
 DBPATCH_END()
