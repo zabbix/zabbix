@@ -109,38 +109,36 @@ abstract class CHostGeneral extends CHostBase {
 		}
 
 		if ($h_names) {
-			$duplicate = DB::select('hosts', [
-				'output' => ['host', 'status'],
-				'filter' => [
-					'flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED],
-					'host' => $h_names
-				],
-				'limit' => 1
-			]);
+			$duplicates = DBselect(
+				'SELECT h.host,h.status'.
+				' FROM hosts h'.
+				' WHERE '.dbConditionInt('h.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]).
+					' AND '.dbConditionInt('h.status', [HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE], true).
+					' AND '.dbConditionString('h.host', $h_names)
+			, 1);
 
-			if ($duplicate) {
-				$error = ($duplicate[0]['status'] == HOST_STATUS_TEMPLATE)
-					? _s('Template with the same name "%1$s" already exists.', $duplicate[0]['host'])
-					: _s('Host with the same name "%1$s" already exists.', $duplicate[0]['host']);
+			if ($duplicate = DBfetch($duplicates)) {
+				$error = ($duplicate['status'] == HOST_STATUS_TEMPLATE)
+					? _s('Template with the same name "%1$s" already exists.', $duplicate['host'])
+					: _s('Host with the same name "%1$s" already exists.', $duplicate['host']);
 
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 		}
 
 		if ($v_names) {
-			$duplicate = DB::select('hosts', [
-				'output' => ['name', 'status'],
-				'filter' => [
-					'flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED],
-					'host' => $v_names
-				],
-				'limit' => 1
-			]);
+			$duplicates = DBselect(
+				'SELECT h.name,h.status'.
+				' FROM hosts h'.
+				' WHERE '.dbConditionInt('h.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]).
+					' AND '.dbConditionInt('h.status', [HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE], true).
+					' AND '.dbConditionString('h.name', $v_names)
+			, 1);
 
-			if ($duplicate) {
-				$error = ($duplicate[0]['status'] == HOST_STATUS_TEMPLATE)
-					? _s('Template with the same name "%1$s" already exists.', $duplicate[0]['name'])
-					: _s('Host with the same name "%1$s" already exists.', $duplicate[0]['name']);
+			if ($duplicate = DBfetch($duplicates)) {
+				$error = ($duplicate['status'] == HOST_STATUS_TEMPLATE)
+					? _s('Template with the same visible name "%1$s" already exists.', $duplicate['name'])
+					: _s('Host with the same visible name "%1$s" already exists.', $duplicate['name']);
 
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
