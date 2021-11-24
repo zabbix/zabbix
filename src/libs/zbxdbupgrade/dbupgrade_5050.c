@@ -1391,8 +1391,12 @@ static void	sla_clean(sla_t *sla)
 	zbx_free(sla);
 }
 
-#define ZBX_SLA_PERIOD_WEEKLY 1
-#define SERVICE_TIME_TYPE_UPTIME 0
+#define ZBX_SLA_PERIOD_WEEKLY		1
+
+#define SERVICE_TIME_TYPE_UPTIME	0
+#define SERVICE_TIME_TYPE_DOWNTIME	1
+
+#define SLA_TAG_NAME			"SLA"
 
 static void	db_insert_sla(const zbx_vector_sla_t *uniq_slas, const char *default_timezone)
 {
@@ -1419,18 +1423,18 @@ static void	db_insert_sla(const zbx_vector_sla_t *uniq_slas, const char *default
 		char		buffer[MAX_STRING_LEN];
 		const sla_t	*sla = uniq_slas->values[i];
 
-		zbx_snprintf(buffer, sizeof(buffer), "SLA:" ZBX_FS_UI64, ++slaid);
+		zbx_snprintf(buffer, sizeof(buffer), "%s:" ZBX_FS_UI64, SLA_TAG_NAME, ++slaid);
 
 		zbx_db_insert_add_values(&db_insert_sla, slaid, buffer, sla->showsla, sla->goodsla,
 				ZBX_SLA_PERIOD_WEEKLY, default_timezone);
 
 		zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64, slaid);
-		zbx_db_insert_add_values(&db_insert_sla_service_tag, slaid, slaid, "SLA:", buffer);
+		zbx_db_insert_add_values(&db_insert_sla_service_tag, slaid, slaid, SLA_TAG_NAME, buffer);
 
 		for (j = 0; j < sla->serviceids.values_num; j++)
 		{
 			zbx_db_insert_add_values(&db_insert_service_tag, __UINT64_C(0), sla->serviceids.values[j],
-					"SLA:", buffer);
+					SLA_TAG_NAME, buffer);
 		}
 
 		for (j = 0; j < sla->services_times.values_num; j++)
@@ -1466,6 +1470,58 @@ static void	db_insert_sla(const zbx_vector_sla_t *uniq_slas, const char *default
 	zbx_db_insert_autoincrement(&db_insert_sla_excluded_downtime, "sla_excluded_downtimeid");
 	zbx_db_insert_execute(&db_insert_sla_excluded_downtime);
 	zbx_db_insert_clean(&db_insert_sla_excluded_downtime);
+}
+
+static void	services_times_convert_downtime(zbx_vector_services_times_t *services_times)
+{
+	int				i;
+	zbx_vector_services_times_t	services_times_converted;
+
+	zbx_vector_services_times_create(&services_times_converted);
+
+	for (i = 0; i < services_times->values_num; i++)
+	{
+		services_times_t	*service_time = &services_times->values[i];
+
+		if (SERVICE_TIME_TYPE_DOWNTIME != service_time->type)
+			continue;
+
+		if (0 != service_time->from)
+		{
+			services_times_t	service_time_new;
+
+			service_time_new.type = SERVICE_TIME_TYPE_UPTIME;
+			service_time_new.from = 0;
+			service_time_new.to = service_time->from;
+			service_time_new.note = zbx_strdup(NULL, "");
+
+			zbx_vector_services_times_append(&services_times_converted, service_time_new);
+		}
+
+		if (SEC_PER_WEEK != service_time->to)
+		{
+			services_times_t	service_time_new;
+
+			service_time_new.type = SERVICE_TIME_TYPE_UPTIME;
+			service_time_new.from = service_time->to;
+			service_time_new.to = SEC_PER_WEEK;
+			service_time_new.note = zbx_strdup(NULL, "");
+
+			zbx_vector_services_times_append(&services_times_converted, service_time_new);
+		}
+
+		services_time_clean(*service_time);
+		zbx_vector_services_times_remove(services_times, i);
+		i--;
+	}
+
+	if (0 != services_times_converted.values_num)
+	{
+		zbx_vector_services_times_append_array(services_times, services_times_converted.values,
+				services_times_converted.values_num);
+	}
+
+	zbx_vector_services_times_destroy(&services_times_converted);
 }
 
 static int	DBpatch_5050125(void)
@@ -1524,7 +1580,10 @@ static int	DBpatch_5050125(void)
 	DBfree_result(result);
 
 	for (i = 0; i < slas.values_num; i++)
+	{
+		services_times_convert_downtime(&slas.values[i]->services_times);
 		zbx_vector_services_times_sort(&slas.values[i]->services_times, compare_services_time);
+	}
 
 	for (i = 0; i < slas.values_num; i++)
 	{
