@@ -1956,7 +1956,10 @@ abstract class CHostGeneral extends CHostBase {
 		if ($objects === 'groups') {
 			$filter = ['hostid' => array_keys($db_hosts)];
 
-			if (!$objectids && self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
+			if ($objectids) {
+				$filter += ['groupid' => $objectids];
+			}
+			elseif (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
 				$db_groups = API::HostGroup()->get([
 					'output' => [],
 					$id_field_name.'s' => array_keys($db_hosts),
