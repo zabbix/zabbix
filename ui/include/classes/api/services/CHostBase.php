@@ -253,8 +253,8 @@ abstract class CHostBase extends CApiService {
 					]);
 
 					$error = ($objects[$hostid]['status'] == HOST_STATUS_TEMPLATE)
-						? _('Unable to unlink template "%1$s" without template "%2$s" from template "%3$s" due to dependency of trigger "%4$s".')
-						: _('Unable to unlink template "%1$s" without template "%2$s" from host "%3$s" due to dependency of trigger "%4$s".');
+						? _('Cannot unlink template "%1$s" without template "%2$s" from template "%3$s" due to dependency of trigger "%4$s".')
+						: _('Cannot unlink template "%1$s" without template "%2$s" from host "%3$s" due to dependency of trigger "%4$s".');
 
 					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $objects[$row['del_templateid']]['host'],
 						$objects[$row['hostid']]['host'], $objects[$hostid]['host'], $triggers[0]['description']
@@ -299,8 +299,8 @@ abstract class CHostBase extends CApiService {
 					]);
 
 					$error = ($objects[$hostid]['status'] == HOST_STATUS_TEMPLATE)
-						? _('Unable to unlink template "%1$s" without template "%2$s" from template "%3$s" due to expression of trigger "%4$s".')
-						: _('Unable to unlink template "%1$s" without template "%2$s" from host "%3$s" due to expression of trigger "%4$s".');
+						? _('Cannot unlink template "%1$s" without template "%2$s" from template "%3$s" due to expression of trigger "%4$s".')
+						: _('Cannot unlink template "%1$s" without template "%2$s" from host "%3$s" due to expression of trigger "%4$s".');
 
 					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $objects[$row['del_templateid']]['host'],
 						$objects[$row['hostid']]['host'], $objects[$hostid]['host'], $triggers[0]['description']
@@ -570,13 +570,13 @@ abstract class CHostBase extends CApiService {
 					]);
 
 					if ($objects[$hostid]['status'] == HOST_STATUS_TEMPLATE) {
-						$error = _('Unable to link template "%1$s" to template "%2$s" due to dependency of trigger "%3$s".');
+						$error = _('Cannot link template "%1$s" to template "%2$s" due to dependency of trigger "%3$s".');
 					}
 					elseif ($objects[$hostid]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-						$error = _('Unable to link template "%1$s" to host prototype "%2$s" due to dependency of trigger "%3$s".');
+						$error = _('Cannot link template "%1$s" to host prototype "%2$s" due to dependency of trigger "%3$s".');
 					}
 					else {
-						$error = _('Unable to link template "%1$s" to host "%2$s" due to dependency of trigger "%3$s".');
+						$error = _('Cannot link template "%1$s" to host "%2$s" due to dependency of trigger "%3$s".');
 					}
 
 					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $objects[$row['ins_templateid']]['host'],
@@ -597,13 +597,13 @@ abstract class CHostBase extends CApiService {
 					]);
 
 					if ($objects[$hostid]['status'] == HOST_STATUS_TEMPLATE) {
-						$error = _('Unable to link template "%1$s" without template "%2$s"  to template "%3$s" due to dependency of trigger "%4$s".');
+						$error = _('Cannot link template "%1$s" without template "%2$s"  to template "%3$s" due to dependency of trigger "%4$s".');
 					}
 					elseif ($objects[$hostid]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-						$error = _('Unable to link template "%1$s" without template "%2$s" to host prototype "%3$s" due to dependency of trigger "%4$s".');
+						$error = _('Cannot link template "%1$s" without template "%2$s" to host prototype "%3$s" due to dependency of trigger "%4$s".');
 					}
 					else {
-						$error = _('Unable to link template "%1$s" without template "%2$s" to host "%3$s" due to dependency of trigger "%4$s".');
+						$error = _('Cannot link template "%1$s" without template "%2$s" to host "%3$s" due to dependency of trigger "%4$s".');
 					}
 
 					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $objects[$row['ins_templateid']]['host'],
@@ -647,13 +647,13 @@ abstract class CHostBase extends CApiService {
 					]);
 
 					if ($objects[$row['hostid']]['status'] == HOST_STATUS_TEMPLATE) {
-						$error = _('Unable to link template "%1$s" to template "%2$s" due to dependency of trigger "%3$s".');
+						$error = _('Cannot link template "%1$s" to template "%2$s" due to dependency of trigger "%3$s".');
 					}
 					elseif ($objects[$row['hostid']]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-						$error = _('Unable to link template "%1$s" to host prototype "%2$s" due to dependency of trigger "%3$s".');
+						$error = _('Cannot link template "%1$s" to host prototype "%2$s" due to dependency of trigger "%3$s".');
 					}
 					else {
-						$error = _('Unable to link template "%1$s" to host "%2$s" due to dependency of trigger "%3$s".');
+						$error = _('Cannot link template "%1$s" to host "%2$s" due to dependency of trigger "%3$s".');
 					}
 
 					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $objects[$row['ins_templateid']]['host'],
@@ -699,13 +699,13 @@ abstract class CHostBase extends CApiService {
 					]);
 
 					if ($objects[$hostid]['status'] == HOST_STATUS_TEMPLATE) {
-						$error = _('Unable to link template "%1$s" to template "%2$s" due to expression of trigger "%3$s".');
+						$error = _('Cannot link template "%1$s" to template "%2$s" due to expression of trigger "%3$s".');
 					}
 					elseif ($objects[$hostid]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-						$error = _('Unable to link template "%1$s" to host prototype "%2$s" due to expression of trigger "%3$s".');
+						$error = _('Cannot link template "%1$s" to host prototype "%2$s" due to expression of trigger "%3$s".');
 					}
 					else {
-						$error = _('Unable to link template "%1$s" to host "%2$s" due to expression of trigger "%3$s".');
+						$error = _('Cannot link template "%1$s" to host "%2$s" due to expression of trigger "%3$s".');
 					}
 
 					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $objects[$row['ins_templateid']]['host'],
@@ -726,13 +726,13 @@ abstract class CHostBase extends CApiService {
 					]);
 
 					if ($objects[$hostid]['status'] == HOST_STATUS_TEMPLATE) {
-						$error = _('Unable to link template "%1$s" without template "%2$s"  to template "%3$s" due to expression of trigger "%4$s".');
+						$error = _('Cannot link template "%1$s" without template "%2$s"  to template "%3$s" due to expression of trigger "%4$s".');
 					}
 					elseif ($objects[$hostid]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-						$error = _('Unable to link template "%1$s" without template "%2$s" to host prototype "%3$s" due to expression of trigger "%4$s".');
+						$error = _('Cannot link template "%1$s" without template "%2$s" to host prototype "%3$s" due to expression of trigger "%4$s".');
 					}
 					else {
-						$error = _('Unable to link template "%1$s" without template "%2$s" to host "%3$s" due to expression of trigger "%4$s".');
+						$error = _('Cannot link template "%1$s" without template "%2$s" to host "%3$s" due to expression of trigger "%4$s".');
 					}
 
 					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $objects[$row['ins_templateid']]['host'],
