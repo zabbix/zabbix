@@ -213,7 +213,7 @@ class C42ImportConverter extends CConverter {
 						continue;
 					}
 
-					if ($data[$tag] === '' || count($data[$tag]) == 0) {
+					if ($data[$tag] === '' || (is_array($data[$tag]) && !$data[$tag])) {
 						if ($tag_rules['type'] & XML_REQUIRED) {
 							continue;
 						}
