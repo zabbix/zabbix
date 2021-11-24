@@ -50,7 +50,7 @@ else {
 					/*
 					 * The $block_key can be "data", "item_value_content" or "classes". We need to loop this because
 					 * units can be inside (before or after value) or outside (above or below) the wrapper. So which
-					 * ever block comes first. Except for classes. That is added for "dv_item_value_content" DIV.
+					 * ever block comes first. Except for classes. That is added for "div_item_value_content" DIV.
 					 */
 					foreach ($block as $block_key => $content) {
 						if ($block_key === 'item_value_content') {
@@ -92,21 +92,21 @@ else {
 							foreach ($content as $content_inner) {
 								foreach ($content_inner as $item_key => $item) {
 									// Make "div_units" DIV.
-									${"$item_key"} = new CDiv($item['data']);
+									${"div_$item_key"} = new CDiv($item['data']);
 
 									foreach ($item['classes'] as $class) {
-										${"$item_key"}->addClass($class);
+										${"div_$item_key"}->addClass($class);
 									}
 
 									$cnt = count($item['styles']);
 									$i = 0;
 
 									foreach ($item['styles'] as $style => $value) {
-										${"$item_key"}->addStyle($style.': '.$value.(($i + 1) != $cnt ? '; ' : ''));
+										${"div_$item_key"}->addStyle($style.': '.$value.(($i + 1) != $cnt ? '; ' : ''));
 										$i++;
 									}
 
-									${"div_$column_key"}->addItem(${"$item_key"});
+									${"div_$column_key"}->addItem(${"div_$item_key"});
 								}
 							}
 						}
