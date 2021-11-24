@@ -242,6 +242,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 			}
 			else {
 				$value = _('No data');
+				$value_type = ITEM_VALUE_TYPE_TEXT;
 
 				// Since there no value, we can still show time.
 				if (array_key_exists(WIDGET_ITEM_SHOW_TIME, $show)) {
@@ -505,8 +506,11 @@ class CControllerWidgetItemView extends CControllerWidget {
 		ksort($data);
 
 		if ($items) {
+			// Use the real item value type.
 			$data['url'] = (new CUrl('history.php'))
-				->setArgument('action', ($value_type == ITEM_VALUE_TYPE_FLOAT || $value_type == ITEM_VALUE_TYPE_UINT64)
+				->setArgument('action',
+					($items[$itemid]['value_type'] == ITEM_VALUE_TYPE_FLOAT
+						|| $items[$itemid]['value_type'] == ITEM_VALUE_TYPE_UINT64)
 					? HISTORY_GRAPH
 					: HISTORY_VALUES
 				)
