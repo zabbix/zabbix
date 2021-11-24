@@ -447,7 +447,7 @@ abstract class CHostGeneral extends CHostBase {
 						unset($db_templates[$template['templateid']]);
 					}
 					else {
-						$ins_links[$template['templateid']][$host[$id_field_name]] = true;
+						$ins_links[$template['templateid']][] = $host[$id_field_name];
 					}
 				}
 
@@ -457,16 +457,16 @@ abstract class CHostGeneral extends CHostBase {
 
 				foreach ($db_templates as $del_template) {
 					if (array_key_exists($del_template['templateid'], $templates_clear)) {
-						$del_links_clear[$del_template['templateid']][$host[$id_field_name]] = true;
+						$del_links_clear[$del_template['templateid']][] = $host[$id_field_name];
 					}
 					else {
-						$del_links[$del_template['templateid']][$host[$id_field_name]] = true;
+						$del_links[$del_template['templateid']][] = $host[$id_field_name];
 					}
 				}
 			}
 			elseif (array_key_exists('templates_clear', $host)) {
 				foreach ($host['templates_clear'] as $template) {
-					$del_links_clear[$template['templateid']][$host[$id_field_name]] = true;
+					$del_links_clear[$template['templateid']][] = $host[$id_field_name];
 				}
 			}
 		}
@@ -484,7 +484,7 @@ abstract class CHostGeneral extends CHostBase {
 				}
 			}
 
-			self::unlinkTemplatesObjects($templateids, array_keys($hostids), true);
+			self::unlinkTemplatesObjects($templateids, $hostids, true);
 		}
 
 		while ($del_links) {
@@ -500,7 +500,7 @@ abstract class CHostGeneral extends CHostBase {
 				}
 			}
 
-			self::unlinkTemplatesObjects($templateids, array_keys($hostids));
+			self::unlinkTemplatesObjects($templateids, $hostids);
 		}
 
 		while ($ins_links) {
@@ -516,7 +516,7 @@ abstract class CHostGeneral extends CHostBase {
 				}
 			}
 
-			self::linkTemplatesObjects($templateids, array_keys($hostids));
+			self::linkTemplatesObjects($templateids, $hostids);
 		}
 	}
 
