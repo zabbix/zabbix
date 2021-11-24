@@ -437,12 +437,14 @@ abstract class CHostGeneral extends CHostBase {
 				continue;
 			}
 
-			$db_templates = ($db_hosts !== null) ? $db_hosts[$host[$id_field_name]]['templates'] : [];
+			$db_templates = ($db_hosts !== null)
+				? array_column($db_hosts[$host[$id_field_name]]['templates'], null, 'templateid')
+				: [];
 
 			if (array_key_exists('templates', $host)) {
 				foreach ($host['templates'] as $template) {
 					if (array_key_exists($template['templateid'], $db_templates)) {
-						unset($db_templates);
+						unset($db_templates[$template['templateid']]);
 					}
 					else {
 						$ins_links[$template['templateid']][$host[$id_field_name]] = true;
@@ -478,7 +480,7 @@ abstract class CHostGeneral extends CHostBase {
 			foreach ($del_links_clear as $templateid => $_hostids) {
 				if ($_hostids === $hostids) {
 					$templateids[] = $templateid;
-					unset($del_links[$templateid]);
+					unset($del_links_clear[$templateid]);
 				}
 			}
 
