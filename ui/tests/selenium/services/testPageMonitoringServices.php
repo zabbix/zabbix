@@ -35,6 +35,11 @@ class testPageMonitoringServices extends CWebTest {
 	use TableTrait;
 
 	const EDIT = true;
+	const LAYOUT_PARENT = 'Server 3';
+	const LAYOUT_CHILD = 'Server 2';
+	const LAYOUT_CHILD2 = 'Server 1';
+	const BREADCRUMB_SELECTOR = 'xpath://ul[@class="breadcrumbs"]';
+
 	private $selector = 'xpath://form[@name="service_list"]/table[@class="list-table"]';
 
 	/**
@@ -264,105 +269,121 @@ class testPageMonitoringServices extends CWebTest {
 	}
 
 	public function testPageMonitoringServices_LayoutView() {
-		// Check layout view mode
 		$this->page->login()->open('zabbix.php?action=service.list');
 		$this->page->assertTitle('Services');
 		$this->page->assertHeader('Services');
 
-		// Check Kiosk mode
-		$this->checkKioskModeButton();
-
-		// Labels on columns at services list
-		$table = $this->query('class:list-table')->asTable()->one();
+		// Labels on columns at services list.
+		$table = $this->query('id:service-list')->asTable()->one();
 		$this->assertSame(['Name', 'Status', 'Root cause', 'SLA', 'Tags'], $table->getHeadersText());
 
-		$expectedViewMode = [
-			'Server 3 1' => [
-				'Status' => 'OK',
-				'Root cause' => '',
-				'SLA' => '',
-				'Tags' => 'test: test123'
-			],
-			'Server 4' => [
-				'Status' => 'OK',
-				'Root cause' => '',
-				'SLA' => '',
-				'Tags' => 'problem: truetest: test456'
-			],
-			'Server 5' => [
-				'Status' => 'OK',
-				'Root cause' => '',
-				'SLA' => '99.9900',
-				'Tags' => ''
-			]
-		];
+		// Check that row buttons are not present in the table.
+		$this->assertFalse($table->query('id:all_services')->exists());
+		$this->assertFalse($table->query('xpath://button[@title="Add child service"]')->exists());
+		$this->assertFalse($table->query('xpath://button[@title="Edit"]')->exists());
+		$this->assertFalse($table->query('xpath://button[@title="Delete"]')->exists());
 
-		$data = $table->index('Name');
+		// Check that action buttons are not present below the table.
+		$this->assertFalse($this->query('button:Mass update')->exists());
+		$this->assertFalse($this->query('button:Delete')->exists());
 
-		foreach ($expectedViewMode as $name => $fields) {
-			// Get table row by service name.
-			$row = $data[$name];
+		// Check parent-child service layout.
+		$this->checkParentChildLayout($table, self::LAYOUT_PARENT, self::LAYOUT_CHILD);
 
-			// Check the value in table.
-			foreach ($fields as $column => $value) {
-				$this->assertEquals($value, $row[$column]);
-			}
-		}
+		// Check Kiosk mode.
+		$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
+		$this->page->waitUntilReady();
 
-		$this->checkBreadcrumbs();
+		// Check that Header and Filter disappeared.
+		$this->query('xpath://h1[@id="page-title-general"]')->waitUntilNotVisible();
+		$this->assertFalse($this->query('xpath://div[@aria-label="Filter"]')->exists());
+		$this->assertTrue($this->query('id:service-list')->exists());
+
+		$this->query('xpath://button[@title="Normal view"]')->waitUntilPresent()->one()->click(true);
+		$this->page->waitUntilReady();
+
+		// Check that Header and Filter are visible again.
+		$this->query('xpath://h1[@id="page-title-general"]')->waitUntilVisible();
+		$this->assertTrue($this->query('xpath://div[@aria-label="Filter"]')->exists());
+		$this->assertTrue($this->query('id:service-list')->exists());
 	}
 
-	public function testPageMonitoringServices_LayoutEdit()
-	{
-		// Click on Edit mode button
-		$this->page->login()->open('zabbix.php?action=service.list.edit');
+	public function testPageMonitoringServices_LayoutEdit() {
+		$this->page->login()->open('zabbix.php?action=service.list');
+		$this->query('id:list_mode')->asSegmentedRadio()->one()->waitUntilClickable()->select('Edit');
+		$this->page->waitUntilReady();
 
-		// Check that "Create service" button is displayed
-		$this->assertTrue($this->query('button', 'Create service')->one()->isVisible());
+		$this->page->assertTitle('Services');
+		$this->page->assertHeader('Services');
 
-		// Labels on columns at services list
+		$this->assertTrue($this->query('button:Create service')->one()->isVisible());
+
 		$table = $this->query('class:list-table')->asTable()->one();
 		$this->assertSame(['', 'Name', 'Status', 'Root cause', 'SLA', 'Tags', ''], $table->getHeadersText());
 
-		$expectedEditMode = [
-			'Server 3 1' => [
-				'' => '',
-				'Status' => 'OK',
-				'Root cause' => '',
-				'SLA' => '',
-				'Tags' => 'test: test123',
-				'' => ''
-			],
-			'Server 4' => [
-				'' => '',
-				'Status' => 'OK',
-				'Root cause' => '',
-				'SLA' => '',
-				'Tags' => 'problem: truetest: test456',
-				'' => ''
-			],
-			'Server 5' => [
-				'' => '',
-				'Status' => 'OK',
-				'Root cause' => '',
-				'SLA' => '99.9900',
-				'Tags' => '',
-				'' => ''
-			]
-		];
+		$this->checkServiceButtons($table->getRow(rand(0,13)));
 
-		$data = $table->index('Name');
+		// Check that action buttons are not present below the table.
+		$this->assertFalse($this->query('button:Mass update')->one()->isEnabled());
+		$this->assertFalse($this->query('button:Delete')->one()->isEnabled());
 
+		$this->checkParentChildLayout($table, self::LAYOUT_PARENT, self::LAYOUT_CHILD, self::EDIT);
+		$this->checkServiceButtons($table->findRow('Name', self::LAYOUT_CHILD2, true));
 
-		foreach ($expectedEditMode as $name => $fields) {
-			// Get table row by service name.
-			$row = $data[$name];
+		// Check there is no Kiosk mode button.
+		$this->assertFalse($this->query('xpath://button[@title="Kiosk mode"]')->exists());
+	}
 
-						// Check the value in table.
-			foreach ($fields as $column => $value) {
-				$this->assertEquals($value, $row[$column]);
-			}
+	private function checkParentChildLayout($table, $parent, $child) {
+		$this->checkSeviceInfoLayout($table, $parent);
+		$this->assertTableDataColumn([$child.' 1'], 'Name');
+		$this->checkSeviceInfoLayout($table, $child);
+		$this->assertTableDataColumn([self::LAYOUT_CHILD2], 'Name');
+
+		foreach (['All services', $parent, $child] as $breadcrumb) {
+			$this->assertTrue($this->query(self::BREADCRUMB_SELECTOR)->one()->query('link', $breadcrumb)
+					->one()->isClickable()
+			);
 		}
+		$this->assertTrue($this->query(self::BREADCRUMB_SELECTOR)->one()
+				->query('xpath://span[@class="selected"]//a[text()='.zbx_dbstr($child).']')->one()->isValid()
+		);
+	}
+
+	private function checkSeviceInfoLayout($table, $service, $edit = false) {
+		$table->findRow('Name', $service, true)->query('link', $service)->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
+		$this->assertTrue($this->query('xpath://li[@role="tab"]//a[text()="Info"]')->one()->isClickable());
+
+		$info_card = $this->query('id:tab_info')->waitUntilReady()->one();
+		foreach ([$service, 'Parent services', 'Status', 'SLA', 'Tags'] as $text) {
+			$this->assertTrue($info_card->query('xpath://div[@class="service-info-grid"]//div[text()='.zbx_dbstr($text).']')
+					->one()->isVisible()
+			);
+		}
+
+		if ($edit) {
+			$this->assertTrue($info_card->query('xpath://button['.CXPathHelper::fromClass('btn-edit').']')->one()
+					->isClickable()
+			);
+		}
+
+		$table->invalidate();
+		$this->assertTableStats(1);
+	}
+
+	private function checkBreadcrumbs($breadcrumbs) {
+		foreach ($breadcrumbs as $breadcrumb) {
+			$this->assertTrue($this->query(self::BREADCRUMB_SELECTOR)->one()->query('link', $breadcrumb)
+					->one()->isClickable()
+			);
+		}
+	}
+
+	private function checkServiceButtons($row) {
+		$this->assertTrue($row->query('xpath://button[@title="Add child service"]')->one()->isClickable());
+		$this->assertTrue($row->query('xpath://button[@title="Edit"]')->one()->isClickable());
+		$this->assertTrue($row->query('xpath://button[@title="Delete"]')->one()->isClickable());
 	}
 
 	public static function getFilterEditData() {
@@ -729,21 +750,20 @@ class testPageMonitoringServices extends CWebTest {
 		// Check filtered result.
 		$this->assertTableDataColumn($data['result'], 'Name');
 
+		// Check breadcrumbs.
+		$selector = $this->query(self::BREADCRUMB_SELECTOR);
 		if (CTestArrayHelper::get($data, 'check_breadcrumbs')) {
-			// Check breadcrumbs.
-			$breadcrumbs = $this->query('xpath://ul[@class="breadcrumbs"]');
-			$this->assertTrue($breadcrumbs->one()->query('link:All services')->one()->isClickable());
-			$this->assertTrue($breadcrumbs->one()->query('xpath://span[@class="selected" and text()="Filter results"]')
-					->one()->isValid());
+			$this->assertTrue($selector->one()->query('link:All services')>one()->isClickable());
+			$this->assertTrue($selector->query('xpath://span[@class="selected" and text()="Filter results"]')->exists());
 		}
 
 		// Reset filter due to not interfere next tests.
 		$filter_form->query('button:Reset')->one()->click();
 
+		// Check breadcrumbs disappeared.
 		if (CTestArrayHelper::get($data, 'check_breadcrumbs')) {
-			// Check breadcrumbs disappeared.
-			$this->assertFalse($breadcrumbs->query('link:All services')->exists());
-			$this->assertFalse($breadcrumbs->query('xpath://span[@class="selected" and text()="Filter results"]')->exists());
+			$this->assertFalse($selector->query('link:All services')->exists());
+			$this->assertFalse($selector->query('xpath://span[@class="selected" and text()="Filter results"]')->exists());
 		}
 	}
 
@@ -859,37 +879,6 @@ class testPageMonitoringServices extends CWebTest {
 		);
 	}
 
-
-	private function checkBreadcrumbs() {
-		// Check by switching childs and parents
-		$table = $this->query('class:list-table')->asTable()->one();
-		$table->getRow(0)->query('xpath://tbody/tr/td/a[text()="Server 3"]')->waitUntilClickable()->one()->click();
-
-		$this->page->waitUntilReady();
-
-		$this->assertEquals('Server 3', $this->query('xpath://ul[@class="breadcrumbs"]/li[2]')->one()->getText());
-
-		$table = $this->query('class:list-table')->asTable()->one();
-		$table->getRow(0)->query('xpath://tbody/tr/td/a[text()="Server 2"]')->waitUntilClickable()->one()->click();
-
-		$this->page->waitUntilReady();
-
-		$this->assertEquals('Server 2', $this->query('xpath://ul[@class="breadcrumbs"]/li[3]')->one()->getText());
-
-		// Return to services list
-		$this->query('xpath://ul[@class="breadcrumbs"]/li[1]')->one()->click();
-
-		// Check by filtered data
-		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
-		$form->fill(['id:filter_evaltype' => 'And/Or']);
-		$this->setTags([['name' => 'test', 'operator' => 'Exists']]);
-		$form->submit();
-		$this->page->waitUntilReady();
-
-		$this->assertEquals('Filter results', $this->query('xpath://ul[@class="breadcrumbs"]/li[2]')->one()->getText());
-		$form->query('button:Reset')->one()->click();
-	}
-
 	private function deleteService($serviceName, $parent = true, $child = false, $checkbox = true) {
 		$this->page->login()->open('zabbix.php?action=service.list.edit');
 
@@ -939,15 +928,5 @@ class testPageMonitoringServices extends CWebTest {
 			// Check database.
 			$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services WHERE name='.CXPathHelper::escapeQuotes('Server 10 child for Server 8')));
 		}
-	}
-
-	private function checkKioskModeButton () {
-		$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
-		$this->page->waitUntilReady();
-
-		$this->query('xpath://ul[@class="header-kioskmode-controls"]')->waitUntilVisible()->one();
-
-		$this->query('xpath://button[@title="Normal view"]')->one()->click();
-		$this->page->waitUntilReady();
 	}
 }
