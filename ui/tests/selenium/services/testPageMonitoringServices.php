@@ -346,7 +346,7 @@ class testPageMonitoringServices extends CWebTest {
 			);
 		}
 		$this->assertTrue($this->query(self::BREADCRUMB_SELECTOR)->one()
-				->query('xpath://span[@class="selected"]//a[text()='.zbx_dbstr($child).']')->one()->isValid()
+				->query("xpath://span[@class='selected']//a[text()=".zbx_dbstr($child)."]")->one()->isValid()
 		);
 	}
 
@@ -357,7 +357,7 @@ class testPageMonitoringServices extends CWebTest {
 
 		$info_card = $this->query('id:tab_info')->waitUntilReady()->one();
 		foreach ([$service, 'Parent services', 'Status', 'SLA', 'Tags'] as $text) {
-			$this->assertTrue($info_card->query('xpath://div[@class="service-info-grid"]//div[text()='.zbx_dbstr($text).']')
+			$this->assertTrue($info_card->query("xpath://div[@class='service-info-grid']//div[text()=".zbx_dbstr($text)."]")
 					->one()->isVisible()
 			);
 		}
