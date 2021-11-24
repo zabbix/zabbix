@@ -76,7 +76,7 @@ $link_templates = (new CTable())
 
 $template_tab->addRow(
 	(new CVisibilityBox('visible[linked_templates]', 'linked-templates-div', _('Original')))
-		->setLabel(_('Templates')),
+		->setLabel(_('Link templates')),
 	(new CDiv($link_templates))
 		->setId('linked-templates-div')
 		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')

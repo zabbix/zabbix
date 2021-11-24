@@ -71,7 +71,8 @@ $link_templates = (new CTable())
 	]);
 
 $host_tab->addRow(
-	(new CVisibilityBox('visible[templates]', 'linked-templates-div', _('Original')))->setLabel(_('Templates')),
+	(new CVisibilityBox('visible[templates]', 'linked-templates-div', _('Original')))
+		->setLabel(_('Link templates')),
 	(new CDiv($link_templates))
 		->setId('linked-templates-div')
 		->addStyle('margin-top: -5px;')
