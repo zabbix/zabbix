@@ -168,6 +168,17 @@ div.dashboard-grid-widget-item {
 		line-height: $line-height;
 	}
 
+	.units,
+	.change-indicator {
+		&:not(:last-child) {
+			margin-right: 5px;
+		}
+
+		&:not(:first-child) {
+			margin-left: 5px;
+		}
+	}
+
 	.svg-arrow {
 		height: calc(var(--content-height) * var(--widget-item-font) * 0.72 / #{$line-height});
 	}
