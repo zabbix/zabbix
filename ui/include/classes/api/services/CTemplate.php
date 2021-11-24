@@ -790,8 +790,6 @@ class CTemplate extends CHostGeneral {
 
 		$templates = $this->getObjectsByData($data, $db_templates);
 
-		$templates = $this->getObjectsByData($data, $db_templates);
-
 		$this->updateGroups($templates, $db_templates);
 		$this->updateMacros($templates, $db_templates);
 		$this->updateTemplates($templates, $db_templates);
@@ -904,9 +902,9 @@ class CTemplate extends CHostGeneral {
 				);
 			}
 
-			$this->massAddAffectedObjects('templates', [], $db_templates);
+			$this->massAddAffectedObjects('templates', $templateids, $db_templates);
 
-			$this->massCheckTemplatesLinks($templateids, $templateids, $db_templates);
+			$this->massCheckTemplatesLinks($templateids, [], $db_templates);
 		}
 	}
 
