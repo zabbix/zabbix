@@ -811,7 +811,7 @@ class CIntegrationTest extends CAPITest {
 	protected static function getPidPath($component) {
 		self::validateComponent($component);
 
-		return self::getConfigurationValue($component, 'PidFile', '/tmp/zabbix_'.$component.'.log');
+		return self::getConfigurationValue($component, 'PidFile', '/tmp/zabbix_'.$component.'.pid');
 	}
 
 	/**

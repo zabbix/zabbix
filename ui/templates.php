@@ -192,15 +192,15 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	try {
 		DBstart();
 
-		$templateId = getRequest('templateid', 0);
+		$input_templateid = getRequest('templateid', 0);
 		$cloneTemplateId = 0;
 
 		if (getRequest('form') === 'full_clone') {
-			$cloneTemplateId = $templateId;
-			$templateId = 0;
+			$cloneTemplateId = $input_templateid;
+			$input_templateid = 0;
 		}
 
-		if ($templateId == 0) {
+		if ($input_templateid == 0) {
 			$messageSuccess = _('Template added');
 			$messageFailed = _('Cannot add template');
 		}
@@ -237,13 +237,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$templates[] = ['templateid' => $templateid];
 		}
 
-		$templatesClear = getRequest('clear_templates', []);
-		$templatesClear = zbx_toObject($templatesClear, 'templateid');
-		$templateName = getRequest('template_name', '');
-
 		// create / update template
 		$template = [
-			'host' => $templateName,
+			'host' => getRequest('template_name', ''),
 			'name' => getRequest('visiblename', ''),
 			'groups' => zbx_toObject($groups, 'groupid'),
 			'templates' => $templates,
@@ -252,19 +248,24 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'description' => getRequest('description', '')
 		];
 
-		if ($templateId == 0) {
+		if ($input_templateid == 0) {
 			$result = API::Template()->create($template);
 
 			if ($result) {
-				$templateId = reset($result['templateids']);
+				$input_templateid = reset($result['templateids']);
 			}
 			else {
 				throw new Exception();
 			}
 		}
 		else {
-			$template['templateid'] = $templateId;
-			$template['templates_clear'] = $templatesClear;
+			$templates_clear = array_diff(
+				getRequest('clear_templates', []),
+				getRequest('add_templates', [])
+			);
+
+			$template['templateid'] = $input_templateid;
+			$template['templates_clear'] = zbx_toObject($templates_clear, 'templateid');
 
 			$result = API::Template()->update($template);
 
@@ -287,7 +288,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		else if (hasRequest('update')) {
 			$del_valuemapids = API::ValueMap()->get([
 				'output' => [],
-				'hostids' => $templateId,
+				'hostids' => $input_templateid,
 				'preservekeys' => true
 			]);
 		}
@@ -298,7 +299,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				unset($del_valuemapids[$valuemap['valuemapid']]);
 			}
 			else {
-				$ins_valuemaps[] = $valuemap + ['hostid' => $templateId];
+				$ins_valuemaps[] = $valuemap + ['hostid' => $input_templateid];
 			}
 		}
 
@@ -321,11 +322,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			 * First copy web scenarios with web items, so that later regular items can use web item as their master
 			 * item.
 			 */
-			if (!copyHttpTests($cloneTemplateId, $templateId)) {
+			if (!copyHttpTests($cloneTemplateId, $input_templateid)) {
 				throw new Exception();
 			}
 
-			if (!copyItems($cloneTemplateId, $templateId)) {
+			if (!copyItems($cloneTemplateId, $input_templateid)) {
 				throw new Exception();
 			}
 
@@ -338,7 +339,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			if ($dbTriggers) {
 				$result &= copyTriggersToHosts(zbx_objectValues($dbTriggers, 'triggerid'),
-						$templateId, $cloneTemplateId);
+						$input_templateid, $cloneTemplateId);
 
 				if (!$result) {
 					throw new Exception();
@@ -353,7 +354,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			]);
 
 			foreach ($dbGraphs as $dbGraph) {
-				copyGraphToHost($dbGraph['graphid'], $templateId);
+				copyGraphToHost($dbGraph['graphid'], $input_templateid);
 			}
 
 			// copy discovery rules
@@ -366,7 +367,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			if ($dbDiscoveryRules) {
 				$result &= API::DiscoveryRule()->copy([
 					'discoveryids' => zbx_objectValues($dbDiscoveryRules, 'itemid'),
-					'hostids' => [$templateId]
+					'hostids' => [$input_templateid]
 				]);
 
 				if (!$result) {
@@ -383,7 +384,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			]);
 
 			if ($db_template_dashboards) {
-				$db_template_dashboards = CDashboardHelper::prepareForClone($db_template_dashboards, $templateId);
+				$db_template_dashboards = CDashboardHelper::prepareForClone($db_template_dashboards, $input_templateid);
 
 				if (!API::TemplateDashboard()->create($db_template_dashboards)) {
 					throw new Exception();

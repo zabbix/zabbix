@@ -135,9 +135,22 @@
 			['input', 'paste'].forEach((event_type) => {
 				host_field.addEventListener(event_type, (e) => this.setVisibleNamePlaceholder(e.target.value));
 			});
-			this.setVisibleNamePlaceholder(host_field.value);
 
+			this.setVisibleNamePlaceholder(host_field.value);
 			this.initHostInterfaces(host_interfaces, host_is_discovered);
+
+			const $groups_ms = $('#groups_');
+			const $template_ms = $('#add_templates_');
+
+			$template_ms.on('change', (e) => {
+				$template_ms.multiSelect('setDisabledEntries', this.getAllTemplates());
+			});
+
+			$groups_ms.on('change', (e) => {
+				$groups_ms.multiSelect('setDisabledEntries',
+					[... document.querySelectorAll('[name^="groups["]')].map((input) => input.value)
+				);
+			});
 		},
 
 		/**
@@ -161,11 +174,15 @@
 			}
 		},
 
-		// Templates tab functions.
-
 		unlinkTemplate(button) {
+			const linked_templates = button.closest('table');
+
 			button.closest('tr').remove();
-			this.resetNewTemplatesField();
+			$('#add_templates_').trigger('change');
+
+			if (linked_templates.querySelector('tbody:empty') !== null) {
+				linked_templates.remove();
+			}
 		},
 
 		unlinkAndClearTemplate(button, templateid) {
@@ -176,37 +193,6 @@
 			button.form.appendChild(clear_tmpl);
 
 			this.unlinkTemplate(button);
-		},
-
-		/**
-		 * Replaces template multiselect with a copy that has disabled templates updated.
-		 */
-		resetNewTemplatesField() {
-			const $old_multiselect = $('#add_templates_');
-			const $new_multiselect = $('<div>');
-			const data = $old_multiselect.multiSelect('getData');
-
-			$('#add_templates_').parent().html($new_multiselect);
-
-			$new_multiselect
-				.addClass('multiselect active')
-				.css('width', '<?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px')
-				.attr('id', 'add_templates_')
-				.multiSelectHelper({
-					object_name: 'templates',
-					name: 'add_templates[]',
-					data: data,
-					popup: {
-						parameters: {
-							srctbl: 'templates',
-							srcfld1: 'hostid',
-							dstfrm: this.form_name,
-							dstfld1: 'add_templates_',
-							multiselect: '1',
-							disableids: this.getLinkedTemplates()
-						}
-					}
-				});
 		},
 
 		/**

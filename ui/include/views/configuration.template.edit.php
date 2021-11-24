@@ -66,9 +66,10 @@ $templates_field_items = [];
 
 if ($data['linked_templates']) {
 	$linked_templates= (new CTable())
-		->setId('linked-template')
+		->setHeader([_('Name'), _('Action')])
+		->setId('linked-templates')
 		->addClass(ZBX_STYLE_TABLE_FORMS)
-		->setHeader([_('Name'), _('Action')]);
+		->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;');
 
 	foreach ($data['linked_templates'] as $template) {
 		$linked_templates->addItem(
@@ -85,6 +86,8 @@ if ($data['linked_templates']) {
 		else {
 			$template_link = new CSpan($template['name']);
 		}
+
+		$template_link->addClass(ZBX_STYLE_WORDWRAP);
 
 		$clone_mode = ($data['form'] === 'clone' || $data['form'] === 'full_clone');
 
@@ -141,7 +144,7 @@ $template_tab
 	->addRow(
 		new CLabel(_('Templates')),
 		(count($templates_field_items) > 1)
-			? (new CDiv($templates_field_items))->addClass('grid-templates-container')
+			? (new CDiv($templates_field_items))->addClass('linked-templates')
 			: $templates_field_items
 	)
 	->addRow((new CLabel(_('Groups'), 'groups__ms'))->setAsteriskMark(),
@@ -156,7 +159,8 @@ $template_tab
 					'srcfld1' => 'groupid',
 					'dstfrm' => $form->getName(),
 					'dstfld1' => 'groups_',
-					'editable' => true
+					'editable' => true,
+					'disableids' => array_column($data['groups_ms'], 'id')
 				]
 			]
 		]))

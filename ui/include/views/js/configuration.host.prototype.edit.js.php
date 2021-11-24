@@ -27,8 +27,8 @@
 <script type="text/x-jquery-tmpl" id="groupPrototypeRow">
 	<tr class="form_row">
 		<td>
-			<input name="group_prototypes[#{i}][name]" type="text" value="#{name}"
-				style="width: 448px" placeholder="{#MACRO}" maxlength="255" />
+			<input name="group_prototypes[#{i}][name]" type="text" value="#{name}" style="width: 448px"
+				placeholder="{#MACRO}" maxlength="255" />
 		</td>
 		<td class="<?= ZBX_STYLE_NOWRAP ?>">
 			<button class="<?= ZBX_STYLE_BTN_LINK ?> group-prototype-remove" type="button" name="remove">
@@ -175,7 +175,7 @@
 			document.getElementById('interface-add'),
 			<?= json_encode([
 				'parent_is_template' => $data['parent_host']['status'] == HOST_STATUS_TEMPLATE,
-				'is_templated' => ($data['host_prototype']['templateid'] != 0),
+				'is_templated' => $data['host_prototype']['templateid'] != 0,
 				'inherited_interfaces' => array_values($data['parent_host']['interfaces']),
 				'custom_interfaces' => array_values($data['host_prototype']['interfaces'])
 			]) ?>

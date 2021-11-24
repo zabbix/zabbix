@@ -1037,6 +1037,49 @@ class CControllerPopupTriggerExpr extends CController {
 				'allowed_types' => $this->allowedTypesNumeric,
 				'operators' => $this->operators
 			],
+			'trendstl' => [
+				'types' => [ZBX_FUNCTION_TYPE_HISTORY],
+				'description' => _('trendstl() - Anomaly detection for period T'),
+				'params' => [
+					'last' => [
+						'C' => _('Evaluation period').' (T)',
+						'T' => T_ZBX_INT,
+						'A' => true
+					],
+					'period_shift' => [
+						'C' => _('Period shift'),
+						'T' => T_ZBX_INT,
+						'A' => true
+					],
+					'detect_period' => [
+						'C' => _('Detection period'),
+						'T' => T_ZBX_STR,
+						'A' => true
+					],
+					'season' => [
+						'C' => _('Season'),
+						'T' => T_ZBX_INT,
+						'A' => true
+					],
+					'deviations' => [
+						'C' => _('Deviations'),
+						'T' => T_ZBX_INT,
+						'A' => false
+					],
+					'algorithm' => [
+						'C' => _('Algorithm'),
+						'T' => T_ZBX_STR,
+						'A' => false
+					],
+					'season_window' => [
+						'C' => _('Season deviation window'),
+						'T' => T_ZBX_INT,
+						'A' => false
+					]
+				],
+				'allowed_types' => $this->allowedTypesNumeric,
+				'operators' => $this->operators
+			],
 			'trendsum' => [
 				'types' => [ZBX_FUNCTION_TYPE_HISTORY],
 				'description' => _('trendsum() - Sum of values of a period T with exact period shift'),
@@ -1399,13 +1442,11 @@ class CControllerPopupTriggerExpr extends CController {
 				}
 				elseif ($data['item_description']) {
 					// Quote function string parameters.
-					foreach ($data['params'] as $param_key => $param) {
-						if (!in_array($param_key, ['v', 'o', 'chars', 'fit', 'mode', 'pattern', 'replace', 'string'])
-								|| !array_key_exists($param_key, $data['params'])
-								|| $data['params'][$param_key] === '') {
-							continue;
-						}
+					$quote_params = ['v', 'o', 'chars', 'fit', 'mode', 'pattern', 'replace', 'string', 'algorithm'];
+					$quote_params = array_intersect_key($data['params'], array_fill_keys($quote_params, ''));
+					$quote_params = array_filter($quote_params, 'strlen');
 
+					foreach ($quote_params as $param_key => $param) {
 						$data['params'][$param_key] = quoteFunctionParam($param, true);
 					}
 

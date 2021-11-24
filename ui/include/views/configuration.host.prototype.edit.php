@@ -84,9 +84,10 @@ $templates_field_items = [];
 if ($host_prototype['templateid']) {
 	if ($host_prototype['templates']) {
 		$linked_templates = (new CTable())
+			->setHeader([_('Name')])
+			->setId('linked-templates')
 			->addClass(ZBX_STYLE_TABLE_FORMS)
-			->setId('linked-template')
-			->setHeader([_('Name')]);
+			->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;');
 
 		foreach ($host_prototype['templates'] as $template) {
 			$host_tab->addItem(
@@ -105,7 +106,7 @@ if ($host_prototype['templateid']) {
 				$template_link = new CSpan($template['name']);
 			}
 
-			$linked_templates->addRow([$template_link]);
+			$linked_templates->addRow([$template_link->addClass(ZBX_STYLE_WORDWRAP)]);
 		}
 
 		$templates_field_items[] = $linked_templates;
@@ -114,9 +115,10 @@ if ($host_prototype['templateid']) {
 else {
 	if ($host_prototype['templates']) {
 		$linked_templates = (new CTable())
+			->setHeader([_('Name'), _('Action')])
+			->setId('linked-templates')
 			->addClass(ZBX_STYLE_TABLE_FORMS)
-			->setId('linked-template')
-			->setHeader([_('Name'), _('Action')]);
+			->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;');
 
 		foreach ($host_prototype['templates'] as $template) {
 			$host_tab->addItem((new CVar('templates['.$template['templateid'].']', $template['templateid']))->removeId());
@@ -140,7 +142,7 @@ else {
 			]);
 
 			$linked_templates->addRow([
-				$template_link,
+				$template_link->addClass(ZBX_STYLE_WORDWRAP),
 				(new CCol(
 					(new CSimpleButton(_('Unlink')))
 						->onClick('submitFormWithParam('.implode(', ', $unlink_parameters).');')
@@ -172,7 +174,7 @@ else {
 $host_tab
 	->addRow(_('Templates'),
 		(count($templates_field_items) > 1)
-			? (new CDiv($templates_field_items))->addClass('grid-templates-container')
+			? (new CDiv($templates_field_items))->addClass('linked-templates')
 			: $templates_field_items
 	);
 
@@ -191,7 +193,8 @@ $host_tab->addRow(
 				'dstfrm' => $form->getName(),
 				'dstfld1' => 'group_links_',
 				'editable' => true,
-				'normal_only' => true
+				'normal_only' => true,
+				'disableids' => array_column($data['groups_ms'], 'id')
 			]
 		]
 	]))
@@ -274,9 +277,7 @@ if ($parent_host['status'] != HOST_STATUS_TEMPLATE) {
 		_('Monitored by proxy'),
 		(new CTextBox(
 			'proxy_hostid',
-			($parent_host['proxy_hostid'] != 0)
-				? $this->data['proxy']['host']
-				: _('(no proxy)'),
+			($parent_host['proxy_hostid'] != 0) ? $this->data['proxy']['host'] : _('(no proxy)'),
 			true
 		))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);

@@ -3695,7 +3695,6 @@ in:
 out:
   return: SUCCEED
   value: 1
-
 ---
 test case: Evaluate default all changecount() with UINT64 data (all values different)
 in:
