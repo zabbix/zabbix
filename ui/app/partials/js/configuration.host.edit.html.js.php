@@ -139,7 +139,7 @@
 			this.setVisibleNamePlaceholder(host_field.value);
 			this.initHostInterfaces(host_interfaces, host_is_discovered);
 
-			const $groups_ms =$('#groups_');
+			const $groups_ms = $('#groups_');
 			const $template_ms = $('#add_templates_');
 
 			$template_ms.on('change', (e) => {
