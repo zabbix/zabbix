@@ -505,27 +505,12 @@ class CControllerWidgetItemView extends CControllerWidget {
 		ksort($data);
 
 		if ($items) {
-			if ($items_with_values) {
-				// History can be shown only if there is at least one minute interval.
-				if (time() - $history[$itemid][0]['clock'] < 60) {
-					$from = date(ZBX_FULL_DATE_TIME, $history[$itemid][0]['clock'] - 60);
-				}
-				else {
-					$from = date(ZBX_FULL_DATE_TIME, (int) $history[$itemid][0]['clock']);
-				}
-			}
-			else {
-				$from = 'now-1h';
-			}
-
 			$data['url'] = (new CUrl('history.php'))
 				->setArgument('action', ($value_type == ITEM_VALUE_TYPE_FLOAT || $value_type == ITEM_VALUE_TYPE_UINT64)
 					? HISTORY_GRAPH
 					: HISTORY_VALUES
 				)
-				->setArgument('itemids[]', $itemid)
-				->setArgument('from', $from)
-				->setArgument('to', 'now');
+				->setArgument('itemids[]', $itemid);
 		}
 
 		$data['bg_color'] = ($fields['bg_color'] !== null && $fields['bg_color'] !== '') ? $fields['bg_color'] : '';
