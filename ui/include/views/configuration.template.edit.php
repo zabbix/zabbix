@@ -159,7 +159,8 @@ $template_tab
 					'srcfld1' => 'groupid',
 					'dstfrm' => $form->getName(),
 					'dstfld1' => 'groups_',
-					'editable' => true
+					'editable' => true,
+					'disableids' => array_column($data['groups_ms'], 'id')
 				]
 			]
 		]))

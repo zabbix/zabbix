@@ -193,7 +193,8 @@ $host_tab->addRow(
 				'dstfrm' => $form->getName(),
 				'dstfld1' => 'group_links_',
 				'editable' => true,
-				'normal_only' => true
+				'normal_only' => true,
+				'disableids' => array_column($data['groups_ms'], 'id')
 			]
 		]
 	]))
