@@ -39,7 +39,7 @@ class CSlaHelper {
 
 	public static function periodToStr(int $period): ?string {
 		static $period_strings;
-		
+
 		if ($period_strings === null) {
 			$period_strings = [
 				self::PERIOD_DAILY => _('Daily'),

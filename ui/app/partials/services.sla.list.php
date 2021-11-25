@@ -40,7 +40,7 @@ $header = [
 ];
 
 if ($data['can_edit']) {
-	array_unshift($header, 
+	array_unshift($header,
 		(new CCheckBox('all_ids'))->onClick("checkAll('sla-list', 'all_ids', 'ids');")
 	);
 }
@@ -56,7 +56,7 @@ foreach ($data['records'] as $recordid => $record) {
 	];
 
 	if ($data['can_edit']) {
-		array_unshift($row, 
+		array_unshift($row,
 			new CCheckBox('ids['.$recordid.']', $recordid),
 		);
 	}

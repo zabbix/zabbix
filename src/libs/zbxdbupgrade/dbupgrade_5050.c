@@ -22,6 +22,7 @@
 #include "dbupgrade.h"
 #include "dbupgrade_macros.h"
 #include "log.h"
+#include "../zbxalgo/vectorimpl.h"
 
 extern unsigned char	program_type;
 
@@ -1248,8 +1249,8 @@ static int	DBpatch_5050117(void)
 			{
 				{"sla_scheduleid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 				{"slaid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-				{"from", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-				{"to", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"period_from", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"period_to", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 				{0}
 			},
 			NULL
@@ -1273,13 +1274,13 @@ static int	DBpatch_5050119(void)
 static int	DBpatch_5050120(void)
 {
 	const ZBX_TABLE table =
-		{"sla_downtime", "sla_downtimeid", 0,
+		{"sla_excluded_downtime", "sla_excluded_downtimeid", 0,
 			{
-				{"sla_downtimeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"sla_excluded_downtimeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 				{"slaid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-				{"from", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-				{"to", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 				{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"period_from", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"period_to", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 				{0}
 			},
 			NULL
@@ -1290,46 +1291,393 @@ static int	DBpatch_5050120(void)
 
 static int	DBpatch_5050121(void)
 {
-	return DBcreate_index("sla_downtime", "sla_downtime_1", "slaid", 0);
+	return DBcreate_index("sla_excluded_downtime", "sla_excluded_downtime_1", "slaid", 0);
 }
 
 static int	DBpatch_5050122(void)
 {
 	const ZBX_FIELD	field = {"slaid", NULL, "sla", "slaid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
 
-	return DBadd_foreign_key("sla_downtime", 1, &field);
+	return DBadd_foreign_key("sla_excluded_downtime", 1, &field);
 }
 
 static int	DBpatch_5050123(void)
-{
-	return DBdrop_table("services_times");
-}
-
-static int	DBpatch_5050124(void)
-{
-	return DBdrop_field("services", "showsla");
-}
-
-static int	DBpatch_5050125(void)
-{
-	return DBdrop_field("services", "goodsla");
-}
-
-static int	DBpatch_5050126(void)
 {
 	const ZBX_FIELD	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("services", &field);
 }
 
-static int	DBpatch_5050127(void)
+static int	DBpatch_5050124(void)
 {
 	const ZBX_FIELD	field = {"uuid", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("services", &field);
 }
 
+typedef struct
+{
+	int	type;
+	int	from;
+	int	to;
+	char	*note;
+}
+services_times_t;
+
+ZBX_PTR_VECTOR_DECL(services_times, services_times_t)
+ZBX_PTR_VECTOR_IMPL(services_times, services_times_t)
+
+typedef struct
+{
+	int				showsla;
+	double				goodsla;
+	zbx_vector_services_times_t	services_times;
+	zbx_vector_uint64_t		serviceids;
+}
+sla_t;
+
+ZBX_PTR_VECTOR_DECL(sla, sla_t *)
+ZBX_PTR_VECTOR_IMPL(sla, sla_t *)
+
+static int	compare_services_time(const void *d1, const void *d2)
+{
+	const services_times_t	*a, *b;
+	int			ret;
+
+	a = (services_times_t *)d1;
+	b = (services_times_t *)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(a->type, b->type);
+	ZBX_RETURN_IF_NOT_EQUAL(a->from, b->from);
+	ZBX_RETURN_IF_NOT_EQUAL(a->to, b->to);
+
+	if (0 != (ret = strcmp(a->note, b->note)))
+		return ret;
+
+	return 0;
+}
+
+static int	compare_sla(const void *d1, const void *d2)
+{
+	const sla_t	*a, *b;
+	int		i, ret;
+
+	a = *(sla_t **)d1;
+	b = *(sla_t **)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(a->showsla, b->showsla);
+	ZBX_RETURN_IF_NOT_EQUAL(a->goodsla, b->goodsla);
+	ZBX_RETURN_IF_NOT_EQUAL(a->services_times.values_num, b->services_times.values_num);
+
+	for (i = 0; i < a->services_times.values_num; i++)
+	{
+		if (0 != (ret = compare_services_time(&a->services_times.values[i], &b->services_times.values[i])))
+			return ret;
+	}
+
+	return 0;
+}
+
+static void	services_time_clean(services_times_t services_time)
+{
+	zbx_free(services_time.note);
+}
+
+static void	sla_clean(sla_t *sla)
+{
+	zbx_vector_services_times_clear_ext(&sla->services_times, services_time_clean);
+	zbx_vector_services_times_destroy(&sla->services_times);
+	zbx_vector_uint64_destroy(&sla->serviceids);
+	zbx_free(sla);
+}
+
+#define ZBX_SLA_PERIOD_WEEKLY		1
+
+#define SERVICE_TIME_TYPE_UPTIME	0
+#define SERVICE_TIME_TYPE_DOWNTIME	1
+
+#define SLA_TAG_NAME			"SLA"
+
+static void	db_insert_sla(const zbx_vector_sla_t *uniq_slas, const char *default_timezone)
+{
+	zbx_db_insert_t		db_insert_sla, db_insert_sla_schedule, db_insert_sla_excluded_downtime,
+				db_insert_sla_service_tag, db_insert_service_tag;
+	int			i, j;
+	zbx_uint64_t		slaid;
+
+	zbx_db_insert_prepare(&db_insert_sla, "sla", "slaid", "name", "status", "slo", "period", "timezone", NULL);
+
+	zbx_db_insert_prepare(&db_insert_sla_service_tag, "sla_service_tag", "sla_service_tagid", "slaid", "tag",
+			"value", NULL);
+
+	zbx_db_insert_prepare(&db_insert_service_tag, "service_tag", "servicetagid", "serviceid", "tag", "value",
+			NULL);
+
+	zbx_db_insert_prepare(&db_insert_sla_schedule, "sla_schedule", "sla_scheduleid", "slaid", "period_from",
+			"period_to", NULL);
+	zbx_db_insert_prepare(&db_insert_sla_excluded_downtime, "sla_excluded_downtime", "sla_excluded_downtimeid",
+			"slaid", "period_from", "period_to", "name", NULL);
+
+	for (i = 0, slaid = 0; i < uniq_slas->values_num; i++)
+	{
+		char		buffer[MAX_STRING_LEN];
+		const sla_t	*sla = uniq_slas->values[i];
+
+		zbx_snprintf(buffer, sizeof(buffer), "%s:" ZBX_FS_UI64, SLA_TAG_NAME, ++slaid);
+
+		zbx_db_insert_add_values(&db_insert_sla, slaid, buffer, sla->showsla, sla->goodsla,
+				ZBX_SLA_PERIOD_WEEKLY, default_timezone);
+
+		zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64, slaid);
+		zbx_db_insert_add_values(&db_insert_sla_service_tag, slaid, slaid, SLA_TAG_NAME, buffer);
+
+		for (j = 0; j < sla->serviceids.values_num; j++)
+		{
+			zbx_db_insert_add_values(&db_insert_service_tag, __UINT64_C(0), sla->serviceids.values[j],
+					SLA_TAG_NAME, buffer);
+		}
+
+		for (j = 0; j < sla->services_times.values_num; j++)
+		{
+			services_times_t	*services_time = &sla->services_times.values[j];
+
+			if (SERVICE_TIME_TYPE_UPTIME == services_time->type)
+			{
+				zbx_db_insert_add_values(&db_insert_sla_schedule, __UINT64_C(0), slaid,
+						services_time->from, services_time->to);
+				continue;
+			}
+
+			zbx_db_insert_add_values(&db_insert_sla_excluded_downtime, __UINT64_C(0), slaid,
+					services_time->from, services_time->to, services_time->note);
+		}
+	}
+
+	zbx_db_insert_execute(&db_insert_sla);
+	zbx_db_insert_clean(&db_insert_sla);
+
+	zbx_db_insert_execute(&db_insert_sla_service_tag);
+	zbx_db_insert_clean(&db_insert_sla_service_tag);
+
+	zbx_db_insert_autoincrement(&db_insert_service_tag, "servicetagid");
+	zbx_db_insert_execute(&db_insert_service_tag);
+	zbx_db_insert_clean(&db_insert_service_tag);
+
+	zbx_db_insert_autoincrement(&db_insert_sla_schedule, "sla_scheduleid");
+	zbx_db_insert_execute(&db_insert_sla_schedule);
+	zbx_db_insert_clean(&db_insert_sla_schedule);
+
+	zbx_db_insert_autoincrement(&db_insert_sla_excluded_downtime, "sla_excluded_downtimeid");
+	zbx_db_insert_execute(&db_insert_sla_excluded_downtime);
+	zbx_db_insert_clean(&db_insert_sla_excluded_downtime);
+}
+
+static void	services_times_convert_downtime(zbx_vector_services_times_t *services_times)
+{
+	int				i;
+	zbx_vector_services_times_t	services_times_converted;
+
+	zbx_vector_services_times_create(&services_times_converted);
+
+	for (i = 0; i < services_times->values_num; i++)
+	{
+		services_times_t	*service_time = &services_times->values[i];
+
+		if (SERVICE_TIME_TYPE_DOWNTIME != service_time->type)
+			continue;
+
+		if (0 != service_time->from)
+		{
+			services_times_t	service_time_new;
+
+			service_time_new.type = SERVICE_TIME_TYPE_UPTIME;
+			service_time_new.from = 0;
+			service_time_new.to = service_time->from;
+			service_time_new.note = zbx_strdup(NULL, "");
+
+			zbx_vector_services_times_append(&services_times_converted, service_time_new);
+		}
+
+		if (SEC_PER_WEEK != service_time->to)
+		{
+			services_times_t	service_time_new;
+
+			service_time_new.type = SERVICE_TIME_TYPE_UPTIME;
+			service_time_new.from = service_time->to;
+			service_time_new.to = SEC_PER_WEEK;
+			service_time_new.note = zbx_strdup(NULL, "");
+
+			zbx_vector_services_times_append(&services_times_converted, service_time_new);
+		}
+
+		services_time_clean(*service_time);
+		zbx_vector_services_times_remove(services_times, i);
+		i--;
+	}
+
+	if (0 != services_times_converted.values_num)
+	{
+		zbx_vector_services_times_append_array(services_times, services_times_converted.values,
+				services_times_converted.values_num);
+	}
+
+	zbx_vector_services_times_destroy(&services_times_converted);
+}
+
+static int	DBpatch_5050125(void)
+{
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_uint64_t		last_serviceid = 0;
+	zbx_vector_sla_t	slas, uniq_slas;
+	int			i, j;
+	char			*default_timezone;
+
+	zbx_vector_sla_create(&slas);
+	zbx_vector_sla_create(&uniq_slas);
+
+	result = DBselect(
+			"select s.serviceid,s.showsla,s.goodsla,t.type,t.ts_from,t.ts_to,t.note"
+			" from services s"
+			" left join services_times t on s.serviceid=t.serviceid"
+			" order by s.serviceid");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	serviceid;
+		sla_t		*sla;
+
+		ZBX_STR2UINT64(serviceid, row[0]);
+
+		if (last_serviceid != serviceid)
+		{
+			sla = zbx_malloc(NULL, sizeof(sla_t));
+
+			zbx_vector_services_times_create(&sla->services_times);
+			zbx_vector_uint64_create(&sla->serviceids);
+
+			sla->showsla = atoi(row[1]);
+			sla->goodsla = atof(row[2]);
+
+			zbx_vector_uint64_append(&sla->serviceids, serviceid);
+
+			zbx_vector_sla_append(&slas, sla);
+			last_serviceid = serviceid;
+		}
+
+		if (NULL != row[3])
+		{
+			services_times_t	service_time;
+
+			service_time.type = atoi(row[3]);
+			service_time.from = atoi(row[4]);
+			service_time.to = atoi(row[5]);
+			service_time.note = zbx_strdup(NULL, row[6]);
+
+			zbx_vector_services_times_append(&sla->services_times, service_time);
+		}
+	}
+	DBfree_result(result);
+
+	for (i = 0; i < slas.values_num; i++)
+	{
+		services_times_convert_downtime(&slas.values[i]->services_times);
+		zbx_vector_services_times_sort(&slas.values[i]->services_times, compare_services_time);
+	}
+
+	for (i = 0; i < slas.values_num; i++)
+	{
+		if (FAIL == (j = zbx_vector_sla_search(&uniq_slas, slas.values[i], compare_sla)))
+		{
+			zbx_vector_sla_append(&uniq_slas, slas.values[i]);
+			zbx_vector_sla_remove_noorder(&slas, i);
+			i--;
+			continue;
+		}
+
+		zbx_vector_uint64_append(&uniq_slas.values[j]->serviceids, slas.values[i]->serviceids.values[0]);
+	}
+
+	for (i = 0; i < slas.values_num; i++)
+		zbx_vector_uint64_sort(&uniq_slas.values[i]->serviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	result = DBselect("select default_timezone from config");
+	if (NULL != (row = DBfetch(result)))
+	{
+		if (0 == strcmp(row[0], "system"))
+			default_timezone = zbx_strdup(NULL, "UTC");
+		else
+			default_timezone = zbx_strdup(NULL, row[0]);
+	}
+	else
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		default_timezone = zbx_strdup(NULL, "UTC");
+	}
+	DBfree_result(result);
+
+	db_insert_sla(&uniq_slas, default_timezone);
+
+	zbx_vector_sla_clear_ext(&slas, sla_clean);
+	zbx_vector_sla_clear_ext(&uniq_slas, sla_clean);
+	zbx_vector_sla_destroy(&slas);
+	zbx_vector_sla_destroy(&uniq_slas);
+
+	zbx_free(default_timezone);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5050126(void)
+{
+	return DBdrop_table("services_times");
+}
+
+static int	DBpatch_5050127(void)
+{
+	return DBdrop_field("services", "showsla");
+}
+
 static int	DBpatch_5050128(void)
+{
+	return DBdrop_field("services", "goodsla");
+}
+
+static int	DBpatch_5050129(void)
+{
+	int		ret = SUCCEED;
+	char		*uuid, *sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	DB_ROW		row;
+	DB_RESULT	result;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect("select serviceid,name from services");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		uuid = zbx_gen_uuid4(row[1]);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update services set uuid='%s' where serviceid=%s;\n",
+				uuid, row[0]);
+		zbx_free(uuid);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_5050130(void)
 {
 	if (ZBX_DB_OK > DBexecute("update role_rule set name='ui.services.services' where name='ui.monitoring.services'"))
 		return FAIL;
@@ -1460,5 +1808,7 @@ DBPATCH_ADD(5050125, 0, 1)
 DBPATCH_ADD(5050126, 0, 1)
 DBPATCH_ADD(5050127, 0, 1)
 DBPATCH_ADD(5050128, 0, 1)
+DBPATCH_ADD(5050129, 0, 1)
+DBPATCH_ADD(5050130, 0, 1)
 
 DBPATCH_END()
