@@ -493,7 +493,7 @@ static void	es_put_header(duk_context *ctx, int idx, char *header)
  *                                                                            *
  * Function: get_headers_as_strings                                           *
  *                                                                            *
- * Purpose: retrieve headers from request in form of arrays                   *
+ * Purpose: retrieve headers from request in form of strings                  *
  *                                                                            *
  * Parameters: ctx     - [IN] the duktape context                             *
  *             request - [IN] the request to retrieve headers from            *
@@ -533,6 +533,16 @@ static void	cached_headers_free(zbx_cached_header_t *header)
 	zbx_free(header);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: get_headers_as_arrays                                            *
+ *                                                                            *
+ * Purpose: retrieve headers from request in form of arrays                   *
+ *                                                                            *
+ * Parameters: ctx     - [IN] the duktape context                             *
+ *             request - [IN] the request to retrieve headers from            *
+ *                                                                            *
+ ******************************************************************************/
 static duk_ret_t	get_headers_as_arrays(duk_context *ctx, zbx_es_httprequest_t *request)
 {
 	char			*ptr, *header;
