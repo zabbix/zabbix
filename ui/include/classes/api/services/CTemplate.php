@@ -683,11 +683,6 @@ class CTemplate extends CHostGeneral {
 		// Finally delete the template.
 		DB::delete('hosts', ['hostid' => $templateids]);
 
-		// TODO: remove info from API
-		foreach ($db_templates as $db_template) {
-			info(_s('Deleted: Template "%1$s".', $db_template['name']));
-		}
-
 		$this->addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_TEMPLATE, $db_templates);
 
 		return ['templateids' => $templateids];
@@ -723,7 +718,8 @@ class CTemplate extends CHostGeneral {
 			' FROM hosts_templates ht,hosts_templates htt'.
 			' WHERE ht.hostid=htt.hostid'.
 				' AND ht.templateid!=htt.templateid'.
-				' AND '.dbConditionInt('ht.templateid', $templateids)
+				' AND '.dbConditionInt('ht.templateid', $templateids).
+				' AND '.dbConditionInt('htt.templateid', $templateids, true)
 		);
 
 		while ($row = DBfetch($result)) {
