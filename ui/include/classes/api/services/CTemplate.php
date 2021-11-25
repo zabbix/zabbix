@@ -699,7 +699,7 @@ class CTemplate extends CHostGeneral {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateDelete(array $templateids, array &$db_templates = null): void {
+	private function validateDelete(array &$templateids, array &$db_templates = null): void {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $templateids, '/', $error)) {
@@ -720,9 +720,9 @@ class CTemplate extends CHostGeneral {
 		$del_templates = [];
 		$result = DBselect(
 			'SELECT ht.hostid,ht.templateid AS del_templateid,htt.templateid'.
-			' FROM hosts_templates ht, hosts_templates htt'.
-			' WHERE htt.hostid=ht.hostid'.
-				' AND htt.templateid!=ht.templateid'.
+			' FROM hosts_templates ht,hosts_templates htt'.
+			' WHERE ht.hostid=htt.hostid'.
+				' AND ht.templateid!=htt.templateid'.
 				' AND '.dbConditionInt('ht.templateid', $templateids)
 		);
 

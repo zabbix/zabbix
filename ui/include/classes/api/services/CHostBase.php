@@ -275,13 +275,11 @@ abstract class CHostBase extends CApiService {
 	protected function checkTriggerExpressionsOfDelTemplates(array $del_templates): void {
 		$result = DBselect(
 			'SELECT DISTINCT i.hostid AS del_templateid,f.triggerid,ii.hostid'.
-			' FROM items i,functions f,functions ff,items ii,hosts h'.
-			' WHERE f.itemid=i.itemid'.
-				' AND ff.triggerid=f.triggerid'.
-				' AND ii.itemid=ff.itemid'.
-				' AND h.hostid=ii.hostid'.
-				' AND '.dbConditionInt('i.hostid', array_keys($del_templates)).
-				' AND '.dbConditionInt('h.status', [HOST_STATUS_TEMPLATE])
+			' FROM items i,functions f,functions ff,items ii'.
+			' WHERE i.itemid=f.itemid'.
+				' AND f.triggerid=ff.triggerid'.
+				' AND ff.itemid=ii.itemid'.
+				' AND '.dbConditionInt('i.hostid', array_keys($del_templates))
 		);
 
 		while ($row = DBfetch($result)) {
