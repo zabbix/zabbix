@@ -290,7 +290,7 @@
 		},
 
 		refreshMap: function(id) {
-			var screen = this.screens[id], self = this;
+			var screen = this.screens[id];
 
 			if (screen.isRefreshing) {
 				this.calculateReRefresh(id);

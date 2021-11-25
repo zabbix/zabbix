@@ -47,7 +47,7 @@ ZBX_NotificationCollection.prototype.map = function(callback) {
 	var len = this._list_sequence.length;
 
 	while (--len > -1) {
-		var ret = callback(this.getById(this._list_sequence[len]), len);
+		callback(this.getById(this._list_sequence[len]), len);
 	}
 };
 
