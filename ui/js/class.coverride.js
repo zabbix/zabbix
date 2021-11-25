@@ -79,7 +79,7 @@ jQuery(function ($) {
 				.append(content)
 				.append(close);
 		}
-	};
+	}
 
 	function getMenu($obj, options, option_to_edit, trigger_elmnt) {
 		var sections = [],
@@ -170,7 +170,7 @@ jQuery(function ($) {
 		});
 
 		return sections;
-	};
+	}
 
 	var methods = {
 		/**

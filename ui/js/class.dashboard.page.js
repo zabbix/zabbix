@@ -697,7 +697,7 @@ class CDashboardPage extends CBaseComponent {
 		}
 
 		return true;
-	};
+	}
 
 	_resizeGrid(min_rows = null) {
 		if (min_rows == 0) {
