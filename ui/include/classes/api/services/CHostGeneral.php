@@ -1844,10 +1844,6 @@ abstract class CHostGeneral extends CHostBase {
 				$db_hosts[$host[$id_field_name]]['templates'] = [];
 			}
 
-			if (array_key_exists('templates_clear', $host)) {
-				$db_hosts[$host[$id_field_name]]['templates_clear'] = [];
-			}
-
 			if (array_key_exists('tags', $host)) {
 				$hostids['tags'][] = $host[$id_field_name];
 				$db_hosts[$host[$id_field_name]]['tags'] = [];
