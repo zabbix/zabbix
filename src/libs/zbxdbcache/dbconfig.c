@@ -1096,14 +1096,13 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 static void	DCsync_autoreg_config(zbx_dbsync_t *sync)
 {
 	/* sync this function with zbx_dbsync_compare_autoreg_psk() */
-	int		ret;
 	char		**db_row;
 	zbx_uint64_t	rowid;
 	unsigned char	tag;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &db_row, &tag)))
+	if (SUCCEED == zbx_dbsync_next(sync, &rowid, &db_row, &tag))
 	{
 		switch (tag)
 		{
@@ -1417,7 +1416,7 @@ static void	DCsync_hosts(zbx_dbsync_t *sync)
 done:
 		if (NULL != host->tls_dc_psk && NULL == psk_owner)
 		{
-			if (NULL == (psk_owner = (zbx_ptr_pair_t *)zbx_hashset_search(&psk_owners, &host->tls_dc_psk->tls_psk_identity)))
+			if (NULL == zbx_hashset_search(&psk_owners, &host->tls_dc_psk->tls_psk_identity))
 			{
 				/* register this host as the PSK identity owner, against which to report conflicts */
 
@@ -2472,10 +2471,6 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync)
 		interface->type = type;
 		interface->main = main_;
 		interface->useip = useip;
-		interface->errors_from = atoi(row[11]);
-		interface->available = (unsigned char)atoi(row[8]);
-		interface->disable_until = atoi(row[9]);
-		interface->availability_ts = time(NULL);
 		reset_snmp_stats |= (SUCCEED == DCstrpool_replace(found, &interface->ip, row[5]));
 		reset_snmp_stats |= (SUCCEED == DCstrpool_replace(found, &interface->dns, row[6]));
 		reset_snmp_stats |= (SUCCEED == DCstrpool_replace(found, &interface->port, row[7]));
@@ -2483,6 +2478,10 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync)
 
 		if (0 == found)
 		{
+			interface->errors_from = atoi(row[11]);
+			interface->available = (unsigned char)atoi(row[8]);
+			interface->disable_until = atoi(row[9]);
+			interface->availability_ts = time(NULL);
 			interface->reset_availability = 0;
 			interface->items_num = 0;
 		}
@@ -8392,7 +8391,7 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 		if (ITEM_TYPE_INTERNAL != dc_item->type)
 			continue;
 
-		if (NULL == (item = (zbx_preproc_item_t *)zbx_hashset_search(items, &dc_item->itemid)))
+		if (NULL == zbx_hashset_search(items, &dc_item->itemid))
 		{
 			if (FAIL == dc_preproc_item_init(&item_local, dc_item->itemid))
 				continue;
@@ -13629,23 +13628,19 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 
 		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS))
 		{
-			if (proxy->auto_compress != diff->compress)
-				proxy->auto_compress = diff->compress;
-			else
+			if (proxy->auto_compress == diff->compress)
 				diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS);
+			proxy->auto_compress = diff->compress;
 		}
 		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTERROR))
 		{
-			if (proxy->last_version_error_time != diff->last_version_error_time)
-				proxy->last_version_error_time = diff->last_version_error_time;
+			proxy->last_version_error_time = diff->last_version_error_time;
 			diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTERROR);
 		}
 
 		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_PROXYDELAY))
 		{
-			if (proxy->proxy_delay != diff->proxy_delay)
-				proxy->proxy_delay = diff->proxy_delay;
-
+			proxy->proxy_delay = diff->proxy_delay;
 			diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_PROXYDELAY);
 		}
 

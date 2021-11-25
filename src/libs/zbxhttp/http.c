@@ -291,6 +291,8 @@ int	zbx_http_get(const char *url, const char *header, long timeout, char **out, 
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() URL '%s'", __func__, url);
 
+	*errbuf = '\0';
+
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
 		*error = zbx_strdup(NULL, "Cannot initialize cURL library");
@@ -337,7 +339,6 @@ int	zbx_http_get(const char *url, const char *header, long timeout, char **out, 
 		goto clean;
 	}
 
-	*errbuf = '\0';
 	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
 	{
 		*error = zbx_dsprintf(NULL, "Cannot perform request: %s", '\0' == *errbuf ? curl_easy_strerror(err) :

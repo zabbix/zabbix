@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-11T08:05:47Z'
+  date: '2021-10-27T08:32:31Z'
   groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -24,7 +24,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387225-discussion-thread-for-official-zabbix-template-for-linux
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.39
       groups:
         -
           name: 'Templates/Operating systems'
@@ -959,7 +959,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Available memory, in Linux, available = free + buffers + cache. On other platforms calculation may vary. See also: https://www.zabbix.com/documentation/5.4/manual/appendix/items/vm.memory.size_params'
+          description: 'Available memory, in Linux, available = free + buffers + cache. On other platforms calculation may vary. See also Appendixes in Zabbix Documentation about parameters of the vm.memory.size item.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -1248,12 +1248,9 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: '0'
-              description: |
-                Indicates the interface RFC2863 operational state as a string.
-                Possible values are:"unknown", "notpresent", "down", "lowerlayerdown", "testing","dormant", "up".
-                Reference: https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-net
+              description: 'Reference: https://www.kernel.org/doc/Documentation/networking/operstates.txt'
               valuemap:
-                name: 'IF-MIB::ifOperStatus'
+                name: ifOperStatus
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1266,25 +1263,27 @@ zabbix_export:
                     - |
                       var newvalue;
                       switch(value) {
-                        case "up":
+                        case "unkonwn":
+                          newvalue = 0;
+                          break;
+                        case "notpresent":
                           newvalue = 1;
                           break;
                         case "down":
                           newvalue = 2;
                           break;
+                        case "lowerlayerdown":
+                          newvalue = 3;
+                          break;
                         case "testing":
                           newvalue = 4;
                           break;
-                        case "unknown":
+                        case "dormant":
                           newvalue = 5;
                           break;
-                        case "dormant":
+                        case "up":
                           newvalue = 6;
-                          break;
-                        case "notPresent":
-                          newvalue = 7;
-                          break;
-                        default:
+                          break;  default:
                           newvalue = "Problem parsing interface operstate in JS";
                       }
                       return newvalue;
@@ -1396,7 +1395,7 @@ zabbix_export:
               recovery_expression: |
                 avg(/Linux by Prom/net.if.in[node_exporter,"{#IFNAME}"],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Linux by Prom/net.if.speed[node_exporter,"{#IFNAME}"]) and
                 avg(/Linux by Prom/net.if.out[node_exporter,"{#IFNAME}"],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Linux by Prom/net.if.speed[node_exporter,"{#IFNAME}"])
-              name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}% )'
+              name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'The network interface utilization is close to its estimated maximum bandwidth.'
@@ -1475,14 +1474,14 @@ zabbix_export:
             key: node_exporter.get
           lld_macro_paths:
             -
+              lld_macro: '{#IFNAME}'
+              path: $.labels.device
+            -
               lld_macro: '{#HELP}'
               path: $.help
             -
               lld_macro: '{#IFALIAS}'
               path: $.labels.ifalias
-            -
-              lld_macro: '{#IFNAME}'
-              path: $.labels.device
             -
               lld_macro: '{#IFOPERSTATUS}'
               path: $.labels.operstate
@@ -1996,14 +1995,14 @@ zabbix_export:
             key: node_exporter.get
           lld_macro_paths:
             -
-              lld_macro: '{#FSDEVICE}'
-              path: $.labels.device
+              lld_macro: '{#FSTYPE}'
+              path: $.labels.fstype
             -
               lld_macro: '{#FSNAME}'
               path: $.labels.mountpoint
             -
-              lld_macro: '{#FSTYPE}'
-              path: $.labels.fstype
+              lld_macro: '{#FSDEVICE}'
+              path: $.labels.device
             -
               lld_macro: '{#HELP}'
               path: $.help
@@ -2049,7 +2048,7 @@ zabbix_export:
           value: '^.*$'
         -
           macro: '{$NET.IF.IFNAME.NOT_MATCHES}'
-          value: '(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9a-z]+$|docker[0-9]+|br-[a-z0-9]{12})'
+          value: '(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9A-z]+$|docker[0-9]+|br-[a-z0-9]{12})'
           description: 'Filter out loopbacks, nulls, docker veth links and docker0 bridge by default'
         -
           macro: '{$NET.IF.IFOPERSTATUS.MATCHES}'
@@ -2134,16 +2133,16 @@ zabbix_export:
                   fields:
                     -
                       type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: INTEGER
                       name: columns
                       value: '1'
                     -
                       type: INTEGER
                       name: rows
                       value: '1'
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -2228,16 +2227,16 @@ zabbix_export:
                   fields:
                     -
                       type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: INTEGER
                       name: columns
                       value: '1'
                     -
                       type: INTEGER
                       name: rows
                       value: '1'
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -2252,16 +2251,16 @@ zabbix_export:
                   fields:
                     -
                       type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: INTEGER
                       name: columns
                       value: '1'
                     -
                       type: INTEGER
                       name: rows
                       value: '1'
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -2276,16 +2275,16 @@ zabbix_export:
                   fields:
                     -
                       type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: INTEGER
                       name: columns
                       value: '1'
                     -
                       type: INTEGER
                       name: rows
                       value: '1'
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -2300,16 +2299,16 @@ zabbix_export:
                   fields:
                     -
                       type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: INTEGER
                       name: columns
                       value: '1'
                     -
                       type: INTEGER
                       name: rows
                       value: '1'
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -2324,16 +2323,16 @@ zabbix_export:
                   fields:
                     -
                       type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: INTEGER
                       name: columns
                       value: '1'
                     -
                       type: INTEGER
                       name: rows
                       value: '1'
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -2343,26 +2342,29 @@ zabbix_export:
       valuemaps:
         -
           uuid: 4827063819f14d539f509552c84f5f94
-          name: 'IF-MIB::ifOperStatus'
+          name: ifOperStatus
           mappings:
             -
+              value: '0'
+              newvalue: unknown
+            -
               value: '1'
-              newvalue: up
+              newvalue: notpresent
             -
               value: '2'
               newvalue: down
             -
+              value: '3'
+              newvalue: lowerlayerdown
+            -
               value: '4'
-              newvalue: unknown
+              newvalue: testing
             -
               value: '5'
               newvalue: dormant
             -
               value: '6'
-              newvalue: notPresent
-            -
-              value: '7'
-              newvalue: lowerLayerDown
+              newvalue: up
         -
           uuid: 4d912f1ee95942038f306ddefb3a57b3
           name: 'Linux::Interface protocol types'

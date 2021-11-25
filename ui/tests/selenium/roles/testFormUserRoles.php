@@ -669,12 +669,6 @@ class testFormUserRoles extends CWebTest {
 		foreach ($roles as $role) {
 			$this->query('class:js-userrole-usertype')->one()->asZDropdown()->select($role);
 			$this->assertScreenshotExcept($screenshot_area, ['query' => 'xpath://input[@id="name"]'], $role);
-
-			// List of API requests.
-			$this->query('button:Select')->one()->click();
-			$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
-			$this->assertScreenshot($this->query('xpath://div[@role="dialog"]')->one(), $role.'api');
-			$overlay->close();
 		}
 
 		// Screens for super admin.
@@ -684,6 +678,143 @@ class testFormUserRoles extends CWebTest {
 		foreach (['Clone' => true, 'Cancel' => true, 'Update' => false, 'Delete' => false] as $button => $clickable) {
 			$this->assertEquals($clickable, $this->query('button', $button)->one()->isClickable());
 		}
+	}
+
+	public static function getApiListData() {
+		return [
+			// User role.
+			[
+				[
+					'fields' => [
+						'Name' => 'user_api',
+						'User type' => 'User'
+					],
+					'api_list' => [
+						'action.get', 'alert.get', 'configuration.export', 'configuration.import', 'configuration.importcompare',
+						'correlation.get', 'dashboard.create', 'dashboard.delete', 'dashboard.get', 'dashboard.update',
+						'dcheck.get', 'dhost.get', 'discoveryrule.get', 'drule.get', 'dservice.get', 'event.acknowledge',
+						'event.get', 'graph.get', 'graphitem.get', 'graphprototype.get', 'history.get', 'host.get',
+						'hostgroup.get', 'hostinterface.get', 'hostprototype.get', 'housekeeping.get', 'httptest.get',
+						'iconmap.get', 'image.get', 'item.get', 'itemprototype.get', 'maintenance.get', 'map.create',
+						'map.delete', 'map.get', 'map.update', 'mediatype.get', 'module.get', 'problem.get', 'proxy.get',
+						'role.get', 'script.execute', 'script.get', 'script.getscriptsbyhosts', 'service.get', 'service.getsla',
+						'settings.get', 'template.get', 'templatedashboard.get', 'token.create', 'token.delete',
+						'token.generate', 'token.get', 'token.update', 'trend.get', 'trigger.get', 'triggerprototype.get',
+						'user.get', 'user.logout', 'user.update', 'usergroup.get', 'usermacro.get', 'valuemap.get'
+					]
+				]
+			],
+			// Admin role.
+			[
+				[
+					'fields' => [
+						'Name' => 'admin_api',
+						'User type' => 'Admin'
+					],
+					'api_list' => [
+						'action.create', 'action.delete', 'action.get', 'action.update', 'alert.get', 'configuration.export',
+						'configuration.import', 'configuration.importcompare', 'correlation.get', 'dashboard.create', 'dashboard.delete',
+						'dashboard.get', 'dashboard.update', 'dcheck.get', 'dhost.get', 'discoveryrule.copy', 'discoveryrule.create',
+						'discoveryrule.delete', 'discoveryrule.get', 'discoveryrule.update', 'drule.create', 'drule.delete', 'drule.get',
+						'drule.update', 'dservice.get', 'event.acknowledge', 'event.get', 'graph.create', 'graph.delete', 'graph.get',
+						'graph.update', 'graphitem.get', 'graphprototype.create', 'graphprototype.delete', 'graphprototype.get',
+						'graphprototype.update', 'history.get', 'host.create', 'host.delete', 'host.get', 'host.massadd', 'host.massremove',
+						'host.massupdate', 'host.update', 'hostgroup.delete', 'hostgroup.get', 'hostgroup.massadd', 'hostgroup.massremove',
+						'hostgroup.massupdate', 'hostgroup.update', 'hostinterface.create', 'hostinterface.delete', 'hostinterface.get',
+						'hostinterface.massadd', 'hostinterface.massremove', 'hostinterface.replacehostinterfaces', 'hostinterface.update',
+						'hostprototype.create', 'hostprototype.delete', 'hostprototype.get', 'hostprototype.update', 'housekeeping.get',
+						'httptest.create', 'httptest.delete', 'httptest.get', 'httptest.update', 'iconmap.get', 'image.get', 'item.create',
+						'item.delete', 'item.get', 'item.update', 'itemprototype.create', 'itemprototype.delete', 'itemprototype.get',
+						'itemprototype.update', 'maintenance.create', 'maintenance.delete', 'maintenance.get', 'maintenance.update',
+						'map.create', 'map.delete', 'map.get', 'map.update', 'mediatype.get', 'module.get', 'problem.get', 'proxy.get',
+						'report.create', 'report.delete', 'report.get', 'report.update', 'role.get', 'script.execute', 'script.get',
+						'script.getscriptsbyhosts', 'service.adddependencies', 'service.addtimes', 'service.create', 'service.delete',
+						'service.deletedependencies', 'service.deletetimes', 'service.get', 'service.getsla', 'service.update',
+						'settings.get', 'template.create', 'template.delete', 'template.get', 'template.massadd', 'template.massremove',
+						'template.massupdate', 'template.update', 'templatedashboard.create', 'templatedashboard.delete',
+						'templatedashboard.get', 'templatedashboard.update', 'token.create', 'token.delete', 'token.generate', 'token.get',
+						'token.update', 'trend.get', 'trigger.adddependencies', 'trigger.create', 'trigger.delete', 'trigger.deletedependencies',
+						'trigger.get', 'trigger.update', 'triggerprototype.create', 'triggerprototype.delete', 'triggerprototype.get',
+						'triggerprototype.update', 'user.get', 'user.logout', 'user.update', 'usergroup.get', 'usermacro.create',
+						'usermacro.delete', 'usermacro.get', 'usermacro.update', 'valuemap.create', 'valuemap.delete', 'valuemap.get',
+						'valuemap.update'
+					]
+				]
+			],
+			// Super Admin role.
+			[
+				[
+					'fields' => [
+						'Name' => 'super_admin_api',
+						'User type' => 'Super admin'
+					],
+					'api_list' => [
+						'action.create', 'action.delete', 'action.get', 'action.update', 'alert.get', 'auditlog.get',
+						'authentication.get', 'authentication.update', 'autoregistration.get', 'autoregistration.update',
+						'configuration.export', 'configuration.import', 'configuration.importcompare', 'correlation.create',
+						'correlation.delete', 'correlation.get', 'correlation.update', 'dashboard.create', 'dashboard.delete',
+						'dashboard.get', 'dashboard.update', 'dcheck.get', 'dhost.get', 'discoveryrule.copy', 'discoveryrule.create',
+						'discoveryrule.delete', 'discoveryrule.get', 'discoveryrule.update', 'drule.create', 'drule.delete', 'drule.get',
+						'drule.update', 'dservice.get', 'event.acknowledge', 'event.get', 'graph.create', 'graph.delete', 'graph.get',
+						'graph.update', 'graphitem.get', 'graphprototype.create', 'graphprototype.delete', 'graphprototype.get',
+						'graphprototype.update', 'history.get', 'host.create', 'host.delete', 'host.get', 'host.massadd', 'host.massremove',
+						'host.massupdate', 'host.update', 'hostgroup.create', 'hostgroup.delete', 'hostgroup.get', 'hostgroup.massadd',
+						'hostgroup.massremove', 'hostgroup.massupdate', 'hostgroup.update', 'hostinterface.create', 'hostinterface.delete',
+						'hostinterface.get', 'hostinterface.massadd', 'hostinterface.massremove', 'hostinterface.replacehostinterfaces',
+						'hostinterface.update', 'hostprototype.create', 'hostprototype.delete', 'hostprototype.get', 'hostprototype.update',
+						'housekeeping.get', 'housekeeping.update', 'httptest.create', 'httptest.delete', 'httptest.get', 'httptest.update',
+						'iconmap.create', 'iconmap.delete', 'iconmap.get', 'iconmap.update', 'image.create', 'image.delete', 'image.get',
+						'image.update', 'item.create', 'item.delete', 'item.get', 'item.update', 'itemprototype.create',
+						'itemprototype.delete', 'itemprototype.get', 'itemprototype.update', 'maintenance.create', 'maintenance.delete',
+						'maintenance.get', 'maintenance.update', 'map.create', 'map.delete', 'map.get', 'map.update', 'mediatype.create',
+						'mediatype.delete', 'mediatype.get', 'mediatype.update', 'module.create', 'module.delete', 'module.get',
+						'module.update', 'problem.get', 'proxy.create', 'proxy.delete', 'proxy.get', 'proxy.update', 'report.create',
+						'report.delete', 'report.get', 'report.update', 'role.create', 'role.delete', 'role.get', 'role.update',
+						'script.create', 'script.delete', 'script.execute', 'script.get', 'script.getscriptsbyhosts', 'script.update',
+						'service.adddependencies', 'service.addtimes', 'service.create', 'service.delete', 'service.deletedependencies',
+						'service.deletetimes', 'service.get', 'service.getsla', 'service.update', 'settings.get', 'settings.update',
+						'task.create', 'task.get', 'template.create', 'template.delete', 'template.get', 'template.massadd',
+						'template.massremove', 'template.massupdate', 'template.update', 'templatedashboard.create', 'templatedashboard.delete',
+						'templatedashboard.get', 'templatedashboard.update', 'token.create', 'token.delete', 'token.generate', 'token.get',
+						'token.update', 'trend.get', 'trigger.adddependencies', 'trigger.create', 'trigger.delete', 'trigger.deletedependencies',
+						'trigger.get', 'trigger.update', 'triggerprototype.create', 'triggerprototype.delete', 'triggerprototype.get',
+						'triggerprototype.update', 'user.create', 'user.delete', 'user.get', 'user.logout', 'user.update', 'usergroup.create',
+						'usergroup.delete', 'usergroup.get', 'usergroup.update', 'usermacro.create', 'usermacro.createglobal',
+						'usermacro.delete', 'usermacro.deleteglobal', 'usermacro.get', 'usermacro.update', 'usermacro.updateglobal',
+						'valuemap.create', 'valuemap.delete', 'valuemap.get', 'valuemap.update'
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * Check available API requests for each role type.
+	 *
+	 * @dataProvider getApiListData
+	 */
+	public function testFormUserRoles_ApiList($data) {
+		$this->page->login()->open('zabbix.php?action=userrole.edit');
+		$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
+		$form->fill($data['fields']);
+		$this->query('button:Select')->one()->click();
+		$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
+		$this->assertTableDataColumn($data['api_list']);
+		$overlay->query('id:all_records')->asCheckbox()->one()->check();
+		$overlay->query('button:Select')->one()->click();
+
+		// Open the list of API methods and check a that random method is selected and disabled.
+		$this->query('button:Select')->one()->click();
+		$overlay->waitUntilReady();
+		$method = $data['api_list'][array_rand($data['api_list'])];
+		$this->assertTrue($overlay->query('name:item['.$method.']')->one()->isAttributePresent(['checked', 'disabled']));
+		$overlay->close();
+
+		$form->submit();
+		$sql_api = 'SELECT * FROM role_rule WHERE type=1 and roleid in (SELECT roleid FROM role WHERE name='
+				.zbx_dbstr($data['fields']['Name']).')'.' ORDER BY value_str ASC';
+		$role_rules = CDBHelper::getColumn($sql_api, 'value_str');
+		$this->assertEquals($data['api_list'], $role_rules);
 	}
 
 	public function testFormUserRoles_SimpleUpdate() {
