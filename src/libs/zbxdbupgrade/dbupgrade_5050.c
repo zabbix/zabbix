@@ -1598,6 +1598,9 @@ static int	DBpatch_5050125(void)
 		zbx_vector_uint64_append(&uniq_slas.values[j]->serviceids, slas.values[i]->serviceids.values[0]);
 	}
 
+	for (i = 0; i < slas.values_num; i++)
+		zbx_vector_uint64_sort(&uniq_slas.values[i]->serviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
 	result = DBselect("select default_timezone from config");
 	if (NULL != (row = DBfetch(result)))
 	{
