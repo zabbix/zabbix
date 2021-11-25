@@ -27,43 +27,19 @@
 $this->addJsFile('layout.mode.js');
 $this->addJsFile('class.tagfilteritem.js');
 
-$this->includeJsFile('monitoring.service.list.js.php');
+$this->includeJsFile('services.sla.list.js.php');
 
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
 
-$breadcrumbs = [];
 $filter = null;
 
 if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
-	if (count($data['breadcrumbs']) > 1) {
-		while ($path_item = array_shift($data['breadcrumbs'])) {
-			$breadcrumbs[] = (new CSpan())
-				->addItem(array_key_exists('curl', $path_item)
-					? new CLink($path_item['name'], $path_item['curl'])
-					: $path_item['name']
-				)
-				->addClass(!$data['breadcrumbs'] ? ZBX_STYLE_SELECTED : null);
-		}
-	}
-
 	$filter = (new CFilter())
-		->addVar('action', 'service.list')
-		->addVar('serviceid', $data['service'] !== null ? $data['service']['serviceid'] : null)
+		->addVar('action', 'sla.list')
 		->setResetUrl($data['reset_curl'])
-		->setProfile('web.service.filter')
+		->setProfile('web.sla.filter')
 		->setActiveTab($data['active_tab']);
-
-	if ($data['service'] !== null && !$data['is_filtered']) {
-		$filter
-			->addTab(
-				(new CLink(_('Info'), '#tab_info'))->addClass(ZBX_STYLE_BTN_INFO),
-				(new CDiv())
-					->setId('tab_info')
-					->addClass(ZBX_STYLE_FILTER_CONTAINER)
-					->addItem(new CPartial('service.info', $data + ['is_editable' => false]))
-			);
-	}
 
 	$filter->addFilterTab(_('Filter'), [
 		(new CFormGrid())
@@ -79,9 +55,9 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 				new CLabel(_('Status')),
 				new CFormField(
 					(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
-						->addValue(_('Any'), SERVICE_STATUS_ANY)
-						->addValue(_('OK'), SERVICE_STATUS_OK)
-						->addValue(_('Problem'), SERVICE_STATUS_PROBLEM)
+						->addValue(_('Any'), CSlaHelper::SLA_STATUS_ANY)
+						->addValue(_('Enabled'), CSlaHelper::SLA_STATUS_ENABLED)
+						->addValue(_('Disabled'), CSlaHelper::SLA_STATUS_DISABLED)
 						->setModern(true)
 				)
 			]),
@@ -102,35 +78,20 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 }
 
 (new CWidget())
-	->setTitle(_('Services'))
+	->setTitle(_('SLA'))
 	->setWebLayoutMode($web_layout_mode)
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())
-				->addItem(
-					$data['can_edit']
-						? (new CRadioButtonList('list_mode', ZBX_LIST_MODE_VIEW))
-							->addValue(_('View'), ZBX_LIST_MODE_VIEW)
-							->addValue(_('Edit'), ZBX_LIST_MODE_EDIT)
-							->disableAutocomplete()
-							->setModern(true)
-						: null
-				)
 				->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
 		))->setAttribute('aria-label', _('Content controls'))
 	)
-	->setNavigation(
-		$breadcrumbs ? new CList([new CBreadcrumbs($breadcrumbs)]) : null
-	)
 	->addItem($filter)
-	->addItem(new CPartial('monitoring.service.list', array_intersect_key($data, array_flip(['can_monitor_problems',
-		'path', 'is_filtered', 'max_in_table', 'service', 'services', 'events', 'tags', 'paging'
-	]))))
+	->addItem(new CPartial('services.sla.list', $data))
 	->show();
 
 (new CScriptTag('
 	view.init('.json_encode([
-		'serviceid' => $data['service'] !== null ? $data['service']['serviceid'] : null,
 		'mode_switch_url' => $data['edit_mode_url'],
 		'refresh_url' => $data['refresh_url'],
 		'refresh_interval' => $data['refresh_interval']

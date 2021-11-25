@@ -331,7 +331,7 @@ class testSID extends CWebTest {
 			// User role creation.
 			[['link' => 'zabbix.php?form_refresh=1&name=sadasda&type=1&ui_monitoring_dashboard=1&ui_monitoring_problems='.
 					'1&ui_monitoring_hosts=1&ui_monitoring_overview=1&ui_monitoring_latest_data=1&ui_monitoring_screens=1'.
-					'&ui_monitoring_maps=1&ui_monitoring_discovery=0&ui_monitoring_services=1&ui_inventory_overview=1&'.
+					'&ui_monitoring_maps=1&ui_monitoring_discovery=0&ui_services_services=1&ui_inventory_overview=1&'.
 					'ui_inventory_hosts=1&ui_reports_system_info=0&ui_reports_availability_report=1&ui_reports_top_triggers'.
 					'=1&ui_reports_audit=0&ui_reports_action_log=0&ui_reports_notifications=0&ui_configuration_host_groups=0'.
 					'&ui_configuration_templates=0&ui_configuration_hosts=0&ui_configuration_maintenance=0&'.
@@ -348,7 +348,7 @@ class testSID extends CWebTest {
 			[['link' => 'zabbix.php?form_refresh=1&roleid=5&name=sadasda&type=2&ui_monitoring_dashboard=1&'.
 					'ui_monitoring_problems=1&ui_monitoring_hosts=1&ui_monitoring_overview=1&ui_monitoring_latest_data=1'.
 					'&ui_monitoring_screens=1&ui_monitoring_maps=1&ui_monitoring_discovery=0&ui_monitoring_discovery=1&'.
-					'ui_monitoring_services=1&ui_inventory_overview=1&ui_inventory_hosts=1&ui_reports_system_info=0&'.
+					'ui_services_services=1&ui_inventory_overview=1&ui_inventory_hosts=1&ui_reports_system_info=0&'.
 					'ui_reports_availability_report=1&ui_reports_top_triggers=1&ui_reports_audit=0&ui_reports_action_log=0'.
 					'&ui_reports_notifications=0&ui_reports_notifications=1&ui_configuration_host_groups=0&'.
 					'ui_configuration_host_groups=1&ui_configuration_templates=0&ui_configuration_templates=1&'.

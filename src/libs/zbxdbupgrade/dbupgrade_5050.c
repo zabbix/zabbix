@@ -1329,6 +1329,15 @@ static int	DBpatch_5050127(void)
 	return DBadd_field("services", &field);
 }
 
+static int	DBpatch_5050128(void)
+{
+	if (ZBX_DB_OK > DBexecute("update role_rule set name='ui.services.services' where name='ui.monitoring.services'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+
 #endif
 
 DBPATCH_START(5050)
@@ -1450,5 +1459,6 @@ DBPATCH_ADD(5050124, 0, 1)
 DBPATCH_ADD(5050125, 0, 1)
 DBPATCH_ADD(5050126, 0, 1)
 DBPATCH_ADD(5050127, 0, 1)
+DBPATCH_ADD(5050128, 0, 1)
 
 DBPATCH_END()

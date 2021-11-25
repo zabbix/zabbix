@@ -22,7 +22,7 @@ define('ZABBIX_VERSION',		'6.0.0alpha7');
 define('ZABBIX_API_VERSION',	'6.0.0');
 define('ZABBIX_EXPORT_VERSION',	'6.0');
 
-define('ZABBIX_DB_VERSION',		5050127);
+define('ZABBIX_DB_VERSION',		5050128);
 
 define('DB_VERSION_SUPPORTED',				0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',		1);
@@ -2026,6 +2026,9 @@ define('ZBX_STYLE_ZSELECT_HOST_INTERFACE', 'z-select-host-interface');
 // Dashboard list table classes.
 define('ZBX_STYLE_DASHBOARD_LIST', 'dashboard-list');
 define('ZBX_STYLE_DASHBOARD_LIST_ITEM', 'dashboard-list-item');
+
+define('ZBX_SLA_MAX_REPORTING_PERIODS', 100);
+define('ZBX_SLA_DEFAULT_REPORTING_PERIODS', 20);
 
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] !== 'off');

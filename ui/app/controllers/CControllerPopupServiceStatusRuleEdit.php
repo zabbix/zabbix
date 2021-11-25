@@ -47,7 +47,7 @@ class CControllerPopupServiceStatusRuleEdit extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_MONITORING_SERVICES);
+		return $this->checkAccess(CRoleHelper::UI_SERVICES_SERVICES);
 	}
 
 	protected function doAction(): void {

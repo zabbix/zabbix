@@ -54,7 +54,7 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 	 * @throws APIException
 	 */
 	protected function checkPermissions(): bool {
-		if (!$this->checkAccess(CRoleHelper::UI_MONITORING_SERVICES) || !$this->canEdit()) {
+		if (!$this->checkAccess(CRoleHelper::UI_SERVICES_SERVICES) || !$this->canEdit()) {
 			return false;
 		}
 

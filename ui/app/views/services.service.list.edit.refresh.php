@@ -24,7 +24,7 @@
  */
 
 $output = [
-	'body' => (new CPartial('monitoring.service.list.edit', $data))->getOutput()
+	'body' => (new CPartial('services.service.list.edit', $data))->getOutput()
 ];
 
 if (($messages = getMessages()) !== null) {

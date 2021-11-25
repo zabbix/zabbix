@@ -40,7 +40,7 @@ class CControllerServiceDelete extends CController {
 	 * @throws APIException
 	 */
 	protected function checkPermissions(): bool {
-		if (!$this->checkAccess(CRoleHelper::UI_MONITORING_SERVICES)) {
+		if (!$this->checkAccess(CRoleHelper::UI_SERVICES_SERVICES)) {
 			return false;
 		}
 
