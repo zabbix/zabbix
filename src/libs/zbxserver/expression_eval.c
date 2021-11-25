@@ -1411,7 +1411,7 @@ static int	expression_eval_bucket_rate(zbx_expression_eval_t *eval, zbx_expressi
 	int				i, pos, ret = FAIL;
 	zbx_vector_dbl_t		*results = NULL;
 	double				percentage, result;
-	char				*param = NULL, *backet = NULL;
+	char				*param = NULL;
 	const char			*log_fn = (ZBX_ITEM_FUNC_BPERCENTL == item_func ?
 							"bucket_percentile" : "bucket_rate_foreach");
 
@@ -1510,8 +1510,7 @@ static int	expression_eval_bucket_rate(zbx_expression_eval_t *eval, zbx_expressi
 		DC_ITEM		*dcitem;
 		zbx_variant_t	rate;
 		double		le;
-		const char	*s;
-
+		char		backet[ZBX_MAX_DOUBLE_LEN + 1];
 
 		if (NULL == (dcitem = get_dcitem(&eval->dcitem_refs, data->itemids.values[i])))
 			continue;
@@ -1525,12 +1524,7 @@ static int	expression_eval_bucket_rate(zbx_expression_eval_t *eval, zbx_expressi
 		if (ITEM_VALUE_TYPE_FLOAT != dcitem->value_type && ITEM_VALUE_TYPE_UINT64 != dcitem->value_type)
 			continue;
 
-		zbx_free(backet);
-
-		for (s = dcitem->key_orig; SUCCEED == is_key_char((unsigned char)*s); s++)
-			;
-
-		if (dcitem->key_orig == s || NULL == (backet = get_param_dyn(s, pos, NULL)))	/* the key is empty */
+		if (0 != get_key_param(dcitem->key_orig, pos, backet, sizeof(backet)))
 			continue;
 
 		zbx_strupper(backet);
@@ -1560,7 +1554,6 @@ static int	expression_eval_bucket_rate(zbx_expression_eval_t *eval, zbx_expressi
 	}
 err:
 	zbx_free(param);
-	zbx_free(backet);
 
 	if (NULL != results)
 	{
