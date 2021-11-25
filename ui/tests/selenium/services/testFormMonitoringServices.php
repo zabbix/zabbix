@@ -315,8 +315,11 @@ class testFormMonitoringServices extends CWebTest {
 
 		// Check filtering reset.
 		$childs_dialog->query('button:Reset')->one()->waitUntilClickable()->click();
-		$table = $childs_dialog->query('class:list-table')->asTable()->waitUntilClickable()->one();
-		$this->assertEquals(9, count($table->getRows()->asArray()));
+		$childs_dialog->invalidate();
+
+		$this->assertEquals(9, count($childs_dialog->query('class:list-table')->asTable()->waitUntilReady()->one()
+				->getRows()->asArray())
+		);
 	}
 
 	public function getServicesData() {
@@ -918,16 +921,12 @@ class testFormMonitoringServices extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=service.list.edit');
 		$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
-		$table->findRow('Name', $parent, true)->query('link', $parent)
-				->waitUntilClickable()->one()->click();
+		$table->findRow('Name', $parent, true)->query('link', $parent)->waitUntilClickable()->one()->click();
 
-		// Open Info tab in case it is not opened yet.
-		$this->query('link:Info')->one()->waitUntilClickable()->click();
 		$this->query('id:tab_info')->one()->waitUntilVisible()->query('xpath:.//button[contains(@class, "btn-edit")]')
 				->one()->waitUntilClickable()->click();
 
-		COverlayDialogElement::find()->one()->waitUntilReady();
-		$form = $this->query('id:service-form')->asForm()->one()->waitUntilReady();
+		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
 		$form->selectTab('Child services');
 
 		// Go to "Childs" tab and find row by particular Service name in Childs table.
@@ -952,7 +951,7 @@ class testFormMonitoringServices extends CWebTest {
 
 		// Check that service linking is disappeared from DB.
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services_links WHERE serviceupid='.
-				self::$parentid.'AND servicedownid ='.self::$childid));
+				self::$parentid.' AND servicedownid ='.self::$childid));
 	}
 
 	public function testFormMonitoringServices_DeleteParent() {
