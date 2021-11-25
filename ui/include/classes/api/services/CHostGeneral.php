@@ -1982,21 +1982,39 @@ abstract class CHostGeneral extends CHostBase {
 		}
 
 		if ($objects === 'macros') {
-			$filter = ['hostid' => array_keys($db_hosts)];
-
-			if ($objectids) {
-				$filter += ['macro' => $objectids];
-			}
-
 			$options = [
 				'output' => ['hostmacroid', 'hostid', 'macro', 'value', 'description', 'type'],
-				'filter' => $filter
+				'filter' => ['hostid' => array_keys($db_hosts)],
 			];
+
+			if ($objectids) {
+				$macro_patterns = [];
+				$trimmed_macros = [];
+
+				foreach ($objectids as $macro) {
+					$trimmed_macro = CApiInputValidator::trimMacro($macro);
+					$context_pos = strpos($trimmed_macro, ':');
+
+					$macro_patterns[] = ($context_pos === false)
+						? '{$'.$trimmed_macro
+						: '{$'.substr($trimmed_macro, 0, $context_pos);
+					$trimmed_macros[] = $trimmed_macro;
+				}
+
+				$options += [
+					'search' => ['macro' => $macro_patterns],
+					'startSearch' => true,
+					'searchByAny' => true
+				];
+			}
+
 			$db_macros = DBselect(DB::makeSql('hostmacro', $options));
 
 			while ($db_macro = DBfetch($db_macros)) {
-				$db_hosts[$db_macro['hostid']]['macros'][$db_macro['hostmacroid']] =
-					array_diff_key($db_macro, array_flip(['hostid']));
+				if (!$objectids || in_array(CApiInputValidator::trimMacro($db_macro['macro']), $trimmed_macros)) {
+					$db_hosts[$db_macro['hostid']]['macros'][$db_macro['hostmacroid']] =
+						array_diff_key($db_macro, array_flip(['hostid']));
+				}
 			}
 		}
 

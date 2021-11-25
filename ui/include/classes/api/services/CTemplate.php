@@ -864,7 +864,7 @@ class CTemplate extends CHostGeneral {
 			$macros = [];
 
 			foreach ($data['macros'] as $macro) {
-				$macros[CApiInputValidator::trimMacro($macro['macro'])] = true;
+				$macros[CApiInputValidator::trimMacro($macro['macro'])] = $macro['macro'];
 			}
 
 			$options = [
@@ -874,9 +874,13 @@ class CTemplate extends CHostGeneral {
 			$db_macros = DBselect(DB::makeSql('hostmacro', $options));
 
 			while ($db_macro = DBfetch($db_macros)) {
-				if (array_key_exists(CApiInputValidator::trimMacro($db_macro['macro']), $macros)) {
+				$trimmed_db_macro = CApiInputValidator::trimMacro($db_macro['macro']);
+
+				if (array_key_exists($trimmed_db_macro, $macros)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Macro "%1$s" already exists on "%2$s".', $macro, $db_templates[$db_macro['hostid']]['host'])
+						_s('Macro "%1$s" already exists on "%2$s".', $macros[$trimmed_db_macro],
+							$db_templates[$db_macro['hostid']]['host']
+						)
 					);
 				}
 			}
