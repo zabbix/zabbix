@@ -1510,7 +1510,7 @@ static int	expression_eval_bucket_rate(zbx_expression_eval_t *eval, zbx_expressi
 		DC_ITEM		*dcitem;
 		zbx_variant_t	rate;
 		double		le;
-		char		backet[ZBX_MAX_DOUBLE_LEN + 1];
+		char		bucket[ZBX_MAX_DOUBLE_LEN + 1];
 
 		if (NULL == (dcitem = get_dcitem(&eval->dcitem_refs, data->itemids.values[i])))
 			continue;
@@ -1524,14 +1524,14 @@ static int	expression_eval_bucket_rate(zbx_expression_eval_t *eval, zbx_expressi
 		if (ITEM_VALUE_TYPE_FLOAT != dcitem->value_type && ITEM_VALUE_TYPE_UINT64 != dcitem->value_type)
 			continue;
 
-		if (0 != get_key_param(dcitem->key_orig, pos, backet, sizeof(backet)))
+		if (0 != get_key_param(dcitem->key_orig, pos, bucket, sizeof(bucket)))
 			continue;
 
-		zbx_strupper(backet);
+		zbx_strupper(bucket);
 
-		if (0 == strcmp(backet, "+INF") || 0 == strcmp(backet, "INF"))
+		if (0 == strcmp(bucket, "+INF") || 0 == strcmp(bucket, "INF"))
 			le = ZBX_INFINITY;
-		else if (SUCCEED != is_double(backet, &le))
+		else if (SUCCEED != is_double(bucket, &le))
 			continue;
 
 		if (SUCCEED != (ret = zbx_evaluate_RATE(&rate, dcitem, param, ts, error)))
