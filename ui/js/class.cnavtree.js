@@ -29,13 +29,6 @@ if (typeof addPopupValues === 'undefined') {
 	window.addPopupValues = null;
 }
 
-if (typeof (zbx_widget_navtree_trigger) !== typeof (Function)) {
-	function zbx_widget_navtree_trigger(action, grid) {
-		var $navtree = jQuery('.navtree', grid['widget']['content_body']);
-
-		$navtree.zbx_navtree(action);
-	}
-}
 (function($) {
 	$.widget('zbx.sortable_tree', $.extend({}, $.ui.sortable.prototype, {
 		options: {
