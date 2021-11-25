@@ -123,7 +123,7 @@ $macros = cleanInheritedMacros(getRequest('macros', []));
 
 // Remove empty new macro lines.
 $macros = array_filter($macros, function($macro) {
-	$keys = array_flip(['macro', 'value', 'description']);
+	$keys = array_flip(['hostmacroid', 'macro', 'value', 'description']);
 
 	return (bool) array_filter(array_intersect_key($macro, $keys));
 });
@@ -168,7 +168,7 @@ elseif (isset($_REQUEST['clone']) && isset($_REQUEST['hostid'])) {
 		warning(_('The cloned host prototype contains user defined macros with type "Secret text". The value and type of these macros were reset.'));
 	}
 
-	$macros = array_map(function($macro) {
+	$macros = array_map(function(array $macro): array {
 		return array_diff_key($macro, array_flip(['hostmacroid']));
 	}, $macros);
 
@@ -197,10 +197,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	}
 
 	if ($macros) {
-		$macros = array_map(function($macro) {
-			return array_diff_key($macro, array_flip(['hostmacroid']));
-		}, $macros);
-
 		$newHostPrototype['macros'] = $macros;
 	}
 

@@ -224,6 +224,9 @@ class CApiInputValidator {
 
 			case API_LAT_LNG_ZOOM:
 				return self::validateLatLngZoom($rule, $data, $path, $error);
+
+			case API_UNEXPECTED:
+				return true;
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
@@ -297,6 +300,8 @@ class CApiInputValidator {
 				foreach ($rule['fields'] as $field_name => $field_rule) {
 					if ($data !== null && array_key_exists($field_name, $data)) {
 						if ($field_rule['type'] === API_MULTIPLE) {
+							self::unsetNonexistMultipleRules($field_rule['rules'], $data);
+
 							foreach ($field_rule['rules'] as $multiple_rule) {
 								if (array_key_exists('else', $multiple_rule)
 										|| self::isInRange($data[$multiple_rule['if']['field']], $multiple_rule['if']['in'])) {
@@ -1188,7 +1193,11 @@ class CApiInputValidator {
 		// validation of the values type
 		foreach ($rule['fields'] as $field_name => $field_rule) {
 			if ($field_rule['type'] === API_MULTIPLE) {
+				self::unsetNonexistMultipleRules($field_rule['rules'], $data);
+
 				foreach ($field_rule['rules'] as $multiple_rule) {
+					self::unsetNonexistMultipleRules($field_rule['rules'], $data);
+
 					if (array_key_exists('else', $multiple_rule)
 							|| self::isInRange($data[$multiple_rule['if']['field']], $multiple_rule['if']['in'])) {
 						if ($multiple_rule['type'] == API_UNEXPECTED && array_key_exists($field_name, $data)) {
@@ -1241,6 +1250,16 @@ class CApiInputValidator {
 		}
 
 		return true;
+	}
+
+	private static function unsetNonexistMultipleRules(array &$rules, array $data): void {
+		foreach ($rules as $index => $rule) {
+			if (array_key_exists('if', $rule)) {
+				if (!array_key_exists($rule['if']['field'], $data)) {
+					unset($rules[$index]);
+				}
+			}
+		}
 	}
 
 	/**
