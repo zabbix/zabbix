@@ -224,9 +224,6 @@ class CApiInputValidator {
 
 			case API_LAT_LNG_ZOOM:
 				return self::validateLatLngZoom($rule, $data, $path, $error);
-
-			case API_UNEXPECTED:
-				return true;
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
