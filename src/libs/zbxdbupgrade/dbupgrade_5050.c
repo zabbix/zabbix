@@ -1532,6 +1532,7 @@ static int	DBpatch_5050125(void)
 	zbx_vector_sla_t	slas, uniq_slas;
 	int			i, j;
 	char			*default_timezone;
+	sla_t			*sla;
 
 	zbx_vector_sla_create(&slas);
 	zbx_vector_sla_create(&uniq_slas);
@@ -1545,7 +1546,6 @@ static int	DBpatch_5050125(void)
 	while (NULL != (row = DBfetch(result)))
 	{
 		zbx_uint64_t	serviceid;
-		sla_t		*sla;
 
 		ZBX_STR2UINT64(serviceid, row[0]);
 
