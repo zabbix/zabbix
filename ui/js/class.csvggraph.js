@@ -514,7 +514,6 @@ jQuery(function ($) {
 								&& (+point.y + tolerance) > e.offsetY && e.offsetY > (+point.y - tolerance)) {
 							xy_point = point;
 							points_total = 1;
-							return;
 						}
 					});
 				}

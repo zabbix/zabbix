@@ -279,7 +279,6 @@ class CTabFilter extends CBaseComponent {
 
 			if (item) {
 				item.updateCounter(value);
-				return;
 			}
 		});
 

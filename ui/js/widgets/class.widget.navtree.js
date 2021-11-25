@@ -903,8 +903,9 @@ class CWidgetNavTree extends CWidget {
 												const root = this._target
 													.querySelector(`.tree-item[data-id="${parent}"]>ul.tree-list`);
 
-												id = this._getNextId(),
-													new_item = {
+												id = this._getNextId();
+
+												new_item = {
 														id: id,
 														name: resp['name'],
 														sysmapid: resp['sysmapid'],

@@ -154,7 +154,7 @@ CViewSwitcher.prototype = {
 				if (obj.getAttribute('type').toUpperCase() === 'CHECKBOX') {
 					return obj.checked ? obj.value : null;
 				}
-
+				break;
 			default:
 				return obj.value;
 		}
@@ -183,6 +183,7 @@ CViewSwitcher.prototype = {
 					obj.value == value;
 					break;
 				}
+				break;
 			case 'textarea':
 			default:
 				obj.value = value;
