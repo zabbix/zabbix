@@ -133,6 +133,7 @@ abstract class CHostGeneral extends CHostBase {
 				'output' => ['name', 'status'],
 				'filter' => [
 					'flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED],
+					'status' => [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, HOST_STATUS_TEMPLATE],
 					'name' => $v_names
 				],
 				'limit' => 1
