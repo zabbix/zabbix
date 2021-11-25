@@ -127,6 +127,7 @@ require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingLowLevelDisc
 require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingTest.php';
 require_once dirname(__FILE__).'/services/testFormMonitoringServices.php';
 require_once dirname(__FILE__).'/services/testPageMonitoringServices.php';
+require_once dirname(__FILE__).'/services/testPageMonitoringServicesMassUpdate.php';
 require_once dirname(__FILE__).'/testFormSetup.php';
 require_once dirname(__FILE__).'/testFormSysmap.php';
 require_once dirname(__FILE__).'/testFormTabIndicators.php';
@@ -233,6 +234,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageMassUpdateItemPrototypes');
 		$suite->addTestSuite('testPageMonitoringHosts');
 		$suite->addTestSuite('testPageMonitoringServices');
+		$suite->addTestSuite('testPageMonitoringServicesMassUpdate');
 		$suite->addTestSuite('testPageNetworkDiscovery');
 /*
 		$suite->addTestSuite('testPageQueueDetails');

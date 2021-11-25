@@ -40,7 +40,7 @@ class testPageMonitoringServices extends CWebTest {
 	const LAYOUT_CHILD2 = 'Server 1';
 	const BREADCRUMB_SELECTOR = 'xpath://ul[@class="breadcrumbs"]';
 
-	private $selector = 'xpath://form[@name="service_list"]/table[@class="list-table"]';
+	private $table_selector = 'id:service-list';
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -224,7 +224,7 @@ class testPageMonitoringServices extends CWebTest {
 				'algorithm' => 1,
 				'showsla' => 1,
 				'goodsla' => 99.99,
-				'sortorder' => 18
+				'sortorder' => 19
 			]
 		]);
 
@@ -274,14 +274,14 @@ class testPageMonitoringServices extends CWebTest {
 		$this->page->assertHeader('Services');
 
 		// Labels on columns at services list.
-		$table = $this->query('id:service-list')->asTable()->one();
+		$table = $this->query($this->table_selector)->asTable()->one();
 		$this->assertSame(['Name', 'Status', 'Root cause', 'SLA', 'Tags'], $table->getHeadersText());
 
-		// Check that row buttons are not present in the table.
+		// Check that service buttons are not present in the table row.
+		$this->checkServiceButtons($table->getRow(rand(0,13)), false);
+
+		// Check that checkbox "Select all" not present in the table header.
 		$this->assertFalse($table->query('id:all_services')->exists());
-		$this->assertFalse($table->query('xpath://button[@title="Add child service"]')->exists());
-		$this->assertFalse($table->query('xpath://button[@title="Edit"]')->exists());
-		$this->assertFalse($table->query('xpath://button[@title="Delete"]')->exists());
 
 		// Check that action buttons are not present below the table.
 		$this->assertFalse($this->query('button:Mass update')->exists());
@@ -318,17 +318,17 @@ class testPageMonitoringServices extends CWebTest {
 
 		$this->assertTrue($this->query('button:Create service')->one()->isVisible());
 
-		$table = $this->query('class:list-table')->asTable()->one();
+		$table = $this->query($this->table_selector)->asTable()->one();
 		$this->assertSame(['', 'Name', 'Status', 'Root cause', 'SLA', 'Tags', ''], $table->getHeadersText());
 
-		$this->checkServiceButtons($table->getRow(rand(0,13)));
+		$this->checkServiceButtons($table->getRow(rand(0,13)), true);
 
 		// Check that action buttons are not present below the table.
 		$this->assertFalse($this->query('button:Mass update')->one()->isEnabled());
 		$this->assertFalse($this->query('button:Delete')->one()->isEnabled());
 
 		$this->checkParentChildLayout($table, self::LAYOUT_PARENT, self::LAYOUT_CHILD, self::EDIT);
-		$this->checkServiceButtons($table->findRow('Name', self::LAYOUT_CHILD2, true));
+		$this->checkServiceButtons($table->findRow('Name', self::LAYOUT_CHILD2, true), true);
 
 		// Check there is no Kiosk mode button.
 		$this->assertFalse($this->query('xpath://button[@title="Kiosk mode"]')->exists());
@@ -340,6 +340,7 @@ class testPageMonitoringServices extends CWebTest {
 		$this->checkSeviceInfoLayout($table, $child);
 		$this->assertTableDataColumn([self::LAYOUT_CHILD2], 'Name');
 
+		// Check breadcrumbs on last child page.
 		foreach (['All services', $parent, $child] as $breadcrumb) {
 			$this->assertTrue($this->query(self::BREADCRUMB_SELECTOR)->one()->query('link', $breadcrumb)
 					->one()->isClickable()
@@ -372,18 +373,10 @@ class testPageMonitoringServices extends CWebTest {
 		$this->assertTableStats(1);
 	}
 
-	private function checkBreadcrumbs($breadcrumbs) {
-		foreach ($breadcrumbs as $breadcrumb) {
-			$this->assertTrue($this->query(self::BREADCRUMB_SELECTOR)->one()->query('link', $breadcrumb)
-					->one()->isClickable()
-			);
-		}
-	}
-
-	private function checkServiceButtons($row) {
-		$this->assertTrue($row->query('xpath://button[@title="Add child service"]')->one()->isClickable());
-		$this->assertTrue($row->query('xpath://button[@title="Edit"]')->one()->isClickable());
-		$this->assertTrue($row->query('xpath://button[@title="Delete"]')->one()->isClickable());
+	private function checkServiceButtons($row, $exists) {
+		$this->assertEquals($exists, $row->query('xpath://button[@title="Add child service"]')->one(false)->isClickable());
+		$this->assertEquals($exists, $row->query('xpath://button[@title="Edit"]')->one(false)->isClickable());
+		$this->assertEquals($exists, $row->query('xpath://button[@title="Delete"]')->one(false)->isClickable());
 	}
 
 	public static function getFilterEditData() {
@@ -753,7 +746,7 @@ class testPageMonitoringServices extends CWebTest {
 		// Check breadcrumbs.
 		$selector = $this->query(self::BREADCRUMB_SELECTOR);
 		if (CTestArrayHelper::get($data, 'check_breadcrumbs')) {
-			$this->assertTrue($selector->one()->query('link:All services')>one()->isClickable());
+			$this->assertTrue($selector->one()->query('link:All services')->one()->isClickable());
 			$this->assertTrue($selector->query('xpath://span[@class="selected" and text()="Filter results"]')->exists());
 		}
 
@@ -769,13 +762,15 @@ class testPageMonitoringServices extends CWebTest {
 
 	public function testPageMonitoringServices_ResetButton() {
 		$this->page->login()->open('zabbix.php?action=service.list');
-		$table = $this->query($this->selector)->asTable()->one();
+
+		$table = $this->query($this->table_selector)->asTable()->one();
 		$form = $this->query('name:zbx_filter')->one()->asForm();
 
 		// Check table contents before filtering.
 		$start_rows_count = $table->getRows()->count();
 		$this->assertTableStats($start_rows_count);
 		$start_contents = array_values($this->getTableResult('Name'));
+
 		// Filling fields with needed services info.
 		$form->fill(['id:filter_name' => 'Server 3']);
 		$form->submit();
@@ -792,43 +787,6 @@ class testPageMonitoringServices extends CWebTest {
 		$this->assertEquals($start_rows_count, $table->getRows()->count());
 		$this->assertTableStats($table->getRows()->count());
 		$this->assertEquals($start_contents, array_values($this->getTableResult('Name')));
-	}
-
-	public function testPageMonitoringServices_MassUpdate() {
-		$this->page->login()->open('zabbix.php?action=service.list.edit');
-
-		$filter_form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
-
-		$filter_form->fill(['id:filter_name' => 'Server for mass update']);
-		$filter_form->submit();
-
-		$this->page->waitUntilReady();
-
-		$this->selectTableRows([
-			'Server for mass update 1',
-			'Server for mass update 2',
-			'Server for mass update 3'], 'Name'
-		);
-
-		$this->query('button:Mass update')->one()->click();
-
-		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
-
-		$filter_form = $dialog->asForm();
-		$filter_form->getLabel('Tags')->click();
-
-		$this->query('id:tags-table')->asMultifieldTable()->one()->fill([
-			'action' => USER_ACTION_UPDATE,
-			'index' => 0,
-			'tag' => 'added_tag_1',
-			'value' => 'added_tag_1']);
-
-		$filter_form->submit();
-		$this->page->waitUntilReady();
-
-		$this->assertMessage(TEST_GOOD, 'Services updated');
-
-		$this->assertTableDataColumn(array_values($this->getTableResult('Name')), 'Name');
 	}
 
 	public function testPageMonitoringServices_DeleteByActionButton() {
@@ -882,7 +840,7 @@ class testPageMonitoringServices extends CWebTest {
 	private function deleteService($serviceName, $parent = true, $child = false, $checkbox = true) {
 		$this->page->login()->open('zabbix.php?action=service.list.edit');
 
-		$table = $this->query('class:list-table')->asTable()->one();
+		$table = $this->query($this->table_selector)->asTable()->one();
 
 		$before_rows_count = $table->getRows()->count();
 		$this->assertTableStats($before_rows_count);
@@ -916,7 +874,7 @@ class testPageMonitoringServices extends CWebTest {
 			$childs_rows_count = $table->getRows()->count();
 			$this->assertTableStats($childs_rows_count);
 
-			$table = $this->query('class:list-table')->asTable()->one();
+			$table = $this->query($this->table_selector)->asTable()->one();
 			$table->findRow('Name', 'Server 10 child for Server 8', true)->query('xpath:.//button[contains(@class, "btn-remove")]')
 					->one()->waitUntilClickable()->click();
 

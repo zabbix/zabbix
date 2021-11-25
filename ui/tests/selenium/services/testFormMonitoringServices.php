@@ -291,7 +291,7 @@ class testFormMonitoringServices extends CWebTest {
 		// Check popup title.
 		$this->assertEquals('Add child services', $childs_dialog->getTitle());
 
-		// Check input fields maxlength
+		// Check input fields maxlength.
 		$this->assertEquals(255, $childs_dialog->query('id:services-filter-name')->one()->getAttribute('maxlength'));
 
 		// Check "select all" checkbox default value.
@@ -300,6 +300,7 @@ class testFormMonitoringServices extends CWebTest {
 		// Enter and submit filtering data.
 		$childs_dialog->query('id:services-filter-name')->one()->fill('Parent1');
 		$childs_dialog->query('button:Filter')->one()->waitUntilClickable()->click();
+		$this->page->waitUntilReady();
 		$childs_dialog->invalidate();
 
 		// Check filtering result.
@@ -850,8 +851,8 @@ class testFormMonitoringServices extends CWebTest {
 		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
 
 		if ($expected === TEST_BAD) {
-			$sql = 'SELECT * FROM services';
-			$old_hash = CDBHelper::getHash('SELECT * FROM services');
+			$sql = 'SELECT * FROM services ORDER BY serviceid';
+			$old_hash = CDBHelper::getHash('SELECT * FROM services ORDER BY serviceid');
 		}
 
 		$this->page->login()->open('zabbix.php?action=service.list.edit');
