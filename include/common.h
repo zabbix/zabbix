@@ -451,6 +451,7 @@ zbx_graph_yaxis_types_t;
 #define ZBX_HA_STATUS			"ha_status"
 #define ZBX_HA_REMOVE_NODE		"ha_remove_node"
 #define ZBX_HA_SET_FAILOVER_DELAY	"ha_set_failover_delay"
+#define ZBX_USER_PARAMETERS_RELOAD	"userparameter_reload"
 
 /* value for not supported items */
 #define ZBX_NOTSUPPORTED	"ZBX_NOTSUPPORTED"
@@ -989,6 +990,7 @@ zbx_task_t;
 #define ZBX_RTC_HA_STATUS			14
 #define ZBX_RTC_HA_REMOVE_NODE			15
 #define ZBX_RTC_HA_SET_FAILOVER_DELAY		16
+#define ZBX_RTC_USER_PARAMETERS_RELOAD		17
 
 typedef enum
 {
@@ -1152,7 +1154,7 @@ int	str_n_in_list(const char *list, const char *value, size_t len, char delimite
 char	*str_linefeed(const char *src, size_t maxline, const char *delim);
 void	zbx_strarr_init(char ***arr);
 void	zbx_strarr_add(char ***arr, const char *entry);
-void	zbx_strarr_free(char **arr);
+void	zbx_strarr_free(char ***arr);
 
 #if defined(__GNUC__) || defined(__clang__)
 #	define __zbx_attr_format_printf(idx1, idx2) __attribute__((__format__(__printf__, (idx1), (idx2))))

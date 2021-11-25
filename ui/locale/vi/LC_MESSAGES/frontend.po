@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-05 20:05+0200\n"
+"POT-Creation-Date: 2021-11-19 19:55+0200\n"
 "PO-Revision-Date: 2021-03-19 18:15+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -575,7 +575,7 @@ msgstr " Sự kiện được ghi nhận giải quyết"
 msgid "Action"
 msgstr "Hành động"
 
-#: include/classes/api/services/CAction.php:2676
+#: include/classes/api/services/CAction.php:2678
 #, c-format
 msgid "Action \"%1$s\" already exists."
 msgstr "Hành động \"%1$s\" đã tồn tại."
@@ -1018,6 +1018,10 @@ msgstr ""
 #: include/actions.inc.php:2106
 msgid "Alert message"
 msgstr "Tin nhắn cảnh báo"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1070
+msgid "Algorithm"
+msgstr ""
 
 #: include/hosts.inc.php:114
 msgid "Alias"
@@ -2651,7 +2655,7 @@ msgid "Cannot import template \"%1$s\", linked template \"%2$s\" does not exist.
 msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" do not exist."
 msgstr[0] "Không thể nhập template \"%1$s\", template được liên kết \"%2$s\" không tồn tại."
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1486
+#: app/controllers/CControllerPopupTriggerExpr.php:1527
 msgid "Cannot insert trigger expression"
 msgstr "Không thể chèn biểu thức trigger"
 
@@ -2828,7 +2832,7 @@ msgstr "Không thể kết nối đến mẫu."
 msgid "Cannot unlink trigger \"%1$s\", it has items from template that is left linked to host."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2624
+#: include/classes/api/services/CAction.php:2626
 #, c-format
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
 msgstr "Không thể cập nhật \"%1$s\" cho hành động \"%2$s\"."
@@ -3237,7 +3241,7 @@ msgstr "Chuỗi ký tự không bao gồm"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:728
 #: app/controllers/CControllerPopupTriggerExpr.php:921
-#: app/controllers/CControllerPopupTriggerExpr.php:1052
+#: app/controllers/CControllerPopupTriggerExpr.php:1095
 msgid "Chars"
 msgstr ""
 
@@ -3253,7 +3257,7 @@ msgstr "Thông tin Chassis. Trả về kiểu string"
 msgid "Check already exists."
 msgstr "Kiểm tra đã tồn tại."
 
-#: include/classes/parsers/C10TriggerExpression.php:538
+#: include/classes/parsers/C10TriggerExpression.php:542
 #, c-format
 msgid "Check expression part starting from \"%1$s\"."
 msgstr "Thành phần biểu thức kiểm tra bắt đầu từ \"%1$s\"."
@@ -3541,7 +3545,7 @@ msgstr "Nén"
 msgid "Concurrent sessions"
 msgstr "Các phiên làm việc đồng thời"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1509
+#: app/controllers/CControllerPopupTriggerExpr.php:1550
 #: app/views/popup.lldoperation.php:59 app/views/popup.lldoverride.php:195
 #: app/views/popup.service.statusrule.edit.php:48
 msgid "Condition"
@@ -4650,7 +4654,7 @@ msgid "December"
 msgstr "Tháng 12"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:908
-#: app/controllers/CControllerPopupTriggerExpr.php:1065
+#: app/controllers/CControllerPopupTriggerExpr.php:1108
 msgid "Decimal places"
 msgstr ""
 
@@ -5106,7 +5110,7 @@ msgstr ""
 msgid "Dependencies"
 msgstr "Quan hệ phụ thuộc"
 
-#: include/triggers.inc.php:2397
+#: include/triggers.inc.php:2398
 msgid "Dependent"
 msgstr "Phụ thuộc"
 
@@ -5114,7 +5118,7 @@ msgstr "Phụ thuộc"
 msgid "Dependent item"
 msgstr "Item phụ thuộc"
 
-#: app/views/popup.generic.php:278 include/triggers.inc.php:2397
+#: app/views/popup.generic.php:278 include/triggers.inc.php:2398
 #: include/views/configuration.trigger.prototype.list.php:92
 #: include/views/configuration.triggers.list.php:238
 msgid "Depends on"
@@ -5172,6 +5176,14 @@ msgstr "Chi tiết"
 #: httpdetails.php:27 httpdetails.php:185
 msgid "Details of web scenario"
 msgstr "Chi tiết của web scenario"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1055
+msgid "Detection period"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1065
+msgid "Deviations"
+msgstr ""
 
 #: include/actions.inc.php:76
 msgid "Device"
@@ -5328,7 +5340,7 @@ msgstr "Vô hiệu hóa web scenario đã chọn?"
 #: include/hosts.inc.php:1126 include/html.inc.php:284
 #: include/httptest.inc.php:48 include/items.inc.php:138
 #: include/items.inc.php:141 include/items.inc.php:185
-#: include/maps.inc.php:325 include/triggers.inc.php:1870
+#: include/maps.inc.php:325 include/triggers.inc.php:1871
 #: include/users.inc.php:84 include/views/configuration.action.list.php:77
 #: include/views/configuration.action.list.php:129
 #: include/views/configuration.host.discovery.list.php:167
@@ -6068,7 +6080,7 @@ msgstr "Kích hoạt trap"
 #: include/html.inc.php:280 include/httptest.inc.php:47
 #: include/items.inc.php:138 include/items.inc.php:141
 #: include/items.inc.php:182 include/triggers.inc.php:999
-#: include/triggers.inc.php:1867
+#: include/triggers.inc.php:1868
 #: include/views/configuration.action.edit.php:147
 #: include/views/configuration.action.list.php:76
 #: include/views/configuration.action.list.php:137
@@ -6163,6 +6175,10 @@ msgstr ""
 #, c-format
 msgid "Error: %1$s"
 msgstr "Lỗi: \"%1$s\"."
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1045
+msgid "Evaluation period"
+msgstr ""
 
 #: include/events.inc.php:180
 msgid "Event"
@@ -7428,7 +7444,7 @@ msgstr "Lịch sử"
 msgid "History and trends compression"
 msgstr ""
 
-#: include/classes/api/services/CHistory.php:359
+#: include/classes/api/services/CHistory.php:353
 msgid "History cleanup is not supported if compression is enabled"
 msgstr ""
 
@@ -8255,7 +8271,7 @@ msgstr ""
 #: app/partials/monitoring.host.view.html.php:89
 #: app/views/configuration.host.list.php:267
 #: include/classes/screens/CScreenProblem.php:386
-#: include/hostgroups.inc.php:293 include/triggers.inc.php:2022
+#: include/hostgroups.inc.php:293 include/triggers.inc.php:2023
 #: include/views/inventory.host.view.php:42
 msgid "Inaccessible maintenance"
 msgstr "Bảo trì không thể tiếp cận"
@@ -8267,11 +8283,11 @@ msgstr "Sơ đồ không thể tiếp cận"
 
 #: httpconf.php:663 include/graphs.inc.php:274 include/hosts.inc.php:649
 #: include/httptest.inc.php:222 include/items.inc.php:916
-#: include/triggers.inc.php:2161
+#: include/triggers.inc.php:2162
 msgid "Inaccessible template"
 msgstr "Mẫu không thể tiếp cận"
 
-#: include/triggers.inc.php:2367 include/triggers.inc.php:2375
+#: include/triggers.inc.php:2368 include/triggers.inc.php:2376
 msgid "Inaccessible trigger"
 msgstr "Trigger không thể tiếp cận"
 
@@ -8386,7 +8402,7 @@ msgstr ""
 msgid "Incorrect action condition discovery check."
 msgstr "Điều kiện kiểm tra phát hiện action không chính xác."
 
-#: include/classes/api/services/CAction.php:3308
+#: include/classes/api/services/CAction.php:3310
 msgid "Incorrect action condition discovery check. Discovery check does not exist or you have no access to it."
 msgstr "Điều kiện kiểm tra phát hiện action không chính xác. Kiểm tra phát hiện không tồn tại hoặc bạn không có quyền truy cập vào nó."
 
@@ -8394,7 +8410,7 @@ msgstr "Điều kiện kiểm tra phát hiện action không chính xác.
 msgid "Incorrect action condition discovery object."
 msgstr "Điều kiện đối tượng phát hiện action không chính xác."
 
-#: include/classes/api/services/CAction.php:3267
+#: include/classes/api/services/CAction.php:3269
 msgid "Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it."
 msgstr "Điều kiện quy tắc phát hiện action không chính xác. Quy tắc phát hiện không tồn tại hoặc bạn không có quyền truy cập vào nó."
 
@@ -8406,15 +8422,15 @@ msgstr "Điều kiện trạng thái phát hiện action không chính xa�
 msgid "Incorrect action condition event type."
 msgstr "Điều kiện kiểu sự kiện action không chính xác."
 
-#: include/classes/api/services/CAction.php:2987
+#: include/classes/api/services/CAction.php:2989
 msgid "Incorrect action condition or operation host group. Host group does not exist or you have no access to it."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:3047
+#: include/classes/api/services/CAction.php:3049
 msgid "Incorrect action condition or operation host. Host does not exist or you have no access to it."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:3185
+#: include/classes/api/services/CAction.php:3187
 msgid "Incorrect action condition or operation template. Template does not exist or you have no access to it."
 msgstr ""
 
@@ -8423,11 +8439,11 @@ msgstr ""
 msgid "Incorrect action condition port \"%1$s\"."
 msgstr "Điều kiện cổng action \"%1$s\" không chính xác."
 
-#: include/classes/api/services/CAction.php:3349
+#: include/classes/api/services/CAction.php:3351
 msgid "Incorrect action condition proxy. Proxy does not exist or you have no access to it."
 msgstr "Điều kiện proxy action không chính xác. Proxy không tồn tại hoặc bạn không có quyền truy cập vào nó."
 
-#: include/classes/api/services/CAction.php:3389
+#: include/classes/api/services/CAction.php:3391
 msgid "Incorrect action condition service. Service does not exist or you have no access to it."
 msgstr ""
 
@@ -8435,7 +8451,7 @@ msgstr ""
 msgid "Incorrect action condition trigger severity."
 msgstr "Điều kiện mức độ quan trọng của trigger action không chính xác."
 
-#: include/classes/api/services/CAction.php:3226
+#: include/classes/api/services/CAction.php:3228
 msgid "Incorrect action condition trigger. Trigger does not exist or you have no access to it."
 msgstr "Điều kiện trigger action không chính xác. Trigger không tồn tại hoặc bạn không có quyền truy cập vào chúng."
 
@@ -8445,11 +8461,11 @@ msgstr "Kiểu điều kiện action không chính xác."
 
 #: app/controllers/CControllerActionOperationValidate.php:83
 #: app/controllers/CControllerActionOperationValidate.php:89
-#: include/classes/api/services/CAction.php:2812
+#: include/classes/api/services/CAction.php:2814
 msgid "Incorrect action operation escalation step values."
 msgstr "Bước thao tác các giá trị tiếp theo không chính xác."
 
-#: include/classes/api/services/CAction.php:2887
+#: include/classes/api/services/CAction.php:2889
 msgid "Incorrect action operation media type. Media type does not exist or you have no access to it."
 msgstr ""
 
@@ -8458,11 +8474,11 @@ msgstr ""
 msgid "Incorrect action operation type \"%1$s\" for event source \"%2$s\"."
 msgstr "Loại thao tác hoạt động không chính xác \"%1$s\" cho nguồn sự kiện \"%2$s\"."
 
-#: include/classes/api/services/CAction.php:3133
+#: include/classes/api/services/CAction.php:3135
 msgid "Incorrect action operation user group. User group does not exist or you have no access to it."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:3090
+#: include/classes/api/services/CAction.php:3092
 msgid "Incorrect action operation user. User does not exist or you have no access to it."
 msgstr ""
 
@@ -8762,8 +8778,8 @@ msgstr "Bước web scenario mẫu không chính xác."
 msgid "Incorrect trigger expression"
 msgstr "Biểu thức trigger không chính xác"
 
-#: include/classes/parsers/C10TriggerExpression.php:522
-#: include/classes/parsers/C10TriggerExpression.php:538
+#: include/classes/parsers/C10TriggerExpression.php:526
+#: include/classes/parsers/C10TriggerExpression.php:542
 msgid "Incorrect trigger expression."
 msgstr "Biểu thức trigger không chính xác."
 
@@ -9358,7 +9374,7 @@ msgstr ""
 msgid "Invalid action condition: %1$s."
 msgstr "Điều kiện hoạt động không hợp lệ: %1$s."
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1476
+#: app/controllers/CControllerPopupTriggerExpr.php:1517
 #, c-format
 msgid "Invalid condition: %1$s."
 msgstr ""
@@ -9419,10 +9435,10 @@ msgstr "Phương pháp tham số không hợp lệ."
 #: app/controllers/CControllerDashboardUpdate.php:200
 #: app/controllers/CControllerDashboardUpdate.php:212
 #: app/controllers/CControllerPopupHttpStep.php:100
-#: include/classes/api/services/CAction.php:2703
-#: include/classes/api/services/CAction.php:2709
-#: include/classes/api/services/CAction.php:2720
-#: include/classes/api/services/CAction.php:2732
+#: include/classes/api/services/CAction.php:2705
+#: include/classes/api/services/CAction.php:2711
+#: include/classes/api/services/CAction.php:2722
+#: include/classes/api/services/CAction.php:2734
 #: include/classes/api/services/CAutoregistration.php:157
 #: include/classes/api/services/CAutoregistration.php:163
 #: include/classes/api/services/CAutoregistration.php:170
@@ -9826,7 +9842,7 @@ msgstr[0] "Item đã được kích hoạtCác item đã được kích h
 msgid "Item in \"not supported\" state"
 msgstr "Item trong trạng thái \"không được hỗ trợ\""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1469
+#: app/controllers/CControllerPopupTriggerExpr.php:1510
 msgid "Item not selected"
 msgstr "Item không được lựa chọn"
 
@@ -12021,7 +12037,7 @@ msgstr "Không khớp với kết quả nào "
 msgid "No new modules discovered"
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2767
+#: include/classes/api/services/CAction.php:2769
 #, c-format
 msgid "No operations defined for action \"%1$s\"."
 msgstr ""
@@ -12099,7 +12115,7 @@ msgstr ""
 #: app/views/monitoring.widget.systeminfo.view.php:45 disc_prototypes.php:748
 #: host_discovery.php:808 hostinventoriesoverview.php:73
 #: include/classes/api/services/CAction.php:1516
-#: include/classes/api/services/CAction.php:2569
+#: include/classes/api/services/CAction.php:2571
 #: include/classes/api/services/CConfiguration.php:78
 #: include/classes/api/services/CCorrelation.php:497
 #: include/classes/api/services/CCorrelation.php:653
@@ -12127,7 +12143,7 @@ msgstr ""
 #: include/classes/api/services/CGraphPrototype.php:369
 #: include/classes/api/services/CGraphPrototype.php:457
 #: include/classes/api/services/CGraphPrototype.php:519
-#: include/classes/api/services/CHistory.php:371
+#: include/classes/api/services/CHistory.php:365
 #: include/classes/api/services/CHostBase.php:56
 #: include/classes/api/services/CHostBase.php:533
 #: include/classes/api/services/CHostGeneral.php:66
@@ -12262,7 +12278,7 @@ msgid "No public key file specified."
 msgstr "Không quy định được khóa tập tin công khai."
 
 #: app/controllers/CControllerActionOperationValidate.php:110
-#: include/classes/api/services/CAction.php:2824
+#: include/classes/api/services/CAction.php:2826
 msgid "No recipients specified for action operation message."
 msgstr ""
 
@@ -12283,7 +12299,7 @@ msgid "No target selected."
 msgstr "Không có mục tiêu nào được chọn."
 
 #: app/controllers/CControllerActionOperationValidate.php:142
-#: include/classes/api/services/CAction.php:2835
+#: include/classes/api/services/CAction.php:2837
 msgid "No targets specified for action operation global script."
 msgstr ""
 
@@ -12816,7 +12832,7 @@ msgstr "Thông tin hệ điều hành. Trả về kiểu string"
 msgid "Operation"
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2793
+#: include/classes/api/services/CAction.php:2795
 #, c-format
 msgid "Operation \"%1$s\" already exists for action \"%2$s\"."
 msgstr ""
@@ -13319,7 +13335,7 @@ msgid "Parameters"
 msgstr "Tham số"
 
 #: app/controllers/CControllerActionOperationValidate.php:76
-#: include/classes/api/services/CAction.php:2805
+#: include/classes/api/services/CAction.php:2807
 msgid "Parameters \"esc_step_from\" and \"esc_step_to\" must be set together."
 msgstr ""
 
@@ -13500,6 +13516,7 @@ msgid "Period"
 msgstr "Chu kỳ"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:95
+#: app/controllers/CControllerPopupTriggerExpr.php:1050
 msgid "Period shift"
 msgstr ""
 
@@ -15284,6 +15301,14 @@ msgstr "Tìm kiếm mẫu là trống"
 msgid "Search type"
 msgstr ""
 
+#: app/controllers/CControllerPopupTriggerExpr.php:1060
+msgid "Season"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1075
+msgid "Season deviation window"
+msgstr ""
+
 #: include/hosts.inc.php:434
 msgid "Secondary POC cell"
 msgstr "Ô POC thứ hai"
@@ -16032,7 +16057,7 @@ msgstr "Sắp xếp mục bởi"
 msgid "Sort order (0->999)"
 msgstr "Sắp sếp theo thứ tự (0->999)"
 
-#: include/classes/api/CApiService.php:588
+#: include/classes/api/CApiService.php:592
 #, c-format
 msgid "Sorting by field \"%1$s\" not allowed."
 msgstr "Sắp xếp theo trường \"%1$s\" không được cho phép."
@@ -16055,7 +16080,7 @@ msgstr "Spanish (es_ES)"
 msgid "Specified role was not found."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2930
+#: include/classes/api/services/CAction.php:2932
 msgid "Specified script does not exist or you do not have rights on it for action operation command."
 msgstr "Tập lệnh được chỉ định không tồn tại hoặc bạn không có quyền truy cập vào nó cho thao tác lệnh hoạt động."
 
@@ -17797,7 +17822,7 @@ msgstr "Đơn vị"
 #: include/items.inc.php:45 include/items.inc.php:110
 #: include/items.inc.php:133 include/items.inc.php:167
 #: include/maintenances.inc.php:33 include/maps.inc.php:39
-#: include/triggers.inc.php:83 include/triggers.inc.php:1867
+#: include/triggers.inc.php:83 include/triggers.inc.php:1868
 #: include/users.inc.php:64 include/users.inc.php:87
 #: include/views/configuration.action.edit.php:233
 #: include/views/configuration.triggers.list.php:77
@@ -17817,7 +17842,7 @@ msgid "Unknown error"
 msgstr "Lỗi không rõ"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:47
-#: app/controllers/CControllerPopupTriggerExpr.php:1258
+#: app/controllers/CControllerPopupTriggerExpr.php:1301
 #: include/triggers.inc.php:1146
 msgid "Unknown host item, no such item in selected host"
 msgstr "Host item không rõ, không có item trong host được lựa chọn"
@@ -19701,7 +19726,7 @@ msgstr "một số lượng chẵn các ký tự thập lục phân được mon
 msgid "an explicit time is expected"
 msgstr "một thời gian rõ ràng được dự kiến"
 
-#: include/classes/api/services/CAction.php:2710
+#: include/classes/api/services/CAction.php:2712
 #: include/classes/api/services/CCorrelation.php:730
 msgid "an identifier is not defined in the formula"
 msgstr ""
@@ -19878,7 +19903,7 @@ msgstr "Không thể thay đổi"
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:41
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:47
 #: app/controllers/CControllerUserUpdateGeneral.php:111
-#: include/classes/api/services/CAction.php:2733
+#: include/classes/api/services/CAction.php:2735
 #: include/classes/api/services/CAutoregistration.php:163
 #: include/classes/api/services/CDiscoveryRule.php:1989
 #: include/classes/api/services/CDRule.php:210
@@ -20316,11 +20341,11 @@ msgstr ""
 msgid "including subgroups"
 msgstr "bao gồm các nhóm nhỏ"
 
-#: include/classes/parsers/C10TriggerExpression.php:521
+#: include/classes/parsers/C10TriggerExpression.php:525
 msgid "incorrect calculated item formula"
 msgstr ""
 
-#: include/classes/parsers/C10TriggerExpression.php:537
+#: include/classes/parsers/C10TriggerExpression.php:541
 #, c-format
 msgid "incorrect calculated item formula starting from \"%1$s\""
 msgstr ""
@@ -20339,7 +20364,7 @@ msgstr "số phần tử không chính xác"
 msgid "incorrect expression starting from \"%1$s\""
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2703
+#: include/classes/api/services/CAction.php:2705
 #: include/classes/api/services/CCorrelation.php:723
 msgid "incorrect number of conditions"
 msgstr ""
@@ -20417,7 +20442,7 @@ msgstr "tên máy chủ không hợp lệ"
 msgid "invalid host name"
 msgstr "Tên máy chủ không hợp lệ"
 
-#: include/classes/validators/CHistFunctionValidator.php:80
+#: include/classes/validators/CHistFunctionValidator.php:82
 #: include/classes/validators/CMathFunctionValidator.php:86
 #, c-format
 msgid "invalid number of parameters in function \"%1$s\""
@@ -20437,6 +20462,16 @@ msgstr "Biểu thức chính quy không hợp lệ"
 #: include/classes/validators/CHistFunctionValidator.php:64
 #, c-format
 msgid "invalid second parameter in function \"%1$s\""
+msgstr ""
+
+#: include/classes/validators/CHistFunctionValidator.php:69
+#, c-format
+msgid "invalid seventh parameter in function \"%1$s\""
+msgstr ""
+
+#: include/classes/validators/CHistFunctionValidator.php:68
+#, c-format
+msgid "invalid sixth parameter in function \"%1$s\""
 msgstr ""
 
 #: include/classes/validators/CHistFunctionValidator.php:65
@@ -20576,7 +20611,7 @@ msgstr "macro(s)"
 msgid "mad() - Median absolute deviation"
 msgstr ""
 
-#: include/classes/validators/CHistFunctionValidator.php:91
+#: include/classes/validators/CHistFunctionValidator.php:93
 #, c-format
 msgid "mandatory parameter is missing in function \"%1$s\""
 msgstr ""
@@ -21264,6 +21299,10 @@ msgid "trendmin() - Minimum value for period T with exact period shift"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1042
+msgid "trendstl() - Anomaly detection for period T"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1085
 msgid "trendsum() - Sum of values of a period T with exact period shift"
 msgstr ""
 
@@ -21289,11 +21328,11 @@ msgstr "mẫu trigger không thể được chuyển sang mẫu hoặc máy ch�
 msgid "trigger with linkages cannot be moved to another template or host"
 msgstr "trigger với các liên kết không thể được chuyển đến một mẫu hoặc máy chủ khác"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1049
+#: app/controllers/CControllerPopupTriggerExpr.php:1092
 msgid "trim() - Remove specified characters from the beginning and the end of a string"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1062
+#: app/controllers/CControllerPopupTriggerExpr.php:1105
 msgid "truncate() - Truncates a value to decimal places"
 msgstr ""
 
@@ -21393,7 +21432,7 @@ msgstr "Giá trị bất ngờ \"%1$s\""
 msgid "unknown"
 msgstr "Không rõ"
 
-#: include/classes/validators/CHistFunctionValidator.php:71
+#: include/classes/validators/CHistFunctionValidator.php:73
 #: include/classes/validators/CMathFunctionValidator.php:55
 #, c-format
 msgid "unknown function \"%1$s\""
@@ -21590,11 +21629,11 @@ msgstr ""
 msgid "value of third parameter must be one of %1$s"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1075
+#: app/controllers/CControllerPopupTriggerExpr.php:1118
 msgid "varpop() - Population variance"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1082
+#: app/controllers/CControllerPopupTriggerExpr.php:1125
 msgid "varsamp() - Sample variance"
 msgstr ""
 

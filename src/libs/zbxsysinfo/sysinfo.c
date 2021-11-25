@@ -200,6 +200,36 @@ int	add_user_parameter(const char *itemkey, char *command, char *error, size_t m
 
 	return ret;
 }
+
+void	remove_user_parameters(void)
+{
+	int	i, usr = -1;
+
+	if (NULL == commands)
+		return;
+
+	for (i = 0; NULL != commands[i].key; i++)
+	{
+		if (0 != (CF_USERPARAMETER & commands[i].flags))
+		{
+			zbx_free(commands[i].key);
+			zbx_free(commands[i].test_param);
+
+			if (0 > usr)
+				usr = i;
+		}
+	}
+
+	if (0 < usr)
+	{
+		commands = (ZBX_METRIC *)zbx_realloc(commands, ((unsigned int)usr + 1) * sizeof(ZBX_METRIC));
+		memset(&commands[usr], 0, sizeof(ZBX_METRIC));
+	}
+	else if (0 == usr)
+	{
+		zbx_free(commands);
+	}
+}
 #endif
 
 void	init_metrics(void)

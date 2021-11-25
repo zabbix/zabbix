@@ -357,7 +357,8 @@ int	zbx_trends_parse_nextcheck(time_t from, const char *period_shift, time_t *ne
 		{
 			if (ZBX_TIME_UNIT_UNKNOWN == (unit = zbx_tm_str_to_unit(++period_shift)))
 			{
-				*error = zbx_dsprintf(*error, "unexpected character starting with \"%s\"", period_shift);
+				*error = zbx_dsprintf(*error, "unexpected character starting with \"%s\"",
+						period_shift);
 				return FAIL;
 			}
 
@@ -386,6 +387,10 @@ int	zbx_trends_parse_nextcheck(time_t from, const char *period_shift, time_t *ne
 			}
 
 			period_shift += len;
+		}
+		else if (',' == *period_shift)
+		{
+			break;
 		}
 		else
 		{

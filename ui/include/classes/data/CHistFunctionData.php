@@ -228,6 +228,16 @@ final class CHistFunctionData {
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_TREND]]]
 		],
+		'baselinedev' => [
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_TREND]]],
+			['rules' => [['type' => 'time', 'with_year' => true]]],
+		],
+		'baselinewma' => [
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_TREND]]],
+			['rules' => [['type' => 'time', 'with_year' => true]]],
+		],
 		'trendcount' => [
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_TREND]]]
@@ -239,6 +249,17 @@ final class CHistFunctionData {
 		'trendmin' => [
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_TREND]]]
+		],
+		'trendstl' => [
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_TREND]]],
+			['rules' => [['type' => 'time', 'min' => SEC_PER_HOUR]]],
+			['rules' => [['type' => 'time', 'min' => SEC_PER_HOUR]]],
+			['rules' => [['type' => 'number', 'min' => 1]], 'required' => false],
+			['rules' => [
+				['type' => 'regexp', 'pattern' => '/^(mad|stddevpop|stddevsamp)$/']
+			], 'required' => false],
+			['rules' => [['type' => 'number', 'min' => 7]], 'required' => false]
 		],
 		'trendsum' => [
 			['rules' => [['type' => 'query']]],
@@ -379,9 +400,12 @@ final class CHistFunctionData {
 		'sumofsquares' => self::ITEM_VALUE_TYPES_NUM,
 		'timeleft' => self::ITEM_VALUE_TYPES_NUM,
 		'trendavg' => self::ITEM_VALUE_TYPES_NUM,
+		'baselinedev' => self::ITEM_VALUE_TYPES_NUM,
+		'baselinewma' => self::ITEM_VALUE_TYPES_NUM,
 		'trendcount' => self::ITEM_VALUE_TYPES_NUM,
 		'trendmax' => self::ITEM_VALUE_TYPES_NUM,
 		'trendmin' => self::ITEM_VALUE_TYPES_NUM,
+		'trendstl' => self::ITEM_VALUE_TYPES_NUM,
 		'trendsum' => self::ITEM_VALUE_TYPES_NUM,
 		'varpop' => self::ITEM_VALUE_TYPES_NUM,
 		'varsamp' => self::ITEM_VALUE_TYPES_NUM

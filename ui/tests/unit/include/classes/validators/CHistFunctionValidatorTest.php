@@ -37,6 +37,39 @@ class CHistFunctionValidatorTest extends TestCase {
 			['min_foreach(/host/key)', [], ['rc' => false, 'error' => 'unknown function "min_foreach"']],
 			['sum_foreach(/host/key)', [], ['rc' => false, 'error' => 'unknown function "sum_foreach"']],
 
+			['trendstl(/host/key)', ['calculated' => true], ['rc' => false, 'error' => 'mandatory parameter is missing in function "trendstl"']],
+			['trendstl(/host/key, 0, 1h, 1)', ['calculated' => true], ['rc' => false, 'error' => 'invalid second parameter in function "trendstl"']],
+			['trendstl(/host/key, 1m:now/h, 1h, 1d)', ['calculated' => true], ['rc' => false, 'error' => 'invalid second parameter in function "trendstl"']],
+			['trendstl(/host/key, #0, 1h, 1)', ['calculated' => true], ['rc' => false, 'error' => 'invalid second parameter in function "trendstl"']],
+			['trendstl(/host/key, 1y, 1h, 1)', ['calculated' => true], ['rc' => false, 'error' => 'invalid second parameter in function "trendstl"']],
+			['trendstl(/host/key, 240h:now/h, 1M, 1d)', [], ['rc' => false, 'error' => 'invalid third parameter in function "trendstl"']],
+			['trendstl(/host/key, 240h:now/h, 1y, 1d)', [], ['rc' => false, 'error' => 'invalid third parameter in function "trendstl"']],
+			['trendstl(/host/key, 1d:now/M-1h, 0, 1)', ['calculated' => true], ['rc' => false, 'error' => 'invalid third parameter in function "trendstl"']],
+			['trendstl(/host/key, 1h:now/h, 1m, 1d)', ['calculated' => true], ['rc' => false, 'error' => 'invalid third parameter in function "trendstl"']],
+			['trendstl(/host/key, 1d:now/M-1h, 1h, 0)', ['calculated' => true], ['rc' => false, 'error' => 'invalid fourth parameter in function "trendstl"']],
+			['trendstl(/host/key, 1d:now/M-1h, 1h, 1d, 0)', ['calculated' => true], ['rc' => false, 'error' => 'invalid fifth parameter in function "trendstl"']],
+			['trendstl(/host/key, 1d:now/M-1w, 1h, 1d, 1, 0)', ['calculated' => true], ['rc' => false, 'error' => 'invalid sixth parameter in function "trendstl"']],
+			['trendstl(/host/key, 1h:now/d, 1h, 1d, 1, "test")', ['calculated' => true], ['rc' => false, 'error' => 'invalid sixth parameter in function "trendstl"']],
+			['trendstl(/host/key, 240h:now/h, 1h, 1d, 1, "mad", 0)', ['calculated' => true], ['rc' => false, 'error' => 'invalid seventh parameter in function "trendstl"']],
+			['trendstl(/host/key)', [], ['rc' => false, 'error' => 'mandatory parameter is missing in function "trendstl"']],
+			['trendstl(/host/key, 0, 1h, 1)', [], ['rc' => false, 'error' => 'invalid second parameter in function "trendstl"']],
+			['trendstl(/host/key, #0, 1h, 1)', [], ['rc' => false, 'error' => 'invalid second parameter in function "trendstl"']],
+			['trendstl(/host/key, 1y, 1h, 1)', [], ['rc' => false, 'error' => 'invalid second parameter in function "trendstl"']],
+			['trendstl(/host/key, 1d:now/M-1h, 0, 1)', [], ['rc' => false, 'error' => 'invalid third parameter in function "trendstl"']],
+			['trendstl(/host/key, 1d:now/M-1h, 1h, 0)', [], ['rc' => false, 'error' => 'invalid fourth parameter in function "trendstl"']],
+			['trendstl(/host/key, 1d:now/M-1h, 1h, 1d, 0)', [], ['rc' => false, 'error' => 'invalid fifth parameter in function "trendstl"']],
+			['trendstl(/host/key, 1d:now/M-1h, 1h, 1h, 1, 0)', [], ['rc' => false, 'error' => 'invalid sixth parameter in function "trendstl"']],
+			['trendstl(/host/key, 1d:now/M-1h, 1h, 1d, 1, "test")', [], ['rc' => false, 'error' => 'invalid sixth parameter in function "trendstl"']],
+			['trendstl(/host/key, 1d:now/M-1h, 1h, 1w, 1, "mad", 0)', [], ['rc' => false, 'error' => 'invalid seventh parameter in function "trendstl"']],
+			['trendstl(/host/key, 240h:now/h, 1h, 1d)', [], ['rc' => true, 'error' => null]],
+			['trendstl(/host/key, 1y:now/h, 1h, 1d)', [], ['rc' => true, 'error' => null]],
+			['trendstl(/host/key, 240h:now/h, 4w, 1d)', [], ['rc' => true, 'error' => null]],
+			['trendstl(/host/key, 240h:now/h, 365d, 1d)', [], ['rc' => true, 'error' => null]],
+			['trendstl(/host/key, {$PERIOD}:{$TIMESHIFT}, 1h, 1d)', ['usermacros' => true], ['rc' => true, 'error' => null]],
+			['trendstl(/host/key, {$PARAM2}, {$MACRO3}, {$MACRO4}, {$MACRO5}, {$MACRO6}, {$MACRO7})', ['usermacros' => true], ['rc' => true, 'error' => null]],
+			['trendstl(/host/key, {#PARAM2}, {#PARAM3}, {#PARAM4}), {#PARAM5}), {#PARAM6}), {#PARAM7})', ['lldmacros' => true], ['rc' => true, 'error' => null]],
+			['trendstl(/host/key, {$PARAM2}, {#PARAM3}, {$PARAM4}), {#PARAM5}), {$PARAM6}), {#PARAM7})', ['lldmacros' => true, 'usermacros' => true], ['rc' => true, 'error' => null]],
+
 			['avg(/host/key)', [], ['rc' => false, 'error' => 'mandatory parameter is missing in function "avg"']],
 			['avg(/host/key,)', [], ['rc' => false, 'error' => 'invalid second parameter in function "avg"']],
 			['avg(/host/key,0)', [], ['rc' => false, 'error' => 'invalid second parameter in function "avg"']],
@@ -779,7 +812,47 @@ class CHistFunctionValidatorTest extends TestCase {
 
 			// Filters.
 			['sum(/host/key?[tag="foo"], 1d)', ['calculated' => true], ['rc' => false, 'error' => 'invalid first parameter in function "sum"']],
-			['sum_foreach(/host/key?[tag="foo"], 1d)', ['calculated' => true, 'aggregating' => true], ['rc' => true, 'error' => null]]
+			['sum_foreach(/host/key?[tag="foo"], 1d)', ['calculated' => true, 'aggregating' => true], ['rc' => true, 'error' => null]],
+
+			['baselinedev(/host/key)', [], ['rc' => false, 'error' => 'mandatory parameter is missing in function "baselinedev"']],
+			['baselinedev(/host/key,)', [], ['rc' => false, 'error' => 'invalid second parameter in function "baselinedev"']],
+			['baselinedev(/host/key, 0)', [], ['rc' => false, 'error' => 'invalid second parameter in function "baselinedev"']],
+			['baselinedev(/host/key, #0)', [], ['rc' => false, 'error' => 'invalid second parameter in function "baselinedev"']],
+			['baselinedev(/host/key, #1)', [], ['rc' => false, 'error' => 'invalid second parameter in function "baselinedev"']],
+			['baselinedev(/host/key, 1)', [], ['rc' => false, 'error' => 'invalid second parameter in function "baselinedev"']],
+			['baselinedev(/host/key, 1h)', [], ['rc' => false, 'error' => 'invalid second parameter in function "baselinedev"']],
+			['baselinedev(/host/key, 1h:now-1h)', [], ['rc' => false, 'error' => 'mandatory parameter is missing in function "baselinedev"']],
+			['baselinedev(/host/key, 1y:now/y,)', [], ['rc' => false, 'error' => 'invalid third parameter in function "baselinedev"']],
+			['baselinedev(/host/key, 1h:now-1h, 1M)', [], ['rc' => true, 'error' => null]],
+			['baselinedev(/host/key, 1d:now-1h, 1y)', [], ['rc' => true, 'error' => null]],
+			['baselinedev(/host/key, 1M:now/M+2M, 1y)', [], ['rc' => true, 'error' => null]],
+			['baselinedev(/host/key, {$PERIOD}:{$TIMESHIFT}, 2y)', ['usermacros' => true], ['rc' => true, 'error' => null]],
+			['baselinedev(/host/key, {$PERIOD}:now-{$TIMESHIFT}, 2y)', ['usermacros' => true], ['rc' => true, 'error' => null]],
+			['baselinedev(/host/key, {$MACRO}, 2y)', ['usermacros' => true], ['rc' => true, 'error' => null]],
+			['baselinedev(/host/key, {$MACRO}, {$MACRO})', ['usermacros' => true], ['rc' => true, 'error' => null]],
+			['baselinedev(/host/key, {#LLDMACRO}, 2y)', ['lldmacros' => true], ['rc' => true, 'error' => null]],
+			['baselinedev(/host/key, {#LLDMACRO}, {$MACRO})', ['lldmacros' => true], ['rc' => false, 'error' => 'invalid third parameter in function "baselinedev"']],
+			['baselinedev(/host/key, {#LLDMACRO}, {$MACRO})', ['lldmacros' => true, 'usermacros' => true], ['rc' => true, 'error' => null]],
+
+			['baselinewma(/host/key)', [], ['rc' => false, 'error' => 'mandatory parameter is missing in function "baselinewma"']],
+			['baselinewma(/host/key,)', [], ['rc' => false, 'error' => 'invalid second parameter in function "baselinewma"']],
+			['baselinewma(/host/key, 0)', [], ['rc' => false, 'error' => 'invalid second parameter in function "baselinewma"']],
+			['baselinewma(/host/key, #0)', [], ['rc' => false, 'error' => 'invalid second parameter in function "baselinewma"']],
+			['baselinewma(/host/key, #1)', [], ['rc' => false, 'error' => 'invalid second parameter in function "baselinewma"']],
+			['baselinewma(/host/key, 1)', [], ['rc' => false, 'error' => 'invalid second parameter in function "baselinewma"']],
+			['baselinewma(/host/key, 1h)', [], ['rc' => false, 'error' => 'invalid second parameter in function "baselinewma"']],
+			['baselinewma(/host/key, 1h:now-1h)', [], ['rc' => false, 'error' => 'mandatory parameter is missing in function "baselinewma"']],
+			['baselinewma(/host/key, 1y:now/y,)', [], ['rc' => false, 'error' => 'invalid third parameter in function "baselinewma"']],
+			['baselinewma(/host/key, 1h:now-1h, 1M)', [], ['rc' => true, 'error' => null]],
+			['baselinewma(/host/key, 1d:now-1h, 1y)', [], ['rc' => true, 'error' => null]],
+			['baselinewma(/host/key, 1M:now/M+2M, 1y)', [], ['rc' => true, 'error' => null]],
+			['baselinewma(/host/key, {$PERIOD}:{$TIMESHIFT}, 2y)', ['usermacros' => true], ['rc' => true, 'error' => null]],
+			['baselinewma(/host/key, {$PERIOD}:now-{$TIMESHIFT}, 2y)', ['usermacros' => true], ['rc' => true, 'error' => null]],
+			['baselinewma(/host/key, {$MACRO}, 2y)', ['usermacros' => true], ['rc' => true, 'error' => null]],
+			['baselinewma(/host/key, {$MACRO}, {$MACRO})', ['usermacros' => true], ['rc' => true, 'error' => null]],
+			['baselinewma(/host/key, {#LLDMACRO}, 2y)', ['lldmacros' => true], ['rc' => true, 'error' => null]],
+			['baselinewma(/host/key, {#LLDMACRO}, {$MACRO})', ['lldmacros' => true], ['rc' => false, 'error' => 'invalid third parameter in function "baselinewma"']],
+			['baselinewma(/host/key, {#LLDMACRO}, {$MACRO})', ['lldmacros' => true, 'usermacros' => true], ['rc' => true, 'error' => null]]
 		];
 	}
 
@@ -795,6 +868,7 @@ class CHistFunctionValidatorTest extends TestCase {
 			'parameters' => (new CHistFunctionData($options))->getParameters()
 		] + $options);
 		$expression_parser->parse($source);
+		$this->assertNotNull($expression_parser->getResult(), $expression_parser->getError());
 		$tokens = $expression_parser->getResult()->getTokens();
 
 		$this->assertSame(CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION, $tokens[0]['type']);

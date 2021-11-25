@@ -42,6 +42,7 @@ class CControllerPopupTriggerExpr extends CController {
 	private $functions = [];
 	private $operators = ['=', '<>', '>', '<', '>=', '<='];
 	private $period_optional = [];
+	private $period_seasons = [];
 
 	protected function init() {
 		$this->disableSIDvalidation();
@@ -93,6 +94,24 @@ class CControllerPopupTriggerExpr extends CController {
 			],
 			'period_shift' => [
 				'C' => _('Period shift'),
+				'T' => T_ZBX_INT,
+				'A' => true
+			]
+		];
+
+		$this->period_seasons = [
+			'last' => [
+				'C' => _('Period').' (T)',
+				'T' => T_ZBX_INT,
+				'A' => true
+			],
+			'period_shift' => [
+				'C' => _('Period shift'),
+				'T' => T_ZBX_INT,
+				'A' => true
+			],
+			'seasons' => [
+				'C' => _('Seasons'),
 				'T' => T_ZBX_INT,
 				'A' => true
 			]
@@ -1016,6 +1035,20 @@ class CControllerPopupTriggerExpr extends CController {
 				'allowed_types' => $this->allowedTypesNumeric,
 				'operators' => $this->operators
 			],
+			'baselinedev' => [
+				'types' => [ZBX_FUNCTION_TYPE_HISTORY],
+				'description' => _('baselinedev() - Returns the number of deviations between data periods in seasons and the last data period'),
+				'params' => $this->period_seasons,
+				'allowed_types' => $this->allowedTypesNumeric,
+				'operators' => $this->operators
+			],
+			'baselinewma' => [
+				'types' => [ZBX_FUNCTION_TYPE_HISTORY],
+				'description' => _('baselinewma() - Calculates baseline by averaging data periods in seasons'),
+				'params' => $this->period_seasons,
+				'allowed_types' => $this->allowedTypesNumeric,
+				'operators' => $this->operators
+			],
 			'trendcount' => [
 				'types' => [ZBX_FUNCTION_TYPE_HISTORY],
 				'description' => _('trendcount() - Number of successfully retrieved values for period T'),
@@ -1034,6 +1067,49 @@ class CControllerPopupTriggerExpr extends CController {
 				'types' => [ZBX_FUNCTION_TYPE_HISTORY],
 				'description' => _('trendmin() - Minimum value for period T with exact period shift'),
 				'params' => $this->param1Period,
+				'allowed_types' => $this->allowedTypesNumeric,
+				'operators' => $this->operators
+			],
+			'trendstl' => [
+				'types' => [ZBX_FUNCTION_TYPE_HISTORY],
+				'description' => _('trendstl() - Anomaly detection for period T'),
+				'params' => [
+					'last' => [
+						'C' => _('Evaluation period').' (T)',
+						'T' => T_ZBX_INT,
+						'A' => true
+					],
+					'period_shift' => [
+						'C' => _('Period shift'),
+						'T' => T_ZBX_INT,
+						'A' => true
+					],
+					'detect_period' => [
+						'C' => _('Detection period'),
+						'T' => T_ZBX_STR,
+						'A' => true
+					],
+					'season' => [
+						'C' => _('Season'),
+						'T' => T_ZBX_INT,
+						'A' => true
+					],
+					'deviations' => [
+						'C' => _('Deviations'),
+						'T' => T_ZBX_INT,
+						'A' => false
+					],
+					'algorithm' => [
+						'C' => _('Algorithm'),
+						'T' => T_ZBX_STR,
+						'A' => false
+					],
+					'season_window' => [
+						'C' => _('Season deviation window'),
+						'T' => T_ZBX_INT,
+						'A' => false
+					]
+				],
 				'allowed_types' => $this->allowedTypesNumeric,
 				'operators' => $this->operators
 			],
@@ -1399,13 +1475,11 @@ class CControllerPopupTriggerExpr extends CController {
 				}
 				elseif ($data['item_description']) {
 					// Quote function string parameters.
-					foreach ($data['params'] as $param_key => $param) {
-						if (!in_array($param_key, ['v', 'o', 'chars', 'fit', 'mode', 'pattern', 'replace', 'string'])
-								|| !array_key_exists($param_key, $data['params'])
-								|| $data['params'][$param_key] === '') {
-							continue;
-						}
+					$quote_params = ['v', 'o', 'chars', 'fit', 'mode', 'pattern', 'replace', 'string', 'algorithm'];
+					$quote_params = array_intersect_key($data['params'], array_fill_keys($quote_params, ''));
+					$quote_params = array_filter($quote_params, 'strlen');
 
+					foreach ($quote_params as $param_key => $param) {
 						$data['params'][$param_key] = quoteFunctionParam($param, true);
 					}
 
