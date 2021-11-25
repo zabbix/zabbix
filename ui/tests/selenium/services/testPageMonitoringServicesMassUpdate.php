@@ -81,13 +81,13 @@ public static function prepareServicesTagsData() {
 				'name' => '2_Service_No_Tags_Preprocessing',
 				'algorithm' => 1,
 				'showsla' => 0,
-				'sortorder' => 3,
+				'sortorder' => 4,
 			],
 			[
 				'name' => '1_Service_Tags_replace',
 				'algorithm' => 1,
 				'showsla' => 0,
-				'sortorder' => 3,
+				'sortorder' => 5,
 				'tags' => [
 					[
 						'tag' => 'Replace_tag_1',
@@ -103,7 +103,7 @@ public static function prepareServicesTagsData() {
 				'name' => '2_Service_Tags_replace',
 				'algorithm' => 1,
 				'showsla' => 0,
-				'sortorder' => 3,
+				'sortorder' => 6,
 				'tags' => [
 					[
 						'tag' => 'Replace_tag_3',
@@ -115,7 +115,7 @@ public static function prepareServicesTagsData() {
 				'name' => '1_Service_Tags_remove',
 				'algorithm' => 1,
 				'showsla' => 0,
-				'sortorder' => 3,
+				'sortorder' => 7,
 				'tags' => [
 					[
 						'tag' => 'remove_tag_1',
@@ -131,7 +131,7 @@ public static function prepareServicesTagsData() {
 				'name' => '2_Service_Tags_remove',
 				'algorithm' => 1,
 				'showsla' => 0,
-				'sortorder' => 3,
+				'sortorder' => 8,
 				'tags' => [
 					[
 						'tag' => 'remove_tag_2',
@@ -143,7 +143,7 @@ public static function prepareServicesTagsData() {
 				'name' => '3_Service_Tags_remove',
 				'algorithm' => 1,
 				'showsla' => 0,
-				'sortorder' => 3,
+				'sortorder' => 9,
 				'tags' => [
 					[
 						'tag' => 'remove_tag_3',
