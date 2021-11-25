@@ -1010,10 +1010,8 @@ class CTemplate extends CHostGeneral {
 			$this->massAddAffectedObjects('macros', [], $db_templates);
 		}
 
-		if (array_key_exists('templates_link', $data) || array_key_exists('templates_clear', $data)) {
-			$templateids_link = null;
-			$templateids_clear = [];
-
+		if (array_key_exists('templates_link', $data)
+				|| (array_key_exists('templates_clear', $data) && $data['templates_clear'])) {
 			if (array_key_exists('templates_link', $data) && array_key_exists('templates_clear', $data)) {
 				$path_clear = '/templates_clear';
 				$path = '/templates_link';
@@ -1032,68 +1030,45 @@ class CTemplate extends CHostGeneral {
 				}
 			}
 
-			if (array_key_exists('templates_link', $data)) {
-				$templateids_link = array_column($data['templates_link'], 'templateid');
+			$this->massAddAffectedObjects('templates', [], $db_templates);
+
+			$templateids_link = array_key_exists('templates_link', $data)
+				? array_column($data['templates_link'], 'templateid')
+				: [];
+			$templateids_clear = array_key_exists('templates_clear', $data)
+				? array_column($data['templates_clear'], 'templateid')
+				: [];
+
+			$edit_templateids = array_flip($templateids_clear);
+
+			if ($templateids_link) {
+				foreach ($db_templates as $db_template) {
+					$edit_templateids += array_flip(array_diff(array_column($db_template['templates'], 'templateid'),
+						$templateids_link
+					));
+				}
 			}
 
-			if (array_key_exists('templates_clear', $data)) {
-				$templateids_clear = array_column($data['templates_clear'], 'templateid');
-			}
-
-			$templateids = ($templateids_link !== null)
-				? array_merge($templateids_link, $templateids_clear)
-				: $templateids_clear;
-
-			if ($templateids) {
+			if ($edit_templateids) {
 				$count = $this->get([
 					'countOutput' => true,
-					'templateids' => $templateids
+					'templateids' => array_keys($edit_templateids),
+					'editable' => true
 				]);
 
-				if ($count != count($templateids)) {
+				if ($count != count($edit_templateids)) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS,
 						_('No permissions to referred object or it does not exist!')
 					);
 				}
-			}
 
-			$this->massAddAffectedObjects('templates', [], $db_templates);
-
-			if ($templateids_link !== null) {
-				$templateids = array_flip($templateids);
-				$edit_templateids = [];
-
-				foreach ($db_templates as $db_template) {
-					foreach ($db_template['templates'] as $db_template_link) {
-						$_templateids = $templateids;
-
-						if (array_key_exists($db_template_link['templateid'], $_templateids)) {
-							unset($_templateids[$db_template_link['templateid']]);
-						}
-						else {
-							$edit_templateids[$db_template_link['templateid']] = true;
-						}
-					}
-
-					$edit_templateids += $_templateids;
+				if (array_key_exists('templates_link', $data)) {
+					$this->massCheckTemplatesLinks($templateids_link, [], $db_templates, true);
 				}
-
-				if ($edit_templateids) {
-					$count = $this->get([
-						'countOutput' => true,
-						'templateids' => array_keys($edit_templateids),
-						'editable' => true
-					]);
-
-					if ($count != count($edit_templateids)) {
-						self::exception(ZBX_API_ERROR_PERMISSIONS,
-							_('No permissions to referred object or it does not exist!')
-						);
-					}
+				else {
+					$this->massCheckTemplatesLinks([], $templateids_clear, $db_templates);
 				}
 			}
-
-			$this->massCheckTemplatesLinks($templateids_link, $templateids_clear, $db_templates, true);
 		}
 	}
 

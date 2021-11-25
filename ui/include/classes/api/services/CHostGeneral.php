@@ -152,12 +152,12 @@ abstract class CHostGeneral extends CHostBase {
 	/**
 	 * Check templates links for given data of mass API methods.
 	 *
-	 * @param array|null $templateids_link
-	 * @param array      $templateids_unlink
-	 * @param array      $db_hosts
-	 * @param bool       $replace
+	 * @param array $templateids_link
+	 * @param array $templateids_unlink
+	 * @param array $db_hosts
+	 * @param bool  $replace
 	 */
-	protected function massCheckTemplatesLinks(?array $templateids_link, array $templateids_unlink,
+	protected function massCheckTemplatesLinks(array $templateids_link, array $templateids_unlink,
 			array $db_hosts, bool $replace = false): void {
 		$ins_templates = [];
 		$del_links = [];
@@ -167,13 +167,14 @@ abstract class CHostGeneral extends CHostBase {
 		foreach ($db_hosts as $hostid => $db_host) {
 			$db_templateids = array_column($db_host['templates'], 'templateid');
 
-			if ($replace && $templateids_link !== null) {
+			if ($replace) {
 				$templateids = $templateids_link;
 			}
+			elseif ($templateids_link) {
+				$templateids = array_diff($templateids_link, $db_templateids);
+			}
 			else {
-				$templateids = array_merge(array_diff($db_templateids, $templateids_unlink),
-					array_diff($templateids_link, $db_templateids)
-				);
+				$templateids = array_diff($db_templateids, $templateids_unlink);
 			}
 
 			$permitted_templateids = $templateids;
