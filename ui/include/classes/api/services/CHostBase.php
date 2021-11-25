@@ -230,10 +230,10 @@ abstract class CHostBase extends CApiService {
 		$result = DBselect(
 			'SELECT DISTINCT i.hostid AS del_templateid,td.triggerid_down,ii.hostid'.
 			' FROM items i,functions f,trigger_depends td,functions ff,items ii'.
-			' WHERE f.itemid=i.itemid'.
-				' AND td.triggerid_up=f.triggerid'.
-				' AND ff.triggerid=td.triggerid_down'.
-				' AND ii.itemid=ff.itemid'.
+			' WHERE i.itemid=f.itemid'.
+				' AND f.triggerid=td.triggerid_up'.
+				' AND td.triggerid_down=ff.triggerid'.
+				' AND ff.itemid=ii.itemid'.
 				' AND '.dbConditionInt('i.hostid', array_keys($del_templates)).
 				' AND '.dbConditionInt('ii.hostid', array_keys($all_upd_templates))
 		);
