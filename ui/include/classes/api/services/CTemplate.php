@@ -1059,10 +1059,6 @@ class CTemplate extends CHostGeneral {
 
 			$this->massAddAffectedObjects('templates', [], $db_templates);
 
-			if (array_key_exists('templates_clear', $data)) {
-				$this->massAddAffectedObjects('templates_clear', [], $db_templates);
-			}
-
 			if ($templateids_link !== null) {
 				$templateids = array_flip($templateids);
 				$edit_templateids = [];
@@ -1179,10 +1175,6 @@ class CTemplate extends CHostGeneral {
 			}
 
 			$this->massAddAffectedObjects('templates', $templateids, $db_templates);
-
-			if (array_key_exists('templateids_clear', $data)) {
-				$this->massAddAffectedObjects('templates_clear', [], $db_templates);
-			}
 
 			$this->massCheckTemplatesLinks([], $templateids, $db_templates);
 		}
