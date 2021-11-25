@@ -38,12 +38,12 @@ else {
 		}
 
 		$row = $data['data'][$key];
+		$divs = [];
 
 		foreach ($row as $column) {
 			// The $column_key can be "item_value", "item_time" or "item_description".
 			foreach ($column as $column_key => $block) {
-				// Possible DIV blocks: "div_item_value", "div_item_time" or "div_item_description".
-				${"div_$column_key"} = new CDiv();
+				$divs[$column_key] = new CDiv();
 
 				// The "item_value" block is special and contain more blocks inside.
 				if ($column_key === 'item_value') {
@@ -54,59 +54,57 @@ else {
 					 */
 					foreach ($block as $block_key => $content) {
 						if ($block_key === 'item_value_content') {
-							// Make "div_item_value_content" DIV block.
-							${"div_$block_key"} = new CDiv();
+							$divs[$block_key] = new CDiv();
 
 							foreach ($content['data'] as $content_inner) {
 								foreach ($content_inner as $item_key => $item) {
 									if ($item_key === 'change_indicator') {
-										${"div_$item_key"} = new CDiv(new CSvgArrow($item['data']));
+										$divs[$item_key] = new CDiv(new CSvgArrow($item['data']));
 									}
 									else {
-										${"div_$item_key"} = new CDiv($item['data']);
+										$divs[$item_key] = new CDiv($item['data']);
 									}
 
 									foreach ($item['classes'] as $class) {
-										${"div_$item_key"}->addClass($class);
+										$divs[$item_key]->addClass($class);
 									}
 
 									$cnt = count($item['styles']);
 									$i = 0;
 
 									foreach ($item['styles'] as $style => $value) {
-										${"div_$item_key"}->addStyle($style.': '.$value.(($i + 1) != $cnt ? '; ' : ''));
+										$divs[$item_key]->addStyle($style.': '.$value.(($i + 1) != $cnt ? '; ' : ''));
 										$i++;
 									}
 
-									${"div_$block_key"}->addItem(${"div_$item_key"});
+									$divs[$block_key]->addItem($divs[$item_key]);
 								}
 							}
 
 							foreach ($block[$block_key]['classes'] as $class) {
-								${"div_$block_key"}->addClass($class);
+								$divs[$block_key]->addClass($class);
 							}
 
-							${"div_$column_key"}->addItem(${"div_$block_key"});
+							$divs[$column_key]->addItem($divs[$block_key]);
 						}
 						elseif ($block_key === 'data') {
 							foreach ($content as $content_inner) {
 								foreach ($content_inner as $item_key => $item) {
-									// Make "div_units" DIV.
-									${"div_$item_key"} = new CDiv($item['data']);
+									$divs[$item_key] = new CDiv($item['data']);
 
 									foreach ($item['classes'] as $class) {
-										${"div_$item_key"}->addClass($class);
+										$divs[$item_key]->addClass($class);
 									}
 
 									$cnt = count($item['styles']);
 									$i = 0;
 
 									foreach ($item['styles'] as $style => $value) {
-										${"div_$item_key"}->addStyle($style.': '.$value.(($i + 1) != $cnt ? '; ' : ''));
+										$divs[$item_key]->addStyle($style.': '.$value.(($i + 1) != $cnt ? '; ' : ''));
 										$i++;
 									}
 
-									${"div_$column_key"}->addItem(${"div_$item_key"});
+									$divs[$column_key]->addItem($divs[$item_key]);
 								}
 							}
 						}
@@ -117,12 +115,12 @@ else {
 					 * This block is either description or time. Description can be array as well if it contains
 					 * multiple lines.
 					 */
-					${"div_$column_key"}->addItem($block['data']);
+					$divs[$column_key]->addItem($block['data']);
 				}
 
 				// Regardless of whether it is description, value or time block, they have classes.
 				foreach ($block['classes'] as $class) {
-					${"div_$column_key"}->addClass($class);
+					$divs[$column_key]->addClass($class);
 				}
 
 				// Value block may not have styles.
@@ -131,12 +129,12 @@ else {
 					$i = 0;
 
 					foreach ($block['styles'] as $style => $value) {
-						${"div_$column_key"}->addStyle($style.': '.$value.(($i + 1) != $cnt ? '; ' : ''));
+						$divs[$column_key]->addStyle($style.': '.$value.(($i + 1) != $cnt ? '; ' : ''));
 						$i++;
 					}
 				}
 
-				$items[$key]->addItem(${"div_$column_key"});
+				$items[$key]->addItem($divs[$column_key]);
 			}
 		}
 	}
