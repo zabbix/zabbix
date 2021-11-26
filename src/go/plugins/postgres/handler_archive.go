@@ -51,11 +51,11 @@ func archiveHandler(ctx context.Context, conn PostgresClient,
 											ELSE ('x' || substring(pg_walfile_name(pg_current_wal_lsn()) from 17 for 8))::bit(32)::int END AS current_wal_mod
 									FROM pg_settings, pg_stat_archiver
 									WHERE pg_settings.name = 'wal_segment_size')
-									SELECT 
-										greatest(coalesce((segment_parts_count - last_wal_mod) + ((current_wal_div - last_wal_div - 1) * segment_parts_count) + current_wal_mod - 1, 0), 0) AS count_files,
-										greatest(coalesce(((segment_parts_count - last_wal_mod) + ((current_wal_div - last_wal_div - 1) * segment_parts_count) + current_wal_mod - 1) * segment_size, 0), 0) AS size_files
-									FROM values
-								) T;`
+								SELECT 
+									greatest(coalesce((segment_parts_count - last_wal_mod) + ((current_wal_div - last_wal_div - 1) * segment_parts_count) + current_wal_mod - 1, 0), 0) AS count_files,
+									greatest(coalesce(((segment_parts_count - last_wal_mod) + ((current_wal_div - last_wal_div - 1) * segment_parts_count) + current_wal_mod - 1) * segment_size, 0), 0) AS size_files
+								FROM values
+							) T;`
 
 	row, err := conn.QueryRow(ctx, queryArchiveCount)
 	if err != nil {
