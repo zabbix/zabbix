@@ -635,11 +635,25 @@ public static function prepareServicesTagsData() {
 			'2_Service_No_Tags_Preprocessing'
 		];
 
+		$new_tags = [
+			[
+				'action' => USER_ACTION_UPDATE,
+				'index' => 0,
+				'tag' => 'new_tag_1',
+				'value' => 'new_value_1'
+			],
+			[
+				'tag' => 'new_tag_2',
+				'value' => 'new_value_2'
+			]
+		];
+
 		$this->selectTableRows($services);
 		$this->query('button:Mass update')->one()->click();
 
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$dialog->asForm()->getLabel('Tags')->click();
+		$this->query('id:tags-table')->asMultifieldTable()->one()->fill($new_tags);
 
 		$dialog->query('button:Cancel')->one()->waitUntilClickable()->click();
 		COverlayDialogElement::ensureNotPresent();

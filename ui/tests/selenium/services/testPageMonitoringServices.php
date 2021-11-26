@@ -129,21 +129,21 @@ class testPageMonitoringServices extends CWebTest {
 				'sortorder' => 6
 			],
 			[
-				'name' => 'Server 7 for delete by action button',
+				'name' => 'Server 7 for delete',
 				'algorithm' => 1,
 				'showsla' => 1,
 				'goodsla' => 99.99,
 				'sortorder' => 7
 			],
 			[
-				'name' => 'Server 8 parent with child for delete child',
+				'name' => 'Server 8 with child for delete',
 				'algorithm' => 1,
 				'showsla' => 1,
 				'goodsla' => 99.99,
 				'sortorder' => 8
 			],
 			[
-				'name' => 'Server 9 parent with child for delete parent',
+				'name' => 'Server 9 with child for delete',
 				'algorithm' => 1,
 				'showsla' => 1,
 				'goodsla' => 99.99,
@@ -206,25 +206,53 @@ class testPageMonitoringServices extends CWebTest {
 				'sortorder' => 16
 			],
 			[
-				'name' => 'Server for mass update 2',
+				'name' => 'Server 12',
 				'algorithm' => 1,
 				'showsla' => 1,
 				'goodsla' => 99.99,
 				'sortorder' => 17
 			],
 			[
-				'name' => 'Server for mass update 3',
+				'name' => 'Child for mass deleting 1',
 				'algorithm' => 1,
 				'showsla' => 1,
 				'goodsla' => 99.99,
 				'sortorder' => 18
 			],
 			[
-				'name' => 'Server with problem',
+				'name' => 'Child for mass deleting 2',
 				'algorithm' => 1,
 				'showsla' => 1,
 				'goodsla' => 99.99,
 				'sortorder' => 19
+			],
+			[
+				'name' => 'Child for mass deleting 3',
+				'algorithm' => 1,
+				'showsla' => 1,
+				'goodsla' => 99.99,
+				'sortorder' => 20
+			],
+			[
+				'name' => 'Server for mass update 2',
+				'algorithm' => 1,
+				'showsla' => 1,
+				'goodsla' => 99.99,
+				'sortorder' => 21
+			],
+			[
+				'name' => 'Server for mass update 3',
+				'algorithm' => 1,
+				'showsla' => 1,
+				'goodsla' => 99.99,
+				'sortorder' => 22
+			],
+			[
+				'name' => 'Server with problem',
+				'algorithm' => 1,
+				'showsla' => 1,
+				'goodsla' => 99.99,
+				'sortorder' => 23
 			]
 		]);
 
@@ -251,7 +279,7 @@ class testPageMonitoringServices extends CWebTest {
 				'serviceid' => $services['Server 10 child for Server 8'],
 				'parents' => [
 					[
-						'serviceid' => $services['Server 8 parent with child for delete child']
+						'serviceid' => $services['Server 8 with child for delete']
 					]
 				]
 			],
@@ -259,7 +287,31 @@ class testPageMonitoringServices extends CWebTest {
 				'serviceid' => $services['Server 11 child for Server 9'],
 				'parents' => [
 					[
-						'serviceid' => $services['Server 9 parent with child for delete parent']
+						'serviceid' => $services['Server 9 with child for delete']
+					]
+				]
+			],
+			[
+				'serviceid' => $services['Child for mass deleting 1'],
+				'parents' => [
+					[
+						'serviceid' => $services['Server 12']
+					]
+				]
+			],
+			[
+				'serviceid' => $services['Child for mass deleting 2'],
+				'parents' => [
+					[
+						'serviceid' => $services['Server 12']
+					]
+				]
+			],
+			[
+				'serviceid' => $services['Child for mass deleting 3'],
+				'parents' => [
+					[
+						'serviceid' => $services['Server 12']
 					]
 				]
 			]
@@ -455,7 +507,7 @@ class testPageMonitoringServices extends CWebTest {
 					],
 					'result' => [
 						'Server 6 for delete by checkbox',
-						'Server 7 for delete by action button',
+						'Server 7 for delete',
 						'Server for mass delete 1',
 						'Server for mass delete 2',
 						'Server for mass delete 3'
@@ -501,8 +553,8 @@ class testPageMonitoringServices extends CWebTest {
 						'Status' => 'Any'
 					],
 					'result' => [
-						'Server 8 parent with child for delete child 1',
-						'Server 9 parent with child for delete parent 1',
+						'Server 8 with child for delete 1',
+						'Server 9 with child for delete 1',
 						'Server with problem'
 					]
 				]
@@ -515,8 +567,8 @@ class testPageMonitoringServices extends CWebTest {
 						'Status' => 'OK'
 					],
 					'result' => [
-						'Server 8 parent with child for delete child 1',
-						'Server 9 parent with child for delete parent 1'
+						'Server 8 with child for delete 1',
+						'Server 9 with child for delete 1'
 					]
 				]
 			],
@@ -743,20 +795,32 @@ class testPageMonitoringServices extends CWebTest {
 		// Check filtered result.
 		$this->assertTableDataColumn($data['result'], 'Name');
 
-		// Check breadcrumbs.
+		// Check breadcrumbs and table headers.
 		$selector = $this->query(self::BREADCRUMB_SELECTOR);
+		$table = $this->query($this->table_selector)->asTable()->one();
 		if (CTestArrayHelper::get($data, 'check_breadcrumbs')) {
 			$this->assertTrue($selector->one()->query('link:All services')->one()->isClickable());
 			$this->assertTrue($selector->query('xpath://span[@class="selected" and text()="Filter results"]')->exists());
+
+			$headers = ($edit)
+					? ['', 'Parent services', 'Name', 'Status', 'Root cause', 'SLA', 'Tags', '']
+					: ['Parent services', 'Name', 'Status', 'Root cause', 'SLA', 'Tags'];
+			$this->assertSame($headers, $table->getHeadersText());
 		}
 
 		// Reset filter due to not interfere next tests.
 		$filter_form->query('button:Reset')->one()->click();
 
-		// Check breadcrumbs disappeared.
+		// Check breadcrumbs and "Parent services" headers disappeared.
 		if (CTestArrayHelper::get($data, 'check_breadcrumbs')) {
 			$this->assertFalse($selector->query('link:All services')->exists());
 			$this->assertFalse($selector->query('xpath://span[@class="selected" and text()="Filter results"]')->exists());
+			$table->invalidate();
+
+			$headers = ($edit)
+					? ['', 'Name', 'Status', 'Root cause', 'SLA', 'Tags', '']
+					: ['Name', 'Status', 'Root cause', 'SLA', 'Tags'];
+			$this->assertSame($headers, $table->getHeadersText());
 		}
 	}
 
@@ -789,102 +853,221 @@ class testPageMonitoringServices extends CWebTest {
 		$this->assertEquals($start_contents, array_values($this->getTableResult('Name')));
 	}
 
-	public function testPageMonitoringServices_DeleteByActionButton() {
-		$byActionButton = 'Server 7 for delete by action button';
+	public function testPageMonitoringServices_AddChild() {
 
-		// Single service delete by action button
-		$this->deleteService($byActionButton, true, false, false);
 	}
 
-	public function testPageMonitoringServices_DeleteChild() {
-		$child = 'Server 8 parent with child for delete child';
-
-		// Delete child service from page
-		$this->deleteService($child, false, true, false);
+	public function testPageMonitoringServices_CancelDeleteFromRow() {
+		$this->cancelDelete();
 	}
 
-	public function testPageMonitoringServices_DeleteParent() {
-		$parent = 'Server 9 parent with child for delete parent';
-
-		// Delete parent service from page
-		$this->deleteService($parent, true, true, false);
+	public function testPageMonitoringServices_CancelMassDelete() {
+		$this->cancelDelete(true);
 	}
 
-	public function testPageMonitoringServices_MassDelete() {
+	private function cancelDelete($mass = false) {
+		$name = 'Server 6 for delete by checkbox';
+
+		$sql = 'SELECT * FROM services ORDER BY serviceid';
+		$old_hash = CDBHelper::getHash('SELECT * FROM services ORDER BY serviceid');
+
 		$this->page->login()->open('zabbix.php?action=service.list.edit');
 
-		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
+		$table = $this->query($this->table_selector)->asTable()->one();
+		$before_rows_count = $table->getRows()->count();
+		$this->assertTableStats($before_rows_count);
 
-		$form->fill(['id:filter_name' => 'Server for mass delete']);
-		$form->submit();
+		if ($mass) {
+			$this->selectTableRows([$name], 'Name');
+			$this->query('button:Delete')->one()->click();
+		}
+		else {
+			$table->findRow('Name', $name)->query('xpath:.//button[contains(@class, "btn-remove")]')->one()
+				->waitUntilClickable()->click();
+		}
 
+		$this->page->dismissAlert();
 		$this->page->waitUntilReady();
 
-		$this->selectTableRows([
-			'Server for mass delete 1',
-			'Server for mass delete 2',
-			'Server for mass delete 3'], 'Name'
-		);
+		// Check service not disappeared from frontend.
+		$this->assertTableStats($before_rows_count);
+		$this->assertTrue($table->query('xpath://table[@class="list-table"]//td[text()='.zbx_dbstr($name).']')->exists());
 
-		$this->query('button:Delete')->one()->click();
-		$this->page->acceptAlert();
-
-		$this->assertMessage(TEST_GOOD, 'Services deleted');
-
-		// Check database
-		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services WHERE name LIKE '.
-			CXPathHelper::escapeQuotes('%Server for mass delete%'))
-		);
+		// Check database.
+		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($name)));
+		$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 	}
 
-	private function deleteService($serviceName, $parent = true, $child = false, $checkbox = true) {
-		$this->page->login()->open('zabbix.php?action=service.list.edit');
+	public function testPageMonitoringServices_SimpleServiceDeleteFromRow() {
+		$name = 'Server 7 for delete';
 
+		$this->page->login()->open('zabbix.php?action=service.list.edit');
 		$table = $this->query($this->table_selector)->asTable()->one();
 
 		$before_rows_count = $table->getRows()->count();
 		$this->assertTableStats($before_rows_count);
 
-		if ($parent === true) {
-			if ($checkbox) {
-				$table->findRow('Name', $serviceName, true)->select();
-				$this->query('button:Delete')->one()->click();
-			}
-			else {
-				$table->findRow('Name', $serviceName, true)->query('xpath:.//button[contains(@class, "btn-remove")]')
-						->one()->waitUntilClickable()->click();
-			}
+		// Delete service pressing cross button.
+		$table->findRow('Name', $name)->query('xpath:.//button[contains(@class, "btn-remove")]')->one()
+				->waitUntilClickable()->click();
+		$this->page->acceptAlert();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Service deleted');
 
-			$this->page->acceptAlert();
-			$this->page->waitUntilReady();
-			$this->assertMessage(TEST_GOOD, 'Service deleted');
+		// Check service disappeared from frontend.
+		$this->assertTableStats($before_rows_count-1);
+		$this->assertFalse($table->query('xpath://table[@class="list-table"]//td[text()='.zbx_dbstr($name).']')->exists());
 
-			$count = ($child === true) ? $before_rows_count : $before_rows_count-1;
-			$this->assertTableStats($count);
+		// Check database.
+		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($name))
+		);
+	}
 
-			// Check database.
-			$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services WHERE name='.CXPathHelper::escapeQuotes($serviceName)));
+	public function testPageMonitoringServices_DeleteChildFromRow() {
+		$parent = 'Server 8 with child for delete';
+		$name = 'Server 10 child for Server 8';
+
+		$this->page->login()->open('zabbix.php?action=service.list.edit');
+		$table = $this->query($this->table_selector)->asTable()->one();
+
+		$before_rows_count = $table->getRows()->count();
+		$this->assertTableStats($before_rows_count);
+
+		// Open parent service info.
+		$table->findRow('Name', $parent, true)->query('link', $parent)->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
+
+		// Count children.
+		$childs_rows_count = $table->getRows()->count();
+		$this->assertTableStats($childs_rows_count);
+
+		// Delete child service pressing cross button.
+		$table->invalidate();
+		$table->findRow('Name', $name)->query('xpath:.//button[contains(@class, "btn-remove")]')->one()
+				->waitUntilClickable()->click();
+
+		$this->page->acceptAlert();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Service deleted');
+
+		// Check service disappeared from frontend.
+		$this->assertTableStats($childs_rows_count - 1);
+		$this->assertFalse($table->query('xpath://table[@class="list-table"]//td[text()='.zbx_dbstr($name).']')->exists());
+
+		// Check database.
+		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($name)));
+		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($parent)));
+	}
+
+	public function testPageMonitoringServices_DeleteParentFromRow() {
+		$name = 'Server 9 with child for delete';
+		$child = 'Server 11 child for Server 9';
+
+		$this->page->login()->open('zabbix.php?action=service.list.edit');
+		$table = $this->query($this->table_selector)->asTable()->one();
+
+		$before_rows_count = $table->getRows()->count();
+		$this->assertTableStats($before_rows_count);
+
+		// Check that parent link exists.
+		$this->assertTrue($table->query('link', $name)->exists());
+
+		// Check that child service is not present in global service table.
+		$this->assertFalse($table->query('xpath://table[@class="list-table"]//td[text()='.zbx_dbstr($child).']')->exists());
+
+		// Delete parent service.
+		$table->findRow('Name', $name, true)->query('xpath:.//button[contains(@class, "btn-remove")]')->one()
+				->waitUntilClickable()->click();
+
+		$this->page->acceptAlert();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Service deleted');
+
+		// Rows count remains unchanged because child takes parent's place.
+		$this->assertTableStats($before_rows_count);
+
+		// Parent disappeared from table.
+		$this->assertFalse($table->query('link', $name)->exists());
+
+		// Child now presents in table.
+		$this->assertTrue($table->query('xpath://table[@class="list-table"]//td[text()='.zbx_dbstr($child).']')->exists());
+
+		// Check database.
+		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($name)));
+		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($child)));
+	}
+
+	public function testPageMonitoringServices_SimpleServicesMassDelete() {
+		$names = [
+			'Server for mass delete 1',
+			'Server for mass delete 2',
+			'Server for mass delete 3'
+		];
+
+		$this->page->login()->open('zabbix.php?action=service.list.edit');
+		$table = $this->query($this->table_selector)->asTable()->one();
+		$before_rows_count = $table->getRows()->count();
+		$this->assertTableStats($before_rows_count);
+
+		$this->selectTableRows($names, 'Name');
+		$this->query('button:Delete')->one()->click();
+		$this->page->acceptAlert();
+		$this->assertMessage(TEST_GOOD, 'Services deleted');
+
+		$this->assertTableStats($before_rows_count - count($names));
+
+		// Services disappeared from frontend.
+		foreach ($names as $name) {
+			$this->assertFalse($table->query("xpath://table[@class='list-table']//td[text()=".zbx_dbstr($name)."]")
+					->exists());
 		}
 
-		if ($child === true && $parent === false) {
-			$table->findRow('Name', $serviceName, true)->query('xpath://tbody/tr/td/a[text()="'.$serviceName.'"]')
-					->waitUntilClickable()->one()->click();
-			$this->page->waitUntilReady();
+		// Check database.
+		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services WHERE name LIKE '.
+				zbx_dbstr('%Server for mass delete%'))
+		);
+	}
 
-			$childs_rows_count = $table->getRows()->count();
-			$this->assertTableStats($childs_rows_count);
+	public function testPageMonitoringServices_ChildrenMassDelete() {
+		$parent = 'Server 12';
+		$names = [
+			'Child for mass deleting 1',
+			'Child for mass deleting 2'
+		];
+		$remained = 'Child for mass deleting 3';
 
-			$table = $this->query($this->table_selector)->asTable()->one();
-			$table->findRow('Name', 'Server 10 child for Server 8', true)->query('xpath:.//button[contains(@class, "btn-remove")]')
-					->one()->waitUntilClickable()->click();
+		$this->page->login()->open('zabbix.php?action=service.list.edit');
+		$table = $this->query($this->table_selector)->asTable()->one();
 
-			$this->page->acceptAlert();
-			$this->page->waitUntilReady();
-			$this->assertMessage(TEST_GOOD, 'Service deleted');
-			$this->assertTableStats($childs_rows_count - 1);
+		// Open parent service info.
+		$table->findRow('Name', $parent, true)->query('link', $parent)->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
 
-			// Check database.
-			$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services WHERE name='.CXPathHelper::escapeQuotes('Server 10 child for Server 8')));
+		$before_rows_count = $table->getRows()->count();
+		$this->assertTableStats($before_rows_count);
+
+		$this->selectTableRows($names, 'Name');
+		$this->query('button:Delete')->one()->click();
+		$this->page->acceptAlert();
+		$this->assertMessage(TEST_GOOD, 'Services deleted');
+
+		$this->assertTableStats($before_rows_count - count($names));
+
+		// Services disappeared from frontend.
+		foreach ($names as $name) {
+			$this->assertFalse($table->query("xpath://table[@class='list-table']//td[text()=".zbx_dbstr($name)."]")
+					->exists());
 		}
+
+		// Last child is not deleted.
+		$this->assertTrue($table->query('xpath://table[@class="list-table"]//td[text()='.zbx_dbstr($remained).']')->exists());
+
+		// Check database.
+		foreach ($names as $name) {
+			$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services WHERE name = '.zbx_dbstr($name)));
+		}
+
+		//  Last child remained in DB.
+		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name = '.zbx_dbstr($remained)));
 	}
 }

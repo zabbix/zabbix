@@ -812,6 +812,14 @@ class testFormMonitoringServices extends CWebTest {
 		}
 	}
 
+	public function testFormMonitoringServices_Clone() {
+
+	}
+
+	public function testFormMonitoringServices_SimpleUpdate() {
+
+	}
+
 	public function getCreateChildData() {
 		return [
 			[
@@ -899,6 +907,7 @@ class testFormMonitoringServices extends CWebTest {
 
 			// Check that child is present in frontend.
 			$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
+
 			// Firstly click on parent.
 			$table->findRow('Name', $data['parent'], true)->query('link', $data['parent'])
 					->waitUntilClickable()->one()->click();
@@ -910,6 +919,7 @@ class testFormMonitoringServices extends CWebTest {
 
 			// Check that all form fields were saved correctly.
 			$form->checkValue($data['fields']);
+
 			// Check parent field separately, because it was not present in data[fields] array.
 			$this->assertEquals([$data['parent']], $form->getField('Parent services')->getValue());
 		}
