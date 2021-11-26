@@ -119,7 +119,7 @@ func replicationHandler(ctx context.Context, conn PostgresClient,
 		query = `SELECT pg_is_in_recovery()::int`
 
 	case keyReplicationCount:
-		query = `SELECT COUNT(DISTINCT client_addr) + SUM(CASE WHEN client_addr IS NULL THEN 1 ELSE 0 END) FROM pg_stat_replication;`
+		query = `SELECT COUNT(DISTINCT client_addr) + COALESCE(SUM(CASE WHEN client_addr IS NULL THEN 1 ELSE 0 END), 0) FROM pg_stat_replication;`
 
 	case keyReplicationProcessInfo:
 		query = `SELECT json_object_agg(application_name, row_to_json(T))

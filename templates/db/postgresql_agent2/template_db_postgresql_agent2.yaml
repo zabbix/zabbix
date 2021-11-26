@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-11-16T13:02:18Z'
+  date: '2021-11-26T10:20:42Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -617,6 +617,7 @@ zabbix_export:
           key: 'pgsql.custom.query["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}",""]'
           history: 1h
           trends: '0'
+          status: DISABLED
           value_type: TEXT
           description: 'Execute custom queries from file *.sql'
           tags:
