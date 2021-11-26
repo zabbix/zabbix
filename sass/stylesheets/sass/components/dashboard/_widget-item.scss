@@ -102,12 +102,6 @@ div.dashboard-grid-widget-item {
 			border: none;
 		}
 
-		@if $theme-name == 'hc-dark' or $theme-name == 'hc-light' {
-			&:link {
-				border-bottom: none;
-			}
-		}
-
 		> div {
 			display: flex;
 			flex: 1 1 calc(100% / 3);
@@ -240,11 +234,14 @@ div.dashboard-grid-widget-item {
 	}
 }
 
-.dashboard-grid-widget:not(.dashboard-grid-widget-hidden-header) {
-	div.dashboard-grid-widget-item {
-		$widget-container-padding: 8px;
+// Modifications by themes.
 
-		height: calc(100% + #{$widget-container-padding});
-		margin-bottom: -$widget-container-padding;
+@if $theme-name == 'hc-dark' or $theme-name == 'hc-light' {
+	div.dashboard-grid-widget-item {
+		a {
+			&:link {
+				border-bottom: none;
+			}
+		}
 	}
 }

@@ -1451,8 +1451,6 @@ div.dashboard-grid-widget-item {
     color: inherit; }
     div.dashboard-grid-widget-item a:focus, div.dashboard-grid-widget-item a:hover, div.dashboard-grid-widget-item a:visited {
       border: none; }
-    div.dashboard-grid-widget-item a:link {
-      border-bottom: none; }
     div.dashboard-grid-widget-item a > div {
       display: flex;
       flex: 1 1 calc(100% / 3); }
@@ -1529,9 +1527,8 @@ div.dashboard-grid-widget-item {
 .dashboard-grid-widget-item .svg-arrow-up-down {
   fill: #3DC51D; }
 
-.dashboard-grid-widget:not(.dashboard-grid-widget-hidden-header) div.dashboard-grid-widget-item {
-  height: calc(100% + 8px);
-  margin-bottom: -8px; }
+div.dashboard-grid-widget-item a:link {
+  border-bottom: none; }
 
 .diff {
   padding: 4px;
