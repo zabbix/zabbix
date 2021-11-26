@@ -271,12 +271,6 @@ static int	get_function_parameter_hist_range(int from, const char *parameters, i
 			goto out;
 		}
 
-		if (end >= from)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() timeshift produced time in future", __func__);
-			goto out;
-		}
-
 		*timeshift = from - end;
 	}
 	else
