@@ -33,6 +33,8 @@ zbx_history_record_t;
 
 ZBX_VECTOR_DECL(history_record, zbx_history_record_t)
 
+int     history_record_float_compare(const zbx_history_record_t *d1, const zbx_history_record_t *d2);
+
 void	zbx_history_record_vector_clean(zbx_vector_history_record_t *vector, int value_type);
 void	zbx_history_record_vector_destroy(zbx_vector_history_record_t *vector, int value_type);
 void	zbx_history_record_clear(zbx_history_record_t *value, int value_type);

@@ -175,17 +175,11 @@ class CHistory extends CApiService {
 
 		switch (CHistoryManager::getDataSourceType($options['history'])) {
 			case ZBX_HISTORY_SOURCE_ELASTIC:
-				$result = $this->getFromElasticsearch($options);
+				return $this->getFromElasticsearch($options);
 
 			default:
-				$result = $this->getFromSql($options);
+				return $this->getFromSql($options);
 		}
-
-		if (is_array($result)) {
-			$result = $this->unsetExtraFields($result, ['itemid', 'clock', 'ns'], $options['output']);
-		}
-
-		return $result;
 	}
 
 	/**

@@ -1071,6 +1071,47 @@ class CHistFunctionParserTest extends TestCase {
 				['/host/key', '1h']
 			],
 			[
+				'function(/host/key, 1h, 0.5y)', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => 'function(/host/key, 1h, 0.5y)',
+					'function' => 'function',
+					'parameters' => [
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
+							'pos' => 9,
+							'match' => '/host/key',
+							'length' => 9,
+							'data' => [
+								'host' => 'host',
+								'item' => 'key',
+								'filter' => [
+									'match' => '',
+									'tokens' => []
+								]
+							]
+						],
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_PERIOD,
+							'pos' => 20,
+							'match' => '1h',
+							'length' => 2,
+							'data' => [
+								'sec_num' => '1h',
+								'time_shift' => ''
+							]
+						],
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_UNQUOTED,
+							'pos' => 24,
+							'match' => '0.5y',
+							'length' => 4
+						]
+					]
+				],
+				['/host/key', '1h', '0.5y']
+			],
+			[
 				'nodata(/host/key, "\\\\1h\\\\")', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,

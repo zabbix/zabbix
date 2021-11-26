@@ -64,7 +64,7 @@ trait MacrosTrait {
 					'class' => 'CElement'
 				]
 			]
-		])->one()->waitUntilVisible();
+		])->waitUntilVisible()->one();
 	}
 
 	/**

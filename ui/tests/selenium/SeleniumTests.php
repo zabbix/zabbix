@@ -64,16 +64,13 @@ require_once dirname(__FILE__).'/testPageQueueDetails.php';
 require_once dirname(__FILE__).'/testPageQueueOverview.php';
 require_once dirname(__FILE__).'/testPageQueueOverviewByProxy.php';
 */
-require_once dirname(__FILE__).'/testPageReportsActionLog.php';
-require_once dirname(__FILE__).'/testPageReportsAudit.php';
-require_once dirname(__FILE__).'/testPageReportsNotifications.php';
-require_once dirname(__FILE__).'/testPageReportsTriggerTop.php';
 require_once dirname(__FILE__).'/testPageSearch.php';
 require_once dirname(__FILE__).'/testPageStatusOfZabbix.php';
 require_once dirname(__FILE__).'/testPageTemplates.php';
 require_once dirname(__FILE__).'/testPageTriggerDescription.php';
 require_once dirname(__FILE__).'/testPageUserGroups.php';
 require_once dirname(__FILE__).'/testPageUsers.php';
+require_once dirname(__FILE__).'/testExpandExpressionMacros.php';
 require_once dirname(__FILE__).'/testFormAction.php';
 require_once dirname(__FILE__).'/testFormAdministrationAuthenticationHttp.php';
 require_once dirname(__FILE__).'/testFormAdministrationAuthenticationLdap.php';
@@ -179,11 +176,18 @@ require_once dirname(__FILE__).'/dashboard/testDashboardDynamicItemWidgets.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardGraphWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardHostAvailabilityWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardProblemsBySeverityWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardSystemInformationWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardPages.php';
 require_once dirname(__FILE__).'/dashboard/testFormTemplateDashboards.php';
 require_once dirname(__FILE__).'/dashboard/testPageTemplateDashboards.php';
-require_once dirname(__FILE__).'/scheduledReports/testFormScheduledReport.php';
-require_once dirname(__FILE__).'/scheduledReports/testPageScheduledReport.php';
-require_once dirname(__FILE__).'/scheduledReports/testScheduledReportPermissions.php';
+require_once dirname(__FILE__).'/reports/testPageReportsActionLog.php';
+require_once dirname(__FILE__).'/reports/testPageReportsAudit.php';
+require_once dirname(__FILE__).'/reports/testPageReportsNotifications.php';
+require_once dirname(__FILE__).'/reports/testPageReportsSystemInformation.php';
+require_once dirname(__FILE__).'/reports/testPageReportsTriggerTop.php';
+require_once dirname(__FILE__).'/reports/testFormScheduledReport.php';
+require_once dirname(__FILE__).'/reports/testPageScheduledReport.php';
+require_once dirname(__FILE__).'/reports/testScheduledReportPermissions.php';
 require_once dirname(__FILE__).'/testSID.php';
 
 class SeleniumTests {
@@ -238,6 +242,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageReportsActionLog');
 		$suite->addTestSuite('testPageReportsAudit');
 		$suite->addTestSuite('testPageReportsNotifications');
+		$suite->addTestSuite('testPageReportsSystemInformation');
 		$suite->addTestSuite('testPageReportsTriggerTop');
 		$suite->addTestSuite('testPageSearch');
 		$suite->addTestSuite('testPageStatusOfZabbix');
@@ -246,6 +251,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageUsers');
 		$suite->addTestSuite('testPageWeb');
 		$suite->addTestSuite('testPasswordComplexity');
+		$suite->addTestSuite('testExpandExpressionMacros');
 		$suite->addTestSuite('testFormAction');
 		$suite->addTestSuite('testFormAdministrationAuthenticationSaml');
 		$suite->addTestSuite('testFormAdministrationAuthenticationHttp');
@@ -351,6 +357,8 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardGraphWidget');
 		$suite->addTestSuite('testDashboardHostAvailabilityWidget');
 		$suite->addTestSuite('testDashboardProblemsBySeverityWidget');
+		$suite->addTestSuite('testDashboardSystemInformationWidget');
+		$suite->addTestSuite('testDashboardPages');
 		$suite->addTestSuite('testFormTemplateDashboards');
 		$suite->addTestSuite('testPageTemplateDashboards');
 		$suite->addTestSuite('testFormScheduledReport');
