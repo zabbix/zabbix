@@ -24,7 +24,6 @@
  */
 
 $this->includeJsFile('administration.gui.edit.js.php');
-$this->addJsFile('multiselect.js');
 
 $widget = (new CWidget())
 	->setTitle(_('GUI'))

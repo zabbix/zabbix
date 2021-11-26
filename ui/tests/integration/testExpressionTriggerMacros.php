@@ -137,7 +137,6 @@ class testExpressionTriggerMacros extends CIntegrationTest {
 					'esc_period' => 0,
 					'esc_step_from' => 1,
 					'esc_step_to' => 1,
-					'evaltype' => 0,
 					'operationtype' => OPERATION_TYPE_MESSAGE,
 					'opmessage' => [
 						'default_msg' => 0,
@@ -153,7 +152,6 @@ class testExpressionTriggerMacros extends CIntegrationTest {
 			'pause_suppressed' => 0,
 			'update_operations' => [
 				[
-					'evaltype' => 0,
 					'operationtype' => OPERATION_TYPE_MESSAGE,
 					'opmessage' => [
 						'default_msg' => 0,
@@ -168,7 +166,6 @@ class testExpressionTriggerMacros extends CIntegrationTest {
 			],
 			'recovery_operations' => [
 				[
-					'evaltype' => 0,
 					'operationtype' => OPERATION_TYPE_MESSAGE,
 					'opmessage' => [
 						'default_msg' => 0,

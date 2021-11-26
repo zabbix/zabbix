@@ -23,10 +23,6 @@
  * @var CView $this
  */
 
-$this->addJsFile('inputsecret.js');
-$this->addJsFile('textareaflexible.js');
-$this->addJsFile('macrovalue.js');
-
 $this->includeJsFile('administration.macros.edit.js.php');
 
 $widget = (new CWidget())

@@ -87,7 +87,6 @@ static int			shm_id;
 static zbx_mutex_t	sm_lock = ZBX_MUTEX_NULL;
 #endif
 
-extern char	*CONFIG_FILE;
 extern int	CONFIG_POLLER_FORKS;
 extern int	CONFIG_UNREACHABLE_POLLER_FORKS;
 extern int	CONFIG_IPMIPOLLER_FORKS;
@@ -311,13 +310,8 @@ void	free_selfmon_collector(void)
 
 	LOCK_SM;
 
+	(void)shmdt(collector);
 	collector = NULL;
-
-	if (-1 == shmctl(shm_id, IPC_RMID, 0))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot remove shared memory for self-monitoring collector: %s",
-				zbx_strerror(errno));
-	}
 
 	UNLOCK_SM;
 

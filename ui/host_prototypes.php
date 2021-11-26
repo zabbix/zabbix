@@ -26,9 +26,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of host prototypes');
 $page['file'] = 'host_prototypes.php';
-$page['scripts'] = ['effects.js', 'class.cviewswitcher.js', 'multiselect.js', 'textareaflexible.js',
-	'class.cverticalaccordion.js', 'inputsecret.js', 'macrovalue.js', 'class.tab-indicators.js'
-];
+$page['scripts'] = ['effects.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -531,6 +529,16 @@ if (hasRequest('form')) {
 		'linked_templates' => array_map('strval', $templateids),
 		'add_templates' => array_map('strval', array_keys($data['host_prototype']['add_templates']))
 	];
+
+	$data['groups_ms'] = [];
+
+	foreach ($data['groups'] as $group) {
+		$data['groups_ms'][] = [
+			'id' => $group['groupid'],
+			'name' => $group['name'],
+			'inaccessible' => (array_key_exists('inaccessible', $group) && $group['inaccessible'])
+		];
+	}
 
 	// Render view.
 	echo (new CView('configuration.host.prototype.edit', $data))->getOutput();

@@ -715,6 +715,9 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 		goto error;
 	}
 
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, ZBX_CURLOPT_ACCEPT_ENCODING, "")))
+		goto error;
+
 	for (i = 0; i < to_mails->values_num; i++)
 		recipients = curl_slist_append(recipients, ((zbx_mailaddr_t *)to_mails->values[i])->addr);
 

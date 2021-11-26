@@ -23,7 +23,6 @@
  * @var CView $this
  */
 
-$this->addJsFile('class.tab-indicators.js');
 $this->includeJsFile('administration.authentication.edit.js.php');
 
 // Authentication general, HTTP authentication and password policy fields.

@@ -24,7 +24,6 @@
  */
 
 $this->includeJsFile('administration.proxy.edit.js.php');
-$this->addJsFile('class.tab-indicators.js');
 
 $widget = (new CWidget())->setTitle(_('Proxies'));
 

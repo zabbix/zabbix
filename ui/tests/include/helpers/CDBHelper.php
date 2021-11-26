@@ -174,6 +174,24 @@ class CDBHelper {
 	}
 
 	/**
+	 * Get all values of database column.
+	 *
+	 * @param type $sql			 query to be executed
+	 * @param type $column		 column name
+	 *
+	 * @return array
+	 */
+	public static function getColumn($sql, $column) {
+		$data = [];
+
+		foreach (CDBHelper::getAll($sql) as $row) {
+			$data[] = $row[$column];
+		}
+
+		return $data;
+	}
+
+	/**
 	 * Get list of all referenced tables sorted by dependency level.
 	 *
 	 * For example: getTables($tables, 'users')
@@ -230,24 +248,32 @@ class CDBHelper {
 
 	/*
 	 * Saves data of the specified table and all dependent tables in temporary storage.
-	 * For example: backupTables('users')
+	 * For example: backupTables(['users'])
 	 */
-	public static function backupTables($top_table) {
+	public static function backupTables(array $top_tables) {
 		global $DB;
 
 		$tables = [];
-		static::getTables($tables, $top_table);
+		static::getTables($tables, $top_tables);
 		self::$backups[] = $tables;
 
 		$suffix = '_tmp'.count(self::$backups);
 
 		if ($DB['TYPE'] === ZBX_DB_POSTGRESQL) {
-
 			if ($DB['PASSWORD'] !== '') {
 				putenv('PGPASSWORD='.$DB['PASSWORD']);
 			}
 			$server = $DB['SERVER'] !== '' ? ' -h'.$DB['SERVER'] : '';
-			exec('pg_dump'.$server.' -U'.$DB['USER'].' -Fd -j5 -t'.implode(' -t', $tables).' '.$DB['DATABASE'].' -f '.PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].$suffix.'.dump');
+			$db_name = $DB['DATABASE'];
+			$file = PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].$suffix.'.dump';
+
+			exec('pg_dump'.$server.' -U'.$DB['USER'].' -Fd -j5 -t'.implode(' -t', $tables).' '.$db_name.' -f'.$file,
+				$output, $result_code
+			);
+
+			if ($result_code != 0) {
+				throw new Exception('Failed to backup "'.implode('", "', $top_tables).'".');
+			}
 		}
 		else {
 			foreach ($tables as $table) {
@@ -272,13 +298,26 @@ class CDBHelper {
 		$tables = array_pop(self::$backups);
 
 		if ($DB['TYPE'] === ZBX_DB_POSTGRESQL) {
-
 			if ($DB['PASSWORD'] !== '') {
 				putenv('PGPASSWORD='.$DB['PASSWORD']);
 			}
 			$server = $DB['SERVER'] !== '' ? ' -h'.$DB['SERVER'] : '';
-			exec('pg_restore'.$server.' -U'.$DB['USER'].' -Fd -j5 --clean -d '.$DB['DATABASE'].' '.PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].$suffix.'.dump');
-			exec('rm -rf '.PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].$suffix.'.dump');
+			$db_name = $DB['DATABASE'];
+			$file = PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].$suffix.'.dump';
+
+			exec('pg_restore'.$server.' -U'.$DB['USER'].' -Fd -j5 --clean -d '.$db_name.' '.$file, $output,
+				$result_code
+			);
+
+			if ($result_code != 0) {
+				throw new Exception('Failed to restore "'.$file.'".');
+			}
+
+			exec('rm -rf '.$file);
+
+			if ($result_code != 0) {
+				throw new Exception('Failed to remove "'.$file.'".');
+			}
 		}
 		else {
 			$result = DBselect('SELECT @@unique_checks,@@foreign_key_checks');

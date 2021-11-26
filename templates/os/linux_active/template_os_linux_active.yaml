@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-08-03T06:48:21Z'
+  version: '6.0'
+  date: '2021-10-27T15:21:13Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -13,7 +13,7 @@ zabbix_export:
       uuid: aa226119d3e94f53b9a2809f1d4ebaee
       template: 'Linux block devices by Zabbix agent active'
       name: 'Linux block devices by Zabbix agent active'
-      description: 'Template tooling version used: 0.38'
+      description: 'Template tooling version used: 0.39'
       groups:
         -
           name: Templates/Modules
@@ -343,7 +343,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387225-discussion-thread-for-official-zabbix-template-for-linux
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.39
       templates:
         -
           name: 'Linux block devices by Zabbix agent active'
@@ -358,7 +358,7 @@ zabbix_export:
         -
           name: 'Linux network interfaces by Zabbix agent active'
         -
-          name: 'Zabbix agent'
+          name: 'Zabbix agent active'
       groups:
         -
           name: 'Templates/Operating systems'
@@ -441,16 +441,16 @@ zabbix_export:
                   fields:
                     -
                       type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: INTEGER
                       name: columns
                       value: '1'
                     -
                       type: INTEGER
                       name: rows
                       value: '1'
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -465,16 +465,16 @@ zabbix_export:
                   fields:
                     -
                       type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: INTEGER
                       name: columns
                       value: '1'
                     -
                       type: INTEGER
                       name: rows
                       value: '1'
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -489,16 +489,16 @@ zabbix_export:
                   fields:
                     -
                       type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: INTEGER
                       name: columns
                       value: '1'
                     -
                       type: INTEGER
                       name: rows
                       value: '1'
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -513,16 +513,16 @@ zabbix_export:
                   fields:
                     -
                       type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: INTEGER
                       name: columns
                       value: '1'
                     -
                       type: INTEGER
                       name: rows
                       value: '1'
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -537,16 +537,16 @@ zabbix_export:
                   fields:
                     -
                       type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: INTEGER
                       name: columns
                       value: '1'
                     -
                       type: INTEGER
                       name: rows
                       value: '1'
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -557,7 +557,7 @@ zabbix_export:
       uuid: da53e44145304098b4c3ff749996e3e7
       template: 'Linux CPU by Zabbix agent active'
       name: 'Linux CPU by Zabbix agent active'
-      description: 'Template tooling version used: 0.38'
+      description: 'Template tooling version used: 0.39'
       groups:
         -
           name: Templates/Modules
@@ -822,7 +822,7 @@ zabbix_export:
       uuid: c626d864a2894d29a9d661d6025536ff
       template: 'Linux filesystems by Zabbix agent active'
       name: 'Linux filesystems by Zabbix agent active'
-      description: 'Template tooling version used: 0.38'
+      description: 'Template tooling version used: 0.39'
       groups:
         -
           name: Templates/Modules
@@ -1019,7 +1019,7 @@ zabbix_export:
       uuid: 7e4dc41320fd48bd97549025f4c3bcc6
       template: 'Linux generic by Zabbix agent active'
       name: 'Linux generic by Zabbix agent active'
-      description: 'Template tooling version used: 0.38'
+      description: 'Template tooling version used: 0.39'
       groups:
         -
           name: Templates/Modules
@@ -1126,7 +1126,7 @@ zabbix_export:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 12h
           tags:
             -
               tag: Application
@@ -1232,7 +1232,7 @@ zabbix_export:
           name: 'System description'
           type: ZABBIX_ACTIVE
           key: system.uname
-          delay: 1h
+          delay: 15m
           history: 2w
           trends: '0'
           value_type: CHAR
@@ -1241,7 +1241,7 @@ zabbix_export:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1d
+                - 12h
           tags:
             -
               tag: Application
@@ -1325,7 +1325,7 @@ zabbix_export:
       uuid: 5f577b9e34a8444c920e8199170f7fe6
       template: 'Linux memory by Zabbix agent active'
       name: 'Linux memory by Zabbix agent active'
-      description: 'Template tooling version used: 0.38'
+      description: 'Template tooling version used: 0.39'
       groups:
         -
           name: Templates/Modules
@@ -1374,7 +1374,7 @@ zabbix_export:
           key: 'vm.memory.size[available]'
           history: 7d
           units: B
-          description: 'Available memory, in Linux, available = free + buffers + cache. On other platforms calculation may vary. See also: https://www.zabbix.com/documentation/6.0/manual/appendix/items/vm.memory.size_params'
+          description: 'Available memory, in Linux, available = free + buffers + cache. On other platforms calculation may vary. See also Appendixes in Zabbix Documentation about parameters of the vm.memory.size item.'
           tags:
             -
               tag: Application
@@ -1387,7 +1387,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Available memory as percentage of total. See also: https://www.zabbix.com/documentation/6.0/manual/appendix/items/vm.memory.size_params'
+          description: 'Available memory as percentage of total. See also Appendixes in Zabbix Documentation about parameters of the vm.memory.size item.'
           tags:
             -
               tag: Application
@@ -1457,7 +1457,7 @@ zabbix_export:
         
           Description: High interface utilization trigger is removed since currently it is not possible to retrieve interface speed to determine the max bandwidth.
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.39
       groups:
         -
           name: Templates/Modules
@@ -1774,7 +1774,7 @@ zabbix_export:
           value: '^.*$'
         -
           macro: '{$NET.IF.IFNAME.NOT_MATCHES}'
-          value: '(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9a-z]+$|docker[0-9]+|br-[a-z0-9]{12})'
+          value: '(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9A-z]+$|docker[0-9]+|br-[a-z0-9]{12})'
           description: 'Filter out loopbacks, nulls, docker veth links and docker0 bridge by default'
       dashboards:
         -
@@ -1790,16 +1790,16 @@ zabbix_export:
                   fields:
                     -
                       type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: INTEGER
                       name: columns
                       value: '1'
                     -
                       type: INTEGER
                       name: rows
                       value: '1'
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
