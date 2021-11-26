@@ -544,11 +544,11 @@ abstract class CHostBase extends CApiService {
 		$result = DBselect(
 			'SELECT DISTINCT i.hostid AS ins_templateid,td.triggerid_down,ii.hostid'.
 			' FROM items i,functions f,trigger_depends td,functions ff,items ii,hosts h'.
-			' WHERE f.itemid=i.itemid'.
-				' AND td.triggerid_down=f.triggerid'.
-				' AND ff.triggerid=td.triggerid_up'.
-				' AND ii.itemid=ff.itemid'.
-				' AND h.hostid=ii.hostid'.
+			' WHERE i.itemid=f.itemid'.
+				' AND f.triggerid=td.triggerid_down'.
+				' AND td.triggerid_up=ff.triggerid'.
+				' AND ff.itemid=ii.itemid'.
+				' AND ii.hostid=h.hostid'.
 				' AND '.dbConditionInt('i.hostid', array_keys($ins_templates)).
 				' AND '.dbConditionInt('h.status', [HOST_STATUS_TEMPLATE])
 		);
@@ -623,10 +623,10 @@ abstract class CHostBase extends CApiService {
 			$result = DBselect(
 				'SELECT DISTINCT i.hostid AS ins_templateid,td.triggerid_down,ii.hostid'.
 				' FROM items i,functions f,trigger_depends td,functions ff,items ii'.
-				' WHERE f.itemid=i.itemid'.
-					' AND td.triggerid_up=f.triggerid'.
-					' AND ff.triggerid=td.triggerid_down'.
-					' AND ii.itemid=ff.itemid'.
+				' WHERE i.itemid=f.itemid'.
+					' AND f.triggerid=td.triggerid_up'.
+					' AND td.triggerid_down=ff.triggerid'.
+					' AND ff.itemid=ii.itemid'.
 					' AND '.dbConditionInt('i.hostid', array_keys($ins_templates)).
 					' AND '.dbConditionInt('ii.hostid', array_keys($hostids))
 			);
@@ -673,13 +673,11 @@ abstract class CHostBase extends CApiService {
 	protected function checkTriggerExpressionsOfInsTemplates(array $ins_templates): void {
 		$result = DBselect(
 			'SELECT DISTINCT i.hostid AS ins_templateid,f.triggerid,ii.hostid'.
-			' FROM items i,functions f,functions ff,items ii,hosts h'.
-			' WHERE f.itemid=i.itemid'.
-				' AND ff.triggerid=f.triggerid'.
-				' AND ii.itemid=ff.itemid'.
-				' AND h.hostid=ii.hostid'.
-				' AND '.dbConditionInt('i.hostid', array_keys($ins_templates)).
-				' AND '.dbConditionInt('h.status', [HOST_STATUS_TEMPLATE])
+			' FROM items i,functions f,functions ff,items ii'.
+			' WHERE i.itemid=f.itemid'.
+				' AND f.triggerid=ff.triggerid'.
+				' AND ff.itemid=ii.itemid'.
+				' AND '.dbConditionInt('i.hostid', array_keys($ins_templates))
 		);
 
 		while ($row = DBfetch($result)) {
