@@ -2120,30 +2120,30 @@ abstract class CHostGeneral extends CHostBase {
 
 				if (array_key_exists($templates, $data) || array_key_exists($templateids, $data)) {
 					$object['templates'] = [];
+
+					if (array_key_exists($templates, $data)) {
+						foreach ($data[$templates] as $template) {
+							$object['templates'][] = ['templateid' => $template['templateid']];
+						}
+					}
 				}
 
 				if (array_key_exists('templates_clear', $data) || array_key_exists('templateids_clear', $data)) {
 					$object['templates_clear'] = [];
-					$db_templates = array_column($db_object['templates'], null, 'templateid');
-				}
+					$db_templateids = array_column($db_object['templates'], 'templateid');
 
-				if (array_key_exists($templates, $data)) {
-					foreach ($data[$templates] as $template) {
-						$object['templates'][] = ['templateid' => $template['templateid']];
-					}
-				}
-
-				if (array_key_exists('templates_clear', $data)) {
-					foreach ($data['templates_clear'] as $template) {
-						if (array_key_exists($template['templateid'], $db_templates)) {
-							$object['templates_clear'][] = ['templateid' => $template['templateid']];
+					if (array_key_exists('templates_clear', $data)) {
+						foreach ($data['templates_clear'] as $template) {
+							if (in_array($template['templateid'], $db_templateids)) {
+								$object['templates_clear'][] = ['templateid' => $template['templateid']];
+							}
 						}
 					}
-				}
-				elseif (array_key_exists('templateids_clear', $data)) {
-					foreach ($data['templateids_clear'] as $templateid) {
-						if (array_key_exists($templateid, $db_templates)) {
-							$object['templates_clear'][] = ['templateid' => $templateid];
+					else {
+						foreach ($data['templateids_clear'] as $templateid) {
+							if (in_array($templateid, $db_templateids)) {
+								$object['templates_clear'][] = ['templateid' => $templateid];
+							}
 						}
 					}
 				}
