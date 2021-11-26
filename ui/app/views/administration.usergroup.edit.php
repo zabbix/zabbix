@@ -24,7 +24,6 @@
  */
 
 $this->includeJsFile('administration.usergroup.edit.js.php');
-$this->addJsFile('class.tab-indicators.js');
 
 $widget = (new CWidget())->setTitle(_('User groups'));
 
@@ -242,5 +241,3 @@ else {
 $form->addItem($tabs);
 $widget->addItem($form);
 $widget->show();
-
-$this->addJsFile('multiselect.js');

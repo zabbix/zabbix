@@ -37,7 +37,7 @@ extern zbx_uint64_t	CONFIG_VALUE_CACHE_SIZE;
 void	zbx_mock_test_entry(void **state)
 {
 	int				err, seconds, count, item_status, item_active_range, item_db_cached_from,
-					item_values_total, cache_mode;
+					item_values_total, cache_mode, ret_flush;
 	zbx_vector_history_record_t	expected, returned;
 	const char			*data;
 	char				*error;
@@ -89,7 +89,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_vector_ptr_create(&history);
 	zbx_vcmock_get_dc_history(zbx_mock_get_object_member_handle(handle, "values"), &history);
 
-	err = zbx_vc_add_values(&history);
+	err = zbx_vc_add_values(&history, &ret_flush);
 	data = zbx_mock_get_parameter_string("out.return");
 	zbx_mock_assert_int_eq("zbx_vc_add_values()", zbx_mock_str_to_return_code(data), err);
 

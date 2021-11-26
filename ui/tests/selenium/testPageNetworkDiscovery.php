@@ -74,6 +74,7 @@ class testPageNetworkDiscovery extends CLegacyWebTest {
 
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM drules WHERE druleid='.$drule['druleid']));
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM dchecks WHERE druleid='.$drule['druleid']));
+		$this->page->logout();
 	}
 
 	public function testPageNetworkDiscovery_MassDisableAll() {

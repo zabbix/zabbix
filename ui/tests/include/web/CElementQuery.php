@@ -552,9 +552,12 @@ class CElementQuery implements IWaitable {
 				'/div/ul[contains(@class, "radio-list-control")]' // TODO: remove after fix DEV-1071.
 			],
 			'CCheckboxListElement'		=> [
-				'/div/div[@class="columns-wrapper columns-3"]', // TODO: fix after DEV-1859
+				'/div/div[@class="columns-wrapper columns-3"]', // TODO: fix after DEV-1859.
 				'/ul[contains(@class, "checkbox-list")]',
 				'/ul[contains(@class, "list-check-radio")]'
+			],
+			'CHostInterfaceElement'		=> [
+				'/div/div[contains(@class, "interface-container")]/../..'
 			],
 			'CMultifieldTableElement'	=> [
 				'/table',
@@ -567,7 +570,7 @@ class CElementQuery implements IWaitable {
 			],
 			'CColorPickerElement'		=> '/div[contains(@class, "input-color-picker")]',
 			'CMultilineElement'			=> '/div[contains(@class, "multilineinput-control")]',
-			'CInputGroupElement'		=> '/div[contains(@class, "input-group")]'
+			'CInputGroupElement'		=> '/div[contains(@class, "macro-input-group")]'
 		];
 
 		if ($class !== null) {

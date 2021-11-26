@@ -228,7 +228,7 @@ class CFrontendSetup {
 		$current = [];
 
 		$databases = self::getSupportedDatabases();
-		foreach ($databases as $database => $name) {
+		foreach ($databases as $name) {
 			$current[] = $name;
 			$current[] = BR();
 		}

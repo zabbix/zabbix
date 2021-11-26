@@ -200,6 +200,36 @@ int	add_user_parameter(const char *itemkey, char *command, char *error, size_t m
 
 	return ret;
 }
+
+void	remove_user_parameters(void)
+{
+	int	i, usr = -1;
+
+	if (NULL == commands)
+		return;
+
+	for (i = 0; NULL != commands[i].key; i++)
+	{
+		if (0 != (CF_USERPARAMETER & commands[i].flags))
+		{
+			zbx_free(commands[i].key);
+			zbx_free(commands[i].test_param);
+
+			if (0 > usr)
+				usr = i;
+		}
+	}
+
+	if (0 < usr)
+	{
+		commands = (ZBX_METRIC *)zbx_realloc(commands, ((unsigned int)usr + 1) * sizeof(ZBX_METRIC));
+		memset(&commands[usr], 0, sizeof(ZBX_METRIC));
+	}
+	else if (0 == usr)
+	{
+		zbx_free(commands);
+	}
+}
 #endif
 
 void	init_metrics(void)
@@ -1746,38 +1776,6 @@ static int	deserialize_agent_result(char *data, AGENT_RESULT *result)
 
 /******************************************************************************
  *                                                                            *
- * Function: write_all                                                        *
- *                                                                            *
- * Purpose: call write in a loop, iterating until all the data is written.    *
- *                                                                            *
- * Parameters: fd      - [IN] descriptor                                      *
- *             buf     - [IN] buffer to write                                 *
- *             n       - [IN] bytes count to write                            *
- *                                                                            *
- * Return value: SUCCEED - n bytes successfully written                       *
- *               FAIL    - less than n bytes are written                      *
- *                                                                            *
- ******************************************************************************/
-static int	write_all(int fd, const char *buf, size_t n)
-{
-	ssize_t	ret;
-
-	while (0 < n)
-	{
-		if (-1 != (ret = write(fd, buf, n)))
-		{
-			buf += ret;
-			n -= ret;
-		}
-		else if (EINTR != errno)
-			return FAIL;
-	}
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: zbx_execute_threaded_metric                                      *
  *                                                                            *
  * Purpose: execute metric in a separate process/thread so it can be          *
@@ -1830,7 +1828,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 		ret = metric_func(request, result);
 		serialize_agent_result(&data, &data_alloc, &data_offset, ret, result);
 
-		ret = write_all(fds[1], data, data_offset);
+		ret = zbx_write_all(fds[1], data, data_offset);
 
 		zbx_free(data);
 		free_result(result);
@@ -2077,3 +2075,51 @@ void	zbx_mpoints_free(zbx_mpoint_t *mpoint)
 {
 	zbx_free(mpoint);
 }
+
+#ifndef _WINDOWS
+int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *hostname)
+{
+	char	*type, *transform;
+
+	type = get_rparam(request, 0);
+	transform = get_rparam(request, 1);
+
+	if (NULL != type && '\0' != *type && 0 != strcmp(type, "host"))
+	{
+		if (0 == strcmp(type, "shorthost"))
+		{
+			char	*dot;
+
+			if (NULL != (dot = strchr(hostname, '.')))
+				*dot = '\0';
+		}
+		else if (0 == strcmp(type, "netbios"))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "NetBIOS is not supported on the current platform."));
+			return FAIL;
+		}
+		else
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
+			return FAIL;
+		}
+	}
+
+	if (NULL != transform && '\0' != *transform && 0 != strcmp(transform, "none"))
+	{
+		if (0 == strcmp(transform, "lower"))
+		{
+			zbx_strlower(hostname);
+		}
+		else
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+			return FAIL;
+		}
+	}
+
+	SET_STR_RESULT(result, hostname);
+
+	return SUCCEED;
+}
+#endif

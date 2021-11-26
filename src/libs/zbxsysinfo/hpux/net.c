@@ -64,7 +64,6 @@ static int	get_if_names(char **if_list, size_t *if_list_alloc, size_t *if_list_o
 {
 	int			s, ifreq_size, numifs, i, family = AF_INET;
 	struct sockaddr		*from;
-	size_t			fromlen;
 	u_char			*buffer = NULL;
 	struct ifconf		ifc;
 	struct ifreq		*ifr;
@@ -145,6 +144,11 @@ next:
 end:
 	zbx_free(buffer);
 	close(s);
+#else
+	ZBX_UNUSED(numifs);
+	ZBX_UNUSED(i);
+	ZBX_UNUSED(lifc);
+	ZBX_UNUSED(lifr);
 #endif
 	return SUCCEED;
 }

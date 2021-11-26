@@ -331,7 +331,7 @@ static void	zbx_socket_free(zbx_socket_t *s)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_socket_timeout_set(zbx_socket_t *s, int timeout)
+void	zbx_socket_timeout_set(zbx_socket_t *s, int timeout)
 {
 	s->timeout = timeout;
 #ifdef _WINDOWS
@@ -402,7 +402,6 @@ static int	zbx_socket_connect(zbx_socket_t *s, const struct sockaddr *addr, sock
 #ifdef _WINDOWS
 	u_long		mode = 1;
 	FD_SET		fdw, fde;
-	int		res;
 	struct timeval	tv, *ptv;
 #endif
 	if (0 != timeout)
@@ -436,7 +435,7 @@ static int	zbx_socket_connect(zbx_socket_t *s, const struct sockaddr *addr, sock
 		return FAIL;
 	}
 
-	if (-1 == (res = select(0, NULL, &fdw, &fde, ptv)))
+	if (-1 == select(0, NULL, &fdw, &fde, ptv))
 	{
 		*error = zbx_strdup(*error, strerror_from_system(zbx_socket_last_error()));
 		return FAIL;
@@ -1401,6 +1400,14 @@ out:
 }
 #endif	/* HAVE_IPV6 */
 
+void	zbx_tcp_unlisten(zbx_socket_t *s)
+{
+	int	i;
+
+	for (i = 0; i < s->num_socks; i++)
+		zbx_socket_close(s->sockets[i]);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tcp_accept                                                   *
@@ -1783,8 +1790,11 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout, unsigned char flags)
 	zbx_uint64_t	expected_len = 16 * ZBX_MEBIBYTE, reserved = 0, max_len;
 	unsigned char	expect = ZBX_TCP_EXPECT_HEADER;
 	int		protocol_version;
-
+#if defined(_WINDOWS)
+	max_len = ZBX_MAX_RECV_DATA_SIZE;
+#else
 	max_len = 0 != (flags & ZBX_TCP_LARGE) ? ZBX_MAX_RECV_LARGE_DATA_SIZE : ZBX_MAX_RECV_DATA_SIZE;
+#endif
 
 	if (0 != timeout)
 		zbx_socket_timeout_set(s, timeout);

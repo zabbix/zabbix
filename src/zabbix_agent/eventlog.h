@@ -182,17 +182,15 @@ EVT_VARIANT_TYPE;
 
 
 
-int			process_eventslog(const char *server, unsigned short port, const char *eventlog_name,
-			zbx_vector_ptr_t *regexps, const char *pattern, const char *key_severity,
-			const char *key_source, const char *key_logeventid, int rate,
-			zbx_process_value_func_t process_value_cb, ZBX_ACTIVE_METRIC *metric,
+int			process_eventslog(zbx_vector_ptr_t *addrs, const char *eventlog_name, zbx_vector_ptr_t *regexps,
+			const char *pattern, const char *key_severity, const char *key_source, const char *key_logeventid,
+			int rate, zbx_process_value_func_t process_value_cb, ZBX_ACTIVE_METRIC *metric,
 			zbx_uint64_t *lastlogsize_sent, char **error);
-int			process_eventslog6(const char *server, unsigned short port, const char *eventlog_name,
-			EVT_HANDLE *render_context, EVT_HANDLE *query, zbx_uint64_t lastlogsize, zbx_uint64_t FirstID,
-			zbx_uint64_t LastID, zbx_vector_ptr_t *regexps, const char *pattern, const char *key_severity,
-			const char *key_source, const char *key_logeventid, int rate,
-			zbx_process_value_func_t process_value_cb, ZBX_ACTIVE_METRIC *metric,
-			zbx_uint64_t *lastlogsize_sent, char **error);
+int			process_eventslog6(zbx_vector_ptr_t *addrs, const char *eventlog_name, EVT_HANDLE *render_context,
+			EVT_HANDLE *query, zbx_uint64_t lastlogsize, zbx_uint64_t FirstID, zbx_uint64_t LastID,
+			zbx_vector_ptr_t *regexps, const char *pattern, const char *key_severity, const char *key_source,
+			const char *key_logeventid, int rate, zbx_process_value_func_t process_value_cb,
+			ZBX_ACTIVE_METRIC *metric, zbx_uint64_t *lastlogsize_sent, char **error);
 int			initialize_eventlog6(const char *source, zbx_uint64_t *lastlogsize, zbx_uint64_t *FirstID,
 			zbx_uint64_t *LastID, EVT_HANDLE *render_context, EVT_HANDLE *query, char **error);
 int			finalize_eventlog6(EVT_HANDLE *render_context, EVT_HANDLE *query);

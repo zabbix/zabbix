@@ -704,25 +704,26 @@ static int	zbx_soap_post(const char *fn_parent, CURL *easyhandle, const char *re
 	if (NULL != fn_parent)
 		zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", fn_parent, resp->data);
 
-	if (SUCCEED != zbx_xml_try_read_value(resp->data, resp->offset, ZBX_XPATH_FAULTSTRING(), &doc, &val, error))
+	if (SUCCEED == zbx_xml_try_read_value(resp->data, resp->offset, ZBX_XPATH_FAULTSTRING(), &doc, &val, error))
 	{
-		ret = FAIL;
-	}
-	else if (NULL != val)
-	{
-		zbx_free(*error);
-		*error = val;
-		ret = FAIL;
-	}
+		if (NULL != val)
+		{
+			zbx_free(*error);
+			*error = val;
+			ret = FAIL;
+		}
 
-	if (NULL != xdoc)
-	{
-		*xdoc = doc;
+		if (NULL != xdoc)
+		{
+			*xdoc = doc;
+		}
+		else
+		{
+			zbx_xml_free_doc(doc);
+		}
 	}
 	else
-	{
-		zbx_xml_free_doc(doc);
-	}
+		ret = FAIL;
 
 	return ret;
 }
@@ -2038,7 +2039,8 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_URL, service->url)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_TIMEOUT,
 					(long)CONFIG_VMWARE_TIMEOUT)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYHOST, 0L)))
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYHOST, 0L)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = ZBX_CURLOPT_ACCEPT_ENCODING, "")))
 	{
 		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
 		goto out;
@@ -2242,6 +2244,12 @@ static	int	vmware_service_get_contents(CURL *easyhandle, char **version, char **
 	*fullname = zbx_xml_read_doc_value(doc, ZBX_XPATH_VMWARE_ABOUT("fullName"));
 	zbx_xml_free_doc(doc);
 
+	if (NULL == *version)
+	{
+		*error = zbx_strdup(*error, "VMware Virtual Center is not ready.");
+		return FAIL;
+	}
+
 	return SUCCEED;
 
 #	undef ZBX_POST_VMWARE_CONTENTS
@@ -2383,6 +2391,8 @@ static int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL 
 			unit = ZBX_VMWARE_UNIT_TERABYTES;					\
 		else if (0 == strcmp("watt",val))						\
 			unit = ZBX_VMWARE_UNIT_WATT;						\
+		else if (0 == strcmp("celsius",val))						\
+			unit = ZBX_VMWARE_UNIT_CELSIUS;						\
 		else										\
 			unit = ZBX_VMWARE_UNIT_UNDEFINED
 
@@ -2485,9 +2495,7 @@ static int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL 
 
 	ret = SUCCEED;
 clean:
-	if (NULL != xpathObj)
-		xmlXPathFreeObject(xpathObj);
-
+	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
 out:
 	zbx_xml_free_doc(doc);
@@ -2553,9 +2561,7 @@ static void	vmware_vm_get_nic_devices(zbx_vmware_vm_t *vm, xmlDoc *details)
 		nics++;
 	}
 clean:
-	if (NULL != xpathObj)
-		xmlXPathFreeObject(xpathObj);
-
+	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() found:%d", __func__, nics);
 }
@@ -2672,8 +2678,7 @@ static void	vmware_vm_get_disk_devices(zbx_vmware_vm_t *vm, xmlDoc *details)
 		}
 		while (0);
 
-		if (NULL != xpathObjController)
-			xmlXPathFreeObject(xpathObjController);
+		xmlXPathFreeObject(xpathObjController);
 
 		zbx_free(controllerLabel);
 		zbx_free(scsiCtlrUnitNumber);
@@ -2750,9 +2755,7 @@ static void	vmware_vm_get_file_systems(zbx_vmware_vm_t *vm, xmlDoc *details)
 		zbx_vector_ptr_append(&vm->file_systems, fs);
 	}
 clean:
-	if (NULL != xpathObj)
-		xmlXPathFreeObject(xpathObj);
-
+	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() found:%d", __func__, vm->file_systems.values_num);
 }
@@ -3082,9 +3085,7 @@ static int	vmware_service_get_diskextents_list(xmlDoc *doc, zbx_vector_vmware_di
 
 	ret = SUCCEED;
 out:
-	if (NULL != xpathObj)
-		xmlXPathFreeObject(xpathObj);
-
+	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
 
 	return ret;
@@ -3492,7 +3493,7 @@ static int	vmware_service_hv_get_multipath_data(const zbx_vmware_service_t *serv
 		"<ns0:pathSet>config.storageDevice.scsiLun[\"%s\"].canonicalName</ns0:pathSet>"
 
 	zbx_vector_str_t	scsi_luns;
-	char			*tmp = NULL, *scsi_req = NULL, *hvid_esc;
+	char			*scsi_req = NULL;
 	int			i, ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hvid:'%s'", __func__, hvid);
@@ -3501,27 +3502,28 @@ static int	vmware_service_hv_get_multipath_data(const zbx_vmware_service_t *serv
 	zbx_xml_read_values(hv_data, ZBX_XPATH_HV_SCSI_TOPOLOGY, &scsi_luns);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() count of scsiLun:%d", __func__, scsi_luns.values_num);
 
-	if (0 == scsi_luns.values_num)
-	{
-		ret = SUCCEED;
-		goto out;
-	}
-
 	for (i = 0; i < scsi_luns.values_num; i++)
 	{
 		scsi_req = zbx_strdcatf(scsi_req , ZBX_POST_SCSI_INFO, scsi_luns.values[i]);
 	}
 
-	zbx_vector_str_clear_ext(&scsi_luns, zbx_str_free);
-	hvid_esc = xml_escape_dyn(hvid);
-	tmp = zbx_dsprintf(tmp, ZBX_POST_HV_MP_DETAILS,
-			vmware_service_objects[service->type].property_collector, scsi_req, hvid_esc);
-	zbx_free(hvid_esc);
-	zbx_free(scsi_req);
+	if (0 != scsi_luns.values_num)
+	{
+		char	*tmp, *hvid_esc;
 
-	ret = zbx_soap_post(__func__, easyhandle, tmp, xdoc, error);
-out:
-	zbx_free(tmp);
+		zbx_vector_str_clear_ext(&scsi_luns, zbx_str_free);
+		hvid_esc = xml_escape_dyn(hvid);
+		tmp = zbx_dsprintf(NULL, ZBX_POST_HV_MP_DETAILS,
+				vmware_service_objects[service->type].property_collector, scsi_req, hvid_esc);
+		zbx_free(hvid_esc);
+		zbx_free(scsi_req);
+
+		ret = zbx_soap_post(__func__, easyhandle, tmp, xdoc, error);
+		zbx_free(tmp);
+	}
+	else
+		ret = SUCCEED;
+
 	zbx_vector_str_destroy(&scsi_luns);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -3651,9 +3653,7 @@ static zbx_uint64_t	vmware_hv_get_ds_access(xmlDoc *xdoc, const char *ds_id)
 		zabbix_log(LOG_LEVEL_DEBUG, "Cannot find item 'accessMode' in mountinfo for DS:%s", ds_id);
 
 clean:
-	if (NULL != xpathObj)
-		xmlXPathFreeObject(xpathObj);
-
+	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() mountinfo:" ZBX_FS_UI64, __func__, mi_access);
 
@@ -4614,9 +4614,7 @@ static int	vmware_service_parse_event_data(zbx_vector_ptr_t *events, zbx_uint64_
 
 	zbx_vector_id_xmlnode_destroy(&ids);
 clean:
-	if (NULL != xpathObj)
-		xmlXPathFreeObject(xpathObj);
-
+	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
 	is_clear = is_prop;
 
@@ -4838,9 +4836,7 @@ static int	vmware_service_get_last_event_data(const zbx_vmware_service_t *servic
 
 	ret = SUCCEED;
 clean:
-	if (NULL != xpathObj)
-		xmlXPathFreeObject(xpathObj);
-
+	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
 out:
 	zbx_xml_free_doc(doc);
@@ -5884,9 +5880,7 @@ static int	vmware_service_process_perf_entity_data(zbx_vmware_perf_data_t *perfd
 	}
 
 out:
-	if (NULL != xpathObj)
-		xmlXPathFreeObject(xpathObj);
-
+	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() values:%d", __func__, values);
@@ -5945,9 +5939,7 @@ static void	vmware_service_parse_perf_data(zbx_vector_ptr_t *perfdata, xmlDoc *x
 			vmware_free_perfdata(data);
 	}
 clean:
-	if (NULL != xpathObj)
-		xmlXPathFreeObject(xpathObj);
-
+	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -6637,11 +6629,16 @@ out:
 void	zbx_vmware_destroy(void)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	if (NULL != vmware_mem)
+	{
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
-	zbx_hashset_destroy(&vmware->strpool);
-	zbx_hashset_destroy(&evt_msg_strpool);
+		zbx_hashset_destroy(&vmware->strpool);
+		zbx_hashset_destroy(&evt_msg_strpool);
 #endif
-	zbx_mutex_destroy(&vmware_lock);
+		zbx_mem_destroy(vmware_mem);
+		vmware_mem = NULL;
+		zbx_mutex_destroy(&vmware_lock);
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -6950,9 +6947,7 @@ static int	zbx_xml_try_read_value(const char *data, size_t len, const char *xpat
 		xmlFree(val);
 	}
 clean:
-	if (NULL != xpathObj)
-		xmlXPathFreeObject(xpathObj);
-
+	xmlXPathFreeObject(xpathObj);
 	xmlSetStructuredErrorFunc(NULL, NULL);
 	xmlXPathFreeContext(xpathCtx);
 	xmlResetLastError();
@@ -7006,9 +7001,7 @@ static char	*zbx_xml_read_node_value(xmlDoc *doc, xmlNode *node, const char *xpa
 		xmlFree(val);
 	}
 clean:
-	if (NULL != xpathObj)
-		xmlXPathFreeObject(xpathObj);
-
+	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
 
 	return value;
@@ -7119,9 +7112,7 @@ static int	zbx_xml_read_values(xmlDoc *xdoc, const char *xpath, zbx_vector_str_t
 
 	ret = SUCCEED;
 clean:
-	if (NULL != xpathObj)
-		xmlXPathFreeObject(xpathObj);
-
+	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
 out:
 	return ret;

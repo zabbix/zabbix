@@ -668,7 +668,7 @@ class CMediatype extends CApiService {
 					if ($upd_param) {
 						$upd_params[] = [
 							'values' => $upd_param,
-							'where' => ['mediatype_paramid' => $upd_param['mediatype_paramid']]
+							'where' => ['mediatype_paramid' => $param['mediatype_paramid']]
 						];
 					}
 				}

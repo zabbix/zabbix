@@ -67,11 +67,20 @@ switch ($data['method']) {
 	case 'zabbix.status':
 		if (!CSessionHelper::has('serverCheckResult')
 				|| (CSessionHelper::get('serverCheckTime') + SERVER_CHECK_INTERVAL) <= time()) {
-			$zabbixServer = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
-				timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
-				timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::SOCKET_TIMEOUT)), 0
-			);
-			CSessionHelper::set('serverCheckResult', $zabbixServer->isRunning(CSessionHelper::getId()));
+
+			if ($ZBX_SERVER === null && $ZBX_SERVER_PORT === null) {
+				$is_running = false;
+			}
+			else {
+				$zabbix_server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
+					timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
+					timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::SOCKET_TIMEOUT)), 0
+				);
+
+				$is_running = $zabbix_server->isRunning(CSessionHelper::getId());
+			}
+
+			CSessionHelper::set('serverCheckResult', $is_running);
 			CSessionHelper::set('serverCheckTime', time());
 		}
 

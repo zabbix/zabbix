@@ -76,6 +76,11 @@ Perform administrative functions according to \fIruntime\-option\fR.
 Runtime control options
 .RS 4
 .TP 4
+\fBuserparameter_reload
+Reload user parameters from the configuration file
+.RE
+.RS 4
+.TP 4
 \fBlog_level_increase\fR[=\fItarget\fR]
 Increase log level, affects all processes if target is not specified
 .RE
