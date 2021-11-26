@@ -904,7 +904,7 @@ class CTemplate extends CHostGeneral {
 
 			$this->massAddAffectedObjects('templates', $templateids, $db_templates);
 
-			$this->massCheckTemplatesLinks($templateids, [], $db_templates);
+			$this->massCheckTemplatesLinks('massadd', $templateids, $db_templates);
 		}
 	}
 
@@ -1059,10 +1059,10 @@ class CTemplate extends CHostGeneral {
 				}
 
 				if (array_key_exists('templates_link', $data)) {
-					$this->massCheckTemplatesLinks($templateids_link, [], $db_templates, true);
+					$this->massCheckTemplatesLinks('massupdate', $templateids_link, $db_templates);
 				}
 				else {
-					$this->massCheckTemplatesLinks([], $templateids_clear, $db_templates);
+					$this->massCheckTemplatesLinks('massremove', $templateids_clear, $db_templates);
 				}
 			}
 		}
@@ -1147,7 +1147,7 @@ class CTemplate extends CHostGeneral {
 
 			$this->massAddAffectedObjects('templates', $templateids, $db_templates);
 
-			$this->massCheckTemplatesLinks([], $templateids, $db_templates);
+			$this->massCheckTemplatesLinks('massremove', $templateids, $db_templates);
 		}
 	}
 

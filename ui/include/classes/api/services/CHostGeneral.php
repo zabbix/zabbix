@@ -152,13 +152,11 @@ abstract class CHostGeneral extends CHostBase {
 	/**
 	 * Check templates links for given data of mass API methods.
 	 *
-	 * @param array $templateids_link
-	 * @param array $templateids_unlink
-	 * @param array $db_hosts
-	 * @param bool  $replace
+	 * @param string $method
+	 * @param array  $templateids
+	 * @param array  $db_hosts
 	 */
-	protected function massCheckTemplatesLinks(array $templateids_link, array $templateids_unlink,
-			array $db_hosts, bool $replace = false): void {
+	protected function massCheckTemplatesLinks(string $method, array $templateids, array $db_hosts): void {
 		$ins_templates = [];
 		$del_links = [];
 		$check_double_linkage = false;
@@ -167,35 +165,37 @@ abstract class CHostGeneral extends CHostBase {
 		foreach ($db_hosts as $hostid => $db_host) {
 			$db_templateids = array_column($db_host['templates'], 'templateid');
 
-			if ($replace) {
-				$templateids = $templateids_link;
+			if ($method === 'massadd') {
+				$_templateids = array_diff($templateids, $db_templateids);
 			}
-			elseif ($templateids_link) {
-				$templateids = array_diff($templateids_link, $db_templateids);
+			elseif ($method === 'massremove') {
+				$_templateids = array_diff($db_templateids, $templateids);
 			}
 			else {
-				$templateids = array_diff($db_templateids, $templateids_unlink);
+				$_templateids = $templateids;
 			}
 
-			$permitted_templateids = $templateids;
+			$permitted_templateids = $_templateids;
 			$templates_count = count($permitted_templateids);
 			$upd_templateids = [];
 
 			if (array_key_exists('nopermissions_templates', $db_host)) {
 				foreach ($db_host['nopermissions_templates'] as $db_template) {
-					$templateids[] = $db_template['templateid'];
+					$_templateids[] = $db_template['templateid'];
 					$templates_count++;
 					$upd_templateids[] = $db_template['templateid'];
 				}
 			}
 
 			foreach ($permitted_templateids as $templateid) {
-				if (in_array($templateid, $db_templateids)) {
+				$index = array_search($templateid, $db_templateids);
+
+				if ($index !== false) {
 					$upd_templateids[] = $templateid;
-					unset($db_templateids[$templateid]);
+					unset($db_templateids[$index]);
 				}
 				else {
-					$ins_templates[$templateid][$hostid] = $templateids;
+					$ins_templates[$templateid][$hostid] = $_templateids;
 
 					if ($this instanceof CTemplate || $templates_count > 1) {
 						$check_double_linkage = true;
@@ -2051,7 +2051,7 @@ abstract class CHostGeneral extends CHostBase {
 				}
 				else {
 					if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN
-							|| array_key_exists($db_hosts[$id_field_name], $permitted_templates)) {
+							|| array_key_exists($link['templateid'], $permitted_templates)) {
 						$db_hosts[$link['hostid']]['templates'][$link['hosttemplateid']] =
 							array_diff_key($link, array_flip(['hostid']));
 					}
