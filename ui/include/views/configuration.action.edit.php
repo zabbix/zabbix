@@ -159,13 +159,6 @@ if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL
 	);
 }
 
-if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-	$operation_tab->addRow(_('Pause operations for suppressed problems'),
-		(new CCheckBox('pause_suppressed', ACTION_PAUSE_SUPPRESSED_TRUE))
-			->setChecked($data['action']['pause_suppressed'] == ACTION_PAUSE_SUPPRESSED_TRUE)
-	);
-}
-
 // create operation table
 $operations_table = (new CTable())
 	->setId('op-table')
@@ -470,6 +463,18 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 		(new CDiv($operations_table))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+	);
+}
+
+if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
+	$operation_tab->addRow(_('Pause operations for suppressed problems'),
+		(new CCheckBox('pause_suppressed', ACTION_PAUSE_SUPPRESSED_TRUE))
+			->setChecked($data['action']['pause_suppressed'] == ACTION_PAUSE_SUPPRESSED_TRUE)
+	);
+
+	$operation_tab->addRow(_('Notify about canceled escalations'),
+		(new CCheckBox('notify_if_canceled', ACTION_NOTIFY_IF_CANCELED_TRUE))
+			->setChecked($data['action']['notify_if_canceled'] == ACTION_NOTIFY_IF_CANCELED_TRUE)
 	);
 }
 
