@@ -102,6 +102,12 @@ div.dashboard-grid-widget-item {
 			border: none;
 		}
 
+		@if $theme-name == 'hc-dark' or $theme-name == 'hc-light' {
+			&:link {
+				border-bottom: none;
+			}
+		}
+
 		> div {
 			display: flex;
 			flex: 1 1 calc(100% / 3);

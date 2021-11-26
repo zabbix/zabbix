@@ -1451,6 +1451,8 @@ div.dashboard-grid-widget-item {
     color: inherit; }
     div.dashboard-grid-widget-item a:focus, div.dashboard-grid-widget-item a:hover, div.dashboard-grid-widget-item a:visited {
       border: none; }
+    div.dashboard-grid-widget-item a:link {
+      border-bottom: none; }
     div.dashboard-grid-widget-item a > div {
       display: flex;
       flex: 1 1 calc(100% / 3); }
