@@ -36,9 +36,9 @@ class testPageMonitoringServices extends CWebTest {
 	const LAYOUT_PARENT = 'Server 3';
 	const LAYOUT_CHILD = 'Server 2';
 	const LAYOUT_CHILD2 = 'Server 1';
-	const BREADCRUMB_SELECTOR = 'xpath://ul[@class="breadcrumbs"]';
 
-	private $table_selector = 'id:service-list';
+	const BREADCRUMB_SELECTOR = 'xpath://ul[@class="breadcrumbs"]';
+	const TABLE_SELECTOR = 'id:service-list';
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -324,7 +324,7 @@ class testPageMonitoringServices extends CWebTest {
 		$this->page->assertHeader('Services');
 
 		// Labels on columns at services list.
-		$table = $this->query($this->table_selector)->asTable()->one();
+		$table = $this->query(self::TABLE_SELECTOR)->asTable()->one();
 		$this->assertSame(['Name', 'Status', 'Root cause', 'SLA', 'Tags'], $table->getHeadersText());
 
 		// Check that service buttons are not present in the table row.
@@ -368,7 +368,7 @@ class testPageMonitoringServices extends CWebTest {
 
 		$this->assertTrue($this->query('button:Create service')->one()->isVisible());
 
-		$table = $this->query($this->table_selector)->asTable()->one();
+		$table = $this->query(self::TABLE_SELECTOR)->asTable()->one();
 		$this->assertSame(['', 'Name', 'Status', 'Root cause', 'SLA', 'Tags', ''], $table->getHeadersText());
 
 		$this->checkServiceButtons($table->getRow(rand(0,13)), true);
@@ -795,7 +795,7 @@ class testPageMonitoringServices extends CWebTest {
 
 		// Check breadcrumbs and table headers.
 		$selector = $this->query(self::BREADCRUMB_SELECTOR);
-		$table = $this->query($this->table_selector)->asTable()->one();
+		$table = $this->query(self::TABLE_SELECTOR)->asTable()->one();
 		if (CTestArrayHelper::get($data, 'check_breadcrumbs')) {
 			$this->assertTrue($selector->one()->query('link:All services')->one()->isClickable());
 			$this->assertTrue($selector->query('xpath://span[@class="selected" and text()="Filter results"]')->exists());
@@ -825,7 +825,7 @@ class testPageMonitoringServices extends CWebTest {
 	public function testPageMonitoringServices_ResetButton() {
 		$this->page->login()->open('zabbix.php?action=service.list');
 
-		$table = $this->query($this->table_selector)->asTable()->one();
+		$table = $this->query(self::TABLE_SELECTOR)->asTable()->one();
 		$form = $this->query('name:zbx_filter')->one()->asForm();
 
 		// Check table contents before filtering.
@@ -871,7 +871,7 @@ class testPageMonitoringServices extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=service.list.edit');
 
-		$table = $this->query($this->table_selector)->asTable()->one();
+		$table = $this->query(self::TABLE_SELECTOR)->asTable()->one();
 		$before_rows_count = $table->getRows()->count();
 		$this->assertTableStats($before_rows_count);
 
@@ -900,7 +900,7 @@ class testPageMonitoringServices extends CWebTest {
 		$name = 'Server 7 for delete';
 
 		$this->page->login()->open('zabbix.php?action=service.list.edit');
-		$table = $this->query($this->table_selector)->asTable()->one();
+		$table = $this->query(self::TABLE_SELECTOR)->asTable()->one();
 
 		$before_rows_count = $table->getRows()->count();
 		$this->assertTableStats($before_rows_count);
@@ -926,7 +926,7 @@ class testPageMonitoringServices extends CWebTest {
 		$name = 'Server 10 child for Server 8';
 
 		$this->page->login()->open('zabbix.php?action=service.list.edit');
-		$table = $this->query($this->table_selector)->asTable()->one();
+		$table = $this->query(self::TABLE_SELECTOR)->asTable()->one();
 
 		$before_rows_count = $table->getRows()->count();
 		$this->assertTableStats($before_rows_count);
@@ -962,7 +962,7 @@ class testPageMonitoringServices extends CWebTest {
 		$child = 'Server 11 child for Server 9';
 
 		$this->page->login()->open('zabbix.php?action=service.list.edit');
-		$table = $this->query($this->table_selector)->asTable()->one();
+		$table = $this->query(self::TABLE_SELECTOR)->asTable()->one();
 
 		$before_rows_count = $table->getRows()->count();
 		$this->assertTableStats($before_rows_count);
@@ -1003,7 +1003,7 @@ class testPageMonitoringServices extends CWebTest {
 		];
 
 		$this->page->login()->open('zabbix.php?action=service.list.edit');
-		$table = $this->query($this->table_selector)->asTable()->one();
+		$table = $this->query(self::TABLE_SELECTOR)->asTable()->one();
 		$before_rows_count = $table->getRows()->count();
 		$this->assertTableStats($before_rows_count);
 
@@ -1035,7 +1035,7 @@ class testPageMonitoringServices extends CWebTest {
 		$remained = 'Child for mass deleting 3';
 
 		$this->page->login()->open('zabbix.php?action=service.list.edit');
-		$table = $this->query($this->table_selector)->asTable()->one();
+		$table = $this->query(self::TABLE_SELECTOR)->asTable()->one();
 
 		// Open parent service info.
 		$table->findRow('Name', $parent, true)->query('link', $parent)->waitUntilClickable()->one()->click();
