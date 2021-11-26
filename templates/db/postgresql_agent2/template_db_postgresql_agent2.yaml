@@ -619,7 +619,7 @@ zabbix_export:
           trends: '0'
           status: DISABLED
           value_type: TEXT
-          description: 'Execute custom queries from file *.sql'
+          description: 'Execute custom queries from file *.sql (check for option Plugins.Postgres.CustomQueriesPath at agent configuration)'
           tags:
             -
               tag: Application
