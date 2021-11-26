@@ -1001,6 +1001,13 @@ class testCalculatedFormula extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
+					'formula' => 'changecount(/host/key,5y)',
+					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "changecount".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
 					'formula' => 'changecount(5w)',
 					'error' => 'Invalid parameter "/1/params": incorrect usage of function "changecount".'
 				]
