@@ -1642,6 +1642,8 @@ function get_item_function_info(string $expr) {
 
 	$hist_functions = [
 		'avg' => $rules['numeric_as_float'],
+		'baselinedev' => $rules['numeric_as_float'],
+		'baselinewma' => $rules['numeric_as_float'],
 		'change' => $rules['numeric'] + $rules['string_as_0or1'],
 		'count' => $rules['numeric_as_uint'] + $rules['string_as_uint'],
 		'changecount' => $rules['numeric_as_uint'] + $rules['string_as_uint'],
