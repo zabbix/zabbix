@@ -41,7 +41,7 @@ class testPageMonitoringServicesMassUpdate extends CWebTest {
 		return [CMessageBehavior::class];
 	}
 
-public static function prepareServicesTagsData() {
+	public static function prepareServicesTagsData() {
 		CDataHelper::call('service.create', [
 			[
 				'name' => '1_Service_Tags_Preprocessing',
@@ -664,6 +664,3 @@ public static function prepareServicesTagsData() {
 		$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM services ORDER BY serviceid'));
 	}
 }
-
-
-
