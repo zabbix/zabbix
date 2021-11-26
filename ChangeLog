@@ -1,8 +1,10 @@
 Changes for 6.0.0alpha8
 
 New features:
+..F....... [ZBXNEXT-7070] transferred host and template mass update template inputs to main tab (jfreibergs)
 
 Bug fixes:
+..F....... [ZBX-20268] fixed disabled button issue when cloning a service (averza)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.0alpha7
