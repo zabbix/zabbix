@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-11-16T14:48:02Z</date>
+   <date>2021-11-26T10:43:32Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -732,8 +732,9 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                <key>pgsql.custom.query["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}",""]</key>
                <history>1h</history>
                <trends>0</trends>
+               <status>DISABLED</status>
                <value_type>TEXT</value_type>
-               <description>Execute custom queries from file *.sql</description>
+               <description>Execute custom queries from file *.sql (check for option Plugins.Postgres.CustomQueriesPath at agent configuration)</description>
                <applications>
                   <application>
                      <name>PostgreSQL</name>

@@ -41,7 +41,7 @@ func archiveHandler(ctx context.Context, conn PostgresClient,
 							FROM (
 								WITH values AS (
 									SELECT
-										4096/(coalesce(pg_settings.setting::bigint/1024/1024, 1)) AS segment_parts_count,
+										4096/(ceil(pg_settings.setting::numeric/1024/1024))::int AS segment_parts_count,
 										setting::bigint AS segment_size,
 										('x' || substring(pg_stat_archiver.last_archived_wal from 9 for 8))::bit(32)::int AS last_wal_div,
 										('x' || substring(pg_stat_archiver.last_archived_wal from 17 for 8))::bit(32)::int AS last_wal_mod,
@@ -49,13 +49,13 @@ func archiveHandler(ctx context.Context, conn PostgresClient,
 											ELSE ('x' || substring(pg_walfile_name(pg_current_wal_lsn()) from 9 for 8))::bit(32)::int END AS current_wal_div,
 										CASE WHEN pg_is_in_recovery() THEN NULL 
 											ELSE ('x' || substring(pg_walfile_name(pg_current_wal_lsn()) from 17 for 8))::bit(32)::int END AS current_wal_mod
-										FROM pg_settings, pg_stat_archiver
-										WHERE pg_settings.name = 'wal_segment_size')
-										SELECT 
-											greatest(coalesce((segment_parts_count - last_wal_mod) + ((current_wal_div - last_wal_div - 1) * segment_parts_count) + current_wal_mod - 1, 0), 0) AS count_files,
-											greatest(coalesce(((segment_parts_count - last_wal_mod) + ((current_wal_div - last_wal_div - 1) * segment_parts_count) + current_wal_mod - 1) * segment_size, 0), 0) AS size_files
-									FROM values
-								) T;`
+									FROM pg_settings, pg_stat_archiver
+									WHERE pg_settings.name = 'wal_segment_size')
+								SELECT 
+									greatest(coalesce((segment_parts_count - last_wal_mod) + ((current_wal_div - last_wal_div - 1) * segment_parts_count) + current_wal_mod - 1, 0), 0) AS count_files,
+									greatest(coalesce(((segment_parts_count - last_wal_mod) + ((current_wal_div - last_wal_div - 1) * segment_parts_count) + current_wal_mod - 1) * segment_size, 0), 0) AS size_files
+								FROM values
+							) T;`
 
 	row, err := conn.QueryRow(ctx, queryArchiveCount)
 	if err != nil {
