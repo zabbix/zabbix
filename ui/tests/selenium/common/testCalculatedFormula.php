@@ -137,6 +137,67 @@ class testCalculatedFormula extends CWebTest {
 					'formula' => "change(//trap[1])"
 				]
 			],
+			// changecount() function.
+			[
+				[
+					'formula' => 'changecount(/host/key,10)'
+				]
+			],
+			[
+				[
+					'formula' => 'changecount(/host/key,#5:now-5h)'
+				]
+			],
+			[
+				[
+					'formula' => 'changecount(/host/key,#10)'
+				]
+			],
+			[
+				[
+					'formula' => 'changecount(/host/key,5,)'
+				]
+			],
+			[
+				[
+					'formula' => 'changecount(/host/key,#10,"all")'
+				]
+			],
+			[
+				[
+					'formula' => 'changecount(/host/key,#10,"dec")'
+				]
+			],
+			[
+				[
+					'formula' => 'changecount(/host/key,#10,"inc")'
+				]
+			],
+			[
+				[
+					'formula' => 'changecount(/host/key,5s)'
+				]
+			],
+			[
+				[
+					'formula' => 'changecount(/host/key,5m)'
+				]
+			],
+			[
+				[
+					'formula' => 'changecount(/host/key,5h)'
+				]
+			],
+			[
+				[
+					'formula' => 'changecount(/host/key,5d)'
+				]
+			],
+			[
+				[
+					'formula' => 'changecount(/host/key,5w)'
+				]
+			],
 			// count() function.
 			[
 				[
@@ -899,6 +960,63 @@ class testCalculatedFormula extends CWebTest {
 					'expected' => TEST_BAD,
 					'formula' => 'change(/Trapper/trap[1],,)',
 					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "change".'
+				]
+			],
+			// changecount() function validation.
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'changecount(/host/key,#5,"")',
+					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "changecount".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'changecount(/host/key,#5,"something")',
+					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "changecount".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'changecount(/host/key,#5,"all",)',
+					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "changecount".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'changecount(/host/key,7,all)',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "changecount(/host/key,7,all)".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'changecount(/host/key,5M)',
+					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "changecount".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'changecount(/host/key,5y)',
+					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "changecount".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'changecount(5w)',
+					'error' => 'Invalid parameter "/1/params": incorrect usage of function "changecount".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'changecount(,5w)',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "changecount(,5w)".'
 				]
 			],
 			// count() function validation.
