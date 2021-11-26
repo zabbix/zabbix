@@ -2925,10 +2925,10 @@ static int	evaluate_TREND(zbx_variant_t *value, DC_ITEM *item, const char *func,
 
 		ZBX_UNUSED(detect_period_shift);
 
-		start_detect_period = end - detect_period;
-		end_detect_period = end;
+		end_detect_period = end + SEC_PER_HOUR - 1;
+		start_detect_period = end_detect_period - detect_period + 1;
 
-		if (start_detect_period < start)
+		if (start_detect_period < start - 1)
 		{
 			*error = zbx_strdup(*error, "detection period must not exceed evaluation period");
 			goto out;
