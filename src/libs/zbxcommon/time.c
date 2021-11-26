@@ -429,7 +429,7 @@ const char	*zbx_timespec_str(const zbx_timespec_t *ts)
 	struct tm	tm;
 
 	localtime_r(&ts_time, &tm);
-	zbx_snprintf(str, sizeof(str), "%04d.%02d.%02d %02d:%02d:%02d %09d", tm.tm_year + 1900, tm.tm_mon + 1,
+	zbx_snprintf(str, sizeof(str), "%04d.%02d.%02d %02d:%02d:%02d.%09d", tm.tm_year + 1900, tm.tm_mon + 1,
 			tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec, ts->ns);
 
 	return str;
