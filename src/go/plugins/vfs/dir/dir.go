@@ -58,6 +58,13 @@ func (p *Plugin) exportCount(params []string) (result interface{}, err error) {
 		return
 	}
 
+	cp.length = len(strings.SplitAfter(cp.path, string(filepath.Separator)))
+
+	err = cp.setMinMax()
+	if err != nil {
+		return 0, zbxerr.ErrorInvalidParams.Wrap(err)
+	}
+
 	return cp.getDirCount()
 }
 
@@ -66,6 +73,8 @@ func (p *Plugin) exportSize(params []string) (result interface{}, err error) {
 	if err != nil {
 		return
 	}
+
+	sp.length = len(strings.SplitAfter(sp.path, string(filepath.Separator)))
 
 	return sp.getDirSize()
 }

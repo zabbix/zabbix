@@ -42,8 +42,6 @@ func (sp *sizeParams) getDirSize() (int64, error) {
 	var parentSize int64
 	var dirSize int64
 
-	sp.length = len(strings.SplitAfter(sp.path, string(filepath.Separator)))
-
 	err := filepath.WalkDir(sp.path,
 		func(p string, d fs.DirEntry, err error) error {
 			if err != nil {
@@ -150,16 +148,20 @@ func getSizeParams(params []string) (out sizeParams, err error) {
 
 				return
 			}
+
+			if out.maxDepth < unlimitedDepth {
+				err = zbxerr.New("Invalid fifth parameter.")
+
+				return
+			}
 		}
 
 		fallthrough
 	case fourthParam:
 		switch params[3] {
-		case "apparent":
-			out.diskMode = false
+		case "apparent", "":
 		case "disk":
 			out.diskMode = true
-		case "":
 		default:
 			err = zbxerr.New("Invalid fourth parameter.").Wrap(err)
 
@@ -189,6 +191,8 @@ func getSizeParams(params []string) (out sizeParams, err error) {
 		out.path = params[0]
 		if out.path == "" {
 			err = zbxerr.New("Invalid first parameter.")
+
+			return
 		}
 
 		if !strings.HasSuffix(out.path, string(filepath.Separator)) {

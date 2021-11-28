@@ -55,7 +55,7 @@ const (
 	gigabyteType = 'G'
 	terabyteType = 'T'
 
-	kb = 1000
+	kb = 1024
 	mb = kb * 1000
 	gb = mb * 1000
 	tb = gb * 1000
@@ -92,14 +92,7 @@ type countParams struct {
 func (cp *countParams) getDirCount() (int, error) {
 	var count int
 
-	cp.length = len(strings.SplitAfter(cp.path, string(filepath.Separator)))
-
-	err := cp.setMinMaxParams()
-	if err != nil {
-		return 0, zbxerr.ErrorInvalidParams.Wrap(err)
-	}
-
-	err = filepath.WalkDir(cp.path,
+	err := filepath.WalkDir(cp.path,
 		func(p string, d fs.DirEntry, err error) error {
 			if err != nil {
 				return err
@@ -193,7 +186,7 @@ func (cp *countParams) skipInfo(d fs.DirEntry) (bool, error) {
 	return false, nil
 }
 
-func (cp *countParams) setMinMaxParams() (err error) {
+func (cp *countParams) setMinMax() (err error) {
 	err = cp.setMinParams()
 	if err != nil {
 		return
@@ -208,11 +201,9 @@ func (cp *countParams) setMinMaxParams() (err error) {
 }
 
 func (cp *countParams) setMaxParams() (err error) {
-	if cp.maxSize != "" {
-		cp.parsedMaxSize, err = parseByte(cp.maxSize)
-		if err != nil {
-			return
-		}
+	cp.parsedMaxSize, err = parseByte(cp.maxSize)
+	if err != nil {
+		return
 	}
 
 	if cp.maxAge != "" {
@@ -229,13 +220,11 @@ func (cp *countParams) setMaxParams() (err error) {
 }
 
 func (cp *countParams) setMinParams() (err error) {
-	if cp.minSize != "" {
-		cp.parsedMinSize, err = parseByte(cp.minSize)
-		if err != nil {
-			err = zbxerr.ErrorInvalidParams.Wrap(err)
+	cp.parsedMinSize, err = parseByte(cp.minSize)
+	if err != nil {
+		err = zbxerr.ErrorInvalidParams.Wrap(err)
 
-			return
-		}
+		return
 	}
 
 	if cp.minAge != "" {
@@ -300,6 +289,12 @@ func getCountParams(params []string) (out countParams, err error) {
 
 				return
 			}
+
+			if out.maxDepth < unlimitedDepth {
+				err = zbxerr.New("Invalid sixth parameter.")
+
+				return
+			}
 		}
 
 		fallthrough
@@ -343,6 +338,8 @@ func getCountParams(params []string) (out countParams, err error) {
 		out.path = params[0]
 		if out.path == "" {
 			err = zbxerr.New("Invalid first parameter.")
+
+			return
 		}
 
 		if !strings.HasSuffix(out.path, string(filepath.Separator)) {
@@ -368,7 +365,7 @@ func parseType(in string, exclude bool) (out map[fs.FileMode]bool, err error) {
 	}
 
 	out = make(map[fs.FileMode]bool)
-	types := strings.SplitAfter(in, ",")
+	types := strings.Split(in, ",")
 
 	for _, t := range types {
 		switch t {
