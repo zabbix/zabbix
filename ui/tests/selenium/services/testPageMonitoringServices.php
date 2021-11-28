@@ -315,7 +315,7 @@ class testPageMonitoringServices extends CWebTest {
 			]
 		]);
 
-		DBexecute('UPDATE services SET status = 5 WHERE name = "Server with problem"');
+		DBexecute("UPDATE services SET status = 5 WHERE name = 'Server with problem'");
 	}
 
 	public function testPageMonitoringServices_LayoutView() {
