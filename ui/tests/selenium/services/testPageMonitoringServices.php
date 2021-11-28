@@ -852,7 +852,43 @@ class testPageMonitoringServices extends CWebTest {
 	}
 
 	public function testPageMonitoringServices_AddChild() {
+		$parent = 'Server with problem';
+		$child_name = 'Added child for Server with problem';
 
+		$this->page->login()->open('zabbix.php?action=service.list.edit');
+		$table = $this->query('class:list-table')->asTable()->waitUntilVisible()->one();
+
+		$before_rows_count = $table->getRows()->count();
+		$this->assertTableStats($before_rows_count);
+
+		$table->findRow('Name', $parent)->query('xpath:.//button[@title="Add child service"]')->waitUntilClickable()
+				->one()->click();
+
+		COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $this->query('id:service-form')->asForm()->one()->waitUntilReady();
+		$form->fill(['Name' => $child_name]);
+		$form->submit();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Service created');
+
+		// Check that row count is not changed.
+		$this->assertTableStats($before_rows_count);
+
+		// Check that parent became a link.
+		$this->assertTrue($table->findRow('Name', $parent, true)->query('link', $parent)->exists());
+
+		// Check DB.
+		$childid = CDBHelper::getValue('SELECT serviceid FROM services WHERE name='.
+				CXPathHelper::escapeQuotes($child_name));
+		$parentid = CDBHelper::getValue('SELECT serviceid FROM services WHERE name='.
+				CXPathHelper::escapeQuotes($parent));
+
+		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.
+				CXPathHelper::escapeQuotes($child_name)));
+
+		// Check parent-child linking in DB.
+		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services_links WHERE serviceupid='.
+				$parentid.' AND servicedownid ='.$childid));
 	}
 
 	public function testPageMonitoringServices_CancelDeleteFromRow() {

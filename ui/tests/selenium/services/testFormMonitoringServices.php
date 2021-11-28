@@ -816,20 +816,49 @@ class testFormMonitoringServices extends CWebTest {
 
 	}
 
-	public function testFormMonitoringServices_SimpleUpdate() {
+	public static function getSimpleUpdateData() {
+		return [
+			// Service without children.
+			[
+				[
+					'name' => 'Child2 with tags'
+				]
+			],
+			// Service with children.
+			[
+				[
+					'name' => 'Parent1'
+				]
+			]
+		];
+	}
 
+	/**
+	 * @dataProvider getSimpleUpdateData
+	 */
+	public function testFormMonitoringServices_SimpleUpdate($data) {
+		$sql = 'SELECT * FROM services';
+		$old_hash = CDBHelper::getHash('SELECT * FROM services');
+
+		$this->page->login()->open('zabbix.php?action=service.list.edit');
+		$table = $this->query('class:list-table')->asTable()->waitUntilVisible()->one();
+		$table->findRow('Name', $data['name'], true)->query('xpath:.//button[@title="Edit"]')
+				->waitUntilClickable()->one()->click();
+
+		COverlayDialogElement::find()->one()->waitUntilReady();
+		$this->query('id:service-form')->asForm()->one()->waitUntilReady()->submit();
+		$this->page->waitUntilReady();
+
+		$this->assertMessage(TEST_GOOD, 'Service updated');
+		$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 	}
 
 	public function getCreateChildData() {
 		return [
 			[
 				[
-					'expected' => TEST_BAD,
 					'parent' => 'Parent3 with problem tags',
-					'fields' => [
-						'Name' => 'With parent that has problem tags'
-					],
-					'error' => 'Service "Parent3 with problem tags" cannot have problem tags and children at the same time.'
+					'enabled' => false
 				]
 			],
 			[
@@ -873,24 +902,33 @@ class testFormMonitoringServices extends CWebTest {
 			$table->findRow('Name', $data['Child services'], true)->query('link', $data['Child services'])
 					->waitUntilClickable()->one()->click();
 		}
-		// Find necessary row and then find Add child button right in that row.
-		$table->findRow('Name', $data['parent'], true)->query('xpath:.//button[@title="Add child service"]')
-				->waitUntilClickable()->one()->click();
-		COverlayDialogElement::find()->one()->waitUntilReady();
-		$form = $this->query('id:service-form')->asForm()->one()->waitUntilReady();
-		$form->fill($data['fields']);
 
-		// Go to child services tab and add child there to create circular dependency.
-		if (CTestArrayHelper::get($data, 'circular', false)) {
-			$form->selectTab('Child services');
-			$service = $form->getFieldContainer('Child services');
-			$service->query('button:Add')->waitUntilClickable()->one()->click();
-			$childs_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
-			$childs_dialog->query('link', $data['Child services'])->waitUntilReady()->one()->click();
+		if (CTestArrayHelper::get($data, 'enabled', true)) {
+			// Find necessary row and then find Add child button right in that row.
+			$table->findRow('Name', $data['parent'], true)->query('xpath:.//button[@title="Add child service"]')
+					->waitUntilClickable()->one()->click();
+			COverlayDialogElement::find()->one()->waitUntilReady();
+			$form = $this->query('id:service-form')->asForm()->one()->waitUntilReady();
+			$form->fill($data['fields']);
+
+			// Go to child services tab and add child there to create circular dependency.
+			if (CTestArrayHelper::get($data, 'circular', false)) {
+				$form->selectTab('Child services');
+				$service = $form->getFieldContainer('Child services');
+				$service->query('button:Add')->waitUntilClickable()->one()->click();
+				$childs_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+				$childs_dialog->query('link', $data['Child services'])->waitUntilReady()->one()->click();
+			}
+
+			$form->submit();
+			$this->page->waitUntilReady();
 		}
-
-		$form->submit();
-		$this->page->waitUntilReady();
+		else {
+			$this->assertFalse($table->findRow('Name', $data['parent'], true)
+					->query('xpath:.//button[@title="Add child service"]')->one()->isEnabled()
+			);
+			return;
+		}
 
 		if ($expected === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, null, $data['error']);
