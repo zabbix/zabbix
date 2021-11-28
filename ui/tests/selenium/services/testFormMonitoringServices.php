@@ -724,20 +724,20 @@ class testFormMonitoringServices extends CWebTest {
 			$this->assertMessage(TEST_BAD, null, $data['error']);
 			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 			$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services WHERE name='.
-					CXPathHelper::escapeQuotes($data['fields']['Name'])));
+					zbx_dbstr($data['fields']['Name'])));
 		}
 		else {
 			$this->assertMessage(TEST_GOOD, ($update ? 'Service updated' : 'Service created'));
 			$count = (array_key_exists('dublicate', $data)) ? 2 : 1;
 			$this->assertEquals($count, CDBHelper::getCount('SELECT * FROM services WHERE name='.
-					CXPathHelper::escapeQuotes($data['fields']['Name']))
+					zbx_dbstr($data['fields']['Name']))
 			);
 
 			if ($update) {
 				// In update scenario check that old name actually changed.
 				$expected_count = (array_key_exists('update_dublicate', $data)) ? 1 : 0;
 				$this->assertEquals($expected_count, CDBHelper::getCount('SELECT * FROM services WHERE name='.
-						CXPathHelper::escapeQuotes(self::$update_service))
+						zbx_dbstr(self::$update_service))
 				);
 
 				//  Write new name to global variable for using it in next case.
@@ -934,13 +934,13 @@ class testFormMonitoringServices extends CWebTest {
 			$this->assertMessage(TEST_BAD, null, $data['error']);
 			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 			$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services WHERE name='.
-					CXPathHelper::escapeQuotes($data['fields']['Name']))
+					zbx_dbstr($data['fields']['Name']))
 			);
 		}
 		else {
 			$this->assertMessage(TEST_GOOD, 'Service created');
 			$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.
-					CXPathHelper::escapeQuotes($data['fields']['Name']))
+					zbx_dbstr($data['fields']['Name']))
 			);
 
 			// Check that child is present in frontend.
@@ -993,9 +993,9 @@ class testFormMonitoringServices extends CWebTest {
 		$this->assertTableData([]);
 
 		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.
-				CXPathHelper::escapeQuotes($parent)));
+				zbx_dbstr($parent)));
 		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.
-				CXPathHelper::escapeQuotes($child)));
+				zbx_dbstr($child)));
 
 		// Check that service linking is disappeared from DB.
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services_links WHERE serviceupid='.
@@ -1023,9 +1023,9 @@ class testFormMonitoringServices extends CWebTest {
 		$this->assertTableData([]);
 
 		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.
-				CXPathHelper::escapeQuotes($parent)));
+				zbx_dbstr($parent)));
 		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.
-				CXPathHelper::escapeQuotes($child)));
+				zbx_dbstr($child)));
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services_links WHERE serviceupid='.
 				self::$parentid_2.' AND servicedownid ='.self::$childid_2));
 	}

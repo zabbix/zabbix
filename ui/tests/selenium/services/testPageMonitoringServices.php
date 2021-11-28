@@ -878,13 +878,10 @@ class testPageMonitoringServices extends CWebTest {
 		$this->assertTrue($table->findRow('Name', $parent, true)->query('link', $parent)->exists());
 
 		// Check DB.
-		$childid = CDBHelper::getValue('SELECT serviceid FROM services WHERE name='.
-				CXPathHelper::escapeQuotes($child_name));
-		$parentid = CDBHelper::getValue('SELECT serviceid FROM services WHERE name='.
-				CXPathHelper::escapeQuotes($parent));
+		$childid = CDBHelper::getValue('SELECT serviceid FROM services WHERE name='.zbx_dbstr($child_name));
+		$parentid = CDBHelper::getValue('SELECT serviceid FROM services WHERE name='.zbx_dbstr($parent));
 
-		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.
-				CXPathHelper::escapeQuotes($child_name)));
+		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($child_name)));
 
 		// Check parent-child linking in DB.
 		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services_links WHERE serviceupid='.
