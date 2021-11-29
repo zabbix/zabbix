@@ -140,7 +140,7 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 				const $close = $('<button type="button" class="overlay-close-btn" title="' + t('S_CLOSE') + '"/>')
 						.click(methods.hide);
 
-				$overlay_input = $('<input/>', {'type': 'text'})
+				$overlay_input = $('<input/>', {'type': 'text', 'autofocus': 'autofocus'})
 					.css('width', ZBX_TEXTAREA_COLOR_WIDTH + 'px')
 					.on('input keydown paste', e => {
 						const color = e.target.value;
@@ -148,10 +148,13 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 							setPreviewColor(color);
 						}
 					})
-					.on('blur', e => {
-						const color = e.target.value;
-						if (color.length == 0 || color.length == 6) {
-							setColorHandler(color);
+					.keyup(event => {
+						if (event.keyCode == 13) {
+							const color = event.target.value;
+
+							if (color.length == 0 || color.length == 6) {
+								setColorHandler(color);
+							}
 						}
 					});
 
