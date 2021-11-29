@@ -942,6 +942,9 @@ int	zbx_restore_file_details(const char *str, struct st_logfile **logfiles, int 
 	(*logfiles)[0].last_block_offset = last_block_offset;
 	memcpy((*logfiles)[0].last_block_md5, last_block_md5, sizeof(last_block_md5));
 
+	*mtime = mtime_tmp;
+	*processed_size = processed_size_tmp;
+
 	return SUCCEED;
 }
 #endif	/* not WINDOWS */
