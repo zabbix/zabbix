@@ -995,7 +995,8 @@ class CTriggerPrototype extends CTriggerGeneral {
 			'output' => ['triggerid'],
 			'selectDependencies' => ['triggerid'],
 			'hostids' => $templateIds,
-			'preservekeys' => true
+			'preservekeys' => true,
+			'nopermissions' => true
 		]);
 
 		if ($parentTriggers) {

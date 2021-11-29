@@ -283,7 +283,8 @@ class CHttpTestManager {
 				'follow_redirects', 'retrieve_mode', 'variables', 'headers', 'query_fields'
 			],
 			'selectTags' => ['tag', 'value'],
-			'preservekeys' => true
+			'preservekeys' => true,
+			'nopermissions' => true
 		]);
 
 		$this->inherit($httpTests, $hostIds);
