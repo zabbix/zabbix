@@ -90,8 +90,7 @@ abstract class CHostBase extends CApiService {
 
 		$count = API::Template()->get([
 			'countOutput' => true,
-			'templateids' => array_keys($edit_templates),
-			'editable' => true
+			'templateids' => array_keys($edit_templates)
 		]);
 
 		if ($count != count($edit_templates)) {

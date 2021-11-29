@@ -892,8 +892,7 @@ class CTemplate extends CHostGeneral {
 
 			$count = API::Template()->get([
 				'countOutput' => true,
-				'templateids' => $templateids,
-				'editable' => true
+				'templateids' => $templateids
 			]);
 
 			if ($count != count($templateids)) {
@@ -1048,8 +1047,7 @@ class CTemplate extends CHostGeneral {
 			if ($edit_templateids) {
 				$count = $this->get([
 					'countOutput' => true,
-					'templateids' => array_keys($edit_templateids),
-					'editable' => true
+					'templateids' => array_keys($edit_templateids)
 				]);
 
 				if ($count != count($edit_templateids)) {
@@ -1135,8 +1133,7 @@ class CTemplate extends CHostGeneral {
 
 			$count = $this->get([
 				'countOutput' => true,
-				'templateids' => $templateids,
-				'editable' => true
+				'templateids' => $templateids
 			]);
 
 			if ($count != count($templateids)) {
