@@ -397,7 +397,7 @@ class testPageMonitoringServices extends CWebTest {
 			);
 		}
 		$this->assertTrue($this->query(self::BREADCRUMB_SELECTOR)->one()
-				->query("xpath://span[@class='selected']//a[text()=".zbx_dbstr($child)."]")->one()->isValid()
+				->query("xpath://span[@class='selected']//a[text()=".CXPathHelper::escapeQuotes($child)."]")->one()->isValid()
 		);
 	}
 
@@ -408,8 +408,8 @@ class testPageMonitoringServices extends CWebTest {
 
 		$info_card = $this->query('id:tab_info')->waitUntilReady()->one();
 		foreach ([$service, 'Parent services', 'Status', 'SLA', 'Tags'] as $text) {
-			$this->assertTrue($info_card->query("xpath://div[@class='service-info-grid']//div[text()=".zbx_dbstr($text)."]")
-					->one()->isVisible()
+			$this->assertTrue($info_card->query("xpath://div[@class='service-info-grid']//div[text()="
+					.CXPathHelper::escapeQuotes($text)."]")->one()->isVisible()
 			);
 		}
 
@@ -922,7 +922,9 @@ class testPageMonitoringServices extends CWebTest {
 
 		// Check service not disappeared from frontend.
 		$this->assertTableStats($before_rows_count);
-		$this->assertTrue($table->query('xpath://table[@class="list-table"]//td[text()='.zbx_dbstr($name).']')->exists());
+		$this->assertTrue($table->query("xpath://table[@class='list-table']//td[text()=".
+				CXPathHelper::escapeQuotes($name)."]")->exists()
+		);
 
 		// Check database.
 		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($name)));
@@ -947,7 +949,8 @@ class testPageMonitoringServices extends CWebTest {
 
 		// Check service disappeared from frontend.
 		$this->assertTableStats($before_rows_count-1);
-		$this->assertFalse($table->query('xpath://table[@class="list-table"]//td[text()='.zbx_dbstr($name).']')->exists());
+		$this->assertFalse($table->query("xpath://table[@class='list-table']//td[text()=".
+				CXPathHelper::escapeQuotes($name)."]")->exists());
 
 		// Check database.
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($name))
@@ -983,7 +986,9 @@ class testPageMonitoringServices extends CWebTest {
 
 		// Check service disappeared from frontend.
 		$this->assertTableStats($childs_rows_count - 1);
-		$this->assertFalse($table->query('xpath://table[@class="list-table"]//td[text()='.zbx_dbstr($name).']')->exists());
+		$this->assertFalse($table->query("xpath://table[@class='list-table']//td[text()=".
+				CXPathHelper::escapeQuotes($name)."]")->exists()
+		);
 
 		// Check database.
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($name)));
@@ -1004,7 +1009,8 @@ class testPageMonitoringServices extends CWebTest {
 		$this->assertTrue($table->query('link', $name)->exists());
 
 		// Check that child service is not present in global service table.
-		$this->assertFalse($table->query('xpath://table[@class="list-table"]//td[text()='.zbx_dbstr($child).']')->exists());
+		$this->assertFalse($table->query("xpath://table[@class='list-table']//td[text()=".
+				CXPathHelper::escapeQuotes($child)."]")->exists());
 
 		// Delete parent service.
 		$table->findRow('Name', $name, true)->query('xpath:.//button[contains(@class, "btn-remove")]')->one()
@@ -1021,7 +1027,8 @@ class testPageMonitoringServices extends CWebTest {
 		$this->assertFalse($table->query('link', $name)->exists());
 
 		// Child now presents in table.
-		$this->assertTrue($table->query('xpath://table[@class="list-table"]//td[text()='.zbx_dbstr($child).']')->exists());
+		$this->assertTrue($table->query("xpath://table[@class='list-table']//td[text()=".
+				CXPathHelper::escapeQuotes($child)."]")->exists());
 
 		// Check database.
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($name)));
@@ -1049,8 +1056,9 @@ class testPageMonitoringServices extends CWebTest {
 
 		// Services disappeared from frontend.
 		foreach ($names as $name) {
-			$this->assertFalse($table->query("xpath://table[@class='list-table']//td[text()=".zbx_dbstr($name)."]")
-					->exists());
+			$this->assertFalse($table->query("xpath://table[@class='list-table']//td[text()=".
+					CXPathHelper::escapeQuotes($name)."]")->exists()
+			);
 		}
 
 		// Check database.
@@ -1086,12 +1094,15 @@ class testPageMonitoringServices extends CWebTest {
 
 		// Services disappeared from frontend.
 		foreach ($names as $name) {
-			$this->assertFalse($table->query("xpath://table[@class='list-table']//td[text()=".zbx_dbstr($name)."]")
-					->exists());
+			$this->assertFalse($table->query("xpath://table[@class='list-table']//td[text()=".
+					CXPathHelper::escapeQuotes($name)."]")->exists()
+			);
 		}
 
 		// Last child is not deleted.
-		$this->assertTrue($table->query('xpath://table[@class="list-table"]//td[text()='.zbx_dbstr($remained).']')->exists());
+		$this->assertTrue($table->query("xpath://table[@class='list-table']//td[text()=".
+				CXPathHelper::escapeQuotes($remained)."]")->exists()
+		);
 
 		// Check database.
 		foreach ($names as $name) {

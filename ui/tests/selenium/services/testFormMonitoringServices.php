@@ -56,28 +56,28 @@ class testFormMonitoringServices extends CWebTest {
 				'algorithm' => 1,
 				'showsla' => 0,
 				'goodsla' => 99.99,
-				'sortorder' => 4,
+				'sortorder' => 1,
 			],
 			[
 				'name' => 'Parent1',
 				'algorithm' => 1,
 				'showsla' => 1,
 				'goodsla' => 99.99,
-				'sortorder' => 5
+				'sortorder' => 2
 			],
 			[
 				'name' => 'Parent2',
 				'algorithm' => 1,
 				'showsla' => 1,
 				'goodsla' => 50,
-				'sortorder' => 5
+				'sortorder' => 3
 			],
 			[
 				'name' => 'Parent3 with problem tags',
 				'algorithm' => 1,
 				'showsla' => 1,
 				'goodsla' => 49.5,
-				'sortorder' => 5,
+				'sortorder' => 4,
 				'problem_tags' => [
 					[
 						'tag' => 'test123',
@@ -108,7 +108,7 @@ class testFormMonitoringServices extends CWebTest {
 				'algorithm' => 1,
 				'showsla' => 1,
 				'goodsla' => 20,
-				'sortorder' => 6,
+				'sortorder' => 7,
 				'problem_tags' => [
 					[
 						'tag' => 'test1',
@@ -125,15 +125,51 @@ class testFormMonitoringServices extends CWebTest {
 				'algorithm' => 1,
 				'showsla' => 1,
 				'goodsla' => 20,
-				'sortorder' => 6
+				'sortorder' => 8
 			],
 			[
 				'name' => 'Child4',
 				'algorithm' => 1,
 				'showsla' => 1,
 				'goodsla' => 20,
-				'sortorder' => 6
-			]
+				'sortorder' => 9
+			],
+			[
+				'name' => 'Clone_parent',
+				'algorithm' => 1,
+				'showsla' => 1,
+				'goodsla' => 20,
+				'sortorder' => 10
+			],
+			[
+				'name' => 'Clone1',
+				'algorithm' => 0,
+				'showsla' => 0,
+				'goodsla' => 99.9,
+				'weight' => 56,
+				'propagation_rule' => 1,
+				'propagation_value' => 3,
+				'sortorder' => 11,
+				'problem_tags' => [
+					[
+						'tag' => 'problem_tag_clone',
+						'value' => 'problem_value_clone'
+					]
+				],
+				'tags' => [
+					[
+						'tag' => 'tag_clone',
+						'value' => 'value_clone'
+					]
+				]
+			],
+			[
+				'name' => 'Clone2',
+				'algorithm' => 1,
+				'showsla' => 1,
+				'goodsla' => 20,
+				'sortorder' => 12
+			],
 		]);
 
 		$services = CDataHelper::getIds('name');
@@ -152,6 +188,22 @@ class testFormMonitoringServices extends CWebTest {
 				'parents' => [
 					[
 						'serviceid' => $services['Parent4']
+					]
+				]
+			],
+			[
+				'serviceid' => $services['Clone1'],
+				'parents' => [
+					[
+						'serviceid' => $services['Clone_parent']
+					]
+				]
+			],
+			[
+				'serviceid' => $services['Clone2'],
+				'parents' => [
+					[
+						'serviceid' => $services['Clone_parent']
 					]
 				]
 			]
@@ -317,7 +369,7 @@ class testFormMonitoringServices extends CWebTest {
 		$childs_dialog->query('button:Reset')->one()->waitUntilClickable()->click();
 		$childs_dialog->invalidate();
 
-		$this->assertEquals(9, count($childs_dialog->query('class:list-table')->asTable()->waitUntilReady()->one()
+		$this->assertEquals(15, count($childs_dialog->query('class:list-table')->asTable()->waitUntilReady()->one()
 				->getRows()->asArray())
 		);
 	}
@@ -812,8 +864,94 @@ class testFormMonitoringServices extends CWebTest {
 		}
 	}
 
-	public function testFormMonitoringServices_Clone() {
+	public static function getCloneData() {
+		return [
+			// Service with children.
+			[
+				[
+					'name' => 'Clone_parent',
+					'children' => ['Clone1', 'Clone2']
+				]
+			],
+			// Service with parent.
+			[
+				[
+					'name' => 'Clone1',
+					'parent' => 'Clone_parent'
+				]
+			],
 
+		];
+	}
+
+	/**
+	 * @dataProvider getCloneData
+	 */
+	public function testFormMonitoringServices_Clone($data) {
+		$this->page->login()->open('zabbix.php?action=service.list.edit');
+
+		$table = $this->query('class:list-table')->asTable()->waitUntilVisible()->one();
+
+		if (CTestArrayHelper::get($data, 'parent')) {
+			$table->findRow('Name', $data['parent'], true)->query('link', $data['parent'])
+					->waitUntilClickable()->one()->click();
+			$this->page->waitUntilReady();
+		}
+
+		$table->findRow('Name', $data['name'], true)->query('xpath:.//button[@title="Edit"]')
+				->waitUntilClickable()->one()->click();
+
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $dialog->asForm();
+		$original_values = $form->getFields()->asValues();
+
+		// Check Child services before cloning.
+		if (CTestArrayHelper::get($data, 'children')) {
+			$form->selectTab('Child services');
+
+			foreach ($data['children'] as $child) {
+				$this->assertTrue($dialog->query('id:children')->waitUntilVisible()->one()
+						->query("xpath:.//tr[@data-serviceid]//td[text()=".CXPathHelper::escapeQuotes($child)."]")
+						->exists()
+				);
+			}
+		}
+
+		$dialog->query('button:Clone')->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
+		$form->invalidate();
+		$form->selectTab('Service');
+		$name = 'New cloned name'.microtime();
+		$form->fill(['Name' => $name]);
+
+		// TODO: after ZBX-20288 is fixed change this to $form->submit();
+		$dialog->query('xpath:.//div[@class="overlay-dialogue-footer"]//button[text()="Add"]')->waitUntilClickable()
+				->one()->click();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Service created');
+
+		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($name)));
+		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($data['name'])));
+
+		// Check cloned service saved form.
+		$table->findRow('Name', $name, true)->query('xpath:.//button[@title="Edit"]')->waitUntilClickable()->one()
+				->click();
+
+		$form->invalidate();
+		$original_values['Name'] = $name;
+		$this->assertEquals($original_values, $form->getFields()->asValues());
+
+		// Check Child services were not cloned.
+		if (CTestArrayHelper::get($data, 'children')) {
+			$form->selectTab('Child services');
+
+			foreach ($data['children'] as $child) {
+				$this->assertFalse($dialog->query('id:children')->waitUntilVisible()->one()
+						->query("xpath:.//tr[@data-serviceid]//td[text()=".CXPathHelper::escapeQuotes($child)."]")
+						->exists()
+				);
+			}
+		}
 	}
 
 	public static function getSimpleUpdateData() {
