@@ -1985,7 +1985,7 @@ abstract class CHostGeneral extends CHostBase {
 		if ($objects === 'macros') {
 			$options = [
 				'output' => ['hostmacroid', 'hostid', 'macro', 'value', 'description', 'type'],
-				'filter' => ['hostid' => array_keys($db_hosts)],
+				'filter' => ['hostid' => array_keys($db_hosts)]
 			];
 
 			if ($objectids) {
