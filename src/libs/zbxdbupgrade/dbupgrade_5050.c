@@ -1685,6 +1685,31 @@ static int	DBpatch_5050130(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_5050131(void)
+{
+	return DBcreate_index("widget_field", "widget_field_7", "value_serviceid", 0);
+}
+
+static int	DBpatch_5050132(void)
+{
+	const ZBX_FIELD	field = {"value_serviceid", NULL, "services", "serviceid", 0, ZBX_TYPE_ID, 0,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("widget_field", 7, &field);
+}
+
+static int	DBpatch_5050133(void)
+{
+	return DBcreate_index("widget_field", "widget_field_8", "value_slaid", 0);
+}
+
+static int	DBpatch_5050134(void)
+{
+	const ZBX_FIELD	field = {"value_slaid", NULL, "sla", "slaid", 0, ZBX_TYPE_ID, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("widget_field", 8, &field);
+}
+
 
 #endif
 
@@ -1810,5 +1835,9 @@ DBPATCH_ADD(5050127, 0, 1)
 DBPATCH_ADD(5050128, 0, 1)
 DBPATCH_ADD(5050129, 0, 1)
 DBPATCH_ADD(5050130, 0, 1)
+DBPATCH_ADD(5050131, 0, 1)
+DBPATCH_ADD(5050132, 0, 1)
+DBPATCH_ADD(5050133, 0, 1)
+DBPATCH_ADD(5050134, 0, 1)
 
 DBPATCH_END()
