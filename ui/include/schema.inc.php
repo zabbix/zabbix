@@ -7508,7 +7508,7 @@ return [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'service',
+				'ref_table' => 'services',
 				'ref_field' => 'serviceid'
 			],
 			'value_slaid' => [
