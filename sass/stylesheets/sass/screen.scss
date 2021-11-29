@@ -4324,6 +4324,11 @@ td.inactive-bg {
 		border: 1px solid $form-border-color;
 		margin: 1px;
 		cursor: pointer;
+
+		&:focus {
+			border-color: $form-border-focus-color;
+			outline: none;
+		}
 	}
 
 	div.use-default {

@@ -327,6 +327,7 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 			$('<div/>')
 				.attr({
 					'id': 'lbl_' + id,
+					'tabindex': 0,
 					'title': element.value ? '#' + element.value : '',
 					'data-use-default': t('D')
 				})
@@ -337,7 +338,8 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 					 */
 					methods.show(id, event);
 				})
-				.insertAfter(element);
+				.insertAfter(element)
+				.keyup(event => (event.keyCode == 32) ? methods.show(id, event) : null);
 
 			$(element)
 				.data('use_default', (options && 'use_default' in options))

@@ -5291,6 +5291,9 @@ td[class] + td.disaster-bg {
     border: 1px solid #4f4f4f;
     margin: 1px;
     cursor: pointer; }
+    .input-color-picker div:focus {
+      border-color: #768d99;
+      outline: none; }
   .input-color-picker div.use-default {
     background: none;
     position: relative; }

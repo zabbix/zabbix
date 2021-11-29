@@ -5238,6 +5238,9 @@ a.link-action {
     border: 1px solid #666666;
     margin: 1px;
     cursor: pointer; }
+    .input-color-picker div:focus {
+      border-color: #bbbbbb;
+      outline: none; }
   .input-color-picker div.use-default {
     background: none;
     position: relative; }
