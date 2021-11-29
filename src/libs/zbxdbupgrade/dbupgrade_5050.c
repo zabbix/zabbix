@@ -1186,7 +1186,6 @@ static int	DBpatch_5050111(void)
 	return DBcreate_index("alerts", "alerts_8", "acknowledgeid", 0);
 }
 
-
 static int	DBpatch_5050112(void)
 {
 	const ZBX_FIELD	field = {"notify_if_canceled", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
