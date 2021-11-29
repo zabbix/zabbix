@@ -389,7 +389,7 @@ class testPageMonitoringServices extends CWebTest {
 	 *
 	 * @param CTableElement    $table    table where to select particular service
 	 * @param string           $parent   name of parent service
-	 * @param string           $childt   name of child service
+	 * @param string           $child    name of child service
 	 */
 	private function checkParentChildLayout($table, $parent, $child) {
 		$this->checkSeviceInfoLayout($table, $parent);

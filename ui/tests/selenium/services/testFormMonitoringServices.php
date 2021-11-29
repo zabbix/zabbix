@@ -955,7 +955,7 @@ class testFormMonitoringServices extends CWebTest {
 		// Check Child services were not cloned.
 		if (CTestArrayHelper::get($data, 'children')) {
 			$form->selectTab('Child services');
-			$this->assertTableData([], 'id:children');
+			$this->assertTableData([], 'id:children', true);
 		}
 	}
 
