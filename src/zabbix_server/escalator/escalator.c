@@ -2420,7 +2420,7 @@ out:
 static void	escalation_log_cancel_warning(const DB_ESCALATION *escalation, const char *error)
 {
 	if (0 != escalation->esc_step)
-		zabbix_log(LOG_LEVEL_WARNING, "escalation cancelled: %s", error);
+		zabbix_log(LOG_LEVEL_WARNING, "escalation canceled: %s", error);
 }
 
 /******************************************************************************
