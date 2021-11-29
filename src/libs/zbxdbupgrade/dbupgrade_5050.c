@@ -1362,8 +1362,8 @@ static int	compare_sla(const void *d1, const void *d2)
 	const sla_t	*a, *b;
 	int		i, ret;
 
-	a = *(const sla_t **)d1;
-	b = *(const sla_t **)d2;
+	a = *(const sla_t * const *)d1;
+	b = *(const sla_t * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(a->showsla, b->showsla);
 	ZBX_RETURN_IF_NOT_EQUAL(a->goodsla, b->goodsla);
