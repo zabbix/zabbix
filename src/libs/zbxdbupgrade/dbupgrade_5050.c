@@ -1398,12 +1398,13 @@ static void	sla_clean(sla_t *sla)
 
 #define SLA_TAG_NAME			"SLA"
 
-static void	db_insert_sla(const zbx_vector_sla_t *uniq_slas, const char *default_timezone)
+static int	db_insert_sla(const zbx_vector_sla_t *uniq_slas, const char *default_timezone)
 {
 	zbx_db_insert_t		db_insert_sla, db_insert_sla_schedule, db_insert_sla_excluded_downtime,
 				db_insert_sla_service_tag, db_insert_service_tag;
 	int			i, j;
 	zbx_uint64_t		slaid;
+	int			ret = FAIL;
 
 	zbx_db_insert_prepare(&db_insert_sla, "sla", "slaid", "name", "status", "slo", "period", "timezone", NULL);
 
@@ -1453,23 +1454,33 @@ static void	db_insert_sla(const zbx_vector_sla_t *uniq_slas, const char *default
 		}
 	}
 
-	zbx_db_insert_execute(&db_insert_sla);
-	zbx_db_insert_clean(&db_insert_sla);
+	if (SUCCEED != zbx_db_insert_execute(&db_insert_sla))
+		goto out;
 
-	zbx_db_insert_execute(&db_insert_sla_service_tag);
-	zbx_db_insert_clean(&db_insert_sla_service_tag);
+	if (SUCCEED != zbx_db_insert_execute(&db_insert_sla_service_tag))
+		goto out;
 
 	zbx_db_insert_autoincrement(&db_insert_service_tag, "servicetagid");
-	zbx_db_insert_execute(&db_insert_service_tag);
-	zbx_db_insert_clean(&db_insert_service_tag);
+	if (SUCCEED != zbx_db_insert_execute(&db_insert_service_tag))
+		goto out;
 
 	zbx_db_insert_autoincrement(&db_insert_sla_schedule, "sla_scheduleid");
-	zbx_db_insert_execute(&db_insert_sla_schedule);
-	zbx_db_insert_clean(&db_insert_sla_schedule);
+	if (SUCCEED != zbx_db_insert_execute(&db_insert_sla_schedule))
+		goto out;
 
 	zbx_db_insert_autoincrement(&db_insert_sla_excluded_downtime, "sla_excluded_downtimeid");
-	zbx_db_insert_execute(&db_insert_sla_excluded_downtime);
+	if (SUCCEED != zbx_db_insert_execute(&db_insert_sla_excluded_downtime))
+		goto out;
+
+	ret = SUCCEED;
+out:
+	zbx_db_insert_clean(&db_insert_sla);
+	zbx_db_insert_clean(&db_insert_sla_service_tag);
+	zbx_db_insert_clean(&db_insert_service_tag);
+	zbx_db_insert_clean(&db_insert_sla_schedule);
 	zbx_db_insert_clean(&db_insert_sla_excluded_downtime);
+
+	return ret;
 }
 
 static void	services_times_convert_downtime(zbx_vector_services_times_t *services_times)
@@ -1530,7 +1541,7 @@ static int	DBpatch_5050125(void)
 	DB_ROW			row;
 	zbx_uint64_t		last_serviceid = 0;
 	zbx_vector_sla_t	slas, uniq_slas;
-	int			i, j;
+	int			i, j, ret;
 	char			*default_timezone;
 	sla_t			*sla;
 
@@ -1616,7 +1627,7 @@ static int	DBpatch_5050125(void)
 	}
 	DBfree_result(result);
 
-	db_insert_sla(&uniq_slas, default_timezone);
+	ret = db_insert_sla(&uniq_slas, default_timezone);
 
 	zbx_vector_sla_clear_ext(&slas, sla_clean);
 	zbx_vector_sla_clear_ext(&uniq_slas, sla_clean);
@@ -1625,7 +1636,7 @@ static int	DBpatch_5050125(void)
 
 	zbx_free(default_timezone);
 
-	return SUCCEED;
+	return ret;
 }
 
 static int	DBpatch_5050126(void)
