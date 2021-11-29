@@ -2952,7 +2952,7 @@ static int	evaluate_TREND(zbx_variant_t *value, DC_ITEM *item, const char *func,
 		if (SUCCEED != get_function_parameter_float(parameters, 4, ZBX_FLAG_DOUBLE_PLAIN, &deviations))
 			deviations = STL_DEF_DEVIATIONS;
 
-		if (SUCCEED != get_function_parameter_str(parameters, 5, &dev_alg))
+		if (SUCCEED != get_function_parameter_str(parameters, 5, &dev_alg) || '\0' == *dev_alg)
 		{
 			dev_alg = zbx_strdup(NULL, "mad");
 		}
