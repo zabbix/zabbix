@@ -1687,10 +1687,17 @@ static int	DBpatch_5050130(void)
 
 static int	DBpatch_5050131(void)
 {
-	return DBcreate_index("widget_field", "widget_field_7", "value_serviceid", 0);
+	const ZBX_FIELD	field = {"value_serviceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("widget_field", &field);
 }
 
 static int	DBpatch_5050132(void)
+{
+	return DBcreate_index("widget_field", "widget_field_7", "value_serviceid", 0);
+}
+
+static int	DBpatch_5050133(void)
 {
 	const ZBX_FIELD	field = {"value_serviceid", NULL, "services", "serviceid", 0, ZBX_TYPE_ID, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -1698,12 +1705,19 @@ static int	DBpatch_5050132(void)
 	return DBadd_foreign_key("widget_field", 7, &field);
 }
 
-static int	DBpatch_5050133(void)
+static int	DBpatch_5050134(void)
+{
+	const ZBX_FIELD	field = {"value_slaid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("widget_field", &field);
+}
+
+static int	DBpatch_5050135(void)
 {
 	return DBcreate_index("widget_field", "widget_field_8", "value_slaid", 0);
 }
 
-static int	DBpatch_5050134(void)
+static int	DBpatch_5050136(void)
 {
 	const ZBX_FIELD	field = {"value_slaid", NULL, "sla", "slaid", 0, ZBX_TYPE_ID, 0, ZBX_FK_CASCADE_DELETE};
 
@@ -1839,5 +1853,7 @@ DBPATCH_ADD(5050131, 0, 1)
 DBPATCH_ADD(5050132, 0, 1)
 DBPATCH_ADD(5050133, 0, 1)
 DBPATCH_ADD(5050134, 0, 1)
+DBPATCH_ADD(5050135, 0, 1)
+DBPATCH_ADD(5050136, 0, 1)
 
 DBPATCH_END()
