@@ -520,7 +520,7 @@ class testEscalations extends CIntegrationTest {
 
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 0);
 
-		// test abiliity to disable notfications about cancelled escalations
+		// test ability to disable notfications about cancelled escalations
 		$response = $this->call('action.update', [
 			'actionid' => self::$trigger_actionid,
 			'notify_if_canceled' => 0
