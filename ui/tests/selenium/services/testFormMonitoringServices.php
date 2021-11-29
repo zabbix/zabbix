@@ -369,7 +369,7 @@ class testFormMonitoringServices extends CWebTest {
 		$childs_dialog->query('button:Reset')->one()->waitUntilClickable()->click();
 		$childs_dialog->invalidate();
 
-		$this->assertEquals(15, count($childs_dialog->query('class:list-table')->asTable()->waitUntilReady()->one()
+		$this->assertEquals(12, count($childs_dialog->query('class:list-table')->asTable()->waitUntilReady()->one()
 				->getRows()->asArray())
 		);
 	}
