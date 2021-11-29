@@ -4091,9 +4091,7 @@ int	process_log_check(char *server, unsigned short port, zbx_vector_ptr_t *regex
 						metric->mtime = mtime_tmp;
 					}
 
-					zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, " from persistent file");
-
-					zabbix_log(LOG_LEVEL_WARNING, "%s", msg);
+					zabbix_log(LOG_LEVEL_WARNING, "%s from persistent file", msg);
 
 					zbx_free(msg);
 				}
