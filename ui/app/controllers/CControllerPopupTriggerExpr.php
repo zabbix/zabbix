@@ -110,9 +110,14 @@ class CControllerPopupTriggerExpr extends CController {
 				'T' => T_ZBX_INT,
 				'A' => true
 			],
-			'seasons' => [
-				'C' => _('Seasons'),
+			'num_seasons' => [
+				'C' => _('Number of seasons'),
 				'T' => T_ZBX_INT,
+				'A' => true
+			],
+			'season_unit' => [
+				'C' => _('Season unit'),
+				'T' => T_ZBX_STR,
 				'A' => true
 			]
 		];
@@ -1475,7 +1480,18 @@ class CControllerPopupTriggerExpr extends CController {
 				}
 				elseif ($data['item_description']) {
 					// Quote function string parameters.
-					$quote_params = ['v', 'o', 'chars', 'fit', 'mode', 'pattern', 'replace', 'string', 'algorithm'];
+					$quote_params = [
+						'algorithm',
+						'chars',
+						'fit',
+						'mode',
+						'o',
+						'pattern',
+						'replace',
+						'season_unit',
+						'string',
+						'v'
+					];
 					$quote_params = array_intersect_key($data['params'], array_fill_keys($quote_params, ''));
 					$quote_params = array_filter($quote_params, 'strlen');
 

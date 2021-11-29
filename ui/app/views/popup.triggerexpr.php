@@ -102,6 +102,7 @@ if ($data['item_required']) {
 $function_select = (new CSelect('function_select'))
 	->setFocusableElementId('label-function')
 	->setId('function-select')
+	->setAttribute('autofocus', 'autofocus')
 	->setValue($data['function_type'].'_'.$data['function']);
 
 $function_types = [
