@@ -34,7 +34,7 @@ func processNameDiscoveryHandler(ctx context.Context, conn PostgresClient,
 	var appNameJSON string
 
 	query := `SELECT 
-	json_build_object('data',coalesce(json_agg(json_build_object('{#APPLICATION_NAME}',application_name)), '[]'))		
+	json_build_object('data',COALESCE(json_agg(json_build_object('{#APPLICATION_NAME}',application_name)), '[]'))		
 	FROM pg_stat_replication`
 
 	row, err := conn.QueryRow(ctx, query)
