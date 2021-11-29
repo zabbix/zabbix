@@ -36,11 +36,11 @@ func Test_parseByte(t *testing.T) {
 		want    int64
 		wantErr bool
 	}{
-		{"+byte", args{"1000"}, 1000, false},
+		{"+byte", args{"1024"}, 1024, false},
 		{"+kB", args{"1K"}, 1024, false},
-		{"+mB", args{"1M"}, 1024 * 1000, false},
-		{"+gB", args{"1G"}, 1024 * 1000 * 1000, false},
-		{"+tB", args{"1T"}, 1024 * 1000 * 1000 * 1000, false},
+		{"+mB", args{"1M"}, 1024 * 1024, false},
+		{"+gB", args{"1G"}, 1024 * 1024 * 1024, false},
+		{"+tB", args{"1T"}, 1024 * 1024 * 1024 * 1024, false},
 		{"-empty", args{""}, 0, false},
 		{"-invalid_string", args{"foobar"}, 0, true},
 		{"-invalid_suffix", args{"1A"}, 0, true},

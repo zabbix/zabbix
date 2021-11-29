@@ -56,9 +56,9 @@ const (
 	terabyteType = 'T'
 
 	kb = 1024
-	mb = kb * 1000
-	gb = mb * 1000
-	tb = gb * 1000
+	mb = kb * 1024
+	gb = mb * 1024
+	tb = gb * 1024
 
 	secondsType = 's'
 	minuteType  = 'm'
