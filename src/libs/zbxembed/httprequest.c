@@ -527,9 +527,9 @@ zbx_cached_header_t;
 
 static void	cached_headers_free(zbx_cached_header_t *header)
 {
-	zbx_free(header->name);
-	zbx_vector_str_clear(&header->values);
+	zbx_vector_str_clear_ext(&header->values, zbx_str_free);
 	zbx_vector_str_destroy(&header->values);
+	zbx_free(header->name);
 	zbx_free(header);
 }
 
@@ -563,34 +563,35 @@ static duk_ret_t	get_headers_as_arrays(duk_context *ctx, zbx_es_httprequest_t *r
 
 		if (FAIL == parse_header(header, &value))
 		{
-			goto skip;
+			zbx_free(header);
+			continue;
 		}
 
-		for (int j = 0; j < headers.values_num; j++) {
+		for (int j = 0; j < headers.values_num; j++)
+		{
 			zbx_cached_header_t *h = (zbx_cached_header_t*)headers.values[j];
 
 			if (0 == strcmp(header, h->name))
 			{
 				existing_header = h;
+				zbx_vector_str_append(&existing_header->values, zbx_strdup(NULL, value));
+				zbx_free(header);
+
 				break;
 			}
 		}
 
-		if (existing_header != NULL) {
-			zbx_vector_str_append(&existing_header->values, value);
-		}
-		else {
+		if (NULL == existing_header)
+		{
 			zbx_cached_header_t	*cached_header;
 
 			cached_header = zbx_malloc(NULL, sizeof(zbx_cached_header_t));
 
-			cached_header->name = zbx_strdup(NULL, header);
+			cached_header->name = header;
 			zbx_vector_str_create(&cached_header->values);
-			zbx_vector_str_append(&cached_header->values, value);
+			zbx_vector_str_append(&cached_header->values, zbx_strdup(NULL, value));
 			zbx_vector_ptr_append(&headers, cached_header);
 		}
-skip:
-		zbx_free(header);
 	}
 
 	for (int i = 0; i < headers.values_num; i++) {
