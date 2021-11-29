@@ -35,7 +35,16 @@ class CMessageBehavior extends CBehavior {
 	public function assertMessage($expected, $title = null, $details = null) {
 		$message = CMessageElement::find()->waitUntilVisible()->one();
 
-		$this->test->assertTrue(($expected === TEST_GOOD) ? $message->isGood() : $message->isBad());
+		if ($expected === TEST_GOOD) {
+			$message->isGood();
+		}
+		elseif ($expected === TEST_BAD) {
+			$message->isBad();
+		}
+		else {
+			$message->isWarning();
+		}
+
 		if ($title !== null) {
 			$this->test->assertEquals($title, $message->getTitle(), 'Message title and the expected title do not match.');
 		}
