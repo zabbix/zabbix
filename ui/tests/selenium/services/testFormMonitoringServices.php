@@ -1135,7 +1135,7 @@ class testFormMonitoringServices extends CWebTest {
 		$this->assertMessage(TEST_GOOD, 'Service updated');
 
 		// Check "No data found." text in table under Parent.
-		$this->assertTableData('No data found.');
+		$this->assertTableData([]);
 
 		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($parent)));
 		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($child)));
@@ -1164,7 +1164,7 @@ class testFormMonitoringServices extends CWebTest {
 
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Service updated');
-		$this->assertTableData('No data found.');
+		$this->assertTableData([]);
 
 		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($parent)));
 		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($child)));
