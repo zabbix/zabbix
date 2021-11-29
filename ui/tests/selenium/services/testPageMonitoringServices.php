@@ -384,6 +384,13 @@ class testPageMonitoringServices extends CWebTest {
 		$this->assertFalse($this->query('xpath://button[@title="Kiosk mode"]')->exists());
 	}
 
+	/**
+	 * Function for checking layout of Parent-Child chains layout.
+	 *
+	 * @param CTableElement    $table    table where to select particular service
+	 * @param string           $parent   name of parent service
+	 * @param string           $childt   name of child service
+	 */
 	private function checkParentChildLayout($table, $parent, $child) {
 		$this->checkSeviceInfoLayout($table, $parent);
 		$this->assertTableDataColumn([$child.' 1'], 'Name');
@@ -396,11 +403,21 @@ class testPageMonitoringServices extends CWebTest {
 					->one()->isClickable()
 			);
 		}
+
+		// Check selected breadcrumb.
 		$this->assertTrue($this->query(self::BREADCRUMB_SELECTOR)->one()
-				->query("xpath://span[@class='selected']//a[text()=".CXPathHelper::escapeQuotes($child)."]")->one()->isValid()
+				->query("xpath://span[@class='selected']//a[text()=".CXPathHelper::escapeQuotes($child)."]")->one()
+				->isValid()
 		);
 	}
 
+	/**
+	 * Function for checking layout of Service info card.
+	 *
+	 * @param CTableElement    $table    table where to select particular service
+	 * @param string           $service  name of service to be checked
+	 * @param boolean          $edit     true if it is edit scenario, false otherwise
+	 */
 	private function checkSeviceInfoLayout($table, $service, $edit = false) {
 		$table->findRow('Name', $service, true)->query('link', $service)->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
@@ -423,6 +440,12 @@ class testPageMonitoringServices extends CWebTest {
 		$this->assertTableStats(1);
 	}
 
+	/**
+	 * Function for checking service action buttons in a table row.
+	 *
+	 * @param CTableRowElement    $row       row where buttons to be found
+	 * @param boolean             $exists    true if buttons should exist, false otherwise
+	 */
 	private function checkServiceButtons($row, $exists) {
 		$this->assertEquals($exists, $row->query('xpath://button[@title="Add child service"]')->one(false)->isClickable());
 		$this->assertEquals($exists, $row->query('xpath://button[@title="Edit"]')->one(false)->isClickable());
@@ -762,6 +785,12 @@ class testPageMonitoringServices extends CWebTest {
 		$this->checkFiltering($data, self::EDIT);
 	}
 
+	/**
+	 * Function for checking filtering on Monitoring->Service page.
+	 *
+	 * @param array      $data      data provider
+	 * @param boolean    $edit      true if is edit scenario, false otherwise
+	 */
 	private function checkFiltering($data, $edit = false){
 		$this->page->login()->open(($edit === false) ? 'zabbix.php?action=service.list' :
 				'zabbix.php?action=service.list.edit'
@@ -896,6 +925,11 @@ class testPageMonitoringServices extends CWebTest {
 		$this->cancelDelete(true);
 	}
 
+	/**
+	 * Function for checking cancelling of Delete action.
+	 *
+	 * @param boolean    $mass      true if is mass delete scenario, false otherwise
+	 */
 	private function cancelDelete($mass = false) {
 		$name = 'Server 6 for delete by checkbox';
 

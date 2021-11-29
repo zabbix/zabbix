@@ -858,6 +858,6 @@ class testPageTriggers extends CLegacyWebTest {
 		$this->assertFalse($this->query('button:Create trigger (select host first)')->one()->isEnabled());
 		$this->assertTrue($this->query('class:breadcrumb')->all()->isEmpty());
 		// Check results in table.
-		$this->assertTableData(CTestArrayHelper::get($data, 'result', []), $this->selector);
+		$this->assertTableData(CTestArrayHelper::get($data, 'result', 'No data found.'), $this->selector);
 	}
 }

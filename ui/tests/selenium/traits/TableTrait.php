@@ -54,9 +54,9 @@ trait TableTrait {
 	 */
 	public function assertTableData($data = [], $selector = 'class:list-table') {
 		$rows = $this->query($selector)->asTable()->one()->getRows();
-		if (!$data) {
+		if ($data === 'No data found.') {
 			// Check that table contain one row with text "No data found."
-			$this->assertEquals(['No data found.'], $rows->asText());
+			$this->assertEquals([$data], $rows->asText());
 
 			return;
 		}

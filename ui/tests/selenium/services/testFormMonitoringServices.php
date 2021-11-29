@@ -232,7 +232,8 @@ class testFormMonitoringServices extends CWebTest {
 
 		foreach ($tabs as $tab) {
 			$this->assertTrue($form->query("xpath:.//li[@role='tab']//a[text()=".CXPathHelper::escapeQuotes($tab).']')
-					->one()->isValid());
+					->one()->isValid()
+			);
 		}
 
 		$service_tabs_labels = [
@@ -293,7 +294,8 @@ class testFormMonitoringServices extends CWebTest {
 		// Check SLA tab labels.
 		$sla_tab_labels = ['SLA', 'Service times'];
 		foreach ($sla_tab_labels as $label) {
-			$this->assertTrue($form->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($label).']')->one(false)->isValid());
+			$this->assertTrue($form->query("xpath:.//label[text()=".CXPathHelper::escapeQuotes($label)."]")
+					->one()->isValid());
 		}
 
 		// Check SLA checkbox.
@@ -338,22 +340,22 @@ class testFormMonitoringServices extends CWebTest {
 		);
 
 		$form->getFieldContainer('Child services')->query('button:Add')->waitUntilClickable()->one()->click();
-		$childs_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+		$children_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 
 		// Check popup title.
-		$this->assertEquals('Add child services', $childs_dialog->getTitle());
+		$this->assertEquals('Add child services', $children_dialog->getTitle());
 
 		// Check input fields maxlength.
-		$this->assertEquals(255, $childs_dialog->query('id:services-filter-name')->one()->getAttribute('maxlength'));
+		$this->assertEquals(255, $children_dialog->query('id:services-filter-name')->one()->getAttribute('maxlength'));
 
 		// Check "select all" checkbox default value.
-		$this->assertFalse($childs_dialog->query('id:serviceid_all')->asCheckbox()->one()->isChecked());
+		$this->assertFalse($children_dialog->query('id:serviceid_all')->asCheckbox()->one()->isChecked());
 
 		// Enter and submit filtering data.
-		$childs_dialog->query('id:services-filter-name')->one()->fill('Parent1');
-		$childs_dialog->query('button:Filter')->one()->waitUntilClickable()->click();
+		$children_dialog->query('id:services-filter-name')->one()->fill('Parent1');
+		$children_dialog->query('button:Filter')->one()->waitUntilClickable()->click();
 		$this->page->waitUntilReady();
-		$childs_dialog->invalidate();
+		$children_dialog->invalidate();
 
 		// Check filtering result.
 		$result = [
@@ -366,10 +368,10 @@ class testFormMonitoringServices extends CWebTest {
 		$this->assertTableData($result, 'xpath://div[@data-dialogueid="services"]//table[@class="list-table"]');
 
 		// Check filtering reset.
-		$childs_dialog->query('button:Reset')->one()->waitUntilClickable()->click();
-		$childs_dialog->invalidate();
+		$children_dialog->query('button:Reset')->one()->waitUntilClickable()->click();
+		$children_dialog->invalidate();
 
-		$this->assertEquals(12, count($childs_dialog->query('class:list-table')->asTable()->waitUntilReady()->one()
+		$this->assertEquals(12, count($children_dialog->query('class:list-table')->asTable()->waitUntilReady()->one()
 				->getRows()->asArray())
 		);
 	}
@@ -629,9 +631,9 @@ class testFormMonitoringServices extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Name' => 'Service with childs'
+						'Name' => 'Service with children'
 					],
-					'childs' => [
+					'children' => [
 						'Child services' => [
 							'Service' => 'Child4',
 							'Status calculation rule' => 'Most critical if all children have problems',
@@ -647,7 +649,7 @@ class testFormMonitoringServices extends CWebTest {
 					'fields' => [
 						'Name' => 'Child1',
 					],
-					'dublicate' => true
+					'duplicate' => true
 				]
 			],
 			// This case should always be last, otherwise update sceanrio won't work.
@@ -657,7 +659,7 @@ class testFormMonitoringServices extends CWebTest {
 						'Name' => 'With parent',
 						'Parent services' => 'Parent1'
 					],
-					'update_dublicate' => true
+					'update_duplicate' => true
 				]
 			]
 		];
@@ -754,16 +756,16 @@ class testFormMonitoringServices extends CWebTest {
 				}
 			}
 		}
-		elseif (array_key_exists('childs', $data)) {
+		elseif (array_key_exists('children', $data)) {
 			$form->selectTab('Child services');
 
 			$service = $form->getFieldContainer('Child services');
 			$service->query('button:Add')->waitUntilClickable()->one()->click();
-			$childs_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
-			$table = $childs_dialog->query('class:list-table')->asTable()->waitUntilVisible()->one();
-			$table->findRow('Name', $data['childs']['Child services']['Service'])->select();
-			$childs_dialog->query('button:Select')->waitUntilClickable()->one()->click();
-			$this->assertTableData([$data['childs']['Child services']], 'id:children');
+			$children_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+			$table = $children_dialog->query('class:list-table')->asTable()->waitUntilVisible()->one();
+			$table->findRow('Name', $data['children']['Child services']['Service'])->select();
+			$children_dialog->query('button:Select')->waitUntilClickable()->one()->click();
+			$this->assertTableData([$data['children']['Child services']], 'id:children');
 		}
 
 		// Return to tab Service for filling it.
@@ -780,14 +782,14 @@ class testFormMonitoringServices extends CWebTest {
 		}
 		else {
 			$this->assertMessage(TEST_GOOD, ($update ? 'Service updated' : 'Service created'));
-			$count = (array_key_exists('dublicate', $data)) ? 2 : 1;
+			$count = (array_key_exists('duplicate', $data)) ? 2 : 1;
 			$this->assertEquals($count, CDBHelper::getCount('SELECT * FROM services WHERE name='.
 					zbx_dbstr($data['fields']['Name']))
 			);
 
 			if ($update) {
 				// In update scenario check that old name actually changed.
-				$expected_count = (array_key_exists('update_dublicate', $data)) ? 1 : 0;
+				$expected_count = (array_key_exists('update_duplicate', $data)) ? 1 : 0;
 				$this->assertEquals($expected_count, CDBHelper::getCount('SELECT * FROM services WHERE name='.
 						zbx_dbstr(self::$update_service))
 				);
@@ -805,16 +807,16 @@ class testFormMonitoringServices extends CWebTest {
 						->query('link', $data['fields']['Parent services'])->waitUntilClickable()->one()->click();
 			}
 
-			if (array_key_exists('childs', $data)) {
+			if (array_key_exists('children', $data)) {
 				$row = $table->findRow('Name', $data['fields']['Name'], true);
 
-				$this->assertEquals($data['fields']['Name'].' '.count($data['childs']),
+				$this->assertEquals($data['fields']['Name'].' '.count($data['children']),
 						$row->getColumn('Name')->getText()
 				);
 
 				$row->query('xpath:.//button[@title="Edit"]')->waitUntilClickable()->one()->click();
 				$form->selectTab('Child services');
-				$this->assertTableData([$data['childs']['Child services']], 'css: form#service-form div#child-services-tab table#children');
+				$this->assertTableData([$data['children']['Child services']], 'id:children');
 			}
 			else {
 				$table->findRow('Name', $data['fields']['Name'])->query('xpath:.//button[@title="Edit"]')
@@ -850,13 +852,13 @@ class testFormMonitoringServices extends CWebTest {
 					);
 				}
 			}
-			elseif (array_key_exists('childs', $data)) {
+			elseif (array_key_exists('children', $data)) {
 				$form->selectTab('Child services');
-				$this->assertTableData([$data['childs']['Child services']], 'css: form#service-form div#child-services-tab table#children');
+				$this->assertTableData([$data['children']['Child services']], 'id:children');
 			}
 
-			if (array_key_exists('childs', $data)){
-				$form->checkValue($data['fields']['Name'].' '.count($data['childs']));
+			if (array_key_exists('children', $data)){
+				$form->checkValue($data['fields']['Name'].' '.count($data['children']));
 			}
 			else {
 				$form->checkValue($data['fields']);
@@ -870,7 +872,23 @@ class testFormMonitoringServices extends CWebTest {
 			[
 				[
 					'name' => 'Clone_parent',
-					'children' => ['Clone1', 'Clone2']
+					'children' => [
+						'Child services' => [
+							[
+								'Service' => 'Clone1',
+								'Status calculation rule' => 'Set status to OK',
+								'Problem tags' => 'problem_tag_clone: problem_value_clone',
+								'Action' => 'Remove'
+							],
+							[
+								'Service' => 'Clone2',
+								'Status calculation rule' => 'Most critical if all children have problems',
+								'Problem tags' => '',
+								'Action' => 'Remove'
+							]
+
+						]
+					]
 				]
 			],
 			// Service with parent.
@@ -879,8 +897,7 @@ class testFormMonitoringServices extends CWebTest {
 					'name' => 'Clone1',
 					'parent' => 'Clone_parent'
 				]
-			],
-
+			]
 		];
 	}
 
@@ -908,13 +925,7 @@ class testFormMonitoringServices extends CWebTest {
 		// Check Child services before cloning.
 		if (CTestArrayHelper::get($data, 'children')) {
 			$form->selectTab('Child services');
-
-			foreach ($data['children'] as $child) {
-				$this->assertTrue($dialog->query('id:children')->waitUntilVisible()->one()
-						->query("xpath:.//tr[@data-serviceid]//td[text()=".CXPathHelper::escapeQuotes($child)."]")
-						->exists()
-				);
-			}
+			$this->assertTableData($data['children']['Child services'], 'id:children');
 		}
 
 		$dialog->query('button:Clone')->waitUntilClickable()->one()->click();
@@ -944,13 +955,7 @@ class testFormMonitoringServices extends CWebTest {
 		// Check Child services were not cloned.
 		if (CTestArrayHelper::get($data, 'children')) {
 			$form->selectTab('Child services');
-
-			foreach ($data['children'] as $child) {
-				$this->assertFalse($dialog->query('id:children')->waitUntilVisible()->one()
-						->query("xpath:.//tr[@data-serviceid]//td[text()=".CXPathHelper::escapeQuotes($child)."]")
-						->exists()
-				);
-			}
+			$this->assertTableData([], 'id:children');
 		}
 	}
 
@@ -972,6 +977,8 @@ class testFormMonitoringServices extends CWebTest {
 	}
 
 	/**
+	 * Test for updating service form without any changes.
+	 *
 	 * @dataProvider getSimpleUpdateData
 	 */
 	public function testFormMonitoringServices_SimpleUpdate($data) {
@@ -1054,8 +1061,8 @@ class testFormMonitoringServices extends CWebTest {
 				$form->selectTab('Child services');
 				$service = $form->getFieldContainer('Child services');
 				$service->query('button:Add')->waitUntilClickable()->one()->click();
-				$childs_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
-				$childs_dialog->query('link', $data['Child services'])->waitUntilReady()->one()->click();
+				$children_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+				$children_dialog->query('link', $data['Child services'])->waitUntilReady()->one()->click();
 			}
 
 			$form->submit();
@@ -1128,16 +1135,15 @@ class testFormMonitoringServices extends CWebTest {
 		$this->assertMessage(TEST_GOOD, 'Service updated');
 
 		// Check "No data found." text in table under Parent.
-		$this->assertTableData([]);
+		$this->assertTableData('No data found.');
 
-		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.
-				zbx_dbstr($parent)));
-		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.
-				zbx_dbstr($child)));
+		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($parent)));
+		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($child)));
 
 		// Check that service linking is disappeared from DB.
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services_links WHERE serviceupid='.
-				self::$parentid.' AND servicedownid ='.self::$childid));
+				self::$parentid.' AND servicedownid ='.self::$childid)
+		);
 	}
 
 	public function testFormMonitoringServices_DeleteParent() {
@@ -1158,13 +1164,12 @@ class testFormMonitoringServices extends CWebTest {
 
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Service updated');
-		$this->assertTableData([]);
+		$this->assertTableData('No data found.');
 
-		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.
-				zbx_dbstr($parent)));
-		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.
-				zbx_dbstr($child)));
+		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($parent)));
+		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($child)));
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services_links WHERE serviceupid='.
-				self::$parentid_2.' AND servicedownid ='.self::$childid_2));
+				self::$parentid_2.' AND servicedownid ='.self::$childid_2)
+		);
 	}
 }
