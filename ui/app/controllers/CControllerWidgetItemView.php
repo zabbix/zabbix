@@ -349,7 +349,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 			return sprintf('%.'.ZBX_FLOAT_DIG.'E', $value);
 		}
 		else {
-			return round($value, $decimals);
+			return round((float) $value, $decimals);
 		}
 	}
 
