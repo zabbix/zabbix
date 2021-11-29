@@ -4068,16 +4068,35 @@ int	process_log_check(char *server, unsigned short port, zbx_vector_ptr_t *regex
 
 				if (metric->lastlogsize != processed_size_tmp || metric->mtime < mtime_tmp)
 				{
-					zabbix_log(LOG_LEVEL_WARNING, "%s(): item \"%s\": overriding mtime:"
-							" %d -> %d lastlogsize: " ZBX_FS_UI64 " -> " ZBX_FS_UI64
-							" from persistent file", __func__, metric->key,
-							metric->mtime, mtime_tmp, metric->lastlogsize,
-							processed_size_tmp);
+					char	*msg = NULL;
+					size_t	msg_alloc = 0, msg_offset = 0;
 
-					metric->lastlogsize = processed_size_tmp;
+					zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, "%s(): item \"%s\":"
+							" overriding", __func__, metric->key);
+
+					if (metric->lastlogsize != processed_size_tmp)
+					{
+						zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset,
+								" lastlogsize: " ZBX_FS_UI64 " -> " ZBX_FS_UI64,
+								metric->lastlogsize, processed_size_tmp);
+
+						metric->lastlogsize = processed_size_tmp;
+					}
 
 					if (metric->mtime < mtime_tmp)
+					{
+						zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset,
+								" mtime: %d -> %d",
+								metric->mtime, mtime_tmp);
+
 						metric->mtime = mtime_tmp;
+					}
+
+					zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, " from persistent file");
+
+					zabbix_log(LOG_LEVEL_WARNING, "%s", msg);
+
+					zbx_free(msg);
 				}
 			}
 			else
