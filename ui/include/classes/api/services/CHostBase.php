@@ -595,7 +595,7 @@ abstract class CHostBase extends CApiService {
 					]);
 
 					if ($objects[$hostid]['status'] == HOST_STATUS_TEMPLATE) {
-						$error = _('Cannot link template "%1$s" without template "%2$s"  to template "%3$s" due to dependency of trigger "%4$s".');
+						$error = _('Cannot link template "%1$s" without template "%2$s" to template "%3$s" due to dependency of trigger "%4$s".');
 					}
 					elseif ($objects[$hostid]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 						$error = _('Cannot link template "%1$s" without template "%2$s" to host prototype "%3$s" due to dependency of trigger "%4$s".');
@@ -722,7 +722,7 @@ abstract class CHostBase extends CApiService {
 					]);
 
 					if ($objects[$hostid]['status'] == HOST_STATUS_TEMPLATE) {
-						$error = _('Cannot link template "%1$s" without template "%2$s"  to template "%3$s" due to expression of trigger "%4$s".');
+						$error = _('Cannot link template "%1$s" without template "%2$s" to template "%3$s" due to expression of trigger "%4$s".');
 					}
 					elseif ($objects[$hostid]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 						$error = _('Cannot link template "%1$s" without template "%2$s" to host prototype "%3$s" due to expression of trigger "%4$s".');
