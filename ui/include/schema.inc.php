@@ -7503,6 +7503,20 @@ return [
 				'length' => 20,
 				'ref_table' => 'sysmaps',
 				'ref_field' => 'sysmapid'
+			],
+			'value_serviceid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'service',
+				'ref_field' => 'serviceid'
+			],
+			'value_slaid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'sla',
+				'ref_field' => 'slaid'
 			]
 		]
 	],

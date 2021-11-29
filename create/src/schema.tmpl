@@ -1608,12 +1608,16 @@ FIELD		|value_hostid	|t_id		|	|NULL		|0			|3|hosts	|hostid
 FIELD		|value_itemid	|t_id		|	|NULL		|0			|4|items	|itemid
 FIELD		|value_graphid	|t_id		|	|NULL		|0			|5|graphs	|graphid
 FIELD		|value_sysmapid	|t_id		|	|NULL		|0			|6|sysmaps	|sysmapid
+FIELD		|value_serviceid|t_id		|	|NULL		|0			|7|service	|serviceid
+FIELD		|value_slaid	|t_id		|	|NULL		|0			|8|sla		|slaid
 INDEX		|1		|widgetid
 INDEX		|2		|value_groupid
 INDEX		|3		|value_hostid
 INDEX		|4		|value_itemid
 INDEX		|5		|value_graphid
 INDEX		|6		|value_sysmapid
+INDEX		|7		|value_serviceid
+INDEX		|8		|value_slaid
 
 TABLE|task_check_now|taskid|0
 FIELD		|taskid		|t_id		|	|NOT NULL	|0			|1|task
