@@ -231,7 +231,7 @@ class testFormMonitoringServices extends CWebTest {
 		$this->assertEquals(count($tabs), $form->query("xpath:.//li[@role='tab']")->all()->count());
 
 		foreach ($tabs as $tab) {
-			$this->assertTrue($form->query("xpath:.//li[@role='tab']//a[text()=".CXPathHelper::escapeQuotes($tab).']')
+			$this->assertTrue($form->query("xpath:.//li[@role='tab']//a[text()=".CXPathHelper::escapeQuotes($tab)."]")
 					->one()->isValid()
 			);
 		}
