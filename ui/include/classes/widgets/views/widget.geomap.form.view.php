@@ -64,7 +64,17 @@ $jq_templates['tag-row-tmpl'] = CWidgetHelper::getTagsTemplate($fields['tags']);
 
 // Default view.
 $form_list->addRow(
-	CWidgetHelper::getLabel($fields['default_view']),
+	CWidgetHelper::getLabel($fields['default_view'], null, [
+		_('Comma separated center coordinates and zoom level to display when the widget is initially loaded.'),
+		BR(),
+		_('Supported formats:'),
+		(new CList([
+			new CListItem((new CSpan('<lat>,<lng>,<zoom>'))->addClass(ZBX_STYLE_MONOSPACE_FONT)),
+			new CListItem((new CSpan('<lat>,<lng>'))->addClass(ZBX_STYLE_MONOSPACE_FONT))
+		]))->addClass(ZBX_STYLE_LIST_DASHED),
+		BR(),
+		_('Initial view is ignored if the default view is set.')
+	]),
 	CWidgetHelper::getLatLngZoomBox($fields['default_view'])
 );
 

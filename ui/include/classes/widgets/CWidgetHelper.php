@@ -111,21 +111,25 @@ class CWidgetHelper {
 	 * Creates label linked to the field.
 	 *
 	 * @param CWidgetField $field
+	 * @param string       $class	Custom CSS class for label.
+	 * @param mixed        $hint	Hint box text.
 	 *
 	 * @return CLabel
 	 */
-	public static function getLabel($field) {
+	public static function getLabel($field, $class = null, $hint = null) {
 		if ($field instanceof CWidgetFieldSelect) {
 			return (new CLabel($field->getLabel(), 'label-'.$field->getName()))
-				->setAsteriskMark(self::isAriaRequired($field));
+				->setAsteriskMark(self::isAriaRequired($field))
+				->addClass($class);
 		}
 
-		$help_icon = property_exists($field, 'help_text')
-			? makeHelpIcon($field->getHelpText())
+		$help_icon = ($hint !== null)
+			? makeHelpIcon($hint)
 			: null;
 
 		return (new CLabel([$field->getLabel(), $help_icon], $field->getName()))
-			->setAsteriskMark(self::isAriaRequired($field));
+			->setAsteriskMark(self::isAriaRequired($field))
+			->addClass($class);
 	}
 
 	/**
