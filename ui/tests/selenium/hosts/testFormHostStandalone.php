@@ -27,7 +27,6 @@ require_once dirname(__FILE__).'/../common/testFormHost.php';
  */
 class testFormHostStandalone extends testFormHost {
 
-
 	public $standalone = true;
 	public $link = 'zabbix.php?action=host.edit&hostid=';
 	public $create_link = 'zabbix.php?action=host.edit';

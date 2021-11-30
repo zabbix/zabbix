@@ -1512,8 +1512,6 @@ class testFormHost extends CWebTest {
 	 * Update the host without any changes and check host and interfaces hashes.
 	 *
 	 * @param string    $link          direct link for opening host page
-	 * @param boolean   $this->monitoring    true if Monitoring->Hosts section is being checked, false if other
-	 * @param boolean   $this->standalone    false if configuration or monitoring, true if standalone page
 	 */
 	public function checkHostSimpleUpdate($link) {
 		$host_old_hash = CDBHelper::getHash($this->hosts_sql);
