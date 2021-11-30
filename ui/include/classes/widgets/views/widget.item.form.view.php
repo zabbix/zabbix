@@ -208,6 +208,11 @@ $form_list
 		'bg-color-row'
 	);
 
+// Dynamic item.
+if ($data['templateid'] === null) {
+	$form_list->addRow(CWidgetHelper::getLabel($fields['dynamic']), CWidgetHelper::getCheckBox($fields['dynamic']));
+}
+
 $form->addItem($form_list);
 
 // Append color picker to widget body instead of whole HTML body. Process checkboxes and form block visibility.

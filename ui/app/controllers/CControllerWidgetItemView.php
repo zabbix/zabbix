@@ -44,23 +44,26 @@ class CControllerWidgetItemView extends CControllerWidget {
 		$time = '';
 		$units = '';
 		$decimals = '';
+		$is_dynamic = ($this->hasInput('dynamic_hostid')
+				&& ($this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
+					|| $fields['dynamic'] == WIDGET_DYNAMIC_ITEM)
+		);
 
-		if ($this->hasInput('dynamic_hostid')) {
-			$template_items = API::Item()->get([
+		if ($is_dynamic) {
+			$tmp_items = API::Item()->get([
 				'output' => ['key_'],
 				'itemids' => $fields['itemid'],
 				'webitems' => true
 			]);
 
-			if ($template_items) {
+			if ($tmp_items) {
 				$options = [
 					'output' => ['value_type'],
 					'selectValueMap' => ['mappings'],
 					'hostids' => [$this->getInput('dynamic_hostid')],
 					'webitems' => true,
 					'filter' => [
-						'status' => ITEM_STATUS_ACTIVE,
-						'key_' => $template_items[0]['key_']
+						'key_' => $tmp_items[0]['key_']
 					],
 					'preservekeys' => true
 				];
@@ -72,16 +75,13 @@ class CControllerWidgetItemView extends CControllerWidget {
 				'selectValueMap' => ['mappings'],
 				'itemids' => $fields['itemid'],
 				'webitems' => true,
-				'filter' => [
-					'status' => ITEM_STATUS_ACTIVE
-				],
 				'preservekeys' => true
 			];
 		}
 
 		$show = array_flip($fields['show']);
 
-		if (($this->hasInput('dynamic_hostid') && $template_items) || !$this->hasInput('dynamic_hostid')) {
+		if ($is_dynamic && $tmp_items || !$is_dynamic) {
 			// If description contains user macros, we need "itemid" and "hostid" to resolve them.
 			if (array_key_exists(WIDGET_ITEM_SHOW_DESCRIPTION, $show)) {
 				$options['output'] = array_merge($options['output'], ['itemid', 'hostid']);
@@ -92,8 +92,8 @@ class CControllerWidgetItemView extends CControllerWidget {
 			}
 		}
 
-		if ($this->hasInput('dynamic_hostid')) {
-			if ($template_items) {
+		if ($is_dynamic) {
+			if ($tmp_items) {
 				$items = API::Item()->get($options);
 				$itemid = key($items);
 			}
