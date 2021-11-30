@@ -124,7 +124,10 @@ class CControllerWidgetGeoMapView extends CControllerWidget {
 		]);
 
 		$hosts = array_filter($hosts, function ($host) {
-			return (is_numeric($host['inventory']['location_lat']) && is_numeric($host['inventory']['location_lon']));
+			['location_lat' => $lat, 'location_lon' => $lng] = $host['inventory'];
+
+			return (is_numeric($lat) && $lat >= GEOMAP_LAT_MIN && $lat <= GEOMAP_LAT_MAX
+						&& is_numeric($lng) && $lng >= GEOMAP_LNG_MIN && $lng <= GEOMAP_LNG_MAX);
 		});
 
 		// Get triggers.

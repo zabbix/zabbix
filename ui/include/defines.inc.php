@@ -1229,6 +1229,12 @@ define('ZBX_BYTE_SUFFIX_MULTIPLIERS', [
 	'T' => ZBX_TEBIBYTE
 ]);
 
+// Geographic coordinate system edges.
+define('GEOMAP_LAT_MIN', -90);
+define('GEOMAP_LAT_MAX', 90);
+define('GEOMAP_LNG_MIN', -180);
+define('GEOMAP_LNG_MAX', 180);
+
 // Regular expressions.
 define('ZBX_PREG_PRINT', '^\x00-\x1F');
 define('ZBX_PREG_MACRO_NAME', '([A-Z0-9\._]+)');
