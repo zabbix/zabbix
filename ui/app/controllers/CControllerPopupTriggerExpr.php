@@ -110,14 +110,21 @@ class CControllerPopupTriggerExpr extends CController {
 				'T' => T_ZBX_INT,
 				'A' => true
 			],
+			'season_unit' => [
+				'C' => _('Season'),
+				'T' => T_ZBX_STR,
+				'A' => true,
+				'options' => [
+					'h' => _('Hour'),
+					'd' => _('Day'),
+					'w' => _('Week'),
+					'M' => _("Month"),
+					'y' => _('Year')
+				]
+			],
 			'num_seasons' => [
 				'C' => _('Number of seasons'),
 				'T' => T_ZBX_INT,
-				'A' => true
-			],
-			'season_unit' => [
-				'C' => _('Season unit'),
-				'T' => T_ZBX_STR,
 				'A' => true
 			]
 		];
