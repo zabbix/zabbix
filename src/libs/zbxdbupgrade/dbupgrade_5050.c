@@ -1185,6 +1185,14 @@ static int	DBpatch_5050111(void)
 
 	return DBcreate_index("alerts", "alerts_8", "acknowledgeid", 0);
 }
+
+static int	DBpatch_5050112(void)
+{
+	const ZBX_FIELD old_field = {"formula", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD new_field = {"formula", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("actions", &new_field, &old_field);
+}
 #endif
 
 DBPATCH_START(5050)
@@ -1290,5 +1298,6 @@ DBPATCH_ADD(5050108, 0, 1)
 DBPATCH_ADD(5050109, 0, 1)
 DBPATCH_ADD(5050110, 0, 1)
 DBPATCH_ADD(5050111, 0, 1)
+DBPATCH_ADD(5050112, 0, 1)
 
 DBPATCH_END()
