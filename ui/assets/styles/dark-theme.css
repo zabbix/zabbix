@@ -6631,6 +6631,10 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
     cursor: default;
     opacity: .4; }
 
+.leaflet-container {
+  height: 100%;
+  z-index: 1; }
+
 .sidebar.is-compact:not(.is-opened) .form-search .search-icon {
   opacity: .75; }
 

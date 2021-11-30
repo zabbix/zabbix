@@ -6619,3 +6619,7 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   .leaflet-control.disabled .geomap-filter-button {
     cursor: default;
     opacity: .4; }
+
+.leaflet-container {
+  height: 100%;
+  z-index: 1; }
