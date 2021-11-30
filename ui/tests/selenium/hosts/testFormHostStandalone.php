@@ -29,7 +29,6 @@ class testFormHostStandalone extends testFormHost {
 
 	public $standalone = true;
 	public $link = 'zabbix.php?action=host.edit&hostid=';
-	public $create_link = 'zabbix.php?action=host.edit';
 
 	public function testFormHostStandalone_Layout() {
 		$this->checkHostLayout();
@@ -39,6 +38,7 @@ class testFormHostStandalone extends testFormHost {
 	 * @dataProvider getCreateData
 	 */
 	public function testFormHostStandalone_Create($data) {
+		$this->link = 'zabbix.php?action=host.edit';
 		$this->checkHostCreate($data);
 	}
 
@@ -89,6 +89,7 @@ class testFormHostStandalone extends testFormHost {
 	 * @dataProvider getCancelData
 	 */
 	public function testFormHostStandalone_Cancel($data) {
+		$this->link = 'zabbix.php?action=host.edit';
 		$this->checkCancel($data);
 	}
 

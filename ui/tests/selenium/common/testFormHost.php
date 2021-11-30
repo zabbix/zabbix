@@ -42,11 +42,6 @@ class testFormHost extends CWebTest {
 	public $link;
 
 	/**
-	 * Direct link for creating host.
-	 */
-	public $create_link = null;
-
-	/**
 	 * Flag for host form opened by direct link.
 	 */
 	public $standalone = false;
@@ -1700,7 +1695,7 @@ class testFormHost extends CWebTest {
 		];
 
 		if ($data['action'] === 'Add') {
-			$this->page->login()->open($this->standalone ? $this->create_link : $this->link)->waitUntilReady();
+			$this->page->login()->open($this->link)->waitUntilReady();
 
 			if (!$this->standalone) {
 				$this->query('button:Create host')->one()->waitUntilClickable()->click();
@@ -1711,7 +1706,7 @@ class testFormHost extends CWebTest {
 			}
 		}
 		else {
-			$form = $this->openForm(($this->standalone ? $this->link.$hostid : $this->link), $host);
+			$form = $this->openForm(($this->standalone ? 'zabbix.php?action=host.edit&hostid='.$hostid : $this->link), $host);
 		}
 
 		$form_type = ($this->standalone) ? $form : COverlayDialogElement::find()->waitUntilReady()->one();
