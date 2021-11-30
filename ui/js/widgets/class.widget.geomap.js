@@ -377,7 +377,7 @@ class CWidgetGeoMap extends CWidget {
 			btn.setAttribute('data-menu-popup', data_menu_popup);
 			btn.classList.add('link-action');
 			btn.href = 'javascript:void(0)';
-			btn.innerHTML = name;
+			btn.textContent = name;
 
 			return btn;
 		};
