@@ -49,8 +49,9 @@ trait TableTrait {
 	/**
 	 * Check if values in table rows match data from data provider.
 	 *
-	 * @param array   $data     data array to be match with result in table
-	 * @param string $selector	table selector
+	 * @param array      $data        data array to be match with result in table
+	 * @param string     $selector	  table selector
+	 * @param boolean    $empty	      true if table is empty without 'No data found.' row
 	 */
 	public function assertTableData($data = [], $selector = 'class:list-table', $empty = false) {
 		$rows = $this->query($selector)->asTable()->one()->getRows();
