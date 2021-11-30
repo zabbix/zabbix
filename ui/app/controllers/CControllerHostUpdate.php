@@ -75,6 +75,11 @@ class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 				$inventory_enabled = true;
 			}
 
+			$clear_templates = array_diff(
+				$this->getInput('clear_templates', []),
+				$this->getInput('add_templates', [])
+			);
+
 			$host = [
 				'hostid' => $this->host['hostid'],
 				'host' => $this->getInput('host', $this->host['host']),
@@ -87,7 +92,7 @@ class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 				'templates' => $this->processTemplates([
 					$this->getInput('add_templates', []), $this->getInput('templates', [])
 				]),
-				'templates_clear' => zbx_toObject($this->getInput('clear_templates', []), 'templateid'),
+				'templates_clear' => zbx_toObject($clear_templates, 'templateid'),
 				'macros' => $this->processUserMacros($this->getInput('macros', [])),
 				'inventory' => $inventory_enabled ? $this->getInput('host_inventory', []) : [],
 				'tls_connect' => $this->getInput('tls_connect', $this->host['tls_connect']),

@@ -1604,14 +1604,12 @@ define('ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION', 2);
 
 // Tab indicator names.
 define('TAB_INDICATOR_MACROS', 'macros');
-define('TAB_INDICATOR_LINKED_TEMPLATE', 'linked-template');
 define('TAB_INDICATOR_TAGS', 'tags');
 define('TAB_INDICATOR_AUTH_HTTP', 'http');
 define('TAB_INDICATOR_AUTH_LDAP', 'ldap');
 define('TAB_INDICATOR_AUTH_SAML', 'saml');
 define('TAB_INDICATOR_INVENTORY', 'inventory');
 define('TAB_INDICATOR_ENCRYPTION', 'encryption');
-define('TAB_INDICATOR_GROUPS', 'groups');
 define('TAB_INDICATOR_PREPROCESSING', 'preprocessing');
 define('TAB_INDICATOR_DEPENDENCY', 'dependency');
 define('TAB_INDICATOR_LLD_MACROS', 'lld-macros');

@@ -213,7 +213,7 @@ class testFormHost extends CWebTest {
 		$form = $this->openForm(($this->standalone ? $link.$hostid : $link), $host);
 
 		// Check tabs available in the form.
-		$tabs = ['Host', 'Templates', 'IPMI', 'Tags', 'Macros', 'Inventory', 'Encryption', 'Value mapping'];
+		$tabs = ['Host', 'IPMI', 'Tags', 'Macros', 'Inventory', 'Encryption', 'Value mapping'];
 		$this->assertEquals(count($tabs), $form->query('xpath:.//li[@role="tab"]')->all()->count());
 		foreach ($tabs as $tab) {
 			$this->assertTrue($form->query("xpath:.//li[@role='tab']//a[text()=".CXPathHelper::escapeQuotes($tab)."]")

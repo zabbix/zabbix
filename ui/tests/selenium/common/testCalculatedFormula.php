@@ -137,6 +137,67 @@ class testCalculatedFormula extends CWebTest {
 					'formula' => "change(//trap[1])"
 				]
 			],
+			// changecount() function.
+			[
+				[
+					'formula' => 'changecount(/host/key,10)'
+				]
+			],
+			[
+				[
+					'formula' => 'changecount(/host/key,#5:now-5h)'
+				]
+			],
+			[
+				[
+					'formula' => 'changecount(/host/key,#10)'
+				]
+			],
+			[
+				[
+					'formula' => 'changecount(/host/key,5,)'
+				]
+			],
+			[
+				[
+					'formula' => 'changecount(/host/key,#10,"all")'
+				]
+			],
+			[
+				[
+					'formula' => 'changecount(/host/key,#10,"dec")'
+				]
+			],
+			[
+				[
+					'formula' => 'changecount(/host/key,#10,"inc")'
+				]
+			],
+			[
+				[
+					'formula' => 'changecount(/host/key,5s)'
+				]
+			],
+			[
+				[
+					'formula' => 'changecount(/host/key,5m)'
+				]
+			],
+			[
+				[
+					'formula' => 'changecount(/host/key,5h)'
+				]
+			],
+			[
+				[
+					'formula' => 'changecount(/host/key,5d)'
+				]
+			],
+			[
+				[
+					'formula' => 'changecount(/host/key,5w)'
+				]
+			],
 			// count() function.
 			[
 				[
@@ -745,6 +806,127 @@ class testCalculatedFormula extends CWebTest {
 					'formula' => 'trendmin(/host/key,"3600:{$USERMACRO}-3600")'
 				]
 			],
+			// trendstl() function.
+			[
+				[
+					'formula' => 'trendstl(/host/item,347h:now/h,300h,7200s)'
+				]
+			],
+			[
+				[
+					'formula' => 'trendstl(/host/item,347h:now/h,300h,120m)'
+				]
+			],
+			[
+				[
+					'formula' => 'trendstl(/host/item,347d:now/h,3600s,12h,)'
+				]
+			],
+			[
+				[
+					'formula' => 'trendstl(/host/item,347h:now/h,60m,12h,)'
+				]
+			],
+			[
+				[
+					'formula' => 'trendstl(/host/item,347h:now/m-5m,347h,12h)'
+				]
+			],
+			[
+				[
+					'formula' => 'trendstl(/host/item,347h:now/h-1h,347h,12h)'
+				]
+			],
+			[
+				[
+					'formula' => 'trendstl(/host/item,347h:now/d-2d,347h,12h)'
+				]
+			],
+			[
+				[
+					'formula' => 'trendstl(/host/item,347h:now/w-3w,347h,12h)'
+				]
+			],
+			[
+				[
+					'formula' => 'trendstl(/host/item,347h:now/y-3y,347h,12h)'
+				]
+			],
+			[
+				[
+					'formula' => 'trendstl(/host/item,347w:now/h,347h,12h,)'
+				]
+			],
+			[
+				[
+					'formula' => 'trendstl(/host/item,347h:now/h,347h,12h,,)'
+				]
+			],
+			[
+				[
+					'formula' => 'trendstl(/host/item,347h:now/m,347h,12h,,,)'
+				]
+			],
+			[
+				[
+					'formula' => 'trendstl(/host/item,347h:now/d,347h,2h)'
+				]
+			],
+			[
+				[
+					'formula' => 'trendstl(/host/item,347h:now/M,347h,1d)'
+				]
+			],
+			[
+				[
+					'formula' => 'trendstl(/host/item,347h:now/w,347h,1w)'
+				]
+			],
+			[
+				[
+					'formula' => 'trendstl(/host/item,347h:now/y,347h,12h,2)'
+				]
+			],
+			[
+				[
+					'formula' => 'trendstl(/host/item,347h:now/h,347h,12h,2,)'
+				]
+			],
+			[
+				[
+					'formula' => 'trendstl(/host/item,347h:now/h,347h,12h,2,"mad")'
+				]
+			],
+			[
+				[
+					'formula' => 'trendstl(/host/item,347h:now/h,347h,12h,2,"stddevpop")'
+				]
+			],
+			[
+				[
+					'formula' => 'trendstl(/host/item,347h:now/h,347h,12h,2,"stddevsamp")'
+				]
+			],
+			[
+				[
+					'formula' => 'trendstl(/host/item,347h:now/h,347h,12h,2,"mad",7)'
+				]
+			],
+			[
+				[
+					'formula' => 'trendstl(/host/item,347h:now/h,347h,12h,2,,7)'
+				]
+			],
+			[
+				[
+					'formula' => 'trendstl(/host/item,347h:now/h,347h,12h,,,7)'
+				]
+			],
+			[
+				[
+					'formula' => 'trendstl(/host/item,20h:now/h,20h,12w,2.1234)'
+				]
+			],
 			// trendsum() function.
 			[
 				[
@@ -899,6 +1081,63 @@ class testCalculatedFormula extends CWebTest {
 					'expected' => TEST_BAD,
 					'formula' => 'change(/Trapper/trap[1],,)',
 					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "change".'
+				]
+			],
+			// changecount() function validation.
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'changecount(/host/key,#5,"")',
+					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "changecount".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'changecount(/host/key,#5,"something")',
+					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "changecount".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'changecount(/host/key,#5,"all",)',
+					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "changecount".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'changecount(/host/key,7,all)',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "changecount(/host/key,7,all)".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'changecount(/host/key,5M)',
+					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "changecount".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'changecount(/host/key,5y)',
+					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "changecount".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'changecount(5w)',
+					'error' => 'Invalid parameter "/1/params": incorrect usage of function "changecount".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'changecount(,5w)',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "changecount(,5w)".'
 				]
 			],
 			// count() function validation.
@@ -1884,6 +2123,161 @@ class testCalculatedFormula extends CWebTest {
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "trendmin(/host/item,-1h)".'
 				]
 			],
+			// trendstl() function validation.
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'trendstl(/host/item)',
+					'error' => 'Invalid parameter "/1/params": mandatory parameter is missing in function "trendstl".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'trendstl(/host/item,20h)',
+					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "trendstl".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'trendstl(/host/item,:now/h,20h,12h,2)',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "trendstl(/host/item,:now/h,20h,12h,2)".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'trendstl(/host/item,20h:now/h,20.15h,12h,2)',
+					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "trendstl".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'trendstl(/host/item,347h:now/h,5m,3h)',
+					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "trendstl".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'trendstl(/host/item,347h:now/h,70s,3h)',
+					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "trendstl".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'trendstl(/host/item,20h:now/h,20M,12h,2)',
+					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "trendstl".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'trendstl(/host/item,20h:now/h,20y,12h,2)',
+					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "trendstl".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'trendstl(/host/item,347h:now/h,20h,3m)',
+					'error' => 'Invalid parameter "/1/params": invalid fourth parameter in function "trendstl".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'trendstl(/host/item,347h:now/h,20h,58s)',
+					'error' => 'Invalid parameter "/1/params": invalid fourth parameter in function "trendstl".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'trendstl(/host/item,20h:now/h,20h,12.23h,2)',
+					'error' => 'Invalid parameter "/1/params": invalid fourth parameter in function "trendstl".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'trendstl(/host/item,20h:now/h,20h,1h)',
+					'error' => 'Invalid parameter "/1/params": invalid fourth parameter in function "trendstl".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'trendstl(/host/item,20h:now/h,20h,12M,2)',
+					'error' => 'Invalid parameter "/1/params": invalid fourth parameter in function "trendstl".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'trendstl(/host/item,20h:now/h,20h,12y,2)',
+					'error' => 'Invalid parameter "/1/params": invalid fourth parameter in function "trendstl".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'trendstl(/host/item,20h:now/h,20h,12w,0.5)',
+					'error' => 'Invalid parameter "/1/params": invalid fifth parameter in function "trendstl".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'trendstl(/host/item,20h:now/h,20h,12w,2.12345)',
+					'error' => 'Invalid parameter "/1/params": invalid fifth parameter in function "trendstl".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'trendstl(/host/item,20h:now/h,20h,12h,0)',
+					'error' => 'Invalid parameter "/1/params": invalid fifth parameter in function "trendstl".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'trendstl(/host/item,20h:now/h,20h,12h,-3)',
+					'error' => 'Invalid parameter "/1/params": invalid fifth parameter in function "trendstl".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'trendstl(/host/item,20h:now/h,20h,12w,2,"")',
+					'error' => 'Invalid parameter "/1/params": invalid sixth parameter in function "trendstl".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'trendstl(/host/item,20h:now/h,20h,12h,2,"bad")',
+					'error' => 'Invalid parameter "/1/params": invalid sixth parameter in function "trendstl".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'trendstl(/host/item,20h:now/h,20h,12w,2,"mad)',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "trendstl(/host/item,20h:now/h,20h,12w,2,"mad)".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'trendstl(/host/item,20h:now/h,20h,12w,2,"mad",3)',
+					'error' => 'Invalid parameter "/1/params": invalid seventh parameter in function "trendstl".'
+				]
+			]
 			// trendsum() function validation.
 			[
 				[

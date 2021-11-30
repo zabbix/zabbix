@@ -205,11 +205,10 @@ class HostMacrosManager {
 		});
 
 		// Init tab indicator observer.
-		const macro_indicator = new MacrosTabIndicatorItem();
-		const tab = document.querySelector('#tab_macros-tab');
+		const tab = document.querySelector('#tab_macros-tab, #tab_macroTab');
 
 		if (tab) {
-			macro_indicator.initObserver(tab);
+			new MacrosTabIndicatorItem().initObserver(tab);
 		}
 	}
 

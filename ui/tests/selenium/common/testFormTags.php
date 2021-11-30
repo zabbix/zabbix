@@ -286,7 +286,6 @@ class testFormTags extends CWebTest {
 		if ($object === 'host prototype') {
 			$data['name'] = $data['name'].' {#KEY}';
 			$form->fill(['Host name' => $data['name']]);
-			$form->selectTab('Groups');
 			$form->fill(['Groups' => 'Zabbix servers']);
 		}
 		elseif ($object === 'web scenario') {
