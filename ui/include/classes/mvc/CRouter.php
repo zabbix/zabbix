@@ -310,6 +310,7 @@ class CRouter {
 		'widget.problemhosts.view'					=> ['CControllerWidgetProblemHostsView',				'layout.widget',		'monitoring.widget.problemhosts.view'],
 		'widget.problems.view'						=> ['CControllerWidgetProblemsView',					'layout.widget',		'monitoring.widget.problems.view'],
 		'widget.problemsbysv.view'					=> ['CControllerWidgetProblemsBySvView',				'layout.widget',		'monitoring.widget.problemsbysv.view'],
+		'widget.slareport.view'						=> ['CControllerWidgetSlaReportView',					'layout.widget',		'monitoring.widget.slareport.view'],
 		'widget.svggraph.view'						=> ['CControllerWidgetSvgGraphView',					'layout.widget',		'monitoring.widget.svggraph.view'],
 		'widget.systeminfo.view'					=> ['CControllerWidgetSystemInfoView',					'layout.widget',		'monitoring.widget.systeminfo.view'],
 		'widget.trigover.view'						=> ['CControllerWidgetTrigOverView',					'layout.widget',		'monitoring.widget.trigover.view'],

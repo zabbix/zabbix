@@ -171,7 +171,9 @@ class CDashboardHelper {
 			ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE => [],
 			ZBX_WIDGET_FIELD_TYPE_GRAPH => [],
 			ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE => [],
-			ZBX_WIDGET_FIELD_TYPE_MAP => []
+			ZBX_WIDGET_FIELD_TYPE_MAP => [],
+			ZBX_WIDGET_FIELD_TYPE_SERVICE => [],
+			ZBX_WIDGET_FIELD_TYPE_SLA => []
 		];
 
 		foreach ($pages as $p_index => $page) {
@@ -280,6 +282,34 @@ class CDashboardHelper {
 
 			foreach ($ids[ZBX_WIDGET_FIELD_TYPE_MAP] as $sysmapid => $indexes) {
 				if (!array_key_exists($sysmapid, $db_sysmaps)) {
+					$inaccessible_indexes = array_merge($inaccessible_indexes, $indexes);
+				}
+			}
+		}
+
+		if ($ids[ZBX_WIDGET_FIELD_TYPE_SERVICE]) {
+			$db_services = API::Service()->get([
+				'output' => [],
+				'serviceids' => array_keys($ids[ZBX_WIDGET_FIELD_TYPE_SERVICE]),
+				'preservekeys' => true
+			]);
+
+			foreach ($ids[ZBX_WIDGET_FIELD_TYPE_SERVICE] as $serviceid => $indexes) {
+				if (!array_key_exists($serviceid, $db_services)) {
+					$inaccessible_indexes = array_merge($inaccessible_indexes, $indexes);
+				}
+			}
+		}
+
+		if ($ids[ZBX_WIDGET_FIELD_TYPE_SLA]) {
+			$db_slas = API::Sla()->get([
+				'output' => [],
+				'slaids' => array_keys($ids[ZBX_WIDGET_FIELD_TYPE_SLA]),
+				'preservekeys' => true
+			]);
+
+			foreach ($ids[ZBX_WIDGET_FIELD_TYPE_SLA] as $slaid => $indexes) {
+				if (!array_key_exists($slaid, $db_slas)) {
 					$inaccessible_indexes = array_merge($inaccessible_indexes, $indexes);
 				}
 			}

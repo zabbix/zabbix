@@ -377,6 +377,35 @@ class CWidgetHelper {
 		] + $field->getFilterParameters());
 	}
 
+	/**
+	 * @param CWidgetFieldMsService $field
+	 * @param array $captions
+	 * @param string $form_name
+	 *
+	 * @return CMultiSelect
+	 */
+	public static function getService($field, $captions, $form_name) {
+		return self::getMultiselectField($field, $captions, $form_name, 'services', [
+				'srctbl' => 'services',
+				'srcfld1' => 'serviceid',
+				'srcfld2' => 'name'
+			] + $field->getFilterParameters());
+	}
+
+	/**
+	 * @param CWidgetFieldMsSla $field
+	 * @param array $captions
+	 * @param string $form_name
+	 *
+	 * @return CMultiSelect
+	 */
+	public static function getSla($field, $captions, $form_name) {
+		return self::getMultiselectField($field, $captions, $form_name, 'slas', [
+				'srctbl' => 'sla',
+				'srcfld1' => 'slaid'
+			] + $field->getFilterParameters());
+	}
+
 	public static function getSelectResource($field, $caption, $form_name) {
 		return [
 			(new CTextBox($field->getName().'_caption', $caption, true))
