@@ -2277,7 +2277,7 @@ class testCalculatedFormula extends CWebTest {
 					'formula' => 'trendstl(/host/item,20h:now/h,20h,12w,2,"mad",3)',
 					'error' => 'Invalid parameter "/1/params": invalid seventh parameter in function "trendstl".'
 				]
-			]
+			],
 			// trendsum() function validation.
 			[
 				[
