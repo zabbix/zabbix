@@ -3702,7 +3702,7 @@ static int	evaluate_BASELINE(zbx_variant_t *value, DC_ITEM *item, const char *fu
 		goto out;
 	}
 
-	if (SUCCEED != get_function_parameter_str(parameters, 2, &tmp) ||
+	if (SUCCEED != get_function_parameter_str(parameters, 3, &tmp) ||
 			0 >= (season_num = atoi(tmp)))
 	{
 		*error = zbx_strdup(*error, "invalid second parameter");
@@ -3710,7 +3710,7 @@ static int	evaluate_BASELINE(zbx_variant_t *value, DC_ITEM *item, const char *fu
 	}
 	zbx_free(tmp);
 
-	if (SUCCEED != get_function_parameter_str(parameters, 3, &tmp) ||
+	if (SUCCEED != get_function_parameter_str(parameters, 2, &tmp) ||
 			ZBX_TIME_UNIT_HOUR > (season_unit = zbx_tm_str_to_unit(tmp)))
 	{
 		*error = zbx_strdup(*error, "invalid third parameter");
