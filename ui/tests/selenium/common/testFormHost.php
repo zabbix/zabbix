@@ -37,6 +37,16 @@ class testFormHost extends CWebTest {
 	}
 
 	/**
+	 * Link to page for opening host form.
+	 */
+	public $link;
+
+	/**
+	 * Direct link for creating host.
+	 */
+	public $create_link = null;
+
+	/**
 	 * Flag for host form opened by direct link.
 	 */
 	public $standalone = false;
@@ -203,14 +213,12 @@ class testFormHost extends CWebTest {
 
 	/**
 	 * Test for checking host form layout.
-	 *
-	 * @param string    $link          direct link for opening host page
 	 */
-	public function checkHostLayout($link) {
+	public function checkHostLayout() {
 		$host = 'testFormHost with items';
 		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr($host));
 
-		$form = $this->openForm(($this->standalone ? $link.$hostid : $link), $host);
+		$form = $this->openForm(($this->standalone ? $this->link.$hostid : $this->link), $host);
 
 		// Check tabs available in the form.
 		$tabs = ['Host', 'IPMI', 'Tags', 'Macros', 'Inventory', 'Encryption', 'Value mapping'];
@@ -753,15 +761,14 @@ class testFormHost extends CWebTest {
 	 * Test for checking new host creation form.
 	 *
 	 * @param array     $data          data provider
-	 * @param string    $link          direct link for opening host page
 	 */
-	public function checkHostCreate($data, $link) {
+	public function checkHostCreate($data) {
 		if ($data['expected'] === TEST_BAD) {
 			$old_hash = CDBHelper::getHash($this->hosts_sql);
 			$interface_old_hash = CDBHelper::getHash($this->interface_snmp_sql);
 		}
 
-		$this->page->login()->open($link)->waitUntilReady();
+		$this->page->login()->open($this->link)->waitUntilReady();
 
 		if ($this->standalone) {
 			$form = $this->query('id:host-form')->asForm()->waitUntilReady()->one();
@@ -1333,9 +1340,8 @@ class testFormHost extends CWebTest {
 	 * Test for checking existing host update form.
 	 *
 	 * @param array     $data          data provider
-	 * @param string    $link          direct link for opening host page
 	 */
-	public function checkHostUpdate($data, $link) {
+	public function checkHostUpdate($data) {
 		if ($data['expected'] === TEST_BAD) {
 			$host_old_hash = CDBHelper::getHash($this->hosts_sql);
 			$interface_old_hash = CDBHelper::getHash($this->interface_snmp_sql);
@@ -1395,7 +1401,7 @@ class testFormHost extends CWebTest {
 		$host = 'testFormHost_Update Visible name';
 		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr($host));
 
-		$form = $this->openForm(($this->standalone ? $link.$hostid : $link), $host);
+		$form = $this->openForm(($this->standalone ? $this->link.$hostid : $this->link), $host);
 		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
 
 		// Set name for field "Default".
@@ -1510,10 +1516,8 @@ class testFormHost extends CWebTest {
 
 	/**
 	 * Update the host without any changes and check host and interfaces hashes.
-	 *
-	 * @param string    $link          direct link for opening host page
 	 */
-	public function checkHostSimpleUpdate($link) {
+	public function checkHostSimpleUpdate() {
 		$host_old_hash = CDBHelper::getHash($this->hosts_sql);
 		$interface_old_hash = CDBHelper::getHash($this->interface_snmp_sql);
 
@@ -1521,7 +1525,7 @@ class testFormHost extends CWebTest {
 		$visible_name = 'testFormHost_Update Visible name';
 		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($host));
 
-		$form = $this->openForm(($this->standalone ? $link.$hostid : $link), $visible_name);
+		$form = $this->openForm(($this->standalone ? $this->link.$hostid : $this->link), $visible_name);
 		$this->page->waitUntilReady();
 		$form->submit();
 		$this->assertMessage(TEST_GOOD, 'Host updated');
@@ -1572,14 +1576,13 @@ class testFormHost extends CWebTest {
 	 * Clone or Full clone a host and compare the data with the original host.
 	 *
 	 * @param array     $data		   data provider with fields values
-	 * @param string    $link          direct link for opening host page
 	 * @param string    $button        Clone or Full clone
 	 */
-	public function cloneHost($data, $link, $button = 'Clone') {
+	public function cloneHost($data, $button = 'Clone') {
 		$host = 'testFormHost with items';
 		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($host));
 
-		$form = $this->openForm(($this->standalone ? 'zabbix.php?action=host.edit&hostid='.$hostid : $link), $host);
+		$form = $this->openForm(($this->standalone ? 'zabbix.php?action=host.edit&hostid='.$hostid : $this->link), $host);
 
 		// Get values from form.
 		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
@@ -1674,10 +1677,8 @@ class testFormHost extends CWebTest {
 	 * Test for checking host actions cancelling.
 	 *
 	 * @param array     $data		   data provider with fields values
-	 * @param string    $link          direct link for opening host form
-	 * @param string    $create_link   direct link for host creation
 	 */
-	public function checkCancel($data, $link, $create_link = null) {
+	public function checkCancel($data) {
 		$host_old_hash = CDBHelper::getHash($this->hosts_sql);
 		$interface_old_hash = CDBHelper::getHash($this->interface_snmp_sql);
 
@@ -1699,7 +1700,7 @@ class testFormHost extends CWebTest {
 		];
 
 		if ($data['action'] === 'Add') {
-			$this->page->login()->open($this->standalone ? $create_link : $link)->waitUntilReady();
+			$this->page->login()->open($this->standalone ? $this->create_link : $this->link)->waitUntilReady();
 
 			if (!$this->standalone) {
 				$this->query('button:Create host')->one()->waitUntilClickable()->click();
@@ -1710,7 +1711,7 @@ class testFormHost extends CWebTest {
 			}
 		}
 		else {
-			$form = $this->openForm(($this->standalone ? $link.$hostid : $link), $host);
+			$form = $this->openForm(($this->standalone ? $this->link.$hostid : $this->link), $host);
 		}
 
 		$form_type = ($this->standalone) ? $form : COverlayDialogElement::find()->waitUntilReady()->one();
@@ -1777,9 +1778,8 @@ class testFormHost extends CWebTest {
 	 * Test for checking host deleting.
 	 *
 	 * @param array     $data		   data provider with fields values
-	 * @param string    $link          direct link for opening host form
 	 */
-	public function checkDelete($data, $link) {
+	public function checkDelete($data) {
 		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($data['name']));
 
 		if ($data['expected'] === TEST_BAD) {
@@ -1791,7 +1791,7 @@ class testFormHost extends CWebTest {
 			$ids = array_column($interfaceids, 'interfaceid');
 		}
 
-		$form = $this->openForm(($this->standalone ? $link.$hostid : $link), $data['name']);
+		$form = $this->openForm(($this->standalone ? $this->link.$hostid : $this->link), $data['name']);
 		$form_type = ($this->standalone) ? $form : COverlayDialogElement::find()->waitUntilReady()->one();
 		$form_type->query('button:Delete')->waitUntilClickable()->one()->click();
 		$this->page->acceptAlert();

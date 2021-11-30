@@ -30,21 +30,21 @@ class testFormHostConfiguration extends testFormHost {
 	public $link = 'zabbix.php?action=host.list';
 
 	public function testFormHostConfiguration_Layout() {
-		$this->checkHostLayout($this->link);
+		$this->checkHostLayout();
 	}
 
 	/**
 	 * @dataProvider getCreateData
 	 */
 	public function testFormHostConfiguration_Create($data) {
-		$this->checkHostCreate($data, $this->link);
+		$this->checkHostCreate($data);
 	}
 
 	/**
 	 * @dataProvider getValidationUpdateData
 	 */
 	public function testFormHostConfiguration_ValidationUpdate($data) {
-		$this->checkHostUpdate($data, $this->link);
+		$this->checkHostUpdate($data);
 	}
 
 	/**
@@ -53,21 +53,21 @@ class testFormHostConfiguration extends testFormHost {
 	 * @dataProvider getUpdateData
 	 */
 	public function testFormHostConfiguration_Update($data) {
-		$this->checkHostUpdate($data, $this->link);
+		$this->checkHostUpdate($data);
 	}
 
 	/**
 	 * Update the host without any changes and check host and interfaces hashes.
 	 */
 	public function testFormHostConfiguration_SimpleUpdate() {
-		$this->checkHostSimpleUpdate($this->link);
+		$this->checkHostSimpleUpdate();
 	}
 
 	/**
 	 * @dataProvider getCloneData
 	 */
 	public function testFormHostConfiguration_Clone($data) {
-		$this->cloneHost($data, $this->link);
+		$this->cloneHost($data);
 
 		// Check that items aren't cloned from original host.
 		$this->assertItemsDBCount($data['host_fields']['Host name'], 0);
@@ -77,7 +77,7 @@ class testFormHostConfiguration extends testFormHost {
 	 * @dataProvider getCloneData
 	 */
 	public function testFormHostConfiguration_FullClone($data) {
-		$this->cloneHost($data, $this->link, 'Full clone');
+		$this->cloneHost($data, 'Full clone');
 
 		// Check that items cloned from original host.
 		$this->assertItemsDBCount($data['host_fields']['Host name'], 3);
@@ -87,13 +87,13 @@ class testFormHostConfiguration extends testFormHost {
 	 * @dataProvider getCancelData
 	 */
 	public function testFormHostConfiguration_Cancel($data) {
-		$this->checkCancel($data, $this->link);
+		$this->checkCancel($data);
 	}
 
 	/**
 	 * @dataProvider getDeleteData
 	 */
 	public function testFormHostConfiguration_Delete($data) {
-		$this->checkDelete($data, $this->link);
+		$this->checkDelete($data);
 	}
 }
