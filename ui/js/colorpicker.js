@@ -140,7 +140,7 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 				const $close = $('<button type="button" class="overlay-close-btn" title="' + t('S_CLOSE') + '"/>')
 						.click(methods.hide);
 
-				$overlay_input = $('<input/>', {'type': 'text', 'autofocus': 'autofocus'})
+				$overlay_input = $('<input/>', {'type': 'text', 'autofocus': 'autofocus', 'maxlength': 6})
 					.css('width', ZBX_TEXTAREA_COLOR_WIDTH + 'px')
 					.on('input keydown paste', e => {
 						const color = e.target.value;
