@@ -87,7 +87,7 @@ class testFormHostMonitoring extends testFormHost {
 	}
 
 	/**
-	 * @dataProvider getСancelData
+	 * @dataProvider getCancelData
 	 */
 	public function testFormHostMonitoring_Cancel($data) {
 		$this->checkCancel($data, $this->link, null, self::STANDALONE, self::MONITORING);

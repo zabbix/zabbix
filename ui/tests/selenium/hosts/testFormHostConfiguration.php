@@ -84,7 +84,7 @@ class testFormHostConfiguration extends testFormHost {
 	}
 
 	/**
-	 * @dataProvider getСancelData
+	 * @dataProvider getCancelData
 	 */
 	public function testFormHostConfiguration_Cancel($data) {
 		$this->checkCancel($data, $this->link);

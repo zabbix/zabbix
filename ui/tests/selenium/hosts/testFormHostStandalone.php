@@ -87,7 +87,7 @@ class testFormHostStandalone extends testFormHost {
 	}
 
 	/**
-	 * @dataProvider getСancelData
+	 * @dataProvider getCancelData
 	 */
 	public function testFormHostStandalone_Cancel($data) {
 		$this->checkCancel($data, $this->link, $this->create_link, self::STANDALONE);

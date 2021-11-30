@@ -1124,7 +1124,7 @@ class testFormHost extends CWebTest {
 	public static function getUpdateData() {
 		return [
 			// Successful host form update.
-			// Add defualt interface values.
+			// Add default interface values.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1658,7 +1658,7 @@ class testFormHost extends CWebTest {
 		$this->assertEquals(count($data['interfaces']), $db_interfaces);
 	}
 
-	public static function getСancelData() {
+	public static function getCancelData() {
 		return [
 			[
 				[
