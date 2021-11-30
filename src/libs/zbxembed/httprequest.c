@@ -443,7 +443,7 @@ static duk_ret_t	es_httprequest_status(duk_context *ctx)
  *                                                                            *
  * Function: parse_header                                                     *
  *                                                                            *
- * Purpose: retrives value of a header                                        *
+ * Purpose: retrieves value of a header                                       *
  *                                                                            *
  * Parameters: header    - [IN] the http header to extract value from         *
  *             value_out - [OUT] the value                                    *
@@ -548,6 +548,7 @@ static duk_ret_t	get_headers_as_arrays(duk_context *ctx, zbx_es_httprequest_t *r
 	char			*ptr, *header;
 	zbx_vector_ptr_t	headers;
 	duk_idx_t		idx;
+	int			i;
 
 	zbx_vector_ptr_create(&headers);
 
@@ -594,16 +595,17 @@ static duk_ret_t	get_headers_as_arrays(duk_context *ctx, zbx_es_httprequest_t *r
 		}
 	}
 
-	for (int i = 0; i < headers.values_num; i++) {
-		zbx_cached_header_t *h = (zbx_cached_header_t*)headers.values[i];
-		duk_idx_t	arr_idx;
+	for (i = 0; i < headers.values_num; i++) {
+		zbx_cached_header_t	*h = (zbx_cached_header_t*)headers.values[i];
+		duk_idx_t		arr_idx;
+		int			j;
 
 		arr_idx = duk_push_array(ctx);
 
-		for (int j = 0; j < h->values.values_num; j++)
+		for (j = 0; j < h->values.values_num; j++)
 		{
 			duk_push_string(ctx, h->values.values[j]);
-			duk_put_prop_index(ctx, arr_idx, j);
+			duk_put_prop_index(ctx, arr_idx, (duk_uarridx_t)j);
 		}
 
 		(void)duk_put_prop_string(ctx, idx, h->name);
@@ -625,7 +627,6 @@ out:
 static duk_ret_t	es_httprequest_get_headers(duk_context *ctx)
 {
 	zbx_es_httprequest_t	*request;
-	duk_idx_t		idx;
 
 	if (NULL == (request = es_httprequest(ctx)))
 		return duk_error(ctx, DUK_RET_EVAL_ERROR, "internal scripting error: null object");
