@@ -27,27 +27,27 @@ require_once dirname(__FILE__).'/../common/testFormHost.php';
  */
 class testFormHostStandalone extends testFormHost {
 
-	const STANDALONE = true;
 
+	public $standalone = true;
 	public $link = 'zabbix.php?action=host.edit&hostid=';
 	public $create_link = 'zabbix.php?action=host.edit';
 
 	public function testFormHostStandalone_Layout() {
-		$this->checkHostLayout($this->link, self::STANDALONE);
+		$this->checkHostLayout($this->link);
 	}
 
 	/**
 	 * @dataProvider getCreateData
 	 */
 	public function testFormHostStandalone_Create($data) {
-		$this->checkHostCreate($data, $this->create_link, self::STANDALONE);
+		$this->checkHostCreate($data, $this->create_link);
 	}
 
 	/**
 	 * @dataProvider getValidationUpdateData
 	 */
 	public function testFormHostStandalone_ValidationUpdate($data) {
-		$this->checkHostUpdate($data, $this->link, self::STANDALONE);
+		$this->checkHostUpdate($data, $this->link);
 	}
 
 	/**
@@ -56,21 +56,21 @@ class testFormHostStandalone extends testFormHost {
 	 * @dataProvider getUpdateData
 	 */
 	public function testFormHostStandalone_Update($data) {
-		$this->checkHostUpdate($data, $this->link, self::STANDALONE);
+		$this->checkHostUpdate($data, $this->link);
 	}
 
 	/**
 	 * Update the host without any changes and check host and interfaces hashes.
 	 */
 	public function testFormHostStandalone_SimpleUpdate() {
-		$this->checkHostSimpleUpdate($this->link, self::STANDALONE);
+		$this->checkHostSimpleUpdate($this->link);
 	}
 
 	/**
 	 * @dataProvider getCloneData
 	 */
 	public function testFormHostStandalone_Clone($data) {
-		$this->cloneHost($data, $this->link, 'Clone', self::STANDALONE);
+		$this->cloneHost($data, $this->link, 'Clone');
 
 		// Check that items aren't cloned from original host.
 		$this->assertItemsDBCount($data['host_fields']['Host name'], 0);
@@ -80,7 +80,7 @@ class testFormHostStandalone extends testFormHost {
 	 * @dataProvider getCloneData
 	 */
 	public function testFormHostStandalone_FullClone($data) {
-		$this->cloneHost($data, $this->link, 'Full clone', self::STANDALONE);
+		$this->cloneHost($data, $this->link, 'Full clone');
 
 		// Check that items cloned from original host.
 		$this->assertItemsDBCount($data['host_fields']['Host name'], 3);
@@ -90,13 +90,13 @@ class testFormHostStandalone extends testFormHost {
 	 * @dataProvider getCancelData
 	 */
 	public function testFormHostStandalone_Cancel($data) {
-		$this->checkCancel($data, $this->link, $this->create_link, self::STANDALONE);
+		$this->checkCancel($data, $this->link, $this->create_link);
 	}
 
 	/**
 	 * @dataProvider getDeleteData
 	 */
 	public function testFormHostStandalone_Delete($data) {
-		$this->checkDelete($data, $this->link, self::STANDALONE);
+		$this->checkDelete($data, $this->link);
 	}
 }

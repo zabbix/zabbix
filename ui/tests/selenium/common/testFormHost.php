@@ -37,6 +37,16 @@ class testFormHost extends CWebTest {
 	}
 
 	/**
+	 * Flag for host form opened by direct link.
+	 */
+	public $standalone = false;
+
+	/**
+	 * Flag for form opened from Monitoring -> Hosts section.
+	 */
+	public $monitoring = false;
+
+	/**
 	 * SQL query to get host and host interfaces tables to compare hash values.
 	 */
 	private $hosts_sql = 'SELECT * FROM hosts h INNER JOIN interface i ON h.hostid=i.hostid ORDER BY h.hostid, i.interfaceid';
@@ -195,18 +205,12 @@ class testFormHost extends CWebTest {
 	 * Test for checking host form layout.
 	 *
 	 * @param string    $link          direct link for opening host page
-	 * @param boolean   $standalone    false if configuration or monitoring, true if standalone page
-	 * @param boolean   $monitoring    true if Monitoring->Hosts section is being checked, false if other
 	 */
-	public function checkHostLayout($link, $standalone = false, $monitoring = false) {
+	public function checkHostLayout($link) {
 		$host = 'testFormHost with items';
 		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr($host));
 
-		$this->page->login()->open($standalone ? $link.$hostid : $link)->waitUntilReady();
-
-		$form = ($standalone)
-			? $this->query('id:host-form')->asForm()->waitUntilReady()->one()
-			: $this->filterHostAndSelect($monitoring, $host);
+		$form = $this->openForm(($this->standalone ? $link.$hostid : $link), $host);
 
 		// Check tabs available in the form.
 		$tabs = ['Host', 'Templates', 'IPMI', 'Tags', 'Macros', 'Inventory', 'Encryption', 'Value mapping'];
@@ -265,7 +269,7 @@ class testFormHost extends CWebTest {
 		}
 
 		// Close host form popup to avoid unexpected alert in further cases.
-		if (!$standalone) {
+		if (!$this->standalone) {
 			COverlayDialogElement::find()->one()->close();
 		}
 	}
@@ -750,10 +754,8 @@ class testFormHost extends CWebTest {
 	 *
 	 * @param array     $data          data provider
 	 * @param string    $link          direct link for opening host page
-	 * @param boolean   $standalone    false if configuration or monitoring, true if standalone page
-	 * @param boolean   $monitoring    true if Monitoring->Hosts section is being checked, false if other
 	 */
-	public function checkHostCreate($data, $link, $standalone = false, $monitoring = false) {
+	public function checkHostCreate($data, $link) {
 		if ($data['expected'] === TEST_BAD) {
 			$old_hash = CDBHelper::getHash($this->hosts_sql);
 			$interface_old_hash = CDBHelper::getHash($this->interface_snmp_sql);
@@ -761,7 +763,7 @@ class testFormHost extends CWebTest {
 
 		$this->page->login()->open($link)->waitUntilReady();
 
-		if ($standalone) {
+		if ($this->standalone) {
 			$form = $this->query('id:host-form')->asForm()->waitUntilReady()->one();
 		}
 		else {
@@ -781,11 +783,11 @@ class testFormHost extends CWebTest {
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				$this->assertMessage(TEST_GOOD, 'Host added');
-				$this->page->assertTitle((!$monitoring) ? 'Configuration of hosts' : 'Hosts');
+				$this->page->assertTitle((!$this->monitoring) ? 'Configuration of hosts' : 'Hosts');
 
 				// Check host fields.
 				$host = CTestArrayHelper::get($data, 'host_fields.Visible name', $data['host_fields']['Host name']);
-				$form = $this->filterHostAndSelect($monitoring, $host);
+				$form = $this->filterAndSelectHost($host);
 				$form->checkValue($data['host_fields']);
 
 				foreach ($interfaces as &$interface) {
@@ -817,7 +819,7 @@ class testFormHost extends CWebTest {
 				$this->assertEquals($interface_old_hash, CDBHelper::getHash($this->interface_snmp_sql));
 				$this->assertMessage(TEST_BAD, CTestArrayHelper::get($data, 'error_title', 'Cannot add host'), $data['error']);
 
-				if (!$standalone) {
+				if (!$this->standalone) {
 					COverlayDialogElement::find()->one()->close();
 				}
 				break;
@@ -1332,10 +1334,8 @@ class testFormHost extends CWebTest {
 	 *
 	 * @param array     $data          data provider
 	 * @param string    $link          direct link for opening host page
-	 * @param boolean   $standalone    false if configuration or monitoring, true if standalone page
-	 * @param boolean   $monitoring    true if Monitoring->Hosts section is being checked, false if other
 	 */
-	public function checkHostUpdate($data, $link, $standalone = false, $monitoring = false) {
+	public function checkHostUpdate($data, $link) {
 		if ($data['expected'] === TEST_BAD) {
 			$host_old_hash = CDBHelper::getHash($this->hosts_sql);
 			$interface_old_hash = CDBHelper::getHash($this->interface_snmp_sql);
@@ -1395,12 +1395,7 @@ class testFormHost extends CWebTest {
 		$host = 'testFormHost_Update Visible name';
 		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr($host));
 
-		$this->page->login()->open(($standalone) ? $link.$hostid : $link)->waitUntilReady();
-
-		$form = ($standalone)
-			? $this->query('id:host-form')->asForm()->waitUntilReady()->one()
-			: $this->filterHostAndSelect($monitoring, $host);
-
+		$form = $this->openForm(($this->standalone ? $link.$hostid : $link), $host);
 		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
 
 		// Set name for field "Default".
@@ -1416,7 +1411,7 @@ class testFormHost extends CWebTest {
 					? CTestArrayHelper::get($data, 'host_fields.Host name', 'testFormHost_Update')
 					: CTestArrayHelper::get($data, 'host_fields.Visible name', 'testFormHost_Update Visible name');
 
-				$form = $this->filterHostAndSelect($monitoring, $host);
+				$form = $this->filterAndSelectHost($host);
 
 				// Update or add new source data from host data.
 				foreach (CTestArrayHelper::get($data, 'host_fields', []) as $key => $value) {
@@ -1506,7 +1501,7 @@ class testFormHost extends CWebTest {
 				$error_title = CTestArrayHelper::get($data, 'error_title', 'Cannot update host');
 				$this->assertMessage(TEST_BAD, $error_title, $data['error']);
 
-				if (!$standalone) {
+				if (!$this->standalone) {
 					COverlayDialogElement::find()->one()->close();
 				}
 				break;
@@ -1517,10 +1512,10 @@ class testFormHost extends CWebTest {
 	 * Update the host without any changes and check host and interfaces hashes.
 	 *
 	 * @param string    $link          direct link for opening host page
-	 * @param boolean   $standalone    false if configuration or monitoring, true if standalone page
-	 * @param boolean   $monitoring    true if Monitoring->Hosts section is being checked, false if other
+	 * @param boolean   $this->monitoring    true if Monitoring->Hosts section is being checked, false if other
+	 * @param boolean   $this->standalone    false if configuration or monitoring, true if standalone page
 	 */
-	public function checkHostSimpleUpdate($link, $standalone = false, $monitoring = false) {
+	public function checkHostSimpleUpdate($link) {
 		$host_old_hash = CDBHelper::getHash($this->hosts_sql);
 		$interface_old_hash = CDBHelper::getHash($this->interface_snmp_sql);
 
@@ -1528,12 +1523,7 @@ class testFormHost extends CWebTest {
 		$visible_name = 'testFormHost_Update Visible name';
 		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($host));
 
-		$this->page->login()->open(($standalone) ? $link.$hostid : $link)->waitUntilReady();
-
-		$form = ($standalone)
-			? $this->query('id:host-form')->asForm()->waitUntilReady()->one()
-			: $this->filterHostAndSelect($monitoring, $visible_name);
-
+		$form = $this->openForm(($this->standalone ? $link.$hostid : $link), $visible_name);
 		$this->page->waitUntilReady();
 		$form->submit();
 		$this->assertMessage(TEST_GOOD, 'Host updated');
@@ -1586,18 +1576,12 @@ class testFormHost extends CWebTest {
 	 * @param array     $data		   data provider with fields values
 	 * @param string    $link          direct link for opening host page
 	 * @param string    $button        Clone or Full clone
-	 * @param boolean   $standalone    false if configuration or monitoring, true if standalone page
-	 * @param boolean   $monitoring    true if Monitoring->Hosts section is being checked, false if other
 	 */
-	public function cloneHost($data, $link, $button = 'Clone', $standalone = false, $monitoring = false) {
+	public function cloneHost($data, $link, $button = 'Clone') {
 		$host = 'testFormHost with items';
 		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($host));
 
-		$this->page->login()->open(($standalone) ? 'zabbix.php?action=host.edit&hostid='.$hostid : $link)->waitUntilReady();
-
-		$form = ($standalone)
-			? $this->query('id:host-form')->asForm()->waitUntilReady()->one()
-			: $this->filterHostAndSelect($monitoring, $host);
+		$form = $this->openForm(($this->standalone ? 'zabbix.php?action=host.edit&hostid='.$hostid : $link), $host);
 
 		// Get values from form.
 		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
@@ -1606,7 +1590,7 @@ class testFormHost extends CWebTest {
 		// Clone host.
 		$this->query('button', $button)->waitUntilClickable()->one()->click();
 
-		$cloned_form = (!$standalone)
+		$cloned_form = (!$this->standalone)
 			? COverlayDialogElement::find()->asForm()->waitUntilPresent()->one()
 			: $this->query('id:host-form')->asForm()->waitUntilReady()->one();
 
@@ -1615,7 +1599,7 @@ class testFormHost extends CWebTest {
 		$this->assertMessage(TEST_GOOD, 'Host added');
 
 		// Check the values of the original host with the cloned host.
-		$this->filterHostAndSelect($monitoring, $data['host_fields']['Host name'])->checkValue($original);
+		$this->filterAndSelectHost($data['host_fields']['Host name'])->checkValue($original);
 
 		COverlayDialogElement::find()->one()->close();
 	}
@@ -1694,10 +1678,8 @@ class testFormHost extends CWebTest {
 	 * @param array     $data		   data provider with fields values
 	 * @param string    $link          direct link for opening host form
 	 * @param string    $create_link   direct link for host creation
-	 * @param boolean   $standalone    false if configuration or monitoring, true if standalone page
-	 * @param boolean   $monitoring    true if Monitoring->Hosts section is being checked, false if other
 	 */
-	public function checkCancel($data, $link, $create_link = null, $standalone = false, $monitoring = false) {
+	public function checkCancel($data, $link, $create_link = null) {
 		$host_old_hash = CDBHelper::getHash($this->hosts_sql);
 		$interface_old_hash = CDBHelper::getHash($this->interface_snmp_sql);
 
@@ -1719,9 +1701,9 @@ class testFormHost extends CWebTest {
 		];
 
 		if ($data['action'] === 'Add') {
-			$this->page->login()->open($standalone ? $create_link : $link)->waitUntilReady();
+			$this->page->login()->open($this->standalone ? $create_link : $link)->waitUntilReady();
 
-			if (!$standalone) {
+			if (!$this->standalone) {
 				$this->query('button:Create host')->one()->waitUntilClickable()->click();
 				$form = COverlayDialogElement::find()->waitUntilReady()->one()->asForm();
 			}
@@ -1730,14 +1712,10 @@ class testFormHost extends CWebTest {
 			}
 		}
 		else {
-			$this->page->login()->open($standalone ? $link.$hostid : $link)->waitUntilReady();
-
-			$form = ($standalone)
-				? $this->query('id:host-form')->asForm()->waitUntilReady()->one()
-				: $this->filterHostAndSelect($monitoring, $host);
+			$form = $this->openForm(($this->standalone ? $link.$hostid : $link), $host);
 		}
 
-		$form_type = ($standalone) ? $form : COverlayDialogElement::find()->waitUntilReady()->one();
+		$form_type = ($this->standalone) ? $form : COverlayDialogElement::find()->waitUntilReady()->one();
 
 		// Change the host data to make sure that the changes are not saved to the database after cancellation.
 		$form->fill(['Host name' => $new_name]);
@@ -1802,10 +1780,8 @@ class testFormHost extends CWebTest {
 	 *
 	 * @param array     $data		   data provider with fields values
 	 * @param string    $link          direct link for opening host form
-	 * @param boolean   $standalone    false if configuration or monitoring, true if standalone page
-	 * @param boolean   $monitoring    true if Monitoring->Hosts section is being checked, false if other
 	 */
-	public function checkDelete($data, $link, $standalone = false, $monitoring = false) {
+	public function checkDelete($data, $link) {
 		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($data['name']));
 
 		if ($data['expected'] === TEST_BAD) {
@@ -1817,13 +1793,8 @@ class testFormHost extends CWebTest {
 			$ids = array_column($interfaceids, 'interfaceid');
 		}
 
-		$this->page->login()->open(($standalone) ? $link.$hostid : $link)->waitUntilReady();
-
-		$form = ($standalone)
-			? $this->query('id:host-form')->asForm()->waitUntilReady()->one()
-			: $this->filterHostAndSelect($monitoring, $data['name']);
-
-		$form_type = ($standalone) ? $form : COverlayDialogElement::find()->waitUntilReady()->one();
+		$form = $this->openForm(($this->standalone ? $link.$hostid : $link), $data['name']);
+		$form_type = ($this->standalone) ? $form : COverlayDialogElement::find()->waitUntilReady()->one();
 		$form_type->query('button:Delete')->waitUntilClickable()->one()->click();
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
@@ -1851,14 +1822,27 @@ class testFormHost extends CWebTest {
 	}
 
 	/**
+	 * Function for opening host form.
+	 *
+	 * @param string   $url     url of page where host form  is opened
+	 * @param string   $host    host name to be opened
+	 */
+	private function openForm($url, $host) {
+		$this->page->login()->open($url)->waitUntilReady();
+
+		return ($this->standalone)
+			? $this->query('id:host-form')->asForm()->waitUntilReady()->one()
+			: $this->filterAndSelectHost($host);
+	}
+
+	/**
 	 * Function for filtering necessary host on page.
 	 *
-	 * @param boolean   $monitoring    true if Monitoring->Hosts section is being checked, false if other
-	 * @param string	$host          host name to be filtered
+	 * @param string	$host    host name to be filtered
 	 *
 	 * @return CFormElement
 	 */
-	public function filterHostAndSelect($monitoring, $host) {
+	public function filterAndSelectHost($host) {
 		$this->query('button:Reset')->one()->click();
 		$this->query('name:zbx_filter')->asForm()->waitUntilReady()->one()->fill(['Name' => $host]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
@@ -1867,7 +1851,7 @@ class testFormHost extends CWebTest {
 		$host_link = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible()
 				->findRow('Name', $host)->getColumn('Name')->query('tag:a')->waitUntilClickable();
 
-		if ($monitoring) {
+		if ($this->monitoring) {
 			$host_link->asPopupButton()->one()->select('Configuration');
 		}
 		else {

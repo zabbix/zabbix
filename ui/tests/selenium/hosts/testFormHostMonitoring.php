@@ -27,27 +27,25 @@ require_once dirname(__FILE__).'/../common/testFormHost.php';
  */
 class testFormHostMonitoring extends testFormHost {
 
-	const MONITORING = true;
-	const STANDALONE = false;
-
+	public $monitoring = true;
 	public $link = 'zabbix.php?action=host.view';
 
 	public function testFormHostMonitoring_Layout() {
-		$this->checkHostLayout($this->link, self::STANDALONE, self::MONITORING);
+		$this->checkHostLayout($this->link);
 	}
 
 	/**
 	 * @dataProvider getCreateData
 	 */
 	public function testFormHostMonitoring_Create($data) {
-		$this->checkHostCreate($data, $this->link, self::STANDALONE, self::MONITORING);
+		$this->checkHostCreate($data, $this->link);
 	}
 
 	/**
 	 * @dataProvider getValidationUpdateData
 	 */
 	public function testFormHostMonitoring_ValidationUpdate($data) {
-		$this->checkHostUpdate($data, $this->link, self::STANDALONE, self::MONITORING);
+		$this->checkHostUpdate($data, $this->link);
 	}
 
 	/**
@@ -56,21 +54,21 @@ class testFormHostMonitoring extends testFormHost {
 	 * @dataProvider getUpdateData
 	 */
 	public function testFormHostMonitoring_Update($data) {
-		$this->checkHostUpdate($data, $this->link, self::STANDALONE, self::MONITORING);
+		$this->checkHostUpdate($data, $this->link);
 	}
 
 	/**
 	 * Update the host without any changes and check host and interfaces hashes.
 	 */
 	public function testFormHostMonitoring_SimpleUpdate() {
-		$this->checkHostSimpleUpdate($this->link, self::STANDALONE, self::MONITORING);
+		$this->checkHostSimpleUpdate($this->link, self::MONITORING);
 	}
 
 	/**
 	 * @dataProvider getCloneData
 	 */
 	public function testFormHostMonitoring_Clone($data) {
-		$this->cloneHost($data, $this->link, 'Clone', self::STANDALONE, self::MONITORING);
+		$this->cloneHost($data, $this->link, 'Clone', self::MONITORING);
 
 		// Check that items aren't cloned from original host.
 		$this->assertItemsDBCount($data['host_fields']['Host name'], 0);
@@ -80,7 +78,7 @@ class testFormHostMonitoring extends testFormHost {
 	 * @dataProvider getCloneData
 	 */
 	public function testFormHostMonitoring_FullClone($data) {
-		$this->cloneHost($data, $this->link, 'Full clone', self::STANDALONE, self::MONITORING);
+		$this->cloneHost($data, $this->link, 'Full clone', self::MONITORING);
 
 		// Check that items cloned from original host.
 		$this->assertItemsDBCount($data['host_fields']['Host name'], 3);
@@ -90,14 +88,14 @@ class testFormHostMonitoring extends testFormHost {
 	 * @dataProvider getCancelData
 	 */
 	public function testFormHostMonitoring_Cancel($data) {
-		$this->checkCancel($data, $this->link, null, self::STANDALONE, self::MONITORING);
+		$this->checkCancel($data, $this->link, null, self::MONITORING);
 	}
 
 	/**
 	 * @dataProvider getDeleteData
 	 */
 	public function testFormHostMonitoring_Delete($data) {
-		$this->checkDelete($data, $this->link, self::STANDALONE, self::MONITORING);
+		$this->checkDelete($data, $this->link, self::MONITORING);
 	}
 }
 
