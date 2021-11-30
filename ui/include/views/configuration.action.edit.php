@@ -108,7 +108,9 @@ if ($data['action']['filter']['conditions']) {
 	}
 }
 
-$formula = (new CTextBox('formula', $data['action']['filter']['formula']))
+$formula = (new CTextBox('formula', $data['action']['filter']['formula'], false,
+		DB::getFieldLength('actions', 'formula')
+	))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	->setId('formula')
 	->setAttribute('placeholder', 'A or (B and C) &hellip;');
