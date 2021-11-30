@@ -81,13 +81,15 @@ class CControllerWidgetItemView extends CControllerWidget {
 
 		$show = array_flip($fields['show']);
 
-		// If description contains user macros, we need "itemid" and "hostid" to resolve them.
-		if (array_key_exists(WIDGET_ITEM_SHOW_DESCRIPTION, $show)) {
-			$options['output'] = array_merge($options['output'], ['itemid', 'hostid']);
-		}
+		if (($this->hasInput('dynamic_hostid') && $template_items) || !$this->hasInput('dynamic_hostid')) {
+			// If description contains user macros, we need "itemid" and "hostid" to resolve them.
+			if (array_key_exists(WIDGET_ITEM_SHOW_DESCRIPTION, $show)) {
+				$options['output'] = array_merge($options['output'], ['itemid', 'hostid']);
+			}
 
-		if (array_key_exists(WIDGET_ITEM_SHOW_VALUE, $show) && $fields['units_show'] == 1) {
-			$options['output'][] = 'units';
+			if (array_key_exists(WIDGET_ITEM_SHOW_VALUE, $show) && $fields['units_show'] == 1) {
+				$options['output'][] = 'units';
+			}
 		}
 
 		if ($this->hasInput('dynamic_hostid')) {
