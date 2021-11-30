@@ -467,15 +467,15 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 }
 
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-	$operation_tab->addRow(_('Pause operations for suppressed problems'),
-		(new CCheckBox('pause_suppressed', ACTION_PAUSE_SUPPRESSED_TRUE))
-			->setChecked($data['action']['pause_suppressed'] == ACTION_PAUSE_SUPPRESSED_TRUE)
-	);
-
-	$operation_tab->addRow(_('Notify about canceled escalations'),
-		(new CCheckBox('notify_if_canceled', ACTION_NOTIFY_IF_CANCELED_TRUE))
-			->setChecked($data['action']['notify_if_canceled'] == ACTION_NOTIFY_IF_CANCELED_TRUE)
-	);
+	$operation_tab
+		->addRow(_('Pause operations for suppressed problems'),
+			(new CCheckBox('pause_suppressed', ACTION_PAUSE_SUPPRESSED_TRUE))
+				->setChecked($data['action']['pause_suppressed'] == ACTION_PAUSE_SUPPRESSED_TRUE)
+		)
+		->addRow(_('Notify about canceled escalations'),
+			(new CCheckBox('notify_if_canceled', ACTION_NOTIFY_IF_CANCELED_TRUE))
+				->setChecked($data['action']['notify_if_canceled'] == ACTION_NOTIFY_IF_CANCELED_TRUE)
+		);
 }
 
 // Append tabs to form.
