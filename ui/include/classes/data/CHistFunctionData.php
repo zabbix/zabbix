@@ -232,13 +232,13 @@ final class CHistFunctionData {
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_TREND, 'min' => SEC_PER_HOUR]]],
 			['rules' => [['type' => 'regexp', 'pattern' => '/^[hdwMy]$/']]],
-			['rules' => [['type' => 'number', 'with_suffix' => false, 'min' => 1]]]
+			['rules' => [['type' => 'number', 'with_suffix' => false, 'min' => 1, 'with_float' => false]]]
 		],
 		'baselinewma' => [
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_TREND, 'min' => SEC_PER_HOUR]]],
 			['rules' => [['type' => 'regexp', 'pattern' => '/^[hdwMy]$/']]],
-			['rules' => [['type' => 'number', 'with_suffix' => false, 'min' => 1]]]
+			['rules' => [['type' => 'number', 'with_suffix' => false, 'min' => 1, 'with_float' => false]]]
 		],
 		'trendcount' => [
 			['rules' => [['type' => 'query']]],

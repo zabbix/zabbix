@@ -226,9 +226,16 @@ class CHistFunctionValidator extends CValidator {
 
 				case 'number':
 					$with_suffix = (array_key_exists('with_suffix', $rule) && $rule['with_suffix']);
+					$with_float = true;
+
+					if (array_key_exists('with_float', $rule) && $rule['with_float'] === false) {
+						$with_float = false;
+					}
+
 					$parser = new CNumberParser([
-						'with_size_suffix' => $with_suffix,
-						'with_time_suffix' => $with_suffix
+						'with_size_suffix'	=> $with_suffix,
+						'with_time_suffix'	=> $with_suffix,
+						'with_float' 		=> $with_float
 					]);
 
 					if ($parser->parse($param_match_unquoted) != CParser::PARSE_SUCCESS) {
