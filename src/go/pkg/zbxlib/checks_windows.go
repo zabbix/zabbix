@@ -29,8 +29,6 @@ package zbxlib
 #include "module.h"
 
 int	SYSTEM_LOCALTIME(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	NET_DNS(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	NET_DNS_RECORD(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_BOOTTIME(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -66,10 +64,6 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 	switch key {
 	case "system.localtime":
 		cfunc = unsafe.Pointer(C.SYSTEM_LOCALTIME)
-	case "net.dns":
-		cfunc = unsafe.Pointer(C.NET_DNS)
-	case "net.dns.record":
-		cfunc = unsafe.Pointer(C.NET_DNS_RECORD)
 	case "vfs.dir.count":
 		cfunc = unsafe.Pointer(C.VFS_DIR_COUNT)
 	case "vfs.dir.size":
