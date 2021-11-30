@@ -783,7 +783,7 @@ class testFormHost extends CWebTest {
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				$this->assertMessage(TEST_GOOD, 'Host added');
-				$this->page->assertTitle((!$this->monitoring) ? 'Configuration of hosts' : 'Hosts');
+				$this->page->assertTitle($this->monitoring ? 'Hosts' : 'Configuration of hosts');
 
 				// Check host fields.
 				$host = CTestArrayHelper::get($data, 'host_fields.Visible name', $data['host_fields']['Host name']);

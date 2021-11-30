@@ -61,14 +61,14 @@ class testFormHostMonitoring extends testFormHost {
 	 * Update the host without any changes and check host and interfaces hashes.
 	 */
 	public function testFormHostMonitoring_SimpleUpdate() {
-		$this->checkHostSimpleUpdate($this->link, self::MONITORING);
+		$this->checkHostSimpleUpdate($this->link);
 	}
 
 	/**
 	 * @dataProvider getCloneData
 	 */
 	public function testFormHostMonitoring_Clone($data) {
-		$this->cloneHost($data, $this->link, 'Clone', self::MONITORING);
+		$this->cloneHost($data, $this->link, 'Clone');
 
 		// Check that items aren't cloned from original host.
 		$this->assertItemsDBCount($data['host_fields']['Host name'], 0);
@@ -78,7 +78,7 @@ class testFormHostMonitoring extends testFormHost {
 	 * @dataProvider getCloneData
 	 */
 	public function testFormHostMonitoring_FullClone($data) {
-		$this->cloneHost($data, $this->link, 'Full clone', self::MONITORING);
+		$this->cloneHost($data, $this->link, 'Full clone');
 
 		// Check that items cloned from original host.
 		$this->assertItemsDBCount($data['host_fields']['Host name'], 3);
@@ -88,14 +88,14 @@ class testFormHostMonitoring extends testFormHost {
 	 * @dataProvider getCancelData
 	 */
 	public function testFormHostMonitoring_Cancel($data) {
-		$this->checkCancel($data, $this->link, null, self::MONITORING);
+		$this->checkCancel($data, $this->link);
 	}
 
 	/**
 	 * @dataProvider getDeleteData
 	 */
 	public function testFormHostMonitoring_Delete($data) {
-		$this->checkDelete($data, $this->link, self::MONITORING);
+		$this->checkDelete($data, $this->link);
 	}
 }
 
