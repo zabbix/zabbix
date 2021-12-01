@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"net"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/miekg/dns"
@@ -81,43 +82,200 @@ var dnsTypes = map[string]uint16{
 
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	var full bool
 	switch key {
 	case "net.dns":
+		return exportDns(params)
 	case "net.dns.record":
-		full = true
+		return exportDnsRecord(params)
 	default:
 		err = zbxerr.ErrorUnsupportedMetric
 
 		return
 	}
+}
 
+func exportDns(params []string) (result interface{}, err error) {
 	options, err := parseParamas(params)
 	if err != nil {
 		return
 	}
 
-	resp, err := runQuery(options.ip, options.name, options.protocol, options.dnsType, options.timeout)
-	if err != nil {
-		p.Debugf("failed to run dns query for ip: %s", options.ip)
+	var resp *dns.Msg
+	for i := 0; i <= options.count; i++ {
+		resp, err = runQuery(options.ip, options.name, options.protocol, options.dnsType, options.timeout)
+		if err != nil {
+			continue
+		}
 
-		return 0, nil
+		break
+	}
+
+	if err != nil {
+		err = zbxerr.ErrorCannotFetchData.Wrap(err)
+		return
 	}
 
 	if len(resp.Answer) < 1 {
 		return 0, nil
 	}
 
-	if full {
-		fmt.Println("Class", resp.Answer[0].Header().Class)
-		fmt.Println("Name", resp.Answer[0].Header().Name)
-		fmt.Println("Rrtype", resp.Answer[0].Header().Rrtype)
-		fmt.Println("Ttl", resp.Answer[0].Header().Ttl)
-		fmt.Println("Rdlength", resp.Answer[0].Header().Rdlength)
-		return resp.Answer[0].String(), nil
+	return 1, nil
+}
+
+func exportDnsRecord(params []string) (result interface{}, err error) {
+	options, err := parseParamas(params)
+	if err != nil {
+		return
 	}
 
-	return 1, nil
+	var resp *dns.Msg
+	for i := 1; i <= options.count; i++ {
+		resp, err = runQuery(options.ip, options.name, options.protocol, options.dnsType, options.timeout)
+		if err != nil {
+			continue
+		}
+
+		break
+	}
+
+	if err != nil {
+		err = zbxerr.ErrorCannotFetchData.Wrap(err)
+		return
+	}
+
+	if len(resp.Answer) < 1 {
+		err = zbxerr.New("Cannot perform DNS query.")
+		return
+	}
+
+	var out string
+	for _, a := range resp.Answer {
+
+		out += strings.TrimSuffix(a.Header().Name, ".") + "\t     "
+		out += dns.Type(a.Header().Rrtype).String()
+
+		switch rr := a.(type) {
+		case *dns.A:
+			out += getAString(rr)
+		case *dns.NS:
+			out += getNSString(rr)
+		case *dns.CNAME:
+			out += getCNAMEString(rr)
+		case *dns.MB:
+			out += getMBString(rr)
+		case *dns.MG:
+			out += getMGString(rr)
+		case *dns.PTR:
+			out += getPTRString(rr)
+		case *dns.MD:
+			out += getMDString(rr)
+		case *dns.MF:
+			out += getMFString(rr)
+		case *dns.MX:
+			out += getMXString(rr)
+		case *dns.SOA:
+			out += getSOAString(rr)
+		case *dns.NULL:
+			out += getNULLString(rr)
+		case *dns.HINFO:
+			out += getHINFOString(rr)
+		case *dns.MINFO:
+			out += getMINFOtring(rr)
+		case *dns.TXT:
+			out += getTXTString(rr)
+		case *dns.AAAA:
+			out += getAAAAString(rr)
+		case *dns.SRV:
+			out += getSRVString(rr)
+		}
+	}
+
+	return out, nil
+}
+
+func getSOAString(in *dns.SOA) string {
+	return "      " + strings.TrimSuffix(in.Ns, ".") +
+		" " + strings.TrimSuffix(in.Mbox, ".") +
+		" " + strconv.FormatInt(int64(in.Serial), 10) +
+		" " + strconv.FormatInt(int64(in.Refresh), 10) +
+		" " + strconv.FormatInt(int64(in.Retry), 10) +
+		" " + strconv.FormatInt(int64(in.Expire), 10) +
+		" " + strconv.FormatInt(int64(in.Minttl), 10)
+}
+
+func getAString(in *dns.A) string {
+	if in.A == nil {
+		return "\n"
+	}
+
+	return "        " + in.A.String() + "\n"
+}
+
+func getNSString(in *dns.NS) string {
+	return "       " + strings.TrimSuffix(in.Ns, ".") + "\n"
+}
+
+func getCNAMEString(in *dns.CNAME) string {
+	return "    " + strings.TrimSuffix(in.Target, ".") + "\n"
+}
+
+func getMBString(in *dns.MB) string {
+	return "       " + strings.TrimSuffix(in.Mb, ".") + "\n"
+}
+func getMGString(in *dns.MG) string {
+	return "       " + strings.TrimSuffix(in.Mg, ".") + "\n"
+}
+
+func getPTRString(in *dns.PTR) string {
+	return "      " + strings.TrimSuffix(in.Ptr, ".") + "\n"
+}
+
+func getMDString(in *dns.MD) string {
+	return "       " + strings.TrimSuffix(in.Md, ".") + "\n"
+}
+func getMFString(in *dns.MF) string {
+	return "       " + strings.TrimSuffix(in.Mf, ".") + "\n"
+
+}
+func getMXString(in *dns.MX) string {
+	return "       " + strconv.Itoa(int(in.Preference)) +
+		" " + strings.TrimSuffix(in.Mx, ".") + "\n"
+
+}
+func getNULLString(in *dns.NULL) string {
+	return "     " + strings.TrimSuffix(in.Data, ".") + "\n"
+}
+func getHINFOString(in *dns.HINFO) string {
+	return "    " + "\"" + in.Cpu + " " + "\"" + in.Os + "\n"
+}
+
+func getMINFOtring(in *dns.MINFO) string {
+	return "    " + strings.TrimSuffix(in.Rmail, ".") + " " +
+		strings.TrimSuffix(in.Email, ".") + "\n"
+}
+func getTXTString(in *dns.TXT) string {
+	out := "      "
+	for _, t := range in.Txt {
+		out += "\"" + t + "\""
+	}
+
+	return out + "\n"
+}
+func getAAAAString(in *dns.AAAA) string {
+	if in.AAAA == nil {
+		return "\n"
+	}
+
+	return "     " + in.AAAA.String() + "\n"
+}
+
+func getSRVString(in *dns.SRV) string {
+	return "      " +
+		strconv.Itoa(int(in.Priority)) + " " +
+		strconv.Itoa(int(in.Weight)) + " " +
+		strconv.Itoa(int(in.Port)) + " " +
+		strings.TrimSuffix(in.Target, ".")
+
 }
 
 func parseParamas(params []string) (o options, err error) {
@@ -154,13 +312,17 @@ func parseParamas(params []string) (o options, err error) {
 		o.name = params[secondParam]
 		fallthrough
 	case 1:
-		if params[firstParam] != "" {
-			o.ip = net.JoinHostPort(params[firstParam], "53")
+		err = o.setIP(params[firstParam])
+		if err != nil {
+			return o, zbxerr.New(fmt.Sprintf("invalid fist parameter %s", err.Error()))
 		}
 
 		fallthrough
 	case 0:
-		o.setDefaults()
+		err = o.setDefaults()
+		if err != nil {
+			return
+		}
 	default:
 		err = zbxerr.ErrorTooManyParameters
 
@@ -168,6 +330,27 @@ func parseParamas(params []string) (o options, err error) {
 	}
 
 	return
+}
+
+func (o *options) setIP(ip string) error {
+	if ip == "" {
+		return nil
+	}
+
+	if !isValidIP(ip) {
+		return zbxerr.New(fmt.Sprintf("invalid address %s", ip))
+	}
+
+	o.ip = net.JoinHostPort(ip, "53")
+
+	return nil
+}
+
+func isValidIP(ip string) bool {
+	if r := net.ParseIP(ip); r == nil {
+		return false
+	}
+	return true
 }
 
 func (o *options) setProtocol(protocol string) error {
@@ -225,9 +408,16 @@ func (o *options) setDNSType(dnsType string) error {
 	return nil
 }
 
-func (o *options) setDefaults() {
+func (o *options) setDefaults() error {
 	if o.ip == "" {
-		o.setDefaultIP()
+		err := o.setDefaultIP()
+		if err != nil {
+			return zbxerr.New(err.Error())
+		}
+	}
+
+	if o.name == "" {
+		o.setDefaultName()
 	}
 
 	if o.dnsType == dns.TypeNone {
@@ -241,6 +431,12 @@ func (o *options) setDefaults() {
 	if o.count < 1 {
 		o.count = 2
 	}
+
+	return nil
+}
+
+func (o *options) setDefaultName() {
+	o.name = "zabbix.com"
 }
 
 func runQuery(resolver, domain, net string, record uint16, timeout time.Duration) (*dns.Msg, error) {
@@ -252,18 +448,15 @@ func runQuery(resolver, domain, net string, record uint16, timeout time.Duration
 
 	m := &dns.Msg{
 		MsgHdr: dns.MsgHdr{
-			// CheckingDisabled: options.CheckingDisabled,
-			// RecursionDesired: options.RecursionDesired,
-			Opcode: dns.OpcodeQuery,
-			Rcode:  dns.RcodeSuccess,
+			CheckingDisabled: false,
+			RecursionDesired: true,
+			Opcode:           dns.OpcodeQuery,
+			Rcode:            dns.RcodeSuccess,
 		},
 		Question: make([]dns.Question, 1),
 	}
 
-	m.SetEdns0(4096, false)
 	m.Question[0] = dns.Question{Name: dns.Fqdn(domain), Qtype: record, Qclass: dns.ClassINET}
-	m.Id = dns.Id()
-
 	r, _, err := c.Exchange(m, resolver)
 
 	return r, err

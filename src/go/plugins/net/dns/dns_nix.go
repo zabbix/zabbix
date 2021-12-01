@@ -1,5 +1,4 @@
 //go:build !windows
-// +build !windows
 
 /*
 ** Zabbix
@@ -20,21 +19,27 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package tcpudp
+package dns
 
 import (
-	"errors"
-
-	"zabbix.com/pkg/plugin"
+	"fmt"
+	"os"
+	"strings"
 )
 
-func exportSystemTcpListen(port uint16) (result interface{}, err error) {
-	return nil, errors.New("Not supported.")
-}
+func (o *options) setDefaultIP() (err error) {
+	data, err := os.ReadFile("/etc/resolv.conf")
+	if err != nil {
+		return
+	}
 
-func init() {
-	plugin.RegisterMetrics(&impl, "TCP",
-		"net.tcp.port", "Checks if it is possible to make TCP connection to specified port.",
-		"net.tcp.service", "Checks if service is running and accepting TCP connections.",
-		"net.tcp.service.perf", "Checks performance of TCP service.")
+	// fmt.Println("data", string(data))
+	s := strings.Split(string(data), "\n")
+	for _, tmp := range s {
+		if strings.HasPrefix(tmp, "nameserver") {
+			return o.setIP(strings.TrimSpace(strings.TrimPrefix(tmp, "nameserver")))
+		}
+	}
+
+	return fmt.Errorf("cannot find default dns nameserver")
 }
