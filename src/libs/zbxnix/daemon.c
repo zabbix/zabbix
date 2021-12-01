@@ -272,6 +272,10 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 		case ZBX_RTC_SERVICE_CACHE_RELOAD:
 			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_SERVICEMAN, ZBX_RTC_GET_DATA(flags), flags);
 			break;
+		case ZBX_RTC_USER_PARAMETERS_RELOAD:
+			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_ACTIVE_CHECKS, ZBX_RTC_GET_DATA(flags), flags);
+			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_LISTENER, ZBX_RTC_GET_DATA(flags), flags);
+			break;
 		default:
 			if (NULL != zbx_sigusr_handler)
 				zbx_sigusr_handler(flags);

@@ -240,6 +240,23 @@ final class CHistFunctionData {
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_TREND]]]
 		],
+		'trendstl' => [
+			['rules' => [['type' => 'query']]],
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_TREND]]],
+			['rules' => [['type' => 'time', 'min' => SEC_PER_HOUR]]],
+			['rules' => [['type' => 'time', 'min' => SEC_PER_HOUR * 2]]],
+			['rules' => [
+				['type' => 'regexp', 'pattern' => '/^((\d+(\.\d{0,4})?)|(\.\d{1,4}))$/'],
+				['type' => 'number', 'min' => 1, 'max' => ZBX_MAX_INT32]
+			], 'required' => false],
+			['rules' => [
+				['type' => 'regexp', 'pattern' => '/^(mad|stddevpop|stddevsamp)$/']
+			], 'required' => false],
+			['rules' => [
+				['type' => 'regexp', 'pattern' => '/^\d+$/'],
+				['type' => 'number', 'min' => 7, 'max' => ZBX_MAX_INT32]
+			], 'required' => false]
+		],
 		'trendsum' => [
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_TREND]]]
@@ -382,6 +399,7 @@ final class CHistFunctionData {
 		'trendcount' => self::ITEM_VALUE_TYPES_NUM,
 		'trendmax' => self::ITEM_VALUE_TYPES_NUM,
 		'trendmin' => self::ITEM_VALUE_TYPES_NUM,
+		'trendstl' => self::ITEM_VALUE_TYPES_NUM,
 		'trendsum' => self::ITEM_VALUE_TYPES_NUM,
 		'varpop' => self::ITEM_VALUE_TYPES_NUM,
 		'varsamp' => self::ITEM_VALUE_TYPES_NUM

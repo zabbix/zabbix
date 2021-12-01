@@ -1658,6 +1658,8 @@ function get_item_function_info(string $expr) {
 		'mad' => $rules['numeric_as_float'],
 		'max' => $rules['numeric'],
 		'min' => $rules['numeric'],
+		'monodec' => $rules['numeric_as_uint'],
+		'monoinc' => $rules['numeric_as_uint'],
 		'nodata' => $rules['numeric_as_0or1'] + $rules['string_as_0or1'],
 		'percentile' => $rules['numeric'],
 		'rate' => $rules['numeric'],
@@ -1671,6 +1673,7 @@ function get_item_function_info(string $expr) {
 		'trendcount' => $rules['numeric'],
 		'trendmax' => $rules['numeric'],
 		'trendmin' => $rules['numeric'],
+		'trendstl' => $rules['numeric'],
 		'trendsum' => $rules['numeric'],
 		'varpop' => $rules['numeric_as_float'],
 		'varsamp' => $rules['numeric_as_float']

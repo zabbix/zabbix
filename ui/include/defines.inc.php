@@ -18,11 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'6.0.0alpha7');
+define('ZABBIX_VERSION',		'6.0.0alpha8');
 define('ZABBIX_API_VERSION',	'6.0.0');
 define('ZABBIX_EXPORT_VERSION',	'6.0');
 
-define('ZABBIX_DB_VERSION',		5050110);
+define('ZABBIX_DB_VERSION',		5050111);
 
 define('DB_VERSION_SUPPORTED',				0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',		1);
@@ -1624,14 +1624,12 @@ define('ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION', 2);
 
 // Tab indicator names.
 define('TAB_INDICATOR_MACROS', 'macros');
-define('TAB_INDICATOR_LINKED_TEMPLATE', 'linked-template');
 define('TAB_INDICATOR_TAGS', 'tags');
 define('TAB_INDICATOR_AUTH_HTTP', 'http');
 define('TAB_INDICATOR_AUTH_LDAP', 'ldap');
 define('TAB_INDICATOR_AUTH_SAML', 'saml');
 define('TAB_INDICATOR_INVENTORY', 'inventory');
 define('TAB_INDICATOR_ENCRYPTION', 'encryption');
-define('TAB_INDICATOR_GROUPS', 'groups');
 define('TAB_INDICATOR_PREPROCESSING', 'preprocessing');
 define('TAB_INDICATOR_DEPENDENCY', 'dependency');
 define('TAB_INDICATOR_LLD_MACROS', 'lld-macros');

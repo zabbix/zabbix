@@ -6676,6 +6676,15 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 .overlay-dialogue #host-form #valuemap-formlist .table-forms-td-right {
   width: 100%; }
 
+.linked-templates > .table-forms {
+  margin-bottom: 5px;
+  line-height: 24px; }
+  .linked-templates > .table-forms td, .linked-templates > .table-forms th {
+    padding: 0 5px 0 0; }
+    .linked-templates > .table-forms td:last-child, .linked-templates > .table-forms th:last-child {
+      width: 0;
+      padding-right: 0; }
+
 .audit-details-popup-wrapper {
   margin: 5px 10px; }
   .audit-details-popup-wrapper .audit-details-popup-textarea {

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-09 16:59+0200\n"
+"POT-Creation-Date: 2021-11-26 19:55+0200\n"
 "PO-Revision-Date: 2018-09-24 07:57+0300\n"
 "Last-Translator: Lukáš <iam@lukasmaly.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -319,10 +319,10 @@ msgstr "(0 - použijte výchozí akci)"
 msgid "(Only super admins can create groups)"
 msgstr "(Skupiny mohou vytvářet jen super administrátoři)"
 
-#: app/partials/configuration.host.edit.html.php:161
+#: app/partials/configuration.host.edit.html.php:275
 #: app/views/popup.itemtestedit.view.php:241
-#: app/views/popup.massupdate.host.php:85
-#: include/views/configuration.host.prototype.edit.php:132
+#: app/views/popup.massupdate.host.php:122
+#: include/views/configuration.host.prototype.edit.php:280
 msgid "(no proxy)"
 msgstr "(bez proxy)"
 
@@ -545,7 +545,7 @@ msgstr "Potvrzené VYŘEŠENÉ události"
 
 #: app/controllers/CControllerAuditLogList.php:209
 #: app/partials/administration.usergroup.tagfilters.html.php:29
-#: app/partials/configuration.host.edit.html.php:216
+#: app/partials/configuration.host.edit.html.php:144
 #: app/partials/configuration.tags.tab.php:41
 #: app/partials/configuration.valuemap.php:35
 #: app/partials/massupdate.valuemaps.tab.php:47
@@ -564,11 +564,11 @@ msgstr "Potvrzené VYŘEŠENÉ události"
 #: app/views/popup.dashboard.share.edit.php:32
 #: app/views/popup.dashboard.share.edit.php:53
 #: app/views/popup.lldoperation.php:117 app/views/popup.lldoperation.php:268
-#: app/views/popup.lldoverride.php:101 app/views/popup.massupdate.host.php:207
+#: app/views/popup.lldoverride.php:101 app/views/popup.massupdate.host.php:203
 #: app/views/popup.massupdate.item.php:228
 #: app/views/popup.massupdate.item.php:486
 #: app/views/popup.massupdate.service.php:50
-#: app/views/popup.massupdate.template.php:140
+#: app/views/popup.massupdate.template.php:132
 #: app/views/popup.massupdate.trigger.php:84
 #: app/views/popup.massupdate.trigger.php:98
 #: app/views/popup.service.edit.php:65 app/views/popup.service.edit.php:145
@@ -590,14 +590,14 @@ msgstr "Potvrzené VYŘEŠENÉ události"
 #: include/views/configuration.host.discovery.edit.php:632
 #: include/views/configuration.host.discovery.edit.php:742
 #: include/views/configuration.host.discovery.edit.php:914
-#: include/views/configuration.host.prototype.edit.php:240
+#: include/views/configuration.host.prototype.edit.php:118
 #: include/views/configuration.httpconf.edit.php:209
 #: include/views/configuration.item.edit.php:193
 #: include/views/configuration.item.edit.php:735
 #: include/views/configuration.item.prototype.edit.php:178
 #: include/views/configuration.item.prototype.edit.php:714
 #: include/views/configuration.maintenance.edit.php:45
-#: include/views/configuration.template.edit.php:127
+#: include/views/configuration.template.edit.php:69
 #: include/views/configuration.trigger.prototype.edit.php:199
 #: include/views/configuration.trigger.prototype.edit.php:394
 #: include/views/configuration.trigger.prototype.edit.php:567
@@ -615,7 +615,7 @@ msgstr "Potvrzené VYŘEŠENÉ události"
 msgid "Action"
 msgstr "Akce"
 
-#: include/classes/api/services/CAction.php:2676
+#: include/classes/api/services/CAction.php:2678
 #, c-format
 msgid "Action \"%1$s\" already exists."
 msgstr "Akce \"%1$s\" již existuje."
@@ -712,7 +712,7 @@ msgid "Active till"
 msgstr "Aktivní do"
 
 #: app/controllers/CControllerAuditLogList.php:194
-#: app/partials/configuration.host.edit.html.php:133
+#: app/partials/configuration.host.edit.html.php:248
 #: app/partials/configuration.tags.tab.php:120
 #: app/partials/configuration.valuemap.php:40
 #: app/partials/hostmacros.inherited.list.html.php:185
@@ -771,14 +771,14 @@ msgstr "Aktivní do"
 #: app/views/popup.lldoperation.php:290 app/views/popup.lldoverride.php:176
 #: app/views/popup.lldoverride.php:201 app/views/popup.lldoverride.php:220
 #: app/views/popup.maintenance.period.php:189
-#: app/views/popup.massupdate.host.php:50
-#: app/views/popup.massupdate.host.php:201
+#: app/views/popup.massupdate.host.php:87
+#: app/views/popup.massupdate.host.php:197
 #: app/views/popup.massupdate.item.php:124
 #: app/views/popup.massupdate.item.php:270
 #: app/views/popup.massupdate.item.php:480
 #: app/views/popup.massupdate.service.php:44
-#: app/views/popup.massupdate.template.php:52
-#: app/views/popup.massupdate.template.php:134
+#: app/views/popup.massupdate.template.php:92
+#: app/views/popup.massupdate.template.php:126
 #: app/views/popup.massupdate.trigger.php:78
 #: app/views/popup.massupdate.trigger.php:125 app/views/popup.media.php:52
 #: app/views/popup.media.php:127 app/views/popup.mediatype.message.php:104
@@ -809,9 +809,9 @@ msgstr "Aktivní do"
 #: include/views/configuration.host.discovery.edit.php:919
 #: include/views/configuration.host.discovery.edit.php:981
 #: include/views/configuration.hostgroups.edit.php:55
-#: include/views/configuration.host.prototype.edit.php:110
-#: include/views/configuration.host.prototype.edit.php:189
-#: include/views/configuration.host.prototype.edit.php:432
+#: include/views/configuration.host.prototype.edit.php:216
+#: include/views/configuration.host.prototype.edit.php:256
+#: include/views/configuration.host.prototype.edit.php:430
 #: include/views/configuration.httpconf.edit.php:120
 #: include/views/configuration.httpconf.edit.php:138
 #: include/views/configuration.httpconf.edit.php:215
@@ -829,7 +829,7 @@ msgstr "Aktivní do"
 #: include/views/configuration.maintenance.edit.php:86
 #: include/views/configuration.maintenance.edit.php:200
 #: include/views/configuration.maintenance.edit.php:275
-#: include/views/configuration.template.edit.php:253
+#: include/views/configuration.template.edit.php:234
 #: include/views/configuration.trigger.prototype.edit.php:111
 #: include/views/configuration.trigger.prototype.edit.php:148
 #: include/views/configuration.trigger.prototype.edit.php:305
@@ -874,7 +874,7 @@ msgstr "Přidat podřízený prvek"
 msgid "Add child service"
 msgstr ""
 
-#: app/views/js/popup.service.edit.js.php:509
+#: app/views/js/popup.service.edit.js.php:508
 msgid "Add child services"
 msgstr ""
 
@@ -899,8 +899,8 @@ msgstr "Přidat více map"
 msgid "Add new data set"
 msgstr "Přidej nový set dat"
 
-#: app/partials/configuration.host.edit.html.php:141
-#: include/views/configuration.host.prototype.edit.php:118
+#: app/partials/configuration.host.edit.html.php:256
+#: include/views/configuration.host.prototype.edit.php:264
 msgid "Add new interface"
 msgstr ""
 
@@ -913,7 +913,7 @@ msgstr "Přidej nový přepis"
 msgid "Add page"
 msgstr ""
 
-#: app/views/js/popup.service.edit.js.php:539 jsLoader.php:414
+#: app/views/js/popup.service.edit.js.php:538 jsLoader.php:414
 msgid "Add parent services"
 msgstr ""
 
@@ -1062,6 +1062,10 @@ msgstr ""
 #: include/actions.inc.php:2106
 msgid "Alert message"
 msgstr "Poplašná zpráva"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1070
+msgid "Algorithm"
+msgstr ""
 
 #: include/hosts.inc.php:114
 msgid "Alias"
@@ -1461,9 +1465,9 @@ msgstr ""
 msgid "Authentication"
 msgstr "Autentizace"
 
-#: app/partials/configuration.host.edit.html.php:311
-#: app/views/popup.massupdate.host.php:151
-#: include/views/configuration.host.prototype.edit.php:309
+#: app/partials/configuration.host.edit.html.php:306
+#: app/views/popup.massupdate.host.php:150
+#: include/views/configuration.host.prototype.edit.php:303
 msgid "Authentication algorithm"
 msgstr "Autentizační algoritmus"
 
@@ -1524,12 +1528,12 @@ msgstr "Možnosti automatického přihlášení a automatického odhlášení ne
 msgid "Auto-logout"
 msgstr "Automatické odhlášení"
 
-#: app/partials/configuration.host.edit.html.php:365
+#: app/partials/configuration.host.edit.html.php:360
 #: app/partials/popup.operations.php:228
 #: app/views/administration.miscconfig.edit.php:61
 #: app/views/popup.lldoperation.php:282
-#: app/views/popup.massupdate.host.php:189 include/hosts.inc.php:1128
-#: include/views/configuration.host.prototype.edit.php:358
+#: app/views/popup.massupdate.host.php:185 include/hosts.inc.php:1128
+#: include/views/configuration.host.prototype.edit.php:362
 msgid "Automatic"
 msgstr "Automaticky"
 
@@ -2359,7 +2363,7 @@ msgstr[2] "Nelze smazat službu"
 msgid "Cannot delete service \"%1$s\": %2$s."
 msgstr ""
 
-#: templates.php:425 templates.php:439 templates.php:472
+#: templates.php:426 templates.php:440 templates.php:473
 msgid "Cannot delete template"
 msgstr "Nelze smazat šablonu"
 
@@ -2779,7 +2783,7 @@ msgstr[0] "Není možné importovat šablonu \"%1$s\", připojená šablona \"%2
 msgstr[1] "Není možné importovat šablonu \"%1$s\", připojené šablony \"%2$s\" neexistují."
 msgstr[2] "Není možné importovat šablonu \"%1$s\", připojené šablony \"%2$s\" neexistují."
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1486
+#: app/controllers/CControllerPopupTriggerExpr.php:1527
 msgid "Cannot insert trigger expression"
 msgstr "Není možné vložit výraz spouštěče"
 
@@ -2960,7 +2964,7 @@ msgstr "Není možné zrušit linkování šablony."
 msgid "Cannot unlink trigger \"%1$s\", it has items from template that is left linked to host."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2624
+#: include/classes/api/services/CAction.php:2626
 #, c-format
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
 msgstr "Nelze aktualizovat \"%1$s\" pro akci \"%2$s\"."
@@ -3087,7 +3091,7 @@ msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr "Není možné aktualizovat skupiny pro objeveného hosta \"%1$s\"."
 
 #: app/controllers/CControllerHostUpdate.php:34
-#: app/controllers/CControllerHostUpdate.php:148
+#: app/controllers/CControllerHostUpdate.php:153
 msgid "Cannot update host"
 msgstr "Nelze upravit hostitele"
 
@@ -3221,7 +3225,7 @@ msgstr "Nelze aktualizovat krok šablony webového scénáře \"%1$s\": %2$s."
 msgid "Cannot update template"
 msgstr "Nelze upravit šablonu"
 
-#: app/controllers/CControllerPopupMassupdateTemplate.php:341
+#: app/controllers/CControllerPopupMassupdateTemplate.php:343
 msgid "Cannot update templates"
 msgstr "Nelze aktualizovat šablony"
 
@@ -3309,14 +3313,14 @@ msgstr "Všechny zachycené SNMP trapy, které nebyly chyceny z snmptrap[] items
 msgid "Center"
 msgstr ""
 
-#: app/partials/configuration.host.edit.html.php:438
-#: app/partials/configuration.host.edit.html.php:457
+#: app/partials/configuration.host.edit.html.php:433
+#: app/partials/configuration.host.edit.html.php:452
 #: app/views/administration.proxy.edit.php:97
 #: app/views/administration.proxy.edit.php:105
-#: app/views/popup.massupdate.host.php:239
-#: app/views/popup.massupdate.host.php:255
-#: include/views/configuration.host.prototype.edit.php:371
-#: include/views/configuration.host.prototype.edit.php:387
+#: app/views/popup.massupdate.host.php:234
+#: app/views/popup.massupdate.host.php:250
+#: include/views/configuration.host.prototype.edit.php:375
+#: include/views/configuration.host.prototype.edit.php:391
 msgid "Certificate"
 msgstr "Certifikát"
 
@@ -3334,10 +3338,10 @@ msgctxt "verb"
 msgid "Change"
 msgstr "Nahradit"
 
-#: app/partials/configuration.host.edit.html.php:469
+#: app/partials/configuration.host.edit.html.php:464
 #: app/views/administration.autoreg.edit.php:80
 #: app/views/administration.proxy.edit.php:126
-#: include/views/configuration.host.prototype.edit.php:392
+#: include/views/configuration.host.prototype.edit.php:396
 msgid "Change PSK"
 msgstr ""
 
@@ -3379,7 +3383,7 @@ msgstr "Neobsahuje řetězec"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:728
 #: app/controllers/CControllerPopupTriggerExpr.php:921
-#: app/controllers/CControllerPopupTriggerExpr.php:1052
+#: app/controllers/CControllerPopupTriggerExpr.php:1095
 msgid "Chars"
 msgstr ""
 
@@ -3395,7 +3399,7 @@ msgstr "Informace o šasi. Vráti řetězec"
 msgid "Check already exists."
 msgstr "Kontrola již existuje."
 
-#: include/classes/parsers/C10TriggerExpression.php:538
+#: include/classes/parsers/C10TriggerExpression.php:542
 #, c-format
 msgid "Check expression part starting from \"%1$s\"."
 msgstr "Zkontrolujte část výrazu začínajícího od \"%1$s\"."
@@ -3517,8 +3521,8 @@ msgstr "Vyčistit historii"
 msgid "Clear history and trends"
 msgstr "Vyčistit historii a trendy"
 
-#: app/views/popup.massupdate.host.php:136
-#: app/views/popup.massupdate.template.php:114
+#: app/views/popup.massupdate.host.php:70
+#: app/views/popup.massupdate.template.php:73
 msgid "Clear when unlinking"
 msgstr "Pročistit při odpojování"
 
@@ -3549,12 +3553,12 @@ msgstr "Hodiny"
 #: include/views/configuration.graph.edit.php:510
 #: include/views/configuration.host.discovery.edit.php:960
 #: include/views/configuration.hostgroups.edit.php:62
-#: include/views/configuration.host.prototype.edit.php:424
+#: include/views/configuration.host.prototype.edit.php:419
 #: include/views/configuration.httpconf.edit.php:254
 #: include/views/configuration.item.edit.php:1015
 #: include/views/configuration.item.prototype.edit.php:901
 #: include/views/configuration.maintenance.edit.php:266
-#: include/views/configuration.template.edit.php:238
+#: include/views/configuration.template.edit.php:219
 #: include/views/configuration.trigger.prototype.edit.php:655
 #: include/views/configuration.triggers.edit.php:648
 #: include/views/monitoring.sysmap.edit.php:421 jsLoader.php:352
@@ -3683,7 +3687,7 @@ msgstr "Komprimace"
 msgid "Concurrent sessions"
 msgstr "Souběžné relace"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1509
+#: app/controllers/CControllerPopupTriggerExpr.php:1550
 #: app/views/popup.lldoperation.php:59 app/views/popup.lldoverride.php:195
 #: app/views/popup.service.statusrule.edit.php:48
 msgid "Condition"
@@ -3955,13 +3959,13 @@ msgstr ""
 msgid "Connection will not be encrypted because it uses a socket file (on Unix) or shared memory (Windows)."
 msgstr ""
 
-#: app/views/popup.massupdate.host.php:282
+#: app/views/popup.massupdate.host.php:277
 msgid "Connections"
 msgstr "Připojení"
 
-#: app/partials/configuration.host.edit.html.php:444
-#: app/views/popup.massupdate.host.php:243
-#: include/views/configuration.host.prototype.edit.php:375
+#: app/partials/configuration.host.edit.html.php:439
+#: app/views/popup.massupdate.host.php:238
+#: include/views/configuration.host.prototype.edit.php:379
 msgid "Connections from host"
 msgstr "Připojení z hostitele"
 
@@ -3969,9 +3973,9 @@ msgstr "Připojení z hostitele"
 msgid "Connections from proxy"
 msgstr "Připojení z proxy"
 
-#: app/partials/configuration.host.edit.html.php:433
-#: app/views/popup.massupdate.host.php:235
-#: include/views/configuration.host.prototype.edit.php:367
+#: app/partials/configuration.host.edit.html.php:428
+#: app/views/popup.massupdate.host.php:230
+#: include/views/configuration.host.prototype.edit.php:371
 msgid "Connections to host"
 msgstr "Připojení na hostitele"
 
@@ -4235,7 +4239,7 @@ msgid "Create discovery rule (select template first)"
 msgstr ""
 
 #: app/views/popup.lldoperation.php:80 app/views/popup.massupdate.item.php:325
-#: include/views/configuration.host.prototype.edit.php:138
+#: include/views/configuration.host.prototype.edit.php:286
 #: include/views/configuration.host.prototype.list.php:61
 #: include/views/configuration.host.prototype.list.php:187
 #: include/views/configuration.item.prototype.edit.php:847
@@ -4437,7 +4441,7 @@ msgid "Current value"
 msgstr "Aktuální hodnota"
 
 #: app/views/administration.mediatype.edit.php:327
-#: include/views/configuration.host.prototype.edit.php:104
+#: include/views/configuration.host.prototype.edit.php:250
 msgid "Custom"
 msgstr "Vlastní"
 
@@ -4800,7 +4804,7 @@ msgid "December"
 msgstr "Prosinec"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:908
-#: app/controllers/CControllerPopupTriggerExpr.php:1065
+#: app/controllers/CControllerPopupTriggerExpr.php:1108
 msgid "Decimal places"
 msgstr ""
 
@@ -4941,7 +4945,7 @@ msgstr "Smazat"
 msgid "Delete all elements that are not present in the import file?"
 msgstr ""
 
-#: include/views/configuration.template.edit.php:243
+#: include/views/configuration.template.edit.php:224
 #: include/views/configuration.template.list.php:285
 msgid "Delete and clear"
 msgstr "Smazat a pročistit"
@@ -4950,7 +4954,7 @@ msgstr "Smazat a pročistit"
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
 msgstr "Smazat a vyčistit zvolené šablony? (Upozornění: tímto smažete vybrané šablony a pročistíte všechny připojené hostitele!)"
 
-#: include/views/configuration.template.edit.php:244
+#: include/views/configuration.template.edit.php:225
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
 msgstr "Smazat a vyčistit šablonu? (Pozor: všechny připojené hosty budou také vyčištěné!)"
 
@@ -5087,7 +5091,7 @@ msgstr "Smazat vybrané skupiny?"
 msgid "Delete selected host groups?"
 msgstr "Smazat označené skupiny?"
 
-#: include/views/configuration.host.prototype.edit.php:416
+#: include/views/configuration.host.prototype.edit.php:421
 msgid "Delete selected host prototype?"
 msgstr "Smazat označený prototyp hosta?"
 
@@ -5195,7 +5199,7 @@ msgstr "Smazat vybrané uživatele?"
 msgid "Delete selected web scenarios?"
 msgstr "Smazat označené scénáře?"
 
-#: include/views/configuration.template.edit.php:240
+#: include/views/configuration.template.edit.php:221
 msgid "Delete template?"
 msgstr "Smazat šablonu?"
 
@@ -5256,7 +5260,7 @@ msgstr ""
 msgid "Dependencies"
 msgstr "Závislosti"
 
-#: include/triggers.inc.php:2397
+#: include/triggers.inc.php:2398
 msgid "Dependent"
 msgstr "Závisející"
 
@@ -5264,7 +5268,7 @@ msgstr "Závisející"
 msgid "Dependent item"
 msgstr "Závislá položka"
 
-#: app/views/popup.generic.php:278 include/triggers.inc.php:2397
+#: app/views/popup.generic.php:278 include/triggers.inc.php:2398
 #: include/views/configuration.trigger.prototype.list.php:92
 #: include/views/configuration.triggers.list.php:238
 msgid "Depends on"
@@ -5275,7 +5279,7 @@ msgid "Deployment status"
 msgstr "Stav nasazení"
 
 #: app/controllers/CControllerAuditLogList.php:286
-#: app/partials/configuration.host.edit.html.php:147
+#: app/partials/configuration.host.edit.html.php:261
 #: app/partials/hostmacros.list.html.php:37
 #: app/partials/massupdate.macros.tab.php:29
 #: app/partials/scheduledreport.formgrid.html.php:191
@@ -5290,16 +5294,16 @@ msgstr "Stav nasazení"
 #: app/views/administration.user.token.edit.php:51
 #: app/views/administration.user.token.view.php:54
 #: app/views/configuration.correlation.edit.php:134
-#: app/views/popup.massupdate.host.php:75
+#: app/views/popup.massupdate.host.php:112
 #: app/views/popup.massupdate.item.php:466
-#: app/views/popup.massupdate.template.php:75
+#: app/views/popup.massupdate.template.php:115
 #: app/views/popup.triggerwizard.php:134 include/events.inc.php:264
 #: include/views/configuration.host.discovery.edit.php:701
 #: include/views/configuration.item.edit.php:961
 #: include/views/configuration.item.prototype.edit.php:839
 #: include/views/configuration.maintenance.edit.php:252
 #: include/views/configuration.maintenance.list.php:90
-#: include/views/configuration.template.edit.php:110
+#: include/views/configuration.template.edit.php:170
 #: include/views/configuration.trigger.prototype.edit.php:531
 #: include/views/configuration.triggers.edit.php:558
 #: include/views/inventory.host.view.php:129
@@ -5322,6 +5326,14 @@ msgstr "Detaily"
 #: httpdetails.php:27 httpdetails.php:185
 msgid "Details of web scenario"
 msgstr "Detaily web scénáře"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1055
+msgid "Detection period"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1065
+msgid "Deviations"
+msgstr ""
 
 #: include/actions.inc.php:76
 msgid "Device"
@@ -5445,7 +5457,7 @@ msgstr "Zakázat označené scénáře?"
 
 #: app/partials/administration.system.info.php:188
 #: app/partials/configuration.filter.items.php:188
-#: app/partials/configuration.host.edit.html.php:363
+#: app/partials/configuration.host.edit.html.php:358
 #: app/partials/monitoring.host.filter.php:129
 #: app/partials/monitoring.host.view.html.php:102
 #: app/partials/scheduledreport.table.html.php:80
@@ -5472,17 +5484,17 @@ msgstr "Zakázat označené scénáře?"
 #: app/views/configuration.discovery.list.php:57
 #: app/views/configuration.host.list.php:280
 #: app/views/popup.lldoperation.php:280
-#: app/views/popup.massupdate.host.php:102
-#: app/views/popup.massupdate.host.php:187
+#: app/views/popup.massupdate.host.php:141
+#: app/views/popup.massupdate.host.php:183
 #: app/views/reports.scheduledreport.list.php:62 include/discovery.inc.php:108
 #: include/hosts.inc.php:1126 include/html.inc.php:284
 #: include/httptest.inc.php:48 include/items.inc.php:138
 #: include/items.inc.php:141 include/items.inc.php:185
-#: include/maps.inc.php:325 include/triggers.inc.php:1870
+#: include/maps.inc.php:325 include/triggers.inc.php:1871
 #: include/users.inc.php:84 include/views/configuration.action.list.php:77
 #: include/views/configuration.action.list.php:129
 #: include/views/configuration.host.discovery.list.php:167
-#: include/views/configuration.host.prototype.edit.php:356
+#: include/views/configuration.host.prototype.edit.php:360
 #: include/views/js/monitoring.sysmaps.js.php:290
 msgid "Disabled"
 msgstr "Zakázáno"
@@ -5507,7 +5519,7 @@ msgstr "Zlikvidovat hodnotu"
 #: app/views/popup.lldoperation.php:92 app/views/popup.massupdate.item.php:334
 #: include/views/configuration.graph.edit.php:468
 #: include/views/configuration.graph.list.php:138
-#: include/views/configuration.host.prototype.edit.php:142
+#: include/views/configuration.host.prototype.edit.php:290
 #: include/views/configuration.host.prototype.list.php:62
 #: include/views/configuration.item.prototype.edit.php:851
 #: include/views/configuration.item.prototype.list.php:66
@@ -5724,7 +5736,7 @@ msgstr "Zobrazit skládaný graf"
 
 #: app/controllers/CControllerHintboxActionlist.php:93
 #: app/views/administration.queue.details.php:85
-#: app/views/js/popup.service.edit.js.php:484 app/views/search.php:187
+#: app/views/js/popup.service.edit.js.php:483 app/views/search.php:187
 #: app/views/search.php:272 app/views/search.php:371
 #: include/actions.inc.php:1724 include/actions.inc.php:1796
 #: include/classes/helpers/CPagerHelper.php:147 jsLoader.php:398
@@ -5823,7 +5835,7 @@ msgstr ""
 msgid "Download the configuration file"
 msgstr "Stáhnout konfigurační soubor"
 
-#: app/views/js/popup.service.edit.js.php:234
+#: app/views/js/popup.service.edit.js.php:233
 #: app/views/popup.service.time.edit.php:46
 #: include/classes/screens/CScreenDiscovery.php:120
 msgid "Downtime"
@@ -5917,8 +5929,8 @@ msgstr ""
 #: app/views/administration.user.edit.php:355
 #: app/views/js/administration.mediatype.edit.js.php:50
 #: app/views/js/configuration.discovery.edit.js.php:33
-#: app/views/js/popup.service.edit.js.php:198
-#: app/views/js/popup.service.edit.js.php:222
+#: app/views/js/popup.service.edit.js.php:197
+#: app/views/js/popup.service.edit.js.php:221
 #: app/views/monitoring.service.list.edit.php:142
 #: app/views/monitoring.service.list.php:114
 #: include/views/configuration.action.edit.php:246
@@ -6180,7 +6192,7 @@ msgstr "Zapnout pasti"
 
 #: app/partials/administration.system.info.php:181
 #: app/partials/configuration.filter.items.php:187
-#: app/partials/configuration.host.edit.html.php:165
+#: app/partials/configuration.host.edit.html.php:279
 #: app/partials/monitoring.host.filter.php:128
 #: app/partials/monitoring.host.view.html.php:101
 #: app/partials/scheduledreport.formgrid.html.php:201
@@ -6218,13 +6230,13 @@ msgstr "Zapnout pasti"
 #: app/views/configuration.discovery.edit.php:130
 #: app/views/configuration.discovery.list.php:56
 #: app/views/configuration.host.list.php:272
-#: app/views/popup.massupdate.host.php:101 app/views/popup.media.php:89
+#: app/views/popup.massupdate.host.php:140 app/views/popup.media.php:89
 #: app/views/popup.triggerwizard.php:137
 #: app/views/reports.scheduledreport.list.php:61 include/discovery.inc.php:107
 #: include/html.inc.php:280 include/httptest.inc.php:47
 #: include/items.inc.php:138 include/items.inc.php:141
 #: include/items.inc.php:182 include/triggers.inc.php:999
-#: include/triggers.inc.php:1867
+#: include/triggers.inc.php:1868
 #: include/views/configuration.action.edit.php:147
 #: include/views/configuration.action.list.php:76
 #: include/views/configuration.action.list.php:137
@@ -6240,11 +6252,11 @@ msgstr "Povoleno"
 msgid "Encrypt"
 msgstr ""
 
-#: app/partials/configuration.host.edit.html.php:533
+#: app/partials/configuration.host.edit.html.php:527
 #: app/views/administration.proxy.edit.php:143
 #: app/views/administration.proxy.list.php:78
-#: app/views/popup.massupdate.host.php:302
-#: include/views/configuration.host.prototype.edit.php:409
+#: app/views/popup.massupdate.host.php:296
+#: include/views/configuration.host.prototype.edit.php:413
 msgid "Encryption"
 msgstr "Šifrování"
 
@@ -6319,6 +6331,10 @@ msgstr ""
 #, c-format
 msgid "Error: %1$s"
 msgstr "Chyba: %1$s"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1045
+msgid "Evaluation period"
+msgstr ""
 
 #: include/events.inc.php:180
 msgid "Event"
@@ -7002,7 +7018,7 @@ msgid "Full"
 msgstr "Plný"
 
 #: app/views/configuration.host.edit.php:46 app/views/popup.host.edit.php:75
-#: include/views/configuration.template.edit.php:239
+#: include/views/configuration.template.edit.php:220
 #: include/views/monitoring.sysmap.edit.php:422
 msgid "Full clone"
 msgstr "Vytvořit úplnou kopii"
@@ -7374,7 +7390,7 @@ msgstr "Název skupiny"
 msgid "Group prototype cannot be based on a discovered host group \"%1$s\"."
 msgstr "Prototyp skupiny nemůže být založený na zjištěné skupině hostů \"%1$s\"."
 
-#: include/views/configuration.host.prototype.edit.php:197
+#: include/views/configuration.host.prototype.edit.php:207
 msgid "Group prototypes"
 msgstr "Prototypy skupiny"
 
@@ -7387,12 +7403,11 @@ msgid "Grouping by"
 msgstr "Seskupovat podle"
 
 #: app/controllers/CControllerPopupImportCompare.php:164
-#: app/partials/configuration.host.edit.html.php:105
+#: app/partials/configuration.host.edit.html.php:218
 #: app/views/administration.user.edit.php:84
 #: app/views/administration.user.list.php:110 app/views/popup.import.php:29
-#: include/views/configuration.host.prototype.edit.php:163
-#: include/views/configuration.host.prototype.edit.php:199
-#: include/views/configuration.template.edit.php:91
+#: include/views/configuration.host.prototype.edit.php:183
+#: include/views/configuration.template.edit.php:150
 msgid "Groups"
 msgstr "Skupiny"
 
@@ -7642,7 +7657,7 @@ msgid "Horizontal align"
 msgstr "Vodorovné zarovnání"
 
 #: app/controllers/CControllerAuditLogList.php:219
-#: app/partials/configuration.host.edit.html.php:527
+#: app/partials/configuration.host.edit.html.php:522
 #: app/partials/monitoring.latest.view.html.php:40
 #: app/partials/popup.operations.php:175
 #: app/views/administration.queue.details.php:47
@@ -7651,7 +7666,7 @@ msgstr "Vodorovné zarovnání"
 #: app/views/monitoring.dashboard.view.php:82
 #: app/views/monitoring.widget.problems.view.php:58
 #: app/views/popup.generic.php:81 app/views/popup.host.edit.php:97
-#: app/views/popup.massupdate.host.php:290 app/views/search.php:33
+#: app/views/popup.massupdate.host.php:285 app/views/search.php:33
 #: include/actions.inc.php:50 include/blocks.inc.php:577
 #: include/classes/screens/CScreenHttpTest.php:112
 #: include/classes/screens/CScreenProblem.php:863
@@ -7662,7 +7677,7 @@ msgstr "Vodorovné zarovnání"
 #: include/hostgroups.inc.php:248 include/maps.inc.php:24
 #: include/triggers.inc.php:956 include/views/configuration.graph.list.php:149
 #: include/views/configuration.host.discovery.list.php:192
-#: include/views/configuration.host.prototype.edit.php:148
+#: include/views/configuration.host.prototype.edit.php:296
 #: include/views/configuration.httpconf.list.php:130
 #: include/views/configuration.item.list.php:82
 #: include/views/configuration.triggers.list.php:189
@@ -7810,8 +7825,8 @@ msgstr "Skupina hostů s ID \"%1$s\" není dostupná."
 #: app/views/monitoring.web.view.php:50
 #: app/views/popup.condition.common.php:101
 #: app/views/popup.condition.common.php:282
-#: app/views/popup.massupdate.host.php:46
-#: app/views/popup.massupdate.template.php:48 app/views/search.php:270
+#: app/views/popup.massupdate.host.php:83
+#: app/views/popup.massupdate.template.php:88 app/views/search.php:270
 #: hostinventoriesoverview.php:159 include/classes/helpers/CMenuHelper.php:141
 #: include/classes/helpers/CRoleHelper.php:357
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:33
@@ -7861,7 +7876,7 @@ msgstr "Přehled inventáře hosta"
 msgid "Host label type"
 msgstr "Typ popisu hosta"
 
-#: app/partials/configuration.host.edit.html.php:346
+#: app/partials/configuration.host.edit.html.php:341
 msgid "Host macros"
 msgstr "Host makra"
 
@@ -7873,7 +7888,7 @@ msgstr "Metadata hosta"
 #: app/views/configuration.discovery.edit.php:106
 #: app/views/configuration.discovery.edit.php:122 host_prototypes.php:37
 #: include/actions.inc.php:47
-#: include/views/configuration.host.prototype.edit.php:70
+#: include/views/configuration.host.prototype.edit.php:65
 #: include/views/inventory.host.view.php:50
 msgid "Host name"
 msgstr "Název hosta"
@@ -7910,7 +7925,7 @@ msgstr ""
 msgid "Host prototype deleted"
 msgstr "Prototyp hosta byl smazán"
 
-#: include/views/configuration.host.prototype.edit.php:341
+#: include/views/configuration.host.prototype.edit.php:334
 msgid "Host prototype macros"
 msgstr ""
 
@@ -7934,7 +7949,7 @@ msgstr "Prototyp hosta s viditelným názvem \"%1$s\" již existuje ve pravidle 
 #: app/controllers/CControllerPopupImportCompare.php:176
 #: include/html.inc.php:483
 #: include/views/configuration.host.discovery.list.php:307
-#: include/views/configuration.host.prototype.edit.php:34
+#: include/views/configuration.host.prototype.edit.php:33
 #: include/views/configuration.host.prototype.list.php:27
 msgid "Host prototypes"
 msgstr "Prototypy hostů"
@@ -7959,7 +7974,7 @@ msgstr "Čas hosta"
 msgid "Host update failed."
 msgstr "Aktualizace hosta selhala."
 
-#: app/controllers/CControllerHostUpdate.php:138
+#: app/controllers/CControllerHostUpdate.php:143
 msgid "Host updated"
 msgstr "Host byl aktualizován"
 
@@ -8105,15 +8120,15 @@ msgstr "Rozsah IP"
 msgid "IP range \"%1$s\" exceeds \"%2$s\" address limit"
 msgstr "IP rozsah \"%1$s\" přesahuje \"%2$s\" limit adresy"
 
-#: app/partials/configuration.host.edit.html.php:529
+#: app/partials/configuration.host.edit.html.php:523
 #: app/views/administration.script.edit.php:118
 #: app/views/administration.script.list.php:140
 #: app/views/monitoring.widget.hostavail.view.php:30
-#: app/views/popup.massupdate.host.php:292
+#: app/views/popup.massupdate.host.php:286
 #: include/classes/widgets/views/widget.hostavail.form.view.php:49
 #: include/hosts.inc.php:471 include/hosts.inc.php:1194
 #: include/items.inc.php:350
-#: include/views/configuration.host.prototype.edit.php:324 jsLoader.php:318
+#: include/views/configuration.host.prototype.edit.php:320 jsLoader.php:318
 msgid "IPMI"
 msgstr "IPMI"
 
@@ -8429,7 +8444,7 @@ msgstr ""
 #: app/partials/monitoring.host.view.html.php:89
 #: app/views/configuration.host.list.php:267
 #: include/classes/screens/CScreenProblem.php:386
-#: include/hostgroups.inc.php:293 include/triggers.inc.php:2022
+#: include/hostgroups.inc.php:293 include/triggers.inc.php:2023
 #: include/views/inventory.host.view.php:42
 msgid "Inaccessible maintenance"
 msgstr "Nedostupná údržba"
@@ -8441,11 +8456,11 @@ msgstr "Nepřístupná mapa"
 
 #: httpconf.php:663 include/graphs.inc.php:274 include/hosts.inc.php:649
 #: include/httptest.inc.php:222 include/items.inc.php:916
-#: include/triggers.inc.php:2161
+#: include/triggers.inc.php:2162
 msgid "Inaccessible template"
 msgstr "Nedostupná šablona"
 
-#: include/triggers.inc.php:2367 include/triggers.inc.php:2375
+#: include/triggers.inc.php:2368 include/triggers.inc.php:2376
 msgid "Inaccessible trigger"
 msgstr "Nedostupný spouštěč"
 
@@ -8560,7 +8575,7 @@ msgstr ""
 msgid "Incorrect action condition discovery check."
 msgstr "Nesprávná podmínka zjišťování stavu akce."
 
-#: include/classes/api/services/CAction.php:3308
+#: include/classes/api/services/CAction.php:3310
 msgid "Incorrect action condition discovery check. Discovery check does not exist or you have no access to it."
 msgstr "Nesprávná podmínka zjišťování stavu akce. Kontrola stavu neexistuje nebo k ní nemáte přístup."
 
@@ -8568,7 +8583,7 @@ msgstr "Nesprávná podmínka zjišťování stavu akce. Kontrola stavu neexistu
 msgid "Incorrect action condition discovery object."
 msgstr "Nesprávná podmínka zjišťování stavu objektu."
 
-#: include/classes/api/services/CAction.php:3267
+#: include/classes/api/services/CAction.php:3269
 msgid "Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it."
 msgstr "Nesprávná podmínka stavu pravidla nálezu. Pravidlo nálezu neexistuje nebo k němu nemáte přístup."
 
@@ -8580,15 +8595,15 @@ msgstr "Neplatná podmínka akce pro stav nálezu."
 msgid "Incorrect action condition event type."
 msgstr "Neplatná podmínka akce pro typ události."
 
-#: include/classes/api/services/CAction.php:2987
+#: include/classes/api/services/CAction.php:2989
 msgid "Incorrect action condition or operation host group. Host group does not exist or you have no access to it."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:3047
+#: include/classes/api/services/CAction.php:3049
 msgid "Incorrect action condition or operation host. Host does not exist or you have no access to it."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:3185
+#: include/classes/api/services/CAction.php:3187
 msgid "Incorrect action condition or operation template. Template does not exist or you have no access to it."
 msgstr ""
 
@@ -8597,11 +8612,11 @@ msgstr ""
 msgid "Incorrect action condition port \"%1$s\"."
 msgstr "Neplatná podmínka pro akci portu \"%1$s\"."
 
-#: include/classes/api/services/CAction.php:3349
+#: include/classes/api/services/CAction.php:3351
 msgid "Incorrect action condition proxy. Proxy does not exist or you have no access to it."
 msgstr "Neplatná podmínka pro akci proxy. Proxy neexistuje nebo k ní nemáte přístup."
 
-#: include/classes/api/services/CAction.php:3389
+#: include/classes/api/services/CAction.php:3391
 msgid "Incorrect action condition service. Service does not exist or you have no access to it."
 msgstr ""
 
@@ -8609,7 +8624,7 @@ msgstr ""
 msgid "Incorrect action condition trigger severity."
 msgstr "Neplatná podmínka pro akci závažného spuštění."
 
-#: include/classes/api/services/CAction.php:3226
+#: include/classes/api/services/CAction.php:3228
 msgid "Incorrect action condition trigger. Trigger does not exist or you have no access to it."
 msgstr "Neplatná podmínka pro akci spouštěče. Spouštěč neexistuje nebo k němu nemáte přístup."
 
@@ -8619,11 +8634,11 @@ msgstr "Neplatná akce pro typ podmínky."
 
 #: app/controllers/CControllerActionOperationValidate.php:83
 #: app/controllers/CControllerActionOperationValidate.php:89
-#: include/classes/api/services/CAction.php:2812
+#: include/classes/api/services/CAction.php:2814
 msgid "Incorrect action operation escalation step values."
 msgstr "Neplatná operace pro stupně eskalace."
 
-#: include/classes/api/services/CAction.php:2887
+#: include/classes/api/services/CAction.php:2889
 msgid "Incorrect action operation media type. Media type does not exist or you have no access to it."
 msgstr ""
 
@@ -8632,11 +8647,11 @@ msgstr ""
 msgid "Incorrect action operation type \"%1$s\" for event source \"%2$s\"."
 msgstr "Nesprávná operace typu \"%1$s\" pro zdroj události \"%2$s\"."
 
-#: include/classes/api/services/CAction.php:3133
+#: include/classes/api/services/CAction.php:3135
 msgid "Incorrect action operation user group. User group does not exist or you have no access to it."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:3090
+#: include/classes/api/services/CAction.php:3092
 msgid "Incorrect action operation user. User does not exist or you have no access to it."
 msgstr ""
 
@@ -8936,8 +8951,8 @@ msgstr "Neplatný počet kroků šablony web scénáře."
 msgid "Incorrect trigger expression"
 msgstr "Neplatný výraz spouštěče"
 
-#: include/classes/parsers/C10TriggerExpression.php:522
-#: include/classes/parsers/C10TriggerExpression.php:538
+#: include/classes/parsers/C10TriggerExpression.php:526
+#: include/classes/parsers/C10TriggerExpression.php:542
 msgid "Incorrect trigger expression."
 msgstr "Neplatný výraz spouštěče."
 
@@ -9335,7 +9350,7 @@ msgstr ""
 msgid "Information about a service. Returns integer with param as state, startup; string - with param as displayname, path, user; text - with param as description; Specifically for state: 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service; Specifically for startup: 0 - automatic, 1 - automatic delayed, 2 - manual, 3 - disabled, 4 - unknown"
 msgstr "Informace o službě. Vrací celé číslo s parametrem jako status, startup; řetězec - s parametrem jako displayname, cesta, uživatel; text - s parametrem jako description; Speciálně pro status: 0 - běží, 1 - pauza, 2 - start čeká, 3 - pauza čeká, 4 - pokračovat čeká, 5 - stop čeká, 6 - zastavena, 7 - neznámý, 255 - žádná služba; Speciálně pro startup: 0 - automaticky, 1 - automaticky zpožděný, 2 - manuální, 3 - zakázána, 4 - neznámý"
 
-#: include/views/configuration.host.prototype.edit.php:103
+#: include/views/configuration.host.prototype.edit.php:249
 msgid "Inherit"
 msgstr ""
 
@@ -9344,11 +9359,11 @@ msgstr ""
 msgid "Inherited"
 msgstr "Zděděné"
 
-#: app/partials/configuration.host.edit.html.php:347
+#: app/partials/configuration.host.edit.html.php:342
 msgid "Inherited and host macros"
 msgstr "Makra zděděná a makra hosta"
 
-#: include/views/configuration.host.prototype.edit.php:342
+#: include/views/configuration.host.prototype.edit.php:335
 msgid "Inherited and host prototype macros"
 msgstr ""
 
@@ -9360,7 +9375,7 @@ msgstr ""
 msgid "Inherited and scenario tags"
 msgstr ""
 
-#: include/views/configuration.template.edit.php:212
+#: include/views/configuration.template.edit.php:193
 msgid "Inherited and template macros"
 msgstr "Makra zděděná a makra šablon"
 
@@ -9439,8 +9454,8 @@ msgstr "Rozhraní s IP \"%1$s\" nemůže mít prázdné DNS jméno, pokud se pou
 msgid "Interface with IP \"%1$s\" cannot have empty DNS name."
 msgstr "Rozhraní s IP \"%1$s\" nemůže mít prázdné DNS jméno."
 
-#: app/partials/configuration.host.edit.html.php:128
-#: include/views/configuration.host.prototype.edit.php:100
+#: app/partials/configuration.host.edit.html.php:242
+#: include/views/configuration.host.prototype.edit.php:246
 msgid "Interfaces"
 msgstr ""
 
@@ -9532,7 +9547,7 @@ msgstr ""
 msgid "Invalid action condition: %1$s."
 msgstr "Neplatná akce: %1$s."
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1476
+#: app/controllers/CControllerPopupTriggerExpr.php:1517
 #, c-format
 msgid "Invalid condition: %1$s."
 msgstr ""
@@ -9593,10 +9608,10 @@ msgstr "Neplatné parametry metody."
 #: app/controllers/CControllerDashboardUpdate.php:200
 #: app/controllers/CControllerDashboardUpdate.php:212
 #: app/controllers/CControllerPopupHttpStep.php:100
-#: include/classes/api/services/CAction.php:2703
-#: include/classes/api/services/CAction.php:2709
-#: include/classes/api/services/CAction.php:2720
-#: include/classes/api/services/CAction.php:2732
+#: include/classes/api/services/CAction.php:2705
+#: include/classes/api/services/CAction.php:2711
+#: include/classes/api/services/CAction.php:2722
+#: include/classes/api/services/CAction.php:2734
 #: include/classes/api/services/CAutoregistration.php:157
 #: include/classes/api/services/CAutoregistration.php:163
 #: include/classes/api/services/CAutoregistration.php:170
@@ -9882,11 +9897,11 @@ msgstr "Neplatná časová perioda."
 msgid "Invalid zoomparameter \"%1$s\": %2$s."
 msgstr ""
 
-#: app/partials/configuration.host.edit.html.php:532
-#: app/views/popup.massupdate.host.php:301
+#: app/partials/configuration.host.edit.html.php:526
+#: app/views/popup.massupdate.host.php:295
 #: include/classes/helpers/CMenuHelper.php:94
 #: include/classes/helpers/CRoleHelper.php:277
-#: include/views/configuration.host.prototype.edit.php:363 jsLoader.php:370
+#: include/views/configuration.host.prototype.edit.php:355 jsLoader.php:370
 msgid "Inventory"
 msgstr "Inventář"
 
@@ -9900,7 +9915,7 @@ msgid "Inventory field"
 msgstr "Pole inventáře"
 
 #: app/partials/popup.operations.php:225
-#: app/views/popup.massupdate.host.php:184
+#: app/views/popup.massupdate.host.php:180
 msgid "Inventory mode"
 msgstr "Režim inventáře"
 
@@ -9908,10 +9923,10 @@ msgstr "Režim inventáře"
 msgid "Is online?"
 msgstr "Je přihlášený?"
 
-#: app/partials/configuration.host.edit.html.php:497
+#: app/partials/configuration.host.edit.html.php:492
 #: app/views/administration.proxy.edit.php:135
-#: app/views/popup.massupdate.host.php:272
-#: include/views/configuration.host.prototype.edit.php:398
+#: app/views/popup.massupdate.host.php:267
+#: include/views/configuration.host.prototype.edit.php:402
 msgid "Issuer"
 msgstr "Emitent"
 
@@ -10006,7 +10021,7 @@ msgstr[2] "Položky povolené"
 msgid "Item in \"not supported\" state"
 msgstr "Položka je v \"not supported\" stavu"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1469
+#: app/controllers/CControllerPopupTriggerExpr.php:1510
 msgid "Item not selected"
 msgstr "Položka nevybraná"
 
@@ -10588,8 +10603,8 @@ msgstr "Typ řádku"
 msgid "Line width"
 msgstr "Šířka řádku"
 
-#: app/views/popup.massupdate.host.php:112
-#: app/views/popup.massupdate.template.php:89
+#: app/views/popup.massupdate.host.php:46
+#: app/views/popup.massupdate.template.php:48
 #: include/views/monitoring.sysmap.constructor.php:43
 msgid "Link"
 msgstr "Spojnice"
@@ -10612,16 +10627,9 @@ msgstr ""
 msgid "Link indicators"
 msgstr "Ukazatel stavu spojnice"
 
-#: app/partials/configuration.host.edit.html.php:282
-#: include/views/configuration.host.prototype.edit.php:293
-#: include/views/configuration.template.edit.php:187
-msgid "Link new templates"
-msgstr ""
-
 #: app/controllers/CControllerPopupLldOperation.php:143
-#: app/views/popup.lldoperation.php:238
-#: app/views/popup.massupdate.host.php:140
-#: app/views/popup.massupdate.template.php:120
+#: app/views/popup.lldoperation.php:238 app/views/popup.massupdate.host.php:75
+#: app/views/popup.massupdate.template.php:79
 msgid "Link templates"
 msgstr "Připojit šablony"
 
@@ -10637,13 +10645,6 @@ msgstr "Připojit k šablonám"
 msgid "Linked map"
 msgstr "Mapa odkazů"
 
-#: app/partials/configuration.host.edit.html.php:206
-#: app/partials/configuration.host.edit.html.php:274
-#: app/views/popup.massupdate.template.php:148
-#: include/views/configuration.host.prototype.edit.php:228
-#: include/views/configuration.host.prototype.edit.php:288
-#: include/views/configuration.template.edit.php:182
-#: include/views/configuration.template.edit.php:195
 #: include/views/configuration.template.list.php:64
 #: include/views/configuration.template.list.php:124
 msgid "Linked templates"
@@ -10864,16 +10865,16 @@ msgstr "Makro \"%1$s\" již existuje na \"%2$s\"."
 msgid "Macro \"%1$s\" already exists."
 msgstr "Makro \"%1$s\" již existuje."
 
-#: app/partials/configuration.host.edit.html.php:531
+#: app/partials/configuration.host.edit.html.php:525
 #: app/partials/massupdate.macros.tab.php:120
 #: app/views/administration.macros.edit.php:29
 #: app/views/administration.macros.edit.php:96
 #: app/views/popup.itemtestedit.view.php:307
-#: app/views/popup.massupdate.host.php:294
-#: app/views/popup.massupdate.template.php:153
+#: app/views/popup.massupdate.host.php:288
+#: app/views/popup.massupdate.template.php:144
 #: include/classes/helpers/CMenuHelper.php:240 include/html.inc.php:893
-#: include/views/configuration.host.prototype.edit.php:338
-#: include/views/configuration.template.edit.php:208
+#: include/views/configuration.host.prototype.edit.php:331
+#: include/views/configuration.template.edit.php:189
 msgid "Macros"
 msgstr "Makra"
 
@@ -10972,12 +10973,12 @@ msgstr ""
 msgid "Manage scheduled reports"
 msgstr ""
 
-#: app/partials/configuration.host.edit.html.php:364
+#: app/partials/configuration.host.edit.html.php:359
 #: app/partials/popup.operations.php:227
 #: app/views/administration.miscconfig.edit.php:60
 #: app/views/popup.lldoperation.php:281
-#: app/views/popup.massupdate.host.php:188 include/hosts.inc.php:1127
-#: include/views/configuration.host.prototype.edit.php:357
+#: app/views/popup.massupdate.host.php:184 include/hosts.inc.php:1127
+#: include/views/configuration.host.prototype.edit.php:361
 msgid "Manual"
 msgstr "Manuál"
 
@@ -11129,7 +11130,7 @@ msgstr "Maska"
 #: app/controllers/CControllerPopupMassupdateHost.php:471
 #: app/controllers/CControllerPopupMassupdateItem.php:406
 #: app/controllers/CControllerPopupMassupdateService.php:171
-#: app/controllers/CControllerPopupMassupdateTemplate.php:364
+#: app/controllers/CControllerPopupMassupdateTemplate.php:370
 #: app/controllers/CControllerPopupMassupdateTrigger.php:235
 #: app/partials/monitoring.service.list.edit.php:141
 #: app/views/configuration.host.list.php:516
@@ -11591,9 +11592,9 @@ msgstr "Pondělí"
 msgid "Monitored by"
 msgstr "Monitorováno"
 
-#: app/partials/configuration.host.edit.html.php:155
-#: app/views/popup.massupdate.host.php:90
-#: include/views/configuration.host.prototype.edit.php:135
+#: app/partials/configuration.host.edit.html.php:269
+#: app/views/popup.massupdate.host.php:129
+#: include/views/configuration.host.prototype.edit.php:277
 msgid "Monitored by proxy"
 msgstr "Sledován přes proxy"
 
@@ -11724,8 +11725,8 @@ msgstr "NTLM"
 #: app/controllers/CControllerPopupValueMapUpdate.php:70
 #: app/partials/administration.ha.nodes.php:28
 #: app/partials/configuration.filter.items.php:91
-#: app/partials/configuration.host.edit.html.php:177
-#: app/partials/configuration.host.edit.html.php:216
+#: app/partials/configuration.host.edit.html.php:110
+#: app/partials/configuration.host.edit.html.php:144
 #: app/partials/configuration.tags.tab.php:39
 #: app/partials/configuration.valuemap.php:29
 #: app/partials/monitoring.host.filter.php:78
@@ -11795,11 +11796,11 @@ msgstr "NTLM"
 #: app/views/popup.httpstep.php:96 app/views/popup.httpstep.php:120
 #: app/views/popup.httpstep.php:139 app/views/popup.itemtestedit.view.php:324
 #: app/views/popup.lldoperation.php:268 app/views/popup.lldoverride.php:47
-#: app/views/popup.massupdate.host.php:207
+#: app/views/popup.massupdate.host.php:203
 #: app/views/popup.massupdate.item.php:120
 #: app/views/popup.massupdate.item.php:486
 #: app/views/popup.massupdate.service.php:50
-#: app/views/popup.massupdate.template.php:140
+#: app/views/popup.massupdate.template.php:132
 #: app/views/popup.massupdate.trigger.php:84
 #: app/views/popup.massupdate.trigger.php:98
 #: app/views/popup.service.edit.php:45 app/views/popup.service.edit.php:65
@@ -11827,8 +11828,8 @@ msgstr "NTLM"
 #: include/views/configuration.host.discovery.list.php:193
 #: include/views/configuration.hostgroups.list.php:46
 #: include/views/configuration.hostgroups.list.php:64
-#: include/views/configuration.host.prototype.edit.php:208
-#: include/views/configuration.host.prototype.edit.php:240
+#: include/views/configuration.host.prototype.edit.php:87
+#: include/views/configuration.host.prototype.edit.php:118
 #: include/views/configuration.host.prototype.list.php:59
 #: include/views/configuration.httpconf.edit.php:69
 #: include/views/configuration.httpconf.edit.php:117
@@ -11849,7 +11850,7 @@ msgstr "NTLM"
 #: include/views/configuration.maintenance.edit.php:94
 #: include/views/configuration.maintenance.list.php:60
 #: include/views/configuration.maintenance.list.php:85
-#: include/views/configuration.template.edit.php:127
+#: include/views/configuration.template.edit.php:69
 #: include/views/configuration.template.list.php:80
 #: include/views/configuration.template.list.php:114
 #: include/views/configuration.trigger.prototype.edit.php:70
@@ -12139,15 +12140,15 @@ msgstr "Žádné stanovené ID pravidla nálezu"
 msgid "No enabled modules found."
 msgstr ""
 
-#: app/partials/configuration.host.edit.html.php:436
-#: app/partials/configuration.host.edit.html.php:449
+#: app/partials/configuration.host.edit.html.php:431
+#: app/partials/configuration.host.edit.html.php:444
 #: app/views/administration.autoreg.edit.php:48
 #: app/views/administration.proxy.edit.php:95
 #: app/views/administration.proxy.edit.php:103
-#: app/views/popup.massupdate.host.php:237
-#: app/views/popup.massupdate.host.php:247
-#: include/views/configuration.host.prototype.edit.php:369
-#: include/views/configuration.host.prototype.edit.php:379
+#: app/views/popup.massupdate.host.php:232
+#: app/views/popup.massupdate.host.php:242
+#: include/views/configuration.host.prototype.edit.php:373
+#: include/views/configuration.host.prototype.edit.php:383
 msgid "No encryption"
 msgstr "Bez šifrování"
 
@@ -12233,7 +12234,7 @@ msgstr "Žádné výběry nenalezené"
 msgid "No new modules discovered"
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2767
+#: include/classes/api/services/CAction.php:2769
 #, c-format
 msgid "No operations defined for action \"%1$s\"."
 msgstr ""
@@ -12311,7 +12312,7 @@ msgstr ""
 #: app/views/monitoring.widget.systeminfo.view.php:45 disc_prototypes.php:748
 #: host_discovery.php:808 hostinventoriesoverview.php:73
 #: include/classes/api/services/CAction.php:1516
-#: include/classes/api/services/CAction.php:2569
+#: include/classes/api/services/CAction.php:2571
 #: include/classes/api/services/CConfiguration.php:78
 #: include/classes/api/services/CCorrelation.php:497
 #: include/classes/api/services/CCorrelation.php:653
@@ -12474,7 +12475,7 @@ msgid "No public key file specified."
 msgstr "Žádný specifikovaný soubor s veřejným klíčem."
 
 #: app/controllers/CControllerActionOperationValidate.php:110
-#: include/classes/api/services/CAction.php:2824
+#: include/classes/api/services/CAction.php:2826
 msgid "No recipients specified for action operation message."
 msgstr ""
 
@@ -12495,7 +12496,7 @@ msgid "No target selected."
 msgstr "Není vybraný cíl."
 
 #: app/controllers/CControllerActionOperationValidate.php:142
-#: include/classes/api/services/CAction.php:2835
+#: include/classes/api/services/CAction.php:2837
 msgid "No targets specified for action operation global script."
 msgstr ""
 
@@ -12905,7 +12906,7 @@ msgid "Off"
 msgstr "Vypnuté"
 
 #: app/views/administration.user.list.php:147
-#: app/views/js/popup.massupdate.js.php:415
+#: app/views/js/popup.massupdate.js.php:428
 #: app/views/js/popup.mediatypetest.edit.js.php:114
 #: app/views/js/popup.scriptexec.js.php:53
 #: app/views/js/reports.auditlog.list.js.php:158
@@ -12952,7 +12953,7 @@ msgstr "Jedna"
 msgid "One time only"
 msgstr "Pouze jednou"
 
-#: app/views/js/popup.service.edit.js.php:236
+#: app/views/js/popup.service.edit.js.php:235
 #: app/views/popup.service.time.edit.php:47
 msgid "One-time downtime"
 msgstr "Jednorázový downtime"
@@ -13030,7 +13031,7 @@ msgstr "Informace operačního systému. Návratová hodnota řetězec"
 msgid "Operation"
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2793
+#: include/classes/api/services/CAction.php:2795
 #, c-format
 msgid "Operation \"%1$s\" already exists for action \"%2$s\"."
 msgstr ""
@@ -13145,19 +13146,19 @@ msgstr "Nebo"
 #: app/views/popup.lldoperation.php:176 app/views/popup.lldoperation.php:184
 #: app/views/popup.lldoperation.php:205 app/views/popup.lldoperation.php:226
 #: app/views/popup.lldoperation.php:237 app/views/popup.lldoperation.php:261
-#: app/views/popup.lldoperation.php:275 app/views/popup.massupdate.host.php:45
-#: app/views/popup.massupdate.host.php:75
-#: app/views/popup.massupdate.host.php:90
-#: app/views/popup.massupdate.host.php:96
-#: app/views/popup.massupdate.host.php:140
-#: app/views/popup.massupdate.host.php:150
-#: app/views/popup.massupdate.host.php:159
-#: app/views/popup.massupdate.host.php:167
-#: app/views/popup.massupdate.host.php:174
-#: app/views/popup.massupdate.host.php:184
-#: app/views/popup.massupdate.host.php:198
-#: app/views/popup.massupdate.host.php:226
-#: app/views/popup.massupdate.host.php:282
+#: app/views/popup.lldoperation.php:275 app/views/popup.massupdate.host.php:74
+#: app/views/popup.massupdate.host.php:82
+#: app/views/popup.massupdate.host.php:112
+#: app/views/popup.massupdate.host.php:129
+#: app/views/popup.massupdate.host.php:135
+#: app/views/popup.massupdate.host.php:149
+#: app/views/popup.massupdate.host.php:157
+#: app/views/popup.massupdate.host.php:164
+#: app/views/popup.massupdate.host.php:170
+#: app/views/popup.massupdate.host.php:180
+#: app/views/popup.massupdate.host.php:194
+#: app/views/popup.massupdate.host.php:222
+#: app/views/popup.massupdate.host.php:277
 #: app/views/popup.massupdate.item.php:47
 #: app/views/popup.massupdate.item.php:59
 #: app/views/popup.massupdate.item.php:79
@@ -13187,10 +13188,10 @@ msgstr "Nebo"
 #: app/views/popup.massupdate.item.php:466
 #: app/views/popup.massupdate.item.php:477
 #: app/views/popup.massupdate.service.php:40
-#: app/views/popup.massupdate.template.php:47
-#: app/views/popup.massupdate.template.php:75
-#: app/views/popup.massupdate.template.php:119
-#: app/views/popup.massupdate.template.php:131
+#: app/views/popup.massupdate.template.php:78
+#: app/views/popup.massupdate.template.php:87
+#: app/views/popup.massupdate.template.php:115
+#: app/views/popup.massupdate.template.php:123
 #: app/views/popup.massupdate.trigger.php:52
 #: app/views/popup.massupdate.trigger.php:60
 #: app/views/popup.massupdate.trigger.php:75
@@ -13453,10 +13454,10 @@ msgstr "PROBLÉM"
 msgid "PROBLEM event generation mode"
 msgstr "PROBLEM režim generování událostí"
 
-#: app/partials/configuration.host.edit.html.php:437
-#: app/partials/configuration.host.edit.html.php:453
-#: app/partials/configuration.host.edit.html.php:467
-#: app/partials/configuration.host.edit.html.php:488
+#: app/partials/configuration.host.edit.html.php:432
+#: app/partials/configuration.host.edit.html.php:448
+#: app/partials/configuration.host.edit.html.php:462
+#: app/partials/configuration.host.edit.html.php:483
 #: app/views/administration.autoreg.edit.php:50
 #: app/views/administration.autoreg.edit.php:67
 #: app/views/administration.autoreg.edit.php:79
@@ -13469,19 +13470,19 @@ msgstr "PROBLEM režim generování událostí"
 #: app/views/configuration.host.list.php:378
 #: app/views/configuration.host.list.php:395
 #: app/views/configuration.host.list.php:398
-#: app/views/popup.massupdate.host.php:238
-#: app/views/popup.massupdate.host.php:251
-#: app/views/popup.massupdate.host.php:266
-#: include/views/configuration.host.prototype.edit.php:370
-#: include/views/configuration.host.prototype.edit.php:383
-#: include/views/configuration.host.prototype.edit.php:391
+#: app/views/popup.massupdate.host.php:233
+#: app/views/popup.massupdate.host.php:246
+#: app/views/popup.massupdate.host.php:261
+#: include/views/configuration.host.prototype.edit.php:374
+#: include/views/configuration.host.prototype.edit.php:387
+#: include/views/configuration.host.prototype.edit.php:395
 msgid "PSK"
 msgstr "PSK"
 
-#: app/partials/configuration.host.edit.html.php:478
+#: app/partials/configuration.host.edit.html.php:473
 #: app/views/administration.autoreg.edit.php:56
 #: app/views/administration.proxy.edit.php:110
-#: app/views/popup.massupdate.host.php:260
+#: app/views/popup.massupdate.host.php:255
 msgid "PSK identity"
 msgstr "PSK identita"
 
@@ -13533,12 +13534,12 @@ msgid "Parameters"
 msgstr "Parametry"
 
 #: app/controllers/CControllerActionOperationValidate.php:76
-#: include/classes/api/services/CAction.php:2805
+#: include/classes/api/services/CAction.php:2807
 msgid "Parameters \"esc_step_from\" and \"esc_step_to\" must be set together."
 msgstr ""
 
 #: include/views/configuration.host.discovery.edit.php:52
-#: include/views/configuration.host.prototype.edit.php:62
+#: include/views/configuration.host.prototype.edit.php:61
 msgid "Parent discovery rules"
 msgstr "Nadřazená pravidla nálezu"
 
@@ -13593,13 +13594,13 @@ msgid "Passive"
 msgstr "Pasivní"
 
 #: app/controllers/CControllerUserUpdateGeneral.php:111
-#: app/partials/configuration.host.edit.html.php:327
+#: app/partials/configuration.host.edit.html.php:322
 #: app/views/administration.mediatype.edit.php:204
 #: app/views/administration.script.edit.php:135
 #: app/views/administration.script.edit.php:154
 #: app/views/administration.user.edit.php:157
 #: app/views/administration.user.edit.php:172
-#: app/views/popup.massupdate.host.php:174
+#: app/views/popup.massupdate.host.php:170
 #: app/views/popup.massupdate.item.php:175
 #: app/views/popup.massupdate.item.php:199 disc_prototypes.php:218
 #: host_discovery.php:191 httpconf.php:74
@@ -13607,7 +13608,7 @@ msgstr "Pasivní"
 #: include/views/configuration.host.discovery.edit.php:413
 #: include/views/configuration.host.discovery.edit.php:554
 #: include/views/configuration.host.discovery.edit.php:593
-#: include/views/configuration.host.prototype.edit.php:320
+#: include/views/configuration.host.prototype.edit.php:315
 #: include/views/configuration.httpconf.edit.php:170
 #: include/views/configuration.item.edit.php:480
 #: include/views/configuration.item.edit.php:637
@@ -13714,6 +13715,7 @@ msgid "Period"
 msgstr "Období"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:95
+#: app/controllers/CControllerPopupTriggerExpr.php:1050
 msgid "Period shift"
 msgstr ""
 
@@ -13777,11 +13779,11 @@ msgstr "Přehrávat zvuk"
 msgid "Please check configuration parameters. If all is correct, press \"%1$s\" button, or \"%2$s\" button to change configuration parameters."
 msgstr "Zkontrolujte konfigurační parametry. Je-li vše v pořádku, stiskni \"%1$s\" tlačítko, nebo \"%2$s\" tlačítko pro změnu konfiguračních parametrů."
 
-#: app/views/js/popup.massupdate.js.php:401
+#: app/views/js/popup.massupdate.js.php:414
 msgid "Please confirm that you want to remove all macros."
 msgstr ""
 
-#: app/views/js/popup.massupdate.js.php:404
+#: app/views/js/popup.massupdate.js.php:417
 msgid "Please confirm that you want to remove all value mappings."
 msgstr ""
 
@@ -13993,9 +13995,9 @@ msgstr "Privátní"
 msgid "Private key file"
 msgstr "Soubor se soukromým klíčem"
 
-#: app/partials/configuration.host.edit.html.php:315
-#: app/views/popup.massupdate.host.php:159
-#: include/views/configuration.host.prototype.edit.php:313
+#: app/partials/configuration.host.edit.html.php:310
+#: app/views/popup.massupdate.host.php:157
+#: include/views/configuration.host.prototype.edit.php:307
 msgid "Privilege level"
 msgstr "Úroveň oprávnění"
 
@@ -14535,20 +14537,20 @@ msgstr "Vzdálený příkaz"
 #: app/views/js/popup.massupdate.tmpl.js.php:59
 #: app/views/js/popup.massupdate.tmpl.js.php:96
 #: app/views/js/popup.massupdate.tmpl.js.php:108
-#: app/views/js/popup.service.edit.js.php:201
-#: app/views/js/popup.service.edit.js.php:225
-#: app/views/js/popup.service.edit.js.php:244
+#: app/views/js/popup.service.edit.js.php:200
+#: app/views/js/popup.service.edit.js.php:224
+#: app/views/js/popup.service.edit.js.php:243
 #: app/views/popup.dashboard.share.edit.php:85
 #: app/views/popup.dashboard.share.edit.php:106
 #: app/views/popup.lldoperation.php:152 app/views/popup.lldoverride.php:158
-#: app/views/popup.massupdate.host.php:52
-#: app/views/popup.massupdate.host.php:203
+#: app/views/popup.massupdate.host.php:89
+#: app/views/popup.massupdate.host.php:199
 #: app/views/popup.massupdate.item.php:137
 #: app/views/popup.massupdate.item.php:263
 #: app/views/popup.massupdate.item.php:482
 #: app/views/popup.massupdate.service.php:46
-#: app/views/popup.massupdate.template.php:54
-#: app/views/popup.massupdate.template.php:136
+#: app/views/popup.massupdate.template.php:94
+#: app/views/popup.massupdate.template.php:128
 #: app/views/popup.massupdate.trigger.php:80 app/views/popup.media.php:45
 #: app/views/popup.media.php:110 app/views/popup.service.edit.php:98
 #: app/views/popup.valuemap.edit.php:91
@@ -14604,7 +14606,7 @@ msgstr "Vzdálený příkaz"
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:93
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:122
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:144
-#: include/views/js/configuration.host.prototype.edit.js.php:33
+#: include/views/js/configuration.host.prototype.edit.js.php:35
 #: include/views/js/configuration.httpconf.edit.js.php:52
 #: include/views/js/configuration.httpconf.edit.js.php:77
 #: include/views/js/configuration.item.list.js.php:64
@@ -14687,14 +14689,14 @@ msgstr ""
 msgid "Repeats"
 msgstr ""
 
-#: app/views/popup.massupdate.host.php:51
-#: app/views/popup.massupdate.host.php:113
-#: app/views/popup.massupdate.host.php:202
+#: app/views/popup.massupdate.host.php:47
+#: app/views/popup.massupdate.host.php:88
+#: app/views/popup.massupdate.host.php:198
 #: app/views/popup.massupdate.item.php:481
 #: app/views/popup.massupdate.service.php:45
-#: app/views/popup.massupdate.template.php:53
-#: app/views/popup.massupdate.template.php:90
-#: app/views/popup.massupdate.template.php:135
+#: app/views/popup.massupdate.template.php:49
+#: app/views/popup.massupdate.template.php:93
+#: app/views/popup.massupdate.template.php:127
 #: app/views/popup.massupdate.trigger.php:79 include/items.inc.php:1807
 #: include/views/configuration.trigger.prototype.edit.php:169
 #: include/views/configuration.trigger.prototype.edit.php:362
@@ -15510,6 +15512,14 @@ msgstr "Vyhledávací vzor je prázdný"
 msgid "Search type"
 msgstr ""
 
+#: app/controllers/CControllerPopupTriggerExpr.php:1060
+msgid "Season"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1075
+msgid "Season deviation window"
+msgstr ""
+
 #: include/hosts.inc.php:434
 msgid "Secondary POC cell"
 msgstr "Sekundární POC buňka"
@@ -16283,7 +16293,7 @@ msgstr "Španělsky (es_ES)"
 msgid "Specified role was not found."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2930
+#: include/classes/api/services/CAction.php:2932
 msgid "Specified script does not exist or you do not have rights on it for action operation command."
 msgstr "Specifikovaný skript neexistuje nebo nemáte práva na jeho vykonání."
 
@@ -16406,7 +16416,7 @@ msgstr ""
 #: app/views/monitoring.service.list.php:79
 #: app/views/monitoring.widget.actionlog.view.php:38
 #: app/views/monitoring.widget.problems.view.php:56
-#: app/views/popup.massupdate.host.php:96
+#: app/views/popup.massupdate.host.php:135
 #: app/views/popup.massupdate.item.php:325
 #: app/views/popup.scheduledreport.subscription.php:114
 #: app/views/popup.service.statusrule.edit.php:74
@@ -16590,10 +16600,10 @@ msgstr "Podfiltr"
 msgid "Subject"
 msgstr "Předmět"
 
-#: app/partials/configuration.host.edit.html.php:505
+#: app/partials/configuration.host.edit.html.php:500
 #: app/views/administration.proxy.edit.php:138
-#: app/views/popup.massupdate.host.php:276
-#: include/views/configuration.host.prototype.edit.php:403
+#: app/views/popup.massupdate.host.php:271
+#: include/views/configuration.host.prototype.edit.php:407
 msgctxt "encryption certificate"
 msgid "Subject"
 msgstr "Subjekt"
@@ -16787,7 +16797,7 @@ msgstr "Hodnota značky"
 #: app/controllers/CControllerPopupLldOperation.php:138
 #: app/partials/administration.usergroup.tagfilters.html.php:29
 #: app/partials/configuration.filter.items.php:166
-#: app/partials/configuration.host.edit.html.php:530
+#: app/partials/configuration.host.edit.html.php:524
 #: app/partials/monitoring.host.filter.php:133
 #: app/partials/monitoring.host.view.html.php:32
 #: app/partials/monitoring.latest.view.html.php:58
@@ -16803,13 +16813,13 @@ msgstr "Hodnota značky"
 #: app/views/monitoring.web.view.php:87
 #: app/views/monitoring.widget.problems.view.php:68
 #: app/views/popup.lldoperation.php:262
-#: app/views/popup.massupdate.host.php:198
-#: app/views/popup.massupdate.host.php:293
+#: app/views/popup.massupdate.host.php:194
+#: app/views/popup.massupdate.host.php:287
 #: app/views/popup.massupdate.item.php:477
 #: app/views/popup.massupdate.item.php:493
 #: app/views/popup.massupdate.service.php:40
-#: app/views/popup.massupdate.template.php:131
-#: app/views/popup.massupdate.template.php:149
+#: app/views/popup.massupdate.template.php:123
+#: app/views/popup.massupdate.template.php:140
 #: app/views/popup.massupdate.trigger.php:75
 #: app/views/popup.massupdate.trigger.php:150
 #: app/views/popup.service.edit.php:263 app/views/popup.service.edit.php:346
@@ -16826,7 +16836,7 @@ msgstr "Hodnota značky"
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:67
 #: include/classes/widgets/forms/CWidgetFormWeb.php:61
 #: include/events.inc.php:263 include/forms.inc.php:89
-#: include/views/configuration.host.prototype.edit.php:328
+#: include/views/configuration.host.prototype.edit.php:323
 #: include/views/configuration.host.prototype.list.php:63
 #: include/views/configuration.httpconf.edit.php:237
 #: include/views/configuration.httpconf.list.php:77
@@ -16836,7 +16846,7 @@ msgstr "Hodnota značky"
 #: include/views/configuration.item.prototype.edit.php:861
 #: include/views/configuration.item.prototype.list.php:67
 #: include/views/configuration.maintenance.edit.php:247
-#: include/views/configuration.template.edit.php:198
+#: include/views/configuration.template.edit.php:179
 #: include/views/configuration.template.list.php:83
 #: include/views/configuration.template.list.php:126
 #: include/views/configuration.trigger.prototype.edit.php:551
@@ -16872,14 +16882,12 @@ msgstr "Telnet"
 
 #: app/controllers/CControllerAuditLogList.php:239
 #: app/views/administration.mediatype.edit.php:280
-#: app/views/popup.massupdate.template.php:147 app/views/search.php:278
+#: app/views/popup.massupdate.template.php:139 app/views/search.php:278
 #: include/actions.inc.php:49 include/forms.inc.php:529
 #: include/views/configuration.graph.list.php:149
 #: include/views/configuration.host.discovery.list.php:192
 #: include/views/configuration.httpconf.list.php:130
 #: include/views/configuration.item.list.php:83
-#: include/views/configuration.template.edit.php:46
-#: include/views/configuration.template.edit.php:118
 #: include/views/configuration.triggers.list.php:190 report2.php:390
 msgid "Template"
 msgstr "Šablona"
@@ -16923,7 +16931,7 @@ msgstr ""
 msgid "Template dashboards"
 msgstr ""
 
-#: templates.php:425 templates.php:439 templates.php:472
+#: templates.php:426 templates.php:440 templates.php:473
 msgid "Template deleted"
 msgstr "Šablona byla smazána"
 
@@ -16935,11 +16943,11 @@ msgstr "Skupina šablon"
 msgid "Template linkage"
 msgstr "Propojení šablon"
 
-#: include/views/configuration.template.edit.php:211
+#: include/views/configuration.template.edit.php:192
 msgid "Template macros"
 msgstr "Makra šablon"
 
-#: include/views/configuration.template.edit.php:82 templates.php:41
+#: include/views/configuration.template.edit.php:54 templates.php:41
 msgid "Template name"
 msgstr "Jméno šablony"
 
@@ -16974,13 +16982,12 @@ msgstr "Šablona se stejným viditelným jménem \"%1$s\" již existuje."
 #: app/controllers/CControllerPopupImportCompare.php:132
 #: app/controllers/CControllerPopupImportCompare.php:165
 #: app/partials/configuration.filter.items.php:72
-#: app/partials/configuration.host.edit.html.php:528
+#: app/partials/configuration.host.edit.html.php:210
 #: app/partials/popup.operations.php:212
 #: app/views/configuration.host.list.php:81
 #: app/views/configuration.host.list.php:191
 #: app/views/popup.condition.common.php:357 app/views/popup.import.php:31
-#: app/views/popup.massupdate.host.php:291 app/views/search.php:223
-#: app/views/search.php:227 app/views/search.php:369
+#: app/views/search.php:223 app/views/search.php:227 app/views/search.php:369
 #: include/classes/helpers/CMenuHelper.php:144
 #: include/classes/helpers/CRoleHelper.php:358
 #: include/views/configuration.copy.elements.php:63
@@ -16989,10 +16996,12 @@ msgstr "Šablona se stejným viditelným jménem \"%1$s\" již existuje."
 #: include/views/configuration.hostgroups.list.php:68
 #: include/views/configuration.hostgroups.list.php:183
 #: include/views/configuration.hostgroups.list.php:187
-#: include/views/configuration.host.prototype.edit.php:302
+#: include/views/configuration.host.prototype.edit.php:175
 #: include/views/configuration.host.prototype.list.php:60
 #: include/views/configuration.httpconf.list.php:50
 #: include/views/configuration.template.edit.php:28
+#: include/views/configuration.template.edit.php:145
+#: include/views/configuration.template.edit.php:176
 #: include/views/configuration.template.list.php:87
 #: include/views/configuration.triggers.list.php:48
 msgid "Templates"
@@ -17003,7 +17012,7 @@ msgstr "Šablony"
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr "Šablony \"%1$s\" odpojené od hostů \"%2$s\"."
 
-#: app/controllers/CControllerPopupMassupdateTemplate.php:348
+#: app/controllers/CControllerPopupMassupdateTemplate.php:350
 msgid "Templates updated"
 msgstr "Šablony aktualizovány"
 
@@ -17219,7 +17228,7 @@ msgstr "Téma"
 msgid "This day last week"
 msgstr "Tento den v minulém týdnu"
 
-#: app/partials/configuration.host.edit.html.php:403
+#: app/partials/configuration.host.edit.html.php:398
 #, c-format
 msgid "This field is automatically populated by item \"%1$s\"."
 msgstr ""
@@ -18037,7 +18046,7 @@ msgstr "Jednotky"
 #: include/items.inc.php:45 include/items.inc.php:110
 #: include/items.inc.php:133 include/items.inc.php:167
 #: include/maintenances.inc.php:33 include/maps.inc.php:39
-#: include/triggers.inc.php:83 include/triggers.inc.php:1867
+#: include/triggers.inc.php:83 include/triggers.inc.php:1868
 #: include/users.inc.php:64 include/users.inc.php:87
 #: include/views/configuration.action.edit.php:233
 #: include/views/configuration.triggers.list.php:77
@@ -18057,7 +18066,7 @@ msgid "Unknown error"
 msgstr "Neznáma chyba"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:47
-#: app/controllers/CControllerPopupTriggerExpr.php:1258
+#: app/controllers/CControllerPopupTriggerExpr.php:1301
 #: include/triggers.inc.php:1146
 msgid "Unknown host item, no such item in selected host"
 msgstr "Zadaná položka ve vybraném hostiteli neexistuje"
@@ -18089,16 +18098,16 @@ msgstr "Neznámý typ hodnoty"
 msgid "Unlimited"
 msgstr "Neomezený"
 
-#: app/partials/configuration.host.edit.html.php:243
-#: app/views/popup.massupdate.host.php:114
-#: app/views/popup.massupdate.template.php:91
-#: include/views/configuration.host.prototype.edit.php:260
-#: include/views/configuration.template.edit.php:145
+#: app/partials/configuration.host.edit.html.php:171
+#: app/views/popup.massupdate.host.php:48
+#: app/views/popup.massupdate.template.php:50
+#: include/views/configuration.host.prototype.edit.php:147
+#: include/views/configuration.template.edit.php:110
 msgid "Unlink"
 msgstr "Odpojit"
 
-#: app/partials/configuration.host.edit.html.php:247
-#: include/views/configuration.template.edit.php:151
+#: app/partials/configuration.host.edit.html.php:175
+#: include/views/configuration.template.edit.php:114
 msgid "Unlink and clear"
 msgstr "Odpojit a pročistit"
 
@@ -18195,10 +18204,10 @@ msgstr "Dostupný"
 #: app/views/popup.dashboard.share.edit.php:155
 #: app/views/popup.discovery.check.php:137 app/views/popup.host.edit.php:61
 #: app/views/popup.httpstep.php:181 app/views/popup.lldoperation.php:290
-#: app/views/popup.lldoverride.php:220 app/views/popup.massupdate.host.php:323
+#: app/views/popup.lldoverride.php:220 app/views/popup.massupdate.host.php:317
 #: app/views/popup.massupdate.item.php:511
 #: app/views/popup.massupdate.service.php:67
-#: app/views/popup.massupdate.template.php:178
+#: app/views/popup.massupdate.template.php:169
 #: app/views/popup.massupdate.trigger.php:165 app/views/popup.media.php:127
 #: app/views/popup.mediatype.message.php:104
 #: app/views/popup.scheduledreport.subscription.php:132
@@ -18211,12 +18220,12 @@ msgstr "Dostupný"
 #: include/views/configuration.graph.edit.php:494
 #: include/views/configuration.host.discovery.edit.php:977
 #: include/views/configuration.hostgroups.edit.php:61
-#: include/views/configuration.host.prototype.edit.php:422
+#: include/views/configuration.host.prototype.edit.php:417
 #: include/views/configuration.httpconf.edit.php:271
 #: include/views/configuration.item.edit.php:1041
 #: include/views/configuration.item.prototype.edit.php:900
 #: include/views/configuration.maintenance.edit.php:264
-#: include/views/configuration.template.edit.php:236
+#: include/views/configuration.template.edit.php:217
 #: include/views/configuration.trigger.prototype.edit.php:654
 #: include/views/configuration.triggers.edit.php:647
 #: include/views/monitoring.sysmap.constructor.php:76
@@ -18272,7 +18281,7 @@ msgstr "Nahrát"
 msgid "Upper level maps"
 msgstr "Mapa nejvyšší úrovně"
 
-#: app/views/js/popup.service.edit.js.php:232
+#: app/views/js/popup.service.edit.js.php:231
 #: app/views/popup.service.time.edit.php:45
 #: include/classes/screens/CScreenDiscovery.php:120
 msgid "Uptime"
@@ -18599,15 +18608,15 @@ msgid "User/Recipient"
 msgstr "Uživatel/Příjemce"
 
 #: app/controllers/CControllerPopupGeneric.php:217
-#: app/partials/configuration.host.edit.html.php:319
+#: app/partials/configuration.host.edit.html.php:314
 #: app/views/administration.mediatype.edit.php:94
 #: app/views/administration.script.edit.php:139
 #: app/views/administration.user.edit.php:65
 #: app/views/administration.user.list.php:62
 #: app/views/administration.user.list.php:106
-#: app/views/popup.massupdate.host.php:167 disc_prototypes.php:209
+#: app/views/popup.massupdate.host.php:164 disc_prototypes.php:209
 #: host_discovery.php:182
-#: include/views/configuration.host.prototype.edit.php:317
+#: include/views/configuration.host.prototype.edit.php:311
 #: include/views/general.login.php:70 index.php:32 items.php:210
 msgid "Username"
 msgstr "Uživatelské jméno"
@@ -18921,11 +18930,11 @@ msgstr "Validace"
 #: app/views/popup.httpstep.php:96 app/views/popup.httpstep.php:120
 #: app/views/popup.httpstep.php:139 app/views/popup.itemtestedit.view.php:262
 #: app/views/popup.lldoperation.php:268
-#: app/views/popup.massupdate.host.php:207
+#: app/views/popup.massupdate.host.php:203
 #: app/views/popup.massupdate.item.php:120
 #: app/views/popup.massupdate.item.php:486
 #: app/views/popup.massupdate.service.php:50
-#: app/views/popup.massupdate.template.php:140
+#: app/views/popup.massupdate.template.php:132
 #: app/views/popup.massupdate.trigger.php:84
 #: app/views/popup.service.edit.php:65 app/views/popup.service.edit.php:271
 #: app/views/popup.testtriggerexpr.php:31 app/views/popup.valuemap.edit.php:51
@@ -18999,14 +19008,14 @@ msgstr "Mapa hodnot \"%1$s\" již existuje."
 #: app/controllers/CControllerPopupGeneric.php:357
 #: app/controllers/CControllerPopupValueMapEdit.php:92
 #: app/partials/configuration.filter.items.php:99
-#: app/partials/configuration.host.edit.html.php:536
+#: app/partials/configuration.host.edit.html.php:530
 #: app/partials/massupdate.valuemaps.tab.php:90
-#: app/views/popup.massupdate.host.php:306
+#: app/views/popup.massupdate.host.php:300
 #: app/views/popup.massupdate.item.php:351
-#: app/views/popup.massupdate.template.php:162
+#: app/views/popup.massupdate.template.php:153
 #: include/views/configuration.item.edit.php:883
 #: include/views/configuration.item.prototype.edit.php:800
-#: include/views/configuration.template.edit.php:223
+#: include/views/configuration.template.edit.php:204
 msgid "Value mapping"
 msgstr "Mapování hodnot"
 
@@ -19149,7 +19158,7 @@ msgstr "Virtuální velikost prostoru v bytech nebo v procentech z celkového po
 #: app/partials/configuration.host.edit.html.php:98
 #: app/views/configuration.discovery.edit.php:118
 #: include/views/configuration.host.prototype.edit.php:76
-#: include/views/configuration.template.edit.php:88
+#: include/views/configuration.template.edit.php:61
 #: include/views/inventory.host.view.php:53
 msgid "Visible name"
 msgstr "Zobrazované jméno"
@@ -19175,7 +19184,7 @@ msgstr ""
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:172
 #: app/views/administration.trigdisplay.edit.php:118
-#: app/views/js/popup.massupdate.js.php:409 include/items.inc.php:33
+#: app/views/js/popup.massupdate.js.php:422 include/items.inc.php:33
 #: include/views/general.warning.php:26 jsLoader.php:176
 msgid "Warning"
 msgstr "Upozornění"
@@ -19957,7 +19966,7 @@ msgstr "je očekáván sudý počet hexadecimálních znaků"
 msgid "an explicit time is expected"
 msgstr "přesný čas je očekáván"
 
-#: include/classes/api/services/CAction.php:2710
+#: include/classes/api/services/CAction.php:2712
 #: include/classes/api/services/CCorrelation.php:730
 msgid "an identifier is not defined in the formula"
 msgstr ""
@@ -20134,7 +20143,7 @@ msgstr "nemůže být změněno"
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:41
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:47
 #: app/controllers/CControllerUserUpdateGeneral.php:111
-#: include/classes/api/services/CAction.php:2733
+#: include/classes/api/services/CAction.php:2735
 #: include/classes/api/services/CAutoregistration.php:163
 #: include/classes/api/services/CDiscoveryRule.php:1989
 #: include/classes/api/services/CDRule.php:210
@@ -20572,11 +20581,11 @@ msgstr ""
 msgid "including subgroups"
 msgstr "včetně podskupin"
 
-#: include/classes/parsers/C10TriggerExpression.php:521
+#: include/classes/parsers/C10TriggerExpression.php:525
 msgid "incorrect calculated item formula"
 msgstr ""
 
-#: include/classes/parsers/C10TriggerExpression.php:537
+#: include/classes/parsers/C10TriggerExpression.php:541
 #, c-format
 msgid "incorrect calculated item formula starting from \"%1$s\""
 msgstr ""
@@ -20595,7 +20604,7 @@ msgstr "neplatný počet prvků"
 msgid "incorrect expression starting from \"%1$s\""
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2703
+#: include/classes/api/services/CAction.php:2705
 #: include/classes/api/services/CCorrelation.php:723
 msgid "incorrect number of conditions"
 msgstr ""
@@ -20673,7 +20682,7 @@ msgstr "neplatný název skupiny"
 msgid "invalid host name"
 msgstr "neplatné jméno hosta"
 
-#: include/classes/validators/CHistFunctionValidator.php:80
+#: include/classes/validators/CHistFunctionValidator.php:82
 #: include/classes/validators/CMathFunctionValidator.php:86
 #, c-format
 msgid "invalid number of parameters in function \"%1$s\""
@@ -20693,6 +20702,16 @@ msgstr "neplatný regulérní výraz"
 #: include/classes/validators/CHistFunctionValidator.php:64
 #, c-format
 msgid "invalid second parameter in function \"%1$s\""
+msgstr ""
+
+#: include/classes/validators/CHistFunctionValidator.php:69
+#, c-format
+msgid "invalid seventh parameter in function \"%1$s\""
+msgstr ""
+
+#: include/classes/validators/CHistFunctionValidator.php:68
+#, c-format
+msgid "invalid sixth parameter in function \"%1$s\""
 msgstr ""
 
 #: include/classes/validators/CHistFunctionValidator.php:65
@@ -20832,7 +20851,7 @@ msgstr "makro(a)"
 msgid "mad() - Median absolute deviation"
 msgstr ""
 
-#: include/classes/validators/CHistFunctionValidator.php:91
+#: include/classes/validators/CHistFunctionValidator.php:93
 #, c-format
 msgid "mandatory parameter is missing in function \"%1$s\""
 msgstr ""
@@ -21004,7 +21023,7 @@ msgstr "název"
 msgid "new"
 msgstr "nový"
 
-#: app/controllers/CControllerHostEdit.php:308 templates.php:626
+#: app/controllers/CControllerHostEdit.php:308 templates.php:627
 msgctxt "new element in multiselect"
 msgid "new"
 msgstr "nový"
@@ -21520,6 +21539,10 @@ msgid "trendmin() - Minimum value for period T with exact period shift"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1042
+msgid "trendstl() - Anomaly detection for period T"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1085
 msgid "trendsum() - Sum of values of a period T with exact period shift"
 msgstr ""
 
@@ -21545,11 +21568,11 @@ msgstr "prototyp spouštěče nelze přesunout do jiné šablony nebo hosta"
 msgid "trigger with linkages cannot be moved to another template or host"
 msgstr "spouštěc s vazbami nelze přesunout do jiné šablony nebo hosta"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1049
+#: app/controllers/CControllerPopupTriggerExpr.php:1092
 msgid "trim() - Remove specified characters from the beginning and the end of a string"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1062
+#: app/controllers/CControllerPopupTriggerExpr.php:1105
 msgid "truncate() - Truncates a value to decimal places"
 msgstr ""
 
@@ -21649,7 +21672,7 @@ msgstr "neočekávaná hodnota \"%1$s\""
 msgid "unknown"
 msgstr "neznámý"
 
-#: include/classes/validators/CHistFunctionValidator.php:71
+#: include/classes/validators/CHistFunctionValidator.php:73
 #: include/classes/validators/CMathFunctionValidator.php:55
 #, c-format
 msgid "unknown function \"%1$s\""
@@ -21850,11 +21873,11 @@ msgstr ""
 msgid "value of third parameter must be one of %1$s"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1075
+#: app/controllers/CControllerPopupTriggerExpr.php:1118
 msgid "varpop() - Population variance"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1082
+#: app/controllers/CControllerPopupTriggerExpr.php:1125
 msgid "varsamp() - Sample variance"
 msgstr ""
 

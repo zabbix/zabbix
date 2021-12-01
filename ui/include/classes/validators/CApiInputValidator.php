@@ -1604,7 +1604,7 @@ class CApiInputValidator {
 			return true;
 		}
 
-		$number_parser = new CNumberParser(['with_suffix' => true]);
+		$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
 
 		if ($number_parser->parse($data) != CParser::PARSE_SUCCESS) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is expected'));

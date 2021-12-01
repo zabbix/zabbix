@@ -1490,12 +1490,17 @@ zabbix_export:
           item_prototypes:
             -
               uuid: 44d9353d47274309bb3edaa34b7b3470
-              name: '{#DEVNAME}: Disk utilization'
-              key: 'perf_counter_en["\PhysicalDisk({#DEVNAME})\% Disk Time",60]'
+              name: '{#DEVNAME}: Disk utilization by idle time'
+              key: 'perf_counter_en["\PhysicalDisk({#DEVNAME})\% Idle Time",60]'
               history: 7d
               value_type: FLOAT
               units: '%'
-              description: 'This item is the percentage of elapsed time that the selected disk drive was busy servicing read or writes requests.'
+              description: 'This item is the percentage of elapsed time that the selected disk drive was busy servicing read or writes requests based on idle time.'
+              preprocessing:
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return (100 - value)'
               tags:
                 -
                   tag: Application
@@ -1503,7 +1508,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: c194f813f0c5417aaac56875b955637a
-                  expression: 'min(/Windows physical disks by Zabbix agent/perf_counter_en["\PhysicalDisk({#DEVNAME})\% Disk Time",60],15m)>{$VFS.DEV.UTIL.MAX.WARN}'
+                  expression: 'min(/Windows physical disks by Zabbix agent/perf_counter_en["\PhysicalDisk({#DEVNAME})\% Idle Time",60],15m)>{$VFS.DEV.UTIL.MAX.WARN}'
                   name: '{#DEVNAME}: Disk is overloaded (util > {$VFS.DEV.UTIL.MAX.WARN}% for 15m)'
                   priority: WARNING
                   description: 'The disk appears to be under heavy load'
@@ -1676,7 +1681,7 @@ zabbix_export:
                   color: 2774A4
                   item:
                     host: 'Windows physical disks by Zabbix agent'
-                    key: 'perf_counter_en["\PhysicalDisk({#DEVNAME})\% Disk Time",60]'
+                    key: 'perf_counter_en["\PhysicalDisk({#DEVNAME})\% Idle Time",60]'
           preprocessing:
             -
               type: STR_REPLACE
