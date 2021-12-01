@@ -96,11 +96,32 @@ class testItemTypeSelection extends CWebTest {
 			[
 				[
 					'fill' => [
+						'Name' => 'Custom key',
+						'Key' => 'custom.key'
+					],
+					'type' => 'Numeric (unsigned)'
+				]
+			],
+			[
+				[
+					'fill' => [
+						'Name' => 'Custom key 2',
+						'Key' => 'custom.key2',
+						'Type of information' => 'Text'
+					],
+					'type' => 'Text',
+					'hint' => false
+				]
+			],
+			[
+				[
+					'fill' => [
 						'Name' => 'Test Info Hint',
 						'Key' => 'net.if.list',
 						'Type of information' => 'Log'
 					],
-					'hint' => 'This type of information may not match the key.',
+					'hint' => true,
+					'hint_text' => 'This type of information may not match the key.',
 					'automatic_type' => 'Text'
 				]
 			]
@@ -135,12 +156,15 @@ class testItemTypeSelection extends CWebTest {
 		$form->fill($data['fill']);
 
 		// Check hintbox text.
-		if (array_key_exists('hint', $data)) {
+		if (CTestArrayHelper::get($data, 'hint')) {
 			$icon = $this->query('id:js-item-type-hint')->waitUntilClickable()->one();
 			$icon->click();
-			$this->assertEquals($data['hint'],
+			$this->assertEquals($data['hint_text'],
 					$form->query('xpath://div[@class="hintbox-wrap"]')->waitUntilPresent()->one()->getText()
 			);
+		}
+		elseif (CTestArrayHelper::get($data, 'hint') === false) {
+			$this->assertFalse($form->query('id:js-item-type-hint')->waitUntilPresent()->one()->isVisible());
 		}
 		else {
 			// Check that type changed to automatic.
@@ -172,7 +196,7 @@ class testItemTypeSelection extends CWebTest {
 		$form->invalidate();
 		$form->checkValue($data['fill']);
 
-		if (array_key_exists('hint', $data)) {
+		if (CTestArrayHelper::get($data, 'hint')) {
 			// Check that info disappears when preprocessing step is added.
 			$form->selectTab('Preprocessing');
 			$this->addPreprocessingSteps([['type' => 'Regular expression', 'parameter_1' => 'pattern', 'parameter_2' => 'output']]);
