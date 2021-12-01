@@ -32,15 +32,20 @@ import (
 )
 
 const (
+	base10 = 10
+
 	tcpProtocol = "tcp"
 	udpProtocol = "udp"
+)
 
-	sixthParam  = 5
-	fifthParam  = 4
-	fourthParam = 3
-	thirdParam  = 2
-	secondParam = 1
-	firstParam  = 0
+const (
+	noneParam = iota
+	firstParam
+	secondParam
+	thirdParam
+	fourthParam
+	fifthParam
+	sixthParam
 )
 
 type options struct {
@@ -95,27 +100,12 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 }
 
 func exportDns(params []string) (result interface{}, err error) {
-	options, err := parseParamas(params)
+	answer, err := getDNSAnswers(params)
 	if err != nil {
 		return
 	}
 
-	var resp *dns.Msg
-	for i := 0; i <= options.count; i++ {
-		resp, err = runQuery(options.ip, options.name, options.protocol, options.dnsType, options.timeout)
-		if err != nil {
-			continue
-		}
-
-		break
-	}
-
-	if err != nil {
-		err = zbxerr.ErrorCannotFetchData.Wrap(err)
-		return
-	}
-
-	if len(resp.Answer) < 1 {
+	if len(answer) < 1 {
 		return 0, nil
 	}
 
@@ -123,34 +113,21 @@ func exportDns(params []string) (result interface{}, err error) {
 }
 
 func exportDnsRecord(params []string) (result interface{}, err error) {
-	options, err := parseParamas(params)
+	answer, err := getDNSAnswers(params)
 	if err != nil {
 		return
 	}
 
-	var resp *dns.Msg
-	for i := 1; i <= options.count; i++ {
-		resp, err = runQuery(options.ip, options.name, options.protocol, options.dnsType, options.timeout)
-		if err != nil {
-			continue
-		}
-
-		break
+	if len(answer) < 1 {
+		return nil, zbxerr.New("Cannot perform DNS query.")
 	}
 
-	if err != nil {
-		err = zbxerr.ErrorCannotFetchData.Wrap(err)
-		return
-	}
+	return parseAnswers(answer), nil
+}
 
-	if len(resp.Answer) < 1 {
-		err = zbxerr.New("Cannot perform DNS query.")
-		return
-	}
-
+func parseAnswers(answers []dns.RR) string {
 	var out string
-	for _, a := range resp.Answer {
-
+	for _, a := range answers {
 		out += strings.TrimSuffix(a.Header().Name, ".") + "\t     "
 		out += dns.Type(a.Header().Rrtype).String()
 
@@ -190,17 +167,40 @@ func exportDnsRecord(params []string) (result interface{}, err error) {
 		}
 	}
 
-	return out, nil
+	return out
+}
+
+func getDNSAnswers(params []string) ([]dns.RR, error) {
+	options, err := parseParamas(params)
+	if err != nil {
+		return nil, err
+	}
+
+	var resp *dns.Msg
+	for i := 1; i <= options.count; i++ {
+		resp, err = runQuery(options.ip, options.name, options.protocol, options.dnsType, options.timeout)
+		if err != nil {
+			continue
+		}
+
+		break
+	}
+
+	if err != nil {
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+	}
+
+	return resp.Answer, nil
 }
 
 func getSOAString(in *dns.SOA) string {
 	return "      " + strings.TrimSuffix(in.Ns, ".") +
 		" " + strings.TrimSuffix(in.Mbox, ".") +
-		" " + strconv.FormatInt(int64(in.Serial), 10) +
-		" " + strconv.FormatInt(int64(in.Refresh), 10) +
-		" " + strconv.FormatInt(int64(in.Retry), 10) +
-		" " + strconv.FormatInt(int64(in.Expire), 10) +
-		" " + strconv.FormatInt(int64(in.Minttl), 10)
+		" " + strconv.FormatInt(int64(in.Serial), base10) +
+		" " + strconv.FormatInt(int64(in.Refresh), base10) +
+		" " + strconv.FormatInt(int64(in.Retry), base10) +
+		" " + strconv.FormatInt(int64(in.Expire), base10) +
+		" " + strconv.FormatInt(int64(in.Minttl), base10)
 }
 
 func getAString(in *dns.A) string {
@@ -222,6 +222,7 @@ func getCNAMEString(in *dns.CNAME) string {
 func getMBString(in *dns.MB) string {
 	return "       " + strings.TrimSuffix(in.Mb, ".") + "\n"
 }
+
 func getMGString(in *dns.MG) string {
 	return "       " + strings.TrimSuffix(in.Mg, ".") + "\n"
 }
@@ -233,34 +234,34 @@ func getPTRString(in *dns.PTR) string {
 func getMDString(in *dns.MD) string {
 	return "       " + strings.TrimSuffix(in.Md, ".") + "\n"
 }
+
 func getMFString(in *dns.MF) string {
 	return "       " + strings.TrimSuffix(in.Mf, ".") + "\n"
-
 }
+
 func getMXString(in *dns.MX) string {
 	return "       " + strconv.Itoa(int(in.Preference)) +
 		" " + strings.TrimSuffix(in.Mx, ".") + "\n"
-
 }
+
 func getNULLString(in *dns.NULL) string {
 	return "     " + strings.TrimSuffix(in.Data, ".") + "\n"
 }
+
 func getHINFOString(in *dns.HINFO) string {
-	return "    " + "\"" + in.Cpu + " " + "\"" + in.Os + "\n"
+	return "    " + parseTXT(in.Cpu, in.Os)
+
 }
 
 func getMINFOtring(in *dns.MINFO) string {
 	return "    " + strings.TrimSuffix(in.Rmail, ".") + " " +
 		strings.TrimSuffix(in.Email, ".") + "\n"
 }
-func getTXTString(in *dns.TXT) string {
-	out := "      "
-	for _, t := range in.Txt {
-		out += "\"" + t + "\""
-	}
 
-	return out + "\n"
+func getTXTString(in *dns.TXT) string {
+	return "      " + parseTXT(in.Txt...)
 }
+
 func getAAAAString(in *dns.AAAA) string {
 	if in.AAAA == nil {
 		return "\n"
@@ -275,50 +276,61 @@ func getSRVString(in *dns.SRV) string {
 		strconv.Itoa(int(in.Weight)) + " " +
 		strconv.Itoa(int(in.Port)) + " " +
 		strings.TrimSuffix(in.Target, ".")
+}
 
+func parseTXT(in ...string) string {
+	var out string
+	for _, s := range in {
+		if s != "" {
+			out += "\"" + s + "\"" + " "
+		}
+	}
+
+	return strings.TrimSpace(out) + "\n"
 }
 
 func parseParamas(params []string) (o options, err error) {
 	switch len(params) {
-	case 6:
-		err = o.setProtocol(params[sixthParam])
+	case sixthParam:
+		err = o.setProtocol(params[sixthParam-1])
 		if err != nil {
 			return
 		}
 
 		fallthrough
-	case 5:
-		err = o.setCount(params[fifthParam])
+	case fifthParam:
+		err = o.setCount(params[fifthParam-1])
 		if err != nil {
 			return
 		}
 
 		fallthrough
-	case 4:
-		err = o.setTimeout(params[fourthParam])
+	case fourthParam:
+		err = o.setTimeout(params[fourthParam-1])
 		if err != nil {
 			return
 		}
 
 		fallthrough
-	case 3:
-		err = o.setDNSType(params[thirdParam])
+	case thirdParam:
+		err = o.setDNSType(params[thirdParam-1])
 		if err != nil {
 			return
 		}
 
 		fallthrough
-	case 2:
-		o.name = params[secondParam]
+	case secondParam:
+		o.name = params[secondParam-1]
+
 		fallthrough
-	case 1:
-		err = o.setIP(params[firstParam])
+	case firstParam:
+		err = o.setIP(params[firstParam-1])
 		if err != nil {
 			return o, zbxerr.New(fmt.Sprintf("invalid fist parameter %s", err.Error()))
 		}
 
 		fallthrough
-	case 0:
+	case noneParam:
 		err = o.setDefaults()
 		if err != nil {
 			return
@@ -350,6 +362,7 @@ func isValidIP(ip string) bool {
 	if r := net.ParseIP(ip); r == nil {
 		return false
 	}
+
 	return true
 }
 
@@ -399,8 +412,7 @@ func (o *options) setTimeout(timeout string) error {
 func (o *options) setDNSType(dnsType string) error {
 	t, ok := dnsTypes[dnsType]
 	if !ok {
-		return zbxerr.New(fmt.Sprintf("unknown dns type %d", t))
-
+		return zbxerr.New(fmt.Sprintf("unknown dns type %s", dnsType))
 	}
 
 	o.dnsType = t
