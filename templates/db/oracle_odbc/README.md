@@ -89,7 +89,7 @@ No specific Zabbix configuration is required.
 |{$ORACLE.EXPIRE.PASSWORD.MIN.WARN} |<p>Number of days of warning before password expires (for trigger expression).</p> |`7` |
 |{$ORACLE.PASSWORD} |<p>Oracle user password.</p> |`<Put your password here>` |
 |{$ORACLE.PGA.USE.MAX.WARN} |<p>Maximum percentage of PGA usage alert threshold (for trigger expression).</p> |`90` |
-|{$ORACLE.PORT} |<p>Oracle port.</p> |`<Put oracle port here>` |
+|{$ORACLE.PORT} |<p>Oracle DB TCP port.</p> |`1521` |
 |{$ORACLE.PROCESSES.MAX.WARN} |<p>Maximum percentage of active processes alert threshold (for trigger expression).</p> |`80` |
 |{$ORACLE.REDO.MIN.WARN} |<p>Minimum number of REDO logs alert threshold (for trigger expression).</p> |`3` |
 |{$ORACLE.SERVICE} |<p>Oracle service name</p> |`<Put oracle service name here>` |

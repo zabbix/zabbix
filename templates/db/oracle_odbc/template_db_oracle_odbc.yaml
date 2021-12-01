@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-11-29T12:38:16Z'
+  date: '2021-12-01T16:34:59Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -2444,8 +2444,8 @@ zabbix_export:
           description: 'Maximum percentage of PGA usage alert threshold (for trigger expression).'
         -
           macro: '{$ORACLE.PORT}'
-          value: '<Put oracle port here>'
-          description: 'Oracle port.'
+          value: '1521'
+          description: 'Oracle DB TCP port.'
         -
           macro: '{$ORACLE.PROCESSES.MAX.WARN}'
           value: '80'
