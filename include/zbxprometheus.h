@@ -22,8 +22,8 @@
 
 #include "zbxalgo.h"
 
-int	zbx_prometheus_pattern(const char *data, const char *filter_data, const char *output, char **value,
-		char **error);
+int	zbx_prometheus_pattern(const char *data, const char *filter_data, const char *request, const char *output,
+		char **value, char **error);
 int	zbx_prometheus_to_json(const char *data, const char *filter_data, char **value, char **error);
 
 int	zbx_prometheus_validate_filter(const char *pattern, char **error);
@@ -38,7 +38,7 @@ zbx_prometheus_t;
 
 int	zbx_prometheus_init(zbx_prometheus_t *prom, const char *data, char **error);
 void	zbx_prometheus_clear(zbx_prometheus_t *prom);
-int	zbx_prometheus_pattern_ex(zbx_prometheus_t *prom, const char *filter_data, const char *output, char **value,
-		char **error);
+int	zbx_prometheus_pattern_ex(zbx_prometheus_t *prom, const char *filter_data, const char *request,
+		const char *output, char **value, char **error);
 
 #endif

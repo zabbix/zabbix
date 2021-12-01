@@ -77,7 +77,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_prometheus_condition_test_t	*metric = NULL, *value = NULL;
 	zbx_vector_ptr_t		labels;
 	int				ret, expected_ret, index;
-	char				*error = NULL, *function = NULL;
+	char				*error = NULL;
 	zbx_mock_handle_t		hmetric, hvalue, hlabels, hlabel, hfunction;
 	zbx_mock_error_t		mock_ret;
 
@@ -87,7 +87,7 @@ void	zbx_mock_test_entry(void **state)
 
 	filter = zbx_mock_get_parameter_string("in.filter");
 
-	if (SUCCEED != (ret = zbx_prometheus_filter_parse(filter, &function, &metric, &labels, &value, &error)))
+	if (SUCCEED != (ret = zbx_prometheus_filter_parse(filter, &metric, &labels, &value, &error)))
 		printf("filter parsing error: %s\n", error);
 
 	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
@@ -102,20 +102,6 @@ void	zbx_mock_test_entry(void **state)
 		if (ZBX_MOCK_SUCCESS != zbx_mock_parameter("out.value", &hvalue))
 			hvalue = -1;
 		test_match("value", hvalue, value);
-
-		if (ZBX_MOCK_SUCCESS == zbx_mock_parameter("out.function", &hfunction))
-		{
-			const char	*function_exp;
-
-			if (NULL == function)
-				fail_msg("expected function while got none");
-
-			zbx_mock_string(hfunction, &function_exp);
-
-			zbx_mock_assert_str_eq("function name", function_exp, function);
-		}
-		else
-			zbx_mock_assert_ptr_eq("function name", NULL, function);
 
 		if (ZBX_MOCK_SUCCESS != zbx_mock_parameter("out.labels", &hlabels))
 			hlabels = -1;
@@ -152,7 +138,6 @@ void	zbx_mock_test_entry(void **state)
 	zbx_vector_ptr_clear_ext(&labels, (zbx_clean_func_t)zbx_prometheus_condition_test_free);
 	zbx_vector_ptr_destroy(&labels);
 
-	zbx_free(function);
 	zbx_free(error);
 }
 

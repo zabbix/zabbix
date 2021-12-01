@@ -1536,7 +1536,7 @@ fail:
 static int	item_preproc_prometheus_pattern(zbx_preproc_cache_t *cache, zbx_variant_t *value, const char *params,
 		char **errmsg)
 {
-	char	pattern[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *output, *value_out = NULL,
+	char	pattern[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *request, *output, *value_out = NULL,
 		*err = NULL;
 	int	ret = FAIL;
 
@@ -1545,17 +1545,23 @@ static int	item_preproc_prometheus_pattern(zbx_preproc_cache_t *cache, zbx_varia
 
 	zbx_strlcpy(pattern, params, sizeof(pattern));
 
-	if (NULL == (output = strchr(pattern, '\n')))
+	if (NULL == (request = strchr(pattern, '\n')))
 	{
 		*errmsg = zbx_strdup(*errmsg, "cannot find second parameter");
 		return FAIL;
 	}
+	*request++ = '\0';
 
+	if (NULL == (output = strchr(request, '\n')))
+	{
+		*errmsg = zbx_strdup(*errmsg, "cannot find third parameter");
+		return FAIL;
+	}
 	*output++ = '\0';
 
 	if (NULL == cache)
 	{
-		ret = zbx_prometheus_pattern(value->data.str, pattern, output, &value_out, &err);
+		ret = zbx_prometheus_pattern(value->data.str, pattern, request, output, &value_out, &err);
 	}
 	else
 	{
@@ -1572,7 +1578,7 @@ static int	item_preproc_prometheus_pattern(zbx_preproc_cache_t *cache, zbx_varia
 			zbx_preproc_cache_put(cache, ZBX_PREPROC_PROMETHEUS_PATTERN, prom_cache);
 		}
 
-		ret = zbx_prometheus_pattern_ex(prom_cache, pattern, output, &value_out, &err);
+		ret = zbx_prometheus_pattern_ex(prom_cache, pattern, request, output, &value_out, &err);
 	}
 out:
 	if (FAIL == ret)

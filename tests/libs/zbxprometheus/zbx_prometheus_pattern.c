@@ -27,7 +27,7 @@
 
 void	zbx_mock_test_entry(void **state)
 {
-	const char	*data, *params, *value_type;
+	const char	*data, *params, *output, *request;
 	char		*ret_err = NULL, *ret_output = NULL;
 	int		ret, expected_ret;
 
@@ -35,9 +35,10 @@ void	zbx_mock_test_entry(void **state)
 
 	data = zbx_mock_get_parameter_string("in.data");
 	params = zbx_mock_get_parameter_string("in.params");
-	value_type = zbx_mock_get_parameter_string("in.value_type");
+	output = zbx_mock_get_parameter_string("in.output");
+	request = zbx_mock_get_parameter_string("in.request");
 
-	if (SUCCEED != (ret = zbx_prometheus_pattern(data, params, value_type, &ret_output, &ret_err)))
+	if (SUCCEED != (ret = zbx_prometheus_pattern(data, params, request, output, &ret_output, &ret_err)))
 		zabbix_log(LOG_LEVEL_DEBUG, "Error: %s", ret_err);
 
 	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.result"));
@@ -45,8 +46,6 @@ void	zbx_mock_test_entry(void **state)
 
 	if (SUCCEED == ret)
 	{
-		const char *output;
-
 		output = zbx_mock_get_parameter_string("out.output");
 		zbx_mock_assert_str_eq("Invalid zbx_prometheus_pattern() returned output", output, ret_output);
 		zbx_free(ret_output);
