@@ -60,6 +60,10 @@ func (t *taskBase) getPlugin() *pluginAgent {
 	return t.plugin
 }
 
+func (t *taskBase) setPlugin(p *pluginAgent) {
+	t.plugin = p
+}
+
 func (t *taskBase) getScheduled() time.Time {
 	return t.scheduled
 }
@@ -125,6 +129,10 @@ func (t *collectorTask) reschedule(now time.Time) (err error) {
 
 func (t *collectorTask) getWeight() int {
 	return t.plugin.maxCapacity
+}
+
+func (t *collectorTask) getItemKey() (itemkey string) {
+	return ""
 }
 
 // exporterTask provides access to plugin Exporter interaface. It's used
@@ -218,6 +226,10 @@ func (t *exporterTask) Output() (output plugin.ResultWriter) {
 
 func (t *exporterTask) ItemID() (itemid uint64) {
 	return t.item.itemid
+}
+
+func (t *exporterTask) getItemKey() (itemkey string) {
+	return t.item.key
 }
 
 func (t *exporterTask) Meta() (meta *plugin.Meta) {
@@ -315,6 +327,10 @@ func (t *directExporterTask) ItemID() (itemid uint64) {
 	return t.item.itemid
 }
 
+func (t *directExporterTask) getItemKey() (itemkey string) {
+	return t.item.key
+}
+
 func (t *directExporterTask) Meta() (meta *plugin.Meta) {
 	return &t.meta
 }
@@ -346,6 +362,10 @@ func (t *starterTask) getWeight() int {
 	return t.plugin.maxCapacity
 }
 
+func (t *starterTask) getItemKey() (itemkey string) {
+	return ""
+}
+
 // stopperTask provides access to plugin Exporter interaface Start() method.
 type stopperTask struct {
 	taskBase
@@ -367,6 +387,10 @@ func (t *stopperTask) reschedule(now time.Time) (err error) {
 
 func (t *stopperTask) getWeight() int {
 	return t.plugin.maxCapacity
+}
+
+func (t *stopperTask) getItemKey() (itemkey string) {
+	return ""
 }
 
 // stopperTask provides access to plugin Watcher interaface.
@@ -408,6 +432,10 @@ func (t *watcherTask) ItemID() (itemid uint64) {
 	return 0
 }
 
+func (t *watcherTask) getItemKey() (itemkey string) {
+	return ""
+}
+
 func (t *watcherTask) Meta() (meta *plugin.Meta) {
 	return nil
 }
@@ -438,4 +466,8 @@ func (t *configuratorTask) reschedule(now time.Time) (err error) {
 
 func (t *configuratorTask) getWeight() int {
 	return t.plugin.maxCapacity
+}
+
+func (t *configuratorTask) getItemKey() (itemkey string) {
+	return ""
 }

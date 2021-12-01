@@ -406,9 +406,12 @@ run:
 				m.processAndFlushUserParamQueue(time.Now())
 				plugin.ClearUserParamMetrics()
 
-				for k, plg := range m.plugins {
+				tasks := make(map[string]performerHeap)
+
+				for key, plg := range m.plugins {
 					if plg.usrprm {
-						delete(m.plugins, k)
+						tasks[key] = plg.tasks
+						delete(m.plugins, key)
 					}
 				}
 
@@ -420,6 +423,24 @@ run:
 
 				for _, key := range keys {
 					m.addUserParamsPlugin(key)
+					m.plugins[key].refcount++
+				}
+
+				for pluginkey, ltasks := range tasks {
+					for task := peekTask(ltasks); task != nil; task = peekTask(ltasks) {
+						heap.Pop(&ltasks)
+
+						for _, key := range keys {
+							if task.getItemKey() == key {
+								task.setPlugin(m.plugins[pluginkey])
+								m.plugins[pluginkey].enqueueTask(task)
+							}
+						}
+					}
+				}
+
+				for _, key := range keys {
+					heap.Push(&m.pluginQueue, m.plugins[key])
 				}
 
 				v.sink <- "ok"
@@ -631,4 +652,12 @@ func (m *Manager) addUserParamsPlugin(key string) {
 	}
 
 	m.plugins[key] = pagent
+}
+
+func peekTask(tasks performerHeap) performer {
+	if len(tasks) == 0 {
+		return nil
+	}
+
+	return tasks[0]
 }

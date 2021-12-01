@@ -28,6 +28,8 @@ import (
 type performer interface {
 	// returns the task plugin
 	getPlugin() *pluginAgent
+	// sets the task plugin
+	setPlugin(p *pluginAgent)
 	// performs the task, this function is called in a separate goroutine
 	perform(s Scheduler)
 	// reschedules the task, returns false if the task has been expired
@@ -46,6 +48,8 @@ type performer interface {
 	deactivate()
 	// true if the task has to be rescheduled after performing
 	isRecurring() bool
+	// return item key
+	getItemKey() string
 }
 
 // performerHeap -
