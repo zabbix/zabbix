@@ -1969,18 +1969,11 @@ static void	add_event_suppress_data(zbx_vector_ptr_t *event_refs, zbx_vector_uin
 						continue;
 					}
 
-					if (SUCCEED == trigger_has_non_maintained_host(event))
-					{
-						event->suppressed = ZBX_PROBLEM_SUPPRESSED_FALSE;
-					}
-					else
-					{
-						zbx_db_insert_add_values(&db_insert, __UINT64_C(0), query->eventid,
-								query->maintenances.values[i].first,
-								(int)query->maintenances.values[i].second);
+					zbx_db_insert_add_values(&db_insert, __UINT64_C(0), query->eventid,
+							query->maintenances.values[i].first,
+							(int)query->maintenances.values[i].second);
 
-						event->suppressed = ZBX_PROBLEM_SUPPRESSED_TRUE;
-					}
+					event->suppressed = ZBX_PROBLEM_SUPPRESSED_TRUE;
 				}
 			}
 

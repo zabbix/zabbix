@@ -1538,6 +1538,8 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vec
 
 		for (j = 0; j < query->functionids.values_num; j++)
 		{
+			DC_HOST	host;
+
 			if (NULL == (function = (ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions,
 					&query->functionids.values[j])))
 			{
@@ -1546,6 +1548,11 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vec
 
 			if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &function->itemid)))
 				continue;
+
+			DCget_host_by_hostid(&host, item->hostid);
+
+			if (HOST_MAINTENANCE_STATUS_OFF == host.maintenance_status)
+				goto skip;
 
 			zbx_vector_uint64_append(&hostids, item->hostid);
 		}
@@ -1589,7 +1596,7 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vec
 				ret = SUCCEED;
 			}
 		}
-
+skip:
 		zbx_vector_uint64_clear(&hostids);
 	}
 unlock:
