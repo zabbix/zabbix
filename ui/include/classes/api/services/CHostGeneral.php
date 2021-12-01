@@ -223,7 +223,7 @@ abstract class CHostGeneral extends CHostBase {
 			}
 
 			if ($check_double_linkage) {
-				self::checkDoubleLinkageNew($ins_templates, $del_links);
+				$this->checkDoubleLinkageNew($ins_templates, $del_links);
 			}
 
 			$this->checkTriggerDependenciesOfInsTemplates($ins_templates);
