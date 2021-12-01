@@ -78,7 +78,7 @@ static int	baseline_get_common_data(zbx_uint64_t itemid, const char *table, time
 			else
 			{
 				zbx_vector_dbl_append(values, value_dbl);
-				zbx_vector_uint64_append(index, (zbx_uint64_t)i - skip);
+				zbx_vector_uint64_append(index, (zbx_uint64_t)(i - skip));
 			}
 		}
 
@@ -157,7 +157,7 @@ static int	baseline_get_isoyear_data(zbx_uint64_t itemid, const char *table, tim
 			else
 			{
 				zbx_vector_dbl_append(values, value_dbl);
-				zbx_vector_uint64_append(index, (zbx_uint64_t)i - skip);
+				zbx_vector_uint64_append(index, (zbx_uint64_t)(i - skip));
 			}
 		}
 
