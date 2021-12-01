@@ -38,7 +38,7 @@ func walHandler(ctx context.Context, conn PostgresClient,
 						CASE
 							WHEN pg_is_in_recovery() THEN 0
 							ELSE pg_wal_lsn_diff(pg_current_wal_lsn(),'0/00000000')
-						END as WRITE,
+						END AS WRITE,
 						CASE 
 							WHEN NOT pg_is_in_recovery() THEN 0
 							ELSE pg_wal_lsn_diff(pg_last_wal_receive_lsn(),'0/00000000')
