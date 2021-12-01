@@ -207,7 +207,7 @@ class testItemTypeSelection extends CWebTest {
 			$form->submit();
 			$this->assertMessage(TEST_GOOD, ($prototype) ? 'Item prototype updated' : 'Item updated');
 
-			// Check that custom type remained in saved form..
+			// Check that custom type remained in saved form.
 			$this->page->open($saved_link)->waitUntilReady();
 			$form->invalidate();
 			$this->assertEquals($data['fill']['Type of information'], $form->getField('Type of information')->getValue());
