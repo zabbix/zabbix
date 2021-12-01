@@ -33,7 +33,6 @@ func (o *options) setDefaultIP() (err error) {
 		return
 	}
 
-	// fmt.Println("data", string(data))
 	s := strings.Split(string(data), "\n")
 	for _, tmp := range s {
 		if strings.HasPrefix(tmp, "nameserver") {
