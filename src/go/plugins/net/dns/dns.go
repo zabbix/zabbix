@@ -432,6 +432,10 @@ func (o *options) setDefaults() error {
 		o.count = 2
 	}
 
+	if o.protocol == "" {
+		o.protocol = udpProtocol
+	}
+
 	return nil
 }
 
