@@ -326,7 +326,7 @@ zabbix_export:
               name: 'F5 BIG-IP: Changes have been made on the device not sync to the device group: {ITEM.VALUE}'
               opdata: '{ITEM.LASTVALUE}'
               priority: WARNING
-              description: 'The device is inconsistent with the device group, requires user intervention'
+              description: 'Changes have been made on the device not sync to the device group, requires user intervention'
               manual_close: 'YES'
             -
               uuid: eb3517626c6d425f9b88a2bc35641ab6
@@ -1816,18 +1816,18 @@ zabbix_export:
           trigger_prototypes:
             -
               uuid: e72f446075214129ab1d6269fcd87051
-              expression: 'max(/F5 Big-IP SNMP/bigip.memory.used[{#HOST.ID}],5m)/min(/F5 Big-IP SNMP/bigip.memory.total[{#HOST.ID}],5m)*100>{$BIGIP.MEMORY.UTIL.WARN.MAX}'
+              expression: 'last(/F5 Big-IP SNMP/bigip.memory.used[{#HOST.ID}])/last(/F5 Big-IP SNMP/bigip.memory.total[{#HOST.ID}])*100>{$BIGIP.MEMORY.UTIL.WARN.MAX}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'max(/F5 Big-IP SNMP/bigip.memory.used[{#HOST.ID}],5m)/min(/F5 Big-IP SNMP/bigip.memory.total[{#HOST.ID}],5m)*100<{$BIGIP.MEMORY.UTIL.WARN.MIN}'
-              name: 'F5 BIG-IP: High memory utilization in host [{#HOST.ID}] (over {$BIGIP.MEMORY.UTIL.WARN.MAX}% for 5m)'
+              recovery_expression: 'last(/F5 Big-IP SNMP/bigip.memory.used[{#HOST.ID}])/last(/F5 Big-IP SNMP/bigip.memory.total[{#HOST.ID}])*100<{$BIGIP.MEMORY.UTIL.WARN.MIN}'
+              name: 'F5 BIG-IP: High memory utilization in host [{#HOST.ID}] (over {$BIGIP.MEMORY.UTIL.WARN.MAX}%)'
               priority: WARNING
               description: 'The system is running out of free memory.'
             -
               uuid: 5cf3e1f819ee46f49ba89156c53274ec
-              expression: 'max(/F5 Big-IP SNMP/bigip.memory.used.swap[{#HOST.ID}],5m)/min(/F5 Big-IP SNMP/bigip.memory.total.swap[{#HOST.ID}],5m)*100>{$BIGIP.SWAP.UTIL.WARN.MAX}'
+              expression: 'last(/F5 Big-IP SNMP/bigip.memory.used.swap[{#HOST.ID}])/last(/F5 Big-IP SNMP/bigip.memory.total.swap[{#HOST.ID}])*100>{$BIGIP.SWAP.UTIL.WARN.MAX}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'max(/F5 Big-IP SNMP/bigip.memory.used.swap[{#HOST.ID}],5m)/min(/F5 Big-IP SNMP/bigip.memory.total.swap[{#HOST.ID}],5m)*100>{$BIGIP.SWAP.UTIL.WARN.MIN}'
-              name: 'F5 BIG-IP: High swap utilization in host [{#HOST.ID}] (over {$BIGIP.SWAP.UTIL.WARN.MAX}% for 5m)'
+              recovery_expression: 'last(/F5 Big-IP SNMP/bigip.memory.used.swap[{#HOST.ID}])/last(/F5 Big-IP SNMP/bigip.memory.total.swap[{#HOST.ID}])*100>{$BIGIP.SWAP.UTIL.WARN.MIN}'
+              name: 'F5 BIG-IP: High swap utilization in host [{#HOST.ID}] (over {$BIGIP.SWAP.UTIL.WARN.MAX}%)'
               priority: WARNING
               description: 'The system is running out of free swap memory.'
           graph_prototypes:
