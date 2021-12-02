@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-10-27T16:39:02Z</date>
+   <date>2021-12-02T13:38:16Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -400,7 +400,7 @@ and are waiting to be executed.</description>
             </macro>
             <macro>
                <macro>{$VFS.FS.FSNAME.NOT_MATCHES}</macro>
-               <value>^(/dev|/sys|/run|/proc|.+/shm$)</value>
+               <value>^(?:/dev|/sys|/run|/proc|.+/shm$)</value>
                <description>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</description>
             </macro>
             <macro>
@@ -1792,17 +1792,17 @@ Template tooling version used: 0.39</description>
             </macro>
             <macro>
                <macro>{$SERVICE.NAME.NOT_MATCHES}</macro>
-               <value>^RemoteRegistry|MMCSS|gupdate|SysmonLog|clr_optimization_v.+|clr_optimization_v.+|sppsvc|gpsvc|Pml Driver HPZ12|Net Driver HPZ12|MapsBroker|IntelAudioService|Intel\(R\) TPM Provisioning Service|dbupdate|DoSvc$</value>
+               <value>^(?:RemoteRegistry|MMCSS|gupdate|SysmonLog|clr_optimization_v.+|clr_optimization_v.+|sppsvc|gpsvc|Pml Driver HPZ12|Net Driver HPZ12|MapsBroker|IntelAudioService|Intel\(R\) TPM Provisioning Service|dbupdate|DoSvc)$</value>
                <description>This macro is used in Service discovery. Can be overridden on the host or linked template level.</description>
             </macro>
             <macro>
                <macro>{$SERVICE.STARTUPNAME.MATCHES}</macro>
-               <value>^automatic|automatic delayed$</value>
+               <value>^(?:automatic|automatic delayed)$</value>
                <description>This macro is used in Service discovery. Can be overridden on the host or linked template level.</description>
             </macro>
             <macro>
                <macro>{$SERVICE.STARTUPNAME.NOT_MATCHES}</macro>
-               <value>^manual|disabled$</value>
+               <value>^(?:manual|disabled)$</value>
                <description>This macro is used in Service discovery. Can be overridden on the host or linked template level.</description>
             </macro>
          </macros>
