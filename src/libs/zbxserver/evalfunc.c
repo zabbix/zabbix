@@ -2364,8 +2364,8 @@ static int	evaluate_FUZZYTIME(zbx_variant_t *value, DC_ITEM *item, const char *p
 		goto out;
 	}
 
-	fuzlow = (int)(ts->sec - arg1);
-	fuzhig = (int)(ts->sec + arg1);
+	fuzlow = (zbx_uint64_t)(ts->sec - arg1);
+	fuzhig = (zbx_uint64_t)(ts->sec + arg1);
 
 	if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
 	{
@@ -2571,8 +2571,8 @@ static int	evaluate_FORECAST(zbx_variant_t *value, DC_ITEM *item, const char *pa
 
 	if (0 < values.values_num)
 	{
-		t = (double *)zbx_malloc(t, values.values_num * sizeof(double));
-		x = (double *)zbx_malloc(x, values.values_num * sizeof(double));
+		t = (double *)zbx_malloc(t, (size_t)values.values_num * sizeof(double));
+		x = (double *)zbx_malloc(x, (size_t)values.values_num * sizeof(double));
 
 		zero_time.sec = values.values[values.values_num - 1].timestamp.sec;
 		zero_time.ns = values.values[values.values_num - 1].timestamp.ns;
@@ -2720,8 +2720,8 @@ static int	evaluate_TIMELEFT(zbx_variant_t *value, DC_ITEM *item, const char *pa
 
 	if (0 < values.values_num)
 	{
-		t = (double *)zbx_malloc(t, values.values_num * sizeof(double));
-		x = (double *)zbx_malloc(x, values.values_num * sizeof(double));
+		t = (double *)zbx_malloc(t, (size_t)values.values_num * sizeof(double));
+		x = (double *)zbx_malloc(x, (size_t)values.values_num * sizeof(double));
 
 		zero_time.sec = values.values[values.values_num - 1].timestamp.sec;
 		zero_time.ns = values.values[values.values_num - 1].timestamp.ns;
@@ -3683,12 +3683,14 @@ static int	evaluate_BASELINE(zbx_variant_t *value, DC_ITEM *item, const char *fu
 	int			ret = FAIL, season_num;
 	char			*period = NULL, *tmp = NULL;
 	zbx_vector_dbl_t	values;
+	zbx_vector_uint64_t	index;
 	double			value_dbl;
 	zbx_time_unit_t		season_unit;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_dbl_create(&values);
+	zbx_vector_uint64_create(&index);
 
 	if (3 != num_param(parameters))
 	{
@@ -3719,10 +3721,10 @@ static int	evaluate_BASELINE(zbx_variant_t *value, DC_ITEM *item, const char *fu
 
 	if (0 == strcmp(func, "wma"))
 	{
-		int	i;
+		int	i, weights = 0;
 
 		if (SUCCEED != zbx_baseline_get_data(item->itemid, item->value_type, ts->sec, period, season_num,
-				season_unit, 1, &values, error))
+				season_unit, 1, &values, &index, error))
 		{
 			goto out;
 		}
@@ -3736,9 +3738,14 @@ static int	evaluate_BASELINE(zbx_variant_t *value, DC_ITEM *item, const char *fu
 		value_dbl = 0;
 
 		for (i = 0; i < values.values_num; i++)
-			value_dbl += values.values[i] * (values.values_num - i);
+		{
+			int	weight = season_num - (int)index.values[i];
 
-		value_dbl /= values.values_num * (values.values_num + 1) / 2;
+			value_dbl += values.values[i] * weight;
+			weights += weight;
+		}
+
+		value_dbl /= weights;
 	}
 	else if (0 == strcmp(func, "dev"))
 	{
@@ -3746,7 +3753,7 @@ static int	evaluate_BASELINE(zbx_variant_t *value, DC_ITEM *item, const char *fu
 		int	i;
 
 		if (SUCCEED != zbx_baseline_get_data(item->itemid, item->value_type, ts->sec, period, season_num,
-				season_unit, 0, &values, error))
+				season_unit, 0, &values, &index, error))
 		{
 			goto out;
 		}
@@ -3787,6 +3794,7 @@ out:
 	zbx_free(tmp);
 	zbx_free(period);
 
+	zbx_vector_uint64_destroy(&index);
 	zbx_vector_dbl_destroy(&values);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));

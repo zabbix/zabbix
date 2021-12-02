@@ -86,6 +86,7 @@ void	zbx_mock_test_entry(void **state)
 	int			skip, season_num;
 	zbx_time_unit_t		season_unit;
 	zbx_vector_dbl_t	values;
+	zbx_vector_uint64_t	index;
 	zbx_mock_handle_t	handle;
 
 	ZBX_UNUSED(state);
@@ -105,15 +106,17 @@ void	zbx_mock_test_entry(void **state)
 	skip = atoi(zbx_mock_get_parameter_string("in.skip"));
 
 	zbx_vector_dbl_create(&values);
+	zbx_vector_uint64_create(&index);
 
 	hout = zbx_mock_get_parameter_handle("out.data");
 
 	if (FAIL == zbx_baseline_get_data(0, ITEM_VALUE_TYPE_FLOAT, ts.sec, period, season_num, season_unit, skip,
-			&values, &error))
+			&values, &index, &error))
 	{
 		fail_msg("failed to get baseline data: %s", error);
 	}
 
+	zbx_vector_uint64_destroy(&index);
 	zbx_vector_dbl_destroy(&values);
 
 	if (ZBX_MOCK_END_OF_VECTOR != zbx_mock_vector_element(hout, &handle))

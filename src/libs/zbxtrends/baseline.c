@@ -36,6 +36,10 @@
  *             skip        - [IN] how many data periods to skip               *
  *             values      - [OUT] the average data period value in each      *
  *                                 season                                     *
+ *             index      - [OUT] the index of returned values, starting      *
+ *                                with 0. It will have values be from 0 to    *
+ *                                <seasons num> + 1 - <skip> with holes for   *
+ *                                periods without data.                       *
  *             error       - [OUT] the error message if parsing failed        *
  *                                                                            *
  * Return value: SUCCEED - data were retrieved successfully                   *
@@ -43,7 +47,8 @@
  *                                                                            *
  ******************************************************************************/
 static int	baseline_get_common_data(zbx_uint64_t itemid, const char *table, time_t now, const char *period,
-		int season_num, zbx_time_unit_t season_unit, int skip, zbx_vector_dbl_t *values, char **error)
+		int season_num, zbx_time_unit_t season_unit, int skip, zbx_vector_dbl_t *values,
+		zbx_vector_uint64_t *index, char **error)
 {
 	int			i, start, end;
 	double			value_dbl;
@@ -71,7 +76,10 @@ static int	baseline_get_common_data(zbx_uint64_t itemid, const char *table, time
 				}
 			}
 			else
+			{
 				zbx_vector_dbl_append(values, value_dbl);
+				zbx_vector_uint64_append(index, (zbx_uint64_t)(i - skip));
+			}
 		}
 
 		tm = tm_now;
@@ -101,6 +109,10 @@ static int	baseline_get_common_data(zbx_uint64_t itemid, const char *table, time
  *             skip       - [IN] how many data periods to skip                *
  *             values     - [OUT] the average data period value in each       *
  *                                season                                      *
+ *             index      - [OUT] the index of returned values, starting      *
+ *                                with 0. It will have values be from 0 to    *
+ *                                <seasons num> + 1 - <skip> with holes for   *
+ *                                periods without data.                       *
  *             error      - [OUT] the error message if parsing failed         *
  *                                                                            *
  * Return value: SUCCEED - data were retrieved successfully                   *
@@ -108,7 +120,7 @@ static int	baseline_get_common_data(zbx_uint64_t itemid, const char *table, time
  *                                                                            *
  ******************************************************************************/
 static int	baseline_get_isoyear_data(zbx_uint64_t itemid, const char *table, time_t now, const char *period,
-		int season_num, int skip, zbx_vector_dbl_t *values, char **error)
+		int season_num, int skip, zbx_vector_dbl_t *values, zbx_vector_uint64_t *index, char **error)
 {
 	int		i, start, end, period_num;
 	time_t		time_tmp;
@@ -143,7 +155,10 @@ static int	baseline_get_isoyear_data(zbx_uint64_t itemid, const char *table, tim
 				}
 			}
 			else
+			{
 				zbx_vector_dbl_append(values, value_dbl);
+				zbx_vector_uint64_append(index, (zbx_uint64_t)(i - skip));
+			}
 		}
 
 		zbx_tm_sub(&tm_end, 1, ZBX_TIME_UNIT_ISOYEAR);
@@ -183,6 +198,10 @@ static int	baseline_get_isoyear_data(zbx_uint64_t itemid, const char *table, tim
  *             skip       - [IN] how many data periods to skip                *
  *             values     - [OUT] the average data period value in each       *
  *                                season                                      *
+ *             index      - [OUT] the index of returned values, starting      *
+ *                                with 0. It will have values be from 0 to    *
+ *                                <seasons num> + 1 - <skip> with holes for   *
+ *                                periods without data.                       *
  *             error      - [OUT] the error message if parsing failed         *
  *                                                                            *
  * Return value: SUCCEED - data were retrieved successfully                   *
@@ -195,7 +214,8 @@ static int	baseline_get_isoyear_data(zbx_uint64_t itemid, const char *table, tim
  *                                                                            *
  ******************************************************************************/
 int	zbx_baseline_get_data(zbx_uint64_t itemid, unsigned char value_type, time_t now, const char *period,
-		int season_num, zbx_time_unit_t season_unit, int skip, zbx_vector_dbl_t *values, char **error)
+		int season_num, zbx_time_unit_t season_unit, int skip, zbx_vector_dbl_t *values,
+		zbx_vector_uint64_t *index, char **error)
 {
 	zbx_time_unit_t	period_unit;
 	int		ret = FAIL;
@@ -235,9 +255,14 @@ int	zbx_baseline_get_data(zbx_uint64_t itemid, unsigned char value_type, time_t 
 	season_num++;
 
 	if (ZBX_TIME_UNIT_WEEK == period_unit && ZBX_TIME_UNIT_YEAR == season_unit)
-		ret = baseline_get_isoyear_data(itemid, table, now, period, season_num, skip, values, error);
+	{
+		ret = baseline_get_isoyear_data(itemid, table, now, period, season_num, skip, values, index, error);
+	}
 	else
-		ret = baseline_get_common_data(itemid, table, now, period, season_num, season_unit, skip, values, error);
+	{
+		ret = baseline_get_common_data(itemid, table, now, period, season_num, season_unit, skip, values,
+				index, error);
+	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s", __func__, zbx_result_string(ret), ZBX_NULL2EMPTY_STR(*error));
 
