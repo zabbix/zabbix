@@ -792,6 +792,9 @@ static int	prometheus_filter_init(zbx_prometheus_filter_t *filter, const char *d
 	memset(filter, 0, sizeof(zbx_prometheus_filter_t));
 	zbx_vector_ptr_create(&filter->labels);
 
+	if (NULL == data)
+		return SUCCEED;
+
 	pos = skip_spaces(data, pos);
 
 	if (SUCCEED == parse_metric(data, pos, &loc))
@@ -1652,8 +1655,8 @@ static int prometheus_aggregate_values(const zbx_vector_ptr_t *rows, const char 
  * Purpose: performs the specified request on rows                            *
  *                                                                            *
  * Parameters: rows    - [IN] the source rows                                 *
- *             request - [IN] the request  (value, label, <function>)         *
- *             output  - [IN] the output template                             *
+ *             request - [IN] the request  (value, label, function)           *
+ *             output  - [IN] the output template/function name               *
  *             value   - [OUT] the result value                               *
  *             error   - [OUT] the error message                              *
  *                                                                            *
@@ -1664,10 +1667,10 @@ static int prometheus_aggregate_values(const zbx_vector_ptr_t *rows, const char 
 static int	prometheus_query_rows(const zbx_vector_ptr_t *rows, const char *request, const char *output,
 		char **value, char **error)
 {
-	if (0 == strcmp(request, "value") || 0 == strcmp(request, "label"))
-		return prometheus_extract_value(rows, output, value, error);
-	else
-		return prometheus_aggregate_values(rows, request, value, error);
+	if (0 == strcmp(request, "function"))
+		return prometheus_aggregate_values(rows, output, value, error);
+
+	return prometheus_extract_value(rows, output, value, error);
 }
 
 /******************************************************************************
@@ -1952,15 +1955,45 @@ static int	prometheus_get_indexed_rows_by_label(zbx_prometheus_t *prom, zbx_prom
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_prometheus_pattern                                           *
+ * Function: prometheus_validate_request                                      *
+ *                                                                            *
+ * Purpose: validate prometheus pattern request and output                    *
+ *                                                                            *
+ * Return value: SUCCEED - valid request and output combination               *
+ *               FAIL    - invalid request and output combination             *
+ *                                                                            *
+ ******************************************************************************/
+static int	prometheus_validate_request(const char *request, const char *output, char **error)
+{
+	if (0 == strcmp(request, "value"))
+	{
+		if ('\0' != *output)
+		{
+			*error = zbx_strdup(NULL, "invalid third parameter");
+			return FAIL;
+		}
+		return SUCCEED;
+	}
+
+	if ('\0' == *output)
+	{
+		*error = zbx_strdup(NULL, "missing third parameter");
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_prometheus_pattern_ex                                        *
  *                                                                            *
  * Purpose: extract value from prometheus cache by the specified filter       *
  *                                                                            *
  * Parameters: data        - [IN] the prometheus cache                        *
  *             fitler_data - [IN] the filter in text format                   *
- *             request     - [IN] the data request - value, label,            *
- *                                <aggregation function>                      *
- *             output      - [IN] the output template                         *
+ *             request     - [IN] the data request - value, label, function   *
+ *             output      - [IN] the output template/function name           *
  *             value       - [OUT] the extracted value                        *
  *             error       - [OUT] the error message                          *
  *                                                                            *
@@ -1987,21 +2020,8 @@ int	zbx_prometheus_pattern_ex(zbx_prometheus_t *prom, const char *filter_data, c
 
 	zbx_vector_ptr_create(&rows);
 
-	if (0 == strcmp(request, "label"))
-	{
-		if ('\0' == *output)
-		{
-			*error = zbx_strdup(NULL, "no output label specified");
-			zbx_free(errmsg);
-			goto cleanup;
-		}
-	}
-	else if ('\0' != *output)
-	{
-		*error = zbx_strdup(NULL, "output can be specified only with label request");
-		zbx_free(errmsg);
-		goto cleanup;
-	}
+	if (SUCCEED != prometheus_validate_request(request, output, error))
+		return FAIL;
 
 	if (SUCCEED != prometheus_get_indexed_rows_by_label(prom, &filter, &prows) || NULL == prows)
 		prows = &prom->rows;
@@ -2014,7 +2034,6 @@ int	zbx_prometheus_pattern_ex(zbx_prometheus_t *prom, const char *filter_data, c
 		zbx_free(errmsg);
 	}
 
-cleanup:
 	prometheus_filter_clear(&filter);
 	zbx_vector_ptr_destroy(&rows);
 out:
@@ -2031,9 +2050,8 @@ out:
  *                                                                            *
  * Parameters: data        - [IN] the prometheus data                         *
  *             fitler_data - [IN] the filter in text format                   *
- *             request     - [IN] the data request - value, label,            *
- *                                <aggregation function>                      *
- *             output      - [IN] the output template                         *
+ *             request     - [IN] the data request - value, label, function   *
+ *             output      - [IN] the output template/function name           *
  *             value       - [OUT] the extracted value                        *
  *             error       - [OUT] the error message                          *
  *                                                                            *
@@ -2060,21 +2078,8 @@ int	zbx_prometheus_pattern(const char *data, const char *filter_data, const char
 
 	zbx_vector_ptr_create(&rows);
 
-	if (0 == strcmp(request, "label"))
-	{
-		if ('\0' == *output)
-		{
-			*error = zbx_strdup(NULL, "no output label specified");
-			zbx_free(errmsg);
-			goto cleanup;
-		}
-	}
-	else if ('\0' != *output)
-	{
-		*error = zbx_strdup(NULL, "output can be specified only with label request");
-		zbx_free(errmsg);
-		goto cleanup;
-	}
+	if (SUCCEED != prometheus_validate_request(request, output, error))
+		return FAIL;
 
 	if (FAIL == prometheus_parse_rows(&filter, data, &rows, NULL, error))
 		goto cleanup;
