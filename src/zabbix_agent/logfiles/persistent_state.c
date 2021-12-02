@@ -750,6 +750,7 @@ void	zbx_update_prep_vec_data(const struct st_logfile *logfile, zbx_uint64_t pro
  * or                                                                         *
  *     {"filename":"/home/zabbix/test.log",                                   *
  *      "mtime":0,                                                            *
+ *      "processed_size":324,                                                 *
  *      "seq":0,                                                              *
  *      "incomplete":0,                                                       *
  *      "copy_of":-1,                                                         *
@@ -757,7 +758,6 @@ void	zbx_update_prep_vec_data(const struct st_logfile *logfile, zbx_uint64_t pro
  *      "ino_lo":17043636,                                                    *
  *      "ino_hi":0,                                                           *
  *      "size":635,                                                           *
- *      "processed_size":324,                                                 *
  *      "md5_block_size":512,                                                 *
  *      "first_block_md5":"7f2d0cf871384671c51359ce8c90e475",                 *
  *      "last_block_offset":123,                                              *
@@ -941,6 +941,9 @@ int	zbx_restore_file_details(const char *str, struct st_logfile **logfiles, int 
 
 	(*logfiles)[0].last_block_offset = last_block_offset;
 	memcpy((*logfiles)[0].last_block_md5, last_block_md5, sizeof(last_block_md5));
+
+	*mtime = mtime_tmp;
+	*processed_size = processed_size_tmp;
 
 	return SUCCEED;
 }

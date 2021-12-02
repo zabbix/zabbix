@@ -4055,19 +4055,45 @@ int	process_log_check(char *server, unsigned short port, zbx_vector_ptr_t *regex
 			if (SUCCEED == zbx_restore_file_details(buf, &metric->logfiles, &metric->logfiles_num,
 					&processed_size_tmp, &mtime_tmp, &err_msg))
 			{
-				if (0 == metric->logfiles_num)	/* only metadata was found */
+				/* If 'lastlogsize' value from server is not equal to 'processed_size' from   */
+				/* persistent file then give priority to persistent file to prevent unwanted  */
+				/* re-reading of log file records. */
+				/* For 'mtime' give priority to persistent file only if server sent a smaller */
+				/* 'mtime' value' (unusual case, it should not happen). The value of 'mtime'  */
+				/* from server larger than 'mtime' from persistent file most likely means     */
+				/* that some other agent instance has analyzed log files up to server-supplied */
+				/* 'mtime' and the current instance needs not to start analysis from 'mtime'  */
+				/* restored from persistent file. */
+
+				if (metric->lastlogsize != processed_size_tmp || metric->mtime < mtime_tmp)
 				{
-					if (metric->lastlogsize != processed_size_tmp || metric->mtime != mtime_tmp)
+					char	*msg = NULL;
+					size_t	msg_alloc = 0, msg_offset = 0;
+
+					zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, "%s(): item \"%s\":"
+							" overriding", __func__, metric->key);
+
+					if (metric->lastlogsize != processed_size_tmp)
 					{
-						zabbix_log(LOG_LEVEL_DEBUG, "%s(): item \"%s\": overriding mtime:"
-								" %d -> %d lastlogsize: " ZBX_FS_UI64 " -> " ZBX_FS_UI64
-								" from persistent file", __func__, metric->key,
-								metric->mtime, mtime_tmp, metric->lastlogsize,
-								processed_size_tmp);
+						zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset,
+								" lastlogsize: " ZBX_FS_UI64 " -> " ZBX_FS_UI64,
+								metric->lastlogsize, processed_size_tmp);
+
+						metric->lastlogsize = processed_size_tmp;
 					}
 
-					metric->lastlogsize = processed_size_tmp;
-					metric->mtime = mtime_tmp;
+					if (metric->mtime < mtime_tmp)
+					{
+						zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset,
+								" mtime: %d -> %d",
+								metric->mtime, mtime_tmp);
+
+						metric->mtime = mtime_tmp;
+					}
+
+					zabbix_log(LOG_LEVEL_WARNING, "%s from persistent file", msg);
+
+					zbx_free(msg);
 				}
 			}
 			else
