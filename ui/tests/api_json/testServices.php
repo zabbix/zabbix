@@ -2267,7 +2267,7 @@ class testServices extends CAPITest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/problem_tags/1/operator": value must be one of '.
-					implode(', ', [SERVICE_TAG_OPERATOR_EQUAL, SERVICE_TAG_OPERATOR_LIKE]).'.'
+					implode(', ', [ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL, ZBX_SERVICE_PROBLEM_TAG_OPERATOR_LIKE]).'.'
 			],
 			[
 				'service' => [
@@ -2280,7 +2280,7 @@ class testServices extends CAPITest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/problem_tags/1/operator": value must be one of '.
-					implode(', ', [SERVICE_TAG_OPERATOR_EQUAL, SERVICE_TAG_OPERATOR_LIKE]).'.'
+					implode(', ', [ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL, ZBX_SERVICE_PROBLEM_TAG_OPERATOR_LIKE]).'.'
 			],
 			[
 				'service' => [
@@ -2349,7 +2349,7 @@ class testServices extends CAPITest {
 					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'problem_tags' => [
-						['operator' => SERVICE_TAG_OPERATOR_EQUAL]
+						['operator' => ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL]
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/problem_tags/1": the parameter "tag" is missing.'
@@ -2373,8 +2373,8 @@ class testServices extends CAPITest {
 					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'problem_tags' => [
-						['tag' => 'foo', 'operator' => SERVICE_TAG_OPERATOR_EQUAL, 'value' => 'bar'],
-						['tag' => 'foo', 'operator' => SERVICE_TAG_OPERATOR_EQUAL, 'value' => 'bar']
+						['tag' => 'foo', 'operator' => ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL, 'value' => 'bar'],
+						['tag' => 'foo', 'operator' => ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL, 'value' => 'bar']
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/problem_tags/2": value (tag, value)=(foo, bar) already exists.'
@@ -2386,8 +2386,8 @@ class testServices extends CAPITest {
 					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'problem_tags' => [
-						['tag' => 'foo', 'operator' => SERVICE_TAG_OPERATOR_LIKE, 'value' => 'bar'],
-						['tag' => 'foo', 'operator' => SERVICE_TAG_OPERATOR_LIKE, 'value' => 'bar']
+						['tag' => 'foo', 'operator' => ZBX_SERVICE_PROBLEM_TAG_OPERATOR_LIKE, 'value' => 'bar'],
+						['tag' => 'foo', 'operator' => ZBX_SERVICE_PROBLEM_TAG_OPERATOR_LIKE, 'value' => 'bar']
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/problem_tags/2": value (tag, value)=(foo, bar) already exists.'
@@ -2399,8 +2399,8 @@ class testServices extends CAPITest {
 					'showsla' => SERVICE_SHOW_SLA_OFF,
 					'sortorder' => 0,
 					'problem_tags' => [
-						['tag' => 'foo', 'operator' => SERVICE_TAG_OPERATOR_EQUAL, 'value' => 'bar'],
-						['tag' => 'foo', 'operator' => SERVICE_TAG_OPERATOR_LIKE, 'value' => 'bar']
+						['tag' => 'foo', 'operator' => ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL, 'value' => 'bar'],
+						['tag' => 'foo', 'operator' => ZBX_SERVICE_PROBLEM_TAG_OPERATOR_LIKE, 'value' => 'bar']
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/problem_tags/2": value (tag, value)=(foo, bar) already exists.'

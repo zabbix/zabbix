@@ -116,7 +116,7 @@ $filter->addFilterTab(_('Filter'), [
 				CTagFilterFieldHelper::getTagFilterField([
 					'evaltype' => $data['filter']['evaltype'],
 					'tags' => $data['filter']['tags'] ?: [
-						['tag' => '', 'value' => '', 'operator' => SERVICE_TAG_OPERATOR_LIKE]
+						['tag' => '', 'value' => '', 'operator' => ZBX_SERVICE_PROBLEM_TAG_OPERATOR_LIKE]
 					]
 				])
 			])

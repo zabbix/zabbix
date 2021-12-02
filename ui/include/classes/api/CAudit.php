@@ -81,6 +81,7 @@ class CAudit {
 	public const RESOURCE_AUTH_TOKEN = 45;
 	public const RESOURCE_SCHEDULED_REPORT = 46;
 	public const RESOURCE_HA_NODE = 47;
+	public const RESOURCE_SLA = 48;
 
 	/**
 	 * Audit details actions.
@@ -125,6 +126,7 @@ class CAudit {
 		self::RESOURCE_SCHEDULED_REPORT => 'report',
 		self::RESOURCE_SCRIPT => 'scripts',
 		self::RESOURCE_SETTINGS => 'config',
+		self::RESOURCE_SLA => 'sla',
 		self::RESOURCE_TEMPLATE_DASHBOARD => 'dashboard',
 		self::RESOURCE_USER => 'users',
 		self::RESOURCE_USER_GROUP => 'usrgrp'
@@ -167,6 +169,7 @@ class CAudit {
 		self::RESOURCE_SCHEDULED_REPORT => 'name',
 		self::RESOURCE_SCRIPT => 'name',
 		self::RESOURCE_SETTINGS => null,
+		self::RESOURCE_SLA => 'name',
 		self::RESOURCE_TEMPLATE_DASHBOARD => 'name',
 		self::RESOURCE_USER => 'username',
 		self::RESOURCE_USER_GROUP => 'name'
@@ -199,6 +202,7 @@ class CAudit {
 		self::RESOURCE_SCHEDULED_REPORT => 'report',
 		self::RESOURCE_SCRIPT => 'script',
 		self::RESOURCE_SETTINGS => 'settings',
+		self::RESOURCE_SLA => 'sla',
 		self::RESOURCE_TEMPLATE_DASHBOARD => 'templatedashboard',
 		self::RESOURCE_USER => 'user',
 		self::RESOURCE_USER_GROUP => 'usergroup'
@@ -282,7 +286,9 @@ class CAudit {
 		'service.problem_tags' => 'service_problem_tag',
 		'service.status_rules' => 'service_status_rule',
 		'service.tags' => 'service_tag',
-		'service.times' => 'services_times',
+		'sla.service_tags' => 'sla_service_tag',
+		'sla.schedule' => 'sla_schedule',
+		'sla.excluded_downtimes' => 'sla_excluded_downtime',
 		'script.parameters' => 'script_param',
 		'templatedashboard.pages' => 'dashboard_page',
 		'templatedashboard.pages.widgets' => 'widget',
@@ -342,7 +348,9 @@ class CAudit {
 		'service.problem_tags' => 'service_problem_tagid',
 		'service.status_rules' => 'service_status_ruleid',
 		'service.tags' => 'servicetagid',
-		'service.times' => 'timeid',
+		'sla.service_tags' => 'sla_service_tagid',
+		'sla.schedule' => 'sla_scheduleid',
+		'sla.excluded_downtimes' => 'sla_excluded_downtimeid',
 		'templatedashboard.pages' => 'dashboard_pageid',
 		'templatedashboard.pages.widgets' => 'widgetid',
 		'templatedashboard.pages.widgets.fields' => 'widget_fieldid',

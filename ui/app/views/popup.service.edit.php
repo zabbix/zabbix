@@ -85,10 +85,10 @@ $service_tab = (new CFormGrid())
 							(new CSelect('problem_tags[#{rowNum}][operator]'))
 								->addClass('js-problem-tag-input')
 								->addOptions(CSelect::createOptionsFromArray([
-									SERVICE_TAG_OPERATOR_EQUAL => _('Equals'),
-									SERVICE_TAG_OPERATOR_LIKE => _('Contains')
+									ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL => _('Equals'),
+									ZBX_SERVICE_PROBLEM_TAG_OPERATOR_LIKE => _('Contains')
 								]))
-								->setValue(SERVICE_TAG_OPERATOR_EQUAL),
+								->setValue(ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL),
 							(new CTextBox('problem_tags[#{rowNum}][value]', '#{value}', false,
 								DB::getFieldLength('service_problem_tag', 'value')
 							))

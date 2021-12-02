@@ -41,7 +41,7 @@ abstract class CControllerUserEditGeneral extends CController {
 
 		$this->timezones = [
 			TIMEZONE_DEFAULT => CDateTimeZoneHelper::getDefaultDateTimeZone()
-		] + (new CDateTimeZoneHelper())->getAllDateTimeZones();
+		] + CDateTimeZoneHelper::getAllDateTimeZones();
 	}
 
 	/**

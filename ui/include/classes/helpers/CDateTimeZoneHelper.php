@@ -29,18 +29,21 @@ class CDateTimeZoneHelper {
 	protected static $list;
 
 	/**
-	 * Returns  formatted list of supported time zones.
+	 * Returns formatted list of supported time zones.
 	 *
 	 * @return array
 	 */
-	public function getAllDateTimeZones(): array {
-		if (!self::$list) {
+	public static function getAllDateTimeZones(): array {
+		if (self::$list === null) {
 			self::prepareDateTimeZones();
 		}
 
-		return array_map(function($tz) {
-			return $tz['formatted'];
-		}, self::$list);
+		return array_map(
+			static function (array $tz): string {
+				return $tz['formatted'];
+			},
+			self::$list
+		);
 	}
 
 	/**

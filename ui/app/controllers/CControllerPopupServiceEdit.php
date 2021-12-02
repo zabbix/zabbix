@@ -189,7 +189,7 @@ class CControllerPopupServiceEdit extends CController {
 					'times' => $this->service['times'],
 					'tags' => $this->service['tags'] ?: [['tag' => '', 'value' => '']],
 					'problem_tags' => $this->service['problem_tags']
-						?: [['tag' => '', 'operator' => SERVICE_TAG_OPERATOR_EQUAL, 'value' => '']],
+						?: [['tag' => '', 'operator' => ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL, 'value' => '']],
 					'advanced_configuration' => $this->service['status_rules']
 						|| $this->service['propagation_rule'] != $defaults['propagation_rule']
 						|| $this->service['propagation_value'] != $defaults['propagation_value']
@@ -223,7 +223,9 @@ class CControllerPopupServiceEdit extends CController {
 					'goodsla' => $defaults['goodsla'],
 					'times' => [],
 					'tags' => [['tag' => '', 'value' => '']],
-					'problem_tags' => [['tag' => '', 'operator' => SERVICE_TAG_OPERATOR_EQUAL, 'value' => '']],
+					'problem_tags' => [
+						['tag' => '', 'operator' => ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL, 'value' => '']
+					],
 					'advanced_configuration' => false,
 					'status_rules' => [],
 					'propagation_rule' => $defaults['propagation_rule'],

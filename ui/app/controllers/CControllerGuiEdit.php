@@ -31,7 +31,7 @@ class CControllerGuiEdit extends CController {
 
 		$this->timezones = [
 			ZBX_DEFAULT_TIMEZONE => CDateTimeZoneHelper::getSystemDateTimeZone()
-		] + (new CDateTimeZoneHelper())->getAllDateTimeZones();
+		] + CDateTimeZoneHelper::getAllDateTimeZones();
 	}
 
 	protected function checkInput() {
