@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/testLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/testGoAgentDataCollection.php';
 require_once dirname(__FILE__).'/testItemState.php';
 require_once dirname(__FILE__).'/testEscalations.php';
-require_once dirname(__FILE__).'/testTriggerTest.php';
+require_once dirname(__FILE__).'/testTriggerStatus.php';
 
 class IntegrationTests {
 	public static function suite() {
