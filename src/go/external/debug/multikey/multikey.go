@@ -20,22 +20,33 @@
 package main
 
 import (
-	"fmt"
-	"net"
-	"time"
+	"errors"
 
-	"github.com/natefinch/npipe"
+	"zabbix.com/pkg/plugin"
 )
 
-func getListener(socket string) (listener net.Listener, err error) {
-	listener, err = npipe.Listen(socket)
-	if err != nil {
-		err = fmt.Errorf(
-			"failed to create listener for external plugins with socket path, %s, %s", socket, err.Error(),
-		)
+// Plugin -
+type Plugin struct {
+	plugin.Base
+}
 
-		return
+var impl Plugin
+
+func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+	switch key {
+	case "debug.external.multikeyOne":
+		return "debug first test response", nil
+	case "debug.external.multikeyTwo":
+		return "debug second test response", nil
+	default:
+		return "", errors.New("Unsupported metric")
 	}
+}
 
-	return
+func init() {
+	plugin.RegisterMetrics(
+		&impl, "DebugMultikey",
+		"debug.external.multikeyOne", "Returns first test value.",
+		"debug.external.multikeyTwo", "Returns second test value.",
+	)
 }

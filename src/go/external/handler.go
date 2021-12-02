@@ -21,6 +21,7 @@ package external
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net"
 	"os"
@@ -46,6 +47,7 @@ const (
 
 type handler struct {
 	name          string
+	accessor      plugin.Accessor
 	socket        string
 	registerStart bool
 	connection    net.Conn
@@ -57,7 +59,9 @@ func NewHandler(name string) (h handler, err error) {
 	h.name = name
 
 	if len(os.Args) < socketArg {
-		panic("no socket provided")
+		err = errors.New("no socket provided")
+
+		return
 	}
 
 	h.socket = os.Args[1]
@@ -70,7 +74,9 @@ func NewHandler(name string) (h handler, err error) {
 
 	h.registerStart, err = strconv.ParseBool(os.Args[2])
 	if err != nil {
-		panic(fmt.Sprintf("failed to parse third parameter %s", err.Error()))
+		err = fmt.Errorf("failed to parse third parameter %s", err.Error())
+
+		return
 	}
 
 	return
@@ -82,8 +88,10 @@ func (h *handler) Execute() error {
 		return err
 	}
 
-	err = h.start()
+	h.accessor, err = plugin.GetByName(h.name)
 	if err != nil {
+		h.Errf("failed to get accessor for external plugin %s, %s", h.name, err.Error())
+
 		return err
 	}
 
@@ -96,7 +104,7 @@ func (h *handler) run() {
 	for {
 		err := h.handle()
 		if err != nil {
-			h.Errf(err.Error())
+			h.Errf("failed to handle request for external plugin %s, %s", h.name, err.Error())
 		}
 	}
 }
@@ -107,11 +115,16 @@ func (h *handler) handle() error {
 		return err
 	}
 
-	h.Tracef("Plugin %s executing %s", h.name, shared.GetRequestName(reqType))
+	h.Tracef("plugin %s executing %s", h.name, shared.GetRequestName(reqType))
 
 	switch reqType {
 	case shared.RegisterRequestType:
 		err = h.register(data)
+		if err != nil {
+			return err
+		}
+	case shared.StartRequestType:
+		err = h.start()
 		if err != nil {
 			return err
 		}
@@ -136,22 +149,13 @@ func (h *handler) handle() error {
 		return fmt.Errorf("unknown request recivied: %d", reqType)
 	}
 
-	h.Tracef("Plugin %s executed %s", h.name, shared.GetRequestName(reqType))
+	h.Tracef("plugin %s executed %s", h.name, shared.GetRequestName(reqType))
 
 	return nil
 }
 
 func (h *handler) start() error {
-	if h.registerStart {
-		return nil
-	}
-
-	acc, err := plugin.GetByName(h.name)
-	if err != nil {
-		return err
-	}
-
-	p, ok := acc.(plugin.Runner)
+	p, ok := h.accessor.(plugin.Runner)
 	if !ok {
 		return nil
 	}
@@ -161,24 +165,17 @@ func (h *handler) start() error {
 	return nil
 }
 
-func (h *handler) stop() error {
+func (h *handler) stop() {
 	if h.registerStart {
-		return nil
+		return
 	}
 
-	acc, err := plugin.GetByName(h.name)
-	if err != nil {
-		return err
-	}
-
-	p, ok := acc.(plugin.Runner)
+	p, ok := h.accessor.(plugin.Runner)
 	if !ok {
-		return nil
+		return
 	}
 
 	p.Stop()
-
-	return nil
 }
 
 func (h *handler) register(data []byte) error {
@@ -204,11 +201,7 @@ func (h *handler) register(data []byte) error {
 		metrics = append(metrics, metric.Description)
 	}
 
-	interfaces, err := h.getInterfaces()
-	if err != nil {
-		return err
-	}
-
+	interfaces := h.getInterfaces()
 	response.Name = h.name
 	response.Metrics = metrics
 	response.Interfaces = interfaces
@@ -232,12 +225,8 @@ func (h *handler) validate(data []byte) error {
 	}
 
 	response := createEmptyValidateResponse(req.Id)
-	acc, err := plugin.GetByName(h.name)
-	if err != nil {
-		return err
-	}
 
-	p, ok := acc.(plugin.Configurator)
+	p, ok := h.accessor.(plugin.Configurator)
 	if !ok {
 		panic("plugin does not implement Configurator interface")
 	}
@@ -257,17 +246,13 @@ func (h *handler) configure(data []byte) error {
 		return err
 	}
 
-	acc, err := plugin.GetByName(h.name)
-	if err != nil {
-		return err
-	}
-
-	p, ok := acc.(plugin.Configurator)
+	p, ok := h.accessor.(plugin.Configurator)
 	if !ok {
 		panic("plugin does not implement Configurator interface")
 	}
 
 	p.Configure(req.GlobalOptions, req.PrivateOptions)
+
 	return nil
 }
 
@@ -278,12 +263,7 @@ func (h *handler) export(data []byte) error {
 		return err
 	}
 
-	acc, err := plugin.GetByName(h.name)
-	if err != nil {
-		return err
-	}
-
-	p, ok := acc.(plugin.Exporter)
+	p, ok := h.accessor.(plugin.Exporter)
 	if !ok {
 		panic("plugin does not implement Exporter interface")
 	}
@@ -298,42 +278,29 @@ func (h *handler) export(data []byte) error {
 }
 
 func (h *handler) terminate() {
-	err := h.stop()
-	if err != nil {
-		h.Errf(fmt.Sprintf("failed to execute stop: %s\n", err.Error()))
-	}
-
+	h.stop()
 	os.Exit(0)
 }
 
-func (h *handler) getInterfaces() (uint32, error) {
+func (h *handler) getInterfaces() uint32 {
 	var interfaces uint32
-	acc, err := plugin.GetByName(h.name)
-	if err != nil {
-		return interfaces, err
-	}
 
-	_, ok := acc.(plugin.Exporter)
+	_, ok := h.accessor.(plugin.Exporter)
 	if ok {
 		interfaces |= shared.Exporter
 	}
 
-	_, ok = acc.(plugin.Configurator)
+	_, ok = h.accessor.(plugin.Configurator)
 	if ok {
 		interfaces |= shared.Configurator
 	}
 
-	_, ok = acc.(plugin.Runner)
+	_, ok = h.accessor.(plugin.Runner)
 	if ok {
 		interfaces |= shared.Runner
 	}
 
-	_, ok = acc.(plugin.Collector)
-	if ok {
-		interfaces |= shared.Collector
-	}
-
-	return interfaces, nil
+	return interfaces
 }
 
 func (h *handler) Tracef(format string, args ...interface{}) {

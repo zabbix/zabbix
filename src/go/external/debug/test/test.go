@@ -37,5 +37,5 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, "DebugExternalEmpty", "debug.external.test", "Returns test string.")
+	plugin.RegisterMetrics(&impl, "DebugEmpty", "debug.external.test", "Returns test string.")
 }

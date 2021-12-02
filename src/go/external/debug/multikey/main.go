@@ -21,21 +21,20 @@ package main
 
 import (
 	"fmt"
-	"net"
-	"time"
 
-	"github.com/natefinch/npipe"
+	"zabbix.com/external"
 )
 
-func getListener(socket string) (listener net.Listener, err error) {
-	listener, err = npipe.Listen(socket)
+func main() {
+	h, err := external.NewHandler(impl.Name())
 	if err != nil {
-		err = fmt.Errorf(
-			"failed to create listener for external plugins with socket path, %s, %s", socket, err.Error(),
-		)
-
-		return
+		panic(fmt.Sprintf("failed to create external plugin handler %s", err.Error()))
 	}
 
-	return
+	impl.Logger = &h
+
+	err = h.Execute()
+	if err != nil {
+		panic(fmt.Sprintf("failed to execute external plugin handler %s", err.Error()))
+	}
 }

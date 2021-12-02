@@ -24,7 +24,6 @@ import (
 	"fmt"
 	"net"
 	"os"
-	"strings"
 	"time"
 
 	"zabbix.com/internal/agent"
@@ -38,7 +37,13 @@ func initExternalPlugins(options *agent.AgentOptions) (string, error) {
 		return "", nil
 	}
 
-	socket, timeout := parseConfig()
+	timeout := parseTimeout()
+	socket := agent.Options.ExternalPluginsSocket
+	err := removeSocket(socket)
+	if err != nil {
+		return "", err
+	}
+
 	listener, err := getListener(socket)
 	if err != nil {
 		return "", err
@@ -59,7 +64,7 @@ func initExternalPlugins(options *agent.AgentOptions) (string, error) {
 
 func initExternalPlugin(p *external.Plugin, options *agent.AgentOptions) (name string, err error) {
 	p.Initial = true
-	p.Start()
+	p.ExecutePlugin()
 	defer p.Stop()
 
 	var resp *shared.RegisterResponse
@@ -74,6 +79,7 @@ func initExternalPlugin(p *external.Plugin, options *agent.AgentOptions) (name s
 
 	name = resp.Name
 
+	p.SetBrokerName(name)
 	p.Interfaces = resp.Interfaces
 	p.Params = resp.Metrics
 	p.Initial = false
@@ -106,16 +112,7 @@ func createAccessor(path, socket string, timeout time.Duration, listener net.Lis
 	return accessor
 }
 
-func parseConfig() (socket string, timeout time.Duration) {
-	var sockBasePath string
-	if agent.Options.ExternalPluginsSocket == "" {
-		sockBasePath = getDefaultSocketPath()
-	} else if !strings.HasSuffix(agent.Options.ExternalPluginsSocket, string(os.PathSeparator)) {
-		sockBasePath = agent.Options.ExternalPluginsSocket + string(os.PathSeparator)
-	}
-
-	socket = createSocket(sockBasePath)
-
+func parseTimeout() (timeout time.Duration) {
 	if agent.Options.ExternalPluginTimeout == 0 {
 		timeout = time.Second * time.Duration(agent.Options.Timeout)
 

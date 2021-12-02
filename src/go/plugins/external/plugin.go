@@ -25,12 +25,15 @@ import (
 	"net"
 	"os/exec"
 	"strconv"
+	"sync"
 	"time"
 
 	"zabbix.com/pkg/shared"
 
 	"zabbix.com/pkg/plugin"
 )
+
+var startLock sync.Mutex
 
 // Plugin -
 type Plugin struct {
@@ -45,11 +48,17 @@ type Plugin struct {
 	broker     *pluginBroker
 }
 
+func (p *Plugin) SetBrokerName(name string) {
+	p.broker.pluginName = name
+}
+
 func (p *Plugin) Register() (response *shared.RegisterResponse, err error) {
 	return p.broker.register()
 }
 
-func (p *Plugin) Start() {
+func (p *Plugin) ExecutePlugin() {
+	startLock.Lock()
+	defer startLock.Unlock()
 	err := exec.Command(p.Path, p.Socket, strconv.FormatBool(p.Initial)).Start()
 	if err != nil {
 		panic(fmt.Sprintf("failed to start external plugin %s, %s", p.Path, err.Error()))
@@ -63,6 +72,12 @@ func (p *Plugin) Start() {
 	p.broker = New(conn, p.Timeout, p.Socket)
 
 	p.broker.run()
+}
+
+func (p *Plugin) Start() {
+	if shared.ImplementsRunner(p.Interfaces) {
+		p.broker.start()
+	}
 }
 
 func (p *Plugin) Stop() {
@@ -83,7 +98,12 @@ func (p *Plugin) Stop() {
 }
 
 func (p *Plugin) Configure(globalOptions *plugin.GlobalOptions, privateOptions interface{}) {
-	p.broker.configure(globalOptions, privateOptions)
+	p.ExecutePlugin()
+	p.SetBrokerName(p.Name())
+
+	if shared.ImplementsConfigurator(p.Interfaces) {
+		p.broker.configure(globalOptions, privateOptions)
+	}
 }
 
 func (p *Plugin) Validate(privateOptions interface{}) error {

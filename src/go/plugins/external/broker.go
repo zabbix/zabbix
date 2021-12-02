@@ -3,6 +3,7 @@ package external
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net"
 	"time"
 
@@ -14,13 +15,13 @@ import (
 const queSize = 100
 
 type pluginBroker struct {
-	socket   string
-	timeout  time.Duration
-	conn     net.Conn
-	requests map[uint32]chan interface{}
-
-	errx chan error
-	log  chan interface{}
+	pluginName string
+	socket     string
+	timeout    time.Duration
+	conn       net.Conn
+	requests   map[uint32]chan interface{}
+	errx       chan error
+	log        chan interface{}
 	// channel to handle agent->plugin requests
 	tx chan *request
 	// channel to handle plugin->agent requests/responses
@@ -39,6 +40,10 @@ type request struct {
 }
 
 // p.socket = fmt.Sprintf("%s%d", socketBasePath, time.Now().UnixNano())
+
+func (b *pluginBroker) SetPluginName(name string) {
+
+}
 
 func New(conn net.Conn, timeout time.Duration, socket string) *pluginBroker {
 	broker := pluginBroker{
@@ -70,7 +75,13 @@ func (b *pluginBroker) handleConnection() {
 			var reg shared.RegisterResponse
 			err := json.Unmarshal(data, &reg)
 			if err != nil {
-				panic(err)
+				panic(
+					fmt.Errorf(
+						"failed to read register response for external plugin %s, %s",
+						b.pluginName,
+						err.Error(),
+					),
+				)
 			}
 
 			id = reg.Id
@@ -80,7 +91,13 @@ func (b *pluginBroker) handleConnection() {
 			var log shared.LogRequest
 			err := json.Unmarshal(data, &log)
 			if err != nil {
-				panic(err)
+				panic(
+					fmt.Errorf(
+						"failed to read log request response for external plugin %s, %s",
+						b.pluginName,
+						err.Error(),
+					),
+				)
 			}
 
 			// plugin notifications don't have responses, so use 0 id
@@ -90,7 +107,13 @@ func (b *pluginBroker) handleConnection() {
 			var valid shared.ValidateResponse
 			err := json.Unmarshal(data, &valid)
 			if err != nil {
-				panic(err)
+				panic(
+					fmt.Errorf(
+						"failed to read validate response for external plugin %s, %s",
+						b.pluginName,
+						err.Error(),
+					),
+				)
 			}
 
 			id = valid.Id
@@ -99,7 +122,13 @@ func (b *pluginBroker) handleConnection() {
 			var export shared.ExportResponse
 			err := json.Unmarshal(data, &export)
 			if err != nil {
-				panic(err)
+				panic(
+					fmt.Errorf(
+						"failed to read export response for external plugin %s, %s",
+						b.pluginName,
+						err.Error(),
+					),
+				)
 			}
 
 			id = export.Id
@@ -152,22 +181,32 @@ func (b *pluginBroker) runBackground() {
 				lastid++
 				switch v := r.data.(type) {
 				case *shared.ExportRequest:
+					go b.timeoutRequest(lastid)
 					v.Id = lastid
 				case *shared.RegisterRequest:
+					go b.timeoutRequest(lastid)
 					v.Id = lastid
 				case *shared.ValidateRequest:
+					go b.timeoutRequest(lastid)
 					v.Id = lastid
 				case *shared.TerminateRequest:
 					v.Id = lastid
 				case *shared.ConfigureRequest:
 					v.Id = lastid
+				case *shared.StartRequest:
+					v.Id = lastid
 				}
 
 				b.requests[lastid] = r.out
-				go b.timeoutRequest(lastid)
 				err := shared.Write(b.conn, r.data)
 				if err != nil {
-					panic(err)
+					panic(
+						fmt.Errorf(
+							"failed to write request for external plugin %s, %s",
+							b.pluginName,
+							err.Error(),
+						),
+					)
 				}
 			}
 		}
@@ -178,27 +217,32 @@ func (b *pluginBroker) handleLogs() {
 	for u := range b.log {
 		switch v := u.(type) {
 		case shared.LogRequest:
-			handleLog(v)
+			b.handleLog(v)
 		default:
 			log.Errf("Failed to log message from external plugins, unknown request type.")
 		}
 	}
 }
 
-func handleLog(l shared.LogRequest) {
+func (b *pluginBroker) handleLog(l shared.LogRequest) {
+	msg := l.Message
+	if b.pluginName != "" {
+		msg = fmt.Sprintf("[%s]%s", b.pluginName, msg)
+	}
+
 	switch l.Severity {
 	case log.Info:
-		log.Infof(l.Message)
+		log.Infof(msg)
 	case log.Crit:
-		log.Critf(l.Message)
+		log.Critf(msg)
 	case log.Err:
-		log.Errf(l.Message)
+		log.Errf(msg)
 	case log.Warning:
-		log.Warningf(l.Message)
+		log.Warningf(msg)
 	case log.Debug:
-		log.Debugf(l.Message)
+		log.Debugf(msg)
 	case log.Trace:
-		log.Tracef(l.Message)
+		log.Tracef(msg)
 	}
 }
 
@@ -206,6 +250,18 @@ func (b *pluginBroker) run() {
 	go b.handleLogs()
 	go b.handleConnection()
 	go b.runBackground()
+}
+
+func (b *pluginBroker) start() {
+	r := request{
+		data: &shared.StartRequest{
+			Common: shared.Common{
+				Type: shared.StartRequestType,
+			},
+		},
+	}
+
+	b.tx <- &r
 }
 
 func (b *pluginBroker) stop() {

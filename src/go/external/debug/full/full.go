@@ -53,6 +53,7 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, private interface{}) {
 
 func (p *Plugin) Validate(private interface{}) (err error) {
 	p.Debugf("executing Validate")
+
 	return
 }
 
@@ -66,5 +67,5 @@ func (p *Plugin) Stop() {
 
 func init() {
 	impl.options.Interval = 1
-	plugin.RegisterMetrics(&impl, "DebugExternalFull", "debug.external.full", "Returns test value.")
+	plugin.RegisterMetrics(&impl, "DebugFull", "debug.external.full", "Returns test value.")
 }

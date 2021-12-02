@@ -28,24 +28,22 @@ const Version = "1.0"
 const NonRequiredID = 0
 
 const (
-	Exporter = iota + 1
+	Exporter = 1 << iota
 	Configurator
 	Runner
-	Collector
 )
 
 const (
 	LogRequestType = iota + 1
 	RegisterRequestType
 	RegisterResponseType
+	StartRequestType
 	TerminateRequestType
 	ExportRequestType
 	ExportResponseType
 	ConfigureRequestType
 	ValidateRequestType
 	ValidateResponseType
-	CollectorRequestType
-	CollectorResponseType
 	PeriodRequestType
 	PeriodResponseType
 )
@@ -53,19 +51,18 @@ const (
 type request int
 
 var toString = map[request]string{
-	LogRequestType:        "Log Request",
-	RegisterRequestType:   "Register Request",
-	RegisterResponseType:  "Register Response",
-	TerminateRequestType:  "Terminate Request",
-	ExportRequestType:     "Export Request",
-	ExportResponseType:    "Export Response",
-	ConfigureRequestType:  "Configure Request",
-	ValidateRequestType:   "Validate Request",
-	ValidateResponseType:  "Validate Response",
-	CollectorRequestType:  "Collector Request",
-	CollectorResponseType: "Collector Response",
-	PeriodRequestType:     "Period Request",
-	PeriodResponseType:    "Period Response",
+	LogRequestType:       "Log Request",
+	RegisterRequestType:  "Register Request",
+	RegisterResponseType: "Register Response",
+	StartRequestType:     "Start Request",
+	TerminateRequestType: "Terminate Request",
+	ExportRequestType:    "Export Request",
+	ExportResponseType:   "Export Response",
+	ConfigureRequestType: "Configure Request",
+	ValidateRequestType:  "Validate Request",
+	ValidateResponseType: "Validate Response",
+	PeriodRequestType:    "Period Request",
+	PeriodResponseType:   "Period Response",
 }
 
 func GetRequestName(reqType uint32) string {
@@ -82,10 +79,6 @@ func ImplementsExporter(in uint32) bool {
 
 func ImplementsRunner(in uint32) bool {
 	return in&Runner != 0
-}
-
-func ImplementsCollector(in uint32) bool {
-	return in&Collector != 0
 }
 
 type Common struct {
@@ -120,6 +113,10 @@ type ValidateRequest struct {
 type ValidateResponse struct {
 	Common
 	Error string `json:"error,omitempty"`
+}
+
+type StartRequest struct {
+	Common
 }
 
 type TerminateRequest struct {
