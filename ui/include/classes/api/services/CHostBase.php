@@ -973,7 +973,6 @@ abstract class CHostBase extends CApiService {
 			}
 			$mas[$row['templateid']][$row['hostid']] = 1;
 		}
-		$targetIdCount = count($targetIds);
 		$commonDBTemplateIds = [];
 		foreach ($mas as $templateId => $targetList) {
 			if (count($targetList) == count($targetIds)) {
