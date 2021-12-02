@@ -326,7 +326,7 @@ zabbix_export:
               name: 'F5 BIG-IP: Changes have been made on the device not sync to the device group: {ITEM.VALUE}'
               opdata: '{ITEM.LASTVALUE}'
               priority: WARNING
-              description: 'The device is inconsistent with the device group, requires user intervention'
+              description: 'Changes have been made on the device not sync to the device group, requires user intervention'
               manual_close: 'YES'
             -
               uuid: eb3517626c6d425f9b88a2bc35641ab6
@@ -599,7 +599,7 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#CERT.NAME},.1.3.6.1.4.1.3375.2.1.15.1.2.1.1]'
           key: bigip.cert.discovery
-          delay: 1h
+          delay: 1d
           description: 'A table containing certificate configuration.'
           item_prototypes:
             -
@@ -608,17 +608,13 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.15.1.2.1.5.{#SNMPINDEX}'
               key: 'bigip.cert.expiration.date[{#CERT.NAME}]'
-              delay: 6h
+              delay: 12h
               history: 7d
+              trends: '0'
               units: unixtime
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
                 The expiration date of the certificate in unix time.
-              preprocessing:
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 12h
               tags:
                 -
                   tag: Application
@@ -626,16 +622,11 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 015ce3f5d10749aca1d871a1d26c51c5
-                  expression: 'last(/F5 Big-IP SNMP/bigip.cert.expiration.date[{#CERT.NAME}]) + 86400 * {$BIGIP.CERT.MIN} < now()'
+                  expression: 'last(/F5 Big-IP SNMP/bigip.cert.expiration.date[{#CERT.NAME}]) - 86400 * {$BIGIP.CERT.MIN} < now()'
                   name: 'F5 BIG-IP: Less than {$BIGIP.CERT.MIN} days left until the certificate expires ({#CERT.NAME})'
                   opdata: 'Expires: {ITEM.VALUE}'
                   priority: WARNING
                   description: 'Please check certificate'
-          preprocessing:
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 12h
         -
           uuid: 1bab90f9f015432c817cabebb98453af
           name: 'Chassis fan discovery'
