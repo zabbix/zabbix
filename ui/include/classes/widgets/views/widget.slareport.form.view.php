@@ -50,6 +50,30 @@ $field_serviceids = CWidgetHelper::getService($fields['serviceids'], $data['capt
 );
 $form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['serviceids']), $field_serviceids);
 $scripts[] = $field_serviceids->getPostJS();
+$scripts[] = '
+	jQuery("#'.$fields['serviceids']->getName().'_").multiSelect("getSelectButton").addEventListener("click", () => {
+		const exclude_serviceids = [];
+
+		for (const service of jQuery("#'.$fields['serviceids']->getName().'_").multiSelect("getData")) {
+			exclude_serviceids.push(service.id);
+		}
+
+		const overlay = PopUp("popup.services", {
+			title: '.json_encode(_('Add services')).',
+			exclude_serviceids
+		}, "services", document.activeElement);
+
+		overlay.$dialogue[0].addEventListener("dialogue.submit", (e) => {
+			const data = [];
+
+			for (const service of e.detail) {
+				data.push({id: service.serviceid, name: service.name});
+			}
+
+			jQuery("#'.$fields['serviceids']->getName().'_").multiSelect("addData", data);
+		});
+	});
+';
 
 // Show periods.
 $form_list->addRow(

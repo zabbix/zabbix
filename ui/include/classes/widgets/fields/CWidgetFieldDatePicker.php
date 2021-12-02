@@ -35,6 +35,6 @@ class CWidgetFieldDatePicker extends CWidgetField {
 
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
 		$this->setValidationRules(['type' => API_RANGE_TIME, 'length' => 255]);
-		$this->setDefault('now');
+		$this->setDefault('');
 	}
 }

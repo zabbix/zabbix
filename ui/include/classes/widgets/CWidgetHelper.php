@@ -385,11 +385,16 @@ class CWidgetHelper {
 	 * @return CMultiSelect
 	 */
 	public static function getService($field, $captions, $form_name) {
-		return self::getMultiselectField($field, $captions, $form_name, 'services', [
-				'srctbl' => 'services',
-				'srcfld1' => 'serviceid',
-				'srcfld2' => 'name'
-			] + $field->getFilterParameters());
+		return (new CMultiSelect([
+			'name' => $field->getName().($field->isMultiple() ? '[]' : ''),
+			'object_name' => 'services',
+			'multiple' => $field->isMultiple(),
+			'data' => $captions,
+			'custom_select' => true,
+			'add_post_js' => false
+		]))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired(self::isAriaRequired($field));
 	}
 
 	/**

@@ -1766,8 +1766,12 @@ class CApiInputValidator {
 	private static function validateRangeTime($rule, &$data, $path, &$error) {
 		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
 
-		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
 			return false;
+		}
+
+		if (($flags & API_NOT_EMPTY) == 0 && $data === '') {
+			return true;
 		}
 
 		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
