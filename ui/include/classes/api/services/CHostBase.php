@@ -308,7 +308,7 @@ abstract class CHostBase extends CApiService {
 	}
 
 	/**
-	 * Searches for circular linkages.
+	 * Check whether circular linkage occurs as a result of the given changes in templates links.
 	 *
 	 * @param array $ins_links[<templateid>][<hostid>]
 	 * @param array $del_links[<templateid>][<hostid>]
@@ -388,12 +388,12 @@ abstract class CHostBase extends CApiService {
 	}
 
 	/**
-	 * Searches for circular linkages for specific template.
+	 * Recursively check whether given template to link forms a circular linkage.
 	 *
-	 * @param array  $links[<templateid>][<hostid>]  The list of linkages.
-	 * @param string $templateid                     ID of the template to check circular linkages.
+	 * @param array  $links[<templateid>][<hostid>]
+	 * @param string $templateid
 	 * @param array  $hostids[<hostid>]
-	 * @param array  $links_path                     The path of circular linkage. Collected during the checks.
+	 * @param array  $links_path                     Circular linkage path, collected performing the check.
 	 *
 	 * @return bool
 	 */
@@ -502,27 +502,7 @@ abstract class CHostBase extends CApiService {
 
 		foreach ($hostids as $hostid => $foo) {
 			if (self::doubleLinkageExists($links, $hostid, $parent_templateid)) {
-				if ($this instanceof CTemplate) {
-					$hostid = self::getDoubleLinkageHost($links, $_ins_links, $hostid, $parent_templateid,
-						$ins_templateid
-					);
-				}
-				else {
-					$ins_templateid = null;
-
-					foreach ($links[$hostid] as $templateid => $foo) {
-						if (!array_key_exists($templateid, $ins_links)
-								|| !array_key_exists($hostid, $ins_links[$templateid])) {
-							continue;
-						}
-
-						if (array_key_exists($templateid, $links)
-								&& self::isDoubleLinkageTemplate($links, $templateid, $parent_templateid)) {
-							$ins_templateid = $templateid;
-							break;
-						}
-					}
-				}
+				$hostid = self::getDoubleLinkageHost($links, $_ins_links, $hostid, $parent_templateid, $ins_templateid);
 
 				$objects = DB::select('hosts', [
 					'output' => ['host', 'status', 'flags'],
@@ -552,7 +532,7 @@ abstract class CHostBase extends CApiService {
 	 *
 	 * @param array       $links[<hostid>][<templateid>]
 	 * @param string      $hostid
-	 * @param string|null $parent_templateid
+	 * @param string|null $parent_templateid              ID of double linked template, retrieved performing the check.
 	 * @param array       $templateids
 	 *
 	 * @return bool
@@ -585,14 +565,14 @@ abstract class CHostBase extends CApiService {
 	}
 
 	/**
-	 * Get ID of the template to which is requested to link the other template, and as the result of this link the
-	 * double linkage occurs.
+	 * Get ID of the object to which is requested to link a template, that results a double linkage.
 	 *
 	 * @param array       $links[<hostid>][<templateid]
 	 * @param array       $ins_links[<hostid>][<templateid>]
 	 * @param string      $hostid
 	 * @param string      $parent_templateid
-	 * @param string|null $ins_templateid
+	 * @param string|null $ins_templateid                     ID of template, requested to be linked to the found host,
+	 *                                                        retrieved performing the check.
 	 *
 	 * @return string
 	 */
@@ -618,7 +598,7 @@ abstract class CHostBase extends CApiService {
 					continue;
 				}
 
-				if (array_key_exists($templateid, $links)
+				if (bccomp($templateid, $parent_templateid) != 0 && array_key_exists($templateid, $links)
 						&& self::isDoubleLinkageTemplate($links, $templateid, $parent_templateid)) {
 					$ins_templateid = $templateid;
 					break;
@@ -630,8 +610,7 @@ abstract class CHostBase extends CApiService {
 	}
 
 	/**
-	 * Check whether the given template is the template that was requested to be linked, but due to which the double
-	 * linkage was detected.
+	 * Check whether the given template is requested to be linked and results a double linkage.
 	 *
 	 * @param array  $links
 	 * @param string $templateid
