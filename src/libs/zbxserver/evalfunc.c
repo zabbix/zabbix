@@ -3712,10 +3712,9 @@ static int	evaluate_BASELINE(zbx_variant_t *value, DC_ITEM *item, const char *fu
 	}
 	zbx_free(tmp);
 
-	if (SUCCEED != get_function_parameter_str(parameters, 3, &tmp) ||
-			0 >= (season_num = atoi(tmp)))
+	if (SUCCEED != get_function_parameter_str(parameters, 3, &tmp) || 0 >= (season_num = atoi(tmp)))
 	{
-		*error = zbx_strdup(*error, "invalid forth parameter");
+		*error = zbx_strdup(*error, "invalid fourth parameter");
 		goto out;
 	}
 
