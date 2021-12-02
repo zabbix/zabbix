@@ -111,22 +111,22 @@
 </script>
 
 <script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-custom-prometheus-pattern">
-   <?= (new CTextBox('preprocessing[#{rowNum}][params][0]', ''))
-		->setAttribute('placeholder', '#{placeholder_0}').
-	(new CSelect('preprocessing[#{rowNum}][params][1]'))
-		->addOptions(CSelect::createOptionsFromArray([
-			ZBX_PREPROC_PROMETHEUS_VALUE => _('value'),
-			ZBX_PREPROC_PROMETHEUS_LABEL => _('label'),
-			ZBX_PREPROC_PROMETHEUS_SUM => 'sum',
-			ZBX_PREPROC_PROMETHEUS_MIN => 'min',
-			ZBX_PREPROC_PROMETHEUS_MAX => 'max',
-			ZBX_PREPROC_PROMETHEUS_AVG => 'avg',
-			ZBX_PREPROC_PROMETHEUS_COUNT => 'count'
-		]))
-		->addClass('js-preproc-param-prometheus-pattern-function').
-	(new CTextBox('preprocessing[#{rowNum}][params][2]', ''))
-		->setAttribute('placeholder', '#{placeholder_2}')
-		->setEnabled(false)
+	<?= (new CTextBox('preprocessing[#{rowNum}][params][0]', ''))
+			->setAttribute('placeholder', '#{placeholder_0}').
+		(new CSelect('preprocessing[#{rowNum}][params][1]'))
+			->addOptions(CSelect::createOptionsFromArray([
+				ZBX_PREPROC_PROMETHEUS_VALUE => _('value'),
+				ZBX_PREPROC_PROMETHEUS_LABEL => _('label'),
+				ZBX_PREPROC_PROMETHEUS_SUM => 'sum',
+				ZBX_PREPROC_PROMETHEUS_MIN => 'min',
+				ZBX_PREPROC_PROMETHEUS_MAX => 'max',
+				ZBX_PREPROC_PROMETHEUS_AVG => 'avg',
+				ZBX_PREPROC_PROMETHEUS_COUNT => 'count'
+			]))
+			->addClass('js-preproc-param-prometheus-pattern-function').
+		(new CTextBox('preprocessing[#{rowNum}][params][2]', ''))
+			->setAttribute('placeholder', '#{placeholder_2}')
+			->setEnabled(false)
 	?>
 </script>
 

@@ -1336,7 +1336,12 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 			case ZBX_PREPROC_PROMETHEUS_PATTERN:
 				$step_param_2_value = (array_key_exists('params', $step) && array_key_exists(2, $step['params']))
 					? $step['params'][2]
-					: ZBX_PREPROC_PROMETHEUS_VALUE;
+					: '';
+
+				if ($step_param_1_value === ZBX_PREPROC_PROMETHEUS_FUNCTION) {
+					$step_param_1_value = $step_param_2_value;
+					$step_param_2_value = '';
+				}
 
 				$params = [
 					$step_param_0->setAttribute('placeholder',

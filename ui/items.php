@@ -625,6 +625,14 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					}
 					unset($param);
 
+					if (in_array($step['params'][1], [
+						ZBX_PREPROC_PROMETHEUS_SUM, ZBX_PREPROC_PROMETHEUS_MIN, ZBX_PREPROC_PROMETHEUS_MAX,
+						ZBX_PREPROC_PROMETHEUS_AVG, ZBX_PREPROC_PROMETHEUS_COUNT
+					])) {
+						$step['params'][2] = $step['params'][1];
+						$step['params'][1] = ZBX_PREPROC_PROMETHEUS_FUNCTION;
+					}
+
 					if (!array_key_exists(2, $step['params'])) {
 						$step['params'][2] = '';
 					}

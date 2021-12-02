@@ -1519,30 +1519,44 @@ abstract class CItemGeneral extends CApiService {
 							}
 
 							if (!in_array($params[1], [ZBX_PREPROC_PROMETHEUS_VALUE, ZBX_PREPROC_PROMETHEUS_LABEL,
-								ZBX_PREPROC_PROMETHEUS_SUM, ZBX_PREPROC_PROMETHEUS_MIN, ZBX_PREPROC_PROMETHEUS_MAX,
-								ZBX_PREPROC_PROMETHEUS_AVG, ZBX_PREPROC_PROMETHEUS_COUNT
+								ZBX_PREPROC_PROMETHEUS_FUNCTION
 							])) {
 								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-									'params', _('invalid Prometheus function')
+									'params', _('invalid aggregation method')
 								));
 							}
 
-							if ($params[2] !== '') {
-								if ($params[1] !== ZBX_PREPROC_PROMETHEUS_LABEL) {
-									self::exception(ZBX_API_ERROR_PARAMETERS,
-										_s('Incorrect value for field "%1$s": %2$s.',
-											'params', _('invalid Prometheus output')
-										)
-									);
-								}
+							switch ($params[1]) {
+								case ZBX_PREPROC_PROMETHEUS_VALUE:
+									if ($params[2] !== '') {
+										self::exception(ZBX_API_ERROR_PARAMETERS,
+											_s('Incorrect value for field "%1$s": %2$s.',
+												'params', _('invalid Prometheus output')
+											));
+									}
+									break;
 
-								if ($prometheus_output_parser->parse($params[1]) != CParser::PARSE_SUCCESS) {
-									self::exception(ZBX_API_ERROR_PARAMETERS,
-										_s('Incorrect value for field "%1$s": %2$s.',
-											'params', _('invalid Prometheus output')
-										)
-									);
-								}
+								case ZBX_PREPROC_PROMETHEUS_LABEL:
+									if ($prometheus_output_parser->parse($params[2]) != CParser::PARSE_SUCCESS) {
+										self::exception(ZBX_API_ERROR_PARAMETERS,
+											_s('Incorrect value for field "%1$s": %2$s.',
+												'params', _('invalid Prometheus output')
+											)
+										);
+									}
+									break;
+
+								case ZBX_PREPROC_PROMETHEUS_FUNCTION:
+									if (!in_array($params[2], [ZBX_PREPROC_PROMETHEUS_SUM, ZBX_PREPROC_PROMETHEUS_MIN,
+										ZBX_PREPROC_PROMETHEUS_MAX, ZBX_PREPROC_PROMETHEUS_AVG,
+										ZBX_PREPROC_PROMETHEUS_COUNT
+									])) {
+										self::exception(ZBX_API_ERROR_PARAMETERS,
+											_s('Incorrect value for field "%1$s": %2$s.',
+											'params', _('unsupported Prometheus function')
+										));
+									}
+									break;
 							}
 						}
 						// Prometheus to JSON can be empty and has only one parameter.
