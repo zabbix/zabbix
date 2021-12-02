@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-11T08:05:43Z'
+  date: '2021-11-26T10:20:42Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -10,7 +10,7 @@ zabbix_export:
       uuid: d0ef7d659a8f4beaaabfc4b6134e737a
       template: 'PostgreSQL by Zabbix agent 2'
       name: 'PostgreSQL by Zabbix agent 2'
-      description: 'Template tooling version used: 0.38'
+      description: 'Template tooling version used: 0.39'
       groups:
         -
           name: Templates/Databases
@@ -386,10 +386,12 @@ zabbix_export:
         -
           uuid: b98d2328694f44598f2177b3f93d4b90
           name: 'PostgreSQL: Cache hit'
+          type: CALCULATED
           key: 'pgsql.cache.hit["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
           history: 7d
           value_type: FLOAT
           units: '%'
+          params: 'last(//pgsql.dbstat.sum.blks_hit.rate) * 100 / (last(//pgsql.dbstat.sum.blks_hit.rate) + last(//pgsql.dbstat.sum.blks_read.rate))'
           tags:
             -
               tag: Application
@@ -617,7 +619,7 @@ zabbix_export:
           trends: '0'
           status: DISABLED
           value_type: TEXT
-          description: 'Execute custom queries from file *.sql'
+          description: 'Execute custom queries from file *.sql (check for option Plugins.Postgres.CustomQueriesPath at agent configuration)'
           tags:
             -
               tag: Application
@@ -813,6 +815,10 @@ zabbix_export:
                 - $.numbackends
           master_item:
             key: 'pgsql.dbstat.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: 'PostgreSQL: DB {#DBNAME}'
         -
           uuid: 96cb6b388b2c480ead1568293dd81e70
           name: 'Dbstat: Number temp bytes'
@@ -1206,7 +1212,31 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.write
+                - $.count
+          master_item:
+            key: 'pgsql.wal.stat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+          tags:
+            -
+              tag: Application
+              value: PostgreSQL
+        -
+          uuid: 0e58a74b8a2d47d28f596196405b22b5
+          name: 'WAL: Bytes received'
+          type: DEPENDENT
+          key: pgsql.wal.receive
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'WAL receive in bytes'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.receive
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: 'pgsql.wal.stat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
@@ -1418,9 +1448,15 @@ zabbix_export:
                   parameters:
                     - '$[''{#DBNAME}''].checksum_failures'
                 -
+                  type: MATCHES_REGEX
+                  parameters:
+                    - '^\d*$'
+                -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '-1'
               master_item:
                 key: 'pgsql.dbstat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
               tags:
@@ -2070,15 +2106,15 @@ zabbix_export:
             evaltype: AND
             conditions:
               -
-                macro: '{#APPLICATION}'
+                macro: '{#APPLICATION_NAME}'
                 value: '{$PG.LLD.FILTER.APPLICATION}'
                 formulaid: A
           item_prototypes:
             -
               uuid: 15b83330044042668e618501160c37e4
-              name: 'Application {#APPLICATION}: Replication flush lag'
+              name: 'Application {#APPLICATION_NAME}: Replication flush lag'
               type: DEPENDENT
-              key: 'pgsql.replication.process.flush_lag["{#APPLICATION}"]'
+              key: 'pgsql.replication.process.flush_lag["{#APPLICATION_NAME}"]'
               delay: '0'
               history: 7d
               value_type: FLOAT
@@ -2087,18 +2123,18 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#APPLICATION}''].flush_lag'
+                    - '$[''{#APPLICATION_NAME}''].flush_lag'
               master_item:
                 key: 'pgsql.replication.process["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
               tags:
                 -
                   tag: Application
-                  value: 'PostgreSQL: Application {#APPLICATION}'
+                  value: 'PostgreSQL: Application {#APPLICATION_NAME}'
             -
               uuid: 0daf6e3c7843488cb3160a2bd6b09fbf
-              name: 'Application {#APPLICATION}: Replication replay lag'
+              name: 'Application {#APPLICATION_NAME}: Replication replay lag'
               type: DEPENDENT
-              key: 'pgsql.replication.process.replay_lag["{#APPLICATION}"]'
+              key: 'pgsql.replication.process.replay_lag["{#APPLICATION_NAME}"]'
               delay: '0'
               history: 7d
               value_type: FLOAT
@@ -2107,18 +2143,18 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#APPLICATION}''].replay_lag'
+                    - '$[''{#APPLICATION_NAME}''].replay_lag'
               master_item:
                 key: 'pgsql.replication.process["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
               tags:
                 -
                   tag: Application
-                  value: 'PostgreSQL: Application {#APPLICATION}'
+                  value: 'PostgreSQL: Application {#APPLICATION_NAME}'
             -
               uuid: 2d96bc517d3a4c3fbcae8a7f1436bf72
-              name: 'Application {#APPLICATION}: Replication write lag'
+              name: 'Application {#APPLICATION_NAME}: Replication write lag'
               type: DEPENDENT
-              key: 'pgsql.replication.process.write_lag["{#APPLICATION}"]'
+              key: 'pgsql.replication.process.write_lag["{#APPLICATION_NAME}"]'
               delay: '0'
               history: 7d
               value_type: FLOAT
@@ -2127,35 +2163,35 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#APPLICATION}''].write_lag'
+                    - '$[''{#APPLICATION_NAME}''].write_lag'
               master_item:
                 key: 'pgsql.replication.process["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
               tags:
                 -
                   tag: Application
-                  value: 'PostgreSQL: Application {#APPLICATION}'
+                  value: 'PostgreSQL: Application {#APPLICATION_NAME}'
           graph_prototypes:
             -
               uuid: e79dfe2d436d49da898772a9e7345825
-              name: 'Application {#APPLICATION}: Replication lag'
+              name: 'Application {#APPLICATION_NAME}: Replication lag'
               graph_items:
                 -
                   color: 1A7C11
                   item:
                     host: 'PostgreSQL by Zabbix agent 2'
-                    key: 'pgsql.replication.process.flush_lag["{#APPLICATION}"]'
+                    key: 'pgsql.replication.process.flush_lag["{#APPLICATION_NAME}"]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
                     host: 'PostgreSQL by Zabbix agent 2'
-                    key: 'pgsql.replication.process.replay_lag["{#APPLICATION}"]'
+                    key: 'pgsql.replication.process.replay_lag["{#APPLICATION_NAME}"]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
                     host: 'PostgreSQL by Zabbix agent 2'
-                    key: 'pgsql.replication.process.write_lag["{#APPLICATION}"]'
+                    key: 'pgsql.replication.process.write_lag["{#APPLICATION_NAME}"]'
       macros:
         -
           macro: '{$PG.CONFLICTS.MAX.WARN}'
@@ -2198,16 +2234,16 @@ zabbix_export:
                   fields:
                     -
                       type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: INTEGER
                       name: columns
                       value: '1'
                     -
                       type: INTEGER
                       name: rows
                       value: '1'
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -2222,16 +2258,16 @@ zabbix_export:
                   fields:
                     -
                       type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: INTEGER
                       name: columns
                       value: '1'
                     -
                       type: INTEGER
                       name: rows
                       value: '1'
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -2246,16 +2282,16 @@ zabbix_export:
                   fields:
                     -
                       type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: INTEGER
                       name: columns
                       value: '1'
                     -
                       type: INTEGER
                       name: rows
                       value: '1'
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -2271,16 +2307,16 @@ zabbix_export:
                   fields:
                     -
                       type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: INTEGER
                       name: columns
                       value: '1'
                     -
                       type: INTEGER
                       name: rows
                       value: '1'
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '2'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
