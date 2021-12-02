@@ -579,11 +579,15 @@ void	zbx_tfc_put_value(zbx_uint64_t itemid, int start, int end, zbx_trend_functi
 		ts_time = end;
 		localtime_r(&ts_time, &tm_end);
 
+		if (state == ZBX_TREND_STATE_NODATA)
+			zbx_strlcpy(buf, "none", sizeof(buf));
+		else
+			zbx_print_double(buf, sizeof(buf), value);
+
 		zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " %s(%04d.%02d.%02d/%02d, %04d.%02d.%02d/%02d)"
 				"=%s state:%s", __func__, itemid, tfc_function_str(function), tm_start.tm_year + 1900,
 				tm_start.tm_mon + 1, tm_start.tm_mday, tm_start.tm_hour, tm_end.tm_year + 1900,
-				tm_end.tm_mon + 1, tm_end.tm_mday, tm_end.tm_hour,
-				zbx_print_double(buf, sizeof(buf), value), tfc_state_str(state));
+				tm_end.tm_mon + 1, tm_end.tm_mday, tm_end.tm_hour, buf, tfc_state_str(state));
 	}
 
 	data_local.itemid = itemid;
