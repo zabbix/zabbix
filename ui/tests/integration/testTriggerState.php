@@ -132,7 +132,7 @@ class testTriggerState extends CIntegrationTest {
 	 *
 	 */
 	public function testTriggerState_checkScenario1() {
-		// Relaod configuration cache before sending values
+		// Reload configuration cache before sending values
 		$this->reloadConfigurationCache();
 
 		// Send first value
