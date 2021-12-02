@@ -1871,40 +1871,6 @@ exit:
 
 /******************************************************************************
  *                                                                            *
- * Function: trigger_has_non_maintained_host                                  *
- *                                                                            *
- * Purpose: check if event is trigger on the non-maintained host              *
- *                                                                            *
- ******************************************************************************/
-static int	trigger_has_non_maintained_host(DB_EVENT *event)
-{
-	zbx_hashset_t		hosts;
-	zbx_hashset_iter_t	iter;
-	DC_HOST			*host;
-	int			ret = FAIL;
-
-	zbx_hashset_create(&hosts, 10, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	get_hosts_by_expression(&hosts, event->trigger.expression, event->trigger.recovery_expression);
-	zbx_hashset_iter_reset(&hosts, &iter);
-
-	while (NULL != (host = (DC_HOST *)zbx_hashset_iter_next(&iter)))
-	{
-		if (HOST_MAINTENANCE_STATUS_OFF == host->maintenance_status)
-		{
-			ret = SUCCEED;
-			break;
-		}
-	}
-
-	zbx_hashset_clear(&hosts);
-	zbx_hashset_destroy(&hosts);
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: add_event_suppress_data                                          *
  *                                                                            *
  * Purpose: adds event suppress data for problem events matching active       *
@@ -1958,8 +1924,6 @@ static void	add_event_suppress_data(zbx_vector_ptr_t *event_refs, zbx_vector_uin
 
 				for (i = 0; i < query->maintenances.values_num; i++)
 				{
-					DB_EVENT *event = (DB_EVENT *)event_refs->values[j];
-
 					/* when locking maintenances not-locked (deleted) maintenance ids */
 					/* are removed from the maintenanceids vector                   */
 					if (FAIL == zbx_vector_uint64_bsearch(maintenanceids,
@@ -1973,7 +1937,7 @@ static void	add_event_suppress_data(zbx_vector_ptr_t *event_refs, zbx_vector_uin
 							query->maintenances.values[i].first,
 							(int)query->maintenances.values[i].second);
 
-					event->suppressed = ZBX_PROBLEM_SUPPRESSED_TRUE;
+					((DB_EVENT *)event_refs->values[j])->suppressed = ZBX_PROBLEM_SUPPRESSED_TRUE;
 				}
 			}
 
