@@ -1396,6 +1396,7 @@ static void	sla_clean(sla_t *sla)
 
 #define SERVICE_TIME_TYPE_UPTIME	0
 #define SERVICE_TIME_TYPE_DOWNTIME	1
+#define SERVICE_INITIAL_EFFECTIVE_DATE	946684800
 
 #define SLA_TAG_NAME			"SLA"
 
@@ -1407,7 +1408,8 @@ static int	db_insert_sla(const zbx_vector_sla_t *uniq_slas, const char *default_
 	zbx_uint64_t		slaid;
 	int			ret = FAIL;
 
-	zbx_db_insert_prepare(&db_insert_sla, "sla", "slaid", "name", "status", "slo", "period", "timezone", NULL);
+	zbx_db_insert_prepare(&db_insert_sla, "sla", "slaid", "name", "status", "slo", "effective_date", "period",
+			"timezone", NULL);
 
 	zbx_db_insert_prepare(&db_insert_sla_service_tag, "sla_service_tag", "sla_service_tagid", "slaid", "tag",
 			"value", NULL);
@@ -1428,7 +1430,7 @@ static int	db_insert_sla(const zbx_vector_sla_t *uniq_slas, const char *default_
 		zbx_snprintf(buffer, sizeof(buffer), "%s:" ZBX_FS_UI64, SLA_TAG_NAME, ++slaid);
 
 		zbx_db_insert_add_values(&db_insert_sla, slaid, buffer, sla->showsla, sla->goodsla,
-				ZBX_SLA_PERIOD_WEEKLY, default_timezone);
+				SERVICE_INITIAL_EFFECTIVE_DATE, ZBX_SLA_PERIOD_WEEKLY, default_timezone);
 
 		zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64, slaid);
 		zbx_db_insert_add_values(&db_insert_sla_service_tag, slaid, slaid, SLA_TAG_NAME, buffer);
@@ -1736,7 +1738,20 @@ static int	DBpatch_5050136(void)
 	return DBadd_foreign_key("widget_field", 8, &field);
 }
 
+static int	DBpatch_5050137(void)
+{
+	const ZBX_FIELD	field = {"created_at", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
+	return DBadd_field("services", &field);
+}
+
+static int	DBpatch_5050138(void)
+{
+	if (ZBX_DB_OK <= DBexecute("update services set created_at=%d", SERVICE_INITIAL_EFFECTIVE_DATE))
+		return SUCCEED;
+
+	return FAIL;
+}
 #endif
 
 DBPATCH_START(5050)
@@ -1867,5 +1882,7 @@ DBPATCH_ADD(5050133, 0, 1)
 DBPATCH_ADD(5050134, 0, 1)
 DBPATCH_ADD(5050135, 0, 1)
 DBPATCH_ADD(5050136, 0, 1)
+DBPATCH_ADD(5050137, 0, 1)
+DBPATCH_ADD(5050138, 0, 1)
 
 DBPATCH_END()
