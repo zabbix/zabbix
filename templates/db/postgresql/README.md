@@ -1,5 +1,5 @@
 
-# Template DB PostgreSQL
+# Template DB PostgreSQL by user parameters
 
 ## Overview
 
@@ -63,7 +63,7 @@ This template was tested on PostgreSQL versions 9.6, 10 and 11 on Linux and Wind
     *:5432:postgres:zbx_monitor:<PASSWORD>
     ```
 
-6. Import `template_db_postgresql.xml` to Zabbix and link it to the target host
+6. Import template file to Zabbix and link it to the target host
 
 ## Zabbix configuration
 
