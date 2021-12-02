@@ -1063,3 +1063,11 @@ $widget->show();
 		'interface_types' => itemTypeInterface()
 	]).');
 '))->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'form_name' => $form->getName()
+	]).');
+'))
+	->setOnDocumentReady()
+	->show();

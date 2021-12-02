@@ -108,7 +108,7 @@
 
 			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
 			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostDelete, {once: true});
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
@@ -127,6 +127,23 @@
 				}
 
 				view.refresh();
+			},
+
+			hostDelete(e) {
+				const data = e.detail;
+
+				if ('success' in data) {
+					postMessageOk(data.success.title);
+
+					if ('messages' in data.success) {
+						postMessageDetails('success', data.success.messages);
+					}
+				}
+
+				const curl = new Curl('zabbix.php', false);
+				curl.setArgument('action', 'host.list');
+
+				location.href = curl.getUrl();
 			}
 		}
 	};
