@@ -142,7 +142,12 @@ class testItemTypeSelection extends CWebTest {
 		$this->checkItemTypeSelection($data, self::PROTOTYPE);
 	}
 
-
+	/**
+	 * Function for checking automatic type selection for items and item prototypes.
+	 *
+	 * @param array      $data         data provider
+	 * @param boolean    $prototype    true if it is item prototype, false if item
+	 */
 	public function checkItemTypeSelection($data, $prototype = false) {
 		$link = ($prototype)
 			? 'disc_prototypes.php?form=create&parent_discoveryid='.self::LLDID.'&context=host'
