@@ -221,6 +221,13 @@ class API {
 	}
 
 	/**
+	 * @return CHaNode
+	 */
+	public static function HaNode() {
+		return self::getApi('hanode');
+	}
+
+	/**
 	 * @return CHistory
 	 */
 	public static function History() {
@@ -337,6 +344,13 @@ class API {
 	 */
 	public static function Report() {
 		return self::getApi('report');
+	}
+
+	/**
+	 * @return CRegexp
+	 */
+	public static function Regexp() {
+		return self::getApi('regexp');
 	}
 
 	/**

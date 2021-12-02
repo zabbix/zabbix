@@ -47,6 +47,7 @@ OBJS = \
 	..\..\..\src\libs\zbxcommon\zbxgetopt.o \
 	..\..\..\src\libs\zbxcommon\file.o \
 	..\..\..\src\libs\zbxcommon\time.o \
+	..\..\..\src\libs\zbxcommshigh\comms.o \
 	..\..\..\src\libs\zbxcomms\comms.o \
 	..\..\..\src\libs\zbxcomms\telnet.o \
 	..\..\..\src\libs\zbxcompress\compress.o \
@@ -66,12 +67,12 @@ OBJS = \
 	..\..\..\src\libs\zbxhttp\punycode.o \
 	..\..\..\src\libs\zbxhttp\urlencode.o \
 	..\..\..\src\libs\zbxsysinfo\agent\agent.o \
+	..\..\..\src\libs\zbxsysinfo\agent\modbus.o \
 	..\..\..\src\libs\zbxsysinfo\common\common.o \
 	..\..\..\src\libs\zbxsysinfo\common\cpu.o \
 	..\..\..\src\libs\zbxsysinfo\common\dir.o \
 	..\..\..\src\libs\zbxsysinfo\common\file.o \
 	..\..\..\src\libs\zbxsysinfo\common\http.o \
-	..\..\..\src\libs\zbxsysinfo\common\modbus.o \
 	..\..\..\src\libs\zbxsysinfo\common\net.o \
 	..\..\..\src\libs\zbxsysinfo\common\dns.o \
 	..\..\..\src\libs\zbxsysinfo\common\system.o \
@@ -100,6 +101,7 @@ OBJS = \
 	..\..\..\src\zabbix_agent\cpustat.o \
 	..\..\..\src\zabbix_agent\eventlog.o \
 	..\..\..\src\zabbix_agent\listener.o \
+	..\..\..\src\zabbix_agent\logfiles\persistent_state.o \
 	..\..\..\src\zabbix_agent\logfiles\logfiles.o \
 	..\..\..\src\zabbix_agent\perfstat.o \
 	..\..\..\src\zabbix_agent\stats.o \

@@ -20,8 +20,8 @@
 #ifndef ZABBIX_JSON_PARSER_H
 #define ZABBIX_JSON_PARSER_H
 
-int	zbx_json_validate(const char *start, char **error);
+zbx_int64_t	zbx_json_validate(const char *start, char **error);
 
-int	json_parse_value(const char *start, char **error);
+zbx_int64_t	json_parse_value(const char *start, char **error);
 
 #endif

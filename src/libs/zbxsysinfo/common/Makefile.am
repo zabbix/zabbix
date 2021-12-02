@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-noinst_LIBRARIES = libcommonsysinfo.a
+noinst_LIBRARIES = libcommonsysinfo.a libcommonsysinfo_http.a libcommonsysinfo_httpmetrics.a
 
 libcommonsysinfo_a_CFLAGS = -I@top_srcdir@/src/zabbix_agent/
 
@@ -15,9 +15,6 @@ libcommonsysinfo_a_SOURCES = \
 	dns.h \
 	file.c \
 	file.h \
-	http.c \
-	http.h \
-	modbus.c \
 	net.c \
 	net.h \
 	system.c \
@@ -25,6 +22,10 @@ libcommonsysinfo_a_SOURCES = \
 	zabbix_stats.c \
 	zabbix_stats.h
 
-if HAVE_LIBMODBUS
-libcommonsysinfo_a_CFLAGS += @LIBMODBUS_CFLAGS@
-endif
+libcommonsysinfo_http_a_SOURCES = \
+	http.c \
+	http.h
+
+libcommonsysinfo_httpmetrics_a_SOURCES = \
+	http_metrics.c \
+	http_metrics.h

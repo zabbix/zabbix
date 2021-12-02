@@ -448,6 +448,10 @@ zbx_graph_yaxis_types_t;
 #define ZBX_SNMP_CACHE_RELOAD		"snmp_cache_reload"
 #define ZBX_DIAGINFO			"diaginfo"
 #define ZBX_TRIGGER_HOUSEKEEPER_EXECUTE "trigger_housekeeper_execute"
+#define ZBX_HA_STATUS			"ha_status"
+#define ZBX_HA_REMOVE_NODE		"ha_remove_node"
+#define ZBX_HA_SET_FAILOVER_DELAY	"ha_set_failover_delay"
+#define ZBX_USER_PARAMETERS_RELOAD	"userparameter_reload"
 
 /* value for not supported items */
 #define ZBX_NOTSUPPORTED	"ZBX_NOTSUPPORTED"
@@ -566,8 +570,16 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_REPORTWRITER		34
 #define ZBX_PROCESS_TYPE_SERVICEMAN		35
 #define ZBX_PROCESS_TYPE_PROBLEMHOUSEKEEPER	36
-#define ZBX_PROCESS_TYPE_COUNT		37	/* number of process types */
-#define ZBX_PROCESS_TYPE_UNKNOWN	255
+#define ZBX_PROCESS_TYPE_COUNT			37	/* number of process types */
+
+/* special processes that are not present worker list */
+#define ZBX_PROCESS_TYPE_EXT_FIRST		126
+#define ZBX_PROCESS_TYPE_HA_MANAGER		126
+#define ZBX_PROCESS_TYPE_MAIN			127
+#define ZBX_PROCESS_TYPE_EXT_LAST		127
+
+#define ZBX_PROCESS_TYPE_UNKNOWN		255
+
 const char	*get_process_type_string(unsigned char proc_type);
 int		get_process_type_by_name(const char *proc_type_str);
 
@@ -708,6 +720,10 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 /* action escalation processing mode */
 #define ACTION_PAUSE_SUPPRESSED_FALSE	0	/* process escalation for suppressed events */
 #define ACTION_PAUSE_SUPPRESSED_TRUE	1	/* pause escalation for suppressed events */
+
+/* action escalation canceled notification mode */
+#define ACTION_NOTIFY_IF_CANCELED_TRUE	1	/* notify about canceled escalations for action (default) */
+#define ACTION_NOTIFY_IF_CANCELED_FALSE	0	/* do not notify about canceled escalations for action */
 
 /* max number of retries for alerts */
 #define ALERT_MAX_RETRIES	3
@@ -975,6 +991,10 @@ zbx_task_t;
 #define ZBX_RTC_SECRETS_RELOAD			11
 #define ZBX_RTC_SERVICE_CACHE_RELOAD		12
 #define ZBX_RTC_TRIGGER_HOUSEKEEPER_EXECUTE	13
+#define ZBX_RTC_HA_STATUS			14
+#define ZBX_RTC_HA_REMOVE_NODE			15
+#define ZBX_RTC_HA_SET_FAILOVER_DELAY		16
+#define ZBX_RTC_USER_PARAMETERS_RELOAD		17
 
 typedef enum
 {
@@ -992,7 +1012,7 @@ zbx_httptest_auth_t;
 typedef struct
 {
 	zbx_task_t	task;
-	int		flags;
+	unsigned int	flags;
 	int		data;
 }
 ZBX_TASK_EX;
@@ -1138,7 +1158,7 @@ int	str_n_in_list(const char *list, const char *value, size_t len, char delimite
 char	*str_linefeed(const char *src, size_t maxline, const char *delim);
 void	zbx_strarr_init(char ***arr);
 void	zbx_strarr_add(char ***arr, const char *entry);
-void	zbx_strarr_free(char **arr);
+void	zbx_strarr_free(char ***arr);
 
 #if defined(__GNUC__) || defined(__clang__)
 #	define __zbx_attr_format_printf(idx1, idx2) __attribute__((__format__(__printf__, (idx1), (idx2))))
@@ -1162,7 +1182,12 @@ void	zbx_setproctitle(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 #define ZBX_JAN_2038		2145916800
 #define ZBX_JAN_1970_IN_SEC	2208988800.0	/* 1970 - 1900 in seconds */
 
-#define ZBX_MAX_RECV_DATA_SIZE	(1 * ZBX_GIBIBYTE)
+#define ZBX_MAX_RECV_DATA_SIZE		(1 * ZBX_GIBIBYTE)
+#if defined(_WINDOWS)
+#define ZBX_MAX_RECV_LARGE_DATA_SIZE	(1 * ZBX_GIBIBYTE)
+#else
+#define ZBX_MAX_RECV_LARGE_DATA_SIZE	(__UINT64_C(16) * ZBX_GIBIBYTE)
+#endif
 
 /* max length of base64 data */
 #define ZBX_MAX_B64_LEN		(16 * ZBX_KIBIBYTE)
@@ -1350,6 +1375,7 @@ void	find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, s
 int	zbx_read(int fd, char *buf, size_t count, const char *encoding);
 int	zbx_is_regular_file(const char *path);
 char	*zbx_fgets(char *buffer, int size, FILE *fp);
+int	zbx_write_all(int fd, const char *buf, size_t n);
 
 int	MAIN_ZABBIX_ENTRY(int flags);
 
@@ -1466,7 +1492,6 @@ int	zbx_strcmp_natural(const char *s1, const char *s2);
 
 /* additional token flags */
 #define ZBX_TOKEN_JSON		0x0010000
-#define ZBX_TOKEN_XML		0x0020000
 #define ZBX_TOKEN_REGEXP	0x0040000
 #define ZBX_TOKEN_XPATH		0x0080000
 #define ZBX_TOKEN_REGEXP_OUTPUT	0x0100000
@@ -1705,6 +1730,7 @@ zbx_function_type_t;
 
 zbx_function_type_t	zbx_get_function_type(const char *func);
 int	zbx_query_xpath(zbx_variant_t *value, const char *params, char **errmsg);
+int	zbx_xmlnode_to_json(void *xml_node, char **jstr);
 int	zbx_xml_to_json(char *xml_data, char **jstr, char **errmsg);
 int	zbx_json_to_xml(char *json_data, char **xstr, char **errmsg);
 #ifdef HAVE_LIBXML2
@@ -1747,4 +1773,19 @@ zbx_tag_t;
 
 void	zbx_free_tag(zbx_tag_t *tag);
 
+typedef enum
+{
+	ERR_Z3001 = 3001,
+	ERR_Z3002,
+	ERR_Z3003,
+	ERR_Z3004,
+	ERR_Z3005,
+	ERR_Z3006,
+	ERR_Z3007,
+	ERR_Z3008
+}
+zbx_err_codes_t;
+
+void	zbx_md5buf2str(const md5_byte_t *md5, char *str);
+int	zbx_hex2bin(const unsigned char *p_hex, unsigned char *buf, int buf_len);
 #endif

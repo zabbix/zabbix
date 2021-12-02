@@ -47,7 +47,9 @@
 
 		jQuery('#evaltype').closest('li').toggle(labels.length > 1);
 		jQuery('#condition_label').toggle(!show_formula);
-		jQuery('#formula').toggle(show_formula);
+		jQuery('#formula')
+			.toggle(show_formula)
+			.prop('disabled', !show_formula);
 
 		if (labels.length > 1) {
 			var conditions = [];

@@ -78,7 +78,7 @@ struct	_DC_TRIGGER;
 
 #define TRIGGER_OPDATA_LEN		255
 #define TRIGGER_URL_LEN			255
-#define TRIGGER_DESCRIPTION_LEN		255
+#define TRIGGER_DESCRIPTION_LEN		2048
 #define TRIGGER_EXPRESSION_LEN		2048
 #define TRIGGER_EXPRESSION_LEN_MAX	(TRIGGER_EXPRESSION_LEN + 1)
 #if defined(HAVE_ORACLE)
@@ -205,7 +205,7 @@ struct	_DC_TRIGGER;
 
 #define PROXY_DHISTORY_VALUE_LEN	255
 
-#define ITEM_PREPROC_PARAMS_LEN		255
+#define ITEM_PREPROC_PARAMS_LEN		65535
 
 #define EVENT_NAME_LEN			2048
 
@@ -243,7 +243,6 @@ struct	_DC_TRIGGER;
 			'\0' != *str ? "<>'" : "",		\
 			'\0' != *str ? str   : " is not null",	\
 			'\0' != *str ? "'"   : ""
-
 #else
 #	define	DBbegin_multiple_update(sql, sql_alloc, sql_offset)	do {} while (0)
 #	define	DBend_multiple_update(sql, sql_alloc, sql_offset)	do {} while (0)
@@ -490,6 +489,7 @@ typedef struct
 	unsigned char	pause_suppressed;
 	unsigned char	recovery;
 	unsigned char	status;
+	unsigned char	notify_if_canceled;
 }
 DB_ACTION;
 
@@ -546,9 +546,9 @@ const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname);
 #define DBget_maxid(table)	DBget_maxid_num(table, 1)
 zbx_uint64_t	DBget_maxid_num(const char *tablename, int num);
 
-zbx_uint32_t	DBextract_version(struct zbx_json *json);
-void		DBflush_version_requirements(const char *version);
-int		DBcheck_capabilities(zbx_uint32_t db_version);
+void	DBextract_version_info(struct zbx_db_version_info_t *version_info);
+void	DBflush_version_requirements(const char *version);
+int	DBcheck_capabilities(zbx_uint32_t db_version);
 
 #ifdef HAVE_POSTGRESQL
 char	*zbx_db_get_schema_esc(void);
@@ -693,6 +693,7 @@ int	DBtable_exists(const char *table_name);
 int	DBfield_exists(const char *table_name, const char *field_name);
 #ifndef HAVE_SQLITE3
 int	DBindex_exists(const char *table_name, const char *index_name);
+int	DBpk_exists(const char *table_name);
 #endif
 
 int	DBprepare_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids, char **sql,
@@ -948,4 +949,5 @@ int	zbx_db_trigger_get_itemid(const DB_TRIGGER *trigger, int index, zbx_uint64_t
 void	zbx_db_trigger_get_itemids(const DB_TRIGGER *trigger, zbx_vector_uint64_t *itemids);
 
 int	DBselect_ids_names(const char *sql, zbx_vector_uint64_t *ids, zbx_vector_str_t *names);
+
 #endif

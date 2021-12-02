@@ -57,6 +57,13 @@ class CExpressionValidator extends CValidator {
 	private $math_function_parameters = [];
 
 	/**
+	 * Known math functions along with additional requirements for usage in expressions.
+	 *
+	 * @var array
+	 */
+	private $math_function_expression_rules = [];
+
+	/**
 	 * Provider of information on history functions.
 	 *
 	 * @var CHistFunctionData
@@ -71,6 +78,13 @@ class CExpressionValidator extends CValidator {
 	private $hist_function_parameters = [];
 
 	/**
+	 * Known history functions along with additional requirements for usage in expressions.
+	 *
+	 * @var array
+	 */
+	private $hist_function_expression_rules = [];
+
+	/**
 	 * @param array $options
 	 */
 	public function __construct(array $options = []) {
@@ -78,9 +92,11 @@ class CExpressionValidator extends CValidator {
 
 		$this->math_function_data = new CMathFunctionData(['calculated' => $this->options['calculated']]);
 		$this->math_function_parameters = $this->math_function_data->getParameters();
+		$this->math_function_expression_rules = $this->math_function_data->getExpressionRules();
 
 		$this->hist_function_data = new CHistFunctionData(['calculated' => $this->options['calculated']]);
 		$this->hist_function_parameters = $this->hist_function_data->getParameters();
+		$this->hist_function_expression_rules = $this->hist_function_data->getExpressionRules();
 	}
 
 	/**
@@ -91,7 +107,7 @@ class CExpressionValidator extends CValidator {
 	 * @return bool
 	 */
 	public function validate($tokens) {
-		if (!$this->validateRecursively($tokens, null)) {
+		if (!$this->validateRecursively($tokens, null, null)) {
 			return false;
 		}
 
@@ -109,12 +125,13 @@ class CExpressionValidator extends CValidator {
 	/**
 	 * Validate expression (recursive helper).
 	 *
-	 * @param array $tokens             A hierarchy of tokens.
+	 * @param array      $tokens        A hierarchy of tokens.
 	 * @param array|null $parent_token  Parent token containing the hierarchy of tokens.
+	 * @param int|null   $position      The parameter number in the math function.
 	 *
 	 * @return bool
 	 */
-	private function validateRecursively(array $tokens, ?array $parent_token): bool {
+	private function validateRecursively(array $tokens, ?array $parent_token, ?int $position): bool {
 		foreach ($tokens as $token) {
 			switch ($token['type']) {
 				case CExpressionParserResult::TOKEN_TYPE_MATH_FUNCTION:
@@ -135,23 +152,14 @@ class CExpressionValidator extends CValidator {
 						return false;
 					}
 
-					if ($this->options['calculated']
-							&& CMathFunctionData::isAggregatingHistOnly($token['data']['function'])) {
-						if (count($token['data']['parameters']) != 1
-								|| count($token['data']['parameters'][0]['data']['tokens']) != 1
-								|| $token['data']['parameters'][0]['data']['tokens'][0]['type']
-									!= CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION
-								|| !CHistFunctionData::isAggregatable(
-									$token['data']['parameters'][0]['data']['tokens'][0]['data']['function']
-								)) {
-							$this->setError(_s('incorrect usage of function "%1$s"', $token['data']['function']));
+					if (!$this->validateMathFunctionExpressionRules($token)) {
+						$this->setError(_s('incorrect usage of function "%1$s"', $token['data']['function']));
 
-							return false;
-						}
+						return false;
 					}
 
-					foreach ($token['data']['parameters'] as $parameter) {
-						if (!$this->validateRecursively($parameter['data']['tokens'], $token)) {
+					foreach ($token['data']['parameters'] as $position => $parameter) {
+						if (!$this->validateRecursively($parameter['data']['tokens'], $token, $position)) {
 							return false;
 						}
 					}
@@ -174,7 +182,7 @@ class CExpressionValidator extends CValidator {
 					];
 
 					if ($this->options['calculated']) {
-						$options['aggregating'] = CHistFunctionData::isAggregating($token['data']['function']);
+						$options['aggregating'] = $this->hist_function_data->isAggregating($token['data']['function']);
 					}
 
 					$hist_function_validator = new CHistFunctionValidator($options);
@@ -185,26 +193,123 @@ class CExpressionValidator extends CValidator {
 						return false;
 					}
 
-					if ($options['calculated'] && CHistFunctionData::isAggregatable($token['data']['function'])) {
-						if ($parent_token === null
-								|| $parent_token['type'] != CExpressionParserResult::TOKEN_TYPE_MATH_FUNCTION
-								|| !CMathFunctionData::isAggregating($parent_token['data']['function'])
-								|| count($parent_token['data']['parameters']) != 1
-								|| count($parent_token['data']['parameters'][0]['data']['tokens']) != 1) {
-							$this->setError(_s('incorrect usage of function "%1$s"', $token['data']['function']));
+					if (!$this->validateHistFunctionExpressionRules($token, $parent_token, $position)) {
+						$this->setError(_s('incorrect usage of function "%1$s"', $token['data']['function']));
 
-							return false;
-						}
-					}
-
-					break;
-
-				case CExpressionParserResult::TOKEN_TYPE_EXPRESSION:
-					if (!$this->validateRecursively($token['data']['tokens'], null)) {
 						return false;
 					}
 
 					break;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * @param array $token
+	 *
+	 * @return bool
+	 */
+	private function validateMathFunctionExpressionRules(array $token): bool {
+		if (!array_key_exists($token['data']['function'], $this->math_function_expression_rules)) {
+			return true;
+		}
+
+		foreach ($this->math_function_expression_rules[$token['data']['function']] as $rule_set) {
+			if (array_key_exists('if', $rule_set)) {
+				if (array_key_exists('parameters', $rule_set['if'])) {
+					if (array_key_exists('count', $rule_set['if']['parameters'])
+							&& count($token['data']['parameters']) != $rule_set['if']['parameters']['count']) {
+						continue;
+					}
+
+					if (array_key_exists('min', $rule_set['if']['parameters'])
+							&& count($token['data']['parameters']) < $rule_set['if']['parameters']['min']) {
+						continue;
+					}
+
+					if (array_key_exists('max', $rule_set['if']['parameters'])
+							&& count($token['data']['parameters']) > $rule_set['if']['parameters']['max']) {
+						continue;
+					}
+				}
+			}
+
+			foreach ($rule_set['rules'] as $rule) {
+				switch ($rule['type']) {
+					case 'require_history_child':
+						$tokens = $token['data']['parameters'][$rule['position']]['data']['tokens'];
+
+						if (count($tokens) != 1
+								|| $tokens[0]['type'] != CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION) {
+							return false;
+						}
+
+						if (array_key_exists('in', $rule) && !in_array($tokens[0]['data']['function'], $rule['in'])) {
+							return false;
+						}
+
+						break;
+
+					default:
+						return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * @param array      $token
+	 * @param array|null $parent_token
+	 * @param int|null   $position
+	 *
+	 * @return bool
+	 */
+	private function validateHistFunctionExpressionRules(array $token, ?array $parent_token, ?int $position): bool {
+		if (!array_key_exists($token['data']['function'], $this->hist_function_expression_rules)) {
+			return true;
+		}
+
+		foreach ($this->hist_function_expression_rules[$token['data']['function']] as $rule) {
+			switch ($rule['type']) {
+				case 'require_math_parent':
+					if ($parent_token === null
+							|| $parent_token['type'] != CExpressionParserResult::TOKEN_TYPE_MATH_FUNCTION) {
+						return false;
+					}
+
+					if (array_key_exists('in', $rule) && !in_array($parent_token['data']['function'], $rule['in'])) {
+						return false;
+					}
+
+					if (array_key_exists('parameters', $rule)) {
+						if (array_key_exists('count', $rule['parameters'])
+								&& count($parent_token['data']['parameters']) != $rule['parameters']['count']) {
+							return false;
+						}
+
+						if (array_key_exists('min', $rule['parameters'])
+								&& count($parent_token['data']['parameters']) < $rule['parameters']['min']) {
+							return false;
+						}
+
+						if (array_key_exists('max', $rule['parameters'])
+								&& count($parent_token['data']['parameters']) > $rule['parameters']['max']) {
+							return false;
+						}
+					}
+
+					if (array_key_exists('position', $rule) && $position != $rule['position']) {
+						return false;
+					}
+
+					break;
+
+				default:
+					return false;
 			}
 		}
 

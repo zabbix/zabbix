@@ -221,11 +221,10 @@ static zbx_jsonpath_list_node_t	*jsonpath_list_create_node(size_t size)
  ******************************************************************************/
 static void	jsonpath_list_free(zbx_jsonpath_list_node_t *list)
 {
-	zbx_jsonpath_list_node_t	*item = list;
-
 	while (NULL != list)
 	{
-		item = list;
+		zbx_jsonpath_list_node_t	*item = list;
+
 		list = list->next;
 		zbx_free(item);
 	}
@@ -1133,8 +1132,7 @@ static int	jsonpath_parse_indexes(const char *list, zbx_jsonpath_t *jsonpath, co
 	*next = end;
 	ret = SUCCEED;
 out:
-	if (NULL != head)
-		jsonpath_list_free(head);
+	jsonpath_list_free(head);
 
 	return ret;
 }
@@ -1595,7 +1593,12 @@ static void	jsonpath_set_expression_error(zbx_jsonpath_expression_t *expression)
 	char	*text;
 
 	text = jsonpath_expression_to_str(expression);
-	zbx_set_json_strerror("invalid compiled expression: %s", text);
+
+	if (NULL != text)
+		zbx_set_json_strerror("invalid compiled expression: %s", text);
+	else
+		THIS_SHOULD_NEVER_HAPPEN;
+
 	zbx_free(text);
 }
 

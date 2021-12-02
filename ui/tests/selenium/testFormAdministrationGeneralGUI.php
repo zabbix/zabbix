@@ -437,7 +437,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// Invalid sting values.
+			// Invalid string values.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -933,15 +933,6 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					],
 					'link' => 'templates.php?filter_name=cisco',
 					'row_count' => 2
-				]
-			],
-			[
-				[
-					'field' =>  [
-						'Max number of columns and rows in overview tables' => '5'
-					],
-					'link' => 'overview.php',
-					'row_count' => 6		// Plus 1 info row in table.
 				]
 			],
 			[

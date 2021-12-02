@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2020-10-16T09:33:52Z'
+  date: '2021-11-12T13:20:11Z'
   media_types:
     -
       name: Telegram
@@ -29,7 +29,20 @@ zabbix_export:
             proxy: null,
             parse_mode: null,
         
-            sendMessage: function() {
+            escapeMarkup: function (str, mode) {
+                switch (mode) {
+                    case 'markdown':
+                        return str.replace(/([_*\[`])/g, '\\$&');
+        
+                    case 'markdownv2':
+                        return str.replace(/([_*\[\]()~`>#+\-=|{}.!])/g, '\\$&');
+        
+                    default:
+                        return str;
+                }
+            },
+        
+            sendMessage: function () {
                 var params = {
                     chat_id: Telegram.to,
                     text: Telegram.message,
@@ -70,11 +83,11 @@ zabbix_export:
                         throw response.description;
                     }
                     else {
-                        throw 'Unknown error. Check debug log for more information.'
+                        throw 'Unknown error. Check debug log for more information.';
                     }
                 }
             }
-        }
+        };
         
         try {
             var params = JSON.parse(value);
@@ -89,12 +102,19 @@ zabbix_export:
                 Telegram.proxy = params.HTTPProxy;
             } 
         
-            if (['Markdown', 'HTML', 'MarkdownV2'].indexOf(params.ParseMode) !== -1) {
+            params.ParseMode = params.ParseMode.toLowerCase();
+            
+            if (['markdown', 'html', 'markdownv2'].indexOf(params.ParseMode) !== -1) {
                 Telegram.parse_mode = params.ParseMode;
             }
         
             Telegram.to = params.To;
             Telegram.message = params.Subject + '\n' + params.Message;
+        
+            if (['markdown', 'markdownv2'].indexOf(params.ParseMode) !== -1) {
+                Telegram.message = Telegram.escapeMarkup(Telegram.message, params.ParseMode);
+            }
+        
             Telegram.sendMessage();
         
             return 'OK';

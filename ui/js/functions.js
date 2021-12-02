@@ -264,10 +264,22 @@ function postMessageError(message) {
 }
 
 function postMessageDetails(type, messages) {
-	cookie.create('system-message-details', btoa(JSON.stringify({
+	const encode = function (string) {
+		const uint8 = new TextEncoder().encode(string);
+
+		let result = '';
+		for (let i = 0; i < uint8.byteLength; i++) {
+			result += String.fromCharCode(uint8[i]);
+		}
+
+		return result;
+	};
+
+	const data = JSON.stringify({
 		type: type,
 		messages: messages
-	})));
+	});
+	cookie.create('system-message-details', btoa(encode(data)));
 }
 
 /**
@@ -777,22 +789,24 @@ function makeMessageBox(type, messages, title, show_close_box, show_details) {
 		}
 	}
 
-	if (Array.isArray(messages) && messages.length > 0) {
-		jQuery.map(messages, function(message) {
+	if (messages.length > 0) {
+		if (Array.isArray(messages)) {
+			jQuery.map(messages, function (message) {
+				jQuery('<li>')
+					.text(message)
+					.appendTo($list);
+				return null;
+			});
+
+			$msg_box.append($msg_details);
+		}
+		else {
 			jQuery('<li>')
-				.text(message)
+				.text(messages ? messages : ' ')
 				.appendTo($list);
-			return null;
-		});
 
-		$msg_box.append($msg_details);
-	}
-	else {
-		jQuery('<li>')
-			.text(messages ? messages : ' ')
-			.appendTo($list);
-
-		$msg_box.append($msg_details);
+			$msg_box.append($msg_details);
+		}
 	}
 
 	if (show_close_box) {
@@ -935,30 +949,35 @@ function getFormFields(form) {
 	const fields = {};
 
 	for (let [key, value] of new FormData(form)) {
-		const key_parts = [...key.matchAll(/[^\[\]]*[^\[\]]|\[\]/g)];
+		const key_parts = [...key.matchAll(/[^\[\]]+|\[\]/g)];
 
 		let key_fields = fields;
 
 		for (let i = 0; i < key_parts.length; i++) {
 			const key_part = key_parts[i][0];
 
-			if (i < key_parts.length - 1 && key_parts[i + 1][0] === '[]') {
-				if (!(key_part in key_fields)) {
-					key_fields[key_part] = [];
+			if (i == key_parts.length - 1) {
+				if (key_part === '[]') {
+					key_fields.push(value);
 				}
-
-				key_fields[key_part].push(value);
+				else {
+					key_fields[key_part] = value;
+				}
 
 				break;
 			}
 
-			if (i == key_parts.length - 1) {
-				key_fields[key_part] = value;
+			if (key_part === '[]') {
+				const key_field = key_parts[i + 1][0] === '[]' ? [] : {};
+
+				key_fields.push(key_field);
+				key_fields = key_field;
 			}
 			else {
 				if (!(key_part in key_fields)) {
-					key_fields[key_part] = {};
+					key_fields[key_part] = key_parts[i + 1][0] === '[]' ? [] : {};
 				}
+
 				key_fields = key_fields[key_part];
 			}
 		}

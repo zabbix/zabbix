@@ -16,4 +16,7 @@ libzbxcommon_a_SOURCES = \
 	zbxgetopt.c \
 	time.c \
 	cuid.c
-libzbxcommon_a_CFLAGS = $(ICONV_CFLAGS) $(LIBXML2_CFLAGS)
+
+libzbxcommon_a_CFLAGS = $(ICONV_CFLAGS)
+
+

@@ -175,7 +175,7 @@ static void	get_item_tags_by_expression(const DB_TRIGGER *trigger, zbx_vector_pt
  *                                                                            *
  * Parameters: source   - [IN] event source (EVENT_SOURCE_*)                  *
  *             object   - [IN] event object (EVENT_OBJECT_*)                  *
- *             objectid - [IN] trigger, item ... identificator from database, *
+ *             objectid - [IN] trigger, item ... identifier from database,    *
  *                             depends on source and object                   *
  *             timespec - [IN] event time                                     *
  *             value    - [IN] event value (TRIGGER_VALUE_*,                  *
@@ -317,7 +317,7 @@ DB_EVENT	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t
  * Purpose: add closing OK event for the specified problem event to an array  *
  *                                                                            *
  * Parameters: eventid  - [IN] the problem eventid                            *
- *             objectid - [IN] trigger, item ... identificator from database, *
+ *             objectid - [IN] trigger, item ... identifier from database,    *
  *                             depends on source and object                   *
  *             ts       - [IN] event time                                     *
  *             userid   - [IN] the user closing the problem                   *

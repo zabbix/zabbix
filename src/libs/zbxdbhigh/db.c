@@ -34,8 +34,10 @@
 #	define ZBX_ORACLE_CESU8_CHARSET "UTF8"
 #elif defined(HAVE_MYSQL)
 #	define ZBX_DB_STRLIST_DELIM		','
-#	define ZBX_SUPPORTED_DB_CHARACTER_SET	"utf8,utf8mb3"
-#	define ZBX_SUPPORTED_DB_COLLATION	"utf8_bin,utf8mb3_bin"
+#	define ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8	"utf8,utf8mb3"
+#	define ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB4 	"utf8mb4"
+#	define ZBX_SUPPORTED_DB_CHARACTER_SET		ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8 "," ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB4
+#	define ZBX_SUPPORTED_DB_COLLATION		"utf8_bin,utf8mb3_bin,utf8mb4_bin"
 #endif
 
 typedef struct
@@ -863,20 +865,16 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
 
 /******************************************************************************
  *                                                                            *
- * Function: DBextract_version                                                *
+ * Function: DBextract_version_info                                           *
  *                                                                            *
  * Purpose: connects to DB and tries to detect DB version                     *
  *                                                                            *
  ******************************************************************************/
-zbx_uint32_t	DBextract_version(struct zbx_json *json)
+void	DBextract_version_info(struct zbx_db_version_info_t *version_info)
 {
-	zbx_uint32_t	ret;
-
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
-	ret = zbx_dbms_version_extract(json);
+	zbx_dbms_version_info_extract(version_info);
 	DBclose();
-
-	return ret;
 }
 
 /******************************************************************************
@@ -892,12 +890,8 @@ void	DBflush_version_requirements(const char *version)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
-
 	if (ZBX_DB_OK > DBexecute("update config set dbversion_status='%s'", version))
 		zabbix_log(LOG_LEVEL_CRIT, "Failed to set dbversion_status");
-
-	DBclose();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -1776,7 +1770,7 @@ static int	compare_autoreg_host_by_hostid(const void *d1, const void *d2)
 void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_hostid)
 {
 	zbx_autoreg_host_t	*autoreg_host;
-	zbx_uint64_t		autoreg_hostid;
+	zbx_uint64_t		autoreg_hostid = 0;
 	zbx_db_insert_t		db_insert;
 	int			i, create = 0, update = 0;
 	char			*sql = NULL, *ip_esc, *dns_esc, *host_metadata_esc;
@@ -2314,6 +2308,45 @@ int	DBindex_exists(const char *table_name, const char *index_name)
 
 	return ret;
 }
+
+int	DBpk_exists(const char *table_name)
+{
+	DB_RESULT	result;
+	int		ret;
+
+#if defined(HAVE_MYSQL)
+	result = DBselect(
+			"show index from %s"
+			" where key_name='PRIMARY'",
+			table_name);
+#elif defined(HAVE_ORACLE)
+	char		*name_u;
+
+	name_u = zbx_strdup(NULL, table_name);
+	zbx_strupper(name_u);
+	result = DBselect(
+			"select 1"
+			" from user_constraints"
+			" where constraint_type='P'"
+				" and table_name='%s'",
+			name_u);
+	zbx_free(name_u);
+#elif defined(HAVE_POSTGRESQL)
+	result = DBselect(
+			"select 1"
+			" from information_schema.table_constraints"
+			" where table_name='%s'"
+				" and constraint_type='PRIMARY KEY'"
+				" and constraint_schema='%s'",
+			table_name, zbx_db_get_schema_esc());
+#endif
+	ret = (NULL == DBfetch(result) ? FAIL : SUCCEED);
+
+	DBfree_result(result);
+
+	return ret;
+}
+
 #endif
 
 /******************************************************************************
@@ -2446,8 +2479,19 @@ void	DBcheck_character_set(void)
 		char	*char_set = row[0];
 		char	*collation = row[1];
 
-		if (SUCCEED != str_in_list(ZBX_SUPPORTED_DB_CHARACTER_SET, char_set, ZBX_DB_STRLIST_DELIM))
+		if (SUCCEED == str_in_list(ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8, char_set, ZBX_DB_STRLIST_DELIM))
+		{
+			zbx_db_set_character_set("utf8");
+		}
+		else if (SUCCEED == str_in_list(ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB4, char_set,
+				ZBX_DB_STRLIST_DELIM))
+		{
+			zbx_db_set_character_set("utf8mb4");
+		}
+		else
+		{
 			zbx_warn_char_set(CONFIG_DBNAME, char_set);
+		}
 
 		if (SUCCEED != str_in_list(ZBX_SUPPORTED_DB_COLLATION, collation, ZBX_DB_STRLIST_DELIM))
 		{
@@ -3247,7 +3291,6 @@ int	zbx_db_get_database_type(void)
 {
 	const char	*result_string;
 	DB_RESULT	result;
-	DB_ROW		row;
 	int		ret = ZBX_DB_UNKNOWN;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -3260,7 +3303,7 @@ int	zbx_db_get_database_type(void)
 		goto out;
 	}
 
-	if (NULL != (row = DBfetch(result)))
+	if (NULL != DBfetch(result))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "there is at least 1 record in \"users\" table");
 		ret = ZBX_DB_SERVER;

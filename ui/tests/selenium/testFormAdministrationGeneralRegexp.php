@@ -128,7 +128,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestInputType('name', '1_regexp3');
 		$this->zbxTestClickWait('add');
 
-		$this->zbxTestTextPresent(['Cannot add regular expression', 'Expression cannot be empty']);
+		$this->zbxTestTextPresent(['Cannot add regular expression', 'Invalid parameter "/1/expressions/1/expression": cannot be empty.']);
 	}
 
 	public function testFormAdministrationGeneralRegexp_TestTrue() {

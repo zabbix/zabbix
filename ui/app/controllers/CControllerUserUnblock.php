@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -21,7 +21,7 @@
 
 class CControllerUserUnblock extends CController {
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'userids' =>	'required|array_db users.userid'
 		];
@@ -35,43 +35,32 @@ class CControllerUserUnblock extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_USERS);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$userids = $this->getInput('userids');
 
-		DBstart();
-
-		$users = API::User()->get([
-			'output' => ['username', 'name', 'surname'],
-			'userids' => $userids,
-			'editable' => true
-		]);
-
-		$result = (count($users) == count($userids) && unblock_user_login($userids));
-
-		if ($result) {
-			foreach ($users as $user) {
-				info('User '.$user['username'].' unblocked');
-				// add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_USER,
-				// 	'Unblocked user username ['.$user['username'].'] name ['.$user['name'].'] surname ['.
-				// 	$user['surname'].']'
-				// );
-			}
-		}
-
-		$result = DBend($result);
-
+		$result = API::User()->unblock($userids);
 		$unblocked = count($userids);
 
-		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-			->setArgument('action', 'user.list')
-			->setArgument('page', CPagerHelper::loadPage('user.list', null))
+		$response = new CControllerResponseRedirect(
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'user.list')
+				->setArgument('page', CPagerHelper::loadPage('user.list', null))
 		);
 
 		if ($result) {
+			$users = API::User()->get([
+				'output' => ['username', 'name', 'surname'],
+				'userids' => $userids
+			]);
+
+			foreach ($users as $user) {
+				info(_s('User "%1$s" unblocked.', getUserFullname($user)));
+			}
+
 			$response->setFormData(['uncheck' => '1']);
 			CMessageHelper::setSuccessTitle(_n('User unblocked', 'Users unblocked', $unblocked));
 		}

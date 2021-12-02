@@ -437,7 +437,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// Invalid sting values.
+			// Invalid string values.
 			[
 				[
 					'expected' => TEST_BAD,

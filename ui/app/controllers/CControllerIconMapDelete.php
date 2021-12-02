@@ -23,7 +23,7 @@ class CControllerIconMapDelete extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'iconmapid' => 'required | db icon_map.iconmapid'
+			'iconmapid' => 'required|db icon_map.iconmapid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -42,24 +42,25 @@ class CControllerIconMapDelete extends CController {
 
 		return (bool) API::IconMap()->get([
 			'output' => [],
-			'iconmapids' => (array) $this->getInput('iconmapid'),
+			'iconmapids' => $this->getInput('iconmapid'),
 			'editable' => true
 		]);
 	}
 
 	protected function doAction() {
-		$result = (bool) API::IconMap()->delete((array) $this->getInput('iconmapid'));
+		$result = (bool) API::IconMap()->delete([$this->getInput('iconmapid')]);
 
 		if ($result) {
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'iconmap.list')
+			$response = new CControllerResponseRedirect(
+				(new CUrl('zabbix.php'))->setArgument('action', 'iconmap.list')
 			);
 			CMessageHelper::setSuccessTitle(_('Icon map deleted'));
 		}
 		else {
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'iconmap.edit')
-				->setArgument('iconmapid', $this->getInput('iconmapid'))
+			$response = new CControllerResponseRedirect(
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'iconmap.edit')
+					->setArgument('iconmapid', $this->getInput('iconmapid'))
 			);
 			CMessageHelper::setErrorTitle(_('Cannot delete icon map'));
 		}

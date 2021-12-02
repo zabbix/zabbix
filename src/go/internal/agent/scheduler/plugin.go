@@ -39,6 +39,8 @@ type pluginAgent struct {
 	index int
 	// refcount us used to track plugin usage by clients
 	refcount int
+	// usrprm is used to indicate that plugin is user parameter
+	usrprm bool
 }
 
 // peekTask() returns next task in the queue without removing it from queue or nil

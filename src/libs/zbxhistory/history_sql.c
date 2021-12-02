@@ -181,7 +181,17 @@ static int	sql_writer_flush(void)
 
 	sql_writer_release();
 
-	return ZBX_DB_OK == txn_error ? SUCCEED : FAIL;
+	if (ZBX_DB_OK == txn_error)
+	{
+		return FLUSH_SUCCEED;
+	}
+	else
+	{
+		if (ZBX_DB_FAIL == txn_error && ERR_Z3008 == zbx_db_last_errcode())
+			return FLUSH_DUPL_REJECTED;
+
+		return FLUSH_FAIL;
+	}
 }
 
 /******************************************************************************************************************

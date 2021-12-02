@@ -61,7 +61,7 @@
 #include "../zabbix_server/availability/avail_manager.h"
 #include "zbxvault.h"
 #include "zbxdiag.h"
-
+#include "sighandler.h"
 
 #ifdef HAVE_OPENIPMI
 #include "../zabbix_server/ipmi/ipmi_manager.h"
@@ -248,12 +248,13 @@ char	*CONFIG_DB_TLS_CIPHER_13	= NULL;
 char	*CONFIG_EXPORT_DIR		= NULL;
 char	*CONFIG_EXPORT_TYPE		= NULL;
 int	CONFIG_DBPORT			= 0;
+int	CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS = 0;
 int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
 int	CONFIG_LOG_REMOTE_COMMANDS	= 0;
 int	CONFIG_UNSAFE_USER_PARAMETERS	= 0;
 
 char	*CONFIG_SERVER			= NULL;
-int	CONFIG_SERVER_PORT		= ZBX_DEFAULT_SERVER_PORT;
+int	CONFIG_SERVER_PORT;
 char	*CONFIG_HOSTNAME		= NULL;
 char	*CONFIG_HOSTNAME_ITEM		= NULL;
 
@@ -312,6 +313,8 @@ char	*CONFIG_STATS_ALLOWED_IP	= NULL;
 int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
 int	CONFIG_DOUBLE_PRECISION		= ZBX_DB_DBL_PRECISION_ENABLED;
+
+zbx_vector_ptr_t	zbx_addrs;
 
 volatile sig_atomic_t	zbx_diaginfo_scope = ZBX_DIAGINFO_UNDEFINED;
 
@@ -541,6 +544,16 @@ static void	zbx_set_defaults(void)
 
 	if (NULL == CONFIG_VAULTURL)
 		CONFIG_VAULTURL = zbx_strdup(CONFIG_VAULTURL, "https://127.0.0.1:8200");
+
+	if (0 == CONFIG_SERVER_PORT)
+	{
+		CONFIG_SERVER_PORT = ZBX_DEFAULT_SERVER_PORT;
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "ServerPort parameter is deprecated,"
+					" please specify port in Server parameter separated by ':' instead");
+	}
 }
 
 /******************************************************************************
@@ -583,11 +596,13 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
-	if (ZBX_PROXYMODE_ACTIVE == CONFIG_PROXYMODE && FAIL == is_supported_ip(CONFIG_SERVER) &&
-			FAIL == zbx_validate_hostname(CONFIG_SERVER))
+	if (ZBX_PROXYMODE_ACTIVE == CONFIG_PROXYMODE)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "invalid \"Server\" configuration parameter: '%s'", CONFIG_SERVER);
-		err = 1;
+		if (NULL != strchr(CONFIG_SERVER, ','))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "\"Server\" configuration parameter must not contain comma");
+			err = 1;
+		}
 	}
 	else if (ZBX_PROXYMODE_PASSIVE == CONFIG_PROXYMODE && FAIL == zbx_validate_peer_list(CONFIG_SERVER, &ch_error))
 	{
@@ -659,6 +674,16 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 
 	if (0 != err)
 		exit(EXIT_FAILURE);
+}
+
+static int	proxy_add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vector_str_t *hostnames, void *data)
+{
+	ZBX_UNUSED(hostnames);
+	ZBX_UNUSED(data);
+
+	zbx_addr_copy(&zbx_addrs, addrs);
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -786,6 +811,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"DBPort",			&CONFIG_DBPORT,				TYPE_INT,
 			PARM_OPT,	1024,			65535},
+		{"AllowUnsupportedDBVersions",	&CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS,	TYPE_INT,
+			PARM_OPT,	0,			1},
 		{"DBTLSConnect",		&CONFIG_DB_TLS_CONNECT,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"DBTLSCertFile",		&CONFIG_DB_TLS_CERT_FILE,		TYPE_STRING,
@@ -878,13 +905,29 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 	/* initialize multistrings */
 	zbx_strarr_init(&CONFIG_LOAD_MODULE);
 
-	parse_cfg_file(CONFIG_FILE, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_STRICT);
+	parse_cfg_file(CONFIG_FILE, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_STRICT, ZBX_CFG_EXIT_FAILURE);
 
 	zbx_set_defaults();
 
 	CONFIG_LOG_TYPE = zbx_get_log_type(CONFIG_LOG_TYPE_STR);
 
 	zbx_validate_config(task);
+
+	zbx_vector_ptr_create(&zbx_addrs);
+
+	if (ZBX_PROXYMODE_PASSIVE != CONFIG_PROXYMODE)
+	{
+		char	*error;
+
+		if (FAIL == zbx_set_data_destination_hosts(CONFIG_SERVER, (unsigned short)CONFIG_SERVER_PORT, "Server",
+				proxy_add_serveractive_host_cb, NULL, NULL, &error))
+		{
+			zbx_error("%s", error);
+			exit(EXIT_FAILURE);
+		}
+	}
+
+
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 	zbx_db_validate_config();
 #endif
@@ -902,7 +945,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
  ******************************************************************************/
 static void	zbx_free_config(void)
 {
-	zbx_strarr_free(CONFIG_LOAD_MODULE);
+	zbx_strarr_free(&CONFIG_LOAD_MODULE);
 }
 
 /******************************************************************************
@@ -1017,6 +1060,43 @@ static void	zbx_main_sigusr_handler(int flags)
 		else
 			zbx_diaginfo_scope = 1 << scope;
 	}
+}
+
+static void	zbx_check_db(void)
+{
+	struct zbx_db_version_info_t	db_version_info;
+
+	DBextract_version_info(&db_version_info);
+
+	if (DB_VERSION_NOT_SUPPORTED_ERROR == db_version_info.flag)
+	{
+		if (0 == CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS)
+		{
+			zabbix_log(LOG_LEVEL_ERR, " ");
+			zabbix_log(LOG_LEVEL_ERR, "Unable to start Zabbix proxy due to unsupported %s database server"
+					" version (%s)", db_version_info.database,
+					db_version_info.friendly_current_version);
+			zabbix_log(LOG_LEVEL_ERR, "Must be at least (%s)",
+					db_version_info.friendly_min_supported_version);
+			zabbix_log(LOG_LEVEL_ERR, "Use of supported database version is highly recommended.");
+			zabbix_log(LOG_LEVEL_ERR, "Override by setting AllowUnsupportedDBVersions=1"
+					" in Zabbix proxy configuration file at your own risk.");
+			zabbix_log(LOG_LEVEL_ERR, " ");
+			exit(EXIT_FAILURE);
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_ERR, " ");
+			zabbix_log(LOG_LEVEL_ERR, "Warning! Unsupported %s database server version (%s)",
+					db_version_info.database, db_version_info.friendly_current_version);
+			zabbix_log(LOG_LEVEL_ERR, "Should be at least (%s)",
+					db_version_info.friendly_min_supported_version);
+			zabbix_log(LOG_LEVEL_ERR, "Use of supported database version is highly recommended.");
+			zabbix_log(LOG_LEVEL_ERR, " ");
+		}
+	}
+
+	zbx_free(db_version_info.friendly_current_version);
 }
 
 int	MAIN_ZABBIX_ENTRY(int flags)
@@ -1190,8 +1270,11 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
+	zbx_check_db();
+
 	if (SUCCEED != DBcheck_version())
 		exit(EXIT_FAILURE);
+
 	DBcheck_character_set();
 
 	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_HEARTBEAT_FORKS + CONFIG_DATASENDER_FORKS
@@ -1203,8 +1286,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			+ CONFIG_PREPROCMAN_FORKS + CONFIG_PREPROCESSOR_FORKS + CONFIG_HISTORYPOLLER_FORKS
 			+ CONFIG_AVAILMAN_FORKS;
 
-	threads = (pid_t *)zbx_calloc(threads, threads_num, sizeof(pid_t));
-	threads_flags = (int *)zbx_calloc(threads_flags, threads_num, sizeof(int));
+	threads = (pid_t *)zbx_calloc(threads, (size_t)threads_num, sizeof(pid_t));
+	threads_flags = (int *)zbx_calloc(threads_flags, (size_t)threads_num, sizeof(int));
 
 	if (0 != CONFIG_TRAPPER_FORKS)
 	{
@@ -1322,34 +1405,33 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	}
 
 	zbx_set_sigusr_handler(zbx_main_sigusr_handler);
+	zbx_unset_exit_on_terminate();
 
-	while (-1 == wait(&i))	/* wait for any child to exit */
+	while (ZBX_IS_RUNNING() && -1 == wait(&i))	/* wait for any child to exit */
 	{
 		if (EINTR != errno)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
+			sig_exiting = ZBX_EXIT_FAILURE;
 			break;
 		}
 
 		/* check if the wait was interrupted because of diaginfo remote command */
 		if (ZBX_DIAGINFO_UNDEFINED != zbx_diaginfo_scope)
 		{
-			zbx_diag_log_info(zbx_diaginfo_scope);
+			zbx_diag_log_info((unsigned int)zbx_diaginfo_scope);
 			zbx_diaginfo_scope = ZBX_DIAGINFO_UNDEFINED;
 		}
 	}
 
-	/* all exiting child processes should be caught by signal handlers */
-	THIS_SHOULD_NEVER_HAPPEN;
-
-	zbx_on_exit(FAIL);
+	zbx_on_exit(ZBX_EXIT_STATUS());
 
 	return SUCCEED;
 }
 
 void	zbx_on_exit(int ret)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called");
+	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
 
 	if (NULL != threads)
 	{
@@ -1364,15 +1446,14 @@ void	zbx_on_exit(int ret)
 	zbx_ipc_service_free_env();
 
 	DBconnect(ZBX_DB_CONNECT_EXIT);
-	free_database_cache();
+	free_database_cache(ZBX_SYNC_ALL);
 	free_configuration_cache();
 	DBclose();
 
 	DBdeinit();
 
 	/* free vmware support */
-	if (0 != CONFIG_VMWARE_FORKS)
-		zbx_vmware_destroy();
+	zbx_vmware_destroy();
 
 	free_selfmon_collector();
 	free_proxy_history_lock();
@@ -1383,6 +1464,8 @@ void	zbx_on_exit(int ret)
 			ZABBIX_VERSION, ZABBIX_REVISION);
 
 	zabbix_close_log();
+
+	zbx_locks_destroy();
 
 #if defined(PS_OVERWRITE_ARGV)
 	setproctitle_free_env();

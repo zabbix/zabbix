@@ -64,10 +64,8 @@ extern int	CONFIG_UNREACHABLE_POLLER_FORKS;
 extern int	CONFIG_IPMIPOLLER_FORKS;
 extern int	CONFIG_JAVAPOLLER_FORKS;
 extern int	CONFIG_PINGER_FORKS;
-extern int	CONFIG_UNAVAILABLE_DELAY;
 extern int	CONFIG_UNREACHABLE_PERIOD;
 extern int	CONFIG_UNREACHABLE_DELAY;
-extern int	CONFIG_HISTSYNCER_FORKS;
 extern int	CONFIG_PROXYCONFIG_FREQUENCY;
 extern int	CONFIG_PROXYDATA_FREQUENCY;
 extern int	CONFIG_HISTORYPOLLER_FORKS;
@@ -608,8 +606,12 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned
 void	dc_flush_history(void);
 void	zbx_sync_history_cache(int *values_num, int *triggers_num, int *more);
 void	zbx_log_sync_history_cache_progress(void);
+
+#define ZBX_SYNC_NONE	0
+#define ZBX_SYNC_ALL	1
+
 int	init_database_cache(char **error);
-void	free_database_cache(void);
+void	free_database_cache(int);
 
 #define ZBX_STATS_HISTORY_COUNTER	0
 #define ZBX_STATS_HISTORY_FLOAT_COUNTER	1
@@ -1034,4 +1036,10 @@ int	zbx_hc_check_proxy(zbx_uint64_t proxyid);
 
 void	zbx_dc_eval_expand_user_macros(zbx_eval_context_t *ctx);
 
+void	zbx_db_trigger_explain_expression(const DB_TRIGGER *trigger, char **expression,
+		int (*eval_func_cb)(zbx_variant_t *, DC_ITEM *, const char *, const char *, const zbx_timespec_t *,
+		char **), int recovery);
+void	zbx_db_trigger_get_function_value(const DB_TRIGGER *trigger, int index, char **value,
+		int (*eval_func_cb)(zbx_variant_t *, DC_ITEM *, const char *, const char *, const zbx_timespec_t *,
+		char **), int recovery);
 #endif

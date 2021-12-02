@@ -186,7 +186,7 @@ class CDashboard extends CDashboardGeneral {
 		$this->updateDashboardUsrgrp($dashboards, __FUNCTION__);
 		$this->updatePages($dashboards);
 
-		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_DASHBOARD, $dashboards);
+		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_DASHBOARD, $dashboards);
 
 		return ['dashboardids' => $dashboardids];
 	}
@@ -216,11 +216,11 @@ class CDashboard extends CDashboardGeneral {
 			DB::update('dashboard', $upd_dashboards);
 		}
 
-		$this->updateDashboardUser($dashboards, __FUNCTION__);
-		$this->updateDashboardUsrgrp($dashboards, __FUNCTION__);
+		$this->updateDashboardUser($dashboards, __FUNCTION__, $db_dashboards);
+		$this->updateDashboardUsrgrp($dashboards, __FUNCTION__, $db_dashboards);
 		$this->updatePages($dashboards, $db_dashboards);
 
-		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_DASHBOARD, $dashboards, $db_dashboards);
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_DASHBOARD, $dashboards, $db_dashboards);
 
 		return ['dashboardids' => array_column($dashboards, 'dashboardid')];
 	}
@@ -235,11 +235,11 @@ class CDashboard extends CDashboardGeneral {
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('dashboard', 'name')],
 			'userid' =>			['type' => API_ID, 'default' => self::$userData['userid']],
 			'private' =>		['type' => API_INT32, 'in' => implode(',', [PUBLIC_SHARING, PRIVATE_SHARING])],
-			'users' =>			['type' => API_OBJECTS, 'fields' => [
+			'users' =>			['type' => API_OBJECTS, 'uniq' => [['userid']], 'fields' => [
 				'userid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 				'permission' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [PERM_READ, PERM_READ_WRITE])]
 			]],
-			'userGroups' =>		['type' => API_OBJECTS, 'fields' => [
+			'userGroups' =>		['type' => API_OBJECTS, 'uniq' => [['usrgrpid']], 'fields' => [
 				'usrgrpid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
 				'permission' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [PERM_READ, PERM_READ_WRITE])]
 			]],
@@ -292,11 +292,11 @@ class CDashboard extends CDashboardGeneral {
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('dashboard', 'name')],
 			'userid' =>				['type' => API_ID],
 			'private' =>			['type' => API_INT32, 'in' => implode(',', [PUBLIC_SHARING, PRIVATE_SHARING])],
-			'users' =>				['type' => API_OBJECTS, 'fields' => [
+			'users' =>				['type' => API_OBJECTS, 'uniq' => [['userid']], 'fields' => [
 				'userid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
 				'permission' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [PERM_READ, PERM_READ_WRITE])]
 			]],
-			'userGroups' =>			['type' => API_OBJECTS, 'fields' => [
+			'userGroups' =>			['type' => API_OBJECTS, 'uniq' => [['usrgrpid']], 'fields' => [
 				'usrgrpid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 				'permission' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [PERM_READ, PERM_READ_WRITE])]
 			]],
@@ -487,84 +487,55 @@ class CDashboard extends CDashboardGeneral {
 	/**
 	 * Update table "dashboard_user".
 	 *
-	 * @param array  $dashboards
-	 * @param string $method
+	 * @param array      $dashboards
+	 * @param string     $method
+	 * @param array|null $db_dashboards
 	 */
-	protected function updateDashboardUser(array $dashboards, string $method): void {
-		$dashboards_users = [];
-
-		foreach ($dashboards as $dashboard) {
-			if (array_key_exists('users', $dashboard)) {
-				$dashboards_users[$dashboard['dashboardid']] = [];
-
-				foreach ($dashboard['users'] as $user) {
-					$dashboards_users[$dashboard['dashboardid']][$user['userid']] = [
-						'permission' => $user['permission']
-					];
-				}
-			}
-		}
-
-		if (!$dashboards_users) {
-			return;
-		}
-
-		$db_dashboard_users = ($method === 'update')
-			? DB::select('dashboard_user', [
-				'output' => ['dashboard_userid', 'dashboardid', 'userid', 'permission'],
-				'filter' => ['dashboardid' => array_keys($dashboards_users)]
-			])
-			: [];
-
-		$userids = [];
-
-		foreach ($db_dashboard_users as $db_dashboard_user) {
-			$userids[$db_dashboard_user['userid']] = true;
-		}
-
-		// get list of accessible users
-		$db_users = $userids
-			? API::User()->get([
-				'output' => [],
-				'preservekeys' => true
-			])
-			: [];
-
+	protected function updateDashboardUser(array &$dashboards, string $method, array $db_dashboards = null): void {
 		$ins_dashboard_users = [];
 		$upd_dashboard_users = [];
 		$del_dashboard_userids = [];
 
-		foreach ($db_dashboard_users as $db_dashboard_user) {
-			$dashboardid = $db_dashboard_user['dashboardid'];
-			$userid = $db_dashboard_user['userid'];
+		foreach ($dashboards as &$dashboard) {
+			if (!array_key_exists('users', $dashboard)) {
+				continue;
+			}
 
-			if (array_key_exists($userid, $dashboards_users[$dashboardid])) {
-				if ($dashboards_users[$dashboardid][$userid]['permission'] != $db_dashboard_user['permission']) {
-					$upd_dashboard_users[] = [
-						'values' => ['permission' => $dashboards_users[$dashboardid][$userid]['permission']],
-						'where' => ['dashboard_userid' => $db_dashboard_user['dashboard_userid']]
-					];
+			$dashboardid = $dashboard['dashboardid'];
+
+			$db_dashboard_users = ($method === 'update')
+				? array_column($db_dashboards[$dashboardid]['users'], null, 'userid')
+				: [];
+
+			foreach ($dashboard['users'] as &$dashboard_user) {
+				$userid = $dashboard_user['userid'];
+
+				if (array_key_exists($userid, $db_dashboard_users)) {
+					$dashboard_user['dashboard_userid'] = $db_dashboard_users[$userid]['dashboard_userid'];
+
+					if ($dashboard_user['permission'] != $db_dashboard_users[$userid]['permission']) {
+						$upd_dashboard_users[] = [
+							'values' => ['permission' => $dashboard_user['permission']],
+							'where' => ['dashboard_userid' => $db_dashboard_users[$userid]['dashboard_userid']]
+						];
+					}
+
+					unset($db_dashboard_users[$userid]);
 				}
+				else {
+					$ins_dashboard_users[] = ['dashboardid' => $dashboardid] + $dashboard_user;
+				}
+			}
+			unset($dashboard_user);
 
-				unset($dashboards_users[$dashboardid][$userid]);
-			}
-			elseif (array_key_exists($userid, $db_users)) {
-				$del_dashboard_userids[] = $db_dashboard_user['dashboard_userid'];
-			}
+			$del_dashboard_userids = array_merge($del_dashboard_userids,
+				array_column($db_dashboard_users, 'dashboard_userid')
+			);
 		}
-
-		foreach ($dashboards_users as $dashboardid => $users) {
-			foreach ($users as $userid => $user) {
-				$ins_dashboard_users[] = [
-					'dashboardid' => $dashboardid,
-					'userid' => $userid,
-					'permission' => $user['permission']
-				];
-			}
-		}
+		unset($dashboard);
 
 		if ($ins_dashboard_users) {
-			DB::insertBatch('dashboard_user', $ins_dashboard_users);
+			$dashboard_userids = DB::insert('dashboard_user', $ins_dashboard_users);
 		}
 
 		if ($upd_dashboard_users) {
@@ -574,89 +545,74 @@ class CDashboard extends CDashboardGeneral {
 		if ($del_dashboard_userids) {
 			DB::delete('dashboard_user', ['dashboard_userid' => $del_dashboard_userids]);
 		}
+
+		foreach ($dashboards as &$dashboard) {
+			if (!array_key_exists('users', $dashboard)) {
+				continue;
+			}
+
+			foreach ($dashboard['users'] as &$user) {
+				if (!array_key_exists('dashboard_userid', $user)) {
+					$user['dashboard_userid'] = array_shift($dashboard_userids);
+				}
+			}
+			unset($user);
+		}
+		unset($dashboard);
 	}
 
 	/**
 	 * Update table "dashboard_usrgrp".
 	 *
-	 * @param array  $dashboards
-	 * @param string $method
+	 * @param array      $dashboards
+	 * @param string     $method
+	 * @param array|null $db_dashboards
 	 */
-	protected function updateDashboardUsrgrp(array $dashboards, string $method): void {
-		$dashboards_usrgrps = [];
-
-		foreach ($dashboards as $dashboard) {
-			if (array_key_exists('userGroups', $dashboard)) {
-				$dashboards_usrgrps[$dashboard['dashboardid']] = [];
-
-				foreach ($dashboard['userGroups'] as $usrgrp) {
-					$dashboards_usrgrps[$dashboard['dashboardid']][$usrgrp['usrgrpid']] = [
-						'permission' => $usrgrp['permission']
-					];
-				}
-			}
-		}
-
-		if (!$dashboards_usrgrps) {
-			return;
-		}
-
-		$db_dashboard_usrgrps = ($method === 'update')
-			? DB::select('dashboard_usrgrp', [
-				'output' => ['dashboard_usrgrpid', 'dashboardid', 'usrgrpid', 'permission'],
-				'filter' => ['dashboardid' => array_keys($dashboards_usrgrps)]
-			])
-			: [];
-
-		$usrgrpids = [];
-
-		foreach ($db_dashboard_usrgrps as $db_dashboard_usrgrp) {
-			$usrgrpids[$db_dashboard_usrgrp['usrgrpid']] = true;
-		}
-
-		// get list of accessible user groups
-		$db_usrgrps = $usrgrpids
-			? API::UserGroup()->get([
-				'output' => [],
-				'preservekeys' => true
-			])
-			: [];
-
+	protected function updateDashboardUsrgrp(array &$dashboards, string $method, array $db_dashboards = null): void {
 		$ins_dashboard_usrgrps = [];
 		$upd_dashboard_usrgrps = [];
 		$del_dashboard_usrgrpids = [];
 
-		foreach ($db_dashboard_usrgrps as $db_dashboard_usrgrp) {
-			$dashboardid = $db_dashboard_usrgrp['dashboardid'];
-			$usrgrpid = $db_dashboard_usrgrp['usrgrpid'];
+		foreach ($dashboards as &$dashboard) {
+			if (!array_key_exists('userGroups', $dashboard)) {
+				continue;
+			}
 
-			if (array_key_exists($usrgrpid, $dashboards_usrgrps[$dashboardid])) {
-				if ($dashboards_usrgrps[$dashboardid][$usrgrpid]['permission'] != $db_dashboard_usrgrp['permission']) {
-					$upd_dashboard_usrgrps[] = [
-						'values' => ['permission' => $dashboards_usrgrps[$dashboardid][$usrgrpid]['permission']],
-						'where' => ['dashboard_usrgrpid' => $db_dashboard_usrgrp['dashboard_usrgrpid']]
-					];
+			$dashboardid = $dashboard['dashboardid'];
+
+			$db_dashboard_groups = ($method === 'update')
+				? array_column($db_dashboards[$dashboardid]['userGroups'], null, 'usrgrpid')
+				: [];
+
+			foreach ($dashboard['userGroups'] as &$dashboard_group) {
+				$usrgrpid = $dashboard_group['usrgrpid'];
+
+				if (array_key_exists($usrgrpid, $db_dashboard_groups)) {
+					$dashboard_group['dashboard_usrgrpid'] = $db_dashboard_groups[$usrgrpid]['dashboard_usrgrpid'];
+
+					if ($dashboard_group['permission'] != $db_dashboard_groups[$usrgrpid]['permission']) {
+						$upd_dashboard_usrgrps[] = [
+							'values' => ['permission' => $dashboard_group['permission']],
+							'where' => ['dashboard_usrgrpid' => $db_dashboard_groups[$usrgrpid]['dashboard_usrgrpid']]
+						];
+					}
+
+					unset($db_dashboard_groups[$usrgrpid]);
 				}
+				else {
+					$ins_dashboard_usrgrps[] = ['dashboardid' => $dashboardid] + $dashboard_group;
+				}
+			}
+			unset($dashboard_group);
 
-				unset($dashboards_usrgrps[$dashboardid][$usrgrpid]);
-			}
-			elseif (array_key_exists($usrgrpid, $db_usrgrps)) {
-				$del_dashboard_usrgrpids[] = $db_dashboard_usrgrp['dashboard_usrgrpid'];
-			}
+			$del_dashboard_usrgrpids = array_merge($del_dashboard_usrgrpids,
+				array_column($db_dashboard_groups, 'dashboard_usrgrpid')
+			);
 		}
-
-		foreach ($dashboards_usrgrps as $dashboardid => $usrgrps) {
-			foreach ($usrgrps as $usrgrpid => $usrgrp) {
-				$ins_dashboard_usrgrps[] = [
-					'dashboardid' => $dashboardid,
-					'usrgrpid' => $usrgrpid,
-					'permission' => $usrgrp['permission']
-				];
-			}
-		}
+		unset($dashboard);
 
 		if ($ins_dashboard_usrgrps) {
-			DB::insertBatch('dashboard_usrgrp', $ins_dashboard_usrgrps);
+			$dashboard_usrgrpids = DB::insert('dashboard_usrgrp', $ins_dashboard_usrgrps);
 		}
 
 		if ($upd_dashboard_usrgrps) {
@@ -666,6 +622,20 @@ class CDashboard extends CDashboardGeneral {
 		if ($del_dashboard_usrgrpids) {
 			DB::delete('dashboard_usrgrp', ['dashboard_usrgrpid' => $del_dashboard_usrgrpids]);
 		}
+
+		foreach ($dashboards as &$dashboard) {
+			if (!array_key_exists('userGroups', $dashboard)) {
+				continue;
+			}
+
+			foreach ($dashboard['userGroups'] as &$usrgrp) {
+				if (!array_key_exists('dashboard_usrgrpid', $usrgrp)) {
+					$usrgrp['dashboard_usrgrpid'] = array_shift($dashboard_usrgrpids);
+				}
+			}
+			unset($usrgrp);
+		}
+		unset($dashboard);
 	}
 
 	protected function addRelatedObjects(array $options, array $result) {

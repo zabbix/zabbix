@@ -861,7 +861,8 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 			zbx_free(str_esc);									\
 														\
 			zbx_audit_item_update_json_update_##field(item->itemid, item->flags,			\
-					ZBX_MACRO_SECRET_MASK, ZBX_MACRO_SECRET_MASK);				\
+					(0 == strcmp("", item->field##_orig) ? "" : ZBX_MACRO_SECRET_MASK),	\
+					(0 == strcmp("", item->field) ? "" : ZBX_MACRO_SECRET_MASK));		\
 		}
 #define PREPARE_UPDATE_UC(FLAG_POSTFIX, field)									\
 		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_##FLAG_POSTFIX))			\
@@ -2273,7 +2274,7 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 
 static void	save_template_lld_overrides(zbx_vector_ptr_t *overrides, zbx_hashset_t *lld_items)
 {
-	zbx_uint64_t			overrideid, override_operationid, override_conditionid;
+	zbx_uint64_t			overrideid, override_operationid = 0, override_conditionid = 0;
 	zbx_db_insert_t			db_insert, db_insert_oconditions, db_insert_ooperations, db_insert_opstatus,
 					db_insert_opdiscover, db_insert_opperiod, db_insert_ophistory,
 					db_insert_optrends, db_insert_opseverity, db_insert_optag, db_insert_optemplate,

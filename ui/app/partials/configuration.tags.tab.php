@@ -81,7 +81,9 @@ foreach ($data['tags'] as $i => $tag) {
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-remove')
 				->setEnabled(!$readonly)
-	))->addClass(ZBX_STYLE_NOWRAP);
+	))
+		->addClass(ZBX_STYLE_NOWRAP)
+		->addClass(ZBX_STYLE_TOP);
 
 	if ($show_inherited_tags) {
 		$template_list = [];

@@ -22,6 +22,7 @@
 #include "comms.h"
 #include "zbxexec.h"
 #include "log.h"
+#include <signal.h>
 
 extern char	*CONFIG_SOURCE_IP;
 extern char	*CONFIG_FPING_LOCATION;
@@ -90,8 +91,8 @@ static void	get_source_ip_option(const char *fping, const char **option, unsigne
  *                                                                            *
  * Purpose: detect minimal possible fping packet interval                     *
  *                                                                            *
- * Parameters: fping         - [IN] the the location of fping program         *
- *             dst           - [IN] the the ip address for test               *
+ * Parameters: fping         - [IN] the location of fping program             *
+ *             dst           - [IN] the ip address for test                   *
  *             value         - [OUT] interval between sending ping packets    *
  *                                   (in millisec)                            *
  *             error         - [OUT] error string if function fails           *
@@ -118,7 +119,7 @@ static int	get_interval_option(const char *fping, const char *dst, int *value, c
 {
 	char		*out = NULL;
 	unsigned int	intervals[] = {0, 1, 10};
-	size_t		i;
+	size_t		i, out_len;
 	int		ret = FAIL;
 
 	for (i = 0; i < ARRSIZE(intervals); i++)
@@ -199,7 +200,7 @@ static int	get_interval_option(const char *fping, const char *dst, int *value, c
 			}
 
 			/* check if we hit the error message */
-			if (NULL != (p = strstr(out, " as root")))
+			if (NULL != strstr(out, " as root"))
 			{
 				zbx_rtrim(out, "\n");
 				zbx_strlcpy(error, out, max_error_len);
@@ -210,7 +211,7 @@ static int	get_interval_option(const char *fping, const char *dst, int *value, c
 
 	/* if we are here we have probably hit the usage or error message, let's collect it if it's error message */
 
-	if (ZBX_KIBIBYTE > strlen(out) && 0 != strlen(out))
+	if (NULL != out && ZBX_KIBIBYTE > (out_len = strlen(out)) && 0 != out_len)
 	{
 		zbx_rtrim(out, "\n");
 		zbx_strlcpy(error, out, max_error_len);
@@ -230,8 +231,8 @@ out:
  *                                                                            *
  * Purpose: check fping supports IPv6                                         *
  *                                                                            *
- * Parameters: fping - [IN] the the location of fping program                 *
- *             dst   - [IN] the the ip address for test                       *
+ * Parameters: fping - [IN] the location of fping program                     *
+ *             dst   - [IN] the ip address for test                           *
  *                                                                            *
  * Return value: SUCCEED - IPv6 is supported                                  *
  *               FAIL    - IPv6 is not supported                              *
@@ -272,7 +273,8 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	size_t		tmp_size;
 	size_t		offset;
 	double		sec;
-	int 		i, ret = NOTSUPPORTED, index;
+	int 		i, ret = NOTSUPPORTED, index, rc;
+	sigset_t	mask, orig_mask;
 
 #ifdef HAVE_IPV6
 	int		family;
@@ -530,11 +532,21 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s", tmp);
 
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGINT);
+	sigaddset(&mask, SIGQUIT);
+
+	if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
+		zbx_error("cannot set sigprocmask to block the user signal");
+
 	if (NULL == (f = popen(tmp, "r")))
 	{
 		zbx_snprintf(error, max_error_len, "%s: %s", tmp, zbx_strerror(errno));
 
 		unlink(filename);
+
+		if (0 > sigprocmask(SIG_SETMASK, &orig_mask, NULL))
+			zbx_error("cannot restore sigprocmask");
 
 		goto out;
 	}
@@ -667,11 +679,16 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 		for (i = 0; i < hosts_count; i++)
 			zbx_free(hosts[i].status);
 	}
-	pclose(f);
+	rc = pclose(f);
+
+	if (0 > sigprocmask(SIG_SETMASK, &orig_mask, NULL))
+		zbx_error("cannot restore sigprocmask");
 
 	unlink(filename);
 
-	if (NOTSUPPORTED == ret)
+	if (WIFSIGNALED(rc))
+		ret = FAIL;
+	else
 		zbx_snprintf(error, max_error_len, "fping failed: %s", tmp);
 out:
 	zbx_free(tmp);

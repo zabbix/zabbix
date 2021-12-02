@@ -155,7 +155,8 @@ static int	rw_get_report(const char *url, const char *cookie, int width, int hei
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_POST, 1L)) ||
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_URL, CONFIG_WEBSERVICE_URL)) ||
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_HTTPHEADER, headers)) ||
-			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_POSTFIELDS, j.buffer)))
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_POSTFIELDS, j.buffer)) ||
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = ZBX_CURLOPT_ACCEPT_ENCODING, "")))
 	{
 		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", (int)opt,
 				(curl_error = rw_curl_error(err)));
@@ -413,7 +414,7 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 	zbx_ipc_message_t	message;
 	zbx_alerter_dispatch_t	dispatch = {0};
 	int			report_status = FAIL, started_num = 0, sent_num = 0, finished_num = 0;
-	double			time_now, time_stat, time_idle = 0, time_wake;
+	double			time_now, time_stat, time_wake, time_idle = 0;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -472,7 +473,7 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 
 		time_wake = zbx_time();
 		zbx_update_env(time_wake);
-		time_idle += time_wake = time_now;
+		time_idle += time_wake - time_now;
 
 		switch (message.code)
 		{

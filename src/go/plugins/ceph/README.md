@@ -13,7 +13,7 @@ You can extend it or create your template for your specific needs.
 * Ceph, version 14+
 
 ## Installation
-* Configure the Ceph RESTful Module according to [documentation.](https://docs.ceph.com/en/latest/mgr/restful/)  
+* Configure the Ceph RESTful Module according to [documentation.](https://docs.ceph.com/en/latest/mgr/restful/)
 * Make sure a RESTful API endpoint is available for connection.  
 
 ## Configuration
@@ -21,9 +21,9 @@ The Zabbix agent 2 configuration file is used to configure plugins.
 
 **Plugins.Ceph.InsecureSkipVerify** — InsecureSkipVerify controls whether an http client verifies the
 server's certificate chain and host name. If InsecureSkipVerify is true, TLS accepts any certificate presented by 
-the server and any host name in that certificate. In this mode, TLS is susceptible to man-in-the-middle attacks.  
+the server and any host name in that certificate. In this mode, TLS is susceptible to man-in-the-middle attacks. 
 **This should be used only for testing.**  
-*Default value:* false  
+*Default value:* false
 *Limits:* false | true
 
 **Plugins.Ceph.Timeout** — The maximum time in seconds for waiting when a request has to be done. The timeout includes 
@@ -31,8 +31,8 @@ connection time, any redirects, and reading the response body.
 *Default value:* equals the global Timeout configuration parameter.  
 *Limits:* 1-30
 
-**Plugins.Ceph.KeepAlive** — Sets a time for waiting before unused connections will be closed.  
-*Default value:* 300 sec.  
+**Plugins.Ceph.KeepAlive** — Sets a time for waiting before unused connections will be closed. 
+*Default value:* 300 sec.
 *Limits:* 60-900
 
 ### Configuring connection

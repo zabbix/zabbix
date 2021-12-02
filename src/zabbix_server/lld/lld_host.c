@@ -452,7 +452,7 @@ static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, z
 		host->tls_psk_identity_orig = NULL;
 		host->tls_psk_orig = NULL;
 		host->jp_row = NULL;
-		host->inventory_mode = 0;
+		host->inventory_mode = HOST_INVENTORY_DISABLED;
 		host->status = 0;
 		host->custom_interfaces_orig = 0;
 		host->proxy_hostid_orig = 0;
@@ -829,7 +829,7 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 		char **info, unsigned char custom_iface)
 {
 	char			*buffer = NULL;
-	int			i;
+	int			i, host_found = 0;
 	zbx_lld_host_t		*host = NULL;
 	zbx_vector_db_tag_ptr_t	tmp_tags;
 
@@ -847,12 +847,15 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 		zbx_lrtrim(buffer, ZBX_WHITESPACE);
 
 		if (0 == strcmp(host->host, buffer))
+		{
+			host_found = 1;
 			break;
+		}
 	}
 
 	zbx_vector_db_tag_ptr_create(&tmp_tags);
 
-	if (i == hosts->values_num)	/* no host found */
+	if (0 == host_found)
 	{
 		host = (zbx_lld_host_t *)zbx_malloc(NULL, sizeof(zbx_lld_host_t));
 
@@ -1101,8 +1104,10 @@ static void	lld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_
 				/* host groups which should be unlinked */
 				ZBX_STR2UINT64(hostgroupid, row[2]);
 				zbx_vector_uint64_append(del_hostgroupids, hostgroupid);
+
 				zbx_audit_host_create_entry(AUDIT_ACTION_UPDATE, hostid,
-						(NULL == host->name_orig) ? host->name : host->name_orig);
+						(NULL == host->host_orig) ? host->host : host->host_orig);
+
 				zbx_audit_hostgroup_update_json_delete_group(hostid, hostgroupid, groupid);
 			}
 			else
@@ -1221,7 +1226,7 @@ static zbx_lld_group_t	*lld_group_make(zbx_vector_ptr_t *groups, zbx_uint64_t gr
 		const char *name_proto, const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macros)
 {
 	char		*buffer = NULL;
-	int		i;
+	int		i, group_found = 0;
 	zbx_lld_group_t	*group = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -1241,10 +1246,13 @@ static zbx_lld_group_t	*lld_group_make(zbx_vector_ptr_t *groups, zbx_uint64_t gr
 		zbx_lrtrim(buffer, ZBX_WHITESPACE);
 
 		if (0 == strcmp(group->name, buffer))
+		{
+			group_found = 1;
 			break;
+		}
 	}
 
-	if (i == groups->values_num)	/* no group found */
+	if (0 == group_found)
 	{
 		/* trying to find an already existing group */
 
@@ -2544,7 +2552,7 @@ static void	lld_templates_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hos
  *                                                                            *
  * Purpose: prepare sql for update record of interface_snmp table             *
  *                                                                            *
- * Parameters: hostid      - [IN] host identificator                          *
+ * Parameters: hostid      - [IN] host identifier                             *
  *             interfaceid - [IN] snmp interface id;                          *
  *             snmp        - [IN] snmp values for update                      *
  *             sql         - [IN/OUT] sql string                              *
@@ -2734,14 +2742,16 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 		else
 		{
 			zbx_audit_host_create_entry(AUDIT_ACTION_UPDATE, host->hostid,
-					(NULL == host->name_orig) ? host->name : host->name_orig);
+					(NULL == host->host_orig) ? host->host : host->host_orig);
 
 			if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE))
 				upd_hosts++;
 
 			if (host->inventory_mode_orig != host->inventory_mode)
 			{
-				zbx_audit_host_update_json_add_inventory_mode(host->hostid, (int)host->inventory_mode);
+				zbx_audit_host_update_json_update_inventory_mode(host->hostid,
+						(int)host->inventory_mode_orig, (int)host->inventory_mode);
+
 				if (HOST_INVENTORY_DISABLED == host->inventory_mode)
 					zbx_vector_uint64_append(&del_host_inventory_hostids, host->hostid);
 				else if (HOST_INVENTORY_DISABLED == host->inventory_mode_orig)
@@ -2780,8 +2790,10 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 			else if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_REMOVE))
 			{
 				zbx_vector_uint64_append(&del_interfaceids, interface->interfaceid);
+
 				zbx_audit_host_create_entry(AUDIT_ACTION_UPDATE,
-						host->hostid, (NULL == host->name_orig) ? host->name : host->name_orig);
+						host->hostid, (NULL == host->host_orig) ? host->host : host->host_orig);
+
 				zbx_audit_host_update_json_delete_interface(
 						host->hostid, interface->interfaceid);
 			}
@@ -2789,8 +2801,10 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 			if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_REMOVE))
 			{
 				zbx_vector_uint64_append(&del_snmp_ids, interface->interfaceid);
+
 				zbx_audit_host_create_entry(AUDIT_ACTION_UPDATE,
-						host->hostid, (NULL == host->name_orig) ? host->name : host->name_orig);
+						host->hostid, (NULL == host->host_orig) ? host->host : host->host_orig);
+
 				zbx_audit_host_update_json_delete_interface(
 						host->hostid, interface->interfaceid);
 			}
@@ -2824,7 +2838,8 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 				zbx_vector_uint64_append(&del_hostmacroids, hostmacro->hostmacroid);
 
 				zbx_audit_host_create_entry(AUDIT_ACTION_UPDATE,
-						host->hostid, (NULL == host->name_orig) ? host->name : host->name_orig);
+						host->hostid, (NULL == host->host_orig) ? host->host : host->host_orig);
+
 				zbx_audit_host_update_json_delete_hostmacro(
 						host->hostid, hostmacro->hostmacroid);
 			}
@@ -2845,7 +2860,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 				zbx_vector_uint64_append(&del_tagids, host->tags.values[j]->tagid);
 
 				zbx_audit_host_prototype_create_entry(AUDIT_ACTION_UPDATE, host->hostid,
-						host->name);
+						host->host);
 				zbx_audit_host_update_json_delete_tag(host->hostid, host->tags.values[j]->tagid);
 			}
 		}
@@ -2950,18 +2965,22 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 					(int)host->status, (int)ZBX_FLAG_DISCOVERY_CREATED, (int)tls_connect,
 					(int)tls_accept, tls_issuer, tls_subject, tls_psk_identity, tls_psk,
 					(int)host->custom_interfaces);
-			zbx_audit_host_create_entry(AUDIT_ACTION_ADD, host->hostid, host->name);
+
+			zbx_audit_host_create_entry(AUDIT_ACTION_ADD, host->hostid, host->host);
 
 			zbx_db_insert_add_values(&db_insert_hdiscovery, host->hostid, parent_hostid, host_proto);
+
+			if (HOST_INVENTORY_DISABLED != host->inventory_mode)
+			{
+				zbx_db_insert_add_values(&db_insert_hinventory, host->hostid,
+						(int)host->inventory_mode);
+			}
 
 			zbx_audit_host_update_json_add_details(host->hostid, host->host, proxy_hostid,
 					(int)ipmi_authtype, (int)ipmi_privilege, ipmi_username, ipmi_password,
 					(int)host->status, (int)ZBX_FLAG_DISCOVERY_CREATED, (int)tls_connect,
 					(int)tls_accept, tls_issuer, tls_subject, tls_psk_identity, tls_psk,
-					host->custom_interfaces);
-
-			if (HOST_INVENTORY_DISABLED != host->inventory_mode)
-				zbx_db_insert_add_values(&db_insert_hinventory, host->hostid, (int)host->inventory_mode);
+					host->custom_interfaces, host->inventory_mode);
 		}
 		else
 		{
@@ -3100,11 +3119,13 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
 							"%stls_psk_identity='%s'", d, value_esc);
 					d = ",";
+					zbx_free(value_esc);
 
 					zbx_audit_host_update_json_update_tls_psk_identity(host->hostid,
-							host->tls_psk_identity_orig, value_esc);
-
-					zbx_free(value_esc);
+							(0 == strcmp("", host->tls_psk_identity_orig) ?
+							"" : ZBX_MACRO_SECRET_MASK),
+							(0 == strcmp("", tls_psk_identity) ?
+							"" : ZBX_MACRO_SECRET_MASK));
 				}
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK))
 				{
@@ -3113,11 +3134,12 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
 							"%stls_psk='%s'", d, value_esc);
 					d = ",";
+					zbx_free(value_esc);
 
 					zbx_audit_host_update_json_update_tls_psk(host->hostid,
-							host->tls_psk_orig, value_esc);
-
-					zbx_free(value_esc);
+							(0 == strcmp("", host->tls_psk_orig) ?
+							"" : ZBX_MACRO_SECRET_MASK),
+							(0 == strcmp("", tls_psk) ? "" : ZBX_MACRO_SECRET_MASK));
 				}
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_CUSTOM_INTERFACES))
 				{
@@ -3943,7 +3965,7 @@ static void	lld_interface_make(zbx_vector_ptr_t *interfaces, zbx_uint64_t parent
 		const char *contextname)
 {
 	zbx_lld_interface_t	*interface = NULL;
-	int			i;
+	int			i, interface_found = 0;
 
 	for (i = 0; i < interfaces->values_num; i++)
 	{
@@ -3953,12 +3975,15 @@ static void	lld_interface_make(zbx_vector_ptr_t *interfaces, zbx_uint64_t parent
 			continue;
 
 		if (interface->parent_interfaceid == parent_interfaceid)
+		{
+			interface_found = 1;
 			break;
+		}
 	}
 
-	if (i == interfaces->values_num)
+	if (0 == interface_found)
 	{
-		/* interface which should be deleted */
+		/* interface should be deleted */
 		interface = (zbx_lld_interface_t *)zbx_malloc(NULL, sizeof(zbx_lld_interface_t));
 
 		interface->interfaceid = interfaceid;
@@ -3982,7 +4007,7 @@ static void	lld_interface_make(zbx_vector_ptr_t *interfaces, zbx_uint64_t parent
 	}
 	else
 	{
-		/* interface which are already added */
+		/* interface already has been added */
 		if (interface->type != type)
 		{
 			interface->type_orig = type;
@@ -4071,7 +4096,7 @@ static void	lld_interface_make(zbx_vector_ptr_t *interfaces, zbx_uint64_t parent
 			}
 			if (0 != strcmp(snmp->contextname, contextname))
 			{
-				snmp->contextname_orig = zbx_strdup(NULL, snmp->contextname);
+				snmp->contextname_orig = zbx_strdup(NULL, contextname);
 				snmp->flags |= ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_CONTEXT;
 			}
 		}

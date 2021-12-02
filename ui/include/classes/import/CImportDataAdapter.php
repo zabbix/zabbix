@@ -385,9 +385,14 @@ class CImportDataAdapter {
 					unset($message_template);
 				}
 
-				$media_types[] = CArrayHelper::renameKeys($media_type,
-					$keys + (($media_type['type'] == MEDIA_TYPE_EXEC) ? ['parameters' => 'exec_params'] : [])
-				);
+				if ($media_type['type'] == MEDIA_TYPE_EXEC && array_key_exists('parameters', $media_type)) {
+					$media_type['exec_params'] = $media_type['parameters']
+						? implode("\n", $media_type['parameters'])."\n"
+						: '';
+					unset($media_type['parameters']);
+				}
+
+				$media_types[] = CArrayHelper::renameKeys($media_type, $keys);
 			}
 		}
 
@@ -451,7 +456,7 @@ class CImportDataAdapter {
 	}
 
 	/**
-	 * Format low-level disovery rule overrides.
+	 * Format low-level discovery rule overrides.
 	 *
 	 * @param array $discovery_rule  Data of single low-level discovery rule.
 	 *

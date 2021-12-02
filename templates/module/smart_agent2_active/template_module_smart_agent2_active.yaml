@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:34Z'
+  version: '6.0'
+  date: '2021-10-01T14:12:43Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -11,11 +11,11 @@ zabbix_export:
       template: 'SMART by Zabbix agent active 2'
       name: 'SMART by Zabbix agent active 2'
       description: |
-        The template for monitoring S.M.A.R.T. attributes of physical disk that works without any external scripts. It collects metrics by Zabbix agent active 2 version 5.0 and later with Smartmontools version 7.1 and later. Disk discovery LLD rule finds all HDD, SSD, NVMe disks with S.M.A.R.T. enabled. Attribute discovery LLD rule finds all Vendor Specific Attributes for each disk. If you want to skip some attributes, please set regular expressions with disk names in {$SMART.DISK.NAME.MATCHES} and with attribute IDs in {$SMART.ATTRIBUTE.ID.MATCHES} macros on the host level.
+        The template for monitoring S.M.A.R.T. attributes of physical disk that works without any external scripts. It collects metrics by Zabbix agent 2 version 5.0 and later with Smartmontools version 7.1 and later. Disk discovery LLD rule finds all HDD, SSD, NVMe disks with S.M.A.R.T. enabled. Attribute discovery LLD rule finds all Vendor Specific Attributes for each disk. If you want to skip some attributes, please set regular expressions with disk names in {$SMART.DISK.NAME.MATCHES} and with attribute IDs in {$SMART.ATTRIBUTE.ID.MATCHES} macros on the host level.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/415662-discussion-thread-for-official-zabbix-smart-disk-monitoring
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.39
       groups:
         -
           name: Templates/Modules
@@ -41,6 +41,30 @@ zabbix_export:
           delay: 1h
           description: 'Discovery SMART Vendor Specific Attributes of disks.'
           item_prototypes:
+            -
+              uuid: 5c09ba32ad72321bce5042d5f4dc59d2
+              name: 'SMART [{#NAME}]: ID {#ID} {#ATTRNAME} raw value'
+              type: DEPENDENT
+              key: 'smart.disk.attr.raw[{#NAME},{#ID}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.disk_name==''{#NAME}'')].ata_smart_attributes.table[?(@.id=={#ID})].raw.string.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: smart.disk.get
+              tags:
+                -
+                  tag: Application
+                  value: '{#DISKTYPE} {#NAME}'
             -
               uuid: 498a4f1b4b7442b5a38c52400646cc47
               name: 'SMART [{#NAME}]: ID {#ID} {#ATTRNAME}'
@@ -128,13 +152,16 @@ zabbix_export:
               key: 'smart.disk.hours[{#NAME}]'
               delay: '0'
               history: 7d
-              units: s
               description: 'Count of hours in power-on state. The raw value of this attribute shows total count of hours (or minutes, or seconds, depending on manufacturer) in power-on state. "By default, the total expected lifetime of a hard disk in perfect condition is defined as 5 years (running every day and night on all days). This is equal to 1825 days in 24/7 mode or 43800 hours." On some pre-2005 drives, this raw value may advance erratically and/or "wrap around" (reset to zero periodically). https://en.wikipedia.org/wiki/S.M.A.R.T.#Known_ATA_S.M.A.R.T._attributes'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
                     - '$[?(@.disk_name==''{#NAME}'')].power_on_time.hours.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
               master_item:
                 key: smart.disk.get
               tags:

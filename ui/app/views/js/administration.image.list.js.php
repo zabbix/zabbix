@@ -25,7 +25,34 @@
 ?>
 
 <script>
-	$(() => {
-		$('#imagetype').on('change', (e) => redirect(e.target.value));
-	});
+	const view = {
+
+		async init({load_images}) {
+			document.getElementById('imagetype').addEventListener('change', (e) => {
+				redirect(e.target.value);
+			});
+
+			if (load_images) {
+				window.addEventListener('unhandledrejection', (e) => {
+					e.preventDefault();
+				});
+
+				for (const image of document.querySelectorAll('.adm-img img[data-src]')) {
+					await this.loadImage(image);
+				}
+			}
+		},
+
+		loadImage(image) {
+			return new Promise((resolve, reject) => {
+				image.onload = () => {
+					image.removeAttribute('data-src');
+					resolve(image);
+				};
+				image.onerror = reject;
+				image.src = image.dataset.src;
+				image.style = '';
+			});
+		}
+	};
 </script>

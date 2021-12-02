@@ -310,19 +310,19 @@ class testFormGraphPrototype extends CLegacyWebTest {
 	 * @dataProvider layout
 	 */
 	public function testFormGraphPrototype_CheckLayout($data) {
-
 		if (isset($data['template'])) {
 			$this->zbxTestLogin('templates.php');
 			$this->query('button:Reset')->one()->click();
-			$this->page->open('templates.php?page=2');
-			$this->zbxTestClickLinkTextWait($data['template']);
+			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+			$this->filterEntriesAndOpenDiscovery($form, $data['template']);
 			$discoveryRule = $this->discoveryRuleTemplate;
 			$hostid = 30000;
 		}
 
 		if (isset($data['host'])) {
-			$this->zbxTestLogin('hosts.php');
-			$this->zbxTestClickLinkTextWait($data['host']);
+			$this->zbxTestLogin(self::HOST_LIST_PAGE);
+			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+			$this->filterEntriesAndOpenDiscovery($form, $data['host']);
 			if (!isset($data['templatedHost'])) {
 				$discoveryRule = $this->discoveryRule;
 				$hostid = 40001;
@@ -333,7 +333,6 @@ class testFormGraphPrototype extends CLegacyWebTest {
 			}
 		}
 
-		$this->zbxTestClickLinkTextWait('Discovery rules');
 		$this->zbxTestClickLinkTextWait($discoveryRule);
 		$this->zbxTestClickLinkTextWait('Graph prototypes');
 
@@ -1064,7 +1063,6 @@ class testFormGraphPrototype extends CLegacyWebTest {
 	 */
 	public function testFormGraphPrototype_SimpleCreate($data) {
 		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
-		$itemName = $this->item;
 		$this->zbxTestLogin('graphs.php?parent_discoveryid=133800&context=host&form=Create+graph+prototype');
 
 		$this->zbxTestCheckTitle('Configuration of graph prototypes');
@@ -1193,9 +1191,9 @@ class testFormGraphPrototype extends CLegacyWebTest {
 		}
 
 		if (isset($data['formCheck'])) {
-			$this->zbxTestOpen('hosts.php');
-			$this->zbxTestClickLinkTextWait($this->host);
-			$this->zbxTestClickLinkTextWait('Discovery rules');
+			$this->zbxTestOpen(self::HOST_LIST_PAGE);
+			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+			$this->filterEntriesAndOpenDiscovery($form, $this->host);
 			$this->zbxTestClickLinkTextWait($this->discoveryRule);
 			$this->zbxTestClickLinkTextWait('Graph prototypes');
 
@@ -1219,9 +1217,9 @@ class testFormGraphPrototype extends CLegacyWebTest {
 				$graphid = $row['graphid'];
 			}
 
-			$this->zbxTestOpen('hosts.php');
-			$this->zbxTestClickLinkTextWait($this->host);
-			$this->zbxTestClickLinkTextWait('Discovery rules');
+			$this->zbxTestOpen(self::HOST_LIST_PAGE);
+			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+			$this->filterEntriesAndOpenDiscovery($form, $this->host);
 			$this->zbxTestClickLinkTextWait($this->discoveryRule);
 			$this->zbxTestClickLinkTextWait('Graph prototypes');
 
@@ -1232,5 +1230,17 @@ class testFormGraphPrototype extends CLegacyWebTest {
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph prototypes deleted');
 			$this->zbxTestTextNotPresent($this->template.": $graphName");
 		}
+	}
+
+	/**
+	 * Function for filtering necessary hosts or templates and opening their Discovery rules.
+	 *
+	 * @param string    $name    name of a host
+	 */
+	private function filterEntriesAndOpenDiscovery($form, $name) {
+		$form->fill(['Name' => $name]);
+		$this->query('button:Apply')->one()->waitUntilClickable()->click();
+		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
+				->getColumn('Discovery')->query('link:Discovery')->one()->click();
 	}
 }
