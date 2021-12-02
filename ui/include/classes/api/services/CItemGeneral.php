@@ -1501,6 +1501,16 @@ abstract class CItemGeneral extends CApiService {
 									'params', _('first parameter is expected')
 								));
 							}
+							elseif (!array_key_exists(1, $params)) {
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+									'params', _('second parameter is expected')
+								));
+							}
+							elseif (!array_key_exists(2, $params)) {
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+									'params', _('third parameter is expected')
+								));
+							}
 
 							if ($prometheus_pattern_parser->parse($params[0]) != CParser::PARSE_SUCCESS) {
 								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
@@ -1508,11 +1518,31 @@ abstract class CItemGeneral extends CApiService {
 								));
 							}
 
-							if ($params[1] !== ''
-									&& $prometheus_output_parser->parse($params[1]) != CParser::PARSE_SUCCESS) {
+							if (!in_array($params[1], [ZBX_PREPROC_PROMETHEUS_VALUE, ZBX_PREPROC_PROMETHEUS_LABEL,
+								ZBX_PREPROC_PROMETHEUS_SUM, ZBX_PREPROC_PROMETHEUS_MIN, ZBX_PREPROC_PROMETHEUS_MAX,
+								ZBX_PREPROC_PROMETHEUS_AVG, ZBX_PREPROC_PROMETHEUS_COUNT
+							])) {
 								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-									'params', _('invalid Prometheus output')
+									'params', _('invalid Prometheus function')
 								));
+							}
+
+							if ($params[2] !== '') {
+								if ($params[1] !== ZBX_PREPROC_PROMETHEUS_LABEL) {
+									self::exception(ZBX_API_ERROR_PARAMETERS,
+										_s('Incorrect value for field "%1$s": %2$s.',
+											'params', _('invalid Prometheus output')
+										)
+									);
+								}
+
+								if ($prometheus_output_parser->parse($params[1]) != CParser::PARSE_SUCCESS) {
+									self::exception(ZBX_API_ERROR_PARAMETERS,
+										_s('Incorrect value for field "%1$s": %2$s.',
+											'params', _('invalid Prometheus output')
+										)
+									);
+								}
 							}
 						}
 						// Prometheus to JSON can be empty and has only one parameter.

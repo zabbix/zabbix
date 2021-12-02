@@ -611,11 +611,23 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					break;
 
 				case ZBX_PREPROC_VALIDATE_RANGE:
+					foreach ($step['params'] as &$param) {
+						$param = trim($param);
+					}
+					unset($param);
+
+					$step['params'] = implode("\n", $step['params']);
+					break;
+
 				case ZBX_PREPROC_PROMETHEUS_PATTERN:
 					foreach ($step['params'] as &$param) {
 						$param = trim($param);
 					}
 					unset($param);
+
+					if (!array_key_exists(2, $step['params'])) {
+						$step['params'][2] = '';
+					}
 
 					$step['params'] = implode("\n", $step['params']);
 					break;
