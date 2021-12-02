@@ -222,6 +222,36 @@ class CHistFunctionValidator extends CValidator {
 						return false;
 					}
 
+					// Make sure time shift uses units no less than one used in period.
+					if (array_key_exists('aligned_shift', $rule) && $rule['aligned_shift']) {
+						if (self::hasMacros($param['data']['sec_num'], $options)
+								|| self::hasMacros($param['data']['time_shift'], $options)) {
+							return true;
+						}
+
+						$period_parser = new CNumberParser([
+							'with_time_suffix' => true,
+							'with_year' => true
+						]);
+
+						if ($period_parser->parse($param['data']['sec_num']) != CParser::PARSE_SUCCESS) {
+							return false;
+						}
+
+						$period_unit_length = timeUnitToSeconds('1'.$period_parser->getSuffix(), true);
+						$shift_parser = new CRelativeTimeParser();
+
+						if ($shift_parser->parse($param['data']['time_shift']) != CParser::PARSE_SUCCESS) {
+							return false;
+						}
+
+						foreach ($shift_parser->getTokens() as $token) {
+							if (timeUnitToSeconds('1'.$token['suffix'], true) < $period_unit_length) {
+								return false;
+							}
+						}
+					}
+
 					break;
 
 				case 'number':
