@@ -1067,7 +1067,7 @@ class CHostGroup extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateMassAdd(array $data, ?array &$db_groups): void {
+	private function validateMassAdd(array &$data, ?array &$db_groups): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
 			'groups' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
 				'groupid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
