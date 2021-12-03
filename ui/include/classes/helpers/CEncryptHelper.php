@@ -32,16 +32,12 @@ class CEncryptHelper {
 	/**
 	 * Session secret key.
 	 *
-	 * @static
-	 *
 	 * @var string
 	 */
 	private static $key;
 
 	/**
 	 * Return session key.
-	 *
-	 * @static
 	 *
 	 * @return string|null
 	 */
@@ -67,8 +63,6 @@ class CEncryptHelper {
 	/**
 	 * Timing attack safe string comparison.
 	 *
-	 * @static
-	 *
 	 * @param string $known_string
 	 * @param string $user_string
 	 *
@@ -80,8 +74,6 @@ class CEncryptHelper {
 
 	/**
 	 * Encrypt string with session key.
-	 *
-	 * @static
 	 *
 	 * @param string $data
 	 *
@@ -96,8 +88,6 @@ class CEncryptHelper {
 	/**
 	 * Generate random 16 bytes key.
 	 *
-	 * @static
-	 *
 	 * @return string
 	 */
 	public static function generateKey(): string {
@@ -106,8 +96,6 @@ class CEncryptHelper {
 
 	/**
 	 * Update secret session key.
-	 *
-	 * @static
 	 *
 	 * @param string $key
 	 *
@@ -121,5 +109,16 @@ class CEncryptHelper {
 			' SET session_key='.zbx_dbstr($key).
 			' WHERE '.dbConditionInt('configid', [$db_config['configid']])
 		);
+	}
+
+	/**
+	 * Generate a hash value.
+	 *
+	 * @param string $message
+	 *
+	 * @return string
+	 */
+	public static function hash(string $message): string {
+		return hash('sha256', $message, false);
 	}
 }
