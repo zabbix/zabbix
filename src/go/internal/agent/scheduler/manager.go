@@ -251,16 +251,19 @@ func (m *Manager) processQueue(now time.Time) {
 // processAndFlushUserParamQueue processes queued user parameters plugins/tasks and/or removes them
 func (m *Manager) processAndFlushUserParamQueue(now time.Time) {
 	seconds := now.Unix()
-	for p := m.pluginQueue.Peek(); p != nil; p = m.pluginQueue.Peek() {
+	num := m.pluginQueue.Len()
+
+	for p := m.pluginQueue.Peek(); p != nil && num > 0; p = m.pluginQueue.Peek() {
+		heap.Pop(&m.pluginQueue)
+		num--
+
 		if !p.usrprm {
-			heap.Pop(&m.pluginQueue)
+			heap.Push(&m.pluginQueue, p)
 			continue
 		}
 
 		if task := p.peekTask(); task != nil {
-			heap.Pop(&m.pluginQueue)
 			if !p.hasCapacity() || task.getScheduled().Unix() > seconds {
-				m.pluginQueue.Remove(p)
 				continue
 			}
 
@@ -268,8 +271,6 @@ func (m *Manager) processAndFlushUserParamQueue(now time.Time) {
 			p.reserveCapacity(p.popTask())
 			task.perform(m)
 		}
-
-		m.pluginQueue.Remove(p)
 	}
 }
 
