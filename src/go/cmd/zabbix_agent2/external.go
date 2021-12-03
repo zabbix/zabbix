@@ -101,12 +101,14 @@ func validate(p *external.Plugin, options interface{}) error {
 }
 
 func createAccessor(path, socket string, timeout time.Duration, listener net.Listener) *external.Plugin {
-	accessor := &external.Plugin{}
-	accessor.Path = path
-	accessor.Socket = socket
-	accessor.Initial = true
-	accessor.Listener = listener
-	accessor.Timeout = timeout
+	accessor := &external.Plugin{
+		Path:     path,
+		Socket:   socket,
+		Initial:  true,
+		Listener: listener,
+		Timeout:  timeout,
+	}
+
 	accessor.SetExternal(true)
 
 	return accessor

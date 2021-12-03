@@ -20,6 +20,7 @@
 package shared
 
 import (
+	"bytes"
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
@@ -27,12 +28,23 @@ import (
 )
 
 const JSONType = uint32(1)
+const headerTypeLen = 4
+const headerDataLen = 4
 
 func Read(conn net.Conn) (dataType uint32, requestData []byte, err error) {
-	reqByteType := make([]byte, 4)
-	reqByteLen := make([]byte, 4)
-	_, err = conn.Read(reqByteType)
+	reqByteType := make([]byte, headerTypeLen)
+	reqByteLen := make([]byte, headerDataLen)
+	n, err := conn.Read(reqByteType)
 	if err != nil {
+		return
+	}
+
+	if n < headerTypeLen {
+		err = fmt.Errorf(
+			"incomplete protocol header type value, %d bytes read, must be 4 bytes",
+			n,
+		)
+
 		return
 	}
 
@@ -42,16 +54,35 @@ func Read(conn net.Conn) (dataType uint32, requestData []byte, err error) {
 		return
 	}
 
-	_, err = conn.Read(reqByteLen)
+	n, err = conn.Read(reqByteLen)
 	if err != nil {
+		return
+	}
+
+	if n < headerDataLen {
+		err = fmt.Errorf(
+			"incomplete protocol header length value, %d bytes read, must be 4 bytes",
+			n,
+		)
+
 		return
 	}
 
 	reqLen := int32(binary.LittleEndian.Uint32(reqByteLen))
 	data := make([]byte, reqLen)
 
-	_, err = conn.Read(data)
+	n, err = conn.Read(data)
 	if err != nil {
+		return
+	}
+
+	if n < int(reqLen) {
+		err = fmt.Errorf(
+			"incomplete protocol body value, %d bytes read, must be %d bytes",
+			n,
+			reqLen,
+		)
+
 		return
 	}
 
@@ -69,18 +100,23 @@ func Write(conn net.Conn, in interface{}) (err error) {
 		return
 	}
 
-	dataType := make([]byte, 4)
-	binary.LittleEndian.PutUint32(dataType, JSONType)
+	buf := new(bytes.Buffer)
+	err = binary.Write(buf, binary.LittleEndian, JSONType)
+	if err != nil {
+		return
+	}
 
-	dataLen := make([]byte, 4)
-	binary.LittleEndian.PutUint32(dataLen, uint32(len(reqBytes)))
+	err = binary.Write(buf, binary.LittleEndian, uint32(len(reqBytes)))
+	if err != nil {
+		return
+	}
 
-	var data []byte
-	data = append(data, dataType...)
-	data = append(data, dataLen...)
-	data = append(data, reqBytes...)
+	_, err = buf.Write(reqBytes)
+	if err != nil {
+		return
+	}
 
-	if _, err = conn.Write(data); err != nil {
+	if _, err = conn.Write(buf.Bytes()); err != nil {
 		return
 	}
 
