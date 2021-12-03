@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-05 19:58+0200\n"
+"POT-Creation-Date: 2021-12-03 19:53+0200\n"
 "PO-Revision-Date: 2021-09-15 12:05+0300\n"
 "Last-Translator: Joachim <joachim.schwender@web.de>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -6937,7 +6937,7 @@ msgstr "GSM-Modem"
 msgid "GUI"
 msgstr "Oberfläche"
 
-#: include/classes/user/CWebUser.php:63 index_sso.php:245
+#: include/classes/user/CWebUser.php:63 index_sso.php:260
 msgid "GUI access disabled."
 msgstr "Zugriff auf Oberfläche deaktiviert."
 
@@ -10813,7 +10813,7 @@ msgstr "Nicht verarbeitbare SNMP-Traps protokollieren"
 #: app/controllers/CControllerAuditLogList.php:166
 #: app/views/administration.authentication.edit.php:132
 #: app/views/administration.user.list.php:112 include/func.inc.php:1523
-#: include/func.inc.php:1539 index_http.php:90 index_sso.php:265
+#: include/func.inc.php:1539 index_http.php:90 index_sso.php:280
 msgid "Login"
 msgstr "Anmelden"
 
@@ -15787,6 +15787,7 @@ msgid "Services form a circular dependency."
 msgstr "Dienste bilden eine zirkläre Abhängigkeit."
 
 #: include/classes/core/ZBase.php:242 include/classes/core/ZBase.php:470
+#: index_sso.php:242 index_sso.php:249
 msgid "Session initialization error."
 msgstr "Fehler bei der Sitzungsinitialisierung."
 
@@ -19508,7 +19509,7 @@ msgstr "Sie sind angemeldet als \"%1$s\"."
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "Sie können einige der Sprachen nicht auswählen, weil die nötige Locale nicht auf dem Web-Server installiert ist."
 
-#: include/func.inc.php:1533 index_http.php:87 index_sso.php:262
+#: include/func.inc.php:1533 index_http.php:87 index_sso.php:277
 msgid "You are not logged in"
 msgstr "Du bist nicht eingeloggt"
 

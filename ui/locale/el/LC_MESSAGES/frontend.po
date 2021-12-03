@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-05 19:58+0200\n"
+"POT-Creation-Date: 2021-12-03 19:53+0200\n"
 "PO-Revision-Date: 2014-10-03 08:43+0300\n"
 "Last-Translator: ΓΙΑΝΝΗΣ <yannis@computerstudio.gr>\n"
 "Language-Team: none\n"
@@ -6929,7 +6929,7 @@ msgstr "GSM μόντεμ"
 msgid "GUI"
 msgstr "GUI"
 
-#: include/classes/user/CWebUser.php:63 index_sso.php:245
+#: include/classes/user/CWebUser.php:63 index_sso.php:260
 msgid "GUI access disabled."
 msgstr "Απενεργοποιημένη πρόσβαση GUI."
 
@@ -10802,7 +10802,7 @@ msgstr "Καταγραφή αταίριαστων SNMP traps"
 #: app/controllers/CControllerAuditLogList.php:166
 #: app/views/administration.authentication.edit.php:132
 #: app/views/administration.user.list.php:112 include/func.inc.php:1523
-#: include/func.inc.php:1539 index_http.php:90 index_sso.php:265
+#: include/func.inc.php:1539 index_http.php:90 index_sso.php:280
 msgid "Login"
 msgstr "Σύνδεση"
 
@@ -15766,6 +15766,7 @@ msgid "Services form a circular dependency."
 msgstr "Υπηρεσίες από κυκλική εξάρτηση."
 
 #: include/classes/core/ZBase.php:242 include/classes/core/ZBase.php:470
+#: index_sso.php:242 index_sso.php:249
 msgid "Session initialization error."
 msgstr ""
 
@@ -19479,7 +19480,7 @@ msgstr ""
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "Δεν μπορείται να επιλέξετε κάποια από τις γλώσσες, επειδή οι τοπικές ρυθμίσεις για αυτές δεν είναι εγκατεστημένες στον εξυπηρετητή ιστού."
 
-#: include/func.inc.php:1533 index_http.php:87 index_sso.php:262
+#: include/func.inc.php:1533 index_http.php:87 index_sso.php:277
 msgid "You are not logged in"
 msgstr ""
 

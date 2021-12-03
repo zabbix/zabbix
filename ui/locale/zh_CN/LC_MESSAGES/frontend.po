@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-05 19:58+0200\n"
+"POT-Creation-Date: 2021-12-03 19:53+0200\n"
 "PO-Revision-Date: 2016-05-11 02:08+0300\n"
 "Last-Translator: 岂几 <tom3000@126.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -6847,7 +6847,7 @@ msgstr "GSM 调制解调器"
 msgid "GUI"
 msgstr "界面设置"
 
-#: include/classes/user/CWebUser.php:63 index_sso.php:245
+#: include/classes/user/CWebUser.php:63 index_sso.php:260
 msgid "GUI access disabled."
 msgstr "图形化界面已经被禁用。"
 
@@ -10705,7 +10705,7 @@ msgstr "日志与SNMP采集器不符"
 #: app/controllers/CControllerAuditLogList.php:166
 #: app/views/administration.authentication.edit.php:132
 #: app/views/administration.user.list.php:112 include/func.inc.php:1523
-#: include/func.inc.php:1539 index_http.php:90 index_sso.php:265
+#: include/func.inc.php:1539 index_http.php:90 index_sso.php:280
 msgid "Login"
 msgstr "登录"
 
@@ -15653,6 +15653,7 @@ msgid "Services form a circular dependency."
 msgstr "服务形成了一个环."
 
 #: include/classes/core/ZBase.php:242 include/classes/core/ZBase.php:470
+#: index_sso.php:242 index_sso.php:249
 msgid "Session initialization error."
 msgstr ""
 
@@ -19352,7 +19353,7 @@ msgstr "\"%1$s\" 欢迎登入."
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "您无法选择某些语言, 因为这些语言并未安装在web服务器上。"
 
-#: include/func.inc.php:1533 index_http.php:87 index_sso.php:262
+#: include/func.inc.php:1533 index_http.php:87 index_sso.php:277
 msgid "You are not logged in"
 msgstr "您还没有登录。"
 

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-05 19:58+0200\n"
+"POT-Creation-Date: 2021-12-03 19:53+0200\n"
 "PO-Revision-Date: 2016-01-22 16:15+0300\n"
 "Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -6841,7 +6841,7 @@ msgstr "GSM 모뎀"
 msgid "GUI"
 msgstr "표시 설정"
 
-#: include/classes/user/CWebUser.php:63 index_sso.php:245
+#: include/classes/user/CWebUser.php:63 index_sso.php:260
 msgid "GUI access disabled."
 msgstr "GUI 액세스를 비활성 하였습니다"
 
@@ -10696,7 +10696,7 @@ msgstr "매치하지 않은 SNMP트랩을 로그에 기록"
 #: app/controllers/CControllerAuditLogList.php:166
 #: app/views/administration.authentication.edit.php:132
 #: app/views/administration.user.list.php:112 include/func.inc.php:1523
-#: include/func.inc.php:1539 index_http.php:90 index_sso.php:265
+#: include/func.inc.php:1539 index_http.php:90 index_sso.php:280
 msgid "Login"
 msgstr "로그인"
 
@@ -15640,6 +15640,7 @@ msgid "Services form a circular dependency."
 msgstr "서비스의 의존관계가 모순되어있습니다."
 
 #: include/classes/core/ZBase.php:242 include/classes/core/ZBase.php:470
+#: index_sso.php:242 index_sso.php:249
 msgid "Session initialization error."
 msgstr ""
 
@@ -19338,7 +19339,7 @@ msgstr "\"%1$s\"로 로그인 하였습니다."
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "Web서버의 언어가 인스톨되어있지 않기 때문에 몇 언어를 이용할 수 없습니다."
 
-#: include/func.inc.php:1533 index_http.php:87 index_sso.php:262
+#: include/func.inc.php:1533 index_http.php:87 index_sso.php:277
 msgid "You are not logged in"
 msgstr "당신은 로그인 되지 않았습니다"
 

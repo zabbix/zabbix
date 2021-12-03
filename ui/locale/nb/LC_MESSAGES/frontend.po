@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-05 19:58+0200\n"
+"POT-Creation-Date: 2021-12-03 19:53+0200\n"
 "PO-Revision-Date: 2021-03-19 18:13+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: none\n"
@@ -6925,7 +6925,7 @@ msgstr "GSM-modem"
 msgid "GUI"
 msgstr "GUI"
 
-#: include/classes/user/CWebUser.php:63 index_sso.php:245
+#: include/classes/user/CWebUser.php:63 index_sso.php:260
 msgid "GUI access disabled."
 msgstr "GUI-tilgang deaktivert."
 
@@ -10797,7 +10797,7 @@ msgstr "Logg på uovertruffen SNMP-feller"
 #: app/controllers/CControllerAuditLogList.php:166
 #: app/views/administration.authentication.edit.php:132
 #: app/views/administration.user.list.php:112 include/func.inc.php:1523
-#: include/func.inc.php:1539 index_http.php:90 index_sso.php:265
+#: include/func.inc.php:1539 index_http.php:90 index_sso.php:280
 #, fuzzy
 msgid "Login"
 msgstr "P"
@@ -15758,6 +15758,7 @@ msgid "Services form a circular dependency."
 msgstr "Tjenester danner en sirkulær avhengighet."
 
 #: include/classes/core/ZBase.php:242 include/classes/core/ZBase.php:470
+#: index_sso.php:242 index_sso.php:249
 msgid "Session initialization error."
 msgstr ""
 
@@ -19470,7 +19471,7 @@ msgstr "Du er innlogget som \"%1$s\"."
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "Du kan ikke velge noen av språkene, fordi lokalene for dem ikke er installert på webserveren."
 
-#: include/func.inc.php:1533 index_http.php:87 index_sso.php:262
+#: include/func.inc.php:1533 index_http.php:87 index_sso.php:277
 msgid "You are not logged in"
 msgstr "Du er ikke innlogget"
 
