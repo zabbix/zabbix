@@ -2235,21 +2235,22 @@ class CApiInputValidator {
 	/**
 	 * Validate IP ranges. Multiple IPs separated by comma character.
 	 * Example:
-	 *   127.0.0.1,192.168.1.1-254,192.168.2.1-100,192.168.3.0/24
+	 *   127.0.0.1,192.168.1.1-254,192.168.2.1-100,192.168.3.0/24,{$MACRO}
 	 *
-	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_DNS, API_ALLOW_RANGE
-	 * @param int    $rule['length']  (optional)
-	 * @param mixed  $data
-	 * @param string $path
-	 * @param string $error
+	 * @param array      $rule
+	 * @param int        $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_DNS, API_ALLOW_RANGE, API_ALLOW_USER_MACRO
+	 * @param array|bool $rule['macros']  (optional) An array of supported macros. True - all macros are supported.
+	 * @param int        $rule['length']  (optional)
+	 * @param mixed      $data
+	 * @param string     $path
+	 * @param string     $error
 	 *
 	 * @return bool
 	 */
 	private static function validateIpRanges($rule, &$data, $path, &$error) {
 		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
 
-		if (self::checkStringUtf8($flags, $data, $path, $error) === false) {
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
 			return false;
 		}
 
@@ -2265,7 +2266,9 @@ class CApiInputValidator {
 		$ip_range_parser = new CIPRangeParser([
 			'v6' => ZBX_HAVE_IPV6,
 			'dns' => ($flags & API_ALLOW_DNS),
-			'ranges' => ($flags & API_ALLOW_RANGE)
+			'ranges' => ($flags & API_ALLOW_RANGE),
+			'usermacros' => ($flags & API_ALLOW_USER_MACRO),
+			'macros' => array_key_exists('macros', $rule) ? $rule['macros'] : []
 		]);
 
 		if (!$ip_range_parser->parse($data)) {

@@ -3997,6 +3997,42 @@ class CApiInputValidatorTest extends TestCase {
 				'192.168.3.5,192.168.6.1-240'
 			],
 			[
+				['type' => API_IP_RANGES],
+				'{$MACRO}',
+				'/1/ip_range',
+				'Invalid parameter "/1/ip_range": invalid address range "{$MACRO}".'
+			],
+			[
+				['type' => API_IP_RANGES, 'flags' => API_ALLOW_USER_MACRO],
+				'{$MACRO}',
+				'/1/ip_range',
+				'{$MACRO}'
+			],
+			[
+				['type' => API_IP_RANGES],
+				'{HOST.IP}',
+				'/1/ip_range',
+				'Invalid parameter "/1/ip_range": invalid address range "{HOST.IP}".'
+			],
+			[
+				['type' => API_IP_RANGES, 'macros' => true],
+				'{HOST.IP}',
+				'/1/ip_range',
+				'{HOST.IP}'
+			],
+			[
+				['type' => API_IP_RANGES, 'macros' => ['{HOST.IP}']],
+				'{HOST.DNS}',
+				'/1/ip_range',
+				'Invalid parameter "/1/ip_range": invalid address range "{HOST.DNS}".'
+			],
+			[
+				['type' => API_IP_RANGES, 'macros' => ['{HOST.IP}']],
+				'{HOST.IP}',
+				'/1/ip_range',
+				'{HOST.IP}'
+			],
+			[
 				['type' => API_DNS],
 				'',
 				'/1/dns',
