@@ -320,10 +320,10 @@ class CMaintenance extends CApiService {
 			'tags_evaltype' =>		['type' => API_INT32, 'in' => implode(',', [MAINTENANCE_TAG_EVAL_TYPE_AND_OR, MAINTENANCE_TAG_EVAL_TYPE_OR])],
 			'groupids' =>			['type' => API_IDS, 'flags' => API_DEPRECATED, 'uniq' => true],
 			'hostids' =>			['type' => API_IDS, 'flags' => API_DEPRECATED, 'uniq' => true],
-			'groups' =>				['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['groupid']], 'fields' => [
+			'groups' =>				['type' => API_OBJECTS, 'uniq' => [['groupid']], 'fields' => [
 				'groupid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
-			'hosts' =>				['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['hostid']], 'fields' => [
+			'hosts' =>				['type' => API_OBJECTS, 'uniq' => [['hostid']], 'fields' => [
 				'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
 			'tags' =>				['type' => API_OBJECTS, 'uniq' => [['tag', 'operator', 'value']], 'fields' => [
