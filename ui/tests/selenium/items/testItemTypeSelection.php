@@ -34,10 +34,8 @@ class testItemTypeSelection extends CWebTest {
 	const LLDID = 90001;
 	const PROTOTYPE = true;
 
-	public $itemid;
-
 	/**
-	 * Attach Behaviors to the test.
+	 * Attach Message behavior to the test.
 	 *
 	 * @return array
 	 */
@@ -49,7 +47,7 @@ class testItemTypeSelection extends CWebTest {
 		return [
 			[
 				[
-					'fill' => [
+					'fields' => [
 						'Name' => 'Character',
 						'Key' => 'agent.hostmetadata'
 					],
@@ -58,7 +56,7 @@ class testItemTypeSelection extends CWebTest {
 			],
 			[
 				[
-					'fill' => [
+					'fields' => [
 						'Name' => 'Numeric unsigned',
 						'Key' => 'agent.ping'
 					],
@@ -68,7 +66,7 @@ class testItemTypeSelection extends CWebTest {
 			[
 				[
 
-					'fill' => [
+					'fields' => [
 						'Name' => 'Numeric float',
 						'Key' => 'net.udp.service.perf[service]'
 					],
@@ -77,7 +75,7 @@ class testItemTypeSelection extends CWebTest {
 			],
 			[
 				[
-					'fill' => [
+					'fields' => [
 						'Name' => 'Log',
 						'Key' => 'eventlog[name]'
 					],
@@ -86,7 +84,7 @@ class testItemTypeSelection extends CWebTest {
 			],
 			[
 				[
-					'fill' => [
+					'fields' => [
 						'Name' => 'Text',
 						'Key' => 'net.if.discovery'
 					],
@@ -95,7 +93,7 @@ class testItemTypeSelection extends CWebTest {
 			],
 			[
 				[
-					'fill' => [
+					'fields' => [
 						'Name' => 'Custom key',
 						'Key' => 'custom.key'
 					],
@@ -104,7 +102,7 @@ class testItemTypeSelection extends CWebTest {
 			],
 			[
 				[
-					'fill' => [
+					'fields' => [
 						'Name' => 'Custom key 2',
 						'Key' => 'custom.key2',
 						'Type of information' => 'Text'
@@ -115,7 +113,7 @@ class testItemTypeSelection extends CWebTest {
 			],
 			[
 				[
-					'fill' => [
+					'fields' => [
 						'Name' => 'Test Info Hint',
 						'Key' => 'net.if.list',
 						'Type of information' => 'Log'
@@ -157,8 +155,8 @@ class testItemTypeSelection extends CWebTest {
 		$form = $this->query('id', ($prototype) ? 'item-prototype-form' : 'item-form')->asForm()->waitUntilReady()->one();
 
 		// Make names unique for items and prototypes.
-		$data['fill']['Name'] = $data['fill']['Name'].microtime();
-		$form->fill($data['fill']);
+		$data['fields']['Name'] = $data['fields']['Name'].microtime();
+		$form->fill($data['fields']);
 
 		// Check hintbox text.
 		if (CTestArrayHelper::get($data, 'hint')) {
@@ -179,17 +177,10 @@ class testItemTypeSelection extends CWebTest {
 		$form->submit();
 		$this->assertMessage(TEST_GOOD, ($prototype) ? 'Item prototype added' : 'Item added');
 
-		// Check item saved in db.
-		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM items '.
-				'WHERE key_ ='.zbx_dbstr($data['fill']['Key']).
-					' AND name ='.zbx_dbstr($data['fill']['Name'])
-			)
-		);
-
-		// Check saved item form in Frontend.
-		$id = CDBHelper::getValue('SELECT * FROM items '.
-				'WHERE key_ ='.zbx_dbstr($data['fill']['Key']).
-					' AND name ='.zbx_dbstr($data['fill']['Name'])
+		// Check saved item form in DB and Frontend.
+		$id = CDBHelper::getValue('SELECT itemid FROM items'.
+				' WHERE key_ ='.zbx_dbstr($data['fields']['Key']).
+					' AND name ='.zbx_dbstr($data['fields']['Name'])
 		);
 
 		$saved_link = ($prototype)
@@ -199,13 +190,13 @@ class testItemTypeSelection extends CWebTest {
 		$this->page->open($saved_link)->waitUntilReady();
 
 		$form->invalidate();
-		$form->checkValue($data['fill']);
+		$form->checkValue($data['fields']);
 
 		if (CTestArrayHelper::get($data, 'hint')) {
 			// Check that info disappears when preprocessing step is added.
 			$form->selectTab('Preprocessing');
 			$this->addPreprocessingSteps([['type' => 'Regular expression', 'parameter_1' => 'pattern', 'parameter_2' => 'output']]);
-			$this->assertEquals($data['fill']['Type of information'], $form->getField('Type of information')->getValue());
+			$this->assertEquals($data['fields']['Type of information'], $form->getField('Type of information')->getValue());
 
 			$form->selectTab(($prototype) ? 'Item prototype' : 'Item');
 			$this->assertTrue($icon->isStalled());
@@ -215,7 +206,7 @@ class testItemTypeSelection extends CWebTest {
 			// Check that custom type remained in saved form.
 			$this->page->open($saved_link)->waitUntilReady();
 			$form->invalidate();
-			$this->assertEquals($data['fill']['Type of information'], $form->getField('Type of information')->getValue());
+			$this->assertEquals($data['fields']['Type of information'], $form->getField('Type of information')->getValue());
 
 			// Check that type changes to automatic when preprocessing is cleared.
 			$form->selectTab('Preprocessing');

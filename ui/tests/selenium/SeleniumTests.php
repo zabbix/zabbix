@@ -22,13 +22,13 @@ require_once dirname(__FILE__).'/testGeneric.php';
 
 // Dashboard.
 require_once dirname(__FILE__).'/dashboard/testDashboardCopyWidgets.php';
-require_once dirname(__FILE__).'/dashboard/testDashboardGraphPrototypeWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardDynamicItemWidgets.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardGraphPrototypeWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardGraphWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardHostAvailabilityWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardPages.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardProblemsBySeverityWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardSystemInformationWidget.php';
-require_once dirname(__FILE__).'/dashboard/testDashboardPages.php';
 require_once dirname(__FILE__).'/dashboard/testFormTemplateDashboards.php';
 require_once dirname(__FILE__).'/dashboard/testPageTemplateDashboards.php';
 
@@ -97,7 +97,6 @@ require_once dirname(__FILE__).'/users/testFormUserMedia.php';
 require_once dirname(__FILE__).'/users/testFormUserPermissions.php';
 require_once dirname(__FILE__).'/users/testFormUserProfile.php';
 
-
 require_once dirname(__FILE__).'/testGraphAxis.php';
 require_once dirname(__FILE__).'/testPageDashboard.php';
 require_once dirname(__FILE__).'/testPageDashboardWidgets.php';
@@ -134,7 +133,6 @@ require_once dirname(__FILE__).'/testPageMassUpdateItems.php';
 require_once dirname(__FILE__).'/testPageMassUpdateItemPrototypes.php';
 require_once dirname(__FILE__).'/testPageMonitoringHosts.php';
 require_once dirname(__FILE__).'/testPageNetworkDiscovery.php';
-
 require_once dirname(__FILE__).'/testPasswordComplexity.php';
 /*
 require_once dirname(__FILE__).'/testPageQueueDetails.php';
@@ -295,7 +293,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormUserPermissions');
 		$suite->addTestSuite('testFormUserProfile');
 
-
 		$suite->addTestSuite('testGraphAxis');
 		$suite->addTestSuite('testPageActions');
 		$suite->addTestSuite('testPageAdministrationDMProxies');
@@ -337,7 +334,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageQueueOverview');
 		$suite->addTestSuite('testPageQueueOverviewByProxy');
 */
-
 		$suite->addTestSuite('testPageSearch');
 		$suite->addTestSuite('testPageStatusOfZabbix');
 		$suite->addTestSuite('testPageTemplates');
