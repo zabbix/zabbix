@@ -1193,8 +1193,6 @@ class CApiInputValidator {
 				self::unsetNonexistMultipleRules($field_rule['rules'], $data);
 
 				foreach ($field_rule['rules'] as $multiple_rule) {
-					self::unsetNonexistMultipleRules($field_rule['rules'], $data);
-
 					if (array_key_exists('else', $multiple_rule)
 							|| self::isInRange($data[$multiple_rule['if']['field']], $multiple_rule['if']['in'])) {
 						if ($multiple_rule['type'] == API_UNEXPECTED && array_key_exists($field_name, $data)) {
@@ -1249,6 +1247,12 @@ class CApiInputValidator {
 		return true;
 	}
 
+	/**
+	 * Unset nonexists 'if' fields from multiple rules.
+	 *
+	 * @param array $rules
+	 * @param array $data
+	 */
 	private static function unsetNonexistMultipleRules(array &$rules, array $data): void {
 		foreach ($rules as $index => $rule) {
 			if (array_key_exists('if', $rule)) {
