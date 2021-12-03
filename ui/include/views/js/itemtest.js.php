@@ -69,7 +69,7 @@
 
 			steps.push(jQuery.extend({
 				type: type,
-				params: params.join("\n")
+				params: params
 			}, on_fail));
 		});
 
