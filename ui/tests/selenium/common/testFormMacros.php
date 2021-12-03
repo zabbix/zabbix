@@ -535,10 +535,6 @@ abstract class testFormMacros extends CWebTest {
 
 			$name = $is_prototype ? $data['Name'].' {#KEY}' : $data['Name'];
 			$form->fill([(($host_type === 'template') ? 'Template name' : 'Host name') => $name]);
-
-			if ($is_prototype) {
-				$form->selectTab('Groups');
-			}
 			$form->fill(['Groups' => 'Zabbix servers']);
 		}
 
@@ -689,7 +685,6 @@ abstract class testFormMacros extends CWebTest {
 			$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
 			$name = 'Host prototype with edited global {#MACRO} '.time();
 			$form->fill(['Host name' => $name]);
-			$form->selectTab('Groups');
 			$form->fill(['Groups' => 'Zabbix servers']);
 		}
 		else {

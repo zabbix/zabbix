@@ -244,12 +244,18 @@ final class CHistFunctionData {
 			['rules' => [['type' => 'query']]],
 			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_TREND]]],
 			['rules' => [['type' => 'time', 'min' => SEC_PER_HOUR]]],
-			['rules' => [['type' => 'time', 'min' => SEC_PER_HOUR]]],
-			['rules' => [['type' => 'number', 'min' => 1]], 'required' => false],
+			['rules' => [['type' => 'time', 'min' => SEC_PER_HOUR * 2]]],
+			['rules' => [
+				['type' => 'regexp', 'pattern' => '/^((\d+(\.\d{0,4})?)|(\.\d{1,4}))$/'],
+				['type' => 'number', 'min' => 1, 'max' => ZBX_MAX_INT32]
+			], 'required' => false],
 			['rules' => [
 				['type' => 'regexp', 'pattern' => '/^(mad|stddevpop|stddevsamp)$/']
 			], 'required' => false],
-			['rules' => [['type' => 'number', 'min' => 7]], 'required' => false]
+			['rules' => [
+				['type' => 'regexp', 'pattern' => '/^\d+$/'],
+				['type' => 'number', 'min' => 7, 'max' => ZBX_MAX_INT32]
+			], 'required' => false]
 		],
 		'trendsum' => [
 			['rules' => [['type' => 'query']]],

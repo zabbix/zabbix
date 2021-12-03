@@ -263,8 +263,6 @@ class testFormHostPrototype extends CLegacyWebTest {
 			$this->zbxTestInputType('name', $data['visible_name']);
 		}
 
-		$this->zbxTestTabSwitch('Groups');
-
 		if (array_key_exists('hostgroup', $data)) {
 			$this->zbxTestClickButtonMultiselect('group_links_');
 			$this->zbxTestLaunchOverlayDialog('Host groups');
@@ -390,8 +388,6 @@ class testFormHostPrototype extends CLegacyWebTest {
 			$this->zbxTestInputClearAndTypeByXpath('//input[@id="name"]', $data['visible_name']);
 		}
 
-		$this->zbxTestTabSwitch('Groups');
-
 		if (array_key_exists('clear_groups', $data)) {
 			$this->zbxTestMultiselectClear('group_links_');
 		}
@@ -493,7 +489,6 @@ class testFormHostPrototype extends CLegacyWebTest {
 			$this->zbxTestCheckboxSelect('status', $data['checkbox']);
 		}
 
-		$this->zbxTestTabSwitch('Groups');
 		$this->zbxTestClickButtonMultiselect('group_links_');
 		$this->zbxTestLaunchOverlayDialog('Host groups');
 		$this->zbxTestClickLinkTextWait($data['hostgroup']);
@@ -503,7 +498,6 @@ class testFormHostPrototype extends CLegacyWebTest {
 		}
 
 		if (array_key_exists('template', $data)) {
-			$this->zbxTestTabSwitch('Templates');
 			$this->zbxTestClickButtonMultiselect('add_templates_');
 			$this->zbxTestLaunchOverlayDialog('Templates');
 			COverlayDialogElement::find()->one()->setDataContext('Templates');
@@ -614,7 +608,6 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		// Change Host group and Group prototype.
 		if (array_key_exists('hostgroup', $data)) {
-			$this->zbxTestTabSwitch('Groups');
 			$this->zbxTestMultiselectClear('group_links_');
 			$this->zbxTestClickButtonMultiselect('group_links_');
 			$this->zbxTestLaunchOverlayDialog('Host groups');
@@ -624,7 +617,6 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		// Change template.
 		if (array_key_exists('template', $data)) {
-			$this->zbxTestTabSwitch('Templates');
 			$this->zbxTestClickXpathWait('//button[contains(@onclick,"unlink")]');
 			$this->zbxTestClickButtonMultiselect('add_templates_');
 			$this->zbxTestLaunchOverlayDialog('Templates');
@@ -886,7 +878,6 @@ class testFormHostPrototype extends CLegacyWebTest {
 		if (array_key_exists('checkbox', $data)) {
 			$this->zbxTestCheckboxSelect('status', $data['checkbox']);
 		}
-		$this->zbxTestTabSwitch('Groups');
 		// Change host group.
 		if (array_key_exists('hostgroup', $data)) {
 			$this->zbxTestClickXpathWait('//span[@class="subfilter-disable-btn"]');
@@ -902,8 +893,6 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		// Change template.
 		if (array_key_exists('template', $data)) {
-			$this->zbxTestTabSwitch('Templates');
-			$this->zbxTestWaitForPageToLoad();
 			$this->zbxTestClickButtonMultiselect('add_templates_');
 			$this->zbxTestLaunchOverlayDialog('Templates');
 			COverlayDialogElement::find()->one()->setDataContext('Templates');
@@ -951,7 +940,6 @@ class testFormHostPrototype extends CLegacyWebTest {
 		}
 
 		if (array_key_exists('hostgroup', $data)) {
-			$this->zbxTestTabSwitch('Groups');
 			$this->zbxTestMultiselectAssertSelected('group_links_', $data['hostgroup']);
 			if (array_key_exists('group_prototype', $data)) {
 				$this->assertEquals($data['group_prototype'], $this->zbxTestGetValue('//input[@name="group_prototypes[0][name]"]'));
@@ -959,8 +947,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 		}
 
 		if (array_key_exists('template', $data)) {
-			$this->zbxTestTabSwitch('Templates');
-			$this->zbxTestAssertElementText('//div[@id="templateTab"]//a', $data['template']);
+			$this->query('link', $data['template']);
 		}
 
 		if (array_key_exists('macros', $data)) {
@@ -1009,7 +996,6 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$this->zbxTestContentControlButtonClickTextWait('Create host prototype');
 
 		$this->zbxTestInputType('host', $name);
-		$this->zbxTestTabSwitch('Groups');
 		$this->zbxTestClickButtonMultiselect('group_links_');
 		$this->zbxTestLaunchOverlayDialog('Host groups');
 		$this->zbxTestClickLinkText($group);

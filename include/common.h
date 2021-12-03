@@ -721,6 +721,10 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define ACTION_PAUSE_SUPPRESSED_FALSE	0	/* process escalation for suppressed events */
 #define ACTION_PAUSE_SUPPRESSED_TRUE	1	/* pause escalation for suppressed events */
 
+/* action escalation canceled notification mode */
+#define ACTION_NOTIFY_IF_CANCELED_TRUE	1	/* notify about canceled escalations for action (default) */
+#define ACTION_NOTIFY_IF_CANCELED_FALSE	0	/* do not notify about canceled escalations for action */
+
 /* max number of retries for alerts */
 #define ALERT_MAX_RETRIES	3
 
@@ -1782,4 +1786,6 @@ typedef enum
 }
 zbx_err_codes_t;
 
+void	zbx_md5buf2str(const md5_byte_t *md5, char *str);
+int	zbx_hex2bin(const unsigned char *p_hex, unsigned char *buf, int buf_len);
 #endif

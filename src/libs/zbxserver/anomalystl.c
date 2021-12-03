@@ -56,7 +56,7 @@ ZBX_PTR_VECTOR_IMPL(VV, zbx_vector_history_record_t *)
  *                                                                             *
  *******************************************************************************/
 int	zbx_get_percentage_of_deviations_in_stl_remainder(const zbx_vector_history_record_t *remainder,
-		zbx_uint64_t deviations_count, const char* devalg, int detect_period_start, int detect_period_end,
+		double deviations_count, const char* devalg, int detect_period_start, int detect_period_end,
 		double *result, char **error)
 {
 	int			i, total_values_count = 0, deviations_detected_count = 0, ret = FAIL;
@@ -99,7 +99,7 @@ int	zbx_get_percentage_of_deviations_in_stl_remainder(const zbx_vector_history_r
 	if (SUCCEED != (ret = stat_func(&remainder_values_dbl, &remainder_deviation, error)))
 		goto out;
 
-	deviation_limit = remainder_deviation * (double)deviations_count;
+	deviation_limit = remainder_deviation * deviations_count;
 
 	for (i = 0; i < remainder->values_num; i++)
 	{
@@ -724,11 +724,15 @@ int	zbx_STL(const zbx_vector_history_record_t *values_in, int freq, int is_robus
 	if (S_JUMP_DEF == nsjump)
 		nsjump = (int)(tmp = ceil((double)s_window / 10));
 
+	ZBX_UNUSED(tmp);
+
 	if (T_WINDOW_DEF == t_window)
 		t_window = nextodd(ceil(1.5 * (double)freq / (1 - (1.5 / s_window))));
 
 	if (T_JUMP_DEF == ntjump)
 		ntjump = (int)(tmp = ceil(t_window/10));
+
+	ZBX_UNUSED(tmp);
 
 	if (L_WINDOW_DEF == l_window)
 		l_window = nextodd(freq);
@@ -738,6 +742,8 @@ int	zbx_STL(const zbx_vector_history_record_t *values_in, int freq, int is_robus
 
 	if (L_JUMP_DEF == nljump)
 		nljump = (int)(tmp = ceil((double)l_window / 10));
+
+	ZBX_UNUSED(tmp);
 
 	if (INNER_DEF == inner)
 		inner = (1 == is_robust) ? 1 : 2;

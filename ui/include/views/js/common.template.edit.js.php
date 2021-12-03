@@ -139,7 +139,7 @@
 			var panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;
 
 			if (panel.attr('id') === 'macroTab') {
-				let macros_initialized = panel.data('macros_initialized') || false;
+				const macros_initialized = panel.data('macros_initialized') || false;
 
 				// Please note that macro initialization must take place once and only when the tab is visible.
 				if (event.type === 'tabsactivate') {
@@ -148,9 +148,12 @@
 
 					if (panel_templateids.xor(templateids).length > 0) {
 						panel.data('templateids', templateids);
-						window.macros_manager.load($show_inherited_macros.val() == 1,
+
+						window.macros_manager.load(
+							$show_inherited_macros.filter(':checked').val() == 1,
 							linked_templateids.concat(templateids)
 						);
+
 						panel.data('macros_initialized', true);
 					}
 				}
@@ -163,7 +166,7 @@
 				<?php if ($data['readonly']): ?>
 					$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', '#tbl_macros').textareaFlexible();
 				<?php else: ?>
-					window.macros_manager.initMacroTable($('input[name="show_inherited_macros"]:checked').val() == 1);
+					window.macros_manager.initMacroTable($show_inherited_macros.filter(':checked').val() == 1);
 				<?php endif ?>
 
 				panel.data('macros_initialized', true);
@@ -175,8 +178,25 @@
 				return;
 			}
 
-			let templateids = linked_templateids.concat(getAddTemplates());
-			window.macros_manager.load($(this).val() == 1, templateids);
+			window.macros_manager.load($(this).val() == 1, linked_templateids.concat(getAddTemplates()));
+		});
+
+		const $groups_ms = $('#groups_, #group_links_');
+		const $template_ms = $('#add_templates_');
+
+		$template_ms.on('change', (e) => {
+			$template_ms.multiSelect('setDisabledEntries',
+				[... document.querySelectorAll('[name^="add_templates["], [name^="templates["]')]
+					.map((input) => input.value)
+			);
+		});
+
+		$groups_ms.on('change', (e) => {
+			console.log('e')
+			$groups_ms.multiSelect('setDisabledEntries',
+				[... document.querySelectorAll('[name^="groups["], [name^="group_links["]')]
+					.map((input) => input.value)
+			);
 		});
 	});
 </script>
