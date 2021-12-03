@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-26 19:55+0200\n"
+"POT-Creation-Date: 2021-12-03 19:55+0200\n"
 "PO-Revision-Date: 2021-11-21 09:37+0300\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
@@ -455,7 +455,7 @@ msgstr "אסימון ה־API עודכן"
 msgid "API tokens"
 msgstr "אסימוני API"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:339
+#: app/controllers/CControllerPopupTriggerExpr.php:370
 msgid "Abscissa"
 msgstr "אבסיסה"
 
@@ -559,11 +559,11 @@ msgstr "אירועים מוכרים שנפתרו"
 #: include/actions.inc.php:1921
 #: include/views/administration.auditacts.list.php:64
 #: include/views/configuration.action.edit.php:59
-#: include/views/configuration.action.edit.php:175
-#: include/views/configuration.action.edit.php:179
-#: include/views/configuration.action.edit.php:319
-#: include/views/configuration.action.edit.php:407
-#: include/views/configuration.action.edit.php:478
+#: include/views/configuration.action.edit.php:168
+#: include/views/configuration.action.edit.php:172
+#: include/views/configuration.action.edit.php:312
+#: include/views/configuration.action.edit.php:400
+#: include/views/configuration.action.edit.php:483
 #: include/views/configuration.graph.edit.php:380
 #: include/views/configuration.host.discovery.edit.php:134
 #: include/views/configuration.host.discovery.edit.php:632
@@ -594,7 +594,7 @@ msgstr "אירועים מוכרים שנפתרו"
 msgid "Action"
 msgstr "משימה"
 
-#: include/classes/api/services/CAction.php:2678
+#: include/classes/api/services/CAction.php:2688
 #, c-format
 msgid "Action \"%1$s\" already exists."
 msgstr "המשימה „%1$s” כבר קיימת."
@@ -604,7 +604,7 @@ msgstr "המשימה „%1$s” כבר קיימת."
 msgid "Action \"%2$s\" is not available for user role \"%1$s\"."
 msgstr "המשימה „%2$s” אינה זמינה לתפקיד משתמש „%1$s”."
 
-#: actionconf.php:279
+#: actionconf.php:285
 msgid "Action added"
 msgstr "נוספה משימה"
 
@@ -613,17 +613,17 @@ msgstr "נוספה משימה"
 msgid "Action class %1$s must extend %2$s class."
 msgstr "מחלקת הפעולה %1$s חייבת להרחיב את המחלקה %2$s."
 
-#: actionconf.php:301
+#: actionconf.php:307
 msgid "Action deleted"
 msgstr "המשימה נמחקה"
 
-#: actionconf.php:469
+#: actionconf.php:475
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] "המשימה הושבתה"
 msgstr[1] "המשימות הושבתו"
 
-#: actionconf.php:468
+#: actionconf.php:474
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] "המשימה הופעלה"
@@ -642,7 +642,7 @@ msgstr "רישום משימות"
 msgid "Action operation"
 msgstr "פעולת משימה"
 
-#: actionconf.php:271
+#: actionconf.php:277
 msgid "Action updated"
 msgstr "המשימה עודכנה"
 
@@ -771,10 +771,10 @@ msgstr "פעיל עד"
 #: include/classes/helpers/CTagFilterFieldHelper.php:92
 #: include/classes/widgets/CWidgetHelper.php:545 include/forms.inc.php:1481
 #: include/forms.inc.php:2045 include/views/configuration.action.edit.php:133
-#: include/views/configuration.action.edit.php:302
-#: include/views/configuration.action.edit.php:386
-#: include/views/configuration.action.edit.php:462
-#: include/views/configuration.action.edit.php:501
+#: include/views/configuration.action.edit.php:295
+#: include/views/configuration.action.edit.php:379
+#: include/views/configuration.action.edit.php:455
+#: include/views/configuration.action.edit.php:506
 #: include/views/configuration.graph.edit.php:423
 #: include/views/configuration.graph.edit.php:518
 #: include/views/configuration.host.discovery.edit.php:162
@@ -1024,7 +1024,7 @@ msgstr "בדיקת הגוון סוכן. מחזירה 1 - לסוכן Zabbix,‏ 2
 msgid "Aggregate"
 msgstr "צבירה"
 
-#: app/views/popup.triggerexpr.php:108
+#: app/views/popup.triggerexpr.php:109
 msgid "Aggregate functions"
 msgstr "פונקציות צבירה"
 
@@ -1040,7 +1040,7 @@ msgstr "משך צבירה"
 msgid "Alert message"
 msgstr "הודעת אזהרה"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1070
+#: app/controllers/CControllerPopupTriggerExpr.php:1115
 msgid "Algorithm"
 msgstr "אלגוריתם"
 
@@ -1360,7 +1360,7 @@ msgstr "אמורה להיות תמיכה באחד לפחות מבין MySQL,‏ 
 msgid "At least one operation must be selected."
 msgstr "יש לבחור בפעילות אחת לפחות."
 
-#: include/views/configuration.action.edit.php:511
+#: include/views/configuration.action.edit.php:516
 msgid "At least one operation must exist."
 msgstr "חייבת להיות לפחות פעולה אחת."
 
@@ -1623,12 +1623,12 @@ msgstr "DN איגוד"
 msgid "Bind password"
 msgstr "ססמת איגוד"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:397
-#: app/controllers/CControllerPopupTriggerExpr.php:430
+#: app/controllers/CControllerPopupTriggerExpr.php:428
+#: app/controllers/CControllerPopupTriggerExpr.php:461
 msgid "Bits to shift"
 msgstr "סיביות להזחה"
 
-#: app/views/popup.triggerexpr.php:109
+#: app/views/popup.triggerexpr.php:110
 msgid "Bitwise functions"
 msgstr "פונקציות על סיביות"
 
@@ -1834,7 +1834,7 @@ msgstr "לא ניתן להוסיף את הפריט „%1$s” שאינו מספ�
 msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
 msgstr "לא ניתן להוסיף את הפריט „%1$s” שאינו מספרי לאבטיפוס התרשים „%2$s”."
 
-#: actionconf.php:280
+#: actionconf.php:286
 msgid "Cannot add action"
 msgstr "לא ניתן להוסיף משימה"
 
@@ -2132,7 +2132,7 @@ msgstr[1] "לא ניתן למחוק אסימוני API"
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "לא ניתן למחוק את המשתמש הפנימי של Zabbix בשם „%1$s”, יש לנסות להשבית את המשתמש הזה."
 
-#: actionconf.php:301
+#: actionconf.php:307
 msgid "Cannot delete action"
 msgstr "לא ניתן למחוק את המשימה"
 
@@ -2296,12 +2296,12 @@ msgid_plural "Cannot delete scripts"
 msgstr[0] "לא ניתן למחוק סקריפט"
 msgstr[1] "לא ניתן למחוק סקריפטים"
 
-#: include/classes/api/services/CScript.php:875
+#: include/classes/api/services/CScript.php:877
 #, c-format
 msgid "Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$s\"."
 msgstr "לא ניתן למחוק את הסקריפטים. בסקריפט „%1$s” נעשה שימוש במשימת הפעולה „%2$s”."
 
-#: actionconf.php:488
+#: actionconf.php:494
 msgid "Cannot delete selected actions"
 msgstr "לא ניתן למחוק את המשימות הנבחרות"
 
@@ -2404,7 +2404,7 @@ msgid_plural "Cannot disable API tokens"
 msgstr[0] "לא ניתן להשבית אסימון API"
 msgstr[1] "לא ניתן להשבית אסימוני API"
 
-#: actionconf.php:477
+#: actionconf.php:483
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] "לא ניתן להשבית משימה"
@@ -2482,7 +2482,7 @@ msgid_plural "Cannot enable API tokens"
 msgstr[0] "לא ניתן להפעיל אסימון API"
 msgstr[1] "לא ניתן להפעיל אסימוני API"
 
-#: actionconf.php:476
+#: actionconf.php:482
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] "לא ניתן להפעיל משימה"
@@ -2711,7 +2711,7 @@ msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" do not 
 msgstr[0] "לא ניתן לייבא את התבנית „%1$s”, התבנית המקושרת „%2$s” אינה קיימת."
 msgstr[1] "לא ניתן לייבא את התבנית „%1$s”, התבניות המקושרות „%2$s” אינן קיימות."
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1527
+#: app/controllers/CControllerPopupTriggerExpr.php:1583
 msgid "Cannot insert trigger expression"
 msgstr "לא ניתן להוסיף ביטוי הקפצה"
 
@@ -2890,7 +2890,7 @@ msgstr "לא ניתן לנתק ולפנות תבנית."
 msgid "Cannot unlink trigger \"%1$s\", it has items from template that is left linked to host."
 msgstr "לא ניתן לנתק את ההקפצה „%1$s”, יש לה פריטים מתבנית שנותרה מקושרת למארח."
 
-#: include/classes/api/services/CAction.php:2626
+#: include/classes/api/services/CAction.php:2636
 #, c-format
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
 msgstr "לא ניתן לעדכן את „%1$s” עבור המשימה „%2$s”."
@@ -2956,7 +2956,7 @@ msgstr "לא ניתן לעדכן את קבוצת המארחים שהתגלתה �
 msgid "Cannot update a templated web scenario \"%1$s\": %2$s."
 msgstr "לא ניתן לעדכן תרחיש רשת בתבנית „%1$s”:‏ %2$s."
 
-#: actionconf.php:272
+#: actionconf.php:278
 msgid "Cannot update action"
 msgstr "לא ניתן לעדכן משימה"
 
@@ -3119,9 +3119,9 @@ msgstr "לא ניתן לעדכן דוח מתוזמן"
 msgid "Cannot update script"
 msgstr "לא ניתן לעדכן את הסקריפט"
 
-#: include/classes/api/services/CScript.php:417
-#: include/classes/api/services/CScript.php:430
-#: include/classes/api/services/CScript.php:443
+#: include/classes/api/services/CScript.php:419
+#: include/classes/api/services/CScript.php:432
+#: include/classes/api/services/CScript.php:445
 #, c-format
 msgid "Cannot update script scope. Script \"%1$s\" is used in action \"%2$s\"."
 msgstr "לא ניתן לעדכן את היקף הסקריפט. הסקריפט „%1$s” משמש את הפעולה „%2$s”."
@@ -3302,9 +3302,9 @@ msgstr "מחרוזת תווים כלולה"
 msgid "Character string not included"
 msgstr "מחרוזת תווים אינה כלולה"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:728
-#: app/controllers/CControllerPopupTriggerExpr.php:921
-#: app/controllers/CControllerPopupTriggerExpr.php:1095
+#: app/controllers/CControllerPopupTriggerExpr.php:759
+#: app/controllers/CControllerPopupTriggerExpr.php:952
+#: app/controllers/CControllerPopupTriggerExpr.php:1140
 msgid "Chars"
 msgstr "תווים"
 
@@ -3470,7 +3470,7 @@ msgstr "שעון"
 #: app/views/configuration.discovery.edit.php:154
 #: app/views/configuration.host.edit.php:43 app/views/popup.host.edit.php:68
 #: app/views/popup.service.edit.php:388
-#: include/views/configuration.action.edit.php:490
+#: include/views/configuration.action.edit.php:495
 #: include/views/configuration.graph.edit.php:510
 #: include/views/configuration.host.discovery.edit.php:960
 #: include/views/configuration.hostgroups.edit.php:62
@@ -3608,7 +3608,7 @@ msgstr "דחיסה"
 msgid "Concurrent sessions"
 msgstr "הפעלות בו־זמנית"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1550
+#: app/controllers/CControllerPopupTriggerExpr.php:1606
 #: app/views/popup.lldoperation.php:59 app/views/popup.lldoverride.php:195
 #: app/views/popup.service.statusrule.edit.php:48
 msgid "Condition"
@@ -4074,10 +4074,10 @@ msgstr "כלל יחס"
 msgid "Correlation updated"
 msgstr "יחס עודכן"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:51
-#: app/controllers/CControllerPopupTriggerExpr.php:674
-#: app/controllers/CControllerPopupTriggerExpr.php:864
+#: app/controllers/CControllerPopupTriggerExpr.php:52
+#: app/controllers/CControllerPopupTriggerExpr.php:705
 #: app/controllers/CControllerPopupTriggerExpr.php:895
+#: app/controllers/CControllerPopupTriggerExpr.php:926
 msgid "Count"
 msgstr "ספירה"
 
@@ -4612,8 +4612,8 @@ msgid "Database TLS key file"
 msgstr "קובץ מפתח TLS של מסד הנתונים"
 
 #: app/partials/administration.system.info.php:121
-msgid "Database history $info_tables upgraded"
-msgstr "היסטוריית מסד הנתונים ‎$info_tables שודרגה"
+msgid "Database history tables upgraded"
+msgstr ""
 
 #: app/partials/administration.system.info.php:129
 msgid "Database history tables use primary key"
@@ -4685,11 +4685,11 @@ msgstr "התאריך בו האחריות על החומרה פגה"
 msgid "Date HW purchased"
 msgstr "התאריך בו החומרה נרכשה"
 
-#: app/views/popup.triggerexpr.php:110
+#: app/views/popup.triggerexpr.php:111
 msgid "Date and time functions"
 msgstr "פונקציות תאריך ושעה"
 
-#: report4.php:175
+#: app/controllers/CControllerPopupTriggerExpr.php:119 report4.php:175
 msgid "Day"
 msgstr "יום"
 
@@ -4730,8 +4730,8 @@ msgstr "דצמ׳"
 msgid "December"
 msgstr "דצמבר"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:908
-#: app/controllers/CControllerPopupTriggerExpr.php:1108
+#: app/controllers/CControllerPopupTriggerExpr.php:939
+#: app/controllers/CControllerPopupTriggerExpr.php:1153
 msgid "Decimal places"
 msgstr "מקומות עשרוניים"
 
@@ -4741,7 +4741,7 @@ msgstr "הקטנה בשיעור"
 
 #: app/views/administration.iconmap.edit.php:108
 #: include/classes/widgets/forms/CWidgetForm.php:54 include/hosts.inc.php:31
-#: include/hosts.inc.php:1233 include/views/configuration.action.edit.php:229
+#: include/hosts.inc.php:1233 include/views/configuration.action.edit.php:222
 #: include/views/inventory.host.view.php:81
 #: include/views/js/monitoring.sysmaps.js.php:145
 #: include/views/js/monitoring.sysmaps.js.php:263
@@ -4885,7 +4885,7 @@ msgstr "למחוק ולפנות את התבניות הנבחרות? (אזהרה:
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
 msgstr "למחוק ולפנות את התבנית? (אזהרה: כל המארחים המקושרים יפונו גם הם!)"
 
-#: include/views/configuration.action.edit.php:492
+#: include/views/configuration.action.edit.php:497
 msgid "Delete current action?"
 msgstr "למחוק את המשימה הנוכחית?"
 
@@ -5187,7 +5187,7 @@ msgstr "רשימת דחייה"
 msgid "Dependencies"
 msgstr "תלויות"
 
-#: include/triggers.inc.php:2398
+#: include/triggers.inc.php:2402
 msgid "Dependent"
 msgstr "תלוי"
 
@@ -5195,7 +5195,7 @@ msgstr "תלוי"
 msgid "Dependent item"
 msgstr "פריט תלוי"
 
-#: app/views/popup.generic.php:278 include/triggers.inc.php:2398
+#: app/views/popup.generic.php:278 include/triggers.inc.php:2402
 #: include/views/configuration.trigger.prototype.list.php:92
 #: include/views/configuration.triggers.list.php:238
 msgid "Depends on"
@@ -5242,10 +5242,10 @@ msgstr "תיאור"
 #: app/views/js/reports.auditlog.list.js.php:153
 #: app/views/reports.auditlog.list.php:96
 #: app/views/reports.auditlog.list.php:129 include/func.inc.php:1601
-#: include/views/configuration.action.edit.php:175
-#: include/views/configuration.action.edit.php:179
-#: include/views/configuration.action.edit.php:319
-#: include/views/configuration.action.edit.php:407
+#: include/views/configuration.action.edit.php:168
+#: include/views/configuration.action.edit.php:172
+#: include/views/configuration.action.edit.php:312
+#: include/views/configuration.action.edit.php:400
 #: include/views/inventory.host.view.php:257
 msgid "Details"
 msgstr "פרטים"
@@ -5254,11 +5254,11 @@ msgstr "פרטים"
 msgid "Details of web scenario"
 msgstr "פרטי תרחיש רשת"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1055
+#: app/controllers/CControllerPopupTriggerExpr.php:1100
 msgid "Detection period"
 msgstr "תקופת זיהוי"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1065
+#: app/controllers/CControllerPopupTriggerExpr.php:1110
 msgid "Deviations"
 msgstr "סטיות"
 
@@ -5417,7 +5417,7 @@ msgstr "להשבית את תרחישי הרשת הנבחרים?"
 #: include/hosts.inc.php:1126 include/html.inc.php:284
 #: include/httptest.inc.php:48 include/items.inc.php:138
 #: include/items.inc.php:141 include/items.inc.php:185
-#: include/maps.inc.php:325 include/triggers.inc.php:1871
+#: include/maps.inc.php:325 include/triggers.inc.php:1875
 #: include/users.inc.php:84 include/views/configuration.action.list.php:77
 #: include/views/configuration.action.list.php:129
 #: include/views/configuration.host.discovery.list.php:167
@@ -5676,7 +5676,7 @@ msgstr "מוצגים %1$s עד %2$s מתוך %3$s פריטים שנמצאו"
 msgid "Displaying options"
 msgstr "אפשרויות הצגה"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:780
+#: app/controllers/CControllerPopupTriggerExpr.php:811
 msgid "Division denominator"
 msgstr "מכנה החילוק"
 
@@ -5822,7 +5822,7 @@ msgstr "userid משוכפל „%1$s” במשתמשים עבור המפה „%2$
 #: include/classes/screens/CScreenProblem.php:867
 #: include/classes/screens/CScreenProblem.php:892
 #: include/classes/screens/CScreenProblem.php:1161 include/events.inc.php:289
-#: include/views/configuration.action.edit.php:175
+#: include/views/configuration.action.edit.php:168
 msgid "Duration"
 msgstr "משך"
 
@@ -5856,10 +5856,10 @@ msgstr "כל פריט"
 #: app/views/js/popup.service.edit.js.php:221
 #: app/views/monitoring.service.list.edit.php:142
 #: app/views/monitoring.service.list.php:114
-#: include/views/configuration.action.edit.php:246
-#: include/views/configuration.action.edit.php:274
-#: include/views/configuration.action.edit.php:358
-#: include/views/configuration.action.edit.php:436
+#: include/views/configuration.action.edit.php:239
+#: include/views/configuration.action.edit.php:267
+#: include/views/configuration.action.edit.php:351
+#: include/views/configuration.action.edit.php:429
 #: include/views/configuration.maintenance.edit.php:68
 #: include/views/configuration.trigger.prototype.edit.php:111
 #: include/views/configuration.trigger.prototype.edit.php:305
@@ -6159,7 +6159,7 @@ msgstr "הפעלת לכידה"
 #: include/html.inc.php:280 include/httptest.inc.php:47
 #: include/items.inc.php:138 include/items.inc.php:141
 #: include/items.inc.php:182 include/triggers.inc.php:999
-#: include/triggers.inc.php:1868
+#: include/triggers.inc.php:1872
 #: include/views/configuration.action.edit.php:147
 #: include/views/configuration.action.list.php:76
 #: include/views/configuration.action.list.php:137
@@ -6255,7 +6255,7 @@ msgstr "שגיאה! לא ניתן להפעיל את שרת ה־Zabbix עקב ג�
 msgid "Error: %1$s"
 msgstr "שגיאה: %1$s"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1045
+#: app/controllers/CControllerPopupTriggerExpr.php:1090
 msgid "Evaluation period"
 msgstr "תקופת הערכה"
 
@@ -6827,8 +6827,8 @@ msgctxt "page navigation"
 msgid "First"
 msgstr "ראשון"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:237
-#: app/controllers/CControllerPopupTriggerExpr.php:266
+#: app/controllers/CControllerPopupTriggerExpr.php:268
+#: app/controllers/CControllerPopupTriggerExpr.php:297
 msgid "Fit"
 msgstr "התאמה"
 
@@ -6945,7 +6945,7 @@ msgstr "מלא"
 msgid "Full clone"
 msgstr "שכפול מלא"
 
-#: app/views/popup.triggerexpr.php:132
+#: app/views/popup.triggerexpr.php:133
 #: include/views/configuration.graph.edit.php:366
 msgid "Function"
 msgstr "פונקציה"
@@ -6961,7 +6961,7 @@ msgstr "מודם GSM"
 msgid "GUI"
 msgstr "מנשק משתמש"
 
-#: include/classes/user/CWebUser.php:63 index_sso.php:245
+#: include/classes/user/CWebUser.php:63 index_sso.php:260
 msgid "GUI access disabled."
 msgstr "הגישה למנשק המשתמש מושבתת."
 
@@ -7546,7 +7546,7 @@ msgstr "מחיקת ההיסטוריה עשויה לארוך זמן רב. להמ�
 msgid "History data selection"
 msgstr "בחירת נתונים היסטוריים"
 
-#: app/views/popup.triggerexpr.php:111
+#: app/views/popup.triggerexpr.php:112
 msgid "History functions"
 msgstr "פונקציות היסטוריה"
 
@@ -7723,7 +7723,7 @@ msgid "Host group label type"
 msgstr "סוג תווית קבוצת מארחים"
 
 #: include/classes/api/services/CDashboardGeneral.php:555
-#: include/classes/api/services/CScript.php:812
+#: include/classes/api/services/CScript.php:814
 #: include/classes/api/services/CSettings.php:247
 #: include/classes/api/services/CUserGroup.php:444
 #, c-format
@@ -7966,6 +7966,10 @@ msgstr "מיקומי מארחים"
 #: app/controllers/CControllerPopupMassupdateHost.php:454
 msgid "Hosts updated"
 msgstr "המארחים עודכנו"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:118
+msgid "Hour"
+msgstr ""
 
 #: app/views/popup.maintenance.period.php:170
 msgid "Hours"
@@ -8276,7 +8280,7 @@ msgstr "תמונות"
 msgid "Images for all maps will be updated!"
 msgstr "התמונות עבור כל המפות יעודכנו!"
 
-#: include/views/configuration.action.edit.php:236
+#: include/views/configuration.action.edit.php:229
 msgid "Immediately"
 msgstr "מיידית"
 
@@ -8358,7 +8362,7 @@ msgstr "אבטיפוס פריט בלתי נגיש"
 #: app/partials/monitoring.host.view.html.php:89
 #: app/views/configuration.host.list.php:267
 #: include/classes/screens/CScreenProblem.php:386
-#: include/hostgroups.inc.php:293 include/triggers.inc.php:2023
+#: include/hostgroups.inc.php:293 include/triggers.inc.php:2027
 #: include/views/inventory.host.view.php:42
 msgid "Inaccessible maintenance"
 msgstr "תחזוקה בלתי נגישה"
@@ -8370,11 +8374,11 @@ msgstr "מפה בלתי נגישה"
 
 #: httpconf.php:663 include/graphs.inc.php:274 include/hosts.inc.php:649
 #: include/httptest.inc.php:222 include/items.inc.php:916
-#: include/triggers.inc.php:2162
+#: include/triggers.inc.php:2166
 msgid "Inaccessible template"
 msgstr "תבנית בלתי נגישה"
 
-#: include/triggers.inc.php:2368 include/triggers.inc.php:2376
+#: include/triggers.inc.php:2372 include/triggers.inc.php:2380
 msgid "Inaccessible trigger"
 msgstr "הקפצה בלתי נגישה"
 
@@ -8489,7 +8493,7 @@ msgstr "אסימון הכספת שגוי."
 msgid "Incorrect action condition discovery check."
 msgstr "בדיקת גילוי תנאי משימה שגויה."
 
-#: include/classes/api/services/CAction.php:3310
+#: include/classes/api/services/CAction.php:3320
 msgid "Incorrect action condition discovery check. Discovery check does not exist or you have no access to it."
 msgstr "בדיקת גילוי תנאי משימה שגויה. בדיקת הגילוי אינה קיימת או שאין לך גישה אליה."
 
@@ -8497,7 +8501,7 @@ msgstr "בדיקת גילוי תנאי משימה שגויה. בדיקת הגי�
 msgid "Incorrect action condition discovery object."
 msgstr "פריט גילוי תנאי משימה שגוי."
 
-#: include/classes/api/services/CAction.php:3269
+#: include/classes/api/services/CAction.php:3279
 msgid "Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it."
 msgstr "כלל גילוי תנאי משימה שגוי. כלל הגילוי לא קיים או שאין לך גישה אליו."
 
@@ -8509,15 +8513,15 @@ msgstr "מצב גילוי תנאי משימה שגוי."
 msgid "Incorrect action condition event type."
 msgstr "סוג אירוע תנאי משימה שגוי."
 
-#: include/classes/api/services/CAction.php:2989
+#: include/classes/api/services/CAction.php:2999
 msgid "Incorrect action condition or operation host group. Host group does not exist or you have no access to it."
 msgstr "תנאי משימה או פעילות קבוצת מארחים שגויים. קבוצת המארחים לא קיימת או שאין לך גישה אליה."
 
-#: include/classes/api/services/CAction.php:3049
+#: include/classes/api/services/CAction.php:3059
 msgid "Incorrect action condition or operation host. Host does not exist or you have no access to it."
 msgstr "תנאי משימה או פעילות מארח שגויים. המארח לא קיים או שאין לך גישה אליו."
 
-#: include/classes/api/services/CAction.php:3187
+#: include/classes/api/services/CAction.php:3197
 msgid "Incorrect action condition or operation template. Template does not exist or you have no access to it."
 msgstr "תנאי משימה או תבנית פעולה שגויים. התבנית לא קיימת או שאין לך גישה אליה."
 
@@ -8526,11 +8530,11 @@ msgstr "תנאי משימה או תבנית פעולה שגויים. התבני�
 msgid "Incorrect action condition port \"%1$s\"."
 msgstr "פתחת תנאי המשימה שגויה „%1$s”."
 
-#: include/classes/api/services/CAction.php:3351
+#: include/classes/api/services/CAction.php:3361
 msgid "Incorrect action condition proxy. Proxy does not exist or you have no access to it."
 msgstr "מתווך תנאי משימה שגוי. המתווך לא קיים או שאין לך גישה אליו."
 
-#: include/classes/api/services/CAction.php:3391
+#: include/classes/api/services/CAction.php:3401
 msgid "Incorrect action condition service. Service does not exist or you have no access to it."
 msgstr "שירות תנאי משימה שגוי. השירות לא קיים או שאין לך גישה אליו."
 
@@ -8538,7 +8542,7 @@ msgstr "שירות תנאי משימה שגוי. השירות לא קיים או
 msgid "Incorrect action condition trigger severity."
 msgstr "חומרת הקפצת תנאי משימה שגויה."
 
-#: include/classes/api/services/CAction.php:3228
+#: include/classes/api/services/CAction.php:3238
 msgid "Incorrect action condition trigger. Trigger does not exist or you have no access to it."
 msgstr "הקפצת תנאי פעולה שגויה. ההקפצה לא קיימת או שאין לך גישה אליה."
 
@@ -8548,11 +8552,11 @@ msgstr "סוג תנאי פעולה שגוי."
 
 #: app/controllers/CControllerActionOperationValidate.php:83
 #: app/controllers/CControllerActionOperationValidate.php:89
-#: include/classes/api/services/CAction.php:2814
+#: include/classes/api/services/CAction.php:2824
 msgid "Incorrect action operation escalation step values."
 msgstr "ערכי דרגות הסלמת משימת הפעולה שגויים."
 
-#: include/classes/api/services/CAction.php:2889
+#: include/classes/api/services/CAction.php:2899
 msgid "Incorrect action operation media type. Media type does not exist or you have no access to it."
 msgstr "סוג מדיה תנאי משימה שגוי. סוג המדיה לא קיים או שאין לך גישה אליו."
 
@@ -8561,11 +8565,11 @@ msgstr "סוג מדיה תנאי משימה שגוי. סוג המדיה לא ק�
 msgid "Incorrect action operation type \"%1$s\" for event source \"%2$s\"."
 msgstr "סוג משימת הפעולה שגוי „%1$s” למקור האירוע „%2$s”."
 
-#: include/classes/api/services/CAction.php:3135
+#: include/classes/api/services/CAction.php:3145
 msgid "Incorrect action operation user group. User group does not exist or you have no access to it."
 msgstr "קבוצת משתמשי תנאי משימה שגוי. קבוצת המשתמשים לא קיימת או שאין לך גישה אליה."
 
-#: include/classes/api/services/CAction.php:3092
+#: include/classes/api/services/CAction.php:3102
 msgid "Incorrect action operation user. User does not exist or you have no access to it."
 msgstr "משתמש תנאי משימה שגוי. המשתמש לא קיים או שאין לך גישה אליו."
 
@@ -9309,7 +9313,7 @@ msgstr "תצוגה ראשונית"
 msgid "Initial view is ignored if the default view is set."
 msgstr "תצוגה ראשונית לא תוצג אם מוגדרת תצוגת בררת מחדל."
 
-#: app/views/popup.triggerexpr.php:239
+#: app/views/popup.triggerexpr.php:258
 msgid "Insert"
 msgstr "הוספה"
 
@@ -9461,7 +9465,7 @@ msgstr "תכני קובץ ה־YAML שגויים"
 msgid "Invalid action condition: %1$s."
 msgstr "תנאי פעולה שגוי: %1$s."
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1517
+#: app/controllers/CControllerPopupTriggerExpr.php:1573
 #, c-format
 msgid "Invalid condition: %1$s."
 msgstr "תנאי שגוי: %1$s."
@@ -9522,10 +9526,10 @@ msgstr "הפרמטרים לשיטה שגויים."
 #: app/controllers/CControllerDashboardUpdate.php:200
 #: app/controllers/CControllerDashboardUpdate.php:212
 #: app/controllers/CControllerPopupHttpStep.php:100
-#: include/classes/api/services/CAction.php:2705
-#: include/classes/api/services/CAction.php:2711
-#: include/classes/api/services/CAction.php:2722
-#: include/classes/api/services/CAction.php:2734
+#: include/classes/api/services/CAction.php:2715
+#: include/classes/api/services/CAction.php:2721
+#: include/classes/api/services/CAction.php:2732
+#: include/classes/api/services/CAction.php:2744
 #: include/classes/api/services/CAutoregistration.php:157
 #: include/classes/api/services/CAutoregistration.php:163
 #: include/classes/api/services/CAutoregistration.php:170
@@ -9588,8 +9592,8 @@ msgstr "הפרמטרים לשיטה שגויים."
 #: include/classes/api/services/CReport.php:582
 #: include/classes/api/services/CReport.php:596
 #: include/classes/api/services/CReport.php:602
-#: include/classes/api/services/CScript.php:902
-#: include/classes/api/services/CScript.php:908
+#: include/classes/api/services/CScript.php:904
+#: include/classes/api/services/CScript.php:910
 #: include/classes/api/services/CTemplate.php:668
 #: include/classes/api/services/CTriggerGeneral.php:665
 #: include/classes/api/services/CTriggerGeneral.php:1773
@@ -9932,7 +9936,7 @@ msgstr[1] "פריטים מופעלים"
 msgid "Item in \"not supported\" state"
 msgstr "פריט במצב „לא נתמך”"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1510
+#: app/controllers/CControllerPopupTriggerExpr.php:1566
 msgid "Item not selected"
 msgstr "לא נבחר פריט"
 
@@ -10385,17 +10389,17 @@ msgstr "תרשים של החודש שעבר"
 msgid "Last name"
 msgstr "שם משפחה"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:62
-#: app/controllers/CControllerPopupTriggerExpr.php:76
-#: app/controllers/CControllerPopupTriggerExpr.php:90
-#: app/controllers/CControllerPopupTriggerExpr.php:103
-#: app/controllers/CControllerPopupTriggerExpr.php:124
-#: app/controllers/CControllerPopupTriggerExpr.php:133
-#: app/controllers/CControllerPopupTriggerExpr.php:146
-#: app/controllers/CControllerPopupTriggerExpr.php:165
-#: app/controllers/CControllerPopupTriggerExpr.php:202
-#: app/controllers/CControllerPopupTriggerExpr.php:221
-#: app/controllers/CControllerPopupTriggerExpr.php:250
+#: app/controllers/CControllerPopupTriggerExpr.php:63
+#: app/controllers/CControllerPopupTriggerExpr.php:77
+#: app/controllers/CControllerPopupTriggerExpr.php:91
+#: app/controllers/CControllerPopupTriggerExpr.php:134
+#: app/controllers/CControllerPopupTriggerExpr.php:155
+#: app/controllers/CControllerPopupTriggerExpr.php:164
+#: app/controllers/CControllerPopupTriggerExpr.php:177
+#: app/controllers/CControllerPopupTriggerExpr.php:196
+#: app/controllers/CControllerPopupTriggerExpr.php:233
+#: app/controllers/CControllerPopupTriggerExpr.php:252
+#: app/controllers/CControllerPopupTriggerExpr.php:281
 msgid "Last of"
 msgstr "אחרון מבין"
 
@@ -10472,8 +10476,8 @@ msgstr "צמצום משמאל"
 msgid "Legend"
 msgstr "מקרא"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:642
-#: app/controllers/CControllerPopupTriggerExpr.php:760
+#: app/controllers/CControllerPopupTriggerExpr.php:673
+#: app/controllers/CControllerPopupTriggerExpr.php:791
 msgid "Length"
 msgstr "אורך"
 
@@ -10687,7 +10691,7 @@ msgstr "תיעוד מלכודות SNMP שאינן תואמות"
 #: app/controllers/CControllerAuditLogList.php:191
 #: app/views/administration.authentication.edit.php:200
 #: app/views/administration.user.list.php:112 include/func.inc.php:1523
-#: include/func.inc.php:1539 index_http.php:90 index_sso.php:265
+#: include/func.inc.php:1539 index_http.php:90 index_sso.php:280
 msgid "Login"
 msgstr "כניסה"
 
@@ -11025,9 +11029,9 @@ msgstr "סימון אחרים"
 msgid "Mark selected"
 msgstr "סימון הנבחרים"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:377
-#: app/controllers/CControllerPopupTriggerExpr.php:417
-#: app/controllers/CControllerPopupTriggerExpr.php:443
+#: app/controllers/CControllerPopupTriggerExpr.php:408
+#: app/controllers/CControllerPopupTriggerExpr.php:448
+#: app/controllers/CControllerPopupTriggerExpr.php:474
 msgid "Mask"
 msgstr "מסכה"
 
@@ -11067,11 +11071,11 @@ msgstr "פריט אב"
 msgid "Matches regular expression"
 msgstr "תואם לביטוי רגולרי"
 
-#: app/views/popup.triggerexpr.php:112
+#: app/views/popup.triggerexpr.php:113
 msgid "Mathematical functions"
 msgstr "פונקציות מתמטיות"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:364
+#: app/controllers/CControllerPopupTriggerExpr.php:395
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:134
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:136
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:206
@@ -11303,7 +11307,7 @@ msgstr "Microsoft Edge"
 msgid "Middle"
 msgstr "אמצעי"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:359
+#: app/controllers/CControllerPopupTriggerExpr.php:390
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:119
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:121
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:191
@@ -11405,7 +11409,7 @@ msgstr "פריטים חסרים לאבטיפוס תרשים „%1$s”."
 msgid "Missing key \"%1$s\" for host \"%2$s\"."
 msgstr "חסר מפתח „%1$s” למארח „%2$s”."
 
-#: app/controllers/CControllerPopupTriggerExpr.php:242
+#: app/controllers/CControllerPopupTriggerExpr.php:273
 #: app/views/administration.proxy.list.php:51
 #: app/views/administration.proxy.list.php:77 report2.php:201
 msgid "Mode"
@@ -11508,6 +11512,7 @@ msgstr "מעקב"
 msgid "Monospace"
 msgstr "רוחב אחיד"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:121
 #: app/views/popup.maintenance.period.php:104 report4.php:163
 msgid "Month"
 msgstr "חודש"
@@ -12129,7 +12134,7 @@ msgstr "לא נמצאו התאמות"
 msgid "No new modules discovered"
 msgstr "לא התגלו מודולים חדשים"
 
-#: include/classes/api/services/CAction.php:2769
+#: include/classes/api/services/CAction.php:2779
 #, c-format
 msgid "No operations defined for action \"%1$s\"."
 msgstr "לא הוגדרו פעילויות למשימה „%1$s”."
@@ -12166,9 +12171,9 @@ msgstr "אין הרשאות לגישה למערכת."
 #: include/classes/api/services/CRole.php:137
 #: include/classes/api/services/CRole.php:230
 #: include/classes/api/services/CRole.php:345
-#: include/classes/api/services/CScript.php:240
-#: include/classes/api/services/CScript.php:316
-#: include/classes/api/services/CScript.php:825
+#: include/classes/api/services/CScript.php:242
+#: include/classes/api/services/CScript.php:318
+#: include/classes/api/services/CScript.php:827
 #: include/classes/api/services/CSettings.php:136
 #: include/classes/api/services/CUserGroup.php:176
 #: include/classes/api/services/CUserGroup.php:260
@@ -12207,7 +12212,7 @@ msgstr "אין הרשאות לקרוא ל־„%1$s.%2$s”."
 #: app/views/monitoring.widget.systeminfo.view.php:45 disc_prototypes.php:748
 #: host_discovery.php:808 hostinventoriesoverview.php:73
 #: include/classes/api/services/CAction.php:1516
-#: include/classes/api/services/CAction.php:2571
+#: include/classes/api/services/CAction.php:2577
 #: include/classes/api/services/CConfiguration.php:78
 #: include/classes/api/services/CCorrelation.php:497
 #: include/classes/api/services/CCorrelation.php:653
@@ -12307,11 +12312,11 @@ msgstr "אין הרשאות לקרוא ל־„%1$s.%2$s”."
 #: include/classes/api/services/CReport.php:909
 #: include/classes/api/services/CRole.php:326
 #: include/classes/api/services/CRole.php:363
-#: include/classes/api/services/CScript.php:375
-#: include/classes/api/services/CScript.php:860
-#: include/classes/api/services/CScript.php:920
-#: include/classes/api/services/CScript.php:937
-#: include/classes/api/services/CScript.php:949
+#: include/classes/api/services/CScript.php:377
+#: include/classes/api/services/CScript.php:862
+#: include/classes/api/services/CScript.php:922
+#: include/classes/api/services/CScript.php:939
+#: include/classes/api/services/CScript.php:951
 #: include/classes/api/services/CService.php:398
 #: include/classes/api/services/CService.php:467
 #: include/classes/api/services/CService.php:947
@@ -12370,7 +12375,7 @@ msgid "No public key file specified."
 msgstr "לא צוין מפתח ציבורי."
 
 #: app/controllers/CControllerActionOperationValidate.php:110
-#: include/classes/api/services/CAction.php:2826
+#: include/classes/api/services/CAction.php:2836
 msgid "No recipients specified for action operation message."
 msgstr "לא צוינו נמענים להודעת פעילות משימה."
 
@@ -12391,7 +12396,7 @@ msgid "No target selected."
 msgstr "לא נבחר יעד."
 
 #: app/controllers/CControllerActionOperationValidate.php:142
-#: include/classes/api/services/CAction.php:2837
+#: include/classes/api/services/CAction.php:2847
 msgid "No targets specified for action operation global script."
 msgstr "לא צוינו יעדים לסקריפט גלובלי של פעילות משימה."
 
@@ -12540,6 +12545,10 @@ msgstr "דוח התרעות"
 msgid "Notifications"
 msgstr "התרעות"
 
+#: actionconf.php:87 include/views/configuration.action.edit.php:475
+msgid "Notify about canceled escalations"
+msgstr ""
+
 #: include/actions.inc.php:865 include/actions.inc.php:1038
 #: include/actions.inc.php:1039
 msgid "Notify all involved"
@@ -12625,6 +12634,10 @@ msgstr "מספר המעבדים במכונה וירטואלית של VMware,‏ 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:279
 msgid "Number of rows"
 msgstr "מספר שורות"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:126
+msgid "Number of seasons"
+msgstr ""
 
 #: include/views/reports.toptriggers.php:86
 msgid "Number of status changes"
@@ -12925,12 +12938,12 @@ msgstr "פרטים על מערכת ההפעלה. מחזירה מחרוזת"
 msgid "Operation"
 msgstr "פעילות"
 
-#: include/classes/api/services/CAction.php:2795
+#: include/classes/api/services/CAction.php:2805
 #, c-format
 msgid "Operation \"%1$s\" already exists for action \"%2$s\"."
 msgstr "הפעילות „%1$s” כבר קיימת למשימה „%2$s”."
 
-#: actionconf.php:378
+#: actionconf.php:384
 #, c-format
 msgid "Operation \"%1$s\" already exists."
 msgstr "הפעילות „%1$s” כבר קיימת."
@@ -12964,8 +12977,8 @@ msgstr "נתונים תפעוליים"
 #: app/views/configuration.correlation.edit.php:140
 #: app/views/configuration.correlation.list.php:77
 #: app/views/popup.lldoverride.php:210
-#: include/views/configuration.action.edit.php:307
-#: include/views/configuration.action.edit.php:479
+#: include/views/configuration.action.edit.php:300
+#: include/views/configuration.action.edit.php:484
 #: include/views/configuration.action.list.php:99
 msgid "Operations"
 msgstr "פעולות"
@@ -13000,7 +13013,7 @@ msgstr "פעולות"
 msgid "Operator"
 msgstr "מפעיל"
 
-#: app/views/popup.triggerexpr.php:113
+#: app/views/popup.triggerexpr.php:114
 msgid "Operator functions"
 msgstr "פונקציות מפעיל"
 
@@ -13428,7 +13441,7 @@ msgid "Parameters"
 msgstr "פרמטרים"
 
 #: app/controllers/CControllerActionOperationValidate.php:76
-#: include/classes/api/services/CAction.php:2807
+#: include/classes/api/services/CAction.php:2817
 msgid "Parameters \"esc_step_from\" and \"esc_step_to\" must be set together."
 msgstr "את המשתנים „esc_step_from” ו־„esc_step_to” יש להגדיר ביחד."
 
@@ -13555,12 +13568,12 @@ msgstr "הדבקת וידג׳ט"
 msgid "Paste without external links"
 msgstr "הדבקה ללא קישורים חיצוניים"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:877
+#: app/controllers/CControllerPopupTriggerExpr.php:908
 #: app/views/monitoring.charts.view.php:106
 msgid "Pattern"
 msgstr "תבנית"
 
-#: actionconf.php:82 include/views/configuration.action.edit.php:163
+#: actionconf.php:82 include/views/configuration.action.edit.php:471
 msgid "Pause operations for suppressed problems"
 msgstr "השהיית פעולות לתקלות מוסתרות"
 
@@ -13573,7 +13586,7 @@ msgstr "השימוש המרבי בזיכרון: %1$s"
 msgid "Percent of time the virtual machine is unable to run because it is contending for access to the physical CPU(s), <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "אחוז הזמן שמכונה וירטואלית לא יכולה לרוץ כי היא מתחרה על גישה למעבדים פיזיים, <url> - כתובת שירות VMware,‏ <uuid> - שם מארח של מכונה וירטואלית ב־VMware"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:213
+#: app/controllers/CControllerPopupTriggerExpr.php:244
 msgid "Percentage"
 msgstr "אחוז"
 
@@ -13597,10 +13610,11 @@ msgstr "קו אחוזון (ימין)"
 msgid "Performs a DNS query. Returns character string with the required type of information"
 msgstr "ביצוע שאילתת DNS. מחזירה מחרוזת תווים עם סוג המידע הנדרש"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:104
 #: app/partials/scheduledreport.formgrid.html.php:83
 #: app/partials/scheduledreport.table.html.php:42
 #: app/views/popup.lldoperation.php:116
-#: app/views/popup.massupdate.item.php:227 app/views/popup.triggerexpr.php:181
+#: app/views/popup.massupdate.item.php:227 app/views/popup.triggerexpr.php:182
 #: include/views/configuration.host.discovery.edit.php:632
 #: include/views/configuration.item.edit.php:735
 #: include/views/configuration.item.prototype.edit.php:714
@@ -13608,8 +13622,9 @@ msgstr "ביצוע שאילתת DNS. מחזירה מחרוזת תווים עם �
 msgid "Period"
 msgstr "תקופה"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:95
-#: app/controllers/CControllerPopupTriggerExpr.php:1050
+#: app/controllers/CControllerPopupTriggerExpr.php:96
+#: app/controllers/CControllerPopupTriggerExpr.php:109
+#: app/controllers/CControllerPopupTriggerExpr.php:1095
 msgid "Period shift"
 msgstr "הזחת פרק זמן"
 
@@ -13763,7 +13778,7 @@ msgstr "סוג Post"
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
 msgstr "ניצולת חשמל , <url> - כתובת שירות ה־VMware,‏ <uuid> - שם המארח של ה־VMware hypervisor,‏ <max> - ניצולת החשמל המרבית המותרת"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:832
+#: app/controllers/CControllerPopupTriggerExpr.php:863
 msgid "Power value"
 msgstr "ערך חזקה"
 
@@ -13772,7 +13787,7 @@ msgstr "ערך חזקה"
 msgid "Pre-installation summary"
 msgstr "תקציר טרום התקנה"
 
-#: app/views/popup.triggerexpr.php:114
+#: app/views/popup.triggerexpr.php:115
 msgid "Prediction functions"
 msgstr "פונקציות חיזוי"
 
@@ -14298,7 +14313,7 @@ msgstr "ביטוי שחזור"
 msgid "Recovery expression syntax error."
 msgstr "שגיאה בתחביר ביטוי השחזור."
 
-#: include/views/configuration.action.edit.php:393
+#: include/views/configuration.action.edit.php:386
 msgid "Recovery operations"
 msgstr "פעולות שחזור"
 
@@ -14451,10 +14466,10 @@ msgstr "פקודה מרוחקת"
 #: include/classes/widgets/CWidgetHelper.php:533
 #: include/classes/widgets/CWidgetHelper.php:586 include/forms.inc.php:1461
 #: include/forms.inc.php:2009 include/views/configuration.action.edit.php:97
-#: include/views/configuration.action.edit.php:256
-#: include/views/configuration.action.edit.php:284
-#: include/views/configuration.action.edit.php:368
-#: include/views/configuration.action.edit.php:446
+#: include/views/configuration.action.edit.php:249
+#: include/views/configuration.action.edit.php:277
+#: include/views/configuration.action.edit.php:361
+#: include/views/configuration.action.edit.php:439
 #: include/views/configuration.host.discovery.edit.php:151
 #: include/views/configuration.host.discovery.edit.php:196
 #: include/views/configuration.host.discovery.edit.php:222
@@ -14601,8 +14616,8 @@ msgstr "החלפה"
 msgid "Replace dependencies"
 msgstr "החלפת תלויות"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:647
-#: app/controllers/CControllerPopupTriggerExpr.php:882
+#: app/controllers/CControllerPopupTriggerExpr.php:678
+#: app/controllers/CControllerPopupTriggerExpr.php:913
 msgid "Replacement"
 msgstr "החלפה"
 
@@ -14803,7 +14818,7 @@ msgstr "סוג התגובה: מחרוזת"
 #: app/views/popup.itemtestedit.view.php:325
 #: app/views/popup.itemtestedit.view.php:365
 #: app/views/popup.testtriggerexpr.php:49
-#: app/views/popup.testtriggerexpr.php:102 app/views/popup.triggerexpr.php:217
+#: app/views/popup.testtriggerexpr.php:102 app/views/popup.triggerexpr.php:236
 #: include/classes/debug/CProfiler.php:183
 msgid "Result"
 msgstr "תוצאה"
@@ -15335,7 +15350,7 @@ msgstr "היקף"
 msgid "Script"
 msgstr "סקריפט"
 
-#: include/classes/api/services/CScript.php:1346
+#: include/classes/api/services/CScript.php:1348
 #, c-format
 msgid "Script \"%1$s\" already exists."
 msgstr "הסקריפט „%1$s“ כבר קיים."
@@ -15400,11 +15415,12 @@ msgstr "תבנית החיפוש ריקה"
 msgid "Search type"
 msgstr "סוג חיפוש"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1060
+#: app/controllers/CControllerPopupTriggerExpr.php:114
+#: app/controllers/CControllerPopupTriggerExpr.php:1105
 msgid "Season"
 msgstr "עונה"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1075
+#: app/controllers/CControllerPopupTriggerExpr.php:1120
 msgid "Season deviation window"
 msgstr "חלון סטיית עונה"
 
@@ -15486,7 +15502,7 @@ msgstr "בחירת וידג׳ט"
 msgid "Selected"
 msgstr "נבחר"
 
-#: actionconf.php:488
+#: actionconf.php:494
 msgid "Selected actions deleted"
 msgstr "הפעולה הנבחרת נמחקה"
 
@@ -15726,6 +15742,7 @@ msgid "Services updated"
 msgstr "שירותים עודכנו"
 
 #: include/classes/core/ZBase.php:244 include/classes/core/ZBase.php:471
+#: index_sso.php:242 index_sso.php:249
 msgid "Session initialization error."
 msgstr "שגיאת אתחול הפעלה."
 
@@ -16179,7 +16196,7 @@ msgstr "ספרדית (es_ES)"
 msgid "Specified role was not found."
 msgstr "התפקיד שצוין לא נמצא."
 
-#: include/classes/api/services/CAction.php:2932
+#: include/classes/api/services/CAction.php:2942
 msgid "Specified script does not exist or you do not have rights on it for action operation command."
 msgstr "הסקריפט שצוין לא קיים או שאין לך הרשאות עליו לטובת פקודת משימת פעולה."
 
@@ -16214,8 +16231,8 @@ msgstr "פריטים רגילים"
 msgid "Standby"
 msgstr "המתנה"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:637
-#: app/controllers/CControllerPopupTriggerExpr.php:755
+#: app/controllers/CControllerPopupTriggerExpr.php:668
+#: app/controllers/CControllerPopupTriggerExpr.php:786
 msgid "Start"
 msgstr "התחלה"
 
@@ -16223,7 +16240,7 @@ msgstr "התחלה"
 msgid "Start date"
 msgstr "תאריך התחלה"
 
-#: include/views/configuration.action.edit.php:175
+#: include/views/configuration.action.edit.php:168
 msgid "Start in"
 msgstr "התחלה בעוד"
 
@@ -16406,7 +16423,7 @@ msgid "Step with name \"%1$s\" already exists."
 msgstr "מהלך עם השם „%1$s” כבר קיים."
 
 #: app/partials/popup.operations.php:51 httpconf.php:51
-#: include/views/configuration.action.edit.php:175
+#: include/views/configuration.action.edit.php:168
 #: include/views/configuration.httpconf.edit.php:227
 #: include/views/configuration.httpconf.edit.php:236
 msgid "Steps"
@@ -16460,12 +16477,12 @@ msgstr "ישירה"
 msgid "Strict"
 msgstr "קפדני"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:497
+#: app/controllers/CControllerPopupTriggerExpr.php:528
 #: include/triggers.inc.php:1596
 msgid "String"
 msgstr "מחרוזת"
 
-#: app/views/popup.triggerexpr.php:115
+#: app/views/popup.triggerexpr.php:116
 msgid "String functions"
 msgstr "פונקציות מחרוזות"
 
@@ -17150,7 +17167,7 @@ msgstr "השנה"
 msgid "This year so far"
 msgstr "השנה הזו עד כה"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:261
+#: app/controllers/CControllerPopupTriggerExpr.php:292
 msgid "Threshold"
 msgstr "סף"
 
@@ -17183,15 +17200,15 @@ msgstr "נתוני יחוס ספק האריחים מופיעים בתיבת טק
 msgid "Till"
 msgstr "עד"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:50
-#: app/controllers/CControllerPopupTriggerExpr.php:232
+#: app/controllers/CControllerPopupTriggerExpr.php:51
+#: app/controllers/CControllerPopupTriggerExpr.php:263
 #: app/views/hintbox.eventlist.php:61 app/views/hintbox.eventlist.php:67
 #: app/views/monitoring.widget.actionlog.view.php:33
 #: app/views/monitoring.widget.problems.view.php:38
 #: app/views/popup.itemtestedit.view.php:270
 #: app/views/popup.service.time.edit.php:70
 #: app/views/popup.service.time.edit.php:98
-#: app/views/popup.triggerexpr.php:174 app/views/popup.triggerexpr.php:178
+#: app/views/popup.triggerexpr.php:175 app/views/popup.triggerexpr.php:179
 #: app/views/reports.auditlog.list.php:89 include/actions.inc.php:1700
 #: include/actions.inc.php:1754 include/actions.inc.php:1827
 #: include/actions.inc.php:1921 include/actions.inc.php:1976
@@ -17228,13 +17245,13 @@ msgstr "זמן הגישה האחרונה למתווך. שם - שם המתווך.
 msgid "Time period"
 msgstr "תקופת זמן"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:68
-#: app/controllers/CControllerPopupTriggerExpr.php:82
-#: app/controllers/CControllerPopupTriggerExpr.php:152
-#: app/controllers/CControllerPopupTriggerExpr.php:171
-#: app/controllers/CControllerPopupTriggerExpr.php:208
-#: app/controllers/CControllerPopupTriggerExpr.php:227
-#: app/controllers/CControllerPopupTriggerExpr.php:256
+#: app/controllers/CControllerPopupTriggerExpr.php:69
+#: app/controllers/CControllerPopupTriggerExpr.php:83
+#: app/controllers/CControllerPopupTriggerExpr.php:183
+#: app/controllers/CControllerPopupTriggerExpr.php:202
+#: app/controllers/CControllerPopupTriggerExpr.php:239
+#: app/controllers/CControllerPopupTriggerExpr.php:258
+#: app/controllers/CControllerPopupTriggerExpr.php:287
 #: include/classes/widgets/CWidgetHelper.php:784
 #: include/classes/widgets/CWidgetHelper.php:860
 #: include/classes/widgets/CWidgetHelper.php:1129
@@ -17926,9 +17943,9 @@ msgstr "יחידות"
 #: include/items.inc.php:45 include/items.inc.php:110
 #: include/items.inc.php:133 include/items.inc.php:167
 #: include/maintenances.inc.php:33 include/maps.inc.php:39
-#: include/triggers.inc.php:83 include/triggers.inc.php:1868
+#: include/triggers.inc.php:83 include/triggers.inc.php:1872
 #: include/users.inc.php:64 include/users.inc.php:87
-#: include/views/configuration.action.edit.php:233
+#: include/views/configuration.action.edit.php:226
 #: include/views/configuration.triggers.list.php:77
 msgid "Unknown"
 msgstr "לא ידוע"
@@ -17946,7 +17963,7 @@ msgid "Unknown error"
 msgstr "שגיאה לא ידועה"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:47
-#: app/controllers/CControllerPopupTriggerExpr.php:1301
+#: app/controllers/CControllerPopupTriggerExpr.php:1346
 #: include/triggers.inc.php:1146
 msgid "Unknown host item, no such item in selected host"
 msgstr "פריט מארח לא ידוע, אין כזה פריט במארח הנבחר"
@@ -18095,7 +18112,7 @@ msgstr "פעיל"
 #: app/views/popup.service.time.edit.php:166
 #: app/views/popup.triggerwizard.php:147 app/views/popup.valuemap.edit.php:126
 #: include/classes/html/CTabFilter.php:94
-#: include/views/configuration.action.edit.php:489
+#: include/views/configuration.action.edit.php:494
 #: include/views/configuration.graph.edit.php:494
 #: include/views/configuration.host.discovery.edit.php:977
 #: include/views/configuration.hostgroups.edit.php:61
@@ -18133,7 +18150,7 @@ msgstr "עדכון קיימים"
 msgid "Update interval"
 msgstr "תדירות עדכון"
 
-#: include/views/configuration.action.edit.php:469
+#: include/views/configuration.action.edit.php:462
 msgid "Update operations"
 msgstr "עדכון פעולות"
 
@@ -18346,7 +18363,7 @@ msgstr[1] "קבוצות משתמשים עודכנו"
 
 #: include/classes/api/services/CDashboard.php:482
 #: include/classes/api/services/CReport.php:463
-#: include/classes/api/services/CScript.php:776
+#: include/classes/api/services/CScript.php:778
 #: include/classes/api/services/CSettings.php:260
 #: include/classes/api/services/CUser.php:741
 #, c-format
@@ -18932,7 +18949,7 @@ msgstr "ערך: אין נתונים"
 msgid "Valuemap with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "מפת ערכים עם המזהה „%1$s” אינה זמינה תחת „%2$s”."
 
-#: app/controllers/CControllerPopupTriggerExpr.php:624
+#: app/controllers/CControllerPopupTriggerExpr.php:655
 #: app/views/monitoring.charts.view.php:56
 #: include/views/monitoring.history.php:78
 msgid "Values"
@@ -19165,6 +19182,10 @@ msgstr "ד׳"
 #: include/func.inc.php:121 include/func.inc.php:211 jsLoader.php:245
 msgid "Wednesday"
 msgstr "יום רביעי"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:120
+msgid "Week"
+msgstr ""
 
 #: app/partials/scheduledreport.formgrid.html.php:99
 #: app/partials/scheduledreport.table.html.php:50
@@ -19438,7 +19459,8 @@ msgctxt "XML date and time format"
 msgid "YYYY-MM-DDThh:mm:ssZ"
 msgstr "YYYY-MM-DDThh:mm:ssZ"
 
-#: report4.php:116 report4.php:152
+#: app/controllers/CControllerPopupTriggerExpr.php:122 report4.php:116
+#: report4.php:152
 msgid "Year"
 msgstr "שנה"
 
@@ -19498,7 +19520,7 @@ msgstr "נכנסת בשם „%1$s“."
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "אין לך אפשרות לבחור בחלק מהשפות כיוון שההגדרות עבורן אינן מותקנות בשרת."
 
-#: include/func.inc.php:1533 index_http.php:87 index_sso.php:262
+#: include/func.inc.php:1533 index_http.php:87 index_sso.php:277
 msgid "You are not logged in"
 msgstr "לא נכנסת"
 
@@ -19742,11 +19764,11 @@ msgstr "אמור להיות טווח זמן"
 msgid "a time unit is expected"
 msgstr "אמור להיות יחידת זמן"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:302
+#: app/controllers/CControllerPopupTriggerExpr.php:333
 msgid "abs() - Absolute value"
 msgstr "abs()‎ - ערך מוחלט"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:308
+#: app/controllers/CControllerPopupTriggerExpr.php:339
 msgid "acos() - The arccosine of a value as an angle, expressed in radians"
 msgstr "acos()‎ - הקוסינוס ההפוך של ערך כזווית, מבוטא ברדיאנים"
 
@@ -19841,7 +19863,7 @@ msgstr "אמור להיות מספר זוגי או תווים הקסדצימלי
 msgid "an explicit time is expected"
 msgstr "אמורה להיות שעה מפורשת"
 
-#: include/classes/api/services/CAction.php:2712
+#: include/classes/api/services/CAction.php:2722
 #: include/classes/api/services/CCorrelation.php:730
 msgid "an identifier is not defined in the formula"
 msgstr "לא הוגדר מזהה בנוסחה"
@@ -19885,11 +19907,11 @@ msgstr "כאדום"
 msgid "ascending"
 msgstr "עולה"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:315
+#: app/controllers/CControllerPopupTriggerExpr.php:346
 msgid "ascii() - Returns the ASCII code of the leftmost character of the value"
 msgstr "ascii()‎ - מחזירה את קוד ה־ASCII של התו השמאלי הקיצוני של הערך"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:322
+#: app/controllers/CControllerPopupTriggerExpr.php:353
 msgid "asin() - The arcsine of a value as an angle, expressed in radians"
 msgstr "asin()‎ - הסינוס ההפוך של ערך כזווית, מבוטא ברדיאנים"
 
@@ -19903,11 +19925,11 @@ msgstr "יש לבחור לפחות יום אחד בשבוע"
 msgid "at least one override option must be specified"
 msgstr "יש לציין אפשרות שכתוב אחת לפחות"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:329
+#: app/controllers/CControllerPopupTriggerExpr.php:360
 msgid "atan() - The arctangent of a value as an angle, expressed in radians"
 msgstr "atan()‎ - הטנגנס ההפוך של ערך כזווית, מבוטא ברדיאנים"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:336
+#: app/controllers/CControllerPopupTriggerExpr.php:367
 msgid "atan2() - The arctangent of the ordinate (exprue) and abscissa coordinates specified as an angle, expressed in radians"
 msgstr "atan2()‎ - הארקטנגנס של הנקודות בצירים האנכי והאופקי שמיוצגים כזווית, ברדיאנים"
 
@@ -19929,39 +19951,47 @@ msgstr "רישום אוטומטי"
 msgid "avg"
 msgstr "ממוצע"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:349
+#: app/controllers/CControllerPopupTriggerExpr.php:380
 msgid "avg() - Average value of a period T"
 msgstr "avg()‎ - ממוצע לטווח T"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:356
+#: app/controllers/CControllerPopupTriggerExpr.php:1052
+msgid "baselinedev() - Returns the number of deviations between data periods in seasons and the last data period"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1059
+msgid "baselinewma() - Calculates baseline by averaging data periods in seasons"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:387
 msgid "between() - Checks if a value belongs to the given range (1 - in range, 0 - otherwise)"
 msgstr "between()‎ - בודקת אם ערך שייך לטווח מסוים (1 - בטווח, 0 - מחוץ לטווח)"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:374
+#: app/controllers/CControllerPopupTriggerExpr.php:405
 msgid "bitand() - Bitwise AND"
 msgstr "bitand()‎ - פעולת וגם על סיביות"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:387
+#: app/controllers/CControllerPopupTriggerExpr.php:418
 msgid "bitlength() - Returns the length in bits"
 msgstr "bitlength()‎ - מחזירה את האורך בסיביות"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:394
+#: app/controllers/CControllerPopupTriggerExpr.php:425
 msgid "bitlshift() - Bitwise shift left"
 msgstr "bitlshift()‎ - הזזה לוגית לשמאל של סיביות"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:407
+#: app/controllers/CControllerPopupTriggerExpr.php:438
 msgid "bitnot() - Bitwise NOT"
 msgstr "bitnot()‎ - פעולה לא על סיביות"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:414
+#: app/controllers/CControllerPopupTriggerExpr.php:445
 msgid "bitor() - Bitwise OR"
 msgstr "bitor()‎ - פעולת או על סיביות"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:427
+#: app/controllers/CControllerPopupTriggerExpr.php:458
 msgid "bitrshift() - Bitwise shift right"
 msgstr "bitrshift()‎ - הזזה לוגית לימין של סיביות"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:440
+#: app/controllers/CControllerPopupTriggerExpr.php:471
 msgid "bitxor() - Bitwise exclusive OR"
 msgstr "bitxor()‎ - פעולת או מוציא (XOR) על סיביות"
 
@@ -19976,7 +20006,7 @@ msgstr "מהבהב"
 msgid "both username and password should be either present or empty"
 msgstr "שם המשתמש והססמה חייבים להיות מלאים או ריקים יחדיו"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:453
+#: app/controllers/CControllerPopupTriggerExpr.php:484
 msgid "bytelength() - Returns the length in bytes"
 msgstr "bytelength()‎ - מחזירה את האורך בבתים"
 
@@ -20018,7 +20048,7 @@ msgstr "לא ניתן לשנות"
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:41
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:47
 #: app/controllers/CControllerUserUpdateGeneral.php:111
-#: include/classes/api/services/CAction.php:2735
+#: include/classes/api/services/CAction.php:2745
 #: include/classes/api/services/CAutoregistration.php:163
 #: include/classes/api/services/CDiscoveryRule.php:1989
 #: include/classes/api/services/CDRule.php:210
@@ -20106,23 +20136,23 @@ msgstr "בקשת ה־Scroll API אינה תקינה, יכול להיות שהנ�
 msgid "cannot update property for templated discovery rule"
 msgstr "לא ניתן לעדכן מאפיין של כלל גילוי מתבנית"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:460
+#: app/controllers/CControllerPopupTriggerExpr.php:491
 msgid "cbrt() - Cube root"
 msgstr "cbrt()‎ - שורש קוביה"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:467
+#: app/controllers/CControllerPopupTriggerExpr.php:498
 msgid "ceil() - Rounds up to the nearest greater integer"
 msgstr "ceil()‎ - מעגלת למספר השלם הגדול הקרוב ביותר"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:474
+#: app/controllers/CControllerPopupTriggerExpr.php:505
 msgid "change() - Difference between last and previous value"
 msgstr "change()‎ - שינוי בין הערך האחרון לקודמו"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:480
+#: app/controllers/CControllerPopupTriggerExpr.php:511
 msgid "changecount() - Number of changes between adjacent values, Mode (all - all changes, inc - only increases, dec - only decreases)"
 msgstr "changecount()‎ - מספר השינויים בין ערכים סמוכים מצב (all - כל השינויים, inc - רק תוספות, dec - רק גריעות)"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:487
+#: app/controllers/CControllerPopupTriggerExpr.php:518
 msgid "char() - Returns the character which represents the given ASCII code"
 msgstr "char()‎ - מחזירה את התו שמייצג את קוד ה־ASCII הנתון"
 
@@ -20149,7 +20179,7 @@ msgstr "צבע"
 msgid "comma-separated list"
 msgstr "רשימה מופרדת בפסיקים"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:494
+#: app/controllers/CControllerPopupTriggerExpr.php:525
 msgid "concat() - Returns a string that is the result of concatenating value to string"
 msgstr "concat()‎ - מחזירה מחרוזת שהיא תוצאה של ערך משורשר למחרוזת"
 
@@ -20164,15 +20194,15 @@ msgstr "הגדרה"
 msgid "contains"
 msgstr "מכיל"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:507
+#: app/controllers/CControllerPopupTriggerExpr.php:538
 msgid "cos() - The cosine of a value, where the value is an angle expressed in radians"
 msgstr "cos()‎ - קוסינוס של ערך, כאשר הערך הוא זווית שמיוצגת ברדיאנים"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:514
+#: app/controllers/CControllerPopupTriggerExpr.php:545
 msgid "cosh() - The hyperbolic cosine of a value"
 msgstr "cosh()‎ - קוסינוס היפרבולי של ערך"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:521
+#: app/controllers/CControllerPopupTriggerExpr.php:552
 msgid "cot() - The cotangent of a value, where the value is an angle expressed in radians"
 msgstr "cot()‎ - קוטנגנס של ערך, כאשר הערך היא זווית שמבוטאת ברדיאנים"
 
@@ -20180,11 +20210,11 @@ msgstr "cot()‎ - קוטנגנס של ערך, כאשר הערך היא זווי
 msgid "count"
 msgstr "ספירה"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:528
+#: app/controllers/CControllerPopupTriggerExpr.php:559
 msgid "count() - Number of successfully retrieved values V (which fulfill operator O) for period T"
 msgstr "count()‎ - מספר ערכי ה־ V שהתקבלו בהצלחה (ומקיימים את המשתנה O) למשך T"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:535
+#: app/controllers/CControllerPopupTriggerExpr.php:566
 msgid "countunique() - The number of unique values"
 msgstr "countunique()‎ - מספר הערכים היחודיים"
 
@@ -20197,15 +20227,15 @@ msgstr "d"
 msgid "d.M"
 msgstr "d.M"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:542
+#: app/controllers/CControllerPopupTriggerExpr.php:573
 msgid "date() - Current date"
 msgstr "date()‎ - תאריך נוכחי"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:548
+#: app/controllers/CControllerPopupTriggerExpr.php:579
 msgid "dayofmonth() - Day of month"
 msgstr "dayofmonth()‎ - יום בחודש"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:554
+#: app/controllers/CControllerPopupTriggerExpr.php:585
 msgid "dayofweek() - Day of week"
 msgstr "dayofweek()‎ - יום בשבוע"
 
@@ -20223,7 +20253,7 @@ msgstr "ימים"
 msgid "default"
 msgstr "בררת מחדל"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:560
+#: app/controllers/CControllerPopupTriggerExpr.php:591
 msgid "degrees() - Converts a value from radians to degrees"
 msgstr "degrees()‎ - ממירה ערך מרדיאנים למעלות"
 
@@ -20300,7 +20330,7 @@ msgstr "לא קיים"
 msgid "does not match"
 msgstr "לא תואם"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:567
+#: app/controllers/CControllerPopupTriggerExpr.php:598
 msgid "e() - Returns Euler's number"
 msgstr "e()‎ - מחזירה את קבוע אוילר"
 
@@ -20323,11 +20353,11 @@ msgstr "הודעת שגיאה"
 msgid "exists"
 msgstr "קיים"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:572
+#: app/controllers/CControllerPopupTriggerExpr.php:603
 msgid "exp() - Euler's number at a power of a value"
 msgstr "exp()‎ - מספר אוילר בחזקה של ערך"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:579
+#: app/controllers/CControllerPopupTriggerExpr.php:610
 msgid "expm1() - Euler's number at a power of a value minus 1"
 msgstr "expm1()‎ - קבוע אוילר בחזקת ערך פחות 1"
 
@@ -20343,7 +20373,7 @@ msgstr "פענוח ה־JSON נכשל"
 msgid "file format is unsupported"
 msgstr "סוג הקובץ אינו נתמך"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:586
+#: app/controllers/CControllerPopupTriggerExpr.php:617
 msgid "find() - Check occurrence of pattern V (which fulfill operator O) for period T (1 - match, 0 - no match)"
 msgstr "find()‎ - בדיקת מופעי התבנית V (שמקיימת את הסימן O) למשך T (1 - תואם, 0 - לא תואם)"
 
@@ -20357,15 +20387,15 @@ msgstr "ראשון"
 msgid "first parameter is expected"
 msgstr "אמור להיות הפרמטר הראשון"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:593
+#: app/controllers/CControllerPopupTriggerExpr.php:624
 msgid "first() - The oldest value in the specified time interval"
 msgstr "first()‎ - הערך הישן ביותר במשך זמן מסוים"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:600
+#: app/controllers/CControllerPopupTriggerExpr.php:631
 msgid "floor() - Rounds down to the nearest smaller integer"
 msgstr "floor()‎ - מעגלת למטה למספר השלם הקרוב"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:607
+#: app/controllers/CControllerPopupTriggerExpr.php:638
 msgid "forecast() - Forecast for next t seconds based on period T"
 msgstr "forecast()‎ - תחזית למשך t השניות הבאות לפי נתונים במשך T"
 
@@ -20373,7 +20403,7 @@ msgstr "forecast()‎ - תחזית למשך t השניות הבאות לפי נ�
 msgid "fourth"
 msgstr "רביעי"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:614
+#: app/controllers/CControllerPopupTriggerExpr.php:645
 msgid "fuzzytime() - Difference between item value (as timestamp) and Zabbix server timestamp is less than or equal to T seconds (1 - true, 0 - false)"
 msgstr "fuzzytime()‎ - ההפרש בין ערך פריט (בתור חותמת זמן) וחותמת הזמן של שרת ה־Zabbix קטנה או שווה ל־T שניות (1 - אמת, 0 - שקר)"
 
@@ -20447,7 +20477,7 @@ msgstr "בתוך"
 msgid "in range"
 msgstr "בטווח"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:621
+#: app/controllers/CControllerPopupTriggerExpr.php:652
 msgid "in() - Checks if a value equals to one of the listed values (1 - equals, 0 - otherwise)"
 msgstr "in()‎ - בודקת אם ערך שווה לאחד מהערכים המוגדרים (1 - שווה, 0 - אחרת)"
 
@@ -20479,7 +20509,7 @@ msgstr "מניין רכיבים שגוי"
 msgid "incorrect expression starting from \"%1$s\""
 msgstr "ביטוי שגוי החל מ־„%1$s”"
 
-#: include/classes/api/services/CAction.php:2705
+#: include/classes/api/services/CAction.php:2715
 #: include/classes/api/services/CCorrelation.php:723
 msgid "incorrect number of conditions"
 msgstr "מספר התנאים שגוי"
@@ -20497,7 +20527,7 @@ msgstr "שגיאת תחביר ליד „%1$s“"
 msgid "incorrect usage of function \"%1$s\""
 msgstr "שימוש שגוי בפונקציה „%1$s”"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:634
+#: app/controllers/CControllerPopupTriggerExpr.php:665
 msgid "insert() - Inserts specified characters or spaces into a character string, beginning at a specified position in the string"
 msgstr "insert()‎ - מוסיפה תווים מסוימים או רווחים למחרוזת תווים, בתחילת מיקום מסוים במחרוזת"
 
@@ -20630,7 +20660,7 @@ msgstr "תבנית פריט"
 msgid "key is empty"
 msgstr "המפתח ריק"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:657
+#: app/controllers/CControllerPopupTriggerExpr.php:688
 msgid "kurtosis() - Measures the \"tailedness\" of the probability distribution"
 msgstr "kurtosis()‎ - מודדת את „ההזדנבות” של ההתפלגות"
 
@@ -20646,7 +20676,7 @@ msgctxt "week of month"
 msgid "last"
 msgstr "אחרון"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:664
+#: app/controllers/CControllerPopupTriggerExpr.php:695
 msgid "last() - Last (most recent) T value"
 msgstr "last()‎ - ערך ה־T (העדכני ביותר)"
 
@@ -20654,11 +20684,11 @@ msgstr "last()‎ - ערך ה־T (העדכני ביותר)"
 msgid "left"
 msgstr "שמאל"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:671
+#: app/controllers/CControllerPopupTriggerExpr.php:702
 msgid "left() - Returns the leftmost count characters"
 msgstr "left()‎ - מחזירה כמות כזאת של תווים משמאל"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:684
+#: app/controllers/CControllerPopupTriggerExpr.php:715
 msgid "length() - Length of last (most recent) T value in characters"
 msgstr "length()‎ - אורך ערך ה־T האחרון (העדכני ביותר) בתווים"
 
@@ -20666,23 +20696,23 @@ msgstr "length()‎ - אורך ערך ה־T האחרון (העדכני ביות�
 msgid "list of characters"
 msgstr "רשימה של תווים"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:690
+#: app/controllers/CControllerPopupTriggerExpr.php:721
 msgid "log() - Natural logarithm"
 msgstr "log()‎ - לוגריתם טבעי"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:697
+#: app/controllers/CControllerPopupTriggerExpr.php:728
 msgid "log10() - Decimal logarithm"
 msgstr "log10()‎ - לוגריתם עשרוני"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:704
+#: app/controllers/CControllerPopupTriggerExpr.php:735
 msgid "logeventid() - Event ID of last log entry matching regular expression V for period T (1 - match, 0 - no match)"
 msgstr "logeventid()‎ - מזהה האירוע של רשומת היומן האחרונה שתואמת לביטוי הרגולרי V למשך T (1 - תואם, 0 - לא תואם)"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:711
+#: app/controllers/CControllerPopupTriggerExpr.php:742
 msgid "logseverity() - Log severity of the last log entry for period T"
 msgstr "logseverity()‎ - חומרת היומן של רשומת היומן האחרונה בפרק זמן T"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:718
+#: app/controllers/CControllerPopupTriggerExpr.php:749
 msgid "logsource() - Log source of the last log entry matching parameter V for period T (1 - match, 0 - no match)"
 msgstr "logsource()‎ - מקור היומן של רשומת היומן האחרונה שתואמת לביטוי הרגולרי V למשך T (1 - תואם, 0 - לא תואם)"
 
@@ -20690,7 +20720,7 @@ msgstr "logsource()‎ - מקור היומן של רשומת היומן האחר
 msgid "low-level discovery rule"
 msgstr "כלל גילוי ברמה נמוכה"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:725
+#: app/controllers/CControllerPopupTriggerExpr.php:756
 msgid "ltrim() - Remove specified characters from the beginning of a string"
 msgstr "ltrim()‎ - מסירה תווים מסוימים מהתחלה של מחרוזת"
 
@@ -20722,7 +20752,7 @@ msgstr "המאקרו ריק"
 msgid "macro(s)"
 msgstr "מאקרו/ים"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:738
+#: app/controllers/CControllerPopupTriggerExpr.php:769
 msgid "mad() - Median absolute deviation"
 msgstr "mad()‎ - ממוצע ערך מוחלט של סטיות"
 
@@ -20762,7 +20792,7 @@ msgstr "מרבי"
 msgid "max period is less than time filter default period"
 msgstr "משך הזמן המרבי קטן ממשך הזמן של מסנן הזמן כבררת מחדל"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:745
+#: app/controllers/CControllerPopupTriggerExpr.php:776
 msgid "max() - Maximum value for period T"
 msgstr "max()‎ - ערך מרבי במשך T"
 
@@ -20776,7 +20806,7 @@ msgstr "כמות הפריטים התלויים המרבית מולאה"
 msgid "maximum number of dependency levels reached"
 msgstr "כמות הרמות המרבית לתלויות מולאה"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:752
+#: app/controllers/CControllerPopupTriggerExpr.php:783
 msgid "mid() - Returns a substring beginning at the character position specified by start for N characters"
 msgstr "mid()‎ - מחזירה תת־מחרוזת שמתחילה במיקום התו שצוין כהתחלה באורך N תווים"
 
@@ -20793,7 +20823,7 @@ msgstr "mid()‎ - מחזירה תת־מחרוזת שמתחילה במיקום �
 msgid "min"
 msgstr "מזערי"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:770
+#: app/controllers/CControllerPopupTriggerExpr.php:801
 msgid "min() - Minimum value for period T"
 msgstr "min()‎ - ערך מזערי במשך T"
 
@@ -20808,15 +20838,15 @@ msgstr "האורך המזערי הוא %1$s תווים"
 msgid "mm"
 msgstr "ממ"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:777
+#: app/controllers/CControllerPopupTriggerExpr.php:808
 msgid "mod() - Division remainder"
 msgstr "mod()‎ - שארית החילוק"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:790
+#: app/controllers/CControllerPopupTriggerExpr.php:821
 msgid "monodec() - Check for continuous item value decrease (1 - data is monotonic, 0 - otherwise), Mode (strict - require strict monotonicity)"
 msgstr "monodec()‎ - בדיקת הקטנת ערך פריט באופן רציף (1 - הנתון הוא מונוטוני, 0 - אחרת), מצב (strict - דורש מונוטוניות קשיחה)"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:797
+#: app/controllers/CControllerPopupTriggerExpr.php:828
 msgid "monoinc() - Check for continuous item value increase (1 - data is monotonic, 0 - otherwise), Mode (strict - require strict monotonicity)"
 msgstr "monoinc()‎ - בדיקת גדילת ערך פריט באופן רציף (1 - הנתון הוא מונוטוני, 0 - אחרת), מצב (strict - דורש מונוטוניות קשיחה)"
 
@@ -20932,7 +20962,7 @@ msgstr "אין הרשאות ליצור ולערוך מפות"
 msgid "no permissions to unacknowledge problems"
 msgstr "אין הרשאות לבטל הכרה בתקלות"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:804
+#: app/controllers/CControllerPopupTriggerExpr.php:835
 msgid "nodata() - No data received during period of time T (1 - true, 0 - false), Mode (strict - ignore proxy time delay in sending data)"
 msgstr "nodata()‎ - לא התקבלו נתונים בפרק זמן T (1 - אמת, 0 - שקר), מצב (קפדני - התעלמות מעיכוב בזמן מהמתווך בשליחת נתונים)"
 
@@ -20953,7 +20983,7 @@ msgstr "לא בין"
 msgid "not selected"
 msgstr "לא נבחר"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:811
+#: app/controllers/CControllerPopupTriggerExpr.php:842
 msgid "now() - Number of seconds since the Epoch"
 msgstr "now()‎ - מספר השניות מאז ראשית ספירת Epoch"
 
@@ -21040,15 +21070,15 @@ msgstr "נתיב/אל/סוד:מפתח"
 msgid "pattern"
 msgstr "תבנית"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:817
+#: app/controllers/CControllerPopupTriggerExpr.php:848
 msgid "percentile() - Percentile P of a period T"
 msgstr "percentile()‎ - אחוזון P במשך T"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:824
+#: app/controllers/CControllerPopupTriggerExpr.php:855
 msgid "pi() - Returns the Pi constant"
 msgstr "pi()‎ - מחזירה את הקבוע פאי"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:829
+#: app/controllers/CControllerPopupTriggerExpr.php:860
 msgid "power() - The power of a base value to a power value"
 msgstr "power()‎ - ערך מעריך החזקה של הבסיס"
 
@@ -21056,15 +21086,15 @@ msgstr "power()‎ - ערך מעריך החזקה של הבסיס"
 msgid "problem pattern"
 msgstr "תבנית תקלה"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:842
+#: app/controllers/CControllerPopupTriggerExpr.php:873
 msgid "radians() - Converts a value from degrees to radians"
 msgstr "radians()‎ - ממירה ערך ממעלות לרדיאנים"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:849
+#: app/controllers/CControllerPopupTriggerExpr.php:880
 msgid "rand() - A random integer value"
 msgstr "rand()‎ - ערך מספרי שלם אקראי"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:854
+#: app/controllers/CControllerPopupTriggerExpr.php:885
 msgid "rate() - Returns per-second average rate for monotonically increasing counters"
 msgstr "rate()‎ - מחזירה רמה ממוצעת לכל שנייה למונים שגדלים באופן אחיד"
 
@@ -21113,11 +21143,11 @@ msgstr "ביטוי רגולרי"
 msgid "regular expression"
 msgstr "ביטוי רגולרי"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:861
+#: app/controllers/CControllerPopupTriggerExpr.php:892
 msgid "repeat() - Returns a string composed of value repeated count times"
 msgstr "repeat()‎ - מחזירה מחרוזת שמורכבת מערך שחוזר מספר פעמים"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:874
+#: app/controllers/CControllerPopupTriggerExpr.php:905
 msgid "replace() - Search value for occurrences of pattern, and replace with replacement"
 msgstr "replace()‎ - חיפוש מופעים של תבנית בערך מסוים והחלפתם"
 
@@ -21141,15 +21171,15 @@ msgstr "מייצג את משתנה רמת התקריב בכתובת,"
 msgid "right"
 msgstr "ימינה"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:892
+#: app/controllers/CControllerPopupTriggerExpr.php:923
 msgid "right() - Returns the rightmost count characters"
 msgstr "right()‎ - מחזירה כמות כזאת של התווים הימניים ביותר"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:905
+#: app/controllers/CControllerPopupTriggerExpr.php:936
 msgid "round() - Rounds a value to decimal places"
 msgstr "round()‎ - מעגלת ערך למיקומים אחרי הנקודה העשרונית"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:918
+#: app/controllers/CControllerPopupTriggerExpr.php:949
 msgid "rtrim() - Removes specified characters from the end of a string"
 msgstr "rtrim()‎ - מסירה תווים מסוימים מסוף המחרוזת"
 
@@ -21240,23 +21270,23 @@ msgstr "הצגת מיפוי סמלים"
 msgid "sign in as guest"
 msgstr "כניסה כאורח"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:931
+#: app/controllers/CControllerPopupTriggerExpr.php:962
 msgid "signum() - Returns -1 if a value is negative, 0 if a value is zero, 1 if a value is positive"
 msgstr "signum()‎ - מחזירה ‎-1 אם ערך הוא שלילי, 0 עם הערך הוא אפס, 1 אם ערך הוא חיובי"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:938
+#: app/controllers/CControllerPopupTriggerExpr.php:969
 msgid "sin() - The sine of a value, where the value is an angle expressed in radians"
 msgstr "sin()‎ - סינוס של ערך, כאשר הערך הוא זווית שמיוצגת ברדיאנים"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:945
+#: app/controllers/CControllerPopupTriggerExpr.php:976
 msgid "sinh() - The hyperbolic sine of a value"
 msgstr "sinh()‎ - הסינוס ההיפרבולי של הערך"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:952
+#: app/controllers/CControllerPopupTriggerExpr.php:983
 msgid "skewness() - Measures the asymmetry of the probability distribution"
 msgstr "skewness()‎ - מודדת את האסימטריה של התפלגות ההסתברות"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:959
+#: app/controllers/CControllerPopupTriggerExpr.php:990
 msgid "sqrt() - Square root of a value"
 msgstr "sqrt()‎ - שורש ריבועי של ערך"
 
@@ -21264,11 +21294,11 @@ msgstr "sqrt()‎ - שורש ריבועי של ערך"
 msgid "standalone server"
 msgstr "שרת עצמאי"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:966
+#: app/controllers/CControllerPopupTriggerExpr.php:997
 msgid "stddevpop() - Population standard deviation"
 msgstr "stddevpop()‎ - סטיית תקן של הקבוצה"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:973
+#: app/controllers/CControllerPopupTriggerExpr.php:1004
 msgid "stddevsamp() - Sample standard deviation"
 msgstr "stddevsamp()‎ - סטיית תקן של מדגם"
 
@@ -21276,11 +21306,11 @@ msgstr "stddevsamp()‎ - סטיית תקן של מדגם"
 msgid "sum"
 msgstr "סכום"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:980
+#: app/controllers/CControllerPopupTriggerExpr.php:1011
 msgid "sum() - Sum of values of a period T"
 msgstr "sum()‎ - סכום הערכים במשך T"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:987
+#: app/controllers/CControllerPopupTriggerExpr.php:1018
 msgid "sumofsquares() - The sum of squares"
 msgstr "sumofsquares()‎ - סכום ריבועים"
 
@@ -21308,7 +21338,7 @@ msgstr "פרטי הגישה שסופקו אינם יחודיים"
 msgid "tag"
 msgstr "תגית"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:994
+#: app/controllers/CControllerPopupTriggerExpr.php:1025
 msgid "tan() - The tangent of a value"
 msgstr "tan()‎ - הטנגנס (משיק) של הערך"
 
@@ -21342,7 +21372,7 @@ msgstr "הזנת השורה החדשה האחרונה חסרה"
 #: include/classes/api/services/CReport.php:195
 #: include/classes/api/services/CReport.php:577
 #: include/classes/api/services/CReport.php:583
-#: include/classes/api/services/CScript.php:902
+#: include/classes/api/services/CScript.php:904
 #: include/classes/api/services/CTemplate.php:451
 #: include/classes/api/services/CValueMap.php:578
 #: include/classes/helpers/CDashboardHelper.php:369
@@ -21389,35 +21419,35 @@ msgstr "משך הזמן כבררת המחדל של מסנן הזמן חורג מ
 msgid "time shift"
 msgstr "הפרש זמן"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1001
+#: app/controllers/CControllerPopupTriggerExpr.php:1032
 msgid "time() - Current time"
 msgstr "time()‎ - השעה הנוכחית"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1007
+#: app/controllers/CControllerPopupTriggerExpr.php:1038
 msgid "timeleft() - Time to reach threshold estimated based on period T"
 msgstr "timeleft()‎ - זמן להגיע לסף המוערך בהתאם למשך T"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1014
+#: app/controllers/CControllerPopupTriggerExpr.php:1045
 msgid "trendavg() - Average value of a period T with exact period shift"
 msgstr "trendavg()‎ - ערך ממוצע של משך זמן T עם הזחת משך זמן מדויקת"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1021
+#: app/controllers/CControllerPopupTriggerExpr.php:1066
 msgid "trendcount() - Number of successfully retrieved values for period T"
 msgstr "trendcount()‎ - מספר הערכים שהתקבלו בהצלחה בפרק הזמן T"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1028
+#: app/controllers/CControllerPopupTriggerExpr.php:1073
 msgid "trendmax() - Maximum value for period T with exact period shift"
 msgstr "trendmax()‎ - ערך מרבי לפרק זמן T עם הזחת זמן מדויקת"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1035
+#: app/controllers/CControllerPopupTriggerExpr.php:1080
 msgid "trendmin() - Minimum value for period T with exact period shift"
 msgstr "trendmin()‎ - ערך מזערי לפרק זמן T עם הזחת זמן מדויקת"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1042
+#: app/controllers/CControllerPopupTriggerExpr.php:1087
 msgid "trendstl() - Anomaly detection for period T"
 msgstr "trendstl()‎ - בדיקת חריגות לתקופה T"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1085
+#: app/controllers/CControllerPopupTriggerExpr.php:1130
 msgid "trendsum() - Sum of values of a period T with exact period shift"
 msgstr "trendsum()‎ - סכוםה ערכים לפרק זמן T עם הזחת זמן מדויקת"
 
@@ -21443,11 +21473,11 @@ msgstr "אבטיפוס ההקפצה אינו ניתן להעברה לתבנית 
 msgid "trigger with linkages cannot be moved to another template or host"
 msgstr "הקפצות עם קישוריות אינן ניתנות להעברה לתבנית או למארח אחרים"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1092
+#: app/controllers/CControllerPopupTriggerExpr.php:1137
 msgid "trim() - Remove specified characters from the beginning and the end of a string"
 msgstr "trim()‎ - הסרת תווים מסוימים מתחילת או סוף מחרוזת"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1105
+#: app/controllers/CControllerPopupTriggerExpr.php:1150
 msgid "truncate() - Truncates a value to decimal places"
 msgstr "truncate()‎ - קוצץ ערך למקומות עשרוניים"
 
@@ -21504,7 +21534,7 @@ msgstr "סוף המאקרו בלתי צפוי"
 #: include/classes/api/services/CHttpTest.php:539
 #: include/classes/api/services/CItemGeneral.php:604
 #: include/classes/api/services/CItemGeneral.php:616
-#: include/classes/api/services/CScript.php:908
+#: include/classes/api/services/CScript.php:910
 #: include/classes/api/services/CTemplate.php:668
 #: include/classes/api/services/CTriggerGeneral.php:666
 #: include/classes/api/services/CValueMap.php:432
@@ -21746,11 +21776,11 @@ msgstr "ערך המשתנה השני ארוך מדי"
 msgid "value of third parameter must be one of %1$s"
 msgstr "ערך המשתנה השלישי חייב להיות אחת מתוך %1$s"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1118
+#: app/controllers/CControllerPopupTriggerExpr.php:1163
 msgid "varpop() - Population variance"
 msgstr "varpop()‎ - שונות אוכלוסיה"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1125
+#: app/controllers/CControllerPopupTriggerExpr.php:1170
 msgid "varsamp() - Sample variance"
 msgstr "varsamp()‎ - סטיית דגימה"
 
