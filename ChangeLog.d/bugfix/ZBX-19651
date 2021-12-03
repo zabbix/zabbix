@@ -1,0 +1,1 @@
+........S. [ZBX-19651] fixed problem escalation when at least one of the hosts in a trigger expression is not in maintenance (dgoloscapov)
