@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-11-05 19:52+0200\n"
-"PO-Revision-Date: 2021-05-20 04:13+0300\n"
-"Last-Translator: Imagunet <soporte@imagunet.com>\n"
+"PO-Revision-Date: 2021-11-30 23:01+0300\n"
+"Last-Translator: cesar.fernandez <cesar.fernandez@mrinformatica.es>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1621476805.000000\n"
+"X-POOTLE-MTIME: 1638306076.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:139
@@ -130,12 +130,12 @@ msgstr[1] "%1$s acciones"
 #: jsLoader.php:239
 #, c-format
 msgid "%1$s characters"
-msgstr ""
+msgstr "%1$s caracteres"
 
 #: jsLoader.php:240
 #, c-format
 msgid "%1$s characters remaining"
-msgstr ""
+msgstr "%1$s caracteres restantes"
 
 #: app/views/popup.acknowledge.edit.php:59
 #: app/views/popup.acknowledge.edit.php:64
@@ -507,7 +507,7 @@ msgstr "Acción agregada"
 #: include/classes/core/ZBase.php:433
 #, c-format
 msgid "Action class %1$s must extend %2$s class."
-msgstr ""
+msgstr "La clase acción \"%1$s\" debe extender la clase \"%2$s\""
 
 #: actionconf.php:202
 msgid "Action deleted"
@@ -728,7 +728,7 @@ msgstr "Agregar"
 
 #: app/views/js/administration.mediatype.edit.js.php:133
 msgid "Add (message type limit reached)"
-msgstr ""
+msgstr "Agregar (límite de tipo de mensajes alcanzado)"
 
 #: jsLoader.php:128
 msgid "Add a new widget"
@@ -853,23 +853,24 @@ msgstr "Interfaces del agente"
 #: include/classes/items/CHelpItems.php:73
 #: include/classes/items/CHelpItems.php:403
 msgid "Agent variant check. Returns 1 - for Zabbix agent; 2 - for Zabbix agent 2"
-msgstr ""
+msgstr "Comprobación de la variante del agente. Devuelve 1 - para el agente Zabbix; 2 - para el agente Zabbix 2"
 
 #: include/classes/widgets/CWidgetHelper.php:1150
 msgid "Aggregate"
-msgstr ""
+msgstr "Agregado"
 
 #: include/classes/widgets/CWidgetHelper.php:1122
+#, fuzzy
 msgid "Aggregation function"
-msgstr ""
+msgstr "Función de agregación"
 
 #: include/classes/widgets/CWidgetHelper.php:1141
 msgid "Aggregation interval"
-msgstr ""
+msgstr "Intervalo de agregación"
 
 #: include/actions.inc.php:2132
 msgid "Alert message"
-msgstr ""
+msgstr "Mensaje de alerta"
 
 #: app/controllers/CControllerPopupGeneric.php:248
 #: app/views/administration.user.edit.php:61
@@ -880,7 +881,7 @@ msgstr "Alias"
 
 #: include/views/monitoring.sysmap.constructor.php:76
 msgid "Align map elements"
-msgstr ""
+msgstr "Alinear los elementos del mapa"
 
 #: app/controllers/CControllerAuditLogList.php:148
 #: app/controllers/CControllerAuditLogList.php:149
@@ -1163,7 +1164,7 @@ msgstr "Como texto sencillo"
 #: app/views/administration.authentication.edit.php:206
 #: app/views/administration.authentication.edit.php:240
 msgid "Assertions"
-msgstr ""
+msgstr "Afirmaciones"
 
 #: include/hosts.inc.php:149
 msgid "Asset tag"
@@ -1273,7 +1274,7 @@ msgstr "Agosto"
 
 #: app/views/administration.authentication.edit.php:212
 msgid "AuthN requests"
-msgstr ""
+msgstr "N Solicitudes de autenticación"
 
 #: app/views/administration.authentication.edit.php:254
 #: app/views/administration.authentication.edit.php:263
@@ -1305,7 +1306,7 @@ msgstr "Método de autenticación"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:314
 msgid "Authentication method changed"
-msgstr ""
+msgstr "Cambio en el método de autenticación"
 
 #: app/views/popup.discovery.check.php:103
 #: include/views/js/configuration.host.edit.js.php:125
@@ -1378,12 +1379,12 @@ msgstr "Acciones de autoregistro"
 
 #: app/views/administration.housekeeping.edit.php:71
 msgid "Autoregistration data storage period"
-msgstr ""
+msgstr "Periodo de almacenamiento de los datos de autorregistro"
 
 #: include/profiles.inc.php:232
 #, c-format
 msgid "Autoregistration event and alert data storage period \"%1$s\"."
-msgstr ""
+msgstr "Periodo de almacenamiento de datos de eventos y alertas de autorregistro \"%1$s\"."
 
 #: app/partials/monitoring.host.view.html.php:35
 #: include/views/configuration.host.list.php:195
@@ -1605,7 +1606,7 @@ msgstr "Calcula la suma de los valores, basado en los parámetros suministrados.
 
 #: jsLoader.php:154
 msgid "Calendar"
-msgstr ""
+msgstr "Calendario"
 
 #: include/hosts.inc.php:60
 msgid "Callback"
@@ -1614,7 +1615,7 @@ msgstr "Devolución de llamada"
 #: jsLoader.php:254
 msgctxt "screen reader"
 msgid "Can not be removed"
-msgstr ""
+msgstr "No se puede eliminar"
 
 #: app/views/administration.iconmap.edit.php:145
 #: app/views/administration.iconmap.edit.php:155
@@ -1742,7 +1743,7 @@ msgstr "No es posible agregar el periodo de mantenimiento"
 #: include/classes/api/services/CMap.php:1509
 #, c-format
 msgid "Cannot add map element of the map \"%1$s\" due to circular reference."
-msgstr ""
+msgstr "No se puede añadir el elemento del mapa \"%1$s\" debido a una referencia circular."
 
 #: app/controllers/CControllerMediatypeCreate.php:76
 #: app/controllers/CControllerMediatypeCreate.php:165
@@ -1753,8 +1754,8 @@ msgstr "No es posible agregar el tipo de medios"
 #, c-format
 msgid "Cannot add module: %1$s."
 msgid_plural "Cannot add modules: %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No se puede añadir el módulo: %1$s."
+msgstr[1] "No se pueden añadir los módulos: %1$s."
 
 #: include/classes/api/services/CGraph.php:40
 #, c-format
@@ -1826,7 +1827,7 @@ msgstr "No es posible agregar el usuario"
 #: app/controllers/CControllerUsergroupCreate.php:51
 #: app/controllers/CControllerUsergroupCreate.php:100
 msgid "Cannot add user group"
-msgstr ""
+msgstr "No se puede añadir el grupo de usuarios"
 
 #: app/controllers/CControllerValuemapCreate.php:41
 #: app/controllers/CControllerValuemapCreate.php:77
