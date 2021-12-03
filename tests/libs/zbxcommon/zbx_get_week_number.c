@@ -28,11 +28,10 @@
 
 void	zbx_mock_test_entry(void **state)
 {
-	zbx_timespec_t	ts_in, ts_out, ts;
+	zbx_timespec_t	ts;
 	struct tm	tm;
-	zbx_time_unit_t	base;
 	time_t		time_tmp;
-	const char	*unit;
+	int		week_ret, week_exp;
 
 	ZBX_UNUSED(state);
 
@@ -41,47 +40,14 @@ void	zbx_mock_test_entry(void **state)
 
 	tzset();
 
-	if (ZBX_MOCK_SUCCESS != zbx_strtime_to_timespec(zbx_mock_get_parameter_string("in.time"), &ts_in))
+	if (ZBX_MOCK_SUCCESS != zbx_strtime_to_timespec(zbx_mock_get_parameter_string("in.time"), &ts))
 		fail_msg("Invalid input time format");
 
-	if (ZBX_MOCK_SUCCESS != zbx_strtime_to_timespec(zbx_mock_get_parameter_string("out.time"), &ts_out))
-		fail_msg("Invalid output time format");
-
-	if ('i' == *(unit = zbx_mock_get_parameter_string("in.base")))
-	{
-		base = ZBX_TIME_UNIT_ISOYEAR;
-	}
-	else
-	{
-		if (ZBX_TIME_UNIT_UNKNOWN == (base = zbx_tm_str_to_unit(unit)))
-			fail_msg("Invalid time unit");
-	}
-
-	time_tmp = ts_in.sec;
+	time_tmp = (time_t)ts.sec;
 	tm = *localtime(&time_tmp);
 
-	zbx_tm_round_down(&tm, base);
+	week_ret = zbx_get_week_number(&tm);
+	week_exp = atoi(zbx_mock_get_parameter_string("out.week"));
 
-	if (0 > tm.tm_hour || 23 < tm.tm_hour)
-		fail_msg("invalid tm_hour:%d", tm.tm_hour);
-
-	if (1 > tm.tm_mday || 31 < tm.tm_mday)
-		fail_msg("invalid tm.tm_mday:%d", tm.tm_mday);
-
-	if (0 > tm.tm_mon || 11 < tm.tm_mon)
-		fail_msg("invalid tm.tm_mon:%d", tm.tm_mon);
-
-	if (0 > tm.tm_wday || 6 < tm.tm_wday)
-		fail_msg("invalid tm.tm_wday:%d", tm.tm_wday);
-
-	if (0 > tm.tm_yday || 365 < tm.tm_yday)
-		fail_msg("invalid tm.tm_yday:%d", tm.tm_yday);
-
-	if (-1 == (time_tmp = mktime(&tm)))
-		fail_msg("invalid time structure");
-
-	ts.ns = 0;
-	ts.sec = time_tmp;
-
-	zbx_mock_assert_timespec_eq("Time rounding result", &ts_out, &ts);
+	zbx_mock_assert_int_eq("week number", week_exp, week_ret);
 }
