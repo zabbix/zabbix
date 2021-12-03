@@ -22,7 +22,7 @@ define('ZABBIX_VERSION',		'6.0.0alpha8');
 define('ZABBIX_API_VERSION',	'6.0.0');
 define('ZABBIX_EXPORT_VERSION',	'6.0');
 
-define('ZABBIX_DB_VERSION',		5050111);
+define('ZABBIX_DB_VERSION',		5050112);
 
 define('DB_VERSION_SUPPORTED',				0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',		1);
@@ -736,6 +736,9 @@ define('ACTION_STATUS_DISABLED',	1);
 
 define('ACTION_PAUSE_SUPPRESSED_FALSE',		0);
 define('ACTION_PAUSE_SUPPRESSED_TRUE',		1);
+
+define('ACTION_NOTIFY_IF_CANCELED_FALSE',	0);
+define('ACTION_NOTIFY_IF_CANCELED_TRUE',	1);
 
 define('OPERATION_TYPE_MESSAGE',			0);
 define('OPERATION_TYPE_COMMAND',			1);
@@ -1604,14 +1607,12 @@ define('ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION', 2);
 
 // Tab indicator names.
 define('TAB_INDICATOR_MACROS', 'macros');
-define('TAB_INDICATOR_LINKED_TEMPLATE', 'linked-template');
 define('TAB_INDICATOR_TAGS', 'tags');
 define('TAB_INDICATOR_AUTH_HTTP', 'http');
 define('TAB_INDICATOR_AUTH_LDAP', 'ldap');
 define('TAB_INDICATOR_AUTH_SAML', 'saml');
 define('TAB_INDICATOR_INVENTORY', 'inventory');
 define('TAB_INDICATOR_ENCRYPTION', 'encryption');
-define('TAB_INDICATOR_GROUPS', 'groups');
 define('TAB_INDICATOR_PREPROCESSING', 'preprocessing');
 define('TAB_INDICATOR_DEPENDENCY', 'dependency');
 define('TAB_INDICATOR_LLD_MACROS', 'lld-macros');

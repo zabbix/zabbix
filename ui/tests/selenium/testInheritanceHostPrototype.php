@@ -78,7 +78,6 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		$this->zbxTestAssertElementPresentXpath('//input[@id="proxy_hostid"][@readonly]');
 
 		// Check layout at Groups tab.
-		$this->zbxTestTabSwitch('Groups');
 		$this->zbxTestAssertElementPresentXpath('//div[@id="group_links_"]//ul[@class="multiselect-list disabled"]');
 		$this->zbxTestAssertElementPresentXpath('//button[@class="btn-grey"][@disabled]');
 		$this->zbxTestAssertElementPresentXpath('//input[@name="group_prototypes[0][name]"][@readonly]');
@@ -179,8 +178,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 
 		$form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => ['1' => 'default']])
 				->fill($data['interfaces']);
-		$form->selectTab('Templates');
-		$form->getFieldContainer('Link new templates')->asMultiselect()->fill($data['template']);
+		$form->getFieldContainer('Templates')->asMultiselect()->fill($data['template']);
 		$form->submit();
 		$this->page->waitUntilReady();
 
@@ -321,8 +319,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 			$this->zbxTestCheckboxSelect('status', $data['create_enabled']);
 		}
 
-		// Groups tab.
-		$this->zbxTestTabSwitch('Groups');
+		// Groups.
 		if (array_key_exists('groups', $data)) {
 			foreach ($data['groups'] as $group) {
 				$this->zbxTestClickButtonMultiselect('group_links_');
@@ -335,8 +332,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 			$this->zbxTestInputTypeByXpath('//*[@name="group_prototypes[0][name]"]', $data['group_macro']);
 		}
 
-		// Templates tab.
-		$this->zbxTestTabSwitch('Templates');
+		// Templates.
 		if (array_key_exists('templates', $data)) {
 			foreach ($data['templates'] as $template) {
 				$this->zbxTestClickButtonMultiselect('add_templates_');
@@ -443,7 +439,6 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 
 		// Change groups.
 		if (array_key_exists('hostgroup', $data) || array_key_exists('group_prototype', $data)) {
-			$this->zbxTestTabSwitch('Groups');
 			if (array_key_exists('hostgroup', $data)) {
 				$this->zbxTestClickXpathWait('//span[@class="subfilter-disable-btn"]');
 				$this->zbxTestMultiselectClear('group_links_');
@@ -458,7 +453,6 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 
 		// Change template.
 		if (array_key_exists('template', $data)) {
-			$this->zbxTestTabSwitch('Templates');
 			$this->zbxTestClickButtonMultiselect('add_templates_');
 			$this->zbxTestLaunchOverlayDialog('Templates');
 			COverlayDialogElement::find()->one()->setDataContext('Templates');
@@ -496,11 +490,9 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 				$this->zbxTestAssertElementValue('host', $data['cloned_name']);
 				$this->zbxTestAssertElementValue('name', $data['cloned_visible_name']);
 				$this->zbxTestCheckboxSelected('status');
-				$this->zbxTestTabSwitch('Groups');
 				$this->zbxTestMultiselectAssertSelected('group_links_', $data['hostgroup']);
 				$this->zbxTestAssertAttribute('//*[@name="group_prototypes[0][name]"]', 'value' , $data['group_prototype']);
-				$this->zbxTestTabSwitch('Templates');
-				$this->zbxTestAssertElementText('//div[@id="templateTab"]//a', $data['template']);
+				$this->query('link', $data['template']);
 				$this->zbxTestTabSwitch('Inventory');
 				$this->zbxTestAssertAttribute('//label[text()="'.$data['inventory'].'"]/../input', 'checked');
 			}

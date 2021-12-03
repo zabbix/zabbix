@@ -264,6 +264,28 @@
 			});
 
 			return ret;
+		},
+
+		/**
+		 * @param array entries  IDs to mark disabled.
+		 */
+		setDisabledEntries: function (entries) {
+			this.each(function() {
+				const $obj = $(this);
+				const ms_parameters = $obj.data('multiSelect');
+
+				if (typeof ms_parameters === 'undefined') {
+					return;
+				}
+
+				const link = new Curl(ms_parameters.options.url, false);
+				link.setArgument('disabledids', entries);
+
+				ms_parameters.options.url = link.getUrl();
+				ms_parameters.options.popup.parameters.disableids = entries;
+
+				$obj.data('multiSelect', ms_parameters);
+			});
 		}
 	};
 

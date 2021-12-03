@@ -1404,7 +1404,7 @@ class CImportReferencer {
 
 		$this->db_proxies = API::Proxy()->get([
 			'output' => ['host'],
-			'search' => ['host' => array_keys($this->proxies)],
+			'filter' => ['host' => array_keys($this->proxies)],
 			'preservekeys' => true
 		]);
 

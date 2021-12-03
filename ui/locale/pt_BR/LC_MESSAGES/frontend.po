@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-19 19:55+0200\n"
+"POT-Creation-Date: 2021-11-26 19:55+0200\n"
 "PO-Revision-Date: 2021-01-25 11:38+0300\n"
 "Last-Translator: Marlon <Marlon@outlook.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -302,10 +302,10 @@ msgstr "(0 - usar a ação padrão)"
 msgid "(Only super admins can create groups)"
 msgstr "(Apenas super administradores podem criar grupos)"
 
-#: app/partials/configuration.host.edit.html.php:161
+#: app/partials/configuration.host.edit.html.php:275
 #: app/views/popup.itemtestedit.view.php:241
-#: app/views/popup.massupdate.host.php:85
-#: include/views/configuration.host.prototype.edit.php:132
+#: app/views/popup.massupdate.host.php:122
+#: include/views/configuration.host.prototype.edit.php:280
 msgid "(no proxy)"
 msgstr "(sem proxy)"
 
@@ -525,7 +525,7 @@ msgstr "Eventos confirmados RESOLVIDOS"
 
 #: app/controllers/CControllerAuditLogList.php:209
 #: app/partials/administration.usergroup.tagfilters.html.php:29
-#: app/partials/configuration.host.edit.html.php:216
+#: app/partials/configuration.host.edit.html.php:144
 #: app/partials/configuration.tags.tab.php:41
 #: app/partials/configuration.valuemap.php:35
 #: app/partials/massupdate.valuemaps.tab.php:47
@@ -544,11 +544,11 @@ msgstr "Eventos confirmados RESOLVIDOS"
 #: app/views/popup.dashboard.share.edit.php:32
 #: app/views/popup.dashboard.share.edit.php:53
 #: app/views/popup.lldoperation.php:117 app/views/popup.lldoperation.php:268
-#: app/views/popup.lldoverride.php:101 app/views/popup.massupdate.host.php:207
+#: app/views/popup.lldoverride.php:101 app/views/popup.massupdate.host.php:203
 #: app/views/popup.massupdate.item.php:228
 #: app/views/popup.massupdate.item.php:486
 #: app/views/popup.massupdate.service.php:50
-#: app/views/popup.massupdate.template.php:140
+#: app/views/popup.massupdate.template.php:132
 #: app/views/popup.massupdate.trigger.php:84
 #: app/views/popup.massupdate.trigger.php:98
 #: app/views/popup.service.edit.php:65 app/views/popup.service.edit.php:145
@@ -570,14 +570,14 @@ msgstr "Eventos confirmados RESOLVIDOS"
 #: include/views/configuration.host.discovery.edit.php:632
 #: include/views/configuration.host.discovery.edit.php:742
 #: include/views/configuration.host.discovery.edit.php:914
-#: include/views/configuration.host.prototype.edit.php:240
+#: include/views/configuration.host.prototype.edit.php:118
 #: include/views/configuration.httpconf.edit.php:209
 #: include/views/configuration.item.edit.php:193
 #: include/views/configuration.item.edit.php:735
 #: include/views/configuration.item.prototype.edit.php:178
 #: include/views/configuration.item.prototype.edit.php:714
 #: include/views/configuration.maintenance.edit.php:45
-#: include/views/configuration.template.edit.php:127
+#: include/views/configuration.template.edit.php:69
 #: include/views/configuration.trigger.prototype.edit.php:199
 #: include/views/configuration.trigger.prototype.edit.php:394
 #: include/views/configuration.trigger.prototype.edit.php:567
@@ -690,7 +690,7 @@ msgid "Active till"
 msgstr "Ativo até"
 
 #: app/controllers/CControllerAuditLogList.php:194
-#: app/partials/configuration.host.edit.html.php:133
+#: app/partials/configuration.host.edit.html.php:248
 #: app/partials/configuration.tags.tab.php:120
 #: app/partials/configuration.valuemap.php:40
 #: app/partials/hostmacros.inherited.list.html.php:185
@@ -749,14 +749,14 @@ msgstr "Ativo até"
 #: app/views/popup.lldoperation.php:290 app/views/popup.lldoverride.php:176
 #: app/views/popup.lldoverride.php:201 app/views/popup.lldoverride.php:220
 #: app/views/popup.maintenance.period.php:189
-#: app/views/popup.massupdate.host.php:50
-#: app/views/popup.massupdate.host.php:201
+#: app/views/popup.massupdate.host.php:87
+#: app/views/popup.massupdate.host.php:197
 #: app/views/popup.massupdate.item.php:124
 #: app/views/popup.massupdate.item.php:270
 #: app/views/popup.massupdate.item.php:480
 #: app/views/popup.massupdate.service.php:44
-#: app/views/popup.massupdate.template.php:52
-#: app/views/popup.massupdate.template.php:134
+#: app/views/popup.massupdate.template.php:92
+#: app/views/popup.massupdate.template.php:126
 #: app/views/popup.massupdate.trigger.php:78
 #: app/views/popup.massupdate.trigger.php:125 app/views/popup.media.php:52
 #: app/views/popup.media.php:127 app/views/popup.mediatype.message.php:104
@@ -787,9 +787,9 @@ msgstr "Ativo até"
 #: include/views/configuration.host.discovery.edit.php:919
 #: include/views/configuration.host.discovery.edit.php:981
 #: include/views/configuration.hostgroups.edit.php:55
-#: include/views/configuration.host.prototype.edit.php:110
-#: include/views/configuration.host.prototype.edit.php:189
-#: include/views/configuration.host.prototype.edit.php:432
+#: include/views/configuration.host.prototype.edit.php:216
+#: include/views/configuration.host.prototype.edit.php:256
+#: include/views/configuration.host.prototype.edit.php:430
 #: include/views/configuration.httpconf.edit.php:120
 #: include/views/configuration.httpconf.edit.php:138
 #: include/views/configuration.httpconf.edit.php:215
@@ -807,7 +807,7 @@ msgstr "Ativo até"
 #: include/views/configuration.maintenance.edit.php:86
 #: include/views/configuration.maintenance.edit.php:200
 #: include/views/configuration.maintenance.edit.php:275
-#: include/views/configuration.template.edit.php:253
+#: include/views/configuration.template.edit.php:234
 #: include/views/configuration.trigger.prototype.edit.php:111
 #: include/views/configuration.trigger.prototype.edit.php:148
 #: include/views/configuration.trigger.prototype.edit.php:305
@@ -852,7 +852,7 @@ msgstr "Adicionar elemento filho"
 msgid "Add child service"
 msgstr ""
 
-#: app/views/js/popup.service.edit.js.php:509
+#: app/views/js/popup.service.edit.js.php:508
 msgid "Add child services"
 msgstr ""
 
@@ -877,8 +877,8 @@ msgstr "Adicionar múltiplos mapas"
 msgid "Add new data set"
 msgstr "Adicionar novo conjunto de dados"
 
-#: app/partials/configuration.host.edit.html.php:141
-#: include/views/configuration.host.prototype.edit.php:118
+#: app/partials/configuration.host.edit.html.php:256
+#: include/views/configuration.host.prototype.edit.php:264
 msgid "Add new interface"
 msgstr ""
 
@@ -891,7 +891,7 @@ msgstr "Adicionar nova sobreposição"
 msgid "Add page"
 msgstr ""
 
-#: app/views/js/popup.service.edit.js.php:539 jsLoader.php:414
+#: app/views/js/popup.service.edit.js.php:538 jsLoader.php:414
 msgid "Add parent services"
 msgstr ""
 
@@ -1442,9 +1442,9 @@ msgstr ""
 msgid "Authentication"
 msgstr "Autenticação"
 
-#: app/partials/configuration.host.edit.html.php:311
-#: app/views/popup.massupdate.host.php:151
-#: include/views/configuration.host.prototype.edit.php:309
+#: app/partials/configuration.host.edit.html.php:306
+#: app/views/popup.massupdate.host.php:150
+#: include/views/configuration.host.prototype.edit.php:303
 msgid "Authentication algorithm"
 msgstr "Algoritmo de autenticação"
 
@@ -1505,12 +1505,12 @@ msgstr "Não é possível habilitar as opções de login automático e logout au
 msgid "Auto-logout"
 msgstr "Logout automático"
 
-#: app/partials/configuration.host.edit.html.php:365
+#: app/partials/configuration.host.edit.html.php:360
 #: app/partials/popup.operations.php:228
 #: app/views/administration.miscconfig.edit.php:61
 #: app/views/popup.lldoperation.php:282
-#: app/views/popup.massupdate.host.php:189 include/hosts.inc.php:1128
-#: include/views/configuration.host.prototype.edit.php:358
+#: app/views/popup.massupdate.host.php:185 include/hosts.inc.php:1128
+#: include/views/configuration.host.prototype.edit.php:362
 msgid "Automatic"
 msgstr "Automático"
 
@@ -2322,7 +2322,7 @@ msgstr[1] "Serviço não foi removido"
 msgid "Cannot delete service \"%1$s\": %2$s."
 msgstr ""
 
-#: templates.php:425 templates.php:439 templates.php:472
+#: templates.php:426 templates.php:440 templates.php:473
 msgid "Cannot delete template"
 msgstr "Não foi possível excluir template"
 
@@ -3021,7 +3021,7 @@ msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr "Não é possível atualizar os grupos para o host descoberto \"%1$s\"."
 
 #: app/controllers/CControllerHostUpdate.php:34
-#: app/controllers/CControllerHostUpdate.php:148
+#: app/controllers/CControllerHostUpdate.php:153
 msgid "Cannot update host"
 msgstr "Host não foi atualizado"
 
@@ -3153,7 +3153,7 @@ msgstr "Não foi possível atualizar o passo do cenário web baseado em template
 msgid "Cannot update template"
 msgstr "Não foi possível atualizar template"
 
-#: app/controllers/CControllerPopupMassupdateTemplate.php:341
+#: app/controllers/CControllerPopupMassupdateTemplate.php:343
 msgid "Cannot update templates"
 msgstr ""
 
@@ -3239,14 +3239,14 @@ msgstr "Recebe todos os traps SNMP que não foram recebidos por nenhum item de s
 msgid "Center"
 msgstr ""
 
-#: app/partials/configuration.host.edit.html.php:438
-#: app/partials/configuration.host.edit.html.php:457
+#: app/partials/configuration.host.edit.html.php:433
+#: app/partials/configuration.host.edit.html.php:452
 #: app/views/administration.proxy.edit.php:97
 #: app/views/administration.proxy.edit.php:105
-#: app/views/popup.massupdate.host.php:239
-#: app/views/popup.massupdate.host.php:255
-#: include/views/configuration.host.prototype.edit.php:371
-#: include/views/configuration.host.prototype.edit.php:387
+#: app/views/popup.massupdate.host.php:234
+#: app/views/popup.massupdate.host.php:250
+#: include/views/configuration.host.prototype.edit.php:375
+#: include/views/configuration.host.prototype.edit.php:391
 msgid "Certificate"
 msgstr "Certificado"
 
@@ -3264,10 +3264,10 @@ msgctxt "verb"
 msgid "Change"
 msgstr "Modificar"
 
-#: app/partials/configuration.host.edit.html.php:469
+#: app/partials/configuration.host.edit.html.php:464
 #: app/views/administration.autoreg.edit.php:80
 #: app/views/administration.proxy.edit.php:126
-#: include/views/configuration.host.prototype.edit.php:392
+#: include/views/configuration.host.prototype.edit.php:396
 msgid "Change PSK"
 msgstr ""
 
@@ -3447,8 +3447,8 @@ msgstr "Limpar histórico"
 msgid "Clear history and trends"
 msgstr "Limpar histórico e estatísticas (médias)"
 
-#: app/views/popup.massupdate.host.php:136
-#: app/views/popup.massupdate.template.php:114
+#: app/views/popup.massupdate.host.php:70
+#: app/views/popup.massupdate.template.php:73
 msgid "Clear when unlinking"
 msgstr "Limpar ao desassociar"
 
@@ -3479,12 +3479,12 @@ msgstr "Relógio"
 #: include/views/configuration.graph.edit.php:510
 #: include/views/configuration.host.discovery.edit.php:960
 #: include/views/configuration.hostgroups.edit.php:62
-#: include/views/configuration.host.prototype.edit.php:424
+#: include/views/configuration.host.prototype.edit.php:419
 #: include/views/configuration.httpconf.edit.php:254
 #: include/views/configuration.item.edit.php:1015
 #: include/views/configuration.item.prototype.edit.php:901
 #: include/views/configuration.maintenance.edit.php:266
-#: include/views/configuration.template.edit.php:238
+#: include/views/configuration.template.edit.php:219
 #: include/views/configuration.trigger.prototype.edit.php:655
 #: include/views/configuration.triggers.edit.php:648
 #: include/views/monitoring.sysmap.edit.php:421 jsLoader.php:352
@@ -3885,13 +3885,13 @@ msgstr ""
 msgid "Connection will not be encrypted because it uses a socket file (on Unix) or shared memory (Windows)."
 msgstr ""
 
-#: app/views/popup.massupdate.host.php:282
+#: app/views/popup.massupdate.host.php:277
 msgid "Connections"
 msgstr "Conexões"
 
-#: app/partials/configuration.host.edit.html.php:444
-#: app/views/popup.massupdate.host.php:243
-#: include/views/configuration.host.prototype.edit.php:375
+#: app/partials/configuration.host.edit.html.php:439
+#: app/views/popup.massupdate.host.php:238
+#: include/views/configuration.host.prototype.edit.php:379
 msgid "Connections from host"
 msgstr "Conexões do host (ativas)"
 
@@ -3899,9 +3899,9 @@ msgstr "Conexões do host (ativas)"
 msgid "Connections from proxy"
 msgstr "Conexões do proxy"
 
-#: app/partials/configuration.host.edit.html.php:433
-#: app/views/popup.massupdate.host.php:235
-#: include/views/configuration.host.prototype.edit.php:367
+#: app/partials/configuration.host.edit.html.php:428
+#: app/views/popup.massupdate.host.php:230
+#: include/views/configuration.host.prototype.edit.php:371
 msgid "Connections to host"
 msgstr "Conexões com o host (passivas)"
 
@@ -4162,7 +4162,7 @@ msgid "Create discovery rule (select template first)"
 msgstr ""
 
 #: app/views/popup.lldoperation.php:80 app/views/popup.massupdate.item.php:325
-#: include/views/configuration.host.prototype.edit.php:138
+#: include/views/configuration.host.prototype.edit.php:286
 #: include/views/configuration.host.prototype.list.php:61
 #: include/views/configuration.host.prototype.list.php:187
 #: include/views/configuration.item.prototype.edit.php:847
@@ -4364,7 +4364,7 @@ msgid "Current value"
 msgstr "Valor atual"
 
 #: app/views/administration.mediatype.edit.php:327
-#: include/views/configuration.host.prototype.edit.php:104
+#: include/views/configuration.host.prototype.edit.php:250
 msgid "Custom"
 msgstr "Customizar"
 
@@ -4867,7 +4867,7 @@ msgstr "Excluir"
 msgid "Delete all elements that are not present in the import file?"
 msgstr ""
 
-#: include/views/configuration.template.edit.php:243
+#: include/views/configuration.template.edit.php:224
 #: include/views/configuration.template.list.php:285
 msgid "Delete and clear"
 msgstr "Excluir e limpar"
@@ -4876,7 +4876,7 @@ msgstr "Excluir e limpar"
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
 msgstr "Excluir e limpar templates selecionados? (Aviso: todos os hosts associados terão as entidades herdadas dos templates excluídas, bem como os dados coletados!)"
 
-#: include/views/configuration.template.edit.php:244
+#: include/views/configuration.template.edit.php:225
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
 msgstr "Excluir e limpar template? (Aviso: todos os hosts associados terão as entidades herdadas dos templates excluídas, bem como os dados coletados!)"
 
@@ -5013,7 +5013,7 @@ msgstr "Excluir grupos selecionados?"
 msgid "Delete selected host groups?"
 msgstr "Excluir os grupos de hosts selecionados?"
 
-#: include/views/configuration.host.prototype.edit.php:416
+#: include/views/configuration.host.prototype.edit.php:421
 msgid "Delete selected host prototype?"
 msgstr "Excluir os protótipos de host selecionados?"
 
@@ -5122,7 +5122,7 @@ msgstr "Excluir usuários selecionados?"
 msgid "Delete selected web scenarios?"
 msgstr "Excluir os cenários web selecionados?"
 
-#: include/views/configuration.template.edit.php:240
+#: include/views/configuration.template.edit.php:221
 msgid "Delete template?"
 msgstr "Excluir template?"
 
@@ -5202,7 +5202,7 @@ msgid "Deployment status"
 msgstr "Status de desenvolvimento"
 
 #: app/controllers/CControllerAuditLogList.php:286
-#: app/partials/configuration.host.edit.html.php:147
+#: app/partials/configuration.host.edit.html.php:261
 #: app/partials/hostmacros.list.html.php:37
 #: app/partials/massupdate.macros.tab.php:29
 #: app/partials/scheduledreport.formgrid.html.php:191
@@ -5217,16 +5217,16 @@ msgstr "Status de desenvolvimento"
 #: app/views/administration.user.token.edit.php:51
 #: app/views/administration.user.token.view.php:54
 #: app/views/configuration.correlation.edit.php:134
-#: app/views/popup.massupdate.host.php:75
+#: app/views/popup.massupdate.host.php:112
 #: app/views/popup.massupdate.item.php:466
-#: app/views/popup.massupdate.template.php:75
+#: app/views/popup.massupdate.template.php:115
 #: app/views/popup.triggerwizard.php:134 include/events.inc.php:264
 #: include/views/configuration.host.discovery.edit.php:701
 #: include/views/configuration.item.edit.php:961
 #: include/views/configuration.item.prototype.edit.php:839
 #: include/views/configuration.maintenance.edit.php:252
 #: include/views/configuration.maintenance.list.php:90
-#: include/views/configuration.template.edit.php:110
+#: include/views/configuration.template.edit.php:170
 #: include/views/configuration.trigger.prototype.edit.php:531
 #: include/views/configuration.triggers.edit.php:558
 #: include/views/inventory.host.view.php:129
@@ -5380,7 +5380,7 @@ msgstr "Desativar os cenários web selecionados?"
 
 #: app/partials/administration.system.info.php:188
 #: app/partials/configuration.filter.items.php:188
-#: app/partials/configuration.host.edit.html.php:363
+#: app/partials/configuration.host.edit.html.php:358
 #: app/partials/monitoring.host.filter.php:129
 #: app/partials/monitoring.host.view.html.php:102
 #: app/partials/scheduledreport.table.html.php:80
@@ -5407,8 +5407,8 @@ msgstr "Desativar os cenários web selecionados?"
 #: app/views/configuration.discovery.list.php:57
 #: app/views/configuration.host.list.php:280
 #: app/views/popup.lldoperation.php:280
-#: app/views/popup.massupdate.host.php:102
-#: app/views/popup.massupdate.host.php:187
+#: app/views/popup.massupdate.host.php:141
+#: app/views/popup.massupdate.host.php:183
 #: app/views/reports.scheduledreport.list.php:62 include/discovery.inc.php:108
 #: include/hosts.inc.php:1126 include/html.inc.php:284
 #: include/httptest.inc.php:48 include/items.inc.php:138
@@ -5417,7 +5417,7 @@ msgstr "Desativar os cenários web selecionados?"
 #: include/users.inc.php:84 include/views/configuration.action.list.php:77
 #: include/views/configuration.action.list.php:129
 #: include/views/configuration.host.discovery.list.php:167
-#: include/views/configuration.host.prototype.edit.php:356
+#: include/views/configuration.host.prototype.edit.php:360
 #: include/views/js/monitoring.sysmaps.js.php:290
 msgid "Disabled"
 msgstr "Inativo"
@@ -5442,7 +5442,7 @@ msgstr ""
 #: app/views/popup.lldoperation.php:92 app/views/popup.massupdate.item.php:334
 #: include/views/configuration.graph.edit.php:468
 #: include/views/configuration.graph.list.php:138
-#: include/views/configuration.host.prototype.edit.php:142
+#: include/views/configuration.host.prototype.edit.php:290
 #: include/views/configuration.host.prototype.list.php:62
 #: include/views/configuration.item.prototype.edit.php:851
 #: include/views/configuration.item.prototype.list.php:66
@@ -5657,7 +5657,7 @@ msgstr "Exibir gráfico empilhado"
 
 #: app/controllers/CControllerHintboxActionlist.php:93
 #: app/views/administration.queue.details.php:85
-#: app/views/js/popup.service.edit.js.php:484 app/views/search.php:187
+#: app/views/js/popup.service.edit.js.php:483 app/views/search.php:187
 #: app/views/search.php:272 app/views/search.php:371
 #: include/actions.inc.php:1724 include/actions.inc.php:1796
 #: include/classes/helpers/CPagerHelper.php:147 jsLoader.php:398
@@ -5756,7 +5756,7 @@ msgstr ""
 msgid "Download the configuration file"
 msgstr "Receber a configuração"
 
-#: app/views/js/popup.service.edit.js.php:234
+#: app/views/js/popup.service.edit.js.php:233
 #: app/views/popup.service.time.edit.php:46
 #: include/classes/screens/CScreenDiscovery.php:120
 msgid "Downtime"
@@ -5850,8 +5850,8 @@ msgstr ""
 #: app/views/administration.user.edit.php:355
 #: app/views/js/administration.mediatype.edit.js.php:50
 #: app/views/js/configuration.discovery.edit.js.php:33
-#: app/views/js/popup.service.edit.js.php:198
-#: app/views/js/popup.service.edit.js.php:222
+#: app/views/js/popup.service.edit.js.php:197
+#: app/views/js/popup.service.edit.js.php:221
 #: app/views/monitoring.service.list.edit.php:142
 #: app/views/monitoring.service.list.php:114
 #: include/views/configuration.action.edit.php:246
@@ -6113,7 +6113,7 @@ msgstr "Ativar traps"
 
 #: app/partials/administration.system.info.php:181
 #: app/partials/configuration.filter.items.php:187
-#: app/partials/configuration.host.edit.html.php:165
+#: app/partials/configuration.host.edit.html.php:279
 #: app/partials/monitoring.host.filter.php:128
 #: app/partials/monitoring.host.view.html.php:101
 #: app/partials/scheduledreport.formgrid.html.php:201
@@ -6151,7 +6151,7 @@ msgstr "Ativar traps"
 #: app/views/configuration.discovery.edit.php:130
 #: app/views/configuration.discovery.list.php:56
 #: app/views/configuration.host.list.php:272
-#: app/views/popup.massupdate.host.php:101 app/views/popup.media.php:89
+#: app/views/popup.massupdate.host.php:140 app/views/popup.media.php:89
 #: app/views/popup.triggerwizard.php:137
 #: app/views/reports.scheduledreport.list.php:61 include/discovery.inc.php:107
 #: include/html.inc.php:280 include/httptest.inc.php:47
@@ -6173,11 +6173,11 @@ msgstr "Ativo"
 msgid "Encrypt"
 msgstr ""
 
-#: app/partials/configuration.host.edit.html.php:533
+#: app/partials/configuration.host.edit.html.php:527
 #: app/views/administration.proxy.edit.php:143
 #: app/views/administration.proxy.list.php:78
-#: app/views/popup.massupdate.host.php:302
-#: include/views/configuration.host.prototype.edit.php:409
+#: app/views/popup.massupdate.host.php:296
+#: include/views/configuration.host.prototype.edit.php:413
 msgid "Encryption"
 msgstr "Criptografia"
 
@@ -6938,7 +6938,7 @@ msgid "Full"
 msgstr "Cheio"
 
 #: app/views/configuration.host.edit.php:46 app/views/popup.host.edit.php:75
-#: include/views/configuration.template.edit.php:239
+#: include/views/configuration.template.edit.php:220
 #: include/views/monitoring.sysmap.edit.php:422
 msgid "Full clone"
 msgstr "Clone completo"
@@ -7308,7 +7308,7 @@ msgstr "Nome do grupo"
 msgid "Group prototype cannot be based on a discovered host group \"%1$s\"."
 msgstr "O protótipo de grupo não pode ser baseado em regra de autobusca no host \"%1$s\"."
 
-#: include/views/configuration.host.prototype.edit.php:197
+#: include/views/configuration.host.prototype.edit.php:207
 msgid "Group prototypes"
 msgstr "Protótipos de grupo"
 
@@ -7321,12 +7321,11 @@ msgid "Grouping by"
 msgstr "Agrupando por"
 
 #: app/controllers/CControllerPopupImportCompare.php:164
-#: app/partials/configuration.host.edit.html.php:105
+#: app/partials/configuration.host.edit.html.php:218
 #: app/views/administration.user.edit.php:84
 #: app/views/administration.user.list.php:110 app/views/popup.import.php:29
-#: include/views/configuration.host.prototype.edit.php:163
-#: include/views/configuration.host.prototype.edit.php:199
-#: include/views/configuration.template.edit.php:91
+#: include/views/configuration.host.prototype.edit.php:183
+#: include/views/configuration.template.edit.php:150
 msgid "Groups"
 msgstr "Grupos"
 
@@ -7576,7 +7575,7 @@ msgid "Horizontal align"
 msgstr "Alinhamento horizontal"
 
 #: app/controllers/CControllerAuditLogList.php:219
-#: app/partials/configuration.host.edit.html.php:527
+#: app/partials/configuration.host.edit.html.php:522
 #: app/partials/monitoring.latest.view.html.php:40
 #: app/partials/popup.operations.php:175
 #: app/views/administration.queue.details.php:47
@@ -7585,7 +7584,7 @@ msgstr "Alinhamento horizontal"
 #: app/views/monitoring.dashboard.view.php:82
 #: app/views/monitoring.widget.problems.view.php:58
 #: app/views/popup.generic.php:81 app/views/popup.host.edit.php:97
-#: app/views/popup.massupdate.host.php:290 app/views/search.php:33
+#: app/views/popup.massupdate.host.php:285 app/views/search.php:33
 #: include/actions.inc.php:50 include/blocks.inc.php:577
 #: include/classes/screens/CScreenHttpTest.php:112
 #: include/classes/screens/CScreenProblem.php:863
@@ -7596,7 +7595,7 @@ msgstr "Alinhamento horizontal"
 #: include/hostgroups.inc.php:248 include/maps.inc.php:24
 #: include/triggers.inc.php:956 include/views/configuration.graph.list.php:149
 #: include/views/configuration.host.discovery.list.php:192
-#: include/views/configuration.host.prototype.edit.php:148
+#: include/views/configuration.host.prototype.edit.php:296
 #: include/views/configuration.httpconf.list.php:130
 #: include/views/configuration.item.list.php:82
 #: include/views/configuration.triggers.list.php:189
@@ -7741,8 +7740,8 @@ msgstr "O grupo de hosts com o ID \"%1$s\" não está disponível."
 #: app/views/monitoring.web.view.php:50
 #: app/views/popup.condition.common.php:101
 #: app/views/popup.condition.common.php:282
-#: app/views/popup.massupdate.host.php:46
-#: app/views/popup.massupdate.template.php:48 app/views/search.php:270
+#: app/views/popup.massupdate.host.php:83
+#: app/views/popup.massupdate.template.php:88 app/views/search.php:270
 #: hostinventoriesoverview.php:159 include/classes/helpers/CMenuHelper.php:141
 #: include/classes/helpers/CRoleHelper.php:357
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:33
@@ -7792,7 +7791,7 @@ msgstr "Visão geral do inventário de host"
 msgid "Host label type"
 msgstr "Tipo do rótulo do host"
 
-#: app/partials/configuration.host.edit.html.php:346
+#: app/partials/configuration.host.edit.html.php:341
 msgid "Host macros"
 msgstr "Macros de host"
 
@@ -7804,7 +7803,7 @@ msgstr "Metadados do host"
 #: app/views/configuration.discovery.edit.php:106
 #: app/views/configuration.discovery.edit.php:122 host_prototypes.php:37
 #: include/actions.inc.php:47
-#: include/views/configuration.host.prototype.edit.php:70
+#: include/views/configuration.host.prototype.edit.php:65
 #: include/views/inventory.host.view.php:50
 msgid "Host name"
 msgstr "Nome do host"
@@ -7841,7 +7840,7 @@ msgstr ""
 msgid "Host prototype deleted"
 msgstr "Protótipo de host foi excluído"
 
-#: include/views/configuration.host.prototype.edit.php:341
+#: include/views/configuration.host.prototype.edit.php:334
 msgid "Host prototype macros"
 msgstr ""
 
@@ -7864,7 +7863,7 @@ msgstr "Já existe protótipo de host com o nome visível \"%1$s\" na autobusca 
 #: app/controllers/CControllerPopupImportCompare.php:176
 #: include/html.inc.php:483
 #: include/views/configuration.host.discovery.list.php:307
-#: include/views/configuration.host.prototype.edit.php:34
+#: include/views/configuration.host.prototype.edit.php:33
 #: include/views/configuration.host.prototype.list.php:27
 msgid "Host prototypes"
 msgstr "Protótipos de host"
@@ -7889,7 +7888,7 @@ msgstr "Hora do host"
 msgid "Host update failed."
 msgstr "A atualização do host falhou."
 
-#: app/controllers/CControllerHostUpdate.php:138
+#: app/controllers/CControllerHostUpdate.php:143
 msgid "Host updated"
 msgstr "Host atualizado"
 
@@ -8035,15 +8034,15 @@ msgstr "Intervalo de IPs"
 msgid "IP range \"%1$s\" exceeds \"%2$s\" address limit"
 msgstr "O range de IP \"%1$s\" excede o limite de endereços \"%2$s\""
 
-#: app/partials/configuration.host.edit.html.php:529
+#: app/partials/configuration.host.edit.html.php:523
 #: app/views/administration.script.edit.php:118
 #: app/views/administration.script.list.php:140
 #: app/views/monitoring.widget.hostavail.view.php:30
-#: app/views/popup.massupdate.host.php:292
+#: app/views/popup.massupdate.host.php:286
 #: include/classes/widgets/views/widget.hostavail.form.view.php:49
 #: include/hosts.inc.php:471 include/hosts.inc.php:1194
 #: include/items.inc.php:350
-#: include/views/configuration.host.prototype.edit.php:324 jsLoader.php:318
+#: include/views/configuration.host.prototype.edit.php:320 jsLoader.php:318
 msgid "IPMI"
 msgstr "IPMI"
 
@@ -9263,7 +9262,7 @@ msgstr ""
 msgid "Information about a service. Returns integer with param as state, startup; string - with param as displayname, path, user; text - with param as description; Specifically for state: 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service; Specifically for startup: 0 - automatic, 1 - automatic delayed, 2 - manual, 3 - disabled, 4 - unknown"
 msgstr "Informação sobre um serviço. Retorna inteiro - (state, startup); Caractere - (displayname, path, user); Texto - (description); Especificamente para estado: 0 - em execução, 1 - pausado, 2 - iniciação pendente, 3 - pausa pendente, 4 - retorno pendente, 5 - finalização pendente, 6 - finalizado, 7 - desconhecido, 255 - serviço desconhecido; Especificamente para inicialização: 0 - automático, 1 - Automático com atraso, 2 - Manual, 3 - Desabilitado, 4 - desconhecido"
 
-#: include/views/configuration.host.prototype.edit.php:103
+#: include/views/configuration.host.prototype.edit.php:249
 msgid "Inherit"
 msgstr ""
 
@@ -9272,11 +9271,11 @@ msgstr ""
 msgid "Inherited"
 msgstr ""
 
-#: app/partials/configuration.host.edit.html.php:347
+#: app/partials/configuration.host.edit.html.php:342
 msgid "Inherited and host macros"
 msgstr "Macros herdadas e do host"
 
-#: include/views/configuration.host.prototype.edit.php:342
+#: include/views/configuration.host.prototype.edit.php:335
 msgid "Inherited and host prototype macros"
 msgstr ""
 
@@ -9288,7 +9287,7 @@ msgstr ""
 msgid "Inherited and scenario tags"
 msgstr ""
 
-#: include/views/configuration.template.edit.php:212
+#: include/views/configuration.template.edit.php:193
 msgid "Inherited and template macros"
 msgstr "Macros herdadas e de template"
 
@@ -9367,8 +9366,8 @@ msgstr "A interface com o IP \"%1$s\" não pode possuir nome de DNS nulo enquant
 msgid "Interface with IP \"%1$s\" cannot have empty DNS name."
 msgstr "A interface com IP \"%1$s\" não pode possuir nome de DNS nulo."
 
-#: app/partials/configuration.host.edit.html.php:128
-#: include/views/configuration.host.prototype.edit.php:100
+#: app/partials/configuration.host.edit.html.php:242
+#: include/views/configuration.host.prototype.edit.php:246
 msgid "Interfaces"
 msgstr ""
 
@@ -9811,11 +9810,11 @@ msgstr "Período de tempo inválido."
 msgid "Invalid zoomparameter \"%1$s\": %2$s."
 msgstr ""
 
-#: app/partials/configuration.host.edit.html.php:532
-#: app/views/popup.massupdate.host.php:301
+#: app/partials/configuration.host.edit.html.php:526
+#: app/views/popup.massupdate.host.php:295
 #: include/classes/helpers/CMenuHelper.php:94
 #: include/classes/helpers/CRoleHelper.php:277
-#: include/views/configuration.host.prototype.edit.php:363 jsLoader.php:370
+#: include/views/configuration.host.prototype.edit.php:355 jsLoader.php:370
 msgid "Inventory"
 msgstr "Inventário"
 
@@ -9829,7 +9828,7 @@ msgid "Inventory field"
 msgstr "Campo de inventário"
 
 #: app/partials/popup.operations.php:225
-#: app/views/popup.massupdate.host.php:184
+#: app/views/popup.massupdate.host.php:180
 msgid "Inventory mode"
 msgstr "Modo de inventário"
 
@@ -9837,10 +9836,10 @@ msgstr "Modo de inventário"
 msgid "Is online?"
 msgstr "Online?"
 
-#: app/partials/configuration.host.edit.html.php:497
+#: app/partials/configuration.host.edit.html.php:492
 #: app/views/administration.proxy.edit.php:135
-#: app/views/popup.massupdate.host.php:272
-#: include/views/configuration.host.prototype.edit.php:398
+#: app/views/popup.massupdate.host.php:267
+#: include/views/configuration.host.prototype.edit.php:402
 msgid "Issuer"
 msgstr "Emissor"
 
@@ -10509,8 +10508,8 @@ msgstr "Tipo da linha"
 msgid "Line width"
 msgstr "Largura da linha"
 
-#: app/views/popup.massupdate.host.php:112
-#: app/views/popup.massupdate.template.php:89
+#: app/views/popup.massupdate.host.php:46
+#: app/views/popup.massupdate.template.php:48
 #: include/views/monitoring.sysmap.constructor.php:43
 msgid "Link"
 msgstr "Link"
@@ -10533,16 +10532,9 @@ msgstr ""
 msgid "Link indicators"
 msgstr "Indicadores de link"
 
-#: app/partials/configuration.host.edit.html.php:282
-#: include/views/configuration.host.prototype.edit.php:293
-#: include/views/configuration.template.edit.php:187
-msgid "Link new templates"
-msgstr ""
-
 #: app/controllers/CControllerPopupLldOperation.php:143
-#: app/views/popup.lldoperation.php:238
-#: app/views/popup.massupdate.host.php:140
-#: app/views/popup.massupdate.template.php:120
+#: app/views/popup.lldoperation.php:238 app/views/popup.massupdate.host.php:75
+#: app/views/popup.massupdate.template.php:79
 msgid "Link templates"
 msgstr "Templates vinculados"
 
@@ -10558,13 +10550,6 @@ msgstr "Vínculo com templates"
 msgid "Linked map"
 msgstr "Mapa linkado"
 
-#: app/partials/configuration.host.edit.html.php:206
-#: app/partials/configuration.host.edit.html.php:274
-#: app/views/popup.massupdate.template.php:148
-#: include/views/configuration.host.prototype.edit.php:228
-#: include/views/configuration.host.prototype.edit.php:288
-#: include/views/configuration.template.edit.php:182
-#: include/views/configuration.template.edit.php:195
 #: include/views/configuration.template.list.php:64
 #: include/views/configuration.template.list.php:124
 msgid "Linked templates"
@@ -10785,16 +10770,16 @@ msgstr "A macro \"%1$s\" já existe em \"%2$s\"."
 msgid "Macro \"%1$s\" already exists."
 msgstr "A macro \"%1$s\" já existe."
 
-#: app/partials/configuration.host.edit.html.php:531
+#: app/partials/configuration.host.edit.html.php:525
 #: app/partials/massupdate.macros.tab.php:120
 #: app/views/administration.macros.edit.php:29
 #: app/views/administration.macros.edit.php:96
 #: app/views/popup.itemtestedit.view.php:307
-#: app/views/popup.massupdate.host.php:294
-#: app/views/popup.massupdate.template.php:153
+#: app/views/popup.massupdate.host.php:288
+#: app/views/popup.massupdate.template.php:144
 #: include/classes/helpers/CMenuHelper.php:240 include/html.inc.php:893
-#: include/views/configuration.host.prototype.edit.php:338
-#: include/views/configuration.template.edit.php:208
+#: include/views/configuration.host.prototype.edit.php:331
+#: include/views/configuration.template.edit.php:189
 msgid "Macros"
 msgstr "Macros"
 
@@ -10893,12 +10878,12 @@ msgstr ""
 msgid "Manage scheduled reports"
 msgstr ""
 
-#: app/partials/configuration.host.edit.html.php:364
+#: app/partials/configuration.host.edit.html.php:359
 #: app/partials/popup.operations.php:227
 #: app/views/administration.miscconfig.edit.php:60
 #: app/views/popup.lldoperation.php:281
-#: app/views/popup.massupdate.host.php:188 include/hosts.inc.php:1127
-#: include/views/configuration.host.prototype.edit.php:357
+#: app/views/popup.massupdate.host.php:184 include/hosts.inc.php:1127
+#: include/views/configuration.host.prototype.edit.php:361
 msgid "Manual"
 msgstr "Manual"
 
@@ -11050,7 +11035,7 @@ msgstr "Máscara"
 #: app/controllers/CControllerPopupMassupdateHost.php:471
 #: app/controllers/CControllerPopupMassupdateItem.php:406
 #: app/controllers/CControllerPopupMassupdateService.php:171
-#: app/controllers/CControllerPopupMassupdateTemplate.php:364
+#: app/controllers/CControllerPopupMassupdateTemplate.php:370
 #: app/controllers/CControllerPopupMassupdateTrigger.php:235
 #: app/partials/monitoring.service.list.edit.php:141
 #: app/views/configuration.host.list.php:516
@@ -11503,9 +11488,9 @@ msgstr "Segunda-feira"
 msgid "Monitored by"
 msgstr "Monitorado por"
 
-#: app/partials/configuration.host.edit.html.php:155
-#: app/views/popup.massupdate.host.php:90
-#: include/views/configuration.host.prototype.edit.php:135
+#: app/partials/configuration.host.edit.html.php:269
+#: app/views/popup.massupdate.host.php:129
+#: include/views/configuration.host.prototype.edit.php:277
 msgid "Monitored by proxy"
 msgstr "Monitorado por proxy"
 
@@ -11636,8 +11621,8 @@ msgstr "NTLM"
 #: app/controllers/CControllerPopupValueMapUpdate.php:70
 #: app/partials/administration.ha.nodes.php:28
 #: app/partials/configuration.filter.items.php:91
-#: app/partials/configuration.host.edit.html.php:177
-#: app/partials/configuration.host.edit.html.php:216
+#: app/partials/configuration.host.edit.html.php:110
+#: app/partials/configuration.host.edit.html.php:144
 #: app/partials/configuration.tags.tab.php:39
 #: app/partials/configuration.valuemap.php:29
 #: app/partials/monitoring.host.filter.php:78
@@ -11707,11 +11692,11 @@ msgstr "NTLM"
 #: app/views/popup.httpstep.php:96 app/views/popup.httpstep.php:120
 #: app/views/popup.httpstep.php:139 app/views/popup.itemtestedit.view.php:324
 #: app/views/popup.lldoperation.php:268 app/views/popup.lldoverride.php:47
-#: app/views/popup.massupdate.host.php:207
+#: app/views/popup.massupdate.host.php:203
 #: app/views/popup.massupdate.item.php:120
 #: app/views/popup.massupdate.item.php:486
 #: app/views/popup.massupdate.service.php:50
-#: app/views/popup.massupdate.template.php:140
+#: app/views/popup.massupdate.template.php:132
 #: app/views/popup.massupdate.trigger.php:84
 #: app/views/popup.massupdate.trigger.php:98
 #: app/views/popup.service.edit.php:45 app/views/popup.service.edit.php:65
@@ -11739,8 +11724,8 @@ msgstr "NTLM"
 #: include/views/configuration.host.discovery.list.php:193
 #: include/views/configuration.hostgroups.list.php:46
 #: include/views/configuration.hostgroups.list.php:64
-#: include/views/configuration.host.prototype.edit.php:208
-#: include/views/configuration.host.prototype.edit.php:240
+#: include/views/configuration.host.prototype.edit.php:87
+#: include/views/configuration.host.prototype.edit.php:118
 #: include/views/configuration.host.prototype.list.php:59
 #: include/views/configuration.httpconf.edit.php:69
 #: include/views/configuration.httpconf.edit.php:117
@@ -11761,7 +11746,7 @@ msgstr "NTLM"
 #: include/views/configuration.maintenance.edit.php:94
 #: include/views/configuration.maintenance.list.php:60
 #: include/views/configuration.maintenance.list.php:85
-#: include/views/configuration.template.edit.php:127
+#: include/views/configuration.template.edit.php:69
 #: include/views/configuration.template.list.php:80
 #: include/views/configuration.template.list.php:114
 #: include/views/configuration.trigger.prototype.edit.php:70
@@ -12051,15 +12036,15 @@ msgstr "Não foram informados os IDs de regra de descoberta."
 msgid "No enabled modules found."
 msgstr ""
 
-#: app/partials/configuration.host.edit.html.php:436
-#: app/partials/configuration.host.edit.html.php:449
+#: app/partials/configuration.host.edit.html.php:431
+#: app/partials/configuration.host.edit.html.php:444
 #: app/views/administration.autoreg.edit.php:48
 #: app/views/administration.proxy.edit.php:95
 #: app/views/administration.proxy.edit.php:103
-#: app/views/popup.massupdate.host.php:237
-#: app/views/popup.massupdate.host.php:247
-#: include/views/configuration.host.prototype.edit.php:369
-#: include/views/configuration.host.prototype.edit.php:379
+#: app/views/popup.massupdate.host.php:232
+#: app/views/popup.massupdate.host.php:242
+#: include/views/configuration.host.prototype.edit.php:373
+#: include/views/configuration.host.prototype.edit.php:383
 msgid "No encryption"
 msgstr "Sem criptografia"
 
@@ -12819,7 +12804,7 @@ msgid "Off"
 msgstr "Inativo"
 
 #: app/views/administration.user.list.php:147
-#: app/views/js/popup.massupdate.js.php:415
+#: app/views/js/popup.massupdate.js.php:428
 #: app/views/js/popup.mediatypetest.edit.js.php:114
 #: app/views/js/popup.scriptexec.js.php:53
 #: app/views/js/reports.auditlog.list.js.php:158
@@ -12866,7 +12851,7 @@ msgstr "Um"
 msgid "One time only"
 msgstr "Apenas uma vez"
 
-#: app/views/js/popup.service.edit.js.php:236
+#: app/views/js/popup.service.edit.js.php:235
 #: app/views/popup.service.time.edit.php:47
 msgid "One-time downtime"
 msgstr "Downtime único"
@@ -13058,19 +13043,19 @@ msgstr "Ou"
 #: app/views/popup.lldoperation.php:176 app/views/popup.lldoperation.php:184
 #: app/views/popup.lldoperation.php:205 app/views/popup.lldoperation.php:226
 #: app/views/popup.lldoperation.php:237 app/views/popup.lldoperation.php:261
-#: app/views/popup.lldoperation.php:275 app/views/popup.massupdate.host.php:45
-#: app/views/popup.massupdate.host.php:75
-#: app/views/popup.massupdate.host.php:90
-#: app/views/popup.massupdate.host.php:96
-#: app/views/popup.massupdate.host.php:140
-#: app/views/popup.massupdate.host.php:150
-#: app/views/popup.massupdate.host.php:159
-#: app/views/popup.massupdate.host.php:167
-#: app/views/popup.massupdate.host.php:174
-#: app/views/popup.massupdate.host.php:184
-#: app/views/popup.massupdate.host.php:198
-#: app/views/popup.massupdate.host.php:226
-#: app/views/popup.massupdate.host.php:282
+#: app/views/popup.lldoperation.php:275 app/views/popup.massupdate.host.php:74
+#: app/views/popup.massupdate.host.php:82
+#: app/views/popup.massupdate.host.php:112
+#: app/views/popup.massupdate.host.php:129
+#: app/views/popup.massupdate.host.php:135
+#: app/views/popup.massupdate.host.php:149
+#: app/views/popup.massupdate.host.php:157
+#: app/views/popup.massupdate.host.php:164
+#: app/views/popup.massupdate.host.php:170
+#: app/views/popup.massupdate.host.php:180
+#: app/views/popup.massupdate.host.php:194
+#: app/views/popup.massupdate.host.php:222
+#: app/views/popup.massupdate.host.php:277
 #: app/views/popup.massupdate.item.php:47
 #: app/views/popup.massupdate.item.php:59
 #: app/views/popup.massupdate.item.php:79
@@ -13100,10 +13085,10 @@ msgstr "Ou"
 #: app/views/popup.massupdate.item.php:466
 #: app/views/popup.massupdate.item.php:477
 #: app/views/popup.massupdate.service.php:40
-#: app/views/popup.massupdate.template.php:47
-#: app/views/popup.massupdate.template.php:75
-#: app/views/popup.massupdate.template.php:119
-#: app/views/popup.massupdate.template.php:131
+#: app/views/popup.massupdate.template.php:78
+#: app/views/popup.massupdate.template.php:87
+#: app/views/popup.massupdate.template.php:115
+#: app/views/popup.massupdate.template.php:123
 #: app/views/popup.massupdate.trigger.php:52
 #: app/views/popup.massupdate.trigger.php:60
 #: app/views/popup.massupdate.trigger.php:75
@@ -13366,10 +13351,10 @@ msgstr "INCIDENTE"
 msgid "PROBLEM event generation mode"
 msgstr "Modo de geração de eventos de INCIDENTE"
 
-#: app/partials/configuration.host.edit.html.php:437
-#: app/partials/configuration.host.edit.html.php:453
-#: app/partials/configuration.host.edit.html.php:467
-#: app/partials/configuration.host.edit.html.php:488
+#: app/partials/configuration.host.edit.html.php:432
+#: app/partials/configuration.host.edit.html.php:448
+#: app/partials/configuration.host.edit.html.php:462
+#: app/partials/configuration.host.edit.html.php:483
 #: app/views/administration.autoreg.edit.php:50
 #: app/views/administration.autoreg.edit.php:67
 #: app/views/administration.autoreg.edit.php:79
@@ -13382,19 +13367,19 @@ msgstr "Modo de geração de eventos de INCIDENTE"
 #: app/views/configuration.host.list.php:378
 #: app/views/configuration.host.list.php:395
 #: app/views/configuration.host.list.php:398
-#: app/views/popup.massupdate.host.php:238
-#: app/views/popup.massupdate.host.php:251
-#: app/views/popup.massupdate.host.php:266
-#: include/views/configuration.host.prototype.edit.php:370
-#: include/views/configuration.host.prototype.edit.php:383
-#: include/views/configuration.host.prototype.edit.php:391
+#: app/views/popup.massupdate.host.php:233
+#: app/views/popup.massupdate.host.php:246
+#: app/views/popup.massupdate.host.php:261
+#: include/views/configuration.host.prototype.edit.php:374
+#: include/views/configuration.host.prototype.edit.php:387
+#: include/views/configuration.host.prototype.edit.php:395
 msgid "PSK"
 msgstr "PSK"
 
-#: app/partials/configuration.host.edit.html.php:478
+#: app/partials/configuration.host.edit.html.php:473
 #: app/views/administration.autoreg.edit.php:56
 #: app/views/administration.proxy.edit.php:110
-#: app/views/popup.massupdate.host.php:260
+#: app/views/popup.massupdate.host.php:255
 msgid "PSK identity"
 msgstr "Identidade PSK"
 
@@ -13451,7 +13436,7 @@ msgid "Parameters \"esc_step_from\" and \"esc_step_to\" must be set together."
 msgstr ""
 
 #: include/views/configuration.host.discovery.edit.php:52
-#: include/views/configuration.host.prototype.edit.php:62
+#: include/views/configuration.host.prototype.edit.php:61
 msgid "Parent discovery rules"
 msgstr "Autobusca herdada"
 
@@ -13506,13 +13491,13 @@ msgid "Passive"
 msgstr "Passivo"
 
 #: app/controllers/CControllerUserUpdateGeneral.php:111
-#: app/partials/configuration.host.edit.html.php:327
+#: app/partials/configuration.host.edit.html.php:322
 #: app/views/administration.mediatype.edit.php:204
 #: app/views/administration.script.edit.php:135
 #: app/views/administration.script.edit.php:154
 #: app/views/administration.user.edit.php:157
 #: app/views/administration.user.edit.php:172
-#: app/views/popup.massupdate.host.php:174
+#: app/views/popup.massupdate.host.php:170
 #: app/views/popup.massupdate.item.php:175
 #: app/views/popup.massupdate.item.php:199 disc_prototypes.php:218
 #: host_discovery.php:191 httpconf.php:74
@@ -13520,7 +13505,7 @@ msgstr "Passivo"
 #: include/views/configuration.host.discovery.edit.php:413
 #: include/views/configuration.host.discovery.edit.php:554
 #: include/views/configuration.host.discovery.edit.php:593
-#: include/views/configuration.host.prototype.edit.php:320
+#: include/views/configuration.host.prototype.edit.php:315
 #: include/views/configuration.httpconf.edit.php:170
 #: include/views/configuration.item.edit.php:480
 #: include/views/configuration.item.edit.php:637
@@ -13691,11 +13676,11 @@ msgstr "Executar som"
 msgid "Please check configuration parameters. If all is correct, press \"%1$s\" button, or \"%2$s\" button to change configuration parameters."
 msgstr "Por favor verifique os parâmetros de configuração. Se tudo estiver correto pressione o botão \"%1$s\", ou pressione o botão \"%2$s\" para modificar parâmetros de configuração."
 
-#: app/views/js/popup.massupdate.js.php:401
+#: app/views/js/popup.massupdate.js.php:414
 msgid "Please confirm that you want to remove all macros."
 msgstr ""
 
-#: app/views/js/popup.massupdate.js.php:404
+#: app/views/js/popup.massupdate.js.php:417
 msgid "Please confirm that you want to remove all value mappings."
 msgstr ""
 
@@ -13907,9 +13892,9 @@ msgstr "Privado"
 msgid "Private key file"
 msgstr "Arquivo de chave privada"
 
-#: app/partials/configuration.host.edit.html.php:315
-#: app/views/popup.massupdate.host.php:159
-#: include/views/configuration.host.prototype.edit.php:313
+#: app/partials/configuration.host.edit.html.php:310
+#: app/views/popup.massupdate.host.php:157
+#: include/views/configuration.host.prototype.edit.php:307
 msgid "Privilege level"
 msgstr "Nível de acesso"
 
@@ -14447,20 +14432,20 @@ msgstr "Comando remoto"
 #: app/views/js/popup.massupdate.tmpl.js.php:59
 #: app/views/js/popup.massupdate.tmpl.js.php:96
 #: app/views/js/popup.massupdate.tmpl.js.php:108
-#: app/views/js/popup.service.edit.js.php:201
-#: app/views/js/popup.service.edit.js.php:225
-#: app/views/js/popup.service.edit.js.php:244
+#: app/views/js/popup.service.edit.js.php:200
+#: app/views/js/popup.service.edit.js.php:224
+#: app/views/js/popup.service.edit.js.php:243
 #: app/views/popup.dashboard.share.edit.php:85
 #: app/views/popup.dashboard.share.edit.php:106
 #: app/views/popup.lldoperation.php:152 app/views/popup.lldoverride.php:158
-#: app/views/popup.massupdate.host.php:52
-#: app/views/popup.massupdate.host.php:203
+#: app/views/popup.massupdate.host.php:89
+#: app/views/popup.massupdate.host.php:199
 #: app/views/popup.massupdate.item.php:137
 #: app/views/popup.massupdate.item.php:263
 #: app/views/popup.massupdate.item.php:482
 #: app/views/popup.massupdate.service.php:46
-#: app/views/popup.massupdate.template.php:54
-#: app/views/popup.massupdate.template.php:136
+#: app/views/popup.massupdate.template.php:94
+#: app/views/popup.massupdate.template.php:128
 #: app/views/popup.massupdate.trigger.php:80 app/views/popup.media.php:45
 #: app/views/popup.media.php:110 app/views/popup.service.edit.php:98
 #: app/views/popup.valuemap.edit.php:91
@@ -14516,7 +14501,7 @@ msgstr "Comando remoto"
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:93
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:122
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:144
-#: include/views/js/configuration.host.prototype.edit.js.php:33
+#: include/views/js/configuration.host.prototype.edit.js.php:35
 #: include/views/js/configuration.httpconf.edit.js.php:52
 #: include/views/js/configuration.httpconf.edit.js.php:77
 #: include/views/js/configuration.item.list.js.php:64
@@ -14599,14 +14584,14 @@ msgstr ""
 msgid "Repeats"
 msgstr ""
 
-#: app/views/popup.massupdate.host.php:51
-#: app/views/popup.massupdate.host.php:113
-#: app/views/popup.massupdate.host.php:202
+#: app/views/popup.massupdate.host.php:47
+#: app/views/popup.massupdate.host.php:88
+#: app/views/popup.massupdate.host.php:198
 #: app/views/popup.massupdate.item.php:481
 #: app/views/popup.massupdate.service.php:45
-#: app/views/popup.massupdate.template.php:53
-#: app/views/popup.massupdate.template.php:90
-#: app/views/popup.massupdate.template.php:135
+#: app/views/popup.massupdate.template.php:49
+#: app/views/popup.massupdate.template.php:93
+#: app/views/popup.massupdate.template.php:127
 #: app/views/popup.massupdate.trigger.php:79 include/items.inc.php:1807
 #: include/views/configuration.trigger.prototype.edit.php:169
 #: include/views/configuration.trigger.prototype.edit.php:362
@@ -16321,7 +16306,7 @@ msgstr ""
 #: app/views/monitoring.service.list.php:79
 #: app/views/monitoring.widget.actionlog.view.php:38
 #: app/views/monitoring.widget.problems.view.php:56
-#: app/views/popup.massupdate.host.php:96
+#: app/views/popup.massupdate.host.php:135
 #: app/views/popup.massupdate.item.php:325
 #: app/views/popup.scheduledreport.subscription.php:114
 #: app/views/popup.service.statusrule.edit.php:74
@@ -16505,10 +16490,10 @@ msgstr "Subfiltro"
 msgid "Subject"
 msgstr "Assunto"
 
-#: app/partials/configuration.host.edit.html.php:505
+#: app/partials/configuration.host.edit.html.php:500
 #: app/views/administration.proxy.edit.php:138
-#: app/views/popup.massupdate.host.php:276
-#: include/views/configuration.host.prototype.edit.php:403
+#: app/views/popup.massupdate.host.php:271
+#: include/views/configuration.host.prototype.edit.php:407
 msgctxt "encryption certificate"
 msgid "Subject"
 msgstr "Segurado"
@@ -16702,7 +16687,7 @@ msgstr "Valor da etiqueta"
 #: app/controllers/CControllerPopupLldOperation.php:138
 #: app/partials/administration.usergroup.tagfilters.html.php:29
 #: app/partials/configuration.filter.items.php:166
-#: app/partials/configuration.host.edit.html.php:530
+#: app/partials/configuration.host.edit.html.php:524
 #: app/partials/monitoring.host.filter.php:133
 #: app/partials/monitoring.host.view.html.php:32
 #: app/partials/monitoring.latest.view.html.php:58
@@ -16718,13 +16703,13 @@ msgstr "Valor da etiqueta"
 #: app/views/monitoring.web.view.php:87
 #: app/views/monitoring.widget.problems.view.php:68
 #: app/views/popup.lldoperation.php:262
-#: app/views/popup.massupdate.host.php:198
-#: app/views/popup.massupdate.host.php:293
+#: app/views/popup.massupdate.host.php:194
+#: app/views/popup.massupdate.host.php:287
 #: app/views/popup.massupdate.item.php:477
 #: app/views/popup.massupdate.item.php:493
 #: app/views/popup.massupdate.service.php:40
-#: app/views/popup.massupdate.template.php:131
-#: app/views/popup.massupdate.template.php:149
+#: app/views/popup.massupdate.template.php:123
+#: app/views/popup.massupdate.template.php:140
 #: app/views/popup.massupdate.trigger.php:75
 #: app/views/popup.massupdate.trigger.php:150
 #: app/views/popup.service.edit.php:263 app/views/popup.service.edit.php:346
@@ -16741,7 +16726,7 @@ msgstr "Valor da etiqueta"
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:67
 #: include/classes/widgets/forms/CWidgetFormWeb.php:61
 #: include/events.inc.php:263 include/forms.inc.php:89
-#: include/views/configuration.host.prototype.edit.php:328
+#: include/views/configuration.host.prototype.edit.php:323
 #: include/views/configuration.host.prototype.list.php:63
 #: include/views/configuration.httpconf.edit.php:237
 #: include/views/configuration.httpconf.list.php:77
@@ -16751,7 +16736,7 @@ msgstr "Valor da etiqueta"
 #: include/views/configuration.item.prototype.edit.php:861
 #: include/views/configuration.item.prototype.list.php:67
 #: include/views/configuration.maintenance.edit.php:247
-#: include/views/configuration.template.edit.php:198
+#: include/views/configuration.template.edit.php:179
 #: include/views/configuration.template.list.php:83
 #: include/views/configuration.template.list.php:126
 #: include/views/configuration.trigger.prototype.edit.php:551
@@ -16787,14 +16772,12 @@ msgstr "Telnet"
 
 #: app/controllers/CControllerAuditLogList.php:239
 #: app/views/administration.mediatype.edit.php:280
-#: app/views/popup.massupdate.template.php:147 app/views/search.php:278
+#: app/views/popup.massupdate.template.php:139 app/views/search.php:278
 #: include/actions.inc.php:49 include/forms.inc.php:529
 #: include/views/configuration.graph.list.php:149
 #: include/views/configuration.host.discovery.list.php:192
 #: include/views/configuration.httpconf.list.php:130
 #: include/views/configuration.item.list.php:83
-#: include/views/configuration.template.edit.php:46
-#: include/views/configuration.template.edit.php:118
 #: include/views/configuration.triggers.list.php:190 report2.php:390
 msgid "Template"
 msgstr "Template"
@@ -16838,7 +16821,7 @@ msgstr ""
 msgid "Template dashboards"
 msgstr ""
 
-#: templates.php:425 templates.php:439 templates.php:472
+#: templates.php:426 templates.php:440 templates.php:473
 msgid "Template deleted"
 msgstr "Template removido"
 
@@ -16850,11 +16833,11 @@ msgstr "Grupo de templates"
 msgid "Template linkage"
 msgstr "Associação a templates"
 
-#: include/views/configuration.template.edit.php:211
+#: include/views/configuration.template.edit.php:192
 msgid "Template macros"
 msgstr "Macros de template"
 
-#: include/views/configuration.template.edit.php:82 templates.php:41
+#: include/views/configuration.template.edit.php:54 templates.php:41
 msgid "Template name"
 msgstr "Nome do template"
 
@@ -16889,13 +16872,12 @@ msgstr "Já existe template com o nome visível \"%1$s\"."
 #: app/controllers/CControllerPopupImportCompare.php:132
 #: app/controllers/CControllerPopupImportCompare.php:165
 #: app/partials/configuration.filter.items.php:72
-#: app/partials/configuration.host.edit.html.php:528
+#: app/partials/configuration.host.edit.html.php:210
 #: app/partials/popup.operations.php:212
 #: app/views/configuration.host.list.php:81
 #: app/views/configuration.host.list.php:191
 #: app/views/popup.condition.common.php:357 app/views/popup.import.php:31
-#: app/views/popup.massupdate.host.php:291 app/views/search.php:223
-#: app/views/search.php:227 app/views/search.php:369
+#: app/views/search.php:223 app/views/search.php:227 app/views/search.php:369
 #: include/classes/helpers/CMenuHelper.php:144
 #: include/classes/helpers/CRoleHelper.php:358
 #: include/views/configuration.copy.elements.php:63
@@ -16904,10 +16886,12 @@ msgstr "Já existe template com o nome visível \"%1$s\"."
 #: include/views/configuration.hostgroups.list.php:68
 #: include/views/configuration.hostgroups.list.php:183
 #: include/views/configuration.hostgroups.list.php:187
-#: include/views/configuration.host.prototype.edit.php:302
+#: include/views/configuration.host.prototype.edit.php:175
 #: include/views/configuration.host.prototype.list.php:60
 #: include/views/configuration.httpconf.list.php:50
 #: include/views/configuration.template.edit.php:28
+#: include/views/configuration.template.edit.php:145
+#: include/views/configuration.template.edit.php:176
 #: include/views/configuration.template.list.php:87
 #: include/views/configuration.triggers.list.php:48
 msgid "Templates"
@@ -16918,7 +16902,7 @@ msgstr "Templates"
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr "Os templates \"%1$s\" foram desvinculados dos hosts \"%2$s\"."
 
-#: app/controllers/CControllerPopupMassupdateTemplate.php:348
+#: app/controllers/CControllerPopupMassupdateTemplate.php:350
 msgid "Templates updated"
 msgstr ""
 
@@ -17132,7 +17116,7 @@ msgstr "Tema"
 msgid "This day last week"
 msgstr "Este dia na semana passada"
 
-#: app/partials/configuration.host.edit.html.php:403
+#: app/partials/configuration.host.edit.html.php:398
 #, c-format
 msgid "This field is automatically populated by item \"%1$s\"."
 msgstr ""
@@ -17998,16 +17982,16 @@ msgstr "Tipo de valor desconhecido"
 msgid "Unlimited"
 msgstr "Ilimitado"
 
-#: app/partials/configuration.host.edit.html.php:243
-#: app/views/popup.massupdate.host.php:114
-#: app/views/popup.massupdate.template.php:91
-#: include/views/configuration.host.prototype.edit.php:260
-#: include/views/configuration.template.edit.php:145
+#: app/partials/configuration.host.edit.html.php:171
+#: app/views/popup.massupdate.host.php:48
+#: app/views/popup.massupdate.template.php:50
+#: include/views/configuration.host.prototype.edit.php:147
+#: include/views/configuration.template.edit.php:110
 msgid "Unlink"
 msgstr "Desassociar"
 
-#: app/partials/configuration.host.edit.html.php:247
-#: include/views/configuration.template.edit.php:151
+#: app/partials/configuration.host.edit.html.php:175
+#: include/views/configuration.template.edit.php:114
 msgid "Unlink and clear"
 msgstr "Desassociar e limpar"
 
@@ -18103,10 +18087,10 @@ msgstr "Ligado"
 #: app/views/popup.dashboard.share.edit.php:155
 #: app/views/popup.discovery.check.php:137 app/views/popup.host.edit.php:61
 #: app/views/popup.httpstep.php:181 app/views/popup.lldoperation.php:290
-#: app/views/popup.lldoverride.php:220 app/views/popup.massupdate.host.php:323
+#: app/views/popup.lldoverride.php:220 app/views/popup.massupdate.host.php:317
 #: app/views/popup.massupdate.item.php:511
 #: app/views/popup.massupdate.service.php:67
-#: app/views/popup.massupdate.template.php:178
+#: app/views/popup.massupdate.template.php:169
 #: app/views/popup.massupdate.trigger.php:165 app/views/popup.media.php:127
 #: app/views/popup.mediatype.message.php:104
 #: app/views/popup.scheduledreport.subscription.php:132
@@ -18119,12 +18103,12 @@ msgstr "Ligado"
 #: include/views/configuration.graph.edit.php:494
 #: include/views/configuration.host.discovery.edit.php:977
 #: include/views/configuration.hostgroups.edit.php:61
-#: include/views/configuration.host.prototype.edit.php:422
+#: include/views/configuration.host.prototype.edit.php:417
 #: include/views/configuration.httpconf.edit.php:271
 #: include/views/configuration.item.edit.php:1041
 #: include/views/configuration.item.prototype.edit.php:900
 #: include/views/configuration.maintenance.edit.php:264
-#: include/views/configuration.template.edit.php:236
+#: include/views/configuration.template.edit.php:217
 #: include/views/configuration.trigger.prototype.edit.php:654
 #: include/views/configuration.triggers.edit.php:647
 #: include/views/monitoring.sysmap.constructor.php:76
@@ -18180,7 +18164,7 @@ msgstr "Enviar"
 msgid "Upper level maps"
 msgstr "Mapas de nível superior"
 
-#: app/views/js/popup.service.edit.js.php:232
+#: app/views/js/popup.service.edit.js.php:231
 #: app/views/popup.service.time.edit.php:45
 #: include/classes/screens/CScreenDiscovery.php:120
 msgid "Uptime"
@@ -18502,15 +18486,15 @@ msgid "User/Recipient"
 msgstr "Usuário/Recipiente"
 
 #: app/controllers/CControllerPopupGeneric.php:217
-#: app/partials/configuration.host.edit.html.php:319
+#: app/partials/configuration.host.edit.html.php:314
 #: app/views/administration.mediatype.edit.php:94
 #: app/views/administration.script.edit.php:139
 #: app/views/administration.user.edit.php:65
 #: app/views/administration.user.list.php:62
 #: app/views/administration.user.list.php:106
-#: app/views/popup.massupdate.host.php:167 disc_prototypes.php:209
+#: app/views/popup.massupdate.host.php:164 disc_prototypes.php:209
 #: host_discovery.php:182
-#: include/views/configuration.host.prototype.edit.php:317
+#: include/views/configuration.host.prototype.edit.php:311
 #: include/views/general.login.php:70 index.php:32 items.php:210
 msgid "Username"
 msgstr "Usuário"
@@ -18824,11 +18808,11 @@ msgstr ""
 #: app/views/popup.httpstep.php:96 app/views/popup.httpstep.php:120
 #: app/views/popup.httpstep.php:139 app/views/popup.itemtestedit.view.php:262
 #: app/views/popup.lldoperation.php:268
-#: app/views/popup.massupdate.host.php:207
+#: app/views/popup.massupdate.host.php:203
 #: app/views/popup.massupdate.item.php:120
 #: app/views/popup.massupdate.item.php:486
 #: app/views/popup.massupdate.service.php:50
-#: app/views/popup.massupdate.template.php:140
+#: app/views/popup.massupdate.template.php:132
 #: app/views/popup.massupdate.trigger.php:84
 #: app/views/popup.service.edit.php:65 app/views/popup.service.edit.php:271
 #: app/views/popup.testtriggerexpr.php:31 app/views/popup.valuemap.edit.php:51
@@ -18902,14 +18886,14 @@ msgstr "O mapeamento de valores \"%1$s\" já existe."
 #: app/controllers/CControllerPopupGeneric.php:357
 #: app/controllers/CControllerPopupValueMapEdit.php:92
 #: app/partials/configuration.filter.items.php:99
-#: app/partials/configuration.host.edit.html.php:536
+#: app/partials/configuration.host.edit.html.php:530
 #: app/partials/massupdate.valuemaps.tab.php:90
-#: app/views/popup.massupdate.host.php:306
+#: app/views/popup.massupdate.host.php:300
 #: app/views/popup.massupdate.item.php:351
-#: app/views/popup.massupdate.template.php:162
+#: app/views/popup.massupdate.template.php:153
 #: include/views/configuration.item.edit.php:883
 #: include/views/configuration.item.prototype.edit.php:800
-#: include/views/configuration.template.edit.php:223
+#: include/views/configuration.template.edit.php:204
 msgid "Value mapping"
 msgstr "Mapeamento de valor"
 
@@ -19052,7 +19036,7 @@ msgstr "Espaço virtual em bytes ou percentual do total. Retorna inteiro para by
 #: app/partials/configuration.host.edit.html.php:98
 #: app/views/configuration.discovery.edit.php:118
 #: include/views/configuration.host.prototype.edit.php:76
-#: include/views/configuration.template.edit.php:88
+#: include/views/configuration.template.edit.php:61
 #: include/views/inventory.host.view.php:53
 msgid "Visible name"
 msgstr "Nome visível"
@@ -19078,7 +19062,7 @@ msgstr ""
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:172
 #: app/views/administration.trigdisplay.edit.php:118
-#: app/views/js/popup.massupdate.js.php:409 include/items.inc.php:33
+#: app/views/js/popup.massupdate.js.php:422 include/items.inc.php:33
 #: include/views/general.warning.php:26 jsLoader.php:176
 msgid "Warning"
 msgstr "Atenção"
@@ -20916,7 +20900,7 @@ msgstr "nome"
 msgid "new"
 msgstr "novo"
 
-#: app/controllers/CControllerHostEdit.php:308 templates.php:626
+#: app/controllers/CControllerHostEdit.php:308 templates.php:627
 msgctxt "new element in multiselect"
 msgid "new"
 msgstr "novo"

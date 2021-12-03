@@ -1108,7 +1108,7 @@ class CControllerPopupTriggerExpr extends CController {
 					],
 					'deviations' => [
 						'C' => _('Deviations'),
-						'T' => T_ZBX_INT,
+						'T' => T_ZBX_DBL,
 						'A' => false
 					],
 					'algorithm' => [
