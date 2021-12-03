@@ -86,7 +86,7 @@ func initExternalPlugin(p *external.Plugin, options *agent.AgentOptions) (name s
 
 	err = validate(p, options.Plugins[name])
 	if err != nil {
-		return
+		return "", fmt.Errorf("[%s] %s", name, err)
 	}
 
 	return

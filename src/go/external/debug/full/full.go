@@ -44,7 +44,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 }
 
 func (p *Plugin) Configure(global *plugin.GlobalOptions, private interface{}) {
-	p.options.Interval = 10
 	if err := conf.Unmarshal(private, &p.options); err != nil {
 		p.Warningf("cannot unmarshal configuration options: %s", err)
 	}
@@ -53,7 +52,7 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, private interface{}) {
 
 func (p *Plugin) Validate(private interface{}) (err error) {
 	p.Debugf("executing Validate")
-
+	err = conf.Unmarshal(private, &p.options)
 	return
 }
 

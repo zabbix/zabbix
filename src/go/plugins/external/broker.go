@@ -7,6 +7,7 @@ import (
 	"net"
 	"time"
 
+	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/log"
 	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/shared"
@@ -227,7 +228,7 @@ func (b *pluginBroker) handleLogs() {
 func (b *pluginBroker) handleLog(l shared.LogRequest) {
 	msg := l.Message
 	if b.pluginName != "" {
-		msg = fmt.Sprintf("[%s]%s", b.pluginName, msg)
+		msg = fmt.Sprintf("[%s] %s", b.pluginName, msg)
 	}
 
 	switch l.Severity {
@@ -335,12 +336,16 @@ func (b *pluginBroker) configure(globalOptions *plugin.GlobalOptions, privateOpt
 }
 
 func (b *pluginBroker) validate(privateOptions interface{}) (*shared.ValidateResponse, error) {
+	opts, ok := privateOptions.(*conf.Node)
+	if !ok {
+		return nil, fmt.Errorf("unsupported plugin options type %T", privateOptions)
+	}
 	r := request{
 		data: &shared.ValidateRequest{
 			Common: shared.Common{
 				Type: shared.ValidateRequestType,
 			},
-			PrivateOptions: privateOptions,
+			PrivateOptions: opts,
 		},
 		out: make(chan interface{}),
 	}
