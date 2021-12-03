@@ -47,6 +47,7 @@ OBJS = \
 	..\..\..\src\libs\zbxcommon\zbxgetopt.o \
 	..\..\..\src\libs\zbxcommon\file.o \
 	..\..\..\src\libs\zbxcommon\time.o \
+	..\..\..\src\libs\zbxcommshigh\comms.o \
 	..\..\..\src\libs\zbxcomms\comms.o \
 	..\..\..\src\libs\zbxcomms\telnet.o \
 	..\..\..\src\libs\zbxcompress\compress.o \
@@ -100,6 +101,7 @@ OBJS = \
 	..\..\..\src\zabbix_agent\cpustat.o \
 	..\..\..\src\zabbix_agent\eventlog.o \
 	..\..\..\src\zabbix_agent\listener.o \
+	..\..\..\src\zabbix_agent\logfiles\persistent_state.o \
 	..\..\..\src\zabbix_agent\logfiles\logfiles.o \
 	..\..\..\src\zabbix_agent\perfstat.o \
 	..\..\..\src\zabbix_agent\stats.o \

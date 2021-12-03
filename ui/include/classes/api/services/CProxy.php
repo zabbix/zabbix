@@ -182,6 +182,12 @@ class CProxy extends CApiService {
 	 * @return array
 	 */
 	public function create(array $proxies) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('No permissions to call "%1$s.%2$s".', 'proxy', __FUNCTION__)
+			);
+		}
+
 		$this->validateCreate($proxies);
 
 		$proxyids = DB::insert('hosts', $proxies);
@@ -207,6 +213,12 @@ class CProxy extends CApiService {
 	 * @return array
 	 */
 	public function update(array $proxies) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('No permissions to call "%1$s.%2$s".', 'proxy', __FUNCTION__)
+			);
+		}
+
 		$this->validateUpdate($proxies, $db_proxies);
 
 		$upd_proxies = [];
@@ -371,6 +383,12 @@ class CProxy extends CApiService {
 	 * @throws APIException if the input is invalid.
 	 */
 	private function validateDelete(array &$proxyids, array &$db_proxies = null) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('No permissions to call "%1$s.%2$s".', 'proxy', __FUNCTION__)
+			);
+		}
+
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $proxyids, '/', $error)) {
@@ -525,7 +543,7 @@ class CProxy extends CApiService {
 			'tls_subject' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'tls_subject')],
 			'tls_psk_identity' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'tls_psk_identity')],
 			'tls_psk' =>			['type' => API_PSK, 'length' => DB::getFieldLength('hosts', 'tls_psk')],
-			'proxy_address' =>		['type' => API_IP_RANGES, 'length' => DB::getFieldLength('hosts', 'proxy_address')],
+			'proxy_address' =>		['type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS, 'length' => DB::getFieldLength('hosts', 'proxy_address')],
 			'hosts' =>				['type' => API_OBJECTS, 'uniq' => [['hostid']], 'fields' => [
 				'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
@@ -828,7 +846,7 @@ class CProxy extends CApiService {
 			'tls_subject' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'tls_subject')],
 			'tls_psk_identity' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'tls_psk_identity')],
 			'tls_psk' =>			['type' => API_PSK, 'length' => DB::getFieldLength('hosts', 'tls_psk')],
-			'proxy_address' =>		['type' => API_IP_RANGES, 'length' => DB::getFieldLength('hosts', 'proxy_address')],
+			'proxy_address' =>		['type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS, 'length' => DB::getFieldLength('hosts', 'proxy_address')],
 			'hosts' =>				['type' => API_OBJECTS, 'uniq' => [['hostid']], 'fields' => [
 				'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
 			]],

@@ -1,11 +1,147 @@
+Changes for 6.0.0alpha8
+
+New features:
+..F....... [ZBXNEXT-7070] transferred host and template mass update template inputs to main tab (jfreibergs)
+
+Bug fixes:
+..F....... [ZBX-20268] fixed disabled button issue when cloning a service (averza)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.0alpha7
+
+New features:
+..F.....S. [ZBXNEXT-6955] added trendstl() anomaly detection function (arimdjonoks, gcalenko)
+...G...... [ZBXNEXT-6936] added possibility to reload user parameters without restarting Zabbix Agent (asestakovs)
+..F....PS. [ZBXNEXT-3706] added support for utf8mb4 encoding with utf8mb4_bin collation on mysql and mariadb (miks, yurii)
+
+Bug fixes:
+.........T [ZBX-19514] fixed disc utilization metric for windows discs discovery (abiba)
+.......PS. [ZBX-19866] fixed possible duplication of server log messages with first network error or interface activation (akozlovs)
+........S. [ZBX-20177] added acnowledgeid index for alerts table (ssimonenko)
+.....J.... [ZBX-19587] fixed Zabbix Java gateway error message when object or attribute is not found (vso)
+....I...S. [ZBX-20176] fixed trigger not being calculated for first value when item changes state to supported; fixed build failure when DES is disabled in Net-SNMP; fixed tests on big-endian systems (vso)
+.........T [ZBX-20150] fixed special characters escaping in markdown parsing of the Telegram media type (abiba)
+A......... [ZBX-19888] fixed selectUpdateOperations option not accepting "extend" value in Actions API (averza)
+A......... [ZBX-20200] fixed PHP runtime errors when updating media type (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.0alpha6
+
+New features:
+..F.....S. [ZBXNEXT-6921] introduced support of primary keys for history tables (dgoloscapov, jfreibergs, vso)
+...G...... [ZBXNEXT-712] added new item vfs.dir.get[] for Agent and Agent2 (akozlovs)
+A.F.I..... [ZBXNEXT-6945] implemented geographical map widget (miks)
+...G...... [ZBXNEXT-6651] added new item agent.variant for Agent and Agent2 (agriscenko, akozlovs)
+A.F....... [ZBXNEXT-6470,ZBXNEXT-6920] implemented audit logging of action API object (agriscenko)
+..F.....S. [ZBXNEXT-6950] implemented changecount() trigger function (miks, ssimonenko)
+...G.....T [ZBXNEXT-6677] added cpu percent field to docker.container_stats key for docker plugin in Zabbix agent 2 and docker template (afayantsev, esneiders)
+.........T [ZBXNEXT-7014] updated README for a newer version of PagerDuty (abiba)
+.........T [ZBXNEXT-7001] added support High availability cluster in Zabbix server health/Remote Zabbix server health template (abakaldin)
+
+Bug fixes:
+A......... [ZBX-20186] fixed incorrect count of result rows reported by API (jfreibergs)
+.......PS. [ZBX-20097] added celsius support to vmware unitInfo (asestakovs)
+.......PS. [ZBX-18944] fixed the fields size for LLD validation of triggers.description and item_preproc.params (ssimonenko)
+.......PS. [ZBX-20085] fixed build on Solaris; thanks to Yuuki Enomoto for the patch (vso)
+..F....... [ZBX-20158] added label to standalone server and fixed issue caused by setup step skew (ashubin, jfreibergs, wiper)
+...G...... [ZBX-19926] fixed Zabbix agent crashing when reading event log on Windows Server 2022 (vso)
+........S. [ZBX-20139] renamed ExternalAddress to NodeAddress and removed ListenIP/Port dependency (wiper)
+.........T [ZBX-20080] fixed error message (abiba)
+........S. [ZBX-20137] fixed HA node not to become active after restart if there is another node that can take over (vso)
+.........T [ZBX-20003] fixed update and discard intervals in generic snmp and some other templates (vkhaliev)
+.......PS. [ZBX-20032] fixed server crash when restarting monitored vmware vc (MVekslers)
+...G...... [ZBX-19912] fixed mysql.db.size, mysql.replication.get_slave_status and pgsql.custom.query items for Zabbix agent 2 (esneiders)
+.........T [ZBX-19963] fixed macro with regular expression for serial numbers discovery in cisco template (vkhaliev)
+.........T [ZBX-19958] fixed macro with regular expression for interfaces discovery in OS linux templates (vkhaliev)
+..F....... [ZBX-20132] fixed item type mismatch warning not getting removed for non-matching key (jfreibergs)
+..F....... [ZBX-20125] fixed invalid argument error in trigger test (ashubin)
+..F....... [ZBX-18975] fixed item value being truncated in item test form (agriscenko)
+..F....... [ZBX-20124] fixed incorrect number of days in the error message when the display period is exceeded (Sasha)
+..F....... [ZBX-20123] fixed svg graph widgets not displaying data for certain time periods (averza)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.0alpha5
+
+New features:
+A.FG...PS. [ZBXNEXT-6923,ZBXNEXT-6928] added High availability cluster support (ashubin, jfreibergs, vso, wiper)
+..F....... [ZBXNEXT-6896] added automatic Item type suggestion (ashubin, jfreibergs)
+..F....... [ZBXNEXT-7004] implemented service cloning (averza)
+A......... [ZBXNEXT-6470,ZBXNEXT-6951] implemented audit logging of services API object (averza)
+.......PS. [ZBXNEXT-2475] added handling of compressed content to web monitoring (akozlovs)
+...G...... [ZBXNEXT-6782] added new parameters for system.hostname (dgoloscapov)
+..F.I..... [ZBXNEXT-6757] added ability to create/edit hosts via modal form (jfreibergs, miks, vmurzins)
+.........T [ZBXNEXT-6837] added VMWare SD-WAN VeloCloud template (abiba)
+..F.....S. [ZBXNEXT-6869] removed positional macros in item name (agriscenko, akozlovs)
+...G...... [ZBXNEXT-6677] added cpu percent field to docker.container_stats key for docker plugin in Zabbix agent 2 (esneiders)
+.......PS. [ZBXNEXT-6608] added support for vmware key named 'vmware.hv.sensors.get' (MVekslers)
+.......PS. [ZBXNEXT-6644] added support for vmware key named 'vmware.hv.maintenance' (MVekslers)
+........S. [ZBXNEXT-6954] added new macros for debugging trigger expressions (dgoloscapov)
+..F.I..... [ZBXNEXT-6930] removed Monitoring -> Overview (agriscenko)
+A.F....... [ZBXNEXT-6470,ZBXNEXT-6868] implemented complete audit logging of host groups; added strict validation for hostgroup.massadd, hostgroup.massupdate, hostgroup.massremove API methods; changed sortfield used in audit log report to auditid (vmaksimovs)
+.........T [ZBXNEXT-6970] added templates for "MikroTik" Ethernet routers and Switches (mchudinov)
+..F.....S. [ZBXNEXT-6879] implemented new history functions "rate", "bucket_rate_foreach" and "bucket_percentile" and math function "histogram_quantile" (miks, MVekslers)
+A.F....... [ZBXNEXT-6470,ZBXNEXT-6929] implemented audit logging of correlation API object (rlataria, Sasha)
+...G...... [ZBXNEXT-6428] moved plugins config options to separate files (akozlovs, esneiders, kalimulin, MVekslers)
+
+Bug fixes:
+........S. [ZBX-20065] fixed count() function gt,ge,lt,le operations (dgoloscapov, wiper)
+.........T [ZBX-19958] fixed macro with regular expression for interfaces discovery in OS linux template (vkhaliev)
+..F....... [ZBX-18611] fixed division by zero error due to small graph size when using gradient lines (Ivo)
+A......... [ZBX-20079] fixed web scenarios import / export error when authentication method is kerberos (rlataria)
+...G...... [ZBX-18988] added vm.vmemory.size metric to Zabbix agent 2 for Windows (esneiders)
+.........T [ZBX-19569] changed linked template "Zabbix agent" to "Zabbix agent active" in templates "Windows by Zabbix agent active" and "Linux by Zabbix agent active" (mchudinov)
+.........T [ZBX-18554] fixed MSSQL by ODBC README (abiba)
+........S. [ZBX-19872] removed redundant escaping in XML data of HTTP agent POST request (asestakovs)
+.........T [ZBX-19920] changed setup instruction in README of the "IIS by Zabbix agent" template (mchudinov)
+.........T [ZBX-19237] changed condition in SQL request of pgsql.connections.sum.waiting item in DB PostgreSQL template to exclude rows with idle state (mchudinov)
+.........T [ZBX-20019] fixed README file in Oracle by Zabbix Agent 2 template (vkhaliev)
+.........T [ZBX-19760] fixed interface operstate valuemap in the linux templates (afayantsev)
+.........T [ZBX-20017] added new metrics, fixed update intervals in the "F5 Big-IP" template (abakaldin)
+........S. [ZBX-20077] fixed possible collision of audit entities for server in json (arimdjonoks)
+........S. [ZBX-20089] fixed server crash during network discovery when default inventory mode is not Disabled (arimdjonoks)
+...G...... [ZBXNEXT-6708] fixed 3rd parameter for Zabbix agent 2 web.certificate.get plugin (esneiders)
+........S. [ZBX-20006] fixed Zabbix server must not audit default DB values (akozlovs)
+...G...... [ZBX-20008] removed curl and ldap linkage from agent2 (yurii)
+..F....... [ZBX-19997] fixed too long URL error when performing background page refresh (miks)
+A......... [ZBX-20021] fixed impossibility to import media types of type script with parameters from previous versions (agriscenko)
+........S. [ZBX-19889] fixed server not updating trigger dependencies and other data during linking (arimdjonoks)
+....I..PS. [ZBX-20001] fixed crash and invalid bytecode error being generated on big-sendian systems when javascript is used; upgraded duktape to version 2.6 (vso)
+..F....... [ZBX-19419] fixed not refreshing graph widgets on dashboards (averza)
+
+--------------------------------------------------------------------------------
 Changes for 6.0.0alpha4
 
 New features:
+A.F.....S. [ZBXNEXT-2406] implemented service problem root cause analysis (ashubin, averza, wiper)
+A......... [ZBXNEXT-6470,ZBXNEXT-6885] implemented audit logging of mediatype API object; refactored mediatype.create, mediatype.update and mediatype.delete (agriscenko)
+.........T [ZBXNEXT-6888] added template "InfluxDB by HTTP" (ychukina)
+A.F....... [ZBXNEXT-6470,ZBXNEXT-6914] implemented audit logging of image and iconmap API objects (rlataria)
+A.F....... [ZBXNEXT-6470,ZBXNEXT-6716] implemented API method history.clear - history cleanup for items and web scenarios (rlataria)
+.......PS. [ZBXNEXT-6809] changed behavior of the vmware event log, the 'skip' option of the new item resets the VMware event cache (MVekslers)
+.........T [ZBXNEXT-6822] added Github media type (abiba)
+.......PS. [ZBX-20010] fixed crash in zabbix-proxy-sqlite3 caused by uninitialized pointer in db_version_info struct (yurii)
+A......... [ZBXNEXT-6470,ZBXNEXT-6918] implemented audit logging of script API object (rlataria)
+........S. [ZBXNEXT-6912] implemented audit for server (processing LLD graphs) (akozlovs)
+........S. [ZBXNEXT-6911] implemented audit for server (processing LLD triggers) (akozlovs)
 .......... [ZBXNEXT-6750] added IgnoreURLCertErrors configuration option to web service (yurii)
 A.F....... [ZBXNEXT-6470,ZBXNEXT-6917] implemented audit logging of global macro API object (rlataria)
 A.F....... [ZBXNEXT-6470,ZBXNEXT-6910] implemented audit logging of dashboard and templatedashboard API object (rlataria)
 
 Bug fixes:
+....I..PS. [ZBX-19604] increased storage size of fields item_preproc.params, triggers.description and media_type_message.message for Oracle backend (MVekslers)
+........S. [ZBX-19781] fixed server not linking host prototype inventory mode (arimdjonoks)
+A......... [ZBX-19978] fixed SQL errors when trying to get count of the interfaces (Sasha)
+.........T [ZBX-19774] fixed README examples (abiba)
+.........T [ZBX-19776] fixed README file (abiba)
+.........T [ZBX-19284] added smart.disk.attr.raw item, removed unit for smart.disk.hours item in "SMART by Zabbix agent 2" template (mchudinov)
+..F....... [ZBX-19899] fixed mass update not working across pages (jfreibergs)
+..F....... [ZBX-19584] increased width for Subscriptions section of Scheduled reports to avoid text clipping (jfreibergs)
+..F....... [ZBX-19580] fixed date format mismatch in UI elements that are loaded via JavaScript (jfreibergs)
+..F....... [ZBX-19683] fixed editable UI tags component for discovered host edit form (miks)
+..F....... [ZBX-19883] fixed broken secret text macro button style (miks)
+.......PS. [ZBX-19848] fixed vmware perf counters that return percentage values (MVekslers)
+.........T [ZBX-19939] fixed typo in Clickhouse Template README (abiba)
+........S. [ZBX-20014] fixed server audit to generate CUID during entry creation instead of audit flush (arimdjonoks)
 ...G...... [ZBX-20015] fixed Zabbix agent not being able to retrieve active checks configuration on Windows (vso)
 ........S. [ZBX-19989] fixed audit flush when used with Oracle (arimdjonoks)
 
@@ -100,11 +236,105 @@ Bug fixes:
 .........T [ZBX-19395] changed version in links of the templates and the media (mchudinov)
 
 --------------------------------------------------------------------------------
-Changes for 5.4.6rc1
+Changes for 5.4.9rc1
 
 New features:
 
 Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.4.8
+
+5.4.8rc1 was released as 5.4.8 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.4.8rc1
+
+New features:
+...G...... [ZBXNEXT-6651] added new item agent.variant for Agent and Agent2 (agriscenko, akozlovs)
+...G.....T [ZBXNEXT-6677] added cpu percent field to docker.container_stats key for docker plugin in Zabbix agent 2 and docker template (afayantsev, esneiders)
+.........T [ZBXNEXT-7014] updated README for a newer version of PagerDuty (abiba)
+
+Bug fixes:
+.........T [ZBX-19514] fixed disc utilization metric for windows discs discovery (abiba)
+.......PS. [ZBX-19866] fixed possible duplication of server log messages with first network error or interface activation (akozlovs)
+........S. [ZBX-20177] added acknowledgeid index for alerts table (ssimonenko)
+.....J.... [ZBX-19587] fixed Zabbix Java gateway error message when object or attribute is not found (vso)
+....I...S. [ZBX-20176] fixed trigger not being calculated for first value when item changes state to supported; fixed build failure when DES is disabled in Net-SNMP; fixed tests on big-endian systems (vso)
+.........T [ZBX-20150] fixed special characters escaping in markdown parsing of the Telegram media type (abiba)
+.......PS. [ZBX-20097] added celsius support to vmware unitInfo (asestakovs)
+.......PS. [ZBX-20085] fixed build on Solaris; thanks to Yuuki Enomoto for the patch (vso)
+...G...... [ZBX-19926] fixed Zabbix agent crashing when reading event log on Windows Server 2022 (vso)
+.........T [ZBX-20080] fixed error message (abiba)
+.........T [ZBX-20003] fixed update and discard intervals in generic snmp and some other templates (vkhaliev)
+.......PS. [ZBX-20032] fixed server crash when restarting monitored vmware vc (MVekslers)
+...G...... [ZBX-19912] fixed mysql.db.size, mysql.replication.get_slave_status and pgsql.custom.query items for Zabbix agent 2 (esneiders)
+.........T [ZBX-19963] fixed macro with regular expression for serial numbers discovery in cisco template (vkhaliev)
+.........T [ZBX-19958] fixed macro with regular expression for interfaces discovery in OS linux templates (vkhaliev)
+
+--------------------------------------------------------------------------------
+Changes for 5.4.7
+
+5.4.7rc1 was released as 5.4.7 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.4.7rc1
+
+New features:
+...G...... [ZBXNEXT-6782] added new parameters for system.hostname (dgoloscapov)
+.........T [ZBXNEXT-6837] added VMWare SD-WAN VeloCloud template (abiba)
+...G...... [ZBXNEXT-6677] added cpu percent field to docker.container_stats key for docker plugin in Zabbix agent 2 (esneiders)
+.......PS. [ZBXNEXT-6608] added support for vmware key named 'vmware.hv.sensors.get' (MVekslers)
+.......PS. [ZBXNEXT-6644] added support for vmware key named 'vmware.hv.maintenance' (MVekslers)
+
+Bug fixes:
+..F....... [ZBX-18975] fixed item value being truncated in item test form (agriscenko)
+..F....... [ZBX-20124] fixed incorrect number of days in the error message when the display period is exceeded (Sasha)
+..F....... [ZBX-20123] fixed svg graph widgets not displaying data for certain time periods (averza)
+.........T [ZBX-19958] fixed macro with regular expression for interfaces discovery in OS linux template (vkhaliev)
+........S. [ZBX-20065] fixed count() function gt,ge,lt,le operations (dgoloscapov, wiper)
+..F....... [ZBX-18611] fixed division by zero error due to small graph size when using gradient lines (Ivo)
+A......... [ZBX-20079] fixed web scenarios import / export error when authentication method is kerberos (rlataria)
+...G...... [ZBX-18988] added vm.vmemory.size metric to Zabbix agent 2 for Windows (esneiders)
+.........T [ZBX-19569] changed linked template "Zabbix agent" to "Zabbix agent active" in templates "Windows by Zabbix agent active" and "Linux by Zabbix agent active" (mchudinov)
+.........T [ZBX-18554] fixed MSSQL by ODBC README (abiba)
+........S. [ZBX-19872] removed redundant escaping in XML data of HTTP agent POST request (asestakovs)
+.........T [ZBX-19920] changed setup instruction in README of the "IIS by Zabbix agent" template (mchudinov)
+.........T [ZBX-19237] changed condition in SQL request of pgsql.connections.sum.waiting item in DB PostgreSQL template to exclude rows with idle state (mchudinov)
+.........T [ZBX-20019] fixed README file in Oracle by Zabbix Agent 2 template (vkhaliev)
+.........T [ZBX-19760] fixed interface operstate valuemap in the linux templates (afayantsev)
+...G...... [ZBXNEXT-6708] fixed 3rd parameter for Zabbix agent 2 web.certificate.get plugin (esneiders)
+...G...... [ZBX-20008] removed curl and ldap linkage from agent2 (yurii)
+.........T [ZBX-20017] added new metrics, fixed update intervals in the "F5 Big-IP" template (abakaldin)
+
+--------------------------------------------------------------------------------
+Changes for 5.4.6
+
+5.4.6rc1 was released as 5.4.6 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.4.6rc1
+
+New features:
+.........T [ZBXNEXT-6888] added template "InfluxDB by HTTP" (ychukina)
+.......PS. [ZBXNEXT-6809] changed behavior of the vmware event log, the 'skip' option of the new item resets the VMware event cache (MVekslers)
+
+Bug fixes:
+..F....... [ZBX-19997] fixed too long URL error when performing background page refresh (miks)
+A......... [ZBX-20021] fixed impossibility to import media types of type script with parameters from previous versions (agriscenko)
+....I..PS. [ZBX-20001] fixed crash and invalid bytecode error being generated on big-sendian systems when javascript is used; upgraded duktape to version 2.6 (vso)
+..F....... [ZBX-19419] fixed not refreshing graph widgets on dashboards (averza)
+A......... [ZBX-19978] fixed SQL errors when trying to get count of the interfaces (Sasha)
+.........T [ZBX-19774] fixed README examples (abiba)
+.........T [ZBX-19776] fixed README file (abiba)
+.........T [ZBX-19284] added smart.disk.attr.raw item, removed unit for smart.disk.hours item in "SMART by Zabbix agent 2" template (mchudinov)
+..F....... [ZBX-19899] fixed mass update not working across pages (jfreibergs)
+..F....... [ZBX-19584] increased width for Subscriptions section of Scheduled reports to avoid text clipping (jfreibergs)
+..F....... [ZBX-19580] fixed date format mismatch in UI elements that are loaded via JavaScript (jfreibergs)
+..F....... [ZBX-19683] fixed editable UI tags component for discovered host edit form (miks)
+.........T [ZBX-19939] fixed typo in Clickhouse README (abiba)
+..F....... [ZBX-19883] fixed broken secret text macro button style (miks)
+.......PS. [ZBX-19848] fixed vmware perf counters that return percentage values (MVekslers)
 
 --------------------------------------------------------------------------------
 Changes for 5.4.5
@@ -121,6 +351,7 @@ Bug fixes:
 Changes for 5.4.5rc1
 
 New features:
+.......... [ZBXNEXT-6750] added IgnoreURLCertErrors configuration option to web service (yurii)
 ...G...PS. [ZBXNEXT-6840] improved protocol to support Zabbix proxy configuration of size up to 16 GB; improved performance and memory usage by freeing uncompressed data as fast as possible and compressing before connection (vso)
 ...G...... [ZBXNEXT-6784] removed item being unsupported when swap is not configured (dgoloscapov)
 ..F....... [ZBXNEXT-6852] updated localization for Zabbix Support URL (agriscenko)
@@ -128,6 +359,7 @@ New features:
 .........T [ZBXNEXT-6789] added template for Travis CI (abiba)
 
 Bug fixes:
+.......PS. [ZBX-19898] fixed postgresql version decoding (yurii)
 A......... [ZBX-19954] fixed updating of the "subject" and "message" parameters in scheduled reports (Sasha)
 ........S. [ZBX-19814] added ignoring final result in case if fping quits on a signal (dgoloscapov)
 ...G...PS. [ZBX-19952] removed libmodbus linkage from server and proxy (yurii)
@@ -1143,11 +1375,84 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
-Changes for 5.0.17rc1
+Changes for 5.0.19rc1
 
 New features:
 
 Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.0.18
+
+5.0.18rc1 was released as 5.0.18 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.18rc1
+
+New features:
+..FG...... [ZBXNEXT-6593] added support of persistent files for restoring log item state after agent restart (Andris)
+...G...... [ZBXNEXT-6651] added new item agent.variant for Agent and Agent2 (agriscenko, akozlovs)
+...G.....T [ZBXNEXT-6677] added cpu percent field to docker.container_stats key for docker plugin in Zabbix agent 2 and docker template (afayantsev, esneiders)
+.........T [ZBXNEXT-7014] updated README for a newer version of PagerDuty (abiba)
+.......PS. [ZBXNEXT-2475] added handling of compressed content to web monitoring (akozlovs)
+...G...... [ZBXNEXT-6782] added new parameters for system.hostname (dgoloscapov)
+...G...... [ZBXNEXT-6677] added cpu percent field to docker.container_stats key for docker plugin in Zabbix agent 2 (esneiders)
+.......PS. [ZBXNEXT-6608] added support for vmware key named 'vmware.hv.sensors.get' (MVekslers)
+.......PS. [ZBXNEXT-6644] added support for vmware key named 'vmware.hv.maintenance' (MVekslers)
+
+Bug fixes:
+.........T [ZBX-19514] fixed disc utilization metric for windows discs discovery (abiba)
+........S. [ZBX-20177] added acknowledgeid index for alerts table (ssimonenko)
+.....J.... [ZBX-19587] fixed Zabbix Java gateway error message when object or attribute is not found (vso)
+....I...S. [ZBX-20176] fixed trigger not being calculated for first value when item changes state to supported; fixed build failure when DES is disabled in Net-SNMP; fixed tests on big-endian systems (vso)
+.........T [ZBX-20150] fixed special characters escaping in markdown parsing of the Telegram media type (abiba)
+...G...... [ZBX-19926] fixed Zabbix agent crashing when reading event log on Windows Server 2022 (vso)
+.........T [ZBX-20080] fixed error message (abiba)
+.........T [ZBX-20003] fixed update and discard intervals in generic snmp and some other templates (vkhaliev)
+.........T [ZBX-18787] removed undefined macro (abiba)
+.......PS. [ZBX-20032] fixed server crash when restarting monitored vmware vc (MVekslers)
+.........T [ZBX-19963] fixed macro with regular expression for serial numbers discovery in cisco template (vkhaliev)
+...G...... [ZBX-19912] fixed mysql.db.size, mysql.replication.get_slave_status and pgsql.custom.query items for Zabbix agent 2 (esneiders)
+.........T [ZBX-19958] fixed macro with regular expression for interfaces discovery in OS linux templates (vkhaliev)
+..F....... [ZBX-18975] fixed item value being truncated in item test form (agriscenko)
+.........T [ZBX-19958] fixed macro with regular expression for interfaces discovery in OS linux template (vkhaliev)
+........S. [ZBX-20065] fixed count() function gt,ge,lt,le operations (dgoloscapov, wiper)
+..F....... [ZBX-18611] fixed division by zero error due to small graph size when using gradient lines (Ivo)
+A......... [ZBX-20079] fixed web scenarios import / export error when authentication method is kerberos (rlataria)
+...G...... [ZBX-18988] added vm.vmemory.size metric to Zabbix agent 2 for Windows (esneiders)
+.........T [ZBX-19569] changed linked template "Zabbix agent" to "Zabbix agent active" in templates "Windows by Zabbix agent active" and "Linux by Zabbix agent active" (mchudinov)
+.........T [ZBX-18554] fixed MSSQL by ODBC README (abiba)
+........S. [ZBX-19872] removed redundant escaping in XML data of HTTP agent POST request (asestakovs)
+.........T [ZBX-19920] changed setup instruction in README of the "IIS by Zabbix agent" template (mchudinov)
+.........T [ZBX-19237] changed condition in SQL request of pgsql.connections.sum.waiting item in DB PostgreSQL template to exclude rows with idle state (mchudinov)
+.........T [ZBX-20019] fixed README file in Oracle by Zabbix Agent 2 template (vkhaliev)
+.........T [ZBX-19760] fixed interface operstate valuemap in the linux templates (afayantsev)
+...G...... [ZBXNEXT-6708] fixed 3rd parameter for Zabbix agent 2 web.certificate.get plugin (esneiders)
+.........T [ZBX-20017] added new metrics, fixed update intervals in the "F5 Big-IP" template (abakaldin)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.17
+
+5.0.17rc1 was released as 5.0.17 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.17rc1
+
+New features:
+.......PS. [ZBXNEXT-6809] changed behavior of the vmware event log, the 'skip' option of the new item resets the VMware event cache (MVekslers)
+
+Bug fixes:
+..F....... [ZBX-19997] fixed too long URL error when performing background page refresh (miks)
+A......... [ZBX-20021] fixed impossibility to import media types of type script with parameters from previous versions (agriscenko)
+...G...... [ZBX-20008] removed curl and ldap linkage from agent2 (yurii)
+....I..PS. [ZBX-20001] fixed crash and invalid bytecode error being generated on big-sendian systems when javascript is used; upgraded duktape to version 2.6 (vso)
+A......... [ZBX-19978] fixed SQL errors when trying to get count of the interfaces (Sasha)
+.........T [ZBX-19774] fixed README examples (abiba)
+.........T [ZBX-19776] fixed README file (abiba)
+.........T [ZBX-19284] added smart.disk.attr.raw item, removed unit for smart.disk.hours item in "SMART by Zabbix agent 2" template (mchudinov)
+..F....... [ZBX-19899] fixed mass update not working across pages for problems monitoring (jfreibergs)
+.........T [ZBX-19939] fixed typo in Clickhouse Template README (abiba)
+........S. [ZBX-19457] fixed failed query when updating application names longer than 255 characters (asestakovs)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.16
@@ -3392,11 +3697,40 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
-Changes for 4.0.35rc1
+Changes for 4.0.37rc1
 
 New features:
 
 Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.36
+
+4.0.36rc1 was released as 4.0.36 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.36rc1
+
+Bug fixes:
+...G...... [ZBX-19926] fixed Zabbix agent crashing when reading event log on Windows Server 2022 (vso)
+.......PS. [ZBX-20032] fixed server crash when restarting monitored vmware vc (MVekslers)
+........S. [ZBX-19872] removed redundant escaping in XML data of HTTP agent POST request (asestakovs)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.35
+
+4.0.35rc1 was released as 4.0.35 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.35rc1
+
+New features:
+.......PS. [ZBXNEXT-6809] changed behavior of the vmware event log, the 'skip' option of the new item resets the VMware event cache (MVekslers)
+
+Bug fixes:
+.......PS. [ZBX-19428] fixed high CPU usage and preprocessing workers exiting with timeout when starting numerous poller, trapper and discoverer processes (vso)
+...G...... [ZBX-19510] fixed re-reading of old Windows events for various Windows event system synchronization problems (MVekslers)
+........S. [ZBX-19457] fixed failed query when updating application names longer than 255 characters (asestakovs)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.34

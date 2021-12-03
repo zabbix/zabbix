@@ -64,8 +64,8 @@ class CWidgetSvgGraph extends CWidget {
 	_getUpdateRequestData() {
 		return {
 			...super._getUpdateRequestData(),
-			from_ts: this._time_period.from_ts,
-			to_ts: this._time_period.to_ts
+			from: this._time_period.from,
+			to: this._time_period.to
 		};
 	}
 

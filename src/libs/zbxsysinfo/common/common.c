@@ -24,7 +24,6 @@
 
 #include "file.h"
 #include "dir.h"
-#include "http.h"
 #include "net.h"
 #include "dns.h"
 #include "system.h"
@@ -60,10 +59,6 @@ ZBX_METRIC	parameters_common[] =
 	{"system.localtime",	CF_HAVEPARAMS,	SYSTEM_LOCALTIME,	"utc"},
 	{"system.run",		CF_HAVEPARAMS,	SYSTEM_RUN,		"echo test"},
 
-	{"web.page.get",	CF_HAVEPARAMS,	WEB_PAGE_GET,		"localhost,,80"},
-	{"web.page.perf",	CF_HAVEPARAMS,	WEB_PAGE_PERF,		"localhost,,80"},
-	{"web.page.regexp",	CF_HAVEPARAMS,	WEB_PAGE_REGEXP,	"localhost,,80,OK"},
-
 	{"vfs.file.size",	CF_HAVEPARAMS,	VFS_FILE_SIZE,		VFS_TEST_FILE},
 	{"vfs.file.time",	CF_HAVEPARAMS,	VFS_FILE_TIME,		VFS_TEST_FILE ",modify"},
 	{"vfs.file.exists",	CF_HAVEPARAMS,	VFS_FILE_EXISTS,	VFS_TEST_FILE},
@@ -78,6 +73,7 @@ ZBX_METRIC	parameters_common[] =
 
 	{"vfs.dir.size",	CF_HAVEPARAMS,	VFS_DIR_SIZE,		VFS_TEST_DIR},
 	{"vfs.dir.count",	CF_HAVEPARAMS,	VFS_DIR_COUNT,		VFS_TEST_DIR},
+	{"vfs.dir.get",		CF_HAVEPARAMS,	VFS_DIR_GET,		VFS_TEST_DIR},
 
 	{"net.dns",		CF_HAVEPARAMS,	NET_DNS,		",zabbix.com"},
 	{"net.dns.record",	CF_HAVEPARAMS,	NET_DNS_RECORD,		",zabbix.com"},

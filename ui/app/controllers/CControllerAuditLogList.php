@@ -104,7 +104,7 @@ class CControllerAuditLogList extends CController {
 				'resourcename', 'details', 'recordsetid'
 			],
 			'filter' => $filter,
-			'sortfield' => 'clock',
+			'sortfield' => 'auditid',
 			'sortorder' => ZBX_SORT_DOWN,
 			'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 		];
@@ -194,7 +194,8 @@ class CControllerAuditLogList extends CController {
 			CAudit::ACTION_ADD => _('Add'),
 			CAudit::ACTION_UPDATE => _('Update'),
 			CAudit::ACTION_DELETE => _('Delete'),
-			CAudit::ACTION_EXECUTE => _('Execute')
+			CAudit::ACTION_EXECUTE => _('Execute'),
+			CAudit::ACTION_HISTORY_CLEAR => _('History clear')
 		];
 	}
 
@@ -214,6 +215,7 @@ class CControllerAuditLogList extends CController {
 			CAudit::RESOURCE_DISCOVERY_RULE => _('Discovery rule'),
 			CAudit::RESOURCE_GRAPH => _('Graph'),
 			CAudit::RESOURCE_GRAPH_PROTOTYPE => _('Graph prototype'),
+			CAudit::RESOURCE_HA_NODE => _('High availability node'),
 			CAudit::RESOURCE_HOST => _('Host'),
 			CAudit::RESOURCE_HOST_GROUP => _('Host group'),
 			CAudit::RESOURCE_HOST_PROTOTYPE => _('Host prototype'),

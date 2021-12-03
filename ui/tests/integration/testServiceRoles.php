@@ -231,8 +231,7 @@ class testServiceRoles extends CIntegrationTest {
 					[
 						'conditiontype' => 27,
 						'operator' => 0,
-						'value' => self::$child1_1_serviceid,
-						'value2' => ''
+						'value' => self::$child1_1_serviceid
 					]
 				]
 			],
@@ -241,7 +240,6 @@ class testServiceRoles extends CIntegrationTest {
 					'esc_period' => 0,
 					'esc_step_from' => 1,
 					'esc_step_to' => 1,
-					'evaltype' => 0,
 					'operationtype' => OPERATION_TYPE_MESSAGE,
 					'opmessage' => [
 						'default_msg' => 0,
@@ -255,7 +253,6 @@ class testServiceRoles extends CIntegrationTest {
 			],
 			'recovery_operations' => [
 				[
-					'evaltype' => 0,
 					'operationtype' => OPERATION_TYPE_MESSAGE,
 					'opmessage' => [
 						'default_msg' => 0,
@@ -269,7 +266,6 @@ class testServiceRoles extends CIntegrationTest {
 			],
 			'update_operations' => [
 				[
-					'evaltype' => 0,
 					'operationtype' => OPERATION_TYPE_MESSAGE,
 					'opmessage' => [
 						'default_msg' => 0,
@@ -718,9 +714,6 @@ class testServiceRoles extends CIntegrationTest {
 			]
 		]);
 
-		$response = $this->call('user.logout', []);
-		$this->authorize('John', 'Doe123123');
-
 		$response = $this->call('service.update', [
 			'serviceid' => self::$child1_1_serviceid,
 			'goodsla' => 33.3
@@ -728,10 +721,7 @@ class testServiceRoles extends CIntegrationTest {
 		$this->assertArrayHasKey('serviceids', $response['result']);
 		$this->assertCount(1, $response['result']['serviceids']);
 
-		$response = $this->call('user.logout', []);
-
 		// Read enabled, write disabled
-		$this->authorize(PHPUNIT_LOGIN_NAME, PHPUNIT_LOGIN_PWD);
 		$response = $this->call('role.update', [
 			'roleid' => self::$roleid,
 			"rules" => [

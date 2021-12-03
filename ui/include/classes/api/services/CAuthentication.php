@@ -83,6 +83,12 @@ class CAuthentication extends CApiService {
 	 * @return array
 	 */
 	public function update(array $auth): array {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('No permissions to call "%1$s.%2$s".', 'authentication', __FUNCTION__)
+			);
+		}
+
 		$db_auth = $this->validateUpdate($auth);
 
 		$upd_config = DB::getUpdatedValues('config', $auth, $db_auth);

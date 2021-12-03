@@ -191,8 +191,8 @@
 
 			fetch(curl.getUrl(), {
 				method: 'POST',
-				headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
-				body: urlEncodeData(request_data)
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify(request_data)
 			})
 				.then((response) => response.json())
 				.then((response) => {
@@ -255,8 +255,27 @@
 			window.removeEventListener('beforeunload', this.events.beforeUnload);
 		},
 
+		editHost(hostid) {
+			const host_data = {hostid};
+
+			this.openHostPopup(host_data);
+		},
+
+		openHostPopup(host_data) {
+			const original_url = location.href;
+
+			const overlay = PopUp('popup.host.edit', host_data, 'host_edit', document.activeElement);
+
+			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+				history.replaceState({}, '', original_url);
+			}, {once: true});
+		},
+
 		events: {
-			addClick: (e) => {
+			addClick(e) {
 				const menu = [
 					{
 						items: [
@@ -300,7 +319,7 @@
 				});
 			},
 
-			beforeUnload: (e) => {
+			beforeUnload(e) {
 				if (ZABBIX.Dashboard.isUnsaved()) {
 					// Display confirmation message.
 					e.preventDefault();
@@ -308,7 +327,7 @@
 				}
 			},
 
-			popState: (e) => {
+			popState(e) {
 				const host = (e.state !== null && 'host' in e.state) ? e.state.host : null;
 
 				jQuery('#dynamic_hostid').multiSelect('addData', host ? [host] : [], false);
@@ -316,7 +335,7 @@
 				ZABBIX.Dashboard.setDynamicHost(host ? host.id : null);
 			},
 
-			dynamicHostChange: () => {
+			dynamicHostChange() {
 				const hosts = jQuery('#dynamic_hostid').multiSelect('getData');
 				const host = hosts.length ? hosts[0] : null;
 				const curl = new Curl('zabbix.php', false);
@@ -343,7 +362,7 @@
 				updateUserProfile('web.dashboard.hostid', host ? host.id : 1);
 			},
 
-			applyProperties: () => {
+			applyProperties() {
 				const dashboard_data = ZABBIX.Dashboard.getData();
 
 				document.getElementById('<?= ZBX_STYLE_PAGE_TITLE ?>').textContent = dashboard_data.name;
@@ -358,6 +377,20 @@
 			idle() {
 				view.is_busy = false;
 				view.updateBusy();
+			},
+
+			hostSuccess(e) {
+				const data = e.detail;
+
+				if ('success' in data) {
+					postMessageOk(data.success.title);
+
+					if ('messages' in data.success) {
+						postMessageDetails('success', data.success.messages);
+					}
+				}
+
+				location.href = location.href;
 			}
 		}
 	}

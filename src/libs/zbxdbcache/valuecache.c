@@ -2512,13 +2512,15 @@ void	zbx_vc_destroy(void)
 	{
 		zbx_vector_vc_itemupdate_destroy(&vc_itemupdates);
 
-		zbx_rwlock_destroy(&vc_lock);
-
 		zbx_hashset_destroy(&vc_cache->items);
 		zbx_hashset_destroy(&vc_cache->strpool);
 
 		__vc_mem_free_func(vc_cache);
 		vc_cache = NULL;
+
+		zbx_mem_destroy(vc_mem);
+		vc_mem = NULL;
+		zbx_rwlock_destroy(&vc_lock);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -2577,14 +2579,14 @@ void	zbx_vc_reset(void)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_vc_add_values(zbx_vector_ptr_t *history)
+int	zbx_vc_add_values(zbx_vector_ptr_t *history, int *ret_flush)
 {
 	zbx_vc_item_t		*item;
-	int 			i;
+	int			i;
 	ZBX_DC_HISTORY		*h;
 	time_t			expire_timestamp;
 
-	if (FAIL == zbx_history_add_values(history))
+	if (SUCCEED != zbx_history_add_values(history, ret_flush))
 		return FAIL;
 
 	if (ZBX_VC_DISABLED == vc_state)
@@ -2659,8 +2661,8 @@ int	zbx_vc_get_values(zbx_uint64_t itemid, int value_type, zbx_vector_history_re
 	zbx_vc_item_t	*item, new_item;
 	int 		ret = FAIL, cache_used = 1;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " value_type:%d seconds:%d count:%d sec:%d ns:%d",
-			__func__, itemid, value_type, seconds, count, ts->sec, ts->ns);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " value_type:%d count:%d period:%d end_timestamp"
+			" '%s'", __func__, itemid, value_type, count, seconds, zbx_timespec_str(ts));
 
 	RDLOCK_CACHE;
 

@@ -21,6 +21,7 @@
 #define ZABBIX_ACTIVE_H
 
 #include "threads.h"
+#include "zbxalgo.h"
 
 extern char	*CONFIG_SOURCE_IP;
 extern char	*CONFIG_HOST_METADATA;
@@ -41,9 +42,8 @@ extern ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME;
 
 typedef struct
 {
-	char		*host;
-	unsigned short	port;
-	char		*hostname;
+	zbx_vector_ptr_t	addrs;
+	char			*hostname;
 }
 ZBX_THREAD_ACTIVECHK_ARGS;
 

@@ -2295,6 +2295,136 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: eval_execute_function_histogram_quantile                         *
+ *                                                                            *
+ * Purpose: evaluate histogram_quantile() function                            *
+ *                                                                            *
+ * Parameters: ctx    - [IN] the evaluation context                           *
+ *             token  - [IN] the function token                               *
+ *             output - [IN/OUT] the output value stack                       *
+ *             error  - [OUT] the error message in the case of failure        *
+ *                                                                            *
+ * Return value: SUCCEED - function evaluation succeeded                      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	eval_execute_function_histogram_quantile(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
+		zbx_vector_var_t *output, char **error)
+{
+	int			i, ret;
+	zbx_variant_t		value;
+	zbx_vector_dbl_t	values, *v = NULL;
+	double			q, result;
+	const char		*err_fn = ctx->expression + token->loc.l;
+
+	if (2 > token->opt || (2 < token->opt && (token->opt % 2 == 0)))
+	{
+		*error = zbx_dsprintf(*error, "invalid number of arguments for function at \"%s\"", err_fn);
+		return FAIL;
+	}
+
+	if (UNKNOWN != (ret = eval_validate_function_args(ctx, token, output, error)))
+		return ret;
+
+	i = output->values_num - (int)token->opt + 1;
+
+	if (2 == token->opt)
+	{
+		if (ZBX_VARIANT_DBL_VECTOR != output->values[i].type)
+		{
+			*error = zbx_dsprintf(*error, "invalid type of second argument for function at \"%s\"", err_fn);
+			return FAIL;
+		}
+
+		if (output->values[i].data.dbl_vector->values_num % 2 != 0)
+		{
+			*error = zbx_dsprintf(*error, "invalid values number of second argument for function at \"%s\"",
+					err_fn);
+			return FAIL;
+		}
+	}
+	else
+	{
+		if ((output->values_num - i) % 2 != 0)
+		{
+			*error = zbx_dsprintf(*error, "invalid number of histogram arguments for function at \"%s\"",
+					err_fn);
+			return FAIL;
+		}
+
+		for (; i < output->values_num; i++)
+		{
+			if (ZBX_VARIANT_STR == output->values[i].type )
+			{
+				zbx_strupper(output->values[i].data.str);
+
+				if (0 == strcmp(output->values[i].data.str, "+INF") ||
+						0 == strcmp(output->values[i].data.str, "INF"))
+				{
+					zbx_variant_clear(&output->values[i]);
+					zbx_variant_set_dbl(&output->values[i], ZBX_INFINITY);
+				}
+				else
+				{
+					*error = zbx_dsprintf(*error, "invalid string values of backet"
+							" for function at \"%s\"", err_fn);
+					return FAIL;
+				}
+			}
+			else if (SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_DBL, &output->values[i],
+					error))
+			{
+				return FAIL;
+			}
+		}
+	}
+
+	i = output->values_num - (int)token->opt;
+
+	if (ZBX_VARIANT_DBL != output->values[i].type &&
+			SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_DBL, &output->values[i], error))
+	{
+		return FAIL;
+	}
+
+	q = output->values[i].data.dbl;
+
+	if (0 > q || 1 < q)
+	{
+		*error = zbx_dsprintf(*error, "invalid value of quantile for function at \"%s\"", err_fn);
+		return FAIL;
+	}
+
+	i = output->values_num - (int)token->opt + 1;
+
+	if (2 == token->opt)
+	{
+		v = output->values[i].data.dbl_vector;
+	}
+	else
+	{
+		zbx_vector_dbl_create(&values);
+
+		while (i < output->values_num)
+		{
+			zbx_vector_dbl_append(&values, output->values[i++].data.dbl);
+		}
+	}
+
+	if (SUCCEED == (ret = zbx_eval_calc_histogram_quantile(q, NULL != v ? v : &values, err_fn, &result, error)))
+	{
+		zbx_variant_set_dbl(&value, result);
+		eval_function_return(token->opt, &value, output);
+	}
+
+	if (NULL == v)
+		zbx_vector_dbl_destroy(&values);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: eval_execute_cb_function                                         *
  *                                                                            *
  * Purpose: evaluate function by calling custom callback (if configured)      *
@@ -2760,6 +2890,8 @@ static int	eval_execute_common_function(const zbx_eval_context_t *ctx, const zbx
 		return eval_execute_statistical_function(ctx, token, zbx_eval_calc_varsamp, output, error);
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "count", ZBX_CONST_STRLEN("count")))
 		return eval_execute_function_count(ctx, token, output, error);
+	if (SUCCEED == eval_compare_token(ctx, &token->loc, "histogram_quantile", ZBX_CONST_STRLEN("histogram_quantile")))
+		return eval_execute_function_histogram_quantile(ctx, token, output, error);
 
 	if (NULL != ctx->common_func_cb)
 		return eval_execute_cb_function(ctx, token, ctx->common_func_cb, output, error);

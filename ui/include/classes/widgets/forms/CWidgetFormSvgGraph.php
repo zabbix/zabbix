@@ -442,7 +442,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		}
 		elseif ($period > $max_period) {
 			$errors[] = _n('Maximum time period to display is %1$s day.',
-				'Maximum time period to display is %1$s days.', (int) ($max_period / SEC_PER_DAY)
+				'Maximum time period to display is %1$s days.', (int) round($max_period / SEC_PER_DAY)
 			);
 		}
 
@@ -467,7 +467,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 			));
 		}
 
-		$number_parser = new CNumberParser(['with_suffix' => true]);
+		$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
 
 		// Validate Min/Max values in Axes tab.
 		if ($this->fields['lefty']->getValue() == SVG_GRAPH_AXIS_SHOW) {

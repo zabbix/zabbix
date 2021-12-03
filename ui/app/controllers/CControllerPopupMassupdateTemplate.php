@@ -206,7 +206,7 @@ class CControllerPopupMassupdateTemplate extends CControllerPopupMassupdateAbstr
 							? array_column($template['parentTemplates'], 'templateid')
 							: [];
 
-						switch ($this->hasInput('mass_action_tpls')) {
+						switch ($this->getInput('mass_action_tpls')) {
 							case ZBX_ACTION_ADD:
 								$template['templates'] = array_unique(
 									array_merge($parent_templateids, $this->getInput('linked_templates', []))
@@ -215,6 +215,7 @@ class CControllerPopupMassupdateTemplate extends CControllerPopupMassupdateAbstr
 
 							case ZBX_ACTION_REPLACE:
 								$template['templates'] = $this->getInput('linked_templates', []);
+
 								if ($this->getInput('mass_clear_tpls', 0)) {
 									$template['templates_clear'] = array_unique(
 										array_diff($parent_templateids, $this->getInput('linked_templates', []))
@@ -226,6 +227,7 @@ class CControllerPopupMassupdateTemplate extends CControllerPopupMassupdateAbstr
 								$template['templates'] = array_unique(
 									array_diff($parent_templateids, $this->getInput('linked_templates', []))
 								);
+
 								if ($this->getInput('mass_clear_tpls', 0)) {
 									$template['templates_clear'] = array_unique($this->getInput('linked_templates', []));
 								}
@@ -344,8 +346,12 @@ class CControllerPopupMassupdateTemplate extends CControllerPopupMassupdateAbstr
 			DBend($result);
 
 			if ($result) {
+				$output = [
+					'title' => _('Templates updated'),
+					'script_inline' => (new CScriptTag('sessionStorage.removeItem("cb_templates");'))->toString()
+				];
 				$messages = CMessageHelper::getMessages();
-				$output = ['title' => _('Templates updated')];
+
 				if (count($messages)) {
 					$output['messages'] = array_column($messages, 'message');
 				}

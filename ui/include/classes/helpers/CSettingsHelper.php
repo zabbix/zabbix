@@ -80,6 +80,11 @@ class CSettingsHelper extends CConfigGeneralHelper {
 	public const SCHEDULED_REPORT_TEST_TIMEOUT = 'report_test_timeout';
 	public const DBVERSION_STATUS = 'dbversion_status';
 	public const AUDITLOG_ENABLED = 'auditlog_enabled';
+	public const GEOMAPS_TILE_PROVIDER = 'geomaps_tile_provider';
+	public const GEOMAPS_TILE_URL = 'geomaps_tile_url';
+	public const GEOMAPS_MAX_ZOOM = 'geomaps_max_zoom';
+	public const GEOMAPS_ATTRIBUTION = 'geomaps_attribution';
+	public const HA_FAILOVER_DELAY = 'ha_failover_delay';
 
 	/**
 	 * Settings API object parameters array.

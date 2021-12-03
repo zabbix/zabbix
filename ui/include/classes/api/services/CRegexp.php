@@ -43,6 +43,12 @@ class CRegexp extends CApiService {
 	 * @return array|int
 	 */
 	public function get(array $options = []) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('No permissions to call "%1$s.%2$s".', 'regexp', __FUNCTION__)
+			);
+		}
+
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
 			'regexpids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
@@ -104,6 +110,12 @@ class CRegexp extends CApiService {
 	 * @return array
 	 */
 	public function create(array $regexs): array {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('No permissions to call "%1$s.%2$s".', 'regexp', __FUNCTION__)
+			);
+		}
+
 		$this->validateCreate($regexs);
 
 		$regexids = DB::insert('regexps', $regexs);
@@ -273,6 +285,12 @@ class CRegexp extends CApiService {
 	 * @return array
 	 */
 	public function update(array $regexs): array {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('No permissions to call "%1$s.%2$s".', 'regexp', __FUNCTION__)
+			);
+		}
+
 		$this->validateUpdate($regexs, $db_regexs);
 
 		$upd_regexs = [];
@@ -341,7 +359,7 @@ class CRegexp extends CApiService {
 
 		self::checkDuplicates($regexs, $db_regexs);
 
-		$this->addAffectedObjects($regexs, $db_regexs);
+		self::addAffectedObjects($regexs, $db_regexs);
 	}
 
 	/**
@@ -352,6 +370,12 @@ class CRegexp extends CApiService {
 	 * @return array
 	 */
 	public function delete(array $regexpids): array {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('No permissions to call "%1$s.%2$s".', 'regexp', __FUNCTION__)
+			);
+		}
+
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $regexpids, '/', $error)) {
@@ -363,7 +387,6 @@ class CRegexp extends CApiService {
 			'regexpids' => $regexpids,
 			'preservekeys' => true
 		]);
-
 
 		if (count($db_regexs) != count($regexpids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
@@ -404,10 +427,12 @@ class CRegexp extends CApiService {
 	/**
 	 * Add the existing expressions to $db_regexs whether these are affected by the update.
 	 *
+	 * @static
+	 *
 	 * @param array $regexs
 	 * @param array $db_regexs
 	 */
-	private function addAffectedObjects(array $regexs, array &$db_regexs): void {
+	private static function addAffectedObjects(array $regexs, array &$db_regexs): void {
 		$regexids = [];
 
 		foreach ($regexs as $regex) {
@@ -427,13 +452,8 @@ class CRegexp extends CApiService {
 			$db_expressions = DBselect(DB::makeSql('expressions', $options));
 
 			while ($db_expression = DBfetch($db_expressions)) {
-				$db_regexs[$db_expression['regexpid']]['expressions'][$db_expression['expressionid']] = [
-					'expressionid' => $db_expression['expressionid'],
-					'expression' => $db_expression['expression'],
-					'expression_type' => $db_expression['expression_type'],
-					'exp_delimiter' => $db_expression['exp_delimiter'],
-					'case_sensitive' => $db_expression['case_sensitive']
-				];
+				$db_regexs[$db_expression['regexpid']]['expressions'][$db_expression['expressionid']] =
+					array_diff_key($db_expression, array_flip(['regexpid']));
 			}
 		}
 	}

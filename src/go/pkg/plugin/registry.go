@@ -30,12 +30,15 @@ type Metric struct {
 	Plugin      Accessor
 	Key         string
 	Description string
+	UsrPrm      bool
 }
 
 var Metrics map[string]*Metric = make(map[string]*Metric)
 var Plugins map[string]Accessor = make(map[string]Accessor)
 
 func registerMetric(plugin Accessor, name string, key string, description string) {
+	var usrprm bool
+
 	if ok, _ := regexp.MatchString(`^[A-Za-z0-9\._-]+$`, key); !ok {
 		panic(fmt.Sprintf(`cannot register metric "%s" having invalid format`, key))
 	}
@@ -97,7 +100,13 @@ func registerMetric(plugin Accessor, name string, key string, description string
 		plugin.Init(name)
 	}
 
-	Metrics[key] = &Metric{Plugin: plugin, Key: key, Description: description}
+	if name == "UserParameter" {
+		usrprm = true
+	} else {
+		usrprm = false
+	}
+
+	Metrics[key] = &Metric{Plugin: plugin, Key: key, Description: description, UsrPrm: usrprm}
 }
 
 func RegisterMetrics(impl Accessor, name string, params ...string) {
@@ -129,4 +138,12 @@ func GetByName(name string) (acc Accessor, err error) {
 		return p, nil
 	}
 	return nil, UnsupportedMetricError
+}
+
+func ClearUserParamMetrics() {
+	for k, _ := range Metrics {
+		if Metrics[k].UsrPrm {
+			delete(Metrics, k)
+		}
+	}
 }

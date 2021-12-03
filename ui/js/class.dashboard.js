@@ -680,10 +680,8 @@ class CDashboard extends CBaseComponent {
 
 		return fetch(curl.getUrl(), {
 			method: 'POST',
-			headers: {
-				'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-			},
-			body: urlEncodeData({widgets: request_widgets_data})
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({widgets: request_widgets_data})
 		})
 			.then((response) => response.json())
 			.then((response) => {
@@ -977,16 +975,14 @@ class CDashboard extends CBaseComponent {
 		properties.template = this._data.templateid !== null ? 1 : undefined;
 		properties.name = properties.name.trim();
 
-		const curl = new Curl('zabbix.php', false);
+		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', 'dashboard.properties.check');
 
 		return fetch(curl.getUrl(), {
 			method: 'POST',
-			headers: {
-				'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-			},
-			body: urlEncodeData(properties)
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify(properties)
 		})
 			.then((response) => response.json())
 			.then((response) => {
@@ -1043,16 +1039,14 @@ class CDashboard extends CBaseComponent {
 	_promiseApplyDashboardPageProperties(properties, data) {
 		properties.name = properties.name.trim();
 
-		const curl = new Curl('zabbix.php', false);
+		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', 'dashboard.page.properties.check');
 
 		return fetch(curl.getUrl(), {
 			method: 'POST',
-			headers: {
-				'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-			},
-			body: urlEncodeData(properties)
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify(properties)
 		})
 			.then((response) => response.json())
 			.then((response) => {
@@ -1299,10 +1293,8 @@ class CDashboard extends CBaseComponent {
 
 		return fetch(curl.getUrl(), {
 			method: 'POST',
-			headers: {
-				'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-			},
-			body: urlEncodeData({templateid, type, name, view_mode, fields: fields_str})
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({templateid, type, name, view_mode, fields: fields_str})
 		})
 			.then((response) => response.json())
 			.then((response) => {
@@ -1321,10 +1313,8 @@ class CDashboard extends CBaseComponent {
 
 		return fetch(curl.getUrl(), {
 			method: 'POST',
-			headers: {
-				'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-			},
-			body: urlEncodeData({templateid, type, view_mode, fields: fields_str})
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({templateid, type, view_mode, fields: fields_str})
 		})
 			.then((response) => response.json())
 			.then((response) => {

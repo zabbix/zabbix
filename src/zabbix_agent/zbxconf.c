@@ -80,13 +80,17 @@ void	load_aliases(char **lines)
  * Purpose: load user parameters from configuration                           *
  *                                                                            *
  * Parameters: lines - user parameter entries from configuration file         *
+ *             error - error message                                          *
+ *                                                                            *
+ * Return value: SUCCEED - successfully loaded user parameters                *
+ *               FAIL    - failed to load user parameters                     *
  *                                                                            *
  * Author: Vladimir Levijev                                                   *
  *                                                                            *
  * Comments: calls add_user_parameter() for each entry                        *
  *                                                                            *
  ******************************************************************************/
-void	load_user_parameters(char **lines)
+int	load_user_parameters(char **lines, char **err)
 {
 	char	*p, **pline, error[MAX_STRING_LEN];
 
@@ -94,19 +98,21 @@ void	load_user_parameters(char **lines)
 	{
 		if (NULL == (p = strchr(*pline, ',')))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "cannot add user parameter \"%s\": not comma-separated", *pline);
-			exit(EXIT_FAILURE);
+			*err = zbx_dsprintf(*err, "user parameter \"%s\": not comma-separated", *pline);
+			return FAIL;
 		}
 		*p = '\0';
 
 		if (FAIL == add_user_parameter(*pline, p + 1, error, sizeof(error)))
 		{
 			*p = ',';
-			zabbix_log(LOG_LEVEL_CRIT, "cannot add user parameter \"%s\": %s", *pline, error);
-			exit(EXIT_FAILURE);
+			*err = zbx_dsprintf(*err, "user parameter \"%s\": %s", *pline, error);
+			return FAIL;
 		}
 		*p = ',';
 	}
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -229,6 +235,65 @@ void	load_perf_counters(const char **def_lines, const char **eng_lines)
 		if (lines == eng_lines)
 			break;
 	}
+}
+#else
+/******************************************************************************
+ *                                                                            *
+ * Function: load_config_user_params                                          *
+ *                                                                            *
+ * Purpose: load user parameters from configuration file                      *
+ *                                                                            *
+ ******************************************************************************/
+static int	load_config_user_params(void)
+{
+	struct cfg_line	cfg[] =
+	{
+		/* PARAMETER,			VAR,					TYPE,
+			MANDATORY,	MIN,			MAX */
+		{"UserParameter",		&CONFIG_USER_PARAMETERS,		TYPE_MULTISTRING,
+			PARM_OPT,	0,			0},
+		{NULL}
+	};
+
+	return parse_cfg_file(CONFIG_FILE, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_NOT_STRICT, ZBX_CFG_NO_EXIT_FAILURE);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: reload_user_parameters                                           *
+ *                                                                            *
+ * Purpose: reload user parameters                                            *
+ *                                                                            *
+ * Parameters: process_type - process type                                    *
+ *             process_num - process number                                   *
+ *                                                                            *
+ ******************************************************************************/
+void	reload_user_parameters(unsigned char process_type, int process_num)
+{
+	char	*error = NULL;
+
+	remove_user_parameters();
+	zbx_strarr_init(&CONFIG_USER_PARAMETERS);
+
+	if (FAIL == load_config_user_params())
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot reload user parameters [%s #%d]: error processing configuration file",
+				get_process_type_string(process_type), process_num);
+		goto out;
+	}
+
+	if (FAIL == load_user_parameters(CONFIG_USER_PARAMETERS, &error))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot reload user parameters [%s #%d], stopped at: %s",
+				get_process_type_string(process_type), process_num, error);
+		zbx_free(error);
+		goto out;
+	}
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "user parameters reloaded [%s #%d]", get_process_type_string(process_type),
+			process_num);
+out:
+	zbx_strarr_free(&CONFIG_USER_PARAMETERS);
 }
 #endif	/* _WINDOWS */
 

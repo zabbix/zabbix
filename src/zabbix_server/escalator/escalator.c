@@ -415,7 +415,6 @@ static int	check_parent_service_intersection(zbx_vector_uint64_t *parent_ids, zb
 static int	check_db_parent_rule_tag_match(zbx_vector_uint64_t *parent_ids, zbx_vector_tags_t *tags)
 {
 	DB_RESULT	result;
-	DB_ROW		row;
 	char		*sql = NULL;
 	int		i, perm = PERM_DENY;
 	size_t		sql_alloc = 0, sql_offset = 0;
@@ -454,7 +453,7 @@ static int	check_db_parent_rule_tag_match(zbx_vector_uint64_t *parent_ids, zbx_v
 
 	result = DBselect("%s) limit 1", sql);
 
-	if (NULL != (row = DBfetch(result)))
+	if (NULL != DBfetch(result))
 	{
 		perm = PERM_READ;
 	}
@@ -1071,7 +1070,7 @@ static void	add_sentusers_msg_esc_cancel(ZBX_USER_MSG **user_msg, zbx_uint64_t a
 				user_timezone = get_user_timezone(userid);
 		}
 
-		message_dyn = zbx_dsprintf(NULL, "NOTE: Escalation cancelled: %s\nLast message sent:\n%s", error,
+		message_dyn = zbx_dsprintf(NULL, "NOTE: Escalation canceled: %s\nLast message sent:\n%s", error,
 				row[3]);
 
 		tz = NULL == user_timezone || 0 == strcmp(user_timezone, "default") ? default_timezone : user_timezone;
@@ -2269,7 +2268,6 @@ static int	check_unfinished_alerts(const DB_ESCALATION *escalation)
 	int		ret;
 	char		*sql;
 	DB_RESULT	result;
-	DB_ROW		row;
 
 	if (0 == escalation->r_eventid)
 		return SUCCEED;
@@ -2280,7 +2278,7 @@ static int	check_unfinished_alerts(const DB_ESCALATION *escalation)
 	result = DBselectN(sql, 1);
 	zbx_free(sql);
 
-	if (NULL != (row = DBfetch(result)))
+	if (NULL != DBfetch(result))
 		ret = FAIL;
 	else
 		ret = SUCCEED;
@@ -2422,7 +2420,7 @@ out:
 static void	escalation_log_cancel_warning(const DB_ESCALATION *escalation, const char *error)
 {
 	if (0 != escalation->esc_step)
-		zabbix_log(LOG_LEVEL_WARNING, "escalation cancelled: %s", error);
+		zabbix_log(LOG_LEVEL_WARNING, "escalation canceled: %s", error);
 }
 
 /******************************************************************************
@@ -2445,8 +2443,9 @@ static void	escalation_cancel(DB_ESCALATION *escalation, const DB_ACTION *action
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
 			__func__, escalation->escalationid, zbx_escalation_status_string(escalation->status));
 
-	/* the cancellation notification can be sent if no objects are deleted */
-	if (NULL != action && NULL != event && 0 != event->trigger.triggerid && 0 != escalation->esc_step)
+	/* the cancellation notification can be sent if no objects are deleted and notification is not disabled */
+	if (NULL != action && NULL != event && 0 != event->trigger.triggerid && 0 != escalation->esc_step &&
+			ACTION_NOTIFY_IF_CANCELED_FALSE != action->notify_if_canceled)
 	{
 		add_sentusers_msg_esc_cancel(&user_msg, action->actionid, event, ZBX_NULL2EMPTY_STR(error),
 				default_timezone, service, roles);

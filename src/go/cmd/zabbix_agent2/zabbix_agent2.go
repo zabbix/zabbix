@@ -48,6 +48,10 @@ import (
 	"zabbix.com/pkg/zbxlib"
 )
 
+type AgentUserParamOption struct {
+	UserParameter []string `conf:"optional"`
+}
+
 const remoteCommandSendingTimeout = time.Second
 
 var manager *scheduler.Manager
@@ -96,10 +100,35 @@ func processHelpCommand(c *remotecontrol.Client) (err error) {
 	help := `Remote control interface, available commands:
 	log_level_increase - Increase log level
 	log_level_decrease - Decrease log level
+	userparameter_reload - Reload user parameters
 	metrics - List available metrics
 	version - Display Agent version
 	help - Display this help message`
 	return c.Reply(help)
+}
+
+func processUserParamReloadCommand(c *remotecontrol.Client) (err error) {
+	var userparams AgentUserParamOption
+
+	if err = conf.LoadUserParams(&userparams); err != nil {
+		err = fmt.Errorf("Cannot load user parameters: %s", err)
+		log.Infof(err.Error())
+		return
+	}
+
+	agent.Options.UserParameter = userparams.UserParameter
+
+	if res := manager.QueryUserParams(); res != "ok" {
+		err = fmt.Errorf("Failed to reload user parameters: %s", res)
+		log.Infof(err.Error())
+		return
+	}
+
+	message := "User parameters reloaded"
+	log.Infof(message)
+	err = c.Reply(message)
+
+	return
 }
 
 func processRemoteCommand(c *remotecontrol.Client) (err error) {
@@ -123,6 +152,8 @@ func processRemoteCommand(c *remotecontrol.Client) (err error) {
 		err = processMetricsCommand(c)
 	case "version":
 		err = processVersionCommand(c)
+	case "userparameter_reload":
+		err = processUserParamReloadCommand(c)
 	default:
 		return errors.New("Unknown command")
 	}
@@ -341,7 +372,7 @@ func main() {
 			fatalExit("failed to load key access rules", err)
 		}
 
-		if err = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters,
+		if _, err = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters,
 			agent.Options.UserParameterDir); err != nil {
 			fatalExit("cannot initialize user parameters", err)
 		}
@@ -462,7 +493,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters,
+	if _, err = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters,
 		agent.Options.UserParameterDir); err != nil {
 		fatalExit("cannot initialize user parameters", err)
 	}

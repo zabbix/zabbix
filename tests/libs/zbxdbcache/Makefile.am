@@ -51,6 +51,8 @@ CACHE_LIBS = \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_httpmetrics.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_http.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
 	$(top_srcdir)/src/libs/zbxhistory/libzbxhistory.a \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
@@ -81,6 +83,7 @@ COMMON_WRAP_FUNCS = \
 	-Wl,--wrap=zbx_mutex_create \
 	-Wl,--wrap=zbx_mutex_destroy \
 	-Wl,--wrap=zbx_mem_create \
+	-Wl,--wrap=zbx_mem_destroy \
 	-Wl,--wrap=__zbx_mem_malloc \
 	-Wl,--wrap=__zbx_mem_realloc \
 	-Wl,--wrap=__zbx_mem_free \

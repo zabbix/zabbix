@@ -32,7 +32,7 @@
 	jQuery(function() {
 		let tags_initialized = false;
 
-		$('#tabs').on('tabscreate tabsactivate', function(event, ui) {
+		$('#<?= $data['tabs_id'] ?>').on('tabscreate tabsactivate', function(event, ui) {
 			const $panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;
 
 			if ($panel.attr('id') === 'tags-tab') {

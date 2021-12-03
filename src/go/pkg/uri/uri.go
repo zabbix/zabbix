@@ -38,6 +38,7 @@ type URI struct {
 	user     string
 	password string
 	rawUri   string
+	path     string
 }
 
 func (u *URI) Scheme() string {
@@ -54,6 +55,14 @@ func (u *URI) Socket() string {
 
 func (u *URI) Port() string {
 	return u.port
+}
+
+func (u *URI) Query() string {
+	return u.rawQuery
+}
+
+func (u *URI) Path() string {
+	return u.path
 }
 
 func (u *URI) GetParam(key string) string {
@@ -109,7 +118,6 @@ func (u *URI) String() string {
 		} else {
 			t.User = url.User(u.user)
 		}
-
 	}
 
 	return t.String()
@@ -192,6 +200,7 @@ func New(rawUri string, defaults *Defaults) (res *URI, err error) {
 
 		res.host = u.Hostname()
 		res.port = port
+		res.path = u.Path
 	}
 
 	res.rawQuery = u.RawQuery
@@ -231,6 +240,43 @@ func (v URIValidator) Validate(value *string) error {
 		}
 
 		return fmt.Errorf("allowed schemes: %s", strings.Join(v.AllowedSchemes, ", "))
+	}
+
+	return nil
+}
+
+func IsHostnameOnly(host string) error {
+	if strings.Contains(host, ":/") {
+		return fmt.Errorf("must not contain scheme")
+	}
+
+	uri, err := New(host, &Defaults{Port: "", Scheme: ""})
+	if err != nil {
+		return err
+	}
+
+	if uri.Port() != "" {
+		return fmt.Errorf("must not contain port")
+	}
+
+	if uri.Socket() != "" {
+		return fmt.Errorf("must not contain socket")
+	}
+
+	if uri.User() != "" {
+		return fmt.Errorf("must not contain user")
+	}
+
+	if uri.Password() != "" {
+		return fmt.Errorf("must not contain password")
+	}
+
+	if uri.Query() != "" {
+		return fmt.Errorf("must not contain query")
+	}
+
+	if uri.Path() != "" {
+		return fmt.Errorf("must not contain path")
 	}
 
 	return nil

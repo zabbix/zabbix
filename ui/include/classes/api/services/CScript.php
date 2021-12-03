@@ -40,7 +40,9 @@ class CScript extends CApiService {
 	/**
 	 * Fields from "actions" table. Used in get() validation and addRelatedObjects() when selecting action fields.
 	 */
-	private $action_fields = ['actionid', 'name', 'eventsource', 'status', 'esc_period', 'pause_suppressed'];
+	private $action_fields = ['actionid', 'name', 'eventsource', 'status', 'esc_period', 'pause_suppressed',
+		'notify_if_canceled'
+	];
 
 	/**
 	 * This property, if filled out, will contain all hostrgroup ids
@@ -235,6 +237,12 @@ class CScript extends CApiService {
 	 * @return array
 	 */
 	public function create(array $scripts) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('No permissions to call "%1$s.%2$s".', 'script', __FUNCTION__)
+			);
+		}
+
 		$this->validateCreate($scripts);
 
 		$scriptids = DB::insert('scripts', $scripts);
@@ -305,6 +313,12 @@ class CScript extends CApiService {
 	 * @return array
 	 */
 	public function update(array $scripts) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('No permissions to call "%1$s.%2$s".', 'script', __FUNCTION__)
+			);
+		}
+
 		$this->validateUpdate($scripts, $db_scripts);
 
 		$upd_scripts = [];
@@ -808,6 +822,12 @@ class CScript extends CApiService {
 	 * @return array
 	 */
 	public function delete(array $scriptids) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('No permissions to call "%1$s.%2$s".', 'script', __FUNCTION__)
+			);
+		}
+
 		self::validateDelete($scriptids, $db_scripts);
 
 		DB::delete('scripts', ['scriptid' => $scriptids]);

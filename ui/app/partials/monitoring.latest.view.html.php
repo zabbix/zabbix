@@ -166,7 +166,6 @@ foreach ($data['items'] as $itemid => $item) {
 		->setMenuPopup(CMenuPopupHelper::getHost($item['hostid']));
 
 	if ($data['filter']['show_details']) {
-
 		$item_config_url = (new CUrl('items.php'))
 			->setArgument('form', 'update')
 			->setArgument('itemid', $itemid)

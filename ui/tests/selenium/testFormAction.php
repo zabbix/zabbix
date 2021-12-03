@@ -99,7 +99,6 @@ class testFormAction extends CLegacyWebTest {
 						'esc_period' => 0,
 						'esc_step_from' => 1,
 						'esc_step_to' => 1,
-						'evaltype' => 0,
 						'opmessage' => [
 							'default_msg' => 1,
 							'mediatypeid' => 0
@@ -117,8 +116,7 @@ class testFormAction extends CLegacyWebTest {
 						'opmessage' => [
 							'default_msg' => 0,
 							'subject' => 'Subject',
-							'message' => 'Message',
-							'mediatypeid' => 0
+							'message' => 'Message'
 						]
 					]
 				],
@@ -429,7 +427,6 @@ class testFormAction extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Name');
 		$this->zbxTestAssertVisibleId('name');
 		$this->zbxTestAssertAttribute('//input[@id="name"]', 'maxlength', 255);
-		$this->zbxTestAssertAttribute('//input[@id="name"]', 'size', 20);
 		$this->zbxTestAssertAttribute('//input[@id="name"]', 'autofocus');
 
 		$this->zbxTestTextPresent('Enabled');
@@ -687,7 +684,6 @@ class testFormAction extends CLegacyWebTest {
 				break;
 			case 'Uptime/Downtime':
 				$this->zbxTestAssertAttribute('//input[@id="value"]', 'maxlength', 15);
-				$this->zbxTestAssertAttribute('//input[@id="value"]', 'size', 20);
 				break;
 		}
 
@@ -825,7 +821,6 @@ class testFormAction extends CLegacyWebTest {
 			case 'Discovery check':
 				$this->zbxTestAssertElementPresentXpath('//input[@id=\'dcheck\']');
 				$this->zbxTestAssertAttribute('//input[@id=\'dcheck\']', 'maxlength', 255);
-				$this->zbxTestAssertAttribute('//input[@id=\'dcheck\']', 'size', 20);
 				$this->zbxTestAssertAttribute('//input[@id=\'dcheck\']', 'readonly');
 				$this->zbxTestAssertElementPresentXpath('//button[@id=\'btn1\']');
 				$this->zbxTestAssertElementText('//button[@id=\'btn1\']', 'Select');
@@ -851,7 +846,6 @@ class testFormAction extends CLegacyWebTest {
 				$this->assertEquals('1h', $form->getField('Default operation step duration')->getValue());
 				$this->zbxTestAssertVisibleId('esc_period');
 				$this->zbxTestAssertAttribute('//input[@id=\'esc_period\']', 'maxlength', 255);
-				$this->zbxTestAssertAttribute('//input[@id=\'esc_period\']', 'size', 20);
 
 				$this->assertEquals($operations_field->getHeadersText(), ['Steps', 'Details', 'Start in', 'Duration', 'Action']);
 
@@ -878,7 +872,6 @@ class testFormAction extends CLegacyWebTest {
 				$this->assertEquals('1h', $form->getField('Default operation step duration')->getValue());
 				$this->zbxTestAssertVisibleId('esc_period');
 				$this->zbxTestAssertAttribute('//input[@id=\'esc_period\']', 'maxlength', 255);
-				$this->zbxTestAssertAttribute('//input[@id=\'esc_period\']', 'size', 20);
 
 				$this->assertEquals($operations_field->getHeadersText(), ['Steps', 'Details', 'Start in', 'Duration', 'Action']);
 				$recovery_field = $form->getField('Recovery operations')->asTable();
@@ -940,19 +933,16 @@ class testFormAction extends CLegacyWebTest {
 					$this->zbxTestTextPresent('Steps');
 					$this->zbxTestAssertVisibleId('operation_esc_step_from');
 					$this->zbxTestAssertAttribute('//input[@id=\'operation_esc_step_from\']', 'maxlength', 5);
-					$this->zbxTestAssertAttribute('//input[@id=\'operation_esc_step_from\']', 'size', 20);
 					$this->zbxTestAssertAttribute('//input[@id=\'operation_esc_step_from\']', 'value', 1);
 
 					$this->zbxTestTextPresent('(0 - infinitely)');
 					$this->zbxTestAssertVisibleId('operation_esc_step_to');
 					$this->zbxTestAssertAttribute('//input[@id=\'operation_esc_step_to\']', 'maxlength', 5);
-					$this->zbxTestAssertAttribute('//input[@id=\'operation_esc_step_to\']', 'size', 20);
 					$this->zbxTestAssertAttribute('//input[@id=\'operation_esc_step_to\']', 'value', 1);
 
 					$this->zbxTestTextPresent(['Step duration', '(0 - use action default)']);
 					$this->zbxTestAssertVisibleId('operation_esc_period');
 					$this->zbxTestAssertAttribute('//input[@id=\'operation_esc_period\']', 'maxlength', 255);
-					$this->zbxTestAssertAttribute('//input[@id=\'operation_esc_period\']', 'size', 20);
 					$this->zbxTestAssertAttribute('//input[@id=\'operation_esc_period\']', 'value', 0);
 					break;
 				}
@@ -1061,7 +1051,6 @@ class testFormAction extends CLegacyWebTest {
 				$this->zbxTestTextPresent('Subject');
 				$this->zbxTestAssertVisibleId('operation_opmessage_subject');
 				$this->zbxTestAssertAttribute('//input[@id=\'operation_opmessage_subject\']', 'maxlength', 255);
-				$this->zbxTestAssertAttribute('//input[@id=\'operation_opmessage_subject\']', 'size', 20);
 
 				$this->zbxTestTextPresent('Message');
 				$this->zbxTestAssertVisibleId('operation_opmessage_message');
@@ -1460,7 +1449,7 @@ class testFormAction extends CLegacyWebTest {
 					'esc_period' => '666',
 					'error_title' => 'Cannot add action',
 					'errors' => [
-						'Action "No operations action" no operations defined.'
+						'No operations defined for action "No operations action".'
 					]
 				]
 			]
@@ -1482,7 +1471,7 @@ class testFormAction extends CLegacyWebTest {
 			foreach ($data['conditions'] as $condition) {
 				$action_form->query('xpath:.//table[@id="conditionTable"]//button[text()="Add"]')->one()->click();
 
-				COverlayDialogElement::find()->waitUntilVisible()->one();
+				COverlayDialogElement::find()->waitUntilReady()->one();
 				$condition_form = $this->query('id:popup.condition')->asForm()->one();
 				$condition_form->fill($condition);
 				$condition_form->submit();
@@ -1495,7 +1484,7 @@ class testFormAction extends CLegacyWebTest {
 			foreach ($data['operations'] as $operation) {
 				$action_form->query('xpath:.//table[@id="op-table"]//button[text()="Add"]')->one()->click();
 
-				COverlayDialogElement::find()->waitUntilVisible()->one();
+				COverlayDialogElement::find()->waitUntilReady()->one();
 				$operation_form = $this->query('id:popup.operation')->asForm()->one();
 
 				if ($data['eventsource'] !== EVENT_SOURCE_INTERNAL) {
