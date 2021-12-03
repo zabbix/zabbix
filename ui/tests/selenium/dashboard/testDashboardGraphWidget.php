@@ -194,36 +194,37 @@ class testDashboardGraphWidget extends CWebTest {
 			],
 			// Base color field validation.
 // TODO: fix hex field
-//			[
-//				[
-//					'Data set' => [
-//						[
-//							'Base color' => ''
-//						]
-//					],
-//					'error' => 'Invalid parameter "Data set/1/color": cannot be empty.'
-//				]
-//			],
-//			[
-//				[
-//					'Data set' => [
-//						[
-//							'Base color' => '00000!'
-//						]
-//					],
-//					'error' => 'Invalid parameter "Data set/1/color": a hexadecimal color code (6 symbols) is expected.'
-//				]
-//			],
-//			[
-//				[
-//					'Data set' => [
-//						[
-//							'Base color' => '00000'
-//						]
-//					],
-//					'error' => 'Invalid parameter "Data set/1/color": a hexadecimal color code (6 symbols) is expected.'
-//				]
-//			],
+/*			[
+*			[
+*					'Data set' => [
+*						[
+*							'Base color' => ''
+*						]
+*					],
+*					'error' => 'Invalid parameter "Data set/1/color": cannot be empty.'
+*				]
+*			],
+*			[
+*				[
+*					'Data set' => [
+*						[
+*							'Base color' => '00000!'
+*						]
+*					],
+*					'error' => 'Invalid parameter "Data set/1/color": a hexadecimal color code (6 symbols) is expected.'
+*				]
+*			],
+*			[
+*				[
+*					'Data set' => [
+*						[
+*							'Base color' => '00000'
+*						]
+*					],
+*					'error' => 'Invalid parameter "Data set/1/color": a hexadecimal color code (6 symbols) is expected.'
+*				]
+*			],
+*/
 			// Time shift field validation.
 			[
 				[
