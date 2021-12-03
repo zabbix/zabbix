@@ -2074,6 +2074,8 @@ class CApiInputValidator {
 		foreach ($data as $index => $object) {
 			foreach ($rule['fields'] as $field_name => $field_rule) {
 				if (array_key_exists($field_name, $object)) {
+					self::unsetNonexistMultipleRules($field_rule['rules'], $data);
+
 					if ($field_rule['type'] === API_MULTIPLE) {
 						foreach ($field_rule['rules'] as $multiple_rule) {
 							if (array_key_exists('else', $multiple_rule)
