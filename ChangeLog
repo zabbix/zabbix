@@ -1,9 +1,26 @@
 Changes for 6.0.0alpha8
 
 New features:
+.........T [ZBXNEXT-7031] upgraded Oracle by ODBC template for using config string in items (abiba)
+........S. [ZBXNEXT-2579] added baseline monitoring functions baslinewma,baselinedev (wiper)
+..F....... [ZBXNEXT-7020] added baseline function entry to front-end (jfreibergs)
+A.F.....S. [ZBXNEXT-6250] added option to opt-out of "escalation canceled" messages (miks, ssimonenko)
+..FG...... [ZBXNEXT-6593] added support of persistent files for restoring log item state after agent restart (Andris)
 ..F....... [ZBXNEXT-7070] transferred host and template mass update template inputs to main tab (jfreibergs)
 
 Bug fixes:
+.........T [ZBX-18474] fixed regexp in macros in Template Module Windows Services (abiba)
+........S. [ZBX-19651] fixed problem escalation when at least one of the hosts in a trigger expression is not in maintenance (dgoloscapov)
+...G.....T [ZBX-19897] updated postgresql templates and plugin files (vkhaliev)
+A......... [ZBX-20120] fixed import of several hosts assigned to different proxies (Sasha)
+........S. [ZBX-20238] fixed linking templates with trigger prototypes (wiper)
+........S. [ZBX-20178] fixed action webhook failure when return value is not required (dgoloscapov, wiper)
+........S. [ZBX-19806] added support of multiple header fields in JS method getHeaders() (dgoloscapov)
+...G...... [ZBX-20192] fixed quote expansion in command execution in agent2 on windows (dgoloscapov)
+........S. [ZBX-19924] fixed trigger expression and calculated items not allowing to specify timeshift that ends in future even if it starts in the past (vso)
+..F....... [ZBX-19973] fixed event list hintbox field validation (miks)
+..F....... [ZBX-20294] fixed typo in system information table (jfreibergs)
+..F....... [ZBX-20170] fixed trigger expression testing constructor for monoinc and monodec functions (miks)
 ..F....... [ZBX-20268] fixed disabled button issue when cloning a service (averza)
 
 --------------------------------------------------------------------------------
