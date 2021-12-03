@@ -403,11 +403,31 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					break;
 
 				case ZBX_PREPROC_VALIDATE_RANGE:
+					foreach ($step['params'] as &$param) {
+						$param = trim($param);
+					}
+					unset($param);
+
+					$step['params'] = implode("\n", $step['params']);
+					break;
+
 				case ZBX_PREPROC_PROMETHEUS_PATTERN:
 					foreach ($step['params'] as &$param) {
 						$param = trim($param);
 					}
 					unset($param);
+
+					if (in_array($step['params'][1], [
+						ZBX_PREPROC_PROMETHEUS_SUM, ZBX_PREPROC_PROMETHEUS_MIN, ZBX_PREPROC_PROMETHEUS_MAX,
+						ZBX_PREPROC_PROMETHEUS_AVG, ZBX_PREPROC_PROMETHEUS_COUNT
+					])) {
+						$step['params'][2] = $step['params'][1];
+						$step['params'][1] = ZBX_PREPROC_PROMETHEUS_FUNCTION;
+					}
+
+					if (!array_key_exists(2, $step['params'])) {
+						$step['params'][2] = '';
+					}
 
 					$step['params'] = implode("\n", $step['params']);
 					break;
