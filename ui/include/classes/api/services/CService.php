@@ -25,10 +25,11 @@
 class CService extends CApiService {
 
 	public const ACCESS_RULES = [
-		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
-		'create' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
-		'update' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
-		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
+		'get' =>		['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'getalarms' =>	['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'create' =>		['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'update' =>		['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'delete' =>		['min_user_type' => USER_TYPE_ZABBIX_USER]
 	];
 
 	protected $tableName = 'services';
@@ -97,7 +98,6 @@ class CService extends CApiService {
 			'selectProblemTags' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['tag', 'operator', 'value']), 'default' => null],
 			'selectProblemEvents' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['eventid', 'severity', 'name']), 'default' => null],
 			'selectStatusRules' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['type', 'limit_value', 'limit_status', 'new_status']), 'default' => null],
-			'selectAlarms' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['clock', 'value']), 'default' => null],
 			// sort and limit
 			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', ['serviceid', 'name', 'status', 'sortorder', 'created_at']), 'uniq' => true, 'default' => []],
 			'sortorder' =>				['type' => API_SORTORDER, 'default' => []],
@@ -623,7 +623,6 @@ class CService extends CApiService {
 		self::addRelatedProblemTags($options, $result);
 		self::addRelatedProblemEvents($options, $result);
 		self::addRelatedStatusRules($options, $result);
-		self::addRelatedAlarms($options, $result);
 
 		return $result;
 	}
@@ -1010,52 +1009,6 @@ class CService extends CApiService {
 		if ($options['selectStatusRules'] === API_OUTPUT_COUNT) {
 			foreach ($result as &$row) {
 				$row['status_rules'] = (string) count($row['status_rules']);
-			}
-			unset($row);
-		}
-	}
-
-	/**
-	 * @param array $options
-	 * @param array $result
-	 */
-	private static function addRelatedAlarms(array $options, array &$result): void {
-		if ($options['selectAlarms'] === null) {
-			return;
-		}
-
-		foreach ($result as &$row) {
-			$row['alarms'] = [];
-		}
-		unset($row);
-
-		if ($options['selectAlarms'] === API_OUTPUT_COUNT) {
-			$output = ['servicealarmid', 'serviceid'];
-		}
-		elseif ($options['selectAlarms'] === API_OUTPUT_EXTEND) {
-			$output = ['servicealarmid', 'serviceid', 'clock', 'value'];
-		}
-		else {
-			$output = array_unique(array_merge(['servicealarmid', 'serviceid'], $options['selectAlarms']));
-		}
-
-		$sql_options = [
-			'output' => $output,
-			'filter' => ['serviceid' => array_keys($result)]
-		];
-		$db_alarms = DBselect(DB::makeSql('service_alarms', $sql_options));
-
-		while ($db_alarm = DBfetch($db_alarms)) {
-			$serviceid = $db_alarm['serviceid'];
-
-			unset($db_alarm['servicealarmid'], $db_alarm['serviceid']);
-
-			$result[$serviceid]['alarms'][] = $db_alarm;
-		}
-
-		if ($options['selectAlarms'] === API_OUTPUT_COUNT) {
-			foreach ($result as &$row) {
-				$row['alarms'] = (string) count($row['alarms']);
 			}
 			unset($row);
 		}
@@ -2413,5 +2366,98 @@ class CService extends CApiService {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
 			}
 		}
+	}
+
+	/**
+	 * @param array $options
+	 *
+	 * @return array
+	 *
+	 * @throws APIException
+	 */
+	public function getAlarms(array $options = []): array {
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'serviceids' =>	['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'periods' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['from', 'to']], 'fields' => [
+				'from' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:'.ZBX_MAX_DATE],
+				'to' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:'.ZBX_MAX_DATE]
+			]]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$db_services = $this->get([
+			'output' => [],
+			'serviceids' => $options['serviceids'],
+			'preservekeys' => true
+		]);
+
+		$alarms = [
+			'serviceids' => array_keys($db_services),
+			'periods' => []
+		];
+
+		foreach ($options['periods'] as $period) {
+			$alarms['periods'][] = [
+				'from' => $period['from'],
+				'to' => $period['to'],
+				'services' => array_fill_keys(array_keys($db_services), [
+					'start_value' => ZBX_SEVERITY_OK,
+					'alarms' => []
+				])
+			];
+		}
+
+		if (!$db_services) {
+			return $alarms;
+		}
+
+		foreach ($alarms['periods'] as &$period) {
+			$db_alarms_start_resource = DBselect('SELECT sa.serviceid, sa.value'.
+				' FROM service_alarms sa'.
+				' JOIN ('.
+					'SELECT sa2.serviceid, MAX(sa2.clock) AS clock'.
+						' FROM service_alarms sa2'.
+						' WHERE '.dbConditionId('sa2.serviceid', array_keys($db_services)).
+							' AND sa2.clock<'.dbQuoteInt($period['from']).
+						' GROUP BY sa2.serviceid'.
+				') sa_max'.
+				' ON (sa.serviceid=sa_max.serviceid AND sa.clock=sa_max.clock)'
+			);
+
+			while ($db_alarm_start = DBfetch($db_alarms_start_resource)) {
+				$period['services'][$db_alarm_start['serviceid']]['start_value'] = $db_alarm_start['value'];
+			}
+		}
+		unset($period);
+
+		$where_or = [];
+
+		foreach ($options['periods'] as $period) {
+			$where_or[] = 'sa.clock BETWEEN '.dbQuoteInt($period['from']).' AND '.dbQuoteInt($period['to'] - 1);
+		}
+
+		$db_alarms_resource = DBselect('SELECT sa.serviceid, sa.clock, sa.value'.
+			' FROM service_alarms sa'.
+			' WHERE '.dbConditionId('sa.serviceid', array_keys($db_services)).
+				' AND ('.implode(' OR ', $where_or).')'.
+			' ORDER BY sa.clock'
+		);
+
+		while ($db_alarm = DBfetch($db_alarms_resource)) {
+			foreach ($alarms['periods'] as &$period) {
+				if ($db_alarm['clock'] >= $period['from'] && $db_alarm['clock'] < $period['to']) {
+					$period['services'][$db_alarm['serviceid']]['alarms'][] = [
+						'clock' => $db_alarm['clock'],
+						'value' => $db_alarm['value']
+					];
+				}
+			}
+			unset($period);
+		}
+
+		return $alarms;
 	}
 }
