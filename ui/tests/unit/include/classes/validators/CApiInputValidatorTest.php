@@ -860,12 +860,6 @@ class CApiInputValidatorTest extends TestCase {
 				'Invalid parameter "/1/int32_ranges": invalid range expression.'
 			],
 			[
-				['type' => API_INT32_RANGES],
-				'{$MACRO},30-40',
-				'/1/int32_ranges',
-				'Invalid parameter "/1/int32_ranges": invalid range expression.'
-			],
-			[
 				['type' => API_INT32_RANGES, 'in' => '0:50'],
 				'10-20,30-40',
 				'/1/int32_ranges',
@@ -876,6 +870,54 @@ class CApiInputValidatorTest extends TestCase {
 				'10-20,30-40',
 				'/1/int32_ranges',
 				'Invalid parameter "/1/int32_ranges": value must be one of 20-30.'
+			],
+			[
+				['type' => API_INT32_RANGES],
+				'{$MACRO}',
+				'/1/int32_ranges',
+				'Invalid parameter "/1/int32_ranges": invalid range expression.'
+			],
+			[
+				['type' => API_INT32_RANGES, 'flags' => API_ALLOW_USER_MACRO],
+				'{$MACRO}',
+				'/1/int32_ranges',
+				'{$MACRO}'
+			],
+			[
+				['type' => API_INT32_RANGES, 'flags' => API_ALLOW_USER_MACRO],
+				'{$MACRO1}-{$MACRO2}',
+				'/1/int32_ranges',
+				'{$MACRO1}-{$MACRO2}'
+			],
+			[
+				['type' => API_INT32_RANGES, 'flags' => API_ALLOW_USER_MACRO, 'in' => '20:30'],
+				'{$MACRO}-20,30-40',
+				'/1/int32_ranges',
+				'Invalid parameter "/1/int32_ranges": value must be one of 20-30.'
+			],
+			[
+				['type' => API_INT32_RANGES, 'flags' => API_ALLOW_USER_MACRO, 'in' => '20:40'],
+				'{$MACRO}-20,30-40',
+				'/1/int32_ranges',
+				'{$MACRO}-20,30-40'
+			],
+			[
+				['type' => API_INT32_RANGES],
+				'{#LLD}',
+				'/1/int32_ranges',
+				'Invalid parameter "/1/int32_ranges": invalid range expression.'
+			],
+			[
+				['type' => API_INT32_RANGES, 'flags' => API_ALLOW_LLD_MACRO],
+				'{#LLD}',
+				'/1/int32_ranges',
+				'{#LLD}'
+			],
+			[
+				['type' => API_INT32_RANGES, 'flags' => API_ALLOW_LLD_MACRO],
+				'{#LLD1}-{#LLD2}',
+				'/1/int32_ranges',
+				'{#LLD1}-{#LLD2}'
 			],
 			[
 				['type' => API_UINT64],

@@ -995,12 +995,12 @@ class CApiInputValidator {
 	/**
 	 * Validate integer ranges.
 	 * Example:
-	 *   0-100,200,300-400
+	 *   -100-0,0-100,200,300-{$MACRO},{$MACRO},{#LLD},400-500
 	 *
 	 * @static
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO
 	 * @param int    $rule['length']  (optional)
 	 * @param string $rule['in']      (optional) A comma-delimited character string, for example: '0,60:900'
 	 * @param mixed  $data
@@ -1012,7 +1012,7 @@ class CApiInputValidator {
 	private static function validateInt32Ranges(array $rule, &$data, string $path, string &$error): bool {
 		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
 
-		if (self::checkStringUtf8($flags, $data, $path, $error) === false) {
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
 			return false;
 		}
 
@@ -1025,7 +1025,11 @@ class CApiInputValidator {
 			return false;
 		}
 
-		$parser = new CRangesParser(['with_minus' => true]);
+		$parser = new CRangesParser([
+			'usermacros' => ($flags & API_ALLOW_USER_MACRO),
+			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO),
+			'with_minus' => true
+		]);
 
 		if ($parser->parse($data) != CParser::PARSE_SUCCESS) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid range expression'));
@@ -1034,6 +1038,10 @@ class CApiInputValidator {
 
 		foreach ($parser->getRanges() as $ranges) {
 			foreach ($ranges as $range) {
+				if (($flags & (API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO)) && $range[0] === '{') {
+					continue;
+				}
+
 				if (!self::checkInt32In($rule, $range, $path, $error)) {
 					return false;
 				}
