@@ -1358,6 +1358,10 @@ define('API_COND_FORMULAID',		50);
 define('API_UNEXPECTED',			51);
 define('API_INT32_RANGES',			52);
 define('API_LAT_LNG_ZOOM',			53);
+define('API_MULTIPLIER',			54);
+define('API_JSON',					55);
+define('API_XML',					56);
+define('API_PROMETHEUS_PATTERN',	57);
 
 // flags
 define('API_REQUIRED',					0x00001);

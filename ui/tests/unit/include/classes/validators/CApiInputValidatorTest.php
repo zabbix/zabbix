@@ -4419,6 +4419,162 @@ class CApiInputValidatorTest extends TestCase {
 				''
 			],
 			[
+				['type' => API_JSON],
+				null,
+				'/1/json',
+				'Invalid parameter "/1/json": a character string is expected.'
+			],
+			[
+				['type' => API_JSON],
+				true,
+				'/1/json',
+				'Invalid parameter "/1/json": a character string is expected.'
+			],
+			[
+				['type' => API_JSON],
+				[],
+				'/1/json',
+				'Invalid parameter "/1/json": a character string is expected.'
+			],
+			[
+				['type' => API_JSON],
+				123,
+				'/1/json',
+				'Invalid parameter "/1/json": a character string is expected.'
+			],
+			[
+				['type' => API_JSON],
+				'123',
+				'/1/json',
+				'123'
+			],
+			[
+				['type' => API_JSON],
+				'',
+				'/1/json',
+				''
+			],
+			[
+				['type' => API_JSON, 'flags' => API_NOT_EMPTY],
+				'',
+				'/1/json',
+				'Invalid parameter "/1/json": cannot be empty.'
+			],
+			[
+				['type' => API_JSON],
+				'{}',
+				'/1/json',
+				'{}'
+			],
+			[
+				['type' => API_JSON],
+				'{"key": "value"}',
+				'/1/json',
+				'{"key": "value"}'
+			],
+			[
+				['type' => API_JSON, 'length' => 15],
+				'{"key": "value"}',
+				'/1/json',
+				'Invalid parameter "/1/json": value is too long.'
+			],
+			[
+				['type' => API_JSON],
+				'abc',
+				'/1/json',
+				'Invalid parameter "/1/json": JSON is expected.'
+			],
+			[
+				['type' => API_JSON],
+				'{"key": value}',
+				'/1/json',
+				'Invalid parameter "/1/json": JSON is expected.'
+			],
+			[
+				['type' => API_JSON],
+				'{"key": 123}',
+				'/1/json',
+				'{"key": 123}'
+			],
+			[
+				['type' => API_JSON],
+				'{$MACRO}',
+				'/1/json',
+				'Invalid parameter "/1/json": JSON is expected.'
+			],
+			[
+				['type' => API_JSON, 'flags' => API_ALLOW_USER_MACRO],
+				'{$MACRO}',
+				'/1/json',
+				'{$MACRO}'
+			],
+			[
+				['type' => API_JSON],
+				'{"key": {$MACRO}}',
+				'/1/json',
+				'Invalid parameter "/1/json": JSON is expected.'
+			],
+			[
+				['type' => API_JSON, 'flags' => API_ALLOW_USER_MACRO],
+				'{"key": {$MACRO}}',
+				'/1/json',
+				'{"key": {$MACRO}}'
+			],
+			[
+				['type' => API_JSON],
+				'{#LLD}',
+				'/1/json',
+				'Invalid parameter "/1/json": JSON is expected.'
+			],
+			[
+				['type' => API_JSON, 'flags' => API_ALLOW_LLD_MACRO],
+				'{#LLD}',
+				'/1/json',
+				'{#LLD}'
+			],
+			[
+				['type' => API_JSON],
+				'{"key": {#LLD}}',
+				'/1/json',
+				'Invalid parameter "/1/json": JSON is expected.'
+			],
+			[
+				['type' => API_JSON, 'flags' => API_ALLOW_LLD_MACRO],
+				'{"key": {#LLD}}',
+				'/1/json',
+				'{"key": {#LLD}}'
+			],
+			[
+				['type' => API_JSON],
+				'{HOST.IP}',
+				'/1/json',
+				'Invalid parameter "/1/json": JSON is expected.'
+			],
+			[
+				['type' => API_JSON, 'macros_n' => ['{HOST.IP}']],
+				'{HOST.IP}',
+				'/1/json',
+				'{HOST.IP}'
+			],
+			[
+				['type' => API_JSON, 'macros_n' => ['{HOST.IP}']],
+				'{HOST.IP2}',
+				'/1/json',
+				'{HOST.IP2}'
+			],
+			[
+				['type' => API_JSON],
+				'{"key": {HOST.IP}}',
+				'/1/json',
+				'Invalid parameter "/1/json": JSON is expected.'
+			],
+			[
+				['type' => API_JSON, 'macros_n' => ['{HOST.IP}']],
+				'{"key1": {HOST.IP1}, "key2": {HOST.IP2}}',
+				'/1/json',
+				'{"key1": {HOST.IP1}, "key2": {HOST.IP2}}',
+			],
+			[
 				['type' => API_JSONRPC_PARAMS],
 				[],
 				'/params',
@@ -5011,6 +5167,222 @@ class CApiInputValidatorTest extends TestCase {
 				'abc'."\n",
 				'/1/exec_params',
 				'abc'."\n"
+			],
+			[
+				['type' => API_MULTIPLIER],
+				null,
+				'/1/multiplier',
+				'Invalid parameter "/1/multiplier": a character string is expected.'
+			],
+			[
+				['type' => API_MULTIPLIER],
+				0,
+				'/1/multiplier',
+				'0'
+			],
+			[
+				['type' => API_MULTIPLIER],
+				0.5,
+				'/1/multiplier',
+				'0.5'
+			],
+			[
+				['type' => API_MULTIPLIER],
+				-0.5,
+				'/1/multiplier',
+				'-0.5'
+			],
+			[
+				['type' => API_MULTIPLIER],
+				12345,
+				'/1/multiplier',
+				'12345'
+			],
+			[
+				['type' => API_MULTIPLIER],
+				'12345',
+				'/1/multiplier',
+				'12345'
+			],
+			[
+				['type' => API_MULTIPLIER],
+				'',
+				'/1/multiplier',
+				'Invalid parameter "/1/multiplier": cannot be empty.'
+			],
+			[
+				['type' => API_MULTIPLIER],
+				'abc',
+				'/1/multiplier',
+				'Invalid parameter "/1/multiplier": a numeric value is expected.'
+			],
+			[
+				['type' => API_MULTIPLIER],
+				'1+1',
+				'/1/multiplier',
+				'Invalid parameter "/1/multiplier": a numeric value is expected.'
+			],
+			[
+				['type' => API_MULTIPLIER],
+				'1*1',
+				'/1/multiplier',
+				'Invalid parameter "/1/multiplier": a numeric value is expected.'
+			],
+			[
+				['type' => API_MULTIPLIER],
+				'1.23E+',
+				'/1/multiplier',
+				'Invalid parameter "/1/multiplier": a numeric value is expected.'
+			],
+			[
+				['type' => API_MULTIPLIER],
+				'1.23E+10',
+				'/1/multiplier',
+				'1.23E+10'
+			],
+			[
+				['type' => API_MULTIPLIER],
+				'{$MACRO}',
+				'/1/multiplier',
+				'Invalid parameter "/1/multiplier": a numeric value is expected.'
+			],
+			[
+				['type' => API_MULTIPLIER, 'flags' => API_ALLOW_USER_MACRO],
+				'{$MACRO}',
+				'/1/multiplier',
+				'{$MACRO}'
+			],
+			[
+				['type' => API_MULTIPLIER],
+				'1.23E+{$MACRO}',
+				'/1/multiplier',
+				'Invalid parameter "/1/multiplier": a numeric value is expected.'
+			],
+			[
+				['type' => API_MULTIPLIER, 'flags' => API_ALLOW_USER_MACRO],
+				'1.23E+{$MACRO}',
+				'/1/multiplier',
+				'1.23E+{$MACRO}'
+			],
+			[
+				['type' => API_MULTIPLIER, 'flags' => API_ALLOW_USER_MACRO],
+				'{$MACRO1}e+{$MACRO2}',
+				'/1/multiplier',
+				'{$MACRO1}e+{$MACRO2}'
+			],
+			[
+				['type' => API_MULTIPLIER, 'flags' => API_ALLOW_USER_MACRO],
+				'{$MACRO}f',
+				'/1/multiplier',
+				'Invalid parameter "/1/multiplier": a numeric value is expected.'
+			],
+			[
+				['type' => API_MULTIPLIER],
+				'{#LLD}',
+				'/1/multiplier',
+				'Invalid parameter "/1/multiplier": a numeric value is expected.'
+			],
+			[
+				['type' => API_MULTIPLIER, 'flags' => API_ALLOW_LLD_MACRO],
+				'{#LLD}',
+				'/1/multiplier',
+				'{#LLD}'
+			],
+			[
+				['type' => API_MULTIPLIER],
+				'1.23E+{#LLD}',
+				'/1/multiplier',
+				'Invalid parameter "/1/multiplier": a numeric value is expected.'
+			],
+			[
+				['type' => API_MULTIPLIER, 'flags' => API_ALLOW_LLD_MACRO],
+				'1.23E+{#LLD}',
+				'/1/multiplier',
+				'1.23E+{#LLD}'
+			],
+			[
+				['type' => API_XML],
+				null,
+				'/1/xml',
+				'Invalid parameter "/1/xml": a character string is expected.'
+			],
+			[
+				['type' => API_XML],
+				123,
+				'/1/xml',
+				'Invalid parameter "/1/xml": a character string is expected.'
+			],
+			[
+				['type' => API_XML],
+				'',
+				'/1/xml',
+				''
+			],
+			[
+				['type' => API_XML, 'flags' => API_NOT_EMPTY],
+				'',
+				'/1/xml',
+				'Invalid parameter "/1/xml": cannot be empty.'
+			],
+			[
+				['type' => API_XML],
+				'<?xml version="1.0" encoding="UTF-8"?>',
+				'/1/xml',
+				'Invalid parameter "/1/xml": (4) Start tag expected, \'<\' not found [Line: 1 | Column: 39].'
+			],
+			[
+				['type' => API_XML],
+				'<?xml version="1.0" encoding="UTF-8"?><node>value</node>',
+				'/1/xml',
+				'<?xml version="1.0" encoding="UTF-8"?><node>value</node>'
+			],
+			[
+				['type' => API_XML, 'length' => 10],
+				'<?xml version="1.0" encoding="UTF-8"?><node>value</node>',
+				'/1/xml',
+				'Invalid parameter "/1/xml": value is too long.'
+			],
+			[
+				['type' => API_PROMETHEUS_PATTERN],
+				null,
+				'/1/prometheus_pattern',
+				'Invalid parameter "/1/prometheus_pattern": a character string is expected.'
+			],
+			[
+				['type' => API_PROMETHEUS_PATTERN],
+				123,
+				'/1/prometheus_pattern',
+				'Invalid parameter "/1/prometheus_pattern": a character string is expected.'
+			],
+			[
+				['type' => API_PROMETHEUS_PATTERN],
+				'',
+				'/1/prometheus_pattern',
+				'Invalid parameter "/1/prometheus_pattern": cannot be empty.'
+			],
+			[
+				['type' => API_PROMETHEUS_PATTERN],
+				'cpu_usage_system{cpu="cpu-total"}',
+				'/1/prometheus_pattern',
+				'cpu_usage_system{cpu="cpu-total"}'
+			],
+			[
+				['type' => API_PROMETHEUS_PATTERN],
+				'{$MACRO}',
+				'/1/prometheus_pattern',
+				'{$MACRO}'
+			],
+			[
+				['type' => API_PROMETHEUS_PATTERN],
+				'{#LLD}',
+				'/1/prometheus_pattern',
+				'Invalid parameter "/1/prometheus_pattern": invalid Prometheus pattern.'
+			],
+			[
+				['type' => API_PROMETHEUS_PATTERN, 'flags' => API_ALLOW_LLD_MACRO],
+				'{#LLD}',
+				'/1/prometheus_pattern',
+				'{#LLD}'
 			]
 		];
 	}

@@ -192,6 +192,9 @@ class CApiInputValidator {
 			case API_EVENT_NAME:
 				return self::validateEventName($rule, $data, $path, $error);
 
+			case API_JSON:
+				return self::validateJson($rule, $data, $path, $error);
+
 			case API_JSONRPC_PARAMS:
 				return self::validateJsonRpcParams($rule, $data, $path, $error);
 
@@ -224,6 +227,15 @@ class CApiInputValidator {
 
 			case API_LAT_LNG_ZOOM:
 				return self::validateLatLngZoom($rule, $data, $path, $error);
+
+			case API_MULTIPLIER:
+				return self::validateMultiplier($rule, $data, $path, $error);
+
+			case API_XML:
+				return self::validateXml($rule, $data, $path, $error);
+
+			case API_PROMETHEUS_PATTERN:
+				return self::validatePrometheusPattern($rule, $data, $path, $error);
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
@@ -280,6 +292,7 @@ class CApiInputValidator {
 			case API_PORT:
 			case API_TRIGGER_EXPRESSION:
 			case API_EVENT_NAME:
+			case API_JSON:
 			case API_JSONRPC_PARAMS:
 			case API_JSONRPC_ID:
 			case API_DATE:
@@ -291,6 +304,9 @@ class CApiInputValidator {
 			case API_EXEC_PARAMS:
 			case API_UNEXPECTED:
 			case API_LAT_LNG_ZOOM:
+			case API_MULTIPLIER:
+			case API_XML:
+			case API_PROMETHEUS_PATTERN:
 				return true;
 
 			case API_OBJECT:
@@ -2465,6 +2481,70 @@ class CApiInputValidator {
 	}
 
 	/**
+	 * JSON validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']     (optional) API_NOT_EMPTY, API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO
+	 * @param array  $rule['macros_n']  (optional) An array of supported macros. Example: ['{HOST.IP}', '{ITEM.KEY}'].
+	 * @param int    $rule['length']    (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateJson($rule, &$data, $path, &$error) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if ($data === '') {
+			return true;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		$json = $data;
+		$types = [];
+
+		if ($flags & API_ALLOW_USER_MACRO) {
+			$types['usermacros'] = true;
+		}
+
+		if ($flags & API_ALLOW_LLD_MACRO) {
+			$types['lldmacros'] = true;
+		}
+
+		if (array_key_exists('macros_n', $rule)) {
+			$types['macros_n'] = $rule['macros_n'];
+		}
+
+		if ($types) {
+			$matches = (new CMacrosResolverGeneral)->getMacroPositions($json, $types);
+			$shift = 0;
+
+			foreach ($matches as $pos => $substr) {
+				$json = substr_replace($json, '1', $pos + $shift, strlen($substr));
+				$shift = $shift + 1 - strlen($substr);
+			}
+		}
+
+		json_decode($json);
+
+		if (json_last_error()) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('JSON is expected'));
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * JSON RPC parameters validator. Parameters MUST contain an array or object value.
 	 *
 	 * @param array  $rule
@@ -2825,6 +2905,147 @@ class CApiInputValidator {
 			$error = _s('Invalid zoomparameter "%1$s": %2$s.', $path,
 				_s('zoom level must be between "%1$s" and "%2$s"', 0, $max_zoom)
 			);
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Custom multiplier validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO
+	 * @param int    $rule['length']  (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateMultiplier(array $rule, &$data, string $path, string &$error): bool {
+		if (is_numeric($data)) {
+			$data = (string) $data;
+		}
+
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		$types = [];
+
+		if ($flags & API_ALLOW_USER_MACRO) {
+			$types['usermacros'] = true;
+		}
+
+		if ($flags & API_ALLOW_LLD_MACRO) {
+			$types['lldmacros'] = true;
+		}
+
+		$multiplier = $data;
+		$matches = (new CMacrosResolverGeneral)->getMacroPositions($data, $types);
+		$shift = 0;
+
+		foreach ($matches as $pos => $substr) {
+			$multiplier = substr_replace($multiplier, '1', $pos + $shift, strlen($substr));
+			$shift = $shift + 1 - strlen($substr);
+		}
+
+		$number_parser = new CNumberParser();
+
+		if ($number_parser->parse($multiplier) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a numeric value is expected'));
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * XML validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY
+	 * @param int    $rule['length']  (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateXml(array $rule, &$data, string $path, string &$error): bool {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if ($data === '') {
+			return true;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		libxml_use_internal_errors(true);
+
+		if (simplexml_load_string($data, null, LIBXML_IMPORT_FLAGS) === false) {
+			$errors = libxml_get_errors();
+			libxml_clear_errors();
+
+			if ($errors) {
+				$error = reset($errors);
+				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _s('%1$s [Line: %2$s | Column: %3$s]',
+					'('.$error->code.') '.trim($error->message), $error->line, $error->column
+				));
+				return false;
+			}
+
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('XML is expected'));
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_ALLOW_LLD_MACRO
+	 * @param int    $rule['length']  (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validatePrometheusPattern(array $rule, &$data, string $path, string &$error): bool {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		$prometheus_pattern_parser = new CPrometheusPatternParser([
+			'usermacros' => true,
+			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO)
+		]);
+
+		if ($prometheus_pattern_parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid Prometheus pattern'));
 			return false;
 		}
 
