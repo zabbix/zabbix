@@ -195,7 +195,7 @@ class testDashboardGraphWidget extends CWebTest {
 			// Base color field validation.
 // TODO: fix hex field
 /*			[
-*			[
+*				[
 *					'Data set' => [
 *						[
 *							'Base color' => ''
@@ -358,20 +358,20 @@ class testDashboardGraphWidget extends CWebTest {
 					'error' => 'Invalid parameter "Data set/2/items": cannot be empty.'
 				]
 			],
-			[
-				[
-					'Data set' => [
-						[],
-						[
-							'host' => 'Zabbix*',
-							'item' => 'Agent ping'
 // TODO: fix hex field
+//			[
+//				[
+//					'Data set' => [
+//						[],
+//						[
+//							'host' => 'Zabbix*',
+//							'item' => 'Agent ping'
 //							'Base color' => '00000'
-						]
-					],
-					'error' => 'Invalid parameter "Data set/2/color": a hexadecimal color code (6 symbols) is expected.'
-				]
-			],
+//						]
+//					],
+//					'error' => 'Invalid parameter "Data set/2/color": a hexadecimal color code (6 symbols) is expected.'
+//				]
+//			],
 			[
 				[
 					'Data set' => [
@@ -916,19 +916,19 @@ class testDashboardGraphWidget extends CWebTest {
 	public static function getOverridesValidationData() {
 		return [
 			// Base color field validation.
+			[
+				[
+					'Overrides' => [
+						[
+							'options' => [
+								'Base color'
+							]
+						]
+					],
+					'error' => 'Invalid parameter "Overrides/1/color": cannot be empty.'
+				]
+			],
 // TODO: fix hex field
-//			[
-//				[
-//					'Overrides' => [
-//						[
-//							'options' => [
-//								'Base color'
-//							]
-//						]
-//					],
-//					'error' => 'Invalid parameter "Overrides/1/color": cannot be empty.'
-//				]
-//			],
 //			[
 //				[
 //					'Overrides' => [
@@ -1090,26 +1090,26 @@ class testDashboardGraphWidget extends CWebTest {
 					'error' => 'Invalid parameter "Overrides/2": at least one override option must be specified.'
 				]
 			],
-			[
-				[
-					'Overrides' => [
-						[
-							'options' => [
-								['Width', '5']
-							]
-						],
-						[
-							'host' => 'Two host',
-							'item' => 'Two item'
 // TODO: fix hex field
+//			[
+//				[
+//					'Overrides' => [
+//						[
+//							'options' => [
+//								['Width', '5']
+//							]
+//						],
+//						[
+//							'host' => 'Two host',
+//							'item' => 'Two item',
 //							'options' => [
 //								'Base color'
 //							]
-						]
-					],
-					'error' => 'Invalid parameter "Overrides/2/color": cannot be empty.'
-				]
-			],
+//						]
+//					],
+//					'error' => 'Invalid parameter "Overrides/2/color": cannot be empty.'
+//				]
+//			],
 			[
 				[
 					'Overrides' => [
