@@ -277,10 +277,9 @@ class CControllerPopupMassupdateItem extends CController {
 							}
 							unset($param);
 
-							if (in_array($step['params'][1], [
-								ZBX_PREPROC_PROMETHEUS_SUM, ZBX_PREPROC_PROMETHEUS_MIN, ZBX_PREPROC_PROMETHEUS_MAX,
-								ZBX_PREPROC_PROMETHEUS_AVG, ZBX_PREPROC_PROMETHEUS_COUNT
-							])) {
+							if (in_array($step['params'][1], [ZBX_PREPROC_PROMETHEUS_SUM, ZBX_PREPROC_PROMETHEUS_MIN,
+									ZBX_PREPROC_PROMETHEUS_MAX, ZBX_PREPROC_PROMETHEUS_AVG,
+									ZBX_PREPROC_PROMETHEUS_COUNT])) {
 								$step['params'][2] = $step['params'][1];
 								$step['params'][1] = ZBX_PREPROC_PROMETHEUS_FUNCTION;
 							}
@@ -298,7 +297,6 @@ class CControllerPopupMassupdateItem extends CController {
 							$step['params'] = implode("\n", $step['params']);
 							break;
 
-						// ZBX-16642
 						case ZBX_PREPROC_CSV_TO_JSON:
 							if (!array_key_exists(2, $step['params'])) {
 								$step['params'][2] = ZBX_PREPROC_CSV_NO_HEADER;
