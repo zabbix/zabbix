@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-10-21T07:42:33Z'
+  date: '2021-12-03T15:13:21Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -551,7 +551,7 @@ zabbix_export:
           description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level.'
         -
           macro: '{$VFS.FS.FSNAME.NOT_MATCHES}'
-          value: ^(?:/dev|/sys|/run|/proc|.+/shm$)
+          value: '^(?:/dev|/sys|/run|/proc|.+/shm$)'
           description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level.'
         -
           macro: '{$VFS.FS.FSTYPE.MATCHES}'
@@ -623,7 +623,7 @@ zabbix_export:
           triggers:
             -
               uuid: 2f5aa644755c4d18a3eafc74bde2d3ad
-              expression: '(last(/Windows generic by Zabbix agent active/system.hostname,#1)<>last(/Windows generic by Zabbix agent active/system.hostname,#2))=1 and length(last(/Windows generic by Zabbix agent active/system.hostname))>0'
+              expression: 'last(/Windows generic by Zabbix agent active/system.hostname,#1)<>last(/Windows generic by Zabbix agent active/system.hostname,#2) and length(last(/Windows generic by Zabbix agent active/system.hostname))>0'
               name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'System name has changed. Ack to close.'
@@ -1380,7 +1380,7 @@ zabbix_export:
       dashboards:
         -
           uuid: 1f4737b4a5364b35a8358dccedf6a492
-          name: 'Netowrk interfaces'
+          name: 'Network interfaces'
           pages:
             -
               widgets:
@@ -1539,7 +1539,7 @@ zabbix_export:
                 -
                   type: JAVASCRIPT
                   parameters:
-                    - 'return (100 - value)'
+                    - 'return 100 - value'
               tags:
                 -
                   tag: Application
@@ -1830,7 +1830,7 @@ zabbix_export:
           description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'
         -
           macro: '{$SERVICE.STARTUPNAME.NOT_MATCHES}'
-          value: ^(?:manual|disabled)$
+          value: '^(?:manual|disabled)$'
           description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'
       valuemaps:
         -
