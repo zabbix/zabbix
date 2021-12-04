@@ -347,7 +347,7 @@ static void	worker_preprocess_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 	zbx_variant_clear(&value);
 	zbx_free(error);
 	zbx_free(ts);
-	zbx_free(steps);
+	zbx_preprocessor_free_steps(steps, steps_num);
 
 	if (FAIL == zbx_ipc_socket_write(socket, ZBX_IPC_PREPROCESSOR_RESULT, data, size))
 	{
@@ -417,7 +417,7 @@ static void	worker_test_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t *messa
 
 	zbx_variant_clear(&value);
 	zbx_free(error);
-	zbx_free(steps);
+	zbx_preprocessor_free_steps(steps, steps_num);
 	zbx_free(data);
 
 	zbx_variant_clear(&value_start);

@@ -132,6 +132,7 @@ zbx_uint32_t	zbx_preprocessor_pack_result(unsigned char **data, zbx_variant_t *v
 
 ZBX_PTR_VECTOR_DECL(ipcmsg, zbx_ipc_message_t *)
 
+void	zbx_preprocessor_free_steps(zbx_preproc_op_t *steps, int steps_num);
 void	zbx_preprocessor_free_deps(zbx_preproc_dep_t *deps, int deps_num);
 void	zbx_preprocessor_pack_dep_request(const zbx_variant_t *value, const zbx_timespec_t *ts,
 		const zbx_preproc_dep_t *deps, int deps_num, zbx_vector_ipcmsg_t *messages);

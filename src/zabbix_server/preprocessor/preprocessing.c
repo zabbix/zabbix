@@ -428,9 +428,9 @@ static int	preprocessor_unpack_step(const unsigned char *data, zbx_preproc_op_t 
 	zbx_uint32_t		value_len;
 
 	offset += zbx_deserialize_char(offset, &step->type);
-	offset += zbx_deserialize_str_ptr(offset, step->params, value_len);
+	offset += zbx_deserialize_str(offset, &step->params, value_len);
 	offset += zbx_deserialize_char(offset, &step->error_handler);
-	offset += zbx_deserialize_str_ptr(offset, step->error_handler_params, value_len);
+	offset += zbx_deserialize_str(offset, &step->error_handler_params, value_len);
 
 	return offset - data;
 }
@@ -1113,6 +1113,26 @@ void	zbx_preprocessor_unpack_task(zbx_uint64_t *itemid, unsigned char *value_typ
 	(void)preprocessor_unpack_steps(offset, steps, steps_num);
 }
 
+
+/******************************************************************************
+ *                                                                            *
+ * Function: free_steps                                                       *
+ *                                                                            *
+ * Purpose: free preprocessing steps                                          *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_preprocessor_free_steps(zbx_preproc_op_t *steps, int steps_num)
+{
+	while (0 < steps_num)
+	{
+		steps_num--;
+		zbx_free(steps[steps_num].params);
+		zbx_free(steps[steps_num].error_handler_params);
+	}
+
+	zbx_free(steps);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_preprocessor_free_deps                                       *
@@ -1129,7 +1149,7 @@ void	zbx_preprocessor_free_deps(zbx_preproc_dep_t *deps, int deps_num)
 
 	for (i = 0; i < deps_num; i++)
 	{
-		zbx_free(deps[i].steps);
+		zbx_preprocessor_free_steps(deps[i].steps, deps[i].steps_num);
 		zbx_vector_ptr_clear_ext(&deps[i].history, (zbx_clean_func_t)zbx_preproc_op_history_free);
 		zbx_vector_ptr_destroy(&deps[i].history);
 	}
