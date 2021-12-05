@@ -100,8 +100,8 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
 	char		*err_msg_buff = NULL;
 #endif
 
-#ifdef PCRE_NO_AUTO_CAPTURE
-	/* If PCRE_NO_AUTO_CAPTURE bit is set in 'flags' but regular expression contains references to numbered */
+#ifdef ZBX_REGEXP_NO_AUTO_CAPTURE
+	/* If ZBX_REGEXP_NO_AUTO_CAPTURE bit is set in 'flags' but regular expression contains references to numbered */
 	/* capturing groups then reset PCRE_NO_AUTO_CAPTURE bit. Otherwise the regular expression might not compile. */
 
 	if (0 != (flags & ZBX_REGEXP_NO_AUTO_CAPTURE))
@@ -145,7 +145,7 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
 		pcre_free(pcre_regexp);
 #endif
 #ifdef USE_PCRE2
-	if (NULL == (pcre2_regexp = pcre2_compile(pattern, PCRE2_ZERO_TERMINATED, PCRE2_UTF, &error, &error_offset, NULL)))
+	if (NULL == (pcre2_regexp = pcre2_compile(pattern, PCRE2_ZERO_TERMINATED, PCRE2_UTF | flags, &error, &error_offset, NULL)))
 	{
 		err_msg_buff = zbx_malloc(NULL, ZBX_REGEXP_ERR_MSG_SIZE);
 		pcre2_get_error_message(error, err_msg_buff, ZBX_REGEXP_ERR_MSG_SIZE);
@@ -374,7 +374,7 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 	}
 
 	return result;
-#endif /* USE_PCRE2 */
+#endif
 }
 
 /******************************************************************************
