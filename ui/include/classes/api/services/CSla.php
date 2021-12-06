@@ -25,10 +25,11 @@
 class CSla extends CApiService {
 
 	public const ACCESS_RULES = [
-		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
-		'create' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN, 'action' => CRoleHelper::ACTIONS_MANAGE_SLA],
-		'update' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN, 'action' => CRoleHelper::ACTIONS_MANAGE_SLA],
-		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN, 'action' => CRoleHelper::ACTIONS_MANAGE_SLA]
+		'get' =>	['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'getsli' =>	['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'create' =>	['min_user_type' => USER_TYPE_ZABBIX_ADMIN, 'action' => CRoleHelper::ACTIONS_MANAGE_SLA],
+		'update' =>	['min_user_type' => USER_TYPE_ZABBIX_ADMIN, 'action' => CRoleHelper::ACTIONS_MANAGE_SLA],
+		'delete' =>	['min_user_type' => USER_TYPE_ZABBIX_ADMIN, 'action' => CRoleHelper::ACTIONS_MANAGE_SLA]
 	];
 
 	protected $tableName = 'sla';
@@ -68,7 +69,7 @@ class CSla extends CApiService {
 			'excludeSearch' =>				['type' => API_FLAG, 'default' => false],
 			'searchWildcardsEnabled' =>		['type' => API_BOOLEAN, 'default' => false],
 			// output
-			'output' =>						['type' => API_OUTPUT, 'in' => implode(',', ['slaid', 'name', 'period', 'slo', 'timezone', 'status', 'description']), 'default' => API_OUTPUT_EXTEND],
+			'output' =>						['type' => API_OUTPUT, 'in' => implode(',', ['slaid', 'name', 'period', 'slo', 'effective_date', 'timezone', 'status', 'description']), 'default' => API_OUTPUT_EXTEND],
 			'countOutput' =>				['type' => API_FLAG, 'default' => false],
 			'selectServiceTags' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['tag', 'operator', 'value']), 'default' => null],
 			'selectSchedule' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['period_from', 'period_to']), 'default' => null],
@@ -166,6 +167,7 @@ class CSla extends CApiService {
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('sla', 'name')],
 			'period' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_SLA_PERIOD_DAILY, ZBX_SLA_PERIOD_WEEKLY, ZBX_SLA_PERIOD_MONTHLY, ZBX_SLA_PERIOD_QUARTERLY, ZBX_SLA_PERIOD_ANNUALLY])],
 			'slo' =>				['type' => API_FLOAT, 'flags' => API_REQUIRED, 'in' => '0:100'],
+			'effective_date' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:'.ZBX_MAX_DATE],
 			'timezone' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', array_keys(CDateTimeZoneHelper::getAllDateTimeZones())), 'length' => DB::getFieldLength('sla', 'timezone')],
 			'status' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_SLA_STATUS_DISABLED, ZBX_SLA_STATUS_ENABLED])],
 			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sla', 'description')],
@@ -243,6 +245,7 @@ class CSla extends CApiService {
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('sla', 'name')],
 			'period' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_SLA_PERIOD_DAILY, ZBX_SLA_PERIOD_WEEKLY, ZBX_SLA_PERIOD_MONTHLY, ZBX_SLA_PERIOD_QUARTERLY, ZBX_SLA_PERIOD_ANNUALLY])],
 			'slo' =>				['type' => API_FLOAT, 'in' => '0:100'],
+			'effective_date' =>		['type' => API_INT32, 'in' => '0:'.ZBX_MAX_DATE],
 			'timezone' =>			['type' => API_STRING_UTF8, 'in' => implode(',', array_keys(CDateTimeZoneHelper::getAllDateTimeZones())), 'length' => DB::getFieldLength('sla', 'timezone')],
 			'status' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_SLA_STATUS_DISABLED, ZBX_SLA_STATUS_ENABLED])],
 			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sla', 'description')],
@@ -349,7 +352,7 @@ class CSla extends CApiService {
 	/**
 	 * @param array $options
 	 * @param array $result
-
+	 *
 	 * @return array
 	 */
 	protected function addRelatedObjects(array $options, array $result): array {
@@ -1041,5 +1044,380 @@ class CSla extends CApiService {
 		}
 
 		return $accessible_slaids;
+	}
+
+	/**
+	 * @param array $options
+	 *
+	 * @return array
+	 *
+	 * @throws Exception
+	 * @throws APIException
+	 */
+	public function getSli(array $options = []): array {
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'slaid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
+			'date_from' =>	['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '0:'.ZBX_MAX_DATE, 'default' => null],
+			'date_to' =>	['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '0:'.ZBX_MAX_DATE, 'default' => null],
+			'periods' =>	['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_SLA_MAX_REPORTING_PERIODS, 'default' => null],
+			'serviceids' =>	['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$db_sla = $this->get([
+			'output' => ['period', 'slo', 'timezone', 'effective_date'],
+			'selectSchedule' => ['period_from', 'period_to'],
+			'selectExcludedDowntimes' => ['name', 'period_from', 'period_to'],
+			'slaids' => $options['slaid']
+		]);
+
+		if (!$db_sla) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		$db_sla = $db_sla[0];
+
+		$reporting_periods = self::getReportingPeriods($db_sla, $options);
+
+		$db_services = API::Service()->get([
+			'output' => ['created_at'],
+			'selectStatusTimeline' => $reporting_periods,
+			'slaids' => $options['slaid'],
+			'serviceids' => $options['serviceids'],
+			'preservekeys' => true
+		]);
+
+		return [
+			'periods' => $reporting_periods,
+			'serviceids' => array_keys($db_services),
+			'data' => self::calculateSli($db_sla, $reporting_periods, array_values($db_services))
+		];
+	}
+
+	/**
+	 * @param array $db_sla
+	 * @param array $reporting_periods
+	 * @param array $db_services
+	 *
+	 * @return array
+	 *
+	 * @throws Exception
+	 */
+	private static function calculateSli(array $db_sla, array $reporting_periods, array $db_services): array {
+		if (!$reporting_periods || !$db_services) {
+			return [];
+		}
+
+		$data = [];
+
+		$combined_excluded_downtimes = self::combineExcludedDowntimes($db_sla['excluded_downtimes']);
+
+		foreach ($reporting_periods as $reporting_period_index => $reporting_period) {
+			$uptime_periods = self::getUptimePeriods($reporting_period, $db_sla);
+
+			$scheduled_uptime = 0;
+			foreach ($uptime_periods as $uptime_period) {
+				$scheduled_uptime += $uptime_period['date_to'] - $uptime_period['date_from'];
+			}
+
+			foreach ($db_services as $service_index => $db_service) {
+				$cell = [
+					'uptime' => 0,
+					'downtime' => 0,
+					'sli' => -1.0,
+					'error_budget' => 0,
+					'excluded_downtimes' => []
+				];
+
+				if ($reporting_period['date_to'] <= $db_service['created_at'] || $scheduled_uptime == 0) {
+					$data[$reporting_period_index][$service_index] = $cell;
+
+					continue;
+				}
+
+				$prev_clock = max($reporting_period['date_from'], $db_service['created_at']);
+				$prev_value = $db_service['status_timeline'][$reporting_period_index]['start_value'];
+
+				$alarms = $db_service['status_timeline'][$reporting_period_index]['alarms'];
+
+				if (!$alarms || $alarms[count($alarms) - 1]['clock'] <= time()) {
+					$alarms[] = ['clock' => time() + 1, 'value' => null];
+				}
+
+				foreach ($alarms as $alarm) {
+					foreach ($uptime_periods as $uptime_period) {
+						$uptime_period_from = max($uptime_period['date_from'], $prev_clock);
+						$uptime_period_to = min($uptime_period['date_to'], $alarm['clock']);
+						$uptime = $uptime_period_to - $uptime_period_from;
+
+						if ($uptime > 0) {
+							foreach ($combined_excluded_downtimes as $combined_excluded_downtime) {
+								$downtime = min($combined_excluded_downtime['period_to'], $uptime_period_to)
+									- max($combined_excluded_downtime['period_from'], $uptime_period_from);
+
+								if ($downtime > 0) {
+									$uptime -= $downtime;
+								}
+							}
+
+							if ($prev_value == ZBX_SEVERITY_OK) {
+								$cell['uptime'] += $uptime;
+							}
+							else {
+								$cell['downtime'] += $uptime;
+							}
+
+							foreach ($db_sla['excluded_downtimes'] as $excluded_downtime) {
+								$downtime_period_from = max($excluded_downtime['period_from'], $uptime_period_from);
+								$downtime_period_to = min($excluded_downtime['period_to'], $uptime_period_to);
+
+								if ($downtime_period_to > $downtime_period_from) {
+									$cell['excluded_downtimes'][] = [
+										'name' => $excluded_downtime['name'],
+										'period_from' => (int) $downtime_period_from,
+										'period_to' => (int) $downtime_period_to
+									];
+								}
+							}
+						}
+					}
+
+					$prev_clock = $alarm['clock'];
+					$prev_value = $alarm['value'];
+				}
+
+				$cell['sli'] = ($scheduled_uptime - $cell['downtime']) / $scheduled_uptime * 100;
+				$cell['error_budget'] = floor($scheduled_uptime * (1 - $db_sla['slo'] / 100)) - $cell['downtime'];
+
+				$data[$reporting_period_index][$service_index] = $cell;
+			}
+		}
+
+		return $data;
+	}
+
+	/**
+	 * @param array $excluded_downtimes
+	 *
+	 * @return array
+	 */
+	private static function combineExcludedDowntimes(array $excluded_downtimes): array {
+		$combined_excluded_downtimes = [];
+
+		foreach ($excluded_downtimes as $excluded_downtime) {
+			$period_from = $excluded_downtime['period_from'];
+			$period_to = $excluded_downtime['period_to'];
+
+			foreach ($combined_excluded_downtimes as $combined_excluded_downtime) {
+				$is_overlapping = $excluded_downtime['period_from'] <= $combined_excluded_downtime['period_to']
+					&& $excluded_downtime['period_to'] >= $combined_excluded_downtime['period_from'];
+
+				if ($is_overlapping) {
+					$period_from = min($period_from, $combined_excluded_downtime['period_from']);
+					$period_to = max($period_to, $combined_excluded_downtime['period_to']);
+				}
+			}
+
+			foreach ($combined_excluded_downtimes as $index => $combined_excluded_downtime) {
+				if ($combined_excluded_downtime['period_from'] >= $period_from
+						&& $combined_excluded_downtime['period_to'] <= $period_to) {
+					unset($combined_excluded_downtimes[$index]);
+				}
+			}
+
+			$combined_excluded_downtimes[] = ['period_from' => $period_from, 'period_to' => $period_to];
+		}
+
+		return $combined_excluded_downtimes;
+	}
+
+	/**
+	 * @param array $reporting_period
+	 * @param array $db_sla
+	 *
+	 * @return array
+	 *
+	 * @throws Exception
+	 */
+	private static function getUptimePeriods(array $reporting_period, array $db_sla): array {
+		if (!$db_sla['schedule']) {
+			return [$reporting_period];
+		}
+
+		$uptime_periods = [];
+
+		$week_offset = $reporting_period['date_from'] -
+			(new DateTime('@'.$reporting_period['date_from']))
+				->setTimezone(new DateTimeZone($db_sla['timezone']))
+				->modify('1 day')
+				->modify('last Monday')
+				->getTimestamp();
+
+		for ($week = 0;; $week++) {
+			foreach ($db_sla['schedule'] as $schedule_row) {
+				$date_from = $reporting_period['date_from'] + SEC_PER_WEEK * $week + $schedule_row['period_from']
+					- $week_offset;
+
+				$date_to = $reporting_period['date_from'] + SEC_PER_WEEK * $week + $schedule_row['period_to']
+					- $week_offset;
+
+				if ($date_from < $reporting_period['date_to'] && $date_to > $reporting_period['date_from']) {
+					$new_date_from = max($reporting_period['date_from'], $date_from);
+					$new_date_to = min($reporting_period['date_to'], $date_to);
+
+					if ($uptime_periods && $uptime_periods[count($uptime_periods) - 1]['date_to'] == $new_date_from) {
+						$uptime_periods[count($uptime_periods) - 1]['date_to'] = $new_date_to;
+					}
+					else {
+						$uptime_periods[] = ['date_from' => $new_date_from, 'date_to' => $new_date_to];
+					}
+				}
+
+				if ($date_to >= $reporting_period['date_to']) {
+					break 2;
+				}
+			}
+		}
+
+		return $uptime_periods;
+	}
+
+	/**
+	 * @param array $sla
+	 * @param array $options
+	 *
+	 * @return array
+	 *
+	 * @throws Exception
+	 */
+	private static function getReportingPeriods(array $sla, array $options): array {
+		$interval = new DateInterval([
+			ZBX_SLA_PERIOD_DAILY => 'P1D',
+			ZBX_SLA_PERIOD_WEEKLY => 'P1W',
+			ZBX_SLA_PERIOD_MONTHLY => 'P1M',
+			ZBX_SLA_PERIOD_QUARTERLY => 'P3M',
+			ZBX_SLA_PERIOD_ANNUALLY => 'P1Y'
+		][$sla['period']]);
+
+		$timezone = new DateTimeZone($sla['timezone']);
+
+		$effective_min = (new DateTime('@'.$sla['effective_date']))->setTimezone($timezone);
+		self::alignDateToPeriodStart($effective_min, (int) $sla['period']);
+
+		$effective_max = (new DateTime('now'))->setTimezone($timezone);
+		self::alignDateToPeriodStart($effective_max, (int) $sla['period']);
+		$effective_max->add($interval);
+
+		if ($options['date_from'] !== null) {
+			$date_from = (new DateTime('@'.$options['date_from']))->setTimezone($timezone);
+			self::alignDateToPeriodStart($date_from, (int) $sla['period']);
+		}
+		else {
+			$date_from = null;
+		}
+
+		if ($options['date_to'] !== null) {
+			$date_to = (new DateTime('@'.$options['date_to']))->setTimezone($timezone);
+			self::alignDateToPeriodStart($date_to, (int) $sla['period']);
+			$date_to->add($interval);
+		}
+		elseif ($date_from === null) {
+			$date_to = $effective_max;
+		}
+		else {
+			$date_to = null;
+		}
+
+		$reporting_periods = [];
+
+		$descending = $date_to !== null;
+		$date = $descending ? clone $date_to : clone $date_from;
+
+		while (count($reporting_periods) < ZBX_SLA_MAX_REPORTING_PERIODS) {
+			if ($options['periods'] !== null) {
+				if (count($reporting_periods) == $options['periods']) {
+					break;
+				}
+			}
+			else {
+				if (($date_from === null || $date_to === null)
+						&& count($reporting_periods) == ZBX_SLA_DEFAULT_REPORTING_PERIODS) {
+					break;
+				}
+
+				if ($descending) {
+					if ($date_from === null && $date <= $effective_min) {
+						break;
+					}
+				}
+				elseif ($date >= $effective_max) {
+					break;
+				}
+			}
+
+			if ($descending && $date_from !== null && $date <= $date_from) {
+				break;
+			}
+
+			if ($descending) {
+				$to = $date->getTimestamp();
+				$date->sub($interval);
+				$from = $date->getTimestamp();
+
+				if ($from < 0) {
+					break;
+				}
+
+				array_unshift($reporting_periods, ['date_from' => $from, 'date_to' => $to]);
+			}
+			else {
+				$from = $date->getTimestamp();
+				$date->add($interval);
+				$to = $date->getTimestamp();
+
+				if ($to > ZBX_MAX_DATE) {
+					break;
+				}
+
+				$reporting_periods[] = ['date_from' => $from, 'date_to' => $to];
+			}
+		}
+
+		return $reporting_periods;
+	}
+
+	/**
+	 * @param DateTime $date
+	 *
+	 * @param int $sla_period
+	 */
+	private static function alignDateToPeriodStart(DateTime $date, int $sla_period): void {
+		$year = (int) $date->format('Y');
+		$month = (int) $date->format('n');
+
+		switch ($sla_period) {
+			case ZBX_SLA_PERIOD_WEEKLY:
+				$date
+					->modify('1 day')
+					->modify('last Monday');
+				break;
+
+			case ZBX_SLA_PERIOD_MONTHLY:
+				$date->setDate($year, $month, 1);
+				break;
+
+			case ZBX_SLA_PERIOD_QUARTERLY:
+				$date->setDate($year, intdiv($month - 1, 3) * 3 + 1, 1);
+				break;
+
+			case ZBX_SLA_PERIOD_ANNUALLY:
+				$date->setDate($year, 1, 1);
+				break;
+		}
+
+		$date->setTime(0, 0);
 	}
 }

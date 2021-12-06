@@ -644,6 +644,9 @@ define('MAP_LINK_DRAWTYPE_BOLD_LINE',		2);
 define('MAP_LINK_DRAWTYPE_DOT',				3);
 define('MAP_LINK_DRAWTYPE_DASHED_LINE',		4);
 
+define('ZBX_SLA_MAX_REPORTING_PERIODS',		100);
+define('ZBX_SLA_DEFAULT_REPORTING_PERIODS',	20);
+
 define('ZBX_SLA_STATUS_DISABLED',	0);
 define('ZBX_SLA_STATUS_ENABLED',	1);
 
@@ -2038,9 +2041,6 @@ define('ZBX_STYLE_ZSELECT_HOST_INTERFACE', 'z-select-host-interface');
 // Dashboard list table classes.
 define('ZBX_STYLE_DASHBOARD_LIST', 'dashboard-list');
 define('ZBX_STYLE_DASHBOARD_LIST_ITEM', 'dashboard-list-item');
-
-define('ZBX_SLA_MAX_REPORTING_PERIODS', 100);
-define('ZBX_SLA_DEFAULT_REPORTING_PERIODS', 20);
 
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] !== 'off');
