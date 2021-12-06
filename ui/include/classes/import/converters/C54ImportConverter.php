@@ -147,7 +147,7 @@ class C54ImportConverter extends CConverter {
 	 *
 	 * @return array
 	 */
-	protected static function convertPreprocessingSteps(array $preprocessing_steps): array {
+	private static function convertPreprocessingSteps(array $preprocessing_steps): array {
 		foreach ($preprocessing_steps as &$preprocessing_step) {
 			if ($preprocessing_step['type'] === CXmlConstantName::PROMETHEUS_PATTERN
 					&& count($preprocessing_step['parameters']) === 2) {
