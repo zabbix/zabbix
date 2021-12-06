@@ -474,40 +474,45 @@ static void	*preprocessor_get_next_task(zbx_preprocessing_manager_t *manager, zb
 
 		switch (base->kind)
 		{
-		case ZBX_PREPROC_DEPS:
-			if (0 == preprocessor_create_dep_message(manager, (zbx_preprocessing_dep_request_t *)base))
-			{
-				base->state = REQUEST_STATE_DONE;
-				continue;
-			}
-			(void)preprocessor_dep_request_next_message((zbx_preprocessing_dep_request_t *)base, message);
-			break;
-		case ZBX_PREPROC_ITEM:
-			request = (zbx_preprocessing_request_t *)base;
-			if (NULL != request->steps && ZBX_PREPROC_VALIDATE_NOT_SUPPORTED == request->steps[0].type)
-				process_notsupported = 1;
-
-			if (ITEM_STATE_NOTSUPPORTED == request->value.state && 0 == process_notsupported)
-			{
-				zbx_preproc_history_t	*vault;
-
-				if (NULL != (vault = (zbx_preproc_history_t *) zbx_hashset_search(&manager->history_cache,
-						&request->value.itemid)))
+			case ZBX_PREPROC_DEPS:
+				if (0 == preprocessor_create_dep_message(manager,
+						(zbx_preprocessing_dep_request_t *)base))
 				{
-					zbx_vector_ptr_clear_ext(&vault->history,
-							(zbx_clean_func_t) zbx_preproc_op_history_free);
-					zbx_vector_ptr_destroy(&vault->history);
-					zbx_hashset_remove_direct(&manager->history_cache, vault);
+					base->state = REQUEST_STATE_DONE;
+					continue;
+				}
+				(void)preprocessor_dep_request_next_message((zbx_preprocessing_dep_request_t *)base,
+						message);
+				break;
+			case ZBX_PREPROC_ITEM:
+				request = (zbx_preprocessing_request_t *)base;
+				if (NULL != request->steps &&
+						ZBX_PREPROC_VALIDATE_NOT_SUPPORTED == request->steps[0].type)
+				{
+					process_notsupported = 1;
 				}
 
-				preprocessor_set_request_state_done(manager, base, iterator.current);
-				continue;
-			}
+				if (ITEM_STATE_NOTSUPPORTED == request->value.state && 0 == process_notsupported)
+				{
+					zbx_preproc_history_t	*vault;
 
-			message->code = ZBX_IPC_PREPROCESSOR_REQUEST;
-			message->size = preprocessor_create_task(manager, request, &message->data);
-			request_free_steps(request);
-			break;
+					if (NULL != (vault = (zbx_preproc_history_t *) zbx_hashset_search(
+							&manager->history_cache, &request->value.itemid)))
+					{
+						zbx_vector_ptr_clear_ext(&vault->history,
+								(zbx_clean_func_t) zbx_preproc_op_history_free);
+						zbx_vector_ptr_destroy(&vault->history);
+						zbx_hashset_remove_direct(&manager->history_cache, vault);
+					}
+
+					preprocessor_set_request_state_done(manager, base, iterator.current);
+					continue;
+				}
+
+				message->code = ZBX_IPC_PREPROCESSOR_REQUEST;
+				message->size = preprocessor_create_task(manager, request, &message->data);
+				request_free_steps(request);
+				break;
 		}
 
 		task = iterator.current;
