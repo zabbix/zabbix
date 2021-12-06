@@ -366,23 +366,24 @@ class CMaintenance extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		// Validate hosts & groups.
-		foreach ($maintenances as $maintenance) {
-			$has_groups = false;
-			$has_hosts = false;
+		foreach ($maintenances as &$maintenance) {
+			if (array_key_exists('groupids', $maintenance)) {
+				if (array_key_exists('groups', $maintenance)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Parameter "%1$s" is deprecated.', 'groupids'));
+				}
 
-			if (array_key_exists('groups', $maintenance) && $maintenance['groups']) {
-				$has_groups = true;
+				$maintenance['groups'] = zbx_toObject($maintenance['groupids'], 'groupid');
 			}
 
-			if (array_key_exists('hosts', $maintenance) && $maintenance['hosts']) {
-				$has_hosts = true;
-			}
+			if (array_key_exists('hostids', $maintenance)) {
+				if (array_key_exists('hosts', $maintenance)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Parameter "%1$s" is deprecated.', 'hostids'));
+				}
 
-			if (!$has_groups && !$has_hosts) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one host group or host must be selected.'));
+				$maintenance['hosts'] = zbx_toObject($maintenance['hostids'], 'hostid');
 			}
 		}
+		unset($maintenance);
 
 		foreach ($maintenances as $i => $maintenance) {
 			// Validate maintenance active interval.
@@ -399,6 +400,12 @@ class CMaintenance extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
 					'/'.($i + 1).'/tags', _('should be empty')
 				));
+			}
+
+			// Validate groups and hosts.
+			if ((!array_key_exists('groups', $maintenance) || !$maintenance['groups'])
+					&& (!array_key_exists('hosts', $maintenance) || !$maintenance['hosts'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one host group or host must be selected.'));
 			}
 		}
 
@@ -552,6 +559,25 @@ class CMaintenance extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
+		foreach ($maintenances as &$maintenance) {
+			if (array_key_exists('groupids', $maintenance)) {
+				if (array_key_exists('groups', $maintenance)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Parameter "%1$s" is deprecated.', 'groupids'));
+				}
+
+				$maintenance['groups'] = zbx_toObject($maintenance['groupids'], 'groupid');
+			}
+
+			if (array_key_exists('hostids', $maintenance)) {
+				if (array_key_exists('hosts', $maintenance)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Parameter "%1$s" is deprecated.', 'hostids'));
+				}
+
+				$maintenance['hosts'] = zbx_toObject($maintenance['hostids'], 'hostid');
+			}
+		}
+		unset($maintenance);
+
 		$db_maintenances = $this->get([
 			'output' => ['maintenanceid', 'name', 'maintenance_type', 'description', 'active_since', 'active_till',
 				'tags_evaltype'
@@ -566,34 +592,6 @@ class CMaintenance extends CApiService {
 		}
 
 		self::addAffectedObjects($maintenances, $db_maintenances);
-
-		// Validate hosts & groups.
-		foreach ($maintenances as $maintenance) {
-			$has_groups = false;
-			$has_hosts = false;
-
-			if (array_key_exists('groups', $maintenance)) {
-				if ($maintenance['groups']) {
-					$has_groups = true;
-				}
-			}
-			else {
-				$has_groups = (count($db_maintenances[$maintenance['maintenanceid']]['groups']) > 0);
-			}
-
-			if (array_key_exists('hosts', $maintenance)) {
-				if ($maintenance['hosts']) {
-					$has_hosts = true;
-				}
-			}
-			else {
-				$has_hosts = (count($db_maintenances[$maintenance['maintenanceid']]['hosts']) > 0);
-			}
-
-			if (!$has_groups && !$has_hosts) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one host group or host must be selected.'));
-			}
-		}
 
 		foreach ($maintenances as $i => $maintenance) {
 			// Validate maintenance active interval.
@@ -620,6 +618,21 @@ class CMaintenance extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
 					'/'.($i + 1).'/tags', _('should be empty')
 				));
+			}
+
+			// Validate groups and hosts.
+			if (array_key_exists('groups', $maintenance) || array_key_exists('hosts', $maintenance)) {
+				$groups = array_key_exists('groups', $maintenance)
+					? $maintenance['groups']
+					: $db_maintenances[$maintenance['maintenanceid']]['groups'];
+
+				$hosts = array_key_exists('hosts', $maintenance)
+					? $maintenance['hosts']
+					: $db_maintenances[$maintenance['maintenanceid']]['hosts'];
+
+				if (!$groups && !$hosts) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one host group or host must be selected.'));
+				}
 			}
 		}
 
@@ -1176,11 +1189,13 @@ class CMaintenance extends CApiService {
 		$maintenanceids = ['groups' => [] , 'hosts' => [], 'timeperiods' => [], 'tags' => []];
 
 		foreach ($maintenances as $maintenance) {
-			$maintenanceids['groups'][] = $maintenance['maintenanceid'];
-			$db_maintenances[$maintenance['maintenanceid']]['groups'] = [];
+			if (array_key_exists('groups', $maintenance) || array_key_exists('hosts', $maintenance)) {
+				$maintenanceids['groups'][] = $maintenance['maintenanceid'];
+				$db_maintenances[$maintenance['maintenanceid']]['groups'] = [];
 
-			$maintenanceids['hosts'][] = $maintenance['maintenanceid'];
-			$db_maintenances[$maintenance['maintenanceid']]['hosts'] = [];
+				$maintenanceids['hosts'][] = $maintenance['maintenanceid'];
+				$db_maintenances[$maintenance['maintenanceid']]['hosts'] = [];
+			}
 
 			if (array_key_exists('tags', $maintenance)) {
 				$maintenanceids['tags'][] = $maintenance['maintenanceid'];
