@@ -78,7 +78,8 @@ zbx_regmatch_t;
  *                      string ("") is allowed, it will match everything.     *
  *                      NULL is not allowed.                                  *
  *     flags     - [IN] regexp compilation parameters passed to pcre_compile. *
- *                      PCRE_CASELESS, PCRE_NO_AUTO_CAPTURE, PCRE_MULTILINE.  *
+ *                      ZBX_REGEXP_CASELESS, ZBX_REGEXP_NO_AUTO_CAPTURE,      *
+ *                      ZBX_REGEXP_MULTILINE.                                 *
  *     regexp    - [OUT] output regexp.                                       *
  *     err_msg   - [OUT] error message if any.                                *
  *                       Free with zbx_regexp_err_msg_free()                  *
@@ -102,7 +103,8 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
 
 #ifdef ZBX_REGEXP_NO_AUTO_CAPTURE
 	/* If ZBX_REGEXP_NO_AUTO_CAPTURE bit is set in 'flags' but regular expression contains references to numbered */
-	/* capturing groups then reset PCRE_NO_AUTO_CAPTURE bit. Otherwise the regular expression might not compile. */
+	/* capturing groups then reset ZBX_REGEXP_NO_AUTO_CAPTURE bit. */
+	/* Otherwise the regular expression might not compile. */
 
 	if (0 != (flags & ZBX_REGEXP_NO_AUTO_CAPTURE))
 	{
