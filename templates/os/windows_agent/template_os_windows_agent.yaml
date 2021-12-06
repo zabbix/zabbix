@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-10-21T07:42:32Z'
+  date: '2021-12-03T15:13:19Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -539,7 +539,7 @@ zabbix_export:
           description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level.'
         -
           macro: '{$VFS.FS.FSNAME.NOT_MATCHES}'
-          value: ^(/dev|/sys|/run|/proc|.+/shm$)
+          value: '^(?:/dev|/sys|/run|/proc|.+/shm$)'
           description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level.'
         -
           macro: '{$VFS.FS.FSTYPE.MATCHES}'
@@ -1500,7 +1500,7 @@ zabbix_export:
                 -
                   type: JAVASCRIPT
                   parameters:
-                    - 'return (100 - value)'
+                    - 'return 100 - value'
               tags:
                 -
                   tag: Application
@@ -1774,15 +1774,15 @@ zabbix_export:
           description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'
         -
           macro: '{$SERVICE.NAME.NOT_MATCHES}'
-          value: '^RemoteRegistry|MMCSS|gupdate|SysmonLog|clr_optimization_v.+|clr_optimization_v.+|sppsvc|gpsvc|Pml Driver HPZ12|Net Driver HPZ12|MapsBroker|IntelAudioService|Intel\(R\) TPM Provisioning Service|dbupdate|DoSvc$'
+          value: '^(?:RemoteRegistry|MMCSS|gupdate|SysmonLog|clr_optimization_v.+|clr_optimization_v.+|sppsvc|gpsvc|Pml Driver HPZ12|Net Driver HPZ12|MapsBroker|IntelAudioService|Intel\(R\) TPM Provisioning Service|dbupdate|DoSvc)$'
           description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'
         -
           macro: '{$SERVICE.STARTUPNAME.MATCHES}'
-          value: '^automatic|automatic delayed$'
+          value: '^(?:automatic|automatic delayed)$'
           description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'
         -
           macro: '{$SERVICE.STARTUPNAME.NOT_MATCHES}'
-          value: ^manual|disabled$
+          value: '^(?:manual|disabled)$'
           description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'
       valuemaps:
         -
