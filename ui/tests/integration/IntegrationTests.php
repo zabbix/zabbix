@@ -25,6 +25,7 @@ require_once dirname(__FILE__).'/testGoAgentDataCollection.php';
 require_once dirname(__FILE__).'/testItemState.php';
 require_once dirname(__FILE__).'/testValuemaps.php';
 require_once dirname(__FILE__).'/testEscalations.php';
+require_once dirname(__FILE__).'/testTriggerState.php';
 
 class IntegrationTests {
 	public static function suite() {
@@ -36,6 +37,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testItemState');
 		$suite->addTestSuite('testValuemaps');
 		$suite->addTestSuite('testEscalations');
+		$suite->addTestSuite('testTriggerState');
 
 		return $suite;
 	}
