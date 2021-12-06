@@ -897,12 +897,9 @@ static void	preprocessor_enqueue_dependent_value(zbx_preprocessing_manager_t *ma
  *                                                                            *
  * Parameters: manage   - [IN] preprocessing manager                          *
  *             value    - [IN] item value                                     *
- *             master   - [IN] request should be enqueued after this item     *
- *                             (NULL for the end of the queue)                *
  *                                                                            *
  ******************************************************************************/
-static void	preprocessor_enqueue(zbx_preprocessing_manager_t *manager, zbx_preproc_item_value_t *value,
-		zbx_list_item_t *master)
+static void	preprocessor_enqueue(zbx_preprocessing_manager_t *manager, zbx_preproc_item_value_t *value)
 {
 	zbx_preprocessing_request_t	*request;
 	zbx_preproc_item_t		*item, item_local;
@@ -987,7 +984,7 @@ static void	preprocessor_enqueue(zbx_preprocessing_manager_t *manager, zbx_prepr
 	}
 
 	/* priority items are enqueued at the beginning of the line */
-	if (NULL == master && ZBX_PREPROC_PRIORITY_FIRST == priority)
+	if (ZBX_PREPROC_PRIORITY_FIRST == priority)
 	{
 		if (SUCCEED == zbx_list_iterator_isset(&manager->priority_tail))
 		{
@@ -1006,12 +1003,8 @@ static void	preprocessor_enqueue(zbx_preprocessing_manager_t *manager, zbx_prepr
 	}
 	else
 	{
-		zbx_list_insert_after(&manager->queue, master, request, &enqueued_at);
+		zbx_list_insert_after(&manager->queue, NULL, request, &enqueued_at);
 		zbx_list_iterator_update(&manager->priority_tail);
-
-		/* move internal item tail position if we are inserting after last internal item */
-		if (NULL != master && master == manager->priority_tail.current)
-			zbx_list_iterator_next(&manager->priority_tail);
 	}
 
 	if (REQUEST_STATE_QUEUED == request->base.state)
@@ -1112,7 +1105,7 @@ static void	preprocessor_add_request(zbx_preprocessing_manager_t *manager, zbx_i
 	while (offset < message->size)
 	{
 		offset += zbx_preprocessor_unpack_value(&value, message->data + offset);
-		preprocessor_enqueue(manager, &value, NULL);
+		preprocessor_enqueue(manager, &value);
 	}
 
 	preprocessor_assign_tasks(manager);
