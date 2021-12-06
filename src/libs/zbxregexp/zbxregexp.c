@@ -149,6 +149,8 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
 		pcre_free(pcre_regexp);
 #endif
 #ifdef USE_PCRE2
+	*err_msg = NULL;
+
 	if (NULL == (pcre2_regexp = pcre2_compile(pattern, PCRE2_ZERO_TERMINATED, PCRE2_UTF | flags, &error, &error_offset, NULL)))
 	{
 		err_msg_buff = zbx_malloc(NULL, ZBX_REGEXP_ERR_MSG_SIZE);
@@ -1360,7 +1362,12 @@ int	zbx_wildcard_match(const char *value, const char *wildcard)
 void	zbx_regexp_err_msg_free(const char *err_msg)
 {
 #ifdef USE_PCRE2
-	char	*ptr = (char*)err_msg;
-	zbx_free(ptr);
+	char	*ptr;
+
+	if (NULL != err_msg)
+	{
+		ptr = (char*)err_msg;
+		zbx_free(ptr);
+	}
 #endif
 }
