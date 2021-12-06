@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -24,27 +24,90 @@
  */
 ?>
 
-<script type="text/x-jquery-tmpl" id="filter-tag-row-tmpl">
-	<?= CTagFilterFieldHelper::getTemplate(); ?>
-</script>
-
 <script>
 	const view = {
 		refresh_url: null,
 		refresh_data: null,
+
+		refresh_simple_url: null,
 		refresh_interval: null,
+		refresh_counters: null,
+
 		running: false,
 		timeout: null,
 		_refresh_message_box: null,
 		_popup_message_box: null,
 
-		init({refresh_url, refresh_data, refresh_interval}) {
+		init({refresh_url, refresh_data, refresh_interval, filter_options}) {
 			this.refresh_url = refresh_url;
 			this.refresh_data = refresh_data;
 			this.refresh_interval = refresh_interval;
 
-			this.liveFilter();
-			this.start();
+			const url = new Curl('zabbix.php', false);
+			url.setArgument('action', 'latest.view.refresh');
+			this.refresh_simple_url = url.getUrl();
+
+			this.initTabFilter(filter_options);
+		},
+
+		initTabFilter(filter_options) {
+			if (!filter_options) {
+				return;
+			}
+
+			this.refresh_counters = this.createCountersRefresh(1);
+			this.filter = new CTabFilter(document.getElementById('monitoring_latest_filter'), filter_options);
+			this.filter.on(TABFILTER_EVENT_URLSET, () => {
+				this.reloadPartialAndTabCounters();
+			});
+		},
+
+		createCountersRefresh(timeout) {
+			if (this.refresh_counters) {
+				clearTimeout(this.refresh_counters);
+				this.refresh_counters = null;
+			}
+
+			return setTimeout(() => this.getFiltersCounters(), timeout);
+		},
+
+		getFiltersCounters() {
+			return $.post(this.refresh_simple_url, {
+				filter_counters: 1
+			})
+			.done((json) => {
+				if (json.filter_counters) {
+					this.filter.updateCounters(json.filter_counters);
+				}
+			})
+			.always(() => {
+				if (this.refresh_interval > 0) {
+					this.refresh_counters = this.createCountersRefresh(this.refresh_interval);
+				}
+			});
+		},
+
+		reloadPartialAndTabCounters() {
+			this.refresh_url = new Curl('', false);
+
+			this.unscheduleRefresh();
+			this.refresh();
+
+			// Filter is not present in Kiosk mode.
+			if (this.filter) {
+				const filter_item = this.filter._active_item;
+
+				if (this.filter._active_item.hasCounter()) {
+					$.post(this.refresh_simple_url, {
+						filter_counters: 1,
+						counter_index: filter_item._index
+					}).done((json) => {
+						if (json.filter_counters) {
+							filter_item.updateCounter(json.filter_counters.pop());
+						}
+					});
+				}
+			}
 		},
 
 		getCurrentForm() {
@@ -82,9 +145,20 @@
 		refresh() {
 			this.setLoading();
 
+			const params = this.refresh_url.getArgumentsObject();
+			const exclude = ['action', 'filter_src', 'filter_show_counter', 'filter_custom_time', 'filter_name'];
+			const post_data = Object.keys(params)
+				.filter(key => !exclude.includes(key))
+				.reduce((post_data, key) => {
+					post_data[key] = (typeof params[key] === 'object')
+						? [...params[key]].filter(i => i)
+						: params[key];
+					return post_data;
+				}, {});
+
 			var deferred = $.ajax({
-				url: this.refresh_url,
-				data: this.refresh_data,
+				url: this.refresh_simple_url,
+				data: post_data,
 				type: 'post',
 				dataType: 'json'
 			});
@@ -156,10 +230,13 @@
 
 		scheduleRefresh() {
 			this.unscheduleRefresh();
-			this.timeout = setTimeout((function() {
-				this.timeout = null;
-				this.refresh();
-			}).bind(this), this.refresh_interval);
+
+			if (this.refresh_interval > 0) {
+				this.timeout = setTimeout((function () {
+					this.timeout = null;
+					this.refresh();
+				}).bind(this), this.refresh_interval);
+			}
 		},
 
 		unscheduleRefresh() {
@@ -167,45 +244,10 @@
 				clearTimeout(this.timeout);
 				this.timeout = null;
 			}
-		},
 
-		start() {
-			if (this.refresh_interval != 0) {
-				this.running = true;
-				this.scheduleRefresh();
+			if (this.deferred) {
+				this.deferred.abort();
 			}
-		},
-
-		stop() {
-			this.running = false;
-			this.unscheduleRefresh();
-		},
-
-		liveFilter() {
-			var $filter_hostids = $('#filter_hostids_'),
-				$filter_show_without_data = $('#filter_show_without_data');
-
-			$filter_hostids.on('change', function() {
-				var no_hosts_selected = !$(this).multiSelect('getData').length;
-
-				if (no_hosts_selected) {
-					$filter_show_without_data.prop('checked', true);
-				}
-
-				$filter_show_without_data.prop('disabled', no_hosts_selected);
-			});
-
-			$('#filter-tags')
-				.dynamicRows({template: '#filter-tag-row-tmpl'})
-				.on('afteradd.dynamicRows', function() {
-					var rows = this.querySelectorAll('.form_row');
-					new CTagFilterItem(rows[rows.length - 1]);
-				});
-
-			// Init existing fields once loaded.
-			document.querySelectorAll('#filter-tags .form_row').forEach(row => {
-				new CTagFilterItem(row);
-			});
 		},
 
 		editHost(hostid) {
@@ -267,5 +309,5 @@
 				view.refresh();
 			}
 		}
-	}
+	};
 </script>

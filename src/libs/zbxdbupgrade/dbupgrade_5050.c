@@ -1185,6 +1185,17 @@ static int	DBpatch_5050111(void)
 
 	return DBcreate_index("alerts", "alerts_8", "acknowledgeid", 0);
 }
+
+static int	DBpatch_5050112(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx like 'web.latest.filter.%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
 #endif
 
 DBPATCH_START(5050)
@@ -1290,5 +1301,6 @@ DBPATCH_ADD(5050108, 0, 1)
 DBPATCH_ADD(5050109, 0, 1)
 DBPATCH_ADD(5050110, 0, 1)
 DBPATCH_ADD(5050111, 0, 1)
+DBPATCH_ADD(5050112, 0, 1)
 
 DBPATCH_END()
