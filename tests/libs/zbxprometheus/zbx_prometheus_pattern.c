@@ -39,7 +39,7 @@ void	zbx_mock_test_entry(void **state)
 	request = zbx_mock_get_parameter_string("in.request");
 
 	if (SUCCEED != (ret = zbx_prometheus_pattern(data, params, request, output, &ret_output, &ret_err)))
-		zabbix_log(LOG_LEVEL_DEBUG, "Error: %s", ret_err);
+		printf("Error: %s\n", ret_err);
 
 	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.result"));
 	zbx_mock_assert_result_eq("Invalid zbx_prometheus_pattern() return value", expected_ret, ret);

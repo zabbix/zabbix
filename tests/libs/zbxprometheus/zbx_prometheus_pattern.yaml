@@ -1912,8 +1912,8 @@ in:
     apache{state="yellow"} 0
     apache{state="green"} 1
   params: apache
-  request: count
-  output: ""
+  request: function
+  output: count
 out:
   result: SUCCEED
   output: 3
@@ -1927,8 +1927,8 @@ in:
     cpu_usage_system{cpu="cpu0"} 60.0
     cpu_usage_system{cpu="cpu1"} 40.0
   params: cpu_usage_system{cpu=~"cpu[0-9]+"}
-  request: sum
-  output: ""
+  request: function
+  output: sum
 out:
   result: SUCCEED
   output: 100
@@ -1942,8 +1942,8 @@ in:
     cpu_usage_system{cpu="cpu0"} 60.0
     cpu_usage_system{cpu="cpu1"} 40.0
   params: cpu_usage_system{cpu=~"cpu[0-9]+"}
-  request: avg
-  output: ""
+  request: function
+  output: avg
 out:
   result: SUCCEED
   output: 50
@@ -1957,8 +1957,8 @@ in:
     cpu_usage_system{cpu="cpu0"} 60.0
     cpu_usage_system{cpu="cpu1"} 40.0
   params: cpu_usage_system{cpu=~"cpu[0-9]+"}
-  request: min
-  output: ""
+  request: function
+  output: min
 out:
   result: SUCCEED
   output: 40
@@ -1972,8 +1972,8 @@ in:
     cpu_usage_system{cpu="cpu0"} 60.0
     cpu_usage_system{cpu="cpu1"} 40.0
   params: cpu_usage_system{cpu=~"cpu[0-9]+"}
-  request: max
-  output: ""
+  request: function
+  output: max
 out:
   result: SUCCEED
   output: 60

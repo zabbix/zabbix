@@ -78,7 +78,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_vector_ptr_t		labels;
 	int				ret, expected_ret, index;
 	char				*error = NULL;
-	zbx_mock_handle_t		hmetric, hvalue, hlabels, hlabel, hfunction;
+	zbx_mock_handle_t		hmetric, hvalue, hlabels, hlabel;
 	zbx_mock_error_t		mock_ret;
 
 	ZBX_UNUSED(state);
