@@ -48,8 +48,8 @@ type performer interface {
 	deactivate()
 	// true if the task has to be rescheduled after performing
 	isRecurring() bool
-	// return item key
-	getItemKey() string
+	// true if item key equals
+	isItemKey(itemkey string) bool
 }
 
 // performerHeap -

@@ -95,8 +95,8 @@ func (t *taskBase) isRecurring() bool {
 	return t.recurring
 }
 
-func (t *taskBase) getItemKey() (itemkey string) {
-	return ""
+func (t *taskBase) isItemKey(itemkey string) bool {
+	return false
 }
 
 // collectorTask provides access to plugin Collector interaface.
@@ -135,8 +135,8 @@ func (t *collectorTask) getWeight() int {
 	return t.plugin.maxCapacity
 }
 
-func (t *collectorTask) getItemKey() (itemkey string) {
-	return ""
+func (t *collectorTask) isItemKey(itemkey string) bool {
+	return false
 }
 
 // exporterTask provides access to plugin Exporter interaface. It's used
@@ -232,8 +232,8 @@ func (t *exporterTask) ItemID() (itemid uint64) {
 	return t.item.itemid
 }
 
-func (t *exporterTask) getItemKey() (itemkey string) {
-	return t.item.key
+func (t *exporterTask) isItemKey(itemkey string) bool {
+	return t.item.key == itemkey
 }
 
 func (t *exporterTask) Meta() (meta *plugin.Meta) {
@@ -331,8 +331,8 @@ func (t *directExporterTask) ItemID() (itemid uint64) {
 	return t.item.itemid
 }
 
-func (t *directExporterTask) getItemKey() (itemkey string) {
-	return t.item.key
+func (t *directExporterTask) isItemKey(itemkey string) bool {
+	return t.item.key == itemkey
 }
 
 func (t *directExporterTask) Meta() (meta *plugin.Meta) {
@@ -366,8 +366,8 @@ func (t *starterTask) getWeight() int {
 	return t.plugin.maxCapacity
 }
 
-func (t *starterTask) getItemKey() (itemkey string) {
-	return ""
+func (t *starterTask) isItemKey(itemkey string) bool {
+	return false
 }
 
 // stopperTask provides access to plugin Exporter interaface Start() method.
@@ -393,8 +393,8 @@ func (t *stopperTask) getWeight() int {
 	return t.plugin.maxCapacity
 }
 
-func (t *stopperTask) getItemKey() (itemkey string) {
-	return ""
+func (t *stopperTask) isItemKey(itemkey string) bool {
+	return false
 }
 
 // stopperTask provides access to plugin Watcher interaface.
@@ -436,8 +436,8 @@ func (t *watcherTask) ItemID() (itemid uint64) {
 	return 0
 }
 
-func (t *watcherTask) getItemKey() (itemkey string) {
-	return ""
+func (t *watcherTask) isItemKey(itemkey string) bool {
+	return false
 }
 
 func (t *watcherTask) Meta() (meta *plugin.Meta) {
@@ -472,6 +472,6 @@ func (t *configuratorTask) getWeight() int {
 	return t.plugin.maxCapacity
 }
 
-func (t *configuratorTask) getItemKey() (itemkey string) {
-	return ""
+func (t *configuratorTask) isItemKey(itemkey string) bool {
+	return false
 }
