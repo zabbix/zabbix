@@ -95,7 +95,7 @@ func (t *taskBase) isRecurring() bool {
 	return t.recurring
 }
 
-func (t *taskBase) isItemKey(itemkey string) bool {
+func (t *taskBase) isItemKeyEqual(itemkey string) bool {
 	return false
 }
 
@@ -135,7 +135,7 @@ func (t *collectorTask) getWeight() int {
 	return t.plugin.maxCapacity
 }
 
-func (t *collectorTask) isItemKey(itemkey string) bool {
+func (t *collectorTask) isItemKeyEqual(itemkey string) bool {
 	return false
 }
 
@@ -232,7 +232,7 @@ func (t *exporterTask) ItemID() (itemid uint64) {
 	return t.item.itemid
 }
 
-func (t *exporterTask) isItemKey(itemkey string) bool {
+func (t *exporterTask) isItemKeyEqual(itemkey string) bool {
 	return t.item.key == itemkey
 }
 
@@ -331,7 +331,7 @@ func (t *directExporterTask) ItemID() (itemid uint64) {
 	return t.item.itemid
 }
 
-func (t *directExporterTask) isItemKey(itemkey string) bool {
+func (t *directExporterTask) isItemKeyEqual(itemkey string) bool {
 	return t.item.key == itemkey
 }
 
@@ -366,7 +366,7 @@ func (t *starterTask) getWeight() int {
 	return t.plugin.maxCapacity
 }
 
-func (t *starterTask) isItemKey(itemkey string) bool {
+func (t *starterTask) isItemKeyEqual(itemkey string) bool {
 	return false
 }
 
@@ -393,7 +393,7 @@ func (t *stopperTask) getWeight() int {
 	return t.plugin.maxCapacity
 }
 
-func (t *stopperTask) isItemKey(itemkey string) bool {
+func (t *stopperTask) isItemKeyEqual(itemkey string) bool {
 	return false
 }
 
@@ -436,7 +436,7 @@ func (t *watcherTask) ItemID() (itemid uint64) {
 	return 0
 }
 
-func (t *watcherTask) isItemKey(itemkey string) bool {
+func (t *watcherTask) isItemKeyEqual(itemkey string) bool {
 	return false
 }
 
@@ -472,6 +472,6 @@ func (t *configuratorTask) getWeight() int {
 	return t.plugin.maxCapacity
 }
 
-func (t *configuratorTask) isItemKey(itemkey string) bool {
+func (t *configuratorTask) isItemKeyEqual(itemkey string) bool {
 	return false
 }

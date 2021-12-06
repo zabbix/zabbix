@@ -432,7 +432,7 @@ run:
 						heap.Pop(&ltasks)
 
 						for _, key := range keys {
-							if task.isItemKey(key) {
+							if task.isItemKeyEqual(key) {
 								task.setPlugin(m.plugins[pluginkey])
 								m.plugins[pluginkey].enqueueTask(task)
 							}
