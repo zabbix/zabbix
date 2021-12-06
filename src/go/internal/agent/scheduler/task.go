@@ -95,6 +95,10 @@ func (t *taskBase) isRecurring() bool {
 	return t.recurring
 }
 
+func (t *taskBase) getItemKey() (itemkey string) {
+	return ""
+}
+
 // collectorTask provides access to plugin Collector interaface.
 type collectorTask struct {
 	taskBase
