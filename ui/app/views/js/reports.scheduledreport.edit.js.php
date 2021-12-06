@@ -130,7 +130,7 @@
 				const update_btn = document.querySelector('#update');
 				update_btn.setAttribute('id', 'add');
 				update_btn.setAttribute('value', 'scheduledreport.create');
-				update_btn.innerHTML = <?= json_encode(_('Add')) ?>;
+				update_btn.innerText = <?= json_encode(_('Add')) ?>;
 
 				document.querySelectorAll('#reportid, #clone, #delete').forEach((elem) => { elem.remove(); });
 			});
