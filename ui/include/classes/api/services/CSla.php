@@ -1093,196 +1093,8 @@ class CSla extends CApiService {
 		return [
 			'periods' => $reporting_periods,
 			'serviceids' => array_keys($db_services),
-			'data' => self::calculateSli($db_sla, $reporting_periods, array_values($db_services))
+			'sli' => self::calculateSli($db_sla, $reporting_periods, array_values($db_services))
 		];
-	}
-
-	/**
-	 * @param array $db_sla
-	 * @param array $reporting_periods
-	 * @param array $db_services
-	 *
-	 * @return array
-	 *
-	 * @throws Exception
-	 */
-	private static function calculateSli(array $db_sla, array $reporting_periods, array $db_services): array {
-		if (!$reporting_periods || !$db_services) {
-			return [];
-		}
-
-		$data = [];
-
-		$combined_excluded_downtimes = self::combineExcludedDowntimes($db_sla['excluded_downtimes']);
-
-		foreach ($reporting_periods as $reporting_period_index => $reporting_period) {
-			$uptime_periods = self::getUptimePeriods($reporting_period, $db_sla);
-
-			$scheduled_uptime = 0;
-			foreach ($uptime_periods as $uptime_period) {
-				$scheduled_uptime += $uptime_period['date_to'] - $uptime_period['date_from'];
-			}
-
-			foreach ($db_services as $service_index => $db_service) {
-				$cell = [
-					'uptime' => 0,
-					'downtime' => 0,
-					'sli' => -1.0,
-					'error_budget' => 0,
-					'excluded_downtimes' => []
-				];
-
-				if ($reporting_period['date_to'] <= $db_service['created_at'] || $scheduled_uptime == 0) {
-					$data[$reporting_period_index][$service_index] = $cell;
-
-					continue;
-				}
-
-				$prev_clock = max($reporting_period['date_from'], $db_service['created_at']);
-				$prev_value = $db_service['status_timeline'][$reporting_period_index]['start_value'];
-
-				$alarms = $db_service['status_timeline'][$reporting_period_index]['alarms'];
-
-				if (!$alarms || $alarms[count($alarms) - 1]['clock'] <= time()) {
-					$alarms[] = ['clock' => time() + 1, 'value' => null];
-				}
-
-				foreach ($alarms as $alarm) {
-					foreach ($uptime_periods as $uptime_period) {
-						$uptime_period_from = max($uptime_period['date_from'], $prev_clock);
-						$uptime_period_to = min($uptime_period['date_to'], $alarm['clock']);
-						$uptime = $uptime_period_to - $uptime_period_from;
-
-						if ($uptime > 0) {
-							foreach ($combined_excluded_downtimes as $combined_excluded_downtime) {
-								$downtime = min($combined_excluded_downtime['period_to'], $uptime_period_to)
-									- max($combined_excluded_downtime['period_from'], $uptime_period_from);
-
-								if ($downtime > 0) {
-									$uptime -= $downtime;
-								}
-							}
-
-							if ($prev_value == ZBX_SEVERITY_OK) {
-								$cell['uptime'] += $uptime;
-							}
-							else {
-								$cell['downtime'] += $uptime;
-							}
-
-							foreach ($db_sla['excluded_downtimes'] as $excluded_downtime) {
-								$downtime_period_from = max($excluded_downtime['period_from'], $uptime_period_from);
-								$downtime_period_to = min($excluded_downtime['period_to'], $uptime_period_to);
-
-								if ($downtime_period_to > $downtime_period_from) {
-									$cell['excluded_downtimes'][] = [
-										'name' => $excluded_downtime['name'],
-										'period_from' => (int) $downtime_period_from,
-										'period_to' => (int) $downtime_period_to
-									];
-								}
-							}
-						}
-					}
-
-					$prev_clock = $alarm['clock'];
-					$prev_value = $alarm['value'];
-				}
-
-				$cell['sli'] = ($scheduled_uptime - $cell['downtime']) / $scheduled_uptime * 100;
-				$cell['error_budget'] = floor($scheduled_uptime * (1 - $db_sla['slo'] / 100)) - $cell['downtime'];
-
-				$data[$reporting_period_index][$service_index] = $cell;
-			}
-		}
-
-		return $data;
-	}
-
-	/**
-	 * @param array $excluded_downtimes
-	 *
-	 * @return array
-	 */
-	private static function combineExcludedDowntimes(array $excluded_downtimes): array {
-		$combined_excluded_downtimes = [];
-
-		foreach ($excluded_downtimes as $excluded_downtime) {
-			$period_from = $excluded_downtime['period_from'];
-			$period_to = $excluded_downtime['period_to'];
-
-			foreach ($combined_excluded_downtimes as $combined_excluded_downtime) {
-				$is_overlapping = $excluded_downtime['period_from'] <= $combined_excluded_downtime['period_to']
-					&& $excluded_downtime['period_to'] >= $combined_excluded_downtime['period_from'];
-
-				if ($is_overlapping) {
-					$period_from = min($period_from, $combined_excluded_downtime['period_from']);
-					$period_to = max($period_to, $combined_excluded_downtime['period_to']);
-				}
-			}
-
-			foreach ($combined_excluded_downtimes as $index => $combined_excluded_downtime) {
-				if ($combined_excluded_downtime['period_from'] >= $period_from
-						&& $combined_excluded_downtime['period_to'] <= $period_to) {
-					unset($combined_excluded_downtimes[$index]);
-				}
-			}
-
-			$combined_excluded_downtimes[] = ['period_from' => $period_from, 'period_to' => $period_to];
-		}
-
-		return $combined_excluded_downtimes;
-	}
-
-	/**
-	 * @param array $reporting_period
-	 * @param array $db_sla
-	 *
-	 * @return array
-	 *
-	 * @throws Exception
-	 */
-	private static function getUptimePeriods(array $reporting_period, array $db_sla): array {
-		if (!$db_sla['schedule']) {
-			return [$reporting_period];
-		}
-
-		$uptime_periods = [];
-
-		$week_offset = $reporting_period['date_from'] -
-			(new DateTime('@'.$reporting_period['date_from']))
-				->setTimezone(new DateTimeZone($db_sla['timezone']))
-				->modify('1 day')
-				->modify('last Monday')
-				->getTimestamp();
-
-		for ($week = 0;; $week++) {
-			foreach ($db_sla['schedule'] as $schedule_row) {
-				$date_from = $reporting_period['date_from'] + SEC_PER_WEEK * $week + $schedule_row['period_from']
-					- $week_offset;
-
-				$date_to = $reporting_period['date_from'] + SEC_PER_WEEK * $week + $schedule_row['period_to']
-					- $week_offset;
-
-				if ($date_from < $reporting_period['date_to'] && $date_to > $reporting_period['date_from']) {
-					$new_date_from = max($reporting_period['date_from'], $date_from);
-					$new_date_to = min($reporting_period['date_to'], $date_to);
-
-					if ($uptime_periods && $uptime_periods[count($uptime_periods) - 1]['date_to'] == $new_date_from) {
-						$uptime_periods[count($uptime_periods) - 1]['date_to'] = $new_date_to;
-					}
-					else {
-						$uptime_periods[] = ['date_from' => $new_date_from, 'date_to' => $new_date_to];
-					}
-				}
-
-				if ($date_to >= $reporting_period['date_to']) {
-					break 2;
-				}
-			}
-		}
-
-		return $uptime_periods;
 	}
 
 	/**
@@ -1333,8 +1145,8 @@ class CSla extends CApiService {
 
 		$reporting_periods = [];
 
-		$descending = $date_to !== null;
-		$date = $descending ? clone $date_to : clone $date_from;
+		$do_descend = $date_to !== null;
+		$date = $do_descend ? clone $date_to : clone $date_from;
 
 		while (count($reporting_periods) < ZBX_SLA_MAX_REPORTING_PERIODS) {
 			if ($options['periods'] !== null) {
@@ -1348,7 +1160,7 @@ class CSla extends CApiService {
 					break;
 				}
 
-				if ($descending) {
+				if ($do_descend) {
 					if ($date_from === null && $date <= $effective_min) {
 						break;
 					}
@@ -1358,11 +1170,11 @@ class CSla extends CApiService {
 				}
 			}
 
-			if ($descending && $date_from !== null && $date <= $date_from) {
+			if ($do_descend && $date_from !== null && $date <= $date_from) {
 				break;
 			}
 
-			if ($descending) {
+			if ($do_descend) {
 				$to = $date->getTimestamp();
 				$date->sub($interval);
 				$from = $date->getTimestamp();
@@ -1419,5 +1231,209 @@ class CSla extends CApiService {
 		}
 
 		$date->setTime(0, 0);
+	}
+
+	/**
+	 * @param array $db_sla
+	 * @param array $reporting_periods
+	 * @param array $db_services
+	 *
+	 * @return array
+	 *
+	 * @throws Exception
+	 */
+	private static function calculateSli(array $db_sla, array $reporting_periods, array $db_services): array {
+		if (!$reporting_periods || !$db_services) {
+			return [];
+		}
+
+		$sli = [];
+
+		$combined_excluded_downtimes = self::combineExcludedDowntimes($db_sla['excluded_downtimes']);
+
+		foreach ($reporting_periods as $reporting_period_index => $reporting_period) {
+			$scheduled_uptime_periods = self::getScheduledUptimePeriods($db_sla, $reporting_period);
+
+			foreach ($db_services as $service_index => $db_service) {
+				$sli_cell = [
+					'uptime' => 0,
+					'downtime' => 0,
+					'sli' => -1.0,
+					'error_budget' => false,
+					'error_budget_value' => 0,
+					'excluded_downtimes' => []
+				];
+
+				$max_uptime = 0;
+
+				$prev_clock = $reporting_period['date_from'];
+				$prev_value = $db_service['status_timeline'][$reporting_period_index]['start_value'];
+
+				$alarms = $db_service['status_timeline'][$reporting_period_index]['alarms'];
+
+				if (!$alarms || $alarms[count($alarms) - 1]['clock'] <= time()) {
+					$alarms[] = ['clock' => time() + 1, 'value' => null];
+				}
+
+				foreach ($alarms as $alarm) {
+					foreach ($scheduled_uptime_periods as $scheduled_uptime_period) {
+						$uptime_period_from = max($db_service['created_at'], $scheduled_uptime_period['date_from'],
+							$prev_clock
+						);
+						$uptime_period_to = min($scheduled_uptime_period['date_to'], $alarm['clock']);
+						$uptime = $uptime_period_to - $uptime_period_from;
+
+						if ($uptime <= 0) {
+							continue;
+						}
+
+						$max_uptime += $uptime;
+
+						foreach ($combined_excluded_downtimes as $combined_excluded_downtime) {
+							$downtime = min($combined_excluded_downtime['period_to'], $uptime_period_to)
+								- max($combined_excluded_downtime['period_from'], $uptime_period_from);
+
+							if ($downtime > 0) {
+								$uptime -= $downtime;
+							}
+						}
+
+						if ($prev_value == ZBX_SEVERITY_OK) {
+							$sli_cell['uptime'] += $uptime;
+						}
+						else {
+							$sli_cell['downtime'] += $uptime;
+						}
+
+						foreach ($db_sla['excluded_downtimes'] as $excluded_downtime) {
+							$downtime_period_from = max($excluded_downtime['period_from'], $uptime_period_from);
+							$downtime_period_to = min($excluded_downtime['period_to'], $uptime_period_to);
+
+							if ($downtime_period_to > $downtime_period_from) {
+								$sli_cell['excluded_downtimes'][] = [
+									'name' => $excluded_downtime['name'],
+									'period_from' => (int) $downtime_period_from,
+									'period_to' => (int) $downtime_period_to
+								];
+							}
+						}
+					}
+
+					$prev_clock = $alarm['clock'];
+					$prev_value = $alarm['value'];
+				}
+
+				if ($sli_cell['uptime'] + $sli_cell['downtime'] != 0) {
+					$sli_cell['sli'] = $sli_cell['uptime'] / ($sli_cell['uptime'] + $sli_cell['downtime']) * 100;
+				}
+
+				if ($sli_cell['sli'] != -1) {
+					$available_uptime = $max_uptime - $sli_cell['uptime'] - $sli_cell['downtime'];
+
+					if ($sli_cell['sli'] >= $db_sla['slo']) {
+						$sli_cell['error_budget'] = true;
+						$sli_cell['error_budget_value'] = $db_sla['slo'] > 0
+							? min($available_uptime,
+								$sli_cell['uptime'] / $db_sla['slo'] * 100 - $sli_cell['uptime'] - $sli_cell['downtime']
+							)
+							: $available_uptime;
+					}
+					elseif ($db_sla['slo'] < 100) {
+						$sli_cell['error_budget'] = true;
+						$sli_cell['error_budget_value'] =
+							$sli_cell['uptime'] - $sli_cell['downtime'] * $db_sla['slo'] / (100 - $db_sla['slo']);
+					}
+				}
+
+				$sli[$reporting_period_index][$service_index] = $sli_cell;
+			}
+		}
+
+		return $sli;
+	}
+
+	/**
+	 * @param array $excluded_downtimes
+	 *
+	 * @return array
+	 */
+	private static function combineExcludedDowntimes(array $excluded_downtimes): array {
+		$combined_excluded_downtimes = [];
+
+		foreach ($excluded_downtimes as $excluded_downtime) {
+			$period_from = $excluded_downtime['period_from'];
+			$period_to = $excluded_downtime['period_to'];
+
+			foreach ($combined_excluded_downtimes as $combined_excluded_downtime) {
+				$is_overlapping = $excluded_downtime['period_from'] <= $combined_excluded_downtime['period_to']
+					&& $excluded_downtime['period_to'] >= $combined_excluded_downtime['period_from'];
+
+				if ($is_overlapping) {
+					$period_from = min($period_from, $combined_excluded_downtime['period_from']);
+					$period_to = max($period_to, $combined_excluded_downtime['period_to']);
+				}
+			}
+
+			foreach ($combined_excluded_downtimes as $index => $combined_excluded_downtime) {
+				if ($combined_excluded_downtime['period_from'] >= $period_from
+						&& $combined_excluded_downtime['period_to'] <= $period_to) {
+					unset($combined_excluded_downtimes[$index]);
+				}
+			}
+
+			$combined_excluded_downtimes[] = ['period_from' => $period_from, 'period_to' => $period_to];
+		}
+
+		return $combined_excluded_downtimes;
+	}
+
+	/**
+	 * @param array $reporting_period
+	 * @param array $db_sla
+	 *
+	 * @return array
+	 *
+	 * @throws Exception
+	 */
+	private static function getScheduledUptimePeriods(array $db_sla, array $reporting_period): array {
+		if (!$db_sla['schedule']) {
+			return [$reporting_period];
+		}
+
+		$uptime_periods = [];
+
+		$week_offset = $reporting_period['date_from'] -
+			(new DateTime('@'.$reporting_period['date_from']))
+				->setTimezone(new DateTimeZone($db_sla['timezone']))
+				->modify('1 day')
+				->modify('last Monday')
+				->getTimestamp();
+
+		for ($week = 0;; $week++) {
+			$week_date_from = $reporting_period['date_from'] - $week_offset + SEC_PER_WEEK * $week;
+
+			foreach ($db_sla['schedule'] as $schedule_row) {
+				$date_from = $week_date_from + $schedule_row['period_from'];
+				$date_to = $week_date_from + $schedule_row['period_to'];
+
+				if ($date_from < $reporting_period['date_to'] && $date_to > $reporting_period['date_from']) {
+					$new_date_from = max($reporting_period['date_from'], $date_from);
+					$new_date_to = min($reporting_period['date_to'], $date_to);
+
+					if ($uptime_periods && $uptime_periods[count($uptime_periods) - 1]['date_to'] == $new_date_from) {
+						$uptime_periods[count($uptime_periods) - 1]['date_to'] = $new_date_to;
+					}
+					else {
+						$uptime_periods[] = ['date_from' => $new_date_from, 'date_to' => $new_date_to];
+					}
+				}
+
+				if ($date_to >= $reporting_period['date_to']) {
+					break 2;
+				}
+			}
+		}
+
+		return $uptime_periods;
 	}
 }
