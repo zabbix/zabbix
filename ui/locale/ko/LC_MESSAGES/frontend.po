@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-26 19:55+0200\n"
+"POT-Creation-Date: 2021-12-03 19:55+0200\n"
 "PO-Revision-Date: 2016-01-22 16:15+0300\n"
 "Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -436,7 +436,7 @@ msgstr ""
 msgid "API tokens"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:339
+#: app/controllers/CControllerPopupTriggerExpr.php:370
 msgid "Abscissa"
 msgstr ""
 
@@ -540,11 +540,11 @@ msgstr "대응 완료된 해결 이벤트"
 #: include/actions.inc.php:1921
 #: include/views/administration.auditacts.list.php:64
 #: include/views/configuration.action.edit.php:59
-#: include/views/configuration.action.edit.php:175
-#: include/views/configuration.action.edit.php:179
-#: include/views/configuration.action.edit.php:319
-#: include/views/configuration.action.edit.php:407
-#: include/views/configuration.action.edit.php:478
+#: include/views/configuration.action.edit.php:168
+#: include/views/configuration.action.edit.php:172
+#: include/views/configuration.action.edit.php:312
+#: include/views/configuration.action.edit.php:400
+#: include/views/configuration.action.edit.php:483
 #: include/views/configuration.graph.edit.php:380
 #: include/views/configuration.host.discovery.edit.php:134
 #: include/views/configuration.host.discovery.edit.php:632
@@ -575,7 +575,7 @@ msgstr "대응 완료된 해결 이벤트"
 msgid "Action"
 msgstr "액션"
 
-#: include/classes/api/services/CAction.php:2678
+#: include/classes/api/services/CAction.php:2688
 #, c-format
 msgid "Action \"%1$s\" already exists."
 msgstr "액션 \"%1$s\"는 이미 존재합니다."
@@ -585,7 +585,7 @@ msgstr "액션 \"%1$s\"는 이미 존재합니다."
 msgid "Action \"%2$s\" is not available for user role \"%1$s\"."
 msgstr ""
 
-#: actionconf.php:279
+#: actionconf.php:285
 msgid "Action added"
 msgstr "액션을 추가하였습니다"
 
@@ -594,16 +594,16 @@ msgstr "액션을 추가하였습니다"
 msgid "Action class %1$s must extend %2$s class."
 msgstr ""
 
-#: actionconf.php:301
+#: actionconf.php:307
 msgid "Action deleted"
 msgstr "액션을 삭제하였습니다"
 
-#: actionconf.php:469
+#: actionconf.php:475
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] "액션을 비활성화 하였습니다"
 
-#: actionconf.php:468
+#: actionconf.php:474
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] "액션이 활성화 되었습니다"
@@ -621,7 +621,7 @@ msgstr "액션 로그"
 msgid "Action operation"
 msgstr ""
 
-#: actionconf.php:271
+#: actionconf.php:277
 msgid "Action updated"
 msgstr "액션을 갱신하였습니다"
 
@@ -750,10 +750,10 @@ msgstr "종료시간"
 #: include/classes/helpers/CTagFilterFieldHelper.php:92
 #: include/classes/widgets/CWidgetHelper.php:545 include/forms.inc.php:1481
 #: include/forms.inc.php:2045 include/views/configuration.action.edit.php:133
-#: include/views/configuration.action.edit.php:302
-#: include/views/configuration.action.edit.php:386
-#: include/views/configuration.action.edit.php:462
-#: include/views/configuration.action.edit.php:501
+#: include/views/configuration.action.edit.php:295
+#: include/views/configuration.action.edit.php:379
+#: include/views/configuration.action.edit.php:455
+#: include/views/configuration.action.edit.php:506
 #: include/views/configuration.graph.edit.php:423
 #: include/views/configuration.graph.edit.php:518
 #: include/views/configuration.host.discovery.edit.php:162
@@ -1003,7 +1003,7 @@ msgstr ""
 msgid "Aggregate"
 msgstr ""
 
-#: app/views/popup.triggerexpr.php:108
+#: app/views/popup.triggerexpr.php:109
 msgid "Aggregate functions"
 msgstr ""
 
@@ -1019,7 +1019,7 @@ msgstr ""
 msgid "Alert message"
 msgstr "알림 메세지"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1070
+#: app/controllers/CControllerPopupTriggerExpr.php:1115
 msgid "Algorithm"
 msgstr ""
 
@@ -1337,7 +1337,7 @@ msgstr ""
 msgid "At least one operation must be selected."
 msgstr ""
 
-#: include/views/configuration.action.edit.php:511
+#: include/views/configuration.action.edit.php:516
 msgid "At least one operation must exist."
 msgstr "최소 하나 이상의 액션처리가 설정되어 있어야 합니다."
 
@@ -1600,12 +1600,12 @@ msgstr "Bind DN"
 msgid "Bind password"
 msgstr "Bind password"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:397
-#: app/controllers/CControllerPopupTriggerExpr.php:430
+#: app/controllers/CControllerPopupTriggerExpr.php:428
+#: app/controllers/CControllerPopupTriggerExpr.php:461
 msgid "Bits to shift"
 msgstr ""
 
-#: app/views/popup.triggerexpr.php:109
+#: app/views/popup.triggerexpr.php:110
 msgid "Bitwise functions"
 msgstr ""
 
@@ -1811,7 +1811,7 @@ msgstr "수치형이 아닌 아이템 \"%1$s\"는 그래프 \"%2$s\"에 추가�
 msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
 msgstr "수치형이 아닌 아이템 \"%1$s\"는 그래프 프로토타입 \"%2$s\"에 추가할 수 없습니다."
 
-#: actionconf.php:280
+#: actionconf.php:286
 msgid "Cannot add action"
 msgstr "액션을 추가할 수 없습니다"
 
@@ -2104,7 +2104,7 @@ msgstr[0] ""
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Zabbix 유저 \"%1$s\"를 삭제할 수 없습니다. 유저를 비활성으로 설정해 주십시오."
 
-#: actionconf.php:301
+#: actionconf.php:307
 msgid "Cannot delete action"
 msgstr "액션을 삭제할 수 없습니다"
 
@@ -2258,12 +2258,12 @@ msgid "Cannot delete script"
 msgid_plural "Cannot delete scripts"
 msgstr[0] "스크립트를 삭제할 수 없습니다"
 
-#: include/classes/api/services/CScript.php:875
+#: include/classes/api/services/CScript.php:877
 #, c-format
 msgid "Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$s\"."
 msgstr "스크립트를 삭제할 수 없습니다. 스크립트 \"%1$s\"는 실행하는 액션 \"%2$s\"에서 이용되고 있습니다."
 
-#: actionconf.php:488
+#: actionconf.php:494
 msgid "Cannot delete selected actions"
 msgstr "선택한 액션을 삭제할 수 없습니다"
 
@@ -2362,7 +2362,7 @@ msgid "Cannot disable API token"
 msgid_plural "Cannot disable API tokens"
 msgstr[0] ""
 
-#: actionconf.php:477
+#: actionconf.php:483
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] "액션을 비활성화 할 수 없습니다."
@@ -2429,7 +2429,7 @@ msgid "Cannot enable API token"
 msgid_plural "Cannot enable API tokens"
 msgstr[0] ""
 
-#: actionconf.php:476
+#: actionconf.php:482
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] "액션(action)을 가동 시킬 수 없습니다."
@@ -2647,7 +2647,7 @@ msgid "Cannot import template \"%1$s\", linked template \"%2$s\" does not exist.
 msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" do not exist."
 msgstr[0] "템플릿 \"%1$s\"를 가져올 수 없습니다. 링크되어 있는 템플릿 \"%2$s\"가 존재하지 않습니다."
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1527
+#: app/controllers/CControllerPopupTriggerExpr.php:1583
 msgid "Cannot insert trigger expression"
 msgstr "트리거 조건식을 추가할 수 없습니다"
 
@@ -2824,7 +2824,7 @@ msgstr "템플릿의 링크를 삭제할 수 없습니다."
 msgid "Cannot unlink trigger \"%1$s\", it has items from template that is left linked to host."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2626
+#: include/classes/api/services/CAction.php:2636
 #, c-format
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
 msgstr "액션 \"%2$s\"의 \"%1$s\"를 갱신할 수 없습니다."
@@ -2890,7 +2890,7 @@ msgstr ""
 msgid "Cannot update a templated web scenario \"%1$s\": %2$s."
 msgstr "템플릿으로 된 Web 시나리오 \"%1$s\"를 갱신할 수 없습니다 : %2$s."
 
-#: actionconf.php:272
+#: actionconf.php:278
 msgid "Cannot update action"
 msgstr "액션을 갱신할 수 없습니다"
 
@@ -3050,9 +3050,9 @@ msgstr ""
 msgid "Cannot update script"
 msgstr "스크립트를 갱신할 수 없습니다"
 
-#: include/classes/api/services/CScript.php:417
-#: include/classes/api/services/CScript.php:430
-#: include/classes/api/services/CScript.php:443
+#: include/classes/api/services/CScript.php:419
+#: include/classes/api/services/CScript.php:432
+#: include/classes/api/services/CScript.php:445
 #, c-format
 msgid "Cannot update script scope. Script \"%1$s\" is used in action \"%2$s\"."
 msgstr ""
@@ -3231,9 +3231,9 @@ msgstr "문자열이 포함됨"
 msgid "Character string not included"
 msgstr "문자열이 포함되지 않음"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:728
-#: app/controllers/CControllerPopupTriggerExpr.php:921
-#: app/controllers/CControllerPopupTriggerExpr.php:1095
+#: app/controllers/CControllerPopupTriggerExpr.php:759
+#: app/controllers/CControllerPopupTriggerExpr.php:952
+#: app/controllers/CControllerPopupTriggerExpr.php:1140
 msgid "Chars"
 msgstr ""
 
@@ -3399,7 +3399,7 @@ msgstr "시각"
 #: app/views/configuration.discovery.edit.php:154
 #: app/views/configuration.host.edit.php:43 app/views/popup.host.edit.php:68
 #: app/views/popup.service.edit.php:388
-#: include/views/configuration.action.edit.php:490
+#: include/views/configuration.action.edit.php:495
 #: include/views/configuration.graph.edit.php:510
 #: include/views/configuration.host.discovery.edit.php:960
 #: include/views/configuration.hostgroups.edit.php:62
@@ -3537,7 +3537,7 @@ msgstr "압축"
 msgid "Concurrent sessions"
 msgstr "동시 세션의 숫자"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1550
+#: app/controllers/CControllerPopupTriggerExpr.php:1606
 #: app/views/popup.lldoperation.php:59 app/views/popup.lldoverride.php:195
 #: app/views/popup.service.statusrule.edit.php:48
 msgid "Condition"
@@ -3990,10 +3990,10 @@ msgstr "상관관계 규칙"
 msgid "Correlation updated"
 msgstr "상관관계를 갱신하였습니다"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:51
-#: app/controllers/CControllerPopupTriggerExpr.php:674
-#: app/controllers/CControllerPopupTriggerExpr.php:864
+#: app/controllers/CControllerPopupTriggerExpr.php:52
+#: app/controllers/CControllerPopupTriggerExpr.php:705
 #: app/controllers/CControllerPopupTriggerExpr.php:895
+#: app/controllers/CControllerPopupTriggerExpr.php:926
 msgid "Count"
 msgstr "회"
 
@@ -4527,7 +4527,7 @@ msgid "Database TLS key file"
 msgstr ""
 
 #: app/partials/administration.system.info.php:121
-msgid "Database history $info_tables upgraded"
+msgid "Database history tables upgraded"
 msgstr ""
 
 #: app/partials/administration.system.info.php:129
@@ -4600,11 +4600,11 @@ msgstr "하드웨어 메인터넌스 종료일"
 msgid "Date HW purchased"
 msgstr "하드웨어 구입일"
 
-#: app/views/popup.triggerexpr.php:110
+#: app/views/popup.triggerexpr.php:111
 msgid "Date and time functions"
 msgstr ""
 
-#: report4.php:175
+#: app/controllers/CControllerPopupTriggerExpr.php:119 report4.php:175
 msgid "Day"
 msgstr "일"
 
@@ -4645,8 +4645,8 @@ msgstr "12월"
 msgid "December"
 msgstr "12월"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:908
-#: app/controllers/CControllerPopupTriggerExpr.php:1108
+#: app/controllers/CControllerPopupTriggerExpr.php:939
+#: app/controllers/CControllerPopupTriggerExpr.php:1153
 msgid "Decimal places"
 msgstr ""
 
@@ -4656,7 +4656,7 @@ msgstr ""
 
 #: app/views/administration.iconmap.edit.php:108
 #: include/classes/widgets/forms/CWidgetForm.php:54 include/hosts.inc.php:31
-#: include/hosts.inc.php:1233 include/views/configuration.action.edit.php:229
+#: include/hosts.inc.php:1233 include/views/configuration.action.edit.php:222
 #: include/views/inventory.host.view.php:81
 #: include/views/js/monitoring.sysmaps.js.php:145
 #: include/views/js/monitoring.sysmaps.js.php:263
@@ -4800,7 +4800,7 @@ msgstr "선택한 템플릿과 데이터를 삭제하시겠습니까? (경고: �
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
 msgstr "템플릿과 데이터를 삭제하시겠습니까? (경고: 링크되어 있는 모든 호스트에서 데이터가 삭제됩니다!)"
 
-#: include/views/configuration.action.edit.php:492
+#: include/views/configuration.action.edit.php:497
 msgid "Delete current action?"
 msgstr "현재 액션을 삭제하시겠습니까?"
 
@@ -5102,7 +5102,7 @@ msgstr ""
 msgid "Dependencies"
 msgstr "의존관계"
 
-#: include/triggers.inc.php:2398
+#: include/triggers.inc.php:2402
 msgid "Dependent"
 msgstr "의존처"
 
@@ -5110,7 +5110,7 @@ msgstr "의존처"
 msgid "Dependent item"
 msgstr "의존 아이템"
 
-#: app/views/popup.generic.php:278 include/triggers.inc.php:2398
+#: app/views/popup.generic.php:278 include/triggers.inc.php:2402
 #: include/views/configuration.trigger.prototype.list.php:92
 #: include/views/configuration.triggers.list.php:238
 msgid "Depends on"
@@ -5157,10 +5157,10 @@ msgstr "이름"
 #: app/views/js/reports.auditlog.list.js.php:153
 #: app/views/reports.auditlog.list.php:96
 #: app/views/reports.auditlog.list.php:129 include/func.inc.php:1601
-#: include/views/configuration.action.edit.php:175
-#: include/views/configuration.action.edit.php:179
-#: include/views/configuration.action.edit.php:319
-#: include/views/configuration.action.edit.php:407
+#: include/views/configuration.action.edit.php:168
+#: include/views/configuration.action.edit.php:172
+#: include/views/configuration.action.edit.php:312
+#: include/views/configuration.action.edit.php:400
 #: include/views/inventory.host.view.php:257
 msgid "Details"
 msgstr "자세히"
@@ -5169,11 +5169,11 @@ msgstr "자세히"
 msgid "Details of web scenario"
 msgstr "Web시나리오 세부 내용"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1055
+#: app/controllers/CControllerPopupTriggerExpr.php:1100
 msgid "Detection period"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1065
+#: app/controllers/CControllerPopupTriggerExpr.php:1110
 msgid "Deviations"
 msgstr ""
 
@@ -5332,7 +5332,7 @@ msgstr "선택한 Web시나리오를 비활성으로 하시겠습니까?"
 #: include/hosts.inc.php:1126 include/html.inc.php:284
 #: include/httptest.inc.php:48 include/items.inc.php:138
 #: include/items.inc.php:141 include/items.inc.php:185
-#: include/maps.inc.php:325 include/triggers.inc.php:1871
+#: include/maps.inc.php:325 include/triggers.inc.php:1875
 #: include/users.inc.php:84 include/views/configuration.action.list.php:77
 #: include/views/configuration.action.list.php:129
 #: include/views/configuration.host.discovery.list.php:167
@@ -5590,7 +5590,7 @@ msgstr "%3$s 건 중 %1$s 에서 %2$s 까지를 표시하고 있습니다"
 msgid "Displaying options"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:780
+#: app/controllers/CControllerPopupTriggerExpr.php:811
 msgid "Division denominator"
 msgstr ""
 
@@ -5736,7 +5736,7 @@ msgstr "맵 \"%2$s\"를 위한 유저 내의 userid \"%1$s\"가 중복되었습�
 #: include/classes/screens/CScreenProblem.php:867
 #: include/classes/screens/CScreenProblem.php:892
 #: include/classes/screens/CScreenProblem.php:1161 include/events.inc.php:289
-#: include/views/configuration.action.edit.php:175
+#: include/views/configuration.action.edit.php:168
 msgid "Duration"
 msgstr "기간"
 
@@ -5770,10 +5770,10 @@ msgstr ""
 #: app/views/js/popup.service.edit.js.php:221
 #: app/views/monitoring.service.list.edit.php:142
 #: app/views/monitoring.service.list.php:114
-#: include/views/configuration.action.edit.php:246
-#: include/views/configuration.action.edit.php:274
-#: include/views/configuration.action.edit.php:358
-#: include/views/configuration.action.edit.php:436
+#: include/views/configuration.action.edit.php:239
+#: include/views/configuration.action.edit.php:267
+#: include/views/configuration.action.edit.php:351
+#: include/views/configuration.action.edit.php:429
 #: include/views/configuration.maintenance.edit.php:68
 #: include/views/configuration.trigger.prototype.edit.php:111
 #: include/views/configuration.trigger.prototype.edit.php:305
@@ -6073,7 +6073,7 @@ msgstr "트래핑의 활성화"
 #: include/html.inc.php:280 include/httptest.inc.php:47
 #: include/items.inc.php:138 include/items.inc.php:141
 #: include/items.inc.php:182 include/triggers.inc.php:999
-#: include/triggers.inc.php:1868
+#: include/triggers.inc.php:1872
 #: include/views/configuration.action.edit.php:147
 #: include/views/configuration.action.list.php:76
 #: include/views/configuration.action.list.php:137
@@ -6169,7 +6169,7 @@ msgstr ""
 msgid "Error: %1$s"
 msgstr "에러: %1$s"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1045
+#: app/controllers/CControllerPopupTriggerExpr.php:1090
 msgid "Evaluation period"
 msgstr ""
 
@@ -6740,8 +6740,8 @@ msgctxt "page navigation"
 msgid "First"
 msgstr "첫번째"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:237
-#: app/controllers/CControllerPopupTriggerExpr.php:266
+#: app/controllers/CControllerPopupTriggerExpr.php:268
+#: app/controllers/CControllerPopupTriggerExpr.php:297
 msgid "Fit"
 msgstr "Fit"
 
@@ -6858,7 +6858,7 @@ msgstr "전부"
 msgid "Full clone"
 msgstr "모두 복제"
 
-#: app/views/popup.triggerexpr.php:132
+#: app/views/popup.triggerexpr.php:133
 #: include/views/configuration.graph.edit.php:366
 msgid "Function"
 msgstr "기능"
@@ -6874,7 +6874,7 @@ msgstr "GSM 모뎀"
 msgid "GUI"
 msgstr "표시 설정"
 
-#: include/classes/user/CWebUser.php:63 index_sso.php:245
+#: include/classes/user/CWebUser.php:63 index_sso.php:260
 msgid "GUI access disabled."
 msgstr "GUI 액세스를 비활성 하였습니다"
 
@@ -7457,7 +7457,7 @@ msgstr "이력 삭제에 시간이 걸릴 수도 있습니다. 계속하시겠�
 msgid "History data selection"
 msgstr "이력 데이터의 선택"
 
-#: app/views/popup.triggerexpr.php:111
+#: app/views/popup.triggerexpr.php:112
 msgid "History functions"
 msgstr ""
 
@@ -7631,7 +7631,7 @@ msgid "Host group label type"
 msgstr "호스트 그룹의 라벨타입"
 
 #: include/classes/api/services/CDashboardGeneral.php:555
-#: include/classes/api/services/CScript.php:812
+#: include/classes/api/services/CScript.php:814
 #: include/classes/api/services/CSettings.php:247
 #: include/classes/api/services/CUserGroup.php:444
 #, c-format
@@ -7873,6 +7873,10 @@ msgstr "호스트의 위치"
 #: app/controllers/CControllerPopupMassupdateHost.php:454
 msgid "Hosts updated"
 msgstr "호스트를 갱신하였습니다"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:118
+msgid "Hour"
+msgstr ""
 
 #: app/views/popup.maintenance.period.php:170
 msgid "Hours"
@@ -8181,7 +8185,7 @@ msgstr "이미지"
 msgid "Images for all maps will be updated!"
 msgstr "모든 맵의 이미지가 업로드 됩니다!"
 
-#: include/views/configuration.action.edit.php:236
+#: include/views/configuration.action.edit.php:229
 msgid "Immediately"
 msgstr "즉시"
 
@@ -8263,7 +8267,7 @@ msgstr ""
 #: app/partials/monitoring.host.view.html.php:89
 #: app/views/configuration.host.list.php:267
 #: include/classes/screens/CScreenProblem.php:386
-#: include/hostgroups.inc.php:293 include/triggers.inc.php:2023
+#: include/hostgroups.inc.php:293 include/triggers.inc.php:2027
 #: include/views/inventory.host.view.php:42
 msgid "Inaccessible maintenance"
 msgstr ""
@@ -8275,11 +8279,11 @@ msgstr "접근할 수 없는 맵"
 
 #: httpconf.php:663 include/graphs.inc.php:274 include/hosts.inc.php:649
 #: include/httptest.inc.php:222 include/items.inc.php:916
-#: include/triggers.inc.php:2162
+#: include/triggers.inc.php:2166
 msgid "Inaccessible template"
 msgstr "접근할 수 없는 템플릿"
 
-#: include/triggers.inc.php:2368 include/triggers.inc.php:2376
+#: include/triggers.inc.php:2372 include/triggers.inc.php:2380
 msgid "Inaccessible trigger"
 msgstr "접속이 안되는 트리거"
 
@@ -8394,7 +8398,7 @@ msgstr ""
 msgid "Incorrect action condition discovery check."
 msgstr "액션 실행조건의 디스커버리 규칙의 값이 올바르지 않습니다."
 
-#: include/classes/api/services/CAction.php:3310
+#: include/classes/api/services/CAction.php:3320
 msgid "Incorrect action condition discovery check. Discovery check does not exist or you have no access to it."
 msgstr "액션 실행조건의 디스커버리 규칙의 값이 올바르지 않습니다. 디스커버리 규칙이 존재하지 않거나 권한이 없습니다."
 
@@ -8402,7 +8406,7 @@ msgstr "액션 실행조건의 디스커버리 규칙의 값이 올바르지 않
 msgid "Incorrect action condition discovery object."
 msgstr "액션 실행조건의 디스커버리 오브젝트가 올바르지 않습니다."
 
-#: include/classes/api/services/CAction.php:3269
+#: include/classes/api/services/CAction.php:3279
 msgid "Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it."
 msgstr "액션 실행조건의 디스커버리 규칙이 올바르지 않습니다. 디스커버리 규칙이 존재하지 않거나 권한이 없습니다."
 
@@ -8414,15 +8418,15 @@ msgstr "액션 실행조건의 디스커버리 스테이터스 값이 올바르�
 msgid "Incorrect action condition event type."
 msgstr "액션 실행조건의 이벤트타입이 올바르지 않습니다."
 
-#: include/classes/api/services/CAction.php:2989
+#: include/classes/api/services/CAction.php:2999
 msgid "Incorrect action condition or operation host group. Host group does not exist or you have no access to it."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:3049
+#: include/classes/api/services/CAction.php:3059
 msgid "Incorrect action condition or operation host. Host does not exist or you have no access to it."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:3187
+#: include/classes/api/services/CAction.php:3197
 msgid "Incorrect action condition or operation template. Template does not exist or you have no access to it."
 msgstr ""
 
@@ -8431,11 +8435,11 @@ msgstr ""
 msgid "Incorrect action condition port \"%1$s\"."
 msgstr "액션 실행조건의 포트 \"%1$s\"가 올바르지 않습니다."
 
-#: include/classes/api/services/CAction.php:3351
+#: include/classes/api/services/CAction.php:3361
 msgid "Incorrect action condition proxy. Proxy does not exist or you have no access to it."
 msgstr "액션 실행조건의 프록시 설정이 올바르지 않습니다. 프록시가 존재하지 않거나 액세스 권한이 없습니다."
 
-#: include/classes/api/services/CAction.php:3391
+#: include/classes/api/services/CAction.php:3401
 msgid "Incorrect action condition service. Service does not exist or you have no access to it."
 msgstr ""
 
@@ -8443,7 +8447,7 @@ msgstr ""
 msgid "Incorrect action condition trigger severity."
 msgstr "액션 실행조건의 트리거의 심각도가 올바르지 않습니다."
 
-#: include/classes/api/services/CAction.php:3228
+#: include/classes/api/services/CAction.php:3238
 msgid "Incorrect action condition trigger. Trigger does not exist or you have no access to it."
 msgstr "액션 실행조건의 트리거 값이 올바르지 않습니다. 트리거가 존재하지 않거나 액세스 권한이 없습니다."
 
@@ -8453,11 +8457,11 @@ msgstr "액션의 실행조건 타입의 값이 올바르지 않습니다."
 
 #: app/controllers/CControllerActionOperationValidate.php:83
 #: app/controllers/CControllerActionOperationValidate.php:89
-#: include/classes/api/services/CAction.php:2814
+#: include/classes/api/services/CAction.php:2824
 msgid "Incorrect action operation escalation step values."
 msgstr "실행하는 액션의 에스컬레이션 스텝의 값이 올바르지 않습니다."
 
-#: include/classes/api/services/CAction.php:2889
+#: include/classes/api/services/CAction.php:2899
 msgid "Incorrect action operation media type. Media type does not exist or you have no access to it."
 msgstr ""
 
@@ -8466,11 +8470,11 @@ msgstr ""
 msgid "Incorrect action operation type \"%1$s\" for event source \"%2$s\"."
 msgstr "이벤트 소스 \"%2$s\" 에 의해 실행되는 액션의 타입 \"%1$s\"가 올바르지 않습니다."
 
-#: include/classes/api/services/CAction.php:3135
+#: include/classes/api/services/CAction.php:3145
 msgid "Incorrect action operation user group. User group does not exist or you have no access to it."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:3092
+#: include/classes/api/services/CAction.php:3102
 msgid "Incorrect action operation user. User does not exist or you have no access to it."
 msgstr ""
 
@@ -9214,7 +9218,7 @@ msgstr ""
 msgid "Initial view is ignored if the default view is set."
 msgstr ""
 
-#: app/views/popup.triggerexpr.php:239
+#: app/views/popup.triggerexpr.php:258
 msgid "Insert"
 msgstr "삽입"
 
@@ -9366,7 +9370,7 @@ msgstr ""
 msgid "Invalid action condition: %1$s."
 msgstr "액션의 실행조건이 올바르지 않습니다 : %1$s."
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1517
+#: app/controllers/CControllerPopupTriggerExpr.php:1573
 #, c-format
 msgid "Invalid condition: %1$s."
 msgstr ""
@@ -9427,10 +9431,10 @@ msgstr "메소드의 파라미터가 올바르지 않습니다."
 #: app/controllers/CControllerDashboardUpdate.php:200
 #: app/controllers/CControllerDashboardUpdate.php:212
 #: app/controllers/CControllerPopupHttpStep.php:100
-#: include/classes/api/services/CAction.php:2705
-#: include/classes/api/services/CAction.php:2711
-#: include/classes/api/services/CAction.php:2722
-#: include/classes/api/services/CAction.php:2734
+#: include/classes/api/services/CAction.php:2715
+#: include/classes/api/services/CAction.php:2721
+#: include/classes/api/services/CAction.php:2732
+#: include/classes/api/services/CAction.php:2744
 #: include/classes/api/services/CAutoregistration.php:157
 #: include/classes/api/services/CAutoregistration.php:163
 #: include/classes/api/services/CAutoregistration.php:170
@@ -9493,8 +9497,8 @@ msgstr "메소드의 파라미터가 올바르지 않습니다."
 #: include/classes/api/services/CReport.php:582
 #: include/classes/api/services/CReport.php:596
 #: include/classes/api/services/CReport.php:602
-#: include/classes/api/services/CScript.php:902
-#: include/classes/api/services/CScript.php:908
+#: include/classes/api/services/CScript.php:904
+#: include/classes/api/services/CScript.php:910
 #: include/classes/api/services/CTemplate.php:668
 #: include/classes/api/services/CTriggerGeneral.php:665
 #: include/classes/api/services/CTriggerGeneral.php:1773
@@ -9834,7 +9838,7 @@ msgstr[0] "아이템을 활성화 하였습니다"
 msgid "Item in \"not supported\" state"
 msgstr "아이템이 \"습득불가\" 상태"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1510
+#: app/controllers/CControllerPopupTriggerExpr.php:1566
 msgid "Item not selected"
 msgstr "아이템이 선택되어 있지 않습니다"
 
@@ -10280,17 +10284,17 @@ msgstr "최근 1개월의 그래프"
 msgid "Last name"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:62
-#: app/controllers/CControllerPopupTriggerExpr.php:76
-#: app/controllers/CControllerPopupTriggerExpr.php:90
-#: app/controllers/CControllerPopupTriggerExpr.php:103
-#: app/controllers/CControllerPopupTriggerExpr.php:124
-#: app/controllers/CControllerPopupTriggerExpr.php:133
-#: app/controllers/CControllerPopupTriggerExpr.php:146
-#: app/controllers/CControllerPopupTriggerExpr.php:165
-#: app/controllers/CControllerPopupTriggerExpr.php:202
-#: app/controllers/CControllerPopupTriggerExpr.php:221
-#: app/controllers/CControllerPopupTriggerExpr.php:250
+#: app/controllers/CControllerPopupTriggerExpr.php:63
+#: app/controllers/CControllerPopupTriggerExpr.php:77
+#: app/controllers/CControllerPopupTriggerExpr.php:91
+#: app/controllers/CControllerPopupTriggerExpr.php:134
+#: app/controllers/CControllerPopupTriggerExpr.php:155
+#: app/controllers/CControllerPopupTriggerExpr.php:164
+#: app/controllers/CControllerPopupTriggerExpr.php:177
+#: app/controllers/CControllerPopupTriggerExpr.php:196
+#: app/controllers/CControllerPopupTriggerExpr.php:233
+#: app/controllers/CControllerPopupTriggerExpr.php:252
+#: app/controllers/CControllerPopupTriggerExpr.php:281
 msgid "Last of"
 msgstr "최근"
 
@@ -10367,8 +10371,8 @@ msgstr "왼쪽 trim"
 msgid "Legend"
 msgstr "범례"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:642
-#: app/controllers/CControllerPopupTriggerExpr.php:760
+#: app/controllers/CControllerPopupTriggerExpr.php:673
+#: app/controllers/CControllerPopupTriggerExpr.php:791
 msgid "Length"
 msgstr ""
 
@@ -10582,7 +10586,7 @@ msgstr "매치하지 않은 SNMP트랩을 로그에 기록"
 #: app/controllers/CControllerAuditLogList.php:191
 #: app/views/administration.authentication.edit.php:200
 #: app/views/administration.user.list.php:112 include/func.inc.php:1523
-#: include/func.inc.php:1539 index_http.php:90 index_sso.php:265
+#: include/func.inc.php:1539 index_http.php:90 index_sso.php:280
 msgid "Login"
 msgstr "로그인"
 
@@ -10920,9 +10924,9 @@ msgstr "선택 이외 항목 색 지정"
 msgid "Mark selected"
 msgstr "선택 항목 색 지정"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:377
-#: app/controllers/CControllerPopupTriggerExpr.php:417
-#: app/controllers/CControllerPopupTriggerExpr.php:443
+#: app/controllers/CControllerPopupTriggerExpr.php:408
+#: app/controllers/CControllerPopupTriggerExpr.php:448
+#: app/controllers/CControllerPopupTriggerExpr.php:474
 msgid "Mask"
 msgstr "마스크"
 
@@ -10962,11 +10966,11 @@ msgstr "마스터 아이템"
 msgid "Matches regular expression"
 msgstr ""
 
-#: app/views/popup.triggerexpr.php:112
+#: app/views/popup.triggerexpr.php:113
 msgid "Mathematical functions"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:364
+#: app/controllers/CControllerPopupTriggerExpr.php:395
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:134
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:136
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:206
@@ -11194,7 +11198,7 @@ msgstr ""
 msgid "Middle"
 msgstr "가운데"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:359
+#: app/controllers/CControllerPopupTriggerExpr.php:390
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:119
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:121
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:191
@@ -11295,7 +11299,7 @@ msgstr "그래프 프로토타입 \"%1$s\"의 아이템이 존재하지 않습�
 msgid "Missing key \"%1$s\" for host \"%2$s\"."
 msgstr "호스트\"%2$s\"에는 키\"%1$s\"가 설정되어 있지 않습니다"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:242
+#: app/controllers/CControllerPopupTriggerExpr.php:273
 #: app/views/administration.proxy.list.php:51
 #: app/views/administration.proxy.list.php:77 report2.php:201
 msgid "Mode"
@@ -11394,6 +11398,7 @@ msgstr "모니터링"
 msgid "Monospace"
 msgstr "Monospace"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:121
 #: app/views/popup.maintenance.period.php:104 report4.php:163
 msgid "Month"
 msgstr "월"
@@ -12015,7 +12020,7 @@ msgstr "조건에 일치하는 데이터가 없습니다"
 msgid "No new modules discovered"
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2769
+#: include/classes/api/services/CAction.php:2779
 #, c-format
 msgid "No operations defined for action \"%1$s\"."
 msgstr ""
@@ -12052,9 +12057,9 @@ msgstr "시스템 액세스 권한이 없습니다."
 #: include/classes/api/services/CRole.php:137
 #: include/classes/api/services/CRole.php:230
 #: include/classes/api/services/CRole.php:345
-#: include/classes/api/services/CScript.php:240
-#: include/classes/api/services/CScript.php:316
-#: include/classes/api/services/CScript.php:825
+#: include/classes/api/services/CScript.php:242
+#: include/classes/api/services/CScript.php:318
+#: include/classes/api/services/CScript.php:827
 #: include/classes/api/services/CSettings.php:136
 #: include/classes/api/services/CUserGroup.php:176
 #: include/classes/api/services/CUserGroup.php:260
@@ -12093,7 +12098,7 @@ msgstr ""
 #: app/views/monitoring.widget.systeminfo.view.php:45 disc_prototypes.php:748
 #: host_discovery.php:808 hostinventoriesoverview.php:73
 #: include/classes/api/services/CAction.php:1516
-#: include/classes/api/services/CAction.php:2571
+#: include/classes/api/services/CAction.php:2577
 #: include/classes/api/services/CConfiguration.php:78
 #: include/classes/api/services/CCorrelation.php:497
 #: include/classes/api/services/CCorrelation.php:653
@@ -12193,11 +12198,11 @@ msgstr ""
 #: include/classes/api/services/CReport.php:909
 #: include/classes/api/services/CRole.php:326
 #: include/classes/api/services/CRole.php:363
-#: include/classes/api/services/CScript.php:375
-#: include/classes/api/services/CScript.php:860
-#: include/classes/api/services/CScript.php:920
-#: include/classes/api/services/CScript.php:937
-#: include/classes/api/services/CScript.php:949
+#: include/classes/api/services/CScript.php:377
+#: include/classes/api/services/CScript.php:862
+#: include/classes/api/services/CScript.php:922
+#: include/classes/api/services/CScript.php:939
+#: include/classes/api/services/CScript.php:951
 #: include/classes/api/services/CService.php:398
 #: include/classes/api/services/CService.php:467
 #: include/classes/api/services/CService.php:947
@@ -12256,7 +12261,7 @@ msgid "No public key file specified."
 msgstr "공개키 파일이 설정되어 있지 않습니다"
 
 #: app/controllers/CControllerActionOperationValidate.php:110
-#: include/classes/api/services/CAction.php:2826
+#: include/classes/api/services/CAction.php:2836
 msgid "No recipients specified for action operation message."
 msgstr ""
 
@@ -12277,7 +12282,7 @@ msgid "No target selected."
 msgstr "아무 것도 선택되어 있지 않습니다."
 
 #: app/controllers/CControllerActionOperationValidate.php:142
-#: include/classes/api/services/CAction.php:2837
+#: include/classes/api/services/CAction.php:2847
 msgid "No targets specified for action operation global script."
 msgstr ""
 
@@ -12426,6 +12431,10 @@ msgstr "통지 보고서"
 msgid "Notifications"
 msgstr "통지"
 
+#: actionconf.php:87 include/views/configuration.action.edit.php:475
+msgid "Notify about canceled escalations"
+msgstr ""
+
 #: include/actions.inc.php:865 include/actions.inc.php:1038
 #: include/actions.inc.php:1039
 msgid "Notify all involved"
@@ -12511,6 +12520,10 @@ msgstr "VMware가상 머신 상의 프로세서 수, <url> - VMware서비스URL,
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:279
 msgid "Number of rows"
 msgstr "행의 수"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:126
+msgid "Number of seasons"
+msgstr ""
 
 #: include/views/reports.toptriggers.php:86
 msgid "Number of status changes"
@@ -12810,12 +12823,12 @@ msgstr "OS정보. string값을 리턴"
 msgid "Operation"
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2795
+#: include/classes/api/services/CAction.php:2805
 #, c-format
 msgid "Operation \"%1$s\" already exists for action \"%2$s\"."
 msgstr ""
 
-#: actionconf.php:378
+#: actionconf.php:384
 #, c-format
 msgid "Operation \"%1$s\" already exists."
 msgstr ""
@@ -12849,8 +12862,8 @@ msgstr ""
 #: app/views/configuration.correlation.edit.php:140
 #: app/views/configuration.correlation.list.php:77
 #: app/views/popup.lldoverride.php:210
-#: include/views/configuration.action.edit.php:307
-#: include/views/configuration.action.edit.php:479
+#: include/views/configuration.action.edit.php:300
+#: include/views/configuration.action.edit.php:484
 #: include/views/configuration.action.list.php:99
 msgid "Operations"
 msgstr "오퍼레이션"
@@ -12885,7 +12898,7 @@ msgstr "오퍼레이션"
 msgid "Operator"
 msgstr "오퍼레이터"
 
-#: app/views/popup.triggerexpr.php:113
+#: app/views/popup.triggerexpr.php:114
 msgid "Operator functions"
 msgstr ""
 
@@ -13313,7 +13326,7 @@ msgid "Parameters"
 msgstr "파라미터"
 
 #: app/controllers/CControllerActionOperationValidate.php:76
-#: include/classes/api/services/CAction.php:2807
+#: include/classes/api/services/CAction.php:2817
 msgid "Parameters \"esc_step_from\" and \"esc_step_to\" must be set together."
 msgstr ""
 
@@ -13440,12 +13453,12 @@ msgstr ""
 msgid "Paste without external links"
 msgstr "링크 없이 붙여넣기"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:877
+#: app/controllers/CControllerPopupTriggerExpr.php:908
 #: app/views/monitoring.charts.view.php:106
 msgid "Pattern"
 msgstr ""
 
-#: actionconf.php:82 include/views/configuration.action.edit.php:163
+#: actionconf.php:82 include/views/configuration.action.edit.php:471
 msgid "Pause operations for suppressed problems"
 msgstr "잠시 억제된 문제의 실행을 일시중지"
 
@@ -13458,7 +13471,7 @@ msgstr "피크 때의 메모리 사용량 : %1$s"
 msgid "Percent of time the virtual machine is unable to run because it is contending for access to the physical CPU(s), <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:213
+#: app/controllers/CControllerPopupTriggerExpr.php:244
 msgid "Percentage"
 msgstr "백분율"
 
@@ -13482,10 +13495,11 @@ msgstr "백분위 선 (오른쪽)"
 msgid "Performs a DNS query. Returns character string with the required type of information"
 msgstr "DNS쿼리를 실행. 요구한 정보 타입의 string을 리턴."
 
+#: app/controllers/CControllerPopupTriggerExpr.php:104
 #: app/partials/scheduledreport.formgrid.html.php:83
 #: app/partials/scheduledreport.table.html.php:42
 #: app/views/popup.lldoperation.php:116
-#: app/views/popup.massupdate.item.php:227 app/views/popup.triggerexpr.php:181
+#: app/views/popup.massupdate.item.php:227 app/views/popup.triggerexpr.php:182
 #: include/views/configuration.host.discovery.edit.php:632
 #: include/views/configuration.item.edit.php:735
 #: include/views/configuration.item.prototype.edit.php:714
@@ -13493,8 +13507,9 @@ msgstr "DNS쿼리를 실행. 요구한 정보 타입의 string을 리턴."
 msgid "Period"
 msgstr "기간"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:95
-#: app/controllers/CControllerPopupTriggerExpr.php:1050
+#: app/controllers/CControllerPopupTriggerExpr.php:96
+#: app/controllers/CControllerPopupTriggerExpr.php:109
+#: app/controllers/CControllerPopupTriggerExpr.php:1095
 msgid "Period shift"
 msgstr ""
 
@@ -13648,7 +13663,7 @@ msgstr "포스트 형식"
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:832
+#: app/controllers/CControllerPopupTriggerExpr.php:863
 msgid "Power value"
 msgstr ""
 
@@ -13657,7 +13672,7 @@ msgstr ""
 msgid "Pre-installation summary"
 msgstr "설치 사전 준비 요약"
 
-#: app/views/popup.triggerexpr.php:114
+#: app/views/popup.triggerexpr.php:115
 msgid "Prediction functions"
 msgstr ""
 
@@ -14182,7 +14197,7 @@ msgstr "복구조건식"
 msgid "Recovery expression syntax error."
 msgstr "복구조건식의 syntax 에러"
 
-#: include/views/configuration.action.edit.php:393
+#: include/views/configuration.action.edit.php:386
 msgid "Recovery operations"
 msgstr "복구시 실행내용"
 
@@ -14334,10 +14349,10 @@ msgstr "원격 명령"
 #: include/classes/widgets/CWidgetHelper.php:533
 #: include/classes/widgets/CWidgetHelper.php:586 include/forms.inc.php:1461
 #: include/forms.inc.php:2009 include/views/configuration.action.edit.php:97
-#: include/views/configuration.action.edit.php:256
-#: include/views/configuration.action.edit.php:284
-#: include/views/configuration.action.edit.php:368
-#: include/views/configuration.action.edit.php:446
+#: include/views/configuration.action.edit.php:249
+#: include/views/configuration.action.edit.php:277
+#: include/views/configuration.action.edit.php:361
+#: include/views/configuration.action.edit.php:439
 #: include/views/configuration.host.discovery.edit.php:151
 #: include/views/configuration.host.discovery.edit.php:196
 #: include/views/configuration.host.discovery.edit.php:222
@@ -14484,8 +14499,8 @@ msgstr "치환"
 msgid "Replace dependencies"
 msgstr "의존관계를 치환"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:647
-#: app/controllers/CControllerPopupTriggerExpr.php:882
+#: app/controllers/CControllerPopupTriggerExpr.php:678
+#: app/controllers/CControllerPopupTriggerExpr.php:913
 msgid "Replacement"
 msgstr ""
 
@@ -14686,7 +14701,7 @@ msgstr ""
 #: app/views/popup.itemtestedit.view.php:325
 #: app/views/popup.itemtestedit.view.php:365
 #: app/views/popup.testtriggerexpr.php:49
-#: app/views/popup.testtriggerexpr.php:102 app/views/popup.triggerexpr.php:217
+#: app/views/popup.testtriggerexpr.php:102 app/views/popup.triggerexpr.php:236
 #: include/classes/debug/CProfiler.php:183
 msgid "Result"
 msgstr "결과"
@@ -15215,7 +15230,7 @@ msgstr "범위"
 msgid "Script"
 msgstr "스크립트"
 
-#: include/classes/api/services/CScript.php:1346
+#: include/classes/api/services/CScript.php:1348
 #, c-format
 msgid "Script \"%1$s\" already exists."
 msgstr "스크립트 \"%1$s\"은 이미 존재합니다."
@@ -15279,11 +15294,12 @@ msgstr "검색패턴이 공백입니다"
 msgid "Search type"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1060
+#: app/controllers/CControllerPopupTriggerExpr.php:114
+#: app/controllers/CControllerPopupTriggerExpr.php:1105
 msgid "Season"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1075
+#: app/controllers/CControllerPopupTriggerExpr.php:1120
 msgid "Season deviation window"
 msgstr ""
 
@@ -15365,7 +15381,7 @@ msgstr "위젯의 선택"
 msgid "Selected"
 msgstr "선택"
 
-#: actionconf.php:488
+#: actionconf.php:494
 msgid "Selected actions deleted"
 msgstr "선택한 액션을 삭제하였습니다"
 
@@ -15605,6 +15621,7 @@ msgid "Services updated"
 msgstr ""
 
 #: include/classes/core/ZBase.php:244 include/classes/core/ZBase.php:471
+#: index_sso.php:242 index_sso.php:249
 msgid "Session initialization error."
 msgstr ""
 
@@ -16058,7 +16075,7 @@ msgstr "스페인어 (es_ES)"
 msgid "Specified role was not found."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2932
+#: include/classes/api/services/CAction.php:2942
 msgid "Specified script does not exist or you do not have rights on it for action operation command."
 msgstr "실행하는 액션 커맨드에서 지정된 스크립트가 존재하지 않거나, 권한이 없습니다."
 
@@ -16093,8 +16110,8 @@ msgstr "표준 아이템"
 msgid "Standby"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:637
-#: app/controllers/CControllerPopupTriggerExpr.php:755
+#: app/controllers/CControllerPopupTriggerExpr.php:668
+#: app/controllers/CControllerPopupTriggerExpr.php:786
 msgid "Start"
 msgstr ""
 
@@ -16102,7 +16119,7 @@ msgstr ""
 msgid "Start date"
 msgstr ""
 
-#: include/views/configuration.action.edit.php:175
+#: include/views/configuration.action.edit.php:168
 msgid "Start in"
 msgstr "시작시간"
 
@@ -16285,7 +16302,7 @@ msgid "Step with name \"%1$s\" already exists."
 msgstr "\"%1$s\"의 이름를 지닌 스텝이 이미 존재합니다."
 
 #: app/partials/popup.operations.php:51 httpconf.php:51
-#: include/views/configuration.action.edit.php:175
+#: include/views/configuration.action.edit.php:168
 #: include/views/configuration.httpconf.edit.php:227
 #: include/views/configuration.httpconf.edit.php:236
 msgid "Steps"
@@ -16339,12 +16356,12 @@ msgstr "Straight"
 msgid "Strict"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:497
+#: app/controllers/CControllerPopupTriggerExpr.php:528
 #: include/triggers.inc.php:1596
 msgid "String"
 msgstr ""
 
-#: app/views/popup.triggerexpr.php:115
+#: app/views/popup.triggerexpr.php:116
 msgid "String functions"
 msgstr ""
 
@@ -17027,7 +17044,7 @@ msgstr "올해"
 msgid "This year so far"
 msgstr "올해의 지금까지"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:261
+#: app/controllers/CControllerPopupTriggerExpr.php:292
 msgid "Threshold"
 msgstr "허용치(Threshold)"
 
@@ -17060,15 +17077,15 @@ msgstr ""
 msgid "Till"
 msgstr "종료"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:50
-#: app/controllers/CControllerPopupTriggerExpr.php:232
+#: app/controllers/CControllerPopupTriggerExpr.php:51
+#: app/controllers/CControllerPopupTriggerExpr.php:263
 #: app/views/hintbox.eventlist.php:61 app/views/hintbox.eventlist.php:67
 #: app/views/monitoring.widget.actionlog.view.php:33
 #: app/views/monitoring.widget.problems.view.php:38
 #: app/views/popup.itemtestedit.view.php:270
 #: app/views/popup.service.time.edit.php:70
 #: app/views/popup.service.time.edit.php:98
-#: app/views/popup.triggerexpr.php:174 app/views/popup.triggerexpr.php:178
+#: app/views/popup.triggerexpr.php:175 app/views/popup.triggerexpr.php:179
 #: app/views/reports.auditlog.list.php:89 include/actions.inc.php:1700
 #: include/actions.inc.php:1754 include/actions.inc.php:1827
 #: include/actions.inc.php:1921 include/actions.inc.php:1976
@@ -17105,13 +17122,13 @@ msgstr ""
 msgid "Time period"
 msgstr "기간"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:68
-#: app/controllers/CControllerPopupTriggerExpr.php:82
-#: app/controllers/CControllerPopupTriggerExpr.php:152
-#: app/controllers/CControllerPopupTriggerExpr.php:171
-#: app/controllers/CControllerPopupTriggerExpr.php:208
-#: app/controllers/CControllerPopupTriggerExpr.php:227
-#: app/controllers/CControllerPopupTriggerExpr.php:256
+#: app/controllers/CControllerPopupTriggerExpr.php:69
+#: app/controllers/CControllerPopupTriggerExpr.php:83
+#: app/controllers/CControllerPopupTriggerExpr.php:183
+#: app/controllers/CControllerPopupTriggerExpr.php:202
+#: app/controllers/CControllerPopupTriggerExpr.php:239
+#: app/controllers/CControllerPopupTriggerExpr.php:258
+#: app/controllers/CControllerPopupTriggerExpr.php:287
 #: include/classes/widgets/CWidgetHelper.php:784
 #: include/classes/widgets/CWidgetHelper.php:860
 #: include/classes/widgets/CWidgetHelper.php:1129
@@ -17799,9 +17816,9 @@ msgstr "단위"
 #: include/items.inc.php:45 include/items.inc.php:110
 #: include/items.inc.php:133 include/items.inc.php:167
 #: include/maintenances.inc.php:33 include/maps.inc.php:39
-#: include/triggers.inc.php:83 include/triggers.inc.php:1868
+#: include/triggers.inc.php:83 include/triggers.inc.php:1872
 #: include/users.inc.php:64 include/users.inc.php:87
-#: include/views/configuration.action.edit.php:233
+#: include/views/configuration.action.edit.php:226
 #: include/views/configuration.triggers.list.php:77
 msgid "Unknown"
 msgstr "알 수 없음"
@@ -17819,7 +17836,7 @@ msgid "Unknown error"
 msgstr "알 수 없는 에러"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:47
-#: app/controllers/CControllerPopupTriggerExpr.php:1301
+#: app/controllers/CControllerPopupTriggerExpr.php:1346
 #: include/triggers.inc.php:1146
 msgid "Unknown host item, no such item in selected host"
 msgstr "알 수 없는 아이템. 선택한 호스트에 그런 아이템은 존재하지 않습니다"
@@ -17967,7 +17984,7 @@ msgstr "Up"
 #: app/views/popup.service.time.edit.php:166
 #: app/views/popup.triggerwizard.php:147 app/views/popup.valuemap.edit.php:126
 #: include/classes/html/CTabFilter.php:94
-#: include/views/configuration.action.edit.php:489
+#: include/views/configuration.action.edit.php:494
 #: include/views/configuration.graph.edit.php:494
 #: include/views/configuration.host.discovery.edit.php:977
 #: include/views/configuration.hostgroups.edit.php:61
@@ -18005,7 +18022,7 @@ msgstr "기존설정을 덮어씌움"
 msgid "Update interval"
 msgstr "갱신 간격"
 
-#: include/views/configuration.action.edit.php:469
+#: include/views/configuration.action.edit.php:462
 msgid "Update operations"
 msgstr "갱신시 실행내용"
 
@@ -18215,7 +18232,7 @@ msgstr[0] ""
 
 #: include/classes/api/services/CDashboard.php:482
 #: include/classes/api/services/CReport.php:463
-#: include/classes/api/services/CScript.php:776
+#: include/classes/api/services/CScript.php:778
 #: include/classes/api/services/CSettings.php:260
 #: include/classes/api/services/CUser.php:741
 #, c-format
@@ -18799,7 +18816,7 @@ msgstr "값: 데이터 없음"
 msgid "Valuemap with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:624
+#: app/controllers/CControllerPopupTriggerExpr.php:655
 #: app/views/monitoring.charts.view.php:56
 #: include/views/monitoring.history.php:78
 msgid "Values"
@@ -19030,6 +19047,10 @@ msgstr "수"
 #: include/func.inc.php:121 include/func.inc.php:211 jsLoader.php:245
 msgid "Wednesday"
 msgstr "수"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:120
+msgid "Week"
+msgstr ""
 
 #: app/partials/scheduledreport.formgrid.html.php:99
 #: app/partials/scheduledreport.table.html.php:50
@@ -19303,7 +19324,8 @@ msgctxt "XML date and time format"
 msgid "YYYY-MM-DDThh:mm:ssZ"
 msgstr "YYYY-MM-DDThh:mm:ssZ"
 
-#: report4.php:116 report4.php:152
+#: app/controllers/CControllerPopupTriggerExpr.php:122 report4.php:116
+#: report4.php:152
 msgid "Year"
 msgstr "년"
 
@@ -19363,7 +19385,7 @@ msgstr "\"%1$s\"로 로그인 하였습니다."
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "Web서버의 언어가 인스톨되어있지 않기 때문에 몇 언어를 이용할 수 없습니다."
 
-#: include/func.inc.php:1533 index_http.php:87 index_sso.php:262
+#: include/func.inc.php:1533 index_http.php:87 index_sso.php:277
 msgid "You are not logged in"
 msgstr "당신은 로그인 되지 않았습니다"
 
@@ -19604,11 +19626,11 @@ msgstr "시간범위를 지정해주세요"
 msgid "a time unit is expected"
 msgstr "시간의 단위를 지정해주세요"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:302
+#: app/controllers/CControllerPopupTriggerExpr.php:333
 msgid "abs() - Absolute value"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:308
+#: app/controllers/CControllerPopupTriggerExpr.php:339
 msgid "acos() - The arccosine of a value as an angle, expressed in radians"
 msgstr ""
 
@@ -19703,7 +19725,7 @@ msgstr "16진수 문자로 입력해주세요"
 msgid "an explicit time is expected"
 msgstr "구체적인 시간을 지정해 주십시오"
 
-#: include/classes/api/services/CAction.php:2712
+#: include/classes/api/services/CAction.php:2722
 #: include/classes/api/services/CCorrelation.php:730
 msgid "an identifier is not defined in the formula"
 msgstr ""
@@ -19747,11 +19769,11 @@ msgstr "빨강"
 msgid "ascending"
 msgstr "오름차순"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:315
+#: app/controllers/CControllerPopupTriggerExpr.php:346
 msgid "ascii() - Returns the ASCII code of the leftmost character of the value"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:322
+#: app/controllers/CControllerPopupTriggerExpr.php:353
 msgid "asin() - The arcsine of a value as an angle, expressed in radians"
 msgstr ""
 
@@ -19765,11 +19787,11 @@ msgstr ""
 msgid "at least one override option must be specified"
 msgstr "적어도 1개의 오버라이드 옵션을 지정할 필요가 있습니다"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:329
+#: app/controllers/CControllerPopupTriggerExpr.php:360
 msgid "atan() - The arctangent of a value as an angle, expressed in radians"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:336
+#: app/controllers/CControllerPopupTriggerExpr.php:367
 msgid "atan2() - The arctangent of the ordinate (exprue) and abscissa coordinates specified as an angle, expressed in radians"
 msgstr ""
 
@@ -19791,39 +19813,47 @@ msgstr ""
 msgid "avg"
 msgstr "평균"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:349
+#: app/controllers/CControllerPopupTriggerExpr.php:380
 msgid "avg() - Average value of a period T"
 msgstr "avg() - 기간 T값의 평균치"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:356
-msgid "between() - Checks if a value belongs to the given range (1 - in range, 0 - otherwise)"
+#: app/controllers/CControllerPopupTriggerExpr.php:1052
+msgid "baselinedev() - Returns the number of deviations between data periods in seasons and the last data period"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:374
-msgid "bitand() - Bitwise AND"
+#: app/controllers/CControllerPopupTriggerExpr.php:1059
+msgid "baselinewma() - Calculates baseline by averaging data periods in seasons"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:387
+msgid "between() - Checks if a value belongs to the given range (1 - in range, 0 - otherwise)"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:405
+msgid "bitand() - Bitwise AND"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:418
 msgid "bitlength() - Returns the length in bits"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:394
+#: app/controllers/CControllerPopupTriggerExpr.php:425
 msgid "bitlshift() - Bitwise shift left"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:407
+#: app/controllers/CControllerPopupTriggerExpr.php:438
 msgid "bitnot() - Bitwise NOT"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:414
+#: app/controllers/CControllerPopupTriggerExpr.php:445
 msgid "bitor() - Bitwise OR"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:427
+#: app/controllers/CControllerPopupTriggerExpr.php:458
 msgid "bitrshift() - Bitwise shift right"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:440
+#: app/controllers/CControllerPopupTriggerExpr.php:471
 msgid "bitxor() - Bitwise exclusive OR"
 msgstr ""
 
@@ -19838,7 +19868,7 @@ msgstr "점멸"
 msgid "both username and password should be either present or empty"
 msgstr "유저명과 비밀번호를 양쪽에 지정하거나 비워둘 필요가 있습니다"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:453
+#: app/controllers/CControllerPopupTriggerExpr.php:484
 msgid "bytelength() - Returns the length in bytes"
 msgstr ""
 
@@ -19880,7 +19910,7 @@ msgstr "변경할 수 없습니다"
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:41
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:47
 #: app/controllers/CControllerUserUpdateGeneral.php:111
-#: include/classes/api/services/CAction.php:2735
+#: include/classes/api/services/CAction.php:2745
 #: include/classes/api/services/CAutoregistration.php:163
 #: include/classes/api/services/CDiscoveryRule.php:1989
 #: include/classes/api/services/CDRule.php:210
@@ -19968,23 +19998,23 @@ msgstr "스크롤 API 리퀘스트를 실행할 수 없습니다. 데이터 뒷�
 msgid "cannot update property for templated discovery rule"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:460
+#: app/controllers/CControllerPopupTriggerExpr.php:491
 msgid "cbrt() - Cube root"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:467
+#: app/controllers/CControllerPopupTriggerExpr.php:498
 msgid "ceil() - Rounds up to the nearest greater integer"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:474
+#: app/controllers/CControllerPopupTriggerExpr.php:505
 msgid "change() - Difference between last and previous value"
 msgstr "change() - 최신값과 이전값의 값 차이"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:480
+#: app/controllers/CControllerPopupTriggerExpr.php:511
 msgid "changecount() - Number of changes between adjacent values, Mode (all - all changes, inc - only increases, dec - only decreases)"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:487
+#: app/controllers/CControllerPopupTriggerExpr.php:518
 msgid "char() - Returns the character which represents the given ASCII code"
 msgstr ""
 
@@ -20011,7 +20041,7 @@ msgstr ""
 msgid "comma-separated list"
 msgstr "콤마로 나누는 리스트"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:494
+#: app/controllers/CControllerPopupTriggerExpr.php:525
 msgid "concat() - Returns a string that is the result of concatenating value to string"
 msgstr ""
 
@@ -20027,15 +20057,15 @@ msgstr "설정"
 msgid "contains"
 msgstr "포함"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:507
+#: app/controllers/CControllerPopupTriggerExpr.php:538
 msgid "cos() - The cosine of a value, where the value is an angle expressed in radians"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:514
+#: app/controllers/CControllerPopupTriggerExpr.php:545
 msgid "cosh() - The hyperbolic cosine of a value"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:521
+#: app/controllers/CControllerPopupTriggerExpr.php:552
 msgid "cot() - The cotangent of a value, where the value is an angle expressed in radians"
 msgstr ""
 
@@ -20043,11 +20073,11 @@ msgstr ""
 msgid "count"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:528
+#: app/controllers/CControllerPopupTriggerExpr.php:559
 msgid "count() - Number of successfully retrieved values V (which fulfill operator O) for period T"
 msgstr "count() - 기간 T로 수집된 값 V(오퍼레이터 O를 만족하는) 의 수"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:535
+#: app/controllers/CControllerPopupTriggerExpr.php:566
 msgid "countunique() - The number of unique values"
 msgstr ""
 
@@ -20060,15 +20090,15 @@ msgstr "d"
 msgid "d.M"
 msgstr "m/d"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:542
+#: app/controllers/CControllerPopupTriggerExpr.php:573
 msgid "date() - Current date"
 msgstr "date() - 현재의 시간"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:548
+#: app/controllers/CControllerPopupTriggerExpr.php:579
 msgid "dayofmonth() - Day of month"
 msgstr "dayofmonth() - 월간 시간"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:554
+#: app/controllers/CControllerPopupTriggerExpr.php:585
 msgid "dayofweek() - Day of week"
 msgstr "dayofweek() - 요일 (월요일 - 1, 일요일 - 7)"
 
@@ -20086,7 +20116,7 @@ msgstr "일"
 msgid "default"
 msgstr "기본"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:560
+#: app/controllers/CControllerPopupTriggerExpr.php:591
 msgid "degrees() - Converts a value from radians to degrees"
 msgstr ""
 
@@ -20163,7 +20193,7 @@ msgstr ""
 msgid "does not match"
 msgstr "일치하지 않음"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:567
+#: app/controllers/CControllerPopupTriggerExpr.php:598
 msgid "e() - Returns Euler's number"
 msgstr ""
 
@@ -20186,11 +20216,11 @@ msgstr ""
 msgid "exists"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:572
+#: app/controllers/CControllerPopupTriggerExpr.php:603
 msgid "exp() - Euler's number at a power of a value"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:579
+#: app/controllers/CControllerPopupTriggerExpr.php:610
 msgid "expm1() - Euler's number at a power of a value minus 1"
 msgstr ""
 
@@ -20206,7 +20236,7 @@ msgstr "JSON의 분석에 실패하였습니다."
 msgid "file format is unsupported"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:586
+#: app/controllers/CControllerPopupTriggerExpr.php:617
 msgid "find() - Check occurrence of pattern V (which fulfill operator O) for period T (1 - match, 0 - no match)"
 msgstr ""
 
@@ -20220,15 +20250,15 @@ msgstr "제1"
 msgid "first parameter is expected"
 msgstr "첫 파라미터를 지정해주세요"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:593
+#: app/controllers/CControllerPopupTriggerExpr.php:624
 msgid "first() - The oldest value in the specified time interval"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:600
+#: app/controllers/CControllerPopupTriggerExpr.php:631
 msgid "floor() - Rounds down to the nearest smaller integer"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:607
+#: app/controllers/CControllerPopupTriggerExpr.php:638
 msgid "forecast() - Forecast for next t seconds based on period T"
 msgstr "forecast() - 기간 T를 기준으로 하는 다음 t초의 예측치"
 
@@ -20236,7 +20266,7 @@ msgstr "forecast() - 기간 T를 기준으로 하는 다음 t초의 예측치"
 msgid "fourth"
 msgstr "제4"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:614
+#: app/controllers/CControllerPopupTriggerExpr.php:645
 msgid "fuzzytime() - Difference between item value (as timestamp) and Zabbix server timestamp is less than or equal to T seconds (1 - true, 0 - false)"
 msgstr ""
 
@@ -20310,7 +20340,7 @@ msgstr "범위 내"
 msgid "in range"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:621
+#: app/controllers/CControllerPopupTriggerExpr.php:652
 msgid "in() - Checks if a value equals to one of the listed values (1 - equals, 0 - otherwise)"
 msgstr ""
 
@@ -20342,7 +20372,7 @@ msgstr "요소의 수가 올바르지 않습니다"
 msgid "incorrect expression starting from \"%1$s\""
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2705
+#: include/classes/api/services/CAction.php:2715
 #: include/classes/api/services/CCorrelation.php:723
 msgid "incorrect number of conditions"
 msgstr ""
@@ -20360,7 +20390,7 @@ msgstr "잘못된 서식이 \"%1$s\" 부근에서 발견되었습니다."
 msgid "incorrect usage of function \"%1$s\""
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:634
+#: app/controllers/CControllerPopupTriggerExpr.php:665
 msgid "insert() - Inserts specified characters or spaces into a character string, beginning at a specified position in the string"
 msgstr ""
 
@@ -20493,7 +20523,7 @@ msgstr "아이템 패턴"
 msgid "key is empty"
 msgstr "키가 설정되지 않았습니다."
 
-#: app/controllers/CControllerPopupTriggerExpr.php:657
+#: app/controllers/CControllerPopupTriggerExpr.php:688
 msgid "kurtosis() - Measures the \"tailedness\" of the probability distribution"
 msgstr ""
 
@@ -20509,7 +20539,7 @@ msgctxt "week of month"
 msgid "last"
 msgstr "최신값"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:664
+#: app/controllers/CControllerPopupTriggerExpr.php:695
 msgid "last() - Last (most recent) T value"
 msgstr "last() - 최신값"
 
@@ -20517,11 +20547,11 @@ msgstr "last() - 최신값"
 msgid "left"
 msgstr "왼쪽"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:671
+#: app/controllers/CControllerPopupTriggerExpr.php:702
 msgid "left() - Returns the leftmost count characters"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:684
+#: app/controllers/CControllerPopupTriggerExpr.php:715
 msgid "length() - Length of last (most recent) T value in characters"
 msgstr ""
 
@@ -20529,23 +20559,23 @@ msgstr ""
 msgid "list of characters"
 msgstr "문자열의 리스트"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:690
+#: app/controllers/CControllerPopupTriggerExpr.php:721
 msgid "log() - Natural logarithm"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:697
+#: app/controllers/CControllerPopupTriggerExpr.php:728
 msgid "log10() - Decimal logarithm"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:704
+#: app/controllers/CControllerPopupTriggerExpr.php:735
 msgid "logeventid() - Event ID of last log entry matching regular expression V for period T (1 - match, 0 - no match)"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:711
+#: app/controllers/CControllerPopupTriggerExpr.php:742
 msgid "logseverity() - Log severity of the last log entry for period T"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:718
+#: app/controllers/CControllerPopupTriggerExpr.php:749
 msgid "logsource() - Log source of the last log entry matching parameter V for period T (1 - match, 0 - no match)"
 msgstr ""
 
@@ -20553,7 +20583,7 @@ msgstr ""
 msgid "low-level discovery rule"
 msgstr "low-level 디스커버리 룰"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:725
+#: app/controllers/CControllerPopupTriggerExpr.php:756
 msgid "ltrim() - Remove specified characters from the beginning of a string"
 msgstr ""
 
@@ -20585,7 +20615,7 @@ msgstr "매크로가 설정되어 있지 않습니다"
 msgid "macro(s)"
 msgstr "매크로"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:738
+#: app/controllers/CControllerPopupTriggerExpr.php:769
 msgid "mad() - Median absolute deviation"
 msgstr ""
 
@@ -20625,7 +20655,7 @@ msgstr "최대"
 msgid "max period is less than time filter default period"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:745
+#: app/controllers/CControllerPopupTriggerExpr.php:776
 msgid "max() - Maximum value for period T"
 msgstr "max() - 기간T 안의 최대치"
 
@@ -20639,7 +20669,7 @@ msgstr "의존 아이템수가 최대 수에 도달하였습니다"
 msgid "maximum number of dependency levels reached"
 msgstr "의존 레벨 수가 최대수에 도달하였습니다"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:752
+#: app/controllers/CControllerPopupTriggerExpr.php:783
 msgid "mid() - Returns a substring beginning at the character position specified by start for N characters"
 msgstr ""
 
@@ -20656,7 +20686,7 @@ msgstr ""
 msgid "min"
 msgstr "최소"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:770
+#: app/controllers/CControllerPopupTriggerExpr.php:801
 msgid "min() - Minimum value for period T"
 msgstr "min() - 기간T 안의 최소치"
 
@@ -20671,15 +20701,15 @@ msgstr "%1$s 문자 이상 입력해주세요"
 msgid "mm"
 msgstr "mm"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:777
+#: app/controllers/CControllerPopupTriggerExpr.php:808
 msgid "mod() - Division remainder"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:790
+#: app/controllers/CControllerPopupTriggerExpr.php:821
 msgid "monodec() - Check for continuous item value decrease (1 - data is monotonic, 0 - otherwise), Mode (strict - require strict monotonicity)"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:797
+#: app/controllers/CControllerPopupTriggerExpr.php:828
 msgid "monoinc() - Check for continuous item value increase (1 - data is monotonic, 0 - otherwise), Mode (strict - require strict monotonicity)"
 msgstr ""
 
@@ -20795,7 +20825,7 @@ msgstr ""
 msgid "no permissions to unacknowledge problems"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:804
+#: app/controllers/CControllerPopupTriggerExpr.php:835
 msgid "nodata() - No data received during period of time T (1 - true, 0 - false), Mode (strict - ignore proxy time delay in sending data)"
 msgstr ""
 
@@ -20816,7 +20846,7 @@ msgstr "범위 밖"
 msgid "not selected"
 msgstr "선택되지 않음"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:811
+#: app/controllers/CControllerPopupTriggerExpr.php:842
 msgid "now() - Number of seconds since the Epoch"
 msgstr "now() - Epoch를 기준으로 한 경과 시간 (초단위)"
 
@@ -20903,15 +20933,15 @@ msgstr ""
 msgid "pattern"
 msgstr "패턴"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:817
+#: app/controllers/CControllerPopupTriggerExpr.php:848
 msgid "percentile() - Percentile P of a period T"
 msgstr "percentile() - 기간 T의 퍼센테일 P"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:824
+#: app/controllers/CControllerPopupTriggerExpr.php:855
 msgid "pi() - Returns the Pi constant"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:829
+#: app/controllers/CControllerPopupTriggerExpr.php:860
 msgid "power() - The power of a base value to a power value"
 msgstr ""
 
@@ -20919,15 +20949,15 @@ msgstr ""
 msgid "problem pattern"
 msgstr "장애 패턴"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:842
+#: app/controllers/CControllerPopupTriggerExpr.php:873
 msgid "radians() - Converts a value from degrees to radians"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:849
+#: app/controllers/CControllerPopupTriggerExpr.php:880
 msgid "rand() - A random integer value"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:854
+#: app/controllers/CControllerPopupTriggerExpr.php:885
 msgid "rate() - Returns per-second average rate for monotonically increasing counters"
 msgstr ""
 
@@ -20976,11 +21006,11 @@ msgstr ""
 msgid "regular expression"
 msgstr "정규 표현"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:861
+#: app/controllers/CControllerPopupTriggerExpr.php:892
 msgid "repeat() - Returns a string composed of value repeated count times"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:874
+#: app/controllers/CControllerPopupTriggerExpr.php:905
 msgid "replace() - Search value for occurrences of pattern, and replace with replacement"
 msgstr ""
 
@@ -21004,15 +21034,15 @@ msgstr ""
 msgid "right"
 msgstr "오른쪽"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:892
+#: app/controllers/CControllerPopupTriggerExpr.php:923
 msgid "right() - Returns the rightmost count characters"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:905
+#: app/controllers/CControllerPopupTriggerExpr.php:936
 msgid "round() - Rounds a value to decimal places"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:918
+#: app/controllers/CControllerPopupTriggerExpr.php:949
 msgid "rtrim() - Removes specified characters from the end of a string"
 msgstr ""
 
@@ -21103,23 +21133,23 @@ msgstr "아이콘의 매핑을 표시"
 msgid "sign in as guest"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:931
+#: app/controllers/CControllerPopupTriggerExpr.php:962
 msgid "signum() - Returns -1 if a value is negative, 0 if a value is zero, 1 if a value is positive"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:938
+#: app/controllers/CControllerPopupTriggerExpr.php:969
 msgid "sin() - The sine of a value, where the value is an angle expressed in radians"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:945
+#: app/controllers/CControllerPopupTriggerExpr.php:976
 msgid "sinh() - The hyperbolic sine of a value"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:952
+#: app/controllers/CControllerPopupTriggerExpr.php:983
 msgid "skewness() - Measures the asymmetry of the probability distribution"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:959
+#: app/controllers/CControllerPopupTriggerExpr.php:990
 msgid "sqrt() - Square root of a value"
 msgstr ""
 
@@ -21127,11 +21157,11 @@ msgstr ""
 msgid "standalone server"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:966
+#: app/controllers/CControllerPopupTriggerExpr.php:997
 msgid "stddevpop() - Population standard deviation"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:973
+#: app/controllers/CControllerPopupTriggerExpr.php:1004
 msgid "stddevsamp() - Sample standard deviation"
 msgstr ""
 
@@ -21139,11 +21169,11 @@ msgstr ""
 msgid "sum"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:980
+#: app/controllers/CControllerPopupTriggerExpr.php:1011
 msgid "sum() - Sum of values of a period T"
 msgstr "sum() - 기간 T안의 합계치"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:987
+#: app/controllers/CControllerPopupTriggerExpr.php:1018
 msgid "sumofsquares() - The sum of squares"
 msgstr ""
 
@@ -21171,7 +21201,7 @@ msgstr "지정된 자격 정보는 유니크 값이 아닙니다."
 msgid "tag"
 msgstr "태그"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:994
+#: app/controllers/CControllerPopupTriggerExpr.php:1025
 msgid "tan() - The tangent of a value"
 msgstr ""
 
@@ -21205,7 +21235,7 @@ msgstr ""
 #: include/classes/api/services/CReport.php:195
 #: include/classes/api/services/CReport.php:577
 #: include/classes/api/services/CReport.php:583
-#: include/classes/api/services/CScript.php:902
+#: include/classes/api/services/CScript.php:904
 #: include/classes/api/services/CTemplate.php:451
 #: include/classes/api/services/CValueMap.php:578
 #: include/classes/helpers/CDashboardHelper.php:369
@@ -21252,35 +21282,35 @@ msgstr ""
 msgid "time shift"
 msgstr "타임시프트"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1001
+#: app/controllers/CControllerPopupTriggerExpr.php:1032
 msgid "time() - Current time"
 msgstr "time() - 현재시간"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1007
+#: app/controllers/CControllerPopupTriggerExpr.php:1038
 msgid "timeleft() - Time to reach threshold estimated based on period T"
 msgstr "timeleft() - 기간T를 기준으로 하여 지정한 값에 도달하기 까지의 시간"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1014
+#: app/controllers/CControllerPopupTriggerExpr.php:1045
 msgid "trendavg() - Average value of a period T with exact period shift"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1021
+#: app/controllers/CControllerPopupTriggerExpr.php:1066
 msgid "trendcount() - Number of successfully retrieved values for period T"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1028
+#: app/controllers/CControllerPopupTriggerExpr.php:1073
 msgid "trendmax() - Maximum value for period T with exact period shift"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1035
+#: app/controllers/CControllerPopupTriggerExpr.php:1080
 msgid "trendmin() - Minimum value for period T with exact period shift"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1042
+#: app/controllers/CControllerPopupTriggerExpr.php:1087
 msgid "trendstl() - Anomaly detection for period T"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1085
+#: app/controllers/CControllerPopupTriggerExpr.php:1130
 msgid "trendsum() - Sum of values of a period T with exact period shift"
 msgstr ""
 
@@ -21306,11 +21336,11 @@ msgstr "트리거 프로토타입은 다른 템플릿이나 호스트에 이동�
 msgid "trigger with linkages cannot be moved to another template or host"
 msgstr "링크가 있는 트리거는 다른 템플릿이나 호스트로 이동할 수 없습니다"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1092
+#: app/controllers/CControllerPopupTriggerExpr.php:1137
 msgid "trim() - Remove specified characters from the beginning and the end of a string"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1105
+#: app/controllers/CControllerPopupTriggerExpr.php:1150
 msgid "truncate() - Truncates a value to decimal places"
 msgstr ""
 
@@ -21367,7 +21397,7 @@ msgstr "매크로의 끝부분이 잘못되어 있습니다"
 #: include/classes/api/services/CHttpTest.php:539
 #: include/classes/api/services/CItemGeneral.php:604
 #: include/classes/api/services/CItemGeneral.php:616
-#: include/classes/api/services/CScript.php:908
+#: include/classes/api/services/CScript.php:910
 #: include/classes/api/services/CTemplate.php:668
 #: include/classes/api/services/CTriggerGeneral.php:666
 #: include/classes/api/services/CValueMap.php:432
@@ -21607,11 +21637,11 @@ msgstr ""
 msgid "value of third parameter must be one of %1$s"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1118
+#: app/controllers/CControllerPopupTriggerExpr.php:1163
 msgid "varpop() - Population variance"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1125
+#: app/controllers/CControllerPopupTriggerExpr.php:1170
 msgid "varsamp() - Sample variance"
 msgstr ""
 
