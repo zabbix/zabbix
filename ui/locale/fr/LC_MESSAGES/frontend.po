@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 5.5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-30 17:52+0100\n"
+"POT-Creation-Date: 2021-12-03 19:55+0200\n"
 "PO-Revision-Date: 2021-11-30 19:22+0100\n"
 "Last-Translator: Davy Defaud <davy.defaud@free.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -454,7 +454,7 @@ msgstr "Jeton d’API mis à jour"
 msgid "API tokens"
 msgstr "Jetons d’API"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:339
+#: app/controllers/CControllerPopupTriggerExpr.php:370
 msgid "Abscissa"
 msgstr "Abscisse"
 
@@ -557,11 +557,11 @@ msgstr "Événements RÉSOLUS acquittés"
 #: include/actions.inc.php:1921
 #: include/views/administration.auditacts.list.php:64
 #: include/views/configuration.action.edit.php:59
-#: include/views/configuration.action.edit.php:175
-#: include/views/configuration.action.edit.php:179
-#: include/views/configuration.action.edit.php:319
-#: include/views/configuration.action.edit.php:407
-#: include/views/configuration.action.edit.php:478
+#: include/views/configuration.action.edit.php:168
+#: include/views/configuration.action.edit.php:172
+#: include/views/configuration.action.edit.php:312
+#: include/views/configuration.action.edit.php:400
+#: include/views/configuration.action.edit.php:483
 #: include/views/configuration.graph.edit.php:380
 #: include/views/configuration.host.discovery.edit.php:134
 #: include/views/configuration.host.discovery.edit.php:632
@@ -592,7 +592,7 @@ msgstr "Événements RÉSOLUS acquittés"
 msgid "Action"
 msgstr "Action"
 
-#: include/classes/api/services/CAction.php:2678
+#: include/classes/api/services/CAction.php:2688
 #, c-format
 msgid "Action \"%1$s\" already exists."
 msgstr "Action « %1$s » déjà existante."
@@ -602,7 +602,7 @@ msgstr "Action « %1$s » déjà existante."
 msgid "Action \"%2$s\" is not available for user role \"%1$s\"."
 msgstr "L’action « %2$s » n’est pas disponible pour le rôle utilisateur « %1$s »."
 
-#: actionconf.php:279
+#: actionconf.php:285
 msgid "Action added"
 msgstr "Action ajoutée"
 
@@ -611,17 +611,17 @@ msgstr "Action ajoutée"
 msgid "Action class %1$s must extend %2$s class."
 msgstr "La classe d’action « %1$s » doit être une extension de la classe « %2$s »."
 
-#: actionconf.php:301
+#: actionconf.php:307
 msgid "Action deleted"
 msgstr "Action supprimée"
 
-#: actionconf.php:469
+#: actionconf.php:475
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] "Action désactivée"
 msgstr[1] "Actions désactivées"
 
-#: actionconf.php:468
+#: actionconf.php:474
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] "Action activée"
@@ -640,7 +640,7 @@ msgstr "Journal des actions"
 msgid "Action operation"
 msgstr "Opération d’action"
 
-#: actionconf.php:271
+#: actionconf.php:277
 msgid "Action updated"
 msgstr "Action mise à jour"
 
@@ -769,10 +769,10 @@ msgstr "Actif jusqu’à"
 #: include/classes/helpers/CTagFilterFieldHelper.php:92
 #: include/classes/widgets/CWidgetHelper.php:545 include/forms.inc.php:1481
 #: include/forms.inc.php:2045 include/views/configuration.action.edit.php:133
-#: include/views/configuration.action.edit.php:302
-#: include/views/configuration.action.edit.php:386
-#: include/views/configuration.action.edit.php:462
-#: include/views/configuration.action.edit.php:501
+#: include/views/configuration.action.edit.php:295
+#: include/views/configuration.action.edit.php:379
+#: include/views/configuration.action.edit.php:455
+#: include/views/configuration.action.edit.php:506
 #: include/views/configuration.graph.edit.php:423
 #: include/views/configuration.graph.edit.php:518
 #: include/views/configuration.host.discovery.edit.php:162
@@ -1022,7 +1022,7 @@ msgstr "Vérification de la variante de l’agent. Retourne : 1 — pour « Za
 msgid "Aggregate"
 msgstr "Agréger"
 
-#: app/views/popup.triggerexpr.php:108
+#: app/views/popup.triggerexpr.php:109
 msgid "Aggregate functions"
 msgstr "Fonctions d’agrégation"
 
@@ -1038,7 +1038,7 @@ msgstr "Intervalle d’agrégation"
 msgid "Alert message"
 msgstr "Message d’alerte"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1070
+#: app/controllers/CControllerPopupTriggerExpr.php:1115
 msgid "Algorithm"
 msgstr "Algorithme"
 
@@ -1357,7 +1357,7 @@ msgstr "Au moins MySQL, PostgreSQL et Oracle devraient être pris en charge."
 msgid "At least one operation must be selected."
 msgstr "Au moins une opération doit être sélectionnée."
 
-#: include/views/configuration.action.edit.php:511
+#: include/views/configuration.action.edit.php:516
 msgid "At least one operation must exist."
 msgstr "Au moins une opération doit exister."
 
@@ -1620,12 +1620,12 @@ msgstr "DN de lien"
 msgid "Bind password"
 msgstr "Mot de passe de lien"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:397
-#: app/controllers/CControllerPopupTriggerExpr.php:430
+#: app/controllers/CControllerPopupTriggerExpr.php:428
+#: app/controllers/CControllerPopupTriggerExpr.php:461
 msgid "Bits to shift"
 msgstr "Bits à décaler"
 
-#: app/views/popup.triggerexpr.php:109
+#: app/views/popup.triggerexpr.php:110
 msgid "Bitwise functions"
 msgstr "Fonctions binaires"
 
@@ -1831,7 +1831,7 @@ msgstr "Impossible d’ajouter un élément non numérique « %1$s » au graph
 msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
 msgstr "Impossible d’ajouter un élément « %1$s »  non numérique au prototype de graphique « %2$s »."
 
-#: actionconf.php:280
+#: actionconf.php:286
 msgid "Cannot add action"
 msgstr "Impossible d’ajouter l’action"
 
@@ -2129,7 +2129,7 @@ msgstr[1] "Impossible de supprimer les jetons d’API"
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Impossible de supprimer l’utilisateur interne Zabbix « %1$s », essayez de désactiver cet utilisateur."
 
-#: actionconf.php:301
+#: actionconf.php:307
 msgid "Cannot delete action"
 msgstr "Impossible de supprimer l’action"
 
@@ -2293,12 +2293,12 @@ msgid_plural "Cannot delete scripts"
 msgstr[0] "Impossible de supprimer le script"
 msgstr[1] "Impossible de supprimer les scripts"
 
-#: include/classes/api/services/CScript.php:875
+#: include/classes/api/services/CScript.php:877
 #, c-format
 msgid "Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$s\"."
 msgstr "Impossible de supprimer des scripts. Le script « %1$s » est utilisé dans l’opération de l’action « %2$s »."
 
-#: actionconf.php:488
+#: actionconf.php:494
 msgid "Cannot delete selected actions"
 msgstr "Impossible de supprimer les actions sélectionnées"
 
@@ -2401,7 +2401,7 @@ msgid_plural "Cannot disable API tokens"
 msgstr[0] "Impossible de désactiver le jeton d’API"
 msgstr[1] "Impossible de désactiver les jetons d’API"
 
-#: actionconf.php:477
+#: actionconf.php:483
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] "Impossible de désactiver l’action"
@@ -2479,7 +2479,7 @@ msgid_plural "Cannot enable API tokens"
 msgstr[0] "Impossible d’activer le jeton d’API"
 msgstr[1] "Impossible d’activer les jetons d’API"
 
-#: actionconf.php:476
+#: actionconf.php:482
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] "Impossible d’activer l’action"
@@ -2708,7 +2708,7 @@ msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" do not 
 msgstr[0] "Impossible d’importer le modèle « %1$s », le modèle lié « %2$s » n’existe pas."
 msgstr[1] "Impossible d’importer le modèle « %1$s », les modèles liés « %2$s » n’existent pas."
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1527
+#: app/controllers/CControllerPopupTriggerExpr.php:1583
 msgid "Cannot insert trigger expression"
 msgstr "Impossible d’insérer l’expression de déclencheur"
 
@@ -2887,7 +2887,7 @@ msgstr "Impossible de délier le modèle."
 msgid "Cannot unlink trigger \"%1$s\", it has items from template that is left linked to host."
 msgstr "Impossible de déconnecter le déclencheur « %1$s », il possède des éléments du modèle toujours liés à l’hôte."
 
-#: include/classes/api/services/CAction.php:2626
+#: include/classes/api/services/CAction.php:2636
 #, c-format
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
 msgstr "Impossible de mettre à jour « %1$s » pour l’action « %2$s »."
@@ -2953,7 +2953,7 @@ msgstr "Impossible de mettre à jour le groupe « %1$s » d’un hôte découv
 msgid "Cannot update a templated web scenario \"%1$s\": %2$s."
 msgstr "Impossible de mettre à jour un scénario Web de modèle « %1$s » : %2$s."
 
-#: actionconf.php:272
+#: actionconf.php:278
 msgid "Cannot update action"
 msgstr "Impossible de mettre à jour l’action"
 
@@ -3116,9 +3116,9 @@ msgstr "Impossible de mettre à jour le rapport planifié"
 msgid "Cannot update script"
 msgstr "Impossible de mettre à jour le script"
 
-#: include/classes/api/services/CScript.php:417
-#: include/classes/api/services/CScript.php:430
-#: include/classes/api/services/CScript.php:443
+#: include/classes/api/services/CScript.php:419
+#: include/classes/api/services/CScript.php:432
+#: include/classes/api/services/CScript.php:445
 #, c-format
 msgid "Cannot update script scope. Script \"%1$s\" is used in action \"%2$s\"."
 msgstr "Impossible de mettre à jour la visibilité du script. Le script « %1$s » est utilisé par l’action « %2$s »."
@@ -3299,9 +3299,9 @@ msgstr "Chaîne de caractères inclue"
 msgid "Character string not included"
 msgstr "Chaîne de caractères non inclue"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:728
-#: app/controllers/CControllerPopupTriggerExpr.php:921
-#: app/controllers/CControllerPopupTriggerExpr.php:1095
+#: app/controllers/CControllerPopupTriggerExpr.php:759
+#: app/controllers/CControllerPopupTriggerExpr.php:952
+#: app/controllers/CControllerPopupTriggerExpr.php:1140
 msgid "Chars"
 msgstr "Caractères"
 
@@ -3467,7 +3467,7 @@ msgstr "Horloge"
 #: app/views/configuration.discovery.edit.php:154
 #: app/views/configuration.host.edit.php:43 app/views/popup.host.edit.php:68
 #: app/views/popup.service.edit.php:388
-#: include/views/configuration.action.edit.php:490
+#: include/views/configuration.action.edit.php:495
 #: include/views/configuration.graph.edit.php:510
 #: include/views/configuration.host.discovery.edit.php:960
 #: include/views/configuration.hostgroups.edit.php:62
@@ -3605,7 +3605,7 @@ msgstr "Compression"
 msgid "Concurrent sessions"
 msgstr "Sessions concurrentes"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1550
+#: app/controllers/CControllerPopupTriggerExpr.php:1606
 #: app/views/popup.lldoperation.php:59 app/views/popup.lldoverride.php:195
 #: app/views/popup.service.statusrule.edit.php:48
 msgid "Condition"
@@ -4070,10 +4070,10 @@ msgstr "Règle de corrélation"
 msgid "Correlation updated"
 msgstr "Corrélation mise à jour"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:51
-#: app/controllers/CControllerPopupTriggerExpr.php:674
-#: app/controllers/CControllerPopupTriggerExpr.php:864
+#: app/controllers/CControllerPopupTriggerExpr.php:52
+#: app/controllers/CControllerPopupTriggerExpr.php:705
 #: app/controllers/CControllerPopupTriggerExpr.php:895
+#: app/controllers/CControllerPopupTriggerExpr.php:926
 msgid "Count"
 msgstr "Compte"
 
@@ -4680,11 +4680,11 @@ msgstr "Date d’expiration de la maintenance matérielle"
 msgid "Date HW purchased"
 msgstr "Date d’achat du matériel"
 
-#: app/views/popup.triggerexpr.php:110
+#: app/views/popup.triggerexpr.php:111
 msgid "Date and time functions"
 msgstr "Fonctions d’horodatage"
 
-#: report4.php:175
+#: app/controllers/CControllerPopupTriggerExpr.php:119 report4.php:175
 msgid "Day"
 msgstr "Jour"
 
@@ -4725,8 +4725,8 @@ msgstr "déc."
 msgid "December"
 msgstr "décembre"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:908
-#: app/controllers/CControllerPopupTriggerExpr.php:1108
+#: app/controllers/CControllerPopupTriggerExpr.php:939
+#: app/controllers/CControllerPopupTriggerExpr.php:1153
 msgid "Decimal places"
 msgstr "Nombre de décimales"
 
@@ -4736,7 +4736,7 @@ msgstr "Diminuer de"
 
 #: app/views/administration.iconmap.edit.php:108
 #: include/classes/widgets/forms/CWidgetForm.php:54 include/hosts.inc.php:31
-#: include/hosts.inc.php:1233 include/views/configuration.action.edit.php:229
+#: include/hosts.inc.php:1233 include/views/configuration.action.edit.php:222
 #: include/views/inventory.host.view.php:81
 #: include/views/js/monitoring.sysmaps.js.php:145
 #: include/views/js/monitoring.sysmaps.js.php:263
@@ -4879,7 +4879,7 @@ msgstr "Supprimer et nettoyer les modèles sélectionnés (attention : tous les
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
 msgstr "Supprimer et nettoyer le modèle (attention : tous les hôtes liés seront effacés !) ?"
 
-#: include/views/configuration.action.edit.php:492
+#: include/views/configuration.action.edit.php:497
 msgid "Delete current action?"
 msgstr "Effacer l’action actuelle ?"
 
@@ -5181,7 +5181,7 @@ msgstr "Liste de refus"
 msgid "Dependencies"
 msgstr "Dépendances"
 
-#: include/triggers.inc.php:2400
+#: include/triggers.inc.php:2402
 msgid "Dependent"
 msgstr "Dépendant"
 
@@ -5189,7 +5189,8 @@ msgstr "Dépendant"
 msgid "Dependent item"
 msgstr "Élément dépendant"
 
-#: app/views/popup.generic.php:278 include/triggers.inc.php:2400
+
+#: app/views/popup.generic.php:278 include/triggers.inc.php:2402
 #: include/views/configuration.trigger.prototype.list.php:92
 #: include/views/configuration.triggers.list.php:238
 msgid "Depends on"
@@ -5236,10 +5237,10 @@ msgstr "Description"
 #: app/views/js/reports.auditlog.list.js.php:153
 #: app/views/reports.auditlog.list.php:96
 #: app/views/reports.auditlog.list.php:129 include/func.inc.php:1601
-#: include/views/configuration.action.edit.php:175
-#: include/views/configuration.action.edit.php:179
-#: include/views/configuration.action.edit.php:319
-#: include/views/configuration.action.edit.php:407
+#: include/views/configuration.action.edit.php:168
+#: include/views/configuration.action.edit.php:172
+#: include/views/configuration.action.edit.php:312
+#: include/views/configuration.action.edit.php:400
 #: include/views/inventory.host.view.php:257
 msgid "Details"
 msgstr "Détails"
@@ -5248,11 +5249,11 @@ msgstr "Détails"
 msgid "Details of web scenario"
 msgstr "Détails du scénario Web"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1055
+#: app/controllers/CControllerPopupTriggerExpr.php:1100
 msgid "Detection period"
 msgstr "Période de détection"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1065
+#: app/controllers/CControllerPopupTriggerExpr.php:1110
 msgid "Deviations"
 msgstr "Déviations"
 
@@ -5409,9 +5410,9 @@ msgstr "Désactiver les scénarios Web sélectionnés ?"
 #: app/views/reports.scheduledreport.list.php:62 include/discovery.inc.php:108
 #: include/hosts.inc.php:1126 include/html.inc.php:284
 #: include/httptest.inc.php:48 include/items.inc.php:138
-#: include/items.inc.php:141 include/items.inc.php:185 include/maps.inc.php:325
-#: include/triggers.inc.php:1873 include/users.inc.php:84
-#: include/views/configuration.action.list.php:77
+#: include/items.inc.php:141 include/items.inc.php:185
+#: include/maps.inc.php:325 include/triggers.inc.php:1875
+#: include/users.inc.php:84 include/views/configuration.action.list.php:77
 #: include/views/configuration.action.list.php:129
 #: include/views/configuration.host.discovery.list.php:167
 #: include/views/configuration.host.prototype.edit.php:360
@@ -5669,7 +5670,7 @@ msgstr "Affichage de %1$s à %2$s parmi %3$s trouvés"
 msgid "Displaying options"
 msgstr "Options d’affichage"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:780
+#: app/controllers/CControllerPopupTriggerExpr.php:811
 msgid "Division denominator"
 msgstr "Dénominateur"
 
@@ -5813,7 +5814,7 @@ msgstr "Identifiant d’utilisateur « %1$s » en doublon dans les utilisateur
 #: include/classes/screens/CScreenProblem.php:867
 #: include/classes/screens/CScreenProblem.php:892
 #: include/classes/screens/CScreenProblem.php:1161 include/events.inc.php:289
-#: include/views/configuration.action.edit.php:175
+#: include/views/configuration.action.edit.php:168
 msgid "Duration"
 msgstr "Durée"
 
@@ -5847,10 +5848,10 @@ msgstr "Chaque élément"
 #: app/views/js/popup.service.edit.js.php:221
 #: app/views/monitoring.service.list.edit.php:142
 #: app/views/monitoring.service.list.php:114
-#: include/views/configuration.action.edit.php:246
-#: include/views/configuration.action.edit.php:274
-#: include/views/configuration.action.edit.php:358
-#: include/views/configuration.action.edit.php:436
+#: include/views/configuration.action.edit.php:239
+#: include/views/configuration.action.edit.php:267
+#: include/views/configuration.action.edit.php:351
+#: include/views/configuration.action.edit.php:429
 #: include/views/configuration.maintenance.edit.php:68
 #: include/views/configuration.trigger.prototype.edit.php:111
 #: include/views/configuration.trigger.prototype.edit.php:305
@@ -6150,7 +6151,7 @@ msgstr "Activer les trap"
 #: include/html.inc.php:280 include/httptest.inc.php:47
 #: include/items.inc.php:138 include/items.inc.php:141
 #: include/items.inc.php:182 include/triggers.inc.php:999
-#: include/triggers.inc.php:1870
+#: include/triggers.inc.php:1872
 #: include/views/configuration.action.edit.php:147
 #: include/views/configuration.action.list.php:76
 #: include/views/configuration.action.list.php:137
@@ -6246,7 +6247,7 @@ msgstr "Erreur ! Impossible de démarrer le serveur Zabbix en raison d’une v
 msgid "Error: %1$s"
 msgstr "Erreur : %1$s"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1045
+#: app/controllers/CControllerPopupTriggerExpr.php:1090
 msgid "Evaluation period"
 msgstr "Période d’évaluation"
 
@@ -6817,8 +6818,8 @@ msgctxt "page navigation"
 msgid "First"
 msgstr "Premier"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:237
-#: app/controllers/CControllerPopupTriggerExpr.php:266
+#: app/controllers/CControllerPopupTriggerExpr.php:268
+#: app/controllers/CControllerPopupTriggerExpr.php:297
 msgid "Fit"
 msgstr "Ajuster"
 
@@ -6934,7 +6935,7 @@ msgstr "Tout"
 msgid "Full clone"
 msgstr "Clone complet"
 
-#: app/views/popup.triggerexpr.php:132
+#: app/views/popup.triggerexpr.php:133
 #: include/views/configuration.graph.edit.php:366
 msgid "Function"
 msgstr "Fonction"
@@ -6950,7 +6951,7 @@ msgstr "Modem GSM"
 msgid "GUI"
 msgstr "GUI"
 
-#: include/classes/user/CWebUser.php:63 index_sso.php:245
+#: include/classes/user/CWebUser.php:63 index_sso.php:260
 msgid "GUI access disabled."
 msgstr "Accès GUI désactivé."
 
@@ -7535,7 +7536,7 @@ msgstr "Le nettoyage de l’historique prend du temps. Continuer ?"
 msgid "History data selection"
 msgstr "Sélection des données d’historique"
 
-#: app/views/popup.triggerexpr.php:111
+#: app/views/popup.triggerexpr.php:112
 msgid "History functions"
 msgstr "Fonctions d’historique"
 
@@ -7711,7 +7712,7 @@ msgid "Host group label type"
 msgstr "Type d’étiquette du groupe d’hôtes"
 
 #: include/classes/api/services/CDashboardGeneral.php:555
-#: include/classes/api/services/CScript.php:812
+#: include/classes/api/services/CScript.php:814
 #: include/classes/api/services/CSettings.php:247
 #: include/classes/api/services/CUserGroup.php:444
 #, c-format
@@ -7952,6 +7953,10 @@ msgstr "Localisation des hôtes"
 #: app/controllers/CControllerPopupMassupdateHost.php:454
 msgid "Hosts updated"
 msgstr "Hôtes mis à jour"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:118
+msgid "Hour"
+msgstr ""
 
 #: app/views/popup.maintenance.period.php:170
 msgid "Hours"
@@ -8262,7 +8267,7 @@ msgstr "Images"
 msgid "Images for all maps will be updated!"
 msgstr "Les images de toutes les cartes seront mises à jour !"
 
-#: include/views/configuration.action.edit.php:236
+#: include/views/configuration.action.edit.php:229
 msgid "Immediately"
 msgstr "Immédiatement"
 
@@ -8344,7 +8349,7 @@ msgstr "Prototype d’élément inaccessible"
 #: app/partials/monitoring.host.view.html.php:89
 #: app/views/configuration.host.list.php:267
 #: include/classes/screens/CScreenProblem.php:386
-#: include/hostgroups.inc.php:293 include/triggers.inc.php:2025
+#: include/hostgroups.inc.php:293 include/triggers.inc.php:2027
 #: include/views/inventory.host.view.php:42
 msgid "Inaccessible maintenance"
 msgstr "Maintenance inaccessible"
@@ -8356,11 +8361,11 @@ msgstr "Carte inaccessible"
 
 #: httpconf.php:663 include/graphs.inc.php:274 include/hosts.inc.php:649
 #: include/httptest.inc.php:222 include/items.inc.php:916
-#: include/triggers.inc.php:2164
+#: include/triggers.inc.php:2166
 msgid "Inaccessible template"
 msgstr "Modèle inaccessible"
 
-#: include/triggers.inc.php:2370 include/triggers.inc.php:2378
+#: include/triggers.inc.php:2372 include/triggers.inc.php:2380
 msgid "Inaccessible trigger"
 msgstr "Déclencheur inaccessible"
 
@@ -8474,7 +8479,7 @@ msgstr "Jeton de coffre‑fort incorrect."
 msgid "Incorrect action condition discovery check."
 msgstr "Test de découverte associé à la condition d’action incorrect."
 
-#: include/classes/api/services/CAction.php:3310
+#: include/classes/api/services/CAction.php:3320
 msgid "Incorrect action condition discovery check. Discovery check does not exist or you have no access to it."
 msgstr "Test de découverte associé à la condition d’action incorrect. Le test de découverte n’existe pas ou vous n’y avez pas accès."
 
@@ -8482,7 +8487,7 @@ msgstr "Test de découverte associé à la condition d’action incorrect. Le te
 msgid "Incorrect action condition discovery object."
 msgstr "Test de découverte associé à la condition d’action incorrect."
 
-#: include/classes/api/services/CAction.php:3269
+#: include/classes/api/services/CAction.php:3279
 msgid "Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it."
 msgstr "Règle de découverte associée à la condition d’action incorrecte. La règle de découverte n’existe pas ou vous n’y avez pas accès."
 
@@ -8494,15 +8499,15 @@ msgstr "État de découverte associé à la condition d’action incorrect."
 msgid "Incorrect action condition event type."
 msgstr "Type d’événement associé à la condition d’action incorrect."
 
-#: include/classes/api/services/CAction.php:2989
+#: include/classes/api/services/CAction.php:2999
 msgid "Incorrect action condition or operation host group. Host group does not exist or you have no access to it."
 msgstr "Condition d’action ou groupe d’hôtes d’opération incorrect. Le groupe d’hôtes n’existe pas ou vous n’y avez pas accès."
 
-#: include/classes/api/services/CAction.php:3049
+#: include/classes/api/services/CAction.php:3059
 msgid "Incorrect action condition or operation host. Host does not exist or you have no access to it."
 msgstr "Condition d’action ou hôte d’opération incorrect. L’hôte n’existe pas ou vous n’y avez pas accès."
 
-#: include/classes/api/services/CAction.php:3187
+#: include/classes/api/services/CAction.php:3197
 msgid "Incorrect action condition or operation template. Template does not exist or you have no access to it."
 msgstr "Condition d’action ou modèle d’opération incorrect. Le modèle n’existe pas ou vous n’y avez pas accès."
 
@@ -8511,11 +8516,11 @@ msgstr "Condition d’action ou modèle d’opération incorrect. Le modèle n�
 msgid "Incorrect action condition port \"%1$s\"."
 msgstr "Port de condition d’action « %1$s » incorrect."
 
-#: include/classes/api/services/CAction.php:3351
+#: include/classes/api/services/CAction.php:3361
 msgid "Incorrect action condition proxy. Proxy does not exist or you have no access to it."
 msgstr "Proxy associé à la condition d’action incorrect. Le proxy n’existe pas ou vous n’y avez pas accès."
 
-#: include/classes/api/services/CAction.php:3391
+#: include/classes/api/services/CAction.php:3401
 msgid "Incorrect action condition service. Service does not exist or you have no access to it."
 msgstr "Service de condition d’action incorrect. Le service n’existe pas ou vous n’y avez pas accès."
 
@@ -8523,7 +8528,7 @@ msgstr "Service de condition d’action incorrect. Le service n’existe pas ou 
 msgid "Incorrect action condition trigger severity."
 msgstr "Sévérité de déclencheur de condition d’action incorrecte."
 
-#: include/classes/api/services/CAction.php:3228
+#: include/classes/api/services/CAction.php:3238
 msgid "Incorrect action condition trigger. Trigger does not exist or you have no access to it."
 msgstr "Déclencheur associé à la condition d’action incorrect. Le déclencheur n’existe pas ou vous n’y avez pas accès."
 
@@ -8533,11 +8538,11 @@ msgstr "Type associé à la condition d’action incorrect."
 
 #: app/controllers/CControllerActionOperationValidate.php:83
 #: app/controllers/CControllerActionOperationValidate.php:89
-#: include/classes/api/services/CAction.php:2814
+#: include/classes/api/services/CAction.php:2824
 msgid "Incorrect action operation escalation step values."
 msgstr "Valeurs de pas d’escalade associées à la condition d’action incorrectes."
 
-#: include/classes/api/services/CAction.php:2889
+#: include/classes/api/services/CAction.php:2899
 msgid "Incorrect action operation media type. Media type does not exist or you have no access to it."
 msgstr "Type de média d’opération d’action incorrect. Le type de média n’existe pas ou vous n’y avez pas accès."
 
@@ -8546,11 +8551,11 @@ msgstr "Type de média d’opération d’action incorrect. Le type de média n�
 msgid "Incorrect action operation type \"%1$s\" for event source \"%2$s\"."
 msgstr "Type d’opération d’action « %1$s » incorrect pour la source d’événement « %2$s »."
 
-#: include/classes/api/services/CAction.php:3135
+#: include/classes/api/services/CAction.php:3145
 msgid "Incorrect action operation user group. User group does not exist or you have no access to it."
 msgstr "Groupe d’utilisateurs d’opération d’action incorrect. Le groupe d’utilisateurs n’existe pas ou vous n’y avez pas accès."
 
-#: include/classes/api/services/CAction.php:3092
+#: include/classes/api/services/CAction.php:3102
 msgid "Incorrect action operation user. User does not exist or you have no access to it."
 msgstr "Utilisateur d’opération d’action incorrect. L’utilisateur n’existe pas ou vous n’y avez pas accès."
 
@@ -9294,7 +9299,7 @@ msgstr "Affichage initial"
 msgid "Initial view is ignored if the default view is set."
 msgstr "L’affichage initial est ignoré si une vue par défaut est définie."
 
-#: app/views/popup.triggerexpr.php:239
+#: app/views/popup.triggerexpr.php:258
 msgid "Insert"
 msgstr "Insertion"
 
@@ -9445,7 +9450,7 @@ msgstr "Contenu du fichier YAML incorrect"
 msgid "Invalid action condition: %1$s."
 msgstr "Condition d’action invalide : %1$s."
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1517
+#: app/controllers/CControllerPopupTriggerExpr.php:1573
 #, c-format
 msgid "Invalid condition: %1$s."
 msgstr "Condition incorrecte : %1$s."
@@ -9506,10 +9511,10 @@ msgstr "Paramètres de la méthode invalides."
 #: app/controllers/CControllerDashboardUpdate.php:200
 #: app/controllers/CControllerDashboardUpdate.php:212
 #: app/controllers/CControllerPopupHttpStep.php:100
-#: include/classes/api/services/CAction.php:2705
-#: include/classes/api/services/CAction.php:2711
-#: include/classes/api/services/CAction.php:2722
-#: include/classes/api/services/CAction.php:2734
+#: include/classes/api/services/CAction.php:2715
+#: include/classes/api/services/CAction.php:2721
+#: include/classes/api/services/CAction.php:2732
+#: include/classes/api/services/CAction.php:2744
 #: include/classes/api/services/CAutoregistration.php:157
 #: include/classes/api/services/CAutoregistration.php:163
 #: include/classes/api/services/CAutoregistration.php:170
@@ -9572,8 +9577,8 @@ msgstr "Paramètres de la méthode invalides."
 #: include/classes/api/services/CReport.php:582
 #: include/classes/api/services/CReport.php:596
 #: include/classes/api/services/CReport.php:602
-#: include/classes/api/services/CScript.php:902
-#: include/classes/api/services/CScript.php:908
+#: include/classes/api/services/CScript.php:904
+#: include/classes/api/services/CScript.php:910
 #: include/classes/api/services/CTemplate.php:668
 #: include/classes/api/services/CTriggerGeneral.php:665
 #: include/classes/api/services/CTriggerGeneral.php:1773
@@ -9916,7 +9921,7 @@ msgstr[1] "Éléments activés"
 msgid "Item in \"not supported\" state"
 msgstr "Élément dans l’état « non géré »"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1510
+#: app/controllers/CControllerPopupTriggerExpr.php:1566
 msgid "Item not selected"
 msgstr "Élément non sélectionné"
 
@@ -10368,17 +10373,17 @@ msgstr "Graphique du dernier mois"
 msgid "Last name"
 msgstr "Nom"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:62
-#: app/controllers/CControllerPopupTriggerExpr.php:76
-#: app/controllers/CControllerPopupTriggerExpr.php:90
-#: app/controllers/CControllerPopupTriggerExpr.php:103
-#: app/controllers/CControllerPopupTriggerExpr.php:124
-#: app/controllers/CControllerPopupTriggerExpr.php:133
-#: app/controllers/CControllerPopupTriggerExpr.php:146
-#: app/controllers/CControllerPopupTriggerExpr.php:165
-#: app/controllers/CControllerPopupTriggerExpr.php:202
-#: app/controllers/CControllerPopupTriggerExpr.php:221
-#: app/controllers/CControllerPopupTriggerExpr.php:250
+#: app/controllers/CControllerPopupTriggerExpr.php:63
+#: app/controllers/CControllerPopupTriggerExpr.php:77
+#: app/controllers/CControllerPopupTriggerExpr.php:91
+#: app/controllers/CControllerPopupTriggerExpr.php:134
+#: app/controllers/CControllerPopupTriggerExpr.php:155
+#: app/controllers/CControllerPopupTriggerExpr.php:164
+#: app/controllers/CControllerPopupTriggerExpr.php:177
+#: app/controllers/CControllerPopupTriggerExpr.php:196
+#: app/controllers/CControllerPopupTriggerExpr.php:233
+#: app/controllers/CControllerPopupTriggerExpr.php:252
+#: app/controllers/CControllerPopupTriggerExpr.php:281
 msgid "Last of"
 msgstr "Dernier"
 
@@ -10455,8 +10460,8 @@ msgstr "Rogner à gauche"
 msgid "Legend"
 msgstr "Légende"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:642
-#: app/controllers/CControllerPopupTriggerExpr.php:760
+#: app/controllers/CControllerPopupTriggerExpr.php:673
+#: app/controllers/CControllerPopupTriggerExpr.php:791
 msgid "Length"
 msgstr "Longueur"
 
@@ -10670,7 +10675,7 @@ msgstr "Enregistrer les traps SNMP non appariés"
 #: app/controllers/CControllerAuditLogList.php:191
 #: app/views/administration.authentication.edit.php:200
 #: app/views/administration.user.list.php:112 include/func.inc.php:1523
-#: include/func.inc.php:1539 index_http.php:90 index_sso.php:265
+#: include/func.inc.php:1539 index_http.php:90 index_sso.php:280
 msgid "Login"
 msgstr "Connexion"
 
@@ -11008,9 +11013,9 @@ msgstr "Marquer les autres"
 msgid "Mark selected"
 msgstr "Marquer les éléments sélectionnés"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:377
-#: app/controllers/CControllerPopupTriggerExpr.php:417
-#: app/controllers/CControllerPopupTriggerExpr.php:443
+#: app/controllers/CControllerPopupTriggerExpr.php:408
+#: app/controllers/CControllerPopupTriggerExpr.php:448
+#: app/controllers/CControllerPopupTriggerExpr.php:474
 msgid "Mask"
 msgstr "Masque"
 
@@ -11050,11 +11055,11 @@ msgstr "Élément maître"
 msgid "Matches regular expression"
 msgstr "Correspond à l’expression rationnelle"
 
-#: app/views/popup.triggerexpr.php:112
+#: app/views/popup.triggerexpr.php:113
 msgid "Mathematical functions"
 msgstr "Fonctions mathématiques"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:364
+#: app/controllers/CControllerPopupTriggerExpr.php:395
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:134
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:136
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:206
@@ -11286,7 +11291,7 @@ msgstr "Microsoft Edge"
 msgid "Middle"
 msgstr "Milieu"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:359
+#: app/controllers/CControllerPopupTriggerExpr.php:390
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:119
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:121
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:191
@@ -11388,7 +11393,7 @@ msgstr "Éléments manquants pour le prototype de graphique « %1$s »."
 msgid "Missing key \"%1$s\" for host \"%2$s\"."
 msgstr "Clef « %1$s » manquante pour l’hôte « %2$s »."
 
-#: app/controllers/CControllerPopupTriggerExpr.php:242
+#: app/controllers/CControllerPopupTriggerExpr.php:273
 #: app/views/administration.proxy.list.php:51
 #: app/views/administration.proxy.list.php:77 report2.php:201
 msgid "Mode"
@@ -11491,6 +11496,7 @@ msgstr "Surveillance"
 msgid "Monospace"
 msgstr "Chasse fixe"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:121
 #: app/views/popup.maintenance.period.php:104 report4.php:163
 msgid "Month"
 msgstr "Mois"
@@ -12110,7 +12116,7 @@ msgstr "Aucune correspondance trouvée"
 msgid "No new modules discovered"
 msgstr "Aucun module découvert"
 
-#: include/classes/api/services/CAction.php:2769
+#: include/classes/api/services/CAction.php:2779
 #, c-format
 msgid "No operations defined for action \"%1$s\"."
 msgstr "Aucune opération n’est définie pour l’action « %1$s »."
@@ -12147,9 +12153,9 @@ msgstr "Aucune permission pour l’accès au système."
 #: include/classes/api/services/CRole.php:137
 #: include/classes/api/services/CRole.php:230
 #: include/classes/api/services/CRole.php:345
-#: include/classes/api/services/CScript.php:240
-#: include/classes/api/services/CScript.php:316
-#: include/classes/api/services/CScript.php:825
+#: include/classes/api/services/CScript.php:242
+#: include/classes/api/services/CScript.php:318
+#: include/classes/api/services/CScript.php:827
 #: include/classes/api/services/CSettings.php:136
 #: include/classes/api/services/CUserGroup.php:176
 #: include/classes/api/services/CUserGroup.php:260
@@ -12188,7 +12194,7 @@ msgstr "Aucune permission d’appeler « %1$s.%2$s »."
 #: app/views/monitoring.widget.systeminfo.view.php:45 disc_prototypes.php:748
 #: host_discovery.php:808 hostinventoriesoverview.php:73
 #: include/classes/api/services/CAction.php:1516
-#: include/classes/api/services/CAction.php:2571
+#: include/classes/api/services/CAction.php:2577
 #: include/classes/api/services/CConfiguration.php:78
 #: include/classes/api/services/CCorrelation.php:497
 #: include/classes/api/services/CCorrelation.php:653
@@ -12288,11 +12294,11 @@ msgstr "Aucune permission d’appeler « %1$s.%2$s »."
 #: include/classes/api/services/CReport.php:909
 #: include/classes/api/services/CRole.php:326
 #: include/classes/api/services/CRole.php:363
-#: include/classes/api/services/CScript.php:375
-#: include/classes/api/services/CScript.php:860
-#: include/classes/api/services/CScript.php:920
-#: include/classes/api/services/CScript.php:937
-#: include/classes/api/services/CScript.php:949
+#: include/classes/api/services/CScript.php:377
+#: include/classes/api/services/CScript.php:862
+#: include/classes/api/services/CScript.php:922
+#: include/classes/api/services/CScript.php:939
+#: include/classes/api/services/CScript.php:951
 #: include/classes/api/services/CService.php:398
 #: include/classes/api/services/CService.php:467
 #: include/classes/api/services/CService.php:947
@@ -12351,7 +12357,7 @@ msgid "No public key file specified."
 msgstr "Aucun fichier de clef publique spécifié."
 
 #: app/controllers/CControllerActionOperationValidate.php:110
-#: include/classes/api/services/CAction.php:2826
+#: include/classes/api/services/CAction.php:2836
 msgid "No recipients specified for action operation message."
 msgstr "Aucun destinataire n’est spécifié pour le message d’opération d’action."
 
@@ -12372,7 +12378,7 @@ msgid "No target selected."
 msgstr "Aucune cible sélectionnée."
 
 #: app/controllers/CControllerActionOperationValidate.php:142
-#: include/classes/api/services/CAction.php:2837
+#: include/classes/api/services/CAction.php:2847
 msgid "No targets specified for action operation global script."
 msgstr "Aucune cible n’est spécifiée pour le script global d’opération d’action."
 
@@ -12521,6 +12527,10 @@ msgstr "Rapport de notification"
 msgid "Notifications"
 msgstr "Notifications"
 
+#: actionconf.php:87 include/views/configuration.action.edit.php:475
+msgid "Notify about canceled escalations"
+msgstr ""
+
 #: include/actions.inc.php:865 include/actions.inc.php:1038
 #: include/actions.inc.php:1039
 msgid "Notify all involved"
@@ -12606,6 +12616,10 @@ msgstr "Nombre de processeurs sur un hyperviseur VMware, <url> — URL du servic
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:279
 msgid "Number of rows"
 msgstr "Nombre de lignes"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:126
+msgid "Number of seasons"
+msgstr ""
 
 #: include/views/reports.toptriggers.php:86
 msgid "Number of status changes"
@@ -12906,12 +12920,12 @@ msgstr "Informations du système d’exploitation. Retourne une chaîne"
 msgid "Operation"
 msgstr "Opération"
 
-#: include/classes/api/services/CAction.php:2795
+#: include/classes/api/services/CAction.php:2805
 #, c-format
 msgid "Operation \"%1$s\" already exists for action \"%2$s\"."
 msgstr "L’opération « %1$s » existe déjà pour l’action « %2$s »."
 
-#: actionconf.php:378
+#: actionconf.php:384
 #, c-format
 msgid "Operation \"%1$s\" already exists."
 msgstr "L’opération « %1$s » existe déjà."
@@ -12945,8 +12959,8 @@ msgstr "Données opérationnelles"
 #: app/views/configuration.correlation.edit.php:140
 #: app/views/configuration.correlation.list.php:77
 #: app/views/popup.lldoverride.php:210
-#: include/views/configuration.action.edit.php:307
-#: include/views/configuration.action.edit.php:479
+#: include/views/configuration.action.edit.php:300
+#: include/views/configuration.action.edit.php:484
 #: include/views/configuration.action.list.php:99
 msgid "Operations"
 msgstr "Opérations"
@@ -12981,7 +12995,7 @@ msgstr "Opérations"
 msgid "Operator"
 msgstr "Opérateur"
 
-#: app/views/popup.triggerexpr.php:113
+#: app/views/popup.triggerexpr.php:114
 msgid "Operator functions"
 msgstr "Fonctions d’exploitation"
 
@@ -13409,7 +13423,7 @@ msgid "Parameters"
 msgstr "Paramètres"
 
 #: app/controllers/CControllerActionOperationValidate.php:76
-#: include/classes/api/services/CAction.php:2807
+#: include/classes/api/services/CAction.php:2817
 msgid "Parameters \"esc_step_from\" and \"esc_step_to\" must be set together."
 msgstr "Les paramètres « esc_step_from » et « esc_step_to » doivent être tous les deux définis."
 
@@ -13536,12 +13550,12 @@ msgstr "Coller le widget"
 msgid "Paste without external links"
 msgstr "Coller sans les liens externes"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:877
+#: app/controllers/CControllerPopupTriggerExpr.php:908
 #: app/views/monitoring.charts.view.php:106
 msgid "Pattern"
 msgstr "Motif"
 
-#: actionconf.php:82 include/views/configuration.action.edit.php:163
+#: actionconf.php:82 include/views/configuration.action.edit.php:471
 msgid "Pause operations for suppressed problems"
 msgstr "Suspendre les opérations des problèmes supprimés"
 
@@ -13554,7 +13568,7 @@ msgstr "Pic d’utilisation de la mémoire : %1$s"
 msgid "Percent of time the virtual machine is unable to run because it is contending for access to the physical CPU(s), <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Pourcentage de temps durant lequel la machine virtuelle ne peut s’exécuter car elle est en conflit pour accéder au(x) processeur(s) physique(s), <url> — URL de service VMware, <uuid> — nom d’hôte de la machine virtuelle VMware"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:213
+#: app/controllers/CControllerPopupTriggerExpr.php:244
 msgid "Percentage"
 msgstr "Pourcentage"
 
@@ -13578,10 +13592,11 @@ msgstr "Ligne de centile (droite)"
 msgid "Performs a DNS query. Returns character string with the required type of information"
 msgstr "Réalise une requête DNS. Retourne une chaîne de caractères avec le type d’information requis"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:104
 #: app/partials/scheduledreport.formgrid.html.php:83
 #: app/partials/scheduledreport.table.html.php:42
-#: app/views/popup.lldoperation.php:116 app/views/popup.massupdate.item.php:227
-#: app/views/popup.triggerexpr.php:181
+#: app/views/popup.lldoperation.php:116
+#: app/views/popup.massupdate.item.php:227 app/views/popup.triggerexpr.php:182
 #: include/views/configuration.host.discovery.edit.php:632
 #: include/views/configuration.item.edit.php:735
 #: include/views/configuration.item.prototype.edit.php:714
@@ -13589,8 +13604,9 @@ msgstr "Réalise une requête DNS. Retourne une chaîne de caractères avec le t
 msgid "Period"
 msgstr "Période"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:95
-#: app/controllers/CControllerPopupTriggerExpr.php:1050
+#: app/controllers/CControllerPopupTriggerExpr.php:96
+#: app/controllers/CControllerPopupTriggerExpr.php:109
+#: app/controllers/CControllerPopupTriggerExpr.php:1095
 msgid "Period shift"
 msgstr "Décalage de période"
 
@@ -13744,7 +13760,7 @@ msgstr "Type POST"
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
 msgstr "Consommation, <url> — URL de service VMware, <uuid> — nom d’hôte de l’hyperviseur VMware, <max> — consommation maximale autorisée"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:832
+#: app/controllers/CControllerPopupTriggerExpr.php:863
 msgid "Power value"
 msgstr "Valeur de puissance"
 
@@ -13753,7 +13769,7 @@ msgstr "Valeur de puissance"
 msgid "Pre-installation summary"
 msgstr "Résumé préinstallation"
 
-#: app/views/popup.triggerexpr.php:114
+#: app/views/popup.triggerexpr.php:115
 msgid "Prediction functions"
 msgstr "Fonctions de prédiction"
 
@@ -14279,7 +14295,7 @@ msgstr "Expression de récupération"
 msgid "Recovery expression syntax error."
 msgstr "Erreur de syntaxe dans l’expression de récupération."
 
-#: include/views/configuration.action.edit.php:393
+#: include/views/configuration.action.edit.php:386
 msgid "Recovery operations"
 msgstr "Opérations de récupération"
 
@@ -14432,10 +14448,10 @@ msgstr "Commande à distance"
 #: include/classes/widgets/CWidgetHelper.php:533
 #: include/classes/widgets/CWidgetHelper.php:586 include/forms.inc.php:1461
 #: include/forms.inc.php:2009 include/views/configuration.action.edit.php:97
-#: include/views/configuration.action.edit.php:256
-#: include/views/configuration.action.edit.php:284
-#: include/views/configuration.action.edit.php:368
-#: include/views/configuration.action.edit.php:446
+#: include/views/configuration.action.edit.php:249
+#: include/views/configuration.action.edit.php:277
+#: include/views/configuration.action.edit.php:361
+#: include/views/configuration.action.edit.php:439
 #: include/views/configuration.host.discovery.edit.php:151
 #: include/views/configuration.host.discovery.edit.php:196
 #: include/views/configuration.host.discovery.edit.php:222
@@ -14582,8 +14598,8 @@ msgstr "Remplacer"
 msgid "Replace dependencies"
 msgstr "Remplacer les dépendances"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:647
-#: app/controllers/CControllerPopupTriggerExpr.php:882
+#: app/controllers/CControllerPopupTriggerExpr.php:678
+#: app/controllers/CControllerPopupTriggerExpr.php:913
 msgid "Replacement"
 msgstr "Remplacement"
 
@@ -14784,7 +14800,7 @@ msgstr "Type de la réponse : String"
 #: app/views/popup.itemtestedit.view.php:325
 #: app/views/popup.itemtestedit.view.php:365
 #: app/views/popup.testtriggerexpr.php:49
-#: app/views/popup.testtriggerexpr.php:102 app/views/popup.triggerexpr.php:217
+#: app/views/popup.testtriggerexpr.php:102 app/views/popup.triggerexpr.php:236
 #: include/classes/debug/CProfiler.php:183
 msgid "Result"
 msgstr "Résultat"
@@ -15314,7 +15330,7 @@ msgstr "Étendue"
 msgid "Script"
 msgstr "Script"
 
-#: include/classes/api/services/CScript.php:1346
+#: include/classes/api/services/CScript.php:1348
 #, c-format
 msgid "Script \"%1$s\" already exists."
 msgstr "Le script « %1$s » existe déjà."
@@ -15379,11 +15395,12 @@ msgstr "Expression de recherche vide"
 msgid "Search type"
 msgstr "Type de recherche"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1060
+#: app/controllers/CControllerPopupTriggerExpr.php:114
+#: app/controllers/CControllerPopupTriggerExpr.php:1105
 msgid "Season"
 msgstr "Saison"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1075
+#: app/controllers/CControllerPopupTriggerExpr.php:1120
 msgid "Season deviation window"
 msgstr "Fenêtre d’écart saisonnier"
 
@@ -15465,7 +15482,7 @@ msgstr "Sélectionnez un widget"
 msgid "Selected"
 msgstr "Sélectionné"
 
-#: actionconf.php:488
+#: actionconf.php:494
 msgid "Selected actions deleted"
 msgstr "Actions sélectionnées supprimées"
 
@@ -15705,6 +15722,7 @@ msgid "Services updated"
 msgstr "Services mis à jour"
 
 #: include/classes/core/ZBase.php:244 include/classes/core/ZBase.php:471
+#: index_sso.php:242 index_sso.php:249
 msgid "Session initialization error."
 msgstr "Erreur d’initialisation de la session."
 
@@ -16157,7 +16175,7 @@ msgstr "Espagnol (es_ES)"
 msgid "Specified role was not found."
 msgstr "Le rôle spécifié n’a pas été trouvé."
 
-#: include/classes/api/services/CAction.php:2932
+#: include/classes/api/services/CAction.php:2942
 msgid "Specified script does not exist or you do not have rights on it for action operation command."
 msgstr "Le script spécifié n’existe pas ou vous n’avez pas les droits dessis pour une commande d’opération d’action."
 
@@ -16192,8 +16210,8 @@ msgstr "Éléments standards"
 msgid "Standby"
 msgstr "Veille"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:637
-#: app/controllers/CControllerPopupTriggerExpr.php:755
+#: app/controllers/CControllerPopupTriggerExpr.php:668
+#: app/controllers/CControllerPopupTriggerExpr.php:786
 msgid "Start"
 msgstr "Démarrer"
 
@@ -16201,7 +16219,7 @@ msgstr "Démarrer"
 msgid "Start date"
 msgstr "Date de démarrage"
 
-#: include/views/configuration.action.edit.php:175
+#: include/views/configuration.action.edit.php:168
 msgid "Start in"
 msgstr "Démarrer dans"
 
@@ -16383,7 +16401,7 @@ msgid "Step with name \"%1$s\" already exists."
 msgstr "L’étape nommée « %1$s » existe déjà."
 
 #: app/partials/popup.operations.php:51 httpconf.php:51
-#: include/views/configuration.action.edit.php:175
+#: include/views/configuration.action.edit.php:168
 #: include/views/configuration.httpconf.edit.php:227
 #: include/views/configuration.httpconf.edit.php:236
 msgid "Steps"
@@ -16437,12 +16455,12 @@ msgstr "Littéral"
 msgid "Strict"
 msgstr "Strict"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:497
+#: app/controllers/CControllerPopupTriggerExpr.php:528
 #: include/triggers.inc.php:1596
 msgid "String"
 msgstr "Chaîne"
 
-#: app/views/popup.triggerexpr.php:115
+#: app/views/popup.triggerexpr.php:116
 msgid "String functions"
 msgstr "Fonctions de chaînes"
 
@@ -17126,7 +17144,7 @@ msgstr "Cette année"
 msgid "This year so far"
 msgstr "Cette année jusqu’à présent"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:261
+#: app/controllers/CControllerPopupTriggerExpr.php:292
 msgid "Threshold"
 msgstr "Seuil"
 
@@ -17159,19 +17177,19 @@ msgstr "Les données d’attribution du fournisseur de tuiles affichées dans un
 msgid "Till"
 msgstr "À"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:50
-#: app/controllers/CControllerPopupTriggerExpr.php:232
+#: app/controllers/CControllerPopupTriggerExpr.php:51
+#: app/controllers/CControllerPopupTriggerExpr.php:263
 #: app/views/hintbox.eventlist.php:61 app/views/hintbox.eventlist.php:67
 #: app/views/monitoring.widget.actionlog.view.php:33
 #: app/views/monitoring.widget.problems.view.php:38
 #: app/views/popup.itemtestedit.view.php:270
 #: app/views/popup.service.time.edit.php:70
-#: app/views/popup.service.time.edit.php:98 app/views/popup.triggerexpr.php:174
-#: app/views/popup.triggerexpr.php:178 app/views/reports.auditlog.list.php:89
-#: include/actions.inc.php:1700 include/actions.inc.php:1754
-#: include/actions.inc.php:1827 include/actions.inc.php:1921
-#: include/actions.inc.php:1976 include/blocks.inc.php:558
-#: include/classes/screens/CScreenProblem.php:816
+#: app/views/popup.service.time.edit.php:98
+#: app/views/popup.triggerexpr.php:175 app/views/popup.triggerexpr.php:179
+#: app/views/reports.auditlog.list.php:89 include/actions.inc.php:1700
+#: include/actions.inc.php:1754 include/actions.inc.php:1827
+#: include/actions.inc.php:1921 include/actions.inc.php:1976
+#: include/blocks.inc.php:558 include/classes/screens/CScreenProblem.php:816
 #: include/classes/screens/CScreenProblem.php:1155
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:31
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:32
@@ -17204,13 +17222,13 @@ msgstr "Date du dernier accès du serveur mandataire (proxy). Nom — nom du pro
 msgid "Time period"
 msgstr "Période de temps"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:68
-#: app/controllers/CControllerPopupTriggerExpr.php:82
-#: app/controllers/CControllerPopupTriggerExpr.php:152
-#: app/controllers/CControllerPopupTriggerExpr.php:171
-#: app/controllers/CControllerPopupTriggerExpr.php:208
-#: app/controllers/CControllerPopupTriggerExpr.php:227
-#: app/controllers/CControllerPopupTriggerExpr.php:256
+#: app/controllers/CControllerPopupTriggerExpr.php:69
+#: app/controllers/CControllerPopupTriggerExpr.php:83
+#: app/controllers/CControllerPopupTriggerExpr.php:183
+#: app/controllers/CControllerPopupTriggerExpr.php:202
+#: app/controllers/CControllerPopupTriggerExpr.php:239
+#: app/controllers/CControllerPopupTriggerExpr.php:258
+#: app/controllers/CControllerPopupTriggerExpr.php:287
 #: include/classes/widgets/CWidgetHelper.php:784
 #: include/classes/widgets/CWidgetHelper.php:860
 #: include/classes/widgets/CWidgetHelper.php:1129
@@ -17897,11 +17915,12 @@ msgstr "Unités"
 #: include/graphs.inc.php:37 include/graphs.inc.php:67 include/hosts.inc.php:47
 #: include/hosts.inc.php:74 include/html.inc.php:287
 #: include/httptest.inc.php:41 include/httptest.inc.php:58
-#: include/items.inc.php:45 include/items.inc.php:110 include/items.inc.php:133
-#: include/items.inc.php:167 include/maintenances.inc.php:33
-#: include/maps.inc.php:39 include/triggers.inc.php:83
-#: include/triggers.inc.php:1870 include/users.inc.php:64
-#: include/users.inc.php:87 include/views/configuration.action.edit.php:233
+#: include/items.inc.php:45 include/items.inc.php:110
+#: include/items.inc.php:133 include/items.inc.php:167
+#: include/maintenances.inc.php:33 include/maps.inc.php:39
+#: include/triggers.inc.php:83 include/triggers.inc.php:1872
+#: include/users.inc.php:64 include/users.inc.php:87
+#: include/views/configuration.action.edit.php:226
 #: include/views/configuration.triggers.list.php:77
 msgid "Unknown"
 msgstr "Inconnu"
@@ -17919,7 +17938,7 @@ msgid "Unknown error"
 msgstr "Erreur inconnue"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:47
-#: app/controllers/CControllerPopupTriggerExpr.php:1301
+#: app/controllers/CControllerPopupTriggerExpr.php:1346
 #: include/triggers.inc.php:1146
 msgid "Unknown host item, no such item in selected host"
 msgstr "Élément inconnu, cet élément n’existe pas dans l’hôte sélectionné"
@@ -18068,7 +18087,7 @@ msgstr "Fonctionne"
 #: app/views/popup.service.time.edit.php:166
 #: app/views/popup.triggerwizard.php:147 app/views/popup.valuemap.edit.php:126
 #: include/classes/html/CTabFilter.php:94
-#: include/views/configuration.action.edit.php:489
+#: include/views/configuration.action.edit.php:494
 #: include/views/configuration.graph.edit.php:494
 #: include/views/configuration.host.discovery.edit.php:977
 #: include/views/configuration.hostgroups.edit.php:61
@@ -18105,7 +18124,7 @@ msgstr "Actualiser l’existant"
 msgid "Update interval"
 msgstr "Intervalle d’actualisation"
 
-#: include/views/configuration.action.edit.php:469
+#: include/views/configuration.action.edit.php:462
 msgid "Update operations"
 msgstr "Opérations de mise à jour"
 
@@ -18318,7 +18337,7 @@ msgstr[1] "Groupes d’utilisateurs mis à jour"
 
 #: include/classes/api/services/CDashboard.php:482
 #: include/classes/api/services/CReport.php:463
-#: include/classes/api/services/CScript.php:776
+#: include/classes/api/services/CScript.php:778
 #: include/classes/api/services/CSettings.php:260
 #: include/classes/api/services/CUser.php:741
 #, c-format
@@ -18903,7 +18922,7 @@ msgstr "Valeur : pas de donnée"
 msgid "Valuemap with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "La carte de correspondance (Valuemap) avec l’identifiant « %1$s » n’est pas disponible pour « %2$s »."
 
-#: app/controllers/CControllerPopupTriggerExpr.php:624
+#: app/controllers/CControllerPopupTriggerExpr.php:655
 #: app/views/monitoring.charts.view.php:56
 #: include/views/monitoring.history.php:78
 msgid "Values"
@@ -19136,6 +19155,10 @@ msgstr "Mer"
 #: include/func.inc.php:121 include/func.inc.php:211 jsLoader.php:245
 msgid "Wednesday"
 msgstr "Mercredi"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:120
+msgid "Week"
+msgstr ""
 
 #: app/partials/scheduledreport.formgrid.html.php:99
 #: app/partials/scheduledreport.table.html.php:50
@@ -19409,7 +19432,8 @@ msgctxt "XML date and time format"
 msgid "YYYY-MM-DDThh:mm:ssZ"
 msgstr "YYYY-MM-DDThh:mm:ssZ"
 
-#: report4.php:116 report4.php:152
+#: app/controllers/CControllerPopupTriggerExpr.php:122 report4.php:116
+#: report4.php:152
 msgid "Year"
 msgstr "Année"
 
@@ -19467,7 +19491,7 @@ msgstr "Vous êtes connecté en tant que « %1$s »."
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "Certaines langues ne peuvent pas être choisi, car elles ne sont pas toutes installées sur le serveur Web."
 
-#: include/func.inc.php:1533 index_http.php:87 index_sso.php:262
+#: include/func.inc.php:1533 index_http.php:87 index_sso.php:277
 msgid "You are not logged in"
 msgstr "Vous n’êtes pas connecté"
 
@@ -19710,11 +19734,11 @@ msgstr "une plage de temps est nécessaire"
 msgid "a time unit is expected"
 msgstr "une unité de temps est nécessaire"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:302
+#: app/controllers/CControllerPopupTriggerExpr.php:333
 msgid "abs() - Absolute value"
 msgstr "abs() — value absolue"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:308
+#: app/controllers/CControllerPopupTriggerExpr.php:339
 msgid "acos() - The arccosine of a value as an angle, expressed in radians"
 msgstr "acos() — l’arc cosinus d’une valeur (réelle comprise entre -1 et 1), donnant un angle en radians"
 
@@ -19809,7 +19833,7 @@ msgstr "un nombre pair de caractères hexadécimaux est nécessaire"
 msgid "an explicit time is expected"
 msgstr "un temps explicite est attendu"
 
-#: include/classes/api/services/CAction.php:2712
+#: include/classes/api/services/CAction.php:2722
 #: include/classes/api/services/CCorrelation.php:730
 msgid "an identifier is not defined in the formula"
 msgstr "un identifiant n’est pas défini dans la formule"
@@ -19853,11 +19877,11 @@ msgstr "en rouge"
 msgid "ascending"
 msgstr "croissant"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:315
+#: app/controllers/CControllerPopupTriggerExpr.php:346
 msgid "ascii() - Returns the ASCII code of the leftmost character of the value"
 msgstr "ascii() — retourne la code ASCII du caractère le plus à gauche de la valeur"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:322
+#: app/controllers/CControllerPopupTriggerExpr.php:353
 msgid "asin() - The arcsine of a value as an angle, expressed in radians"
 msgstr "asin() — l’arc sinus d’une valeur (réelle comprise entre -1 et 1), donnant un angle en radians"
 
@@ -19871,11 +19895,11 @@ msgstr "au moins un jour de la semaine doit être sélectionné"
 msgid "at least one override option must be specified"
 msgstr "au moins une option de substitution doit être spécifiée"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:329
+#: app/controllers/CControllerPopupTriggerExpr.php:360
 msgid "atan() - The arctangent of a value as an angle, expressed in radians"
 msgstr "atan() — l’arc tangente d’une valeur, le résultat est un angle en radians"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:336
+#: app/controllers/CControllerPopupTriggerExpr.php:367
 msgid "atan2() - The arctangent of the ordinate (exprue) and abscissa coordinates specified as an angle, expressed in radians"
 msgstr "atan2() — variante de l’arc tangente des coordonnées (x,y) donnant un l’angle en radians"
 
@@ -19897,39 +19921,47 @@ msgstr "enregistrement automatique"
 msgid "avg"
 msgstr "moy"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:349
+#: app/controllers/CControllerPopupTriggerExpr.php:380
 msgid "avg() - Average value of a period T"
 msgstr "avg() — valeur moyenne d’une période T"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:356
+#: app/controllers/CControllerPopupTriggerExpr.php:1052
+msgid "baselinedev() - Returns the number of deviations between data periods in seasons and the last data period"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1059
+msgid "baselinewma() - Calculates baseline by averaging data periods in seasons"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:387
 msgid "between() - Checks if a value belongs to the given range (1 - in range, 0 - otherwise)"
 msgstr "between() — vérifie qu’une valeur est comprise dans une plage donnée (renvoie 1 si positif, 0 sinon)"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:374
+#: app/controllers/CControllerPopupTriggerExpr.php:405
 msgid "bitand() - Bitwise AND"
 msgstr "bitand() — ET binaire"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:387
+#: app/controllers/CControllerPopupTriggerExpr.php:418
 msgid "bitlength() - Returns the length in bits"
 msgstr "bitlength() — retourne le nombre de bits"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:394
+#: app/controllers/CControllerPopupTriggerExpr.php:425
 msgid "bitlshift() - Bitwise shift left"
 msgstr "bitlshift() — décalage binaire à gauche"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:407
+#: app/controllers/CControllerPopupTriggerExpr.php:438
 msgid "bitnot() - Bitwise NOT"
 msgstr "bitnot() — NON binaire"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:414
+#: app/controllers/CControllerPopupTriggerExpr.php:445
 msgid "bitor() - Bitwise OR"
 msgstr "bitor() — OU binaire"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:427
+#: app/controllers/CControllerPopupTriggerExpr.php:458
 msgid "bitrshift() - Bitwise shift right"
 msgstr "bitrshift() — décalage binaire à droite"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:440
+#: app/controllers/CControllerPopupTriggerExpr.php:471
 msgid "bitxor() - Bitwise exclusive OR"
 msgstr "bitxor() — OU exclusif binaire"
 
@@ -19944,7 +19976,7 @@ msgstr "clignotant"
 msgid "both username and password should be either present or empty"
 msgstr "le nom d’utilisateur et le mot de passe doivent être présents ou vides"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:453
+#: app/controllers/CControllerPopupTriggerExpr.php:484
 msgid "bytelength() - Returns the length in bytes"
 msgstr "bytelength() — retourne la longueur en octets"
 
@@ -19986,7 +20018,7 @@ msgstr "ne peut être modifié"
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:41
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:47
 #: app/controllers/CControllerUserUpdateGeneral.php:111
-#: include/classes/api/services/CAction.php:2735
+#: include/classes/api/services/CAction.php:2745
 #: include/classes/api/services/CAutoregistration.php:163
 #: include/classes/api/services/CDiscoveryRule.php:1989
 #: include/classes/api/services/CDRule.php:210
@@ -20074,23 +20106,23 @@ msgstr "ne peut pas exécuter la requête API de défilement, les données peuve
 msgid "cannot update property for templated discovery rule"
 msgstr "impossible de mettre à jour la propriété pour la règle de découverte basée sur un modèle"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:460
+#: app/controllers/CControllerPopupTriggerExpr.php:491
 msgid "cbrt() - Cube root"
 msgstr "cbrt() — racine cubique"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:467
+#: app/controllers/CControllerPopupTriggerExpr.php:498
 msgid "ceil() - Rounds up to the nearest greater integer"
 msgstr "ceil() — arrondit la valeur au nombre entier supérieur"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:474
+#: app/controllers/CControllerPopupTriggerExpr.php:505
 msgid "change() - Difference between last and previous value"
 msgstr "change () — Différence entre la dernière valeur et la précédente"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:480
+#: app/controllers/CControllerPopupTriggerExpr.php:511
 msgid "changecount() - Number of changes between adjacent values, Mode (all - all changes, inc - only increases, dec - only decreases)"
 msgstr "changecount() — nombre de changements entre les valeurs adjacentes, mode (all — tous les changements, inc — croissants uniquement, dec — décroissants uniquement)"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:487
+#: app/controllers/CControllerPopupTriggerExpr.php:518
 msgid "char() - Returns the character which represents the given ASCII code"
 msgstr "char() — retourne le caractère correspondant au code ASCII donné"
 
@@ -20117,7 +20149,7 @@ msgstr "couleur"
 msgid "comma-separated list"
 msgstr "liste séparée par des virgules"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:494
+#: app/controllers/CControllerPopupTriggerExpr.php:525
 msgid "concat() - Returns a string that is the result of concatenating value to string"
 msgstr "concat(chaine1, chaine2) — retourne une chaîne de caractères résultant de la concaténation des chaînes chaine1 et chaine2"
 
@@ -20132,15 +20164,15 @@ msgstr "configurer"
 msgid "contains"
 msgstr "contient"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:507
+#: app/controllers/CControllerPopupTriggerExpr.php:538
 msgid "cos() - The cosine of a value, where the value is an angle expressed in radians"
 msgstr "cos() — le cosinus d’un angle exprimé en radians"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:514
+#: app/controllers/CControllerPopupTriggerExpr.php:545
 msgid "cosh() - The hyperbolic cosine of a value"
 msgstr "cosh() — le cosinus hyperbolique d’une valeur"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:521
+#: app/controllers/CControllerPopupTriggerExpr.php:552
 msgid "cot() - The cotangent of a value, where the value is an angle expressed in radians"
 msgstr "cot() — la cotangente d’une valeur"
 
@@ -20148,11 +20180,11 @@ msgstr "cot() — la cotangente d’une valeur"
 msgid "count"
 msgstr "total"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:528
+#: app/controllers/CControllerPopupTriggerExpr.php:559
 msgid "count() - Number of successfully retrieved values V (which fulfill operator O) for period T"
 msgstr "count () — nombre de valeurs récupérées avec succès V (qui remplissent l’opérateur O) pour la période T"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:535
+#: app/controllers/CControllerPopupTriggerExpr.php:566
 msgid "countunique() - The number of unique values"
 msgstr "countunique() — le nombre de valeurs uniques"
 
@@ -20165,15 +20197,15 @@ msgstr "j"
 msgid "d.M"
 msgstr "d M"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:542
+#: app/controllers/CControllerPopupTriggerExpr.php:573
 msgid "date() - Current date"
 msgstr "date () — Date actuelle"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:548
+#: app/controllers/CControllerPopupTriggerExpr.php:579
 msgid "dayofmonth() - Day of month"
 msgstr "dayofmonth () — Jour du mois"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:554
+#: app/controllers/CControllerPopupTriggerExpr.php:585
 msgid "dayofweek() - Day of week"
 msgstr "dayofweek () — Jour de la semaine"
 
@@ -20191,7 +20223,7 @@ msgstr "jours"
 msgid "default"
 msgstr "défaut"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:560
+#: app/controllers/CControllerPopupTriggerExpr.php:591
 msgid "degrees() - Converts a value from radians to degrees"
 msgstr "degrees() — Convertit en degrés une valeur exprimée en radians"
 
@@ -20268,7 +20300,7 @@ msgstr "n’existe pas"
 msgid "does not match"
 msgstr "ne correspond pas"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:567
+#: app/controllers/CControllerPopupTriggerExpr.php:598
 msgid "e() - Returns Euler's number"
 msgstr "e() — retourne le nombre d’Euler"
 
@@ -20290,11 +20322,11 @@ msgstr "message d’erreur"
 msgid "exists"
 msgstr "existe"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:572
+#: app/controllers/CControllerPopupTriggerExpr.php:603
 msgid "exp() - Euler's number at a power of a value"
 msgstr "exp() — retourne l’exponentielle d’un nombre"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:579
+#: app/controllers/CControllerPopupTriggerExpr.php:610
 msgid "expm1() - Euler's number at a power of a value minus 1"
 msgstr "expm1() — retourne l’exponentielle d’un nombre moins 1"
 
@@ -20310,7 +20342,7 @@ msgstr "impossible de parcourir le JSON"
 msgid "file format is unsupported"
 msgstr "le format de fichier n’est pas pris en charge"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:586
+#: app/controllers/CControllerPopupTriggerExpr.php:617
 msgid "find() - Check occurrence of pattern V (which fulfill operator O) for period T (1 - match, 0 - no match)"
 msgstr "find (/hôte/clef,<(sec|#nb)<:décalage temporel>>,<opérateur>,<motif>) — vérifie l’occurrence du motif (satisfaisant l’opérateur) pour la période donnée (1 — positif, 0 — négatif)"
 
@@ -20324,15 +20356,15 @@ msgstr "premier"
 msgid "first parameter is expected"
 msgstr "le premier paramètre est nécessaire"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:593
+#: app/controllers/CControllerPopupTriggerExpr.php:624
 msgid "first() - The oldest value in the specified time interval"
 msgstr "first() — valeur la plus ancienne de l’intervalle de temps spécifié"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:600
+#: app/controllers/CControllerPopupTriggerExpr.php:631
 msgid "floor() - Rounds down to the nearest smaller integer"
 msgstr "floor() — arrondit la valeur au nombre entier inférieur"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:607
+#: app/controllers/CControllerPopupTriggerExpr.php:638
 msgid "forecast() - Forecast for next t seconds based on period T"
 msgstr "forecast () — Prévisions pour les prochaines t secondes sur la base de la période T"
 
@@ -20340,7 +20372,7 @@ msgstr "forecast () — Prévisions pour les prochaines t secondes sur la base d
 msgid "fourth"
 msgstr "quatrième"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:614
+#: app/controllers/CControllerPopupTriggerExpr.php:645
 msgid "fuzzytime() - Difference between item value (as timestamp) and Zabbix server timestamp is less than or equal to T seconds (1 - true, 0 - false)"
 msgstr "fuzzytime() — La différence entre la valeur de l’horodatage de l’élément et l’horodatage du serveur Zabbix est inférieure ou égale à T secondes (1 — vrai, 0 — faux)"
 
@@ -20414,7 +20446,7 @@ msgstr "dans"
 msgid "in range"
 msgstr "dans l’intervalle"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:621
+#: app/controllers/CControllerPopupTriggerExpr.php:652
 msgid "in() - Checks if a value equals to one of the listed values (1 - equals, 0 - otherwise)"
 msgstr "in() — vérifie la présence d’une valeur parmi une liste (1 — positif, 0 — négatif)"
 
@@ -20446,7 +20478,7 @@ msgstr "compte d’éléments incorrect"
 msgid "incorrect expression starting from \"%1$s\""
 msgstr "expression incorrecte à partir de « %1$s »"
 
-#: include/classes/api/services/CAction.php:2705
+#: include/classes/api/services/CAction.php:2715
 #: include/classes/api/services/CCorrelation.php:723
 msgid "incorrect number of conditions"
 msgstr "nombre de conditions incorrect"
@@ -20464,7 +20496,7 @@ msgstr "syntaxe incorrecte à proximité de « %1$s »"
 msgid "incorrect usage of function \"%1$s\""
 msgstr "utilisation incorrecte de la fonction « %1$s »"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:634
+#: app/controllers/CControllerPopupTriggerExpr.php:665
 msgid "insert() - Inserts specified characters or spaces into a character string, beginning at a specified position in the string"
 msgstr "insert(chaine1, p, n, insert) — insère les n premiers caractères de la chaîne insert dans la chaîne chaine1, à partir de la position p"
 
@@ -20597,7 +20629,7 @@ msgstr "modèle d’article"
 msgid "key is empty"
 msgstr "la clef est vide"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:657
+#: app/controllers/CControllerPopupTriggerExpr.php:688
 msgid "kurtosis() - Measures the \"tailedness\" of the probability distribution"
 msgstr "kurtosis() — coefficient d’aplatissement « kurtosis »"
 
@@ -20613,7 +20645,7 @@ msgctxt "week of month"
 msgid "last"
 msgstr "dernier"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:664
+#: app/controllers/CControllerPopupTriggerExpr.php:695
 msgid "last() - Last (most recent) T value"
 msgstr "last () — Dernière valeur T la plus récente"
 
@@ -20621,11 +20653,11 @@ msgstr "last () — Dernière valeur T la plus récente"
 msgid "left"
 msgstr "gauche"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:671
+#: app/controllers/CControllerPopupTriggerExpr.php:702
 msgid "left() - Returns the leftmost count characters"
 msgstr "left(chaine, n) — retourne les n caractères les plus à gauche de la chaîne"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:684
+#: app/controllers/CControllerPopupTriggerExpr.php:715
 msgid "length() - Length of last (most recent) T value in characters"
 msgstr "length() — longueur de la dernière valeur T (la plus récente) en caractères"
 
@@ -20633,23 +20665,23 @@ msgstr "length() — longueur de la dernière valeur T (la plus récente) en car
 msgid "list of characters"
 msgstr "liste de caractères"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:690
+#: app/controllers/CControllerPopupTriggerExpr.php:721
 msgid "log() - Natural logarithm"
 msgstr "log() — logarithme népérien"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:697
+#: app/controllers/CControllerPopupTriggerExpr.php:728
 msgid "log10() - Decimal logarithm"
 msgstr "log10() — logarithme décimal"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:704
+#: app/controllers/CControllerPopupTriggerExpr.php:735
 msgid "logeventid() - Event ID of last log entry matching regular expression V for period T (1 - match, 0 - no match)"
 msgstr "logeventid(/host/key,<période<:décalage de temps>>,<regexp>) — vérifie qu’un identifiant d’événement du journal correspond à une expression rationnelle durant la période donnée (1 — positif, 0 — négatif)"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:711
+#: app/controllers/CControllerPopupTriggerExpr.php:742
 msgid "logseverity() - Log severity of the last log entry for period T"
 msgstr "logseverity() — gravité de la dernière entrée du journal pour la période considérée"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:718
+#: app/controllers/CControllerPopupTriggerExpr.php:749
 msgid "logsource() - Log source of the last log entry matching parameter V for period T (1 - match, 0 - no match)"
 msgstr "logsource() — vérifie si la source de la dernière entrée de journal correspond à l’expression rationnelle pour la période considérée (1 — positif, 0 — aucune correspondance)"
 
@@ -20657,7 +20689,7 @@ msgstr "logsource() — vérifie si la source de la dernière entrée de journal
 msgid "low-level discovery rule"
 msgstr "règle de découverte bas niveau"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:725
+#: app/controllers/CControllerPopupTriggerExpr.php:756
 msgid "ltrim() - Remove specified characters from the beginning of a string"
 msgstr "ltrim(chaine, <caracteres>) — supprime les caractères spécifiés (ou sinon les espaces) au début de la chaîne chaine"
 
@@ -20689,7 +20721,7 @@ msgstr "la macro est vide"
 msgid "macro(s)"
 msgstr "macro(s)"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:738
+#: app/controllers/CControllerPopupTriggerExpr.php:769
 msgid "mad() - Median absolute deviation"
 msgstr "mad() — écart absolu médian"
 
@@ -20729,7 +20761,7 @@ msgstr "max"
 msgid "max period is less than time filter default period"
 msgstr "la période maximale est inférieure à la période par défaut du filtre"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:745
+#: app/controllers/CControllerPopupTriggerExpr.php:776
 msgid "max() - Maximum value for period T"
 msgstr "max () — Valeur maximale pour la période T"
 
@@ -20743,7 +20775,7 @@ msgstr "nombre maximal d’éléments dépendants atteint"
 msgid "maximum number of dependency levels reached"
 msgstr "nombre maximal de niveaux de dépendance atteint"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:752
+#: app/controllers/CControllerPopupTriggerExpr.php:783
 msgid "mid() - Returns a substring beginning at the character position specified by start for N characters"
 msgstr "mid(chaine, p, l) — retourne une sous‐chaîne de l caractères à partir de la position p"
 
@@ -20760,7 +20792,7 @@ msgstr "mid(chaine, p, l) — retourne une sous‐chaîne de l caractères à pa
 msgid "min"
 msgstr "min"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:770
+#: app/controllers/CControllerPopupTriggerExpr.php:801
 msgid "min() - Minimum value for period T"
 msgstr "min () — Valeur minimale pour la période T"
 
@@ -20775,15 +20807,15 @@ msgstr "la longueur minimale est de %1$s caractères"
 msgid "mm"
 msgstr "mm"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:777
+#: app/controllers/CControllerPopupTriggerExpr.php:808
 msgid "mod() - Division remainder"
 msgstr "mod(dividende, diviseur) — reste de la division entière de dividende par diviseur"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:790
+#: app/controllers/CControllerPopupTriggerExpr.php:821
 msgid "monodec() - Check for continuous item value decrease (1 - data is monotonic, 0 - otherwise), Mode (strict - require strict monotonicity)"
 msgstr "monodec() — vérifie la décroissance continue des valeurs (1 — la décroissance est monotone, 0 — non monotone), mode (strict — requiert une monotonie stricte)"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:797
+#: app/controllers/CControllerPopupTriggerExpr.php:828
 msgid "monoinc() - Check for continuous item value increase (1 - data is monotonic, 0 - otherwise), Mode (strict - require strict monotonicity)"
 msgstr "monoinc() — vérifie la croissance continue des valeurs (1 — la croissance est monotone, 0 — non monotone), mode (strict — requiert une monotonie stricte)"
 
@@ -20899,7 +20931,7 @@ msgstr "aucune permission de créer et modifier des cartes"
 msgid "no permissions to unacknowledge problems"
 msgstr "aucune permission d’ignorer des problèmes"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:804
+#: app/controllers/CControllerPopupTriggerExpr.php:835
 msgid "nodata() - No data received during period of time T (1 - true, 0 - false), Mode (strict - ignore proxy time delay in sending data)"
 msgstr "nodata() — détermine si aucune donnée n’a été reçue durant la période de temps considérée (1 — vrai, 0 — faux), mode (strict — ignore le délai d’envoi des données par le proxy)"
 
@@ -20920,7 +20952,7 @@ msgstr "pas dans"
 msgid "not selected"
 msgstr "non sélectionné"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:811
+#: app/controllers/CControllerPopupTriggerExpr.php:842
 msgid "now() - Number of seconds since the Epoch"
 msgstr "now () — Nombre de secondes écoulées depuis le temps Epoch"
 
@@ -21007,15 +21039,15 @@ msgstr "chemin/vers/secret:clef"
 msgid "pattern"
 msgstr "motif"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:817
+#: app/controllers/CControllerPopupTriggerExpr.php:848
 msgid "percentile() - Percentile P of a period T"
 msgstr "percentile () — Pourcentage P d’une période T"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:824
+#: app/controllers/CControllerPopupTriggerExpr.php:855
 msgid "pi() - Returns the Pi constant"
 msgstr "pi() — retourne la valeur de π"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:829
+#: app/controllers/CControllerPopupTriggerExpr.php:860
 msgid "power() - The power of a base value to a power value"
 msgstr "power() — la valeur d’un nombre élevé à une puissance donnée"
 
@@ -21023,15 +21055,15 @@ msgstr "power() — la valeur d’un nombre élevé à une puissance donnée"
 msgid "problem pattern"
 msgstr "modèle de problème"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:842
+#: app/controllers/CControllerPopupTriggerExpr.php:873
 msgid "radians() - Converts a value from degrees to radians"
 msgstr "radians() — convertit un angle de degrés en radians"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:849
+#: app/controllers/CControllerPopupTriggerExpr.php:880
 msgid "rand() - A random integer value"
 msgstr "rand() — retourne un entier au hasard"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:854
+#: app/controllers/CControllerPopupTriggerExpr.php:885
 msgid "rate() - Returns per-second average rate for monotonically increasing counters"
 msgstr "rate() — renvoie le taux moyen par seconde des compteurs à augmentation monotone"
 
@@ -21080,11 +21112,11 @@ msgstr "expression rationnelle"
 msgid "regular expression"
 msgstr "expression rationnelle"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:861
+#: app/controllers/CControllerPopupTriggerExpr.php:892
 msgid "repeat() - Returns a string composed of value repeated count times"
 msgstr "repeat(chaine, n) — retourne une chaîne de caractères composée de la chaîne « chaine » répétée n fois"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:874
+#: app/controllers/CControllerPopupTriggerExpr.php:905
 msgid "replace() - Search value for occurrences of pattern, and replace with replacement"
 msgstr "replace(chaine, motif, remplacement) — recherche les occurrences de la chaîne motif dans la première chaîne, et les remplace par la dernière"
 
@@ -21108,15 +21140,15 @@ msgstr "représente le paramètre d’agrandissement dans l’URL ;"
 msgid "right"
 msgstr "droite"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:892
+#: app/controllers/CControllerPopupTriggerExpr.php:923
 msgid "right() - Returns the rightmost count characters"
 msgstr "right(chaine, n) — retourne les n caractères les plus à droite de la chaîne"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:905
+#: app/controllers/CControllerPopupTriggerExpr.php:936
 msgid "round() - Rounds a value to decimal places"
 msgstr "round(nombre, decimales) — arrondit un nombre à un certain nombre de décimales"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:918
+#: app/controllers/CControllerPopupTriggerExpr.php:949
 msgid "rtrim() - Removes specified characters from the end of a string"
 msgstr "rtrim(chaine, <caracteres>) — supprime les caractères spécifiés (ou sinon les espaces) à la fin de la chaîne chaine"
 
@@ -21207,23 +21239,23 @@ msgstr "afficher les correspondances d’icônes"
 msgid "sign in as guest"
 msgstr "s’identifier comme invité"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:931
+#: app/controllers/CControllerPopupTriggerExpr.php:962
 msgid "signum() - Returns -1 if a value is negative, 0 if a value is zero, 1 if a value is positive"
 msgstr "signum() — retourne -1 si la valeur est négative, 0 si elle est nulle et 1 si elle est positive"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:938
+#: app/controllers/CControllerPopupTriggerExpr.php:969
 msgid "sin() - The sine of a value, where the value is an angle expressed in radians"
 msgstr "sin() — le sinus d’un angle exprimé en radians"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:945
+#: app/controllers/CControllerPopupTriggerExpr.php:976
 msgid "sinh() - The hyperbolic sine of a value"
 msgstr "sinh() — le sinus hyperbolique d’une valeur"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:952
+#: app/controllers/CControllerPopupTriggerExpr.php:983
 msgid "skewness() - Measures the asymmetry of the probability distribution"
 msgstr "skewness() — mesure le coefficient d’asymétrie"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:959
+#: app/controllers/CControllerPopupTriggerExpr.php:990
 msgid "sqrt() - Square root of a value"
 msgstr "cbrt() — racine carré d’une valeur"
 
@@ -21231,11 +21263,11 @@ msgstr "cbrt() — racine carré d’une valeur"
 msgid "standalone server"
 msgstr "serveur autonome"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:966
+#: app/controllers/CControllerPopupTriggerExpr.php:997
 msgid "stddevpop() - Population standard deviation"
 msgstr "stddevpop() — écart type de la population"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:973
+#: app/controllers/CControllerPopupTriggerExpr.php:1004
 msgid "stddevsamp() - Sample standard deviation"
 msgstr "stddevsamp() — écart type de l’échantillon"
 
@@ -21243,11 +21275,11 @@ msgstr "stddevsamp() — écart type de l’échantillon"
 msgid "sum"
 msgstr "somme"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:980
+#: app/controllers/CControllerPopupTriggerExpr.php:1011
 msgid "sum() - Sum of values of a period T"
 msgstr "sum () — Somme des valeurs d’une période T"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:987
+#: app/controllers/CControllerPopupTriggerExpr.php:1018
 msgid "sumofsquares() - The sum of squares"
 msgstr "sumofsquares(/hôte/clef,(sec|#nb)<:durée>) — la somme des carrés des valeurs collectées durant la période considérée"
 
@@ -21275,7 +21307,7 @@ msgstr "les informations d’identification fournies ne sont pas uniques"
 msgid "tag"
 msgstr "tag"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:994
+#: app/controllers/CControllerPopupTriggerExpr.php:1025
 msgid "tan() - The tangent of a value"
 msgstr "tan() — la tangente d’une valeur"
 
@@ -21309,7 +21341,7 @@ msgstr "le dernier saut de ligne est absent"
 #: include/classes/api/services/CReport.php:195
 #: include/classes/api/services/CReport.php:577
 #: include/classes/api/services/CReport.php:583
-#: include/classes/api/services/CScript.php:902
+#: include/classes/api/services/CScript.php:904
 #: include/classes/api/services/CTemplate.php:451
 #: include/classes/api/services/CValueMap.php:578
 #: include/classes/helpers/CDashboardHelper.php:369
@@ -21356,35 +21388,35 @@ msgstr "la période par défaut du filtre temporel dépasse la période maximale
 msgid "time shift"
 msgstr "décalage horaire"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1001
+#: app/controllers/CControllerPopupTriggerExpr.php:1032
 msgid "time() - Current time"
 msgstr "time () — Heure actuelle"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1007
+#: app/controllers/CControllerPopupTriggerExpr.php:1038
 msgid "timeleft() - Time to reach threshold estimated based on period T"
 msgstr "timeleft () — Temps nécessaire pour atteindre le seuil estimé en fonction de la période T"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1014
+#: app/controllers/CControllerPopupTriggerExpr.php:1045
 msgid "trendavg() - Average value of a period T with exact period shift"
 msgstr "trendavg() — moyenne des valeurs de tendance sur la période considérée"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1021
+#: app/controllers/CControllerPopupTriggerExpr.php:1066
 msgid "trendcount() - Number of successfully retrieved values for period T"
 msgstr "trendcount() — nombre de valeurs de tendance récupérées sur la période considérée"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1028
+#: app/controllers/CControllerPopupTriggerExpr.php:1073
 msgid "trendmax() - Maximum value for period T with exact period shift"
 msgstr "trendmax() — valeur maximale des tendances sur la période considérée"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1035
+#: app/controllers/CControllerPopupTriggerExpr.php:1080
 msgid "trendmin() - Minimum value for period T with exact period shift"
 msgstr "trendmin() — valeur minimale des tendances sur la période considérée"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1042
+#: app/controllers/CControllerPopupTriggerExpr.php:1087
 msgid "trendstl() - Anomaly detection for period T"
 msgstr "trendstl() — détection d’anomalies durant la période donnée"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1085
+#: app/controllers/CControllerPopupTriggerExpr.php:1130
 msgid "trendsum() - Sum of values of a period T with exact period shift"
 msgstr "trendsum() — somme des valeurs de tendance sur la période considérée"
 
@@ -21410,11 +21442,11 @@ msgstr "un prototype de déclencheur ne peut pas être déplacé vers un autre m
 msgid "trigger with linkages cannot be moved to another template or host"
 msgstr "un déclencheur avec liens ne peut pas être déplacé vers un autre modèle ou hôte"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1092
+#: app/controllers/CControllerPopupTriggerExpr.php:1137
 msgid "trim() - Remove specified characters from the beginning and the end of a string"
 msgstr "trim(chaine, <caracteres>) — supprime les caractères spécifiés (ou sinon les espaces) au début et à la fin de la chaîne chaine"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1105
+#: app/controllers/CControllerPopupTriggerExpr.php:1150
 msgid "truncate() - Truncates a value to decimal places"
 msgstr "truncate(valeur, n) — tronque la valeur à n décimales"
 
@@ -21471,7 +21503,7 @@ msgstr "fin de macro inattendue"
 #: include/classes/api/services/CHttpTest.php:539
 #: include/classes/api/services/CItemGeneral.php:604
 #: include/classes/api/services/CItemGeneral.php:616
-#: include/classes/api/services/CScript.php:908
+#: include/classes/api/services/CScript.php:910
 #: include/classes/api/services/CTemplate.php:668
 #: include/classes/api/services/CTriggerGeneral.php:666
 #: include/classes/api/services/CValueMap.php:432
@@ -21712,11 +21744,11 @@ msgstr "la valeur du deuxième paramètre est trop longue"
 msgid "value of third parameter must be one of %1$s"
 msgstr "la valeur du troisième paramètre doit être parmi %1$s"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1118
+#: app/controllers/CControllerPopupTriggerExpr.php:1163
 msgid "varpop() - Population variance"
 msgstr "varpop() — variance de la population"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1125
+#: app/controllers/CControllerPopupTriggerExpr.php:1170
 msgid "varsamp() - Sample variance"
 msgstr "varsamp() — variance de l’échantillon"
 
