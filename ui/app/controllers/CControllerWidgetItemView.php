@@ -123,13 +123,6 @@ class CControllerWidgetItemView extends CControllerWidget {
 				// Get values regardless of show status, since change indicator can be shown independently.
 				$last_value = $history[$itemid][0]['value'];
 
-				// Override item units if needed.
-				if (array_key_exists(WIDGET_ITEM_SHOW_VALUE, $show) && $fields['units_show'] == 1) {
-					$units = ($fields['units'] === '')
-						? $items[$itemid]['units']
-						: $fields['units'];
-				}
-
 				// Time can be shown independently.
 				if (array_key_exists(WIDGET_ITEM_SHOW_TIME, $show)) {
 					$time = date(ZBX_FULL_DATE_TIME, (int) $history[$itemid][0]['clock']);
@@ -138,6 +131,13 @@ class CControllerWidgetItemView extends CControllerWidget {
 				switch ($value_type) {
 					case ITEM_VALUE_TYPE_FLOAT:
 					case ITEM_VALUE_TYPE_UINT64:
+						// Override item units if needed.
+						if (array_key_exists(WIDGET_ITEM_SHOW_VALUE, $show) && $fields['units_show'] == 1) {
+							$units = ($fields['units'] === '')
+								? $items[$itemid]['units']
+								: $fields['units'];
+						}
+
 						// Apply unit conversion always because it will also convert values to scientific notation.
 						$raw_units = convertUnitsRaw([
 							'value' => $last_value,
@@ -239,7 +239,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 				}
 			}
 			else {
-				$value_type = ITEM_VALUE_TYPE_TEXT; // TODO VM: is to correct to change value type here?
+				$value_type = ITEM_VALUE_TYPE_TEXT;
 
 				// Since there no value, we can still show time.
 				if (array_key_exists(WIDGET_ITEM_SHOW_TIME, $show)) {
