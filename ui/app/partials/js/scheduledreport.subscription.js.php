@@ -112,7 +112,7 @@
 				}
 			}
 
-			recipient.innerHTML = this.data.recipient_name;
+			recipient.innerText = this.data.recipient_name;
 			recipient.setAttribute('title', this.data.recipient_name);
 
 			cell.appendChild(icon);
@@ -129,7 +129,7 @@
 			const cell = document.createElement('td');
 			const span = document.createElement('span');
 
-			span.innerHTML = this.data.creator_name;
+			span.innerText = this.data.creator_name;
 			span.setAttribute('title', this.data.creator_name);
 
 			if (this.data.creator_type == <?= ZBX_REPORT_CREATOR_TYPE_RECIPIENT ?> || this.data.creator_inaccessible) {

@@ -47,7 +47,7 @@
 			}
 			else if (row.querySelector('[name*=creator_type]').value == <?= ZBX_REPORT_RECIPIENT_TYPE_USER ?>) {
 				const creator = row.querySelector('[name*=creatorid]').parentNode.querySelector('span');
-				creator.innerHTML = current_user_name;
+				creator.innerText = current_user_name;
 				creator.setAttribute('title', current_user_name);
 				creator.classList.remove('<?= ZBX_STYLE_GREY ?>');
 
