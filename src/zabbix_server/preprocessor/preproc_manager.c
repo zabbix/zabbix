@@ -1820,9 +1820,10 @@ static zbx_hash_t	preproc_item_link_hash(const void *d)
 {
 	const zbx_item_link_t	*link = (const zbx_item_link_t *)d;
 	zbx_hash_t		hash;
+	unsigned char		kind = link->kind;
 
 	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&link->itemid);
-	return ZBX_DEFAULT_STRING_HASH_ALGO(&link->kind, 1, hash);
+	return ZBX_DEFAULT_STRING_HASH_ALGO(&kind, 1, hash);
 }
 
 static int	preproc_item_link_compare(const void *d1, const void *d2)
