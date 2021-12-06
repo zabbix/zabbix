@@ -223,7 +223,7 @@ static void	worker_format_error(const zbx_variant_t *value, zbx_preproc_result_t
  *               FAIL - otherwise, error contains the error message           *
  *                                                                            *
  ******************************************************************************/
-static int	worker_item_preproc_execute(zbx_preproc_cache_t * cache, unsigned char value_type, zbx_variant_t *value,
+static int	worker_item_preproc_execute(zbx_preproc_cache_t *cache, unsigned char value_type, zbx_variant_t *value,
 		const zbx_timespec_t *ts, zbx_preproc_op_t *steps, int steps_num, zbx_vector_ptr_t *history_in,
 		zbx_vector_ptr_t *history_out, zbx_preproc_result_t *results, int *results_num, char **error)
 {
