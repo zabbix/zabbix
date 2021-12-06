@@ -52,6 +52,7 @@ struct zbx_regexp
 #endif
 #ifdef USE_PCRE2
 	pcre2_code		*pcre2_regexp;
+	pcre2_match_context	*match_ctx;
 #endif
 };
 
@@ -95,10 +96,11 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
 	struct pcre_extra	*extra;
 #endif
 #ifdef USE_PCRE2
-	pcre2_code	*pcre2_regexp;
-	int		error = 0;
-	PCRE2_SIZE 	error_offset = 0;
-	char		*err_msg_buff = NULL;
+	pcre2_code		*pcre2_regexp;
+	pcre2_match_context	*match_ctx;
+	int			error = 0;
+	PCRE2_SIZE 		error_offset = 0;
+	char			*err_msg_buff = NULL;
 #endif
 
 #ifdef ZBX_REGEXP_NO_AUTO_CAPTURE
@@ -155,8 +157,21 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
 		return FAIL;
 	}
 
-	*regexp = (zbx_regexp_t *)zbx_malloc(NULL, sizeof(zbx_regexp_t));
-	(*regexp)->pcre2_regexp = pcre2_regexp;
+	if (NULL != regexp)
+	{
+		match_ctx = pcre2_match_context_create(NULL);
+		if (NULL == match_ctx)
+		{
+			pcre2_code_free(pcre2_regexp);
+			return FAIL;
+		}
+
+		*regexp = (zbx_regexp_t *)zbx_malloc(NULL, sizeof(zbx_regexp_t));
+		(*regexp)->pcre2_regexp = pcre2_regexp;
+		(*regexp)->match_ctx = match_ctx;
+	}
+	else
+		pcre2_code_free(pcre2_regexp);
 #endif
 	return SUCCEED;
 }
@@ -322,20 +337,12 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 #endif
 #ifdef USE_PCRE2
 	int				result, r, i;
-	pcre2_match_context		*match_ctx = NULL;
 	pcre2_match_data		*match_data = NULL;
 	PCRE2_SIZE			*ovector = NULL;
 	int				ovector_size = 0;
 
-	match_ctx = pcre2_match_context_create(NULL);
-	if (NULL == match_ctx)
-	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot create pcre2 match context");
-		return FAIL;
-	}
-
-	pcre2_set_match_limit(match_ctx, 1000000);
-	pcre2_set_recursion_limit(match_ctx, 10000);
+	pcre2_set_match_limit(regexp->match_ctx, 1000000);
+	pcre2_set_recursion_limit(regexp->match_ctx, 10000);
 	match_data = pcre2_match_data_create(count, NULL);
 
 	if (NULL == match_data)
@@ -345,14 +352,17 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 	}
 	else
 	{
-		/* see "man pcreapi" about pcre_exec() return value and 'ovector' size and layout */
-		if (0 <= (r = pcre2_match(regexp->pcre2_regexp, string, PCRE2_ZERO_TERMINATED, 0, flags, match_data, NULL)))
+		if (0 <= (r = pcre2_match(regexp->pcre2_regexp, string, PCRE2_ZERO_TERMINATED, 0, flags, match_data,
+				regexp->match_ctx)))
 		{
 			if (NULL != matches)
 			{
 				ovector = pcre2_get_ovector_pointer(match_data);
 				ovector_size = (int)pcre2_get_ovector_count(match_data);
 
+				/* have to copy this way because pcre ovector uses 8 byte integers,   *
+				 * but we want to keep it compatible with existing matches structure, *
+				 * which uses 4 byte integers                                         */
 				for (i = 0; i < ((0 < r) ? MIN(r, count) : count); i++)
 				{
 					matches[i].rm_so = (int)ovector[i*2];
@@ -398,12 +408,12 @@ void	zbx_regexp_free(zbx_regexp_t *regexp)
 	pcre_free(regexp->extra);
 #endif
 	pcre_free(regexp->pcre_regexp);
-	zbx_free(regexp);
 #endif
 #ifdef USE_PCRE2
 	pcre2_code_free(regexp->pcre2_regexp);
-	zbx_free(regexp);
+	pcre2_match_context_free(regexp->match_ctx);
 #endif
+	zbx_free(regexp);
 }
 
 /******************************************************************************
