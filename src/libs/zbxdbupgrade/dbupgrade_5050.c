@@ -1222,7 +1222,7 @@ static int	DBpatch_5050114(void)
 		if (NULL == (output = strchr(row[1], '\n')))
 			continue;
 
-		zbx_strncpy_alloc(&params, &params_alloc, &params_offset, row[1], output - row[1] + 1);
+		zbx_strncpy_alloc(&params, &params_alloc, &params_offset, row[1], (size_t)(output - row[1] + 1));
 		zbx_strcpy_alloc(&params, &params_alloc, &params_offset, '\0' == output[1] ? "value" : "label");
 		zbx_strcpy_alloc(&params, &params_alloc, &params_offset, output);
 
