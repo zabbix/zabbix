@@ -749,7 +749,8 @@ static void	preprocessor_flush_dep_results(zbx_preprocessing_manager_t *manager,
 		}
 	}
 
-	manager->preproc_num -= (zbx_uint64_t)request->results_alloc;
+	manager->processed_num += (zbx_uint64_t)request->results_alloc;
+	manager->preproc_num--;
 }
 
 /******************************************************************************
@@ -1081,6 +1082,8 @@ static void	preprocessor_enqueue_dependent(zbx_preprocessing_manager_t *manager,
 
 			preprocessor_assign_tasks(manager);
 			preprocessing_flush_queue(manager);
+
+			manager->preproc_num++;
 		}
 	}
 
