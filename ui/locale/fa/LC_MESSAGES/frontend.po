@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-12 19:55+0200\n"
+"POT-Creation-Date: 2021-12-03 19:55+0200\n"
 "PO-Revision-Date: 2013-10-10 08:30+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: none\n"
@@ -284,10 +284,10 @@ msgstr ""
 msgid "(Only super admins can create groups)"
 msgstr ""
 
-#: app/partials/configuration.host.edit.html.php:161
+#: app/partials/configuration.host.edit.html.php:275
 #: app/views/popup.itemtestedit.view.php:241
-#: app/views/popup.massupdate.host.php:85
-#: include/views/configuration.host.prototype.edit.php:132
+#: app/views/popup.massupdate.host.php:122
+#: include/views/configuration.host.prototype.edit.php:280
 msgid "(no proxy)"
 msgstr "(بدون پروکسی)"
 
@@ -435,7 +435,7 @@ msgstr ""
 msgid "API tokens"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:339
+#: app/controllers/CControllerPopupTriggerExpr.php:370
 msgid "Abscissa"
 msgstr ""
 
@@ -504,7 +504,7 @@ msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:209
 #: app/partials/administration.usergroup.tagfilters.html.php:29
-#: app/partials/configuration.host.edit.html.php:216
+#: app/partials/configuration.host.edit.html.php:144
 #: app/partials/configuration.tags.tab.php:41
 #: app/partials/configuration.valuemap.php:35
 #: app/partials/massupdate.valuemaps.tab.php:47
@@ -523,11 +523,11 @@ msgstr ""
 #: app/views/popup.dashboard.share.edit.php:32
 #: app/views/popup.dashboard.share.edit.php:53
 #: app/views/popup.lldoperation.php:117 app/views/popup.lldoperation.php:268
-#: app/views/popup.lldoverride.php:101 app/views/popup.massupdate.host.php:207
+#: app/views/popup.lldoverride.php:101 app/views/popup.massupdate.host.php:203
 #: app/views/popup.massupdate.item.php:228
 #: app/views/popup.massupdate.item.php:486
 #: app/views/popup.massupdate.service.php:50
-#: app/views/popup.massupdate.template.php:140
+#: app/views/popup.massupdate.template.php:132
 #: app/views/popup.massupdate.trigger.php:84
 #: app/views/popup.massupdate.trigger.php:98
 #: app/views/popup.service.edit.php:65 app/views/popup.service.edit.php:145
@@ -539,24 +539,24 @@ msgstr ""
 #: include/actions.inc.php:1921
 #: include/views/administration.auditacts.list.php:64
 #: include/views/configuration.action.edit.php:59
-#: include/views/configuration.action.edit.php:175
-#: include/views/configuration.action.edit.php:179
-#: include/views/configuration.action.edit.php:319
-#: include/views/configuration.action.edit.php:407
-#: include/views/configuration.action.edit.php:478
+#: include/views/configuration.action.edit.php:168
+#: include/views/configuration.action.edit.php:172
+#: include/views/configuration.action.edit.php:312
+#: include/views/configuration.action.edit.php:400
+#: include/views/configuration.action.edit.php:483
 #: include/views/configuration.graph.edit.php:380
 #: include/views/configuration.host.discovery.edit.php:134
 #: include/views/configuration.host.discovery.edit.php:632
 #: include/views/configuration.host.discovery.edit.php:742
 #: include/views/configuration.host.discovery.edit.php:914
-#: include/views/configuration.host.prototype.edit.php:240
+#: include/views/configuration.host.prototype.edit.php:118
 #: include/views/configuration.httpconf.edit.php:209
 #: include/views/configuration.item.edit.php:193
 #: include/views/configuration.item.edit.php:735
 #: include/views/configuration.item.prototype.edit.php:178
 #: include/views/configuration.item.prototype.edit.php:714
 #: include/views/configuration.maintenance.edit.php:45
-#: include/views/configuration.template.edit.php:127
+#: include/views/configuration.template.edit.php:69
 #: include/views/configuration.trigger.prototype.edit.php:199
 #: include/views/configuration.trigger.prototype.edit.php:394
 #: include/views/configuration.trigger.prototype.edit.php:567
@@ -574,7 +574,7 @@ msgstr ""
 msgid "Action"
 msgstr "فعالیت ها"
 
-#: include/classes/api/services/CAction.php:2678
+#: include/classes/api/services/CAction.php:2688
 #, c-format
 msgid "Action \"%1$s\" already exists."
 msgstr ""
@@ -584,7 +584,7 @@ msgstr ""
 msgid "Action \"%2$s\" is not available for user role \"%1$s\"."
 msgstr ""
 
-#: actionconf.php:279
+#: actionconf.php:285
 msgid "Action added"
 msgstr "فعالیت اضافه شد"
 
@@ -593,16 +593,16 @@ msgstr "فعالیت اضافه شد"
 msgid "Action class %1$s must extend %2$s class."
 msgstr ""
 
-#: actionconf.php:301
+#: actionconf.php:307
 msgid "Action deleted"
 msgstr "فعالیت حذف شد"
 
-#: actionconf.php:469
+#: actionconf.php:475
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] ""
 
-#: actionconf.php:468
+#: actionconf.php:474
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] ""
@@ -620,7 +620,7 @@ msgstr ""
 msgid "Action operation"
 msgstr ""
 
-#: actionconf.php:271
+#: actionconf.php:277
 msgid "Action updated"
 msgstr "فعالیت بروز شد"
 
@@ -667,7 +667,7 @@ msgid "Active till"
 msgstr "فعال تا"
 
 #: app/controllers/CControllerAuditLogList.php:194
-#: app/partials/configuration.host.edit.html.php:133
+#: app/partials/configuration.host.edit.html.php:248
 #: app/partials/configuration.tags.tab.php:120
 #: app/partials/configuration.valuemap.php:40
 #: app/partials/hostmacros.inherited.list.html.php:185
@@ -726,14 +726,14 @@ msgstr "فعال تا"
 #: app/views/popup.lldoperation.php:290 app/views/popup.lldoverride.php:176
 #: app/views/popup.lldoverride.php:201 app/views/popup.lldoverride.php:220
 #: app/views/popup.maintenance.period.php:189
-#: app/views/popup.massupdate.host.php:50
-#: app/views/popup.massupdate.host.php:201
+#: app/views/popup.massupdate.host.php:87
+#: app/views/popup.massupdate.host.php:197
 #: app/views/popup.massupdate.item.php:124
 #: app/views/popup.massupdate.item.php:270
 #: app/views/popup.massupdate.item.php:480
 #: app/views/popup.massupdate.service.php:44
-#: app/views/popup.massupdate.template.php:52
-#: app/views/popup.massupdate.template.php:134
+#: app/views/popup.massupdate.template.php:92
+#: app/views/popup.massupdate.template.php:126
 #: app/views/popup.massupdate.trigger.php:78
 #: app/views/popup.massupdate.trigger.php:125 app/views/popup.media.php:52
 #: app/views/popup.media.php:127 app/views/popup.mediatype.message.php:104
@@ -749,10 +749,10 @@ msgstr "فعال تا"
 #: include/classes/helpers/CTagFilterFieldHelper.php:92
 #: include/classes/widgets/CWidgetHelper.php:545 include/forms.inc.php:1481
 #: include/forms.inc.php:2045 include/views/configuration.action.edit.php:133
-#: include/views/configuration.action.edit.php:302
-#: include/views/configuration.action.edit.php:386
-#: include/views/configuration.action.edit.php:462
-#: include/views/configuration.action.edit.php:501
+#: include/views/configuration.action.edit.php:295
+#: include/views/configuration.action.edit.php:379
+#: include/views/configuration.action.edit.php:455
+#: include/views/configuration.action.edit.php:506
 #: include/views/configuration.graph.edit.php:423
 #: include/views/configuration.graph.edit.php:518
 #: include/views/configuration.host.discovery.edit.php:162
@@ -764,9 +764,9 @@ msgstr "فعال تا"
 #: include/views/configuration.host.discovery.edit.php:919
 #: include/views/configuration.host.discovery.edit.php:981
 #: include/views/configuration.hostgroups.edit.php:55
-#: include/views/configuration.host.prototype.edit.php:110
-#: include/views/configuration.host.prototype.edit.php:189
-#: include/views/configuration.host.prototype.edit.php:432
+#: include/views/configuration.host.prototype.edit.php:216
+#: include/views/configuration.host.prototype.edit.php:256
+#: include/views/configuration.host.prototype.edit.php:430
 #: include/views/configuration.httpconf.edit.php:120
 #: include/views/configuration.httpconf.edit.php:138
 #: include/views/configuration.httpconf.edit.php:215
@@ -784,7 +784,7 @@ msgstr "فعال تا"
 #: include/views/configuration.maintenance.edit.php:86
 #: include/views/configuration.maintenance.edit.php:200
 #: include/views/configuration.maintenance.edit.php:275
-#: include/views/configuration.template.edit.php:253
+#: include/views/configuration.template.edit.php:234
 #: include/views/configuration.trigger.prototype.edit.php:111
 #: include/views/configuration.trigger.prototype.edit.php:148
 #: include/views/configuration.trigger.prototype.edit.php:305
@@ -829,7 +829,7 @@ msgstr ""
 msgid "Add child service"
 msgstr ""
 
-#: app/views/js/popup.service.edit.js.php:509
+#: app/views/js/popup.service.edit.js.php:508
 msgid "Add child services"
 msgstr ""
 
@@ -854,8 +854,8 @@ msgstr ""
 msgid "Add new data set"
 msgstr ""
 
-#: app/partials/configuration.host.edit.html.php:141
-#: include/views/configuration.host.prototype.edit.php:118
+#: app/partials/configuration.host.edit.html.php:256
+#: include/views/configuration.host.prototype.edit.php:264
 msgid "Add new interface"
 msgstr ""
 
@@ -868,7 +868,7 @@ msgstr ""
 msgid "Add page"
 msgstr ""
 
-#: app/views/js/popup.service.edit.js.php:539 jsLoader.php:414
+#: app/views/js/popup.service.edit.js.php:538 jsLoader.php:414
 msgid "Add parent services"
 msgstr ""
 
@@ -1002,7 +1002,7 @@ msgstr ""
 msgid "Aggregate"
 msgstr ""
 
-#: app/views/popup.triggerexpr.php:108
+#: app/views/popup.triggerexpr.php:109
 msgid "Aggregate functions"
 msgstr ""
 
@@ -1016,6 +1016,10 @@ msgstr ""
 
 #: include/actions.inc.php:2106
 msgid "Alert message"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1115
+msgid "Algorithm"
 msgstr ""
 
 #: include/hosts.inc.php:114
@@ -1332,7 +1336,7 @@ msgstr ""
 msgid "At least one operation must be selected."
 msgstr ""
 
-#: include/views/configuration.action.edit.php:511
+#: include/views/configuration.action.edit.php:516
 msgid "At least one operation must exist."
 msgstr ""
 
@@ -1412,9 +1416,9 @@ msgstr ""
 msgid "Authentication"
 msgstr "تصدیق هویت"
 
-#: app/partials/configuration.host.edit.html.php:311
-#: app/views/popup.massupdate.host.php:151
-#: include/views/configuration.host.prototype.edit.php:309
+#: app/partials/configuration.host.edit.html.php:306
+#: app/views/popup.massupdate.host.php:150
+#: include/views/configuration.host.prototype.edit.php:303
 msgid "Authentication algorithm"
 msgstr "الگوریتم تصدیق هویت"
 
@@ -1475,12 +1479,12 @@ msgstr ""
 msgid "Auto-logout"
 msgstr ""
 
-#: app/partials/configuration.host.edit.html.php:365
+#: app/partials/configuration.host.edit.html.php:360
 #: app/partials/popup.operations.php:228
 #: app/views/administration.miscconfig.edit.php:61
 #: app/views/popup.lldoperation.php:282
-#: app/views/popup.massupdate.host.php:189 include/hosts.inc.php:1128
-#: include/views/configuration.host.prototype.edit.php:358
+#: app/views/popup.massupdate.host.php:185 include/hosts.inc.php:1128
+#: include/views/configuration.host.prototype.edit.php:362
 msgid "Automatic"
 msgstr "خودکار"
 
@@ -1595,12 +1599,12 @@ msgstr ""
 msgid "Bind password"
 msgstr "مقید به کلمه عبور"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:397
-#: app/controllers/CControllerPopupTriggerExpr.php:430
+#: app/controllers/CControllerPopupTriggerExpr.php:428
+#: app/controllers/CControllerPopupTriggerExpr.php:461
 msgid "Bits to shift"
 msgstr ""
 
-#: app/views/popup.triggerexpr.php:109
+#: app/views/popup.triggerexpr.php:110
 msgid "Bitwise functions"
 msgstr ""
 
@@ -1806,7 +1810,7 @@ msgstr ""
 msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
 msgstr ""
 
-#: actionconf.php:280
+#: actionconf.php:286
 msgid "Cannot add action"
 msgstr "فعالیت نمی تواند اضافه شود"
 
@@ -2099,7 +2103,7 @@ msgstr[0] ""
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr ""
 
-#: actionconf.php:301
+#: actionconf.php:307
 msgid "Cannot delete action"
 msgstr "فعالیت نمی‌تواند حذف شود"
 
@@ -2253,12 +2257,12 @@ msgid "Cannot delete script"
 msgid_plural "Cannot delete scripts"
 msgstr[0] "اسکریپت نمی تواند حذف شود"
 
-#: include/classes/api/services/CScript.php:875
+#: include/classes/api/services/CScript.php:877
 #, c-format
 msgid "Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$s\"."
 msgstr "اسکریپت ها نمی توانند حذف شوند.اسکریپت \"%1$s\" در عملکرد فعالیت \"%2$s\" استفاده شده است.اسکریپت ها نمی توانند حذف شوند.اسکریپت \"%1$s\" در عملکرد فعالیت \"%2$s\" استفاده شده است.اسکریپت ها نمی توانند حذف شوند.اسکریپت \"%1$s\" در عملکرد فعالیت \"%2$s\" استفاده شده است.اسکریپت ها نمی توانند حذف شوند.اسکریپت \"%1$s\" در عملکرد فعالیت \"%2$s\" استفاده شده است.اسکریپت ها نمی توانند حذف شوند.اسکریپت \"%1$s\" در عملکرد فعالیت \"%2$s\" استفاده شده است."
 
-#: actionconf.php:488
+#: actionconf.php:494
 msgid "Cannot delete selected actions"
 msgstr "فعالیت های انتخاب شده نمی‌توانند حذف شوند"
 
@@ -2274,7 +2278,7 @@ msgstr[0] "سرویس نمی‌تواند حذف شود"
 msgid "Cannot delete service \"%1$s\": %2$s."
 msgstr ""
 
-#: templates.php:425 templates.php:439 templates.php:472
+#: templates.php:426 templates.php:440 templates.php:473
 msgid "Cannot delete template"
 msgstr "قالب نمی تواند حذف شود"
 
@@ -2357,7 +2361,7 @@ msgid "Cannot disable API token"
 msgid_plural "Cannot disable API tokens"
 msgstr[0] ""
 
-#: actionconf.php:477
+#: actionconf.php:483
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] ""
@@ -2425,7 +2429,7 @@ msgid "Cannot enable API token"
 msgid_plural "Cannot enable API tokens"
 msgstr[0] ""
 
-#: actionconf.php:476
+#: actionconf.php:482
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] ""
@@ -2644,7 +2648,7 @@ msgid "Cannot import template \"%1$s\", linked template \"%2$s\" does not exist.
 msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" do not exist."
 msgstr[0] ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1486
+#: app/controllers/CControllerPopupTriggerExpr.php:1583
 msgid "Cannot insert trigger expression"
 msgstr ""
 
@@ -2821,7 +2825,7 @@ msgstr ""
 msgid "Cannot unlink trigger \"%1$s\", it has items from template that is left linked to host."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2626
+#: include/classes/api/services/CAction.php:2636
 #, c-format
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
 msgstr ""
@@ -2887,7 +2891,7 @@ msgstr ""
 msgid "Cannot update a templated web scenario \"%1$s\": %2$s."
 msgstr ""
 
-#: actionconf.php:272
+#: actionconf.php:278
 msgid "Cannot update action"
 msgstr "فعالیت نمی‌تواند بروز شود"
 
@@ -2946,7 +2950,7 @@ msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr ""
 
 #: app/controllers/CControllerHostUpdate.php:34
-#: app/controllers/CControllerHostUpdate.php:148
+#: app/controllers/CControllerHostUpdate.php:153
 msgid "Cannot update host"
 msgstr "هاست نمی‌تواند بروز شود"
 
@@ -3047,9 +3051,9 @@ msgstr ""
 msgid "Cannot update script"
 msgstr "اسکریپت نمی تواند بروز شود"
 
-#: include/classes/api/services/CScript.php:417
-#: include/classes/api/services/CScript.php:430
-#: include/classes/api/services/CScript.php:443
+#: include/classes/api/services/CScript.php:419
+#: include/classes/api/services/CScript.php:432
+#: include/classes/api/services/CScript.php:445
 #, c-format
 msgid "Cannot update script scope. Script \"%1$s\" is used in action \"%2$s\"."
 msgstr ""
@@ -3076,7 +3080,7 @@ msgstr ""
 msgid "Cannot update template"
 msgstr "قالب نمی تواند بروز شود"
 
-#: app/controllers/CControllerPopupMassupdateTemplate.php:341
+#: app/controllers/CControllerPopupMassupdateTemplate.php:343
 msgid "Cannot update templates"
 msgstr ""
 
@@ -3160,14 +3164,14 @@ msgstr ""
 msgid "Center"
 msgstr ""
 
-#: app/partials/configuration.host.edit.html.php:438
-#: app/partials/configuration.host.edit.html.php:457
+#: app/partials/configuration.host.edit.html.php:433
+#: app/partials/configuration.host.edit.html.php:452
 #: app/views/administration.proxy.edit.php:97
 #: app/views/administration.proxy.edit.php:105
-#: app/views/popup.massupdate.host.php:239
-#: app/views/popup.massupdate.host.php:255
-#: include/views/configuration.host.prototype.edit.php:371
-#: include/views/configuration.host.prototype.edit.php:387
+#: app/views/popup.massupdate.host.php:234
+#: app/views/popup.massupdate.host.php:250
+#: include/views/configuration.host.prototype.edit.php:375
+#: include/views/configuration.host.prototype.edit.php:391
 msgid "Certificate"
 msgstr ""
 
@@ -3185,10 +3189,10 @@ msgctxt "verb"
 msgid "Change"
 msgstr ""
 
-#: app/partials/configuration.host.edit.html.php:469
+#: app/partials/configuration.host.edit.html.php:464
 #: app/views/administration.autoreg.edit.php:80
 #: app/views/administration.proxy.edit.php:126
-#: include/views/configuration.host.prototype.edit.php:392
+#: include/views/configuration.host.prototype.edit.php:396
 msgid "Change PSK"
 msgstr ""
 
@@ -3228,9 +3232,9 @@ msgstr "در بر داشتن رشته کاراکتری"
 msgid "Character string not included"
 msgstr "در بر نداشتن رشته کاراکتری"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:728
-#: app/controllers/CControllerPopupTriggerExpr.php:921
-#: app/controllers/CControllerPopupTriggerExpr.php:1052
+#: app/controllers/CControllerPopupTriggerExpr.php:759
+#: app/controllers/CControllerPopupTriggerExpr.php:952
+#: app/controllers/CControllerPopupTriggerExpr.php:1140
 msgid "Chars"
 msgstr ""
 
@@ -3246,7 +3250,7 @@ msgstr ""
 msgid "Check already exists."
 msgstr "بررسی از قبل وجود دارد"
 
-#: include/classes/parsers/C10TriggerExpression.php:538
+#: include/classes/parsers/C10TriggerExpression.php:542
 #, c-format
 msgid "Check expression part starting from \"%1$s\"."
 msgstr "بخش عبارت بررسی از \"%1$s\" شروع می‌شود."
@@ -3368,8 +3372,8 @@ msgstr ""
 msgid "Clear history and trends"
 msgstr "پاک کردن تاریخچه و روند ها"
 
-#: app/views/popup.massupdate.host.php:136
-#: app/views/popup.massupdate.template.php:114
+#: app/views/popup.massupdate.host.php:70
+#: app/views/popup.massupdate.template.php:73
 msgid "Clear when unlinking"
 msgstr "پاک کردن وقتی جدا شد"
 
@@ -3396,16 +3400,16 @@ msgstr "ساعت"
 #: app/views/configuration.discovery.edit.php:154
 #: app/views/configuration.host.edit.php:43 app/views/popup.host.edit.php:68
 #: app/views/popup.service.edit.php:388
-#: include/views/configuration.action.edit.php:490
+#: include/views/configuration.action.edit.php:495
 #: include/views/configuration.graph.edit.php:510
 #: include/views/configuration.host.discovery.edit.php:960
 #: include/views/configuration.hostgroups.edit.php:62
-#: include/views/configuration.host.prototype.edit.php:424
+#: include/views/configuration.host.prototype.edit.php:419
 #: include/views/configuration.httpconf.edit.php:254
 #: include/views/configuration.item.edit.php:1015
 #: include/views/configuration.item.prototype.edit.php:901
 #: include/views/configuration.maintenance.edit.php:266
-#: include/views/configuration.template.edit.php:238
+#: include/views/configuration.template.edit.php:219
 #: include/views/configuration.trigger.prototype.edit.php:655
 #: include/views/configuration.triggers.edit.php:648
 #: include/views/monitoring.sysmap.edit.php:421 jsLoader.php:352
@@ -3534,7 +3538,7 @@ msgstr ""
 msgid "Concurrent sessions"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1509
+#: app/controllers/CControllerPopupTriggerExpr.php:1606
 #: app/views/popup.lldoperation.php:59 app/views/popup.lldoverride.php:195
 #: app/views/popup.service.statusrule.edit.php:48
 msgid "Condition"
@@ -3806,13 +3810,13 @@ msgstr ""
 msgid "Connection will not be encrypted because it uses a socket file (on Unix) or shared memory (Windows)."
 msgstr ""
 
-#: app/views/popup.massupdate.host.php:282
+#: app/views/popup.massupdate.host.php:277
 msgid "Connections"
 msgstr ""
 
-#: app/partials/configuration.host.edit.html.php:444
-#: app/views/popup.massupdate.host.php:243
-#: include/views/configuration.host.prototype.edit.php:375
+#: app/partials/configuration.host.edit.html.php:439
+#: app/views/popup.massupdate.host.php:238
+#: include/views/configuration.host.prototype.edit.php:379
 msgid "Connections from host"
 msgstr ""
 
@@ -3820,9 +3824,9 @@ msgstr ""
 msgid "Connections from proxy"
 msgstr ""
 
-#: app/partials/configuration.host.edit.html.php:433
-#: app/views/popup.massupdate.host.php:235
-#: include/views/configuration.host.prototype.edit.php:367
+#: app/partials/configuration.host.edit.html.php:428
+#: app/views/popup.massupdate.host.php:230
+#: include/views/configuration.host.prototype.edit.php:371
 msgid "Connections to host"
 msgstr ""
 
@@ -3986,10 +3990,10 @@ msgstr ""
 msgid "Correlation updated"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:51
-#: app/controllers/CControllerPopupTriggerExpr.php:674
-#: app/controllers/CControllerPopupTriggerExpr.php:864
+#: app/controllers/CControllerPopupTriggerExpr.php:52
+#: app/controllers/CControllerPopupTriggerExpr.php:705
 #: app/controllers/CControllerPopupTriggerExpr.php:895
+#: app/controllers/CControllerPopupTriggerExpr.php:926
 msgid "Count"
 msgstr "تعداد"
 
@@ -4079,7 +4083,7 @@ msgid "Create discovery rule (select template first)"
 msgstr ""
 
 #: app/views/popup.lldoperation.php:80 app/views/popup.massupdate.item.php:325
-#: include/views/configuration.host.prototype.edit.php:138
+#: include/views/configuration.host.prototype.edit.php:286
 #: include/views/configuration.host.prototype.list.php:61
 #: include/views/configuration.host.prototype.list.php:187
 #: include/views/configuration.item.prototype.edit.php:847
@@ -4281,7 +4285,7 @@ msgid "Current value"
 msgstr "مقدار فعلی"
 
 #: app/views/administration.mediatype.edit.php:327
-#: include/views/configuration.host.prototype.edit.php:104
+#: include/views/configuration.host.prototype.edit.php:250
 msgid "Custom"
 msgstr ""
 
@@ -4523,7 +4527,7 @@ msgid "Database TLS key file"
 msgstr ""
 
 #: app/partials/administration.system.info.php:121
-msgid "Database history $info_tables upgraded"
+msgid "Database history tables upgraded"
 msgstr ""
 
 #: app/partials/administration.system.info.php:129
@@ -4596,11 +4600,11 @@ msgstr "تاریخ منقضی شدن تعمیر سخت افزار"
 msgid "Date HW purchased"
 msgstr "تاریخ خرید سخت افزار"
 
-#: app/views/popup.triggerexpr.php:110
+#: app/views/popup.triggerexpr.php:111
 msgid "Date and time functions"
 msgstr ""
 
-#: report4.php:175
+#: app/controllers/CControllerPopupTriggerExpr.php:119 report4.php:175
 msgid "Day"
 msgstr "روز"
 
@@ -4641,8 +4645,8 @@ msgstr ""
 msgid "December"
 msgstr "دسامبر"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:908
-#: app/controllers/CControllerPopupTriggerExpr.php:1065
+#: app/controllers/CControllerPopupTriggerExpr.php:939
+#: app/controllers/CControllerPopupTriggerExpr.php:1153
 msgid "Decimal places"
 msgstr ""
 
@@ -4652,7 +4656,7 @@ msgstr ""
 
 #: app/views/administration.iconmap.edit.php:108
 #: include/classes/widgets/forms/CWidgetForm.php:54 include/hosts.inc.php:31
-#: include/hosts.inc.php:1233 include/views/configuration.action.edit.php:229
+#: include/hosts.inc.php:1233 include/views/configuration.action.edit.php:222
 #: include/views/inventory.host.view.php:81
 #: include/views/js/monitoring.sysmaps.js.php:145
 #: include/views/js/monitoring.sysmaps.js.php:263
@@ -4783,7 +4787,7 @@ msgstr "حذف"
 msgid "Delete all elements that are not present in the import file?"
 msgstr ""
 
-#: include/views/configuration.template.edit.php:243
+#: include/views/configuration.template.edit.php:224
 #: include/views/configuration.template.list.php:285
 msgid "Delete and clear"
 msgstr "حذف و پاک کردن"
@@ -4792,11 +4796,11 @@ msgstr "حذف و پاک کردن"
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
 msgstr ""
 
-#: include/views/configuration.template.edit.php:244
+#: include/views/configuration.template.edit.php:225
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
 msgstr ""
 
-#: include/views/configuration.action.edit.php:492
+#: include/views/configuration.action.edit.php:497
 msgid "Delete current action?"
 msgstr ""
 
@@ -4929,7 +4933,7 @@ msgstr ""
 msgid "Delete selected host groups?"
 msgstr ""
 
-#: include/views/configuration.host.prototype.edit.php:416
+#: include/views/configuration.host.prototype.edit.php:421
 msgid "Delete selected host prototype?"
 msgstr ""
 
@@ -5037,7 +5041,7 @@ msgstr ""
 msgid "Delete selected web scenarios?"
 msgstr ""
 
-#: include/views/configuration.template.edit.php:240
+#: include/views/configuration.template.edit.php:221
 msgid "Delete template?"
 msgstr ""
 
@@ -5098,7 +5102,7 @@ msgstr ""
 msgid "Dependencies"
 msgstr "وابستگی‌ها"
 
-#: include/triggers.inc.php:2397
+#: include/triggers.inc.php:2402
 msgid "Dependent"
 msgstr "وابسته"
 
@@ -5106,7 +5110,7 @@ msgstr "وابسته"
 msgid "Dependent item"
 msgstr ""
 
-#: app/views/popup.generic.php:278 include/triggers.inc.php:2397
+#: app/views/popup.generic.php:278 include/triggers.inc.php:2402
 #: include/views/configuration.trigger.prototype.list.php:92
 #: include/views/configuration.triggers.list.php:238
 msgid "Depends on"
@@ -5117,7 +5121,7 @@ msgid "Deployment status"
 msgstr "وضعیت گسترش"
 
 #: app/controllers/CControllerAuditLogList.php:286
-#: app/partials/configuration.host.edit.html.php:147
+#: app/partials/configuration.host.edit.html.php:261
 #: app/partials/hostmacros.list.html.php:37
 #: app/partials/massupdate.macros.tab.php:29
 #: app/partials/scheduledreport.formgrid.html.php:191
@@ -5132,16 +5136,16 @@ msgstr "وضعیت گسترش"
 #: app/views/administration.user.token.edit.php:51
 #: app/views/administration.user.token.view.php:54
 #: app/views/configuration.correlation.edit.php:134
-#: app/views/popup.massupdate.host.php:75
+#: app/views/popup.massupdate.host.php:112
 #: app/views/popup.massupdate.item.php:466
-#: app/views/popup.massupdate.template.php:75
+#: app/views/popup.massupdate.template.php:115
 #: app/views/popup.triggerwizard.php:134 include/events.inc.php:264
 #: include/views/configuration.host.discovery.edit.php:701
 #: include/views/configuration.item.edit.php:961
 #: include/views/configuration.item.prototype.edit.php:839
 #: include/views/configuration.maintenance.edit.php:252
 #: include/views/configuration.maintenance.list.php:90
-#: include/views/configuration.template.edit.php:110
+#: include/views/configuration.template.edit.php:170
 #: include/views/configuration.trigger.prototype.edit.php:531
 #: include/views/configuration.triggers.edit.php:558
 #: include/views/inventory.host.view.php:129
@@ -5153,16 +5157,24 @@ msgstr "توصیف"
 #: app/views/js/reports.auditlog.list.js.php:153
 #: app/views/reports.auditlog.list.php:96
 #: app/views/reports.auditlog.list.php:129 include/func.inc.php:1601
-#: include/views/configuration.action.edit.php:175
-#: include/views/configuration.action.edit.php:179
-#: include/views/configuration.action.edit.php:319
-#: include/views/configuration.action.edit.php:407
+#: include/views/configuration.action.edit.php:168
+#: include/views/configuration.action.edit.php:172
+#: include/views/configuration.action.edit.php:312
+#: include/views/configuration.action.edit.php:400
 #: include/views/inventory.host.view.php:257
 msgid "Details"
 msgstr "جزئیات"
 
 #: httpdetails.php:27 httpdetails.php:185
 msgid "Details of web scenario"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1100
+msgid "Detection period"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1110
+msgid "Deviations"
 msgstr ""
 
 #: include/actions.inc.php:76
@@ -5287,7 +5299,7 @@ msgstr ""
 
 #: app/partials/administration.system.info.php:188
 #: app/partials/configuration.filter.items.php:188
-#: app/partials/configuration.host.edit.html.php:363
+#: app/partials/configuration.host.edit.html.php:358
 #: app/partials/monitoring.host.filter.php:129
 #: app/partials/monitoring.host.view.html.php:102
 #: app/partials/scheduledreport.table.html.php:80
@@ -5314,17 +5326,17 @@ msgstr ""
 #: app/views/configuration.discovery.list.php:57
 #: app/views/configuration.host.list.php:280
 #: app/views/popup.lldoperation.php:280
-#: app/views/popup.massupdate.host.php:102
-#: app/views/popup.massupdate.host.php:187
+#: app/views/popup.massupdate.host.php:141
+#: app/views/popup.massupdate.host.php:183
 #: app/views/reports.scheduledreport.list.php:62 include/discovery.inc.php:108
 #: include/hosts.inc.php:1126 include/html.inc.php:284
 #: include/httptest.inc.php:48 include/items.inc.php:138
 #: include/items.inc.php:141 include/items.inc.php:185
-#: include/maps.inc.php:325 include/triggers.inc.php:1870
+#: include/maps.inc.php:325 include/triggers.inc.php:1875
 #: include/users.inc.php:84 include/views/configuration.action.list.php:77
 #: include/views/configuration.action.list.php:129
 #: include/views/configuration.host.discovery.list.php:167
-#: include/views/configuration.host.prototype.edit.php:356
+#: include/views/configuration.host.prototype.edit.php:360
 #: include/views/js/monitoring.sysmaps.js.php:290
 msgid "Disabled"
 msgstr "غیرفعال‌شده"
@@ -5349,7 +5361,7 @@ msgstr ""
 #: app/views/popup.lldoperation.php:92 app/views/popup.massupdate.item.php:334
 #: include/views/configuration.graph.edit.php:468
 #: include/views/configuration.graph.list.php:138
-#: include/views/configuration.host.prototype.edit.php:142
+#: include/views/configuration.host.prototype.edit.php:290
 #: include/views/configuration.host.prototype.list.php:62
 #: include/views/configuration.item.prototype.edit.php:851
 #: include/views/configuration.item.prototype.list.php:66
@@ -5559,7 +5571,7 @@ msgstr ""
 
 #: app/controllers/CControllerHintboxActionlist.php:93
 #: app/views/administration.queue.details.php:85
-#: app/views/js/popup.service.edit.js.php:484 app/views/search.php:187
+#: app/views/js/popup.service.edit.js.php:483 app/views/search.php:187
 #: app/views/search.php:272 app/views/search.php:371
 #: include/actions.inc.php:1724 include/actions.inc.php:1796
 #: include/classes/helpers/CPagerHelper.php:147 jsLoader.php:398
@@ -5576,7 +5588,7 @@ msgstr ""
 msgid "Displaying options"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:780
+#: app/controllers/CControllerPopupTriggerExpr.php:811
 msgid "Division denominator"
 msgstr ""
 
@@ -5658,7 +5670,7 @@ msgstr ""
 msgid "Download the configuration file"
 msgstr ""
 
-#: app/views/js/popup.service.edit.js.php:234
+#: app/views/js/popup.service.edit.js.php:233
 #: app/views/popup.service.time.edit.php:46
 #: include/classes/screens/CScreenDiscovery.php:120
 msgid "Downtime"
@@ -5722,7 +5734,7 @@ msgstr ""
 #: include/classes/screens/CScreenProblem.php:867
 #: include/classes/screens/CScreenProblem.php:892
 #: include/classes/screens/CScreenProblem.php:1161 include/events.inc.php:289
-#: include/views/configuration.action.edit.php:175
+#: include/views/configuration.action.edit.php:168
 msgid "Duration"
 msgstr "مدت"
 
@@ -5752,14 +5764,14 @@ msgstr ""
 #: app/views/administration.user.edit.php:355
 #: app/views/js/administration.mediatype.edit.js.php:50
 #: app/views/js/configuration.discovery.edit.js.php:33
-#: app/views/js/popup.service.edit.js.php:198
-#: app/views/js/popup.service.edit.js.php:222
+#: app/views/js/popup.service.edit.js.php:197
+#: app/views/js/popup.service.edit.js.php:221
 #: app/views/monitoring.service.list.edit.php:142
 #: app/views/monitoring.service.list.php:114
-#: include/views/configuration.action.edit.php:246
-#: include/views/configuration.action.edit.php:274
-#: include/views/configuration.action.edit.php:358
-#: include/views/configuration.action.edit.php:436
+#: include/views/configuration.action.edit.php:239
+#: include/views/configuration.action.edit.php:267
+#: include/views/configuration.action.edit.php:351
+#: include/views/configuration.action.edit.php:429
 #: include/views/configuration.maintenance.edit.php:68
 #: include/views/configuration.trigger.prototype.edit.php:111
 #: include/views/configuration.trigger.prototype.edit.php:305
@@ -6015,7 +6027,7 @@ msgstr ""
 
 #: app/partials/administration.system.info.php:181
 #: app/partials/configuration.filter.items.php:187
-#: app/partials/configuration.host.edit.html.php:165
+#: app/partials/configuration.host.edit.html.php:279
 #: app/partials/monitoring.host.filter.php:128
 #: app/partials/monitoring.host.view.html.php:101
 #: app/partials/scheduledreport.formgrid.html.php:201
@@ -6053,13 +6065,13 @@ msgstr ""
 #: app/views/configuration.discovery.edit.php:130
 #: app/views/configuration.discovery.list.php:56
 #: app/views/configuration.host.list.php:272
-#: app/views/popup.massupdate.host.php:101 app/views/popup.media.php:89
+#: app/views/popup.massupdate.host.php:140 app/views/popup.media.php:89
 #: app/views/popup.triggerwizard.php:137
 #: app/views/reports.scheduledreport.list.php:61 include/discovery.inc.php:107
 #: include/html.inc.php:280 include/httptest.inc.php:47
 #: include/items.inc.php:138 include/items.inc.php:141
 #: include/items.inc.php:182 include/triggers.inc.php:999
-#: include/triggers.inc.php:1867
+#: include/triggers.inc.php:1872
 #: include/views/configuration.action.edit.php:147
 #: include/views/configuration.action.list.php:76
 #: include/views/configuration.action.list.php:137
@@ -6075,11 +6087,11 @@ msgstr "فعال‌شده"
 msgid "Encrypt"
 msgstr ""
 
-#: app/partials/configuration.host.edit.html.php:533
+#: app/partials/configuration.host.edit.html.php:527
 #: app/views/administration.proxy.edit.php:143
 #: app/views/administration.proxy.list.php:78
-#: app/views/popup.massupdate.host.php:302
-#: include/views/configuration.host.prototype.edit.php:409
+#: app/views/popup.massupdate.host.php:296
+#: include/views/configuration.host.prototype.edit.php:413
 msgid "Encryption"
 msgstr ""
 
@@ -6153,6 +6165,10 @@ msgstr ""
 #: include/classes/screens/CScreenHttpTestDetails.php:182
 #, c-format
 msgid "Error: %1$s"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1090
+msgid "Evaluation period"
 msgstr ""
 
 #: include/events.inc.php:180
@@ -6723,8 +6739,8 @@ msgctxt "page navigation"
 msgid "First"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:237
-#: app/controllers/CControllerPopupTriggerExpr.php:266
+#: app/controllers/CControllerPopupTriggerExpr.php:268
+#: app/controllers/CControllerPopupTriggerExpr.php:297
 msgid "Fit"
 msgstr ""
 
@@ -6836,12 +6852,12 @@ msgid "Full"
 msgstr ""
 
 #: app/views/configuration.host.edit.php:46 app/views/popup.host.edit.php:75
-#: include/views/configuration.template.edit.php:239
+#: include/views/configuration.template.edit.php:220
 #: include/views/monitoring.sysmap.edit.php:422
 msgid "Full clone"
 msgstr "کپی کامل"
 
-#: app/views/popup.triggerexpr.php:132
+#: app/views/popup.triggerexpr.php:133
 #: include/views/configuration.graph.edit.php:366
 msgid "Function"
 msgstr "تابع"
@@ -6857,7 +6873,7 @@ msgstr "مودم GSM"
 msgid "GUI"
 msgstr "واسط گرافیکی کاربران"
 
-#: include/classes/user/CWebUser.php:63 index_sso.php:245
+#: include/classes/user/CWebUser.php:63 index_sso.php:260
 msgid "GUI access disabled."
 msgstr "دسترسی واسط گرافیکی غیرفعال شده است."
 
@@ -7204,7 +7220,7 @@ msgstr "نام گروه"
 msgid "Group prototype cannot be based on a discovered host group \"%1$s\"."
 msgstr ""
 
-#: include/views/configuration.host.prototype.edit.php:197
+#: include/views/configuration.host.prototype.edit.php:207
 msgid "Group prototypes"
 msgstr ""
 
@@ -7217,12 +7233,11 @@ msgid "Grouping by"
 msgstr "گروه کردن بر اساس"
 
 #: app/controllers/CControllerPopupImportCompare.php:164
-#: app/partials/configuration.host.edit.html.php:105
+#: app/partials/configuration.host.edit.html.php:218
 #: app/views/administration.user.edit.php:84
 #: app/views/administration.user.list.php:110 app/views/popup.import.php:29
-#: include/views/configuration.host.prototype.edit.php:163
-#: include/views/configuration.host.prototype.edit.php:199
-#: include/views/configuration.template.edit.php:91
+#: include/views/configuration.host.prototype.edit.php:183
+#: include/views/configuration.template.edit.php:150
 msgid "Groups"
 msgstr "گروهها"
 
@@ -7441,7 +7456,7 @@ msgstr ""
 msgid "History data selection"
 msgstr ""
 
-#: app/views/popup.triggerexpr.php:111
+#: app/views/popup.triggerexpr.php:112
 msgid "History functions"
 msgstr ""
 
@@ -7472,7 +7487,7 @@ msgid "Horizontal align"
 msgstr "ردیف کردن افقی"
 
 #: app/controllers/CControllerAuditLogList.php:219
-#: app/partials/configuration.host.edit.html.php:527
+#: app/partials/configuration.host.edit.html.php:522
 #: app/partials/monitoring.latest.view.html.php:40
 #: app/partials/popup.operations.php:175
 #: app/views/administration.queue.details.php:47
@@ -7481,7 +7496,7 @@ msgstr "ردیف کردن افقی"
 #: app/views/monitoring.dashboard.view.php:82
 #: app/views/monitoring.widget.problems.view.php:58
 #: app/views/popup.generic.php:81 app/views/popup.host.edit.php:97
-#: app/views/popup.massupdate.host.php:290 app/views/search.php:33
+#: app/views/popup.massupdate.host.php:285 app/views/search.php:33
 #: include/actions.inc.php:50 include/blocks.inc.php:577
 #: include/classes/screens/CScreenHttpTest.php:112
 #: include/classes/screens/CScreenProblem.php:863
@@ -7492,7 +7507,7 @@ msgstr "ردیف کردن افقی"
 #: include/hostgroups.inc.php:248 include/maps.inc.php:24
 #: include/triggers.inc.php:956 include/views/configuration.graph.list.php:149
 #: include/views/configuration.host.discovery.list.php:192
-#: include/views/configuration.host.prototype.edit.php:148
+#: include/views/configuration.host.prototype.edit.php:296
 #: include/views/configuration.httpconf.list.php:130
 #: include/views/configuration.item.list.php:82
 #: include/views/configuration.triggers.list.php:189
@@ -7616,7 +7631,7 @@ msgid "Host group label type"
 msgstr "نوع برچسب گروه هاست"
 
 #: include/classes/api/services/CDashboardGeneral.php:555
-#: include/classes/api/services/CScript.php:812
+#: include/classes/api/services/CScript.php:814
 #: include/classes/api/services/CSettings.php:247
 #: include/classes/api/services/CUserGroup.php:444
 #, c-format
@@ -7635,8 +7650,8 @@ msgstr ""
 #: app/views/monitoring.web.view.php:50
 #: app/views/popup.condition.common.php:101
 #: app/views/popup.condition.common.php:282
-#: app/views/popup.massupdate.host.php:46
-#: app/views/popup.massupdate.template.php:48 app/views/search.php:270
+#: app/views/popup.massupdate.host.php:83
+#: app/views/popup.massupdate.template.php:88 app/views/search.php:270
 #: hostinventoriesoverview.php:159 include/classes/helpers/CMenuHelper.php:141
 #: include/classes/helpers/CRoleHelper.php:357
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:33
@@ -7686,7 +7701,7 @@ msgstr "نمای کلی فهرست هاست"
 msgid "Host label type"
 msgstr "نوع برچسب هاست"
 
-#: app/partials/configuration.host.edit.html.php:346
+#: app/partials/configuration.host.edit.html.php:341
 msgid "Host macros"
 msgstr ""
 
@@ -7698,7 +7713,7 @@ msgstr ""
 #: app/views/configuration.discovery.edit.php:106
 #: app/views/configuration.discovery.edit.php:122 host_prototypes.php:37
 #: include/actions.inc.php:47
-#: include/views/configuration.host.prototype.edit.php:70
+#: include/views/configuration.host.prototype.edit.php:65
 #: include/views/inventory.host.view.php:50
 msgid "Host name"
 msgstr "نام هاست"
@@ -7735,7 +7750,7 @@ msgstr ""
 msgid "Host prototype deleted"
 msgstr ""
 
-#: include/views/configuration.host.prototype.edit.php:341
+#: include/views/configuration.host.prototype.edit.php:334
 msgid "Host prototype macros"
 msgstr ""
 
@@ -7757,7 +7772,7 @@ msgstr ""
 #: app/controllers/CControllerPopupImportCompare.php:176
 #: include/html.inc.php:483
 #: include/views/configuration.host.discovery.list.php:307
-#: include/views/configuration.host.prototype.edit.php:34
+#: include/views/configuration.host.prototype.edit.php:33
 #: include/views/configuration.host.prototype.list.php:27
 msgid "Host prototypes"
 msgstr ""
@@ -7782,7 +7797,7 @@ msgstr "زمان هاست"
 msgid "Host update failed."
 msgstr ""
 
-#: app/controllers/CControllerHostUpdate.php:138
+#: app/controllers/CControllerHostUpdate.php:143
 msgid "Host updated"
 msgstr ""
 
@@ -7859,6 +7874,10 @@ msgstr "مکان هاست ها"
 msgid "Hosts updated"
 msgstr ""
 
+#: app/controllers/CControllerPopupTriggerExpr.php:118
+msgid "Hour"
+msgstr ""
+
 #: app/views/popup.maintenance.period.php:170
 msgid "Hours"
 msgstr "ساعت"
@@ -7928,15 +7947,15 @@ msgstr "محدوده IP"
 msgid "IP range \"%1$s\" exceeds \"%2$s\" address limit"
 msgstr ""
 
-#: app/partials/configuration.host.edit.html.php:529
+#: app/partials/configuration.host.edit.html.php:523
 #: app/views/administration.script.edit.php:118
 #: app/views/administration.script.list.php:140
 #: app/views/monitoring.widget.hostavail.view.php:30
-#: app/views/popup.massupdate.host.php:292
+#: app/views/popup.massupdate.host.php:286
 #: include/classes/widgets/views/widget.hostavail.form.view.php:49
 #: include/hosts.inc.php:471 include/hosts.inc.php:1194
 #: include/items.inc.php:350
-#: include/views/configuration.host.prototype.edit.php:324 jsLoader.php:318
+#: include/views/configuration.host.prototype.edit.php:320 jsLoader.php:318
 msgid "IPMI"
 msgstr ""
 
@@ -8166,7 +8185,7 @@ msgstr "تصاویر"
 msgid "Images for all maps will be updated!"
 msgstr ""
 
-#: include/views/configuration.action.edit.php:236
+#: include/views/configuration.action.edit.php:229
 msgid "Immediately"
 msgstr "فوری"
 
@@ -8248,7 +8267,7 @@ msgstr ""
 #: app/partials/monitoring.host.view.html.php:89
 #: app/views/configuration.host.list.php:267
 #: include/classes/screens/CScreenProblem.php:386
-#: include/hostgroups.inc.php:293 include/triggers.inc.php:2022
+#: include/hostgroups.inc.php:293 include/triggers.inc.php:2027
 #: include/views/inventory.host.view.php:42
 msgid "Inaccessible maintenance"
 msgstr ""
@@ -8260,11 +8279,11 @@ msgstr ""
 
 #: httpconf.php:663 include/graphs.inc.php:274 include/hosts.inc.php:649
 #: include/httptest.inc.php:222 include/items.inc.php:916
-#: include/triggers.inc.php:2161
+#: include/triggers.inc.php:2166
 msgid "Inaccessible template"
 msgstr ""
 
-#: include/triggers.inc.php:2367 include/triggers.inc.php:2375
+#: include/triggers.inc.php:2372 include/triggers.inc.php:2380
 msgid "Inaccessible trigger"
 msgstr ""
 
@@ -8379,7 +8398,7 @@ msgstr ""
 msgid "Incorrect action condition discovery check."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:3310
+#: include/classes/api/services/CAction.php:3320
 msgid "Incorrect action condition discovery check. Discovery check does not exist or you have no access to it."
 msgstr ""
 
@@ -8387,7 +8406,7 @@ msgstr ""
 msgid "Incorrect action condition discovery object."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:3269
+#: include/classes/api/services/CAction.php:3279
 msgid "Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it."
 msgstr ""
 
@@ -8399,15 +8418,15 @@ msgstr ""
 msgid "Incorrect action condition event type."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2989
+#: include/classes/api/services/CAction.php:2999
 msgid "Incorrect action condition or operation host group. Host group does not exist or you have no access to it."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:3049
+#: include/classes/api/services/CAction.php:3059
 msgid "Incorrect action condition or operation host. Host does not exist or you have no access to it."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:3187
+#: include/classes/api/services/CAction.php:3197
 msgid "Incorrect action condition or operation template. Template does not exist or you have no access to it."
 msgstr ""
 
@@ -8416,11 +8435,11 @@ msgstr ""
 msgid "Incorrect action condition port \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:3351
+#: include/classes/api/services/CAction.php:3361
 msgid "Incorrect action condition proxy. Proxy does not exist or you have no access to it."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:3391
+#: include/classes/api/services/CAction.php:3401
 msgid "Incorrect action condition service. Service does not exist or you have no access to it."
 msgstr ""
 
@@ -8428,7 +8447,7 @@ msgstr ""
 msgid "Incorrect action condition trigger severity."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:3228
+#: include/classes/api/services/CAction.php:3238
 msgid "Incorrect action condition trigger. Trigger does not exist or you have no access to it."
 msgstr ""
 
@@ -8438,11 +8457,11 @@ msgstr ""
 
 #: app/controllers/CControllerActionOperationValidate.php:83
 #: app/controllers/CControllerActionOperationValidate.php:89
-#: include/classes/api/services/CAction.php:2814
+#: include/classes/api/services/CAction.php:2824
 msgid "Incorrect action operation escalation step values."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2889
+#: include/classes/api/services/CAction.php:2899
 msgid "Incorrect action operation media type. Media type does not exist or you have no access to it."
 msgstr ""
 
@@ -8451,11 +8470,11 @@ msgstr ""
 msgid "Incorrect action operation type \"%1$s\" for event source \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:3135
+#: include/classes/api/services/CAction.php:3145
 msgid "Incorrect action operation user group. User group does not exist or you have no access to it."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:3092
+#: include/classes/api/services/CAction.php:3102
 msgid "Incorrect action operation user. User does not exist or you have no access to it."
 msgstr ""
 
@@ -8755,8 +8774,8 @@ msgstr ""
 msgid "Incorrect trigger expression"
 msgstr ""
 
-#: include/classes/parsers/C10TriggerExpression.php:522
-#: include/classes/parsers/C10TriggerExpression.php:538
+#: include/classes/parsers/C10TriggerExpression.php:526
+#: include/classes/parsers/C10TriggerExpression.php:542
 msgid "Incorrect trigger expression."
 msgstr ""
 
@@ -9154,7 +9173,7 @@ msgstr ""
 msgid "Information about a service. Returns integer with param as state, startup; string - with param as displayname, path, user; text - with param as description; Specifically for state: 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service; Specifically for startup: 0 - automatic, 1 - automatic delayed, 2 - manual, 3 - disabled, 4 - unknown"
 msgstr ""
 
-#: include/views/configuration.host.prototype.edit.php:103
+#: include/views/configuration.host.prototype.edit.php:249
 msgid "Inherit"
 msgstr ""
 
@@ -9163,11 +9182,11 @@ msgstr ""
 msgid "Inherited"
 msgstr ""
 
-#: app/partials/configuration.host.edit.html.php:347
+#: app/partials/configuration.host.edit.html.php:342
 msgid "Inherited and host macros"
 msgstr ""
 
-#: include/views/configuration.host.prototype.edit.php:342
+#: include/views/configuration.host.prototype.edit.php:335
 msgid "Inherited and host prototype macros"
 msgstr ""
 
@@ -9179,7 +9198,7 @@ msgstr ""
 msgid "Inherited and scenario tags"
 msgstr ""
 
-#: include/views/configuration.template.edit.php:212
+#: include/views/configuration.template.edit.php:193
 msgid "Inherited and template macros"
 msgstr ""
 
@@ -9199,7 +9218,7 @@ msgstr ""
 msgid "Initial view is ignored if the default view is set."
 msgstr ""
 
-#: app/views/popup.triggerexpr.php:239
+#: app/views/popup.triggerexpr.php:258
 msgid "Insert"
 msgstr "درج"
 
@@ -9258,8 +9277,8 @@ msgstr ""
 msgid "Interface with IP \"%1$s\" cannot have empty DNS name."
 msgstr ""
 
-#: app/partials/configuration.host.edit.html.php:128
-#: include/views/configuration.host.prototype.edit.php:100
+#: app/partials/configuration.host.edit.html.php:242
+#: include/views/configuration.host.prototype.edit.php:246
 msgid "Interfaces"
 msgstr ""
 
@@ -9351,7 +9370,7 @@ msgstr ""
 msgid "Invalid action condition: %1$s."
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1476
+#: app/controllers/CControllerPopupTriggerExpr.php:1573
 #, c-format
 msgid "Invalid condition: %1$s."
 msgstr ""
@@ -9412,10 +9431,10 @@ msgstr ""
 #: app/controllers/CControllerDashboardUpdate.php:200
 #: app/controllers/CControllerDashboardUpdate.php:212
 #: app/controllers/CControllerPopupHttpStep.php:100
-#: include/classes/api/services/CAction.php:2705
-#: include/classes/api/services/CAction.php:2711
-#: include/classes/api/services/CAction.php:2722
-#: include/classes/api/services/CAction.php:2734
+#: include/classes/api/services/CAction.php:2715
+#: include/classes/api/services/CAction.php:2721
+#: include/classes/api/services/CAction.php:2732
+#: include/classes/api/services/CAction.php:2744
 #: include/classes/api/services/CAutoregistration.php:157
 #: include/classes/api/services/CAutoregistration.php:163
 #: include/classes/api/services/CAutoregistration.php:170
@@ -9478,8 +9497,8 @@ msgstr ""
 #: include/classes/api/services/CReport.php:582
 #: include/classes/api/services/CReport.php:596
 #: include/classes/api/services/CReport.php:602
-#: include/classes/api/services/CScript.php:902
-#: include/classes/api/services/CScript.php:908
+#: include/classes/api/services/CScript.php:904
+#: include/classes/api/services/CScript.php:910
 #: include/classes/api/services/CTemplate.php:668
 #: include/classes/api/services/CTriggerGeneral.php:665
 #: include/classes/api/services/CTriggerGeneral.php:1773
@@ -9701,11 +9720,11 @@ msgstr ""
 msgid "Invalid zoomparameter \"%1$s\": %2$s."
 msgstr ""
 
-#: app/partials/configuration.host.edit.html.php:532
-#: app/views/popup.massupdate.host.php:301
+#: app/partials/configuration.host.edit.html.php:526
+#: app/views/popup.massupdate.host.php:295
 #: include/classes/helpers/CMenuHelper.php:94
 #: include/classes/helpers/CRoleHelper.php:277
-#: include/views/configuration.host.prototype.edit.php:363 jsLoader.php:370
+#: include/views/configuration.host.prototype.edit.php:355 jsLoader.php:370
 msgid "Inventory"
 msgstr "فهرست"
 
@@ -9719,7 +9738,7 @@ msgid "Inventory field"
 msgstr ""
 
 #: app/partials/popup.operations.php:225
-#: app/views/popup.massupdate.host.php:184
+#: app/views/popup.massupdate.host.php:180
 msgid "Inventory mode"
 msgstr ""
 
@@ -9727,10 +9746,10 @@ msgstr ""
 msgid "Is online?"
 msgstr ""
 
-#: app/partials/configuration.host.edit.html.php:497
+#: app/partials/configuration.host.edit.html.php:492
 #: app/views/administration.proxy.edit.php:135
-#: app/views/popup.massupdate.host.php:272
-#: include/views/configuration.host.prototype.edit.php:398
+#: app/views/popup.massupdate.host.php:267
+#: include/views/configuration.host.prototype.edit.php:402
 msgid "Issuer"
 msgstr ""
 
@@ -9819,7 +9838,7 @@ msgstr[0] ""
 msgid "Item in \"not supported\" state"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1469
+#: app/controllers/CControllerPopupTriggerExpr.php:1566
 msgid "Item not selected"
 msgstr ""
 
@@ -10265,17 +10284,17 @@ msgstr "نمودار ماه گذشته"
 msgid "Last name"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:62
-#: app/controllers/CControllerPopupTriggerExpr.php:76
-#: app/controllers/CControllerPopupTriggerExpr.php:90
-#: app/controllers/CControllerPopupTriggerExpr.php:103
-#: app/controllers/CControllerPopupTriggerExpr.php:124
-#: app/controllers/CControllerPopupTriggerExpr.php:133
-#: app/controllers/CControllerPopupTriggerExpr.php:146
-#: app/controllers/CControllerPopupTriggerExpr.php:165
-#: app/controllers/CControllerPopupTriggerExpr.php:202
-#: app/controllers/CControllerPopupTriggerExpr.php:221
-#: app/controllers/CControllerPopupTriggerExpr.php:250
+#: app/controllers/CControllerPopupTriggerExpr.php:63
+#: app/controllers/CControllerPopupTriggerExpr.php:77
+#: app/controllers/CControllerPopupTriggerExpr.php:91
+#: app/controllers/CControllerPopupTriggerExpr.php:134
+#: app/controllers/CControllerPopupTriggerExpr.php:155
+#: app/controllers/CControllerPopupTriggerExpr.php:164
+#: app/controllers/CControllerPopupTriggerExpr.php:177
+#: app/controllers/CControllerPopupTriggerExpr.php:196
+#: app/controllers/CControllerPopupTriggerExpr.php:233
+#: app/controllers/CControllerPopupTriggerExpr.php:252
+#: app/controllers/CControllerPopupTriggerExpr.php:281
 msgid "Last of"
 msgstr "آخرین از"
 
@@ -10352,8 +10371,8 @@ msgstr ""
 msgid "Legend"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:642
-#: app/controllers/CControllerPopupTriggerExpr.php:760
+#: app/controllers/CControllerPopupTriggerExpr.php:673
+#: app/controllers/CControllerPopupTriggerExpr.php:791
 msgid "Length"
 msgstr ""
 
@@ -10387,8 +10406,8 @@ msgstr ""
 msgid "Line width"
 msgstr ""
 
-#: app/views/popup.massupdate.host.php:112
-#: app/views/popup.massupdate.template.php:89
+#: app/views/popup.massupdate.host.php:46
+#: app/views/popup.massupdate.template.php:48
 #: include/views/monitoring.sysmap.constructor.php:43
 msgid "Link"
 msgstr "پیوند"
@@ -10411,16 +10430,9 @@ msgstr ""
 msgid "Link indicators"
 msgstr "شاخص پیوند"
 
-#: app/partials/configuration.host.edit.html.php:282
-#: include/views/configuration.host.prototype.edit.php:293
-#: include/views/configuration.template.edit.php:187
-msgid "Link new templates"
-msgstr ""
-
 #: app/controllers/CControllerPopupLldOperation.php:143
-#: app/views/popup.lldoperation.php:238
-#: app/views/popup.massupdate.host.php:140
-#: app/views/popup.massupdate.template.php:120
+#: app/views/popup.lldoperation.php:238 app/views/popup.massupdate.host.php:75
+#: app/views/popup.massupdate.template.php:79
 msgid "Link templates"
 msgstr ""
 
@@ -10436,13 +10448,6 @@ msgstr "پیوند به قالب ها"
 msgid "Linked map"
 msgstr ""
 
-#: app/partials/configuration.host.edit.html.php:206
-#: app/partials/configuration.host.edit.html.php:274
-#: app/views/popup.massupdate.template.php:148
-#: include/views/configuration.host.prototype.edit.php:228
-#: include/views/configuration.host.prototype.edit.php:288
-#: include/views/configuration.template.edit.php:182
-#: include/views/configuration.template.edit.php:195
 #: include/views/configuration.template.list.php:64
 #: include/views/configuration.template.list.php:124
 msgid "Linked templates"
@@ -10581,7 +10586,7 @@ msgstr ""
 #: app/controllers/CControllerAuditLogList.php:191
 #: app/views/administration.authentication.edit.php:200
 #: app/views/administration.user.list.php:112 include/func.inc.php:1523
-#: include/func.inc.php:1539 index_http.php:90 index_sso.php:265
+#: include/func.inc.php:1539 index_http.php:90 index_sso.php:280
 msgid "Login"
 msgstr "ورود"
 
@@ -10663,16 +10668,16 @@ msgstr ""
 msgid "Macro \"%1$s\" already exists."
 msgstr ""
 
-#: app/partials/configuration.host.edit.html.php:531
+#: app/partials/configuration.host.edit.html.php:525
 #: app/partials/massupdate.macros.tab.php:120
 #: app/views/administration.macros.edit.php:29
 #: app/views/administration.macros.edit.php:96
 #: app/views/popup.itemtestedit.view.php:307
-#: app/views/popup.massupdate.host.php:294
-#: app/views/popup.massupdate.template.php:153
+#: app/views/popup.massupdate.host.php:288
+#: app/views/popup.massupdate.template.php:144
 #: include/classes/helpers/CMenuHelper.php:240 include/html.inc.php:893
-#: include/views/configuration.host.prototype.edit.php:338
-#: include/views/configuration.template.edit.php:208
+#: include/views/configuration.host.prototype.edit.php:331
+#: include/views/configuration.template.edit.php:189
 msgid "Macros"
 msgstr "ماکروها"
 
@@ -10771,12 +10776,12 @@ msgstr ""
 msgid "Manage scheduled reports"
 msgstr ""
 
-#: app/partials/configuration.host.edit.html.php:364
+#: app/partials/configuration.host.edit.html.php:359
 #: app/partials/popup.operations.php:227
 #: app/views/administration.miscconfig.edit.php:60
 #: app/views/popup.lldoperation.php:281
-#: app/views/popup.massupdate.host.php:188 include/hosts.inc.php:1127
-#: include/views/configuration.host.prototype.edit.php:357
+#: app/views/popup.massupdate.host.php:184 include/hosts.inc.php:1127
+#: include/views/configuration.host.prototype.edit.php:361
 msgid "Manual"
 msgstr "دستی"
 
@@ -10919,16 +10924,16 @@ msgstr "انتخاب دیگران"
 msgid "Mark selected"
 msgstr "انتخاب موارد"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:377
-#: app/controllers/CControllerPopupTriggerExpr.php:417
-#: app/controllers/CControllerPopupTriggerExpr.php:443
+#: app/controllers/CControllerPopupTriggerExpr.php:408
+#: app/controllers/CControllerPopupTriggerExpr.php:448
+#: app/controllers/CControllerPopupTriggerExpr.php:474
 msgid "Mask"
 msgstr ""
 
 #: app/controllers/CControllerPopupMassupdateHost.php:471
 #: app/controllers/CControllerPopupMassupdateItem.php:406
 #: app/controllers/CControllerPopupMassupdateService.php:171
-#: app/controllers/CControllerPopupMassupdateTemplate.php:364
+#: app/controllers/CControllerPopupMassupdateTemplate.php:370
 #: app/controllers/CControllerPopupMassupdateTrigger.php:235
 #: app/partials/monitoring.service.list.edit.php:141
 #: app/views/configuration.host.list.php:516
@@ -10961,11 +10966,11 @@ msgstr ""
 msgid "Matches regular expression"
 msgstr ""
 
-#: app/views/popup.triggerexpr.php:112
+#: app/views/popup.triggerexpr.php:113
 msgid "Mathematical functions"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:364
+#: app/controllers/CControllerPopupTriggerExpr.php:395
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:134
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:136
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:206
@@ -11193,7 +11198,7 @@ msgstr ""
 msgid "Middle"
 msgstr "وسط"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:359
+#: app/controllers/CControllerPopupTriggerExpr.php:390
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:119
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:121
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:191
@@ -11294,7 +11299,7 @@ msgstr ""
 msgid "Missing key \"%1$s\" for host \"%2$s\"."
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:242
+#: app/controllers/CControllerPopupTriggerExpr.php:273
 #: app/views/administration.proxy.list.php:51
 #: app/views/administration.proxy.list.php:77 report2.php:201
 msgid "Mode"
@@ -11372,9 +11377,9 @@ msgstr "دوشنبه"
 msgid "Monitored by"
 msgstr ""
 
-#: app/partials/configuration.host.edit.html.php:155
-#: app/views/popup.massupdate.host.php:90
-#: include/views/configuration.host.prototype.edit.php:135
+#: app/partials/configuration.host.edit.html.php:269
+#: app/views/popup.massupdate.host.php:129
+#: include/views/configuration.host.prototype.edit.php:277
 msgid "Monitored by proxy"
 msgstr "مانیتور شده با پروکسی"
 
@@ -11393,6 +11398,7 @@ msgstr "مانیتورینگ"
 msgid "Monospace"
 msgstr ""
 
+#: app/controllers/CControllerPopupTriggerExpr.php:121
 #: app/views/popup.maintenance.period.php:104 report4.php:163
 msgid "Month"
 msgstr "ماه"
@@ -11505,8 +11511,8 @@ msgstr ""
 #: app/controllers/CControllerPopupValueMapUpdate.php:70
 #: app/partials/administration.ha.nodes.php:28
 #: app/partials/configuration.filter.items.php:91
-#: app/partials/configuration.host.edit.html.php:177
-#: app/partials/configuration.host.edit.html.php:216
+#: app/partials/configuration.host.edit.html.php:110
+#: app/partials/configuration.host.edit.html.php:144
 #: app/partials/configuration.tags.tab.php:39
 #: app/partials/configuration.valuemap.php:29
 #: app/partials/monitoring.host.filter.php:78
@@ -11576,11 +11582,11 @@ msgstr ""
 #: app/views/popup.httpstep.php:96 app/views/popup.httpstep.php:120
 #: app/views/popup.httpstep.php:139 app/views/popup.itemtestedit.view.php:324
 #: app/views/popup.lldoperation.php:268 app/views/popup.lldoverride.php:47
-#: app/views/popup.massupdate.host.php:207
+#: app/views/popup.massupdate.host.php:203
 #: app/views/popup.massupdate.item.php:120
 #: app/views/popup.massupdate.item.php:486
 #: app/views/popup.massupdate.service.php:50
-#: app/views/popup.massupdate.template.php:140
+#: app/views/popup.massupdate.template.php:132
 #: app/views/popup.massupdate.trigger.php:84
 #: app/views/popup.massupdate.trigger.php:98
 #: app/views/popup.service.edit.php:45 app/views/popup.service.edit.php:65
@@ -11608,8 +11614,8 @@ msgstr ""
 #: include/views/configuration.host.discovery.list.php:193
 #: include/views/configuration.hostgroups.list.php:46
 #: include/views/configuration.hostgroups.list.php:64
-#: include/views/configuration.host.prototype.edit.php:208
-#: include/views/configuration.host.prototype.edit.php:240
+#: include/views/configuration.host.prototype.edit.php:87
+#: include/views/configuration.host.prototype.edit.php:118
 #: include/views/configuration.host.prototype.list.php:59
 #: include/views/configuration.httpconf.edit.php:69
 #: include/views/configuration.httpconf.edit.php:117
@@ -11630,7 +11636,7 @@ msgstr ""
 #: include/views/configuration.maintenance.edit.php:94
 #: include/views/configuration.maintenance.list.php:60
 #: include/views/configuration.maintenance.list.php:85
-#: include/views/configuration.template.edit.php:127
+#: include/views/configuration.template.edit.php:69
 #: include/views/configuration.template.list.php:80
 #: include/views/configuration.template.list.php:114
 #: include/views/configuration.trigger.prototype.edit.php:70
@@ -11920,15 +11926,15 @@ msgstr ""
 msgid "No enabled modules found."
 msgstr ""
 
-#: app/partials/configuration.host.edit.html.php:436
-#: app/partials/configuration.host.edit.html.php:449
+#: app/partials/configuration.host.edit.html.php:431
+#: app/partials/configuration.host.edit.html.php:444
 #: app/views/administration.autoreg.edit.php:48
 #: app/views/administration.proxy.edit.php:95
 #: app/views/administration.proxy.edit.php:103
-#: app/views/popup.massupdate.host.php:237
-#: app/views/popup.massupdate.host.php:247
-#: include/views/configuration.host.prototype.edit.php:369
-#: include/views/configuration.host.prototype.edit.php:379
+#: app/views/popup.massupdate.host.php:232
+#: app/views/popup.massupdate.host.php:242
+#: include/views/configuration.host.prototype.edit.php:373
+#: include/views/configuration.host.prototype.edit.php:383
 msgid "No encryption"
 msgstr ""
 
@@ -12014,7 +12020,7 @@ msgstr ""
 msgid "No new modules discovered"
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2769
+#: include/classes/api/services/CAction.php:2779
 #, c-format
 msgid "No operations defined for action \"%1$s\"."
 msgstr ""
@@ -12051,9 +12057,9 @@ msgstr ""
 #: include/classes/api/services/CRole.php:137
 #: include/classes/api/services/CRole.php:230
 #: include/classes/api/services/CRole.php:345
-#: include/classes/api/services/CScript.php:240
-#: include/classes/api/services/CScript.php:316
-#: include/classes/api/services/CScript.php:825
+#: include/classes/api/services/CScript.php:242
+#: include/classes/api/services/CScript.php:318
+#: include/classes/api/services/CScript.php:827
 #: include/classes/api/services/CSettings.php:136
 #: include/classes/api/services/CUserGroup.php:176
 #: include/classes/api/services/CUserGroup.php:260
@@ -12092,7 +12098,7 @@ msgstr ""
 #: app/views/monitoring.widget.systeminfo.view.php:45 disc_prototypes.php:748
 #: host_discovery.php:808 hostinventoriesoverview.php:73
 #: include/classes/api/services/CAction.php:1516
-#: include/classes/api/services/CAction.php:2571
+#: include/classes/api/services/CAction.php:2577
 #: include/classes/api/services/CConfiguration.php:78
 #: include/classes/api/services/CCorrelation.php:497
 #: include/classes/api/services/CCorrelation.php:653
@@ -12192,11 +12198,11 @@ msgstr ""
 #: include/classes/api/services/CReport.php:909
 #: include/classes/api/services/CRole.php:326
 #: include/classes/api/services/CRole.php:363
-#: include/classes/api/services/CScript.php:375
-#: include/classes/api/services/CScript.php:860
-#: include/classes/api/services/CScript.php:920
-#: include/classes/api/services/CScript.php:937
-#: include/classes/api/services/CScript.php:949
+#: include/classes/api/services/CScript.php:377
+#: include/classes/api/services/CScript.php:862
+#: include/classes/api/services/CScript.php:922
+#: include/classes/api/services/CScript.php:939
+#: include/classes/api/services/CScript.php:951
 #: include/classes/api/services/CService.php:398
 #: include/classes/api/services/CService.php:467
 #: include/classes/api/services/CService.php:947
@@ -12255,7 +12261,7 @@ msgid "No public key file specified."
 msgstr ""
 
 #: app/controllers/CControllerActionOperationValidate.php:110
-#: include/classes/api/services/CAction.php:2826
+#: include/classes/api/services/CAction.php:2836
 msgid "No recipients specified for action operation message."
 msgstr ""
 
@@ -12276,7 +12282,7 @@ msgid "No target selected."
 msgstr "هدف انتخاب نشده"
 
 #: app/controllers/CControllerActionOperationValidate.php:142
-#: include/classes/api/services/CAction.php:2837
+#: include/classes/api/services/CAction.php:2847
 msgid "No targets specified for action operation global script."
 msgstr ""
 
@@ -12425,6 +12431,10 @@ msgstr "گزارش آگاه سازی"
 msgid "Notifications"
 msgstr "اخطارها"
 
+#: actionconf.php:87 include/views/configuration.action.edit.php:475
+msgid "Notify about canceled escalations"
+msgstr ""
+
 #: include/actions.inc.php:865 include/actions.inc.php:1038
 #: include/actions.inc.php:1039
 msgid "Notify all involved"
@@ -12509,6 +12519,10 @@ msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:279
 msgid "Number of rows"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:126
+msgid "Number of seasons"
 msgstr ""
 
 #: include/views/reports.toptriggers.php:86
@@ -12686,7 +12700,7 @@ msgid "Off"
 msgstr "خاموش"
 
 #: app/views/administration.user.list.php:147
-#: app/views/js/popup.massupdate.js.php:415
+#: app/views/js/popup.massupdate.js.php:428
 #: app/views/js/popup.mediatypetest.edit.js.php:114
 #: app/views/js/popup.scriptexec.js.php:53
 #: app/views/js/reports.auditlog.list.js.php:158
@@ -12733,7 +12747,7 @@ msgstr ""
 msgid "One time only"
 msgstr "فقط یکبار"
 
-#: app/views/js/popup.service.edit.js.php:236
+#: app/views/js/popup.service.edit.js.php:235
 #: app/views/popup.service.time.edit.php:47
 msgid "One-time downtime"
 msgstr "یکبار پایین آمده"
@@ -12809,12 +12823,12 @@ msgstr ""
 msgid "Operation"
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2795
+#: include/classes/api/services/CAction.php:2805
 #, c-format
 msgid "Operation \"%1$s\" already exists for action \"%2$s\"."
 msgstr ""
 
-#: actionconf.php:378
+#: actionconf.php:384
 #, c-format
 msgid "Operation \"%1$s\" already exists."
 msgstr ""
@@ -12848,8 +12862,8 @@ msgstr ""
 #: app/views/configuration.correlation.edit.php:140
 #: app/views/configuration.correlation.list.php:77
 #: app/views/popup.lldoverride.php:210
-#: include/views/configuration.action.edit.php:307
-#: include/views/configuration.action.edit.php:479
+#: include/views/configuration.action.edit.php:300
+#: include/views/configuration.action.edit.php:484
 #: include/views/configuration.action.list.php:99
 msgid "Operations"
 msgstr "عملکردها"
@@ -12884,7 +12898,7 @@ msgstr "عملکردها"
 msgid "Operator"
 msgstr "عملگر"
 
-#: app/views/popup.triggerexpr.php:113
+#: app/views/popup.triggerexpr.php:114
 msgid "Operator functions"
 msgstr ""
 
@@ -12924,19 +12938,19 @@ msgstr ""
 #: app/views/popup.lldoperation.php:176 app/views/popup.lldoperation.php:184
 #: app/views/popup.lldoperation.php:205 app/views/popup.lldoperation.php:226
 #: app/views/popup.lldoperation.php:237 app/views/popup.lldoperation.php:261
-#: app/views/popup.lldoperation.php:275 app/views/popup.massupdate.host.php:45
-#: app/views/popup.massupdate.host.php:75
-#: app/views/popup.massupdate.host.php:90
-#: app/views/popup.massupdate.host.php:96
-#: app/views/popup.massupdate.host.php:140
-#: app/views/popup.massupdate.host.php:150
-#: app/views/popup.massupdate.host.php:159
-#: app/views/popup.massupdate.host.php:167
-#: app/views/popup.massupdate.host.php:174
-#: app/views/popup.massupdate.host.php:184
-#: app/views/popup.massupdate.host.php:198
-#: app/views/popup.massupdate.host.php:226
-#: app/views/popup.massupdate.host.php:282
+#: app/views/popup.lldoperation.php:275 app/views/popup.massupdate.host.php:74
+#: app/views/popup.massupdate.host.php:82
+#: app/views/popup.massupdate.host.php:112
+#: app/views/popup.massupdate.host.php:129
+#: app/views/popup.massupdate.host.php:135
+#: app/views/popup.massupdate.host.php:149
+#: app/views/popup.massupdate.host.php:157
+#: app/views/popup.massupdate.host.php:164
+#: app/views/popup.massupdate.host.php:170
+#: app/views/popup.massupdate.host.php:180
+#: app/views/popup.massupdate.host.php:194
+#: app/views/popup.massupdate.host.php:222
+#: app/views/popup.massupdate.host.php:277
 #: app/views/popup.massupdate.item.php:47
 #: app/views/popup.massupdate.item.php:59
 #: app/views/popup.massupdate.item.php:79
@@ -12966,10 +12980,10 @@ msgstr ""
 #: app/views/popup.massupdate.item.php:466
 #: app/views/popup.massupdate.item.php:477
 #: app/views/popup.massupdate.service.php:40
-#: app/views/popup.massupdate.template.php:47
-#: app/views/popup.massupdate.template.php:75
-#: app/views/popup.massupdate.template.php:119
-#: app/views/popup.massupdate.template.php:131
+#: app/views/popup.massupdate.template.php:78
+#: app/views/popup.massupdate.template.php:87
+#: app/views/popup.massupdate.template.php:115
+#: app/views/popup.massupdate.template.php:123
 #: app/views/popup.massupdate.trigger.php:52
 #: app/views/popup.massupdate.trigger.php:60
 #: app/views/popup.massupdate.trigger.php:75
@@ -13232,10 +13246,10 @@ msgstr "مشکل"
 msgid "PROBLEM event generation mode"
 msgstr ""
 
-#: app/partials/configuration.host.edit.html.php:437
-#: app/partials/configuration.host.edit.html.php:453
-#: app/partials/configuration.host.edit.html.php:467
-#: app/partials/configuration.host.edit.html.php:488
+#: app/partials/configuration.host.edit.html.php:432
+#: app/partials/configuration.host.edit.html.php:448
+#: app/partials/configuration.host.edit.html.php:462
+#: app/partials/configuration.host.edit.html.php:483
 #: app/views/administration.autoreg.edit.php:50
 #: app/views/administration.autoreg.edit.php:67
 #: app/views/administration.autoreg.edit.php:79
@@ -13248,19 +13262,19 @@ msgstr ""
 #: app/views/configuration.host.list.php:378
 #: app/views/configuration.host.list.php:395
 #: app/views/configuration.host.list.php:398
-#: app/views/popup.massupdate.host.php:238
-#: app/views/popup.massupdate.host.php:251
-#: app/views/popup.massupdate.host.php:266
-#: include/views/configuration.host.prototype.edit.php:370
-#: include/views/configuration.host.prototype.edit.php:383
-#: include/views/configuration.host.prototype.edit.php:391
+#: app/views/popup.massupdate.host.php:233
+#: app/views/popup.massupdate.host.php:246
+#: app/views/popup.massupdate.host.php:261
+#: include/views/configuration.host.prototype.edit.php:374
+#: include/views/configuration.host.prototype.edit.php:387
+#: include/views/configuration.host.prototype.edit.php:395
 msgid "PSK"
 msgstr ""
 
-#: app/partials/configuration.host.edit.html.php:478
+#: app/partials/configuration.host.edit.html.php:473
 #: app/views/administration.autoreg.edit.php:56
 #: app/views/administration.proxy.edit.php:110
-#: app/views/popup.massupdate.host.php:260
+#: app/views/popup.massupdate.host.php:255
 msgid "PSK identity"
 msgstr ""
 
@@ -13312,12 +13326,12 @@ msgid "Parameters"
 msgstr ""
 
 #: app/controllers/CControllerActionOperationValidate.php:76
-#: include/classes/api/services/CAction.php:2807
+#: include/classes/api/services/CAction.php:2817
 msgid "Parameters \"esc_step_from\" and \"esc_step_to\" must be set together."
 msgstr ""
 
 #: include/views/configuration.host.discovery.edit.php:52
-#: include/views/configuration.host.prototype.edit.php:62
+#: include/views/configuration.host.prototype.edit.php:61
 msgid "Parent discovery rules"
 msgstr ""
 
@@ -13372,13 +13386,13 @@ msgid "Passive"
 msgstr "منفعل"
 
 #: app/controllers/CControllerUserUpdateGeneral.php:111
-#: app/partials/configuration.host.edit.html.php:327
+#: app/partials/configuration.host.edit.html.php:322
 #: app/views/administration.mediatype.edit.php:204
 #: app/views/administration.script.edit.php:135
 #: app/views/administration.script.edit.php:154
 #: app/views/administration.user.edit.php:157
 #: app/views/administration.user.edit.php:172
-#: app/views/popup.massupdate.host.php:174
+#: app/views/popup.massupdate.host.php:170
 #: app/views/popup.massupdate.item.php:175
 #: app/views/popup.massupdate.item.php:199 disc_prototypes.php:218
 #: host_discovery.php:191 httpconf.php:74
@@ -13386,7 +13400,7 @@ msgstr "منفعل"
 #: include/views/configuration.host.discovery.edit.php:413
 #: include/views/configuration.host.discovery.edit.php:554
 #: include/views/configuration.host.discovery.edit.php:593
-#: include/views/configuration.host.prototype.edit.php:320
+#: include/views/configuration.host.prototype.edit.php:315
 #: include/views/configuration.httpconf.edit.php:170
 #: include/views/configuration.item.edit.php:480
 #: include/views/configuration.item.edit.php:637
@@ -13439,12 +13453,12 @@ msgstr ""
 msgid "Paste without external links"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:877
+#: app/controllers/CControllerPopupTriggerExpr.php:908
 #: app/views/monitoring.charts.view.php:106
 msgid "Pattern"
 msgstr ""
 
-#: actionconf.php:82 include/views/configuration.action.edit.php:163
+#: actionconf.php:82 include/views/configuration.action.edit.php:471
 msgid "Pause operations for suppressed problems"
 msgstr ""
 
@@ -13457,7 +13471,7 @@ msgstr ""
 msgid "Percent of time the virtual machine is unable to run because it is contending for access to the physical CPU(s), <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:213
+#: app/controllers/CControllerPopupTriggerExpr.php:244
 msgid "Percentage"
 msgstr ""
 
@@ -13481,10 +13495,11 @@ msgstr ""
 msgid "Performs a DNS query. Returns character string with the required type of information"
 msgstr ""
 
+#: app/controllers/CControllerPopupTriggerExpr.php:104
 #: app/partials/scheduledreport.formgrid.html.php:83
 #: app/partials/scheduledreport.table.html.php:42
 #: app/views/popup.lldoperation.php:116
-#: app/views/popup.massupdate.item.php:227 app/views/popup.triggerexpr.php:181
+#: app/views/popup.massupdate.item.php:227 app/views/popup.triggerexpr.php:182
 #: include/views/configuration.host.discovery.edit.php:632
 #: include/views/configuration.item.edit.php:735
 #: include/views/configuration.item.prototype.edit.php:714
@@ -13492,7 +13507,9 @@ msgstr ""
 msgid "Period"
 msgstr "دوره"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:95
+#: app/controllers/CControllerPopupTriggerExpr.php:96
+#: app/controllers/CControllerPopupTriggerExpr.php:109
+#: app/controllers/CControllerPopupTriggerExpr.php:1095
 msgid "Period shift"
 msgstr ""
 
@@ -13556,11 +13573,11 @@ msgstr "پخش صدا"
 msgid "Please check configuration parameters. If all is correct, press \"%1$s\" button, or \"%2$s\" button to change configuration parameters."
 msgstr ""
 
-#: app/views/js/popup.massupdate.js.php:401
+#: app/views/js/popup.massupdate.js.php:414
 msgid "Please confirm that you want to remove all macros."
 msgstr ""
 
-#: app/views/js/popup.massupdate.js.php:404
+#: app/views/js/popup.massupdate.js.php:417
 msgid "Please confirm that you want to remove all value mappings."
 msgstr ""
 
@@ -13646,7 +13663,7 @@ msgstr ""
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:832
+#: app/controllers/CControllerPopupTriggerExpr.php:863
 msgid "Power value"
 msgstr ""
 
@@ -13655,7 +13672,7 @@ msgstr ""
 msgid "Pre-installation summary"
 msgstr ""
 
-#: app/views/popup.triggerexpr.php:114
+#: app/views/popup.triggerexpr.php:115
 msgid "Prediction functions"
 msgstr ""
 
@@ -13772,9 +13789,9 @@ msgstr ""
 msgid "Private key file"
 msgstr "فابل کلید اختصاصی"
 
-#: app/partials/configuration.host.edit.html.php:315
-#: app/views/popup.massupdate.host.php:159
-#: include/views/configuration.host.prototype.edit.php:313
+#: app/partials/configuration.host.edit.html.php:310
+#: app/views/popup.massupdate.host.php:157
+#: include/views/configuration.host.prototype.edit.php:307
 msgid "Privilege level"
 msgstr "سطح ویژه"
 
@@ -14180,7 +14197,7 @@ msgstr ""
 msgid "Recovery expression syntax error."
 msgstr ""
 
-#: include/views/configuration.action.edit.php:393
+#: include/views/configuration.action.edit.php:386
 msgid "Recovery operations"
 msgstr ""
 
@@ -14310,20 +14327,20 @@ msgstr "فرمان راه دور"
 #: app/views/js/popup.massupdate.tmpl.js.php:59
 #: app/views/js/popup.massupdate.tmpl.js.php:96
 #: app/views/js/popup.massupdate.tmpl.js.php:108
-#: app/views/js/popup.service.edit.js.php:201
-#: app/views/js/popup.service.edit.js.php:225
-#: app/views/js/popup.service.edit.js.php:244
+#: app/views/js/popup.service.edit.js.php:200
+#: app/views/js/popup.service.edit.js.php:224
+#: app/views/js/popup.service.edit.js.php:243
 #: app/views/popup.dashboard.share.edit.php:85
 #: app/views/popup.dashboard.share.edit.php:106
 #: app/views/popup.lldoperation.php:152 app/views/popup.lldoverride.php:158
-#: app/views/popup.massupdate.host.php:52
-#: app/views/popup.massupdate.host.php:203
+#: app/views/popup.massupdate.host.php:89
+#: app/views/popup.massupdate.host.php:199
 #: app/views/popup.massupdate.item.php:137
 #: app/views/popup.massupdate.item.php:263
 #: app/views/popup.massupdate.item.php:482
 #: app/views/popup.massupdate.service.php:46
-#: app/views/popup.massupdate.template.php:54
-#: app/views/popup.massupdate.template.php:136
+#: app/views/popup.massupdate.template.php:94
+#: app/views/popup.massupdate.template.php:128
 #: app/views/popup.massupdate.trigger.php:80 app/views/popup.media.php:45
 #: app/views/popup.media.php:110 app/views/popup.service.edit.php:98
 #: app/views/popup.valuemap.edit.php:91
@@ -14332,10 +14349,10 @@ msgstr "فرمان راه دور"
 #: include/classes/widgets/CWidgetHelper.php:533
 #: include/classes/widgets/CWidgetHelper.php:586 include/forms.inc.php:1461
 #: include/forms.inc.php:2009 include/views/configuration.action.edit.php:97
-#: include/views/configuration.action.edit.php:256
-#: include/views/configuration.action.edit.php:284
-#: include/views/configuration.action.edit.php:368
-#: include/views/configuration.action.edit.php:446
+#: include/views/configuration.action.edit.php:249
+#: include/views/configuration.action.edit.php:277
+#: include/views/configuration.action.edit.php:361
+#: include/views/configuration.action.edit.php:439
 #: include/views/configuration.host.discovery.edit.php:151
 #: include/views/configuration.host.discovery.edit.php:196
 #: include/views/configuration.host.discovery.edit.php:222
@@ -14379,7 +14396,7 @@ msgstr "فرمان راه دور"
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:93
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:122
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:144
-#: include/views/js/configuration.host.prototype.edit.js.php:33
+#: include/views/js/configuration.host.prototype.edit.js.php:35
 #: include/views/js/configuration.httpconf.edit.js.php:52
 #: include/views/js/configuration.httpconf.edit.js.php:77
 #: include/views/js/configuration.item.list.js.php:64
@@ -14462,14 +14479,14 @@ msgstr ""
 msgid "Repeats"
 msgstr ""
 
-#: app/views/popup.massupdate.host.php:51
-#: app/views/popup.massupdate.host.php:113
-#: app/views/popup.massupdate.host.php:202
+#: app/views/popup.massupdate.host.php:47
+#: app/views/popup.massupdate.host.php:88
+#: app/views/popup.massupdate.host.php:198
 #: app/views/popup.massupdate.item.php:481
 #: app/views/popup.massupdate.service.php:45
-#: app/views/popup.massupdate.template.php:53
-#: app/views/popup.massupdate.template.php:90
-#: app/views/popup.massupdate.template.php:135
+#: app/views/popup.massupdate.template.php:49
+#: app/views/popup.massupdate.template.php:93
+#: app/views/popup.massupdate.template.php:127
 #: app/views/popup.massupdate.trigger.php:79 include/items.inc.php:1807
 #: include/views/configuration.trigger.prototype.edit.php:169
 #: include/views/configuration.trigger.prototype.edit.php:362
@@ -14482,8 +14499,8 @@ msgstr "جایگزینی"
 msgid "Replace dependencies"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:647
-#: app/controllers/CControllerPopupTriggerExpr.php:882
+#: app/controllers/CControllerPopupTriggerExpr.php:678
+#: app/controllers/CControllerPopupTriggerExpr.php:913
 msgid "Replacement"
 msgstr ""
 
@@ -14684,7 +14701,7 @@ msgstr ""
 #: app/views/popup.itemtestedit.view.php:325
 #: app/views/popup.itemtestedit.view.php:365
 #: app/views/popup.testtriggerexpr.php:49
-#: app/views/popup.testtriggerexpr.php:102 app/views/popup.triggerexpr.php:217
+#: app/views/popup.testtriggerexpr.php:102 app/views/popup.triggerexpr.php:236
 #: include/classes/debug/CProfiler.php:183
 msgid "Result"
 msgstr "نتیجه"
@@ -15213,7 +15230,7 @@ msgstr ""
 msgid "Script"
 msgstr "اسکریپت"
 
-#: include/classes/api/services/CScript.php:1346
+#: include/classes/api/services/CScript.php:1348
 #, c-format
 msgid "Script \"%1$s\" already exists."
 msgstr ""
@@ -15275,6 +15292,15 @@ msgstr ""
 
 #: app/views/monitoring.charts.view.php:103
 msgid "Search type"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:114
+#: app/controllers/CControllerPopupTriggerExpr.php:1105
+msgid "Season"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1120
+msgid "Season deviation window"
 msgstr ""
 
 #: include/hosts.inc.php:434
@@ -15355,7 +15381,7 @@ msgstr ""
 msgid "Selected"
 msgstr "انتخاب شده"
 
-#: actionconf.php:488
+#: actionconf.php:494
 msgid "Selected actions deleted"
 msgstr ""
 
@@ -15594,6 +15620,7 @@ msgid "Services updated"
 msgstr ""
 
 #: include/classes/core/ZBase.php:244 include/classes/core/ZBase.php:471
+#: index_sso.php:242 index_sso.php:249
 msgid "Session initialization error."
 msgstr ""
 
@@ -16047,7 +16074,7 @@ msgstr ""
 msgid "Specified role was not found."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2932
+#: include/classes/api/services/CAction.php:2942
 msgid "Specified script does not exist or you do not have rights on it for action operation command."
 msgstr ""
 
@@ -16082,8 +16109,8 @@ msgstr "آیتم های استاندارد"
 msgid "Standby"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:637
-#: app/controllers/CControllerPopupTriggerExpr.php:755
+#: app/controllers/CControllerPopupTriggerExpr.php:668
+#: app/controllers/CControllerPopupTriggerExpr.php:786
 msgid "Start"
 msgstr ""
 
@@ -16091,7 +16118,7 @@ msgstr ""
 msgid "Start date"
 msgstr ""
 
-#: include/views/configuration.action.edit.php:175
+#: include/views/configuration.action.edit.php:168
 msgid "Start in"
 msgstr ""
 
@@ -16170,7 +16197,7 @@ msgstr ""
 #: app/views/monitoring.service.list.php:79
 #: app/views/monitoring.widget.actionlog.view.php:38
 #: app/views/monitoring.widget.problems.view.php:56
-#: app/views/popup.massupdate.host.php:96
+#: app/views/popup.massupdate.host.php:135
 #: app/views/popup.massupdate.item.php:325
 #: app/views/popup.scheduledreport.subscription.php:114
 #: app/views/popup.service.statusrule.edit.php:74
@@ -16274,7 +16301,7 @@ msgid "Step with name \"%1$s\" already exists."
 msgstr ""
 
 #: app/partials/popup.operations.php:51 httpconf.php:51
-#: include/views/configuration.action.edit.php:175
+#: include/views/configuration.action.edit.php:168
 #: include/views/configuration.httpconf.edit.php:227
 #: include/views/configuration.httpconf.edit.php:236
 msgid "Steps"
@@ -16328,12 +16355,12 @@ msgstr "مستقیم"
 msgid "Strict"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:497
+#: app/controllers/CControllerPopupTriggerExpr.php:528
 #: include/triggers.inc.php:1596
 msgid "String"
 msgstr ""
 
-#: app/views/popup.triggerexpr.php:115
+#: app/views/popup.triggerexpr.php:116
 msgid "String functions"
 msgstr ""
 
@@ -16354,10 +16381,10 @@ msgstr ""
 msgid "Subject"
 msgstr "موضوع"
 
-#: app/partials/configuration.host.edit.html.php:505
+#: app/partials/configuration.host.edit.html.php:500
 #: app/views/administration.proxy.edit.php:138
-#: app/views/popup.massupdate.host.php:276
-#: include/views/configuration.host.prototype.edit.php:403
+#: app/views/popup.massupdate.host.php:271
+#: include/views/configuration.host.prototype.edit.php:407
 msgctxt "encryption certificate"
 msgid "Subject"
 msgstr ""
@@ -16551,7 +16578,7 @@ msgstr ""
 #: app/controllers/CControllerPopupLldOperation.php:138
 #: app/partials/administration.usergroup.tagfilters.html.php:29
 #: app/partials/configuration.filter.items.php:166
-#: app/partials/configuration.host.edit.html.php:530
+#: app/partials/configuration.host.edit.html.php:524
 #: app/partials/monitoring.host.filter.php:133
 #: app/partials/monitoring.host.view.html.php:32
 #: app/partials/monitoring.latest.view.html.php:58
@@ -16567,13 +16594,13 @@ msgstr ""
 #: app/views/monitoring.web.view.php:87
 #: app/views/monitoring.widget.problems.view.php:68
 #: app/views/popup.lldoperation.php:262
-#: app/views/popup.massupdate.host.php:198
-#: app/views/popup.massupdate.host.php:293
+#: app/views/popup.massupdate.host.php:194
+#: app/views/popup.massupdate.host.php:287
 #: app/views/popup.massupdate.item.php:477
 #: app/views/popup.massupdate.item.php:493
 #: app/views/popup.massupdate.service.php:40
-#: app/views/popup.massupdate.template.php:131
-#: app/views/popup.massupdate.template.php:149
+#: app/views/popup.massupdate.template.php:123
+#: app/views/popup.massupdate.template.php:140
 #: app/views/popup.massupdate.trigger.php:75
 #: app/views/popup.massupdate.trigger.php:150
 #: app/views/popup.service.edit.php:263 app/views/popup.service.edit.php:346
@@ -16590,7 +16617,7 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:67
 #: include/classes/widgets/forms/CWidgetFormWeb.php:61
 #: include/events.inc.php:263 include/forms.inc.php:89
-#: include/views/configuration.host.prototype.edit.php:328
+#: include/views/configuration.host.prototype.edit.php:323
 #: include/views/configuration.host.prototype.list.php:63
 #: include/views/configuration.httpconf.edit.php:237
 #: include/views/configuration.httpconf.list.php:77
@@ -16600,7 +16627,7 @@ msgstr ""
 #: include/views/configuration.item.prototype.edit.php:861
 #: include/views/configuration.item.prototype.list.php:67
 #: include/views/configuration.maintenance.edit.php:247
-#: include/views/configuration.template.edit.php:198
+#: include/views/configuration.template.edit.php:179
 #: include/views/configuration.template.list.php:83
 #: include/views/configuration.template.list.php:126
 #: include/views/configuration.trigger.prototype.edit.php:551
@@ -16636,14 +16663,12 @@ msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:239
 #: app/views/administration.mediatype.edit.php:280
-#: app/views/popup.massupdate.template.php:147 app/views/search.php:278
+#: app/views/popup.massupdate.template.php:139 app/views/search.php:278
 #: include/actions.inc.php:49 include/forms.inc.php:529
 #: include/views/configuration.graph.list.php:149
 #: include/views/configuration.host.discovery.list.php:192
 #: include/views/configuration.httpconf.list.php:130
 #: include/views/configuration.item.list.php:83
-#: include/views/configuration.template.edit.php:46
-#: include/views/configuration.template.edit.php:118
 #: include/views/configuration.triggers.list.php:190 report2.php:390
 msgid "Template"
 msgstr "قالب"
@@ -16687,7 +16712,7 @@ msgstr ""
 msgid "Template dashboards"
 msgstr ""
 
-#: templates.php:425 templates.php:439 templates.php:472
+#: templates.php:426 templates.php:440 templates.php:473
 msgid "Template deleted"
 msgstr ""
 
@@ -16699,11 +16724,11 @@ msgstr "گروه قالب"
 msgid "Template linkage"
 msgstr "پیوند قالب"
 
-#: include/views/configuration.template.edit.php:211
+#: include/views/configuration.template.edit.php:192
 msgid "Template macros"
 msgstr ""
 
-#: include/views/configuration.template.edit.php:82 templates.php:41
+#: include/views/configuration.template.edit.php:54 templates.php:41
 msgid "Template name"
 msgstr "نام قالب"
 
@@ -16738,13 +16763,12 @@ msgstr ""
 #: app/controllers/CControllerPopupImportCompare.php:132
 #: app/controllers/CControllerPopupImportCompare.php:165
 #: app/partials/configuration.filter.items.php:72
-#: app/partials/configuration.host.edit.html.php:528
+#: app/partials/configuration.host.edit.html.php:210
 #: app/partials/popup.operations.php:212
 #: app/views/configuration.host.list.php:81
 #: app/views/configuration.host.list.php:191
 #: app/views/popup.condition.common.php:357 app/views/popup.import.php:31
-#: app/views/popup.massupdate.host.php:291 app/views/search.php:223
-#: app/views/search.php:227 app/views/search.php:369
+#: app/views/search.php:223 app/views/search.php:227 app/views/search.php:369
 #: include/classes/helpers/CMenuHelper.php:144
 #: include/classes/helpers/CRoleHelper.php:358
 #: include/views/configuration.copy.elements.php:63
@@ -16753,10 +16777,12 @@ msgstr ""
 #: include/views/configuration.hostgroups.list.php:68
 #: include/views/configuration.hostgroups.list.php:183
 #: include/views/configuration.hostgroups.list.php:187
-#: include/views/configuration.host.prototype.edit.php:302
+#: include/views/configuration.host.prototype.edit.php:175
 #: include/views/configuration.host.prototype.list.php:60
 #: include/views/configuration.httpconf.list.php:50
 #: include/views/configuration.template.edit.php:28
+#: include/views/configuration.template.edit.php:145
+#: include/views/configuration.template.edit.php:176
 #: include/views/configuration.template.list.php:87
 #: include/views/configuration.triggers.list.php:48
 msgid "Templates"
@@ -16767,7 +16793,7 @@ msgstr "قالب ها"
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr ""
 
-#: app/controllers/CControllerPopupMassupdateTemplate.php:348
+#: app/controllers/CControllerPopupMassupdateTemplate.php:350
 msgid "Templates updated"
 msgstr ""
 
@@ -16979,7 +17005,7 @@ msgstr "پوسته"
 msgid "This day last week"
 msgstr ""
 
-#: app/partials/configuration.host.edit.html.php:403
+#: app/partials/configuration.host.edit.html.php:398
 #, c-format
 msgid "This field is automatically populated by item \"%1$s\"."
 msgstr ""
@@ -17017,7 +17043,7 @@ msgstr "امسال"
 msgid "This year so far"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:261
+#: app/controllers/CControllerPopupTriggerExpr.php:292
 msgid "Threshold"
 msgstr ""
 
@@ -17050,15 +17076,15 @@ msgstr ""
 msgid "Till"
 msgstr "تا"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:50
-#: app/controllers/CControllerPopupTriggerExpr.php:232
+#: app/controllers/CControllerPopupTriggerExpr.php:51
+#: app/controllers/CControllerPopupTriggerExpr.php:263
 #: app/views/hintbox.eventlist.php:61 app/views/hintbox.eventlist.php:67
 #: app/views/monitoring.widget.actionlog.view.php:33
 #: app/views/monitoring.widget.problems.view.php:38
 #: app/views/popup.itemtestedit.view.php:270
 #: app/views/popup.service.time.edit.php:70
 #: app/views/popup.service.time.edit.php:98
-#: app/views/popup.triggerexpr.php:174 app/views/popup.triggerexpr.php:178
+#: app/views/popup.triggerexpr.php:175 app/views/popup.triggerexpr.php:179
 #: app/views/reports.auditlog.list.php:89 include/actions.inc.php:1700
 #: include/actions.inc.php:1754 include/actions.inc.php:1827
 #: include/actions.inc.php:1921 include/actions.inc.php:1976
@@ -17095,13 +17121,13 @@ msgstr ""
 msgid "Time period"
 msgstr "دوره زمانی"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:68
-#: app/controllers/CControllerPopupTriggerExpr.php:82
-#: app/controllers/CControllerPopupTriggerExpr.php:152
-#: app/controllers/CControllerPopupTriggerExpr.php:171
-#: app/controllers/CControllerPopupTriggerExpr.php:208
-#: app/controllers/CControllerPopupTriggerExpr.php:227
-#: app/controllers/CControllerPopupTriggerExpr.php:256
+#: app/controllers/CControllerPopupTriggerExpr.php:69
+#: app/controllers/CControllerPopupTriggerExpr.php:83
+#: app/controllers/CControllerPopupTriggerExpr.php:183
+#: app/controllers/CControllerPopupTriggerExpr.php:202
+#: app/controllers/CControllerPopupTriggerExpr.php:239
+#: app/controllers/CControllerPopupTriggerExpr.php:258
+#: app/controllers/CControllerPopupTriggerExpr.php:287
 #: include/classes/widgets/CWidgetHelper.php:784
 #: include/classes/widgets/CWidgetHelper.php:860
 #: include/classes/widgets/CWidgetHelper.php:1129
@@ -17789,9 +17815,9 @@ msgstr "واحدها"
 #: include/items.inc.php:45 include/items.inc.php:110
 #: include/items.inc.php:133 include/items.inc.php:167
 #: include/maintenances.inc.php:33 include/maps.inc.php:39
-#: include/triggers.inc.php:83 include/triggers.inc.php:1867
+#: include/triggers.inc.php:83 include/triggers.inc.php:1872
 #: include/users.inc.php:64 include/users.inc.php:87
-#: include/views/configuration.action.edit.php:233
+#: include/views/configuration.action.edit.php:226
 #: include/views/configuration.triggers.list.php:77
 msgid "Unknown"
 msgstr "ناشناخته"
@@ -17809,7 +17835,7 @@ msgid "Unknown error"
 msgstr ""
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:47
-#: app/controllers/CControllerPopupTriggerExpr.php:1258
+#: app/controllers/CControllerPopupTriggerExpr.php:1346
 #: include/triggers.inc.php:1146
 msgid "Unknown host item, no such item in selected host"
 msgstr ""
@@ -17841,16 +17867,16 @@ msgstr ""
 msgid "Unlimited"
 msgstr ""
 
-#: app/partials/configuration.host.edit.html.php:243
-#: app/views/popup.massupdate.host.php:114
-#: app/views/popup.massupdate.template.php:91
-#: include/views/configuration.host.prototype.edit.php:260
-#: include/views/configuration.template.edit.php:145
+#: app/partials/configuration.host.edit.html.php:171
+#: app/views/popup.massupdate.host.php:48
+#: app/views/popup.massupdate.template.php:50
+#: include/views/configuration.host.prototype.edit.php:147
+#: include/views/configuration.template.edit.php:110
 msgid "Unlink"
 msgstr "حذف پیوند"
 
-#: app/partials/configuration.host.edit.html.php:247
-#: include/views/configuration.template.edit.php:151
+#: app/partials/configuration.host.edit.html.php:175
+#: include/views/configuration.template.edit.php:114
 msgid "Unlink and clear"
 msgstr "حذف پیوند و پاک کردن"
 
@@ -17945,10 +17971,10 @@ msgstr ""
 #: app/views/popup.dashboard.share.edit.php:155
 #: app/views/popup.discovery.check.php:137 app/views/popup.host.edit.php:61
 #: app/views/popup.httpstep.php:181 app/views/popup.lldoperation.php:290
-#: app/views/popup.lldoverride.php:220 app/views/popup.massupdate.host.php:323
+#: app/views/popup.lldoverride.php:220 app/views/popup.massupdate.host.php:317
 #: app/views/popup.massupdate.item.php:511
 #: app/views/popup.massupdate.service.php:67
-#: app/views/popup.massupdate.template.php:178
+#: app/views/popup.massupdate.template.php:169
 #: app/views/popup.massupdate.trigger.php:165 app/views/popup.media.php:127
 #: app/views/popup.mediatype.message.php:104
 #: app/views/popup.scheduledreport.subscription.php:132
@@ -17957,16 +17983,16 @@ msgstr ""
 #: app/views/popup.service.time.edit.php:166
 #: app/views/popup.triggerwizard.php:147 app/views/popup.valuemap.edit.php:126
 #: include/classes/html/CTabFilter.php:94
-#: include/views/configuration.action.edit.php:489
+#: include/views/configuration.action.edit.php:494
 #: include/views/configuration.graph.edit.php:494
 #: include/views/configuration.host.discovery.edit.php:977
 #: include/views/configuration.hostgroups.edit.php:61
-#: include/views/configuration.host.prototype.edit.php:422
+#: include/views/configuration.host.prototype.edit.php:417
 #: include/views/configuration.httpconf.edit.php:271
 #: include/views/configuration.item.edit.php:1041
 #: include/views/configuration.item.prototype.edit.php:900
 #: include/views/configuration.maintenance.edit.php:264
-#: include/views/configuration.template.edit.php:236
+#: include/views/configuration.template.edit.php:217
 #: include/views/configuration.trigger.prototype.edit.php:654
 #: include/views/configuration.triggers.edit.php:647
 #: include/views/monitoring.sysmap.constructor.php:76
@@ -17995,7 +18021,7 @@ msgstr "بروزرسانی در حال حاضر"
 msgid "Update interval"
 msgstr " فاصله به‌روزرسانی"
 
-#: include/views/configuration.action.edit.php:469
+#: include/views/configuration.action.edit.php:462
 msgid "Update operations"
 msgstr ""
 
@@ -18022,7 +18048,7 @@ msgstr "بارگذاری"
 msgid "Upper level maps"
 msgstr "نقشه های سطح بالاتر"
 
-#: app/views/js/popup.service.edit.js.php:232
+#: app/views/js/popup.service.edit.js.php:231
 #: app/views/popup.service.time.edit.php:45
 #: include/classes/screens/CScreenDiscovery.php:120
 msgid "Uptime"
@@ -18205,7 +18231,7 @@ msgstr[0] ""
 
 #: include/classes/api/services/CDashboard.php:482
 #: include/classes/api/services/CReport.php:463
-#: include/classes/api/services/CScript.php:776
+#: include/classes/api/services/CScript.php:778
 #: include/classes/api/services/CSettings.php:260
 #: include/classes/api/services/CUser.php:741
 #, c-format
@@ -18339,15 +18365,15 @@ msgid "User/Recipient"
 msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:217
-#: app/partials/configuration.host.edit.html.php:319
+#: app/partials/configuration.host.edit.html.php:314
 #: app/views/administration.mediatype.edit.php:94
 #: app/views/administration.script.edit.php:139
 #: app/views/administration.user.edit.php:65
 #: app/views/administration.user.list.php:62
 #: app/views/administration.user.list.php:106
-#: app/views/popup.massupdate.host.php:167 disc_prototypes.php:209
+#: app/views/popup.massupdate.host.php:164 disc_prototypes.php:209
 #: host_discovery.php:182
-#: include/views/configuration.host.prototype.edit.php:317
+#: include/views/configuration.host.prototype.edit.php:311
 #: include/views/general.login.php:70 index.php:32 items.php:210
 msgid "Username"
 msgstr "نام کاربری"
@@ -18661,11 +18687,11 @@ msgstr ""
 #: app/views/popup.httpstep.php:96 app/views/popup.httpstep.php:120
 #: app/views/popup.httpstep.php:139 app/views/popup.itemtestedit.view.php:262
 #: app/views/popup.lldoperation.php:268
-#: app/views/popup.massupdate.host.php:207
+#: app/views/popup.massupdate.host.php:203
 #: app/views/popup.massupdate.item.php:120
 #: app/views/popup.massupdate.item.php:486
 #: app/views/popup.massupdate.service.php:50
-#: app/views/popup.massupdate.template.php:140
+#: app/views/popup.massupdate.template.php:132
 #: app/views/popup.massupdate.trigger.php:84
 #: app/views/popup.service.edit.php:65 app/views/popup.service.edit.php:271
 #: app/views/popup.testtriggerexpr.php:31 app/views/popup.valuemap.edit.php:51
@@ -18739,14 +18765,14 @@ msgstr ""
 #: app/controllers/CControllerPopupGeneric.php:357
 #: app/controllers/CControllerPopupValueMapEdit.php:92
 #: app/partials/configuration.filter.items.php:99
-#: app/partials/configuration.host.edit.html.php:536
+#: app/partials/configuration.host.edit.html.php:530
 #: app/partials/massupdate.valuemaps.tab.php:90
-#: app/views/popup.massupdate.host.php:306
+#: app/views/popup.massupdate.host.php:300
 #: app/views/popup.massupdate.item.php:351
-#: app/views/popup.massupdate.template.php:162
+#: app/views/popup.massupdate.template.php:153
 #: include/views/configuration.item.edit.php:883
 #: include/views/configuration.item.prototype.edit.php:800
-#: include/views/configuration.template.edit.php:223
+#: include/views/configuration.template.edit.php:204
 msgid "Value mapping"
 msgstr "نگاشت مقدار"
 
@@ -18789,7 +18815,7 @@ msgstr ""
 msgid "Valuemap with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:624
+#: app/controllers/CControllerPopupTriggerExpr.php:655
 #: app/views/monitoring.charts.view.php:56
 #: include/views/monitoring.history.php:78
 msgid "Values"
@@ -18889,7 +18915,7 @@ msgstr ""
 #: app/partials/configuration.host.edit.html.php:98
 #: app/views/configuration.discovery.edit.php:118
 #: include/views/configuration.host.prototype.edit.php:76
-#: include/views/configuration.template.edit.php:88
+#: include/views/configuration.template.edit.php:61
 #: include/views/inventory.host.view.php:53
 msgid "Visible name"
 msgstr "نام قابل رؤیت"
@@ -18915,7 +18941,7 @@ msgstr ""
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:172
 #: app/views/administration.trigdisplay.edit.php:118
-#: app/views/js/popup.massupdate.js.php:409 include/items.inc.php:33
+#: app/views/js/popup.massupdate.js.php:422 include/items.inc.php:33
 #: include/views/general.warning.php:26 jsLoader.php:176
 msgid "Warning"
 msgstr "اخطار"
@@ -19020,6 +19046,10 @@ msgstr "چهارشنبه"
 #: include/func.inc.php:121 include/func.inc.php:211 jsLoader.php:245
 msgid "Wednesday"
 msgstr "چهارشنبه"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:120
+msgid "Week"
+msgstr ""
 
 #: app/partials/scheduledreport.formgrid.html.php:99
 #: app/partials/scheduledreport.table.html.php:50
@@ -19293,7 +19323,8 @@ msgctxt "XML date and time format"
 msgid "YYYY-MM-DDThh:mm:ssZ"
 msgstr ""
 
-#: report4.php:116 report4.php:152
+#: app/controllers/CControllerPopupTriggerExpr.php:122 report4.php:116
+#: report4.php:152
 msgid "Year"
 msgstr "سال"
 
@@ -19353,7 +19384,7 @@ msgstr ""
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr ""
 
-#: include/func.inc.php:1533 index_http.php:87 index_sso.php:262
+#: include/func.inc.php:1533 index_http.php:87 index_sso.php:277
 msgid "You are not logged in"
 msgstr ""
 
@@ -19594,11 +19625,11 @@ msgstr ""
 msgid "a time unit is expected"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:302
+#: app/controllers/CControllerPopupTriggerExpr.php:333
 msgid "abs() - Absolute value"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:308
+#: app/controllers/CControllerPopupTriggerExpr.php:339
 msgid "acos() - The arccosine of a value as an angle, expressed in radians"
 msgstr ""
 
@@ -19693,7 +19724,7 @@ msgstr ""
 msgid "an explicit time is expected"
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2712
+#: include/classes/api/services/CAction.php:2722
 #: include/classes/api/services/CCorrelation.php:730
 msgid "an identifier is not defined in the formula"
 msgstr ""
@@ -19737,11 +19768,11 @@ msgstr "به عنوان قرمز"
 msgid "ascending"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:315
+#: app/controllers/CControllerPopupTriggerExpr.php:346
 msgid "ascii() - Returns the ASCII code of the leftmost character of the value"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:322
+#: app/controllers/CControllerPopupTriggerExpr.php:353
 msgid "asin() - The arcsine of a value as an angle, expressed in radians"
 msgstr ""
 
@@ -19755,11 +19786,11 @@ msgstr ""
 msgid "at least one override option must be specified"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:329
+#: app/controllers/CControllerPopupTriggerExpr.php:360
 msgid "atan() - The arctangent of a value as an angle, expressed in radians"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:336
+#: app/controllers/CControllerPopupTriggerExpr.php:367
 msgid "atan2() - The arctangent of the ordinate (exprue) and abscissa coordinates specified as an angle, expressed in radians"
 msgstr ""
 
@@ -19781,39 +19812,47 @@ msgstr ""
 msgid "avg"
 msgstr "میانگین"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:349
+#: app/controllers/CControllerPopupTriggerExpr.php:380
 msgid "avg() - Average value of a period T"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:356
-msgid "between() - Checks if a value belongs to the given range (1 - in range, 0 - otherwise)"
+#: app/controllers/CControllerPopupTriggerExpr.php:1052
+msgid "baselinedev() - Returns the number of deviations between data periods in seasons and the last data period"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:374
-msgid "bitand() - Bitwise AND"
+#: app/controllers/CControllerPopupTriggerExpr.php:1059
+msgid "baselinewma() - Calculates baseline by averaging data periods in seasons"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:387
+msgid "between() - Checks if a value belongs to the given range (1 - in range, 0 - otherwise)"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:405
+msgid "bitand() - Bitwise AND"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:418
 msgid "bitlength() - Returns the length in bits"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:394
+#: app/controllers/CControllerPopupTriggerExpr.php:425
 msgid "bitlshift() - Bitwise shift left"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:407
+#: app/controllers/CControllerPopupTriggerExpr.php:438
 msgid "bitnot() - Bitwise NOT"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:414
+#: app/controllers/CControllerPopupTriggerExpr.php:445
 msgid "bitor() - Bitwise OR"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:427
+#: app/controllers/CControllerPopupTriggerExpr.php:458
 msgid "bitrshift() - Bitwise shift right"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:440
+#: app/controllers/CControllerPopupTriggerExpr.php:471
 msgid "bitxor() - Bitwise exclusive OR"
 msgstr ""
 
@@ -19828,7 +19867,7 @@ msgstr ""
 msgid "both username and password should be either present or empty"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:453
+#: app/controllers/CControllerPopupTriggerExpr.php:484
 msgid "bytelength() - Returns the length in bytes"
 msgstr ""
 
@@ -19870,7 +19909,7 @@ msgstr ""
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:41
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:47
 #: app/controllers/CControllerUserUpdateGeneral.php:111
-#: include/classes/api/services/CAction.php:2735
+#: include/classes/api/services/CAction.php:2745
 #: include/classes/api/services/CAutoregistration.php:163
 #: include/classes/api/services/CDiscoveryRule.php:1989
 #: include/classes/api/services/CDRule.php:210
@@ -19958,23 +19997,23 @@ msgstr ""
 msgid "cannot update property for templated discovery rule"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:460
+#: app/controllers/CControllerPopupTriggerExpr.php:491
 msgid "cbrt() - Cube root"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:467
+#: app/controllers/CControllerPopupTriggerExpr.php:498
 msgid "ceil() - Rounds up to the nearest greater integer"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:474
+#: app/controllers/CControllerPopupTriggerExpr.php:505
 msgid "change() - Difference between last and previous value"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:480
+#: app/controllers/CControllerPopupTriggerExpr.php:511
 msgid "changecount() - Number of changes between adjacent values, Mode (all - all changes, inc - only increases, dec - only decreases)"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:487
+#: app/controllers/CControllerPopupTriggerExpr.php:518
 msgid "char() - Returns the character which represents the given ASCII code"
 msgstr ""
 
@@ -20001,7 +20040,7 @@ msgstr ""
 msgid "comma-separated list"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:494
+#: app/controllers/CControllerPopupTriggerExpr.php:525
 msgid "concat() - Returns a string that is the result of concatenating value to string"
 msgstr ""
 
@@ -20016,15 +20055,15 @@ msgstr ""
 msgid "contains"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:507
+#: app/controllers/CControllerPopupTriggerExpr.php:538
 msgid "cos() - The cosine of a value, where the value is an angle expressed in radians"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:514
+#: app/controllers/CControllerPopupTriggerExpr.php:545
 msgid "cosh() - The hyperbolic cosine of a value"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:521
+#: app/controllers/CControllerPopupTriggerExpr.php:552
 msgid "cot() - The cotangent of a value, where the value is an angle expressed in radians"
 msgstr ""
 
@@ -20032,11 +20071,11 @@ msgstr ""
 msgid "count"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:528
+#: app/controllers/CControllerPopupTriggerExpr.php:559
 msgid "count() - Number of successfully retrieved values V (which fulfill operator O) for period T"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:535
+#: app/controllers/CControllerPopupTriggerExpr.php:566
 msgid "countunique() - The number of unique values"
 msgstr ""
 
@@ -20049,15 +20088,15 @@ msgstr ""
 msgid "d.M"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:542
+#: app/controllers/CControllerPopupTriggerExpr.php:573
 msgid "date() - Current date"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:548
+#: app/controllers/CControllerPopupTriggerExpr.php:579
 msgid "dayofmonth() - Day of month"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:554
+#: app/controllers/CControllerPopupTriggerExpr.php:585
 msgid "dayofweek() - Day of week"
 msgstr ""
 
@@ -20075,7 +20114,7 @@ msgstr "روز"
 msgid "default"
 msgstr "پیش‌فرض"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:560
+#: app/controllers/CControllerPopupTriggerExpr.php:591
 msgid "degrees() - Converts a value from radians to degrees"
 msgstr ""
 
@@ -20152,7 +20191,7 @@ msgstr ""
 msgid "does not match"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:567
+#: app/controllers/CControllerPopupTriggerExpr.php:598
 msgid "e() - Returns Euler's number"
 msgstr ""
 
@@ -20175,11 +20214,11 @@ msgstr ""
 msgid "exists"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:572
+#: app/controllers/CControllerPopupTriggerExpr.php:603
 msgid "exp() - Euler's number at a power of a value"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:579
+#: app/controllers/CControllerPopupTriggerExpr.php:610
 msgid "expm1() - Euler's number at a power of a value minus 1"
 msgstr ""
 
@@ -20195,7 +20234,7 @@ msgstr ""
 msgid "file format is unsupported"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:586
+#: app/controllers/CControllerPopupTriggerExpr.php:617
 msgid "find() - Check occurrence of pattern V (which fulfill operator O) for period T (1 - match, 0 - no match)"
 msgstr ""
 
@@ -20209,15 +20248,15 @@ msgstr ""
 msgid "first parameter is expected"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:593
+#: app/controllers/CControllerPopupTriggerExpr.php:624
 msgid "first() - The oldest value in the specified time interval"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:600
+#: app/controllers/CControllerPopupTriggerExpr.php:631
 msgid "floor() - Rounds down to the nearest smaller integer"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:607
+#: app/controllers/CControllerPopupTriggerExpr.php:638
 msgid "forecast() - Forecast for next t seconds based on period T"
 msgstr ""
 
@@ -20225,7 +20264,7 @@ msgstr ""
 msgid "fourth"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:614
+#: app/controllers/CControllerPopupTriggerExpr.php:645
 msgid "fuzzytime() - Difference between item value (as timestamp) and Zabbix server timestamp is less than or equal to T seconds (1 - true, 0 - false)"
 msgstr ""
 
@@ -20299,7 +20338,7 @@ msgstr "در"
 msgid "in range"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:621
+#: app/controllers/CControllerPopupTriggerExpr.php:652
 msgid "in() - Checks if a value equals to one of the listed values (1 - equals, 0 - otherwise)"
 msgstr ""
 
@@ -20308,11 +20347,11 @@ msgstr ""
 msgid "including subgroups"
 msgstr ""
 
-#: include/classes/parsers/C10TriggerExpression.php:521
+#: include/classes/parsers/C10TriggerExpression.php:525
 msgid "incorrect calculated item formula"
 msgstr ""
 
-#: include/classes/parsers/C10TriggerExpression.php:537
+#: include/classes/parsers/C10TriggerExpression.php:541
 #, c-format
 msgid "incorrect calculated item formula starting from \"%1$s\""
 msgstr ""
@@ -20331,7 +20370,7 @@ msgstr ""
 msgid "incorrect expression starting from \"%1$s\""
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2705
+#: include/classes/api/services/CAction.php:2715
 #: include/classes/api/services/CCorrelation.php:723
 msgid "incorrect number of conditions"
 msgstr ""
@@ -20349,7 +20388,7 @@ msgstr ""
 msgid "incorrect usage of function \"%1$s\""
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:634
+#: app/controllers/CControllerPopupTriggerExpr.php:665
 msgid "insert() - Inserts specified characters or spaces into a character string, beginning at a specified position in the string"
 msgstr ""
 
@@ -20409,7 +20448,7 @@ msgstr ""
 msgid "invalid host name"
 msgstr ""
 
-#: include/classes/validators/CHistFunctionValidator.php:80
+#: include/classes/validators/CHistFunctionValidator.php:82
 #: include/classes/validators/CMathFunctionValidator.php:86
 #, c-format
 msgid "invalid number of parameters in function \"%1$s\""
@@ -20429,6 +20468,16 @@ msgstr ""
 #: include/classes/validators/CHistFunctionValidator.php:64
 #, c-format
 msgid "invalid second parameter in function \"%1$s\""
+msgstr ""
+
+#: include/classes/validators/CHistFunctionValidator.php:69
+#, c-format
+msgid "invalid seventh parameter in function \"%1$s\""
+msgstr ""
+
+#: include/classes/validators/CHistFunctionValidator.php:68
+#, c-format
+msgid "invalid sixth parameter in function \"%1$s\""
 msgstr ""
 
 #: include/classes/validators/CHistFunctionValidator.php:65
@@ -20472,7 +20521,7 @@ msgstr ""
 msgid "key is empty"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:657
+#: app/controllers/CControllerPopupTriggerExpr.php:688
 msgid "kurtosis() - Measures the \"tailedness\" of the probability distribution"
 msgstr ""
 
@@ -20488,7 +20537,7 @@ msgctxt "week of month"
 msgid "last"
 msgstr "آخرین"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:664
+#: app/controllers/CControllerPopupTriggerExpr.php:695
 msgid "last() - Last (most recent) T value"
 msgstr ""
 
@@ -20496,11 +20545,11 @@ msgstr ""
 msgid "left"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:671
+#: app/controllers/CControllerPopupTriggerExpr.php:702
 msgid "left() - Returns the leftmost count characters"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:684
+#: app/controllers/CControllerPopupTriggerExpr.php:715
 msgid "length() - Length of last (most recent) T value in characters"
 msgstr ""
 
@@ -20508,23 +20557,23 @@ msgstr ""
 msgid "list of characters"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:690
+#: app/controllers/CControllerPopupTriggerExpr.php:721
 msgid "log() - Natural logarithm"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:697
+#: app/controllers/CControllerPopupTriggerExpr.php:728
 msgid "log10() - Decimal logarithm"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:704
+#: app/controllers/CControllerPopupTriggerExpr.php:735
 msgid "logeventid() - Event ID of last log entry matching regular expression V for period T (1 - match, 0 - no match)"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:711
+#: app/controllers/CControllerPopupTriggerExpr.php:742
 msgid "logseverity() - Log severity of the last log entry for period T"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:718
+#: app/controllers/CControllerPopupTriggerExpr.php:749
 msgid "logsource() - Log source of the last log entry matching parameter V for period T (1 - match, 0 - no match)"
 msgstr ""
 
@@ -20532,7 +20581,7 @@ msgstr ""
 msgid "low-level discovery rule"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:725
+#: app/controllers/CControllerPopupTriggerExpr.php:756
 msgid "ltrim() - Remove specified characters from the beginning of a string"
 msgstr ""
 
@@ -20564,11 +20613,11 @@ msgstr ""
 msgid "macro(s)"
 msgstr "ماکرو(ها)"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:738
+#: app/controllers/CControllerPopupTriggerExpr.php:769
 msgid "mad() - Median absolute deviation"
 msgstr ""
 
-#: include/classes/validators/CHistFunctionValidator.php:91
+#: include/classes/validators/CHistFunctionValidator.php:93
 #, c-format
 msgid "mandatory parameter is missing in function \"%1$s\""
 msgstr ""
@@ -20604,7 +20653,7 @@ msgstr "بیشترین"
 msgid "max period is less than time filter default period"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:745
+#: app/controllers/CControllerPopupTriggerExpr.php:776
 msgid "max() - Maximum value for period T"
 msgstr ""
 
@@ -20618,7 +20667,7 @@ msgstr ""
 msgid "maximum number of dependency levels reached"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:752
+#: app/controllers/CControllerPopupTriggerExpr.php:783
 msgid "mid() - Returns a substring beginning at the character position specified by start for N characters"
 msgstr ""
 
@@ -20635,7 +20684,7 @@ msgstr ""
 msgid "min"
 msgstr "کمترین"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:770
+#: app/controllers/CControllerPopupTriggerExpr.php:801
 msgid "min() - Minimum value for period T"
 msgstr ""
 
@@ -20650,15 +20699,15 @@ msgstr ""
 msgid "mm"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:777
+#: app/controllers/CControllerPopupTriggerExpr.php:808
 msgid "mod() - Division remainder"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:790
+#: app/controllers/CControllerPopupTriggerExpr.php:821
 msgid "monodec() - Check for continuous item value decrease (1 - data is monotonic, 0 - otherwise), Mode (strict - require strict monotonicity)"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:797
+#: app/controllers/CControllerPopupTriggerExpr.php:828
 msgid "monoinc() - Check for continuous item value increase (1 - data is monotonic, 0 - otherwise), Mode (strict - require strict monotonicity)"
 msgstr ""
 
@@ -20740,7 +20789,7 @@ msgstr ""
 msgid "new"
 msgstr ""
 
-#: app/controllers/CControllerHostEdit.php:308 templates.php:626
+#: app/controllers/CControllerHostEdit.php:308 templates.php:627
 msgctxt "new element in multiselect"
 msgid "new"
 msgstr ""
@@ -20774,7 +20823,7 @@ msgstr ""
 msgid "no permissions to unacknowledge problems"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:804
+#: app/controllers/CControllerPopupTriggerExpr.php:835
 msgid "nodata() - No data received during period of time T (1 - true, 0 - false), Mode (strict - ignore proxy time delay in sending data)"
 msgstr ""
 
@@ -20795,7 +20844,7 @@ msgstr "نیست در"
 msgid "not selected"
 msgstr "انتخاب نشده"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:811
+#: app/controllers/CControllerPopupTriggerExpr.php:842
 msgid "now() - Number of seconds since the Epoch"
 msgstr ""
 
@@ -20882,15 +20931,15 @@ msgstr ""
 msgid "pattern"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:817
+#: app/controllers/CControllerPopupTriggerExpr.php:848
 msgid "percentile() - Percentile P of a period T"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:824
+#: app/controllers/CControllerPopupTriggerExpr.php:855
 msgid "pi() - Returns the Pi constant"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:829
+#: app/controllers/CControllerPopupTriggerExpr.php:860
 msgid "power() - The power of a base value to a power value"
 msgstr ""
 
@@ -20898,15 +20947,15 @@ msgstr ""
 msgid "problem pattern"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:842
+#: app/controllers/CControllerPopupTriggerExpr.php:873
 msgid "radians() - Converts a value from degrees to radians"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:849
+#: app/controllers/CControllerPopupTriggerExpr.php:880
 msgid "rand() - A random integer value"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:854
+#: app/controllers/CControllerPopupTriggerExpr.php:885
 msgid "rate() - Returns per-second average rate for monotonically increasing counters"
 msgstr ""
 
@@ -20955,11 +21004,11 @@ msgstr ""
 msgid "regular expression"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:861
+#: app/controllers/CControllerPopupTriggerExpr.php:892
 msgid "repeat() - Returns a string composed of value repeated count times"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:874
+#: app/controllers/CControllerPopupTriggerExpr.php:905
 msgid "replace() - Search value for occurrences of pattern, and replace with replacement"
 msgstr ""
 
@@ -20983,15 +21032,15 @@ msgstr ""
 msgid "right"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:892
+#: app/controllers/CControllerPopupTriggerExpr.php:923
 msgid "right() - Returns the rightmost count characters"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:905
+#: app/controllers/CControllerPopupTriggerExpr.php:936
 msgid "round() - Rounds a value to decimal places"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:918
+#: app/controllers/CControllerPopupTriggerExpr.php:949
 msgid "rtrim() - Removes specified characters from the end of a string"
 msgstr ""
 
@@ -21082,23 +21131,23 @@ msgstr "نمایش نشان های نگاشت شده"
 msgid "sign in as guest"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:931
+#: app/controllers/CControllerPopupTriggerExpr.php:962
 msgid "signum() - Returns -1 if a value is negative, 0 if a value is zero, 1 if a value is positive"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:938
+#: app/controllers/CControllerPopupTriggerExpr.php:969
 msgid "sin() - The sine of a value, where the value is an angle expressed in radians"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:945
+#: app/controllers/CControllerPopupTriggerExpr.php:976
 msgid "sinh() - The hyperbolic sine of a value"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:952
+#: app/controllers/CControllerPopupTriggerExpr.php:983
 msgid "skewness() - Measures the asymmetry of the probability distribution"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:959
+#: app/controllers/CControllerPopupTriggerExpr.php:990
 msgid "sqrt() - Square root of a value"
 msgstr ""
 
@@ -21106,11 +21155,11 @@ msgstr ""
 msgid "standalone server"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:966
+#: app/controllers/CControllerPopupTriggerExpr.php:997
 msgid "stddevpop() - Population standard deviation"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:973
+#: app/controllers/CControllerPopupTriggerExpr.php:1004
 msgid "stddevsamp() - Sample standard deviation"
 msgstr ""
 
@@ -21118,11 +21167,11 @@ msgstr ""
 msgid "sum"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:980
+#: app/controllers/CControllerPopupTriggerExpr.php:1011
 msgid "sum() - Sum of values of a period T"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:987
+#: app/controllers/CControllerPopupTriggerExpr.php:1018
 msgid "sumofsquares() - The sum of squares"
 msgstr ""
 
@@ -21150,7 +21199,7 @@ msgstr ""
 msgid "tag"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:994
+#: app/controllers/CControllerPopupTriggerExpr.php:1025
 msgid "tan() - The tangent of a value"
 msgstr ""
 
@@ -21184,7 +21233,7 @@ msgstr ""
 #: include/classes/api/services/CReport.php:195
 #: include/classes/api/services/CReport.php:577
 #: include/classes/api/services/CReport.php:583
-#: include/classes/api/services/CScript.php:902
+#: include/classes/api/services/CScript.php:904
 #: include/classes/api/services/CTemplate.php:451
 #: include/classes/api/services/CValueMap.php:578
 #: include/classes/helpers/CDashboardHelper.php:369
@@ -21231,31 +21280,35 @@ msgstr ""
 msgid "time shift"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1001
+#: app/controllers/CControllerPopupTriggerExpr.php:1032
 msgid "time() - Current time"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1007
+#: app/controllers/CControllerPopupTriggerExpr.php:1038
 msgid "timeleft() - Time to reach threshold estimated based on period T"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1014
+#: app/controllers/CControllerPopupTriggerExpr.php:1045
 msgid "trendavg() - Average value of a period T with exact period shift"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1021
+#: app/controllers/CControllerPopupTriggerExpr.php:1066
 msgid "trendcount() - Number of successfully retrieved values for period T"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1028
+#: app/controllers/CControllerPopupTriggerExpr.php:1073
 msgid "trendmax() - Maximum value for period T with exact period shift"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1035
+#: app/controllers/CControllerPopupTriggerExpr.php:1080
 msgid "trendmin() - Minimum value for period T with exact period shift"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1042
+#: app/controllers/CControllerPopupTriggerExpr.php:1087
+msgid "trendstl() - Anomaly detection for period T"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1130
 msgid "trendsum() - Sum of values of a period T with exact period shift"
 msgstr ""
 
@@ -21281,11 +21334,11 @@ msgstr ""
 msgid "trigger with linkages cannot be moved to another template or host"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1049
+#: app/controllers/CControllerPopupTriggerExpr.php:1137
 msgid "trim() - Remove specified characters from the beginning and the end of a string"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1062
+#: app/controllers/CControllerPopupTriggerExpr.php:1150
 msgid "truncate() - Truncates a value to decimal places"
 msgstr ""
 
@@ -21342,7 +21395,7 @@ msgstr ""
 #: include/classes/api/services/CHttpTest.php:539
 #: include/classes/api/services/CItemGeneral.php:604
 #: include/classes/api/services/CItemGeneral.php:616
-#: include/classes/api/services/CScript.php:908
+#: include/classes/api/services/CScript.php:910
 #: include/classes/api/services/CTemplate.php:668
 #: include/classes/api/services/CTriggerGeneral.php:666
 #: include/classes/api/services/CValueMap.php:432
@@ -21385,7 +21438,7 @@ msgstr ""
 msgid "unknown"
 msgstr "ناشناخته"
 
-#: include/classes/validators/CHistFunctionValidator.php:71
+#: include/classes/validators/CHistFunctionValidator.php:73
 #: include/classes/validators/CMathFunctionValidator.php:55
 #, c-format
 msgid "unknown function \"%1$s\""
@@ -21582,11 +21635,11 @@ msgstr ""
 msgid "value of third parameter must be one of %1$s"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1075
+#: app/controllers/CControllerPopupTriggerExpr.php:1163
 msgid "varpop() - Population variance"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1082
+#: app/controllers/CControllerPopupTriggerExpr.php:1170
 msgid "varsamp() - Sample variance"
 msgstr ""
 

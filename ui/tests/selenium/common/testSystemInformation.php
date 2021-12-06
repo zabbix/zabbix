@@ -32,7 +32,7 @@ class testSystemInformation extends CWebTest {
 	public static $unavailable_lastaccess;
 	public static $standalone_lastaccess;
 
-	public static $skip_fields = [];
+	public static $skip_fields;
 
 	/**
 	 * Function inserts HA cluster data into ha_node table.
@@ -122,7 +122,7 @@ class testSystemInformation extends CWebTest {
 	 */
 	public function assertEnabledHACluster($dashboardid = null) {
 		global $DB;
-		$skip_fields = [];
+		self::$skip_fields = [];
 		$url = (!$dashboardid) ? 'zabbix.php?action=report.status' : 'zabbix.php?action=dashboard.view&dashboardid='.$dashboardid;
 		// Wait for frontend to get the new config from updated zabbix.conf.php file.
 		sleep((int) ini_get('opcache.revalidate_freq') + 1);
@@ -148,7 +148,7 @@ class testSystemInformation extends CWebTest {
 			'Unavailable node' => self::$unavailable_lastaccess,
 			'Stopped node' => self::$stopped_lastaccess,
 			'Standby node' => self::$standby_lastaccess,
-			'' => self::$standalone_lastaccess
+			'<standalone server>' => self::$standalone_lastaccess
 		];
 
 		/**

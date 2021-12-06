@@ -1158,18 +1158,20 @@ static int	execute_triggers_inserts(zbx_vector_trigger_copies_insert_t *trigger_
 	{
 		zbx_eval_context_t	ctx, ctx_r;
 		zbx_trigger_copy_t	*trigger_copy_template = trigger_copies_insert->values[i];
+		zbx_uint64_t            parse_rules = ZBX_EVAL_PARSE_TRIGGER_EXPRESSSION | ZBX_EVAL_COMPOSE_FUNCTIONID;
 
-		if (SUCCEED != (res = zbx_eval_parse_expression(&ctx, trigger_copy_template->expression,
-				ZBX_EVAL_PARSE_TRIGGER_EXPRESSSION | ZBX_EVAL_COMPOSE_FUNCTIONID, error)))
+		if (0 != (trigger_copy_template->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
+			parse_rules |= ZBX_EVAL_PARSE_LLDMACRO | ZBX_EVAL_COMPOSE_LLD;
+
+		if (SUCCEED != (res = zbx_eval_parse_expression(&ctx, trigger_copy_template->expression, parse_rules,
+				error)))
 		{
 			goto func_out;
 		}
 
 		if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == (int)trigger_copy_template->recovery_mode &&
 				(SUCCEED != (res = zbx_eval_parse_expression(&ctx_r,
-				trigger_copy_template->recovery_expression,
-				ZBX_EVAL_PARSE_TRIGGER_EXPRESSSION | ZBX_EVAL_COMPOSE_FUNCTIONID,
-				error))))
+				trigger_copy_template->recovery_expression, parse_rules, error))))
 		{
 			zbx_eval_clear(&ctx);
 			goto func_out;

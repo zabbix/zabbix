@@ -18,16 +18,38 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
+require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
- * @backup hosts
- *
- * @onBefore prepareUpdateData
+ * Base class for Host form tests.
  */
 class testFormHost extends CWebTest {
+
+	/**
+	 * Attach Behaviors to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return ['class' => CMessageBehavior::class];
+	}
+
+	/**
+	 * Link to page for opening host form.
+	 */
+	public $link;
+
+	/**
+	 * Flag for host form opened by direct link.
+	 */
+	public $standalone = false;
+
+	/**
+	 * Flag for form opened from Monitoring -> Hosts section.
+	 */
+	public $monitoring = false;
 
 	/**
 	 * SQL query to get host and host interfaces tables to compare hash values.
@@ -63,13 +85,13 @@ class testFormHost extends CWebTest {
 			'ip' => '127.0.0.1',
 			'dns' => '',
 			'Connect to' => 'IP',
-			'port' => '10050'
+			'port' => 10050
 		],
 		'SNMP' => [
 			'ip' => '127.0.0.1',
 			'dns' => '',
 			'Connect to' => 'IP',
-			'port' => '161',
+			'port' => 161,
 			'SNMP version' => 'SNMPv2',
 			'SNMP community' => '{$SNMP_COMMUNITY}',
 			'Use bulk requests' => true
@@ -78,24 +100,15 @@ class testFormHost extends CWebTest {
 			'ip' => '127.0.0.1',
 			'dns' => '',
 			'Connect to' => 'IP',
-			'port' => '12345'
+			'port' => 12345
 		],
 		'IPMI' => [
 			'ip' => '127.0.0.1',
 			'dns' => '',
 			'Connect to' => 'IP',
-			'port' => '623'
+			'port' => 623
 		]
 	];
-
-	/**
-	 * Attach Behaviors to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return ['class' => CMessageBehavior::class];
-	}
 
 	public static function prepareUpdateData() {
 		$interfaces = [
@@ -113,10 +126,10 @@ class testFormHost extends CWebTest {
 				'useip' => 1,
 				'ip' => '127.2.2.2',
 				'dns' => '',
-				'port' => '122',
+				'port' => 122,
 				'details' => [
-					'version' => '1',
-					'bulk' => '0',
+					'version' => 1,
+					'bulk' => 0,
 					'community' => 'zabbix'
 				]
 			],
@@ -126,7 +139,7 @@ class testFormHost extends CWebTest {
 				'useip' => 0,
 				'ip' => '',
 				'dns' => 'selenium.test',
-				'port' => '30053'
+				'port' => 30053
 			],
 			[
 				'type' => 4,
@@ -134,7 +147,7 @@ class testFormHost extends CWebTest {
 				'useip' => 1,
 				'ip' => '127.4.4.4',
 				'dns' => '',
-				'port' => '426'
+				'port' => 426
 			]
 		];
 
@@ -193,19 +206,22 @@ class testFormHost extends CWebTest {
 		self::$itemids = $result['itemids'];
 	}
 
-	public function testFormHost_Layout() {
-		$hostname = 'testFormHost with items';
-		$this->page->login()->open('zabbix.php?action=host.list')->waitUntilReady();
-		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $hostname)->getColumn('Name')
-				->query('link', $hostname)->waitUntilClickable()->one()->click();
-		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
+	/**
+	 * Test for checking host form layout.
+	 */
+	public function checkHostLayout() {
+		$host = 'testFormHost with items';
+		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr($host));
 
-		// Check tabs available in the form
-		$tabs = ['Host', 'Templates', 'IPMI', 'Tags', 'Macros', 'Inventory', 'Encryption', 'Value mapping'];
+		$form = $this->openForm(($this->standalone ? $this->link.$hostid : $this->link), $host);
+
+		// Check tabs available in the form.
+		$tabs = ['Host', 'IPMI', 'Tags', 'Macros', 'Inventory', 'Encryption', 'Value mapping'];
 		$this->assertEquals(count($tabs), $form->query('xpath:.//li[@role="tab"]')->all()->count());
 		foreach ($tabs as $tab) {
-			$this->assertTrue($form->query("xpath:.//li[@role='tab']//a[text()=".CXPathHelper::escapeQuotes($tab).
-					"]")->one()->isValid());
+			$this->assertTrue($form->query("xpath:.//li[@role='tab']//a[text()=".CXPathHelper::escapeQuotes($tab)."]")
+					->one()->isValid()
+			);
 		}
 
 		// Host form fields maxlength attribute.
@@ -214,7 +230,9 @@ class testFormHost extends CWebTest {
 		}
 
 		$interfaces_form = $form->getFieldContainer('Interfaces')->asHostInterfaceElement();
-		$this->assertEquals(['', 'Type', 'IP address', 'DNS name', 'Connect to', 'Port', 'Default'], $interfaces_form->getHeadersText());
+		$this->assertEquals(['', 'Type', 'IP address', 'DNS name', 'Connect to', 'Port', 'Default'],
+				$interfaces_form->getHeadersText()
+		);
 
 		foreach ($interfaces_form->getRows() as $i => $row) {
 			$enabled = ($i !== 0 && $i !== 2);
@@ -224,7 +242,8 @@ class testFormHost extends CWebTest {
 		// Interface fields maxlength attribute.
 		foreach (['IP address' => 64, 'DNS name' => 255, 'Port' => 64] as $field => $maxlength) {
 			$this->assertEquals($maxlength, $interfaces_form->getRow(0)->getColumn($field)
-					->query('tag:input')->one()->getAttribute('maxlength'));
+					->query('tag:input')->one()->getAttribute('maxlength')
+			);
 		}
 
 		// Click the "expand" icon (in the 0th column) for the SNMP interface (1th row).
@@ -245,14 +264,17 @@ class testFormHost extends CWebTest {
 			$select = ($field === 'authNoPriv') ? 'Security level' : 'SNMP version';
 			$snmp_form->fill([$select => $field]);
 			$this->assertEquals($labels, array_values($snmp_form->getLabels()
-					->filter(new CElementFilter(CElementFilter::VISIBLE))->asText()));
+					->filter(new CElementFilter(CElementFilter::VISIBLE))->asText())
+			);
 			$this->assertFalse($snmp_form->query('xpath:.//label[text()="Use bulk requests"]')->one()
-					->asCheckbox()->isChecked());
+					->asCheckbox()->isChecked()
+			);
 		}
 
 		// Close host form popup to avoid unexpected alert in further cases.
-		COverlayDialogElement::find()->one()->close();
-		COverlayDialogElement::ensureNotPresent();
+		if (!$this->standalone) {
+			COverlayDialogElement::find()->one()->close();
+		}
 	}
 
 	public static function getCreateData() {
@@ -261,7 +283,7 @@ class testFormHost extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'error' => ['Incorrect value for field "host": cannot be empty.', 'Field "groups" is mandatory.']
+					'error' => ['Field "groups" is mandatory.', 'Incorrect value for field "host": cannot be empty.']
 				]
 			],
 			[
@@ -731,17 +753,26 @@ class testFormHost extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider getCreateData
+	 * Test for checking new host creation form.
+	 *
+	 * @param array     $data          data provider
 	 */
-	public function testFormHost_Create($data) {
+	public function checkHostCreate($data) {
 		if ($data['expected'] === TEST_BAD) {
 			$old_hash = CDBHelper::getHash($this->hosts_sql);
 			$interface_old_hash = CDBHelper::getHash($this->interface_snmp_sql);
 		}
 
-		$this->page->login()->open('zabbix.php?action=host.list')->waitUntilReady();
-		$this->query('button:Create host')->one()->waitUntilClickable()->click();
-		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
+		$this->page->login()->open($this->link)->waitUntilReady();
+
+		if ($this->standalone) {
+			$form = $this->query('id:host-form')->asForm()->waitUntilReady()->one();
+		}
+		else {
+			$this->query('button:Create host')->one()->waitUntilClickable()->click();
+			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
+		}
+
 		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
 
 		// Set name for field "Default".
@@ -754,12 +785,11 @@ class testFormHost extends CWebTest {
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				$this->assertMessage(TEST_GOOD, 'Host added');
+				$this->page->assertTitle($this->monitoring ? 'Hosts' : 'Configuration of hosts');
 
 				// Check host fields.
 				$host = CTestArrayHelper::get($data, 'host_fields.Visible name', $data['host_fields']['Host name']);
-				$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $host)
-						->getColumn('Name')->query('link', $host)->waitUntilClickable()->one()->click();
-				$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+				$form = $this->filterAndSelectHost($host);
 				$form->checkValue($data['host_fields']);
 
 				foreach ($interfaces as &$interface) {
@@ -782,22 +812,25 @@ class testFormHost extends CWebTest {
 				// Check interfaces field values.
 				$form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => $names])
 						->checkValue($data['interfaces']);
+
+				COverlayDialogElement::find()->one()->close();
 				break;
 
 			case TEST_BAD:
 				$this->assertEquals($old_hash, CDBHelper::getHash($this->hosts_sql));
 				$this->assertEquals($interface_old_hash, CDBHelper::getHash($this->interface_snmp_sql));
 				$this->assertMessage(TEST_BAD, CTestArrayHelper::get($data, 'error_title', 'Cannot add host'), $data['error']);
+
+				if (!$this->standalone) {
+					COverlayDialogElement::find()->one()->close();
+				}
 				break;
 		}
-
-		COverlayDialogElement::find()->one()->close();
-		COverlayDialogElement::ensureNotPresent();
 	}
 
-	public static function getUpdateData() {
+	public static function getValidationUpdateData() {
 		return [
-			// Host form validation
+			// Host form validation.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1088,7 +1121,12 @@ class testFormHost extends CWebTest {
 					'error_title' => 'Cannot update host',
 					'error' => 'Incorrect arguments passed to function.'
 				]
-			],
+			]
+		];
+	}
+
+	public static function getUpdateData() {
+		return [
 			// Successful host form update.
 			// Add default interface values.
 			[
@@ -1294,11 +1332,11 @@ class testFormHost extends CWebTest {
 	}
 
 	/**
-	 * @backup hosts
+	 * Test for checking existing host update form.
 	 *
-	 * @dataProvider getUpdateData
+	 * @param array     $data          data provider
 	 */
-	public function testFormHost_Update($data) {
+	public function checkHostUpdate($data) {
 		if ($data['expected'] === TEST_BAD) {
 			$host_old_hash = CDBHelper::getHash($this->hosts_sql);
 			$interface_old_hash = CDBHelper::getHash($this->interface_snmp_sql);
@@ -1355,11 +1393,10 @@ class testFormHost extends CWebTest {
 			]
 		];
 
-		$hostname = 'testFormHost_Update Visible name';
-		$this->page->login()->open('zabbix.php?action=host.list')->waitUntilReady();
-		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $hostname)->getColumn('Name')
-				->query('link', $hostname)->waitUntilClickable()->one()->click();
-		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
+		$host = 'testFormHost_Update Visible name';
+		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr($host));
+
+		$form = $this->openForm(($this->standalone ? $this->link.$hostid : $this->link), $host);
 		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
 
 		// Set name for field "Default".
@@ -1371,16 +1408,11 @@ class testFormHost extends CWebTest {
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				$this->assertMessage(TEST_GOOD, 'Host updated');
+				$host = (CTestArrayHelper::get($data, 'host_fields.Visible name') === "")
+					? CTestArrayHelper::get($data, 'host_fields.Host name', 'testFormHost_Update')
+					: CTestArrayHelper::get($data, 'host_fields.Visible name', 'testFormHost_Update Visible name');
 
-				if (CTestArrayHelper::get($data, 'host_fields.Visible name') === "") {
-					$host = CTestArrayHelper::get($data, 'host_fields.Host name', 'testFormHost_Update');
-				}
-				else {
-					$host = CTestArrayHelper::get($data, 'host_fields.Visible name', 'testFormHost_Update Visible name');
-				}
-				$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $host)
-						->getColumn('Name')->query('link', $host)->waitUntilClickable()->one()->click();
-				$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
+				$form = $this->filterAndSelectHost($host);
 
 				// Update or add new source data from host data.
 				foreach (CTestArrayHelper::get($data, 'host_fields', []) as $key => $value) {
@@ -1459,6 +1491,8 @@ class testFormHost extends CWebTest {
 				// Check interfaces field values.
 				$form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => $names])
 						->checkValue($source['interfaces']);
+
+				COverlayDialogElement::find()->one()->close();
 				break;
 
 			case TEST_BAD:
@@ -1467,68 +1501,26 @@ class testFormHost extends CWebTest {
 
 				$error_title = CTestArrayHelper::get($data, 'error_title', 'Cannot update host');
 				$this->assertMessage(TEST_BAD, $error_title, $data['error']);
+
+				if (!$this->standalone) {
+					COverlayDialogElement::find()->one()->close();
+				}
 				break;
 		}
-
-		COverlayDialogElement::find()->one()->close();
-		COverlayDialogElement::ensureNotPresent();
-	}
-
-	/**
-	 * Check host fields data with data in DB.
-	 *
-	 * @param array $data	data provider with fields values
-	 */
-	private function assertDatabaseFields($data) {
-		$db_default = [
-			'name' => $data['host_fields']['Host name'],
-			'description' => '',
-			'status' => 0
-		];
-		$db_host = CDBHelper::getRow('SELECT hostid, host, name, description, status FROM hosts WHERE host='.
-				zbx_dbstr($data['host_fields']['Host name']));
-
-		if (CTestArrayHelper::get($data, 'host_fields.Visible name') === "") {
-			$data['host_fields']['Visible name'] = $data['host_fields']['Host name'];
-		}
-		$fields = ['Host name' => 'host', 'Visible name' => 'name', 'Description' => 'description', 'Enabled' => 'status'];
-		foreach ($fields as $ui_field => $db_field) {
-			if (array_key_exists($ui_field, $data['host_fields'])) {
-				if ($ui_field === 'Enabled') {
-					$data['host_fields'][$ui_field] = ($data['host_fields'][$ui_field] === false)
-							? HOST_STATUS_NOT_MONITORED
-							: HOST_STATUS_MONITORED;
-				}
-				$this->assertEquals($data['host_fields'][$ui_field], $db_host[$db_field]);
-			}
-			else {
-				$this->assertEquals($db_default[$db_field], $db_host[$db_field]);
-			}
-		}
-
-		// Check interfaces amount in DB.
-		$db_interfaces = CDBHelper::getCount('SELECT NULL FROM interface WHERE hostid='.$db_host['hostid']);
-		$this->assertEquals(count($data['interfaces']), $db_interfaces);
 	}
 
 	/**
 	 * Update the host without any changes and check host and interfaces hashes.
 	 */
-	public function testFormHost_SimpleUpdate() {
-		$host = 'testFormHost_Update';
+	public function checkHostSimpleUpdate() {
 		$host_old_hash = CDBHelper::getHash($this->hosts_sql);
 		$interface_old_hash = CDBHelper::getHash($this->interface_snmp_sql);
 
-		$this->page->login()->open('zabbix.php?action=host.list')->waitUntilReady();
-		$this->query('button:Reset')->one()->click();
-		$filter = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
-		$filter->fill(['Name' => $host]);
-		$filter->query('button:Apply')->one()->waitUntilClickable()->click();
+		$host = 'testFormHost_Update';
+		$visible_name = 'testFormHost_Update Visible name';
+		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($host));
 
-		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $host, true)
-				->getColumn('Name')->query('tag:a')->waitUntilClickable()->one()->click();
-		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
-
+		$form = $this->openForm(($this->standalone ? $this->link.$hostid : $this->link), $visible_name);
 		$this->page->waitUntilReady();
 		$form->submit();
 		$this->assertMessage(TEST_GOOD, 'Host updated');
@@ -1576,69 +1568,77 @@ class testFormHost extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider getCloneData
-	 */
-	public function testFormHost_Clone($data) {
-		$this->cloneHost($data);
-
-		// Check that items isn't cloned from original host.
-		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($data['host_fields']['Host name']));
-		$this->assertEquals(0, CDBHelper::getCount('SELECT null FROM items WHERE hostid='.$hostid));
-	}
-
-	/**
-	 * @dataProvider getCloneData
-	 */
-	public function testFormHost_FullClone($data) {
-		$this->cloneHost($data, true);
-
-		// Check that items cloned from original host.
-		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($data['host_fields']['Host name']));
-		$this->assertEquals(3, CDBHelper::getCount('SELECT null FROM items WHERE hostid='.$hostid));
-	}
-
-	/**
 	 * Clone or Full clone a host and compare the data with the original host.
 	 *
-	 * @param type $data		data provider with fields values
-	 * @param type $full_clone	type of cloning
+	 * @param array     $data		   data provider with fields values
+	 * @param string    $button        Clone or Full clone
 	 */
-	private function cloneHost($data, $full_clone = false) {
-		$name = 'testFormHost with items';
-		$type = $full_clone ? 'Full clone' : 'Clone';
+	public function cloneHost($data, $button = 'Clone') {
+		$host = 'testFormHost with items';
+		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($host));
 
-		$this->page->login()->open('zabbix.php?action=host.list')->waitUntilReady();
-		$this->query('button:Reset')->one()->click();
-		$filter = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
-		$filter->fill(['Name' => $name]);
-		$filter->query('button:Apply')->waitUntilClickable()->one()->click();
-
-		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
-				->getColumn('Name')->query('tag:a')->waitUntilClickable()->one()->click();
-		$form = COverlayDialogElement::find()->asForm()->waitUntilVisible()->one();
+		$form = $this->openForm(($this->standalone ? 'zabbix.php?action=host.edit&hostid='.$hostid : $this->link), $host);
 
 		// Get values from form.
 		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
 		$original = $form->getFields()->asValues();
 
 		// Clone host.
-		$this->query('button', $type)->waitUntilClickable()->one()->click();
-		$cloned_form = COverlayDialogElement::find()->asForm()->waitUntilPresent()->one();
+		$this->query('button', $button)->waitUntilClickable()->one()->click();
+
+		$cloned_form = (!$this->standalone)
+			? COverlayDialogElement::find()->asForm()->waitUntilPresent()->one()
+			: $this->query('id:host-form')->asForm()->waitUntilReady()->one();
+
 		$cloned_form->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Host added');
-		$this->query('button:Reset')->one()->click();
 
 		// Check the values of the original host with the cloned host.
-		$this->query('link', $data['host_fields']['Host name'])->waitUntilClickable()->one()->forceClick();
-		$saved_form = COverlayDialogElement::find()->asForm()->waitUntilReady()->one();
-		$saved_form->checkValue($original);
+		$this->filterAndSelectHost($data['host_fields']['Host name'])->checkValue($original);
 
 		COverlayDialogElement::find()->one()->close();
-		COverlayDialogElement::ensureNotPresent();
 	}
 
-	public static function getСancelData() {
+	/**
+	 * Check host fields data with data in DB.
+	 *
+	 * @param array $data	data provider with fields values
+	 */
+	private function assertDatabaseFields($data) {
+		$db_default = [
+			'name' => $data['host_fields']['Host name'],
+			'description' => '',
+			'status' => 0
+		];
+		$db_host = CDBHelper::getRow('SELECT hostid, host, name, description, status FROM hosts WHERE host='.
+				zbx_dbstr($data['host_fields']['Host name'])
+		);
+
+		if (CTestArrayHelper::get($data, 'host_fields.Visible name') === "") {
+			$data['host_fields']['Visible name'] = $data['host_fields']['Host name'];
+		}
+		$fields = ['Host name' => 'host', 'Visible name' => 'name', 'Description' => 'description', 'Enabled' => 'status'];
+		foreach ($fields as $ui_field => $db_field) {
+			if (array_key_exists($ui_field, $data['host_fields'])) {
+				if ($ui_field === 'Enabled') {
+					$data['host_fields'][$ui_field] = ($data['host_fields'][$ui_field] === false)
+							? HOST_STATUS_NOT_MONITORED
+							: HOST_STATUS_MONITORED;
+				}
+				$this->assertEquals($data['host_fields'][$ui_field], $db_host[$db_field]);
+			}
+			else {
+				$this->assertEquals($db_default[$db_field], $db_host[$db_field]);
+			}
+		}
+
+		// Check interfaces amount in DB.
+		$db_interfaces = CDBHelper::getCount('SELECT NULL FROM interface WHERE hostid='.$db_host['hostid']);
+		$this->assertEquals(count($data['interfaces']), $db_interfaces);
+	}
+
+	public static function getCancelData() {
 		return [
 			[
 				[
@@ -1669,13 +1669,18 @@ class testFormHost extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider getСancelData
+	 * Test for checking host actions cancelling.
+	 *
+	 * @param array     $data		   data provider with fields values
 	 */
-	public function testFormHost_Cancel($data) {
+	public function checkCancel($data) {
 		$host_old_hash = CDBHelper::getHash($this->hosts_sql);
 		$interface_old_hash = CDBHelper::getHash($this->interface_snmp_sql);
-		$name = 'testFormHost with items';
-		$new_name = microtime(true).' Cancel '.$name;
+
+		$host = 'testFormHost with items';
+		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($host));
+		$new_name = microtime(true).' Cancel '.$host;
+
 		$interface = [
 			[
 				'action' => USER_ACTION_ADD,
@@ -1690,24 +1695,29 @@ class testFormHost extends CWebTest {
 		];
 
 		if ($data['action'] === 'Add') {
-			$this->page->login()->open('zabbix.php?action=host.list')->waitUntilReady();
-			$this->query('button:Create host')->one()->waitUntilClickable()->click();
+			$this->page->login()->open($this->link)->waitUntilReady();
+
+			if (!$this->standalone) {
+				$this->query('button:Create host')->one()->waitUntilClickable()->click();
+				$form = COverlayDialogElement::find()->waitUntilReady()->one()->asForm();
+			}
+			else {
+				$form = $this->query('id:host-form')->asForm()->waitUntilReady()->one();
+			}
 		}
 		else {
-			$this->page->login()->open('zabbix.php?action=host.list')->waitUntilReady();
-			$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)->getColumn('Name')
-					->query('link', $name)->waitUntilClickable()->one()->click();
+			$form = $this->openForm(($this->standalone ? 'zabbix.php?action=host.edit&hostid='.$hostid : $this->link), $host);
 		}
 
+		$form_type = ($this->standalone) ? $form : COverlayDialogElement::find()->waitUntilReady()->one();
+
 		// Change the host data to make sure that the changes are not saved to the database after cancellation.
-		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-		$form = $dialog->asForm();
 		$form->fill(['Host name' => $new_name]);
 		$interfaces_form = $form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => ['1' => 'default']]);
 		$interfaces_form->fill($interface);
 
 		if (in_array($data['action'], ['Clone', 'Full clone', 'Delete'])) {
-			$dialog->query('button', $data['action'])->one()->click();
+			$form_type->query('button', $data['action'])->one()->click();
 		}
 		if ($data['action'] === 'Delete') {
 			$this->page->dismissAlert();
@@ -1717,18 +1727,22 @@ class testFormHost extends CWebTest {
 
 		// Check that the host creation page is open after cloning or full cloning.
 		if ($data['action'] === 'Clone' || $data['action'] === 'Full clone') {
-			$dialog->invalidate();
-			$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($name));
+			$form_type->invalidate();
+			$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($host));
 			$action = ($data['action'] === 'Clone') ? 'clone' : 'full_clone';
 			$expected_url = PHPUNIT_URL.'zabbix.php?action=host.edit&hostid='.$id.'&'.$action.'=1';
 
 			$this->assertEquals($expected_url, $this->page->getCurrentUrl());
-			$this->assertFalse($dialog->query('xpath:.//ul['.CXPathHelper::fromClass('filter-breadcrumb').']')->one(false)->isValid());
-			$this->assertFalse($dialog->query('button', ['Update', 'Clone', 'Full clone', 'Delete'])->one(false)->isValid());
-			$this->assertTrue($dialog->query('button', ['Add', 'Cancel'])->one(false)->isValid());
+			$this->assertFalse($form_type->query("xpath:.//ul[".CXPathHelper::fromClass('filter-breadcrumb')."]")
+					->one(false)->isValid()
+			);
+			$this->assertFalse($form_type->query('button', ['Update', 'Clone', 'Full clone', 'Delete'])->one(false)
+					->isValid()
+			);
+			$this->assertTrue($form_type->query('button', ['Add', 'Cancel'])->one(false)->isValid());
 		}
 
-		$dialog->query('button:Cancel')->waitUntilClickable()->one()->click();
+		$form_type->query('button:Cancel')->waitUntilClickable()->one()->click();
 
 		// Check invariability of host data in the database.
 		$this->assertEquals($host_old_hash, CDBHelper::getHash($this->hosts_sql));
@@ -1756,10 +1770,13 @@ class testFormHost extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider getDeleteData
+	 * Test for checking host deleting.
+	 *
+	 * @param array     $data		   data provider with fields values
 	 */
-	public function testFormHost_Delete($data) {
+	public function checkDelete($data) {
 		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($data['name']));
+
 		if ($data['expected'] === TEST_BAD) {
 			$old_hash = CDBHelper::getHash($this->hosts_sql);
 		}
@@ -1769,30 +1786,82 @@ class testFormHost extends CWebTest {
 			$ids = array_column($interfaceids, 'interfaceid');
 		}
 
-		$this->page->login()->open('zabbix.php?action=host.list')->waitUntilReady();
-		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $data['name'])
-				->getColumn('Name')->query('link', $data['name'])->waitUntilClickable()->one()->click();
-		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-		$dialog->query('button:Delete')->waitUntilClickable()->one()->click();
+		$form = $this->openForm(($this->standalone ? $this->link.$hostid : $this->link), $data['name']);
+		$form_type = ($this->standalone) ? $form : COverlayDialogElement::find()->waitUntilReady()->one();
+		$form_type->query('button:Delete')->waitUntilClickable()->one()->click();
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				$this->assertMessage(TEST_GOOD, 'Host deleted');
+
 				// Check if all host records have been deleted.
-				$tables=['hosts', 'interface', 'items', 'hostmacro', 'hosts_groups', 'hosts_templates',
-					'maintenances_hosts', 'host_inventory'];
+				$tables = ['hosts', 'interface', 'items', 'hostmacro', 'hosts_groups', 'hosts_templates',
+						'maintenances_hosts', 'host_inventory'];
+
 				foreach ($tables as $table) {
 					$this->assertEquals(0, CDBHelper::getCount('SELECT null FROM '.$table.' WHERE hostid='.$hostid));
 				}
 				$this->assertEquals(0, CDBHelper::getCount('SELECT null FROM interface_snmp'.
-						' WHERE interfaceid IN ('.CDBHelper::escape($ids).')'));
+						' WHERE interfaceid IN ('.CDBHelper::escape($ids).')')
+				);
 				break;
 
 			case TEST_BAD:
 				$this->assertEquals($old_hash, CDBHelper::getHash($this->hosts_sql));
 				$this->assertMessage(TEST_BAD, 'Cannot delete host', $data['error']);
 		}
+	}
+
+	/**
+	 * Function for opening host form.
+	 *
+	 * @param string   $url     url of page where host form  is opened
+	 * @param string   $host    host name to be opened
+	 */
+	private function openForm($url, $host) {
+		$this->page->login()->open($url)->waitUntilReady();
+
+		return ($this->standalone)
+			? $this->query('id:host-form')->asForm()->waitUntilReady()->one()
+			: $this->filterAndSelectHost($host);
+	}
+
+	/**
+	 * Function for filtering necessary host on page.
+	 *
+	 * @param string	$host    host name to be filtered
+	 *
+	 * @return CFormElement
+	 */
+	public function filterAndSelectHost($host) {
+		$this->query('button:Reset')->one()->click();
+		$this->query('name:zbx_filter')->asForm()->waitUntilReady()->one()->fill(['Name' => $host]);
+		$this->query('button:Apply')->one()->waitUntilClickable()->click();
+		$this->page->waitUntilReady();
+
+		$host_link = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible()
+				->findRow('Name', $host)->getColumn('Name')->query('tag:a')->waitUntilClickable();
+
+		if ($this->monitoring) {
+			$host_link->asPopupButton()->one()->select('Configuration');
+		}
+		else {
+			$host_link->one()->click();
+		}
+
+		return COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
+	}
+
+	/**
+	 * Function for selecting and counting items on particular host.
+	 *
+	 * @param boolean   $host     name of host
+	 * @param string	$count    expected items count
+	 */
+	public function assertItemsDBCount($host, $count) {
+		$sql = 'SELECT null FROM items WHERE hostid IN (SELECT hostid FROM hosts WHERE host='.zbx_dbstr($host).')';
+		$this->assertEquals($count, CDBHelper::getCount($sql));
 	}
 }

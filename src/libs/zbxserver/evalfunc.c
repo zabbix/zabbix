@@ -50,13 +50,6 @@ zbx_valuemaps_t;
 ZBX_PTR_VECTOR_DECL(valuemaps_ptr, zbx_valuemaps_t *)
 ZBX_PTR_VECTOR_IMPL(valuemaps_ptr, zbx_valuemaps_t *)
 
-typedef enum
-{
-	ZBX_PARAM_OPTIONAL,
-	ZBX_PARAM_MANDATORY
-}
-zbx_param_type_t;
-
 /******************************************************************************
  *                                                                            *
  * Function: add_value_suffix_uptime                                          *
@@ -656,8 +649,6 @@ int	zbx_evaluatable_for_notsupported(const char *fn)
  *                                                                            *
  * Parameters: parameters     - [IN] trigger function parameters              *
  *             Nparam         - [IN] specifies which parameter to extract     *
- *             parameter_type - [IN] specifies whether parameter is mandatory *
- *                              or optional                                   *
  *             value          - [OUT] parameter value (preserved as is if the *
  *                              parameter is optional and empty)              *
  *             type           - [OUT] parameter value type (number of seconds *
@@ -668,8 +659,7 @@ int	zbx_evaluatable_for_notsupported(const char *fn)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	get_function_parameter_period(const char *parameters, int Nparam, zbx_param_type_t parameter_type,
-		int *value, zbx_value_type_t *type)
+static int	get_function_parameter_period(const char *parameters, int Nparam, int *value, zbx_value_type_t *type)
 {
 	char	*parameter;
 	int	ret = FAIL;
@@ -679,38 +669,28 @@ static int	get_function_parameter_period(const char *parameters, int Nparam, zbx
 	if (NULL == (parameter = zbx_function_get_param_dyn(parameters, Nparam)))
 		goto out;
 
-	if ('\0' == *parameter)
+	if ('\0' != *parameter)
 	{
-		switch (parameter_type)
+		if ('#' == *parameter)
 		{
-			case ZBX_PARAM_OPTIONAL:
+			*type = ZBX_VALUE_NVALUES;
+			if (SUCCEED == is_uint31(parameter + 1, value) && 0 < *value)
 				ret = SUCCEED;
-				break;
-			case ZBX_PARAM_MANDATORY:
-				break;
-			default:
-				THIS_SHOULD_NEVER_HAPPEN;
 		}
-	}
-	else if ('#' == *parameter)
-	{
-		*type = ZBX_VALUE_NVALUES;
-		if (SUCCEED == is_uint31(parameter + 1, value) && 0 < *value)
-			ret = SUCCEED;
-	}
-	else if ('-' == *parameter)
-	{
-		if (SUCCEED == is_time_suffix(parameter + 1, value, ZBX_LENGTH_UNLIMITED))
+		else if ('-' == *parameter)
 		{
-			*value = -(*value);
+			if (SUCCEED == is_time_suffix(parameter + 1, value, ZBX_LENGTH_UNLIMITED))
+			{
+				*value = -(*value);
+				*type = ZBX_VALUE_SECONDS;
+				ret = SUCCEED;
+			}
+		}
+		else if (SUCCEED == is_time_suffix(parameter, value, ZBX_LENGTH_UNLIMITED))
+		{
 			*type = ZBX_VALUE_SECONDS;
 			ret = SUCCEED;
 		}
-	}
-	else if (SUCCEED == is_time_suffix(parameter, value, ZBX_LENGTH_UNLIMITED))
-	{
-		*type = ZBX_VALUE_SECONDS;
-		ret = SUCCEED;
 	}
 
 	if (SUCCEED == ret)
@@ -2155,7 +2135,7 @@ static int	evaluate_NODATA(zbx_variant_t *value, DC_ITEM *item, const char *para
 		goto out;
 	}
 
-	if (SUCCEED != get_function_parameter_period(parameters, 1, ZBX_PARAM_MANDATORY, &arg1, &arg1_type) ||
+	if (SUCCEED != get_function_parameter_period(parameters, 1, &arg1, &arg1_type) ||
 			ZBX_VALUE_SECONDS != arg1_type || 0 >= arg1)
 	{
 		*error = zbx_strdup(*error, "invalid second parameter");
@@ -2345,7 +2325,7 @@ static int	evaluate_FUZZYTIME(zbx_variant_t *value, DC_ITEM *item, const char *p
 		goto out;
 	}
 
-	if (SUCCEED != get_function_parameter_period(parameters, 1, ZBX_PARAM_MANDATORY, &arg1, &arg1_type) ||
+	if (SUCCEED != get_function_parameter_period(parameters, 1, &arg1, &arg1_type) ||
 			0 >= arg1)
 	{
 		*error = zbx_strdup(*error, "invalid second parameter");
@@ -2364,8 +2344,8 @@ static int	evaluate_FUZZYTIME(zbx_variant_t *value, DC_ITEM *item, const char *p
 		goto out;
 	}
 
-	fuzlow = (int)(ts->sec - arg1);
-	fuzhig = (int)(ts->sec + arg1);
+	fuzlow = (zbx_uint64_t)(ts->sec - arg1);
+	fuzhig = (zbx_uint64_t)(ts->sec + arg1);
 
 	if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
 	{
@@ -2514,7 +2494,7 @@ static int	evaluate_FORECAST(zbx_variant_t *value, DC_ITEM *item, const char *pa
 		goto out;
 	}
 
-	if (SUCCEED != get_function_parameter_period(parameters, 2, ZBX_PARAM_MANDATORY, &time, &time_type) ||
+	if (SUCCEED != get_function_parameter_period(parameters, 2, &time, &time_type) ||
 			ZBX_VALUE_SECONDS != time_type)
 	{
 		*error = zbx_strdup(*error, "invalid third parameter");
@@ -2571,8 +2551,8 @@ static int	evaluate_FORECAST(zbx_variant_t *value, DC_ITEM *item, const char *pa
 
 	if (0 < values.values_num)
 	{
-		t = (double *)zbx_malloc(t, values.values_num * sizeof(double));
-		x = (double *)zbx_malloc(x, values.values_num * sizeof(double));
+		t = (double *)zbx_malloc(t, (size_t)values.values_num * sizeof(double));
+		x = (double *)zbx_malloc(x, (size_t)values.values_num * sizeof(double));
 
 		zero_time.sec = values.values[values.values_num - 1].timestamp.sec;
 		zero_time.ns = values.values[values.values_num - 1].timestamp.ns;
@@ -2720,8 +2700,8 @@ static int	evaluate_TIMELEFT(zbx_variant_t *value, DC_ITEM *item, const char *pa
 
 	if (0 < values.values_num)
 	{
-		t = (double *)zbx_malloc(t, values.values_num * sizeof(double));
-		x = (double *)zbx_malloc(x, values.values_num * sizeof(double));
+		t = (double *)zbx_malloc(t, (size_t)values.values_num * sizeof(double));
+		x = (double *)zbx_malloc(x, (size_t)values.values_num * sizeof(double));
 
 		zero_time.sec = values.values[values.values_num - 1].timestamp.sec;
 		zero_time.ns = values.values[values.values_num - 1].timestamp.ns;
@@ -2768,7 +2748,7 @@ out:
 }
 
 static int	trends_eval_stl(const char *table, zbx_uint64_t itemid, int start, int end, int start_detect_period,
-		int end_detect_period, int season, zbx_uint64_t deviations, const char *dev_alg, int s_window,
+		int end_detect_period, int season, double deviations, const char *dev_alg, int s_window,
 		double *value, char **error)
 {
 	int				i, period_counter, ret = FAIL;
@@ -2925,25 +2905,28 @@ static int	evaluate_TREND(zbx_variant_t *value, DC_ITEM *item, const char *func,
 	{
 		char			*dev_alg = NULL;
 		int			start_detect_period, end_detect_period, season_shift, season, season_processed,
-					detect_period;
-		zbx_uint64_t		deviations, s_window;
-		zbx_value_type_t	season_type;
+					detect_period, detect_period_shift;
+		double			deviations;
+		zbx_uint64_t		s_window;
+		zbx_value_type_t	detect_period_type, season_type;
 
-		if (SUCCEED != get_function_parameter_hist_range(ts->sec, parameters, 2, &detect_period, &season_type,
-				&season_shift))
+		if (SUCCEED != get_function_parameter_hist_range(ts->sec, parameters, 2, &detect_period,
+				&detect_period_type, &detect_period_shift))
 		{
 			*error = zbx_strdup(*error, "invalid third parameter");
 			goto out;
 		}
 
-		if (ZBX_VALUE_SECONDS != season_type)
+		if (ZBX_VALUE_SECONDS != detect_period_type)
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			goto out;
 		}
 
-		start_detect_period = end - detect_period;
-		end_detect_period = end;
+		ZBX_UNUSED(detect_period_shift);
+
+		end_detect_period = end + SEC_PER_HOUR - 1;
+		start_detect_period = end_detect_period - detect_period + 1;
 
 		if (start_detect_period < start)
 		{
@@ -2966,10 +2949,10 @@ static int	evaluate_TREND(zbx_variant_t *value, DC_ITEM *item, const char *func,
 			goto out;
 		}
 
-		if (SUCCEED != get_function_parameter_uint64(parameters, 4, &deviations))
+		if (SUCCEED != get_function_parameter_float(parameters, 4, ZBX_FLAG_DOUBLE_PLAIN, &deviations))
 			deviations = STL_DEF_DEVIATIONS;
 
-		if (SUCCEED != get_function_parameter_str(parameters, 5, &dev_alg))
+		if (SUCCEED != get_function_parameter_str(parameters, 5, &dev_alg) || '\0' == *dev_alg)
 		{
 			dev_alg = zbx_strdup(NULL, "mad");
 		}
@@ -2977,6 +2960,7 @@ static int	evaluate_TREND(zbx_variant_t *value, DC_ITEM *item, const char *func,
 				(0 != strcmp("stddevsamp", dev_alg))))
 		{
 			*error = zbx_strdup(*error, "invalid sixth parameter");
+			zbx_free(dev_alg);
 			goto out;
 		}
 
@@ -3658,6 +3642,148 @@ out:
 #undef PREV
 #undef LAST
 
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_BASELINE                                                *
+ *                                                                            *
+ * Purpose: evaluate baseline* functions for the item                         *
+ *                                                                            *
+ * Parameters: value      - [OUT] the function result                         *
+ *             item       - [IN] item (performance metric)                    *
+ *             func       - [IN] the baseline function to evaluate            *
+ *                               (wma, dev)                                   *
+ *             parameters - [IN] function parameters                          *
+ *             ts         - [IN] the historical time when function must be    *
+ *                               evaluated                                    *
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	evaluate_BASELINE(zbx_variant_t *value, DC_ITEM *item, const char *func, const char *parameters,
+		const zbx_timespec_t *ts, char **error)
+{
+	int			ret = FAIL, season_num;
+	char			*period = NULL, *tmp = NULL;
+	zbx_vector_dbl_t	values;
+	zbx_vector_uint64_t	index;
+	double			value_dbl;
+	zbx_time_unit_t		season_unit;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_dbl_create(&values);
+	zbx_vector_uint64_create(&index);
+
+	if (3 != num_param(parameters))
+	{
+		*error = zbx_strdup(*error, "invalid number of parameters");
+		goto out;
+	}
+
+	if (SUCCEED != get_function_parameter_str(parameters, 1, &period))
+	{
+		*error = zbx_strdup(*error, "invalid second parameter");
+		goto out;
+	}
+
+	if (SUCCEED != get_function_parameter_str(parameters, 2, &tmp) ||
+			ZBX_TIME_UNIT_HOUR > (season_unit = zbx_tm_str_to_unit(tmp)))
+	{
+		*error = zbx_strdup(*error, "invalid third parameter");
+		goto out;
+	}
+	zbx_free(tmp);
+
+	if (SUCCEED != get_function_parameter_str(parameters, 3, &tmp) || 0 >= (season_num = atoi(tmp)))
+	{
+		*error = zbx_strdup(*error, "invalid fourth parameter");
+		goto out;
+	}
+
+	if (0 == strcmp(func, "wma"))
+	{
+		int	i, weights = 0;
+
+		if (SUCCEED != zbx_baseline_get_data(item->itemid, item->value_type, ts->sec, period, season_num,
+				season_unit, 1, &values, &index, error))
+		{
+			goto out;
+		}
+
+		if (0 == values.values_num)
+		{
+			*error = zbx_strdup(NULL, "not enough data");
+			goto out;
+		}
+
+		value_dbl = 0;
+
+		for (i = 0; i < values.values_num; i++)
+		{
+			int	weight = season_num - (int)index.values[i];
+
+			value_dbl += values.values[i] * weight;
+			weights += weight;
+		}
+
+		value_dbl /= weights;
+	}
+	else if (0 == strcmp(func, "dev"))
+	{
+		double	value_dev, value_avg = 0;
+		int	i;
+
+		if (SUCCEED != zbx_baseline_get_data(item->itemid, item->value_type, ts->sec, period, season_num,
+				season_unit, 0, &values, &index, error))
+		{
+			goto out;
+		}
+
+		if (1 >= values.values_num)
+		{
+			*error = zbx_strdup(NULL, "not enough data");
+			goto out;
+		}
+
+		if (SUCCEED != zbx_eval_calc_stddevpop(&values, &value_dev, error))
+			goto out;
+
+		if (ZBX_DOUBLE_EPSILON <= value_dev)
+		{
+			for (i = 0; i < values.values_num; i++)
+				value_avg += values.values[i];
+			value_avg /= values.values_num;
+
+			value_dbl = fabs(values.values[0] - value_avg) / value_dev;
+		}
+		else
+			value_dbl = 0;
+
+		zabbix_log(LOG_LEVEL_TRACE, "fabs(" ZBX_FS_DBL " - " ZBX_FS_DBL ") / " ZBX_FS_DBL " = " ZBX_FS_DBL,
+				values.values[0], value_avg, value_dev, value_dbl);
+	}
+	else
+	{
+		*error = zbx_strdup(*error, "unknown baseline function");
+		goto out;
+	}
+
+	zbx_variant_set_dbl(value, value_dbl);
+
+	ret = SUCCEED;
+out:
+	zbx_free(tmp);
+	zbx_free(period);
+
+	zbx_vector_uint64_destroy(&index);
+	zbx_vector_dbl_destroy(&values);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
 static void	history_to_dbl_vector(const zbx_history_record_t *v, int n, unsigned char value_type,
 		zbx_vector_dbl_t *values)
 {
@@ -3886,6 +4012,10 @@ int	evaluate_function2(zbx_variant_t *value, DC_ITEM *item, const char *function
 	{
 		ret = evaluate_CHANGECOUNT(value, item, parameter, ts, error);
 	}
+	else if (0 == strncmp(function, "baseline", 8))
+	{
+		ret = evaluate_BASELINE(value, item, function + 8, parameter, ts, error);
+	}
 	else
 	{
 		*error = zbx_strdup(*error, "function is not supported");
@@ -3921,7 +4051,8 @@ int	zbx_is_trigger_function(const char *name, size_t len)
 			"pi", "e", "expm1", "atan2", "first", "kurtosis", "mad", "skewness", "stddevpop", "stddevsamp",
 			"sumofsquares", "varpop", "varsamp", "ascii", "bitlength", "char", "concat", "insert", "lcase",
 			"left", "ltrim", "bytelength", "repeat", "replace", "right", "rtrim", "mid", "trim", "between",
-			"in", "bitor", "bitxor", "bitnot", "bitlshift", "bitrshift", NULL};
+			"in", "bitor", "bitxor", "bitnot", "bitlshift", "bitrshift", "baselinewma", "baselinedev",
+			NULL};
 	char	**ptr;
 
 	for (ptr = functions; NULL != *ptr; ptr++)

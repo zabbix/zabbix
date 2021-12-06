@@ -215,7 +215,7 @@ trim:
  *                                                                            *
  ******************************************************************************/
 #ifdef _WINDOWS
-static int	parse_cfg_dir(const char *path, const char *pattern, struct cfg_line *cfg, int level, int strict
+static int	parse_cfg_dir(const char *path, const char *pattern, struct cfg_line *cfg, int level, int strict,
 		int noexit)
 {
 	WIN32_FIND_DATAW	find_file_data;
