@@ -1246,6 +1246,9 @@ static int	DBpatch_5050114(void)
 			ret = FAIL;
 	}
 
+	zbx_free(params);
+	zbx_free(sql);
+
 	return ret;
 }
 
