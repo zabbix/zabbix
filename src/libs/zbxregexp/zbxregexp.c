@@ -151,7 +151,8 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
 #ifdef USE_PCRE2
 	*err_msg = NULL;
 
-	if (NULL == (pcre2_regexp = pcre2_compile(pattern, PCRE2_ZERO_TERMINATED, PCRE2_UTF | flags, &error, &error_offset, NULL)))
+	if (NULL == (pcre2_regexp = pcre2_compile(pattern, PCRE2_ZERO_TERMINATED, PCRE2_UTF | flags, &error,
+			&error_offset, NULL)))
 	{
 		err_msg_buff = zbx_malloc(NULL, ZBX_REGEXP_ERR_MSG_SIZE);
 		pcre2_get_error_message(error, err_msg_buff, ZBX_REGEXP_ERR_MSG_SIZE);
