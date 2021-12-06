@@ -246,7 +246,7 @@ static int	regexp_prepare(const char *pattern, int flags, zbx_regexp_t **regexp,
 	return ret;
 }
 
-static unsigned long int compute_recursion_limit()
+static unsigned long int compute_recursion_limit(void)
 {
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 	struct rlimit	rlim;
@@ -339,7 +339,6 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 	int				result, r, i;
 	pcre2_match_data		*match_data = NULL;
 	PCRE2_SIZE			*ovector = NULL;
-	int				ovector_size = 0;
 
 	pcre2_set_match_limit(regexp->match_ctx, 1000000);
 	pcre2_set_recursion_limit(regexp->match_ctx, compute_recursion_limit());
@@ -358,7 +357,6 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 			if (NULL != matches)
 			{
 				ovector = pcre2_get_ovector_pointer(match_data);
-				ovector_size = (int)pcre2_get_ovector_count(match_data);
 
 				/* have to copy this way because pcre2 ovector uses 8 byte integers,  *
 				 * but we want to keep it compatible with existing matches structure, *
@@ -1359,6 +1357,9 @@ int	zbx_wildcard_match(const char *value, const char *wildcard)
 
 void	zbx_regexp_err_msg_free(const char *err_msg)
 {
+#ifdef USE_PCRE
+	ZBX_UNUSED(err_msg);
+#endif
 #ifdef USE_PCRE2
 	char	*ptr;
 
