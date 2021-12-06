@@ -539,7 +539,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	 * "delay_flex" is a temporary field that collects flexible and scheduling intervals separated by a semicolon.
 	 * In the end, custom intervals together with "delay" are stored in the "delay" variable.
 	 */
-	if ($type != ITEM_TYPE_TRAPPER && $type != ITEM_TYPE_SNMPTRAP
+	if (!in_array($type, [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT])
 			&& ($type != ITEM_TYPE_ZABBIX_ACTIVE || strncmp(getRequest('key'), 'mqtt.get', 8) !== 0)
 			&& hasRequest('delay_flex')) {
 		$intervals = [];
@@ -558,7 +558,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					info(_s('Invalid interval "%1$s".', $interval['delay']));
 					break;
 				}
-				elseif ($time_period_parser->parse($interval['period']) != CParser::PARSE_SUCCESS) {
+
+				if ($time_period_parser->parse($interval['period']) != CParser::PARSE_SUCCESS) {
 					$result = false;
 					info(_s('Invalid interval "%1$s".', $interval['period']));
 					break;
@@ -645,48 +646,61 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 		unset($step);
 
-		if (hasRequest('add')) {
-			$item = [
-				'hostid' => getRequest('hostid'),
-				'name' => getRequest('name', ''),
-				'type' => getRequest('type', ITEM_TYPE_ZABBIX),
-				'key_' => getRequest('key', ''),
-				'interfaceid' => getRequest('interfaceid', 0),
-				'snmp_oid' => getRequest('snmp_oid', ''),
-				'authtype' => getRequest('authtype', ITEM_AUTHTYPE_PASSWORD),
-				'username' => getRequest('username', ''),
-				'password' => getRequest('password', ''),
-				'publickey' => getRequest('publickey', ''),
-				'privatekey' => getRequest('privatekey', ''),
-				'params' => getRequest('params', ''),
-				'ipmi_sensor' => getRequest('ipmi_sensor', ''),
-				'value_type' => getRequest('value_type', ITEM_VALUE_TYPE_FLOAT),
-				'units' => getRequest('units', ''),
-				'delay' => $delay,
-				'history' => (getRequest('history_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF)
-					? ITEM_NO_STORAGE_VALUE
-					: getRequest('history', DB::getDefault('items', 'history')),
-				'trends' => (getRequest('trends_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF)
-					? ITEM_NO_STORAGE_VALUE
-					: getRequest('trends', DB::getDefault('items', 'trends')),
-				'valuemapid' => getRequest('valuemapid', 0),
-				'logtimefmt' => getRequest('logtimefmt', ''),
-				'trapper_hosts' => getRequest('trapper_hosts', ''),
-				'inventory_link' => getRequest('inventory_link', 0),
-				'description' => getRequest('description', ''),
-				'status' => getRequest('status', ITEM_STATUS_DISABLED),
-				'tags' => $tags
-			];
+		$item = [
+			'hostid' => getRequest('hostid'),
+			'name' => getRequest('name', ''),
+			'type' => $type,
+			'key_' => getRequest('key', ''),
+			'interfaceid' => getRequest('interfaceid', 0),
+			'username' => getRequest('username', ''),
+			'password' => getRequest('password', ''),
+			'params' => getRequest('params', ''),
+			'value_type' => getRequest('value_type', ITEM_VALUE_TYPE_FLOAT),
+			'delay' => $delay,
+			'history' => (getRequest('history_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF)
+				? ITEM_NO_STORAGE_VALUE
+				: getRequest('history', DB::getDefault('items', 'history')),
+			'inventory_link' => getRequest('inventory_link', 0),
+			'description' => getRequest('description', ''),
+			'status' => getRequest('status', ITEM_STATUS_DISABLED),
+			'tags' => $tags
+		];
 
-			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
+		switch ($item['type']) {
+			case ITEM_TYPE_TRAPPER:
+				$item['trapper_hosts'] = getRequest('trapper_hosts', '');
+				break;
+
+			case ITEM_TYPE_IPMI:
+				$item['ipmi_sensor'] = getRequest('ipmi_sensor', '');
+				break;
+
+			case ITEM_TYPE_SSH:
+				$item['authtype'] = getRequest('authtype', ITEM_AUTHTYPE_PASSWORD);
+
+				if ($item['authtype'] == ITEM_AUTHTYPE_PUBLICKEY) {
+					$item['publickey'] = getRequest('publickey', '');
+					$item['privatekey'] = getRequest('privatekey', '');
+				}
+				break;
+
+			case ITEM_TYPE_JMX:
+				$item['jmx_endpoint'] = getRequest('jmx_endpoint', '');
+				break;
+
+			case ITEM_TYPE_DEPENDENT:
+				$item['master_itemid'] = getRequest('master_itemid');
+				break;
+
+			case ITEM_TYPE_HTTPAGENT:
 				$http_item = [
 					'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout')),
 					'url' => getRequest('url'),
 					'query_fields' => getRequest('query_fields', []),
+					'post_type' => (int) getRequest('post_type'),
 					'posts' => getRequest('posts'),
 					'status_codes' => getRequest('status_codes', DB::getDefault('items', 'status_codes')),
 					'follow_redirects' => (int) getRequest('follow_redirects'),
-					'post_type' => (int) getRequest('post_type'),
 					'http_proxy' => getRequest('http_proxy'),
 					'headers' => getRequest('headers', []),
 					'retrieve_mode' => (int) getRequest('retrieve_mode'),
@@ -698,41 +712,76 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					'ssl_key_password' => getRequest('ssl_key_password'),
 					'verify_peer' => (int) getRequest('verify_peer'),
 					'verify_host' => (int) getRequest('verify_host'),
-					'authtype' => getRequest('http_authtype', HTTPTEST_AUTH_NONE),
-					'username' => getRequest('http_username', ''),
-					'password' => getRequest('http_password', '')
+					'authtype' => getRequest('http_authtype', HTTPTEST_AUTH_NONE)
 				];
+
+				if ($http_item['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_ON) {
+					$http_item['trapper_hosts'] = getRequest('trapper_hosts', '');
+				}
+
+				if ($http_item['authtype'] != HTTPTEST_AUTH_NONE) {
+					$http_item['username'] = getRequest('http_username', '');
+					$http_item['password'] = getRequest('http_password', '');
+				}
+
 				$item = prepareItemHttpAgentFormData($http_item) + $item;
-			}
+				break;
 
-			if ($item['type'] == ITEM_TYPE_JMX) {
-				$item['jmx_endpoint'] = getRequest('jmx_endpoint', '');
-			}
+			case ITEM_TYPE_SNMP:
+				$item['snmp_oid'] = getRequest('snmp_oid', '');
+				break;
 
-			if ($preprocessing) {
-				$item['preprocessing'] = $preprocessing;
-			}
-
-			if ($item['type'] == ITEM_TYPE_DEPENDENT) {
-				$item['master_itemid'] = getRequest('master_itemid');
-			}
-
-			if ($item['type'] == ITEM_TYPE_SCRIPT) {
+			case ITEM_TYPE_SCRIPT:
 				$script_item = [
 					'parameters' => getRequest('parameters', []),
 					'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout'))
 				];
 
 				$item = prepareScriptItemFormData($script_item) + $item;
-			}
-
-			if ($item['value_type'] == ITEM_VALUE_TYPE_LOG || $item['value_type'] == ITEM_VALUE_TYPE_TEXT) {
-				unset($item['valuemapid']);
-			}
-
-			$result = (bool) API::Item()->create($item);
+				break;
 		}
-		else {
+
+		if (in_array($item['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT])
+				|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key_'], 'mqtt.get', 8) === 0)) {
+			unset($item['delay']);
+		}
+
+		if ($host['status'] == HOST_STATUS_TEMPLATE || !in_array($item['type'], [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE,
+				ITEM_TYPE_EXTERNAL, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP,
+				ITEM_TYPE_SNMP])) {
+			unset($item['interfaceid']);
+		}
+
+		if (!in_array($item['type'], [ITEM_TYPE_SIMPLE, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_DB_MONITOR,
+				ITEM_TYPE_JMX, ITEM_TYPE_HTTPAGENT])) {
+			unset($item['username'], $item['password']);
+		}
+
+		if (!in_array($item['type'], [ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED,
+				ITEM_TYPE_SCRIPT])) {
+			unset($item['params']);
+		}
+
+		switch ($item['value_type']) {
+			case ITEM_VALUE_TYPE_FLOAT:
+			case ITEM_VALUE_TYPE_UINT64:
+				$item['trends'] = (getRequest('trends_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF)
+					? ITEM_NO_STORAGE_VALUE
+					: getRequest('trends', DB::getDefault('items', 'trends'));
+				$item['units'] = getRequest('units', '');
+				// break; is not missing here
+			case ITEM_VALUE_TYPE_STR:
+				$item['valuemapid'] = getRequest('valuemapid', 0);
+				break;
+
+			case ITEM_VALUE_TYPE_LOG:
+				$item['logtimefmt'] = getRequest('logtimefmt', '');
+				break;
+		}
+
+		if (hasRequest('update')) {
+			$itemid = getRequest('itemid');
+
 			$db_items = API::Item()->get([
 				'output' => ['name', 'type', 'key_', 'interfaceid', 'snmp_oid', 'authtype', 'username', 'password',
 					'publickey', 'privatekey', 'params', 'ipmi_sensor', 'value_type', 'units', 'delay', 'history',
@@ -744,128 +793,18 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				],
 				'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 				'selectTags' => ['tag', 'value'],
-				'itemids' => getRequest('itemid')
+				'itemids' => $itemid
 			]);
 			$db_item = reset($db_items);
 
-			$item = [];
-
-			if ($db_item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-				if ($db_item['templateid'] == 0) {
-					$value_type = getRequest('value_type', ITEM_VALUE_TYPE_FLOAT);
-
-					if ($db_item['name'] !== getRequest('name', '')) {
-						$item['name'] = getRequest('name', '');
-					}
-					if ($db_item['type'] != getRequest('type', ITEM_TYPE_ZABBIX)) {
-						$item['type'] = getRequest('type', ITEM_TYPE_ZABBIX);
-					}
-					if ($db_item['key_'] !== getRequest('key', '')) {
-						$item['key_'] = getRequest('key', '');
-					}
-					if ($db_item['snmp_oid'] !== getRequest('snmp_oid', '')) {
-						$item['snmp_oid'] = getRequest('snmp_oid', '');
-					}
-					if ($db_item['ipmi_sensor'] !== getRequest('ipmi_sensor', '')) {
-						$item['ipmi_sensor'] = getRequest('ipmi_sensor', '');
-					}
-					if ($db_item['value_type'] != $value_type) {
-						$item['value_type'] = $value_type;
-					}
-					if ($db_item['units'] !== getRequest('units', '')) {
-						$item['units'] = getRequest('units', '');
-					}
-					if ($value_type != ITEM_VALUE_TYPE_LOG && $value_type != ITEM_VALUE_TYPE_TEXT
-							&& bccomp($db_item['valuemapid'], getRequest('valuemapid', 0)) != 0) {
-						$item['valuemapid'] = getRequest('valuemapid', 0);
-					}
-					if ($db_item['logtimefmt'] !== getRequest('logtimefmt', '')) {
-						$item['logtimefmt'] = getRequest('logtimefmt', '');
-					}
-				}
-
-				if (bccomp($db_item['interfaceid'], getRequest('interfaceid', 0)) != 0) {
-					$item['interfaceid'] = getRequest('interfaceid', 0);
-				}
-				if ($db_item['authtype'] != getRequest('authtype', ITEM_AUTHTYPE_PASSWORD)) {
-					$item['authtype'] = getRequest('authtype', ITEM_AUTHTYPE_PASSWORD);
-				}
-				if ($db_item['username'] !== getRequest('username', '')) {
-					$item['username'] = getRequest('username', '');
-				}
-				if ($db_item['password'] !== getRequest('password', '')) {
-					$item['password'] = getRequest('password', '');
-				}
-				if ($db_item['publickey'] !== getRequest('publickey', '')) {
-					$item['publickey'] = getRequest('publickey', '');
-				}
-				if ($db_item['privatekey'] !== getRequest('privatekey', '')) {
-					$item['privatekey'] = getRequest('privatekey', '');
-				}
-				if ($db_item['params'] !== getRequest('params', '')) {
-					$item['params'] = getRequest('params', '');
-				}
-				if ($db_item['delay'] != $delay) {
-					$item['delay'] = $delay;
-				}
-				$def_item_history = (getRequest('history_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF)
-					? ITEM_NO_STORAGE_VALUE
-					: DB::getDefault('items', 'history');
-				if ((string) $db_item['history'] !== (string) getRequest('history', $def_item_history)) {
-					$item['history'] = getRequest('history', $def_item_history);
-				}
-				$def_item_trends = (getRequest('trends_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF)
-					? ITEM_NO_STORAGE_VALUE
-					: DB::getDefault('items', 'trends');
-				if ((string) $db_item['trends'] !== (string) getRequest('trends', $def_item_trends)) {
-					$item['trends'] = getRequest('trends', $def_item_trends);
-				}
-				if ($db_item['trapper_hosts'] !== getRequest('trapper_hosts', '')) {
-					$item['trapper_hosts'] = getRequest('trapper_hosts', '');
-				}
-				if ($db_item['jmx_endpoint'] !== getRequest('jmx_endpoint', '')) {
-					$item['jmx_endpoint'] = getRequest('jmx_endpoint', '');
-				}
-				if ($db_item['inventory_link'] != getRequest('inventory_link', 0)) {
-					$item['inventory_link'] = getRequest('inventory_link', 0);
-				}
-				if ($db_item['description'] !== getRequest('description', '')) {
-					$item['description'] = getRequest('description', '');
-				}
-				if ($db_item['preprocessing'] !== $preprocessing) {
-					$item['preprocessing'] = $preprocessing;
-				}
-				if (getRequest('type') == ITEM_TYPE_HTTPAGENT) {
-					$http_item = [
-						'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout')),
-						'url' => getRequest('url'),
-						'query_fields' => getRequest('query_fields', []),
-						'posts' => getRequest('posts'),
-						'status_codes' => getRequest('status_codes', DB::getDefault('items', 'status_codes')),
-						'follow_redirects' => (int) getRequest('follow_redirects'),
-						'post_type' => (int) getRequest('post_type'),
-						'http_proxy' => getRequest('http_proxy'),
-						'headers' => getRequest('headers', []),
-						'retrieve_mode' => (int) getRequest('retrieve_mode'),
-						'request_method' => (int) getRequest('request_method'),
-						'output_format' => (int) getRequest('output_format'),
-						'allow_traps' => (int) getRequest('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF),
-						'ssl_cert_file' => getRequest('ssl_cert_file'),
-						'ssl_key_file' => getRequest('ssl_key_file'),
-						'ssl_key_password' => getRequest('ssl_key_password'),
-						'verify_peer' => (int) getRequest('verify_peer'),
-						'verify_host' => (int) getRequest('verify_host'),
-						'authtype' => getRequest('http_authtype', HTTPTEST_AUTH_NONE),
-						'username' => getRequest('http_username', ''),
-						'password' => getRequest('http_password', '')
-					];
-					$item = prepareItemHttpAgentFormData($http_item) + $item;
-				}
+			if ($db_item['type'] == $item['type']) {
+				$item = CArrayHelper::unsetEqualValues($item, $db_item);
+			}
+			else {
+				unset($item['hostid']);
 			}
 
-			if ($db_item['status'] != getRequest('status', ITEM_STATUS_DISABLED)) {
-				$item['status'] = getRequest('status', ITEM_STATUS_DISABLED);
-			}
+			$item['itemid'] = $itemid;
 
 			if (getRequest('type') == ITEM_TYPE_DEPENDENT && hasRequest('master_itemid')
 					&& bccomp($db_item['master_itemid'], getRequest('master_itemid')) != 0) {
@@ -873,12 +812,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			}
 
 			if (getRequest('type') == ITEM_TYPE_SCRIPT) {
-				$script_item = [
-					'parameters' => getRequest('parameters', []),
-					'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout'))
-				];
-
-				$item = prepareScriptItemFormData($script_item) + $item;
 				if ($db_item['type'] == getRequest('type')) {
 					$compare = function($arr, $arr2) {
 						return (array_combine(array_column($arr, 'name'), array_column($arr, 'value')) ==
@@ -889,23 +822,18 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					if ($compare($db_item['parameters'], $item['parameters'])) {
 						unset($item['parameters']);
 					}
-					if ($db_item['timeout'] === $item['timeout']) {
-						unset($item['timeout']);
-					}
-
-					if ($db_item['params'] !== getRequest('params', '')) {
-						$item['params'] = getRequest('params', '');
-					}
 				}
 				else {
-					// If type is changed, even if value stays the same, it must be set. It is required by API.
 					$item['params'] = getRequest('params', '');
 				}
 			}
-			else {
-				if ($db_item['params'] !== getRequest('params', '')) {
-					$item['params'] = getRequest('params', '');
-				}
+			elseif (in_array($type, [ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED])
+					&& $db_item['params'] !== getRequest('params', '')) {
+				$item['params'] = getRequest('params', '');
+			}
+
+			if ($db_item['preprocessing'] !== $preprocessing) {
+				$item['preprocessing'] = $preprocessing;
 			}
 
 			CArrayHelper::sort($db_item['tags'], ['tag', 'value']);
@@ -914,14 +842,16 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$item['tags'] = $tags;
 			}
 
-			if ($item) {
-				$item['itemid'] = getRequest('itemid');
+			$result = API::Item()->update($item);
+		}
+		else {
+			if ($preprocessing) {
+				$item['preprocessing'] = $preprocessing;
+			}
 
-				$result = (bool) API::Item()->update($item);
-			}
-			else {
-				$result = true;
-			}
+			$item['tags'] = $tags;
+
+			$result = (bool) API::Item()->create($item);
 		}
 	}
 

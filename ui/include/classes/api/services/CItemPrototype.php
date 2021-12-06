@@ -29,18 +29,30 @@ class CItemPrototype extends CItemGeneral {
 	protected $sortColumns = ['itemid', 'name', 'key_', 'delay', 'history', 'trends', 'type', 'status', 'discover'];
 
 	/**
-	 * Define a set of supported pre-processing rules.
+	 * A set of supported pre-processing rules.
 	 *
 	 * @var array
 	 */
-	const SUPPORTED_PREPROCESSING_TYPES = [ZBX_PREPROC_REGSUB, ZBX_PREPROC_TRIM, ZBX_PREPROC_RTRIM,
-		ZBX_PREPROC_LTRIM, ZBX_PREPROC_XPATH, ZBX_PREPROC_JSONPATH, ZBX_PREPROC_MULTIPLIER, ZBX_PREPROC_DELTA_VALUE,
-		ZBX_PREPROC_DELTA_SPEED, ZBX_PREPROC_BOOL2DEC, ZBX_PREPROC_OCT2DEC, ZBX_PREPROC_HEX2DEC,
-		ZBX_PREPROC_VALIDATE_RANGE, ZBX_PREPROC_VALIDATE_REGEX, ZBX_PREPROC_VALIDATE_NOT_REGEX,
-		ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_ERROR_FIELD_XML, ZBX_PREPROC_ERROR_FIELD_REGEX,
-		ZBX_PREPROC_THROTTLE_VALUE, ZBX_PREPROC_THROTTLE_TIMED_VALUE, ZBX_PREPROC_SCRIPT,
-		ZBX_PREPROC_PROMETHEUS_PATTERN, ZBX_PREPROC_PROMETHEUS_TO_JSON, ZBX_PREPROC_CSV_TO_JSON,
-		ZBX_PREPROC_STR_REPLACE, ZBX_PREPROC_VALIDATE_NOT_SUPPORTED, ZBX_PREPROC_XML_TO_JSON
+	public const SUPPORTED_PREPROCESSING_TYPES = [
+		ZBX_PREPROC_MULTIPLIER, ZBX_PREPROC_RTRIM, ZBX_PREPROC_LTRIM, ZBX_PREPROC_TRIM, ZBX_PREPROC_REGSUB,
+		ZBX_PREPROC_BOOL2DEC, ZBX_PREPROC_OCT2DEC, ZBX_PREPROC_HEX2DEC, ZBX_PREPROC_DELTA_VALUE,
+		ZBX_PREPROC_DELTA_SPEED, ZBX_PREPROC_XPATH, ZBX_PREPROC_JSONPATH, ZBX_PREPROC_VALIDATE_RANGE,
+		ZBX_PREPROC_VALIDATE_REGEX, ZBX_PREPROC_VALIDATE_NOT_REGEX, ZBX_PREPROC_ERROR_FIELD_JSON,
+		ZBX_PREPROC_ERROR_FIELD_XML, ZBX_PREPROC_ERROR_FIELD_REGEX, ZBX_PREPROC_THROTTLE_VALUE,
+		ZBX_PREPROC_THROTTLE_TIMED_VALUE, ZBX_PREPROC_SCRIPT, ZBX_PREPROC_PROMETHEUS_PATTERN,
+		ZBX_PREPROC_PROMETHEUS_TO_JSON, ZBX_PREPROC_CSV_TO_JSON, ZBX_PREPROC_STR_REPLACE,
+		ZBX_PREPROC_VALIDATE_NOT_SUPPORTED, ZBX_PREPROC_XML_TO_JSON
+	];
+
+	/**
+	 * A set of supported item types.
+	 *
+	 * @var array
+	 */
+	protected const SUPPORTED_ITEM_TYPES = [
+		ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
+		ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED,
+		ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
 	];
 
 	public function __construct() {
@@ -52,17 +64,6 @@ class CItemPrototype extends CItemGeneral {
 			self::ERROR_INVALID_KEY => _('Invalid key "%1$s" for item prototype "%2$s" on "%3$s": %4$s.')
 		]);
 	}
-
-	/**
-	 * Define a set of supported item types.
-	 *
-	 * @var array
-	 */
-	const SUPPORTED_ITEM_TYPES = [ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL,
-		ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH,
-		ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT,
-		ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
-	];
 
 	/**
 	 * Get ItemPrototype data.
@@ -306,7 +307,7 @@ class CItemPrototype extends CItemGeneral {
 			}
 
 			if (array_key_exists('headers', $item)) {
-				$item['headers'] = $this->headersStringToArray($item['headers']);
+				$item['headers'] = self::headersStringToArray($item['headers']);
 			}
 		}
 		unset($item);
@@ -337,164 +338,101 @@ class CItemPrototype extends CItemGeneral {
 	}
 
 	/**
-	 * Check item prototype data and set flags field.
-	 *
-	 * @param array  $items										an array of items passed by reference
-	 * @param bool	 $update
-	 */
-	protected function checkInput(array &$items, $update = false) {
-		parent::checkInput($items, $update);
-
-		// set proper flags to divide normal and discovered items in future processing
-		foreach ($items as &$item) {
-			$item['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
-		}
-		unset($item);
-	}
-
-	/**
-	 * Create item prototype.
-	 *
 	 * @param array $items
+	 *
+	 * @throws APIException
 	 *
 	 * @return array
 	 */
-	public function create($items) {
-		$items = zbx_toArray($items);
-
-		$this->checkInput($items);
-
-		foreach ($items as $key => $item) {
-			$items[$key]['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
-			unset($items[$key]['itemid']);
-		}
-
-		// Validate item prototype status and discover status fields.
-		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'status' => ['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
-			'discover' => ['type' => API_INT32, 'in' => implode(',', [ITEM_DISCOVER, ITEM_NO_DISCOVER])]
-		]];
-
-		foreach ($items as $key => $item) {
-			$item = array_intersect_key($item, $api_input_rules['fields']);
-
-			if (!CApiInputValidator::validate($api_input_rules, $item, '/'.($key + 1), $error)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-			}
-		}
-
-		$this->validateDependentItems($items);
-
-		foreach ($items as &$item) {
-			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
-				if (array_key_exists('query_fields', $item)) {
-					$item['query_fields'] = $item['query_fields'] ? json_encode($item['query_fields']) : '';
-				}
-
-				if (array_key_exists('headers', $item)) {
-					$item['headers'] = $this->headersArrayToString($item['headers']);
-				}
-
-				if (array_key_exists('request_method', $item) && $item['request_method'] == HTTPCHECK_REQUEST_HEAD
-						&& !array_key_exists('retrieve_mode', $item)) {
-					$item['retrieve_mode'] = HTTPTEST_STEP_RETRIEVE_MODE_HEADERS;
-				}
-			}
-			else {
-				$item['query_fields'] = '';
-				$item['headers'] = '';
-			}
-		}
-		unset($item);
+	public function create(array $items): array {
+		$this->validateCreate($items);
 
 		$this->createReal($items);
 		$this->inherit($items);
 
-		return ['itemids' => zbx_objectValues($items, 'itemid')];
+		return ['itemids' => array_column($items, 'itemid')];
 	}
 
-	protected function createReal(&$items) {
-		foreach ($items as &$item) {
-			if ($item['type'] != ITEM_TYPE_DEPENDENT) {
-				$item['master_itemid'] = null;
-			}
-		}
-		unset($item);
+	/**
+	 * @param array $items
+	 * @param array $specific_rules
+	 *
+	 * @throws APIException
+	 */
+	protected function validateCreate(array &$items, array $specific_rules = []): void {
+		parent::validateCreate($items, [
+			'ruleid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
+			'history' =>		['type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | $this instanceof CItemPrototype ? API_ALLOW_LLD_MACRO : 0, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'history')],
+			'trends' =>			['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | $this instanceof CItemPrototype ? API_ALLOW_LLD_MACRO : 0, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'trends')],
+									['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'value_type' =>		['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
+									['if' => ['field' => 'type', 'in' => ITEM_TYPE_CALCULATED], 'type' => API_INT32, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])],
+									['else' => true, 'type' => API_INT32, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT])]
+			]],
+			'units' =>			['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'units')],
+									['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'logtimefmt' =>		['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'value_type', 'in' => ITEM_VALUE_TYPE_LOG], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'logtimefmt')],
+									['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'valuemapid' =>		['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_UINT64])], 'type' => API_ID],
+									['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'params' =>			['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'type', 'in' => implode(',', [ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_SCRIPT])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'params')],
+									['if' => ['field' => 'type', 'in' => ITEM_TYPE_CALCULATED], 'type' => API_CALC_FORMULA, 'flags' => API_REQUIRED | API_NOT_EMPTY | $this instanceof CItemPrototype ? API_ALLOW_LLD_MACRO : 0, 'length' => DB::getFieldLength('items', 'params')],
+									['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'interfaceid' =>	['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'type', 'in' => implode(',', [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_SNMP])], 'type' => API_ID],
+									['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'discover' =>		['type' => API_INT32, 'in' => implode(',', [ITEM_DISCOVER, ITEM_NO_DISCOVER])],
+			'tags' =>			self::getTagsValidationRules()
+		]);
+
+		self::checkDiscoveryRulePermissions($items);
+		self::checkValueMaps($items);
+	}
+
+	/**
+	 * @param array $items
+	 */
+	protected function createReal(array &$items): void {
 		$itemids = DB::insert('items', $items);
 
-		$insertItemDiscovery = [];
+		$ins_item_discovery = [];
 		foreach ($items as $key => $item) {
 			$items[$key]['itemid'] = $itemids[$key];
 
-			$insertItemDiscovery[] = [
+			$ins_item_discovery[] = [
 				'itemid' => $items[$key]['itemid'],
 				'parent_itemid' => $item['ruleid']
 			];
 		}
-		DB::insertBatch('item_discovery', $insertItemDiscovery);
+		DB::insertBatch('item_discovery', $ins_item_discovery);
 
-		$this->createItemParameters($items, $itemids);
-		$this->createItemPreprocessing($items);
-		$this->createItemTags($items);
-	}
+		self::updateParameters($items);
+		self::updatePreprocessing($items);
+		self::updateTags($items);
 
-	protected function updateReal(array $items) {
-		CArrayHelper::sort($items, ['itemid']);
-
-		$data = [];
-		foreach ($items as $item) {
-			$data[] = ['values' => $item, 'where'=> ['itemid' => $item['itemid']]];
-		}
-
-		$result = DB::update('items', $data);
-		if (!$result) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-		}
-
-		$this->updateItemParameters($items);
-		$this->updateItemPreprocessing($items);
-		$this->updateItemTags($items);
+		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_ITEM_PROTOTYPE, $items);
 	}
 
 	/**
-	 * Update ItemPrototype.
-	 *
 	 * @param array $items
+	 *
+	 * @throws APIException
 	 *
 	 * @return array
 	 */
-	public function update($items) {
-		$items = zbx_toArray($items);
-
-		$this->checkInput($items, true);
-
-		// Validate item prototype status and discover status fields.
-		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'status' => ['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
-			'discover' => ['type' => API_INT32, 'in' => implode(',', [ITEM_DISCOVER, ITEM_NO_DISCOVER])]
-		]];
-
-		foreach ($items as $key => $item) {
-			$items[$key]['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
-
-			$item = array_intersect_key($item, $api_input_rules['fields']);
-			if (!CApiInputValidator::validate($api_input_rules, $item, '/'.($key + 1), $error)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-			}
-		}
-
-		$db_items = $this->get([
-			'output' => ['type', 'master_itemid', 'authtype', 'allow_traps', 'retrieve_mode', 'value_type'],
-			'itemids' => zbx_objectValues($items, 'itemid'),
-			'editable' => true,
-			'preservekeys' => true
-		]);
-
-		$items = $this->extendFromObjects(zbx_toHash($items, 'itemid'), $db_items, ['type', 'authtype',
-			'master_itemid', 'value_type'
-		]);
-
-		$this->validateDependentItems($items);
+	public function update(array $items): array {
+		$this->validateUpdate($items, $db_items);
 
 		$defaults = DB::getDefaults('items');
 		$clean = [
@@ -549,7 +487,7 @@ class CItemPrototype extends CItemGeneral {
 				}
 
 				if (array_key_exists('allow_traps', $item) && $item['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_OFF
-						&& $item['allow_traps'] != $db_items[$item['itemid']]['allow_traps']) {
+					&& $item['allow_traps'] != $db_items[$item['itemid']]['allow_traps']) {
 					$item['trapper_hosts'] = '';
 				}
 
@@ -558,7 +496,7 @@ class CItemPrototype extends CItemGeneral {
 				}
 
 				if (array_key_exists('headers', $item) && is_array($item['headers'])) {
-					$item['headers'] = $this->headersArrayToString($item['headers']);
+					$item['headers'] = self::headersArrayToString($item['headers']);
 				}
 
 				if (array_key_exists('request_method', $item) && $item['request_method'] == HTTPCHECK_REQUEST_HEAD
@@ -589,48 +527,128 @@ class CItemPrototype extends CItemGeneral {
 					$item['valuemapid'] = 0;
 				}
 			}
+		}
+		unset($item);
 
-			if (array_key_exists('tags', $item)) {
-				$item['tags'] = array_map(function ($tag) {
-					return $tag + ['value' => ''];
-				}, $item['tags']);
+		$this->updateReal($items, $db_items);
+		$this->inherit($items);
+
+		return ['itemids' => array_column($items, 'itemid')];
+	}
+
+	/**
+	 * @param array      $items
+	 * @param array|null $db_items
+	 * @param array      $specific_rules
+	 *
+	 * @throws APIException
+	 */
+	protected function validateUpdate(array &$items, ?array &$db_items, array $specific_rules = []): void {
+		parent::validateUpdate($items, $db_items, [
+			'ruleid' =>			['type' => API_ID],
+			'history' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO | $this instanceof CItemPrototype ? API_ALLOW_LLD_MACRO : 0, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'history')],
+			'trends' =>			['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO | $this instanceof CItemPrototype ? API_ALLOW_LLD_MACRO : 0, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'trends')],
+									['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'value_type' =>		['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'type', 'in' => ITEM_TYPE_CALCULATED], 'type' => API_INT32, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])],
+									['else' => true, 'type' => API_INT32, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT])]
+			]],
+			'units' =>			['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'units')],
+									['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'logtimefmt' =>		['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'value_type', 'in' => ITEM_VALUE_TYPE_LOG], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'logtimefmt')],
+									['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'valuemapid' =>		['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_UINT64])], 'type' => API_ID],
+									['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'params' =>			['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'type', 'in' => implode(',', [ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_SCRIPT])], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'params')],
+									['if' => ['field' => 'type', 'in' => ITEM_TYPE_CALCULATED], 'type' => API_CALC_FORMULA, 'flags' => API_NOT_EMPTY | $this instanceof CItemPrototype ? API_ALLOW_LLD_MACRO : 0, 'length' => DB::getFieldLength('items', 'params')],
+									['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'interfaceid' =>	['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'type', 'in' => implode(',', [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_SNMP])], 'type' => API_ID],
+									['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'discover' =>		['type' => API_INT32, 'in' => implode(',', [ITEM_DISCOVER, ITEM_NO_DISCOVER])],
+			'tags' =>			self::getTagsValidationRules()
+		]);
+
+		self::checkValueMaps($items);
+	}
+
+	/**
+	 * @param array $items
+	 * @param array $db_items
+	 *
+	 * @throws APIException
+	 */
+	protected function updateReal(array $items, array $db_items): void {
+		CArrayHelper::sort($items, ['itemid']);
+
+		$upd_items = [];
+
+		foreach ($items as &$item) {
+			$upd_item = DB::getUpdatedValues('items', $item, $db_items[$item['itemid']]);
+
+			if ($upd_item) {
+				$upd_items[] = [
+					'values' => $upd_item,
+					'where' => ['itemid' => $item['itemid']]
+				];
+			}
+
+			foreach (['query_fields', 'headers'] as $field) {
+				if (array_key_exists($field, $item) && $item[$field] === '') {
+					$item[$field] = [];
+				}
 			}
 		}
 		unset($item);
 
-		$this->updateReal($items);
-		$this->inherit($items);
+		if ($upd_items) {
+			DB::update('items', $upd_items);
+		}
 
-		return ['itemids' => zbx_objectValues($items, 'itemid')];
+		self::updateParameters($items, $db_items);
+		self::updatePreprocessing($items, $db_items);
+		self::updateTags($items, $db_items);
+
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_ITEM_PROTOTYPE, $items, $db_items);
 	}
 
 	/**
-	 * Delete Item prototypes.
-	 *
 	 * @param array $itemids
+	 *
+	 * @throws APIException
 	 *
 	 * @return array
 	 */
-	public function delete(array $itemids) {
+	public function delete(array $itemids): array {
 		$this->validateDelete($itemids, $db_items);
 
 		CItemPrototypeManager::delete($itemids);
 
-		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_ITEM_PROTOTYPE, $db_items);
+		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_ITEM_PROTOTYPE, $db_items);
 
 		return ['prototypeids' => $itemids];
 	}
 
 	/**
-	 * Validates the input parameters for the delete() method.
+	 * @param array      $itemids
+	 * @param array|null $db_items
 	 *
-	 * @param array $itemids   [IN/OUT]
-	 * @param array $db_items  [OUT]
-	 *
-	 * @throws APIException if the input is invalid.
+	 * @throws APIException
 	 */
-	private function validateDelete(array &$itemids, array &$db_items = null) {
+	private function validateDelete(array &$itemids, ?array &$db_items): void {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+
 		if (!CApiInputValidator::validate($api_input_rules, $itemids, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
@@ -662,7 +680,7 @@ class CItemPrototype extends CItemGeneral {
 		$data['hostids'] = zbx_toArray($data['hostids']);
 
 		$output = [];
-		foreach ($this->fieldRules as $field_name => $rules) {
+		foreach ($this->field_rules as $field_name => $rules) {
 			if (!array_key_exists('system', $rules) && !array_key_exists('host', $rules)) {
 				$output[] = $field_name;
 			}
@@ -685,7 +703,7 @@ class CItemPrototype extends CItemGeneral {
 				}
 
 				if (array_key_exists('headers', $tpl_item) && is_array($tpl_item['headers'])) {
-					$tpl_item['headers'] = $this->headersArrayToString($tpl_item['headers']);
+					$tpl_item['headers'] = self::headersArrayToString($tpl_item['headers']);
 				}
 			}
 			else {
@@ -701,30 +719,24 @@ class CItemPrototype extends CItemGeneral {
 	}
 
 	/**
-	 * Check item prototype specific fields:
-	 *		- validate history and trends using simple interval parser, user macro parser and lld macro parser;
-	 *		- validate item preprocessing.
+	 * @param array $items
 	 *
-	 * @param array  $item    An array of single item data.
-	 * @param string $method  A string of "create" or "update" method.
-	 *
-	 * @throws APIException if the input is invalid.
+	 * @throws APIException
 	 */
-	protected function checkSpecificFields(array $item, $method) {
-		if (array_key_exists('history', $item)
-				&& !validateTimeUnit($item['history'], SEC_PER_HOUR, 25 * SEC_PER_YEAR, true, $error,
-					['usermacros' => true, 'lldmacros' => true])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Incorrect value for field "%1$s": %2$s.', 'history', $error)
-			);
-		}
+	private static function checkDiscoveryRulePermissions(array $items): void {
+		$db_discovery_rules = API::DiscoveryRule()->get([
+			'output' => ['hostid'],
+			'itemids' => array_column($items, 'ruleid'),
+			'preservekeys' => true
+		]);
 
-		if (array_key_exists('trends', $item)
-				&& !validateTimeUnit($item['trends'], SEC_PER_DAY, 25 * SEC_PER_YEAR, true, $error,
-					['usermacros' => true, 'lldmacros' => true])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Incorrect value for field "%1$s": %2$s.', 'trends', $error)
-			);
+		foreach ($items as $item) {
+			if (!array_key_exists($item['ruleid'], $db_discovery_rules)
+					|| bccomp($db_discovery_rules[$item['ruleid']]['hostid'], $item['hostid']) != 0) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
 		}
 	}
 
@@ -744,7 +756,7 @@ class CItemPrototype extends CItemGeneral {
 		return $sqlParts;
 	}
 
-	public function addRelatedObjects(array $options, array $result) {
+	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
 		$itemids = array_keys($result);

@@ -22,7 +22,7 @@
 /**
  * Class containing methods for operations with discovery rules.
  */
-class CDiscoveryRule extends CItemGeneral {
+class CDiscoveryRule extends CItemGeneralOld {
 
 	public const ACCESS_RULES = parent::ACCESS_RULES + [
 		'copy' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
