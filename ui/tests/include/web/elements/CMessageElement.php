@@ -50,6 +50,16 @@ class CMessageElement extends CElement {
 	}
 
 	/**
+	 * Check if message is warning.
+	 *
+	 * @return boolean
+	 */
+	public function isWarning() {
+		return in_array('msg-warning', explode(' ', $this->getAttribute('class')));
+	}
+
+
+	/**
 	 * Get message title.
 	 *
 	 * @return string

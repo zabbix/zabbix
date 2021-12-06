@@ -3493,7 +3493,7 @@ static int	vmware_service_hv_get_multipath_data(const zbx_vmware_service_t *serv
 		"<ns0:pathSet>config.storageDevice.scsiLun[\"%s\"].canonicalName</ns0:pathSet>"
 
 	zbx_vector_str_t	scsi_luns;
-	char			*tmp = NULL, *scsi_req = NULL, *hvid_esc;
+	char			*scsi_req = NULL;
 	int			i, ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hvid:'%s'", __func__, hvid);
@@ -3502,27 +3502,28 @@ static int	vmware_service_hv_get_multipath_data(const zbx_vmware_service_t *serv
 	zbx_xml_read_values(hv_data, ZBX_XPATH_HV_SCSI_TOPOLOGY, &scsi_luns);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() count of scsiLun:%d", __func__, scsi_luns.values_num);
 
-	if (0 == scsi_luns.values_num)
-	{
-		ret = SUCCEED;
-		goto out;
-	}
-
 	for (i = 0; i < scsi_luns.values_num; i++)
 	{
 		scsi_req = zbx_strdcatf(scsi_req , ZBX_POST_SCSI_INFO, scsi_luns.values[i]);
 	}
 
-	zbx_vector_str_clear_ext(&scsi_luns, zbx_str_free);
-	hvid_esc = xml_escape_dyn(hvid);
-	tmp = zbx_dsprintf(tmp, ZBX_POST_HV_MP_DETAILS,
-			vmware_service_objects[service->type].property_collector, scsi_req, hvid_esc);
-	zbx_free(hvid_esc);
-	zbx_free(scsi_req);
+	if (0 != scsi_luns.values_num)
+	{
+		char	*tmp, *hvid_esc;
 
-	ret = zbx_soap_post(__func__, easyhandle, tmp, xdoc, error);
-out:
-	zbx_free(tmp);
+		zbx_vector_str_clear_ext(&scsi_luns, zbx_str_free);
+		hvid_esc = xml_escape_dyn(hvid);
+		tmp = zbx_dsprintf(NULL, ZBX_POST_HV_MP_DETAILS,
+				vmware_service_objects[service->type].property_collector, scsi_req, hvid_esc);
+		zbx_free(hvid_esc);
+		zbx_free(scsi_req);
+
+		ret = zbx_soap_post(__func__, easyhandle, tmp, xdoc, error);
+		zbx_free(tmp);
+	}
+	else
+		ret = SUCCEED;
+
 	zbx_vector_str_destroy(&scsi_luns);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

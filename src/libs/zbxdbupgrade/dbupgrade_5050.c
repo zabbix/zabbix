@@ -1180,6 +1180,29 @@ static int	DBpatch_5050110(void)
 
 static int	DBpatch_5050111(void)
 {
+	if (FAIL != DBindex_exists("alerts", "alerts_8"))
+		return SUCCEED;
+
+	return DBcreate_index("alerts", "alerts_8", "acknowledgeid", 0);
+}
+
+static int	DBpatch_5050112(void)
+{
+	const ZBX_FIELD	field = {"notify_if_canceled", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("actions", &field);
+}
+
+static int	DBpatch_5050113(void)
+{
+	const ZBX_FIELD old_field = {"formula", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD new_field = {"formula", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("actions", &new_field, &old_field);
+}
+
+static int	DBpatch_5050114(void)
+{
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		*sql = NULL, *params = NULL;
@@ -1331,5 +1354,8 @@ DBPATCH_ADD(5050108, 0, 1)
 DBPATCH_ADD(5050109, 0, 1)
 DBPATCH_ADD(5050110, 0, 1)
 DBPATCH_ADD(5050111, 0, 1)
+DBPATCH_ADD(5050112, 0, 1)
+DBPATCH_ADD(5050113, 0, 1)
+DBPATCH_ADD(5050114, 0, 1)
 
 DBPATCH_END()

@@ -6424,6 +6424,22 @@ z-select,
 	}
 }
 
+.linked-templates {
+	> .table-forms {
+		margin-bottom: 5px;
+		line-height: 24px;
+
+		td, th {
+			padding: 0 5px 0 0;
+
+			&:last-child {
+				width: 0;
+				padding-right: 0;
+			}
+		}
+	}
+}
+
 // Report -> Audit details styles.
 
 .audit-details-popup-wrapper {

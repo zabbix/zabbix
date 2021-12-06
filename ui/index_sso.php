@@ -194,7 +194,7 @@ try {
 			);
 		}
 
-		CSessionHelper::set('saml_data', [
+		$saml_data = [
 			'username_attribute' => reset(
 				$user_attributes[CAuthenticationHelper::get(CAuthenticationHelper::SAML_USERNAME_ATTRIBUTE)]
 			),
@@ -203,7 +203,10 @@ try {
 			'nameid_name_qualifier' => $auth->getNameIdNameQualifier(),
 			'nameid_sp_name_qualifier' => $auth->getNameIdSPNameQualifier(),
 			'session_index' => $auth->getSessionIndex()
-		]);
+		];
+		$saml_data['sign'] = CEncryptHelper::hash(json_encode($saml_data));
+
+		CSessionHelper::set('saml_data', $saml_data);
 
 		if (hasRequest('RelayState') && strpos(getRequest('RelayState'), $baseurl) === false) {
 			$relay_state = getRequest('RelayState');
@@ -234,6 +237,18 @@ try {
 
 	if (CSessionHelper::has('saml_data')) {
 		$saml_data = CSessionHelper::get('saml_data');
+
+		if (!array_key_exists('sign', $saml_data)) {
+			throw new Exception(_('Session initialization error.'));
+		}
+
+		$saml_data_sign = $saml_data['sign'];
+		$saml_data_sign_check = CEncryptHelper::hash(json_encode(array_diff_key($saml_data, array_flip(['sign']))));
+
+		if (!CEncryptHelper::checkSign($saml_data_sign, $saml_data_sign_check)) {
+			throw new Exception(_('Session initialization error.'));
+		}
+
 		CWebUser::$data = API::getApiService('user')->loginByUsername($saml_data['username_attribute'],
 			(CAuthenticationHelper::get(CAuthenticationHelper::SAML_CASE_SENSITIVE) == ZBX_AUTH_CASE_SENSITIVE),
 			CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE)

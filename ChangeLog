@@ -1,8 +1,45 @@
+Changes for 6.0.0alpha8
+
+New features:
+.........T [ZBXNEXT-7031] upgraded Oracle by ODBC template for using config string in items (abiba)
+........S. [ZBXNEXT-2579] added baseline monitoring functions baslinewma,baselinedev (wiper)
+..F....... [ZBXNEXT-7020] added baseline function entry to front-end (jfreibergs)
+A.F.....S. [ZBXNEXT-6250] added option to opt-out of "escalation canceled" messages (miks, ssimonenko)
+..FG...... [ZBXNEXT-6593] added support of persistent files for restoring log item state after agent restart (Andris)
+..F....... [ZBXNEXT-7070] transferred host and template mass update template inputs to main tab (jfreibergs)
+
+Bug fixes:
+.........T [ZBX-18474] fixed regexp in macros in Template Module Windows Services (abiba)
+........S. [ZBX-19651] fixed problem escalation when at least one of the hosts in a trigger expression is not in maintenance (dgoloscapov)
+...G.....T [ZBX-19897] updated postgresql templates and plugin files (vkhaliev)
+A......... [ZBX-20120] fixed import of several hosts assigned to different proxies (Sasha)
+........S. [ZBX-20238] fixed linking templates with trigger prototypes (wiper)
+........S. [ZBX-20178] fixed action webhook failure when return value is not required (dgoloscapov, wiper)
+........S. [ZBX-19806] added support of multiple header fields in JS method getHeaders() (dgoloscapov)
+...G...... [ZBX-20192] fixed quote expansion in command execution in agent2 on windows (dgoloscapov)
+........S. [ZBX-19924] fixed trigger expression and calculated items not allowing to specify timeshift that ends in future even if it starts in the past (vso)
+..F....... [ZBX-19973] fixed event list hintbox field validation (miks)
+..F....... [ZBX-20294] fixed typo in system information table (jfreibergs)
+..F....... [ZBX-20170] fixed trigger expression testing constructor for monoinc and monodec functions (miks)
+..F....... [ZBX-20268] fixed disabled button issue when cloning a service (averza)
+
+--------------------------------------------------------------------------------
 Changes for 6.0.0alpha7
 
 New features:
+..F.....S. [ZBXNEXT-6955] added trendstl() anomaly detection function (arimdjonoks, gcalenko)
+...G...... [ZBXNEXT-6936] added possibility to reload user parameters without restarting Zabbix Agent (asestakovs)
+..F....PS. [ZBXNEXT-3706] added support for utf8mb4 encoding with utf8mb4_bin collation on mysql and mariadb (miks, yurii)
 
 Bug fixes:
+.........T [ZBX-19514] fixed disc utilization metric for windows discs discovery (abiba)
+.......PS. [ZBX-19866] fixed possible duplication of server log messages with first network error or interface activation (akozlovs)
+........S. [ZBX-20177] added acnowledgeid index for alerts table (ssimonenko)
+.....J.... [ZBX-19587] fixed Zabbix Java gateway error message when object or attribute is not found (vso)
+....I...S. [ZBX-20176] fixed trigger not being calculated for first value when item changes state to supported; fixed build failure when DES is disabled in Net-SNMP; fixed tests on big-endian systems (vso)
+.........T [ZBX-20150] fixed special characters escaping in markdown parsing of the Telegram media type (abiba)
+A......... [ZBX-19888] fixed selectUpdateOperations option not accepting "extend" value in Actions API (averza)
+A......... [ZBX-20200] fixed PHP runtime errors when updating media type (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.0alpha6
@@ -216,6 +253,29 @@ Bug fixes:
 .........T [ZBX-19395] changed version in links of the templates and the media (mchudinov)
 
 --------------------------------------------------------------------------------
+Changes for 5.4.9rc1
+
+New features:
+.........T [ZBXNEXT-7031] upgraded Oracle by ODBC template for using config string in items (abiba)
+..FG...... [ZBXNEXT-6593] added support of persistent files for restoring log item state after agent restart (Andris)
+
+Bug fixes:
+........S. [ZBX-19651] fixed problem escalation when at least one of the hosts in a trigger expression is not in maintenance (dgoloscapov)
+...G.....T [ZBX-19897] updated postgresql templates and plugin files (vkhaliev)
+A......... [ZBX-20120] fixed import of several hosts assigned to different proxies (Sasha)
+........S. [ZBX-20178] fixed action webhook failure when return value is not required (dgoloscapov, wiper)
+........S. [ZBX-19806] added support of multiple header fields in JS method getHeaders() (dgoloscapov)
+...G...... [ZBX-20192] fixed quote expansion in command execution in agent2 on windows (dgoloscapov)
+........S. [ZBX-19924] fixed trigger expression and calculated items not allowing to specify timeshift that ends in future even if it starts in the past (vso)
+........S. [ZBX-20238] fixed linking templates with trigger prototypes (wiper)
+..F....... [ZBX-19973] fixed event list hintbox field validation (miks)
+
+--------------------------------------------------------------------------------
+Changes for 5.4.8
+
+5.4.8rc1 was released as 5.4.8 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.4.8rc1
 
 New features:
@@ -224,6 +284,12 @@ New features:
 .........T [ZBXNEXT-7014] updated README for a newer version of PagerDuty (abiba)
 
 Bug fixes:
+.........T [ZBX-19514] fixed disc utilization metric for windows discs discovery (abiba)
+.......PS. [ZBX-19866] fixed possible duplication of server log messages with first network error or interface activation (akozlovs)
+........S. [ZBX-20177] added acknowledgeid index for alerts table (ssimonenko)
+.....J.... [ZBX-19587] fixed Zabbix Java gateway error message when object or attribute is not found (vso)
+....I...S. [ZBX-20176] fixed trigger not being calculated for first value when item changes state to supported; fixed build failure when DES is disabled in Net-SNMP; fixed tests on big-endian systems (vso)
+.........T [ZBX-20150] fixed special characters escaping in markdown parsing of the Telegram media type (abiba)
 .......PS. [ZBX-20097] added celsius support to vmware unitInfo (asestakovs)
 .......PS. [ZBX-20085] fixed build on Solaris; thanks to Yuuki Enomoto for the patch (vso)
 ...G...... [ZBX-19926] fixed Zabbix agent crashing when reading event log on Windows Server 2022 (vso)
@@ -1337,9 +1403,27 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
+Changes for 5.0.19rc1
+
+New features:
+
+Bug fixes:
+.........T [ZBX-18474] fixed filters regex in OS Windows template (abiba)
+........S. [ZBX-19651] fixed problem escalation when at least one of the hosts in a trigger expression is not in maintenance (dgoloscapov)
+...G.....T [ZBX-19897] updated postgresql templates and plugin files (vkhaliev)
+.........T [ZBX-20212] fixed max columns values for screens in linux templates (vkhaliev)
+...G...... [ZBX-20192] fixed quote expansion in command execution in agent2 on windows (dgoloscapov)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.18
+
+5.0.18rc1 was released as 5.0.18 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.18rc1
 
 New features:
+..FG...... [ZBXNEXT-6593] added support of persistent files for restoring log item state after agent restart (Andris)
 ...G...... [ZBXNEXT-6651] added new item agent.variant for Agent and Agent2 (agriscenko, akozlovs)
 ...G.....T [ZBXNEXT-6677] added cpu percent field to docker.container_stats key for docker plugin in Zabbix agent 2 and docker template (afayantsev, esneiders)
 .........T [ZBXNEXT-7014] updated README for a newer version of PagerDuty (abiba)
@@ -1350,6 +1434,11 @@ New features:
 .......PS. [ZBXNEXT-6644] added support for vmware key named 'vmware.hv.maintenance' (MVekslers)
 
 Bug fixes:
+.........T [ZBX-19514] fixed disc utilization metric for windows discs discovery (abiba)
+........S. [ZBX-20177] added acknowledgeid index for alerts table (ssimonenko)
+.....J.... [ZBX-19587] fixed Zabbix Java gateway error message when object or attribute is not found (vso)
+....I...S. [ZBX-20176] fixed trigger not being calculated for first value when item changes state to supported; fixed build failure when DES is disabled in Net-SNMP; fixed tests on big-endian systems (vso)
+.........T [ZBX-20150] fixed special characters escaping in markdown parsing of the Telegram media type (abiba)
 ...G...... [ZBX-19926] fixed Zabbix agent crashing when reading event log on Windows Server 2022 (vso)
 .........T [ZBX-20080] fixed error message (abiba)
 .........T [ZBX-20003] fixed update and discard intervals in generic snmp and some other templates (vkhaliev)
@@ -3641,9 +3730,19 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
-Changes for 4.0.36rc1
+Changes for 4.0.37rc1
 
 New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.36
+
+4.0.36rc1 was released as 4.0.36 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.36rc1
 
 Bug fixes:
 ...G...... [ZBX-19926] fixed Zabbix agent crashing when reading event log on Windows Server 2022 (vso)

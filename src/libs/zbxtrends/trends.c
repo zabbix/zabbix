@@ -91,7 +91,6 @@ static int	trends_parse_base(const char *period_shift, zbx_time_unit_t *base, ch
 int	zbx_trends_parse_base(const char *params, zbx_time_unit_t *base, char **error)
 {
 	const char	*period_shift;
-	int		ret;
 
 	if (NULL == (period_shift = strchr(params, ':')))
 	{
@@ -99,9 +98,7 @@ int	zbx_trends_parse_base(const char *params, zbx_time_unit_t *base, char **erro
 		return FAIL;
 	}
 
-	ret = trends_parse_base(period_shift + 1, base, error);
-
-	return ret;
+	return trends_parse_base(period_shift + 1, base, error);
 }
 
 /******************************************************************************
@@ -252,7 +249,8 @@ int	zbx_parse_timeshift(time_t from, const char *timeshift, struct tm *tm, char 
  ******************************************************************************/
 int	zbx_trends_parse_range(time_t from, const char *param, int *start, int *end, char **error)
 {
-	int		period_num, period_hours[ZBX_TIME_UNIT_COUNT] = {0, 0, 0, 1, 24, 24 * 7, 24 * 30, 24 * 365};
+	int		period_num;
+	int		period_hours[ZBX_TIME_UNIT_COUNT] = {0, 0, 0, 1, 24, 24 * 7, 24 * 30, 24 * 365, 24 * 7 * 53};
 	zbx_time_unit_t	period_unit;
 	size_t		len;
 	struct tm	tm_end, tm_start;
@@ -359,7 +357,8 @@ int	zbx_trends_parse_nextcheck(time_t from, const char *period_shift, time_t *ne
 		{
 			if (ZBX_TIME_UNIT_UNKNOWN == (unit = zbx_tm_str_to_unit(++period_shift)))
 			{
-				*error = zbx_dsprintf(*error, "unexpected character starting with \"%s\"", period_shift);
+				*error = zbx_dsprintf(*error, "unexpected character starting with \"%s\"",
+						period_shift);
 				return FAIL;
 			}
 
@@ -388,6 +387,10 @@ int	zbx_trends_parse_nextcheck(time_t from, const char *period_shift, time_t *ne
 			}
 
 			period_shift += len;
+		}
+		else if (',' == *period_shift)
+		{
+			break;
 		}
 		else
 		{
@@ -678,3 +681,28 @@ int	zbx_trends_eval_sum(const char *table, zbx_uint64_t itemid, int start, int e
 
 	return FAIL;
 }
+
+zbx_trend_state_t	zbx_trends_get_avg(const char *table, zbx_uint64_t itemid, int start, int end, double *value)
+{
+	zbx_trend_state_t	state;
+
+	if (FAIL == zbx_tfc_get_value(itemid, start, end, ZBX_TREND_FUNCTION_AVG, value, &state))
+	{
+		state = trends_eval_avg(table, itemid, start, end, value);
+		zbx_tfc_put_value(itemid, start, end, ZBX_TREND_FUNCTION_AVG, *value, state);
+	}
+
+	return state;
+}
+
+const char	*zbx_trends_error(zbx_trend_state_t state)
+{
+	if (0 > state || state >= ZBX_TREND_STATE_COUNT)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return "unknown trend cache state";
+	}
+
+	return trends_errors[state];
+}
+

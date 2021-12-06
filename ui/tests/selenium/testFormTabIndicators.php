@@ -39,14 +39,6 @@ class testFormTabIndicators extends CWebTest {
 					'form' => 'name:templatesForm',
 					'tabs' => [
 						[
-							'name' => 'Linked templates',
-							'entries' => [
-								'Link new templates' => ['Empty template', 'Form test template', 'Docker']
-							],
-							'field_type' => 'DEV-1671', // Change field type to multiselect once DEV-1671 is merged.
-							'count' => 3
-						],
-						[
 							'name' => 'Tags',
 							'entries' => [
 								[
@@ -100,14 +92,6 @@ class testFormTabIndicators extends CWebTest {
 					'url' => 'zabbix.php?action=host.edit',
 					'form' => 'id:host-form',
 					'tabs' => [
-						[
-							'name' => 'Templates',
-							'entries' => [
-								'Link new templates' => ['Empty template', 'Form test template']
-							],
-							'field_type' => 'DEV-1671', // Change field type to multiselect once DEV-1671 is merged.
-							'count' => 2
-						],
 						[
 							'name' => 'Tags',
 							'entries' => [
@@ -186,22 +170,6 @@ class testFormTabIndicators extends CWebTest {
 					'url' => 'host_prototypes.php?form=create&context=host&parent_discoveryid=31369',
 					'form' => 'name:hostPrototypeForm',
 					'tabs' => [
-						[
-							'name' => 'Groups',
-							'entries' => [
-								'Groups' => ['Discovered hosts', 'Empty group', 'Hypervisors']
-							],
-							'field_type' => 'multiselect',
-							'count' => 3
-						],
-						[
-							'name' => 'Templates',
-							'entries' => [
-								'Link new templates' => ['Empty template', 'Form test template', 'MySQL by Zabbix agent']
-							],
-							'field_type' => 'DEV-1671', // Change field type to multiselect once DEV-1671 is merged.
-							'count' => 3
-						],
 						[
 							'name' => 'Tags',
 							'entries' => [
@@ -697,9 +665,6 @@ class testFormTabIndicators extends CWebTest {
 			$form = $this->query($data['form'])->asForm()->one()->waitUntilVisible();
 			$form->getField('Type')->fill('Graph');
 			$form->invalidate();
-		}
-		elseif ($data['url'] === 'zabbix.php?action=host.edit') {
-			$form = $this->query($data['form'])->asForm()->one()->waitUntilVisible();
 		}
 		else {
 			$form = $this->query($data['form'])->asForm()->one()->waitUntilVisible();
