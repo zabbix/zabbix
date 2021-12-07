@@ -37,6 +37,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 	}
 
 	protected function doAction() {
+		$name = $this->getDefaultName();
 		$cells = [];
 		$url = null;
 		$error = '';
@@ -85,6 +86,25 @@ class CControllerWidgetItemView extends CControllerWidget {
 
 		$show = array_flip($fields['show']);
 
+		/*
+		 * Select orignal item name in several cases: if user is in normal dashboards or in template dashboards when
+		 * user is in view mode to display that item name in widget name. Item name will be resolved using standard
+		 * macro resolving and the "name_expanded" will be used afterwards. Item name should be select only if it is not
+		 * overwritten. Host name can be attached to item name with delimiter when user is in normal dashbords.
+		 */
+		if ($this->getInput('name', '') === '') {
+			if ($this->getContext() === CWidgetConfig::CONTEXT_DASHBOARD
+					|| $this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
+					&& $this->hasInput('dynamic_hostid')) {
+				$options['output'] = array_merge($options['output'], ['name']);
+			}
+
+			if ($this->getContext() === CWidgetConfig::CONTEXT_DASHBOARD) {
+				$options['selectHosts'] = ['name'];
+			}
+		}
+
+		// Add other fields in case current widget is set in dynamic mode, template dashboard or has a specified host.
 		if ($is_dynamic && $tmp_items || !$is_dynamic) {
 			// If description contains user macros, we need "itemid" and "hostid" to resolve them.
 			if (array_key_exists(WIDGET_ITEM_SHOW_DESCRIPTION, $show)) {
@@ -246,6 +266,20 @@ class CControllerWidgetItemView extends CControllerWidget {
 				}
 			}
 
+			if ($this->getInput('name', '') === '') {
+				if ($this->getContext() === CWidgetConfig::CONTEXT_DASHBOARD
+						|| $this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
+						&& $this->hasInput('dynamic_hostid')) {
+					// Resolve original item name when user is in normal dashboards or template dashbods view mode.
+					$items = CMacrosResolverHelper::resolveItemNames($items);
+					$name = $items[$itemid]['name_expanded'];
+				}
+
+				if ($this->getContext() === CWidgetConfig::CONTEXT_DASHBOARD) {
+					$name = $items[$itemid]['hosts'][0]['name'].NAME_DELIMITER.$name;
+				}
+			}
+
 			/*
 			 * It doesn't matter if item has value or not, description can be resolved separately if needed. If item
 			 * will have value it will resolve, otherwise it will not.
@@ -292,7 +326,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 		}
 
 		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', $this->getDefaultName()),
+			'name' => $this->getInput('name', $name),
 			'cells' => $cells,
 			'url' => $url,
 			'bg_color' => $fields['bg_color'],
