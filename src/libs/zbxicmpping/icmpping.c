@@ -360,51 +360,47 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	{
 		if (FPING_UNINITIALIZED_VALUE == packet_interval)
 		{
-			if (SUCCEED != get_interval_option(CONFIG_FPING_LOCATION, hosts[0].addr, &packet_interval,
+			if (SUCCEED == get_interval_option(CONFIG_FPING_LOCATION, hosts[0].addr, &packet_interval,
 					error, max_error_len))
 			{
-				goto out;
+				zabbix_log(LOG_LEVEL_DEBUG, "detected minimum supported fping interval (-i): %d",
+						packet_interval);
+				offset += zbx_snprintf(params + offset, sizeof(params) - offset, " -i%d",
+						packet_interval);
 			}
-
-			zabbix_log(LOG_LEVEL_DEBUG, "detected minimum supported fping interval (-i): %d",
-					packet_interval);
 		}
-
-		offset += zbx_snprintf(params + offset, sizeof(params) - offset, " -i%d", packet_interval);
 	}
 
 	if (0 != (fping_existence & FPING6_EXISTS) && 0 != hosts_count)
 	{
 		if (FPING_UNINITIALIZED_VALUE == packet_interval6)
 		{
-			if (SUCCEED != get_interval_option(CONFIG_FPING6_LOCATION, hosts[0].addr, &packet_interval6,
+			if (SUCCEED == get_interval_option(CONFIG_FPING6_LOCATION, hosts[0].addr, &packet_interval6,
 					error, max_error_len))
 			{
-				goto out;
+				zabbix_log(LOG_LEVEL_DEBUG, "detected minimum supported fping6 interval (-i): %d",
+						packet_interval6);
+
+				offset6 += zbx_snprintf(params6 + offset6, sizeof(params6) - offset6, " -i%d",
+						packet_interval6);
 			}
-
-			zabbix_log(LOG_LEVEL_DEBUG, "detected minimum supported fping6 interval (-i): %d",
-					packet_interval6);
 		}
-
-		offset6 += zbx_snprintf(params6 + offset6, sizeof(params6) - offset6, " -i%d", packet_interval6);
 	}
 #else
 	if (0 != hosts_count)
 	{
 		if (FPING_UNINITIALIZED_VALUE == packet_interval)
 		{
-			if (SUCCEED != get_interval_option(CONFIG_FPING_LOCATION, hosts[0].addr, &packet_interval,
+			if (SUCCEED == get_interval_option(CONFIG_FPING_LOCATION, hosts[0].addr, &packet_interval,
 					error, max_error_len))
 			{
-				goto out;
+				zabbix_log(LOG_LEVEL_DEBUG, "detected minimum supported fping interval (-i): %d",
+						packet_interval);
+
+				offset += zbx_snprintf(params + offset, sizeof(params) - offset, " -i%d",
+						packet_interval);
 			}
-
-			zabbix_log(LOG_LEVEL_DEBUG, "detected minimum supported fping interval (-i): %d",
-					packet_interval);
 		}
-
-		offset += zbx_snprintf(params + offset, sizeof(params) - offset, " -i%d", packet_interval);
 	}
 #endif	/* HAVE_IPV6 */
 
