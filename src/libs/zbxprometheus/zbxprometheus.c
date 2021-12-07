@@ -1590,7 +1590,7 @@ static int prometheus_extract_value(const zbx_vector_ptr_t *rows, const char *ou
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int prometheus_aggregate_values(const zbx_vector_ptr_t *rows, const char *function, char **value, char **error)
+static int	prometheus_aggregate_values(const zbx_vector_ptr_t *rows, const char *function, char **value, char **error)
 {
 	zbx_vector_dbl_t		values;
 	int				i, ret;
