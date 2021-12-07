@@ -70,7 +70,8 @@ class testFormPreprocessingTest extends CWebTest {
 						['type' => 'Check for error using regular expression', 'parameter_1' => 'path', 'parameter_2' => 'output'],
 						['type' => 'Discard unchanged'],
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1'],
-						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu_usage_system', 'parameter_2' => 'label_name'],
+						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu_usage_system', 'parameter_2' => 'label',
+								'parameter_3' => 'label_name'],
 						['type' => 'Prometheus to JSON', 'parameter_1' => '']
 					],
 					'action' => 'Test'
@@ -146,7 +147,7 @@ class testFormPreprocessingTest extends CWebTest {
 						['type' => 'Replace', 'parameter_1' => 'test', 'parameter_2' => ''],
 						['type' => 'In range', 'parameter_1' => '1', 'parameter_2' => ''],
 						['type' => 'In range', 'parameter_1' => '', 'parameter_2' => '2'],
-						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu', 'parameter_2' => '']
+						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu', 'parameter_2' => 'label', 'parameter_3' => '']
 					],
 					'action' => 'Cancel'
 				]
@@ -170,7 +171,7 @@ class testFormPreprocessingTest extends CWebTest {
 						['type' => 'Check for error in XML', 'parameter_1' => ''],
 						['type' => 'Check for error using regular expression', 'parameter_1' => '', 'parameter_2' => ''],
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => ''],
-						['type' => 'Prometheus pattern', 'parameter_1' => '', 'parameter_2' => '']
+						['type' => 'Prometheus pattern', 'parameter_1' => '', 'parameter_2' => 'label', 'parameter_3' => '']
 					],
 					'error' => 'Incorrect value for field "params":'
 				]
@@ -192,7 +193,7 @@ class testFormPreprocessingTest extends CWebTest {
 					'preprocessing' => [
 						['type' => 'Replace', 'parameter_1' => '', 'parameter_2' => 'test'],
 						['type' => 'Regular expression', 'parameter_1' => '', 'parameter_2' => '1'],
-						['type' => 'Prometheus pattern', 'parameter_1' => '', 'parameter_2' => 'label']
+						['type' => 'Prometheus pattern', 'parameter_1' => '', 'parameter_2' => 'label', 'parameter_3' => 'label']
 					],
 					'error' => 'Incorrect value for field "params": first parameter is expected.'
 				]

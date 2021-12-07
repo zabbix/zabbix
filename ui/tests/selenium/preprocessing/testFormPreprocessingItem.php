@@ -64,8 +64,12 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 						'Key' => 'wrong-second-parameter-macro'
 					],
 					'preprocessing' => [
-						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu_usage_system', 'parameter_2' => '{#LABELNAME}']
-
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => 'cpu_usage_system',
+							'parameter_2' => 'label',
+							'parameter_3' => '{#LABELNAME}'
+						]
 					],
 					'error' => 'Incorrect value for field "params": invalid Prometheus output.'
 				]
