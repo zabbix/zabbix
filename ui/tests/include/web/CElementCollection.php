@@ -250,7 +250,7 @@ class CElementCollection implements Iterator {
 	}
 
 	/**
-	 * Element specific action @see CDropdownElement::select | CTableRowElement::select.
+	 * Element specific action @see CZDropdownElement::select | CTableRowElement::select.
 	 *
 	 * @return $this
 	 */
