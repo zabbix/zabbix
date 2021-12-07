@@ -236,7 +236,7 @@ class testPageDashboardWidgets extends CWebTest {
 		$overlay = $dashboard->addWidget();
 		$form = $overlay->asForm();
 		// Set type to "Clock".
-		$form->getField('Type')->asZDropdown()->select('Clock');
+		$form->getField('Type')->asDropdown()->select('Clock');
 		// Wait until overlay is reloaded.
 		$overlay->waitUntilReady();
 		// Set name of widget.

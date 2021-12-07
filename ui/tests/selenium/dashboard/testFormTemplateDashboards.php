@@ -1056,7 +1056,7 @@ class testFormTemplateDashboards extends CWebTest {
 	public function testFormTemplateDashboards_ViewDashboardOnHost() {
 		$this->page->login()->open('zabbix.php?action=host.dashboard.view&hostid='.self::HOST_FOR_TEMPLATE);
 		$this->page->waitUntilReady();
-		$this->query('id:dashboardid')->asZDropdown()->one()->select('Dashboard with all widgets');
+		$this->query('id:dashboardid')->asDropdown()->one()->select('Dashboard with all widgets');
 
 		$skip_selectors = [
 			'class:clock',

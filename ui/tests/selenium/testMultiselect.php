@@ -78,9 +78,9 @@ class testMultiselect extends CWebTest {
 		$dashboard = CDashboardElement::find()->one();
 		$overlay = $dashboard->addWidget();
 		$form = $overlay->asForm();
-		$widget_type = $form->getField('Type')->asZDropdown()->getText();
+		$widget_type = $form->getField('Type')->asDropdown()->getText();
 		if ($widget_type !== $widget) {
-			$form->getField('Type')->asZDropdown()->select($widget);
+			$form->getField('Type')->asDropdown()->select($widget);
 			$form->waitUntilReloaded();
 			/* After selecting "type" focus remains in the suggested list,
 			 * need to click on another field to change the position of the mouse.

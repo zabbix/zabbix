@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/../CElement.php';
 /**
  * Custom dropdown (z-select) element.
  */
-class CZDropdownElement extends CElement {
+class CDropdownElement extends CElement {
 
 	/**
 	 * Get collection of options.

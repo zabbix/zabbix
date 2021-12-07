@@ -68,14 +68,14 @@ trait CastableTrait {
 	}
 
 	/**
-	 * Cast object to ZDropdown element.
+	 * Cast object to Dropdown element.
 	 *
 	 * @param array $options    additional casting options
 	 *
-	 * @return CZDropdownElement
+	 * @return CDropdownElement
 	 */
-	public function asZDropdown($options = []) {
-		return $this->cast(CZDropdownElement::class, $options);
+	public function asDropdown($options = []) {
+		return $this->cast(CDropdownElement::class, $options);
 	}
 
 	/**
