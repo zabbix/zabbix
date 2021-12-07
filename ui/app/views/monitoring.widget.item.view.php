@@ -28,8 +28,77 @@ if ($data['error'] !== '') {
 	$body = (new CTableInfo())->setNoDataMessage($data['error']);
 }
 else {
+	$classes_vertical = [
+		WIDGET_ITEM_POS_TOP => 'top',
+		WIDGET_ITEM_POS_MIDDLE => 'middle',
+		WIDGET_ITEM_POS_BOTTOM => 'bottom'
+	];
+	$classes_horizontal = [
+		WIDGET_ITEM_POS_LEFT => 'left',
+		WIDGET_ITEM_POS_CENTER => 'center',
+		WIDGET_ITEM_POS_RIGHT => 'right'
+	];
+
+	$rows = [];
+
+	foreach ($classes_vertical as $row_key => $row_class) {
+		$cols = [];
+
+		foreach ($classes_horizontal as $column_key => $column_class) {
+			if (!array_key_exists($row_key, $data['cells'])
+					|| !array_key_exists($column_key, $data['cells'][$row_key])) {
+				continue;
+			}
+
+			$div = new CDiv();
+
+			$cell = $data['cells'][$row_key][$column_key];
+			$cell_type = array_keys($cell)[0];
+			$cell_data = array_values($cell)[0];
+
+			$div->addClass($row_class);
+			$div->addClass($column_class);
+
+			switch($cell_type) {
+				case 'item_description':
+					$div->addClass('item-description');
+
+					if (strpos($cell_data['text'], "\n") !== false) {
+						$cell_data['text'] = zbx_nl2br($cell_data['text']);
+						$div->addClass('multiline');
+					}
+
+					$div = addTextFormatting($div, $cell_data);
+					break;
+
+				case 'item_time':
+					$div->addClass('item-time');
+					$div = addTextFormatting($div, $cell_data);
+					break;
+
+				case 'item_value':
+					$div->addClass('item-value');
+
+					if (array_key_exists('value_type', $cell_data)) {
+						$div->addClass(($cell_data['value_type'] == ITEM_VALUE_TYPE_FLOAT
+								|| $cell_data['value_type'] == ITEM_VALUE_TYPE_UINT64)
+							? 'type-number'
+							: 'type-text'
+						);
+					}
+
+					$div->addItem(drawValueCell($cell_data));
+					break;
+			}
+
+			$cols[] = $div;
+		}
+
+		$rows[] = new CDiv($cols);
+	}
+
 	$body = (new CDiv(
-		new CLink(drawCells($data['cells']), $data['url'])
+		new CLink($rows, $data['url'])
 	))->addClass('dashboard-grid-widget-item');
 
 	if ($data['bg_color'] !== '') {
@@ -53,98 +122,6 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 
 echo json_encode($output);
 
-
-/**
- * Prepare array of DIVs one for each row with all their content.
- *
- * @param array $cells  Widget data arranged by cells.
- *
- * @return array
- */
-function drawCells(array $cells): array {
-	$rows = [];
-
-	foreach ([WIDGET_ITEM_POS_TOP, WIDGET_ITEM_POS_MIDDLE, WIDGET_ITEM_POS_BOTTOM] as $row_key) {
-		if (array_key_exists($row_key, $cells)) {
-			$cols = [];
-
-			foreach ($cells[$row_key] as $column_key => $cell) {
-				$cols[] = drawCell($cell, $row_key, $column_key);
-			}
-
-			$rows[] = new CDiv($cols);
-		}
-		else {
-			$rows[] = new CDiv();
-		}
-	}
-
-	return $rows;
-}
-
-/**
- * Prepare DIV for single cell in row with all it's content.
- *
- * @param array $cell        Data for single cell.
- * @param int   $row_key     Cell's vertical alignment.
- * @param int   $column_key  Cell's horizontal alignment.
- *
- * @return CDiv
- */
-function drawCell(array $cell, int $row_key, int $column_key): CDiv {
-	$div = new CDiv();
-
-	$cell_type = array_keys($cell)[0];
-	$cell_data = array_values($cell)[0];
-
-	$classes_vertical = [
-		WIDGET_ITEM_POS_TOP => 'top',
-		WIDGET_ITEM_POS_MIDDLE => 'middle',
-		WIDGET_ITEM_POS_BOTTOM => 'bottom'
-	];
-	$classes_horizontal = [
-		WIDGET_ITEM_POS_LEFT => 'left',
-		WIDGET_ITEM_POS_CENTER => 'center',
-		WIDGET_ITEM_POS_RIGHT => 'right'
-	];
-
-	$div->addClass($classes_vertical[$row_key]);
-	$div->addClass($classes_horizontal[$column_key]);
-
-	switch($cell_type) {
-		case 'item_description':
-			$div->addClass('item-description');
-
-			if (strpos($cell_data['text'], "\n") !== false) {
-				$cell_data['text'] = zbx_nl2br($cell_data['text']);
-				$div->addClass('multiline');
-			}
-
-			$div = addTextFormatting($div, $cell_data);
-			break;
-
-		case 'item_time':
-			$div->addClass('item-time');
-			$div = addTextFormatting($div, $cell_data);
-			break;
-
-		case 'item_value':
-			$div->addClass('item-value');
-
-			if (array_key_exists('value_type', $cell_data)) {
-				$div->addClass(($cell_data['value_type'] == ITEM_VALUE_TYPE_FLOAT
-					|| $cell_data['value_type'] == ITEM_VALUE_TYPE_UINT64)
-					? 'type-number'
-					: 'type-text'
-				);
-			}
-
-			$div->addItem(drawValueCell($cell_data));
-			break;
-	}
-
-	return $div;
-}
 
 /**
  * Prepare content for value cell.
@@ -232,12 +209,8 @@ function drawValueCell(array $cell_data): array {
 /**
  * Adds formatting and content for text part on widget, based on provided data.
  *
- * @param CDiv    $div                     Div where text element will be displayed.
- * @param array   $text_data               Text divs settings and content.
- * @param boolean $text_data['bold']       Flag if text should be in bold.
- * @param int     $text_data['font_size']  Font size of text in percents from widget height.
- * @param string  $text_data['color']      Hex string with text color or emtpy for default color.
- * @param string  $text_data['text']       Text string to display.
+ * @param CDiv    $div        Div where text element will be displayed.
+ * @param array   $text_data  Text divs settings and content.
  *
  * @return CDiv
  */
@@ -246,11 +219,11 @@ function addTextFormatting(CDiv $div, array $text_data): CDiv {
 		$div->addClass('bold');
 	}
 
-	$style = sprintf('--widget-item-font: %1$s;', number_format($text_data['font_size'] / 100, 2));
+	$div->addStyle(sprintf('--widget-item-font: %1$s;', number_format($text_data['font_size'] / 100, 2)));
+
 	if ($text_data['color'] !== '') {
-		$style .= sprintf(' color: #%1$s;', $text_data['color']);
+		$div->addStyle(sprintf(' color: #%1$s;', $text_data['color']));
 	}
-	$div->addStyle($style);
 
 	$div->addItem($text_data['text']);
 
