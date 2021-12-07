@@ -171,7 +171,7 @@ class testFormTags extends CWebTest {
 							'value' => 'value1'
 						]
 					],
-					'host_and_template_error_details' => 'Invalid parameter "/tags/1/tag": cannot be empty.',
+					'host_and_template_error_details' => 'Invalid parameter "/1/tags/1/tag": cannot be empty.',
 					'error_details' => 'Invalid parameter "/1/tags/1/tag": cannot be empty.'
 				]
 			],
@@ -191,7 +191,7 @@ class testFormTags extends CWebTest {
 							'value' => 'value'
 						]
 					],
-					'host_and_template_error_details' => 'Invalid parameter "/tags/2": value (tag, value)=(tag, value) already exists.',
+					'host_and_template_error_details' => 'Invalid parameter "/1/tags/2": value (tag, value)=(tag, value) already exists.',
 					'error_details' => 'Invalid parameter "/1/tags/2": value (tag, value)=(tag, value) already exists.'
 				]
 			],
@@ -334,7 +334,7 @@ class testFormTags extends CWebTest {
 							'value' => 'value1'
 						]
 					],
-					'host_and_template_error_details' => 'Invalid parameter "/tags/1/tag": cannot be empty.',
+					'host_and_template_error_details' => 'Invalid parameter "/1/tags/1/tag": cannot be empty.',
 					'error_details'=>'Invalid parameter "/1/tags/1/tag": cannot be empty.'
 				]
 			],
@@ -349,7 +349,7 @@ class testFormTags extends CWebTest {
 							'value' => 'update'
 						]
 					],
-					'host_and_template_error_details' => 'Invalid parameter "/tags/2": value (tag, value)=(action, update) already exists.',
+					'host_and_template_error_details' => 'Invalid parameter "/1/tags/2": value (tag, value)=(action, update) already exists.',
 					'error_details' => 'Invalid parameter "/1/tags/2": value (tag, value)=(action, update) already exists.'
 				]
 			],
@@ -364,7 +364,7 @@ class testFormTags extends CWebTest {
 							'value' => ''
 						]
 					],
-					'host_and_template_error_details' => 'Invalid parameter "/tags/3": value (tag, value)=(tag without value, ) already exists.',
+					'host_and_template_error_details' => 'Invalid parameter "/1/tags/3": value (tag, value)=(tag without value, ) already exists.',
 					'error_details' => 'Invalid parameter "/1/tags/3": value (tag, value)=(tag without value, ) already exists.'
 				]
 			],
