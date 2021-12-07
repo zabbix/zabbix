@@ -75,7 +75,9 @@ class CTemplateImporter extends CImporter {
 
 				if (array_key_exists('templateid', $template)
 						&& ($this->options['templates']['updateExisting'] || $this->options['process_templates'])) {
-					$templates_to_update[] = array_intersect_key($template, $templates_api_params);
+					$templates_to_update[] = array_intersect_key($template,
+						$templates_api_params + array_flip(['templateid'])
+					);
 				}
 				elseif ($this->options['templates']['createMissing']) {
 					if (array_key_exists('templateid', $template)) {
