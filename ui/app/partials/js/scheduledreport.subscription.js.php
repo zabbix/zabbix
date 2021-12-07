@@ -112,7 +112,7 @@
 				}
 			}
 
-			recipient.innerHTML = this.data.recipient_name;
+			recipient.innerText = this.data.recipient_name;
 			recipient.setAttribute('title', this.data.recipient_name);
 
 			cell.appendChild(icon);
@@ -129,7 +129,7 @@
 			const cell = document.createElement('td');
 			const span = document.createElement('span');
 
-			span.innerHTML = this.data.creator_name;
+			span.innerText = this.data.creator_name;
 			span.setAttribute('title', this.data.creator_name);
 
 			if (this.data.creator_type == <?= ZBX_REPORT_CREATOR_TYPE_RECIPIENT ?> || this.data.creator_inaccessible) {
@@ -162,12 +162,12 @@
 					const input = status.parentNode.querySelector('[name*=exclude]');
 
 					if (input.value == <?= ZBX_REPORT_EXCLUDE_USER_TRUE ?>) {
-						status.innerHTML = <?= json_encode(_('Include')) ?>;
+						status.innerText = <?= json_encode(_('Include')) ?>;
 						status.classList.replace('<?= ZBX_STYLE_RED ?>', '<?= ZBX_STYLE_GREEN ?>');
 						input.value = <?= ZBX_REPORT_EXCLUDE_USER_FALSE ?>
 					}
 					else {
-						status.innerHTML = <?= json_encode(_('Exclude')) ?>;
+						status.innerText = <?= json_encode(_('Exclude')) ?>;
 						status.classList.replace('<?= ZBX_STYLE_GREEN ?>', '<?= ZBX_STYLE_RED ?>');
 						input.value = <?= ZBX_REPORT_EXCLUDE_USER_TRUE ?>
 					}
@@ -178,11 +178,11 @@
 			}
 
 			if (this.data.exclude == <?= ZBX_REPORT_EXCLUDE_USER_FALSE ?>) {
-				status.innerHTML = <?= json_encode(_('Include')) ?>;
+				status.innerText = <?= json_encode(_('Include')) ?>;
 				status.classList.add('<?= ZBX_STYLE_GREEN ?>');
 			}
 			else {
-				status.innerHTML = <?= json_encode(_('Exclude')) ?>;
+				status.innerText = <?= json_encode(_('Exclude')) ?>;
 				status.classList.add('<?= ZBX_STYLE_RED ?>');
 			}
 
@@ -198,7 +198,7 @@
 
 			btn.type = 'button';
 			btn.classList.add('<?= ZBX_STYLE_BTN_LINK ?>');
-			btn.innerHTML = <?= json_encode(_('Remove')) ?>;
+			btn.innerText = <?= json_encode(_('Remove')) ?>;
 
 			if (allowed_edit) {
 				btn.addEventListener('click', () => {
