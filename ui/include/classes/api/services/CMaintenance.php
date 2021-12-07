@@ -315,7 +315,7 @@ class CMaintenance extends CApiService {
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('maintenances', 'name')],
 			'active_since' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:2147464800'],
 			'active_till' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:2147464800'],
-			'maintenance_type' =>	['type' => API_INT32, 'default' => DB::getDefault('maintenances', 'maintenance_type'), 'in' => implode(',', [MAINTENANCE_TYPE_NORMAL, MAINTENANCE_TYPE_NODATA])],
+			'maintenance_type' =>	['type' => API_INT32, 'in' => implode(',', [MAINTENANCE_TYPE_NORMAL, MAINTENANCE_TYPE_NODATA]), 'default' => DB::getDefault('maintenances', 'maintenance_type')],
 			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('maintenances', 'description')],
 			'tags_evaltype' =>		['type' => API_INT32, 'in' => implode(',', [MAINTENANCE_TAG_EVAL_TYPE_AND_OR, MAINTENANCE_TAG_EVAL_TYPE_OR])],
 			'groupids' =>			['type' => API_IDS, 'flags' => API_DEPRECATED, 'uniq' => true],
@@ -328,8 +328,8 @@ class CMaintenance extends CApiService {
 			]],
 			'tags' =>				['type' => API_OBJECTS, 'uniq' => [['tag', 'operator', 'value']], 'fields' => [
 				'tag' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('maintenance_tag', 'tag')],
-				'operator' =>			['type' => API_INT32, 'default' => DB::getDefault('maintenance_tag', 'operator'), 'in' => implode(',', [MAINTENANCE_TAG_OPERATOR_EQUAL, MAINTENANCE_TAG_OPERATOR_LIKE])],
-				'value' =>				['type' => API_STRING_UTF8, 'default' => DB::getDefault('maintenance_tag', 'value'), 'length' => DB::getFieldLength('maintenance_tag', 'value')]
+				'operator' =>			['type' => API_INT32, 'in' => implode(',', [MAINTENANCE_TAG_OPERATOR_EQUAL, MAINTENANCE_TAG_OPERATOR_LIKE]), 'default' => DB::getDefault('maintenance_tag', 'operator')],
+				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('maintenance_tag', 'value'), 'default' => DB::getDefault('maintenance_tag', 'value')]
 			]],
 			'timeperiods' => 		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
 				'timeperiod_type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])],
@@ -340,23 +340,23 @@ class CMaintenance extends CApiService {
 											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_ONETIME], 'type' => API_INT32, 'in' => '1']
 				]],
 				'month' =>				['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_MONTHLY], 'type' => API_INT32, 'default' => DB::getDefault('timeperiods', 'month'), 'in' => '0:4095'],
+											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_MONTHLY], 'type' => API_INT32, 'in' => '0:4095', 'default' => DB::getDefault('timeperiods', 'month')],
 											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY])], 'type' => API_INT32, 'in' => '0']
 				]],
 				'dayofweek' =>			['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'default' => DB::getDefault('timeperiods', 'dayofweek'), 'in' => '0:127'],
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => '0:127', 'default' => DB::getDefault('timeperiods', 'dayofweek')],
 											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY])], 'type' => API_INT32, 'in' => '0']
 				]],
 				'day' =>				['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_MONTHLY], 'type' => API_INT32, 'default' => DB::getDefault('timeperiods', 'day'), 'in' => '0:31'],
+											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_MONTHLY], 'type' => API_INT32, 'in' => '0:31', 'default' => DB::getDefault('timeperiods', 'day')],
 											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY])], 'type' => API_INT32, 'in' => '0']
 				]],
 				'start_time' =>			['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'default' => DB::getDefault('timeperiods', 'start_time'), 'in' => '0:86340'],
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => '0:86340', 'default' => DB::getDefault('timeperiods', 'start_time')],
 											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_ONETIME], 'type' => API_INT32, 'in' => '0']
 				]],
 				'start_date' =>			['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_ONETIME], 'type' => API_INT32, 'default' => DB::getDefault('timeperiods', 'start_date'), 'in' => '0:2147464800'],
+											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_ONETIME], 'type' => API_INT32, 'in' => '0:2147464800', 'default' => DB::getDefault('timeperiods', 'start_date')],
 											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => '0']
 				]]
 			]]
@@ -522,36 +522,36 @@ class CMaintenance extends CApiService {
 			]],
 			'tags' =>				['type' => API_OBJECTS, 'uniq' => [['tag', 'operator', 'value']], 'fields' => [
 				'tag' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('maintenance_tag', 'tag')],
-				'operator' =>			['type' => API_INT32, 'default' => DB::getDefault('maintenance_tag', 'operator'), 'in' => implode(',', [MAINTENANCE_TAG_OPERATOR_EQUAL, MAINTENANCE_TAG_OPERATOR_LIKE])],
-				'value' =>				['type' => API_STRING_UTF8, 'default' => DB::getDefault('maintenance_tag', 'value'), 'length' => DB::getFieldLength('maintenance_tag', 'value')]
+				'operator' =>			['type' => API_INT32, 'in' => implode(',', [MAINTENANCE_TAG_OPERATOR_EQUAL, MAINTENANCE_TAG_OPERATOR_LIKE]), 'default' => DB::getDefault('maintenance_tag', 'operator')],
+				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('maintenance_tag', 'value'), 'default' => DB::getDefault('maintenance_tag', 'value')]
 			]],
 			'timeperiods' => 		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['timeperiodid']], 'fields' => [
 				'timeperiodid' =>		['type' => API_ID],
 				'timeperiod_type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])],
 				'period' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:2147464800'],
 				'every' =>				['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'default' => DB::getDefault('timeperiods', 'every'), 'in' => '0:'.ZBX_MAX_INT32],
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => '0:'.ZBX_MAX_INT32, 'default' => DB::getDefault('timeperiods', 'every')],
 											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_MONTHLY], 'type' => API_INT32, 'in' => '1:5'],
 											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_ONETIME], 'type' => API_INT32, 'in' => '1']
 				]],
 				'month' =>				['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_MONTHLY], 'type' => API_INT32, 'default' => DB::getDefault('timeperiods', 'month'), 'in' => '0:4095'],
+											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_MONTHLY], 'type' => API_INT32, 'in' => '0:4095', 'default' => DB::getDefault('timeperiods', 'month')],
 											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY])], 'type' => API_INT32, 'in' => '0']
 				]],
 				'dayofweek' =>			['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'default' => DB::getDefault('timeperiods', 'dayofweek'), 'in' => '0:127'],
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => '0:127', 'default' => DB::getDefault('timeperiods', 'dayofweek')],
 											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY])], 'type' => API_INT32, 'in' => '0']
 				]],
 				'day' =>				['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_MONTHLY], 'type' => API_INT32, 'default' => DB::getDefault('timeperiods', 'day'), 'in' => '0:31'],
+											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_MONTHLY], 'type' => API_INT32, 'in' => '0:31', 'default' => DB::getDefault('timeperiods', 'day')],
 											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY])], 'type' => API_INT32, 'in' => '0']
 				]],
 				'start_time' =>			['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'default' => DB::getDefault('timeperiods', 'start_time'), 'in' => '0:86340'],
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => '0:86340', 'default' => DB::getDefault('timeperiods', 'start_time')],
 											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_ONETIME], 'type' => API_INT32, 'in' => '0']
 				]],
 				'start_date' =>			['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_ONETIME], 'type' => API_INT32, 'default' => DB::getDefault('timeperiods', 'start_date'), 'in' => '0:2147464800'],
+											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_ONETIME], 'type' => API_INT32, 'in' => '0:2147464800', 'default' => DB::getDefault('timeperiods', 'start_date')],
 											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => '0']
 				]]
 			]]
