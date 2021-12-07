@@ -348,7 +348,8 @@ class testFormPreprocessingTest extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'preprocessing' => [
-						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu_usage_system', 'parameter_2' => 'label_name'],
+						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu_usage_system', 'parameter_2' => 'label',
+								'parameter_3' => 'label_name'],
 						['type' => 'Prometheus to JSON', 'parameter_1' => '']
 					],
 					'error' => 'Only one Prometheus step is allowed.'
@@ -373,7 +374,7 @@ class testFormPreprocessingTest extends CWebTest {
 						['type' => 'Check for error in XML', 'parameter_1' => ''],
 						['type' => 'Check for error using regular expression', 'parameter_1' => '', 'parameter_2' => ''],
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => ''],
-						['type' => 'Prometheus pattern', 'parameter_1' => '', 'parameter_2' => '']
+						['type' => 'Prometheus pattern', 'parameter_1' => '', 'parameter_2' => 'value']
 					],
 					'error' => 'Incorrect value for field "params":'
 				]
