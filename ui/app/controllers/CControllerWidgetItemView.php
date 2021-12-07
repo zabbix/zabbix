@@ -389,7 +389,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 	 * @param string|null $values['value']             Value of the item or NULL if there is no value.
 	 * @param string|null $values['decimals']          Decimal places or NULL if there is no decimals to show.
 	 * @param int|null    $values['change_indicator']  Change indicator type or NULL if indicator should not be shown.
-	 * @param string      $values['time']              Time when item received the value or current time of no data.
+	 * @param string      $values['time']              Time when item received the value or current time if no data.
 	 * @param array       $values['items']             The original array of items.
 	 * @param string      $values['itemid']            Item ID from the host.
 	 *
