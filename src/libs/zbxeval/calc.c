@@ -51,9 +51,9 @@ static int	zbx_is_normal_double(double dbl)
  * Return value: arithmetic mean value                                        *
  *                                                                            *
  ******************************************************************************/
-static double  calc_arithmetic_mean(const zbx_vector_dbl_t *v)
+static double	calc_arithmetic_mean(const zbx_vector_dbl_t *v)
 {
-	double  sum = 0;
+	double	sum = 0;
 	int	i;
 
 	for (i = 0; i < v->values_num; i++)
