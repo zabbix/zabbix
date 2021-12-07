@@ -715,13 +715,16 @@ static void	add_sentusers_msg_esc_cancel(ZBX_USER_MSG **user_msg, zbx_uint64_t a
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select userid,mediatypeid,subject,message,esc_step"
 			" from alerts"
-			" where actionid=" ZBX_FS_UI64
-				" and mediatypeid is not null"
-				" and alerttype=%d"
-				" and acknowledgeid is null"
-				" and eventid=" ZBX_FS_UI64
-				" order by userid,mediatypeid,esc_step desc",
-				actionid, ALERT_TYPE_MESSAGE, event->eventid);
+			" where (alertid,userid,mediatypeid,esc_step) in"
+				" (select distinct alertid,userid,mediatypeid,esc_step"
+				" from alerts"
+				" where actionid=" ZBX_FS_UI64
+					" and mediatypeid is not null"
+					" and alerttype=%d"
+					" and acknowledgeid is null"
+					" and eventid=" ZBX_FS_UI64 ")"
+					" order by userid,mediatypeid,esc_step desc",
+					actionid, ALERT_TYPE_MESSAGE, event->eventid);
 
 	result = DBselect("%s", sql);
 
@@ -731,7 +734,7 @@ static void	add_sentusers_msg_esc_cancel(ZBX_USER_MSG **user_msg, zbx_uint64_t a
 		ZBX_STR2UINT64(mediatypeid, row[1]);
 		esc_step = atoi(row[4]);
 
-		if (userid == userid_prev && mediatypeid == mediatypeid_prev && esc_step <= esc_step_prev)
+		if (userid == userid_prev && mediatypeid == mediatypeid_prev && esc_step == esc_step_prev)
 			continue;
 
 		userid_prev = userid;
