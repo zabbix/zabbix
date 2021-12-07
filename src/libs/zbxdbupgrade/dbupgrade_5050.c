@@ -1189,6 +1189,22 @@ static int	DBpatch_5050111(void)
 
 static int	DBpatch_5050112(void)
 {
+	const ZBX_FIELD	field = {"notify_if_canceled", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("actions", &field);
+}
+
+static int	DBpatch_5050113(void)
+{
+	const ZBX_FIELD old_field = {"formula", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD new_field = {"formula", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("actions", &new_field, &old_field);
+}
+
+
+static int	DBpatch_5050114(void)
+{
 	const ZBX_TABLE	table =
 		{"sla", "slaid", 0,
 			{
@@ -1208,12 +1224,12 @@ static int	DBpatch_5050112(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_5050113(void)
+static int	DBpatch_5050115(void)
 {
 	return DBcreate_index("sla", "sla_1", "name", 1);
 }
 
-static int	DBpatch_5050114(void)
+static int	DBpatch_5050116(void)
 {
 	const ZBX_TABLE	table =
 		{"sla_service_tag", "sla_service_tagid", 0,
@@ -1231,19 +1247,19 @@ static int	DBpatch_5050114(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_5050115(void)
+static int	DBpatch_5050117(void)
 {
 	return DBcreate_index("sla_service_tag", "sla_service_tag_1", "slaid", 0);
 }
 
-static int	DBpatch_5050116(void)
+static int	DBpatch_5050118(void)
 {
 	const ZBX_FIELD	field = {"slaid", NULL, "sla", "slaid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("sla_service_tag", 1, &field);
 }
 
-static int	DBpatch_5050117(void)
+static int	DBpatch_5050119(void)
 {
 	const ZBX_TABLE	table =
 		{"sla_schedule", "sla_scheduleid", 0,
@@ -1260,19 +1276,19 @@ static int	DBpatch_5050117(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_5050118(void)
+static int	DBpatch_5050120(void)
 {
 	return DBcreate_index("sla_schedule", "sla_schedule_1", "slaid", 0);
 }
 
-static int	DBpatch_5050119(void)
+static int	DBpatch_5050121(void)
 {
 	const ZBX_FIELD	field = {"slaid", NULL, "sla", "slaid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("sla_schedule", 1, &field);
 }
 
-static int	DBpatch_5050120(void)
+static int	DBpatch_5050122(void)
 {
 	const ZBX_TABLE table =
 		{"sla_excluded_downtime", "sla_excluded_downtimeid", 0,
@@ -1290,26 +1306,26 @@ static int	DBpatch_5050120(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_5050121(void)
+static int	DBpatch_5050123(void)
 {
 	return DBcreate_index("sla_excluded_downtime", "sla_excluded_downtime_1", "slaid", 0);
 }
 
-static int	DBpatch_5050122(void)
+static int	DBpatch_5050124(void)
 {
 	const ZBX_FIELD	field = {"slaid", NULL, "sla", "slaid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("sla_excluded_downtime", 1, &field);
 }
 
-static int	DBpatch_5050123(void)
+static int	DBpatch_5050125(void)
 {
 	const ZBX_FIELD	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("services", &field);
 }
 
-static int	DBpatch_5050124(void)
+static int	DBpatch_5050126(void)
 {
 	const ZBX_FIELD	field = {"uuid", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
@@ -1538,7 +1554,7 @@ static void	services_times_convert_downtime(zbx_vector_services_times_t *service
 	zbx_vector_services_times_destroy(&services_times_converted);
 }
 
-static int	DBpatch_5050125(void)
+static int	DBpatch_5050127(void)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -1642,22 +1658,22 @@ static int	DBpatch_5050125(void)
 	return ret;
 }
 
-static int	DBpatch_5050126(void)
+static int	DBpatch_5050128(void)
 {
 	return DBdrop_table("services_times");
 }
 
-static int	DBpatch_5050127(void)
+static int	DBpatch_5050129(void)
 {
 	return DBdrop_field("services", "showsla");
 }
 
-static int	DBpatch_5050128(void)
+static int	DBpatch_5050130(void)
 {
 	return DBdrop_field("services", "goodsla");
 }
 
-static int	DBpatch_5050129(void)
+static int	DBpatch_5050131(void)
 {
 	int		ret = SUCCEED;
 	char		*uuid, *sql = NULL;
@@ -1691,7 +1707,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_5050130(void)
+static int	DBpatch_5050132(void)
 {
 	if (ZBX_DB_OK > DBexecute("update role_rule set name='ui.services.services' where name='ui.monitoring.services'"))
 		return FAIL;
@@ -1699,19 +1715,19 @@ static int	DBpatch_5050130(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_5050131(void)
+static int	DBpatch_5050133(void)
 {
 	const ZBX_FIELD	field = {"value_serviceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("widget_field", &field);
 }
 
-static int	DBpatch_5050132(void)
+static int	DBpatch_5050134(void)
 {
 	return DBcreate_index("widget_field", "widget_field_7", "value_serviceid", 0);
 }
 
-static int	DBpatch_5050133(void)
+static int	DBpatch_5050135(void)
 {
 	const ZBX_FIELD	field = {"value_serviceid", NULL, "services", "serviceid", 0, ZBX_TYPE_ID, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -1719,33 +1735,33 @@ static int	DBpatch_5050133(void)
 	return DBadd_foreign_key("widget_field", 7, &field);
 }
 
-static int	DBpatch_5050134(void)
+static int	DBpatch_5050136(void)
 {
 	const ZBX_FIELD	field = {"value_slaid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("widget_field", &field);
 }
 
-static int	DBpatch_5050135(void)
+static int	DBpatch_5050137(void)
 {
 	return DBcreate_index("widget_field", "widget_field_8", "value_slaid", 0);
 }
 
-static int	DBpatch_5050136(void)
+static int	DBpatch_5050138(void)
 {
 	const ZBX_FIELD	field = {"value_slaid", NULL, "sla", "slaid", 0, ZBX_TYPE_ID, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("widget_field", 8, &field);
 }
 
-static int	DBpatch_5050137(void)
+static int	DBpatch_5050139(void)
 {
 	const ZBX_FIELD	field = {"created_at", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("services", &field);
 }
 
-static int	DBpatch_5050138(void)
+static int	DBpatch_5050140(void)
 {
 	if (ZBX_DB_OK <= DBexecute("update services set created_at=%d", SERVICE_INITIAL_EFFECTIVE_DATE))
 		return SUCCEED;
@@ -1884,5 +1900,7 @@ DBPATCH_ADD(5050135, 0, 1)
 DBPATCH_ADD(5050136, 0, 1)
 DBPATCH_ADD(5050137, 0, 1)
 DBPATCH_ADD(5050138, 0, 1)
+DBPATCH_ADD(5050139, 0, 1)
+DBPATCH_ADD(5050140, 0, 1)
 
 DBPATCH_END()

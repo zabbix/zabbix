@@ -18,11 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'6.0.0alpha7');
+define('ZABBIX_VERSION',		'6.0.0alpha8');
 define('ZABBIX_API_VERSION',	'6.0.0');
 define('ZABBIX_EXPORT_VERSION',	'6.0');
 
-define('ZABBIX_DB_VERSION',		5050138);
+define('ZABBIX_DB_VERSION',		5050140);
 
 define('DB_VERSION_SUPPORTED',				0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',		1);
@@ -647,18 +647,6 @@ define('MAP_LINK_DRAWTYPE_DASHED_LINE',		4);
 define('ZBX_SLA_MAX_REPORTING_PERIODS',		100);
 define('ZBX_SLA_DEFAULT_REPORTING_PERIODS',	20);
 
-define('ZBX_SLA_STATUS_DISABLED',	0);
-define('ZBX_SLA_STATUS_ENABLED',	1);
-
-define('ZBX_SLA_PERIOD_DAILY',		0);
-define('ZBX_SLA_PERIOD_WEEKLY',		1);
-define('ZBX_SLA_PERIOD_MONTHLY',	2);
-define('ZBX_SLA_PERIOD_QUARTERLY',	3);
-define('ZBX_SLA_PERIOD_ANNUALLY',	4);
-
-define('ZBX_SLA_SERVICE_TAG_OPERATOR_EQUAL',	0);
-define('ZBX_SLA_SERVICE_TAG_OPERATOR_LIKE',		2);
-
 define('ZBX_SERVICE_STATUS_CALC_SET_OK',			0);
 define('ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL',	1);
 define('ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE',	2);
@@ -748,6 +736,9 @@ define('ACTION_STATUS_DISABLED',	1);
 
 define('ACTION_PAUSE_SUPPRESSED_FALSE',		0);
 define('ACTION_PAUSE_SUPPRESSED_TRUE',		1);
+
+define('ACTION_NOTIFY_IF_CANCELED_FALSE',	0);
+define('ACTION_NOTIFY_IF_CANCELED_TRUE',	1);
 
 define('OPERATION_TYPE_MESSAGE',			0);
 define('OPERATION_TYPE_COMMAND',			1);
@@ -1619,14 +1610,12 @@ define('ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION', 2);
 
 // Tab indicator names.
 define('TAB_INDICATOR_MACROS', 'macros');
-define('TAB_INDICATOR_LINKED_TEMPLATE', 'linked-template');
 define('TAB_INDICATOR_TAGS', 'tags');
 define('TAB_INDICATOR_AUTH_HTTP', 'http');
 define('TAB_INDICATOR_AUTH_LDAP', 'ldap');
 define('TAB_INDICATOR_AUTH_SAML', 'saml');
 define('TAB_INDICATOR_INVENTORY', 'inventory');
 define('TAB_INDICATOR_ENCRYPTION', 'encryption');
-define('TAB_INDICATOR_GROUPS', 'groups');
 define('TAB_INDICATOR_PREPROCESSING', 'preprocessing');
 define('TAB_INDICATOR_DEPENDENCY', 'dependency');
 define('TAB_INDICATOR_LLD_MACROS', 'lld-macros');
@@ -1636,6 +1625,7 @@ define('TAB_INDICATOR_STEPS', 'steps');
 define('TAB_INDICATOR_HTTP_AUTH', 'http-auth');
 define('TAB_INDICATOR_OPERATIONS', 'operations');
 define('TAB_INDICATOR_SLA', 'sla');
+define('TAB_INDICATOR_SLA_DOWNTIMES', 'sla-downtimes');
 define('TAB_INDICATOR_CHILD_SERVICES', 'child-services');
 define('TAB_INDICATOR_TIME', 'time');
 define('TAB_INDICATOR_TAG_FILTER', 'tag-filter');

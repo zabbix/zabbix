@@ -1,0 +1,191 @@
+---
+test case: mad, 2 dc, 1 entry is excluded from the detection period
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1
+      ts: 2021-03-27 14:00:00.000000001 +00:00
+    - value: 2
+      ts: 2021-03-27 13:00:00.000000000 +00:00
+    - value: 3
+      ts: 2021-03-27 12:00:00.000000000 +00:00
+    - value: 4
+      ts: 2021-03-27 11:00:00.000000000 +00:00
+    - value: 5
+      ts: 2021-03-27 10:00:00.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 09:00:00.000000000 +00:00
+  time: 2021-03-27 15:00:00.000000000 +00:00
+  deviations_count: 2.0
+  dev_alg: mad
+  detect_period: 1d
+  detect_period_type: 1
+  params: '7h:now/h,4h'
+out:
+  return: SUCCEED
+  value: 0.75
+---
+test case: mad, 2 dc, no entries excluded from the detection period
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1
+      ts: 2021-03-27 15:00:00.000000001 +00:00
+    - value: 2
+      ts: 2021-03-27 14:00:00.000000000 +00:00
+    - value: 3
+      ts: 2021-03-27 13:00:00.000000000 +00:00
+    - value: 4
+      ts: 2021-03-27 12:00:00.000000000 +00:00
+    - value: 5
+      ts: 2021-03-27 11:00:00.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 10:00:00.000000000 +00:00
+  time: 2021-03-27 16:00:00.000000000 +00:00
+  deviations_count: 2.1
+  dev_alg: mad
+  detect_period: 1d
+  detect_period_type: 1
+  params: '7h:now/h,5h'
+out:
+  return: SUCCEED
+  value: 0.6
+---
+test case: mad, 0 dc
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1
+      ts: 2021-03-27 15:00:00.000000001 +00:00
+    - value: 2
+      ts: 2021-03-27 14:00:00.000000000 +00:00
+    - value: 3
+      ts: 2021-03-27 13:00:00.000000000 +00:00
+    - value: 4
+      ts: 2021-03-27 11:00:00.000000000 +00:00
+    - value: 5
+      ts: 2021-03-27 10:00:00.000000000 +00:00
+  time: 2021-03-27 16:00:00.000000000 +00:00
+  deviations_count: 0
+  dev_alg: mad
+  detect_period: 1d
+  detect_period_type: 1
+  params: '7h:now/h,7h'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: mad, 1 dc, stable series
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1
+      ts: 2021-03-27 15:00:00.000000001 +00:00
+    - value: 1
+      ts: 2021-03-27 14:00:00.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 13:00:00.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 11:00:00.000000000 +00:00
+    - value: 666
+      ts: 2021-03-27 10:00:00.000000000 +00:00
+  time: 2021-03-27 16:00:00.000000000 +00:00
+  deviations_count: 1.0001
+  dev_alg: mad
+  detect_period: 1d
+  detect_period_type: 1
+  params: '7h:now/h,7h'
+out:
+  return: SUCCEED
+  value: 1.0
+---
+test case: mad, 4 dc
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1
+      ts: 2021-03-27 15:00:00.000000001 +00:00
+    - value: 3
+      ts: 2021-03-27 14:00:00.000000000 +00:00
+    - value: 5
+      ts: 2021-03-27 13:00:00.000000000 +00:00
+    - value: 3
+      ts: 2021-03-27 11:00:00.000000000 +00:00
+    - value: 666
+      ts: 2021-03-27 10:00:00.000000000 +00:00
+  time: 2021-03-27 16:00:00.000000000 +00:00
+  deviations_count: 3.9999
+  dev_alg: mad
+  detect_period: 1d
+  detect_period_type: 1
+  params: '7h:now/h,7h'
+out:
+  return: SUCCEED
+  value: 0.5
+---
+test case: mad, time shift, 4 dc, small detection period
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1
+      ts: 2021-03-27 15:00:00.000000001 +00:00
+    - value: 2
+      ts: 2021-03-27 14:00:00.000000000 +00:00
+    - value: 3
+      ts: 2021-03-27 13:00:00.000000000 +00:00
+    - value: 666
+      ts: 2021-03-27 12:00:00.000000000 +00:00
+    - value: 4
+      ts: 2021-03-27 11:00:00.000000000 +00:00
+    - value: 10000
+      ts: 2021-03-27 10:00:00.000000000 +00:00
+  time: 2021-03-27 16:00:00.000000000 +00:00
+  deviations_count: 4
+  dev_alg: mad
+  detect_period: 1d
+  detect_period_type: 1
+  params: '7h:now/h-2h,3h'
+out:
+  return: SUCCEED
+  value: 0.25
+---
+test case: mad, 4 dc, detection period removes all remainder
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1
+      ts: 2021-03-27 15:00:00.000000001 +00:00
+    - value: 2
+      ts: 2021-03-27 14:00:00.000000000 +00:00
+    - value: 3
+      ts: 2021-03-27 13:00:00.000000000 +00:00
+    - value: 666
+      ts: 2026-03-27 12:00:00.000000000 +00:00
+    - value: 4
+      ts: 2021-03-27 11:00:00.000000000 +00:00
+    - value: 10000
+      ts: 2021-03-27 10:00:00.000000000 +00:00
+  time: 2021-03-27 16:00:00.000000000 +00:00
+  deviations_count: 4
+  dev_alg: mad
+  detect_period: 1d
+  detect_period_type: 1
+  params: '7h:now/h,1h'
+out:
+  return: SUCCEED
+  value: 0
+...

@@ -471,7 +471,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 			));
 		}
 
-		$number_parser = new CNumberParser(['with_suffix' => true]);
+		$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
 
 		// Validate Min/Max values in Axes tab.
 		if ($this->fields['lefty']->getValue() == SVG_GRAPH_AXIS_SHOW) {
