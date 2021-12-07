@@ -30,7 +30,6 @@ class CControllerWidgetItemView extends CControllerWidget {
 
 		$this->setType(WIDGET_ITEM);
 		$this->setValidationRules([
-			'edit_mode' => 'in 0,1',
 			'name' => 'string',
 			'fields' => 'json',
 			'dynamic_hostid' => 'db hosts.hostid'
@@ -266,7 +265,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 				$description = $items[$itemid]['name'];
 			}
 
-			$cells = $this->arrangeByCells($fields, [
+			$cells = self::arrangeByCells($fields, [
 				'description' => $description,
 				'value_type' => $value_type,
 				'units' => $units,
@@ -324,6 +323,8 @@ class CControllerWidgetItemView extends CControllerWidget {
 	/**
 	 * Arrange all widget parts by cells, apply all related configuration settings to each part.
 	 *
+	 * @static
+	 *
 	 * @param array       $fields                      Input fields from the form.
 	 * @param array       $fields['show']              Flags to show description, value, time and change indicator.
 	 * @param int         $fields['desc_v_pos']        Vertical position of the description.
@@ -360,7 +361,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 	 *
 	 * @return array
 	 */
-	private function arrangeByCells(array $fields, array $values): array {
+	private static function arrangeByCells(array $fields, array $values): array {
 		$cells = [];
 
 		$show = array_flip($fields['show']);
