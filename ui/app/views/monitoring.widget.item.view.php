@@ -59,7 +59,7 @@ else {
 			$div->addClass($row_class);
 			$div->addClass($column_class);
 
-			switch($cell_type) {
+			switch ($cell_type) {
 				case 'item_description':
 					$div->addClass('item-description');
 
