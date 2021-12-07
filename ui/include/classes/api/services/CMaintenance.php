@@ -373,6 +373,7 @@ class CMaintenance extends CApiService {
 				}
 
 				$maintenance['groups'] = zbx_toObject($maintenance['groupids'], 'groupid');
+				unset($maintenance['groupids']);
 			}
 
 			if (array_key_exists('hostids', $maintenance)) {
@@ -381,6 +382,7 @@ class CMaintenance extends CApiService {
 				}
 
 				$maintenance['hosts'] = zbx_toObject($maintenance['hostids'], 'hostid');
+				unset($maintenance['hostids']);
 			}
 		}
 		unset($maintenance);
@@ -566,6 +568,7 @@ class CMaintenance extends CApiService {
 				}
 
 				$maintenance['groups'] = zbx_toObject($maintenance['groupids'], 'groupid');
+				unset($maintenance['groupids']);
 			}
 
 			if (array_key_exists('hostids', $maintenance)) {
@@ -574,6 +577,7 @@ class CMaintenance extends CApiService {
 				}
 
 				$maintenance['hosts'] = zbx_toObject($maintenance['hostids'], 'hostid');
+				unset($maintenance['hostids']);
 			}
 		}
 		unset($maintenance);
@@ -639,17 +643,6 @@ class CMaintenance extends CApiService {
 		self::checkDuplicates($maintenances, $db_maintenances);
 		self::checkGroups($maintenances);
 		self::checkHosts($maintenances);
-
-		// FIXME: Delete this code after ZBXNEXT-6889 merged to master.
-		foreach ($maintenances as $maintenance) {
-			if (!array_key_exists('groups', $maintenance)) {
-				unset($db_maintenances[$maintenance['maintenanceid']]['groups']);
-			}
-
-			if (!array_key_exists('hosts', $maintenance)) {
-				unset($db_maintenances[$maintenance['maintenanceid']]['hosts']);
-			}
-		}
 	}
 
 	/**
