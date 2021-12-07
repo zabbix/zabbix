@@ -734,7 +734,7 @@ static void	add_sentusers_msg_esc_cancel(ZBX_USER_MSG **user_msg, zbx_uint64_t a
 		ZBX_STR2UINT64(mediatypeid, row[1]);
 		esc_step = atoi(row[4]);
 
-		if (userid == userid_prev && mediatypeid == mediatypeid_prev && esc_step == esc_step_prev)
+		if (userid == userid_prev && mediatypeid == mediatypeid_prev && esc_step < esc_step_prev)
 			continue;
 
 		userid_prev = userid;
