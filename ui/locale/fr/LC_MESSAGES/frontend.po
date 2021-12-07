@@ -7115,7 +7115,7 @@ msgstr "Le graphique « %1$s » avec des éléments de modèles ne peut pas co
 
 #: include/classes/widgets/CWidgetConfig.php:52
 msgid "Graph (classic)"
-msgstr "Graph (classique)"
+msgstr "Graphique (standard)"
 
 #: graphs.php:248
 msgid "Graph added"
