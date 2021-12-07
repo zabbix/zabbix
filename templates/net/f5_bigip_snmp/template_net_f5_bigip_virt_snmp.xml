@@ -1994,18 +1994,18 @@ The host memory in bytes currently in use for the specified host.</description>
                     </item_prototypes>
                     <trigger_prototypes>
                         <trigger_prototype>
-                            <expression>{Template F5 Big-IP SNMP:bigip.memory.used[{#HOST.ID}].max(5m)}/{Template F5 Big-IP SNMP:bigip.memory.total[{#HOST.ID}].min(5m)}*100&gt;{$BIGIP.MEMORY.UTIL.WARN.MAX}</expression>
+                            <expression>{Template F5 Big-IP SNMP:bigip.memory.used[{#HOST.ID}].last()}/{Template F5 Big-IP SNMP:bigip.memory.total[{#HOST.ID}].last()}*100&gt;{$BIGIP.MEMORY.UTIL.WARN.MAX}</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                            <recovery_expression>{Template F5 Big-IP SNMP:bigip.memory.used[{#HOST.ID}].max(5m)}/{Template F5 Big-IP SNMP:bigip.memory.total[{#HOST.ID}].min(5m)}*100&lt;{$BIGIP.MEMORY.UTIL.WARN.MIN}</recovery_expression>
-                            <name>F5 BIG-IP: High memory utilization in host [{#HOST.ID}] (over {$BIGIP.MEMORY.UTIL.WARN.MAX}% for 5m)</name>
+                            <recovery_expression>{Template F5 Big-IP SNMP:bigip.memory.used[{#HOST.ID}].last()}/{Template F5 Big-IP SNMP:bigip.memory.total[{#HOST.ID}].last()}*100&lt;{$BIGIP.MEMORY.UTIL.WARN.MIN}</recovery_expression>
+                            <name>F5 BIG-IP: High memory utilization in host [{#HOST.ID}] (over {$BIGIP.MEMORY.UTIL.WARN.MAX}%)</name>
                             <priority>WARNING</priority>
                             <description>The system is running out of free memory.</description>
                         </trigger_prototype>
                         <trigger_prototype>
-                            <expression>{Template F5 Big-IP SNMP:bigip.memory.used.swap[{#HOST.ID}].max(5m)}/{Template F5 Big-IP SNMP:bigip.memory.total.swap[{#HOST.ID}].min(5m)}*100&gt;{$BIGIP.SWAP.UTIL.WARN.MAX}</expression>
+                            <expression>{Template F5 Big-IP SNMP:bigip.memory.used.swap[{#HOST.ID}].last()}/{Template F5 Big-IP SNMP:bigip.memory.total.swap[{#HOST.ID}].last()}*100&gt;{$BIGIP.SWAP.UTIL.WARN.MAX}</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                            <recovery_expression>{Template F5 Big-IP SNMP:bigip.memory.used.swap[{#HOST.ID}].max(5m)}/{Template F5 Big-IP SNMP:bigip.memory.total.swap[{#HOST.ID}].min(5m)}*100&gt;{$BIGIP.SWAP.UTIL.WARN.MIN}</recovery_expression>
-                            <name>F5 BIG-IP: High swap utilization in host [{#HOST.ID}] (over {$BIGIP.SWAP.UTIL.WARN.MAX}% for 5m)</name>
+                            <recovery_expression>{Template F5 Big-IP SNMP:bigip.memory.used.swap[{#HOST.ID}].last()}/{Template F5 Big-IP SNMP:bigip.memory.total.swap[{#HOST.ID}].last()}*100&gt;{$BIGIP.SWAP.UTIL.WARN.MIN}</recovery_expression>
+                            <name>F5 BIG-IP: High swap utilization in host [{#HOST.ID}] (over {$BIGIP.SWAP.UTIL.WARN.MAX}%)</name>
                             <priority>WARNING</priority>
                             <description>The system is running out of free swap memory.</description>
                         </trigger_prototype>
