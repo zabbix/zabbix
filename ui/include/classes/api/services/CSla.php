@@ -1330,19 +1330,12 @@ class CSla extends CApiService {
 				if ($sli_cell['sli'] != -1) {
 					$available_uptime = $max_uptime - $sli_cell['uptime'] - $sli_cell['downtime'];
 
-					if ($sli_cell['sli'] >= $db_sla['slo']) {
-						$sli_cell['error_budget'] = true;
-						$sli_cell['error_budget_value'] = $db_sla['slo'] > 0
-							? min($available_uptime,
-								$sli_cell['uptime'] / $db_sla['slo'] * 100 - $sli_cell['uptime'] - $sli_cell['downtime']
-							)
-							: $available_uptime;
-					}
-					elseif ($db_sla['slo'] < 100) {
-						$sli_cell['error_budget'] = true;
-						$sli_cell['error_budget_value'] =
-							$sli_cell['uptime'] - $sli_cell['downtime'] * $db_sla['slo'] / (100 - $db_sla['slo']);
-					}
+					$sli_cell['error_budget'] = true;
+					$sli_cell['error_budget_value'] = $db_sla['slo'] > 0
+						? min($available_uptime,
+							$sli_cell['uptime'] / $db_sla['slo'] * 100 - $sli_cell['uptime'] - $sli_cell['downtime']
+						)
+						: $available_uptime;
 				}
 
 				$sli[$reporting_period_index][$service_index] = $sli_cell;
