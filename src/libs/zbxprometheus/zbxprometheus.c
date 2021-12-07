@@ -1768,6 +1768,9 @@ int	zbx_prometheus_init(zbx_prometheus_t *prom, const char *data, char **error)
 out:
 	prometheus_filter_clear(&filter);
 
+	if (SUCCEED != ret)
+		zbx_prometheus_clear(prom);
+
 	return ret;
 }
 

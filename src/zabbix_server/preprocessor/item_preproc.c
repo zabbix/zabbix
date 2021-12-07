@@ -33,8 +33,8 @@
 
 #include "item_preproc.h"
 
-extern zbx_es_t	es_engine;
 
+extern zbx_es_t	es_engine;
 /******************************************************************************
  *                                                                            *
  * Function: item_preproc_numeric_type_hint                                   *
@@ -1573,7 +1573,10 @@ static int	item_preproc_prometheus_pattern(zbx_preproc_cache_t *cache, zbx_varia
 			prom_cache = (zbx_prometheus_t *)zbx_malloc(NULL, sizeof(zbx_prometheus_t));
 
 			if (SUCCEED != zbx_prometheus_init(prom_cache, value->data.str, &err))
+			{
+				zbx_free(prom_cache);
 				goto out;
+			}
 
 			zbx_preproc_cache_put(cache, ZBX_PREPROC_PROMETHEUS_PATTERN, prom_cache);
 		}
