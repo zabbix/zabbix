@@ -1354,8 +1354,8 @@ define('API_EXEC_PARAMS',			48);
 define('API_COND_FORMULA',			49);
 define('API_COND_FORMULAID',		50);
 define('API_UNEXPECTED',			51);
-define('API_INT32_RANGES',			52);
-define('API_LAT_LNG_ZOOM',			53);
+define('API_INT32_RANGES',			53);
+define('API_LAT_LNG_ZOOM',			54);
 
 // flags
 define('API_REQUIRED',					0x00001);
