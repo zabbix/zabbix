@@ -1539,18 +1539,9 @@ static int	expression_eval_bucket_rate(zbx_expression_eval_t *eval, zbx_expressi
 
 		zbx_vector_dbl_append(results, le);
 		zbx_vector_dbl_append(results, rate.data.dbl);
-
-		if (SUCCEED == zbx_double_compare(ZBX_INFINITY, le) && SUCCEED == zbx_double_compare(0, rate.data.dbl))
-			break;
 	}
 
-	if (results->values_num >= 2 &&
-			SUCCEED == zbx_double_compare(results->values[results->values_num - 2], ZBX_INFINITY) &&
-			SUCCEED == zbx_double_compare(results->values[results->values_num - 1], 0))
-	{
-		zbx_variant_set_none(value);
-	}
-	else if (ZBX_MIXVALUE_FUNC_BRATE == item_func)
+	if (ZBX_MIXVALUE_FUNC_BRATE == item_func)
 	{
 		zbx_variant_set_dbl_vector(value, results);
 		results = NULL;
