@@ -147,7 +147,7 @@ class testFormPreprocessingTest extends CWebTest {
 						['type' => 'Replace', 'parameter_1' => 'test', 'parameter_2' => ''],
 						['type' => 'In range', 'parameter_1' => '1', 'parameter_2' => ''],
 						['type' => 'In range', 'parameter_1' => '', 'parameter_2' => '2'],
-						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu', 'parameter_2' => 'label', 'parameter_3' => '']
+						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu', 'parameter_2' => 'value']
 					],
 					'action' => 'Cancel'
 				]
@@ -171,7 +171,7 @@ class testFormPreprocessingTest extends CWebTest {
 						['type' => 'Check for error in XML', 'parameter_1' => ''],
 						['type' => 'Check for error using regular expression', 'parameter_1' => '', 'parameter_2' => ''],
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => ''],
-						['type' => 'Prometheus pattern', 'parameter_1' => '', 'parameter_2' => 'label', 'parameter_3' => '']
+						['type' => 'Prometheus pattern', 'parameter_1' => '', 'parameter_2' => 'value']
 					],
 					'error' => 'Incorrect value for field "params":'
 				]
@@ -181,7 +181,7 @@ class testFormPreprocessingTest extends CWebTest {
 					'expected' => TEST_BAD,
 					'preprocessing' => [
 						['type' => 'Regular expression', 'parameter_1' => '1', 'parameter_2' => ''],
-						['type' => 'Check for error using regular expression', 'parameter_1' => 'path', 'parameter_2' => '']
+						['type' => 'Check for error using regular expression', 'parameter_1' => 'path']
 
 					],
 					'error' => 'Incorrect value for field "params": second parameter is expected.'

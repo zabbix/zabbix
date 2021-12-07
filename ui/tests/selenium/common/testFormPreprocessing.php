@@ -2698,7 +2698,8 @@ abstract class testFormPreprocessing extends CWebTest {
 					[
 						'type' => 'Prometheus pattern',
 						'parameter_1' => 'cpu_usage_system',
-						'parameter_2' => 'label_name',
+						'parameter_2' => 'label',
+						'parameter_3' => 'label_name',
 						'on_fail' => true,
 						'error_handler' => 'Set error to',
 						'error_handler_params' => 'Custom_text'
