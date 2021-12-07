@@ -222,7 +222,7 @@ function addTextFormatting(CDiv $div, array $text_data): CDiv {
 	$div->addStyle(sprintf('--widget-item-font: %1$s;', number_format($text_data['font_size'] / 100, 2)));
 
 	if ($text_data['color'] !== '') {
-		$div->addStyle(sprintf(' color: #%1$s;', $text_data['color']));
+		$div->addStyle(sprintf('color: #%1$s;', $text_data['color']));
 	}
 
 	$div->addItem($text_data['text']);
