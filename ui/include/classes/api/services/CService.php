@@ -285,9 +285,9 @@ class CService extends CApiService {
 	/**
 	 * @param array $services
 	 *
-	 * @return array
-	 *
 	 * @throws APIException
+	 *
+	 * @return array
 	 */
 	public function update(array $services): array {
 		self::validateUpdate($services, $db_services);

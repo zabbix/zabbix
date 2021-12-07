@@ -200,9 +200,9 @@ class CSla extends CApiService {
 	/**
 	 * @param array $slas
 	 *
-	 * @return array
-	 *
 	 * @throws APIException
+	 *
+	 * @return array
 	 */
 	public function update(array $slas): array {
 		self::validateUpdate($slas, $db_slas);
@@ -290,9 +290,9 @@ class CSla extends CApiService {
 	/**
 	 * @param array $slaids
 	 *
-	 * @return array
-	 *
 	 * @throws APIException
+	 *
+	 * @return array
 	 */
 	public function delete(array $slaids): array {
 		$this->validateDelete($slaids, $db_slas);
@@ -980,9 +980,9 @@ class CSla extends CApiService {
 	 * @param array|null $limit_slaids
 	 * @param array|null $limit_serviceids
 	 *
-	 * @return array|null
-	 *
 	 * @throws APIException
+	 *
+	 * @return array|null
 	 */
 	private static function getAccessibleSlaids(?array $limit_slaids, ?array $limit_serviceids): ?array {
 		$role = API::Role()->get([
@@ -1049,10 +1049,10 @@ class CSla extends CApiService {
 	/**
 	 * @param array $options
 	 *
-	 * @return array
-	 *
 	 * @throws Exception
 	 * @throws APIException
+	 *
+	 * @return array
 	 */
 	public function getSli(array $options = []): array {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
@@ -1101,9 +1101,9 @@ class CSla extends CApiService {
 	 * @param array $sla
 	 * @param array $options
 	 *
-	 * @return array
-	 *
 	 * @throws Exception
+	 *
+	 * @return array
 	 */
 	private static function getReportingPeriods(array $sla, array $options): array {
 		$interval = new DateInterval([
@@ -1238,9 +1238,9 @@ class CSla extends CApiService {
 	 * @param array $reporting_periods
 	 * @param array $db_services
 	 *
-	 * @return array
-	 *
 	 * @throws Exception
+	 *
+	 * @return array
 	 */
 	private static function calculateSli(array $db_sla, array $reporting_periods, array $db_services): array {
 		if (!$reporting_periods || !$db_services) {
@@ -1391,9 +1391,9 @@ class CSla extends CApiService {
 	 * @param array $reporting_period
 	 * @param array $db_sla
 	 *
-	 * @return array
-	 *
 	 * @throws Exception
+	 *
+	 * @return array
 	 */
 	private static function getScheduledUptimePeriods(array $db_sla, array $reporting_period): array {
 		if (!$db_sla['schedule']) {
