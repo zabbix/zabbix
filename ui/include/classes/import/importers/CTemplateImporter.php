@@ -68,7 +68,7 @@ class CTemplateImporter extends CImporter {
 				 *  - save linkages to add in case if 'create new' linkages is checked;
 				 *  - calculate missing linkages in case if 'delete missing' is checked.
 				 */
-				if (array_key_exists('templates', $template)) {
+				if ($template['templates']) {
 					$template_linkage[$template['host']] = $template['templates'];
 				}
 				unset($template['templates']);
@@ -145,7 +145,7 @@ class CTemplateImporter extends CImporter {
 					if ($this->options['templateLinkage']['createMissing']
 							&& array_key_exists($template['host'], $template_linkage)) {
 						API::Template()->massAdd([
-							'templates' => $template,
+							'templates' => array_intersect_key($template, array_flip(['templateid'])),
 							'templates_link' => $template_linkage[$template['host']]
 						]);
 					}
