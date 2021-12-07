@@ -46,20 +46,13 @@
 #define ZBX_IPC_PREPROCESSOR_DEP_RESULT			15
 #define ZBX_IPC_PREPROCESSOR_DEP_RESULT_CONT		16
 
-typedef struct
-{
-	AGENT_RESULT	*result;
-	int		refcount;
-}
-zbx_result_ptr_t;
-
 /* item value data used in preprocessing manager */
 typedef struct
 {
 	zbx_uint64_t		itemid;		 /* item id */
 	zbx_uint64_t		hostid;		 /* host id */
 	unsigned char		item_value_type; /* item value type */
-	zbx_result_ptr_t	*result_ptr;	 /* item value (if any) to be shared between master and dependent items */
+	AGENT_RESULT		*result;	 /* item value (if any) */
 	zbx_timespec_t		*ts;		 /* timestamp of a value */
 	char			*error;		 /* error message (if any) */
 	unsigned char		item_flags;	 /* item flags */

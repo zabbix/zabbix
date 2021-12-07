@@ -153,7 +153,7 @@ static zbx_uint32_t	preprocessor_pack_value(zbx_ipc_message_t *message, zbx_prep
 	unsigned char		ts_marker, result_marker, log_marker;
 
 	ts_marker = (NULL != value->ts);
-	result_marker = (NULL != value->result_ptr->result);
+	result_marker = (NULL != value->result);
 
 	*offset++ = PACKED_FIELD(&value->itemid, sizeof(zbx_uint64_t));
 	*offset++ = PACKED_FIELD(&value->hostid, sizeof(zbx_uint64_t));
@@ -171,27 +171,27 @@ static zbx_uint32_t	preprocessor_pack_value(zbx_ipc_message_t *message, zbx_prep
 
 	*offset++ = PACKED_FIELD(&result_marker, sizeof(unsigned char));
 
-	if (NULL != value->result_ptr->result)
+	if (NULL != value->result)
 	{
 
-		*offset++ = PACKED_FIELD(&value->result_ptr->result->lastlogsize, sizeof(zbx_uint64_t));
-		*offset++ = PACKED_FIELD(&value->result_ptr->result->ui64, sizeof(zbx_uint64_t));
-		*offset++ = PACKED_FIELD(&value->result_ptr->result->dbl, sizeof(double));
-		*offset++ = PACKED_FIELD(value->result_ptr->result->str, 0);
-		*offset++ = PACKED_FIELD(value->result_ptr->result->text, 0);
-		*offset++ = PACKED_FIELD(value->result_ptr->result->msg, 0);
-		*offset++ = PACKED_FIELD(&value->result_ptr->result->type, sizeof(int));
-		*offset++ = PACKED_FIELD(&value->result_ptr->result->mtime, sizeof(int));
+		*offset++ = PACKED_FIELD(&value->result->lastlogsize, sizeof(zbx_uint64_t));
+		*offset++ = PACKED_FIELD(&value->result->ui64, sizeof(zbx_uint64_t));
+		*offset++ = PACKED_FIELD(&value->result->dbl, sizeof(double));
+		*offset++ = PACKED_FIELD(value->result->str, 0);
+		*offset++ = PACKED_FIELD(value->result->text, 0);
+		*offset++ = PACKED_FIELD(value->result->msg, 0);
+		*offset++ = PACKED_FIELD(&value->result->type, sizeof(int));
+		*offset++ = PACKED_FIELD(&value->result->mtime, sizeof(int));
 
-		log_marker = (NULL != value->result_ptr->result->log);
+		log_marker = (NULL != value->result->log);
 		*offset++ = PACKED_FIELD(&log_marker, sizeof(unsigned char));
-		if (NULL != value->result_ptr->result->log)
+		if (NULL != value->result->log)
 		{
-			*offset++ = PACKED_FIELD(value->result_ptr->result->log->value, 0);
-			*offset++ = PACKED_FIELD(value->result_ptr->result->log->source, 0);
-			*offset++ = PACKED_FIELD(&value->result_ptr->result->log->timestamp, sizeof(int));
-			*offset++ = PACKED_FIELD(&value->result_ptr->result->log->severity, sizeof(int));
-			*offset++ = PACKED_FIELD(&value->result_ptr->result->log->logeventid, sizeof(int));
+			*offset++ = PACKED_FIELD(value->result->log->value, 0);
+			*offset++ = PACKED_FIELD(value->result->log->source, 0);
+			*offset++ = PACKED_FIELD(&value->result->log->timestamp, sizeof(int));
+			*offset++ = PACKED_FIELD(&value->result->log->severity, sizeof(int));
+			*offset++ = PACKED_FIELD(&value->result->log->logeventid, sizeof(int));
 		}
 	}
 
@@ -1063,9 +1063,7 @@ zbx_uint32_t	zbx_preprocessor_unpack_value(zbx_preproc_item_value_t *value, unsi
 		agent_result->log = log;
 	}
 
-	value->result_ptr = (zbx_result_ptr_t *)zbx_malloc(NULL, sizeof(zbx_result_ptr_t));
-	value->result_ptr->result = agent_result;
-	value->result_ptr->refcount = 1;
+	value->result = agent_result;
 
 	return offset - data;
 }
@@ -1612,8 +1610,8 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, zbx_uint64_t hostid, unsigne
 		unsigned char item_flags, AGENT_RESULT *result, zbx_timespec_t *ts, unsigned char state, char *error)
 {
 	zbx_preproc_item_value_t	value = {.itemid = itemid, .hostid = hostid, .item_value_type = item_value_type,
-					.error = error, .item_flags = item_flags, .state = state, .ts = ts};
-	zbx_result_ptr_t		result_ptr = {.result = result};
+					.error = error, .item_flags = item_flags, .state = state, .ts = ts,
+					.result = result};
 	size_t				value_len = 0, len;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -1637,13 +1635,11 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, zbx_uint64_t hostid, unsigne
 
 		if (ZBX_MAX_RECV_DATA_SIZE < value_len)
 		{
-			result_ptr.result = NULL;
+			value.result = NULL;
 			value.state = ITEM_STATE_NOTSUPPORTED;
 			value.error = "Value is too large.";
 		}
 	}
-
-	value.result_ptr = &result_ptr;
 
 	if (0 == preprocessor_pack_value(&cached_message, &value))
 	{

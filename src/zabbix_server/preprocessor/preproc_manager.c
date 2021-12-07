@@ -279,7 +279,7 @@ static zbx_uint32_t	preprocessor_create_task(zbx_preprocessing_manager_t *manage
 	if (ITEM_STATE_NOTSUPPORTED == request->value.state)
 		zbx_variant_set_str(&value, "");
 	else
-		preprocessing_ar_to_variant(request->value.result_ptr->result, &value);
+		preprocessing_ar_to_variant(request->value.result, &value);
 
 	if (NULL != (vault = (zbx_preproc_history_t *)zbx_hashset_search(&manager->history_cache,
 				&request->value.itemid)))
@@ -525,21 +525,6 @@ out:
 	return task;
 }
 
-static void	preproc_item_result_free(zbx_preproc_item_value_t *value)
-{
-	if (0 == --(value->result_ptr->refcount))
-	{
-		if (NULL != value->result_ptr->result)
-		{
-			free_result(value->result_ptr->result);
-			zbx_free(value->result_ptr->result);
-		}
-		zbx_free(value->result_ptr);
-	}
-	else
-		value->result_ptr = NULL;
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: preprocessor_get_worker_by_client                                *
@@ -645,8 +630,13 @@ static void	preprocessor_assign_tasks(zbx_preprocessing_manager_t *manager)
 static void	preproc_item_value_clear(zbx_preproc_item_value_t *value)
 {
 	zbx_free(value->error);
-	preproc_item_result_free(value);
 	zbx_free(value->ts);
+
+	if (NULL != value->result)
+	{
+		free_result(value->result);
+		zbx_free(value->result);
+	}
 }
 
 /******************************************************************************
@@ -713,12 +703,12 @@ static void	preprocessor_flush_value(const zbx_preproc_item_value_t *value)
 {
 	if (0 == (value->item_flags & ZBX_FLAG_DISCOVERY_RULE) || 0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 	{
-		dc_add_history(value->itemid, value->item_value_type, value->item_flags, value->result_ptr->result,
+		dc_add_history(value->itemid, value->item_value_type, value->item_flags, value->result,
 				value->ts, value->state, value->error);
 	}
 	else
 	{
-		zbx_lld_process_agent_result(value->itemid, value->hostid, value->result_ptr->result, value->ts,
+		zbx_lld_process_agent_result(value->itemid, value->hostid, value->result, value->ts,
 				value->error);
 	}
 }
@@ -882,10 +872,10 @@ static void	preprocessor_link_items(zbx_preprocessing_manager_t *manager, zbx_li
 static void	preprocessor_enqueue_dependent_value(zbx_preprocessing_manager_t *manager,
 		zbx_preproc_item_value_t *value)
 {
-	if (NULL == value->result_ptr->result)
+	if (NULL == value->result)
 		return;
 
-	preprocessor_enqueue_dependent(manager, value->hostid, value->itemid, value->result_ptr->result,
+	preprocessor_enqueue_dependent(manager, value->hostid, value->itemid, value->result,
 			value->item_value_type, value->ts);
 }
 
@@ -919,7 +909,7 @@ static void	preprocessor_enqueue(zbx_preprocessing_manager_t *manager, zbx_prepr
 		priority = ZBX_PREPROC_PRIORITY_FIRST;
 
 	if (NULL == item || 0 == item->preproc_ops_num || (ITEM_STATE_NOTSUPPORTED != value->state &&
-			(NULL == value->result_ptr->result || 0 == ISSET_VALUE(value->result_ptr->result))))
+			(NULL == value->result || 0 == ISSET_VALUE(value->result))))
 	{
 		state = REQUEST_STATE_DONE;
 
@@ -1145,35 +1135,6 @@ static void	preprocessor_add_test_request(zbx_preprocessing_manager_t *manager, 
 
 /******************************************************************************
  *                                                                            *
- * Function: create_result_with_meta                                          *
- *                                                                            *
- * Purpose: create new result and copy meta information from previous result  *
- *                                                                            *
- * Parameters: result_old - [IN] result that can contain meta information     *
- *                                                                            *
- * Return value: pointer newly allocated result                               *
- *                                                                            *
- ******************************************************************************/
-static AGENT_RESULT	*create_result_with_meta(const AGENT_RESULT *result_old)
-{
-	AGENT_RESULT	*result;
-
-	result = zbx_malloc(NULL, sizeof(AGENT_RESULT));
-
-	init_result(result);
-
-	if (NULL == result_old || 0 == ISSET_META(result_old))
-		return result;
-
-	result->type = AR_META;
-	result->lastlogsize = result_old->lastlogsize;
-	result->mtime = result_old->mtime;
-
-	return result;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: preprocessor_set_variant_result                                  *
  *                                                                            *
  * Purpose: get result data from variant and error message                    *
@@ -1202,15 +1163,9 @@ static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request,
 
 	if (ZBX_VARIANT_NONE == value->type)
 	{
-		AGENT_RESULT	*result;
-
-		result = create_result_with_meta(request->value.result_ptr->result);
-
-		preproc_item_result_free(&request->value);
-		request->value.result_ptr = (zbx_result_ptr_t *)zbx_malloc(NULL, sizeof(zbx_result_ptr_t));
-		request->value.result_ptr->refcount = 1;
-		request->value.result_ptr->result = result;
+		free_result(request->value.result);
 		zbx_free(request->value.error);
+
 		request->value.state = ITEM_STATE_NORMAL;
 		ret = FAIL;
 
@@ -1233,9 +1188,14 @@ static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request,
 	if (FAIL != (ret = zbx_variant_convert(value, type)))
 	{
 		/* old result is shared between dependent and master items, it cannot be modified, create new result */
-		AGENT_RESULT	*result;
 
-		result = create_result_with_meta(request->value.result_ptr->result);
+		if (NULL == request->value.result)
+		{
+			request->value.result = (AGENT_RESULT *)zbx_malloc(NULL, sizeof(AGENT_RESULT));
+			init_result(request->value.result);
+		}
+		else
+			free_result(request->value.result);
 
 		if (ITEM_STATE_NOTSUPPORTED == request->value.state)
 			request->value.state = ITEM_STATE_NORMAL;
@@ -1243,39 +1203,32 @@ static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request,
 		switch (request->value_type)
 		{
 			case ITEM_VALUE_TYPE_FLOAT:
-				SET_DBL_RESULT(result, value->data.dbl);
+				SET_DBL_RESULT(request->value.result, value->data.dbl);
 				break;
 			case ITEM_VALUE_TYPE_STR:
-				SET_STR_RESULT(result, value->data.str);
+				SET_STR_RESULT(request->value.result, value->data.str);
 				break;
 			case ITEM_VALUE_TYPE_LOG:
-				log = (zbx_log_t *)zbx_malloc(NULL, sizeof(zbx_log_t));
-
-				if (NULL != request->value.result_ptr->result &&
-						ISSET_LOG(request->value.result_ptr->result))
+				if (ISSET_LOG(request->value.result))
 				{
-					*log = *request->value.result_ptr->result->log;
-					if (NULL != log->source)
-						log->source = zbx_strdup(NULL, log->source);
+					log = GET_LOG_RESULT(request->value.result);
+					zbx_free(log->value);
 				}
 				else
+				{
+					log = zbx_malloc(NULL, sizeof(zbx_log_t));
 					memset(log, 0, sizeof(zbx_log_t));
-
+					SET_LOG_RESULT(request->value.result, log);
+				}
 				log->value = value->data.str;
-				SET_LOG_RESULT(result, log);
 				break;
 			case ITEM_VALUE_TYPE_UINT64:
-				SET_UI64_RESULT(result, value->data.ui64);
+				SET_UI64_RESULT(request->value.result, value->data.ui64);
 				break;
 			case ITEM_VALUE_TYPE_TEXT:
-				SET_TEXT_RESULT(result, value->data.str);
+				SET_TEXT_RESULT(request->value.result, value->data.str);
 				break;
 		}
-
-		preproc_item_result_free(&request->value);
-		request->value.result_ptr = (zbx_result_ptr_t *)zbx_malloc(NULL, sizeof(zbx_result_ptr_t));
-		request->value.result_ptr->refcount = 1;
-		request->value.result_ptr->result = result;
 
 		zbx_variant_set_none(value);
 	}
