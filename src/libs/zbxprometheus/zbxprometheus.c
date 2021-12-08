@@ -1133,21 +1133,7 @@ static int	prometheus_parse_row(zbx_prometheus_filter_t *filter, const char *dat
 	/* check if there was a whitespace before metric value */
 	if (pos == loc.r + 1)
 	{
-		const char	*ptr;
-		int		len;
-
-		if ('\0' != data[pos])
-		{
-			if (NULL == (ptr = strchr(data + pos, '\n')))
-				len = strlen(data + pos);
-			else
-				len = (size_t)(ptr - data) + pos;
-
-			*error = zbx_dsprintf(*error, "no space before metric value at: %.*s", len, data + pos);
-		}
-		else
-			*error = zbx_strdup(*error, "no metric value found");
-
+		*error = zbx_strdup(*error, "no space before metric value");
 		goto out;
 	}
 
