@@ -50,6 +50,7 @@ class CTabFilterItem extends CBaseComponent {
 		this._template_rendered = false;
 		this._src_url = null;
 		this._apply_url = null;
+		this._subfilter = new FormData();
 
 		this.init();
 		this.registerEvents();
@@ -361,6 +362,13 @@ class CTabFilterItem extends CBaseComponent {
 			if ('page' in this._data && this._data.page > 1) {
 				params.set('page', this._data.page);
 			}
+
+			for (let key of this._subfilter.keys()) {
+				const k = key.replace('[]', '');
+				this._subfilter.getAll(key).forEach((v, i) => {
+					params.set(k+'['+i+']', v);
+				});
+			}
 		}
 
 		return params;
@@ -472,6 +480,48 @@ class CTabFilterItem extends CBaseComponent {
 	initUnsavedState() {
 		if (this._src_url === null) {
 			this.resetUnsavedState();
+		}
+	}
+
+	/**
+	 * Unset opened subfilter parameters.
+	 */
+	emptySubfilter() {
+		this._subfilter = new FormData();
+	}
+
+	/**
+	 * Set new subfilter field.
+	 *
+	 * @param {string} key
+	 * @param {string} value
+	 */
+	setSubfilter(key, value) {
+		value = String(value);
+
+		if (!this._subfilter.has(key) || this._subfilter.getAll(key).indexOf(value) == -1) {
+			this._subfilter.append(key, value);
+		}
+	}
+
+	/**
+	 * Remove some of existing subfilter field.
+	 *
+	 * @param {string} key
+	 * @param {string} value
+	 */
+	unsetSubfilter(key, value) {
+		value = String(value);
+
+		if (this._subfilter.has(key)) {
+			const existing = this._subfilter.getAll(key);
+			this._subfilter.delete(key);
+
+			existing
+				.filter(val => val !== value)
+				.forEach(val => {
+					this._subfilter.append(key, val);
+				});
 		}
 	}
 

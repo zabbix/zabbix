@@ -146,7 +146,6 @@ $right_column = (new CFormGrid())
 				(new CLabel(_('Show items without data'), 'show_without_data'))
 					->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
 				(new CCheckBox('show_without_data'))
-					->setChecked(true)
 					->setAttribute('disabled', 'disabled')
 					->setUncheckedValue(0)
 			]))->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
@@ -175,7 +174,7 @@ $template = (new CForm('get'))
 	]);
 
 if (array_key_exists('render_html', $data)) {
-	/**
+	/*
 	 * Render HTML to prevent filter flickering after initial page load. PHP created content will be replaced by
 	 * javascript with additional event handling (dynamic rows, etc.) when page will be fully loaded and javascript
 	 * executed.

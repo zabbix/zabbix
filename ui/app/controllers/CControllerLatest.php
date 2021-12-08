@@ -38,7 +38,11 @@ abstract class CControllerLatest extends CController {
 		'show_details' => true,
 		'page' => null,
 		'sort' => 'name',
-		'sortorder' => ZBX_SORT_UP
+		'sortorder' => ZBX_SORT_UP,
+		'subfilter_hostids' => [],
+		'subfilter_tagnames' => [],
+		'subfilter_tags' => [],
+		'subfilter_data' => []
 	];
 
 	/**
@@ -227,6 +231,10 @@ abstract class CControllerLatest extends CController {
 	 * @param string $filter['evaltype']            Filter items by tags.
 	 * @param string $filter['tags']                Filter items by tag names and values.
 	 * @param int    $filter['show_without_data']   Filter items with/without data.
+	 * @param array  $filter['subfilter_hostids']	Host subfilter.
+	 * @param array  $filter['subfilter_tagnames']	Taname subfilter.
+	 * @param int    $filter['subfilter_tags']      Tags subfilter.
+	 * @param int    $filter['subfilter_data']      Data subfilter.
 	 *
 	 * @return int
 	 */
@@ -273,5 +281,235 @@ abstract class CControllerLatest extends CController {
 		}
 
 		return min($select_items_cnt, $search_limit);
+	}
+
+	/**
+	 * Find what subfilters are available based on items selected using the main filter.
+	 *
+	 * @param array  $filter
+	 * @param array  $filter['subfilter_hostids']
+	 * @param array  $filter['subfilter_tagnames']
+	 * @param array  $filter['subfilter_tags']
+	 * @param array  $filter['subfilter_data']
+	 * @param array  $prepared_data
+	 * @param array  $prepared_data['hosts']
+	 * @param string $prepared_data['hosts'][]['name']
+	 * @param array  $prepared_data['items']
+	 * @param int    $prepared_data['items'][]['hostid']
+	 *
+	 * @return array
+	 */
+	protected static function getSubfilters(array $filter, array &$prepared_data): array {
+		$tags = [];
+		foreach ($filter['subfilter_tags'] as $tag => $tag_values) {
+			$tags[urldecode($tag)] = array_flip($tag_values);
+		}
+
+		$subfilter = [
+			'hostids' => array_flip($filter['subfilter_hostids']),
+			'tagnames' => array_flip($filter['subfilter_tagnames']),
+			'tags' => $tags,
+			'data' => array_flip($filter['subfilter_data'])
+		];
+
+		$subfilter_options = self::getSubfilterOptions($prepared_data, $subfilter);
+		$prepared_data['items'] = self::getItemMatchings($prepared_data['items'], $subfilter);
+
+		/*
+		 * Calculate how many additional items would match the filtering results after selecting each of provided host
+		 * subfilters. So item MUST match all subfilters except the tested one.
+		 */
+		foreach ($prepared_data['items'] as $item) {
+			// Hosts subfilter.
+			$item_matches = true;
+			foreach ($item['matching_subfilters'] as $filter_name => $match) {
+				if ($filter_name === 'hostids') {
+					continue;
+				}
+				$item_matches &= $match;
+			}
+
+			if ($item_matches) {
+				$subfilter_options['hostids'][$item['hostid']]['count']++;
+			}
+
+			// Calculate the counters of tag existance subfilter options.
+			foreach ($item['tags'] as $tag) {
+				$item_matches = true;
+				foreach ($item['matching_subfilters'] as $filter_name => $match) {
+					if ($filter_name === 'tagnames') {
+						continue;
+					}
+					$item_matches &= $match;
+				}
+
+				if ($item_matches) {
+					$subfilter_options['tagnames'][$tag['tag']]['count']++;
+				}
+			}
+
+			// Calculate the same for the tag/value pair subfilter options.
+			foreach ($item['tags'] as $tag) {
+				$item_matches = true;
+				foreach ($item['matching_subfilters'] as $filter_name => $match) {
+					if ($filter_name === 'tags') {
+						continue;
+					}
+					$item_matches &= $match;
+				}
+
+				if ($item_matches) {
+					$subfilter_options['tags'][$tag['tag']][$tag['value']]['count']++;
+				}
+			}
+
+			// Data subfilter.
+			$data_key = (int) $item['has_data'];
+			$subfilter_options['data'][$data_key]['count']++;
+		}
+
+		return $subfilter_options;
+	}
+
+	protected static function getSubfilterOptions(array $data, array $subfilter): array {
+		$subfilter_options = [
+			'hostids' => [],
+			'tagnames' => [],
+			'tags' => [],
+			'data' => []
+		];
+
+		foreach ($data['hosts'] as $hostid => $host) {
+			$subfilter_options['hostids'][$hostid] = [
+				'name' => $host['name'],
+				'selected' => array_key_exists($hostid, $subfilter['hostids']),
+				'count' => 0
+			];
+		}
+
+		foreach ($data['items'] as $item) {
+			foreach ($item['tags'] as $tag) {
+				if (!array_key_exists($tag['tag'], $subfilter_options['tagnames'])) {
+					$subfilter_options['tagnames'][$tag['tag']] = [
+						'name' => $tag['tag'],
+						'selected' => array_key_exists($tag['tag'], $subfilter['tagnames']),
+						'count' => 0
+					];
+
+					$subfilter_options['tags'][$tag['tag']] = [];
+				}
+
+				$subfilter_options['tags'][$tag['tag']][$tag['value']] = [
+					'name' => $tag['value'],
+					'selected' => array_key_exists($tag['tag'], $subfilter['tags'])
+						&& array_key_exists($tag['value'], $subfilter['tags'][$tag['tag']]),
+					'count' => 0
+				];
+			}
+		}
+
+		$subfilter_options['data'] = [
+			1 => [
+				'name' => _('With data'),
+				'selected' => array_key_exists(1, $subfilter['data']),
+				'count' => 0
+			],
+			0 => [
+				'name' => _('Without data'),
+				'selected' => array_key_exists(0, $subfilter['data']),
+				'count' => 0
+			]
+		];
+
+		// Sort subfilters by values.
+		CArrayHelper::sort($subfilter_options['hostids'], ['name']);
+		CArrayHelper::sort($subfilter_options['tagnames'], ['name']);
+		array_walk($subfilter_options['tags'], function (&$tag_values) {
+			CArrayHelper::sort($tag_values, ['name']);
+		});
+
+		return $subfilter_options;
+	}
+
+	protected static function getItemMatchings(array $items, array $subfilter): array {
+		$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
+		$with_data = Manager::History()->getItemsHavingValues($items, $history_period);
+		$with_data = array_flip(array_keys($with_data));
+
+		foreach ($items as &$item) {
+			$match_hosts = (!$subfilter['hostids'] || array_key_exists($item['hostid'], $subfilter['hostids']));
+			$match_tagnames = (!$subfilter['tagnames']
+					|| (bool) array_intersect_key($subfilter['tagnames'], array_flip(array_column($item['tags'], 'tag')))
+			);
+
+			if ($subfilter['tags']) {
+				$match_tags = false;
+				foreach ($item['tags'] as $tag) {
+					if (array_key_exists($tag['tag'], $subfilter['tags'])
+							&& array_key_exists($tag['value'], $subfilter['tags'][$tag['tag']])) {
+						$match_tags = true;
+						break;
+					}
+				}
+			}
+			else {
+				$match_tags = true;
+			}
+
+			$item['has_data'] = array_key_exists($item['itemid'], $with_data);
+			$match_data = (!$subfilter['data']
+				|| array_key_exists(0, $subfilter['data']) && !$item['has_data']
+				|| array_key_exists(1, $subfilter['data']) && $item['has_data']
+			);
+
+			$item['matching_subfilters'] = [
+				'hostids' => $match_hosts,
+				'tagnames' => $match_tagnames,
+				'tags' => $match_tags,
+				'data' => $match_data
+			];
+		}
+		unset($item);
+
+		return $items;
+	}
+
+	protected static function applySubfilters(array $items): array {
+		return array_filter($items, function ($item) {
+			return array_sum($item['matching_subfilters']) == count($item['matching_subfilters']);
+		});
+	}
+
+	public static function getSubfilterSelectedValues(array $subfilters): array {
+		$selected_subfilters = [];
+
+		foreach ($subfilters as $subfilter_key => $subfilter) {
+			if (!$subfilter) {
+				continue;
+			}
+
+			if ($subfilter_key === 'tags') {
+				foreach ($subfilter as $tag => $tag_values) {
+					$tag_values = array_filter($tag_values, function ($element) {
+						return $element['selected'];
+					});
+
+					foreach ($tag_values as $element) {
+						$selected_subfilters[] = ['subfilter_tags['.$tag.'][]', $element['name']];
+					}
+				}
+			}
+			else {
+				$subfilter = array_filter($subfilter, function ($element) {
+					return $element['selected'];
+				});
+
+				foreach ($subfilter as $value => $element) {
+					$selected_subfilters[] = ['subfilter_'.$subfilter_key.'[]', $value];
+				}
+			}
+		}
+
+		return $selected_subfilters;
 	}
 }

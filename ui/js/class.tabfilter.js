@@ -329,6 +329,28 @@ class CTabFilter extends CBaseComponent {
 		return null;
 	}
 
+	setSubfilter(key, value) {
+		this._active_item.setSubfilter(key, value);
+		this._active_item.updateUnsavedState();
+		this._active_item.updateApplyUrl();
+		this._active_item.setBrowserLocationToApplyUrl();
+	}
+
+	unsetSubfilter(key, value) {
+		this._active_item.unsetSubfilter(key, value);
+		this._active_item.updateUnsavedState();
+		this._active_item.updateApplyUrl();
+		this._active_item.setBrowserLocationToApplyUrl();
+	}
+
+	initSubfilter(fields) {
+		this._active_item.emptySubfilter();
+
+		fields.forEach(field => {
+			this._active_item.setSubfilter(field[0], field[1]);
+		});
+	}
+
 	/**
 	 * Register tab filter events, called once during initialization.
 	 */
@@ -398,7 +420,9 @@ class CTabFilter extends CBaseComponent {
 				}
 
 				item.setExpanded();
-				this._target.querySelector('.tabfilter-content-container').classList.remove('display-none');
+
+				const tabfilter = this._target.querySelector('.tabfilter-content-container');
+				tabfilter.classList.remove('tabfilter-collapsed', 'display-none');
 			},
 
 			/**
@@ -412,7 +436,13 @@ class CTabFilter extends CBaseComponent {
 				}
 
 				item.removeExpanded();
-				this._target.querySelector('.tabfilter-content-container').classList.add('display-none');
+				const tabfilter = this._target.querySelector('.tabfilter-content-container');
+				if (tabfilter.querySelector('.tabfilter-subfilter')) {
+					tabfilter.classList.add('tabfilter-collapsed');
+				}
+				else {
+					tabfilter.classList.add('tabfilter-collapsed', 'display-none');
+				}
 			},
 
 			/**

@@ -34,8 +34,8 @@ class CControllerLatestView extends CControllerLatest {
 			'groupids' =>				'array_db hosts_groups.groupid',
 			'hostids' =>				'array_db hosts.hostid',
 			'name' =>					'string',
-			'show_without_data' =>		'in 1',
-			'show_details' =>			'in 1',
+			'show_without_data' =>		'in 1,0',
+			'show_details' =>			'in 1,0',
 			'evaltype' =>				'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
 			'tags' =>					'array',
 
@@ -50,7 +50,11 @@ class CControllerLatestView extends CControllerLatest {
 			'filter_show_counter' =>	'in 1,0',
 			'filter_counters' =>		'in 1',
 			'filter_reset' =>			'in 1',
-			'counter_index' =>			'ge 0'
+			'counter_index' =>			'ge 0',
+			'subfilter_hostids' =>		'array',
+			'subfilter_tagnames' =>		'array',
+			'subfilter_tags' =>			'array',
+			'subfilter_data' =>			'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -67,6 +71,35 @@ class CControllerLatestView extends CControllerLatest {
 					break;
 				}
 			}
+		}
+
+		// Validate subfilters.
+		if ($ret && $this->hasInput('subfilter_hostids')) {
+			$hostids = $this->getInput('subfilter_hostids', []);
+			$ret = (!$hostids || count($hostids) === count(array_filter($hostids, 'ctype_digit')));
+		}
+
+		if ($ret && $this->hasInput('subfilter_tagnames')) {
+			$tagnames = $this->getInput('subfilter_tagnames', []);
+			$ret = (!$tagnames || count($tagnames) === count(array_filter($tagnames, 'is_string')));
+		}
+
+		if ($ret && $this->hasInput('subfilter_tags')) {
+			$tags = $this->getInput('subfilter_tags', []);
+			foreach ($tags as $tag => $values) {
+				if (!is_scalar($tag) || count($values) !== count(array_filter($values, 'is_string'))) {
+					$ret = false;
+					break;
+				}
+			}
+		}
+
+		if ($ret && $this->hasInput('subfilter_data')) {
+			$data = $this->getInput('subfilter_data', []);
+			$valid = array_filter($data, function ($val) {
+				return $val === '0' || $val === '1';
+			});
+			$ret = count($data) === count($valid);
 		}
 
 		if (!$ret) {
@@ -96,15 +129,22 @@ class CControllerLatestView extends CControllerLatest {
 			$filter_tabs[] = $filter_tab + ['filter_view_data' => $this->getAdditionalData($filter_tab)];
 		}
 
-		$filter = ['action' => 'latest.view.refresh'] + $filter_tabs[$profile->selected];
+		$filter = $filter_tabs[$profile->selected];
 
 		$refresh_curl = new CUrl('zabbix.php');
-		array_map([$refresh_curl, 'setArgument'], array_keys($filter), $filter);
+		$refresh_curl_params = ['action' => 'latest.view.refresh'] + $filter;
+		array_map([$refresh_curl, 'setArgument'], array_keys($refresh_curl_params), $refresh_curl_params);
 
 		// data sort and pager
 		$sort_field = $this->getInput('sort', 'name');
 		$sort_order = $this->getInput('sortorder', ZBX_SORT_UP);
 		$prepared_data = $this->prepareData($filter, $sort_field, $sort_order);
+
+		$subfilter = array_intersect_key($filter,
+			array_flip(['subfilter_hostids', 'subfilter_tagnames', 'subfilter_tags', 'subfilter_data'])
+		);
+		$subfilters = self::getSubfilters($subfilter, $prepared_data);
+		$prepared_data['items'] = self::applySubfilters($prepared_data['items']);
 
 		$view_url = (new CUrl('zabbix.php'))->setArgument('action', 'latest.view');
 		$paging = CPagerHelper::paginate($this->getInput('page', 1), $prepared_data['items'], ZBX_SORT_UP, $view_url);
@@ -150,7 +190,8 @@ class CControllerLatestView extends CControllerLatest {
 				'hk_history' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY),
 				'hk_history_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)
 			],
-			'tags' => makeTags($prepared_data['items'], true, 'itemid', ZBX_TAG_COUNT_DEFAULT, $filter['tags'])
+			'tags' => makeTags($prepared_data['items'], true, 'itemid', ZBX_TAG_COUNT_DEFAULT, $filter['tags']),
+			'subfilters' => $subfilters
 		] + $prepared_data;
 
 		$response = new CControllerResponseData($data);

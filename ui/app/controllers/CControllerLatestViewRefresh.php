@@ -51,6 +51,12 @@ class CControllerLatestViewRefresh extends CControllerLatestView {
 			// make data
 			$prepared_data = $this->prepareData($filter, $filter['sort'], $filter['sortorder']);
 
+			$subfilter = array_intersect_key($filter,
+				array_flip(['subfilter_hostids', 'subfilter_tagnames', 'subfilter_tags', 'subfilter_data'])
+			);
+			$subfilters = self::getSubfilters($subfilter, $prepared_data);
+			$prepared_data['items'] = self::applySubfilters($prepared_data['items']);
+
 			$page = $this->getInput('page', 1);
 			$view_url = (new CUrl('zabbix.php'))->setArgument('action', 'latest.view');
 			$paging = CPagerHelper::paginate($page, $prepared_data['items'], ZBX_SORT_UP, $view_url);
@@ -59,19 +65,22 @@ class CControllerLatestViewRefresh extends CControllerLatestView {
 
 			// make response
 			$data = [
-				'filter' => $filter,
-				'view_curl' => $view_url,
-				'sort_field' => $filter['sort'],
-				'sort_order' => $filter['sortorder'],
-				'paging' => $paging,
-				'config' => [
-					'hk_trends' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS),
-					'hk_trends_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL),
-					'hk_history' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY),
-					'hk_history_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)
-				],
-				'tags' => makeTags($prepared_data['items'], true, 'itemid', ZBX_TAG_COUNT_DEFAULT, $filter['tags'])
-			] + $prepared_data;
+				'results' => [
+					'filter' => $filter,
+					'view_curl' => $view_url,
+					'sort_field' => $filter['sort'],
+					'sort_order' => $filter['sortorder'],
+					'paging' => $paging,
+					'config' => [
+						'hk_trends' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS),
+						'hk_trends_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL),
+						'hk_history' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY),
+						'hk_history_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)
+					],
+					'tags' => makeTags($prepared_data['items'], true, 'itemid', ZBX_TAG_COUNT_DEFAULT, $filter['tags'])
+				] + $prepared_data,
+				'subfilters' => $subfilters
+			];
 
 			$response = new CControllerResponseData($data);
 			$this->setResponse($response);

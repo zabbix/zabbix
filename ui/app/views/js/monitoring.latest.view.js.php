@@ -38,7 +38,7 @@
 		_refresh_message_box: null,
 		_popup_message_box: null,
 
-		init({refresh_url, refresh_data, refresh_interval, filter_options}) {
+		init({refresh_url, refresh_data, refresh_interval, filter_options, subfilter_options}) {
 			this.refresh_url = refresh_url;
 			this.refresh_data = refresh_data;
 			this.refresh_interval = refresh_interval;
@@ -47,19 +47,26 @@
 			url.setArgument('action', 'latest.view.refresh');
 			this.refresh_simple_url = url.getUrl();
 
-			this.initTabFilter(filter_options);
+			this.initTabFilter(filter_options, subfilter_options);
 		},
 
-		initTabFilter(filter_options) {
+		initTabFilter(filter_options, subfilter_options) {
 			if (!filter_options) {
 				return;
 			}
 
 			this.refresh_counters = this.createCountersRefresh(1);
 			this.filter = new CTabFilter(document.getElementById('monitoring_latest_filter'), filter_options);
+
+			this.initSubfilter(subfilter_options);
+
 			this.filter.on(TABFILTER_EVENT_URLSET, () => {
 				this.reloadPartialAndTabCounters();
 			});
+		},
+
+		initSubfilter(subfilter_options = {}) {
+			this.filter.initSubfilter(subfilter_options);
 		},
 
 		createCountersRefresh(timeout) {
@@ -114,6 +121,10 @@
 			return $('form[name=items]');
 		},
 
+		getCurrentSubfilter() {
+			return $('#latest-data-subfilter');
+		},
+
 		_addRefreshMessage(messages) {
 			this._removeRefreshMessage();
 
@@ -150,9 +161,15 @@
 			const post_data = Object.keys(params)
 				.filter(key => !exclude.includes(key))
 				.reduce((post_data, key) => {
-					post_data[key] = (typeof params[key] === 'object')
-						? [...params[key]].filter(i => i)
-						: params[key];
+					if (key === 'subfilter_tags') {
+						post_data[key] = {...params[key]};
+					}
+					else {
+						post_data[key] = (typeof params[key] === 'object')
+							? [...params[key]].filter(i => i)
+							: params[key];
+					}
+
 					return post_data;
 				}, {});
 
@@ -174,8 +191,9 @@
 			this.getCurrentForm().removeClass('is-loading is-loading-fadein delayed-15s');
 		},
 
-		doRefresh(body) {
+		doRefresh(body, subfilter) {
 			this.getCurrentForm().replaceWith(body);
+			this.getCurrentSubfilter().replaceWith(subfilter);
 			chkbxRange.init();
 		},
 
@@ -197,7 +215,7 @@
 		onDataDone(response) {
 			this.clearLoading();
 			this._removeRefreshMessage();
-			this.doRefresh(response.body);
+			this.doRefresh(response.body, response.subfilter);
 
 			if ('messages' in response) {
 				this._addRefreshMessage(response.messages);
@@ -271,6 +289,14 @@
 				history.replaceState({}, '', original_url);
 				this.scheduleRefresh();
 			}, {once: true});
+		},
+
+		setSubfilter(field) {
+			this.filter.setSubfilter(field[0], field[1]);
+		},
+
+		unsetSubfilter(field) {
+			this.filter.unsetSubfilter(field[0], field[1]);
 		},
 
 		events: {

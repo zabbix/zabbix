@@ -65,6 +65,11 @@ class CTabFilter extends CDiv {
 	public $buttons = null;
 
 	/**
+	 * Subfilter node.
+	 */
+	public $subfilter = null;
+
+	/**
 	 * Array of CPartial elements used as tab content rendering templates.
 	 *
 	 * @var array $template
@@ -122,6 +127,17 @@ class CTabFilter extends CDiv {
 	 */
 	public function addTemplate(CPartial $template) {
 		$this->templates[$template->getName()] = $template;
+
+		return $this;
+	}
+
+	/**
+	 * Add subfilter.
+	 *
+	 * @param CPartial $subfilter  Rendered subfilter.
+	 */
+	public function addSubfilter(CPartial $subfilter) {
+		$this->subfilter = $subfilter;
 
 		return $this;
 	}
@@ -257,14 +273,22 @@ class CTabFilter extends CDiv {
 			$templates .= $template->getOutput();
 		}
 
+		$tabfilter_container_classes = 'tabfilter-content-container';
+		if (!$this->options['expanded']) {
+			$tabfilter_container_classes .= ' tabfilter-collapsed';
+			if (!$this->subfilter) {
+				$tabfilter_container_classes .= ' display-none';
+			}
+		}
+
 		return implode('', [
 			$this->getNavigation(),
 			(new CDiv([
 				(new CDiv($this->contents))->addClass('tabfilter-tabs-container'),
-				$this->buttons
+				$this->buttons,
+				$this->subfilter
 			]))
-				->addClass('tabfilter-content-container')
-				->addClass($this->options['expanded'] ? null : ZBX_STYLE_DISPLAY_NONE),
+				->addClass($tabfilter_container_classes),
 			$templates
 		]);
 	}

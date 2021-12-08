@@ -31,6 +31,23 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 		background-color: $ui-bg-color;
 		padding: 10px 0;
 		margin-bottom: 6px;
+
+		&.tabfilter-collapsed {
+			.tabfilter-tabs-container,
+			.form-buttons {
+				display: none;
+			}
+		}
+	}
+
+	.subfilter-option-grid {
+		grid-template-columns: minmax(75px, max-content) auto;
+		display: grid;
+		margin: 5px 0;
+
+		.subfilter-options {
+			grid-column: 2 / -1;
+		}
 	}
 
 	/* Top navigation labels */
