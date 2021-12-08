@@ -98,8 +98,8 @@ class CService extends CApiService {
 			'selectProblemEvents' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['eventid', 'severity', 'name']), 'default' => null],
 			'selectStatusRules' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['type', 'limit_value', 'limit_status', 'new_status']), 'default' => null],
 			'selectStatusTimeline' =>	['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NOT_EMPTY, 'uniq' => [['from', 'to']], 'default' => null, 'fields' => [
-				'date_from' =>				['type' => API_INT32, 'flags' => API_REQUIRED],
-				'date_to' =>				['type' => API_INT32, 'flags' => API_REQUIRED]
+				'period_from' =>			['type' => API_INT32, 'flags' => API_REQUIRED],
+				'period_to' =>				['type' => API_INT32, 'flags' => API_REQUIRED]
 			]],
 			// sort and limit
 			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', ['serviceid', 'name', 'status', 'sortorder', 'created_at']), 'uniq' => true, 'default' => []],
@@ -595,8 +595,8 @@ class CService extends CApiService {
 				' FROM service_tag st, sla_service_tag sst'.
 				' WHERE sst.tag=st.tag'.
 					' AND ('.
-						'(sst.operator='.ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL.' AND st.value=sst.value)'.
-						' OR (sst.operator='.ZBX_SERVICE_PROBLEM_TAG_OPERATOR_LIKE.' AND UPPER(st.value) LIKE CONCAT('.
+						'(sst.operator='.ZBX_SLA_SERVICE_TAG_OPERATOR_EQUAL.' AND st.value=sst.value)'.
+						' OR (sst.operator='.ZBX_SLA_SERVICE_TAG_OPERATOR_LIKE.' AND UPPER(st.value) LIKE CONCAT('.
 							'"%", REPLACE(REPLACE(REPLACE(UPPER(sst.value), "%", "!%"), "_", "!_"), "!", "!!"), "%"'.
 						') ESCAPE "!")'.
 					')'.
@@ -1042,7 +1042,7 @@ class CService extends CApiService {
 					'SELECT sa2.serviceid, MAX(sa2.clock) AS clock'.
 						' FROM service_alarms sa2'.
 						' WHERE '.dbConditionId('sa2.serviceid', array_keys($result)).
-							' AND sa2.clock<'.dbQuoteInt($period['date_from']).
+							' AND sa2.clock<'.dbQuoteInt($period['period_from']).
 						' GROUP BY sa2.serviceid'.
 				') sa_max'.
 				' ON (sa.serviceid=sa_max.serviceid AND sa.clock=sa_max.clock)'
@@ -1058,7 +1058,7 @@ class CService extends CApiService {
 
 		foreach ($options['selectStatusTimeline'] as $period) {
 			$where_or[] =
-				'sa.clock BETWEEN '.dbQuoteInt($period['date_from']).' AND '.dbQuoteInt($period['date_to'] - 1);
+				'sa.clock BETWEEN '.dbQuoteInt($period['period_from']).' AND '.dbQuoteInt($period['period_to'] - 1);
 		}
 
 		$db_alarms_resource = DBselect('SELECT sa.serviceid, sa.clock, sa.value'.
@@ -1070,7 +1070,7 @@ class CService extends CApiService {
 
 		while ($db_alarm = DBfetch($db_alarms_resource)) {
 			foreach ($options['selectStatusTimeline'] as $index => $period) {
-				if ($db_alarm['clock'] >= $period['date_from'] && $db_alarm['clock'] < $period['date_to']) {
+				if ($db_alarm['clock'] >= $period['period_from'] && $db_alarm['clock'] < $period['period_to']) {
 					$result[$db_alarm['serviceid']]['status_timeline'][$index]['alarms'][] = [
 						'clock' => $db_alarm['clock'],
 						'value' => $db_alarm['value']
