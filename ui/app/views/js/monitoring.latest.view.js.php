@@ -216,8 +216,8 @@
 
 		openHostPopup(host_data) {
 			this._removePopupMessage();
-			const original_url = location.href;
 
+			const original_url = location.href;
 			const overlay = PopUp('popup.host.edit', host_data, 'host_edit', document.activeElement);
 
 			this.unscheduleRefresh();
