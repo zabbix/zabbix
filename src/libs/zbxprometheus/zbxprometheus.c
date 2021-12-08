@@ -1136,12 +1136,18 @@ static int	prometheus_parse_row(zbx_prometheus_filter_t *filter, const char *dat
 		const char	*ptr;
 		int		len;
 
-		if (NULL == (ptr = strchr(data + pos, '\n')))
-			len = strlen(data + pos);
-		else
-			len = (size_t)(ptr - data) + pos;
+		if ('\0' != data[pos])
+		{
+			if (NULL == (ptr = strchr(data + pos, '\n')))
+				len = strlen(data + pos);
+			else
+				len = (size_t)(ptr - data) + pos;
 
-		*error = zbx_dsprintf(*error, "cannot parse text at: %.*s", len, data + pos);
+			*error = zbx_strdup(*error, "no space before metric value");
+		}
+		else
+			*error = zbx_strdup(*error, "no metric value found");
+
 		goto out;
 	}
 
