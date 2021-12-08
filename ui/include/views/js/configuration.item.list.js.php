@@ -77,7 +77,7 @@
 			$('#filter-tags')
 				.dynamicRows({template: '#filter-tag-row-tmpl'})
 				.on('afteradd.dynamicRows', function() {
-					var rows = this.querySelectorAll('.form_row');
+					const rows = this.querySelectorAll('.form_row');
 					new CTagFilterItem(rows[rows.length - 1]);
 				});
 
@@ -96,7 +96,6 @@
 
 		openHostPopup(host_data) {
 			const original_url = location.href;
-
 			const overlay = PopUp('popup.host.edit', host_data, 'host_edit', document.activeElement);
 
 			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});

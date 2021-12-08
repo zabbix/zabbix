@@ -38,41 +38,39 @@ include __DIR__.'/itemtest.js.php';
 			// Field switchers.
 			new CViewSwitcher('value_type', 'change', item_form.field_switches.for_value_type);
 
-			var old_value,
-				value_type = $('#value_type');
+			const $value_type = $('#value_type');
 
 			$('#type')
 				.change(function() {
 					view.typeChangeHandler();
 
-					var type = $(this).val();
-					old_value = value_type.val();
+					const type = $(this).val();
+					const old_value = $value_type.val();
 
 					if (type == <?= ITEM_TYPE_CALCULATED ?>) {
 						if (!(old_value == <?= ITEM_VALUE_TYPE_UINT64 ?>
 								|| old_value == <?= ITEM_VALUE_TYPE_FLOAT ?>)) {
-							value_type.val(<?= ITEM_VALUE_TYPE_UINT64 ?>);
+							$value_type.val(<?= ITEM_VALUE_TYPE_UINT64 ?>);
 						}
 
-						value_type.trigger('change');
+						$value_type.trigger('change');
 					}
 				})
 				.trigger('change');
 
 			// Whenever non-numeric type is changed back to numeric type, set the default value in "trends" field.
-			value_type
+			$value_type
 				.change(function() {
-					old_value = $(this).data('old-value');
-
-					var new_value = $(this).val(),
-						trends = $('#trends');
+					const old_value = $(this).data('old-value');
+					const new_value = $(this).val();
+					const $trends = $('#trends');
 
 					if ((old_value == <?= ITEM_VALUE_TYPE_STR ?> || old_value == <?= ITEM_VALUE_TYPE_LOG ?>
 							|| old_value == <?= ITEM_VALUE_TYPE_TEXT ?>)
 							&& (new_value == <?= ITEM_VALUE_TYPE_FLOAT ?>
 							|| new_value == <?= ITEM_VALUE_TYPE_UINT64 ?>)) {
-						if (trends.val() == 0) {
-							trends.val('<?= $data['trends_default'] ?>');
+						if ($trends.val() == 0) {
+							$trends.val('<?= $data['trends_default'] ?>');
 						}
 
 						$('#trends_mode_1').prop('checked', true);
@@ -81,7 +79,7 @@ include __DIR__.'/itemtest.js.php';
 					$('#trends_mode').trigger('change');
 					$(this).data('old-value', new_value);
 				})
-				.data('old-value', value_type.val());
+				.data('old-value', $value_type.val());
 
 			$('#history_mode')
 				.change(function() {
@@ -112,8 +110,8 @@ include __DIR__.'/itemtest.js.php';
 
 		typeChangeHandler() {
 			// Selected item type.
-			var type = parseInt($('#type').val()),
-				asterisk = '<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>';
+			const type = parseInt($('#type').val());
+			const asterisk = '<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>';
 
 			$('#keyButton').prop('disabled',
 				type != <?= ITEM_TYPE_ZABBIX ?>
@@ -145,7 +143,6 @@ include __DIR__.'/itemtest.js.php';
 
 		openHostPopup(host_data) {
 			const original_url = location.href;
-
 			const overlay = PopUp('popup.host.edit', host_data, 'host_edit', document.activeElement);
 
 			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});

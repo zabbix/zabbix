@@ -37,7 +37,7 @@
 		},
 
 		changeTargetType(data) {
-			var $multiselect = $('<div>', {
+			let $multiselect = $('<div>', {
 					id: 'copy_targetids',
 					class: 'multiselect',
 					css: {
@@ -68,11 +68,13 @@
 					helper_options.popup.parameters.srctbl = 'host_groups';
 					helper_options.popup.parameters.srcfld1 = 'groupid';
 					break;
+
 				case '<?= COPY_TYPE_TO_HOST ?>':
 					helper_options.object_name = 'hosts';
 					helper_options.popup.parameters.srctbl = 'hosts';
 					helper_options.popup.parameters.srcfld1 = 'hostid';
 					break;
+
 				case '<?= COPY_TYPE_TO_TEMPLATE ?>':
 					helper_options.object_name = 'templates';
 					helper_options.popup.parameters.srctbl = 'templates';
@@ -103,7 +105,6 @@
 
 		openHostPopup(host_data) {
 			const original_url = location.href;
-
 			const overlay = PopUp('popup.host.edit', host_data, 'host_edit', document.activeElement);
 
 			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});

@@ -41,7 +41,6 @@
 
 		openHostPopup(host_data) {
 			const original_url = location.href;
-
 			const overlay = PopUp('popup.host.edit', host_data, 'host_edit', document.activeElement);
 
 			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
