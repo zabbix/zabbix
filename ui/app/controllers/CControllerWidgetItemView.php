@@ -95,7 +95,7 @@ class CControllerWidgetItemView extends CControllerWidget {
 		if ($this->getInput('name', '') === '') {
 			if ($this->getContext() === CWidgetConfig::CONTEXT_DASHBOARD
 					|| $this->getContext() === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
-					&& $this->hasInput('dynamic_hostid')) {
+					&& $this->hasInput('dynamic_hostid') && $tmp_items) {
 				$options['output'] = array_merge($options['output'], ['name']);
 			}
 
