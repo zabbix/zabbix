@@ -1059,7 +1059,7 @@ class CSla extends CApiService {
 			'slaid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
 			'date_from' =>	['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '0:'.ZBX_MAX_DATE, 'default' => null],
 			'date_to' =>	['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '0:'.ZBX_MAX_DATE, 'default' => null],
-			'periods' =>	['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_SLA_MAX_REPORTING_PERIODS, 'default' => null],
+			'periods' =>	['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.CSlaHelper::SLA_MAX_REPORTING_PERIODS, 'default' => null],
 			'serviceids' =>	['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null]
 		]];
 
@@ -1107,11 +1107,11 @@ class CSla extends CApiService {
 	 */
 	private static function getReportingPeriods(array $sla, array $options): array {
 		$interval = new DateInterval([
-			ZBX_SLA_PERIOD_DAILY => 'P1D',
-			ZBX_SLA_PERIOD_WEEKLY => 'P1W',
-			ZBX_SLA_PERIOD_MONTHLY => 'P1M',
-			ZBX_SLA_PERIOD_QUARTERLY => 'P3M',
-			ZBX_SLA_PERIOD_ANNUALLY => 'P1Y'
+			CSlaHelper::PERIOD_DAILY => 'P1D',
+			CSlaHelper::PERIOD_WEEKLY => 'P1W',
+			CSlaHelper::PERIOD_MONTHLY => 'P1M',
+			CSlaHelper::PERIOD_QUARTERLY => 'P3M',
+			CSlaHelper::PERIOD_ANNUALLY => 'P1Y'
 		][$sla['period']]);
 
 		$timezone = new DateTimeZone($sla['timezone']);
@@ -1148,7 +1148,7 @@ class CSla extends CApiService {
 		$do_descend = $date_to !== null;
 		$date = $do_descend ? clone $date_to : clone $date_from;
 
-		while (count($reporting_periods) < ZBX_SLA_MAX_REPORTING_PERIODS) {
+		while (count($reporting_periods) < CSlaHelper::SLA_MAX_REPORTING_PERIODS) {
 			if ($options['periods'] !== null) {
 				if (count($reporting_periods) == $options['periods']) {
 					break;
@@ -1156,7 +1156,7 @@ class CSla extends CApiService {
 			}
 			else {
 				if (($date_from === null || $date_to === null)
-						&& count($reporting_periods) == ZBX_SLA_DEFAULT_REPORTING_PERIODS) {
+						&& count($reporting_periods) == CSlaHelper::SLA_MAX_REPORTING_PERIODS) {
 					break;
 				}
 
@@ -1211,21 +1211,21 @@ class CSla extends CApiService {
 		$month = (int) $date->format('n');
 
 		switch ($sla_period) {
-			case ZBX_SLA_PERIOD_WEEKLY:
+			case CSlaHelper::PERIOD_WEEKLY:
 				$date
 					->modify('1 day')
 					->modify('last Monday');
 				break;
 
-			case ZBX_SLA_PERIOD_MONTHLY:
+			case CSlaHelper::PERIOD_MONTHLY:
 				$date->setDate($year, $month, 1);
 				break;
 
-			case ZBX_SLA_PERIOD_QUARTERLY:
+			case CSlaHelper::PERIOD_QUARTERLY:
 				$date->setDate($year, intdiv($month - 1, 3) * 3 + 1, 1);
 				break;
 
-			case ZBX_SLA_PERIOD_ANNUALLY:
+			case CSlaHelper::PERIOD_ANNUALLY:
 				$date->setDate($year, 1, 1);
 				break;
 		}
@@ -1428,141 +1428,5 @@ class CSla extends CApiService {
 		}
 
 		return $uptime_periods;
-	}
-
-	/**
-	 * @param array $sla
-	 * @param array $options
-	 *
-	 * @return array
-	 *
-	 * @throws Exception
-	 */
-	private static function getReportingPeriods(array $sla, array $options): array {
-		$interval = new DateInterval([
-			CSlaHelper::PERIOD_DAILY => 'P1D',
-			CSlaHelper::PERIOD_WEEKLY => 'P1W',
-			CSlaHelper::PERIOD_MONTHLY => 'P1M',
-			CSlaHelper::PERIOD_QUARTERLY => 'P3M',
-			CSlaHelper::PERIOD_ANNUALLY => 'P1Y'
-		][$sla['period']]);
-
-		$timezone = new DateTimeZone($sla['timezone']);
-
-		$effective_min = (new DateTime('@'.$sla['effective_date']))->setTimezone($timezone);
-		self::alignDateToPeriodStart($effective_min, (int) $sla['period']);
-
-		$effective_max = (new DateTime('now'))->setTimezone($timezone);
-		self::alignDateToPeriodStart($effective_max, (int) $sla['period']);
-		$effective_max->add($interval);
-
-		if ($options['date_from'] !== null) {
-			$date_from = (new DateTime('@'.$options['date_from']))->setTimezone($timezone);
-			self::alignDateToPeriodStart($date_from, (int) $sla['period']);
-		}
-		else {
-			$date_from = null;
-		}
-
-		if ($options['date_to'] !== null) {
-			$date_to = (new DateTime('@'.$options['date_to']))->setTimezone($timezone);
-			self::alignDateToPeriodStart($date_to, (int) $sla['period']);
-			$date_to->add($interval);
-		}
-		elseif ($date_from === null) {
-			$date_to = $effective_max;
-		}
-		else {
-			$date_to = null;
-		}
-
-		$reporting_periods = [];
-
-		$descending = $date_to !== null;
-		$date = $descending ? clone $date_to : clone $date_from;
-
-		while (count($reporting_periods) < ZBX_SLA_MAX_REPORTING_PERIODS) {
-			if ($options['periods'] !== null) {
-				if (count($reporting_periods) == $options['periods']) {
-					break;
-				}
-			}
-			else {
-				if (($date_from === null || $date_to === null)
-						&& count($reporting_periods) == ZBX_SLA_DEFAULT_REPORTING_PERIODS) {
-					break;
-				}
-
-				if ($descending) {
-					if ($date_from === null && $date <= $effective_min) {
-						break;
-					}
-				}
-				elseif ($date >= $effective_max) {
-					break;
-				}
-			}
-
-			if ($descending && $date_from !== null && $date <= $date_from) {
-				break;
-			}
-
-			if ($descending) {
-				$to = $date->getTimestamp();
-				$date->sub($interval);
-				$from = $date->getTimestamp();
-
-				if ($from < 0) {
-					break;
-				}
-
-				array_unshift($reporting_periods, ['date_from' => $from, 'date_to' => $to]);
-			}
-			else {
-				$from = $date->getTimestamp();
-				$date->add($interval);
-				$to = $date->getTimestamp();
-
-				if ($to > ZBX_MAX_DATE) {
-					break;
-				}
-
-				$reporting_periods[] = ['date_from' => $from, 'date_to' => $to];
-			}
-		}
-
-		return $reporting_periods;
-	}
-
-	/**
-	 * @param DateTime $date
-	 *
-	 * @param int $sla_period
-	 */
-	private static function alignDateToPeriodStart(DateTime $date, int $sla_period): void {
-		$year = (int) $date->format('Y');
-		$month = (int) $date->format('n');
-
-		switch ($sla_period) {
-			case ZBX_SLA_PERIOD_WEEKLY:
-				$date
-					->modify('1 day')
-					->modify('last Monday');
-				break;
-
-			case ZBX_SLA_PERIOD_MONTHLY:
-				$date->setDate($year, $month, 1);
-				break;
-
-			case ZBX_SLA_PERIOD_QUARTERLY:
-				$date->setDate($year, intdiv($month - 1, 3) * 3 + 1, 1);
-				break;
-
-			case ZBX_SLA_PERIOD_ANNUALLY:
-				$date->setDate($year, 1, 1);
-				break;
-		}
-
-		$date->setTime(0, 0);
 	}
 }

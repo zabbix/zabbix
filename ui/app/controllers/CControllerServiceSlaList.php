@@ -157,7 +157,7 @@ class CControllerServiceSlaList extends CController {
 			'preservekeys' => true
 		];
 
-		$data['records'] = API::Sla()->get($options);
+		$data['records'] = []; //API::Sla()->get($options);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('SLA'));
