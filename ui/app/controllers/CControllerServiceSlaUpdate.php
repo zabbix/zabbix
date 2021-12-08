@@ -70,55 +70,69 @@ class CControllerServiceSlaUpdate extends CController {
 	}
 
 	protected function validateAndTransformSchedule(): bool {
-		$schedule = [];
-		$rules = [];
+		$rules = [
+			'hours_from' => 'ge 0|le 24',
+			'hours_till' => 'ge 0|le 24',
+			'minutes_from' => 'ge 0|le 59',
+			'minutes_till' => 'ge 0|le 59'
+		];
+
+		function periodError(int $weekday, ?int $key = null): bool {
+			error(_s(
+				'Incorrect value for field "%1$s": %2$s.',
+				_('Schedule').':'.getDayOfWeekCaption($weekday).($key === null ? '' : '/'.++$key),
+				_('a time period is expected')
+			));
+
+			return false;
+		}
 
 		foreach ($this->getInput('schedule', []) as $weekday => &$periods) {
-			$periods = trim($periods);
+			$periods = preg_replace('/\s/', '', $periods);
 
 			if ($periods === '') {
 				continue;
 			}
 
-			$periods = str_replace(',', ';', $periods);
-			$periods = explode(';', $periods);
+			$hhmm_hhmm = '(?P<hours_from>[0-9]{1,2}):(?P<minutes_from>[0-9]{2})'.
+				'-(?P<hours_till>[0-9]{1,2}):(?P<minutes_till>[0-9]{2})';
+
+			if (!preg_match('/^('.$hhmm_hhmm.',?)+$/', $periods)) {
+				return periodError($weekday);
+			}
+
+			$periods = explode(',', $periods);
+			$matches = [];
 
 			foreach ($periods as $key => $period) {
-				$pattern_weekday = $weekday == 0 ? 7 : $weekday;
-				$schedule[$weekday.'.'.$key] = $pattern_weekday.','.trim($period);
+				preg_match('/'.$hhmm_hhmm.'/', $period, $matches);
+
+				$validator = new CNewValidator($matches, $rules);
+
+				if ($validator->isError()) {
+					periodError($weekday, $key);
+
+					foreach ($validator->getAllErrors() as $error) {
+						info($error);
+					}
+
+					return false;
+				}
+
+				$period = explode('-', $period);
+				$period = [
+					'period_from' => strtotime(getDayOfWeekCaption($weekday).', '.$period[0]) % SEC_PER_WEEK,
+					'period_to' => strtotime(getDayOfWeekCaption($weekday).', '.$period[1]) % SEC_PER_WEEK
+				];
+
+				if ($period['period_from'] > $period['period_to']) {
+					return periodError($weekday, $key);
+				}
+
+				$this->schedule[] = $period;
 			}
 		}
 		unset($periods);
-
-		foreach ($schedule as $key => $period) {
-			$rules[$key] = 'time_periods';
-		}
-
-		$validator = new CNewValidator($schedule, $rules);
-
-		foreach ($validator->getAllErrors() as $error) {
-			error($error);
-		}
-
-		if ($validator->isError()) {
-			return false;
-		}
-
-		foreach ($schedule as $key => $period) {
-			$key = explode('.', $key);
-			$weekday = array_shift($key);
-
-			$period = explode(',', $period);
-			$period = array_pop($period);
-			$period = explode('-', $period);
-
-			$period = [
-				'period_from' => strtotime(getDayOfWeekCaption($weekday).', '.$period[0]) % SEC_PER_WEEK,
-				'period_to' => strtotime(getDayOfWeekCaption($weekday).', '.$period[1]) % SEC_PER_WEEK
-			];
-
-			$this->schedule[] = $period;
-		}
 
 		return true;
 	}

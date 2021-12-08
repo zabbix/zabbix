@@ -46,8 +46,7 @@ $output = [
 		$this->readJsFile('services.sla.edit.js.php').
 		'sla_edit.init('.json_encode([
 			'service_tags' => $data['form']['service_tags'],
-			'excluded_downtimes' => $data['form']['excluded_downtimes'],
-			'form_url' => $popup_url->getUrl()
+			'excluded_downtimes' => $data['form']['excluded_downtimes']
 		]).');',
 	'buttons' => $data['buttons']
 ];

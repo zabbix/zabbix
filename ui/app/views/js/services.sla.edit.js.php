@@ -47,8 +47,9 @@ window.sla_edit = {
 
 		$tags.dynamicRows({
 			template: '#tag-row-tmpl',
-			//rows: service_tags
+			rows: service_tags
 		});
+
 		$tags.on('click', '.element-table-add', () => {
 			$tags
 				.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>')
@@ -56,6 +57,10 @@ window.sla_edit = {
 
 			$tags.find('z-select:last').val(<?= json_encode(ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL) ?>);
 		});
+
+		if ($tags.find('z-select:last').length == 0) {
+			$tags.find('.element-table-add').click();
+		}
 
 		this.form.querySelector('#excluded_downtimes')
 			.addEventListener('click', (e) => {

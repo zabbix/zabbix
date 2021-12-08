@@ -133,6 +133,7 @@ class CControllerServiceSlaEdit extends CController {
 		];
 
 		$schedule_mode = CSlaHelper::SCHEDULE_MODE_NONSTOP;
+		$this->record['schedule'] = CSlaHelper::convertScheduleToWeekdayPeriods($this->record['schedule']);
 
 		foreach (range(0, 6) as $weekday) {
 			if (array_key_exists($weekday, $this->record['schedule'])) {

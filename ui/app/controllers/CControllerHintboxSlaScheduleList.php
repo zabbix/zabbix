@@ -21,7 +21,7 @@
 
 class CControllerHintboxSlaScheduleList extends CController {
 
-	protected $recordid;
+	protected $record;
 
 	protected function init(): void {
 		$this->disableSIDvalidation();
@@ -65,16 +65,22 @@ class CControllerHintboxSlaScheduleList extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
+		if (!$this->checkAccess(CRoleHelper::UI_SERVICES_SLA)) {
+			return false;
+		}
 	}
 
 	protected function doAction(): void {
+
 		/*
 		$records = API::SlaSchedules()->get([
 			'output' => ['period_from', 'period_to'],
 			'slaids' => [$this->recordid],
 			'limit' => ZBX_WIDGET_ROWS
 		]);
+
+		// TODO:
+		CSlaHelper::convertScheduleToWeekdayPeriods($records);
 		*/
 
 		$records = [];
