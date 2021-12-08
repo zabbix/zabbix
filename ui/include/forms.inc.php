@@ -1358,7 +1358,8 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 							ZBX_PREPROC_PROMETHEUS_COUNT => 'count'
 						]))
 						->addClass('js-preproc-param-prometheus-pattern-function')
-						->setValue($step_param_1_value),
+						->setValue($step_param_1_value)
+						->setReadonly($readonly),
 					(new CTextBox('preprocessing['.$i.'][params][2]', $step_param_2_value))
 						->setTitle($step_param_2_value)
 						->setAttribute('placeholder', _('<label name>'))
