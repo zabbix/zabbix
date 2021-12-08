@@ -295,7 +295,7 @@ class CMaintenance extends CApiService {
 
 		self::updateGroups($maintenances, __FUNCTION__);
 		self::updateHosts($maintenances, __FUNCTION__);
-		self::updateTags($maintenances, __FUNCTION__);
+		self::updateTags($maintenances);
 		self::updateTimeperiods($maintenances, __FUNCTION__);
 
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_MAINTENANCE, $maintenances);
@@ -317,7 +317,18 @@ class CMaintenance extends CApiService {
 			'active_till' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:2147464800'],
 			'maintenance_type' =>	['type' => API_INT32, 'in' => implode(',', [MAINTENANCE_TYPE_NORMAL, MAINTENANCE_TYPE_NODATA]), 'default' => DB::getDefault('maintenances', 'maintenance_type')],
 			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('maintenances', 'description')],
-			'tags_evaltype' =>		['type' => API_INT32, 'in' => implode(',', [MAINTENANCE_TAG_EVAL_TYPE_AND_OR, MAINTENANCE_TAG_EVAL_TYPE_OR])],
+			'tags_evaltype' =>		['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'maintenance_type', 'in' => implode(',', [MAINTENANCE_TYPE_NORMAL])], 'type' => API_INT32, 'in' => implode(',', [MAINTENANCE_TAG_EVAL_TYPE_AND_OR, MAINTENANCE_TAG_EVAL_TYPE_OR])],
+										['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'tags' =>				['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'maintenance_type', 'in' => implode(',', [MAINTENANCE_TYPE_NORMAL])], 'type' => API_OBJECTS, 'uniq' => [['tag', 'operator', 'value']], 'fields' => [
+				'tag' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('maintenance_tag', 'tag')],
+				'operator' =>				['type' => API_INT32, 'in' => implode(',', [MAINTENANCE_TAG_OPERATOR_EQUAL, MAINTENANCE_TAG_OPERATOR_LIKE]), 'default' => DB::getDefault('maintenance_tag', 'operator')],
+				'value' =>					['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('maintenance_tag', 'value'), 'default' => DB::getDefault('maintenance_tag', 'value')]
+										]],
+										['else' => true, 'type' => API_UNEXPECTED]
+			]],
 			'groupids' =>			['type' => API_IDS, 'flags' => API_DEPRECATED, 'uniq' => true],
 			'hostids' =>			['type' => API_IDS, 'flags' => API_DEPRECATED, 'uniq' => true],
 			'groups' =>				['type' => API_OBJECTS, 'uniq' => [['groupid']], 'fields' => [
@@ -325,11 +336,6 @@ class CMaintenance extends CApiService {
 			]],
 			'hosts' =>				['type' => API_OBJECTS, 'uniq' => [['hostid']], 'fields' => [
 				'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
-			]],
-			'tags' =>				['type' => API_OBJECTS, 'uniq' => [['tag', 'operator', 'value']], 'fields' => [
-				'tag' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('maintenance_tag', 'tag')],
-				'operator' =>			['type' => API_INT32, 'in' => implode(',', [MAINTENANCE_TAG_OPERATOR_EQUAL, MAINTENANCE_TAG_OPERATOR_LIKE]), 'default' => DB::getDefault('maintenance_tag', 'operator')],
-				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('maintenance_tag', 'value'), 'default' => DB::getDefault('maintenance_tag', 'value')]
 			]],
 			'timeperiods' => 		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
 				'timeperiod_type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])],
@@ -393,15 +399,6 @@ class CMaintenance extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Maintenance "%1$s" value cannot be bigger than "%2$s".', 'active_since', 'active_till')
 				);
-			}
-
-			// Validate maintenance tags when maintenance_type is no data.
-			if (array_key_exists('maintenance_type', $maintenance)
-					&& $maintenance['maintenance_type'] == MAINTENANCE_TYPE_NODATA
-					&& array_key_exists('tags', $maintenance) && $maintenance['tags']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-					'/'.($i + 1).'/tags', _('should be empty')
-				));
 			}
 
 			// Validate groups and hosts.
@@ -487,7 +484,7 @@ class CMaintenance extends CApiService {
 
 		self::updateGroups($maintenances, __FUNCTION__, $db_maintenances);
 		self::updateHosts($maintenances, __FUNCTION__, $db_maintenances);
-		self::updateTags($maintenances, __FUNCTION__, $db_maintenances);
+		self::updateTags($maintenances, $db_maintenances);
 		self::updateTimeperiods($maintenances, __FUNCTION__, $db_maintenances);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_MAINTENANCE, $maintenances, $db_maintenances);
@@ -504,57 +501,10 @@ class CMaintenance extends CApiService {
 	 * @throws APIException if no permissions to object, it does no exists or the input is invalid.
 	 */
 	protected function validateUpdate(array &$maintenances, array &$db_maintenances = null): void {
-		$api_input_rules =		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['maintenanceid'], ['name']], 'fields' => [
-			'maintenanceid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
-			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('maintenances', 'name')],
-			'maintenance_type' =>	['type' => API_INT32, 'in' => implode(',', [MAINTENANCE_TYPE_NORMAL, MAINTENANCE_TYPE_NODATA])],
-			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('maintenances', 'description')],
-			'active_since' =>		['type' => API_INT32, 'in' => '0:2147464800'],
-			'active_till' =>		['type' => API_INT32, 'in' => '0:2147464800'],
-			'tags_evaltype' =>		['type' => API_INT32, 'in' => implode(',', [MAINTENANCE_TAG_EVAL_TYPE_AND_OR, MAINTENANCE_TAG_EVAL_TYPE_OR])],
-			'groupids' =>			['type' => API_IDS, 'flags' => API_DEPRECATED, 'uniq' => true],
-			'hostids' =>			['type' => API_IDS, 'flags' => API_DEPRECATED, 'uniq' => true],
-			'groups' =>				['type' => API_OBJECTS, 'uniq' => [['groupid']], 'fields' => [
-				'groupid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
-			]],
-			'hosts' =>				['type' => API_OBJECTS, 'uniq' => [['hostid']], 'fields' => [
-				'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
-			]],
-			'tags' =>				['type' => API_OBJECTS, 'uniq' => [['tag', 'operator', 'value']], 'fields' => [
-				'tag' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('maintenance_tag', 'tag')],
-				'operator' =>			['type' => API_INT32, 'in' => implode(',', [MAINTENANCE_TAG_OPERATOR_EQUAL, MAINTENANCE_TAG_OPERATOR_LIKE]), 'default' => DB::getDefault('maintenance_tag', 'operator')],
-				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('maintenance_tag', 'value'), 'default' => DB::getDefault('maintenance_tag', 'value')]
-			]],
-			'timeperiods' => 		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['timeperiodid']], 'fields' => [
-				'timeperiodid' =>		['type' => API_ID],
-				'timeperiod_type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])],
-				'period' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:2147464800'],
-				'every' =>				['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => '0:'.ZBX_MAX_INT32, 'default' => DB::getDefault('timeperiods', 'every')],
-											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_MONTHLY], 'type' => API_INT32, 'in' => '1:5'],
-											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_ONETIME], 'type' => API_INT32, 'in' => '1']
-				]],
-				'month' =>				['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_MONTHLY], 'type' => API_INT32, 'in' => '0:4095', 'default' => DB::getDefault('timeperiods', 'month')],
-											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY])], 'type' => API_INT32, 'in' => '0']
-				]],
-				'dayofweek' =>			['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => '0:127', 'default' => DB::getDefault('timeperiods', 'dayofweek')],
-											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY])], 'type' => API_INT32, 'in' => '0']
-				]],
-				'day' =>				['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_MONTHLY], 'type' => API_INT32, 'in' => '0:31', 'default' => DB::getDefault('timeperiods', 'day')],
-											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY])], 'type' => API_INT32, 'in' => '0']
-				]],
-				'start_time' =>			['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => '0:86340', 'default' => DB::getDefault('timeperiods', 'start_time')],
-											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_ONETIME], 'type' => API_INT32, 'in' => '0']
-				]],
-				'start_date' =>			['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_ONETIME], 'type' => API_INT32, 'in' => '0:2147464800', 'default' => DB::getDefault('timeperiods', 'start_date')],
-											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => '0']
-				]]
-			]]
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['maintenanceid']], 'fields' => [
+			'maintenanceid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
+			'groupids' =>		['type' => API_IDS, 'flags' => API_DEPRECATED, 'uniq' => true],
+			'hostids' =>		['type' => API_IDS, 'flags' => API_DEPRECATED, 'uniq' => true]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $maintenances, '/', $error)) {
@@ -595,9 +545,74 @@ class CMaintenance extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
+		$maintenances = $this->extendObjectsByKey($maintenances, $db_maintenances, 'maintenanceid',
+			['maintenance_type']
+		);
+
+		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['maintenanceid'], ['name']], 'fields' => [
+			'maintenanceid' =>		['type' => API_ID],
+			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('maintenances', 'name')],
+			'maintenance_type' =>	['type' => API_INT32, 'in' => implode(',', [MAINTENANCE_TYPE_NORMAL, MAINTENANCE_TYPE_NODATA])],
+			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('maintenances', 'description')],
+			'active_since' =>		['type' => API_INT32, 'in' => '0:2147464800'],
+			'active_till' =>		['type' => API_INT32, 'in' => '0:2147464800'],
+			'tags_evaltype' =>		['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'maintenance_type', 'in' => implode(',', [MAINTENANCE_TYPE_NORMAL])], 'type' => API_INT32, 'in' => implode(',', [MAINTENANCE_TAG_EVAL_TYPE_AND_OR, MAINTENANCE_TAG_EVAL_TYPE_OR])],
+										['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'tags' =>				['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'maintenance_type', 'in' => implode(',', [MAINTENANCE_TYPE_NORMAL])], 'type' => API_OBJECTS, 'uniq' => [['tag', 'operator', 'value']], 'fields' => [
+				'tag' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('maintenance_tag', 'tag')],
+				'operator' =>				['type' => API_INT32, 'in' => implode(',', [MAINTENANCE_TAG_OPERATOR_EQUAL, MAINTENANCE_TAG_OPERATOR_LIKE]), 'default' => DB::getDefault('maintenance_tag', 'operator')],
+				'value' =>					['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('maintenance_tag', 'value'), 'default' => DB::getDefault('maintenance_tag', 'value')]
+										]],
+										['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'groups' =>				['type' => API_OBJECTS, 'uniq' => [['groupid']], 'fields' => [
+				'groupid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
+			]],
+			'hosts' =>				['type' => API_OBJECTS, 'uniq' => [['hostid']], 'fields' => [
+				'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
+			]],
+			'timeperiods' => 		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['timeperiodid']], 'fields' => [
+				'timeperiodid' =>		['type' => API_ID],
+				'timeperiod_type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])],
+				'period' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:2147464800'],
+				'every' =>				['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => '0:'.ZBX_MAX_INT32, 'default' => DB::getDefault('timeperiods', 'every')],
+											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_MONTHLY], 'type' => API_INT32, 'in' => '1:5'],
+											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_ONETIME], 'type' => API_INT32, 'in' => '1']
+				]],
+				'month' =>				['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_MONTHLY], 'type' => API_INT32, 'in' => '0:4095', 'default' => DB::getDefault('timeperiods', 'month')],
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY])], 'type' => API_INT32, 'in' => '0']
+				]],
+				'dayofweek' =>			['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => '0:127', 'default' => DB::getDefault('timeperiods', 'dayofweek')],
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY])], 'type' => API_INT32, 'in' => '0']
+				]],
+				'day' =>				['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_MONTHLY], 'type' => API_INT32, 'in' => '0:31', 'default' => DB::getDefault('timeperiods', 'day')],
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY])], 'type' => API_INT32, 'in' => '0']
+				]],
+				'start_time' =>			['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => '0:86340', 'default' => DB::getDefault('timeperiods', 'start_time')],
+											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_ONETIME], 'type' => API_INT32, 'in' => '0']
+				]],
+				'start_date' =>			['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_ONETIME], 'type' => API_INT32, 'in' => '0:2147464800', 'default' => DB::getDefault('timeperiods', 'start_date')],
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => '0']
+				]]
+			]]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $maintenances, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
 		self::addAffectedObjects($maintenances, $db_maintenances);
 
-		foreach ($maintenances as $i => $maintenance) {
+		foreach ($maintenances as &$maintenance) {
 			// Validate maintenance active interval.
 			$active_since = array_key_exists('active_since', $maintenance)
 				? $maintenance['active_since']
@@ -613,15 +628,10 @@ class CMaintenance extends CApiService {
 				);
 			}
 
-			// Validate maintenance tags when maintenance_type is no data.
-			$maintenance_type = array_key_exists('maintenance_type', $maintenance)
-				? $maintenance['maintenance_type']
-				: $db_maintenances[$maintenance['maintenanceid']]['maintenance_type'];
-			if ($maintenance_type == MAINTENANCE_TYPE_NODATA && array_key_exists('tags', $maintenance)
-					&& $maintenance['tags']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-					'/'.($i + 1).'/tags', _('should be empty')
-				));
+			// Set default value for tags_evaltype field, if maintenance_type was changed to MAINTENANCE_TYPE_NODATA.
+			if ($maintenance['maintenance_type'] != $db_maintenances[$maintenance['maintenanceid']]['maintenance_type']
+					&& $maintenance['maintenance_type'] == MAINTENANCE_TYPE_NODATA) {
+				$maintenance['tags_evaltype'] = DB::getDefault('maintenances', 'tags_evaltype');
 			}
 
 			// Validate groups and hosts.
@@ -639,6 +649,7 @@ class CMaintenance extends CApiService {
 				}
 			}
 		}
+		unset($maintenance);
 
 		self::checkDuplicates($maintenances, $db_maintenances);
 		self::checkGroups($maintenances);
@@ -991,67 +1002,47 @@ class CMaintenance extends CApiService {
 	 * @static
 	 *
 	 * @param array      $maintenances
-	 * @param string     $method
 	 * @param array|null $db_maintenances
 	 */
-	private static function updateTags(array &$maintenances, string $method, array $db_maintenances = null): void {
-		$ins_tags = [];
+	private static function updateTags(array &$maintenances, array $db_maintenances = null): void {
+		$ins_maintenance_tags = [];
 		$del_maintenancetagids = [];
 
 		foreach ($maintenances as &$maintenance) {
-			$maintenanceid = $maintenance['maintenanceid'];
-
-			$maintenance_type = array_key_exists('maintenance_type', $maintenance)
-				? $maintenance['maintenance_type']
-				: $db_maintenances[$maintenanceid]['maintenance_type'];
-
-			if ($maintenance_type == MAINTENANCE_TYPE_NODATA && $method === 'update') {
-				if (array_key_exists('tags', $db_maintenances[$maintenanceid])) {
-					$del_maintenancetagids = array_merge($del_maintenancetagids,
-						array_column($db_maintenances[$maintenanceid]['tags'], 'maintenancetagid')
-					);
-				}
-			}
-
-			if (!array_key_exists('tags', $maintenance)) {
+			if (($db_maintenances === null && !array_key_exists('tags', $maintenance))
+					|| !array_key_exists('tags', $db_maintenances[$maintenance['maintenanceid']])) {
 				continue;
 			}
 
-			$db_maintenancetagid_by_tag_operator_value = [];
-			$db_tags = ($method === 'update')
-				? $db_maintenances[$maintenanceid]['tags']
-				: [];
-
-			foreach ($db_tags as $db_tag) {
-				$db_maintenancetagid_by_tag_operator_value[$db_tag['tag']][$db_tag['operator']][$db_tag['value']] = $db_tag['maintenancetagid'];
+			if ($db_maintenances !== null && !array_key_exists('tags', $maintenance)) {
+				$maintenance['tags'] = [];
 			}
 
-			foreach ($maintenance['tags'] as &$tag_row) {
-				$tag = $tag_row['tag'];
-				$operator = $tag_row['operator'];
-				$value = $tag_row['value'];
+			$db_tags = ($db_maintenances !== null) ? $db_maintenances[$maintenance['maintenanceid']]['tags'] : [];
 
+			foreach ($maintenance['tags'] as $tag) {
+				$db_maintenancetagid = key(
+					array_filter($db_tags, static function (array $db_tag) use ($tag): bool {
+						return $tag['tag'] == $db_tag['tag'] && $tag['operator'] == $db_tag['operator']
+							&& $tag['value'] == $db_tag['value'];
+					})
+				);
 
-				if (array_key_exists($tag, $db_maintenancetagid_by_tag_operator_value)
-						&& array_key_exists($operator, $db_maintenancetagid_by_tag_operator_value[$tag])
-						&& array_key_exists($value, $db_maintenancetagid_by_tag_operator_value[$tag][$operator])) {
-					$maintenancetagid = $db_maintenancetagid_by_tag_operator_value[$tag][$operator][$value];
-					unset($db_tags[$maintenancetagid]);
-
-					$tag_row['maintenancetagid'] = $maintenancetagid;
+				if ($db_maintenancetagid !== null) {
+					unset($db_tags[$db_maintenancetagid]);
 				}
 				else {
-					$ins_tags[] = ['maintenanceid' => $maintenanceid] + $tag_row;
+					$ins_maintenance_tags[] = ['maintenanceid' => $maintenance['maintenanceid']] + $tag;
 				}
 			}
-			unset($tag_row);
 
-			$del_maintenancetagids = array_merge($del_maintenancetagids, array_column($db_tags, 'maintenancetagid'));
+			$del_maintenancetagids = array_merge($del_maintenancetagids, array_keys($db_tags));
 		}
 		unset($maintenance);
 
-		if ($ins_tags) {
-			$maintenancetagids = DB::insert('maintenance_tag', $ins_tags);
+		if ($ins_maintenance_tags) {
+			file_put_contents('test.txt', print_r($ins_maintenance_tags, true) . "\n", FILE_APPEND);
+			$maintenancetagids = DB::insert('maintenance_tag', $ins_maintenance_tags);
 		}
 
 		if ($del_maintenancetagids) {
@@ -1190,7 +1181,11 @@ class CMaintenance extends CApiService {
 				$db_maintenances[$maintenance['maintenanceid']]['hosts'] = [];
 			}
 
-			if (array_key_exists('tags', $maintenance)) {
+			$db_maintenance_type = $db_maintenances[$maintenance['maintenanceid']]['maintenance_type'];
+
+			if (array_key_exists('tags', $maintenance)
+					|| ($maintenance['maintenance_type'] != $db_maintenance_type
+						&& $maintenance['maintenance_type'] == MAINTENANCE_TYPE_NODATA)) {
 				$maintenanceids['tags'][] = $maintenance['maintenanceid'];
 				$db_maintenances[$maintenance['maintenanceid']]['tags'] = [];
 			}
