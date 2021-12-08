@@ -223,11 +223,18 @@ static void	worker_format_error(const zbx_variant_t *value, zbx_preproc_result_t
  *               FAIL - otherwise, error contains the error message           *
  *                                                                            *
  ******************************************************************************/
-static int	worker_item_preproc_execute(zbx_preproc_cache_t *cache, unsigned char value_type, zbx_variant_t *value,
-		const zbx_timespec_t *ts, zbx_preproc_op_t *steps, int steps_num, zbx_vector_ptr_t *history_in,
-		zbx_vector_ptr_t *history_out, zbx_preproc_result_t *results, int *results_num, char **error)
+static int	worker_item_preproc_execute(zbx_preproc_cache_t *cache, unsigned char value_type,
+		zbx_variant_t *value_in, zbx_variant_t *value_out, const zbx_timespec_t *ts,
+		zbx_preproc_op_t *steps, int steps_num, zbx_vector_ptr_t *history_in, zbx_vector_ptr_t *history_out,
+		zbx_preproc_result_t *results, int *results_num, char **error)
 {
 	int		i, ret = SUCCEED;
+
+	if (value_in != value_out)
+	{
+		if (0 == steps_num || NULL == cache || NULL == zbx_preproc_cache_get(cache, steps[0].type))
+			zbx_variant_copy(value_out, value_in);
+	}
 
 	for (i = 0; i < steps_num; i++)
 	{
@@ -238,11 +245,11 @@ static int	worker_item_preproc_execute(zbx_preproc_cache_t *cache, unsigned char
 
 		zbx_preproc_history_pop_value(history_in, i, &history_value, &history_ts);
 
-		if (FAIL == (ret = zbx_item_preproc(pcache, value_type, value, ts, op, &history_value, &history_ts,
+		if (FAIL == (ret = zbx_item_preproc(pcache, value_type, value_out, ts, op, &history_value, &history_ts,
 				error)))
 		{
 			results[i].action = op->error_handler;
-			ret = zbx_item_preproc_handle_error(value, op, error);
+			ret = zbx_item_preproc_handle_error(value_out, op, error);
 			zbx_variant_clear(&history_value);
 		}
 		else
@@ -255,7 +262,7 @@ static int	worker_item_preproc_execute(zbx_preproc_cache_t *cache, unsigned char
 				/* result history is kept to report results of steps before failing step, */
 				/* which means it can be omitted for the last step.                       */
 				if (i != steps_num - 1)
-					zbx_variant_copy(&results[i].value, value);
+					zbx_variant_copy(&results[i].value, value_out);
 				else
 					zbx_variant_set_none(&results[i].value);
 			}
@@ -278,7 +285,7 @@ static int	worker_item_preproc_execute(zbx_preproc_cache_t *cache, unsigned char
 			zbx_preproc_history_add_value(history_out, i, &history_value, &history_ts);
 		}
 
-		if (ZBX_VARIANT_NONE == value->type)
+		if (ZBX_VARIANT_NONE == value_out->type)
 			break;
 	}
 
@@ -320,7 +327,7 @@ static void	worker_preprocess_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 	results = (zbx_preproc_result_t *)zbx_malloc(NULL, sizeof(zbx_preproc_result_t) * (size_t)steps_num);
 	memset(results, 0, sizeof(zbx_preproc_result_t) * (size_t)steps_num);
 
-	if (FAIL == (ret = worker_item_preproc_execute(NULL, value_type, &value, ts, steps, steps_num, &history_in,
+	if (FAIL == (ret = worker_item_preproc_execute(NULL, value_type, &value, &value, ts, steps, steps_num, &history_in,
 			&history_out, results, &results_num, &errmsg)) && 0 != results_num)
 	{
 		int action = results[results_num - 1].action;
@@ -492,7 +499,7 @@ static void	worker_preprocess_dep_items(zbx_ipc_socket_t *socket, zbx_preproc_de
 		int				j, step_results_num, ret;
 		zbx_variant_t			value;
 
-		zbx_variant_copy(&value, &request->value);
+		zbx_variant_set_none(&value);
 
 		if (dep->steps_num > results_alloc)
 		{
@@ -504,8 +511,8 @@ static void	worker_preprocess_dep_items(zbx_ipc_socket_t *socket, zbx_preproc_de
 		if (0 != dep->steps_num)
 			memset(results, 0, (size_t)dep->steps_num * sizeof(zbx_preproc_result_t));
 
-		if (FAIL == (ret = worker_item_preproc_execute(&cache, dep->value_type, &value, &request->ts,
-				dep->steps, dep->steps_num, &dep->history, &history_out, results,
+		if (FAIL == (ret = worker_item_preproc_execute(&cache, dep->value_type, &request->value, &value,
+				&request->ts, dep->steps, dep->steps_num, &dep->history, &history_out, results,
 				&step_results_num, &errmsg)) && 0 != step_results_num)
 		{
 			int action = results[step_results_num - 1].action;
