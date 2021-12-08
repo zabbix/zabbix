@@ -77,7 +77,7 @@ var AddValueMap = class {
 	createNameCell() {
 		const cell = document.createElement('td');
 		const link = document.createElement('a');
-		link.innerText = this.data.name;
+		link.textContent = this.data.name;
 		link.classList.add('wordwrap');
 		link.href = 'javascript:void(0);';
 		link.addEventListener('click', (e) => {
@@ -103,7 +103,7 @@ var AddValueMap = class {
 		const btn = document.createElement('button');
 		btn.type = 'button';
 		btn.classList.add('btn-link', 'element-table-remove');
-		btn.innerText = <?= json_encode(_('Remove')) ?>;
+		btn.textContent = <?= json_encode(_('Remove')) ?>;
 		btn.addEventListener('click', () => this.row.remove());
 
 		cell.appendChild(btn);

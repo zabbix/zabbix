@@ -47,7 +47,7 @@
 			}
 			else if (row.querySelector('[name*=creator_type]').value == <?= ZBX_REPORT_RECIPIENT_TYPE_USER ?>) {
 				const creator = row.querySelector('[name*=creatorid]').parentNode.querySelector('span');
-				creator.innerText = current_user_name;
+				creator.textContent = current_user_name;
 				creator.setAttribute('title', current_user_name);
 				creator.classList.remove('<?= ZBX_STYLE_GREY ?>');
 
@@ -130,7 +130,7 @@
 				const update_btn = document.querySelector('#update');
 				update_btn.setAttribute('id', 'add');
 				update_btn.setAttribute('value', 'scheduledreport.create');
-				update_btn.innerText = <?= json_encode(_('Add')) ?>;
+				update_btn.textContent = <?= json_encode(_('Add')) ?>;
 
 				document.querySelectorAll('#reportid, #clone, #delete').forEach((elem) => { elem.remove(); });
 			});
