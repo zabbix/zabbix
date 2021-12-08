@@ -37,25 +37,34 @@ class CSlaHelper {
 	public const SCHEDULE_MODE_NONSTOP	= 0;
 	public const SCHEDULE_MODE_CUSTOM	= 1;
 
-	public static function periodToStr(int $period): ?string {
-		static $period_strings;
+	public const SLA_MAX_REPORTING_PERIODS = 100;
+	public const SLA_DEFAULT_REPORTING_PERIODS = 20;
 
-		if ($period_strings === null) {
-			$period_strings = [
-				self::PERIOD_DAILY => _('Daily'),
-				self::PERIOD_WEEKLY => _('Weekly'),
-				self::PERIOD_MONTHLY => _('Monthly'),
-				self::PERIOD_QUARTERLY => _('Quarterly'),
-				self::PERIOD_ANNUALLY => _('Annually')
-			];
+	public const TAB_INDICATOR_SLA_DOWNTIMES = 'sla-downtimes';
+
+	public const OUTPUT_FIELDS = [
+		'name',
+		'description',
+		'effective_date',
+		'status',
+		'slo',
+		'period',
+		'timezone'
+	];
+
+	public static function periodToStr(int $period): ?string {
+		static $periods;
+
+		if ($periods === null) {
+			$periods = self::periods();
 		}
 
-		return array_key_exists($period, $period_strings)
-			? $period_strings[$period]
+		return array_key_exists($period, $periods)
+			? $periods[$period]
 			: null;
 	}
 
-	public static function scheduleToStr(int $schedule_mode): ?string {
+	public static function scheduleModeToStr(int $schedule_mode): ?string {
 		static $schedule_modes;
 
 		if ($schedule_modes === null) {
@@ -68,5 +77,15 @@ class CSlaHelper {
 		return array_key_exists($schedule_mode, $schedule_modes)
 			? $schedule_modes[$schedule_mode]
 			: null;
+	}
+
+	public static function periods(): array {
+		return [
+			self::PERIOD_DAILY => _('Daily'),
+			self::PERIOD_WEEKLY => _('Weekly'),
+			self::PERIOD_MONTHLY => _('Monthly'),
+			self::PERIOD_QUARTERLY => _('Quarterly'),
+			self::PERIOD_ANNUALLY => _('Annually')
+		];
 	}
 }

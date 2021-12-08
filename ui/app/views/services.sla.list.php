@@ -26,6 +26,7 @@
 
 $this->addJsFile('layout.mode.js');
 $this->addJsFile('class.tagfilteritem.js');
+$this->addJsFile('class.calendar.js');
 
 $this->includeJsFile('services.sla.list.js.php');
 
@@ -83,16 +84,21 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())
+				->addItem(
+					$data['can_edit']
+						? (new CSimpleButton(_('Create SLA')))->onClick('view.edit()')
+						: null
+				)
 				->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
 		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem($filter)
-	->addItem(new CPartial('services.sla.list', $data))
+	->addItem(new CPartial('services.sla.list.partial', $data))
 	->show();
 
 (new CScriptTag('
 	view.init('.json_encode([
-		'mode_switch_url' => $data['edit_mode_url'],
+		'mode_switch_url' => $data['mode_switch_url'],
 		'refresh_url' => $data['refresh_url'],
 		'refresh_interval' => $data['refresh_interval']
 	]).');

@@ -24,10 +24,6 @@
  */
 ?>
 
-<script type="text/x-jquery-tmpl" id="filter-tag-row-tmpl">
-	<?= CTagFilterFieldHelper::getTemplate() ?>
-</script>
-
 <script>
 	const view = {
 		mode_switch_url: null,
@@ -45,7 +41,6 @@
 
 			this.initViewModeSwitcher();
 			this.initTagFilter();
-			this.initActionButtons();
 			this.initRefresh();
 		},
 
@@ -72,24 +67,6 @@
 			});
 		},
 
-		initActionButtons() {
-			document.addEventListener('click', (e) => {
-				if (e.target.matches('.js-create-sla')) {
-					const options = e.target.dataset.slaid !== undefined
-						? {slaid: [e.target.dataset.slaid]}
-						: {};
-
-					this.edit(options);
-				}
-				else if (e.target.classList.contains('js-edit-sla')) {
-					this.edit({slaid: e.target.dataset.slaid});
-				}
-				else if (e.target.classList.contains('js-massupdate-sla')) {
-					openMassupdatePopup(e.target, 'popup.massupdate.sla', {location_url: this.back_url});
-				}
-			});
-		},
-
 		initRefresh() {
 			if (this.refresh_interval > 0) {
 				setInterval(() => this.refresh(), this.refresh_interval);
@@ -99,7 +76,7 @@
 		edit(options = {}) {
 			this.pauseRefresh();
 
-			const overlay = PopUp('popup.sla.edit', options, 'service_edit', document.activeElement);
+			const overlay = PopUp('popup.sla.edit', options, 'sla_edit', document.activeElement);
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 				postMessageOk(e.detail.title);
@@ -112,6 +89,72 @@
 			});
 
 			overlay.$dialogue[0].addEventListener('overlay.close', () => this.resumeRefresh(), {once: true});
+		},
+
+		massEnable() {
+			this.massToggle(<?= CSlaHelper::SLA_STATUS_ENABLED?>)
+		},
+
+		massDisable() {
+			this.massToggle(<?= CSlaHelper::SLA_STATUS_DISABLED?>)
+		},
+
+		massToggle(status) {
+			const curl = new Curl('zabbix.php');
+
+			curl.setArgument('action', 'services.sla.massupdate');
+			curl.setArgument('status', status);
+
+			this.massProcess(curl);
+		},
+
+		massDelete() {
+			const curl = new Curl('zabbix.php');
+
+			curl.setArgument('action', 'services.sla.delete');
+			this.massProcess(curl)
+		},
+
+		massProcess(curl) {
+			const record_list = document.getElementById('sla-list');
+
+			this.pauseRefresh();
+			record_list.classList.add('is-loading', 'is-loading-fadein', 'delayed-15s');
+
+			fetch(curl.getUrl(), {
+				method: 'POST',
+				headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
+				body: urlEncodeData({ids: Object.values(chkbxRange.getSelectedIds())})
+			})
+				.then((response) => response.json())
+				.then((response) => {
+					if ('errors' in response) {
+						const keepids = ('keepids' in response) ? response.keepids : [];
+
+						clearMessages();
+						addMessage(response.errors);
+						uncheckTableRows('slas', keepids);
+					}
+					else {
+						if ('messages' in response) {
+							clearMessages();
+							addMessage(response.messages);
+						}
+
+						uncheckTableRows('slas');
+					}
+				})
+				.catch(() => {
+					const title = <?= json_encode(_('Unexpected server error.')) ?>;
+					const message_box = makeMessageBox('bad', [], title)[0];
+
+					clearMessages();
+					addMessage(message_box);
+				})
+				.finally(() => {
+					record_list.classList.remove('is-loading', 'is-loading-fadein', 'delayed-15s');
+					this.resumeRefresh();
+				});
 		},
 
 		pauseRefresh() {
@@ -127,7 +170,7 @@
 				return;
 			}
 
-			const record_list = document.getElementById('record-list');
+			const record_list = document.getElementById('sla-list');
 
 			if (record_list.querySelectorAll('[data-expanded="true"], [aria-expanded="true"]').length > 0) {
 				return;

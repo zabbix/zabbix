@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerSlaList extends CController {
+class CControllerServiceSlaList extends CController {
 
 	protected function init(): void {
 		$this->disableSIDValidation();
@@ -84,7 +84,7 @@ class CControllerSlaList extends CController {
 		}
 
 		$paging_curl = (new CUrl('zabbix.php'))
-			->setArgument('action', 'sla.list');
+			->setArgument('action', 'services.sla.list');
 
 		$reset_curl = clone $paging_curl;
 
@@ -102,25 +102,24 @@ class CControllerSlaList extends CController {
 		$sort_field = $this->getInput('sort', CProfile::get('sla.list.sort', 'name'));
 		$sort_order = $this->getInput('sortorder', CProfile::get('sla.list.sortorder', ZBX_SORT_UP));
 
-		$edit_mode_curl = (clone $paging_curl)
-			->setArgument('action', 'service.list.edit')
-			->setArgument('page', $page_num);
-
 		$data = [
 			'can_edit' => CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_SLA),
 			'filter' => $filter,
-			'is_filtered' => $filter['filter_set'],
 			'active_tab' => CProfile::get('web.sla.filter.active', 1),
 			'refresh_interval' => CWebUser::getRefresh() * 1000,
-			'reset_curl' => $reset_curl,
-			'filter_url' => $paging_curl->getUrl(),
+			'page_number' => $page_num,
 			'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE),
 			'sort' => $sort_field,
 			'sortorder' => $sort_order,
-			'edit_mode_url' => $edit_mode_curl->getUrl(),
-			'refresh_url' => (clone $paging_curl)
-				->setArgument('action', 'sla.list.refresh')
+			'reset_curl' => $reset_curl,
+			'filter_url' => $paging_curl->getUrl(),
+			'mode_switch_url' => (clone $paging_curl)
+				->setArgument('page', $page_num)
 				->getUrl(),
+			'refresh_url' => (clone $paging_curl)
+				->setArgument('action', 'services.sla.list.refresh')
+				->getUrl(),
+			'status_toggle_curl' => (new CUrl('zabbix.php'))->setArgument('action', 'services.sla.update'),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
@@ -128,55 +127,37 @@ class CControllerSlaList extends CController {
 
 		$options = [
 			'output' => [],
-			'search' => ($filter['name'] === '')
-				? null
-				: ['name' => $filter['name']],
-			'filter' => [
-				'status' => $filter['status']
-			],
-			'tags' => $filter['tags'],
+			'filter' => [],
+			'service_tags' => $filter['tags'],
 			'evaltype' => $filter['evaltype'],
 			'sortfield' => [$sort_field],
 			'sortorder' => $sort_order,
-			'preservekeys' => true
+			'preservekeys' => true,
 		];
+
+		if ($filter['name'] !== '') {
+			$options['search'] = ['name' => $filter['name']];
+		}
 
 		if (in_array($filter['status'], [CSlaHelper::SLA_STATUS_ENABLED, CSlaHelper::SLA_STATUS_DISABLED])) {
 			$options['filter']['status'] = $filter['status'];
 		}
 
-		$x = 120;
-		$records = [];
-
-		while ($x-- > 0) {
-			$records[$x] = [
-				'name' => 'My SLA-'.$x,
-				'period' => mt_rand(0, 4),
-				'slo' => 99.9999,
-				'effective_date' => strtotime('+'.mt_rand(0, 365).' days'),
-				'timezone' => array_rand(['UTC' => 1, 'Europe/Riga' => 1, 'Europe/Dublin']),
-				'schedule_mode' => mt_rand(0, 1),
-				'status' => mt_rand(0, 1),
-				'description' => 'Description of SLA '.$x
-			];
-		}
-
-		//$db_slaids = array_keys(API::Sla()->get($options));
+		$records = API::Sla()->get($options);
 		$db_slaids = array_keys($records);
 
 		CPagerHelper::savePage('sla.list', $page_num);
 		$data['paging'] = CPagerHelper::paginate($page_num, $db_slaids, $sort_order, $paging_curl);
 
 		$options = [
-			'output' => [],
-			'selectTags' => ['tag', 'value'],
+			'output' => array_diff(CSlaHelper::OUTPUT_FIELDS, ['description']),
 			'slaids' => $db_slaids,
 			'limit' => $per_page,
-			'offset' => $page_num * $per_page
+			'offset' => $page_num * $per_page,
+			'preservekeys' => true
 		];
 
-		//$data['records'] = API::Sla()->get($options);
-		$data['records'] = $records;
+		$data['records'] = API::Sla()->get($options);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('SLA'));

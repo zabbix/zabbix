@@ -285,9 +285,9 @@ class CService extends CApiService {
 	/**
 	 * @param array $services
 	 *
-	 * @return array
-	 *
 	 * @throws APIException
+	 *
+	 * @return array
 	 */
 	public function update(array $services): array {
 		self::validateUpdate($services, $db_services);
@@ -595,8 +595,8 @@ class CService extends CApiService {
 				' FROM service_tag st, sla_service_tag sst'.
 				' WHERE sst.tag=st.tag'.
 					' AND ('.
-						'(sst.operator='.ZBX_SLA_SERVICE_TAG_OPERATOR_EQUAL.' AND st.value=sst.value)'.
-						' OR (sst.operator='.ZBX_SLA_SERVICE_TAG_OPERATOR_LIKE.' AND UPPER(st.value) LIKE CONCAT('.
+						'(sst.operator='.ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL.' AND st.value=sst.value)'.
+						' OR (sst.operator='.ZBX_SERVICE_PROBLEM_TAG_OPERATOR_LIKE.' AND UPPER(st.value) LIKE CONCAT('.
 							'"%", REPLACE(REPLACE(REPLACE(UPPER(sst.value), "%", "!%"), "_", "!_"), "!", "!!"), "%"'.
 						') ESCAPE "!")'.
 					')'.

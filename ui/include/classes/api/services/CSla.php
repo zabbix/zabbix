@@ -57,9 +57,9 @@ class CSla extends CApiService {
 			'filter' =>						['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
 				'slaid' =>						['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'name' =>						['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'period' =>						['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [ZBX_SLA_PERIOD_DAILY, ZBX_SLA_PERIOD_WEEKLY, ZBX_SLA_PERIOD_MONTHLY, ZBX_SLA_PERIOD_QUARTERLY, ZBX_SLA_PERIOD_ANNUALLY])],
+				'period' =>						['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', array_keys(CSlaHelper::periods()))],
 				'timezone' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', array_keys(CDateTimeZoneHelper::getAllDateTimeZones()))],
-				'status' =>						['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [ZBX_SLA_STATUS_DISABLED, ZBX_SLA_STATUS_ENABLED])]
+				'status' =>						['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [CSlaHelper::SLA_STATUS_DISABLED, CSlaHelper::SLA_STATUS_ENABLED])]
 			]],
 			'search' =>						['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
 				'name' =>						['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
@@ -165,15 +165,15 @@ class CSla extends CApiService {
 	private static function validateCreate(array &$slas): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('sla', 'name')],
-			'period' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_SLA_PERIOD_DAILY, ZBX_SLA_PERIOD_WEEKLY, ZBX_SLA_PERIOD_MONTHLY, ZBX_SLA_PERIOD_QUARTERLY, ZBX_SLA_PERIOD_ANNUALLY])],
+			'period' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', array_keys(CSlaHelper::periods()))],
 			'slo' =>				['type' => API_FLOAT, 'flags' => API_REQUIRED, 'in' => '0:100'],
 			'effective_date' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:'.ZBX_MAX_DATE],
 			'timezone' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', array_keys(CDateTimeZoneHelper::getAllDateTimeZones())), 'length' => DB::getFieldLength('sla', 'timezone')],
-			'status' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_SLA_STATUS_DISABLED, ZBX_SLA_STATUS_ENABLED])],
+			'status' =>				['type' => API_INT32, 'in' => implode(',', [CSlaHelper::SLA_STATUS_DISABLED, CSlaHelper::SLA_STATUS_ENABLED])],
 			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sla', 'description')],
 			'service_tags' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['tag', 'value']], 'fields' => [
 				'tag' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('sla_service_tag', 'tag')],
-				'operator' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_SLA_SERVICE_TAG_OPERATOR_EQUAL, ZBX_SLA_SERVICE_TAG_OPERATOR_LIKE]), 'default' => DB::getDefault('sla_service_tag', 'operator')],
+				'operator' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL, ZBX_SERVICE_PROBLEM_TAG_OPERATOR_LIKE]), 'default' => DB::getDefault('sla_service_tag', 'operator')],
 				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sla_service_tag', 'value'), 'default' => DB::getDefault('sla_service_tag', 'value')]
 			]],
 			'schedule' =>			['type' => API_OBJECTS, 'uniq' => [['period_from', 'period_to']], 'fields' => [
@@ -200,9 +200,9 @@ class CSla extends CApiService {
 	/**
 	 * @param array $slas
 	 *
-	 * @return array
-	 *
 	 * @throws APIException
+	 *
+	 * @return array
 	 */
 	public function update(array $slas): array {
 		self::validateUpdate($slas, $db_slas);
@@ -243,15 +243,15 @@ class CSla extends CApiService {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['slaid'], ['name']], 'fields' => [
 			'slaid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('sla', 'name')],
-			'period' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_SLA_PERIOD_DAILY, ZBX_SLA_PERIOD_WEEKLY, ZBX_SLA_PERIOD_MONTHLY, ZBX_SLA_PERIOD_QUARTERLY, ZBX_SLA_PERIOD_ANNUALLY])],
+			'period' =>				['type' => API_INT32, 'in' => implode(',', array_keys(CSlaHelper::periods()))],
 			'slo' =>				['type' => API_FLOAT, 'in' => '0:100'],
 			'effective_date' =>		['type' => API_INT32, 'in' => '0:'.ZBX_MAX_DATE],
 			'timezone' =>			['type' => API_STRING_UTF8, 'in' => implode(',', array_keys(CDateTimeZoneHelper::getAllDateTimeZones())), 'length' => DB::getFieldLength('sla', 'timezone')],
-			'status' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_SLA_STATUS_DISABLED, ZBX_SLA_STATUS_ENABLED])],
+			'status' =>				['type' => API_INT32, 'in' => implode(',', [CSlaHelper::SLA_STATUS_DISABLED, CSlaHelper::SLA_STATUS_ENABLED])],
 			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sla', 'description')],
 			'service_tags' =>		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['tag', 'value']], 'fields' => [
 				'tag' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('sla_service_tag', 'tag')],
-				'operator' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_SLA_SERVICE_TAG_OPERATOR_EQUAL, ZBX_SLA_SERVICE_TAG_OPERATOR_LIKE]), 'default' => DB::getDefault('sla_service_tag', 'operator')],
+				'operator' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL, ZBX_SERVICE_PROBLEM_TAG_OPERATOR_LIKE]), 'default' => DB::getDefault('sla_service_tag', 'operator')],
 				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sla_service_tag', 'value'), 'default' => DB::getDefault('sla_service_tag', 'value')]
 			]],
 			'schedule' =>			['type' => API_OBJECTS, 'uniq' => [['period_from', 'period_to']], 'fields' => [
@@ -290,9 +290,9 @@ class CSla extends CApiService {
 	/**
 	 * @param array $slaids
 	 *
-	 * @return array
-	 *
 	 * @throws APIException
+	 *
+	 * @return array
 	 */
 	public function delete(array $slaids): array {
 		$this->validateDelete($slaids, $db_slas);
@@ -980,9 +980,9 @@ class CSla extends CApiService {
 	 * @param array|null $limit_slaids
 	 * @param array|null $limit_serviceids
 	 *
-	 * @return array|null
-	 *
 	 * @throws APIException
+	 *
+	 * @return array|null
 	 */
 	private static function getAccessibleSlaids(?array $limit_slaids, ?array $limit_serviceids): ?array {
 		$role = API::Role()->get([
@@ -1025,8 +1025,8 @@ class CSla extends CApiService {
 			' FROM service_tag st, sla_service_tag sst'.
 			' WHERE sst.tag=st.tag'.
 				' AND ('.
-					'(sst.operator='.ZBX_SLA_SERVICE_TAG_OPERATOR_EQUAL.' AND st.value=sst.value)'.
-					' OR (sst.operator='.ZBX_SLA_SERVICE_TAG_OPERATOR_LIKE.' AND UPPER(st.value) LIKE CONCAT('.
+					'(sst.operator='.ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL.' AND st.value=sst.value)'.
+					' OR (sst.operator='.ZBX_SERVICE_PROBLEM_TAG_OPERATOR_LIKE.' AND UPPER(st.value) LIKE CONCAT('.
 						'"%", REPLACE(REPLACE(REPLACE(UPPER(sst.value), "%", "!%"), "_", "!_"), "!", "!!"), "%"'.
 					') ESCAPE "!")'.
 				')'.
@@ -1049,10 +1049,10 @@ class CSla extends CApiService {
 	/**
 	 * @param array $options
 	 *
-	 * @return array
-	 *
 	 * @throws Exception
 	 * @throws APIException
+	 *
+	 * @return array
 	 */
 	public function getSli(array $options = []): array {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
@@ -1093,8 +1093,144 @@ class CSla extends CApiService {
 		return [
 			'periods' => $reporting_periods,
 			'serviceids' => array_keys($db_services),
-			'data' => self::calculateSli($db_sla, $reporting_periods, array_values($db_services))
+			'sli' => self::calculateSli($db_sla, $reporting_periods, array_values($db_services))
 		];
+	}
+
+	/**
+	 * @param array $sla
+	 * @param array $options
+	 *
+	 * @throws Exception
+	 *
+	 * @return array
+	 */
+	private static function getReportingPeriods(array $sla, array $options): array {
+		$interval = new DateInterval([
+			ZBX_SLA_PERIOD_DAILY => 'P1D',
+			ZBX_SLA_PERIOD_WEEKLY => 'P1W',
+			ZBX_SLA_PERIOD_MONTHLY => 'P1M',
+			ZBX_SLA_PERIOD_QUARTERLY => 'P3M',
+			ZBX_SLA_PERIOD_ANNUALLY => 'P1Y'
+		][$sla['period']]);
+
+		$timezone = new DateTimeZone($sla['timezone']);
+
+		$effective_min = (new DateTime('@'.$sla['effective_date']))->setTimezone($timezone);
+		self::alignDateToPeriodStart($effective_min, (int) $sla['period']);
+
+		$effective_max = (new DateTime('now'))->setTimezone($timezone);
+		self::alignDateToPeriodStart($effective_max, (int) $sla['period']);
+		$effective_max->add($interval);
+
+		if ($options['date_from'] !== null) {
+			$date_from = (new DateTime('@'.$options['date_from']))->setTimezone($timezone);
+			self::alignDateToPeriodStart($date_from, (int) $sla['period']);
+		}
+		else {
+			$date_from = null;
+		}
+
+		if ($options['date_to'] !== null) {
+			$date_to = (new DateTime('@'.$options['date_to']))->setTimezone($timezone);
+			self::alignDateToPeriodStart($date_to, (int) $sla['period']);
+			$date_to->add($interval);
+		}
+		elseif ($date_from === null) {
+			$date_to = $effective_max;
+		}
+		else {
+			$date_to = null;
+		}
+
+		$reporting_periods = [];
+
+		$do_descend = $date_to !== null;
+		$date = $do_descend ? clone $date_to : clone $date_from;
+
+		while (count($reporting_periods) < ZBX_SLA_MAX_REPORTING_PERIODS) {
+			if ($options['periods'] !== null) {
+				if (count($reporting_periods) == $options['periods']) {
+					break;
+				}
+			}
+			else {
+				if (($date_from === null || $date_to === null)
+						&& count($reporting_periods) == ZBX_SLA_DEFAULT_REPORTING_PERIODS) {
+					break;
+				}
+
+				if ($do_descend) {
+					if ($date_from === null && $date <= $effective_min) {
+						break;
+					}
+				}
+				elseif ($date >= $effective_max) {
+					break;
+				}
+			}
+
+			if ($do_descend && $date_from !== null && $date <= $date_from) {
+				break;
+			}
+
+			if ($do_descend) {
+				$to = $date->getTimestamp();
+				$date->sub($interval);
+				$from = $date->getTimestamp();
+
+				if ($from < 0) {
+					break;
+				}
+
+				array_unshift($reporting_periods, ['date_from' => $from, 'date_to' => $to]);
+			}
+			else {
+				$from = $date->getTimestamp();
+				$date->add($interval);
+				$to = $date->getTimestamp();
+
+				if ($to > ZBX_MAX_DATE) {
+					break;
+				}
+
+				$reporting_periods[] = ['date_from' => $from, 'date_to' => $to];
+			}
+		}
+
+		return $reporting_periods;
+	}
+
+	/**
+	 * @param DateTime $date
+	 *
+	 * @param int $sla_period
+	 */
+	private static function alignDateToPeriodStart(DateTime $date, int $sla_period): void {
+		$year = (int) $date->format('Y');
+		$month = (int) $date->format('n');
+
+		switch ($sla_period) {
+			case ZBX_SLA_PERIOD_WEEKLY:
+				$date
+					->modify('1 day')
+					->modify('last Monday');
+				break;
+
+			case ZBX_SLA_PERIOD_MONTHLY:
+				$date->setDate($year, $month, 1);
+				break;
+
+			case ZBX_SLA_PERIOD_QUARTERLY:
+				$date->setDate($year, intdiv($month - 1, 3) * 3 + 1, 1);
+				break;
+
+			case ZBX_SLA_PERIOD_ANNUALLY:
+				$date->setDate($year, 1, 1);
+				break;
+		}
+
+		$date->setTime(0, 0);
 	}
 
 	/**
@@ -1102,43 +1238,35 @@ class CSla extends CApiService {
 	 * @param array $reporting_periods
 	 * @param array $db_services
 	 *
-	 * @return array
-	 *
 	 * @throws Exception
+	 *
+	 * @return array
 	 */
 	private static function calculateSli(array $db_sla, array $reporting_periods, array $db_services): array {
 		if (!$reporting_periods || !$db_services) {
 			return [];
 		}
 
-		$data = [];
+		$sli = [];
 
 		$combined_excluded_downtimes = self::combineExcludedDowntimes($db_sla['excluded_downtimes']);
 
 		foreach ($reporting_periods as $reporting_period_index => $reporting_period) {
-			$uptime_periods = self::getUptimePeriods($reporting_period, $db_sla);
-
-			$scheduled_uptime = 0;
-			foreach ($uptime_periods as $uptime_period) {
-				$scheduled_uptime += $uptime_period['date_to'] - $uptime_period['date_from'];
-			}
+			$scheduled_uptime_periods = self::getScheduledUptimePeriods($db_sla, $reporting_period);
 
 			foreach ($db_services as $service_index => $db_service) {
-				$cell = [
+				$sli_cell = [
 					'uptime' => 0,
 					'downtime' => 0,
 					'sli' => -1.0,
-					'error_budget' => 0,
+					'error_budget' => false,
+					'error_budget_value' => 0,
 					'excluded_downtimes' => []
 				];
 
-				if ($reporting_period['date_to'] <= $db_service['created_at'] || $scheduled_uptime == 0) {
-					$data[$reporting_period_index][$service_index] = $cell;
+				$max_uptime = 0;
 
-					continue;
-				}
-
-				$prev_clock = max($reporting_period['date_from'], $db_service['created_at']);
+				$prev_clock = $reporting_period['date_from'];
 				$prev_value = $db_service['status_timeline'][$reporting_period_index]['start_value'];
 
 				$alarms = $db_service['status_timeline'][$reporting_period_index]['alarms'];
@@ -1148,39 +1276,45 @@ class CSla extends CApiService {
 				}
 
 				foreach ($alarms as $alarm) {
-					foreach ($uptime_periods as $uptime_period) {
-						$uptime_period_from = max($uptime_period['date_from'], $prev_clock);
-						$uptime_period_to = min($uptime_period['date_to'], $alarm['clock']);
+					foreach ($scheduled_uptime_periods as $scheduled_uptime_period) {
+						$uptime_period_from = max($db_service['created_at'], $scheduled_uptime_period['date_from'],
+							$prev_clock
+						);
+						$uptime_period_to = min($scheduled_uptime_period['date_to'], $alarm['clock']);
 						$uptime = $uptime_period_to - $uptime_period_from;
 
-						if ($uptime > 0) {
-							foreach ($combined_excluded_downtimes as $combined_excluded_downtime) {
-								$downtime = min($combined_excluded_downtime['period_to'], $uptime_period_to)
-									- max($combined_excluded_downtime['period_from'], $uptime_period_from);
+						if ($uptime <= 0) {
+							continue;
+						}
 
-								if ($downtime > 0) {
-									$uptime -= $downtime;
-								}
+						$max_uptime += $uptime;
+
+						foreach ($combined_excluded_downtimes as $combined_excluded_downtime) {
+							$downtime = min($combined_excluded_downtime['period_to'], $uptime_period_to)
+								- max($combined_excluded_downtime['period_from'], $uptime_period_from);
+
+							if ($downtime > 0) {
+								$uptime -= $downtime;
 							}
+						}
 
-							if ($prev_value == ZBX_SEVERITY_OK) {
-								$cell['uptime'] += $uptime;
-							}
-							else {
-								$cell['downtime'] += $uptime;
-							}
+						if ($prev_value == ZBX_SEVERITY_OK) {
+							$sli_cell['uptime'] += $uptime;
+						}
+						else {
+							$sli_cell['downtime'] += $uptime;
+						}
 
-							foreach ($db_sla['excluded_downtimes'] as $excluded_downtime) {
-								$downtime_period_from = max($excluded_downtime['period_from'], $uptime_period_from);
-								$downtime_period_to = min($excluded_downtime['period_to'], $uptime_period_to);
+						foreach ($db_sla['excluded_downtimes'] as $excluded_downtime) {
+							$downtime_period_from = max($excluded_downtime['period_from'], $uptime_period_from);
+							$downtime_period_to = min($excluded_downtime['period_to'], $uptime_period_to);
 
-								if ($downtime_period_to > $downtime_period_from) {
-									$cell['excluded_downtimes'][] = [
-										'name' => $excluded_downtime['name'],
-										'period_from' => (int) $downtime_period_from,
-										'period_to' => (int) $downtime_period_to
-									];
-								}
+							if ($downtime_period_to > $downtime_period_from) {
+								$sli_cell['excluded_downtimes'][] = [
+									'name' => $excluded_downtime['name'],
+									'period_from' => (int) $downtime_period_from,
+									'period_to' => (int) $downtime_period_to
+								];
 							}
 						}
 					}
@@ -1189,14 +1323,26 @@ class CSla extends CApiService {
 					$prev_value = $alarm['value'];
 				}
 
-				$cell['sli'] = ($scheduled_uptime - $cell['downtime']) / $scheduled_uptime * 100;
-				$cell['error_budget'] = floor($scheduled_uptime * (1 - $db_sla['slo'] / 100)) - $cell['downtime'];
+				if ($sli_cell['uptime'] + $sli_cell['downtime'] != 0) {
+					$sli_cell['sli'] = $sli_cell['uptime'] / ($sli_cell['uptime'] + $sli_cell['downtime']) * 100;
+				}
 
-				$data[$reporting_period_index][$service_index] = $cell;
+				if ($sli_cell['sli'] != -1) {
+					$available_uptime = $max_uptime - $sli_cell['uptime'] - $sli_cell['downtime'];
+
+					$sli_cell['error_budget'] = true;
+					$sli_cell['error_budget_value'] = $db_sla['slo'] > 0
+						? min($available_uptime,
+							$sli_cell['uptime'] / $db_sla['slo'] * 100 - $sli_cell['uptime'] - $sli_cell['downtime']
+						)
+						: $available_uptime;
+				}
+
+				$sli[$reporting_period_index][$service_index] = $sli_cell;
 			}
 		}
 
-		return $data;
+		return $sli;
 	}
 
 	/**
@@ -1238,11 +1384,11 @@ class CSla extends CApiService {
 	 * @param array $reporting_period
 	 * @param array $db_sla
 	 *
-	 * @return array
-	 *
 	 * @throws Exception
+	 *
+	 * @return array
 	 */
-	private static function getUptimePeriods(array $reporting_period, array $db_sla): array {
+	private static function getScheduledUptimePeriods(array $db_sla, array $reporting_period): array {
 		if (!$db_sla['schedule']) {
 			return [$reporting_period];
 		}
@@ -1257,12 +1403,11 @@ class CSla extends CApiService {
 				->getTimestamp();
 
 		for ($week = 0;; $week++) {
-			foreach ($db_sla['schedule'] as $schedule_row) {
-				$date_from = $reporting_period['date_from'] + SEC_PER_WEEK * $week + $schedule_row['period_from']
-					- $week_offset;
+			$week_date_from = $reporting_period['date_from'] - $week_offset + SEC_PER_WEEK * $week;
 
-				$date_to = $reporting_period['date_from'] + SEC_PER_WEEK * $week + $schedule_row['period_to']
-					- $week_offset;
+			foreach ($db_sla['schedule'] as $schedule_row) {
+				$date_from = $week_date_from + $schedule_row['period_from'];
+				$date_to = $week_date_from + $schedule_row['period_to'];
 
 				if ($date_from < $reporting_period['date_to'] && $date_to > $reporting_period['date_from']) {
 					$new_date_from = max($reporting_period['date_from'], $date_from);
@@ -1295,11 +1440,11 @@ class CSla extends CApiService {
 	 */
 	private static function getReportingPeriods(array $sla, array $options): array {
 		$interval = new DateInterval([
-			ZBX_SLA_PERIOD_DAILY => 'P1D',
-			ZBX_SLA_PERIOD_WEEKLY => 'P1W',
-			ZBX_SLA_PERIOD_MONTHLY => 'P1M',
-			ZBX_SLA_PERIOD_QUARTERLY => 'P3M',
-			ZBX_SLA_PERIOD_ANNUALLY => 'P1Y'
+			CSlaHelper::PERIOD_DAILY => 'P1D',
+			CSlaHelper::PERIOD_WEEKLY => 'P1W',
+			CSlaHelper::PERIOD_MONTHLY => 'P1M',
+			CSlaHelper::PERIOD_QUARTERLY => 'P3M',
+			CSlaHelper::PERIOD_ANNUALLY => 'P1Y'
 		][$sla['period']]);
 
 		$timezone = new DateTimeZone($sla['timezone']);

@@ -29,9 +29,10 @@ $form = (new CForm())
 
 $header = [
 	make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $data['filter_url'])
+		->addStyle('width: 24%'),
+	make_sorting_header(_('SLO'), 'slo', $data['sort'], $data['sortorder'], $data['filter_url']),
+	make_sorting_header(_('Effective date'), 'effective_date', $data['sort'], $data['sortorder'], $data['filter_url'])
 		->addStyle('width: 14%'),
-	(new CColHeader(_('SLO'))),
-	(new CColHeader(_('Effective date')))->addStyle('width: 24%'),
 	(new CColHeader(_('Reporting period')))->addStyle('width: 14%'),
 	(new CColHeader(_('Timezone'))),
 	(new CColHeader(_('Schedule'))),
@@ -49,10 +50,72 @@ $table = (new CTableInfo())
 	->setHeader($header);
 
 foreach ($data['records'] as $recordid => $record) {
+	if ($data['can_edit']) {
+		$name_element = (new CLink(CHtml::encode($record['name']),
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'services.sla.edit')
+				->setArgument('id', $recordid)
+		))
+			->onClick('view.edit('.json_encode($recordid).')');
+
+		if ($record['status'] == CSlaHelper::SLA_STATUS_ENABLED) {
+			$status_element = (new CLink(_('Enabled'),
+				$data['status_toggle_curl']
+					->setArgument('id', $recordid)
+					->setArgument('status', CSlaHelper::SLA_STATUS_DISABLED)
+					->getUrl()
+			))
+				->addClass(ZBX_STYLE_LINK_ACTION)
+				->addClass(ZBX_STYLE_GREEN)
+				->addConfirmation(_('Disable SLA?'))
+				->addSID();
+		}
+		else {
+			$status_element = (new CLink(_('Disabled'),
+				$data['status_toggle_curl']
+					->setArgument('id', $recordid)
+					->setArgument('status', CSlaHelper::SLA_STATUS_ENABLED)
+					->getUrl()
+			))
+				->addClass(ZBX_STYLE_LINK_ACTION)
+				->addClass(ZBX_STYLE_RED)
+				->addConfirmation(_('Enable SLA?'))
+				->addSID();
+		}
+	}
+	else {
+		$name_element = CHtml::encode($record['name']);
+		$status_element = ($record['status'] == CSlaHelper::SLA_STATUS_ENABLED) ? _('Enabled') : _('Disabled');
+	}
+
+	$schedule_mode = CSlaHelper::scheduleModeToStr($record['schedule_mode']);
+
+	if ($record['schedule_mode'] == CSlaHelper::SCHEDULE_MODE_CUSTOM) {
+		$schedule_mode = (new CCol(
+			(new CLinkAction([
+				$schedule_mode,
+				(new CSpan())->addClass('icon-description')
+			]))
+				->setAjaxHint([
+					'type' => 'sla_schedule',
+					'data' => ['slaid' => $recordid]
+				])
+		))->addClass(ZBX_STYLE_NOWRAP);
+	}
+
 	$row = [
-		$record['name'],
+		$name_element,
 		sprintf('%.4f', $record['slo']),
 		zbx_date2str(DATE_FORMAT, $record['effective_date']),
+		CSlaHelper::periodToStr($record['period']),
+		$record['timezone'],
+		$schedule_mode,
+		(new CLink(_('SLA report'),
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'services.sla.report')
+				->setArgument('slaid', $recordid)
+		))->setTarget('blank'),
+		$status_element
 	];
 
 	if ($data['can_edit']) {
@@ -72,7 +135,7 @@ $form->addItem([
 		'sla.massenable' => [
 			'content' => (new CSimpleButton(_('Enable')))
 				->setAttribute('confirm', _('Enable selected SLAs?'))
-				->onClick('view.massEnable(this);')
+				->onClick('view.massEnable();')
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('no-chkbxrange')
 				->removeAttribute('id')
@@ -80,7 +143,7 @@ $form->addItem([
 		'sla.massdisable' => [
 			'content' => (new CSimpleButton(_('Disable')))
 				->setAttribute('confirm', _('Disable selected SLAs?'))
-				->onClick('view.massDisable(this);')
+				->onClick('view.massDisable();')
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('no-chkbxrange')
 				->removeAttribute('id')
@@ -88,7 +151,7 @@ $form->addItem([
 		'sla.massdelete' => [
 			'content' => (new CSimpleButton(_('Delete')))
 				->setAttribute('confirm', _('Delete selected SLAs?'))
-				->onClick('view.massDeleteSlas(this);')
+				->onClick('view.massDelete();')
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('no-chkbxrange')
 				->removeAttribute('id')

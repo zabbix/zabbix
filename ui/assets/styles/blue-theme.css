@@ -688,6 +688,8 @@ footer {
     line-height: 1.4; }
     .form-grid .table-forms-separator td {
       padding: 5px 5px 5px 0; }
+    .form-grid .table-forms-separator.display-none {
+      display: none; }
 
 .btn-add,
 .btn-edit,
@@ -6623,3 +6625,9 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   .leaflet-control.disabled .geomap-filter-button {
     cursor: default;
     opacity: .4; }
+
+.wrapper > .msg-bad,
+.wrapper > .msg-good,
+.wrapper > .msg-warning {
+  position: fixed;
+  z-index: 5; }

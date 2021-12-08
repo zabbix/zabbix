@@ -67,6 +67,7 @@ class TabIndicators {
 		const MEDIA_TYPE = document.querySelector('#media-type-form');
 		const MAP = document.querySelector('#sysmap-form');
 		const GRAPH = document.querySelector('#widget-dialogue-form');
+		const SLA = document.querySelector('#sla-form');
 
 		switch (true) {
 			case !!TEMPLATE:
@@ -93,6 +94,8 @@ class TabIndicators {
 				return ACTION;
 			case !!SERVICE:
 				return SERVICE;
+			case !!SLA:
+				return SLA;
 			case !!PROXY:
 				return PROXY;
 			case !!USER_GROUP:
@@ -203,6 +206,8 @@ class TabIndicatorFactory {
 				return new OperationsTabIndicatorItem;
 			case 'Sla':
 				return new SlaTabIndicatorItem;
+			case 'SlaDowntimes':
+				return new SlaDowntimeIndicatorItem;
 			case 'ChildServices':
 				return new ChildServicesTabIndicatorItem;
 			case 'Time':
@@ -817,6 +822,34 @@ class SlaTabIndicatorItem extends TabIndicatorItem {
 		if (target_node !== null) {
 			target_node.addEventListener('click', () => {
 				this.addAttributes(element);
+			});
+		}
+	}
+}
+
+class SlaDowntimeIndicatorItem extends TabIndicatorItem {
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_COUNT);
+	}
+
+	getValue() {
+		return document
+			.querySelectorAll('#excluded_downtimes tbody tr:not(:empty')
+			.length;
+	}
+
+	initObserver(element) {
+		const target_node_op = document.querySelector('#excluded_downtimes tbody');
+
+		if (target_node_op !== null) {
+			const observer_op = new MutationObserver(() => {
+				this.addAttributes(element);
+			});
+
+			observer_op.observe(target_node_op, {
+				childList: true,
+				subtree: true
 			});
 		}
 	}

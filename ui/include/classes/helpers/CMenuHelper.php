@@ -88,13 +88,11 @@ class CMenuHelper {
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_SERVICES_SLA)
 				? (new CMenuItem(_('SLA')))
-					->setAction('sla.list')
-					->setAliases(['sla.list.edit'])
+					->setAction('services.sla.list')
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_SERVICES_SLA_REPORT)
 				? (new CMenuItem(_('SLA report')))
-					->setAction('sla_report.list')
-					->setAliases(['sla_report.list.edit'])
+					->setAction('services.sla_report.list')
 				: null
 		];
 

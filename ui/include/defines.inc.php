@@ -644,9 +644,6 @@ define('MAP_LINK_DRAWTYPE_BOLD_LINE',		2);
 define('MAP_LINK_DRAWTYPE_DOT',				3);
 define('MAP_LINK_DRAWTYPE_DASHED_LINE',		4);
 
-define('ZBX_SLA_MAX_REPORTING_PERIODS',		100);
-define('ZBX_SLA_DEFAULT_REPORTING_PERIODS',	20);
-
 define('ZBX_SERVICE_STATUS_CALC_SET_OK',			0);
 define('ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL',	1);
 define('ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE',	2);
@@ -1625,7 +1622,6 @@ define('TAB_INDICATOR_STEPS', 'steps');
 define('TAB_INDICATOR_HTTP_AUTH', 'http-auth');
 define('TAB_INDICATOR_OPERATIONS', 'operations');
 define('TAB_INDICATOR_SLA', 'sla');
-define('TAB_INDICATOR_SLA_DOWNTIMES', 'sla-downtimes');
 define('TAB_INDICATOR_CHILD_SERVICES', 'child-services');
 define('TAB_INDICATOR_TIME', 'time');
 define('TAB_INDICATOR_TAG_FILTER', 'tag-filter');
