@@ -322,23 +322,7 @@ static void	set_daemon_signal_handlers(void)
 	sigaction(SIGPIPE, &phan, NULL);
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: daemon_start                                                     *
- *                                                                            *
- * Purpose: init process as daemon                                            *
- *                                                                            *
- * Parameters: allow_root - allow root permission for application             *
- *             user       - user on the system to which to drop the           *
- *                          privileges                                        *
- *             flags      - daemon startup flags                              *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments: it doesn't allow running under 'root' if allow_root is zero      *
- *                                                                            *
- ******************************************************************************/
-int	daemon_start(int allow_root, const char *user, unsigned int flags)
+void	daemon_change_user(int allow_root, const char *user)
 {
 	struct passwd	*pwd;
 
@@ -391,7 +375,26 @@ int	daemon_start(int allow_root, const char *user, unsigned int flags)
 		}
 #endif
 	}
+}
 
+/******************************************************************************
+ *                                                                            *
+ * Function: daemon_start                                                     *
+ *                                                                            *
+ * Purpose: init process as daemon                                            *
+ *                                                                            *
+ * Parameters: allow_root - allow root permission for application             *
+ *             user       - user on the system to which to drop the           *
+ *                          privileges                                        *
+ *             flags      - daemon startup flags                              *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: it doesn't allow running under 'root' if allow_root is zero      *
+ *                                                                            *
+ ******************************************************************************/
+int	daemon_start(unsigned int flags)
+{
 	umask(0002);
 
 	if (0 == (flags & ZBX_TASK_FLAG_FOREGROUND))

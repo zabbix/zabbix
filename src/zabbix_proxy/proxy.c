@@ -1038,6 +1038,8 @@ int	main(int argc, char **argv)
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
 		exit(SUCCEED == zbx_sigusr_send(t.data) ? EXIT_SUCCESS : EXIT_FAILURE);
 
+	daemon_change_user(CONFIG_ALLOW_ROOT, CONFIG_USER);
+
 	if (FAIL == zbx_ipc_service_init_env(CONFIG_SOCKET_PATH, &error))
 	{
 		zbx_error("Cannot initialize IPC services: %s", error);
@@ -1045,7 +1047,7 @@ int	main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 
-	return daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags);
+	return daemon_start(t.flags);
 }
 
 static void	zbx_main_sigusr_handler(int flags)
