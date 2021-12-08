@@ -268,10 +268,11 @@ class CHttpTestManager {
 				'http_user', 'http_password', 'hostid', 'templateid', 'http_proxy', 'retries', 'ssl_cert_file',
 				'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host', 'variables', 'headers'
 			],
-			'hostids' => $templateId,
 			'selectSteps' => ['httpstepid', 'name', 'no', 'url', 'timeout', 'posts', 'required', 'status_codes',
 				'follow_redirects', 'retrieve_mode', 'variables', 'headers', 'query_fields'
 			],
+			'hostids' => $templateId,
+			'nopermissions' => true,
 			'preservekeys' => true
 		]);
 

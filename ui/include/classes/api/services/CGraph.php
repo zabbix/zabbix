@@ -496,11 +496,12 @@ class CGraph extends CGraphGeneral {
 		}
 
 		$graphs = $this->get([
-			'hostids' => $data['templateids'],
-			'preservekeys' => true,
 			'output' => API_OUTPUT_EXTEND,
 			'selectGraphItems' => API_OUTPUT_EXTEND,
-			'selectHosts' => ['hostid']
+			'selectHosts' => ['hostid'],
+			'hostids' => $data['templateids'],
+			'nopermissions' => true,
+			'preservekeys' => true
 		]);
 
 		foreach ($graphs as $graph) {

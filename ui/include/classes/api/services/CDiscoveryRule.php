@@ -663,6 +663,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'selectLLDMacroPaths' => ['lld_macro', 'path'],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'selectOverrides' => ['name', 'step', 'stop', 'filter', 'operations'],
+			'nopermissions' => true,
 			'preservekeys' => true
 		]);
 

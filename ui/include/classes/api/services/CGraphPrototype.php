@@ -509,12 +509,13 @@ class CGraphPrototype extends CGraphGeneral {
 		}
 
 		$graphs = $this->get([
-			'hostids' => $data['templateids'],
-			'preservekeys' => true,
 			'output' => API_OUTPUT_EXTEND,
 			'selectGraphItems' => API_OUTPUT_EXTEND,
 			'selectHosts' => ['hostid'],
-			'filter' => ['flags' => null]
+			'hostids' => $data['templateids'],
+			'filter' => ['flags' => null],
+			'nopermissions' => true,
+			'preservekeys' => true
 		]);
 
 		foreach ($graphs as $graph) {

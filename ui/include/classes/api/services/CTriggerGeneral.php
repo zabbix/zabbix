@@ -1820,6 +1820,7 @@ abstract class CTriggerGeneral extends CApiService {
 			'output' => $output,
 			'selectTags' => ['tag', 'value'],
 			'hostids' => $data['templateids'],
+			'nopermissions' => true,
 			'preservekeys' => true
 		]);
 

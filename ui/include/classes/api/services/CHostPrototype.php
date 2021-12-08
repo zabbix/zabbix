@@ -914,14 +914,15 @@ class CHostPrototype extends CHostBase {
 			'hostids' => $data['templateids']
 		]);
 		$hostPrototypes = $this->get([
-			'discoveryids' => zbx_objectValues($discoveryRules, 'itemid'),
-			'preservekeys' => true,
 			'output' => API_OUTPUT_EXTEND,
 			'selectGroupLinks' => API_OUTPUT_EXTEND,
 			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
 			'selectMacros' => ['macro', 'type', 'value', 'description'],
 			'selectTemplates' => ['templateid'],
-			'selectDiscoveryRule' => ['itemid']
+			'selectDiscoveryRule' => ['itemid'],
+			'discoveryids' => array_column($discoveryRules, 'itemid'),
+			'nopermissions' => true,
+			'preservekeys' => true
 		]);
 
 		foreach ($hostPrototypes as &$hostPrototype) {
