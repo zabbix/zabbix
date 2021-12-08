@@ -357,3 +357,9 @@ $triggers_form->addItem([
 $widget->addItem($triggers_form);
 
 $widget->show();
+
+(new CScriptTag('
+	view.init();
+'))
+	->setOnDocumentReady()
+	->show();
