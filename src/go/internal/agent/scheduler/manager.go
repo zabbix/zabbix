@@ -252,13 +252,14 @@ func (m *Manager) processQueue(now time.Time) {
 func (m *Manager) processAndFlushUserParamQueue(now time.Time) {
 	seconds := now.Unix()
 	num := m.pluginQueue.Len()
+	var pluginsBuf []*pluginAgent
 
 	for p := m.pluginQueue.Peek(); p != nil && num > 0; p = m.pluginQueue.Peek() {
 		heap.Pop(&m.pluginQueue)
 		num--
 
 		if !p.usrprm {
-			heap.Push(&m.pluginQueue, p)
+			pluginsBuf = append(pluginsBuf, p)
 			continue
 		}
 
@@ -271,6 +272,10 @@ func (m *Manager) processAndFlushUserParamQueue(now time.Time) {
 			p.reserveCapacity(p.popTask())
 			task.perform(m)
 		}
+	}
+
+	for _, p := range pluginsBuf {
+		m.pluginQueue.Push(p)
 	}
 }
 
@@ -404,8 +409,16 @@ run:
 				var keys []string
 				var rerr error
 
+				metrics := plugin.ClearUserParamMetrics()
+
+				if keys, rerr = agent.InitUserParameterPlugin(agent.Options.UserParameter,
+					agent.Options.UnsafeUserParameters, agent.Options.UserParameterDir); rerr != nil {
+					plugin.RestoreUserParamMetrics(metrics)
+					v.sink <- "cannot process user parameters request: " + rerr.Error()
+					continue
+				}
+
 				m.processAndFlushUserParamQueue(time.Now())
-				plugin.ClearUserParamMetrics()
 
 				tasks := make(map[string]performerHeap)
 
@@ -414,12 +427,6 @@ run:
 						tasks[key] = plg.tasks
 						delete(m.plugins, key)
 					}
-				}
-
-				if keys, rerr = agent.InitUserParameterPlugin(agent.Options.UserParameter,
-					agent.Options.UnsafeUserParameters, agent.Options.UserParameterDir); rerr != nil {
-					v.sink <- "cannot process user parameters request: " + rerr.Error()
-					continue
 				}
 
 				for _, key := range keys {
