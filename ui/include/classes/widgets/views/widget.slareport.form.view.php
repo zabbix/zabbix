@@ -35,7 +35,7 @@ $form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dia
 	$data['dialogue']['view_mode'], $data['known_widget_types'], $rf_rate_field
 );
 
-$scripts = [];
+$scripts = [$this->readJsFile('../../../include/classes/widgets/views/js/widget.slareport.form.view.js.php')];
 
 // SLA.
 $field_slaids = CWidgetHelper::getSla($fields['slaids'], $data['captions']['ms']['slas']['slaids'],
@@ -50,35 +50,12 @@ $field_serviceids = CWidgetHelper::getService($fields['serviceids'], $data['capt
 );
 $form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['serviceids']), $field_serviceids);
 $scripts[] = $field_serviceids->getPostJS();
-$scripts[] = '
-	jQuery("#'.$fields['serviceids']->getName().'_").multiSelect("getSelectButton").addEventListener("click", () => {
-		const exclude_serviceids = [];
-
-		for (const service of jQuery("#'.$fields['serviceids']->getName().'_").multiSelect("getData")) {
-			exclude_serviceids.push(service.id);
-		}
-
-		const overlay = PopUp("popup.services", {
-			title: '.json_encode(_('Add services')).',
-			exclude_serviceids
-		}, "services", document.activeElement);
-
-		overlay.$dialogue[0].addEventListener("dialogue.submit", (e) => {
-			const data = [];
-
-			for (const service of e.detail) {
-				data.push({id: service.serviceid, name: service.name});
-			}
-
-			jQuery("#'.$fields['serviceids']->getName().'_").multiSelect("addData", data);
-		});
-	});
-';
 
 // Show periods.
 $form_list->addRow(
 	CWidgetHelper::getLabel($fields['show_periods']),
-	CWidgetHelper::getNumericBox($fields['show_periods'])
+	CWidgetHelper::getNumericBox($fields['show_periods']),
+	'js-show_periods'
 );
 
 // Date from.
@@ -98,6 +75,14 @@ $form_list->addRow(
 );
 
 $form->addItem($form_list);
+
+$form->addItem(
+	(new CScriptTag('
+		widget_slareport.init('.json_encode([
+			'serviceids_field_id' => $fields['serviceids']->getName()
+		]).');
+	'))->setOnDocumentReady()
+);
 
 return [
 	'form' => $form,
