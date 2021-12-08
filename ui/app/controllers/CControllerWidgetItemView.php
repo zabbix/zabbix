@@ -87,10 +87,10 @@ class CControllerWidgetItemView extends CControllerWidget {
 		$show = array_flip($fields['show']);
 
 		/*
-		 * Select orignal item name in several cases: if user is in normal dashboards or in template dashboards when
+		 * Select original item name in several cases: if user is in normal dashboards or in template dashboards when
 		 * user is in view mode to display that item name in widget name. Item name will be resolved using standard
 		 * macro resolving and the "name_expanded" will be used afterwards. Item name should be select only if it is not
-		 * overwritten. Host name can be attached to item name with delimiter when user is in normal dashbords.
+		 * overwritten. Host name can be attached to item name with delimiter when user is in normal dashboards.
 		 */
 		if ($this->getInput('name', '') === '') {
 			if ($this->getContext() === CWidgetConfig::CONTEXT_DASHBOARD
