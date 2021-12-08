@@ -45,7 +45,7 @@ class CWidgetFormSlaReport extends CWidgetForm
 
 		// Show periods.
 		$field_show_periods = (new CWidgetFieldNumericBox('show_periods', _('Show periods')))
-			->setDefault(ZBX_SLA_DEFAULT_REPORTING_PERIODS)
+			->setDefault(20) // TODO: Get from constant
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
 
 		if (array_key_exists('serviceids', $this->data) && $this->data['serviceids']) {

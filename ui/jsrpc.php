@@ -592,6 +592,24 @@ switch ($data['method']) {
 					$result = CArrayHelper::renameObjectsKeys($services, ['serviceid' => 'id']);
 				}
 				break;
+
+			case 'sla':
+				$slas = API::Sla()->get([
+					'output' => ['slaid', 'name'],
+					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
+					'limit' => $limit
+				]);
+
+				if ($slas) {
+					CArrayHelper::sort($slas, [['field' => 'name', 'order' => ZBX_SORT_UP]]);
+
+					if (array_key_exists('limit', $data)) {
+						$slas = array_slice($slas, 0, $data['limit']);
+					}
+
+					$result = CArrayHelper::renameObjectsKeys($slas, ['slaid' => 'id']);
+				}
+				break;
 		}
 		break;
 
