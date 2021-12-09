@@ -52,7 +52,7 @@ trait FilterTrait {
 				[
 					'name' => 'operator',
 					'selector' => 'xpath:./z-select',
-					'class' => 'CDropdownElement'
+					'class' => 'CZDropdownElement'
 				],
 				[
 					'name' => 'value',

@@ -668,7 +668,13 @@ class CLegacyWebTest extends CWebTest {
 	protected function getDropdown($id) {
 		foreach (['id', 'name'] as $type) {
 			foreach ($this->query($type, $id)->all() as $element) {
-				return $element->asDropdown();
+				switch ($element->getTagName()) {
+					case 'select':
+						return $element->asDropdown();
+
+					case 'z-select':
+						return $element->asZDropdown();
+				}
 			}
 		}
 
