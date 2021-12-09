@@ -38,18 +38,18 @@ require_once dirname(__FILE__).'/hosts/testFormHostMonitoring.php';
 require_once dirname(__FILE__).'/hosts/testFormHostStandalone.php';
 
 // Items.
-require_once dirname(__FILE__).'/items/testItemTypeSelection.php';
 require_once dirname(__FILE__).'/items/testFormItem.php';
 require_once dirname(__FILE__).'/items/testFormItemHttpAgent.php';
 require_once dirname(__FILE__).'/items/testFormItemPrototype.php';
-require_once dirname(__FILE__).'/items/testFormulaCalculatedItem.php';
-require_once dirname(__FILE__).'/items/testFormulaCalculatedItemPrototype.php';
-require_once dirname(__FILE__).'/items/testPageItems.php';
-require_once dirname(__FILE__).'/items/testPageItemPrototypes.php';
 require_once dirname(__FILE__).'/items/testFormTestItem.php';
 require_once dirname(__FILE__).'/items/testFormTestItemPrototype.php';
+require_once dirname(__FILE__).'/items/testFormulaCalculatedItem.php';
+require_once dirname(__FILE__).'/items/testFormulaCalculatedItemPrototype.php';
 require_once dirname(__FILE__).'/items/testInheritanceItem.php';
 require_once dirname(__FILE__).'/items/testInheritanceItemPrototype.php';
+require_once dirname(__FILE__).'/items/testItemTypeSelection.php';
+require_once dirname(__FILE__).'/items/testPageItemPrototypes.php';
+require_once dirname(__FILE__).'/items/testPageItems.php';
 
 // LLD.
 require_once dirname(__FILE__).'/lld/testFormLowLevelDiscovery.php';
@@ -96,6 +96,7 @@ require_once dirname(__FILE__).'/users/testFormUser.php';
 require_once dirname(__FILE__).'/users/testFormUserMedia.php';
 require_once dirname(__FILE__).'/users/testFormUserPermissions.php';
 require_once dirname(__FILE__).'/users/testFormUserProfile.php';
+require_once dirname(__FILE__).'/users/testPageUsers.php';
 
 require_once dirname(__FILE__).'/testGraphAxis.php';
 require_once dirname(__FILE__).'/testPageDashboard.php';
@@ -144,7 +145,6 @@ require_once dirname(__FILE__).'/testPageStatusOfZabbix.php';
 require_once dirname(__FILE__).'/testPageTemplates.php';
 require_once dirname(__FILE__).'/testPageTriggerDescription.php';
 require_once dirname(__FILE__).'/testPageUserGroups.php';
-require_once dirname(__FILE__).'/testPageUsers.php';
 require_once dirname(__FILE__).'/testExpandExpressionMacros.php';
 require_once dirname(__FILE__).'/testFormAction.php';
 require_once dirname(__FILE__).'/testFormAdministrationAuthenticationHttp.php';
@@ -243,6 +243,8 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormTestItemPrototype');
 		$suite->addTestSuite('testFormulaCalculatedItem');
 		$suite->addTestSuite('testFormulaCalculatedItemPrototype');
+		$suite->addTestSuite('testInheritanceItem');
+		$suite->addTestSuite('testInheritanceItemPrototype');
 		$suite->addTestSuite('testItemTypeSelection');
 		$suite->addTestSuite('testPageItemPrototypes');
 		$suite->addTestSuite('testPageItems');
@@ -292,6 +294,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormUserMedia');
 		$suite->addTestSuite('testFormUserPermissions');
 		$suite->addTestSuite('testFormUserProfile');
+		$suite->addTestSuite('testPageUsers');
 
 		$suite->addTestSuite('testGraphAxis');
 		$suite->addTestSuite('testPageActions');
@@ -338,7 +341,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageStatusOfZabbix');
 		$suite->addTestSuite('testPageTemplates');
 		$suite->addTestSuite('testPageUserGroups');
-		$suite->addTestSuite('testPageUsers');
 		$suite->addTestSuite('testPageWeb');
 		$suite->addTestSuite('testPasswordComplexity');
 		$suite->addTestSuite('testExpandExpressionMacros');
@@ -367,8 +369,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormFilterProblems');
 		$suite->addTestSuite('testFormGraph');
 		$suite->addTestSuite('testFormGraphPrototype');
-		$suite->addTestSuite('testInheritanceItem');
-		$suite->addTestSuite('testInheritanceItemPrototype');
 		$suite->addTestSuite('testFormHostGroup');
 		$suite->addTestSuite('testFormHostLinkTemplates');
 		$suite->addTestSuite('testFormHostPrototype');
