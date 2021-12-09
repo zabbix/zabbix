@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-12-08T16:53:29Z'
+  date: '2021-12-09T12:30:27Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -357,7 +357,7 @@ zabbix_export:
               value: VMware
         -
           uuid: 50de05f27f33425cb207a3fdece7ecb1
-          name: 'VMware: CPU swap-in latence in percents'
+          name: 'VMware: CPU swap-in latency in percents'
           type: SIMPLE
           key: 'vmware.vm.cpu.swapwait[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           history: 7d

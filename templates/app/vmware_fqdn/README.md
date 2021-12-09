@@ -125,7 +125,7 @@ No specific Zabbix configuration is required.
 |VMware |VMware: CPU usage in percents |<p>CPU usage as a percentage during the interval.</p> |SIMPLE |vmware.vm.cpu.usage.perf[{$VMWARE.URL},{$VMWARE.VM.UUID}] |
 |VMware |VMware: CPU latency in percents |<p>Percentage of time the virtual machine is unable to run because it is contending for access to the physical CPU(s).</p> |SIMPLE |vmware.vm.cpu.latency[{$VMWARE.URL},{$VMWARE.VM.UUID}] |
 |VMware |VMware: CPU readiness latency in percents |<p>Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU.</p> |SIMPLE |vmware.vm.cpu.readiness[{$VMWARE.URL},{$VMWARE.VM.UUID}] |
-|VMware |VMware: CPU swap-in latence in percents |<p>Percentage of CPU time spent waiting for swap-in.</p> |SIMPLE |vmware.vm.cpu.swapwait[{$VMWARE.URL},{$VMWARE.VM.UUID}] |
+|VMware |VMware: CPU swap-in latency in percents |<p>Percentage of CPU time spent waiting for swap-in.</p> |SIMPLE |vmware.vm.cpu.swapwait[{$VMWARE.URL},{$VMWARE.VM.UUID}] |
 |VMware |VMware: Uptime of guest OS |<p>Total time elapsed since the last operating system boot-up (in seconds).</p> |SIMPLE |vmware.vm.guest.osuptime[{$VMWARE.URL},{$VMWARE.VM.UUID}] |
 |VMware |VMware: Number of bytes received on interface {#IFDESC} |<p>VMware virtual machine network interface input statistics (bytes per second).</p> |SIMPLE |vmware.vm.net.if.in[{$VMWARE.URL},{$VMWARE.VM.UUID},{#IFNAME},bps] |
 |VMware |VMware: Number of packets received on interface {#IFDESC} |<p>VMware virtual machine network interface input statistics (packets per second).</p> |SIMPLE |vmware.vm.net.if.in[{$VMWARE.URL},{$VMWARE.VM.UUID},{#IFNAME},pps] |
