@@ -53,7 +53,7 @@ static zbx_uint32_t	fields_calc_size(zbx_packed_field_t *fields, int fields_num)
 		{
 			field_size = (NULL != fields[i].value) ? (zbx_uint32_t)strlen((const char *)fields[i].value) + 1 : 0;
 			fields[i].size = (zbx_uint32_t)field_size;
-			field_size += sizeof(zbx_uint32_t);
+			field_size += (zbx_uint32_t)sizeof(zbx_uint32_t);
 		}
 		else
 			field_size = fields[i].size;
@@ -88,7 +88,7 @@ static zbx_uint32_t	fields_pack(const zbx_packed_field_t *fields, int fields_num
 		offset += fields[i].size;
 	}
 
-	return offset - data;
+	return (zbx_uint32_t)(offset - data);
 }
 
 static int	message_pack_fields(zbx_ipc_message_t *message, const zbx_packed_field_t *fields,
@@ -195,7 +195,7 @@ static zbx_uint32_t	preprocessor_pack_value(zbx_ipc_message_t *message, zbx_prep
 		}
 	}
 
-	return message_pack_data(message, fields, offset - fields);
+	return message_pack_data(message, fields, (int)(offset - fields));
 }
 
 /******************************************************************************
@@ -366,7 +366,7 @@ static int	preprocesser_unpack_variant(const unsigned char *data, zbx_variant_t 
 			break;
 	}
 
-	return offset - data;
+	return (int)(offset - data);
 }
 
 /******************************************************************************
@@ -407,7 +407,7 @@ static int	preprocesser_unpack_history(const unsigned char *data, zbx_vector_ptr
 		}
 	}
 
-	return offset - data;
+	return (int)(offset - data);
 }
 
 /******************************************************************************
@@ -432,7 +432,7 @@ static int	preprocessor_unpack_step(const unsigned char *data, zbx_preproc_op_t 
 	offset += zbx_deserialize_char(offset, &step->error_handler);
 	offset += zbx_deserialize_str(offset, &step->error_handler_params, value_len);
 
-	return offset - data;
+	return (int)(offset - data);
 }
 
 /******************************************************************************
@@ -463,7 +463,7 @@ static int	preprocessor_unpack_steps(const unsigned char *data, zbx_preproc_op_t
 	else
 		*steps = NULL;
 
-	return offset - data;
+	return (int)(offset - data);
 }
 
 /******************************************************************************
@@ -519,7 +519,7 @@ zbx_uint32_t	zbx_preprocessor_pack_task(unsigned char **data, zbx_uint64_t itemi
 	offset += preprocessor_pack_steps(offset, steps, &steps_num);
 
 	zbx_ipc_message_init(&message);
-	size = message_pack_data(&message, fields, offset - fields);
+	size = message_pack_data(&message, fields, (int)(offset - fields));
 	*data = message.data;
 	zbx_free(fields);
 
@@ -624,14 +624,14 @@ void	zbx_preprocessor_pack_dep_request(const zbx_variant_t *value, const zbx_tim
 		offset += preprocessor_pack_steps(offset, deps[i].steps, &deps[i].steps_num);
 		offset += preprocessor_pack_history(offset, &deps[i].history, &deps[i].history.values_num);
 
-		dep_num = offset - dep;
+		dep_num = (int)(offset - dep);
 		dep_size = fields_calc_size(dep, dep_num);
 
 		if (ZBX_PREPROC_MAX_PACKET_SIZE - dep_size < size)
 		{
 			batch_num = i - sent_num;
 
-			if (SUCCEED != (preprocessor_append_packed_message(fields, dep - fields, size,
+			if (SUCCEED != (preprocessor_append_packed_message(fields, (int)(dep - fields), size,
 					ZBX_IPC_PREPROCESSOR_DEP_REQUEST, messages)))
 			{
 				goto out;
@@ -651,7 +651,7 @@ void	zbx_preprocessor_pack_dep_request(const zbx_variant_t *value, const zbx_tim
 	}
 
 	batch_num = i - sent_num;
-	(void)preprocessor_append_packed_message(fields, offset - fields, size, ZBX_IPC_PREPROCESSOR_DEP_REQUEST,
+	(void)preprocessor_append_packed_message(fields, (int)(offset - fields), size, ZBX_IPC_PREPROCESSOR_DEP_REQUEST,
 			messages);
 out:
 	zbx_free(fields);
@@ -694,7 +694,7 @@ zbx_uint32_t	zbx_preprocessor_pack_result(unsigned char **data, zbx_variant_t *v
 	*offset++ = PACKED_FIELD(error, 0);
 
 	zbx_ipc_message_init(&message);
-	size = message_pack_data(&message, fields, offset - fields);
+	size = message_pack_data(&message, fields, (int)(offset - fields));
 	*data = message.data;
 
 	zbx_free(fields);
@@ -735,7 +735,7 @@ void	zbx_preprocessor_result_init(zbx_preproc_result_buffer_t *buf, int total_nu
 	buf->data = (unsigned char *)zbx_malloc(NULL, buf->data_alloc);
 	buf->data_offset = zbx_serialize_value(buf->data, total_num);
 	/* reserve space for number of results in batch */
-	buf->data_offset += sizeof(int);
+	buf->data_offset += (zbx_uint32_t)sizeof(int);
 
 	/* reserve fields for result + one history record */
 	buf->fields_num = 12;
@@ -799,7 +799,7 @@ void	zbx_preprocessor_result_append(zbx_preproc_result_buffer_t *buf, zbx_uint64
 	*offset++ = PACKED_FIELD(error, 0);
 	offset += preprocessor_pack_history(offset, history, &history->values_num);
 
-	result_size = fields_calc_size(buf->fields, offset - buf->fields);
+	result_size = fields_calc_size(buf->fields, (int)(offset - buf->fields));
 
 	if (ZBX_PREPROC_MAX_PACKET_SIZE - sizeof(int) < result_size)
 	{
@@ -830,7 +830,7 @@ void	zbx_preprocessor_result_append(zbx_preproc_result_buffer_t *buf, zbx_uint64
 		buf->data = (unsigned char *)zbx_realloc(buf->data, buf->data_alloc);
 	}
 
-	buf->data_offset += fields_pack(buf->fields, offset - buf->fields, buf->data + buf->data_offset);
+	buf->data_offset += fields_pack(buf->fields, (int)(offset - buf->fields), buf->data + buf->data_offset);
 	buf->results_num++;
 }
 
@@ -1065,7 +1065,7 @@ zbx_uint32_t	zbx_preprocessor_unpack_value(zbx_preproc_item_value_t *value, unsi
 
 	value->result = agent_result;
 
-	return offset - data;
+	return (int)(offset - data);
 }
 
 /******************************************************************************
