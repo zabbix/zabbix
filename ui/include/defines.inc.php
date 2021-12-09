@@ -22,7 +22,7 @@ define('ZABBIX_VERSION',		'6.0.0alpha8');
 define('ZABBIX_API_VERSION',	'6.0.0');
 define('ZABBIX_EXPORT_VERSION',	'6.0');
 
-define('ZABBIX_DB_VERSION',		5050113);
+define('ZABBIX_DB_VERSION',		5050114);
 
 define('DB_VERSION_SUPPORTED',				0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',		1);
@@ -615,6 +615,16 @@ define('ZBX_PREPROC_FAIL_SET_ERROR',		3);
 
 define('ZBX_PREPROC_CSV_NO_HEADER',	0);
 define('ZBX_PREPROC_CSV_HEADER',	1);
+
+define('ZBX_PREPROC_PROMETHEUS_VALUE', 'value');
+define('ZBX_PREPROC_PROMETHEUS_LABEL', 'label');
+define('ZBX_PREPROC_PROMETHEUS_FUNCTION', 'function');
+
+define('ZBX_PREPROC_PROMETHEUS_SUM',   'sum');
+define('ZBX_PREPROC_PROMETHEUS_MIN',   'min');
+define('ZBX_PREPROC_PROMETHEUS_MAX',   'max');
+define('ZBX_PREPROC_PROMETHEUS_AVG',   'avg');
+define('ZBX_PREPROC_PROMETHEUS_COUNT', 'count');
 
 // LLD rule overrides.
 define('ZBX_LLD_OVERRIDE_STOP_NO',	0);

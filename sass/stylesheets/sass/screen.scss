@@ -4969,7 +4969,6 @@ svg {
 		min-width: 0; // https://stackoverflow.com/a/43361500
 	}
 
-	input[type=text],
 	.btn-link {
 		&:not(:last-of-type) {
 			margin-right: 10px;
@@ -5005,6 +5004,17 @@ svg {
 
 	.step-parameters {
 		flex: 1;
+
+		z-select {
+			flex: 0 0 auto;
+		}
+
+		> input[type=text],
+		z-select {
+			&:not(:last-child) {
+				margin-right: 5px;
+			}
+		}
 	}
 
 	.step-on-fail {
