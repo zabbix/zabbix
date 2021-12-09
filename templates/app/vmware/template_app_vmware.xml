@@ -398,7 +398,7 @@ Template tooling version used: 0.39</description>
                </applications>
             </item>
             <item>
-               <name>VMware: CPU swap-in latence in percents</name>
+               <name>VMware: CPU swap-in latency in percents</name>
                <type>SIMPLE</type>
                <key>vmware.vm.cpu.swapwait[{$VMWARE.URL},{$VMWARE.VM.UUID}]</key>
                <history>7d</history>
