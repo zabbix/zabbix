@@ -6577,12 +6577,6 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
     cursor: default;
     opacity: .4; }
 
-.wrapper > .msg-bad,
-.wrapper > .msg-good,
-.wrapper > .msg-warning {
-  position: fixed;
-  z-index: 5; }
-
 .sidebar .logo:focus .sidebar-logo {
   box-shadow: 0 0 0 2px #000000; }
 .sidebar button:focus {

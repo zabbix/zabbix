@@ -88,11 +88,11 @@ class CMenuHelper {
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_SERVICES_SLA)
 				? (new CMenuItem(_('SLA')))
-					->setAction('services.sla.list')
+					->setAction('sla.list')
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_SERVICES_SLA_REPORT)
 				? (new CMenuItem(_('SLA report')))
-					->setAction('services.sla_report.list')
+					->setAction('sla_report.list')
 				: null
 		];
 

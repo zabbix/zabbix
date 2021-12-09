@@ -97,6 +97,9 @@ class CSlaHelper {
 		}
 
 		foreach ($schedule_periods as $period) {
+			$period['period_from'] = (int) $period['period_from'];
+			$period['period_to'] = (int) $period['period_to'];
+
 			while (date('Y-m-d', $period['period_from']) != date('Y-m-d', $period['period_to'])) {
 				$inject = [
 					'period_from' => $period['period_from'],
@@ -112,6 +115,6 @@ class CSlaHelper {
 
 		// @TODO: intersections, if not weeded out by API.
 
-		return array_filter($schedule);
+		return $schedule;
 	}
 }

@@ -6507,12 +6507,3 @@ z-select,
 		}
 	}
 }
-
-.wrapper {
-	> .msg-bad,
-	> .msg-good,
-	> .msg-warning {
-		position: fixed;
-		z-index: 5;
-	}
-}

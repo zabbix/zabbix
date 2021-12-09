@@ -368,9 +368,6 @@ var hintBox = {
 
 			case 'eventactions':
 				return 'hintbox.actionlist';
-
-			case 'sla_schedule':
-				return 'hintbox.sla_schedule';
 		}
 	},
 

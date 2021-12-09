@@ -27,21 +27,16 @@
 <script>
 	const view = {
 		mode_switch_url: null,
-		refresh_url: null,
-		refresh_interval: null,
-		back_url: null,
-		is_refresh_paused: false,
-		is_refresh_pending: false,
+		list_update_url: null,
+		list_delete_url: null,
 
-		init({mode_switch_url, refresh_url, refresh_interval, back_url = null}) {
+		init({mode_switch_url, list_update_url, list_delete_url}) {
 			this.mode_switch_url = mode_switch_url;
-			this.refresh_url = refresh_url;
-			this.refresh_interval = refresh_interval;
-			this.back_url = back_url;
+			this.list_update_url = list_update_url;
+			this.list_delete_url = list_delete_url;
 
 			this.initViewModeSwitcher();
 			this.initTagFilter();
-			this.initRefresh();
 		},
 
 		initViewModeSwitcher() {
@@ -59,6 +54,7 @@
 				.dynamicRows({template: '#filter-tag-row-tmpl'})
 				.on('afteradd.dynamicRows', function() {
 					const rows = this.querySelectorAll('.form_row');
+
 					new CTagFilterItem(rows[rows.length - 1]);
 				});
 
@@ -67,15 +63,7 @@
 			});
 		},
 
-		initRefresh() {
-			if (this.refresh_interval > 0) {
-				setInterval(() => this.refresh(), this.refresh_interval);
-			}
-		},
-
 		edit(options = {}) {
-			this.pauseRefresh();
-
 			const overlay = PopUp('popup.sla.edit', options, 'sla_edit', document.activeElement);
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
@@ -87,8 +75,6 @@
 
 				location.href = location.href;
 			});
-
-			overlay.$dialogue[0].addEventListener('overlay.close', () => this.resumeRefresh(), {once: true});
 		},
 
 		massEnable() {
@@ -100,48 +86,55 @@
 		},
 
 		massToggle(status) {
-			const curl = new Curl('zabbix.php');
-
-			curl.setArgument('action', 'services.sla.massupdate');
-			curl.setArgument('status', status);
-
-			this.massProcess(curl);
+			this.massProcess(this.list_update_url, {status});
 		},
 
 		massDelete() {
-			const curl = new Curl('zabbix.php');
-
-			curl.setArgument('action', 'services.sla.delete');
-			this.massProcess(curl)
+			this.massProcess(this.list_delete_url)
 		},
 
-		massProcess(curl) {
+		massProcess(endpoint_url, data = {}) {
 			const record_list = document.getElementById('sla-list');
 
-			this.pauseRefresh();
 			record_list.classList.add('is-loading', 'is-loading-fadein', 'delayed-15s');
 
-			fetch(curl.getUrl(), {
+			data = Object.assign(data, {
+				slaids: Object.values(chkbxRange.getSelectedIds()),
+				sid: document.querySelector('meta[name="csrf-token"]').content
+			});
+
+			fetch(endpoint_url, {
 				method: 'POST',
-				headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
-				body: urlEncodeData({ids: Object.values(chkbxRange.getSelectedIds())})
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify(data)
 			})
 				.then((response) => response.json())
 				.then((response) => {
-					if ('errors' in response) {
-						const keepids = ('keepids' in response) ? response.keepids : [];
+					uncheckTableRows('slas', ('keepids' in response) ? response.keepids : []);
+					clearMessages();
 
-						clearMessages();
+					if ('errors' in response) {
 						addMessage(response.errors);
-						uncheckTableRows('slas', keepids);
-					}
-					else {
+
 						if ('messages' in response) {
-							clearMessages();
 							addMessage(response.messages);
 						}
+					}
+					else {
+						if ('title' in response) {
+							postMessageOk(response.title);
 
-						uncheckTableRows('slas');
+							if ('messages' in response) {
+								postMessageDetails('success', response.messages);
+							}
+
+							location.href = location.href;
+							return true;
+						}
+
+						if ('messages' in response) {
+							addMessage(response.messages);
+						}
 					}
 				})
 				.catch(() => {
@@ -153,55 +146,6 @@
 				})
 				.finally(() => {
 					record_list.classList.remove('is-loading', 'is-loading-fadein', 'delayed-15s');
-					this.resumeRefresh();
-				});
-		},
-
-		pauseRefresh() {
-			this.is_refresh_paused = true;
-		},
-
-		resumeRefresh() {
-			this.is_refresh_paused = false;
-		},
-
-		refresh() {
-			if (this.is_refresh_paused || this.is_refresh_pending) {
-				return;
-			}
-
-			const record_list = document.getElementById('sla-list');
-
-			if (record_list.querySelectorAll('[data-expanded="true"], [aria-expanded="true"]').length > 0) {
-				return;
-			}
-
-			this.is_refresh_pending = true;
-
-			record_list.classList.add('is-loading', 'is-loading-fadein', 'delayed-15s');
-
-			fetch(this.refresh_url)
-				.then((response) => response.json())
-				.then((response) => {
-					if ('errors' in response) {
-						clearMessages();
-						addMessage(response.errors);
-					}
-					else {
-						if ('messages' in response) {
-							clearMessages();
-							addMessage(response.messages);
-						}
-
-						record_list.outerHTML = response.body;
-
-						chkbxRange.init();
-					}
-				})
-				.finally(() => {
-					record_list.classList.remove('is-loading', 'is-loading-fadein', 'delayed-15s');
-
-					this.is_refresh_pending = false;
 				});
 		}
 	};

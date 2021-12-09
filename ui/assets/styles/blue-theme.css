@@ -6625,9 +6625,3 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   .leaflet-control.disabled .geomap-filter-button {
     cursor: default;
     opacity: .4; }
-
-.wrapper > .msg-bad,
-.wrapper > .msg-good,
-.wrapper > .msg-warning {
-  position: fixed;
-  z-index: 5; }

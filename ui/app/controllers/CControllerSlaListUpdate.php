@@ -19,7 +19,9 @@
 **/
 
 
-class CControllerServiceSlaMassUpdate extends CController {
+class CControllerSlaListUpdate extends CController {
+
+	protected $slas;
 
 	protected function init() {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
@@ -27,8 +29,8 @@ class CControllerServiceSlaMassUpdate extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'ids' =>						'required|db sla.slaid',
-			'status' => 					'in '.implode(',', [
+			'slaids' =>	'required|array_db sla.slaid',
+			'status' => 'required|in '.implode(',', [
 				CSlaHelper::SLA_STATUS_DISABLED,
 				CSlaHelper::SLA_STATUS_ENABLED
 			]),
@@ -55,46 +57,49 @@ class CControllerServiceSlaMassUpdate extends CController {
 			return false;
 		}
 
-		$records = API::SLA()->get([
-			'output' => [],
-			'slaids' => $this->getInput('ids'),
-			'editable' => true
+		$this->slas = API::SLA()->get([
+			'output' => ['slaid', 'name'],
+			'slaids' => $this->getInput('slaids'),
+			'editable' => true,
+			'preservekeys' => true
 		]);
 
-		return count($records) > 0;
+		return (bool) $this->slas;
 	}
 
 	/**
 	 * @throws APIException
 	 */
 	protected function doAction(): void {
+		$output = [];
 		$update = [];
 
-		$this->getInputs($update, ['status']);
-		$update = array_filter($update);
+		$this->getInputs($update, ['slaids', 'status']);
 
-		if (!$update) {
-			$this->setResponse(new CControllerResponseFatal());
+		foreach ($update['slaids'] as $key => $slaid) {
+			if (!array_key_exists($slaid, $this->slas)) {
+				unset($update['slaids'][$key]);
+				continue;
+			}
 
-			return;
+			$update['slaids'][$key] = array_merge($this->slas[$slaid], [
+				'status' => $update['status'],
+			]);
 		}
 
-		$update['slaids'] = $this->getInput('ids');
-
-		$result = API::SLA()->update($update);
+		$result = API::SLA()->update($update['slaids']);
 
 		if ($result) {
-			$output = ['title' => _('SLA updated')];
-
-			if ($messages = CMessageHelper::getMessages()) {
-				$output['messages'] = array_column($messages, 'message');
-			}
+			$output['title'] = _n('SLA updated', 'SLAs updated', count($result['slaids']));
 		}
 		else {
-			$output = [
-				'errors' => makeMessageBox(ZBX_STYLE_MSG_BAD, filter_messages(), CMessageHelper::getTitle())
-					->toString()
-			];
+			$output['errors'] = makeMessageBox(ZBX_STYLE_MSG_BAD, filter_messages(), CMessageHelper::getTitle())
+				->toString();
+			$output['keepids'] = $this->getInput('slaids');
+		}
+
+		if ($messages = get_and_clear_messages()) {
+			$output['messages'] = array_column($messages, 'message');
 		}
 
 		$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());
