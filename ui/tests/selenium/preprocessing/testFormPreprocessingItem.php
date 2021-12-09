@@ -201,4 +201,33 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 
 		$this->checkPreprocessingInheritance($data, $host_link);
 	}
+
+	/**
+	 * Check Prometheus 3rd parameter editability depending on formula field.
+	 */
+	public function testFormPreprocessingItem_PrometheusParameters() {
+		$this->page->login()->open($this->link);
+		$this->query('button:'.$this->button)->waitUntilPresent()->one()->click();
+
+		// Open preprocessing form and add prometheus step.
+		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+		$form->selectTab('Preprocessing');
+		$this->addPreprocessingSteps([['type' => 'Prometheus pattern', 'parameter_1' => 'pattern']]);
+
+		$values = [
+			'value' => false,
+			'label' => true,
+			'sum' => false,
+			'min' => false,
+			'max' => false,
+			'avg' => false,
+			'count' => false
+		];
+
+		// Change dropdown values and check label field.
+		foreach ($values as $value => $enabled) {
+			$form->getField('name:preprocessing[0][params][1]')->asZDropdown()->fill($value);
+			$this->assertTrue($form->getField('id:preprocessing_0_params_2')->isEnabled($enabled));
+		}
+	}
 }
