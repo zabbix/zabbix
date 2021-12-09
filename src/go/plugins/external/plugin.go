@@ -45,6 +45,7 @@ type Plugin struct {
 	Initial    bool
 	Listener   net.Listener
 	Timeout    time.Duration
+	Cmd        *exec.Cmd
 	broker     *pluginBroker
 }
 
@@ -59,7 +60,9 @@ func (p *Plugin) Register() (response *shared.RegisterResponse, err error) {
 func (p *Plugin) ExecutePlugin() {
 	startLock.Lock()
 	defer startLock.Unlock()
-	err := exec.Command(p.Path, p.Socket, strconv.FormatBool(p.Initial)).Start()
+	p.Cmd = exec.Command(p.Path, p.Socket, strconv.FormatBool(p.Initial))
+
+	err := p.Cmd.Start()
 	if err != nil {
 		panic(fmt.Sprintf("failed to start external plugin %s, %s", p.Path, err.Error()))
 	}

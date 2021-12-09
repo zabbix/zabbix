@@ -1,3 +1,4 @@
+//go:build !windows
 // +build !windows
 
 /*
@@ -21,6 +22,19 @@
 
 package main
 
+import (
+	"syscall"
+
+	"zabbix.com/pkg/log"
+)
+
 func loadOSDependentItems() error {
 	return nil
+}
+
+func cleanUpExternal() {
+	err := syscall.Unlink(pluginsocket)
+	if err != nil {
+		log.Critf("failed to clean up after external plugins, %s", err)
+	}
 }

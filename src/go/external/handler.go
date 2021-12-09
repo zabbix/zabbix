@@ -25,7 +25,9 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"os/signal"
 	"strconv"
+	"syscall"
 	"time"
 
 	"zabbix.com/pkg/plugin"
@@ -101,6 +103,8 @@ func (h *handler) Execute() error {
 }
 
 func (h *handler) run() {
+	go ignoreSIGINTandSIGTERM()
+
 	for {
 		err := h.handle()
 		if err != nil {
@@ -360,6 +364,14 @@ func (h *handler) sendLog(request shared.LogRequest) {
 	err := shared.Write(h.connection, request)
 	if err != nil {
 		panic(fmt.Sprintf("failed to log message %s", err.Error()))
+	}
+}
+
+func ignoreSIGINTandSIGTERM() {
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+	for {
+		<-sigs
 	}
 }
 

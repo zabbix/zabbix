@@ -203,6 +203,7 @@ loop:
 var (
 	confDefault     string
 	applicationName string
+	pluginsocket    string
 
 	argConfig  bool
 	argTest    bool
@@ -351,11 +352,10 @@ func main() {
 		fatalExit("cannot initialize logger", err)
 	}
 
-	var socket string
-	if socket, err = initExternalPlugins(&agent.Options); err != nil {
+	if pluginsocket, err = initExternalPlugins(&agent.Options); err != nil {
 		fatalExit("cannot register external plugins", err)
 	}
-	defer cleanUpExternal(socket)
+	defer cleanUpExternal()
 
 	if argTest || argPrint {
 		var level int
@@ -409,7 +409,7 @@ func main() {
 
 		monitor.Wait(monitor.Scheduler)
 
-		cleanUpExternal(socket)
+		cleanUpExternal()
 
 		os.Exit(0)
 	}
@@ -489,7 +489,7 @@ func main() {
 	log.Infof("using configuration file: %s", confFlag)
 
 	if err = keyaccess.LoadRules(agent.Options.AllowKey, agent.Options.DenyKey); err != nil {
-		log.Errf("Failed to load key access rules: %s", err.Error())
+		fatalExit("Failed to load key access rules", err)
 		os.Exit(1)
 	}
 
@@ -612,15 +612,13 @@ func main() {
 	waitServiceClose()
 }
 
-func cleanUpExternal(socket string) {
-	err := removeSocket(socket)
-	if err != nil {
-		fatalExit("failed to clean up after external plugins", err)
-	}
-}
-
 func fatalExit(message string, err error) {
 	fatalCloseOSItems()
+
+	if pluginsocket != "" {
+		cleanUpExternal()
+	}
+
 	if len(message) == 0 {
 		message = err.Error()
 	} else {

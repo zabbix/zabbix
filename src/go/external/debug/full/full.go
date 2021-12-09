@@ -20,6 +20,9 @@
 package main
 
 import (
+	"fmt"
+	"strings"
+
 	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/plugin"
 )
@@ -40,7 +43,19 @@ var impl Plugin
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	p.Debugf("export %s%v", key, params)
 
-	return "debug full test response", nil
+	if len(params) == 0 {
+		return "debug full test response, without parameters", nil
+	}
+
+	var out string
+
+	for _, p := range params {
+		out += p + " "
+	}
+
+	out = strings.TrimSpace(out)
+
+	return fmt.Sprintf("debug full test response, with parameters: %s", out), nil
 }
 
 func (p *Plugin) Configure(global *plugin.GlobalOptions, private interface{}) {

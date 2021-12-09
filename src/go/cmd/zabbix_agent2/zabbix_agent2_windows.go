@@ -31,8 +31,9 @@ func loadOSDependentItems() error {
 	return pdh.LocateObjectsAndDefaultCounters(true)
 }
 
-func init() {
+func cleanUpExternal() {}
 
+func init() {
 	if path, err := os.Executable(); err == nil {
 		dir, name := filepath.Split(path)
 		confDefault = dir + strings.TrimSuffix(name, filepath.Ext(name)) + ".win.conf"

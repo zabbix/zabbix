@@ -27,13 +27,28 @@ import (
 	"time"
 
 	"zabbix.com/internal/agent"
+	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/shared"
 	"zabbix.com/plugins/external"
 )
 
+type pluginOptions struct {
+	Path string
+}
+
 func initExternalPlugins(options *agent.AgentOptions) (string, error) {
-	if len(options.ExternalPlugins) == 0 {
+	paths := make(map[string]string)
+
+	for name, p := range options.Plugins {
+		var o pluginOptions
+		if err := conf.Unmarshal(p, &o, false); err != nil {
+			return "", fmt.Errorf(`Invalid plugin '%s' configuration: %s`, name, err)
+		}
+		paths[name] = o.Path
+	}
+
+	if len(paths) == 0 {
 		return "", nil
 	}
 
@@ -49,9 +64,9 @@ func initExternalPlugins(options *agent.AgentOptions) (string, error) {
 		return "", err
 	}
 
-	for _, p := range options.ExternalPlugins {
+	for name, p := range paths {
 		accessor := createAccessor(p, socket, timeout, listener)
-		name, err := initExternalPlugin(accessor, options)
+		err := initExternalPlugin(name, accessor, options)
 		if err != nil {
 			return "", err
 		}
@@ -62,10 +77,13 @@ func initExternalPlugins(options *agent.AgentOptions) (string, error) {
 	return socket, nil
 }
 
-func initExternalPlugin(p *external.Plugin, options *agent.AgentOptions) (name string, err error) {
+func initExternalPlugin(name string, p *external.Plugin, options *agent.AgentOptions) (err error) {
 	p.Initial = true
 	p.ExecutePlugin()
-	defer p.Stop()
+	defer func() {
+		p.Stop()
+		p.Cmd.Wait()
+	}()
 
 	var resp *shared.RegisterResponse
 	resp, err = p.Register()
@@ -74,19 +92,23 @@ func initExternalPlugin(p *external.Plugin, options *agent.AgentOptions) (name s
 	}
 
 	if resp.Error != "" {
-		return "", errors.New(resp.Error)
+		return errors.New(resp.Error)
 	}
 
-	name = resp.Name
+	if name != resp.Name {
+		return fmt.Errorf("missmatch plugin names %s and %s, with plugin path %s", name, resp.Name, p.Path)
+	}
 
 	p.SetBrokerName(name)
 	p.Interfaces = resp.Interfaces
 	p.Params = resp.Metrics
 	p.Initial = false
 
+	options.Plugins[name] = removePath(options.Plugins[name])
+
 	err = validate(p, options.Plugins[name])
 	if err != nil {
-		return "", fmt.Errorf("[%s] %s", name, err)
+		return fmt.Errorf("[%s] %s", name, err.Error())
 	}
 
 	return
@@ -132,4 +154,33 @@ func removeSocket(socket string) error {
 	}
 
 	return nil
+}
+
+func removePath(privateOptions interface{}) interface{} {
+	removeIndex := -1
+	var node *conf.Node
+	var ok bool
+
+	if node, ok = privateOptions.(*conf.Node); ok {
+		for i, node := range node.Nodes {
+			if childNode, ok := node.(*conf.Node); ok {
+				if childNode.Name == "Path" {
+					removeIndex = i
+				}
+			}
+		}
+	}
+
+	if removeIndex >= len(node.Nodes) || removeIndex == -1 {
+		return node
+	}
+
+	node.Nodes = remove(node.Nodes, removeIndex)
+
+	return node
+}
+
+func remove(s []interface{}, i int) []interface{} {
+	s[i] = s[len(s)-1]
+	return s[:len(s)-1]
 }
