@@ -18,45 +18,43 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../../../include/items.inc.php';
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
  *
  * @backup items
  */
-class testInheritanceItemPrototype extends CLegacyWebTest {
+class testInheritanceItem extends CLegacyWebTest {
 	private $templateid = 15000;	// 'Inheritance test template'
-	private $template = 'Inheritance test template';
+	private $template  = 'Inheritance test template';
 
 	private $hostid = 15001;		// 'Template inheritance test host'
 	private $host = 'Template inheritance test host';
 
-	private $discoveryRuleId = 15011;	// 'testInheritanceDiscoveryRule'
-	private $discoveryRule = 'testInheritanceDiscoveryRule';
-
-	// returns list of item prototypes from a template
+	// returns list of items from a template
 	public static function update() {
 		return CDBHelper::getDataProvider(
-			'SELECT i.itemid,id.parent_itemid'.
-			' FROM items i,item_discovery id'.
-			' WHERE i.itemid=id.itemid'.
-				' AND i.hostid=15000'.	//	$this->templateid.
-				' AND i.flags=2'
+			'SELECT itemid'.
+			' FROM items'.
+			' WHERE hostid=15000'.	//	$this->templateid.
+				' AND flags=0'.
+				' AND type<>'.ITEM_TYPE_HTTPTEST
 		);
 	}
 
 	/**
 	 * @dataProvider update
 	 */
-	public function testInheritanceItemPrototype_SimpleUpdate($data) {
+	public function testInheritanceItem_SimpleUpdate($data) {
 		$sqlItems = 'SELECT * FROM items ORDER BY itemid';
 		$oldHashItems = CDBHelper::getHash($sqlItems);
 
-		$this->zbxTestLogin('disc_prototypes.php?form=update&itemid='.$data['itemid'].'&parent_discoveryid='.$data['parent_itemid']);
+		$this->zbxTestLogin('items.php?form=update&itemid='.$data['itemid']);
 		$this->zbxTestClickWait('update');
-		$this->zbxTestCheckTitle('Configuration of item prototypes');
-		$this->zbxTestTextPresent('Item prototype updated');
+		$this->zbxTestCheckTitle('Configuration of items');
+		$this->zbxTestTextPresent('Item updated');
 
 		$this->assertEquals($oldHashItems, CDBHelper::getHash($sqlItems));
 	}
@@ -67,17 +65,17 @@ class testInheritanceItemPrototype extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'testInheritanceItemPrototype6',
-					'key' => 'item-prototype-test6'
+					'name' => 'testInheritanceItem5',
+					'key' => 'test-inheritance-item5'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'testInheritanceItemPrototype5',
-					'key' => 'item-prototype-test5',
+					'name' => 'itemInheritance',
+					'key' => 'key-item-inheritance',
 					'errors' => [
-						'Item prototype "item-prototype-test5" already exists on "Template inheritance test host", inherited from another template'
+						'Item "key-item-inheritance" already exists on "Template inheritance test host", inherited from another template.'
 					]
 				]
 			]
@@ -87,19 +85,19 @@ class testInheritanceItemPrototype extends CLegacyWebTest {
 	/**
 	 * @dataProvider create
 	 */
-	public function testInheritanceItemPrototype_SimpleCreate($data) {
-		$this->zbxTestLogin('disc_prototypes.php?form=Create+item+prototype&parent_discoveryid='.$this->discoveryRuleId);
+	public function testInheritanceItem_SimpleCreate($data) {
+		$this->zbxTestLogin('items.php?form=create&hostid='.$this->templateid);
 
-		$this->zbxTestInputType('name', $data['name']);
-		$this->assertEquals($data['name'], $this->zbxTestGetValue("//input[@id='name']"));
+		$this->zbxTestInputTypeWait('name', $data['name']);
 		$this->zbxTestInputType('key', $data['key']);
-		$this->assertEquals($data['key'], $this->zbxTestGetValue("//input[@id='key']"));
 
 		$this->zbxTestClickWait('add');
+
 		switch ($data['expected']) {
 			case TEST_GOOD:
-				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item prototype added');
-				$this->zbxTestTextPresent($data['name']);
+				$this->zbxTestCheckTitle('Configuration of items');
+				$this->zbxTestCheckHeader('Items');
+				$this->zbxTestTextPresent('Item added');
 
 				$itemId = 0;
 
@@ -109,7 +107,7 @@ class testInheritanceItemPrototype extends CLegacyWebTest {
 					' FROM items'.
 					' WHERE hostid='.$this->templateid.
 						' AND key_='.zbx_dbstr($data['key']).
-						' AND flags=2'
+						' AND flags=0'
 				);
 				if ($dbRow = DBfetch($dbResult)) {
 					$itemId = $dbRow['itemid'];
@@ -125,7 +123,7 @@ class testInheritanceItemPrototype extends CLegacyWebTest {
 					' FROM items'.
 					' WHERE hostid='.$this->hostid.
 						' AND templateid='.$itemId.
-						' AND flags=2'
+						' AND flags=0'
 				);
 				if ($dbRow = DBfetch($dbResult)) {
 					$this->assertEquals($dbRow['key_'], $data['key']);
@@ -134,6 +132,9 @@ class testInheritanceItemPrototype extends CLegacyWebTest {
 				break;
 
 			case TEST_BAD:
+				$this->zbxTestCheckTitle('Configuration of items');
+				$this->zbxTestCheckHeader('Items');
+				$this->zbxTestTextNotPresent('Item added');
 				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add item');
 				$this->zbxTestTextPresent($data['errors']);
 				break;
