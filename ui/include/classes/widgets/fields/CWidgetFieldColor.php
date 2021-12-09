@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,25 +19,21 @@
 **/
 
 
-class CWidgetFieldCheckBoxList extends CWidgetField {
+/**
+ * Class for widget field color.
+ */
+class CWidgetFieldColor extends CWidgetField {
 
+	/**
+	 * Create color widget field.
+	 *
+	 * @param string $name   Field name in form.
+	 * @param string $label  Label for the field in form.
+	 */
 	public function __construct($name, $label) {
 		parent::__construct($name, $label);
 
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32);
-		$this->setDefault([]);
-		$this->setValidationRules(['type' => API_INTS32]);
-	}
-
-	public function setValue($value) {
-		$this->value = (array) $value;
-
-		return $this;
-	}
-
-	public function setDefault($values) {
-		$this->default = (array) $values;
-
-		return $this;
+		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
+		$this->setValidationRules(['type' => API_COLOR, 'flags' => API_ALLOW_NULL]);
 	}
 }

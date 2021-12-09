@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,25 +18,33 @@
 **/
 
 
-class CWidgetFieldCheckBoxList extends CWidgetField {
+class CWidgetItem extends CWidget {
 
-	public function __construct($name, $label) {
-		parent::__construct($name, $label);
+	_registerEvents() {
+		super._registerEvents();
 
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32);
-		$this->setDefault([]);
-		$this->setValidationRules(['type' => API_INTS32]);
+		this._events.resize = () => {
+			const margin = 5;
+			const padding = 10;
+			const header_height = this._view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER ? 0 : 33;
+
+			this._target.style.setProperty(
+				'--content-height',
+				`${this._cell_height * this._pos.height - margin * 2 - padding * 2 - header_height}px`
+			);
+		}
 	}
 
-	public function setValue($value) {
-		$this->value = (array) $value;
+	_activateEvents() {
+		super._activateEvents();
 
-		return $this;
+		this._resize_observer = new ResizeObserver(this._events.resize);
+		this._resize_observer.observe(this._target);
 	}
 
-	public function setDefault($values) {
-		$this->default = (array) $values;
+	_deactivateEvents() {
+		super._deactivateEvents();
 
-		return $this;
+		this._resize_observer.disconnect();
 	}
 }

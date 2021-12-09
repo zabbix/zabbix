@@ -1446,7 +1446,6 @@ define('ZBX_TEXTAREA_TAG_WIDTH',				250);
 define('ZBX_TEXTAREA_TAG_VALUE_WIDTH',			300);
 define('ZBX_TEXTAREA_MAPPING_VALUE_WIDTH',		250);
 define('ZBX_TEXTAREA_MAPPING_NEWVALUE_WIDTH',	250);
-define('ZBX_TEXTAREA_COLOR_WIDTH',				96);
 define('ZBX_TEXTAREA_FILTER_SMALL_WIDTH',		150);
 define('ZBX_TEXTAREA_FILTER_STANDARD_WIDTH',	300);
 define('ZBX_TEXTAREA_TINY_WIDTH',				75);
@@ -1498,6 +1497,21 @@ define('WIDGET_SYSTEM_INFO',		'systeminfo');
 define('WIDGET_TRIG_OVER',			'trigover');
 define('WIDGET_URL',				'url');
 define('WIDGET_WEB',				'web');
+define('WIDGET_ITEM',				'item');
+
+// Item widget object positions.
+define('WIDGET_ITEM_POS_LEFT',		0);
+define('WIDGET_ITEM_POS_CENTER',	1);
+define('WIDGET_ITEM_POS_RIGHT',		2);
+
+define('WIDGET_ITEM_POS_TOP',		0);
+define('WIDGET_ITEM_POS_MIDDLE',	1);
+define('WIDGET_ITEM_POS_BOTTOM',	2);
+
+define('WIDGET_ITEM_POS_BEFORE',	0);
+define('WIDGET_ITEM_POS_ABOVE',		1);
+define('WIDGET_ITEM_POS_AFTER',		2);
+define('WIDGET_ITEM_POS_BELOW',		3);
 
 // sysmap widget source types
 define('WIDGET_SYSMAP_SOURCETYPE_MAP',	1);
@@ -1522,6 +1536,12 @@ define('WIDGET_SEARCH_TEMPLATES',		'search_templates');
 // dashboard widget dynamic state
 define('WIDGET_SIMPLE_ITEM',	0);
 define('WIDGET_DYNAMIC_ITEM',	1);
+
+// item widget blocks
+define('WIDGET_ITEM_SHOW_DESCRIPTION',		1);
+define('WIDGET_ITEM_SHOW_VALUE',			2);
+define('WIDGET_ITEM_SHOW_TIME',				3);
+define('WIDGET_ITEM_SHOW_CHANGE_INDICATOR',	4);
 
 // widget defaults
 define('ZBX_WIDGET_ROWS', 20);
@@ -1972,6 +1992,7 @@ define('ZBX_STYLE_PROBLEM_ICON_LIST_ITEM' , 'problem-icon-list-item');
 define('ZBX_STYLE_ZABBIX_LOGO', 'zabbix-logo');
 define('ZBX_STYLE_ZABBIX_SIDEBAR_LOGO', 'zabbix-sidebar-logo');
 define('ZBX_STYLE_ZABBIX_SIDEBAR_LOGO_COMPACT', 'zabbix-sidebar-logo-compact');
+define('ZBX_STYLE_WIDGET_ITEM_LABEL', 'widget-item-label');
 
 // HTML column layout.
 define('ZBX_STYLE_COLUMNS', 'columns-wrapper');

@@ -64,7 +64,11 @@ $jq_templates['tag-row-tmpl'] = CWidgetHelper::getTagsTemplate($fields['tags']);
 
 // Default view.
 $form_list->addRow(
-	CWidgetHelper::getLabel($fields['default_view']),
+	CWidgetHelper::getLabel($fields['default_view'], null, [
+		_('Comma separated center coordinates to display when the widget is initially loaded.'),
+		BR(),
+		_('Initial view is ignored if the default view is set.')
+	]),
 	CWidgetHelper::getLatLngZoomBox($fields['default_view'])
 );
 
