@@ -1038,13 +1038,6 @@ int	main(int argc, char **argv)
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
 		exit(SUCCEED == zbx_sigusr_send(t.data) ? EXIT_SUCCESS : EXIT_FAILURE);
 
-	if (FAIL == zbx_ipc_service_init_env(CONFIG_SOCKET_PATH, &error))
-	{
-		zbx_error("Cannot initialize IPC services: %s", error);
-		zbx_free(error);
-		exit(EXIT_FAILURE);
-	}
-
 	return daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags);
 }
 
@@ -1110,6 +1103,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		printf("Starting Zabbix Proxy (%s) [%s]. Zabbix %s (revision %s).\nPress Ctrl+C to exit.\n\n",
 				ZBX_PROXYMODE_PASSIVE == CONFIG_PROXYMODE ? "passive" : "active",
 				CONFIG_HOSTNAME, ZABBIX_VERSION, ZABBIX_REVISION);
+	}
+
+	if (FAIL == zbx_ipc_service_init_env(CONFIG_SOCKET_PATH, &error))
+	{
+		zbx_error("cannot initialize IPC services: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
 	}
 
 	if (SUCCEED != zbx_locks_create(&error))
