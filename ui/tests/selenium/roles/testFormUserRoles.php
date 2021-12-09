@@ -1169,7 +1169,7 @@ class testFormUserRoles extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Read-write access to services' => 'None',
-						'Read-write access to services' => 'None'
+						'Read-only access to services' => 'None'
 					],
 					'message_header' => 'User role updated'
 				]
@@ -1180,7 +1180,7 @@ class testFormUserRoles extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Read-write access to services' => 'All',
-						'Read-write access to services' => 'All'
+						'Read-only access to services' => 'All'
 					],
 					'message_header' => 'User role updated'
 				]
