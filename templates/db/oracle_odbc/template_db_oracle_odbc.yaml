@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-12-01T16:34:59Z'
+  date: '2021-12-09T19:35:25Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -22,7 +22,7 @@ zabbix_export:
         The "Service's TCP port state" item uses {HOST.CONN} and {$ORACLE.PORT} macros to check the availability of the listener.
         
         
-        Template tooling version used: 0.39
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Databases
@@ -88,7 +88,7 @@ zabbix_export:
             FROM v$database
           username: '{$ORACLE.USER}'
           password: '{$ORACLE.PASSWORD}'
-          description: 'Get info about CDB and  No-CDB databases on instansce.'
+          description: 'Get info about CDB and  No-CDB databases on instance.'
           tags:
             -
               tag: Application
@@ -133,7 +133,7 @@ zabbix_export:
             FROM v$pdbs;
           username: '{$ORACLE.USER}'
           password: '{$ORACLE.PASSWORD}'
-          description: 'Get info about PDB databases on instansce.'
+          description: 'Get info about PDB databases on instance.'
           tags:
             -
               tag: Application
@@ -222,13 +222,13 @@ zabbix_export:
           value_type: TEXT
           params: |
             SELECT
-              df.tablespace_name AS TABLESPACE, 
-              df.type AS TYPE, 
-              NVL(SUM(df.BYTES), 0) AS FILE_BYTES, 
-              NVL(SUM(df.MAX_BYTES), 0) AS MAX_BYTES, 
+              df.tablespace_name AS TABLESPACE,
+              df.type AS TYPE,
+              NVL(SUM(df.BYTES), 0) AS FILE_BYTES,
+              NVL(SUM(df.MAX_BYTES), 0) AS MAX_BYTES,
               NVL(SUM(f.FREE), 0) AS FREE_BYTES,
               SUM(df.BYTES)-SUM(f.FREE) AS USED_BYTES,
-              ROUND(DECODE(SUM(df.MAX_BYTES), 0, 0, (SUM(df.BYTES) / SUM(df.MAX_BYTES) * 100)), 2) AS USED_PCT_MAX, 
+              ROUND(DECODE(SUM(df.MAX_BYTES), 0, 0, (SUM(df.BYTES) / SUM(df.MAX_BYTES) * 100)), 2) AS USED_PCT_MAX,
               ROUND(DECODE(SUM(df.BYTES), 0, 0,(SUM(df.BYTES)-SUM(f.FREE))/ SUM(df.BYTES)* 100), 2) AS USED_FILE_PCT,
               DECODE(df.STATUS, 'ONLINE', 1, 'OFFLINE', 2, 'READ ONLY', 3, 0) AS STATUS
             FROM ( SELECT
@@ -249,15 +249,15 @@ zabbix_export:
                GROUP BY df.tablespace_name, df.TYPE, df.status
             UNION ALL
             SELECT
-              Y.name AS TABLESPACE, 
-              Y.type AS TYPE, 
-              NVL(SUM(Y.BYTES), 0) AS FILE_BYTES, 
-              NVL(SUM(Y.MAX_BYTES), 0) AS MAX_BYTES, 
+              Y.name AS TABLESPACE,
+              Y.type AS TYPE,
+              NVL(SUM(Y.BYTES), 0) AS FILE_BYTES,
+              NVL(SUM(Y.MAX_BYTES), 0) AS MAX_BYTES,
               NVL(MAX(NVL(Y.FREE_BYTES, 0)), 0) AS FREE,
               SUM(Y.BYTES)-SUM(Y.FREE_BYTES) AS USED_BYTES,
-              ROUND(DECODE(SUM(Y.MAX_BYTES), 0, 0, (SUM(Y.BYTES) / SUM(Y.MAX_BYTES) * 100)), 2) AS USED_PCT_MAX, 
+              ROUND(DECODE(SUM(Y.MAX_BYTES), 0, 0, (SUM(Y.BYTES) / SUM(Y.MAX_BYTES) * 100)), 2) AS USED_PCT_MAX,
               ROUND(DECODE(SUM(Y.BYTES), 0, 0,(SUM(Y.BYTES)-SUM(Y.FREE_BYTES))/ SUM(Y.BYTES)* 100), 2) AS USED_FILE_PCT,
-              DECODE(Y.TBS_STATUS, 'ONLINE', 1, 'OFFLINE', 2, 'READ ONLY', 3, 0) AS STATUS 
+              DECODE(Y.TBS_STATUS, 'ONLINE', 1, 'OFFLINE', 2, 'READ ONLY', 3, 0) AS STATUS
                FROM ( SELECT
                  dtf.tablespace_name AS name,
                  dt.contents AS TYPE,
@@ -1326,7 +1326,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Count of the prolongely locked sessions. (You can change maximum session lock duration in seconds for query by {$ORACLE.SESSION.LOCK.MAX.TIME} macro. Default 600 sec)'
+          description: 'Count of the prolongedly locked sessions. (You can change maximum session lock duration in seconds for query by {$ORACLE.SESSION.LOCK.MAX.TIME} macro. Default 600 sec)'
           preprocessing:
             -
               type: JSONPATH
@@ -1814,7 +1814,7 @@ zabbix_export:
               key: 'oracle.archivelog_log_status["{#DEST_NAME}"]'
               delay: '0'
               history: 7d
-              description: 'Identifies the current status of the destination: 1 - ''Valid'', 2 - ''Dederred'',3 - ''Error'', 0 - ''Unknown'''
+              description: 'Identifies the current status of the destination: 1 - ''Valid'', 2 - ''Deferred'',3 - ''Error'', 0 - ''Unknown'''
               valuemap:
                 name: 'Oracle Archivelog status'
               preprocessing:
@@ -2271,6 +2271,12 @@ zabbix_export:
                   value: 'Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}'
               trigger_prototypes:
                 -
+                  uuid: 3c5f54f41f95440aa18ca5316aeb50f6
+                  expression: 'last(/Oracle by ODBC/oracle.tbs_status["{#TABLESPACE}"])=2'
+                  name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace is OFFLINE'
+                  priority: WARNING
+                  description: 'The tablespace is in the offline state.'
+                -
                   uuid: 05c2af5a765842a1a70f2f67355db1b3
                   expression: 'last(/Oracle by ODBC/oracle.tbs_status["{#TABLESPACE}"],#1)<>last(/Oracle by ODBC/oracle.tbs_status["{#TABLESPACE}"],#2)'
                   name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace status has changed (new value received: {ITEM.VALUE})'
@@ -2279,14 +2285,8 @@ zabbix_export:
                   manual_close: 'YES'
                   dependencies:
                     -
-                      name: 'Oracle TBS ''{#TABLESPACE}'': Tablespase is OFFLINE'
+                      name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace is OFFLINE'
                       expression: 'last(/Oracle by ODBC/oracle.tbs_status["{#TABLESPACE}"])=2'
-                -
-                  uuid: 3c5f54f41f95440aa18ca5316aeb50f6
-                  expression: 'last(/Oracle by ODBC/oracle.tbs_status["{#TABLESPACE}"])=2'
-                  name: 'Oracle TBS ''{#TABLESPACE}'': Tablespase is OFFLINE'
-                  priority: WARNING
-                  description: 'The tablespase is in the offline state.'
             -
               uuid: b9cc0eabdcbc404fb0df2a2a082411f1
               name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace used, bytes'
@@ -2461,11 +2461,11 @@ zabbix_export:
         -
           macro: '{$ORACLE.SESSION.LOCK.MAX.TIME}'
           value: '600'
-          description: 'Maximum session lock duration in seconds for count the session as a prolongely locked query.'
+          description: 'Maximum session lock duration in seconds for count the session as a prolongedly locked query.'
         -
           macro: '{$ORACLE.SESSION.LONG.LOCK.MAX.WARN}'
           value: '3'
-          description: 'Maximum number of the prolongely locked sessions alert threshold (for trigger expression).'
+          description: 'Maximum number of the prolongedly locked sessions alert threshold (for trigger expression).'
         -
           macro: '{$ORACLE.SESSIONS.LOCK.MAX.WARN}'
           value: '20'

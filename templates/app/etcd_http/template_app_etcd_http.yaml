@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-11T08:05:17Z'
+  date: '2021-12-09T12:22:05Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -13,7 +13,7 @@ zabbix_export:
       description: |
         Get Etcd metrics by HTTP agent.
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Applications
@@ -333,7 +333,6 @@ zabbix_export:
               parameters:
                 - 10m
           url: '{$ETCD.SCHEME}://{HOST.CONN}:{$ETCD.PORT}/health'
-          status_codes: ''
           tags:
             -
               tag: Application
@@ -770,9 +769,7 @@ zabbix_export:
               expression: 'min(/Etcd by HTTP/etcd.proposals.failed.rate,5m)>{$ETCD.PROPOSAL.FAIL.MAX.WARN}'
               name: 'Etcd: Too many proposal failures (over {$ETCD.PROPOSAL.FAIL.MAX.WARN} for 5m)'''
               priority: WARNING
-              description: |
-                "Normally related to two issues: temporary failures related to a leader election or 
-                longer downtime caused by a loss of quorum in the cluster."
+              description: 'Normally related to two issues: temporary failures related to a leader election or longer downtime caused by a loss of quorum in the cluster.'
         -
           uuid: 1c506ff69e7b4564a6d95fd35b1a11fd
           name: 'Etcd: Proposals pending'
@@ -1400,9 +1397,7 @@ zabbix_export:
       expression: 'min(/Etcd by HTTP/etcd.open.fds,5m)/last(/Etcd by HTTP/etcd.max.fds)*100>{$ETCD.OPEN.FDS.MAX.WARN}'
       name: 'Etcd: Current number of open files is too high (over {$ETCD.OPEN.FDS.MAX.WARN}% for 5m)'
       priority: WARNING
-      description: |
-        "Heavy file descriptor usage (i.e., near the process’s file descriptor limit) indicates a potential file descriptor exhaustion issue. 
-        If the file descriptors are exhausted, etcd may panic because it cannot create new WAL files."
+      description: 'Heavy file descriptor usage (i.e., near the process’s file descriptor limit) indicates a potential file descriptor exhaustion issue. If the file descriptors are exhausted, etcd may panic because it cannot create new WAL files.'
   graphs:
     -
       uuid: 18baccd03c0f4814a42d32b51334787d

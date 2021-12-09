@@ -95,7 +95,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Mounted filesystem discovery |<p>Discovery of file systems of different types.</p> |ZABBIX_PASSIVE |vfs.fs.discovery<p>**Filter**:</p>AND <p>- A: {#FSTYPE} MATCHES_REGEX `{$VFS.FS.FSTYPE.MATCHES}`</p><p>- B: {#FSTYPE} NOT_MATCHES_REGEX `{$VFS.FS.FSTYPE.NOT_MATCHES}`</p><p>- C: {#FSNAME} MATCHES_REGEX `{$VFS.FS.FSNAME.MATCHES}`</p><p>- D: {#FSNAME} NOT_MATCHES_REGEX `{$VFS.FS.FSNAME.NOT_MATCHES}`</p> |
+|Mounted filesystem discovery |<p>Discovery of file systems of different types.</p> |ZABBIX_PASSIVE |vfs.fs.discovery<p>**Filter**:</p>AND <p>- {#FSTYPE} MATCHES_REGEX `{$VFS.FS.FSTYPE.MATCHES}`</p><p>- {#FSTYPE} NOT_MATCHES_REGEX `{$VFS.FS.FSTYPE.NOT_MATCHES}`</p><p>- {#FSNAME} MATCHES_REGEX `{$VFS.FS.FSNAME.MATCHES}`</p><p>- {#FSNAME} NOT_MATCHES_REGEX `{$VFS.FS.FSNAME.NOT_MATCHES}`</p> |
 
 ## Items collected
 
@@ -203,7 +203,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Block devices discovery |<p>-</p> |ZABBIX_PASSIVE |vfs.dev.discovery<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Filter**:</p>AND <p>- A: {#DEVTYPE} MATCHES_REGEX `disk`</p><p>- B: {#DEVNAME} MATCHES_REGEX `{$VFS.DEV.DEVNAME.MATCHES}`</p><p>- C: {#DEVNAME} NOT_MATCHES_REGEX `{$VFS.DEV.DEVNAME.NOT_MATCHES}`</p> |
+|Block devices discovery |<p>-</p> |ZABBIX_PASSIVE |vfs.dev.discovery<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Filter**:</p>AND <p>- {#DEVTYPE} MATCHES_REGEX `disk`</p><p>- {#DEVNAME} MATCHES_REGEX `{$VFS.DEV.DEVNAME.MATCHES}`</p><p>- {#DEVNAME} NOT_MATCHES_REGEX `{$VFS.DEV.DEVNAME.NOT_MATCHES}`</p> |
 
 ## Items collected
 
@@ -260,18 +260,18 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Network interface discovery |<p>Discovery of network interfaces.</p> |ZABBIX_PASSIVE |net.if.discovery<p>**Filter**:</p>AND <p>- A: {#IFNAME} MATCHES_REGEX `{$NET.IF.IFNAME.MATCHES}`</p><p>- B: {#IFNAME} NOT_MATCHES_REGEX `{$NET.IF.IFNAME.NOT_MATCHES}`</p> |
+|Network interface discovery |<p>Discovery of network interfaces.</p> |ZABBIX_PASSIVE |net.if.discovery<p>**Filter**:</p>AND <p>- {#IFNAME} MATCHES_REGEX `{$NET.IF.IFNAME.MATCHES}`</p><p>- {#IFNAME} NOT_MATCHES_REGEX `{$NET.IF.IFNAME.NOT_MATCHES}`</p> |
 
 ## Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|Network_interfaces |Interface {#IFNAME}: Bits received | |ZABBIX_PASSIVE |net.if.in["{#IFNAME}"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND<p>- MULTIPLIER: `8`</p> |
-|Network_interfaces |Interface {#IFNAME}: Bits sent | |ZABBIX_PASSIVE |net.if.out["{#IFNAME}"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND<p>- MULTIPLIER: `8`</p> |
-|Network_interfaces |Interface {#IFNAME}: Outbound packets with errors | |ZABBIX_PASSIVE |net.if.out["{#IFNAME}",errors]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
-|Network_interfaces |Interface {#IFNAME}: Inbound packets with errors | |ZABBIX_PASSIVE |net.if.in["{#IFNAME}",errors]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
-|Network_interfaces |Interface {#IFNAME}: Outbound packets discarded | |ZABBIX_PASSIVE |net.if.out["{#IFNAME}",dropped]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
-|Network_interfaces |Interface {#IFNAME}: Inbound packets discarded | |ZABBIX_PASSIVE |net.if.in["{#IFNAME}",dropped]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
+|Network_interfaces |Interface {#IFNAME}: Bits received |<p>-</p> |ZABBIX_PASSIVE |net.if.in["{#IFNAME}"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND<p>- MULTIPLIER: `8`</p> |
+|Network_interfaces |Interface {#IFNAME}: Bits sent |<p>-</p> |ZABBIX_PASSIVE |net.if.out["{#IFNAME}"]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND<p>- MULTIPLIER: `8`</p> |
+|Network_interfaces |Interface {#IFNAME}: Outbound packets with errors |<p>-</p> |ZABBIX_PASSIVE |net.if.out["{#IFNAME}",errors]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
+|Network_interfaces |Interface {#IFNAME}: Inbound packets with errors |<p>-</p> |ZABBIX_PASSIVE |net.if.in["{#IFNAME}",errors]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
+|Network_interfaces |Interface {#IFNAME}: Outbound packets discarded |<p>-</p> |ZABBIX_PASSIVE |net.if.out["{#IFNAME}",dropped]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
+|Network_interfaces |Interface {#IFNAME}: Inbound packets discarded |<p>-</p> |ZABBIX_PASSIVE |net.if.in["{#IFNAME}",dropped]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
 |Network_interfaces |Interface {#IFNAME}: Operational status |<p>Reference: https://www.kernel.org/doc/Documentation/networking/operstates.txt</p> |ZABBIX_PASSIVE |vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 |Network_interfaces |Interface {#IFNAME}: Interface type |<p>Indicates the interface protocol type as a decimal value.</p><p>See include/uapi/linux/if_arp.h for all possible values.</p><p>Reference: https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-net</p> |ZABBIX_PASSIVE |vfs.file.contents["/sys/class/net/{#IFNAME}/type"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 
