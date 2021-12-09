@@ -214,20 +214,30 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 		$form->selectTab('Preprocessing');
 		$this->addPreprocessingSteps([['type' => 'Prometheus pattern', 'parameter_1' => 'pattern']]);
 
+		// Check default values.
+		$fields = [
+			'dropdown' => 'name:preprocessing[0][params][1]',
+			'value' => 'id:preprocessing_0_params_2'
+		];
+
+		$this->assertEquals('value', $form->getField($fields['dropdown'])->getValue());
+		$this->assertEquals('', $form->getField($fields['value'])->getValue());
+
 		$values = [
-			'value' => false,
 			'label' => true,
 			'sum' => false,
 			'min' => false,
 			'max' => false,
 			'avg' => false,
-			'count' => false
+			'count' => false,
+			'value' => false
 		];
 
-		// Change dropdown values and check label field.
+		// Change dropdown values and check label field value and editability.
 		foreach ($values as $value => $enabled) {
-			$form->getField('name:preprocessing[0][params][1]')->asZDropdown()->fill($value);
-			$this->assertTrue($form->getField('id:preprocessing_0_params_2')->isEnabled($enabled));
+			$form->getField($fields['dropdown'])->asZDropdown()->fill($value);
+			$this->assertTrue($form->getField($fields['value'])->isEnabled($enabled));
+			$this->assertEquals('', $form->getField($fields['value'])->getValue());
 		}
 	}
 }
