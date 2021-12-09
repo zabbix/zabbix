@@ -80,10 +80,7 @@ func initExternalPlugins(options *agent.AgentOptions) (string, error) {
 func initExternalPlugin(name string, p *external.Plugin, options *agent.AgentOptions) (err error) {
 	p.Initial = true
 	p.ExecutePlugin()
-	defer func() {
-		p.Stop()
-		p.Cmd.Wait()
-	}()
+	defer p.Stop()
 
 	var resp *shared.RegisterResponse
 	resp, err = p.Register()

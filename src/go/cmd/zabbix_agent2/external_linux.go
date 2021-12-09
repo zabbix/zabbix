@@ -22,6 +22,9 @@ package main
 import (
 	"fmt"
 	"net"
+	"syscall"
+
+	"zabbix.com/pkg/log"
 )
 
 func getListener(socket string) (listener net.Listener, err error) {
@@ -35,4 +38,11 @@ func getListener(socket string) (listener net.Listener, err error) {
 	}
 
 	return
+}
+
+func cleanUpExternal() {
+	err := syscall.Unlink(pluginsocket)
+	if err != nil {
+		log.Critf("failed to clean up after external plugins, %s", err)
+	}
 }

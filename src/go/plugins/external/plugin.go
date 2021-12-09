@@ -45,7 +45,7 @@ type Plugin struct {
 	Initial    bool
 	Listener   net.Listener
 	Timeout    time.Duration
-	Cmd        *exec.Cmd
+	cmd        *exec.Cmd
 	broker     *pluginBroker
 }
 
@@ -60,9 +60,9 @@ func (p *Plugin) Register() (response *shared.RegisterResponse, err error) {
 func (p *Plugin) ExecutePlugin() {
 	startLock.Lock()
 	defer startLock.Unlock()
-	p.Cmd = exec.Command(p.Path, p.Socket, strconv.FormatBool(p.Initial))
+	p.cmd = exec.Command(p.Path, p.Socket, strconv.FormatBool(p.Initial))
 
-	err := p.Cmd.Start()
+	err := p.cmd.Start()
 	if err != nil {
 		panic(fmt.Sprintf("failed to start external plugin %s, %s", p.Path, err.Error()))
 	}
@@ -98,6 +98,15 @@ func (p *Plugin) Stop() {
 	}
 
 	p.broker.stop()
+
+	if p.cmd == nil {
+		panic(fmt.Sprintf("missing cmd reference for external plugin %s, %s", p.Path, err.Error()))
+	}
+
+	err = p.cmd.Wait()
+	if err != nil {
+		panic(fmt.Sprintf("failed to reap external plugin %s, %s", p.Path, err.Error()))
+	}
 }
 
 func (p *Plugin) Configure(globalOptions *plugin.GlobalOptions, privateOptions interface{}) {

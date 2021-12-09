@@ -31,8 +31,6 @@ func loadOSDependentItems() error {
 	return pdh.LocateObjectsAndDefaultCounters(true)
 }
 
-func cleanUpExternal() {}
-
 func init() {
 	if path, err := os.Executable(); err == nil {
 		dir, name := filepath.Split(path)

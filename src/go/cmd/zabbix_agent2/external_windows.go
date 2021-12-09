@@ -38,3 +38,5 @@ func getListener(socket string) (listener net.Listener, err error) {
 
 	return
 }
+
+func cleanUpExternal() {}
