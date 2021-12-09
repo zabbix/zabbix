@@ -50,6 +50,8 @@
 
 #define ZBX_SNMPTRAP_LOGGING_ENABLED	1
 
+#define ZBX_IPC_SERVICE_CONFIG	"config"
+
 extern int	CONFIG_TIMEOUT;
 
 extern zbx_uint64_t	CONFIG_CONF_CACHE_SIZE;
