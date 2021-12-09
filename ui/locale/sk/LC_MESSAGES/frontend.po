@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-26 19:55+0200\n"
+"POT-Creation-Date: 2021-12-03 19:55+0200\n"
 "PO-Revision-Date: 2013-08-25 22:42+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -477,7 +477,7 @@ msgstr ""
 msgid "API tokens"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:339
+#: app/controllers/CControllerPopupTriggerExpr.php:370
 msgid "Abscissa"
 msgstr ""
 
@@ -581,11 +581,11 @@ msgstr ""
 #: include/actions.inc.php:1921
 #: include/views/administration.auditacts.list.php:64
 #: include/views/configuration.action.edit.php:59
-#: include/views/configuration.action.edit.php:175
-#: include/views/configuration.action.edit.php:179
-#: include/views/configuration.action.edit.php:319
-#: include/views/configuration.action.edit.php:407
-#: include/views/configuration.action.edit.php:478
+#: include/views/configuration.action.edit.php:168
+#: include/views/configuration.action.edit.php:172
+#: include/views/configuration.action.edit.php:312
+#: include/views/configuration.action.edit.php:400
+#: include/views/configuration.action.edit.php:483
 #: include/views/configuration.graph.edit.php:380
 #: include/views/configuration.host.discovery.edit.php:134
 #: include/views/configuration.host.discovery.edit.php:632
@@ -616,7 +616,7 @@ msgstr ""
 msgid "Action"
 msgstr "Akcia"
 
-#: include/classes/api/services/CAction.php:2678
+#: include/classes/api/services/CAction.php:2688
 #, c-format
 msgid "Action \"%1$s\" already exists."
 msgstr "Akcia \"%1$s\" už existuje."
@@ -626,7 +626,7 @@ msgstr "Akcia \"%1$s\" už existuje."
 msgid "Action \"%2$s\" is not available for user role \"%1$s\"."
 msgstr ""
 
-#: actionconf.php:279
+#: actionconf.php:285
 msgid "Action added"
 msgstr "Akcia bola pridaná"
 
@@ -635,18 +635,18 @@ msgstr "Akcia bola pridaná"
 msgid "Action class %1$s must extend %2$s class."
 msgstr ""
 
-#: actionconf.php:301
+#: actionconf.php:307
 msgid "Action deleted"
 msgstr "Akcia bola zmazaná"
 
-#: actionconf.php:469
+#: actionconf.php:475
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] "Akcia vypnutá"
 msgstr[1] "Akcie vypnuté"
 msgstr[2] "Akcie vypnuté"
 
-#: actionconf.php:468
+#: actionconf.php:474
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] "Akcia povolená"
@@ -666,7 +666,7 @@ msgstr "Log akcií"
 msgid "Action operation"
 msgstr ""
 
-#: actionconf.php:271
+#: actionconf.php:277
 msgid "Action updated"
 msgstr "Akcia aktualizovaná"
 
@@ -795,10 +795,10 @@ msgstr "Aktívny do"
 #: include/classes/helpers/CTagFilterFieldHelper.php:92
 #: include/classes/widgets/CWidgetHelper.php:545 include/forms.inc.php:1481
 #: include/forms.inc.php:2045 include/views/configuration.action.edit.php:133
-#: include/views/configuration.action.edit.php:302
-#: include/views/configuration.action.edit.php:386
-#: include/views/configuration.action.edit.php:462
-#: include/views/configuration.action.edit.php:501
+#: include/views/configuration.action.edit.php:295
+#: include/views/configuration.action.edit.php:379
+#: include/views/configuration.action.edit.php:455
+#: include/views/configuration.action.edit.php:506
 #: include/views/configuration.graph.edit.php:423
 #: include/views/configuration.graph.edit.php:518
 #: include/views/configuration.host.discovery.edit.php:162
@@ -1048,7 +1048,7 @@ msgstr ""
 msgid "Aggregate"
 msgstr ""
 
-#: app/views/popup.triggerexpr.php:108
+#: app/views/popup.triggerexpr.php:109
 msgid "Aggregate functions"
 msgstr ""
 
@@ -1064,7 +1064,7 @@ msgstr ""
 msgid "Alert message"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1070
+#: app/controllers/CControllerPopupTriggerExpr.php:1115
 msgid "Algorithm"
 msgstr ""
 
@@ -1382,7 +1382,7 @@ msgstr ""
 msgid "At least one operation must be selected."
 msgstr ""
 
-#: include/views/configuration.action.edit.php:511
+#: include/views/configuration.action.edit.php:516
 msgid "At least one operation must exist."
 msgstr ""
 
@@ -1645,12 +1645,12 @@ msgstr "Bind DN"
 msgid "Bind password"
 msgstr "Bind heslo"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:397
-#: app/controllers/CControllerPopupTriggerExpr.php:430
+#: app/controllers/CControllerPopupTriggerExpr.php:428
+#: app/controllers/CControllerPopupTriggerExpr.php:461
 msgid "Bits to shift"
 msgstr ""
 
-#: app/views/popup.triggerexpr.php:109
+#: app/views/popup.triggerexpr.php:110
 msgid "Bitwise functions"
 msgstr ""
 
@@ -1856,7 +1856,7 @@ msgstr "Nie je možné pridať nečíselnú položku \"%1$s\" do grafu \"%2$s\".
 msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
 msgstr "Nie je možné pridať nečíselnú položku \"%1$s\" k prototypu grafu \"%2$s\"."
 
-#: actionconf.php:280
+#: actionconf.php:286
 msgid "Cannot add action"
 msgstr "Nie je možné pridať akciu"
 
@@ -2159,7 +2159,7 @@ msgstr[2] ""
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Nie je možné zmazať interného Zabbix používateľa \"%1$s\", skúste ho vypnúť."
 
-#: actionconf.php:301
+#: actionconf.php:307
 msgid "Cannot delete action"
 msgstr "Nie je možné zmazať akciu"
 
@@ -2336,12 +2336,12 @@ msgstr[0] "Nie je možné zmazať skript"
 msgstr[1] "Nie je možné zmazať skript"
 msgstr[2] "Nie je možné zmazať skript"
 
-#: include/classes/api/services/CScript.php:875
+#: include/classes/api/services/CScript.php:877
 #, c-format
 msgid "Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$s\"."
 msgstr "Nie je možné zmazať skripty. Skript \"%1$s\" sa používa v operácii akcie \"%2$s\"."
 
-#: actionconf.php:488
+#: actionconf.php:494
 msgid "Cannot delete selected actions"
 msgstr "Nie je možné zmazať označené akcie"
 
@@ -2450,7 +2450,7 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: actionconf.php:477
+#: actionconf.php:483
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] "Nie je možné vypnúť akciu"
@@ -2539,7 +2539,7 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: actionconf.php:476
+#: actionconf.php:482
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] "Nie je možné vypnúť akciu"
@@ -2779,7 +2779,7 @@ msgstr[0] "Nie je možné importovať šablónu \"%1$s\", prepojená šablóna \
 msgstr[1] "Nie je možné importovať šablónu \"%1$s\", prepojené šablóny \"%2$s\" neexistujú."
 msgstr[2] "Nie je možné importovať šablónu \"%1$s\", prepojené šablóny \"%2$s\" neexistujú."
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1527
+#: app/controllers/CControllerPopupTriggerExpr.php:1583
 msgid "Cannot insert trigger expression"
 msgstr "Nie je možné vložiť výraz spúšťača"
 
@@ -2960,7 +2960,7 @@ msgstr "Nie je možné zrušiť prepojenie šablóny."
 msgid "Cannot unlink trigger \"%1$s\", it has items from template that is left linked to host."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2626
+#: include/classes/api/services/CAction.php:2636
 #, c-format
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
 msgstr "Nie je možné aktualizovať \"%1$s\" pre akciu \"%2$s\"."
@@ -3026,7 +3026,7 @@ msgstr ""
 msgid "Cannot update a templated web scenario \"%1$s\": %2$s."
 msgstr ""
 
-#: actionconf.php:272
+#: actionconf.php:278
 msgid "Cannot update action"
 msgstr "Nie je možné aktualizovať akciu"
 
@@ -3194,9 +3194,9 @@ msgstr ""
 msgid "Cannot update script"
 msgstr "Nie je možné aktualizovať skript"
 
-#: include/classes/api/services/CScript.php:417
-#: include/classes/api/services/CScript.php:430
-#: include/classes/api/services/CScript.php:443
+#: include/classes/api/services/CScript.php:419
+#: include/classes/api/services/CScript.php:432
+#: include/classes/api/services/CScript.php:445
 #, c-format
 msgid "Cannot update script scope. Script \"%1$s\" is used in action \"%2$s\"."
 msgstr ""
@@ -3380,9 +3380,9 @@ msgstr "Obsahuje reťazec"
 msgid "Character string not included"
 msgstr "Neobsahuje reťazec"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:728
-#: app/controllers/CControllerPopupTriggerExpr.php:921
-#: app/controllers/CControllerPopupTriggerExpr.php:1095
+#: app/controllers/CControllerPopupTriggerExpr.php:759
+#: app/controllers/CControllerPopupTriggerExpr.php:952
+#: app/controllers/CControllerPopupTriggerExpr.php:1140
 msgid "Chars"
 msgstr ""
 
@@ -3548,7 +3548,7 @@ msgstr "Hodiny"
 #: app/views/configuration.discovery.edit.php:154
 #: app/views/configuration.host.edit.php:43 app/views/popup.host.edit.php:68
 #: app/views/popup.service.edit.php:388
-#: include/views/configuration.action.edit.php:490
+#: include/views/configuration.action.edit.php:495
 #: include/views/configuration.graph.edit.php:510
 #: include/views/configuration.host.discovery.edit.php:960
 #: include/views/configuration.hostgroups.edit.php:62
@@ -3686,7 +3686,7 @@ msgstr ""
 msgid "Concurrent sessions"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1550
+#: app/controllers/CControllerPopupTriggerExpr.php:1606
 #: app/views/popup.lldoperation.php:59 app/views/popup.lldoverride.php:195
 #: app/views/popup.service.statusrule.edit.php:48
 msgid "Condition"
@@ -4144,10 +4144,10 @@ msgstr ""
 msgid "Correlation updated"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:51
-#: app/controllers/CControllerPopupTriggerExpr.php:674
-#: app/controllers/CControllerPopupTriggerExpr.php:864
+#: app/controllers/CControllerPopupTriggerExpr.php:52
+#: app/controllers/CControllerPopupTriggerExpr.php:705
 #: app/controllers/CControllerPopupTriggerExpr.php:895
+#: app/controllers/CControllerPopupTriggerExpr.php:926
 msgid "Count"
 msgstr "Počet"
 
@@ -4683,7 +4683,7 @@ msgid "Database TLS key file"
 msgstr ""
 
 #: app/partials/administration.system.info.php:121
-msgid "Database history $info_tables upgraded"
+msgid "Database history tables upgraded"
 msgstr ""
 
 #: app/partials/administration.system.info.php:129
@@ -4756,11 +4756,11 @@ msgstr "Dátum vypršania kontraktu podpory HW"
 msgid "Date HW purchased"
 msgstr "Dátum kúpy HW"
 
-#: app/views/popup.triggerexpr.php:110
+#: app/views/popup.triggerexpr.php:111
 msgid "Date and time functions"
 msgstr ""
 
-#: report4.php:175
+#: app/controllers/CControllerPopupTriggerExpr.php:119 report4.php:175
 msgid "Day"
 msgstr "Deň"
 
@@ -4801,8 +4801,8 @@ msgstr "Dec"
 msgid "December"
 msgstr "December"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:908
-#: app/controllers/CControllerPopupTriggerExpr.php:1108
+#: app/controllers/CControllerPopupTriggerExpr.php:939
+#: app/controllers/CControllerPopupTriggerExpr.php:1153
 msgid "Decimal places"
 msgstr ""
 
@@ -4812,7 +4812,7 @@ msgstr ""
 
 #: app/views/administration.iconmap.edit.php:108
 #: include/classes/widgets/forms/CWidgetForm.php:54 include/hosts.inc.php:31
-#: include/hosts.inc.php:1233 include/views/configuration.action.edit.php:229
+#: include/hosts.inc.php:1233 include/views/configuration.action.edit.php:222
 #: include/views/inventory.host.view.php:81
 #: include/views/js/monitoring.sysmaps.js.php:145
 #: include/views/js/monitoring.sysmaps.js.php:263
@@ -4956,7 +4956,7 @@ msgstr "Zmazať a vyčistiť označené šablóny? (Pozor: všetky prepojené ho
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
 msgstr "Zmazať a vyčistiť šablónu? (Pozor: všetky prepojené hosty budú tiež vyčistené!)"
 
-#: include/views/configuration.action.edit.php:492
+#: include/views/configuration.action.edit.php:497
 msgid "Delete current action?"
 msgstr "Zmazať aktuálnu akciu?"
 
@@ -5258,7 +5258,7 @@ msgstr ""
 msgid "Dependencies"
 msgstr "Závislosti"
 
-#: include/triggers.inc.php:2398
+#: include/triggers.inc.php:2402
 msgid "Dependent"
 msgstr "Podradená závislosť (tento ovplyvňuje)"
 
@@ -5266,7 +5266,7 @@ msgstr "Podradená závislosť (tento ovplyvňuje)"
 msgid "Dependent item"
 msgstr ""
 
-#: app/views/popup.generic.php:278 include/triggers.inc.php:2398
+#: app/views/popup.generic.php:278 include/triggers.inc.php:2402
 #: include/views/configuration.trigger.prototype.list.php:92
 #: include/views/configuration.triggers.list.php:238
 msgid "Depends on"
@@ -5313,10 +5313,10 @@ msgstr "Poznámka"
 #: app/views/js/reports.auditlog.list.js.php:153
 #: app/views/reports.auditlog.list.php:96
 #: app/views/reports.auditlog.list.php:129 include/func.inc.php:1601
-#: include/views/configuration.action.edit.php:175
-#: include/views/configuration.action.edit.php:179
-#: include/views/configuration.action.edit.php:319
-#: include/views/configuration.action.edit.php:407
+#: include/views/configuration.action.edit.php:168
+#: include/views/configuration.action.edit.php:172
+#: include/views/configuration.action.edit.php:312
+#: include/views/configuration.action.edit.php:400
 #: include/views/inventory.host.view.php:257
 msgid "Details"
 msgstr "Podrobnosti"
@@ -5325,11 +5325,11 @@ msgstr "Podrobnosti"
 msgid "Details of web scenario"
 msgstr "Detaily web scenára"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1055
+#: app/controllers/CControllerPopupTriggerExpr.php:1100
 msgid "Detection period"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1065
+#: app/controllers/CControllerPopupTriggerExpr.php:1110
 msgid "Deviations"
 msgstr ""
 
@@ -5488,7 +5488,7 @@ msgstr "Zakázať označené scenáre?"
 #: include/hosts.inc.php:1126 include/html.inc.php:284
 #: include/httptest.inc.php:48 include/items.inc.php:138
 #: include/items.inc.php:141 include/items.inc.php:185
-#: include/maps.inc.php:325 include/triggers.inc.php:1871
+#: include/maps.inc.php:325 include/triggers.inc.php:1875
 #: include/users.inc.php:84 include/views/configuration.action.list.php:77
 #: include/views/configuration.action.list.php:129
 #: include/views/configuration.host.discovery.list.php:167
@@ -5751,7 +5751,7 @@ msgstr "Zobrazujem %1$s do %2$s z %3$s nájdených"
 msgid "Displaying options"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:780
+#: app/controllers/CControllerPopupTriggerExpr.php:811
 msgid "Division denominator"
 msgstr ""
 
@@ -5897,7 +5897,7 @@ msgstr "Duplicitné userid \"%1$s\" v používateľoch pre mapu \"%2$s\"."
 #: include/classes/screens/CScreenProblem.php:867
 #: include/classes/screens/CScreenProblem.php:892
 #: include/classes/screens/CScreenProblem.php:1161 include/events.inc.php:289
-#: include/views/configuration.action.edit.php:175
+#: include/views/configuration.action.edit.php:168
 msgid "Duration"
 msgstr "Trvanie"
 
@@ -5931,10 +5931,10 @@ msgstr ""
 #: app/views/js/popup.service.edit.js.php:221
 #: app/views/monitoring.service.list.edit.php:142
 #: app/views/monitoring.service.list.php:114
-#: include/views/configuration.action.edit.php:246
-#: include/views/configuration.action.edit.php:274
-#: include/views/configuration.action.edit.php:358
-#: include/views/configuration.action.edit.php:436
+#: include/views/configuration.action.edit.php:239
+#: include/views/configuration.action.edit.php:267
+#: include/views/configuration.action.edit.php:351
+#: include/views/configuration.action.edit.php:429
 #: include/views/configuration.maintenance.edit.php:68
 #: include/views/configuration.trigger.prototype.edit.php:111
 #: include/views/configuration.trigger.prototype.edit.php:305
@@ -6234,7 +6234,7 @@ msgstr ""
 #: include/html.inc.php:280 include/httptest.inc.php:47
 #: include/items.inc.php:138 include/items.inc.php:141
 #: include/items.inc.php:182 include/triggers.inc.php:999
-#: include/triggers.inc.php:1868
+#: include/triggers.inc.php:1872
 #: include/views/configuration.action.edit.php:147
 #: include/views/configuration.action.list.php:76
 #: include/views/configuration.action.list.php:137
@@ -6330,7 +6330,7 @@ msgstr ""
 msgid "Error: %1$s"
 msgstr "Chyba: %1$s"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1045
+#: app/controllers/CControllerPopupTriggerExpr.php:1090
 msgid "Evaluation period"
 msgstr ""
 
@@ -6903,8 +6903,8 @@ msgctxt "page navigation"
 msgid "First"
 msgstr "Prvá"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:237
-#: app/controllers/CControllerPopupTriggerExpr.php:266
+#: app/controllers/CControllerPopupTriggerExpr.php:268
+#: app/controllers/CControllerPopupTriggerExpr.php:297
 msgid "Fit"
 msgstr "Fit"
 
@@ -7021,7 +7021,7 @@ msgstr ""
 msgid "Full clone"
 msgstr "Vytvoriť úplnú kópiu"
 
-#: app/views/popup.triggerexpr.php:132
+#: app/views/popup.triggerexpr.php:133
 #: include/views/configuration.graph.edit.php:366
 msgid "Function"
 msgstr "Funkcia"
@@ -7037,7 +7037,7 @@ msgstr "GSM modem"
 msgid "GUI"
 msgstr "GUI"
 
-#: include/classes/user/CWebUser.php:63 index_sso.php:245
+#: include/classes/user/CWebUser.php:63 index_sso.php:260
 msgid "GUI access disabled."
 msgstr "GUI prístup vypnutý."
 
@@ -7624,7 +7624,7 @@ msgstr "Čistenie histórie môže trvať dlhší čas. Pokračovať?"
 msgid "History data selection"
 msgstr ""
 
-#: app/views/popup.triggerexpr.php:111
+#: app/views/popup.triggerexpr.php:112
 msgid "History functions"
 msgstr ""
 
@@ -7804,7 +7804,7 @@ msgid "Host group label type"
 msgstr "Typ popisku skupiny"
 
 #: include/classes/api/services/CDashboardGeneral.php:555
-#: include/classes/api/services/CScript.php:812
+#: include/classes/api/services/CScript.php:814
 #: include/classes/api/services/CSettings.php:247
 #: include/classes/api/services/CUserGroup.php:444
 #, c-format
@@ -8049,6 +8049,10 @@ msgstr "Umiestnenie hostov"
 #: app/controllers/CControllerPopupMassupdateHost.php:454
 msgid "Hosts updated"
 msgstr "Hosty aktualizované"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:118
+msgid "Hour"
+msgstr ""
 
 #: app/views/popup.maintenance.period.php:170
 msgid "Hours"
@@ -8361,7 +8365,7 @@ msgstr "Obrázky"
 msgid "Images for all maps will be updated!"
 msgstr "Obrázky pre všetky mapy budú aktualizované!"
 
-#: include/views/configuration.action.edit.php:236
+#: include/views/configuration.action.edit.php:229
 msgid "Immediately"
 msgstr "Hneď"
 
@@ -8443,7 +8447,7 @@ msgstr ""
 #: app/partials/monitoring.host.view.html.php:89
 #: app/views/configuration.host.list.php:267
 #: include/classes/screens/CScreenProblem.php:386
-#: include/hostgroups.inc.php:293 include/triggers.inc.php:2023
+#: include/hostgroups.inc.php:293 include/triggers.inc.php:2027
 #: include/views/inventory.host.view.php:42
 msgid "Inaccessible maintenance"
 msgstr ""
@@ -8455,11 +8459,11 @@ msgstr ""
 
 #: httpconf.php:663 include/graphs.inc.php:274 include/hosts.inc.php:649
 #: include/httptest.inc.php:222 include/items.inc.php:916
-#: include/triggers.inc.php:2162
+#: include/triggers.inc.php:2166
 msgid "Inaccessible template"
 msgstr ""
 
-#: include/triggers.inc.php:2368 include/triggers.inc.php:2376
+#: include/triggers.inc.php:2372 include/triggers.inc.php:2380
 msgid "Inaccessible trigger"
 msgstr ""
 
@@ -8574,7 +8578,7 @@ msgstr ""
 msgid "Incorrect action condition discovery check."
 msgstr "Neplatná podmienka akcie zisťovacej kontroly."
 
-#: include/classes/api/services/CAction.php:3310
+#: include/classes/api/services/CAction.php:3320
 msgid "Incorrect action condition discovery check. Discovery check does not exist or you have no access to it."
 msgstr "Neplatná podmienka akcie zisťovacej kontroly. Zisťovacia kontrola neexistuje alebo nemáte k nej prístup."
 
@@ -8582,7 +8586,7 @@ msgstr "Neplatná podmienka akcie zisťovacej kontroly. Zisťovacia kontrola nee
 msgid "Incorrect action condition discovery object."
 msgstr "Neplatná podmienka akcie zisťovacieho pravidla."
 
-#: include/classes/api/services/CAction.php:3269
+#: include/classes/api/services/CAction.php:3279
 msgid "Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it."
 msgstr "Neplatná podmienka akcie zisťovacieho pravidla. Zisťovacie pravidlo neexituje alebo nemáte k nemu prístup."
 
@@ -8594,15 +8598,15 @@ msgstr "Neplatná podmienka akcie zisťovacieho stavu."
 msgid "Incorrect action condition event type."
 msgstr "Neplatná podmienka akcie typu udalosti."
 
-#: include/classes/api/services/CAction.php:2989
+#: include/classes/api/services/CAction.php:2999
 msgid "Incorrect action condition or operation host group. Host group does not exist or you have no access to it."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:3049
+#: include/classes/api/services/CAction.php:3059
 msgid "Incorrect action condition or operation host. Host does not exist or you have no access to it."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:3187
+#: include/classes/api/services/CAction.php:3197
 msgid "Incorrect action condition or operation template. Template does not exist or you have no access to it."
 msgstr ""
 
@@ -8611,11 +8615,11 @@ msgstr ""
 msgid "Incorrect action condition port \"%1$s\"."
 msgstr "Neplatná podmienka akcie portu \"%1$s\"."
 
-#: include/classes/api/services/CAction.php:3351
+#: include/classes/api/services/CAction.php:3361
 msgid "Incorrect action condition proxy. Proxy does not exist or you have no access to it."
 msgstr "Neplatná podmienka akcie proxy. Proxy neexistuje alebo nemáte k nej prístup."
 
-#: include/classes/api/services/CAction.php:3391
+#: include/classes/api/services/CAction.php:3401
 msgid "Incorrect action condition service. Service does not exist or you have no access to it."
 msgstr ""
 
@@ -8623,7 +8627,7 @@ msgstr ""
 msgid "Incorrect action condition trigger severity."
 msgstr "Neplatná podmienka akcie závažnosti spúšťača."
 
-#: include/classes/api/services/CAction.php:3228
+#: include/classes/api/services/CAction.php:3238
 msgid "Incorrect action condition trigger. Trigger does not exist or you have no access to it."
 msgstr "Neplatná podmienka akcie spúšťača. Spúšťač neexistuje alebo nemáte k nemu prístup."
 
@@ -8633,11 +8637,11 @@ msgstr "Neplatná podmienka akcie typu."
 
 #: app/controllers/CControllerActionOperationValidate.php:83
 #: app/controllers/CControllerActionOperationValidate.php:89
-#: include/classes/api/services/CAction.php:2814
+#: include/classes/api/services/CAction.php:2824
 msgid "Incorrect action operation escalation step values."
 msgstr "Neplatné hodnoty eskalačného kroku v prevádzkovej akcii."
 
-#: include/classes/api/services/CAction.php:2889
+#: include/classes/api/services/CAction.php:2899
 msgid "Incorrect action operation media type. Media type does not exist or you have no access to it."
 msgstr ""
 
@@ -8646,11 +8650,11 @@ msgstr ""
 msgid "Incorrect action operation type \"%1$s\" for event source \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:3135
+#: include/classes/api/services/CAction.php:3145
 msgid "Incorrect action operation user group. User group does not exist or you have no access to it."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:3092
+#: include/classes/api/services/CAction.php:3102
 msgid "Incorrect action operation user. User does not exist or you have no access to it."
 msgstr ""
 
@@ -9394,7 +9398,7 @@ msgstr ""
 msgid "Initial view is ignored if the default view is set."
 msgstr ""
 
-#: app/views/popup.triggerexpr.php:239
+#: app/views/popup.triggerexpr.php:258
 msgid "Insert"
 msgstr "Vložiť"
 
@@ -9546,7 +9550,7 @@ msgstr ""
 msgid "Invalid action condition: %1$s."
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1517
+#: app/controllers/CControllerPopupTriggerExpr.php:1573
 #, c-format
 msgid "Invalid condition: %1$s."
 msgstr ""
@@ -9607,10 +9611,10 @@ msgstr "Neplatné parametre metódy."
 #: app/controllers/CControllerDashboardUpdate.php:200
 #: app/controllers/CControllerDashboardUpdate.php:212
 #: app/controllers/CControllerPopupHttpStep.php:100
-#: include/classes/api/services/CAction.php:2705
-#: include/classes/api/services/CAction.php:2711
-#: include/classes/api/services/CAction.php:2722
-#: include/classes/api/services/CAction.php:2734
+#: include/classes/api/services/CAction.php:2715
+#: include/classes/api/services/CAction.php:2721
+#: include/classes/api/services/CAction.php:2732
+#: include/classes/api/services/CAction.php:2744
 #: include/classes/api/services/CAutoregistration.php:157
 #: include/classes/api/services/CAutoregistration.php:163
 #: include/classes/api/services/CAutoregistration.php:170
@@ -9673,8 +9677,8 @@ msgstr "Neplatné parametre metódy."
 #: include/classes/api/services/CReport.php:582
 #: include/classes/api/services/CReport.php:596
 #: include/classes/api/services/CReport.php:602
-#: include/classes/api/services/CScript.php:902
-#: include/classes/api/services/CScript.php:908
+#: include/classes/api/services/CScript.php:904
+#: include/classes/api/services/CScript.php:910
 #: include/classes/api/services/CTemplate.php:668
 #: include/classes/api/services/CTriggerGeneral.php:665
 #: include/classes/api/services/CTriggerGeneral.php:1773
@@ -10020,7 +10024,7 @@ msgstr[2] "Položky povolené"
 msgid "Item in \"not supported\" state"
 msgstr "Položka je v \"not supported\" stave"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1510
+#: app/controllers/CControllerPopupTriggerExpr.php:1566
 msgid "Item not selected"
 msgstr "Položka nie je označená"
 
@@ -10481,17 +10485,17 @@ msgstr "Graf posledného mesiaca"
 msgid "Last name"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:62
-#: app/controllers/CControllerPopupTriggerExpr.php:76
-#: app/controllers/CControllerPopupTriggerExpr.php:90
-#: app/controllers/CControllerPopupTriggerExpr.php:103
-#: app/controllers/CControllerPopupTriggerExpr.php:124
-#: app/controllers/CControllerPopupTriggerExpr.php:133
-#: app/controllers/CControllerPopupTriggerExpr.php:146
-#: app/controllers/CControllerPopupTriggerExpr.php:165
-#: app/controllers/CControllerPopupTriggerExpr.php:202
-#: app/controllers/CControllerPopupTriggerExpr.php:221
-#: app/controllers/CControllerPopupTriggerExpr.php:250
+#: app/controllers/CControllerPopupTriggerExpr.php:63
+#: app/controllers/CControllerPopupTriggerExpr.php:77
+#: app/controllers/CControllerPopupTriggerExpr.php:91
+#: app/controllers/CControllerPopupTriggerExpr.php:134
+#: app/controllers/CControllerPopupTriggerExpr.php:155
+#: app/controllers/CControllerPopupTriggerExpr.php:164
+#: app/controllers/CControllerPopupTriggerExpr.php:177
+#: app/controllers/CControllerPopupTriggerExpr.php:196
+#: app/controllers/CControllerPopupTriggerExpr.php:233
+#: app/controllers/CControllerPopupTriggerExpr.php:252
+#: app/controllers/CControllerPopupTriggerExpr.php:281
 msgid "Last of"
 msgstr "Posledných"
 
@@ -10568,8 +10572,8 @@ msgstr ""
 msgid "Legend"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:642
-#: app/controllers/CControllerPopupTriggerExpr.php:760
+#: app/controllers/CControllerPopupTriggerExpr.php:673
+#: app/controllers/CControllerPopupTriggerExpr.php:791
 msgid "Length"
 msgstr ""
 
@@ -10783,7 +10787,7 @@ msgstr "Logovať aj nenastavené SNMP trapy"
 #: app/controllers/CControllerAuditLogList.php:191
 #: app/views/administration.authentication.edit.php:200
 #: app/views/administration.user.list.php:112 include/func.inc.php:1523
-#: include/func.inc.php:1539 index_http.php:90 index_sso.php:265
+#: include/func.inc.php:1539 index_http.php:90 index_sso.php:280
 msgid "Login"
 msgstr "Prihlásenie"
 
@@ -11121,9 +11125,9 @@ msgstr "Označiť ostatné"
 msgid "Mark selected"
 msgstr "Označiť vybrané"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:377
-#: app/controllers/CControllerPopupTriggerExpr.php:417
-#: app/controllers/CControllerPopupTriggerExpr.php:443
+#: app/controllers/CControllerPopupTriggerExpr.php:408
+#: app/controllers/CControllerPopupTriggerExpr.php:448
+#: app/controllers/CControllerPopupTriggerExpr.php:474
 msgid "Mask"
 msgstr "Maska"
 
@@ -11163,11 +11167,11 @@ msgstr ""
 msgid "Matches regular expression"
 msgstr ""
 
-#: app/views/popup.triggerexpr.php:112
+#: app/views/popup.triggerexpr.php:113
 msgid "Mathematical functions"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:364
+#: app/controllers/CControllerPopupTriggerExpr.php:395
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:134
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:136
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:206
@@ -11403,7 +11407,7 @@ msgstr ""
 msgid "Middle"
 msgstr "Stred"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:359
+#: app/controllers/CControllerPopupTriggerExpr.php:390
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:119
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:121
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:191
@@ -11506,7 +11510,7 @@ msgstr "Chýbajúce položky pre prototyp grafu \"%1$s\"."
 msgid "Missing key \"%1$s\" for host \"%2$s\"."
 msgstr "Chýbajúci kľúč \"%1$s\" pre host \"%2$s\"."
 
-#: app/controllers/CControllerPopupTriggerExpr.php:242
+#: app/controllers/CControllerPopupTriggerExpr.php:273
 #: app/views/administration.proxy.list.php:51
 #: app/views/administration.proxy.list.php:77 report2.php:201
 msgid "Mode"
@@ -11613,6 +11617,7 @@ msgstr "Monitorovanie"
 msgid "Monospace"
 msgstr ""
 
+#: app/controllers/CControllerPopupTriggerExpr.php:121
 #: app/views/popup.maintenance.period.php:104 report4.php:163
 msgid "Month"
 msgstr "Mesiac"
@@ -12234,7 +12239,7 @@ msgstr "Žiadne výbery nenájdené"
 msgid "No new modules discovered"
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2769
+#: include/classes/api/services/CAction.php:2779
 #, c-format
 msgid "No operations defined for action \"%1$s\"."
 msgstr ""
@@ -12271,9 +12276,9 @@ msgstr "Žiadne oprávnenia pre prístup do systému."
 #: include/classes/api/services/CRole.php:137
 #: include/classes/api/services/CRole.php:230
 #: include/classes/api/services/CRole.php:345
-#: include/classes/api/services/CScript.php:240
-#: include/classes/api/services/CScript.php:316
-#: include/classes/api/services/CScript.php:825
+#: include/classes/api/services/CScript.php:242
+#: include/classes/api/services/CScript.php:318
+#: include/classes/api/services/CScript.php:827
 #: include/classes/api/services/CSettings.php:136
 #: include/classes/api/services/CUserGroup.php:176
 #: include/classes/api/services/CUserGroup.php:260
@@ -12312,7 +12317,7 @@ msgstr ""
 #: app/views/monitoring.widget.systeminfo.view.php:45 disc_prototypes.php:748
 #: host_discovery.php:808 hostinventoriesoverview.php:73
 #: include/classes/api/services/CAction.php:1516
-#: include/classes/api/services/CAction.php:2571
+#: include/classes/api/services/CAction.php:2577
 #: include/classes/api/services/CConfiguration.php:78
 #: include/classes/api/services/CCorrelation.php:497
 #: include/classes/api/services/CCorrelation.php:653
@@ -12412,11 +12417,11 @@ msgstr ""
 #: include/classes/api/services/CReport.php:909
 #: include/classes/api/services/CRole.php:326
 #: include/classes/api/services/CRole.php:363
-#: include/classes/api/services/CScript.php:375
-#: include/classes/api/services/CScript.php:860
-#: include/classes/api/services/CScript.php:920
-#: include/classes/api/services/CScript.php:937
-#: include/classes/api/services/CScript.php:949
+#: include/classes/api/services/CScript.php:377
+#: include/classes/api/services/CScript.php:862
+#: include/classes/api/services/CScript.php:922
+#: include/classes/api/services/CScript.php:939
+#: include/classes/api/services/CScript.php:951
 #: include/classes/api/services/CService.php:398
 #: include/classes/api/services/CService.php:467
 #: include/classes/api/services/CService.php:947
@@ -12475,7 +12480,7 @@ msgid "No public key file specified."
 msgstr "Žiadny špecifikovaný súbor s verejným kľúčom."
 
 #: app/controllers/CControllerActionOperationValidate.php:110
-#: include/classes/api/services/CAction.php:2826
+#: include/classes/api/services/CAction.php:2836
 msgid "No recipients specified for action operation message."
 msgstr ""
 
@@ -12496,7 +12501,7 @@ msgid "No target selected."
 msgstr "Nie je vybraný cieľ."
 
 #: app/controllers/CControllerActionOperationValidate.php:142
-#: include/classes/api/services/CAction.php:2837
+#: include/classes/api/services/CAction.php:2847
 msgid "No targets specified for action operation global script."
 msgstr ""
 
@@ -12645,6 +12650,10 @@ msgstr "Report hlásení"
 msgid "Notifications"
 msgstr "Správy"
 
+#: actionconf.php:87 include/views/configuration.action.edit.php:475
+msgid "Notify about canceled escalations"
+msgstr ""
+
 #: include/actions.inc.php:865 include/actions.inc.php:1038
 #: include/actions.inc.php:1039
 msgid "Notify all involved"
@@ -12729,6 +12738,10 @@ msgstr "Počet procesorov na virtuálnom stroji VMware, <url> - URL VMware služ
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:279
 msgid "Number of rows"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:126
+msgid "Number of seasons"
 msgstr ""
 
 #: include/views/reports.toptriggers.php:86
@@ -13031,12 +13044,12 @@ msgstr "Informácie o operačnom systéme. Vráti reťazec"
 msgid "Operation"
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2795
+#: include/classes/api/services/CAction.php:2805
 #, c-format
 msgid "Operation \"%1$s\" already exists for action \"%2$s\"."
 msgstr ""
 
-#: actionconf.php:378
+#: actionconf.php:384
 #, c-format
 msgid "Operation \"%1$s\" already exists."
 msgstr ""
@@ -13070,8 +13083,8 @@ msgstr ""
 #: app/views/configuration.correlation.edit.php:140
 #: app/views/configuration.correlation.list.php:77
 #: app/views/popup.lldoverride.php:210
-#: include/views/configuration.action.edit.php:307
-#: include/views/configuration.action.edit.php:479
+#: include/views/configuration.action.edit.php:300
+#: include/views/configuration.action.edit.php:484
 #: include/views/configuration.action.list.php:99
 msgid "Operations"
 msgstr "Operácie"
@@ -13106,7 +13119,7 @@ msgstr "Operácie"
 msgid "Operator"
 msgstr "Operátor"
 
-#: app/views/popup.triggerexpr.php:113
+#: app/views/popup.triggerexpr.php:114
 msgid "Operator functions"
 msgstr ""
 
@@ -13534,7 +13547,7 @@ msgid "Parameters"
 msgstr "Parametre"
 
 #: app/controllers/CControllerActionOperationValidate.php:76
-#: include/classes/api/services/CAction.php:2807
+#: include/classes/api/services/CAction.php:2817
 msgid "Parameters \"esc_step_from\" and \"esc_step_to\" must be set together."
 msgstr ""
 
@@ -13661,12 +13674,12 @@ msgstr ""
 msgid "Paste without external links"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:877
+#: app/controllers/CControllerPopupTriggerExpr.php:908
 #: app/views/monitoring.charts.view.php:106
 msgid "Pattern"
 msgstr ""
 
-#: actionconf.php:82 include/views/configuration.action.edit.php:163
+#: actionconf.php:82 include/views/configuration.action.edit.php:471
 msgid "Pause operations for suppressed problems"
 msgstr ""
 
@@ -13679,7 +13692,7 @@ msgstr "Maximálne využitie pamäte: %1$s"
 msgid "Percent of time the virtual machine is unable to run because it is contending for access to the physical CPU(s), <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:213
+#: app/controllers/CControllerPopupTriggerExpr.php:244
 msgid "Percentage"
 msgstr "Percentá"
 
@@ -13703,10 +13716,11 @@ msgstr "Percentilová čiara (vpravo)"
 msgid "Performs a DNS query. Returns character string with the required type of information"
 msgstr "Vykonať DNS dotaz. Vráti reťazec s požadovaným typom informácie"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:104
 #: app/partials/scheduledreport.formgrid.html.php:83
 #: app/partials/scheduledreport.table.html.php:42
 #: app/views/popup.lldoperation.php:116
-#: app/views/popup.massupdate.item.php:227 app/views/popup.triggerexpr.php:181
+#: app/views/popup.massupdate.item.php:227 app/views/popup.triggerexpr.php:182
 #: include/views/configuration.host.discovery.edit.php:632
 #: include/views/configuration.item.edit.php:735
 #: include/views/configuration.item.prototype.edit.php:714
@@ -13714,8 +13728,9 @@ msgstr "Vykonať DNS dotaz. Vráti reťazec s požadovaným typom informácie"
 msgid "Period"
 msgstr "Perióda"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:95
-#: app/controllers/CControllerPopupTriggerExpr.php:1050
+#: app/controllers/CControllerPopupTriggerExpr.php:96
+#: app/controllers/CControllerPopupTriggerExpr.php:109
+#: app/controllers/CControllerPopupTriggerExpr.php:1095
 msgid "Period shift"
 msgstr ""
 
@@ -13869,7 +13884,7 @@ msgstr ""
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:832
+#: app/controllers/CControllerPopupTriggerExpr.php:863
 msgid "Power value"
 msgstr ""
 
@@ -13878,7 +13893,7 @@ msgstr ""
 msgid "Pre-installation summary"
 msgstr "Predinštalačné zhrnutie"
 
-#: app/views/popup.triggerexpr.php:114
+#: app/views/popup.triggerexpr.php:115
 msgid "Prediction functions"
 msgstr ""
 
@@ -14405,7 +14420,7 @@ msgstr ""
 msgid "Recovery expression syntax error."
 msgstr ""
 
-#: include/views/configuration.action.edit.php:393
+#: include/views/configuration.action.edit.php:386
 msgid "Recovery operations"
 msgstr ""
 
@@ -14559,10 +14574,10 @@ msgstr "Vzdialený príkaz"
 #: include/classes/widgets/CWidgetHelper.php:533
 #: include/classes/widgets/CWidgetHelper.php:586 include/forms.inc.php:1461
 #: include/forms.inc.php:2009 include/views/configuration.action.edit.php:97
-#: include/views/configuration.action.edit.php:256
-#: include/views/configuration.action.edit.php:284
-#: include/views/configuration.action.edit.php:368
-#: include/views/configuration.action.edit.php:446
+#: include/views/configuration.action.edit.php:249
+#: include/views/configuration.action.edit.php:277
+#: include/views/configuration.action.edit.php:361
+#: include/views/configuration.action.edit.php:439
 #: include/views/configuration.host.discovery.edit.php:151
 #: include/views/configuration.host.discovery.edit.php:196
 #: include/views/configuration.host.discovery.edit.php:222
@@ -14709,8 +14724,8 @@ msgstr "Nahradiť"
 msgid "Replace dependencies"
 msgstr "Nahradiť závislosti"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:647
-#: app/controllers/CControllerPopupTriggerExpr.php:882
+#: app/controllers/CControllerPopupTriggerExpr.php:678
+#: app/controllers/CControllerPopupTriggerExpr.php:913
 msgid "Replacement"
 msgstr ""
 
@@ -14911,7 +14926,7 @@ msgstr ""
 #: app/views/popup.itemtestedit.view.php:325
 #: app/views/popup.itemtestedit.view.php:365
 #: app/views/popup.testtriggerexpr.php:49
-#: app/views/popup.testtriggerexpr.php:102 app/views/popup.triggerexpr.php:217
+#: app/views/popup.testtriggerexpr.php:102 app/views/popup.triggerexpr.php:236
 #: include/classes/debug/CProfiler.php:183
 msgid "Result"
 msgstr "Výsledok"
@@ -15446,7 +15461,7 @@ msgstr ""
 msgid "Script"
 msgstr "Skript"
 
-#: include/classes/api/services/CScript.php:1346
+#: include/classes/api/services/CScript.php:1348
 #, c-format
 msgid "Script \"%1$s\" already exists."
 msgstr "Skript \"%1$s\" už existuje."
@@ -15512,11 +15527,12 @@ msgstr "Vyhľadávací vzor je prázdny"
 msgid "Search type"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1060
+#: app/controllers/CControllerPopupTriggerExpr.php:114
+#: app/controllers/CControllerPopupTriggerExpr.php:1105
 msgid "Season"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1075
+#: app/controllers/CControllerPopupTriggerExpr.php:1120
 msgid "Season deviation window"
 msgstr ""
 
@@ -15598,7 +15614,7 @@ msgstr ""
 msgid "Selected"
 msgstr "Označené"
 
-#: actionconf.php:488
+#: actionconf.php:494
 msgid "Selected actions deleted"
 msgstr "Označené akcie zmazané"
 
@@ -15840,6 +15856,7 @@ msgid "Services updated"
 msgstr ""
 
 #: include/classes/core/ZBase.php:244 include/classes/core/ZBase.php:471
+#: index_sso.php:242 index_sso.php:249
 msgid "Session initialization error."
 msgstr ""
 
@@ -16293,7 +16310,7 @@ msgstr "Španielsky (es_ES)"
 msgid "Specified role was not found."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2932
+#: include/classes/api/services/CAction.php:2942
 msgid "Specified script does not exist or you do not have rights on it for action operation command."
 msgstr "Špecifikovaný skript neexistuje alebo nemáte práva na jeho vykonanie."
 
@@ -16328,8 +16345,8 @@ msgstr "Štandardné položky"
 msgid "Standby"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:637
-#: app/controllers/CControllerPopupTriggerExpr.php:755
+#: app/controllers/CControllerPopupTriggerExpr.php:668
+#: app/controllers/CControllerPopupTriggerExpr.php:786
 msgid "Start"
 msgstr ""
 
@@ -16337,7 +16354,7 @@ msgstr ""
 msgid "Start date"
 msgstr ""
 
-#: include/views/configuration.action.edit.php:175
+#: include/views/configuration.action.edit.php:168
 msgid "Start in"
 msgstr "Začiatok v"
 
@@ -16520,7 +16537,7 @@ msgid "Step with name \"%1$s\" already exists."
 msgstr "Krok s menom \"%1$s\" už existuje."
 
 #: app/partials/popup.operations.php:51 httpconf.php:51
-#: include/views/configuration.action.edit.php:175
+#: include/views/configuration.action.edit.php:168
 #: include/views/configuration.httpconf.edit.php:227
 #: include/views/configuration.httpconf.edit.php:236
 msgid "Steps"
@@ -16574,12 +16591,12 @@ msgstr "Priamy"
 msgid "Strict"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:497
+#: app/controllers/CControllerPopupTriggerExpr.php:528
 #: include/triggers.inc.php:1596
 msgid "String"
 msgstr ""
 
-#: app/views/popup.triggerexpr.php:115
+#: app/views/popup.triggerexpr.php:116
 msgid "String functions"
 msgstr ""
 
@@ -17266,7 +17283,7 @@ msgstr "Tento rok"
 msgid "This year so far"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:261
+#: app/controllers/CControllerPopupTriggerExpr.php:292
 msgid "Threshold"
 msgstr "Prahová hodnota"
 
@@ -17299,15 +17316,15 @@ msgstr ""
 msgid "Till"
 msgstr "Do"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:50
-#: app/controllers/CControllerPopupTriggerExpr.php:232
+#: app/controllers/CControllerPopupTriggerExpr.php:51
+#: app/controllers/CControllerPopupTriggerExpr.php:263
 #: app/views/hintbox.eventlist.php:61 app/views/hintbox.eventlist.php:67
 #: app/views/monitoring.widget.actionlog.view.php:33
 #: app/views/monitoring.widget.problems.view.php:38
 #: app/views/popup.itemtestedit.view.php:270
 #: app/views/popup.service.time.edit.php:70
 #: app/views/popup.service.time.edit.php:98
-#: app/views/popup.triggerexpr.php:174 app/views/popup.triggerexpr.php:178
+#: app/views/popup.triggerexpr.php:175 app/views/popup.triggerexpr.php:179
 #: app/views/reports.auditlog.list.php:89 include/actions.inc.php:1700
 #: include/actions.inc.php:1754 include/actions.inc.php:1827
 #: include/actions.inc.php:1921 include/actions.inc.php:1976
@@ -17344,13 +17361,13 @@ msgstr ""
 msgid "Time period"
 msgstr "Časová perióda"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:68
-#: app/controllers/CControllerPopupTriggerExpr.php:82
-#: app/controllers/CControllerPopupTriggerExpr.php:152
-#: app/controllers/CControllerPopupTriggerExpr.php:171
-#: app/controllers/CControllerPopupTriggerExpr.php:208
-#: app/controllers/CControllerPopupTriggerExpr.php:227
-#: app/controllers/CControllerPopupTriggerExpr.php:256
+#: app/controllers/CControllerPopupTriggerExpr.php:69
+#: app/controllers/CControllerPopupTriggerExpr.php:83
+#: app/controllers/CControllerPopupTriggerExpr.php:183
+#: app/controllers/CControllerPopupTriggerExpr.php:202
+#: app/controllers/CControllerPopupTriggerExpr.php:239
+#: app/controllers/CControllerPopupTriggerExpr.php:258
+#: app/controllers/CControllerPopupTriggerExpr.php:287
 #: include/classes/widgets/CWidgetHelper.php:784
 #: include/classes/widgets/CWidgetHelper.php:860
 #: include/classes/widgets/CWidgetHelper.php:1129
@@ -18047,9 +18064,9 @@ msgstr "Jednotky"
 #: include/items.inc.php:45 include/items.inc.php:110
 #: include/items.inc.php:133 include/items.inc.php:167
 #: include/maintenances.inc.php:33 include/maps.inc.php:39
-#: include/triggers.inc.php:83 include/triggers.inc.php:1868
+#: include/triggers.inc.php:83 include/triggers.inc.php:1872
 #: include/users.inc.php:64 include/users.inc.php:87
-#: include/views/configuration.action.edit.php:233
+#: include/views/configuration.action.edit.php:226
 #: include/views/configuration.triggers.list.php:77
 msgid "Unknown"
 msgstr "Neznámy"
@@ -18067,7 +18084,7 @@ msgid "Unknown error"
 msgstr "Neznáma chyba"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:47
-#: app/controllers/CControllerPopupTriggerExpr.php:1301
+#: app/controllers/CControllerPopupTriggerExpr.php:1346
 #: include/triggers.inc.php:1146
 msgid "Unknown host item, no such item in selected host"
 msgstr "Neznáme položky hosta, nenájdené položky na označenom hostovi"
@@ -18217,7 +18234,7 @@ msgstr "Dostupný"
 #: app/views/popup.service.time.edit.php:166
 #: app/views/popup.triggerwizard.php:147 app/views/popup.valuemap.edit.php:126
 #: include/classes/html/CTabFilter.php:94
-#: include/views/configuration.action.edit.php:489
+#: include/views/configuration.action.edit.php:494
 #: include/views/configuration.graph.edit.php:494
 #: include/views/configuration.host.discovery.edit.php:977
 #: include/views/configuration.hostgroups.edit.php:61
@@ -18255,7 +18272,7 @@ msgstr "Aktualizovať existujúce"
 msgid "Update interval"
 msgstr "Interval obnovovania"
 
-#: include/views/configuration.action.edit.php:469
+#: include/views/configuration.action.edit.php:462
 msgid "Update operations"
 msgstr ""
 
@@ -18471,7 +18488,7 @@ msgstr[2] ""
 
 #: include/classes/api/services/CDashboard.php:482
 #: include/classes/api/services/CReport.php:463
-#: include/classes/api/services/CScript.php:776
+#: include/classes/api/services/CScript.php:778
 #: include/classes/api/services/CSettings.php:260
 #: include/classes/api/services/CUser.php:741
 #, c-format
@@ -19059,7 +19076,7 @@ msgstr "Hodnota: bez údajov"
 msgid "Valuemap with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:624
+#: app/controllers/CControllerPopupTriggerExpr.php:655
 #: app/views/monitoring.charts.view.php:56
 #: include/views/monitoring.history.php:78
 msgid "Values"
@@ -19294,6 +19311,10 @@ msgstr "St"
 #: include/func.inc.php:121 include/func.inc.php:211 jsLoader.php:245
 msgid "Wednesday"
 msgstr "Streda"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:120
+msgid "Week"
+msgstr ""
 
 #: app/partials/scheduledreport.formgrid.html.php:99
 #: app/partials/scheduledreport.table.html.php:50
@@ -19567,7 +19588,8 @@ msgctxt "XML date and time format"
 msgid "YYYY-MM-DDThh:mm:ssZ"
 msgstr "YYYY-MM-DDThh:mm:ssZ"
 
-#: report4.php:116 report4.php:152
+#: app/controllers/CControllerPopupTriggerExpr.php:122 report4.php:116
+#: report4.php:152
 msgid "Year"
 msgstr "Rok"
 
@@ -19627,7 +19649,7 @@ msgstr "Ste prihlásený ako \"%1$s\"."
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "Nemôžete si vybrať niektoré jazyky pretože locales pre ne nie sú nainštalované na web servery."
 
-#: include/func.inc.php:1533 index_http.php:87 index_sso.php:262
+#: include/func.inc.php:1533 index_http.php:87 index_sso.php:277
 msgid "You are not logged in"
 msgstr "Nie ste prihlásený"
 
@@ -19868,11 +19890,11 @@ msgstr ""
 msgid "a time unit is expected"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:302
+#: app/controllers/CControllerPopupTriggerExpr.php:333
 msgid "abs() - Absolute value"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:308
+#: app/controllers/CControllerPopupTriggerExpr.php:339
 msgid "acos() - The arccosine of a value as an angle, expressed in radians"
 msgstr ""
 
@@ -19967,7 +19989,7 @@ msgstr ""
 msgid "an explicit time is expected"
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2712
+#: include/classes/api/services/CAction.php:2722
 #: include/classes/api/services/CCorrelation.php:730
 msgid "an identifier is not defined in the formula"
 msgstr ""
@@ -20011,11 +20033,11 @@ msgstr "na červeno"
 msgid "ascending"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:315
+#: app/controllers/CControllerPopupTriggerExpr.php:346
 msgid "ascii() - Returns the ASCII code of the leftmost character of the value"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:322
+#: app/controllers/CControllerPopupTriggerExpr.php:353
 msgid "asin() - The arcsine of a value as an angle, expressed in radians"
 msgstr ""
 
@@ -20029,11 +20051,11 @@ msgstr ""
 msgid "at least one override option must be specified"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:329
+#: app/controllers/CControllerPopupTriggerExpr.php:360
 msgid "atan() - The arctangent of a value as an angle, expressed in radians"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:336
+#: app/controllers/CControllerPopupTriggerExpr.php:367
 msgid "atan2() - The arctangent of the ordinate (exprue) and abscissa coordinates specified as an angle, expressed in radians"
 msgstr ""
 
@@ -20055,39 +20077,47 @@ msgstr ""
 msgid "avg"
 msgstr "priemer"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:349
+#: app/controllers/CControllerPopupTriggerExpr.php:380
 msgid "avg() - Average value of a period T"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:356
-msgid "between() - Checks if a value belongs to the given range (1 - in range, 0 - otherwise)"
+#: app/controllers/CControllerPopupTriggerExpr.php:1052
+msgid "baselinedev() - Returns the number of deviations between data periods in seasons and the last data period"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:374
-msgid "bitand() - Bitwise AND"
+#: app/controllers/CControllerPopupTriggerExpr.php:1059
+msgid "baselinewma() - Calculates baseline by averaging data periods in seasons"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:387
+msgid "between() - Checks if a value belongs to the given range (1 - in range, 0 - otherwise)"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:405
+msgid "bitand() - Bitwise AND"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:418
 msgid "bitlength() - Returns the length in bits"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:394
+#: app/controllers/CControllerPopupTriggerExpr.php:425
 msgid "bitlshift() - Bitwise shift left"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:407
+#: app/controllers/CControllerPopupTriggerExpr.php:438
 msgid "bitnot() - Bitwise NOT"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:414
+#: app/controllers/CControllerPopupTriggerExpr.php:445
 msgid "bitor() - Bitwise OR"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:427
+#: app/controllers/CControllerPopupTriggerExpr.php:458
 msgid "bitrshift() - Bitwise shift right"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:440
+#: app/controllers/CControllerPopupTriggerExpr.php:471
 msgid "bitxor() - Bitwise exclusive OR"
 msgstr ""
 
@@ -20102,7 +20132,7 @@ msgstr "blikajúci"
 msgid "both username and password should be either present or empty"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:453
+#: app/controllers/CControllerPopupTriggerExpr.php:484
 msgid "bytelength() - Returns the length in bytes"
 msgstr ""
 
@@ -20144,7 +20174,7 @@ msgstr ""
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:41
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:47
 #: app/controllers/CControllerUserUpdateGeneral.php:111
-#: include/classes/api/services/CAction.php:2735
+#: include/classes/api/services/CAction.php:2745
 #: include/classes/api/services/CAutoregistration.php:163
 #: include/classes/api/services/CDiscoveryRule.php:1989
 #: include/classes/api/services/CDRule.php:210
@@ -20232,23 +20262,23 @@ msgstr ""
 msgid "cannot update property for templated discovery rule"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:460
+#: app/controllers/CControllerPopupTriggerExpr.php:491
 msgid "cbrt() - Cube root"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:467
+#: app/controllers/CControllerPopupTriggerExpr.php:498
 msgid "ceil() - Rounds up to the nearest greater integer"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:474
+#: app/controllers/CControllerPopupTriggerExpr.php:505
 msgid "change() - Difference between last and previous value"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:480
+#: app/controllers/CControllerPopupTriggerExpr.php:511
 msgid "changecount() - Number of changes between adjacent values, Mode (all - all changes, inc - only increases, dec - only decreases)"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:487
+#: app/controllers/CControllerPopupTriggerExpr.php:518
 msgid "char() - Returns the character which represents the given ASCII code"
 msgstr ""
 
@@ -20275,7 +20305,7 @@ msgstr ""
 msgid "comma-separated list"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:494
+#: app/controllers/CControllerPopupTriggerExpr.php:525
 msgid "concat() - Returns a string that is the result of concatenating value to string"
 msgstr ""
 
@@ -20290,15 +20320,15 @@ msgstr "nastaviť"
 msgid "contains"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:507
+#: app/controllers/CControllerPopupTriggerExpr.php:538
 msgid "cos() - The cosine of a value, where the value is an angle expressed in radians"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:514
+#: app/controllers/CControllerPopupTriggerExpr.php:545
 msgid "cosh() - The hyperbolic cosine of a value"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:521
+#: app/controllers/CControllerPopupTriggerExpr.php:552
 msgid "cot() - The cotangent of a value, where the value is an angle expressed in radians"
 msgstr ""
 
@@ -20306,11 +20336,11 @@ msgstr ""
 msgid "count"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:528
+#: app/controllers/CControllerPopupTriggerExpr.php:559
 msgid "count() - Number of successfully retrieved values V (which fulfill operator O) for period T"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:535
+#: app/controllers/CControllerPopupTriggerExpr.php:566
 msgid "countunique() - The number of unique values"
 msgstr ""
 
@@ -20323,15 +20353,15 @@ msgstr "d"
 msgid "d.M"
 msgstr "d.M"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:542
+#: app/controllers/CControllerPopupTriggerExpr.php:573
 msgid "date() - Current date"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:548
+#: app/controllers/CControllerPopupTriggerExpr.php:579
 msgid "dayofmonth() - Day of month"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:554
+#: app/controllers/CControllerPopupTriggerExpr.php:585
 msgid "dayofweek() - Day of week"
 msgstr ""
 
@@ -20349,7 +20379,7 @@ msgstr "dní"
 msgid "default"
 msgstr "predvolené"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:560
+#: app/controllers/CControllerPopupTriggerExpr.php:591
 msgid "degrees() - Converts a value from radians to degrees"
 msgstr ""
 
@@ -20426,7 +20456,7 @@ msgstr ""
 msgid "does not match"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:567
+#: app/controllers/CControllerPopupTriggerExpr.php:598
 msgid "e() - Returns Euler's number"
 msgstr ""
 
@@ -20449,11 +20479,11 @@ msgstr ""
 msgid "exists"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:572
+#: app/controllers/CControllerPopupTriggerExpr.php:603
 msgid "exp() - Euler's number at a power of a value"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:579
+#: app/controllers/CControllerPopupTriggerExpr.php:610
 msgid "expm1() - Euler's number at a power of a value minus 1"
 msgstr ""
 
@@ -20469,7 +20499,7 @@ msgstr ""
 msgid "file format is unsupported"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:586
+#: app/controllers/CControllerPopupTriggerExpr.php:617
 msgid "find() - Check occurrence of pattern V (which fulfill operator O) for period T (1 - match, 0 - no match)"
 msgstr ""
 
@@ -20483,15 +20513,15 @@ msgstr ""
 msgid "first parameter is expected"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:593
+#: app/controllers/CControllerPopupTriggerExpr.php:624
 msgid "first() - The oldest value in the specified time interval"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:600
+#: app/controllers/CControllerPopupTriggerExpr.php:631
 msgid "floor() - Rounds down to the nearest smaller integer"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:607
+#: app/controllers/CControllerPopupTriggerExpr.php:638
 msgid "forecast() - Forecast for next t seconds based on period T"
 msgstr ""
 
@@ -20499,7 +20529,7 @@ msgstr ""
 msgid "fourth"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:614
+#: app/controllers/CControllerPopupTriggerExpr.php:645
 msgid "fuzzytime() - Difference between item value (as timestamp) and Zabbix server timestamp is less than or equal to T seconds (1 - true, 0 - false)"
 msgstr ""
 
@@ -20573,7 +20603,7 @@ msgstr "v"
 msgid "in range"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:621
+#: app/controllers/CControllerPopupTriggerExpr.php:652
 msgid "in() - Checks if a value equals to one of the listed values (1 - equals, 0 - otherwise)"
 msgstr ""
 
@@ -20605,7 +20635,7 @@ msgstr ""
 msgid "incorrect expression starting from \"%1$s\""
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2705
+#: include/classes/api/services/CAction.php:2715
 #: include/classes/api/services/CCorrelation.php:723
 msgid "incorrect number of conditions"
 msgstr ""
@@ -20623,7 +20653,7 @@ msgstr "nesprávna syntax pri \"%1$s\""
 msgid "incorrect usage of function \"%1$s\""
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:634
+#: app/controllers/CControllerPopupTriggerExpr.php:665
 msgid "insert() - Inserts specified characters or spaces into a character string, beginning at a specified position in the string"
 msgstr ""
 
@@ -20756,7 +20786,7 @@ msgstr ""
 msgid "key is empty"
 msgstr "kľúč je prázdny"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:657
+#: app/controllers/CControllerPopupTriggerExpr.php:688
 msgid "kurtosis() - Measures the \"tailedness\" of the probability distribution"
 msgstr ""
 
@@ -20772,7 +20802,7 @@ msgctxt "week of month"
 msgid "last"
 msgstr "naposledy"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:664
+#: app/controllers/CControllerPopupTriggerExpr.php:695
 msgid "last() - Last (most recent) T value"
 msgstr ""
 
@@ -20780,11 +20810,11 @@ msgstr ""
 msgid "left"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:671
+#: app/controllers/CControllerPopupTriggerExpr.php:702
 msgid "left() - Returns the leftmost count characters"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:684
+#: app/controllers/CControllerPopupTriggerExpr.php:715
 msgid "length() - Length of last (most recent) T value in characters"
 msgstr ""
 
@@ -20792,23 +20822,23 @@ msgstr ""
 msgid "list of characters"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:690
+#: app/controllers/CControllerPopupTriggerExpr.php:721
 msgid "log() - Natural logarithm"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:697
+#: app/controllers/CControllerPopupTriggerExpr.php:728
 msgid "log10() - Decimal logarithm"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:704
+#: app/controllers/CControllerPopupTriggerExpr.php:735
 msgid "logeventid() - Event ID of last log entry matching regular expression V for period T (1 - match, 0 - no match)"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:711
+#: app/controllers/CControllerPopupTriggerExpr.php:742
 msgid "logseverity() - Log severity of the last log entry for period T"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:718
+#: app/controllers/CControllerPopupTriggerExpr.php:749
 msgid "logsource() - Log source of the last log entry matching parameter V for period T (1 - match, 0 - no match)"
 msgstr ""
 
@@ -20816,7 +20846,7 @@ msgstr ""
 msgid "low-level discovery rule"
 msgstr "nízko úrovňové zisťovacie pravidlo"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:725
+#: app/controllers/CControllerPopupTriggerExpr.php:756
 msgid "ltrim() - Remove specified characters from the beginning of a string"
 msgstr ""
 
@@ -20848,7 +20878,7 @@ msgstr "makro je prázdne"
 msgid "macro(s)"
 msgstr "makro(á)"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:738
+#: app/controllers/CControllerPopupTriggerExpr.php:769
 msgid "mad() - Median absolute deviation"
 msgstr ""
 
@@ -20888,7 +20918,7 @@ msgstr "max"
 msgid "max period is less than time filter default period"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:745
+#: app/controllers/CControllerPopupTriggerExpr.php:776
 msgid "max() - Maximum value for period T"
 msgstr ""
 
@@ -20902,7 +20932,7 @@ msgstr ""
 msgid "maximum number of dependency levels reached"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:752
+#: app/controllers/CControllerPopupTriggerExpr.php:783
 msgid "mid() - Returns a substring beginning at the character position specified by start for N characters"
 msgstr ""
 
@@ -20919,7 +20949,7 @@ msgstr ""
 msgid "min"
 msgstr "min"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:770
+#: app/controllers/CControllerPopupTriggerExpr.php:801
 msgid "min() - Minimum value for period T"
 msgstr ""
 
@@ -20934,15 +20964,15 @@ msgstr ""
 msgid "mm"
 msgstr "mm"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:777
+#: app/controllers/CControllerPopupTriggerExpr.php:808
 msgid "mod() - Division remainder"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:790
+#: app/controllers/CControllerPopupTriggerExpr.php:821
 msgid "monodec() - Check for continuous item value decrease (1 - data is monotonic, 0 - otherwise), Mode (strict - require strict monotonicity)"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:797
+#: app/controllers/CControllerPopupTriggerExpr.php:828
 msgid "monoinc() - Check for continuous item value increase (1 - data is monotonic, 0 - otherwise), Mode (strict - require strict monotonicity)"
 msgstr ""
 
@@ -21058,7 +21088,7 @@ msgstr ""
 msgid "no permissions to unacknowledge problems"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:804
+#: app/controllers/CControllerPopupTriggerExpr.php:835
 msgid "nodata() - No data received during period of time T (1 - true, 0 - false), Mode (strict - ignore proxy time delay in sending data)"
 msgstr ""
 
@@ -21079,7 +21109,7 @@ msgstr "mimo"
 msgid "not selected"
 msgstr "nie je vybratý"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:811
+#: app/controllers/CControllerPopupTriggerExpr.php:842
 msgid "now() - Number of seconds since the Epoch"
 msgstr ""
 
@@ -21166,15 +21196,15 @@ msgstr ""
 msgid "pattern"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:817
+#: app/controllers/CControllerPopupTriggerExpr.php:848
 msgid "percentile() - Percentile P of a period T"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:824
+#: app/controllers/CControllerPopupTriggerExpr.php:855
 msgid "pi() - Returns the Pi constant"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:829
+#: app/controllers/CControllerPopupTriggerExpr.php:860
 msgid "power() - The power of a base value to a power value"
 msgstr ""
 
@@ -21182,15 +21212,15 @@ msgstr ""
 msgid "problem pattern"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:842
+#: app/controllers/CControllerPopupTriggerExpr.php:873
 msgid "radians() - Converts a value from degrees to radians"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:849
+#: app/controllers/CControllerPopupTriggerExpr.php:880
 msgid "rand() - A random integer value"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:854
+#: app/controllers/CControllerPopupTriggerExpr.php:885
 msgid "rate() - Returns per-second average rate for monotonically increasing counters"
 msgstr ""
 
@@ -21239,11 +21269,11 @@ msgstr ""
 msgid "regular expression"
 msgstr "regulárny výraz"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:861
+#: app/controllers/CControllerPopupTriggerExpr.php:892
 msgid "repeat() - Returns a string composed of value repeated count times"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:874
+#: app/controllers/CControllerPopupTriggerExpr.php:905
 msgid "replace() - Search value for occurrences of pattern, and replace with replacement"
 msgstr ""
 
@@ -21267,15 +21297,15 @@ msgstr ""
 msgid "right"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:892
+#: app/controllers/CControllerPopupTriggerExpr.php:923
 msgid "right() - Returns the rightmost count characters"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:905
+#: app/controllers/CControllerPopupTriggerExpr.php:936
 msgid "round() - Rounds a value to decimal places"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:918
+#: app/controllers/CControllerPopupTriggerExpr.php:949
 msgid "rtrim() - Removes specified characters from the end of a string"
 msgstr ""
 
@@ -21366,23 +21396,23 @@ msgstr "zobraziť mapovanie ikon"
 msgid "sign in as guest"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:931
+#: app/controllers/CControllerPopupTriggerExpr.php:962
 msgid "signum() - Returns -1 if a value is negative, 0 if a value is zero, 1 if a value is positive"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:938
+#: app/controllers/CControllerPopupTriggerExpr.php:969
 msgid "sin() - The sine of a value, where the value is an angle expressed in radians"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:945
+#: app/controllers/CControllerPopupTriggerExpr.php:976
 msgid "sinh() - The hyperbolic sine of a value"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:952
+#: app/controllers/CControllerPopupTriggerExpr.php:983
 msgid "skewness() - Measures the asymmetry of the probability distribution"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:959
+#: app/controllers/CControllerPopupTriggerExpr.php:990
 msgid "sqrt() - Square root of a value"
 msgstr ""
 
@@ -21390,11 +21420,11 @@ msgstr ""
 msgid "standalone server"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:966
+#: app/controllers/CControllerPopupTriggerExpr.php:997
 msgid "stddevpop() - Population standard deviation"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:973
+#: app/controllers/CControllerPopupTriggerExpr.php:1004
 msgid "stddevsamp() - Sample standard deviation"
 msgstr ""
 
@@ -21402,11 +21432,11 @@ msgstr ""
 msgid "sum"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:980
+#: app/controllers/CControllerPopupTriggerExpr.php:1011
 msgid "sum() - Sum of values of a period T"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:987
+#: app/controllers/CControllerPopupTriggerExpr.php:1018
 msgid "sumofsquares() - The sum of squares"
 msgstr ""
 
@@ -21434,7 +21464,7 @@ msgstr ""
 msgid "tag"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:994
+#: app/controllers/CControllerPopupTriggerExpr.php:1025
 msgid "tan() - The tangent of a value"
 msgstr ""
 
@@ -21468,7 +21498,7 @@ msgstr ""
 #: include/classes/api/services/CReport.php:195
 #: include/classes/api/services/CReport.php:577
 #: include/classes/api/services/CReport.php:583
-#: include/classes/api/services/CScript.php:902
+#: include/classes/api/services/CScript.php:904
 #: include/classes/api/services/CTemplate.php:451
 #: include/classes/api/services/CValueMap.php:578
 #: include/classes/helpers/CDashboardHelper.php:369
@@ -21515,35 +21545,35 @@ msgstr ""
 msgid "time shift"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1001
+#: app/controllers/CControllerPopupTriggerExpr.php:1032
 msgid "time() - Current time"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1007
+#: app/controllers/CControllerPopupTriggerExpr.php:1038
 msgid "timeleft() - Time to reach threshold estimated based on period T"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1014
+#: app/controllers/CControllerPopupTriggerExpr.php:1045
 msgid "trendavg() - Average value of a period T with exact period shift"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1021
+#: app/controllers/CControllerPopupTriggerExpr.php:1066
 msgid "trendcount() - Number of successfully retrieved values for period T"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1028
+#: app/controllers/CControllerPopupTriggerExpr.php:1073
 msgid "trendmax() - Maximum value for period T with exact period shift"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1035
+#: app/controllers/CControllerPopupTriggerExpr.php:1080
 msgid "trendmin() - Minimum value for period T with exact period shift"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1042
+#: app/controllers/CControllerPopupTriggerExpr.php:1087
 msgid "trendstl() - Anomaly detection for period T"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1085
+#: app/controllers/CControllerPopupTriggerExpr.php:1130
 msgid "trendsum() - Sum of values of a period T with exact period shift"
 msgstr ""
 
@@ -21569,11 +21599,11 @@ msgstr ""
 msgid "trigger with linkages cannot be moved to another template or host"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1092
+#: app/controllers/CControllerPopupTriggerExpr.php:1137
 msgid "trim() - Remove specified characters from the beginning and the end of a string"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1105
+#: app/controllers/CControllerPopupTriggerExpr.php:1150
 msgid "truncate() - Truncates a value to decimal places"
 msgstr ""
 
@@ -21630,7 +21660,7 @@ msgstr "neočakávaný koniec makra"
 #: include/classes/api/services/CHttpTest.php:539
 #: include/classes/api/services/CItemGeneral.php:604
 #: include/classes/api/services/CItemGeneral.php:616
-#: include/classes/api/services/CScript.php:908
+#: include/classes/api/services/CScript.php:910
 #: include/classes/api/services/CTemplate.php:668
 #: include/classes/api/services/CTriggerGeneral.php:666
 #: include/classes/api/services/CValueMap.php:432
@@ -21874,11 +21904,11 @@ msgstr ""
 msgid "value of third parameter must be one of %1$s"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1118
+#: app/controllers/CControllerPopupTriggerExpr.php:1163
 msgid "varpop() - Population variance"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:1125
+#: app/controllers/CControllerPopupTriggerExpr.php:1170
 msgid "varsamp() - Sample variance"
 msgstr ""
 

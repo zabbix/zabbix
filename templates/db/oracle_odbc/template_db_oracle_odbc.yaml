@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-11T08:05:41Z'
+  date: '2021-12-01T16:34:59Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -22,7 +22,7 @@ zabbix_export:
         The "Service's TCP port state" item uses {HOST.CONN} and {$ORACLE.PORT} macros to check the availability of the listener.
         
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.39
       groups:
         -
           name: Templates/Databases
@@ -31,7 +31,7 @@ zabbix_export:
           uuid: 1a6e01f90dca47459975632c14ce5a39
           name: 'Oracle: Get archive log info'
           type: ODBC
-          key: 'db.odbc.get[get_archivelog_stat,"{$ORACLE.DSN}"]'
+          key: 'db.odbc.get[get_archivelog_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           delay: 5m
           history: '0'
           trends: '0'
@@ -53,7 +53,7 @@ zabbix_export:
           uuid: 63fad55a2ced487aa30017b33bf1692e
           name: 'Oracle: Get ASM stats'
           type: ODBC
-          key: 'db.odbc.get[get_asm_stat,"{$ORACLE.DSN}"]'
+          key: 'db.odbc.get[get_asm_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           history: '0'
           trends: '0'
           value_type: TEXT
@@ -75,7 +75,7 @@ zabbix_export:
           uuid: 5de7c786988d49d0b50f28d2d622db62
           name: 'Oracle: Get CDB and No-CDB info'
           type: ODBC
-          key: 'db.odbc.get[get_cdb_info,"{$ORACLE.DSN}"]'
+          key: 'db.odbc.get[get_cdb_info,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           history: '0'
           trends: '0'
           value_type: TEXT
@@ -97,7 +97,7 @@ zabbix_export:
           uuid: dde19b79507648bd80a82a0575bf8671
           name: 'Oracle: Get instance state'
           type: ODBC
-          key: 'db.odbc.get[get_instance_state,"{$ORACLE.DSN}"]'
+          key: 'db.odbc.get[get_instance_state,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           history: '0'
           trends: '0'
           value_type: TEXT
@@ -122,7 +122,7 @@ zabbix_export:
           uuid: cedcebd0b7ce474c9681022fcc75df1c
           name: 'Oracle: Get PDB info'
           type: ODBC
-          key: 'db.odbc.get[get_pdb_info,"{$ORACLE.DSN}"]'
+          key: 'db.odbc.get[get_pdb_info,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           history: '0'
           trends: '0'
           value_type: TEXT
@@ -142,7 +142,7 @@ zabbix_export:
           uuid: 3839683749974cdeafd9178bdccb38d6
           name: 'Oracle: Get system metrics'
           type: ODBC
-          key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+          key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           delay: 0;m0-59
           history: '0'
           trends: '0'
@@ -216,7 +216,7 @@ zabbix_export:
           uuid: 972be2e777e44c539d0ddd7918b79e88
           name: 'Oracle: Get tablespaces stats'
           type: ODBC
-          key: 'db.odbc.get[tablespace_stats,"{$ORACLE.DSN}"]'
+          key: 'db.odbc.get[get_tablespaces_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           history: '0'
           trends: '0'
           value_type: TEXT
@@ -324,7 +324,7 @@ zabbix_export:
               parameters:
                 - '$[?(@.METRIC==''SYS::Active Parallel Sessions'')].VALUE.first()'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -344,7 +344,7 @@ zabbix_export:
               parameters:
                 - '$[?(@.METRIC==''SYS::Active Serial Sessions'')].VALUE.first()'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -364,7 +364,7 @@ zabbix_export:
               parameters:
                 - '$[?(@.METRIC==''SYS::Average Active Sessions'')].VALUE.first()'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -385,7 +385,7 @@ zabbix_export:
               parameters:
                 - $..ARCHIVER.first()
           master_item:
-            key: 'db.odbc.get[get_instance_state,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_instance_state,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -406,7 +406,7 @@ zabbix_export:
               parameters:
                 - '$[?(@.METRIC==''SYS::Buffer Cache Hit Ratio'')].VALUE.first()'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -425,7 +425,7 @@ zabbix_export:
               parameters:
                 - '$[?(@.METRIC==''SYS::Global Cache Blocks Corrupted'')].VALUE.first()'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -444,7 +444,7 @@ zabbix_export:
               parameters:
                 - '$[?(@.METRIC==''SYS::Global Cache Blocks Lost'')].VALUE.first()'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -465,7 +465,7 @@ zabbix_export:
               parameters:
                 - '$[?(@.METRIC==''SYS::Cursor Cache Hit Ratio'')].VALUE.first()'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -486,7 +486,7 @@ zabbix_export:
               parameters:
                 - '$[?(@.METRIC==''SYS::Database CPU Time Ratio'')].VALUE.first()'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -507,7 +507,7 @@ zabbix_export:
               parameters:
                 - '$[?(@.METRIC==''SYS::Database Wait Time Ratio'')].VALUE.first()'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -526,7 +526,7 @@ zabbix_export:
               parameters:
                 - '$[?(@.METRIC==''DATAFILE::Count'')].VALUE.first()'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -545,7 +545,7 @@ zabbix_export:
               parameters:
                 - '$[?(@.METRIC==''SYSPARAM::Db_Files'')].VALUE.first()'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -566,7 +566,7 @@ zabbix_export:
               parameters:
                 - '$[?(@.METRIC==''SYS::Disk Sort Per Sec'')].VALUE.first()'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -587,7 +587,7 @@ zabbix_export:
               parameters:
                 - '$[?(@.METRIC==''SYS::Enqueue Timeouts Per Sec'')].VALUE.first()'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -608,7 +608,7 @@ zabbix_export:
               error_handler: CUSTOM_VALUE
               error_handler_params: '0'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -627,7 +627,7 @@ zabbix_export:
               parameters:
                 - '$[?(@.METRIC==''FRA::Restore Point'')].VALUE.first()'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -649,7 +649,7 @@ zabbix_export:
               error_handler: CUSTOM_VALUE
               error_handler_params: '0'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -671,7 +671,7 @@ zabbix_export:
               error_handler: CUSTOM_VALUE
               error_handler_params: '0'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -693,7 +693,7 @@ zabbix_export:
               error_handler: CUSTOM_VALUE
               error_handler_params: '0'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -715,7 +715,7 @@ zabbix_export:
               error_handler: CUSTOM_VALUE
               error_handler_params: '0'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -736,7 +736,7 @@ zabbix_export:
               parameters:
                 - '$[?(@.METRIC==''SYS::GC CR Block Received Per Second'')].VALUE.first()'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -757,7 +757,7 @@ zabbix_export:
               parameters:
                 - $..INSTANCE_ROLE.first()
           master_item:
-            key: 'db.odbc.get[get_instance_state,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_instance_state,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -778,7 +778,7 @@ zabbix_export:
               parameters:
                 - $..HOST_NAME.first()
           master_item:
-            key: 'db.odbc.get[get_instance_state,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_instance_state,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -807,7 +807,7 @@ zabbix_export:
               parameters:
                 - $..INSTANCE_NAME.first()
           master_item:
-            key: 'db.odbc.get[get_instance_state,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_instance_state,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -836,7 +836,7 @@ zabbix_export:
               parameters:
                 - $..STATUS.first()
           master_item:
-            key: 'db.odbc.get[get_instance_state,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_instance_state,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -857,7 +857,7 @@ zabbix_export:
               parameters:
                 - '$[?(@.METRIC==''SYS::Library Cache Hit Ratio'')].VALUE.first()'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -878,7 +878,7 @@ zabbix_export:
               parameters:
                 - '$[?(@.METRIC==''SYS::Logons Per Sec'')].VALUE.first()'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -899,7 +899,7 @@ zabbix_export:
               parameters:
                 - '$[?(@.METRIC==''SYS::Long Table Scans Per Sec'')].VALUE.first()'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -920,7 +920,7 @@ zabbix_export:
               parameters:
                 - '$[?(@.METRIC==''SYS::Memory Sorts Ratio'')].VALUE.first()'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -940,7 +940,7 @@ zabbix_export:
               parameters:
                 - '$[?(@.METRIC==''PGA::Global Memory Bound'')].VALUE.first()'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -960,7 +960,7 @@ zabbix_export:
               parameters:
                 - '$[?(@.METRIC==''PGA::Aggregate Pga Target Parameter'')].VALUE.first()'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -981,7 +981,7 @@ zabbix_export:
               parameters:
                 - '$[?(@.METRIC==''SYS::Physical Reads Per Sec'')].VALUE.first()'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -1002,7 +1002,7 @@ zabbix_export:
               parameters:
                 - '$[?(@.METRIC==''SYS::Physical Read Bytes Per Sec'')].VALUE.first()'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -1023,7 +1023,7 @@ zabbix_export:
               parameters:
                 - '$[?(@.METRIC==''SYS::Physical Writes Per Sec'')].VALUE.first()'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -1044,7 +1044,7 @@ zabbix_export:
               parameters:
                 - '$[?(@.METRIC==''SYS::Physical Write Bytes Per Sec'')].VALUE.first()'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -1062,7 +1062,7 @@ zabbix_export:
               parameters:
                 - '$[?(@.METRIC==''PROC::Procnum'')].VALUE.first()'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -1081,7 +1081,7 @@ zabbix_export:
               parameters:
                 - '$[?(@.METRIC==''SYSPARAM::Processes'')].VALUE.first()'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -1100,7 +1100,7 @@ zabbix_export:
               parameters:
                 - '$[?(@.METRIC==''REDO::Available'')].VALUE.first()'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -1127,7 +1127,7 @@ zabbix_export:
               parameters:
                 - '$[?(@.METRIC==''SYS::Rows Per Sort'')].VALUE.first()'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -1152,7 +1152,7 @@ zabbix_export:
               parameters:
                 - '0.01'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -1174,7 +1174,7 @@ zabbix_export:
               error_handler: CUSTOM_VALUE
               error_handler_params: '0'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -1196,7 +1196,7 @@ zabbix_export:
               error_handler: CUSTOM_VALUE
               error_handler_params: '0'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -1217,7 +1217,7 @@ zabbix_export:
               parameters:
                 - '$[?(@.METRIC==''SESSION::Concurrency rate'')].VALUE.first()'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -1244,7 +1244,7 @@ zabbix_export:
               parameters:
                 - '$[?(@.METRIC==''SESSION::Total'')].VALUE.first()'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -1266,7 +1266,7 @@ zabbix_export:
               error_handler: CUSTOM_VALUE
               error_handler_params: '0'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -1285,7 +1285,7 @@ zabbix_export:
               parameters:
                 - '$[?(@.METRIC==''SYSPARAM::Sessions'')].VALUE.first()'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -1306,7 +1306,7 @@ zabbix_export:
               parameters:
                 - '$[?(@.METRIC==''SESSION::Lock rate'')].VALUE.first()'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -1333,7 +1333,7 @@ zabbix_export:
               parameters:
                 - '$[?(@.METRIC==''SESSION::Long time locked'')].VALUE.first()'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -1362,7 +1362,7 @@ zabbix_export:
               error_handler: CUSTOM_VALUE
               error_handler_params: '0'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -1384,7 +1384,7 @@ zabbix_export:
               error_handler: CUSTOM_VALUE
               error_handler_params: '0'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -1406,7 +1406,7 @@ zabbix_export:
               error_handler: CUSTOM_VALUE
               error_handler_params: '0'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -1428,7 +1428,7 @@ zabbix_export:
               error_handler: CUSTOM_VALUE
               error_handler_params: '0'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -1450,7 +1450,7 @@ zabbix_export:
               error_handler: CUSTOM_VALUE
               error_handler_params: '0'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -1472,7 +1472,7 @@ zabbix_export:
               error_handler: CUSTOM_VALUE
               error_handler_params: '0'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -1493,7 +1493,7 @@ zabbix_export:
               parameters:
                 - '$[?(@.METRIC==''SYS::Shared Pool Free %'')].VALUE.first()'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -1520,7 +1520,7 @@ zabbix_export:
               parameters:
                 - '$[?(@.METRIC==''SYS::Total Sorts Per User Call'')].VALUE.first()'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -1541,7 +1541,7 @@ zabbix_export:
               parameters:
                 - '$[?(@.METRIC==''SYS::Temp Space Used'')].VALUE.first()'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -1561,7 +1561,7 @@ zabbix_export:
               parameters:
                 - '$[?(@.METRIC==''PGA::Total Pga Allocated'')].VALUE.first()'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -1581,7 +1581,7 @@ zabbix_export:
               parameters:
                 - '$[?(@.METRIC==''PGA::Total Freeable Pga Memory'')].VALUE.first()'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -1601,7 +1601,7 @@ zabbix_export:
               parameters:
                 - '$[?(@.METRIC==''PGA::Total Pga Inuse'')].VALUE.first()'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -1622,7 +1622,7 @@ zabbix_export:
               parameters:
                 - $..UPTIME.first()
           master_item:
-            key: 'db.odbc.get[get_instance_state,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_instance_state,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -1661,7 +1661,7 @@ zabbix_export:
               parameters:
                 - '$[?(@.METRIC==''USER::Expire password'')].VALUE.first()'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -1689,7 +1689,7 @@ zabbix_export:
               parameters:
                 - '$[?(@.METRIC==''SYS::User Rollbacks Per Sec'')].VALUE.first()'
           master_item:
-            key: 'db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -1714,7 +1714,7 @@ zabbix_export:
               parameters:
                 - 1d
           master_item:
-            key: 'db.odbc.get[get_instance_state,"{$ORACLE.DSN}"]'
+            key: 'db.odbc.get[get_instance_state,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           tags:
             -
               tag: Application
@@ -1754,7 +1754,7 @@ zabbix_export:
           uuid: a527b14b1cee4115be5c5e9387af821b
           name: 'Archive log discovery'
           type: ODBC
-          key: 'db.odbc.discovery[archivelog,"{$ORACLE.DSN}"]'
+          key: 'db.odbc.discovery[archivelog,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           delay: 1h
           params: |
             SELECT d.dest_name
@@ -1783,7 +1783,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: 'db.odbc.get[get_archivelog_stat,"{$ORACLE.DSN}"]'
+                key: 'db.odbc.get[get_archivelog_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
                   tag: Application
@@ -1802,7 +1802,7 @@ zabbix_export:
                   parameters:
                     - '$[?(@.DEST_NAME==''{#DEST_NAME}'')].LOG_SEQUENCE.first()'
               master_item:
-                key: 'db.odbc.get[get_archivelog_stat,"{$ORACLE.DSN}"]'
+                key: 'db.odbc.get[get_archivelog_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
                   tag: Application
@@ -1827,7 +1827,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: 'db.odbc.get[get_archivelog_stat,"{$ORACLE.DSN}"]'
+                key: 'db.odbc.get[get_archivelog_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
                   tag: Application
@@ -1843,7 +1843,7 @@ zabbix_export:
           uuid: c40708b755c7464bb064b7bffc584381
           name: 'ASM disk groups discovery'
           type: ODBC
-          key: 'db.odbc.discovery[asm,"{$ORACLE.DSN}"]'
+          key: 'db.odbc.discovery[asm,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           delay: 1h
           params: 'SELECT name AS dg_name FROM v$asm_diskgroup;'
           username: '{$ORACLE.USER}'
@@ -1865,7 +1865,7 @@ zabbix_export:
                   parameters:
                     - '$[?(@.DG_NAME==''{#DG_NAME}'')].FREE_SIZE_BYTE.first()'
               master_item:
-                key: 'db.odbc.get[get_asm_stat,"{$ORACLE.DSN}"]'
+                key: 'db.odbc.get[get_asm_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
                   tag: Application
@@ -1885,7 +1885,7 @@ zabbix_export:
                   parameters:
                     - '$[?(@.DG_NAME==''{#DG_NAME}'')].SIZE_BYTE.first()'
               master_item:
-                key: 'db.odbc.get[get_asm_stat,"{$ORACLE.DSN}"]'
+                key: 'db.odbc.get[get_asm_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
                   tag: Application
@@ -1906,7 +1906,7 @@ zabbix_export:
                   parameters:
                     - '$[?(@.DG_NAME==''{#DG_NAME}'')].USED_PERCENT.first()'
               master_item:
-                key: 'db.odbc.get[get_asm_stat,"{$ORACLE.DSN}"]'
+                key: 'db.odbc.get[get_asm_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
                   tag: Application
@@ -1948,7 +1948,7 @@ zabbix_export:
           uuid: 0f65936b86314c269b7720a9ff3f1c14
           name: 'Database discovery'
           type: ODBC
-          key: 'db.odbc.discovery[db_list,"{$ORACLE.DSN}"]'
+          key: 'db.odbc.discovery[db_list,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           delay: 1h
           params: 'SELECT name as DBNAME, DECODE(CDB, ''YES'', ''CDB'', ''No-CDB'') AS TYPE  FROM V$DATABASE;'
           username: '{$ORACLE.USER}'
@@ -1987,7 +1987,7 @@ zabbix_export:
                   parameters:
                     - 15m
               master_item:
-                key: 'db.odbc.get[get_cdb_info,"{$ORACLE.DSN}"]'
+                key: 'db.odbc.get[get_cdb_info,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
                   tag: Application
@@ -2012,7 +2012,7 @@ zabbix_export:
                   parameters:
                     - 15m
               master_item:
-                key: 'db.odbc.get[get_cdb_info,"{$ORACLE.DSN}"]'
+                key: 'db.odbc.get[get_cdb_info,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
                   tag: Application
@@ -2037,7 +2037,7 @@ zabbix_export:
                   parameters:
                     - 15m
               master_item:
-                key: 'db.odbc.get[get_cdb_info,"{$ORACLE.DSN}"]'
+                key: 'db.odbc.get[get_cdb_info,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
                   tag: Application
@@ -2080,7 +2080,7 @@ zabbix_export:
                   parameters:
                     - 15m
               master_item:
-                key: 'db.odbc.get[get_cdb_info,"{$ORACLE.DSN}"]'
+                key: 'db.odbc.get[get_cdb_info,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
                   tag: Application
@@ -2104,7 +2104,7 @@ zabbix_export:
           uuid: 2611e69f735a42b190852589658dd591
           name: 'PDB discovery'
           type: ODBC
-          key: 'db.odbc.discovery[pdb_list,"{$ORACLE.DSN}"]'
+          key: 'db.odbc.discovery[pdb_list,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           delay: 1h
           params: 'SELECT name as DBNAME FROM V$PDBS;'
           username: '{$ORACLE.USER}'
@@ -2143,7 +2143,7 @@ zabbix_export:
                   parameters:
                     - 15m
               master_item:
-                key: 'db.odbc.get[get_pdb_info,"{$ORACLE.DSN}"]'
+                key: 'db.odbc.get[get_pdb_info,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
                   tag: Application
@@ -2166,7 +2166,7 @@ zabbix_export:
           uuid: c8de553c98f64e59b40bf927f6447ad1
           name: 'Tablespace discovery'
           type: ODBC
-          key: 'db.odbc.discovery[tbsname,"{$ORACLE.DSN}"]'
+          key: 'db.odbc.discovery[tbsname,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           delay: 1h
           params: |
             SELECT
@@ -2203,7 +2203,7 @@ zabbix_export:
                   parameters:
                     - '$[?(@.TABLESPACE==''{#TABLESPACE}'')].FILE_BYTES.first()'
               master_item:
-                key: 'db.odbc.get[tablespace_stats,"{$ORACLE.DSN}"]'
+                key: 'db.odbc.get[get_tablespaces_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
                   tag: Application
@@ -2223,7 +2223,7 @@ zabbix_export:
                   parameters:
                     - '$[?(@.TABLESPACE==''{#TABLESPACE}'')].FREE_BYTES.first()'
               master_item:
-                key: 'db.odbc.get[tablespace_stats,"{$ORACLE.DSN}"]'
+                key: 'db.odbc.get[get_tablespaces_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
                   tag: Application
@@ -2243,7 +2243,7 @@ zabbix_export:
                   parameters:
                     - '$[?(@.TABLESPACE==''{#TABLESPACE}'')].MAX_BYTES.first()'
               master_item:
-                key: 'db.odbc.get[tablespace_stats,"{$ORACLE.DSN}"]'
+                key: 'db.odbc.get[get_tablespaces_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
                   tag: Application
@@ -2264,7 +2264,7 @@ zabbix_export:
                   parameters:
                     - '$[?(@.TABLESPACE==''{#TABLESPACE}'')].STATUS.first()'
               master_item:
-                key: 'db.odbc.get[tablespace_stats,"{$ORACLE.DSN}"]'
+                key: 'db.odbc.get[get_tablespaces_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
                   tag: Application
@@ -2302,7 +2302,7 @@ zabbix_export:
                   parameters:
                     - '$[?(@.TABLESPACE==''{#TABLESPACE}'')].USED_BYTES.first()'
               master_item:
-                key: 'db.odbc.get[tablespace_stats,"{$ORACLE.DSN}"]'
+                key: 'db.odbc.get[get_tablespaces_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
                   tag: Application
@@ -2323,7 +2323,7 @@ zabbix_export:
                   parameters:
                     - '$[?(@.TABLESPACE==''{#TABLESPACE}'')].USED_FILE_PCT.first()'
               master_item:
-                key: 'db.odbc.get[tablespace_stats,"{$ORACLE.DSN}"]'
+                key: 'db.odbc.get[get_tablespaces_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
                   tag: Application
@@ -2359,7 +2359,7 @@ zabbix_export:
                   parameters:
                     - '$[?(@.TABLESPACE==''{#TABLESPACE}'')].USED_PCT_MAX.first()'
               master_item:
-                key: 'db.odbc.get[tablespace_stats,"{$ORACLE.DSN}"]'
+                key: 'db.odbc.get[get_tablespaces_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
                   tag: Application
@@ -2427,9 +2427,9 @@ zabbix_export:
           value: PDB\$SEED
           description: 'This macro is used in database discovery. It can be overridden on a host or linked template level.'
         -
-          macro: '{$ORACLE.DSN}'
-          value: '<Put your DSN here>'
-          description: 'System data source name'
+          macro: '{$ORACLE.DRIVER}'
+          value: '<Put path to oracle driver here>'
+          description: 'Oracle driver path. e.g /usr/lib/oracle/21/client64/lib/libsqora.so.21.1'
         -
           macro: '{$ORACLE.EXPIRE.PASSWORD.MIN.WARN}'
           value: '7'
@@ -2454,6 +2454,10 @@ zabbix_export:
           macro: '{$ORACLE.REDO.MIN.WARN}'
           value: '3'
           description: 'Minimum number of REDO logs alert threshold (for trigger expression).'
+        -
+          macro: '{$ORACLE.SERVICE}'
+          value: '<Put oracle service name here>'
+          description: 'Oracle service name'
         -
           macro: '{$ORACLE.SESSION.LOCK.MAX.TIME}'
           value: '600'

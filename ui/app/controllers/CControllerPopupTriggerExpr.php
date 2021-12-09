@@ -42,6 +42,7 @@ class CControllerPopupTriggerExpr extends CController {
 	private $functions = [];
 	private $operators = ['=', '<>', '>', '<', '>=', '<='];
 	private $period_optional = [];
+	private $period_seasons = [];
 
 	protected function init() {
 		$this->disableSIDvalidation();
@@ -93,6 +94,36 @@ class CControllerPopupTriggerExpr extends CController {
 			],
 			'period_shift' => [
 				'C' => _('Period shift'),
+				'T' => T_ZBX_INT,
+				'A' => true
+			]
+		];
+
+		$this->period_seasons = [
+			'last' => [
+				'C' => _('Period').' (T)',
+				'T' => T_ZBX_INT,
+				'A' => true
+			],
+			'period_shift' => [
+				'C' => _('Period shift'),
+				'T' => T_ZBX_INT,
+				'A' => true
+			],
+			'season_unit' => [
+				'C' => _('Season'),
+				'T' => T_ZBX_STR,
+				'A' => true,
+				'options' => [
+					'h' => _('Hour'),
+					'd' => _('Day'),
+					'w' => _('Week'),
+					'M' => _("Month"),
+					'y' => _('Year')
+				]
+			],
+			'num_seasons' => [
+				'C' => _('Number of seasons'),
 				'T' => T_ZBX_INT,
 				'A' => true
 			]
@@ -1016,6 +1047,20 @@ class CControllerPopupTriggerExpr extends CController {
 				'allowed_types' => $this->allowedTypesNumeric,
 				'operators' => $this->operators
 			],
+			'baselinedev' => [
+				'types' => [ZBX_FUNCTION_TYPE_HISTORY],
+				'description' => _('baselinedev() - Returns the number of deviations between data periods in seasons and the last data period'),
+				'params' => $this->period_seasons,
+				'allowed_types' => $this->allowedTypesNumeric,
+				'operators' => $this->operators
+			],
+			'baselinewma' => [
+				'types' => [ZBX_FUNCTION_TYPE_HISTORY],
+				'description' => _('baselinewma() - Calculates baseline by averaging data periods in seasons'),
+				'params' => $this->period_seasons,
+				'allowed_types' => $this->allowedTypesNumeric,
+				'operators' => $this->operators
+			],
 			'trendcount' => [
 				'types' => [ZBX_FUNCTION_TYPE_HISTORY],
 				'description' => _('trendcount() - Number of successfully retrieved values for period T'),
@@ -1442,7 +1487,18 @@ class CControllerPopupTriggerExpr extends CController {
 				}
 				elseif ($data['item_description']) {
 					// Quote function string parameters.
-					$quote_params = ['v', 'o', 'chars', 'fit', 'mode', 'pattern', 'replace', 'string', 'algorithm'];
+					$quote_params = [
+						'algorithm',
+						'chars',
+						'fit',
+						'mode',
+						'o',
+						'pattern',
+						'replace',
+						'season_unit',
+						'string',
+						'v'
+					];
 					$quote_params = array_intersect_key($data['params'], array_fill_keys($quote_params, ''));
 					$quote_params = array_filter($quote_params, 'strlen');
 

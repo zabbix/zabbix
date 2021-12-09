@@ -505,7 +505,7 @@ class testEscalations extends CIntegrationTest {
 			'actionids' => [self::$trigger_actionid],
 			'sortfield' => 'alertid'
 		], 5, 2);
-		$esc_msg = 'NOTE: Escalation cancelled';
+		$esc_msg = 'NOTE: Escalation canceled';
 		$this->assertArrayHasKey(1, $response['result']);
 		$this->assertEquals(0, strncmp($esc_msg, $response['result'][1]['message'], strlen($esc_msg)));
 
@@ -515,6 +515,57 @@ class testEscalations extends CIntegrationTest {
 			'triggerid' => self::$triggerid,
 			'status' => 0
 		]);
+
+		$this->reloadConfigurationCache();
+
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 0);
+
+		// test ability to disable notifications about cancelled escalations
+		$response = $this->call('action.update', [
+			'actionid' => self::$trigger_actionid,
+			'notify_if_canceled' => 0
+		]);
+		$this->assertArrayHasKey('actionids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['actionids']);
+
+		$this->reloadConfigurationCache();
+
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 10);
+
+		$response = $this->call('trigger.update', [
+			'triggerid' => self::$triggerid,
+			'status' => 1
+		]);
+
+		$this->assertArrayHasKey('triggerids', $response['result']);
+		$this->assertEquals(1, count($response['result']['triggerids']));
+
+		$this->reloadConfigurationCache();
+
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_cancel()', true, 120);
+
+		$response = $this->callUntilDataIsPresent('alert.get', [
+			'actionids' => [self::$trigger_actionid],
+			'sortfield' => 'alertid',
+			'sortorder' => 'DESC'
+		], 5, 2);
+		$this->assertArrayHasKey(0, $response['result']);
+		$this->assertNotEquals(0, strncmp($esc_msg, $response['result'][0]['message'], strlen($esc_msg)));
+
+		// revert to defaults, restore trigger status and value
+		$response = $this->call('action.update', [
+			'actionid' => self::$trigger_actionid,
+			'notify_if_canceled' => 1
+		]);
+		$this->assertArrayHasKey('actionids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['actionids']);
+
+		$response = $this->call('trigger.update', [
+			'triggerid' => self::$triggerid,
+			'status' => 0
+		]);
+		$this->assertArrayHasKey('triggerids', $response['result']);
+		$this->assertEquals(1, count($response['result']['triggerids']));
 
 		$this->reloadConfigurationCache();
 
