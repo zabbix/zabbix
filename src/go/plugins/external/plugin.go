@@ -103,10 +103,7 @@ func (p *Plugin) Stop() {
 		panic(fmt.Sprintf("missing cmd reference for external plugin %s, %s", p.Path, err.Error()))
 	}
 
-	err = p.cmd.Wait()
-	if err != nil {
-		panic(fmt.Sprintf("failed to reap external plugin %s, %s", p.Path, err.Error()))
-	}
+	p.cmd.Wait()
 }
 
 func (p *Plugin) Configure(globalOptions *plugin.GlobalOptions, privateOptions interface{}) {
