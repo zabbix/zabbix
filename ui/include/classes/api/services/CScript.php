@@ -40,7 +40,9 @@ class CScript extends CApiService {
 	/**
 	 * Fields from "actions" table. Used in get() validation and addRelatedObjects() when selecting action fields.
 	 */
-	private $action_fields = ['actionid', 'name', 'eventsource', 'status', 'esc_period', 'pause_suppressed'];
+	private $action_fields = ['actionid', 'name', 'eventsource', 'status', 'esc_period', 'pause_suppressed',
+		'notify_if_canceled'
+	];
 
 	/**
 	 * This property, if filled out, will contain all hostrgroup ids

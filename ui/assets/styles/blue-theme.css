@@ -5756,10 +5756,7 @@ svg {
   .preprocessing-list select {
     width: 100%;
     min-width: 0; }
-  .preprocessing-list input[type=text]:not(:last-of-type),
-  .preprocessing-list .btn-link:not(:last-of-type),
-  .preprocessing-list .interface-container .interface-row .interface-cell .interface-btn-toggle:not(:last-of-type),
-  .interface-container .interface-row .interface-cell .preprocessing-list .interface-btn-toggle:not(:last-of-type) {
+  .preprocessing-list .btn-link:not(:last-of-type), .preprocessing-list .interface-container .interface-row .interface-cell .interface-btn-toggle:not(:last-of-type), .interface-container .interface-row .interface-cell .preprocessing-list .interface-btn-toggle:not(:last-of-type) {
     margin-right: 10px; }
   .preprocessing-list .preprocessing-list-head,
   .preprocessing-list .preprocessing-list-foot,
@@ -5784,6 +5781,11 @@ svg {
     max-width: 295px; }
   .preprocessing-list .step-parameters {
     flex: 1; }
+    .preprocessing-list .step-parameters z-select {
+      flex: 0 0 auto; }
+    .preprocessing-list .step-parameters > input[type=text]:not(:last-child),
+    .preprocessing-list .step-parameters z-select:not(:last-child) {
+      margin-right: 5px; }
   .preprocessing-list .step-on-fail {
     flex: 0 0 100px;
     max-width: 100px;
