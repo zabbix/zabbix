@@ -223,21 +223,27 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 		$this->assertEquals('value', $form->getField($fields['dropdown'])->getValue());
 		$this->assertEquals('', $form->getField($fields['value'])->getValue());
 
+		// Fill value with text.
+		$form->getField($fields['dropdown'])->asZDropdown()->fill('label');
+		$form->getField($fields['value'])->fill('test');
+
 		$values = [
+			'value' => false,
 			'label' => true,
 			'sum' => false,
 			'min' => false,
 			'max' => false,
 			'avg' => false,
-			'count' => false,
-			'value' => false
+			'count' => false
 		];
 
 		// Change dropdown values and check label field value and editability.
 		foreach ($values as $value => $enabled) {
 			$form->getField($fields['dropdown'])->asZDropdown()->fill($value);
 			$this->assertTrue($form->getField($fields['value'])->isEnabled($enabled));
-			$this->assertEquals('', $form->getField($fields['value'])->getValue());
+
+			// Check that entered value did not disappear.
+			$this->assertEquals('test', $form->getField($fields['value'])->getValue());
 		}
 	}
 }
