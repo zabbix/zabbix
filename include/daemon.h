@@ -32,8 +32,7 @@ extern volatile sig_atomic_t	sig_exiting;
 #define ZBX_EXIT_SUCCESS	1
 #define ZBX_EXIT_FAILURE	2
 
-void	daemon_change_user(int allow_root, const char *user);
-int	daemon_start(unsigned int flags);
+int	daemon_start(int allow_root, const char *user, unsigned int flags);
 void	daemon_stop(void);
 
 int	zbx_sigusr_send(int flags);
@@ -44,6 +43,6 @@ void	zbx_set_sigusr_handler(void (*handler)(int flags));
 
 #define ZBX_DO_EXIT()
 
-#define START_MAIN_ZABBIX_ENTRY(flags)	daemon_start(flags)
+#define START_MAIN_ZABBIX_ENTRY(allow_root, user, flags)	daemon_start(allow_root, user, flags)
 
 #endif	/* ZABBIX_DAEMON_H */

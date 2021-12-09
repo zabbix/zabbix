@@ -1486,8 +1486,7 @@ int	main(int argc, char **argv)
 			break;
 	}
 
-	daemon_change_user(CONFIG_ALLOW_ROOT, CONFIG_USER);
-	START_MAIN_ZABBIX_ENTRY(t.flags);
+	START_MAIN_ZABBIX_ENTRY(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags);
 
 	exit(EXIT_SUCCESS);
 }
