@@ -1614,7 +1614,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					'{ITEM.LOG.AGE}', '{ITEM.LOG.SOURCE}', '{ITEM.LOG.SEVERITY}', '{ITEM.LOG.NSEVERITY}',
 					'{ITEM.LOG.EVENTID}'
 				],
-				'inventory' => array_keys(self::getSupportedHostInventoryMacrosMap()),
+				'inventory' => array_keys(self::getSupportedHostInventoryMacrosMap())
 			],
 			'macro_funcs' => [
 				'item_value' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}']

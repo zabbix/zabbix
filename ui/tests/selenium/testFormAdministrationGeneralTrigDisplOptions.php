@@ -85,7 +85,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 		'Unacknowledged PROBLEM events' => false,
 		'Acknowledged PROBLEM events' => false,
 		'Unacknowledged RESOLVED events' => false,
-		'Acknowledged RESOLVED events' => false,
+		'Acknowledged RESOLVED events' => false
 // TODO: fix hex field
 /*		'id:problem_unack_color' => 'CC0000',
 *		'id:problem_ack_color'=> 'CC0000',
