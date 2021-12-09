@@ -1000,8 +1000,6 @@ class CMacrosResolverGeneral {
 		}
 		unset($db_item);
 
-
-
 		$item_macros = ['{ITEM.DESCRIPTION}' => 'description_expanded', '{ITEM.DESCRIPTION.ORIG}' => 'description',
 			'{ITEM.KEY}' => 'key_expanded', '{ITEM.KEY.ORIG}' => 'key_', '{ITEM.NAME}' => 'name_expanded',
 			'{ITEM.NAME.ORIG}' => 'name', '{ITEM.STATE}' => 'state', '{ITEM.VALUETYPE}' => 'value_type'
@@ -1679,9 +1677,11 @@ class CMacrosResolverGeneral {
 				$interfaceids[$db_item['interfaceid']][] = $itemid;
 			}
 			else {
-				// Collecting host IDs for items without interface. Macros for such items will resolve to either the
-				// Zabbix agent, SNMP, JMX or IPMI interface of the host in this order of priority or to 'UNKNOWN' if
-				// the host does not have any interface.
+				/*
+				 * Collecting host IDs for items without interface. Macros for such items will resolve to either the
+				 * Zabbix agent, SNMP, JMX or IPMI interface of the host in this order of priority or to 'UNKNOWN' if
+				 * the host does not have any interface.
+				 */
 				$hostids[$db_item['hostid']][] = $itemid;
 			}
 		}
@@ -1702,9 +1702,11 @@ class CMacrosResolverGeneral {
 				return self::interfacePriorities[$b['type']] <=> self::interfacePriorities[$a['type']];
 			});
 
-			// Collecting host interfaces:
-			//  - with highest priority for each host
-			//  - with interface IDs contained in the $interfaceids array
+			/*
+			 * Collecting host interfaces:
+			 *  - with highest priority for each host
+			 *  - with interface IDs contained in the $interfaceids array
+			 */
 			foreach ($db_interfaces as $interfaceid => $db_interface) {
 				if (array_key_exists($db_interface['hostid'], $hostids)) {
 					$host_interfaces[$db_interface['hostid']] = $interfaceid;
