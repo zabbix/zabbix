@@ -384,7 +384,7 @@ class CControllerPopupGeneric extends CController {
 				'allowed_src_fields' => 'slaid,name',
 				'form' => [
 					'name' => 'slaform',
-					'id' => 'slas'
+					'id' => 'sla'
 				],
 				'table_columns' => [
 					_('Name')

@@ -405,7 +405,7 @@ class CWidgetHelper {
 	 * @return CMultiSelect
 	 */
 	public static function getSla($field, $captions, $form_name) {
-		return self::getMultiselectField($field, $captions, $form_name, 'slas', [
+		return self::getMultiselectField($field, $captions, $form_name, 'sla', [
 				'srctbl' => 'sla',
 				'srcfld1' => 'slaid'
 			] + $field->getFilterParameters());

@@ -34,6 +34,11 @@ class CControllerWidgetSlaReportView extends CControllerWidget {
 	protected function doAction() {
 		$fields = $this->getForm()->getFieldsData();
 
+		$sla_db = API::Sla()->get([
+			'slaids' => $fields['slaids'],
+			'serviceids' => $fields['serviceids']
+		]);
+
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultName()),
 			'user' => [

@@ -1012,7 +1012,8 @@ abstract class CDashboardGeneral extends CApiService {
 
 						$db_widget_fields = DB::select('widget_field', [
 							'output' => ['widget_fieldid', 'widgetid', 'type', 'name', 'value_int', 'value_str',
-								'value_groupid', 'value_hostid', 'value_itemid', 'value_graphid', 'value_sysmapid'
+								'value_groupid', 'value_hostid', 'value_itemid', 'value_graphid', 'value_serviceid',
+								'value_slaid', 'value_sysmapid'
 							],
 							'filter' => [
 								'widgetid' => array_keys($db_widgets),
