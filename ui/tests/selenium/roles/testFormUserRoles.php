@@ -1400,7 +1400,7 @@ class testFormUserRoles extends CWebTest {
 						// Leave only 3 tags in array as it is the maximal number of tags displayed in table per row.
 						array_splice($service['Problem tags'], 3);
 					}
-					// Combine all problem tags into a signle string so that it would be valid for comparison.
+					// Combine all problem tags into a single string so that it would be valid for comparison.
 					$service['Problem tags'] = implode('',$service['Problem tags']);
 				}
 			}

@@ -1373,7 +1373,7 @@ class testUserRolesPermissions extends CWebTest {
 		$this->assertTableDataColumn($column_content, 'Name');
 		$table = $this->query('class:list-table')->asTable()->one();
 
-		// Check buttons are not visible for user with no permisions, otherwise, check edit permissions per service.
+		// Check buttons are not visible for user with no permissions, otherwise, check edit permissions per service.
 		if ($data['role_config']['Read-write access to services'] === 'None') {
 			foreach ($table->getRows() as $row) {
 				$this->assertEquals(0, $row->query('xpath:.//button')->all(false)->count());
