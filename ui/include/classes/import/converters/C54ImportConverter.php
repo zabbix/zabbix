@@ -174,6 +174,10 @@ class C54ImportConverter extends CConverter {
 			if (array_key_exists('graph_prototypes', $discovery_rule)) {
 				$discovery_rule['graph_prototypes'] = self::convertGraphs($discovery_rule['graph_prototypes']);
 			}
+
+			if (array_key_exists('item_prototypes', $discovery_rule)) {
+				$discovery_rule['item_prototypes'] = self::convertItems($discovery_rule['item_prototypes']);
+			}
 		}
 		unset($discovery_rule);
 
