@@ -141,7 +141,7 @@ class CHttpTestManager {
 				'follow_redirects', 'retrieve_mode'
 			],
 			'httptestids' => array_column($httptests, 'httptestid'),
-			'editable' => true,
+			'nopermissions' => true,
 			'preservekeys' => true
 		]);
 
