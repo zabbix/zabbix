@@ -789,7 +789,8 @@ class CItem extends CItemGeneral {
 			'selectTags' => ['tag', 'value'],
 			'hostids' => $data['templateids'],
 			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
-			'preservekeys' => true
+			'preservekeys' => true,
+			'nopermissions' => true
 		]);
 
 		foreach ($tpl_items as &$tpl_item) {

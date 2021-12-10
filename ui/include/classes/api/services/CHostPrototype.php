@@ -1062,18 +1062,20 @@ class CHostPrototype extends CHostBase {
 
 		$discoveryRules = API::DiscoveryRule()->get([
 			'output' => ['itemid'],
-			'hostids' => $data['templateids']
+			'hostids' => $data['templateids'],
+			'nopermissions' => true
 		]);
 		$hostPrototypes = $this->get([
-			'discoveryids' => zbx_objectValues($discoveryRules, 'itemid'),
-			'preservekeys' => true,
 			'output' => API_OUTPUT_EXTEND,
 			'selectGroupLinks' => API_OUTPUT_EXTEND,
 			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
 			'selectTags' => ['tag', 'value'],
 			'selectTemplates' => ['templateid'],
 			'selectDiscoveryRule' => ['itemid'],
-			'selectInterfaces' => ['main', 'type', 'useip', 'ip', 'dns', 'port', 'details']
+			'selectInterfaces' => ['main', 'type', 'useip', 'ip', 'dns', 'port', 'details'],
+			'discoveryids' => zbx_objectValues($discoveryRules, 'itemid'),
+			'preservekeys' => true,
+			'nopermissions' => true
 		]);
 
 		$hostPrototypes = $this->getHostMacros($hostPrototypes);
