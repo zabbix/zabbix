@@ -995,7 +995,8 @@ class CTriggerPrototype extends CTriggerGeneral {
 			'output' => ['triggerid'],
 			'selectDependencies' => ['triggerid'],
 			'hostids' => $templateIds,
-			'preservekeys' => true
+			'preservekeys' => true,
+			'nopermissions' => true
 		]);
 
 		if ($parentTriggers) {
@@ -1036,10 +1037,10 @@ class CTriggerPrototype extends CTriggerGeneral {
 					}
 				}
 
-				$this->deleteDependencies($childTriggers);
+				$this->deleteDependencies($childTriggers, true);
 
 				if ($newDependencies) {
-					$this->addDependencies($newDependencies);
+					$this->addDependencies($newDependencies, true);
 				}
 			}
 		}

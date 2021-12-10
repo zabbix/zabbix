@@ -25,7 +25,8 @@
 
 $widget_view = include('include/classes/widgets/views/widget.'.$data['dialogue']['type'].'.form.view.php');
 
-$form = $widget_view['form'];
+$form = $widget_view['form']
+	->addClass('dashboard-grid-widget-'.$data['dialogue']['type']);
 
 // Submit button is needed to enable submit event on Enter on inputs.
 $form->addItem((new CInput('submit', 'dashboard_widget_config_submit'))->addStyle('display: none;'));
