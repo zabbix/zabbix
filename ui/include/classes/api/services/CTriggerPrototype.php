@@ -675,9 +675,11 @@ class CTriggerPrototype extends CTriggerGeneral {
 			'output' => ['triggerid'],
 			'selectDiscoveryRule' => ['itemid'],
 			'triggerids' => $depTriggerIds,
-			'nopermissions' => ($inherited) ? true : null,
+			'nopermissions' => $inherited ? true : null,
 			'preservekeys' => true
 		]);
+
+		$dep_triggerids = array_diff($depTriggerIds, array_keys($depTriggerPrototypes));
 
 		if ($depTriggerPrototypes) {
 			// Get current trigger prototype discovery rules.
@@ -685,7 +687,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 				'output' => ['triggerid'],
 				'selectDiscoveryRule' => ['itemid'],
 				'triggerids' => zbx_objectValues($trigger_prototypes, 'triggerid'),
-				'nopermissions' => ($inherited) ? true : null,
+				'nopermissions' => $inherited ? true : null,
 				'preservekeys' => true
 			]);
 
@@ -710,23 +712,25 @@ class CTriggerPrototype extends CTriggerGeneral {
 				}
 			}
 		}
+		elseif (!$dep_triggerids) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
 
-		$dep_triggers = [];
-		$dep_triggerids = array_diff($depTriggerIds, array_keys($depTriggerPrototypes));
-
-		if (!$inherited) {
+		if ($dep_triggerids && !$inherited) {
 			// Check other dependency IDs if those are normal triggers.
-			$dep_triggers = API::Trigger()->get([
-				'output' => ['triggerid'],
+			$count = API::Trigger()->get([
+				'countOutput' => true,
 				'triggerids' => $dep_triggerids,
 				'filter' => [
 					'flags' => [ZBX_FLAG_DISCOVERY_NORMAL]
 				]
 			]);
-		}
 
-		if (!$depTriggerPrototypes || count($dep_triggers) != count($dep_triggerids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+			if ($count != count($dep_triggerids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
 		}
 
 		$this->checkDependencies($trigger_prototypes);
