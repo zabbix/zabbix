@@ -1065,7 +1065,6 @@ class CMaintenance extends CApiService {
 		unset($maintenance);
 
 		if ($ins_maintenance_tags) {
-			file_put_contents('test.txt', print_r($ins_maintenance_tags, true) . "\n", FILE_APPEND);
 			$maintenancetagids = DB::insert('maintenance_tag', $ins_maintenance_tags);
 		}
 
