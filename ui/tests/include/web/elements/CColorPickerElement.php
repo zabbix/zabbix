@@ -20,19 +20,71 @@
 
 require_once 'vendor/autoload.php';
 
-require_once dirname(__FILE__).'/CCompositeInputElement.php';
+require_once dirname(__FILE__).'/../CElement.php';
 
 /**
  * Color picker element.
  */
-class CColorPickerElement extends CCompositeInputElement {
+class CColorPickerElement extends CElement {
 
 	/**
-	 * Overwrite color picker value.
+	 * @inheritdoc
+	 */
+	public static function find() {
+		return (new CElementQuery('id:color_picker'))->asColorPicker();
+	}
+
+	/**
+	 * Get input field.
+	 *
+	 * @return type
+	 */
+	public function getInput() {
+		return $this->query('xpath:.//input')->waitUntilVisible()->one();
+	}
+
+	/**
+	 * Overwrite input value.
 	 *
 	 * @inheritdoc
 	 */
 	public function overwrite($text) {
-		return parent::overwrite($text)->fireEvent();
+		$this->getInput()->overwrite($text);
+
+		return $this;
+	}
+
+
+	/**
+	 * @inheritdoc
+	 */
+	public function getValue() {
+		return $this->getInput()->getValue();
+	}
+
+	/**
+	 * Alias for getValue.
+	 * @see self::getValue
+	 *
+	 * @return string
+	 */
+	public function getText() {
+		return $this->getValue();
+	}
+
+	/**
+	 * Close overlay dialog.
+	 *
+	 * @return $this
+	 */
+	public function close() {
+		$this->query('class:overlay-close-btn')->one()->click();
+		return $this->waitUntilNotVisible();
+	}
+
+	public function fill($color) {
+		$this->overwrite($color);
+//		$this->close();
+		$this->keyboard->pressKey('Enter');
 	}
 }
