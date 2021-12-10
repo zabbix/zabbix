@@ -75,7 +75,7 @@ class CSla extends CApiService {
 			'selectSchedule' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['period_from', 'period_to']), 'default' => null],
 			'selectExcludedDowntimes' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['name', 'period_from', 'period_to']), 'default' => null],
 			// sort and limit
-			'sortfield' =>					['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', ['name', 'slo', 'effective_date', 'status']), 'uniq' => true, 'default' => []],
+			'sortfield' =>					['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', ['slaid', 'name', 'period', 'slo', 'effective_date', 'timezone', 'status', 'description']), 'uniq' => true, 'default' => []],
 			'sortorder' =>					['type' => API_SORTORDER, 'default' => []],
 			'limit' =>						['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
 			// flags
