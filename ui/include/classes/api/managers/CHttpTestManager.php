@@ -138,6 +138,7 @@ class CHttpTestManager {
 				'follow_redirects', 'retrieve_mode'
 			],
 			'editable' => true,
+			'nopermissions' => true,
 			'preservekeys' => true
 		]);
 
