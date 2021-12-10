@@ -652,8 +652,8 @@ class CMaintenance extends CApiService {
 		unset($maintenance);
 
 		self::checkDuplicates($maintenances, $db_maintenances);
-		self::checkGroups($maintenances);
-		self::checkHosts($maintenances);
+		self::checkGroups($maintenances, $db_maintenances);
+		self::checkHosts($maintenances, $db_maintenances);
 	}
 
 	/**
@@ -799,70 +799,94 @@ class CMaintenance extends CApiService {
 	}
 
 	/**
-	 * Check for valid groups.
+	 * Check for valid host groups.
 	 *
-	 * @static
-	 *
-	 * @param array $maintenances
+	 * @param array      $maintenances
+	 * @param array|null $db_maintenances
 	 *
 	 * @throws APIException if groups are not valid.
 	 */
-	private static function checkGroups(array $maintenances): void {
-		$groupids = [];
+	private static function checkGroups(array $maintenances, array $db_maintenances = null): void {
+		$edit_groupids = [];
+
 		foreach ($maintenances as $maintenance) {
-			if (array_key_exists('groups', $maintenance) && $maintenance['groups']) {
-				foreach ($maintenance['groups'] as $group) {
-					$groupids[$group['groupid']] = true;
-				}
+			if (!array_key_exists('groups', $maintenance)) {
+				continue;
+			}
+
+			$groupids = array_column($maintenance['groups'], 'groupid');
+
+			if ($db_maintenances === null) {
+				$edit_groupids += array_flip($groupids);
+			}
+			else {
+				$db_groupids = array_column($db_maintenances[$maintenance['maintenanceid']]['groups'], 'groupid');
+
+				$ins_groupids = array_flip(array_diff($groupids, $db_groupids));
+				$del_groupids = array_flip(array_diff($db_groupids, $groupids));
+
+				$edit_groupids += $ins_groupids + $del_groupids;
 			}
 		}
 
-		if ($groupids) {
-			$groups_count = API::HostGroup()->get([
-				'countOutput' => true,
-				'groupids' => array_keys($groupids),
-				'editable' => true
-			]);
+		if (!$edit_groupids) {
+			return;
+		}
 
-			if ($groups_count != count($groupids)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
+		$count = API::HostGroup()->get([
+			'countOutput' => true,
+			'groupids' => array_keys($edit_groupids),
+			'editable' => true
+		]);
+
+		if ($count != count($edit_groupids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 	}
 
 	/**
 	 * Check for valid hosts.
 	 *
-	 * @static
-	 *
-	 * @param array $maintenances
+	 * @param array      $maintenances
+	 * @param array|null $db_maintenances
 	 *
 	 * @throws APIException if hosts are not valid.
 	 */
-	private static function checkHosts(array $maintenances): void {
-		$hostids = [];
+	private static function checkHosts(array $maintenances, array $db_maintenances = null): void {
+		$edit_hostids = [];
+
 		foreach ($maintenances as $maintenance) {
-			if (array_key_exists('hosts', $maintenance) && $maintenance['hosts']) {
-				foreach ($maintenance['hosts'] as $host) {
-					$hostids[$host['hostid']] = true;
-				}
+			if (!array_key_exists('hosts', $maintenance)) {
+				continue;
+			}
+
+			$hostids = array_column($maintenance['hosts'], 'hostid');
+
+			if ($db_maintenances === null) {
+				$edit_hostids += array_flip($hostids);
+			}
+			else {
+				$db_hostids = array_column($db_maintenances[$maintenance['maintenanceid']]['hosts'], 'hostid');
+
+				$ins_hostids = array_flip(array_diff($hostids, $db_hostids));
+				$del_hostids = array_flip(array_diff($db_hostids, $hostids));
+
+				$edit_hostids += $ins_hostids + $del_hostids;
 			}
 		}
 
-		if ($hostids) {
-			$hosts_count = API::Host()->get([
-				'countOutput' => true,
-				'hostids' => array_keys($hostids),
-				'editable' => true
-			]);
+		if (!$edit_hostids) {
+			return;
+		}
 
-			if ($hosts_count != count($hostids)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
+		$count = API::Host()->get([
+			'countOutput' => true,
+			'hostids' => array_keys($edit_hostids),
+			'editable' => true
+		]);
+
+		if ($count != count($edit_hostids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 	}
 
