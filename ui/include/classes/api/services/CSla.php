@@ -1265,6 +1265,27 @@ class CSla extends CApiService {
 
 				$max_uptime = 0;
 
+				foreach ($scheduled_uptime_periods as $scheduled_uptime_period) {
+					$uptime_period_from = max($db_service['created_at'], $scheduled_uptime_period['period_from']);
+					$uptime_period_to = $scheduled_uptime_period['period_to'];
+					$uptime = $uptime_period_to - $uptime_period_from;
+
+					if ($uptime <= 0) {
+						continue;
+					}
+
+					$max_uptime += $uptime;
+
+					foreach ($combined_excluded_downtimes as $combined_excluded_downtime) {
+						$downtime = min($combined_excluded_downtime['period_to'], $uptime_period_to)
+							- max($combined_excluded_downtime['period_from'], $uptime_period_from);
+
+						if ($downtime > 0) {
+							$max_uptime -= $downtime;
+						}
+					}
+				}
+
 				$prev_clock = $reporting_period['period_from'];
 				$prev_value = $db_service['status_timeline'][$reporting_period_index]['start_value'];
 
@@ -1285,8 +1306,6 @@ class CSla extends CApiService {
 						if ($uptime <= 0) {
 							continue;
 						}
-
-						$max_uptime += $uptime;
 
 						foreach ($combined_excluded_downtimes as $combined_excluded_downtime) {
 							$downtime = min($combined_excluded_downtime['period_to'], $uptime_period_to)
