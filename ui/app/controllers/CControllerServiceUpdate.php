@@ -33,15 +33,13 @@ class CControllerServiceUpdate extends CController {
 			'problem_tags' =>				'array',
 			'sortorder' =>					'required|db services.sortorder|ge 0|le 999',
 			'algorithm' =>					'required|db services.algorithm|in '.implode(',', [ZBX_SERVICE_STATUS_CALC_SET_OK, ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL, ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE]),
+			'description' =>				'db services.description',
 			'advanced_configuration' =>		'in 1',
 			'status_rules' =>				'array',
 			'propagation_rule' =>			'in '.implode(',', array_keys(CServiceHelper::getStatusPropagationNames())),
 			'propagation_value_number' =>	'int32',
 			'propagation_value_status' =>	'int32',
 			'weight' =>						'string',
-			'showsla' =>					'in 1',
-			'goodsla' =>					'string',
-			'times' =>						'array',
 			'tags' =>						'array',
 			'child_serviceids' =>			'array_db services.serviceid'
 		];
@@ -122,16 +120,14 @@ class CControllerServiceUpdate extends CController {
 	 */
 	protected function doAction(): void {
 		$service = [
-			'showsla' => $this->hasInput('showsla') ? SERVICE_SHOW_SLA_ON : SERVICE_SHOW_SLA_OFF,
 			'tags' => [],
 			'problem_tags' => [],
 			'parents' => [],
 			'children' => [],
-			'times' => $this->getInput('times', []),
 			'status_rules' => []
 		];
 
-		$this->getInputs($service, ['serviceid', 'name', 'algorithm', 'sortorder', 'goodsla']);
+		$this->getInputs($service, ['serviceid', 'name', 'algorithm', 'sortorder', 'description']);
 
 		foreach ($this->getInput('tags', []) as $tag) {
 			if ($tag['tag'] === '' && $tag['value'] === '') {

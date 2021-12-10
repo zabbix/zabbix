@@ -21,6 +21,7 @@
 
 /**
  * @var CPartial $this
+ * @var array    $data
  */
 
 $parents = [];
@@ -39,6 +40,52 @@ while ($parent = array_shift($data['service']['parents'])) {
 	}
 
 	$parents[] = ', ';
+}
+
+$slas = [];
+
+if (array_key_exists('slas', $data)) {
+	foreach ($data['slas'] as $sla) {
+		$sla_html = [
+			new CLink($sla['name'],
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'sla_report')
+					->setArgument('slaid', $sla['slaid'])
+			)
+		];
+
+		if ($sla['sli']['sli']) {
+			$sli = $sla['sli']['sli'][0][0];
+
+			$sla_html[] = ': ';
+			$sla_html[] = CSlaHelper::getSliTag($sli['sli'], (float) $sla['slo']);
+			$sla_html[] = (new CSpan())
+				->addClass(ZBX_STYLE_ICON_DESCRIPTION)
+				->setHint(
+					(new CTable())
+						->addClass(ZBX_STYLE_LIST_TABLE)
+						->setHeader([_('Reporting period'), _('SLO'), _('SLI'), _('Uptime'), _('Downtime'),
+							_('Error budget')
+						])
+						->addRow([
+							CSlaHelper::getPeriodTag((int) $sla['period'], $sla['sli']['periods'][0]['period_from'],
+								$sla['sli']['periods'][0]['period_to'], $sla['timezone']
+							),
+							CSlaHelper::getSloTag((float) $sla['slo']),
+							CSlaHelper::getSliTag($sli['sli'], (float) $sla['slo']),
+							CSlaHelper::getUptimeTag($sli['uptime']),
+							CSlaHelper::getDowntimeTag($sli['downtime']),
+							CSlaHelper::getErrorBudgetTag($sli['error_budget'])
+						])
+				);
+		}
+
+		$slas[] = new CDiv($sla_html);
+	}
+
+	if ($data['slas_count'] > count($data['slas'])) {
+		$slas[] = new CDiv('&hellip;');
+	}
 }
 
 (new CDiv([
@@ -65,16 +112,15 @@ while ($parent = array_shift($data['service']['parents'])) {
 		->addItem([
 			(new CDiv(_('Status')))->addClass(ZBX_STYLE_SERVICE_INFO_LABEL),
 			(new CDiv(
-				(new CDiv(CSeverityHelper::getName((int) $data['service']['status'])))->addClass(ZBX_STYLE_SERVICE_STATUS))
+				(new CDiv(CSeverityHelper::getName((int) $data['service']['status'])))
+					->addClass(ZBX_STYLE_SERVICE_STATUS))
 			)->addClass(ZBX_STYLE_SERVICE_INFO_VALUE)
 		])
 		->addItem([
 			(new CDiv(_('SLA')))->addClass(ZBX_STYLE_SERVICE_INFO_LABEL),
-			(new CDiv(
-				$data['service']['showsla'] == SERVICE_SHOW_SLA_ON
-					? sprintf('%.4f', $data['service']['goodsla'])
-					: ''
-			))->addClass(ZBX_STYLE_SERVICE_INFO_VALUE)
+			(new CDiv($slas))
+				->addClass(ZBX_STYLE_SERVICE_INFO_VALUE)
+				->addClass(ZBX_STYLE_SERVICE_INFO_VALUE_SLA)
 		])
 		->addItem([
 			(new CDiv(_('Tags')))->addClass(ZBX_STYLE_SERVICE_INFO_LABEL),

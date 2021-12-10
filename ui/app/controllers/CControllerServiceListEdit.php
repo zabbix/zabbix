@@ -151,14 +151,18 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 			'service' => $this->service
 		];
 
-		$db_serviceids = $this->prepareData($filter, $filter['filter_set']);
+		if ($this->service !== null && !$filter['filter_set']) {
+			$data += $this->getSlas();
+		}
+
+		$db_serviceids = self::getServiceIds($filter, $filter['filter_set']);
 
 		$page_num = $this->getInput('page', 1);
 		CPagerHelper::savePage('service.list.edit', $page_num);
 		$data['paging'] = CPagerHelper::paginate($page_num, $db_serviceids, ZBX_SORT_UP, $paging_curl);
 
 		$data['services'] = API::Service()->get([
-			'output' => ['serviceid', 'name', 'status', 'goodsla', 'showsla', 'readonly'],
+			'output' => ['serviceid', 'name', 'status', 'created_at', 'readonly'],
 			'selectParents' => $filter['filter_set'] ? ['serviceid', 'name'] : null,
 			'selectChildren' => API_OUTPUT_COUNT,
 			'selectProblemTags' => API_OUTPUT_COUNT,

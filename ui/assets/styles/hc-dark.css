@@ -2018,6 +2018,10 @@ footer {
       padding-bottom: 10px; }
   .service-info .service-info-label::after {
     content: ':'; }
+  .service-info .service-info-value.service-info-value-sla div {
+    display: inline-block; }
+    .service-info .service-info-value.service-info-value-sla div:not(:last-child) {
+      margin-right: 10px; }
   .service-info .service-name {
     padding-bottom: 5px;
     font-size: 1.5em; }

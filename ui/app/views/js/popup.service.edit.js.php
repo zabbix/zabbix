@@ -26,10 +26,6 @@
 
 window.service_edit_popup = {
 	status_rule_template: null,
-	time_template: null,
-	uptime_template: null,
-	downtime_template: null,
-	onetime_downtime_template: null,
 	child_template: null,
 
 	serviceid: null,
@@ -45,8 +41,8 @@ window.service_edit_popup = {
 	form: null,
 	footer: null,
 
-	init({serviceid, children, children_problem_tags_html, problem_tags, status_rules, service_times, algorithm_names,
-			create_url, update_url, search_limit}) {
+	init({serviceid, children, children_problem_tags_html, problem_tags, status_rules, algorithm_names, create_url,
+			update_url, search_limit}) {
 		this.initTemplates();
 
 		this.serviceid = serviceid;
@@ -63,10 +59,6 @@ window.service_edit_popup = {
 
 		for (const status_rule of status_rules) {
 			this.addStatusRule(status_rule);
-		}
-
-		for (const service_time of service_times) {
-			this.addTime(service_time);
 		}
 
 		for (const service of children) {
@@ -97,7 +89,7 @@ window.service_edit_popup = {
 
 		// Update form field state according to the form data.
 
-		for (const id of ['advanced_configuration', 'propagation_rule', 'algorithm', 'showsla']) {
+		for (const id of ['advanced_configuration', 'propagation_rule', 'algorithm']) {
 			document
 				.getElementById(id)
 				.addEventListener('change', () => this.update());
@@ -124,21 +116,6 @@ window.service_edit_popup = {
 				}
 				else if (e.target.classList.contains('js-edit')) {
 					this.editStatusRule(e.target.closest('tr'));
-				}
-				else if (e.target.classList.contains('js-remove')) {
-					e.target.closest('tr').remove();
-				}
-			});
-
-		// Setup Service times.
-		document
-			.getElementById('times')
-			.addEventListener('click', (e) => {
-				if (e.target.classList.contains('js-add')) {
-					this.editTime();
-				}
-				else if (e.target.classList.contains('js-edit')) {
-					this.editTime(e.target.closest('tr'));
 				}
 				else if (e.target.classList.contains('js-remove')) {
 					e.target.closest('tr').remove();
@@ -204,36 +181,6 @@ window.service_edit_popup = {
 			</tr>
 		`);
 
-		this.time_template = new Template(`
-			<tr data-row_index="#{row_index}">
-				<td>
-					#{*time_type}
-					<input type="hidden" id="times_#{row_index}_type" name="times[#{row_index}][type]" value="#{type}">
-					<input type="hidden" id="times_#{row_index}_ts_from" name="times[#{row_index}][ts_from]" value="#{ts_from}">
-					<input type="hidden" id="times_#{row_index}_ts_to" name="times[#{row_index}][ts_to]" value="#{ts_to}">
-					<input type="hidden" id="times_#{row_index}_note" name="times[#{row_index}][note]" value="#{note}">
-				</td>
-				<td>#{from} - #{till}</td>
-				<td class="wordwrap" style="max-width: 540px;">#{note}</td>
-				<td>
-					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
-						<li>
-							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-edit"><?= _('Edit') ?></button>
-						</li>
-						<li>
-							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
-						</li>
-					</ul>
-				</td>
-			</tr>
-		`);
-
-		this.uptime_template = `<span class="enabled"><?= _('Uptime') ?></span>`;
-
-		this.downtime_template = `<span class="disabled"><?= _('Downtime') ?></span>`;
-
-		this.onetime_downtime_template = `<span class="disabled"><?= _('One-time downtime') ?></span>`;
-
 		this.child_template = new Template(`
 			<tr data-serviceid="#{serviceid}">
 				<td class="<?= ZBX_STYLE_WORDWRAP ?>" style="max-width: <?= ZBX_TEXTAREA_BIG_WIDTH ?>px;">#{name}</td>
@@ -249,8 +196,6 @@ window.service_edit_popup = {
 	update() {
 		const advanced_configuration = document.getElementById('advanced_configuration').checked;
 		const propagation_rule = document.getElementById('propagation_rule').value;
-		const status_enabled = document.getElementById('algorithm').value != <?= ZBX_SERVICE_STATUS_CALC_SET_OK ?>;
-		const showsla = document.getElementById('showsla').checked;
 
 		let has_problem_tags = false;
 
@@ -298,9 +243,6 @@ window.service_edit_popup = {
 				document.getElementById('status_propagation_value_field').style.display = 'none';
 		}
 
-		document.getElementById('showsla').disabled = !status_enabled;
-		document.getElementById('goodsla').disabled = !status_enabled || !showsla;
-
 		document.querySelector('#children .js-add').disabled = has_problem_tags;
 	},
 
@@ -343,43 +285,6 @@ window.service_edit_popup = {
 		});
 	},
 
-	editTime(row = null) {
-		let popup_params;
-
-		if (row !== null) {
-			const row_index = row.dataset.row_index;
-
-			popup_params = {
-				edit: '1',
-				row_index,
-				type: row.querySelector(`[name="times[${row_index}][type]"`).value,
-				ts_from: row.querySelector(`[name="times[${row_index}][ts_from]"`).value,
-				ts_to: row.querySelector(`[name="times[${row_index}][ts_to]"`).value,
-				note: row.querySelector(`[name="times[${row_index}][note]"`).value
-			};
-		}
-		else {
-			let row_index = 0;
-
-			while (document.querySelector(`#times [data-row_index="${row_index}"]`) !== null) {
-				row_index++;
-			}
-
-			popup_params = {row_index};
-		}
-
-		const overlay = PopUp('popup.service.time.edit', popup_params, 'service_time_edit', document.activeElement);
-
-		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-			if (row !== null) {
-				this.updateTime(row, e.detail)
-			}
-			else {
-				this.addTime(e.detail);
-			}
-		});
-	},
-
 	addStatusRule(status_rule) {
 		document
 			.querySelector('#status_rules tbody')
@@ -389,34 +294,6 @@ window.service_edit_popup = {
 	updateStatusRule(row, status_rule) {
 		row.insertAdjacentHTML('afterend', this.status_rule_template.evaluate(status_rule));
 		row.remove();
-	},
-
-	addTime(time) {
-		document
-			.querySelector('#times tbody')
-			.insertAdjacentHTML('beforeend', this.time_template.evaluate({
-				...time,
-				time_type: this.makeServiceTimeType(parseInt(time.type))
-			}));
-	},
-
-	updateTime(row, time) {
-		row.insertAdjacentHTML('afterend', this.time_template.evaluate({
-			...time,
-			time_type: this.makeServiceTimeType(parseInt(time.type))
-		}));
-		row.remove();
-	},
-
-	makeServiceTimeType(type) {
-		switch (type) {
-			case <?= SERVICE_TIME_TYPE_UPTIME ?>:
-				return this.uptime_template;
-			case <?= SERVICE_TIME_TYPE_DOWNTIME ?>:
-				return this.downtime_template;
-			case <?= SERVICE_TIME_TYPE_ONETIME_DOWNTIME ?>:
-				return this.onetime_downtime_template;
-		}
 	},
 
 	renderChild(service) {

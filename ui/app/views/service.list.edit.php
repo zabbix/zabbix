@@ -32,7 +32,7 @@ $this->addJsFile('layout.mode.js');
 $this->addJsFile('class.tagfilteritem.js');
 $this->addJsFile('class.calendar.js');
 
-$this->includeJsFile('services.service.list.js.php');
+$this->includeJsFile('service.list.js.php');
 
 $breadcrumbs = [];
 $filter = null;
@@ -149,7 +149,7 @@ $filter->addFilterTab(_('Filter'), [
 		$breadcrumbs ? new CList([new CBreadcrumbs($breadcrumbs)]) : null
 	)
 	->addItem($filter)
-	->addItem(new CPartial('services.service.list.edit', array_intersect_key($data, array_flip([
+	->addItem(new CPartial('service.list.edit', array_intersect_key($data, array_flip([
 		'can_monitor_problems', 'path', 'is_filtered', 'max_in_table', 'service', 'services', 'events', 'tags',
 		'paging', 'back_url'
 	]))))

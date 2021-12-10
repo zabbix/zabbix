@@ -19,10 +19,7 @@
 **/
 
 
-/**
- * A class designed to perform actions and contain constants related to SLA.
- */
-class CSlaHelper {
+final class CSlaHelper {
 
 	public const SLA_STATUS_ANY			= -1;
 	public const SLA_STATUS_ENABLED		= 0;
@@ -116,5 +113,110 @@ class CSlaHelper {
 		// @TODO: intersections, if not weeded out by API.
 
 		return $schedule;
+	}
+
+
+
+	/**
+	 * @param int    $period
+	 * @param int    $period_from
+	 * @param int    $period_to
+	 * @param string $timezone
+	 *
+	 * @return CTag
+	 */
+	public static function getPeriodTag(int $period, int $period_from, int $period_to, string $timezone): CTag {
+		$tag = new CSpan();
+
+		try {
+			$datetime_from = (new DateTime('@'.$period_from))->setTimezone(new DateTimeZone($timezone));
+			$datetime_to = (new DateTime('@'.($period_to - 1)))->setTimezone(new DateTimeZone($timezone));
+		}
+		catch (Exception $e) {
+			return $tag;
+		}
+
+		switch ($period) {
+			case ZBX_SLA_PERIOD_DAILY:
+				$tag->addItem($datetime_from->format(ZBX_SLA_PERIOD_DATE_FORMAT_DAILY));
+				break;
+
+			case ZBX_SLA_PERIOD_WEEKLY:
+				$tag->addItem([
+					$datetime_from->format(ZBX_SLA_PERIOD_DATE_FORMAT_WEEKLY_FROM),
+					' &#8211; ',
+					$datetime_to->format(ZBX_SLA_PERIOD_DATE_FORMAT_WEEKLY_TO)
+				]);
+				break;
+
+			case ZBX_SLA_PERIOD_MONTHLY:
+				$tag->addItem($datetime_from->format(ZBX_SLA_PERIOD_DATE_FORMAT_MONTHLY));
+				break;
+
+			case ZBX_SLA_PERIOD_QUARTERLY:
+				$tag->addItem([
+					$datetime_from->format(ZBX_SLA_PERIOD_DATE_FORMAT_QUARTERLY_FROM),
+					' &#8211; ',
+					$datetime_to->format(ZBX_SLA_PERIOD_DATE_FORMAT_QUARTERLY_TO)
+				]);
+				break;
+
+			case ZBX_SLA_PERIOD_ANNUALLY:
+				$tag->addItem($datetime_from->format(ZBX_SLA_PERIOD_DATE_FORMAT_ANNUALLY));
+				break;
+		}
+
+		return $tag;
+	}
+
+	/**
+	 * @param float $slo
+	 *
+	 * @return CTag
+	 */
+	public static function getSloTag(float $slo): CTag {
+		return new CSpan([round($slo, 4), '%']);
+	}
+
+	/**
+	 * @param float $sli
+	 * @param float $slo
+	 *
+	 * @return CTag
+	 */
+	public static function getSliTag(float $sli, float $slo): CTag {
+		if ($sli == -1) {
+			return (new CSpan(_('N/A')))->addClass(ZBX_STYLE_GREY);
+		}
+
+		return (new CSpan(floor($sli * 10000) / 10000))->addClass($sli >= $slo ? ZBX_STYLE_GREEN : ZBX_STYLE_RED);
+	}
+
+	/**
+	 * @param int $uptime
+	 *
+	 * @return CTag
+	 */
+	public static function getUptimeTag(int $uptime): CTag {
+		return (new CSpan(convertUnitsS($uptime, true)))->addClass($uptime == 0 ? ZBX_STYLE_GREY : null);
+	}
+
+	/**
+	 * @param int $downtime
+	 *
+	 * @return CTag
+	 */
+	public static function getDowntimeTag(int $downtime): CTag {
+		return (new CSpan(convertUnitsS($downtime, true)))->addClass($downtime == 0 ? ZBX_STYLE_GREY : null);
+	}
+
+	/**
+	 * @param int $error_budget
+	 *
+	 * @return CTag
+	 */
+	public static function getErrorBudgetTag(int $error_budget): CTag {
+		return (new CSpan(convertUnitsS($error_budget, true)))
+			->addClass($error_budget >= 0 ? ZBX_STYLE_GREY : ZBX_STYLE_RED);
 	}
 }

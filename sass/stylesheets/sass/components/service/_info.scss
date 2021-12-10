@@ -21,6 +21,19 @@
 		}
 	}
 
+	.service-info-value {
+
+		&.service-info-value-sla {
+			div {
+				display: inline-block;
+
+				&:not(:last-child) {
+					margin-right: 10px;
+				}
+			}
+		}
+	}
+
 	.service-name {
 		padding-bottom: 5px;
 		font-size: $font-h2-size;

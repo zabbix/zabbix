@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $form = (new CForm('post'))
@@ -131,6 +132,22 @@ $service_tab = (new CFormGrid())
 				->addOptions(CSelect::createOptionsFromArray(CServiceHelper::getAlgorithmNames()))
 		)
 	])
+	->addItem([
+		new CLabel(_('Description'), 'description'),
+		new CFormField(
+			(new CTextArea('description', $data['form']['description']))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('services', 'description'))
+		)
+	])
+	->addItem([
+		new CLabel(_('Created at'), 'created_at'),
+		new CFormField(
+			(new CTextBox('created_at', zbx_date2str(DATE_FORMAT, $data['form']['created_at'])))
+				->setEnabled(false)
+				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+		)
+	])
 	->addItem(
 		(new CFormField(
 			(new CCheckBox('advanced_configuration'))
@@ -216,44 +233,6 @@ $service_tab
 		))
 			->setId('weight_field')
 			->addStyle('display: none;')
-	]);
-
-// SLA tab.
-
-$times = (new CTable())
-	->setId('times')
-	->setHeader(
-		(new CRowHeader([_('Type'), _('Interval'), _('Note'), _('Action')]))->addClass(ZBX_STYLE_GREY)
-	);
-
-$times->addItem(
-	(new CTag('tfoot', true))
-		->addItem(
-			(new CCol(
-				(new CSimpleButton(_('Add')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('js-add')
-			))->setColSpan(4)
-		)
-);
-
-$sla_tab = (new CFormGrid())
-	->addItem([
-		new CLabel(_('SLA'), 'showsla'),
-		new CFormField(
-			new CHorList([
-				(new CCheckBox('showsla'))->setChecked($data['form']['showsla'] == SERVICE_SHOW_SLA_ON),
-				(new CTextBox('goodsla', $data['form']['goodsla'], false, 8))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-			])
-		)
-	])
-	->addItem([
-		new CLabel(_('Service times')),
-		new CFormField([
-			(new CDiv($times))
-				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-				->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-		])
 	]);
 
 // Tags tab.
@@ -342,7 +321,6 @@ $child_services_tab = [
 $tabs = (new CTabView())
 	->setSelected(0)
 	->addTab('service-tab', _('Service'), $service_tab)
-	->addTab('sla-tab', _('SLA'), $sla_tab, TAB_INDICATOR_SLA)
 	->addTab('tags-tab', _('Tags'), $tags_tab, TAB_INDICATOR_TAGS)
 	->addTab('child-services-tab', _('Child services'), $child_services_tab, TAB_INDICATOR_CHILD_SERVICES);
 
@@ -358,7 +336,6 @@ $form
 				'children_problem_tags_html' => $data['form']['children_problem_tags_html'],
 				'problem_tags' => $data['form']['problem_tags'],
 				'status_rules' => $data['form']['status_rules'],
-				'service_times' => $data['form']['times'],
 				'create_url' => (new CUrl('zabbix.php'))
 					->setArgument('action', 'service.create')
 					->getUrl(),

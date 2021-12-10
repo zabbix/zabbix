@@ -21,6 +21,7 @@
 
 /**
  * @var CPartial $this
+ * @var array    $data
  */
 
 $form = (new CForm())
@@ -50,7 +51,7 @@ $table = (new CTableInfo())
 	->setHeader(array_merge($header, [
 		(new CColHeader(_('Status')))->addStyle('width: 14%'),
 		(new CColHeader(_('Root cause')))->addStyle('width: 24%'),
-		(new CColHeader(_('SLA')))->addStyle('width: 14%'),
+		(new CColHeader(_('Created at')))->addStyle('width: 14%'),
 		(new CColHeader(_('Tags')))->addClass(ZBX_STYLE_COLUMN_TAGS_3)
 	]));
 
@@ -104,10 +105,10 @@ foreach ($data['services'] as $serviceid => $service) {
 				CViewHelper::showNum($service['children'])
 			]
 			: $service['name'],
-			(new CCol(CSeverityHelper::getName((int) $service['status'])))
-				->addClass(CSeverityHelper::getStyle((int) $service['status'])),
+		(new CCol(CSeverityHelper::getName((int) $service['status'])))
+			->addClass(CSeverityHelper::getStyle((int) $service['status'])),
 		$root_cause,
-		($service['showsla'] == SERVICE_SHOW_SLA_ON) ? sprintf('%.4f', $service['goodsla']) : '',
+		zbx_date2str(DATE_FORMAT, $service['created_at']),
 		$data['tags'][$serviceid]
 	])));
 }

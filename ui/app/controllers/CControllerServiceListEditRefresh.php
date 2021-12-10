@@ -104,7 +104,7 @@ class CControllerServiceListEditRefresh extends CControllerServiceListGeneral {
 			]
 		];
 
-		$db_serviceids = $this->prepareData($filter, $filter['filter_set']);
+		$db_serviceids = self::getServiceIds($filter, $filter['filter_set']);
 
 		$paging_curl = (new CUrl('zabbix.php'))
 			->setArgument('action', 'service.list.edit')
@@ -132,7 +132,7 @@ class CControllerServiceListEditRefresh extends CControllerServiceListGeneral {
 		$data['paging'] = CPagerHelper::paginate($page_num, $db_serviceids, ZBX_SORT_UP, $paging_curl);
 
 		$data['services'] = API::Service()->get([
-			'output' => ['serviceid', 'name', 'status', 'goodsla', 'showsla', 'readonly'],
+			'output' => ['serviceid', 'name', 'status', 'created_at', 'readonly'],
 			'selectParents' => $filter['filter_set'] ? ['serviceid', 'name'] : null,
 			'selectChildren' => API_OUTPUT_COUNT,
 			'selectProblemTags' => API_OUTPUT_COUNT,
