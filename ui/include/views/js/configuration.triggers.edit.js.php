@@ -37,8 +37,6 @@
 				})
 				.trigger('input');
 
-			console.log('es esmu te');
-
 			// Refresh field visibility on document load.
 			this.changeRecoveryMode();
 			this.changeCorrelationMode();
@@ -66,8 +64,6 @@
 		},
 
 		changeRecoveryMode() {
-			console.log('changeRecoveryMode');
-
 			const recovery_mode = $('input[name=recovery_mode]:checked').val();
 
 			$('#expression_row').find('label').text(
@@ -86,8 +82,6 @@
 		},
 
 		changeCorrelationMode() {
-			console.log('changeCorrelationMode');
-
 			const recovery_mode = $('input[name=recovery_mode]:checked').val();
 			const correlation_mode = $('input[name=correlation_mode]:checked').val();
 
@@ -102,7 +96,6 @@
 		 * @see init.js add.popup event
 		 */
 		addPopupValues(list) {
-			console.log('trigger add popup values');
 			if (!isset('object', list)) {
 				return false;
 			}
