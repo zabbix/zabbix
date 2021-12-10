@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 5.4 and higher  
 The template to monitor InfluxDB by Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
@@ -51,7 +51,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Organizations discovery |<p>Discovery of organizations merics.</p> |HTTP_AGENT |influxdb.orgs.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Filter**:</p>AND <p>- A: {#ORG_NAME} NOT_MATCHES_REGEX `{$INFLUXDB.ORG_NAME.NOT_MATCHES}`</p><p>- B: {#ORG_NAME} MATCHES_REGEX `{$INFLUXDB.ORG_NAME.MATCHES}`</p> |
+|Organizations discovery |<p>Discovery of organizations metrics.</p> |HTTP_AGENT |influxdb.orgs.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Filter**:</p>AND <p>- {#ORG_NAME} NOT_MATCHES_REGEX `{$INFLUXDB.ORG_NAME.NOT_MATCHES}`</p><p>- {#ORG_NAME} MATCHES_REGEX `{$INFLUXDB.ORG_NAME.MATCHES}`</p> |
 
 ## Items collected
 

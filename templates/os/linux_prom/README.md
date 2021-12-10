@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 5.4 and higher  
 This template collects Linux metrics from node_exporter 0.18 and above. Support for older node_exporter versions is provided as 'best effort'.
 
 This template was tested on:
@@ -63,9 +63,9 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Network interface discovery |<p>Discovery of network interfaces. Requires node_exporter v0.18 and up.</p> |DEPENDENT |net.if.discovery[node_exporter]<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~"^node_network_info$"}`</p><p>**Filter**:</p>AND <p>- A: {#IFNAME} MATCHES_REGEX `{$NET.IF.IFNAME.MATCHES}`</p><p>- B: {#IFNAME} NOT_MATCHES_REGEX `{$NET.IF.IFNAME.NOT_MATCHES}`</p><p>- C: {#IFALIAS} MATCHES_REGEX `{$NET.IF.IFALIAS.MATCHES}`</p><p>- D: {#IFALIAS} NOT_MATCHES_REGEX `{$NET.IF.IFALIAS.NOT_MATCHES}`</p><p>- E: {#IFOPERSTATUS} MATCHES_REGEX `{$NET.IF.IFOPERSTATUS.MATCHES}`</p><p>- F: {#IFOPERSTATUS} NOT_MATCHES_REGEX `{$NET.IF.IFOPERSTATUS.NOT_MATCHES}`</p> |
-|Mounted filesystem discovery |<p>Discovery of file systems of different types.</p> |DEPENDENT |vfs.fs.discovery[node_exporter]<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~"^node_filesystem_size(?:_bytes)?$", mountpoint=~".+"}`</p><p>**Filter**:</p>AND <p>- A: {#FSTYPE} MATCHES_REGEX `{$VFS.FS.FSTYPE.MATCHES}`</p><p>- B: {#FSTYPE} NOT_MATCHES_REGEX `{$VFS.FS.FSTYPE.NOT_MATCHES}`</p><p>- C: {#FSNAME} MATCHES_REGEX `{$VFS.FS.FSNAME.MATCHES}`</p><p>- D: {#FSNAME} NOT_MATCHES_REGEX `{$VFS.FS.FSNAME.NOT_MATCHES}`</p><p>- E: {#FSNAME} MATCHES_REGEX `{$VFS.FS.FSDEVICE.MATCHES}`</p><p>- F: {#FSDEVICE} NOT_MATCHES_REGEX `{$VFS.FS.FSDEVICE.NOT_MATCHES}`</p> |
-|Block devices discovery |<p>-</p> |DEPENDENT |vfs.dev.discovery[node_exporter]<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `node_disk_io_now{device=~".+"}`</p><p>**Filter**:</p>AND <p>- A: {#DEVNAME} MATCHES_REGEX `{$VFS.DEV.DEVNAME.MATCHES}`</p><p>- B: {#DEVNAME} NOT_MATCHES_REGEX `{$VFS.DEV.DEVNAME.NOT_MATCHES}`</p> |
+|Network interface discovery |<p>Discovery of network interfaces. Requires node_exporter v0.18 and up.</p> |DEPENDENT |net.if.discovery[node_exporter]<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~"^node_network_info$"}`</p><p>**Filter**:</p>AND <p>- {#IFNAME} MATCHES_REGEX `{$NET.IF.IFNAME.MATCHES}`</p><p>- {#IFNAME} NOT_MATCHES_REGEX `{$NET.IF.IFNAME.NOT_MATCHES}`</p><p>- {#IFALIAS} MATCHES_REGEX `{$NET.IF.IFALIAS.MATCHES}`</p><p>- {#IFALIAS} NOT_MATCHES_REGEX `{$NET.IF.IFALIAS.NOT_MATCHES}`</p><p>- {#IFOPERSTATUS} MATCHES_REGEX `{$NET.IF.IFOPERSTATUS.MATCHES}`</p><p>- {#IFOPERSTATUS} NOT_MATCHES_REGEX `{$NET.IF.IFOPERSTATUS.NOT_MATCHES}`</p> |
+|Mounted filesystem discovery |<p>Discovery of file systems of different types.</p> |DEPENDENT |vfs.fs.discovery[node_exporter]<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~"^node_filesystem_size(?:_bytes)?$", mountpoint=~".+"}`</p><p>**Filter**:</p>AND <p>- {#FSTYPE} MATCHES_REGEX `{$VFS.FS.FSTYPE.MATCHES}`</p><p>- {#FSTYPE} NOT_MATCHES_REGEX `{$VFS.FS.FSTYPE.NOT_MATCHES}`</p><p>- {#FSNAME} MATCHES_REGEX `{$VFS.FS.FSNAME.MATCHES}`</p><p>- {#FSNAME} NOT_MATCHES_REGEX `{$VFS.FS.FSNAME.NOT_MATCHES}`</p><p>- {#FSNAME} MATCHES_REGEX `{$VFS.FS.FSDEVICE.MATCHES}`</p><p>- {#FSDEVICE} NOT_MATCHES_REGEX `{$VFS.FS.FSDEVICE.NOT_MATCHES}`</p> |
+|Block devices discovery |<p>-</p> |DEPENDENT |vfs.dev.discovery[node_exporter]<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `node_disk_io_now{device=~".+"}`</p><p>**Filter**:</p>AND <p>- {#DEVNAME} MATCHES_REGEX `{$VFS.DEV.DEVNAME.MATCHES}`</p><p>- {#DEVNAME} NOT_MATCHES_REGEX `{$VFS.DEV.DEVNAME.NOT_MATCHES}`</p> |
 
 ## Items collected
 
@@ -103,12 +103,12 @@ There are no template links in this template.
 |Memory |Free swap space |<p>The free space of swap volume/file in bytes.</p> |DEPENDENT |system.swap.free[node_exporter]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `{__name__=~"node_memory_SwapFree"} `</p> |
 |Memory |Free swap space in % |<p>The free space of swap volume/file in percent.</p> |CALCULATED |system.swap.pfree[node_exporter]<p>**Expression**:</p>`last(//system.swap.free[node_exporter])/last(//system.swap.total[node_exporter])*100` |
 |Monitoring_agent |Version of node_exporter running |<p>-</p> |DEPENDENT |agent.version[node_exporter]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `node_exporter_build_info version`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
-|Network_interfaces |Interface {#IFNAME}({#IFALIAS}): Bits received | |DEPENDENT |net.if.in[node_exporter,"{#IFNAME}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `node_network_receive_bytes_total{device="{#IFNAME}"} `</p><p>- CHANGE_PER_SECOND<p>- MULTIPLIER: `8`</p> |
-|Network_interfaces |Interface {#IFNAME}({#IFALIAS}): Bits sent | |DEPENDENT |net.if.out[node_exporter,"{#IFNAME}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `node_network_transmit_bytes_total{device="{#IFNAME}"} `</p><p>- CHANGE_PER_SECOND<p>- MULTIPLIER: `8`</p> |
-|Network_interfaces |Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors | |DEPENDENT |net.if.out.errors[node_exporter"{#IFNAME}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `node_network_transmit_errs_total{device="{#IFNAME}"} `</p><p>- CHANGE_PER_SECOND |
-|Network_interfaces |Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors | |DEPENDENT |net.if.in.errors[node_exporter,"{#IFNAME}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `node_network_receive_errs_total{device="{#IFNAME}"} `</p><p>- CHANGE_PER_SECOND |
-|Network_interfaces |Interface {#IFNAME}({#IFALIAS}): Inbound packets discarded | |DEPENDENT |net.if.in.discards[node_exporter,"{#IFNAME}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `node_network_receive_drop_total{device="{#IFNAME}"} `</p><p>- CHANGE_PER_SECOND |
-|Network_interfaces |Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded | |DEPENDENT |net.if.out.discards[node_exporter,"{#IFNAME}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `node_network_transmit_drop_total{device="{#IFNAME}"} `</p><p>- CHANGE_PER_SECOND |
+|Network_interfaces |Interface {#IFNAME}({#IFALIAS}): Bits received |<p>-</p> |DEPENDENT |net.if.in[node_exporter,"{#IFNAME}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `node_network_receive_bytes_total{device="{#IFNAME}"} `</p><p>- CHANGE_PER_SECOND<p>- MULTIPLIER: `8`</p> |
+|Network_interfaces |Interface {#IFNAME}({#IFALIAS}): Bits sent |<p>-</p> |DEPENDENT |net.if.out[node_exporter,"{#IFNAME}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `node_network_transmit_bytes_total{device="{#IFNAME}"} `</p><p>- CHANGE_PER_SECOND<p>- MULTIPLIER: `8`</p> |
+|Network_interfaces |Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors |<p>-</p> |DEPENDENT |net.if.out.errors[node_exporter"{#IFNAME}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `node_network_transmit_errs_total{device="{#IFNAME}"} `</p><p>- CHANGE_PER_SECOND |
+|Network_interfaces |Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors |<p>-</p> |DEPENDENT |net.if.in.errors[node_exporter,"{#IFNAME}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `node_network_receive_errs_total{device="{#IFNAME}"} `</p><p>- CHANGE_PER_SECOND |
+|Network_interfaces |Interface {#IFNAME}({#IFALIAS}): Inbound packets discarded |<p>-</p> |DEPENDENT |net.if.in.discards[node_exporter,"{#IFNAME}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `node_network_receive_drop_total{device="{#IFNAME}"} `</p><p>- CHANGE_PER_SECOND |
+|Network_interfaces |Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded |<p>-</p> |DEPENDENT |net.if.out.discards[node_exporter,"{#IFNAME}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `node_network_transmit_drop_total{device="{#IFNAME}"} `</p><p>- CHANGE_PER_SECOND |
 |Network_interfaces |Interface {#IFNAME}({#IFALIAS}): Speed |<p>Sets value to 0 if metric is missing in node_exporter output.</p> |DEPENDENT |net.if.speed[node_exporter,"{#IFNAME}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `node_network_speed_bytes{device="{#IFNAME}"} `</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- MULTIPLIER: `8`</p> |
 |Network_interfaces |Interface {#IFNAME}({#IFALIAS}): Interface type |<p>node_network_protocol_type protocol_type value of /sys/class/net/<iface>.</p> |DEPENDENT |net.if.type[node_exporter,"{#IFNAME}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `node_network_protocol_type{device="{#IFNAME}"} `</p> |
 |Network_interfaces |Interface {#IFNAME}({#IFALIAS}): Operational status |<p>Reference: https://www.kernel.org/doc/Documentation/networking/operstates.txt</p> |DEPENDENT |net.if.status[node_exporter,"{#IFNAME}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `node_network_info{device="{#IFNAME}"} operstate`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
@@ -163,8 +163,8 @@ You can also provide a feedback, discuss the template or ask for help with it at
 
 ## Known Issues
 
-- Description: node_exporter v0.16.0 renamed many metrics. CPU utilization for 'guest' and 'guest_nice' metrics are not supported in this template with node_exporter < 0.16. Disk IO metrics are not supported. Other metrics provided as 'best effort'.  
- See https://github.com/prometheus/node_exporter/releases/tag/v0.16.0 for details.
+- Description: node_exporter v0.16.0 renamed many metrics. CPU utilization for 'guest' and 'guest_nice' metrics are not supported in this template with node_exporter < 0.16. Disk IO metrics are not supported. Other metrics provided as 'best effort'.
+See https://github.com/prometheus/node_exporter/releases/tag/v0.16.0 for details.
   - Version: below 0.16.0
 
 - Description: metric node_network_info with label 'device' cannot be found, so network discovery is not possible.

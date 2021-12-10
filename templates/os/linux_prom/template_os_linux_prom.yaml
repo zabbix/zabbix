@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-10-27T08:39:23Z'
+  date: '2021-12-10T06:18:42Z'
   groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -15,8 +15,8 @@ zabbix_export:
         
         Known Issues:
         
-          Description: node_exporter v0.16.0 renamed many metrics. CPU utilization for 'guest' and 'guest_nice' metrics are not supported in this template with node_exporter < 0.16. Disk IO metrics are not supported. Other metrics provided as 'best effort'.  
-         See https://github.com/prometheus/node_exporter/releases/tag/v0.16.0 for details.
+          Description: node_exporter v0.16.0 renamed many metrics. CPU utilization for 'guest' and 'guest_nice' metrics are not supported in this template with node_exporter < 0.16. Disk IO metrics are not supported. Other metrics provided as 'best effort'.
+        See https://github.com/prometheus/node_exporter/releases/tag/v0.16.0 for details.
           Version: below 0.16.0
         
           Description: metric node_network_info with label 'device' cannot be found, so network discovery is not possible.
@@ -24,7 +24,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387225-discussion-thread-for-official-zabbix-template-for-linux
         
-        Template tooling version used: 0.39
+        Template tooling version used: 0.40
       groups:
         -
           name: 'Templates/Operating systems'
@@ -1263,7 +1263,7 @@ zabbix_export:
                     - |
                       var newvalue;
                       switch(value) {
-                        case "unkonwn":
+                        case "unknown":
                           newvalue = 0;
                           break;
                         case "notpresent":
