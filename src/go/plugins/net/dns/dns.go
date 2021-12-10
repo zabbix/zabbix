@@ -345,7 +345,7 @@ func parseParamas(params []string) (o options, err error) {
 }
 
 func (o *options) setIP(ip string) error {
-	if strings.TrimSpace(ip) == "" {
+	if ip == "" {
 		return nil
 	}
 
