@@ -128,7 +128,7 @@ func exportDnsRecord(params []string) (result interface{}, err error) {
 func parseAnswers(answers []dns.RR) string {
 	var out string
 	for _, a := range answers {
-		out += strings.TrimSuffix(a.Header().Name, ".") + "\t     "
+		out += strings.TrimSuffix(a.Header().Name, ".") + "\t      "
 		out += dns.Type(a.Header().Rrtype).String()
 
 		switch rr := a.(type) {
@@ -157,7 +157,7 @@ func parseAnswers(answers []dns.RR) string {
 		case *dns.HINFO:
 			out += getHINFOString(rr)
 		case *dns.MINFO:
-			out += getMINFOtring(rr)
+			out += getMINFOString(rr)
 		case *dns.TXT:
 			out += getTXTString(rr)
 		case *dns.AAAA:
@@ -253,7 +253,7 @@ func getHINFOString(in *dns.HINFO) string {
 
 }
 
-func getMINFOtring(in *dns.MINFO) string {
+func getMINFOString(in *dns.MINFO) string {
 	return "    " + strings.TrimSuffix(in.Rmail, ".") + " " +
 		strings.TrimSuffix(in.Email, ".") + "\n"
 }
@@ -326,7 +326,7 @@ func parseParamas(params []string) (o options, err error) {
 	case firstParam:
 		err = o.setIP(params[firstParam-1])
 		if err != nil {
-			return o, zbxerr.New(fmt.Sprintf("invalid fist parameter %s", err.Error()))
+			return o, zbxerr.New(fmt.Sprintf("invalid fist parameter, %s", err.Error()))
 		}
 
 		fallthrough
@@ -345,12 +345,12 @@ func parseParamas(params []string) (o options, err error) {
 }
 
 func (o *options) setIP(ip string) error {
-	if ip == "" {
+	if strings.TrimSpace(ip) == "" {
 		return nil
 	}
 
 	if !isValidIP(ip) {
-		return zbxerr.New(fmt.Sprintf("invalid address %s", ip))
+		return fmt.Errorf("invalid IP address, %s", ip)
 	}
 
 	o.ip = net.JoinHostPort(ip, "53")
@@ -380,13 +380,17 @@ func (o *options) setProtocol(protocol string) error {
 }
 
 func (o *options) setCount(c string) error {
-	count, err := strconv.Atoi(c)
-	if err != nil {
-		return zbxerr.New(fmt.Sprintf("invalid fifth parameter %s", err.Error()))
+	if c == "" {
+		return nil
 	}
 
-	if count < 0 {
-		return zbxerr.New("invalid fourth parameter")
+	count, err := strconv.Atoi(c)
+	if err != nil {
+		return zbxerr.New(fmt.Sprintf("invalid fifth parameter, %s", err.Error()))
+	}
+
+	if count <= 0 {
+		return zbxerr.New("invalid fifth parameter")
 	}
 
 	o.count = count
@@ -395,12 +399,16 @@ func (o *options) setCount(c string) error {
 }
 
 func (o *options) setTimeout(timeout string) error {
-	t, err := strconv.Atoi(timeout)
-	if err != nil {
-		return zbxerr.New(fmt.Sprintf("invalid fourth parameter %s", err.Error()))
+	if timeout == "" {
+		return nil
 	}
 
-	if t < 0 {
+	t, err := strconv.Atoi(timeout)
+	if err != nil {
+		return zbxerr.New(fmt.Sprintf("invalid fourth parameter, %s", err.Error()))
+	}
+
+	if t <= 0 {
 		return zbxerr.New("invalid fourth parameter")
 	}
 
@@ -410,9 +418,13 @@ func (o *options) setTimeout(timeout string) error {
 }
 
 func (o *options) setDNSType(dnsType string) error {
-	t, ok := dnsTypes[dnsType]
+	if dnsType == "" {
+		return nil
+	}
+
+	t, ok := dnsTypes[strings.ToUpper(dnsType)]
 	if !ok {
-		return zbxerr.New(fmt.Sprintf("unknown dns type %s", dnsType))
+		return zbxerr.New(fmt.Sprintf("invalid third parameter, unknown dns type %s", dnsType))
 	}
 
 	o.dnsType = t
@@ -481,6 +493,6 @@ func runQuery(resolver, domain, net string, record uint16, timeout time.Duration
 func init() {
 	plugin.RegisterMetrics(&impl, "DNS",
 		"net.dns", "Checks if DNS service is up.",
-		"net.dns.record", "	Performs a DNS query.",
+		"net.dns.record", "Performs a DNS query.",
 	)
 }

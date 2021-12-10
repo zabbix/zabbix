@@ -75,7 +75,5 @@ func (o *options) setDefaultIP() error {
 		return zbxerr.New("no dns server found")
 	}
 
-	o.setIP(servers[0])
-
-	return nil
+	return o.setIP(servers[0])
 }
