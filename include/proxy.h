@@ -44,7 +44,7 @@ int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char
 void	update_proxy_lastaccess(const zbx_uint64_t hostid, time_t last_access);
 
 int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j, char **error);
-void	process_proxyconfig(struct zbx_json_parse *jp_data);
+int	process_proxyconfig(struct zbx_json_parse *jp_data);
 
 int	get_host_availability_data(struct zbx_json *json, int *ts);
 int	process_host_availability(struct zbx_json_parse *jp, char **error);

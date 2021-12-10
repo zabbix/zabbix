@@ -28,6 +28,7 @@
 #include "../servercomms.h"
 #include "zbxcrypto.h"
 #include "zbxcompress.h"
+#include "zbxipcservice.h"
 
 #define CONFIG_PROXYCONFIG_RETRY	120	/* seconds */
 
@@ -126,7 +127,11 @@ static void	process_configuration_sync(size_t *data_size)
 	zabbix_log(LOG_LEVEL_WARNING, "received configuration data from server at \"%s\", datalen " ZBX_FS_SIZE_T,
 			sock.peer, (zbx_fs_size_t)*data_size);
 
-	process_proxyconfig(&jp);
+	if (SUCCEED == process_proxyconfig(&jp))
+	{
+		DCsync_configuration(ZBX_DBSYNC_UPDATE);
+		DCupdate_hosts_availability();
+	}
 error:
 	disconnect_server(&sock);
 out:
@@ -154,8 +159,10 @@ out:
  ******************************************************************************/
 ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 {
-	size_t	data_size;
-	double	sec;
+	size_t			data_size;
+	double			sec;
+	zbx_ipc_service_t	config_service;
+	char			*error = NULL;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -168,6 +175,14 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child();
 #endif
+
+	if (FAIL == zbx_ipc_service_start(&config_service, ZBX_IPC_SERVICE_CONFIG, &error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot start configuration syncer service: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
@@ -177,6 +192,38 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
+		if (ZBX_PROGRAM_TYPE_PROXY_PASSIVE == program_type)
+		{
+			zbx_ipc_client_t	*client;
+			zbx_ipc_message_t	*message;
+
+			update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
+			zbx_ipc_service_recv(&config_service, 1, &client, &message);
+			update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+
+			sec = zbx_time();
+			zbx_update_env(sec);
+
+			if (NULL != message)
+			{
+				zbx_setproctitle("%s [loading configuration]", get_process_type_string(process_type));
+
+				DCsync_configuration(ZBX_DBSYNC_UPDATE);
+				DCupdate_hosts_availability();
+
+				zbx_setproctitle("%s [synced config in " ZBX_FS_DBL " sec]",
+						get_process_type_string(process_type), zbx_time() - sec);
+				zbx_ipc_client_send(client, ZBX_IPC_CONFIG_RELOAD_RESPONSE, NULL, 0);
+			}
+
+			zbx_ipc_message_free(message);
+
+			if (NULL != client)
+				zbx_ipc_client_release(client);
+
+			continue;
+		}
+
 		sec = zbx_time();
 		zbx_update_env(sec);
 

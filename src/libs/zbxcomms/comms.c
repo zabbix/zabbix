@@ -1514,6 +1514,7 @@ void	zbx_tcp_unaccept(zbx_socket_t *s)
 
 	shutdown(s->socket, 2);
 
+	zbx_socket_free(s);
 	zbx_socket_close(s->socket);
 
 	s->socket = s->socket_orig;	/* restore main socket */
