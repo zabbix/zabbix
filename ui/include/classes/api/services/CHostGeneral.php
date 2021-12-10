@@ -1505,6 +1505,7 @@ abstract class CHostGeneral extends CHostBase {
 					$templates = API::Template()->get([
 						'output' => $options['selectParentTemplates'],
 						'templateids' => $related_ids,
+						'nopermissions' => $options['nopermissions'],
 						'preservekeys' => true
 					]);
 					if (!is_null($options['limitSelects'])) {
