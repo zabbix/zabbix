@@ -28,6 +28,8 @@ require_once dirname(__FILE__).'/../CElement.php';
 class CColorPickerElement extends CElement {
 
 	/**
+	 * Find opened color pick overlay dialog.
+	 *
 	 * @inheritdoc
 	 */
 	public static function find() {
@@ -35,7 +37,7 @@ class CColorPickerElement extends CElement {
 	}
 
 	/**
-	 * Get input field.
+	 * Get input field of color pick form.
 	 *
 	 * @return type
 	 */
@@ -47,9 +49,11 @@ class CColorPickerElement extends CElement {
 	 * Overwrite input value.
 	 *
 	 * @inheritdoc
+	 *
+	 * @param string $color		color code
 	 */
-	public function overwrite($text) {
-		$this->getInput()->overwrite($text);
+	public function overwrite($color) {
+		$this->getInput()->overwrite($color);
 
 		return $this;
 	}
@@ -82,6 +86,11 @@ class CColorPickerElement extends CElement {
 		return $this->waitUntilNotVisible();
 	}
 
+	/**
+	 * Add/rewrite code color and close color pick form.
+	 *
+	 * @param string $color		color code
+	 */
 	public function fill($color) {
 		$this->overwrite($color);
 //		$this->close();
