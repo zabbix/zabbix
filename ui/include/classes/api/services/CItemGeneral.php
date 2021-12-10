@@ -2901,18 +2901,18 @@ abstract class CItemGeneral extends CApiService {
 	/**
 	 * Normalize preprocessing step parameters.
 	 *
-	 * @param array  $preprocessings            Preprocessing steps.
-	 * @param string $preprocessings['params']  Preprocessing step parameters.
-	 * @param int    $preprocessings['type']    Preprocessing step type.
+	 * @param array  $preprocessing                   Preprocessing steps.
+	 * @param string $preprocessing[<num>]['params']  Preprocessing step parameters.
+	 * @param int    $preprocessing[<num>]['type']    Preprocessing step type.
 	 *
 	 * @return array
 	 */
-	protected function normalizeItemPreprocessing(array $preprocessings): array {
-		foreach ($preprocessings as &$preprocessing) {
-			$preprocessing['params'] = str_replace("\r\n", "\n", $preprocessing['params']);
-			$params = explode("\n", $preprocessing['params']);
+	protected function normalizeItemPreprocessingSteps(array $preprocessing): array {
+		foreach ($preprocessing as &$step) {
+			$step['params'] = str_replace("\r\n", "\n", $step['params']);
+			$params = explode("\n", $step['params']);
 
-			switch ($preprocessing['type']) {
+			switch ($step['type']) {
 				case ZBX_PREPROC_PROMETHEUS_PATTERN:
 					if (!array_key_exists(2, $params)) {
 						$params[2] = '';
@@ -2920,10 +2920,10 @@ abstract class CItemGeneral extends CApiService {
 					break;
 			}
 
-			$preprocessing['params'] = implode("\n", $params);
+			$step['params'] = implode("\n", $params);
 		}
-		unset($preprocessing);
+		unset($step);
 
-		return $preprocessings;
+		return $preprocessing;
 	}
 }

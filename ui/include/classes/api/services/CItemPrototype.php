@@ -406,7 +406,7 @@ class CItemPrototype extends CItemGeneral {
 			}
 
 			if (array_key_exists('preprocessing', $item)) {
-				$item['preprocessing'] = $this->normalizeItemPreprocessing($item['preprocessing']);
+				$item['preprocessing'] = $this->normalizeItemPreprocessingSteps($item['preprocessing']);
 			}
 		}
 		unset($item);
@@ -601,7 +601,7 @@ class CItemPrototype extends CItemGeneral {
 			}
 
 			if (array_key_exists('preprocessing', $item)) {
-				$item['preprocessing'] = $this->normalizeItemPreprocessing($item['preprocessing']);
+				$item['preprocessing'] = $this->normalizeItemPreprocessingSteps($item['preprocessing']);
 			}
 		}
 		unset($item);
