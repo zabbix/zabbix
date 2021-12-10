@@ -52,6 +52,10 @@
 
 #define ZBX_SNMPTRAP_LOGGING_ENABLED	1
 
+#define ZBX_IPC_SERVICE_CONFIG		"config"
+#define ZBX_IPC_CONFIG_RELOAD_REQUEST	1
+#define ZBX_IPC_CONFIG_RELOAD_RESPONSE	2
+
 extern int	CONFIG_TIMEOUT;
 
 extern zbx_uint64_t	CONFIG_CONF_CACHE_SIZE;
@@ -668,7 +672,8 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num);
 
 #define ZBX_ITEM_GET_PROCESS		(ZBX_ITEM_GET_MAINTENANCE|ZBX_ITEM_GET_MISC|ZBX_ITEM_GET_LOGTIMEFMT)
 
-void	DCsync_configuration(unsigned char mode, const struct zbx_json_parse *jp_kvs_paths);
+void	DCsync_configuration(unsigned char mode);
+int	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths);
 int	init_configuration_cache(char **error);
 void	free_configuration_cache(void);
 

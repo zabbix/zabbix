@@ -2131,7 +2131,7 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static int	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
+int	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
 {
 	zbx_dc_kvs_path_t	*dc_kvs_path;
 	zbx_dc_kv_t		*dc_kv;
@@ -5931,7 +5931,7 @@ static void	dc_load_trigger_queue(zbx_hashset_t *trend_functions)
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
  ******************************************************************************/
-void	DCsync_configuration(unsigned char mode, const struct zbx_json_parse *jp_kvs_paths)
+void	DCsync_configuration(unsigned char mode)
 {
 	int		i, flags;
 	double		sec, csec, hsec, hisec, htsec, gmsec, hmsec, ifsec, isec, tsec, dsec, fsec, expr_sec, csec2,
@@ -5959,12 +5959,6 @@ void	DCsync_configuration(unsigned char mode, const struct zbx_json_parse *jp_kv
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	config->sync_start_ts = time(NULL);
-
-	if (ZBX_SYNC_SECRETS == mode)
-	{
-		DCsync_kvs_paths(NULL);
-		goto skip;
-	}
 
 	zbx_dbsync_init_env(config);
 
@@ -6076,7 +6070,9 @@ void	DCsync_configuration(unsigned char mode, const struct zbx_json_parse *jp_kv
 	host_tag_sec2 = zbx_time() - sec;
 	FINISH_SYNC;
 
-	if (FAIL == DCsync_kvs_paths(jp_kvs_paths))
+	/* postpone configuration sync until macro secrets are received from Zabbix server */
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER) && 0 != config->kvs_paths.values_num &&
+			ZBX_DBSYNC_INIT == mode)
 	{
 		START_SYNC;
 		goto out;
@@ -6672,7 +6668,7 @@ out:
 		zbx_hashset_destroy(&trend_queue);
 
 	zbx_dbsync_free_env();
-skip:
+
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 		DCdump_configuration();
 
