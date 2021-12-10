@@ -152,8 +152,8 @@ void	recv_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 		unsigned char	*result;
 		char		*error = NULL;
 
-		if (SUCCEED == zbx_ipc_async_exchange(ZBX_IPC_SERVICE_CONFIG, 0, ZBX_IPC_WAIT_FOREVER, NULL, 0,
-				&result, &error))
+		if (SUCCEED == zbx_ipc_async_exchange(ZBX_IPC_SERVICE_CONFIG, ZBX_IPC_CONFIG_RELOAD_REQUEST,
+				ZBX_IPC_WAIT_FOREVER, NULL, 0, &result, &error))
 		{
 			zbx_free(result);
 		}

@@ -213,7 +213,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 
 				zbx_setproctitle("%s [synced config in " ZBX_FS_DBL " sec]",
 						get_process_type_string(process_type), zbx_time() - sec);
-				zbx_ipc_client_send(client, 0, NULL, 0);
+				zbx_ipc_client_send(client, ZBX_IPC_CONFIG_RELOAD_RESPONSE, NULL, 0);
 			}
 
 			zbx_ipc_message_free(message);
