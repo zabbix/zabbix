@@ -34,8 +34,8 @@ abstract class CHostBase extends CApiService {
 	/**
 	 * Check for valid templates.
 	 *
-	 * @param array $hosts
-	 * @param array $db_hosts
+	 * @param array      $hosts
+	 * @param array|null $db_hosts
 	 *
 	 * @throws APIException
 	 */
