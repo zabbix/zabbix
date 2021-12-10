@@ -824,9 +824,7 @@ jQuery(function($) {
 
 	function addAvailable($obj, item) {
 		var ms = $obj.data('multiSelect'),
-			is_new = item.isNew || false,
 			prefix = item.prefix || '',
-			search = ms.values.search.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/[*]/g, '\\\*?'),
 			$li = $('<li>', {
 				'data-id': item.id,
 				'data-label': prefix + item.name
@@ -844,11 +842,31 @@ jQuery(function($) {
 		}
 
 		// Highlight matched.
-		$li
-			.append(item.name.replace(new RegExp(search, 'gi'), function(match) {
-				return '<span' + (!is_new ? ' class="suggest-found"' : '') + '>' + match + '</span>';
-			}))
-			.toggleClass('suggest-new', is_new);
+		var text = item.name.toLowerCase(),
+			search = ms.values.search.toLowerCase(),
+			is_new = item.isNew || false,
+			start = 0,
+			end = 0;
+
+		while (text.indexOf(search, end) > -1) {
+			end = text.indexOf(search, end);
+
+			if (end > start) {
+				$li.append($('<span>', {text: item.name.substring(start, end)}));
+			}
+
+			$li.append($('<span>', {
+				'class': !is_new ? 'suggest-found' : null,
+				text: item.name.substring(end, end + search.length)
+			})).toggleClass('suggest-new', is_new);
+
+			end += search.length;
+			start = end;
+		}
+
+		if (end < item.name.length) {
+			$li.append($('<span>', {text: item.name.substring(end, item.name.length)}));
+		}
 
 		$('ul', ms.values.available_div).append($li);
 	}
