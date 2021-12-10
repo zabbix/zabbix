@@ -893,10 +893,9 @@ class CTrigger extends CTriggerGeneral {
 
 		$parentTriggers = $this->get([
 			'output' => ['triggerid'],
-			'selectDependencies' => ['triggerid'],
 			'hostids' => $templateIds,
-			'nopermissions' => true,
-			'preservekeys' => true
+			'preservekeys' => true,
+			'selectDependencies' => ['triggerid']
 		]);
 
 		if ($parentTriggers) {

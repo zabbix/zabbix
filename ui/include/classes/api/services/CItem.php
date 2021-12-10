@@ -786,7 +786,6 @@ class CItem extends CItemGeneral {
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'hostids' => $data['templateids'],
 			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
-			'nopermissions' => true,
 			'preservekeys' => true
 		]);
 
