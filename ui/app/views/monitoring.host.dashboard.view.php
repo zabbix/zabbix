@@ -47,6 +47,7 @@ $this->addJsFile('class.widget.iterator.js');
 $this->addJsFile('class.widget.clock.js');
 $this->addJsFile('class.widget.graph.js');
 $this->addJsFile('class.widget.graph-prototype.js');
+$this->addJsFile('class.widget.item.js');
 $this->addJsFile('class.widget.map.js');
 $this->addJsFile('class.widget.navtree.js');
 $this->addJsFile('class.widget.paste-placeholder.js');

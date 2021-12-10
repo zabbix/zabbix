@@ -28,7 +28,8 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 @import "layout/form-grid";
 
 @import "components/buttons";
-@import "components/dashboard";
+@import "components/dashboard/dashboard";
+@import "components/dashboard/widget-item";
 @import "components/diff";
 @import "components/form-search";
 @import "components/inline-filter";
@@ -4313,36 +4314,63 @@ td.inactive-bg {
 }
 
 .input-color-picker {
-	position: relative;
 	display: inline-block;
+	vertical-align: middle;
 
 	div {
-		position: absolute;
-		top: 2px;
-		left: 2px;
 		width: 18px;
 		height: 18px;
-		border: 1px solid $form-border-color;
 		background: url($sprite-path) no-repeat -323px -411px;
+		border: 1px solid $form-border-color;
+		margin: 1px;
 		cursor: pointer;
+
+		&:focus {
+			border-color: $form-border-focus-color;
+			outline: none;
+		}
 	}
 
-	input[readonly],
-	input:disabled {
-		color: $form-disabled-font-color !important;
+	div.use-default {
+		background: none;
+		position: relative;
 
-		+ div {
-			cursor: default;
+		&::after {
+			content: attr(data-use-default);
+			position: absolute;
+			text-align: center;
+			line-height: 18px;
+			right: 0;
+			left: 0;
 		}
 	}
 
 	input:disabled + div {
+		cursor: default;
 		background: $form-disabled-font-color !important;
-		border: 1px solid $form-disabled-font-color;
+		border-color: $form-disabled-font-color;
 	}
 
 	input[type="text"] {
 		padding-left: 25px;
+	}
+}
+
+.color-picker-controls {
+	margin-bottom: 5px;
+
+	.input-color-picker {
+		position: relative;
+		cursor: default;
+		margin-top: -2px;
+
+		div {
+			position: absolute;
+			border-width: 1px;
+			margin: 0px;
+			left: 2px;
+			top: 2px;
+		}
 	}
 }
 
@@ -4525,6 +4553,8 @@ $browser-logos: (
 
 // TODO: Legacy
 %webkit-scrollbar {
+	scrollbar-width: thin;
+
 	&::-webkit-scrollbar {
 		width: 9px;
 	}
@@ -4969,7 +4999,6 @@ svg {
 		min-width: 0; // https://stackoverflow.com/a/43361500
 	}
 
-	input[type=text],
 	.btn-link {
 		&:not(:last-of-type) {
 			margin-right: 10px;
@@ -5005,6 +5034,17 @@ svg {
 
 	.step-parameters {
 		flex: 1;
+
+		z-select {
+			flex: 0 0 auto;
+		}
+
+		> input[type=text],
+		z-select {
+			&:not(:last-child) {
+				margin-right: 5px;
+			}
+		}
 	}
 
 	.step-on-fail {
@@ -6220,7 +6260,7 @@ $range-input-width: 31px;
 	.table-col-function { width: 85px; }
 	.table-col-draw-style { width: 85px; }
 	.table-col-y-axis-side { width: 85px; }
-	.table-col-colour { width: 105px; }
+	.table-col-colour { width: 55px; }
 	.table-col-action { width: 55px; }
 }
 

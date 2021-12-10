@@ -1,0 +1,1 @@
+.......PS. [ZBX-20311] returned the value -1 for bucket_percentile() and histogram_quantile() if bucket[+inf] = 0 (MVekslers)

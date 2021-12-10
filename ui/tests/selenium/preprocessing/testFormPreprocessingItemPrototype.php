@@ -51,7 +51,11 @@ class testFormPreprocessingItemPrototype extends testFormPreprocessing {
 						'Key' => 'parameters-macro-1'
 					],
 					'preprocessing' => [
-						['type' => 'Prometheus pattern', 'parameter_1' => '{#METRICNAME}==1', 'parameter_2' => '{#LABELNAME}']
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => '{#METRICNAME}==1',
+							'parameter_2' => 'label',
+							'parameter_3' => '{#LABELNAME}']
 					]
 				]
 			],
@@ -63,7 +67,11 @@ class testFormPreprocessingItemPrototype extends testFormPreprocessing {
 						'Key' => 'parameters-macro-2'
 					],
 					'preprocessing' => [
-						['type' => 'Prometheus pattern', 'parameter_1' => '{__name__="{#METRICNAME}"}', 'parameter_2' => '{#LABELNAME}']
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => '{__name__="{#METRICNAME}"}',
+							'parameter_2' => 'label',
+							'parameter_3' => '{#LABELNAME}']
 					]
 				]
 			],
