@@ -1,8 +1,27 @@
 Changes for 6.0.0alpha8
 
 New features:
+.........T [ZBXNEXT-7031] upgraded Oracle by ODBC template for using config string in items (abiba)
+........S. [ZBXNEXT-2579] added baseline monitoring functions baslinewma,baselinedev (wiper)
+..F....... [ZBXNEXT-7020] added baseline function entry to front-end (jfreibergs)
+A.F.....S. [ZBXNEXT-6250] added option to opt-out of "escalation canceled" messages (miks, ssimonenko)
+..FG...... [ZBXNEXT-6593] added support of persistent files for restoring log item state after agent restart (Andris)
+..F....... [ZBXNEXT-7070] transferred host and template mass update template inputs to main tab (jfreibergs)
 
 Bug fixes:
+.........T [ZBX-18474] fixed regexp in macros in Template Module Windows Services (abiba)
+........S. [ZBX-19651] fixed problem escalation when at least one of the hosts in a trigger expression is not in maintenance (dgoloscapov)
+...G.....T [ZBX-19897] updated postgresql templates and plugin files (vkhaliev)
+A......... [ZBX-20120] fixed import of several hosts assigned to different proxies (Sasha)
+........S. [ZBX-20238] fixed linking templates with trigger prototypes (wiper)
+........S. [ZBX-20178] fixed action webhook failure when return value is not required (dgoloscapov, wiper)
+........S. [ZBX-19806] added support of multiple header fields in JS method getHeaders() (dgoloscapov)
+...G...... [ZBX-20192] fixed quote expansion in command execution in agent2 on windows (dgoloscapov)
+........S. [ZBX-19924] fixed trigger expression and calculated items not allowing to specify timeshift that ends in future even if it starts in the past (vso)
+..F....... [ZBX-19973] fixed event list hintbox field validation (miks)
+..F....... [ZBX-20294] fixed typo in system information table (jfreibergs)
+..F....... [ZBX-20170] fixed trigger expression testing constructor for monoinc and monodec functions (miks)
+..F....... [ZBX-20268] fixed disabled button issue when cloning a service (averza)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.0alpha7
@@ -232,6 +251,29 @@ A.F....... [ZBXNEXT-6528,ZBXNEXT-6669] moved auditlog calls from frontend sectio
 
 Bug fixes:
 .........T [ZBX-19395] changed version in links of the templates and the media (mchudinov)
+
+--------------------------------------------------------------------------------
+Changes for 5.4.9rc1
+
+New features:
+.........T [ZBXNEXT-7031] upgraded Oracle by ODBC template for using config string in items (abiba)
+..FG...... [ZBXNEXT-6593] added support of persistent files for restoring log item state after agent restart (Andris)
+
+Bug fixes:
+........S. [ZBX-19651] fixed problem escalation when at least one of the hosts in a trigger expression is not in maintenance (dgoloscapov)
+...G.....T [ZBX-19897] updated postgresql templates and plugin files (vkhaliev)
+A......... [ZBX-20120] fixed import of several hosts assigned to different proxies (Sasha)
+........S. [ZBX-20178] fixed action webhook failure when return value is not required (dgoloscapov, wiper)
+........S. [ZBX-19806] added support of multiple header fields in JS method getHeaders() (dgoloscapov)
+...G...... [ZBX-20192] fixed quote expansion in command execution in agent2 on windows (dgoloscapov)
+........S. [ZBX-19924] fixed trigger expression and calculated items not allowing to specify timeshift that ends in future even if it starts in the past (vso)
+........S. [ZBX-20238] fixed linking templates with trigger prototypes (wiper)
+..F....... [ZBX-19973] fixed event list hintbox field validation (miks)
+
+--------------------------------------------------------------------------------
+Changes for 5.4.8
+
+5.4.8rc1 was released as 5.4.8 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.4.8rc1
@@ -1359,6 +1401,23 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.19rc1
+
+New features:
+
+Bug fixes:
+.........T [ZBX-18474] fixed filters regex in OS Windows template (abiba)
+........S. [ZBX-19651] fixed problem escalation when at least one of the hosts in a trigger expression is not in maintenance (dgoloscapov)
+...G.....T [ZBX-19897] updated postgresql templates and plugin files (vkhaliev)
+.........T [ZBX-20212] fixed max columns values for screens in linux templates (vkhaliev)
+...G...... [ZBX-20192] fixed quote expansion in command execution in agent2 on windows (dgoloscapov)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.18
+
+5.0.18rc1 was released as 5.0.18 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.0.18rc1
@@ -3669,6 +3728,18 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.37rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.36
+
+4.0.36rc1 was released as 4.0.36 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.0.36rc1

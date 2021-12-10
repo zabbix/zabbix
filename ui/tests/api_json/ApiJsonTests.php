@@ -39,6 +39,7 @@ require_once dirname(__FILE__).'/testMaintenance.php';
 require_once dirname(__FILE__).'/testProxy.php';
 require_once dirname(__FILE__).'/testServices.php';
 require_once dirname(__FILE__).'/testScripts.php';
+require_once dirname(__FILE__).'/testTemplate.php';
 require_once dirname(__FILE__).'/testTriggers.php';
 require_once dirname(__FILE__).'/testTriggerPermissions.php';
 require_once dirname(__FILE__).'/testTriggerValidation.php';
@@ -80,6 +81,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testProxy');
 		$suite->addTestSuite('testServices');
 		$suite->addTestSuite('testScripts');
+		$suite->addTestSuite('testTemplate');
 		$suite->addTestSuite('testTriggers');
 		$suite->addTestSuite('testTriggerPermissions');
 		$suite->addTestSuite('testTriggerValidation');

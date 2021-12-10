@@ -673,7 +673,8 @@ class CItemPrototype extends CItemGeneral {
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'selectTags' => ['tag', 'value'],
 			'hostids' => $data['templateids'],
-			'preservekeys' => true
+			'preservekeys' => true,
+			'nopermissions' => true
 		]);
 
 		foreach ($tpl_items as &$tpl_item) {

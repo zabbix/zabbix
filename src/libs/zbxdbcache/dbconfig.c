@@ -3969,9 +3969,11 @@ static int	dc_function_calculate_nextcheck(const zbx_trigger_timer_t *timer, tim
 		time_t		nextcheck;
 		int		offsets[ZBX_TIME_UNIT_COUNT] = {0, 0, 0, SEC_PER_MIN * 10,
 				SEC_PER_HOUR + SEC_PER_MIN * 10, SEC_PER_HOUR + SEC_PER_MIN * 10,
-				SEC_PER_HOUR + SEC_PER_MIN * 10, SEC_PER_HOUR + SEC_PER_MIN * 10};
+				SEC_PER_HOUR + SEC_PER_MIN * 10, SEC_PER_HOUR + SEC_PER_MIN * 10,
+				SEC_PER_HOUR + SEC_PER_MIN * 10};
 		int		periods[ZBX_TIME_UNIT_COUNT] = {0, 0, 0, SEC_PER_MIN * 10, SEC_PER_HOUR,
-				SEC_PER_HOUR * 11, SEC_PER_DAY - SEC_PER_HOUR, SEC_PER_DAY - SEC_PER_HOUR};
+				SEC_PER_HOUR * 11, SEC_PER_DAY - SEC_PER_HOUR, SEC_PER_DAY - SEC_PER_HOUR,
+				SEC_PER_DAY - SEC_PER_HOUR};
 
 		if (ZBX_TIME_UNIT_HOUR == timer->trend_base)
 		{
@@ -3990,9 +3992,10 @@ static int	dc_function_calculate_nextcheck(const zbx_trigger_timer_t *timer, tim
 		else
 		{
 			int	ret = FAIL;
-			char	*error = NULL, *period_shift;
+			char	*error = NULL, *period_shift, *param = NULL;
 
-			if (NULL != (period_shift = strchr(timer->parameter, ':')))
+			if (NULL != (param = zbx_function_get_param_dyn(timer->parameter, 1)) &&
+					NULL != (period_shift = strchr(param, ':')))
 			{
 				period_shift++;
 				ret = dc_function_calculate_trends_nextcheck(from, period_shift, timer->trend_base,
@@ -4000,6 +4003,8 @@ static int	dc_function_calculate_nextcheck(const zbx_trigger_timer_t *timer, tim
 			}
 			else
 				error = zbx_dsprintf(NULL, "invalid first parameter");
+
+			zbx_free(param);
 
 			if (FAIL == ret)
 			{

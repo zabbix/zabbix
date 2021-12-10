@@ -35,6 +35,7 @@ require_once dirname(__FILE__).'/testAgentItems.php';
 require_once dirname(__FILE__).'/testItemRate.php';
 require_once dirname(__FILE__).'/testHistoryValueDuplicates.php';
 require_once dirname(__FILE__).'/testUserParametersReload.php';
+require_once dirname(__FILE__).'/testTriggerState.php';
 
 class IntegrationTests {
 	public static function suite() {
@@ -56,6 +57,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testItemRate');
 		$suite->addTestSuite('testHistoryValueDuplicates');
 		$suite->addTestSuite('testUserParametersReload');
+		$suite->addTestSuite('testTriggerState');
 
 		return $suite;
 	}
