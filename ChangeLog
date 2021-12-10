@@ -1,10 +1,20 @@
 Changes for 5.4.9rc1
 
 New features:
+.......PS. [ZBXNEXT-7100] added new LLD macro HV.NETNAME to vmware.hv.discovery (MVekslers)
 .........T [ZBXNEXT-7031] upgraded Oracle by ODBC template for using config string in items (abiba)
 ..FG...... [ZBXNEXT-6593] added support of persistent files for restoring log item state after agent restart (Andris)
 
 Bug fixes:
+.........T [ZBX-20113] fixed items value map for VMware template (abiba)
+.......PS. [ZBX-20341] moved zbx_ipc_service_init_env() to MAIN_ZABBIX_ENTRY (vso, yurii)
+..F....... [ZBX-20278] fixed XSS attack vulnerability in scheduled report configuration form (agriscenko)
+.........T [ZBX-20060] fixed trigger expression for memory monitoring in F5 Big-IP SNMP template (abakaldin)
+.........T [ZBX-20075] fixed trigger expression for certificate monitoring in F5 Big-IP SNMP template (abakaldin)
+.........T [ZBX-19704] fixed item pattern in "Zabbix server health" dashboard (abakaldin)
+.........T [ZBX-18474] fixed regexp in macros Template Module Windows Services (abiba)
+.......... [ZBX-20240] added integration tests for trigger state (ssimonenko)
+.........T [ZBX-18389] fixed sql query for 32 and 64 bit xids postgresql versions in postgresql by user parameters template (vkhaliev)
 ........S. [ZBX-19651] fixed problem escalation when at least one of the hosts in a trigger expression is not in maintenance (dgoloscapov)
 ...G.....T [ZBX-19897] updated postgresql templates and plugin files (vkhaliev)
 A......... [ZBX-20120] fixed import of several hosts assigned to different proxies (Sasha)
