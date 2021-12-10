@@ -6,7 +6,7 @@
 For Zabbix version: 5.4 and higher  
 The template to monitor VMware vCenter and ESX hypervisor.
 The "VMware Hypervisor" and "VMware Guest" templates are used by discovery and normally should not be manually linked to a host.
-For additional information please check https://www.zabbix.com/documentation in part Virtual machine monitoring
+For additional information please check https://www.zabbix.com/documentation/5.4/manual/vm_monitoring
 
 
 ## Setup
