@@ -842,6 +842,7 @@ jQuery(function($) {
 			$li.append($('<span>', {'class': 'grey', text: prefix}));
 		}
 
+		// Highlight matched.
 		if (ms.values.search !== item.name) {
 			var text = item.name.toLowerCase(),
 				search = ms.values.search.toLowerCase().replace(/[*]+/g, ''),
