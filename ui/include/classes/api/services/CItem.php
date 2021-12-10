@@ -502,6 +502,10 @@ class CItem extends CItemGeneral {
 				$item['query_fields'] = '';
 				$item['headers'] = '';
 			}
+
+			if (array_key_exists('preprocessing', $item)) {
+				$item['preprocessing'] = $this->normalizeItemPreprocessing($item['preprocessing']);
+			}
 		}
 		unset($item);
 
@@ -709,6 +713,10 @@ class CItem extends CItemGeneral {
 				$item['tags'] = array_map(function ($tag) {
 					return $tag + ['value' => ''];
 				}, $item['tags']);
+			}
+
+			if (array_key_exists('preprocessing', $item)) {
+				$item['preprocessing'] = $this->normalizeItemPreprocessing($item['preprocessing']);
 			}
 		}
 		unset($item);
