@@ -28,7 +28,8 @@ SERVER_tests = \
 	zbx_tm_round_down \
 	zbx_get_report_nextcheck \
 	zbx_ltrim_utf8 \
-	zbx_rtrim_utf8
+	zbx_rtrim_utf8 \
+	zbx_get_week_number
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -516,5 +517,21 @@ zbx_rtrim_utf8_LDADD += @SERVER_LIBS@
 zbx_rtrim_utf8_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_rtrim_utf8_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+# zbx_get_week_number
+
+zbx_get_week_number_SOURCES = \
+	zbx_get_week_number.c \
+	$(COMMON_SRC_FILES)
+
+zbx_get_week_number_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_get_week_number_LDADD += @SERVER_LIBS@
+
+zbx_get_week_number_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_get_week_number_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
 
 endif

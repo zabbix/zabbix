@@ -279,4 +279,8 @@ int	zbx_eval_calc_varsamp(zbx_vector_dbl_t *values, double *result, char **error
 int	zbx_eval_calc_histogram_quantile(const double q, const zbx_vector_dbl_t *values, const char *err_fn,
 		double *result, char **error);
 
+int	zbx_eval_calc_avg(zbx_vector_dbl_t *values, double *result, char **error);
+int	zbx_eval_calc_min(zbx_vector_dbl_t *values, double *result, char **error);
+int	zbx_eval_calc_max(zbx_vector_dbl_t *values, double *result, char **error);
+void	zbx_eval_calc_sum(zbx_vector_dbl_t *values, double *result);
 #endif

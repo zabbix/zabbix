@@ -1,0 +1,1695 @@
+---
+test case: 2010-01-01 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2010-01-01 12:00:00 +02:00
+out:
+  week: 53
+---
+test case: 2010-01-02 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2010-01-02 12:00:00 +02:00
+out:
+  week: 53
+---
+test case: 2010-01-03 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2010-01-03 12:00:00 +02:00
+out:
+  week: 53
+---
+test case: 2010-01-04 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2010-01-04 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2010-01-05 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2010-01-05 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2010-01-06 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2010-01-06 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2010-01-07 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2010-01-07 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2010-01-08 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2010-01-08 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2010-01-09 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2010-01-09 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2010-01-10 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2010-01-10 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2010-01-11 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2010-01-11 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2010-12-21 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2010-12-21 12:00:00 +02:00
+out:
+  week: 51
+---
+test case: 2010-12-22 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2010-12-22 12:00:00 +02:00
+out:
+  week: 51
+---
+test case: 2010-12-23 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2010-12-23 12:00:00 +02:00
+out:
+  week: 51
+---
+test case: 2010-12-24 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2010-12-24 12:00:00 +02:00
+out:
+  week: 51
+---
+test case: 2010-12-25 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2010-12-25 12:00:00 +02:00
+out:
+  week: 51
+---
+test case: 2010-12-26 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2010-12-26 12:00:00 +02:00
+out:
+  week: 51
+---
+test case: 2010-12-27 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2010-12-27 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2010-12-28 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2010-12-28 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2010-12-29 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2010-12-29 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2010-12-30 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2010-12-30 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2010-12-31 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2010-12-31 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2011-01-01 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2011-01-01 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2011-01-02 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2011-01-02 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2011-01-03 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2011-01-03 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2011-01-04 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2011-01-04 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2011-01-05 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2011-01-05 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2011-01-06 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2011-01-06 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2011-01-07 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2011-01-07 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2011-01-08 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2011-01-08 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2011-01-09 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2011-01-09 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2011-01-10 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2011-01-10 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2011-01-11 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2011-01-11 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2011-12-21 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2011-12-21 12:00:00 +02:00
+out:
+  week: 51
+---
+test case: 2011-12-22 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2011-12-22 12:00:00 +02:00
+out:
+  week: 51
+---
+test case: 2011-12-23 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2011-12-23 12:00:00 +02:00
+out:
+  week: 51
+---
+test case: 2011-12-24 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2011-12-24 12:00:00 +02:00
+out:
+  week: 51
+---
+test case: 2011-12-25 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2011-12-25 12:00:00 +02:00
+out:
+  week: 51
+---
+test case: 2011-12-26 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2011-12-26 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2011-12-27 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2011-12-27 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2011-12-28 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2011-12-28 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2011-12-29 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2011-12-29 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2011-12-30 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2011-12-30 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2011-12-31 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2011-12-31 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2012-01-01 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2012-01-01 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2012-01-02 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2012-01-02 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2012-01-03 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2012-01-03 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2012-01-04 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2012-01-04 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2012-01-05 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2012-01-05 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2012-01-06 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2012-01-06 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2012-01-07 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2012-01-07 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2012-01-08 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2012-01-08 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2012-01-09 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2012-01-09 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2012-01-10 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2012-01-10 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2012-01-11 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2012-01-11 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2012-12-21 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2012-12-21 12:00:00 +02:00
+out:
+  week: 51
+---
+test case: 2012-12-22 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2012-12-22 12:00:00 +02:00
+out:
+  week: 51
+---
+test case: 2012-12-23 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2012-12-23 12:00:00 +02:00
+out:
+  week: 51
+---
+test case: 2012-12-24 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2012-12-24 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2012-12-25 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2012-12-25 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2012-12-26 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2012-12-26 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2012-12-27 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2012-12-27 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2012-12-28 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2012-12-28 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2012-12-29 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2012-12-29 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2012-12-30 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2012-12-30 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2012-12-31 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2012-12-31 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2013-01-01 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2013-01-01 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2013-01-02 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2013-01-02 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2013-01-03 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2013-01-03 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2013-01-04 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2013-01-04 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2013-01-05 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2013-01-05 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2013-01-06 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2013-01-06 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2013-01-07 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2013-01-07 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2013-01-08 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2013-01-08 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2013-01-09 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2013-01-09 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2013-01-10 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2013-01-10 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2013-01-11 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2013-01-11 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2013-12-21 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2013-12-21 12:00:00 +02:00
+out:
+  week: 51
+---
+test case: 2013-12-22 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2013-12-22 12:00:00 +02:00
+out:
+  week: 51
+---
+test case: 2013-12-23 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2013-12-23 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2013-12-24 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2013-12-24 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2013-12-25 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2013-12-25 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2013-12-26 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2013-12-26 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2013-12-27 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2013-12-27 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2013-12-28 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2013-12-28 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2013-12-29 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2013-12-29 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2013-12-30 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2013-12-30 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2013-12-31 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2013-12-31 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2014-01-01 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2014-01-01 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2014-01-02 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2014-01-02 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2014-01-03 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2014-01-03 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2014-01-04 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2014-01-04 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2014-01-05 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2014-01-05 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2014-01-06 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2014-01-06 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2014-01-07 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2014-01-07 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2014-01-08 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2014-01-08 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2014-01-09 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2014-01-09 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2014-01-10 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2014-01-10 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2014-01-11 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2014-01-11 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2014-12-21 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2014-12-21 12:00:00 +02:00
+out:
+  week: 51
+---
+test case: 2014-12-22 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2014-12-22 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2014-12-23 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2014-12-23 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2014-12-24 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2014-12-24 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2014-12-25 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2014-12-25 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2014-12-26 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2014-12-26 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2014-12-27 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2014-12-27 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2014-12-28 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2014-12-28 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2014-12-29 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2014-12-29 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2014-12-30 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2014-12-30 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2014-12-31 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2014-12-31 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2015-01-01 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2015-01-01 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2015-01-02 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2015-01-02 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2015-01-03 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2015-01-03 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2015-01-04 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2015-01-04 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2015-01-05 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2015-01-05 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2015-01-06 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2015-01-06 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2015-01-07 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2015-01-07 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2015-01-08 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2015-01-08 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2015-01-09 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2015-01-09 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2015-01-10 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2015-01-10 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2015-01-11 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2015-01-11 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2015-12-21 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2015-12-21 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2015-12-22 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2015-12-22 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2015-12-23 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2015-12-23 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2015-12-24 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2015-12-24 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2015-12-25 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2015-12-25 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2015-12-26 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2015-12-26 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2015-12-27 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2015-12-27 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2015-12-28 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2015-12-28 12:00:00 +02:00
+out:
+  week: 53
+---
+test case: 2015-12-29 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2015-12-29 12:00:00 +02:00
+out:
+  week: 53
+---
+test case: 2015-12-30 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2015-12-30 12:00:00 +02:00
+out:
+  week: 53
+---
+test case: 2015-12-31 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2015-12-31 12:00:00 +02:00
+out:
+  week: 53
+---
+test case: 2016-01-01 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2016-01-01 12:00:00 +02:00
+out:
+  week: 53
+---
+test case: 2016-01-02 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2016-01-02 12:00:00 +02:00
+out:
+  week: 53
+---
+test case: 2016-01-03 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2016-01-03 12:00:00 +02:00
+out:
+  week: 53
+---
+test case: 2016-01-04 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2016-01-04 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2016-01-05 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2016-01-05 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2016-01-06 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2016-01-06 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2016-01-07 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2016-01-07 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2016-01-08 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2016-01-08 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2016-01-09 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2016-01-09 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2016-01-10 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2016-01-10 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2016-01-11 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2016-01-11 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2016-12-21 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2016-12-21 12:00:00 +02:00
+out:
+  week: 51
+---
+test case: 2016-12-22 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2016-12-22 12:00:00 +02:00
+out:
+  week: 51
+---
+test case: 2016-12-23 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2016-12-23 12:00:00 +02:00
+out:
+  week: 51
+---
+test case: 2016-12-24 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2016-12-24 12:00:00 +02:00
+out:
+  week: 51
+---
+test case: 2016-12-25 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2016-12-25 12:00:00 +02:00
+out:
+  week: 51
+---
+test case: 2016-12-26 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2016-12-26 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2016-12-27 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2016-12-27 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2016-12-28 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2016-12-28 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2016-12-29 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2016-12-29 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2016-12-30 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2016-12-30 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2016-12-31 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2016-12-31 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2017-01-01 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2017-01-01 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2017-01-02 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2017-01-02 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2017-01-03 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2017-01-03 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2017-01-04 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2017-01-04 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2017-01-05 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2017-01-05 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2017-01-06 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2017-01-06 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2017-01-07 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2017-01-07 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2017-01-08 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2017-01-08 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2017-01-09 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2017-01-09 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2017-01-10 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2017-01-10 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2017-01-11 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2017-01-11 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2017-12-21 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2017-12-21 12:00:00 +02:00
+out:
+  week: 51
+---
+test case: 2017-12-22 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2017-12-22 12:00:00 +02:00
+out:
+  week: 51
+---
+test case: 2017-12-23 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2017-12-23 12:00:00 +02:00
+out:
+  week: 51
+---
+test case: 2017-12-24 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2017-12-24 12:00:00 +02:00
+out:
+  week: 51
+---
+test case: 2017-12-25 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2017-12-25 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2017-12-26 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2017-12-26 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2017-12-27 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2017-12-27 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2017-12-28 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2017-12-28 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2017-12-29 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2017-12-29 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2017-12-30 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2017-12-30 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2017-12-31 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2017-12-31 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2018-01-01 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2018-01-01 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2018-01-02 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2018-01-02 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2018-01-03 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2018-01-03 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2018-01-04 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2018-01-04 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2018-01-05 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2018-01-05 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2018-01-06 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2018-01-06 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2018-01-07 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2018-01-07 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2018-01-08 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2018-01-08 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2018-01-09 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2018-01-09 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2018-01-10 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2018-01-10 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2018-01-11 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2018-01-11 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2018-12-21 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2018-12-21 12:00:00 +02:00
+out:
+  week: 51
+---
+test case: 2018-12-22 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2018-12-22 12:00:00 +02:00
+out:
+  week: 51
+---
+test case: 2018-12-23 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2018-12-23 12:00:00 +02:00
+out:
+  week: 51
+---
+test case: 2018-12-24 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2018-12-24 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2018-12-25 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2018-12-25 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2018-12-26 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2018-12-26 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2018-12-27 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2018-12-27 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2018-12-28 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2018-12-28 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2018-12-29 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2018-12-29 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2018-12-30 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2018-12-30 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2018-12-31 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2018-12-31 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2019-01-01 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2019-01-01 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2019-01-02 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2019-01-02 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2019-01-03 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2019-01-03 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2019-01-04 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2019-01-04 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2019-01-05 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2019-01-05 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2019-01-06 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2019-01-06 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2019-01-07 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2019-01-07 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2019-01-08 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2019-01-08 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2019-01-09 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2019-01-09 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2019-01-10 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2019-01-10 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2019-01-11 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2019-01-11 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2019-12-21 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2019-12-21 12:00:00 +02:00
+out:
+  week: 51
+---
+test case: 2019-12-22 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2019-12-22 12:00:00 +02:00
+out:
+  week: 51
+---
+test case: 2019-12-23 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2019-12-23 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2019-12-24 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2019-12-24 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2019-12-25 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2019-12-25 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2019-12-26 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2019-12-26 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2019-12-27 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2019-12-27 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2019-12-28 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2019-12-28 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2019-12-29 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2019-12-29 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2019-12-30 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2019-12-30 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2019-12-31 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2019-12-31 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2020-01-01 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2020-01-01 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2020-01-02 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2020-01-02 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2020-01-03 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2020-01-03 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2020-01-04 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2020-01-04 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2020-01-05 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2020-01-05 12:00:00 +02:00
+out:
+  week: 1
+---
+test case: 2020-01-06 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2020-01-06 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2020-01-07 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2020-01-07 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2020-01-08 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2020-01-08 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2020-01-09 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2020-01-09 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2020-01-10 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2020-01-10 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2020-01-11 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2020-01-11 12:00:00 +02:00
+out:
+  week: 2
+---
+test case: 2020-12-21 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2020-12-21 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2020-12-22 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2020-12-22 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2020-12-23 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2020-12-23 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2020-12-24 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2020-12-24 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2020-12-25 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2020-12-25 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2020-12-26 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2020-12-26 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2020-12-27 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2020-12-27 12:00:00 +02:00
+out:
+  week: 52
+---
+test case: 2020-12-28 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2020-12-28 12:00:00 +02:00
+out:
+  week: 53
+---
+test case: 2020-12-29 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2020-12-29 12:00:00 +02:00
+out:
+  week: 53
+---
+test case: 2020-12-30 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2020-12-30 12:00:00 +02:00
+out:
+  week: 53
+---
+test case: 2020-12-31 12:00:00 +02:00
+in:
+  timezone: :Europe/Riga
+  time: 2020-12-31 12:00:00 +02:00
+out:
+  week: 53
+...

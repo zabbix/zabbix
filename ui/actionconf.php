@@ -81,6 +81,11 @@ $fields = [
 											null,
 											_('Pause operations for suppressed problems')
 										],
+	'notify_if_canceled' =>				[T_ZBX_STR, O_OPT, null,
+											IN([ACTION_NOTIFY_IF_CANCELED_FALSE, ACTION_NOTIFY_IF_CANCELED_TRUE]),
+											null,
+											_('Notify about canceled escalations')
+										],
 	'add' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'update' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'delete' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
@@ -248,6 +253,7 @@ if (hasRequest('add') || hasRequest('update')) {
 
 	if ($eventsource == EVENT_SOURCE_TRIGGERS) {
 		$action['pause_suppressed'] = getRequest('pause_suppressed', ACTION_PAUSE_SUPPRESSED_FALSE);
+		$action['notify_if_canceled'] = getRequest('notify_if_canceled', ACTION_NOTIFY_IF_CANCELED_FALSE);
 	}
 
 	switch ($eventsource) {
@@ -514,7 +520,9 @@ if (hasRequest('form')) {
 
 	if ($data['actionid']) {
 		$data['action'] = API::Action()->get([
-			'output' => ['actionid', 'name', 'eventsource', 'status', 'esc_period', 'pause_suppressed'],
+			'output' => ['actionid', 'name', 'eventsource', 'status', 'esc_period', 'pause_suppressed',
+				'notify_if_canceled'
+			],
 			'selectFilter' => ['evaltype', 'formula', 'conditions'],
 			'selectOperations' => ['operationtype', 'esc_period', 'esc_step_from', 'esc_step_to', 'evaltype',
 				'opconditions', 'opmessage', 'opmessage_grp', 'opmessage_usr', 'opcommand', 'opcommand_grp',
@@ -556,12 +564,18 @@ if (hasRequest('form')) {
 		if ($data['actionid'] && hasRequest('form_refresh')) {
 			if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 				$data['action']['pause_suppressed'] = getRequest('pause_suppressed', ACTION_PAUSE_SUPPRESSED_FALSE);
+				$data['action']['notify_if_canceled'] = getRequest('notify_if_canceled',
+					ACTION_NOTIFY_IF_CANCELED_FALSE
+				);
 			}
 		}
 		else {
 			if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 				$data['action']['pause_suppressed'] = getRequest('pause_suppressed',
 					hasRequest('form_refresh') ? ACTION_PAUSE_SUPPRESSED_FALSE : ACTION_PAUSE_SUPPRESSED_TRUE
+				);
+				$data['action']['notify_if_canceled'] = getRequest('notify_if_canceled',
+					hasRequest('form_refresh') ? ACTION_NOTIFY_IF_CANCELED_FALSE : ACTION_NOTIFY_IF_CANCELED_TRUE
 				);
 			}
 		}

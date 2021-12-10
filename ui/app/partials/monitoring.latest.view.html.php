@@ -81,7 +81,7 @@ foreach ($data['items'] as $itemid => $item) {
 
 	$item_name = (new CDiv([
 		(new CSpan($item['name_expanded']))->addClass('label'),
-		($item['description'] !== '') ? makeDescriptionIcon($item['description']) : null
+		($item['description_expanded'] !== '') ? makeDescriptionIcon($item['description_expanded']) : null
 	]))->addClass('action-container');
 
 	// Row history data preparation.
