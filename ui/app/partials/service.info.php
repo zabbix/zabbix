@@ -54,6 +54,7 @@ if (array_key_exists('slas', $data)) {
 			)
 		];
 
+		forech...
 		if ($sla['sli']['sli']) {
 			$sli = $sla['sli']['sli'][0][0];
 

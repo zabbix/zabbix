@@ -38,8 +38,8 @@ $header = [
 if ($data['is_filtered']) {
 	$path = null;
 
-	$header[] = (new CColHeader(_('Parent services')))->addStyle('width: 15%');
-	$header[] = (new CColHeader(_('Name')))->addStyle('width: 10%');
+	$header[] = (new CColHeader(_('Parent services')))->addStyle('width: 15%;');
+	$header[] = (new CColHeader(_('Name')))->addStyle('width: 10%;');
 }
 else {
 	$path = $data['path'];
@@ -47,14 +47,14 @@ else {
 		$path[] = $data['service']['serviceid'];
 	}
 
-	$header[] = (new CColHeader(_('Name')))->addStyle('width: 25%');
+	$header[] = (new CColHeader(_('Name')))->addStyle('width: 25%;');
 }
 
 $table = (new CTableInfo())
 	->setHeader(array_merge($header, [
-		(new CColHeader(_('Status')))->addStyle('width: 14%'),
-		(new CColHeader(_('Root cause')))->addStyle('width: 24%'),
-		(new CColHeader(_('Created at')))->addStyle('width: 14%'),
+		(new CColHeader(_('Status')))->addStyle('width: 14%;'),
+		(new CColHeader(_('Root cause')))->addStyle('width: 25%;'),
+		(new CColHeader(_('Created at')))->addStyle('width: 10%;'),
 		(new CColHeader(_('Tags')))->addClass(ZBX_STYLE_COLUMN_TAGS_3),
 		(new CColHeader())
 	]));
