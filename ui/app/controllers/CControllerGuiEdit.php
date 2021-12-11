@@ -30,7 +30,7 @@ class CControllerGuiEdit extends CController {
 		$this->disableSIDValidation();
 
 		$this->timezones = [
-			ZBX_DEFAULT_TIMEZONE => CTimezoneHelper::getTitle(CTimezoneHelper::getSystemTimezone(), _('System default'))
+			ZBX_DEFAULT_TIMEZONE => CTimezoneHelper::getTitle(CTimezoneHelper::getSystemTimezone(), _('System'))
 		] + CTimezoneHelper::getList();
 	}
 

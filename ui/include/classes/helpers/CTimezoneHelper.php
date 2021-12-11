@@ -39,9 +39,7 @@ class CTimezoneHelper {
 				$timezones[$timezone] = [
 					'offset' => $offset,
 					'timezone' => $timezone,
-					'title' => $timezone !== 'UTC'
-						? '(UTC'.($offset < 0 ? '-' : '+').gmdate('H:i', abs($offset)).') '.$timezone
-						: '(UTC)'
+					'title' => '(UTC'.($offset < 0 ? '-' : '+').gmdate('H:i', abs($offset)).') '.$timezone
 				];
 			}
 
@@ -68,10 +66,6 @@ class CTimezoneHelper {
 			return $timezone_title;
 		}
 
-		if ($timezone === 'UTC') {
-			return $prefix.' '.$timezone_title;
-		}
-
 		return $prefix.': '.$timezone_title;
 	}
 
@@ -95,7 +89,7 @@ class CTimezoneHelper {
 	public static function getSystemTimezone(): string {
 		$system_timezone_lower = strtolower(ini_get('date.timezone'));
 
-		foreach (self::getList() as $timezone) {
+		foreach (array_keys(self::getList()) as $timezone) {
 			if ($system_timezone_lower === strtolower($timezone)) {
 				return $timezone;
 			}
