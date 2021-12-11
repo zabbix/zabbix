@@ -115,7 +115,7 @@ class CDateSelector extends CTag {
 	/**
 	 * Add placeholder to date textbox field.
 	 *
-	 * @param type $text  Placeholder text for date textbox field.
+	 * @param string $text  Placeholder text for date textbox field.
 	 *
 	 * @return CDateSelector
 	 */
