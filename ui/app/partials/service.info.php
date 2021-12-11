@@ -54,31 +54,31 @@ if (array_key_exists('slas', $data)) {
 			)
 		];
 
-		forech...
 		if ($sla['sli']['sli']) {
-			$sli = $sla['sli']['sli'][0][0];
+			$hint = (new CTable())
+				->addClass(ZBX_STYLE_LIST_TABLE)
+				->setHeader([_('Reporting period'), _('SLO'), _('SLI'), _('Uptime'), _('Downtime'), _('Error budget')]);
+
+			foreach (array_reverse($sla['sli']['sli'], true) as $period_index => $sli) {
+				$hint->addRow([
+					CSlaHelper::getPeriodTag((int) $sla['period'], $sla['sli']['periods'][$period_index]['period_from'],
+						$sla['sli']['periods'][$period_index]['period_to'], $sla['timezone']
+					),
+					CSlaHelper::getSloTag((float) $sla['slo']),
+					CSlaHelper::getSliTag($sli[0]['sli'], (float) $sla['slo']),
+					CSlaHelper::getUptimeTag($sli[0]['uptime']),
+					CSlaHelper::getDowntimeTag($sli[0]['downtime']),
+					CSlaHelper::getErrorBudgetTag($sli[0]['error_budget'])
+				]);
+			}
+
+			$current_period_sli = $sla['sli']['sli'][count($sla['sli']['sli']) - 1][0]['sli'];
 
 			$sla_html[] = ': ';
-			$sla_html[] = CSlaHelper::getSliTag($sli['sli'], (float) $sla['slo']);
+			$sla_html[] = CSlaHelper::getSliTag($current_period_sli, (float) $sla['slo']);
 			$sla_html[] = (new CSpan())
 				->addClass(ZBX_STYLE_ICON_DESCRIPTION)
-				->setHint(
-					(new CTable())
-						->addClass(ZBX_STYLE_LIST_TABLE)
-						->setHeader([_('Reporting period'), _('SLO'), _('SLI'), _('Uptime'), _('Downtime'),
-							_('Error budget')
-						])
-						->addRow([
-							CSlaHelper::getPeriodTag((int) $sla['period'], $sla['sli']['periods'][0]['period_from'],
-								$sla['sli']['periods'][0]['period_to'], $sla['timezone']
-							),
-							CSlaHelper::getSloTag((float) $sla['slo']),
-							CSlaHelper::getSliTag($sli['sli'], (float) $sla['slo']),
-							CSlaHelper::getUptimeTag($sli['uptime']),
-							CSlaHelper::getDowntimeTag($sli['downtime']),
-							CSlaHelper::getErrorBudgetTag($sli['error_budget'])
-						])
-				);
+				->setHint($hint);
 		}
 
 		$slas[] = new CDiv($sla_html);
