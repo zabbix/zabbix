@@ -40,7 +40,7 @@ abstract class CControllerUserUpdateGeneral extends CController {
 	protected function init() {
 		parent::init();
 
-		$this->timezones = array_keys(CDateTimeZoneHelper::getAllDateTimeZones());
+		$this->timezones = array_keys(CTimezoneHelper::getList());
 		$this->timezones[] = TIMEZONE_DEFAULT;
 	}
 

@@ -36,12 +36,18 @@ abstract class CControllerUserEditGeneral extends CController {
 	 */
 	protected $timezones = [];
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableSIDValidation();
 
+		$timezone = CSettingsHelper::get(CSettingsHelper::DEFAULT_TIMEZONE);
+
+		if ($timezone === ZBX_DEFAULT_TIMEZONE || $timezone === TIMEZONE_DEFAULT) {
+			$timezone = CTimezoneHelper::getSystemTimezone();
+		}
+
 		$this->timezones = [
-			TIMEZONE_DEFAULT => CDateTimeZoneHelper::getDefaultDateTimeZone()
-		] + CDateTimeZoneHelper::getAllDateTimeZones();
+			TIMEZONE_DEFAULT => CTimezoneHelper::getTitle($timezone, _('System default'))
+		] + CTimezoneHelper::getList();
 	}
 
 	/**
