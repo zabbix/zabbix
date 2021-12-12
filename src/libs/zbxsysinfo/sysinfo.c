@@ -1603,6 +1603,7 @@ zbx_uint64_t	get_kstat_numeric_value(const kstat_named_t *kn)
 #if defined(WITH_AGENT2_METRICS)
 int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result, int timeout)
 {
+	ZBX_UNUSED(timeout);
 	/* calling fork() in a multithreaded program may result in deadlock on mutex */
 	return metric_func(request, result);
 }
