@@ -135,7 +135,7 @@ func GetVolumePathName(path string, len uint32) (disk string, err error) {
 	)
 
 	if ret == 0 {
-		return "", fmt.Errorf("failed to get volume name for path :%s, %s", path, err.Error())
+		return "", fmt.Errorf("failed to get volume name for path %s, %s", path, err.Error())
 	}
 
 	return syscall.UTF16ToString(wdisk), nil

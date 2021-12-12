@@ -27,7 +27,19 @@ import (
 	"zabbix.com/pkg/win32"
 )
 
-func (sp *sizeParams) handleHomeDir(d fs.DirEntry) (int64, error) {
+func (sp *sizeParams) handleHomeDir(path string, d fs.DirEntry) (int64, error) {
+	if sp.diskMode {
+		_, len, err := win32.GetFullPathName(path)
+		if err != nil {
+			return 0, err
+		}
+
+		sp.disk, err = win32.GetVolumePathName(path, len)
+		if err != nil {
+			return 0, err
+		}
+	}
+
 	// home dir is not counter on windows
 	return 0, nil
 }
@@ -49,32 +61,22 @@ func (sp *sizeParams) getSize(fs fs.FileInfo, path string) (int64, error) {
 	fileSize := uint64(sys.FileSizeHigh)<<32 | uint64(sys.FileSizeLow)
 
 	if sp.diskMode {
-		clusterSize, err := getClusterSize(path)
+		clusterSize, err := sp.getClusterSize(path)
 		if err != nil {
 			return 0, err
 		}
 
 		mod := fileSize % clusterSize
-
-		fileSize += clusterSize - mod
-		return int64(fileSize), nil
+		if mod != 0 {
+			fileSize += clusterSize - mod
+		}
 	}
 
 	return int64(fileSize), nil
 }
 
-func getClusterSize(path string) (uint64, error) {
-	_, len, err := win32.GetFullPathName(path)
-	if err != nil {
-		return 0, err
-	}
-
-	disk, err := win32.GetVolumePathName(path, len)
-	if err != nil {
-		return 0, err
-	}
-
-	clusters, err := win32.GetDiskFreeSpace(disk)
+func (sp *sizeParams) getClusterSize(path string) (uint64, error) {
+	clusters, err := win32.GetDiskFreeSpace(sp.disk)
 	if err != nil {
 		return 0, err
 	}

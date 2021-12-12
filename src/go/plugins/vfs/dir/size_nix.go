@@ -44,7 +44,7 @@ func skipDir(d fs.DirEntry) bool {
 	return false
 }
 
-func (sp *sizeParams) handleHomeDir(d fs.DirEntry) (int64, error) {
+func (sp *sizeParams) handleHomeDir(path string, d fs.DirEntry) (int64, error) {
 	parentSize, err := sp.getParentSize(d)
 	if err != nil {
 		return 0, err

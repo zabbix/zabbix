@@ -36,6 +36,7 @@ const (
 type sizeParams struct {
 	common
 	diskMode bool
+	disk     string
 }
 
 func (sp *sizeParams) getDirSize() (int64, error) {
@@ -45,11 +46,12 @@ func (sp *sizeParams) getDirSize() (int64, error) {
 	err := filepath.WalkDir(sp.path,
 		func(p string, d fs.DirEntry, err error) error {
 			if err != nil {
-				return err
+				impl.Logger.Errf("failed to walk dir with path  %s", p)
+				return nil
 			}
 
 			if p == sp.path {
-				parentSize, err = sp.handleHomeDir(d)
+				parentSize, err = sp.handleHomeDir(p, d)
 				if err != nil {
 					return err
 				}
@@ -110,10 +112,6 @@ func (sp *sizeParams) getParentSize(dir fs.DirEntry) (int64, error) {
 }
 
 func (sp *sizeParams) skip(path string, d fs.DirEntry) (bool, error) {
-	if skipDir(d) {
-		return true, nil
-	}
-
 	s, err := sp.skipPath(path)
 	if s {
 		return true, err
@@ -122,6 +120,10 @@ func (sp *sizeParams) skip(path string, d fs.DirEntry) (bool, error) {
 	s, err = sp.skipRegex(d)
 	if s {
 		return true, err
+	}
+
+	if skipDir(d) {
+		return true, nil
 	}
 
 	return false, nil
