@@ -22,6 +22,8 @@
 #include "log.h"
 #include "inodes.h"
 
+extern int	CONFIG_TIMEOUT;
+
 #define get_string(field)	#field
 
 #define validate(error, structure, field)								\
@@ -141,5 +143,5 @@ static int	vfs_fs_inode(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return zbx_execute_threaded_metric(vfs_fs_inode, request, result);
+	return zbx_execute_threaded_metric(vfs_fs_inode, request, result, CONFIG_TIMEOUT);
 }

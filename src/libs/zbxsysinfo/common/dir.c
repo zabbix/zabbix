@@ -27,6 +27,8 @@
 #	include "disk.h"
 #endif
 
+extern int	CONFIG_TIMEOUT;
+
 /******************************************************************************
  *                                                                            *
  * Function: filename_matches                                                 *
@@ -841,7 +843,7 @@ err1:
 
 int	VFS_DIR_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return zbx_execute_threaded_metric(vfs_dir_size, request, result);
+	return zbx_execute_threaded_metric(vfs_dir_size, request, result, CONFIG_TIMEOUT);
 }
 
 /******************************************************************************
@@ -1160,5 +1162,5 @@ err1:
 
 int	VFS_DIR_COUNT(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return zbx_execute_threaded_metric(vfs_dir_count, request, result);
+	return zbx_execute_threaded_metric(vfs_dir_count, request, result, CONFIG_TIMEOUT);
 }

@@ -902,12 +902,63 @@ clean_dns:
 #endif	/* defined(HAVE_RES_QUERY) || defined(_WINDOWS) || defined(__MINGW32__)*/
 }
 
+#if defined(HAVE_RES_NINIT) && !defined(_AIX) && (defined(HAVE_RES_U_EXT) || defined(HAVE_RES_U_EXT_EXT))
+static int	dns_query_short_threaded(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	return dns_query(request, result, 1);
+}
+
+static int	dns_query_threaded(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	return dns_query(request, result, 0);
+}
+
+static int	dns_query_is_tcp(AGENT_REQUEST *request, int *timeout)
+{
+	char	*param;
+	int	ret = FAIL;
+
+	param = get_rparam(request, 5);
+
+	if (NULL == param || '\0' == *param || 0 == strcmp(param, "udp"))
+	{
+		return FAIL;
+	}
+	else if (0 == strcmp(param, "tcp"))
+	{
+		param = get_rparam(request, 3);
+
+		if (NULL == param || '\0' == *param)
+			*timeout = 1;
+		else if (SUCCEED != is_uint31(param, timeout) || 0 == *timeout)
+			return FAIL;
+
+		return SUCCEED;
+	}
+
+	return ret;
+}
+#endif
+
 int	NET_DNS(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
+	int	tcp_timeout;
+
+#if defined(HAVE_RES_NINIT) && !defined(_AIX) && (defined(HAVE_RES_U_EXT) || defined(HAVE_RES_U_EXT_EXT))
+	if (SUCCEED == dns_query_is_tcp(request, &tcp_timeout))
+		return zbx_execute_threaded_metric(dns_query_short_threaded, request, result, tcp_timeout);
+#endif
 	return dns_query(request, result, 1);
 }
 
 int	NET_DNS_RECORD(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
+	int	tcp_timeout;
+
+#if defined(HAVE_RES_NINIT) && !defined(_AIX) && (defined(HAVE_RES_U_EXT) || defined(HAVE_RES_U_EXT_EXT))
+	if (SUCCEED == dns_query_is_tcp(request, &tcp_timeout))
+		return zbx_execute_threaded_metric(dns_query_threaded, request, result, tcp_timeout);
+#endif
+
 	return dns_query(request, result, 0);
 }

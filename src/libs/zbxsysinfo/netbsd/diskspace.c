@@ -193,7 +193,7 @@ static int	vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return zbx_execute_threaded_metric(vfs_fs_size, request, result);
+	return zbx_execute_threaded_metric(vfs_fs_size, request, result, CONFIG_TIMEOUT);
 }
 
 int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -334,6 +334,6 @@ out:
 
 int	VFS_FS_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return zbx_execute_threaded_metric(vfs_fs_get, request, result);
+	return zbx_execute_threaded_metric(vfs_fs_get, request, result, CONFIG_TIMEOUT);
 
 }
