@@ -6068,15 +6068,15 @@ void	DCsync_configuration(unsigned char mode)
 	sec = zbx_time();
 	DCsync_host_tags(&host_tag_sync);
 	host_tag_sec2 = zbx_time() - sec;
-	FINISH_SYNC;
 
 	/* postpone configuration sync until macro secrets are received from Zabbix server */
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER) && 0 != config->kvs_paths.values_num &&
 			ZBX_DBSYNC_INIT == mode)
 	{
-		START_SYNC;
 		goto out;
 	}
+
+	FINISH_SYNC;
 
 	/* sync host data to support host lookups when resolving macros during configuration sync */
 
