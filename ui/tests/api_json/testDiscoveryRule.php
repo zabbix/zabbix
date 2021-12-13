@@ -125,7 +125,7 @@ class testDiscoveryRule extends CAPITest {
 
 				case ITEM_TYPE_DEPENDENT:
 					$params = [
-						'master_itemid' => '150151',
+						'master_itemid' => '160151',
 						'delay' => '0'
 					];
 					break;
