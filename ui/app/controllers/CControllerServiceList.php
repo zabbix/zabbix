@@ -46,9 +46,6 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 		return $ret;
 	}
 
-	/**
-	 * @throws APIException
-	 */
 	protected function checkPermissions(): bool {
 		if (!$this->checkAccess(CRoleHelper::UI_SERVICES_SERVICES)) {
 			return false;
@@ -57,9 +54,6 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 		return parent::checkPermissions();
 	}
 
-	/**
-	 * @throws Exception
-	 */
 	protected function doAction(): void {
 		parent::doAction();
 

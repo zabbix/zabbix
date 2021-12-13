@@ -48,7 +48,7 @@ $fields = (new CFormGrid())
 		new CFormField(
 			(new CDateSelector('start_time', $data['form']['start_time']))
 				->setDateFormat(DATE_TIME_FORMAT_SECONDS)
-				->setPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
+				->setPlaceholder(DATE_TIME_FORMAT_SECONDS_PLACEHOLDER)
 				->setAriaRequired()
 		)
 	])

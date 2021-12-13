@@ -25,8 +25,9 @@ final class CSlaHelper {
 	public const SLA_STATUS_ENABLED		= 0;
 	public const SLA_STATUS_DISABLED	= 1;
 
-	public const SCHEDULE_MODE_NONSTOP	= 0;
-	public const SCHEDULE_MODE_CUSTOM	= 1;
+
+
+	public const SCHEDULE_MODE_NONSTOP = 1;
 
 	public const TAB_INDICATOR_SLA_DOWNTIMES = 'sla-downtimes';
 
@@ -116,6 +117,9 @@ final class CSlaHelper {
 	}
 
 
+
+	public const SCHEDULE_MODE_24X7 = 0;
+	public const SCHEDULE_MODE_CUSTOM = 1;
 
 	/**
 	 * @param int    $period

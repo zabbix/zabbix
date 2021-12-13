@@ -136,7 +136,7 @@ $sla_tab
 		new CFormField(
 			(new CDateSelector('effective_date', $data['form']['effective_date']))
 				->setDateFormat(DATE_TIME_FORMAT_SECONDS)
-				->setPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
+				->setPlaceholder(DATE_TIME_FORMAT_SECONDS_PLACEHOLDER)
 				->setAriaRequired()
 		)
 	])

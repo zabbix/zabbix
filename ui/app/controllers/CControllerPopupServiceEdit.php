@@ -23,6 +23,9 @@ require_once __DIR__ .'/../../include/forms.inc.php';
 
 class CControllerPopupServiceEdit extends CController {
 
+	/**
+	 * @var array
+	 */
 	private $service;
 
 	protected function checkInput(): bool {

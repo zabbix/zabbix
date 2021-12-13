@@ -3194,8 +3194,6 @@ form.is-loading {
       display: flex; }
     .table-forms .table-forms-td-right .table-forms-separator .radio-segmented + .multiselect-wrapper {
       margin-top: 5px; }
-  .table-forms .form-fields-inline label {
-    margin: 0 8px 0 3px; }
   .table-forms h4 {
     margin-bottom: -5px; }
   .table-forms .hor-list li {
@@ -3300,6 +3298,9 @@ select {
   select[readonly] {
     color: #000000 !important;
     pointer-events: none; }
+
+.form-fields-inline label {
+  margin: 0 8px 0 3px; }
 
 .form-input-margin {
   display: inline-block;

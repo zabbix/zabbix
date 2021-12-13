@@ -113,7 +113,7 @@ foreach ($data['slas'] as $slaid => $sla) {
 				->setArgument('action', 'sla.edit')
 				->setArgument('slaid', $slaid)
 		))
-			->onClick('view.edit('.json_encode($slaid).')');
+			->onClick('view.edit('.json_encode(['slaid' => $slaid]).'); return false;');
 
 		if ($sla['status'] == CSlaHelper::SLA_STATUS_ENABLED) {
 			$status_element = (new CLink(_('Enabled'),

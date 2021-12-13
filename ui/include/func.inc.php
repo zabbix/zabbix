@@ -174,24 +174,40 @@ function dowHrMinToSec($dow, $hr, $min) {
 	return $dow * SEC_PER_DAY + $hr * SEC_PER_HOUR + $min * SEC_PER_MIN;
 }
 
-// Convert timestamp to string representation. Return 'Never' if 0.
-function zbx_date2str($format, $value = null) {
+/**
+ * Convert time to a string representation. Return 'Never' if timestamp is 0.
+ *
+ * @param             $format
+ * @param null        $time
+ * @param string|null $timezone
+ *
+ * @throws Exception
+ *
+ * @return string
+ */
+function zbx_date2str($format, $time = null, string $timezone = null) {
 	static $weekdaynames, $weekdaynameslong, $months, $monthslong;
 
-	$prefix = '';
+	if ($time === null) {
+		$time = time();
+	}
 
-	if ($value === null) {
-		$value = time();
-	}
-	elseif ($value > ZBX_MAX_DATE) {
-		$prefix = '> ';
-		$value = ZBX_MAX_DATE;
-	}
-	elseif (!$value) {
+	if ($time == 0) {
 		return _('Never');
 	}
 
-	if (!is_array($weekdaynames)) {
+	if ($time > ZBX_MAX_DATE) {
+		$prefix = '> ';
+		$datetime = new DateTime('@'.ZBX_MAX_DATE);
+	}
+	else {
+		$prefix = '';
+		$datetime = new DateTime('@'.$time);
+	}
+
+	$datetime->setTimezone(new DateTimeZone($timezone ?? date_default_timezone_get()));
+
+	if ($weekdaynames === null) {
 		$weekdaynames = [
 			0 => _('Sun'),
 			1 => _('Mon'),
@@ -203,7 +219,7 @@ function zbx_date2str($format, $value = null) {
 		];
 	}
 
-	if (!is_array($weekdaynameslong)) {
+	if ($weekdaynameslong === null) {
 		$weekdaynameslong = [
 			0 => _('Sunday'),
 			1 => _('Monday'),
@@ -215,7 +231,7 @@ function zbx_date2str($format, $value = null) {
 		];
 	}
 
-	if (!is_array($months)) {
+	if ($months === null) {
 		$months = [
 			1 => _('Jan'),
 			2 => _('Feb'),
@@ -232,7 +248,7 @@ function zbx_date2str($format, $value = null) {
 		];
 	}
 
-	if (!is_array($monthslong)) {
+	if ($monthslong === null) {
 		$monthslong = [
 			1 => _('January'),
 			2 => _('February'),
@@ -249,30 +265,28 @@ function zbx_date2str($format, $value = null) {
 		];
 	}
 
-	$rplcs = [
-		'l' => $weekdaynameslong[date('w', $value)],
-		'F' => $monthslong[date('n', $value)],
-		'D' => $weekdaynames[date('w', $value)],
-		'M' => $months[date('n', $value)]
+	$replacements = [
+		'l' => $weekdaynameslong[$datetime->format('w')],
+		'F' => $monthslong[$datetime->format('n')],
+		'D' => $weekdaynames[$datetime->format('w')],
+		'M' => $months[$datetime->format('n')]
 	];
 
-	$output = $part = '';
+	$output = '';
+
 	$length = strlen($format);
 
 	for ($i = 0; $i < $length; $i++) {
-		$pchar = ($i > 0) ? substr($format, $i - 1, 1) : '';
-		$char = substr($format, $i, 1);
+		$char = $format[$i];
+		$char_escaped = $i > 0 && $format[$i - 1] === '\\';
 
-		if ($pchar != '\\' && isset($rplcs[$char])) {
-			$output .= (strlen($part) ? date($part, $value) : '').$rplcs[$char];
-			$part = '';
+		if (!$char_escaped && array_key_exists($char, $replacements)) {
+			$output .= $replacements[$char];
 		}
 		else {
-			$part .= $char;
+			$output .= $datetime->format($char);
 		}
 	}
-
-	$output .= (strlen($part) > 0) ? date($part, $value) : '';
 
 	return $prefix.$output;
 }

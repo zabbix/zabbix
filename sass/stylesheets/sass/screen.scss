@@ -1460,12 +1460,6 @@ form {
 		}
 	}
 
-	.form-fields-inline {
-		label {
-			margin: 0 8px 0 3px;
-		}
-	}
-
 	h4 {
 		margin-bottom: -5px;
 	}
@@ -1701,6 +1695,12 @@ select {
 		color: $font-color !important;
 		pointer-events: none;
 		@extend %form-disabled;
+	}
+}
+
+.form-fields-inline {
+	label {
+		margin: 0 8px 0 3px;
 	}
 }
 

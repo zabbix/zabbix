@@ -30,11 +30,12 @@ abstract class CControllerServiceListGeneral extends CController {
 	protected const FILTER_DEFAULT_TAG_SOURCE = ZBX_SERVICE_FILTER_TAGS_SERVICE;
 	protected const FILTER_DEFAULT_EVALTYPE = TAG_EVAL_TYPE_AND_OR;
 
+	/**
+	 * @var array
+	 */
 	protected $service;
 
 	/**
-	 * @return bool
-
 	 * @throws APIException
 	 */
 	protected function checkPermissions(): bool {
@@ -58,6 +59,8 @@ abstract class CControllerServiceListGeneral extends CController {
 
 	/**
 	 * @throws APIException
+	 *
+	 * @return bool
 	 */
 	protected function canEdit(): bool {
 		$db_roles = API::Role()->get([
@@ -90,9 +93,9 @@ abstract class CControllerServiceListGeneral extends CController {
 	}
 
 	/**
-	 * @return array
-	 *
 	 * @throws APIException
+	 *
+	 * @return array
 	 */
 	protected function getPath(): array {
 		if ($this->service === null) {
@@ -133,8 +136,8 @@ abstract class CControllerServiceListGeneral extends CController {
 	}
 
 	/**
-	 * @param array  $path
-	 * @param bool   $is_filtered
+	 * @param array $path
+	 * @param bool  $is_filtered
 	 *
 	 * @throws APIException
 	 *

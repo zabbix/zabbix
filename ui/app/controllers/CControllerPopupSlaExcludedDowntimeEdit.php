@@ -19,20 +19,34 @@
 **/
 
 
-class CControllerPopupServiceStatusRuleEdit extends CController {
+class CControllerPopupSlaExcludedDowntimeEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'form_refresh' => 	'int32',
 			'edit' => 			'in 1',
 			'row_index' =>		'required|int32',
-			'new_status' =>		'in '.implode(',', array_keys(CServiceHelper::getProblemStatusNames())),
-			'type' =>			'in '.implode(',', array_keys(CServiceHelper::getStatusRuleTypeOptions())),
-			'limit_value' =>	'int32',
-			'limit_status' =>	'in '.implode(',', array_keys(CServiceHelper::getStatusNames()))
+			'name' =>			'string',
+			'period_from' =>	'int32',
+			'period_to' =>		'int32'
 		];
 
 		$ret = $this->validateInput($fields);
+
+		if ($ret && $this->hasInput('edit')) {
+			$fields = [
+				'name' =>			'required',
+				'period_from' =>	'required',
+				'period_to' =>		'required'
+			];
+
+			$validator = new CNewValidator(array_intersect_key($this->getInputAll(), $fields), $fields);
+
+			foreach ($validator->getAllErrors() as $error) {
+				info($error);
+			}
+
+			$ret = !$validator->isErrorFatal() && !$validator->isError();
+		}
 
 		if (!$ret) {
 			$this->setResponse(
@@ -46,18 +60,38 @@ class CControllerPopupServiceStatusRuleEdit extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_SERVICES_SERVICES);
+		return $this->checkAccess(CRoleHelper::UI_SERVICES_SLA) && $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SLA);
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	protected function doAction(): void {
-		$form = [
-			'new_status' => $this->getInput('new_status', TRIGGER_SEVERITY_NOT_CLASSIFIED),
-			'type' => $this->getInput('type', ZBX_SERVICE_STATUS_RULE_TYPE_N_GE),
-			'limit_value' => $this->getInput('limit_value', 1),
-			'limit_status' => $this->getInput('limit_status', ZBX_SEVERITY_OK)
-		];
+		if ($this->hasInput('edit')) {
+			$datetime_from = (new DateTime())->setTimestamp((int) $this->getInput('period_from'));
+			$datetime_to = (new DateTime())->setTimestamp((int) $this->getInput('period_to'));
+			$interval = $datetime_to->diff($datetime_from);
+
+			$form = [
+				'name' => $this->getInput('name'),
+				'start_time' => $datetime_from->format(DATE_TIME_FORMAT),
+				'duration_days' => $interval->days,
+				'duration_hours' => $interval->h,
+				'duration_minutes' => $interval->m
+			];
+		}
+		else {
+			$form = [
+				'name' => '',
+				'start_time' => date(DATE_TIME_FORMAT, strtotime('tomorrow')),
+				'duration_days' => 0,
+				'duration_hours' => 1,
+				'duration_minutes' => 0
+			];
+		}
 
 		$data = [
+			'title' => $this->hasInput('edit') ? _('Excluded downtime') : _('New excluded downtime'),
 			'is_edit' => $this->hasInput('edit'),
 			'row_index' => $this->getInput('row_index'),
 			'form' => $form,

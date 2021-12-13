@@ -49,6 +49,9 @@ class CControllerPopupServices extends CController {
 		return true;
 	}
 
+	/**
+	 * @throws APIException
+	 */
 	protected function doAction(): void {
 		$exclude_serviceids = $this->getInput('exclude_serviceids', []);
 
