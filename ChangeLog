@@ -13,6 +13,7 @@ A.F.....S. [ZBXNEXT-6250] added option to opt-out of "escalation canceled" messa
 ..F....... [ZBXNEXT-7070] transferred host and template mass update template inputs to main tab (jfreibergs)
 
 Bug fixes:
+A......... [ZBX-20328] fixed incomplete inheritance of items, item prototypes, lld rules, host prototypes, when user with type "Admin" was edited them on template which is linked to non-permitted for him templates or hosts (vmaksimovs)
 ........S. [ZBX-20232] added HA node table cleanup on startup (wiper)
 .........T [ZBX-20113] fixed items value map for VMware template (abiba)
 .......PS. [ZBX-20341] moved zbx_ipc_service_init_env() to MAIN_ZABBIX_ENTRY (vso, yurii)
