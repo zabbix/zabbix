@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-12-13T13:48:25Z</date>
+   <date>2021-12-13T13:54:15Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -621,6 +621,15 @@ Template tooling version used: 0.39</description>
                      <name>VMware</name>
                   </application>
                </applications>
+               <triggers>
+                  <trigger>
+                     <expression>{last()}&lt;10m</expression>
+                     <name>VMware: {HOST.HOST} has been restarted (uptime &lt; 10m)</name>
+                     <priority>WARNING</priority>
+                     <description>Uptime is less than 10 minutes.</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
             </item>
          </items>
          <discovery_rules>
@@ -702,21 +711,6 @@ Template tooling version used: 0.39</description>
                <password>{$VMWARE.PASSWORD}</password>
                <description>Discovery of all disk devices.</description>
                <item_prototypes>
-                  <item_prototype>
-                     <name>VMware: Average write latency to the disk {#DISKDESC}</name>
-                     <type>SIMPLE</type>
-                     <key>vmware.vm.storage.totalwritelatency[{$VMWARE.URL},{HOST.HOST},{#DISKNAME}]</key>
-                     <history>7d</history>
-                     <units>!ms</units>
-                     <username>{$VMWARE.USERNAME}</username>
-                     <password>{$VMWARE.PASSWORD}</password>
-                     <description>The average time a write to the virtual disk takes.</description>
-                     <applications>
-                        <application>
-                           <name>VMware</name>
-                        </application>
-                     </applications>
-                  </item_prototype>
                   <item_prototype>
                      <name>VMware: Average number of bytes read from the disk {#DISKDESC}</name>
                      <type>SIMPLE</type>

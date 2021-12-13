@@ -127,7 +127,6 @@ No specific Zabbix configuration is required.
 |VMware |VMware: Average number of reads from the disk {#DISKDESC} |<p>VMware virtual machine disk device read statistics (operations per second).</p> |SIMPLE |vmware.vm.vfs.dev.read[{$VMWARE.URL},{HOST.HOST},{#DISKNAME},ops] |
 |VMware |VMware: Average number of bytes written to the disk {#DISKDESC} |<p>VMware virtual machine disk device write statistics (bytes per second).</p> |SIMPLE |vmware.vm.vfs.dev.write[{$VMWARE.URL},{HOST.HOST},{#DISKNAME},bps] |
 |VMware |VMware: Average number of writes to the disk {#DISKDESC} |<p>VMware virtual machine disk device write statistics (operations per second).</p> |SIMPLE |vmware.vm.vfs.dev.write[{$VMWARE.URL},{HOST.HOST},{#DISKNAME},ops] |
-|VMware |VMware: Average write latency to the disk {#DISKDESC} |<p>The average time a write to the virtual disk takes.</p> |SIMPLE |vmware.vm.storage.totalwritelatency[{$VMWARE.URL},{HOST.HOST},{#DISKNAME}] |
 |VMware |VMware: Free disk space on {#FSNAME} |<p>VMware virtual machine file system statistics (bytes).</p> |SIMPLE |vmware.vm.vfs.fs.size[{$VMWARE.URL},{HOST.HOST},{#FSNAME},free] |
 |VMware |VMware: Free disk space on {#FSNAME} (percentage) |<p>VMware virtual machine file system statistics (percentages).</p> |SIMPLE |vmware.vm.vfs.fs.size[{$VMWARE.URL},{HOST.HOST},{#FSNAME},pfree] |
 |VMware |VMware: Total disk space on {#FSNAME} |<p>VMware virtual machine total disk space (bytes).</p> |SIMPLE |vmware.vm.vfs.fs.size[{$VMWARE.URL},{HOST.HOST},{#FSNAME},total]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
@@ -137,6 +136,7 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
+|VMware: {HOST.HOST} has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes.</p> |`{TEMPLATE_NAME:vmware.vm.uptime[{$VMWARE.URL},{HOST.HOST}].last()}<10m` |WARNING |<p>Manual close: YES</p> |
 
 ## Feedback
 
