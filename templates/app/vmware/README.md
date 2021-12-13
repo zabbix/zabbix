@@ -123,15 +123,11 @@ No specific Zabbix configuration is required.
 |VMware |VMware: Number of packets received on interface {#IFDESC} |<p>VMware virtual machine network interface input statistics (packets per second).</p> |SIMPLE |vmware.vm.net.if.in[{$VMWARE.URL},{HOST.HOST},{#IFNAME},pps] |
 |VMware |VMware: Number of bytes transmitted on interface {#IFDESC} |<p>VMware virtual machine network interface output statistics (bytes per second).</p> |SIMPLE |vmware.vm.net.if.out[{$VMWARE.URL},{HOST.HOST},{#IFNAME},bps] |
 |VMware |VMware: Number of packets transmitted on interface {#IFDESC} |<p>VMware virtual machine network interface output statistics (packets per second).</p> |SIMPLE |vmware.vm.net.if.out[{$VMWARE.URL},{HOST.HOST},{#IFNAME},pps] |
-|VMware |VMware: Network utilization on interface {#IFDESC} |<p>VMware virtual machine network utilization (combined transmit-rates and receive-rates) during the interval.</p> |SIMPLE |vmware.vm.net.if.usage[{$VMWARE.URL},{HOST.HOST},{#IFNAME}]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1024`</p> |
 |VMware |VMware: Average number of bytes read from the disk {#DISKDESC} |<p>VMware virtual machine disk device read statistics (bytes per second).</p> |SIMPLE |vmware.vm.vfs.dev.read[{$VMWARE.URL},{HOST.HOST},{#DISKNAME},bps] |
 |VMware |VMware: Average number of reads from the disk {#DISKDESC} |<p>VMware virtual machine disk device read statistics (operations per second).</p> |SIMPLE |vmware.vm.vfs.dev.read[{$VMWARE.URL},{HOST.HOST},{#DISKNAME},ops] |
 |VMware |VMware: Average number of bytes written to the disk {#DISKDESC} |<p>VMware virtual machine disk device write statistics (bytes per second).</p> |SIMPLE |vmware.vm.vfs.dev.write[{$VMWARE.URL},{HOST.HOST},{#DISKNAME},bps] |
 |VMware |VMware: Average number of writes to the disk {#DISKDESC} |<p>VMware virtual machine disk device write statistics (operations per second).</p> |SIMPLE |vmware.vm.vfs.dev.write[{$VMWARE.URL},{HOST.HOST},{#DISKNAME},ops] |
-|VMware |VMware: Average number of outstanding read requests to the disk {#DISKDESC} |<p>Average number of outstanding read requests to the virtual disk during the collection interval.</p> |SIMPLE |vmware.vm.storage.readoio[{$VMWARE.URL},{HOST.HOST},{#DISKNAME}] |
-|VMware |VMware: Average number of outstanding write requests to the disk {#DISKDESC} |<p>Average number of outstanding write requests to the virtual disk during the collection interval.</p> |SIMPLE |vmware.vm.storage.writeoio[{$VMWARE.URL},{HOST.HOST},{#DISKNAME}] |
 |VMware |VMware: Average write latency to the disk {#DISKDESC} |<p>The average time a write to the virtual disk takes.</p> |SIMPLE |vmware.vm.storage.totalwritelatency[{$VMWARE.URL},{HOST.HOST},{#DISKNAME}] |
-|VMware |VMware: Average read latency to the disk {#DISKDESC} |<p>The average time a read from the virtual disk takes.</p> |SIMPLE |vmware.vm.storage.totalreadlatency[{$VMWARE.URL},{HOST.HOST},{#DISKNAME}] |
 |VMware |VMware: Free disk space on {#FSNAME} |<p>VMware virtual machine file system statistics (bytes).</p> |SIMPLE |vmware.vm.vfs.fs.size[{$VMWARE.URL},{HOST.HOST},{#FSNAME},free] |
 |VMware |VMware: Free disk space on {#FSNAME} (percentage) |<p>VMware virtual machine file system statistics (percentages).</p> |SIMPLE |vmware.vm.vfs.fs.size[{$VMWARE.URL},{HOST.HOST},{#FSNAME},pfree] |
 |VMware |VMware: Total disk space on {#FSNAME} |<p>VMware virtual machine total disk space (bytes).</p> |SIMPLE |vmware.vm.vfs.fs.size[{$VMWARE.URL},{HOST.HOST},{#FSNAME},total]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
@@ -203,7 +199,6 @@ No specific Zabbix configuration is required.
 |VMware |VMware: Free space on datastore {#DATASTORE} (percentage) |<p>VMware datastore space in percentage from total.</p> |SIMPLE |vmware.hv.datastore.size[{$VMWARE.URL},{HOST.HOST},{#DATASTORE},pfree] |
 |VMware |VMware: Total size of datastore {#DATASTORE} |<p>VMware datastore space in bytes.</p> |SIMPLE |vmware.hv.datastore.size[{$VMWARE.URL},{HOST.HOST},{#DATASTORE}] |
 |VMware |VMware: Average write latency of the datastore {#DATASTORE} |<p>Average amount of time for a write operation to the datastore (milliseconds).</p> |SIMPLE |vmware.hv.datastore.write[{$VMWARE.URL},{HOST.HOST},{#DATASTORE},latency] |
-|VMware |VMware: Multipath count for datastore {#DATASTORE} |<p>Number of available datastore paths.</p> |SIMPLE |vmware.hv.datastore.multipath[{$VMWARE.URL},{HOST.HOST},{#DATASTORE}] |
 
 ## Triggers
 
@@ -215,7 +210,6 @@ No specific Zabbix configuration is required.
 |VMware: The {HOST.HOST} health is Red |<p>One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.</p> |`{TEMPLATE_NAME:vmware.hv.status[{$VMWARE.URL},{HOST.HOST}].last()}=3` |HIGH | |
 |VMware: The {HOST.HOST} health is Yellow |<p>One or more components in the appliance might become overloaded soon.</p> |`{TEMPLATE_NAME:vmware.hv.status[{$VMWARE.URL},{HOST.HOST}].last()}=2` |AVERAGE |<p>**Depends on**:</p><p>- VMware: The {HOST.HOST} health is Red</p> |
 |VMware: Hypervisor has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:vmware.hv.uptime[{$VMWARE.URL},{HOST.HOST}].last()}<10m` |WARNING |<p>Manual close: YES</p> |
-|VMware: The multipath count has been changed |<p>The number of available datastore paths less than registered ({#MULTIPATH.COUNT}).</p> |`{TEMPLATE_NAME:vmware.hv.datastore.multipath[{$VMWARE.URL},{HOST.HOST},{#DATASTORE}].diff()}=1 and {TEMPLATE_NAME:vmware.hv.datastore.multipath[{$VMWARE.URL},{HOST.HOST},{#DATASTORE}].last()}<{#MULTIPATH.COUNT}` |AVERAGE |<p>Manual close: YES</p> |
 
 ## Feedback
 
