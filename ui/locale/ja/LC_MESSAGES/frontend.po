@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-13 14:06+0200\n"
+"POT-Creation-Date: 2021-12-13 16:02+0200\n"
 "PO-Revision-Date: 2021-12-07 04:12+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -3611,8 +3611,8 @@ msgid "Combined result"
 msgstr "最終結果"
 
 #: include/classes/widgets/views/widget.geomap.form.view.php:68
-msgid "Comma separated center coordinates to display when the widget is initially loaded."
-msgstr "ウィジェットが最初に読み込まれた時に表示するためのカンマ区切りの中心座標。"
+msgid "Comma separated center coordinates and zoom level to display when the widget is initially loaded."
+msgstr ""
 
 #: app/views/administration.script.edit.php:173 include/actions.inc.php:1943
 #: include/views/administration.auditacts.list.php:103
@@ -9339,7 +9339,7 @@ msgstr "継承したアイテム"
 msgid "Initial view"
 msgstr "初期表示位置"
 
-#: include/classes/widgets/views/widget.geomap.form.view.php:70
+#: include/classes/widgets/views/widget.geomap.form.view.php:78
 msgid "Initial view is ignored if the default view is set."
 msgstr "デフォルト表示が設定されている場合は、初期表示設定は無視されます。"
 
@@ -9843,7 +9843,7 @@ msgstr "タグ\"%1$s\"が正しくありません: %2$s。"
 msgid "Invalid time period."
 msgstr "期間が正しくありません。"
 
-#: include/classes/validators/CApiInputValidator.php:2870
+#: include/classes/validators/CApiInputValidator.php:2869
 #, c-format
 msgid "Invalid zoomparameter \"%1$s\": %2$s."
 msgstr "ズームパラメーター\"%1$s\"が正しくありません：%2$s。"
@@ -16602,6 +16602,10 @@ msgstr "特権管理者"
 msgid "Support"
 msgstr "サポート"
 
+#: include/classes/widgets/views/widget.geomap.form.view.php:70
+msgid "Supported formats:"
+msgstr ""
+
 #: include/classes/widgets/views/widget.item.form.view.php:59
 msgid "Supported macros:"
 msgstr ""
@@ -17137,6 +17141,11 @@ msgstr "アイテムがディスカバリされなくなったため%1$sに削�
 #: include/html.inc.php:737
 msgid "The item is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "ディスカバリされたアイテムが見つかりませんでした。次のディスカバリルールの処理時に削除されます。"
+
+#: include/classes/widgets/views/widget.geomap.form.view.php:76
+#, c-format
+msgid "The maximum zoom level is \"%1$s\"."
+msgstr ""
 
 #: include/classes/data/CItemData.php:1024
 msgid "The number of processes. Returns integer"
@@ -21883,7 +21892,7 @@ msgctxt "year short"
 msgid "y"
 msgstr "y"
 
-#: include/classes/validators/CApiInputValidator.php:2871
+#: include/classes/validators/CApiInputValidator.php:2870
 #, c-format
 msgid "zoom level must be between \"%1$s\" and \"%2$s\""
 msgstr "ズームレベルは\"%1$s\"から\"%2$s\"までで指定してください"
