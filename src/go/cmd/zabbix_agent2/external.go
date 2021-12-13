@@ -154,27 +154,19 @@ func removeSocket(socket string) error {
 }
 
 func removePath(privateOptions interface{}) interface{} {
-	removeIndex := -1
-	var node *conf.Node
-	var ok bool
 
-	if node, ok = privateOptions.(*conf.Node); ok {
-		for i, node := range node.Nodes {
-			if childNode, ok := node.(*conf.Node); ok {
-				if childNode.Name == "Path" {
-					removeIndex = i
+	if root, ok := privateOptions.(*conf.Node); ok {
+		for i, v := range root.Nodes {
+			if node, ok := v.(*conf.Node); ok {
+				if node.Name == "Path" {
+					root.Nodes = remove(root.Nodes, i)
+					return root
 				}
 			}
 		}
 	}
 
-	if removeIndex >= len(node.Nodes) || removeIndex == -1 {
-		return node
-	}
-
-	node.Nodes = remove(node.Nodes, removeIndex)
-
-	return node
+	return privateOptions
 }
 
 func remove(s []interface{}, i int) []interface{} {
