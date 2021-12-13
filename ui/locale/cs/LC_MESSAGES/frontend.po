@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-10 19:55+0200\n"
+"POT-Creation-Date: 2021-12-13 14:06+0200\n"
 "PO-Revision-Date: 2018-09-24 07:57+0300\n"
 "Last-Translator: Lukáš <iam@lukasmaly.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1901,7 +1901,7 @@ msgid "Cannot add dashboard page: maximum number of %1$d dashboard pages has bee
 msgstr ""
 
 #: include/classes/api/services/CTrigger.php:979
-#: include/classes/api/services/CTriggerPrototype.php:773
+#: include/classes/api/services/CTriggerPrototype.php:788
 msgid "Cannot add dependency from a host to a template."
 msgstr "Nemohu předat závislost z hosta na šablonu."
 
@@ -2138,7 +2138,7 @@ msgid "Cannot create another database connection."
 msgstr "Nelze otevřít další připojení k databázi."
 
 #: include/classes/api/services/CTrigger.php:1013
-#: include/classes/api/services/CTriggerPrototype.php:804
+#: include/classes/api/services/CTriggerPrototype.php:819
 msgid "Cannot create circular dependencies."
 msgstr "Nelze vytvořit zacyklené závislosti."
 
@@ -2146,7 +2146,7 @@ msgstr "Nelze vytvořit zacyklené závislosti."
 msgid "Cannot create dependency on trigger itself."
 msgstr "Nelze vytvořit závislost spouštěče na sebe sama."
 
-#: include/classes/api/services/CTriggerPrototype.php:743
+#: include/classes/api/services/CTriggerPrototype.php:758
 msgid "Cannot create dependency on trigger prototype itself."
 msgstr "Nelze vytvořit závislost prototypu spouštěče na sobě samém."
 
@@ -2403,7 +2403,7 @@ msgstr "Nelze odstranit prototyp šablony grafu."
 msgid "Cannot delete templated graph."
 msgstr "Nelze odstranit šablonu grafu."
 
-#: include/classes/api/services/CHostPrototype.php:1315
+#: include/classes/api/services/CHostPrototype.php:1317
 msgid "Cannot delete templated host prototype."
 msgstr "Není možné smazat prototyp šablony hosta."
 
@@ -5355,7 +5355,7 @@ msgstr ""
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Smazané: Host \"%1$s\"."
 
-#: include/classes/api/services/CHostPrototype.php:1183
+#: include/classes/api/services/CHostPrototype.php:1185
 #, c-format
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Smazané: Prototyp hosta \"%1$s\" na \"%2$s\"."
@@ -6000,7 +6000,7 @@ msgstr ""
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "Kopírovat závislosti ve spouštěči \"%1$s\"."
 
-#: include/classes/api/services/CTriggerPrototype.php:974
+#: include/classes/api/services/CTriggerPrototype.php:989
 #, c-format
 msgid "Duplicate dependencies in trigger prototype \"%1$s\"."
 msgstr "Duplicita závislosti v prototypu spouštěče \"%1$s\"."
@@ -6173,7 +6173,7 @@ msgstr "Prázdná filtrovací podmínka makra pro pravidlo nálezu \"%1$s\"."
 #: include/classes/api/services/CHost.php:1319
 #: include/classes/api/services/CHost.php:1850
 #: include/classes/api/services/CHost.php:2075
-#: include/classes/api/services/CHostPrototype.php:1111
+#: include/classes/api/services/CHostPrototype.php:1113
 #: include/classes/api/services/CMaintenance.php:542
 #: include/classes/api/services/CMap.php:563
 #: include/classes/api/services/CMap.php:589
@@ -7505,7 +7505,7 @@ msgstr "Skupina pro nalezené hostitele"
 msgid "Group name"
 msgstr "Název skupiny"
 
-#: include/classes/api/services/CHostPrototype.php:1273
+#: include/classes/api/services/CHostPrototype.php:1275
 #, c-format
 msgid "Group prototype cannot be based on a discovered host group \"%1$s\"."
 msgstr "Prototyp skupiny nemůže být založený na zjištěné skupině hostů \"%1$s\"."
@@ -8028,12 +8028,12 @@ msgstr "Sítě hosta"
 msgid "Host prototype"
 msgstr "Prototyp hosta"
 
-#: include/classes/api/services/CHostPrototype.php:978
+#: include/classes/api/services/CHostPrototype.php:980
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Prototyp hosta \"%1$s\" již existuje na \"%2$s\", zděděný z jiné šablony."
 
-#: include/classes/api/services/CHostPrototype.php:966
+#: include/classes/api/services/CHostPrototype.php:968
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "Prototyp hosta \"%1$s\" již existuje na \"%2$s\"."
@@ -8042,7 +8042,7 @@ msgstr "Prototyp hosta \"%1$s\" již existuje na \"%2$s\"."
 msgid "Host prototype added"
 msgstr "Prototyp hosta byl přidán"
 
-#: include/classes/api/services/CHostPrototype.php:1761
+#: include/classes/api/services/CHostPrototype.php:1763
 msgid "Host prototype cannot have more than one default interface of the same type."
 msgstr ""
 
@@ -9761,15 +9761,15 @@ msgstr "Neplatné parametry metody."
 #: include/classes/api/services/CHostBase.php:110
 #: include/classes/api/services/CHostBase.php:1416
 #: include/classes/api/services/CHostPrototype.php:325
-#: include/classes/api/services/CHostPrototype.php:1661
-#: include/classes/api/services/CHostPrototype.php:1666
-#: include/classes/api/services/CHostPrototype.php:1673
-#: include/classes/api/services/CHostPrototype.php:1678
-#: include/classes/api/services/CHostPrototype.php:1689
-#: include/classes/api/services/CHostPrototype.php:1694
-#: include/classes/api/services/CHostPrototype.php:1701
-#: include/classes/api/services/CHostPrototype.php:1707
-#: include/classes/api/services/CHostPrototype.php:1717
+#: include/classes/api/services/CHostPrototype.php:1663
+#: include/classes/api/services/CHostPrototype.php:1668
+#: include/classes/api/services/CHostPrototype.php:1675
+#: include/classes/api/services/CHostPrototype.php:1680
+#: include/classes/api/services/CHostPrototype.php:1691
+#: include/classes/api/services/CHostPrototype.php:1696
+#: include/classes/api/services/CHostPrototype.php:1703
+#: include/classes/api/services/CHostPrototype.php:1709
+#: include/classes/api/services/CHostPrototype.php:1719
 #: include/classes/api/services/CHttpTest.php:372
 #: include/classes/api/services/CItemGeneral.php:603
 #: include/classes/api/services/CItemGeneral.php:616
@@ -10081,7 +10081,7 @@ msgstr "Italsky (it_IT)"
 msgid "Item"
 msgstr "Položka"
 
-#: include/classes/api/services/CHostPrototype.php:1217
+#: include/classes/api/services/CHostPrototype.php:1219
 #: include/classes/api/services/CItem.php:61
 #, c-format
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
@@ -12265,7 +12265,7 @@ msgid "No data."
 msgstr "Žádná data."
 
 #: include/classes/api/services/CHostInterface.php:1023
-#: include/classes/api/services/CHostPrototype.php:1754
+#: include/classes/api/services/CHostPrototype.php:1756
 #, c-format
 msgid "No default interface for \"%1$s\" type on \"%2$s\"."
 msgstr "Žádné standardní rozhraní pro \"%1$s\" typu na \"%2$s\"."
@@ -12515,9 +12515,9 @@ msgstr ""
 #: include/classes/api/services/CHostPrototype.php:543
 #: include/classes/api/services/CHostPrototype.php:602
 #: include/classes/api/services/CHostPrototype.php:623
-#: include/classes/api/services/CHostPrototype.php:1242
-#: include/classes/api/services/CHostPrototype.php:1264
-#: include/classes/api/services/CHostPrototype.php:1298
+#: include/classes/api/services/CHostPrototype.php:1244
+#: include/classes/api/services/CHostPrototype.php:1266
+#: include/classes/api/services/CHostPrototype.php:1300
 #: include/classes/api/services/CHttpTest.php:505
 #: include/classes/api/services/CHttpTest.php:602
 #: include/classes/api/services/CHttpTest.php:689
@@ -12594,8 +12594,9 @@ msgstr ""
 #: include/classes/api/services/CTrigger.php:736
 #: include/classes/api/services/CTrigger.php:829
 #: include/classes/api/services/CTriggerPrototype.php:515
-#: include/classes/api/services/CTriggerPrototype.php:693
-#: include/classes/api/services/CTriggerPrototype.php:711
+#: include/classes/api/services/CTriggerPrototype.php:701
+#: include/classes/api/services/CTriggerPrototype.php:709
+#: include/classes/api/services/CTriggerPrototype.php:724
 #: include/classes/api/services/CUserGroup.php:315
 #: include/classes/api/services/CUserGroup.php:921
 #: include/classes/api/services/CUserMacro.php:345
@@ -12736,7 +12737,7 @@ msgid "Not all results are displayed. Please provide more specific search criter
 msgstr ""
 
 #: include/classes/api/services/CTrigger.php:1058
-#: include/classes/api/services/CTriggerPrototype.php:852
+#: include/classes/api/services/CTriggerPrototype.php:867
 #, c-format
 msgid "Not all templates are linked to \"%1$s\"."
 msgstr ""
@@ -17843,7 +17844,7 @@ msgstr "Prototyp spouštěče \"%1$s\" musí obsahovat nejméně jeden prototyp 
 msgid "Trigger prototype added"
 msgstr "Prototyp spouštěč přidaný"
 
-#: include/classes/api/services/CTriggerPrototype.php:909
+#: include/classes/api/services/CTriggerPrototype.php:924
 msgid "Trigger prototype cannot be dependent on a trigger that is inherited from it."
 msgstr "Trigger prototyp nemůže být závislý na spoušťěči, který se z něj dědí."
 
@@ -20374,9 +20375,9 @@ msgstr "nemůže být změněno"
 #: include/classes/api/services/CEvent.php:820
 #: include/classes/api/services/CHost.php:1786
 #: include/classes/api/services/CHost.php:1792
-#: include/classes/api/services/CHostPrototype.php:1667
-#: include/classes/api/services/CHostPrototype.php:1679
-#: include/classes/api/services/CHostPrototype.php:1695
+#: include/classes/api/services/CHostPrototype.php:1669
+#: include/classes/api/services/CHostPrototype.php:1681
+#: include/classes/api/services/CHostPrototype.php:1697
 #: include/classes/api/services/CItemGeneral.php:481
 #: include/classes/api/services/CItemGeneral.php:508
 #: include/classes/api/services/CItemGeneral.php:514
@@ -21566,7 +21567,7 @@ msgstr "krátký popis"
 #: include/classes/api/services/CHost.php:1817
 #: include/classes/api/services/CHost.php:1826
 #: include/classes/api/services/CHost.php:1832
-#: include/classes/api/services/CHostPrototype.php:1718
+#: include/classes/api/services/CHostPrototype.php:1720
 #: include/classes/api/services/CHttpTest.php:983
 #: include/classes/api/services/CHttpTest.php:1079
 #: include/classes/api/services/CItemGeneral.php:495
@@ -21695,10 +21696,10 @@ msgstr ""
 #: include/classes/api/services/CHostBase.php:1417
 #: include/classes/api/services/CHost.php:1907
 #: include/classes/api/services/CHost.php:2140
-#: include/classes/api/services/CHostPrototype.php:1662
-#: include/classes/api/services/CHostPrototype.php:1674
-#: include/classes/api/services/CHostPrototype.php:1690
-#: include/classes/api/services/CHostPrototype.php:1702
+#: include/classes/api/services/CHostPrototype.php:1664
+#: include/classes/api/services/CHostPrototype.php:1676
+#: include/classes/api/services/CHostPrototype.php:1692
+#: include/classes/api/services/CHostPrototype.php:1704
 #: include/classes/api/services/CHttpTest.php:744
 #: include/classes/api/services/CProxy.php:708
 #: include/classes/api/services/CProxy.php:719
@@ -21862,7 +21863,7 @@ msgstr "neočekávaný konec makra"
 #: include/classes/api/services/CGraphGeneral.php:627
 #: include/classes/api/services/CGraphGeneral.php:749
 #: include/classes/api/services/CHostPrototype.php:325
-#: include/classes/api/services/CHostPrototype.php:1708
+#: include/classes/api/services/CHostPrototype.php:1710
 #: include/classes/api/services/CHttpTest.php:372
 #: include/classes/api/services/CHttpTest.php:515
 #: include/classes/api/services/CHttpTest.php:539
