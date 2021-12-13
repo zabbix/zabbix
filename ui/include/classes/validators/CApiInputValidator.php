@@ -2816,7 +2816,7 @@ class CApiInputValidator {
 
 		if (array_key_exists('zoom', $geoloc_parser->result) && $geoloc_parser->result['zoom'] > $max_zoom) {
 			$error = _s('Invalid zoomparameter "%1$s": %2$s.', $path,
-				_s('zoom level must be between "%1$s" and "%2$s"', 1, $max_zoom)
+				_s('zoom level must be between "%1$s" and "%2$s"', 0, $max_zoom)
 			);
 			return false;
 		}
