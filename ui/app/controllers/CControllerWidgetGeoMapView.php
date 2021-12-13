@@ -214,12 +214,21 @@ class CControllerWidgetGeoMapView extends CControllerWidget {
 		if ($user_default_view !== '' && $geoloc_parser->parse($user_default_view) == CParser::PARSE_SUCCESS) {
 			$home_coords['default'] = true;
 			$center = $geoloc_parser->result;
+			$center['zoom'] = min($this->geomap_config['max_zoom'], $center['zoom']);
 		}
 
 		if (array_key_exists('default_view', $this->fields)
 				&& $this->fields['default_view'] !== ''
 				&& $geoloc_parser->parse($this->fields['default_view']) == CParser::PARSE_SUCCESS) {
-			$initial_view = $geoloc_parser->result + ['zoom' => ceil($this->geomap_config['max_zoom'] / 2)];
+			$initial_view = $geoloc_parser->result;
+
+			if (array_key_exists('zoom', $initial_view)) {
+				$initial_view['zoom'] = min($this->geomap_config['max_zoom'], $initial_view['zoom']);
+			}
+			else {
+				$initial_view['zoom'] = ceil($this->geomap_config['max_zoom'] / 2);
+			}
+
 			$home_coords['initial'] = $initial_view;
 			if (!$center) {
 				$center = $home_coords['initial'];

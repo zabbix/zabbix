@@ -73,6 +73,8 @@ $form_list->addRow(
 			new CListItem((new CSpan('<lat>,<lng>'))->addClass(ZBX_STYLE_MONOSPACE_FONT))
 		]))->addClass(ZBX_STYLE_LIST_DASHED),
 		BR(),
+		_s('The maximum zoom level is "%1$s".', CSettingsHelper::get(CSettingsHelper::GEOMAPS_MAX_ZOOM)),
+		' ',
 		_('Initial view is ignored if the default view is set.')
 	]),
 	CWidgetHelper::getLatLngZoomBox($fields['default_view'])

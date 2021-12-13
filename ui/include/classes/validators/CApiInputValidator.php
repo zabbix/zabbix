@@ -2809,14 +2809,9 @@ class CApiInputValidator {
 			return false;
 		}
 
-		$tile_provider = CSettingsHelper::get(CSettingsHelper::GEOMAPS_TILE_PROVIDER);
-		$max_zoom = ($tile_provider === '')
-			? CSettingsHelper::get(CSettingsHelper::GEOMAPS_MAX_ZOOM)
-			: getTileProviders()[$tile_provider]['geomaps_max_zoom'];
-
-		if (array_key_exists('zoom', $geoloc_parser->result) && $geoloc_parser->result['zoom'] > $max_zoom) {
+		if (array_key_exists('zoom', $geoloc_parser->result) && $geoloc_parser->result['zoom'] > ZBX_GEOMAP_MAX_ZOOM) {
 			$error = _s('Invalid zoomparameter "%1$s": %2$s.', $path,
-				_s('zoom level must be between "%1$s" and "%2$s"', 0, $max_zoom)
+				_s('zoom level must be between "%1$s" and "%2$s"', 0, ZBX_GEOMAP_MAX_ZOOM)
 			);
 			return false;
 		}
