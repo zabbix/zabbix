@@ -1,5 +1,5 @@
 
-# VMware
+# Template VM VMware
 
 ## Overview
 
@@ -67,7 +67,7 @@ Please report any issues with the template at https://support.zabbix.com
 
 You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/).
 
-# VMware Guest
+# Template VM VMware Guest
 
 ## Overview
 
@@ -119,14 +119,6 @@ No specific Zabbix configuration is required.
 |VMware |VMware: Uncommitted storage space |<p>Additional storage space, in bytes, potentially used by this virtual machine on all datastores.</p> |SIMPLE |vmware.vm.storage.uncommitted[{$VMWARE.URL},{HOST.HOST}] |
 |VMware |VMware: Unshared storage space |<p>Total storage space, in bytes, occupied by the virtual machine across all datastores, that is not shared with any other virtual machine.</p> |SIMPLE |vmware.vm.storage.unshared[{$VMWARE.URL},{HOST.HOST}] |
 |VMware |VMware: Uptime |<p>System uptime.</p> |SIMPLE |vmware.vm.uptime[{$VMWARE.URL},{HOST.HOST}] |
-|VMware |VMware: Guest memory swapped |<p>Amount of guest physical memory that is swapped out to the swap space.</p> |SIMPLE |vmware.vm.guest.memory.size.swapped[{$VMWARE.URL},{HOST.HOST}] |
-|VMware |VMware: Host memory consumed |<p>Amount of host physical memory consumed for backing up guest physical memory pages.</p> |SIMPLE |vmware.vm.memory.size.consumed[{$VMWARE.URL},{HOST.HOST}] |
-|VMware |VMware: Host memory usage in percents |<p>Percentage of host physical memory that has been consumed.</p> |SIMPLE |vmware.vm.memory.usage[{$VMWARE.URL},{HOST.HOST}] |
-|VMware |VMware: CPU usage in percents |<p>CPU usage as a percentage during the interval.</p> |SIMPLE |vmware.vm.cpu.usage.perf[{$VMWARE.URL},{HOST.HOST}] |
-|VMware |VMware: CPU latency in percents |<p>Percentage of time the virtual machine is unable to run because it is contending for access to the physical CPU(s).</p> |SIMPLE |vmware.vm.cpu.latency[{$VMWARE.URL},{HOST.HOST}] |
-|VMware |VMware: CPU readiness latency in percents |<p>Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU.</p> |SIMPLE |vmware.vm.cpu.readiness[{$VMWARE.URL},{HOST.HOST}] |
-|VMware |VMware: CPU swap-in latency in percents |<p>Percentage of CPU time spent waiting for swap-in.</p> |SIMPLE |vmware.vm.cpu.swapwait[{$VMWARE.URL},{HOST.HOST}] |
-|VMware |VMware: Uptime of guest OS |<p>Total time elapsed since the last operating system boot-up (in seconds).</p> |SIMPLE |vmware.vm.guest.osuptime[{$VMWARE.URL},{HOST.HOST}] |
 |VMware |VMware: Number of bytes received on interface {#IFDESC} |<p>VMware virtual machine network interface input statistics (bytes per second).</p> |SIMPLE |vmware.vm.net.if.in[{$VMWARE.URL},{HOST.HOST},{#IFNAME},bps] |
 |VMware |VMware: Number of packets received on interface {#IFDESC} |<p>VMware virtual machine network interface input statistics (packets per second).</p> |SIMPLE |vmware.vm.net.if.in[{$VMWARE.URL},{HOST.HOST},{#IFNAME},pps] |
 |VMware |VMware: Number of bytes transmitted on interface {#IFDESC} |<p>VMware virtual machine network interface output statistics (bytes per second).</p> |SIMPLE |vmware.vm.net.if.out[{$VMWARE.URL},{HOST.HOST},{#IFNAME},bps] |
@@ -149,13 +141,12 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|VMware: VM has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:vmware.vm.guest.osuptime[{$VMWARE.URL},{HOST.HOST}].last()}<10m` |WARNING |<p>Manual close: YES</p> |
 
 ## Feedback
 
 Please report any issues with the template at https://support.zabbix.com
 
-# VMware Hypervisor
+# Template VM VMware Hypervisor
 
 ## Overview
 
@@ -189,10 +180,6 @@ No specific Zabbix configuration is required.
 |VMware |VMware: Hypervisor ping |<p>Checks if the hypervisor is running and accepting ICMP pings.</p> |SIMPLE |icmpping[]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
 |VMware |VMware: Cluster name |<p>Cluster name of the guest VM.</p> |SIMPLE |vmware.hv.cluster.name[{$VMWARE.URL},{HOST.HOST}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |VMware |VMware: CPU usage |<p>Aggregated CPU usage across all cores on the host in Hz. This is only available if the host is connected.</p> |SIMPLE |vmware.hv.cpu.usage[{$VMWARE.URL},{HOST.HOST}] |
-|VMware |VMware: CPU usage in percents |<p>CPU usage as a percentage during the interval.</p> |SIMPLE |vmware.hv.cpu.usage.perf[{$VMWARE.URL},{HOST.HOST}] |
-|VMware |VMware: CPU utilization |<p>CPU usage as a percentage during the interval depends on power management or HT.</p> |SIMPLE |vmware.hv.cpu.utilization[{$VMWARE.URL},{HOST.HOST}] |
-|VMware |VMware: Power usage |<p>Current power usage.</p> |SIMPLE |vmware.hv.power[{$VMWARE.URL},{HOST.HOST}] |
-|VMware |VMware: Power usage maximum allowed |<p>Maximum allowed power usage.</p> |SIMPLE |vmware.hv.power[{$VMWARE.URL},{HOST.HOST},max]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |VMware |VMware: Datacenter name |<p>Datacenter name of the hypervisor.</p> |SIMPLE |vmware.hv.datacenter.name[{$VMWARE.URL},{HOST.HOST}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |VMware |VMware: Full name |<p>The complete product name, including the version information.</p> |SIMPLE |vmware.hv.fullname[{$VMWARE.URL},{HOST.HOST}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |VMware |VMware: CPU frequency |<p>The speed of the CPU cores. This is an average value if there are multiple speeds. The product of CPU frequency and number of cores is approximately equal to the sum of the MHz for all the individual cores on the host.</p> |SIMPLE |vmware.hv.hw.cpu.freq[{$VMWARE.URL},{HOST.HOST}] |
@@ -234,7 +221,7 @@ No specific Zabbix configuration is required.
 
 Please report any issues with the template at https://support.zabbix.com
 
-# VMware macros
+# Template VM VMware macros
 
 ## Overview
 
