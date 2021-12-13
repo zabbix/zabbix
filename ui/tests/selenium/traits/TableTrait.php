@@ -51,19 +51,12 @@ trait TableTrait {
 	 *
 	 * @param array      $data        data array to be match with result in table
 	 * @param string     $selector	  table selector
-	 * @param boolean    $empty	      true if table is empty without 'No data found.' row
 	 */
-	public function assertTableData($data = [], $selector = 'class:list-table', $empty = false) {
+	public function assertTableData($data = [], $selector = 'class:list-table') {
 		$rows = $this->query($selector)->asTable()->one()->getRows();
-		if (!$data) {
-			if (!$empty) {
-				// Check that table contain one row with text "No data found."
-				$this->assertEquals(['No data found.'], $rows->asText());
-			}
-			else {
-				// Check that table is empty.
-				$this->assertEquals([], $rows->asText());
-			}
+		if ($data === 'No data found.') {
+			// Check that table contain one row with text "No data found."
+			$this->assertEquals([$data], $rows->asText());
 
 			return;
 		}
@@ -93,10 +86,10 @@ trait TableTrait {
 	 * @param string  $field       table column name
 	 */
 	public function assertTableDataColumn($rows = [], $field = 'Name', $selector = 'class:list-table') {
-			$data = [];
-			foreach ($rows as $row) {
-				$data[] = [$field => $row];
-			}
+		$data = [];
+		foreach ($rows as $row) {
+			$data[] = [$field => $row];
+		}
 
 		$this->assertTableData($data, $selector);
 	}
