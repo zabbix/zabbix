@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2021-10-27T08:39:23Z'
+  date: '2021-12-13T12:28:09Z'
   groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -43,6 +43,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - node_exporter_build_info
+                - label
                 - version
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -67,6 +68,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - node_filefd_allocated
+                - value
                 - ''
           master_item:
             key: node_exporter.get
@@ -88,6 +90,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - node_filefd_maximum
+                - value
                 - ''
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -144,6 +147,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - '{__name__=~"^node_boot_time(?:_seconds)?$"}'
+                - value
                 - ''
           master_item:
             key: node_exporter.get
@@ -316,6 +320,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - '{__name__=~"node_intr"}'
+                - value
                 - ''
             -
               type: CHANGE_PER_SECOND
@@ -378,6 +383,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - node_load1
+                - value
                 - ''
           master_item:
             key: node_exporter.get
@@ -398,6 +404,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - node_load5
+                - value
                 - ''
           master_item:
             key: node_exporter.get
@@ -418,6 +425,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - node_load15
+                - value
                 - ''
           master_item:
             key: node_exporter.get
@@ -576,6 +584,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - '{__name__=~"node_context_switches"}'
+                - value
                 - ''
             -
               type: CHANGE_PER_SECOND
@@ -747,6 +756,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - '{__name__=~"^node_time(?:_seconds)?$"}'
+                - value
                 - ''
           master_item:
             key: node_exporter.get
@@ -778,6 +788,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - node_uname_info
+                - label
                 - nodename
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -812,6 +823,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - node_uname_info
+                - label
                 - machine
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -871,6 +883,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - '{__name__=~"node_memory_SwapFree"}'
+                - value
                 - ''
           master_item:
             key: node_exporter.get
@@ -907,6 +920,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - '{__name__=~"node_memory_SwapTotal"}'
+                - value
                 - ''
           master_item:
             key: node_exporter.get
@@ -929,6 +943,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - '{__name__=~"^node_boot_time(?:_seconds)?$"}'
+                - value
                 - ''
             -
               type: JAVASCRIPT
@@ -965,6 +980,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - '{__name__=~"node_memory_MemAvailable"}'
+                - value
                 - ''
           master_item:
             key: node_exporter.get
@@ -987,6 +1003,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - '{__name__=~"node_memory_MemTotal"}'
+                - value
                 - ''
           master_item:
             key: node_exporter.get
@@ -1071,6 +1088,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - 'node_network_receive_drop_total{device="{#IFNAME}"}'
+                    - value
                     - ''
                 -
                   type: CHANGE_PER_SECOND
@@ -1095,6 +1113,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - 'node_network_receive_errs_total{device="{#IFNAME}"}'
+                    - value
                     - ''
                 -
                   type: CHANGE_PER_SECOND
@@ -1120,6 +1139,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - 'node_network_receive_bytes_total{device="{#IFNAME}"}'
+                    - value
                     - ''
                 -
                   type: CHANGE_PER_SECOND
@@ -1148,6 +1168,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - 'node_network_transmit_drop_total{device="{#IFNAME}"}'
+                    - value
                     - ''
                 -
                   type: CHANGE_PER_SECOND
@@ -1172,6 +1193,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - 'node_network_transmit_errs_total{device="{#IFNAME}"}'
+                    - value
                     - ''
                 -
                   type: CHANGE_PER_SECOND
@@ -1197,6 +1219,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - 'node_network_transmit_bytes_total{device="{#IFNAME}"}'
+                    - value
                     - ''
                 -
                   type: CHANGE_PER_SECOND
@@ -1227,6 +1250,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - 'node_network_speed_bytes{device="{#IFNAME}"}'
+                    - value
                     - ''
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
@@ -1256,6 +1280,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - 'node_network_info{device="{#IFNAME}"}'
+                    - label
                     - operstate
                 -
                   type: JAVASCRIPT
@@ -1326,6 +1351,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - 'node_network_protocol_type{device="{#IFNAME}"}'
+                    - value
                     - ''
               master_item:
                 key: node_exporter.get
@@ -1523,6 +1549,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - 'node_disk_io_time_weighted_seconds_total{device="{#DEVNAME}"}'
+                    - value
                     - ''
                 -
                   type: CHANGE_PER_SECOND
@@ -1563,6 +1590,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - 'node_disk_reads_completed_total{device="{#DEVNAME}"}'
+                    - value
                     - ''
                 -
                   type: CHANGE_PER_SECOND
@@ -1588,6 +1616,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - 'node_disk_read_time_seconds_total{device="{#DEVNAME}"}'
+                    - value
                     - ''
                 -
                   type: CHANGE_PER_SECOND
@@ -1614,6 +1643,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - 'node_disk_io_time_seconds_total{device="{#DEVNAME}"}'
+                    - value
                     - ''
                 -
                   type: CHANGE_PER_SECOND
@@ -1658,6 +1688,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - 'node_disk_writes_completed_total{device="{#DEVNAME}"}'
+                    - value
                     - ''
                 -
                   type: CHANGE_PER_SECOND
@@ -1683,6 +1714,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - 'node_disk_write_time_seconds_total{device="{#DEVNAME}"}'
+                    - value
                     - ''
                 -
                   type: CHANGE_PER_SECOND
@@ -1818,6 +1850,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - '{__name__=~"^node_filesystem_avail(?:_bytes)?$", mountpoint="{#FSNAME}"}'
+                    - value
                     - ''
               master_item:
                 key: node_exporter.get
@@ -1912,6 +1945,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - '{__name__=~"^node_filesystem_size(?:_bytes)?$", mountpoint="{#FSNAME}"}'
+                    - value
                     - ''
               master_item:
                 key: node_exporter.get
