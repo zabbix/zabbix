@@ -17,7 +17,6 @@ A......... [ZBX-20328] fixed incomplete inheritance of items, item prototypes, l
 ...G.....T [ZBX-19897] updated postgresql templates and plugin files (vkhaliev)
 .........T [ZBX-20212] fixed max columns values for screens in linux templates (vkhaliev)
 ...G...... [ZBX-20192] fixed quote expansion in command execution in agent2 on windows (dgoloscapov)
-..F....... [ZBX-20350] fixed SAML login data comparing (rlataria)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.18
