@@ -276,6 +276,7 @@ New features:
 ..FG...... [ZBXNEXT-6593] added support of persistent files for restoring log item state after agent restart (Andris)
 
 Bug fixes:
+A......... [ZBX-20328] fixed incomplete inheritance of items, item prototypes, lld rules, host prototypes, when user with type "Admin" was edited them on template which is linked to non-permitted for him templates or hosts (vmaksimovs)
 .........T [ZBX-20113] fixed items value map for VMware template (abiba)
 .......PS. [ZBX-20341] moved zbx_ipc_service_init_env() to MAIN_ZABBIX_ENTRY (vso, yurii)
 ..F....... [ZBX-20278] fixed XSS attack vulnerability in scheduled report configuration form (agriscenko)
