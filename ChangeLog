@@ -1,6 +1,7 @@
 Changes for 6.0.0alpha8
 
 New features:
+.........T [ZBXNEXT-7112] added new fields in PROMETHEUS_PATTERN preprocessing in templates Etcd, Vault, Linux (mchudinov)
 A.F.....S. [ZBXNEXT-7049] added aggregation options to prometheus pattern preprocessing step, added bulk preprocessing for dependent items (valdis, wiper)
 .......PS. [ZBXNEXT-7100] added new LLD macro HV.NETNAME to vmware.hv.discovery (MVekslers)
 A......... [ZBXNEXT-6470,ZBXNEXT-6867] implemented complete audit logging of templates; added strict validation for template.create, template.update, template.delete, template.massadd, template.massupdate, template.massremove API methods (vmaksimovs)
@@ -13,6 +14,7 @@ A.F.....S. [ZBXNEXT-6250] added option to opt-out of "escalation canceled" messa
 ..F....... [ZBXNEXT-7070] transferred host and template mass update template inputs to main tab (jfreibergs)
 
 Bug fixes:
+A.F....... [ZBX-20270] fixed XSS vulnerability, max zoom level validation, inventory field processing and initial view hintbox text in geomap widget (miks)
 A......... [ZBX-20328] fixed incomplete inheritance of items, item prototypes, lld rules, host prototypes, when user with type "Admin" was edited them on template which is linked to non-permitted for him templates or hosts (vmaksimovs)
 ........S. [ZBX-20232] added HA node table cleanup on startup (wiper)
 .........T [ZBX-20113] fixed items value map for VMware template (abiba)
