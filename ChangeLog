@@ -4,6 +4,7 @@ New features:
 .......PS. [ZBXNEXT-7100] added new LLD macro HV.NETNAME to vmware.hv.discovery (MVekslers)
 
 Bug fixes:
+A......... [ZBX-20328] fixed incomplete inheritance of items, item prototypes, lld rules, host prototypes, when user with type "Admin" was edited them on template which is linked to non-permitted for him templates or hosts (vmaksimovs)
 ...G...PS. [ZBX-20236] improved memory consumption in Zabbix proxy trappers by moving configuration sync between database and cache to configuration syncer; improved trappers and listeners memory consumption by freeing received data after it was processed instead of after new data is received (vso)
 .......PS. [ZBX-20341] moved zbx_ipc_service_init_env() to MAIN_ZABBIX_ENTRY (vso, yurii)
 .........T [ZBX-20060] fixed trigger expression for memory monitoring in F5 Big-IP SNMP template (abakaldin)
