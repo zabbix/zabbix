@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-05 19:52+0200\n"
+"POT-Creation-Date: 2021-12-13 14:03+0200\n"
 "PO-Revision-Date: 2021-11-30 23:01+0300\n"
 "Last-Translator: cesar.fernandez <cesar.fernandez@mrinformatica.es>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1679,7 +1679,7 @@ msgid "Cannot add correlation condition"
 msgstr "No es posible agregar la condición de correlación"
 
 #: include/classes/api/services/CTrigger.php:970
-#: include/classes/api/services/CTriggerPrototype.php:780
+#: include/classes/api/services/CTriggerPrototype.php:795
 msgid "Cannot add dependency from a host to a template."
 msgstr "No es posible agregar una dependencia desde un host a una plantilla."
 
@@ -1930,7 +1930,7 @@ msgid "Cannot create another database connection."
 msgstr "No es posible crear otra conexión a la base de datos."
 
 #: include/classes/api/services/CTrigger.php:1004
-#: include/classes/api/services/CTriggerPrototype.php:811
+#: include/classes/api/services/CTriggerPrototype.php:826
 msgid "Cannot create circular dependencies."
 msgstr "No es posible crear dependencias circulares."
 
@@ -1938,7 +1938,7 @@ msgstr "No es posible crear dependencias circulares."
 msgid "Cannot create dependency on trigger itself."
 msgstr "No es posible crear una dependencia sobre el mismo trigger."
 
-#: include/classes/api/services/CTriggerPrototype.php:750
+#: include/classes/api/services/CTriggerPrototype.php:765
 msgid "Cannot create dependency on trigger prototype itself."
 msgstr "No es posible crear una dependencia sobre el mismo prototipo de trigger."
 
@@ -2163,7 +2163,7 @@ msgstr "No es posible eliminar el prototipo de gráfico de la plantilla."
 msgid "Cannot delete templated graph."
 msgstr "No es posible eliminar el gráfico de la plantilla."
 
-#: include/classes/api/services/CHostPrototype.php:1159
+#: include/classes/api/services/CHostPrototype.php:1161
 msgid "Cannot delete templated host prototype."
 msgstr "No es posible eliminar el prototipo de host de la plantilla."
 
@@ -4913,7 +4913,7 @@ msgstr "¿Desea eliminar el escenario web?"
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Se ha eliminado el host \"%1$s\"."
 
-#: include/classes/api/services/CHostPrototype.php:1027
+#: include/classes/api/services/CHostPrototype.php:1029
 #, c-format
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Se ha eliminado el prototipo de host \"%1$s\" en \"%2$s\"."
@@ -5505,7 +5505,7 @@ msgstr "Valor \"name\" duplicado \"%1$s\" para la pantalla."
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "Dependencias duplicadas en el trigger \"%1$s\"."
 
-#: include/classes/api/services/CTriggerPrototype.php:981
+#: include/classes/api/services/CTriggerPrototype.php:996
 #, c-format
 msgid "Duplicate dependencies in trigger prototype \"%1$s\"."
 msgstr "Dependencias duplicadas en el prototipo del iniciador \"%1$s\"."
@@ -5731,7 +5731,7 @@ msgstr ""
 #: include/classes/api/services/CHost.php:855
 #: include/classes/api/services/CHost.php:1427
 #: include/classes/api/services/CHost.php:1963
-#: include/classes/api/services/CHostPrototype.php:955
+#: include/classes/api/services/CHostPrototype.php:957
 #: include/classes/api/services/CImage.php:423
 #: include/classes/api/services/CImage.php:475
 #: include/classes/api/services/CMaintenance.php:535
@@ -7034,7 +7034,7 @@ msgstr ""
 msgid "Group name"
 msgstr "Nombre del grupo"
 
-#: include/classes/api/services/CHostPrototype.php:1117
+#: include/classes/api/services/CHostPrototype.php:1119
 #, c-format
 msgid "Group prototype cannot be based on a discovered host group \"%1$s\"."
 msgstr ""
@@ -7561,12 +7561,12 @@ msgstr ""
 msgid "Host prototype"
 msgstr ""
 
-#: include/classes/api/services/CHostPrototype.php:835
+#: include/classes/api/services/CHostPrototype.php:837
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr ""
 
-#: include/classes/api/services/CHostPrototype.php:823
+#: include/classes/api/services/CHostPrototype.php:825
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr ""
@@ -9848,7 +9848,7 @@ msgstr "Italiano (it_IT)"
 msgid "Item"
 msgstr "Monitor"
 
-#: include/classes/api/services/CHostPrototype.php:1061
+#: include/classes/api/services/CHostPrototype.php:1063
 #: include/classes/api/services/CItem.php:62
 #, c-format
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
@@ -12227,9 +12227,9 @@ msgstr ""
 #: include/classes/api/services/CHostPrototype.php:418
 #: include/classes/api/services/CHostPrototype.php:464
 #: include/classes/api/services/CHostPrototype.php:485
-#: include/classes/api/services/CHostPrototype.php:1086
-#: include/classes/api/services/CHostPrototype.php:1108
-#: include/classes/api/services/CHostPrototype.php:1142
+#: include/classes/api/services/CHostPrototype.php:1088
+#: include/classes/api/services/CHostPrototype.php:1110
+#: include/classes/api/services/CHostPrototype.php:1144
 #: include/classes/api/services/CHttpTest.php:446
 #: include/classes/api/services/CHttpTest.php:539
 #: include/classes/api/services/CHttpTest.php:626
@@ -12291,8 +12291,9 @@ msgstr ""
 #: include/classes/api/services/CTrigger.php:734
 #: include/classes/api/services/CTrigger.php:827
 #: include/classes/api/services/CTriggerPrototype.php:522
-#: include/classes/api/services/CTriggerPrototype.php:700
-#: include/classes/api/services/CTriggerPrototype.php:718
+#: include/classes/api/services/CTriggerPrototype.php:708
+#: include/classes/api/services/CTriggerPrototype.php:716
+#: include/classes/api/services/CTriggerPrototype.php:731
 #: include/classes/api/services/CUserGroup.php:322
 #: include/classes/api/services/CUserGroup.php:870
 #: include/classes/api/services/CUserMacro.php:377
@@ -12436,7 +12437,7 @@ msgid "Not all results are displayed. Please provide more specific search criter
 msgstr "No todos los resultados son mostrados. Por favor utilizar un criterio de búsqueda mas específico."
 
 #: include/classes/api/services/CTrigger.php:1049
-#: include/classes/api/services/CTriggerPrototype.php:859
+#: include/classes/api/services/CTriggerPrototype.php:874
 #, c-format
 msgid "Not all templates are linked to \"%1$s\"."
 msgstr "No todas las plantillas están vinculadas a \"%1$s\"."
@@ -17365,7 +17366,7 @@ msgstr "El prototipo de trigger \"%1$s\" debe tener al menos un prototipo de ite
 msgid "Trigger prototype added"
 msgstr "Prototipo de trigger agregado"
 
-#: include/classes/api/services/CTriggerPrototype.php:916
+#: include/classes/api/services/CTriggerPrototype.php:931
 msgid "Trigger prototype cannot be dependent on a trigger that is inherited from it."
 msgstr ""
 
