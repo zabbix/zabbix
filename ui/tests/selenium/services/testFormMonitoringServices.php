@@ -56,7 +56,7 @@ class testFormMonitoringServices extends CWebTest {
 				'algorithm' => 1,
 				'showsla' => 0,
 				'goodsla' => 99.99,
-				'sortorder' => 1,
+				'sortorder' => 1
 			],
 			[
 				'name' => 'Parent1',
@@ -169,7 +169,7 @@ class testFormMonitoringServices extends CWebTest {
 				'showsla' => 1,
 				'goodsla' => 20,
 				'sortorder' => 12
-			],
+			]
 		]);
 
 		$services = CDataHelper::getIds('name');
@@ -223,18 +223,11 @@ class testFormMonitoringServices extends CWebTest {
 		$this->query('id:list_mode')->one()->asSegmentedRadio()->waitUntilClickable()->select('Edit');
 		$this->query('button:Create service')->waitUntilClickable()->one()->click();
 
-		COverlayDialogElement::find()->one()->waitUntilReady();
-		$form = $this->query('id:service-form')->asForm()->one()->waitUntilReady();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $dialog->query('id:service-form')->asForm()->one();
 
 		// Check tabs available in the form.
-		$tabs = ['Service', 'SLA', 'Tags', 'Child services'];
-		$this->assertEquals(count($tabs), $form->query("xpath:.//li[@role='tab']")->all()->count());
-
-		foreach ($tabs as $tab) {
-			$this->assertTrue($form->query("xpath:.//li[@role='tab']//a[text()=".CXPathHelper::escapeQuotes($tab)."]")
-					->one()->isValid()
-			);
-		}
+		$form->checkTabs(['Service', 'SLA', 'Tags', 'Child services']);
 
 		$service_tabs_labels = [
 			'Name',
@@ -253,24 +246,37 @@ class testFormMonitoringServices extends CWebTest {
 
 		// Check Problem tags table data.
 		// Checks Problem tags table headers.
-		$this->assertSame(['Name', 'Operation', 'Value', 'Action'],
-				$form->query('id:problem_tags')->asTable()->one()->getHeadersText()
-		);
+		$problem_tags_table = $form->query('id:problem_tags')->asMultifieldTable()->one();
+		$this->assertSame(['Name', 'Operation', 'Value', 'Action'], $problem_tags_table->getHeadersText());
 
 		// Check Problem tags table fields.
-		$form->query('id:problem_tags')->asMultifieldTable()->one()
-				->checkValue([['tag' => '', 'operator' => 'Equals', 'value' => '']]
-		);
+		$problem_tags_table->checkValue([['tag' => '', 'operator' => 'Equals', 'value' => '']]);
 
+		// Check Service tab fields' maxlengths.
 		$service_tab_limits = [
 			'Name' => 128,
-			'Sort order (0->999)' => 3
+			'Sort order (0->999)' => 3,
+			'id:problem_tags_0_tag' => 255,
+			'id:problem_tags_0_value' => 255
 		];
-
-		// Service tab fields maxlength attribute.
 		foreach ($service_tab_limits as $field => $max_length) {
 			$this->assertEquals($max_length, $form->getField($field)->getAttribute('maxlength'));
 		}
+
+		// Check table tags placeholders.
+		foreach (['tag', 'value'] as $placeholder) {
+			$this->assertEquals($placeholder, $problem_tags_table->query('id:problem_tags_0_'.$placeholder)->one()
+					->getAttribute('placeholder')
+			);
+		}
+
+		// Check Operator options.
+		$this->assertSame(['Equals', 'Contains'],
+			$form->getField('name:problem_tags[0][operator]')->asZDropdown()->getOptions()->asText()
+		);
+
+		// Check Sort order default value.
+		$this->assertEquals(0, $form->getField('Sort order (0->999)')->getValue());
 
 		// Check status calculation rule default value.
 		$this->assertEquals('Most critical of child services', $form->getField('Status calculation rule')->getText());
@@ -315,28 +321,37 @@ class testFormMonitoringServices extends CWebTest {
 
 		// Check layout at Tags tab.
 		$form->selectTab('Tags');
+		$tags_tab = $form->query('id:tags-tab')->one();
 
 		// Check Tags tab labels.
-		$this->assertTrue($form->query('id:tags-tab')->one()->query('xpath:.//label[text()="Tags"]')
-				->one()->isValid()
-		);
+		$this->assertTrue($tags_tab->query('xpath:.//label[text()="Tags"]')->one()->isValid());
 
-		// Check Tags tab Tags table header labels.
-		$this->assertSame(['Name', 'Value', 'Action'],
-				$form->query('id:tags-tab')->one()->query('id:tags-table')->asTable()->one()->getHeadersText()
-		);
+		// Check Tags default empty row and headers.
+		$tags_tab->query('id:tags-table')->asMultifieldTable()->one()->checkValue([['Name' => '', 'Value' => '']]);
+
+		// Check table tags placeholders and length.
+		foreach (['tag' => 255, 'value' => 255] as $placeholder => $length) {
+			$this->assertEquals($length, $tags_tab->query('id:tags_0_'.$placeholder)->one()->getAttribute('maxlength'));
+			$this->assertEquals($placeholder, $tags_tab->query('id:tags_0_'.$placeholder)->one()->getAttribute('placeholder'));
+		}
 
 		// Check layout at Child services tab.
 		$form->selectTab('Child services');
+		$service_tab = $form->query('id:child-services-tab')->one();
+
+		$filter = $service_tab->query('id:children-filter')->one();
+		$this->assertEquals(255, $filter->query('id:children-filter-name')->one()->getAttribute('maxlength'));
+
+		foreach (['Filter', 'Reset'] as $button) {
+			$this->assertTrue($filter->query('button', $button)->one()->isClickable());
+		}
 
 		// Check Child services tab labels.
-		$this->assertTrue($form->query('id:child-services-tab')->one()->query('xpath:.//label[text()="Child services"]')
-				->one()->isValid()
-		);
+		$this->assertTrue($service_tab->query('xpath:.//label[text()="Child services"]')->one()->isValid());
 
-		// Check Tags tab Tags table header labels.
+		// Check Child services table header labels.
 		$this->assertSame(['Service', 'Status calculation rule', 'Problem tags', 'Action'],
-				$form->query('id:child-services-tab')->one()->query('id:children')->asTable()->one()->getHeadersText()
+				$service_tab->query('id:children')->asTable()->one()->getHeadersText()
 		);
 
 		$form->getFieldContainer('Child services')->query('button:Add')->waitUntilClickable()->one()->click();
@@ -353,8 +368,9 @@ class testFormMonitoringServices extends CWebTest {
 
 		// Enter and submit filtering data.
 		$children_dialog->query('id:services-filter-name')->one()->fill('Parent1');
+		$this->assertTrue($children_dialog->query('button:Cancel')->one()->isCLickable());
 		$children_dialog->query('button:Filter')->one()->waitUntilClickable()->click();
-		$this->page->waitUntilReady();
+		$children_dialog->waitUntilReady();
 		$children_dialog->invalidate();
 
 		// Check filtering result.
@@ -374,6 +390,11 @@ class testFormMonitoringServices extends CWebTest {
 		$this->assertEquals(12, count($children_dialog->query('class:list-table')->asTable()->waitUntilReady()->one()
 				->getRows()->asArray())
 		);
+
+		foreach (['Add', 'Cancel'] as $button) {
+			$this->assertTrue($dialog->query("xpath:.//div[@class='overlay-dialogue-footer']//button[text()=".
+					CXPathHelper::escapeQuotes($button)."]")->one()->isClickable());
+		}
 	}
 
 	public function getServicesData() {
@@ -955,7 +976,7 @@ class testFormMonitoringServices extends CWebTest {
 		// Check Child services were not cloned.
 		if (CTestArrayHelper::get($data, 'children')) {
 			$form->selectTab('Child services');
-			$this->assertTableData([], 'id:children', true);
+			$this->assertEquals('', $form->query('xpath:.//table[@id="children"]/tbody')->one()->getText());
 		}
 	}
 
@@ -1070,7 +1091,7 @@ class testFormMonitoringServices extends CWebTest {
 		}
 		else {
 			$this->assertFalse($table->findRow('Name', $data['parent'], true)
-					->query('xpath:.//button[@title="Add child service"]')->one()->isEnabled()
+					->query('xpath:.//button[@title="Add child service"]')->one()->isClickable()
 			);
 			return;
 		}
