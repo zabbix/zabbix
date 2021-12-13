@@ -2131,13 +2131,13 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-int	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
+void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
 {
 	zbx_dc_kvs_path_t	*dc_kvs_path;
 	zbx_dc_kv_t		*dc_kv;
 	zbx_hashset_t		kvs;
 	zbx_hashset_iter_t	iter;
-	int			i, j, ret;
+	int			i, j;
 	zbx_vector_ptr_pair_t	diff;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -2154,12 +2154,6 @@ int	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
 
 		if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		{
-			if (NULL == jp_kvs_paths)
-			{
-				ret = FAIL;
-				goto fail;
-			}
-
 			if (FAIL == zbx_vault_json_kvs_get(dc_kvs_path->path, jp_kvs_paths, &kvs, &error))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot get secrets for path \"%s\": %s",
@@ -2223,13 +2217,10 @@ int	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
 		zbx_vector_ptr_pair_clear(&diff);
 		zbx_hashset_clear(&kvs);
 	}
-	ret = SUCCEED;
-fail:
+
 	zbx_vector_ptr_pair_destroy(&diff);
 	zbx_hashset_destroy(&kvs);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-
-	return ret;
 }
 
 /******************************************************************************
