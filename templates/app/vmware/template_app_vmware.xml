@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-12-06T15:58:31Z</date>
+   <date>2021-12-13T13:01:52Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -227,13 +227,6 @@ Template tooling version used: 0.39</description>
                            <name>Template VM VMware Hypervisor</name>
                         </template>
                      </templates>
-                     <macros>
-                        <macro>
-                           <macro>{$VMWARE.HV.UUID}</macro>
-                           <value>{#HV.UUID}</value>
-                           <description>UUID of hypervisor.</description>
-                        </macro>
-                     </macros>
                   </host_prototype>
                </host_prototypes>
             </discovery_rule>
@@ -263,7 +256,7 @@ Template tooling version used: 0.39</description>
                            <name>{#CLUSTER.NAME} (vm)</name>
                         </group_prototype>
                         <group_prototype>
-                           <name>{#DATACENTER.NAME}/{#VM.FOLDER} (vm)</name>
+                           <name>{#DATACENTER.NAME} (vm)</name>
                         </group_prototype>
                         <group_prototype>
                            <name>{#HV.NAME}</name>
@@ -274,13 +267,6 @@ Template tooling version used: 0.39</description>
                            <name>Template VM VMware Guest</name>
                         </template>
                      </templates>
-                     <macros>
-                        <macro>
-                           <macro>{$VMWARE.VM.UUID}</macro>
-                           <value>{#VM.UUID}</value>
-                           <description>UUID of guest virtual machine.</description>
-                        </macro>
-                     </macros>
                   </host_prototype>
                </host_prototypes>
             </discovery_rule>
@@ -309,7 +295,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: Cluster name</name>
                <type>SIMPLE</type>
-               <key>vmware.vm.cluster.name[{$VMWARE.URL},{$VMWARE.VM.UUID}]</key>
+               <key>vmware.vm.cluster.name[{$VMWARE.URL},{HOST.HOST}]</key>
                <delay>1h</delay>
                <history>7d</history>
                <trends>0</trends>
@@ -332,7 +318,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: CPU latency in percents</name>
                <type>SIMPLE</type>
-               <key>vmware.vm.cpu.latency[{$VMWARE.URL},{$VMWARE.VM.UUID}]</key>
+               <key>vmware.vm.cpu.latency[{$VMWARE.URL},{HOST.HOST}]</key>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>%</units>
@@ -348,7 +334,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: Number of virtual CPUs</name>
                <type>SIMPLE</type>
-               <key>vmware.vm.cpu.num[{$VMWARE.URL},{$VMWARE.VM.UUID}]</key>
+               <key>vmware.vm.cpu.num[{$VMWARE.URL},{HOST.HOST}]</key>
                <delay>1h</delay>
                <history>7d</history>
                <username>{$VMWARE.USERNAME}</username>
@@ -369,7 +355,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: CPU readiness latency in percents</name>
                <type>SIMPLE</type>
-               <key>vmware.vm.cpu.readiness[{$VMWARE.URL},{$VMWARE.VM.UUID}]</key>
+               <key>vmware.vm.cpu.readiness[{$VMWARE.URL},{HOST.HOST}]</key>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>%</units>
@@ -385,7 +371,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: CPU ready</name>
                <type>SIMPLE</type>
-               <key>vmware.vm.cpu.ready[{$VMWARE.URL},{$VMWARE.VM.UUID}]</key>
+               <key>vmware.vm.cpu.ready[{$VMWARE.URL},{HOST.HOST}]</key>
                <history>7d</history>
                <units>ms</units>
                <username>{$VMWARE.USERNAME}</username>
@@ -400,7 +386,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: CPU swap-in latency in percents</name>
                <type>SIMPLE</type>
-               <key>vmware.vm.cpu.swapwait[{$VMWARE.URL},{$VMWARE.VM.UUID}]</key>
+               <key>vmware.vm.cpu.swapwait[{$VMWARE.URL},{HOST.HOST}]</key>
                <history>7d</history>
                <units>%</units>
                <username>{$VMWARE.USERNAME}</username>
@@ -415,7 +401,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: CPU usage in percents</name>
                <type>SIMPLE</type>
-               <key>vmware.vm.cpu.usage.perf[{$VMWARE.URL},{$VMWARE.VM.UUID}]</key>
+               <key>vmware.vm.cpu.usage.perf[{$VMWARE.URL},{HOST.HOST}]</key>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>%</units>
@@ -431,7 +417,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: CPU usage</name>
                <type>SIMPLE</type>
-               <key>vmware.vm.cpu.usage[{$VMWARE.URL},{$VMWARE.VM.UUID}]</key>
+               <key>vmware.vm.cpu.usage[{$VMWARE.URL},{HOST.HOST}]</key>
                <history>7d</history>
                <units>Hz</units>
                <username>{$VMWARE.USERNAME}</username>
@@ -446,7 +432,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: Datacenter name</name>
                <type>SIMPLE</type>
-               <key>vmware.vm.datacenter.name[{$VMWARE.URL},{$VMWARE.VM.UUID}]</key>
+               <key>vmware.vm.datacenter.name[{$VMWARE.URL},{HOST.HOST}]</key>
                <delay>1h</delay>
                <history>7d</history>
                <trends>0</trends>
@@ -469,7 +455,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: Guest memory swapped</name>
                <type>SIMPLE</type>
-               <key>vmware.vm.guest.memory.size.swapped[{$VMWARE.URL},{$VMWARE.VM.UUID}]</key>
+               <key>vmware.vm.guest.memory.size.swapped[{$VMWARE.URL},{HOST.HOST}]</key>
                <history>7d</history>
                <units>B</units>
                <username>{$VMWARE.USERNAME}</username>
@@ -484,7 +470,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: Uptime of guest OS</name>
                <type>SIMPLE</type>
-               <key>vmware.vm.guest.osuptime[{$VMWARE.URL},{$VMWARE.VM.UUID}]</key>
+               <key>vmware.vm.guest.osuptime[{$VMWARE.URL},{HOST.HOST}]</key>
                <history>7d</history>
                <units>uptime</units>
                <username>{$VMWARE.USERNAME}</username>
@@ -508,7 +494,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: Hypervisor name</name>
                <type>SIMPLE</type>
-               <key>vmware.vm.hv.name[{$VMWARE.URL},{$VMWARE.VM.UUID}]</key>
+               <key>vmware.vm.hv.name[{$VMWARE.URL},{HOST.HOST}]</key>
                <delay>1h</delay>
                <history>7d</history>
                <trends>0</trends>
@@ -531,7 +517,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: Ballooned memory</name>
                <type>SIMPLE</type>
-               <key>vmware.vm.memory.size.ballooned[{$VMWARE.URL},{$VMWARE.VM.UUID}]</key>
+               <key>vmware.vm.memory.size.ballooned[{$VMWARE.URL},{HOST.HOST}]</key>
                <history>7d</history>
                <units>B</units>
                <username>{$VMWARE.USERNAME}</username>
@@ -546,7 +532,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: Compressed memory</name>
                <type>SIMPLE</type>
-               <key>vmware.vm.memory.size.compressed[{$VMWARE.URL},{$VMWARE.VM.UUID}]</key>
+               <key>vmware.vm.memory.size.compressed[{$VMWARE.URL},{HOST.HOST}]</key>
                <history>7d</history>
                <units>B</units>
                <username>{$VMWARE.USERNAME}</username>
@@ -561,7 +547,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: Host memory consumed</name>
                <type>SIMPLE</type>
-               <key>vmware.vm.memory.size.consumed[{$VMWARE.URL},{$VMWARE.VM.UUID}]</key>
+               <key>vmware.vm.memory.size.consumed[{$VMWARE.URL},{HOST.HOST}]</key>
                <history>7d</history>
                <units>B</units>
                <username>{$VMWARE.USERNAME}</username>
@@ -576,7 +562,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: Private memory</name>
                <type>SIMPLE</type>
-               <key>vmware.vm.memory.size.private[{$VMWARE.URL},{$VMWARE.VM.UUID}]</key>
+               <key>vmware.vm.memory.size.private[{$VMWARE.URL},{HOST.HOST}]</key>
                <history>7d</history>
                <units>B</units>
                <username>{$VMWARE.USERNAME}</username>
@@ -591,7 +577,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: Shared memory</name>
                <type>SIMPLE</type>
-               <key>vmware.vm.memory.size.shared[{$VMWARE.URL},{$VMWARE.VM.UUID}]</key>
+               <key>vmware.vm.memory.size.shared[{$VMWARE.URL},{HOST.HOST}]</key>
                <history>7d</history>
                <units>B</units>
                <username>{$VMWARE.USERNAME}</username>
@@ -606,7 +592,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: Swapped memory</name>
                <type>SIMPLE</type>
-               <key>vmware.vm.memory.size.swapped[{$VMWARE.URL},{$VMWARE.VM.UUID}]</key>
+               <key>vmware.vm.memory.size.swapped[{$VMWARE.URL},{HOST.HOST}]</key>
                <history>7d</history>
                <units>B</units>
                <username>{$VMWARE.USERNAME}</username>
@@ -621,7 +607,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: Guest memory usage</name>
                <type>SIMPLE</type>
-               <key>vmware.vm.memory.size.usage.guest[{$VMWARE.URL},{$VMWARE.VM.UUID}]</key>
+               <key>vmware.vm.memory.size.usage.guest[{$VMWARE.URL},{HOST.HOST}]</key>
                <history>7d</history>
                <units>B</units>
                <username>{$VMWARE.USERNAME}</username>
@@ -636,7 +622,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: Host memory usage</name>
                <type>SIMPLE</type>
-               <key>vmware.vm.memory.size.usage.host[{$VMWARE.URL},{$VMWARE.VM.UUID}]</key>
+               <key>vmware.vm.memory.size.usage.host[{$VMWARE.URL},{HOST.HOST}]</key>
                <history>7d</history>
                <units>B</units>
                <username>{$VMWARE.USERNAME}</username>
@@ -651,7 +637,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: Memory size</name>
                <type>SIMPLE</type>
-               <key>vmware.vm.memory.size[{$VMWARE.URL},{$VMWARE.VM.UUID}]</key>
+               <key>vmware.vm.memory.size[{$VMWARE.URL},{HOST.HOST}]</key>
                <delay>1h</delay>
                <history>7d</history>
                <units>B</units>
@@ -673,7 +659,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: Host memory usage in percents</name>
                <type>SIMPLE</type>
-               <key>vmware.vm.memory.usage[{$VMWARE.URL},{$VMWARE.VM.UUID}]</key>
+               <key>vmware.vm.memory.usage[{$VMWARE.URL},{HOST.HOST}]</key>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>%</units>
@@ -689,7 +675,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: Power state</name>
                <type>SIMPLE</type>
-               <key>vmware.vm.powerstate[{$VMWARE.URL},{$VMWARE.VM.UUID}]</key>
+               <key>vmware.vm.powerstate[{$VMWARE.URL},{HOST.HOST}]</key>
                <history>7d</history>
                <username>{$VMWARE.USERNAME}</username>
                <password>{$VMWARE.PASSWORD}</password>
@@ -712,7 +698,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: Committed storage space</name>
                <type>SIMPLE</type>
-               <key>vmware.vm.storage.committed[{$VMWARE.URL},{$VMWARE.VM.UUID}]</key>
+               <key>vmware.vm.storage.committed[{$VMWARE.URL},{HOST.HOST}]</key>
                <history>7d</history>
                <units>B</units>
                <username>{$VMWARE.USERNAME}</username>
@@ -727,7 +713,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: Uncommitted storage space</name>
                <type>SIMPLE</type>
-               <key>vmware.vm.storage.uncommitted[{$VMWARE.URL},{$VMWARE.VM.UUID}]</key>
+               <key>vmware.vm.storage.uncommitted[{$VMWARE.URL},{HOST.HOST}]</key>
                <history>7d</history>
                <units>B</units>
                <username>{$VMWARE.USERNAME}</username>
@@ -742,7 +728,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: Unshared storage space</name>
                <type>SIMPLE</type>
-               <key>vmware.vm.storage.unshared[{$VMWARE.URL},{$VMWARE.VM.UUID}]</key>
+               <key>vmware.vm.storage.unshared[{$VMWARE.URL},{HOST.HOST}]</key>
                <history>7d</history>
                <units>B</units>
                <username>{$VMWARE.USERNAME}</username>
@@ -757,7 +743,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: Uptime</name>
                <type>SIMPLE</type>
-               <key>vmware.vm.uptime[{$VMWARE.URL},{$VMWARE.VM.UUID}]</key>
+               <key>vmware.vm.uptime[{$VMWARE.URL},{HOST.HOST}]</key>
                <history>7d</history>
                <units>uptime</units>
                <username>{$VMWARE.USERNAME}</username>
@@ -774,7 +760,7 @@ Template tooling version used: 0.39</description>
             <discovery_rule>
                <name>Network device discovery</name>
                <type>SIMPLE</type>
-               <key>vmware.vm.net.if.discovery[{$VMWARE.URL},{$VMWARE.VM.UUID}]</key>
+               <key>vmware.vm.net.if.discovery[{$VMWARE.URL},{HOST.HOST}]</key>
                <delay>1h</delay>
                <username>{$VMWARE.USERNAME}</username>
                <password>{$VMWARE.PASSWORD}</password>
@@ -783,7 +769,7 @@ Template tooling version used: 0.39</description>
                   <item_prototype>
                      <name>VMware: Number of bytes received on interface {#IFDESC}</name>
                      <type>SIMPLE</type>
-                     <key>vmware.vm.net.if.in[{$VMWARE.URL},{$VMWARE.VM.UUID},{#IFNAME},bps]</key>
+                     <key>vmware.vm.net.if.in[{$VMWARE.URL},{HOST.HOST},{#IFNAME},bps]</key>
                      <history>7d</history>
                      <units>Bps</units>
                      <username>{$VMWARE.USERNAME}</username>
@@ -798,7 +784,7 @@ Template tooling version used: 0.39</description>
                   <item_prototype>
                      <name>VMware: Number of packets received on interface {#IFDESC}</name>
                      <type>SIMPLE</type>
-                     <key>vmware.vm.net.if.in[{$VMWARE.URL},{$VMWARE.VM.UUID},{#IFNAME},pps]</key>
+                     <key>vmware.vm.net.if.in[{$VMWARE.URL},{HOST.HOST},{#IFNAME},pps]</key>
                      <history>7d</history>
                      <username>{$VMWARE.USERNAME}</username>
                      <password>{$VMWARE.PASSWORD}</password>
@@ -812,7 +798,7 @@ Template tooling version used: 0.39</description>
                   <item_prototype>
                      <name>VMware: Number of bytes transmitted on interface {#IFDESC}</name>
                      <type>SIMPLE</type>
-                     <key>vmware.vm.net.if.out[{$VMWARE.URL},{$VMWARE.VM.UUID},{#IFNAME},bps]</key>
+                     <key>vmware.vm.net.if.out[{$VMWARE.URL},{HOST.HOST},{#IFNAME},bps]</key>
                      <history>7d</history>
                      <units>Bps</units>
                      <username>{$VMWARE.USERNAME}</username>
@@ -827,7 +813,7 @@ Template tooling version used: 0.39</description>
                   <item_prototype>
                      <name>VMware: Number of packets transmitted on interface {#IFDESC}</name>
                      <type>SIMPLE</type>
-                     <key>vmware.vm.net.if.out[{$VMWARE.URL},{$VMWARE.VM.UUID},{#IFNAME},pps]</key>
+                     <key>vmware.vm.net.if.out[{$VMWARE.URL},{HOST.HOST},{#IFNAME},pps]</key>
                      <history>7d</history>
                      <username>{$VMWARE.USERNAME}</username>
                      <password>{$VMWARE.PASSWORD}</password>
@@ -841,7 +827,7 @@ Template tooling version used: 0.39</description>
                   <item_prototype>
                      <name>VMware: Network utilization on interface {#IFDESC}</name>
                      <type>SIMPLE</type>
-                     <key>vmware.vm.net.if.usage[{$VMWARE.URL},{$VMWARE.VM.UUID},{#IFNAME}]</key>
+                     <key>vmware.vm.net.if.usage[{$VMWARE.URL},{HOST.HOST},{#IFNAME}]</key>
                      <history>7d</history>
                      <units>Bps</units>
                      <username>{$VMWARE.USERNAME}</username>
@@ -864,7 +850,7 @@ Template tooling version used: 0.39</description>
             <discovery_rule>
                <name>Disk device discovery</name>
                <type>SIMPLE</type>
-               <key>vmware.vm.vfs.dev.discovery[{$VMWARE.URL},{$VMWARE.VM.UUID}]</key>
+               <key>vmware.vm.vfs.dev.discovery[{$VMWARE.URL},{HOST.HOST}]</key>
                <delay>1h</delay>
                <username>{$VMWARE.USERNAME}</username>
                <password>{$VMWARE.PASSWORD}</password>
@@ -873,7 +859,7 @@ Template tooling version used: 0.39</description>
                   <item_prototype>
                      <name>VMware: Average number of outstanding read requests to the disk {#DISKDESC}</name>
                      <type>SIMPLE</type>
-                     <key>vmware.vm.storage.readoio[{$VMWARE.URL},{$VMWARE.VM.UUID},{#DISKNAME}]</key>
+                     <key>vmware.vm.storage.readoio[{$VMWARE.URL},{HOST.HOST},{#DISKNAME}]</key>
                      <history>7d</history>
                      <username>{$VMWARE.USERNAME}</username>
                      <password>{$VMWARE.PASSWORD}</password>
@@ -887,7 +873,7 @@ Template tooling version used: 0.39</description>
                   <item_prototype>
                      <name>VMware: Average read latency to the disk {#DISKDESC}</name>
                      <type>SIMPLE</type>
-                     <key>vmware.vm.storage.totalreadlatency[{$VMWARE.URL},{$VMWARE.VM.UUID},{#DISKNAME}]</key>
+                     <key>vmware.vm.storage.totalreadlatency[{$VMWARE.URL},{HOST.HOST},{#DISKNAME}]</key>
                      <history>7d</history>
                      <units>!ms</units>
                      <username>{$VMWARE.USERNAME}</username>
@@ -902,7 +888,7 @@ Template tooling version used: 0.39</description>
                   <item_prototype>
                      <name>VMware: Average write latency to the disk {#DISKDESC}</name>
                      <type>SIMPLE</type>
-                     <key>vmware.vm.storage.totalwritelatency[{$VMWARE.URL},{$VMWARE.VM.UUID},{#DISKNAME}]</key>
+                     <key>vmware.vm.storage.totalwritelatency[{$VMWARE.URL},{HOST.HOST},{#DISKNAME}]</key>
                      <history>7d</history>
                      <units>!ms</units>
                      <username>{$VMWARE.USERNAME}</username>
@@ -917,7 +903,7 @@ Template tooling version used: 0.39</description>
                   <item_prototype>
                      <name>VMware: Average number of outstanding write requests to the disk {#DISKDESC}</name>
                      <type>SIMPLE</type>
-                     <key>vmware.vm.storage.writeoio[{$VMWARE.URL},{$VMWARE.VM.UUID},{#DISKNAME}]</key>
+                     <key>vmware.vm.storage.writeoio[{$VMWARE.URL},{HOST.HOST},{#DISKNAME}]</key>
                      <history>7d</history>
                      <username>{$VMWARE.USERNAME}</username>
                      <password>{$VMWARE.PASSWORD}</password>
@@ -931,7 +917,7 @@ Template tooling version used: 0.39</description>
                   <item_prototype>
                      <name>VMware: Average number of bytes read from the disk {#DISKDESC}</name>
                      <type>SIMPLE</type>
-                     <key>vmware.vm.vfs.dev.read[{$VMWARE.URL},{$VMWARE.VM.UUID},{#DISKNAME},bps]</key>
+                     <key>vmware.vm.vfs.dev.read[{$VMWARE.URL},{HOST.HOST},{#DISKNAME},bps]</key>
                      <history>7d</history>
                      <units>Bps</units>
                      <username>{$VMWARE.USERNAME}</username>
@@ -946,7 +932,7 @@ Template tooling version used: 0.39</description>
                   <item_prototype>
                      <name>VMware: Average number of reads from the disk {#DISKDESC}</name>
                      <type>SIMPLE</type>
-                     <key>vmware.vm.vfs.dev.read[{$VMWARE.URL},{$VMWARE.VM.UUID},{#DISKNAME},ops]</key>
+                     <key>vmware.vm.vfs.dev.read[{$VMWARE.URL},{HOST.HOST},{#DISKNAME},ops]</key>
                      <history>7d</history>
                      <username>{$VMWARE.USERNAME}</username>
                      <password>{$VMWARE.PASSWORD}</password>
@@ -960,7 +946,7 @@ Template tooling version used: 0.39</description>
                   <item_prototype>
                      <name>VMware: Average number of bytes written to the disk {#DISKDESC}</name>
                      <type>SIMPLE</type>
-                     <key>vmware.vm.vfs.dev.write[{$VMWARE.URL},{$VMWARE.VM.UUID},{#DISKNAME},bps]</key>
+                     <key>vmware.vm.vfs.dev.write[{$VMWARE.URL},{HOST.HOST},{#DISKNAME},bps]</key>
                      <history>7d</history>
                      <units>Bps</units>
                      <username>{$VMWARE.USERNAME}</username>
@@ -975,7 +961,7 @@ Template tooling version used: 0.39</description>
                   <item_prototype>
                      <name>VMware: Average number of writes to the disk {#DISKDESC}</name>
                      <type>SIMPLE</type>
-                     <key>vmware.vm.vfs.dev.write[{$VMWARE.URL},{$VMWARE.VM.UUID},{#DISKNAME},ops]</key>
+                     <key>vmware.vm.vfs.dev.write[{$VMWARE.URL},{HOST.HOST},{#DISKNAME},ops]</key>
                      <history>7d</history>
                      <username>{$VMWARE.USERNAME}</username>
                      <password>{$VMWARE.PASSWORD}</password>
@@ -991,7 +977,7 @@ Template tooling version used: 0.39</description>
             <discovery_rule>
                <name>Mounted filesystem discovery</name>
                <type>SIMPLE</type>
-               <key>vmware.vm.vfs.fs.discovery[{$VMWARE.URL},{$VMWARE.VM.UUID}]</key>
+               <key>vmware.vm.vfs.fs.discovery[{$VMWARE.URL},{HOST.HOST}]</key>
                <delay>1h</delay>
                <username>{$VMWARE.USERNAME}</username>
                <password>{$VMWARE.PASSWORD}</password>
@@ -1000,7 +986,7 @@ Template tooling version used: 0.39</description>
                   <item_prototype>
                      <name>VMware: Free disk space on {#FSNAME}</name>
                      <type>SIMPLE</type>
-                     <key>vmware.vm.vfs.fs.size[{$VMWARE.URL},{$VMWARE.VM.UUID},{#FSNAME},free]</key>
+                     <key>vmware.vm.vfs.fs.size[{$VMWARE.URL},{HOST.HOST},{#FSNAME},free]</key>
                      <history>7d</history>
                      <units>B</units>
                      <username>{$VMWARE.USERNAME}</username>
@@ -1015,7 +1001,7 @@ Template tooling version used: 0.39</description>
                   <item_prototype>
                      <name>VMware: Free disk space on {#FSNAME} (percentage)</name>
                      <type>SIMPLE</type>
-                     <key>vmware.vm.vfs.fs.size[{$VMWARE.URL},{$VMWARE.VM.UUID},{#FSNAME},pfree]</key>
+                     <key>vmware.vm.vfs.fs.size[{$VMWARE.URL},{HOST.HOST},{#FSNAME},pfree]</key>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
                      <units>%</units>
@@ -1031,7 +1017,7 @@ Template tooling version used: 0.39</description>
                   <item_prototype>
                      <name>VMware: Total disk space on {#FSNAME}</name>
                      <type>SIMPLE</type>
-                     <key>vmware.vm.vfs.fs.size[{$VMWARE.URL},{$VMWARE.VM.UUID},{#FSNAME},total]</key>
+                     <key>vmware.vm.vfs.fs.size[{$VMWARE.URL},{HOST.HOST},{#FSNAME},total]</key>
                      <delay>1h</delay>
                      <history>7d</history>
                      <units>B</units>
@@ -1053,7 +1039,7 @@ Template tooling version used: 0.39</description>
                   <item_prototype>
                      <name>VMware: Used disk space on {#FSNAME}</name>
                      <type>SIMPLE</type>
-                     <key>vmware.vm.vfs.fs.size[{$VMWARE.URL},{$VMWARE.VM.UUID},{#FSNAME},used]</key>
+                     <key>vmware.vm.vfs.fs.size[{$VMWARE.URL},{HOST.HOST},{#FSNAME},used]</key>
                      <history>7d</history>
                      <units>B</units>
                      <username>{$VMWARE.USERNAME}</username>
@@ -1122,7 +1108,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: Cluster name</name>
                <type>SIMPLE</type>
-               <key>vmware.hv.cluster.name[{$VMWARE.URL},{$VMWARE.HV.UUID}]</key>
+               <key>vmware.hv.cluster.name[{$VMWARE.URL},{HOST.HOST}]</key>
                <delay>1h</delay>
                <history>7d</history>
                <trends>0</trends>
@@ -1145,7 +1131,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: CPU usage in percents</name>
                <type>SIMPLE</type>
-               <key>vmware.hv.cpu.usage.perf[{$VMWARE.URL},{$VMWARE.HV.UUID}]</key>
+               <key>vmware.hv.cpu.usage.perf[{$VMWARE.URL},{HOST.HOST}]</key>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>%</units>
@@ -1161,7 +1147,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: CPU usage</name>
                <type>SIMPLE</type>
-               <key>vmware.hv.cpu.usage[{$VMWARE.URL},{$VMWARE.HV.UUID}]</key>
+               <key>vmware.hv.cpu.usage[{$VMWARE.URL},{HOST.HOST}]</key>
                <history>7d</history>
                <units>Hz</units>
                <username>{$VMWARE.USERNAME}</username>
@@ -1176,7 +1162,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: CPU utilization</name>
                <type>SIMPLE</type>
-               <key>vmware.hv.cpu.utilization[{$VMWARE.URL},{$VMWARE.HV.UUID}]</key>
+               <key>vmware.hv.cpu.utilization[{$VMWARE.URL},{HOST.HOST}]</key>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>%</units>
@@ -1192,7 +1178,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: Datacenter name</name>
                <type>SIMPLE</type>
-               <key>vmware.hv.datacenter.name[{$VMWARE.URL},{$VMWARE.HV.UUID}]</key>
+               <key>vmware.hv.datacenter.name[{$VMWARE.URL},{HOST.HOST}]</key>
                <delay>1h</delay>
                <history>7d</history>
                <trends>0</trends>
@@ -1215,7 +1201,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: Full name</name>
                <type>SIMPLE</type>
-               <key>vmware.hv.fullname[{$VMWARE.URL},{$VMWARE.HV.UUID}]</key>
+               <key>vmware.hv.fullname[{$VMWARE.URL},{HOST.HOST}]</key>
                <delay>1h</delay>
                <history>7d</history>
                <trends>0</trends>
@@ -1238,7 +1224,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: CPU frequency</name>
                <type>SIMPLE</type>
-               <key>vmware.hv.hw.cpu.freq[{$VMWARE.URL},{$VMWARE.HV.UUID}]</key>
+               <key>vmware.hv.hw.cpu.freq[{$VMWARE.URL},{HOST.HOST}]</key>
                <delay>1h</delay>
                <history>7d</history>
                <units>Hz</units>
@@ -1254,7 +1240,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: CPU model</name>
                <type>SIMPLE</type>
-               <key>vmware.hv.hw.cpu.model[{$VMWARE.URL},{$VMWARE.HV.UUID}]</key>
+               <key>vmware.hv.hw.cpu.model[{$VMWARE.URL},{HOST.HOST}]</key>
                <delay>1h</delay>
                <history>7d</history>
                <trends>0</trends>
@@ -1271,7 +1257,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: CPU cores</name>
                <type>SIMPLE</type>
-               <key>vmware.hv.hw.cpu.num[{$VMWARE.URL},{$VMWARE.HV.UUID}]</key>
+               <key>vmware.hv.hw.cpu.num[{$VMWARE.URL},{HOST.HOST}]</key>
                <delay>1h</delay>
                <history>7d</history>
                <username>{$VMWARE.USERNAME}</username>
@@ -1292,7 +1278,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: CPU threads</name>
                <type>SIMPLE</type>
-               <key>vmware.hv.hw.cpu.threads[{$VMWARE.URL},{$VMWARE.HV.UUID}]</key>
+               <key>vmware.hv.hw.cpu.threads[{$VMWARE.URL},{HOST.HOST}]</key>
                <delay>1h</delay>
                <history>7d</history>
                <username>{$VMWARE.USERNAME}</username>
@@ -1307,7 +1293,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: Total memory</name>
                <type>SIMPLE</type>
-               <key>vmware.hv.hw.memory[{$VMWARE.URL},{$VMWARE.HV.UUID}]</key>
+               <key>vmware.hv.hw.memory[{$VMWARE.URL},{HOST.HOST}]</key>
                <delay>1h</delay>
                <history>7d</history>
                <units>B</units>
@@ -1323,7 +1309,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: Model</name>
                <type>SIMPLE</type>
-               <key>vmware.hv.hw.model[{$VMWARE.URL},{$VMWARE.HV.UUID}]</key>
+               <key>vmware.hv.hw.model[{$VMWARE.URL},{HOST.HOST}]</key>
                <delay>1h</delay>
                <history>7d</history>
                <trends>0</trends>
@@ -1340,7 +1326,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: Bios UUID</name>
                <type>SIMPLE</type>
-               <key>vmware.hv.hw.uuid[{$VMWARE.URL},{$VMWARE.HV.UUID}]</key>
+               <key>vmware.hv.hw.uuid[{$VMWARE.URL},{HOST.HOST}]</key>
                <delay>1h</delay>
                <history>7d</history>
                <trends>0</trends>
@@ -1357,7 +1343,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: Vendor</name>
                <type>SIMPLE</type>
-               <key>vmware.hv.hw.vendor[{$VMWARE.URL},{$VMWARE.HV.UUID}]</key>
+               <key>vmware.hv.hw.vendor[{$VMWARE.URL},{HOST.HOST}]</key>
                <delay>1h</delay>
                <history>7d</history>
                <trends>0</trends>
@@ -1374,7 +1360,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: Ballooned memory</name>
                <type>SIMPLE</type>
-               <key>vmware.hv.memory.size.ballooned[{$VMWARE.URL},{$VMWARE.HV.UUID}]</key>
+               <key>vmware.hv.memory.size.ballooned[{$VMWARE.URL},{HOST.HOST}]</key>
                <history>7d</history>
                <units>B</units>
                <username>{$VMWARE.USERNAME}</username>
@@ -1389,7 +1375,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: Used memory</name>
                <type>SIMPLE</type>
-               <key>vmware.hv.memory.used[{$VMWARE.URL},{$VMWARE.HV.UUID}]</key>
+               <key>vmware.hv.memory.used[{$VMWARE.URL},{HOST.HOST}]</key>
                <history>7d</history>
                <units>B</units>
                <username>{$VMWARE.USERNAME}</username>
@@ -1404,7 +1390,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: Number of bytes received</name>
                <type>SIMPLE</type>
-               <key>vmware.hv.network.in[{$VMWARE.URL},{$VMWARE.HV.UUID},bps]</key>
+               <key>vmware.hv.network.in[{$VMWARE.URL},{HOST.HOST},bps]</key>
                <history>7d</history>
                <units>Bps</units>
                <username>{$VMWARE.USERNAME}</username>
@@ -1419,7 +1405,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: Number of bytes transmitted</name>
                <type>SIMPLE</type>
-               <key>vmware.hv.network.out[{$VMWARE.URL},{$VMWARE.HV.UUID},bps]</key>
+               <key>vmware.hv.network.out[{$VMWARE.URL},{HOST.HOST},bps]</key>
                <history>7d</history>
                <units>Bps</units>
                <username>{$VMWARE.USERNAME}</username>
@@ -1434,7 +1420,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: Power usage maximum allowed</name>
                <type>SIMPLE</type>
-               <key>vmware.hv.power[{$VMWARE.URL},{$VMWARE.HV.UUID},max]</key>
+               <key>vmware.hv.power[{$VMWARE.URL},{HOST.HOST},max]</key>
                <history>7d</history>
                <units>!W</units>
                <username>{$VMWARE.USERNAME}</username>
@@ -1455,7 +1441,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: Power usage</name>
                <type>SIMPLE</type>
-               <key>vmware.hv.power[{$VMWARE.URL},{$VMWARE.HV.UUID}]</key>
+               <key>vmware.hv.power[{$VMWARE.URL},{HOST.HOST}]</key>
                <history>7d</history>
                <units>!W</units>
                <username>{$VMWARE.USERNAME}</username>
@@ -1470,7 +1456,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: Health state rollup</name>
                <type>SIMPLE</type>
-               <key>vmware.hv.sensor.health.state[{$VMWARE.URL},{$VMWARE.HV.UUID}]</key>
+               <key>vmware.hv.sensor.health.state[{$VMWARE.URL},{HOST.HOST}]</key>
                <history>7d</history>
                <username>{$VMWARE.USERNAME}</username>
                <password>{$VMWARE.PASSWORD}</password>
@@ -1486,33 +1472,33 @@ Template tooling version used: 0.39</description>
                <triggers>
                   <trigger>
                      <expression>{last()}=3</expression>
-                     <name>VMware: The {$VMWARE.HV.UUID} health is Red</name>
+                     <name>VMware: The {HOST.HOST} health is Red</name>
                      <priority>HIGH</priority>
                      <description>One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.</description>
                      <dependencies>
                         <dependency>
-                           <name>VMware: The {$VMWARE.HV.UUID} health is Red</name>
-                           <expression>{VMware Hypervisor:vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}].last()}=3</expression>
+                           <name>VMware: The {HOST.HOST} health is Red</name>
+                           <expression>{Template VM VMware Hypervisor:vmware.hv.status[{$VMWARE.URL},{HOST.HOST}].last()}=3</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
                   <trigger>
                      <expression>{last()}=2</expression>
-                     <name>VMware: The {$VMWARE.HV.UUID} health is Yellow</name>
+                     <name>VMware: The {HOST.HOST} health is Yellow</name>
                      <priority>AVERAGE</priority>
                      <description>One or more components in the appliance might become overloaded soon.</description>
                      <dependencies>
                         <dependency>
-                           <name>VMware: The {$VMWARE.HV.UUID} health is Red</name>
-                           <expression>{VMware Hypervisor:vmware.hv.sensor.health.state[{$VMWARE.URL},{$VMWARE.HV.UUID}].last()}=3</expression>
+                           <name>VMware: The {HOST.HOST} health is Red</name>
+                           <expression>{Template VM VMware Hypervisor:vmware.hv.sensor.health.state[{$VMWARE.URL},{HOST.HOST}].last()}=3</expression>
                         </dependency>
                         <dependency>
-                           <name>VMware: The {$VMWARE.HV.UUID} health is Red</name>
-                           <expression>{VMware Hypervisor:vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}].last()}=3</expression>
+                           <name>VMware: The {HOST.HOST} health is Red</name>
+                           <expression>{Template VM VMware Hypervisor:vmware.hv.status[{$VMWARE.URL},{HOST.HOST}].last()}=3</expression>
                         </dependency>
                         <dependency>
-                           <name>VMware: The {$VMWARE.HV.UUID} health is Yellow</name>
-                           <expression>{VMware Hypervisor:vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}].last()}=2</expression>
+                           <name>VMware: The {HOST.HOST} health is Yellow</name>
+                           <expression>{Template VM VMware Hypervisor:vmware.hv.status[{$VMWARE.URL},{HOST.HOST}].last()}=2</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -1521,7 +1507,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: Overall status</name>
                <type>SIMPLE</type>
-               <key>vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}]</key>
+               <key>vmware.hv.status[{$VMWARE.URL},{HOST.HOST}]</key>
                <history>7d</history>
                <username>{$VMWARE.USERNAME}</username>
                <password>{$VMWARE.PASSWORD}</password>
@@ -1537,19 +1523,19 @@ Template tooling version used: 0.39</description>
                <triggers>
                   <trigger>
                      <expression>{last()}=3</expression>
-                     <name>VMware: The {$VMWARE.HV.UUID} health is Red</name>
+                     <name>VMware: The {HOST.HOST} health is Red</name>
                      <priority>HIGH</priority>
                      <description>One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.</description>
                   </trigger>
                   <trigger>
                      <expression>{last()}=2</expression>
-                     <name>VMware: The {$VMWARE.HV.UUID} health is Yellow</name>
+                     <name>VMware: The {HOST.HOST} health is Yellow</name>
                      <priority>AVERAGE</priority>
                      <description>One or more components in the appliance might become overloaded soon.</description>
                      <dependencies>
                         <dependency>
-                           <name>VMware: The {$VMWARE.HV.UUID} health is Red</name>
-                           <expression>{VMware Hypervisor:vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}].last()}=3</expression>
+                           <name>VMware: The {HOST.HOST} health is Red</name>
+                           <expression>{Template VM VMware Hypervisor:vmware.hv.status[{$VMWARE.URL},{HOST.HOST}].last()}=3</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -1558,7 +1544,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: Uptime</name>
                <type>SIMPLE</type>
-               <key>vmware.hv.uptime[{$VMWARE.URL},{$VMWARE.HV.UUID}]</key>
+               <key>vmware.hv.uptime[{$VMWARE.URL},{HOST.HOST}]</key>
                <history>7d</history>
                <units>uptime</units>
                <username>{$VMWARE.USERNAME}</username>
@@ -1582,7 +1568,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: Version</name>
                <type>SIMPLE</type>
-               <key>vmware.hv.version[{$VMWARE.URL},{$VMWARE.HV.UUID}]</key>
+               <key>vmware.hv.version[{$VMWARE.URL},{HOST.HOST}]</key>
                <delay>1h</delay>
                <history>7d</history>
                <trends>0</trends>
@@ -1599,7 +1585,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>VMware: Number of guest VMs</name>
                <type>SIMPLE</type>
-               <key>vmware.hv.vm.num[{$VMWARE.URL},{$VMWARE.HV.UUID}]</key>
+               <key>vmware.hv.vm.num[{$VMWARE.URL},{HOST.HOST}]</key>
                <delay>1h</delay>
                <history>7d</history>
                <username>{$VMWARE.USERNAME}</username>
@@ -1616,7 +1602,7 @@ Template tooling version used: 0.39</description>
             <discovery_rule>
                <name>Datastore discovery</name>
                <type>SIMPLE</type>
-               <key>vmware.hv.datastore.discovery[{$VMWARE.URL},{$VMWARE.HV.UUID}]</key>
+               <key>vmware.hv.datastore.discovery[{$VMWARE.URL},{HOST.HOST}]</key>
                <delay>1h</delay>
                <username>{$VMWARE.USERNAME}</username>
                <password>{$VMWARE.PASSWORD}</password>
@@ -1624,7 +1610,7 @@ Template tooling version used: 0.39</description>
                   <item_prototype>
                      <name>VMware: Multipath count for datastore {#DATASTORE}</name>
                      <type>SIMPLE</type>
-                     <key>vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}]</key>
+                     <key>vmware.hv.datastore.multipath[{$VMWARE.URL},{HOST.HOST},{#DATASTORE}]</key>
                      <history>7d</history>
                      <username>{$VMWARE.USERNAME}</username>
                      <password>{$VMWARE.PASSWORD}</password>
@@ -1648,7 +1634,7 @@ Template tooling version used: 0.39</description>
                   <item_prototype>
                      <name>VMware: Average read latency of the datastore {#DATASTORE}</name>
                      <type>SIMPLE</type>
-                     <key>vmware.hv.datastore.read[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},latency]</key>
+                     <key>vmware.hv.datastore.read[{$VMWARE.URL},{HOST.HOST},{#DATASTORE},latency]</key>
                      <history>7d</history>
                      <username>{$VMWARE.USERNAME}</username>
                      <password>{$VMWARE.PASSWORD}</password>
@@ -1662,7 +1648,7 @@ Template tooling version used: 0.39</description>
                   <item_prototype>
                      <name>VMware: Free space on datastore {#DATASTORE} (percentage)</name>
                      <type>SIMPLE</type>
-                     <key>vmware.hv.datastore.size[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},pfree]</key>
+                     <key>vmware.hv.datastore.size[{$VMWARE.URL},{HOST.HOST},{#DATASTORE},pfree]</key>
                      <delay>5m</delay>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
@@ -1679,7 +1665,7 @@ Template tooling version used: 0.39</description>
                   <item_prototype>
                      <name>VMware: Total size of datastore {#DATASTORE}</name>
                      <type>SIMPLE</type>
-                     <key>vmware.hv.datastore.size[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}]</key>
+                     <key>vmware.hv.datastore.size[{$VMWARE.URL},{HOST.HOST},{#DATASTORE}]</key>
                      <delay>5m</delay>
                      <history>7d</history>
                      <units>B</units>
@@ -1695,7 +1681,7 @@ Template tooling version used: 0.39</description>
                   <item_prototype>
                      <name>VMware: Average write latency of the datastore {#DATASTORE}</name>
                      <type>SIMPLE</type>
-                     <key>vmware.hv.datastore.write[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},latency]</key>
+                     <key>vmware.hv.datastore.write[{$VMWARE.URL},{HOST.HOST},{#DATASTORE},latency]</key>
                      <history>7d</history>
                      <username>{$VMWARE.USERNAME}</username>
                      <password>{$VMWARE.PASSWORD}</password>
