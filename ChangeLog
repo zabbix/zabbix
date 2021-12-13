@@ -1,14 +1,29 @@
 Changes for 6.0.0alpha8
 
 New features:
+A.F.....S. [ZBXNEXT-7049] added aggregation options to prometheus pattern preprocessing step, added bulk preprocessing for dependent items (valdis, wiper)
+.......PS. [ZBXNEXT-7100] added new LLD macro HV.NETNAME to vmware.hv.discovery (MVekslers)
+A......... [ZBXNEXT-6470,ZBXNEXT-6867] implemented complete audit logging of templates; added strict validation for template.create, template.update, template.delete, template.massadd, template.massupdate, template.massremove API methods (vmaksimovs)
+A.F....... [ZBXNEXT-6966] added single item widget (ashubin, averza, Ivo, miks, Sasha, vmurzins)
+..F.I..... [ZBXNEXT-7085] extended 'formula' field in 'actions' table from 255 to 1024 characters (akozlovs, rlataria)
 .........T [ZBXNEXT-7031] upgraded Oracle by ODBC template for using config string in items (abiba)
-........S. [ZBXNEXT-2579] added baseline monitoring functions baslinewma,baselinedev (wiper)
-..F....... [ZBXNEXT-7020] added baseline function entry to front-end (jfreibergs)
+..F.....S. [ZBXNEXT-2579,ZBXNEXT-7020] added baseline monitoring functions baslinewma,baselinedev (jfreibergs, wiper)
 A.F.....S. [ZBXNEXT-6250] added option to opt-out of "escalation canceled" messages (miks, ssimonenko)
 ..FG...... [ZBXNEXT-6593] added support of persistent files for restoring log item state after agent restart (Andris)
 ..F....... [ZBXNEXT-7070] transferred host and template mass update template inputs to main tab (jfreibergs)
 
 Bug fixes:
+........S. [ZBX-20232] added HA node table cleanup on startup (wiper)
+.........T [ZBX-20113] fixed items value map for VMware template (abiba)
+.......PS. [ZBX-20341] moved zbx_ipc_service_init_env() to MAIN_ZABBIX_ENTRY (vso, yurii)
+.......PS. [ZBX-20311] returned the value -1 for bucket_percentile() and histogram_quantile() if bucket[+inf] = 0 (MVekslers)
+.......PS. [ZBX-20276] fixed parameter parsing error in bucket_percentile (MVekslers)
+..F....... [ZBX-20278] fixed XSS attack vulnerability in scheduled report configuration form (agriscenko)
+.........T [ZBX-20060] fixed trigger expression for memory monitoring in F5 Big-IP SNMP template (abakaldin)
+.........T [ZBX-20075] fixed trigger expression for certificate monitoring in F5 Big-IP SNMP template (abakaldin)
+.........T [ZBX-19704] fixed item pattern in "Zabbix server health" dashboard (abakaldin)
+.......... [ZBX-20240] added integration tests for trigger state (ssimonenko)
+.........T [ZBX-18389] fixed sql query for 32 and 64 bit xids postgresql versions in postgresql by user parameters template (vkhaliev)
 .........T [ZBX-18474] fixed regexp in macros in Template Module Windows Services (abiba)
 ........S. [ZBX-19651] fixed problem escalation when at least one of the hosts in a trigger expression is not in maintenance (dgoloscapov)
 ...G.....T [ZBX-19897] updated postgresql templates and plugin files (vkhaliev)
@@ -256,10 +271,20 @@ Bug fixes:
 Changes for 5.4.9rc1
 
 New features:
+.......PS. [ZBXNEXT-7100] added new LLD macro HV.NETNAME to vmware.hv.discovery (MVekslers)
 .........T [ZBXNEXT-7031] upgraded Oracle by ODBC template for using config string in items (abiba)
 ..FG...... [ZBXNEXT-6593] added support of persistent files for restoring log item state after agent restart (Andris)
 
 Bug fixes:
+.........T [ZBX-20113] fixed items value map for VMware template (abiba)
+.......PS. [ZBX-20341] moved zbx_ipc_service_init_env() to MAIN_ZABBIX_ENTRY (vso, yurii)
+..F....... [ZBX-20278] fixed XSS attack vulnerability in scheduled report configuration form (agriscenko)
+.........T [ZBX-20060] fixed trigger expression for memory monitoring in F5 Big-IP SNMP template (abakaldin)
+.........T [ZBX-20075] fixed trigger expression for certificate monitoring in F5 Big-IP SNMP template (abakaldin)
+.........T [ZBX-19704] fixed item pattern in "Zabbix server health" dashboard (abakaldin)
+.........T [ZBX-18474] fixed regexp in macros Template Module Windows Services (abiba)
+.......... [ZBX-20240] added integration tests for trigger state (ssimonenko)
+.........T [ZBX-18389] fixed sql query for 32 and 64 bit xids postgresql versions in postgresql by user parameters template (vkhaliev)
 ........S. [ZBX-19651] fixed problem escalation when at least one of the hosts in a trigger expression is not in maintenance (dgoloscapov)
 ...G.....T [ZBX-19897] updated postgresql templates and plugin files (vkhaliev)
 A......... [ZBX-20120] fixed import of several hosts assigned to different proxies (Sasha)
@@ -1406,8 +1431,16 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.19rc1
 
 New features:
+.......PS. [ZBXNEXT-7100] added new LLD macro HV.NETNAME to vmware.hv.discovery (MVekslers)
 
 Bug fixes:
+...G...PS. [ZBX-20236] improved memory consumption in Zabbix proxy trappers by moving configuration sync between database and cache to configuration syncer; improved trappers and listeners memory consumption by freeing received data after it was processed instead of after new data is received (vso)
+.......PS. [ZBX-20341] moved zbx_ipc_service_init_env() to MAIN_ZABBIX_ENTRY (vso, yurii)
+.........T [ZBX-20060] fixed trigger expression for memory monitoring in F5 Big-IP SNMP template (abakaldin)
+.........T [ZBX-20075] fixed trigger expression for certificate monitoring in F5 Big-IP SNMP template (abakaldin)
+.........T [ZBX-19704] fixed item pattern in "Zabbix server health" dashboard (abakaldin)
+.......... [ZBX-20240] added integration tests for trigger state (ssimonenko)
+.........T [ZBX-18389] fixed sql query for 32 and 64 bit xids postgresql versions in postgresql by user parameters template (vkhaliev)
 .........T [ZBX-18474] fixed filters regex in OS Windows template (abiba)
 ........S. [ZBX-19651] fixed problem escalation when at least one of the hosts in a trigger expression is not in maintenance (dgoloscapov)
 ...G.....T [ZBX-19897] updated postgresql templates and plugin files (vkhaliev)

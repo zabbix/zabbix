@@ -148,6 +148,18 @@ class CWidgetHelper {
 	}
 
 	/**
+	 * @param CWidgetFieldTextArea $field
+	 *
+	 * @return CTextBox
+	 */
+	public static function getTextArea($field) {
+		return (new CTextArea($field->getName(), $field->getValue()))
+			->setAriaRequired(self::isAriaRequired($field))
+			->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
+			->setAdaptiveWidth($field->getWidth());
+	}
+
+	/**
 	 * @param CWidgetFieldTextBox $field
 	 *
 	 * @return CTextBox
@@ -235,6 +247,21 @@ class CWidgetHelper {
 			->setLabel($field->getCaption())
 			->onChange($field->getAction())
 		];
+	}
+
+	/**
+	 * @param CWidgetFieldColor $field
+	 * @param bool              $use_default  Tell the Color picker whether to use Default color feature or not.
+	 *
+	 * @return CColor
+	 */
+	public static function getColor($field, $use_default = false) {
+		// appendColorPickerJs(false), because the script responsible for it is in widget.item.form.view.
+		$color_picker = (new CColor($field->getName(), $field->getValue()))->appendColorPickerJs(false);
+		if ($use_default) {
+			$color_picker->enableUseDefault();
+		}
+		return $color_picker;
 	}
 
 	/**
@@ -466,12 +493,18 @@ class CWidgetHelper {
 
 	/**
 	 * @param CWidgetFieldCheckBoxList $field
-	 * @param array                    $list  Option list array.
+	 * @param array                    $list        Option list array.
+	 * @param array                    $class_list  List of additional CSS classes.
 	 *
 	 * @return CList
 	 */
-	public static function getCheckBoxList($field, array $list) {
+	public static function getCheckBoxList($field, array $list, array $class_list = []) {
 		$checkbox_list = (new CList())->addClass(ZBX_STYLE_LIST_CHECK_RADIO);
+		if ($class_list) {
+			foreach ($class_list as $class) {
+				$checkbox_list->addClass($class);
+			}
+		}
 
 		foreach ($list as $key => $label) {
 			$checkbox_list->addItem(
