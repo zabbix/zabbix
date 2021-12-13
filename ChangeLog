@@ -296,6 +296,7 @@ A......... [ZBX-20120] fixed import of several hosts assigned to different proxi
 ........S. [ZBX-19924] fixed trigger expression and calculated items not allowing to specify timeshift that ends in future even if it starts in the past (vso)
 ........S. [ZBX-20238] fixed linking templates with trigger prototypes (wiper)
 ..F....... [ZBX-19973] fixed event list hintbox field validation (miks)
+..F....... [ZBX-20350] fixed SAML login data comparing (rlataria)
 
 --------------------------------------------------------------------------------
 Changes for 5.4.8
