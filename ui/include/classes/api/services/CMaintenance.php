@@ -416,8 +416,6 @@ class CMaintenance extends CApiService {
 	/**
 	 * Check for unique maintenance names.
 	 *
-	 * @static
-	 *
 	 * @param array      $maintenances
 	 * @param array|null $db_maintenances
 	 *
@@ -441,12 +439,14 @@ class CMaintenance extends CApiService {
 			return;
 		}
 
-		$duplicate = DBfetch(DBselect('SELECT m.name FROM maintenances m WHERE '.dbConditionString('m.name', $names), 1));
+		$duplicates = DB::select('maintenances', [
+			'output' => ['name'],
+			'filter' => ['name' => $names],
+			'limit' => 1
+		]);
 
-		if ($duplicate) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Maintenance "%1$s" already exists.', $duplicate['name'])
-			);
+		if ($duplicates) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Maintenance "%1$s" already exists.', $duplicates[0]['name']));
 		}
 	}
 
