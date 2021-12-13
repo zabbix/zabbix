@@ -218,7 +218,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 					'numeric' => '1',
 					'writeonly' => '1'
 				]).
-					',getOnlyHostParam()), null, this);'
+					',view.getOnlyHostParam()), null, this);'
 			)
 			->setEnabled(!$readonly);
 
@@ -305,7 +305,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 					'numeric' => '1',
 					'writeonly' => '1'
 				]).
-					',getOnlyHostParam()), null, this);'
+					',view.getOnlyHostParam()), null, this);'
 			)
 			->setEnabled(!$readonly);
 
@@ -422,7 +422,7 @@ $items_table->addRow(
 				new CHorList([
 					(new CButton('add_item', _('Add')))
 						->onClick('return PopUp("popup.generic",jQuery.extend('.
-							json_encode($popup_options_add).',getOnlyHostParam()), null, this);'
+							json_encode($popup_options_add).',view.getOnlyHostParam()), null, this);'
 						)
 						->addClass(ZBX_STYLE_BTN_LINK),
 					$data['parent_discoveryid']
@@ -436,28 +436,6 @@ $items_table->addRow(
 			))->setColSpan(8)
 	))->setId('itemButtonsRow')
 );
-
-foreach ($this->data['items'] as $n => $item) {
-	$name = $item['host'].NAME_DELIMITER.$item['name_expanded'];
-
-	if (zbx_empty($item['drawtype'])) {
-		$item['drawtype'] = 0;
-	}
-
-	if (zbx_empty($item['yaxisside'])) {
-		$item['yaxisside'] = 0;
-	}
-
-	if (!array_key_exists('gitemid', $item)) {
-		$item['gitemid'] = '';
-	}
-
-	insert_js('loadItem('.$n.', '.json_encode($item['gitemid']).', '.$item['itemid'].', '.
-		json_encode($name).', '.$item['type'].', '.$item['calc_fnc'].', '.$item['drawtype'].', '.
-		$item['yaxisside'].', \''.$item['color'].'\', '.$item['flags'].');',
-		true
-	);
-}
 
 $graphFormList->addRow(
 	(new CLabel(_('Items'), $items_table->getId()))->setAsteriskMark(),
@@ -534,3 +512,21 @@ $graphForm->addItem($graphTab);
 $widget->addItem($graphForm);
 
 $widget->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'form_name' => $graphForm->getName(),
+		'theme_colors' => explode(',', getUserGraphTheme()['colorpalette']),
+		'graphs' => [
+			'graphtype' =>  $data['graphtype'],
+			'readonly' => $readonly,
+			'hostid' => $data['hostid'],
+			'is_template' => $data['is_template'],
+			'normal_only' => $data['normal_only'],
+			'parent_discoveryid' => $data['parent_discoveryid']
+		],
+		'items' => $data['items']
+	]).');
+'))
+	->setOnDocumentReady()
+	->show();
