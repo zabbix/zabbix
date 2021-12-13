@@ -1,4 +1,4 @@
-Changes for 6.0.0alpha8
+Changes for 6.0.0beta1
 
 New features:
 .........T [ZBXNEXT-7112] added new fields in PROMETHEUS_PATTERN preprocessing in templates Etcd, Vault, Linux (mchudinov)
@@ -12,6 +12,7 @@ A.F....... [ZBXNEXT-6966] added single item widget (ashubin, averza, Ivo, miks, 
 A.F.....S. [ZBXNEXT-6250] added option to opt-out of "escalation canceled" messages (miks, ssimonenko)
 ..FG...... [ZBXNEXT-6593] added support of persistent files for restoring log item state after agent restart (Andris)
 ..F....... [ZBXNEXT-7070] transferred host and template mass update template inputs to main tab (jfreibergs)
+..F....... [ZBXNEXT-7018] transferred template and group input to main tabs (ashubin, jfreibergs)
 
 Bug fixes:
 A.F....... [ZBX-20270] fixed XSS vulnerability, max zoom level validation, inventory field processing and initial view hintbox text in geomap widget (miks)
