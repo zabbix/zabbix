@@ -269,24 +269,7 @@ class CMaintenance extends CApiService {
 
 		$this->validateCreate($maintenances);
 
-		$ins_maintenances = [];
-
-		foreach ($maintenances as &$maintenance) {
-			$maintenance['active_since'] -= $maintenance['active_since'] % SEC_PER_MIN;
-			$maintenance['active_till'] -= $maintenance['active_till'] % SEC_PER_MIN;
-
-			foreach ($maintenance['timeperiods'] as &$timeperiod) {
-				if ($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME) {
-					$timeperiod['start_date'] -= $timeperiod['start_date'] % SEC_PER_MIN;
-				}
-			}
-			unset($timeperiod);
-
-			$ins_maintenances[] = $maintenance;
-		}
-		unset($maintenance);
-
-		$maintenanceids = DB::insert('maintenances', $ins_maintenances);
+		$maintenanceids = DB::insert('maintenances', $maintenances);
 
 		foreach ($maintenances as $index => &$maintenance) {
 			$maintenance['maintenanceid'] = $maintenanceids[$index];
@@ -393,12 +376,23 @@ class CMaintenance extends CApiService {
 		}
 		unset($maintenance);
 
-		foreach ($maintenances as $maintenance) {
+		foreach ($maintenances as &$maintenance) {
+			$maintenance['active_since'] -= $maintenance['active_since'] % SEC_PER_MIN;
+			$maintenance['active_till'] -= $maintenance['active_till'] % SEC_PER_MIN;
+
 			if ((!array_key_exists('groups', $maintenance) || !$maintenance['groups'])
 					&& (!array_key_exists('hosts', $maintenance) || !$maintenance['hosts'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one host group or host must be selected.'));
 			}
+
+			foreach ($maintenance['timeperiods'] as &$timeperiod) {
+				if ($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME) {
+					$timeperiod['start_date'] -= $timeperiod['start_date'] % SEC_PER_MIN;
+				}
+			}
+			unset($timeperiod);
 		}
+		unset($maintenance);
 
 		self::checkDuplicates($maintenances);
 		self::checkGroups($maintenances);
@@ -420,6 +414,7 @@ class CMaintenance extends CApiService {
 		$this->validateUpdate($maintenances, $db_maintenances);
 
 		$upd_maintenances = [];
+
 		foreach ($maintenances as $maintenance) {
 			$upd_maintenance = DB::getUpdatedValues('maintenances', $maintenance,
 				$db_maintenances[$maintenance['maintenanceid']]
@@ -568,6 +563,9 @@ class CMaintenance extends CApiService {
 		self::addAffectedObjects($maintenances, $db_maintenances);
 
 		foreach ($maintenances as &$maintenance) {
+			$maintenance['active_since'] -= $maintenance['active_since'] % SEC_PER_MIN;
+			$maintenance['active_till'] -= $maintenance['active_till'] % SEC_PER_MIN;
+
 			if ($maintenance['maintenance_type'] != $db_maintenances[$maintenance['maintenanceid']]['maintenance_type']
 					&& $maintenance['maintenance_type'] == MAINTENANCE_TYPE_NODATA) {
 				$maintenance['tags_evaltype'] = DB::getDefault('maintenances', 'tags_evaltype');
@@ -585,6 +583,15 @@ class CMaintenance extends CApiService {
 				if (!$groups && !$hosts) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one host group or host must be selected.'));
 				}
+			}
+
+			if (array_key_exists('timeperiods', $maintenance)) {
+				foreach ($maintenance['timeperiods'] as &$timeperiod) {
+					if ($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME) {
+						$timeperiod['start_date'] -= $timeperiod['start_date'] % SEC_PER_MIN;
+					}
+				}
+				unset($timeperiod);
 			}
 		}
 		unset($maintenance);
