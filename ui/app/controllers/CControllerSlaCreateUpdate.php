@@ -141,7 +141,6 @@ class CControllerSlaCreateUpdate extends CController {
 			$sla['service_tags'][] = $service_tag;
 		}
 
-
 		$result = $this->getAction() === 'sla.update' ? API::Sla()->update($sla) : API::Sla()->create($sla);
 
 		if ($result) {
@@ -167,7 +166,7 @@ class CControllerSlaCreateUpdate extends CController {
 	 * @return int
 	 */
 	protected static function validateEffectiveDate(string $effective_date, string $field_name): int {
-		$datetime = DateTime::createFromFormat(DATE_FORMAT, $effective_date, new DateTimeZone('UTC'));
+		$datetime = DateTime::createFromFormat('!'.DATE_FORMAT, $effective_date, new DateTimeZone('UTC'));
 
 		if ($datetime === false || $datetime->getTimestamp() > ZBX_MAX_DATE) {
 			throw new InvalidArgumentException(
