@@ -46,7 +46,7 @@ trait TableTrait {
 		return $data;
 	}
 
-		/**
+	/**
 	 * Check if values in table rows match data from data provider.
 	 *
 	 * @param array   $data        data array to be match with result in table
