@@ -124,7 +124,7 @@ $weekdays = [];
 foreach ([1, 4, 6, 2, 5, 7, 3] as $day) {
 	$value = 1 << ($day - 1);
 	$weekdays[] = [
-		'name' => getDayOfWeekCaption($day),
+		'label' => getDayOfWeekCaption($day),
 		'value' => $value,
 		'checked' => (bool) ($value & $data['weekdays'])
 	];

@@ -42,6 +42,16 @@ class CCheckBoxList extends CList {
 	protected $uniqid = '';
 
 	/**
+	 * @var bool $vertical
+	 */
+	protected $vertical = false;
+
+	/**
+	 * @var int $columns
+	 */
+	protected $columns;
+
+	/**
 	 * @param string $name
 	 */
 	public function __construct($name) {
@@ -89,7 +99,7 @@ class CCheckBoxList extends CList {
 
 		foreach ($values as $value) {
 			$this->values[] = $value + [
-				'name' => '',
+				'label' => '',
 				'value' => null,
 				'checked' => false
 			];
@@ -120,6 +130,68 @@ class CCheckBoxList extends CList {
 		return $this;
 	}
 
+	/**
+	 * Display checkboxes in vertical order.
+	 *
+	 * @param bool $vertical
+	 *
+	 * @return CCheckBoxList
+	 */
+	public function setVertical(bool $vertical): CCheckBoxList {
+		$this->vertical = $vertical;
+
+		return $this;
+	}
+
+	/**
+	 * Set number of columns.
+	 *
+	 * @param int $columns
+	 *
+	 * @return CCheckBoxList
+	 */
+	public function setColumns(int $columns): CCheckBoxList {
+		$this->columns = $columns;
+		$classes = [
+			1 => null,
+			2 => ZBX_STYLE_COLUMNS_2,
+			3 => ZBX_STYLE_COLUMNS_3
+		];
+		if (array_key_exists($columns, $classes)) {
+			$this->addClass(ZBX_STYLE_COLUMNS);
+			$this->addClass($classes[$columns]);
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Change order of values for them to appear vertically aligned.
+	 *
+	 * @return array
+	 */
+	protected function orderValuesVertical(): array {
+		$ordered = [];
+		$values_count = count($this->values);
+		$max_rows = (int) ceil($values_count / $this->columns);
+		$values_last_row = $values_count % $this->columns;
+		if ($values_count < $this->columns) {
+			$values_last_row = 0;
+		}
+
+		for ($row = 0; $row < $max_rows; $row++) {
+			for ($i = 0; $i < $values_count; $i += $max_rows) {
+				if ($values_last_row !== 0 && $i >= $values_count - ($this->columns - $values_last_row)) {
+					$i -= $values_last_row;
+				}
+				if (array_key_exists($row + $i, $this->values)) {
+					$ordered[$row + $i] = $this->values[$row + $i];
+				}
+			}
+		}
+		return $ordered;
+	}
+
 	/*
 	 * @param bool $destroy
 	 *
@@ -128,9 +200,15 @@ class CCheckBoxList extends CList {
 	public function toString($destroy = true) {
 		$uniqid = ($this->uniqid === '') ? '' : '_'.$this->uniqid;
 
+		if ($this->vertical) {
+			$this->values = $this->orderValuesVertical();
+		}
+
 		foreach ($this->values as $value) {
-			$checkbox = (new CCheckBox($this->name.'['.$value['value'].']', $value['value']))
-				->setLabel($value['name'])
+			$name = array_key_exists('name', $value) ? $value['name'] : $this->name.'['.$value['value'].']';
+
+			$checkbox = (new CCheckBox($name, $value['value']))
+				->setLabel($value['label'])
 				->setChecked($value['checked'])
 				->setEnabled($this->enabled);
 			$checkbox->setId($checkbox->getId().$uniqid);
