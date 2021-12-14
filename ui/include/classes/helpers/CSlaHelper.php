@@ -25,40 +25,15 @@ final class CSlaHelper {
 	public const SLA_STATUS_ENABLED		= 0;
 	public const SLA_STATUS_DISABLED	= 1;
 
-
-
-	public const SCHEDULE_MODE_NONSTOP = 1;
-
-	public const TAB_INDICATOR_SLA_DOWNTIMES = 'sla-downtimes';
-
-	public const OUTPUT_FIELDS = [
-		'name',
-		'description',
-		'effective_date',
-		'status',
-		'slo',
-		'period',
-		'timezone'
-	];
-
-	public static function periodToStr(int $period): ?string {
-		static $periods;
-
-		if ($periods === null) {
-			$periods = self::periods();
-		}
-
-		return array_key_exists($period, $periods)
-			? $periods[$period]
-			: null;
-	}
+	public const SCHEDULE_MODE_24X7		= 0;
+	public const SCHEDULE_MODE_CUSTOM 	= 1;
 
 	public static function scheduleModeToStr(int $schedule_mode): ?string {
 		static $schedule_modes;
 
 		if ($schedule_modes === null) {
 			$schedule_modes = [
-				self::SCHEDULE_MODE_NONSTOP => _('24x7'),
+				self::SCHEDULE_MODE_24X7 => _('24x7'),
 				self::SCHEDULE_MODE_CUSTOM => _('Custom')
 			];
 		}
@@ -68,14 +43,20 @@ final class CSlaHelper {
 			: null;
 	}
 
-	public static function periods(): array {
-		return [
-			ZBX_SLA_PERIOD_DAILY => _('Daily'),
-			ZBX_SLA_PERIOD_WEEKLY=> _('Weekly'),
-			ZBX_SLA_PERIOD_MONTHLY => _('Monthly'),
-			ZBX_SLA_PERIOD_QUARTERLY => _('Quarterly'),
-			ZBX_SLA_PERIOD_ANNUALLY => _('Annually')
-		];
+	public static function getPeriodNames(): array {
+		static $periods;
+
+		if ($periods === null) {
+			$periods = [
+				ZBX_SLA_PERIOD_DAILY => _('Daily'),
+				ZBX_SLA_PERIOD_WEEKLY=> _('Weekly'),
+				ZBX_SLA_PERIOD_MONTHLY => _('Monthly'),
+				ZBX_SLA_PERIOD_QUARTERLY => _('Quarterly'),
+				ZBX_SLA_PERIOD_ANNUALLY => _('Annually')
+			];
+		}
+
+		return $periods;
 	}
 
 	/**
@@ -115,11 +96,6 @@ final class CSlaHelper {
 
 		return $schedule;
 	}
-
-
-
-	public const SCHEDULE_MODE_24X7 = 0;
-	public const SCHEDULE_MODE_CUSTOM = 1;
 
 	/**
 	 * @param int    $period
@@ -222,5 +198,34 @@ final class CSlaHelper {
 	public static function getErrorBudgetTag(int $error_budget): CTag {
 		return (new CSpan(convertUnitsS($error_budget, true)))
 			->addClass($error_budget >= 0 ? ZBX_STYLE_GREY : ZBX_STYLE_RED);
+	}
+
+	/**
+	 * @param array excluded_downtime  Record.
+	 * @param string timezone          SLA timezone.
+	 *
+	 * @return CTag
+	 */
+	public static function getExcludedDowntimeTag(array $excluded_downtime, string $timezone): CTag {
+		$tag = new CDiv();
+
+		try {
+			$datetime_from = (new DateTime('@'.$excluded_downtime['period_from']))
+				->setTimezone(new DateTimeZone($timezone));
+			$datetime_to = (new DateTime('@'.($excluded_downtime['period_to'] - 1)))
+				->setTimezone(new DateTimeZone($timezone));
+		}
+		catch (Exception $e) {
+			return $tag;
+		}
+
+		$tag
+			->addItem($datetime_from->format(DATE_TIME_FORMAT))
+			->addItem(' ')
+			->addItem($excluded_downtime['name'])
+			->addItem(': ')
+			->addItem(convertUnitsS($datetime_to->getTimestamp() - $datetime_from->getTimestamp(), true));
+
+		return $tag;
 	}
 }
