@@ -81,7 +81,7 @@ if (array_key_exists('problems', $data)) {
 	$last_clock = 0;
 
 	if ($data['problems'] && $data['show_tags'] != PROBLEMS_SHOW_TAGS_NONE) {
-		$tags = makeTags($data['problems'], true, 'eventid', $data['show_tags'], $data['filter_tags'],
+		$tags = makeTags($data['problems'], true, 'eventid', $data['show_tags'], $data['filter_tags'], null,
 			$data['tag_name_format'], $data['tag_priority']
 		);
 	}

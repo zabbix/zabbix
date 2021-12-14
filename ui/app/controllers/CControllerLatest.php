@@ -284,13 +284,53 @@ abstract class CControllerLatest extends CController {
 	}
 
 	/**
-	 * Find what subfilters are available based on items selected using the main filter.
+	 * Prepare subfilter fields from filter.
 	 *
 	 * @param array  $filter
 	 * @param array  $filter['subfilter_hostids']
 	 * @param array  $filter['subfilter_tagnames']
 	 * @param array  $filter['subfilter_tags']
 	 * @param array  $filter['subfilter_data']
+	 *
+	 * @return array
+	 */
+	protected static function getSubfilterFields(array $filter): array {
+		$subfilters = [];
+
+		foreach (['subfilter_hostids', 'subfilter_tagnames', 'subfilter_tags', 'subfilter_data'] as $subfilter_key) {
+			if (!array_key_exists($subfilter_key, $filter)) {
+				continue;
+			}
+
+			if ($subfilter_key === 'subfilter_tags') {
+				$tmp_tags = [];
+				foreach ($filter[$subfilter_key] as $tag => $tag_values) {
+					$tmp_tags[urldecode($tag)] = array_flip($tag_values);
+				}
+				$subfilters[$subfilter_key] = $tmp_tags;
+				unset($tmp_tags);
+			}
+			else {
+				$subfilters[$subfilter_key] = array_flip($filter[$subfilter_key]);
+			}
+		}
+
+		return CArrayHelper::renameKeys($subfilters, [
+			'subfilter_hostids' => 'hostids',
+			'subfilter_tagnames' => 'tagnames',
+			'subfilter_tags' => 'tags',
+			'subfilter_data' => 'data'
+		]);
+	}
+
+	/**
+	 * Find what subfilters are available based on items selected using the main filter.
+	 *
+	 * @param array  $subfilters
+	 * @param array  $subfilters['subfilter_hostids']
+	 * @param array  $subfilters['subfilter_tagnames']
+	 * @param array  $subfilters['subfilter_tags']
+	 * @param array  $subfilters['subfilter_data']
 	 * @param array  $prepared_data
 	 * @param array  $prepared_data['hosts']
 	 * @param string $prepared_data['hosts'][]['name']
@@ -299,21 +339,9 @@ abstract class CControllerLatest extends CController {
 	 *
 	 * @return array
 	 */
-	protected static function getSubfilters(array $filter, array &$prepared_data): array {
-		$tags = [];
-		foreach ($filter['subfilter_tags'] as $tag => $tag_values) {
-			$tags[urldecode($tag)] = array_flip($tag_values);
-		}
-
-		$subfilter = [
-			'hostids' => array_flip($filter['subfilter_hostids']),
-			'tagnames' => array_flip($filter['subfilter_tagnames']),
-			'tags' => $tags,
-			'data' => array_flip($filter['subfilter_data'])
-		];
-
-		$subfilter_options = self::getSubfilterOptions($prepared_data, $subfilter);
-		$prepared_data['items'] = self::getItemMatchings($prepared_data['items'], $subfilter);
+	protected static function getSubfilters(array $subfilters, array &$prepared_data): array {
+		$subfilter_options = self::getSubfilterOptions($prepared_data, $subfilters);
+		$prepared_data['items'] = self::getItemMatchings($prepared_data['items'], $subfilters);
 
 		/*
 		 * Calculate how many additional items would match the filtering results after selecting each of provided host

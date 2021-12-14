@@ -4908,6 +4908,12 @@ a.link-action {
   max-width: 133px;
   vertical-align: middle;
   border-radius: 2px; }
+  .tag a.link-action {
+    color: inherit !important;
+    border-bottom: none; }
+    .tag a.link-action:hover {
+      text-decoration: underline;
+      border-bottom: none; }
   .tag:last-child {
     margin: 0; }
   .tag.green-bg {

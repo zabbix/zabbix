@@ -4109,6 +4109,16 @@ a.link-action {
 	@extend %overflow-ellipsis;
 	border-radius: 2px;
 
+	a.link-action {
+		color: inherit !important;
+		border-bottom: none;
+
+		&:hover {
+			text-decoration: underline;
+			border-bottom: none;
+		}
+	}
+
 	&:last-child {
 		margin: 0;
 	}

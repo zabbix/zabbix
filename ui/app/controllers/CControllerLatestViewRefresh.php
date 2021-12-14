@@ -51,10 +51,9 @@ class CControllerLatestViewRefresh extends CControllerLatestView {
 			// make data
 			$prepared_data = $this->prepareData($filter, $filter['sort'], $filter['sortorder']);
 
-			$subfilter = array_intersect_key($filter,
-				array_flip(['subfilter_hostids', 'subfilter_tagnames', 'subfilter_tags', 'subfilter_data'])
-			);
-			$subfilters = self::getSubfilters($subfilter, $prepared_data);
+			// Prepare subfilter data.
+			$subfilters_fields = self::getSubfilterFields($filter);
+			$subfilters = self::getSubfilters($subfilters_fields, $prepared_data);
 			$prepared_data['items'] = self::applySubfilters($prepared_data['items']);
 
 			$page = $this->getInput('page', 1);
@@ -77,7 +76,9 @@ class CControllerLatestViewRefresh extends CControllerLatestView {
 						'hk_history' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY),
 						'hk_history_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)
 					],
-					'tags' => makeTags($prepared_data['items'], true, 'itemid', ZBX_TAG_COUNT_DEFAULT, $filter['tags'])
+					'tags' => makeTags($prepared_data['items'], true, 'itemid', ZBX_TAG_COUNT_DEFAULT, $filter['tags'],
+						array_key_exists('tags', $subfilters_fields) ? $subfilters_fields['tags'] : []
+					)
 				] + $prepared_data,
 				'subfilters' => $subfilters
 			];

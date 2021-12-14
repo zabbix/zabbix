@@ -898,7 +898,7 @@ class CScreenProblem extends CScreenBase {
 
 			if ($this->data['filter']['show_tags']) {
 				$tags = makeTags($data['problems'], true, 'eventid', $this->data['filter']['show_tags'],
-					array_key_exists('tags', $this->data['filter']) ? $this->data['filter']['tags'] : [],
+					array_key_exists('tags', $this->data['filter']) ? $this->data['filter']['tags'] : [], null,
 					$this->data['filter']['tag_name_format'], $this->data['filter']['tag_priority']
 				);
 			}

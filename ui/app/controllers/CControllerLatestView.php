@@ -140,10 +140,9 @@ class CControllerLatestView extends CControllerLatest {
 		$sort_order = $this->getInput('sortorder', ZBX_SORT_UP);
 		$prepared_data = $this->prepareData($filter, $sort_field, $sort_order);
 
-		$subfilter = array_intersect_key($filter,
-			array_flip(['subfilter_hostids', 'subfilter_tagnames', 'subfilter_tags', 'subfilter_data'])
-		);
-		$subfilters = self::getSubfilters($subfilter, $prepared_data);
+		// Prepare subfilter data.
+		$subfilters_fields = self::getSubfilterFields($filter);
+		$subfilters = self::getSubfilters($subfilters_fields, $prepared_data);
 		$prepared_data['items'] = self::applySubfilters($prepared_data['items']);
 
 		$view_url = (new CUrl('zabbix.php'))->setArgument('action', 'latest.view');
@@ -190,7 +189,9 @@ class CControllerLatestView extends CControllerLatest {
 				'hk_history' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY),
 				'hk_history_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)
 			],
-			'tags' => makeTags($prepared_data['items'], true, 'itemid', ZBX_TAG_COUNT_DEFAULT, $filter['tags']),
+			'tags' => makeTags($prepared_data['items'], true, 'itemid', ZBX_TAG_COUNT_DEFAULT, $filter['tags'],
+				array_key_exists('tags', $subfilters_fields) ? $subfilters_fields['tags'] : []
+			),
 			'subfilters' => $subfilters
 		] + $prepared_data;
 
