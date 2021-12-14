@@ -76,14 +76,14 @@ $filter->addFilterTab(_('Filter'), [
 			new CFormField(
 				(new CDateSelector('filter_period_from', $data['filter']['period_from']))
 					->setDateFormat(DATE_FORMAT)
-					->setPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
+					->setPlaceholder(DATE_FORMAT_PLACEHOLDER)
 					->setAriaRequired()
 			),
 			new CLabel(_('To'), 'filter_period_to'),
 			new CFormField(
 				(new CDateSelector('filter_period_to', $data['filter']['period_to']))
 					->setDateFormat(DATE_FORMAT)
-					->setPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
+					->setPlaceholder(DATE_FORMAT_PLACEHOLDER)
 					->setAriaRequired()
 			)
 		])
@@ -101,7 +101,7 @@ if (!$data['services']) {
 	}
 }
 elseif (array_key_exists('sla', $data)) {
-	if (count($data['services']) != 1) {
+	if (count($data['services']) > 1) {
 		$slareport_list = (new CTableInfo());
 		$header = [
 			make_sorting_header(_('Service'), 'name', $data['sort'], $data['sortorder'], $data['filter_url'])
@@ -121,8 +121,9 @@ elseif (array_key_exists('sla', $data)) {
 		$slareport_list->setHeader($header);
 
 		foreach ($data['services'] as $serviceid => $service) {
-			if ($data['can_edit']) {
-				$name_element = (new CLink(($service['name']),
+			if ($data['can_manage_sla']) {
+				$name_element = (new CLink(
+					$service['name'],
 					$data['service_curl']->setArgument('filter_serviceid', $serviceid)
 				));
 			}

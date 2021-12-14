@@ -31,6 +31,11 @@ class CControllerSlaReportList extends CController {
 		$this->disableSIDValidation();
 	}
 
+	/**
+	 * @throws InvalidArgumentException
+	 *
+	 * @return bool
+	 */
 	protected function checkInput(): bool {
 		$fields = [
 			'filter_slaid' =>		'db sla.slaid',
@@ -45,6 +50,18 @@ class CControllerSlaReportList extends CController {
 		];
 
 		$ret = $this->validateInput($fields);
+
+		if ($ret && !$this->hasInput('filter_rst') && $this->hasInput('filter_serviceid')) {
+			$fields = [
+				'filter_slaid' =>	'required'
+			];
+			$validator = new CNewValidator(array_intersect_key($this->getInputAll(), $fields), $fields);
+			$ret = !$validator->isErrorFatal() && !$validator->isError();
+
+			if (!$ret) {
+				throw new InvalidArgumentException(implode(' ', $validator->getAllErrors()));
+			}
+		}
 
 		if (!$ret) {
 			$this->setResponse(
@@ -67,8 +84,23 @@ class CControllerSlaReportList extends CController {
 			return false;
 		}
 
-		$slaid = CProfile::get('web.slareport.filter_slaid', $this->getInput('filter_slaid', ''));
-		if ($slaid !== '') {
+		if ($this->hasInput('filter_rst')) {
+			return true;
+		}
+
+		$filter = [
+			'slaid' => $this->hasInput('filter_slaid'),
+			'serviceid' => $this->hasInput('filter_serviceid'),
+			'period_from' => $this->hasInput('filter_period_from'),
+			'period_to' => $this->hasInput('filter_period_to')
+		];
+		$filter_submitted = array_filter($filter);
+
+		$slaid = $filter_submitted
+			? ($this->hasInput('filter_slaid') ? $this->getInput('filter_slaid') : null)
+			: CProfile::get('web.slareport.filter_slaid');
+
+		if ($slaid !== null) {
 			$this->sla = API::Sla()->get([
 				'output' => ['slaid', 'name', 'slo', 'period', 'timezone'],
 				'slaids' => $slaid
@@ -84,8 +116,15 @@ class CControllerSlaReportList extends CController {
 			$this->sla['period'] = (int) $this->sla['period'];
 		}
 
-		$serviceid = CProfile::get('web.slareport.filter_serviceid', $this->getInput('filter_serviceid', ''));
-		if ($this->hasInput('filter_serviceid')) {
+		$serviceid = $filter_submitted
+			? ($this->hasInput('filter_serviceid') ? $this->getInput('filter_serviceid') : null)
+			: CProfile::get('web.slareport.filter_serviceid');
+
+		if ($serviceid !== null) {
+			if ($this->sla === null) {
+				return false;
+			}
+
 			$this->service = API::Service()->get([
 				'output' => ['serviceid', 'name'],
 				'serviceids' => $serviceid
@@ -122,6 +161,10 @@ class CControllerSlaReportList extends CController {
 			CProfile::update('web.slareport.filter_period_to', $this->getInput('filter_period_to', ''),
 				PROFILE_TYPE_STR
 			);
+
+			if ($this->getInput('filter_slaid', '') === '') {
+				CProfile::delete('web.slareport.filter_serviceid');
+			}
 		}
 		elseif ($this->hasInput('filter_rst')) {
 			CProfile::delete('web.slareport.filter_slaid');
@@ -134,31 +177,48 @@ class CControllerSlaReportList extends CController {
 		}
 
 		$filter = [
-			'slaid' => CProfile::get('web.slareport.filter_slaid', $this->getInput('filter_slaid', '')),
-			'serviceid' => CProfile::get('web.slareport.filter_serviceid', $this->getInput('filter_serviceid', '')),
-			'period_from' => CProfile::get('web.slareport.filter_period_from', $this->getInput('period_from', '')),
-			'period_to' => CProfile::get('web.slareport.filter_period_to', $this->getInput('period_to', '')),
+			'slaid' => $this->getInput('filter_slaid', ''),
+			'serviceid' => $this->getInput('filter_serviceid', ''),
+			'period_from' => $this->getInput('filter_period_from', ''),
+			'period_to' => $this->getInput('filter_period_to', '')
 		];
-
+		$filter_submitted = [];
 		$paging_curl = (new CUrl('zabbix.php'))->setArgument('action', 'slareport.list');
 		$reset_curl = (clone $paging_curl)->setArgument('filter_rst', 1);
-		$filter_arguments = array_filter($filter);
 
-		foreach ($filter_arguments as $key => $value) {
-			$paging_curl->setArgument('filter_'.$key, $value);
+		if (!$this->hasInput('filter_rst')) {
+			$filter_submitted = array_filter($filter);
+
+			if (!$filter_submitted) {
+				$filter = [
+					'slaid' => CProfile::get('web.slareport.filter_slaid', ''),
+					'serviceid' => CProfile::get('web.slareport.filter_serviceid', ''),
+					'period_from' => CProfile::get('web.slareport.filter_period_from', ''),
+					'period_to' => CProfile::get('web.slareport.filter_period_to', '')
+				];
+
+				$filter_submitted = array_filter($filter);
+			}
+
+			foreach ($filter_submitted as $key => $value) {
+				$paging_curl->setArgument('filter_'.$key, $value);
+			}
 		}
 
 		$data = [
-			'can_edit' => CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_SLA),
+			'can_manage_sla' => CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_SLA),
 			'filter' => $filter,
 			'sort' => $sort_field,
 			'sortorder' => $sort_order,
 			'active_tab' => CProfile::get('web.slareport.filter.active', 1),
 			'filter_url' => $paging_curl->getUrl(),
 			'reset_curl' => $reset_curl,
-			'ms_sla' => $this->sla !== null ? [CArrayHelper::renameKeys($this->sla, ['slaid' => 'id'])] : null,
-			'ms_service' => $this->service !== null ?
-				[CArrayHelper::renameKeys($this->service, ['serviceid' => 'id'])] : null,
+			'ms_sla' => $this->sla !== null
+				? [CArrayHelper::renameKeys($this->sla, ['slaid' => 'id'])]
+				: null,
+			'ms_service' => $this->service !== null
+				? [CArrayHelper::renameKeys($this->service, ['serviceid' => 'id'])]
+				: null,
 			'periods' => null,
 			'paging' => '',
 			'sla' => $this->sla,
@@ -167,7 +227,6 @@ class CControllerSlaReportList extends CController {
 		$services = [];
 
 		if ($this->sla != null) {
-			$data['sla'] = $this->sla;
 			$data['service_curl'] = (new CUrl('zabbix.php'))
 				->setArgument('action', 'slareport.list')
 				->setArgument('filter_slaid', $this->sla['slaid']);

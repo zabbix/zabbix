@@ -127,11 +127,11 @@ class CControllerSlaList extends CController {
 			'tags' => []
 		];
 
-		foreach (CProfile::getArray('web.sla.tags.tag', []) as $i => $tag) {
+		foreach (CProfile::getArray('web.sla.tags.tag', []) as $key => $tag) {
 			$filter['tags'][] = [
 				'tag' => $tag,
-				'value' => CProfile::get('web.sla.tags.value', null, $i),
-				'operator' => CProfile::get('web.sla.tags.operator', null, $i)
+				'value' => CProfile::get('web.sla.tags.value', null, $key),
+				'operator' => CProfile::get('web.sla.tags.operator', null, $key)
 			];
 		}
 
@@ -141,13 +141,12 @@ class CControllerSlaList extends CController {
 		$reset_curl = (clone $paging_curl)->setArgument('filter_rst', 1);
 		$page_argument = $this->hasInput('page') ? $this->getInput('page') : null;
 
-		if ($this->hasInput('filter_set')) {
+		if (!$this->hasInput('filter_rst')) {
 			$paging_curl
 				->setArgument('filter_name', $filter['name'])
 				->setArgument('filter_status', $filter['status'])
 				->setArgument('filter_evaltype', $filter['evaltype'])
-				->setArgument('filter_tags', $filter['tags'])
-				->setArgument('filter_set', 1);
+				->setArgument('filter_tags', $filter['tags']);
 		}
 
 		$data = [

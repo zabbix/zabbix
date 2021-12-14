@@ -26,27 +26,14 @@
 
 <script>
 	const view = {
-		mode_switch_url: null,
 		list_update_url: null,
 		list_delete_url: null,
 
-		init({mode_switch_url, list_update_url, list_delete_url}) {
-			this.mode_switch_url = mode_switch_url;
+		init({list_update_url, list_delete_url}) {
 			this.list_update_url = list_update_url;
 			this.list_delete_url = list_delete_url;
 
-			this.initViewModeSwitcher();
 			this.initTagFilter();
-		},
-
-		initViewModeSwitcher() {
-			for (const element of document.getElementsByName('list_mode')) {
-				if (!element.checked) {
-					element.addEventListener('click', () => {
-						location.href = this.mode_switch_url;
-					});
-				}
-			}
 		},
 
 		initTagFilter() {
@@ -79,20 +66,32 @@
 			});
 		},
 
-		massEnable() {
+		massEnable(button) {
+			if (!confirm(button.getAttribute('confirm'))) {
+				return false;
+			}
+
 			this.massToggle(<?= CSlaHelper::SLA_STATUS_ENABLED?>)
 		},
 
-		massDisable() {
+		massDisable(button) {
+			if (!confirm(button.getAttribute('confirm'))) {
+				return false;
+			}
+
 			this.massToggle(<?= CSlaHelper::SLA_STATUS_DISABLED?>)
+		},
+
+		massDelete(button) {
+			if (!confirm(button.getAttribute('confirm'))) {
+				return false;
+			}
+
+			this.massProcess(this.list_delete_url)
 		},
 
 		massToggle(status) {
 			this.massProcess(this.list_update_url, {status});
-		},
-
-		massDelete() {
-			this.massProcess(this.list_delete_url)
 		},
 
 		massProcess(endpoint_url, data = {}) {
