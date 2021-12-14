@@ -46,17 +46,17 @@ trait TableTrait {
 		return $data;
 	}
 
-	/**
+		/**
 	 * Check if values in table rows match data from data provider.
 	 *
-	 * @param array      $data        data array to be match with result in table
-	 * @param string     $selector	  table selector
+	 * @param array   $data        data array to be match with result in table
+	 * @param string  $selector    table selector
 	 */
 	public function assertTableData($data = [], $selector = 'class:list-table') {
 		$rows = $this->query($selector)->asTable()->one()->getRows();
-		if ($data === 'No data found.') {
+		if (!$data) {
 			// Check that table contain one row with text "No data found."
-			$this->assertEquals([$data], $rows->asText());
+			$this->assertEquals(['No data found.'], $rows->asText());
 
 			return;
 		}
