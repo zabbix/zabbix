@@ -34,7 +34,7 @@ class testPageMonitoringServices extends CWebTest {
 
 	const EDIT = true;
 
-	const SERVICE_COUNT = 15; // Row count starts with 0, so here real service count - 1.
+	const SERVICE_COUNT = 16;
 
 	const LAYOUT_PARENT = 'Server 3';
 	const LAYOUT_CHILD = 'Server 2';
@@ -384,7 +384,8 @@ class testPageMonitoringServices extends CWebTest {
 		$this->assertTableStats(self::SERVICE_COUNT);
 
 		// Check that service buttons are not present in the table row.
-		$this->checkServiceButtons($table->getRow(rand(0, self::SERVICE_COUNT)), false);
+		// Row count starts with 0, so here real service count - 1.
+		$this->checkServiceButtons($table->getRow(rand(0, self::SERVICE_COUNT - 1)), false);
 
 		// Check that "Edit elements" are not present in View mode.
 		$elements = [
@@ -447,7 +448,8 @@ class testPageMonitoringServices extends CWebTest {
 
 		// Check that action buttons became enabled.
 		$this->checkActionButtons(true);
-		$this->checkServiceButtons($table->getRow(rand(0, self::SERVICE_COUNT)), true);
+		// Row count starts with 0, so here real service count - 1.
+		$this->checkServiceButtons($table->getRow(rand(0, self::SERVICE_COUNT - 1)), true);
 		$this->checkParentChildLayout($table, self::LAYOUT_PARENT, self::LAYOUT_CHILD, self::EDIT);
 		$this->checkServiceButtons($table->findRow('Name', self::LAYOUT_CHILD2, true), true);
 
