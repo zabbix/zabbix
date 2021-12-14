@@ -175,20 +175,3 @@ function timer($timer = null) {
 function sdex($ex = 'My exception') {
 	throw new APIException(ZBX_API_ERROR_INTERNAL, $ex);
 }
-
-function sdfjson() {
-	$prefix = (new DateTime('NOW'))->format('r.u')."\n";
-	$file_handle = @fopen('/tmp/zabbix.log', 'a');
-
-	foreach(func_get_args() as $msg) {
-		fwrite($file_handle,
-			$prefix.
-			json_encode(
-				$msg,
-				JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES
-			)."\n\n"
-		);
-	}
-
-	fclose($file_handle);
-}
