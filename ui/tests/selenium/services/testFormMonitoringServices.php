@@ -1138,6 +1138,11 @@ class testFormMonitoringServices extends CWebTest {
 			// Check that child is present in frontend.
 			$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
 
+			// Check that Parent in table has Children count now.
+			$this->assertEquals($data['parent'].' 1',
+					$table->findRow('Name', $data['parent'], true)->getColumn('Name')->getText()
+			);
+
 			// Firstly click on parent.
 			$table->findRow('Name', $data['parent'], true)->query('link', $data['parent'])
 					->waitUntilClickable()->one()->click();
