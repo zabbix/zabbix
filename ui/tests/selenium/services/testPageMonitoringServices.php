@@ -384,7 +384,10 @@ class testPageMonitoringServices extends CWebTest {
 		$this->assertTableStats(self::SERVICE_COUNT);
 
 		// Check that service buttons are not present in the table row.
-		$this->checkServiceButtons($table->getRow(rand(1, self::SERVICE_COUNT)), false);
+		$row_number = rand(1, self::SERVICE_COUNT);
+		var_dump($row_number);
+
+		$this->checkServiceButtons($table->getRow($row_number), false);
 
 		// Check that "Edit elements" are not present in View mode.
 		$elements = [

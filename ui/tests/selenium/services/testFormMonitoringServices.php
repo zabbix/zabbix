@@ -98,6 +98,13 @@ class testFormMonitoringServices extends CWebTest {
 				'sortorder' => 0
 			],
 			[
+				'name' => 'Parent5',
+				'algorithm' => 1,
+				'showsla' => 0,
+				'goodsla' => 99.99,
+				'sortorder' => 0
+			],
+			[
 				'name' => 'Child1',
 				'algorithm' => 1,
 				'showsla' => 1,
@@ -1071,7 +1078,7 @@ class testFormMonitoringServices extends CWebTest {
 			],
 			[
 				[
-					'parent' => 'Parent1',
+					'parent' => 'Parent5',
 					'fields' => [
 						'Name' => 'With parent without tags'
 					]
