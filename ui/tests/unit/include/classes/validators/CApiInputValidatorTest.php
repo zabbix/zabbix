@@ -42,7 +42,7 @@ class CApiInputValidatorTest extends TestCase {
 		API::setApiServiceFactory($api_service_factory);
 
 		$this->default_timezone = date_default_timezone_get();
-		date_default_timezone_set('GMT');
+		date_default_timezone_set('UTC');
 	}
 
 	protected function tearDown(): void {
