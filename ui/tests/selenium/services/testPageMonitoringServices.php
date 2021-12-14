@@ -430,24 +430,13 @@ class testPageMonitoringServices extends CWebTest {
 		$this->page->assertTitle('Services');
 		$this->page->assertHeader('Services');
 
-		$this->assertTrue($this->query('button:Create service')->one()->isVisible());
-
 		$table = $this->query(self::TABLE_SELECTOR)->asTable()->one();
 		$this->assertSame(['', 'Name', 'Status', 'Root cause', 'SLA', 'Tags', ''], $table->getHeadersText());
 		$this->assertTableStats(self::SERVICE_COUNT);
 
-		// Check that action buttons are not enabled below the table.
+		// Check that action buttons below the table are not enabled .
 		$this->checkActionButtons(false);
 
-		$selected_services = ['Server 4', 'Server 5'];
-		$this->selectTableRows($selected_services);
-		$this->page->waitUntilReady();
-		$this->assertEquals(count($selected_services).' selected',
-				$this->query('id:selected_count')->waitUntilVisible()->one()->getText()
-		);
-
-		// Check that action buttons became enabled.
-		$this->checkActionButtons(true);
 		// Row count starts with 0, so here real service count - 1.
 		$this->checkServiceButtons($table->getRow(rand(0, self::SERVICE_COUNT - 1)), true);
 		$this->checkParentChildLayout($table, self::LAYOUT_PARENT, self::LAYOUT_CHILD, self::EDIT);
@@ -1167,7 +1156,11 @@ class testPageMonitoringServices extends CWebTest {
 		$before_rows_count = $table->getRows()->count();
 		$this->assertTableStats($before_rows_count);
 
-		$this->selectTableRows($names, 'Name');
+		$this->selectTableRows($names);
+		$this->assertEquals(count($names).' selected',
+				$this->query('id:selected_count')->waitUntilVisible()->one()->getText()
+		);
+
 		$this->query('button:Delete')->one()->click();
 		$this->page->acceptAlert();
 		$this->assertMessage(TEST_GOOD, 'Services deleted');
