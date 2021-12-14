@@ -200,32 +200,21 @@ final class CSlaHelper {
 			->addClass($error_budget >= 0 ? ZBX_STYLE_GREY : ZBX_STYLE_RED);
 	}
 
+
 	/**
-	 * @param array excluded_downtime  Record.
-	 * @param string timezone          SLA timezone.
+	 * @param array $excluded_downtime
+	 *
+	 * @throws Exception
 	 *
 	 * @return CTag
 	 */
-	public static function getExcludedDowntimeTag(array $excluded_downtime, string $timezone): CTag {
-		$tag = new CDiv();
-
-		try {
-			$datetime_from = (new DateTime('@'.$excluded_downtime['period_from']))
-				->setTimezone(new DateTimeZone($timezone));
-			$datetime_to = (new DateTime('@'.($excluded_downtime['period_to'] - 1)))
-				->setTimezone(new DateTimeZone($timezone));
-		}
-		catch (Exception $e) {
-			return $tag;
-		}
-
-		$tag
-			->addItem($datetime_from->format(DATE_TIME_FORMAT))
-			->addItem(' ')
-			->addItem($excluded_downtime['name'])
-			->addItem(': ')
-			->addItem(convertUnitsS($datetime_to->getTimestamp() - $datetime_from->getTimestamp(), true));
-
-		return $tag;
+	public static function getExcludedDowntimeTag(array $excluded_downtime): CTag {
+		return new CDiv([
+			zbx_date2str(DATE_TIME_FORMAT, $excluded_downtime['period_from']),
+			' ',
+			$excluded_downtime['name'],
+			': ',
+			convertUnitsS($excluded_downtime['period_to'] - $excluded_downtime['period_from'])
+		]);
 	}
 }
