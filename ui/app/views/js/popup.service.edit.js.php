@@ -474,6 +474,8 @@ window.service_edit_popup = {
 					if ('messages' in response.success) {
 						postMessageDetails('success', response.success.messages);
 					}
+
+					uncheckTableRows('service');
 				}
 
 				location.href = location.href;

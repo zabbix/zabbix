@@ -221,6 +221,8 @@ window.sla_edit_popup = {
 					if ('messages' in response.success) {
 						postMessageDetails('success', response.success.messages);
 					}
+
+					uncheckTableRows('sla');
 				}
 
 				location.href = location.href;

@@ -205,7 +205,7 @@ $form->addItem([
 				->addClass('js-massdelete-sla')
 				->addClass('no-chkbxrange')
 		]
-	], 'slas')
+	], 'sla')
 ]);
 
 (new CWidget())

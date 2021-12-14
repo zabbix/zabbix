@@ -139,20 +139,22 @@
 				.then((response) => response.json())
 				.then((response) => {
 					if ('error' in response) {
-						uncheckTableRows('service', 'keepids' in response ? response.keepids : []);
-
 						if ('title' in response.error) {
 							postMessageError(response.error.title);
 						}
 
 						postMessageDetails('error', response.error.messages);
+
+						uncheckTableRows('service', response.error.keepids);
 					}
-					else if('success' in response) {
+					else if ('success' in response) {
 						postMessageOk(response.success.title);
 
 						if ('messages' in response.success) {
 							postMessageDetails('success', response.success.messages);
 						}
+
+						uncheckTableRows('service');
 					}
 
 					location.href = location.href;
