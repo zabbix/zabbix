@@ -140,7 +140,11 @@ func (cp *countParams) skip(path string, d fs.DirEntry) (bool, error) {
 
 	s, err = cp.skipInfo(d)
 	if s {
-		return true, err
+		if err != nil {
+			impl.Logger.Errf("failed to get file info for path %s, %s", path, err.Error())
+		}
+
+		return true, nil
 	}
 
 	return false, nil
