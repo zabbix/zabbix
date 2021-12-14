@@ -76,8 +76,9 @@ class CControllerLatestViewRefresh extends CControllerLatestView {
 						'hk_history' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY),
 						'hk_history_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)
 					],
-					'tags' => makeTags($prepared_data['items'], true, 'itemid', ZBX_TAG_COUNT_DEFAULT, $filter['tags'],
-						array_key_exists('tags', $subfilters_fields) ? $subfilters_fields['tags'] : []
+					'tags' => makeTags($prepared_data['items'], true, 'itemid', (int) $filter['show_tags'],
+						$filter['tags'], array_key_exists('tags', $subfilters_fields) ? $subfilters_fields['tags'] : [],
+						(int) $filter['tag_name_format'], $filter['tag_priority']
 					)
 				] + $prepared_data,
 				'subfilters' => $subfilters

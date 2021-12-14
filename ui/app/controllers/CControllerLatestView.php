@@ -38,6 +38,9 @@ class CControllerLatestView extends CControllerLatest {
 			'show_details' =>			'in 1,0',
 			'evaltype' =>				'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
 			'tags' =>					'array',
+			'show_tags' =>				'in '.PROBLEMS_SHOW_TAGS_NONE.','.PROBLEMS_SHOW_TAGS_1.','.PROBLEMS_SHOW_TAGS_2.','.PROBLEMS_SHOW_TAGS_3,
+			'tag_name_format' =>		'in '.PROBLEMS_TAG_NAME_FULL.','.PROBLEMS_TAG_NAME_SHORTENED.','.PROBLEMS_TAG_NAME_NONE,
+			'tag_priority' =>			'string',
 
 			// table sorting inputs
 			'sort' =>					'in name,status',
@@ -158,6 +161,9 @@ class CControllerLatestView extends CControllerLatest {
 			'show_details' => $filter['show_details'] ? 1 : null,
 			'evaltype' => $filter['evaltype'],
 			'tags' => $filter['tags'],
+			'show_tags' => $filter['show_tags'],
+			'tag_name_format' => $filter['tag_name_format'],
+			'tag_priority' => $filter['tag_priority'],
 			'sort' => $sort_field,
 			'sortorder' => $sort_order,
 			'page' => $this->hasInput('page') ? $this->getInput('page') : null
@@ -189,8 +195,9 @@ class CControllerLatestView extends CControllerLatest {
 				'hk_history' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY),
 				'hk_history_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)
 			],
-			'tags' => makeTags($prepared_data['items'], true, 'itemid', ZBX_TAG_COUNT_DEFAULT, $filter['tags'],
-				array_key_exists('tags', $subfilters_fields) ? $subfilters_fields['tags'] : []
+			'tags' => makeTags($prepared_data['items'], true, 'itemid', (int) $filter['show_tags'], $filter['tags'],
+				array_key_exists('tags', $subfilters_fields) ? $subfilters_fields['tags'] : [],
+				(int) $filter['tag_name_format'], $filter['tag_priority']
 			),
 			'subfilters' => $subfilters
 		] + $prepared_data;

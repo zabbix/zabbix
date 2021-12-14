@@ -132,11 +132,45 @@ $filter_tags_table->addRow(
 	))->setColSpan(3)
 );
 
+$tag_format_line = (new CHorList())
+	->addItem((new CRadioButtonList('show_tags', (int) $data['show_tags']))
+		->addValue(_('None'), PROBLEMS_SHOW_TAGS_NONE, 'show_tags_0#{uniqid}')
+		->addValue(PROBLEMS_SHOW_TAGS_1, PROBLEMS_SHOW_TAGS_1, 'show_tags_1#{uniqid}')
+		->addValue(PROBLEMS_SHOW_TAGS_2, PROBLEMS_SHOW_TAGS_2, 'show_tags_2#{uniqid}')
+		->addValue(PROBLEMS_SHOW_TAGS_3, PROBLEMS_SHOW_TAGS_3, 'show_tags_3#{uniqid}')
+		->setModern(true)
+		->setId('show_tags_#{uniqid}')
+	)
+	->addItem((new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN))
+	->addItem(new CLabel(_('Tag name')))
+	->addItem((new CRadioButtonList('tag_name_format', (int) $data['tag_name_format']))
+		->addValue(_('Full'), PROBLEMS_TAG_NAME_FULL, 'tag_name_format_0#{uniqid}')
+		->addValue(_('Shortened'), PROBLEMS_TAG_NAME_SHORTENED, 'tag_name_format_1#{uniqid}')
+		->addValue(_('None'), PROBLEMS_TAG_NAME_NONE, 'tag_name_format_2#{uniqid}')
+		->setModern(true)
+		->setEnabled((int) $data['show_tags'] !== PROBLEMS_SHOW_TAGS_NONE)
+		->setId('tag_name_format_#{uniqid}')
+	);
+
 $right_column = (new CFormGrid())
 	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
 	->addItem([
 		new CLabel(_('Tags')),
 		new CFormField($filter_tags_table)
+	])
+	->addItem([
+		new CLabel(_('Show tags')),
+		new CFormField($tag_format_line)
+	])
+	->addItem([
+		new CLabel(_('Tag display priority')),
+		new CFormField(
+			(new CTextBox('tag_priority', $data['tag_priority']))
+				->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+				->setAttribute('placeholder', _('comma-separated list'))
+				->setEnabled((int) $data['show_tags'] !== PROBLEMS_SHOW_TAGS_NONE)
+				->setId('tag_priority_#{uniqid}')
+		)
 	])
 	->addItem([
 		new CLabel(_('Show details')),
@@ -302,7 +336,11 @@ if (array_key_exists('render_html', $data)) {
 		});
 
 		// Input, radio and single checkboxes.
-		['name', 'evaltype', 'show_without_data', 'show_details'].forEach((key) => {
+		const fields = ['name', 'evaltype', 'show_without_data', 'show_details', 'show_tags', 'tag_name_format',
+			'tag_priority'
+		];
+
+		fields.forEach(key => {
 			var elm = $('[name="' + key + '"]', container);
 
 			if (elm.is(':radio,:checkbox')) {

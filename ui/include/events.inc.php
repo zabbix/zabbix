@@ -490,7 +490,11 @@ function orderEventTagsByPriority(array $event_tags, array $priorities) {
  *                                            - 'triggerid' - for triggers.
  * @param int    $list_tag_count             Maximum number of tags to display.
  * @param array  $filter_tags                An array of tag filtering data.
- * @param array  $subfilter_tags
+ * @param ?array $subfilter_tags             Array of selected sub-filter tags. Null when tags are not clickable.
+ * @param array  $subfilter_tags[<tag>]
+ * @param array  $subfilter_tags[<tag>][<value1>]
+ * @param array  $subfilter_tags[<tag>][<value2>]
+ * @param array  $subfilter_tags[<tag>][<value...>]
  * @param string $filter_tags[]['tag']
  * @param int    $filter_tags[]['operator']
  * @param string $filter_tags[]['value']

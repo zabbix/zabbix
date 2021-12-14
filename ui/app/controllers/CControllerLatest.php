@@ -34,6 +34,9 @@ abstract class CControllerLatest extends CController {
 		'name' => '',
 		'evaltype' => TAG_EVAL_TYPE_AND_OR,
 		'tags' => [],
+		'show_tags' => PROBLEMS_SHOW_TAGS_3,
+		'tag_name_format' => PROBLEMS_TAG_NAME_FULL,
+		'tag_priority' => '',
 		'show_without_data' => true,
 		'show_details' => true,
 		'page' => null,
@@ -467,7 +470,7 @@ abstract class CControllerLatest extends CController {
 		foreach ($items as &$item) {
 			$match_hosts = (!$subfilter['hostids'] || array_key_exists($item['hostid'], $subfilter['hostids']));
 			$match_tagnames = (!$subfilter['tagnames']
-					|| (bool) array_intersect_key($subfilter['tagnames'], array_flip(array_column($item['tags'], 'tag')))
+				|| (bool) array_intersect_key($subfilter['tagnames'], array_flip(array_column($item['tags'], 'tag')))
 			);
 
 			if ($subfilter['tags']) {
