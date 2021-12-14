@@ -313,10 +313,10 @@ class CMaintenance extends CApiService {
 	protected function validateCreate(array &$maintenances): void {
 		$api_input_rules =		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('maintenances', 'name')],
-			'active_since' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:2147464800'],
-			'active_till' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:2147464800'],
 			'maintenance_type' =>	['type' => API_INT32, 'in' => implode(',', [MAINTENANCE_TYPE_NORMAL, MAINTENANCE_TYPE_NODATA]), 'default' => DB::getDefault('maintenances', 'maintenance_type')],
 			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('maintenances', 'description')],
+			'active_since' =>		['type' => API_TIMESTAMP, 'flags' => API_REQUIRED],
+			'active_till' =>		['type' => API_TIMESTAMP, 'flags' => API_REQUIRED, 'compare' => ['operator' => '>', 'field' => 'active_since']],
 			'tags_evaltype' =>		['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'maintenance_type', 'in' => implode(',', [MAINTENANCE_TYPE_NORMAL])], 'type' => API_INT32, 'in' => implode(',', [MAINTENANCE_TAG_EVAL_TYPE_AND_OR, MAINTENANCE_TAG_EVAL_TYPE_OR])],
 										['else' => true, 'type' => API_UNEXPECTED]
@@ -339,31 +339,31 @@ class CMaintenance extends CApiService {
 			]],
 			'timeperiods' => 		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
 				'timeperiod_type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])],
-				'period' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:2147464800'],
+				'period' =>				['type' => API_TIMESTAMP, 'flags' => API_REQUIRED],
 				'every' =>				['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'default' => DB::getDefault('timeperiods', 'every'), 'in' => '0:'.ZBX_MAX_INT32],
 											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_MONTHLY], 'type' => API_INT32, 'in' => '1:5'],
-											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_ONETIME], 'type' => API_INT32, 'in' => '1']
+											['else' => true, 'type' => API_UNEXPECTED]
 				]],
 				'month' =>				['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_MONTHLY], 'type' => API_INT32, 'in' => '0:4095', 'default' => DB::getDefault('timeperiods', 'month')],
-											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY])], 'type' => API_INT32, 'in' => '0']
+											['else' => true, 'type' => API_UNEXPECTED]
 				]],
 				'dayofweek' =>			['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => '0:127', 'default' => DB::getDefault('timeperiods', 'dayofweek')],
-											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY])], 'type' => API_INT32, 'in' => '0']
+											['else' => true, 'type' => API_UNEXPECTED]
 				]],
 				'day' =>				['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_MONTHLY], 'type' => API_INT32, 'in' => '0:31', 'default' => DB::getDefault('timeperiods', 'day')],
-											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY])], 'type' => API_INT32, 'in' => '0']
+											['else' => true, 'type' => API_UNEXPECTED]
 				]],
 				'start_time' =>			['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => '0:86340', 'default' => DB::getDefault('timeperiods', 'start_time')],
-											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_ONETIME], 'type' => API_INT32, 'in' => '0']
+											['else' => true, 'type' => API_UNEXPECTED]
 				]],
 				'start_date' =>			['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_ONETIME], 'type' => API_INT32, 'in' => '0:2147464800', 'default' => DB::getDefault('timeperiods', 'start_date')],
-											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => '0']
+											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_ONETIME], 'type' => API_TIMESTAMP, 'default' => DB::getDefault('timeperiods', 'start_date')],
+											['else' => true, 'type' => API_UNEXPECTED]
 				]]
 			]]
 		]];
@@ -393,15 +393,7 @@ class CMaintenance extends CApiService {
 		}
 		unset($maintenance);
 
-		foreach ($maintenances as $i => $maintenance) {
-			// Validate maintenance active interval.
-			if ($maintenance['active_since'] > $maintenance['active_till']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Maintenance "%1$s" value cannot be bigger than "%2$s".', 'active_since', 'active_till')
-				);
-			}
-
-			// Validate groups and hosts.
+		foreach ($maintenances as $maintenance) {
 			if ((!array_key_exists('groups', $maintenance) || !$maintenance['groups'])
 					&& (!array_key_exists('hosts', $maintenance) || !$maintenance['hosts'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one host group or host must be selected.'));
@@ -546,7 +538,7 @@ class CMaintenance extends CApiService {
 		}
 
 		$maintenances = $this->extendObjectsByKey($maintenances, $db_maintenances, 'maintenanceid',
-			['maintenance_type']
+			['maintenance_type', 'active_since', 'active_till']
 		);
 
 		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['maintenanceid'], ['name']], 'fields' => [
@@ -554,8 +546,8 @@ class CMaintenance extends CApiService {
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('maintenances', 'name')],
 			'maintenance_type' =>	['type' => API_INT32, 'in' => implode(',', [MAINTENANCE_TYPE_NORMAL, MAINTENANCE_TYPE_NODATA])],
 			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('maintenances', 'description')],
-			'active_since' =>		['type' => API_INT32, 'in' => '0:2147464800'],
-			'active_till' =>		['type' => API_INT32, 'in' => '0:2147464800'],
+			'active_since' =>		['type' => API_TIMESTAMP],
+			'active_till' =>		['type' => API_TIMESTAMP, 'compare' => ['operator' => '>', 'field' => 'active_since']],
 			'tags_evaltype' =>		['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'maintenance_type', 'in' => implode(',', [MAINTENANCE_TYPE_NORMAL])], 'type' => API_INT32, 'in' => implode(',', [MAINTENANCE_TAG_EVAL_TYPE_AND_OR, MAINTENANCE_TAG_EVAL_TYPE_OR])],
 										['else' => true, 'type' => API_UNEXPECTED]
@@ -577,31 +569,31 @@ class CMaintenance extends CApiService {
 			'timeperiods' => 		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['timeperiodid']], 'fields' => [
 				'timeperiodid' =>		['type' => API_ID],
 				'timeperiod_type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])],
-				'period' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:2147464800'],
+				'period' =>				['type' => API_TIMESTAMP, 'flags' => API_REQUIRED],
 				'every' =>				['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => '0:'.ZBX_MAX_INT32, 'default' => DB::getDefault('timeperiods', 'every')],
 											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_MONTHLY], 'type' => API_INT32, 'in' => '1:5'],
-											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_ONETIME], 'type' => API_INT32, 'in' => '1']
+											['else' => true, 'type' => API_UNEXPECTED]
 				]],
 				'month' =>				['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_MONTHLY], 'type' => API_INT32, 'in' => '0:4095', 'default' => DB::getDefault('timeperiods', 'month')],
-											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY])], 'type' => API_INT32, 'in' => '0']
+											['else' => true, 'type' => API_UNEXPECTED]
 				]],
 				'dayofweek' =>			['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => '0:127', 'default' => DB::getDefault('timeperiods', 'dayofweek')],
-											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY])], 'type' => API_INT32, 'in' => '0']
+											['else' => true, 'type' => API_UNEXPECTED]
 				]],
 				'day' =>				['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_MONTHLY], 'type' => API_INT32, 'in' => '0:31', 'default' => DB::getDefault('timeperiods', 'day')],
-											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY])], 'type' => API_INT32, 'in' => '0']
+											['else' => true, 'type' => API_UNEXPECTED]
 				]],
 				'start_time' =>			['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => '0:86340', 'default' => DB::getDefault('timeperiods', 'start_time')],
-											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_ONETIME], 'type' => API_INT32, 'in' => '0']
+											['else' => true, 'type' => API_UNEXPECTED]
 				]],
 				'start_date' =>			['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_ONETIME], 'type' => API_INT32, 'in' => '0:2147464800', 'default' => DB::getDefault('timeperiods', 'start_date')],
-											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => '0']
+											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_ONETIME], 'type' => API_TIMESTAMP, 'default' => DB::getDefault('timeperiods', 'start_date')],
+											['else' => true, 'type' => API_UNEXPECTED]
 				]]
 			]]
 		]];
@@ -613,28 +605,11 @@ class CMaintenance extends CApiService {
 		self::addAffectedObjects($maintenances, $db_maintenances);
 
 		foreach ($maintenances as &$maintenance) {
-			// Validate maintenance active interval.
-			$active_since = array_key_exists('active_since', $maintenance)
-				? $maintenance['active_since']
-				: $db_maintenances[$maintenance['maintenanceid']]['active_since'];
-
-			$active_till = array_key_exists('active_till', $maintenance)
-				? $maintenance['active_till']
-				: $db_maintenances[$maintenance['maintenanceid']]['active_till'];
-
-			if ($active_since > $active_till) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Maintenance "%1$s" value cannot be bigger than "%2$s".', 'active_since', 'active_till')
-				);
-			}
-
-			// Set default value for tags_evaltype field, if maintenance_type was changed to MAINTENANCE_TYPE_NODATA.
 			if ($maintenance['maintenance_type'] != $db_maintenances[$maintenance['maintenanceid']]['maintenance_type']
 					&& $maintenance['maintenance_type'] == MAINTENANCE_TYPE_NODATA) {
 				$maintenance['tags_evaltype'] = DB::getDefault('maintenances', 'tags_evaltype');
 			}
 
-			// Validate groups and hosts.
 			if (array_key_exists('groups', $maintenance) || array_key_exists('hosts', $maintenance)) {
 				$groups = array_key_exists('groups', $maintenance)
 					? $maintenance['groups']

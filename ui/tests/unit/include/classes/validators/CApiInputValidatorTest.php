@@ -22,6 +22,7 @@
 use PHPUnit\Framework\TestCase;
 
 class CApiInputValidatorTest extends TestCase {
+	protected $default_timezone;
 
 	protected function setUp(): void {
 		$settings = $this->createMock(CSettings::class);
@@ -39,6 +40,13 @@ class CApiInputValidatorTest extends TestCase {
 			->will($this->returnValueMap($instances_map));
 
 		API::setApiServiceFactory($api_service_factory);
+
+		$this->default_timezone = date_default_timezone_get();
+		date_default_timezone_set('GMT');
+	}
+
+	protected function tearDown(): void {
+		date_default_timezone_set($this->default_timezone);
 	}
 
 	public function dataProviderInput() {
@@ -4933,6 +4941,171 @@ class CApiInputValidatorTest extends TestCase {
 				'abc'."\n",
 				'/1/exec_params',
 				'abc'."\n"
+			],
+			[
+				['type' => API_TIMESTAMP],
+				0,
+				'/',
+				0
+			],
+			[
+				['type' => API_TIMESTAMP],
+				1234567,
+				'/',
+				1234567
+			],
+			[
+				['type' => API_TIMESTAMP],
+				ZBX_MAX_DATE,
+				'/',
+				ZBX_MAX_DATE
+			],
+			[
+				['type' => API_TIMESTAMP],
+				'01234567',
+				'/',
+				1234567
+			],
+			[
+				['type' => API_TIMESTAMP],
+				'-12345',
+				'/',
+				'Invalid parameter "/": value must be one of 1970-01-01 00:00:00-2038-01-19 03:14:07.'
+			],
+			[
+				['type' => API_TIMESTAMP],
+				ZBX_MAX_DATE + 1,
+				'/',
+				'Invalid parameter "/": value must be one of 1970-01-01 00:00:00-2038-01-19 03:14:07.'
+			],
+			[
+				['type' => API_TIMESTAMP],
+				'9223372036854775808',
+				'/',
+				'Invalid parameter "/": value must be one of 1970-01-01 00:00:00-2038-01-19 03:14:07.'
+			],
+			[
+				['type' => API_TIMESTAMP],
+				'foo',
+				'/',
+				'Invalid parameter "/": an integer is expected.'
+			],
+			[
+				['type' => API_TIMESTAMP],
+				[],
+				'/',
+				'Invalid parameter "/": an integer is expected.'
+			],
+			[
+				['type' => API_TIMESTAMP],
+				true,
+				'/',
+				'Invalid parameter "/": an integer is expected.'
+			],
+			[
+				['type' => API_TIMESTAMP],
+				null,
+				'/',
+				'Invalid parameter "/": an integer is expected.'
+			],
+			[
+				['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL],
+				null,
+				'/',
+				null
+			],
+			[
+				['type' => API_TIMESTAMP],
+				0.0,
+				'/',
+				'Invalid parameter "/": an integer is expected.'
+			],
+			[
+				['type' => API_TIMESTAMP],
+				1.23E+11,
+				'/',
+				'Invalid parameter "/": an integer is expected.'
+			],
+			[
+				['type' => API_TIMESTAMP, 'in' => '0,1,2'],
+				1,
+				'/',
+				1
+			],
+			[
+				['type' => API_TIMESTAMP, 'in' => '0,1,2'],
+				3,
+				'/',
+				'Invalid parameter "/": value must be one of 1970-01-01 00:00:00, 1970-01-01 00:00:01, 1970-01-01 00:00:02.'
+			],
+			[
+				['type' => API_TIMESTAMP, 'in' => '0,30:90'],
+				0,
+				'/',
+				0
+			],
+			[
+				['type' => API_TIMESTAMP, 'in' => '0,30:90'],
+				30,
+				'/',
+				30
+			],
+			[
+				['type' => API_TIMESTAMP, 'in' => '0,30:90'],
+				60,
+				'/',
+				60
+			],
+			[
+				['type' => API_TIMESTAMP, 'in' => '0,30:90'],
+				90,
+				'/',
+				90
+			],
+			[
+				['type' => API_TIMESTAMP, 'in' => '0,30:90'],
+				1,
+				'/',
+				'Invalid parameter "/": value must be one of 1970-01-01 00:00:00, 1970-01-01 00:00:30-1970-01-01 00:01:30.'
+			],
+			[
+				['type' => API_TIMESTAMP, 'in' => '0,30:90'],
+				29,
+				'/',
+				'Invalid parameter "/": value must be one of 1970-01-01 00:00:00, 1970-01-01 00:00:30-1970-01-01 00:01:30.'
+			],
+			[
+				['type' => API_TIMESTAMP, 'in' => '0,30:90'],
+				91,
+				'/',
+				'Invalid parameter "/": value must be one of 1970-01-01 00:00:00, 1970-01-01 00:00:30-1970-01-01 00:01:30.'
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'active_since' => ['type' => API_TIMESTAMP],
+					'active_till' => ['type' => API_TIMESTAMP, 'compare' => ['operator' => '>', 'field' => 'active_since']]
+				]],
+				[
+					'active_since' => '1640995200', // 2022-01-01 00:00:00
+					'active_till' => '1643673599' // 2022-01-31 23:59:59
+				],
+				'/',
+				[
+					'active_since' => 1640995200, // 2022-01-01 00:00:00
+					'active_till' => 1643673599 // 2022-01-31 23:59:59
+				],
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'active_since' => ['type' => API_TIMESTAMP],
+					'active_till' => ['type' => API_TIMESTAMP, 'compare' => ['operator' => '>', 'field' => 'active_since']]
+				]],
+				[
+					'active_since' => '1643673599', // 2022-01-31 23:59:59
+					'active_till' => '1640995200' // 2022-01-01 00:00:00
+				],
+				'/',
+				'Invalid parameter "/active_till": cannot be less than or equals the value of parameter "/active_since".',
 			]
 		];
 	}
