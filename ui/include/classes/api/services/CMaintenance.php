@@ -276,10 +276,10 @@ class CMaintenance extends CApiService {
 		}
 		unset($maintenance);
 
-		self::updateGroups($maintenances, __FUNCTION__);
-		self::updateHosts($maintenances, __FUNCTION__);
+		self::updateGroups($maintenances);
+		self::updateHosts($maintenances);
 		self::updateTags($maintenances);
-		self::updateTimeperiods($maintenances, __FUNCTION__);
+		self::updateTimeperiods($maintenances);
 
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_MAINTENANCE, $maintenances);
 
@@ -432,10 +432,10 @@ class CMaintenance extends CApiService {
 			DB::update('maintenances', $upd_maintenances);
 		}
 
-		self::updateGroups($maintenances, __FUNCTION__, $db_maintenances);
-		self::updateHosts($maintenances, __FUNCTION__, $db_maintenances);
+		self::updateGroups($maintenances, $db_maintenances);
+		self::updateHosts($maintenances, $db_maintenances);
 		self::updateTags($maintenances, $db_maintenances);
-		self::updateTimeperiods($maintenances, __FUNCTION__, $db_maintenances);
+		self::updateTimeperiods($maintenances, $db_maintenances);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_MAINTENANCE, $maintenances, $db_maintenances);
 
@@ -875,13 +875,10 @@ class CMaintenance extends CApiService {
 	/**
 	 * Update table "maintenances_groups".
 	 *
-	 * @static
-	 *
 	 * @param array      $maintenances
-	 * @param string     $method
 	 * @param array|null $db_maintenances
 	 */
-	private static function updateGroups(array &$maintenances, string $method, array $db_maintenances = null): void {
+	private static function updateGroups(array &$maintenances, array $db_maintenances = null): void {
 		$ins_groups = [];
 		$del_groupids = [];
 
@@ -892,7 +889,7 @@ class CMaintenance extends CApiService {
 
 			$maintenanceid = $maintenance['maintenanceid'];
 
-			$db_groups = ($method === 'update')
+			$db_groups = ($db_maintenances !== null)
 				? array_column($db_maintenances[$maintenanceid]['groups'], null, 'groupid')
 				: [];
 
@@ -940,13 +937,10 @@ class CMaintenance extends CApiService {
 	/**
 	 * Update table "maintenances_hosts".
 	 *
-	 * @static
-	 *
 	 * @param array      $maintenances
-	 * @param string     $method
 	 * @param array|null $db_maintenances
 	 */
-	private static function updateHosts(array &$maintenances, string $method, array $db_maintenances = null): void {
+	private static function updateHosts(array &$maintenances, array $db_maintenances = null): void {
 		$ins_hosts = [];
 		$del_hostids = [];
 
@@ -957,7 +951,7 @@ class CMaintenance extends CApiService {
 
 			$maintenanceid = $maintenance['maintenanceid'];
 
-			$db_hosts = ($method === 'update')
+			$db_hosts = ($db_maintenances !== null)
 				? array_column($db_maintenances[$maintenanceid]['hosts'], null, 'hostid')
 				: [];
 
@@ -1004,8 +998,6 @@ class CMaintenance extends CApiService {
 
 	/**
 	 * Update table "maintenance_tag".
-	 *
-	 * @static
 	 *
 	 * @param array      $maintenances
 	 * @param array|null $db_maintenances
@@ -1072,14 +1064,10 @@ class CMaintenance extends CApiService {
 	/**
 	 * Update tables "periods" and "maintenances_windows".
 	 *
-	 * @static
-	 *
 	 * @param array      $maintenances
-	 * @param string     $method
 	 * @param array|null $db_maintenances
 	 */
-	private static function updateTimeperiods(array &$maintenances, string $method, array $db_maintenances = null
-				): void {
+	private static function updateTimeperiods(array &$maintenances, array $db_maintenances = null): void {
 		$timeperiods = [];
 		$ins_windows = [];
 		$ins_timeperiods = [];
@@ -1093,7 +1081,7 @@ class CMaintenance extends CApiService {
 
 			$maintenanceid = $maintenance['maintenanceid'];
 
-			$db_timeperiods = ($method === 'update')
+			$db_timeperiods = ($db_maintenances !== null)
 				? $db_maintenances[$maintenanceid]['timeperiods']
 				: [];
 
@@ -1168,8 +1156,6 @@ class CMaintenance extends CApiService {
 	/**
 	 * Add the existing groups, hosts, tags and timeperiods to $db_maintenances whether these are affected by the
 	 * update.
-	 *
-	 * @static
 	 *
 	 * @param array $maintenances
 	 * @param array $db_maintenances
