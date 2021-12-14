@@ -88,8 +88,9 @@ $form = (new CForm())
 
 $header = [
 	make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $data['filter_url'])
-		->addStyle('width: 24%'),
-	make_sorting_header(_('SLO'), 'slo', $data['sort'], $data['sortorder'], $data['filter_url']),
+		->addStyle('width: 14%;'),
+	make_sorting_header(_('SLO'), 'slo', $data['sort'], $data['sortorder'], $data['filter_url'])
+		->addStyle('width: 7%;'),
 	make_sorting_header(_('Effective date'), 'effective_date', $data['sort'], $data['sortorder'], $data['filter_url'])
 		->addStyle('width: 14%'),
 	(new CColHeader(_('Reporting period')))->addStyle('width: 14%'),
@@ -99,16 +100,16 @@ $header = [
 	make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $data['filter_url'])
 ];
 
-if ($data['can_edit']) {
+if ($data['can_manage_sla']) {
 	array_unshift($header, (new CCheckBox('all_ids'))->onClick("checkAll('sla-list', 'all_ids', 'slaids');"));
 }
 
-$table = (new CTableInfo())
+$sla_list = (new CTableInfo())
 	->setHeader($header);
 
 foreach ($data['slas'] as $slaid => $sla) {
-	if ($data['can_edit']) {
-		$name_element = (new CLink(CHtml::encode($sla['name']),
+	if ($data['can_manage_sla']) {
+		$name_element = (new CLink($sla['name'],
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'sla.edit')
 				->setArgument('slaid', $slaid)
@@ -130,7 +131,7 @@ foreach ($data['slas'] as $slaid => $sla) {
 		else {
 			$status_element = (new CLink(_('Disabled'),
 				$data['status_toggle_curl']
-					->setArgument('slaid', [$slaid])
+					->setArgument('slaids', [$slaid])
 					->setArgument('status', CSlaHelper::SLA_STATUS_ENABLED)
 					->getUrl()
 			))
@@ -141,47 +142,57 @@ foreach ($data['slas'] as $slaid => $sla) {
 		}
 	}
 	else {
-		$name_element = CHtml::encode($sla['name']);
+		$name_element = $sla['name'];
 		$status_element = ($sla['status'] == CSlaHelper::SLA_STATUS_ENABLED) ? _('Enabled') : _('Disabled');
 	}
 
-	if (array_key_exists($slaid, $data['schedule_hints'])) {
+	if (array_key_exists($slaid, $data['custom_schedule'])) {
+		$schedule_hint = (new CTableInfo())->setHeader([_('Schedule'), _('Time period')]);
+
+		foreach ($data['custom_schedule'][$slaid] as $weekday => $periods) {
+			$schedule_hint->addRow([getDayOfWeekCaption($weekday), $periods === '' ? '-' : $periods]);
+		}
+
 		$schedule_mode = (new CCol(
 			(new CLinkAction([
 				CSlaHelper::scheduleModeToStr(CSlaHelper::SCHEDULE_MODE_CUSTOM),
 				(new CSpan())->addClass('icon-description')
 			]))
-				->setHint($data['schedule_hints'][$slaid])
+				->setHint($schedule_hint)
 		))->addClass(ZBX_STYLE_NOWRAP);
 	}
 	else {
-		$schedule_mode = CSlaHelper::scheduleModeToStr(CSlaHelper::SCHEDULE_MODE_NONSTOP);
+		$schedule_mode = CSlaHelper::scheduleModeToStr(CSlaHelper::SCHEDULE_MODE_24X7);
 	}
 
 	$row = [
 		$name_element,
-		sprintf('%.4f', $sla['slo']),
+		CSlaHelper::getSloTag((float) $sla['slo']),
 		zbx_date2str(DATE_FORMAT, $sla['effective_date']),
-		CSlaHelper::periodToStr((int) $sla['period']),
+		CSlaHelper::getPeriodNames()[$sla['period']],
 		$sla['timezone'],
-		$schedule_mode,
-		(new CLink(_('SLA report'),
-			(new CUrl('zabbix.php'))
-				->setArgument('action', 'sla.report')
-				->setArgument('slaid', $slaid)
-		))->setTarget('blank'),
-		$status_element
+		$schedule_mode
 	];
 
-	if ($data['can_edit']) {
+	if ($data['has_report_access']) {
+		$row[] = (new CLink(_('SLA report'),
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'slareport.list')
+				->setArgument('filter_slaid', $slaid)
+		))->setTarget('blank');
+	}
+
+	$row[] = $status_element;
+
+	if ($data['can_manage_sla']) {
 		array_unshift($row, new CCheckBox('slaids['.$slaid.']', $slaid));
 	}
 
-	$table->addRow(new CRow($row));
+	$sla_list->addRow(new CRow($row));
 }
 
 $form->addItem([
-	$table,
+	$sla_list,
 	$data['paging'],
 	new CActionButtonList('action', 'slaids', [
 		'sla.massenable' => [
@@ -218,7 +229,7 @@ $form->addItem([
 		(new CTag('nav', true,
 			(new CList())
 				->addItem(
-					$data['can_edit']
+					$data['can_manage_sla']
 						? (new CSimpleButton(_('Create SLA')))->onClick('view.edit()')
 						: null
 				)

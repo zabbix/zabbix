@@ -37,6 +37,8 @@ abstract class CControllerServiceListGeneral extends CController {
 
 	/**
 	 * @throws APIException
+	 *
+	 * @return bool
 	 */
 	protected function checkPermissions(): bool {
 		if ($this->hasInput('serviceid')) {

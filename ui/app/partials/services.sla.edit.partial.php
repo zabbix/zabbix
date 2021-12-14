@@ -57,8 +57,8 @@ $sla_tab = (new CFormGrid())
 
 $period_switch = (new CRadioButtonList('period', (int) $data['form']['period']))->setModern(true);
 
-foreach (CSlaHelper::periods() as $period => $label) {
-	$period_switch->addValue($label, $period);
+foreach (CSlaHelper::getPeriodNames() as $period => $name) {
+	$period_switch->addValue($name, $period);
 }
 
 $timezone_select = (new CSelect('timezone'))
@@ -67,8 +67,8 @@ $timezone_select = (new CSelect('timezone'))
 $schedule_switch = (new CRadioButtonList('schedule_mode', (int) $data['schedule_mode']))->setModern(true);
 
 $schedule_switch->addValue(
-	CSlaHelper::scheduleModeToStr(CSlaHelper::SCHEDULE_MODE_NONSTOP),
-	CSlaHelper::SCHEDULE_MODE_NONSTOP
+	CSlaHelper::scheduleModeToStr(CSlaHelper::SCHEDULE_MODE_24X7),
+	CSlaHelper::SCHEDULE_MODE_24X7
 );
 $schedule_switch->addValue(
 	CSlaHelper::scheduleModeToStr(CSlaHelper::SCHEDULE_MODE_CUSTOM),
@@ -277,7 +277,7 @@ $form
 			->setSelected(0)
 			->addTab('sla-tab', _('SLA'), $sla_tab)
 			->addTab('sla-downtimes-tab',
-				_('Excluded downtimes'), $downtime_tab, CSlaHelper::TAB_INDICATOR_SLA_DOWNTIMES
+				_('Excluded downtimes'), $downtime_tab, TAB_INDICATOR_SLA_EXCLUDED_DOWNTIMES
 			)
 		)
 	->show();

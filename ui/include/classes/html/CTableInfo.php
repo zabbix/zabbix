@@ -70,6 +70,8 @@ class CTableInfo extends CTable {
 	/**
 	 * Rotate table header text vertical.
 	 * Cells must be marked with "vertical_rotation" class.
+	 *
+	 * @deprecated  Use CSS writing-mode.
 	 */
 	public function makeVerticalRotation() {
 		$this->addMakeVerticalRotationJs = true;

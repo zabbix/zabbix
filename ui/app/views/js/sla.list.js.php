@@ -66,6 +66,8 @@
 		edit(options = {}) {
 			const overlay = PopUp('popup.sla.edit', options, 'sla_edit', document.activeElement);
 
+			overlay.$dialogue[0].classList.add('sticked-to-top');
+
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 				postMessageOk(e.detail.title);
 

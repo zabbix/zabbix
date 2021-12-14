@@ -251,6 +251,7 @@ class CRouter {
 		'sla.delete'								=> ['CControllerSlaDelete',								'layout.json',			null],
 		'sla.excludeddowntime.validate'				=> ['CControllerSlaExcludedDowntimeValidate',			'layout.json',			null],
 		'sla.list'									=> ['CControllerSlaList',								'layout.htmlpage',		'sla.list'],
+		'slareport.list'							=> ['CControllerSlaReportList',							'layout.htmlpage',		'slareport.list'],
 		'sla.listupdate'							=> ['CControllerSlaListUpdate',							'layout.json',			null],
 		'sla.update'								=> ['CControllerSlaCreateUpdate',						'layout.json',			null],
 		'system.warning'							=> ['CControllerSystemWarning',							'layout.warning',		'system.warning'],

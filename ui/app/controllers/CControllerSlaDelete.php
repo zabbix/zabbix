@@ -45,13 +45,11 @@ class CControllerSlaDelete extends CController {
 
 	/**
 	 * @throws APIException
+	 *
+	 * @return bool
 	 */
 	protected function checkPermissions(): bool {
-		if (!$this->checkAccess(CRoleHelper::UI_SERVICES_SLA)) {
-			return false;
-		}
-
-		return true;
+		return CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_SLA);
 	}
 
 	/**

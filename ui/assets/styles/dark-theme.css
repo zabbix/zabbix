@@ -2688,6 +2688,9 @@ form.is-loading {
       border-top-color: #737373; }
     .list-table thead th .treeview span {
       margin: 0; }
+    .list-table thead th .vertical {
+      writing-mode: vertical-lr;
+      transform: rotate(180deg); }
     .list-table thead th a {
       display: block;
       position: relative;

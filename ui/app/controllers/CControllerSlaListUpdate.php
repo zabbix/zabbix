@@ -24,16 +24,16 @@ class CControllerSlaListUpdate extends CController {
 	protected $slas;
 
 	protected function init() {
-		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+		if (!hasRequest('backurl')) {
+			$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+		}
 	}
 
 	protected function checkInput(): bool {
 		$fields = [
 			'slaids' =>	'required|array_db sla.slaid',
-			'status' => 'required|in '.implode(',', [
-				CSlaHelper::SLA_STATUS_DISABLED,
-				CSlaHelper::SLA_STATUS_ENABLED
-			]),
+			'status' => 'required|in '.implode(',', [CSlaHelper::SLA_STATUS_DISABLED, CSlaHelper::SLA_STATUS_ENABLED]),
+			'backurl' => 'string'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -91,8 +91,21 @@ class CControllerSlaListUpdate extends CController {
 
 		if ($result) {
 			$output['title'] = _n('SLA updated', 'SLAs updated', count($result['slaids']));
+
+			if ($this->hasInput('backurl')) {
+				CMessageHelper::setSuccessTitle($output['title']);
+				$this->setResponse(new CControllerResponseRedirect($this->getInput('backurl')));
+
+				return;
+			}
 		}
 		else {
+			if ($this->hasInput('backurl')) {
+				$this->setResponse(new CControllerResponseRedirect($this->getInput('backurl')));
+
+				return;
+			}
+
 			$output['errors'] = makeMessageBox(ZBX_STYLE_MSG_BAD, filter_messages(), CMessageHelper::getTitle())
 				->toString();
 			$output['keepids'] = $this->getInput('slaids');

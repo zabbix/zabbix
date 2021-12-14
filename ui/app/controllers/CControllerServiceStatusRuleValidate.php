@@ -21,7 +21,7 @@
 
 class CControllerServiceStatusRuleValidate extends CController {
 
-	protected function init(): bool {
+	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 

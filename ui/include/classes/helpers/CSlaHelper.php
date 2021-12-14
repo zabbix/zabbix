@@ -60,41 +60,42 @@ final class CSlaHelper {
 	}
 
 	/**
-	 * Split periods that may span several days to periods grouped by weekday.
+	 * Convert a list of schedule periods to string representation by weekday.
 	 *
-	 * @param array $schedule_periods					List of SLA periods, sorted by period_from.
-	 * @param array $schedule_periods['period_from']	Timestamp within week.
-	 * @param array $schedule_periods['period_to]		Timestamp within week.
+	 * @param array $schedule_rows						List of SLA periods, sorted by period_from.
+	 * @param array $schedule_rows[n]['period_from']	Start timestamp within week.
+	 * @param array $schedule_rows[n]['period_to]		End timestamp within week, may span across days.
 	 *
-	 * @return array
+	 * @return array E.g. [0 => '00:00-12:40, 20:30-21:00', 1 => ...]
 	 */
-	public static function convertScheduleToWeekdayPeriods(array $schedule_periods): array {
-		$schedule = [];
+	public static function convertScheduleToWeekdayPeriods(array $schedule_rows): array {
+		$schedule_periods = array_fill(0, 7, '');
 
-		foreach (range(0,6) as $weekday) {
-			$schedule[$weekday] = [];
-		}
+		for ($weekday = 0; $weekday < 7; $weekday++) {
+			foreach ($schedule_rows as $schedule_row) {
+				$period_from = max(SEC_PER_DAY * $weekday, $schedule_row['period_from']);
+				$period_to = min(SEC_PER_DAY * ($weekday + 1), $schedule_row['period_to']);
 
-		foreach ($schedule_periods as $period) {
-			$period['period_from'] = (int) $period['period_from'];
-			$period['period_to'] = (int) $period['period_to'];
+				if ($period_to <= $period_from) {
+					continue;
+				}
 
-			while (date('Y-m-d', $period['period_from']) != date('Y-m-d', $period['period_to'])) {
-				$inject = [
-					'period_from' => $period['period_from'],
-					'period_to' => strtotime(date('Y-m-d 24:00:0', $period['period_from']))
-				];
+				$period_from_str = (new DateTime('@'.($period_from - SEC_PER_DAY * $weekday)))->format('H:i');
+				$period_to_str = (new DateTime('@'.($period_to - SEC_PER_DAY * $weekday)))->format('H:i');
 
-				$schedule[date('w', $inject['period_from'])][] = $inject;
-				$period['period_from'] = strtotime(date('Y-m-d 00:00:00', $inject['period_to'] + 2));
+				if ($period_to_str === '00:00') {
+					$period_to_str = '24:00';
+				}
+
+				if ($schedule_periods[$weekday] !== '') {
+					$schedule_periods[$weekday] .= ', ';
+				}
+
+				$schedule_periods[$weekday] .= $period_from_str.'-'.$period_to_str;
 			}
-
-			$schedule[date('w', $period['period_from'])][] = $period;
 		}
 
-		// @TODO: intersections, if not weeded out by API.
-
-		return $schedule;
+		return $schedule_periods;
 	}
 
 	/**
