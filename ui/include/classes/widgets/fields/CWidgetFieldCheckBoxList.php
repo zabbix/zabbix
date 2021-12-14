@@ -34,4 +34,10 @@ class CWidgetFieldCheckBoxList extends CWidgetField {
 
 		return $this;
 	}
+
+	public function setDefault($values) {
+		$this->default = (array) $values;
+
+		return $this;
+	}
 }

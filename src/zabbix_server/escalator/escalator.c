@@ -1070,7 +1070,7 @@ static void	add_sentusers_msg_esc_cancel(ZBX_USER_MSG **user_msg, zbx_uint64_t a
 				user_timezone = get_user_timezone(userid);
 		}
 
-		message_dyn = zbx_dsprintf(NULL, "NOTE: Escalation cancelled: %s\nLast message sent:\n%s", error,
+		message_dyn = zbx_dsprintf(NULL, "NOTE: Escalation canceled: %s\nLast message sent:\n%s", error,
 				row[3]);
 
 		tz = NULL == user_timezone || 0 == strcmp(user_timezone, "default") ? default_timezone : user_timezone;
@@ -2420,7 +2420,7 @@ out:
 static void	escalation_log_cancel_warning(const DB_ESCALATION *escalation, const char *error)
 {
 	if (0 != escalation->esc_step)
-		zabbix_log(LOG_LEVEL_WARNING, "escalation cancelled: %s", error);
+		zabbix_log(LOG_LEVEL_WARNING, "escalation canceled: %s", error);
 }
 
 /******************************************************************************
@@ -2443,8 +2443,9 @@ static void	escalation_cancel(DB_ESCALATION *escalation, const DB_ACTION *action
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
 			__func__, escalation->escalationid, zbx_escalation_status_string(escalation->status));
 
-	/* the cancellation notification can be sent if no objects are deleted */
-	if (NULL != action && NULL != event && 0 != event->trigger.triggerid && 0 != escalation->esc_step)
+	/* the cancellation notification can be sent if no objects are deleted and notification is not disabled */
+	if (NULL != action && NULL != event && 0 != event->trigger.triggerid && 0 != escalation->esc_step &&
+			ACTION_NOTIFY_IF_CANCELED_FALSE != action->notify_if_canceled)
 	{
 		add_sentusers_msg_esc_cancel(&user_msg, action->actionid, event, ZBX_NULL2EMPTY_STR(error),
 				default_timezone, service, roles);
