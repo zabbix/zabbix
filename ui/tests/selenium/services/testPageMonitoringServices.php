@@ -33,6 +33,9 @@ class testPageMonitoringServices extends CWebTest {
 	use TableTrait;
 
 	const EDIT = true;
+
+	const SERVICE_COUNT = 16;
+
 	const LAYOUT_PARENT = 'Server 3';
 	const LAYOUT_CHILD = 'Server 2';
 	const LAYOUT_CHILD2 = 'Server 1';
@@ -251,6 +254,34 @@ class testPageMonitoringServices extends CWebTest {
 				'showsla' => 1,
 				'goodsla' => 99.99,
 				'sortorder' => 23
+			],
+			[
+				'name' => 'Test order',
+				'algorithm' => 1,
+				'showsla' => 0,
+				'goodsla' => 99.9,
+				'sortorder' => 0
+			],
+			[
+				'name' => '1',
+				'algorithm' => 1,
+				'showsla' => 0,
+				'goodsla' => 99.9,
+				'sortorder' => 2
+			],
+			[
+				'name' => '2',
+				'algorithm' => 1,
+				'showsla' => 0,
+				'goodsla' => 99.9,
+				'sortorder' => 2
+			],
+			[
+				'name' => '3',
+				'algorithm' => 1,
+				'showsla' => 0,
+				'goodsla' => 99.9,
+				'sortorder' => 2
 			]
 		]);
 
@@ -312,6 +343,30 @@ class testPageMonitoringServices extends CWebTest {
 						'serviceid' => $services['Server 12']
 					]
 				]
+			],
+			[
+				'serviceid' => $services['1'],
+				'parents' => [
+					[
+						'serviceid' => $services['Test order']
+					]
+				]
+			],
+			[
+				'serviceid' => $services['2'],
+				'parents' => [
+					[
+						'serviceid' => $services['Test order']
+					]
+				]
+			],
+			[
+				'serviceid' => $services['3'],
+				'parents' => [
+					[
+						'serviceid' => $services['Test order']
+					]
+				]
 			]
 		]);
 
@@ -326,16 +381,24 @@ class testPageMonitoringServices extends CWebTest {
 		// Labels on columns at services list.
 		$table = $this->query(self::TABLE_SELECTOR)->asTable()->one();
 		$this->assertSame(['Name', 'Status', 'Root cause', 'SLA', 'Tags'], $table->getHeadersText());
+		$this->assertTableStats(self::SERVICE_COUNT);
 
 		// Check that service buttons are not present in the table row.
-		$this->checkServiceButtons($table->getRow(rand(0,13)), false);
+		$this->checkServiceButtons($table->getRow(rand(1, self::SERVICE_COUNT)), false);
 
-		// Check that checkbox "Select all" not present in the table header.
-		$this->assertFalse($table->query('id:all_services')->exists());
-
-		// Check that action buttons are not present below the table.
-		$this->assertFalse($this->query('button:Mass update')->exists());
-		$this->assertFalse($this->query('button:Delete')->exists());
+		// Check that "Edit elements" are not present in View mode.
+		$elements = [
+			'button:Create service',
+			'id:filter_without_children',       // "Only services without children" checkbox in Filter.
+			'id:filter_without_problem_tags',   // "Only services without problem tags" checkbox in Filter.
+			'id:filter_tag_source_1',           // "Tag source" radiobutton in Filter.
+			'id:all_services',                  // "Select all" checkbox in table.
+			'button:Mass update',
+			'button:Delete'
+		];
+		foreach ($elements as $element) {
+			$this->assertFalse($table->query($element)->exists());
+		}
 
 		// Check parent-child service layout.
 		$this->checkParentChildLayout($table, self::LAYOUT_PARENT, self::LAYOUT_CHILD);
@@ -370,18 +433,31 @@ class testPageMonitoringServices extends CWebTest {
 
 		$table = $this->query(self::TABLE_SELECTOR)->asTable()->one();
 		$this->assertSame(['', 'Name', 'Status', 'Root cause', 'SLA', 'Tags', ''], $table->getHeadersText());
+		$this->assertTableStats(self::SERVICE_COUNT);
 
-		$this->checkServiceButtons($table->getRow(rand(0,13)), true);
+		// Check that action buttons are not enabled below the table.
+		$this->checkActionButtons(false);
 
-		// Check that action buttons are not present below the table.
-		$this->assertFalse($this->query('button:Mass update')->one()->isEnabled());
-		$this->assertFalse($this->query('button:Delete')->one()->isEnabled());
+		$selected_services = ['Server 4', 'Server 5'];
+		$this->selectTableRows($selected_services);
+		$this->assertEquals(count($selected_services).' selected',
+				$this->query('id:selected_count')->waitUntilVisible()->one()->getText()
+		);
 
+		// Check that action buttons became enabled.
+		$this->checkActionButtons(true);
+		$this->checkServiceButtons($table->getRow(rand(1, self::SERVICE_COUNT)), true);
 		$this->checkParentChildLayout($table, self::LAYOUT_PARENT, self::LAYOUT_CHILD, self::EDIT);
 		$this->checkServiceButtons($table->findRow('Name', self::LAYOUT_CHILD2, true), true);
 
 		// Check there is no Kiosk mode button.
 		$this->assertFalse($this->query('xpath://button[@title="Kiosk mode"]')->exists());
+
+		// Check Info/Filter tabs switching.
+		$this->query('xpath://li[@role="tab"]//a[text()="Filter"]')->waitUntilClickable()->one()->click();
+		$this->assertTrue($this->query('id:tab_1')->waitUntilReady()->one()->isVisible());
+		$this->query('xpath://li[@role="tab"]//a[text()="Info"]')->waitUntilClickable()->one()->click();
+		$this->assertTrue($this->query('id:tab_info')->waitUntilReady()->one()->isVisible());
 	}
 
 	/**
@@ -390,24 +466,23 @@ class testPageMonitoringServices extends CWebTest {
 	 * @param CTableElement    $table    table where to select particular service
 	 * @param string           $parent   name of parent service
 	 * @param string           $child    name of child service
+	 * @param boolean          $edit     true if it is edit scenario, false otherwise
 	 */
-	private function checkParentChildLayout($table, $parent, $child) {
-		$this->checkSeviceInfoLayout($table, $parent);
+	private function checkParentChildLayout($table, $parent, $child, $edit = false) {
+		$this->checkSeviceInfoLayout($table, $parent, $edit);
 		$this->assertTableDataColumn([$child.' 1'], 'Name');
-		$this->checkSeviceInfoLayout($table, $child);
+		$this->checkSeviceInfoLayout($table, $child, $edit);
 		$this->assertTableDataColumn([self::LAYOUT_CHILD2], 'Name');
 
+		$breadcrumbs = $this->query(self::BREADCRUMB_SELECTOR)->one();
 		// Check breadcrumbs on last child page.
 		foreach (['All services', $parent, $child] as $breadcrumb) {
-			$this->assertTrue($this->query(self::BREADCRUMB_SELECTOR)->one()->query('link', $breadcrumb)
-					->one()->isClickable()
-			);
+			$this->assertTrue($breadcrumbs->query('link', $breadcrumb)->one()->isClickable());
 		}
 
 		// Check selected breadcrumb.
-		$this->assertTrue($this->query(self::BREADCRUMB_SELECTOR)->one()
-				->query("xpath://span[@class='selected']//a[text()=".CXPathHelper::escapeQuotes($child)."]")->one()
-				->isValid()
+		$this->assertTrue($breadcrumbs->query("xpath:.//span[@class='selected']//a[text()=".
+				CXPathHelper::escapeQuotes($child)."]")->one()->isValid()
 		);
 	}
 
@@ -421,7 +496,11 @@ class testPageMonitoringServices extends CWebTest {
 	private function checkSeviceInfoLayout($table, $service, $edit = false) {
 		$table->findRow('Name', $service, true)->query('link', $service)->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
-		$this->assertTrue($this->query('xpath://li[@role="tab"]//a[text()="Info"]')->one()->isClickable());
+
+		foreach (['Info', 'Filter'] as $tab) {
+			$this->assertTrue($this->query("xpath://li[@role='tab']//a[text()=".CXPathHelper::escapeQuotes($tab).
+					"]")->one()->isClickable());
+		}
 
 		$info_card = $this->query('id:tab_info')->waitUntilReady()->one();
 		foreach ([$service, 'Parent services', 'Status', 'SLA', 'Tags'] as $text) {
@@ -430,10 +509,12 @@ class testPageMonitoringServices extends CWebTest {
 			);
 		}
 
+		$edit_button = $info_card->query('xpath://button['.CXPathHelper::fromClass('btn-edit').']');
 		if ($edit) {
-			$this->assertTrue($info_card->query('xpath://button['.CXPathHelper::fromClass('btn-edit').']')->one()
-					->isClickable()
-			);
+			$this->assertTrue($edit_button->one()->isClickable());
+		}
+		else {
+			$this->assertFalse($edit_button->exists());
 		}
 
 		$table->invalidate();
@@ -447,9 +528,22 @@ class testPageMonitoringServices extends CWebTest {
 	 * @param boolean             $exists    true if buttons should exist, false otherwise
 	 */
 	private function checkServiceButtons($row, $exists) {
-		$this->assertEquals($exists, $row->query('xpath://button[@title="Add child service"]')->one(false)->isClickable());
-		$this->assertEquals($exists, $row->query('xpath://button[@title="Edit"]')->one(false)->isClickable());
-		$this->assertEquals($exists, $row->query('xpath://button[@title="Delete"]')->one(false)->isClickable());
+		foreach (['Add child service', 'Edit', 'Delete'] as $button) {
+			$this->assertEquals($exists, $row->query("xpath:.//button[@title=".CXPathHelper::escapeQuotes($button).
+					"]")->one(false)->isClickable()
+			);
+		}
+	}
+
+	/**
+	 * Function for checking service action buttons in a table row.
+	 *
+	 * @param boolean    $enabled    true if buttons should be enabled, false otherwise
+	 */
+	private function checkActionButtons($enabled) {
+		foreach (['Mass update', 'Delete'] as $button) {
+			$this->assertTrue($this->query('button', $button)->one()->isEnabled($enabled));
+		}
 	}
 
 	public static function getFilterEditData() {
@@ -524,7 +618,7 @@ class testPageMonitoringServices extends CWebTest {
 				[
 					'filter' => [
 						'Name' => 'delete',
-						'Only services without children' => true,
+						'Only services without children' => true
 					],
 					'result' => [
 						'Server 6 for delete by checkbox',
@@ -540,7 +634,7 @@ class testPageMonitoringServices extends CWebTest {
 				[
 					'filter' => [
 						'Name' => 'Server for mass delete',
-						'Only services without problem tags' => true,
+						'Only services without problem tags' => true
 					],
 					'result' => [
 						'Server for mass delete 1'
@@ -556,7 +650,7 @@ class testPageMonitoringServices extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Name' => 'Server for mass delete',
+						'Name' => 'Server for mass delete'
 					],
 					'result' => [
 						'Server for mass delete 1',
@@ -791,7 +885,7 @@ class testPageMonitoringServices extends CWebTest {
 	 * @param array      $data      data provider
 	 * @param boolean    $edit      true if is edit scenario, false otherwise
 	 */
-	private function checkFiltering($data, $edit = false){
+	private function checkFiltering($data, $edit = false) {
 		$this->page->login()->open(($edit === false) ? 'zabbix.php?action=service.list' :
 				'zabbix.php?action=service.list.edit'
 		);
@@ -827,7 +921,7 @@ class testPageMonitoringServices extends CWebTest {
 		$table = $this->query(self::TABLE_SELECTOR)->asTable()->one();
 		if (CTestArrayHelper::get($data, 'check_breadcrumbs')) {
 			$this->assertTrue($selector->one()->query('link:All services')->one()->isClickable());
-			$this->assertTrue($selector->query('xpath://span[@class="selected" and text()="Filter results"]')->exists());
+			$this->assertTrue($selector->query('xpath:.//span[@class="selected" and text()="Filter results"]')->exists());
 
 			$headers = ($edit)
 					? ['', 'Parent services', 'Name', 'Status', 'Root cause', 'SLA', 'Tags', '']
@@ -835,7 +929,7 @@ class testPageMonitoringServices extends CWebTest {
 			$this->assertSame($headers, $table->getHeadersText());
 		}
 
-		// Reset filter due to not interfere next tests.
+		// Reset filer not to impact the results of next tests.
 		$filter_form->query('button:Reset')->one()->click();
 
 		// Check breadcrumbs and "Parent services" headers disappeared.
@@ -855,12 +949,12 @@ class testPageMonitoringServices extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=service.list');
 
 		$table = $this->query(self::TABLE_SELECTOR)->asTable()->one();
-		$form = $this->query('name:zbx_filter')->one()->asForm();
+		$form = $this->query('name:zbx_filter')->asForm()->one();
 
 		// Check table contents before filtering.
 		$start_rows_count = $table->getRows()->count();
 		$this->assertTableStats($start_rows_count);
-		$start_contents = array_values($this->getTableResult('Name'));
+		$start_contents = $this->getTableResult('Name');
 
 		// Filling fields with needed services info.
 		$form->fill(['id:filter_name' => 'Server 3']);
@@ -871,13 +965,15 @@ class testPageMonitoringServices extends CWebTest {
 		$this->assertTableStats(1);
 
 		// Checking that filtered service matches expected.
-		$this->assertEquals(['Server 3 1'], array_values($this->getTableResult('Name')));
+		$this->assertTableDataColumn(['Server 3 1']);
 
 		// After pressing reset button, check that previous services are displayed again.
 		$form->query('button:Reset')->one()->click();
-		$this->assertEquals($start_rows_count, $table->getRows()->count());
-		$this->assertTableStats($table->getRows()->count());
-		$this->assertEquals($start_contents, array_values($this->getTableResult('Name')));
+
+		$reset_count =  $table->getRows()->count();
+		$this->assertEquals($start_rows_count, $reset_count);
+		$this->assertTableStats($reset_count);
+		$this->assertEquals($start_contents, $this->getTableResult('Name'));
 	}
 
 	public function testPageMonitoringServices_AddChild() {
@@ -910,8 +1006,6 @@ class testPageMonitoringServices extends CWebTest {
 		$childid = CDBHelper::getValue('SELECT serviceid FROM services WHERE name='.zbx_dbstr($child_name));
 		$parentid = CDBHelper::getValue('SELECT serviceid FROM services WHERE name='.zbx_dbstr($parent));
 
-		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($child_name)));
-
 		// Check parent-child linking in DB.
 		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services_links WHERE serviceupid='.
 				$parentid.' AND servicedownid ='.$childid));
@@ -928,19 +1022,15 @@ class testPageMonitoringServices extends CWebTest {
 	/**
 	 * Function for checking cancelling of Delete action.
 	 *
-	 * @param boolean    $mass      true if is mass delete scenario, false otherwise
+	 * @param boolean    $mass    true if is mass delete scenario, false otherwise
 	 */
 	private function cancelDelete($mass = false) {
 		$name = 'Server 6 for delete by checkbox';
-
 		$sql = 'SELECT * FROM services ORDER BY serviceid';
-		$old_hash = CDBHelper::getHash('SELECT * FROM services ORDER BY serviceid');
+		$old_hash = CDBHelper::getHash($sql);
 
 		$this->page->login()->open('zabbix.php?action=service.list.edit');
-
 		$table = $this->query(self::TABLE_SELECTOR)->asTable()->one();
-		$before_rows_count = $table->getRows()->count();
-		$this->assertTableStats($before_rows_count);
 
 		if ($mass) {
 			$this->selectTableRows([$name], 'Name');
@@ -955,13 +1045,10 @@ class testPageMonitoringServices extends CWebTest {
 		$this->page->waitUntilReady();
 
 		// Check service not disappeared from frontend.
-		$this->assertTableStats($before_rows_count);
-		$this->assertTrue($table->query("xpath://table[@class='list-table']//td[text()=".
-				CXPathHelper::escapeQuotes($name)."]")->exists()
+			$this->assertTrue($table->query("xpath:.//td[text()=".CXPathHelper::escapeQuotes($name)."]")->exists()
 		);
 
 		// Check database.
-		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($name)));
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 	}
 
@@ -998,16 +1085,9 @@ class testPageMonitoringServices extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=service.list.edit');
 		$table = $this->query(self::TABLE_SELECTOR)->asTable()->one();
 
-		$before_rows_count = $table->getRows()->count();
-		$this->assertTableStats($before_rows_count);
-
 		// Open parent service info.
 		$table->findRow('Name', $parent, true)->query('link', $parent)->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
-
-		// Count children.
-		$childs_rows_count = $table->getRows()->count();
-		$this->assertTableStats($childs_rows_count);
 
 		// Delete child service pressing cross button.
 		$table->invalidate();
@@ -1019,14 +1099,15 @@ class testPageMonitoringServices extends CWebTest {
 		$this->assertMessage(TEST_GOOD, 'Service deleted');
 
 		// Check service disappeared from frontend.
-		$this->assertTableStats($childs_rows_count - 1);
+		$this->assertTableData();
 		$this->assertFalse($table->query("xpath://table[@class='list-table']//td[text()=".
 				CXPathHelper::escapeQuotes($name)."]")->exists()
 		);
 
 		// Check database.
-		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($name)));
-		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($parent)));
+		foreach ([$name => 0, $parent => 1] as $service => $count) {
+			$this->assertEquals($count, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($service)));
+		}
 	}
 
 	public function testPageMonitoringServices_DeleteParentFromRow() {
@@ -1065,8 +1146,9 @@ class testPageMonitoringServices extends CWebTest {
 				CXPathHelper::escapeQuotes($child)."]")->exists());
 
 		// Check database.
-		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($name)));
-		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($child)));
+		foreach ([$name => 0, $child => 1] as $service => $count) {
+			$this->assertEquals($count, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($service)));
+		}
 	}
 
 	public function testPageMonitoringServices_SimpleServicesMassDelete() {
@@ -1115,18 +1197,15 @@ class testPageMonitoringServices extends CWebTest {
 		// Open parent service info.
 		$table->findRow('Name', $parent, true)->query('link', $parent)->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
-
-		$before_rows_count = $table->getRows()->count();
-		$this->assertTableStats($before_rows_count);
+		$children_count = $table->getRows()->count();
 
 		$this->selectTableRows($names, 'Name');
 		$this->query('button:Delete')->one()->click();
 		$this->page->acceptAlert();
 		$this->assertMessage(TEST_GOOD, 'Services deleted');
 
-		$this->assertTableStats($before_rows_count - count($names));
-
 		// Services disappeared from frontend.
+		$this->assertEquals($children_count - count($names), $table->getRows()->count());
 		foreach ($names as $name) {
 			$this->assertFalse($table->query("xpath://table[@class='list-table']//td[text()=".
 					CXPathHelper::escapeQuotes($name)."]")->exists()
@@ -1145,5 +1224,29 @@ class testPageMonitoringServices extends CWebTest {
 
 		//  Last child remained in DB.
 		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name = '.zbx_dbstr($remained)));
+	}
+
+	/**
+	 * Test for checking services ordering.
+	 */
+	public function testPageMonitoringServices_TestOrder() {
+		$parent = 'Test order';
+		$children = ['1' => 2, '2' => 3, '3' => 1];
+
+		$this->page->login()->open('zabbix.php?action=service.list.edit');
+		$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
+		$table->findRow('Name', $parent, true)->query('link', $parent)->waitUntilClickable()->one()->click();
+		$this->assertTableDataColumn(['1', '2', '3']);
+
+		foreach ($children as $child => $order) {
+			$table->findRow('Name', $child)->query('xpath:.//button[@title="Edit"]')->waitUntilClickable()->one()->click();
+			$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
+			$form->fill(['Sort order (0->999)' => $order]);
+			$form->submit();
+			$this->page->waitUntilReady();
+			$this->assertMessage(TEST_GOOD, 'Service updated');
+		}
+
+		$this->assertTableDataColumn(['3', '1', '2']);
 	}
 }

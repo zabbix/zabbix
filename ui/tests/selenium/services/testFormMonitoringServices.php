@@ -1174,7 +1174,7 @@ class testFormMonitoringServices extends CWebTest {
 		$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 		$form->selectTab('Child services');
 
-		// Go to "Child services" tab and find row by particular Service name in Childs table.
+		// Go to "Child services" tab and find row by particular Service name in Children table.
 		$service_table = $form->getFieldContainer('Child services')->asTable();
 		$service_table->findRow('Service', $child, true)->query('button:Remove')->waitUntilClickable()->one()->click();
 
