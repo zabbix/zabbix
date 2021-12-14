@@ -35,30 +35,8 @@ class CSeverityCheckBoxList extends CCheckBoxList {
 		parent::__construct($name);
 
 		$this
-			->setOptions(self::getSeverities())
-			->addClass(ZBX_STYLE_COLUMNS)
-			->addClass(ZBX_STYLE_COLUMNS_3);
-	}
-
-	/**
-	 * Generate array with data for severities options ordered for showing by rows.
-	 *
-	 * @return array
-	 */
-	private static function getSeverities(): array {
-		$ordered = [];
-		$severities = CSeverityHelper::getSeverities();
-		$severities_count = count($severities);
-		$max_rows = (int) ceil($severities_count / self::COLUMNS);
-
-		for ($row = 0; $row < $max_rows; $row++) {
-			for ($i = 0; $i < $severities_count; $i += $max_rows) {
-				if (array_key_exists($row + $i, $severities)) {
-					$ordered[$row + $i] = $severities[$row + $i];
-				}
-			}
-		}
-
-		return $ordered;
+			->setOptions(CSeverityHelper::getSeverities())
+			->setVertical(true)
+			->setColumns(self::COLUMNS);
 	}
 }

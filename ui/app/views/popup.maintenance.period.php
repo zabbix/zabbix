@@ -40,7 +40,7 @@ if (array_key_exists('timeperiodid', $data)) {
 $days_weekly = [];
 $days_monthly = [];
 
-foreach ([1, 4, 6, 2, 5, 7, 3] as $day) {
+foreach (range(1,7) as $day) {
 	$value = 1 << ($day - 1);
 	$days_weekly[] = [
 		'label' => getDayOfWeekCaption($day),
@@ -56,7 +56,7 @@ foreach ([1, 4, 6, 2, 5, 7, 3] as $day) {
 
 $months = [];
 
-foreach ([1, 5, 9, 2, 6, 10, 3, 7, 11, 4, 8, 12] as $month) {
+foreach (range(1, 12) as $month) {
 	$value = 1 << ($month - 1);
 	$months[] = [
 		'label' => getMonthCaption($month),
@@ -95,18 +95,18 @@ $form_list
 	)
 	->addRow((new CLabel(_('Day of week'), 'days'))->setAsteriskMark(),
 		(new CCheckBoxList('days'))
-			->addClass(ZBX_STYLE_COLUMNS)
-			->addClass(ZBX_STYLE_COLUMNS_3)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setOptions($days_weekly),
+			->setOptions($days_weekly)
+			->setVertical(true)
+			->setColumns(3),
 		'row_timeperiod_dayofweek'
 	)
 	->addRow((new CLabel(_('Month'), 'months'))->setAsteriskMark(),
 		(new CCheckBoxList('months'))
-			->addClass(ZBX_STYLE_COLUMNS)
-			->addClass(ZBX_STYLE_COLUMNS_3)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setOptions($months),
+			->setOptions($months)
+			->setVertical(true)
+			->setColumns(3),
 		'row_timeperiod_months'
 	)
 	->addRow(new CLabel(_('Date'), 'month_date_type'),
@@ -132,10 +132,10 @@ $form_list
 	)
 	->addRow('',
 		(new CCheckBoxList('monthly_days'))
-			->addClass(ZBX_STYLE_COLUMNS)
-			->addClass(ZBX_STYLE_COLUMNS_3)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setOptions($days_monthly),
+			->setOptions($days_monthly)
+			->setVertical(true)
+			->setColumns(3),
 		'row_timeperiod_week_days'
 	)
 	->addRow((new CLabel(_('Day of month'), 'day'))->setAsteriskMark(),
