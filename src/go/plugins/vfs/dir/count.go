@@ -95,7 +95,8 @@ func (cp *countParams) getDirCount() (int, error) {
 	err := filepath.WalkDir(cp.path,
 		func(p string, d fs.DirEntry, err error) error {
 			if err != nil {
-				return err
+				impl.Logger.Errf("failed to walk dir with path  %s", p)
+				return nil
 			}
 
 			if p == cp.path {
