@@ -66,10 +66,7 @@ func (sp *sizeParams) getDirSize() (int64, error) {
 
 			fi, err := d.Info()
 			if err != nil {
-				if err != nil {
-					impl.Logger.Errf("failed to get file info for path %s, %s", p, err.Error())
-				}
-
+				impl.Logger.Errf("failed to get file info for path %s, %s", p, err.Error())
 				return nil
 			}
 
