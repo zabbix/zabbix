@@ -406,43 +406,6 @@ class CMaintenance extends CApiService {
 	}
 
 	/**
-	 * Check for unique maintenance names.
-	 *
-	 * @param array      $maintenances
-	 * @param array|null $db_maintenances
-	 *
-	 * @throws APIException if maintenance names are not unique.
-	 */
-	protected static function checkDuplicates(array $maintenances, array $db_maintenances = null): void {
-		$names = [];
-
-		foreach ($maintenances as $maintenance) {
-			if (!array_key_exists('name', $maintenance)) {
-				continue;
-			}
-
-			if ($db_maintenances === null
-					|| $maintenance['name'] !== $db_maintenances[$maintenance['maintenanceid']]['name']) {
-				$names[] = $maintenance['name'];
-			}
-		}
-
-		if (!$names) {
-			return;
-		}
-
-		$duplicates = DB::select('maintenances', [
-			'output' => ['name'],
-			'filter' => ['name' => $names],
-			'limit' => 1
-		]);
-
-		if ($duplicates) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Maintenance "%1$s" already exists.', $duplicates[0]['name']));
-		}
-	}
-
-	/**
 	 * Update maintenances.
 	 *
 	 * @param array $maintenances
@@ -771,6 +734,43 @@ class CMaintenance extends CApiService {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Check for unique maintenance names.
+	 *
+	 * @param array      $maintenances
+	 * @param array|null $db_maintenances
+	 *
+	 * @throws APIException if maintenance names are not unique.
+	 */
+	protected static function checkDuplicates(array $maintenances, array $db_maintenances = null): void {
+		$names = [];
+
+		foreach ($maintenances as $maintenance) {
+			if (!array_key_exists('name', $maintenance)) {
+				continue;
+			}
+
+			if ($db_maintenances === null
+					|| $maintenance['name'] !== $db_maintenances[$maintenance['maintenanceid']]['name']) {
+				$names[] = $maintenance['name'];
+			}
+		}
+
+		if (!$names) {
+			return;
+		}
+
+		$duplicates = DB::select('maintenances', [
+			'output' => ['name'],
+			'filter' => ['name' => $names],
+			'limit' => 1
+		]);
+
+		if ($duplicates) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Maintenance "%1$s" already exists.', $duplicates[0]['name']));
+		}
 	}
 
 	/**
