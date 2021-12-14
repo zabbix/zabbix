@@ -33,6 +33,8 @@ class testFormMonitoringServices extends CWebTest {
 
 	const UPDATE = true;
 
+	const CHILDREN_COUNT = 13;
+
 	private static $service_sql = 'SELECT * FROM services ORDER BY serviceid';
 	private static $update_service = 'Update service';
 
@@ -395,7 +397,7 @@ class testFormMonitoringServices extends CWebTest {
 		$children_dialog->query('button:Reset')->one()->waitUntilClickable()->click();
 		$children_dialog->invalidate();
 
-		$this->assertEquals(12, count($children_dialog->query('class:list-table')->asTable()->waitUntilReady()->one()
+		$this->assertEquals(self::CHILDREN_COUNT, count($children_dialog->query('class:list-table')->asTable()->waitUntilReady()->one()
 				->getRows()->asArray())
 		);
 

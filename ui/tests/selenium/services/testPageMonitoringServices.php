@@ -443,6 +443,7 @@ class testPageMonitoringServices extends CWebTest {
 
 		$selected_services = ['Server 4', 'Server 5'];
 		$this->selectTableRows($selected_services);
+		$this->page->waitUntilReady();
 		$this->assertEquals(count($selected_services).' selected',
 				$this->query('id:selected_count')->waitUntilVisible()->one()->getText()
 		);
