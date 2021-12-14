@@ -208,73 +208,36 @@ static int	get_problem_update_actions(const DB_ACKNOWLEDGE *ack, int actions, ch
  *          the item description string with real values                      *
  *                                                                            *
  ******************************************************************************/
-static void	item_description(char **data, const char *key, zbx_uint64_t hostid)
+static void	item_description(char *data, const char *key)
 {
 	AGENT_REQUEST	request;
-	char		c, *p, *m, *n, *str_out = NULL, *replace_to = NULL;
-	int		macro_r, context_l, context_r, warning = 0;
+	char		*m;
+	int		macro_r, context_l, context_r;
 
 	init_request(&request);
 
 	if (SUCCEED != parse_item_key(key, &request))
 		goto out;
 
-	p = *data;
-
-	while (NULL != (m = strchr(p, '$')))
+	if (NULL != (m = strchr(data, '$')))
 	{
-		if (m > p && '{' == *(m - 1) && FAIL != zbx_user_macro_parse(m - 1, &macro_r, &context_l, &context_r,
+		if (m > data && '{' == *(m - 1) && FAIL != zbx_user_macro_parse(m - 1, &macro_r, &context_l, &context_r,
 				NULL))
 		{
 			/* user macros */
-
-			n = m + macro_r;
-			c = *n;
-			*n = '\0';
-			DCget_user_macro(&hostid, 1, m - 1, &replace_to);
-
-			if (NULL != replace_to)
-			{
-				*(m - 1) = '\0';
-				str_out = zbx_strdcat(str_out, p);
-				*(m - 1) = '{';
-
-				str_out = zbx_strdcat(str_out, replace_to);
-				zbx_free(replace_to);
-			}
-			else
-				str_out = zbx_strdcat(str_out, p);
-
-			*n = c;
-			p = n;
+			zabbix_log(LOG_LEVEL_WARNING, "Use of user macros in the item key '%s' is no longer supported",
+					key);
 		}
 		else
 		{
-			if (0 == warning && '1' <= *(m + 1) && *(m + 1) <= '9')
+			if ('1' <= *(m + 1) && *(m + 1) <= '9')
 			{
 				/* macros $1, $2, ... */
 				zabbix_log(LOG_LEVEL_WARNING, "Use of positional macros ($1,$2... $9 - referring to the"
 						" first, second... ninth parameter of the item key '%s') is "
 						"no longer supported", key);
-
-				warning = 1;
 			}
-
-			/* just a dollar sign */
-
-			c = *++m;
-			*m = '\0';
-			str_out = zbx_strdcat(str_out, p);
-			*m = c;
-			p = m;
 		}
-	}
-
-	if (NULL != str_out)
-	{
-		str_out = zbx_strdcat(str_out, p);
-		zbx_free(*data);
-		*data = str_out;
 	}
 out:
 	free_request(&request);
@@ -638,7 +601,7 @@ void	zbx_substitute_item_name_macros(DC_ITEM *dc_item, const char *name, char **
 	if (NULL != name)
 	{
 		*replace_to = zbx_strdup(*replace_to, name);
-		item_description(replace_to, key, dc_item->host.hostid);
+		item_description(*replace_to, key);
 		zbx_free(key);
 	}
 	else	/* ZBX_REQUEST_ITEM_KEY */
