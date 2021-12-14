@@ -229,6 +229,9 @@ $form
 					->getUrl(),
 				'update_url' => (new CUrl('zabbix.php'))
 					->setArgument('action', 'sla.update')
+					->getUrl(),
+				'delete_url' => (new CUrl('zabbix.php'))
+					->setArgument('action', 'sla.delete')
 					->getUrl()
 			]).');
 		'))->setOnDocumentReady()
@@ -248,6 +251,7 @@ if ($data['slaid'] !== null) {
 			'title' => _('Clone'),
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-clone']),
 			'keepOpen' => true,
+			'isSubmit' => false,
 			'action' => 'sla_edit_popup.clone('.json_encode(_('New SLA')).');'
 		],
 		[
@@ -256,6 +260,14 @@ if ($data['slaid'] !== null) {
 			'keepOpen' => true,
 			'isSubmit' => true,
 			'action' => 'sla_edit_popup.submit();'
+		],
+		[
+			'title' => _('Delete'),
+			'confirmation' => _('Delete selected SLA?'),
+			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-delete']),
+			'keepOpen' => true,
+			'isSubmit' => false,
+			'action' => 'sla_edit_popup.delete();'
 		]
 	];
 }

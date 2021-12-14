@@ -34,54 +34,57 @@ class CControllerSlaDelete extends CController {
 
 		if (!$ret) {
 			$this->setResponse(
-				new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-				])])
+				(new CControllerResponseData([
+					'main_block' => json_encode(['errors' => getMessages()->toString()])
+				]))->disableView()
 			);
 		}
 
 		return $ret;
 	}
 
+	/**
+	 * @throws APIException
+	 */
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_SERVICES_SLA)
-			|| $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SLA);
+		if (!$this->checkAccess(CRoleHelper::UI_SERVICES_SLA)
+				|| !$this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SLA)) {
+			return false;
+		}
+
+		$sla_count = API::Sla()->get([
+			'countOutput' => true,
+			'slaids' => $this->getInput('slaids')
+		]);
+
+		return $sla_count == count($this->getInput('slaids'));
 	}
 
 	/**
 	 * @throws APIException
 	 */
 	protected function doAction(): void {
-		$output = [];
-
 		$slaids = $this->getInput('slaids');
 
 		$result = API::Sla()->delete($slaids);
 
-		if ($result) {
-			$output['success']['title'] = _n('SLA deleted', 'SLAs deleted', count($slaids));
+		$deleted = count($slaids);
 
-			if ($messages = get_and_clear_messages()) {
-				$output['success']['messages'] = array_column($messages, 'message');
+		if ($result) {
+			$output = ['title' => _n('SLA deleted', 'SLAs deleted', $deleted)];
+
+			if ($messages = CMessageHelper::getMessages()) {
+				$output['messages'] = array_column($messages, 'message');
 			}
 		}
 		else {
-			$services = API::Sla()->get([
-				'output' => [],
-				'slaids' => $slaids,
-				'editable' => true,
-				'preservekeys' => true
-			]);
-
-			$output['error'] = [
-				'title' => _n('Cannot delete SLA', 'Cannot delete SLAs', count($slaids)),
-				'messages' => array_column(get_and_clear_messages(), 'message'),
-				'keepids' => array_keys($services)
+			$output = [
+				'errors' => makeMessageBox(ZBX_STYLE_MSG_BAD, filter_messages(),
+					_n('Cannot delete SLA', 'Cannot delete SLAs', $deleted)
+				)->toString()
 			];
 		}
 
-		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
+		$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());
 	}
 }

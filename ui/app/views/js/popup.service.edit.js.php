@@ -34,6 +34,7 @@ window.service_edit_popup = {
 	algorithm_names: null,
 	create_url: null,
 	update_url: null,
+	delete_url: null,
 	search_limit: null,
 
 	overlay: null,
@@ -42,7 +43,7 @@ window.service_edit_popup = {
 	footer: null,
 
 	init({serviceid, children, children_problem_tags_html, problem_tags, status_rules, algorithm_names, create_url,
-			update_url, search_limit}) {
+			update_url, delete_url, search_limit}) {
 		this.initTemplates();
 
 		this.serviceid = serviceid;
@@ -50,6 +51,7 @@ window.service_edit_popup = {
 		this.algorithm_names = algorithm_names;
 		this.create_url = create_url;
 		this.update_url = update_url;
+		this.delete_url = delete_url;
 		this.search_limit = search_limit;
 
 		this.overlay = overlays_stack.getById('service_edit');
@@ -435,13 +437,65 @@ window.service_edit_popup = {
 		this.overlay.setProperties({title: dialog_title});
 		this.overlay.unsetLoading();
 
-		for (const element of this.footer.querySelectorAll('.js-update, .js-clone')) {
+		for (const element of this.footer.querySelectorAll('.js-update, .js-clone, .js-delete')) {
 			element.classList.add('<?= ZBX_STYLE_DISPLAY_NONE ?>');
 		}
 
 		for (const element of this.footer.querySelectorAll('.js-add')) {
 			element.classList.remove('<?= ZBX_STYLE_DISPLAY_NONE ?>');
 		}
+	},
+
+	delete() {
+		for (const el of this.form.parentNode.children) {
+			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
+				el.parentNode.removeChild(el);
+			}
+		}
+
+		this.overlay.setLoading();
+
+		const curl = new Curl(this.delete_url);
+
+		fetch(curl.getUrl(), {
+			method: 'POST',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({serviceids: [this.serviceid]})
+		})
+			.then((response) => response.json())
+			.then((response) => {
+				if ('error' in response) {
+					throw {response_error: response.error};
+				}
+
+				if ('success' in response) {
+					postMessageOk(response.success.title);
+
+					if ('messages' in response.success) {
+						postMessageDetails('success', response.success.messages);
+					}
+				}
+
+				location.href = location.href;
+			})
+			.catch((error) => {
+				this.overlay.unsetLoading();
+
+				let title, messages;
+
+				if (typeof error === 'object' && 'response_error' in error) {
+					title = error.response_error.title;
+					messages = error.response_error.messages;
+				}
+				else {
+					title = <?= json_encode(_('Unexpected server error.')) ?>;
+					messages = [];
+				}
+
+				const message_box = makeMessageBox('bad', messages, title, true, false)[0];
+
+				this.form.parentNode.insertBefore(message_box, this.form);
+			})
 	},
 
 	submit() {

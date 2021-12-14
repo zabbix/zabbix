@@ -240,7 +240,7 @@ class CRouter {
 		'script.update'								=> ['CControllerScriptUpdate',							null,					null],
 		'search'									=> ['CControllerSearch',								'layout.htmlpage',		'search'],
 		'service.create'							=> ['CControllerServiceCreateUpdate',					'layout.json',			null],
-		'service.delete'							=> ['CControllerServiceDelete',							null,					null],
+		'service.delete'							=> ['CControllerServiceDelete',							'layout.json',			null],
 		'service.list'								=> ['CControllerServiceList',							'layout.htmlpage',		'service.list'],
 		'service.list.refresh'						=> ['CControllerServiceListRefresh',					'layout.json',			'service.list.refresh'],
 		'service.list.edit'							=> ['CControllerServiceListEdit',						'layout.htmlpage',		'service.list.edit'],

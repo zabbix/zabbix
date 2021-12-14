@@ -27,27 +27,29 @@ class CControllerSlaDelete extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'slaids' => 'required|array_id'
+			'slaids' =>	'required|array_db sla.slaid'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
 			$this->setResponse(
-				new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-				])])
+				new CControllerResponseData([
+					'main_block' => json_encode(['messages' => array_column(get_and_clear_messages(), 'message')])
+				])
 			);
 		}
 
 		return $ret;
 	}
 
+	/**
+	 * @throws APIException
+	 *
+	 * @return bool
+	 */
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_SERVICES_SLA)
-			|| $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SLA);
+		return CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_SLA);
 	}
 
 	/**
@@ -55,33 +57,22 @@ class CControllerSlaDelete extends CController {
 	 */
 	protected function doAction(): void {
 		$output = [];
-
 		$slaids = $this->getInput('slaids');
-
-		$result = API::Sla()->delete($slaids);
+		$result = API::SLA()->delete($slaids);
 
 		if ($result) {
-			$output['success']['title'] = _n('SLA deleted', 'SLAs deleted', count($slaids));
-
-			if ($messages = get_and_clear_messages()) {
-				$output['success']['messages'] = array_column($messages, 'message');
-			}
+			$output['title'] = _n('SLA deleted', 'SLAs deleted', count($result['slaids']));
 		}
 		else {
-			$services = API::Sla()->get([
-				'output' => [],
-				'slaids' => $slaids,
-				'editable' => true,
-				'preservekeys' => true
-			]);
-
-			$output['error'] = [
-				'title' => _n('Cannot delete SLA', 'Cannot delete SLAs', count($slaids)),
-				'messages' => array_column(get_and_clear_messages(), 'message'),
-				'keepids' => array_keys($services)
-			];
+			$output['errors'] = makeMessageBox(ZBX_STYLE_MSG_BAD, filter_messages(), CMessageHelper::getTitle())
+				->toString();
+			$output['keepids'] = $slaids;
 		}
 
-		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
+		if ($messages = get_and_clear_messages()) {
+			$output['messages'] = array_column($messages, 'message');
+		}
+
+		$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());
 	}
 }

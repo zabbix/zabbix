@@ -32,15 +32,17 @@
 	const view = {
 		serviceid: null,
 		mode_switch_url: null,
+		delete_url: null,
 		refresh_url: null,
 		refresh_interval: null,
 		back_url: null,
 		is_refresh_paused: false,
 		is_refresh_pending: false,
 
-		init({serviceid, mode_switch_url, refresh_url, refresh_interval, back_url = null}) {
+		init({serviceid, mode_switch_url, delete_url, refresh_url, refresh_interval, back_url = null}) {
 			this.serviceid = serviceid;
 			this.mode_switch_url = mode_switch_url;
+			this.delete_url = delete_url;
 			this.refresh_url = refresh_url;
 			this.refresh_interval = refresh_interval;
 			this.back_url = back_url;
@@ -86,19 +88,14 @@
 				else if (e.target.classList.contains('js-edit-service')) {
 					this.edit({serviceid: e.target.dataset.serviceid});
 				}
-				else if (e.target.classList.contains('js-remove-service')) {
-					if (window.confirm(<?= json_encode(_('Delete selected service?')) ?>)) {
-						const curl = new Curl('zabbix.php', false);
-
-						curl.setArgument('action', 'service.delete');
-						curl.setArgument('serviceids', [e.target.dataset.serviceid]);
-						curl.setArgument('back_url', this.back_url);
-
-						redirect(curl.getUrl(), 'post');
-					}
+				else if (e.target.classList.contains('js-delete-service')) {
+					this.delete(e.target, [e.target.dataset.serviceid]);
 				}
 				else if (e.target.classList.contains('js-massupdate-service')) {
 					openMassupdatePopup(e.target, 'popup.massupdate.service', {location_url: this.back_url});
+				}
+				else if (e.target.classList.contains('js-massdelete-service')) {
+					this.delete(e.target, chkbxRange.getSelectedIds());
 				}
 			});
 		},
@@ -125,6 +122,51 @@
 			});
 
 			overlay.$dialogue[0].addEventListener('overlay.close', () => this.resumeRefresh(), {once: true});
+		},
+
+		delete(target, serviceids) {
+			if (!window.confirm(<?= json_encode(_('Delete selected service?')) ?>)) {
+				return Promise.resolve();
+			}
+
+			target.classList.add('is-loading');
+
+			return fetch(this.delete_url, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({serviceids})
+			})
+				.then((response) => response.json())
+				.then((response) => {
+					if ('error' in response) {
+						uncheckTableRows('service', 'keepids' in response ? response.keepids : []);
+
+						if ('title' in response.error) {
+							postMessageError(response.error.title);
+						}
+
+						postMessageDetails('error', response.error.messages);
+					}
+					else if('success' in response) {
+						postMessageOk(response.success.title);
+
+						if ('messages' in response.success) {
+							postMessageDetails('success', response.success.messages);
+						}
+					}
+
+					location.href = location.href;
+				})
+				.catch(() => {
+					const title = <?= json_encode(_('Unexpected server error.')) ?>;
+					const message_box = makeMessageBox('bad', [], title, true, false)[0];
+
+					clearMessages();
+					addMessage(message_box);
+				})
+				.finally(() => {
+					target.classList.remove('is-loading');
+				});
 		},
 
 		pauseRefresh() {

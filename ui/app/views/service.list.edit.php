@@ -24,10 +24,6 @@
  * @var array $data
  */
 
-if ($data['uncheck']) {
-	uncheckTableRows('service');
-}
-
 $this->addJsFile('layout.mode.js');
 $this->addJsFile('class.tagfilteritem.js');
 $this->addJsFile('class.calendar.js');
@@ -159,6 +155,10 @@ $filter->addFilterTab(_('Filter'), [
 	view.init('.json_encode([
 		'serviceid' => $data['service'] !== null ? $data['service']['serviceid'] : null,
 		'mode_switch_url' => $data['view_mode_url'],
+		'delete_url' => (new CUrl('zabbix.php'))
+			->setArgument('action', 'service.delete')
+			->setArgumentSID()
+			->getUrl(),
 		'refresh_url' => $data['refresh_url'],
 		'refresh_interval' => $data['refresh_interval'],
 		'back_url' => $data['back_url']

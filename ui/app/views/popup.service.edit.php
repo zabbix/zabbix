@@ -140,14 +140,18 @@ $service_tab = (new CFormGrid())
 				->setMaxlength(DB::getFieldLength('services', 'description'))
 		)
 	])
-	->addItem([
-		new CLabel(_('Created at'), 'created_at'),
-		new CFormField(
-			(new CTextBox('created_at', zbx_date2str(DATE_FORMAT, $data['form']['created_at'])))
-				->setEnabled(false)
-				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-		)
-	])
+	->addItem(
+		$data['serviceid'] !== null
+			? [
+				new CLabel(_('Created at'), 'created_at'),
+				new CFormField(
+					(new CTextBox('created_at', zbx_date2str(DATE_FORMAT, $data['form']['created_at'])))
+						->setEnabled(false)
+						->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+				)
+			]
+			: null
+	)
 	->addItem(
 		(new CFormField(
 			(new CCheckBox('advanced_configuration'))
@@ -342,6 +346,9 @@ $form
 				'update_url' => (new CUrl('zabbix.php'))
 					->setArgument('action', 'service.update')
 					->getUrl(),
+				'delete_url' => (new CUrl('zabbix.php'))
+					->setArgument('action', 'service.delete')
+					->getUrl(),
 				'search_limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
 			]).'
 
@@ -365,6 +372,7 @@ if ($data['serviceid'] !== null) {
 			'title' => _('Clone'),
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-clone']),
 			'keepOpen' => true,
+			'isSubmit' => false,
 			'action' => 'service_edit_popup.clone('.json_encode(_('New service')).');'
 		],
 		[
@@ -373,6 +381,14 @@ if ($data['serviceid'] !== null) {
 			'keepOpen' => true,
 			'isSubmit' => true,
 			'action' => 'service_edit_popup.submit();'
+		],
+		[
+			'title' => _('Delete'),
+			'confirmation' => _('Delete selected service?'),
+			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-delete']),
+			'keepOpen' => true,
+			'isSubmit' => false,
+			'action' => 'service_edit_popup.delete();'
 		]
 	];
 }

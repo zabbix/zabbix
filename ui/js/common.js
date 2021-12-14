@@ -1064,7 +1064,7 @@ function uncheckTableRows(page, keepids = []) {
 		// If keepids will not have same key as value, it will create mess, when new checkbox will be checked.
 		let keepids_formatted = {};
 		for (const id of Object.values(keepids)) {
-			keepids_formatted[id] = id;
+			keepids_formatted[id.toString()] = id.toString();
 		}
 
 		sessionStorage.setItem(key, JSON.stringify(keepids_formatted));

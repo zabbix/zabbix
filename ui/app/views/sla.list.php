@@ -24,10 +24,6 @@
  * @var array $data
  */
 
-if ($data['uncheck']) {
-	uncheckTableRows('sla', $data['keepids']);
-}
-
 $this->addJsFile('layout.mode.js');
 $this->addJsFile('class.tagfilteritem.js');
 $this->addJsFile('class.calendar.js');
@@ -201,7 +197,6 @@ $form->addItem([
 				->onClick('view.massEnable();')
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('no-chkbxrange')
-				->removeAttribute('id')
 		],
 		'sla.massdisable' => [
 			'content' => (new CSimpleButton(_('Disable')))
@@ -209,15 +204,13 @@ $form->addItem([
 				->onClick('view.massDisable();')
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('no-chkbxrange')
-				->removeAttribute('id')
 		],
 		'sla.massdelete' => [
 			'content' => (new CSimpleButton(_('Delete')))
 				->setAttribute('confirm', _('Delete selected SLAs?'))
-				->onClick('view.massDelete();')
 				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massdelete-sla')
 				->addClass('no-chkbxrange')
-				->removeAttribute('id')
 		]
 	], 'slas')
 ]);
