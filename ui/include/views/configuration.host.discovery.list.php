@@ -342,3 +342,7 @@ $discoveryForm->addItem([$discoveryTable, $data['paging'], new CActionButtonList
 $widget->addItem($discoveryForm);
 
 $widget->show();
+
+(new CScriptTag('view.init();'))
+	->setOnDocumentReady()
+	->show();

@@ -324,8 +324,6 @@ $widget->addItem($itemForm);
 
 $widget->show();
 
-(new CScriptTag('
-	view.init();
-'))
+(new CScriptTag('view.init();'))
 	->setOnDocumentReady()
 	->show();
