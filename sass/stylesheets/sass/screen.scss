@@ -5262,55 +5262,20 @@ svg {
 
 .problem-icon-link,
 .problem-icon-list {
-	display: flex;
-	flex-wrap: wrap;
+	display: inline-flex;
+	margin: 1px 0;
 
 	.problem-icon-list-item {
-		border-radius: 3px;
 		color: $btn-font-color;
-		display: inline-block;
-		flex: 0 0 7px;
 		font-size: 12px;
 		line-height: 1;
-		padding: 3px 4px 2px;
-		margin: 1px 0;
-
-		&:not(:last-of-type) {
-			margin-right: 5px;
-		}
-
-	}
-	&:hover,
-	&:focus {
-		border-bottom: none;
+		padding: 3px 5px 2px;
 	}
 }
 
 .problem-icon-link {
-
-	display: inline-block;
-	width: auto;
+	overflow: hidden;
 	border-radius: 3px;
-	.problem-icon-link-item {
-		color: $btn-font-color;
-		display: inline-block;
-		flex: 0 0 7px;
-		font-size: 12px;
-		line-height: 1;
-		padding: 4px 4px 4px;
-		margin: 0;
-
-		&:first-of-type {
-			border-top-left-radius: 3px;
-			border-bottom-left-radius: 3px;
-		}
-
-		&:last-of-type {
-			border-top-right-radius: 3px;
-			border-bottom-right-radius: 3px;
-		}
-
-	}
 
 	&:hover,
 	&:focus {
@@ -5318,8 +5283,17 @@ svg {
 	}
 
 	&:focus {
-		border-bottom: none;
 		box-shadow: 0 0 0 2px rgba(2, 117, 184, 0.5);
+	}
+}
+
+.problem-icon-list {
+	.problem-icon-list-item {
+		border-radius: 3px;
+
+		&:not(:last-of-type) {
+			margin-right: 5px;
+		}
 	}
 }
 

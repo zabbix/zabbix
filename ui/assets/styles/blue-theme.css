@@ -5814,49 +5814,27 @@ svg {
 
 .problem-icon-link,
 .problem-icon-list {
-  display: flex;
-  flex-wrap: wrap; }
+  display: inline-flex;
+  margin: 1px 0; }
   .problem-icon-link .problem-icon-list-item,
   .problem-icon-list .problem-icon-list-item {
-    border-radius: 3px;
     color: #ffffff;
-    display: inline-block;
-    flex: 0 0 7px;
     font-size: 12px;
     line-height: 1;
-    padding: 3px 4px 2px;
-    margin: 1px 0; }
-    .problem-icon-link .problem-icon-list-item:not(:last-of-type),
-    .problem-icon-list .problem-icon-list-item:not(:last-of-type) {
-      margin-right: 5px; }
-  .problem-icon-link:hover, .problem-icon-link:focus,
-  .problem-icon-list:hover,
-  .problem-icon-list:focus {
-    border-bottom: none; }
+    padding: 3px 5px 2px; }
 
 .problem-icon-link {
-  display: inline-block;
-  width: auto;
+  overflow: hidden;
   border-radius: 3px; }
-  .problem-icon-link .problem-icon-link-item {
-    color: #ffffff;
-    display: inline-block;
-    flex: 0 0 7px;
-    font-size: 12px;
-    line-height: 1;
-    padding: 4px 4px 4px;
-    margin: 0; }
-    .problem-icon-link .problem-icon-link-item:first-of-type {
-      border-top-left-radius: 3px;
-      border-bottom-left-radius: 3px; }
-    .problem-icon-link .problem-icon-link-item:last-of-type {
-      border-top-right-radius: 3px;
-      border-bottom-right-radius: 3px; }
   .problem-icon-link:hover, .problem-icon-link:focus {
     border-bottom: none; }
   .problem-icon-link:focus {
-    border-bottom: none;
     box-shadow: 0 0 0 2px rgba(2, 117, 184, 0.5); }
+
+.problem-icon-list .problem-icon-list-item {
+  border-radius: 3px; }
+  .problem-icon-list .problem-icon-list-item:not(:last-of-type) {
+    margin-right: 5px; }
 
 :-ms-input-placeholder {
   color: #9d9d9d !important; }
