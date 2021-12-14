@@ -320,7 +320,10 @@ var hintBox = {
 				return false;
 			}
 
-			hintBox.displayHint(e, $target, 400);
+			hintBox.displayHint(e, $target, $target.data('hintbox-delay') !== undefined
+				? $target.data('hintbox-delay')
+				: 400
+			);
 
 			return false;
 		});

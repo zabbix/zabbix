@@ -5260,6 +5260,7 @@ svg {
 	}
 }
 
+.problem-icon-link,
 .problem-icon-list {
 	display: flex;
 	flex-wrap: wrap;
@@ -5277,6 +5278,48 @@ svg {
 		&:not(:last-of-type) {
 			margin-right: 5px;
 		}
+
+	}
+	&:hover,
+	&:focus {
+		border-bottom: none;
+	}
+}
+
+.problem-icon-link {
+
+	display: inline-block;
+	width: auto;
+	border-radius: 3px;
+	.problem-icon-link-item {
+		color: $btn-font-color;
+		display: inline-block;
+		flex: 0 0 7px;
+		font-size: 12px;
+		line-height: 1;
+		padding: 4px 4px 4px;
+		margin: 0;
+
+		&:first-of-type {
+			border-top-left-radius: 3px;
+			border-bottom-left-radius: 3px;
+		}
+
+		&:last-of-type {
+			border-top-right-radius: 3px;
+			border-bottom-right-radius: 3px;
+		}
+
+	}
+
+	&:hover,
+	&:focus {
+		border-bottom: none;
+	}
+
+	&:focus {
+		border-bottom: none;
+		box-shadow: 0 0 0 2px rgba(2, 117, 184, 0.5);
 	}
 }
 

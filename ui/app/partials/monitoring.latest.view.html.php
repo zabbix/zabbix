@@ -69,7 +69,8 @@ else {
 		(new CColHeader(_('Last value')))->addStyle('width: 14%'),
 		(new CColHeader(_x('Change', 'noun')))->addStyle('width: 10%'),
 		(new CColHeader(_('Tags')))->addClass(ZBX_STYLE_COLUMN_TAGS_3),
-		(new CColHeader())->addStyle('width: 6%')
+		(new CColHeader())->addStyle('width: 6%'),
+		(new CColHeader(_('Info')))->addStyle('width: 35px')
 	]);
 }
 
@@ -91,8 +92,25 @@ foreach ($data['items'] as $itemid => $item) {
 
 	if ($last_history) {
 		$prev_history = (count($data['history'][$itemid]) > 1) ? $data['history'][$itemid][1] : null;
-		$last_check = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $last_history['clock']);
-		$last_value = formatHistoryValue($last_history['value'], $item, false);
+
+		$last_check_actual_date_time = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $last_history['clock']);
+
+		$last_check_interval = (new DateTime($last_check_actual_date_time))
+			->diff(new DateTime(date("Y-m-d H:i:s")))
+			->format('%m' . 'm %s' . 's');
+
+		$last_check = (new CSpan($last_check_interval))
+			->setHint($last_check_actual_date_time,'',true, '', 0 );
+
+		$last_value = (new CSpan(formatHistoryValue($last_history['value'], $item, false)))
+			->setHint(((new CDiv(substr($last_history['value'], 0, 8000)))
+				->addClass('hintbox-wrap')),
+				'',
+				true,
+				'max-height: 90vh;overflow: scroll',
+				0
+			);
+
 		$change = '';
 
 		if ($prev_history && in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
@@ -165,6 +183,12 @@ foreach ($data['items'] as $itemid => $item) {
 		->addClass($host['status'] == HOST_STATUS_NOT_MONITORED ? ZBX_STYLE_RED : null)
 		->setMenuPopup(CMenuPopupHelper::getHost($item['hostid']));
 
+
+	$item_icons = [];
+	if ($item['status'] == ITEM_STATUS_ACTIVE && $item['error'] !== '') {
+		$item_icons[] = makeErrorIcon($item['error']);
+	}
+
 	if ($data['filter']['show_details']) {
 		$item_config_url = (new CUrl('items.php'))
 			->setArgument('form', 'update')
@@ -192,11 +216,6 @@ foreach ($data['items'] as $itemid => $item) {
 			$item_delay = (new CSpan($item['delay']))->addClass(ZBX_STYLE_RED);
 		}
 
-		$item_icons = [];
-		if ($item['status'] == ITEM_STATUS_ACTIVE && $item['error'] !== '') {
-			$item_icons[] = makeErrorIcon($item['error']);
-		}
-
 		$table_row = new CRow([
 			$checkbox,
 			$host_name,
@@ -222,7 +241,8 @@ foreach ($data['items'] as $itemid => $item) {
 			(new CCol($last_value))->addClass($state_css),
 			(new CCol($change))->addClass($state_css),
 			$data['tags'][$itemid],
-			$actions
+			$actions,
+			makeInformationList($item_icons)
 		]);
 	}
 
