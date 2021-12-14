@@ -33,6 +33,7 @@ class testFormMonitoringServices extends CWebTest {
 
 	const UPDATE = true;
 
+	private static $service_sql = 'SELECT * FROM services ORDER BY serviceid';
 	private static $update_service = 'Update service';
 
 	private static $parentid;
@@ -56,28 +57,28 @@ class testFormMonitoringServices extends CWebTest {
 				'algorithm' => 1,
 				'showsla' => 0,
 				'goodsla' => 99.99,
-				'sortorder' => 1
+				'sortorder' => 0
 			],
 			[
 				'name' => 'Parent1',
 				'algorithm' => 1,
 				'showsla' => 1,
 				'goodsla' => 99.99,
-				'sortorder' => 2
+				'sortorder' => 0
 			],
 			[
 				'name' => 'Parent2',
 				'algorithm' => 1,
 				'showsla' => 1,
 				'goodsla' => 50,
-				'sortorder' => 3
+				'sortorder' => 0
 			],
 			[
 				'name' => 'Parent3 with problem tags',
 				'algorithm' => 1,
 				'showsla' => 1,
 				'goodsla' => 49.5,
-				'sortorder' => 4,
+				'sortorder' => 0,
 				'problem_tags' => [
 					[
 						'tag' => 'test123',
@@ -94,21 +95,21 @@ class testFormMonitoringServices extends CWebTest {
 				'algorithm' => 1,
 				'showsla' => 1,
 				'goodsla' => 99.99,
-				'sortorder' => 5
+				'sortorder' => 0
 			],
 			[
 				'name' => 'Child1',
 				'algorithm' => 1,
 				'showsla' => 1,
 				'goodsla' => 20,
-				'sortorder' => 6
+				'sortorder' => 0
 			],
 			[
 				'name' => 'Child2 with tags',
 				'algorithm' => 1,
 				'showsla' => 1,
 				'goodsla' => 20,
-				'sortorder' => 7,
+				'sortorder' => 0,
 				'problem_tags' => [
 					[
 						'tag' => 'test1',
@@ -125,21 +126,21 @@ class testFormMonitoringServices extends CWebTest {
 				'algorithm' => 1,
 				'showsla' => 1,
 				'goodsla' => 20,
-				'sortorder' => 8
+				'sortorder' => 0
 			],
 			[
 				'name' => 'Child4',
 				'algorithm' => 1,
 				'showsla' => 1,
 				'goodsla' => 20,
-				'sortorder' => 9
+				'sortorder' => 0
 			],
 			[
 				'name' => 'Clone_parent',
 				'algorithm' => 1,
 				'showsla' => 1,
 				'goodsla' => 20,
-				'sortorder' => 10
+				'sortorder' => 0
 			],
 			[
 				'name' => 'Clone1',
@@ -149,7 +150,7 @@ class testFormMonitoringServices extends CWebTest {
 				'weight' => 56,
 				'propagation_rule' => 1,
 				'propagation_value' => 3,
-				'sortorder' => 11,
+				'sortorder' => 0,
 				'problem_tags' => [
 					[
 						'tag' => 'problem_tag_clone',
@@ -168,7 +169,7 @@ class testFormMonitoringServices extends CWebTest {
 				'algorithm' => 1,
 				'showsla' => 1,
 				'goodsla' => 20,
-				'sortorder' => 12
+				'sortorder' => 0
 			]
 		]);
 
@@ -712,8 +713,7 @@ class testFormMonitoringServices extends CWebTest {
 		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
 
 		if ($expected === TEST_BAD) {
-			$sql = 'SELECT * FROM services';
-			$old_hash = CDBHelper::getHash('SELECT * FROM services');
+			$old_hash = CDBHelper::getHash(self::$service_sql);
 		}
 
 		// Open service form depending on create or update scenario.
@@ -729,6 +729,7 @@ class testFormMonitoringServices extends CWebTest {
 
 		COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $this->query('id:service-form')->asForm()->one()->waitUntilReady();
+		$form->fill($data['fields']);
 
 		if (array_key_exists('sla', $data)) {
 			$form->selectTab('SLA');
@@ -789,17 +790,12 @@ class testFormMonitoringServices extends CWebTest {
 			$this->assertTableData([$data['children']['Child services']], 'id:children');
 		}
 
-		// Return to tab Service for filling it.
-		$form->selectTab('Service');
-		$form->fill($data['fields']);
 		$form->submit();
 		$this->page->waitUntilReady();
 
 		if ($expected === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, null, $data['error']);
-			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
-			$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services WHERE name='.
-					zbx_dbstr($data['fields']['Name'])));
+			$this->assertEquals($old_hash, CDBHelper::getHash(self::$service_sql));
 		}
 		else {
 			$this->assertMessage(TEST_GOOD, ($update ? 'Service updated' : 'Service created'));
@@ -836,16 +832,17 @@ class testFormMonitoringServices extends CWebTest {
 				);
 
 				$row->query('xpath:.//button[@title="Edit"]')->waitUntilClickable()->one()->click();
+				COverlayDialogElement::find()->one()->waitUntilReady();
 				$form->selectTab('Child services');
 				$this->assertTableData([$data['children']['Child services']], 'id:children');
 			}
 			else {
 				$table->findRow('Name', $data['fields']['Name'])->query('xpath:.//button[@title="Edit"]')
 						->waitUntilClickable()->one()->click();
+				COverlayDialogElement::find()->one()->waitUntilReady();
 			}
-
-			COverlayDialogElement::find()->one()->waitUntilReady();
-			$form = $this->query('id:service-form')->asForm()->one()->waitUntilReady();
+			$form->invalidate();
+			$form->checkValue($data['fields']);
 
 			// Check that fields in frontend are the same as in data provider.
 			if (array_key_exists('sla', $data)) {
@@ -872,17 +869,6 @@ class testFormMonitoringServices extends CWebTest {
 						], 'id:times'
 					);
 				}
-			}
-			elseif (array_key_exists('children', $data)) {
-				$form->selectTab('Child services');
-				$this->assertTableData([$data['children']['Child services']], 'id:children');
-			}
-
-			if (array_key_exists('children', $data)){
-				$form->checkValue($data['fields']['Name'].' '.count($data['children']));
-			}
-			else {
-				$form->checkValue($data['fields']);
 			}
 		}
 	}
@@ -950,24 +936,23 @@ class testFormMonitoringServices extends CWebTest {
 		}
 
 		$dialog->query('button:Clone')->waitUntilClickable()->one()->click();
-		$this->page->waitUntilReady();
+		$dialog->waitUntilReady();
 		$form->invalidate();
 		$form->selectTab('Service');
 		$name = 'New cloned name'.microtime();
 		$form->fill(['Name' => $name]);
 
 		// TODO: after ZBX-20288 is fixed change this to $form->submit();
-		$dialog->query('xpath:.//div[@class="overlay-dialogue-footer"]//button[text()="Add"]')->waitUntilClickable()
-				->one()->click();
+		$dialog->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Service created');
 
-		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($name)));
-		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($data['name'])));
+		foreach([$name, $data['name']] as $service_name) {
+			$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($service_name)));
+		}
 
 		// Check cloned service saved form.
-		$table->findRow('Name', $name, true)->query('xpath:.//button[@title="Edit"]')->waitUntilClickable()->one()
-				->click();
+		$table->findRow('Name', $name, true)->query('xpath:.//button[@title="Edit"]')->waitUntilClickable()->one()->click();
 
 		$form->invalidate();
 		$original_values['Name'] = $name;
@@ -978,6 +963,52 @@ class testFormMonitoringServices extends CWebTest {
 			$form->selectTab('Child services');
 			$this->assertEquals('', $form->query('xpath:.//table[@id="children"]/tbody')->one()->getText());
 		}
+	}
+
+	public static function getCancelData() {
+		return [
+			// Service without children.
+			[
+				[
+					'button_query' => 'xpath:.//button[@title="Close"]'
+				]
+			],
+			// Service with children.
+			[
+				[
+					'button_query' => 'button:Cancel'
+				]
+			]
+		];
+	}
+	/**
+	 * Test for cancelling form with changes.
+	 *
+	 * @dataProvider getCancelData
+	 */
+	public function testFormMonitoringServices_Cancel($data) {
+		$old_hash = CDBHelper::getHash(self::$service_sql);
+
+		$this->page->login()->open('zabbix.php?action=service.list.edit');
+		$table = $this->query('class:list-table')->asTable()->waitUntilVisible()->one();
+		$table->findRow('Name', 'Child2 with tags', true)->query('xpath:.//button[@title="Edit"]')
+				->waitUntilClickable()->one()->click();
+
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$dialog->asForm()->fill([
+			'Name' => 'Updated name',
+			'Parent services' => 'Parent2',
+			'Sort order (0->999)' => '85',
+			'id:advanced_configuration' => true,
+			'Status propagation rule' => 'Increase by',
+			'id:propagation_value_number' => '4',
+			'Weight' => '9'
+		]);
+
+		$dialog->query($data['button_query'])->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
+
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::$service_sql));
 	}
 
 	public static function getSimpleUpdateData() {
@@ -1003,20 +1034,19 @@ class testFormMonitoringServices extends CWebTest {
 	 * @dataProvider getSimpleUpdateData
 	 */
 	public function testFormMonitoringServices_SimpleUpdate($data) {
-		$sql = 'SELECT * FROM services';
-		$old_hash = CDBHelper::getHash('SELECT * FROM services');
+		$old_hash = CDBHelper::getHash(self::$service_sql);
 
 		$this->page->login()->open('zabbix.php?action=service.list.edit');
 		$table = $this->query('class:list-table')->asTable()->waitUntilVisible()->one();
 		$table->findRow('Name', $data['name'], true)->query('xpath:.//button[@title="Edit"]')
 				->waitUntilClickable()->one()->click();
 
-		COverlayDialogElement::find()->one()->waitUntilReady();
+		COverlayDialogElement::find()->waitUntilReady()->one();
 		$this->query('id:service-form')->asForm()->one()->waitUntilReady()->submit();
 		$this->page->waitUntilReady();
 
 		$this->assertMessage(TEST_GOOD, 'Service updated');
-		$this->assertEquals($old_hash, CDBHelper::getHash($sql));
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::$service_sql));
 	}
 
 	public function getCreateChildData() {
@@ -1057,8 +1087,7 @@ class testFormMonitoringServices extends CWebTest {
 		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
 
 		if ($expected === TEST_BAD) {
-			$sql = 'SELECT * FROM services ORDER BY serviceid';
-			$old_hash = CDBHelper::getHash('SELECT * FROM services ORDER BY serviceid');
+			$old_hash = CDBHelper::getHash(self::$service_sql);
 		}
 
 		$this->page->login()->open('zabbix.php?action=service.list.edit');
@@ -1098,10 +1127,7 @@ class testFormMonitoringServices extends CWebTest {
 
 		if ($expected === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, null, $data['error']);
-			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
-			$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services WHERE name='.
-					zbx_dbstr($data['fields']['Name']))
-			);
+			$this->assertEquals($old_hash, CDBHelper::getHash(self::$service_sql));
 		}
 		else {
 			$this->assertMessage(TEST_GOOD, 'Service created');
@@ -1119,7 +1145,7 @@ class testFormMonitoringServices extends CWebTest {
 					->waitUntilClickable()->one()->click();
 
 			COverlayDialogElement::find()->one()->waitUntilReady();
-			$form = $this->query('id:service-form')->asForm()->one()->waitUntilReady();
+			$form = $this->query('id:service-form')->asForm()->one();
 
 			// Check that all form fields were saved correctly.
 			$form->checkValue($data['fields']);
@@ -1140,13 +1166,12 @@ class testFormMonitoringServices extends CWebTest {
 		$this->query('id:tab_info')->one()->waitUntilVisible()->query('xpath:.//button[contains(@class, "btn-edit")]')
 				->one()->waitUntilClickable()->click();
 
-		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+		$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 		$form->selectTab('Child services');
 
-		// Go to "Childs" tab and find row by particular Service name in Childs table.
+		// Go to "Child services" tab and find row by particular Service name in Childs table.
 		$service_table = $form->getFieldContainer('Child services')->asTable();
-		$service_table->findRow('Service', $child, true)->query('button:Remove')
-				->waitUntilClickable()->one()->click();
+		$service_table->findRow('Service', $child, true)->query('button:Remove')->waitUntilClickable()->one()->click();
 
 		// Make sure that Name disappeared right after removing.
 		$this->assertFalse($service_table->query("xpath:.//table[@id='children']//td[contains(text(),".
@@ -1158,8 +1183,9 @@ class testFormMonitoringServices extends CWebTest {
 		// Check "No data found." text in table under Parent.
 		$this->assertTableData([]);
 
-		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($parent)));
-		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($child)));
+		foreach ([$parent, $child] as $name) {
+			$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($name)));
+		}
 
 		// Check that service linking is disappeared from DB.
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services_links WHERE serviceupid='.
@@ -1178,17 +1204,18 @@ class testFormMonitoringServices extends CWebTest {
 		$table->findRow('Name', $child, true)->query('xpath:.//button[contains(@class, "btn-edit")]')
 				->one()->waitUntilClickable()->click();
 
-		COverlayDialogElement::find()->one()->waitUntilReady();
-		$form = $this->query('id:service-form')->asForm()->one()->waitUntilReady();
+		$form = $form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
 		$form->getField('Parent services')->asMultiselect()->clear();
 		$form->submit();
 
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Service updated');
-		$this->assertTableData([]);
+		$this->assertTableData();
 
-		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($parent)));
-		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($child)));
+		foreach ([$parent, $child] as $name) {
+			$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr($name)));
+		}
+
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services_links WHERE serviceupid='.
 				self::$parentid_2.' AND servicedownid ='.self::$childid_2)
 		);
