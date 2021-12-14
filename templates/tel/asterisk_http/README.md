@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 The template for monitoring Asterisk over HTTP that works without any external scripts.  
 It collects metrics by polling the Asterisk Manager API remotely using an HTTP agent and JS preprocessing.  
 All metrics are collected at once, thanks to Zabbix's bulk data collection.
@@ -70,7 +70,7 @@ There are no template links in this template.
 |Asterisk |Asterisk: Active channels |<p>The number of active channels at the moment.</p> |DEPENDENT |asterisk.active_channels<p>**Preprocessing**:</p><p>- JSONPATH: `$.active_channels`</p> |
 |Asterisk |Asterisk: Active calls |<p>The number of active calls at the moment.</p> |DEPENDENT |asterisk.active_calls<p>**Preprocessing**:</p><p>- JSONPATH: `$.active_calls`</p> |
 |Asterisk |Asterisk: Calls processed |<p>The number of calls processed after the last service restart.</p> |DEPENDENT |asterisk.calls_processed<p>**Preprocessing**:</p><p>- JSONPATH: `$.calls_processed`</p> |
-|Asterisk |Asterisk: Calls processed per second |<p>The number of calls processed per second.</p> |DEPENDENT |asterisk.calls_processed.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.calls_processed`</p><p>- CHANGE_PER_SECOND |
+|Asterisk |Asterisk: Calls processed per second |<p>The number of calls processed per second.</p> |DEPENDENT |asterisk.calls_processed.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.calls_processed`</p><p>- CHANGE_PER_SECOND</p> |
 |Asterisk |Asterisk: Total queues |<p>The number of configured queues.</p> |DEPENDENT |asterisk.total_queues<p>**Preprocessing**:</p><p>- JSONPATH: `$.queue.total`</p> |
 |Asterisk |Asterisk: SIP monitored online |<p>The number of monitored online SIP peers.</p> |DEPENDENT |asterisk.sip.monitored_online<p>**Preprocessing**:</p><p>- JSONPATH: `$.sip.monitored_online`</p> |
 |Asterisk |Asterisk: SIP monitored offline |<p>The number of monitored offline SIP peers.</p> |DEPENDENT |asterisk.sip.monitored_offline<p>**Preprocessing**:</p><p>- JSONPATH: `$.sip.monitored_offline`</p> |

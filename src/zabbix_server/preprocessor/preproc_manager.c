@@ -1163,7 +1163,9 @@ static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request,
 
 	if (ZBX_VARIANT_NONE == value->type)
 	{
-		free_result(request->value.result);
+		if (NULL != request->value.result)
+			free_result(request->value.result);
+
 		zbx_free(request->value.error);
 
 		request->value.state = ITEM_STATE_NORMAL;

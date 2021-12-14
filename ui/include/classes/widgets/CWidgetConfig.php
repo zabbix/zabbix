@@ -49,7 +49,7 @@ class CWidgetConfig {
 			WIDGET_FAV_GRAPHS			=> _('Favorite graphs'),
 			WIDGET_FAV_MAPS				=> _('Favorite maps'),
 			WIDGET_GEOMAP				=> _('Geomap'),
-			WIDGET_ITEM					=> _('Item'),
+			WIDGET_ITEM					=> _('Item value'),
 			WIDGET_GRAPH				=> _('Graph (classic)'),
 			WIDGET_GRAPH_PROTOTYPE		=> _('Graph prototype'),
 			WIDGET_HOST_AVAIL			=> _('Host availability'),

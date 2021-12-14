@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 Official JMX Template for Apache ActiveMQ.
 
 
@@ -85,8 +85,8 @@ There are no template links in this template.
 |ActiveMQ |Broker {#JMXBROKERNAME}: Storage usage in percents |<p>Percent of store limit used.</p> |JMX |jmx[{#JMXOBJ},StorePercentUsage] |
 |ActiveMQ |Broker {#JMXBROKERNAME}: Temp limit |<p>Disk limit, in bytes, used for non-persistent messages and temporary data before producers are blocked.</p> |JMX |jmx[{#JMXOBJ},TempLimit]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |ActiveMQ |Broker {#JMXBROKERNAME}: Temp usage in percents |<p>Percent of temp limit used.</p> |JMX |jmx[{#JMXOBJ},TempPercentUsage] |
-|ActiveMQ |Broker {#JMXBROKERNAME}: Messages enqueue rate |<p>Rate of messages that have been sent to the broker.</p> |JMX |jmx[{#JMXOBJ},TotalEnqueueCount]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
-|ActiveMQ |Broker {#JMXBROKERNAME}: Messages dequeue rate |<p>Rate of messages that have been delivered by the broker and acknowledged by consumers.</p> |JMX |jmx[{#JMXOBJ},TotalDequeueCount]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
+|ActiveMQ |Broker {#JMXBROKERNAME}: Messages enqueue rate |<p>Rate of messages that have been sent to the broker.</p> |JMX |jmx[{#JMXOBJ},TotalEnqueueCount]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
+|ActiveMQ |Broker {#JMXBROKERNAME}: Messages dequeue rate |<p>Rate of messages that have been delivered by the broker and acknowledged by consumers.</p> |JMX |jmx[{#JMXOBJ},TotalDequeueCount]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
 |ActiveMQ |Broker {#JMXBROKERNAME}: Consumers count total |<p>Number of consumers attached to this broker.</p> |JMX |jmx[{#JMXOBJ},TotalConsumerCount] |
 |ActiveMQ |Broker {#JMXBROKERNAME}: Producers count total |<p>Number of producers attached to this broker.</p> |JMX |jmx[{#JMXOBJ},TotalProducerCount] |
 |ActiveMQ |{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Consumers count |<p>Number of consumers attached to this destination.</p> |JMX |jmx[{#JMXOBJ},ConsumerCount] |
@@ -94,8 +94,8 @@ There are no template links in this template.
 |ActiveMQ |{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Producers count |<p>Number of producers attached to this destination.</p> |JMX |jmx[{#JMXOBJ},ProducerCount] |
 |ActiveMQ |{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Producers count total on {#JMXBROKERNAME} |<p>Number of producers attached to the broker of this destination. Used to suppress destination's triggers when the count of producers on the broker is lower than threshold.</p> |JMX |jmx["org.apache.activemq:type=Broker,brokerName={#JMXBROKERNAME}",{$ACTIVEMQ.TOTAL.PRODUCERS.COUNT: "{#JMXDESTINATIONNAME}"}]<p>**Preprocessing**:</p><p>- IN_RANGE: `0 {$ACTIVEMQ.BROKER.PRODUCERS.MIN.HIGH}`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> {$ACTIVEMQ.BROKER.PRODUCERS.MIN.HIGH}`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |ActiveMQ |{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Memory usage in percents |<p>The percentage of the memory limit used.</p> |JMX |jmx[{#JMXOBJ},MemoryPercentUsage] |
-|ActiveMQ |{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Messages enqueue rate |<p>Rate of messages that have been sent to the destination.</p> |JMX |jmx[{#JMXOBJ},EnqueueCount]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
-|ActiveMQ |{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Messages dequeue rate |<p>Rate of messages that has been acknowledged (and removed) from the destination.</p> |JMX |jmx[{#JMXOBJ},DequeueCount]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND |
+|ActiveMQ |{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Messages enqueue rate |<p>Rate of messages that have been sent to the destination.</p> |JMX |jmx[{#JMXOBJ},EnqueueCount]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
+|ActiveMQ |{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Messages dequeue rate |<p>Rate of messages that has been acknowledged (and removed) from the destination.</p> |JMX |jmx[{#JMXOBJ},DequeueCount]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
 |ActiveMQ |{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Queue size |<p>Number of messages on this destination, including any that have been dispatched but not acknowledged.</p> |JMX |jmx[{#JMXOBJ},QueueSize] |
 |ActiveMQ |{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Expired messages count |<p>Number of messages that have been expired.</p> |JMX |jmx[{#JMXOBJ},ExpiredCount]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 

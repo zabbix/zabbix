@@ -270,9 +270,9 @@ static int	load_config_user_params(void)
  ******************************************************************************/
 void	reload_user_parameters(unsigned char process_type, int process_num)
 {
-	char	*error = NULL;
+	char		*error = NULL;
+	ZBX_METRIC	*metrics_fallback = NULL;
 
-	remove_user_parameters();
 	zbx_strarr_init(&CONFIG_USER_PARAMETERS);
 
 	if (FAIL == load_config_user_params())
@@ -282,14 +282,19 @@ void	reload_user_parameters(unsigned char process_type, int process_num)
 		goto out;
 	}
 
+	get_metrics_copy(&metrics_fallback);
+	remove_user_parameters();
+
 	if (FAIL == load_user_parameters(CONFIG_USER_PARAMETERS, &error))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot reload user parameters [%s #%d], stopped at: %s",
+		set_metrics(metrics_fallback);
+		zabbix_log(LOG_LEVEL_ERR, "cannot reload user parameters [%s #%d], %s",
 				get_process_type_string(process_type), process_num, error);
 		zbx_free(error);
 		goto out;
 	}
 
+	free_metrics_ext(&metrics_fallback);
 	zabbix_log(LOG_LEVEL_INFORMATION, "user parameters reloaded [%s #%d]", get_process_type_string(process_type),
 			process_num);
 out:

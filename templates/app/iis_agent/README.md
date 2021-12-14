@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 The template to monitor IIS (Internet Information Services) by Zabbix that works without any external scripts.
 
 

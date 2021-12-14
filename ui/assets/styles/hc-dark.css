@@ -6750,6 +6750,10 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
     cursor: default;
     opacity: .4; }
 
+.leaflet-container {
+  height: 100%;
+  z-index: 1; }
+
 .sidebar .logo:focus .sidebar-logo {
   box-shadow: 0 0 0 2px #000000; }
 .sidebar button:focus {
