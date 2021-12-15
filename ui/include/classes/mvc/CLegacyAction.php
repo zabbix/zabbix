@@ -105,9 +105,19 @@ class CLegacyAction extends CAction {
 				CRoleHelper::UI_CONFIGURATION_HOSTS => ['host.list'],
 				CRoleHelper::UI_CONFIGURATION_MAINTENANCE => ['maintenance.php'],
 				CRoleHelper::UI_CONFIGURATION_TEMPLATES => ['templates.php'],
-				CRoleHelper::UI_REPORTS_NOTIFICATIONS => ['report4.php'],
-				CRoleHelper::UI_SERVICES_ACTIONS => ['actionconf.php']
+				CRoleHelper::UI_REPORTS_NOTIFICATIONS => ['report4.php']
 			];
+
+			if ($action === 'actionconf.php' && getRequest('eventsource') === (string) EVENT_SOURCE_SERVICE) {
+				$rule_actions += [
+					CRoleHelper::UI_SERVICES_ACTIONS => ['actionconf.php']
+				];
+			}
+			else {
+				$rule_actions += [
+					CRoleHelper::UI_CONFIGURATION_ACTIONS => ['actionconf.php']
+				];
+			}
 		}
 
 		if ($user_type == USER_TYPE_SUPER_ADMIN) {
