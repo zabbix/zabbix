@@ -22,6 +22,8 @@ require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../CElement.php';
 
+use Facebook\WebDriver\WebDriverKeys;
+
 /**
  * Color picker element.
  */
@@ -58,7 +60,6 @@ class CColorPickerElement extends CElement {
 		return $this;
 	}
 
-
 	/**
 	 * @inheritdoc
 	 */
@@ -77,23 +78,21 @@ class CColorPickerElement extends CElement {
 	}
 
 	/**
-	 * Close overlay dialog.
+	 * Close color pick overlay dialog.
 	 *
 	 * @return $this
 	 */
 	public function close() {
-		$this->query('class:overlay-close-btn')->one()->click();
-		return $this->waitUntilNotVisible();
+		$this->query('class:overlay-close-btn')->one()->click()->waitUntilNotVisible();
 	}
 
 	/**
-	 * Add/rewrite code color and close color pick form.
+	 * Add/rewrite color code and submit it.
 	 *
 	 * @param string $color		color code
 	 */
 	public function fill($color) {
 		$this->overwrite($color);
-//		$this->close();
-		$this->keyboard->pressKey('Enter');
+		$this->overwrite(WebDriverKeys::ENTER)->waitUntilNotVisible();
 	}
 }
