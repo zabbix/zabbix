@@ -6902,7 +6902,7 @@ a.link-action {
   color: #ffffff !important; }
   .btn-link:focus, .interface-container .interface-row .interface-cell .interface-btn-toggle:focus {
     margin-bottom: -3px !important;
-    border-bottom: 3px solid currentColor !important; }
+    border-bottom: 3px solid #ffffff !important; }
 
 .table-paging a:focus {
   background-color: #ffffff; }
