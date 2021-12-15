@@ -73,7 +73,11 @@ $filter_column = (new CFormList())
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	)
 	->addRow(new CLabel(_('Severity')),
-		(new CSeverityCheckBoxList('severities'))->setChecked($data['filter']['severities'])
+		(new CCheckBoxList('severities'))
+			->setOptions(CSeverityHelper::getSeverities())
+			->setChecked($data['filter']['severities'])
+			->setColumns(3)
+			->setVertical(true)
 	);
 
 $filterForm

@@ -116,9 +116,12 @@ $left_column = (new CFormList())
 			->setId('port_#{uniqid}')
 	)
 	->addRow(_('Severity'),
-		(new CSeverityCheckBoxList('severities'))
-			->setChecked($data['severities'])
+		(new CCheckBoxList('severities'))
 			->setUniqid('#{uniqid}')
+			->setOptions(CSeverityHelper::getSeverities())
+			->setChecked($data['severities'])
+			->setColumns(3)
+			->setVertical(true)
 	);
 
 $right_column = (new CFormList())
