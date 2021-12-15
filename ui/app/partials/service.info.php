@@ -81,11 +81,11 @@ if (array_key_exists('slas', $data)) {
 				->setHint($hint);
 		}
 
-		$slas[] = new CDiv($sla_html);
+		$slas[] = (new CDiv($sla_html))->addClass(ZBX_STYLE_SERVICE_INFO_VALUE_SLA);
 	}
 
 	if ($data['slas_count'] > count($data['slas'])) {
-		$slas[] = new CDiv('&hellip;');
+		$slas[] = (new CDiv('&hellip;'))->addClass(ZBX_STYLE_SERVICE_INFO_VALUE_SLA);
 	}
 }
 
@@ -119,9 +119,7 @@ if (array_key_exists('slas', $data)) {
 		])
 		->addItem([
 			(new CDiv(_('SLA')))->addClass(ZBX_STYLE_SERVICE_INFO_LABEL),
-			(new CDiv($slas))
-				->addClass(ZBX_STYLE_SERVICE_INFO_VALUE)
-				->addClass(ZBX_STYLE_SERVICE_INFO_VALUE_SLA)
+			(new CDiv($slas))->addClass(ZBX_STYLE_SERVICE_INFO_VALUE)
 		])
 		->addItem([
 			(new CDiv(_('Tags')))->addClass(ZBX_STYLE_SERVICE_INFO_LABEL),

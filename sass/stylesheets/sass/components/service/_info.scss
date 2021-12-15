@@ -23,13 +23,12 @@
 
 	.service-info-value {
 
-		&.service-info-value-sla {
-			div {
-				display: inline-block;
+		.service-info-value-sla {
+			display: inline-block;
+			word-break: break-word;
 
-				&:not(:last-child) {
-					margin-right: 10px;
-				}
+			&:not(:last-child) {
+				margin-right: 10px;
 			}
 		}
 	}
