@@ -49,8 +49,9 @@ if (array_key_exists('slas', $data)) {
 		$sla_html = [
 			new CLink($sla['name'],
 				(new CUrl('zabbix.php'))
-					->setArgument('action', 'sla_report')
-					->setArgument('slaid', $sla['slaid'])
+					->setArgument('action', 'slareport.list')
+					->setArgument('filter_slaid', $sla['slaid'])
+					->setArgument('filter_set', 1)
 			)
 		];
 
