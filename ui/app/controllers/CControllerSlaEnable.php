@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerSlaDelete extends CController {
+class CControllerSlaEnable extends CController {
 
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
@@ -58,17 +58,26 @@ class CControllerSlaDelete extends CController {
 
 		$slaids = $this->getInput('slaids');
 
-		$result = API::Sla()->delete($slaids);
+		$update = [];
+
+		foreach ($slaids as $slaid) {
+			$update[] = [
+				'slaid' => $slaid,
+				'status' => ZBX_SLA_STATUS_ENABLED
+			];
+		}
+
+		$result = API::Sla()->update($update);
 
 		if ($result) {
-			$output['success']['title'] = _n('SLA deleted', 'SLAs deleted', count($slaids));
+			$output['success']['title'] = _n('SLA enabled', 'SLAs enabled', count($slaids));
 
 			if ($messages = get_and_clear_messages()) {
 				$output['success']['messages'] = array_column($messages, 'message');
 			}
 		}
 		else {
-			$services = API::Sla()->get([
+			$slas = API::Sla()->get([
 				'output' => [],
 				'slaids' => $slaids,
 				'editable' => true,
@@ -76,9 +85,9 @@ class CControllerSlaDelete extends CController {
 			]);
 
 			$output['error'] = [
-				'title' => _n('Cannot delete SLA', 'Cannot delete SLAs', count($slaids)),
+				'title' => _n('Cannot enable SLA', 'Cannot enable SLAs', count($slaids)),
 				'messages' => array_column(get_and_clear_messages(), 'message'),
-				'keepids' => array_keys($services)
+				'keepids' => array_keys($slas)
 			];
 		}
 

@@ -4434,6 +4434,23 @@ button {
 	}
 }
 
+.link-action {
+	&.is-loading {
+		position: relative;
+		color: transparent !important;
+		border-bottom-color: transparent;
+
+		&::after {
+			box-shadow: none;
+			background: none;
+			border: 1px solid $preloader-disabled-color;
+			border-bottom-color: $preloader-accent-color;
+			width: 12px;
+			height: 12px;
+		}
+	}
+}
+
 span {
 	&.is-loading {
 		position: relative;

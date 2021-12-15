@@ -66,12 +66,13 @@
 		initTagFilter() {
 			$('#filter-tags')
 				.dynamicRows({template: '#filter-tag-row-tmpl'})
-				.on('afteradd.dynamicRows', function() {
+				.on('afteradd.dynamicRows', function () {
 					const rows = this.querySelectorAll('.form_row');
+
 					new CTagFilterItem(rows[rows.length - 1]);
 				});
 
-			document.querySelectorAll('#filter-tags .form_row').forEach(row => {
+			document.querySelectorAll('#filter-tags .form_row').forEach((row) => {
 				new CTagFilterItem(row);
 			});
 		},
@@ -95,7 +96,7 @@
 					openMassupdatePopup(e.target, 'popup.massupdate.service', {location_url: this.back_url});
 				}
 				else if (e.target.classList.contains('js-massdelete-service')) {
-					this.delete(e.target, chkbxRange.getSelectedIds());
+					this.delete(e.target, Object.values(chkbxRange.getSelectedIds()));
 				}
 			});
 		},
@@ -125,8 +126,12 @@
 		},
 
 		delete(target, serviceids) {
-			if (!window.confirm(<?= json_encode(_('Delete selected service?')) ?>)) {
-				return Promise.resolve();
+			const confirmation = serviceids.length > 1
+				? <?= json_encode(_('Delete selected services?')) ?>
+				: <?= json_encode(_('Delete selected service?')) ?>;
+
+			if (!window.confirm(confirmation)) {
+				return;
 			}
 
 			target.classList.add('is-loading');

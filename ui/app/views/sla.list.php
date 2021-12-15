@@ -31,152 +31,119 @@ $this->includeJsFile('sla.list.js.php');
 
 $filter = (new CFilter())
 	->addVar('action', 'sla.list')
-	->setResetUrl($data['reset_curl'])
-	->setProfile('web.sla.filter')
-	->setActiveTab($data['active_tab']);
-
-$filter->addFilterTab(_('Filter'), [
-	(new CFormGrid())
-		->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
-		->addItem([
-			new CLabel(_('Name'), 'filter_name'),
-			new CFormField(
-				(new CTextBox('filter_name', $data['filter']['name']))
-					->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-			)
-		])
-		->addItem([
-			new CLabel(_('Status')),
-			new CFormField(
-				(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
-					->addValue(_('Any'), CSlaHelper::SLA_STATUS_ANY)
-					->addValue(_('Enabled'), CSlaHelper::SLA_STATUS_ENABLED)
-					->addValue(_('Disabled'), CSlaHelper::SLA_STATUS_DISABLED)
-					->setModern(true)
-			)
-		]),
-	(new CFormGrid())
-		->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
-		->addItem([
-			new CLabel(_('Tags')),
-			new CFormField(
-				CTagFilterFieldHelper::getTagFilterField([
-					'evaltype' => $data['filter']['evaltype'],
-					'tags' => $data['filter']['tags'] ?: [
-						['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]
-					]
-				])
-			)
-		])
-]);
+	->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', 'sla.list'))
+	->setProfile('web.sla.list.filter')
+	->setActiveTab($data['active_tab'])
+	->addFilterTab(_('Filter'), [
+		(new CFormGrid())
+			->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
+			->addItem([
+				new CLabel(_('Name'), 'filter_name'),
+				new CFormField(
+					(new CTextBox('filter_name', $data['filter']['name']))
+						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+				)
+			])
+			->addItem([
+				new CLabel(_('Status')),
+				new CFormField(
+					(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
+						->addValue(_('Any'), CSlaHelper::SLA_STATUS_ANY)
+						->addValue(_('Enabled'), CSlaHelper::SLA_STATUS_ENABLED)
+						->addValue(_('Disabled'), CSlaHelper::SLA_STATUS_DISABLED)
+						->setModern(true)
+				)
+			]),
+		(new CFormGrid())
+			->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
+			->addItem([
+				new CLabel(_('Tags')),
+				new CFormField(
+					CTagFilterFieldHelper::getTagFilterField([
+						'evaltype' => $data['filter']['evaltype'],
+						'tags' => $data['filter']['tags'] ?: [
+							['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]
+						]
+					])
+				)
+			])
+	]);
 
 $form = (new CForm())
 	->setId('sla-list')
 	->setName('sla_list');
 
+$view_url = (new CUrl('zabbix.php'))
+	->setArgument('action', 'sla.list')
+	->getUrl();
+
 $header = [
-	make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $data['filter_url'])
+	$data['has_access'][CRoleHelper::ACTIONS_MANAGE_SLA]
+		? (new CColHeader(
+			(new CCheckBox('all_slas'))->onClick("checkAll('sla_list', 'all_slas', 'slaids');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH)
+		: null,
+	make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $view_url)
 		->addStyle('width: 14%;'),
-	make_sorting_header(_('SLO'), 'slo', $data['sort'], $data['sortorder'], $data['filter_url'])
+	make_sorting_header(_('SLO'), 'slo', $data['sort'], $data['sortorder'], $view_url)
 		->addStyle('width: 7%;'),
-	make_sorting_header(_('Effective date'), 'effective_date', $data['sort'], $data['sortorder'], $data['filter_url'])
+	make_sorting_header(_('Effective date'), 'effective_date', $data['sort'], $data['sortorder'], $view_url)
 		->addStyle('width: 14%'),
 	new CColHeader(_('Reporting period')),
 	new CColHeader(_('Timezone')),
 	new CColHeader(_('Schedule')),
-	new CColHeader(_('SLA report')),
-	make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $data['filter_url'])
+	$data['has_access'][CRoleHelper::UI_SERVICES_SLA_REPORT] ? new CColHeader(_('SLA report')) : null,
+	make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $view_url)
 ];
 
-if ($data['can_manage_sla']) {
-	array_unshift($header, (new CCheckBox('all_ids'))->onClick("checkAll('sla-list', 'all_ids', 'slaids');"));
-}
-
-$sla_list = (new CTableInfo())
-	->setHeader($header);
+$sla_list = (new CTableInfo())->setHeader($header);
 
 foreach ($data['slas'] as $slaid => $sla) {
-	if ($data['can_manage_sla']) {
-		$name_element = (new CLink($sla['name'],
-			(new CUrl('zabbix.php'))
-				->setArgument('action', 'sla.edit')
-				->setArgument('slaid', $slaid)
-		))
-			->onClick('view.edit('.json_encode(['slaid' => $slaid]).'); return false;');
-
-		if ($sla['status'] == CSlaHelper::SLA_STATUS_ENABLED) {
-			$status_element = (new CLink(_('Enabled'),
-				$data['status_toggle_curl']
-					->setArgument('slaids', [$slaid])
-					->setArgument('status', CSlaHelper::SLA_STATUS_DISABLED)
-					->getUrl()
-			))
+	if ($data['has_access'][CRoleHelper::ACTIONS_MANAGE_SLA]) {
+		$status_tag = $sla['status'] == ZBX_SLA_STATUS_ENABLED
+			? (new CLink(_('Enabled')))
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_GREEN)
-				->addConfirmation(_('Disable SLA?'))
-				->addSID();
-		}
-		else {
-			$status_element = (new CLink(_('Disabled'),
-				$data['status_toggle_curl']
-					->setArgument('slaids', [$slaid])
-					->setArgument('status', CSlaHelper::SLA_STATUS_ENABLED)
-					->getUrl()
-			))
+				->addClass('js-disable-sla')
+				->setAttribute('data-slaid', $slaid)
+			: (new CLink(_('Disabled')))
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_RED)
-				->addConfirmation(_('Enable SLA?'))
-				->addSID();
-		}
+				->addClass('js-enable-sla')
+				->setAttribute('data-slaid', $slaid);
 	}
 	else {
-		$name_element = $sla['name'];
-		$status_element = ($sla['status'] == CSlaHelper::SLA_STATUS_ENABLED) ? _('Enabled') : _('Disabled');
-	}
-
-	if (array_key_exists($slaid, $data['custom_schedule'])) {
-		$schedule_hint = (new CTableInfo())->setHeader([_('Schedule'), _('Time period')]);
-
-		foreach ($data['custom_schedule'][$slaid] as $weekday => $periods) {
-			$schedule_hint->addRow([getDayOfWeekCaption($weekday), $periods === '' ? '-' : $periods]);
-		}
-
-		$schedule_mode = (new CCol(
-			(new CLinkAction([
-				CSlaHelper::scheduleModeToStr(CSlaHelper::SCHEDULE_MODE_CUSTOM),
-				(new CSpan())->addClass('icon-description')
-			]))
-				->setHint($schedule_hint)
-		))->addClass(ZBX_STYLE_NOWRAP);
-	}
-	else {
-		$schedule_mode = CSlaHelper::scheduleModeToStr(CSlaHelper::SCHEDULE_MODE_24X7);
+		$status_tag = $sla['status'] == ZBX_SLA_STATUS_ENABLED
+			? (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN)
+			: (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_RED);
 	}
 
 	$row = [
-		$name_element,
+		$data['has_access'][CRoleHelper::ACTIONS_MANAGE_SLA]
+			? new CCheckBox('slaids['.$slaid.']', $slaid)
+			: null,
+		$data['has_access'][CRoleHelper::ACTIONS_MANAGE_SLA]
+			? (new CLink($sla['name']))
+				->addClass('js-edit-sla')
+				->setAttribute('data-slaid', $slaid)
+			: $sla['name'],
 		CSlaHelper::getSloTag((float) $sla['slo']),
-		zbx_date2str(DATE_FORMAT, $sla['effective_date']),
+		zbx_date2str(DATE_FORMAT, $sla['effective_date'], 'UTC'),
 		CSlaHelper::getPeriodNames()[$sla['period']],
 		$sla['timezone'],
-		$schedule_mode
+		CSlaHelper::getScheduleTag($sla['schedule']),
+		$data['has_access'][CRoleHelper::UI_SERVICES_SLA_REPORT]
+			? new CLink(_('SLA report'),
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'slareport.list')
+					->setArgument('filter_slaid', $slaid)
+					->setArgument('filter_set', 1)
+			)
+			: null,
+		$status_tag
 	];
 
-	if ($data['has_report_access']) {
-		$row[] = (new CLink(_('SLA report'),
-			(new CUrl('zabbix.php'))
-				->setArgument('action', 'slareport.list')
-				->setArgument('filter_slaid', $slaid)
-		))->setTarget('blank');
-	}
-
-	$row[] = $status_element;
-
-	if ($data['can_manage_sla']) {
-		array_unshift($row, new CCheckBox('slaids['.$slaid.']', $slaid));
-	}
-
-	$sla_list->addRow(new CRow($row));
+	$sla_list->addRow($row);
 }
 
 $form->addItem([
@@ -185,22 +152,18 @@ $form->addItem([
 	new CActionButtonList('action', 'slaids', [
 		'sla.massenable' => [
 			'content' => (new CSimpleButton(_('Enable')))
-				->setAttribute('confirm', _('Enable selected SLAs?'))
-				->onClick('view.massEnable(this);')
 				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massenable-sla')
 				->addClass('no-chkbxrange')
 		],
 		'sla.massdisable' => [
 			'content' => (new CSimpleButton(_('Disable')))
-				->setAttribute('confirm', _('Disable selected SLAs?'))
-				->onClick('view.massDisable(this);')
 				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massdisable-sla')
 				->addClass('no-chkbxrange')
 		],
 		'sla.massdelete' => [
 			'content' => (new CSimpleButton(_('Delete')))
-				->setAttribute('confirm', _('Delete selected SLAs?'))
-				->onClick('view.massDelete(this);')
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('js-massdelete-sla')
 				->addClass('no-chkbxrange')
@@ -212,12 +175,9 @@ $form->addItem([
 	->setTitle(_('SLA'))
 	->setControls(
 		(new CTag('nav', true,
-			(new CList())
-				->addItem(
-					$data['can_manage_sla']
-						? (new CSimpleButton(_('Create SLA')))->onClick('view.edit()')
-						: null
-				)
+			(new CSimpleButton(_('Create SLA')))
+				->addClass('js-create-sla')
+				->setEnabled($data['has_access'][CRoleHelper::ACTIONS_MANAGE_SLA])
 		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem($filter)
@@ -226,8 +186,18 @@ $form->addItem([
 
 (new CScriptTag('
 	view.init('.json_encode([
-		'list_update_url' => $data['list_update_url'],
-		'list_delete_url' => $data['list_delete_url']
+		'enable_url' => (new CUrl('zabbix.php'))
+			->setArgument('action', 'sla.enable')
+			->setArgumentSID()
+			->getUrl(),
+		'disable_url' => (new CUrl('zabbix.php'))
+			->setArgument('action', 'sla.disable')
+			->setArgumentSID()
+			->getUrl(),
+		'delete_url' => (new CUrl('zabbix.php'))
+			->setArgument('action', 'sla.delete')
+			->setArgumentSID()
+			->getUrl()
 	]).');
 '))
 	->setOnDocumentReady()

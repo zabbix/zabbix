@@ -146,7 +146,6 @@ $action_buttons = new CActionButtonList('action', 'serviceids', [
 	],
 	'service.massdelete' => [
 		'content' => (new CSimpleButton(_('Delete')))
-			->setAttribute('confirm', _('Delete selected services?'))
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->addClass('js-massdelete-service')
 			->addClass('no-chkbxrange')

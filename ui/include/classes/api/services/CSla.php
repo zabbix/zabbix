@@ -517,7 +517,8 @@ class CSla extends CApiService {
 		$names = [];
 
 		foreach ($slas as $sla) {
-			if ($db_slas === null || $sla['name'] !== $db_slas[$sla['slaid']]['name']) {
+			if ($db_slas === null
+					|| (array_key_exists('name', $sla) && $sla['name'] !== $db_slas[$sla['slaid']]['name'])) {
 				$names[] = $sla['name'];
 			}
 		}
@@ -570,7 +571,7 @@ class CSla extends CApiService {
 			foreach ($sla['schedule'] as $schedule_row) {
 				if ($schedule_row['period_from'] >= $schedule_row['period_to']) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Start time must be less than the end time for SLA "%1$s".',$name)
+						_s('Start time must be less than the end time for SLA "%1$s".', $name)
 					);
 				}
 			}

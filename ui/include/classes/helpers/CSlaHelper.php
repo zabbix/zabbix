@@ -22,8 +22,8 @@
 final class CSlaHelper {
 
 	public const SLA_STATUS_ANY			= -1;
-	public const SLA_STATUS_ENABLED		= 0;
-	public const SLA_STATUS_DISABLED	= 1;
+	public const SLA_STATUS_ENABLED		= ZBX_SLA_STATUS_ENABLED;
+	public const SLA_STATUS_DISABLED	= ZBX_SLA_STATUS_DISABLED;
 
 	public const SCHEDULE_MODE_24X7		= 0;
 	public const SCHEDULE_MODE_CUSTOM 	= 1;
@@ -49,7 +49,7 @@ final class CSlaHelper {
 		if ($periods === null) {
 			$periods = [
 				ZBX_SLA_PERIOD_DAILY => _('Daily'),
-				ZBX_SLA_PERIOD_WEEKLY=> _('Weekly'),
+				ZBX_SLA_PERIOD_WEEKLY => _('Weekly'),
 				ZBX_SLA_PERIOD_MONTHLY => _('Monthly'),
 				ZBX_SLA_PERIOD_QUARTERLY => _('Quarterly'),
 				ZBX_SLA_PERIOD_ANNUALLY => _('Annually')
@@ -60,19 +60,16 @@ final class CSlaHelper {
 	}
 
 	/**
-	 * Convert a list of schedule periods to string representation by weekday.
+	 * @param array $schedule
 	 *
-	 * @param array $schedule_rows						List of SLA periods, sorted by period_from.
-	 * @param array $schedule_rows[n]['period_from']	Start timestamp within week.
-	 * @param array $schedule_rows[n]['period_to]		End timestamp within week, may span across days.
-	 *
-	 * @return array E.g. [0 => '00:00-12:40, 20:30-21:00', 1 => ...]
+	 * @throws Exception
+	 * @return array
 	 */
-	public static function convertScheduleToWeekdayPeriods(array $schedule_rows): array {
+	public static function getSchedulePeriods(array $schedule): array {
 		$schedule_periods = array_fill(0, 7, '');
 
 		for ($weekday = 0; $weekday < 7; $weekday++) {
-			foreach ($schedule_rows as $schedule_row) {
+			foreach ($schedule as $schedule_row) {
 				$period_from = max(SEC_PER_DAY * $weekday, $schedule_row['period_from']);
 				$period_to = min(SEC_PER_DAY * ($weekday + 1), $schedule_row['period_to']);
 
@@ -201,7 +198,6 @@ final class CSlaHelper {
 			->addClass($error_budget >= 0 ? ZBX_STYLE_GREY : ZBX_STYLE_RED);
 	}
 
-
 	/**
 	 * @param array $excluded_downtime
 	 *
@@ -217,5 +213,31 @@ final class CSlaHelper {
 			': ',
 			convertUnitsS($excluded_downtime['period_to'] - $excluded_downtime['period_from'])
 		]);
+	}
+
+	/**
+	 * @param array $schedule
+	 *
+	 * @throws Exception
+	 *
+	 * @return CTag
+	 */
+	public static function getScheduleTag(array $schedule): CTag {
+		if (!$schedule) {
+			return new CSpan(_('24x7'));
+		}
+
+		$hint = (new CTableInfo())->setHeader([_('Schedule'), _('Time period')]);
+
+		foreach (self::getSchedulePeriods($schedule) as $weekday => $periods) {
+			$hint->addRow([getDayOfWeekCaption($weekday), $periods === '' ? '-' : $periods]);
+		}
+
+		return (new CSpan(_('Custom')))
+			->addItem(
+				(new CSpan())
+					->addClass('icon-description')
+					->setHint($hint)
+			);
 	}
 }

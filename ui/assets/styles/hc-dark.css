@@ -5171,6 +5171,18 @@ button.is-loading {
     width: 12px;
     height: 12px; }
 
+.link-action.is-loading {
+  position: relative;
+  color: transparent !important;
+  border-bottom-color: transparent; }
+  .link-action.is-loading::after {
+    box-shadow: none;
+    background: none;
+    border: 1px solid #fdfdfd;
+    border-bottom-color: #0275b8;
+    width: 12px;
+    height: 12px; }
+
 span.is-loading {
   position: relative;
   display: inline-block;
@@ -6890,7 +6902,7 @@ a.link-action {
   color: #ffffff !important; }
   .btn-link:focus, .interface-container .interface-row .interface-cell .interface-btn-toggle:focus {
     margin-bottom: -3px !important;
-    border-bottom: 3px solid #ffffff !important; }
+    border-bottom: 3px solid currentColor !important; }
 
 .table-paging a:focus {
   background-color: #ffffff; }

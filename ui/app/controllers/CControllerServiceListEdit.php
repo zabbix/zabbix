@@ -27,7 +27,6 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'uncheck' =>						'in 1',
 			'serviceid' =>						'db services.serviceid',
 			'path' =>							'array',
 			'filter_name' =>					'string',
@@ -66,14 +65,6 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 	 */
 	protected function doAction(): void {
 		parent::doAction();
-
-		$profile_serviceid = $this->service !== null
-			? $this->service['serviceid']
-			: (string) self::WITHOUT_PARENTS_SERVICEID;
-
-		$uncheck = $this->hasInput('uncheck') || CProfile::get('web.service.list.serviceid') !== $profile_serviceid;
-
-		CProfile::update('web.service.list.serviceid', $profile_serviceid, PROFILE_TYPE_ID);
 
 		$path = $this->getPath();
 
@@ -136,7 +127,6 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 
 		$data = [
 			'can_monitor_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
-			'uncheck' => $uncheck,
 			'path' => $path,
 			'breadcrumbs' => $this->getBreadcrumbs($path, $filter['filter_set']),
 			'filter' => $filter,

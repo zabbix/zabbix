@@ -24,36 +24,69 @@
  */
 ?>
 
+<script type="text/x-jquery-tmpl" id="filter-tag-row-tmpl">
+	<?= CTagFilterFieldHelper::getTemplate() ?>
+</script>
+
 <script>
 	const view = {
-		list_update_url: null,
-		list_delete_url: null,
+		enable_url: null,
+		disable_url: null,
+		delete_url: null,
 
-		init({list_update_url, list_delete_url}) {
-			this.list_update_url = list_update_url;
-			this.list_delete_url = list_delete_url;
+		init({enable_url, disable_url, delete_url}) {
+			this.enable_url = enable_url;
+			this.disable_url = disable_url;
+			this.delete_url = delete_url;
 
 			this.initTagFilter();
+			this.initActionButtons();
 		},
 
 		initTagFilter() {
 			$('#filter-tags')
 				.dynamicRows({template: '#filter-tag-row-tmpl'})
-				.on('afteradd.dynamicRows', function() {
+				.on('afteradd.dynamicRows', function () {
 					const rows = this.querySelectorAll('.form_row');
 
 					new CTagFilterItem(rows[rows.length - 1]);
 				});
 
-			document.querySelectorAll('#filter-tags .form_row').forEach(row => {
+			document.querySelectorAll('#filter-tags .form_row').forEach((row) => {
 				new CTagFilterItem(row);
+			});
+		},
+
+		initActionButtons() {
+			document.addEventListener('click', (e) => {
+				if (e.target.classList.contains('js-create-sla')) {
+					this.edit();
+				}
+				else if (e.target.classList.contains('js-edit-sla')) {
+					this.edit({slaid: e.target.dataset.slaid});
+				}
+				else if (e.target.classList.contains('js-enable-sla')) {
+					this.enable(e.target, [e.target.dataset.slaid]);
+				}
+				else if (e.target.classList.contains('js-disable-sla')) {
+					this.disable(e.target, [e.target.dataset.slaid]);
+				}
+				else if (e.target.classList.contains('js-massenable-sla')) {
+					this.enable(e.target, Object.values(chkbxRange.getSelectedIds()));
+				}
+				else if (e.target.classList.contains('js-massdisable-sla')) {
+					this.disable(e.target, Object.values(chkbxRange.getSelectedIds()));
+				}
+				else if (e.target.classList.contains('js-massdelete-sla')) {
+					this.delete(e.target, Object.values(chkbxRange.getSelectedIds()));
+				}
 			});
 		},
 
 		edit(options = {}) {
 			const overlay = PopUp('popup.sla.edit', options, 'sla_edit', document.activeElement);
 
-			overlay.$dialogue[0].classList.add('sticked-to-top');
+			overlay.$dialogue[0].classList.add(<?= json_encode(ZBX_STYLE_STICKED_TO_TOP) ?>);
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 				postMessageOk(e.detail.title);
@@ -66,92 +99,84 @@
 			});
 		},
 
-		massEnable(button) {
-			if (!confirm(button.getAttribute('confirm'))) {
-				return false;
+		enable(target, slaids) {
+			const confirmation = slaids.length > 1
+				? <?= json_encode(_('Enable selected SLAs?')) ?>
+				: <?= json_encode(_('Enable selected SLA?')) ?>;
+
+			if (!window.confirm(confirmation)) {
+				return;
 			}
 
-			this.massToggle(<?= CSlaHelper::SLA_STATUS_ENABLED?>)
+			this.post(target, slaids, this.enable_url);
 		},
 
-		massDisable(button) {
-			if (!confirm(button.getAttribute('confirm'))) {
-				return false;
+		disable(target, slaids) {
+			const confirmation = slaids.length > 1
+				? <?= json_encode(_('Disable selected SLAs?')) ?>
+				: <?= json_encode(_('Disable selected SLA?')) ?>;
+
+			if (!window.confirm(confirmation)) {
+				return;
 			}
 
-			this.massToggle(<?= CSlaHelper::SLA_STATUS_DISABLED?>)
+			this.post(target, slaids, this.disable_url);
 		},
 
-		massDelete(button) {
-			if (!confirm(button.getAttribute('confirm'))) {
-				return false;
+		delete(target, slaids) {
+			const confirmation = slaids.length > 1
+				? <?= json_encode(_('Delete selected SLAs?')) ?>
+				: <?= json_encode(_('Delete selected SLA?')) ?>;
+
+			if (!window.confirm(confirmation)) {
+				return;
 			}
 
-			this.massProcess(this.list_delete_url)
+			this.post(target, slaids, this.delete_url);
 		},
 
-		massToggle(status) {
-			this.massProcess(this.list_update_url, {status});
-		},
+		post(target, slaids, url) {
+			target.classList.add('is-loading');
 
-		massProcess(endpoint_url, data = {}) {
-			const record_list = document.getElementById('sla-list');
-
-			record_list.classList.add('is-loading', 'is-loading-fadein', 'delayed-15s');
-
-			data = Object.assign(data, {
-				slaids: Object.values(chkbxRange.getSelectedIds()),
-				sid: document.querySelector('meta[name="csrf-token"]').content
-			});
-
-			fetch(endpoint_url, {
+			return fetch(url, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify(data)
+				body: JSON.stringify({slaids})
 			})
 				.then((response) => response.json())
 				.then((response) => {
-					clearMessages();
-
 					if ('error' in response) {
-						uncheckTableRows('sla', ('keepids' in response.error) ? response.error.keepids : []);
-
-						const message_box = makeMessageBox('bad', [], response.error.title)[0];
-						addMessage(message_box);
-
-						if ('messages' in response.error) {
-							addMessage(response.messages);
+						if ('title' in response.error) {
+							postMessageError(response.error.title);
 						}
+
+						postMessageDetails('error', response.error.messages);
+
+						uncheckTableRows('sla', response.error.keepids);
 					}
-					else {
-						if ('success' in response) {
-							uncheckTableRows('sla', ('keepids' in response.success) ? response.success.keepids : []);
+					else if ('success' in response) {
+						postMessageOk(response.success.title);
 
-							postMessageOk(response.success.title);
-
-							if ('messages' in response.success) {
-								postMessageDetails('success', response.success.messages);
-							}
-
-							location.href = location.href;
-							return true;
+						if ('messages' in response.success) {
+							postMessageDetails('success', response.success.messages);
 						}
 
-						if ('messages' in response) {
-							addMessage(response.messages);
-						}
+						uncheckTableRows('sla');
 					}
+
+					location.href = location.href;
 				})
 				.catch(() => {
 					const title = <?= json_encode(_('Unexpected server error.')) ?>;
-					const message_box = makeMessageBox('bad', [], title)[0];
+					const message_box = makeMessageBox('bad', [], title, true, false)[0];
 
 					clearMessages();
 					addMessage(message_box);
 				})
 				.finally(() => {
-					record_list.classList.remove('is-loading', 'is-loading-fadein', 'delayed-15s');
+					target.classList.remove('is-loading');
 				});
+
 		}
 	};
 </script>

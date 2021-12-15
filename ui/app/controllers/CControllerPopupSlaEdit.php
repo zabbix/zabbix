@@ -85,31 +85,7 @@ class CControllerPopupSlaEdit extends CController {
 		$defaults = DB::getDefaults('sla');
 
 		if ($this->sla !== null) {
-			$schedule_periods = array_fill(0, 7, '');
-
-			for ($weekday = 0; $weekday < 7; $weekday++) {
-				foreach ($this->sla['schedule'] as $schedule_row) {
-					$period_from = max(SEC_PER_DAY * $weekday, $schedule_row['period_from']);
-					$period_to = min(SEC_PER_DAY * ($weekday + 1), $schedule_row['period_to']);
-
-					if ($period_to <= $period_from) {
-						continue;
-					}
-
-					$period_from_str = (new DateTime('@'.($period_from - SEC_PER_DAY * $weekday)))->format('H:i');
-					$period_to_str = (new DateTime('@'.($period_to - SEC_PER_DAY * $weekday)))->format('H:i');
-
-					if ($period_to_str === '00:00') {
-						$period_to_str = '24:00';
-					}
-
-					if ($schedule_periods[$weekday] !== '') {
-						$schedule_periods[$weekday] .= ', ';
-					}
-
-					$schedule_periods[$weekday] .= $period_from_str.'-'.$period_to_str;
-				}
-			}
+			$schedule_periods = CSlaHelper::getSchedulePeriods($this->sla['schedule']);
 
 			foreach ($this->sla['excluded_downtimes'] as $row_index => &$excluded_downtime) {
 				$excluded_downtime += [
