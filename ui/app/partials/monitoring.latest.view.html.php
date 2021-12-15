@@ -93,15 +93,9 @@ foreach ($data['items'] as $itemid => $item) {
 	if ($last_history) {
 		$prev_history = (count($data['history'][$itemid]) > 1) ? $data['history'][$itemid][1] : null;
 
-		$last_check_actual_date_time = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $last_history['clock']);
-
-		$last_check_interval = (new DateTime($last_check_actual_date_time))
-			->diff(new DateTime(date("Y-m-d H:i:s")))
-			->format('%m' . 'm %s' . 's');
-
-		$last_check = (new CSpan($last_check_interval))
+		$last_check = (new CSpan(zbx_date2age($last_history['clock'])))
 			->addClass(ZBX_STYLE_CURSOR_POINTER)
-			->setHint($last_check_actual_date_time, '', true, '', 0);
+			->setHint(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $last_history['clock']), '', true, '', 0);
 
 		$last_value = (new CSpan(formatHistoryValue($last_history['value'], $item, false)))
 			->addClass(ZBX_STYLE_CURSOR_POINTER)
