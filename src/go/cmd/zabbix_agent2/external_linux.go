@@ -22,6 +22,8 @@ package main
 import (
 	"fmt"
 	"net"
+	"os"
+	"os/signal"
 	"syscall"
 
 	"zabbix.com/pkg/log"
@@ -74,4 +76,23 @@ func checkExternalExit(pid int, p *external.Plugin, name string) error {
 	}
 
 	return nil
+}
+
+func listenOnPluginFail(p *external.Plugin, name string) {
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGCHLD)
+	defer signal.Stop(sigs)
+
+	select {
+	case <-sigs:
+		var status syscall.WaitStatus
+		pid, err := syscall.Wait4(-1, &status, syscall.WNOHANG, nil)
+		if err != nil {
+			panic(fmt.Errorf("failed to obtain PID of dead child process: %s", err))
+		}
+
+		if err := checkExternalExit(pid, p, name); err != nil {
+			panic(err)
+		}
+	}
 }

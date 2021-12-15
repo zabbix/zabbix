@@ -48,3 +48,5 @@ func checkExternalExits() error {
 func checkExternalExit() error {
 	return nil
 }
+
+func listenOnPluginFail(p *external.Plugin, name string) {}

@@ -21,8 +21,10 @@ package main
 
 import (
 	"os"
+	"os/signal"
 	"path/filepath"
 	"strings"
+	"syscall"
 
 	"zabbix.com/pkg/pdh"
 )
@@ -35,5 +37,20 @@ func init() {
 	if path, err := os.Executable(); err == nil {
 		dir, name := filepath.Split(path)
 		confDefault = dir + strings.TrimSuffix(name, filepath.Ext(name)) + ".win.conf"
+	}
+}
+
+func createSigsChan() chan os.Signal {
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+
+	return sigs
+}
+
+func handleSig(sig os.Signal) {
+	switch sig {
+	case syscall.SIGINT, syscall.SIGTERM:
+		sendServiceStop()
+		}
 	}
 }

@@ -22,6 +22,33 @@
 
 package main
 
+import (
+	"os"
+	"os/signal"
+	"syscall"
+
+	"zabbix.com/pkg/log"
+)
+
 func loadOSDependentItems() error {
 	return nil
+}
+
+func createSigsChan() chan os.Signal {
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM, syscall.SIGCHLD)
+
+	return sigs
+}
+
+func handleSig(sig os.Signal) {
+	switch sig {
+	case syscall.SIGINT, syscall.SIGTERM:
+		sendServiceStop()
+	case syscall.SIGCHLD:
+		if err := checkExternalExits(); err != nil {
+			log.Warningf("Error: %s", err)
+			sendServiceStop()
+		}
+	}
 }

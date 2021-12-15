@@ -24,9 +24,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"os/signal"
 	"strings"
-	"syscall"
 	"time"
 
 	_ "zabbix.com/plugins"
@@ -163,8 +161,7 @@ func processRemoteCommand(c *remotecontrol.Client) (err error) {
 var pidFile *pidfile.File
 
 func run() (err error) {
-	sigs := make(chan os.Signal, 1)
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM, syscall.SIGCHLD)
+	sigs := createSigsChan()
 
 	var control *remotecontrol.Conn
 	if control, err = remotecontrol.New(agent.Options.ControlSocket, remoteCommandSendingTimeout); err != nil {
@@ -177,17 +174,8 @@ loop:
 	for {
 		select {
 		case sig := <-sigs:
-			switch sig {
-			case syscall.SIGINT, syscall.SIGTERM:
-				sendServiceStop()
-				break loop
-			case syscall.SIGCHLD:
-				if err := checkExternalExits(); err != nil {
-					log.Warningf("Error: %s", err)
-					sendServiceStop()
-					break loop
-				}
-			}
+			handleSig(sig)
+			break loop
 		case client := <-control.Client():
 			if rerr := processRemoteCommand(client); rerr != nil {
 				if rerr = client.Reply("error: " + rerr.Error()); rerr != nil {
