@@ -116,6 +116,17 @@ void	__wrap_zbx_user_free(zbx_user_t *user)
 	zbx_free(user->username);
 }
 
+void	__wrap_init_result(AGENT_RESULT *result)
+{
+	ZBX_UNUSED(result);
+}
+
+void	__wrap_free_result(AGENT_RESULT *result)
+{
+	ZBX_UNUSED(result);
+}
+
+
 void	zbx_mock_test_entry(void **state)
 {
 	const char		*request;

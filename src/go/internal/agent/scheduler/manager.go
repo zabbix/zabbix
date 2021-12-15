@@ -251,16 +251,20 @@ func (m *Manager) processQueue(now time.Time) {
 // processAndFlushUserParamQueue processes queued user parameters plugins/tasks and/or removes them
 func (m *Manager) processAndFlushUserParamQueue(now time.Time) {
 	seconds := now.Unix()
-	for p := m.pluginQueue.Peek(); p != nil; p = m.pluginQueue.Peek() {
+	num := m.pluginQueue.Len()
+	var pluginsBuf []*pluginAgent
+
+	for p := m.pluginQueue.Peek(); p != nil && num > 0; p = m.pluginQueue.Peek() {
+		heap.Pop(&m.pluginQueue)
+		num--
+
 		if !p.usrprm {
-			heap.Pop(&m.pluginQueue)
+			pluginsBuf = append(pluginsBuf, p)
 			continue
 		}
 
 		if task := p.peekTask(); task != nil {
-			heap.Pop(&m.pluginQueue)
 			if !p.hasCapacity() || task.getScheduled().Unix() > seconds {
-				m.pluginQueue.Remove(p)
 				continue
 			}
 
@@ -268,8 +272,10 @@ func (m *Manager) processAndFlushUserParamQueue(now time.Time) {
 			p.reserveCapacity(p.popTask())
 			task.perform(m)
 		}
+	}
 
-		m.pluginQueue.Remove(p)
+	for _, p := range pluginsBuf {
+		m.pluginQueue.Push(p)
 	}
 }
 
@@ -403,23 +409,46 @@ run:
 				var keys []string
 				var rerr error
 
-				m.processAndFlushUserParamQueue(time.Now())
-				plugin.ClearUserParamMetrics()
-
-				for k, plg := range m.plugins {
-					if plg.usrprm {
-						delete(m.plugins, k)
-					}
-				}
+				metrics := plugin.ClearUserParamMetrics()
 
 				if keys, rerr = agent.InitUserParameterPlugin(agent.Options.UserParameter,
 					agent.Options.UnsafeUserParameters, agent.Options.UserParameterDir); rerr != nil {
+					plugin.RestoreUserParamMetrics(metrics)
 					v.sink <- "cannot process user parameters request: " + rerr.Error()
 					continue
 				}
 
+				m.processAndFlushUserParamQueue(time.Now())
+
+				tasks := make(map[string]performerHeap)
+
+				for key, plg := range m.plugins {
+					if plg.usrprm {
+						tasks[key] = plg.tasks
+						delete(m.plugins, key)
+					}
+				}
+
 				for _, key := range keys {
 					m.addUserParamsPlugin(key)
+					m.plugins[key].refcount++
+				}
+
+				for pluginkey, ltasks := range tasks {
+					for task := peekTask(ltasks); task != nil; task = peekTask(ltasks) {
+						heap.Pop(&ltasks)
+
+						for _, key := range keys {
+							if task.isItemKeyEqual(key) {
+								task.setPlugin(m.plugins[pluginkey])
+								m.plugins[pluginkey].enqueueTask(task)
+							}
+						}
+					}
+				}
+
+				for _, key := range keys {
+					heap.Push(&m.pluginQueue, m.plugins[key])
 				}
 
 				v.sink <- "ok"
@@ -631,4 +660,12 @@ func (m *Manager) addUserParamsPlugin(key string) {
 	}
 
 	m.plugins[key] = pagent
+}
+
+func peekTask(tasks performerHeap) performer {
+	if len(tasks) == 0 {
+		return nil
+	}
+
+	return tasks[0]
 }
