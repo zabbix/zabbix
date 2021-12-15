@@ -859,6 +859,13 @@ if (hasRequest('form')) {
 		$data['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
 	}
 
+	$data['counter'] = null;
+	if (hasRequest('conditions')) {
+		$conditions = getRequest('conditions');
+		krsort($conditions);
+		$data['counter'] = key($conditions) + 1;
+	}
+
 	// render view
 	if (!$has_errors) {
 		echo (new CView('configuration.host.discovery.edit', $data))->getOutput();
