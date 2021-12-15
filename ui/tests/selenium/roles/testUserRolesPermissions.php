@@ -1310,6 +1310,24 @@ class testUserRolesPermissions extends CWebTest {
 						'Child of parent 1' => 'read'
 					]
 				]
+			],
+			[
+				[
+					'role_config' => [
+						'Read-write access to services' => 'Service list',
+						'Read-only access to services' => 'All'
+					],
+					'service_list' => [
+						'xpath:(//div[@class="multiselect-control"])[1]' => 'Child of parent 1'
+					],
+					'services' => [
+						'Child of child 1' => 'write',
+						'Child of parent 1' => 'write',
+						'Child of parent 2' => 'read',
+						'Parent 1' => 'read',
+						'Parent 2' => 'read'
+					]
+				]
 			]
 		];
 	}
@@ -1381,11 +1399,11 @@ class testUserRolesPermissions extends CWebTest {
 		}
 		else {
 			foreach ($data['services'] as $service => $permissions) {
-				$editable = ($permissions === 'write') ? true : false;
+				$property = ($permissions === 'write') ? CElementFilter::CLICKABLE : CElementFilter::NOT_CLICKABLE;
 				$row = $table->findRow('Name', $service, true);
 				// Check that all three action buttons in the row are clickable.
 				$this->assertEquals(3, $row->query("xpath:.//button")->all()
-						->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
+						->filter(new CElementFilter($property))->count()
 				);
 			}
 		}

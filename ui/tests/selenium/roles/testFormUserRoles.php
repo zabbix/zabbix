@@ -744,12 +744,17 @@ class testFormUserRoles extends CWebTest {
 						'Read-only access to services' => 'Service list'
 					],
 					'write_services' => [
-						'xpath:(//div[@class="multiselect-control"])[1]' => ['Service 1', 'Service 2']
+						'xpath:(//div[@class="multiselect-control"])[1]' => 'Service 1',
+						'Read-write access to services with tag' => [
+							'service-write-tag-tag' => 'tag-write',
+							'service_write_tag_value' => 'value-write'
+						]
 					],
 					'read_services' => [
+						'xpath:(//div[@class="multiselect-control"])[2]' => ['Service 1', 'Service 2'],
 						'Read-only access to services with tag' => [
-							'service-read-tag-tag' => 'tag',
-							'service_read_tag_value' => 'value'
+							'service-read-tag-tag' => 'tag-read',
+							'service_read_tag_value' => 'value-read'
 						]
 					],
 					'message_header' => 'User role created'
@@ -802,7 +807,7 @@ class testFormUserRoles extends CWebTest {
 		$this->page->assertHeader('User roles');
 		$form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
 		$this->assertEquals(255, $form->getField('Name')->getAttribute('maxlength'));
-		$this->assertEquals($roles, $this->query('id:user-type')->one()->asDropdown()->getOptions()->asText());
+		$this->assertEquals($roles, $this->query('id:user-type')->one()->asZDropdown()->getOptions()->asText());
 
 		// Unchecking API, button and radio button becomes disabled.
 		$form->fill(['Enabled' => false]);
@@ -818,7 +823,7 @@ class testFormUserRoles extends CWebTest {
 		$this->page->removeFocus();
 		$screenshot_area = $this->query('id:user_role_tab')->one();
 		foreach ($roles as $role) {
-			$this->query('id:user-type')->one()->asDropdown()->select($role);
+			$this->query('id:user-type')->one()->asZDropdown()->select($role);
 
 			if ($role === 'Super admin') {
 				$form->invalidate();
@@ -1219,12 +1224,17 @@ class testFormUserRoles extends CWebTest {
 						'Read-only access to services' => 'Service list'
 					],
 					'write_services' => [
-						'xpath:(//div[@class="multiselect-control"])[1]' => ['Service 1', 'Service 2']
+						'xpath:(//div[@class="multiselect-control"])[1]' => ['Service 1', 'Service 2'],
+						'Read-write access to services with tag' => [
+							'service-write-tag-tag' => 'tag-write',
+							'service_write_tag_value' => 'value-write'
+						]
 					],
 					'read_services' => [
+						'xpath:(//div[@class="multiselect-control"])[2]' => 'Service 1',
 						'Read-only access to services with tag' => [
-							'service-read-tag-tag' => 'tag',
-							'service_read_tag_value' => 'value'
+							'service-read-tag-tag' => 'tag-read',
+							'service_read_tag_value' => 'value-read'
 						]
 					],
 					'message_header' => 'User role updated'
@@ -1376,7 +1386,6 @@ class testFormUserRoles extends CWebTest {
 			$filter_form = $dialog->query('name:services_filter_form')->one();
 			$this->assertEquals('Name', $filter_form->query('xpath:.//label')->one()->getText());
 			$this->assertEquals(255, $filter_form->query('name:filter_name')->one()->getAttribute('maxlength'));
-
 			$this->assertEquals(4, $dialog->query('button', ['Filter', 'Reset', 'Select', 'Cancel'])->all()
 					->filter(new CElementFilter(CElementFilter::CLICKABLE))->count());
 
