@@ -2362,6 +2362,10 @@ z-select,
     .z-select[readonly] button:focus {
       border-color: #02659f; }
 
+div.dashboard-grid-widget-slareport .date-vertical {
+  writing-mode: vertical-lr;
+  transform: rotate(180deg); }
+
 .link-action {
   border-bottom: 1px dotted;
   cursor: pointer;

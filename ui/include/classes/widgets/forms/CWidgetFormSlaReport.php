@@ -25,23 +25,25 @@ class CWidgetFormSlaReport extends CWidgetForm
 		parent::__construct($data, $templateid, WIDGET_SLA_REPORT);
 
 		// SLA.
-		$field_sla = (new CWidgetFieldMsSla('slaids', _('SLA')))
-			->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK);
+		$field_sla = (new CWidgetFieldMsSla('slaid', _('SLA')))
+			->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
+			->setMultiple(false);
 
-		if (array_key_exists('slaids', $this->data)) {
-			$field_sla->setValue($this->data['slaids']);
+		if (array_key_exists('slaid', $this->data)) {
+			$field_sla->setValue($this->data['slaid']);
 		}
 
 		$this->fields[$field_sla->getName()] = $field_sla;
 
-		// Services.
-		$field_services = new CWidgetFieldMsService('serviceids', _('Services'));
+		// Service.
+		$field_service = (new CWidgetFieldMsService('serviceid', _('Service')))
+			->setMultiple(false);
 
-		if (array_key_exists('serviceids', $this->data)) {
-			$field_services->setValue($this->data['serviceids']);
+		if (array_key_exists('serviceid', $this->data)) {
+			$field_service->setValue($this->data['serviceid']);
 		}
 
-		$this->fields[$field_services->getName()] = $field_services;
+		$this->fields[$field_service->getName()] = $field_service;
 
 		// Show periods.
 		$field_show_periods = (new CWidgetFieldNumericBox('show_periods', _('Show periods')))

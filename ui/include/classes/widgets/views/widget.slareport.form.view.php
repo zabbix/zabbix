@@ -38,18 +38,18 @@ $form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dia
 $scripts = [$this->readJsFile('../../../include/classes/widgets/views/js/widget.slareport.form.view.js.php')];
 
 // SLA.
-$field_slaids = CWidgetHelper::getSla($fields['slaids'], $data['captions']['ms']['slas']['slaids'],
+$field_slaid = CWidgetHelper::getSla($fields['slaid'], $data['captions']['ms']['slas']['slaid'],
 	$form->getName()
 );
-$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['slaids']), $field_slaids);
-$scripts[] = $field_slaids->getPostJS();
+$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['slaid']), $field_slaid);
+$scripts[] = $field_slaid->getPostJS();
 
 // Services.
-$field_serviceids = CWidgetHelper::getService($fields['serviceids'], $data['captions']['ms']['services']['serviceids'],
+$field_serviceid = CWidgetHelper::getService($fields['serviceid'], $data['captions']['ms']['services']['serviceid'],
 	$form->getName()
 );
-$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['serviceids']), $field_serviceids);
-$scripts[] = $field_serviceids->getPostJS();
+$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['serviceid']), $field_serviceid);
+$scripts[] = $field_serviceid->getPostJS();
 
 // Show periods.
 $form_list->addRow(
@@ -79,7 +79,8 @@ $form->addItem($form_list);
 $form->addItem(
 	(new CScriptTag('
 		widget_slareport.init('.json_encode([
-			'serviceids_field_id' => $fields['serviceids']->getName()
+			'serviceid_field_id' => $fields['serviceid']->getName(),
+			'serviceid_multiple' => $fields['serviceid']->isMultiple()
 		]).');
 	'))->setOnDocumentReady()
 );

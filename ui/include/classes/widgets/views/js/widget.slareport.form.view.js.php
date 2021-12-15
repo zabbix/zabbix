@@ -27,30 +27,31 @@
 window.widget_slareport = {
 
 	show_periods_form_row: null,
-	$services: null,
+	$service: null,
 
-	init({serviceids_field_id}) {
+	init({serviceid_field_id}) {
 		this.show_periods_form_row = document.getElementById('js-show_periods');
 
-		this.$services = jQuery(`#${serviceids_field_id}_`);
-		this.$services
-			.on('change', this.events.updateServices)
-			.multiSelect('getSelectButton').addEventListener('click', this.events.selectServices);
+		this.$service = jQuery(`#${serviceid_field_id}`);
+		this.$service
+			.on('change', this.events.updateService)
+			.multiSelect('getSelectButton').addEventListener('click', this.events.selectService);
 
-		this.events.updateServices();
+		this.events.updateService();
 	},
 
 	events: {
-		selectServices: () => {
+		selectService: () => {
 			const exclude_serviceids = [];
 
-			for (const service of widget_slareport.$services.multiSelect('getData')) {
+			for (const service of widget_slareport.$service.multiSelect('getData')) {
 				exclude_serviceids.push(service.id);
 			}
 
 			const overlay = PopUp('popup.services', {
-				title: <?= json_encode(_('Add services')) ?>,
-				exclude_serviceids
+				title: <?= json_encode(_('Select service')) ?>,
+				exclude_serviceids,
+				multiple: 0
 			}, 'services', document.activeElement);
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
@@ -60,13 +61,13 @@ window.widget_slareport = {
 					data.push({id: service.serviceid, name: service.name});
 				}
 
-				widget_slareport.$services.multiSelect('addData', data);
+				widget_slareport.$service.multiSelect('addData', data);
 			});
 		},
 
-		updateServices: () => {
+		updateService: () => {
 			widget_slareport.show_periods_form_row.style.display =
-				widget_slareport.$services.multiSelect('getData').length > 0 ? '' : 'none';
+				widget_slareport.$service.multiSelect('getData').length > 0 ? '' : 'none';
 		}
 	}
 };

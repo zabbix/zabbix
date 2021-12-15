@@ -29,7 +29,8 @@ class CControllerPopupServices extends CController {
 		$fields = [
 			'title' =>				'string|required',
 			'filter_name' =>		'string',
-			'exclude_serviceids' =>	'array_db services.serviceid'
+			'exclude_serviceids' =>	'array_db services.serviceid',
+			'multiple' =>			'in 0,1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -89,6 +90,7 @@ class CControllerPopupServices extends CController {
 				'name' => $this->getInput('filter_name', '')
 			],
 			'exclude_serviceids' => $exclude_serviceids,
+			'multiple' => (bool) $this->getInput('multiple', 1),
 			'services' => $services,
 			'problem_tags' => makeTags($problem_tags, true, 'serviceid'),
 			'problem_tags_html' => $problem_tags_html,

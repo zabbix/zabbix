@@ -31,16 +31,38 @@ class CControllerWidgetSlaReportView extends CControllerWidget {
 		]);
 	}
 
-	protected function doAction() {
+	/**
+	 * @throws APIException
+	 */
+	protected function doAction(): void {
 		$fields = $this->getForm()->getFieldsData();
 
-		$sla_db = API::Sla()->get([
-			'slaids' => $fields['slaids'],
-			'serviceids' => $fields['serviceids']
+		$db_services = API::Service()->get([
+			'output' => ['name'],
+			'serviceids' => $fields['serviceid'] ?: null,
+			'limit' => CWebUser::$data['rows_per_page'],
+			'preservekeys' => true
+		]);
+
+		$db_sla = API::Sla()->get([
+			'output' => ['name', 'period', 'slo', 'timezone'],
+			'slaids' => $fields['slaid']
+		]);
+
+		$db_sli = API::Sla()->getSli([
+			'slaid' => $fields['slaid'][0],
+			'serviceids' => array_keys($db_services),
+			'periods' => $fields['serviceid'] && $fields['show_periods'] !== '' ? $fields['show_periods'] : null,
+			'period_from' => $fields['date_from'] !== '' ? $fields['date_from'] : null,
+			'period_to' => $fields['date_to'] !== '' ? $fields['date_to'] : null
 		]);
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultName()),
+			'services' => array_intersect_key($db_services, array_flip($db_sli['serviceids'])),
+			'sla' => $db_sla[0],
+			'sli' => $db_sli['sli'],
+			'periods' => $db_sli['periods'],
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
