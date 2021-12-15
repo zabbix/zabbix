@@ -5277,6 +5277,7 @@ svg {
 	overflow: hidden;
 	border-radius: 3px;
 
+	&:link,
 	&:hover,
 	&:focus {
 		border-bottom: none;
