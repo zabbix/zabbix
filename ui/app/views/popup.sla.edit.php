@@ -65,7 +65,7 @@ $sla_tab = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('SLO'), 'slo'))->setAsteriskMark(),
 		new CFormField([
-			(new CTextBox('slo', $data['form']['slo']))
+			(new CTextBox('slo', $data['form']['slo'], false, 7))
 				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 				->setAttribute('placeholder', DB::getDefault('sla', 'slo'))
 				->setAriaRequired(),
