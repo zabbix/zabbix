@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerServiceCreateUpdate extends CController {
+class CControllerServiceUpdate extends CController {
 
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
@@ -27,6 +27,7 @@ class CControllerServiceCreateUpdate extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
+			'serviceid' =>					'required|id',
 			'name' =>						'required|db services.name|not_empty',
 			'parent_serviceids' =>			'array_db services.serviceid',
 			'problem_tags' =>				'array',
@@ -42,12 +43,6 @@ class CControllerServiceCreateUpdate extends CController {
 			'tags' =>						'array',
 			'child_serviceids' =>			'array_db services.serviceid'
 		];
-
-		if ($this->getAction() === 'service.update') {
-			$fields += [
-				'serviceid' => 'required|id'
-			];
-		}
 
 		$ret = $this->validateInput($fields);
 
@@ -114,20 +109,14 @@ class CControllerServiceCreateUpdate extends CController {
 			return false;
 		}
 
-		if ($this->getAction() === 'service.update') {
-			return (bool) API::Service()->get([
-				'output' => [],
-				'serviceids' => $this->getInput('serviceid')
-			]);
-		}
-
-		return true;
+		return (bool) API::Service()->get([
+			'output' => [],
+			'serviceids' => $this->getInput('serviceid')
+		]);
 	}
 
 	/**
 	 * @throws APIException
-	 *
-	 * @return void
 	 */
 	protected function doAction(): void {
 		$service = [
@@ -138,11 +127,7 @@ class CControllerServiceCreateUpdate extends CController {
 			'status_rules' => []
 		];
 
-		$fields = ['name', 'algorithm', 'sortorder', 'description'];
-
-		if ($this->getAction() === 'service.update') {
-			$fields[] = 'serviceid';
-		}
+		$fields = ['serviceid', 'name', 'algorithm', 'sortorder', 'description'];
 
 		$this->getInputs($service, $fields);
 
@@ -190,20 +175,11 @@ class CControllerServiceCreateUpdate extends CController {
 
 			$service['weight'] = $this->getInput('weight', '') !== '' ? $this->getInput('weight') : 0;
 		}
-		elseif ($this->getAction() !== 'service.update') {
-			$service['propagation_rule'] = DB::getDefault('services', 'propagation_rule');
-			$service['propagation_value'] = DB::getDefault('services', 'propagation_value');
-			$service['weight'] = DB::getDefault('services', 'weight');
-		}
 
-		$result = $this->getAction() === 'service.update'
-			? API::Service()->update($service)
-			: API::Service()->create($service);
+		$result = API::Service()->update($service);
 
 		if ($result) {
-			$output = [
-				'title' => $this->getAction() === 'service.update' ? _('Service updated') : _('Service created')
-			];
+			$output = ['title' => _('Service updated')];
 
 			if ($messages = CMessageHelper::getMessages()) {
 				$output['messages'] = array_column($messages, 'message');
