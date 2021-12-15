@@ -1387,6 +1387,12 @@ td.inactive-bg {
 	}
 }
 
+.problem-icon-link {
+	&:focus {
+		box-shadow: 0 0 0 2px $blue;
+	}
+}
+
 .problem-icon-list {
 	.problem-icon-list-item {
 		background: transparent;

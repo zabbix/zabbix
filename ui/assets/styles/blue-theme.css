@@ -5827,7 +5827,7 @@ svg {
   .problem-icon-link:link, .problem-icon-link:hover, .problem-icon-link:focus {
     border-bottom: none; }
   .problem-icon-link:focus {
-    box-shadow: 0 0 0 2px rgba(2, 117, 184, 0.5); }
+    box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35); }
 
 .problem-icon-list .problem-icon-list-item {
   border-radius: 3px; }
