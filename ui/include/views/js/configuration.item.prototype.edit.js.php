@@ -29,11 +29,69 @@ include dirname(__FILE__).'/editabletable.js.php';
 include dirname(__FILE__).'/itemtest.js.php';
 ?>
 <script type="text/javascript">
-	jQuery(document).ready(function($) {
-		function typeChangeHandler() {
+	const view = {
+		form_name: null,
+
+		init({form_name}) {
+			this.form_name = form_name;
+
+			// Field switchers.
+			new CViewSwitcher('value_type', 'change', item_form.field_switches.for_value_type);
+
+			$('#type')
+				.change(this.typeChangeHandler)
+				.trigger('change');
+
+			// Whenever non-numeric type is changed back to numeric type, set the default value in "trends" field.
+			$('#value_type')
+				.change(function() {
+					const new_value = $(this).val();
+					const old_value = $(this).data('old-value');
+					const trends = $('#trends');
+
+					if ((old_value == <?= ITEM_VALUE_TYPE_STR ?> || old_value == <?= ITEM_VALUE_TYPE_LOG ?>
+							|| old_value == <?= ITEM_VALUE_TYPE_TEXT ?>)
+							&& (new_value == <?= ITEM_VALUE_TYPE_FLOAT ?>
+							|| new_value == <?= ITEM_VALUE_TYPE_UINT64 ?>)) {
+						if (trends.val() == 0) {
+							trends.val('<?= $data['trends_default'] ?>');
+						}
+
+						$('#trends_mode_1').prop('checked', true);
+					}
+
+					$('#trends_mode').trigger('change');
+					$(this).data('old-value', new_value);
+				})
+				.data('old-value', $('#value_type').val());
+
+			$('#history_mode')
+				.change(function() {
+					if ($('[name="history_mode"][value=' + <?= ITEM_STORAGE_OFF ?> + ']').is(':checked')) {
+						$('#history').prop('disabled', true).hide();
+					}
+					else {
+						$('#history').prop('disabled', false).show();
+					}
+				})
+				.trigger('change');
+
+			$('#trends_mode')
+				.change(function() {
+					if ($('[name="trends_mode"][value=' + <?= ITEM_STORAGE_OFF ?> + ']').is(':checked')) {
+						$('#trends').prop('disabled', true).hide();
+					}
+					else {
+						$('#trends').prop('disabled', false).show();
+					}
+				})
+				.trigger('change');
+		},
+
+		typeChangeHandler() {
 			// Selected item type.
-			var type = parseInt($('#type').val(), 10),
-				asterisk = '<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>';
+			const type = parseInt($('#type').val(), 10);
+			const asterisk = '<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>';
 
 			$('#keyButton').prop('disabled',
 				type != <?= ITEM_TYPE_ZABBIX ?>
@@ -54,58 +112,66 @@ include dirname(__FILE__).'/itemtest.js.php';
 				$('label[for=username]').removeClass(asterisk);
 				$('input[name=username]').removeAttr('aria-required');
 			}
-		}
+		},
 
-		// Field switchers.
-		new CViewSwitcher('value_type', 'change', item_form.field_switches.for_value_type);
+		editHost(e, hostid) {
+			e.preventDefault();
+			const host_data = {hostid};
 
-		$('#type')
-			.change(typeChangeHandler)
-			.trigger('change');
+			this.openHostPopup(host_data);
+		},
 
-		// Whenever non-numeric type is changed back to numeric type, set the default value in "trends" field.
-		$('#value_type')
-			.change(function() {
-				var new_value = $(this).val(),
-					old_value = $(this).data('old-value'),
-					trends = $('#trends');
+		openHostPopup(host_data) {
+			const original_url = location.href;
+			const overlay = PopUp('popup.host.edit', host_data, 'host_edit', document.activeElement);
 
-				if ((old_value == <?= ITEM_VALUE_TYPE_STR ?> || old_value == <?= ITEM_VALUE_TYPE_LOG ?>
-						|| old_value == <?= ITEM_VALUE_TYPE_TEXT ?>)
-						&& (new_value == <?= ITEM_VALUE_TYPE_FLOAT ?>
-						|| new_value == <?= ITEM_VALUE_TYPE_UINT64 ?>)) {
-					if (trends.val() == 0) {
-						trends.val('<?= $data['trends_default'] ?>');
+			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostDelete, {once: true});
+			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+				history.replaceState({}, '', original_url);
+			}, {once: true});
+		},
+
+		refresh() {
+			const url = new Curl('', false);
+			const form = document.getElementsByName(this.form_name)[0];
+			const fields = getFormFields(form);
+
+			post(url.getUrl(), fields);
+		},
+
+		events: {
+			hostSuccess(e) {
+				const data = e.detail;
+
+				if ('success' in data) {
+					postMessageOk(data.success.title);
+
+					if ('messages' in data.success) {
+						postMessageDetails('success', data.success.messages);
 					}
-
-					$('#trends_mode_1').prop('checked', true);
 				}
 
-				$('#trends_mode').trigger('change');
-				$(this).data('old-value', new_value);
-			})
-			.data('old-value', $('#value_type').val());
+				view.refresh();
+			},
 
-		$('#history_mode')
-			.change(function() {
-				if ($('[name="history_mode"][value=' + <?= ITEM_STORAGE_OFF ?> + ']').is(':checked')) {
-					$('#history').prop('disabled', true).hide();
-				}
-				else {
-					$('#history').prop('disabled', false).show();
-				}
-			})
-			.trigger('change');
+			hostDelete(e) {
+				const data = e.detail;
 
-		$('#trends_mode')
-			.change(function() {
-				if ($('[name="trends_mode"][value=' + <?= ITEM_STORAGE_OFF ?> + ']').is(':checked')) {
-					$('#trends').prop('disabled', true).hide();
+				if ('success' in data) {
+					postMessageOk(data.success.title);
+
+					if ('messages' in data.success) {
+						postMessageDetails('success', data.success.messages);
+					}
 				}
-				else {
-					$('#trends').prop('disabled', false).show();
-				}
-			})
-			.trigger('change');
-	});
+
+				const curl = new Curl('zabbix.php', false);
+				curl.setArgument('action', 'host.list');
+
+				location.href = curl.getUrl();
+			}
+		}
+	};
 </script>

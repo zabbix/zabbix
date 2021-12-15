@@ -124,7 +124,7 @@ include __DIR__.'/itemtest.js.php';
 					&& type != <?= ITEM_TYPE_IPMI ?>
 			)
 
-			if ((type == <?= ITEM_TYPE_SSH ?> || type == <?= ITEM_TYPE_TELNET ?>)) {
+			if (type == <?= ITEM_TYPE_SSH ?> || type == <?= ITEM_TYPE_TELNET ?>) {
 				$('label[for=username]').addClass(asterisk);
 				$('input[name=username]').attr('aria-required', 'true');
 			}
