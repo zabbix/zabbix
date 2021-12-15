@@ -185,7 +185,8 @@ static const char	*ipc_make_path(const char *service_name, char **error)
 static int	ipc_write_data(int fd, const unsigned char *data, zbx_uint32_t size, zbx_uint32_t *size_sent)
 {
 	zbx_uint32_t	offset = 0;
-	int		n, ret = SUCCEED;
+	int		ret = SUCCEED;
+	ssize_t		n;
 
 	while (offset != size)
 	{
@@ -203,6 +204,7 @@ static int	ipc_write_data(int fd, const unsigned char *data, zbx_uint32_t size, 
 			ret = FAIL;
 			break;
 		}
+
 		offset += n;
 	}
 

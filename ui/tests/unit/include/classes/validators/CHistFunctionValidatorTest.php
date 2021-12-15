@@ -917,7 +917,7 @@ class CHistFunctionValidatorTest extends TestCase {
 			['baselinewma(/host/key, {$MACRO}, {$MACRO}, {$MACRO})', ['usermacros' => true], ['rc' => true, 'error' => null]],
 			['baselinewma(/host/key, {#LLDMACRO}, {#LLDMACRO}, {#LLDMACRO})', ['lldmacros' => true], ['rc' => true, 'error' => null]],
 			['baselinewma(/host/key, {#LLDMACRO}, {$MACRO}, {#LLDMACRO})', ['lldmacros' => true], ['rc' => false, 'error' => 'invalid third parameter in function "baselinewma"']],
-			['baselinewma(/host/key, {#LLDMACRO}, {$MACRO}, {#LLDMACRO})', ['lldmacros' => true, 'usermacros' => true], ['rc' => true, 'error' => null]],
+			['baselinewma(/host/key, {#LLDMACRO}, {$MACRO}, {#LLDMACRO})', ['lldmacros' => true, 'usermacros' => true], ['rc' => true, 'error' => null]]
 		];
 	}
 
