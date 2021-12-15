@@ -25,15 +25,24 @@ abstract class CControllerSlaCreateUpdate extends CController {
 	 * @param string $effective_date
 	 * @param string $field_name
 	 *
+	 * @throws Exception
+	 *
 	 * @return int
 	 */
 	protected static function validateEffectiveDate(string $effective_date, string $field_name): int {
 		$datetime = DateTime::createFromFormat('!'.DATE_FORMAT, $effective_date, new DateTimeZone('UTC'));
+		$last_errors = DateTime::getLastErrors();
 
-		if ($datetime === false || $datetime->getTimestamp() > ZBX_MAX_DATE) {
+		if ($datetime === false || $last_errors['warning_count'] > 0 || $last_errors['error_count'] > 0) {
 			throw new InvalidArgumentException(
 				_s('Incorrect value for field "%1$s": %2$s.', $field_name, _('a date is expected'))
 			);
+		}
+
+		if ($datetime->getTimestamp() < 0 || $datetime->getTimestamp() > ZBX_MAX_DATE) {
+			throw new InvalidArgumentException(_s('Incorrect value for field "%1$s": %2$s.', $field_name,
+				_s('a date later than %1$s is expected', zbx_date2str(DATE_FORMAT, ZBX_MAX_DATE, 'UTC'))
+			));
 		}
 
 		return $datetime->getTimestamp();

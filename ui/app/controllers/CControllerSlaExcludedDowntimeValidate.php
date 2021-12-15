@@ -35,6 +35,9 @@ class CControllerSlaExcludedDowntimeValidate extends CController {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	protected function checkInput(): bool {
 		$fields = [
 			'row_index' =>			'required|int32',
@@ -48,14 +51,21 @@ class CControllerSlaExcludedDowntimeValidate extends CController {
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
-			$datetime_from = DateTime::createFromFormat(DATE_TIME_FORMAT, $this->getInput('start_time'));
+			$datetime_from = DateTime::createFromFormat('!'.DATE_TIME_FORMAT, $this->getInput('start_time'));
+			$last_errors = DateTime::getLastErrors();
 
-			if ($datetime_from !== false) {
-				$this->period_from = $datetime_from->getTimestamp();
+			if ($datetime_from === false || $last_errors['warning_count'] > 0 || $last_errors['error_count'] > 0) {
+				error(_s('Incorrect value for field "%1$s": %2$s.', 'start_time', _('a time is expected')));
+				$ret = false;
 			}
 
-			if ($datetime_from === false || $this->period_from < 0 || $this->period_from > ZBX_MAX_DATE) {
-				error(_('Incorrect start time of the excluded downtime.'));
+			$this->period_from = $datetime_from->getTimestamp();
+
+			if ($this->period_from < 0 || $this->period_from > ZBX_MAX_DATE) {
+				error(_s('Incorrect value for field "%1$s": %2$s.', 'start_time',
+					_s('a time later than %1$s is expected', zbx_date2str(DATE_TIME_FORMAT, ZBX_MAX_DATE))
+				));
+
 				$ret = false;
 			}
 
@@ -73,12 +83,18 @@ class CControllerSlaExcludedDowntimeValidate extends CController {
 					$this->period_to = $datetime_to->getTimestamp();
 
 					if ($this->period_to <= $this->period_from || $this->period_to > ZBX_MAX_DATE) {
-						error(_('Incorrect duration of the excluded downtime.'));
+						error(_s('Incorrect value for field "%1$s": %2$s.', 'duration',
+							_s('a time later than %1$s is expected', zbx_date2str(DATE_TIME_FORMAT, ZBX_MAX_DATE))
+						));
+
 						$ret = false;
 					}
 				}
 				catch (Exception $e) {
-					error(_('Incorrect duration of the excluded downtime.'));
+					error(_s('Incorrect value for field "%1$s": %2$s.', 'duration',
+						_s('a time later than %1$s is expected', zbx_date2str(DATE_TIME_FORMAT, ZBX_MAX_DATE))
+					));
+
 					$ret = false;
 				}
 			}
