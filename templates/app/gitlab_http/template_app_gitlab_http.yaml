@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-06-15T14:16:46Z'
+  version: '6.0'
+  date: '2021-12-15T08:29:12Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -16,11 +16,11 @@ zabbix_export:
         To access the metrics, the client IP address must be explicitly allowed. See https://docs.gitlab.com/ee/administration/monitoring/ip_whitelist.html.
         
         Don't forget change macros {$GITLAB.URL}.
-        Some metrics may not be collected depending on your Gitlab instance version and configuration. See (Gitlab’s documentation[)https://docs.gitlab.com/ee/administration/monitoring/prometheus/gitlab_metrics.html] for further information about its metric collection.
+        Some metrics may not be collected depending on your Gitlab instance version and configuration. See (Gitlab's documentation[)https://docs.gitlab.com/ee/administration/monitoring/prometheus/gitlab_metrics.html] for further information about its metric collection.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Applications
@@ -377,7 +377,6 @@ zabbix_export:
               parameters:
                 - 30m
           url: '{$GITLAB.URL}/-/liveness'
-          status_codes: ''
           tags:
             -
               tag: Application
@@ -846,7 +845,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: "Average RSS\tMemory usage in bytes."
+          description: 'Average RSS Memory usage in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -867,7 +866,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: "Maxinun RSS\tMemory usage in bytes."
+          description: 'Maximum RSS Memory usage in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -888,7 +887,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: "Minimum RSS\tMemory usage in bytes."
+          description: 'Minimum RSS Memory usage in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -1037,7 +1036,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - "$[?(@.name==\"upload_file_does_not_exist\t\")].value.first()"
+                - '$[?(@.name=="upload_file_does_not_exist")].value.first()'
               error_handler: DISCARD_VALUE
           master_item:
             key: gitlab.get_metrics
