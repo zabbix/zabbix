@@ -671,3 +671,11 @@ $triggersForm->addItem($triggersTab);
 $triggersWidget->addItem($triggersForm);
 
 $triggersWidget->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'form_name' => $triggersForm->getName()
+	]).');
+'))
+	->setOnDocumentReady()
+	->show();
