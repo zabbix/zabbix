@@ -44,7 +44,7 @@ static void	rtc_diaginfo(int scope)
 	else
 		flags = 1u << scope;
 
-	zbx_diag_log_info(flags);
+	zbx_diag_log_info(flags, NULL);
 }
 
 /******************************************************************************

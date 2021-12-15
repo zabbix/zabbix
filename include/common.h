@@ -982,6 +982,7 @@ typedef enum
 }
 zbx_task_t;
 
+#define ZBX_RTC_UNKNOWN				0
 #define ZBX_RTC_LOG_LEVEL_INCREASE		1
 #define ZBX_RTC_LOG_LEVEL_DECREASE		2
 #define ZBX_RTC_HOUSEKEEPER_EXECUTE		3
@@ -1014,6 +1015,7 @@ typedef struct
 	zbx_task_t	task;
 	unsigned int	flags;
 	int		data;
+	char		*opts;
 }
 ZBX_TASK_EX;
 

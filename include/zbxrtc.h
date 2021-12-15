@@ -17,34 +17,22 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef ZABBIX_ZBXRTC_H
+#define ZABBIX_ZBXRTC_H
 
-#ifndef ZABBIX_ZBXDIAG_H
-#define ZABBIX_ZBXDIAG_H
+#include "zbxipcservice.h"
 
-#include "common.h"
-#include "zbxjson.h"
-
-typedef enum
+typedef struct
 {
-	ZBX_DIAGINFO_UNDEFINED = -1,
-	ZBX_DIAGINFO_ALL,
-	ZBX_DIAGINFO_HISTORYCACHE,
-	ZBX_DIAGINFO_VALUECACHE,
-	ZBX_DIAGINFO_PREPROCESSING,
-	ZBX_DIAGINFO_LLD,
-	ZBX_DIAGINFO_ALERTING,
-	ZBX_DIAGINFO_LOCKS
+	zbx_ipc_service_t	service;
 }
-zbx_diaginfo_section_t;
+zbx_rtc_t;
 
-#define ZBX_DIAG_HISTORYCACHE	"historycache"
-#define ZBX_DIAG_VALUECACHE	"valuecache"
-#define ZBX_DIAG_PREPROCESSING	"preprocessing"
-#define ZBX_DIAG_LLD		"lld"
-#define ZBX_DIAG_ALERTING	"alerting"
-#define ZBX_DIAG_LOCKS		"locks"
+/* provider API */
+int	zbx_rtc_init(zbx_rtc_t *rtc ,char **error);
+void 	zbx_rtc_dispatch(zbx_rtc_t *rtc);
 
-int	zbx_diag_get_info(const struct zbx_json_parse *jp, char **info);
-void	zbx_diag_log_info(unsigned int flags, char **result);
+/* client API */
+int	zbx_rtc_process(const char *option, char **error);
 
 #endif
