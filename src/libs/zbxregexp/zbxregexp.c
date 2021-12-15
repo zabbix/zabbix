@@ -36,6 +36,9 @@
 #ifndef HAVE_PCRE2_H
 #error "must use pcre or pcre2!"
 #endif
+#endif
+
+#ifdef HAVE_PCRE2_H
 #define ZBX_REGEXP_MULTILINE PCRE2_MULTILINE
 #ifdef PCRE2_NO_AUTO_CAPTURE
 #define ZBX_REGEXP_NO_AUTO_CAPTURE PCRE2_NO_AUTO_CAPTURE
