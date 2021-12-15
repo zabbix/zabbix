@@ -19,6 +19,11 @@
 **/
 
 
+/**
+ * @var CView $form
+ * @var array $data
+ */
+
 $form = (new CForm())->setName('host_view');
 
 $table = (new CTableInfo());
@@ -56,11 +61,11 @@ foreach ($data['hosts'] as $hostid => $host) {
 		}
 	}
 
-	$problems_div = (new CLink('', (new CUrl('zabbix.php'))
+	$problems_div = new CLink('', (new CUrl('zabbix.php'))
 		->setArgument('action', 'problem.view')
 		->setArgument('filter_name', '')
 		->setArgument('severities', $data['filter']['severities'])
-		->setArgument('hostids', [$host['hostid']])));
+		->setArgument('hostids', [$host['hostid']]));
 
 	$total_problem_count = 0;
 

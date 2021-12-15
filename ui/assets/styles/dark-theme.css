@@ -5820,8 +5820,6 @@ svg {
   .navtree .tree .placeholder {
     background-color: #121212;
     animation: fadein .5s; }
-.navtree .problem-icon-list {
-  flex-wrap: nowrap; }
 
 .problem-icon-link,
 .problem-icon-list {

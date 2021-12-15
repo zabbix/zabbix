@@ -1466,6 +1466,8 @@ define('ZBX_ACTION_RENAME',		4);
 // Maximum width for popups in Actions column for problems.
 define('ZBX_ACTIONS_POPUP_MAX_WIDTH',			800);
 
+define('ZBX_HINTBOX_CONTENT_LIMIT',				8192);
+
 // dashboard widgets
 define('WIDGET_ACTION_LOG',			'actionlog');
 define('WIDGET_CLOCK',				'clock');

@@ -100,15 +100,14 @@ foreach ($data['items'] as $itemid => $item) {
 			->format('%m' . 'm %s' . 's');
 
 		$last_check = (new CSpan($last_check_interval))
-			->setHint($last_check_actual_date_time,'',true, '', 0 );
+			->addClass(ZBX_STYLE_CURSOR_POINTER)
+			->setHint($last_check_actual_date_time, '', true, '', 0);
 
 		$last_value = (new CSpan(formatHistoryValue($last_history['value'], $item, false)))
-			->setHint(((new CDiv(substr($last_history['value'], 0, 8000)))
-				->addClass('hintbox-wrap')),
-				'',
-				true,
-				'max-height: 90vh;overflow: scroll',
-				0
+			->addClass(ZBX_STYLE_CURSOR_POINTER)
+			->setHint(
+				(new CDiv(mb_substr($last_history['value'], 0, 8000)))->addClass('hintbox-wrap'),
+				'', true, '', 0
 			);
 
 		$change = '';
