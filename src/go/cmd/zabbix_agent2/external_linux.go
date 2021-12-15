@@ -25,13 +25,15 @@ import (
 	"syscall"
 
 	"zabbix.com/pkg/log"
+	"zabbix.com/pkg/plugin"
+	"zabbix.com/plugins/external"
 )
 
 func getListener(socket string) (listener net.Listener, err error) {
 	listener, err = net.Listen("unix", socket)
 	if err != nil {
 		err = fmt.Errorf(
-			"failed to create listener for external plugins with socket path, %s, %s", socket, err.Error(),
+			"failed to create plugin listener with socket path, %s, %s", socket, err.Error(),
 		)
 
 		return
@@ -43,6 +45,33 @@ func getListener(socket string) (listener net.Listener, err error) {
 func cleanUpExternal() {
 	err := syscall.Unlink(pluginsocket)
 	if err != nil {
-		log.Critf("failed to clean up after external plugins, %s", err)
+		log.Critf("failed to clean up after plugins, %s", err)
 	}
+}
+
+func checkExternalExits() error {
+	var status syscall.WaitStatus
+	pid, err := syscall.Wait4(-1, &status, syscall.WNOHANG, nil)
+	if err != nil {
+		return fmt.Errorf("failed to obtain PID of dead child process: %s", err)
+	}
+
+	for _, p := range plugin.Plugins {
+		if p.IsExternal() {
+			if ep, ok := p.(*external.Plugin); ok {
+				return checkExternalExit(pid, ep, ep.Name())
+			}
+		}
+	}
+
+	return nil
+}
+
+func checkExternalExit(pid int, p *external.Plugin, name string) error {
+	if p.CheckPid(pid) {
+		p.Cleanup()
+		return fmt.Errorf("plugin %s died", name)
+	}
+
+	return nil
 }

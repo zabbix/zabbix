@@ -30,7 +30,7 @@ func getListener(socket string) (listener net.Listener, err error) {
 	listener, err = npipe.Listen(socket)
 	if err != nil {
 		err = fmt.Errorf(
-			"failed to create listener for external plugins with socket path, %s, %s", socket, err.Error(),
+			"failed to create plugin listener with socket path, %s, %s", socket, err.Error(),
 		)
 
 		return
@@ -40,3 +40,11 @@ func getListener(socket string) (listener net.Listener, err error) {
 }
 
 func cleanUpExternal() {}
+
+func checkExternalExits() error {
+	return nil
+}
+
+func checkExternalExit() error {
+	return nil
+}

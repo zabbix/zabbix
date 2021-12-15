@@ -92,7 +92,7 @@ func (h *handler) Execute() error {
 
 	h.accessor, err = plugin.GetByName(h.name)
 	if err != nil {
-		h.Errf("failed to get accessor for external plugin %s, %s", h.name, err.Error())
+		h.Errf("failed to get accessor for plugin %s, %s", h.name, err.Error())
 
 		return err
 	}
@@ -108,7 +108,7 @@ func (h *handler) run() {
 	for {
 		err := h.handle()
 		if err != nil {
-			h.Errf("failed to handle request for external plugin %s, %s", h.name, err.Error())
+			h.Errf("failed to handle request for plugin %s, %s", h.name, err.Error())
 		}
 	}
 }

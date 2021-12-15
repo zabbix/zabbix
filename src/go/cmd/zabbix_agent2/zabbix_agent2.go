@@ -164,7 +164,7 @@ var pidFile *pidfile.File
 
 func run() (err error) {
 	sigs := make(chan os.Signal, 1)
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM, syscall.SIGCHLD)
 
 	var control *remotecontrol.Conn
 	if control, err = remotecontrol.New(agent.Options.ControlSocket, remoteCommandSendingTimeout); err != nil {
@@ -181,6 +181,12 @@ loop:
 			case syscall.SIGINT, syscall.SIGTERM:
 				sendServiceStop()
 				break loop
+			case syscall.SIGCHLD:
+				if err := checkExternalExits(); err != nil {
+					log.Warningf("Error: %s", err)
+					sendServiceStop()
+					break loop
+				}
 			}
 		case client := <-control.Client():
 			if rerr := processRemoteCommand(client); rerr != nil {
@@ -353,7 +359,7 @@ func main() {
 	}
 
 	if pluginsocket, err = initExternalPlugins(&agent.Options); err != nil {
-		fatalExit("cannot register external plugins", err)
+		fatalExit("cannot register plugins", err)
 	}
 	defer cleanUpExternal()
 

@@ -28,13 +28,13 @@ import (
 func main() {
 	h, err := external.NewHandler(impl.Name())
 	if err != nil {
-		panic(fmt.Sprintf("failed to create external plugin handler %s", err.Error()))
+		panic(fmt.Sprintf("failed to create plugin handler %s", err.Error()))
 	}
 
 	impl.Logger = &h
 
 	err = h.Execute()
 	if err != nil {
-		panic(fmt.Sprintf("failed to execute external plugin handler %s", err.Error()))
+		panic(fmt.Sprintf("failed to execute plugin handler %s", err.Error()))
 	}
 }

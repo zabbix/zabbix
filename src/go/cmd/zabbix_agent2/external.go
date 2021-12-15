@@ -24,6 +24,8 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"zabbix.com/internal/agent"
@@ -70,6 +72,7 @@ func initExternalPlugins(options *agent.AgentOptions) (string, error) {
 		if err != nil {
 			return "", err
 		}
+		accessor.Initial = false
 
 		plugin.RegisterMetrics(accessor, name, accessor.Params...)
 	}
@@ -78,9 +81,10 @@ func initExternalPlugins(options *agent.AgentOptions) (string, error) {
 }
 
 func initExternalPlugin(name string, p *external.Plugin, options *agent.AgentOptions) (err error) {
-	p.Initial = true
 	p.ExecutePlugin()
 	defer p.Stop()
+
+	go listenOnPluginFail(p, name)
 
 	var resp *shared.RegisterResponse
 	resp, err = p.Register()
@@ -93,13 +97,12 @@ func initExternalPlugin(name string, p *external.Plugin, options *agent.AgentOpt
 	}
 
 	if name != resp.Name {
-		return fmt.Errorf("missmatch plugin names %s and %s, with plugin path %s", name, resp.Name, p.Path)
+		return fmt.Errorf("mismatch plugin names %s and %s, with plugin path %s", name, resp.Name, p.Path)
 	}
 
 	p.SetBrokerName(name)
 	p.Interfaces = resp.Interfaces
 	p.Params = resp.Metrics
-	p.Initial = false
 
 	options.Plugins[name] = removePath(options.Plugins[name])
 
@@ -109,6 +112,25 @@ func initExternalPlugin(name string, p *external.Plugin, options *agent.AgentOpt
 	}
 
 	return
+}
+
+func listenOnPluginFail(p *external.Plugin, name string) {
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGCHLD)
+	defer signal.Stop(sigs)
+
+	select {
+	case <-sigs:
+		var status syscall.WaitStatus
+		pid, err := syscall.Wait4(-1, &status, syscall.WNOHANG, nil)
+		if err != nil {
+			panic(fmt.Errorf("failed to obtain PID of dead child process: %s", err))
+		}
+
+		if err := checkExternalExit(pid, p, name); err != nil {
+			panic(err)
+		}
+	}
 }
 
 func validate(p *external.Plugin, options interface{}) error {
@@ -147,7 +169,7 @@ func parseTimeout() (timeout time.Duration) {
 
 func removeSocket(socket string) error {
 	if err := os.RemoveAll(socket); err != nil {
-		return fmt.Errorf("failed to drop external plugin socket, with path %s, %s", socket, err.Error())
+		return fmt.Errorf("failed to drop plugin socket, with path %s, %s", socket, err.Error())
 	}
 
 	return nil

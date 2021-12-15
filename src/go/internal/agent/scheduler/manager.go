@@ -501,13 +501,7 @@ func (m *Manager) init() {
 				interfaces += "configurator, "
 			}
 			interfaces = interfaces[:len(interfaces)-2]
-			var typeMSg string
-			if metric.Plugin.IsExternal() {
-				typeMSg = "using external plugin"
-			} else {
-				typeMSg = "using plugin"
-			}
-			log.Infof("%s '%s' providing following interfaces: %s", typeMSg, metric.Plugin.Name(), interfaces)
+			log.Infof("using plugin '%s' providing following interfaces: %s", metric.Plugin.Name(), interfaces)
 		}
 		m.plugins[metric.Key] = pagent
 	}

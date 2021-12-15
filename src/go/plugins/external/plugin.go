@@ -64,12 +64,12 @@ func (p *Plugin) ExecutePlugin() {
 
 	err := p.cmd.Start()
 	if err != nil {
-		panic(fmt.Sprintf("failed to start external plugin %s, %s", p.Path, err.Error()))
+		panic(fmt.Sprintf("failed to start plugin %s, %s", p.Path, err.Error()))
 	}
 
 	conn, err := getConnection(p.Listener, p.Timeout)
 	if err != nil {
-		panic(fmt.Sprintf("failed to create connection with external plugin %s, %s", p.Path, err.Error()))
+		panic(fmt.Sprintf("failed to create connection with plugin %s, %s", p.Path, err.Error()))
 	}
 
 	p.broker = New(conn, p.Timeout, p.Socket)
@@ -84,6 +84,11 @@ func (p *Plugin) Start() {
 }
 
 func (p *Plugin) Stop() {
+	if p.cmd == nil {
+		return
+	}
+	p.cmd = nil
+
 	err := shared.Write(
 		p.broker.conn,
 		shared.TerminateRequest{
@@ -94,16 +99,10 @@ func (p *Plugin) Stop() {
 	)
 
 	if err != nil {
-		panic(fmt.Sprintf("failed to send stop request to external plugin %s, %s", p.Path, err.Error()))
+		panic(fmt.Sprintf("failed to send stop request to plugin %s, %s", p.Path, err.Error()))
 	}
 
 	p.broker.stop()
-
-	if p.cmd == nil {
-		panic(fmt.Sprintf("missing cmd reference for external plugin %s, %s", p.Path, err.Error()))
-	}
-
-	p.cmd.Wait()
 }
 
 func (p *Plugin) Configure(globalOptions *plugin.GlobalOptions, privateOptions interface{}) {
@@ -139,6 +138,15 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 
 	return nil, errors.New(resp.Error)
+}
+
+func (p *Plugin) CheckPid(pid int) bool {
+	return p.cmd != nil && p.cmd.Process.Pid == pid
+}
+
+func (p *Plugin) Cleanup() {
+	p.broker.stop()
+	p.cmd = nil
 }
 
 func getConnection(listener net.Listener, timeout time.Duration) (conn net.Conn, err error) {

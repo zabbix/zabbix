@@ -97,7 +97,7 @@ func (b *pluginBroker) handleConnection() {
 			if err != nil {
 				panic(
 					fmt.Errorf(
-						"failed to read register response for external plugin %s, %s",
+						"failed to read register response for plugin %s, %s",
 						b.pluginName,
 						err.Error(),
 					),
@@ -113,7 +113,7 @@ func (b *pluginBroker) handleConnection() {
 			if err != nil {
 				panic(
 					fmt.Errorf(
-						"failed to read log request response for external plugin %s, %s",
+						"failed to read log request response for plugin %s, %s",
 						b.pluginName,
 						err.Error(),
 					),
@@ -129,7 +129,7 @@ func (b *pluginBroker) handleConnection() {
 			if err != nil {
 				panic(
 					fmt.Errorf(
-						"failed to read validate response for external plugin %s, %s",
+						"failed to read validate response for plugin %s, %s",
 						b.pluginName,
 						err.Error(),
 					),
@@ -144,7 +144,7 @@ func (b *pluginBroker) handleConnection() {
 			if err != nil {
 				panic(
 					fmt.Errorf(
-						"failed to read export response for external plugin %s, %s",
+						"failed to read export response for plugin %s, %s",
 						b.pluginName,
 						err.Error(),
 					),
@@ -222,7 +222,7 @@ func (b *pluginBroker) runBackground() {
 				if err != nil {
 					panic(
 						fmt.Errorf(
-							"failed to write request for external plugin %s, %s",
+							"failed to write request for plugin %s, %s",
 							b.pluginName,
 							err.Error(),
 						),
@@ -239,7 +239,7 @@ func (b *pluginBroker) handleLogs() {
 		case shared.LogRequest:
 			b.handleLog(v)
 		default:
-			log.Errf("Failed to log message from external plugins, unknown request type.")
+			log.Errf(`Failed to log message from plugins, unknown request type "%T"`, u)
 		}
 	}
 }
