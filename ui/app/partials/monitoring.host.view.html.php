@@ -61,7 +61,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 		}
 	}
 
-	$problems_div = new CLink('', (new CUrl('zabbix.php'))
+	$problems_link = new CLink('', (new CUrl('zabbix.php'))
 		->setArgument('action', 'problem.view')
 		->setArgument('filter_name', '')
 		->setArgument('severities', $data['filter']['severities'])
@@ -75,7 +75,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 				|| (!$data['filter']['severities'] && $count > 0)) {
 			$total_problem_count += $count;
 
-			$problems_div->addItem((new CSpan($count))
+			$problems_link->addItem((new CSpan($count))
 				->addClass(ZBX_STYLE_PROBLEM_ICON_LIST_ITEM)
 				->addClass(CSeverityHelper::getStatusStyle($severity))
 				->setAttribute('title', CSeverityHelper::getName($severity))
@@ -85,10 +85,10 @@ foreach ($data['hosts'] as $hostid => $host) {
 	}
 
 	if ($total_problem_count == 0) {
-		$problems_div->addItem('Problems');
+		$problems_link->addItem('Problems');
 	}
 	else {
-		$problems_div->addClass(ZBX_STYLE_PROBLEM_ICON_LINK);
+		$problems_link->addClass(ZBX_STYLE_PROBLEM_ICON_LINK);
 	}
 
 	$maintenance_icon = '';
@@ -125,7 +125,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 				)
 				: _('Latest data')
 		],
-		$problems_div,
+		$problems_link,
 		$host['graphs']
 			? [
 				new CLink(_('Graphs'),
