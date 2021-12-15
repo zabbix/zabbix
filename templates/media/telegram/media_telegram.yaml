@@ -92,7 +92,7 @@ zabbix_export:
         try {
             var params = JSON.parse(value);
         
-            if (typeof params.Token === 'undefined') {
+            if (typeof params.token === 'undefined') {
                 throw 'Incorrect value is given for parameter "Token": parameter is missing';
             }
         
