@@ -23,6 +23,8 @@
  * @var CView $this
  */
 
+require_once dirname(__FILE__).'/js/configuration.host.prototype.list.js.php';
+
 $widget = (new CWidget())
 	->setTitle(_('Host prototypes'))
 	->setControls(
