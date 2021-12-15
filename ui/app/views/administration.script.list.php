@@ -105,7 +105,7 @@ foreach ($data['scripts'] as $script) {
 						$actions[] = ', ';
 					}
 
-					if (CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_ACTIONS)) {
+					if (CWebUser::checkAccess(CRoleHelper::UI_SERVICES_ACTIONS)) {
 						$url = (new CUrl('actionconf.php'))
 							->setArgument('form', 'update')
 							->setArgument('actionid', $action['actionid']);
