@@ -154,18 +154,21 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
 	if (NULL == (pcre2_regexp = pcre2_compile(pattern, PCRE2_ZERO_TERMINATED, PCRE2_UTF | flags, &error,
 			&error_offset, NULL)))
 	{
-		err_msg_buff = zbx_malloc(NULL, ZBX_REGEXP_ERR_MSG_SIZE);
-		pcre2_get_error_message(error, err_msg_buff, ZBX_REGEXP_ERR_MSG_SIZE);
+		err_msg_buff = (char*)zbx_malloc(NULL, ZBX_REGEXP_ERR_MSG_SIZE);
+		if (0 > pcre2_get_error_message(error, err_msg_buff, ZBX_REGEXP_ERR_MSG_SIZE))
+			zbx_snprintf(err_msg_buff, ZBX_REGEXP_ERR_MSG_SIZE, "unknown regexp error");
 		*err_msg = (const char*)err_msg_buff;
 		return FAIL;
 	}
 
 	if (NULL != regexp)
 	{
-		match_ctx = pcre2_match_context_create(NULL);
-		if (NULL == match_ctx)
+		if (NULL == (match_ctx = pcre2_match_context_create(NULL)))
 		{
 			pcre2_code_free(pcre2_regexp);
+			err_msg_buff = (char*)zbx_malloc(NULL, ZBX_REGEXP_ERR_MSG_SIZE);
+			zbx_snprintf(err_msg_buff, ZBX_REGEXP_ERR_MSG_SIZE, "cannot create pcre2 match context");
+			*err_msg = (const char*)err_msg_buff;
 			return FAIL;
 		}
 
@@ -336,9 +339,9 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 #undef MATCHES_BUFF_SIZE
 #endif
 #ifdef USE_PCRE2
-	int				result, r, i;
-	pcre2_match_data		*match_data = NULL;
-	PCRE2_SIZE			*ovector = NULL;
+	int			result, r, i;
+	pcre2_match_data	*match_data = NULL;
+	PCRE2_SIZE		*ovector = NULL;
 
 	pcre2_set_match_limit(regexp->match_ctx, 1000000);
 	pcre2_set_recursion_limit(regexp->match_ctx, compute_recursion_limit());
@@ -346,7 +349,7 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 
 	if (NULL == match_data)
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot create pcre2 match data of size %d", count);
+		zabbix_log(LOG_LEVEL_WARNING, "%s() cannot create pcre2 match data of size %d",__func__, count);
 		result = FAIL;
 	}
 	else
