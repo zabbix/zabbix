@@ -7300,11 +7300,13 @@ td.inactive-bg {
 .problem-icon-link:focus {
   box-shadow: 0 0 0 2px #ffffff; }
 
+.problem-icon-link .problem-icon-list-item,
 .problem-icon-list .problem-icon-list-item {
   background: transparent;
   color: #ffffff;
   position: relative;
   padding-left: 20px; }
+  .problem-icon-link .problem-icon-list-item::before,
   .problem-icon-list .problem-icon-list-item::before {
     content: '';
     background-image: url("../img/icon-sprite.svg?20200407");
@@ -7315,16 +7317,22 @@ td.inactive-bg {
     left: 0;
     height: 17px;
     width: 17px; }
+.problem-icon-link .status-na-bg::before,
 .problem-icon-list .status-na-bg::before {
   background-position: -357px -432px; }
+.problem-icon-link .status-info-bg::before,
 .problem-icon-list .status-info-bg::before {
   background-position: -380px -432px; }
+.problem-icon-link .status-average-bg::before,
 .problem-icon-list .status-average-bg::before {
   background-position: -403px -432px; }
+.problem-icon-link .status-warning-bg::before,
 .problem-icon-list .status-warning-bg::before {
   background-position: -426px -432px; }
+.problem-icon-link .status-high-bg::before,
 .problem-icon-list .status-high-bg::before {
   background-position: -449px -432px; }
+.problem-icon-link .status-disaster-bg::before,
 .problem-icon-list .status-disaster-bg::before {
   background-position: -472px -432px; }
 
