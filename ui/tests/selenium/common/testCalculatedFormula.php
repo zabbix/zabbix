@@ -1146,7 +1146,7 @@ class testCalculatedFormula extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => 'baselinedev(/test/trap,1h:now/h,"m",120)',
+					'formula' => 'baselinedev(/test/trap,1h:now/h,"s",120)',
 					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "baselinedev".'
 				]
 			],
@@ -1162,6 +1162,13 @@ class testCalculatedFormula extends CWebTest {
 					'expected' => TEST_BAD,
 					'formula' => 'baselinedev(/test/trap,1h:now/m,"h",12)',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "baselinedev".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'baselinedev(/host/key,1d:now/d-1d,"d",2,)',
+					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "baselinedev".'
 				]
 			],
 			// baselinewma() function validation.
@@ -1238,7 +1245,7 @@ class testCalculatedFormula extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'formula' => 'baselinewma(/test/trap,1h:now/h,"m",120)',
+					'formula' => 'baselinewma(/test/trap,1h:now/h,"s",120)',
 					'error' => 'Invalid parameter "/1/params": invalid third parameter in function "baselinewma".'
 				]
 			],
@@ -1254,6 +1261,13 @@ class testCalculatedFormula extends CWebTest {
 					'expected' => TEST_BAD,
 					'formula' => 'baselinewma(/test/trap,1h:now/m,"h",12)',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "baselinewma".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'baselinewma(/host/key,1d:now/d-1d,"d",2,)',
+					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "baselinewma".'
 				]
 			],
 			// bitand() function validation.
