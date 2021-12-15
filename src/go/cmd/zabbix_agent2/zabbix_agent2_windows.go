@@ -51,6 +51,5 @@ func handleSig(sig os.Signal) {
 	switch sig {
 	case syscall.SIGINT, syscall.SIGTERM:
 		sendServiceStop()
-		}
 	}
 }
