@@ -213,6 +213,10 @@ class CCheckBoxList extends CList {
 				->setEnabled($this->enabled);
 			$checkbox->setId($checkbox->getId().$uniqid);
 
+			if (array_key_exists('unchecked_value', $value)) {
+				$checkbox->setUncheckedValue($value['unchecked_value']);
+			}
+
 			parent::addItem($checkbox);
 		}
 

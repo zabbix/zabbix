@@ -123,8 +123,7 @@
 			], JSON_FORCE_OBJECT) ?>;
 
 			for (const [id, value] of Object.entries(access)) {
-				const checkbox = document.getElementsByName(id.replace(/\./g, '_'))[0];
-
+				const checkbox = document.getElementById(id.replace(/\./g, '_'));
 				if (user_type < value) {
 					checkbox.readOnly = true;
 					checkbox.checked = false;

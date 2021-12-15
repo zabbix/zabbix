@@ -90,7 +90,8 @@ foreach ($data['labels']['sections'] as $section_key => $section_label) {
 			'label' => $rule_label,
 			'value' => 1,
 			'checked' => array_key_exists($rule_key, $data['rules']['ui'])
-				&& $data['rules']['ui'][$rule_key]
+				&& $data['rules']['ui'][$rule_key],
+			'unchecked_value' => 0
 		];
 	}
 
