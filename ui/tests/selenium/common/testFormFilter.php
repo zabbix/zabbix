@@ -72,7 +72,7 @@ class testFormFilter extends CWebTest {
 
 				// Checking that hosts/problems amount displayed near name in filter tab.
 				if (array_key_exists('Show number of records', $data['filter'])) {
-					$this->query('xpath://a[@class="icon-home tabfilter-item-link"]')->one()->click();
+					$this->query('xpath://a[@class="icon-filter tabfilter-item-link"]')->one()->click();
 					$this->assertEquals($filtered_rows_count, $this->query('xpath://li[@data-target="tabfilter_'.
 							$data['tab_id'].'"]/a')->one()->getAttribute('data-counter'));
 				}

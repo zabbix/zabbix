@@ -29,7 +29,7 @@ class CTabFilter extends CDiv {
 	const CSS_TAB_EXPANDED = 'expanded';
 	const CSS_TAB_SORTABLE_CONTAINER = 'ui-sortable-container';
 	const CSS_ID_PREFIX = 'tabfilter_';
-	const CSS_TABFILTER_ICON_HOME = 'icon-home';
+	const CSS_TABFILTER_ICON_FILTER = 'icon-filter';
 	const CSS_TABFILTER_ITEM = 'tabfilter-item-label';
 
 	/**
@@ -164,7 +164,7 @@ class CTabFilter extends CDiv {
 			if ($tab_index == 0) {
 				$label = (new CLink(''))
 					->setAttribute('aria-label', _('Home'))
-					->addClass(self::CSS_TABFILTER_ICON_HOME);
+					->addClass(self::CSS_TABFILTER_ICON_FILTER);
 				$data += [
 					'filter_sortable' => false,
 					'filter_configurable' => false
