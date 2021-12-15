@@ -184,6 +184,8 @@ class CTest extends PHPUnit_Framework_TestCase {
 				else {
 					throw new Exception($error);
 				}
+
+				continue;
 			}
 
 			try {
