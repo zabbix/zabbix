@@ -1870,7 +1870,9 @@ SENDER_LIBS="$SENDER_LIBS $ZLIB_LIBS $LIBPTHREAD_LIBS"
 ZBXJS_LDFLAGS="$ZBXJS_LDFLAGS $LIBCURL_LDFLAGS"
 ZBXJS_LIBS="$ZBXJS_LIBS $LIBCURL_LIBS"
 
+if test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes" || test "x$agent2" = "xyes"; then
 dnl Check for libpcre or libpcre2, used by Zabbix for regular expressions
+dnl Must check for both pcre and pcre2 to check if both were selected by the user and produce an error in that case
 LIBPCRE_CHECK_CONFIG([no])
 LIBPCRE2_CHECK_CONFIG([no])
 if test "x$want_libpcre2" = "xyes"; then
@@ -1890,8 +1892,10 @@ if test "x$want_libpcre2" = "xyes"; then
 		LIBS="$LIBS $LIBPCRE2_LIBS"
 	fi
 
-	AC_DEFINE([USE_PCRE2], 1, [Using new pcre2 library])
-elif test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes" || test "x$agent2" = "xyes"; then
+	if test "x$found_libpcre2" = "xyes"; then
+		AC_DEFINE([HAVE_PCRE2_H], 1, [Define to 1 if you have the 'libpcre2' library (-lpcre2-8)])
+	fi
+else
 	if test "x$found_libpcre" != "xyes"; then
 		AC_MSG_ERROR([Unable to use libpcre (libpcre check failed)])
 	fi
@@ -1904,7 +1908,10 @@ elif test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xy
 		LIBS="$LIBS $LIBPCRE_LIBS"
 	fi
 
-	AC_DEFINE([USE_PCRE], 1, [Using old pcre library])
+	if test "x$found_libpcre" = "xyes"; then
+		AC_DEFINE([HAVE_PCRE_H], 1, [Define to 1 if you have the 'libpcre' library (-lpcre)])
+	fi
+fi
 fi
 
 found_iconv="no"

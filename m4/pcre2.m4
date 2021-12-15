@@ -155,7 +155,6 @@ AC_HELP_STRING([--with-libpcre2@<:@=DIR@:>@], [use libpcre2 from given base inst
 	fi
 
 	if test "x$found_libpcre2" = "xyes"; then
-		AC_DEFINE([HAVE_PCRE2_H], 1, [Define to 1 if you have the 'libpcre2' library (-lpcre2-8)])
 		AC_MSG_RESULT(yes)
 	else
 		LIBPCRE2_CFLAGS=""

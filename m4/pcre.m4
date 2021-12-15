@@ -154,7 +154,6 @@ AC_HELP_STRING([--with-libpcre@<:@=DIR@:>@], [use libpcre from given base instal
 	fi
 
 	if test "x$found_libpcre" = "xyes"; then
-		AC_DEFINE([HAVE_PCRE_H], 1, [Define to 1 if you have the 'libpcre' library (-lpcre)])
 		AC_MSG_RESULT(yes)
 	else
 		LIBPCRE_CFLAGS=""

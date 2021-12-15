@@ -21,8 +21,8 @@
 #include "zbxregexp.h"
 #include "log.h"
 
-#ifdef USE_PCRE
-#ifdef USE_PCRE2
+#ifdef HAVE_PCRE_H
+#ifdef HAVE_PCRE2_H
 #error "cannot use both pcre and pcre2 at the same time!"
 #endif
 #define ZBX_REGEXP_MULTILINE PCRE_MULTILINE
@@ -32,8 +32,8 @@
 #define ZBX_REGEXP_CASELESS PCRE_CASELESS
 #endif
 
-#ifndef USE_PCRE
-#ifndef USE_PCRE2
+#ifndef HAVE_PCRE_H
+#ifndef HAVE_PCRE2_H
 #error "must use pcre or pcre2!"
 #endif
 #define ZBX_REGEXP_MULTILINE PCRE2_MULTILINE
@@ -46,11 +46,11 @@
 
 struct zbx_regexp
 {
-#ifdef USE_PCRE
+#ifdef HAVE_PCRE_H
 	pcre			*pcre_regexp;
 	struct pcre_extra	*extra;
 #endif
-#ifdef USE_PCRE2
+#ifdef HAVE_PCRE2_H
 	pcre2_code		*pcre2_regexp;
 	pcre2_match_context	*match_ctx;
 #endif
@@ -90,12 +90,12 @@ zbx_regmatch_t;
  ******************************************************************************/
 static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp, const char **err_msg)
 {
-#ifdef USE_PCRE
+#ifdef HAVE_PCRE_H
 	int			error_offset = -1;
 	pcre			*pcre_regexp;
 	struct pcre_extra	*extra;
 #endif
-#ifdef USE_PCRE2
+#ifdef HAVE_PCRE2_H
 	pcre2_code		*pcre2_regexp;
 	pcre2_match_context	*match_ctx;
 	int			error = 0;
@@ -129,7 +129,7 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
 		}
 	}
 #endif
-#ifdef USE_PCRE
+#ifdef HAVE_PCRE_H
 	if (NULL == (pcre_regexp = pcre_compile(pattern, flags, err_msg, &error_offset, NULL)))
 		return FAIL;
 
@@ -148,7 +148,7 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
 	else
 		pcre_free(pcre_regexp);
 #endif
-#ifdef USE_PCRE2
+#ifdef HAVE_PCRE2_H
 	*err_msg = NULL;
 
 	if (NULL == (pcre2_regexp = pcre2_compile(pattern, PCRE2_ZERO_TERMINATED, PCRE2_UTF | flags, &error,
@@ -288,7 +288,7 @@ static unsigned long int compute_recursion_limit(void)
 static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags, int count,
 		zbx_regmatch_t *matches)
 {
-#ifdef USE_PCRE
+#ifdef HAVE_PCRE_H
 #define MATCHES_BUFF_SIZE	(ZBX_REGEXP_GROUPS_MAX * 3)		/* see pcre_exec() in "man pcreapi" why 3 */
 
 	int				result, r;
@@ -338,7 +338,7 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 	return result;
 #undef MATCHES_BUFF_SIZE
 #endif
-#ifdef USE_PCRE2
+#ifdef HAVE_PCRE2_H
 	int			result, r, i;
 	pcre2_match_data	*match_data = NULL;
 	PCRE2_SIZE		*ovector = NULL;
@@ -401,7 +401,7 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
  ******************************************************************************/
 void	zbx_regexp_free(zbx_regexp_t *regexp)
 {
-#ifdef USE_PCRE
+#ifdef HAVE_PCRE_H
 	/* pcre_free_study() was added to the API for release 8.20 while extra was available before */
 #ifdef PCRE_CONFIG_JIT
 	pcre_free_study(regexp->extra);
@@ -410,7 +410,7 @@ void	zbx_regexp_free(zbx_regexp_t *regexp)
 #endif
 	pcre_free(regexp->pcre_regexp);
 #endif
-#ifdef USE_PCRE2
+#ifdef HAVE_PCRE2_H
 	pcre2_code_free(regexp->pcre2_regexp);
 	pcre2_match_context_free(regexp->match_ctx);
 #endif
@@ -1360,10 +1360,10 @@ int	zbx_wildcard_match(const char *value, const char *wildcard)
 
 void	zbx_regexp_err_msg_free(const char *err_msg)
 {
-#ifdef USE_PCRE
+#ifdef HAVE_PCRE_H
 	ZBX_UNUSED(err_msg);
 #endif
-#ifdef USE_PCRE2
+#ifdef HAVE_PCRE2_H
 	char	*ptr;
 
 	if (NULL != err_msg)
