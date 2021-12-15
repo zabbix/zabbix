@@ -111,22 +111,26 @@
 			})
 				.then((response) => response.json())
 				.then((response) => {
-					uncheckTableRows('slas', ('keepids' in response) ? response.keepids : []);
 					clearMessages();
 
-					if ('errors' in response) {
-						addMessage(response.errors);
+					if ('error' in response) {
+						uncheckTableRows('sla', ('keepids' in response.error) ? response.error.keepids : []);
 
-						if ('messages' in response) {
+						const message_box = makeMessageBox('bad', [], response.error.title)[0];
+						addMessage(message_box);
+
+						if ('messages' in response.error) {
 							addMessage(response.messages);
 						}
 					}
 					else {
-						if ('title' in response) {
-							postMessageOk(response.title);
+						if ('success' in response) {
+							uncheckTableRows('sla', ('keepids' in response.success) ? response.success.keepids : []);
 
-							if ('messages' in response) {
-								postMessageDetails('success', response.messages);
+							postMessageOk(response.success.title);
+
+							if ('messages' in response.success) {
+								postMessageDetails('success', response.success.messages);
 							}
 
 							location.href = location.href;

@@ -31,7 +31,7 @@ class CControllerSlaListUpdate extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'slaids' =>	'required|array_db sla.slaid',
+			'slaids' =>	'required|array_id',
 			'status' => 'required|in '.implode(',', [CSlaHelper::SLA_STATUS_DISABLED, CSlaHelper::SLA_STATUS_ENABLED]),
 			'backurl' => 'string'
 		];
@@ -83,20 +83,24 @@ class CControllerSlaListUpdate extends CController {
 			}
 
 			$update['slaids'][$key] = array_merge($this->slas[$slaid], [
-				'status' => $update['status'],
+				'status' => $update['status']
 			]);
 		}
 
 		$result = API::SLA()->update($update['slaids']);
 
 		if ($result) {
-			$output['title'] = _n('SLA updated', 'SLAs updated', count($result['slaids']));
+			$output['success']['title'] = _n('SLA updated', 'SLAs updated', count($result['slaids']));
 
 			if ($this->hasInput('backurl')) {
-				CMessageHelper::setSuccessTitle($output['title']);
+				CMessageHelper::setSuccessTitle($output['success']['title']);
 				$this->setResponse(new CControllerResponseRedirect($this->getInput('backurl')));
 
 				return;
+			}
+
+			if ($messages = get_and_clear_messages()) {
+				$output['success']['messages'] = array_column($messages, 'message');
 			}
 		}
 		else {
@@ -106,13 +110,11 @@ class CControllerSlaListUpdate extends CController {
 				return;
 			}
 
-			$output['errors'] = makeMessageBox(ZBX_STYLE_MSG_BAD, filter_messages(), CMessageHelper::getTitle())
-				->toString();
-			$output['keepids'] = $this->getInput('slaids');
-		}
-
-		if ($messages = get_and_clear_messages()) {
-			$output['messages'] = array_column($messages, 'message');
+			$output['error'] = [
+				'title' => _n('Cannot update SLA', 'Cannot update SLAs', count($this->getInput('slaids'))),
+				'messages' => array_column(get_and_clear_messages(), 'message'),
+				'keepids' => $this->getInput('slaids')
+			];
 		}
 
 		$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());
