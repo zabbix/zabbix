@@ -1,1 +1,1 @@
-.......PS. [ZBXNEXT-7049] fixed crash in preprocessing manager when single 'check for not supported value' step is used (vso)
+.......PS. [ZBX-20325] fixed crash in preprocessing manager when single 'check for not supported value' step is used (vso)
