@@ -36,6 +36,10 @@ window.sla_excluded_downtime_edit_popup = {
 	},
 
 	submit() {
+		const fields = getFormFields(this.form);
+
+		fields.name = fields.name.trim();
+
 		for (const el of this.form.parentNode.children) {
 			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
 				el.parentNode.removeChild(el);
@@ -51,7 +55,7 @@ window.sla_excluded_downtime_edit_popup = {
 		fetch(curl.getUrl(), {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify(getFormFields(this.form))
+			body: JSON.stringify(fields)
 		})
 			.then((response) => response.json())
 			.then((response) => {
