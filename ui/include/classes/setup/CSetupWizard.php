@@ -594,9 +594,7 @@ class CSetupWizard extends CForm {
 	}
 
 	private function stageSettings(): array {
-		$timezones[ZBX_DEFAULT_TIMEZONE] = CTimezoneHelper::getTitle(CTimezoneHelper::getSystemTimezone(),
-			_('System default')
-		);
+		$timezones[ZBX_DEFAULT_TIMEZONE] = CTimezoneHelper::getTitle(CTimezoneHelper::getSystemTimezone(), _('System'));
 		$timezones += CTimezoneHelper::getList();
 
 		$table = (new CFormList())
