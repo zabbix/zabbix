@@ -121,7 +121,7 @@ if (hasRequest('g_actionid')) {
 if ($check_actionids) {
 	$actions = API::Action()->get([
 		'output' => [],
-		'actionids' => $check_actionids,
+		'actionids' => array_keys($check_actionids),
 		'filter' => [
 			'eventsource' => $eventsource
 		],
