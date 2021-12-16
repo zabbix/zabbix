@@ -24,31 +24,35 @@
  * @var array $data
  */
 
-$submenu_source = [
-	EVENT_SOURCE_TRIGGERS => _('Trigger actions'),
-	EVENT_SOURCE_DISCOVERY => _('Discovery actions'),
-	EVENT_SOURCE_AUTOREGISTRATION => _('Autoregistration actions'),
-	EVENT_SOURCE_INTERNAL => _('Internal actions')
-];
+if ($data['eventsource'] == EVENT_SOURCE_SERVICE) {
+	$title = _('Service actions');
+	$submenu = null;
+}
+else {
+	$submenu_source = [
+		EVENT_SOURCE_TRIGGERS => _('Trigger actions'),
+		EVENT_SOURCE_DISCOVERY => _('Discovery actions'),
+		EVENT_SOURCE_AUTOREGISTRATION => _('Autoregistration actions'),
+		EVENT_SOURCE_INTERNAL => _('Internal actions')
+	];
 
-$submenu = [];
-foreach ($submenu_source as $value => $label) {
-	$url = (new CUrl('actionconf.php'))
-		->setArgument('eventsource', $value)
-		->getUrl();
+	$title = array_key_exists($data['eventsource'], $submenu_source) ? $submenu_source[$data['eventsource']] : null;
+	$submenu = [];
 
-	$submenu[$url] = $label;
+	foreach ($submenu_source as $value => $label) {
+		$url = (new CUrl('actionconf.php'))
+			->setArgument('eventsource', $value)
+			->getUrl();
+
+		$submenu[$url] = $label;
+	}
 }
 
 $current_url = (new CUrl('actionconf.php'))->setArgument('eventsource', $data['eventsource']);
 
 $widget = (new CWidget())
-	->setTitle(array_key_exists($data['eventsource'], $submenu_source) ? $submenu_source[$data['eventsource']] : null)
-	->setTitleSubmenu([
-		'main_section' => [
-			'items' => $submenu
-		]
-	])
+	->setTitle($title)
+	->setTitleSubmenu($submenu ? ['main_section' => ['items' => $submenu]] : null)
 	->setControls((new CTag('nav', true,
 		(new CForm('get'))
 			->cleanItems()
