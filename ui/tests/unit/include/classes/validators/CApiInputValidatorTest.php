@@ -4968,45 +4968,21 @@ class CApiInputValidatorTest extends TestCase {
 			],
 			[
 				['type' => API_TIMESTAMP],
-				'-12345',
-				'/',
-				'Invalid parameter "/": value must be one of 1970-01-01 00:00:00-2038-01-19 03:14:07.'
-			],
-			[
-				['type' => API_TIMESTAMP],
-				ZBX_MAX_DATE + 1,
-				'/',
-				'Invalid parameter "/": value must be one of 1970-01-01 00:00:00-2038-01-19 03:14:07.'
-			],
-			[
-				['type' => API_TIMESTAMP],
-				'9223372036854775808',
-				'/',
-				'Invalid parameter "/": value must be one of 1970-01-01 00:00:00-2038-01-19 03:14:07.'
-			],
-			[
-				['type' => API_TIMESTAMP],
-				'foo',
-				'/',
-				'Invalid parameter "/": an integer is expected.'
-			],
-			[
-				['type' => API_TIMESTAMP],
 				[],
 				'/',
-				'Invalid parameter "/": an integer is expected.'
+				'Invalid parameter "/": an unsigned integer is expected.'
 			],
 			[
 				['type' => API_TIMESTAMP],
 				true,
 				'/',
-				'Invalid parameter "/": an integer is expected.'
+				'Invalid parameter "/": an unsigned integer is expected.'
 			],
 			[
 				['type' => API_TIMESTAMP],
 				null,
 				'/',
-				'Invalid parameter "/": an integer is expected.'
+				'Invalid parameter "/": an unsigned integer is expected.'
 			],
 			[
 				['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL],
@@ -5016,15 +4992,39 @@ class CApiInputValidatorTest extends TestCase {
 			],
 			[
 				['type' => API_TIMESTAMP],
+				'foo',
+				'/',
+				'Invalid parameter "/": an unsigned integer is expected.'
+			],
+			[
+				['type' => API_TIMESTAMP],
 				0.0,
 				'/',
-				'Invalid parameter "/": an integer is expected.'
+				'Invalid parameter "/": an unsigned integer is expected.'
 			],
 			[
 				['type' => API_TIMESTAMP],
 				1.23E+11,
 				'/',
-				'Invalid parameter "/": an integer is expected.'
+				'Invalid parameter "/": an unsigned integer is expected.'
+			],
+			[
+				['type' => API_TIMESTAMP],
+				'-12345',
+				'/',
+				'Invalid parameter "/": an unsigned integer is expected.'
+			],
+			[
+				['type' => API_TIMESTAMP],
+				ZBX_MAX_DATE + 1,
+				'/',
+				'Invalid parameter "/": a timestamp is too large.'
+			],
+			[
+				['type' => API_TIMESTAMP],
+				'9223372036854775808',
+				'/',
+				'Invalid parameter "/": a timestamp is too large.'
 			],
 			[
 				['type' => API_TIMESTAMP, 'in' => '0,1,2'],
@@ -5079,6 +5079,12 @@ class CApiInputValidatorTest extends TestCase {
 				91,
 				'/',
 				'Invalid parameter "/": value must be one of 1970-01-01 00:00:00, 1970-01-01 00:00:30-1970-01-01 00:01:30.'
+			],
+			[
+				['type' => API_TIMESTAMP, 'format' => 'H:i', 'in' => '0,300:3600'],
+				1,
+				'/',
+				'Invalid parameter "/": value must be one of 00:00, 00:05-01:00.'
 			],
 			[
 				['type' => API_OBJECT, 'fields' => [

@@ -1919,7 +1919,7 @@ class CApiInputValidator {
 
 		$seconds = timeUnitToSeconds($data, ($flags & API_TIME_UNIT_WITH_YEAR));
 
-		if ($seconds < ZBX_MIN_INT32 || $seconds > ZBX_MAX_INT32) {
+		if (bccomp($seconds, ZBX_MIN_INT32) == -1 || bccomp($seconds, ZBX_MAX_INT32) == 1) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
 			return false;
 		}
@@ -2848,16 +2848,14 @@ class CApiInputValidator {
 			return true;
 		}
 
-		if ((!is_int($data) && !is_string($data)) || !preg_match('/^'.ZBX_PREG_INT.'$/', strval($data))) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an integer is expected'));
+		if (!is_scalar($data) || is_bool($data) || is_double($data) || !ctype_digit(strval($data))) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an unsigned integer is expected'));
 
 			return false;
 		}
 
-		if (bccomp($data, 0) == -1 || bccomp($data, ZBX_MAX_DATE) == 1) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _s('value must be one of %1$s',
-				date(ZBX_FULL_DATE_TIME, 0).'-'.date(ZBX_FULL_DATE_TIME, ZBX_MAX_DATE)
-			));
+		if (bccomp($data, ZBX_MAX_DATE) > 0) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a timestamp is too large'));
 
 			return false;
 		}
@@ -2894,6 +2892,7 @@ class CApiInputValidator {
 		$valid = self::isInRange($data, $rule['in']);
 
 		if (!$valid) {
+			$format = array_key_exists('format', $rule) ? $rule['format'] : ZBX_FULL_DATE_TIME;
 			$in = explode(',', $rule['in']);
 			$formatted_in = '';
 
@@ -2901,10 +2900,10 @@ class CApiInputValidator {
 				if (strpos($el, ':')) {
 					[$from, $to] = explode(':', $el);
 
-					$formatted_in .= date(ZBX_FULL_DATE_TIME, $from).'-'.date(ZBX_FULL_DATE_TIME, $to);
+					$formatted_in .= date($format, $from).'-'.date($format, $to);
 				}
 				else {
-					$formatted_in .= date(ZBX_FULL_DATE_TIME, $el);
+					$formatted_in .= date($format, $el);
 				}
 
 				if (array_key_exists($i + 1, $in)) {
