@@ -108,15 +108,31 @@ $new_update_operation = getRequest('new_update_operation', []);
 $update_operations = getRequest('update_operations', []);
 $eventsource = getRequest('eventsource', EVENT_SOURCE_TRIGGERS);
 
+$check_actionids = [];
+
 if (hasRequest('actionid')) {
-	$actionPermissions = API::Action()->get([
-		'output' => ['actionid'],
-		'actionids' => $_REQUEST['actionid'],
+	$check_actionids[getRequest('actionid')] = true;
+}
+
+if (hasRequest('g_actionid')) {
+	$check_actionids += array_fill_keys((array) getRequest('g_actionid'), true);
+}
+
+if ($check_actionids) {
+	$actions = API::Action()->get([
+		'output' => [],
+		'actionids' => $check_actionids,
+		'filter' => [
+			'eventsource' => $eventsource
+		],
 		'editable' => true
 	]);
-	if (empty($actionPermissions)) {
+
+	if (count($actions) != count($check_actionids)) {
 		access_deny();
 	}
+
+	unset($check_actionids, $actions);
 }
 
 /*
@@ -512,6 +528,7 @@ if (hasRequest('form')) {
 	$data = [
 		'form' => getRequest('form'),
 		'actionid' => getRequest('actionid', '0'),
+		'eventsource' => $eventsource,
 		'new_condition' => getRequest('new_condition', []),
 		'new_operation' => getRequest('new_operation'),
 		'new_recovery_operation' => getRequest('new_recovery_operation'),
@@ -538,10 +555,8 @@ if (hasRequest('form')) {
 			'editable' => true
 		]);
 		$data['action'] = reset($data['action']);
-		$data['eventsource'] = $data['action']['eventsource'];
 	}
 	else {
-		$data['eventsource'] = $eventsource;
 		$data['esc_period'] = getRequest('esc_period');
 	}
 
