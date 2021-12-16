@@ -361,6 +361,14 @@ define('TIMEPERIOD_TYPE_WEEKLY',	3);
 define('TIMEPERIOD_TYPE_MONTHLY',	4);
 define('TIMEPERIOD_TYPE_YEARLY',	5);
 
+define('MONTH_WEEK_FIRST',	1);
+define('MONTH_WEEK_SECOND',	2);
+define('MONTH_WEEK_THIRD',	3);
+define('MONTH_WEEK_FOURTH',	4);
+define('MONTH_WEEK_LAST',	5);
+
+define('MONTH_MAX_DAY',	31);
+
 // report periods
 define('REPORT_PERIOD_TODAY',			0);
 define('REPORT_PERIOD_YESTERDAY',		1);

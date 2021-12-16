@@ -320,32 +320,33 @@ class CMaintenance extends CApiService {
 			'hosts' =>				['type' => API_OBJECTS, 'uniq' => [['hostid']], 'fields' => [
 				'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
-			'timeperiods' => 		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
-				'timeperiod_type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])],
-				'period' =>				['type' => API_TIMESTAMP, 'flags' => API_REQUIRED],
-				'every' =>				['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'default' => DB::getDefault('timeperiods', 'every'), 'in' => '0:'.ZBX_MAX_INT32],
-											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_MONTHLY], 'type' => API_INT32, 'in' => '1:5'],
-											['else' => true, 'type' => API_UNEXPECTED]
-				]],
-				'month' =>				['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_MONTHLY], 'type' => API_INT32, 'in' => '0:4095', 'default' => DB::getDefault('timeperiods', 'month')],
-											['else' => true, 'type' => API_UNEXPECTED]
-				]],
-				'dayofweek' =>			['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => '0:127', 'default' => DB::getDefault('timeperiods', 'dayofweek')],
-											['else' => true, 'type' => API_UNEXPECTED]
-				]],
-				'day' =>				['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_MONTHLY], 'type' => API_INT32, 'in' => '0:31', 'default' => DB::getDefault('timeperiods', 'day')],
+			'timeperiods' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
+				'period' =>				['type' => API_TIME_UNIT, 'in' => implode(':', [5 * SEC_PER_MIN, ZBX_MAX_INT32]), 'default' => SEC_PER_HOUR],
+				'timeperiod_type' =>	['type' => API_INT32, 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY]), 'default' => DB::getDefault('timeperiods', 'timeperiod_type')],
+				'start_date' =>			['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME])], 'type' => API_TIMESTAMP, 'default' => time()],
 											['else' => true, 'type' => API_UNEXPECTED]
 				]],
 				'start_time' =>			['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => '0:86340', 'default' => DB::getDefault('timeperiods', 'start_time')],
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_TIMESTAMP, 'format' => 'H:i', 'in' => implode(':', [0, SEC_PER_DAY - SEC_PER_MIN]), 'default' => DB::getDefault('timeperiods', 'start_time')],
 											['else' => true, 'type' => API_UNEXPECTED]
 				]],
-				'start_date' =>			['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_ONETIME], 'type' => API_TIMESTAMP, 'default' => DB::getDefault('timeperiods', 'start_date')],
+				'every' =>				['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY])], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(':', [1, ZBX_MAX_INT32])],
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => implode(',', [MONTH_WEEK_FIRST, MONTH_WEEK_SECOND, MONTH_WEEK_THIRD, MONTH_WEEK_FOURTH, MONTH_WEEK_LAST]), 'default' => DB::getDefault('timeperiods', 'every')],
+											['else' => true, 'type' => API_UNEXPECTED]
+				]],
+				'day' =>				['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => implode(':', [1, MONTH_MAX_DAY])],
+											['else' => true, 'type' => API_UNEXPECTED]
+				]],
+				'dayofweek' =>			['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_WEEKLY])], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(':', [0b0000001, 0b1111111])],
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => implode(':', [0b0000001, 0b1111111])],
+											['else' => true, 'type' => API_UNEXPECTED]
+				]],
+				'month' =>				['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(':', [0b000000000001, 0b111111111111])],
 											['else' => true, 'type' => API_UNEXPECTED]
 				]]
 			]]
@@ -384,15 +385,10 @@ class CMaintenance extends CApiService {
 					&& (!array_key_exists('hosts', $maintenance) || !$maintenance['hosts'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one host group or host must be selected.'));
 			}
-
-			foreach ($maintenance['timeperiods'] as &$timeperiod) {
-				if ($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME) {
-					$timeperiod['start_date'] -= $timeperiod['start_date'] % SEC_PER_MIN;
-				}
-			}
-			unset($timeperiod);
 		}
 		unset($maintenance);
+
+		$maintenances = self::validateTimePeriods($maintenances);
 
 		self::checkDuplicates($maintenances);
 		self::checkGroups($maintenances);
@@ -524,33 +520,33 @@ class CMaintenance extends CApiService {
 			'hosts' =>				['type' => API_OBJECTS, 'uniq' => [['hostid']], 'fields' => [
 				'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
-			'timeperiods' => 		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['timeperiodid']], 'fields' => [
-				'timeperiodid' =>		['type' => API_ID],
-				'timeperiod_type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])],
-				'period' =>				['type' => API_TIMESTAMP, 'flags' => API_REQUIRED],
-				'every' =>				['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => '0:'.ZBX_MAX_INT32, 'default' => DB::getDefault('timeperiods', 'every')],
-											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_MONTHLY], 'type' => API_INT32, 'in' => '1:5'],
-											['else' => true, 'type' => API_UNEXPECTED]
-				]],
-				'month' =>				['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_MONTHLY], 'type' => API_INT32, 'in' => '0:4095', 'default' => DB::getDefault('timeperiods', 'month')],
-											['else' => true, 'type' => API_UNEXPECTED]
-				]],
-				'dayofweek' =>			['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => '0:127', 'default' => DB::getDefault('timeperiods', 'dayofweek')],
-											['else' => true, 'type' => API_UNEXPECTED]
-				]],
-				'day' =>				['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_MONTHLY], 'type' => API_INT32, 'in' => '0:31', 'default' => DB::getDefault('timeperiods', 'day')],
+			'timeperiods' =>		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'fields' => [
+				'period' =>				['type' => API_TIME_UNIT, 'in' => implode(':', [5 * SEC_PER_MIN, ZBX_MAX_INT32]), 'default' => SEC_PER_HOUR],
+				'timeperiod_type' =>	['type' => API_INT32, 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY]), 'default' => DB::getDefault('timeperiods', 'timeperiod_type')],
+				'start_date' =>			['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME])], 'type' => API_TIMESTAMP, 'default' => time()],
 											['else' => true, 'type' => API_UNEXPECTED]
 				]],
 				'start_time' =>			['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => '0:86340', 'default' => DB::getDefault('timeperiods', 'start_time')],
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_TIMESTAMP, 'format' => 'H:i', 'in' => implode(':', [0, SEC_PER_DAY - SEC_PER_MIN]), 'default' => DB::getDefault('timeperiods', 'start_time')],
 											['else' => true, 'type' => API_UNEXPECTED]
 				]],
-				'start_date' =>			['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'timeperiod_type', 'in' => TIMEPERIOD_TYPE_ONETIME], 'type' => API_TIMESTAMP, 'default' => DB::getDefault('timeperiods', 'start_date')],
+				'every' =>				['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY])], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(':', [1, ZBX_MAX_INT32])],
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => implode(',', [MONTH_WEEK_FIRST, MONTH_WEEK_SECOND, MONTH_WEEK_THIRD, MONTH_WEEK_FOURTH, MONTH_WEEK_LAST]), 'default' => DB::getDefault('timeperiods', 'every')],
+											['else' => true, 'type' => API_UNEXPECTED]
+				]],
+				'day' =>				['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => implode(':', [1, MONTH_MAX_DAY])],
+											['else' => true, 'type' => API_UNEXPECTED]
+				]],
+				'dayofweek' =>			['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_WEEKLY])], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(':', [0b0000001, 0b1111111])],
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => implode(':', [0b0000001, 0b1111111])],
+											['else' => true, 'type' => API_UNEXPECTED]
+				]],
+				'month' =>				['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(':', [0b000000000001, 0b111111111111])],
 											['else' => true, 'type' => API_UNEXPECTED]
 				]]
 			]]
@@ -559,6 +555,8 @@ class CMaintenance extends CApiService {
 		if (!CApiInputValidator::validate($api_input_rules, $maintenances, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
+
+		$maintenances = self::validateTimePeriods($maintenances);
 
 		self::addAffectedObjects($maintenances, $db_maintenances);
 
@@ -583,15 +581,6 @@ class CMaintenance extends CApiService {
 				if (!$groups && !$hosts) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one host group or host must be selected.'));
 				}
-			}
-
-			if (array_key_exists('timeperiods', $maintenance)) {
-				foreach ($maintenance['timeperiods'] as &$timeperiod) {
-					if ($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME) {
-						$timeperiod['start_date'] -= $timeperiod['start_date'] % SEC_PER_MIN;
-					}
-				}
-				unset($timeperiod);
 			}
 		}
 		unset($maintenance);
@@ -741,6 +730,55 @@ class CMaintenance extends CApiService {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Validate time periods of given maintenances.
+	 *
+	 * @param array $maintenances
+	 *
+	 * @return array Array of validated maintenances.
+	 *
+	 * @throws APIException if time periods are not valid.
+	 */
+	private static function validateTimePeriods(array $maintenances): array {
+		foreach ($maintenances as $i1 => &$maintenance) {
+			if (!array_key_exists('timeperiods', $maintenance)) {
+				continue;
+			}
+
+			$path = '/'.($i1 + 1).'/timeperiods';
+
+			foreach ($maintenance['timeperiods'] as $i2 => &$timeperiod) {
+				$timeperiod['period'] = timeUnitToSeconds($timeperiod['period'], API_TIME_UNIT_WITH_YEAR);
+				$timeperiod['period'] -= $timeperiod['period'] % SEC_PER_MIN;
+
+				if ($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME) {
+					$timeperiod['start_date'] -= $timeperiod['start_date'] % SEC_PER_MIN;
+				}
+				else {
+					$timeperiod['start_time'] -= $timeperiod['start_time'] % SEC_PER_MIN;
+				}
+
+				if ($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_MONTHLY) {
+					if (!array_key_exists('day', $maintenance) && !array_key_exists('dayofweek', $maintenance)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_('At least one day of week or day must be specified.')
+						);
+					}
+					elseif (array_key_exists('day', $maintenance) && array_key_exists('dayofweek', $maintenance)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+							$path.'/'.($i2 + 1).'/day',
+							_s('cannot be specified together with parameter "%1$s"', $path.'/'.($i2 + 1).'/dayofweek')
+						));
+					}
+				}
+			}
+			unset($timeperiod);
+		}
+		unset($maintenance);
+
+		return $maintenances;
 	}
 
 	/**
@@ -1018,7 +1056,7 @@ class CMaintenance extends CApiService {
 
 			$db_tags = ($db_maintenances !== null) ? $db_maintenances[$maintenance['maintenanceid']]['tags'] : [];
 
-			foreach ($maintenance['tags'] as $tag) {
+			foreach ($maintenance['tags'] as &$tag) {
 				$db_maintenancetagid = key(
 					array_filter($db_tags, static function (array $db_tag) use ($tag): bool {
 						return $tag['tag'] == $db_tag['tag'] && $tag['operator'] == $db_tag['operator']
@@ -1027,12 +1065,14 @@ class CMaintenance extends CApiService {
 				);
 
 				if ($db_maintenancetagid !== null) {
+					$tag['maintenancetagid'] = $db_maintenancetagid;
 					unset($db_tags[$db_maintenancetagid]);
 				}
 				else {
 					$ins_maintenance_tags[] = ['maintenanceid' => $maintenance['maintenanceid']] + $tag;
 				}
 			}
+			unset($tag);
 
 			$del_maintenancetagids = array_merge($del_maintenancetagids, array_keys($db_tags));
 		}
@@ -1068,10 +1108,8 @@ class CMaintenance extends CApiService {
 	 * @param array|null $db_maintenances
 	 */
 	private static function updateTimeperiods(array &$maintenances, array $db_maintenances = null): void {
-		$timeperiods = [];
-		$ins_windows = [];
 		$ins_timeperiods = [];
-		$upd_timeperiods = [];
+		$ins_maintenance_windows = [];
 		$del_timeperiodids = [];
 
 		foreach ($maintenances as &$maintenance) {
@@ -1079,62 +1117,56 @@ class CMaintenance extends CApiService {
 				continue;
 			}
 
-			$maintenanceid = $maintenance['maintenanceid'];
-
 			$db_timeperiods = ($db_maintenances !== null)
-				? $db_maintenances[$maintenanceid]['timeperiods']
+				? $db_maintenances[$maintenance['maintenanceid']]['timeperiods']
 				: [];
 
 			foreach ($maintenance['timeperiods'] as &$timeperiod) {
-				if (array_key_exists('timeperiodid', $timeperiod)
-						&& array_key_exists($timeperiod['timeperiodid'], $db_timeperiods)) {
-					$db_timeperiod = $db_timeperiods[$timeperiod['timeperiodid']];
-					$upd_timeperiod = DB::getUpdatedValues('timeperiods', $timeperiod, $db_timeperiod);
+				$db_timeperiodid = key(
+					array_filter($db_timeperiods, static function (array $db_timeperiod) use ($timeperiod): bool {
+						return $timeperiod['period'] == $db_timeperiod['period']
+							&& $timeperiod['timeperiod_type'] == $db_timeperiod['timeperiod_type']
+							&& (!array_key_exists('start_date', $timeperiod)
+									|| $timeperiod['start_date'] == $db_timeperiod['start_date'])
+							&& (!array_key_exists('start_time', $timeperiod)
+									|| $timeperiod['start_time'] == $db_timeperiod['start_time'])
+							&& (!array_key_exists('every', $timeperiod)
+									|| $timeperiod['every'] == $db_timeperiod['every'])
+							&& (!array_key_exists('day', $timeperiod) || $timeperiod['day'] == $db_timeperiod['day'])
+							&& (!array_key_exists('dayofweek', $timeperiod)
+									|| $timeperiod['dayofweek'] == $db_timeperiod['dayofweek'])
+							&& (!array_key_exists('month', $timeperiod)
+									|| $timeperiod['month'] == $db_timeperiod['month']);
+					})
+				);
 
-					if ($upd_timeperiod) {
-						$upd_timeperiods[] = [
-							'values' => $upd_timeperiod,
-							'where' => ['timeperiodid' => $timeperiod['timeperiodid']]
-						];
-					}
-
-					unset($db_timeperiods[$timeperiod['timeperiodid']]);
+				if ($db_timeperiodid !== null) {
+					$timeperiod['timeperiodid'] = $db_timeperiodid;
+					unset($db_timeperiods[$db_timeperiodid]);
 				}
 				else {
-					unset($timeperiod['timeperiodid']);
-
 					$ins_timeperiods[] = $timeperiod;
-					$timeperiods[] = $maintenanceid;
+					$ins_maintenance_windows[] = ['maintenanceid' => $maintenance['maintenanceid']];
 				}
 			}
 			unset($timeperiod);
 
-			$del_timeperiodids = array_merge($del_timeperiodids, array_column($db_timeperiods, 'timeperiodid'));
+			$del_timeperiodids = array_merge($del_timeperiodids, array_keys($db_timeperiods));
 		}
 		unset($maintenance);
 
-		$timeperiodids = [];
 		if ($ins_timeperiods) {
 			$timeperiodids = DB::insert('timeperiods', $ins_timeperiods);
-		}
 
-		foreach ($timeperiods as $timeperiod_index => $maintenanceid) {
-			$ins_windows[] = [
-				'timeperiodid' => $timeperiodids[$timeperiod_index],
-				'maintenanceid' => $maintenanceid
-			];
-		}
+			foreach ($ins_maintenance_windows as $i => &$maintenance_window) {
+				$maintenance_window += ['timeperiodid' => $timeperiodids[$i]];
+			}
+			unset($maintenance_window);
 
-		if ($ins_windows) {
-			DB::insertBatch('maintenances_windows', $ins_windows);
-		}
-
-		if ($upd_timeperiods) {
-			DB::update('timeperiods', $upd_timeperiods);
+			DB::insertBatch('maintenances_windows', $ins_maintenance_windows);
 		}
 
 		if ($del_timeperiodids) {
-			DB::delete('maintenances_windows', ['timeperiodid' => $del_timeperiodids]);
 			DB::delete('timeperiods', ['timeperiodid' => $del_timeperiodids]);
 		}
 
@@ -1161,17 +1193,9 @@ class CMaintenance extends CApiService {
 	 * @param array $db_maintenances
 	 */
 	private static function addAffectedObjects(array $maintenances, array &$db_maintenances): void {
-		$maintenanceids = ['groups' => [] , 'hosts' => [], 'timeperiods' => [], 'tags' => []];
+		$maintenanceids = ['tags' => [], 'groups' => [] , 'hosts' => [], 'timeperiods' => []];
 
 		foreach ($maintenances as $maintenance) {
-			if (array_key_exists('groups', $maintenance) || array_key_exists('hosts', $maintenance)) {
-				$maintenanceids['groups'][] = $maintenance['maintenanceid'];
-				$db_maintenances[$maintenance['maintenanceid']]['groups'] = [];
-
-				$maintenanceids['hosts'][] = $maintenance['maintenanceid'];
-				$db_maintenances[$maintenance['maintenanceid']]['hosts'] = [];
-			}
-
 			$db_maintenance_type = $db_maintenances[$maintenance['maintenanceid']]['maintenance_type'];
 
 			if (array_key_exists('tags', $maintenance)
@@ -1181,9 +1205,34 @@ class CMaintenance extends CApiService {
 				$db_maintenances[$maintenance['maintenanceid']]['tags'] = [];
 			}
 
+			if (array_key_exists('groups', $maintenance) || array_key_exists('hosts', $maintenance)) {
+				$maintenanceids['groups'][] = $maintenance['maintenanceid'];
+				$db_maintenances[$maintenance['maintenanceid']]['groups'] = [];
+
+				$maintenanceids['hosts'][] = $maintenance['maintenanceid'];
+				$db_maintenances[$maintenance['maintenanceid']]['hosts'] = [];
+			}
+
 			if (array_key_exists('timeperiods', $maintenance)) {
 				$maintenanceids['timeperiods'][] = $maintenance['maintenanceid'];
 				$db_maintenances[$maintenance['maintenanceid']]['timeperiods'] = [];
+			}
+		}
+
+		if ($maintenanceids['tags']) {
+			$options = [
+				'output' => ['maintenancetagid', 'maintenanceid', 'tag', 'operator', 'value'],
+				'filter' => ['maintenanceid' => $maintenanceids['tags']]
+			];
+			$db_tags = DBselect(DB::makeSql('maintenance_tag', $options));
+
+			while ($db_tag = DBfetch($db_tags)) {
+				$db_maintenances[$db_tag['maintenanceid']]['tags'][$db_tag['maintenancetagid']] = [
+					'maintenancetagid' => $db_tag['maintenancetagid'],
+					'tag' => $db_tag['tag'],
+					'operator' => $db_tag['operator'],
+					'value' => $db_tag['value']
+				];
 			}
 		}
 
@@ -1217,38 +1266,18 @@ class CMaintenance extends CApiService {
 			}
 		}
 
-		if ($maintenanceids['tags']) {
-			$options = [
-				'output' => ['maintenancetagid', 'maintenanceid', 'tag', 'operator', 'value'],
-				'filter' => ['maintenanceid' => $maintenanceids['tags']]
-			];
-			$db_tags = DBselect(DB::makeSql('maintenance_tag', $options));
-
-			while ($db_tag = DBfetch($db_tags)) {
-				$db_maintenances[$db_tag['maintenanceid']]['tags'][$db_tag['maintenancetagid']] = [
-					'maintenancetagid' => $db_tag['maintenancetagid'],
-					'tag' => $db_tag['tag'],
-					'operator' => $db_tag['operator'],
-					'value' => $db_tag['value']
-				];
-			}
-		}
-
 		if ($maintenanceids['timeperiods']) {
-			$db_timeperiods = DBselect('SELECT w.maintenanceid,t.timeperiodid,t.timeperiod_type,t.every,t.month,t.dayofweek,t.day,t.start_time,t.period,t.start_date FROM maintenances_windows w LEFT JOIN timeperiods t ON t.timeperiodid = w.timeperiodid WHERE '.dbConditionId('w.maintenanceid', $maintenanceids['timeperiods']));
+			$db_timeperiods = DBselect(
+				'SELECT mw.maintenanceid,mw.timeperiodid,t.timeperiod_type,t.every,t.month,t.dayofweek,t.day,'.
+					't.start_time,t.period,t.start_date'.
+				' FROM maintenances_windows mw,timeperiods t'.
+				' WHERE mw.timeperiodid=t.timeperiodid'.
+					' AND '.dbConditionInt('mw.maintenanceid', $maintenanceids['timeperiods'])
+			);
 
 			while ($db_timeperiod = DBfetch($db_timeperiods)) {
-				$db_maintenances[$db_timeperiod['maintenanceid']]['timeperiods'][$db_timeperiod['timeperiodid']] = [
-					'timeperiodid' => $db_timeperiod['timeperiodid'],
-					'timeperiod_type' => $db_timeperiod['timeperiod_type'],
-					'every' => $db_timeperiod['every'],
-					'month' => $db_timeperiod['month'],
-					'dayofweek' => $db_timeperiod['dayofweek'],
-					'day' => $db_timeperiod['day'],
-					'start_time' => $db_timeperiod['start_time'],
-					'period' => $db_timeperiod['period'],
-					'start_date' => $db_timeperiod['start_date']
-				];
+				$db_maintenances[$db_timeperiod['maintenanceid']]['timeperiods'][$db_timeperiod['timeperiodid']] =
+					array_diff_key($db_timeperiod, array_flip(['maintenanceid']));
 			}
 		}
 	}
