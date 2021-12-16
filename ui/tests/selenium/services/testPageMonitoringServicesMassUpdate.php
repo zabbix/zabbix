@@ -32,6 +32,8 @@ class testPageMonitoringServicesMassUpdate extends CWebTest {
 
 	use TableTrait;
 
+	private static $service_sql = 'SELECT * FROM services ORDER BY serviceid';
+
 	/**
 	 * Attach MessageBehavior to the test.
 	 *
@@ -75,13 +77,13 @@ class testPageMonitoringServicesMassUpdate extends CWebTest {
 				'name' => '1_Service_No_Tags_Preprocessing',
 				'algorithm' => 1,
 				'showsla' => 0,
-				'sortorder' => 3,
+				'sortorder' => 3
 			],
 			[
 				'name' => '2_Service_No_Tags_Preprocessing',
 				'algorithm' => 1,
 				'showsla' => 0,
-				'sortorder' => 4,
+				'sortorder' => 4
 			],
 			[
 				'name' => '1_Service_Tags_replace',
@@ -555,7 +557,7 @@ class testPageMonitoringServicesMassUpdate extends CWebTest {
 	 */
 	public function testPageMonitoringServicesMassUpdate_Tags($data) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$old_hash = CDBHelper::getHash('SELECT * FROM services ORDER BY serviceid');
+			$old_hash = CDBHelper::getHash(self::$service_sql);
 		}
 
 		$this->page->login()->open('zabbix.php?action=service.list.edit');
@@ -571,9 +573,10 @@ class testPageMonitoringServicesMassUpdate extends CWebTest {
 		}
 
 		$dialog->submit();
+
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, 'Cannot update services', $data['details']);
-			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM services ORDER BY serviceid'));
+			$this->assertEquals($old_hash, CDBHelper::getHash(self::$service_sql));
 		}
 		else {
 			COverlayDialogElement::ensureNotPresent();
@@ -585,8 +588,8 @@ class testPageMonitoringServicesMassUpdate extends CWebTest {
 				$table->findRow('Name', $name)->query('xpath:.//button[@title="Edit"]')->waitUntilClickable()
 						->one()->click();
 
-				$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-				$dialog->asForm()->selectTab('Tags');
+				$service_dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+				$service_dialog->asForm()->selectTab('Tags');
 
 				$expected = $data['Tags']['tags'];
 				if (!array_key_exists('expected_tags', $data)) {
@@ -598,7 +601,7 @@ class testPageMonitoringServicesMassUpdate extends CWebTest {
 							continue;
 						}
 
-						// Remove trailing spaces from tag and value for asserting expected result.
+						// Removing trailing and leading spaces from tag and value for asserting expected result.
 						foreach ($expected as $i => &$options) {
 							foreach (['tag', 'value'] as $parameter) {
 								if (array_key_exists($parameter, $options)) {
@@ -614,8 +617,7 @@ class testPageMonitoringServicesMassUpdate extends CWebTest {
 				$expected_tags = array_key_exists('expected_tags', $data) ? $data['expected_tags'][$name] : $expected;
 				$this->query('id:tags-table')->asMultifieldTable()->one()->checkValue($expected_tags);
 
-				$dialog->query('button:Cancel')->one()->waitUntilClickable()->click();
-				COverlayDialogElement::ensureNotPresent();
+				$service_dialog->close();
 			}
 		}
 	}
@@ -624,7 +626,7 @@ class testPageMonitoringServicesMassUpdate extends CWebTest {
 	 * Cancel Mass updating of Services.
 	 */
 	public function testPageMonitoringServicesMassUpdate_Cancel() {
-		$old_hash = CDBHelper::getHash('SELECT * FROM services ORDER BY serviceid');
+		$old_hash = CDBHelper::getHash(self::$service_sql);
 
 		$this->page->login()->open('zabbix.php?action=service.list.edit');
 
@@ -661,6 +663,6 @@ class testPageMonitoringServicesMassUpdate extends CWebTest {
 		// Check that UI returned to previous page and hash remained unchanged.
 		$this->page->waitUntilReady();
 		$this->page->assertHeader('Services');
-		$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM services ORDER BY serviceid'));
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::$service_sql));
 	}
 }
