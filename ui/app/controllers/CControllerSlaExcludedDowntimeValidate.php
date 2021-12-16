@@ -63,7 +63,7 @@ class CControllerSlaExcludedDowntimeValidate extends CController {
 
 			if ($this->period_from < 0 || $this->period_from > ZBX_MAX_DATE) {
 				error(_s('Incorrect value for field "%1$s": %2$s.', 'start_time',
-					_s('a time later than %1$s is expected', zbx_date2str(DATE_TIME_FORMAT, ZBX_MAX_DATE))
+					_s('a time not later than %1$s is expected', zbx_date2str(DATE_TIME_FORMAT, ZBX_MAX_DATE))
 				));
 
 				$ret = false;
@@ -84,7 +84,7 @@ class CControllerSlaExcludedDowntimeValidate extends CController {
 
 					if ($this->period_to <= $this->period_from || $this->period_to > ZBX_MAX_DATE) {
 						error(_s('Incorrect value for field "%1$s": %2$s.', 'duration',
-							_s('a time later than %1$s is expected', zbx_date2str(DATE_TIME_FORMAT, ZBX_MAX_DATE))
+							_s('a time not later than %1$s is expected', zbx_date2str(DATE_TIME_FORMAT, ZBX_MAX_DATE))
 						));
 
 						$ret = false;
@@ -92,7 +92,7 @@ class CControllerSlaExcludedDowntimeValidate extends CController {
 				}
 				catch (Exception $e) {
 					error(_s('Incorrect value for field "%1$s": %2$s.', 'duration',
-						_s('a time later than %1$s is expected', zbx_date2str(DATE_TIME_FORMAT, ZBX_MAX_DATE))
+						_s('a time not later than %1$s is expected', zbx_date2str(DATE_TIME_FORMAT, ZBX_MAX_DATE))
 					));
 
 					$ret = false;

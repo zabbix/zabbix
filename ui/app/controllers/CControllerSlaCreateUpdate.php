@@ -41,7 +41,7 @@ abstract class CControllerSlaCreateUpdate extends CController {
 
 		if ($datetime->getTimestamp() < 0 || $datetime->getTimestamp() > ZBX_MAX_DATE) {
 			throw new InvalidArgumentException(_s('Incorrect value for field "%1$s": %2$s.', $field_name,
-				_s('a date later than %1$s is expected', zbx_date2str(DATE_FORMAT, ZBX_MAX_DATE, 'UTC'))
+				_s('a date not later than %1$s is expected', zbx_date2str(DATE_FORMAT, ZBX_MAX_DATE, 'UTC'))
 			));
 		}
 
