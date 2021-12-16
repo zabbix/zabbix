@@ -4,7 +4,7 @@
 ## Overview
 
 For Zabbix version: 6.0 and higher  
-The template is developed for monitoring DBMS Oracle Database single instance via Zabbix Agent2.
+The template is developed for monitoring DBMS Oracle Database single instance via Zabbix agent 2.
 
 This template was tested on:
 
