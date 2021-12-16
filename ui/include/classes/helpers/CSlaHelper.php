@@ -227,7 +227,9 @@ final class CSlaHelper {
 			return new CSpan(_('24x7'));
 		}
 
-		$hint = (new CTableInfo())->setHeader([_('Schedule'), _('Time period')]);
+		$hint = (new CTableInfo())->setHeader(
+			(new CColHeader(_('Custom schedule')))->setColSpan(2)
+		);
 
 		foreach (self::getSchedulePeriods($schedule) as $weekday => $periods) {
 			$hint->addRow([getDayOfWeekCaption($weekday), $periods === '' ? '-' : $periods]);

@@ -34,12 +34,7 @@ $form->addItem((new CInput('submit'))->addStyle('display: none;'));
 
 // SLA tab.
 
-$schedule = (new CTable())
-	->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-	->setHeader([
-		new CColHeader(),
-		(new CColHeader(_('Schedule')))->addClass(ZBX_STYLE_GREY)
-	]);
+$schedule = (new CTable())->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;');
 
 for ($weekday = 0; $weekday < 7; $weekday++) {
 	$schedule->addRow(new CRow([
