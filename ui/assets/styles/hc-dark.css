@@ -1480,7 +1480,7 @@ footer {
   .inline-filter-footer > li.inline-filter-stats {
     color: #cacaca; }
 
-.icon-dashboard::before, .icon-problems::before, .icon-monitoring::before, .icon-inventory::before, .icon-reports::before, .icon-configuration::before, .icon-administration::before {
+.icon-dashboard::before, .icon-problems::before, .icon-monitoring::before, .icon-services::before, .icon-inventory::before, .icon-reports::before, .icon-configuration::before, .icon-administration::before {
   content: '';
   width: 24px;
   height: 24px;
@@ -1494,6 +1494,9 @@ footer {
 
 .icon-monitoring::before {
   background-position: -600px -712px; }
+
+.icon-services::before {
+  background-position: -600px -832px; }
 
 .icon-inventory::before {
   background-position: -600px -736px; }
