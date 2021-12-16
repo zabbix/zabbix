@@ -62,8 +62,26 @@ class testSidebarMenu extends CWebTest {
 			],
 			[
 				[
-					'section' => 'Monitoring',
+					'section' => 'Services',
 					'page' => 'Services'
+				]
+			],
+			[
+				[
+					'section' => 'Services',
+					'page' => 'Service actions'
+				]
+			],
+			[
+				[
+					'section' => 'Services',
+					'page' => 'SLA'
+				]
+			],
+			[
+				[
+					'section' => 'Services',
+					'page' => 'SLA report'
 				]
 			],
 			[

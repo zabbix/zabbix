@@ -220,6 +220,7 @@ class testFormUserRoles extends CWebTest {
 						'Name' => 'user_ui_checked_out',
 						'User type' => 'User',
 						'Monitoring' => [],
+						'Services' => [],
 						'Inventory' => [],
 						'Reports' => []
 					],
@@ -234,6 +235,7 @@ class testFormUserRoles extends CWebTest {
 						'Name' => 'admin_ui_checked_out',
 						'User type' => 'Admin',
 						'Monitoring' => [],
+						'Services' => [],
 						'Inventory' => [],
 						'Reports' => [],
 						'Configuration' => []
@@ -249,6 +251,7 @@ class testFormUserRoles extends CWebTest {
 						'Name' => 'super_admin_ui_checked_out',
 						'User type' => 'Super admin',
 						'Monitoring' => [],
+						'Services' => [],
 						'Inventory' => [],
 						'Reports' => [],
 						'Configuration' => [],
@@ -266,6 +269,7 @@ class testFormUserRoles extends CWebTest {
 						'Name' => 'user_everything_removed',
 						'User type' => 'User',
 						'Monitoring' => [],
+						'Services' => [],
 						'Inventory' => [],
 						'Reports' => [],
 						'Default access to new UI elements' => false,
@@ -292,6 +296,7 @@ class testFormUserRoles extends CWebTest {
 						'Name' => 'admin_everything_removed',
 						'User type' => 'Admin',
 						'Monitoring' => [],
+						'Services' => [],
 						'Inventory' => [],
 						'Reports' => [],
 						'Configuration' => [],
@@ -308,6 +313,7 @@ class testFormUserRoles extends CWebTest {
 						'Execute scripts' => false,
 						'Manage API tokens' => false,
 						'Manage scheduled reports' => false,
+						'Manage SLA' => false,
 						'Default access to new actions' => false
 					],
 					'message_header' => 'Cannot create user role',
@@ -321,6 +327,7 @@ class testFormUserRoles extends CWebTest {
 						'Name' => 'super_admin_everything_removed',
 						'User type' => 'Super admin',
 						'Monitoring' => [],
+						'Services' => [],
 						'Inventory' => [],
 						'Reports' => [],
 						'Configuration' => [],
@@ -338,6 +345,7 @@ class testFormUserRoles extends CWebTest {
 						'Execute scripts' => false,
 						'Manage API tokens' => false,
 						'Manage scheduled reports' => false,
+						'Manage SLA' => false,
 						'Default access to new actions' => false
 					],
 					'message_header' => 'Cannot create user role',
@@ -425,7 +433,7 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'user_ui_one_left',
 						'User type' => 'User',
-						'Monitoring' => ['Services'],
+						'Services' => ['Services'],
 						'Inventory' => [],
 						'Reports' => []
 					],
@@ -438,7 +446,7 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'admin_ui_one_left',
 						'User type' => 'Admin',
-						'Monitoring' => ['Services'],
+						'Services' => ['Services'],
 						'Inventory' => [],
 						'Reports' => [],
 						'Configuration' => []
@@ -452,7 +460,7 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'super_admin_ui_one_left',
 						'User type' => 'Super admin',
-						'Monitoring' => ['Services'],
+						'Services' => ['Services'],
 						'Inventory' => [],
 						'Reports' => [],
 						'Configuration' => [],
@@ -497,6 +505,7 @@ class testFormUserRoles extends CWebTest {
 						'Execute scripts' => false,
 						'Manage API tokens' => false,
 						'Manage scheduled reports' => false,
+						'Manage SLA' => false,
 						'Default access to new actions' => false
 					],
 					'message_header' => 'User role created'
@@ -518,6 +527,7 @@ class testFormUserRoles extends CWebTest {
 						'Execute scripts' => false,
 						'Manage API tokens' => false,
 						'Manage scheduled reports' => false,
+						'Manage SLA' => false,
 						'Default access to new actions' => false
 					],
 					'message_header' => 'User role created'
@@ -698,8 +708,8 @@ class testFormUserRoles extends CWebTest {
 						'iconmap.get', 'image.get', 'item.get', 'itemprototype.get', 'maintenance.get', 'map.create',
 						'map.delete', 'map.get', 'map.update', 'mediatype.get', 'module.get', 'problem.get', 'proxy.get',
 						'role.get', 'script.execute', 'script.get', 'script.getscriptsbyhosts', 'service.create',
-						'service.delete', 'service.get', 'service.getsla', 'service.update', 'settings.get', 'template.get',
-						'templatedashboard.get', 'token.create', 'token.delete', 'token.generate', 'token.get',
+						'service.delete', 'service.get', 'service.update', 'settings.get', 'sla.get', 'sla.getsli',
+						'template.get', 'templatedashboard.get', 'token.create', 'token.delete', 'token.generate', 'token.get',
 						'token.update', 'trend.get', 'trigger.get', 'triggerprototype.get',
 						'user.get', 'user.logout', 'user.update', 'usergroup.get', 'usermacro.get', 'valuemap.get'
 					]
@@ -729,10 +739,11 @@ class testFormUserRoles extends CWebTest {
 						'itemprototype.update', 'maintenance.create', 'maintenance.delete', 'maintenance.get', 'maintenance.update',
 						'map.create', 'map.delete', 'map.get', 'map.update', 'mediatype.get', 'module.get', 'problem.get', 'proxy.get',
 						'report.create', 'report.delete', 'report.get', 'report.update', 'role.get', 'script.execute', 'script.get',
-						'script.getscriptsbyhosts', 'service.create', 'service.delete', 'service.get', 'service.getsla', 'service.update',
-						'settings.get', 'template.create', 'template.delete', 'template.get', 'template.massadd', 'template.massremove',
-						'template.massupdate', 'template.update', 'templatedashboard.create', 'templatedashboard.delete',
-						'templatedashboard.get', 'templatedashboard.update', 'token.create', 'token.delete', 'token.generate', 'token.get',
+						'script.getscriptsbyhosts', 'service.create', 'service.delete', 'service.get', 'service.update',
+						'settings.get', 'sla.create', 'sla.delete', 'sla.get', 'sla.getsli', 'sla.update', 'template.create',
+						'template.delete', 'template.get', 'template.massadd', 'template.massremove', 'template.massupdate',
+						'template.update', 'templatedashboard.create', 'templatedashboard.delete', 'templatedashboard.get',
+						'templatedashboard.update', 'token.create', 'token.delete', 'token.generate', 'token.get',
 						'token.update', 'trend.get', 'trigger.adddependencies', 'trigger.create', 'trigger.delete', 'trigger.deletedependencies',
 						'trigger.get', 'trigger.update', 'triggerprototype.create', 'triggerprototype.delete', 'triggerprototype.get',
 						'triggerprototype.update', 'user.get', 'user.logout', 'user.update', 'usergroup.get', 'usermacro.create',
@@ -775,12 +786,12 @@ class testFormUserRoles extends CWebTest {
 						'regexp.delete', 'regexp.get', 'regexp.update', 'report.create', 'report.delete', 'report.get',
 						'report.update', 'role.create', 'role.delete', 'role.get', 'role.update', 'script.create',
 						'script.delete', 'script.execute', 'script.get', 'script.getscriptsbyhosts', 'script.update',
-						'service.create', 'service.delete', 'service.get', 'service.getsla', 'service.update',
-						'settings.get', 'settings.update', 'task.create', 'task.get', 'template.create', 'template.delete',
-						'template.get', 'template.massadd', 'template.massremove', 'template.massupdate', 'template.update',
-						'templatedashboard.create', 'templatedashboard.delete', 'templatedashboard.get',
-						'templatedashboard.update', 'token.create', 'token.delete', 'token.generate', 'token.get',
-						'token.update', 'trend.get', 'trigger.adddependencies', 'trigger.create', 'trigger.delete',
+						'service.create', 'service.delete', 'service.get', 'service.update', 'settings.get', 'settings.update',
+						'sla.create', 'sla.delete', 'sla.get', 'sla.getsli', 'sla.update', 'task.create', 'task.get',
+						'template.create', 'template.delete', 'template.get', 'template.massadd', 'template.massremove',
+						'template.massupdate', 'template.update', 'templatedashboard.create', 'templatedashboard.delete',
+						'templatedashboard.get', 'templatedashboard.update', 'token.create', 'token.delete', 'token.generate',
+						'token.get', 'token.update', 'trend.get', 'trigger.adddependencies', 'trigger.create', 'trigger.delete',
 						'trigger.deletedependencies', 'trigger.get', 'trigger.update', 'triggerprototype.create',
 						'triggerprototype.delete', 'triggerprototype.get', 'triggerprototype.update', 'user.create',
 						'user.delete', 'user.get', 'user.logout', 'user.unblock', 'user.update', 'usergroup.create',
@@ -873,6 +884,7 @@ class testFormUserRoles extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Monitoring' => [],
+						'Services' => [],
 						'Inventory' => [],
 						'Reports' => []
 					],
