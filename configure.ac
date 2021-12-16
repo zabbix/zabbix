@@ -1874,7 +1874,9 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes
 dnl Check for libpcre or libpcre2, used by Zabbix for regular expressions
 dnl Must check for both pcre and pcre2 to check if both were selected by the user and produce an error in that case
 LIBPCRE_CHECK_CONFIG([no])
+if test "x$enable_static_libs" != "xyes"; then
 LIBPCRE2_CHECK_CONFIG([no])
+fi
 if test "x$want_libpcre2" = "xyes"; then
 	if test "x$want_libpcre" = "xyes"; then
 		AC_MSG_ERROR([Cannot use both pcre and pcre2 at the same time!])
