@@ -37,4 +37,23 @@ class CWidgetFieldDatePicker extends CWidgetField {
 		$this->setValidationRules(['type' => API_RANGE_TIME, 'length' => 255]);
 		$this->setDefault('');
 	}
+
+	/**
+	 * Set additional flags, which can be used in configuration form.
+	 *
+	 * @param int $flags
+	 *
+	 * @return $this
+	 */
+	public function setFlags($flags) {
+		parent::setFlags($flags);
+
+		if ($flags & self::FLAG_NOT_EMPTY) {
+			$validation_rules = $this->getValidationRules();
+			self::setValidationRuleFlag($validation_rules, API_NOT_EMPTY);
+			$this->setValidationRules($validation_rules);
+		}
+
+		return $this;
+	}
 }
