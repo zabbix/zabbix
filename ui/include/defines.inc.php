@@ -1627,7 +1627,7 @@ define('TAB_INDICATOR_AUTH_SAML', 'saml');
 define('TAB_INDICATOR_CHILD_SERVICES', 'child-services');
 define('TAB_INDICATOR_DEPENDENCY', 'dependency');
 define('TAB_INDICATOR_ENCRYPTION', 'encryption');
-define('TAB_INDICATOR_SLA_EXCLUDED_DOWNTIMES', 'sla-excluded-downtimes');
+define('TAB_INDICATOR_EXCLUDED_DOWNTIMES', 'excluded-downtimes');
 define('TAB_INDICATOR_FILTERS', 'filters');
 define('TAB_INDICATOR_FRONTEND_MESSAGE', 'frontend-message');
 define('TAB_INDICATOR_GRAPH_DATASET', 'graph-dataset');

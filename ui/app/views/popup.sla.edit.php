@@ -211,7 +211,7 @@ $tabs = (new CTabView())
 	->setSelected(0)
 	->addTab('sla-tab', _('SLA'), $sla_tab)
 	->addTab('excluded-downtimes-tab', _('Excluded downtimes'), $excluded_downtimes_tab,
-		TAB_INDICATOR_SLA_EXCLUDED_DOWNTIMES
+		TAB_INDICATOR_EXCLUDED_DOWNTIMES
 	);
 
 // Output.
