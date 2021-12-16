@@ -101,7 +101,7 @@ class CMenuHelper {
 		if ($submenu_services) {
 			$menu->add(
 				(new CMenuItem(_('Services')))
-					->setId('view')
+					->setId('services')
 					->setIcon('icon-services')
 					->setSubMenu(new CMenu($submenu_services))
 			);
