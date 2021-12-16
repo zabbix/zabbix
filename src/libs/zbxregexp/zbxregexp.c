@@ -32,10 +32,8 @@
 #define ZBX_REGEXP_CASELESS PCRE_CASELESS
 #endif
 
-#ifndef HAVE_PCRE_H
-#ifndef HAVE_PCRE2_H
+#if !defined(HAVE_PCRE_H) && !defined(HAVE_PCRE2_H)
 #error "must use pcre or pcre2!"
-#endif
 #endif
 
 #ifdef HAVE_PCRE2_H
@@ -158,8 +156,10 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
 			&error_offset, NULL)))
 	{
 		err_msg_buff = (char*)zbx_malloc(NULL, ZBX_REGEXP_ERR_MSG_SIZE);
+
 		if (0 > pcre2_get_error_message(error, err_msg_buff, ZBX_REGEXP_ERR_MSG_SIZE))
 			zbx_snprintf(err_msg_buff, ZBX_REGEXP_ERR_MSG_SIZE, "unknown regexp error");
+
 		*err_msg = (const char*)err_msg_buff;
 		return FAIL;
 	}
@@ -352,7 +352,7 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 
 	if (NULL == match_data)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s() cannot create pcre2 match data of size %d",__func__, count);
+		zabbix_log(LOG_LEVEL_WARNING, "%s() cannot create pcre2 match data of size %d", __func__, count);
 		result = FAIL;
 	}
 	else

@@ -1892,9 +1892,7 @@ if test "x$want_libpcre2" = "xyes"; then
 		LIBS="$LIBS $LIBPCRE2_LIBS"
 	fi
 
-	if test "x$found_libpcre2" = "xyes"; then
-		AC_DEFINE([HAVE_PCRE2_H], 1, [Define to 1 if you have the 'libpcre2' library (-lpcre2-8)])
-	fi
+	AC_DEFINE([HAVE_PCRE2_H], 1, [Define to 1 if you have the 'libpcre2' library (-lpcre2-8)])
 else
 	if test "x$found_libpcre" != "xyes"; then
 		AC_MSG_ERROR([Unable to use libpcre (libpcre check failed)])
@@ -1908,9 +1906,7 @@ else
 		LIBS="$LIBS $LIBPCRE_LIBS"
 	fi
 
-	if test "x$found_libpcre" = "xyes"; then
-		AC_DEFINE([HAVE_PCRE_H], 1, [Define to 1 if you have the 'libpcre' library (-lpcre)])
-	fi
+	AC_DEFINE([HAVE_PCRE_H], 1, [Define to 1 if you have the 'libpcre' library (-lpcre)])
 fi
 fi
 
