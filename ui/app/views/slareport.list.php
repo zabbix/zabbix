@@ -28,7 +28,7 @@ $this->addJsFile('class.calendar.js');
 
 $filter = (new CFilter())
 	->addVar('action', 'slareport.list')
-	->setResetUrl($data['reset_curl'])
+	->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', 'slareport.list'))
 	->setProfile('web.slareport.filter')
 	->setActiveTab($data['active_tab']);
 
@@ -104,7 +104,11 @@ elseif (array_key_exists('sla', $data)) {
 	if (count($data['services']) > 1) {
 		$slareport_list = (new CTableInfo());
 		$header = [
-			make_sorting_header(_('Service'), 'name', $data['sort'], $data['sortorder'], $data['filter_url'])
+			make_sorting_header(_('Service'), 'name', $data['sort'], $data['sortorder'],
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'slareport.list')
+					->getUrl()
+			)
 				->addStyle('width: 14%'),
 			(new CColHeader(_('SLO')))->setWidth('7%')
 		];
@@ -121,18 +125,16 @@ elseif (array_key_exists('sla', $data)) {
 		$slareport_list->setHeader($header);
 
 		foreach ($data['services'] as $serviceid => $service) {
-			if ($data['can_manage_sla']) {
-				$name_element = (new CLink(
-					$service['name'],
-					$data['service_curl']->setArgument('filter_serviceid', $serviceid)
-				));
-			}
-			else {
-				$name_element = $service['name'];
-			}
-
 			$row = [
-				$name_element,
+				$data['has_access'][CRoleHelper::ACTIONS_MANAGE_SLA]
+					? (new CLink(
+						$service['name'],
+						$data['service_curl']
+							->setArgument('filter_serviceid', $serviceid)
+							->setArgument('filter_set', 1)
+							->toString()
+					))->addClass(ZBX_STYLE_WORDBREAK)
+					: (new CSpan($service['name']))->addClass(ZBX_STYLE_WORDBREAK),
 				CSlaHelper::getSloTag($data['sla']['slo'])
 			];
 
@@ -142,7 +144,7 @@ elseif (array_key_exists('sla', $data)) {
 				}
 			}
 
-			$slareport_list->addRow(new CRow($row));
+			$slareport_list->addRow($row);
 		}
 	}
 	elseif (false != ($service = reset($data['services']))) {
