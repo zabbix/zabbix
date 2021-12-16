@@ -366,7 +366,7 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 				break;
 #ifndef _WINDOWS
 			case 'R':
-				if (SUCCEED != parse_rtc_options(zbx_optarg, program_type, &t->data))
+				if (SUCCEED != parse_rtc_options(zbx_optarg, &t->data))
 					exit(EXIT_FAILURE);
 
 				t->task = ZBX_TASK_RUNTIME_CONTROL;

@@ -18,11 +18,15 @@
 **/
 
 #include "zbxipcservice.h"
+#include "daemon.h"
+#include "log.h"
+#include "zbxdiag.h"
 #include "zbxjson.h"
+#include "zbxha.h"
 #include "zbxrtc.h"
 #include "rtc.h"
 
-int	rtc_parse_options_ext(const char *opt, zbx_uint32_t *code, char **data, char **error)
+int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data, char **error)
 {
 	const char	*param;
 
@@ -81,7 +85,7 @@ int	rtc_parse_options_ext(const char *opt, zbx_uint32_t *code, char **data, char
 	{
 		int	delay;
 
-		param = opt + ZBX_CONST_STRLEN(ZBX_HA_REMOVE_NODE);
+		param = opt + ZBX_CONST_STRLEN(ZBX_HA_SET_FAILOVER_DELAY);
 
 		if ('=' == *param)
 		{
@@ -119,4 +123,322 @@ int	rtc_parse_options_ext(const char *opt, zbx_uint32_t *code, char **data, char
 	}
 
 	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: rtc_process_loglevel                                             *
+ *                                                                            *
+ * Purpose: process loglevel runtime control option                           *
+ *                                                                            *
+ * Parameters: code   - [IN] the runtime control request code                 *
+ *             data   - [IN] the runtime control parameter (optional)         *
+ *             result - [OUT] the runtime control result                      *
+ *                                                                            *
+ ******************************************************************************/
+static int	rtc_process_loglevel(int direction, const char *data, char **result)
+{
+	struct zbx_json_parse	jp;
+	char			buf[MAX_STRING_LEN];
+	int			process_num = 0;
+
+	if (NULL == data)
+	{
+		(void)zbx_ha_change_loglevel(direction, result);
+		return FAIL;
+	}
+
+	if (FAIL == zbx_json_open(data, &jp))
+	{
+		*result = zbx_dsprintf(NULL, "Invalid parameters \"%s\"\n", data);
+		return SUCCEED;
+	}
+
+	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_PROCESS_NUM, buf, sizeof(buf), NULL))
+		process_num = atoi(buf);
+
+	if (SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_PROCESS_NAME, buf, sizeof(buf), NULL))
+	{
+		return FAIL;
+	}
+
+	if (0 == strcmp(buf, "ha manager"))
+	{
+		if (0 != process_num && 1 != process_num)
+		{
+			*result = zbx_dsprintf(NULL, "Invalid option parameter \"%d\"\n", process_num);
+		}
+		else
+		{
+			(void)zbx_ha_change_loglevel(direction, result);
+			*result = zbx_strdup(NULL, "Changed HA manager log level\n");
+
+		}
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+
+/******************************************************************************
+ *                                                                            *
+ * Function: rtc_process_diaginfo                                             *
+ *                                                                            *
+ * Purpose: process diaginfo runtime control option                           *
+ *                                                                            *
+ * Parameters: data   - [IN] the runtime control parameter (optional)         *
+ *             result - [OUT] the runtime control result                      *
+ *                                                                            *
+ ******************************************************************************/
+static void	rtc_process_diaginfo(const char *data, char **result)
+{
+	struct zbx_json_parse	jp;
+	char			buf[MAX_STRING_LEN];
+	unsigned int		scope;
+
+	if (FAIL == zbx_json_open(data, &jp) ||
+			SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_SECTION, buf, sizeof(buf), NULL))
+	{
+		*result = zbx_dsprintf(NULL, "Invalid parameter \"%s\"\n", data);
+		return;
+	}
+
+	if (0 == strcmp(buf, "all"))
+	{
+		scope = (1 << ZBX_DIAGINFO_HISTORYCACHE) | (1 << ZBX_DIAGINFO_PREPROCESSING) |
+				(1 << ZBX_DIAGINFO_LOCKS) | (1 << ZBX_DIAGINFO_VALUECACHE) |
+				(1 << ZBX_DIAGINFO_LLD) | (1 << ZBX_DIAGINFO_ALERTING);
+	}
+	else if (0 == strcmp(buf, ZBX_DIAG_HISTORYCACHE))
+		scope = 1 << ZBX_DIAGINFO_HISTORYCACHE;
+	else if (0 == strcmp(buf, ZBX_DIAG_PREPROCESSING))
+		scope = 1 << ZBX_DIAGINFO_PREPROCESSING;
+	else if (0 == strcmp(buf, ZBX_DIAG_LOCKS))
+		scope = 1 << ZBX_DIAGINFO_LOCKS;
+	else if (0 == strcmp(buf, ZBX_DIAG_VALUECACHE))
+		scope = 1 << ZBX_DIAGINFO_VALUECACHE;
+	else if (0 == strcmp(buf, ZBX_DIAG_LLD))
+		scope = 1 << ZBX_DIAGINFO_LLD;
+	else if (0 == strcmp(buf, ZBX_DIAG_ALERTING))
+		scope = 1 << ZBX_DIAGINFO_ALERTING;
+	else
+		return;
+
+	zbx_diag_log_info(scope, result);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: rtc_ha_status                                                    *
+ *                                                                            *
+ * Purpose: process ha_status runtime command                                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	rtc_ha_status(char **out)
+{
+	char			*nodes = NULL, *error = NULL;
+	struct zbx_json_parse	jp, jp_node;
+	size_t			out_alloc = 0, out_offset = 0;
+
+	if (SUCCEED != zbx_ha_get_nodes(&nodes, &error))
+	{
+		zbx_strlog_alloc(LOG_LEVEL_ERR, out, &out_alloc, &out_offset, "cannot get HA node information: %s",
+				error);
+		zbx_free(error);
+		return;
+	}
+
+#define ZBX_HA_REPORT_FMT	"%-25s %-25s %-30s %-11s %s"
+
+	if (SUCCEED == zbx_json_open(nodes, &jp))
+	{
+		const char	*pnext;
+		char		name[256], address[261], id[26], buffer[256];
+		int		status, lastaccess_age, index = 1;
+
+		zbx_strlog_alloc(LOG_LEVEL_INFORMATION, out, &out_alloc, &out_offset, "cluster status:");
+		zbx_strlog_alloc(LOG_LEVEL_INFORMATION, out, &out_alloc, &out_offset, "  %2s  " ZBX_HA_REPORT_FMT, "#",
+				"ID", "Name", "Address", "Status", "Last Access");
+
+		for (pnext = NULL; NULL != (pnext = zbx_json_next(&jp, pnext));)
+		{
+			if (FAIL == zbx_json_brackets_open(pnext, &jp_node))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+
+			if (SUCCEED != zbx_json_value_by_name(&jp_node, ZBX_PROTO_TAG_ID, id, sizeof(id), NULL))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+
+			if (SUCCEED != zbx_json_value_by_name(&jp_node, ZBX_PROTO_TAG_NAME, name, sizeof(name),
+					NULL))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+
+			if (SUCCEED != zbx_json_value_by_name(&jp_node, ZBX_PROTO_TAG_STATUS, buffer,
+					sizeof(buffer), NULL))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+			status = atoi(buffer);
+
+			if (SUCCEED != zbx_json_value_by_name(&jp_node, ZBX_PROTO_TAG_LASTACCESS_AGE, buffer,
+					sizeof(buffer), NULL))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+			lastaccess_age = atoi(buffer);
+
+			if (SUCCEED != zbx_json_value_by_name(&jp_node, ZBX_PROTO_TAG_ADDRESS, address,
+					sizeof(address), NULL))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+
+			zbx_strlog_alloc(LOG_LEVEL_INFORMATION, out, &out_alloc, &out_offset, "  %2d. "
+					ZBX_HA_REPORT_FMT, index++, id, '\0' != *name ? name : "<standalone server>",
+					address, zbx_ha_status_str(status), zbx_age2str(lastaccess_age));
+		}
+	}
+	zbx_free(nodes);
+
+#undef ZBX_HA_REPORT_FMT
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: rtc_remove_node                                                  *
+ *                                                                            *
+ * Purpose: process ha_remove_node runtime command                            *
+ *                                                                            *
+ ******************************************************************************/
+static void	rtc_ha_remove_node(const char *data, char **out)
+{
+	char			*error = NULL;
+	struct zbx_json_parse	jp;
+	char			buf[MAX_STRING_LEN];
+	size_t			out_alloc = 0, out_offset = 0;
+
+	if (FAIL == zbx_json_open(data, &jp))
+	{
+		*out = zbx_dsprintf(NULL, "Invalid parameter format \"%s\"\n", data);
+		return;
+	}
+
+	if (SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_NODE, buf, sizeof(buf), NULL))
+	{
+		*out = zbx_dsprintf(NULL, "Missing node parameter \"%s\"\n", data);
+		return;
+	}
+
+	if (SUCCEED != zbx_ha_remove_node(buf, out, &error))
+	{
+		zbx_strlog_alloc(LOG_LEVEL_ERR, out, &out_alloc, &out_offset, "cannot remove HA node: %s", error);
+		zbx_free(error);
+		return;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: rtc_ha_failover_delay                                            *
+ *                                                                            *
+ * Purpose: process ha_failover_delay runtime command                         *
+ *                                                                            *
+ ******************************************************************************/
+static void	rtc_ha_failover_delay(const char *data, char **out)
+{
+	char			*error = NULL;
+	struct zbx_json_parse	jp;
+	char			buf[MAX_STRING_LEN];
+	int			failover_delay;
+	size_t			out_alloc = 0, out_offset = 0;
+
+	if (FAIL == zbx_json_open(data, &jp))
+	{
+		*out = zbx_dsprintf(NULL, "Invalid parameter format \"%s\"\n", data);
+		return;
+	}
+
+	if (SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_FAILOVER_DELAY, buf, sizeof(buf), NULL))
+	{
+		*out = zbx_dsprintf(NULL, "Missing failover_delay parameter \"%s\"\n", data);
+		return;
+	}
+
+	if (10 > (failover_delay = atoi(buf)) || 15 * SEC_PER_MIN < failover_delay)
+	{
+		*out = zbx_dsprintf(NULL, "Invalid failover delay value \"%s\"\n", buf);
+		return;
+	}
+
+	if (SUCCEED != zbx_ha_set_failover_delay(failover_delay, &error))
+	{
+		zbx_strlog_alloc(LOG_LEVEL_ERR, out, &out_alloc, &out_offset, "cannot set HA failover delay: %s", error);
+		zbx_free(error);
+		return;
+	}
+
+	*out = zbx_dsprintf(NULL, "HA failover delay set to %d seconds\n", failover_delay);
+
+}
+/******************************************************************************
+ *                                                                            *
+ * Function: rtc_process_request_ex                                           *
+ *                                                                            *
+ * Purpose: process runtime control option                                    *
+ *                                                                            *
+ * Parameters: code   - [IN] the request code                                 *
+ *             data   - [IN] the runtime control parameter (optional)         *
+ *             result - [OUT] the runtime control result                      *
+ *                                                                            *
+ ******************************************************************************/
+int	rtc_process_request_ex(int code, const unsigned char *data, char **result)
+{
+	ZBX_UNUSED(data);
+
+	switch (code)
+	{
+		case ZBX_RTC_LOG_LEVEL_INCREASE:
+			return rtc_process_loglevel(1, (const char *)data, result);
+		case ZBX_RTC_LOG_LEVEL_DECREASE:
+			return rtc_process_loglevel(-1, (const char *)data, result);
+		case ZBX_RTC_CONFIG_CACHE_RELOAD:
+		case ZBX_RTC_SERVICE_CACHE_RELOAD:
+			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_SERVICEMAN, 1,
+					ZBX_RTC_MAKE_MESSAGE(ZBX_RTC_SERVICE_CACHE_RELOAD, 0, 0), result);
+			return FAIL;
+		case ZBX_RTC_SECRETS_RELOAD:
+			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_CONFSYNCER, 1, ZBX_RTC_MAKE_MESSAGE(code, 0, 0),
+					result);
+			return SUCCEED;
+		case ZBX_RTC_TRIGGER_HOUSEKEEPER_EXECUTE:
+			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_PROBLEMHOUSEKEEPER, 1,
+					ZBX_RTC_MAKE_MESSAGE(code, 0, 0), result);
+			return SUCCEED;
+		case ZBX_RTC_DIAGINFO:
+			rtc_process_diaginfo((const char *)data, result);
+			return FAIL;
+		case ZBX_RTC_HA_STATUS:
+			rtc_ha_status(result);
+			return SUCCEED;
+		case ZBX_RTC_HA_SET_FAILOVER_DELAY:
+			rtc_ha_failover_delay((const char *)data, result);
+			return SUCCEED;
+		case ZBX_RTC_HA_REMOVE_NODE:
+			rtc_ha_remove_node((const char *)data, result);
+			return SUCCEED;
+	}
+
+	return FAIL;
 }

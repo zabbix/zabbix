@@ -26,6 +26,6 @@ int	zbx_rtc_parse_loglevel_option(const char *opt, size_t len, pid_t *pid, int *
 		char **error);
 
 int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data, char **error);
-void	rtc_process_request_ex(int code, const unsigned char *data, char **result);
+int	rtc_process_request_ex(int code, const unsigned char *data, char **result);
 
 #endif

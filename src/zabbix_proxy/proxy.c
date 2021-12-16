@@ -1098,6 +1098,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	char		*error = NULL;
 	int		i, db_type, ret;
 	zbx_rtc_t	rtc;
+	zbx_timespec_t	rtc_timeout = {1, 0};
 
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
@@ -1416,7 +1417,19 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	while (ZBX_IS_RUNNING())
 	{
-		zbx_rtc_dispatch(&rtc);
+		zbx_ipc_client_t	*client;
+		zbx_ipc_message_t	*message;
+
+		(void)zbx_ipc_service_recv(&rtc.service, &rtc_timeout, &client, &message);
+
+		if (NULL != message)
+		{
+			zbx_rtc_dispatch(client, message);
+			zbx_ipc_message_free(message);
+		}
+
+		if (NULL != client)
+			zbx_ipc_client_release(client);
 
 		if (0 < (ret = waitpid((pid_t)-1, &i, WNOHANG)))
 		{

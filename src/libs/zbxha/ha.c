@@ -54,3 +54,86 @@ int	zbx_ha_get_nodes(char **nodes, char **error)
 
 	return ret;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_ha_remove_node                                               *
+ *                                                                            *
+ * Purpose: remove HA node                                                    *
+ *                                                                            *
+ * Comments: A new socket is opened to avoid interfering with notification    *
+ *           channel                                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_ha_remove_node(const char *node, char **result, char **error)
+{
+	unsigned char		*data, *ptr;
+	zbx_uint32_t		error_len, result_len;
+
+	if (SUCCEED != zbx_ipc_async_exchange(ZBX_IPC_SERVICE_HA, ZBX_IPC_SERVICE_HA_REMOVE_NODE,
+			ZBX_HA_SERVICE_TIMEOUT, (const unsigned char *)node, (zbx_uint32_t)strlen(node) + 1, &data, error))
+	{
+		return FAIL;
+	}
+
+	ptr = data;
+	ptr += zbx_deserialize_str(ptr, result, result_len);
+	(void)zbx_deserialize_str(ptr, error, error_len);
+	zbx_free(data);
+
+	return (0 == error_len ? SUCCEED : FAIL);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_ha_set_failover_delay                                        *
+ *                                                                            *
+ * Purpose: set HA failover delay                                             *
+ *                                                                            *
+ * Comments: A new socket is opened to avoid interfering with notification    *
+ *           channel                                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_ha_set_failover_delay(int delay, char **error)
+{
+	unsigned char		*data;
+	zbx_uint32_t		error_len;
+
+	if (SUCCEED != zbx_ipc_async_exchange(ZBX_IPC_SERVICE_HA, ZBX_IPC_SERVICE_HA_SET_FAILOVER_DELAY,
+			ZBX_HA_SERVICE_TIMEOUT, (unsigned char *)&delay, sizeof(delay), &data, error))
+	{
+		return FAIL;
+	}
+
+	(void)zbx_deserialize_str(data, error, error_len);
+	zbx_free(data);
+
+	return (0 == error_len ? SUCCEED : FAIL);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_ha_status_str                                                *
+ *                                                                            *
+ * Purpose: get HA status in text format                                      *
+ *                                                                            *
+ ******************************************************************************/
+const char	*zbx_ha_status_str(int ha_status)
+{
+	switch (ha_status)
+	{
+		case ZBX_NODE_STATUS_STANDBY:
+			return "standby";
+		case ZBX_NODE_STATUS_STOPPED:
+			return "stopped";
+		case ZBX_NODE_STATUS_UNAVAILABLE:
+			return "unavailable";
+		case ZBX_NODE_STATUS_ACTIVE:
+			return "active";
+		case ZBX_NODE_STATUS_ERROR:
+			return "error";
+		default:
+			return "unknown";
+	}
+}
+

@@ -27,7 +27,7 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: rtc_change_loglevel_main                                         *
+ * Function: rtc_change_service_loglevel                                      *
  *                                                                            *
  * Purpose: change log level of service process                               *
  *                                                                            *
@@ -152,7 +152,7 @@ static void	rtc_process_diaginfo(const char *data, char **result)
 	}
 
 	if (0 == strcmp(buf, "all"))
-	 	scope = (1 << ZBX_DIAGINFO_HISTORYCACHE) | (1 << ZBX_DIAGINFO_PREPROCESSING) | (1 << ZBX_DIAGINFO_LOCKS);
+		scope = (1 << ZBX_DIAGINFO_HISTORYCACHE) | (1 << ZBX_DIAGINFO_PREPROCESSING) | (1 << ZBX_DIAGINFO_LOCKS);
 	else if (0 == strcmp(buf, ZBX_DIAG_HISTORYCACHE))
 		scope = 1 << ZBX_DIAGINFO_HISTORYCACHE;
 	else if (0 == strcmp(buf, ZBX_DIAG_PREPROCESSING))
@@ -243,43 +243,31 @@ int	zbx_rtc_init(zbx_rtc_t *rtc ,char **error)
  * Purpose: accept and process runtime control request                        *
  *                                                                            *
  ******************************************************************************/
-void 	zbx_rtc_dispatch(zbx_rtc_t *rtc)
+void 	zbx_rtc_dispatch(zbx_ipc_client_t *client, zbx_ipc_message_t *message)
 {
-	zbx_timespec_t		ts = {1, 0};
-	zbx_ipc_client_t	*client;
-	zbx_ipc_message_t	*message;
+	char		*result = NULL, *result_ex = NULL;
+	zbx_uint32_t	size = 0;
 
-	(void)zbx_ipc_service_recv(&rtc->service, &ts, &client, &message);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() code:%u", __func__, message->code);
 
-	if (NULL != message)
+	if (FAIL == rtc_process_request_ex((int)message->code, message->data, &result_ex))
+		rtc_process_request((int)message->code, message->data, &result);
+
+	if (NULL != result_ex)
+		result = zbx_strdcat(result, result_ex);
+
+	if (NULL == result)
 	{
-		char		*result = NULL, *result_ex = NULL;
-		zbx_uint32_t	size = 0;
-		int		code = (int)message->code;
-
-		rtc_process_request(code, message->data, &result);
-		rtc_process_request_ex(code, message->data, &result_ex);
-
-		if (NULL != result_ex)
-			result = zbx_dsprintf(result, result_ex);
-
-		if (NULL == result)
-		{
-			/* all runtime commands generate some output */
-			result = zbx_strdup(NULL, "Invalid runtime control option\n");
-		}
-
-		size = (zbx_uint32_t)strlen(result) + 1;
-		zbx_ipc_client_send(client, message->code, (unsigned char *)result, size);
-		zbx_free(result);
-
-		zbx_free(result_ex);
-		zbx_free(result);
-
-		zbx_ipc_message_free(message);
-
+		/* all runtime commands generate some output */
+		result = zbx_strdup(NULL, "Unknown runtime control option\n");
 	}
 
-	if (NULL != client)
-		zbx_ipc_client_release(client);
+	size = (zbx_uint32_t)strlen(result) + 1;
+	zbx_ipc_client_send(client, message->code, (unsigned char *)result, size);
+	zbx_free(result);
+
+	zbx_free(result_ex);
+	zbx_free(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

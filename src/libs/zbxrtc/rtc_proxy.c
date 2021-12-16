@@ -31,11 +31,11 @@ int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data, char 
 	return SUCCEED;
 }
 
-void	rtc_process_request_ex(int code, const unsigned char *data, char **result)
+int	rtc_process_request_ex(int code, const unsigned char *data, char **result)
 {
 	ZBX_UNUSED(code);
 	ZBX_UNUSED(data);
 	ZBX_UNUSED(result);
 
-	return;
+	return FAIL;
 }

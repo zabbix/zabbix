@@ -213,3 +213,11 @@ int	zbx_rtc_process(const char *option, char **error)
 
 	return ret;
 }
+
+int	zbx_rtc_open(zbx_ipc_async_socket_t *asocket, int timeout, char **error)
+{
+	if (FAIL == zbx_ipc_async_socket_open(asocket, ZBX_IPC_SERVICE_RTC, timeout, error))
+		return FAIL;
+
+	return SUCCEED;
+}

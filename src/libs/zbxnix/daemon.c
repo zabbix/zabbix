@@ -224,28 +224,14 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 		return;
 	}
 
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_AGENTD))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot redirect signal: runtime control signals are supported only by agent");
+		return;
+	}
+
 	switch (ZBX_RTC_GET_MSG(flags))
 	{
-		case ZBX_RTC_CONFIG_CACHE_RELOAD:
-			if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the configuration cache"
-						" cannot be performed for a passive proxy");
-				return;
-			}
-
-			if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-			{
-				zbx_signal_process_by_type(ZBX_PROCESS_TYPE_SERVICEMAN, 1,
-						ZBX_RTC_MAKE_MESSAGE(ZBX_RTC_SERVICE_CACHE_RELOAD, 0, 0), NULL);
-			}
-			ZBX_FALLTHROUGH;
-		case ZBX_RTC_SECRETS_RELOAD:
-			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_CONFSYNCER, 1, flags, NULL);
-			break;
-		case ZBX_RTC_HOUSEKEEPER_EXECUTE:
-			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_HOUSEKEEPER, 1, flags, NULL);
-			break;
 		case ZBX_RTC_LOG_LEVEL_INCREASE:
 		case ZBX_RTC_LOG_LEVEL_DECREASE:
 			scope = ZBX_RTC_GET_SCOPE(flags);
@@ -267,19 +253,6 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 			if (NULL != zbx_sigusr_handler)
 				zbx_sigusr_handler(flags);
 
-			break;
-		case ZBX_RTC_SNMP_CACHE_RELOAD:
-			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_UNREACHABLE, ZBX_RTC_GET_DATA(flags), flags, NULL);
-			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_POLLER, ZBX_RTC_GET_DATA(flags), flags, NULL);
-			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_TRAPPER, ZBX_RTC_GET_DATA(flags), flags, NULL);
-			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_DISCOVERER, ZBX_RTC_GET_DATA(flags), flags, NULL);
-			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_TASKMANAGER, ZBX_RTC_GET_DATA(flags), flags, NULL);
-			break;
-		case ZBX_RTC_TRIGGER_HOUSEKEEPER_EXECUTE:
-			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_PROBLEMHOUSEKEEPER, 1, flags, NULL);
-			break;
-		case ZBX_RTC_SERVICE_CACHE_RELOAD:
-			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_SERVICEMAN, ZBX_RTC_GET_DATA(flags), flags, NULL);
 			break;
 		case ZBX_RTC_USER_PARAMETERS_RELOAD:
 			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_ACTIVE_CHECKS, ZBX_RTC_GET_DATA(flags), flags, NULL);
