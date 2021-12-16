@@ -19,55 +19,50 @@
 **/
 
 require_once dirname(__FILE__).'/../common/testFormTags.php';
+require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
  * @dataSource EntitiesTags
- * @backup hosts
+ *
+ * @backup services
  */
-class testFormTagsHost extends testFormTags {
+class testFormTagsServices extends testFormTags {
 
-	public $update_name = 'Host with tags for updating';
-	public $clone_name = 'Host with tags for cloning';
-	public $remove_name = 'Host for removing tags';
-	public $link = 'zabbix.php?action=host.list';
+	public $update_name = 'Service with tags for updating';
+	public $clone_name = 'Service with tags for cloning';
+	public $remove_name = 'Service for removing tags';
+	public $link = 'zabbix.php?action=service.list.edit';
 	public $saved_link = 'zabbix.php?action=host.edit&hostid=';
 
 	/**
-	 * Test creating of Host with tags.
+	 * Test creating of Service with tags.
 	 *
 	 * @dataProvider getCreateData
 	 */
-	public function testFormTagsHost_Create($data) {
-		$this->checkTagsCreate($data, 'host');
+	public function testFormTagsServices_Create($data) {
+		$this->checkTagsCreate($data, 'service');
 	}
 
 	/**
-	 * Test update of Host with tags.
+	 * Test update of Service with tags.
 	 *
 	 * @dataProvider getUpdateData
 	 */
-	public function testFormTagsHost_Update($data) {
-		$this->checkTagsUpdate($data, 'host');
+	public function testFormTagsServices_Update($data) {
+		$this->checkTagsUpdate($data, 'service');
 	}
 
 	/**
-	 * Test cloning of Host with tags.
+	 * Test cloning of Service with tags.
 	 */
-	public function testFormTagsHost_Clone() {
-		$this->executeCloning('host', 'Clone');
+	public function testFormTagsServices_Clone() {
+		$this->executeCloning('service', 'Clone');
 	}
 
 	/**
-	 * Test full cloning of Host with tags.
+	 * Test removing tags from Service.
 	 */
-	public function testFormTagsHost_FullClone() {
-		$this->executeCloning('host', 'Full clone');
-	}
-
-	/**
-	 * Test removing tags from Host.
-	 */
-	public function testFormTagsHost_RemoveTags() {
-		$this->clearTags('host');
+	public function testFormTagsServices_RemoveTags() {
+		$this->clearTags('service');
 	}
 }

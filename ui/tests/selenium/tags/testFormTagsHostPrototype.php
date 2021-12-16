@@ -28,6 +28,7 @@ class testFormTagsHostPrototype extends testFormTags {
 
 	public $update_name = '{#HOST} prototype with tags for updating';
 	public $clone_name = '{#HOST} prototype with tags for cloning';
+	public $remove_name = '{#HOST} prototype with for removing tags';
 	public $link;
 	public $saved_link;
 	public $host = 'Host for tags testing';
@@ -117,5 +118,15 @@ class testFormTagsHostPrototype extends testFormTags {
 				$this->assertFalse($row->getColumn($field)->children()->one()->detect()->isEnabled());
 			}
 		}
+	}
+
+	/**
+	 * Test removing tags from Host prototype.
+	 */
+	public function testFormTagsHostPrototype_RemoveTags() {
+		$discoveryruleid = CDataHelper::get('EntitiesTags.discoveryruleids.Host for tags testing:trap_discovery');
+		$this->link = 'host_prototypes.php?parent_discoveryid='.$discoveryruleid.'&context=host';
+		$this->saved_link = 'host_prototypes.php?form=update&context=host&parent_discoveryid='.$discoveryruleid.'&hostid=';
+		$this->clearTags('host prototype');
 	}
 }

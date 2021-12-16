@@ -29,6 +29,7 @@ class testFormTagsWeb extends testFormTags {
 
 	public $update_name = 'Web scenario with tags for updating';
 	public $clone_name = 'Web scenario with tags for cloning';
+	public $remove_name = 'Web scenario for removing tags';
 	public $link;
 	public $saved_link;
 	public $host = 'Host for tags testing';
@@ -124,5 +125,15 @@ class testFormTagsWeb extends testFormTags {
 		$host_link = 'httpconf.php?filter_set=1&context=host&filter_hostids[0]='.$hostid;
 
 		$this->checkInheritedElementTags($data, 'web scenario', $host_link);
+	}
+
+	/**
+	 * Test removing tags from Web scenario.
+	 */
+	public function testFormTagsWeb_RemoveTags() {
+		$hostid = CDataHelper::get('EntitiesTags.hostids.'.$this->host);
+		$this->link = 'httpconf.php?filter_set=1&filter_hostids[0]='.$hostid.'&context=host';
+		$this->saved_link = 'httpconf.php?form=update&hostid='.$hostid.'&context=host&httptestid=';
+		$this->clearTags('web scenario');
 	}
 }
