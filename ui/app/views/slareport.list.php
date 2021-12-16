@@ -29,169 +29,180 @@ $this->addJsFile('class.calendar.js');
 $filter = (new CFilter())
 	->addVar('action', 'slareport.list')
 	->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', 'slareport.list'))
-	->setProfile('web.slareport.filter')
-	->setActiveTab($data['active_tab']);
-
-$filter->addFilterTab(_('Filter'), [
-	(new CFormGrid())
-		->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
-		->addItem([
-			new CLabel(_('SLA'), 'filter_slaid'),
-			(new CMultiSelect([
-				'name' => 'filter_slaid',
-				'object_name' => 'sla',
-				'data' => $data['ms_sla'],
-				'multiple' => false,
-				'popup' => [
-					'parameters' => [
-						'srctbl' => 'sla',
-						'srcfld1' => 'slaid',
-						'dstfrm' => 'zbx_filter',
-						'dstfld1' => 'filter_slaid'
-					]
-				]
-			]))
-				->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
-			new CLabel(_('Service'), 'filter_serviceid'),
-			(new CMultiSelect([
-				'name' => 'filter_serviceid',
-				'object_name' => 'service',
-				'data' => $data['ms_service'],
-				'multiple' => false,
-				'popup' => [
-					'parameters' => [
-						'srctbl' => 'services',
-						'srcfld1' => 'serviceid',
-						'dstfrm' => 'zbx_filter',
-						'dstfld1' => 'filter_serviceid'
-					]
-				]
-			]))
-				->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
-		]),
-	(new CFormGrid())
-		->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
-		->addItem([
-			new CLabel(_('From'), 'filter_period_from'),
-			new CFormField(
-				(new CDateSelector('filter_period_from', $data['filter']['period_from']))
-					->setDateFormat(DATE_FORMAT)
-					->setPlaceholder(DATE_FORMAT_PLACEHOLDER)
-					->setAriaRequired()
-			),
-			new CLabel(_('To'), 'filter_period_to'),
-			new CFormField(
-				(new CDateSelector('filter_period_to', $data['filter']['period_to']))
-					->setDateFormat(DATE_FORMAT)
-					->setPlaceholder(DATE_FORMAT_PLACEHOLDER)
-					->setAriaRequired()
-			)
-		])
+	->setProfile('web.slareport.list.filter')
+	->setActiveTab($data['active_tab'])
+	->addFilterTab(_('Filter'), [
+		(new CFormGrid())
+			->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
+			->addItem([
+				new CLabel(_('SLA'), 'filter_slaid'),
+				new CFormField(
+					(new CMultiSelect([
+						'name' => 'filter_slaid',
+						'object_name' => 'sla',
+						'data' => $data['ms_sla'],
+						'multiple' => false,
+						'popup' => [
+							'parameters' => [
+								'srctbl' => 'sla',
+								'srcfld1' => 'slaid',
+								'dstfrm' => 'zbx_filter',
+								'dstfld1' => 'filter_slaid'
+							]
+						]
+					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+				),
+				new CLabel(_('Service'), 'filter_serviceid'),
+				new CFormField(
+					(new CMultiSelect([
+						'name' => 'filter_serviceid',
+						'object_name' => 'service',
+						'data' => $data['ms_service'],
+						'multiple' => false,
+						'popup' => [
+							'parameters' => [
+								'srctbl' => 'services',
+								'srcfld1' => 'serviceid',
+								'dstfrm' => 'zbx_filter',
+								'dstfld1' => 'filter_serviceid'
+							]
+						]
+					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+				)
+			]),
+		(new CFormGrid())
+			->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
+			->addItem([
+				new CLabel(_('From'), 'filter_date_from'),
+				new CFormField(
+					(new CDateSelector('filter_date_from', $data['filter']['date_from']))
+						->setDateFormat(DATE_FORMAT)
+						->setPlaceholder(DATE_FORMAT_PLACEHOLDER)
+				),
+				new CLabel(_('To'), 'filter_date_to'),
+				new CFormField(
+					(new CDateSelector('filter_date_to', $data['filter']['date_to']))
+						->setDateFormat(DATE_FORMAT)
+						->setPlaceholder(DATE_FORMAT_PLACEHOLDER)
+				)
+			])
 	]);
+
+$widget = (new CWidget())
+	->setTitle(_('SLA report'))
+	->addItem($filter);
+
+$slareport_list = new CTableInfo();
 
 $form = (new CForm())
 	->setId('slareport-list')
 	->setName('slareport_list');
 
-$slareport_list = (new CTableInfo());
 
-if (!$data['services']) {
-	if ($data['filter']['slaid'] === '' && $data['filter']['serviceid'] === '') {
-		$slareport_list->setNoDataMessage(_('Select SLA to display SLA report.'));
-	}
+if ($data['sla'] === null) {
+	$slareport_list->setNoDataMessage(_('Select SLA to display SLA report.'));
+
+	$form->addItem($slareport_list);
+
+	$widget
+		->addItem($form)
+		->show();
+
+	return;
 }
-elseif (array_key_exists('sla', $data)) {
-	if (count($data['services']) > 1) {
-		$slareport_list = (new CTableInfo());
-		$header = [
-			make_sorting_header(_('Service'), 'name', $data['sort'], $data['sortorder'],
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'slareport.list')
-					->getUrl()
-			)
-				->addStyle('width: 14%'),
-			(new CColHeader(_('SLO')))->setWidth('7%')
+
+if ($data['service'] === null) {
+	$header = [
+		make_sorting_header(_('Service'), 'name', $data['sort'], $data['sortorder'],
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'slareport.list')
+				->getUrl()
+		)->addStyle('width: 14%'),
+		(new CColHeader(_('SLO')))->setWidth('7%')
+	];
+
+	foreach ($data['sli']['periods'] as $period) {
+		$header[] = CSlaHelper::getPeriodTag(
+			(int) $data['sla']['period'],
+			$period['period_from'],
+			$period['period_to'],
+			$data['sla']['timezone']
+		)->addClass('vertical');
+	}
+
+	$slareport_list->setHeader($header);
+
+	foreach ($data['sli']['serviceids'] as $service_index => $serviceid) {
+		$row = [
+			(new CCol($data['has_access'][CRoleHelper::ACTIONS_MANAGE_SLA]
+				? new CLink(
+					$data['services'][$serviceid]['name'],
+					(new CUrl('zabbix.php'))
+						->setArgument('action', 'slareport.list')
+						->setArgument('filter_slaid', $data['sla']['slaid'])
+						->setArgument('filter_serviceid', $serviceid)
+						->setArgument('filter_set', 1)
+						->toString()
+				)
+				: $service['name']
+			))->addClass(ZBX_STYLE_WORDBREAK),
+			CSlaHelper::getSloTag((float) $data['sla']['slo'])
 		];
 
-		foreach ($data['periods'] as $period) {
-			$header[] = CSlaHelper::getPeriodTag(
-				$data['sla']['period'],
+		foreach (array_keys($data['sli']['periods']) as $period_index) {
+			$row[] = CSlaHelper::getSliTag(
+				$data['sli']['sli'][$period_index][$service_index]['sli'],
+				(float) $data['sla']['slo']
+			);
+		}
+
+		$slareport_list->addRow($row);
+	}
+
+	$form
+		->addItem($slareport_list)
+		->addItem($data['paging']);
+}
+else {
+	$slareport_list->setHeader([
+		CSlaHelper::getPeriodNames()[$data['sla']['period']],
+		_('SLO'),
+		_('SLI'),
+		_('Uptime'),
+		_('Downtime'),
+		_('Error budget'),
+		_('Excluded downtimes')
+	]);
+
+	$service_index = key($data['sli']['serviceids']);
+
+	foreach ($data['sli']['periods'] as $period_index => $period) {
+		$sli = $data['sli']['sli'][$period_index][$service_index];
+
+		foreach ($sli['excluded_downtimes'] as &$excluded_downtime) {
+			$excluded_downtime = CSlaHelper::getExcludedDowntimeTag($excluded_downtime, $data['sla']['timezone']);
+		}
+		unset($excluded_downtime);
+
+		$slareport_list->addRow([
+			CSlaHelper::getPeriodTag(
+				(int) $data['sla']['period'],
 				$period['period_from'],
 				$period['period_to'],
 				$data['sla']['timezone']
-			)->addClass('vertical');
-		}
-
-		$slareport_list->setHeader($header);
-
-		foreach ($data['services'] as $serviceid => $service) {
-			$row = [
-				$data['has_access'][CRoleHelper::ACTIONS_MANAGE_SLA]
-					? (new CLink(
-						$service['name'],
-						$data['service_curl']
-							->setArgument('filter_serviceid', $serviceid)
-							->setArgument('filter_set', 1)
-							->toString()
-					))->addClass(ZBX_STYLE_WORDBREAK)
-					: (new CSpan($service['name']))->addClass(ZBX_STYLE_WORDBREAK),
-				CSlaHelper::getSloTag($data['sla']['slo'])
-			];
-
-			if (array_key_exists('sli', $service)) {
-				foreach ($service['sli'] as $sli) {
-					$row[] = CSlaHelper::getSliTag($sli['sli'], $data['sla']['slo']);
-				}
-			}
-
-			$slareport_list->addRow($row);
-		}
+			),
+			CSlaHelper::getSloTag((float) $data['sla']['slo']),
+			CSlaHelper::getSliTag($sli['sli'], (float) $data['sla']['slo']),
+			CSlaHelper::getUptimeTag($sli['uptime']),
+			CSlaHelper::getDowntimeTag($sli['downtime']),
+			CSlaHelper::getErrorBudgetTag($sli['error_budget']),
+			$sli['excluded_downtimes']
+		]);
 	}
-	elseif (false != ($service = reset($data['services']))) {
-		$slareport_list = (new CTableInfo())
-			->setHeader([
-				CSlaHelper::getPeriodNames()[$data['sla']['period']],
-				_('SLO'),
-				_('SLI'),
-				_('Uptime'),
-				_('Downtime'),
-				_('Error budget'),
-				_('Excluded downtimes')
-			]);
 
-		foreach ($data['periods'] as $period_key => $period) {
-			$sli = $service['sli'][$period_key];
+	$form->addItem($slareport_list);
+}
 
-			foreach ($sli['excluded_downtimes'] as &$excluded_downtime) {
-				$excluded_downtime = CSlaHelper::getExcludedDowntimeTag($excluded_downtime, $data['sla']['timezone']);
-			}
-			unset($excluded_downtime);
-
-			$slareport_list->addRow([
-				CSlaHelper::getPeriodTag(
-					$data['sla']['period'],
-					$period['period_from'],
-					$period['period_to'],
-					$data['sla']['timezone']
-				),
-				CSlaHelper::getSloTag($data['sla']['slo']),
-				CSlaHelper::getSliTag($sli['sli'], $data['sla']['slo']),
-				CSlaHelper::getUptimeTag($sli['uptime']),
-				CSlaHelper::getDowntimeTag($sli['downtime']),
-				CSlaHelper::getErrorBudgetTag($sli['error_budget']),
-				$sli['excluded_downtimes']
-			]);
-		}
-	}
-};
-
-$form->addItem([
-	$slareport_list,
-	$data['paging']
-]);
-
-(new CWidget())
-	->setTitle(_('SLA report'))
-	->addItem($filter)
+$widget
 	->addItem($form)
 	->show();
