@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $submenu_source = [
@@ -162,7 +163,7 @@ $actionForm->addItem([
 		'action.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected actions?')],
 		'action.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected actions?')],
 		'action.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected actions?')]
-	])
+	], $data['eventsource'])
 ]);
 
 // append form to widget
