@@ -21,6 +21,7 @@
 #include "zbxipcservice.h"
 #include "zbxserialize.h"
 #include "zbxha.h"
+#include "log.h"
 
 /******************************************************************************
  *                                                                            *
@@ -35,6 +36,8 @@ int	zbx_ha_get_nodes(char **nodes, char **error)
 	zbx_uint32_t		str_len;
 	int			ret;
 	char			*str;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (SUCCEED != zbx_ipc_async_exchange(ZBX_IPC_SERVICE_HA, ZBX_IPC_SERVICE_HA_GET_NODES,
 			ZBX_HA_SERVICE_TIMEOUT, NULL, 0, &data, error))
@@ -51,6 +54,8 @@ int	zbx_ha_get_nodes(char **nodes, char **error)
 		*nodes = str;
 	else
 		*error = str;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -109,6 +114,57 @@ int	zbx_ha_set_failover_delay(int delay, char **error)
 	zbx_free(data);
 
 	return (0 == error_len ? SUCCEED : FAIL);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_ha_get_failover_delay                                        *
+ *                                                                            *
+ * Purpose: get HA failover delay                                             *
+ *                                                                            *
+ * Comments: A new socket is opened to avoid interfering with notification    *
+ *           channel                                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_ha_get_failover_delay(int *delay, char **error)
+{
+	unsigned char		*data;
+
+	if (SUCCEED != zbx_ipc_async_exchange(ZBX_IPC_SERVICE_HA, ZBX_IPC_SERVICE_HA_GET_FAILOVER_DELAY,
+			ZBX_HA_SERVICE_TIMEOUT, (unsigned char *)&delay, sizeof(delay), &data, error))
+	{
+		return FAIL;
+	}
+
+	memcpy(delay, data, sizeof(*delay));
+	zbx_free(data);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_ha_change_loglevel                                           *
+ *                                                                            *
+ * Purpose: change HA manager log level                                       *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_ha_change_loglevel(int direction, char **error)
+{
+	int		ret = FAIL;
+	zbx_uint32_t	cmd;
+	unsigned char	*result = NULL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	cmd = 0 < direction ? ZBX_IPC_SERVICE_HA_LOGLEVEL_INCREASE :  ZBX_IPC_SERVICE_HA_LOGLEVEL_DECREASE;
+
+	ret = zbx_ipc_async_exchange(ZBX_IPC_SERVICE_HA, cmd, ZBX_HA_SERVICE_TIMEOUT, NULL, 0, &result, error);
+	zbx_free(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
 }
 
 /******************************************************************************

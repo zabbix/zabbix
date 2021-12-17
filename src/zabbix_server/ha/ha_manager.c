@@ -1422,6 +1422,23 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: ha_get_failover_delay                                            *
+ *                                                                            *
+ * Purpose: get failover delay                                                *
+ *                                                                            *
+ ******************************************************************************/
+static void	ha_get_failover_delay(zbx_ha_info_t *info, zbx_ipc_client_t *client)
+{
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_ipc_client_send(client, ZBX_IPC_SERVICE_HA_GET_FAILOVER_DELAY, (const unsigned char *)&info->failover_delay,
+			(zbx_uint32_t)sizeof(info->failover_delay));
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+/******************************************************************************
+ *                                                                            *
  * Function: ha_send_node_list                                               *
  *                                                                            *
  * Purpose: reply to get nodes request                                        *
@@ -1748,37 +1765,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_ha_change_loglevel                                           *
- *                                                                            *
- * Purpose: change HA manager log level                                       *
- *                                                                            *
- ******************************************************************************/
-int	zbx_ha_change_loglevel(int direction, char **error)
-{
-	int		ret = FAIL;
-	zbx_uint32_t	cmd;
-	unsigned char	*result = NULL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (ZBX_THREAD_ERROR == ha_pid)
-	{
-		*error = zbx_strdup(NULL, "HA manager has not been started");
-		goto out;
-	}
-
-	cmd = 0 < direction ? ZBX_IPC_SERVICE_HA_LOGLEVEL_INCREASE :  ZBX_IPC_SERVICE_HA_LOGLEVEL_DECREASE;
-
-	ret = zbx_ipc_async_exchange(ZBX_IPC_SERVICE_HA, cmd, ZBX_HA_SERVICE_TIMEOUT, NULL, 0, &result, error);
-	zbx_free(result);
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: zbx_ha_kill                                                      *
  *                                                                            *
  * Purpose: kill HA manager                                                   *
@@ -1940,6 +1926,9 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 				case ZBX_IPC_SERVICE_HA_SET_FAILOVER_DELAY:
 					ha_set_failover_delay(&info, client, message);
 					ha_update_parent(&rtc_socket, &info);
+					break;
+				case ZBX_IPC_SERVICE_HA_GET_FAILOVER_DELAY:
+					ha_get_failover_delay(&info, client);
 					break;
 				case ZBX_IPC_SERVICE_HA_LOGLEVEL_INCREASE:
 					if (SUCCEED != zabbix_increase_log_level())

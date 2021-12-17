@@ -1801,7 +1801,16 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			}
 		}
 		else
-			zbx_rtc_dispatch(client, message);
+		{
+			if (ZBX_NODE_STATUS_ACTIVE == ha_status)
+				zbx_rtc_dispatch(client, message);
+			else
+			{
+				const char	*result = "Runtime commands can be executed only in active mode\n";
+				zbx_ipc_client_send(client, message->code, (const unsigned char *)result,
+						(zbx_uint32_t)strlen(result) + 1);
+			}
+		}
 
 		zbx_ipc_message_free(message);
 

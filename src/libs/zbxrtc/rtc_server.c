@@ -240,6 +240,15 @@ static void	rtc_ha_status(char **out)
 	char			*nodes = NULL, *error = NULL;
 	struct zbx_json_parse	jp, jp_node;
 	size_t			out_alloc = 0, out_offset = 0;
+	int			failover_delay;
+
+	if (SUCCEED != zbx_ha_get_failover_delay(&failover_delay, &error))
+	{
+		zbx_strlog_alloc(LOG_LEVEL_ERR, out, &out_alloc, &out_offset, "cannot get failover delay: %s",
+				error);
+		zbx_free(error);
+		return;
+	}
 
 	if (SUCCEED != zbx_ha_get_nodes(&nodes, &error))
 	{
@@ -256,6 +265,9 @@ static void	rtc_ha_status(char **out)
 		const char	*pnext;
 		char		name[256], address[261], id[26], buffer[256];
 		int		status, lastaccess_age, index = 1;
+
+		zbx_strlog_alloc(LOG_LEVEL_INFORMATION, out, &out_alloc, &out_offset, "failover delay: %d seconds",
+				failover_delay);
 
 		zbx_strlog_alloc(LOG_LEVEL_INFORMATION, out, &out_alloc, &out_offset, "cluster status:");
 		zbx_strlog_alloc(LOG_LEVEL_INFORMATION, out, &out_alloc, &out_offset, "  %2s  " ZBX_HA_REPORT_FMT, "#",
@@ -309,6 +321,11 @@ static void	rtc_ha_status(char **out)
 					ZBX_HA_REPORT_FMT, index++, id, '\0' != *name ? name : "<standalone server>",
 					address, zbx_ha_status_str(status), zbx_age2str(lastaccess_age));
 		}
+	}
+	else
+	{
+		zbx_strlog_alloc(LOG_LEVEL_ERR, out, &out_alloc, &out_offset, "invalid response: %s",
+				nodes);
 	}
 	zbx_free(nodes);
 
