@@ -630,7 +630,7 @@ static duk_ret_t	get_headers_as_arrays(duk_context *ctx, zbx_es_httprequest_t *r
 	char			*ptr, *header;
 	zbx_vector_ptr_t	headers;
 	duk_idx_t		idx;
-	int			i;
+	int			i, j;
 
 	zbx_vector_ptr_create(&headers);
 
@@ -650,7 +650,7 @@ static duk_ret_t	get_headers_as_arrays(duk_context *ctx, zbx_es_httprequest_t *r
 			continue;
 		}
 
-		for (int j = 0; j < headers.values_num; j++)
+		for (j = 0; j < headers.values_num; j++)
 		{
 			zbx_cached_header_t *h = (zbx_cached_header_t*)headers.values[j];
 
