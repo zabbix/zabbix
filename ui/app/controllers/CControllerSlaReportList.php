@@ -22,9 +22,6 @@
 
 class CControllerSlaReportList extends CController {
 
-	private $sla;
-	private $service;
-
 	protected function init(): void {
 		$this->disableSIDValidation();
 	}
@@ -81,32 +78,36 @@ class CControllerSlaReportList extends CController {
 			CProfile::delete('web.slareport.list.filter.date_to');
 		}
 
+		$sla = null;
+
 		$slaid = CProfile::get('web.slareport.list.filter.slaid');
 
 		if ($slaid != 0) {
-			$sla = API::Sla()->get([
+			$slas = API::Sla()->get([
 				'output' => ['slaid', 'name', 'period', 'slo', 'timezone'],
 				'slaids' => $slaid
 			]);
 
-			if ($sla) {
-				$this->sla = $sla[0];
+			if ($slas) {
+				$sla = $slas[0];
 			}
 			else {
 				CProfile::delete('web.slareport.list.filter.slaid');
 			}
 		}
 
+		$service = null;
+
 		$serviceid = CProfile::get('web.slareport.list.filter.serviceid');
 
 		if ($serviceid != 0) {
-			$service = API::Service()->get([
+			$services = API::Service()->get([
 				'output' => ['serviceid', 'name'],
 				'serviceids' => $serviceid
 			]);
 
-			if ($service) {
-				$this->service = $service[0];
+			if ($services) {
+				$service = $services[0];
 			}
 			else {
 				CProfile::delete('web.slareport.list.filter.serviceid');
@@ -187,22 +188,22 @@ class CControllerSlaReportList extends CController {
 			'active_tab' => CProfile::get('web.slareport.list.filter.active', 1),
 			'sort' => $sort_field,
 			'sortorder' => $sort_order,
-			'ms_sla' => $this->sla !== null
-				? [CArrayHelper::renameKeys($this->sla, ['slaid' => 'id'])]
+			'ms_sla' => $sla !== null
+				? [CArrayHelper::renameKeys($sla, ['slaid' => 'id'])]
 				: [],
-			'ms_service' => $this->service !== null
-				? [CArrayHelper::renameKeys($this->service, ['serviceid' => 'id'])]
+			'ms_service' => $service !== null
+				? [CArrayHelper::renameKeys($service, ['serviceid' => 'id'])]
 				: [],
-			'sla' => $this->sla,
-			'service' => $this->service,
+			'sla' => $sla,
+			'service' => $service,
 			'has_errors' => $has_errors
 		];
 
-		if ($this->sla !== null && !$has_errors) {
+		if ($sla !== null && !$has_errors) {
 			$options = [
 				'output' => ['name'],
-				'serviceids' => $this->service !== null ? $this->service['serviceid'] : null,
-				'slaids' => $this->sla['slaid'],
+				'serviceids' => $service !== null ? $service['serviceid'] : null,
+				'slaids' => $sla['slaid'],
 				'sortfield' => $sort_field,
 				'sortorder' => $sort_order,
 				'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1,
@@ -216,12 +217,12 @@ class CControllerSlaReportList extends CController {
 			$data['paging'] = CPagerHelper::paginate($page_num, $data['services'], $sort_order,
 				(new CUrl('zabbix.php'))
 					->setArgument('action', $this->getAction())
-					->setArgument('filter_slaid', $this->sla['slaid'])
+					->setArgument('filter_slaid', $sla['slaid'])
 					->setArgument('filter_set', 1)
 			);
 
 			$options = [
-				'slaid' => $this->sla['slaid'],
+				'slaid' => $sla['slaid'],
 				'serviceids' => array_keys($data['services']),
 				'period_from' => $period_from,
 				'period_to' => $period_to
