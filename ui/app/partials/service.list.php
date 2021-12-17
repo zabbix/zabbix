@@ -94,18 +94,15 @@ foreach ($data['services'] as $serviceid => $service) {
 	}
 
 	$table->addRow(new CRow(array_merge($row, [
-		(new CCol($service['children'] > 0
-			? [
-				(new CLink($service['name'],
-					(new CUrl('zabbix.php'))
-						->setArgument('action', 'service.list')
-						->setArgument('path', $path)
-						->setArgument('serviceid', $serviceid)
-				))->setAttribute('data-serviceid', $serviceid),
-				CViewHelper::showNum($service['children'])
-			]
-			: $service['name']
-		))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CCol([
+			(new CLink($service['name'],
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'service.list')
+					->setArgument('path', $path)
+					->setArgument('serviceid', $serviceid)
+			))->setAttribute('data-serviceid', $serviceid),
+			CViewHelper::showNum($service['children'])
+		]))->addClass(ZBX_STYLE_WORDBREAK),
 		(new CCol(CSeverityHelper::getName((int) $service['status'])))
 			->addClass(CSeverityHelper::getStyle((int) $service['status'])),
 		$root_cause,
