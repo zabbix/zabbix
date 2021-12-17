@@ -662,70 +662,6 @@ class CMaintenance extends CApiService {
 		}
 	}
 
-	protected function addRelatedObjects(array $options, array $result) {
-		$result = parent::addRelatedObjects($options, $result);
-
-		// selectGroups
-		if ($options['selectGroups'] !== null && $options['selectGroups'] != API_OUTPUT_COUNT) {
-			$groups = [];
-			$relationMap = $this->createRelationMap($result, 'maintenanceid', 'groupid', 'maintenances_groups');
-			$related_ids = $relationMap->getRelatedIds();
-
-			if ($related_ids) {
-				$groups = API::HostGroup()->get([
-					'output' => $options['selectGroups'],
-					'hostgroupids' => $related_ids,
-					'preservekeys' => true
-				]);
-			}
-
-			$result = $relationMap->mapMany($result, $groups, 'groups');
-		}
-
-		// selectHosts
-		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
-			$hosts = [];
-			$relationMap = $this->createRelationMap($result, 'maintenanceid', 'hostid', 'maintenances_hosts');
-			$related_ids = $relationMap->getRelatedIds();
-
-			if ($related_ids) {
-				$hosts = API::Host()->get([
-					'output' => $options['selectHosts'],
-					'hostids' => $related_ids,
-					'preservekeys' => true
-				]);
-			}
-
-			$result = $relationMap->mapMany($result, $hosts, 'hosts');
-		}
-
-		// Adding problem tags.
-		if ($options['selectTags'] !== null && $options['selectTags'] != API_OUTPUT_COUNT) {
-			$tags = API::getApiService()->select('maintenance_tag', [
-				'output' => $this->outputExtend($options['selectTags'], ['maintenanceid']),
-				'filter' => ['maintenanceids' => array_keys($result)],
-				'preservekeys' => true
-			]);
-			$relation_map = $this->createRelationMap($tags, 'maintenanceid', 'maintenancetagid');
-			$tags = $this->unsetExtraFields($tags, ['maintenancetagid', 'maintenanceid']);
-			$result = $relation_map->mapMany($result, $tags, 'tags');
-		}
-
-		// selectTimeperiods
-		if ($options['selectTimeperiods'] !== null && $options['selectTimeperiods'] != API_OUTPUT_COUNT) {
-			$relationMap = $this->createRelationMap($result, 'maintenanceid', 'timeperiodid', 'maintenances_windows');
-			$timeperiods = API::getApiService()->select('timeperiods', [
-				'output' => $options['selectTimeperiods'],
-				'filter' => ['timeperiodid' => $relationMap->getRelatedIds()],
-				'preservekeys' => true
-			]);
-			$timeperiods = $this->unsetExtraFields($timeperiods, ['timeperiodid']);
-			$result = $relationMap->mapMany($result, $timeperiods, 'timeperiods');
-		}
-
-		return $result;
-	}
-
 	/**
 	 * Validate time periods of given maintenances.
 	 *
@@ -1278,5 +1214,69 @@ class CMaintenance extends CApiService {
 					array_diff_key($db_timeperiod, array_flip(['maintenanceid']));
 			}
 		}
+	}
+
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		// selectGroups
+		if ($options['selectGroups'] !== null && $options['selectGroups'] != API_OUTPUT_COUNT) {
+			$groups = [];
+			$relationMap = $this->createRelationMap($result, 'maintenanceid', 'groupid', 'maintenances_groups');
+			$related_ids = $relationMap->getRelatedIds();
+
+			if ($related_ids) {
+				$groups = API::HostGroup()->get([
+					'output' => $options['selectGroups'],
+					'hostgroupids' => $related_ids,
+					'preservekeys' => true
+				]);
+			}
+
+			$result = $relationMap->mapMany($result, $groups, 'groups');
+		}
+
+		// selectHosts
+		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
+			$hosts = [];
+			$relationMap = $this->createRelationMap($result, 'maintenanceid', 'hostid', 'maintenances_hosts');
+			$related_ids = $relationMap->getRelatedIds();
+
+			if ($related_ids) {
+				$hosts = API::Host()->get([
+					'output' => $options['selectHosts'],
+					'hostids' => $related_ids,
+					'preservekeys' => true
+				]);
+			}
+
+			$result = $relationMap->mapMany($result, $hosts, 'hosts');
+		}
+
+		// Adding problem tags.
+		if ($options['selectTags'] !== null && $options['selectTags'] != API_OUTPUT_COUNT) {
+			$tags = API::getApiService()->select('maintenance_tag', [
+				'output' => $this->outputExtend($options['selectTags'], ['maintenanceid']),
+				'filter' => ['maintenanceids' => array_keys($result)],
+				'preservekeys' => true
+			]);
+			$relation_map = $this->createRelationMap($tags, 'maintenanceid', 'maintenancetagid');
+			$tags = $this->unsetExtraFields($tags, ['maintenancetagid', 'maintenanceid']);
+			$result = $relation_map->mapMany($result, $tags, 'tags');
+		}
+
+		// selectTimeperiods
+		if ($options['selectTimeperiods'] !== null && $options['selectTimeperiods'] != API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'maintenanceid', 'timeperiodid', 'maintenances_windows');
+			$timeperiods = API::getApiService()->select('timeperiods', [
+				'output' => $options['selectTimeperiods'],
+				'filter' => ['timeperiodid' => $relationMap->getRelatedIds()],
+				'preservekeys' => true
+			]);
+			$timeperiods = $this->unsetExtraFields($timeperiods, ['timeperiodid']);
+			$result = $relationMap->mapMany($result, $timeperiods, 'timeperiods');
+		}
+
+		return $result;
 	}
 }
