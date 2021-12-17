@@ -56,7 +56,7 @@ $controls = (new CForm())
 
 $services = (new CTableInfo())
 	->setHeader([
-		$data['multiple'] ? (new CColHeader(new CCheckBox('serviceid_all')))->addClass(ZBX_STYLE_CELL_WIDTH) : null,
+		$data['is_multiple'] ? (new CColHeader(new CCheckBox('serviceid_all')))->addClass(ZBX_STYLE_CELL_WIDTH) : null,
 		_('Name'),
 		_('Status calculation rule'),
 		_('Problem tags')
@@ -64,9 +64,9 @@ $services = (new CTableInfo())
 
 foreach ($data['services'] as $service) {
 	$services->addRow([
-		$data['multiple'] ? new CCol((new CCheckBox('serviceid', $service['serviceid']))->removeId()) : null,
+		$data['is_multiple'] ? (new CCheckBox('serviceid', $service['serviceid']))->removeId() : null,
 		(new CCol([
-			$data['multiple'] ? null : (new CVar('serviceid', $service['serviceid']))->removeId(),
+			$data['is_multiple'] ? null : (new CVar('serviceid', $service['serviceid']))->removeId(),
 			(new CVar('name', $service['name']))->removeId(),
 			(new CVar('algorithm', $service['algorithm']))->removeId(),
 			(new CVar('problem_tags_html', $data['problem_tags_html'][$service['serviceid']]))->removeId(),
@@ -81,22 +81,28 @@ $form
 	->addItem($services)
 	->addItem(
 		(new CScriptTag('
-			services_popup.init();
+			services_popup.init('.json_encode([
+				'is_multiple' => $data['is_multiple']
+			]).');
 		'))->setOnDocumentReady()
 	);
+
+$buttons = [];
+
+if ($data['is_multiple']) {
+	$buttons[] = [
+		'title' => _('Select'),
+		'keepOpen' => true,
+		'isSubmit' => true,
+		'action' => 'services_popup.submit();'
+	];
+}
 
 $output = [
 	'header' => $data['title'],
 	'controls' => $controls->toString(),
 	'body' => $form->toString(),
-	'buttons' => [
-		[
-			'title' => _('Select'),
-			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'services_popup.submit();'
-		]
-	],
+	'buttons' => $buttons,
 	'script_inline' => $this->readJsFile('popup.services.js.php')
 ];
 

@@ -90,7 +90,7 @@ class CControllerPopupServices extends CController {
 				'name' => $this->getInput('filter_name', '')
 			],
 			'exclude_serviceids' => $exclude_serviceids,
-			'multiple' => (bool) $this->getInput('multiple', 1),
+			'is_multiple' => $this->getInput('multiple', 1) == 1,
 			'services' => $services,
 			'problem_tags' => makeTags($problem_tags, true, 'serviceid'),
 			'problem_tags_html' => $problem_tags_html,

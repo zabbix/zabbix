@@ -389,18 +389,6 @@ class CControllerPopupGeneric extends CController {
 				'table_columns' => [
 					_('Name')
 				]
-			],
-			'services' => [
-				'title' => _('Services'),
-				'min_user_type' => USER_TYPE_ZABBIX_ADMIN,
-				'allowed_src_fields' => 'serviceid,name',
-				'form' => [
-					'name' => 'servicesform',
-					'id' => 'services'
-				],
-				'table_columns' => [
-					_('Name')
-				]
 			]
 		];
 	}
@@ -1401,17 +1389,6 @@ class CControllerPopupGeneric extends CController {
 				$records = API::Sla()->get($options);
 				CArrayHelper::sort($records, ['name']);
 				$records = CArrayHelper::renameObjectsKeys($records, ['slaid' => 'id']);
-				break;
-
-			case 'services':
-				$options += [
-					'output' => ['serviceid', 'name'],
-					'preservekeys' => true
-				];
-
-				$records = API::Service()->get($options);
-				CArrayHelper::sort($records, ['name']);
-				$records = CArrayHelper::renameObjectsKeys($records, ['serviceid' => 'id']);
 				break;
 		}
 

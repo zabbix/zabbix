@@ -164,11 +164,6 @@ class CControllerServiceCreate extends CController {
 
 			$service['weight'] = $this->getInput('weight', '') !== '' ? $this->getInput('weight') : 0;
 		}
-		else {
-			$service['propagation_rule'] = DB::getDefault('services', 'propagation_rule');
-			$service['propagation_value'] = DB::getDefault('services', 'propagation_value');
-			$service['weight'] = DB::getDefault('services', 'weight');
-		}
 
 		$result = API::Service()->create($service);
 

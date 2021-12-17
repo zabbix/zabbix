@@ -26,6 +26,8 @@
 
 $this->addJsFile('class.calendar.js');
 
+$this->includeJsFile('slareport.list.js.php');
+
 $filter = (new CFilter())
 	->addVar('action', 'slareport.list')
 	->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', 'slareport.list'))
@@ -58,15 +60,7 @@ $filter = (new CFilter())
 						'name' => 'filter_serviceid',
 						'object_name' => 'service',
 						'data' => $data['ms_service'],
-						'multiple' => false,
-						'popup' => [
-							'parameters' => [
-								'srctbl' => 'services',
-								'srcfld1' => 'serviceid',
-								'dstfrm' => 'zbx_filter',
-								'dstfld1' => 'filter_serviceid'
-							]
-						]
+						'custom_select' => true
 					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 				)
 			]),
@@ -200,4 +194,10 @@ else {
 
 $widget
 	->addItem($form)
+	->show();
+
+(new CScriptTag('
+	view.init();
+'))
+	->setOnDocumentReady()
 	->show();

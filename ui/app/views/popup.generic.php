@@ -156,7 +156,6 @@ switch ($data['popup_type']) {
 	case 'api_methods':
 	case 'dashboard':
 	case 'sla':
-	case 'services':
 		foreach ($data['table_records'] as $item) {
 			$check_box = $data['multiselect']
 				? new CCheckBox('item['.$item['id'].']', $item['id'])
@@ -648,7 +647,6 @@ $types = [
 	'users',
 	'usrgrp',
 	'sla',
-	'services',
 	'valuemaps'
 ];
 
