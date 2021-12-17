@@ -979,8 +979,8 @@ class CMaintenance extends CApiService {
 	 * @param array|null $db_maintenances
 	 */
 	private static function updateHosts(array &$maintenances, array $db_maintenances = null): void {
-		$ins_hosts = [];
-		$del_hostids = [];
+		$ins_maintenances_hosts = [];
+		$del_maintenance_hostids = [];
 
 		foreach ($maintenances as &$maintenance) {
 			if (!array_key_exists('hosts', $maintenance)) {
@@ -999,7 +999,7 @@ class CMaintenance extends CApiService {
 					unset($db_hosts[$host['hostid']]);
 				}
 				else {
-					$ins_hosts[] = [
+					$ins_maintenances_hosts[] = [
 						'maintenanceid' => $maintenanceid,
 						'hostid' => $host['hostid']
 					];
@@ -1007,16 +1007,18 @@ class CMaintenance extends CApiService {
 			}
 			unset($host);
 
-			$del_hostids = array_merge($del_hostids, array_column($db_hosts, 'maintenance_hostid'));
+			$del_maintenance_hostids = array_merge($del_maintenance_hostids,
+				array_column($db_hosts, 'maintenance_hostid')
+			);
 		}
 		unset($maintenance);
 
-		if ($del_hostids) {
-			DB::delete('maintenances_hosts', ['maintenance_hostid' => $del_hostids]);
+		if ($del_maintenance_hostids) {
+			DB::delete('maintenances_hosts', ['maintenance_hostid' => $del_maintenance_hostids]);
 		}
 
-		if ($ins_hosts) {
-			$maintenance_hostids = DB::insertBatch('maintenances_hosts', $ins_hosts);
+		if ($ins_maintenances_hosts) {
+			$maintenance_hostids = DB::insertBatch('maintenances_hosts', $ins_maintenances_hosts);
 		}
 
 		foreach ($maintenances as &$maintenance) {
@@ -1109,7 +1111,7 @@ class CMaintenance extends CApiService {
 	 */
 	private static function updateTimeperiods(array &$maintenances, array $db_maintenances = null): void {
 		$ins_timeperiods = [];
-		$ins_maintenance_windows = [];
+		$ins_maintenances_windows = [];
 		$del_timeperiodids = [];
 
 		foreach ($maintenances as &$maintenance) {
@@ -1146,7 +1148,7 @@ class CMaintenance extends CApiService {
 				}
 				else {
 					$ins_timeperiods[] = $timeperiod;
-					$ins_maintenance_windows[] = ['maintenanceid' => $maintenance['maintenanceid']];
+					$ins_maintenances_windows[] = ['maintenanceid' => $maintenance['maintenanceid']];
 				}
 			}
 			unset($timeperiod);
@@ -1162,12 +1164,12 @@ class CMaintenance extends CApiService {
 		if ($ins_timeperiods) {
 			$timeperiodids = DB::insert('timeperiods', $ins_timeperiods);
 
-			foreach ($ins_maintenance_windows as $i => &$maintenance_window) {
+			foreach ($ins_maintenances_windows as $i => &$maintenance_window) {
 				$maintenance_window += ['timeperiodid' => $timeperiodids[$i]];
 			}
 			unset($maintenance_window);
 
-			DB::insertBatch('maintenances_windows', $ins_maintenance_windows);
+			DB::insertBatch('maintenances_windows', $ins_maintenances_windows);
 		}
 
 		foreach ($maintenances as &$maintenance) {
