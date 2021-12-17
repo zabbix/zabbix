@@ -276,9 +276,9 @@ class CMaintenance extends CApiService {
 		}
 		unset($maintenance);
 
+		self::updateTags($maintenances);
 		self::updateGroups($maintenances);
 		self::updateHosts($maintenances);
-		self::updateTags($maintenances);
 		self::updateTimeperiods($maintenances);
 
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_MAINTENANCE, $maintenances);
@@ -428,9 +428,9 @@ class CMaintenance extends CApiService {
 			DB::update('maintenances', $upd_maintenances);
 		}
 
+		self::updateTags($maintenances, $db_maintenances);
 		self::updateGroups($maintenances, $db_maintenances);
 		self::updateHosts($maintenances, $db_maintenances);
-		self::updateTags($maintenances, $db_maintenances);
 		self::updateTimeperiods($maintenances, $db_maintenances);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_MAINTENANCE, $maintenances, $db_maintenances);
@@ -910,6 +910,74 @@ class CMaintenance extends CApiService {
 		}
 	}
 
+
+	/**
+	 * Update table "maintenance_tag".
+	 *
+	 * @param array      $maintenances
+	 * @param array|null $db_maintenances
+	 */
+	private static function updateTags(array &$maintenances, array $db_maintenances = null): void {
+		$ins_maintenance_tags = [];
+		$del_maintenancetagids = [];
+
+		foreach ($maintenances as &$maintenance) {
+			if (($db_maintenances === null && !array_key_exists('tags', $maintenance))
+					|| !array_key_exists('tags', $db_maintenances[$maintenance['maintenanceid']])) {
+				continue;
+			}
+
+			if ($db_maintenances !== null && !array_key_exists('tags', $maintenance)) {
+				$maintenance['tags'] = [];
+			}
+
+			$db_tags = ($db_maintenances !== null) ? $db_maintenances[$maintenance['maintenanceid']]['tags'] : [];
+
+			foreach ($maintenance['tags'] as &$tag) {
+				$db_maintenancetagid = key(
+					array_filter($db_tags, static function (array $db_tag) use ($tag): bool {
+						return $tag['tag'] == $db_tag['tag'] && $tag['operator'] == $db_tag['operator']
+							&& $tag['value'] == $db_tag['value'];
+					})
+				);
+
+				if ($db_maintenancetagid !== null) {
+					$tag['maintenancetagid'] = $db_maintenancetagid;
+					unset($db_tags[$db_maintenancetagid]);
+				}
+				else {
+					$ins_maintenance_tags[] = ['maintenanceid' => $maintenance['maintenanceid']] + $tag;
+				}
+			}
+			unset($tag);
+
+			$del_maintenancetagids = array_merge($del_maintenancetagids, array_keys($db_tags));
+		}
+		unset($maintenance);
+
+		if ($del_maintenancetagids) {
+			DB::delete('maintenance_tag', ['maintenancetagid' => $del_maintenancetagids]);
+		}
+
+		if ($ins_maintenance_tags) {
+			$maintenancetagids = DB::insert('maintenance_tag', $ins_maintenance_tags);
+		}
+
+		foreach ($maintenances as &$maintenance) {
+			if (!array_key_exists('tags', $maintenance)) {
+				continue;
+			}
+
+			foreach ($maintenance['tags'] as &$tag) {
+				if (!array_key_exists('maintenancetagid', $tag)) {
+					$tag['maintenancetagid'] = array_shift($maintenancetagids);
+				}
+			}
+			unset($tag);
+		}
+		unset($maintenance);
+	}
+
 	/**
 	 * Update table "maintenances_groups".
 	 *
@@ -1032,73 +1100,6 @@ class CMaintenance extends CApiService {
 				}
 			}
 			unset($host);
-		}
-		unset($maintenance);
-	}
-
-	/**
-	 * Update table "maintenance_tag".
-	 *
-	 * @param array      $maintenances
-	 * @param array|null $db_maintenances
-	 */
-	private static function updateTags(array &$maintenances, array $db_maintenances = null): void {
-		$ins_maintenance_tags = [];
-		$del_maintenancetagids = [];
-
-		foreach ($maintenances as &$maintenance) {
-			if (($db_maintenances === null && !array_key_exists('tags', $maintenance))
-					|| !array_key_exists('tags', $db_maintenances[$maintenance['maintenanceid']])) {
-				continue;
-			}
-
-			if ($db_maintenances !== null && !array_key_exists('tags', $maintenance)) {
-				$maintenance['tags'] = [];
-			}
-
-			$db_tags = ($db_maintenances !== null) ? $db_maintenances[$maintenance['maintenanceid']]['tags'] : [];
-
-			foreach ($maintenance['tags'] as &$tag) {
-				$db_maintenancetagid = key(
-					array_filter($db_tags, static function (array $db_tag) use ($tag): bool {
-						return $tag['tag'] == $db_tag['tag'] && $tag['operator'] == $db_tag['operator']
-							&& $tag['value'] == $db_tag['value'];
-					})
-				);
-
-				if ($db_maintenancetagid !== null) {
-					$tag['maintenancetagid'] = $db_maintenancetagid;
-					unset($db_tags[$db_maintenancetagid]);
-				}
-				else {
-					$ins_maintenance_tags[] = ['maintenanceid' => $maintenance['maintenanceid']] + $tag;
-				}
-			}
-			unset($tag);
-
-			$del_maintenancetagids = array_merge($del_maintenancetagids, array_keys($db_tags));
-		}
-		unset($maintenance);
-
-		if ($del_maintenancetagids) {
-			DB::delete('maintenance_tag', ['maintenancetagid' => $del_maintenancetagids]);
-		}
-
-		if ($ins_maintenance_tags) {
-			$maintenancetagids = DB::insert('maintenance_tag', $ins_maintenance_tags);
-		}
-
-		foreach ($maintenances as &$maintenance) {
-			if (!array_key_exists('tags', $maintenance)) {
-				continue;
-			}
-
-			foreach ($maintenance['tags'] as &$tag) {
-				if (!array_key_exists('maintenancetagid', $tag)) {
-					$tag['maintenancetagid'] = array_shift($maintenancetagids);
-				}
-			}
-			unset($tag);
 		}
 		unset($maintenance);
 	}
