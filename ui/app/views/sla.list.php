@@ -122,11 +122,12 @@ foreach ($data['slas'] as $slaid => $sla) {
 		$data['has_access'][CRoleHelper::ACTIONS_MANAGE_SLA]
 			? new CCheckBox('slaids['.$slaid.']', $slaid)
 			: null,
-		$data['has_access'][CRoleHelper::ACTIONS_MANAGE_SLA]
+		(new CCol($data['has_access'][CRoleHelper::ACTIONS_MANAGE_SLA]
 			? (new CLink($sla['name']))
 				->addClass('js-edit-sla')
 				->setAttribute('data-slaid', $slaid)
-			: $sla['name'],
+			: $sla['name']
+		))->addClass(ZBX_STYLE_WORDBREAK),
 		CSlaHelper::getSloTag((float) $sla['slo']),
 		zbx_date2str(DATE_FORMAT, $sla['effective_date'], 'UTC'),
 		CSlaHelper::getPeriodNames()[$sla['period']],

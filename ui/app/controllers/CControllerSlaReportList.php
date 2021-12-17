@@ -24,15 +24,13 @@ class CControllerSlaReportList extends CController {
 
 	private $sla;
 	private $service;
-	private $period_from;
-	private $period_to;
 
 	protected function init(): void {
 		$this->disableSIDValidation();
 	}
 
 	/**
-	 * @throws InvalidArgumentException
+	 * @throws Exception
 	 */
 	protected function checkInput(): bool {
 		$fields = [
@@ -49,67 +47,6 @@ class CControllerSlaReportList extends CController {
 
 		$ret = $this->validateInput($fields);
 
-		if ($ret && $this->hasInput('filter_set')) {
-			$filter_date_from = $this->getInput('filter_date_from', '');
-
-			if ($filter_date_from !== '') {
-				$date_from = DateTime::createFromFormat('!'.DATE_FORMAT, $filter_date_from, new DateTimeZone('UTC'));
-				$last_errors = DateTime::getLastErrors();
-
-				if ($date_from === false || $last_errors['warning_count'] > 0 || $last_errors['error_count'] > 0) {
-					error(_s('Incorrect value for field "%1$s": %2$s.', _('From'), _('a date is expected')));
-				}
-				else {
-					$this->period_from = $date_from->getTimestamp();
-
-					if ($this->period_from < 0 || $this->period_from > ZBX_MAX_DATE) {
-						$this->period_from = null;
-
-						error(_s('Incorrect value for field "%1$s": %2$s.', _('From'),
-							_s('a time not later than %1$s is expected', zbx_date2str(DATE_TIME_FORMAT, ZBX_MAX_DATE))
-						));
-					}
-				}
-			}
-
-			$filter_date_to = $this->getInput('filter_date_to', '');
-
-			if ($filter_date_to !== '') {
-				$date_to = DateTime::createFromFormat('!'.DATE_FORMAT, $filter_date_to, new DateTimeZone('UTC'));
-				$last_errors = DateTime::getLastErrors();
-
-				if ($date_to === false || $last_errors['warning_count'] > 0 || $last_errors['error_count'] > 0) {
-					error(_s('Incorrect value for field "%1$s": %2$s.', _('To'), _('a date is expected')));
-				}
-				else {
-					$this->period_to = $date_to->getTimestamp();
-
-					if ($this->period_to < 0 || $this->period_to > ZBX_MAX_DATE) {
-						$this->period_to = null;
-
-						error(_s('Incorrect value for field "%1$s": %2$s.', _('To'),
-							_s('a time not later than %1$s is expected', zbx_date2str(DATE_TIME_FORMAT, ZBX_MAX_DATE))
-						));
-					}
-				}
-			}
-
-			if ($this->period_from !== null && $this->period_to !== null && $this->period_to <= $this->period_from) {
-				$this->period_from = null;
-				$this->period_to = null;
-
-				error(_s('"%1$s" date must be less than "%2$s" date.', _('From'), _('To')));
-			}
-
-			if ($this->period_from >= time()) {
-				$this->period_from = null;
-
-				error(_s('Incorrect value for field "%1$s": %2$s.', _('From'),
-					_s('a date not later than %1$s is expected', zbx_date2str(DATE_FORMAT, time(), 'UTC'))
-				));
-			}
-		}
-
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
 		}
@@ -117,15 +54,13 @@ class CControllerSlaReportList extends CController {
 		return $ret;
 	}
 
-	/**
-	 * @throws APIException
-	 *
-	 * @return bool
-	 */
 	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_SERVICES_SLA_REPORT);
 	}
 
+	/**
+	 * @throws APIException
+	 */
 	protected function doAction(): void {
 		if ($this->hasInput('filter_set')) {
 			CProfile::update('web.slareport.list.filter.slaid', $this->getInput('filter_slaid', 0), PROFILE_TYPE_ID);
@@ -150,7 +85,7 @@ class CControllerSlaReportList extends CController {
 
 		if ($slaid != 0) {
 			$sla = API::Sla()->get([
-				'output' => ['slaid', 'name', 'slo', 'period', 'timezone'],
+				'output' => ['slaid', 'name', 'period', 'slo', 'timezone'],
 				'slaids' => $slaid
 			]);
 
@@ -191,8 +126,58 @@ class CControllerSlaReportList extends CController {
 		CProfile::update('web.slareport.list.sort', $sort_field, PROFILE_TYPE_STR);
 		CProfile::update('web.slareport.list.sortorder', $sort_order, PROFILE_TYPE_STR);
 
-		$page_num = getRequest('page', 1);
-		CPagerHelper::savePage('slareport.list', $page_num);
+		$period_from = null;
+
+		if ($filter['date_from'] !== '') {
+			$date_from = DateTime::createFromFormat('!'.DATE_FORMAT, $filter['date_from'], new DateTimeZone('UTC'));
+			$last_errors = DateTime::getLastErrors();
+
+			if ($date_from === false || $last_errors['warning_count'] > 0 || $last_errors['error_count'] > 0) {
+				error(_s('Incorrect value for field "%1$s": %2$s.', _('From'), _('a date is expected')));
+			}
+			else {
+				$period_from = $date_from->getTimestamp();
+
+				if ($period_from < 0 || $period_from > ZBX_MAX_DATE) {
+					$period_from = null;
+
+					error(_s('Incorrect value for field "%1$s": %2$s.', _('From'),
+						_s('a date not later than %1$s is expected', zbx_date2str(DATE_FORMAT, ZBX_MAX_DATE))
+					));
+				}
+			}
+		}
+
+		$period_to = null;
+
+		if ($filter['date_to'] !== '') {
+			$date_to = DateTime::createFromFormat('!'.DATE_FORMAT, $filter['date_to'], new DateTimeZone('UTC'));
+			$last_errors = DateTime::getLastErrors();
+
+			if ($date_to === false || $last_errors['warning_count'] > 0 || $last_errors['error_count'] > 0) {
+				error(_s('Incorrect value for field "%1$s": %2$s.', _('To'), _('a date is expected')));
+			}
+			else {
+				$period_to = $date_to->getTimestamp();
+
+				if ($period_to < 0 || $period_to > ZBX_MAX_DATE) {
+					$period_to = null;
+
+					error(_s('Incorrect value for field "%1$s": %2$s.', _('To'),
+						_s('a date not later than %1$s is expected', zbx_date2str(DATE_FORMAT, ZBX_MAX_DATE))
+					));
+				}
+			}
+		}
+
+		if ($period_from !== null && $period_to !== null && $period_to <= $period_from) {
+			$period_from = null;
+			$period_to = null;
+
+			error(_s('"%1$s" date must be less than "%2$s" date.', _('From'), _('To')));
+		}
+
+		$has_errors = hasErrorMesssages();
 
 		$data = [
 			'has_access' => [
@@ -209,10 +194,11 @@ class CControllerSlaReportList extends CController {
 				? [CArrayHelper::renameKeys($this->service, ['serviceid' => 'id'])]
 				: [],
 			'sla' => $this->sla,
-			'service' => $this->service
+			'service' => $this->service,
+			'has_errors' => $has_errors
 		];
 
-		if ($this->sla !== null) {
+		if ($this->sla !== null && !$has_errors) {
 			$options = [
 				'output' => ['name'],
 				'serviceids' => $this->service !== null ? $this->service['serviceid'] : null,
@@ -225,19 +211,20 @@ class CControllerSlaReportList extends CController {
 
 			$data['services'] = API::Service()->get($options);
 
+			$page_num = getRequest('page', 1);
+			CPagerHelper::savePage('slareport.list', $page_num);
 			$data['paging'] = CPagerHelper::paginate($page_num, $data['services'], $sort_order,
 				(new CUrl('zabbix.php'))
 					->setArgument('action', $this->getAction())
 					->setArgument('filter_slaid', $this->sla['slaid'])
-					->setArgument('filter_serviceid', 0)
 					->setArgument('filter_set', 1)
 			);
 
 			$options = [
 				'slaid' => $this->sla['slaid'],
 				'serviceids' => array_keys($data['services']),
-				'period_from' => $this->period_from,
-				'period_to' => $this->period_to
+				'period_from' => $period_from,
+				'period_to' => $period_to
 			];
 
 			$data['sli'] = API::Sla()->getSli($options);

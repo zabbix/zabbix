@@ -98,9 +98,10 @@ $form = (new CForm())
 	->setId('slareport-list')
 	->setName('slareport_list');
 
-
-if ($data['sla'] === null) {
-	$slareport_list->setNoDataMessage(_('Select SLA to display SLA report.'));
+if ($data['sla'] === null || $data['has_errors']) {
+	if ($data['sla'] === null) {
+		$slareport_list->setNoDataMessage(_('Select SLA to display SLA report.'));
+	}
 
 	$form->addItem($slareport_list);
 
@@ -117,8 +118,8 @@ if ($data['service'] === null) {
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'slareport.list')
 				->getUrl()
-		)->addStyle('width: 14%'),
-		(new CColHeader(_('SLO')))->setWidth('7%')
+		)->addStyle('width: 14%;'),
+		(new CColHeader(_('SLO')))->setWidth('7%;')
 	];
 
 	foreach ($data['sli']['periods'] as $period) {
@@ -142,9 +143,9 @@ if ($data['service'] === null) {
 						->setArgument('filter_slaid', $data['sla']['slaid'])
 						->setArgument('filter_serviceid', $serviceid)
 						->setArgument('filter_set', 1)
-						->toString()
+						->getUrl()
 				)
-				: $service['name']
+				: $data['services'][$serviceid]['name']
 			))->addClass(ZBX_STYLE_WORDBREAK),
 			CSlaHelper::getSloTag((float) $data['sla']['slo'])
 		];
@@ -174,15 +175,15 @@ else {
 		_('Excluded downtimes')
 	]);
 
-	$service_index = key($data['sli']['serviceids']);
+	$service_index = 0;
 
 	foreach ($data['sli']['periods'] as $period_index => $period) {
 		$sli = $data['sli']['sli'][$period_index][$service_index];
 
-		foreach ($sli['excluded_downtimes'] as &$excluded_downtime) {
-			$excluded_downtime = CSlaHelper::getExcludedDowntimeTag($excluded_downtime, $data['sla']['timezone']);
+		$excluded_downtime_tags = [];
+		foreach ($sli['excluded_downtimes'] as $excluded_downtime) {
+			$excluded_downtime_tags[] = CSlaHelper::getExcludedDowntimeTag($excluded_downtime);
 		}
-		unset($excluded_downtime);
 
 		$slareport_list->addRow([
 			CSlaHelper::getPeriodTag(
@@ -196,7 +197,7 @@ else {
 			CSlaHelper::getUptimeTag($sli['uptime']),
 			CSlaHelper::getDowntimeTag($sli['downtime']),
 			CSlaHelper::getErrorBudgetTag($sli['error_budget']),
-			$sli['excluded_downtimes']
+			$excluded_downtime_tags
 		]);
 	}
 

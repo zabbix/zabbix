@@ -28,21 +28,9 @@ final class CSlaHelper {
 	public const SCHEDULE_MODE_24X7		= 0;
 	public const SCHEDULE_MODE_CUSTOM 	= 1;
 
-	public static function scheduleModeToStr(int $schedule_mode): ?string {
-		static $schedule_modes;
-
-		if ($schedule_modes === null) {
-			$schedule_modes = [
-				self::SCHEDULE_MODE_24X7 => _('24x7'),
-				self::SCHEDULE_MODE_CUSTOM => _('Custom')
-			];
-		}
-
-		return array_key_exists($schedule_mode, $schedule_modes)
-			? $schedule_modes[$schedule_mode]
-			: null;
-	}
-
+	/**
+	 * @return array
+	 */
 	public static function getPeriodNames(): array {
 		static $periods;
 
