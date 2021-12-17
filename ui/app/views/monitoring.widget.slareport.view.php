@@ -81,27 +81,29 @@ else {
 		_('Excluded downtimes')
 	]);
 
-	$service_index = 0;
+	if ($data['sli']['serviceids']) {
+		$service_index = 0;
 
-	foreach (array_reverse($data['sli']['periods'], true) as $period_index => $period) {
-		$sli = $data['sli']['sli'][$period_index][$service_index];
+		foreach (array_reverse($data['sli']['periods'], true) as $period_index => $period) {
+			$sli = $data['sli']['sli'][$period_index][$service_index];
 
-		$excluded_downtime_tags = [];
-		foreach ($sli['excluded_downtimes'] as $excluded_downtime) {
-			$excluded_downtime_tags[] = CSlaHelper::getExcludedDowntimeTag($excluded_downtime);
+			$excluded_downtime_tags = [];
+			foreach ($sli['excluded_downtimes'] as $excluded_downtime) {
+				$excluded_downtime_tags[] = CSlaHelper::getExcludedDowntimeTag($excluded_downtime);
+			}
+
+			$report->addRow([
+				CSlaHelper::getPeriodTag((int) $data['sla']['period'], $period['period_from'], $period['period_to'],
+					$data['sla']['timezone']
+				),
+				CSlaHelper::getSloTag((float) $data['sla']['slo']),
+				CSlaHelper::getSliTag($sli['sli'], (float) $data['sla']['slo']),
+				CSlaHelper::getUptimeTag($sli['uptime']),
+				CSlaHelper::getDowntimeTag($sli['downtime']),
+				CSlaHelper::getErrorBudgetTag($sli['error_budget']),
+				$excluded_downtime_tags
+			]);
 		}
-
-		$report->addRow([
-			CSlaHelper::getPeriodTag((int) $data['sla']['period'], $period['period_from'], $period['period_to'],
-				$data['sla']['timezone']
-			),
-			CSlaHelper::getSloTag((float) $data['sla']['slo']),
-			CSlaHelper::getSliTag($sli['sli'], (float) $data['sla']['slo']),
-			CSlaHelper::getUptimeTag($sli['uptime']),
-			CSlaHelper::getDowntimeTag($sli['downtime']),
-			CSlaHelper::getErrorBudgetTag($sli['error_budget']),
-			$excluded_downtime_tags
-		]);
 	}
 }
 
