@@ -104,7 +104,7 @@ window.sla_edit_popup = {
 				</td>
 				<td>#{duration}</td>
 				<td>#{name}</td>
-				<td>
+				<td class="nowrap">
 					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
 						<li>
 							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-edit"><?= _('Edit') ?></button>

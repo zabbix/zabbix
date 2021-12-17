@@ -178,7 +178,12 @@ $sla_tab = (new CFormGrid())
 $excluded_downtimes = (new CTable())
 	->setId('excluded-downtimes')
 	->setHeader(
-		(new CRowHeader([_('Start time'), _('Duration'), _('Name'), _('Action')]))->addClass(ZBX_STYLE_GREY)
+		(new CRowHeader([
+			(new CCol(_('Start time')))->addClass(ZBX_STYLE_NOWRAP),
+			(new CCol(_('Duration')))->addClass(ZBX_STYLE_NOWRAP),
+			_('Name'),
+			_('Action')
+		]))->addClass(ZBX_STYLE_GREY)
 	);
 
 $excluded_downtimes->addItem(
@@ -195,11 +200,11 @@ $excluded_downtimes->addItem(
 $excluded_downtimes_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Excluded downtimes')),
-		new CFormField([
+		(new CFormField([
 			(new CDiv($excluded_downtimes))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-		])
+		]))->addClass(ZBX_STYLE_WORDBREAK)
 	]);
 
 $tabs = (new CTabView())
