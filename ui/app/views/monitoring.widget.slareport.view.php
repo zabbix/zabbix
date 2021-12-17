@@ -43,11 +43,17 @@ elseif (!$data['has_serviceid']) {
 
 	$report->setHeader($header);
 
-	foreach ($data['sli']['serviceids'] as $service_index => $serviceid) {
+	$service_index = array_flip($data['sli']['serviceids']);
+
+	foreach ($data['services'] as $serviceid => $service) {
+		if (!array_key_exists($serviceid, $service_index)) {
+			continue;
+		}
+
 		$row = [
 			(new CCol($data['has_access'][CRoleHelper::ACTIONS_MANAGE_SLA]
 				? new CLink(
-					$data['services'][$serviceid]['name'],
+					$service['name'],
 					(new CUrl('zabbix.php'))
 						->setArgument('action', 'slareport.list')
 						->setArgument('filter_slaid', $data['sla']['slaid'])
@@ -55,14 +61,14 @@ elseif (!$data['has_serviceid']) {
 						->setArgument('filter_set', 1)
 						->getUrl()
 				)
-				: $data['services'][$serviceid]['name']
+				: $service['name']
 			))->addClass(ZBX_STYLE_WORDBREAK),
 			CSlaHelper::getSloTag((float) $data['sla']['slo'])
 		];
 
 		foreach (array_keys($data['sli']['periods']) as $period_index) {
 			$row[] = CSlaHelper::getSliTag(
-				$data['sli']['sli'][$period_index][$service_index]['sli'],
+				$data['sli']['sli'][$period_index][$service_index[$serviceid]]['sli'],
 				(float) $data['sla']['slo']
 			);
 		}
