@@ -1933,7 +1933,6 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 
 	item->name = zbx_strdup(NULL, item_prototype->name);
 	item->name_proto = NULL;
-
 	substitute_lld_macros(&item->name, jp_row, lld_macro_paths, ZBX_TOKEN_LLD_MACRO | ZBX_TOKEN_LLD_FUNC_MACRO,
 			NULL, 0);
 	zbx_lrtrim(item->name, ZBX_WHITESPACE);
