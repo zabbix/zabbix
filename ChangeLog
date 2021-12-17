@@ -1,8 +1,13 @@
 Changes for 6.0.0beta2
 
 New features:
+...G...PS. [ZBXNEXT-4922] added support for pcre2 (yurii)
 
 Bug fixes:
+A.F....... [ZBX-20350] changed hash algo for encrypted cookies (rlataria)
+...G...... [ZBX-20164] fixed agent2 crash caused by wmi metrics (asestakovs)
+........S. [ZBX-20249] fixed escalator query failure on Oracle (ssimonenko)
+........S. [ZBX-19351] fixed event correlation query failure on Oracle (ssimonenko)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.0beta1
