@@ -26,10 +26,6 @@
 
 <script>
 	const view = {
-		enable_url: null,
-		disable_url: null,
-		delete_url: null,
-
 		init() {
 			jQuery('#filter_serviceid')
 				.multiSelect('getSelectButton')
@@ -53,6 +49,6 @@
 
 				jQuery('#filter_serviceid').multiSelect('addData', data);
 			});
-		},
+		}
 	};
 </script>

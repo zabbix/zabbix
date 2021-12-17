@@ -99,15 +99,8 @@ if ($data['sla'] === null || $data['has_errors']) {
 	}
 
 	$form->addItem($report);
-
-	$widget
-		->addItem($form)
-		->show();
-
-	return;
 }
-
-if ($data['service'] === null) {
+elseif ($data['service'] === null) {
 	$header = [
 		make_sorting_header(_('Service'), 'name', $data['sort'], $data['sortorder'],
 			(new CUrl('zabbix.php'))
