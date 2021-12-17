@@ -2784,6 +2784,12 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_RANGE_TIME],
 				'',
 				'/1/time',
+				''
+			],
+			[
+				['type' => API_RANGE_TIME, 'flags' => API_NOT_EMPTY],
+				'',
+				'/1/time',
 				'Invalid parameter "/1/time": cannot be empty.'
 			],
 			[
