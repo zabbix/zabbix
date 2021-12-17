@@ -21,8 +21,7 @@
 #include "sysinfo.h"
 #include "log.h"
 #include "inodes.h"
-
-extern int	CONFIG_TIMEOUT;
+#include "zbxconf.h"
 
 #define get_string(field)	#field
 

@@ -43,6 +43,7 @@ extern char	**CONFIG_PERF_COUNTERS;
 extern char	**CONFIG_PERF_COUNTERS_EN;
 #endif
 extern char	*CONFIG_USER;
+extern int	CONFIG_TIMEOUT;
 
 extern unsigned int	configured_tls_connect_mode;
 extern unsigned int	configured_tls_accept_modes;

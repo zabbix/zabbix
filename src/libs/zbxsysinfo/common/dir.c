@@ -27,8 +27,6 @@
 #	include "disk.h"
 #endif
 
-extern int	CONFIG_TIMEOUT;
-
 /******************************************************************************
  *                                                                            *
  * Function: filename_matches                                                 *
