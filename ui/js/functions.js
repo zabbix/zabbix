@@ -107,7 +107,7 @@ function removeObjectById(id) {
  * Converts all HTML symbols into HTML entities.
  */
 jQuery.escapeHtml = function(html) {
-	return jQuery('<div />').text(html).html();
+	return jQuery('<div>').text(html).html();
 }
 
 function validateNumericBox(obj, allowempty, allownegative) {
