@@ -77,7 +77,7 @@ class CControllerPopupSlaExcludedDowntimeEdit extends CController {
 				'start_time' => $datetime_from->format(DATE_TIME_FORMAT),
 				'duration_days' => $interval->days,
 				'duration_hours' => $interval->h,
-				'duration_minutes' => $interval->m
+				'duration_minutes' => $interval->i
 			];
 		}
 		else {
