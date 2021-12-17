@@ -103,7 +103,7 @@ int	rtc_parse_options(const char *opt, zbx_uint32_t *code, char **data, char **e
 	{
 		*code = ZBX_RTC_LOG_LEVEL_DECREASE;
 
-		return rtc_parse_log_level_parameter(opt, ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_INCREASE), data, error);
+		return rtc_parse_log_level_parameter(opt, ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_DECREASE), data, error);
 	}
 
 	if (0 == strcmp(opt, ZBX_CONFIG_CACHE_RELOAD))
