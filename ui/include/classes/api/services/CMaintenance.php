@@ -256,8 +256,6 @@ class CMaintenance extends CApiService {
 	}
 
 	/**
-	 * Add maintenances.
-	 *
 	 * @param array $maintenances
 	 *
 	 * @return array
@@ -287,8 +285,6 @@ class CMaintenance extends CApiService {
 	}
 
 	/**
-	 * Validates the input parameters for the create() method.
-	 *
 	 * @param array $maintenances
 	 *
 	 * @throws APIException if no permissions to object, it does no exists or the input is invalid.
@@ -396,8 +392,6 @@ class CMaintenance extends CApiService {
 	}
 
 	/**
-	 * Update maintenances.
-	 *
 	 * @param array $maintenances
 	 *
 	 * @return array
@@ -439,12 +433,10 @@ class CMaintenance extends CApiService {
 	}
 
 	/**
-	 * Validates the input parameters for the update() method.
-	 *
 	 * @param array      $maintenances
 	 * @param array|null $db_maintenances
 	 *
-	 * @throws APIException if no permissions to object, it does no exists or the input is invalid.
+	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateUpdate(array &$maintenances, array &$db_maintenances = null): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['maintenanceid']], 'fields' => [
@@ -591,8 +583,6 @@ class CMaintenance extends CApiService {
 	}
 
 	/**
-	 * Delete Maintenances.
-	 *
 	 * @param array $maintenanceids
 	 *
 	 * @return array
@@ -636,12 +626,10 @@ class CMaintenance extends CApiService {
 	}
 
 	/**
-	 * Validates the input parameters for the delete() method.
-	 *
 	 * @param array      $maintenanceids
 	 * @param array|null $db_maintenances
 	 *
-	 * @throws APIException if no permissions to object, it does no exists or the input is invalid.
+	 * @throws APIException if the input is invalid.
 	 */
 	private function validateDelete(array $maintenanceids, array &$db_maintenances = null): void {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
@@ -1120,8 +1108,7 @@ class CMaintenance extends CApiService {
 	}
 
 	/**
-	 * Add the existing groups, hosts, tags and timeperiods to $db_maintenances whether these are affected by the
-	 * update.
+	 * Add the existing tags, groups, hosts and timeperiods.
 	 *
 	 * @param array $maintenances
 	 * @param array $db_maintenances
@@ -1216,7 +1203,7 @@ class CMaintenance extends CApiService {
 		}
 	}
 
-	protected function addRelatedObjects(array $options, array $result) {
+	protected function addRelatedObjects(array $options, array $result): array {
 		$result = parent::addRelatedObjects($options, $result);
 
 		// selectGroups
