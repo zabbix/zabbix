@@ -60,6 +60,7 @@ $filter = (new CFilter())
 						'name' => 'filter_serviceid',
 						'object_name' => 'service',
 						'data' => $data['ms_service'],
+						'multiple' => false,
 						'custom_select' => true
 					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 				)
