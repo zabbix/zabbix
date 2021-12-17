@@ -242,10 +242,10 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 					$items_created[] = $item;
 				}
 			}
-			foreach (CMacrosResolverHelper::resolveItemNames($items_created) as $item) {
+			foreach ($items_created as $item) {
 				$items_collected[$item['itemid']] = $is_template_dashboard
-					? $item['name_expanded']
-					: $item_prototype['hosts'][0]['name'].NAME_DELIMITER.$item['name_expanded'];
+					? $item['name']
+					: $item_prototype['hosts'][0]['name'].NAME_DELIMITER.$item['name'];
 			}
 			natsort($items_collected);
 		}

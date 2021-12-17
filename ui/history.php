@@ -87,7 +87,6 @@ if ($itemids) {
 		}
 	}
 
-	$items = CMacrosResolverHelper::resolveItemNames($items);
 	$item = reset($items);
 	$value_type = $item['value_type'];
 }

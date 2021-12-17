@@ -1398,14 +1398,11 @@ class CControllerPopupTriggerExpr extends CController {
 		}
 
 		if ($item) {
-			$items = CMacrosResolverHelper::resolveItemNames([$item]);
-			$item = $items[0];
-
 			$itemid = $item['itemid'];
 			$item_value_type = $item['value_type'];
 			$item_key = $item['key_'];
 			$item_host_data = reset($item['hosts']);
-			$description = $item_host_data['name'].NAME_DELIMITER.$item['name_expanded'];
+			$description = $item_host_data['name'].NAME_DELIMITER.$item['name'];
 		}
 		else {
 			$item_key = '';

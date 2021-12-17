@@ -586,11 +586,6 @@ class CScreenProblem extends CScreenBase {
 			// Sort items.
 			if ($filter['show_opdata'] != OPERATIONAL_DATA_SHOW_NONE) {
 				$data['triggers'] = CMacrosResolverHelper::sortItemsByExpressionOrder($data['triggers']);
-
-				foreach ($data['triggers'] as &$trigger) {
-					$trigger['items'] = CMacrosResolverHelper::resolveItemNames($trigger['items']);
-				}
-				unset($trigger);
 			}
 		}
 
@@ -1292,7 +1287,7 @@ class CScreenProblem extends CScreenBase {
 
 			if ($html) {
 				$hint_table->addRow([
-					new CCol($item['name_expanded']),
+					new CCol($item['name']),
 					new CCol(
 						($last_value['clock'] !== null)
 							? zbx_date2str(DATE_TIME_FORMAT_SECONDS, $last_value['clock'])

@@ -88,9 +88,6 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 				$error = _('No permissions to referred object or it does not exist!');
 			}
 			else {
-				// macros
-				$items = CMacrosResolverHelper::resolveItemNames($items);
-
 				$histories = Manager::History()->getLastValues($items, $fields['show_lines']);
 
 				if ($histories) {
@@ -126,8 +123,8 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 				if ($items_count == 1) {
 					$item = reset($items);
 					$dynamic_widget_name = $is_template_dashboard
-						? $item['name_expanded']
-						: $host_name.NAME_DELIMITER.$item['name_expanded'];
+						? $item['name']
+						: $host_name.NAME_DELIMITER.$item['name'];
 				}
 				elseif ($same_host && $items_count > 1) {
 					$dynamic_widget_name = $is_template_dashboard

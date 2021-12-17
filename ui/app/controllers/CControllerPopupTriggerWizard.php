@@ -272,8 +272,7 @@ class CControllerPopupTriggerWizard extends CController {
 				]);
 
 				if ($items) {
-					$items = CMacrosResolverHelper::resolveItemNames($items);
-					$page_options['item_name'] = $items[0]['hosts'][0]['name'].NAME_DELIMITER.$items[0]['name_expanded'];
+					$page_options['item_name'] = $items[0]['hosts'][0]['name'].NAME_DELIMITER.$items[0]['name'];
 				}
 			}
 

@@ -49,10 +49,6 @@ class CSvgGraphHelper {
 		// Find which metrics will be shown in graph and calculate time periods and display options.
 		self::getMetrics($metrics, $options['data_sets']);
 		// Apply overrides for previously selected $metrics.
-
-		$metrics = CMacrosResolverHelper::resolveItemNames($metrics);
-		$metrics = CArrayHelper::renameObjectsKeys($metrics, ['name_expanded' => 'name']);
-
 		self::applyOverrides($metrics, $options['overrides']);
 		// Apply time periods for each $metric, based on graph/dashboard time as well as metric level timeshifts.
 		self::getTimePeriods($metrics, $options['time_period']);

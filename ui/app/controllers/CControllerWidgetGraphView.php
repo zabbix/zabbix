@@ -252,11 +252,9 @@ class CControllerWidgetGraphView extends CControllerWidget {
 					->setArgument('from', '')
 					->setArgument('to', '');
 
-				$item = CMacrosResolverHelper::resolveItemNames([$item])[0];
-
 				$header_name = $is_template_dashboard
-					? $item['name_expanded']
-					: $item['hosts'][0]['name'].NAME_DELIMITER.$item['name_expanded'];
+					? $item['name']
+					: $item['hosts'][0]['name'].NAME_DELIMITER.$item['name'];
 			}
 			elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
 				$graph_src = '';

@@ -637,8 +637,33 @@ elseif (isset($_REQUEST['form'])) {
 			$item['flags'] = $items[$item['itemid']]['flags'];
 		}
 		unset($item);
+	}
 
-		$data['items'] = CMacrosResolverHelper::resolveItemNames($data['items']);
+	// Set ymin_item_name.
+	$data['ymin_item_name'] = '';
+	$data['ymax_item_name'] = '';
+
+	if ($data['ymin_itemid'] || $data['ymax_itemid']) {
+		$minmax_items = API::Item()->get([
+			'output' => ['itemid', 'name'],
+			'selectHosts' => ['name'],
+			'itemids' => array_filter([$data['ymin_itemid'], $data['ymax_itemid']]),
+			'filter' => [
+				'flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED]
+			],
+			'webitems' => true,
+			'preservekeys' => true
+		]);
+
+		if ($data['ymin_itemid'] && array_key_exists($data['ymin_itemid'], $minmax_items)) {
+			$ymin_item = $minmax_items[$data['ymin_itemid']];
+			$data['ymin_item_name'] = $ymin_item['hosts'][0]['name'].NAME_DELIMITER.$ymin_item['name'];
+		}
+
+		if ($data['ymax_itemid'] && array_key_exists($data['ymax_itemid'], $minmax_items)) {
+			$ymax_item = $minmax_items[$data['ymax_itemid']];
+			$data['ymax_item_name'] = $ymax_item['hosts'][0]['name'].NAME_DELIMITER.$ymax_item['name'];
+		}
 	}
 
 	$data['items'] = array_values($data['items']);

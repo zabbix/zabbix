@@ -66,12 +66,10 @@ class CControllerWidgetFavGraphsView extends CControllerWidget {
 				'webitems' => true
 			]);
 
-			$db_items = CMacrosResolverHelper::resolveItemNames($db_items);
-
 			foreach ($db_items as $db_item) {
 				$graphs[] = [
 					'itemid' => $db_item['itemid'],
-					'label' => $db_item['hosts'][0]['name'].NAME_DELIMITER.$db_item['name_expanded'],
+					'label' => $db_item['hosts'][0]['name'].NAME_DELIMITER.$db_item['name'],
 					'simple' => true
 				];
 			}

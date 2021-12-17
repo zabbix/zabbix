@@ -73,8 +73,6 @@ class CControllerQueueDetails extends CController {
 				]);
 			}
 
-			$items = CMacrosResolverHelper::resolveItemNames($items);
-
 			$hosts = API::Host()->get([
 				'output' => ['proxy_hostid'],
 				'hostids' => array_column($items, 'hostid', 'hostid'),

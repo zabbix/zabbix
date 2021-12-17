@@ -245,12 +245,10 @@ class CControllerDashboardWidgetEdit extends CController {
 				'preservekeys' => true
 			]);
 
-			$items = CMacrosResolverHelper::resolveItemNames($items);
-
 			foreach ($items as $itemid => $item) {
 				foreach ($itemids[$itemid] as $field_name) {
 					$captions['ms']['items'][$field_name][$itemid] += [
-						'name' => $item['name_expanded'],
+						'name' => $item['name'],
 						'prefix' => $item['hosts'][0]['name'].NAME_DELIMITER
 					];
 				}
@@ -283,12 +281,10 @@ class CControllerDashboardWidgetEdit extends CController {
 				'preservekeys' => true
 			]);
 
-			$item_prototypes = CMacrosResolverHelper::resolveItemNames($item_prototypes);
-
 			foreach ($item_prototypes as $itemid => $item) {
 				foreach ($prototype_itemids[$itemid] as $field_name) {
 					$captions['ms']['item_prototypes'][$field_name][$itemid] += [
-						'name' => $item['name_expanded'],
+						'name' => $item['name'],
 						'prefix' => $item['hosts'][0]['name'].NAME_DELIMITER
 					];
 				}

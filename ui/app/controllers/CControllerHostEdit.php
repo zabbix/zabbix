@@ -419,7 +419,6 @@ class CControllerHostEdit extends CController {
 			: [];
 
 		$inventory_items = zbx_toHash($inventory_items, 'inventory_link');
-		$inventory_items = CMacrosResolverHelper::resolveItemNames($inventory_items);
 	}
 
 	/**

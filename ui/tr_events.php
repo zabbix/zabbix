@@ -138,7 +138,6 @@ else {
 		'selectValueMap' => ['mappings'],
 		'triggerids' => $event['objectid']
 	]);
-	$db_items = CMacrosResolverHelper::resolveItemNames($db_items);
 	$event['opdata'] = (new CCol(CScreenProblem::getLatestValues($db_items)))->addClass('latest-values');
 }
 
