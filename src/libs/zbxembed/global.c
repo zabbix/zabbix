@@ -167,32 +167,6 @@ static duk_ret_t	es_sha256(duk_context *ctx)
 
 /******************************************************************************
  *                                                                            *
- * Function: es_msleep                                                        *
- *                                                                            *
- * Purpose: sleep for given duration in milliseconds                          *
- *                                                                            *
- * Parameters: ctx - [IN] pointer to duk_context                              *
- *                                                                            *
- * Comments: Throws an error:                                                 *
- *               - if the top value at ctx value stack is not a uint          *
- *               - if the value stack is empty                                *
- *                                                                            *
- ******************************************************************************/
-static duk_ret_t	es_msleep(duk_context *ctx)
-{
-	struct timespec	ts;
-	unsigned int	msec;
-
-	msec = duk_require_uint(ctx, 0);
-	ts.tv_sec = msec / 1000;
-	ts.tv_nsec = msec % 1000 * 1000000;
-	nanosleep(&ts, NULL);
-
-	return 1;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: es_init_global_functions                                         *
  *                                                                            *
  * Purpose: initializes additional global functions                           *
@@ -213,7 +187,4 @@ void	es_init_global_functions(zbx_es_t *es)
 
 	duk_push_c_function(es->env->ctx, es_sha256, 1);
 	duk_put_global_string(es->env->ctx, "sha256");
-
-	duk_push_c_function(es->env->ctx, es_msleep, 1);
-	duk_put_global_string(es->env->ctx, "msleep");
 }

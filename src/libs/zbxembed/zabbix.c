@@ -110,8 +110,35 @@ out:
 	return 0;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: es_zabbix_sleep                                                  *
+ *                                                                            *
+ * Purpose: sleep for given duration in milliseconds                          *
+ *                                                                            *
+ * Parameters: ctx - [IN] pointer to duk_context                              *
+ *                                                                            *
+ * Comments: Throws an error:                                                 *
+ *               - if the top value at ctx value stack is not a uint          *
+ *               - if the value stack is empty                                *
+ *                                                                            *
+ ******************************************************************************/
+static duk_ret_t	es_zabbix_sleep(duk_context *ctx)
+{
+	struct timespec	ts;
+	unsigned int	msec;
+
+	msec = duk_require_uint(ctx, 0);
+	ts.tv_sec = msec / 1000;
+	ts.tv_nsec = msec % 1000 * 1000000;
+	nanosleep(&ts, NULL);
+
+	return 0;
+}
+
 static const duk_function_list_entry	zabbix_methods[] = {
 	{"Log",			es_zabbix_log,		2},
+	{"Sleep",		es_zabbix_sleep,	1},
 	{NULL, NULL, 0}
 };
 
