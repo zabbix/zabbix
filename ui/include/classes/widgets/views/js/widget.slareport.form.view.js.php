@@ -26,18 +26,11 @@
 
 window.widget_slareport = {
 
-	show_periods_form_row: null,
 	$service: null,
 
 	init({serviceid_field_id}) {
-		this.show_periods_form_row = document.getElementById('js-show_periods');
-
 		this.$service = jQuery(`#${serviceid_field_id}`);
-		this.$service
-			.on('change', this.events.updateService)
-			.multiSelect('getSelectButton').addEventListener('click', this.events.selectService);
-
-		this.events.updateService();
+		this.$service.multiSelect('getSelectButton').addEventListener('click', this.events.selectService);
 	},
 
 	events: {
@@ -63,11 +56,6 @@ window.widget_slareport = {
 
 				widget_slareport.$service.multiSelect('addData', data);
 			});
-		},
-
-		updateService: () => {
-			widget_slareport.show_periods_form_row.style.display =
-				widget_slareport.$service.multiSelect('getData').length > 0 ? '' : 'none';
 		}
 	}
 };

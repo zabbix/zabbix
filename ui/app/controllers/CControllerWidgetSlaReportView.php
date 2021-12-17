@@ -37,35 +37,53 @@ class CControllerWidgetSlaReportView extends CControllerWidget {
 	protected function doAction(): void {
 		$fields = $this->getForm()->getFieldsData();
 
-		$db_services = API::Service()->get([
-			'output' => ['name'],
-			'serviceids' => $fields['serviceid'] ?: null,
-			'limit' => CWebUser::$data['rows_per_page'],
-			'preservekeys' => true
-		]);
-
-		$db_sla = API::Sla()->get([
-			'output' => ['name', 'period', 'slo', 'timezone'],
-			'slaids' => $fields['slaid']
-		]);
-
-		$db_sli = API::Sla()->getSli([
-			'slaid' => $fields['slaid'][0],
-			'serviceids' => array_keys($db_services),
-			'periods' => $fields['serviceid'] && $fields['show_periods'] !== '' ? $fields['show_periods'] : null,
-			'period_from' => $fields['date_from'] !== '' ? $fields['date_from'] : null,
-			'period_to' => $fields['date_to'] !== '' ? $fields['date_to'] : null
-		]);
-
-		$this->setResponse(new CControllerResponseData([
+		$data = [
 			'name' => $this->getInput('name', $this->getDefaultName()),
-			'services' => array_intersect_key($db_services, array_flip($db_sli['serviceids'])),
-			'sla' => $db_sla[0],
-			'sli' => $db_sli['sli'],
-			'periods' => $db_sli['periods'],
+			'has_access' => [
+				CRoleHelper::ACTIONS_MANAGE_SLA => $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SLA)
+			],
+			'has_serviceid' => (bool) $fields['serviceid'],
+			'has_permissions_error' => false,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
-		]));
+		];
+
+		$db_slas = API::Sla()->get([
+			'output' => ['slaid', 'name', 'period', 'slo', 'timezone'],
+			'slaids' => $fields['slaid']
+		]);
+
+		if ($db_slas) {
+			$data['sla'] = $db_slas[0];
+
+			$data['services'] = API::Service()->get([
+				'output' => ['name'],
+				'serviceids' => $fields['serviceid'] ?: null,
+				'slaids' => $data['sla']['slaid'],
+				'sortfield' => 'name',
+				'sortorder' => ZBX_SORT_UP,
+				'limit' => CWebUser::$data['rows_per_page'],
+				'preservekeys' => true
+			]);
+
+			if ($fields['serviceid'] && !$data['services']) {
+				$data['has_permissions_error'] = true;
+			}
+			else {
+				$data['sli'] = API::Sla()->getSli([
+					'slaid' => $data['sla']['slaid'],
+					'serviceids' => array_keys($data['services']),
+					'periods' => $fields['show_periods'] !== '' ? $fields['show_periods'] : null,
+					'period_from' => $fields['date_from'] !== '' ? $fields['date_from'] : null,
+					'period_to' => $fields['date_to'] !== '' ? $fields['date_to'] : null
+				]);
+			}
+		}
+		else {
+			$data['has_permissions_error'] = true;
+		}
+
+		$this->setResponse(new CControllerResponseData($data));
 	}
 }

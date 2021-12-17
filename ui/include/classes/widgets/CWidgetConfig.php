@@ -260,7 +260,6 @@ class CWidgetConfig {
 			case WIDGET_PROBLEM_HOSTS:
 			case WIDGET_PROBLEMS:
 			case WIDGET_PROBLEMS_BY_SV:
-			case WIDGET_SLA_REPORT:
 			case WIDGET_SVG_GRAPH:
 			case WIDGET_TRIG_OVER:
 			case WIDGET_WEB:
@@ -275,6 +274,7 @@ class CWidgetConfig {
 			case WIDGET_SYSTEM_INFO:
 				return 15 * SEC_PER_MIN;
 
+			case WIDGET_SLA_REPORT:
 			case WIDGET_URL:
 				return 0;
 		}

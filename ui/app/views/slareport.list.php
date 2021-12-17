@@ -92,7 +92,7 @@ $widget = (new CWidget())
 	->setTitle(_('SLA report'))
 	->addItem($filter);
 
-$slareport_list = new CTableInfo();
+$report = new CTableInfo();
 
 $form = (new CForm())
 	->setId('slareport-list')
@@ -100,10 +100,10 @@ $form = (new CForm())
 
 if ($data['sla'] === null || $data['has_errors']) {
 	if ($data['sla'] === null) {
-		$slareport_list->setNoDataMessage(_('Select SLA to display SLA report.'));
+		$report->setNoDataMessage(_('Select SLA to display SLA report.'));
 	}
 
-	$form->addItem($slareport_list);
+	$form->addItem($report);
 
 	$widget
 		->addItem($form)
@@ -118,20 +118,17 @@ if ($data['service'] === null) {
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'slareport.list')
 				->getUrl()
-		)->addStyle('width: 14%;'),
-		(new CColHeader(_('SLO')))->setWidth('7%;')
+		)->addStyle('width: 15%;'),
+		_('SLO')
 	];
 
 	foreach ($data['sli']['periods'] as $period) {
-		$header[] = CSlaHelper::getPeriodTag(
-			(int) $data['sla']['period'],
-			$period['period_from'],
-			$period['period_to'],
+		$header[] = CSlaHelper::getPeriodTag((int) $data['sla']['period'], $period['period_from'], $period['period_to'],
 			$data['sla']['timezone']
-		)->addClass('vertical');
+		)->addClass($data['sla']['period'] != ZBX_SLA_PERIOD_ANNUALLY ? 'vertical' : null);
 	}
 
-	$slareport_list->setHeader($header);
+	$report->setHeader($header);
 
 	foreach ($data['sli']['serviceids'] as $service_index => $serviceid) {
 		$row = [
@@ -157,15 +154,15 @@ if ($data['service'] === null) {
 			);
 		}
 
-		$slareport_list->addRow($row);
+		$report->addRow($row);
 	}
 
 	$form
-		->addItem($slareport_list)
+		->addItem($report)
 		->addItem($data['paging']);
 }
 else {
-	$slareport_list->setHeader([
+	$report->setHeader([
 		CSlaHelper::getPeriodNames()[$data['sla']['period']],
 		_('SLO'),
 		_('SLI'),
@@ -177,7 +174,7 @@ else {
 
 	$service_index = 0;
 
-	foreach ($data['sli']['periods'] as $period_index => $period) {
+	foreach (array_reverse($data['sli']['periods'], true) as $period_index => $period) {
 		$sli = $data['sli']['sli'][$period_index][$service_index];
 
 		$excluded_downtime_tags = [];
@@ -185,11 +182,8 @@ else {
 			$excluded_downtime_tags[] = CSlaHelper::getExcludedDowntimeTag($excluded_downtime);
 		}
 
-		$slareport_list->addRow([
-			CSlaHelper::getPeriodTag(
-				(int) $data['sla']['period'],
-				$period['period_from'],
-				$period['period_to'],
+		$report->addRow([
+			CSlaHelper::getPeriodTag((int) $data['sla']['period'], $period['period_from'], $period['period_to'],
 				$data['sla']['timezone']
 			),
 			CSlaHelper::getSloTag((float) $data['sla']['slo']),
@@ -201,7 +195,7 @@ else {
 		]);
 	}
 
-	$form->addItem($slareport_list);
+	$form->addItem($report);
 }
 
 $widget

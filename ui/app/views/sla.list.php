@@ -84,11 +84,9 @@ $header = [
 		))->addClass(ZBX_STYLE_CELL_WIDTH)
 		: null,
 	make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $view_url)
-		->addStyle('width: 14%;'),
-	make_sorting_header(_('SLO'), 'slo', $data['sort'], $data['sortorder'], $view_url)
-		->addStyle('width: 7%;'),
-	make_sorting_header(_('Effective date'), 'effective_date', $data['sort'], $data['sortorder'], $view_url)
-		->addStyle('width: 14%'),
+		->addStyle('width: 15%;'),
+	make_sorting_header(_('SLO'), 'slo', $data['sort'], $data['sortorder'], $view_url),
+	make_sorting_header(_('Effective date'), 'effective_date', $data['sort'], $data['sortorder'], $view_url),
 	new CColHeader(_('Reporting period')),
 	new CColHeader(_('Timezone')),
 	new CColHeader(_('Schedule')),

@@ -54,8 +54,7 @@ $scripts[] = $field_serviceid->getPostJS();
 // Show periods.
 $form_list->addRow(
 	CWidgetHelper::getLabel($fields['show_periods']),
-	CWidgetHelper::getNumericBox($fields['show_periods']),
-	'js-show_periods'
+	CWidgetHelper::getNumericBox($fields['show_periods'])
 );
 
 // Date from.

@@ -26,19 +26,49 @@
 
 $report = (new CTableInfo())->addClass(ZBX_STYLE_LIST_TABLE_STICKY_HEADER);
 
-if (count($data['services']) > 1) {
+if ($data['has_permissions_error']) {
+	$report->setNoDataMessage(_('No permissions to referred object or it does not exist!'));
+}
+elseif (!$data['has_serviceid']) {
 	$header = [
 		_('Service'),
 		_('SLO')
 	];
 
-	foreach ($data['periods'] as $period) {
-		$header[] = CSlaHelper::getPeriodTag($data['sla']['period'], $period['period_from'], $period['period_to'],
+	foreach ($data['sli']['periods'] as $period) {
+		$header[] = CSlaHelper::getPeriodTag((int) $data['sla']['period'], $period['period_from'], $period['period_to'],
 			$data['sla']['timezone']
-		)->addClass($data['sla']['period'] !== ZBX_SLA_PERIOD_ANNUALLY ? 'date-vertical' : null);
+		)->addClass($data['sla']['period'] != ZBX_SLA_PERIOD_ANNUALLY ? 'date-vertical' : null);
 	}
 
 	$report->setHeader($header);
+
+	foreach ($data['sli']['serviceids'] as $service_index => $serviceid) {
+		$row = [
+			(new CCol($data['has_access'][CRoleHelper::ACTIONS_MANAGE_SLA]
+				? new CLink(
+					$data['services'][$serviceid]['name'],
+					(new CUrl('zabbix.php'))
+						->setArgument('action', 'slareport.list')
+						->setArgument('filter_slaid', $data['sla']['slaid'])
+						->setArgument('filter_serviceid', $serviceid)
+						->setArgument('filter_set', 1)
+						->getUrl()
+				)
+				: $data['services'][$serviceid]['name']
+			))->addClass(ZBX_STYLE_WORDBREAK),
+			CSlaHelper::getSloTag((float) $data['sla']['slo'])
+		];
+
+		foreach (array_keys($data['sli']['periods']) as $period_index) {
+			$row[] = CSlaHelper::getSliTag(
+				$data['sli']['sli'][$period_index][$service_index]['sli'],
+				(float) $data['sla']['slo']
+			);
+		}
+
+		$report->addRow($row);
+	}
 }
 else {
 	$report->setHeader([
@@ -51,23 +81,26 @@ else {
 		_('Excluded downtimes')
 	]);
 
-	foreach (array_reverse($data['periods'], true) as $index => $period) {
-		$excluded_downtimes = [];
+	$service_index = 0;
 
-		foreach ($data['sli'][$index][0]['excluded_downtimes'] as $excluded_downtime) {
-			$excluded_downtimes[] = CSlaHelper::getExcludedDowntimeTag($excluded_downtime);
+	foreach (array_reverse($data['sli']['periods'], true) as $period_index => $period) {
+		$sli = $data['sli']['sli'][$period_index][$service_index];
+
+		$excluded_downtime_tags = [];
+		foreach ($sli['excluded_downtimes'] as $excluded_downtime) {
+			$excluded_downtime_tags[] = CSlaHelper::getExcludedDowntimeTag($excluded_downtime);
 		}
 
 		$report->addRow([
-			CSlaHelper::getPeriodTag($data['sla']['period'], $period['period_from'], $period['period_to'],
+			CSlaHelper::getPeriodTag((int) $data['sla']['period'], $period['period_from'], $period['period_to'],
 				$data['sla']['timezone']
 			),
-			CSlaHelper::getSloTag($data['sla']['slo']),
-			CSlaHelper::getSliTag($data['sli'][$index][0]['sli'], $data['sla']['slo']),
-			CSlaHelper::getUptimeTag($data['sli'][$index][0]['uptime']),
-			CSlaHelper::getDowntimeTag($data['sli'][$index][0]['downtime']),
-			CSlaHelper::getErrorBudgetTag($data['sli'][$index][0]['error_budget']),
-			$excluded_downtimes
+			CSlaHelper::getSloTag((float) $data['sla']['slo']),
+			CSlaHelper::getSliTag($sli['sli'], (float) $data['sla']['slo']),
+			CSlaHelper::getUptimeTag($sli['uptime']),
+			CSlaHelper::getDowntimeTag($sli['downtime']),
+			CSlaHelper::getErrorBudgetTag($sli['error_budget']),
+			$excluded_downtime_tags
 		]);
 	}
 }

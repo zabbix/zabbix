@@ -50,10 +50,7 @@ class CWidgetFormSlaReport extends CWidgetForm
 			->setDefault(ZBX_SLA_DEFAULT_REPORTING_PERIODS)
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
 
-		if (array_key_exists('serviceids', $this->data) && $this->data['serviceids']) {
-			$field_show_periods->setFlags(CWidgetField::FLAG_DISABLED);
-		}
-		elseif (array_key_exists('show_periods', $this->data)) {
+		if (array_key_exists('show_periods', $this->data)) {
 			$field_show_periods->setValue($this->data['show_periods']);
 		}
 
