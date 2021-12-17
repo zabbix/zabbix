@@ -714,7 +714,7 @@ class CMaintenance extends CApiService {
 				'preservekeys' => true
 			]);
 			$relation_map = $this->createRelationMap($tags, 'maintenanceid', 'maintenancetagid');
-			$tags = $this->unsetExtraFields($tags, ['maintenancetagid', 'maintenanceid'], []);
+			$tags = $this->unsetExtraFields($tags, ['maintenancetagid', 'maintenanceid']);
 			$result = $relation_map->mapMany($result, $tags, 'tags');
 		}
 
@@ -726,6 +726,7 @@ class CMaintenance extends CApiService {
 				'filter' => ['timeperiodid' => $relationMap->getRelatedIds()],
 				'preservekeys' => true
 			]);
+			$timeperiods = $this->unsetExtraFields($timeperiods, ['timeperiodid']);
 			$result = $relationMap->mapMany($result, $timeperiods, 'timeperiods');
 		}
 
