@@ -990,7 +990,7 @@ ZABBIX.apps.map = (function($) {
 			 * @return {object}
 			 */
 			dragGroupPlaceholder: function() {
-				return $('<div/>').css({
+				return $('<div>').css({
 					width: $(this.domNode).width(),
 					height: $(this.domNode).height()
 				});
@@ -1710,7 +1710,7 @@ ZABBIX.apps.map = (function($) {
 			this.sysmap.data.shapes[this.id] = this.data;
 
 			// create dom
-			this.domNode = $('<div></div>', {
+			this.domNode = $('<div>', {
 					style: 'position: absolute; z-index: 1;\
 						background: url("data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7") 0 0 repeat',
 				})
@@ -2215,7 +2215,7 @@ ZABBIX.apps.map = (function($) {
 			this.sysmap.data.selements[this.id] = this.data;
 
 			// create dom
-			this.domNode = $('<div></div>', {style: 'position: absolute; z-index: 100'})
+			this.domNode = $('<div>', {style: 'position: absolute; z-index: 100'})
 				.appendTo(this.sysmap.container)
 				.addClass('cursor-pointer sysmap_element')
 				.attr('data-id', this.id)

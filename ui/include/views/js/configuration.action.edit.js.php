@@ -951,7 +951,7 @@
 	OperationViewType.prototype.setConfig = function(conf) {
 		const {options, selected} = conf;
 		if (options.length == 1) {
-			const $hidden_input = $('<input />', {type: 'hidden', name: this.$select.attr('name'), value: selected});
+			const $hidden_input = $('<input>', {type: 'hidden', name: this.$select.attr('name'), value: selected});
 			this.$select.replaceWith([options[0].name, $hidden_input]);
 		}
 		else {

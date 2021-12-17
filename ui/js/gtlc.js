@@ -376,7 +376,7 @@ jQuery(function($) {
 		}
 
 		prevent_click = true;
-		noclick_area = $('<div/>')
+		noclick_area = $('<div>')
 			.css({
 				position: 'absolute',
 				top: 0,
@@ -389,7 +389,7 @@ jQuery(function($) {
 			.insertAfter(parent);
 
 		selection = {
-			dom: $('<div class="graph-selection"/>')
+			dom: $('<div>', {class: 'graph-selection'})
 				.css({
 					position: 'absolute',
 					top: data.top,
@@ -616,7 +616,7 @@ var timeControl = {
 
 		if (img.length == 0) {
 			window.flickerfreeScreen.setElementProgressState(obj.id, true);
-			img = jQuery('<img/>', {id: id}).appendTo(('#'+obj.containerid)).on('load', function() {
+			img = jQuery('<img>', {id: id}).appendTo(('#'+obj.containerid)).on('load', function() {
 				window.flickerfreeScreen.setElementProgressState(obj.id, false);
 				img.closest('.dashbrd-grid-widget').trigger('load.image', {imageid: id});
 			});
@@ -654,7 +654,7 @@ var timeControl = {
 		url.setArgument('to', obj.timeline.to);
 
 		var container = jQuery('#' + obj.containerid),
-			clone = jQuery('<img/>', {
+			clone = jQuery('<img>', {
 				id: img.attr('id'),
 				'class': img.attr('class')
 			})
