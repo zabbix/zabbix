@@ -96,14 +96,14 @@ window.sla_edit_popup = {
 	initTemplates() {
 		this.excluded_downtime_template = new Template(`
 			<tr data-row_index="#{row_index}">
-				<td class="wordwrap" style="max-width: <?= ZBX_TEXTAREA_BIG_WIDTH ?>px;">
+				<td class="wordwrap">
 					#{start_time}
 					<input type="hidden" name="excluded_downtimes[#{row_index}][name]" value="#{name}">
 					<input type="hidden" name="excluded_downtimes[#{row_index}][period_from]" value="#{period_from}">
 					<input type="hidden" name="excluded_downtimes[#{row_index}][period_to]" value="#{period_to}">
 				</td>
 				<td>#{duration}</td>
-				<td>#{name}</td>
+				<td style="max-width: <?= ZBX_TEXTAREA_BIG_WIDTH ?>px;">#{name}</td>
 				<td class="nowrap">
 					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
 						<li>
