@@ -949,12 +949,12 @@ class CMaintenance extends CApiService {
 		}
 		unset($maintenance);
 
-		if ($ins_groups) {
-			$maintenance_groupids = DB::insertBatch('maintenances_groups', $ins_groups);
-		}
-
 		if ($del_groupids) {
 			DB::delete('maintenances_groups', ['maintenance_groupid' => $del_groupids]);
+		}
+
+		if ($ins_groups) {
+			$maintenance_groupids = DB::insertBatch('maintenances_groups', $ins_groups);
 		}
 
 		foreach ($maintenances as &$maintenance) {
@@ -1011,12 +1011,12 @@ class CMaintenance extends CApiService {
 		}
 		unset($maintenance);
 
-		if ($ins_hosts) {
-			$maintenance_hostids = DB::insertBatch('maintenances_hosts', $ins_hosts);
-		}
-
 		if ($del_hostids) {
 			DB::delete('maintenances_hosts', ['maintenance_hostid' => $del_hostids]);
+		}
+
+		if ($ins_hosts) {
+			$maintenance_hostids = DB::insertBatch('maintenances_hosts', $ins_hosts);
 		}
 
 		foreach ($maintenances as &$maintenance) {
@@ -1078,12 +1078,12 @@ class CMaintenance extends CApiService {
 		}
 		unset($maintenance);
 
-		if ($ins_maintenance_tags) {
-			$maintenancetagids = DB::insert('maintenance_tag', $ins_maintenance_tags);
-		}
-
 		if ($del_maintenancetagids) {
 			DB::delete('maintenance_tag', ['maintenancetagid' => $del_maintenancetagids]);
+		}
+
+		if ($ins_maintenance_tags) {
+			$maintenancetagids = DB::insert('maintenance_tag', $ins_maintenance_tags);
 		}
 
 		foreach ($maintenances as &$maintenance) {
@@ -1155,6 +1155,10 @@ class CMaintenance extends CApiService {
 		}
 		unset($maintenance);
 
+		if ($del_timeperiodids) {
+			DB::delete('timeperiods', ['timeperiodid' => $del_timeperiodids]);
+		}
+
 		if ($ins_timeperiods) {
 			$timeperiodids = DB::insert('timeperiods', $ins_timeperiods);
 
@@ -1164,10 +1168,6 @@ class CMaintenance extends CApiService {
 			unset($maintenance_window);
 
 			DB::insertBatch('maintenances_windows', $ins_maintenance_windows);
-		}
-
-		if ($del_timeperiodids) {
-			DB::delete('timeperiods', ['timeperiodid' => $del_timeperiodids]);
 		}
 
 		foreach ($maintenances as &$maintenance) {
