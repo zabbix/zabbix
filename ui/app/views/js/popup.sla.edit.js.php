@@ -104,6 +104,7 @@ window.sla_edit_popup = {
 				</td>
 				<td>#{duration}</td>
 				<td class="wordwrap" style="max-width: <?= ZBX_TEXTAREA_BIG_WIDTH ?>px;">#{name}</td>
+				<td>
 					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
 						<li>
 							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-edit"><?= _('Edit') ?></button>
