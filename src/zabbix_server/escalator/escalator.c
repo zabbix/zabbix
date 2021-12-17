@@ -993,10 +993,12 @@ static int	get_dynamic_hostid(const DB_EVENT *event, DC_HOST *host, char *error,
 	{
 		host->hostid = 0;
 		*host->host = '\0';
+		*host->name = '\0';
 	}
 	else if (0 == host->hostid)
 	{
 		*host->host = '\0';
+		*host->name = '\0';
 
 		zbx_strlcpy(error, "Cannot find a corresponding host", max_error_len);
 		ret = FAIL;
