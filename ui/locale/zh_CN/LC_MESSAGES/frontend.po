@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-05 19:52+0200\n"
+"POT-Creation-Date: 2021-12-13 14:03+0200\n"
 "PO-Revision-Date: 2021-02-15 09:13+0300\n"
 "Last-Translator: Yurii <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1662,7 +1662,7 @@ msgid "Cannot add correlation condition"
 msgstr "无法添加关联条件"
 
 #: include/classes/api/services/CTrigger.php:970
-#: include/classes/api/services/CTriggerPrototype.php:780
+#: include/classes/api/services/CTriggerPrototype.php:795
 msgid "Cannot add dependency from a host to a template."
 msgstr "无法添加自主机到模板的依赖"
 
@@ -1909,7 +1909,7 @@ msgid "Cannot create another database connection."
 msgstr "无法创建其他的数据库连接."
 
 #: include/classes/api/services/CTrigger.php:1004
-#: include/classes/api/services/CTriggerPrototype.php:811
+#: include/classes/api/services/CTriggerPrototype.php:826
 msgid "Cannot create circular dependencies."
 msgstr "不能创建环形的依赖关系。"
 
@@ -1917,7 +1917,7 @@ msgstr "不能创建环形的依赖关系。"
 msgid "Cannot create dependency on trigger itself."
 msgstr "不能创建触发器本身的依赖."
 
-#: include/classes/api/services/CTriggerPrototype.php:750
+#: include/classes/api/services/CTriggerPrototype.php:765
 msgid "Cannot create dependency on trigger prototype itself."
 msgstr "无法创建触发器原形的依赖。"
 
@@ -2132,7 +2132,7 @@ msgstr "无法删除模板的图表原型。"
 msgid "Cannot delete templated graph."
 msgstr "无法删除模板的图表。"
 
-#: include/classes/api/services/CHostPrototype.php:1159
+#: include/classes/api/services/CHostPrototype.php:1161
 msgid "Cannot delete templated host prototype."
 msgstr "无法删除模板的主机原型。"
 
@@ -4849,7 +4849,7 @@ msgstr "删除 web 场景？"
 msgid "Deleted: Host \"%1$s\"."
 msgstr "已删除: 主机 \"%1$s\"."
 
-#: include/classes/api/services/CHostPrototype.php:1027
+#: include/classes/api/services/CHostPrototype.php:1029
 #, c-format
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "已删除：主机原型 \"%1$s\" 于 \"%2$s\"。"
@@ -5439,7 +5439,7 @@ msgstr "复制聚合图形的\"name\"值\"%1$s\""
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "重复依赖关系在触发器 \"%1$s\" 中."
 
-#: include/classes/api/services/CTriggerPrototype.php:981
+#: include/classes/api/services/CTriggerPrototype.php:996
 #, c-format
 msgid "Duplicate dependencies in trigger prototype \"%1$s\"."
 msgstr "触发器的原形依赖复制\"%1$s\"。"
@@ -5665,7 +5665,7 @@ msgstr ""
 #: include/classes/api/services/CHost.php:855
 #: include/classes/api/services/CHost.php:1427
 #: include/classes/api/services/CHost.php:1963
-#: include/classes/api/services/CHostPrototype.php:955
+#: include/classes/api/services/CHostPrototype.php:957
 #: include/classes/api/services/CImage.php:423
 #: include/classes/api/services/CImage.php:475
 #: include/classes/api/services/CMaintenance.php:535
@@ -6966,7 +6966,7 @@ msgstr "应用于被自动发现主机 \"%1$s\"的主机组"
 msgid "Group name"
 msgstr "组名"
 
-#: include/classes/api/services/CHostPrototype.php:1117
+#: include/classes/api/services/CHostPrototype.php:1119
 #, c-format
 msgid "Group prototype cannot be based on a discovered host group \"%1$s\"."
 msgstr "组模板不可以基于一个已经被自动发现的主机组\"%1$s\""
@@ -7492,12 +7492,12 @@ msgstr "主机网络"
 msgid "Host prototype"
 msgstr "原型主机"
 
-#: include/classes/api/services/CHostPrototype.php:835
+#: include/classes/api/services/CHostPrototype.php:837
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "主机模板 \"%1$s\"已存在于\"%2$s\", 它继承自其它模板"
 
-#: include/classes/api/services/CHostPrototype.php:823
+#: include/classes/api/services/CHostPrototype.php:825
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "主机模板\"%1$s\"已存在于\"%2$s\""
@@ -9778,7 +9778,7 @@ msgstr "意大利语 (it_IT)"
 msgid "Item"
 msgstr "监控项"
 
-#: include/classes/api/services/CHostPrototype.php:1061
+#: include/classes/api/services/CHostPrototype.php:1063
 #: include/classes/api/services/CItem.php:62
 #, c-format
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
@@ -12139,9 +12139,9 @@ msgstr "没有系统访问权限。"
 #: include/classes/api/services/CHostPrototype.php:418
 #: include/classes/api/services/CHostPrototype.php:464
 #: include/classes/api/services/CHostPrototype.php:485
-#: include/classes/api/services/CHostPrototype.php:1086
-#: include/classes/api/services/CHostPrototype.php:1108
-#: include/classes/api/services/CHostPrototype.php:1142
+#: include/classes/api/services/CHostPrototype.php:1088
+#: include/classes/api/services/CHostPrototype.php:1110
+#: include/classes/api/services/CHostPrototype.php:1144
 #: include/classes/api/services/CHttpTest.php:446
 #: include/classes/api/services/CHttpTest.php:539
 #: include/classes/api/services/CHttpTest.php:626
@@ -12203,8 +12203,9 @@ msgstr "没有系统访问权限。"
 #: include/classes/api/services/CTrigger.php:734
 #: include/classes/api/services/CTrigger.php:827
 #: include/classes/api/services/CTriggerPrototype.php:522
-#: include/classes/api/services/CTriggerPrototype.php:700
-#: include/classes/api/services/CTriggerPrototype.php:718
+#: include/classes/api/services/CTriggerPrototype.php:708
+#: include/classes/api/services/CTriggerPrototype.php:716
+#: include/classes/api/services/CTriggerPrototype.php:731
 #: include/classes/api/services/CUserGroup.php:322
 #: include/classes/api/services/CUserGroup.php:870
 #: include/classes/api/services/CUserMacro.php:377
@@ -12348,7 +12349,7 @@ msgid "Not all results are displayed. Please provide more specific search criter
 msgstr ""
 
 #: include/classes/api/services/CTrigger.php:1049
-#: include/classes/api/services/CTriggerPrototype.php:859
+#: include/classes/api/services/CTriggerPrototype.php:874
 #, c-format
 msgid "Not all templates are linked to \"%1$s\"."
 msgstr ""
@@ -17273,7 +17274,7 @@ msgstr "触发器模板 \"%1$s\"必须至少包含一个项目模板."
 msgid "Trigger prototype added"
 msgstr "触发器模板已添加"
 
-#: include/classes/api/services/CTriggerPrototype.php:916
+#: include/classes/api/services/CTriggerPrototype.php:931
 msgid "Trigger prototype cannot be dependent on a trigger that is inherited from it."
 msgstr "原型的触发将不能够依靠从自己继承了触发。"
 

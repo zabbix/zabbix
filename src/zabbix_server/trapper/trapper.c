@@ -1367,13 +1367,6 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	/* configuration sync is performed by trappers on passive Zabbix proxy */
-	if (1 == process_num && 0 == CONFIG_CONFSYNCER_FORKS)
-	{
-		zbx_setproctitle("%s [syncing configuration]", get_process_type_string(process_type));
-		DCsync_configuration(ZBX_DBSYNC_INIT);
-	}
-
 	zbx_set_sigusr_handler(zbx_trapper_sigusr_handler);
 
 	while (ZBX_IS_RUNNING())

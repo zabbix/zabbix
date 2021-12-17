@@ -681,7 +681,7 @@ the sensor data is available.</description>
                     <type>SNMP_AGENT</type>
                     <snmp_oid>discovery[{#CERT.NAME},.1.3.6.1.4.1.3375.2.1.15.1.2.1.1]</snmp_oid>
                     <key>bigip.cert.discovery</key>
-                    <delay>1h</delay>
+                    <delay>1d</delay>
                     <description>A table containing certificate configuration.</description>
                     <item_prototypes>
                         <item_prototype>
@@ -689,8 +689,9 @@ the sensor data is available.</description>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>.1.3.6.1.4.1.3375.2.1.15.1.2.1.5.{#SNMPINDEX}</snmp_oid>
                             <key>bigip.cert.expiration.date[{#CERT.NAME}]</key>
-                            <delay>6h</delay>
+                            <delay>12h</delay>
                             <history>7d</history>
+                            <trends>0</trends>
                             <units>unixtime</units>
                             <description>MIB: F5-BIGIP-SYSTEM-MIB&#13;
 The expiration date of the certificate in unix time.</description>
@@ -699,15 +700,9 @@ The expiration date of the certificate in unix time.</description>
                                     <name>Security</name>
                                 </application>
                             </applications>
-                            <preprocessing>
-                                <step>
-                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <params>12h</params>
-                                </step>
-                            </preprocessing>
                             <trigger_prototypes>
                                 <trigger_prototype>
-                                    <expression>{last()} + 86400 * {$BIGIP.CERT.MIN} &lt; {now()}</expression>
+                                    <expression>{last()} - 86400 * {$BIGIP.CERT.MIN} &lt; {now()}</expression>
                                     <name>F5 BIG-IP: Less than {$BIGIP.CERT.MIN} days left until the certificate expires ({#CERT.NAME})</name>
                                     <opdata>Expires: {ITEM.VALUE}</opdata>
                                     <priority>WARNING</priority>
@@ -716,12 +711,6 @@ The expiration date of the certificate in unix time.</description>
                             </trigger_prototypes>
                         </item_prototype>
                     </item_prototypes>
-                    <preprocessing>
-                        <step>
-                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <params>12h</params>
-                        </step>
-                    </preprocessing>
                 </discovery_rule>
                 <discovery_rule>
                     <name>Chassis fan discovery</name>
@@ -2005,18 +1994,18 @@ The host memory in bytes currently in use for the specified host.</description>
                     </item_prototypes>
                     <trigger_prototypes>
                         <trigger_prototype>
-                            <expression>{Template F5 Big-IP SNMP:bigip.memory.used[{#HOST.ID}].max(5m)}/{Template F5 Big-IP SNMP:bigip.memory.total[{#HOST.ID}].min(5m)}*100&gt;{$BIGIP.MEMORY.UTIL.WARN.MAX}</expression>
+                            <expression>{Template F5 Big-IP SNMP:bigip.memory.used[{#HOST.ID}].last()}/{Template F5 Big-IP SNMP:bigip.memory.total[{#HOST.ID}].last()}*100&gt;{$BIGIP.MEMORY.UTIL.WARN.MAX}</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                            <recovery_expression>{Template F5 Big-IP SNMP:bigip.memory.used[{#HOST.ID}].max(5m)}/{Template F5 Big-IP SNMP:bigip.memory.total[{#HOST.ID}].min(5m)}*100&lt;{$BIGIP.MEMORY.UTIL.WARN.MIN}</recovery_expression>
-                            <name>F5 BIG-IP: High memory utilization in host [{#HOST.ID}] (over {$BIGIP.MEMORY.UTIL.WARN.MAX}% for 5m)</name>
+                            <recovery_expression>{Template F5 Big-IP SNMP:bigip.memory.used[{#HOST.ID}].last()}/{Template F5 Big-IP SNMP:bigip.memory.total[{#HOST.ID}].last()}*100&lt;{$BIGIP.MEMORY.UTIL.WARN.MIN}</recovery_expression>
+                            <name>F5 BIG-IP: High memory utilization in host [{#HOST.ID}] (over {$BIGIP.MEMORY.UTIL.WARN.MAX}%)</name>
                             <priority>WARNING</priority>
                             <description>The system is running out of free memory.</description>
                         </trigger_prototype>
                         <trigger_prototype>
-                            <expression>{Template F5 Big-IP SNMP:bigip.memory.used.swap[{#HOST.ID}].max(5m)}/{Template F5 Big-IP SNMP:bigip.memory.total.swap[{#HOST.ID}].min(5m)}*100&gt;{$BIGIP.SWAP.UTIL.WARN.MAX}</expression>
+                            <expression>{Template F5 Big-IP SNMP:bigip.memory.used.swap[{#HOST.ID}].last()}/{Template F5 Big-IP SNMP:bigip.memory.total.swap[{#HOST.ID}].last()}*100&gt;{$BIGIP.SWAP.UTIL.WARN.MAX}</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                            <recovery_expression>{Template F5 Big-IP SNMP:bigip.memory.used.swap[{#HOST.ID}].max(5m)}/{Template F5 Big-IP SNMP:bigip.memory.total.swap[{#HOST.ID}].min(5m)}*100&gt;{$BIGIP.SWAP.UTIL.WARN.MIN}</recovery_expression>
-                            <name>F5 BIG-IP: High swap utilization in host [{#HOST.ID}] (over {$BIGIP.SWAP.UTIL.WARN.MAX}% for 5m)</name>
+                            <recovery_expression>{Template F5 Big-IP SNMP:bigip.memory.used.swap[{#HOST.ID}].last()}/{Template F5 Big-IP SNMP:bigip.memory.total.swap[{#HOST.ID}].last()}*100&gt;{$BIGIP.SWAP.UTIL.WARN.MIN}</recovery_expression>
+                            <name>F5 BIG-IP: High swap utilization in host [{#HOST.ID}] (over {$BIGIP.SWAP.UTIL.WARN.MAX}%)</name>
                             <priority>WARNING</priority>
                             <description>The system is running out of free swap memory.</description>
                         </trigger_prototype>

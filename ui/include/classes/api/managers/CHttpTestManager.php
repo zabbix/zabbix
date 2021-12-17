@@ -137,7 +137,7 @@ class CHttpTestManager {
 			'selectSteps' => ['httpstepid', 'name', 'no', 'url', 'timeout', 'posts', 'required', 'status_codes',
 				'follow_redirects', 'retrieve_mode'
 			],
-			'editable' => true,
+			'nopermissions' => true,
 			'preservekeys' => true
 		]);
 

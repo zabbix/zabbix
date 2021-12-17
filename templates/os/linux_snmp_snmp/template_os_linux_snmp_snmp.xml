@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-06-05T01:30:22Z</date>
+   <date>2021-11-25T11:53:05Z</date>
    <groups>
       <group>
          <name>Templates/Modules</name>
@@ -17,7 +17,7 @@
          <description>MIBs used:&#13;
 UCD-DISKIO-MIB&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -159,7 +159,7 @@ The number of write accesses from this device since boot.</description>
 HOST-RESOURCES-MIB&#13;
 UCD-SNMP-MIB&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -726,7 +726,7 @@ return JSON.stringify([{"{#CPU.COUNT}": value, "{#SNMPINDEX}": 0, "{#SINGLETON}"
 HOST-RESOURCES-MIB&#13;
 UCD-SNMP-MIB&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -992,7 +992,7 @@ Known Issues:&#13;
 &#13;
   Description: Please note that memory utilization is a rough estimate, since memory available is calculated as free+buffers+cached, which is not 100% accurate, but the best we can get using SNMP.&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -1180,7 +1180,7 @@ Total memory in Bytes</description>
                      <description>The system is running out of free memory.</description>
                      <dependencies>
                         <dependency>
-                           <name>Lack of available memory (&lt; {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
+                           <name>Lack of available memory (&lt;{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
                            <expression>{Template Module Linux memory SNMP:vm.memory.available[snmp].min(5m)}&lt;{$MEMORY.AVAILABLE.MIN} and {Template Module Linux memory SNMP:vm.memory.total[memTotalReal.0].last()}&gt;0</expression>
                         </dependency>
                      </dependencies>
@@ -1210,7 +1210,7 @@ Total memory in Bytes</description>
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387225-discussion-thread-for-official-zabbix-template-for-linux&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.39</description>
          <templates>
             <template>
                <name>Template Module EtherLike-MIB SNMP</name>
@@ -1353,7 +1353,7 @@ Template tooling version used: 0.36</description>
                      <sort_triggers>0</sort_triggers>
                      <url/>
                      <application/>
-                     <max_columns>3</max_columns>
+                     <max_columns>2</max_columns>
                   </screen_item>
                   <screen_item>
                      <resourcetype>20</resourcetype>
@@ -1375,7 +1375,7 @@ Template tooling version used: 0.36</description>
                      <sort_triggers>0</sort_triggers>
                      <url/>
                      <application/>
-                     <max_columns>3</max_columns>
+                     <max_columns>2</max_columns>
                   </screen_item>
                   <screen_item>
                      <resourcetype>19</resourcetype>
@@ -1397,7 +1397,7 @@ Template tooling version used: 0.36</description>
                      <sort_triggers>0</sort_triggers>
                      <url/>
                      <application/>
-                     <max_columns>3</max_columns>
+                     <max_columns>2</max_columns>
                   </screen_item>
                   <screen_item>
                      <resourcetype>20</resourcetype>
@@ -1419,7 +1419,7 @@ Template tooling version used: 0.36</description>
                      <sort_triggers>0</sort_triggers>
                      <url/>
                      <application/>
-                     <max_columns>3</max_columns>
+                     <max_columns>2</max_columns>
                   </screen_item>
                </screen_items>
             </screen>
@@ -1439,14 +1439,14 @@ Template tooling version used: 0.36</description>
                <expression>{Template Module Linux memory SNMP:vm.memory.util[snmp].min(5m)}&gt;{$MEMORY.UTIL.MAX}</expression>
             </dependency>
             <dependency>
-               <name>Lack of available memory (&lt; {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
+               <name>Lack of available memory (&lt;{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
                <expression>{Template Module Linux memory SNMP:vm.memory.available[snmp].min(5m)}&lt;{$MEMORY.AVAILABLE.MIN} and {Template Module Linux memory SNMP:vm.memory.total[memTotalReal.0].last()}&gt;0</expression>
             </dependency>
          </dependencies>
       </trigger>
       <trigger>
          <expression>{Template Module Linux memory SNMP:vm.memory.available[snmp].min(5m)}&lt;{$MEMORY.AVAILABLE.MIN} and {Template Module Linux memory SNMP:vm.memory.total[memTotalReal.0].last()}&gt;0</expression>
-         <name>Lack of available memory (&lt; {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
+         <name>Lack of available memory (&lt;{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
          <opdata>Available: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}</opdata>
          <priority>AVERAGE</priority>
       </trigger>

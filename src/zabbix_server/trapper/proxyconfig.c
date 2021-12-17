@@ -25,6 +25,7 @@
 #include "proxyconfig.h"
 #include "../../libs/zbxcrypto/tls_tcp_active.h"
 #include "zbxcompress.h"
+#include "zbxipcservice.h"
 
 /******************************************************************************
  *                                                                            *
@@ -146,7 +147,23 @@ void	recv_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	if (SUCCEED != check_access_passive_proxy(sock, ZBX_SEND_RESPONSE, "configuration update"))
 		goto out;
 
-	process_proxyconfig(&jp_data);
+	if (SUCCEED == process_proxyconfig(&jp_data))
+	{
+		unsigned char	*result;
+		char		*error = NULL;
+
+		if (SUCCEED == zbx_ipc_async_exchange(ZBX_IPC_SERVICE_CONFIG, ZBX_IPC_CONFIG_RELOAD_REQUEST,
+				ZBX_IPC_WAIT_FOREVER, NULL, 0, &result, &error))
+		{
+			zbx_free(result);
+		}
+		else
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			zabbix_log(LOG_LEVEL_WARNING, "cannot send message to configuration syncer: %s", error);
+			zbx_free(error);
+		}
+	}
 	zbx_send_proxy_response(sock, ret, NULL, CONFIG_TIMEOUT);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);

@@ -585,9 +585,12 @@ class CTriggerPrototype extends CTriggerGeneral {
 	 * @param string $triggerPrototypes[]['triggerid']
 	 * @param array  $triggerPrototypes[]['dependencies']
 	 * @param string $triggerPrototypes[]['dependencies'][]['triggerid']
+	 * @param bool   $inherited                                           Determines either to check permissions for
+	 *                                                                    added dependencies. Permissions are not
+	 *                                                                    validated for inherited triggers.
 	 */
-	public function addDependencies(array $triggerPrototypes) {
-		$this->validateAddDependencies($triggerPrototypes);
+	public function addDependencies(array $triggerPrototypes, bool $inherited = false) {
+		$this->validateAddDependencies($triggerPrototypes, $inherited);
 
 		$insert = [];
 
@@ -634,7 +637,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 				}
 				unset($childTrigger);
 
-				$this->addDependencies($childTriggers);
+				$this->addDependencies($childTriggers, true);
 			}
 		}
 	}
@@ -646,10 +649,11 @@ class CTriggerPrototype extends CTriggerGeneral {
 	 * @param string $trigger_prototypes[]['triggerid']
 	 * @param array  $trigger_prototypes[]['dependencies']
 	 * @param string $trigger_prototypes[]['dependencies'][]['triggerid']
+	 * @param bool   $inherited
 	 *
 	 * @throws APIException if the given dependencies are invalid.
 	 */
-	protected function validateAddDependencies(array $trigger_prototypes) {
+	protected function validateAddDependencies(array $trigger_prototypes, bool $inherited = false): void {
 		$depTriggerIds = [];
 
 		foreach ($trigger_prototypes as $trigger_prototype) {
@@ -671,8 +675,11 @@ class CTriggerPrototype extends CTriggerGeneral {
 			'output' => ['triggerid'],
 			'selectDiscoveryRule' => ['itemid'],
 			'triggerids' => $depTriggerIds,
+			'nopermissions' => $inherited ? true : null,
 			'preservekeys' => true
 		]);
+
+		$dep_triggerids = array_diff($depTriggerIds, array_keys($depTriggerPrototypes));
 
 		if ($depTriggerPrototypes) {
 			// Get current trigger prototype discovery rules.
@@ -680,6 +687,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 				'output' => ['triggerid'],
 				'selectDiscoveryRule' => ['itemid'],
 				'triggerids' => zbx_objectValues($trigger_prototypes, 'triggerid'),
+				'nopermissions' => $inherited ? true : null,
 				'preservekeys' => true
 			]);
 
@@ -704,18 +712,25 @@ class CTriggerPrototype extends CTriggerGeneral {
 				}
 			}
 		}
-
-		// Check other dependency IDs if those are normal triggers.
-		$triggers = API::Trigger()->get([
-			'output' => ['triggerid'],
-			'triggerids' => $depTriggerIds,
-			'filter' => [
-				'flags' => [ZBX_FLAG_DISCOVERY_NORMAL]
-			]
-		]);
-
-		if (!$depTriggerPrototypes && !$triggers) {
+		elseif (!$dep_triggerids) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		if ($dep_triggerids && !$inherited) {
+			// Check other dependency IDs if those are normal triggers.
+			$count = API::Trigger()->get([
+				'countOutput' => true,
+				'triggerids' => $dep_triggerids,
+				'filter' => [
+					'flags' => [ZBX_FLAG_DISCOVERY_NORMAL]
+				]
+			]);
+
+			if ($count != count($dep_triggerids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
 		}
 
 		$this->checkDependencies($trigger_prototypes);

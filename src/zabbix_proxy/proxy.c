@@ -505,7 +505,7 @@ static void	zbx_set_defaults(void)
 
 	if (ZBX_PROXYMODE_PASSIVE == CONFIG_PROXYMODE)
 	{
-		CONFIG_CONFSYNCER_FORKS = CONFIG_DATASENDER_FORKS = 0;
+		CONFIG_DATASENDER_FORKS = 0;
 		program_type = ZBX_PROGRAM_TYPE_PROXY_PASSIVE;
 	}
 
@@ -885,7 +885,6 @@ int	main(int argc, char **argv)
 	ZBX_TASK_EX	t = {ZBX_TASK_START};
 	char		ch;
 	int		opt_c = 0, opt_r = 0;
-	char		*error = NULL;
 
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	argv = setproctitle_save_env(argc, argv);
@@ -961,13 +960,6 @@ int	main(int argc, char **argv)
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
 		exit(SUCCEED == zbx_sigusr_send(t.data) ? EXIT_SUCCESS : EXIT_FAILURE);
 
-	if (FAIL == zbx_ipc_service_init_env(CONFIG_SOCKET_PATH, &error))
-	{
-		zbx_error("Cannot initialize IPC services: %s", error);
-		zbx_free(error);
-		exit(EXIT_FAILURE);
-	}
-
 	return daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags);
 }
 
@@ -996,6 +988,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		printf("Starting Zabbix Proxy (%s) [%s]. Zabbix %s (revision %s).\nPress Ctrl+C to exit.\n\n",
 				ZBX_PROXYMODE_PASSIVE == CONFIG_PROXYMODE ? "passive" : "active",
 				CONFIG_HOSTNAME, ZABBIX_VERSION, ZABBIX_REVISION);
+	}
+
+	if (FAIL == zbx_ipc_service_init_env(CONFIG_SOCKET_PATH, &error))
+	{
+		zbx_error("Cannot initialize IPC services: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
 	}
 
 	if (SUCCEED != zbx_locks_create(&error))
@@ -1194,8 +1193,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			case ZBX_PROCESS_TYPE_TRAPPER:
 				thread_args.args = &listen_sock;
 				zbx_thread_start(trapper_thread, &thread_args, &threads[i]);
-				if (0 == CONFIG_CONFSYNCER_FORKS)
-					DCconfig_wait_sync();
 				break;
 			case ZBX_PROCESS_TYPE_HEARTBEAT:
 				zbx_thread_start(heart_thread, &thread_args, &threads[i]);

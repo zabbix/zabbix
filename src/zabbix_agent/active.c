@@ -48,6 +48,10 @@ static ZBX_THREAD_LOCAL zbx_vector_ptr_t	active_metrics;
 static ZBX_THREAD_LOCAL zbx_vector_ptr_t	regexps;
 static ZBX_THREAD_LOCAL char			*session_token;
 static ZBX_THREAD_LOCAL zbx_uint64_t		last_valueid = 0;
+static ZBX_THREAD_LOCAL zbx_vector_pre_persistent_t	pre_persistent_vec;	/* used for staging of data going */
+										/* into persistent files */
+/* used for deleting inactive persistent files */
+static ZBX_THREAD_LOCAL zbx_vector_persistent_inactive_t	persistent_inactive_vec;
 
 static void	init_active_metrics(void)
 {
@@ -58,7 +62,7 @@ static void	init_active_metrics(void)
 	if (NULL == buffer.data)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "buffer: first allocation for %d elements", CONFIG_BUFFER_SIZE);
-		sz = CONFIG_BUFFER_SIZE * sizeof(ZBX_ACTIVE_BUFFER_ELEMENT);
+		sz = (size_t)CONFIG_BUFFER_SIZE * sizeof(ZBX_ACTIVE_BUFFER_ELEMENT);
 		buffer.data = (ZBX_ACTIVE_BUFFER_ELEMENT *)zbx_malloc(buffer.data, sz);
 		memset(buffer.data, 0, sz);
 		buffer.count = 0;
@@ -69,6 +73,8 @@ static void	init_active_metrics(void)
 
 	zbx_vector_ptr_create(&active_metrics);
 	zbx_vector_ptr_create(&regexps);
+	zbx_vector_pre_persistent_create(&pre_persistent_vec);
+	zbx_vector_persistent_inactive_create(&persistent_inactive_vec);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -84,6 +90,9 @@ static void	free_active_metric(ZBX_ACTIVE_METRIC *metric)
 		zbx_free(metric->logfiles[i].filename);
 
 	zbx_free(metric->logfiles);
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+	zbx_free(metric->persistent_file_name);
+#endif
 	zbx_free(metric);
 }
 
@@ -169,8 +178,35 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 			metric->logfiles_num = 0;
 			metric->start_time = 0.0;
 			metric->processed_bytes = 0;
-		}
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+			if (NULL != metric->persistent_file_name)
+			{
+				char	*error = NULL;
 
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() removing persistent file '%s'",
+						__func__, metric->persistent_file_name);
+
+				zbx_remove_from_persistent_inactive_list(&persistent_inactive_vec, metric->key_orig);
+
+				if (SUCCEED != zbx_remove_persistent_file(metric->persistent_file_name, &error))
+				{
+					/* log error and continue operation */
+					zabbix_log(LOG_LEVEL_WARNING, "cannot remove persistent file \"%s\": %s",
+							metric->persistent_file_name, error);
+					zbx_free(error);
+				}
+
+				zbx_free(metric->persistent_file_name);
+			}
+#endif
+		}
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+		else if (NULL != metric->persistent_file_name)
+		{
+			/* the metric is active, but it could have been placed on inactive list earlier */
+			zbx_remove_from_persistent_inactive_list(&persistent_inactive_vec, metric->key_orig);
+		}
+#endif
 		/* replace metric */
 		if (metric->refresh != refresh)
 		{
@@ -226,6 +262,7 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 
 	metric->start_time = 0.0;
 	metric->processed_bytes = 0;
+	metric->persistent_file_name = NULL;	/* initialized but not used on Microsoft Windows */
 
 	zbx_vector_ptr_append(&active_metrics, metric);
 out:
@@ -420,6 +457,13 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 
 		if (0 == found)
 		{
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+			if (NULL != metric->persistent_file_name)
+			{
+				zbx_add_to_persistent_inactive_list(&persistent_inactive_vec, metric->key_orig,
+						metric->persistent_file_name);
+			}
+#endif
 			zbx_vector_ptr_remove_noorder(&active_metrics, i);
 			free_active_metric(metric);
 			i--;	/* consider the same index on the next run */
@@ -624,7 +668,7 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 	}
 
 	if (ZBX_DEFAULT_AGENT_PORT != CONFIG_LISTEN_PORT)
-		zbx_json_adduint64(&json, ZBX_PROTO_TAG_PORT, CONFIG_LISTEN_PORT);
+		zbx_json_adduint64(&json, ZBX_PROTO_TAG_PORT, (zbx_uint64_t)CONFIG_LISTEN_PORT);
 
 	switch (configured_tls_connect_mode)
 	{
@@ -736,16 +780,21 @@ static int	check_response(char *response)
  *                                                                            *
  * Purpose: Send value stored in the buffer to Zabbix server                  *
  *                                                                            *
- * Parameters: host - IP or Hostname of Zabbix server                         *
- *             port - port number                                             *
+ * Parameters: host     - [IN] IP or Hostname of Zabbix server                *
+ *             port     - [IN] port number                                    *
+ *             prep_vec - [IN/OUT] vector with data for writing into          *
+ *                                 persistent files                           *
  *                                                                            *
- * Return value: returns SUCCEED on successful sending,                       *
- *               FAIL on other cases                                          *
+ * Return value: SUCCEED if:                                                  *
+ *                    - no need to send data now (buffer empty or has enough  *
+ *                      free elements, or recently sent)                      *
+ *                    - data successfully sent to server (proxy)              *
+ *               FAIL - error when sending data                               *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-static int	send_buffer(const char *host, unsigned short port)
+static int	send_buffer(const char *host, unsigned short port, zbx_vector_pre_persistent_t *prep_vec)
 {
 	ZBX_ACTIVE_BUFFER_ELEMENT	*el;
 	int				ret = SUCCEED, i, now;
@@ -881,6 +930,12 @@ out:
 
 	if (SUCCEED == ret)
 	{
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+		zbx_write_persistent_files(prep_vec);
+		zbx_clean_pre_persistent_elements(prep_vec);
+#else
+		ZBX_UNUSED(prep_vec);
+#endif
 		/* free buffer */
 		for (i = 0; i < buffer.count; i++)
 		{
@@ -955,9 +1010,9 @@ ret:
  *                                                                            *
  ******************************************************************************/
 static int	process_value(const char *server, unsigned short port, const char *host, const char *key,
-		const char *value, unsigned char state, zbx_uint64_t *lastlogsize, int *mtime,
-		unsigned long *timestamp, const char *source, unsigned short *severity, unsigned long *logeventid,
-		unsigned char flags)
+		const char *value, unsigned char state, zbx_uint64_t *lastlogsize, const int *mtime,
+		const unsigned long *timestamp, const char *source, const unsigned short *severity,
+		const unsigned long *logeventid, unsigned char flags)
 {
 	ZBX_ACTIVE_BUFFER_ELEMENT	*el = NULL;
 	int				i, ret = FAIL;
@@ -978,7 +1033,7 @@ static int	process_value(const char *server, unsigned short port, const char *ho
 		}
 	}
 
-	/* do not sent data from buffer if host/key are the same as previous unless buffer is full already */
+	/* do not send data from buffer if host/key are the same as previous unless buffer is full already */
 	if (0 < buffer.count)
 	{
 		el = &buffer.data[buffer.count - 1];
@@ -987,7 +1042,7 @@ static int	process_value(const char *server, unsigned short port, const char *ho
 				CONFIG_BUFFER_SIZE <= buffer.count ||
 				0 != strcmp(el->key, key) || 0 != strcmp(el->host, host))
 		{
-			send_buffer(server, port);
+			send_buffer(server, port, &pre_persistent_vec);
 		}
 	}
 
@@ -1035,7 +1090,7 @@ static int	process_value(const char *server, unsigned short port, const char *ho
 			zbx_free(el->source);
 		}
 
-		sz = (CONFIG_BUFFER_SIZE - i - 1) * sizeof(ZBX_ACTIVE_BUFFER_ELEMENT);
+		sz = (size_t)(CONFIG_BUFFER_SIZE - i - 1) * sizeof(ZBX_ACTIVE_BUFFER_ELEMENT);
 		memmove(&buffer.data[i], &buffer.data[i + 1], sz);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "buffer full: new element %d", buffer.count - 1);
@@ -1069,6 +1124,14 @@ static int	process_value(const char *server, unsigned short port, const char *ho
 
 	if (0 != (ZBX_METRIC_FLAG_PERSISTENT & flags))
 		buffer.pcount++;
+
+	/* If conditions are met then send buffer now. It is necessary for synchronization */
+	/* between sending data to server and writing of persistent files. */
+	if ((0 != (flags & ZBX_METRIC_FLAG_PERSISTENT) && CONFIG_BUFFER_SIZE / 2 <= buffer.pcount) ||
+			CONFIG_BUFFER_SIZE <= buffer.count)
+	{
+		send_buffer(server, port, &pre_persistent_vec);
+	}
 
 	ret = SUCCEED;
 out:
@@ -1153,10 +1216,54 @@ out:
 	return ret;
 }
 
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_minimal_init_prep_vec_data                                   *
+ *                                                                            *
+ * Purpose: initialize an element of preparation vector with available data   *
+ *                                                                            *
+ * Parameters: lastlogsize   - [IN] lastlogize value to write into persistent *
+ *                                  data file                                 *
+ *             mtime         - [IN] mtime value to write into persistent data *
+ *                                  file                                      *
+ *             prep_vec_elem - [IN/OUT] element of vector to initialize       *
+ *                                                                            *
+ * Comments: this is a minimal initialization for using before sending status *
+ *           updates or meta-data. It initializes only 2 attributes to be     *
+ *           usable without any data about log files.                         *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_minimal_init_prep_vec_data(zbx_uint64_t lastlogsize, int mtime, zbx_pre_persistent_t *prep_vec_elem)
+{
+	if (NULL != prep_vec_elem->filename)
+		zbx_free(prep_vec_elem->filename);	/* filename == NULL should be checked when preparing JSON */
+							/* for writing as most attributes are not initialized */
+	prep_vec_elem->processed_size = lastlogsize;
+	prep_vec_elem->mtime = mtime;
+}
+
+static void	zbx_fill_prep_vec_element(zbx_vector_pre_persistent_t *prep_vec, const char *key,
+		const char *persistent_file_name, const struct st_logfile *logfile, const zbx_uint64_t lastlogsize,
+		const int mtime)
+{
+	/* index in preparation vector */
+	int	idx = zbx_find_or_create_prep_vec_element(prep_vec, key, persistent_file_name);
+
+	if (NULL != logfile)
+	{
+		zbx_init_prep_vec_data(logfile, prep_vec->values + idx);
+		zbx_update_prep_vec_data(logfile, logfile->processed_size, prep_vec->values + idx);
+	}
+	else
+		zbx_minimal_init_prep_vec_data(lastlogsize, mtime, prep_vec->values + idx);
+}
+#endif	/* not WINDOWS, not __MINGW32__ */
+
 static void	process_active_checks(char *server, unsigned short port)
 {
 	char	*error = NULL;
-	int	i, now, ret;
+	int	i, now;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() server:'%s' port:%hu", __func__, server, port);
 
@@ -1165,10 +1272,8 @@ static void	process_active_checks(char *server, unsigned short port)
 	for (i = 0; i < active_metrics.values_num; i++)
 	{
 		zbx_uint64_t		lastlogsize_last, lastlogsize_sent;
-		int			mtime_last, mtime_sent;
-		ZBX_ACTIVE_METRIC	*metric;
-
-		metric = (ZBX_ACTIVE_METRIC *)active_metrics.values[i];
+		int			mtime_last, mtime_sent, ret;
+		ZBX_ACTIVE_METRIC	*metric = (ZBX_ACTIVE_METRIC *)active_metrics.values[i];
 
 		if (metric->nextcheck > now)
 			continue;
@@ -1192,18 +1297,19 @@ static void	process_active_checks(char *server, unsigned short port)
 		else if (0 != ((ZBX_METRIC_FLAG_LOG_LOG | ZBX_METRIC_FLAG_LOG_LOGRT) & metric->flags))
 		{
 			ret = process_log_check(server, port, &regexps, metric, process_value, &lastlogsize_sent,
-					&mtime_sent, &error);
+					&mtime_sent, &error, &pre_persistent_vec);
 		}
 		else if (0 != (ZBX_METRIC_FLAG_LOG_EVENTLOG & metric->flags))
-			ret = process_eventlog_check(server, port, &regexps, metric, process_value, &lastlogsize_sent, &error);
+		{
+			ret = process_eventlog_check(server, port, &regexps, metric, process_value, &lastlogsize_sent,
+					&error);
+		}
 		else
 			ret = process_common_check(server, port, metric, &error);
 
 		if (SUCCEED != ret)
 		{
-			const char	*perror;
-
-			perror = (NULL != error ? error : ZBX_NOTSUPPORTED_MSG);
+			const char	*perror = (NULL != error ? error : ZBX_NOTSUPPORTED_MSG);
 
 			metric->state = ITEM_STATE_NOTSUPPORTED;
 			metric->refresh_unsupported = 0;
@@ -1212,7 +1318,24 @@ static void	process_active_checks(char *server, unsigned short port)
 			metric->processed_bytes = 0;
 
 			zabbix_log(LOG_LEVEL_WARNING, "active check \"%s\" is not supported: %s", metric->key, perror);
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+			/* only for log*[] items */
+			if (0 != ((ZBX_METRIC_FLAG_LOG_LOG | ZBX_METRIC_FLAG_LOG_LOGRT) & metric->flags) &&
+					NULL != metric->persistent_file_name)
+			{
+				const struct st_logfile	*logfile = NULL;
 
+				if (0 < metric->logfiles_num)
+				{
+					logfile = find_last_processed_file_in_logfiles_list(metric->logfiles,
+							metric->logfiles_num);
+				}
+
+				zbx_fill_prep_vec_element(&pre_persistent_vec, metric->key_orig,
+						metric->persistent_file_name, logfile, metric->lastlogsize,
+						metric->mtime);
+			}
+#endif
 			process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, perror, ITEM_STATE_NOTSUPPORTED,
 					&metric->lastlogsize, &metric->mtime, NULL, NULL, NULL, NULL, metric->flags);
 
@@ -1222,9 +1345,7 @@ static void	process_active_checks(char *server, unsigned short port)
 		{
 			if (0 == metric->error_count)
 			{
-				unsigned char	old_state;
-
-				old_state = metric->state;
+				unsigned char	old_state = metric->state;
 
 				if (ITEM_STATE_NOTSUPPORTED == metric->state)
 				{
@@ -1236,6 +1357,22 @@ static void	process_active_checks(char *server, unsigned short port)
 				if (SUCCEED == need_meta_update(metric, lastlogsize_sent, mtime_sent, old_state,
 						lastlogsize_last, mtime_last))
 				{
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+					if (NULL != metric->persistent_file_name)
+					{
+						const struct st_logfile	*logfile = NULL;
+
+						if (0 < metric->logfiles_num)
+						{
+							logfile = find_last_processed_file_in_logfiles_list(
+									metric->logfiles, metric->logfiles_num);
+						}
+
+						zbx_fill_prep_vec_element(&pre_persistent_vec, metric->key_orig,
+								metric->persistent_file_name, logfile, metric->lastlogsize,
+								metric->mtime);
+					}
+#endif
 					/* meta information update */
 					process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, NULL,
 							metric->state, &metric->lastlogsize, &metric->mtime, NULL, NULL,
@@ -1247,7 +1384,7 @@ static void	process_active_checks(char *server, unsigned short port)
 			}
 		}
 
-		send_buffer(server, port);
+		send_buffer(server, port, &pre_persistent_vec);
 		metric->nextcheck = (int)time(NULL) + metric->refresh;
 	}
 
@@ -1314,7 +1451,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 		if ((now = time(NULL)) >= nextsend)
 		{
-			send_buffer(activechk_args.host, activechk_args.port);
+			send_buffer(activechk_args.host, activechk_args.port, &pre_persistent_vec);
 			nextsend = time(NULL) + 1;
 		}
 
@@ -1330,6 +1467,9 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 			{
 				nextrefresh = time(NULL) + CONFIG_REFRESH_ACTIVE_CHECKS;
 			}
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+			zbx_remove_inactive_persistent_files(&persistent_inactive_vec);
+#endif
 		}
 
 		if (now >= nextcheck && CONFIG_BUFFER_SIZE / 2 > buffer.pcount)

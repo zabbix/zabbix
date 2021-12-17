@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-10-27T14:48:16Z</date>
+   <date>2021-12-02T13:38:16Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -400,7 +400,7 @@ and are waiting to be executed.</description>
             </macro>
             <macro>
                <macro>{$VFS.FS.FSNAME.NOT_MATCHES}</macro>
-               <value>^(/dev|/sys|/run|/proc|.+/shm$)</value>
+               <value>^(?:/dev|/sys|/run|/proc|.+/shm$)</value>
                <description>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</description>
             </macro>
             <macro>
@@ -1433,18 +1433,24 @@ return JSON.stringify({"data": output})</params>
                <description>Discovery of installed physical disks.</description>
                <item_prototypes>
                   <item_prototype>
-                     <name>{#DEVNAME}: Disk utilization</name>
+                     <name>{#DEVNAME}: Disk utilization by idle time</name>
                      <type>ZABBIX_ACTIVE</type>
-                     <key>perf_counter_en["\PhysicalDisk({#DEVNAME})\% Disk Time",60]</key>
+                     <key>perf_counter_en["\PhysicalDisk({#DEVNAME})\% Idle Time",60]</key>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
                      <units>%</units>
-                     <description>This item is the percentage of elapsed time that the selected disk drive was busy servicing read or writes requests.</description>
+                     <description>This item is the percentage of elapsed time that the selected disk drive was busy servicing read or writes requests based on idle time</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Disk {#DEVNAME}</name>
                         </application_prototype>
                      </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JAVASCRIPT</type>
+                           <params>return 100 - value</params>
+                        </step>
+                     </preprocessing>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{min(15m)}&gt;{$VFS.DEV.UTIL.MAX.WARN}</expression>
@@ -1659,7 +1665,7 @@ return JSON.stringify({"data": output})</params>
                            <color>2774A4</color>
                            <item>
                               <host>Template Module Windows physical disks by Zabbix agent active</host>
-                              <key>perf_counter_en["\PhysicalDisk({#DEVNAME})\% Disk Time",60]</key>
+                              <key>perf_counter_en["\PhysicalDisk({#DEVNAME})\% Idle Time",60]</key>
                            </item>
                         </graph_item>
                      </graph_items>
@@ -1786,17 +1792,17 @@ Template tooling version used: 0.39</description>
             </macro>
             <macro>
                <macro>{$SERVICE.NAME.NOT_MATCHES}</macro>
-               <value>^RemoteRegistry|MMCSS|gupdate|SysmonLog|clr_optimization_v.+|clr_optimization_v.+|sppsvc|gpsvc|Pml Driver HPZ12|Net Driver HPZ12|MapsBroker|IntelAudioService|Intel\(R\) TPM Provisioning Service|dbupdate|DoSvc$</value>
+               <value>^(?:RemoteRegistry|MMCSS|gupdate|SysmonLog|clr_optimization_v.+|clr_optimization_v.+|sppsvc|gpsvc|Pml Driver HPZ12|Net Driver HPZ12|MapsBroker|IntelAudioService|Intel\(R\) TPM Provisioning Service|dbupdate|DoSvc)$</value>
                <description>This macro is used in Service discovery. Can be overridden on the host or linked template level.</description>
             </macro>
             <macro>
                <macro>{$SERVICE.STARTUPNAME.MATCHES}</macro>
-               <value>^automatic|automatic delayed$</value>
+               <value>^(?:automatic|automatic delayed)$</value>
                <description>This macro is used in Service discovery. Can be overridden on the host or linked template level.</description>
             </macro>
             <macro>
                <macro>{$SERVICE.STARTUPNAME.NOT_MATCHES}</macro>
-               <value>^manual|disabled$</value>
+               <value>^(?:manual|disabled)$</value>
                <description>This macro is used in Service discovery. Can be overridden on the host or linked template level.</description>
             </macro>
          </macros>

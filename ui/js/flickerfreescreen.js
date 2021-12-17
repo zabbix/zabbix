@@ -372,9 +372,9 @@
 					url.setArgument('_', request_start.toString(34));
 
 					// Create temp image in buffer.
-					var	img = $('<img/>', {
-							'class': domImg.attr('class'),
+					var	img = $('<img>', {
 							id: domImg.attr('id'),
+							class: domImg.attr('class'),
 							name: domImg.attr('name'),
 							border: domImg.attr('border'),
 							usemap: domImg.attr('usemap'),

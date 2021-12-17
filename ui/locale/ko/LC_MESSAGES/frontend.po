@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-05 19:52+0200\n"
+"POT-Creation-Date: 2021-12-13 14:03+0200\n"
 "PO-Revision-Date: 2020-06-04 05:05+0300\n"
 "Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1656,7 +1656,7 @@ msgid "Cannot add correlation condition"
 msgstr "상관관계의 조건을 추가할 수 없습니다"
 
 #: include/classes/api/services/CTrigger.php:970
-#: include/classes/api/services/CTriggerPrototype.php:780
+#: include/classes/api/services/CTriggerPrototype.php:795
 msgid "Cannot add dependency from a host to a template."
 msgstr "호스트에서 템플릿에 의존관계는 작성할 수 없습니다."
 
@@ -1903,7 +1903,7 @@ msgid "Cannot create another database connection."
 msgstr "데이터베이스에 커넥션을 작성할 수 없습니다."
 
 #: include/classes/api/services/CTrigger.php:1004
-#: include/classes/api/services/CTriggerPrototype.php:811
+#: include/classes/api/services/CTriggerPrototype.php:826
 msgid "Cannot create circular dependencies."
 msgstr "순환하는 의존관계는 작성할 수 없습니다."
 
@@ -1911,7 +1911,7 @@ msgstr "순환하는 의존관계는 작성할 수 없습니다."
 msgid "Cannot create dependency on trigger itself."
 msgstr "재귀적 의존관계(dependency on itself)는 허용되지 않습니다."
 
-#: include/classes/api/services/CTriggerPrototype.php:750
+#: include/classes/api/services/CTriggerPrototype.php:765
 msgid "Cannot create dependency on trigger prototype itself."
 msgstr "트리거 프로토타입 자신에 대한 의존관계는 작성할 수 없습니다."
 
@@ -2126,7 +2126,7 @@ msgstr ""
 msgid "Cannot delete templated graph."
 msgstr ""
 
-#: include/classes/api/services/CHostPrototype.php:1159
+#: include/classes/api/services/CHostPrototype.php:1161
 msgid "Cannot delete templated host prototype."
 msgstr "템플릿 호스트 프로토타입을 삭제할 수 없습니다."
 
@@ -4843,7 +4843,7 @@ msgstr "Web시나리오를 삭제하시겠습니까?"
 msgid "Deleted: Host \"%1$s\"."
 msgstr "삭제: 호스트\"%1$s\"."
 
-#: include/classes/api/services/CHostPrototype.php:1027
+#: include/classes/api/services/CHostPrototype.php:1029
 #, c-format
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "삭제: \"%2$s\" 호스트 프로토타입\"%1$s\"."
@@ -5434,7 +5434,7 @@ msgstr "스크린을 위한 \"name\"의 값 \"%1$s\"가 중복되었습니다."
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "트리거\"%1$s\"의 의존관계가 중복되어 있습니다."
 
-#: include/classes/api/services/CTriggerPrototype.php:981
+#: include/classes/api/services/CTriggerPrototype.php:996
 #, c-format
 msgid "Duplicate dependencies in trigger prototype \"%1$s\"."
 msgstr "트리거 프로토타입 \"%1$s\"의 의존관계가 중복되었습니다."
@@ -5660,7 +5660,7 @@ msgstr ""
 #: include/classes/api/services/CHost.php:855
 #: include/classes/api/services/CHost.php:1427
 #: include/classes/api/services/CHost.php:1963
-#: include/classes/api/services/CHostPrototype.php:955
+#: include/classes/api/services/CHostPrototype.php:957
 #: include/classes/api/services/CImage.php:423
 #: include/classes/api/services/CImage.php:475
 #: include/classes/api/services/CMaintenance.php:535
@@ -6960,7 +6960,7 @@ msgstr "디스커버리에서 발견한 호스트 \"%1$s\" 그룹."
 msgid "Group name"
 msgstr "그룹 이름"
 
-#: include/classes/api/services/CHostPrototype.php:1117
+#: include/classes/api/services/CHostPrototype.php:1119
 #, c-format
 msgid "Group prototype cannot be based on a discovered host group \"%1$s\"."
 msgstr "그룹 프로토타입에 발견된 호스트용의 그룹 \"%1$s\"을이용하는 것은 할 수 없습니다."
@@ -7484,12 +7484,12 @@ msgstr "호스트 네트워크"
 msgid "Host prototype"
 msgstr "호스트 프로토타입"
 
-#: include/classes/api/services/CHostPrototype.php:835
+#: include/classes/api/services/CHostPrototype.php:837
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "호스트 프로토타입 \"%1$s\"는 \"%2$s\"에 이미 존재하고 있습니다. (다른 템플릿에서 계승)"
 
-#: include/classes/api/services/CHostPrototype.php:823
+#: include/classes/api/services/CHostPrototype.php:825
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "호스트 프로토타입 \"%1$s\"는 \"%2$s\"에 이미 존재하고 있습니다."
@@ -9770,7 +9770,7 @@ msgstr "이탈리아어 (it_IT)"
 msgid "Item"
 msgstr "아이템"
 
-#: include/classes/api/services/CHostPrototype.php:1061
+#: include/classes/api/services/CHostPrototype.php:1063
 #: include/classes/api/services/CItem.php:62
 #, c-format
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
@@ -12130,9 +12130,9 @@ msgstr "시스템 액세스 권한이 없습니다."
 #: include/classes/api/services/CHostPrototype.php:418
 #: include/classes/api/services/CHostPrototype.php:464
 #: include/classes/api/services/CHostPrototype.php:485
-#: include/classes/api/services/CHostPrototype.php:1086
-#: include/classes/api/services/CHostPrototype.php:1108
-#: include/classes/api/services/CHostPrototype.php:1142
+#: include/classes/api/services/CHostPrototype.php:1088
+#: include/classes/api/services/CHostPrototype.php:1110
+#: include/classes/api/services/CHostPrototype.php:1144
 #: include/classes/api/services/CHttpTest.php:446
 #: include/classes/api/services/CHttpTest.php:539
 #: include/classes/api/services/CHttpTest.php:626
@@ -12194,8 +12194,9 @@ msgstr "시스템 액세스 권한이 없습니다."
 #: include/classes/api/services/CTrigger.php:734
 #: include/classes/api/services/CTrigger.php:827
 #: include/classes/api/services/CTriggerPrototype.php:522
-#: include/classes/api/services/CTriggerPrototype.php:700
-#: include/classes/api/services/CTriggerPrototype.php:718
+#: include/classes/api/services/CTriggerPrototype.php:708
+#: include/classes/api/services/CTriggerPrototype.php:716
+#: include/classes/api/services/CTriggerPrototype.php:731
 #: include/classes/api/services/CUserGroup.php:322
 #: include/classes/api/services/CUserGroup.php:870
 #: include/classes/api/services/CUserMacro.php:377
@@ -12339,7 +12340,7 @@ msgid "Not all results are displayed. Please provide more specific search criter
 msgstr ""
 
 #: include/classes/api/services/CTrigger.php:1049
-#: include/classes/api/services/CTriggerPrototype.php:859
+#: include/classes/api/services/CTriggerPrototype.php:874
 #, c-format
 msgid "Not all templates are linked to \"%1$s\"."
 msgstr ""
@@ -17259,7 +17260,7 @@ msgstr "트리거 프로토타입\"%1$s\"은 적어도 하나 이상의 아이�
 msgid "Trigger prototype added"
 msgstr "트리거 프로토타입을 추가하였습니다"
 
-#: include/classes/api/services/CTriggerPrototype.php:916
+#: include/classes/api/services/CTriggerPrototype.php:931
 msgid "Trigger prototype cannot be dependent on a trigger that is inherited from it."
 msgstr "트리거 프로토타입은 자신을 계승한 트리거에 의존할 수 없습니다."
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-10-26T07:18:17Z</date>
+   <date>2021-11-25T11:53:04Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -2562,7 +2562,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                      <sort_triggers>0</sort_triggers>
                      <url/>
                      <application/>
-                     <max_columns>3</max_columns>
+                     <max_columns>2</max_columns>
                   </screen_item>
                   <screen_item>
                      <resourcetype>20</resourcetype>
@@ -2584,7 +2584,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                      <sort_triggers>0</sort_triggers>
                      <url/>
                      <application/>
-                     <max_columns>3</max_columns>
+                     <max_columns>2</max_columns>
                   </screen_item>
                   <screen_item>
                      <resourcetype>20</resourcetype>
@@ -2606,7 +2606,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                      <sort_triggers>0</sort_triggers>
                      <url/>
                      <application/>
-                     <max_columns>3</max_columns>
+                     <max_columns>2</max_columns>
                   </screen_item>
                   <screen_item>
                      <resourcetype>20</resourcetype>
@@ -2628,7 +2628,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                      <sort_triggers>0</sort_triggers>
                      <url/>
                      <application/>
-                     <max_columns>3</max_columns>
+                     <max_columns>2</max_columns>
                   </screen_item>
                   <screen_item>
                      <resourcetype>20</resourcetype>
@@ -2650,7 +2650,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                      <sort_triggers>0</sort_triggers>
                      <url/>
                      <application/>
-                     <max_columns>3</max_columns>
+                     <max_columns>2</max_columns>
                   </screen_item>
                </screen_items>
             </screen>

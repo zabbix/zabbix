@@ -591,7 +591,7 @@
 				preview_chart.append($('<div>', {css: {'position': 'relative', 'min-height': '50px'}})
 					.addClass('is-loading'));
 
-				$('<img />')
+				$('<img>')
 					.attr('src', src.getUrl())
 					.on('load', function() {
 						preview_chart.html($(this));
@@ -673,7 +673,7 @@
 
 					item.sortorder = i + 1;
 
-					$form.append($('<input />', {
+					$form.append($('<input>', {
 						type: 'hidden',
 						name: 'items[' + i + ']',
 						value: JSON.stringify(item)
