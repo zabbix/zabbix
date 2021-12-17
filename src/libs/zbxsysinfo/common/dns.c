@@ -942,9 +942,9 @@ static int	dns_query_is_tcp(AGENT_REQUEST *request, int *timeout)
 
 int	NET_DNS(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
+#if defined(HAVE_RES_NINIT) && !defined(_AIX) && (defined(HAVE_RES_U_EXT) || defined(HAVE_RES_U_EXT_EXT))
 	int	tcp_timeout;
 
-#if defined(HAVE_RES_NINIT) && !defined(_AIX) && (defined(HAVE_RES_U_EXT) || defined(HAVE_RES_U_EXT_EXT))
 	if (SUCCEED == dns_query_is_tcp(request, &tcp_timeout))
 		return zbx_execute_threaded_metric(dns_query_short_threaded, request, result, tcp_timeout);
 #endif
@@ -953,9 +953,9 @@ int	NET_DNS(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	NET_DNS_RECORD(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
+#if defined(HAVE_RES_NINIT) && !defined(_AIX) && (defined(HAVE_RES_U_EXT) || defined(HAVE_RES_U_EXT_EXT))
 	int	tcp_timeout;
 
-#if defined(HAVE_RES_NINIT) && !defined(_AIX) && (defined(HAVE_RES_U_EXT) || defined(HAVE_RES_U_EXT_EXT))
 	if (SUCCEED == dns_query_is_tcp(request, &tcp_timeout))
 		return zbx_execute_threaded_metric(dns_query_threaded, request, result, tcp_timeout);
 #endif
