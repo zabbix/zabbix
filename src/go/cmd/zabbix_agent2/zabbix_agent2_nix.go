@@ -41,7 +41,9 @@ func createSigsChan() chan os.Signal {
 	return sigs
 }
 
-func handleSig(sig os.Signal) {
+// handleSig() checks received signal and returns true if the signal is handled
+// and can be ignored, false if the progam should stop.
+func handleSig(sig os.Signal) bool {
 	switch sig {
 	case syscall.SIGINT, syscall.SIGTERM:
 		sendServiceStop()
@@ -49,6 +51,9 @@ func handleSig(sig os.Signal) {
 		if err := checkExternalExits(); err != nil {
 			log.Warningf("Error: %s", err)
 			sendServiceStop()
+		} else {
+			return true
 		}
 	}
+	return false
 }

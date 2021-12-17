@@ -174,8 +174,9 @@ loop:
 	for {
 		select {
 		case sig := <-sigs:
-			handleSig(sig)
-			break loop
+			if !handleSig(sig) {
+				break loop
+			}
 		case client := <-control.Client():
 			if rerr := processRemoteCommand(client); rerr != nil {
 				if rerr = client.Reply("error: " + rerr.Error()); rerr != nil {
