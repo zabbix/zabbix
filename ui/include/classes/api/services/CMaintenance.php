@@ -604,16 +604,10 @@ class CMaintenance extends CApiService {
 
 		$this->validateDelete($maintenanceids, $db_maintenances);
 
-		$timeperiodids = [];
-		$db_timeperiods = DBselect(
-			'SELECT DISTINCT tp.timeperiodid'.
-			' FROM timeperiods tp,maintenances_windows mw'.
-			' WHERE '.dbConditionInt('mw.maintenanceid', $maintenanceids).
-				' AND tp.timeperiodid=mw.timeperiodid'
-		);
-		while ($db_timeperiod = DBfetch($db_timeperiods)) {
-			$timeperiodids[] = $db_timeperiod['timeperiodid'];
-		}
+		$maintenances_windows = DB::select('maintenances_windows', [
+			'output' => ['timeperiodid'],
+			'filter' => ['maintenanceid' => $maintenanceids]
+		]);
 
 		// Lock maintenances table before maintenance delete to prevent server from adding host to maintenance.
 		DBselect(
@@ -629,13 +623,12 @@ class CMaintenance extends CApiService {
 			'where' => ['maintenanceid' => $maintenanceids]
 		]);
 
-		$maintenanceids_condition = ['maintenanceid' => $maintenanceids];
-
-		DB::delete('timeperiods', ['timeperiodid' => $timeperiodids]);
-		DB::delete('maintenances_windows', $maintenanceids_condition);
-		DB::delete('maintenances_hosts', $maintenanceids_condition);
-		DB::delete('maintenances_groups', $maintenanceids_condition);
-		DB::delete('maintenances', $maintenanceids_condition);
+		DB::delete('maintenances_windows', ['maintenanceid' => $maintenanceids]);
+		DB::delete('timeperiods', ['timeperiodid' => array_column($maintenances_windows, 'timeperiodid')]);
+		DB::delete('maintenances_hosts', ['maintenanceid' => $maintenanceids]);
+		DB::delete('maintenances_groups', ['maintenanceid' => $maintenanceids]);
+		DB::delete('maintenance_tag', ['maintenanceid' => $maintenanceids]);
+		DB::delete('maintenances', ['maintenanceid' => $maintenanceids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_MAINTENANCE, $db_maintenances);
 
@@ -665,7 +658,7 @@ class CMaintenance extends CApiService {
 		]);
 
 		if (count($db_maintenances) != count($maintenanceids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 	}
 
@@ -1160,6 +1153,7 @@ class CMaintenance extends CApiService {
 		unset($maintenance);
 
 		if ($del_timeperiodids) {
+			DB::delete('maintenances_windows', ['timeperiodid' => $del_timeperiodids]);
 			DB::delete('timeperiods', ['timeperiodid' => $del_timeperiodids]);
 		}
 
