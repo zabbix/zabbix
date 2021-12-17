@@ -597,8 +597,8 @@ class CService extends CApiService {
 					' AND ('.
 						'(sst.operator='.ZBX_SLA_SERVICE_TAG_OPERATOR_EQUAL.' AND st.value=sst.value)'.
 						' OR (sst.operator='.ZBX_SLA_SERVICE_TAG_OPERATOR_LIKE.' AND UPPER(st.value) LIKE CONCAT('.
-							'"%", REPLACE(REPLACE(REPLACE(UPPER(sst.value), "%", "!%"), "_", "!_"), "!", "!!"), "%"'.
-						') ESCAPE "!")'.
+							"'%', REPLACE(REPLACE(REPLACE(UPPER(sst.value), '%', '!%'), '_', '!_'), '!', '!!'), '%'".
+						") ESCAPE '!')".
 					')'.
 					' AND st.serviceid=s.serviceid'.
 					' AND '.dbConditionId('sst.slaid', $options['slaids']).
