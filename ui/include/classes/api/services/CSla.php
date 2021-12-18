@@ -1292,6 +1292,8 @@ class CSla extends CApiService {
 					}
 				}
 
+				$last_excluded_downtimes = [];
+
 				$prev_clock = $reporting_period['period_from'];
 				$prev_value = $db_service['status_timeline'][$reporting_period_index]['start_value'];
 
@@ -1329,16 +1331,30 @@ class CSla extends CApiService {
 							$cell['downtime'] += $uptime;
 						}
 
-						foreach ($db_sla['excluded_downtimes'] as $excluded_downtime) {
+						foreach ($db_sla['excluded_downtimes'] as $index => $excluded_downtime) {
 							$downtime_period_from = max($excluded_downtime['period_from'], $uptime_period_from);
 							$downtime_period_to = min($excluded_downtime['period_to'], $uptime_period_to);
 
 							if ($downtime_period_to > $downtime_period_from) {
-								$cell['excluded_downtimes'][] = [
-									'name' => $excluded_downtime['name'],
-									'period_from' => (int) $downtime_period_from,
-									'period_to' => (int) $downtime_period_to
+								if (array_key_exists($index, $last_excluded_downtimes)) {
+									$cell['excluded_downtimes'][$last_excluded_downtimes[$index]['cell']]['period_to'] =
+										(int) $downtime_period_to;
+								}
+								else {
+									$cell['excluded_downtimes'][] = [
+										'name' => $excluded_downtime['name'],
+										'period_from' => (int) $downtime_period_from,
+										'period_to' => (int) $downtime_period_to
+									];
+								}
+
+								$last_excluded_downtimes[$index] = [
+									'cell' => count($cell['excluded_downtimes']) - 1,
+									'period_to' => $downtime_period_to
 								];
+							}
+							else {
+								unset($last_excluded_downtimes[$index]);
 							}
 						}
 					}
