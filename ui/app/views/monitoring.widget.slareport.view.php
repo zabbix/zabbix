@@ -78,7 +78,7 @@ elseif (!$data['has_serviceid']) {
 }
 else {
 	$report->setHeader([
-		CSlaHelper::getPeriodNames()[$data['sla']['period']],
+		CSlaHelper::getReportNames()[$data['sla']['period']],
 		_('SLO'),
 		_('SLI'),
 		_('Uptime'),

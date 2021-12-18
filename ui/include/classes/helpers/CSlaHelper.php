@@ -32,10 +32,10 @@ final class CSlaHelper {
 	 * @return array
 	 */
 	public static function getPeriodNames(): array {
-		static $periods;
+		static $period_names;
 
-		if ($periods === null) {
-			$periods = [
+		if ($period_names === null) {
+			$period_names = [
 				ZBX_SLA_PERIOD_DAILY => _('Daily'),
 				ZBX_SLA_PERIOD_WEEKLY => _('Weekly'),
 				ZBX_SLA_PERIOD_MONTHLY => _('Monthly'),
@@ -44,7 +44,26 @@ final class CSlaHelper {
 			];
 		}
 
-		return $periods;
+		return $period_names;
+	}
+
+	/**
+	 * @return array
+	 */
+	public static function getReportNames(): array {
+		static $report_names;
+
+		if ($report_names === null) {
+			$report_names = [
+				ZBX_SLA_PERIOD_DAILY => _('Day'),
+				ZBX_SLA_PERIOD_WEEKLY => _('Week'),
+				ZBX_SLA_PERIOD_MONTHLY => _('Month'),
+				ZBX_SLA_PERIOD_QUARTERLY => _('Quarter'),
+				ZBX_SLA_PERIOD_ANNUALLY => _('Year')
+			];
+		}
+
+		return $report_names;
 	}
 
 	/**
