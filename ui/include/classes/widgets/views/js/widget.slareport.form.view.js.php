@@ -42,7 +42,7 @@ window.widget_slareport = {
 			}
 
 			const overlay = PopUp('popup.services', {
-				title: <?= json_encode(_('Select service')) ?>,
+				title: <?= json_encode(_('Service')) ?>,
 				exclude_serviceids,
 				multiple: 0
 			}, 'services', document.activeElement);
