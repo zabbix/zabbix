@@ -571,7 +571,7 @@ class CSla extends CApiService {
 			foreach ($sla['schedule'] as $schedule_row) {
 				if ($schedule_row['period_from'] >= $schedule_row['period_to']) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Start time must be less than the end time for SLA "%1$s".', $name)
+						_s('Start time must be less than end time for SLA "%1$s".', $name)
 					);
 				}
 			}
@@ -598,7 +598,7 @@ class CSla extends CApiService {
 			foreach ($sla['excluded_downtimes'] as $excluded_downtime) {
 				if ($excluded_downtime['period_from'] >= $excluded_downtime['period_to']) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'Start time must be less than the end time for excluded downtime "%2$s" of SLA "%1$s".',
+						'Start time must be less than end time for excluded downtime "%2$s" of SLA "%1$s".',
 						$name, $excluded_downtime['name']
 					));
 				}
