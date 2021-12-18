@@ -12,15 +12,15 @@ Zabbix is an open-source product that can be installed on a majority of Unix-lik
 
 3. Supported Morningstar products
 
-| Product           | Readme                                     | Template                                                       |
-|-------------------|--------------------------------------------|----------------------------------------------------------------|
-| Prostar MPPT      | [Readme](prostar_mppt_snmp/README.md)      | [Template](prostar_mppt_snmp/prostar_mppt_snmp.yaml)           |
-| Prostar PWM       | [Readme](prostar_pwm_snmp/README.md)       | [Template](prostar_pwm_snmp/prostar_pwm_snmp.yaml)             |
-| Sunsaver MPPT     | [Readme](sunsaver_mppt_snmp/README.md)     | [Template](sunsaver_mppt_snmp/sunsaver_mppt_snmp.yaml)         |
-| Suresine          | [Readme](suresine_snmp/README.md)          | [Template](suresine_snmp/suresine_snmp.yaml)                   |
-| Tristar MPPT 600V | [Readme](tristar_mppt_600V_snmp/README.md) | [Template](tristar_mppt_600V_snmp/tristar_mppt_600V_snmp.yaml) |
-| Tristar MPPT      | [Readme](tristar_mppt_snmp/README.md)      | [Template](tristar_mppt_snmp/tristar_mppt_snmp.yaml)           |
-| Tristar PWM       | [Readme](tristar_pwm_snmp/README.md)       | [Template](tristar_pwm_snmp/tristar_pwm_snmp.yaml)             |
+| Product | Readme | Template |
+|---|---|---|
+| Prostar MPPT | [Readme](morningstar_prostar_mppt_snmp/README.md) | [Template](morningstar_prostar_mppt_snmp/template_net_morningstar_prostar_mppt_snmp.yaml) |
+| Prostar PWM | [Readme](morningstar_prostar_pwm_snmp/README.md) | [Template](morningstar_prostar_pwm_snmp/template_net_morningstar_prostar_pwm_snmp.yaml) |
+| Sunsaver MPPT | [Readme](morningstar_sunsaver_mppt_snmp/README.md) | [Template](morningstar_sunsaver_mppt_snmp/template_net_morningstar_sunsaver_mppt_snmp.yaml) |
+| Suresine | [Readme](morningstar_suresine_snmp/README.md) | [Template](morningstar_suresine_snmp/template_net_morningstar_suresine_snmp.yaml) |
+| Tristar MPPT 600V | [Readme](morningstar_tristar_mppt_600V_snmp/README.md) | [Template](morningstar_tristar_mppt_600V_snmp/template_net_morningstar_tristar_mppt_600V_snmp.yaml) |
+| Tristar MPPT | [Readme](morningstar_tristar_mppt_snmp/README.md) | [Template](morningstar_tristar_mppt_snmp/template_net_morningstar_tristar_mppt_snmp.yaml) |
+| Tristar PWM | [Readme](morningstar_tristar_pwm_snmp/README.md) | [Template](morningstar_tristar_pwm_snmp/template_net_morningstar_tristar_pwm_snmp.yaml) |
 
 ## Zabbix set up
 
@@ -30,14 +30,14 @@ Zabbix is an open-source product that can be installed on a majority of Unix-lik
 Import the downloaded template into Zabbix by following these steps:
 
 - Press the *Import* button in the top right corner
-- Select the XML file of the required template on your machine
+- Select the YAML file of the required template on your machine
 - Press *Import*
 
 1. Now you need to teach Zabbix how to connect to the device.
 To do so, first create a host to represent your Morningstar device:
 
 - Using a sidebar menu at the left, navigate to the _Configuration -> Hosts_ section
-- Press the *Create host* button in the top right corner
+- Press the *Create host* button in the top right corner
 - In the Host configuration window fill in the required fields:
 
   - *Host name* -  enter any unique name
@@ -45,10 +45,10 @@ To do so, first create a host to represent your Morningstar device:
   - *Interfaces* - press Add and select SNMP from the drop-down list that appears.
 
 - Add an SNMP interface for the host:
-  - Enter the IP address/DNS name and port number
-  - Select the SNMP v2 from the dropdown
+  - Enter the IP address/DNS name and port number
+  - Select the SNMP v2 from the dropdown
   - In the *SNMP community* field enter 'public'
-  - Turn off the *Use bulk requests* checkbox because devices do not work correctly in this mode
+  - Turn off the *Use bulk requests* checkbox because devices do not work correctly in this mode
 - Open the *Templates* tab. In the *Link new templates* field, start typing Morningstar, then select the imported template from the list.
 
 1. Repeat step 3 for each Morningstar device you want to monitor.

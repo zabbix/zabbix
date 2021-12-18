@@ -1,103 +1,171 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:07Z'
+  version: '6.0'
+  date: '2021-12-17T06:31:59Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
       name: Templates/Modules
   templates:
     -
-      uuid: 24bed6339f0a492fab86fe757394b937
-      template: 'Morningstar ProStar PWM SNMP'
-      name: 'Morningstar ProStar PWM SNMP'
+      uuid: b84324c2a40a496dbbb379bbf5dde8d5
+      template: 'Morningstar ProStar MPPT SNMP'
+      name: 'Morningstar ProStar MPPT SNMP'
       description: |
         MIBs used:
-        PROSTAR-PWM
+        PROSTAR-MPPT
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Modules
       items:
         -
-          uuid: 953fb8b3c23f420bb6132874ce3e33e2
-          name: 'Array: Voltage'
+          uuid: a517a7aafbab426eb6ced8d5f57c1fa4
+          name: 'Array: Sweep Pmax'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.4.1.33333.6.31.0
-          key: 'array.voltage[arrayVoltage.0]'
+          snmp_oid: 1.3.6.1.4.1.33333.5.64.0
+          key: 'array.sweep_pmax[arrayMaxPowerSweep.0]'
           history: 7d
           value_type: FLOAT
-          units: V
+          units: W
           description: |
-            MIB: PROSTAR-PWM
-            Description:Array Voltage
-            Scaling Factor:1.0
-            Units:V
-            Range:[0, 80]
-            Modbus address:0x0013
+            MIB: PROSTAR-MPPT
+            Array Max. Power (sweep)
+             Description:Array Max. Power (last sweep)
+             Scaling Factor:1.0
+             Units:W
+             Range:[0.0, 500]
+             Modbus address:0x003E
           tags:
             -
               tag: Application
               value: Array
         -
-          uuid: a80ad3ace9b14446bc5fd5d6aaa5af87
+          uuid: 7714c76013e341f8b6753cc5a50a960f
+          name: 'Array: Sweep Vmp'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.5.63.0
+          key: 'array.sweep_vmp[arrayVmp.0]'
+          history: 7d
+          value_type: FLOAT
+          units: V
+          description: |
+            MIB: PROSTAR-MPPT
+            Array Vmp
+              Description:Array Max. Power Point Voltage
+              Scaling Factor:1.0
+              Units:V
+              Range:[0.0, 5000.0]
+              Modbus address:0x003D
+          tags:
+            -
+              tag: Application
+              value: Array
+        -
+          uuid: 379ab969ad784968a1090ff98f5801ff
+          name: 'Array: Sweep Voc'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.5.65.0
+          key: 'array.sweep_voc[arrayVoc.0]'
+          history: 7d
+          value_type: FLOAT
+          units: V
+          description: |
+            MIB: PROSTAR-MPPT
+            Array Voc
+             Description:Array Open Circuit Voltage
+             Scaling Factor:1.0
+             Units:V
+             Range:[0.0, 80.0]
+             Modbus address:0x003F
+          tags:
+            -
+              tag: Application
+              value: Array
+        -
+          uuid: 41a1118e1be3417daa79faace733d861
+          name: 'Array: Voltage'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.5.31.0
+          key: 'array.voltage[arrayVoltage.0]'
+          history: 7d
+          value_type: FLOAT
+          units: V
+          description: |
+            MIB: PROSTAR-MPPT
+            Array Voltage
+              Description:Array Voltage
+              Scaling Factor:1.0
+              Units:V
+              Range:[0, 80]
+              Modbus address:0x0013
+          tags:
+            -
+              tag: Application
+              value: Array
+        -
+          uuid: fe5c3b724e894573acdaf522a2213adb
           name: 'Battery: Battery Voltage discovery'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.4.1.33333.6.30.0
+          snmp_oid: 1.3.6.1.4.1.33333.5.30.0
           key: 'battery.voltage.discovery[batteryTerminalVoltage.0]'
           delay: 15m
           history: '0'
           value_type: FLOAT
           units: V
-          description: 'MIB: PROSTAR-PWM'
+          description: 'MIB: PROSTAR-MPPT'
           tags:
             -
               tag: Application
               value: 'Zabbix raw items'
         -
-          uuid: 148008b117c94155ba81600e3050ab25
+          uuid: ed1d54fce0904b7c9d0895a094f55108
           name: 'Battery: Charge Current'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.4.1.33333.6.33.0
+          snmp_oid: 1.3.6.1.4.1.33333.5.33.0
           key: 'charge.current[chargeCurrent.0]'
           history: 7d
           value_type: FLOAT
           units: A
           description: |
-            MIB: PROSTAR-PWM
-            Description:Charge Current
-            Scaling Factor:1.0
-            Units:A
-            Range:[0, 40]
-            Modbus address:0x0011
+            MIB: PROSTAR-MPPT
+            Charge Current
+              Description:Charge Current
+              Scaling Factor:1.0
+              Units:A
+              Range:[0, 40]
+              Modbus address:0x0010
           tags:
             -
               tag: Application
               value: Battery
         -
-          uuid: a7ae2d3b911e4bb5a7eeb770470245a5
+          uuid: 1b1b61995c0d4d89a7f9ad4e14c3541f
           name: 'Battery: Charge State'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.4.1.33333.6.45.0
+          snmp_oid: 1.3.6.1.4.1.33333.5.45.0
           key: 'charge.state[chargeState.0]'
           history: 7d
           value_type: FLOAT
           description: |
-            MIB: PROSTAR-PWM
-            Description:Control State
-            Modbus address:0x0021
+            MIB: PROSTAR-MPPT
+            Charge State
+              Description:Control State
+              Modbus address:0x0021
             
-            0: Start
-            1: NightCheck
-            2: Disconnect
-            3: Night
-            4: Fault
-            5: Bulk
-            6: Pwm
-            7: Float
-            8: Equalize
+              0: Start
+              1: NightCheck
+              2: Disconnect
+              3: Night
+              4: Fault
+              5: BulkMppt
+              6: Absorption
+              7: Float
+              8: Equalize
+              9: Slave
+              10: Fixed
           valuemap:
-            name: 'ProStar PWM charge state'
+            name: 'ProStar MPPT charge state'
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -109,37 +177,38 @@ zabbix_export:
               value: Battery
           triggers:
             -
-              uuid: f12fc2c1a7a142a287304c18bafa1181
-              expression: 'last(/Morningstar ProStar PWM SNMP/charge.state[chargeState.0])={$CHARGE.STATE.CRIT}'
+              uuid: fe4863fdd4d64e1c977328bd3d0f687f
+              expression: 'last(/Morningstar ProStar MPPT SNMP/charge.state[chargeState.0])={$CHARGE.STATE.CRIT}'
               name: 'Battery: Device charge in critical state'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: adf8cf02aa1e42fa84e1f11ddae4df01
-              expression: 'last(/Morningstar ProStar PWM SNMP/charge.state[chargeState.0])={$CHARGE.STATE.WARN}'
+              uuid: 4d064e4877474d72b85c9cdfb7b09dad
+              expression: 'last(/Morningstar ProStar MPPT SNMP/charge.state[chargeState.0])={$CHARGE.STATE.WARN}'
               name: 'Battery: Device charge in warning state'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'Battery: Device charge in critical state'
-                  expression: 'last(/Morningstar ProStar PWM SNMP/charge.state[chargeState.0])={$CHARGE.STATE.CRIT}'
+                  expression: 'last(/Morningstar ProStar MPPT SNMP/charge.state[chargeState.0])={$CHARGE.STATE.CRIT}'
         -
-          uuid: 8acd2e7944694a828cf9b739b75513d9
+          uuid: 009eb72ff6674da49d1dd85a6f9459cf
           name: 'Counter: Charge Amp-hours'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.4.1.33333.6.49.0
+          snmp_oid: 1.3.6.1.4.1.33333.5.49.0
           key: 'counter.charge_amp_hours[ahChargeResettable.0]'
           history: 7d
           value_type: FLOAT
           units: Ah
           description: |
-            MIB: PROSTAR-PWM
-            Description:Ah Charge (Resettable)
-            Scaling Factor:0.1
-            Units:Ah
-            Range:[0.0, 4294967294]
-            Modbus addresses:H=0x0026 L=0x0027
+            MIB: PROSTAR-MPPT
+            Ah Charge (Resettable)
+             Description:Ah Charge (Resettable)
+             Scaling Factor:0.1
+             Units:Ah
+             Range:[0.0, 4294967294]
+             Modbus addresses:H=0x0026 L=0x0027
           preprocessing:
             -
               type: MULTIPLIER
@@ -150,16 +219,17 @@ zabbix_export:
               tag: Application
               value: Counter
         -
-          uuid: 0e7124df3f2b4298b1a13576d0b2d5e7
+          uuid: 4a53a2211a1249d59369ad65762ffe47
           name: 'Counter: Charge KW-hours'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.4.1.33333.6.51.0
+          snmp_oid: 1.3.6.1.4.1.33333.5.51.0
           key: 'counter.charge_kw_hours[kwhChargeResettable.0]'
           history: 7d
           value_type: FLOAT
           units: '!kWh'
           description: |
-            MIB: PROSTAR-PWM
+            MIB: PROSTAR-MPPT
+            kWh Charge (Resettable)
             Description:Kilowatt Hours Charge (Resettable)
             Scaling Factor:1.0
             Units:kWh
@@ -170,16 +240,16 @@ zabbix_export:
               tag: Application
               value: Counter
         -
-          uuid: 104a7db1c27d40b3bbee506f7f922393
+          uuid: c72ef851c2d240c9835c1703cec49fd6
           name: 'Counter: Load Amp-hours'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.4.1.33333.6.56.0
+          snmp_oid: 1.3.6.1.4.1.33333.5.56.0
           key: 'counter.load_amp_hours[ahLoadResettable.0]'
           history: 7d
           value_type: FLOAT
           units: Ah
           description: |
-            MIB: PROSTAR-PWM
+            MIB: PROSTAR-MPPT
             Description:Ah Load (Resettable)
             Scaling Factor:0.1
             Units:Ah
@@ -195,39 +265,41 @@ zabbix_export:
               tag: Application
               value: Counter
         -
-          uuid: dcade8607cf142a2b88333f9880448fc
+          uuid: 29a7d76472fb4025bc78fbeab273e955
           name: 'Load: Current'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.4.1.33333.6.34.0
+          snmp_oid: 1.3.6.1.4.1.33333.5.34.0
           key: 'load.current[loadCurrent.0]'
           history: 7d
           value_type: FLOAT
           units: A
           description: |
-            MIB: PROSTAR-PWM
-            Description:Load Current
-            Scaling Factor:1.0
-            Units:A
-            Range:[0, 60]
-            Modbus address:0x0016
+            MIB: PROSTAR-MPPT
+            Load Current
+             Description:Load Current
+             Scaling Factor:1.0
+             Units:A
+             Range:[0, 60]
+             Modbus address:0x0016
           tags:
             -
               tag: Application
               value: Load
         -
-          uuid: 14b3ca3869374f54a467e5e9017f918a
+          uuid: ae927b5cba5b43f5a2136fd3ee71b63d
           name: 'Load: State'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.4.1.33333.6.53.0
+          snmp_oid: 1.3.6.1.4.1.33333.5.53.0
           key: 'load.state[loadState.0]'
           history: 7d
           value_type: FLOAT
           description: |
-            MIB: PROSTAR-PWM
-            Description:Load State
-            Modbus address:0x002E
+            MIB: PROSTAR-MPPT
+            Load State
+             Description:Load State
+             Modbus address:0x002E
             
-            0: Start
+             0: Start
             1: Normal
             2: LvdWarning
             3: Lvd
@@ -237,7 +309,7 @@ zabbix_export:
             7: Override
             8: NotUsed
           valuemap:
-            name: 'ProStar PWM load state'
+            name: 'ProStar MPPT load state'
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -249,52 +321,53 @@ zabbix_export:
               value: Load
           triggers:
             -
-              uuid: 7a8bf4420b6b48ab8a5bc999eecae760
-              expression: 'last(/Morningstar ProStar PWM SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"lvd"} or last(/Morningstar ProStar PWM SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"fault"}'
+              uuid: a88025c5e5a748e3a6dfa01685ba075b
+              expression: 'last(/Morningstar ProStar MPPT SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"lvd"} or last(/Morningstar ProStar MPPT SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"fault"}'
               name: 'Load: Device load in critical state'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: 5152f9cd4ee34be485f3cb0a0f60afd5
-              expression: 'last(/Morningstar ProStar PWM SNMP/load.state[loadState.0])={$LOAD.STATE.WARN:"lvdWarning"}  or last(/Morningstar ProStar PWM SNMP/load.state[loadState.0])={$LOAD.STATE.WARN:"override"}'
+              uuid: 9ab107b39b874fed83d09e7c1964a699
+              expression: 'last(/Morningstar ProStar MPPT SNMP/load.state[loadState.0])={$LOAD.STATE.WARN:"lvdWarning"}  or last(/Morningstar ProStar MPPT SNMP/load.state[loadState.0])={$LOAD.STATE.WARN:"override"}'
               name: 'Load: Device load in warning state'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'Load: Device load in critical state'
-                  expression: 'last(/Morningstar ProStar PWM SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"lvd"} or last(/Morningstar ProStar PWM SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"fault"}'
+                  expression: 'last(/Morningstar ProStar MPPT SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"lvd"} or last(/Morningstar ProStar MPPT SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"fault"}'
         -
-          uuid: cccc0976a62b47b1a558d521704c125d
+          uuid: 47894752dd1d41f1aa882387acf6dc3a
           name: 'Load: Voltage'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.4.1.33333.6.32.0
+          snmp_oid: 1.3.6.1.4.1.33333.5.32.0
           key: 'load.voltage[loadVoltage.0]'
           history: 7d
           value_type: FLOAT
           units: V
           description: |
-            MIB: PROSTAR-PWM
-            Description:Load Voltage
-            Scaling Factor:1.0
-            Units:V
-            Range:[0, 80]
-            Modbus address:0x0014
+            MIB: PROSTAR-MPPT
+            Load Voltage
+             Description:Load Voltage
+             Scaling Factor:1.0
+             Units:V
+             Range:[0, 80]
+             Modbus address:0x0014
           tags:
             -
               tag: Application
               value: Load
         -
-          uuid: 7c1c1e03425c4b4bb176cf45458b916a
+          uuid: d44cb5d7db31402dae79275a9148817d
           name: 'Status: Alarms'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.4.1.33333.6.59.0
+          snmp_oid: 1.3.6.1.4.1.33333.5.59.0
           key: 'status.alarms[alarms.0]'
           history: 1h
           trends: '0'
           value_type: TEXT
           description: |
-            MIB: PROSTAR-PWM
+            MIB: PROSTAR-MPPT
             Description:Alarms
             Modbus addresses:H=0x0038 L=0x0039
           preprocessing:
@@ -313,13 +386,17 @@ zabbix_export:
                     'heatsinkTempSensorOpen',
                     'heatsinkTempSensorShorted',
                     'heatsinkTempLimit',
+                    'inductorTempSensorOpen',
+                    'inductorTempSensorShorted',
+                    'inductorTempLimit',
                     'currentLimit',
                     'currentMeasurementError',
                     'batterySenseOutOfRange',
                     'batterySenseDisconnected',
                     'uncalibrated',
-                    'batteryTempOutOfRange',
+                    'tb5v',
                     'fp10SupplyOutOfRange',
+                    'unused',
                     'mosfetOpen',
                     'arrayCurrentOffset',
                     'loadCurrentOffset',
@@ -348,148 +425,166 @@ zabbix_export:
               value: Status
           triggers:
             -
-              uuid: 67fd46f034c3486e9af3cabfc5dc8056
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","arrayCurrentOffset")=2'
+              uuid: a2d0ab5150dd4bad8b5ec4f2c6aa13f8
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","arrayCurrentOffset")=2'
               name: 'Status: Device has "arrayCurrentOffset" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: 31cc0b05b83045de80a7d07f26545010
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","batterySenseDisconnected")=2'
+              uuid: cc6a15f16fd8470a9dcd9a9e01cba61c
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","batterySenseDisconnected")=2'
               name: 'Status: Device has "batterySenseDisconnected" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: 9e498d21bc7f4ca1937f1628f4b1ea55
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","batterySenseOutOfRange")=2'
+              uuid: 55d4726d9b9047c79cf690353d950797
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","batterySenseOutOfRange")=2'
               name: 'Status: Device has "batterySenseOutOfRange" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: 8a09c7609f9a45cea5b217757a7d2e5e
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","batteryTempOutOfRange")=2'
-              name: 'Status: Device has "batteryTempOutOfRange" alarm flag'
-              opdata: 'Current value: {ITEM.LASTVALUE1}'
-              priority: WARNING
-            -
-              uuid: b173b8ca12f8464aae6476009b4c89e8
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","controllerReset")=2'
+              uuid: 7f015198395042219666cde4458d407c
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","controllerReset")=2'
               name: 'Status: Device has "controllerReset" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: cdbac88810ff49caa35771e661d8b312
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","currentLimit")=2'
+              uuid: 48339339e5a7465fbc67266998c9a8fe
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","currentLimit")=2'
               name: 'Status: Device has "currentLimit" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: 7758388df28d4540ba393f4423fef00a
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","currentMeasurementError")=2'
+              uuid: c88074037099498c896bb4793e04fea3
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","currentMeasurementError")=2'
               name: 'Status: Device has "currentMeasurementError" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: a56fef1f61c44ba884ec448b0d306c1d
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","eepromAccessFailure")=2'
+              uuid: cecd8ee17e5143ffb46495e927750c82
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","eepromAccessFailure")=2'
               name: 'Status: Device has "eepromAccessFailure" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: fefea5daa03d453c8c5148ddb39997f9
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","fp10SupplyOutOfRange")=2'
+              uuid: 4affa15e1c1c42459ea8dd6820d1c008
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","fp10SupplyOutOfRange")=2'
               name: 'Status: Device has "fp10SupplyOutOfRange" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: c252c82aff2a4ac680965115cb2fab64
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempLimit")=2'
+              uuid: 41e4225072a3468696cfb534c65b9736
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempLimit")=2'
               name: 'Status: Device has "heatsinkTempLimit" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: 5b93a0a09a62481d8096ec743c2ceaff
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorOpen")=2'
+              uuid: 5d269997a57d44ceb545e751e8e2d919
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorOpen")=2'
               name: 'Status: Device has "heatsinkTempSensorOpen" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: f28e5143a238470ba93c1345c814f87d
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorShorted")=2'
+              uuid: a8342a4e2fff40a7b830086dec303fd9
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorShorted")=2'
               name: 'Status: Device has "heatsinkTempSensorShorted" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: 75c84ef378984fca854b34a8ef79668c
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","hightInputVoltageLimit")=2'
+              uuid: 32e5b7ae81ce4ebea9b05ff7ab411e5a
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","hightInputVoltageLimit")=2'
               name: 'Status: Device has "hightInputVoltageLimit" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: 5c1551f7e2be40e0b8b50ed263f8e293
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","loadCurrentOffset")=2'
+              uuid: c10d27c1d9d54b8981a639e7bf0dfc02
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","inductorTempLimit")=2'
+              name: 'Status: Device has "inductorTempLimit" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+            -
+              uuid: 9f80959684b34b6498a1634097cd0d22
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","inductorTempSensorOpen")=2'
+              name: 'Status: Device has "inductorTempSensorOpen" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+            -
+              uuid: cc735ddcc98e4c099bb770e2b2a171b5
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","inductorTempSensorShorted")=2'
+              name: 'Status: Device has "inductorTempSensorShorted" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+            -
+              uuid: 217935cd6c7547bc95f5af51b3e643d4
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","loadCurrentOffset")=2'
               name: 'Status: Device has "loadCurrentOffset" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: 665117c5b9b64ea09a1d661e9c40fc43
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","loadLvd")=2'
+              uuid: cb05261f120240bf944b304ffc4979e6
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","loadLvd")=2'
               name: 'Status: Device has "loadLvd" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: b89c002c859c419ea748b43d575e9e27
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","logTimeout")=2'
+              uuid: 1ed1de932e084ce5ba03747bdd8ca4e5
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","logTimeout")=2'
               name: 'Status: Device has "logTimeout" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: 17f51e7b248b4e63934e8b529b85b2ef
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","mosfetOpen")=2'
+              uuid: 8824f80f1ef245508d6d0d660e3cabf1
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","mosfetOpen")=2'
               name: 'Status: Device has "mosfetOpen" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: 75e23772250741d0b1fc1ddff2a72ef6
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","p12SupplyOutOfRange")=2'
+              uuid: 59569aaebf32403c9fd310f6b26845b0
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","p12SupplyOutOfRange")=2'
               name: 'Status: Device has "p12SupplyOutOfRange" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: fc374c9ac9fa4f979fbff9f7c7d83565
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","p33SupplyOutOfRange")=2'
+              uuid: 4775d3a7b843455eb404661c070be092
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","p33SupplyOutOfRange")=2'
               name: 'Status: Device has "p33SupplyOutOfRange" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: fbec2a1fdbe54d8da352471acf67bad1
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","rtsDisconnected")=2'
+              uuid: 2015d2b876564ad79699a23fc6b60f07
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","rtsDisconnected")=2'
               name: 'Status: Device has "rtsDisconnected" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: 915da6e7b1cd410da9a6c68e3b4abd85
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","rtsShorted")=2'
+              uuid: cce1eb2bee094a3b9a993ec2d60d182b
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","rtsShorted")=2'
               name: 'Status: Device has "rtsShorted" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
             -
-              uuid: e8bf2213a5444e2c9923b6f093d43f75
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","uncalibrated")=2'
+              uuid: 7a07b757660a4c9a879ac03a94832720
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","tb5v")=2'
+              name: 'Status: Device has "tb5v" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+            -
+              uuid: 39205fc6d2cd4888994cccb016b4b2f8
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.alarms[alarms.0],#3,"like","uncalibrated")=2'
               name: 'Status: Device has "uncalibrated" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
         -
-          uuid: 2517d96e51c14372a0336c9a6ed5d078
+          uuid: 8fbb5c650fa040c892a1d10a17fbbf14
           name: 'Status: Array Faults'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.4.1.33333.6.46.0
+          snmp_oid: 1.3.6.1.4.1.33333.5.46.0
           key: 'status.array_faults[arrayFaults.0]'
           history: 1h
           trends: '0'
           value_type: TEXT
           description: |
-            MIB: PROSTAR-PWM
+            MIB: PROSTAR-MPPT
             Description:Array Faults
             Modbus address:0x0022
           preprocessing:
@@ -514,7 +609,6 @@ zabbix_export:
                     'batteryLowVoltageDisconnect',
                     'slaveTimeout',
                     'dipSwitchChanged',
-                    'p3Fault',
                   ];
                   
                   var flags = parseInt(value.replace(/\x20/g, ''), 16),
@@ -533,96 +627,90 @@ zabbix_export:
               value: Status
           triggers:
             -
-              uuid: b2ff69793e124031a79a668b03678fac
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","arrayHvd")=2'
+              uuid: 8322f8ca8e2e462a8799dc399f17ba27
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.array_faults[arrayFaults.0],#3,"like","arrayHvd")=2'
               name: 'Status: Device has "arrayHvd" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: a4ca36ccaa9d45ceb79303afef1c49f0
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","batteryHvd")=2'
+              uuid: 6a138cd2af754bb3a22173e8da28b254
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.array_faults[arrayFaults.0],#3,"like","batteryHvd")=2'
               name: 'Status: Device has "batteryHvd" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: f4d1120afb13456b9d45f8795dbc30b7
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","batteryLowVoltageDisconnect")=2'
+              uuid: 8e42cf21ec10409da840021bfd26f74c
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.array_faults[arrayFaults.0],#3,"like","batteryLowVoltageDisconnect")=2'
               name: 'Status: Device has "batteryLowVoltageDisconnect" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: 9e5f2c575945458ea8a39f33cb23b833
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","customSettingsEdit")=2'
+              uuid: d1112d9828064a879d56626ac6339dbf
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.array_faults[arrayFaults.0],#3,"like","customSettingsEdit")=2'
               name: 'Status: Device has "customSettingsEdit" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: fd904f4469324784ac2c469e64069f94
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","dipSwitchChanged")=2'
+              uuid: 75a67f17a33e41eea34585fade6319ef
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.array_faults[arrayFaults.0],#3,"like","dipSwitchChanged")=2'
               name: 'Status: Device has "dipSwitchChanged" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: 62076ce0967049c8bde39f71afcb85d9
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","localTempSensorDamaged")=2'
+              uuid: 4502112383524f0499ea13e6f83ce789
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.array_faults[arrayFaults.0],#3,"like","localTempSensorDamaged")=2'
               name: 'Status: Device has "localTempSensorDamaged" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: ea8487afe1c14bc08f3d9fd7f75d208f
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","mosfetSShorted")=2'
+              uuid: f1489dc1f8574895bd233b14ce080748
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.array_faults[arrayFaults.0],#3,"like","mosfetSShorted")=2'
               name: 'Status: Device has "mosfetSShorted" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: b0bb139541ae493bafc40dac9074d898
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","overcurrent")=2'
+              uuid: 4ea903d3e8644ddaa5309eaa9715b894
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.array_faults[arrayFaults.0],#3,"like","overcurrent")=2'
               name: 'Status: Device has "overcurrent" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: 8af94d7ff1a84e18b10122b0e3743d45
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","p3Fault")=2'
-              name: 'Status: Device has "p3Fault" array faults flag'
-              opdata: 'Current value: {ITEM.LASTVALUE1}'
-              priority: HIGH
-            -
-              uuid: b41cb2e05acb40f59efa50a25f66cd62
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","rtsNoLongerValid")=2'
+              uuid: e12a29ec16ea423cb69ca4ce460f201b
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.array_faults[arrayFaults.0],#3,"like","rtsNoLongerValid")=2'
               name: 'Status: Device has "rtsNoLongerValid" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: d99c3f126c7e480cb4fcc705349eb61d
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","rtsShorted")=2'
+              uuid: 3ec4307bb2c444fc8eca27f9b7a136e2
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.array_faults[arrayFaults.0],#3,"like","rtsShorted")=2'
               name: 'Status: Device has "rtsShorted" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: 711b28f19cb74c0faeef73263ca1fb8f
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","slaveTimeout")=2'
+              uuid: 915c00d98e144ee7a9a2d50d0bd474c0
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.array_faults[arrayFaults.0],#3,"like","slaveTimeout")=2'
               name: 'Status: Device has "slaveTimeout" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: e4a261d750d546c7b5d5067dd9a0ec25
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","software")=2'
+              uuid: 9aac314eef594a8d86fd4b88308428e5
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.array_faults[arrayFaults.0],#3,"like","software")=2'
               name: 'Status: Device has "software" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
         -
-          uuid: 1cd47d04af104cb9ab1cd7dc745a6aea
+          uuid: fb4d2147a8224b599ad908eca1b019e4
           name: 'Status: Load Faults'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.4.1.33333.6.54.0
+          snmp_oid: 1.3.6.1.4.1.33333.5.54.0
           key: 'status.load_faults[loadFaults.0]'
           history: 1h
           trends: '0'
           value_type: TEXT
           description: |
-            MIB: PROSTAR-PWM
-            Description:Load Faults
-            Modbus address:0x002F
+            MIB: PROSTAR-MPPT
+            Description:Array Faults
+            Modbus address:0x0022
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -640,8 +728,7 @@ zabbix_export:
                     'loadHvd',
                     'highTempDisconnect',
                     'dipSwitchChanged',
-                    'customSettingsEdit',
-                    'p3Fault'
+                    'customSettingsEdit'
                   ];
                   
                   var flags = parseInt(value.replace(/\x20/g, ''), 16),
@@ -660,61 +747,55 @@ zabbix_export:
               value: Status
           triggers:
             -
-              uuid: 99ab5f0d3014459a8cd7d137d3a1f688
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.load_faults[loadFaults.0],#3,"like","customSettingsEdit")=2'
+              uuid: 93750f768ba94f1bb9302fc17c76faeb
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.load_faults[loadFaults.0],#3,"like","customSettingsEdit")=2'
               name: 'Status: Device has "customSettingsEdit" load faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: 77752192092f4f1caceef19c3c164b72
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.load_faults[loadFaults.0],#3,"like","dipSwitchChanged")=2'
+              uuid: 456e2c36369f4519b2c80bcfe1acb4b0
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.load_faults[loadFaults.0],#3,"like","dipSwitchChanged")=2'
               name: 'Status: Device has "dipSwitchChanged" load faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: d2e55501d89844aeb47f7887a11754a9
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.load_faults[loadFaults.0],#3,"like","externalShortCircuit")=2'
+              uuid: 359df17c40684187b7ae92c8aa0c9624
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.load_faults[loadFaults.0],#3,"like","externalShortCircuit")=2'
               name: 'Status: Device has "externalShortCircuit" load faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: a6548502cfc4406098ba3129af8efcb5
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.load_faults[loadFaults.0],#3,"like","highTempDisconnect")=2'
+              uuid: 6dadf09064304f4381ad9ed0436e562a
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.load_faults[loadFaults.0],#3,"like","highTempDisconnect")=2'
               name: 'Status: Device has "highTempDisconnect" load faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: 6e8f0127bc7b42dea9d867ab174f458c
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.load_faults[loadFaults.0],#3,"like","loadHvd")=2'
+              uuid: bc41145ae8074290913a47cc3fd11e1e
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.load_faults[loadFaults.0],#3,"like","loadHvd")=2'
               name: 'Status: Device has "loadHvd" load faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: 2a303d4712e244a9b051fb1b0247fac5
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.load_faults[loadFaults.0],#3,"like","mosfetShorted")=2'
+              uuid: 8c8a7021928e4bf78b6309574e298876
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.load_faults[loadFaults.0],#3,"like","mosfetShorted")=2'
               name: 'Status: Device has "mosfetShorted" load faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: 5720e2e15e5f42099fd7de361f62c99a
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.load_faults[loadFaults.0],#3,"like","overcurrent")=2'
+              uuid: b7d3f05837bd4d788d14f1aaf18b0482
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.load_faults[loadFaults.0],#3,"like","overcurrent")=2'
               name: 'Status: Device has "overcurrent" load faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: 2f522d50a8124ed2a8af4d7b6417c31c
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.load_faults[loadFaults.0],#3,"like","p3Fault")=2'
-              name: 'Status: Device has "p3Fault" load faults flag'
-              opdata: 'Current value: {ITEM.LASTVALUE1}'
-              priority: HIGH
-            -
-              uuid: e75abe852b9c4e1d91a1f8f83622ef64
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.load_faults[loadFaults.0],#3,"like","software")=2'
+              uuid: 801728740c1948b1a751469e6443daab
+              expression: 'count(/Morningstar ProStar MPPT SNMP/status.load_faults[loadFaults.0],#3,"like","software")=2'
               name: 'Status: Device has "software" load faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
         -
-          uuid: 42f6a75d923d4262b37d85c4f7d1d322
+          uuid: 526ee94df484462a9264e57d92954e64
           name: 'Status: Uptime'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
@@ -733,35 +814,36 @@ zabbix_export:
               value: Status
           triggers:
             -
-              uuid: dea364bf454746bca6be38d7e0759d06
-              expression: 'last(/Morningstar ProStar PWM SNMP/status.uptime)<10m'
+              uuid: ca65a39c019046c29a522a6ca93ceb75
+              expression: 'last(/Morningstar ProStar MPPT SNMP/status.uptime)<10m'
               name: 'Status: Device has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
             -
-              uuid: 16c1444a745a47e59fd22bd1a64baef3
-              expression: 'nodata(/Morningstar ProStar PWM SNMP/status.uptime,5m)=1'
+              uuid: 59cbcaaee8304b38a1144b3abf40bd9d
+              expression: 'nodata(/Morningstar ProStar MPPT SNMP/status.uptime,5m)=1'
               name: 'Status: Failed to fetch data (or no data for 5m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 5 minutes'
               manual_close: 'YES'
         -
-          uuid: f4b7bfb000754a17b4719863d3755519
+          uuid: 20ce95acdff6486684461f10579a73b4
           name: 'Battery: Target Voltage'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.4.1.33333.6.48.0
+          snmp_oid: 1.3.6.1.4.1.33333.5.48.0
           key: 'target.voltage[targetVoltage.0]'
           history: 7d
           value_type: FLOAT
           units: V
           description: |
-            MIB: PROSTAR-PWM
-            Description:Target Regulation Voltage
-            Scaling Factor:1.0
-            Units:V
-            Range:[0.0, 80.0]
-            Modbus address:0x0024
+            MIB: PROSTAR-MPPT
+            Target Voltage
+             Description:Target Regulation Voltage
+             Scaling Factor:1.0
+             Units:V
+             Range:[0.0, 80.0]
+             Modbus address:0x0024
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -772,101 +854,104 @@ zabbix_export:
               tag: Application
               value: Battery
         -
-          uuid: 13d3479a7b5940b5a53d5f13bea9e2d1
+          uuid: 9a87cdcf65184059be334e986bcf801d
           name: 'Temperature: Ambient'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.4.1.33333.6.40.0
+          snmp_oid: 1.3.6.1.4.1.33333.5.40.0
           key: 'temp.ambient[ambientTemperature.0]'
           history: 7d
           value_type: FLOAT
           units: C
           description: |
-            MIB: PROSTAR-PWM
-            Description:Ambient Temperature
-            Scaling Factor:1.0
-            Units:deg C
-            Range:[-128, 127]
-            Modbus address:0x001C
+            MIB: PROSTAR-MPPT
+            Ambient Temperature
+             Description:Ambient Temperature
+             Scaling Factor:1.0
+             Units:deg C
+             Range:[-128, 127]
+             Modbus address:0x001C
           tags:
             -
               tag: Application
               value: Temperature
         -
-          uuid: 39763f7fccd94aefb720a34871c0962b
+          uuid: 1a8e79f49e86429abc80dd29598299ee
           name: 'Temperature: Battery'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.4.1.33333.6.39.0
+          snmp_oid: 1.3.6.1.4.1.33333.5.39.0
           key: 'temp.battery[batteryTemperature.0]'
           history: 7d
           value_type: FLOAT
           units: C
           description: |
-            MIB: PROSTAR-PWM
-            Description:Battery Temperature
-            Scaling Factor:1.0
-            Units:deg C
-            Range:[-128, 127]
-            Modbus address:0x001B
+            MIB: PROSTAR-MPPT
+            Battery Temperature
+              Description:Battery Temperature
+              Scaling Factor:1.0
+              Units:deg C
+              Range:[-128, 127]
+              Modbus address:0x001B
           tags:
             -
               tag: Application
               value: Temperature
           triggers:
             -
-              uuid: 46eb3a0e80294a4db8324d56337ed712
-              expression: 'min(/Morningstar ProStar PWM SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.CRIT}'
+              uuid: c74e1d3be1c24bde986bbce068db4bb8
+              expression: 'min(/Morningstar ProStar MPPT SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.CRIT}'
               name: 'Temperature: Critically high battery temperature (over {$BATTERY.TEMP.MAX.CRIT}C for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: c3f3ba5b2cab4481bb62fa8527554e96
-              expression: 'max(/Morningstar ProStar PWM SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.CRIT}'
+              uuid: 0c2180ae5deb41adb503e37bf91c34e2
+              expression: 'max(/Morningstar ProStar MPPT SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.CRIT}'
               name: 'Temperature: Critically low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
             -
-              uuid: 80aaf1de029b4d6eadce9f2a946f6dde
-              expression: 'min(/Morningstar ProStar PWM SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.WARN}'
+              uuid: 1ab91d781c734f1eb2b9552f6dee9370
+              expression: 'min(/Morningstar ProStar MPPT SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.WARN}'
               name: 'Temperature: High battery temperature (over {$BATTERY.TEMP.MAX.WARN}C for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'Temperature: Critically high battery temperature (over {$BATTERY.TEMP.MAX.CRIT}C for 5m)'
-                  expression: 'min(/Morningstar ProStar PWM SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.CRIT}'
+                  expression: 'min(/Morningstar ProStar MPPT SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.CRIT}'
             -
-              uuid: cf1db336ea124f9a9fd6eb367f93f0e8
-              expression: 'max(/Morningstar ProStar PWM SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.WARN}'
+              uuid: 6ec855dc6a5c42a79f1f40e14655418a
+              expression: 'max(/Morningstar ProStar MPPT SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.WARN}'
               name: 'Temperature: Low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'Temperature: Critically low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)'
-                  expression: 'max(/Morningstar ProStar PWM SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.CRIT}'
+                  expression: 'max(/Morningstar ProStar MPPT SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.CRIT}'
         -
-          uuid: 1d13bd3ea24a4fcab3cd5b7586e6033a
+          uuid: 7d0cf28c0d334154971738df11775d1f
           name: 'Temperature: Heatsink'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.4.1.33333.6.38.0
+          snmp_oid: 1.3.6.1.4.1.33333.5.38.0
           key: 'temp.heatsink[heatsinkTemperature.0]'
           history: 7d
           value_type: FLOAT
           units: C
           description: |
-            MIB: PROSTAR-PWM
-            Description:Heatsink Temperature
-            Scaling Factor:1.0
-            Units:deg C
-            Range:[-128, 127]
-            Modbus address:0x001A
+            MIB: PROSTAR-MPPT
+            Heatsink Temperature
+             Description:Heatsink Temperature
+             Scaling Factor:1.0
+             Units:deg C
+             Range:[-128, 127]
+             Modbus address:0x001A
           tags:
             -
               tag: Application
               value: Temperature
       discovery_rules:
         -
-          uuid: 17148797def9484ba26b0afdcc44bfd5
+          uuid: 1a21c30663c74c23b60e6ad72e228681
           name: 'Battery voltage discovery'
           type: DEPENDENT
           key: battery.voltage.discovery
@@ -874,72 +959,76 @@ zabbix_export:
           description: 'Discovery for battery voltage triggers'
           item_prototypes:
             -
-              uuid: 6e4ed5ae449c48eeb328d30b76d083a2
+              uuid: c02c73a349ec4a6b8557e142c4866148
               name: 'Battery: Voltage{#SINGLETON}'
               type: SNMP_AGENT
-              snmp_oid: 1.3.6.1.4.1.33333.6.30.0
+              snmp_oid: 1.3.6.1.4.1.33333.5.30.0
               key: 'battery.voltage[batteryTerminalVoltage.0{#SINGLETON}]'
               history: 7d
               value_type: FLOAT
               units: V
               description: |
-                MIB: PROSTAR-PWM
-                Description:Control State
-                Modbus address:0x0021
+                MIB: PROSTAR-MPPT
+                Battery Terminal Voltage
+                Description:Battery  Terminal Voltage
+                Scaling Factor:1.0
+                Units:V
+                Range:[0.0, 80.0]
+                Modbus address:0x0012
               tags:
                 -
                   tag: Application
                   value: Battery
               trigger_prototypes:
                 -
-                  uuid: e89cf2b8066840c2876642f0d8db1edd
-                  expression: 'min(/Morningstar ProStar PWM SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}'
+                  uuid: 402f73ca5b8d412689a7e715223e890d
+                  expression: 'min(/Morningstar ProStar MPPT SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}'
                   name: 'Battery: Critically high battery voltage (over {#VOLTAGE.MAX.CRIT}V for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                 -
-                  uuid: 8356aba9afb242b09902873a5f0e1d47
-                  expression: 'max(/Morningstar ProStar PWM SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}'
+                  uuid: 753a0d25832d434186f586f895124f31
+                  expression: 'max(/Morningstar ProStar MPPT SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}'
                   name: 'Battery: Critically low battery voltage (below {#VOLTAGE.MIN.CRIT}V for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                 -
-                  uuid: 77f130af976c43edb8c823de5cbd57b2
-                  expression: 'min(/Morningstar ProStar PWM SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.WARN}'
+                  uuid: 66e1fdfbfa5740dfa8945626f7f8be78
+                  expression: 'min(/Morningstar ProStar MPPT SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.WARN}'
                   name: 'Battery: High battery voltage (over {#VOLTAGE.MAX.WARN}V for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   dependencies:
                     -
                       name: 'Battery: Critically high battery voltage (over {#VOLTAGE.MAX.CRIT}V for 5m)'
-                      expression: 'min(/Morningstar ProStar PWM SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}'
+                      expression: 'min(/Morningstar ProStar MPPT SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}'
                 -
-                  uuid: 6c288c8b28db4f8e95c8ad2aa8b838ef
-                  expression: 'max(/Morningstar ProStar PWM SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.WARN}'
+                  uuid: c9f3d03ce06641eb9b184f511a3a0341
+                  expression: 'max(/Morningstar ProStar MPPT SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.WARN}'
                   name: 'Battery: Low battery voltage (below {#VOLTAGE.MIN.WARN}V for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   dependencies:
                     -
                       name: 'Battery: Critically low battery voltage (below {#VOLTAGE.MIN.CRIT}V for 5m)'
-                      expression: 'max(/Morningstar ProStar PWM SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}'
+                      expression: 'max(/Morningstar ProStar MPPT SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}'
           graph_prototypes:
             -
-              uuid: 8ecd4f88627a4dadb132fdbb6d911b6b
+              uuid: 480e4c11060a4e34851b48bf7b9c5bb1
               name: 'Voltage: Battery/Load{#SINGLETON}'
               graph_items:
                 -
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Morningstar ProStar PWM SNMP'
+                    host: 'Morningstar ProStar MPPT SNMP'
                     key: 'battery.voltage[batteryTerminalVoltage.0{#SINGLETON}]'
                 -
                   sortorder: '1'
                   drawtype: GRADIENT_LINE
                   color: 2774A4
                   item:
-                    host: 'Morningstar ProStar PWM SNMP'
+                    host: 'Morningstar ProStar MPPT SNMP'
                     key: 'load.voltage[loadVoltage.0]'
           master_item:
             key: 'battery.voltage.discovery[batteryTerminalVoltage.0]'
@@ -1024,8 +1113,8 @@ zabbix_export:
           macro: '{$VOLTAGE.MIN.WARN}'
       valuemaps:
         -
-          uuid: f94eb6ad54c44281878c7c018c6209d1
-          name: 'ProStar PWM charge state'
+          uuid: 1703c3aeb1b24641821e1c6d2cb4c8b7
+          name: 'ProStar MPPT charge state'
           mappings:
             -
               value: '0'
@@ -1044,19 +1133,25 @@ zabbix_export:
               newvalue: Fault
             -
               value: '5'
-              newvalue: Bulk
+              newvalue: BulkMppt
             -
               value: '6'
-              newvalue: Pwm
+              newvalue: Absorption
             -
               value: '7'
               newvalue: Float
             -
               value: '8'
               newvalue: Equalize
+            -
+              value: '9'
+              newvalue: Slave
+            -
+              value: '10'
+              newvalue: Fixed
         -
-          uuid: f0be8765c74e4c4788d4ff99a6c5ccd4
-          name: 'ProStar PWM load state'
+          uuid: b5403a0805a54b9294f69a1e11a438b1
+          name: 'ProStar MPPT load state'
           mappings:
             -
               value: '0'
@@ -1087,53 +1182,67 @@ zabbix_export:
               newvalue: NotUsed
   graphs:
     -
-      uuid: 730d1e1e43224d1ea7b08f53988a7a60
+      uuid: 0662dc480c2b487e9f9afc389166a15b
       name: 'Array: Voltage'
       graph_items:
         -
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'Morningstar ProStar PWM SNMP'
+            host: 'Morningstar ProStar MPPT SNMP'
+            key: 'array.sweep_vmp[arrayVmp.0]'
+        -
+          sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: 2774A4
+          item:
+            host: 'Morningstar ProStar MPPT SNMP'
+            key: 'array.sweep_voc[arrayVoc.0]'
+        -
+          sortorder: '2'
+          drawtype: GRADIENT_LINE
+          color: F63100
+          item:
+            host: 'Morningstar ProStar MPPT SNMP'
             key: 'array.voltage[arrayVoltage.0]'
     -
-      uuid: 252a40cfba4242deac69f8ed77a04b84
+      uuid: 94bbfd8a60a8412998ff617011db9372
       name: 'Current: Charge/Load'
       graph_items:
         -
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'Morningstar ProStar PWM SNMP'
+            host: 'Morningstar ProStar MPPT SNMP'
             key: 'charge.current[chargeCurrent.0]'
         -
           sortorder: '1'
           drawtype: GRADIENT_LINE
           color: 2774A4
           item:
-            host: 'Morningstar ProStar PWM SNMP'
+            host: 'Morningstar ProStar MPPT SNMP'
             key: 'load.current[loadCurrent.0]'
     -
-      uuid: 94e4d2db752b4c54a8b497516b515fe0
+      uuid: 02652b1251244702bf28f691e72ba27e
       name: 'Temperature: Ambient/Battery/Heatsink'
       graph_items:
         -
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'Morningstar ProStar PWM SNMP'
+            host: 'Morningstar ProStar MPPT SNMP'
             key: 'temp.ambient[ambientTemperature.0]'
         -
           sortorder: '1'
           drawtype: GRADIENT_LINE
           color: 2774A4
           item:
-            host: 'Morningstar ProStar PWM SNMP'
+            host: 'Morningstar ProStar MPPT SNMP'
             key: 'temp.battery[batteryTemperature.0]'
         -
           sortorder: '2'
           drawtype: GRADIENT_LINE
           color: F63100
           item:
-            host: 'Morningstar ProStar PWM SNMP'
+            host: 'Morningstar ProStar MPPT SNMP'
             key: 'temp.heatsink[heatsinkTemperature.0]'
