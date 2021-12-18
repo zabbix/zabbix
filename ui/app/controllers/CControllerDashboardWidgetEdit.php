@@ -173,7 +173,6 @@ class CControllerDashboardWidgetEdit extends CController {
 			'sla' => []
 		];
 
-
 		foreach ($form->getFields() as $field) {
 			if ($field instanceof CWidgetFieldMsGroup) {
 				$key = 'groups';
