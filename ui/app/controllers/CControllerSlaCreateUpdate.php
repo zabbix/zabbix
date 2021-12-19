@@ -59,7 +59,7 @@ abstract class CControllerSlaCreateUpdate extends CController {
 
 		$incorrect_schedule_exception = new InvalidArgumentException(
 			_s('Incorrect schedule: %1$s.',
-				_('comma separated list of time periods is expected for enabled week days')
+				_('comma separated list of time periods is expected for scheduled week days')
 			)
 		);
 
