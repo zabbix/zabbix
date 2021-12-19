@@ -814,6 +814,7 @@ class testFormUserRoles extends CWebTest {
 		$sql_api = 'SELECT * FROM role_rule WHERE type=1 and roleid in (SELECT roleid FROM role WHERE name='
 				.zbx_dbstr($data['fields']['Name']).')'.' ORDER BY value_str ASC';
 		$role_rules = CDBHelper::getColumn($sql_api, 'value_str');
+		sort($role_rules);
 		$this->assertEquals($data['api_list'], $role_rules);
 	}
 

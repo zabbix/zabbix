@@ -375,12 +375,15 @@ static zbx_vmware_propmap_t	hv_propmap[] = {
 	{"runtime.healthSystemRuntime.systemHealthInfo", 	/* ZBX_VMWARE_HVPROP_HEALTH_STATE */
 			ZBX_XPATH_HV_SENSOR_STATUS("VMware Rollup Health State"), NULL},
 	ZBX_HVPROPMAP("summary.quickStats.uptime"),		/* ZBX_VMWARE_HVPROP_UPTIME */
-	ZBX_HVPROPMAP("summary.config.product.version"),	/* ZBX_VMWARE_HVPROP_VERSION */
+	ZBX_HVPROPMAP("summary.config.product.version"),		/* ZBX_VMWARE_HVPROP_VERSION */
 	ZBX_HVPROPMAP("summary.config.name"),			/* ZBX_VMWARE_HVPROP_NAME */
 	ZBX_HVPROPMAP("overallStatus"),				/* ZBX_VMWARE_HVPROP_STATUS */
 	ZBX_HVPROPMAP("runtime.inMaintenanceMode"),		/* ZBX_VMWARE_HVPROP_MAINTENANCE */
 	ZBX_HVPROPMAP_EXT("summary.runtime.healthSystemRuntime.systemHealthInfo.numericSensorInfo",
-			zbx_xmlnode_to_json)			/* ZBX_VMWARE_HVPROP_SENSOR */
+			zbx_xmlnode_to_json),			/* ZBX_VMWARE_HVPROP_SENSOR */
+	{"config.network.dnsConfig", "concat("			/* ZBX_VMWARE_HVPROP_NET_NAME */
+			ZBX_XPATH_PROP_NAME("config.network.dnsConfig") "/*[local-name()='hostName']" ",'.',"
+			ZBX_XPATH_PROP_NAME("config.network.dnsConfig") "/*[local-name()='domainName'])", NULL}
 };
 
 static zbx_vmware_propmap_t	vm_propmap[] = {
@@ -840,7 +843,14 @@ static char	**xml_read_props(xmlDoc *xdoc, const zbx_vmware_propmap_t *propmap, 
 
 		if (NULL != (xpathObj = xmlXPathEvalExpression((const xmlChar *)propmap[i].xpath, xpathCtx)))
 		{
-			if (0 == xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
+			if (XPATH_STRING == xpathObj->type)
+			{
+				if (NULL != propmap[i].func)
+					propmap[i].func((void *)xpathObj->stringval, &props[i]);
+				else if ('.' != *xpathObj->stringval)
+					props[i] = zbx_strdup(NULL, (const char *)xpathObj->stringval);
+			}
+			else if (0 == xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
 			{
 				nodeset = xpathObj->nodesetval;
 

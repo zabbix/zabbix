@@ -179,9 +179,8 @@
 			};
 
 			this.allow_empty_message = true;
-			this.$noInterfacesMsg = jQuery('<div class="<?= ZBX_STYLE_GREY ?>"></div>')
+			this.$noInterfacesMsg = jQuery('<div>', {class: '<?= ZBX_STYLE_GREY ?>'})
 				.text('<?= _('No interfaces are defined.') ?>')
-				.addClass('<?= ZBX_STYLE_GREY ?>')
 				.css('padding', '5px 0px')
 				.insertAfter(jQuery('.<?= ZBX_STYLE_HOST_INTERFACE_CONTAINER_HEADER ?>'));
 
