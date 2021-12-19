@@ -25,19 +25,18 @@
  */
 
 $subfilter_options = [];
-$subfilters = $data['subfilters'];
 
 foreach (['hostids', 'tagnames', 'data'] as $key) {
-	if (count($subfilters[$key]) <= 1) {
+	if (count($data[$key]) <= 1) {
 		$subfilter_options[$key] = null;
 		continue;
 	}
 
-	$subfilter_used = (bool) array_filter($subfilters[$key], function ($elmnt) {
+	$subfilter_used = (bool) array_filter($data[$key], function ($elmnt) {
 		return $elmnt['selected'];
 	});
 
-	foreach ($subfilters[$key] as $value => $element) {
+	foreach ($data[$key] as $value => $element) {
 		if ($element['selected']) {
 			$subfilter_options[$key][] = (new CSpan([
 				(new CLinkAction($element['name']))->onClick(CHtml::encode(
@@ -73,14 +72,14 @@ foreach (['hostids', 'tagnames', 'data'] as $key) {
 	}
 }
 
-if (count($subfilters['tags']) > 1) {
+if (count($data['tags']) > 1) {
 	$subfilter_options['tags'] = [];
 
-	$subfilter_used = (bool) array_filter($subfilters['tags'], function ($elmnt) {
+	$subfilter_used = (bool) array_filter($data['tags'], function ($elmnt) {
 		return (bool) array_sum(array_column($elmnt, 'selected'));
 	});
 
-	foreach ($subfilters['tags'] as $tag => $tag_values) {
+	foreach ($data['tags'] as $tag => $tag_values) {
 		$tag_values = array_map(function ($element) use ($tag, $subfilter_used) {
 			if ($element['name'] === '') {
 				$element_name = _('None');
@@ -175,11 +174,3 @@ $subfilter = (new CTableInfo())
 	->addClass('tabfilter-subfilter')
 	->setId('latest-data-subfilter')
 	->show();
-
-if (array_key_exists('init_subfilter', $data)) {
-	(new CScriptTag(
-		'view.initSubfilter('.json_encode(CControllerLatest::getSubfilterSelectedValues($subfilters)).');'
-	))
-		->setOnDocumentReady()
-		->show();
-}

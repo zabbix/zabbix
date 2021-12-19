@@ -525,6 +525,32 @@ class CTabFilterItem extends CBaseComponent {
 		}
 	}
 
+	/**
+	 * Init subfilter parameters from tabfilter options.
+	 *
+	 * @param {object} data
+	 */
+	initSubfilter(data) {
+		this.emptySubfilter();
+
+		Object.keys(data)
+			.filter(key => key.substr(0, 10) === 'subfilter_' && Object.keys(data[key]).length)
+			.forEach(key => {
+				if (Array.isArray(data[key])) {
+					data[key].forEach(value => {
+						this.setSubfilter(key + '[]', value);
+					});
+				}
+				else {
+					Object.keys(data[key]).forEach(group => {
+						data[key][group].forEach(value => {
+							this.setSubfilter(key + '[' + group + '][]', value);
+						});
+					});
+				}
+			});
+	}
+
 	registerEvents() {
 		this._events = {
 			click: () => {

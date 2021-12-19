@@ -164,6 +164,8 @@ class CTabFilter extends CBaseComponent {
 			support_custom_time: this._options.support_custom_time
 		});
 
+		item.initSubfilter(data);
+
 		this._items.push(item);
 
 		if (title.getAttribute('data-target') === 'tabfilter_timeselector') {
@@ -341,14 +343,6 @@ class CTabFilter extends CBaseComponent {
 		this._active_item.updateUnsavedState();
 		this._active_item.updateApplyUrl();
 		this._active_item.setBrowserLocationToApplyUrl();
-	}
-
-	initSubfilter(fields) {
-		this._active_item.emptySubfilter();
-
-		fields.forEach(field => {
-			this._active_item.setSubfilter(field[0], field[1]);
-		});
 	}
 
 	/**

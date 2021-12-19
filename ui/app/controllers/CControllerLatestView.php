@@ -90,7 +90,8 @@ class CControllerLatestView extends CControllerLatest {
 		if ($ret && $this->hasInput('subfilter_tags')) {
 			$tags = $this->getInput('subfilter_tags', []);
 			foreach ($tags as $tag => $values) {
-				if (!is_scalar($tag) || count($values) !== count(array_filter($values, 'is_string'))) {
+				if (!is_scalar($tag) || !is_array($values)
+						|| count($values) !== count(array_filter($values, 'is_string'))) {
 					$ret = false;
 					break;
 				}
@@ -185,6 +186,7 @@ class CControllerLatestView extends CControllerLatest {
 				'page' => $filter['page']
 			],
 			'filter' => $filter,
+			'subfilters' => $subfilters,
 			'sort_field' => $sort_field,
 			'sort_order' => $sort_order,
 			'view_curl' => $view_url,
@@ -198,8 +200,7 @@ class CControllerLatestView extends CControllerLatest {
 			'tags' => makeTags($prepared_data['items'], true, 'itemid', (int) $filter['show_tags'], $filter['tags'],
 				array_key_exists('tags', $subfilters_fields) ? $subfilters_fields['tags'] : [],
 				(int) $filter['tag_name_format'], $filter['tag_priority']
-			),
-			'subfilters' => $subfilters
+			)
 		] + $prepared_data;
 
 		$response = new CControllerResponseData($data);

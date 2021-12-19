@@ -26,10 +26,7 @@
 
 $output = [
 	'body' => (new CPartial('monitoring.latest.view.html', $data['results']))->getOutput(),
-	'subfilter' => (new CPartial('monitoring.latest.subfilter', [
-		'subfilters' => $data['subfilters'],
-		'init_subfilter' => true
-	]))->getOutput()
+	'subfilter' => (new CPartial('monitoring.latest.subfilter', $data['subfilters']))->getOutput()
 ];
 
 if (($messages = getMessages()) !== null) {

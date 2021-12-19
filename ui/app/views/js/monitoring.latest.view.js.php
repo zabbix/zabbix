@@ -38,7 +38,7 @@
 		_refresh_message_box: null,
 		_popup_message_box: null,
 
-		init({refresh_url, refresh_data, refresh_interval, filter_options, subfilter_options}) {
+		init({refresh_url, refresh_data, refresh_interval, filter_options}) {
 			this.refresh_url = refresh_url;
 			this.refresh_data = refresh_data;
 			this.refresh_interval = refresh_interval;
@@ -47,18 +47,16 @@
 			url.setArgument('action', 'latest.view.refresh');
 			this.refresh_simple_url = url.getUrl();
 
-			this.initTabFilter(filter_options, subfilter_options);
+			this.initTabFilter(filter_options);
 		},
 
-		initTabFilter(filter_options, subfilter_options) {
+		initTabFilter(filter_options) {
 			if (!filter_options) {
 				return;
 			}
 
 			this.refresh_counters = this.createCountersRefresh(1);
 			this.filter = new CTabFilter(document.getElementById('monitoring_latest_filter'), filter_options);
-
-			this.initSubfilter(subfilter_options);
 
 			this.filter.on(TABFILTER_EVENT_URLSET, () => {
 				this.reloadPartialAndTabCounters();

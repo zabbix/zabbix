@@ -45,9 +45,7 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	$filter = (new CTabFilter())
 		->setId('monitoring_latest_filter')
 		->setOptions($data['tabfilter_options'])
-		->addSubfilter(new CPartial('monitoring.latest.subfilter',
-			array_intersect_key($data, array_flip(['subfilters']))
-		))
+		->addSubfilter(new CPartial('monitoring.latest.subfilter', $data['subfilters']))
 		->addTemplate(new CPartial($data['filter_view'], $data['filter_defaults']));
 
 	foreach ($data['filter_tabs'] as $tab) {
@@ -74,7 +72,6 @@ $widget->show();
 (new CScriptTag('
 	view.init('.json_encode([
 		'filter_options' => $data['filter_options'],
-		'subfilter_options' => CControllerLatest::getSubfilterSelectedValues($data['subfilters']),
 		'refresh_url' => $data['refresh_url'],
 		'refresh_data' => $data['refresh_data'],
 		'refresh_interval' => $data['refresh_interval']
