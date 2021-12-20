@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-10-28T06:44:02Z'
+  date: '2021-12-20T07:10:04Z'
   groups:
     -
       uuid: 3dcd5bbe90534f9e8eb5c2d53756af63
@@ -19,7 +19,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/420730-discussion-thread-for-official-zabbix-template-apc-ups
         
-        Template tooling version used: 0.39
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Power
@@ -1592,16 +1592,6 @@ zabbix_export:
             -
               value: '26'
               newvalue: 'Charger Only'
-        -
-          uuid: cbd3d7c999244cd6a44a8fc566533005
-          name: 'Service state'
-          mappings:
-            -
-              value: '0'
-              newvalue: Down
-            -
-              value: '1'
-              newvalue: Up
         -
           uuid: 781c568d935d40f2a43951488cf2e046
           name: zabbix.host.available
