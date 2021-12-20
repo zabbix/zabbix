@@ -677,14 +677,14 @@ class CMaintenance extends CApiService {
 				}
 
 				if ($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_MONTHLY) {
-					if ((!array_key_exists('day', $maintenance) || $maintenance['day'] == 0)
-							&& (!array_key_exists('dayofweek', $maintenance) || $maintenance['dayofweek'] == 0)) {
+					if ((!array_key_exists('day', $timeperiod) || $timeperiod['day'] == 0)
+							&& (!array_key_exists('dayofweek', $timeperiod) || $timeperiod['dayofweek'] == 0)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_('At least one day of week or day must be specified.')
 						);
 					}
-					elseif (array_key_exists('day', $maintenance) && $maintenance['day'] != 0
-							&& array_key_exists('dayofweek', $maintenance) && $maintenance['dayofweek'] != 0) {
+					elseif (array_key_exists('day', $timeperiod) && $timeperiod['day'] != 0
+							&& array_key_exists('dayofweek', $timeperiod) && $timeperiod['dayofweek'] != 0) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Only day of week or day is allowed.'));
 					}
 				}
