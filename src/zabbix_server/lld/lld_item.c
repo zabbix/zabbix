@@ -1363,6 +1363,7 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 			if (FAIL == (ret = zbx_regexp_compile(param1, NULL, &regexp_err)))
 			{
 				zbx_strlcpy(err, regexp_err, sizeof(err));
+				zbx_regexp_err_msg_free(regexp_err);
 			}
 			break;
 		case ZBX_PREPROC_JSONPATH:
@@ -1433,7 +1434,10 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 			/* break; is not missing here */
 		case ZBX_PREPROC_VALIDATE_NOT_REGEX:
 			if (FAIL == (ret = zbx_regexp_compile(pp->params, NULL, &regexp_err)))
+			{
 				zbx_strlcpy(err, regexp_err, sizeof(err));
+				zbx_regexp_err_msg_free(regexp_err);
+			}
 			break;
 		case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
 			if (SUCCEED != str2uint64(pp->params, "smhdw", &value_ui64) || 0 == value_ui64)

@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:17Z'
+  version: '6.0'
+  date: '2021-12-13T12:28:02Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -66,6 +66,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - process_cpu_seconds_total
+                - value
                 - ''
             -
               type: CHANGE_PER_SECOND
@@ -92,6 +93,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - etcd_debugging_mvcc_db_total_size_in_bytes
+                - value
                 - ''
           master_item:
             key: etcd.get_metrics
@@ -114,6 +116,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - etcd_debugging_mvcc_delete_total
+                - value
                 - ''
             -
               type: CHANGE_PER_SECOND
@@ -138,6 +141,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - etcd_debugging_mvcc_pending_events_total
+                - value
                 - ''
           master_item:
             key: etcd.get_metrics
@@ -288,6 +292,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - etcd_server_has_leader
+                - value
                 - ''
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -471,6 +476,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - etcd_server_is_leader
+                - value
                 - ''
               error_handler: CUSTOM_VALUE
               error_handler_params: '0'
@@ -510,6 +516,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - etcd_debugging_mvcc_db_compaction_keys_total
+                - value
                 - ''
               error_handler: CUSTOM_VALUE
               error_handler_params: '0'
@@ -537,6 +544,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - etcd_debugging_store_expires_total
+                - value
                 - ''
             -
               type: CHANGE_PER_SECOND
@@ -561,6 +569,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - etcd_debugging_mvcc_keys_total
+                - value
                 - ''
           master_item:
             key: etcd.get_metrics
@@ -581,6 +590,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - etcd_server_leader_changes_seen_total
+                - value
                 - ''
           master_item:
             key: etcd.get_metrics
@@ -609,6 +619,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - process_max_fds
+                - value
                 - ''
           master_item:
             key: etcd.get_metrics
@@ -631,6 +642,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - etcd_network_client_grpc_received_bytes_total
+                - value
                 - ''
             -
               type: CHANGE_PER_SECOND
@@ -657,6 +669,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - etcd_network_client_grpc_sent_bytes_total
+                - value
                 - ''
             -
               type: CHANGE_PER_SECOND
@@ -682,6 +695,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - process_open_fds
+                - value
                 - ''
           master_item:
             key: etcd.get_metrics
@@ -703,6 +717,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - etcd_server_proposals_applied_total
+                - value
                 - ''
             -
               type: CHANGE_PER_SECOND
@@ -728,6 +743,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - etcd_server_proposals_committed_total
+                - value
                 - ''
             -
               type: CHANGE_PER_SECOND
@@ -753,6 +769,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - etcd_server_proposals_failed_total
+                - value
                 - ''
             -
               type: CHANGE_PER_SECOND
@@ -786,6 +803,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - etcd_server_proposals_pending
+                - value
                 - ''
           master_item:
             key: etcd.get_metrics
@@ -815,6 +833,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - etcd_debugging_mvcc_put_total
+                - value
                 - ''
             -
               type: CHANGE_PER_SECOND
@@ -841,6 +860,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - etcd_debugging_mvcc_range_total
+                - value
                 - ''
             -
               type: CHANGE_PER_SECOND
@@ -901,6 +921,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - process_resident_memory_bytes
+                - value
                 - ''
           master_item:
             key: etcd.get_metrics
@@ -956,6 +977,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - etcd_debugging_mvcc_range_total
+                - value
                 - ''
             -
               type: CHANGE_PER_SECOND
@@ -982,6 +1004,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - process_start_time_seconds
+                - value
                 - ''
             -
               type: JAVASCRIPT
@@ -1018,6 +1041,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - process_virtual_memory_bytes
+                - value
                 - ''
           master_item:
             key: etcd.get_metrics
@@ -1206,6 +1230,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - 'etcd_network_peer_received_bytes_total{From="{#ETCD.PEER}"}'
+                    - value
                     - ''
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
@@ -1234,6 +1259,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - 'etcd_network_peer_sent_bytes_total{To="{#ETCD.PEER}"}'
+                    - value
                     - ''
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
@@ -1262,6 +1288,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - 'etcd_network_peer_received_failures_total{To="{#ETCD.PEER}"}'
+                    - value
                     - ''
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
@@ -1290,6 +1317,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - 'etcd_network_peer_sent_failures_total{To="{#ETCD.PEER}"}'
+                    - value
                     - ''
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'

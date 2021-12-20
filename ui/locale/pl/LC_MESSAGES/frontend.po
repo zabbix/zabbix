@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-10 19:55+0200\n"
+"POT-Creation-Date: 2021-12-13 16:02+0200\n"
 "PO-Revision-Date: 2014-06-04 11:22+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zetosoftware.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1898,7 +1898,7 @@ msgid "Cannot add dashboard page: maximum number of %1$d dashboard pages has bee
 msgstr ""
 
 #: include/classes/api/services/CTrigger.php:979
-#: include/classes/api/services/CTriggerPrototype.php:773
+#: include/classes/api/services/CTriggerPrototype.php:788
 msgid "Cannot add dependency from a host to a template."
 msgstr "Nie można utworzyć zależności szablonu od hosta."
 
@@ -2135,7 +2135,7 @@ msgid "Cannot create another database connection."
 msgstr "Nie można utworzyć kolejnego połączenia do bazy."
 
 #: include/classes/api/services/CTrigger.php:1013
-#: include/classes/api/services/CTriggerPrototype.php:804
+#: include/classes/api/services/CTriggerPrototype.php:819
 msgid "Cannot create circular dependencies."
 msgstr "Nie można utworzyć cyklicznych zależności."
 
@@ -2143,7 +2143,7 @@ msgstr "Nie można utworzyć cyklicznych zależności."
 msgid "Cannot create dependency on trigger itself."
 msgstr "Nie można utworzyć zależności do tego samego wyzwalacza."
 
-#: include/classes/api/services/CTriggerPrototype.php:743
+#: include/classes/api/services/CTriggerPrototype.php:758
 msgid "Cannot create dependency on trigger prototype itself."
 msgstr "Nie można utworzyć zależności do samego prototypu wyzwalacza."
 
@@ -2398,7 +2398,7 @@ msgstr "Nie można usunąć prototypu wykresu szablonowego."
 msgid "Cannot delete templated graph."
 msgstr "Nie można usunąć wykresu szablonowego."
 
-#: include/classes/api/services/CHostPrototype.php:1315
+#: include/classes/api/services/CHostPrototype.php:1317
 msgid "Cannot delete templated host prototype."
 msgstr "Nie można usunąć prototypów hosta pochodzących z szablonu."
 
@@ -3759,7 +3759,7 @@ msgid "Combined result"
 msgstr "Połączony wynik"
 
 #: include/classes/widgets/views/widget.geomap.form.view.php:68
-msgid "Comma separated center coordinates to display when the widget is initially loaded."
+msgid "Comma separated center coordinates and zoom level to display when the widget is initially loaded."
 msgstr ""
 
 #: app/views/administration.script.edit.php:173 include/actions.inc.php:1943
@@ -5360,7 +5360,7 @@ msgstr ""
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Usunięto: Host \"%1$s\"."
 
-#: include/classes/api/services/CHostPrototype.php:1183
+#: include/classes/api/services/CHostPrototype.php:1185
 #, c-format
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Usunięto: Prototyp hosta \"%1$s\" w \"%2$s\"."
@@ -6004,7 +6004,7 @@ msgstr ""
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "Powielone zależności w wyzwalaczu \"%1$s\""
 
-#: include/classes/api/services/CTriggerPrototype.php:974
+#: include/classes/api/services/CTriggerPrototype.php:989
 #, c-format
 msgid "Duplicate dependencies in trigger prototype \"%1$s\"."
 msgstr "Powielone zależności w prototypie wyzwalacza \"%1$s\"."
@@ -6177,7 +6177,7 @@ msgstr "Makro warunku filtra dla reguły wykrywania \"%1$s\" jest puste."
 #: include/classes/api/services/CHost.php:1319
 #: include/classes/api/services/CHost.php:1850
 #: include/classes/api/services/CHost.php:2075
-#: include/classes/api/services/CHostPrototype.php:1111
+#: include/classes/api/services/CHostPrototype.php:1113
 #: include/classes/api/services/CMaintenance.php:542
 #: include/classes/api/services/CMap.php:563
 #: include/classes/api/services/CMap.php:589
@@ -7509,7 +7509,7 @@ msgstr "Grupa dla wykrytych hostów"
 msgid "Group name"
 msgstr "Nazwa grupy"
 
-#: include/classes/api/services/CHostPrototype.php:1273
+#: include/classes/api/services/CHostPrototype.php:1275
 #, c-format
 msgid "Group prototype cannot be based on a discovered host group \"%1$s\"."
 msgstr "Prototyp grupy nie może bazować na wykrytej grupie hostów \"%1$s\"."
@@ -8032,12 +8032,12 @@ msgstr "Sieci hosta"
 msgid "Host prototype"
 msgstr "Prototyp hosta"
 
-#: include/classes/api/services/CHostPrototype.php:978
+#: include/classes/api/services/CHostPrototype.php:980
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Prototyp hosta \"%1$s\" istnieje w \"%2$s\", odziedziczony z innego szablonu."
 
-#: include/classes/api/services/CHostPrototype.php:966
+#: include/classes/api/services/CHostPrototype.php:968
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "Prototyp hosta \"%1$s\" istnieje w \"%2$s\"."
@@ -8046,7 +8046,7 @@ msgstr "Prototyp hosta \"%1$s\" istnieje w \"%2$s\"."
 msgid "Host prototype added"
 msgstr "Dodano prototyp hosta"
 
-#: include/classes/api/services/CHostPrototype.php:1761
+#: include/classes/api/services/CHostPrototype.php:1763
 msgid "Host prototype cannot have more than one default interface of the same type."
 msgstr "Prototyp hosta nie może mieć więcej niż jednego domyślnego interfejsu tego samego typu."
 
@@ -9519,7 +9519,7 @@ msgstr "Dziedziczone elementy"
 msgid "Initial view"
 msgstr ""
 
-#: include/classes/widgets/views/widget.geomap.form.view.php:70
+#: include/classes/widgets/views/widget.geomap.form.view.php:78
 msgid "Initial view is ignored if the default view is set."
 msgstr ""
 
@@ -9765,15 +9765,15 @@ msgstr "Nieprawidłowe parametry metody."
 #: include/classes/api/services/CHostBase.php:110
 #: include/classes/api/services/CHostBase.php:1416
 #: include/classes/api/services/CHostPrototype.php:325
-#: include/classes/api/services/CHostPrototype.php:1661
-#: include/classes/api/services/CHostPrototype.php:1666
-#: include/classes/api/services/CHostPrototype.php:1673
-#: include/classes/api/services/CHostPrototype.php:1678
-#: include/classes/api/services/CHostPrototype.php:1689
-#: include/classes/api/services/CHostPrototype.php:1694
-#: include/classes/api/services/CHostPrototype.php:1701
-#: include/classes/api/services/CHostPrototype.php:1707
-#: include/classes/api/services/CHostPrototype.php:1717
+#: include/classes/api/services/CHostPrototype.php:1663
+#: include/classes/api/services/CHostPrototype.php:1668
+#: include/classes/api/services/CHostPrototype.php:1675
+#: include/classes/api/services/CHostPrototype.php:1680
+#: include/classes/api/services/CHostPrototype.php:1691
+#: include/classes/api/services/CHostPrototype.php:1696
+#: include/classes/api/services/CHostPrototype.php:1703
+#: include/classes/api/services/CHostPrototype.php:1709
+#: include/classes/api/services/CHostPrototype.php:1719
 #: include/classes/api/services/CHttpTest.php:372
 #: include/classes/api/services/CItemGeneral.php:603
 #: include/classes/api/services/CItemGeneral.php:616
@@ -10023,7 +10023,7 @@ msgstr "Nieprawidłowy znacznik \"%1$s\": %2$s."
 msgid "Invalid time period."
 msgstr "Nieprawidłowy okres czasu."
 
-#: include/classes/validators/CApiInputValidator.php:2870
+#: include/classes/validators/CApiInputValidator.php:2869
 #, c-format
 msgid "Invalid zoomparameter \"%1$s\": %2$s."
 msgstr ""
@@ -10085,7 +10085,7 @@ msgstr "Włoski (it_IT)"
 msgid "Item"
 msgstr "Pozycja"
 
-#: include/classes/api/services/CHostPrototype.php:1217
+#: include/classes/api/services/CHostPrototype.php:1219
 #: include/classes/api/services/CItem.php:61
 #, c-format
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
@@ -12269,7 +12269,7 @@ msgid "No data."
 msgstr "Brak danych."
 
 #: include/classes/api/services/CHostInterface.php:1023
-#: include/classes/api/services/CHostPrototype.php:1754
+#: include/classes/api/services/CHostPrototype.php:1756
 #, c-format
 msgid "No default interface for \"%1$s\" type on \"%2$s\"."
 msgstr "Brak domyślnego interfejsu dla typu \"%1$s\" w \"%2$s\"."
@@ -12519,9 +12519,9 @@ msgstr "Brak uprawnień do wywołania \"%1$s.%2$s\"."
 #: include/classes/api/services/CHostPrototype.php:543
 #: include/classes/api/services/CHostPrototype.php:602
 #: include/classes/api/services/CHostPrototype.php:623
-#: include/classes/api/services/CHostPrototype.php:1242
-#: include/classes/api/services/CHostPrototype.php:1264
-#: include/classes/api/services/CHostPrototype.php:1298
+#: include/classes/api/services/CHostPrototype.php:1244
+#: include/classes/api/services/CHostPrototype.php:1266
+#: include/classes/api/services/CHostPrototype.php:1300
 #: include/classes/api/services/CHttpTest.php:505
 #: include/classes/api/services/CHttpTest.php:602
 #: include/classes/api/services/CHttpTest.php:689
@@ -12598,8 +12598,9 @@ msgstr "Brak uprawnień do wywołania \"%1$s.%2$s\"."
 #: include/classes/api/services/CTrigger.php:736
 #: include/classes/api/services/CTrigger.php:829
 #: include/classes/api/services/CTriggerPrototype.php:515
-#: include/classes/api/services/CTriggerPrototype.php:693
-#: include/classes/api/services/CTriggerPrototype.php:711
+#: include/classes/api/services/CTriggerPrototype.php:701
+#: include/classes/api/services/CTriggerPrototype.php:709
+#: include/classes/api/services/CTriggerPrototype.php:724
 #: include/classes/api/services/CUserGroup.php:315
 #: include/classes/api/services/CUserGroup.php:921
 #: include/classes/api/services/CUserMacro.php:345
@@ -12740,7 +12741,7 @@ msgid "Not all results are displayed. Please provide more specific search criter
 msgstr "Nie wszystkie wyniki są wyświetlanie. Proszę dostarczyć ściślej określone kryteria wyszukiwania."
 
 #: include/classes/api/services/CTrigger.php:1058
-#: include/classes/api/services/CTriggerPrototype.php:852
+#: include/classes/api/services/CTriggerPrototype.php:867
 #, c-format
 msgid "Not all templates are linked to \"%1$s\"."
 msgstr "Nie wszystkie szablony są podłączone\"%1$s\"."
@@ -16836,6 +16837,10 @@ msgstr "Super administrator"
 msgid "Support"
 msgstr "Wsparcie"
 
+#: include/classes/widgets/views/widget.geomap.form.view.php:70
+msgid "Supported formats:"
+msgstr ""
+
 #: include/classes/widgets/views/widget.item.form.view.php:59
 msgid "Supported macros:"
 msgstr ""
@@ -17376,6 +17381,11 @@ msgstr "Nie można wykryć pozycji i zostanie ona wykasowana za %1$s (%2$s o %3$
 msgid "The item is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "Pozycja nie jest już wykrywana i zostanie usunięta przy następnym przetwarzaniu reguły wykrywania."
 
+#: include/classes/widgets/views/widget.geomap.form.view.php:76
+#, c-format
+msgid "The maximum zoom level is \"%1$s\"."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1024
 msgid "The number of processes. Returns integer"
 msgstr "Liczba procesów. Zwraca liczbę całkowitą"
@@ -17847,7 +17857,7 @@ msgstr "Prototyp wyzwalacza \"%1$s\" musi posiadać przynajmniej jeden prototyp 
 msgid "Trigger prototype added"
 msgstr "Dodano prototyp wyzwalaczy"
 
-#: include/classes/api/services/CTriggerPrototype.php:909
+#: include/classes/api/services/CTriggerPrototype.php:924
 msgid "Trigger prototype cannot be dependent on a trigger that is inherited from it."
 msgstr "Prototyp wyzwalacza nie może zależeć od wyzwalacza, który po nim dziedziczy."
 
@@ -20378,9 +20388,9 @@ msgstr "nie może być zmieniony"
 #: include/classes/api/services/CEvent.php:820
 #: include/classes/api/services/CHost.php:1786
 #: include/classes/api/services/CHost.php:1792
-#: include/classes/api/services/CHostPrototype.php:1667
-#: include/classes/api/services/CHostPrototype.php:1679
-#: include/classes/api/services/CHostPrototype.php:1695
+#: include/classes/api/services/CHostPrototype.php:1669
+#: include/classes/api/services/CHostPrototype.php:1681
+#: include/classes/api/services/CHostPrototype.php:1697
 #: include/classes/api/services/CItemGeneral.php:481
 #: include/classes/api/services/CItemGeneral.php:508
 #: include/classes/api/services/CItemGeneral.php:514
@@ -21570,7 +21580,7 @@ msgstr "krótki opis"
 #: include/classes/api/services/CHost.php:1817
 #: include/classes/api/services/CHost.php:1826
 #: include/classes/api/services/CHost.php:1832
-#: include/classes/api/services/CHostPrototype.php:1718
+#: include/classes/api/services/CHostPrototype.php:1720
 #: include/classes/api/services/CHttpTest.php:983
 #: include/classes/api/services/CHttpTest.php:1079
 #: include/classes/api/services/CItemGeneral.php:495
@@ -21699,10 +21709,10 @@ msgstr ""
 #: include/classes/api/services/CHostBase.php:1417
 #: include/classes/api/services/CHost.php:1907
 #: include/classes/api/services/CHost.php:2140
-#: include/classes/api/services/CHostPrototype.php:1662
-#: include/classes/api/services/CHostPrototype.php:1674
-#: include/classes/api/services/CHostPrototype.php:1690
-#: include/classes/api/services/CHostPrototype.php:1702
+#: include/classes/api/services/CHostPrototype.php:1664
+#: include/classes/api/services/CHostPrototype.php:1676
+#: include/classes/api/services/CHostPrototype.php:1692
+#: include/classes/api/services/CHostPrototype.php:1704
 #: include/classes/api/services/CHttpTest.php:744
 #: include/classes/api/services/CProxy.php:708
 #: include/classes/api/services/CProxy.php:719
@@ -21866,7 +21876,7 @@ msgstr "nieoczekiwany koniec makra"
 #: include/classes/api/services/CGraphGeneral.php:627
 #: include/classes/api/services/CGraphGeneral.php:749
 #: include/classes/api/services/CHostPrototype.php:325
-#: include/classes/api/services/CHostPrototype.php:1708
+#: include/classes/api/services/CHostPrototype.php:1710
 #: include/classes/api/services/CHttpTest.php:372
 #: include/classes/api/services/CHttpTest.php:515
 #: include/classes/api/services/CHttpTest.php:539
@@ -22146,7 +22156,7 @@ msgctxt "year short"
 msgid "y"
 msgstr "y"
 
-#: include/classes/validators/CApiInputValidator.php:2871
+#: include/classes/validators/CApiInputValidator.php:2870
 #, c-format
 msgid "zoom level must be between \"%1$s\" and \"%2$s\""
 msgstr ""
