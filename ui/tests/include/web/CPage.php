@@ -210,7 +210,7 @@ class CPage {
 			$data = ['sessionid' => $sessionid];
 
 			$config = CDBHelper::getRow('SELECT session_key FROM config WHERE configid=1');
-			$data['sign'] = openssl_encrypt(json_encode($data), 'aes-256-ecb', $config['session_key']);
+			$data['sign'] = hash_hmac('sha256', json_encode($data), $config['session_key'], false);
 
 			$path = parse_url(PHPUNIT_URL, PHP_URL_PATH);
 			self::$cookie = [
