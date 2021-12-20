@@ -996,20 +996,22 @@ class CSla extends CApiService {
 			return [];
 		}
 
-		$rules = $role[0]['rules'];
+		if ($limit_serviceids === null) {
+			$rules = $role[0]['rules'];
 
-		$manage_sla_status = 0;
-		foreach ($rules['actions'] as $action) {
-			if ($action['name'] === 'manage_sla') {
-				$manage_sla_status = $action['status'];
-				break;
+			$manage_sla_status = 0;
+			foreach ($rules['actions'] as $action) {
+				if ($action['name'] === 'manage_sla') {
+					$manage_sla_status = $action['status'];
+					break;
+				}
 			}
-		}
 
-		if ($rules['services.read.mode'] == ZBX_ROLE_RULE_SERVICES_ACCESS_ALL
-				|| $rules['services.write.mode'] == ZBX_ROLE_RULE_SERVICES_ACCESS_ALL
-				|| $manage_sla_status == 1) {
-			return null;
+			if ($rules['services.read.mode'] == ZBX_ROLE_RULE_SERVICES_ACCESS_ALL
+					|| $rules['services.write.mode'] == ZBX_ROLE_RULE_SERVICES_ACCESS_ALL
+					|| $manage_sla_status == 1) {
+				return null;
+			}
 		}
 
 		$accessible_services = API::Service()->get([
