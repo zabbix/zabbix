@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-12-09T12:17:26Z'
+  date: '2021-12-20T07:18:10Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -959,7 +959,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Returns a database’s state.'
+          description: 'Returns a database''s state.'
           tags:
             -
               tag: Application
@@ -1983,7 +1983,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'Returns statistics reflecting the database system’s state.'
+              description: 'Returns statistics reflecting the database system''s state.'
               tags:
                 -
                   tag: Application

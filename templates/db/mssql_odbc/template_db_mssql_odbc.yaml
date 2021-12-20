@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-12-09T12:17:31Z'
+  date: '2021-12-20T07:18:12Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -1276,7 +1276,7 @@ zabbix_export:
               expression: 'min(/MSSQL by ODBC/mssql.percent_of_adhoc_queries,15m) > {$MSSQL.PERCENT_COMPILATIONS.MAX}'
               name: 'MSSQL: Percent of adhoc queries running is over {$MSSQL.PERCENT_COMPILATIONS.MAX}% for 15m'
               priority: WARNING
-              description: 'The lower this value is the better. High values often indicate excessive adhoc querying and should be as low as possible. If excessive adhoc querying is happening, try rewriting the queries as procedures or invoke the queries using sp_executeSQL. When rewriting isn’t possible, consider using a plan guide or setting the database to parameterization forced mode.'
+              description: 'The lower this value is the better. High values often indicate excessive adhoc querying and should be as low as possible. If excessive adhoc querying is happening, try rewriting the queries as procedures or invoke the queries using sp_executeSQL. When rewriting isn''t possible, consider using a plan guide or setting the database to parameterization forced mode.'
         -
           uuid: ceab0472883f47b0a18b04fc6f7438ab
           name: 'MSSQL: Percent of Recompiled Transact-SQL Objects'
@@ -1300,7 +1300,7 @@ zabbix_export:
               expression: 'min(/MSSQL by ODBC/mssql.percent_recompilations_to_compilations,15m) > {$MSSQL.PERCENT_RECOMPILATIONS.MAX}'
               name: 'MSSQL: Percent of times statement recompiles is over {$MSSQL.PERCENT_RECOMPILATIONS.MAX}% for 15m'
               priority: WARNING
-              description: 'This number should be at or near zero, since recompiles can cause deadlocks and exclusive compile locks. This counter’s value should follow in proportion to “Batch Requests/sec” and “SQL Compilations/sec”.'
+              description: 'This number should be at or near zero, since recompiles can cause deadlocks and exclusive compile locks. This counter''s value should follow in proportion to “Batch Requests/sec” and “SQL Compilations/sec”.'
         -
           uuid: 5c0bee24f9494bb49860171ff875caf7
           name: 'MSSQL: Number of blocked processes'

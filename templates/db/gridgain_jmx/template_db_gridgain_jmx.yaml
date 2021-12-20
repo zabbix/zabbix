@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-06-17T15:25:51Z'
+  date: '2021-12-20T07:18:08Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -13,13 +13,13 @@ zabbix_export:
       description: |
         The template to monitor GridGain In-Memory Computing Platform by Zabbix that work without any external scripts.
           It works with both standalone and cluster instances.
-          The metrics are discoverable and collected by JMX.  
+          The metrics are discoverable and collected by JMX.
           Current JMX tree hierarchy contains classloader by default. Add the following jvm option `-DIGNITE_MBEAN_APPEND_CLASS_LOADER_ID=false`to will exclude one level with Classloader name.
           You can set {$GRIDGAIN.USER} and {$GRIDGAIN.PASSWORD} macros in the template for using on the host level.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Databases
@@ -318,7 +318,6 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(data)
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -593,7 +592,6 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(data)
-                  
         -
           uuid: 5b7b9e010a274bb5a52784143dd57628
           name: 'Cluster metrics'
@@ -738,7 +736,6 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(data)
-                  
         -
           uuid: 3b81fbcbef204717be1918d3df919174
           name: 'GridGain kernal metrics'
@@ -855,8 +852,6 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(data)
-                  
-                  
         -
           uuid: 6265d30cd7494809bc94f929968d3c6f
           name: 'TCP Ccmmunication SPI metrics'
@@ -975,9 +970,6 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(data)
-                  
-                  
-                  
         -
           uuid: 5fb38d8148d746d6ae19d4f8c5a33ce8
           name: 'TCP discovery SPI'
@@ -1167,9 +1159,6 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(data)
-                  
-                  
-                  
         -
           uuid: b0b570121f1646e5baf0b0ff5cc5de2b
           name: 'Transaction metrics'
@@ -1299,9 +1288,6 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(data)
-                  
-                  
-                  
         -
           uuid: 7e3825aba1ad47c194162122eb050612
           name: 'Cache groups'
@@ -1529,7 +1515,6 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(data)
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1661,7 +1646,6 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(data)
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1950,7 +1934,6 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(data)
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
