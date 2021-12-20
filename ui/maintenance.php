@@ -132,18 +132,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	$absolute_time_parser->parse(getRequest('active_till'));
 	$active_till_date = $absolute_time_parser->getDateTime(true);
 
-	if (!validateDateInterval($active_since_date->format('Y'), $active_since_date->format('m'),
-			$active_since_date->format('d'))) {
-		info(_s('"%1$s" must be between 1970.01.01 and 2038.01.18.', _('Active since')));
-		$result = false;
-	}
-
-	if (!validateDateInterval($active_till_date->format('Y'), $active_till_date->format('m'),
-			$active_till_date->format('d'))) {
-		info(_s('"%1$s" must be between 1970.01.01 and 2038.01.18.', _('Active till')));
-		$result = false;
-	}
-
 	if ($result) {
 		$timeperiods = getRequest('timeperiods', []);
 		$type_fields = [
