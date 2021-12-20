@@ -680,7 +680,6 @@ static duk_ret_t	get_headers_as_arrays(duk_context *ctx, zbx_es_httprequest_t *r
 	for (i = 0; i < headers.values_num; i++) {
 		zbx_cached_header_t	*h = (zbx_cached_header_t*)headers.values[i];
 		duk_idx_t		arr_idx;
-		int			j;
 
 		arr_idx = duk_push_array(ctx);
 
