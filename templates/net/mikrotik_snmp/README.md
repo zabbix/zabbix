@@ -47,10 +47,10 @@ No specific Zabbix configuration is required.
 |CPU discovery |<p>HOST-RESOURCES-MIB::hrProcessorTable discovery</p> |SNMP |hrProcessorLoad.discovery |
 |Temperature CPU discovery |<p>MIKROTIK-MIB::mtxrHlProcessorTemperature</p><p>Since temperature of CPU is not available on all Mikrotik hardware, this is done to avoid unsupported items.</p> |SNMP |mtxrHlProcessorTemperature.discovery |
 |Temperature sensor discovery |<p>MIKROTIK-MIB::mtxrHlTemperature</p><p>Since temperature sensor is not available on all Mikrotik hardware,</p><p>this is done to avoid unsupported items.</p> |SNMP |mtxrHlTemperature.discovery |
-|LTE modem discovery |<p>MIKROTIK-MIB::mtxrLTEModemInterfaceIndex</p> |SNMP |mtxrLTEModem.discovery<p>**Filter**:</p>AND <p>- A: {#IFTYPE} MATCHES_REGEX `^1$`</p><p>- B: {#IFNAME} MATCHES_REGEX `{$IFNAME.LTEMODEM.MATCHES}`</p> |
-|AP channel discovery |<p>MIKROTIK-MIB::mtxrWlAp</p> |SNMP |mtxrWlAp.discovery<p>**Filter**:</p>AND <p>- A: {#IFTYPE} MATCHES_REGEX `^71$`</p><p>- B: {#IFADMINSTATUS} MATCHES_REGEX `^1$`</p> |
-|CAPsMAN AP channel discovery |<p>MIKROTIK-MIB::mtxrWlCMChannel</p> |SNMP |mtxrWlCMChannel.discovery<p>**Filter**:</p>AND <p>- A: {#IFTYPE} MATCHES_REGEX `^1$`</p><p>- B: {#IFNAME} MATCHES_REGEX `{$IFNAME.WIFI.MATCHES}`</p> |
-|Storage discovery |<p>HOST-RESOURCES-MIB::hrStorage discovery with storage filter</p> |SNMP |storage.discovery<p>**Filter**:</p>OR <p>- B: {#STORAGE_TYPE} MATCHES_REGEX `.+4$`</p><p>- A: {#STORAGE_TYPE} MATCHES_REGEX `.+hrStorageFixedDisk`</p> |
+|LTE modem discovery |<p>MIKROTIK-MIB::mtxrLTEModemInterfaceIndex</p> |SNMP |mtxrLTEModem.discovery<p>**Filter**:</p>AND <p>- {#IFTYPE} MATCHES_REGEX `^1$`</p><p>- {#IFNAME} MATCHES_REGEX `{$IFNAME.LTEMODEM.MATCHES}`</p> |
+|AP channel discovery |<p>MIKROTIK-MIB::mtxrWlAp</p> |SNMP |mtxrWlAp.discovery<p>**Filter**:</p>AND <p>- {#IFTYPE} MATCHES_REGEX `^71$`</p><p>- {#IFADMINSTATUS} MATCHES_REGEX `^1$`</p> |
+|CAPsMAN AP channel discovery |<p>MIKROTIK-MIB::mtxrWlCMChannel</p> |SNMP |mtxrWlCMChannel.discovery<p>**Filter**:</p>AND <p>- {#IFTYPE} MATCHES_REGEX `^1$`</p><p>- {#IFNAME} MATCHES_REGEX `{$IFNAME.WIFI.MATCHES}`</p> |
+|Storage discovery |<p>HOST-RESOURCES-MIB::hrStorage discovery with storage filter</p> |SNMP |storage.discovery<p>**Filter**:</p>OR <p>- {#STORAGE_TYPE} MATCHES_REGEX `.+4$`</p><p>- {#STORAGE_TYPE} MATCHES_REGEX `.+hrStorageFixedDisk`</p> |
 
 ## Items collected
 

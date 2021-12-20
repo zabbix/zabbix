@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-10-27T11:52:56Z'
+  date: '2021-12-20T09:20:08Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -21,7 +21,7 @@ zabbix_export:
         ENTITY-MIB
         IF-MIB
         
-        Template tooling version used: 0.39
+        Template tooling version used: 0.40
       groups:
         -
           name: 'Templates/Network devices'

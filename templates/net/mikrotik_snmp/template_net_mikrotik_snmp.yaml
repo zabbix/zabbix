@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-11-29T12:15:44Z'
+  date: '2021-12-20T08:19:24Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -26,7 +26,7 @@ zabbix_export:
           Version: RouterOS 6.38.5
           Device: Mikrotik 941-2nD, Mikrotik 951G-2HnD
         
-        Template tooling version used: 0.39
+        Template tooling version used: 0.40
       templates:
         -
           name: 'Generic SNMP'
