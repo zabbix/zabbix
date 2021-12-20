@@ -24,6 +24,8 @@
  * @var array    $data
  */
 
+$filter_view_data = array_key_exists('filter_view_data', $data) ? $data['filter_view_data'] : [];
+
 $left_column = (new CFormGrid())
 	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
 	->addItem([
@@ -32,7 +34,9 @@ $left_column = (new CFormGrid())
 			(new CMultiSelect([
 				'name' => 'groupids[]',
 				'object_name' => 'hostGroup',
-				'data' => [],
+				'data' => array_key_exists('groups_multiselect', $filter_view_data)
+					? $filter_view_data['groups_multiselect']
+					: [],
 				'popup' => [
 					'parameters' => [
 						'srctbl' => 'host_groups',
@@ -54,7 +58,9 @@ $left_column = (new CFormGrid())
 			(new CMultiSelect([
 				'name' => 'hostids[]',
 				'object_name' => 'hosts',
-				'data' => [],
+				'data' => array_key_exists('hosts_multiselect', $filter_view_data)
+					? $filter_view_data['hosts_multiselect']
+					: [],
 				'popup' => [
 					'filter_preselect_fields' => [
 						'hostgroups' => 'groupids_'
@@ -74,7 +80,7 @@ $left_column = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Name'), 'name'),
 		new CFormField(
-			(new CTextBox('name', ''))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+			(new CTextBox('name', $data['name']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 		)
 	]);
 
