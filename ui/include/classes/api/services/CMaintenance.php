@@ -333,12 +333,12 @@ class CMaintenance extends CApiService {
 											['else' => true, 'type' => API_UNEXPECTED]
 				]],
 				'day' =>				['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => implode(':', [1, MONTH_MAX_DAY])],
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => implode(':', [0, MONTH_MAX_DAY])],
 											['else' => true, 'type' => API_UNEXPECTED]
 				]],
 				'dayofweek' =>			['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_WEEKLY])], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(':', [0b0000001, 0b1111111])],
-											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => implode(':', [0b0000001, 0b1111111])],
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => implode(':', [0, 0b1111111])],
 											['else' => true, 'type' => API_UNEXPECTED]
 				]],
 				'month' =>				['type' => API_MULTIPLE, 'rules' => [
@@ -529,12 +529,12 @@ class CMaintenance extends CApiService {
 											['else' => true, 'type' => API_UNEXPECTED]
 				]],
 				'day' =>				['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => implode(':', [1, MONTH_MAX_DAY])],
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => implode(':', [0, MONTH_MAX_DAY])],
 											['else' => true, 'type' => API_UNEXPECTED]
 				]],
 				'dayofweek' =>			['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_WEEKLY])], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(':', [0b0000001, 0b1111111])],
-											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => implode(':', [0b0000001, 0b1111111])],
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => implode(':', [0, 0b1111111])],
 											['else' => true, 'type' => API_UNEXPECTED]
 				]],
 				'month' =>				['type' => API_MULTIPLE, 'rules' => [
@@ -660,14 +660,12 @@ class CMaintenance extends CApiService {
 	 * @throws APIException if time periods are not valid.
 	 */
 	private static function validateTimePeriods(array $maintenances): array {
-		foreach ($maintenances as $i1 => &$maintenance) {
+		foreach ($maintenances as &$maintenance) {
 			if (!array_key_exists('timeperiods', $maintenance)) {
 				continue;
 			}
 
-			$path = '/'.($i1 + 1).'/timeperiods';
-
-			foreach ($maintenance['timeperiods'] as $i2 => &$timeperiod) {
+			foreach ($maintenance['timeperiods'] as &$timeperiod) {
 				$timeperiod['period'] = timeUnitToSeconds($timeperiod['period'], API_TIME_UNIT_WITH_YEAR);
 				$timeperiod['period'] -= $timeperiod['period'] % SEC_PER_MIN;
 
@@ -679,16 +677,15 @@ class CMaintenance extends CApiService {
 				}
 
 				if ($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_MONTHLY) {
-					if (!array_key_exists('day', $maintenance) && !array_key_exists('dayofweek', $maintenance)) {
+					if ((!array_key_exists('day', $maintenance) || $maintenance['day'] == 0)
+							&& (!array_key_exists('dayofweek', $maintenance) || $maintenance['dayofweek'] == 0)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_('At least one day of week or day must be specified.')
 						);
 					}
-					elseif (array_key_exists('day', $maintenance) && array_key_exists('dayofweek', $maintenance)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-							$path.'/'.($i2 + 1).'/day',
-							_s('cannot be specified together with parameter "%1$s"', $path.'/'.($i2 + 1).'/dayofweek')
-						));
+					elseif (array_key_exists('day', $maintenance) && $maintenance['day'] != 0
+							&& array_key_exists('dayofweek', $maintenance) && $maintenance['dayofweek'] != 0) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Only day of week or day is allowed.'));
 					}
 				}
 			}
