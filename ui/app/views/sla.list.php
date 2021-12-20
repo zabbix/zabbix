@@ -57,7 +57,7 @@ $filter = (new CFilter())
 		(new CFormGrid())
 			->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
 			->addItem([
-				new CLabel(_('Tags')),
+				new CLabel(_('Service tags')),
 				new CFormField(
 					CTagFilterFieldHelper::getTagFilterField([
 						'evaltype' => $data['filter']['evaltype'],
