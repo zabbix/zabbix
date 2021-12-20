@@ -236,6 +236,11 @@ $diff-removed-bg-color: transparent;
 // Text
 $text-placeholder-color: #000000;
 
+// Change indicators.
+$arrow-fill-up: #FFFFFF;
+$arrow-fill-down: #FFFFFF;
+$arrow-fill-up-down: #FFFFFF;
+
 // Important! @import string should come after variables.
 @import 'screen.scss';
 

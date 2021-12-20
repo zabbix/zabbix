@@ -441,7 +441,7 @@ var hintBox = {
 
 	createBox: function(e, target, hintText, className, isStatic, styles, appendTo) {
 		var hintboxid = hintBox.getUniqueId(),
-			box = jQuery('<div></div>', {'data-hintboxid': hintboxid}).addClass('overlay-dialogue'),
+			box = jQuery('<div>', {'data-hintboxid': hintboxid}).addClass('overlay-dialogue'),
 			appendTo = appendTo || '.wrapper';
 
 		if (styles) {
@@ -463,7 +463,7 @@ var hintBox = {
 		}
 
 		if (!empty(className)) {
-			box.append(jQuery('<div></div>').addClass(className).html(hintText));
+			box.append(jQuery('<div>').addClass(className).html(hintText));
 		}
 		else {
 			box.html(hintText);

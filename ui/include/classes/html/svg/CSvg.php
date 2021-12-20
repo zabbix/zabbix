@@ -31,6 +31,10 @@ class CSvg extends CSvgTag {
 	}
 
 	protected function startToString() {
+		if (!$this->styles) {
+			return parent::startToString();
+		}
+
 		$styles = "\n";
 		$scope = '#'.$this->getAttribute('id').' ';
 

@@ -593,7 +593,7 @@ function convertUnitsS($value, $ignore_millisec = false) {
 }
 
 /**
- * Converts value to actual value.
+ * Converts a raw value to a user-friendly representation based on unit and other parameters.
  * Example:
  * 	6442450944 B convert to 6 GB
  *
@@ -611,6 +611,39 @@ function convertUnitsS($value, $ignore_millisec = false) {
  * @return string
  */
 function convertUnits(array $options) {
+	[
+		'value' => $value,
+		'units' => $units
+	] = convertUnitsRaw($options);
+
+	$result = $value;
+
+	if ($units !== '') {
+		$result .= ' '.$units;
+	}
+
+	return $result;
+}
+
+/**
+ * Converts a raw value to a user-friendly representation based on unit and other parameters.
+ * Example:
+ * 	6442450944 B convert to 6 GB
+ *
+ * @param array  $options
+ * @param string $options['value']
+ * @param string $options['units']
+ * @param int    $options['convert']
+ * @param int    $options['power']
+ * @param string $options['unit_base']
+ * @param bool   $options['ignore_milliseconds']
+ * @param int    $options['precision']
+ * @param int    $options['decimals']
+ * @param bool   $options['decimals_exact']
+ *
+ * @return array
+ */
+function convertUnitsRaw(array $options) {
 	static $power_table = ['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'];
 
 	$options += [
@@ -628,21 +661,37 @@ function convertUnits(array $options) {
 	$value = $options['value'] !== null ? $options['value'] : '';
 
 	if (!is_numeric($value)) {
-		return $value;
+		return [
+			'value' => $value,
+			'units' => '',
+			'is_numeric' => false
+		];
 	}
 
 	$units = $options['units'] !== null ? $options['units'] : '';
 
 	if ($units === 'unixtime') {
-		return zbx_date2str(DATE_TIME_FORMAT_SECONDS, $value);
+		return [
+			'value' => zbx_date2str(DATE_TIME_FORMAT_SECONDS, $value),
+			'units' => '',
+			'is_numeric' => false
+		];
 	}
 
 	if ($units === 'uptime') {
-		return convertUnitsUptime($value);
+		return [
+			'value' => convertUnitsUptime($value),
+			'units' => '',
+			'is_numeric' => false
+		];
 	}
 
 	if ($units === 's') {
-		return convertUnitsS($value, $options['ignore_milliseconds']);
+		return [
+			'value' => convertUnitsS($value, $options['ignore_milliseconds']),
+			'units' => '',
+			'is_numeric' => false
+		];
 	}
 
 	$blacklist = ['%', 'ms', 'rpm', 'RPM'];
@@ -658,16 +707,17 @@ function convertUnits(array $options) {
 	$do_convert = $units !== '' || $options['convert'] == ITEM_CONVERT_NO_UNITS;
 
 	if (in_array($units, $blacklist) || !$do_convert || $value_abs < 1) {
-		$result = formatFloat($value, $options['precision'], $options['decimals'] ?? ZBX_UNITS_ROUNDOFF_UNSUFFIXED,
-			$options['decimals_exact']
-		);
-
-		$result .= ($units === '' ? '' : ' '.$units);
-
-		return $result;
+		return [
+			'value' => formatFloat($value, $options['precision'], $options['decimals'] ?? ZBX_UNITS_ROUNDOFF_UNSUFFIXED,
+				$options['decimals_exact']
+			),
+			'units' => $units,
+			'is_numeric' => true
+		];
 	}
 
 	$unit_base = $options['unit_base'];
+
 	if ($unit_base != 1000 && $unit_base != ZBX_KIBIBYTE) {
 		$unit_base = ($units === 'B' || $units === 'Bps') ? ZBX_KIBIBYTE : 1000;
 	}
@@ -694,20 +744,23 @@ function convertUnits(array $options) {
 			$unit_prefix = $power_table[$unit_power];
 		}
 		else {
-			$unit_power = count($power_table);
+			$unit_power = count($power_table) - 1;
 			$unit_prefix = $power_table[$unit_power];
 		}
 
-		$result = formatFloat($value / pow($unit_base, $unit_power), $options['precision'], $options['decimals'] ??
-			($unit_prefix === '' ? ZBX_UNITS_ROUNDOFF_UNSUFFIXED : ZBX_UNITS_ROUNDOFF_SUFFIXED), $options['decimals_exact']
+		$result = formatFloat($value / pow($unit_base, $unit_power), $options['precision'],
+			$options['decimals'] ?? ($unit_prefix === '' ? ZBX_UNITS_ROUNDOFF_UNSUFFIXED : ZBX_UNITS_ROUNDOFF_SUFFIXED),
+			$options['decimals_exact']
 		);
 	}
 
 	$result_units = ($result == 0 ? '' : $unit_prefix).$units;
 
-	$result .= ($result_units === '' ? '' : ' '.$result_units);
-
-	return $result;
+	return [
+		'value' => $result,
+		'units' => $result_units,
+		'is_numeric' => true
+	];
 }
 
 /**
