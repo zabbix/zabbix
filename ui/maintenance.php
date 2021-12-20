@@ -146,6 +146,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 	if ($result) {
 		$timeperiods = getRequest('timeperiods', []);
+		$type_fields = [
+			TIMEPERIOD_TYPE_ONETIME => ['start_date'],
+			TIMEPERIOD_TYPE_DAILY => ['start_time', 'every'],
+			TIMEPERIOD_TYPE_WEEKLY => ['start_time', 'every', 'dayofweek'],
+			TIMEPERIOD_TYPE_MONTHLY => ['start_time', 'every', 'day', 'dayofweek', 'month']
+		];
 
 		foreach ($timeperiods as &$timeperiod) {
 			if ($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME) {
@@ -154,6 +160,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					->getDateTime(true)
 					->getTimestamp();
 			}
+
+			$timeperiod = array_intersect_key($timeperiod,
+				array_flip(['period', 'timeperiod_type']) + array_flip($type_fields[$timeperiod['timeperiod_type']])
+			);
 		}
 		unset($timeperiod);
 
