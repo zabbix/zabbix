@@ -103,7 +103,11 @@ static void	rtc_process_loglevel(int code, const char *data, char **result)
 		}
 
 		if ((pid_t)pid == getpid())
+		{
 			rtc_change_service_loglevel(code);
+			/* temporary message, the signal forwarding command output will be changed later */
+			*result = zbx_strdup(NULL, "Changed log level for the main process\n");
+		}
 		else
 			zbx_signal_process_by_pid((int)pid, ZBX_RTC_MAKE_MESSAGE(code, 0, 0), result);
 

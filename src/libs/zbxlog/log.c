@@ -702,7 +702,7 @@ void	zbx_strlog_alloc(int level, char **out, size_t *out_alloc, size_t *out_offs
 	size_t	len;
 	char	*buf;
 
-	if (SUCCEED != ZBX_CHECK_LOG_LEVEL(level))
+	if (SUCCEED != ZBX_CHECK_LOG_LEVEL(level) && NULL == out)
 		return;
 
 	va_start(args, format);
@@ -715,7 +715,8 @@ void	zbx_strlog_alloc(int level, char **out, size_t *out_alloc, size_t *out_offs
 	len = (size_t)vsnprintf(buf, len, format, args);
 	va_end(args);
 
-	zabbix_log(level, "%s",  buf);
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(level))
+			zabbix_log(level, "%s",  buf);
 
 	if (NULL != out)
 	{
