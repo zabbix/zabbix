@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:20Z'
+  version: '6.0'
+  date: '2021-12-13T12:28:17Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -371,9 +371,6 @@ zabbix_export:
               name: host
               value: '{$VAULT.HOST}'
             -
-              name: accessors
-              value: '{$VAULT.TOKEN.ACCESSORS}'
-            -
               name: token
               value: '{$VAULT.TOKEN}'
             -
@@ -382,6 +379,9 @@ zabbix_export:
             -
               name: port
               value: '{$VAULT.API.PORT}'
+            -
+              name: accessors
+              value: '{$VAULT.TOKEN.ACCESSORS}'
           tags:
             -
               tag: Application
@@ -708,6 +708,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_audit_log_request_failure
+                - value
                 - ''
               error_handler: DISCARD_VALUE
             -
@@ -735,6 +736,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_audit_log_request_count
+                - value
                 - ''
               error_handler: DISCARD_VALUE
             -
@@ -761,6 +763,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_audit_log_response_failure
+                - value
                 - ''
               error_handler: DISCARD_VALUE
             -
@@ -788,6 +791,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_audit_log_response_count
+                - value
                 - ''
               error_handler: DISCARD_VALUE
             -
@@ -814,6 +818,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_barrier_delete_count
+                - value
                 - ''
               error_handler: DISCARD_VALUE
             -
@@ -840,6 +845,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_barrier_list_count
+                - value
                 - ''
               error_handler: DISCARD_VALUE
             -
@@ -866,6 +872,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_barrier_put_count
+                - value
                 - ''
               error_handler: DISCARD_VALUE
             -
@@ -892,6 +899,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_cache_hit
+                - value
                 - ''
               error_handler: DISCARD_VALUE
             -
@@ -918,6 +926,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_cache_miss
+                - value
                 - ''
               error_handler: DISCARD_VALUE
             -
@@ -944,6 +953,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_cache_write
+                - value
                 - ''
               error_handler: DISCARD_VALUE
             -
@@ -970,6 +980,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_core_check_token_count
+                - value
                 - ''
               error_handler: DISCARD_VALUE
             -
@@ -996,6 +1007,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_core_fetch_acl_and_token_count
+                - value
                 - ''
               error_handler: DISCARD_VALUE
             -
@@ -1022,6 +1034,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_core_handle_request_count
+                - value
                 - ''
               error_handler: DISCARD_VALUE
             -
@@ -1111,6 +1124,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_core_post_unseal_count
+                - value
                 - ''
               error_handler: DISCARD_VALUE
           master_item:
@@ -1132,6 +1146,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_core_pre_seal_count
+                - value
                 - ''
               error_handler: DISCARD_VALUE
           master_item:
@@ -1154,6 +1169,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_core_seal_count
+                - value
                 - ''
               error_handler: DISCARD_VALUE
           master_item:
@@ -1175,6 +1191,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_core_seal_internal_count
+                - value
                 - ''
               error_handler: DISCARD_VALUE
           master_item:
@@ -1196,6 +1213,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_core_seal_with_request_count
+                - value
                 - ''
               error_handler: DISCARD_VALUE
           master_item:
@@ -1249,6 +1267,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_core_unseal_count
+                - value
                 - ''
               error_handler: DISCARD_VALUE
           master_item:
@@ -1270,6 +1289,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_expire_fetch_lease_times_count
+                - value
                 - ''
               error_handler: DISCARD_VALUE
           master_item:
@@ -1291,6 +1311,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_expire_fetch_lease_times_by_token_count
+                - value
                 - ''
               error_handler: DISCARD_VALUE
           master_item:
@@ -1312,6 +1333,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_expire_num_leases
+                - value
                 - ''
               error_handler: DISCARD_VALUE
           master_item:
@@ -1334,6 +1356,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_expire_register_count
+                - value
                 - ''
               error_handler: DISCARD_VALUE
           master_item:
@@ -1356,6 +1379,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_expire_register_auth_count
+                - value
                 - ''
               error_handler: DISCARD_VALUE
           master_item:
@@ -1378,6 +1402,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_expire_renew_count
+                - value
                 - ''
               error_handler: DISCARD_VALUE
           master_item:
@@ -1400,6 +1425,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_expire_renew_token_count
+                - value
                 - ''
               error_handler: DISCARD_VALUE
           master_item:
@@ -1422,6 +1448,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_expire_revoke_count
+                - value
                 - ''
               error_handler: DISCARD_VALUE
           master_item:
@@ -1444,6 +1471,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_expire_revoke_by_token_count
+                - value
                 - ''
               error_handler: DISCARD_VALUE
           master_item:
@@ -1466,6 +1494,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_expire_revoke_force_count
+                - value
                 - ''
               error_handler: DISCARD_VALUE
           master_item:
@@ -1488,6 +1517,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_expire_revoke_prefix_count
+                - value
                 - ''
               error_handler: DISCARD_VALUE
           master_item:
@@ -1510,6 +1540,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_policy_delete_policy_count
+                - value
                 - ''
               error_handler: DISCARD_VALUE
             -
@@ -1536,6 +1567,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_policy_get_policy_count
+                - value
                 - ''
               error_handler: DISCARD_VALUE
             -
@@ -1562,6 +1594,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_policy_list_policies_count
+                - value
                 - ''
               error_handler: DISCARD_VALUE
             -
@@ -1588,6 +1621,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_policy_set_policy_count
+                - value
                 - ''
               error_handler: DISCARD_VALUE
             -
@@ -1615,6 +1649,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - process_cpu_seconds_total
+                - value
                 - ''
               error_handler: DISCARD_VALUE
           master_item:
@@ -1637,6 +1672,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - process_max_fds
+                - value
                 - ''
               error_handler: DISCARD_VALUE
             -
@@ -1663,6 +1699,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - process_open_fds
+                - value
                 - ''
               error_handler: DISCARD_VALUE
           master_item:
@@ -1686,6 +1723,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - process_resident_memory_bytes
+                - value
                 - ''
               error_handler: DISCARD_VALUE
           master_item:
@@ -1708,6 +1746,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - process_start_time_seconds
+                - value
                 - ''
               error_handler: DISCARD_VALUE
             -
@@ -1743,6 +1782,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - process_virtual_memory_bytes
+                - value
                 - ''
               error_handler: DISCARD_VALUE
           master_item:
@@ -1766,6 +1806,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - process_virtual_memory_max_bytes
+                - value
                 - ''
               error_handler: DISCARD_VALUE
             -
@@ -1793,6 +1834,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_runtime_alloc_bytes
+                - value
                 - ''
               error_handler: DISCARD_VALUE
           master_item:
@@ -1815,6 +1857,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_runtime_free_count
+                - value
                 - ''
               error_handler: DISCARD_VALUE
           master_item:
@@ -1837,6 +1880,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_runtime_heap_objects
+                - value
                 - ''
               error_handler: DISCARD_VALUE
           master_item:
@@ -1859,6 +1903,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_runtime_malloc_count
+                - value
                 - ''
               error_handler: DISCARD_VALUE
           master_item:
@@ -1881,6 +1926,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_runtime_num_goroutines
+                - value
                 - ''
               error_handler: DISCARD_VALUE
           master_item:
@@ -1904,6 +1950,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_runtime_sys_bytes
+                - value
                 - ''
               error_handler: DISCARD_VALUE
           master_item:
@@ -1925,6 +1972,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_runtime_total_gc_runs
+                - value
                 - ''
               error_handler: DISCARD_VALUE
           master_item:
@@ -2102,6 +2150,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_token_create_count
+                - value
                 - ''
               error_handler: DISCARD_VALUE
           master_item:
@@ -2124,6 +2173,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_token_createAccessor_count
+                - value
                 - ''
               error_handler: DISCARD_VALUE
           master_item:
@@ -2176,6 +2226,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_token_lookup_count
+                - value
                 - ''
               error_handler: DISCARD_VALUE
             -
@@ -2202,6 +2253,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_token_revoke_count
+                - value
                 - ''
               error_handler: DISCARD_VALUE
           master_item:
@@ -2224,6 +2276,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_token_revoke_tree_count
+                - value
                 - ''
               error_handler: DISCARD_VALUE
           master_item:
@@ -2246,6 +2299,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_token_store_count
+                - value
                 - ''
               error_handler: DISCARD_VALUE
           master_item:
@@ -2268,6 +2322,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_runtime_total_gc_pause_ns
+                - value
                 - ''
               error_handler: DISCARD_VALUE
             -
@@ -2294,6 +2349,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - vault_barrier_get_count
+                - value
                 - ''
               error_handler: DISCARD_VALUE
             -
@@ -2329,6 +2385,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - '{#PATTERN_C}'
+                    - value
                     - ''
                   error_handler: DISCARD_VALUE
                 -
@@ -2355,6 +2412,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - '{#PATTERN_C}'
+                    - value
                     - ''
                   error_handler: DISCARD_VALUE
                 -
@@ -2391,6 +2449,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - logshipper_streamWALs_guard_found
+                    - value
                     - ''
                   error_handler: DISCARD_VALUE
               master_item:
@@ -2413,6 +2472,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - logshipper_streamWALs_missing_guard
+                    - value
                     - ''
                   error_handler: DISCARD_VALUE
               master_item:
@@ -2435,6 +2495,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - replication_fsm_last_remote_wal
+                    - value
                     - ''
                   error_handler: DISCARD_VALUE
               master_item:
@@ -2457,6 +2518,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - replication_merkle_commit_index
+                    - value
                     - ''
                   error_handler: DISCARD_VALUE
               master_item:
@@ -2479,6 +2541,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - replication_wal_last_dr_wal
+                    - value
                     - ''
                   error_handler: DISCARD_VALUE
               master_item:
@@ -2501,6 +2564,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - replication_wal_last_performance_wal
+                    - value
                     - ''
                   error_handler: DISCARD_VALUE
               master_item:
@@ -2523,6 +2587,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - replication_wal_last_wal
+                    - value
                     - ''
                   error_handler: DISCARD_VALUE
               master_item:
@@ -2562,6 +2627,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - '{#PATTERN_C}'
+                    - value
                     - ''
                   error_handler: DISCARD_VALUE
                 -
@@ -2716,6 +2782,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - vault_wal_deletewals_count
+                    - value
                     - ''
                   error_handler: DISCARD_VALUE
               master_item:
@@ -2738,6 +2805,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - vault_wal_flushready_count
+                    - value
                     - ''
                   error_handler: DISCARD_VALUE
               master_item:
@@ -2760,6 +2828,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - vault_wal_gc_deleted
+                    - value
                     - ''
                   error_handler: DISCARD_VALUE
               master_item:
@@ -2782,6 +2851,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - vault_wal_gc_total
+                    - value
                     - ''
                   error_handler: DISCARD_VALUE
               master_item:
@@ -2804,6 +2874,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - vault_wal_loadWAL_count
+                    - value
                     - ''
                   error_handler: DISCARD_VALUE
               master_item:
@@ -2826,6 +2897,7 @@ zabbix_export:
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - vault_wal_persistwals_count
+                    - value
                     - ''
                   error_handler: DISCARD_VALUE
               master_item:

@@ -806,7 +806,14 @@ static void	ha_db_register_node(zbx_ha_info_t *info)
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",port=%d", port);
 	}
 
-	ha_db_execute(info, "%s where ha_nodeid='%s'", sql, info->ha_nodeid.str);
+	if (SUCCEED == ha_db_execute(info, "%s where ha_nodeid='%s'", sql, info->ha_nodeid.str))
+	{
+		if (ZBX_HA_IS_CLUSTER())
+			ha_db_execute(info, "delete from ha_node where name=''");
+		else
+			ha_db_execute(info, "delete from ha_node where name<>''");
+	}
+
 	ha_flush_audit(info);
 
 	zbx_free(sql);

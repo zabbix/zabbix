@@ -827,12 +827,12 @@ ROW   |2       |Traceroute             |/usr/bin/traceroute {HOST.CONN}         
 ROW   |3       |Detect operating system|sudo /usr/bin/nmap -O {HOST.CONN}                             |2          |7       |NULL   |           |            |0   |2         |2    |    |0       |        |        |         |          |         |
 
 TABLE |actions
-FIELDS|actionid|name                                          |eventsource|evaltype|status|esc_period|formula|pause_suppressed|
-ROW   |2       |Auto discovery. Linux servers.                |1          |0       |1     |0         |       |1               |
-ROW   |3       |Report problems to Zabbix administrators      |0          |0       |1     |1h        |       |1               |
-ROW   |4       |Report not supported items                    |3          |0       |1     |1h        |       |1               |
-ROW   |5       |Report not supported low level discovery rules|3          |0       |1     |1h        |       |1               |
-ROW   |6       |Report unknown triggers                       |3          |0       |1     |1h        |       |1               |
+FIELDS|actionid|name                                          |eventsource|evaltype|status|esc_period|formula|pause_suppressed|notify_if_canceled|
+ROW   |2       |Auto discovery. Linux servers.                |1          |0       |1     |0         |       |1               |1                 |
+ROW   |3       |Report problems to Zabbix administrators      |0          |0       |1     |1h        |       |1               |1                 |
+ROW   |4       |Report not supported items                    |3          |0       |1     |1h        |       |1               |1                 |
+ROW   |5       |Report not supported low level discovery rules|3          |0       |1     |1h        |       |1               |1                 |
+ROW   |6       |Report unknown triggers                       |3          |0       |1     |1h        |       |1               |1                 |
 
 TABLE |operations
 FIELDS|operationid|actionid|operationtype|esc_period|esc_step_from|esc_step_to|evaltype|recovery|

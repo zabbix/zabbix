@@ -58,7 +58,8 @@ class CMacrosResolverTest extends TestCase {
 				'expected_item' => [
 					30896 => [
 						'hostid' => 10084,
-						'description' => 'Response from http://zabbix.com through proxy in Tokyo'
+						'description' => 'Response from {$TMG.PROXY.CHECK.URL1} through proxy in {$CITY}',
+						'description_expanded' => 'Response from http://zabbix.com through proxy in Tokyo'
 					]
 				]
 			],
@@ -72,7 +73,8 @@ class CMacrosResolverTest extends TestCase {
 				'expected_item' => [
 					30896 => [
 						'hostid' => 10084,
-						'description' => 'Number of packages in {$UNKNOWN_MACRO}'
+						'description' => 'Number of packages in {$UNKNOWN_MACRO}',
+						'description_expanded' => 'Number of packages in {$UNKNOWN_MACRO}'
 					]
 				]
 			]

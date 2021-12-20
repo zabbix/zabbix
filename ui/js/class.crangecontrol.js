@@ -29,7 +29,7 @@ jQuery(function ($) {
 		var value;
 
 		for (value = options.min; value < options.max; value += options.step) {
-			$('<option/>').attr('value', value).appendTo(datalist);
+			$('<option>', {value: value}).appendTo(datalist);
 		}
 	}
 
@@ -45,11 +45,11 @@ jQuery(function ($) {
 		init: function() {
 			var tmpl = $('<div class="range-control">' +
 					'<div>' +
-						'<div class="range-control-track"/>' +
-						'<div class="range-control-progress"/>' +
-						'<datalist/>' +
-						'<div class="range-control-thumb"/>' +
-						'<input type="range"/>' +
+						'<div class="range-control-track"></div>' +
+						'<div class="range-control-progress"></div>' +
+						'<datalist></datalist>' +
+						'<div class="range-control-thumb"></div>' +
+						'<input type="range">' +
 					'</div>' +
 				'</div>');
 

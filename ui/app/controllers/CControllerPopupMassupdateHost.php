@@ -262,26 +262,30 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 
 						switch ($this->getInput('mass_action_tpls')) {
 							case ZBX_ACTION_ADD:
-								$host['templates'] = array_unique(
-									array_merge($host_templateids, $this->getInput('templates', []))
+								$host['templates'] = zbx_toObject(
+									array_unique(array_merge($host_templateids, $this->getInput('templates', []))),
+									'templateid'
 								);
 								break;
 
 							case ZBX_ACTION_REPLACE:
-								$host['templates'] = $this->getInput('templates', []);
+								$host['templates'] = zbx_toObject($this->getInput('templates', []), 'templateid');
+
 								if ($this->hasInput('mass_clear_tpls')) {
-									$host['templates_clear'] = array_unique(
-										array_diff($host_templateids, $this->getInput('templates', []))
+									$host['templates_clear'] = zbx_toObject(
+										array_diff($host_templateids, $this->getInput('templates', [])), 'templateid'
 									);
 								}
 								break;
 
 							case ZBX_ACTION_REMOVE:
-								$host['templates'] = array_unique(
-									array_diff($host_templateids, $this->getInput('templates', []))
+								$host['templates'] = zbx_toObject(
+									array_diff($host_templateids, $this->getInput('templates', [])), 'templateid'
 								);
+
 								if ($this->hasInput('mass_clear_tpls')) {
-									$host['templates_clear'] = array_unique($this->getInput('templates', []));
+									$host['templates_clear'] =
+										zbx_toObject($this->getInput('templates', []), 'templateid');
 								}
 								break;
 						}
