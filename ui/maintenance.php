@@ -163,24 +163,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'description' => getRequest('description'),
 			'active_since' => $active_since_date->getTimestamp(),
 			'active_till' => $active_till_date->getTimestamp(),
+			'groups' => zbx_toObject(getRequest('groupids', []), 'groupid'),
+			'hosts' => zbx_toObject(getRequest('hostids', []), 'hostid'),
 			'timeperiods' => $timeperiods
 		];
-
-		$groups = array_map(function (string $id): array {
-			return ['groupid' => $id];
-		}, getRequest('groupids', []));
-
-		if ($groups) {
-			$maintenance['groups'] = $groups;
-		}
-
-		$hosts = array_map(function (string $id): array {
-			return ['hostid' => $id];
-		}, getRequest('hostids', []));
-
-		if ($hosts) {
-			$maintenance['hosts'] = $hosts;
-		}
 
 		if ($maintenance['maintenance_type'] != MAINTENANCE_TYPE_NODATA) {
 			$maintenance += [
