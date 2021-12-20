@@ -161,7 +161,10 @@
 
 			switch ($btn.data('action')) {
 				case 'add':
-					PopUp('popup.mediatype.message', 'modal-popup modal-popup-medium', params, null, $btn);
+					PopUp('popup.mediatype.message', params, {
+						dialogue_class: 'modal-popup-medium',
+						trigger_element: this
+					});
 					break;
 
 				case 'edit':
@@ -179,7 +182,10 @@
 						}
 					});
 
-					PopUp('popup.mediatype.message', 'modal-popup modal-popup-medium', params, null, $btn);
+					PopUp('popup.mediatype.message', params, {
+						dialogue_class: 'modal-popup-medium',
+						trigger_element: this
+					});
 					break;
 			}
 		});

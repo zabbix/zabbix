@@ -93,22 +93,22 @@ window.host_edit_popup = {
 
 	clone() {
 		this.overlay.setLoading();
-		const options = host_edit.preprocessFormFields(getFormFields(this.form));
-		delete options.sid;
-		options.clone = 1;
+		const parameters = host_edit.preprocessFormFields(getFormFields(this.form));
+		delete parameters.sid;
+		parameters.clone = 1;
 
 		this.removeEventListeners();
-		PopUp('popup.host.edit', options, {dialogueid: 'host_edit', dialogue_class: 'modal-popup-large'});
+		PopUp('popup.host.edit', parameters, {dialogue_id: 'host_edit', dialogue_class: 'modal-popup-large'});
 	},
 
 	fullClone() {
 		this.overlay.setLoading();
-		const options = host_edit.preprocessFormFields(getFormFields(this.form));
-		delete options.sid;
-		options.full_clone = 1;
+		const parameters = host_edit.preprocessFormFields(getFormFields(this.form));
+		delete parameters.sid;
+		parameters.full_clone = 1;
 
 		this.removeEventListeners();
-		PopUp('popup.host.edit', options, {dialogueid: 'host_edit', dialogue_class: 'modal-popup-large'});
+		PopUp('popup.host.edit', parameters, {dialogue_id: 'host_edit', dialogue_class: 'modal-popup-large'});
 	},
 
 	delete(hostid) {

@@ -348,28 +348,32 @@
 	 * @param {Node} return_focus
 	 */
 	OperationViewMessage.prototype.showUserPopup = function(return_focus) {
-		PopUp('popup.generic', 'modal-popup modal-popup-generic', {
-			'srctbl': 'users',
-			'srcfld1': 'userid',
-			'srcfld2': 'fullname',
-			'dstfrm': 'popup.operation',
-			'dstfld1': 'operation-message-users-footer',
-			'multiselect': '1'
-		}, null, return_focus);
+		PopUp('popup.generic', {
+				'srctbl': 'users',
+				'srcfld1': 'userid',
+				'srcfld2': 'fullname',
+				'dstfrm': 'popup.operation',
+				'dstfld1': 'operation-message-users-footer',
+				'multiselect': '1'
+			},
+			{dialogue_class: 'modal-popup-generic', trigger_element: return_focus}
+		);
 	};
 
 	/**
 	 * @param {Node} return_focus
 	 */
 	OperationViewMessage.prototype.showUserGroupPopup = function(return_focus) {
-		PopUp('popup.generic', 'modal-popup modal-popup-generic', {
-			'srctbl': 'usrgrp',
-			'srcfld1': 'usrgrpid',
-			'srcfld2': 'name',
-			'dstfrm': 'popup.operation',
-			'dstfld1': 'operation-message-user-groups-footer',
-			'multiselect': '1'
-		}, null, return_focus);
+		PopUp('popup.generic', {
+				'srctbl': 'usrgrp',
+				'srcfld1': 'usrgrpid',
+				'srcfld2': 'name',
+				'dstfrm': 'popup.operation',
+				'dstfld1': 'operation-message-user-groups-footer',
+				'multiselect': '1'
+			},
+			{dialogue_class: 'modal-popup-generic', trigger_element: return_focus}
+		);
 	};
 
 	/**
@@ -832,10 +836,12 @@
 	 * @param {Node} return_focus
 	 */
 	OperationViewCondition.prototype.showConditionsPopup = function(return_focus) {
-		PopUp('popup.condition.operations', 'modal-popup modal-popup-medium', {
-			'type': operation_details.ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION,
-			'source': operation_details.EVENT_SOURCE_TRIGGERS
-		}, null, return_focus);
+		PopUp('popup.condition.operations', {
+				'type': operation_details.ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION,
+				'source': operation_details.EVENT_SOURCE_TRIGGERS
+			},
+			{dialogue_class: 'modal-popup-medium', trigger_element: return_focus}
+		);
 	};
 
 	/**

@@ -934,9 +934,10 @@ class CDashboard extends CBaseComponent {
 			auto_start: this._data.auto_start
 		};
 
-		PopUp('dashboard.properties.edit', 'modal-popup modal-popup-generic',
-			properties, 'dashboard_properties', document.activeElement
-		);
+		PopUp('dashboard.properties.edit', properties, {
+			dialogue_id: 'dashboard_properties',
+			dialogue_class: 'modal-popup-generic'
+		});
 	}
 
 	applyProperties() {
@@ -1002,9 +1003,10 @@ class CDashboard extends CBaseComponent {
 	editDashboardPageProperties(properties = {}) {
 		properties.dashboard_display_period = this._data.display_period;
 
-		PopUp('dashboard.page.properties.edit', 'modal-popup modal-popup-generic',
-			properties, 'dashboard_page_properties', document.activeElement
-		);
+		PopUp('dashboard.page.properties.edit', properties, {
+			dialogue_id: 'dashboard_page_properties',
+			dialogue_class: 'modal-popup-generic'
+		});
 	}
 
 	applyDashboardPageProperties() {
@@ -1088,10 +1090,12 @@ class CDashboard extends CBaseComponent {
 	}
 
 	editWidgetProperties(properties = {}, {new_widget_pos = null} = {}) {
-		const overlay = PopUp('dashboard.widget.edit', 'modal-popup modal-popup-generic', {
-			templateid: this._data.templateid ?? undefined,
-			...properties
-		}, 'widget_properties', document.activeElement);
+		const overlay = PopUp('dashboard.widget.edit', {
+				templateid: this._data.templateid ?? undefined,
+				...properties
+			},
+			{dialogue_id: 'widget_properties', dialoogue_class: 'modal-popup-generic'}
+		);
 
 		overlay.xhr.then(() => {
 			const form = overlay.$dialogue.$body[0].querySelector('form');

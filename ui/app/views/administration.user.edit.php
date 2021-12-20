@@ -307,7 +307,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 				->addClass(ZBX_STYLE_RED);
 		}
 
-		$popup_options = [
+		$parameters = [
 			'dstfrm' => $user_form->getName(),
 			'media' => $index,
 			'mediatypeid' => $media['mediatypeid'],
@@ -316,8 +316,6 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 			'severity' => $media['severity'],
 			'active' => $media['active']
 		];
-
-
 		$media_severity = [];
 
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
@@ -354,8 +352,8 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 					new CHorList([
 						(new CButton(null, _('Edit')))
 							->addClass(ZBX_STYLE_BTN_LINK)
-							->onClick('return PopUp("popup.media", "modal-popup", '.
-								json_encode($popup_options).', null, this);'
+							->onClick(
+								'return PopUp("popup.media", '.json_encode($parameters).', {trigger_element: this});'
 							),
 						(new CButton(null, _('Remove')))
 							->addClass(ZBX_STYLE_BTN_LINK)
@@ -370,10 +368,10 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 		(new CDiv([
 			$media_table_info,
 			(new CButton(null, _('Add')))
-				->onClick('return PopUp("popup.media", "modal-popup", '.
-					json_encode([
-						'dstfrm' => $user_form->getName()
-					]).', null, this);'
+				->onClick(
+					'return PopUp("popup.media", '.json_encode(['dstfrm' => $user_form->getName()]).',
+						{trigger_element: this}
+					);'
 				)
 				->addClass(ZBX_STYLE_BTN_LINK)
 		]))

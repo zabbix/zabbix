@@ -206,19 +206,20 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		// Select item button.
 		$yaxisMinData[] = (new CButton('yaxis_min', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
-			->onClick('return PopUp("popup.generic", "modal-popup", jQuery.extend('.
-				json_encode([
-					'srctbl' => 'items',
-					'srcfld1' => 'itemid',
-					'srcfld2' => 'name',
-					'dstfrm' => $graphForm->getName(),
-					'dstfld1' => 'ymin_itemid',
-					'dstfld2' => 'ymin_name',
-					'with_webitems' => '1',
-					'numeric' => '1',
-					'writeonly' => '1'
-				]).
-					',getOnlyHostParam()), null, this);'
+			->onClick(
+				'return PopUp("popup.generic", jQuery.extend('.json_encode([
+						'srctbl' => 'items',
+						'srcfld1' => 'itemid',
+						'srcfld2' => 'name',
+						'dstfrm' => $graphForm->getName(),
+						'dstfld1' => 'ymin_itemid',
+						'dstfld2' => 'ymin_name',
+						'with_webitems' => '1',
+						'numeric' => '1',
+						'writeonly' => '1'
+					]).', getOnlyHostParam()),
+					{trigger_element: this}
+				);'
 			)
 			->setEnabled(!$readonly);
 
@@ -227,17 +228,19 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 			$yaxisMinData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 			$yaxisMinData[] = (new CButton('yaxis_min_prototype', _('Select prototype')))
 				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick('return PopUp("popup.generic", "modal-popup",'.
-					json_encode([
-						'srctbl' => 'item_prototypes',
-						'srcfld1' => 'itemid',
-						'srcfld2' => 'name',
-						'dstfrm' => $graphForm->getName(),
-						'dstfld1' => 'ymin_itemid',
-						'dstfld2' => 'ymin_name',
-						'parent_discoveryid' => $data['parent_discoveryid'],
-						'numeric' => '1'
-					]).', null, this);'
+				->onClick(
+					'return PopUp("popup.generic", '.json_encode([
+							'srctbl' => 'item_prototypes',
+							'srcfld1' => 'itemid',
+							'srcfld2' => 'name',
+							'dstfrm' => $graphForm->getName(),
+							'dstfld1' => 'ymin_itemid',
+							'dstfld2' => 'ymin_name',
+							'parent_discoveryid' => $data['parent_discoveryid'],
+							'numeric' => '1'
+						]).',
+						{trigger_element: this}
+					);'
 				)
 				->setEnabled(!$readonly);
 		}
@@ -293,19 +296,20 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		// Select item button.
 		$yaxisMaxData[] = (new CButton('yaxis_max', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
-			->onClick('return PopUp("popup.generic", "modal-popup", jQuery.extend('.
-				json_encode([
-					'srctbl' => 'items',
-					'srcfld1' => 'itemid',
-					'srcfld2' => 'name',
-					'dstfrm' => $graphForm->getName(),
-					'dstfld1' => 'ymax_itemid',
-					'dstfld2' => 'ymax_name',
-					'with_webitems' => '1',
-					'numeric' => '1',
-					'writeonly' => '1'
-				]).
-					',getOnlyHostParam()), null, this);'
+			->onClick(
+				'return PopUp("popup.generic", jQuery.extend('.json_encode([
+						'srctbl' => 'items',
+						'srcfld1' => 'itemid',
+						'srcfld2' => 'name',
+						'dstfrm' => $graphForm->getName(),
+						'dstfld1' => 'ymax_itemid',
+						'dstfld2' => 'ymax_name',
+						'with_webitems' => '1',
+						'numeric' => '1',
+						'writeonly' => '1'
+					]).', getOnlyHostParam()),
+					{trigger_element: this}
+				);'
 			)
 			->setEnabled(!$readonly);
 
@@ -314,17 +318,19 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 			$yaxisMaxData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 			$yaxisMaxData[] = (new CButton('yaxis_max_prototype', _('Select prototype')))
 				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick('return PopUp("popup.generic", "modal-popup",'.
-					json_encode([
-						'srctbl' => 'item_prototypes',
-						'srcfld1' => 'itemid',
-						'srcfld2' => 'name',
-						'dstfrm' => $graphForm->getName(),
-						'dstfld1' => 'ymax_itemid',
-						'dstfld2' => 'ymax_name',
-						'parent_discoveryid' => $data['parent_discoveryid'],
-						'numeric' => '1'
-					]).', null, this);'
+				->onClick(
+					'return PopUp("popup.generic", '.json_encode([
+							'srctbl' => 'item_prototypes',
+							'srcfld1' => 'itemid',
+							'srcfld2' => 'name',
+							'dstfrm' => $graphForm->getName(),
+							'dstfld1' => 'ymax_itemid',
+							'dstfld2' => 'ymax_name',
+							'parent_discoveryid' => $data['parent_discoveryid'],
+							'numeric' => '1'
+						]).',
+						{trigger_element: this}
+					);'
 				)
 				->setEnabled(!$readonly);
 		}
@@ -421,14 +427,20 @@ $items_table->addRow(
 			: (new CCol(
 				new CHorList([
 					(new CButton('add_item', _('Add')))
-						->onClick('return PopUp("popup.generic", "modal-popup", jQuery.extend('.
-							json_encode($popup_options_add).',getOnlyHostParam()), null, this);'
+						->onClick(
+							'return PopUp("popup.generic",
+								jQuery.extend('.json_encode($popup_options_add).', getOnlyHostParam()),
+								{trigger_element: this}
+							);'
 						)
 						->addClass(ZBX_STYLE_BTN_LINK),
 					$data['parent_discoveryid']
 						? (new CButton('add_protoitem', _('Add prototype')))
-							->onClick('return PopUp("popup.generic", "modal-popup",'.
-								json_encode($popup_options_add_prototype).', null, this);'
+							->onClick(
+								'return PopUp("popup.generic",
+									'.json_encode($popup_options_add_prototype).',
+									{trigger_element: this}
+								);'
 							)
 							->addClass(ZBX_STYLE_BTN_LINK)
 						: null

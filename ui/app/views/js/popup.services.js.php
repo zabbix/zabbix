@@ -39,7 +39,10 @@ window.services_popup = {
 		filter_form.addEventListener('submit', (e) => {
 			e.preventDefault();
 
-			PopUp('popup.services', 'modal-popup', getFormFields(filter_form), 'services', e.target);
+			PopUp('popup.services', getFormFields(filter_form), {
+				dialogue_id: 'services',
+				trigger_element: e.target
+			});
 		}, {passive: false});
 
 		filter_form.addEventListener('reset', (e) => {
@@ -47,7 +50,10 @@ window.services_popup = {
 
 			filter_form.elements.filter_name.value = '';
 
-			PopUp('popup.services', 'modal-popup', getFormFields(filter_form), 'services', e.target);
+			PopUp('popup.services', getFormFields(filter_form), {
+				dialogue_id: 'services',
+				trigger_element: e.target
+			});
 		}, {passive: false});
 
 		this.form.addEventListener('click', (e) => {

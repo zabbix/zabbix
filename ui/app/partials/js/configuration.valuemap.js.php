@@ -35,7 +35,7 @@
 		let valuemap_table = event.target.closest('table');
 
 		valuemap_table.querySelectorAll('[name$="[name]"]').forEach((elm) => valuemap_names.push(elm.value));
-		PopUp("popup.valuemap.edit", 'modal-popup', {valuemap_names: valuemap_names}, null, event.target);
+		PopUp('popup.valuemap.edit', {valuemap_names}, {trigger_element: event.target});
 	}
 })();
 </script>
@@ -89,7 +89,7 @@ var AddValueMap = class {
 					valuemap_names.push(element.value);
 				}
 			});
-			PopUp('popup.valuemap.edit', 'modal-popup', {...this.data, valuemap_names, edit: 1}, null, e.target);
+			PopUp('popup.valuemap.edit', {...this.data, valuemap_names, edit: 1}, {trigger_element: e.target});
 		});
 
 		cell.appendChild(this.createHiddenInput('[name]', this.data.name));

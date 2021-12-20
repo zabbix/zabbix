@@ -402,16 +402,18 @@ switch ($data['type']) {
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 					(new CButton('btn1', _('Select')))
 						->addClass(ZBX_STYLE_BTN_GREY)
-						->onClick('return PopUp("popup.generic", "modal-popup", '.
-							json_encode([
-								'srctbl' => 'dchecks',
-								'srcfld1' => 'dcheckid',
-								'srcfld2' => 'name',
-								'dstfrm' => $form->getName(),
-								'dstfld1' => 'dcheck_new_condition_value',
-								'dstfld2' => 'dcheck',
-								'writeonly' => '1'
-							]).', null, this);'
+						->onClick('
+							return PopUp("popup.generic", '. json_encode([
+									'srctbl' => 'dchecks',
+									'srcfld1' => 'dcheckid',
+									'srcfld2' => 'name',
+									'dstfrm' => $form->getName(),
+									'dstfld1' => 'dcheck_new_condition_value',
+									'dstfld2' => 'dcheck',
+									'writeonly' => '1'
+								]).',
+								{trigger_element: this}
+							);'
 						)
 				];
 

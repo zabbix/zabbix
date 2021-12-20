@@ -88,20 +88,20 @@
 				recipient = document.createElement('a');
 				recipient.href = 'javascript:void(0);';
 				recipient.addEventListener('click', (event) => {
-					const popup_options = Object.assign(this.data, {
+					const parameters = Object.assign(this.data, {
 						edit: 1,
 						old_recipientid: this.data.recipientid
 					});
 
 					if (this.data.recipient_type == <?= ZBX_REPORT_RECIPIENT_TYPE_USER ?>) {
-						popup_options.exclude = recipient.parentNode.parentNode.querySelector('[name*=exclude]').value;
-						popup_options.userids = Array.from(userids);
+						parameters.exclude = recipient.parentNode.parentNode.querySelector('[name*=exclude]').value;
+						parameters.userids = Array.from(userids);
 					}
 					else {
-						popup_options.usrgrpids = Array.from(usrgrpids);
+						parameters.usrgrpids = Array.from(usrgrpids);
 					}
 
-					PopUp('popup.scheduledreport.subscription.edit', 'modal-popup', popup_options, null, event.target);
+					PopUp('popup.scheduledreport.subscription.edit', parameters, {trigger_element: event.target});
 				});
 			}
 			else {
@@ -239,12 +239,10 @@
 			}
 
 			elem.addEventListener('click', (event) => {
-				const popup_options = {
+				PopUp('popup.scheduledreport.subscription.edit', {
 					recipient_type: <?= ZBX_REPORT_RECIPIENT_TYPE_USER ?>,
 					userids: Array.from(userids)
-				};
-
-				PopUp('popup.scheduledreport.subscription.edit', 'modal-popup', popup_options, null, event.target);
+				}, {trigger_element: event.target});
 			});
 		}
 
@@ -256,12 +254,10 @@
 			}
 
 			elem.addEventListener('click', (event) => {
-				const popup_options = {
+				PopUp('popup.scheduledreport.subscription.edit', {
 					recipient_type: <?= ZBX_REPORT_RECIPIENT_TYPE_USER_GROUP ?>,
 					usrgrpids: Array.from(usrgrpids)
-				};
-
-				PopUp('popup.scheduledreport.subscription.edit', 'modal-popup', popup_options, null, event.target);
+				}, {trigger_element: event.target});
 			});
 		}
 	}

@@ -335,15 +335,15 @@ function getPosition(obj) {
  * @returns {Overlay}
  */
 function PopUp(action, parameters, {
-	dialogueid = null,
+	dialogue_id = null,
 	dialogue_class = '',
 	trigger_element = document.activeElement
 }) {
-	var overlay = overlays_stack.getById(dialogueid);
+	var overlay = overlays_stack.getById(dialogue_id);
 
 	if (!overlay) {
 		overlay = overlayDialogue({
-			'dialogueid': dialogueid,
+			'dialogueid': dialogue_id,
 			'title': '',
 			'content': jQuery('<div>', {'height': '68px', class: 'is-loading'}),
 			'class': 'modal-popup ' + dialogue_class,
@@ -407,23 +407,23 @@ function PopUp(action, parameters, {
 /**
  * Open "Update problem" dialog and manage URL change.
  *
- * @param {Object}  options
- * @param {array}  options['eventids']  Eventids to update.
- * @param {object} trigger_elmnt        (optional) UI element which was clicked to open overlay dialogue.
+ * @param {Object} parameters
+ * @param {array}  parameters['eventids']  Eventids to update.
+ * @param {object} trigger_element        (optional) UI element which was clicked to open overlay dialogue.
  *
  * @returns {Overlay}
  */
-function acknowledgePopUp(options, trigger_elmnt) {
-	var overlay = PopUp('popup.acknowledge.edit', 'modal-popup', options, null, trigger_elmnt),
+function acknowledgePopUp(parameters, trigger_element) {
+	var overlay = PopUp('popup.acknowledge.edit', parameters, {trigger_element}),
 		backurl = location.href;
 
-	overlay.trigger_parents = $(trigger_elmnt).parents();
+	overlay.trigger_parents = $(trigger_element).parents();
 
 	overlay.xhr.then(function() {
 		var url = new Curl('zabbix.php', false);
 		url.setArgument('action', 'popup');
 		url.setArgument('popup_action', 'acknowledge.edit');
-		url.setArgument('eventids', options.eventids);
+		url.setArgument('eventids', parameters.eventids);
 
 		history.replaceState({}, '', url.getUrl());
 	});
@@ -545,16 +545,16 @@ function removeFromOverlaysStack(dialogueid, return_focus) {
  * @param {string} action	(optional) action value that is used in CRouter. Default value is 'popup.generic'.
  */
 function reloadPopup(form, action) {
-	var dialogueid = jQuery(form).closest('[data-dialogueid]').prop('data-dialogueid'),
+	var dialogue_id = jQuery(form).closest('[data-dialogueid]').prop('data-dialogueid'),
 		dialogue_class = jQuery(form).closest('[data-dialogueid]').prop('class'),
 		action = action || 'popup.generic',
-		options = {};
+		parameters = {};
 
 	jQuery(form.elements).each(function() {
-		options[this.name] = this.value;
+		parameters[this.name] = this.value;
 	});
 
-	PopUp(action, dialogue_class, options, dialogueid);
+	PopUp(action, parameters, {dialogue_id, dialogue_class});
 }
 
 /**

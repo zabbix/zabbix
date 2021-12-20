@@ -142,22 +142,23 @@
 		if (test_btn !== null) {
 			test_btn.addEventListener('click', (event) => {
 				const form = event.target.closest('form');
-				const popup_options = {
+				const parameters = {
 					period: form.elements['period'].value,
 					now: Math.floor(Date.now() / 1000)
 				};
 
 				if (typeof form.elements['dashboardid'] !== 'undefined') {
-					popup_options.dashboardid = form.elements['dashboardid'].value;
+					parameters.dashboardid = form.elements['dashboardid'].value;
 				}
 
 				document.querySelectorAll('#name, #subject, #message').forEach((elem) => {
-					popup_options[elem.id] = elem.value.trim();
+					parameters[elem.id] = elem.value.trim();
 				});
 
-				PopUp('popup.scheduledreport.test', 'modal-popup modal-popup-medium',
-					popup_options, null, event.target
-				);
+				PopUp('popup.scheduledreport.test', parameters, {
+					dialogue_class: 'modal-popup-medium',
+					trigger_element: event.target
+				});
 			});
 		}
 	});

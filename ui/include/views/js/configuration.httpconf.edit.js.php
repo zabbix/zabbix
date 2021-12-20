@@ -778,22 +778,24 @@
 	 * @param {Node} refocus  A node to set focus to, when popup is closed.
 	 */
 	Step.prototype.open = function(no, refocus) {
-		return PopUp('popup.httpstep', 'modal-popup modal-popup-generic', {
-			no:               no,
-			httpstepid:       this.data.httpstepid,
-			templated:        httpconf.templated,
-			name:             this.data.name,
-			url:              this.data.url,
-			posts:            this.data.posts,
-			post_type:        this.data.post_type,
-			timeout:          this.data.timeout,
-			required:         this.data.required,
-			status_codes:     this.data.status_codes,
-			old_name:         this.data.name,
-			retrieve_mode:    this.data.retrieve_mode,
-			follow_redirects: this.data.follow_redirects,
-			steps_names:      httpconf.steps.getStepNames()
-		}, null, refocus);
+		return PopUp('popup.httpstep', {
+				no:               no,
+				httpstepid:       this.data.httpstepid,
+				templated:        httpconf.templated,
+				name:             this.data.name,
+				url:              this.data.url,
+				posts:            this.data.posts,
+				post_type:        this.data.post_type,
+				timeout:          this.data.timeout,
+				required:         this.data.required,
+				status_codes:     this.data.status_codes,
+				old_name:         this.data.name,
+				retrieve_mode:    this.data.retrieve_mode,
+				follow_redirects: this.data.follow_redirects,
+				steps_names:      httpconf.steps.getStepNames()
+			},
+			{dialogue_class: 'modal-popup-generic', trigger_element: refocus}
+		);
 	};
 
 	/**

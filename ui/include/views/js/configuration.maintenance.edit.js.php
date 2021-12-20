@@ -66,19 +66,19 @@
 
 		// Maintenance periods.
 		$('#maintenance_periods').on('click', '[data-action]', function() {
-			var btn = $(this),
+			var button = $(this),
 				rows = $('#maintenance_periods table > tbody > tr'),
-				params;
+				parameters;
 
-			switch (btn.data('action')) {
+			switch (button.data('action')) {
 				case 'remove':
-					btn.closest('tr').remove();
+					button.closest('tr').remove();
 					break;
 
 				case 'edit':
-					var row = btn.closest('tr');
+					var row = button.closest('tr');
 
-					params = {
+					parameters = {
 						update: 1,
 						index: row.find('[type="hidden"]:first').attr('name').match(/\[(\d+)\]/)[1]
 					};
@@ -88,11 +88,13 @@
 							name = $input.attr('name').match(/\[([^\]]+)]$/);
 
 						if (name) {
-							params[name[1]] = $input.val();
+							parameters[name[1]] = $input.val();
 						}
 					});
 
-					PopUp("popup.maintenance.period", 'modal-popup modal-popup-medium', params, null, btn);
+					PopUp('popup.maintenance.period', parameters,
+						{dialogue_class: 'modal-popup-medium', trigger_element: button[0]}
+					);
 					break;
 
 				case 'add':
@@ -104,11 +106,13 @@
 						);
 					});
 
-					params = {
+					parameters = {
 						index: index + 1
 					}
 
-					PopUp("popup.maintenance.period", 'modal-popup modal-popup-medium', params, null, btn);
+					PopUp("popup.maintenance.period", parameters,
+						{dialogue_class: 'modal-popup-medium', trigger_element: button[0]}
+					);
 					break;
 			}
 		});

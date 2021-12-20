@@ -421,34 +421,38 @@ if ($data['single_host_selected']) {
 		$master_item[] = (new CButton('button', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->removeId()
-			->onClick('return PopUp("popup.generic", "modal-popup", '.
-				json_encode([
-					'srctbl' => 'items',
-					'srcfld1' => 'itemid',
-					'srcfld2' => 'name',
-					'dstfrm' => $form->getName(),
-					'dstfld1' => 'master_itemid',
-					'dstfld2' => 'master_itemname',
-					'only_hostid' => $data['hostid'],
-					'with_webitems' => 1,
-					'normal_only' => 1
-				]).', null, this);'
+			->onClick(
+				'return PopUp("popup.generic", '.json_encode([
+						'srctbl' => 'items',
+						'srcfld1' => 'itemid',
+						'srcfld2' => 'name',
+						'dstfrm' => $form->getName(),
+						'dstfld1' => 'master_itemid',
+						'dstfld2' => 'master_itemname',
+						'only_hostid' => $data['hostid'],
+						'with_webitems' => 1,
+						'normal_only' => 1
+					]).',
+					{trigger_element: this}
+				);'
 			);
 
 		$master_item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 		$master_item[] = (new CButton('button', _('Select prototype')))
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->removeId()
-			->onClick('return PopUp("popup.generic", "modal-popup",'.
-				json_encode([
-					'srctbl' => 'item_prototypes',
-					'srcfld1' => 'itemid',
-					'srcfld2' => 'name',
-					'dstfrm' => $form->getName(),
-					'dstfld1' => 'master_itemid',
-					'dstfld2' => 'master_itemname',
-					'parent_discoveryid' => $data['parent_discoveryid']
-				]).', null, this);'
+			->onClick(
+				'return PopUp("popup.generic", '.json_encode([
+						'srctbl' => 'item_prototypes',
+						'srcfld1' => 'itemid',
+						'srcfld2' => 'name',
+						'dstfrm' => $form->getName(),
+						'dstfld1' => 'master_itemid',
+						'dstfld2' => 'master_itemname',
+						'parent_discoveryid' => $data['parent_discoveryid']
+					]).',
+					{trigger_element: this}
+				);'
 			);
 	}
 

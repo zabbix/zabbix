@@ -321,17 +321,21 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 		}
 	}
 
-	function openAddfromPopup(elm) {
+	function openAddfromPopup(element) {
 		let disable_names = [];
-		let valuemap_table = elm.closest('table');
+		let valuemap_table = element.closest('table');
 
-		valuemap_table.querySelectorAll('[name$="[name]"]').forEach((elm) => disable_names.push(elm.value));
-		PopUp('popup.generic', 'modal-popup modal-popup-generic', {
-			srctbl: 'valuemaps',
-			srcfld1: 'valuemapid',
-			disable_names: disable_names,
-			editable: true
-		}, null, elm);
+		valuemap_table.querySelectorAll('[name$="[name]"]').forEach((element) => disable_names.push(element.value));
+		PopUp('popup.generic', {
+				srctbl: 'valuemaps',
+				srcfld1: 'valuemapid',
+				disable_names: disable_names,
+				editable: true
+			}, {
+				dialogue_class: 'modal-popup-generic',
+				trigger_element: element
+			}
+		);
 	}
 
 	function toggleVisible(obj, data_type) {

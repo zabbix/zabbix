@@ -547,11 +547,11 @@ function overlayDialogue(params, trigger_elmnt) {
  *
  * @param string scriptid			Script ID.
  * @param string confirmation		Confirmation text.
- * @param {object} trigger_elmnt	UI element that was clicked to open overlay dialogue.
+ * @param {object} trigger_element	UI element that was clicked to open overlay dialogue.
  * @param string hostid				Host ID.
  * @param string eventid			Event ID.
  */
-function executeScript(scriptid, confirmation, trigger_elmnt, hostid = null, eventid = null) {
+function executeScript(scriptid, confirmation, trigger_element, hostid = null, eventid = null) {
 	var execute = function() {
 		var popup_options = {scriptid: scriptid};
 
@@ -564,7 +564,7 @@ function executeScript(scriptid, confirmation, trigger_elmnt, hostid = null, eve
 		}
 
 		if (Object.keys(popup_options).length === 2) {
-			PopUp('popup.scriptexec', 'modal-popup modal-popup-medium', popup_options, null, trigger_elmnt);
+			PopUp('popup.scriptexec', popup_options, {dialogue_class: 'modal-popup-medium', trigger_element});
 		}
 	};
 
@@ -591,7 +591,7 @@ function executeScript(scriptid, confirmation, trigger_elmnt, hostid = null, eve
 					}
 				}
 			]
-		}, trigger_elmnt);
+		}, trigger_element);
 
 		return false;
 	}

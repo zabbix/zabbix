@@ -77,11 +77,11 @@
 		initActionButtons() {
 			document.addEventListener('click', (e) => {
 				if (e.target.matches('.js-create-service, .js-add-child-service')) {
-					const options = e.target.dataset.serviceid !== undefined
+					const parameters = e.target.dataset.serviceid !== undefined
 						? {parent_serviceids: [e.target.dataset.serviceid]}
 						: {};
 
-					this.edit(options);
+					this.edit(parameters);
 				}
 				else if (e.target.classList.contains('js-edit-service')) {
 					this.edit({serviceid: e.target.dataset.serviceid});
@@ -112,12 +112,13 @@
 			}
 		},
 
-		edit(options = {}) {
+		edit(parameters = {}) {
 			this.pauseRefresh();
 
-			const overlay = PopUp('popup.service.edit', 'modal-popup modal-popup-medium',
-				options, 'service_edit', document.activeElement
-			);
+			const overlay = PopUp('popup.service.edit', parameters, {
+				dialogue_id: 'service_edit',
+				dialogue_class: 'modal-popup-medium'
+			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 				postMessageOk(e.detail.title);

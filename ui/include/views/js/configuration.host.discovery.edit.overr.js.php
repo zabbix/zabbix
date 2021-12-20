@@ -712,18 +712,19 @@ insert_javascript_for_visibilitybox();
 	 * @param {object} refocus  A node to set focus to, when popup is closed.
 	 */
 	Override.prototype.open = function(no, refocus) {
-		return PopUp('popup.lldoverride', 'modal-popup modal-popup-generic', {
-			no:                 no,
-			templated:          lldoverrides.templated,
-			name:               this.data.name,
-			old_name:           this.data.name,
-			stop:               this.data.stop,
-			overrides_evaltype: this.data.overrides_evaltype,
-			overrides_formula:  this.data.overrides_formula,
-			overrides_filters:  this.data.overrides_filters,
-			operations:         this.data.operations,
-			overrides_names:    lldoverrides.overrides.getOverrideNames()
-		}, null, refocus);
+		return PopUp('popup.lldoverride', {
+				no:                 no,
+				templated:          lldoverrides.templated,
+				name:               this.data.name,
+				old_name:           this.data.name,
+				stop:               this.data.stop,
+				overrides_evaltype: this.data.overrides_evaltype,
+				overrides_formula:  this.data.overrides_formula,
+				overrides_filters:  this.data.overrides_filters,
+				operations:         this.data.operations,
+				overrides_names:    lldoverrides.overrides.getOverrideNames()
+			}, {dialogue_class: 'modal-popup-generic', trigger_element: refocus}
+		);
 	};
 
 	/**
@@ -1009,7 +1010,7 @@ insert_javascript_for_visibilitybox();
 	 * @param {object}  refocus  A node to set focus to, when popup is closed.
 	 */
 	Operation.prototype.open = function(no, refocus) {
-		var params = {
+		var parameters = {
 			no:                 no,
 			templated:          lldoverrides.templated,
 			operationobject:    this.data.operationobject,
@@ -1019,11 +1020,13 @@ insert_javascript_for_visibilitybox();
 
 		window.lldoverrides.actions.forEach(function(action) {
 			if (action in this.data) {
-				params[action] = this.data[action];
+				parameters[action] = this.data[action];
 			}
 		}.bind(this));
 
-		return PopUp('popup.lldoperation', 'modal-popup modal-popup-generic',  params, null, refocus);
+		return PopUp('popup.lldoperation', parameters,
+			{dialogue_class: 'modal-popup-generic', trigger_element: refocus}
+		);
 	};
 
 	/**

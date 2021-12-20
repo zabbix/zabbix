@@ -103,14 +103,15 @@ if (!$readonly) {
 	$key_controls[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 	$key_controls[] = (new CButton('keyButton', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("popup.generic", "modal-popup", jQuery.extend('.
-			json_encode([
-				'srctbl' => 'help_items',
-				'srcfld1' => 'key',
-				'dstfrm' => $form->getName(),
-				'dstfld1' => 'key'
-			]).
-				',{itemtype: jQuery("#type").val()}), null, this);'
+		->onClick(
+			'return PopUp("popup.generic", jQuery.extend('.json_encode([
+					'srctbl' => 'help_items',
+					'srcfld1' => 'key',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => 'key'
+				]).', {itemtype: jQuery("#type").val()}),
+				{trigger_element: this}
+			);'
 		);
 }
 

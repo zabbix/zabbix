@@ -131,10 +131,14 @@ $action_tab->addRow(new CLabel(_('Type of calculation'), 'label-evaltype'), [
 
 $condition_table->addRow([
 	(new CSimpleButton(_('Add')))
-		->onClick('return PopUp("popup.condition.actions", "modal-popup modal-popup-medium", '.json_encode([
-			'type' => ZBX_POPUP_CONDITION_TYPE_ACTION,
-			'source' => $data['eventsource']
-		]).', null, this);')
+		->onClick(
+			'return PopUp("popup.condition.actions", '.json_encode([
+					'type' => ZBX_POPUP_CONDITION_TYPE_ACTION,
+					'source' => $data['eventsource']
+				]).',
+				{dialogue_class: "modal-popup-medium", trigger_element: this}
+			);'
+		)
 		->addClass(ZBX_STYLE_BTN_LINK)
 ]);
 

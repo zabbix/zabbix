@@ -88,14 +88,15 @@ if (!$readonly) {
 	$key_controls[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 	$key_controls[] = (new CButton('keyButton', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("popup.generic", "modal-popup", jQuery.extend('.
-			json_encode([
-				'srctbl' => 'help_items',
-				'srcfld1' => 'key',
-				'dstfrm' => $form->getName(),
-				'dstfld1' => 'key'
-			]).
-				',{itemtype: jQuery("#type").val()}), null, this);'
+		->onClick(
+			'return PopUp("popup.generic", jQuery.extend('.json_encode([
+					'srctbl' => 'help_items',
+					'srcfld1' => 'key',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => 'key'
+				]).', {itemtype: jQuery("#type").val()}),
+				{trigger_element: this}
+			);'
 		);
 }
 
@@ -528,35 +529,39 @@ if (!$readonly) {
 	$master_item[] = (new CButton('button', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->removeId()
-		->onClick('return PopUp("popup.generic", "modal-popup",'.
-			json_encode([
-				'srctbl' => 'items',
-				'srcfld1' => 'itemid',
-				'srcfld2' => 'name',
-				'dstfrm' => $form->getName(),
-				'dstfld1' => 'master_itemid',
-				'dstfld2' => 'master_itemname',
-				'only_hostid' => $data['hostid'],
-				'excludeids' => [$data['itemid']],
-				'with_webitems' => 1,
-				'normal_only' => 1
-			]).', null, this);'
+		->onClick(
+			'return PopUp("popup.generic", '.json_encode([
+					'srctbl' => 'items',
+					'srcfld1' => 'itemid',
+					'srcfld2' => 'name',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => 'master_itemid',
+					'dstfld2' => 'master_itemname',
+					'only_hostid' => $data['hostid'],
+					'excludeids' => [$data['itemid']],
+					'with_webitems' => 1,
+					'normal_only' => 1
+				]).',
+				{trigger_element: this}
+			);'
 		);
 	$master_item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 	$master_item[] = (new CButton('button', _('Select prototype')))
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->removeId()
-		->onClick('return PopUp("popup.generic", "modal-popup",'.
-			json_encode([
-				'srctbl' => 'item_prototypes',
-				'srcfld1' => 'itemid',
-				'srcfld2' => 'name',
-				'dstfrm' => $form->getName(),
-				'dstfld1' => 'master_itemid',
-				'dstfld2' => 'master_itemname',
-				'parent_discoveryid' => $data['parent_discoveryid'],
-				'excludeids' => [$data['itemid']]
-			]).', null, this);'
+		->onClick(
+			'return PopUp("popup.generic", '.json_encode([
+					'srctbl' => 'item_prototypes',
+					'srcfld1' => 'itemid',
+					'srcfld2' => 'name',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => 'master_itemid',
+					'dstfld2' => 'master_itemname',
+					'parent_discoveryid' => $data['parent_discoveryid'],
+					'excludeids' => [$data['itemid']]
+				]).',
+				{trigger_element: this}
+			);'
 		);
 }
 
