@@ -838,7 +838,8 @@ class CMaintenance extends CApiService {
 
 		foreach ($maintenances as &$maintenance) {
 			if (($db_maintenances === null && !array_key_exists('tags', $maintenance))
-					|| !array_key_exists('tags', $db_maintenances[$maintenance['maintenanceid']])) {
+					|| ($db_maintenances !== null
+						&& !array_key_exists('tags', $db_maintenances[$maintenance['maintenanceid']]))) {
 				continue;
 			}
 
