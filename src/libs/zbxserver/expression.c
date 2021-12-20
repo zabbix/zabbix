@@ -538,30 +538,21 @@ static int	get_host_value(zbx_uint64_t itemid, char **replace_to, int request)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_substitute_item_name                                         *
+ * Function: zbx_substitute_macros_in_item_key                                *
  *                                                                            *
- * Purpose: substitute key macros and use it to substitute item name          *
- *          if item name is not specified                                     *
+ * Purpose: get item key, replace macros in the key                           *
  *                                                                            *
  * Parameters: dc_item    - [IN] item information used in substitution        *
- *             name       - [IN] optional item name to substitute             *
- *             replace_to - [OUT] expanded item name or key if name is absent *
+ *             replace_to - [OUT] string with item key with replaced macros   *
  *                                                                            *
  ******************************************************************************/
-void	zbx_substitute_item_name(DC_ITEM *dc_item, const char *name, char **replace_to)
+static void	zbx_substitute_macros_in_item_key(DC_ITEM *dc_item, char **replace_to)
 {
-	if (NULL == name)	/* ZBX_REQUEST_ITEM_KEY */
-	{
-		char	*key;
+	char	*key = zbx_strdup(NULL, dc_item->key_orig);
 
-		key = zbx_strdup(NULL, dc_item->key_orig);
-		substitute_key_macros_impl(&key, NULL, dc_item, NULL, NULL, MACRO_TYPE_ITEM_KEY, NULL, 0);
-		zbx_free(*replace_to);
-		*replace_to = key;
-	}
-	else
-		*replace_to = zbx_strdup(*replace_to, name);
-
+	substitute_key_macros_impl(&key, NULL, dc_item, NULL, NULL, MACRO_TYPE_ITEM_KEY, NULL, 0);
+	zbx_free(*replace_to);
+	*replace_to = key;
 }
 
 /******************************************************************************
@@ -616,22 +607,15 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 				ret = SUCCEED;
 				break;
 			case ZBX_REQUEST_ITEM_NAME:
-				DCconfig_get_items_by_itemids(&dc_item, &itemid, &errcode, 1);
-
-				if (SUCCEED == errcode)
-				{
-					zbx_substitute_item_name(&dc_item, row[3], replace_to);
-					ret = SUCCEED;
-				}
-
-				DCconfig_clean_items(&dc_item, &errcode, 1);
+				*replace_to = zbx_strdup(*replace_to, row[3]);
+				ret = SUCCEED;
 				break;
 			case ZBX_REQUEST_ITEM_KEY:
 				DCconfig_get_items_by_itemids(&dc_item, &itemid, &errcode, 1);
 
 				if (SUCCEED == errcode)
 				{
-					zbx_substitute_item_name(&dc_item, NULL, replace_to);
+					zbx_substitute_macros_in_item_key(&dc_item, replace_to);
 					ret = SUCCEED;
 				}
 
