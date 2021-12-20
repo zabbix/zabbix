@@ -331,6 +331,9 @@ class CTabFilter extends CBaseComponent {
 		return null;
 	}
 
+	/**
+	 * Enable subfilter option by key and value.
+	 */
 	setSubfilter(key, value) {
 		this._active_item.setSubfilter(key, value);
 		this._active_item.updateUnsavedState();
@@ -338,6 +341,9 @@ class CTabFilter extends CBaseComponent {
 		this._active_item.setBrowserLocationToApplyUrl();
 	}
 
+	/**
+	 * Disable subfilter option by key and value.
+	 */
 	unsetSubfilter(key, value) {
 		this._active_item.unsetSubfilter(key, value);
 		this._active_item.updateUnsavedState();
@@ -624,6 +630,7 @@ class CTabFilter extends CBaseComponent {
 			 * Action on 'Apply' button press.
 			 */
 			buttonApplyAction: () => {
+				this._active_item.emptySubfilter();
 				this._active_item.updateUnsavedState();
 				this._active_item.updateApplyUrl();
 				this._active_item.setBrowserLocationToApplyUrl();

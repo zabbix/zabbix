@@ -370,31 +370,12 @@ if (array_key_exists('render_html', $data)) {
 
 		// Initialize src_url.
 		this.resetUnsavedState();
-		this.on(TABFILTERITEM_EVENT_ACTION, update.bind(this));
 	}
 
 	function expand(data, container) {
 		// "Save as" can contain only home tab, also home tab cannot contain "Update" button.
 		$('[name="filter_new"],[name="filter_update"]').hide()
 			.filter(data.filter_configurable ? '[name="filter_update"]' : '[name="filter_new"]').show();
-	}
-
-	/**
-	 * On filter apply or update buttons press update disabled UI fields.
-	 *
-	 * @param {CustomEvent} ev    CustomEvent object.
-	 */
-	function update(ev) {
-		let action = ev.detail.action,
-			container = this._content_container;
-
-		if (action !== 'filter_apply' && action !== 'filter_update') {
-			return;
-		}
-
-		$('[name="show_suppressed"]', container)
-			.filter(':disabled')
-			.prop('checked', false);
 	}
 
 	// Tab filter item events handlers.
