@@ -3081,21 +3081,25 @@ $form-icon-btn: (
 		}
 	}
 
-	&.sticked-to-top {
-		top: 50px;
-	}
-
 	&.modal-popup {
-		max-width: 1024px;
 		top: 50px;
+		max-width: 1024px;
+
+		&.modal-popup-small {
+			max-width: 450px;
+			width: 100%;
+		}
 
 		&.modal-popup-medium {
 			min-width: 450px;
 		}
 
-		&.modal-popup-small {
-			max-width: 450px;
+		&.modal-popup-large {
 			width: 100%;
+		}
+
+		&.modal-popup-generic {
+			min-width: 650px;
 		}
 
 		&.modal-popup-static {
@@ -3106,10 +3110,15 @@ $form-icon-btn: (
 		&.modal-popup-preprocessing {
 			max-width: 900px;
 			width: 100%;
-		}
 
-		&.modal-popup-generic {
-			min-width: 650px;
+			.preprocessing-list .step-name {
+				flex: 0 0 180px;
+			}
+
+			.preprocessing-list {
+				min-width: unset;
+				max-width: unset;
+			}
 		}
 
 		&.modal-popup-fullscreen {
@@ -3117,8 +3126,20 @@ $form-icon-btn: (
 			max-width: calc(100vw - 40px);
 		}
 
-		&.host-edit {
-			width: 1024px;
+		.table-forms-container {
+			border: none;
+		}
+
+		.ui-tabs-nav {
+			position: sticky;
+			top: 0;
+			background: $header-bg-color;
+			z-index: 3;
+		}
+
+		.textarea-flexible {
+			max-height: 200px;
+			overflow-y: auto;
 		}
 	}
 

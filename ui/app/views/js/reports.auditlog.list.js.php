@@ -152,7 +152,7 @@
 		overlayDialogue({
 			title: <?= json_encode(_('Details')) ?>,
 			content: wrapper,
-			class: 'modal-popup modal-popup-generic choice',
+			class: 'modal-popup modal-popup-generic position-middle',
 			buttons: [
 				{
 					title: <?= json_encode(_('Ok')) ?>,

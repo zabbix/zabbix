@@ -98,9 +98,10 @@
 					}
 				}
 				else if (e.target.classList.contains('js-massupdate-service')) {
-					openMassupdatePopup(e.target, 'popup.massupdate.service', 'modal-popup modal-popup-static',
-						{location_url: this.back_url}
-					);
+					openMassupdatePopup('popup.massupdate.service', {location_url: this.back_url}, {
+						dialogue_class: 'modal-popup-static',
+						target_element: e.target
+					});
 				}
 			});
 		},

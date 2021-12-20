@@ -39,7 +39,7 @@ $default_inventory_mode = DB::getDefault('config', 'default_inventory_mode');
 		$("#resetDefaults").click(function() {
 			overlayDialogue({
 				'title': <?= json_encode(_('Reset confirmation')) ?>,
-				'class': 'modal-popup choice',
+				'class': 'position-middle',
 				'content': $('<span>').text(<?= json_encode(_('Reset all fields to default values?')) ?>),
 				'buttons': [
 					{

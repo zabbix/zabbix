@@ -4227,29 +4227,42 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       float: right;
       top: -13px;
       right: -8px; }
-  .overlay-dialogue.sticked-to-top {
-    top: 50px; }
   .overlay-dialogue.modal-popup {
-    max-width: 1024px;
-    top: 50px; }
-    .overlay-dialogue.modal-popup.modal-popup-medium {
-      min-width: 450px; }
+    top: 50px;
+    max-width: 1024px; }
     .overlay-dialogue.modal-popup.modal-popup-small {
       max-width: 450px;
       width: 100%; }
+    .overlay-dialogue.modal-popup.modal-popup-medium {
+      min-width: 450px; }
+    .overlay-dialogue.modal-popup.modal-popup-large {
+      width: 100%; }
+    .overlay-dialogue.modal-popup.modal-popup-generic {
+      min-width: 650px; }
     .overlay-dialogue.modal-popup.modal-popup-static {
       max-width: 700px;
       width: 100%; }
     .overlay-dialogue.modal-popup.modal-popup-preprocessing {
       max-width: 900px;
       width: 100%; }
-    .overlay-dialogue.modal-popup.modal-popup-generic {
-      min-width: 650px; }
+      .overlay-dialogue.modal-popup.modal-popup-preprocessing .preprocessing-list .step-name {
+        flex: 0 0 180px; }
+      .overlay-dialogue.modal-popup.modal-popup-preprocessing .preprocessing-list {
+        min-width: unset;
+        max-width: unset; }
     .overlay-dialogue.modal-popup.modal-popup-fullscreen {
       width: calc(100vw - 40px);
       max-width: calc(100vw - 40px); }
-    .overlay-dialogue.modal-popup.host-edit {
-      width: 1024px; }
+    .overlay-dialogue.modal-popup .table-forms-container, .overlay-dialogue.modal-popup .browser-warning-container {
+      border: none; }
+    .overlay-dialogue.modal-popup .ui-tabs-nav {
+      position: sticky;
+      top: 0;
+      background: #f3f3f3;
+      z-index: 3; }
+    .overlay-dialogue.modal-popup .textarea-flexible {
+      max-height: 200px;
+      overflow-y: auto; }
   .overlay-dialogue .hintbox-wrap {
     overflow: auto;
     max-height: 240px;

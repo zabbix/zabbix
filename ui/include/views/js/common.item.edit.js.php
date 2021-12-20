@@ -196,7 +196,7 @@
 			else {
 				overlayDialogue({
 					'title': <?= json_encode(_('Error')); ?>,
-					'class': 'modal-popup choice',
+					'class': 'modal-popup position-middle',
 					'content': $('<span>').html(<?=
 						json_encode(_('Failed to parse URL.').'<br><br>'._('URL is not properly encoded.'));
 					?>),

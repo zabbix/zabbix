@@ -1096,12 +1096,6 @@ class CDashboard extends CBaseComponent {
 		overlay.xhr.then(() => {
 			const form = overlay.$dialogue.$body[0].querySelector('form');
 			const original_properties = overlay.data.original_properties;
-			const dialogue_stick_to_top = this._widget_defaults[original_properties.type].dialogue_stick_to_top;
-
-			if (dialogue_stick_to_top !== overlay.$dialogue[0].classList.contains('sticked-to-top')) {
-				overlay.$dialogue[0].classList.toggle('sticked-to-top', dialogue_stick_to_top);
-				overlay.centerDialog();
-			}
 
 			if (original_properties.unique_id === null) {
 				this._new_widget_dashboard_page = this._selected_dashboard_page;

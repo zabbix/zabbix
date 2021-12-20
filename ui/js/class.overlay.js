@@ -128,11 +128,9 @@ Overlay.prototype.centerDialog = function() {
 
 	this.$dialogue.css('left', position_left);
 
-	if (this.$dialogue.hasClass('choice')) {
+	if (this.$dialogue.hasClass('position-middle')) {
 		this.$dialogue.css('top',
-			this.$dialogue.hasClass('sticked-to-top')
-				? ''
-				: Math.max(0, parseInt((jQuery(window).height() - this.$dialogue.outerHeight(true)) / 2)) + 'px'
+			Math.max(0, Math.floor((jQuery(window).height() - this.$dialogue.outerHeight(true)) / 2)) + 'px'
 		);
 	}
 

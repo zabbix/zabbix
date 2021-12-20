@@ -325,15 +325,20 @@ function getPosition(obj) {
 /**
  * Opens popup content in overlay dialogue.
  *
- * @param {string} action          Popup controller related action.
- * @param {string} dialogue_class  CSS class, usually based on .modal-popup and .modal-popup-{size}.
- * @param {array|object}  options  (optional) Array with key/value pairs that will be used as query for popup request.
- * @param {string} dialogueid      (optional) id of overlay dialogue.
- * @param {object} trigger_elmnt   (optional) UI element which was clicked to open overlay dialogue.
+ * @param {string}           action           Popup controller related action.
+ * @param {array|object}     parameters       Array with key/value pairs that will be used as query for popup request.
+ *
+ * @param {string}           dialogue_class   CSS class, usually based on .modal-popup and .modal-popup-{size}.
+ * @param {string|null}      dialogueid       ID of overlay dialogue.
+ * @param {HTMLElement|null} trigger_element  UI element which was clicked to open overlay dialogue.
  *
  * @returns {Overlay}
  */
-function PopUp(action, dialogue_class, options, dialogueid, trigger_elmnt) {
+function PopUp(action, parameters, {
+	dialogueid = null,
+	dialogue_class = '',
+	trigger_element = document.activeElement
+}) {
 	var overlay = overlays_stack.getById(dialogueid);
 
 	if (!overlay) {
@@ -341,15 +346,15 @@ function PopUp(action, dialogue_class, options, dialogueid, trigger_elmnt) {
 			'dialogueid': dialogueid,
 			'title': '',
 			'content': jQuery('<div>', {'height': '68px', class: 'is-loading'}),
-			'class': dialogue_class,
+			'class': 'modal-popup ' + dialogue_class,
 			'buttons': [],
-			'element': trigger_elmnt,
+			'element': trigger_element,
 			'type': 'popup'
 		});
 	}
 
 	overlay
-		.load(action, options)
+		.load(action, parameters)
 		.then(function(resp) {
 			if (typeof resp.errors !== 'undefined') {
 				overlay.setProperties({
@@ -997,30 +1002,33 @@ Function.prototype.bindAsEventListener = function (context) {
 	};
 };
 
-function openMassupdatePopup(elem, popup_name, dialogue_class, data = {}) {
-	const form = elem.closest('form');
+function openMassupdatePopup(action, parameters = {}, {
+	dialogue_class = '',
+	target_element = document.activeElement
+}) {
+	const form = target_element.closest('form');
 
-	data.ids = chkbxRange.getSelectedIds();
+	parameters.ids = chkbxRange.getSelectedIds();
 
-	switch (popup_name) {
+	switch (action) {
 		case 'popup.massupdate.item':
-			data['context'] = form.querySelector('#context').value;
-			data['prototype'] = 0;
+			parameters.context = form.querySelector('#context').value;
+			parameters.prototype = 0;
 			break;
 
 		case 'popup.massupdate.trigger':
-			data['context'] = form.querySelector('#context').value;
+			parameters.context = form.querySelector('#context').value;
 			break;
 
 		case 'popup.massupdate.itemprototype':
 		case 'popup.massupdate.triggerprototype':
-			data['parent_discoveryid'] = form.querySelector('#parent_discoveryid').value;
-			data['context'] = form.querySelector('#context').value;
-			data['prototype'] = 1;
+			parameters.parent_discoveryid = form.querySelector('#parent_discoveryid').value;
+			parameters.context = form.querySelector('#context').value;
+			parameters.prototype = 1;
 			break;
 	}
 
-	return PopUp(popup_name, dialogue_class, data, null, elem);
+	return PopUp(action, parameters, {dialogue_class, target_element});
 }
 
 /**
