@@ -145,30 +145,32 @@ foreach ($data['slas'] as $slaid => $sla) {
 	$sla_list->addRow($row);
 }
 
-$form->addItem([
-	$sla_list,
-	$data['paging'],
-	new CActionButtonList('action', 'slaids', [
-		'sla.massenable' => [
-			'content' => (new CSimpleButton(_('Enable')))
-				->addClass(ZBX_STYLE_BTN_ALT)
-				->addClass('js-massenable-sla')
-				->addClass('no-chkbxrange')
-		],
-		'sla.massdisable' => [
-			'content' => (new CSimpleButton(_('Disable')))
-				->addClass(ZBX_STYLE_BTN_ALT)
-				->addClass('js-massdisable-sla')
-				->addClass('no-chkbxrange')
-		],
-		'sla.massdelete' => [
-			'content' => (new CSimpleButton(_('Delete')))
-				->addClass(ZBX_STYLE_BTN_ALT)
-				->addClass('js-massdelete-sla')
-				->addClass('no-chkbxrange')
-		]
-	], 'sla')
-]);
+$form->addItem([$sla_list, $data['paging']]);
+
+if ($data['has_access'][CRoleHelper::ACTIONS_MANAGE_SLA]) {
+	$form->addItem(
+		new CActionButtonList('action', 'slaids', [
+			'sla.massenable' => [
+				'content' => (new CSimpleButton(_('Enable')))
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->addClass('js-massenable-sla')
+					->addClass('no-chkbxrange')
+			],
+			'sla.massdisable' => [
+				'content' => (new CSimpleButton(_('Disable')))
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->addClass('js-massdisable-sla')
+					->addClass('no-chkbxrange')
+			],
+			'sla.massdelete' => [
+				'content' => (new CSimpleButton(_('Delete')))
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->addClass('js-massdelete-sla')
+					->addClass('no-chkbxrange')
+			]
+		], 'sla')
+	);
+}
 
 (new CWidget())
 	->setTitle(_('SLA'))
