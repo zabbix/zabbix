@@ -45,6 +45,8 @@ elseif (!$data['has_serviceid']) {
 
 	$service_index = array_flip($data['sli']['serviceids']);
 
+	$num_rows_displayed = 0;
+
 	foreach ($data['services'] as $serviceid => $service) {
 		if (!array_key_exists($serviceid, $service_index)) {
 			continue;
@@ -74,7 +76,21 @@ elseif (!$data['has_serviceid']) {
 		}
 
 		$report->addRow($row);
+
+		if (++$num_rows_displayed == $data['rows_per_page']) {
+			break;
+		}
 	}
+
+	$report->setFooter(
+		(new CCol(_s('Displaying %1$s of %2$s found', $num_rows_displayed,
+			count($data['services']) > $data['rows_per_page']
+				? $data['rows_per_page'].'+'
+				: count($data['services'])
+		)))
+			->setColSpan($report->getNumCols())
+			->addClass(ZBX_STYLE_LIST_TABLE_FOOTER)
+	);
 }
 else {
 	$report->setHeader([

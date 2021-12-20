@@ -44,6 +44,7 @@ class CControllerWidgetSlaReportView extends CControllerWidget {
 			],
 			'has_serviceid' => (bool) $fields['serviceid'],
 			'has_permissions_error' => false,
+			'rows_per_page' => CWebUser::$data['rows_per_page'],
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
@@ -63,7 +64,7 @@ class CControllerWidgetSlaReportView extends CControllerWidget {
 				'slaids' => $data['sla']['slaid'],
 				'sortfield' => 'name',
 				'sortorder' => ZBX_SORT_UP,
-				'limit' => CWebUser::$data['rows_per_page'],
+				'limit' => CWebUser::$data['rows_per_page'] + 1,
 				'preservekeys' => true
 			]);
 
