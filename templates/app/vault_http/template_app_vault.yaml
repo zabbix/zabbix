@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-12-09T12:17:22Z'
+  date: '2021-12-19T15:19:55Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -1065,7 +1065,7 @@ zabbix_export:
               expression: '(max(/HashiCorp Vault by HTTP/vault.metrics.core.leadership.setup_failed,1h)-min(/HashiCorp Vault by HTTP/vault.metrics.core.leadership.setup_failed,1h))>{$VAULT.LEADERSHIP.SETUP.FAILED.MAX.WARN}'
               name: 'Vault: High frequency of leadership setup failures (over {$VAULT.LEADERSHIP.SETUP.FAILED.MAX.WARN} for 1h)'
               priority: AVERAGE
-              description: 'There have been more than {$VAULT.LEADERSHIP.SETUP.FAILED.MAX.WARN} Vault leadership setup failures in the past 1h'
+              description: 'There have been more than {$VAULT.LEADERSHIP.SETUP.FAILED.MAX.WARN} Vault leadership setup failures in the past 1h.'
         -
           uuid: f0ca68774b5842d7803d2c2619958184
           name: 'Vault: Leadership setup lost, counter'
@@ -1097,7 +1097,7 @@ zabbix_export:
               expression: '(max(/HashiCorp Vault by HTTP/vault.metrics.core.leadership_lost,1h)-min(/HashiCorp Vault by HTTP/vault.metrics.core.leadership_lost,1h))>{$VAULT.LEADERSHIP.LOSSES.MAX.WARN}'
               name: 'Vault: High frequency of leadership losses (over {$VAULT.LEADERSHIP.LOSSES.MAX.WARN} for 1h)'
               priority: AVERAGE
-              description: 'There have been more than {$VAULT.LEADERSHIP.LOSSES.MAX.WARN} Vault leadership losses in the past 1h'
+              description: 'There have been more than {$VAULT.LEADERSHIP.LOSSES.MAX.WARN} Vault leadership losses in the past 1h.'
         -
           uuid: 2bdb273b513d4a06914cd6ea11ac2368
           name: 'Vault: Post-unseal ops, counter'

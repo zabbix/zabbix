@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-12-09T12:17:20Z'
+  date: '2021-12-19T15:19:41Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -766,7 +766,7 @@ zabbix_export:
         -
           macro: '{$IIS.SERVICE}'
           value: http
-          description: 'The service (http/https/etc) for port check. See "net.tcp.service" documentation page for more information.'
+          description: 'The service (http/https/etc) for port check. See "net.tcp.service" documentation page for more information: https://www.zabbix.com/documentation/5.4/manual/config/items/itemtypes/simple_checks'
       valuemaps:
         -
           uuid: 63d1ad6b4cf643da870b14c53da6c52f

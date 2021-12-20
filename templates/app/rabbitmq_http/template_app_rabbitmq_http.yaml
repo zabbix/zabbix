@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-05-11T08:05:17Z'
+  date: '2021-12-19T15:19:49Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -15,7 +15,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387226-discussion-thread-for-official-zabbix-template-rabbitmq
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Applications
@@ -1001,7 +1001,7 @@ zabbix_export:
                 - |
                   var rabbit_version = parseInt(value.split('.')[0]) * 10000 +
                                        parseInt(value.split('.')[1]) * 100 +
-                                       parseInt(value.split('.')[2]) 
+                                       parseInt(value.split('.')[2])
                   return JSON.stringify(rabbit_version >= 30810 ? [{'{#SINGLETON}': ''}] : []);
       macros:
         -
@@ -1136,7 +1136,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387226-discussion-thread-for-official-zabbix-template-rabbitmq
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Applications
@@ -1690,7 +1690,7 @@ zabbix_export:
                 - |
                   var rabbit_version = parseInt(value.split('.')[0]) * 10000 +
                                        parseInt(value.split('.')[1]) * 100 +
-                                       parseInt(value.split('.')[2]) 
+                                       parseInt(value.split('.')[2])
                   return JSON.stringify(rabbit_version < 30810 ? [{'{#SINGLETON}': ''}] : []);
         -
           uuid: ab89d103c015400fbbeecaaf9bf01400
@@ -1938,7 +1938,7 @@ zabbix_export:
                 - |
                   var rabbit_version = parseInt(value.split('.')[0]) * 10000 +
                                        parseInt(value.split('.')[1]) * 100 +
-                                       parseInt(value.split('.')[2]) 
+                                       parseInt(value.split('.')[2])
                   return JSON.stringify(rabbit_version >= 30810 ? [{'{#SINGLETON}': ''}] : []);
         -
           uuid: cc1d85b6045b44b38f588cd9a4c6c62d

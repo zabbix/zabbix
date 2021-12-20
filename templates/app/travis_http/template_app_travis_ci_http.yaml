@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-08-18T12:34:02Z'
+  date: '2021-12-19T15:19:53Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -14,13 +14,13 @@ zabbix_export:
         Template for monitoring Travis CI https://travis-ci.com
         You must set {$TRAVIS.API.TOKEN} and {$TRAVIS.API.URL} macros.
           {$TRAVIS.API.TOKEN} is a Travis API authentication token located in User -> Settings -> API authentication.
-          {$TRAVIS.API.URL} could be in 3 different variations:
+          {$TRAVIS.API.URL} could be in 2 different variations:
            - for a private project : api.travis-ci.com
            - for an enterprise projects: api.example.com (where you replace example.com with the domain Travis CI is running on)
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.40
       groups:
         -
           name: Templates/Applications
@@ -79,7 +79,6 @@ zabbix_export:
             -
               name: limit
               value: '0'
-          status_codes: ''
           headers:
             -
               name: Travis-API-Version
@@ -148,7 +147,6 @@ zabbix_export:
           value_type: TEXT
           description: 'Getting jobs using Travis API.'
           url: 'https://{$TRAVIS.API.URL}/jobs'
-          status_codes: ''
           headers:
             -
               name: Travis-API-Version
@@ -174,7 +172,6 @@ zabbix_export:
             -
               name: limit
               value: '0'
-          status_codes: ''
           headers:
             -
               name: Travis-API-Version
@@ -414,7 +411,6 @@ zabbix_export:
                 -
                   name: limit
                   value: '50'
-              status_codes: ''
               headers:
                 -
                   name: Travis-API-Version
@@ -440,7 +436,6 @@ zabbix_export:
                 -
                   name: limit
                   value: '50'
-              status_codes: ''
               headers:
                 -
                   name: Travis-API-Version
@@ -588,7 +583,7 @@ zabbix_export:
                   var result = [];
                   
                   JSON.parse(value).repositories.forEach(function (e) {
-                  result.push({ '{#ID}': e.id, '{#SLUG}': e.slug });
+                      result.push({ '{#ID}': e.id, '{#SLUG}': e.slug });
                   });
                   
                   return JSON.stringify(result)

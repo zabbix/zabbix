@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-12-09T12:22:05Z'
+  date: '2021-12-19T15:19:34Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -305,7 +305,7 @@ zabbix_export:
               expression: 'last(/Etcd by HTTP/etcd.has.leader)=0'
               name: 'Etcd: Member has no leader'
               priority: AVERAGE
-              description: '"If a member does not have a leader, it is totally unavailable."'
+              description: 'If a member does not have a leader, it is totally unavailable.'
         -
           uuid: 3fde4db8b9684ba4b56ba915e48957b5
           name: 'Etcd: Node health'
@@ -421,7 +421,7 @@ zabbix_export:
               expression: 'min(/Etcd by HTTP/etcd.http.requests.5xx.rate,5m)>{$ETCD.HTTP.FAIL.MAX.WARN}'
               name: 'Etcd: Too many HTTP requests failures (over {$ETCD.HTTP.FAIL.MAX.WARN} for 5m)'''
               priority: WARNING
-              description: '"Too many reqvests failed on etcd instance with 5xx HTTP code"'
+              description: 'Too many reqvests failed on etcd instance with 5xx HTTP code.'
         -
           uuid: 2a19db1c58ee4a509061fcb1b557c1a3
           name: 'Etcd: HTTP requests received'
@@ -489,7 +489,7 @@ zabbix_export:
               expression: 'nodata(/Etcd by HTTP/etcd.is.leader,30m)=1'
               name: 'Etcd: Failed to fetch info data (or no data for 30m)'
               priority: WARNING
-              description: 'Zabbix has not received data for items for the last 30 minutes'
+              description: 'Zabbix has not received data for items for the last 30 minutes.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -624,7 +624,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'The number of bytes received from grpc clients per second'
+          description: 'The number of bytes received from grpc clients per second.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -650,7 +650,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'The number of bytes sent from grpc clients per second'
+          description: 'The number of bytes sent from grpc clients per second.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
@@ -796,7 +796,7 @@ zabbix_export:
               expression: 'min(/Etcd by HTTP/etcd.proposals.pending,5m)>{$ETCD.PROPOSAL.PENDING.MAX.WARN}'
               name: 'Etcd: Too many proposals are queued to commit (over {$ETCD.PROPOSAL.PENDING.MAX.WARN} for 5m)'''
               priority: WARNING
-              description: '"Rising pending proposals suggests there is a high client load or the member cannot commit proposals."'
+              description: 'Rising pending proposals suggests there is a high client load or the member cannot commit proposals.'
         -
           uuid: bd7398507c274bfab53339380df16761
           name: 'Etcd: PUT per second'
@@ -1108,7 +1108,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: rps
-              description: 'The number of RPCs completed on the server with grpc_code {#GRPC.CODE}'
+              description: 'The number of RPCs completed on the server with grpc_code {#GRPC.CODE}.'
               preprocessing:
                 -
                   type: PROMETHEUS_TO_JSON
@@ -1197,7 +1197,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: Bps
-              description: 'The number of bytes received from peer with ID {#ETCD.PEER}'
+              description: 'The number of bytes received from peer with ID {#ETCD.PEER}.'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1225,7 +1225,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: Bps
-              description: 'The number of bytes sent to peer with ID {#ETCD.PEER}'
+              description: 'The number of bytes sent to peer with ID {#ETCD.PEER}.'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1253,7 +1253,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: rps
-              description: 'The number of receive failures from the peer with ID {#ETCD.PEER}'
+              description: 'The number of receive failures from the peer with ID {#ETCD.PEER}.'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1281,7 +1281,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: rps
-              description: 'The number of send failures from peer with ID {#ETCD.PEER}'
+              description: 'The number of send failures from peer with ID {#ETCD.PEER}.'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1315,49 +1315,49 @@ zabbix_export:
         -
           macro: '{$ETCD.GRPC.ERRORS.MAX.WARN}'
           value: '1'
-          description: 'Maximum number of gRPC requests failures'
+          description: 'Maximum number of gRPC requests failures.'
         -
           macro: '{$ETCD.GRPC_CODE.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable gRPC codes https://github.com/grpc/grpc/blob/master/doc/statuscodes.md'
+          description: 'Filter of discoverable gRPC codes https://github.com/grpc/grpc/blob/master/doc/statuscodes.md.'
         -
           macro: '{$ETCD.GRPC_CODE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered gRPC codes https://github.com/grpc/grpc/blob/master/doc/statuscodes.md'
+          description: 'Filter to exclude discovered gRPC codes https://github.com/grpc/grpc/blob/master/doc/statuscodes.md.'
         -
           macro: '{$ETCD.GRPC_CODE.TRIGGER.MATCHES}'
           value: Aborted|Unavailable
-          description: 'Filter of discoverable gRPC codes which will be create triggers'
+          description: 'Filter of discoverable gRPC codes which will be create triggers.'
         -
           macro: '{$ETCD.HTTP.FAIL.MAX.WARN}'
           value: '2'
-          description: 'Maximum number of HTTP requests failures'
+          description: 'Maximum number of HTTP requests failures.'
         -
           macro: '{$ETCD.LEADER.CHANGES.MAX.WARN}'
           value: '5'
-          description: 'Maximum number of leader changes'
+          description: 'Maximum number of leader changes.'
         -
           macro: '{$ETCD.OPEN.FDS.MAX.WARN}'
           value: '90'
-          description: 'Maximum percentage of used file descriptors'
+          description: 'Maximum percentage of used file descriptors.'
         -
           macro: '{$ETCD.PASSWORD}'
         -
           macro: '{$ETCD.PORT}'
           value: '2379'
-          description: 'The port of Etcd API endpoint'
+          description: 'The port of Etcd API endpoint.'
         -
           macro: '{$ETCD.PROPOSAL.FAIL.MAX.WARN}'
           value: '2'
-          description: 'Maximum number of proposal failures'
+          description: 'Maximum number of proposal failures.'
         -
           macro: '{$ETCD.PROPOSAL.PENDING.MAX.WARN}'
           value: '5'
-          description: 'Maximum number of proposals in queue'
+          description: 'Maximum number of proposals in queue.'
         -
           macro: '{$ETCD.SCHEME}'
           value: http
-          description: 'Request scheme which may be http or https'
+          description: 'Request scheme which may be http or https.'
         -
           macro: '{$ETCD.USER}'
       valuemaps:
@@ -1397,7 +1397,9 @@ zabbix_export:
       expression: 'min(/Etcd by HTTP/etcd.open.fds,5m)/last(/Etcd by HTTP/etcd.max.fds)*100>{$ETCD.OPEN.FDS.MAX.WARN}'
       name: 'Etcd: Current number of open files is too high (over {$ETCD.OPEN.FDS.MAX.WARN}% for 5m)'
       priority: WARNING
-      description: 'Heavy file descriptor usage (i.e., near the process’s file descriptor limit) indicates a potential file descriptor exhaustion issue. If the file descriptors are exhausted, etcd may panic because it cannot create new WAL files.'
+      description: |
+        Heavy file descriptor usage (i.e., near the process's file descriptor limit) indicates a potential file descriptor exhaustion issue.
+        If the file descriptors are exhausted, etcd may panic because it cannot create new WAL files.
   graphs:
     -
       uuid: 18baccd03c0f4814a42d32b51334787d
