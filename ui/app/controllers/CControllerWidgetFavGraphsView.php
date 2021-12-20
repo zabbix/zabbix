@@ -44,7 +44,7 @@ class CControllerWidgetFavGraphsView extends CControllerWidget {
 		if ($ids['graphid']) {
 			$db_graphs = API::Graph()->get([
 				'output' => ['graphid', 'name'],
-				'selectHosts' => ['hostid', 'name'],
+				'selectHosts' => ['name'],
 				'expandName' => true,
 				'graphids' => array_keys($ids['graphid'])
 			]);
@@ -60,8 +60,8 @@ class CControllerWidgetFavGraphsView extends CControllerWidget {
 
 		if ($ids['itemid']) {
 			$db_items = API::Item()->get([
-				'output' => ['itemid', 'hostid', 'name', 'key_'],
-				'selectHosts' => ['hostid', 'name'],
+				'output' => ['itemid', 'name'],
+				'selectHosts' => ['name'],
 				'itemids' => array_keys($ids['itemid']),
 				'webitems' => true
 			]);

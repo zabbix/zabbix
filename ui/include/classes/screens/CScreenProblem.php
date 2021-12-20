@@ -332,7 +332,7 @@ class CScreenProblem extends CScreenBase {
 
 		if ($show_opdata && $data['triggers']) {
 			$items = API::Item()->get([
-				'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units'],
+				'output' => ['itemid', 'name', 'value_type', 'units'],
 				'selectValueMap' => ['mappings'],
 				'triggerids' => array_keys($data['triggers']),
 				'webitems' => true,

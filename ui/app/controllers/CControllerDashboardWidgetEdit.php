@@ -238,7 +238,7 @@ class CControllerDashboardWidgetEdit extends CController {
 
 		if ($itemids) {
 			$items = API::Item()->get([
-				'output' => ['itemid', 'hostid', 'name', 'key_'],
+				'output' => ['name'],
 				'selectHosts' => ['name'],
 				'itemids' => array_keys($itemids),
 				'webitems' => true,
@@ -275,7 +275,7 @@ class CControllerDashboardWidgetEdit extends CController {
 
 		if ($prototype_itemids) {
 			$item_prototypes = API::ItemPrototype()->get([
-				'output' => ['itemid', 'hostid', 'name', 'key_'],
+				'output' => ['name'],
 				'selectHosts' => ['name'],
 				'itemids' => array_keys($prototype_itemids),
 				'preservekeys' => true

@@ -229,7 +229,7 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 		// Do not collect items while editing a template dashboard.
 		if (!$is_template_dashboard || $this->hasInput('dynamic_hostid')) {
 			$items_created_all = API::Item()->get([
-				'output' => ['itemid', 'name', 'key_', 'hostid'],
+				'output' => ['itemid', 'name'],
 				'hostids' => [$item_prototype['discoveryRule']['hostid']],
 				'selectItemDiscovery' => ['itemid', 'parent_itemid'],
 				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED]

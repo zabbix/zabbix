@@ -102,7 +102,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 				]);
 
 				$items = API::Item()->get([
-					'output' => ['itemid', 'hostid', 'name', 'key_'],
+					'output' => ['itemid', 'name'],
 					'selectHosts' => ['name'],
 					'hostids' => $dynamic_hostid,
 					'filter' => [

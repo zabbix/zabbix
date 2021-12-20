@@ -54,7 +54,7 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 
 			if ($fields['itemids']) {
 				$items = API::Item()->get([
-					'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
+					'output' => ['itemid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
 					'selectHosts' => ['name'],
 					'selectValueMap' => ['mappings'],
 					'itemids' => $fields['itemids'],
@@ -64,19 +64,14 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 
 				$dynamic_hostid = $this->getInput('dynamic_hostid', 0);
 
-				$keys = [];
-				foreach ($items as $item) {
-					$keys[$item['key_']] = true;
-				}
-
 				if ($items && $is_dynamic_item && $dynamic_hostid) {
 					$items = API::Item()->get([
-						'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
+						'output' => ['itemid', 'name', 'value_type', 'units', 'valuemapid'],
 						'selectHosts' => ['name'],
 						'selectValueMap' => ['mappings'],
 						'filter' => [
 							'hostid' => $dynamic_hostid,
-							'key_' => array_keys($keys)
+							'key_' => array_keys(array_column($items, null, 'key_'))
 						],
 						'webitems' => true,
 						'preservekeys' => true

@@ -410,7 +410,7 @@ class CControllerHostEdit extends CController {
 		// Select inventory items.
 		$inventory_items = $this->host['hostid']
 			? API::Item()->get([
-				'output' => ['inventory_link', 'itemid', 'hostid', 'name', 'key_'],
+				'output' => ['inventory_link', 'itemid', 'name'],
 				'hostids' => $this->host['hostid'],
 				'filter' => [
 					'inventory_link' => array_keys($inventory_fields)

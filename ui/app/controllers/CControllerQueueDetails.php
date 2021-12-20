@@ -57,7 +57,7 @@ class CControllerQueueDetails extends CController {
 		else {
 			$queue_data = array_column($queue_data, null, 'itemid');
 			$items = API::Item()->get([
-				'output' => ['itemid', 'hostid', 'name', 'key_'],
+				'output' => ['hostid', 'name'],
 				'selectHosts' => ['name'],
 				'itemids' => array_keys($queue_data),
 				'webitems' => true,
@@ -66,7 +66,7 @@ class CControllerQueueDetails extends CController {
 
 			if (count($queue_data) != count($items)) {
 				$items += API::DiscoveryRule()->get([
-					'output' => ['itemid', 'hostid', 'name', 'key_'],
+					'output' => ['hostid', 'name'],
 					'selectHosts' => ['name'],
 					'itemids' => array_diff(array_keys($queue_data), array_keys($items)),
 					'preservekeys' => true

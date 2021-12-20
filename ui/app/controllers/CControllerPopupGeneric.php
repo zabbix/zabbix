@@ -869,9 +869,9 @@ class CControllerPopupGeneric extends CController {
 				break;
 
 			case 'items':
-				foreach ($records as $itmeid => $row) {
+				foreach ($records as $itemid => $row) {
 					$records[$row['name']] = ['itemid' => $row['name']] + $row;
-					unset($records[$itmeid]);
+					unset($records[$itemid]);
 				}
 				break;
 
@@ -1099,8 +1099,8 @@ class CControllerPopupGeneric extends CController {
 			case 'items':
 			case 'item_prototypes':
 				$options += [
-					'output' => ['itemid', 'hostid', 'name', 'key_', 'flags', 'type', 'value_type', 'status'],
-					'selectHosts' => ['name', 'host'],
+					'output' => ['itemid', 'name', 'key_', 'flags', 'type', 'value_type', 'status'],
+					'selectHosts' => ['name'],
 					'templated' => $this->hasInput('templated_hosts') ? true : null
 				];
 

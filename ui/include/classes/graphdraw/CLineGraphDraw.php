@@ -2015,8 +2015,7 @@ class CLineGraphDraw extends CGraphDraw {
 				$graph_item['delay'] = $master_item['delay'];
 			}
 
-			$graph_items = CMacrosResolverHelper::resolveTimeUnitMacros([$graph_item], ['delay']);
-			$graph_item = reset($graph_items);
+			$graph_item = CMacrosResolverHelper::resolveTimeUnitMacros([$graph_item], ['delay'])[0];
 
 			$update_interval_parser->parse($graph_item['delay']);
 			$graph_item['delay'] = getItemDelay($update_interval_parser->getDelay(),

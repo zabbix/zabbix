@@ -617,7 +617,7 @@ elseif (isset($_REQUEST['form'])) {
 	// items
 	if ($data['items']) {
 		$items = API::Item()->get([
-			'output' => ['itemid', 'hostid', 'name', 'key_', 'flags'],
+			'output' => ['itemid', 'hostid', 'name', 'flags'],
 			'selectHosts' => ['hostid', 'name'],
 			'itemids' => zbx_objectValues($data['items'], 'itemid'),
 			'filter' => [
@@ -633,7 +633,6 @@ elseif (isset($_REQUEST['form'])) {
 			$item['host'] = $host['name'];
 			$item['hostid'] = $items[$item['itemid']]['hostid'];
 			$item['name'] = $items[$item['itemid']]['name'];
-			$item['key_'] = $items[$item['itemid']]['key_'];
 			$item['flags'] = $items[$item['itemid']]['flags'];
 		}
 		unset($item);
@@ -643,8 +642,8 @@ elseif (isset($_REQUEST['form'])) {
 	$data['ymin_item_name'] = '';
 	$data['ymax_item_name'] = '';
 
-	if ($data['ymin_itemid'] || $data['ymax_itemid']) {
-		$minmax_items = API::Item()->get([
+	if ($data['ymin_itemid'] != 0 || $data['ymax_itemid'] != 0) {
+		$items = API::Item()->get([
 			'output' => ['itemid', 'name'],
 			'selectHosts' => ['name'],
 			'itemids' => array_filter([$data['ymin_itemid'], $data['ymax_itemid']]),
@@ -655,14 +654,14 @@ elseif (isset($_REQUEST['form'])) {
 			'preservekeys' => true
 		]);
 
-		if ($data['ymin_itemid'] && array_key_exists($data['ymin_itemid'], $minmax_items)) {
-			$ymin_item = $minmax_items[$data['ymin_itemid']];
-			$data['ymin_item_name'] = $ymin_item['hosts'][0]['name'].NAME_DELIMITER.$ymin_item['name'];
+		if ($data['ymin_itemid'] != 0 && array_key_exists($data['ymin_itemid'], $items)) {
+			$item = $items[$data['ymin_itemid']];
+			$data['ymin_item_name'] = $item['hosts'][0]['name'].NAME_DELIMITER.$item['name'];
 		}
 
-		if ($data['ymax_itemid'] && array_key_exists($data['ymax_itemid'], $minmax_items)) {
-			$ymax_item = $minmax_items[$data['ymax_itemid']];
-			$data['ymax_item_name'] = $ymax_item['hosts'][0]['name'].NAME_DELIMITER.$ymax_item['name'];
+		if ($data['ymax_itemid'] != 0 && array_key_exists($data['ymax_itemid'], $items)) {
+			$item = $items[$data['ymax_itemid']];
+			$data['ymax_item_name'] = $item['hosts'][0]['name'].NAME_DELIMITER.$item['name'];
 		}
 	}
 

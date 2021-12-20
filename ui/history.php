@@ -73,7 +73,7 @@ $value_type = '';
 
 if ($itemids) {
 	$items = API::Item()->get([
-		'output' => ['itemid', 'key_', 'name', 'value_type', 'hostid', 'valuemapid', 'history', 'trends'],
+		'output' => ['itemid', 'name', 'value_type'],
 		'selectHosts' => ['name'],
 		'itemids' => $itemids,
 		'preservekeys' => true,

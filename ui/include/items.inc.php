@@ -1124,7 +1124,7 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?
 	}
 
 	$db_items = API::Item()->get([
-		'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
+		'output' => ['itemid', 'hostid', 'name', 'value_type', 'units', 'valuemapid'],
 		'selectHosts' => ['name'],
 		'selectValueMap' => ['mappings'],
 		'hostids' => $hostids,
@@ -1991,7 +1991,7 @@ function expandItemNamesWithMasterItems($items, $data_source) {
 
 	if ($master_itemids) {
 		$options = [
-			'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
+			'output' => ['itemid', 'type', 'name'],
 			'itemids' => $master_itemids,
 			'editable' => true,
 			'preservekeys' => true
@@ -2009,6 +2009,8 @@ function expandItemNamesWithMasterItems($items, $data_source) {
 			$master_item_prototype['source'] = 'itemprototypes';
 		}
 		unset($master_item_prototype);
+
+		$master_items += $master_item_prototypes;
 	}
 
 	foreach ($items as &$item) {

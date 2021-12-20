@@ -528,7 +528,7 @@ class CControllerMenuPopup extends CController {
 		$db_triggers = API::Trigger()->get([
 			'output' => ['expression', 'url', 'comments', 'manual_close'],
 			'selectHosts' => ['hostid', 'name', 'status'],
-			'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
+			'selectItems' => ['itemid', 'hostid', 'name', 'value_type'],
 			'triggerids' => $data['triggerid'],
 			'preservekeys' => true
 		]);
