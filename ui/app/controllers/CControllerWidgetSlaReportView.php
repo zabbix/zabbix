@@ -61,7 +61,6 @@ class CControllerWidgetSlaReportView extends CControllerWidget {
 			$data['services'] = API::Service()->get([
 				'output' => ['name'],
 				'serviceids' => $fields['serviceid'] ?: null,
-				'slaids' => $data['sla']['slaid'],
 				'sortfield' => 'name',
 				'sortorder' => ZBX_SORT_UP,
 				'limit' => CWebUser::$data['rows_per_page'] + 1,
