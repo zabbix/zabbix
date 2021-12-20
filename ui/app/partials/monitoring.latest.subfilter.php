@@ -72,7 +72,7 @@ foreach (['hostids', 'tagnames', 'data'] as $key) {
 	}
 }
 
-if (count($data['tags']) > 1) {
+if (count($data['tags']) > 1 || count(reset($data['tags'])) > 1) {
 	$subfilter_options['tags'] = [];
 
 	$subfilter_used = (bool) array_filter($data['tags'], function ($elmnt) {
