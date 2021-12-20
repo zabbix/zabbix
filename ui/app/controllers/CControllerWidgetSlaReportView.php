@@ -72,12 +72,30 @@ class CControllerWidgetSlaReportView extends CControllerWidget {
 				$data['has_permissions_error'] = true;
 			}
 			else {
+				$range_time_parser = new CRangeTimeParser();
+
+				if ($fields['date_from'] !== ''
+						&& $range_time_parser->parse($fields['date_from']) == CParser::PARSE_SUCCESS) {
+					$period_from = $range_time_parser->getDateTime(true)->getTimestamp();
+				}
+				else {
+					$period_from = null;
+				}
+
+				if ($fields['date_to'] !== ''
+						&& $range_time_parser->parse($fields['date_to']) == CParser::PARSE_SUCCESS) {
+					$period_to = $range_time_parser->getDateTime(false)->getTimestamp();
+				}
+				else {
+					$period_to = null;
+				}
+
 				$data['sli'] = API::Sla()->getSli([
 					'slaid' => $data['sla']['slaid'],
 					'serviceids' => array_keys($data['services']),
 					'periods' => $fields['show_periods'] !== '' ? $fields['show_periods'] : null,
-					'period_from' => $fields['date_from'] !== '' ? $fields['date_from'] : null,
-					'period_to' => $fields['date_to'] !== '' ? $fields['date_to'] : null
+					'period_from' => $period_from,
+					'period_to' => $period_to
 				]);
 			}
 		}
