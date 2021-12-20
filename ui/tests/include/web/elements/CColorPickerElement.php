@@ -30,15 +30,6 @@ use Facebook\WebDriver\WebDriverKeys;
 class CColorPickerElement extends CElement {
 
 	/**
-	 * Find opened color pick overlay dialog.
-	 *
-	 * @inheritdoc
-	 */
-	public static function find() {
-		return (new CElementQuery('id:color_picker'))->asColorPicker();
-	}
-
-	/**
 	 * Get input field of color pick form.
 	 *
 	 * @return type
@@ -92,7 +83,6 @@ class CColorPickerElement extends CElement {
 	 * @param string $color		color code
 	 */
 	public function fill($color) {
-		$this->overwrite($color);
-		$this->overwrite(WebDriverKeys::ENTER)->waitUntilNotVisible();
+		$this->overwrite($color.WebDriverKeys::ENTER)->waitUntilNotVisible();
 	}
 }
