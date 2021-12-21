@@ -141,10 +141,6 @@ class CDataHelper extends CAPIHelper {
 		$items = [];
 		$discoveryrules = [];
 		foreach ($params as &$param) {
-			if ($object === 'template') {
-				$param['status'] = HOST_STATUS_TEMPLATE;
-			}
-
 			if (array_key_exists('items', $param)) {
 				$items[$param['host']] = $param['items'];
 				unset($param['items']);

@@ -1,1 +1,0 @@
-........S. [ZBX-19924] fixed trigger expression and calculated items not allowing to specify timeshift that ends in future even if it starts in the past (vso)

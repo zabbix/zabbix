@@ -1192,6 +1192,66 @@ static int	DBpatch_5050112(void)
 
 	return DBadd_field("actions", &field);
 }
+
+static int	DBpatch_5050113(void)
+{
+	const ZBX_FIELD old_field = {"formula", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD new_field = {"formula", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("actions", &new_field, &old_field);
+}
+
+static int	DBpatch_5050114(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*sql = NULL, *params = NULL;
+	const char	*output;
+	size_t		sql_alloc = 0, sql_offset = 0, params_alloc = 0, params_offset = 0;
+	int		ret = SUCCEED;
+
+	/* 22 - ZBX_PREPROC_PROMETHEUS_PATTERN */
+	result = DBselect("select item_preprocid,params from item_preproc where type=22");
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	{
+		char	*params_esc;
+
+		if (NULL == (output = strchr(row[1], '\n')))
+			continue;
+
+		zbx_strncpy_alloc(&params, &params_alloc, &params_offset, row[1], (size_t)(output - row[1] + 1));
+		zbx_strcpy_alloc(&params, &params_alloc, &params_offset, '\0' == output[1] ? "value" : "label");
+		zbx_strcpy_alloc(&params, &params_alloc, &params_offset, output);
+
+		params_esc = DBdyn_escape_field("item_preproc", "params", params);
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update item_preproc set params='%s' where item_preprocid=%s;\n", params_esc, row[0]);
+		ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+
+		zbx_free(params_esc);
+		params_offset = 0;
+	}
+
+	DBfree_result(result);
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (SUCCEED == ret && 16 < sql_offset)
+	{
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			ret = FAIL;
+	}
+
+	zbx_free(params);
+	zbx_free(sql);
+
+	return ret;
+}
+
 #endif
 
 DBPATCH_START(5050)
@@ -1298,5 +1358,7 @@ DBPATCH_ADD(5050109, 0, 1)
 DBPATCH_ADD(5050110, 0, 1)
 DBPATCH_ADD(5050111, 0, 1)
 DBPATCH_ADD(5050112, 0, 1)
+DBPATCH_ADD(5050113, 0, 1)
+DBPATCH_ADD(5050114, 0, 1)
 
 DBPATCH_END()

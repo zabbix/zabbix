@@ -87,7 +87,9 @@ void	zbx_mock_test_entry(void **state)
 
 	filter = zbx_mock_get_parameter_string("in.filter");
 
-	ret = zbx_prometheus_filter_parse(filter, &metric, &labels, &value, &error);
+	if (SUCCEED != (ret = zbx_prometheus_filter_parse(filter, &metric, &labels, &value, &error)))
+		printf("filter parsing error: %s\n", error);
+
 	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 	zbx_mock_assert_result_eq("prometheus filter parsing", expected_ret, ret);
 

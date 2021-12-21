@@ -141,6 +141,7 @@ static int	prepare_common_parameters(const AGENT_REQUEST *request, AGENT_RESULT 
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL,
 					"Invalid regular expression in second parameter: %s", error));
+			zbx_regexp_err_msg_free(error);
 			return FAIL;
 		}
 	}
@@ -151,6 +152,7 @@ static int	prepare_common_parameters(const AGENT_REQUEST *request, AGENT_RESULT 
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL,
 					"Invalid regular expression in third parameter: %s", error));
+			zbx_regexp_err_msg_free(error);
 			return FAIL;
 		}
 	}
@@ -161,6 +163,7 @@ static int	prepare_common_parameters(const AGENT_REQUEST *request, AGENT_RESULT 
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid regular expression in %s parameter: %s",
 					(5 == excl_dir_param ? "sixth" : "eleventh"), error));
+			zbx_regexp_err_msg_free(error);
 			return FAIL;
 		}
 	}

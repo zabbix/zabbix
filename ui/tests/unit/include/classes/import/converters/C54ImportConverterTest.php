@@ -159,6 +159,90 @@ class C54ImportConverterTest extends CImportConverterTest {
 						]
 					]
 				]
+			],
+			[
+				[
+					'hosts' => [
+						[
+							'host' => 'Zabbix server',
+							'groups' => [
+								['name' => 'Zabbix servers']
+							],
+							'items' => [
+								[
+									'name' => 'Item1',
+									'type' => CXmlConstantName::TRAP,
+									'key' => 'item1',
+									'preprocessing' => [
+										[
+											'type' => CXmlConstantName::PROMETHEUS_PATTERN,
+											'parameters' => [
+												'metric',
+												'my_label'
+											]
+										]
+									]
+								],
+								[
+									'name' => 'Item2',
+									'type' => CXmlConstantName::TRAP,
+									'key' => 'item2',
+									'preprocessing' => [
+										[
+											'type' => CXmlConstantName::PROMETHEUS_PATTERN,
+											'parameters' => [
+												'metric',
+												''
+											]
+										]
+									]
+								]
+							]
+						]
+					]
+				],
+				[
+					'hosts' => [
+						[
+							'host' => 'Zabbix server',
+							'groups' => [
+								['name' => 'Zabbix servers']
+							],
+							'items' => [
+								[
+									'name' => 'Item1',
+									'type' => CXmlConstantName::TRAP,
+									'key' => 'item1',
+									'preprocessing' => [
+										[
+											'type' => CXmlConstantName::PROMETHEUS_PATTERN,
+											'parameters' => [
+												'metric',
+												ZBX_PREPROC_PROMETHEUS_LABEL,
+												'my_label'
+											]
+										]
+									]
+								],
+								[
+									'name' => 'Item2',
+									'type' => CXmlConstantName::TRAP,
+									'key' => 'item2',
+									'preprocessing' => [
+										[
+											'type' => CXmlConstantName::PROMETHEUS_PATTERN,
+											'parameters' => [
+												'metric',
+												ZBX_PREPROC_PROMETHEUS_VALUE,
+												''
+											]
+										]
+									]
+								]
+							]
+						]
+					]
+				]
 			]
 		];
 	}

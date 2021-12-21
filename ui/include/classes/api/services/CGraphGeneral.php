@@ -1279,7 +1279,8 @@ abstract class CGraphGeneral extends CApiService {
 			'output' => $output,
 			'selectGraphItems' => ['itemid', 'drawtype', 'sortorder', 'color', 'yaxisside', 'calc_fnc', 'type'],
 			'hostids' => $data['templateids'],
-			'preservekeys' => true
+			'preservekeys' => true,
+			'nopermissions' => true
 		]);
 
 		if ($graphs) {

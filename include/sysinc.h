@@ -355,6 +355,11 @@
 #	include <pcre.h>
 #endif
 
+#ifdef HAVE_PCRE2_H
+#	define PCRE2_CODE_UNIT_WIDTH 8
+#	include <pcre2.h>
+#endif
+
 #ifdef HAVE_VM_VM_PARAM_H
 #	include <vm/vm_param.h>
 #endif
