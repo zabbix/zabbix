@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2021-12-16T04:49:07Z</date>
+    <date>2021-12-21T06:45:15Z</date>
     <groups>
         <group>
             <name>Templates/Applications</name>
@@ -56,7 +56,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average percentage of time configuration syncer processes have been busy in the last minute</description>
+                    <description>Average percentage of time configuration syncer processes have been busy in the last minute.</description>
                     <applications>
                         <application>
                             <name>Zabbix proxy</name>
@@ -75,10 +75,10 @@
                     </master_item>
                     <triggers>
                         <trigger>
-                            <expression>{avg(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX}</expression>
+                            <expression>{avg(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX:&quot;configuration syncer&quot;}</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;{$ZABBIX.PROXY.UTIL.MIN}</recovery_expression>
-                            <name>Remote Zabbix proxy: Utilization of configuration syncer processes over {$ZABBIX.PROXY.UTIL.MAX}%</name>
+                            <recovery_expression>{avg(10m)}&lt;{$ZABBIX.PROXY.UTIL.MIN:&quot;configuration syncer&quot;}</recovery_expression>
+                            <name>Remote Zabbix proxy: Utilization of configuration syncer processes over {$ZABBIX.PROXY.UTIL.MAX:&quot;configuration syncer&quot;}%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -91,7 +91,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average percentage of time data sender processes have been busy in the last minute</description>
+                    <description>Average percentage of time data sender processes have been busy in the last minute.</description>
                     <applications>
                         <application>
                             <name>Zabbix proxy</name>
@@ -110,10 +110,10 @@
                     </master_item>
                     <triggers>
                         <trigger>
-                            <expression>{avg(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX}</expression>
+                            <expression>{avg(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX:&quot;data sender&quot;}</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;{$ZABBIX.PROXY.UTIL.MIN}</recovery_expression>
-                            <name>Remote Zabbix proxy: Utilization of data sender processes over {$ZABBIX.PROXY.UTIL.MAX}%</name>
+                            <recovery_expression>{avg(10m)}&lt;{$ZABBIX.PROXY.UTIL.MIN:&quot;data sender&quot;}</recovery_expression>
+                            <name>Remote Zabbix proxy: Utilization of data sender processes over {$ZABBIX.PROXY.UTIL.MAX:&quot;data sender&quot;}%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -126,7 +126,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average percentage of time discoverer processes have been busy in the last minute</description>
+                    <description>Average percentage of time discoverer processes have been busy in the last minute.</description>
                     <applications>
                         <application>
                             <name>Zabbix proxy</name>
@@ -145,10 +145,10 @@
                     </master_item>
                     <triggers>
                         <trigger>
-                            <expression>{avg(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX}</expression>
+                            <expression>{avg(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX:&quot;discoverer&quot;}</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;{$ZABBIX.PROXY.UTIL.MIN}</recovery_expression>
-                            <name>Remote Zabbix proxy: Utilization of discoverer processes over {$ZABBIX.PROXY.UTIL.MAX}%</name>
+                            <recovery_expression>{avg(10m)}&lt;{$ZABBIX.PROXY.UTIL.MIN:&quot;discoverer&quot;}</recovery_expression>
+                            <name>Remote Zabbix proxy: Utilization of discoverer processes over {$ZABBIX.PROXY.UTIL.MAX:&quot;discoverer&quot;}%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -161,7 +161,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average percentage of time heartbeat sender processes have been busy in the last minute</description>
+                    <description>Average percentage of time heartbeat sender processes have been busy in the last minute.</description>
                     <applications>
                         <application>
                             <name>Zabbix proxy</name>
@@ -180,10 +180,10 @@
                     </master_item>
                     <triggers>
                         <trigger>
-                            <expression>{avg(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX}</expression>
+                            <expression>{avg(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX:&quot;heartbeat sender&quot;}</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;{$ZABBIX.PROXY.UTIL.MIN}</recovery_expression>
-                            <name>Remote Zabbix proxy: Utilization of heartbeat sender processes over {$ZABBIX.PROXY.UTIL.MAX}%</name>
+                            <recovery_expression>{avg(10m)}&lt;{$ZABBIX.PROXY.UTIL.MIN:&quot;heartbeat sender&quot;}</recovery_expression>
+                            <name>Remote Zabbix proxy: Utilization of heartbeat sender processes over {$ZABBIX.PROXY.UTIL.MAX:&quot;heartbeat sender&quot;}%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -196,7 +196,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average percentage of time history syncer processes have been busy in the last minute</description>
+                    <description>Average percentage of time history syncer processes have been busy in the last minute.</description>
                     <applications>
                         <application>
                             <name>Zabbix proxy</name>
@@ -215,10 +215,10 @@
                     </master_item>
                     <triggers>
                         <trigger>
-                            <expression>{avg(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX}</expression>
+                            <expression>{avg(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX:&quot;history syncer&quot;}</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;{$ZABBIX.PROXY.UTIL.MIN}</recovery_expression>
-                            <name>Remote Zabbix proxy: Utilization of history syncer processes over {$ZABBIX.PROXY.UTIL.MAX}%</name>
+                            <recovery_expression>{avg(10m)}&lt;{$ZABBIX.PROXY.UTIL.MIN:&quot;history syncer&quot;}</recovery_expression>
+                            <name>Remote Zabbix proxy: Utilization of history syncer processes over {$ZABBIX.PROXY.UTIL.MAX:&quot;history syncer&quot;}%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -231,7 +231,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average percentage of time housekeeper processes have been busy in the last minute</description>
+                    <description>Average percentage of time housekeeper processes have been busy in the last minute.</description>
                     <applications>
                         <application>
                             <name>Zabbix proxy</name>
@@ -250,10 +250,10 @@
                     </master_item>
                     <triggers>
                         <trigger>
-                            <expression>{avg(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX}</expression>
+                            <expression>{avg(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX:&quot;housekeeper&quot;}</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;{$ZABBIX.PROXY.UTIL.MIN}</recovery_expression>
-                            <name>Remote Zabbix proxy: Utilization of housekeeper processes over {$ZABBIX.PROXY.UTIL.MAX}%</name>
+                            <recovery_expression>{avg(10m)}&lt;{$ZABBIX.PROXY.UTIL.MIN:&quot;housekeeper&quot;}</recovery_expression>
+                            <name>Remote Zabbix proxy: Utilization of housekeeper processes over {$ZABBIX.PROXY.UTIL.MAX:&quot;housekeeper&quot;}%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -266,7 +266,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average percentage of time http poller processes have been busy in the last minute</description>
+                    <description>Average percentage of time http poller processes have been busy in the last minute.</description>
                     <applications>
                         <application>
                             <name>Zabbix proxy</name>
@@ -285,10 +285,10 @@
                     </master_item>
                     <triggers>
                         <trigger>
-                            <expression>{avg(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX}</expression>
+                            <expression>{avg(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX:&quot;http poller&quot;}</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;{$ZABBIX.PROXY.UTIL.MIN}</recovery_expression>
-                            <name>Remote Zabbix proxy: Utilization of http poller processes over {$ZABBIX.PROXY.UTIL.MAX}%</name>
+                            <recovery_expression>{avg(10m)}&lt;{$ZABBIX.PROXY.UTIL.MIN:&quot;http poller&quot;}</recovery_expression>
+                            <name>Remote Zabbix proxy: Utilization of http poller processes over {$ZABBIX.PROXY.UTIL.MAX:&quot;http poller&quot;}%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -301,7 +301,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average percentage of time icmp pinger processes have been busy in the last minute</description>
+                    <description>Average percentage of time icmp pinger processes have been busy in the last minute.</description>
                     <applications>
                         <application>
                             <name>Zabbix proxy</name>
@@ -320,10 +320,10 @@
                     </master_item>
                     <triggers>
                         <trigger>
-                            <expression>{avg(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX}</expression>
+                            <expression>{avg(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX:&quot;icmp pinger&quot;}</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;{$ZABBIX.PROXY.UTIL.MIN}</recovery_expression>
-                            <name>Remote Zabbix proxy: Utilization of icmp pinger processes over {$ZABBIX.PROXY.UTIL.MAX}%</name>
+                            <recovery_expression>{avg(10m)}&lt;{$ZABBIX.PROXY.UTIL.MIN:&quot;icmp pinger&quot;}</recovery_expression>
+                            <name>Remote Zabbix proxy: Utilization of icmp pinger processes over {$ZABBIX.PROXY.UTIL.MAX:&quot;icmp pinger&quot;}%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -336,7 +336,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average percentage of time ipmi manager processes have been busy in the last minute</description>
+                    <description>Average percentage of time ipmi manager processes have been busy in the last minute.</description>
                     <applications>
                         <application>
                             <name>Zabbix proxy</name>
@@ -355,10 +355,10 @@
                     </master_item>
                     <triggers>
                         <trigger>
-                            <expression>{avg(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX}</expression>
+                            <expression>{avg(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX:&quot;ipmi manager&quot;}</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;{$ZABBIX.PROXY.UTIL.MIN}</recovery_expression>
-                            <name>Remote Zabbix proxy: Utilization of ipmi manager processes over {$ZABBIX.PROXY.UTIL.MAX}%</name>
+                            <recovery_expression>{avg(10m)}&lt;{$ZABBIX.PROXY.UTIL.MIN:&quot;ipmi manager&quot;}</recovery_expression>
+                            <name>Remote Zabbix proxy: Utilization of ipmi manager processes over {$ZABBIX.PROXY.UTIL.MAX:&quot;ipmi manager&quot;}%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -371,7 +371,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average percentage of time ipmi poller processes have been busy in the last minute</description>
+                    <description>Average percentage of time ipmi poller processes have been busy in the last minute.</description>
                     <applications>
                         <application>
                             <name>Zabbix proxy</name>
@@ -390,10 +390,10 @@
                     </master_item>
                     <triggers>
                         <trigger>
-                            <expression>{avg(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX}</expression>
+                            <expression>{avg(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX:&quot;ipmi poller&quot;}</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;{$ZABBIX.PROXY.UTIL.MIN}</recovery_expression>
-                            <name>Remote Zabbix proxy: Utilization of ipmi poller processes over {$ZABBIX.PROXY.UTIL.MAX}%</name>
+                            <recovery_expression>{avg(10m)}&lt;{$ZABBIX.PROXY.UTIL.MIN:&quot;ipmi poller&quot;}</recovery_expression>
+                            <name>Remote Zabbix proxy: Utilization of ipmi poller processes over {$ZABBIX.PROXY.UTIL.MAX:&quot;ipmi poller&quot;}%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -406,7 +406,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average percentage of time java poller processes have been busy in the last minute</description>
+                    <description>Average percentage of time java poller processes have been busy in the last minute.</description>
                     <applications>
                         <application>
                             <name>Zabbix proxy</name>
@@ -425,10 +425,10 @@
                     </master_item>
                     <triggers>
                         <trigger>
-                            <expression>{avg(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX}</expression>
+                            <expression>{avg(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX:&quot;java poller&quot;}</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;{$ZABBIX.PROXY.UTIL.MIN}</recovery_expression>
-                            <name>Remote Zabbix proxy: Utilization of java poller processes over {$ZABBIX.PROXY.UTIL.MAX}%</name>
+                            <recovery_expression>{avg(10m)}&lt;{$ZABBIX.PROXY.UTIL.MIN:&quot;java poller&quot;}</recovery_expression>
+                            <name>Remote Zabbix proxy: Utilization of java poller processes over {$ZABBIX.PROXY.UTIL.MAX:&quot;java poller&quot;}%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -441,7 +441,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average percentage of time poller processes have been busy in the last minute</description>
+                    <description>Average percentage of time poller processes have been busy in the last minute.</description>
                     <applications>
                         <application>
                             <name>Zabbix proxy</name>
@@ -460,10 +460,10 @@
                     </master_item>
                     <triggers>
                         <trigger>
-                            <expression>{avg(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX}</expression>
+                            <expression>{avg(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX:&quot;poller&quot;}</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;{$ZABBIX.PROXY.UTIL.MIN}</recovery_expression>
-                            <name>Remote Zabbix proxy: Utilization of poller processes over {$ZABBIX.PROXY.UTIL.MAX}%</name>
+                            <recovery_expression>{avg(10m)}&lt;{$ZABBIX.PROXY.UTIL.MIN:&quot;poller&quot;}</recovery_expression>
+                            <name>Remote Zabbix proxy: Utilization of poller processes over {$ZABBIX.PROXY.UTIL.MAX:&quot;poller&quot;}%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -476,7 +476,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average percentage of time preprocessing manager processes have been busy in the last minute</description>
+                    <description>Average percentage of time preprocessing manager processes have been busy in the last minute.</description>
                     <applications>
                         <application>
                             <name>Zabbix proxy</name>
@@ -495,10 +495,10 @@
                     </master_item>
                     <triggers>
                         <trigger>
-                            <expression>{avg(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX}</expression>
+                            <expression>{avg(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX:&quot;preprocessing manager&quot;}</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;{$ZABBIX.PROXY.UTIL.MIN}</recovery_expression>
-                            <name>Remote Zabbix proxy: Utilization of preprocessing manager processes over {$ZABBIX.PROXY.UTIL.MAX}%</name>
+                            <recovery_expression>{avg(10m)}&lt;{$ZABBIX.PROXY.UTIL.MIN:&quot;preprocessing manager&quot;}</recovery_expression>
+                            <name>Remote Zabbix proxy: Utilization of preprocessing manager processes over {$ZABBIX.PROXY.UTIL.MAX:&quot;preprocessing manager&quot;}%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -511,7 +511,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average percentage of time preprocessing worker processes have been busy in the last minute</description>
+                    <description>Average percentage of time preprocessing worker processes have been busy in the last minute.</description>
                     <applications>
                         <application>
                             <name>Zabbix proxy</name>
@@ -530,10 +530,10 @@
                     </master_item>
                     <triggers>
                         <trigger>
-                            <expression>{avg(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX}</expression>
+                            <expression>{avg(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX:&quot;preprocessing worker&quot;}</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;{$ZABBIX.PROXY.UTIL.MIN}</recovery_expression>
-                            <name>Remote Zabbix proxy: Utilization of preprocessing worker processes over {$ZABBIX.PROXY.UTIL.MAX}%</name>
+                            <recovery_expression>{avg(10m)}&lt;{$ZABBIX.PROXY.UTIL.MIN:&quot;preprocessing worker&quot;}</recovery_expression>
+                            <name>Remote Zabbix proxy: Utilization of preprocessing worker processes over {$ZABBIX.PROXY.UTIL.MAX:&quot;preprocessing worker&quot;}%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -546,7 +546,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average percentage of time self-monitoring processes have been busy in the last minute</description>
+                    <description>Average percentage of time self-monitoring processes have been busy in the last minute.</description>
                     <applications>
                         <application>
                             <name>Zabbix proxy</name>
@@ -565,10 +565,10 @@
                     </master_item>
                     <triggers>
                         <trigger>
-                            <expression>{avg(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX}</expression>
+                            <expression>{avg(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX:&quot;self-monitoring&quot;}</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;{$ZABBIX.PROXY.UTIL.MIN}</recovery_expression>
-                            <name>Remote Zabbix proxy: Utilization of self-monitoring processes over {$ZABBIX.PROXY.UTIL.MAX}%</name>
+                            <recovery_expression>{avg(10m)}&lt;{$ZABBIX.PROXY.UTIL.MIN:&quot;self-monitoring&quot;}</recovery_expression>
+                            <name>Remote Zabbix proxy: Utilization of self-monitoring processes over {$ZABBIX.PROXY.UTIL.MAX:&quot;self-monitoring&quot;}%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -581,7 +581,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average percentage of time snmp trapper processes have been busy in the last minute</description>
+                    <description>Average percentage of time snmp trapper processes have been busy in the last minute.</description>
                     <applications>
                         <application>
                             <name>Zabbix proxy</name>
@@ -600,10 +600,10 @@
                     </master_item>
                     <triggers>
                         <trigger>
-                            <expression>{avg(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX}</expression>
+                            <expression>{avg(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX:&quot;snmp trapper&quot;}</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;{$ZABBIX.PROXY.UTIL.MIN}</recovery_expression>
-                            <name>Remote Zabbix proxy: Utilization of snmp trapper processes over {$ZABBIX.PROXY.UTIL.MAX}%</name>
+                            <recovery_expression>{avg(10m)}&lt;{$ZABBIX.PROXY.UTIL.MIN:&quot;snmp trapper&quot;}</recovery_expression>
+                            <name>Remote Zabbix proxy: Utilization of snmp trapper processes over {$ZABBIX.PROXY.UTIL.MAX:&quot;snmp trapper&quot;}%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -616,7 +616,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average percentage of time task manager processes have been busy in the last minute</description>
+                    <description>Average percentage of time task manager processes have been busy in the last minute.</description>
                     <applications>
                         <application>
                             <name>Zabbix proxy</name>
@@ -635,10 +635,10 @@
                     </master_item>
                     <triggers>
                         <trigger>
-                            <expression>{avg(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX}</expression>
+                            <expression>{avg(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX:&quot;task manager&quot;}</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;{$ZABBIX.PROXY.UTIL.MIN}</recovery_expression>
-                            <name>Remote Zabbix proxy: Utilization of task manager processes over {$ZABBIX.PROXY.UTIL.MAX}%</name>
+                            <recovery_expression>{avg(10m)}&lt;{$ZABBIX.PROXY.UTIL.MIN:&quot;task manager&quot;}</recovery_expression>
+                            <name>Remote Zabbix proxy: Utilization of task manager processes over {$ZABBIX.PROXY.UTIL.MAX:&quot;task manager&quot;}%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -651,7 +651,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average percentage of time trapper processes have been busy in the last minute</description>
+                    <description>Average percentage of time trapper processes have been busy in the last minute.</description>
                     <applications>
                         <application>
                             <name>Zabbix proxy</name>
@@ -670,10 +670,10 @@
                     </master_item>
                     <triggers>
                         <trigger>
-                            <expression>{avg(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX}</expression>
+                            <expression>{avg(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX:&quot;trapper&quot;}</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;{$ZABBIX.PROXY.UTIL.MIN}</recovery_expression>
-                            <name>Remote Zabbix proxy: Utilization of trapper processes over {$ZABBIX.PROXY.UTIL.MAX}%</name>
+                            <recovery_expression>{avg(10m)}&lt;{$ZABBIX.PROXY.UTIL.MIN:&quot;trapper&quot;}</recovery_expression>
+                            <name>Remote Zabbix proxy: Utilization of trapper processes over {$ZABBIX.PROXY.UTIL.MAX:&quot;trapper&quot;}%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -686,7 +686,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average percentage of time unreachable poller processes have been busy in the last minute</description>
+                    <description>Average percentage of time unreachable poller processes have been busy in the last minute.</description>
                     <applications>
                         <application>
                             <name>Zabbix proxy</name>
@@ -705,10 +705,10 @@
                     </master_item>
                     <triggers>
                         <trigger>
-                            <expression>{avg(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX}</expression>
+                            <expression>{avg(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX:&quot;unreachable poller&quot;}</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;{$ZABBIX.PROXY.UTIL.MIN}</recovery_expression>
-                            <name>Remote Zabbix proxy: Utilization of unreachable poller processes over {$ZABBIX.PROXY.UTIL.MAX}%</name>
+                            <recovery_expression>{avg(10m)}&lt;{$ZABBIX.PROXY.UTIL.MIN:&quot;unreachable poller&quot;}</recovery_expression>
+                            <name>Remote Zabbix proxy: Utilization of unreachable poller processes over {$ZABBIX.PROXY.UTIL.MAX:&quot;unreachable poller&quot;}%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -721,7 +721,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Average percentage of time vmware collector processes have been busy in the last minute</description>
+                    <description>Average percentage of time vmware collector processes have been busy in the last minute.</description>
                     <applications>
                         <application>
                             <name>Zabbix proxy</name>
@@ -740,10 +740,10 @@
                     </master_item>
                     <triggers>
                         <trigger>
-                            <expression>{avg(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX}</expression>
+                            <expression>{avg(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX:&quot;vmware collector&quot;}</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;{$ZABBIX.PROXY.UTIL.MIN}</recovery_expression>
-                            <name>Remote Zabbix proxy: Utilization of vmware collector processes over {$ZABBIX.PROXY.UTIL.MAX}%</name>
+                            <recovery_expression>{avg(10m)}&lt;{$ZABBIX.PROXY.UTIL.MIN:&quot;vmware collector&quot;}</recovery_expression>
+                            <name>Remote Zabbix proxy: Utilization of vmware collector processes over {$ZABBIX.PROXY.UTIL.MAX:&quot;vmware collector&quot;}%</name>
                             <priority>AVERAGE</priority>
                         </trigger>
                     </triggers>
@@ -756,7 +756,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Availability statistics of Zabbix configuration cache. Percentage of used buffer</description>
+                    <description>Availability statistics of Zabbix configuration cache. Percentage of used buffer.</description>
                     <applications>
                         <application>
                             <name>Zabbix proxy</name>
@@ -776,7 +776,7 @@
                             <expression>{max(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX}</expression>
                             <name>Remote Zabbix proxy: More than {$ZABBIX.PROXY.UTIL.MAX}% used in the configuration cache</name>
                             <priority>AVERAGE</priority>
-                            <description>Consider increasing CacheSize in the zabbix_server.conf configuration file</description>
+                            <description>Consider increasing CacheSize in the zabbix_server.conf configuration file.</description>
                         </trigger>
                     </triggers>
                 </item>
@@ -787,7 +787,7 @@
                     <delay>0</delay>
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
-                    <description>Required performance of Zabbix proxy, in new values per second expected</description>
+                    <description>Required performance of Zabbix proxy, in new values per second expected.</description>
                     <applications>
                         <application>
                             <name>Zabbix proxy</name>
@@ -880,7 +880,7 @@
                     <history>1w</history>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <description>Availability statistics of Zabbix vmware cache. Percentage of used buffer</description>
+                    <description>Availability statistics of Zabbix vmware cache. Percentage of used buffer.</description>
                     <applications>
                         <application>
                             <name>Zabbix proxy</name>
@@ -902,7 +902,7 @@
                             <expression>{max(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX}</expression>
                             <name>Remote Zabbix proxy: More than {$ZABBIX.PROXY.UTIL.MAX}% used in the vmware cache</name>
                             <priority>AVERAGE</priority>
-                            <description>Consider increasing VMwareCacheSize in the zabbix_server.conf configuration file</description>
+                            <description>Consider increasing VMwareCacheSize in the zabbix_server.conf configuration file.</description>
                         </trigger>
                     </triggers>
                 </item>
@@ -935,7 +935,7 @@ History cache is used to store item values. A high number indicates performance 
                             <expression>{max(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX}</expression>
                             <name>Remote Zabbix proxy: More than {$ZABBIX.PROXY.UTIL.MAX}% used in the history cache</name>
                             <priority>AVERAGE</priority>
-                            <description>Consider increasing HistoryCacheSize in the zabbix_server.conf configuration file</description>
+                            <description>Consider increasing HistoryCacheSize in the zabbix_server.conf configuration file.</description>
                         </trigger>
                     </triggers>
                 </item>
@@ -968,7 +968,7 @@ History index cache is used to index values stored in history cache.</descriptio
                             <expression>{max(10m)}&gt;{$ZABBIX.PROXY.UTIL.MAX}</expression>
                             <name>Remote Zabbix proxy: More than {$ZABBIX.PROXY.UTIL.MAX}% used in the history index cache</name>
                             <priority>AVERAGE</priority>
-                            <description>Consider increasing HistoryIndexCacheSize in the zabbix_server.conf configuration file</description>
+                            <description>Consider increasing HistoryIndexCacheSize in the zabbix_server.conf configuration file.</description>
                         </trigger>
                     </triggers>
                 </item>
@@ -1173,7 +1173,7 @@ Number of processed numeric (unsigned) values.</description>
                     <type>INTERNAL</type>
                     <key>zabbix[stats,{$ZABBIX.PROXY.ADDRESS},{$ZABBIX.PROXY.PORT},queue,10m]</key>
                     <history>1w</history>
-                    <description>Number of monitored items in the queue which are delayed at least by 10 minutes</description>
+                    <description>Number of monitored items in the queue which are delayed at least by 10 minutes.</description>
                     <applications>
                         <application>
                             <name>Zabbix proxy</name>
@@ -1190,7 +1190,7 @@ Number of processed numeric (unsigned) values.</description>
                             <expression>{min(10m)}&gt;100</expression>
                             <name>Remote Zabbix proxy: More than 100 items having missing data for more than 10 minutes</name>
                             <priority>WARNING</priority>
-                            <description>zabbix[stats,{$ZABBIX.PROXY.ADDRESS},{$ZABBIX.PROXY.PORT},queue,10m] item is collecting data about how many items are missing data for more than 10 minutes</description>
+                            <description>zabbix[stats,{$ZABBIX.PROXY.ADDRESS},{$ZABBIX.PROXY.PORT},queue,10m] item is collecting data about how many items are missing data for more than 10 minutes.</description>
                         </trigger>
                     </triggers>
                 </item>
@@ -1199,7 +1199,7 @@ Number of processed numeric (unsigned) values.</description>
                     <type>INTERNAL</type>
                     <key>zabbix[stats,{$ZABBIX.PROXY.ADDRESS},{$ZABBIX.PROXY.PORT},queue]</key>
                     <history>1w</history>
-                    <description>Number of monitored items in the queue which are delayed at least by 6 seconds</description>
+                    <description>Number of monitored items in the queue which are delayed at least by 6 seconds.</description>
                     <applications>
                         <application>
                             <name>Zabbix proxy</name>
@@ -1236,17 +1236,17 @@ Number of processed numeric (unsigned) values.</description>
                 <macro>
                     <macro>{$ZABBIX.PROXY.PORT}</macro>
                     <value>10051</value>
-                    <description>Port of proxy to be remotely queried (default is 10051)</description>
+                    <description>Port of proxy to be remotely queried (default is 10051).</description>
                 </macro>
                 <macro>
                     <macro>{$ZABBIX.PROXY.UTIL.MAX}</macro>
                     <value>75</value>
-                    <description>Maximum average percentage of time processes busy in the last minute (default is 75)</description>
+                    <description>Maximum average percentage of time processes busy in the last minute (default is 75).</description>
                 </macro>
                 <macro>
                     <macro>{$ZABBIX.PROXY.UTIL.MIN}</macro>
                     <value>65</value>
-                    <description>Minimum average percentage of time processes busy in the last minute (default is 65)</description>
+                    <description>Minimum average percentage of time processes busy in the last minute (default is 65).</description>
                 </macro>
             </macros>
             <screens>
