@@ -187,7 +187,9 @@ $right_column = (new CFormGrid())
 					->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
 				(new CCheckBox('show_without_data'))
 					->setAttribute('disabled', 'disabled')
+					->setChecked($data['show_without_data'])
 					->setUncheckedValue(0)
+					->removeId()
 			]))->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
 		])
 	]);
@@ -350,7 +352,7 @@ if (array_key_exists('render_html', $data)) {
 			var elm = $('[name="' + key + '"]', container);
 
 			if (elm.is(':radio,:checkbox')) {
-				elm.filter('[value="' + data[key] + '"]').attr('checked', true);
+				elm.filter('[value="' + data[key] + '"]').prop('checked', true);
 			}
 			else {
 				elm.val(data[key]);
@@ -386,15 +388,16 @@ if (array_key_exists('render_html', $data)) {
 		});
 
 		// Show without data can be used only with 1+ hosts.
-		$('#hostids_' + data.uniqid, container)
-			.on('change', function () {
-				const no_hosts_selected = !$(this).multiSelect('getData').length;
-				if (no_hosts_selected) {
-					$('#show_without_data').prop('checked', true);
-				}
-				$('#show_without_data').prop('disabled', no_hosts_selected);
-			})
-			.trigger('change');
+		$('#hostids_' + data.uniqid, container).on('change', function (e) {
+			if ($(this).multiSelect('getData').length == 0) {
+				$('[name="show_without_data"]').prop('checked', true);
+				$('[name="show_without_data"]').prop('disabled', true);
+			}
+			else {
+				$('[name="show_without_data"]').prop('checked', Boolean(data['show_without_data']));
+				$('[name="show_without_data"]').prop('disabled', false);
+			}
+		});
 
 		// Initialize src_url.
 		this.resetUnsavedState();
@@ -406,11 +409,18 @@ if (array_key_exists('render_html', $data)) {
 			.filter(data.filter_configurable ? '[name="filter_update"]' : '[name="filter_new"]').show();
 	}
 
+	function select(data, container) {
+		$('#hostids_' + data.uniqid, container).trigger('change');
+	}
+
 	// Tab filter item events handlers.
 	template.addEventListener(TABFILTERITEM_EVENT_RENDER, function (ev) {
 		render.call(ev.detail, ev.detail._data, ev.detail._content_container);
 	});
 	template.addEventListener(TABFILTERITEM_EVENT_EXPAND, function (ev) {
 		expand.call(ev.detail, ev.detail._data, ev.detail._content_container);
+	});
+	template.addEventListener(TABFILTERITEM_EVENT_SELECT, function (ev) {
+		select.call(ev.detail, ev.detail._data, ev.detail._content_container);
 	});
 </script>
