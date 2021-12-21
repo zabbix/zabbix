@@ -419,7 +419,7 @@ class testMaintenance extends CAPITest {
 						]
 					]
 				] + $def_options,
-				'expected_error' => 'Invalid parameter "/1/tags": should be empty.'
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "tags".'
 			],
 			// Fail. Active since bigger active till.
 			[
@@ -428,7 +428,7 @@ class testMaintenance extends CAPITest {
 					'active_since' => '1546207200',
 					'active_till' => '1514757600'
 				] + $def_options,
-				'expected_error' => 'Maintenance "active_since" value cannot be bigger than "active_till".'
+				'expected_error' => 'Invalid parameter "/1/active_till": cannot be less than or equals the value of parameter "/1/active_since".'
 			],
 			// Fail. Empty groups.
 			[
@@ -436,17 +436,26 @@ class testMaintenance extends CAPITest {
 					'name' => 'M'.++$n,
 					'groups' => []
 				] + $def_options,
-				'expected_error' => 'Invalid parameter "/1/groups": cannot be empty.'
+				'expected_error' => 'At least one host group or host must be selected.'
 			],
-			// Fail. Empty groups.
+			// Fail. Empty hosts.
 			[
 				'request_data' => [
 					'name' => 'M'.++$n,
 					'hosts' => []
-				] + $def_options,
-				'expected_error' => 'Invalid parameter "/1/hosts": cannot be empty.'
+				] + array_diff_key($def_options, array_flip(['groups'])),
+				'expected_error' => 'At least one host group or host must be selected.'
 			],
 			// Fail. Empty groups and hosts.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'groups' => [],
+					'hosts' => []
+				] + $def_options,
+				'expected_error' => 'At least one host group or host must be selected.'
+			],
+			// Fail. No groups and hosts.
 			[
 				'request_data' => [
 					'name' => 'M'.++$n,
@@ -474,26 +483,39 @@ class testMaintenance extends CAPITest {
 				] + $def_options,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
+			// Fail. Duplicate group.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'groups' => [
+						['groupid' => 999],
+						['groupid' => 1000],
+						['groupid' => 999]
+					],
+				] + $def_options,
+				'expected_error' => 'Invalid parameter "/1/groups/3": value (groupid)=(999) already exists.'
+			],
 			// Fail. Wrong hosts.
 			[
 				'request_data' => [
 					'name' => 'M'.++$n,
-					'active_since' => '1514757600',
-					'active_till' => '1546207200',
 					'hosts' => [
 						['hostid' => 999]
-					],
-					'timeperiods' => [
-						[
-							'timeperiod_type' => 3,
-							'every' => 1,
-							'dayofweek' => 64,
-							'start_time' => 3600,
-							'period' => 7200
-						]
 					]
-				],
+				] + array_diff_key($def_options, array_flip(['groups'])),
 				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
+			// Fail. Duplicate host.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'hosts' => [
+						['hostid' => 999],
+						['hostid' => 1000],
+						['hostid' => 999]
+					],
+				] + $def_options,
+				'expected_error' => 'Invalid parameter "/1/hosts/3": value (hostid)=(999) already exists.'
 			],
 			// Fail. Same name.
 			[
@@ -505,21 +527,7 @@ class testMaintenance extends CAPITest {
 				] + $def_options],
 				'expected_error' => 'Invalid parameter "/2": value (name)=(Same name) already exists.'
 			],
-			// Fail. Empty timeperiod.
-			[
-				'request_data' => [
-					'name' => 'M'.++$n,
-					'active_since' => '1514757600',
-					'active_till' => '1546207200',
-					'groups' => [
-						['groupid' => 2]
-					],
-					'timeperiods' => [
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/timeperiods": cannot be empty.'
-			],
-			// Fail. Missing period type.
+			// Success. One time period.
 			[
 				'request_data' => [
 					'name' => 'M'.++$n,
@@ -533,9 +541,9 @@ class testMaintenance extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/timeperiods/1": the parameter "timeperiod_type" is missing.'
+				'expected_error' => null
 			],
-			// Fail. Missing cannot be empty. period.
+			// Success. One time period.
 			[
 				'request_data' => [
 					'name' => 'M'.++$n,
@@ -550,7 +558,58 @@ class testMaintenance extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/timeperiods/1": the parameter "period" is missing.'
+				'expected_error' => null
+			],
+			// Success. One time period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 0,
+							'start_date' => '1514764800'
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			// Success. One time period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 0,
+							'period' => '600',
+							'start_date' => '1514764800'
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			// Fail. Empty time periods.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods": cannot be empty.'
 			],
 			// Fail. Wrong period type.
 			[
@@ -563,12 +622,185 @@ class testMaintenance extends CAPITest {
 					],
 					'timeperiods' => [
 						[
-							'timeperiod_type' => 1,
-							'period' => 7200
+							'timeperiod_type' => 1
 						]
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/timeperiods/1/timeperiod_type": value must be one of 0, 2, 3, 4.'
+			],
+			// Fail. One time period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 0,
+							'period' => 0
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/period": value must be one of 300-2147483647.'
+			],
+			// Fail. One time period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 0,
+							'period' => '2147483648'
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/period": a number is too large.'
+			],
+			// Fail. One time period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 0,
+							'start_date' => '-1'
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/start_date": an unsigned integer is expected.'
+			],
+			// Fail. One time period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 0,
+							'start_date' => '2147483648'
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/start_date": a timestamp is too large.'
+			],
+			// Fail. One time period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'start_time' => 1
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1": unexpected parameter "start_time".'
+			],
+			// Fail. One time period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'every' => 1
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1": unexpected parameter "every".'
+			],
+			// Fail. One time period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'day' => 1
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1": unexpected parameter "day".'
+			],
+			// Fail. One time period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'dayofweek' => 1
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1": unexpected parameter "dayofweek".'
+			],
+			// Fail. One time period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'month' => 1
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1": unexpected parameter "month".'
+			],
+			// Success. Daily period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 2
+						]
+					]
+				],
+				'expected_error' => null
 			],
 			// Success. Daily period.
 			[
@@ -582,9 +814,27 @@ class testMaintenance extends CAPITest {
 					'timeperiods' => [
 						[
 							'timeperiod_type' => 2,
-							'period' => 7200,
-							'every' => 1,
-							'start_time' => '6492'
+							'every' => 1
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			// Success. Daily period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'period' => '600',
+							'timeperiod_type' => 2,
+							'start_time' => '7200',
+							'every' => 1
 						]
 					]
 				],
@@ -602,31 +852,11 @@ class testMaintenance extends CAPITest {
 					'timeperiods' => [
 						[
 							'timeperiod_type' => 2,
-							'period' => 7200,
-							'every' => '-1'
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/timeperiods/1/every": value must be one of 0-2147483647.'
-			],
-			// Fail. Daily period.
-			[
-				'request_data' => [
-					'name' => 'M'.++$n,
-					'active_since' => '1514757600',
-					'active_till' => '1546207200',
-					'groups' => [
-						['groupid' => 2]
-					],
-					'timeperiods' => [
-						[
-							'timeperiod_type' => 2,
-							'period' => 7200,
 							'start_time' => '-1'
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/timeperiods/1/start_time": value must be one of 0-86340.'
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/start_time": an unsigned integer is expected.'
 			],
 			// Fail. Daily period.
 			[
@@ -640,14 +870,11 @@ class testMaintenance extends CAPITest {
 					'timeperiods' => [
 						[
 							'timeperiod_type' => 2,
-							'period' => 7200,
-							'every' => 1,
-							'start_time' => '6492',
-							'day' => ''
+							'start_time' => '86400'
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/timeperiods/1/day": an integer is expected.'
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/start_time": value must be one of 00:00-23:59.'
 			],
 			// Fail. Daily period.
 			[
@@ -661,14 +888,11 @@ class testMaintenance extends CAPITest {
 					'timeperiods' => [
 						[
 							'timeperiod_type' => 2,
-							'period' => 7200,
-							'every' => 1,
-							'start_time' => '6492',
-							'day' => '1'
+							'every' => 0
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/timeperiods/1/day": value must be one of 0.'
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/every": value must be one of 1-2147483647.'
 			],
 			// Fail. Daily period.
 			[
@@ -682,14 +906,11 @@ class testMaintenance extends CAPITest {
 					'timeperiods' => [
 						[
 							'timeperiod_type' => 2,
-							'period' => 7200,
-							'every' => 1,
-							'start_time' => '6492',
-							'dayofweek' => ''
+							'every' => '2147483648'
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/timeperiods/1/dayofweek": an integer is expected.'
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/every": a number is too large.'
 			],
 			// Fail. Daily period.
 			[
@@ -703,14 +924,47 @@ class testMaintenance extends CAPITest {
 					'timeperiods' => [
 						[
 							'timeperiod_type' => 2,
-							'period' => 7200,
-							'every' => 1,
-							'start_time' => '6492',
+							'start_date' => '1514764800'
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1": unexpected parameter "start_date".'
+			],
+			// Fail. Daily period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 2,
+							'day' => 10
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1": unexpected parameter "day".'
+			],
+			// Fail. Daily period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 2,
 							'dayofweek' => '1'
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/timeperiods/1/dayofweek": value must be one of 0.'
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1": unexpected parameter "dayofweek".'
 			],
 			// Fail. Daily period.
 			[
@@ -724,80 +978,12 @@ class testMaintenance extends CAPITest {
 					'timeperiods' => [
 						[
 							'timeperiod_type' => 2,
-							'period' => 7200,
-							'every' => 1,
-							'start_time' => '6492',
 							'month' => ''
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/timeperiods/1/month": an integer is expected.'
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1": unexpected parameter "month".'
 			],
-			// Fail. Daily period.
-			[
-				'request_data' => [
-					'name' => 'M'.++$n,
-					'active_since' => '1514757600',
-					'active_till' => '1546207200',
-					'groups' => [
-						['groupid' => 2]
-					],
-					'timeperiods' => [
-						[
-							'timeperiod_type' => 2,
-							'period' => 7200,
-							'every' => 1,
-							'start_time' => '6492',
-							'month' => '1'
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/timeperiods/1/month": value must be one of 0.'
-			],
-			// Fail. Daily period.
-			[
-				'request_data' => [
-					'name' => 'M'.++$n,
-					'active_since' => '1514757600',
-					'active_till' => '1546207200',
-					'groups' => [
-						['groupid' => 2]
-					],
-					'timeperiods' => [
-						[
-							'timeperiod_type' => 2,
-							'period' => 7200,
-							'every' => 1,
-							'start_time' => '6492',
-							'start_date' => ''
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/timeperiods/1/start_date": an integer is expected.'
-			],
-			// Fail. Daily period.
-			[
-				'request_data' => [
-					'name' => 'M'.++$n,
-					'active_since' => '1514757600',
-					'active_till' => '1546207200',
-					'groups' => [
-						['groupid' => 2]
-					],
-					'timeperiods' => [
-						[
-							'timeperiod_type' => 2,
-							'period' => 7200,
-							'every' => 1,
-							'start_time' => '6492',
-							'start_date' => '1'
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/timeperiods/1/start_date": value must be one of 0.'
-			],
-
-
 			// Success. Weekly period.
 			[
 				'request_data' => [
@@ -810,10 +996,28 @@ class testMaintenance extends CAPITest {
 					'timeperiods' => [
 						[
 							'timeperiod_type' => 3,
+							'dayofweek' => '64'
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			// Success. Weekly period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
 							'period' => 7200,
+							'timeperiod_type' => 3,
+							'start_time' => 7200,
 							'every' => 1,
-							'dayofweek' => '64',
-							'start_time' => '6492'
+							'dayofweek' => '64'
 						]
 					]
 				],
@@ -830,15 +1034,11 @@ class testMaintenance extends CAPITest {
 					],
 					'timeperiods' => [
 						[
-							'timeperiod_type' => 3,
-							'period' => 7200,
-							'every' => 1,
-							'start_time' => '6492',
-							'day' => ''
+							'timeperiod_type' => 3
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/timeperiods/1/day": an integer is expected.'
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1": the parameter "dayofweek" is missing.'
 			],
 			// Fail. Weekly period.
 			[
@@ -852,30 +1052,6 @@ class testMaintenance extends CAPITest {
 					'timeperiods' => [
 						[
 							'timeperiod_type' => 3,
-							'period' => 7200,
-							'every' => 1,
-							'start_time' => '6492',
-							'day' => '1'
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/timeperiods/1/day": value must be one of 0.'
-			],
-			// Fail. Weekly period.
-			[
-				'request_data' => [
-					'name' => 'M'.++$n,
-					'active_since' => '1514757600',
-					'active_till' => '1546207200',
-					'groups' => [
-						['groupid' => 2]
-					],
-					'timeperiods' => [
-						[
-							'timeperiod_type' => 3,
-							'period' => 7200,
-							'every' => 1,
-							'start_time' => '6492',
 							'dayofweek' => ''
 						]
 					]
@@ -894,14 +1070,11 @@ class testMaintenance extends CAPITest {
 					'timeperiods' => [
 						[
 							'timeperiod_type' => 3,
-							'period' => 7200,
-							'every' => 1,
-							'start_time' => '6492',
-							'dayofweek' => '128'
+							'dayofweek' => '0'
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/timeperiods/1/dayofweek": value must be one of 0-127.'
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/dayofweek": value must be one of 1-127.'
 			],
 			// Fail. Weekly period.
 			[
@@ -915,14 +1088,11 @@ class testMaintenance extends CAPITest {
 					'timeperiods' => [
 						[
 							'timeperiod_type' => 3,
-							'period' => 7200,
-							'every' => 1,
-							'start_time' => '6492',
-							'month' => ''
+							'dayofweek' => 128
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/timeperiods/1/month": an integer is expected.'
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/dayofweek": value must be one of 1-127.'
 			],
 			// Fail. Weekly period.
 			[
@@ -936,14 +1106,12 @@ class testMaintenance extends CAPITest {
 					'timeperiods' => [
 						[
 							'timeperiod_type' => 3,
-							'period' => 7200,
-							'every' => 1,
-							'start_time' => '6492',
-							'month' => '1'
+							'dayofweek' => 1,
+							'start_date' => '1514764800'
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/timeperiods/1/month": value must be one of 0.'
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1": unexpected parameter "start_date".'
 			],
 			// Fail. Weekly period.
 			[
@@ -957,14 +1125,12 @@ class testMaintenance extends CAPITest {
 					'timeperiods' => [
 						[
 							'timeperiod_type' => 3,
-							'period' => 7200,
-							'every' => 1,
-							'start_time' => '6492',
-							'start_date' => ''
+							'dayofweek' => 1,
+							'day' => '30'
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/timeperiods/1/start_date": an integer is expected.'
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1": unexpected parameter "day".'
 			],
 			// Fail. Weekly period.
 			[
@@ -978,16 +1144,13 @@ class testMaintenance extends CAPITest {
 					'timeperiods' => [
 						[
 							'timeperiod_type' => 3,
-							'period' => 7200,
-							'every' => 1,
-							'start_time' => '6492',
-							'start_date' => '1'
+							'dayofweek' => 1,
+							'month' => '30'
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/timeperiods/1/start_date": value must be one of 0.'
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1": unexpected parameter "month".'
 			],
-
 			// Success. Monthly period.
 			[
 				'request_data' => [
@@ -1000,11 +1163,127 @@ class testMaintenance extends CAPITest {
 					'timeperiods' => [
 						[
 							'timeperiod_type' => 4,
-							'period' => 7200,
-							'every' => 1,
-							'start_time' => '6492',
 							'day' => 1,
-							'dayofweek' => 64,
+							'month' => 240
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			// Success. Monthly period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 4,
+							'dayofweek' => 1,
+							'month' => 240
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			// Success. Monthly period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 4,
+							'every' => 2,
+							'dayofweek' => 1,
+							'month' => 240
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			// Success. Monthly period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 4,
+							'day' => 2,
+							'dayofweek' => 0,
+							'month' => 240
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			// Success. Monthly period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 4,
+							'day' => 2,
+							'dayofweek' => 0,
+							'month' => 240
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			// Success. Monthly period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 4,
+							'every' => 2,
+							'day' => 2,
+							'month' => 240
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			// Success. Monthly period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 4,
+							'every' => 2,
+							'day' => 0,
+							'dayofweek' => 5,
 							'month' => 240
 						]
 					]
@@ -1023,12 +1302,13 @@ class testMaintenance extends CAPITest {
 					'timeperiods' => [
 						[
 							'timeperiod_type' => 4,
-							'period' => 7200,
-							'every' => '-1'
+							'every' => 0,
+							'dayofweek' => 1,
+							'month' => 240
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/timeperiods/1/every": value must be one of 0-2147483647.'
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/every": value must be one of 1, 2, 3, 4, 5.'
 			],
 			// Fail. Monthly period.
 			[
@@ -1042,12 +1322,13 @@ class testMaintenance extends CAPITest {
 					'timeperiods' => [
 						[
 							'timeperiod_type' => 4,
-							'period' => 7200,
-							'start_time' => '-1'
+							'every' => 6,
+							'dayofweek' => 1,
+							'month' => 240
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/timeperiods/1/start_time": value must be one of 0-86340.'
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/every": value must be one of 1, 2, 3, 4, 5.'
 			],
 			// Fail. Monthly period.
 			[
@@ -1061,10 +1342,27 @@ class testMaintenance extends CAPITest {
 					'timeperiods' => [
 						[
 							'timeperiod_type' => 4,
-							'period' => 7200,
-							'every' => 1,
-							'start_time' => '6492',
-							'day' => ''
+							'day' => 0,
+							'month' => 240
+						]
+					]
+				],
+				'expected_error' => 'At least one day of week or day must be specified.'
+			],
+			// Fail. Monthly period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 4,
+							'day' => '',
+							'month' => 240
 						]
 					]
 				],
@@ -1082,10 +1380,8 @@ class testMaintenance extends CAPITest {
 					'timeperiods' => [
 						[
 							'timeperiod_type' => 4,
-							'period' => 7200,
-							'every' => 1,
-							'start_time' => '6492',
-							'day' => '32'
+							'day' => '-1',
+							'month' => 240
 						]
 					]
 				],
@@ -1103,11 +1399,66 @@ class testMaintenance extends CAPITest {
 					'timeperiods' => [
 						[
 							'timeperiod_type' => 4,
-							'period' => 7200,
-							'every' => 1,
-							'start_time' => '6492',
-							'day' => '1',
-							'dayofweek' => ''
+							'day' => 32,
+							'month' => 240
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/day": value must be one of 0-31.'
+			],
+			// Fail. Monthly period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 4,
+							'day' => 1,
+							'dayofweek' => 1,
+							'month' => 240
+						]
+					]
+				],
+				'expected_error' => 'Only day of week or day is allowed.'
+			],
+			// Fail. Monthly period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 4,
+							'dayofweek' => 0,
+							'month' => 240
+						]
+					]
+				],
+				'expected_error' => 'At least one day of week or day must be specified.'
+			],
+			// Fail. Monthly period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 4,
+							'dayofweek' => '',
+							'month' => 240
 						]
 					]
 				],
@@ -1125,11 +1476,8 @@ class testMaintenance extends CAPITest {
 					'timeperiods' => [
 						[
 							'timeperiod_type' => 4,
-							'period' => 7200,
-							'every' => 1,
-							'start_time' => '6492',
-							'day' => '1',
-							'dayofweek' => '128'
+							'dayofweek' => '-1',
+							'month' => 240
 						]
 					]
 				],
@@ -1147,11 +1495,44 @@ class testMaintenance extends CAPITest {
 					'timeperiods' => [
 						[
 							'timeperiod_type' => 4,
-							'period' => 7200,
-							'every' => 1,
-							'start_time' => '6492',
-							'day' => '1',
-							'dayofweek' => '127',
+							'dayofweek' => 128,
+							'month' => 240
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/dayofweek": value must be one of 0-127.'
+			],
+			// Fail. Monthly period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 4,
+							'day' => 1
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1": the parameter "month" is missing.'
+			],
+			// Fail. Monthly period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 4,
+							'day' => 1,
 							'month' => ''
 						]
 					]
@@ -1170,16 +1551,12 @@ class testMaintenance extends CAPITest {
 					'timeperiods' => [
 						[
 							'timeperiod_type' => 4,
-							'period' => 7200,
-							'every' => 1,
-							'start_time' => '6492',
-							'day' => '1',
-							'dayofweek' => '127',
-							'month' => '4096'
+							'day' => 1,
+							'month' => 0
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/timeperiods/1/month": value must be one of 0-4095.'
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/month": value must be one of 1-4095.'
 			],
 			// Fail. Monthly period.
 			[
@@ -1193,41 +1570,32 @@ class testMaintenance extends CAPITest {
 					'timeperiods' => [
 						[
 							'timeperiod_type' => 4,
-							'period' => 7200,
-							'every' => 1,
-							'start_time' => '6492',
-							'day' => '1',
-							'dayofweek' => '127',
-							'month' => '4095',
+							'day' => 1,
+							'month' => 4096
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/month": value must be one of 1-4095.'
+			],
+			// Fail. Monthly period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 4,
+							'day' => 1,
+							'month' => 1,
 							'start_date' => ''
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/timeperiods/1/start_date": an integer is expected.'
-			],
-			// Fail. Monthly period.
-			[
-				'request_data' => [
-					'name' => 'M'.++$n,
-					'active_since' => '1514757600',
-					'active_till' => '1546207200',
-					'groups' => [
-						['groupid' => 2]
-					],
-					'timeperiods' => [
-						[
-							'timeperiod_type' => 4,
-							'period' => 7200,
-							'every' => 1,
-							'start_time' => '6492',
-							'day' => '1',
-							'dayofweek' => '127',
-							'month' => '4095',
-							'start_date' => '1'
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/timeperiods/1/start_date": value must be one of 0.'
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1": unexpected parameter "start_date".'
 			]
 		];
 	}
@@ -1237,30 +1605,6 @@ class testMaintenance extends CAPITest {
 	 */
 	public function testMaintenance_Create($request_data, $expected_error = null) {
 		$this->call('maintenance.create', $request_data, $expected_error);
-	}
-
-	public static function getMaintenanceUpdateData() {
-		return [
-			// Fail. Unexpected parameter.
-			[
-				'request_data' => [
-					'maintenanceid' => 99999,
-					'tags' => [
-						[
-							'aaa' => 'bbb'
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/tags/1": unexpected parameter "aaa".'
-			]
-		];
-	}
-
-	/**
-	 * @dataProvider getMaintenanceUpdateData
-	 */
-	public function testMaintenance_Update($request_data, $expected_error = null) {
-		$this->call('maintenance.update', $request_data, $expected_error);
 	}
 
 	public static function getMaintenanceGetData() {
