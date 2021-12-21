@@ -678,12 +678,13 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 }
 
 /**
- * Get menu popup trigger log section data.
+ * Get menu popup item log section data.
  *
  * @param string options['itemid']
  * @param string options['hostid']
+ * @param string options['host']                      Host name.
  * @param string options['name']
- * @param bool   options['show_triggers']             (optional) Show trigger menus.
+ * @param string options['key']                       Item key.
  * @param array  options['triggers']                  (optional)
  * @param string options['triggers'][n]['triggerid']
  * @param string options['triggers'][n]['name']
@@ -693,53 +694,60 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
  * @return array
  */
 function getMenuPopupItem(options, trigger_elmnt) {
-	var items = [];
+	const items = [];
+	let url;
 
-	if (typeof options.show_triggers !== 'undefined' && options.show_triggers) {
-		// create
+	if (options.context === 'host') {
+		url = new Curl('zabbix.php', false);
+		url.setArgument('action', 'latest.view');
+		url.setArgument('filter_hostids[]', options.hostid);
+		url.setArgument('filter_select', options.name);
+		url.setArgument('filter_set', 1);
+
 		items.push({
-			label: t('Create trigger'),
-			clickCallback: function() {
-				jQuery(this).closest('.menu-popup').menuPopup('close', null);
+			label: t('Latest data'),
+			url: url.getUrl()
+		});
+	}
 
-				return PopUp('popup.triggerwizard', {
-					itemid: options.itemid
-				}, null, trigger_elmnt);
-			}
+	// create
+	url = new Curl('triggers.php', false);
+	url.setArgument('form', 'create');
+	url.setArgument('hostid', options.hostid);
+	url.setArgument('description', options.name);
+	url.setArgument('expression', 'func(/' + options.host + '/' + options.key + ')');
+	url.setArgument('context', options.context);
+
+	items.push({
+		label: t('Create trigger'),
+		url: url.getUrl()
+	});
+
+	// edit
+	const edit_trigger = {
+		label: t('Triggers')
+	};
+
+	if (options.triggers.length > 0) {
+		const triggers = [];
+
+		jQuery.each(options.triggers, function (i, trigger) {
+			url = new Curl('triggers.php', false);
+			url.setArgument('form', 'update');
+			url.setArgument('triggerid', trigger.triggerid)
+			url.setArgument('context', options.context);
+
+			triggers.push({
+				label: trigger.name,
+				url: url.getUrl()
+			});
 		});
 
-		var edit_trigger = {
-			label: t('Edit trigger')
-		};
-
-		// edit
-		if (options.triggers.length > 0) {
-			var triggers = [];
-
-			jQuery.each(options.triggers, function(i, trigger) {
-				triggers.push({
-					label: trigger.name,
-					clickCallback: function() {
-						jQuery(this).closest('.menu-popup-top').menuPopup('close', null);
-
-						return PopUp('popup.triggerwizard', {
-							itemid: options.itemid,
-							triggerid: trigger.triggerid
-						}, null, trigger_elmnt);
-					}
-				});
-			});
-
-			edit_trigger.items = triggers;
-		}
-		else {
-			edit_trigger.disabled = true;
-		}
-
+		edit_trigger.items = triggers;
 		items.push(edit_trigger);
 	}
 
-	var url = new Curl('items.php', false);
+	url = new Curl('items.php', false);
 	url.setArgument('form', 'create');
 	url.setArgument('hostid', options.hostid);
 	url.setArgument('type', 18);	// ITEM_TYPE_DEPENDENT

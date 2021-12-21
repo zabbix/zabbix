@@ -232,7 +232,8 @@ class CControllerMenuPopup extends CController {
 	 */
 	private static function getMenuDataItem(array $data) {
 		$db_items = API::Item()->get([
-			'output' => ['hostid', 'name', 'value_type', 'flags'],
+			'output' => ['hostid', 'key_', 'name', 'flags'],
+			'selectHosts' => ['host'],
 			'itemids' => $data['itemid'],
 			'webitems' => true
 		]);
@@ -243,42 +244,25 @@ class CControllerMenuPopup extends CController {
 				'type' => 'item',
 				'itemid' => $data['itemid'],
 				'hostid' => $db_item['hostid'],
+				'host' => $db_item['hosts'][0]['host'],
 				'name' => $db_item['name'],
+				'key' => $db_item['key_'],
 				'create_dependent_item' => ($db_item['flags'] != ZBX_FLAG_DISCOVERY_CREATED),
 				'create_dependent_discovery' => ($db_item['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 			];
 
-			if (in_array($db_item['value_type'], [ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT])) {
-				$db_triggers = API::Trigger()->get([
-					'output' => ['triggerid', 'description', 'recovery_mode'],
-					'selectFunctions' => API_OUTPUT_EXTEND,
-					'itemids' => $data['itemid']
-				]);
+			$db_triggers = API::Trigger()->get([
+				'output' => ['triggerid', 'description'],
+				'itemids' => $data['itemid']
+			]);
 
-				$menu_data['show_triggers'] = true;
-				$menu_data['triggers'] = [];
+			$menu_data['triggers'] = [];
 
-				foreach ($db_triggers as $db_trigger) {
-					if ($db_trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
-						continue;
-					}
-
-					foreach ($db_trigger['functions'] as $function) {
-						$parameters = array_map(function ($param) {
-							return trim($param, ' "');
-						}, explode(',', $function['parameter']));
-
-						if ($function['function'] !== 'find' || !array_key_exists(2, $parameters)
-								|| !in_array($parameters[2], ['regexp', 'iregexp'])) {
-							continue 2;
-						}
-					}
-
-					$menu_data['triggers'][] = [
-						'triggerid' => $db_trigger['triggerid'],
-						'name' => $db_trigger['description']
-					];
-				}
+			foreach ($db_triggers as $db_trigger) {
+				$menu_data['triggers'][] = [
+					'triggerid' => $db_trigger['triggerid'],
+					'name' => $db_trigger['description']
+				];
 			}
 
 			return $menu_data;
