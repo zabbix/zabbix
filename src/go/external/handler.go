@@ -236,7 +236,6 @@ func (h *handler) validate(data []byte) error {
 	}
 
 	err = p.Validate(req.PrivateOptions)
-
 	if err != nil {
 		response.Error = err.Error()
 	}

@@ -55,7 +55,8 @@ func checkExternalExits() error {
 	var status syscall.WaitStatus
 	pid, err := syscall.Wait4(-1, &status, syscall.WNOHANG, nil)
 	if err != nil {
-		return fmt.Errorf("failed to obtain PID of dead child process: %s", err)
+		log.Tracef("failed to obtain PID of dead child process: %s", err)
+		return nil
 	}
 
 	for _, p := range plugin.Plugins {
