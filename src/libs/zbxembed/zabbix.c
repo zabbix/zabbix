@@ -138,7 +138,7 @@ static duk_ret_t	es_zabbix_sleep(duk_context *ctx)
 
 static const duk_function_list_entry	zabbix_methods[] = {
 	{"Log",			es_zabbix_log,		2},
-	{"Sleep",		es_zabbix_sleep,	1},
+	{"sleep",		es_zabbix_sleep,	1},
 	{NULL, NULL, 0}
 };
 
