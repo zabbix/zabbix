@@ -71,13 +71,13 @@ $fields = [
 
 $check_fields_result = check_fields($fields, false);
 
+if (hasRequest('cancel') || hasRequest('finish')) {
+	redirect('index.php');
+}
+
 if (CWebUser::$data && CWebUser::getType() < USER_TYPE_SUPER_ADMIN
 		&& CSessionHelper::get('step') != CSetupWizard::STAGE_INSTALL) {
 	access_deny(ACCESS_DENY_PAGE);
-}
-
-if (hasRequest('cancel') || hasRequest('finish')) {
-	redirect('index.php');
 }
 
 CSessionHelper::set('check_fields_result', $check_fields_result);
