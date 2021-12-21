@@ -357,6 +357,34 @@ if (array_key_exists('render_html', $data)) {
 			}
 		});
 
+		// Render subfilter fields.
+		const form = container.querySelector('form');
+		const subfilter_fields = ['subfilter_hostids', 'subfilter_tagnames', 'subfilter_tags', 'subfilter_data'];
+		subfilter_fields.forEach(key => {
+			if ((key in data) && data[key].length != 0) {
+				if (Array.isArray(data[key])) {
+					data[key].forEach(val => {
+						const el = document.createElement('input');
+						el.type = 'hidden';
+						el.name = key + '[]';
+						el.value = val;
+						form.appendChild(el);
+					});
+				}
+				else {
+					for (const k in data[key]) {
+						data[key][k].forEach(val => {
+							const el = document.createElement('input');
+							el.type = 'hidden';
+							el.name = key + '[' + k + ']' + '[]';
+							el.value = val;
+							form.appendChild(el);
+						});
+					}
+				}
+			}
+		});
+
 		// Show without data can be used only with 1+ hosts.
 		$('#hostids_' + data.uniqid, container)
 			.on('change', function () {

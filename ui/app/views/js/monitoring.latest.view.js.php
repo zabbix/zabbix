@@ -59,13 +59,8 @@
 			this.filter = new CTabFilter(document.getElementById('monitoring_latest_filter'), filter_options);
 
 			this.filter.on(TABFILTER_EVENT_URLSET, () => {
-				console.log('TABFILTER_EVENT_URLSET');
 				this.reloadPartialAndTabCounters();
 			});
-		},
-
-		initSubfilter(subfilter_options = {}) {
-			this.filter.initSubfilter(subfilter_options);
 		},
 
 		createCountersRefresh(timeout) {
@@ -171,8 +166,6 @@
 
 					return post_data;
 				}, {});
-
-			console.log(post_data);
 
 			var deferred = $.ajax({
 				url: this.refresh_simple_url,

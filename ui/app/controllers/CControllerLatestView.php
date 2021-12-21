@@ -173,8 +173,7 @@ class CControllerLatestView extends CControllerLatest {
 			'sortorder' => $sort_order,
 			'page' => $this->hasInput('page') ? $this->getInput('page') : null
 		]);
-//sdii($filter);
-//sdii($refresh_data);exit;
+
 		// display
 		$data = [
 			'refresh_url' => $refresh_curl->getUrl(),
