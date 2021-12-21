@@ -235,9 +235,9 @@ abstract class CControllerLatest extends CController {
 	 * @param string $filter['tags']                Filter items by tag names and values.
 	 * @param int    $filter['show_without_data']   Filter items with/without data.
 	 * @param array  $filter['subfilter_hostids']	Host subfilter.
-	 * @param array  $filter['subfilter_tagnames']	Taname subfilter.
-	 * @param int    $filter['subfilter_tags']      Tags subfilter.
-	 * @param int    $filter['subfilter_data']      Data subfilter.
+	 * @param array  $filter['subfilter_tagnames']	Tagname subfilter.
+	 * @param array  $filter['subfilter_tags']      Tags subfilter.
+	 * @param array  $filter['subfilter_data']      Data subfilter.
 	 *
 	 * @return int
 	 */
@@ -284,9 +284,9 @@ abstract class CControllerLatest extends CController {
 
 		$subfilter_data = -1;
 		if ($filter['show_without_data']) {
-			if (array_key_exists('subfilter_data', $filter) && count($filter['subfilter_data']) != 2) {
+			if (array_key_exists('subfilter_data', $filter)
+					&& $filter['subfilter_data'] && count($filter['subfilter_data']) != 2) {
 				$subfilter_data = reset($filter['subfilter_data']);
-				$filter['show_without_data'] = false;
 			}
 		}
 
@@ -314,7 +314,7 @@ abstract class CControllerLatest extends CController {
 				'preservekeys' => true
 			]);
 
-			if (!$filter['show_without_data'] || $subfilter_data == -1) {
+			if ($subfilter_data != -1) {
 				$items_having_values = Manager::History()->getItemsHavingValues($host_items, $history_period);
 
 				switch ($subfilter_data) {

@@ -395,7 +395,6 @@ class CTabFilterItem extends CBaseComponent {
 
 		apply_url.set(name, value);
 		src_url.set(name, value);
-
 		this._apply_url = apply_url.toString();
 		this._src_url = src_url.toString();
 	}
