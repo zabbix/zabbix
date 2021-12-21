@@ -783,27 +783,72 @@ function getMenuPopupItem(options, trigger_elmnt) {
  * Get menu structure for item prototypess.
  *
  * @param array options['name']
+ * @param array options['key']                                  Item prototype key.
+ * @param array options['host']                                 Host name.
  * @param array options['itemid']
+ * @param array  options['trigger_prototypes']                  (optional)
+ * @param string options['trigger_prototypes'][n]['triggerid']
+ * @param string options['trigger_prototypes'][n]['name']
  * @param array options['parent_discoveryid']
- * @param string options['context']                   Additional parameter in URL to identify main section.
+ * @param string options['context']                             Additional parameter in URL to identify main section.
  *
  * @return array
  */
 function getMenuPopupItemPrototype(options) {
-	var url = new Curl('disc_prototypes.php', false);
+	const items = [];
+	let url;
 
+	url = new Curl('trigger_prototypes.php', false);
+	url.setArgument('parent_discoveryid', options.parent_discoveryid);
+	url.setArgument('form', 'create');
+	url.setArgument('description', options.name);
+	url.setArgument('expression', 'func(/' + options.host + '/' + options.key + ')');
+	url.setArgument('context', options.context);
+
+	items.push({
+		label: t('Create trigger prototype'),
+		url: url.getUrl()
+	});
+
+	const edit_trigger_prototypes = {
+		label: t('Trigger prototypes')
+	};
+
+	if (options.trigger_prototypes.length > 0) {
+		const trigger_prototypes = [];
+
+		jQuery.each(options.trigger_prototypes, function (i, trigger) {
+			url = new Curl('trigger_prototypes.php', false);
+			url.setArgument('form', 'update');
+			url.setArgument('parent_discoveryid', options.parent_discoveryid);
+			url.setArgument('triggerid', trigger.triggerid)
+			url.setArgument('context', options.context);
+
+			trigger_prototypes.push({
+				label: trigger.name,
+				url: url.getUrl()
+			});
+		});
+
+		edit_trigger_prototypes.items = trigger_prototypes;
+		items.push(edit_trigger_prototypes);
+	}
+
+	url = new Curl('disc_prototypes.php', false);
 	url.setArgument('form', 'create');
 	url.setArgument('parent_discoveryid', options.parent_discoveryid);
 	url.setArgument('type', 18);	// ITEM_TYPE_DEPENDENT
 	url.setArgument('master_itemid', options.itemid);
 	url.setArgument('context', options.context);
 
+	items.push({
+		label: t('Create dependent item'),
+		url: url.getUrl()
+	});
+
 	return [{
 		label: options.name,
-		items: [{
-			label: t('Create dependent item'),
-			url: url.getUrl()
-		}]
+		items: items
 	}];
 }
 

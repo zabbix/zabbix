@@ -55,7 +55,7 @@ $itemTable = (new CTableInfo())
 		(new CColHeader(
 			(new CCheckBox('all_items'))->onClick("checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		_('Wizard'),
+		_(''),
 		make_sorting_header(_('Name'),'name', $data['sort'], $data['sortorder'], $url),
 		make_sorting_header(_('Key'), 'key_', $data['sort'], $data['sortorder'], $url),
 		make_sorting_header(_('Interval'), 'delay', $data['sort'], $data['sortorder'], $url),

@@ -283,20 +283,38 @@ class CControllerMenuPopup extends CController {
 	 */
 	private static function getMenuDataItemPrototype(array $data) {
 		$db_item_prototypes = API::ItemPrototype()->get([
-			'output' => ['name'],
+			'output' => ['name', 'key_'],
 			'selectDiscoveryRule' => ['itemid'],
+			'selectHosts' => ['host'],
 			'itemids' => $data['itemid']
 		]);
 
 		if ($db_item_prototypes) {
 			$db_item_prototype = $db_item_prototypes[0];
 
-			return [
+			$menu_data = [
 				'type' => 'item_prototype',
 				'itemid' => $data['itemid'],
 				'name' => $db_item_prototype['name'],
+				'key' => $db_item_prototype['key_'],
+				'host' => $db_item_prototype['hosts'][0]['host'],
 				'parent_discoveryid' => $db_item_prototype['discoveryRule']['itemid']
 			];
+
+			$db_trigger_prototypes = API::TriggerPrototype()->get([
+				'output' => ['triggerid', 'description'],
+				'itemids' => $data['itemid']
+			]);
+
+			$menu_data['trigger_prototypes'] = [];
+
+			foreach ($db_trigger_prototypes as $db_trigger_prototype) {
+				$menu_data['trigger_prototypes'][] = [
+					'triggerid' => $db_trigger_prototype['triggerid'],
+					'name' => $db_trigger_prototype['description']
+				];
+			}
+			return $menu_data;
 		}
 
 		error(_('No permissions to referred object or it does not exist!'));
