@@ -324,11 +324,11 @@ class CMaintenance extends CApiService {
 											['else' => true, 'type' => API_UNEXPECTED]
 				]],
 				'start_time' =>			['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_TIMESTAMP, 'format' => 'H:i', 'in' => implode(':', [0, SEC_PER_DAY - SEC_PER_MIN]), 'default' => DB::getDefault('timeperiods', 'start_time')],
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_TIMESTAMP, 'format' => 'H:i', 'timezone' => 'UTC', 'in' => implode(':', [0, SEC_PER_DAY - SEC_PER_MIN]), 'default' => DB::getDefault('timeperiods', 'start_time')],
 											['else' => true, 'type' => API_UNEXPECTED]
 				]],
 				'every' =>				['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY])], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(':', [1, ZBX_MAX_INT32])],
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY])], 'type' => API_INT32, 'in' => implode(':', [1, ZBX_MAX_INT32]), 'default' => DB::getDefault('timeperiods', 'every')],
 											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => implode(',', [MONTH_WEEK_FIRST, MONTH_WEEK_SECOND, MONTH_WEEK_THIRD, MONTH_WEEK_FOURTH, MONTH_WEEK_LAST]), 'default' => DB::getDefault('timeperiods', 'every')],
 											['else' => true, 'type' => API_UNEXPECTED]
 				]],
@@ -520,11 +520,11 @@ class CMaintenance extends CApiService {
 											['else' => true, 'type' => API_UNEXPECTED]
 				]],
 				'start_time' =>			['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_TIMESTAMP, 'format' => 'H:i', 'in' => implode(':', [0, SEC_PER_DAY - SEC_PER_MIN]), 'default' => DB::getDefault('timeperiods', 'start_time')],
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_TIMESTAMP, 'format' => 'H:i', 'timezone' => 'UTC', 'in' => implode(':', [0, SEC_PER_DAY - SEC_PER_MIN]), 'default' => DB::getDefault('timeperiods', 'start_time')],
 											['else' => true, 'type' => API_UNEXPECTED]
 				]],
 				'every' =>				['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY])], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(':', [1, ZBX_MAX_INT32])],
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY])], 'type' => API_INT32, 'in' => implode(':', [1, ZBX_MAX_INT32]), 'default' => DB::getDefault('timeperiods', 'every')],
 											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => implode(',', [MONTH_WEEK_FIRST, MONTH_WEEK_SECOND, MONTH_WEEK_THIRD, MONTH_WEEK_FOURTH, MONTH_WEEK_LAST]), 'default' => DB::getDefault('timeperiods', 'every')],
 											['else' => true, 'type' => API_UNEXPECTED]
 				]],

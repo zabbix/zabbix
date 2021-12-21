@@ -2951,6 +2951,11 @@ class CApiInputValidator {
 			$in = explode(',', $rule['in']);
 			$formatted_in = '';
 
+			if (array_key_exists('timezone', $rule)) {
+				$default_timezone = date_default_timezone_get();
+				date_default_timezone_set('UTC');
+			}
+
 			foreach ($in as $i => $el) {
 				if (strpos($el, ':')) {
 					[$from, $to] = explode(':', $el);
@@ -2964,6 +2969,10 @@ class CApiInputValidator {
 				if (array_key_exists($i + 1, $in)) {
 					$formatted_in .= ', ';
 				}
+			}
+
+			if (array_key_exists('timezone', $rule)) {
+				date_default_timezone_set($default_timezone);
 			}
 
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _n('value must be %1$s', 'value must be one of %1$s',

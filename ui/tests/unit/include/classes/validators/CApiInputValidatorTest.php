@@ -5189,6 +5189,12 @@ class CApiInputValidatorTest extends TestCase {
 				'Invalid parameter "/": value must be one of 00:00, 00:05-01:00.'
 			],
 			[
+				['type' => API_TIMESTAMP, 'format' => 'H:i', 'timezone' => 'UTC', 'in' => '0,300:3600'],
+				1,
+				'/',
+				'Invalid parameter "/": value must be one of 00:00, 00:05-01:00.'
+			],
+			[
 				['type' => API_OBJECT, 'fields' => [
 					'active_since' => ['type' => API_TIMESTAMP],
 					'active_till' => ['type' => API_TIMESTAMP, 'compare' => ['operator' => '>', 'field' => 'active_since']]
