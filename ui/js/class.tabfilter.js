@@ -164,8 +164,6 @@ class CTabFilter extends CBaseComponent {
 			support_custom_time: this._options.support_custom_time
 		});
 
-		item.initSubfilter(data);
-
 		this._items.push(item);
 
 		if (title.getAttribute('data-target') === 'tabfilter_timeselector') {

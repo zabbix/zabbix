@@ -122,6 +122,8 @@ class CTabFilterItem extends CBaseComponent {
 	 * Render tab template with data. Fire TABFILTERITEM_EVENT_RENDER on template container binding this as event this.
 	 */
 	renderContentTemplate() {
+		this.initSubfilter(this._data);
+
 		if (this._template && !this._template_rendered) {
 			this._template_rendered = true;
 			this._content_container.innerHTML = (new Template(this._template.innerHTML)).evaluate(this._data);
@@ -199,6 +201,7 @@ class CTabFilterItem extends CBaseComponent {
 	 * Set selected state of item.
 	 */
 	setSelected() {
+		console.log('setSelected');
 		this._target.parentNode.classList.add(TABFILTERITEM_STYLE_SELECTED);
 		this.renderContentTemplate();
 
@@ -381,6 +384,8 @@ class CTabFilterItem extends CBaseComponent {
 	 * @param {URLSearchParams} search_params  Filter field values to be set in URL.
 	 */
 	setBrowserLocation(search_params) {
+		//console.log([...search_params.keys()].find(key => key.substr(0, 10) === 'subfilter_'));
+
 		let url = new Curl('', false);
 
 		search_params.set('action', url.getArgument('action'));
@@ -391,6 +396,49 @@ class CTabFilterItem extends CBaseComponent {
 	}
 
 	/**
+	 * Unset opened subfilter parameters.
+	 */
+	emptySubfilter() {
+		this._subfilter = new FormData();
+
+		/*
+		const apply_url = new URLSearchParams(this._apply_url);
+		const src_url = new URLSearchParams(this._src_url);
+
+		Object.keys(apply_url)
+			.filter(key => key.substr(0, 10) === 'subfilter_')
+			.forEach(key => {
+				apply_url.delete(key);
+			});
+
+		Object.keys(src_url)
+			.filter(key => key.substr(0, 10) === 'subfilter_')
+			.forEach(key => {
+				src_url.delete(key);
+			});
+
+		this._apply_url = apply_url.toString();
+		this._src_url = src_url.toString();
+		*/
+	}
+
+	/**
+	 * Set new subfilter field.
+	 *
+	 * @param {string} key
+	 * @param {string} value
+	 */
+	setSubfilter(key, value) {
+		value = String(value);
+
+		//this.setUrlArgument(key, value);
+
+		if (!this._subfilter.has(key) || this._subfilter.getAll(key).indexOf(value) == -1) {
+			this._subfilter.append(key, value);
+		}
+	}
+
+	/**
 	 * Set argument to URL used for data pooling (_apply_url) and URL used to track unsaved changes (_src_url).
 	 * Allow to change argument without affecting "unsaved" state of filter.
 	 *
@@ -398,19 +446,109 @@ class CTabFilterItem extends CBaseComponent {
 	 * @param {string} value  Argument value.
 	 */
 	setUrlArgument(name, value) {
+		console.log('setUrlArgument');
 		let apply_url = new URLSearchParams(this._apply_url || (this.getFilterParams()).toString()),
 			src_url = new URLSearchParams(this._src_url);
 
-		apply_url.set(name, value);
-		src_url.set(name, value);
+		if (!apply_url.has(name) || apply_url.getAll(name).indexOf(value) == -1) {
+			apply_url.set(name, value);
+		}
+		if (!src_url.has(name) || src_url.getAll(name).indexOf(value) == -1) {
+			src_url.set(name, value);
+		}
+
 		this._apply_url = apply_url.toString();
 		this._src_url = src_url.toString();
+	}
+
+	unsetUrlArgument(name, value) {
+		console.log('unsetUrlArgument');
+
+		let apply_url = new URLSearchParams(this._apply_url),
+			src_url = new URLSearchParams(this._src_url),
+			existing;
+
+		if (apply_url.has(name)) {
+			existing = apply_url.getAll(name);
+			apply_url.delete(name);
+
+			existing
+				.filter(val => val !== value)
+				.forEach(val => {
+					apply_url.append(name, val);
+				});
+		}
+
+		if (src_url.has(name)) {
+			existing = src_url.getAll(name);
+			src_url.delete(name);
+
+			existing
+				.filter(val => val !== value)
+				.forEach(val => {
+					src_url.append(name, val);
+				});
+		}
+
+		this._apply_url = apply_url.toString();
+		this._src_url = src_url.toString();
+	}
+
+	/**
+	 * Remove some of existing subfilter field.
+	 *
+	 * @param {string} key
+	 * @param {string} value
+	 */
+	unsetSubfilter(key, value) {
+		console.log('unsetSubfilter');
+		value = String(value);
+
+		unsetUrlArgument(key, value);
+
+		if (this._subfilter.has(key)) {
+			const existing = this._subfilter.getAll(key);
+			this._subfilter.delete(key);
+
+			existing
+				.filter(val => val !== value)
+				.forEach(val => {
+					this._subfilter.append(key, val);
+				});
+		}
+	}
+
+	/**
+	 * Init subfilter parameters from tabfilter options.
+	 *
+	 * @param {object} data
+	 */
+	initSubfilter(data) {
+		this.emptySubfilter();
+
+		Object.keys(data)
+			.filter(key => key.substr(0, 10) === 'subfilter_' && Object.keys(data[key]).length)
+			.forEach(key => {
+				if (Array.isArray(data[key])) {
+					data[key].forEach(value => {
+						this.setSubfilter(key + '[]', value);
+					});
+				}
+				else {
+					Object.keys(data[key]).forEach(group => {
+						data[key][group].forEach(value => {
+							this.setSubfilter(key + '[' + group + '][]', value);
+						});
+					});
+				}
+			});
 	}
 
 	/**
 	 * Keep filter tab results request parameters.
 	 */
 	updateApplyUrl() {
+		console.log('updateApplyUrl');
 		this._apply_url = (this.getFilterParams()).toString();
 	}
 
@@ -418,10 +556,11 @@ class CTabFilterItem extends CBaseComponent {
 	 * Request filter results for fields defined before last 'Apply' being used.
 	 */
 	setBrowserLocationToApplyUrl() {
+		console.log('setBrowserLocationToApplyUrl');
 		if (this._apply_url === null) {
 			this.updateApplyUrl();
 		}
-
+		//console.log(this._apply_url);
 		this.setBrowserLocation(new URLSearchParams(this._apply_url));
 	}
 
@@ -481,74 +620,6 @@ class CTabFilterItem extends CBaseComponent {
 		if (this._src_url === null) {
 			this.resetUnsavedState();
 		}
-	}
-
-	/**
-	 * Unset opened subfilter parameters.
-	 */
-	emptySubfilter() {
-		this._subfilter = new FormData();
-	}
-
-	/**
-	 * Set new subfilter field.
-	 *
-	 * @param {string} key
-	 * @param {string} value
-	 */
-	setSubfilter(key, value) {
-		value = String(value);
-
-		if (!this._subfilter.has(key) || this._subfilter.getAll(key).indexOf(value) == -1) {
-			this._subfilter.append(key, value);
-		}
-	}
-
-	/**
-	 * Remove some of existing subfilter field.
-	 *
-	 * @param {string} key
-	 * @param {string} value
-	 */
-	unsetSubfilter(key, value) {
-		value = String(value);
-
-		if (this._subfilter.has(key)) {
-			const existing = this._subfilter.getAll(key);
-			this._subfilter.delete(key);
-
-			existing
-				.filter(val => val !== value)
-				.forEach(val => {
-					this._subfilter.append(key, val);
-				});
-		}
-	}
-
-	/**
-	 * Init subfilter parameters from tabfilter options.
-	 *
-	 * @param {object} data
-	 */
-	initSubfilter(data) {
-		this.emptySubfilter();
-
-		Object.keys(data)
-			.filter(key => key.substr(0, 10) === 'subfilter_' && Object.keys(data[key]).length)
-			.forEach(key => {
-				if (Array.isArray(data[key])) {
-					data[key].forEach(value => {
-						this.setSubfilter(key + '[]', value);
-					});
-				}
-				else {
-					Object.keys(data[key]).forEach(group => {
-						data[key][group].forEach(value => {
-							this.setSubfilter(key + '[' + group + '][]', value);
-						});
-					});
-				}
-			});
 	}
 
 	registerEvents() {

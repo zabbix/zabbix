@@ -165,11 +165,16 @@ class CControllerLatestView extends CControllerLatest {
 			'show_tags' => $filter['show_tags'],
 			'tag_name_format' => $filter['tag_name_format'],
 			'tag_priority' => $filter['tag_priority'],
+			'subfilter_hostids' => $filter['subfilter_hostids'],
+			'subfilter_tagnames' => $filter['subfilter_tagnames'],
+			'subfilter_tags' => $filter['tags'],
+			'subfilter_data' => $filter['subfilter_data'],
 			'sort' => $sort_field,
 			'sortorder' => $sort_order,
 			'page' => $this->hasInput('page') ? $this->getInput('page') : null
 		]);
-
+//sdii($filter);
+//sdii($refresh_data);exit;
 		// display
 		$data = [
 			'refresh_url' => $refresh_curl->getUrl(),
