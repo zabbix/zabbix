@@ -745,6 +745,20 @@ class CSetupWizard extends CForm {
 	}
 
 	private function stageInstall(): array {
+		/*
+		 * Having non-super-admin authenticated at this step means:
+		 *   - Either the config file has been manually created by the user.
+		 *   - Or dealing with a spoofed session cookie.
+		 *
+		 * Since it is not possible to distinguish between the two, it's also impossible to validate the config file
+		 * and display any discrepancies with the configuration stored within the session.
+		 */
+		if (CWebUser::$data && CWebUser::getType() < USER_TYPE_SUPER_ADMIN) {
+			CSessionHelper::clear();
+
+			return $this->stageInstalled();
+		}
+
 		$vault_config = [
 			'VAULT_URL' => '',
 			'VAULT_DB_PATH' => '',
@@ -857,21 +871,29 @@ class CSetupWizard extends CForm {
 					new CTag('li', true, _s('Save it as "%1$s"', $config_file_name))
 				])
 			];
-		}
-		else {
-			$this->disable_cancel_button = true;
-			$this->disable_back_button = true;
 
-			// Clear session after success install.
-			CSessionHelper::clear();
-
-			$message_box = null;
-			$message = [
-				(new CTag('h1', true, _('Congratulations! You have successfully installed Zabbix frontend.')))
-					->addClass(ZBX_STYLE_GREEN),
-				new CTag('p', true, _s('Configuration file "%1$s" created.', $config_file_name))
+			return [
+				new CTag('h1', true, _('Install')),
+				(new CDiv([$message_box, $message]))->addClass(ZBX_STYLE_SETUP_RIGHT_BODY)
 			];
 		}
+
+		// Clear session after success install.
+		CSessionHelper::clear();
+
+		return $this->stageInstalled();
+	}
+
+	private function stageInstalled() {
+		$this->disable_cancel_button = true;
+		$this->disable_back_button = true;
+
+		$message_box = null;
+		$message = [
+			(new CTag('h1', true, _('Congratulations! You have successfully installed Zabbix frontend.')))
+				->addClass(ZBX_STYLE_GREEN),
+			new CTag('p', true, _s('Configuration file created.'))
+		];
 
 		return [
 			new CTag('h1', true, _('Install')),

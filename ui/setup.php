@@ -69,18 +69,18 @@ $fields = [
 	'back' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,				null]
 ];
 
-CSessionHelper::set('check_fields_result', check_fields($fields, false));
-if (!CSessionHelper::has('step')) {
-	CSessionHelper::set('step', CSetupWizard::STAGE_WELCOME);
+$check_fields_result = check_fields($fields, false);
+
+if (CWebUser::$data && CWebUser::getType() < USER_TYPE_SUPER_ADMIN
+		&& CSessionHelper::get('step') != CSetupWizard::STAGE_INSTALL) {
+	access_deny(ACCESS_DENY_PAGE);
 }
 
 if (hasRequest('cancel') || hasRequest('finish')) {
 	redirect('index.php');
 }
 
-if (CWebUser::$data && CWebUser::getType() < USER_TYPE_SUPER_ADMIN) {
-	access_deny(ACCESS_DENY_PAGE);
-}
+CSessionHelper::set('check_fields_result', $check_fields_result);
 
 // Set default language.
 $default_lang = ZBX_DEFAULT_LANG;
