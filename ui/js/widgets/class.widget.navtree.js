@@ -897,7 +897,7 @@ class CWidgetNavTree extends CWidget {
 												jQuery('> .tree-row > .content > .item-name', $row)
 													.empty()
 													.attr('title', resp['name'])
-													.append(jQuery('<span/>').text(resp.name));
+													.append(jQuery('<span>').text(resp.name));
 												$row.toggleClass('no-map', resp.sysmapid == 0);
 											}
 											else {

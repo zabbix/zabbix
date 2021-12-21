@@ -451,6 +451,7 @@ zbx_graph_yaxis_types_t;
 #define ZBX_HA_STATUS			"ha_status"
 #define ZBX_HA_REMOVE_NODE		"ha_remove_node"
 #define ZBX_HA_SET_FAILOVER_DELAY	"ha_set_failover_delay"
+#define ZBX_USER_PARAMETERS_RELOAD	"userparameter_reload"
 
 /* value for not supported items */
 #define ZBX_NOTSUPPORTED	"ZBX_NOTSUPPORTED"
@@ -719,6 +720,10 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 /* action escalation processing mode */
 #define ACTION_PAUSE_SUPPRESSED_FALSE	0	/* process escalation for suppressed events */
 #define ACTION_PAUSE_SUPPRESSED_TRUE	1	/* pause escalation for suppressed events */
+
+/* action escalation canceled notification mode */
+#define ACTION_NOTIFY_IF_CANCELED_TRUE	1	/* notify about canceled escalations for action (default) */
+#define ACTION_NOTIFY_IF_CANCELED_FALSE	0	/* do not notify about canceled escalations for action */
 
 /* max number of retries for alerts */
 #define ALERT_MAX_RETRIES	3
@@ -989,6 +994,7 @@ zbx_task_t;
 #define ZBX_RTC_HA_STATUS			14
 #define ZBX_RTC_HA_REMOVE_NODE			15
 #define ZBX_RTC_HA_SET_FAILOVER_DELAY		16
+#define ZBX_RTC_USER_PARAMETERS_RELOAD		17
 
 typedef enum
 {
@@ -1152,7 +1158,7 @@ int	str_n_in_list(const char *list, const char *value, size_t len, char delimite
 char	*str_linefeed(const char *src, size_t maxline, const char *delim);
 void	zbx_strarr_init(char ***arr);
 void	zbx_strarr_add(char ***arr, const char *entry);
-void	zbx_strarr_free(char **arr);
+void	zbx_strarr_free(char ***arr);
 
 #if defined(__GNUC__) || defined(__clang__)
 #	define __zbx_attr_format_printf(idx1, idx2) __attribute__((__format__(__printf__, (idx1), (idx2))))
@@ -1189,6 +1195,7 @@ void	zbx_setproctitle(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 double		zbx_time(void);
 void		zbx_timespec(zbx_timespec_t *ts);
 double		zbx_current_time(void);
+int		zbx_is_leap_year(int year);
 void		zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz);
 long		zbx_get_timezone_offset(time_t t, struct tm *tm);
 struct tm	*zbx_localtime(const time_t *time, const char *tz);
@@ -1683,7 +1690,7 @@ char	*zbx_create_token(zbx_uint64_t seed);
 #define ZBX_PROBLEM_SUPPRESSED_TRUE	1
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
-#define ZBX_PCRE_RECURSION_LIMIT	2000	/* assume ~1 MB stack and ~500 bytes per recursion */
+#define ZBX_REGEXP_RECURSION_LIMIT	2000	/* assume ~1 MB stack and ~500 bytes per recursion */
 #endif
 
 int	zbx_str_extract(const char *text, size_t len, char **value);
@@ -1698,6 +1705,7 @@ typedef enum
 	ZBX_TIME_UNIT_WEEK,
 	ZBX_TIME_UNIT_MONTH,
 	ZBX_TIME_UNIT_YEAR,
+	ZBX_TIME_UNIT_ISOYEAR,
 	ZBX_TIME_UNIT_COUNT
 }
 zbx_time_unit_t;
@@ -1709,6 +1717,8 @@ void	zbx_tm_round_up(struct tm *tm, zbx_time_unit_t base);
 void	zbx_tm_round_down(struct tm *tm, zbx_time_unit_t base);
 
 const char	*zbx_timespec_str(const zbx_timespec_t *ts);
+
+int	zbx_get_week_number(const struct tm *tm);
 
 zbx_time_unit_t	zbx_tm_str_to_unit(const char *text);
 int	zbx_tm_parse_period(const char *period, size_t *len, int *multiplier, zbx_time_unit_t *base, char **error);
@@ -1780,4 +1790,6 @@ typedef enum
 }
 zbx_err_codes_t;
 
+void	zbx_md5buf2str(const md5_byte_t *md5, char *str);
+int	zbx_hex2bin(const unsigned char *p_hex, unsigned char *buf, int buf_len);
 #endif

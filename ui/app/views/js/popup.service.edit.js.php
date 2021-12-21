@@ -59,7 +59,6 @@ window.service_edit_popup = {
 		this.overlay = overlays_stack.getById('service_edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
-		this.header = this.overlay.$dialogue.$header[0];
 		this.footer = this.overlay.$dialogue.$footer[0];
 
 		for (const status_rule of status_rules) {
@@ -215,7 +214,7 @@ window.service_edit_popup = {
 					<input type="hidden" id="times_#{row_index}_note" name="times[#{row_index}][note]" value="#{note}">
 				</td>
 				<td>#{from} - #{till}</td>
-				<td class="wordwrap" style="max-width: 540px;"></td>
+				<td class="wordwrap" style="max-width: 540px;">#{note}</td>
 				<td>
 					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
 						<li>
@@ -554,7 +553,8 @@ window.service_edit_popup = {
 
 		this.removeAllChildren();
 
-		this.header.textContent = dialog_title;
+		this.overlay.setProperties({title: dialog_title});
+		this.overlay.unsetLoading();
 
 		for (const element of this.footer.querySelectorAll('.js-update, .js-clone')) {
 			element.classList.add('<?= ZBX_STYLE_DISPLAY_NONE ?>');

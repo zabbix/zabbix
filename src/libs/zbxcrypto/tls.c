@@ -979,58 +979,6 @@ void	zbx_tls_validate_config(void)
 	}
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: zbx_psk_hex2bin                                                  *
- *                                                                            *
- * Purpose:                                                                   *
- *     convert a pre-shared key from a textual representation (ASCII hex      *
- *     digit string) to a binary representation (byte string)                 *
- *                                                                            *
- * Parameters:                                                                *
- *     p_hex   - [IN] null-terminated input PSK hex-string                    *
- *     buf     - [OUT] output buffer                                          *
- *     buf_len - [IN] output buffer size                                      *
- *                                                                            *
- * Return value:                                                              *
- *     Number of PSK bytes written into 'buf' on successful conversion.       *
- *     -1 - an error occurred.                                                *
- *                                                                            *
- * Comments:                                                                  *
- *     In case of error incomplete useless data may be written into 'buf'.    *
- *                                                                            *
- ******************************************************************************/
-static int	zbx_psk_hex2bin(const unsigned char *p_hex, unsigned char *buf, int buf_len)
-{
-	unsigned char	*q, hi, lo;
-	int		len = 0;
-
-	q = buf;
-
-	while ('\0' != *p_hex)
-	{
-		if (0 != isxdigit(*p_hex) && 0 != isxdigit(*(p_hex + 1)) && buf_len > len)
-		{
-			hi = *p_hex & 0x0f;
-
-			if ('9' < *p_hex++)
-				hi += 9u;
-
-			lo = *p_hex & 0x0f;
-
-			if ('9' < *p_hex++)
-				lo += 9u;
-
-			*q++ = hi << 4 | lo;
-			len++;
-		}
-		else
-			return -1;
-	}
-
-	return len;
-}
-
 static void	zbx_psk_warn_misconfig(const char *psk_identity)
 {
 	zabbix_log(LOG_LEVEL_WARNING, "same PSK identity \"%s\" but different PSK values used in proxy configuration"
@@ -1079,7 +1027,7 @@ static int	zbx_psk_cb(gnutls_session_t session, const char *psk_identity, gnutls
 		if (0 < find_psk_in_cache((const unsigned char *)psk_identity, tls_psk_hex, &psk_usage))
 		{
 			/* The PSK is in configuration cache. Convert PSK to binary form. */
-			if (0 >= (psk_bin_len = zbx_psk_hex2bin(tls_psk_hex, psk_buf, sizeof(psk_buf))))
+			if (0 >= (psk_bin_len = zbx_hex2bin(tls_psk_hex, psk_buf, sizeof(psk_buf))))
 			{
 				/* this should have been prevented by validation in frontend or API */
 				zabbix_log(LOG_LEVEL_WARNING, "cannot convert PSK to binary form for PSK identity"
@@ -1250,7 +1198,7 @@ static unsigned int	zbx_psk_server_cb(SSL *ssl, const char *identity, unsigned c
 		if (0 < find_psk_in_cache((const unsigned char *)identity, tls_psk_hex, &psk_usage))
 		{
 			/* The PSK is in configuration cache. Convert PSK to binary form. */
-			if (0 >= (psk_bin_len = zbx_psk_hex2bin(tls_psk_hex, psk_buf, sizeof(psk_buf))))
+			if (0 >= (psk_bin_len = zbx_hex2bin(tls_psk_hex, psk_buf, sizeof(psk_buf))))
 			{
 				/* this should have been prevented by validation in frontend or API */
 				zabbix_log(LOG_LEVEL_WARNING, "cannot convert PSK to binary form for PSK identity"
@@ -1403,7 +1351,7 @@ static void	zbx_read_psk_file(void)
 		goto out;
 	}
 
-	if (0 >= (len_bin = zbx_psk_hex2bin((unsigned char *)buf, (unsigned char *)buf_bin, sizeof(buf_bin))))
+	if (0 >= (len_bin = zbx_hex2bin((unsigned char *)buf, (unsigned char *)buf_bin, sizeof(buf_bin))))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid PSK in file \"%s\"", CONFIG_TLS_PSK_FILE);
 		goto out;
@@ -3381,7 +3329,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 			int		psk_len;
 			unsigned char	psk_buf[HOST_TLS_PSK_LEN / 2];
 
-			if (0 >= (psk_len = zbx_psk_hex2bin((const unsigned char *)tls_arg2, psk_buf, sizeof(psk_buf))))
+			if (0 >= (psk_len = zbx_hex2bin((const unsigned char *)tls_arg2, psk_buf, sizeof(psk_buf))))
 			{
 				*error = zbx_strdup(*error, "invalid PSK");
 				goto out;
@@ -3623,7 +3571,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 
 			int	psk_len;
 
-			if (0 >= (psk_len = zbx_psk_hex2bin((const unsigned char *)tls_arg2, (unsigned char *)psk_buf,
+			if (0 >= (psk_len = zbx_hex2bin((const unsigned char *)tls_arg2, (unsigned char *)psk_buf,
 					sizeof(psk_buf))))
 			{
 				*error = zbx_strdup(*error, "invalid PSK");

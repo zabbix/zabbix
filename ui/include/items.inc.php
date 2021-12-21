@@ -1465,7 +1465,7 @@ function getItemFunctionalValue($item, $function, $parameter) {
 		return UNRESOLVED_MACRO_STRING;
 	}
 
-	$number_parser = new CNumberParser(['with_suffix' => true]);
+	$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
 
 	if ($number_parser->parse($parameter) != CParser::PARSE_SUCCESS) {
 		return UNRESOLVED_MACRO_STRING;
@@ -2118,4 +2118,88 @@ function validateDelay(CUpdateIntervalParser $parser, $field_name, $value, &$err
 	}
 
 	return true;
+}
+
+/**
+ * Normalizes item preprocessing step parameters after item preprocessing form submit.
+ *
+ * @param array $preprocessing  Array of item preprocessing steps, as received from form submit.
+ *
+ * @return array
+ */
+function normalizeItemPreprocessingSteps(array $preprocessing): array {
+	foreach ($preprocessing as &$step) {
+		switch ($step['type']) {
+			case ZBX_PREPROC_MULTIPLIER:
+			case ZBX_PREPROC_PROMETHEUS_TO_JSON:
+				$step['params'] = trim($step['params'][0]);
+				break;
+
+			case ZBX_PREPROC_RTRIM:
+			case ZBX_PREPROC_LTRIM:
+			case ZBX_PREPROC_TRIM:
+			case ZBX_PREPROC_XPATH:
+			case ZBX_PREPROC_JSONPATH:
+			case ZBX_PREPROC_VALIDATE_REGEX:
+			case ZBX_PREPROC_VALIDATE_NOT_REGEX:
+			case ZBX_PREPROC_ERROR_FIELD_JSON:
+			case ZBX_PREPROC_ERROR_FIELD_XML:
+			case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
+			case ZBX_PREPROC_SCRIPT:
+				$step['params'] = $step['params'][0];
+				break;
+
+			case ZBX_PREPROC_VALIDATE_RANGE:
+				foreach ($step['params'] as &$param) {
+					$param = trim($param);
+				}
+				unset($param);
+
+				$step['params'] = implode("\n", $step['params']);
+				break;
+
+			case ZBX_PREPROC_PROMETHEUS_PATTERN:
+				foreach ($step['params'] as &$param) {
+					$param = trim($param);
+				}
+				unset($param);
+
+				if (in_array($step['params'][1], [ZBX_PREPROC_PROMETHEUS_SUM, ZBX_PREPROC_PROMETHEUS_MIN,
+						ZBX_PREPROC_PROMETHEUS_MAX, ZBX_PREPROC_PROMETHEUS_AVG, ZBX_PREPROC_PROMETHEUS_COUNT])) {
+					$step['params'][2] = $step['params'][1];
+					$step['params'][1] = ZBX_PREPROC_PROMETHEUS_FUNCTION;
+				}
+
+				if (!array_key_exists(2, $step['params'])) {
+					$step['params'][2] = '';
+				}
+
+				$step['params'] = implode("\n", $step['params']);
+				break;
+
+			case ZBX_PREPROC_REGSUB:
+			case ZBX_PREPROC_ERROR_FIELD_REGEX:
+			case ZBX_PREPROC_STR_REPLACE:
+				$step['params'] = implode("\n", $step['params']);
+				break;
+
+			case ZBX_PREPROC_CSV_TO_JSON:
+				if (!array_key_exists(2, $step['params'])) {
+					$step['params'][2] = ZBX_PREPROC_CSV_NO_HEADER;
+				}
+				$step['params'] = implode("\n", $step['params']);
+				break;
+
+			default:
+				$step['params'] = '';
+		}
+
+		$step += [
+			'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+			'error_handler_params' => ''
+		];
+	}
+	unset($step);
+
+	return $preprocessing;
 }

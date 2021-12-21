@@ -534,6 +534,8 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 				*error = zbx_strdup(*error, "undefined return value");
 		}
 	}
+	else
+		ret = SUCCEED;
 
 	duk_pop(es->env->ctx);
 	es->env->rt_error_num = 0;

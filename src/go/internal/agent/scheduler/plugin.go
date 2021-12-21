@@ -39,6 +39,8 @@ type pluginAgent struct {
 	index int
 	// refcount us used to track plugin usage by clients
 	refcount int
+	// usrprm is used to indicate that plugin is user parameter
+	usrprm bool
 }
 
 // peekTask() returns next task in the queue without removing it from queue or nil
@@ -50,7 +52,7 @@ func (p *pluginAgent) peekTask() performer {
 	return p.tasks[0]
 }
 
-// peekTask() returns next task in the queue and removes it from queue.
+// popTask() returns next task in the queue and removes it from queue.
 // nil is returned for empty queues.
 func (p *pluginAgent) popTask() performer {
 	if len(p.tasks) == 0 {

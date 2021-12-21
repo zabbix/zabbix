@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[6.0.0alpha7])
+AC_INIT([Zabbix],[6.0.0beta2])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects filename-length-max=99])
 
@@ -1870,20 +1870,46 @@ SENDER_LIBS="$SENDER_LIBS $ZLIB_LIBS $LIBPTHREAD_LIBS"
 ZBXJS_LDFLAGS="$ZBXJS_LDFLAGS $LIBCURL_LDFLAGS"
 ZBXJS_LIBS="$ZBXJS_LIBS $LIBCURL_LIBS"
 
-dnl Check for libpcre, used by Zabbix for regular expressions
 if test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes" || test "x$agent2" = "xyes"; then
-	LIBPCRE_CHECK_CONFIG([no])
+dnl Check for libpcre or libpcre2, used by Zabbix for regular expressions
+dnl Must check for both pcre and pcre2 to check if both were selected by the user and produce an error in that case
+LIBPCRE_CHECK_CONFIG([no])
+if test "x$enable_static_libs" != "xyes" || test "x$found_libpcre" != "xyes"; then
+LIBPCRE2_CHECK_CONFIG([no])
+fi
+if test "x$want_libpcre2" = "xyes"; then
+	if test "x$want_libpcre" = "xyes"; then
+		AC_MSG_ERROR([Cannot use both pcre and pcre2 at the same time!])
+	fi
+
+	if test "x$found_libpcre2" != "xyes"; then
+		AC_MSG_ERROR([Unable to use libpcre2 (libpcre2 check failed)])
+	fi
+
+	CFLAGS="$CFLAGS $LIBPCRE2_CFLAGS"
+	LDFLAGS="$LDFLAGS $LIBPCRE2_LDFLAGS"
+	if test "x$ARCH" = "xosx"; then
+		LIBS="$LIBPCRE2_LIBS $LIBS"
+	else
+		LIBS="$LIBS $LIBPCRE2_LIBS"
+	fi
+
+	AC_DEFINE([HAVE_PCRE2_H], 1, [Define to 1 if you have the 'libpcre2' library (-lpcre2-8)])
+else
 	if test "x$found_libpcre" != "xyes"; then
 		AC_MSG_ERROR([Unable to use libpcre (libpcre check failed)])
 	fi
-fi
 
-CFLAGS="$CFLAGS $LIBPCRE_CFLAGS"
-LDFLAGS="$LDFLAGS $LIBPCRE_LDFLAGS"
-if test "x$ARCH" = "xosx"; then
-	LIBS="$LIBPCRE_LIBS $LIBS"
-else
-	LIBS="$LIBS $LIBPCRE_LIBS"
+	CFLAGS="$CFLAGS $LIBPCRE_CFLAGS"
+	LDFLAGS="$LDFLAGS $LIBPCRE_LDFLAGS"
+	if test "x$ARCH" = "xosx"; then
+		LIBS="$LIBPCRE_LIBS $LIBS"
+	else
+		LIBS="$LIBS $LIBPCRE_LIBS"
+	fi
+
+	AC_DEFINE([HAVE_PCRE_H], 1, [Define to 1 if you have the 'libpcre' library (-lpcre)])
+fi
 fi
 
 found_iconv="no"

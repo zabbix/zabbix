@@ -171,7 +171,7 @@ class testFormTags extends CWebTest {
 							'value' => 'value1'
 						]
 					],
-					'host_and_template_error_details' => 'Invalid parameter "/tags/1/tag": cannot be empty.',
+					'host_error_details' => 'Invalid parameter "/tags/1/tag": cannot be empty.',
 					'error_details' => 'Invalid parameter "/1/tags/1/tag": cannot be empty.'
 				]
 			],
@@ -191,7 +191,7 @@ class testFormTags extends CWebTest {
 							'value' => 'value'
 						]
 					],
-					'host_and_template_error_details' => 'Invalid parameter "/tags/2": value (tag, value)=(tag, value) already exists.',
+					'host_error_details' => 'Invalid parameter "/tags/2": value (tag, value)=(tag, value) already exists.',
 					'error_details' => 'Invalid parameter "/1/tags/2": value (tag, value)=(tag, value) already exists.'
 				]
 			],
@@ -286,7 +286,6 @@ class testFormTags extends CWebTest {
 		if ($object === 'host prototype') {
 			$data['name'] = $data['name'].' {#KEY}';
 			$form->fill(['Host name' => $data['name']]);
-			$form->selectTab('Groups');
 			$form->fill(['Groups' => 'Zabbix servers']);
 		}
 		elseif ($object === 'web scenario') {
@@ -335,7 +334,7 @@ class testFormTags extends CWebTest {
 							'value' => 'value1'
 						]
 					],
-					'host_and_template_error_details' => 'Invalid parameter "/tags/1/tag": cannot be empty.',
+					'host_error_details' => 'Invalid parameter "/tags/1/tag": cannot be empty.',
 					'error_details'=>'Invalid parameter "/1/tags/1/tag": cannot be empty.'
 				]
 			],
@@ -350,7 +349,7 @@ class testFormTags extends CWebTest {
 							'value' => 'update'
 						]
 					],
-					'host_and_template_error_details' => 'Invalid parameter "/tags/2": value (tag, value)=(action, update) already exists.',
+					'host_error_details' => 'Invalid parameter "/tags/2": value (tag, value)=(action, update) already exists.',
 					'error_details' => 'Invalid parameter "/1/tags/2": value (tag, value)=(action, update) already exists.'
 				]
 			],
@@ -365,7 +364,7 @@ class testFormTags extends CWebTest {
 							'value' => ''
 						]
 					],
-					'host_and_template_error_details' => 'Invalid parameter "/tags/3": value (tag, value)=(tag without value, ) already exists.',
+					'host_error_details' => 'Invalid parameter "/tags/3": value (tag, value)=(tag without value, ) already exists.',
 					'error_details' => 'Invalid parameter "/1/tags/3": value (tag, value)=(tag without value, ) already exists.'
 				]
 			],
@@ -502,8 +501,8 @@ class testFormTags extends CWebTest {
 	 */
 	private function checkResult($data, $object, $form, $action, $sql = null, $old_hash = null) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$error_details = ($object === 'host' || $object === 'template')
-					? CTestArrayHelper::get($data, 'host_and_template_error_details')
+			$error_details = ($object === 'host')
+					? CTestArrayHelper::get($data, 'host_error_details')
 					: CTestArrayHelper::get($data, 'error_details');
 			$title = ($action === 'add') ? 'Cannot add '.$object : 'Cannot update '.$object;
 
