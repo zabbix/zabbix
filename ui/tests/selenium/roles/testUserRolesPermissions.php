@@ -1333,7 +1333,7 @@ class testUserRolesPermissions extends CWebTest {
 	}
 
 	/**
-	 * Function checks permissions to services based on user role configuration.
+	 * Check permissions to services based on user role configuration.
 	 *
 	 * @dataProvider getRoleServiceData
 	 */
